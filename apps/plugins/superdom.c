@@ -118,8 +118,8 @@ char buf[255];
 #define SUPERDOM_RIGHT BUTTON_RIGHT
 #define SUPERDOM_CANCEL (BUTTON_HOME|BUTTON_REPEAT)
 
-#elif CONFIG_KEYPAD == GIGABEAT_S_PAD || \
-      CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
+#elif CONFIG_KEYPAD == GIGABEAT_S_PAD ||        \
+    CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
 #define SUPERDOM_OK BUTTON_SELECT
 #define SUPERDOM_UP BUTTON_UP
 #define SUPERDOM_DOWN BUTTON_DOWN
@@ -165,8 +165,8 @@ char buf[255];
 #elif (CONFIG_KEYPAD == ONDAVX747_PAD) || (CONFIG_KEYPAD == MROBE500_PAD)
 #define SUPERDOM_CANCEL BUTTON_POWER
 
-#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
-      (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
+#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) ||   \
+    (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
 #define SUPERDOM_OK     BUTTON_PLAY
 #define SUPERDOM_UP     BUTTON_UP
 #define SUPERDOM_DOWN   BUTTON_DOWN
@@ -222,7 +222,7 @@ char buf[255];
 #define SUPERDOM_RIGHT BUTTON_RIGHT
 #define SUPERDOM_CANCEL BUTTON_POWER
 
-#elif (CONFIG_KEYPAD == HM60X_PAD) || \
+#elif (CONFIG_KEYPAD == HM60X_PAD) ||           \
     (CONFIG_KEYPAD == HM801_PAD)
 #define SUPERDOM_OK BUTTON_SELECT
 #define SUPERDOM_UP BUTTON_UP
@@ -375,73 +375,73 @@ void draw_board(void) {
             } else {
                 rb->lcd_set_foreground(LCD_LIGHTGRAY);
             }
-            rb->lcd_fillrect(MARGIN+(BOX_WIDTH*(i-1)), 
-                            MARGIN+(BOX_HEIGHT*(j-1)), BOX_WIDTH, 
-                            BOX_HEIGHT);
+            rb->lcd_fillrect(MARGIN+(BOX_WIDTH*(i-1)),
+                             MARGIN+(BOX_HEIGHT*(j-1)), BOX_WIDTH,
+                             BOX_HEIGHT);
 #if LCD_DEPTH != 16
-            rb->lcd_set_drawmode(DRMODE_BG | DRMODE_INVERSEVID); 
+            rb->lcd_set_drawmode(DRMODE_BG | DRMODE_INVERSEVID);
 #endif
             if(board[i][j].ind) {
                 MY_BITMAP_PART(superdom_boarditems,
-                                board[i][j].colour?ICON_WIDTH:0, 0, ICON_STRIDE, 
+                               board[i][j].colour?ICON_WIDTH:0, 0, ICON_STRIDE,
 #if LCD_WIDTH > LCD_HEIGHT
-                                MARGIN+(BOX_WIDTH*(i-1))+1, 
-                                MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1, 
+                               MARGIN+(BOX_WIDTH*(i-1))+1,
+                               MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1,
 #else
-                                MARGIN+(BOX_WIDTH*(i-1))+1+ICON_WIDTH,
-                                MARGIN+(BOX_HEIGHT*(j-1))+1,
+                               MARGIN+(BOX_WIDTH*(i-1))+1+ICON_WIDTH,
+                               MARGIN+(BOX_HEIGHT*(j-1))+1,
 #endif
-                                ICON_WIDTH, ICON_HEIGHT);
+                               ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].farm) {
                 MY_BITMAP_PART(superdom_boarditems,
-                                board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT, 
-                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1, 
-                                MARGIN+(BOX_HEIGHT*(j-1))+1, 
-                                ICON_WIDTH, ICON_HEIGHT);
+                               board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT,
+                               ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1,
+                               MARGIN+(BOX_HEIGHT*(j-1))+1,
+                               ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].tank) {
                 MY_BITMAP_PART(superdom_boarditems,
-                                board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*2,
-                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1, 
-                                MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1, 
-                                ICON_WIDTH, ICON_HEIGHT);
+                               board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*2,
+                               ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
+                               MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1,
+                               ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].men) {
                 MY_BITMAP_PART(superdom_boarditems,
-                                board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*3,
+                               board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*3,
 #if LCD_WIDTH > LCD_HEIGHT
-                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
-                                MARGIN+(BOX_HEIGHT*(j-1))+1, 
+                               ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
+                               MARGIN+(BOX_HEIGHT*(j-1))+1,
 #else
-                                ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1,
-                                MARGIN+(BOX_HEIGHT*(j-1))+1+ICON_HEIGHT,
+                               ICON_STRIDE, MARGIN+(BOX_WIDTH*(i-1))+1,
+                               MARGIN+(BOX_HEIGHT*(j-1))+1+ICON_HEIGHT,
 #endif
-                                ICON_WIDTH, ICON_HEIGHT);
+                               ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].plane) {
                 MY_BITMAP_PART(superdom_boarditems,
-                                board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*4,
+                               board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*4,
 #if LCD_WIDTH > LCD_HEIGHT
-                                ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH*2+1,
-                                MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1,
+                               ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH*2+1,
+                               MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT+1,
 #else
-                                ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
-                                MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT*2+1,
+                               ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH+1,
+                               MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT*2+1,
 #endif
-                                ICON_WIDTH, ICON_HEIGHT);
+                               ICON_WIDTH, ICON_HEIGHT);
             }
             if(board[i][j].nuke) {
                 MY_BITMAP_PART(superdom_boarditems,
-                                board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*5,
+                               board[i][j].colour?ICON_WIDTH:0, ICON_HEIGHT*5,
 #if LCD_WIDTH > LCD_HEIGHT
-                                ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH*2+1,
-                                MARGIN+(BOX_HEIGHT*(j-1))+1, 
+                               ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+ICON_WIDTH*2+1,
+                               MARGIN+(BOX_HEIGHT*(j-1))+1,
 #else
-                                ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+1,
-                                MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT*2+1,
+                               ICON_STRIDE,MARGIN+(BOX_WIDTH*(i-1))+1,
+                               MARGIN+(BOX_HEIGHT*(j-1))+ICON_HEIGHT*2+1,
 #endif
-                                ICON_WIDTH, ICON_HEIGHT);
+                               ICON_WIDTH, ICON_HEIGHT);
             }
 #if LCD_DEPTH != 16
             rb->lcd_set_drawmode(DRMODE_SOLID);
@@ -489,8 +489,8 @@ void gen_interest(void) {
 
 void draw_cursor(void) {
     rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_fillrect(MARGIN+((cursor.x-1)*BOX_WIDTH), 
-                  MARGIN+((cursor.y-1)*BOX_HEIGHT), BOX_WIDTH+1, BOX_HEIGHT+1);
+    rb->lcd_fillrect(MARGIN+((cursor.x-1)*BOX_WIDTH),
+                     MARGIN+((cursor.y-1)*BOX_HEIGHT), BOX_WIDTH+1, BOX_HEIGHT+1);
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_update();
 }
@@ -504,58 +504,58 @@ void gen_resources(void) {
     gen_interest();
     rb->srand(*rb->current_tick);
     /* Generate Human's resources */
-        for(i=0;i<humanres.inds;i++) {
-            inccash += (300+rb->rand()%200);
-        }
-        for(i=0;i<humanres.farms;i++) {
-            incfood += (200+rb->rand()%200);
-        }
-        if(humanres.inds)
-            ratecash = inccash/humanres.inds;
-        if(humanres.farms)
-            ratefood = incfood/humanres.farms;
-        if(ratecash > 450) {
-            if(ratefood > 350) {
-                rb->splash(HZ*2, "Patriotism sweeps the land, all production" 
-                                " is up this year!");
-            } else {
-                rb->splash(HZ*2, "Factories working at maximum efficiency," 
-                                " cash production up this year!");
-            }
-        } else if(ratecash > 350) {
-            if(ratefood > 350) {
-                rb->splash(HZ*2, "Record crop harvest this year!");
-            } else if(ratefood > 250) {
-                rb->splash(HZ*2, "Production continues as normal");
-            } else {
-                rb->splash(HZ*2, "Spoilage of crops leads to reduced farm" 
-                                " output this  year");
-            }
+    for(i=0;i<humanres.inds;i++) {
+        inccash += (300+rb->rand()%200);
+    }
+    for(i=0;i<humanres.farms;i++) {
+        incfood += (200+rb->rand()%200);
+    }
+    if(humanres.inds)
+        ratecash = inccash/humanres.inds;
+    if(humanres.farms)
+        ratefood = incfood/humanres.farms;
+    if(ratecash > 450) {
+        if(ratefood > 350) {
+            rb->splash(HZ*2, "Patriotism sweeps the land, all production"
+                       " is up this year!");
         } else {
-            if(ratefood > 350) {
-                rb->splash(HZ*2, "Record crop harvest this year!");
-            } else if(ratefood > 250) {
-                rb->splash(HZ*2, "Factory unions introduced. Industrial" 
-                                " production is down this year.");
-            } else {
-                rb->splash(HZ*2, "Internet created. All production is down" 
-                                " due to time wasted.");
-            }
+            rb->splash(HZ*2, "Factories working at maximum efficiency,"
+                       " cash production up this year!");
         }
-        humanres.cash += inccash;
-        humanres.food += incfood;
+    } else if(ratecash > 350) {
+        if(ratefood > 350) {
+            rb->splash(HZ*2, "Record crop harvest this year!");
+        } else if(ratefood > 250) {
+            rb->splash(HZ*2, "Production continues as normal");
+        } else {
+            rb->splash(HZ*2, "Spoilage of crops leads to reduced farm"
+                       " output this  year");
+        }
+    } else {
+        if(ratefood > 350) {
+            rb->splash(HZ*2, "Record crop harvest this year!");
+        } else if(ratefood > 250) {
+            rb->splash(HZ*2, "Factory unions introduced. Industrial"
+                       " production is down this year.");
+        } else {
+            rb->splash(HZ*2, "Internet created. All production is down"
+                       " due to time wasted.");
+        }
+    }
+    humanres.cash += inccash;
+    humanres.food += incfood;
 
     /* Generate Computer's resources */
-        inccash = 0;
-        incfood = 0;
-        for(i=0;i<compres.inds;i++) {
-            inccash += (300+rb->rand()%200);
-        }
-        for(i=0;i<compres.farms;i++) {
-            incfood += (200+rb->rand()%200);
-        }
-        compres.cash += inccash;
-        compres.food += incfood;
+    inccash = 0;
+    incfood = 0;
+    for(i=0;i<compres.inds;i++) {
+        inccash += (300+rb->rand()%200);
+    }
+    for(i=0;i<compres.farms;i++) {
+        incfood += (200+rb->rand()%200);
+    }
+    compres.cash += inccash;
+    compres.food += incfood;
 }
 
 static void update_score(void) {
@@ -575,46 +575,46 @@ static int settings_menu(void) {
     int selection = 0;
 
     MENUITEM_STRINGLIST(menu, "Super Domination Settings", NULL,
-                    "Computer starting farms", "Computer starting factories",
-                    "Human starting farms", "Human starting factories",
-                    "Starting cash", "Starting food", "Moves per turn");
+                        "Computer starting farms", "Computer starting factories",
+                        "Human starting farms", "Human starting factories",
+                        "Starting cash", "Starting food", "Moves per turn");
 
     while(1) {
         switch(rb->do_menu(&menu, &selection, NULL, false)) {
         case 0:
-            rb->set_int("Computer starting farms", "", UNIT_INT, 
-                            &superdom_settings.compstartfarms, NULL, 
-                            1, 0, 5, NULL);
+            rb->set_int("Computer starting farms", "", UNIT_INT,
+                        &superdom_settings.compstartfarms, NULL,
+                        1, 0, 5, NULL);
             break;
         case 1:
-            rb->set_int("Computer starting factories", "", UNIT_INT, 
-                            &superdom_settings.compstartinds, NULL, 
-                            1, 0, 5, NULL);
+            rb->set_int("Computer starting factories", "", UNIT_INT,
+                        &superdom_settings.compstartinds, NULL,
+                        1, 0, 5, NULL);
             break;
         case 2:
-            rb->set_int("Human starting farms", "", UNIT_INT, 
-                            &superdom_settings.humanstartfarms, NULL, 
-                            1, 0, 5, NULL);
+            rb->set_int("Human starting farms", "", UNIT_INT,
+                        &superdom_settings.humanstartfarms, NULL,
+                        1, 0, 5, NULL);
             break;
         case 3:
             rb->set_int("Human starting factories", "", UNIT_INT,
-                            &superdom_settings.humanstartinds, NULL,
-                            1, 0, 5, NULL);
+                        &superdom_settings.humanstartinds, NULL,
+                        1, 0, 5, NULL);
             break;
         case 4:
-            rb->set_int("Starting cash", "", UNIT_INT, 
-                            &superdom_settings.startcash, NULL, 
-                            250, 0, 5000, NULL);
+            rb->set_int("Starting cash", "", UNIT_INT,
+                        &superdom_settings.startcash, NULL,
+                        250, 0, 5000, NULL);
             break;
         case 5:
-            rb->set_int("Starting food", "", UNIT_INT, 
-                            &superdom_settings.startfood, NULL, 
-                            250, 0, 5000, NULL);
+            rb->set_int("Starting food", "", UNIT_INT,
+                        &superdom_settings.startfood, NULL,
+                        250, 0, 5000, NULL);
             break;
         case 6:
-            rb->set_int("Moves per turn", "", UNIT_INT, 
-                            &superdom_settings.movesperturn, NULL,
-                            1, 1, 5, NULL);
+            rb->set_int("Moves per turn", "", UNIT_INT,
+                        &superdom_settings.movesperturn, NULL,
+                        1, 1, 5, NULL);
             break;
         case MENU_ATTACHED_USB:
             return RET_VAL_USB;
@@ -650,29 +650,29 @@ static int start_menu(void) {
     int selection = 0;
 
     MENUITEM_STRINGLIST(menu, "Super Domination Menu", NULL,
-                    "Play Super Domination", "Settings",
-                    "Help", "Playback Control", "Quit");
+                        "Play Super Domination", "Settings",
+                        "Help", "Playback Control", "Quit");
 
     while(1) {
         switch(rb->do_menu(&menu, &selection, NULL, false)) {
-            case 0:
-                return RET_VAL_OK; /* start playing */
-                break;
-            case 1:
-                if(settings_menu()==RET_VAL_USB)
-                    return RET_VAL_USB;
-                break;
-            case 2:
-                if(superdom_help()==RET_VAL_USB)
-                    return RET_VAL_USB;
-                break;
-            case 3:
-                if(playback_control(NULL))
-                    return RET_VAL_USB;
-                break;
-            case 4:
-                return RET_VAL_QUIT_ERR;
-                break;
+        case 0:
+            return RET_VAL_OK; /* start playing */
+            break;
+        case 1:
+            if(settings_menu()==RET_VAL_USB)
+                return RET_VAL_USB;
+            break;
+        case 2:
+            if(superdom_help()==RET_VAL_USB)
+                return RET_VAL_USB;
+            break;
+        case 3:
+            if(playback_control(NULL))
+                return RET_VAL_USB;
+            break;
+        case 4:
+            return RET_VAL_QUIT_ERR;
+            break;
         }
     }
     return RET_VAL_QUIT_ERR;
@@ -731,32 +731,32 @@ static int save_game(void) {
 
 static int ingame_menu(void) {
     MENUITEM_STRINGLIST(menu, "Super Domination Menu", NULL,
-                    "Return to game", "Save Game",
-                    "Playback Control", "Quit");
+                        "Return to game", "Save Game",
+                        "Playback Control", "Quit");
 
     switch(rb->do_menu(&menu, NULL, NULL, false)) {
-        case 0:
-            return RET_VAL_OK;
-            break;
-        case 1:
-            if(!save_game())
-                rb->splash(HZ, "Game saved");
-            else
-                rb->splash(HZ, "Error in save");
-            break;
-        case 2:
-            if(playback_control(NULL))
-                return RET_VAL_USB;
-            break;
-        case 3:
-            return RET_VAL_QUIT_ERR;
-            break;
-        case MENU_ATTACHED_USB:
+    case 0:
+        return RET_VAL_OK;
+        break;
+    case 1:
+        if(!save_game())
+            rb->splash(HZ, "Game saved");
+        else
+            rb->splash(HZ, "Error in save");
+        break;
+    case 2:
+        if(playback_control(NULL))
             return RET_VAL_USB;
-            break;
-        case GO_TO_PREVIOUS:
-            return RET_VAL_OK;
-            break;
+        break;
+    case 3:
+        return RET_VAL_QUIT_ERR;
+        break;
+    case MENU_ATTACHED_USB:
+        return RET_VAL_USB;
+        break;
+    case GO_TO_PREVIOUS:
+        return RET_VAL_OK;
+        break;
     }
     return RET_VAL_OK;
 }
@@ -789,9 +789,9 @@ static int get_number(char* param, int* value, int max) {
         for(j=0;j<3;j++) {
             rb->lcd_getstringsize(button_labels[i][j], &width, &height);
             rb->lcd_putsxy(
-                    NUM_MARGIN_X+(j*NUM_BOX_WIDTH)+NUM_BOX_WIDTH/2-width/2,
-                    NUM_MARGIN_Y+(i*NUM_BOX_HEIGHT)+NUM_BOX_HEIGHT/2-height/2,
-                    button_labels[i][j]);
+                NUM_MARGIN_X+(j*NUM_BOX_WIDTH)+NUM_BOX_WIDTH/2-width/2,
+                NUM_MARGIN_Y+(i*NUM_BOX_HEIGHT)+NUM_BOX_HEIGHT/2-height/2,
+                button_labels[i][j]);
         }
     }
     rb->lcd_putsxyf(NUM_MARGIN_X+10, NUM_MARGIN_Y+4*NUM_BOX_HEIGHT+10,"%d",*value);
@@ -801,113 +801,113 @@ static int get_number(char* param, int* value, int max) {
     else
         rb->lcd_puts_scroll(0, (NUM_MARGIN_Y/height-1)/2, param);
     rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-    rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x), 
-                    NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y), 
-                    NUM_BOX_WIDTH+1, NUM_BOX_HEIGHT+1);
+    rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x),
+                     NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y),
+                     NUM_BOX_WIDTH+1, NUM_BOX_HEIGHT+1);
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_update();
     while(!done) {
         button = rb->button_get(true);
         rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
         rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x),
-                        NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y),
-                        NUM_BOX_WIDTH+1, NUM_BOX_HEIGHT+1);
+                         NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y),
+                         NUM_BOX_WIDTH+1, NUM_BOX_HEIGHT+1);
         rb->lcd_set_drawmode(DRMODE_SOLID);
         switch(button) {
-            case SUPERDOM_OK:
-                if(y!=3) {
-                    *value *= 10;
-                    *value += button_labels[y][x][0] - '0';
-                } else if(x==0) {
-                    *value /= 10;
-                } else if(x==1) {
-                    *value *= 10;
-                } else if(x==2) {
-                    done = true;
-                    break;
-                }
-                if ((unsigned) *value > (unsigned) max)
-                    *value = max;
-                rb->lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
-                rb->lcd_fillrect(0, NUM_MARGIN_Y+4*NUM_BOX_HEIGHT+10,
-                                LCD_WIDTH, 30);
-                rb->lcd_set_drawmode(DRMODE_SOLID);
-                rb->lcd_putsxyf(NUM_MARGIN_X+10,NUM_MARGIN_Y+4*NUM_BOX_HEIGHT+10,
-                               "%d", *value);
-                break;
-            case SUPERDOM_CANCEL:
-                *value = 0;
+        case SUPERDOM_OK:
+            if(y!=3) {
+                *value *= 10;
+                *value += button_labels[y][x][0] - '0';
+            } else if(x==0) {
+                *value /= 10;
+            } else if(x==1) {
+                *value *= 10;
+            } else if(x==2) {
                 done = true;
-                ret = RET_VAL_QUIT_ERR;
                 break;
+            }
+            if ((unsigned) *value > (unsigned) max)
+                *value = max;
+            rb->lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
+            rb->lcd_fillrect(0, NUM_MARGIN_Y+4*NUM_BOX_HEIGHT+10,
+                             LCD_WIDTH, 30);
+            rb->lcd_set_drawmode(DRMODE_SOLID);
+            rb->lcd_putsxyf(NUM_MARGIN_X+10,NUM_MARGIN_Y+4*NUM_BOX_HEIGHT+10,
+                            "%d", *value);
+            break;
+        case SUPERDOM_CANCEL:
+            *value = 0;
+            done = true;
+            ret = RET_VAL_QUIT_ERR;
+            break;
 #if CONFIG_KEYPAD != IRIVER_H10_PAD
-            case SUPERDOM_LEFT:
-                if(x==0) {
+        case SUPERDOM_LEFT:
+            if(x==0) {
 #ifdef IPOD_STYLE
-                    if(y>0)
-                        y--;
-                    else
-                        y=3;
+                if(y>0)
+                    y--;
+                else
+                    y=3;
 #endif
-                    x=2;
-                } else {
-                    x--;
-                }
-                break;
-            case SUPERDOM_RIGHT:
-                if(x==2) {
+                x=2;
+            } else {
+                x--;
+            }
+            break;
+        case SUPERDOM_RIGHT:
+            if(x==2) {
 #ifdef IPOD_STYLE
-                    if(y==3)
-                        y=0;
-                    else
-                        y++;
+                if(y==3)
+                    y=0;
+                else
+                    y++;
 #endif
-                    x=0;
-                } else {
-                    x++;
-                }
-                break;
+                x=0;
+            } else {
+                x++;
+            }
+            break;
 #endif
 #ifndef IPOD_STYLE
-            case SUPERDOM_UP:
-                if(y==0) {
+        case SUPERDOM_UP:
+            if(y==0) {
 #if CONFIG_KEYPAD == IRIVER_H10_PAD
-                    if(x > 0)
-                        x--;
-                    else
-                        x=2;
+                if(x > 0)
+                    x--;
+                else
+                    x=2;
 #endif
-                    y=3;
-                } else {
-                    y--;
-                }
-                break;
-            case SUPERDOM_DOWN:
-                if(y==3) {
+                y=3;
+            } else {
+                y--;
+            }
+            break;
+        case SUPERDOM_DOWN:
+            if(y==3) {
 #if CONFIG_KEYPAD == IRIVER_H10_PAD
-                    if(x < 2)
-                        x++;
-                    else
-                        x=0;
+                if(x < 2)
+                    x++;
+                else
+                    x=0;
 #endif
-                    y=0;
-                } else {
-                    y++;
-                }
-                break;
+                y=0;
+            } else {
+                y++;
+            }
+            break;
 #endif
-            default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                {
-                    done = true;
-                    ret = RET_VAL_USB;
-                }
-                break;
+        default:
+            if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+            {
+                done = true;
+                ret = RET_VAL_USB;
+            }
+            break;
         }
         rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
-        rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x), 
-                        NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y), 
-                        NUM_BOX_WIDTH+1, NUM_BOX_HEIGHT+1);
+        rb->lcd_fillrect(NUM_MARGIN_X+(NUM_BOX_WIDTH*x),
+                         NUM_MARGIN_Y+(NUM_BOX_HEIGHT*y),
+                         NUM_BOX_WIDTH+1, NUM_BOX_HEIGHT+1);
         rb->lcd_set_drawmode(DRMODE_SOLID);
         rb->lcd_update();
     }
@@ -920,24 +920,24 @@ static int get_number(char* param, int* value, int max) {
 
 static bool tile_has_item(int type, int x, int y) {
     switch(type) {
-        case 0:
-            return (board[x][y].men > 0);
-            break;
-        case 1:
-            return board[x][y].tank;
-            break;
-        case 2:
-            return board[x][y].plane;
-            break;
-        case 3:
-            return board[x][y].farm;
-            break;
-        case 4:
-            return board[x][y].ind;
-            break;
-        case 5:
-            return board[x][y].nuke;
-            break;
+    case 0:
+        return (board[x][y].men > 0);
+        break;
+    case 1:
+        return board[x][y].tank;
+        break;
+    case 2:
+        return board[x][y].plane;
+        break;
+    case 3:
+        return board[x][y].farm;
+        break;
+    case 4:
+        return board[x][y].ind;
+        break;
+    case 5:
+        return board[x][y].nuke;
+        break;
     }
     return false;
 }
@@ -979,24 +979,24 @@ static int buy_resources(int colour, int type, int x, int y, int nummen) {
         res = &compres;
     }
     switch(type) {
-        case 0: /* men */
-            price = 1*nummen;
-            break;
-        case 1: /* tank */
-            price = 300;
-            break;
-        case 2: /* plane */
-            price = 600;
-            break;
-        case 3: /* Farm */
-            price = 1150;
-            break;
-        case 4: /* Factory */
-            price = 1300;
-            break;
-        case 5: /* nuke */
-            price = 2000;
-            break;
+    case 0: /* men */
+        price = 1*nummen;
+        break;
+    case 1: /* tank */
+        price = 300;
+        break;
+    case 2: /* plane */
+        price = 600;
+        break;
+    case 3: /* Farm */
+        price = 1150;
+        break;
+    case 4: /* Factory */
+        price = 1300;
+        break;
+    case 5: /* nuke */
+        price = 2000;
+        break;
     }
     if(res->cash < price) {
         if(human)
@@ -1021,30 +1021,30 @@ static int buy_resources(int colour, int type, int x, int y, int nummen) {
         return RET_VAL_QUIT_ERR;
     }
     switch(type) {
-        case 0:
-            board[x][y].men += nummen;
-            res->men += nummen;
-            break;
-        case 1:
-            board[x][y].tank = true;
-            res->tanks++;
-            break;
-        case 2:
-            board[x][y].plane = true;
-            res->planes++;
-            break;
-        case 3:
-            board[x][y].farm = true;
-            res->farms++;
-            break;
-        case 4:
-            board[x][y].ind = true;
-            res->inds++;
-            break;
-        case 5:
-            board[x][y].nuke = true;
-            res->nukes++;
-            break;
+    case 0:
+        board[x][y].men += nummen;
+        res->men += nummen;
+        break;
+    case 1:
+        board[x][y].tank = true;
+        res->tanks++;
+        break;
+    case 2:
+        board[x][y].plane = true;
+        res->planes++;
+        break;
+    case 3:
+        board[x][y].farm = true;
+        res->farms++;
+        break;
+    case 4:
+        board[x][y].ind = true;
+        res->inds++;
+        break;
+    case 5:
+        board[x][y].nuke = true;
+        res->nukes++;
+        break;
     }
     res->cash -= price;
 
@@ -1058,46 +1058,46 @@ static int buy_resources_menu(void) {
     int selection = 0,nummen;
 
     MENUITEM_STRINGLIST(menu, "Buy Resources", NULL,
-                    "Buy men ($1)", "Buy tank ($300)", "Buy plane ($600)",
-                    "Buy Farm ($1150)", "Buy Factory ($1300)",
-                    "Buy Nuke ($2000)",
-                    "Finish buying");
+                        "Buy men ($1)", "Buy tank ($300)", "Buy plane ($600)",
+                        "Buy Farm ($1150)", "Buy Factory ($1300)",
+                        "Buy Nuke ($2000)",
+                        "Finish buying");
 
     while(1) {
         switch(rb->do_menu(&menu, &selection, NULL, false)) {
-            case 0:
-                nummen = 0;
-                if(get_number("How many men would you like?", &nummen,
-                                humanres.cash) == RET_VAL_USB)
-                    return RET_VAL_USB;
-                if(!nummen)
-                    break;
-                /* fall through */
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                if(buy_resources(COLOUR_LIGHT, selection, 0, 0, nummen)
-                                    == RET_VAL_USB)
-                    return RET_VAL_USB;
-                break;
-            case 6:
-                return RET_VAL_OK;
-                break;
-            case MENU_ATTACHED_USB:
+        case 0:
+            nummen = 0;
+            if(get_number("How many men would you like?", &nummen,
+                          humanres.cash) == RET_VAL_USB)
                 return RET_VAL_USB;
+            if(!nummen)
                 break;
-            case GO_TO_PREVIOUS:
-                return RET_VAL_OK;
-                break;
+            /* fall through */
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+            if(buy_resources(COLOUR_LIGHT, selection, 0, 0, nummen)
+               == RET_VAL_USB)
+                return RET_VAL_USB;
+            break;
+        case 6:
+            return RET_VAL_OK;
+            break;
+        case MENU_ATTACHED_USB:
+            return RET_VAL_USB;
+            break;
+        case GO_TO_PREVIOUS:
+            return RET_VAL_OK;
+            break;
         }
     }
     return RET_VAL_OK;
 }
 
 static int move_unit(int colour, int type, int fromx, int fromy,
-                int tox, int toy, int nummen) {
+                     int tox, int toy, int nummen) {
     const char *itemnames[][3] = {
         {
             "troops",
@@ -1118,7 +1118,7 @@ static int move_unit(int colour, int type, int fromx, int fromy,
 
     if(human) {
         rb->splashf(HZ, "Select where you want to move %s from",
-                        itemnames[0][type]);
+                    itemnames[0][type]);
         if((temp = select_square()) != RET_VAL_OK)
             return temp;
         fromx = cursor.x;
@@ -1138,7 +1138,7 @@ static int move_unit(int colour, int type, int fromx, int fromy,
         if(human) {
             nummen = board[fromx][fromy].men;
             if((temp = get_number("How many men do you want to move?", &nummen,
-                        nummen)) != RET_VAL_OK)
+                                  nummen)) != RET_VAL_OK)
                 return temp;
         }
         if(nummen > board[fromx][fromy].men) {
@@ -1149,7 +1149,7 @@ static int move_unit(int colour, int type, int fromx, int fromy,
     }
     if(human) {
         rb->splashf(HZ, "Select where you want to move %s to",
-                        itemnames[2][type]);
+                    itemnames[2][type]);
         if((temp = select_square()) != RET_VAL_OK)
             return temp;
         tox = cursor.x;
@@ -1168,18 +1168,18 @@ static int move_unit(int colour, int type, int fromx, int fromy,
         return RET_VAL_QUIT_ERR;
     }
     switch(type) {
-        case 0:
-            board[fromx][fromy].men -= nummen;
-            board[tox][toy].men += nummen;
-            break;
-        case 1:
-            board[fromx][fromy].tank = false;
-            board[tox][toy].tank = true;
-            break;
-        case 2:
-            board[fromx][fromy].plane = false;
-            board[tox][toy].plane = true;
-            break;
+    case 0:
+        board[fromx][fromy].men -= nummen;
+        board[tox][toy].men += nummen;
+        break;
+    case 1:
+        board[fromx][fromy].tank = false;
+        board[tox][toy].tank = true;
+        break;
+    case 2:
+        board[fromx][fromy].plane = false;
+        board[tox][toy].plane = true;
+        break;
     }
     return RET_VAL_OK;
 }
@@ -1188,22 +1188,22 @@ static int move_unit_menu(void) {
     int selection = 0;
 
     MENUITEM_STRINGLIST(menu, "Move unit", NULL,
-                    "Move men", "Move tank", "Move plane");
+                        "Move men", "Move tank", "Move plane");
     switch(rb->do_menu(&menu, &selection, NULL, false)) {
-        case 0:
-        case 1:
-        case 2:
-            switch(move_unit(COLOUR_LIGHT, selection, 0, 0, 0, 0, 0)) {
-                case RET_VAL_OK:
-                    humanres.moves--;
-                    break;
-                case RET_VAL_USB:
-                    return RET_VAL_USB;
-                    break;
-            }
+    case 0:
+    case 1:
+    case 2:
+        switch(move_unit(COLOUR_LIGHT, selection, 0, 0, 0, 0, 0)) {
+        case RET_VAL_OK:
+            humanres.moves--;
             break;
-        case MENU_ATTACHED_USB:
+        case RET_VAL_USB:
             return RET_VAL_USB;
+            break;
+        }
+        break;
+    case MENU_ATTACHED_USB:
+        return RET_VAL_USB;
     }
     return RET_VAL_OK;
 }
@@ -1263,61 +1263,61 @@ static int movement_menu(void) {
     int selection = 0, temp;
 
     MENUITEM_STRINGLIST(menu, "Movement", NULL,
-                    "Move unit", "Buy additional moves ($100)",
-                    "Launch nuclear missile", "Check map",
-                    "Finish moving", "Game menu");
+                        "Move unit", "Buy additional moves ($100)",
+                        "Launch nuclear missile", "Check map",
+                        "Finish moving", "Game menu");
 
     while(1) {
         switch(rb->do_menu(&menu, &selection, NULL, false)) {
-            case 0:
-                if(humanres.moves) {
-                    if(move_unit_menu()==RET_VAL_USB)
-                        return RET_VAL_USB;
-                } else {
-                    rb->splash(HZ, "You have no more moves left." 
-                                   " You can buy more for $100 each.");
-                }
-                break;
-            case 1:
-                if(humanres.cash > 100) {
-                    humanres.moves++;
-                    humanres.cash -= 100;
-                    rb->snprintf(buf, sizeof(buf), "You now have %d moves", 
-                                    humanres.moves);
-                    rb->splash(HZ, buf);
-                }
-                break;
-            case 2:
-                if(humanres.nukes==0) {
-                    rb->splash(HZ, "You do not have any nukes to launch");
-                } else {
-                    rb->splash(HZ, "Select place to launch nuke from");
-                    switch(select_square()) {
-                        case RET_VAL_OK:
-                            if(launch_nuke(COLOUR_LIGHT, cursor.x, cursor.y,
-                                           0, 0) == RET_VAL_USB)
-                                return RET_VAL_USB;
-                            break;
-                        case RET_VAL_USB:
-                            return RET_VAL_USB;
-                            break;
-                    }
-                }
-                break;
-            case 3:
-                if(select_square() == RET_VAL_USB)
+        case 0:
+            if(humanres.moves) {
+                if(move_unit_menu()==RET_VAL_USB)
                     return RET_VAL_USB;
-                break;
-            case 4:
-                return RET_VAL_OK;
-                break;
-            case 5:
-                if((temp = ingame_menu()) != RET_VAL_OK)
-                    return temp;
-                break;
-            case MENU_ATTACHED_USB:
+            } else {
+                rb->splash(HZ, "You have no more moves left."
+                           " You can buy more for $100 each.");
+            }
+            break;
+        case 1:
+            if(humanres.cash > 100) {
+                humanres.moves++;
+                humanres.cash -= 100;
+                rb->snprintf(buf, sizeof(buf), "You now have %d moves",
+                             humanres.moves);
+                rb->splash(HZ, buf);
+            }
+            break;
+        case 2:
+            if(humanres.nukes==0) {
+                rb->splash(HZ, "You do not have any nukes to launch");
+            } else {
+                rb->splash(HZ, "Select place to launch nuke from");
+                switch(select_square()) {
+                case RET_VAL_OK:
+                    if(launch_nuke(COLOUR_LIGHT, cursor.x, cursor.y,
+                                   0, 0) == RET_VAL_USB)
+                        return RET_VAL_USB;
+                    break;
+                case RET_VAL_USB:
+                    return RET_VAL_USB;
+                    break;
+                }
+            }
+            break;
+        case 3:
+            if(select_square() == RET_VAL_USB)
                 return RET_VAL_USB;
-                break;
+            break;
+        case 4:
+            return RET_VAL_OK;
+            break;
+        case 5:
+            if((temp = ingame_menu()) != RET_VAL_OK)
+                return temp;
+            break;
+        case MENU_ATTACHED_USB:
+            return RET_VAL_USB;
+            break;
         }
     }
     return RET_VAL_OK;
@@ -1327,35 +1327,35 @@ static const char* inventory_data(int selected_item, void * data,
                                   char * buffer, size_t buffer_len) {
     (void)data;
     switch(selected_item) {
-        case 0:
-            rb->snprintf(buffer,buffer_len,"Men: %d", humanres.men);
-            break;
-        case 1:
-            rb->snprintf(buffer,buffer_len,"Tanks: %d", humanres.tanks);
-            break;
-        case 2:
-            rb->snprintf(buffer,buffer_len,"Planes: %d", humanres.planes);
-            break;
-        case 3:
-            rb->snprintf(buffer,buffer_len,"Factories: %d", humanres.inds);
-            break;
-        case 4:
-            rb->snprintf(buffer,buffer_len,"Farms: %d", humanres.farms);
-            break;
-        case 5:
-            rb->snprintf(buffer,buffer_len,"Nukes: %d", humanres.nukes);
-            break;
-        case 6:
-            rb->snprintf(buffer,buffer_len,"Cash: %d", humanres.cash);
-            break;
-        case 7:
-            rb->snprintf(buffer,buffer_len,"Food: %d", humanres.food);
-            break;
-        case 8:
-            rb->snprintf(buffer,buffer_len,"Bank: %d", humanres.bank);
-            break;
-        default:
-            return NULL;
+    case 0:
+        rb->snprintf(buffer,buffer_len,"Men: %d", humanres.men);
+        break;
+    case 1:
+        rb->snprintf(buffer,buffer_len,"Tanks: %d", humanres.tanks);
+        break;
+    case 2:
+        rb->snprintf(buffer,buffer_len,"Planes: %d", humanres.planes);
+        break;
+    case 3:
+        rb->snprintf(buffer,buffer_len,"Factories: %d", humanres.inds);
+        break;
+    case 4:
+        rb->snprintf(buffer,buffer_len,"Farms: %d", humanres.farms);
+        break;
+    case 5:
+        rb->snprintf(buffer,buffer_len,"Nukes: %d", humanres.nukes);
+        break;
+    case 6:
+        rb->snprintf(buffer,buffer_len,"Cash: %d", humanres.cash);
+        break;
+    case 7:
+        rb->snprintf(buffer,buffer_len,"Food: %d", humanres.food);
+        break;
+    case 8:
+        rb->snprintf(buffer,buffer_len,"Bank: %d", humanres.bank);
+        break;
+    default:
+        return NULL;
     }
     return buffer;
 }
@@ -1376,58 +1376,58 @@ static int production_menu(void) {
     int selection = 0, temp;
 
     MENUITEM_STRINGLIST(menu, "Production", NULL,
-                    "Buy resources", "Show inventory", "Check map",
-                    "Invest money", "Withdraw money",
-                    "Finish turn", "Game menu");
+                        "Buy resources", "Show inventory", "Check map",
+                        "Invest money", "Withdraw money",
+                        "Finish turn", "Game menu");
 
     while(1) {
         switch(rb->do_menu(&menu, &selection, NULL, false)) {
-            case 0:
-                if(buy_resources_menu() == RET_VAL_USB)
-                    return RET_VAL_USB;
-                break;
-            case 1:
-                if(show_inventory() == RET_VAL_USB)
-                    return RET_VAL_USB;
-                break;
-            case 2:
-                if(select_square() == RET_VAL_USB)
-                    return RET_VAL_USB;
-                break;
-            case 3:
-                temp = humanres.cash;
-                if(get_number("How much do you want to invest?", &temp,
-                                humanres.cash) == RET_VAL_USB)
-                    return RET_VAL_USB;
-                if(temp > humanres.cash) {
-                    rb->splash(HZ, "You don't have that much cash to invest");
-                } else {
-                    humanres.cash -= temp;
-                    humanres.bank += temp;
-                }
-                break;
-            case 4:
-                temp = humanres.bank;
-                if(get_number("How much do you want to withdraw?", &temp,
-                                humanres.bank) == RET_VAL_USB)
-                    return RET_VAL_USB;
-                if(temp > humanres.bank) {
-                    rb->splash(HZ, "You don't have that much cash to withdraw");
-                } else {
-                    humanres.cash += temp;
-                    humanres.bank -= temp;
-                }
-                break;
-            case 5:
-                return RET_VAL_OK;
-                break;
-            case 6:
-                if((temp = ingame_menu()) != RET_VAL_OK)
-                    return temp;
-                break;
-            case MENU_ATTACHED_USB:
+        case 0:
+            if(buy_resources_menu() == RET_VAL_USB)
                 return RET_VAL_USB;
-                break;
+            break;
+        case 1:
+            if(show_inventory() == RET_VAL_USB)
+                return RET_VAL_USB;
+            break;
+        case 2:
+            if(select_square() == RET_VAL_USB)
+                return RET_VAL_USB;
+            break;
+        case 3:
+            temp = humanres.cash;
+            if(get_number("How much do you want to invest?", &temp,
+                          humanres.cash) == RET_VAL_USB)
+                return RET_VAL_USB;
+            if(temp > humanres.cash) {
+                rb->splash(HZ, "You don't have that much cash to invest");
+            } else {
+                humanres.cash -= temp;
+                humanres.bank += temp;
+            }
+            break;
+        case 4:
+            temp = humanres.bank;
+            if(get_number("How much do you want to withdraw?", &temp,
+                          humanres.bank) == RET_VAL_USB)
+                return RET_VAL_USB;
+            if(temp > humanres.bank) {
+                rb->splash(HZ, "You don't have that much cash to withdraw");
+            } else {
+                humanres.cash += temp;
+                humanres.bank -= temp;
+            }
+            break;
+        case 5:
+            return RET_VAL_OK;
+            break;
+        case 6:
+            if((temp = ingame_menu()) != RET_VAL_OK)
+                return temp;
+            break;
+        case MENU_ATTACHED_USB:
+            return RET_VAL_USB;
+            break;
         }
     }
     return RET_VAL_OK;
@@ -1471,90 +1471,90 @@ static int select_square(void) {
     while(1) {
         button = rb->button_get(true);
         switch(button) {
-            case SUPERDOM_CANCEL:
-                rb->splash(HZ, "Cancelled");
-                return RET_VAL_QUIT_ERR;
-                break;
-            case SUPERDOM_OK:
-                return RET_VAL_OK;
-                break;
+        case SUPERDOM_CANCEL:
+            rb->splash(HZ, "Cancelled");
+            return RET_VAL_QUIT_ERR;
+            break;
+        case SUPERDOM_OK:
+            return RET_VAL_OK;
+            break;
 #if CONFIG_KEYPAD != IRIVER_H10_PAD
-            case SUPERDOM_LEFT:
-            case (SUPERDOM_LEFT|BUTTON_REPEAT):
-                draw_cursor(); /* Deselect the current tile */
-                if(cursor.x>1) {
-                    cursor.x--;
-                } else {
+        case SUPERDOM_LEFT:
+        case (SUPERDOM_LEFT|BUTTON_REPEAT):
+            draw_cursor(); /* Deselect the current tile */
+            if(cursor.x>1) {
+                cursor.x--;
+            } else {
 #ifdef IPOD_STYLE
-                    if(cursor.y>1)
-                        cursor.y--;
-                    else
-                        cursor.y = 10;
+                if(cursor.y>1)
+                    cursor.y--;
+                else
+                    cursor.y = 10;
 #endif
-                    cursor.x = 10;
-                }
-                update_score();
-                draw_cursor();
-                break;
-            case SUPERDOM_RIGHT:
-            case (SUPERDOM_RIGHT|BUTTON_REPEAT):
-                draw_cursor(); /* Deselect the current tile */
-                if(cursor.x<10) {
-                    cursor.x++;
-                } else {
+                cursor.x = 10;
+            }
+            update_score();
+            draw_cursor();
+            break;
+        case SUPERDOM_RIGHT:
+        case (SUPERDOM_RIGHT|BUTTON_REPEAT):
+            draw_cursor(); /* Deselect the current tile */
+            if(cursor.x<10) {
+                cursor.x++;
+            } else {
 #ifdef IPOD_STYLE
-                    if(cursor.y<10)
-                        cursor.y++;
-                    else
-                        cursor.y = 1;
+                if(cursor.y<10)
+                    cursor.y++;
+                else
+                    cursor.y = 1;
 #endif
-                    cursor.x = 1;
-                }
-                update_score();
-                draw_cursor();
-                break;
+                cursor.x = 1;
+            }
+            update_score();
+            draw_cursor();
+            break;
 #endif
 #ifndef IPOD_STYLE
-            case SUPERDOM_UP:
-            case (SUPERDOM_UP|BUTTON_REPEAT):
-                draw_cursor(); /* Deselect the current tile */
-                if(cursor.y>1) {
-                    cursor.y--;
-                } else {
+        case SUPERDOM_UP:
+        case (SUPERDOM_UP|BUTTON_REPEAT):
+            draw_cursor(); /* Deselect the current tile */
+            if(cursor.y>1) {
+                cursor.y--;
+            } else {
 #if CONFIG_KEYPAD == IRIVER_H10_PAD
-                    if(cursor.x > 1)
-                        cursor.x--;
-                    else
-                        cursor.x = 10;
+                if(cursor.x > 1)
+                    cursor.x--;
+                else
+                    cursor.x = 10;
 #endif
-                    cursor.y = 10;
-                }
-                update_score();
-                draw_cursor();
-                break;
-            case SUPERDOM_DOWN:
-            case (SUPERDOM_DOWN|BUTTON_REPEAT):
-                draw_cursor(); /* Deselect the current tile */
-                if(cursor.y<10) {
-                    cursor.y++;
-                } else {
+                cursor.y = 10;
+            }
+            update_score();
+            draw_cursor();
+            break;
+        case SUPERDOM_DOWN:
+        case (SUPERDOM_DOWN|BUTTON_REPEAT):
+            draw_cursor(); /* Deselect the current tile */
+            if(cursor.y<10) {
+                cursor.y++;
+            } else {
 #if CONFIG_KEYPAD == IRIVER_H10_PAD
-                    if(cursor.x < 10)
-                        cursor.x++;
-                    else
-                        cursor.x = 1;
+                if(cursor.x < 10)
+                    cursor.x++;
+                else
+                    cursor.x = 1;
 #endif
-                    cursor.y = 1;
-                }
-                update_score();
-                draw_cursor();
-                break;
+                cursor.y = 1;
+            }
+            update_score();
+            draw_cursor();
+            break;
 #endif
-            default:
-                if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
-                {
-                    return RET_VAL_USB;
-                }
+        default:
+            if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+            {
+                return RET_VAL_USB;
+            }
         }
     }
 }
@@ -1599,7 +1599,7 @@ static int attack_territory(int colour, int x, int y) {
         return -1;
     }
     str_diff = calc_strength(COLOUR_DARK, x, y) -
-               calc_strength(COLOUR_LIGHT, x, y);
+        calc_strength(COLOUR_LIGHT, x, y);
     if(human) {
         str_diff = -str_diff;
     }
@@ -1635,11 +1635,11 @@ static int attack_territory(int colour, int x, int y) {
     } else {
         if(human)
             rb->splash(HZ, "Your troops were unable to overcome"
-                           " the enemy troops");
+                       " the enemy troops");
         else
             rb->splash(HZ*2, "The computer attempted to "
-                            "attack, but the invasion was"
-                            " pushed back");
+                       "attack, but the invasion was"
+                       " pushed back");
         return 0;
     }
     return 0;
@@ -1649,30 +1649,30 @@ static int war_menu(void) {
     int selection = 0, temp;
 
     MENUITEM_STRINGLIST(menu, "War!", NULL,
-                    "Select territory to attack",
-                    "Finish turn", "Game menu");
+                        "Select territory to attack",
+                        "Finish turn", "Game menu");
 
     while(humanres.moves) {
         switch(rb->do_menu(&menu, &selection, NULL, false)) {
-            case 0:
-                switch(select_square()) {
-                    case RET_VAL_OK:
-                        if(attack_territory(COLOUR_LIGHT, cursor.x, cursor.y)
-                                >= 0)
-                            humanres.moves--;
-                        break;
-                    case RET_VAL_USB:
-                        return RET_VAL_USB;
-                        break;
-                }
+        case 0:
+            switch(select_square()) {
+            case RET_VAL_OK:
+                if(attack_territory(COLOUR_LIGHT, cursor.x, cursor.y)
+                   >= 0)
+                    humanres.moves--;
                 break;
-            case 1:
-                return RET_VAL_OK;
+            case RET_VAL_USB:
+                return RET_VAL_USB;
                 break;
-            case 2:
-                if((temp = ingame_menu()) != RET_VAL_OK)
-                    return temp;
-                break;
+            }
+            break;
+        case 1:
+            return RET_VAL_OK;
+            break;
+        case 2:
+            if((temp = ingame_menu()) != RET_VAL_OK)
+                return temp;
+            break;
         }
     }
     return RET_VAL_OK;
@@ -1705,11 +1705,11 @@ static bool place_adjacent(bool tank, int x, int y) {
 }
 
 static bool has_adjacent(int x, int y) {
-    if((board[x][y].colour == COLOUR_LIGHT) && 
+    if((board[x][y].colour == COLOUR_LIGHT) &&
        ((board[x-1][y].colour == COLOUR_DARK) ||
-       (board[x+1][y].colour == COLOUR_DARK) ||
-       (board[x][y+1].colour == COLOUR_DARK) ||
-       (board[x][y-1].colour == COLOUR_DARK)))
+        (board[x+1][y].colour == COLOUR_DARK) ||
+        (board[x][y+1].colour == COLOUR_DARK) ||
+        (board[x][y-1].colour == COLOUR_DARK)))
         return 1;
     else
         return 0;
@@ -1763,7 +1763,7 @@ static void computer_allocate(void) {
             if(board[i][j].colour == COLOUR_DARK) {
                 numterritory++;
                 str_diff = calc_strength(COLOUR_LIGHT,i,j) -
-                           calc_strength(COLOUR_DARK,i,j);
+                    calc_strength(COLOUR_DARK,i,j);
                 if(str_diff > 0 && (board[i][j].ind || board[i][j].farm)) {
                     if(numthreats < 3) {
                         offensive = false;
@@ -1799,8 +1799,8 @@ static void computer_allocate(void) {
                         targets[k].x = i;
                         targets[k].y = j;
                         targets[k].str_diff =
-                                calc_strength(COLOUR_LIGHT, i, j) -
-                                calc_strength(COLOUR_DARK, i, j);
+                            calc_strength(COLOUR_LIGHT, i, j) -
+                            calc_strength(COLOUR_DARK, i, j);
                         k++;
                     }
                 }
@@ -1808,17 +1808,17 @@ static void computer_allocate(void) {
             }
         }
         if(k == 0) {
-            /* No targets found! Randomly pick squares and if they're owned 
+            /* No targets found! Randomly pick squares and if they're owned
              * by the computer then stick a tank on it. */
-                rb->srand(*rb->current_tick);
-                while(compres.cash >= 300 && compres.tanks < numterritory) {
-                    i = rb->rand()%10 + 1;
-                    j = rb->rand()%10 + 1;
-                    if(board[i][j].colour == COLOUR_DARK) {
-                        buy_resources(COLOUR_DARK, 1, i, j, 0);
-                    }
-                    rb->yield();
+            rb->srand(*rb->current_tick);
+            while(compres.cash >= 300 && compres.tanks < numterritory) {
+                i = rb->rand()%10 + 1;
+                j = rb->rand()%10 + 1;
+                if(board[i][j].colour == COLOUR_DARK) {
+                    buy_resources(COLOUR_DARK, 1, i, j, 0);
                 }
+                rb->yield();
+            }
         } else {
             for(i=0;i<k;i++) {
                 str_diff = targets[i].str_diff;
@@ -1826,18 +1826,18 @@ static void computer_allocate(void) {
                     /* While we still need them keep placing men */
                     if(!place_adjacent(true, targets[i].x, targets[i].y)) {
                         find_adjacent(targets[i].x, targets[i].y,
-                            &adj.x, &adj.y);
+                                      &adj.x, &adj.y);
                         men_needed = (str_diff + 20)*1000/133;
                         if(compres.cash < men_needed) {
                             men_needed = compres.cash;
                         }
                         buy_resources(COLOUR_DARK, 0, adj.x, adj.y,
-                                            men_needed);
+                                      men_needed);
                         break;
                     }
                     str_diff = calc_strength(COLOUR_LIGHT,
-                                      targets[i].x, targets[i].y) -
-                               calc_strength(COLOUR_DARK,
+                                             targets[i].x, targets[i].y) -
+                        calc_strength(COLOUR_DARK,
                                       targets[i].x, targets[i].y);
                 }
             }
@@ -1862,7 +1862,7 @@ static void computer_allocate(void) {
                     men_needed = compres.cash;
                 }
                 buy_resources(COLOUR_DARK, 0, threats[i].x, threats[i].y,
-                                    men_needed);
+                              men_needed);
             }
         } else {
             /* Tanks it is */
@@ -1875,18 +1875,18 @@ static void computer_allocate(void) {
                         /* No room for any more planes or tanks, revert to
                          * men */
                         find_adjacent(threats[i].x, threats[i].y,
-                            &adj.x, &adj.y);
+                                      &adj.x, &adj.y);
                         men_needed = (str_diff + 20)*1000/133;
                         if(compres.cash < men_needed) {
                             men_needed = compres.cash;
                         }
                         buy_resources(COLOUR_DARK, 0, threats[i].x,
-                                        threats[i].y, men_needed);
+                                      threats[i].y, men_needed);
                         break;
                     }
                     str_diff = calc_strength(COLOUR_LIGHT,
-                                      threats[i].x, threats[i].y) -
-                               calc_strength(COLOUR_DARK,
+                                             threats[i].x, threats[i].y) -
+                        calc_strength(COLOUR_DARK,
                                       threats[i].x, threats[i].y);
                 }
             }
@@ -1899,26 +1899,26 @@ static void computer_allocate(void) {
 static int find_adj_target(int x, int y, struct cursor* adj) {
     /* Find a square next to a computer's farm or factory owned by the player
      * that is vulnerable. Return 1 on success, 0 otherwise */
-    if(board[x+1][y].colour == COLOUR_LIGHT && 
-         calc_strength(COLOUR_LIGHT,x+1,y)<=calc_strength(COLOUR_DARK,x+1,y)) {
+    if(board[x+1][y].colour == COLOUR_LIGHT &&
+       calc_strength(COLOUR_LIGHT,x+1,y)<=calc_strength(COLOUR_DARK,x+1,y)) {
         adj->x = x+1;
         adj->y = y;
         return 1;
     }
-    if(board[x-1][y].colour == COLOUR_LIGHT && 
-         calc_strength(COLOUR_LIGHT,x-1,y)<=calc_strength(COLOUR_DARK,x-1,y)) {
+    if(board[x-1][y].colour == COLOUR_LIGHT &&
+       calc_strength(COLOUR_LIGHT,x-1,y)<=calc_strength(COLOUR_DARK,x-1,y)) {
         adj->x = x-1;
         adj->y = y;
         return 1;
     }
-    if(board[x][y+1].colour == COLOUR_LIGHT && 
-         calc_strength(COLOUR_LIGHT,x,y+1)<=calc_strength(COLOUR_DARK,x,y+1)) {
+    if(board[x][y+1].colour == COLOUR_LIGHT &&
+       calc_strength(COLOUR_LIGHT,x,y+1)<=calc_strength(COLOUR_DARK,x,y+1)) {
         adj->x = x;
         adj->y = y+1;
         return 1;
     }
-    if(board[x][y-1].colour == COLOUR_LIGHT && 
-         calc_strength(COLOUR_LIGHT,x,y-1)<=calc_strength(COLOUR_DARK,x,y-1)) {
+    if(board[x][y-1].colour == COLOUR_LIGHT &&
+       calc_strength(COLOUR_LIGHT,x,y-1)<=calc_strength(COLOUR_DARK,x,y-1)) {
         adj->x = x;
         adj->y = y-1;
         return 1;
@@ -1957,9 +1957,9 @@ static void computer_war(void) {
         for(i=1;i<11;i++) {
             for(j=1;j<11;j++) {
                 if(board[i][j].colour == COLOUR_LIGHT &&
-                        (board[i][j].ind || board[i][j].farm) &&
-                        (calc_strength(COLOUR_DARK, i, j) >=
-                         calc_strength(COLOUR_LIGHT, i, j))) {
+                   (board[i][j].ind || board[i][j].farm) &&
+                   (calc_strength(COLOUR_DARK, i, j) >=
+                    calc_strength(COLOUR_LIGHT, i, j))) {
                     found_target = true;
                     if(attack_territory(COLOUR_DARK, i, j) >= 0) {
                         compres.moves--;
@@ -1977,9 +1977,9 @@ static void computer_war(void) {
         found_target = false;
         for(i=1;i<11;i++) {
             for(j=1;j<11;j++) {
-                if(board[i][j].colour == COLOUR_LIGHT && 
-                  (calc_strength(COLOUR_DARK, i, j)  >= 
-                   calc_strength(COLOUR_LIGHT, i, j))) {
+                if(board[i][j].colour == COLOUR_LIGHT &&
+                   (calc_strength(COLOUR_DARK, i, j)  >=
+                    calc_strength(COLOUR_LIGHT, i, j))) {
                     found_target = true;
                     if(attack_territory(COLOUR_DARK, i, j) >= 0) {
                         compres.moves--;
@@ -2080,31 +2080,31 @@ enum plugin_status plugin_start(const void* parameter)
             DEBUGF("Loading failed, generating new game\n");
         } else {
             switch(gamestate) {
-                case GS_PROD:
-                    goto startprod;
-                    break;
-                case GS_MOVE:
-                    goto startmove;
-                    break;
-                case GS_WAR:
-                    goto startwar;
-                    break;
-                default:
-                    goto startyear;
-                    break;
+            case GS_PROD:
+                goto startprod;
+                break;
+            case GS_MOVE:
+                goto startmove;
+                break;
+            case GS_WAR:
+                goto startwar;
+                break;
+            default:
+                goto startyear;
+                break;
             }
         }
     }
 
     switch(start_menu()) {
-        case RET_VAL_OK: /* start playing */
-            break;
-        case RET_VAL_QUIT_ERR: /* quit */
-            return PLUGIN_OK;
-            break;
-        case RET_VAL_USB:
-            return PLUGIN_USB_CONNECTED;
-            break;
+    case RET_VAL_OK: /* start playing */
+        break;
+    case RET_VAL_QUIT_ERR: /* quit */
+        return PLUGIN_OK;
+        break;
+    case RET_VAL_USB:
+        return PLUGIN_USB_CONNECTED;
+        break;
     }
 
     init_resources();
@@ -2120,45 +2120,45 @@ startyear:
         }
         if(-avg_str_diff > 15) {
             rb->splash(HZ*4, "Your army have suffered terrible morale from"
-                             " the bleak prospects of winning. You lose.");
+                       " the bleak prospects of winning. You lose.");
             return PLUGIN_OK;
         }
 
         /* production */
-startprod:
+    startprod:
         gamestate = GS_PROD;
         switch(production_menu()) {
-            case RET_VAL_USB:
-                return PLUGIN_USB_CONNECTED;
-                break;
-            case RET_VAL_QUIT_ERR:
-                return PLUGIN_OK;
-                break;
+        case RET_VAL_USB:
+            return PLUGIN_USB_CONNECTED;
+            break;
+        case RET_VAL_QUIT_ERR:
+            return PLUGIN_OK;
+            break;
         }
         computer_allocate();
 
         /* movement */
         humanres.moves = superdom_settings.movesperturn;
-startmove:
+    startmove:
         gamestate = GS_MOVE;
         switch(movement_menu()) {
-            case RET_VAL_USB:
-                return PLUGIN_USB_CONNECTED;
-                break;
-            case RET_VAL_QUIT_ERR:
-                return PLUGIN_OK;
-                break;
+        case RET_VAL_USB:
+            return PLUGIN_USB_CONNECTED;
+            break;
+        case RET_VAL_QUIT_ERR:
+            return PLUGIN_OK;
+            break;
         }
         /* feed men */
         if(humanres.men) {
             if(humanres.food > humanres.men) {
                 rb->snprintf(buf, sizeof(buf), "Your men ate %d units of food",
-                                humanres.men);
+                             humanres.men);
                 humanres.food -= humanres.men;
             } else {
                 rb->snprintf(buf, sizeof(buf), "There was not enough food"
-                   " to feed all your men, %d men have died of starvation",
-                                killmen(COLOUR_LIGHT));
+                             " to feed all your men, %d men have died of starvation",
+                             killmen(COLOUR_LIGHT));
             }
             rb->splash(HZ*2, buf);
         }
@@ -2167,22 +2167,22 @@ startmove:
                 compres.food -= compres.men;
             } else {
                 rb->snprintf(buf, sizeof(buf), "The computer does not have"
-                 " enough food to feed its men. %d have died of starvation",
-                                killmen(COLOUR_DARK));
+                             " enough food to feed its men. %d have died of starvation",
+                             killmen(COLOUR_DARK));
                 rb->splash(HZ, buf);
             }
         }
         /* war */
         humanres.moves = superdom_settings.movesperturn;
-startwar:
+    startwar:
         gamestate = GS_WAR;
         switch(war_menu()) {
-            case RET_VAL_USB:
-                return PLUGIN_USB_CONNECTED;
-                break;
-            case RET_VAL_QUIT_ERR:
-                return PLUGIN_OK;
-                break;
+        case RET_VAL_USB:
+            return PLUGIN_USB_CONNECTED;
+            break;
+        case RET_VAL_QUIT_ERR:
+            return PLUGIN_OK;
+            break;
         }
         compres.moves = superdom_settings.movesperturn;
         computer_war();
