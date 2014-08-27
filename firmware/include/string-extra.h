@@ -34,4 +34,38 @@
 #endif
 #endif
 
+/* copies a buffer of len bytes and null terminates it */
+static inline char * strmemcpy(char *dst, const char *src, size_t len)
+{
+    /* NOTE: for now, assumes valid parameters! */
+    *(char *)mempcpy(dst, src, len) = '\0';
+    return dst;
+}
+
+/* duplicate and null-terminate a memory block on the stack with alloca() */
+#define strmemdupa(s, l) \
+    ({ const char *___s = (s);          \
+       size_t ___l = (l);               \
+       char *___buf = alloca(___l + 1); \
+       strmemcpy(___buf, ___s, ___l); })
+
+/* strdupa and strndupa may already be provided by a system's string.h */
+
+#ifndef strdupa
+/* duplicate an entire string on the stack with alloca() */
+#define strdupa(s) \
+    ({ const char *__s = (s); \
+       strmemdupa((__s), strlen(__s)); })
+#endif /* strdupa */
+
+#ifndef strndupa
+/* duplicate a string on the stack with alloca(), truncating it if it is too
+   long */
+#define strndupa(s, n) \
+    ({ const char *__s = (s);     \
+       size_t __n = (n);          \
+       size_t __len = strlen(_s); \
+       strmemdupa(__s, MIN(__n, __len)); })
+#endif /* strndupa */
+
 #endif /* STRING_EXTRA_H */
