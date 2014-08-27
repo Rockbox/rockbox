@@ -11737,6 +11737,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Час атаки"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Час атаки"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_NEXT
   desc: Shown in WPS (short form of Next Track)
   user: core
