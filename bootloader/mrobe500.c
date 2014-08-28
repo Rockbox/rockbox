@@ -85,7 +85,7 @@ void main(void)
         verbose = true;
 
     printf("Rockbox boot loader");
-    printf("Version " RBVERSION);
+    printf("Version %s", rbversion);
 
     /* Enter USB mode without USB thread */
     if(usb_detect() == USB_INSERTED)

@@ -254,7 +254,7 @@ void failsafe_menu(void)
     extern int line;
     
     reset_screen();
-    printf("Bootloader " RBVERSION);
+    printf("Bootloader %s", rbversion);
     check_battery();
     printf("=========================");
     line += FAILSAFE_OPTIONS;
@@ -502,7 +502,7 @@ void main(void)
     lcd_setfont(FONT_SYSFIXED);
     
     printf("Rockbox boot loader");
-    printf("Version " RBVERSION);
+    printf("Version %s", rbversion);
 
     /* No need to wait here more because lcd_init and others already do that. */
     // sleep(HZ/50); /* Allow the button driver to check the buttons */

@@ -66,7 +66,7 @@ void main(void)
     btn = button_read_device();
 
     printf("Rockbox boot loader");
-    printf("Version " RBVERSION);
+    printf("Version %s", rbversion);
 
     ret = storage_init();
     if(ret)

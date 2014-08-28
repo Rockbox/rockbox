@@ -79,7 +79,7 @@ int main(void)
         verbose = true;
         
     printf("Rockbox boot loader");
-    printf("Version " RBVERSION);
+    printf("Version %s", rbversion);
 
     rc = storage_init();
     if(rc)

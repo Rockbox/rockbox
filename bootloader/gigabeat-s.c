@@ -354,7 +354,7 @@ void main(void)
         verbose = true;
 
     printf("Gigabeat S Rockbox Bootloader");
-    printf("Version " RBVERSION);
+    printf("Version %s", rbversion);
 
     adc_init();
     batt = _battery_voltage();

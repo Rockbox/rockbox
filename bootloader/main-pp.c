@@ -349,7 +349,7 @@ void* main(void)
     lcd_setfont(FONT_SYSFIXED);
 
     printf("Rockbox boot loader");
-    printf("Version: " RBVERSION);
+    printf("Version: %s", rbversion);
     printf(MODEL_NAME);
 
     i=storage_init();

@@ -196,7 +196,7 @@ static void rb_boot(void)
 
     reset_screen();
     printf("Rockbox boot loader");
-    printf("Version " RBVERSION);
+    printf("Version %s", rbversion);
 
     rc = storage_init();
     if(rc)
@@ -234,7 +234,7 @@ static void bootmenu(void)
     /* backbone of menu */
     /* run the loader */
     printf("Rockbox boot loader");
-    printf("Ver: " RBVERSION);
+    printf("Ver: %s", rbversion);
 
     check_battery();
 

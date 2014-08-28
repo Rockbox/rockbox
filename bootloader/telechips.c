@@ -152,7 +152,7 @@ void* main(void)
    available for loading the firmware. Otherwise display the debug screen. */
 #ifdef TCCBOOT
     printf("Rockbox boot loader");
-    printf("Version " RBVERSION);
+    printf("Version %s", rbversion);
 
     printf("ATA");
     rc = storage_init();

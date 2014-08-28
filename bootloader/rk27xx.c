@@ -159,7 +159,7 @@ void main(void)
     else if (boot == of)
         snprintf(filename,sizeof(filename), BOOTDIR "/%s", "BASE.RKW");
 
-    printf("Bootloader version: %s", RBVERSION);
+    printf("Bootloader version: %s", rbversion);
     printf("Loading: %s", filename);
 
     ret = load_rkw(loadbuffer, filename, LOAD_SIZE);

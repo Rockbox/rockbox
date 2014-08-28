@@ -154,7 +154,7 @@ void main(uint32_t arg, uint32_t addr)
 
     button_init();
 
-    printf("%s: %s", MSG(240, "Ver", "Boot version"), RBVERSION);
+    printf("%s: %s", MSG(240, "Ver", "Boot version"), rbversion);
     printf("%s: %x ", MSG(240, "Arg", "Boot arg"), arg);
     printf("%s: %x", MSG(240, "Addr", "Boot addr"), addr);
 #if IMX233_SUBTARGET >= 3780

@@ -297,7 +297,7 @@ int main(void)
     if(verbose)
         reset_screen();
     printf(MODEL_NAME" Rockbox Bootloader");
-    printf("Version " RBVERSION);
+    printf("Version %s", rbversion);
 
 #ifdef HAS_BUTTON_HOLD
     if(button_hold())

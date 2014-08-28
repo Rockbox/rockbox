@@ -174,7 +174,7 @@ void main(void)
         verbose = true;
 
     printf("Rockbox boot loader");
-    printf("Version " RBVERSION);
+    printf("Version %s", rbversion);
 
     sleep(50); /* ATA seems to error without this pause */
 

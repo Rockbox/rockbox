@@ -112,7 +112,7 @@ void* main(void)
     lcd_setfont(FONT_SYSFIXED);
 
     printf("Rockbox e200R installer");
-    printf("Version: " RBVERSION);
+    printf("Version: %s", rbversion);
     printf(MODEL_NAME);
     printf("");
 

@@ -188,7 +188,7 @@ void main(void)
     }
 
     printf("Rockbox boot loader");
-    printf("Version " RBVERSION);
+    printf("Version %s", rbversion);
     
     check_battery();
     
