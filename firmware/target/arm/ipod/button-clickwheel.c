@@ -364,15 +364,13 @@ static void s5l_clickwheel_init(void)
 #elif CONFIG_CPU==S5L8702
     /* enable and init internal (s5l8702) wheel controller */
     PWRCON(1) &= ~(1 << 1);
+    PCON(14) = (PCON(14) & ~0xffff0000) | 0x22220000;
     WHEELINT = 7;
     WHEEL10 = 1;
     WHEEL00 = 0x380000;
     WHEEL08 = 0x20000;
     WHEELTX = 0x8000023A;
     WHEEL04 |= 1;
-
-    /* enable external (CY8C21x34) wheel controller */
-    GPIOCMD = 0xe040f;
 #endif
 }
 
@@ -383,7 +381,6 @@ void button_init_device(void)
     INTMSK |= (1<<26);
 #elif CONFIG_CPU==S5L8702
     /* configure GPIO E2 as pull-up input */
-    GPIOCMD = 0xe0200;
     PUNB(14) |= (1 << 2);
 #endif
     s5l_clickwheel_init();
