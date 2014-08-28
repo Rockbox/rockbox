@@ -33,8 +33,54 @@
 
 char buf[255];
 
+/* key mappings */
+
+#define SUPERDOM_OK PLA_SELECT
+#define SUPERDOM_CANCEL PLA_CANCEL
+#define SUPERDOM_RIGHT PLA_RIGHT
+#define SUPERDOM_LEFT PLA_LEFT
+#define SUPERDOM_UP PLA_UP
+#define SUPERDOM_DOWN PLA_DOWN
+
+#define SUPERDOM_RIGHT_REPEAT PLA_RIGHT_REPEAT
+#define SUPERDOM_LEFT_REPEAT PLA_LEFT_REPEAT
+#define SUPERDOM_UP_REPEAT PLA_UP_REPEAT
+#define SUPERDOM_DOWN_REPEAT PLA_DOWN_REPEAT
+
+/***** game settings *****/
+
+/* Some defines for the prices */
+#define PRICE_MEN 1
+#define PRICE_MOVE 100
+#define PRICE_TANK 300
+#define PRICE_PLANE 600
+#define PRICE_FARM 1150
+#define PRICE_FACTORY 1300
+#define PRICE_NUKE 2000
+
+#define STRINGIZE_2(X) #X
+#define STRINGIZE(X) STRINGIZE_2(X)
+
+#define PRICE_MEN_STR STRINGIZE(PRICE_MEN)
+#define PRICE_MOVE_STR STRINGIZE(PRICE_MOVE)
+#define PRICE_TANK_STR STRINGIZE(PRICE_TANK)
+#define PRICE_PLANE_STR STRINGIZE(PRICE_PLANE)
+#define PRICE_FARM_STR STRINGIZE(PRICE_FARM)
+#define PRICE_FACTORY_STR STRINGIZE(PRICE_FACTORY)
+#define PRICE_NUKE_STR STRINGIZE(PRICE_NUKE)
+
+/* surrender thresholds */
+#define HUMAN_SURRENDER_THRESHOLD 15
+#define COMPUTER_SURRENDER_THRESHOLD 15
+#define COMPUTER_HARD_SURRENDER_THRESHOLD 25
+
+/* board size */
+#define BOARD_SIZE 10
+#define NUM_SPACES (BOARD_SIZE*BOARD_SIZE)
 #define COLOUR_DARK 0
 #define COLOUR_LIGHT 1
+
+/* drawing presets */
 
 #define MARGIN 5
 
@@ -45,11 +91,11 @@ char buf[255];
 #endif
 
 #if LCD_WIDTH > LCD_HEIGHT
-#define BOX_WIDTH ((LCD_WIDTH-(MARGIN*2))/10)
+#define BOX_WIDTH ((LCD_WIDTH-(MARGIN*2))/BOARD_SIZE)
 #define BOX_HEIGHT ((BOX_WIDTH*2)/3)
 
 #else
-#define BOX_HEIGHT ((LCD_HEIGHT-(MARGIN*2)-15)/10)
+#define BOX_HEIGHT ((LCD_HEIGHT-(MARGIN*2)-15)/BOARD_SIZE)
 #define BOX_WIDTH ((BOX_HEIGHT*2)/3)
 
 #endif
@@ -71,38 +117,6 @@ char buf[255];
 #define ICON_STRIDE     STRIDE(SCREEN_MAIN, BMPWIDTH_superdom_boarditems, BMPHEIGHT_superdom_boarditems)
 #define ICON_HEIGHT     (BMPHEIGHT_superdom_boarditems/6)
 #define ICON_WIDTH      (BMPWIDTH_superdom_boarditems/2)
-
-#define SUPERDOM_OK PLA_SELECT
-#define SUPERDOM_CANCEL PLA_CANCEL
-#define SUPERDOM_RIGHT PLA_RIGHT
-#define SUPERDOM_LEFT PLA_LEFT
-#define SUPERDOM_UP PLA_UP
-#define SUPERDOM_DOWN PLA_DOWN
-
-#define SUPERDOM_RIGHT_REPEAT PLA_RIGHT_REPEAT
-#define SUPERDOM_LEFT_REPEAT PLA_LEFT_REPEAT
-#define SUPERDOM_UP_REPEAT PLA_UP_REPEAT
-#define SUPERDOM_DOWN_REPEAT PLA_DOWN_REPEAT
-
-/* Some defines for the prices */
-#define PRICE_MEN 1
-#define PRICE_MOVE 100
-#define PRICE_TANK 300
-#define PRICE_PLANE 600
-#define PRICE_FARM 1150
-#define PRICE_FACTORY 1300
-#define PRICE_NUKE 2000
-
-#define STRINGIZE_2(X) #X
-#define STRINGIZE(X) STRINGIZE_2(X)
-
-#define PRICE_MEN_STR STRINGIZE(PRICE_MEN)
-#define PRICE_MOVE_STR STRINGIZE(PRICE_MOVE)
-#define PRICE_TANK_STR STRINGIZE(PRICE_TANK)
-#define PRICE_PLANE_STR STRINGIZE(PRICE_PLANE)
-#define PRICE_FARM_STR STRINGIZE(PRICE_FARM)
-#define PRICE_FACTORY_STR STRINGIZE(PRICE_FACTORY)
-#define PRICE_NUKE_STR STRINGIZE(PRICE_NUKE)
 
 enum {
     RET_VAL_OK,
@@ -149,6 +163,21 @@ static struct settings {
     int startcash;
     int startfood;
     int movesperturn;
+    /* 1=easy 2=medium 3=hard */
+    /* AI difficulty works like this:
+       easy:
+        - no movement
+        - no investing
+       medium:
+        - movement
+        - investing
+        - can build factories/farms
+       hard:
+        - nuclear war
+        - harder to surrender
+    */
+    int compdiff;
+    bool spoil_enabled;
 } superdom_settings;
 
 static struct resources humanres;
@@ -161,7 +190,7 @@ static struct cursor {
     int y;
 } cursor;
 
-static struct tile board[12][12];
+static struct tile board[BOARD_SIZE+2][BOARD_SIZE+2];
 
 static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
@@ -171,9 +200,9 @@ static void init_board(void)
     rb->srand(*rb->current_tick);
     for(i=0;i<12;i++)
     {  /* Hopefully about 50% each colour */
-        for(j=0;j<12;j++)
+        for(j=0;j<BOARD_SIZE+2;j++)
         {
-            if((i<1)||(j<1)||(i>10)||(j>10))
+            if((i<1)||(j<1)||(i>BOARD_SIZE)||(j>BOARD_SIZE))
                 board[i][j].colour = -1;   /* Unset */
             else
                 board[i][j].colour = rb->rand()%2;
@@ -188,8 +217,8 @@ static void init_board(void)
 
     while(compres.farms < superdom_settings.compstartfarms)
     {
-        i = rb->rand()%10 + 1;
-        j = rb->rand()%10 + 1;
+        i = rb->rand()%BOARD_SIZE + 1;
+        j = rb->rand()%BOARD_SIZE + 1;
         if((board[i][j].colour == COLOUR_DARK) && (board[i][j].farm == false))
         {
             board[i][j].farm = true;
@@ -198,8 +227,8 @@ static void init_board(void)
     }
     while(compres.inds < superdom_settings.compstartinds)
     {
-        i = rb->rand()%10 + 1;
-        j = rb->rand()%10 + 1;
+        i = rb->rand()%BOARD_SIZE + 1;
+        j = rb->rand()%BOARD_SIZE + 1;
         if((board[i][j].colour == COLOUR_DARK) && (board[i][j].ind == false))
         {
             board[i][j].ind = true;
@@ -208,8 +237,8 @@ static void init_board(void)
     }
     while(humanres.farms < superdom_settings.humanstartfarms)
     {
-        i = rb->rand()%10 + 1;
-        j = rb->rand()%10 + 1;
+        i = rb->rand()%BOARD_SIZE + 1;
+        j = rb->rand()%BOARD_SIZE + 1;
         if((board[i][j].colour == COLOUR_LIGHT)&&(board[i][j].farm == false))
         {
             board[i][j].farm = true;
@@ -218,8 +247,8 @@ static void init_board(void)
     }
     while(humanres.inds < superdom_settings.humanstartinds)
     {
-        i = rb->rand()%10 + 1;
-        j = rb->rand()%10 + 1;
+        i = rb->rand()%BOARD_SIZE + 1;
+        j = rb->rand()%BOARD_SIZE + 1;
         if((board[i][j].colour == COLOUR_LIGHT) && (board[i][j].ind == false))
         {
             board[i][j].ind = true;
@@ -232,9 +261,9 @@ void draw_board(void)
 {
     int i,j;
     rb->lcd_clear_display();
-    for(i=1;i<11;i++)
+    for(i=1;i<=BOARD_SIZE;i++)
     {
-        for(j=1;j<11;j++)
+        for(j=1;j<=BOARD_SIZE;j++)
         {
             if(board[i][j].colour == COLOUR_DARK)
             {
@@ -325,14 +354,14 @@ void draw_board(void)
     }
     rb->lcd_set_foreground(LCD_BLACK);
     /* Draw Horizontal lines */
-    for(i=0;i<=10;i++)
+    for(i=0;i<=BOARD_SIZE;i++)
     {
-        rb->lcd_hline(MARGIN, MARGIN+(BOX_WIDTH*10), MARGIN+(BOX_HEIGHT*i));
+        rb->lcd_hline(MARGIN, MARGIN+(BOX_WIDTH*BOARD_SIZE), MARGIN+(BOX_HEIGHT*i));
     }
     /* Draw Vertical lines */
-    for(i=0;i<=10;i++)
+    for(i=0;i<=BOARD_SIZE;i++)
     {
-        rb->lcd_vline(MARGIN+(BOX_WIDTH*i), MARGIN, MARGIN+(BOX_HEIGHT*10));
+        rb->lcd_vline(MARGIN+(BOX_WIDTH*i), MARGIN, MARGIN+(BOX_HEIGHT*BOARD_SIZE));
     }
     rb->lcd_update();
 }
@@ -346,15 +375,30 @@ static int calc_strength(int colour, int x, int y)
         {
             if(board[x+a][y+b].colour==colour)
             {
-                score += 10;
-                if(board[x + a][y + b].tank || board[x + a][y + b].farm)
-                    score += 30;
-                if(board[x + a][y + b].plane || board[x + a][y + b].ind)
-                    score += 40;
-                if(board[x + a][y + b].nuke)
-                    score += 20;
-                if(board[x + a][y + b].men)
-                    score += (board[x + a][y + b].men*133/1000);
+                if(a && b) /* diagonally adjacent, give less influence */
+                {
+                    score += 5;
+                    if(board[x + a][y + b].tank || board[x + a][y + b].farm)
+                        score += 15;
+                    if(board[x + a][y + b].plane || board[x + a][y + b].ind)
+                        score += 20;
+                    if(board[x + a][y + b].nuke)
+                        score += 10;
+                    if(board[x + a][y + b].men)
+                        score += (board[x + a][y + b].men*133/1000);
+                }
+                else
+                {
+                    score += 10;
+                    if(board[x + a][y + b].tank || board[x + a][y + b].farm)
+                        score += 30;
+                    if(board[x + a][y + b].plane || board[x + a][y + b].ind)
+                        score += 40;
+                    if(board[x + a][y + b].nuke)
+                        score += 20;
+                    if(board[x + a][y + b].men)
+                        score += (board[x + a][y + b].men*133/1000);
+                }
             }
         }
     }
@@ -468,6 +512,7 @@ void gen_resources(void)
 static void update_score(void)
 {
     int strength;
+
     rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_set_drawmode(DRMODE_BG|DRMODE_INVERSEVID);
     rb->lcd_fillrect(5,LCD_HEIGHT-20,105,20);
@@ -486,7 +531,7 @@ static int settings_menu(void)
     MENUITEM_STRINGLIST(menu, "Super Domination Settings", NULL,
                         "Computer starting farms", "Computer starting factories",
                         "Human starting farms", "Human starting factories",
-                        "Starting cash", "Starting food", "Moves per turn");
+                        "Starting cash", "Starting food", "Computer difficulty","Food spoilage",  "Moves per turn");
 
     while(1)
     {
@@ -523,6 +568,22 @@ static int settings_menu(void)
                         250, 0, 5000, NULL);
             break;
         case 6:
+        {
+            static const struct opt_items difficulty_options[3]={
+                                                           {"Easy", 1},
+                                                           {"Intermediate", 2},
+                                                           {"Hard", 3}
+                                                         };
+            rb->set_option("Computer difficulty", &superdom_settings.compdiff,
+                           INT, difficulty_options, 3, NULL);
+            superdom_settings.compdiff++;
+            break;
+        }
+        case 7:
+            rb->set_bool_options("Food spoilage", &superdom_settings.spoil_enabled, "Enabled",
+                                                                  0, "Disabled", 0, NULL);
+            break;
+        case 8:
             rb->set_int("Moves per turn", "", UNIT_INT,
                         &superdom_settings.movesperturn, NULL,
                         1, 1, 5, NULL);
@@ -1499,7 +1560,7 @@ static int select_square(void)
             }
             else
             {
-                cursor.x = 10;
+                cursor.x = BOARD_SIZE;
             }
             update_score();
             draw_cursor();
@@ -1507,7 +1568,7 @@ static int select_square(void)
         case SUPERDOM_RIGHT:
         case SUPERDOM_RIGHT_REPEAT:
             draw_cursor(); /* Deselect the current tile */
-            if(cursor.x<10)
+            if(cursor.x<BOARD_SIZE)
             {
                 cursor.x++;
             }
@@ -1531,9 +1592,9 @@ static int select_square(void)
                 if(cursor.x > 1)
                     cursor.x--;
                 else
-                    cursor.x = 10;
+                    cursor.x = BOARD_SIZE;
 #endif
-                cursor.y = 10;
+                cursor.y = BOARD_SIZE;
             }
             update_score();
             draw_cursor();
@@ -1541,14 +1602,14 @@ static int select_square(void)
         case SUPERDOM_DOWN:
         case SUPERDOM_DOWN_REPEAT:
             draw_cursor(); /* Deselect the current tile */
-            if(cursor.y<10)
+            if(cursor.y<BOARD_SIZE)
             {
                 cursor.y++;
             }
             else
             {
 #if CONFIG_KEYPAD == IRIVER_H10_PAD
-                if(cursor.x < 10)
+                if(cursor.x < BOARD_SIZE)
                     cursor.x++;
                 else
                     cursor.x = 1;
@@ -1583,9 +1644,9 @@ static int killmen(int colour)
         compres.food = 0;
     }
     menkilled = 0;
-    for(i=1;i<11;i++)
+    for(i=1;i<=BOARD_SIZE;i++)
     {
-        for(j=1;j<11;j++)
+        for(j=1;j<=BOARD_SIZE;j++)
         {
             if(board[i][j].colour == colour)
             {
@@ -1642,11 +1703,11 @@ static int attack_territory(int colour, int x, int y)
         defres->inds -= board[x][y].ind;
         offres->farms += board[x][y].farm;
         offres->inds += board[x][y].ind;
+        offres->nukes += board[x][y].nuke;
         board[x][y].colour = colour;
         board[x][y].men = 0;
         board[x][y].tank = false;
         board[x][y].plane = false;
-        board[x][y].nuke = false;
         draw_board();
         if(human)
             rb->sleep(HZ*2);
@@ -1666,6 +1727,19 @@ static int attack_territory(int colour, int x, int y)
         return 0;
     }
     return 0;
+}
+
+static void spoil_food(void)
+{
+    /* spoil 0-10% of food, different amounts for computer/player */
+    int spoil_amount=humanres.food*(0.1*rb->rand()/RAND_MAX);
+    if(spoil_amount)
+        rb->splashf(2*HZ, "Spoilage claims %d units of food", spoil_amount);
+    humanres.food-=spoil_amount;
+
+    /* now for computer */
+    spoil_amount=compres.food*(0.1*rb->rand()/RAND_MAX);
+    compres.food-=spoil_amount;
 }
 
 static int war_menu(void)
@@ -1782,7 +1856,7 @@ static void computer_allocate(void)
 {
     /* Firstly, decide whether to go offensive or defensive.
      * This is primarily decided by the human player posing a threat to either
-     * the computer's farms or factories */
+     * the computer's farms, factories or nukes */
     int i, j, k;
     bool offensive = true;
     struct threat threats[4];
@@ -1797,17 +1871,18 @@ static void computer_allocate(void)
 
     compres.cash += compres.bank;
     compres.bank = 0;
-    for(i=1;i<11;i++)
+    for(i=1;i<=BOARD_SIZE;i++)
     {
-        for(j=1;j<11;j++)
+        for(j=1;j<=BOARD_SIZE;j++)
         {
             if(board[i][j].colour == COLOUR_DARK)
             {
                 numterritory++;
                 str_diff = calc_strength(COLOUR_LIGHT,i,j) -
                     calc_strength(COLOUR_DARK,i,j);
-                if(str_diff > 0 && (board[i][j].ind || board[i][j].farm))
+                if(str_diff > 0 && (board[i][j].ind || board[i][j].farm || board[i][j].nuke))
                 {
+                    /* computer's farm/factory/nuke is being threatened */
                     if(numthreats < 3)
                     {
                         offensive = false;
@@ -1821,10 +1896,24 @@ static void computer_allocate(void)
             rb->yield();
         }
     }
+    /* AI player will buy nukes if possible first */
+    if(compres.cash > PRICE_NUKE + PRICE_TANK && superdom_settings.compdiff>=3)
+    {
+        while(compres.cash >= PRICE_NUKE && compres.nukes < numterritory)
+        {
+            i = rb->rand()%BOARD_SIZE + 1;
+            j = rb->rand()%BOARD_SIZE + 1;
+            if(board[i][j].colour == COLOUR_DARK)
+            {
+                buy_resources(COLOUR_DARK, 5, i, j, 0);
+            }
+            rb->yield();
+        }
+    }
     if(offensive)
     {
         /* The AI is going to go straight for the throat here and attack
-         * the player's farms and factories. The amount of cash
+         * the player's farms, nukes, and factories. The amount of cash
          * the AI has to spend will determine how many targets there are */
         if(compres.cash > 1200)
         {
@@ -1839,12 +1928,12 @@ static void computer_allocate(void)
          * owned by the computer. If none are found just place troops in
          * random places around the map until we run out of money */
         k = 0;
-        for(i=1;i<11;i++)
+        for(i=1;i<=BOARD_SIZE;i++)
         {
-            for(j=1;j<11;j++)
+            for(j=1;j<=BOARD_SIZE;j++)
             {
                 if(has_adjacent(i,j) &&
-                   (board[i][j].ind || board[i][j].farm))
+                   (board[i][j].ind || board[i][j].farm || board[i][j].nuke))
                 {
                     if(k<numtargets)
                     {
@@ -1863,10 +1952,12 @@ static void computer_allocate(void)
         {
             /* No targets found! Randomly pick squares and if they're owned
              * by the computer then stick a tank on it. */
-            while(compres.cash >= 300 && compres.tanks < numterritory) {
-                i = rb->rand()%10 + 1;
-                j = rb->rand()%10 + 1;
-                if(board[i][j].colour == COLOUR_DARK) {
+            while(compres.cash >= 300 && compres.tanks < numterritory)
+            {
+                i = rb->rand()%BOARD_SIZE + 1;
+                j = rb->rand()%BOARD_SIZE + 1;
+                if(board[i][j].colour == COLOUR_DARK)
+                {
                     buy_resources(COLOUR_DARK, 1, i, j, 0);
                 }
                 rb->yield();
@@ -1962,8 +2053,12 @@ static void computer_allocate(void)
             }
         }
     }
-    compres.bank += compres.cash;
-    compres.cash = 0;
+    /* no investing in easy mode */
+    if(superdom_settings.compdiff>=2)
+    {
+        compres.bank += compres.cash;
+        compres.cash = 0;
+    }
 }
 
 static int find_adj_target(int x, int y, struct cursor* adj)
@@ -2001,9 +2096,14 @@ static int find_adj_target(int x, int y, struct cursor* adj)
     return 0;
 }
 
+static void computer_movement(void)
+{
+
+}
+
 static void computer_war(void)
 {
-    /* Work out where to attack - prioritise the defence of buildings */
+    /* Work out where to attack - prioritise the defence of buildings and nukes */
     int i, j;
     bool found_target = true;
     struct cursor adj;
@@ -2011,12 +2111,12 @@ static void computer_war(void)
     while(found_target)
     {
         found_target = false;
-        for(i=1;i<11;i++)
+        for(i=1;i<=BOARD_SIZE;i++)
         {
-            for(j=1;j<11;j++)
+            for(j=1;j<=BOARD_SIZE;j++)
             {
                 if((board[i][j].colour == COLOUR_DARK)   &&
-                   (board[i][j].farm || board[i][j].ind) &&
+                   (board[i][j].farm || board[i][j].ind || board[i][j].nuke) &&
                    find_adj_target(i, j, &adj))
                 {
                     found_target = true;
@@ -2036,12 +2136,12 @@ static void computer_war(void)
     while(found_target)
     {
         found_target = false;
-        for(i=1;i<11;i++)
+        for(i=1;i<=BOARD_SIZE;i++)
         {
-            for(j=1;j<11;j++)
+            for(j=1;j<=BOARD_SIZE;j++)
             {
                 if(board[i][j].colour == COLOUR_LIGHT    &&
-                   (board[i][j].ind || board[i][j].farm) &&
+                   (board[i][j].ind || board[i][j].farm || board[i][j].nuke) &&
                    (calc_strength(COLOUR_DARK, i, j) >= calc_strength(COLOUR_LIGHT, i, j)))
                 {
                     found_target = true;
@@ -2061,9 +2161,9 @@ static void computer_war(void)
     while(found_target)
     {
         found_target = false;
-        for(i=1;i<11;i++)
+        for(i=1;i<=BOARD_SIZE;i++)
         {
-            for(j=1;j<11;j++)
+            for(j=1;j<=BOARD_SIZE;j++)
             {
                 if(board[i][j].colour == COLOUR_LIGHT &&
                    (calc_strength(COLOUR_DARK, i, j)  >=
@@ -2141,6 +2241,8 @@ static void default_settings(void)
     superdom_settings.startcash = 0;
     superdom_settings.startfood = 0;
     superdom_settings.movesperturn = 2;
+    superdom_settings.compdiff=2;
+    superdom_settings.spoil_enabled=false;
 }
 
 static int average_strength(int colour)
@@ -2149,9 +2251,9 @@ static int average_strength(int colour)
      * used to determine when the computer wins or loses. */
     int i,j;
     int totalpower = 0;
-    for(i=1;i<11;i++)
+    for(i=1;i<=BOARD_SIZE;i++)
     {
-        for(j=1;j<11;j++)
+        for(j=1;j<=BOARD_SIZE;j++)
         {
             if(board[i][j].colour != -1)
             {
@@ -2159,7 +2261,7 @@ static int average_strength(int colour)
             }
         }
     }
-    return totalpower/100;
+    return totalpower/NUM_SPACES;
 }
 
 enum plugin_status plugin_start(const void* parameter)
@@ -2220,12 +2322,15 @@ startyear:
     {
         int avg_str_diff = (average_strength(COLOUR_LIGHT) -
                             average_strength(COLOUR_DARK));
-        if(avg_str_diff > 15)
+        /* computer will hold out longer in hard mode */
+        if(avg_str_diff > (superdom_settings.compdiff>=3     ?
+                           COMPUTER_HARD_SURRENDER_THRESHOLD :
+                           COMPUTER_SURRENDER_THRESHOLD))
         {
             rb->splash(HZ*4, "The computer has surrendered. You win.");
             return PLUGIN_OK;
         }
-        if(-avg_str_diff > 15)
+        if(-avg_str_diff > HUMAN_SURRENDER_THRESHOLD)
         {
             rb->splash(HZ*4, "Your army have suffered terrible morale from"
                        " the bleak prospects of winning. You lose.");
@@ -2259,6 +2364,15 @@ startyear:
             return PLUGIN_OK;
             break;
         }
+        /* computer movement */
+        computer_movement();
+
+        /* spoil food */
+        if(superdom_settings.spoil_enabled)
+        {
+            spoil_food();
+        }
+
         /* feed men */
         if(humanres.men)
         {
