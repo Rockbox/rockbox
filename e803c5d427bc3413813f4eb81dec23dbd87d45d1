@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_b694c8e8",
+        "filename": "firmware/target/arm/ipod/button-clickwheel.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1000351
+      },
+      "writtenOn": "2014-08-28T19:01:15Z",
+      "side": 1,
+      "message": "This change breaks bidirectional communication with the wheel, which is required for detecting the button state during boot.\nI suspect that this GPIO is in fact the wheel TX pin.\nWhat is the reasoning for this change? I assume this was reverse engineered from some OF code?\nAlso, how do you know that PUNB is related to pull-ups? While it seems to make sense, I couldn\u0027t find such information in the datasheets that I\u0027m aware of.",
+      "revId": "e803c5d427bc3413813f4eb81dec23dbd87d45d1",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
