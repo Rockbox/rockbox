@@ -227,7 +227,18 @@ therefore result in better runtime.
       on the touchpad.
     }
     \end{description}
+    \begin{description}
+    \opt{touchpad_deadzone}{
+      \item [Touchpad Deadzone. ]This setting controls the size of a configurable deadzone
+      where touch events between virtual keys are ignored.  If set to \opt{SANSA_FUZEPLUS_PAD}
+      {\setting{0}} there is effectivly no deadzone. If set to \opt{SANSA_FUZEPLUS_PAD}
+      {\setting{100}} the deadzones between each virtual button are set to a maximuim
+      400px.
+    }
+    \end{description}
 }
+
+
 
 \opt{usb_hid}{
   \subsection{\label{ref:USB_HID}USB HID}
