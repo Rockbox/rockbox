@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_3689d8cb",
+        "filename": "apps/plugins/viewers.config",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000220
+      },
+      "writtenOn": "2014-08-29T07:30:38Z",
+      "side": 1,
+      "message": "Why so many deletions?  Surely conditionals can be used to make this universal to all targets.",
+      "revId": "5dd09c8279493362bb0b620e05cc7aab5ffd4bc9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}

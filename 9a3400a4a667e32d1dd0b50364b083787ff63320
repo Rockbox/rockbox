@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_d6a3444e",
+        "filename": "apps/plugins/viewers.config",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000220
+      },
+      "writtenOn": "2014-08-29T07:30:38Z",
+      "side": 0,
+      "message": "I\u0027m guessing this conditional was here for a reason (without digging deeper) Is there a good reason to remove it?  Does removing it break other targets?",
+      "revId": "9a3400a4a667e32d1dd0b50364b083787ff63320",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
