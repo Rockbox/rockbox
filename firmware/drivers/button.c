@@ -309,7 +309,12 @@ static void button_tick(void)
                     }
                     else
 #endif
-                        if (!filter_first_keypress || is_backlight_on(false)
+#ifdef SMARTPHONE_UI_STYLE
+                        if (!(btn & SMARTPHONE_UI_STYLE_BUTTONS)
+#else
+                        if (!filter_first_keypress
+#endif
+                           || is_backlight_on(false)
 #if BUTTON_REMOTE
                                 || (btn & BUTTON_REMOTE)
 #endif
@@ -322,18 +327,27 @@ static void button_tick(void)
 #endif
                     post = false;
                 }
+#ifdef SMARTPHONE_UI_STYLE
+                if(btn & SMARTPHONE_UI_STYLE_BUTTONS){
+#endif
 #ifdef HAVE_REMOTE_LCD
-                if(btn & BUTTON_REMOTE)
-                    remote_backlight_on();
-                else
+                    if(btn & BUTTON_REMOTE)
+                        remote_backlight_on();
+                    else
 #endif
-                {
-                    backlight_on();
+                    {
+                        backlight_on();
 #ifdef HAVE_BUTTON_LIGHT
-                    buttonlight_on();
+                        buttonlight_on();
 #endif
+                   }
+#ifdef SMARTPHONE_UI_STYLE
                 }
-
+                else if(is_backlight_on(false))
+                {
+                    backlight_reset_timeout();
+                }
+#endif
                 reset_poweroff_timer();
             }
         }

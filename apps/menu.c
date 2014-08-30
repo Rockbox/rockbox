@@ -553,6 +553,12 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 ret = GO_TO_PREVIOUS;
                 done = true;
             }
+#ifdef SMARTPHONE_UI_STYLE
+            else{
+                ret = GO_TO_PREVIOUS_MUSIC;
+                done = true;
+            }
+#endif
         }
         else if (action == ACTION_STD_OK)
         {

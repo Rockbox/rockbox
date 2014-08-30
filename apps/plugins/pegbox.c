@@ -616,6 +616,11 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LVL_DOWN_TEXT     "PLAY/PAUSE"
 #define SELECT_TEXT       "SELECT"
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define PEGBOX_QUIT       BUTTON_POWER
+
+#define QUIT_TEXT         "Power"
+
 #else
 #error Unsupported keymap!
 #endif

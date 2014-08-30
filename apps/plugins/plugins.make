@@ -11,7 +11,9 @@
 is_app_build =
 ifdef APP_TYPE
 ifneq ($(APP_TYPE),sdl-sim)
-  is_app_build = yes
+ifeq (,$(findstring standalone, $(APP_TYPE)))
+    is_app_build = yes
+endif
 endif
 endif
 
