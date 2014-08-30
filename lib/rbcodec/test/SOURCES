@@ -2,4 +2,4 @@ warble.c
 ../../../firmware/common/strlcpy.c
 ../../../firmware/common/unicode.c
 ../../../firmware/common/structec.c
-../../../uisimulator/common/io.c
+../../../firmware/common/pathfuncs.c

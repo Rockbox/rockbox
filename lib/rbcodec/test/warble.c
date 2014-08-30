@@ -77,6 +77,13 @@ int find_first_set_bit(uint32_t value)
     return __builtin_ctz(value);
 }
 
+off_t filesize(int fd)
+{
+    struct stat st;
+    fstat(fd, &st);
+    return st.st_size;
+}
+
 /***************** INTERNAL *****************/
 
 static enum { MODE_PLAY, MODE_WRITE } mode;

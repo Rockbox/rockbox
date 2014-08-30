@@ -50,15 +50,7 @@
 #endif
 
 /* filesize */
-#include <sys/stat.h>
 off_t filesize(int fd);
-/*
-static inline off_t filesize(int fd) {
-    struct stat st;
-    fstat(fd, &st);
-    return st.st_size;
-}
-*/
 
 /* snprintf */
 #include <stdio.h>

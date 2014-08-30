@@ -94,6 +94,20 @@ bool hostfs_present(IF_MD_NONVOID(int drive))
         return true; /* internal: always present */
 }
 
+#ifdef HAVE_MULTIDRIVE
+int volume_drive(int drive)
+{
+    return drive;
+}
+#endif /* HAVE_MULTIDRIVE */
+
+#ifdef CONFIG_STORAGE_MULTI
+int hostfs_driver_type(int drive)
+{
+    return drive > 0 ? STORAGE_SD_NUM : STORAGE_HOSTFS_NUM;
+}
+#endif /* CONFIG_STORAGE_MULTI */
+
 #ifdef HAVE_HOTSWAP
 bool volume_removable(int volume)
 {

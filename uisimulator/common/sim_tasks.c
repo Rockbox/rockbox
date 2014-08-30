@@ -234,4 +234,26 @@ bool mmc_touched(void)
 }
 #endif
 
+#ifdef CONFIG_STORAGE_MULTI
+int hostfs_driver_type(int drive)
+{
+    /* Hack alert */
+#if (CONFIG_STORAGE & STORAGE_ATA)
+ #define SIMEXT1_TYPE_NUM   STORAGE_ATA_NUM
+#elif (CONFIG_STORAGE & STORAGE_SD)
+ #define SIMEXT1_TYPE_NUM   STORAGE_SD_NUM
+#elif (CONFIG_STORAGE & STORAGE_MMC)
+ #define SIMEXT1_TYPE_NUM   STORAGE_MMC_NUM
+#elif (CONFIG_STORAGE & STORAGE_NAND)
+ #define SIMEXT1_TYPE_NUM   STORAGE_NAND_NUM
+#elif (CONFIG_STORAGE & STORAGE_RAMDISK)
+ #define SIMEXT1_TYPE_NUM   STORAGE_RAMDISK_NUM
+#else
+#error Unknown storage driver
+#endif /* CONFIG_STORAGE */
+
+    return drive > 0 ? SIMEXT1_TYPE_NUM : STORAGE_HOSTFS_NUM;
+}
+#endif /* CONFIG_STORAGE_MULTI */
+
 #endif /* CONFIG_STORAGE & STORAGE_MMC */
