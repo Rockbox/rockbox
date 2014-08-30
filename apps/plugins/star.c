@@ -581,6 +581,10 @@
 #define STAR_TOGGLE_CONTROL_NAME "Select"
 #define STAR_QUIT_NAME           "Back"
 
+#elif (CONFIG_KEYPAD == DX50_PAD)
+#define STAR_QUIT           BUTTON_POWER
+#define STAR_QUIT_NAME      "Power"
+
 #else
 #error No keymap defined!
 #endif

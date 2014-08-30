@@ -188,7 +188,7 @@ bool touchscreen_is_enabled(void)
 }
 #endif
 
-#if ((CONFIG_PLATFORM & PLATFORM_ANDROID) == 0)
+#if ((CONFIG_PLATFORM & PLATFORM_ANDROID) == 0) || defined(DX50) || defined(DX90)
 /* android has an API for this */
 
 #define TOUCH_SLOP      16u

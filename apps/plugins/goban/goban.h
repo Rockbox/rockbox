@@ -432,6 +432,9 @@
 #define  GBN_BUTTON_CONTEXT            BUTTON_PLAY
 #define  GBN_BUTTON_NEXT_VAR           BUTTON_NEXT
 
+#elif (CONFIG_KEYPAD == DX50_PAD)
+#define  GBN_BUTTON_MENU               (BUTTON_POWER|BUTTON_REL)
+
 #else
 #error Unsupported keypad
 #endif

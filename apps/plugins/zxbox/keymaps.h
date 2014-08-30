@@ -262,6 +262,14 @@
 #define ZX_RIGHT        BUTTON_RIGHT
 #define ZX_SELECT       BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define ZX_MENU         BUTTON_POWER
+#define ZX_UP           BUTTON_VOL_UP
+#define ZX_DOWN         BUTTON_VOL_DOWN
+#define ZX_SELECT       BUTTON_PLAY
+#define ZX_LEFT         BUTTON_LEFT
+#define ZX_RIGHT        BUTTON_RIGHT
+
 #else
 #error Keymap not defined!
 
