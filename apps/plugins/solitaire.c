@@ -651,6 +651,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define HK_CUR2STACK  "Menu"
 #define HK_REM2STACK  "Shortcut"
 
+#elif (CONFIG_KEYPAD == DX50_PAD)
+#   define SOL_QUIT          (BUTTON_POWER | BUTTON_REL)
+
 #else
 #error No keymap defined!
 #endif
