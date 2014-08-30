@@ -470,15 +470,7 @@ static void load_codec(const struct codec_load_info *ev_data)
         /* Either not a valid handle or the buffer method failed */
         const char *codec_fn = get_codec_filename(data.afmt);
         if (codec_fn)
-        {
-#ifdef HAVE_IO_PRIORITY
-            buf_back_off_storage(true);
-#endif
             status = codec_load_file(codec_fn, &ci);
-#ifdef HAVE_IO_PRIORITY
-            buf_back_off_storage(false);
-#endif
-        }
     }
 
     /* Types must agree */

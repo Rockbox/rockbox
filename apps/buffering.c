@@ -1572,15 +1572,6 @@ size_t buf_get_watermark(void)
     return BUF_WATERMARK;
 }
 
-#ifdef HAVE_IO_PRIORITY
-void buf_back_off_storage(bool back_off)
-{
-    int priority = back_off ?
-        IO_PRIORITY_BACKGROUND : IO_PRIORITY_IMMEDIATE;
-    thread_set_io_priority(buffering_thread_id, priority);
-}
-#endif
-
 /** -- buffer thread helpers -- **/
 static void shrink_buffer_inner(struct memory_handle *h)
 {

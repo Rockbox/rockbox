@@ -134,9 +134,6 @@ struct thread_entry
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     unsigned char cpu_boost;     /* CPU frequency boost flag */
 #endif
-#ifdef HAVE_IO_PRIORITY
-    unsigned char io_priority;
-#endif
 };
 
 /* Thread ID, 32 bits = |VVVVVVVV|VVVVVVVV|VVVVVVVV|SSSSSSSS| */

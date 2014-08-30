@@ -111,9 +111,6 @@ size_t buf_length(void);
 size_t buf_used(void);
 bool buf_pin_handle(int handle_id, bool pin);
 bool buf_signal_handle(int handle_id, bool signal);
-#ifdef HAVE_IO_PRIORITY
-void buf_back_off_storage(bool back_off);
-#endif
 
 /* Settings */
 void buf_set_watermark(size_t bytes);

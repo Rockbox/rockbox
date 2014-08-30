@@ -1560,9 +1560,6 @@ static bool audio_load_cuesheet(struct track_info *info,
         int hid = ERR_UNSUPPORTED_TYPE;
         struct cuesheet_file cue_file;
 
-#ifdef HAVE_IO_PRIORITY
-        buf_back_off_storage(true);
-#endif
         if (look_for_cuesheet_file(track_id3, &cue_file))
         {
             hid = bufalloc(NULL, sizeof (struct cuesheet), TYPE_CUESHEET);
@@ -1586,9 +1583,6 @@ static bool audio_load_cuesheet(struct track_info *info,
             }
         }
 
-#ifdef HAVE_IO_PRIORITY
-        buf_back_off_storage(false);
-#endif
         if (hid == ERR_BUFFER_FULL)
         {
             logf("buffer is full for now (%s)", __func__);
@@ -1627,10 +1621,6 @@ static bool audio_load_albumart(struct track_info *info,
         memset(&user_data, 0, sizeof(user_data));
         user_data.dim = &albumart_slots[i].dim;
 
-#ifdef HAVE_IO_PRIORITY
-        buf_back_off_storage(true);
-#endif
-
         /* We can only decode jpeg for embedded AA */
         if (track_id3->has_embedded_albumart && track_id3->albumart.type == AA_TYPE_JPG)
         {
@@ -1651,9 +1641,6 @@ static bool audio_load_albumart(struct track_info *info,
             }
         }
 
-#ifdef HAVE_IO_PRIORITY
-        buf_back_off_storage(false);
-#endif
         if (hid == ERR_BUFFER_FULL)
         {
             logf("buffer is full for now (%s)", __func__);

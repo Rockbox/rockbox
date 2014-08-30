@@ -367,10 +367,6 @@ static void new_thread_base_init(struct thread_entry *thread,
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     thread->cpu_boost = 0;
 #endif
-#ifdef HAVE_IO_PRIORITY
-    /* Default to high (foreground) priority */
-    thread->io_priority = IO_PRIORITY_IMMEDIATE;
-#endif
 }
 
 /*---------------------------------------------------------------------------
@@ -1420,20 +1416,6 @@ int thread_get_priority(unsigned int thread_id)
     return base_priority;
 }
 #endif /* HAVE_PRIORITY_SCHEDULING */
-
-#ifdef HAVE_IO_PRIORITY
-int thread_get_io_priority(unsigned int thread_id)
-{
-    struct thread_entry *thread = __thread_id_entry(thread_id);
-    return thread->io_priority;
-}
-
-void thread_set_io_priority(unsigned int thread_id,int io_priority)
-{
-    struct thread_entry *thread = __thread_id_entry(thread_id);
-    thread->io_priority = io_priority;
-}
-#endif
 
 /*---------------------------------------------------------------------------
  * Starts a frozen thread - similar semantics to wakeup_thread except that

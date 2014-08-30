@@ -1196,10 +1196,6 @@ Lyre prototype 1 */
 #define HAVE_PLUGIN_CHECK_OPEN_CLOSE
 #endif
 
-#if defined(HAVE_DIRCACHE) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
-#define HAVE_IO_PRIORITY
-#endif
-
 #if defined(CPU_COLDIRE) || CONFIG_CPU == IMX31L
 /* Can record and play simultaneously */
 #define HAVE_PCM_FULL_DUPLEX

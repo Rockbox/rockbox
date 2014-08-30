@@ -169,11 +169,6 @@ int thread_set_priority(unsigned int thread_id, int priority);
 int thread_get_priority(unsigned int thread_id);
 #endif /* HAVE_PRIORITY_SCHEDULING */
 
-#ifdef HAVE_IO_PRIORITY
-void thread_set_io_priority(unsigned int thread_id, int io_priority);
-int thread_get_io_priority(unsigned int thread_id);
-#endif /* HAVE_IO_PRIORITY */
-
 #if NUM_CORES > 1
 unsigned int switch_core(unsigned int new_core);
 #endif
