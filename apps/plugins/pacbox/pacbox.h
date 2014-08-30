@@ -328,6 +328,9 @@
 #define PACMAN_1UP      BUTTON_SELECT
 #define PACMAN_COIN     BUTTON_PLAYPAUSE
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define PACMAN_MENU     BUTTON_POWER
+
 #else
 
 #error Keymap not defined!

@@ -398,6 +398,9 @@
 #define SUDOKU_BUTTON_TOGGLE     BUTTON_SELECT
 #define SUDOKU_BUTTON_POSSIBLE   BUTTON_SHORTCUT
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define SUDOKU_BUTTON_QUIT       (BUTTON_POWER|BUTTON_REL)
+
 #else
 #error No keymap defined!
 #endif

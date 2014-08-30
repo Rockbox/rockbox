@@ -486,6 +486,11 @@
 #define OSCILLOSCOPE_VOL_UP         BUTTON_UP
 #define OSCILLOSCOPE_VOL_DOWN       BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define OSCILLOSCOPE_QUIT            (BUTTON_POWER|BUTTON_REL)
+#define OSCILLOSCOPE_VOL_UP          BUTTON_VOL_UP
+#define OSCILLOSCOPE_VOL_DOWN        BUTTON_VOL_DOWN
+
 #else
 #error No keymap defined!
 #endif

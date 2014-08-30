@@ -311,6 +311,13 @@ CONFIG_KEYPAD == SANSA_CONNECT_PAD
 #define UP        BUTTON_UP
 #define DOWN      BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define QUIT      BUTTON_POWER
+#define LEFT      BUTTON_LEFT
+#define RIGHT     BUTTON_RIGHT
+#define SELECT    BUTTON_PLAY
+#define UP        BUTTON_VOL_UP
+#define DOWN      BUTTON_VOL_DOWN
 
 #else
 #error No keymap defined!
