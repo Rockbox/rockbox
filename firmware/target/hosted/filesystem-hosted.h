@@ -63,6 +63,7 @@ bool os_file_exists(const char *ospath);
 #define _FILESYSTEM_HOSTED__DIR_H_
 
 #ifndef OSFUNCTIONS_DECLARED
+int os_opendirfd(const char *osdirname);
 int os_opendir_and_fd(const char *osdirname, OS_DIR_T **osdirpp,
                       int *osfdp);
 

@@ -54,6 +54,7 @@
 #else /* APPLICATION */
 #ifdef __PCTOOL__
 #define yield()
+#define DEFAULT_CP_STATIC_ALLOC
 #endif
 #define open_noiso_internal open
 #endif /* !APPLICATION */
@@ -182,6 +183,23 @@ const char *get_current_codepage_name_linux(void)
 }
 #endif /* defined(APPLICATION) && defined(__linux__) */
 
+#ifdef DEFAULT_CP_STATIC_ALLOC
+static unsigned short default_cp_table_buf[MAX_CP_TABLE_SIZE+1];
+#define cp_table_get_data(handle) \
+    default_cp_table_buf
+#define cp_table_free(handle) \
+    do {} while (0)
+#define cp_table_alloc(filename, size, opsp) \
+    ({ (void)(opsp); 1; })
+#else
+#define cp_table_alloc(filename, size, opsp) \
+    core_alloc_ex((filename), (size), (opsp))
+#define cp_table_free(handle) \
+    core_free(handle)
+#define cp_table_get_data(handle) \
+    core_get_data(handle)
+#endif
+
 static const unsigned char utf8comp[6] =
 {
     0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC
@@ -233,9 +251,9 @@ static int alloc_and_load_cp_table(int cp, void *buf)
         !(size % (off_t)sizeof (uint16_t))) {
 
         /* if the buffer is provided, use that but don't alloc */
-        int handle = buf ? 0 : core_alloc_ex(filename, size, &ops);
+        int handle = buf ? 0 : cp_table_alloc(filename, size, &ops);
         if (handle > 0)
-            buf = core_get_data(handle);
+            buf = cp_table_get_data(handle);
 
         if (buf && read(fd, buf, size) == size) {
             close(fd);
@@ -244,7 +262,7 @@ static int alloc_and_load_cp_table(int cp, void *buf)
         }
 
         if (handle > 0)
-            core_free(handle);
+            cp_table_free(handle);
     }
 
     close(fd);
@@ -284,7 +302,7 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
         if (tid == default_cp_tid) {
             /* use default table */
             if (default_cp_handle > 0) {
-                table = core_get_data(default_cp_handle);
+                table = cp_table_get_data(default_cp_handle);
                 default_cp_table_ref++;
             }
 
@@ -564,7 +582,7 @@ void set_codepage(int cp)
     cp_lock_leave();
 
     if (handle > 0)
-        core_free(handle);
+        cp_table_free(handle);
 }
 
 int get_codepage(void)

@@ -584,6 +584,7 @@ Lyre prototype 1 */
 #define CONFIG_CPU 0
 #undef HAVE_MULTIVOLUME
 #undef HAVE_MULTIDRIVE
+#undef CONFIG_STORAGE
 #endif
 
 #ifdef APPLICATION

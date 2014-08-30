@@ -40,6 +40,7 @@
 #include "panic.h"
 #include "power.h"
 #include "powermgmt.h"
+#include "file_internal.h"
 #include "file.h"
 #include "version.h"
 #include "loader_strerror.h"

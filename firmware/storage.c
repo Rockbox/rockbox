@@ -192,7 +192,7 @@ int storage_num_drives(void)
 
 int storage_driver_type(int drive)
 {
-    if (drive >= num_drives)
+    if ((unsigned int)drive >= num_drives)
         return -1;
 
     unsigned int bit = (storage_drivers[drive] & DRIVER_MASK)>>DRIVER_OFFSET;

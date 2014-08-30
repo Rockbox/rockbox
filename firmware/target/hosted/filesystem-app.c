@@ -69,7 +69,7 @@ static const char *handle_special_links(const char* link, unsigned flags,
 {
     (void) flags;
     char vol_string[VOL_MAX_LEN + 1];
-    get_volume_name(-1, vol_string);
+    int len = get_volume_name(-1, vol_string);
 
     /* link might be passed with or without HOME_DIR expanded. To handle
      * both perform substring matching (VOL_NAMES is unique enough) */
@@ -354,7 +354,7 @@ DIR * app_opendir(const char *dirname)
 
 #ifdef HAVE_MULTIDRIVE
     this->volumes_returned = INT_MAX; /* assume NOT $HOME */
-    if (rbhome_fildes >= 0 && os_samefile(rbhome_fildes, fd) > 0)
+    if (rbhome_fildes >= 0 && os_fsamefile(rbhome_fildes, this->osfd) > 0)
         this->volumes_returned = 0; /* there's no place like $HOME */
 #endif /* HAVE_MULTIDRIVE */
 
