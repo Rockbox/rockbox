@@ -497,6 +497,9 @@ F3: equal to "="
 #define CALCULATOR_CALC    BUTTON_PLAYPAUSE
 #define CALCULATOR_CLEAR   BUTTON_SHORTCUT
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define CALCULATOR_QUIT    BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

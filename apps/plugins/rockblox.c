@@ -449,6 +449,14 @@
 #define ROCKBLOX_DROP          BUTTON_SELECT
 #define ROCKBLOX_RESTART       BUTTON_SHORTCUT
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define ROCKBLOX_OFF           BUTTON_POWER
+#define ROCKBLOX_ROTATE        BUTTON_RIGHT
+#define ROCKBLOX_LEFT          BUTTON_LEFT
+#define ROCKBLOX_RIGHT         BUTTON_PLAY
+#define ROCKBLOX_DROP          BUTTON_VOL_DOWN
+#define ROCKBLOX_RESTART       BUTTON_VOL_UP
+
 #else
 #error No keymap defined!
 #endif

@@ -287,6 +287,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define PONG_RIGHT_UP    BUTTON_RIGHT
 #define PONG_RIGHT_DOWN  BUTTON_LEFT
 
+#elif (CONFIG_KEYPAD == DX50_PAD)
+#define PONG_QUIT (BUTTON_POWER|BUTTON_REL)
+
 #else
 #error No keymap defined!
 #endif

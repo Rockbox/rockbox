@@ -402,6 +402,13 @@ static void setoptions (void)
         options.A      = BUTTON_SHORTCUT;
         options.B      = BUTTON_PLAYPAUSE;
 
+#elif CONFIG_KEYPAD == DX50_PAD
+        options.A       = BUTTON_VOL_UP;
+        options.B       = BUTTON_VOL_DOWN;
+        options.MENU    = BUTTON_POWER;
+        options.START   = BUTTON_LEFT;
+        options.SELECT  = BUTTON_RIGHT;
+
 #else
 #error No Keymap Defined!
 #endif
@@ -414,7 +421,7 @@ static void setoptions (void)
 #if CONFIG_KEYPAD == MROBE500_PAD
         options.A       = BUTTON_BOTTOMLEFT;
         options.B       = BUTTON_BOTTOMRIGHT;
-#elif CONFIG_KEYPAD != COWON_D2_PAD
+#elif (CONFIG_KEYPAD != COWON_D2_PAD ) || (CONFIG_KEYPAD != DX50_PAD )
         options.A       = BUTTON_BOTTOMLEFT;
         options.B       = BUTTON_BOTTOMRIGHT;
         options.MENU    = BUTTON_TOPLEFT;

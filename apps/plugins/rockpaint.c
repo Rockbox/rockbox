@@ -310,6 +310,9 @@
 #define ROCKPAINT_TOOLBAR     BUTTON_SHORTCUT
 #define ROCKPAINT_TOOLBAR2    BUTTON_PLAYPAUSE
 
+#elif ( CONFIG_KEYPAD == DX50_PAD )
+#define ROCKPAINT_QUIT      (BUTTON_POWER|BUTTON_REL)
+
 #else
 #error "Please define keys for this keypad"
 #endif
