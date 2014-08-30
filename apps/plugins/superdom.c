@@ -19,9 +19,7 @@
  *
  ****************************************************************************/
 /* TODO list:
-   - don't hardcode board size
    - improve AI (move, use nukes, etc.)
-   - allow for configurable AI
 */
 
 
@@ -1294,7 +1292,11 @@ static int launch_nuke(int colour, int nukex, int nukey, int targetx, int target
     board[targetx][targety].nuke = false;
     board[targetx][targety].farm = false;
     /* TODO: Fallout carried by wind */
-
+    draw_board();
+    if(human)
+        rb->sleep(HZ*2);
+    else
+        rb->sleep(HZ);
     return RET_VAL_OK;
 }
 
@@ -2098,7 +2100,78 @@ static int find_adj_target(int x, int y, struct cursor* adj)
 
 static void computer_movement(void)
 {
+    /* use nukes */
+    if(superdom_settings.compdiff>=3)
+    {
+        struct cursor nukes[10]; /* 10 for now, change as needed */
+        int nukes_back=0;
+        rb->splashf(HZ, "computer has %d nukes", compres.nukes);
+        if(compres.nukes>0)
+        {
+            for(int i=1;i<=BOARD_SIZE && nukes_back<compres.nukes && nukes_back<10;i++)
+            {
+                for(int j=1;j<BOARD_SIZE && nukes_back<compres.nukes && nukes_back<10 ;j++)
+                {
+                    if(board[i][j].nuke)
+                    {
+                        nukes[nukes_back].x=i;
+                        nukes[nukes_back].y=j;
+                        nukes_back++;
+                    }
+                    rb->yield();
+                }
+            }
+            bool found_target=true;
+            struct cursor adj;
+            int next_nuke=0;
+            /* first, use nukes for defence */
+            while(found_target && next_nuke<nukes_back)
+            {
+                found_target = false;
+                for(int i=1;i<=BOARD_SIZE && nukes_back<compres.nukes && nukes_back<10;i++)
+                {
+                    for(int j=1;j<=BOARD_SIZE && nukes_back<compres.nukes && nukes_back<10;j++)
+                    {
+                        if((board[i][j].colour == COLOUR_DARK)   &&
+                           (board[i][j].farm || board[i][j].ind || board[i][j].nuke) &&
+                           find_adj_target(i, j, &adj))
+                        {
+                            found_target = true;
+                            rb->splashf(2*HZ, "Launching nuke for defence, from (%d, %d) to (%d, %d)", nukes[next_nuke].x, nukes[next_nuke].y, adj.x, adj.y);
+                            launch_nuke(COLOUR_DARK, nukes[next_nuke].x, nukes[next_nuke].y, adj.x, adj.y);
+                            next_nuke++;
+                        }
+                        rb->yield();
+                    }
+                }
+            }
 
+            /* if we still have any left over, use those for offence */
+            found_target = true;
+            while(found_target && next_nuke<nukes_back)
+            {
+                found_target = false;
+                for(int i=1;i<=BOARD_SIZE;i++)
+                {
+                    for(int j=1;j<=BOARD_SIZE;j++)
+                    {
+                        if(board[i][j].colour == COLOUR_LIGHT    &&
+                           (board[i][j].ind || board[i][j].farm || board[i][j].nuke) &&
+                           (calc_strength(COLOUR_DARK, i, j) >= calc_strength(COLOUR_LIGHT, i, j)))
+                        {
+                            found_target = true;
+                            rb->splashf(2*HZ, "Launching nuke for offence, nuke index %d", next_nuke);
+                            launch_nuke(COLOUR_DARK, nukes[next_nuke].x, nukes[next_nuke].y, i, j);
+                            next_nuke++;
+                        }
+                        rb->yield();
+                    }
+                }
+            }
+
+        }
+    }
+    /* TODO: move other units */
 }
 
 static void computer_war(void)
