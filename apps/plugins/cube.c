@@ -390,6 +390,14 @@
 #define CUBE_PAUSE       BUTTON_PLAYPAUSE
 #define CUBE_HIGHSPEED   BUTTON_SHORTCUT
 
+#elif (CONFIG_KEYPAD == DX50_PAD)
+#define CUBE_QUIT          (BUTTON_POWER|BUTTON_REL)
+#define CUBE_NEXT          BUTTON_RIGHT
+#define CUBE_PREV          BUTTON_LEFT
+#define CUBE_INC           BUTTON_VOL_UP
+#define CUBE_DEC           BUTTON_VOL_DOWN
+#define CUBE_MODE          BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

@@ -541,6 +541,20 @@ enum {
 #define BJACK_QUIT_NAME     "Back"
 #define BJACK_DOUBLE_NAME   "Shortcut"
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_DOUBLEDOWN    BUTTON_RIGHT
+#define BJACK_SELECT        BUTTON_PLAY
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_STAY          BUTTON_LEFT
+#define BJACK_UP            BUTTON_VOL_UP
+#define BJACK_DOWN          BUTTON_VOL_DOWN
+#define BJACK_LEFT          BUTTON_LEFT
+#define BJACK_SELECT_NAME   "Play"
+#define BJACK_STAY_NAME     "Left"
+#define BJACK_QUIT_NAME     "Power"
+#define BJACK_DOUBLE_NAME   "Right"
+
 #else
 #error No keymap defined!
 #endif
