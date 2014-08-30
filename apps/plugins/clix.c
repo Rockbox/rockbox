@@ -253,6 +253,9 @@
 #elif (CONFIG_KEYPAD == SAMSUNG_YPR1_PAD)
 #define CLIX_BUTTON_QUIT    BUTTON_POWER
 
+#elif (CONFIG_KEYPAD == DX50_PAD)
+#define CLIX_BUTTON_QUIT          BUTTON_POWER
+
 #else
 #error "no keymap"
 #endif

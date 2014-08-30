@@ -1259,6 +1259,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define CHIP8_KEY8 BUTTON_PLAY
 #define CHIP8_KEY9 BUTTON_POWER
 
+#elif (CONFIG_KEYPAD == DX50_PAD)
+#define CHIP8_OFF  BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

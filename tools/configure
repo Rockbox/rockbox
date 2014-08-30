@@ -664,14 +664,19 @@ androidcc () {
         exit
     fi
     if [ -z "$ANDROID_NDK_PATH" ]; then
-        echo "ERROR: You need the Android NDK installed (r5 or higher) and have the ANDROID_NDK_PATH"
+        echo "ERROR: You need the Android NDK installed (r16 or higher) and have the ANDROID_NDK_PATH"
         echo "environment variable point to the root directory of the Android NDK."
         exit
     fi
     buildhost=$(uname | tr "[:upper:]" "[:lower:]")
     GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
-    LDOPTS="$LDOPTS -Wl,-soname,librockbox.so -shared -ldl -llog"
-    GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack -shared"
+    LDOPTS="$LDOPTS -ldl -llog"
+    if [ "$modelname" != "ibassodx50" ] && [ "$modelname" != "ibassodx90" ]; then
+        LDOPTS="$LDOPTS -Wl,-soname,librockbox.so -shared"
+    fi
+    SHARED_LDFLAG="-shared"
+    SHARED_CFLAGS=''
+    GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack"
     ANDROID_ARCH=$1 # for android.make too
     gccchoice="4.6"
     # arch dependant stuff
@@ -683,8 +688,8 @@ androidcc () {
             # threads work fine so far
             thread_support="ASSEMBLER_THREADS"
             GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer \
-                    --sysroot=$ANDROID_NDK_PATH/platforms/android-5/arch-arm"
-            LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-5/arch-arm"
+                    --sysroot=$ANDROID_NDK_PATH/platforms/android-16/arch-arm"
+            LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-16/arch-arm"
             ;;
         mips)
             endian="little"
@@ -1336,13 +1341,10 @@ cat <<EOF
  203) Nokia N900          212) MA8               220) NWZ-E370/E380 series
  204) Pandora             213) MA8C              221) NWZ-E360 series
  205) Samsung YP-R0
- 206) Android MIPS
- 207) Android x86
- 208) Samsung YP-R1
+ 206) Android MIPS        ==IHIFI==              ==iBasso==
+ 207) Android x86         230) 760               232) DX50
+ 208) Samsung YP-R1       231) 960               233) DX90
 
-==IHIFI==
- 230) 760
- 231) 960
 
 EOF
 
@@ -3742,6 +3744,62 @@ fi
     t_cpu="arm"
     t_manufacturer="rk27xx"
     t_model="ihifi"
+    ;;
+
+   232|ibassodx50)
+    application="yes"
+    target_id=94
+    modelname="ibassodx50"
+    target="DX50"
+    app_type="android_standalone"
+    lcd_orientation="landscape"
+    sharedir="/system/rockbox/app_rockbox/rockbox"
+    bindir="/system/rockbox/lib"
+    libdir="/system/rockbox/app_rockbox"
+    memory=32
+    uname=`uname`
+    androidcc armeabi
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox"
+    bootoutput="rockbox"
+    appextra="recorder:gui:radio:hosted/android"
+    plugins="yes"
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="android"
+    t_model="dx50"
+    ;;
+
+    233|ibassodx90)
+    application="yes"
+    target_id=95
+    modelname="ibassodx90"
+    target="DX90"
+    app_type="android_standalone"
+    lcd_orientation="landscape"
+    sharedir="/system/rockbox/app_rockbox/rockbox"
+    bindir="/system/rockbox/lib"
+    libdir="/system/rockbox/app_rockbox"
+    memory=32
+    uname=`uname`
+    androidcc armeabi
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox"
+    bootoutput="rockbox"
+    appextra="recorder:gui:radio:hosted/android"
+    plugins="yes"
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="android"
+    t_model="dx50"
     ;;
 
    *)

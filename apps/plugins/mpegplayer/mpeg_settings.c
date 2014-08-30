@@ -289,6 +289,14 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
 #define MPEG_START_TIME_EXIT        BUTTON_BACK
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define MPEG_START_TIME_EXIT        BUTTON_POWER
+#define MPEG_START_TIME_SELECT      BUTTON_PLAY
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_UP          BUTTON_VOL_UP
+#define MPEG_START_TIME_DOWN        BUTTON_VOL_DOWN
+
 #else
 #error No keymap defined!
 #endif

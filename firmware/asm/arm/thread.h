@@ -31,7 +31,11 @@ struct regs
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
   #include <errno.h>
+#if defined(DX50) || defined (DX90)
+  #define DEFAULT_STACK_SIZE 0x2000 /* Bytes */
+#else
   #define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
+#endif
 #else
   #define DEFAULT_STACK_SIZE 0x400  /* Bytes */
 #endif

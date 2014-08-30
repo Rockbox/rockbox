@@ -320,6 +320,11 @@ GREY_INFO_STRUCT
 #   define FFT_ORIENTATION  BUTTON_SELECT
 #   define FFT_WINDOW       BUTTON_MENU
 
+#elif (CONFIG_KEYPAD == DX50_PAD)
+#   define FFT_QUIT         (BUTTON_POWER|BUTTON_REL)
+#   define FFT_PREV_GRAPH   BUTTON_VOL_UP
+#   define FFT_NEXT_GRAPH   BUTTON_VOL_DOWN
+
 #elif !defined(HAVE_TOUCHSCREEN)
 #error No keymap defined!
 #endif

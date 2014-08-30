@@ -377,6 +377,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define MINESWP_DISCOVER    BUTTON_SELECT
 #define MINESWP_INFO        BUTTON_MENU
 
+#elif (CONFIG_KEYPAD == DX50_PAD)
+#   define MINESWP_QUIT     (BUTTON_POWER|BUTTON_REL)
+
 #else
 #error No keymap defined!
 #endif

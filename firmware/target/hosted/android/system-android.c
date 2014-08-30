@@ -23,6 +23,12 @@
 #include <setjmp.h>
 #include <jni.h>
 #include <pthread.h>
+#if defined(DX50) || defined(DX90)
+#include <stdlib.h>
+#include <sys/reboot.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#endif /* DX50 || DX90 */
 #include <unistd.h>
 #include "config.h"
 #include "system.h"
@@ -31,40 +37,83 @@
 
 
 
+#if !defined(DX50) && !defined(DX90)
 /* global fields for use with various JNI calls */
 static JavaVM *vm_ptr;
 JNIEnv *env_ptr;
 jobject RockboxService_instance;
 jclass  RockboxService_class;
+#endif /* !DX50 && !DX90 */
 
 uintptr_t *stackbegin;
 uintptr_t *stackend;
 
 extern int main(void);
+#if !defined(DX50) && !defined(DX90)
 extern void telephony_init_device(void);
-
+#endif
 void system_exception_wait(void)
 {
+#if defined(DX50) || defined(DX90)
+    while(1);
+#else
     intptr_t dummy = 0;
     while(button_read_device(&dummy) != BUTTON_BACK);
+#endif /* DX50 || DX90 */
 }
 
 void system_reboot(void)
 {
+#if defined(DX50) || defined(DX90)
+    reboot(RB_AUTOBOOT);
+#else
     power_off();
+#endif /* DX50 || DX90 */
 }
 
+#if !defined(DX50) && !defined(DX90)
 /* this is used to return from the entry point of the native library. */
 static jmp_buf poweroff_buf;
+#endif
+
 void power_off(void)
 {
+#if defined(DX50) || defined(DX90)
+    reboot(RB_POWER_OFF);
+#else
     longjmp(poweroff_buf, 1);
+#endif /* DX50 || DX90 */
 }
 
 void system_init(void)
 {
+#if defined(DX50) || defined(DX90)
+     volatile uintptr_t stack = 0;
+     stackbegin = stackend = (uintptr_t*) &stack;
+
+     struct stat m1, m2;
+     stat("/mnt/", &m1);
+     do
+     {
+         /* waiting for storage to get mounted */
+         stat("/sdcard/", &m2);
+         usleep(100000);
+     }
+     while(m1.st_dev == m2.st_dev);
+/* here would be the correct place for 'system("/system/bin/muteopen");' (headphone-out relay) but in pcm-dx50.c, pcm_play_dma_start()
+   the output capacitors are charged already a bit and the click of the headphone-connection-relay is softer */
+
+#if defined(DX90)
+    /* DAC needs to be unmuted on DX90 */
+    FILE * f = fopen("/sys/class/codec/wm8740_mute", "w");
+    fputc(0, f);
+    fclose(f);
+#endif /* DX90 */
+
+#else
     /* no better place yet */
     telephony_init_device();
+#endif /* DX50 || DX90 */
 }
 
 int hostfs_init(void)
@@ -79,6 +128,7 @@ int hostfs_flush(void)
     return 0;
 }
 
+#if !defined(DX50) && !defined(DX90)
 JNIEXPORT jint JNICALL
 JNI_OnLoad(JavaVM *vm, void* reserved)
 {
@@ -119,7 +169,7 @@ Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
     /* simply return here. this will allow the VM to clean up objects and do
      * garbage collection */
 }
-
+#endif /* !DX50 && !DX90 */
 
 /* below is the facility for external (from other java threads) to safely call
  * into our snative code. When extracting rockbox.zip the main function is

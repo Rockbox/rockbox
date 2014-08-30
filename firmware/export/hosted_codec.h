@@ -25,7 +25,9 @@
     && !(CONFIG_PLATFORM & PLATFORM_MAEMO5)
 AUDIOHW_SETTING(VOLUME,      "dB",   0,  1, -80,   0,   0)
 #else
+#if !defined(DX50) && !defined(DX90)
 #define AUDIOHW_CAPS    (MONO_VOL_CAP)
+#endif
 AUDIOHW_SETTING(VOLUME,      "dB",   0,  1, -99,   0,   0)
 #endif /* CONFIG_PLATFORM & PLATFORM_SDL */
 

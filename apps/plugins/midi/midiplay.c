@@ -275,6 +275,13 @@
 #define BTN_DOWN         BUTTON_DOWN
 #define BTN_PLAY         BUTTON_PLAYPAUSE
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define BTN_QUIT         BUTTON_POWER
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_LEFT         BUTTON_LEFT
+#define BTN_UP           BUTTON_VOL_UP
+#define BTN_DOWN         BUTTON_VOL_DOWN
+
 #else
 #error No keymap defined!
 #endif

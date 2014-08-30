@@ -523,6 +523,12 @@ void I_ShutdownGraphics(void)
 #define DOOMBUTTON_WEAPON  BUTTON_SHORTCUT
 #define DOOMBUTTON_MAP     BUTTON_MENU
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define DOOMBUTTON_ESC        BUTTON_POWER
+#define DOOMBUTTON_SHOOT      BUTTON_VOL_UP
+#define DOOMBUTTON_WEAPON     BUTTON_VOL_DOWN
+#define DOOMBUTTON_MAP        BUTTON_PLAY
+
 #else
 #error Keymap not defined!
 #endif

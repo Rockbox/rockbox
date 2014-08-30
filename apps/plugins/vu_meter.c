@@ -395,6 +395,14 @@
 #define LABEL_MENU      "Menu"
 #define LABEL_VOLUME    "Up/Down"
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define VUMETER_QUIT    (BUTTON_POWER|BUTTON_REL)
+#define VUMETER_MENU    BUTTON_PLAY
+#define VUMETER_UP      BUTTON_RIGHT
+#define VUMETER_DOWN    BUTTON_LEFT
+#define LABEL_QUIT      "Power"
+#define LABEL_MENU      "Play"
+
 #else
 #error No keymap defined!
 #endif

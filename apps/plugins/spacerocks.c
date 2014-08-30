@@ -333,6 +333,14 @@
 #define AST_RIGHT       BUTTON_RIGHT
 #define AST_FIRE        BUTTON_SELECT
 
+#elif (CONFIG_KEYPAD == DX50_PAD)
+#define AST_QUIT        BUTTON_POWER
+#define AST_THRUST      BUTTON_VOL_UP
+#define AST_HYPERSPACE  BUTTON_VOL_DOWN
+#define AST_LEFT        BUTTON_LEFT
+#define AST_RIGHT       BUTTON_PLAY
+#define AST_FIRE        BUTTON_RIGHT
+
 #else
 #error No keymap defined!
 #endif

@@ -259,6 +259,13 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define RIGHT BUTTON_RIGHT
 #define FIRE  BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == DX50_PAD
+
+#define QUIT  (BUTTON_POWER|BUTTON_REL)
+#define LEFT  BUTTON_LEFT
+#define RIGHT BUTTON_PLAY
+#define FIRE  BUTTON_RIGHT
+
 #else
     #error INVADROX: Unsupported keypad
 #endif

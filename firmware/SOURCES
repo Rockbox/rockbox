@@ -1811,18 +1811,28 @@ target/arm/rk27xx/ihifi/powermgmt-ihifi960.c
 target/hosted/kernel-unix.c
 target/hosted/filesystem-unix.c
 target/hosted/lc-unix.c
+#if !defined(DX50) && !defined(DX90)
 target/hosted/android/lcd-android.c
 target/hosted/android/button-android.c
-#ifdef DEBUG
-target/hosted/android/debug-android.c
-#endif
 target/hosted/android/pcm-android.c
 target/hosted/android/powermgmt-android.c
-target/hosted/android/system-android.c
 target/hosted/android/telephony-android.c
 #ifdef APPLICATION
 target/hosted/android/app/button-application.c
 #endif
+#else
+drivers/lcd-memframe.c
+target/hosted/android/dx50/pcm-dx50.c
+target/hosted/android/dx50/tinyalsa/pcm.c
+target/hosted/android/dx50/powermgmt-dx50.c
+target/hosted/android/dx50/backlight-dx50.c
+target/hosted/android/dx50/button-dx50.c
+target/hosted/android/dx50/lcd-dx50.c
+#endif
+#ifdef DEBUG
+target/hosted/android/debug-android.c
+#endif
+target/hosted/android/system-android.c
 drivers/audio/android.c
 #endif
 

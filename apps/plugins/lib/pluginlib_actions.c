@@ -434,6 +434,13 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
+#elif (CONFIG_KEYPAD == DX50_PAD)
+    {PLA_CANCEL,            BUTTON_LEFT|BUTTON_REL,             BUTTON_NONE},
+    {PLA_EXIT,              BUTTON_POWER|BUTTON_REL,            BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_NONE},
+    {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
+
 #else
 #   ifndef HAVE_TOUCHSCREEN
 #       error pluginlib_actions: No actions defined

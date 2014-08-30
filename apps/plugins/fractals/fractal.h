@@ -451,6 +451,9 @@
 #define FRACTAL_PRECISION_DEC   (BUTTON_POWER|BUTTON_MENU)
 #define FRACTAL_RESET           BUTTON_SHORTCUT
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define FRACTAL_QUIT            (BUTTON_POWER|BUTTON_REL)
+
 #else
 #error No keymap defined!
 #endif
