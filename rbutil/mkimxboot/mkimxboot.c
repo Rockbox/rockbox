@@ -258,10 +258,6 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
      * call in the ____ section and get rid of everything else. In recovery mode,
      * we give 0xfee1dead as argument */
 
-    /* Do not override real key and IV */
-    sb_file->override_crypto_iv = false;
-    sb_file->override_real_key = false;
-
     /* used to manipulate entries */
     int nr_boot_inst = rb_fw_get_sb_inst_count(&boot_fw);
 
