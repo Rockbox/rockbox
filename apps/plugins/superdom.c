@@ -176,6 +176,7 @@ static struct settings {
     */
     int compdiff;
     bool spoil_enabled;
+    bool persistent_units;
 } superdom_settings;
 
 static struct resources humanres;
@@ -529,7 +530,7 @@ static int settings_menu(void)
     MENUITEM_STRINGLIST(menu, "Super Domination Settings", NULL,
                         "Computer starting farms", "Computer starting factories",
                         "Human starting farms", "Human starting factories",
-                        "Starting cash", "Starting food", "Computer difficulty","Food spoilage",  "Moves per turn");
+                        "Starting cash", "Starting food", "Computer difficulty","Food spoilage", "Persistent units", "Moves per turn");
 
     while(1)
     {
@@ -582,6 +583,10 @@ static int settings_menu(void)
                                                                   0, "Disabled", 0, NULL);
             break;
         case 8:
+            rb->set_bool_options("Persistent units", &superdom_settings.persistent_units, "Enabled", 0,
+                                 "Disabled", 0, NULL);
+            break;
+        case 9:
             rb->set_int("Moves per turn", "", UNIT_INT,
                         &superdom_settings.movesperturn, NULL,
                         1, 1, 5, NULL);
@@ -1707,9 +1712,12 @@ static int attack_territory(int colour, int x, int y)
         offres->inds += board[x][y].ind;
         offres->nukes += board[x][y].nuke;
         board[x][y].colour = colour;
-        board[x][y].men = 0;
-        board[x][y].tank = false;
-        board[x][y].plane = false;
+        if(!superdom_settings.persistent_units)
+        {
+            board[x][y].men = 0;
+            board[x][y].tank = false;
+            board[x][y].plane = false;
+        }
         draw_board();
         if(human)
             rb->sleep(HZ*2);
@@ -2316,6 +2324,7 @@ static void default_settings(void)
     superdom_settings.movesperturn = 2;
     superdom_settings.compdiff=2;
     superdom_settings.spoil_enabled=false;
+    superdom_settings.persistent_units=false;
 }
 
 static int average_strength(int colour)
