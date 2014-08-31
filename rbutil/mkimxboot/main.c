@@ -206,6 +206,7 @@ int main(int argc, char *argv[])
     opt.output = type;
     opt.fw_variant = variant;
     opt.force_version = force_version;
+    opt.model = model;
     enum imx_error_t err = mkimxboot(infile, bootfile, outfile, opt);
     printf("Result: %d\n", err);
     return 0;
