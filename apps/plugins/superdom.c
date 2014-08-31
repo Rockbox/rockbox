@@ -613,23 +613,37 @@ static int settings_menu(void)
 
 static int superdom_help(void)
 {
-    static char* help_text[] = {
-        "Super", "Domination", "is", "a", "turn-based", "strategy", "game,",
-        "where", "the", "aim", "is", "to", "overpower", "the", "computer",
-        "player", "by", "taking", "their", "territory.", "",
-        "Each", "year", "you", "are", "allocated", "an", "amount", "of", "cash",
-        "and", "food,", "depending", "on", "how", "many", "farms", "and",
-        "factories", "you", "control.", "",
-        "Use", "this", "cash", "and", "food", "to", "build", "and", "feed", "your",
-        "army.", "Each", "tile", "has", "a", "strength,", "calculated", "by",
-        "the", "ownership", "of", "surrounding", "tiles,", "and", "the", "type",
-        "and", "number", "of", "troops", "on", "them.",
+    static char* help_text[] = {"Super Domination","",
+                                "Aim", "",
+                                "Super", "Domination", "is", "a", "turn-based",
+                                "strategy", "game", "where", "the", "aim", "is",
+                                "to", "overpower", "the", "computer.", "", "",
+                                "How", "to", "Play", "",
+                                "Each", "year", "you", "are", "allocated", "an", "amount", "of", "cash",
+                                "and", "food,", "depending", "on", "how", "many", "farms", "and",
+                                "factories", "you", "control.", "",
+                                "Use", "this", "cash", "and", "food", "to", "build", "and", "feed", "your",
+                                "army.", "Each", "tile", "has", "a", "strength,", "calculated", "by",
+                                "the", "ownership", "of", "surrounding", "tiles,", "and", "the", "type",
+                                "and", "number", "of", "troops", "on", "them."};
+    static const struct style_text style[]={
+        {0, TEXT_CENTER|TEXT_UNDERLINE},
+        {2, C_RED},
+        {21, C_RED},
+        {22, C_RED},
+        {23, C_RED},
+        LAST_STYLE_ITEM
     };
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(LCD_BLACK);
 #endif
-    if (display_text(ARRAYLEN(help_text), help_text, NULL, NULL, true))
+    int ret=display_text(ARRAYLEN(help_text), help_text, style, NULL, true);
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(LCD_BLACK);
+    rb->lcd_set_background(LCD_WHITE);
+#endif
+    if(ret)
         return RET_VAL_USB;
     return RET_VAL_OK;
 }
