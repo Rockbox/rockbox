@@ -280,5 +280,7 @@ void cbc_mac(
             /* copy cipher to iv */
             memcpy(feedback, &in_data[i * 16], 16);
         }
+        if(out_cbc_mac)
+            memcpy(out_cbc_mac, feedback, 16);
     }
 }
