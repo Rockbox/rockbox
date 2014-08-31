@@ -185,6 +185,7 @@ static void extract_sb_file(struct sb_file_t *file)
         printf("Write command file to %s\n", filename);
     db_generate_file(cmd_file, filename, NULL, generic_std_printf);
     db_free(cmd_file);
+    free(filename);
 }
 
 static void extract_elf(struct elf_params_t *elf, int count)
