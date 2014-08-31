@@ -384,6 +384,7 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
     {
         byte *data = xmalloc(init_gap);
         generate_random_data(data, init_gap);
+        sha_1_update(&file_sha1, data, init_gap);
         write(data, init_gap);
         free(data);
     }
@@ -436,6 +437,7 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
         {
             byte *data = xmalloc(pad_size * BLOCK_SIZE);
             generate_random_data(data, pad_size * BLOCK_SIZE);
+            sha_1_update(&file_sha1, data, pad_size * BLOCK_SIZE);
             write(data, pad_size);
             free(data);
         }
