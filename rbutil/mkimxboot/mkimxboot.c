@@ -491,11 +491,100 @@ static enum imx_error_t patch_firmware(struct imx_option_t opt,
     }
 }
 
+static enum imx_error_t unpatch_std_zero_host_play(int jump_before,
+    struct imx_option_t opt, struct sb_file_t *sb_file)
+{
+    /* find rockbox section */
+    int rb_sec = -1;
+    for(int i = 0; i < sb_file->nr_sections; i++)
+        if(sb_file->sections[i].identifier == MAGIC_ROCK)
+            rb_sec = i;
+    if(rb_sec == -1)
+    {
+        printf("[ERR][INTERNAL] Cannot find rockbox section\n");
+        return IMX_ERROR;
+    }
+    /** 1) remove rockbox section */
+    /* free rockbox section */
+    sb_free_section(sb_file->sections[rb_sec]);
+    /* create a new array of sections */
+    sb_file->nr_sections--;
+    struct sb_section_t *new_sec = xmalloc(sb_file->nr_sections * sizeof(struct sb_section_t));
+    /* copy all sections exception rockbox */
+    memcpy(new_sec, sb_file->sections, rb_sec * sizeof(struct sb_section_t));
+    memcpy(new_sec + rb_sec, sb_file->sections + rb_sec + 1,
+        (sb_file->nr_sections - rb_sec) * sizeof(struct sb_section_t));
+    /* free old array and replace it */
+    free(sb_file->sections);
+    sb_file->sections = new_sec;
+
+    /** 2) remove patch instructions in boot section */
+    struct sb_section_t *sec = &sb_file->sections[0];
+    int jump_idx = 0;
+    while(jump_idx < sec->nr_insts && jump_before > 0)
+        if(sec->insts[jump_idx++].inst == SB_INST_CALL)
+            jump_before--;
+    if(jump_idx == sec->nr_insts)
+    {
+        printf("[ERR] Cannot locate call in section ____\n");
+        return IMX_DONT_KNOW_HOW_TO_PATCH;
+    }
+    /* free two instructions */
+    sb_free_instruction(sec->insts[jump_idx]);
+    sb_free_instruction(sec->insts[jump_idx + 1]);
+    /* create a new array of instructions */
+    sec->nr_insts -= 2;
+    struct sb_inst_t *new_inst = xmalloc(sec->nr_insts * sizeof(struct sb_inst_t));
+    /* copy all instructions except the two patch to remove */
+    memcpy(new_inst, sec->insts, jump_idx * sizeof(struct sb_inst_t));
+    memcpy(new_inst + jump_idx, sec->insts + jump_idx + 2,
+        (sec->nr_insts - jump_idx) * sizeof(struct sb_inst_t));
+    /* free old array and replace it */
+    free(sec->insts);
+    sec->insts = new_inst;
+
+    return IMX_SUCCESS;
+}
+
 static enum imx_error_t unpatch_firmware(struct imx_option_t opt,
     struct sb_file_t *sb_file)
 {
-    printf("[ERR] Unimplemented\n");
-    return IMX_ERROR;
+    /* keep consistent with patch_firmware */
+    switch(opt.model)
+    {
+        case MODEL_FUZEPLUS:
+            /* The Fuze+ uses the standard ____, host, play sections, patch after third
+             * call in ____ section */
+            return unpatch_std_zero_host_play(3, opt, sb_file);
+        case MODEL_ZENXFI3:
+            /* The ZEN X-Fi3 uses the standard ____, hSst, pSay sections, patch after third
+             * call in ____ section. Although sections names use the S variant, they are standard. */
+            return unpatch_std_zero_host_play(3, opt, sb_file);
+        case MODEL_NWZE360:
+        case MODEL_NWZE370:
+            /* The NWZ-E360/E370 uses the standard ____, host, play sections, patch after first
+             * call in ____ section. */
+            return unpatch_std_zero_host_play(1, opt, sb_file);
+        case MODEL_ZENXFI2:
+            /* The ZEN X-Fi2 has two types of firmware: recovery and normal.
+             * Normal uses the standard ___, host, play sections and recovery only ____ */
+            switch(opt.fw_variant)
+            {
+                case VARIANT_ZENXFI2_RECOVERY:
+                case VARIANT_ZENXFI2_NAND:
+                case VARIANT_ZENXFI2_SD:
+                    return unpatch_std_zero_host_play(1, opt, sb_file);
+                default:
+                    return IMX_DONT_KNOW_HOW_TO_PATCH;
+            }
+            break;
+        case MODEL_ZENXFISTYLE:
+            /* The ZEN X-Fi Style uses the standard ____, host, play sections, patch after first
+             * call in ____ section. */
+            return unpatch_std_zero_host_play(1, opt, sb_file);
+        default:
+            return IMX_DONT_KNOW_HOW_TO_PATCH;
+    }
 }
 
 static uint32_t get_uint32be(unsigned char *p)
@@ -558,7 +647,7 @@ static enum imx_error_t find_model_by_md5sum(uint8_t file_md5sum[16], int *md5_i
     }
     if(i == NR_IMX_SUMS)
     {
-        printf("[ERR] MD5 sum doesn't match any known file\n");
+        printf("[WARN] MD5 sum doesn't match any known file\n");
         return IMX_NO_MATCH;
     }
     *md5_idx = i;
@@ -886,6 +975,9 @@ static enum imx_error_t make_boot(struct sb_file_t *sb_file, const char *bootfil
         if(ret != IMX_SUCCESS)
             return ret;
     }
+    /* if asked to produce OF, don't do anything more */
+    if(opt.output == IMX_ORIG_FW)
+        return IMX_SUCCESS;
     /* load rockbox file */
     struct rb_fw_t boot_fw;
     enum imx_error_t ret = rb_fw_load(&boot_fw, bootfile, opt.model);
