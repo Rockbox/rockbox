@@ -27,6 +27,9 @@
 #include "crypto.h"
 #include "sb.h"
 
+#define ALIGN_DOWN(n, a)    (((n)/(a))*(a))
+#define ALIGN_UP(n, a)      ALIGN_DOWN((n)+((a)-1),a)
+
 static void fill_gaps(struct sb_file_t *sb)
 {
     for(int i = 0; i < sb->nr_sections; i++)
@@ -58,27 +61,33 @@ static void compute_sb_offsets(struct sb_file_t *sb, void *u, generic_printf_t c
     /* sections */
     for(int i = 0; i < sb->nr_sections; i++)
     {
-        /* each section has a preliminary TAG command */
-        sb->image_size += sizeof(struct sb_instruction_tag_t) / BLOCK_SIZE;
-        /* we might need to pad the section so compute next alignment */
-        uint32_t alignment = BLOCK_SIZE;
-        if((i + 1) < sb->nr_sections)
-            alignment = sb->sections[i + 1].alignment;
-        alignment /= BLOCK_SIZE; /* alignment in block sizes */
-
         struct sb_section_t *sec = &sb->sections[i];
+        /* we need to make sure section starts on the right alignment,
+         * and since each section starts with a boot tag, we need to ensure
+         * that the boot tag is at address X such that X+BLOCK_SIZE is a
+         * multiple of the alignment */
+        uint32_t alignment = sb->sections[i].alignment / BLOCK_SIZE;
+        sb->image_size = ALIGN_UP(sb->image_size + 1, alignment) - 1;
+        /* update padding of previous section */
+        if(i > 0)
+            sb->sections[i - 1].pad_size = sb->image_size -
+                sb->sections[i - 1].file_offset - sb->sections[i - 1].sec_size;
+        /* each section has a preliminary TAG command */
+        sb->image_size += 1;
+        sec->file_offset = sb->image_size;
+        /* compute section size */
         sec->sec_size = 0;
+        sec->pad_size = 0;
 
         char name[5];
         sb_fill_section_name(name, sec->identifier);
         printf(BLUE, "%s", sec->is_data ? "Data" : "Boot");
-        printf(GREEN, " Section");
+        printf(GREEN, " Section ");
         printf(YELLOW, "'%s'", name);
         if(sec->is_cleartext)
             printf(RED, " (cleartext)");
         printf(OFF, "\n");
 
-        sec->file_offset = sb->image_size;
         for(int j = 0; j < sec->nr_insts; j++)
         {
             struct sb_inst_t *inst = &sec->insts[j];
@@ -87,7 +96,6 @@ static void compute_sb_offsets(struct sb_file_t *sb, void *u, generic_printf_t c
                 printf(RED, "  %s", inst->inst == SB_INST_CALL ? "CALL" : "JUMP");
                 printf(OFF, " | "); printf(BLUE, "addr=0x%08x", inst->addr);
                 printf(OFF, " | "); printf(GREEN, "arg=0x%08x\n", inst->argument);
-                sb->image_size += sizeof(struct sb_instruction_call_t) / BLOCK_SIZE;
                 sec->sec_size += sizeof(struct sb_instruction_call_t) / BLOCK_SIZE;
             }
             else if(inst->inst == SB_INST_FILL)
@@ -96,7 +104,6 @@ static void compute_sb_offsets(struct sb_file_t *sb, void *u, generic_printf_t c
                 printf(OFF, " | "); printf(BLUE, "addr=0x%08x", inst->addr);
                 printf(OFF, " | "); printf(GREEN, "len=0x%08x", inst->size);
                 printf(OFF, " | "); printf(YELLOW, "pattern=0x%08x\n", inst->pattern);
-                sb->image_size += sizeof(struct sb_instruction_fill_t) / BLOCK_SIZE;
                 sec->sec_size += sizeof(struct sb_instruction_fill_t) / BLOCK_SIZE;
             }
             else if(inst->inst == SB_INST_LOAD)
@@ -105,30 +112,25 @@ static void compute_sb_offsets(struct sb_file_t *sb, void *u, generic_printf_t c
                 printf(OFF, " | "); printf(BLUE, "addr=0x%08x", inst->addr);
                 printf(OFF, " | "); printf(GREEN, "len=0x%08x\n", inst->size);
                 /* load header */
-                sb->image_size += sizeof(struct sb_instruction_load_t) / BLOCK_SIZE;
                 sec->sec_size += sizeof(struct sb_instruction_load_t) / BLOCK_SIZE;
                 /* data + alignment */
-                sb->image_size += (inst->size + inst->padding_size) / BLOCK_SIZE;
                 sec->sec_size += (inst->size + inst->padding_size) / BLOCK_SIZE;
             }
             else if(inst->inst == SB_INST_MODE)
             {
                 printf(RED, "  MODE");
                 printf(OFF, " | "); printf(BLUE, "mod=0x%08x\n", inst->addr);
-                sb->image_size += sizeof(struct sb_instruction_mode_t) / BLOCK_SIZE;
                 sec->sec_size += sizeof(struct sb_instruction_mode_t) / BLOCK_SIZE;
             }
             else if(inst->inst == SB_INST_DATA)
             {
                 printf(RED, "  DATA");
                 printf(OFF, " | "); printf(BLUE, "size=0x%08x\n", inst->size);
-                sb->image_size += ROUND_UP(inst->size, BLOCK_SIZE) / BLOCK_SIZE;
                 sec->sec_size += ROUND_UP(inst->size, BLOCK_SIZE) / BLOCK_SIZE;
             }
             else if(inst->inst == SB_INST_NOP)
             {
                 printf(RED, "  NOOP\n");
-                sb->image_size += sizeof(struct sb_instruction_nop_t) / BLOCK_SIZE;
                 sec->sec_size += sizeof(struct sb_instruction_nop_t) / BLOCK_SIZE;
             }
             else
@@ -136,50 +138,7 @@ static void compute_sb_offsets(struct sb_file_t *sb, void *u, generic_printf_t c
                 cprintf(u, true, GREY, "die on inst %d\n", inst->inst);
             }
         }
-        /* we need to make sure next section starts on the right alignment.
-         * Since each section starts with a boot tag, we thus need to ensure
-         * that this sections ends at adress X such that X+BLOCK_SIZE is
-         * a multiple of the alignment.
-         * For data sections, we just add random data, otherwise we add nops */
-        uint32_t missing_sz = alignment - ((sb->image_size + 1) % alignment);
-        if(missing_sz != alignment)
-        {
-            struct sb_inst_t *aug_insts;
-            int nr_aug_insts = 0;
-
-            if(sb->sections[i].is_data)
-            {
-                nr_aug_insts = 1;
-                aug_insts = xmalloc(sizeof(struct sb_inst_t));
-                memset(aug_insts, 0, sizeof(struct sb_inst_t));
-                aug_insts[0].inst = SB_INST_DATA;
-                aug_insts[0].size = missing_sz * BLOCK_SIZE;
-                aug_insts[0].data = xmalloc(missing_sz * BLOCK_SIZE);
-                generate_random_data(aug_insts[0].data, missing_sz * BLOCK_SIZE);
-                printf(RED, "  DATA");
-                printf(OFF, " | "); printf(BLUE, "size=0x%08x\n", aug_insts[0].size);
-            }
-            else
-            {
-                nr_aug_insts = missing_sz;
-                aug_insts = xmalloc(sizeof(struct sb_inst_t) * nr_aug_insts);
-                memset(aug_insts, 0, sizeof(struct sb_inst_t) * nr_aug_insts);
-                for(int j = 0; j < nr_aug_insts; j++)
-                {
-                    aug_insts[j].inst = SB_INST_NOP;
-                    printf(RED, "  NOOP\n");
-                }
-            }
-
-            sb->sections[i].insts = augment_array(sb->sections[i].insts, sizeof(struct sb_inst_t),
-                sb->sections[i].nr_insts, aug_insts, nr_aug_insts);
-            sb->sections[i].nr_insts += nr_aug_insts;
-            free(aug_insts);
-
-            /* augment image and section size */
-            sb->image_size += missing_sz;
-            sec->sec_size += missing_sz;
-        }
+        sb->image_size += sec->sec_size;
     }
     /* final signature */
     sb->image_size += 2;
@@ -222,14 +181,13 @@ static void produce_sb_header(struct sb_file_t *sb, struct sb_header_t *sb_hdr)
     sb_hdr->flags = sb->flags;
     sb_hdr->image_size = sb->image_size;
     sb_hdr->header_size = sizeof(struct sb_header_t) / BLOCK_SIZE;
-    sb_hdr->first_boot_sec_id = sb->sections[0].identifier;
+    sb_hdr->first_boot_sec_id = sb->sections[sb->first_boot_sec].identifier;
     sb_hdr->nr_keys = g_nr_keys;
     sb_hdr->nr_sections = sb->nr_sections;
     sb_hdr->sec_hdr_size = sizeof(struct sb_section_header_t) / BLOCK_SIZE;
     sb_hdr->key_dict_off = sb_hdr->header_size +
         sb_hdr->sec_hdr_size * sb_hdr->nr_sections;
-    sb_hdr->first_boot_tag_off = sb_hdr->key_dict_off +
-        sizeof(struct sb_key_dictionary_entry_t) * sb_hdr->nr_keys / BLOCK_SIZE;
+    sb_hdr->first_boot_tag_off = sb->sections[sb->first_boot_sec].file_offset - 1;
     generate_random_data(sb_hdr->rand_pad0, sizeof(sb_hdr->rand_pad0));
     generate_random_data(sb_hdr->rand_pad1, sizeof(sb_hdr->rand_pad1));
     /* Version 1.0 has 6 bytes of random padding,
@@ -277,7 +235,11 @@ static void produce_section_tag_cmd(struct sb_section_t *sec,
     tag->hdr.opcode = SB_INST_TAG;
     tag->hdr.flags = is_last ? SB_INST_LAST_TAG : 0;
     tag->identifier = sec->identifier;
-    tag->len = sec->sec_size;
+    /* there is a catch here: in the section header at the beginning of the SB
+     * file, we put the *useful* length of the section (without padding) but
+     * the bootloader will not use those and only use the TAG commande which
+     * need to give the *actual* length (with padding) */
+    tag->len = sec->sec_size + sec->pad_size;
     tag->flags = (sec->is_data ? 0 : SECTION_BOOTABLE)
         | (sec->is_cleartext ? SECTION_CLEARTEXT : 0)
         | sec->other_flags;
@@ -330,15 +292,24 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
     /* init CBC-MACs */
     for(int i = 0; i < g_nr_keys; i++)
         memset(cbc_macs[i], 0, 16);
-
+    /* fill gaps */
     fill_gaps(sb);
-    if(sb->nr_sections == 0 || sb->sections[0].is_data)
+    /* find first bootable section */
+    sb->first_boot_sec = -1;
+    for(int i = 0; i < sb->nr_sections; i++)
+        if(!sb->sections[i].is_data)
+        {
+            sb->first_boot_sec = i;
+            break;
+        }
+    if(sb->first_boot_sec == -1)
     {
-        cprintf(u, true, GREY, "First section of the image is not bootable, I cannot handle that.\n");
+        cprintf(u, true, GREY, "Image contains no bootable section, I cannot handle that.\n");
         return SB_ERROR;
     }
+    /* compute section offsets */
     compute_sb_offsets(sb, u, cprintf);
-
+    /* generate random real key */
     generate_random_data(real_key.u.key, 16);
 
     /* global SHA-1 */
@@ -406,6 +377,16 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
             printf(YELLOW, "%02x", crypto_iv[j]);
         printf(OFF, "\n");
     }
+    /* the first section might not start right after the header, pad with
+     * random data */
+    unsigned init_gap = (sb->sections[0].file_offset - 1) * BLOCK_SIZE - (buf_p - buf);
+    if(init_gap > 0)
+    {
+        byte *data = xmalloc(init_gap);
+        generate_random_data(data, init_gap);
+        write(data, init_gap);
+        free(data);
+    }
     /* produce sections data */
     for(int i = 0; i< sb_hdr.nr_sections; i++)
     {
@@ -449,6 +430,30 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
                 free(data);
             }
         }
+        /* pad section with random data or NOP */
+        uint32_t pad_size = sb->sections[i].pad_size;
+        if(sb->sections[i].is_data)
+        {
+            byte *data = xmalloc(pad_size * BLOCK_SIZE);
+            generate_random_data(data, pad_size * BLOCK_SIZE);
+            write(data, pad_size);
+            free(data);
+        }
+        else
+        {
+            for(unsigned j = 0; j < pad_size; j++)
+            {
+                struct sb_instruction_nop_t cmd;
+                memset(&cmd, 0, sizeof(cmd));
+                cmd.hdr.opcode = SB_INST_NOP;
+                cmd.hdr.checksum = instruction_checksum(&cmd.hdr);
+                if(g_nr_keys > 0 && !sb->sections[i].is_cleartext)
+                    crypto_cbc((byte *)&cmd, (byte *)&cmd, sizeof(cmd) / BLOCK_SIZE,
+                        &real_key, cur_cbc_mac, &cur_cbc_mac, 1);
+                sha_1_update(&file_sha1, (byte *)&cmd, sizeof(cmd));
+                write(&cmd, sizeof(cmd));
+            }
+        }
     }
     /* write file SHA-1 */
     byte final_sig[32];
@@ -458,11 +463,11 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
     if(g_nr_keys > 0)
         crypto_cbc(final_sig, final_sig, 2, &real_key, crypto_iv, NULL, 1);
     write(final_sig, 32);
-
     if(buf_p - buf != sb_hdr.image_size * BLOCK_SIZE)
     {
-        if(g_debug)
-            printf(GREY, u, true, "SB image buffer was not entirely filled !\n");
+        printf(GREY, "[ERROR][INTERNAL] SB image buffer was not entirely filled !\n");
+        printf(GREY, "[ERROR][INTERNAL] expected %u blocks, got %u\n",
+            (buf_p - buf) / BLOCK_SIZE, sb_hdr.image_size);
         return SB_ERROR;
     }
 
