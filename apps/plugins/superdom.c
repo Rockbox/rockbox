@@ -19,7 +19,9 @@
  *
  ****************************************************************************/
 /* TODO list:
-   - improve AI (move, use nukes, etc.)
+   - improve AI
+     - buy/use nukes - DONE
+     - build farms/factories
 */
 
 
@@ -71,6 +73,11 @@ char buf[255];
 #define HUMAN_SURRENDER_THRESHOLD 15
 #define COMPUTER_SURRENDER_THRESHOLD 15
 #define COMPUTER_HARD_SURRENDER_THRESHOLD 25
+
+/* AI settings */
+#define AI_INVESTING_LEVEL 2
+#define AI_BUILD_NUKES_LEVEL 3
+#define AI_BUILD_INDS_FARMS_LEVEL 2
 
 /* board size */
 #define BOARD_SIZE 10
@@ -166,13 +173,14 @@ static struct settings {
        easy:
         - no movement
         - no investing
+        - will build factories if it has none
        medium:
         - movement
         - investing
-        - can build factories/farms
+        - can build factories/farms if it has money
        hard:
-        - nuclear war
-        - harder to surrender
+        - can buy/use nukes
+        - will hold out longer (surrender threshold 25)
     */
     int compdiff;
     bool spoil_enabled;
@@ -569,13 +577,14 @@ static int settings_menu(void)
         case 6:
         {
             static const struct opt_items difficulty_options[3]={
-                                                           {"Easy", 1},
-                                                           {"Intermediate", 2},
-                                                           {"Hard", 3}
+                                                           {"Easy", -1},
+                                                           {"Intermediate", -1},
+                                                           {"Hard", -1}
                                                          };
-            rb->set_option("Computer difficulty", &superdom_settings.compdiff,
+            static int sel=1;
+            rb->set_option("Computer difficulty", &sel,
                            INT, difficulty_options, 3, NULL);
-            superdom_settings.compdiff++;
+            superdom_settings.compdiff=sel+1;
             break;
         }
         case 7:
@@ -1906,8 +1915,53 @@ static void computer_allocate(void)
             rb->yield();
         }
     }
-    /* AI player will buy nukes if possible first */
-    if(compres.cash > PRICE_NUKE + PRICE_TANK && superdom_settings.compdiff>=3)
+    /* if the computer has no factories, build some ASAP */
+    if(!compres.inds)
+    {
+        while(compres.cash >= PRICE_FACTORY && compres.inds < numterritory)
+        {
+            i = rb->rand()%BOARD_SIZE + 1;
+            j = rb->rand()%BOARD_SIZE + 1;
+            if(board[i][j].colour == COLOUR_DARK)
+            {
+                buy_resources(COLOUR_DARK, 4, i, j, 0);
+            }
+        }
+    }
+    if(superdom_settings.compdiff>=AI_BUILD_INDS_FARMS_LEVEL && compres.cash>=PRICE_FACTORY)
+    {
+        while(compres.cash>=PRICE_FACTORY)
+        {
+            if(compres.farms<compres.inds)
+            {
+                while(compres.farms<compres.inds && compres.cash>=PRICE_FARM)
+                {
+                    i = rb->rand()%BOARD_SIZE + 1;
+                    j = rb->rand()%BOARD_SIZE + 1;
+                    if(board[i][j].colour == COLOUR_DARK && !board[i][j].farm)
+                    {
+                        buy_resources(COLOUR_DARK, 3, i, j, 0);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                while(compres.inds<compres.farms && compres.cash>=PRICE_FACTORY)
+                {
+                    i = rb->rand()%BOARD_SIZE + 1;
+                    j = rb->rand()%BOARD_SIZE + 1;
+                    if(board[i][j].colour == COLOUR_DARK && !board[i][j].ind)
+                    {
+                        buy_resources(COLOUR_DARK, 4, i, j, 0);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    /* AI will buy nukes first if possible */
+    if(compres.cash > PRICE_NUKE + PRICE_TANK && superdom_settings.compdiff>=AI_BUILD_NUKES_LEVEL)
     {
         while(compres.cash >= PRICE_NUKE && compres.nukes < numterritory)
         {
@@ -1960,9 +2014,8 @@ static void computer_allocate(void)
         }
         if(k == 0)
         {
-            /* No targets found! Randomly pick squares and if they're owned
-             * by the computer then stick a tank on it. */
-            while(compres.cash >= 300 && compres.tanks < numterritory)
+            /* randomly place tanks */
+            while(compres.cash >= PRICE_TANK && compres.tanks < numterritory)
             {
                 i = rb->rand()%BOARD_SIZE + 1;
                 j = rb->rand()%BOARD_SIZE + 1;
@@ -2064,7 +2117,7 @@ static void computer_allocate(void)
         }
     }
     /* no investing in easy mode */
-    if(superdom_settings.compdiff>=2)
+    if(superdom_settings.compdiff>=AI_INVESTING_LEVEL)
     {
         compres.bank += compres.cash;
         compres.cash = 0;
@@ -2113,7 +2166,6 @@ static void computer_movement(void)
     {
         struct cursor nukes[10]; /* 10 for now, change as needed */
         int nukes_back=0;
-        rb->splashf(HZ, "computer has %d nukes", compres.nukes);
         if(compres.nukes>0)
         {
             for(int i=1;i<=BOARD_SIZE && nukes_back<compres.nukes && nukes_back<10;i++)
@@ -2414,7 +2466,7 @@ startyear:
         }
         if(-avg_str_diff > HUMAN_SURRENDER_THRESHOLD)
         {
-            rb->splash(HZ*4, "Your army have suffered terrible morale from"
+            rb->splash(HZ*4, "Your army has suffered terrible morale from"
                        " the bleak prospects of winning. You lose.");
             return PLUGIN_OK;
         }
