@@ -50,7 +50,11 @@ void generate_random_data(void *buf, size_t sz)
 void *xmalloc(size_t s)
 {
     void * r = malloc(s);
-    if(!r) bugp("malloc");
+    if(!r)
+    {
+        printf("Alloc failed\n");
+        abort();
+    }
     return r;
 }
 
@@ -118,7 +122,6 @@ bool parse_key(char **pstr, struct crypto_key_t *key)
     while(isspace(*str))
         str++;
     /* CRYPTO_KEY: 32 hex characters
-     * CRYPTO_USBOTP: usbotp(vid:pid) where vid and pid are hex numbers
      * CRYPTO_XOR_KEY: 256 hex characters */
     if(isxdigit(str[0]) && strlen(str) >= 256 && isxdigit(str[32]))
     {
@@ -151,30 +154,7 @@ bool parse_key(char **pstr, struct crypto_key_t *key)
         return true;
     }
     else
-    {
-        const char *prefix = "usbotp(";
-        if(strlen(str) < strlen(prefix))
-            return false;
-        if(strncmp(str, prefix, strlen(prefix)) != 0)
-            return false;
-        str += strlen(prefix);
-        /* vid */
-        long vid = strtol(str, &str, 16);
-        if(vid < 0 || vid > 0xffff)
-            return false;
-        if(*str++ != ':')
-            return false;
-        /* pid */
-        long pid = strtol(str, &str, 16);
-        if(pid < 0 || pid > 0xffff)
-            return false;
-        if(*str++ != ')')
-            return false;
-        *pstr = str;
-        key->method = CRYPTO_USBOTP;
-        key->u.vid_pid = vid << 16 | pid;
-        return true;
-    }
+        return false;
 }
 
 void add_keys(key_array_t ka, int kac)
@@ -277,9 +257,6 @@ void print_key(void *user, misc_printf_t printf, struct crypto_key_t *key, bool 
     {
         case CRYPTO_KEY:
             print_hex(user, printf, key->u.key, 16, false);
-            break;
-        case CRYPTO_USBOTP:
-            printf(user, "USB-OTP(%04x:%04x)", key->u.vid_pid >> 16, key->u.vid_pid & 0xffff);
             break;
         case CRYPTO_NONE:
             printf(user, "none");

@@ -195,7 +195,8 @@ struct sb_section_t
     struct sb_inst_t *insts;
     /* for production use */
     uint32_t file_offset; /* in blocks */
-    uint32_t sec_size; /* in blocks */
+    uint32_t sec_size; /* in blocks, without padding */
+    uint32_t pad_size; /* padding size after the section until next section */
 };
 
 struct sb_file_t
@@ -217,6 +218,7 @@ struct sb_file_t
     struct sb_version_t product_ver;
     struct sb_version_t component_ver;
     /* for production use */
+    int first_boot_sec; /* index in sections[] */
     uint32_t image_size; /* in blocks */
 };
 
@@ -230,8 +232,7 @@ enum sb_error_t
     SB_FORMAT_ERROR = -5,
     SB_CHECKSUM_ERROR = -6,
     SB_NO_VALID_KEY = -7,
-    SB_FIRST_CRYPTO_ERROR = -8,
-    SB_LAST_CRYPTO_ERROR = SB_FIRST_CRYPTO_ERROR - CRYPTO_NUM_ERRORS,
+    SB_CRYPTO_ERROR = -8,
 };
 
 #define SB_RAW_MODE     (1 << 0) /* read image in raw mode (aka bootloader-like) */
