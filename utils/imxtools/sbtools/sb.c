@@ -935,9 +935,7 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, vo
         printf(GREEN, "    IV      : ");
         print_hex(YELLOW, buf, 16, true);
 
-        sb_file->override_real_key = true;
         memcpy(sb_file->real_key, real_key, 16);
-        sb_file->override_crypto_iv = true;
         memcpy(sb_file->crypto_iv, buf, 16);
     }
 
