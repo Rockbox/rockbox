@@ -413,14 +413,7 @@ int main(int argc, char **argv)
             sb_dump(file, NULL, generic_std_printf);
         }
         if(loopback)
-        {
-            /* sb_read_file will fill real key and IV but we don't want to override
-            * them when looping back otherwise the output will be inconsistent and
-            * garbage */
-            file->override_real_key = false;
-            file->override_crypto_iv = false;
             sb_write_file(file, loopback, 0, generic_std_printf);
-        }
         sb_free(file);
     }
     else if(force_sb1 || ver == SB_VERSION_1)
