@@ -505,8 +505,12 @@ walk_path(struct pathwalk *walkp, struct pathwalk_component *compp,
             /* check for "." and ".." */
             if (name[0] == '.')
             {
-                if (len == 2 && name[1] == '.')
+                if (len == 1)
+                    break; /* is "." */
+
+                if (name[1] == '.')
                 {
+                    /* is ".." */
                     struct pathwalk_component *parentp = compp->nextp;
                     if (!parentp)
                         return WALK_RC_CONT_AT_ROOT;
@@ -514,9 +518,8 @@ walk_path(struct pathwalk *walkp, struct pathwalk_component *compp,
                     compp->nextp = freep;
                     freep = compp;
                     compp = parentp;
+                    break;
                 }
-
-                break;
             }
 
         /* fallthrough */
