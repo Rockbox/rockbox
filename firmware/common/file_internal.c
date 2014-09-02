@@ -498,51 +498,44 @@ walk_path(struct pathwalk *walkp, struct pathwalk_component *compp,
         if (!(compp->attr & ATTR_DIRECTORY))
             return -ENOTDIR;
 
-        switch (len)
+        if (len >= MAX_NAME)
+            return -ENAMETOOLONG;
+
+        /* check for "." and ".." */
+        if (name[0] == '.')
         {
-        case 1:
-        case 2:
-            /* check for "." and ".." */
-            if (name[0] == '.')
+            if (len == 1)
+                continue; /* is "." */
+
+            if (len == 2 && name[1] == '.')
             {
-                if (len == 1)
-                    break; /* is "." */
+                /* is ".." */
+                struct pathwalk_component *parentp = compp->nextp;
+                if (!parentp)
+                    return WALK_RC_CONT_AT_ROOT;
 
-                if (name[1] == '.')
-                {
-                    /* is ".." */
-                    struct pathwalk_component *parentp = compp->nextp;
-                    if (!parentp)
-                        return WALK_RC_CONT_AT_ROOT;
-
-                    compp->nextp = freep;
-                    freep = compp;
-                    compp = parentp;
-                    break;
-                }
+                compp->nextp = freep;
+                freep = compp;
+                compp = parentp;
+                continue;
             }
-
-        /* fallthrough */
-        default:
-            if (len >= MAX_NAME)
-                return -ENAMETOOLONG;
-
-            struct pathwalk_component *newp = freep;
-            if (!newp)
-                newp = pathwalk_comp_alloc(compp);
-            else
-                freep = freep->nextp;
-
-            newp->nextp = compp;
-            compp = newp;
-
-            compp->name = name;
-            compp->length = len;
-
-            rc = open_path_component(walkp, compp, stream);
-            if (rc < 0)
-                break;
         }
+
+        struct pathwalk_component *newp = freep;
+        if (!newp)
+            newp = pathwalk_comp_alloc(compp);
+        else
+            freep = freep->nextp;
+
+        newp->nextp = compp;
+        compp = newp;
+
+        compp->name = name;
+        compp->length = len;
+
+        rc = open_path_component(walkp, compp, stream);
+        if (rc < 0)
+            break; /* return info below */
     }
 
     return walk_open_info(walkp, compp, rc, stream);
