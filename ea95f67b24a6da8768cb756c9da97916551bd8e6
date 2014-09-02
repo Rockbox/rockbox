@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_360c3842",
+        "filename": "firmware/drivers/audio/uda1380.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-09-02T09:22:16Z",
+      "side": 1,
+      "message": "Why not initialize it to false by default here?",
+      "revId": "ea95f67b24a6da8768cb756c9da97916551bd8e6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_d616a454",
+        "filename": "firmware/drivers/audio/uda1380.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-09-02T09:22:16Z",
+      "side": 1,
+      "message": "Don\u0027t you need to check some flag (or at least delay) to be sure PLL is running stable?",
+      "revId": "ea95f67b24a6da8768cb756c9da97916551bd8e6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_16093c32",
+        "filename": "firmware/drivers/audio/uda1380.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-09-02T09:22:16Z",
+      "side": 1,
+      "message": "white space error",
+      "revId": "ea95f67b24a6da8768cb756c9da97916551bd8e6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_7606b021",
+        "filename": "firmware/drivers/audio/uda1380.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-09-02T09:22:16Z",
+      "side": 1,
+      "message": "white space error",
+      "revId": "ea95f67b24a6da8768cb756c9da97916551bd8e6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_5603b40f",
+        "filename": "firmware/drivers/audio/uda1380.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-09-02T09:22:16Z",
+      "side": 1,
+      "message": "white space errors",
+      "revId": "ea95f67b24a6da8768cb756c9da97916551bd8e6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
