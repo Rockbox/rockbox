@@ -22,6 +22,18 @@ _2048_background.56x56x24.bmp
 #endif
 #undef MIN
 
+/* amaze */
+#if LCD_DEPTH == 16
+amaze_tiles_9.9x9x16.bmp
+amaze_tiles_7.7x7x16.bmp
+#elif LCD_DEPTH > 1
+amaze_tiles_9.9x9x2.bmp
+amaze_tiles_7.7x7x2.bmp
+#else /* mono */
+amaze_tiles_9.9x9x1.bmp
+amaze_tiles_7.7x7x1.bmp
+#endif
+
 /* Brickmania */
 #ifdef HAVE_LCD_COLOR
 #if LCD_WIDTH >= 112
