@@ -27,6 +27,44 @@ _2048_background.56x56x24.bmp
 #endif
 #undef MIN
 
+/* amaze */
+#if defined(HAVE_LCD_COLOR)
+#if LCD_WIDTH >= 220 || LCD_HEIGHT >= 220
+amaze_tiles_9.9x9x16.bmp
+amaze_tiles_7.7x7x16.bmp
+#elif LCD_WIDTH >= 160 || LCD_HEIGHT >= 160
+amaze_tiles_7.7x7x16.bmp
+amaze_tiles_5.5x5x16.bmp
+#else
+amaze_tiles_5.5x5x16.bmp
+amaze_tiles_3.3x3x16.bmp
+#endif
+
+#elif LCD_DEPTH > 1
+#if LCD_WIDTH >= 220 || LCD_HEIGHT >= 220
+amaze_tiles_9.9x9x2.bmp
+amaze_tiles_7.7x7x2.bmp
+#elif LCD_WIDTH >= 160 || LCD_HEIGHT >= 160
+amaze_tiles_7.7x7x2.bmp
+amaze_tiles_5.5x5x2.bmp
+#else
+amaze_tiles_5.5x5x2.bmp
+amaze_tiles_3.3x3x2.bmp
+#endif
+
+#else /* mono */
+#if LCD_WIDTH >= 220 || LCD_HEIGHT >= 220
+amaze_tiles_9.9x9x1.bmp
+amaze_tiles_7.7x7x1.bmp
+#elif LCD_WIDTH >= 160 || LCD_HEIGHT >= 160
+amaze_tiles_7.7x7x1.bmp
+amaze_tiles_5.5x5x1.bmp
+#else
+amaze_tiles_5.5x5x1.bmp
+amaze_tiles_3.3x3x1.bmp
+#endif
+#endif /* amaze */
+
 /* Brickmania */
 #ifdef HAVE_LCD_COLOR
 #if LCD_WIDTH >= 112
