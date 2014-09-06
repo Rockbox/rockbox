@@ -16,6 +16,24 @@
       "revId": "d848f8962be287bbfa583df22bab8fa0b5a90133",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_d9f7f7f3",
+        "filename": "apps/plugins/amaze.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 1516,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-09-06T15:19:19Z",
+      "side": 1,
+      "message": "Yes, I just automatically replaced \" {\" with \"\\n{\".",
+      "parentUuid": "7a1b2928_99ed7f28",
+      "revId": "d848f8962be287bbfa583df22bab8fa0b5a90133",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
