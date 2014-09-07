@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a1b2928_d9453718",
+        "filename": "firmware/target/hosted/android/system-android.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1000386
+      },
+      "writtenOn": "2014-09-07T01:09:56Z",
+      "side": 1,
+      "message": "Will check all files for  debugging line comments.",
+      "parentUuid": "7a1b2928_19c16f81",
+      "revId": "a9d39620acb57fbfa49f63f1f1e75bbc991176e8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a1b2928_79bea300",
         "filename": "tools/configure",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2014-09-07T00:37:59Z",
       "side": 1,
       "message": "I\u0027m not familiar with the Android port, but does this change anything that would matter to it?",
+      "revId": "a9d39620acb57fbfa49f63f1f1e75bbc991176e8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_f940f309",
+        "filename": "tools/configure",
+        "patchSetId": 2
+      },
+      "lineNbr": 673,
+      "author": {
+        "id": 1000386
+      },
+      "writtenOn": "2014-09-07T01:09:56Z",
+      "side": 1,
+      "message": "I don\u0027t know, to be honest. The only thing I\u0027ve tried is if the android port still compiles. The problem with me and the port is, that it wasn\u0027t me who did the port and I cannot distinguish what is needed and what was a at the end unnecessary debugging intent.",
+      "parentUuid": "7a1b2928_79bea300",
       "revId": "a9d39620acb57fbfa49f63f1f1e75bbc991176e8",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
