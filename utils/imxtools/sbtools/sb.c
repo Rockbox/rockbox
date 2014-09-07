@@ -646,14 +646,14 @@ static uint32_t guess_alignment(uint32_t off)
     return a;
 }
 
-struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
+struct sb_file_t *sb_read_file(const char *filename, unsigned flags, void *u,
     generic_printf_t cprintf, enum sb_error_t *err)
 {
-    return sb_read_file_ex(filename, 0, -1, raw_mode, u, cprintf, err);
+    return sb_read_file_ex(filename, 0, -1, flags, u, cprintf, err);
 }
 
-struct sb_file_t *sb_read_file_ex(const char *filename, size_t offset, size_t size, bool raw_mode, void *u,
-    generic_printf_t cprintf, enum sb_error_t *err)
+struct sb_file_t *sb_read_file_ex(const char *filename, size_t offset, size_t size,
+    unsigned flags, void *u, generic_printf_t cprintf, enum sb_error_t *err)
 {
     #define fatal(e, ...) \
         do { if(err) *err = e; \
@@ -678,7 +678,7 @@ struct sb_file_t *sb_read_file_ex(const char *filename, size_t offset, size_t si
     }
     fclose(f);
 
-    struct sb_file_t *ret = sb_read_memory(buf, read_size, raw_mode, u, cprintf, err);
+    struct sb_file_t *ret = sb_read_memory(buf, read_size, flags, u, cprintf, err);
     free(buf);
     return ret;
 
@@ -704,7 +704,7 @@ static void sb_printer(void *user, const char *fmt, ...)
     va_end(args);
 }
 
-struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, void *u,
+struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, void *u,
     generic_printf_t cprintf, enum sb_error_t *err)
 {
     struct sb_file_t *sb_file = NULL;
@@ -935,7 +935,7 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
     }
 
     /* sections */
-    if(!raw_mode)
+    if(!(flags & SB_RAW_MODE))
     {
         sb_file->nr_sections = sb_header->nr_sections;
         sb_file->sections = xmalloc(sb_file->nr_sections * sizeof(struct sb_section_t));
@@ -1132,6 +1132,14 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, bool raw_mode, voi
     sha_1_output(&sha_1_params, computed_sha1);
     if(memcmp(decrypted_block, computed_sha1, 20) == 0)
         printf(RED, " Ok\n");
+    else if(flags & SB_IGNORE_SHA1)
+    {
+        /* some weird images produced by some buggy tools have wrong SHA-1,
+         * this probably gone unnoticed because the bootloader ignores the SH1-1
+         * anyway */
+        printf(RED, " Failed\n");
+        cprintf(u, true, GREY, "Warning: SHA-1 mismatch ignored per flags\n");
+    }
     else
     {
         printf(RED, " Failed\n");

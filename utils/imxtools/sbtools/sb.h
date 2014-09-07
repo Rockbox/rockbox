@@ -234,14 +234,17 @@ enum sb_error_t
     SB_LAST_CRYPTO_ERROR = SB_FIRST_CRYPTO_ERROR - CRYPTO_NUM_ERRORS,
 };
 
+#define SB_RAW_MODE     (1 << 0) /* read image in raw mode (aka bootloader-like) */
+#define SB_IGNORE_SHA1  (1 << 1) /* ignore SHA-1 mismatch */
+
 enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *u,
     generic_printf_t printf);
-struct sb_file_t *sb_read_file(const char *filename, bool raw_mode, void *u,
+struct sb_file_t *sb_read_file(const char *filename, unsigned flags, void *u,
     generic_printf_t printf, enum sb_error_t *err);
 /* use size_t(-1) to use maximum size */
-struct sb_file_t *sb_read_file_ex(const char *filename, size_t offset, size_t size, bool raw_mode, void *u,
-    generic_printf_t printf, enum sb_error_t *err);
-struct sb_file_t *sb_read_memory(void *buffer, size_t size, bool raw_mode, void *u,
+struct sb_file_t *sb_read_file_ex(const char *filename, size_t offset, size_t size,
+    unsigned flags, void *u, generic_printf_t printf, enum sb_error_t *err);
+struct sb_file_t *sb_read_memory(void *buffer, size_t size, unsigned flags, void *u,
     generic_printf_t printf, enum sb_error_t *err);
 
 uint64_t sb_generate_timestamp(void);

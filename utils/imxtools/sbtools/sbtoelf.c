@@ -263,13 +263,14 @@ static void usage(void)
     printf("  -s/--no-simpl         Prevent elf files from being simplified*\n");
     printf("  -x                    Use default sb1 key\n");
     printf("  -b                    Brute force key\n");
+    printf("  --ignore-sha1         Ignore SHA-1 mismatch*\n");
     printf("Options marked with a * are for debug purpose only\n");
     exit(1);
 }
 
 int main(int argc, char **argv)
 {
-    bool raw_mode = false;
+    unsigned flags = 0;
     const char *loopback = NULL;
     bool force_sb1 = false;
     bool force_sb2 = false;
@@ -288,6 +289,7 @@ int main(int argc, char **argv)
             {"v1", no_argument, 0, '1'},
             {"v2", no_argument, 0, '2'},
             {"no-simpl", no_argument, 0, 's'},
+            {"ignore-sha1", no_argument,  0, 254},
             {0, 0, 0, 0}
         };
 
@@ -339,7 +341,7 @@ int main(int argc, char **argv)
                 break;
             }
             case 'r':
-                raw_mode = true;
+                flags |= SB_RAW_MODE;
                 break;
             case 'a':
             {
@@ -363,6 +365,9 @@ int main(int argc, char **argv)
                 break;
             case 'b':
                 brute_force = true;
+                break;
+            case 254:
+                flags |= SB_IGNORE_SHA1;
                 break;
             default:
                 bug("Internal error: unknown option '%c'\n", c);
@@ -390,7 +395,7 @@ int main(int argc, char **argv)
     if(force_sb2 || ver == SB_VERSION_2)
     {
         enum sb_error_t err;
-        struct sb_file_t *file = sb_read_file(sb_filename, raw_mode, NULL, generic_std_printf, &err);
+        struct sb_file_t *file = sb_read_file(sb_filename, flags, NULL, generic_std_printf, &err);
         if(file == NULL)
         {
             color(OFF);
