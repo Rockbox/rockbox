@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_19c16f81",
+        "filename": "firmware/target/hosted/android/system-android.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1000005
+      },
+      "writtenOn": "2014-09-07T00:37:59Z",
+      "side": 1,
+      "message": "Should probably remove all this stuff thats commented out.  Also we try not to use \"\\\\\" comments.",
+      "revId": "a9d39620acb57fbfa49f63f1f1e75bbc991176e8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_79bea300",
+        "filename": "tools/configure",
+        "patchSetId": 2
+      },
+      "lineNbr": 673,
+      "author": {
+        "id": 1000005
+      },
+      "writtenOn": "2014-09-07T00:37:59Z",
+      "side": 1,
+      "message": "I\u0027m not familiar with the Android port, but does this change anything that would matter to it?",
+      "revId": "a9d39620acb57fbfa49f63f1f1e75bbc991176e8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
