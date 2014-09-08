@@ -56,6 +56,7 @@ int hwstub_read(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz
 int hwstub_write(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz);
 int hwstub_rw_mem(struct hwstub_device_t *dev, int read, uint32_t addr, void *buf, size_t sz);
 /* Returns <0 on error */
+int hwstub_exec(struct hwstub_device_t *dev, uint32_t addr, uint16_t flags);
 int hwstub_call(struct hwstub_device_t *dev, uint32_t addr);
 int hwstub_jump(struct hwstub_device_t *dev, uint32_t addr);
 

@@ -207,30 +207,25 @@ int hwstub_rw_mem(struct hwstub_device_t *dev, int read, uint32_t addr, void *bu
     return read ? hwstub_read(dev, addr, buf, sz) : hwstub_write(dev, addr, buf, sz);
 }
 
+int hwstub_exec(struct hwstub_device_t *dev, uint32_t addr, uint16_t flags)
+{
+    struct hwstub_exec_req_t exec;
+    exec.dAddress = addr;
+    exec.bmFlags = flags;
+    int size = libusb_control_transfer(dev->handle,
+        LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT,
+        HWSTUB_EXEC, dev->id, dev->intf, (void *)&exec, sizeof(exec), 1000);
+    if(size != (int)sizeof(exec))
+        return -1;
+    return 0;
+}
+
 int hwstub_call(struct hwstub_device_t *dev, uint32_t addr)
 {
-#if 0
-    return libusb_control_transfer(dev->handle,
-            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE |
-            LIBUSB_ENDPOINT_OUT, HWSTUB_CALL, addr & 0xffff, addr >> 16, NULL, 0,
-            1000);
-#else
-    (void) dev;
-    (void) addr;
-    return -1;
-#endif
+    return hwstub_exec(dev, addr, HWSTUB_EXEC_CALL);
 }
 
 int hwstub_jump(struct hwstub_device_t *dev, uint32_t addr)
 {
-#if 0
-    return libusb_control_transfer(dev->handle,
-            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_DEVICE |
-            LIBUSB_ENDPOINT_OUT, HWSTUB_JUMP, addr & 0xffff, addr >> 16, NULL, 0,
-            1000);
-#else
-    (void) dev;
-    (void) addr;
-    return -1;
-#endif
+    return hwstub_exec(dev, addr, HWSTUB_EXEC_JUMP);
 }
