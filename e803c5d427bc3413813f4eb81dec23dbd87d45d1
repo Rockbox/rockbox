@@ -16,6 +16,24 @@
       "revId": "e803c5d427bc3413813f4eb81dec23dbd87d45d1",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_99d73f23",
+        "filename": "firmware/target/arm/ipod/button-clickwheel.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1000097
+      },
+      "writtenOn": "2014-09-08T16:16:11Z",
+      "side": 1,
+      "message": "This change was a workaround for not to poll the PMU every 100ms., it is not what OF is doing, OF uses an external interrupt raised by the PMU when the hold switch changes. I found this method for detecting hold switch status and the PUNB function by pure SW testing, running commands and test programs inside emcore, i have not (yet) opened my iPod to play with HW.\n\nI figured the internal wheel controller is connected using GPIO E2..E5 (function 2) to an external wheel/button controller, on my iPod it seems to be CY8C21x34 IC, there is code on diagnostic OF to detect this controller sending some kind of command to it. I didn\u0027t inspect this code in deep, so at this moment i really don\u0027t know what is each GPIO. I suspect when hold switch is locked it disables the CY8C21x34 (i.e. opening power line), but i am not sure of that so i used GPIO E4 as output for \u0027manual\u0027 enable/disable (it seems a chip enable pin when hold switch is unlocked). I discovered GPIO E2 can be used to detect hold switch status when it is pulled-up, but as you say this could be an indirect detection on the TX line caused when the external controller is powered on/off by the hold switch, but again i am not sure of that, maybe inspecting the diagnostic OF or the HW will solve this, i will try to do this in future.\n\nActually i have code (tested on emcore) to manage external interrupts, i will try to add it to RB and send it to gerrit on next days, the goal is to use external interrupts to detect all kind of events (hold switch, usb, fw, headphone remote...) as OF does. \n\nI don\u0027t know what is exactly the problem during boot, but if communication with PMU is up, you can read the hold switch status without dealing with GPIOs.",
+      "parentUuid": "7a1b2928_b694c8e8",
+      "revId": "e803c5d427bc3413813f4eb81dec23dbd87d45d1",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
