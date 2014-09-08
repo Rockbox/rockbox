@@ -69,6 +69,24 @@
       "revId": "a9d39620acb57fbfa49f63f1f1e75bbc991176e8",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_79f183cd",
+        "filename": "tools/configure",
+        "patchSetId": 2
+      },
+      "lineNbr": 673,
+      "author": {
+        "id": 1000386
+      },
+      "writtenOn": "2014-09-08T21:10:44Z",
+      "side": 1,
+      "message": "just tried DX50 with original options - it compiles - but when executing rockbox binary it gives the error \"illegal instruction\". Don\u0027t know about android target.",
+      "parentUuid": "7a1b2928_f940f309",
+      "revId": "a9d39620acb57fbfa49f63f1f1e75bbc991176e8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
