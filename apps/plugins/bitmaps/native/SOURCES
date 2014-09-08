@@ -887,6 +887,8 @@ matrix_normal.bmp
 #if defined HAVE_LCD_COLOR
 #if SMALLER_DIMENSION <= 80
 sliding_puzzle.80x80x16.bmp
+#elif SMALLER_DIMENSION <= 96
+sliding_puzzle.96x96x16.bmp
 #elif SMALLER_DIMENSION <= 108
 sliding_puzzle.108x108x16.bmp
 #elif SMALLER_DIMENSION <= 128
