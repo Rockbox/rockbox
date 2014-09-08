@@ -187,9 +187,9 @@ enum {
 #define XOFS          33
 #define MAX_FPS       30
 
-/* 9x9 bubbles (iAudio M3) */
+/* 9x9 bubbles (iAudio M3, Samsung YH-820) */
 #elif (LCD_HEIGHT == 96) && (LCD_WIDTH == 128)
-#define XOFS          45
+#define XOFS          29
 #define MAX_FPS       30
 
 /* 8x8 bubbles (Sansa C200) */
