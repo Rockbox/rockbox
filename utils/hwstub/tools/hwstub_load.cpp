@@ -269,7 +269,7 @@ int main(int argc, char **argv)
     ret = hwstub_rw_mem(hwdev, 0, addr, buffer, size);
     if(ret != (int)size)
     {
-        fprintf(stderr, "Image write failed\n");
+        fprintf(stderr, "Image write failed: %d\n", ret);
         goto Lerr;
     }
     hwstub_jump(hwdev, addr);

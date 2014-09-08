@@ -190,7 +190,8 @@ int hwstub_write(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t s
     int cnt = 0;
     while(sz > 0)
     {
-        int xfer = _hwstub_write(dev, addr, buf, MIN(sz, dev->buf_sz - sizeof(struct hwstub_write_req_t)));
+        int xfer = _hwstub_write(dev, addr, buf, MIN(sz, dev->buf_sz -
+            sizeof(struct hwstub_write_req_t)));
         if(xfer <  0)
             return xfer;
         sz -= xfer;
