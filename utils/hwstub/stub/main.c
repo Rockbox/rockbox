@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "stddef.h"
+#include "config.h"
 #include "protocol.h"
 #include "logf.h"
 #include "usb_ch9.h"
@@ -402,17 +403,35 @@ static void handle_exec(struct usb_ctrlrequest *req)
     struct hwstub_exec_req_t *exec = (void *)usb_buffer;
     if(size != sizeof(struct hwstub_exec_req_t))
         return usb_drv_stall(EP_CONTROL, true, true);
-    usb_drv_send(EP_CONTROL, NULL, 0);
-#if 0
-    if(req->bRequest == HWSTUB_CALL)
-        ((void (*)(void))addr)();
+    uint32_t addr = exec->dAddress;
+    if(exec->bmFlags & HWSTUB_EXEC_THUMB)
+        addr |= 1;
+    else
+        addr &= ~1;
+
+    if(exec->bmFlags & HWSTUB_EXEC_CALL)
+    {
+#ifdef CPU_ARM
+        /* in case of call, respond after return */
+        asm volatile("blx %0\n" : : "r"(addr) : "memory");
+        usb_drv_send(EP_CONTROL, NULL, 0);
+#else
+#warning call is unsupported on this platform
+        usb_drv_stall(EP_CONTROL, true, true);
+#endif
+    }
     else
     {
-        /* disconnect to make sure usb/dma won't interfere */
+        /* in case of jump, respond immediately and disconnect usb */
+        usb_drv_send(EP_CONTROL, NULL, 0);
         usb_drv_exit();
+#ifdef CPU_ARM
         asm volatile("bx %0\n" : : "r" (addr) : "memory");
-    }
+#else
+#warning jump is unsupported on this platform
+        usb_drv_stall(EP_CONTROL, true, true);
 #endif
+    }
 }
 
 static void handle_class_intf_req(struct usb_ctrlrequest *req)
