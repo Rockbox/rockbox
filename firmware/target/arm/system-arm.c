@@ -145,6 +145,10 @@ void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
     }   /* num == 1 || num == 2 // prefetch/data abort */
 #endif /* !defined(CPU_ARM7TDMI */
 
+    HW_DIGCTL_SCRATCH0 = pc;
+    HW_DIGCTL_SCRATCH1 = __get_sp();
+    system_exception_wait(); /* if this returns, try to reboot */
+
     if (!triggered)
     {
         triggered = true;

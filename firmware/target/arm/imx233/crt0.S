@@ -165,6 +165,17 @@ remap:
 1:
     b       1b
 
+
+#ifdef ROCKBOX_PANIC_PAYLOAD
+.section .text.panic.payload,"ax",%progbits
+.code 32
+.global panic_payload_start
+panic_payload_start:
+.incbin ROCKBOX_PANIC_PAYLOAD
+.global panic_payload_end
+panic_payload_end:
+#endif
+
 /* Cache-align interrupt stacks */
     .balign    32
 /* 256 words of IRQ stack */

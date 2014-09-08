@@ -84,6 +84,9 @@ void panicf( const char *fmt, ...)
     vsnprintf( panic_buf, sizeof(panic_buf), fmt, ap );
     va_end( ap );
 
+    HW_DIGCTL_SCRATCH0 = (uint32_t)&panic_buf;
+    system_exception_wait(); /* if this returns, try to reboot */
+
     lcd_set_viewport(NULL);
 
 #ifdef HAVE_LCD_CHARCELLS

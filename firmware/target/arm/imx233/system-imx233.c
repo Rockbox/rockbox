@@ -121,6 +121,11 @@ void system_exception_wait(void)
     lcd_update();
     _backlight_on();
     _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+#ifdef ROCKBOX_PANIC_PAYLOAD
+    extern char panic_payload_start[];
+    void (*fn)(void) = (void *)&panic_payload_start;
+    fn();
+#endif
     /* wait until button release (if a button is pressed) */
 #ifdef HAVE_BUTTON_DATA
     int data;
