@@ -29,17 +29,17 @@
 #include "button.h"
 #include "settings.h"
 
-/* 
+/*
  * The format of the list is as follows
- * { Action Code,   Button code,    Prereq button code } 
+ * { Action Code,   Button code,    Prereq button code }
  * if there's no need to check the previous button's value, use BUTTON_NONE
- * Insert LAST_ITEM_IN_LIST at the end of each mapping 
+ * Insert LAST_ITEM_IN_LIST at the end of each mapping
  */
 
 /* CONTEXT_CUSTOM's used in this file...
 
 CONTEXT_CUSTOM|CONTEXT_TREE = the standard list/tree defines (without directions)
-CONTEXT_CUSTOM|CONTEXT_SETTINGS = the direction keys for the eq/col picker screens 
+CONTEXT_CUSTOM|CONTEXT_SETTINGS = the direction keys for the eq/col picker screens
                                   i.e where up/down is inc/dec
                CONTEXT_SETTINGS = up/down is prev/next, l/r is inc/dec
 
@@ -61,7 +61,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_QUICKSCREEN,   BUTTON_LEFT|BUTTON_DOWN|BUTTON_REPEAT,
                                         BUTTON_LEFT|BUTTON_DOWN|BUTTON_REPEAT },
 
-    { ACTION_STD_REC,           BUTTON_REC|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_STD_REC,           BUTTON_REC|BUTTON_REPEAT,       BUTTON_REC  },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
@@ -83,7 +83,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_ABRESET,       BUTTON_PLAY|BUTTON_UP,          BUTTON_PLAY },
 
     { ACTION_WPS_VOLDOWN,       BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
-    { ACTION_WPS_VOLDOWN,       BUTTON_DOWN|BUTTON_REL,         BUTTON_NONE },
+    { ACTION_WPS_VOLDOWN,       BUTTON_DOWN,                    BUTTON_NONE },
     { ACTION_WPS_VOLUP,         BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_WPS_VOLUP,         BUTTON_UP,                      BUTTON_NONE },
 
@@ -99,14 +99,14 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_HOTKEY,        BUTTON_REC|BUTTON_REL,          BUTTON_REC },
     { ACTION_WPS_VIEW_PLAYLIST, BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_LEFT },
     { ACTION_WPS_REC,           BUTTON_REC|BUTTON_REPEAT,       BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
-   
+
 static const struct button_mapping button_context_list[]  = {
 #ifdef SAMSUNG_YH820
-    { ACTION_LISTTREE_PGUP,     BUTTON_REC|BUTTON_UP,           BUTTON_REC },
-    { ACTION_LISTTREE_PGDOWN,   BUTTON_REC|BUTTON_DOWN,         BUTTON_REC },
+    { ACTION_LISTTREE_PGUP,     BUTTON_REC|BUTTON_UP,           BUTTON_NONE },
+    { ACTION_LISTTREE_PGDOWN,   BUTTON_REC|BUTTON_DOWN,         BUTTON_NONE },
 #else
     { ACTION_LISTTREE_PGUP,     BUTTON_FFWD,                    BUTTON_NONE },
     { ACTION_LISTTREE_PGDOWN,   BUTTON_REW,                     BUTTON_NONE },
@@ -156,7 +156,7 @@ static const struct button_mapping button_context_settings[]  = {
     { ACTION_STD_NEXTREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
 
     { ACTION_SETTINGS_RESET,    BUTTON_PLAY,                    BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
 
@@ -244,6 +244,9 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,        BUTTON_NONE },
 
+    { ACTION_PS_SLOWER,         BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_PS_FASTER,         BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
+
     { ACTION_PS_TOGGLE_MODE,    BUTTON_FFWD,                    BUTTON_NONE },
     { ACTION_PS_RESET,          BUTTON_REW,                     BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_PLAY,                    BUTTON_NONE },
@@ -255,9 +258,9 @@ static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_REC_PAUSE,             BUTTON_PLAY|BUTTON_REL,     BUTTON_NONE },
     { ACTION_REC_NEWFILE,           BUTTON_FFWD|BUTTON_REL,     BUTTON_NONE },
 
-    { ACTION_STD_MENU,              BUTTON_REC,                 BUTTON_NONE },
-    { ACTION_STD_MENU,              BUTTON_REW|BUTTON_REPEAT,   BUTTON_REW },
-    { ACTION_STD_CANCEL,            BUTTON_REW|BUTTON_REL,      BUTTON_NONE },
+    { ACTION_STD_MENU,              BUTTON_REW|BUTTON_REL,      BUTTON_NONE },
+    { ACTION_STD_CANCEL,            BUTTON_REW|BUTTON_REPEAT,   BUTTON_REW  },
+    { ACTION_STD_CANCEL,            BUTTON_REC,                 BUTTON_NONE },
 
     { ACTION_SETTINGS_INC,          BUTTON_RIGHT,               BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
@@ -280,18 +283,25 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                    BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,      BUTTON_NONE },
 
-    { ACTION_KBD_CURSOR_LEFT,  BUTTON_REW|BUTTON_REL,           BUTTON_FFWD },
-    { ACTION_KBD_CURSOR_LEFT,  BUTTON_REW|BUTTON_REPEAT,        BUTTON_NONE },
-
-    { ACTION_KBD_CURSOR_RIGHT, BUTTON_FFWD|BUTTON_REL,          BUTTON_FFWD },
-    { ACTION_KBD_CURSOR_RIGHT, BUTTON_FFWD|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_FFWD|BUTTON_LEFT,         BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_FFWD|BUTTON_LEFT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_FFWD|BUTTON_RIGHT,        BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_FFWD|BUTTON_RIGHT|BUTTON_REPEAT,BUTTON_NONE },
 
     { ACTION_KBD_SELECT,       BUTTON_PLAY|BUTTON_REL,          BUTTON_NONE },
-    { ACTION_KBD_PAGE_FLIP,    BUTTON_PLAY|BUTTON_RIGHT,        BUTTON_NONE },
+    { ACTION_KBD_PAGE_FLIP,    BUTTON_FFWD|BUTTON_REL,          BUTTON_FFWD },
 
     { ACTION_KBD_DONE,         BUTTON_PLAY|BUTTON_REPEAT,       BUTTON_NONE },
-    { ACTION_KBD_ABORT,        BUTTON_FFWD|BUTTON_PLAY,         BUTTON_FFWD },
-    { ACTION_KBD_ABORT,        BUTTON_FFWD|BUTTON_REW,          BUTTON_FFWD },
+    { ACTION_KBD_DONE,         BUTTON_FFWD|BUTTON_PLAY,         BUTTON_NONE },
+
+    { ACTION_KBD_ABORT,        BUTTON_FFWD|BUTTON_REW,          BUTTON_NONE },
+    { ACTION_KBD_ABORT,        BUTTON_REC,                      BUTTON_NONE },
+
+    { ACTION_KBD_BACKSPACE,    BUTTON_REW|BUTTON_REL,           BUTTON_REW  },
+    { ACTION_KBD_BACKSPACE,    BUTTON_REW|BUTTON_REPEAT,        BUTTON_NONE },
+
+    { ACTION_KBD_MORSE_INPUT,  BUTTON_FFWD|BUTTON_REL, BUTTON_FFWD|BUTTON_REPEAT },
+    { ACTION_KBD_MORSE_SELECT, BUTTON_PLAY|BUTTON_REL,          BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
@@ -325,34 +335,34 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_standard;
         case CONTEXT_WPS:
             return button_context_wps;
-            
+
         case CONTEXT_LIST:
             return button_context_list;
         case CONTEXT_TREE:
         case CONTEXT_MAINMENU:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_listtree_scroll_without_combo;
-            else 
+            else
                 return button_context_listtree_scroll_with_combo;
         case CONTEXT_CUSTOM|CONTEXT_TREE:
             return button_context_tree;
-        
+
         case CONTEXT_SETTINGS:
             return button_context_settings;
         case CONTEXT_CUSTOM|CONTEXT_SETTINGS:
         case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_settings_right_is_inc;
-        
+
         case CONTEXT_SETTINGS_COLOURCHOOSER:
             return button_context_colorchooser;
         case CONTEXT_SETTINGS_EQ:
             return button_context_eq;
-            
+
         case CONTEXT_SETTINGS_TIME:
             return button_context_time;
-            
+
         case CONTEXT_YESNOSCREEN:
-            return button_context_yesno;            
+            return button_context_yesno;
         case CONTEXT_BOOKMARKSCREEN:
             return button_context_bmark;
         case CONTEXT_QUICKSCREEN:
