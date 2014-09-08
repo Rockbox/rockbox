@@ -3364,7 +3364,28 @@ fi
     sharedir="/data/data/org.rockbox/app_rockbox/rockbox"
     bindir="/data/data/org.rockbox/lib"
     libdir="/data/data/org.rockbox/app_rockbox"
-    memory=8
+
+    if [ "$lcd_orientation" != "landscape" ] ; then
+        if [ $ARG_LCDWIDTH -gt "720" ]; then
+            memory=32
+        else
+            if [ $ARG_LCDWIDTH -gt "540" ]; then
+                memory=16
+            else
+                memory=8
+            fi
+        fi
+    else
+        if [ $ARG_LCDHEIGHT -gt "720" ]; then
+            memory=32
+        else
+            if [ $ARG_LCDHEIGHT -gt "540" ]; then
+                memory=16
+            else
+                memory=8
+            fi
+        fi
+    fi
     uname=`uname`
     androidcc armeabi
     tool="cp "
@@ -3496,7 +3517,27 @@ fi
     sharedir="/data/data/org.rockbox/app_rockbox/rockbox"
     bindir="/data/data/org.rockbox/lib"
     libdir="/data/data/org.rockbox/app_rockbox"
-    memory=8
+    if [ "$lcd_orientation" != "landscape" ] ; then
+        if [ $ARG_LCDWIDTH -gt "720" ]; then
+            memory=32
+        else
+            if [ $ARG_LCDWIDTH -gt "540" ]; then
+                memory=16
+            else
+                memory=8
+            fi
+        fi
+    else
+        if [ $ARG_LCDHEIGHT -gt "720" ]; then
+            memory=32
+        else
+            if [ $ARG_LCDHEIGHT -gt "540" ]; then
+                memory=16
+            else
+                memory=8
+            fi
+        fi
+    fi
     uname=`uname`
     androidcc mips
     tool="cp "
@@ -3524,7 +3565,27 @@ fi
     sharedir="/data/data/org.rockbox/app_rockbox/rockbox"
     bindir="/data/data/org.rockbox/lib"
     libdir="/data/data/org.rockbox/app_rockbox"
-    memory=8
+    if [ "$lcd_orientation" != "landscape" ] ; then
+        if [ $ARG_LCDWIDTH -gt "720" ]; then
+            memory=32
+        else
+            if [ $ARG_LCDWIDTH -gt "540" ]; then
+                memory=16
+            else
+                memory=8
+            fi
+        fi
+    else
+        if [ $ARG_LCDHEIGHT -gt "720" ]; then
+            memory=32
+        else
+            if [ $ARG_LCDHEIGHT -gt "540" ]; then
+                memory=16
+            else
+                memory=8
+            fi
+        fi
+    fi
     uname=`uname`
     androidcc x86
     tool="cp "
