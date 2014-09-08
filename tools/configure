@@ -3364,7 +3364,11 @@ fi
     sharedir="/data/data/org.rockbox/app_rockbox/rockbox"
     bindir="/data/data/org.rockbox/lib"
     libdir="/data/data/org.rockbox/app_rockbox"
-    memory=8
+    if [ $ARG_LCDWIDTH -gt $ARG_LCDHEIGHT ]; then
+        memory=8+`expr $ARG_LCDWIDTH / 100`
+    else
+        memory=8+`expr $ARG_LCDHEIGHT / 100`
+    fi
     uname=`uname`
     androidcc armeabi
     tool="cp "
@@ -3496,7 +3500,11 @@ fi
     sharedir="/data/data/org.rockbox/app_rockbox/rockbox"
     bindir="/data/data/org.rockbox/lib"
     libdir="/data/data/org.rockbox/app_rockbox"
-    memory=8
+    if [ $ARG_LCDWIDTH -gt $ARG_LCDHEIGHT ]; then
+        memory=8+`expr $ARG_LCDWIDTH / 100`
+    else
+        memory=8+`expr $ARG_LCDHEIGHT / 100`
+    fi
     uname=`uname`
     androidcc mips
     tool="cp "
@@ -3524,7 +3532,11 @@ fi
     sharedir="/data/data/org.rockbox/app_rockbox/rockbox"
     bindir="/data/data/org.rockbox/lib"
     libdir="/data/data/org.rockbox/app_rockbox"
-    memory=8
+    if [ $ARG_LCDWIDTH -gt $ARG_LCDHEIGHT ]; then
+        memory=8+`expr $ARG_LCDWIDTH / 100`
+    else
+        memory=8+`expr $ARG_LCDHEIGHT / 100`
+    fi
     uname=`uname`
     androidcc x86
     tool="cp "
