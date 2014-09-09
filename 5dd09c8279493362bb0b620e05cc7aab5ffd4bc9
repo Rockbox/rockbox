@@ -16,6 +16,23 @@
       "revId": "5dd09c8279493362bb0b620e05cc7aab5ffd4bc9",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_599c8769",
+        "filename": "apps/plugins/viewers.config",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2014-09-09T03:06:00Z",
+      "side": 1,
+      "message": "This is a prime example of when the \"Do It Right\" philosophy should be deployed.\n\nIt is hard to make any sense at all out of the deletions you have made.\n\nI find it very hard to believe that you tested this on the wide range of targets you have affected with this change.",
+      "revId": "5dd09c8279493362bb0b620e05cc7aab5ffd4bc9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
