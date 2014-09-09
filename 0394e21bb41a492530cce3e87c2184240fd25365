@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_39954b40",
+        "filename": "tools/configure",
+        "patchSetId": 3
+      },
+      "lineNbr": 667,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2014-09-09T02:46:22Z",
+      "side": 1,
+      "message": "If we\u0027re bumping the minimum NDK version, we\u0027ll also want to make sure this error message reflects this.",
+      "revId": "0394e21bb41a492530cce3e87c2184240fd25365",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
