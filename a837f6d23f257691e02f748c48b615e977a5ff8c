@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_d986d712",
+        "filename": "firmware/target/arm/usb-designware.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2014-09-09T03:39:22Z",
+      "side": 1,
+      "message": "usb-designware.c\n\nThis file is absolutely riddled with whitespace.",
+      "revId": "a837f6d23f257691e02f748c48b615e977a5ff8c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
