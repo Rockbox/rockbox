@@ -402,6 +402,13 @@ void storage_spindown(int seconds)
 #endif
 }
 
+void storage_spindown_while_connected(bool enabled)
+{
+#if (CONFIG_STORAGE & STORAGE_ATA)
+    ata_spindown_while_connected(enabled);
+#endif
+}
+
 #if (CONFIG_LED == LED_REAL)
 void storage_set_led_enabled(bool enabled)
 {

@@ -201,6 +201,9 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
 /* Disk */
 #ifdef HAVE_DISK_STORAGE
 MENUITEM_SETTING(disk_spindown, &global_settings.disk_spindown, NULL);
+MENUITEM_SETTING(disk_spindown_while_connected,
+                 &global_settings.disk_spindown_while_connected,
+                 NULL);
 #endif
 #ifdef HAVE_DIRCACHE
 static int dircache_callback(int action,const struct menu_item_ex *this_item)
@@ -228,6 +231,7 @@ MENUITEM_SETTING(dircache, &global_settings.dircache, dircache_callback);
 MAKE_MENU(disk_menu, ID2P(LANG_DISK_MENU), 0, Icon_NOICON,
 #ifdef HAVE_DISK_STORAGE
           &disk_spindown,
+          &disk_spindown_while_connected,
 #endif
 #ifdef HAVE_DIRCACHE
             &dircache,

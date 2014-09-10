@@ -881,6 +881,7 @@ void settings_apply(bool read_disk)
 #endif
 #ifdef HAVE_DISK_STORAGE
     storage_spindown(global_settings.disk_spindown);
+    storage_spindown_while_connected(global_settings.disk_spindown_while_connected);
 #endif
 #if (CONFIG_CODEC == MAS3507D) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
     dac_line_in(global_settings.line_in);

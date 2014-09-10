@@ -1166,6 +1166,9 @@ const struct settings_list settings[] = {
 #ifdef HAVE_DISK_STORAGE
     INT_SETTING(0, disk_spindown, LANG_SPINDOWN, 5, "disk spindown",
                     UNIT_SEC, 3, 254, 1, NULL, NULL, storage_spindown),
+    OFFON_SETTING(0, disk_spindown_while_connected,
+                  LANG_SPINDOWN_WHILE_CONNECTED, true,
+                  "disk spindown while connected", NULL),
 #endif /* HAVE_DISK_STORAGE */
     /* browser */
     TEXT_SETTING(0, start_directory, "start directory", "/", NULL, NULL),

@@ -13254,3 +13254,20 @@
     swcodec: "Q"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SPINDOWN_WHILE_CONNECTED
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Spindown While Connected"
+    flash_storage: none
+  </source>
+  <dest>
+    *: "Spindown While Connected"
+    flash_storage: none
+  </dest>
+  <voice>
+    *: "Spindown While Connected"
+    flash_storage: none
+  </voice>
+</phrase>
