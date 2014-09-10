@@ -97,6 +97,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
     #elif (CONFIG_STORAGE & STORAGE_ATA)
         #define STORAGE_FUNCTION(NAME) (ata_## NAME)
         #define storage_spindown ata_spindown
+        #define storage_spindown_while_connected ata_spindown_while_connected
         #define storage_sleep ata_sleep
         #define storage_spin ata_spin
 

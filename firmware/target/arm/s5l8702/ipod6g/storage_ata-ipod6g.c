@@ -60,6 +60,7 @@ static struct semaphore ata_wakeup;
 static uint32_t ata_dma_flags;
 static long ata_last_activity_value = -1;
 static long ata_sleep_timeout = 20 * HZ;
+static bool spindown_while_connected = true;
 static uint32_t ata_stack[(DEFAULT_STACK_SIZE + 0x400) / 4];
 static bool ata_powered;
 static const int ata_retries = ATA_RETRIES;
@@ -943,8 +944,10 @@ static void ata_thread(void)
 {
     while (true)
     {
+        bool charging = (power_input_status() & POWER_INPUT_MAIN_CHARGER) != 0;
         mutex_lock(&ata_mutex);
-        if (TIME_AFTER(current_tick, ata_last_activity_value + ata_sleep_timeout) && ata_powered)
+        if ((!charging || (charging && spindown_while_connected)) &&
+            TIME_AFTER(current_tick, ata_last_activity_value + ata_sleep_timeout) && ata_powered)
         {
             call_storage_idle_notifys(false);
             ata_power_down();
@@ -1001,6 +1004,11 @@ int ata_write_sectors(IF_MD(int drive,) unsigned long start, int count,
 void ata_spindown(int seconds)
 {
     ata_sleep_timeout = seconds * HZ;
+}
+
+void ata_spindown_while_connected(bool enabled)
+{
+    spindown_while_connected = enabled;
 }
 
 void ata_sleep(void)

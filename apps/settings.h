@@ -480,6 +480,7 @@ struct user_settings
 
 #ifdef HAVE_DISK_STORAGE
     int disk_spindown; /* time until disk spindown, in seconds (0=off) */
+    bool disk_spindown_while_connected; /* sleep while connected via USB */
     int buffer_margin; /* audio buffer watermark margin, in seconds */
 #endif
 
