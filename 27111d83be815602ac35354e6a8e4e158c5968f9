@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_59ef67b0",
+        "filename": "tools/rockboxdev.sh",
+        "patchSetId": 29
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1000644
+      },
+      "writtenOn": "2014-09-11T18:01:31Z",
+      "side": 0,
+      "message": "While I agree that these whitespace things are a bit annoying, I also tend to prefer them not to be fixed in unrelated patches",
+      "revId": "27111d83be815602ac35354e6a8e4e158c5968f9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}

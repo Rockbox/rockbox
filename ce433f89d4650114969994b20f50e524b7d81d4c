@@ -34,6 +34,40 @@
       "revId": "ce433f89d4650114969994b20f50e524b7d81d4c",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_b92afbe5",
+        "filename": "tools/rockboxdev.sh",
+        "patchSetId": 29
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1000644
+      },
+      "writtenOn": "2014-09-11T18:01:31Z",
+      "side": 1,
+      "message": "I assume there\u0027s no suitable tarball?",
+      "revId": "ce433f89d4650114969994b20f50e524b7d81d4c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_992f3ff6",
+        "filename": "tools/rockboxdev.sh",
+        "patchSetId": 29
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1000644
+      },
+      "writtenOn": "2014-09-11T18:01:31Z",
+      "side": 1,
+      "message": "The patch should probably be hosted on rockbox.org with other toolchain patches. Ideally, it would be downloaded by the common download code as well.",
+      "revId": "ce433f89d4650114969994b20f50e524b7d81d4c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
