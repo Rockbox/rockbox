@@ -310,7 +310,7 @@ void INT_UDC(void)
         /* TODO handle errors */
         if (rxstat & RXACK)        /* RxACK */
         {
-            int xfer_size = RX0STAT & 0xffff;
+            int xfer_size = rxstat & 0x7ff;
             ctrlep[DIR_OUT].cnt -= xfer_size;
 
             if (ctrlep[DIR_OUT].cnt > 0 && xfer_size == 64)
