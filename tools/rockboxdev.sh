@@ -85,7 +85,7 @@ getfile() {
       exit
   fi
 
-  if test -z "$tool"; then 
+  if test -z "$tool"; then
     echo "ROCKBOXDEV: No downloader tool found!"
     echo "ROCKBOXDEV: Please install curl or wget and re-run the script"
     exit
@@ -123,7 +123,7 @@ build() {
             exit
             ;;
     esac
-    
+
     # create build directory
     if test -d $builddir; then
         if test ! -w $builddir; then
@@ -252,11 +252,11 @@ build_ctng() {
 
     dlurl="http://www.rockbox.org/gcc/$ctng_target"
 
-    # download 
+    # download
     getfile "ct-ng-config" "$dlurl"
 
     test -n "$extra" && getfile "$extra" "$dlurl"
-    
+
     # create build directory
     if test -d $builddir; then
         if test ! -w $builddir; then
@@ -283,12 +283,12 @@ build_ctng() {
             tar xf "$dlwhere/$extra" -C "$prefix/$tc_arch-$ctng_target-$tc_host/$sysroot"
         fi
     fi
-    
+
     # cleanup
     cd $builddir
     rm -rf $builddir/build-$ctng_target
 }
-    
+
 ##############################################################################
 # Code:
 
