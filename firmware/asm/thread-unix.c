@@ -23,12 +23,14 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include <signal.h>
 #include <stdio.h>
 #include <setjmp.h>
 #include <unistd.h>
 #include <pthread.h>
+#ifndef WINCE
 #include <errno.h>
+#include <signal.h>
+#endif
 #include "debug.h"
 
 static volatile bool sig_handler_called;

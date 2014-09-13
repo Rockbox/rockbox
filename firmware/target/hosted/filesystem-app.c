@@ -23,7 +23,9 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <time.h>
+#ifndef WINCE
 #include <errno.h>
+#endif
 #include <string.h>
 #include <limits.h>
 #include "config.h"

@@ -27,7 +27,9 @@
 #include "plugin.h"
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
+#ifndef WINCE
 #include <errno.h>
+#endif
 #define PREFIX(_x_) sim_ ## _x_
 #else
 extern int errno;

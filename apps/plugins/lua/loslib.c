@@ -4,8 +4,9 @@
 ** See Copyright Notice in lua.h
 */
 
-
+#ifndef WINCE
 #include <errno.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>

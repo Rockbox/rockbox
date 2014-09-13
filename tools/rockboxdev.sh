@@ -34,7 +34,7 @@ if [ -z $GNU_MIRROR ] ; then
 fi
 
 # These are the tools this script requires and depends upon.
-reqtools="gcc bzip2 gzip make patch makeinfo automake libtool autoconf flex bison"
+reqtools="gcc bzip2 gzip make patch makeinfo automake libtool autoconf flex bison svn"
 
 ##############################################################################
 # Functions:
@@ -289,6 +289,54 @@ build_ctng() {
     rm -rf $builddir/build-$ctng_target
 }
     
+build_mingw32ce() {
+    # Cegcc has a dedicated build and install script within
+    # their sources.
+
+    # Create build directory
+    if test -d $builddir; then
+        if test ! -w $builddir; then
+            echo "ROCKBOXDEV: No write permission for $builddir"
+            exit
+        fi
+    else
+        mkdir -p $builddir
+    fi
+
+    # findtool doesn't find libraries? So a simple warning is issued
+    echo "CEgcc requires libmpfr-dev and libgmp-dev to be installed"
+    echo "Press CTRL+C now to exit script, and install them now"
+    echo "Or Press any key to continue"
+    read anykey
+
+    echo "ROCKBOXDEV: Creating Build Directories"
+    if test ! -d $builddir/build-mingw32ce; then
+        mkdir $builddir/build-mingw32ce
+    else
+    cd $builddir/build-mingw32ce
+    fi
+
+    echo "ROCKBOXDEV: Fetching CEgcc Sources"
+    # There is no suitable tarball availible so we'll use svn for now
+    svn checkout svn://svn.code.sf.net/p/cegcc/code/trunk cegcc-code
+
+    echo "ROCKBOXDEV: Building CEgcc"
+    if test ! -d $builddir/build-mingw32ce/build; then
+        mkdir $builddir/build-mingw32ce/build
+    else
+    cd $builddir/build-mingw32ce/build
+    fi
+
+    ../cegcc-code/cegcc/src/scripts/build-mingw32ce.sh --prefix=$prefix
+
+    ## TBD - SDL library wince port?  Is it needed for compilation?
+
+    echo "ROCKBOXDEV: Cleaning Up CEgcc"
+    cd $builddir
+    rm -rf ./build-cegcc
+}
+
+
 ##############################################################################
 # Code:
 
@@ -337,11 +385,12 @@ if test ! -w $prefix; then
 fi
 
 echo "Select target arch:"
-echo "s   - sh       (Archos models)"
-echo "m   - m68k     (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
-echo "a   - arm      (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
-echo "i   - mips     (Jz4740 and ATJ-based players)"
-echo "r   - arm-app  (Samsung ypr0)"
+echo "s   - sh        (Archos models)"
+echo "m   - m68k      (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
+echo "a   - arm       (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
+echo "i   - mips      (Jz4740 and ATJ-based players)"
+echo "r   - arm-app   (Samsung ypr0)"
+echo "c   - mingw32ce (Windows CE, PocketPC, Windows Mobile)"
 echo "separate multiple targets with spaces"
 echo "(Example: \"s m a\" will build sh, m68k and arm)"
 echo ""
@@ -393,6 +442,9 @@ do
             ;;
         [Rr])
             build_ctng "ypr0" "alsalib.tar.gz" "arm" "linux-gnueabi"
+            ;;
+        [Cc])
+            build_mingw32ce
             ;;
         *)
             echo "ROCKBOXDEV: Unsupported architecture option: $arch"
