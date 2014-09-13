@@ -44,8 +44,8 @@
 #define O_NOISODECODE 0
 #endif
 
-#define getle16(p) (p[0] | (p[1] >> 8))
-#define getbe16(p) ((p[1] << 8) | p[0])
+#define getle16(p) (p[0] | (p[1] << 8))
+#define getbe16(p) ((p[0] << 8) | p[1])
 
 #if !defined (__PCTOOL__) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
 /* Because file scanning uses the default CP table when matching entries,
