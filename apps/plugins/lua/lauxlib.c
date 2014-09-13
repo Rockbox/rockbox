@@ -6,7 +6,9 @@
 
 
 #include <ctype.h>
+#ifndef WINCE
 #include <errno.h>
+#endif
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>

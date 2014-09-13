@@ -22,7 +22,9 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#ifndef WINCE
 #include <errno.h>
+#endif
 #include "string-extra.h"
 #include "config.h"
 #include "misc.h"
