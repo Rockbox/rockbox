@@ -289,6 +289,46 @@ build_ctng() {
     rm -rf $builddir/build-$ctng_target
 }
     
+build_mingw32ce() {
+    # Cegcc has a dedicated build and install script within
+    # their sources.
+
+    # Create build directory
+    if test -d $builddir; then
+        if test ! -w $builddir; then
+            echo "ROCKBOXDEV: No write permission for $builddir"
+            exit
+        fi
+    else
+        mkdir -p $builddir
+    fi
+    echo "ROCKBOXDEV: Creating build Directories"
+    mkdir $builddir/build-cegcc
+    cd $builddir/build-cegcc
+
+    echo "ROCKBOXDEV: Fetching CEgcc"
+    mkdir cegcc && cd cegcc
+    ## An older version of Cegcc is used, there is not an adequate tarball available
+    svn co -r1266 https://svn.code.sf.net/p/cegcc/code
+
+    #echo "ROCKBOXDEV: Patching CEgcc"
+    cd code/tags/cegcc-0.55
+    ### Patch changes all referances from arm-wince-mingw32ce to arm-mingw32ce this stays with the current naming schema of cegcc to avoid conflicts
+    #wget -O patch.diff "HTTP://MISSINGPATCH"
+    #patch -p3 < ./patch.diff
+    #rm ./patch.diff
+
+    echo "ROCKBOXDEV: Building CEgcc"
+    cd src
+    mkdir build && cd build
+    ../scripts/build-mingw32ce.sh --prefix=$prefix
+
+    echo "ROCKBOXDEV: Cleaning Up CEgcc"
+    cd $builddir
+    rm -rf ./build-cegcc
+}
+
+
 ##############################################################################
 # Code:
 
@@ -337,11 +377,12 @@ if test ! -w $prefix; then
 fi
 
 echo "Select target arch:"
-echo "s   - sh       (Archos models)"
-echo "m   - m68k     (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
-echo "a   - arm      (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
-echo "i   - mips     (Jz4740 and ATJ-based players)"
-echo "r   - arm-app  (Samsung ypr0)"
+echo "s   - sh              (Archos models)"
+echo "m   - m68k            (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
+echo "a   - arm             (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
+echo "i   - mips            (Jz4740 and ATJ-based players)"
+echo "r   - arm-app         (Samsung ypr0)"
+echo "c   - mingw32ce & sdl (Windows Ce, PocketPC, Windows Mobile)"
 echo "separate multiple targets with spaces"
 echo "(Example: \"s m a\" will build sh, m68k and arm)"
 echo ""
@@ -393,6 +434,9 @@ do
             ;;
         [Rr])
             build_ctng "ypr0" "alsalib.tar.gz" "arm" "linux-gnueabi"
+            ;;
+        [Cc])
+            build_mingw32ce
             ;;
         *)
             echo "ROCKBOXDEV: Unsupported architecture option: $arch"
