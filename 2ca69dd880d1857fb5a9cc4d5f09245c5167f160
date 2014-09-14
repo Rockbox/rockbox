@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_396d4b33",
+        "filename": "apps/plugin.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1000005
+      },
+      "writtenOn": "2014-09-14T01:28:48Z",
+      "side": 1,
+      "message": "This should not be in plugins.c, its part of the Nano/Classic piezo driver.",
+      "revId": "2ca69dd880d1857fb5a9cc4d5f09245c5167f160",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
