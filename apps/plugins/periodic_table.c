@@ -614,7 +614,9 @@ enum plugin_status plugin_start(const void* parameter)
     font_height = pf->height;
 
     while (1) {
+#ifdef HAVE_LCD_COLOR
         rb->lcd_set_background(theme_bg);
+#endif
         rb->lcd_clear_display();
         periodic_draw();
         rb->lcd_update();
