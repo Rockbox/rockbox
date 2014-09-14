@@ -626,7 +626,7 @@ static int superdom_help(void)
                                 "army.", "Each", "tile", "has", "a", "strength,", "calculated", "by",
                                 "the", "ownership", "of", "surrounding", "tiles,", "and", "the", "type",
                                 "and", "number", "of", "troops", "on", "them."};
-    static const struct style_text style[]={
+    static struct style_text style[]={
         {0, TEXT_CENTER|TEXT_UNDERLINE},
         {2, C_RED},
         {21, C_RED},
