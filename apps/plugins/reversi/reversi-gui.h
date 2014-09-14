@@ -312,6 +312,10 @@
 #define REVERSI_BUTTON_MAKE_MOVE   BUTTON_SELECT
 #define REVERSI_BUTTON_MENU        BUTTON_MENU
 
+#elif CONFIG_KEYPAD == DX50_PAD
+#define REVERSI_BUTTON_QUIT         BUTTON_POWER
+#define REVERSI_BUTTON_MENU         BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

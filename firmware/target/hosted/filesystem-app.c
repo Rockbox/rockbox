@@ -104,6 +104,7 @@ void paths_init(void)
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
     os_mkdir("/sdcard/rockbox" __MKDIR_MODE_ARG);
     os_mkdir("/sdcard/rockbox/rocks.data" __MKDIR_MODE_ARG);
+    os_mkdir("/sdcard/rockbox/eqs" __MKDIR_MODE_ARG);
 #else
     char config_dir[MAX_PATH];
 

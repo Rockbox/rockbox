@@ -340,7 +340,7 @@ static void init(void)
 #ifdef SIMULATOR
     sim_tasks_init();
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID) && !defined(DX50) && !defined(DX90)
     notification_init();
 #endif
     lang_init(core_language_builtin, language_strings,
