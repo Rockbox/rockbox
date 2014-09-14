@@ -605,8 +605,10 @@ enum plugin_status plugin_start(const void* parameter)
     periodic_sel = 0;
     periodic_makecols();
 
+#ifdef HAVE_LCD_COLOR
     theme_fg=rb->lcd_get_foreground();
     theme_bg=rb->lcd_get_background();
+#endif
 
     struct font *pf = rb->font_get(FONT_UI);
     font_height = pf->height;
