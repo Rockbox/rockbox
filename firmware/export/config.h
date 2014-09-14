@@ -164,6 +164,7 @@
 #define IHIFI_PAD          60
 #define SAMSUNG_YPR1_PAD  61
 #define SAMSUNG_YH920_PAD  62
+#define DX50_PAD           63
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -575,6 +576,10 @@ Lyre prototype 1 */
 #include "config/creativezenxfistyle.h"
 #elif defined(SAMSUNG_YPR1)
 #include "config/samsungypr1.h"
+#elif defined(DX50)
+#include "config/ibassodx50.h"
+#elif defined(DX90)
+#include "config/ibassodx90.h"
 #else
 /* no known platform */
 #endif
