@@ -200,6 +200,7 @@ static const long int periodic_tinyfont_bitmaps[] = {
     0x00052500, 0x00055360, 0x00072700, 0x00162100, 0x00222220, 0x00432400, 0x00630000, 0x00525250
 };
 
+#if LCD_DEPTH > 1
 static void periodic_tinyfont_draw_char(int x, int y, char ch)
 {
     int i,j;
@@ -233,6 +234,7 @@ static void periodic_tinyfont_draw_string(int x, int y, char * s)
         t++;
     }
 }
+#endif
 
 /*
   void periodic_tinyfont_draw_chart(int x, int y, ttk_color col)
@@ -269,13 +271,13 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 
 /* - - - SOME CONSTANTS - - - */
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 #define PERIODIC_COLOR_BLACK LCD_RGBPACK(0,0,0)
 #elif LCD_DEPTH > 1
 #define PERIODIC_COLOR_BLACK LCD_BLACK
 #endif
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 #define PERIODIC_COLOR_WHITE LCD_RGBPACK(255,255,255)
 #elif LCD_DEPTH > 1
 #define PERIODIC_COLOR_WHITE LCD_WHITE
@@ -291,7 +293,7 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 static void periodic_makecols(void)
 {
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     int i = 0;
 
     periodic_color_palette[i++] = LCD_RGBPACK(255,255,255); /* 0 hydrogen */
@@ -477,7 +479,7 @@ static void periodic_draw(void)
     struct periodic_element_t e;
     e = periodic_elements[periodic_sel];
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     rb->lcd_set_foreground(theme_fg);
 #endif
 
@@ -605,7 +607,7 @@ enum plugin_status plugin_start(const void* parameter)
     periodic_sel = 0;
     periodic_makecols();
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     theme_fg=rb->lcd_get_foreground();
     theme_bg=rb->lcd_get_background();
 #endif
@@ -614,7 +616,7 @@ enum plugin_status plugin_start(const void* parameter)
     font_height = pf->height;
 
     while (1) {
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
         rb->lcd_set_background(theme_bg);
 #endif
         rb->lcd_clear_display();
