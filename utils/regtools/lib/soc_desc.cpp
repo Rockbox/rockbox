@@ -285,7 +285,11 @@ bool soc_desc_parse_xml(const std::string& filename, soc_t& socs)
 {
     LIBXML_TEST_VERSION
 
+    printf("xmlIsMainThread(): %d\n", xmlIsMainThread());
+
+    printf("> xmlReadFile(%s)\n", filename.c_str());
     xmlDocPtr doc = xmlReadFile(filename.c_str(), NULL, 0);
+    printf("< xmlReadFile\n");
     if(doc == NULL)
         return false;
 
@@ -966,4 +970,22 @@ bool soc_desc_evaluate_formula(const std::string& formula,
 {
     my_evaluator e(formula, var);
     return e.parse(result, error);
+}
+
+/** WARNING we need to call xmlInitParser() to init libxml2 but it needs to
+ * called from the main thread, which is a super strong requirement, so do it
+ * using a static constructor */
+namespace
+{
+class dummy_ctor
+{
+public:
+    dummy_ctor()
+    {
+        printf("xmlInitParser()\n");
+        xmlInitParser();
+    }
+};
+
+dummy_ctor __dummy_ctor_xml_init;
 }

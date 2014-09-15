@@ -10,6 +10,17 @@
 SocFile::SocFile()
     :m_valid(false)
 {
+    /* create a fake dev */
+    soc_dev_t dev;
+    dev.name = "NUCLEAR";
+    dev.long_name = "nuclear launcher";
+    /* create a fake soc */
+    m_soc.name = "VCHIP";
+    m_soc.desc = "This is a virtual chip";
+    m_soc.dev.push_back(dev);
+
+    m_filename = "VCHIP.xml";
+    m_valid = true;
 }
 
 SocFile::SocFile(const QString& filename)

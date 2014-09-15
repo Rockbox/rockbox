@@ -1054,7 +1054,7 @@ bool RegEdit::SaveSocFile(const QString& filename)
 
 void RegEdit::LoadSocFile(const QString& filename)
 {
-    m_cur_socfile = SocFile(filename);
+    m_cur_socfile = SocFile();
     if(!m_cur_socfile.IsValid())
     {
         QMessageBox::warning(this, "The description was not loaded",
