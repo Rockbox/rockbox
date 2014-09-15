@@ -967,3 +967,20 @@ bool soc_desc_evaluate_formula(const std::string& formula,
     my_evaluator e(formula, var);
     return e.parse(result, error);
 }
+
+/** WARNING we need to call xmlInitParser() to init libxml2 but it needs to
+ * called from the main thread, which is a super strong requirement, so do it
+ * using a static constructor */
+namespace
+{
+class dummy_ctor
+{
+public:
+    dummy_ctor()
+    {
+        xmlInitParser();
+    }
+};
+
+dummy_ctor __dummy_ctor_xml_init;
+}
