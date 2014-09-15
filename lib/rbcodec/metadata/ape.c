@@ -44,17 +44,17 @@
 struct apetag_header 
 {
     char id[8];
-    long version;
-    long length;
-    long item_count;
-    long flags;
+    uint32_t version;
+    uint32_t length;
+    uint32_t item_count;
+    uint32_t flags;
     char reserved[8];
 };
 
 struct apetag_item_header 
 {
-    long length;
-    long flags;
+    uint32_t length;
+    uint32_t flags;
 };
 
 /* Read the items in an APEV2 tag. Only looks for a tag at the end of a 
@@ -79,9 +79,9 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
         unsigned int buf_remaining = sizeof(id3->id3v2buf) 
             + sizeof(id3->id3v1buf);
         unsigned int tag_remaining = header.length - APETAG_HEADER_LENGTH;
-        int i;
-        
-        if (lseek(fd, -header.length, SEEK_END) < 0)
+        unsigned int i;
+
+        if (lseek(fd, -((int)header.length), SEEK_END) < 0)
         {
             return false;
         }
@@ -117,17 +117,27 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
             if ((item.flags & APETAG_ITEM_TYPE_MASK) == 0) 
             {
                 long len;
-                
+
                 if (read_string(fd, value, sizeof(value), -1, item.length) 
                     != item.length)
                 {
                     return false;
                 }
 
-                len = parse_tag(name, value, id3, buf, buf_remaining, 
+                if (!strcasecmp(name, "cuesheet"))
+                {
+                    id3->has_embedded_cuesheet = true;
+                    id3->embedded_cuesheet.pos = lseek(fd, 0, SEEK_CUR)-item.length;
+                    id3->embedded_cuesheet.size = item.length;
+                    id3->embedded_cuesheet.encoding = CHAR_ENC_UTF_8;
+                }
+                else
+                {
+                    len = parse_tag(name, value, id3, buf, buf_remaining,
                     TAGTYPE_APE);
-                buf += len;
-                buf_remaining -= len;
+                    buf += len;
+                    buf_remaining -= len;
+                }
             }
             else
             {
