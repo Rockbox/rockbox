@@ -925,93 +925,749 @@ KIND, either express or implied.
   </dev>
   <dev name="UDC" long_name="USB 2.0 Device Controller" desc="USB 2.0 Device Controller" version="1.0">
     <addr name="UDC" addr="0x180a0000" />
-    <reg name="DEV_CTL" addr="0x08"></reg>
-    <reg name="DEV_INFO" addr="0x10"></reg>
-    <reg name="EN_INT" addr="0x14"></reg>
-    <reg name="INT2FLAG" addr="0x18"></reg>
-    <reg name="INTCON" addr="0x1C"></reg>
-    <reg name="SETUP1" addr="0x20"></reg>
-    <reg name="SETUP2" addr="0x24"></reg>
-    <reg name="AHBCON" addr="0x28"></reg>
-    <reg name="RX0STAT" addr="0x30"></reg>
-    <reg name="RX0CON" addr="0x34"></reg>
-    <reg name="RX0DMACTLO" addr="0x38"></reg>
-    <reg name="RX0DMAOUTLMADDR" addr="0x3C"></reg>
-    <reg name="TX0STAT" addr="0x40"></reg>
-    <reg name="TX0CON" addr="0x44"></reg>
-    <reg name="TX0BUF" addr="0x48"></reg>
-    <reg name="TX0DMAINCTL" addr="0x4C"></reg>
-    <reg name="TX0DMALM_IADDR" addr="0x50"></reg>
-    <reg name="RX1STAT" addr="0x54"></reg>
-    <reg name="RX1CON" addr="0x58"></reg>
-    <reg name="RX1DMACTLO" addr="0x5C"></reg>
-    <reg name="RX1DMAOUTLMADDR" addr="0x60"></reg>
-    <reg name="TX2STAT" addr="0x64"></reg>
-    <reg name="TX2CON" addr="0x68"></reg>
-    <reg name="TX2BUF" addr="0x6C"></reg>
-    <reg name="TX2DMAINCTL" addr="0x70"></reg>
-    <reg name="TX2DMALM_IADDR" addr="0x74"></reg>
-    <reg name="TX3STAT" addr="0x78"></reg>
-    <reg name="TX3CON" addr="0x7C"></reg>
-    <reg name="TX3BUF" addr="0x80"></reg>
-    <reg name="TX3DMAINCTL" addr="0x84"></reg>
-    <reg name="TX3DMALM_IADDR" addr="0x88"></reg>
-    <reg name="RX4STAT" addr="0x8C"></reg>
-    <reg name="RX4CON" addr="0x90"></reg>
-    <reg name="RX4DMACTLO" addr="0x94"></reg>
-    <reg name="RX4DMAOUTLMADDR" addr="0x98"></reg>
-    <reg name="TX5STAT" addr="0x9C"></reg>
-    <reg name="TX5CON" addr="0xA0"></reg>
-    <reg name="TX5BUF" addr="0xA4"></reg>
-    <reg name="TX5DMAINCTL" addr="0xA8"></reg>
-    <reg name="TX5DMALM_IADDR" addr="0xAC"></reg>
-    <reg name="TX6STAT" addr="0xB0"></reg>
-    <reg name="TX6CON" addr="0xB4"></reg>
-    <reg name="TX6BUF" addr="0xB8"></reg>
-    <reg name="TX6DMAINCTL" addr="0xBC"></reg>
-    <reg name="TX6DMALM_IADDR" addr="0xC0"></reg>
-    <reg name="RX7STAT" addr="0xC4"></reg>
-    <reg name="RX7CON" addr="0xC8"></reg>
-    <reg name="RX7DMACTLO" addr="0xCC"></reg>
-    <reg name="RX7DMAOUTLMADDR" addr="0xD0"></reg>
-    <reg name="TX8STAT" addr="0xD4"></reg>
-    <reg name="TX8CON" addr="0xD8"></reg>
-    <reg name="TX8BUF" addr="0xDC"></reg>
-    <reg name="TX8DMAINCTL" addr="0xE0"></reg>
+    <reg name="DEV_CTL" addr="0x08">
+      <field name="RESERVED" bitrange="31:10"/>
+      <field name="TEST_MODE" bitrange="9:9"/>
+      <field name="CSR_DONE" bitrange="8:8"/>
+      <field name="SOFT_POR" bitrange="7:7"/>
+      <field name="DEV_PHYBUS16_8" bitrange="6:6"/>
+      <field name="DEV_RESUME" bitrange="5:5"/>
+      <field name="DEV_SOFT_CN" bitrange="4:4"/>
+      <field name="DEV_SELF_PWR" bitrange="3:3"/>
+      <field name="DEV_RMTWKP" bitrange="2:2"/>
+      <field name="DEV_SPEED" bitrange="1:0">
+        <value name="HS" value="0x00" desc="High Speed"/>
+      </field>
+    </reg>
+    <reg name="DEV_INFO" addr="0x10">
+      <field name="RESERVED" bitrange="31:23"/>
+      <field name="DEV_SPEED" bitrange="22:21">
+        <value name="HS" value="0x00" desc="High Speed"/>
+        <value name="FS" value="0x03" desc="Full Speed"/>
+      </field>
+      <field name="VBUS_SYNC" bitrange="20:20">
+        <value name="CONNECTION" value="0x01"/>
+        <value name="DISCONNECTION" value="0x00"/>
+      </field>
+      <field name="DEV_ALTINTF" bitrange="19:16"/>
+      <field name="INTF_NUMBER" bitrange="15:12"/>
+      <field name="CFG_NUMBER" bitrange="11:8"/>
+      <field name="DEV_EN" bitrange="7:7"/>
+      <field name="DEV_ADDRESS" bitrange="6:0"/>
+    </reg>
+    <reg name="EN_INT" addr="0x14">
+      <field name="RESERVED" bitrange="31:27"/>
+      <field name="TEST_PKT" bitrange="26:26"/>
+      <field name="TEST_K" bitrange="25:25"/>
+      <field name="TEST_J" bitrange="24:24"/>
+      <field name="TEST_SE0_NAK" bitrange="23:23"/>
+      <field name="EN_IIN15_INTR" bitrange="22:22"/>
+      <field name="EN_BIN14_INTR" bitrange="21:21"/>
+      <field name="EN_BOUT13_INTR" bitrange="20:20"/>
+      <field name="EN_IIN12_INTR" bitrange="19:19"/>
+      <field name="EN_BIN11_INTR" bitrange="18:18"/>
+      <field name="EN_BOUT10_INTR" bitrange="17:17"/>
+      <field name="EN_IIN9_INTR" bitrange="16:16"/>
+      <field name="EN_BIN8_INTR" bitrange="15:15"/>
+      <field name="EN_BOUT7_INTR" bitrange="14:14"/>
+      <field name="EN_IIN6_INTR" bitrange="13:13"/>
+      <field name="EN_BIN5_INTR" bitrange="12:12"/>
+      <field name="EN_BOUT4_INTR" bitrange="11:11"/>
+      <field name="EN_IIN3_INTR" bitrange="10:10"/>
+      <field name="EN_BIN2_INTR" bitrange="9:9"/>
+      <field name="EN_BOUT1_INTR" bitrange="8:8"/>
+      <field name="RESERVED" bitrange="7:7"/>
+      <field name="EN_SUSP_INTR" bitrange="6:6"/>
+      <field name="EN_RSUME_INTR" bitrange="5:5"/>
+      <field name="EN_USBRST_INTR" bitrange="4:4"/>
+      <field name="EN_OUT0_INTR" bitrange="3:3"/>
+      <field name="EN_IN0_INTR" bitrange="2:2"/>
+      <field name="EN_SETUP_INTR" bitrange="1:1"/>
+      <field name="EN_SOF_INTR" bitrange="0:0"/>
+    </reg>
+    <reg name="INT2FLAG" addr="0x18">
+      <field name="RESERVED31_27" bitrange="31:27"/>
+      <field name="TEST_PKT" bitrange="26:26"/>
+      <field name="TEST_K" bitrange="25:25"/>
+      <field name="TEST_J" bitrange="24:24"/>
+      <field name="TEST_SE0_NAK" bitrange="23:23"/>
+      <field name="IIN15_INTR" bitrange="22:22"/>
+      <field name="BIN14_INTR" bitrange="21:21"/>
+      <field name="BOUT13_INTR" bitrange="20:20"/>
+      <field name="IIN12_INTR" bitrange="19:19"/>
+      <field name="BIN11_INTR" bitrange="18:18"/>
+      <field name="BOUT10_INTR" bitrange="17:17"/>
+      <field name="IIN9_INTR" bitrange="16:16"/>
+      <field name="BIN8_INTR" bitrange="15:15"/>
+      <field name="BOUT7_INTR" bitrange="14:14"/>
+      <field name="IIN6_INTR" bitrange="13:13"/>
+      <field name="BIN5_INTR" bitrange="12:12"/>
+      <field name="BOUT4_INTR" bitrange="11:11"/>
+      <field name="IIN3_INTR" bitrange="10:10"/>
+      <field name="BIN2_INTR" bitrange="9:9"/>
+      <field name="BOUT1_INTR" bitrange="8:8"/>
+      <field name="RESERVED7" bitrange="7:7"/>
+      <field name="SUSP_INTR" bitrange="6:6"/>
+      <field name="RSUME_INTR" bitrange="5:5"/>
+      <field name="USBRST_INTR" bitrange="4:4"/>
+      <field name="OUT0_INTR" bitrange="3:3"/>
+      <field name="IN0_INTR" bitrange="2:2"/>
+      <field name="SETUP_INTR" bitrange="1:1"/>
+      <field name="SOF_INTR" bitrange="0:0"/>
+    </reg>
+    <reg name="INTCON" addr="0x1C">
+      <field name="RESERVED" bitrange="31:3"/>
+      <field name="INT0MODE" bitrange="2:2">
+        <value name="ACTIVE_LOW" value="0x00"/>
+        <value name="ACTIVE_HIGH" value="0x01"/>
+      </field>
+      <field name="INT0TYPE" bitrange="1:1">
+        <value name="LEVEL_TRIGGER" value="0x00"/>
+        <value name="EDGE_TRIGGER" value="0x01"/>
+      </field>
+      <field name="INT0EN" bitrange="0:0">
+        <value name="DISABLE" value="0x00"/>
+        <value name="ENABLE" value="0x01"/>
+      </field>
+    </reg>
+    <reg name="SETUP1" addr="0x20">
+      <field name="wValue" bitrange="31:16"/>
+      <field name="bRequest" bitrange="15:8">
+        <value name="GetStatus" value="0x00"/>
+        <value name="ClearFeature" value="0x01"/>
+        <value name="Reserved2" value="0x02"/>
+        <value name="SetFeature" value="0x03"/>
+        <value name="Reserved4" value="0x04"/>
+        <value name="SetAddress" value="0x05"/>
+        <value name="GetDescriptor" value="0x06"/>
+        <value name="SetDescriptor" value="0x07"/>
+        <value name="GetConfiguration" value="0x08"/>
+        <value name="SetConfiguration" value="0x09"/>
+        <value name="GetInterface" value="0x0a"/>
+        <value name="SetInterface" value="0x0b"/>
+        <value name="SyncFrame" value="0x0c"/>
+      </field>
+      <field name="bmRequestTypeDir" bitrange="7:7">
+        <value name="Host2Device" value="0x00"/>
+        <value name="Device2Host" value="0x01"/>
+      </field>
+      <field name="bmRequestType" bitrange="6:5">
+        <value name="Standard" value="0x00"/>
+        <value name="Class" value="0x01"/>
+        <value name="Vendor" value="0x02"/>
+      </field>
+      <field name="bmRequestTypeRecipient" bitrange="4:0">
+        <value name="Device" value="0x00"/>
+        <value name="Interface" value="0x01"/>
+        <value name="Endpoint" value="0x02"/>
+        <value name="Other" value="0x03"/>
+      </field>
+    </reg>
+    <reg name="SETUP2" addr="0x24">
+      <field name="wLength" bitrange="31:16"/>
+      <field name="wIndex" bitrange="15:0"/>
+    </reg>
+    <reg name="AHBCON" addr="0x28">
+      <field name="RESERVED" bitrange="31:4"/>
+      <field name="MID" bitrange="3:0" description="AHB Mater ID"/>
+    </reg>
+    <reg name="RX0STAT" addr="0x30">
+      <field name="RESERVED31_26" bitrange="31:26"/>
+      <field name="RX0OVF" bitrange="25:25"/>
+      <field name="RX0FULL" bitrange="24:24"/>
+      <field name="RESERVED23_19" bitrange="23:19"/>
+      <field name="RX0ACK" bitrange="18:18"/>
+      <field name="RX0ERR" bitrange="17:17"/>
+      <field name="RX0VOID" bitrange="16:16"/>
+      <field name="RESERVED15_11" bitrange="15:11"/>
+      <field name="RX0LEN" bitrange="10:0"/>
+    </reg>
+    <reg name="RX0CON" addr="0x34">
+      <field name="RESERVED31_8" bitrange="31:8"/>
+      <field name="RX0ACKINTEN" bitrange="7:7"/>
+      <field name="RX0ERRINTEN" bitrange="6:6"/>
+      <field name="RX0VOIDINTEN" bitrange="5:5"/>
+      <field name="EP0EN" bitrange="4:4"/>
+      <field name="RX0NAK" bitrange="3:3"/>
+      <field name="RX0STALL" bitrange="2:2"/>
+      <field name="RX0CLR" bitrange="1:1"/>
+      <field name="RX0FFRC" bitrange="0:0"/>
+    </reg>
+    <reg name="RX0DMACTLO" addr="0x38">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMA0OUTSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="RX0DMAOUTLMADDR" addr="0x3C">
+      <field name="LM0OUTADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
+    <reg name="TX0STAT" addr="0x40">
+      <field name="RESERVED31_19" bitrange="31:19"/>
+      <field name="TX0ACK" bitrange="18:18"/>
+      <field name="TX0ERR" bitrange="17:17"/>
+      <field name="TX0VOID" bitrange="16:16"/>
+      <field name="RESERVED15_11" bitrange="15:11"/>
+      <field name="TX0LEN" bitrange="10:0"/>
+    </reg>
+    <reg name="TX0CON" addr="0x44">
+      <field name="RESERVED31_7" bitrange="31:7"/>
+      <field name="TX0ACKINTEN" bitrange="6:6"/>
+      <field name="TX0ERRINTEN" bitrange="5:5"/>
+      <field name="TX0VOIDINTEN" bitrange="4:4"/>
+      <field name="RESERVED3" bitrange="3:3"/>
+      <field name="TX0NAK" bitrange="2:2"/>
+      <field name="TX0STALL" bitrange="1:1"/>
+      <field name="TX0CLR" bitrange="0:0"/>
+    </reg>
+    <reg name="TX0BUF" addr="0x48">
+      <field name="RESERVED31_2" bitrange="31:2"/>
+      <field name="TX0URF" bitrange="1:1"/>
+      <field name="TX0FULL" bitrange="0:0"/>
+    </reg>
+    <reg name="TX0DMAINCTL" addr="0x4C">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMA0INSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="TX0DMALM_IADDR" addr="0x50">
+      <field name="LM0INADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
+    <reg name="RX1STAT" addr="0x54">
+      <field name="RESERVED31_26" bitrange="31:26"/>
+      <field name="RXOVF" bitrange="25:25"/>
+      <field name="RXFULL" bitrange="24:24"/>
+      <field name="RESERVED23_20" bitrange="23:20"/>
+      <field name="RX_CF_INT" bitrange="19:19"/>
+      <field name="RXACK" bitrange="18:18"/>
+      <field name="RXERR" bitrange="17:17"/>
+      <field name="RXVOID" bitrange="16:16"/>
+      <field name="RESERVED15_11" bitrange="15:11"/>
+      <field name="RXCNT" bitrange="10:0"/>
+    </reg>
+    <reg name="RX1CON" addr="0x58">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="RXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="RX_CF_INTE" bitrange="12:12"/>
+      <field name="RXENDP_NUM" bitrange="11:8"/>
+      <field name="RXACKINTEN" bitrange="7:7"/>
+      <field name="RXERRINTEN" bitrange="6:6"/>
+      <field name="RXVOIDINTEN" bitrange="5:5"/>
+      <field name="EPEN" bitrange="4:4"/>
+      <field name="RXNAK" bitrange="3:3"/>
+      <field name="RXSTALL" bitrange="2:2"/>
+      <field name="RXCLR" bitrange="1:1"/>
+      <field name="RXFFRC" bitrange="0:0"/>
+    </reg>
+    <reg name="RX1DMACTLO" addr="0x5C">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAOUTSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="RX1DMAOUTLMADDR" addr="0x60">
+      <field name="LMOUTADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
+    <reg name="TX2STAT" addr="0x64">
+      <field name="RESERVED31_21" bitrange="31:21"/>
+      <field name="TX_CF_INT" bitrange="20:20"/>
+      <field name="TXDMA_DN" bitrange="19:19"/>
+      <field name="TXACK" bitrange="18:18"/>
+      <field name="TXERR" bitrange="17:17"/>
+      <field name="TXVOID" bitrange="16:16"/>
+      <field name="RESERVED15:11" bitrange="15:11"/>
+      <field name="TXLEN" bitrange="10:0"/>
+    </reg>
+    <reg name="TX2CON" addr="0x68">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="TXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="TX_CF_INTE" bitrange="12:12"/>
+      <field name="TXENDP_NUM" bitrange="11:8"/>
+      <field name="TXDMADN_EN" bitrange="7:7"/>
+      <field name="TXACKINTEN" bitrange="6:6"/>
+      <field name="TXERRINTEN" bitrange="5:5"/>
+      <field name="TXVOIDINTEN" bitrange="4:4"/>
+      <field name="TXEPEN" bitrange="3:3"/>
+      <field name="TXNAK" bitrange="2:2"/>
+      <field name="TXSTALL" bitrange="1:1"/>
+      <field name="TXCLR" bitrange="0:0"/>
+    </reg>
+    <reg name="TX2BUF" addr="0x6C">
+      <field name="RESERVED31_4" bitrange="31:4"/>
+      <field name="TXDS1" bitrange="3:3"/>
+      <field name="TXDS0" bitrange="2:2"/>
+      <field name="TXURF" bitrange="1:1"/>
+      <field name="TXFULL" bitrange="0:0"/>
+    </reg>
+    <reg name="TX2DMAINCTL" addr="0x70">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAINSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="TX2DMALM_IADDR" addr="0x74">
+      <field name="LMINADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
+    <reg name="TX3STAT" addr="0x78">
+      <field name="RESERVED31_20" bitrange="31:20"/>
+      <field name="TX_CF_INT" bitrange="19:19"/>
+      <field name="TXACK" bitrange="18:18"/>
+      <field name="TXERR" bitrange="17:17"/>
+      <field name="TXVOID" bitrange="16:16"/>
+      <field name="RESERVED15_11" bitrange="15:11"/>
+      <field name="TXLEN" bitrange="10:0"/>
+    </reg>
+    <reg name="TX3CON" addr="0x7C">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="TXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="TX_CF_INTE" bitrange="12:12"/>
+      <field name="TXENDP_NUM" bitrange="11:8"/>
+      <field name="RESERVED7" bitrange="7:7"/>
+      <field name="TXACKINTEN" bitrange="6:6"/>
+      <field name="TXERRINTEN" bitrange="5:5"/>
+      <field name="TXVOIDINTEN" bitrange="4:4"/>
+      <field name="TXEPEN" bitrange="3:3"/>
+      <field name="TXNAK" bitrange="2:2"/>
+      <field name="TXSTALL" bitrange="1:1"/>
+      <field name="TXCLR" bitrange="0:0"/>
+    </reg>
+    <reg name="TX3BUF" addr="0x80">
+      <field name="RESERVED31_2" bitrange="31:2"/>
+      <field name="TXURF" bitrange="1:1"/>
+      <field name="TXFULL" bitrange="0:0"/>
+    </reg>
+    <reg name="TX3DMAINCTL" addr="0x84">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAINSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="TX3DMALM_IADDR" addr="0x88">
+      <field name="LMINADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
+    <reg name="RX4STAT" addr="0x8C">
+      <field name="RESERVED31_26" bitrange="31:26"/>
+      <field name="RXOVF" bitrange="25:25"/>
+      <field name="RXFULL" bitrange="24:24"/>
+      <field name="RESERVED23_20" bitrange="23:20"/>
+      <field name="RX_CF_INT" bitrange="19:19"/>
+      <field name="RXACK" bitrange="18:18"/>
+      <field name="RXERR" bitrange="17:17"/>
+      <field name="RXVOID" bitrange="16:16"/>
+      <field name="RESERVED15_11" bitrange="15:11"/>
+      <field name="RXCNT" bitrange="10:0"/>
+    </reg>
+    <reg name="RX4CON" addr="0x90">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="RXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="RX_CF_INTE" bitrange="12:12"/>
+      <field name="RXENDP_NUM" bitrange="11:8"/>
+      <field name="RXACKINTEN" bitrange="7:7"/>
+      <field name="RXERRINTEN" bitrange="6:6"/>
+      <field name="RXVOIDINTEN" bitrange="5:5"/>
+      <field name="EPEN" bitrange="4:4"/>
+      <field name="RXNAK" bitrange="3:3"/>
+      <field name="RXSTALL" bitrange="2:2"/>
+      <field name="RXCLR" bitrange="1:1"/>
+      <field name="RXFFRC" bitrange="0:0"/>
+    </reg>
+    <reg name="RX4DMACTLO" addr="0x94">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAOUTSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="RX4DMAOUTLMADDR" addr="0x98">
+      <field name="LMOUTADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
+    <reg name="TX5STAT" addr="0x9C">
+      <field name="RESERVED31_21" bitrange="31:21"/>
+      <field name="TX_CF_INT" bitrange="20:20"/>
+      <field name="TXDMA_DN" bitrange="19:19"/>
+      <field name="TXACK" bitrange="18:18"/>
+      <field name="TXERR" bitrange="17:17"/>
+      <field name="TXVOID" bitrange="16:16"/>
+      <field name="RESERVED15:11" bitrange="15:11"/>
+      <field name="TXLEN" bitrange="10:0"/>
+    </reg>
+    <reg name="TX5CON" addr="0xA0">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="TXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="TX_CF_INTE" bitrange="12:12"/>
+      <field name="TXENDP_NUM" bitrange="11:8"/>
+      <field name="TXDMADN_EN" bitrange="7:7"/>
+      <field name="TXACKINTEN" bitrange="6:6"/>
+      <field name="TXERRINTEN" bitrange="5:5"/>
+      <field name="TXVOIDINTEN" bitrange="4:4"/>
+      <field name="TXEPEN" bitrange="3:3"/>
+      <field name="TXNAK" bitrange="2:2"/>
+      <field name="TXSTALL" bitrange="1:1"/>
+      <field name="TXCLR" bitrange="0:0"/>
+    </reg>
+    <reg name="TX5BUF" addr="0xA4">
+      <field name="RESERVED31_4" bitrange="31:4"/>
+      <field name="TXDS1" bitrange="3:3"/>
+      <field name="TXDS0" bitrange="2:2"/>
+      <field name="TXURF" bitrange="1:1"/>
+      <field name="TXFULL" bitrange="0:0"/>
+    </reg>
+    <reg name="TX5DMAINCTL" addr="0xA8">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAINSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="TX5DMALM_IADDR" addr="0xAC">
+      <field name="LMINADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
+    <reg name="TX6STAT" addr="0xB0">
+      <field name="RESERVED31_20" bitrange="31:20"/>
+      <field name="TX_CF_INT" bitrange="19:19"/>
+      <field name="TXACK" bitrange="18:18"/>
+      <field name="TXERR" bitrange="17:17"/>
+      <field name="TXVOID" bitrange="16:16"/>
+      <field name="RESERVED15_11" bitrange="15:11"/>
+      <field name="TXLEN" bitrange="10:0"/>
+    </reg>
+    <reg name="TX6CON" addr="0xB4">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="TXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="TX_CF_INTE" bitrange="12:12"/>
+      <field name="TXENDP_NUM" bitrange="11:8"/>
+      <field name="RESERVED7" bitrange="7:7"/>
+      <field name="TXACKINTEN" bitrange="6:6"/>
+      <field name="TXERRINTEN" bitrange="5:5"/>
+      <field name="TXVOIDINTEN" bitrange="4:4"/>
+      <field name="TXEPEN" bitrange="3:3"/>
+      <field name="TXNAK" bitrange="2:2"/>
+      <field name="TXSTALL" bitrange="1:1"/>
+      <field name="TXCLR" bitrange="0:0"/>
+    </reg>
+    <reg name="TX6BUF" addr="0xB8">
+      <field name="RESERVED31_2" bitrange="31:2"/>
+      <field name="TXURF" bitrange="1:1"/>
+      <field name="TXFULL" bitrange="0:0"/>
+    </reg>
+    <reg name="TX6DMAINCTL" addr="0xBC">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAINSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="TX6DMALM_IADDR" addr="0xC0">
+      <field name="LMINADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
+    <reg name="RX7STAT" addr="0xC4">
+      <field name="RESERVED31_26" bitrange="31:26"/>
+      <field name="RXOVF" bitrange="25:25"/>
+      <field name="RXFULL" bitrange="24:24"/>
+      <field name="RESERVED23_20" bitrange="23:20"/>
+      <field name="RX_CF_INT" bitrange="19:19"/>
+      <field name="RXACK" bitrange="18:18"/>
+      <field name="RXERR" bitrange="17:17"/>
+      <field name="RXVOID" bitrange="16:16"/>
+      <field name="RESERVED15_11" bitrange="15:11"/>
+      <field name="RXCNT" bitrange="10:0"/>
+    </reg>
+    <reg name="RX7CON" addr="0xC8">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="RXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="RX_CF_INTE" bitrange="12:12"/>
+      <field name="RXENDP_NUM" bitrange="11:8"/>
+      <field name="RXACKINTEN" bitrange="7:7"/>
+      <field name="RXERRINTEN" bitrange="6:6"/>
+      <field name="RXVOIDINTEN" bitrange="5:5"/>
+      <field name="EPEN" bitrange="4:4"/>
+      <field name="RXNAK" bitrange="3:3"/>
+      <field name="RXSTALL" bitrange="2:2"/>
+      <field name="RXCLR" bitrange="1:1"/>
+      <field name="RXFFRC" bitrange="0:0"/>
+    </reg>
+    <reg name="RX7DMACTLO" addr="0xCC">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAOUTSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="RX7DMAOUTLMADDR" addr="0xD0">
+      <field name="LMOUTADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
+    <reg name="TX8STAT" addr="0xD4">
+      <field name="RESERVED31_21" bitrange="31:21"/>
+      <field name="TX_CF_INT" bitrange="20:20"/>
+      <field name="TXDMA_DN" bitrange="19:19"/>
+      <field name="TXACK" bitrange="18:18"/>
+      <field name="TXERR" bitrange="17:17"/>
+      <field name="TXVOID" bitrange="16:16"/>
+      <field name="RESERVED15:11" bitrange="15:11"/>
+      <field name="TXLEN" bitrange="10:0"/>
+    </reg>
+    <reg name="TX8CON" addr="0xD8">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="TXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="TX_CF_INTE" bitrange="12:12"/>
+      <field name="TXENDP_NUM" bitrange="11:8"/>
+      <field name="TXDMADN_EN" bitrange="7:7"/>
+      <field name="TXACKINTEN" bitrange="6:6"/>
+      <field name="TXERRINTEN" bitrange="5:5"/>
+      <field name="TXVOIDINTEN" bitrange="4:4"/>
+      <field name="TXEPEN" bitrange="3:3"/>
+      <field name="TXNAK" bitrange="2:2"/>
+      <field name="TXSTALL" bitrange="1:1"/>
+      <field name="TXCLR" bitrange="0:0"/>
+    </reg>
+    <reg name="TX8BUF" addr="0xDC">
+      <field name="RESERVED31_4" bitrange="31:4"/>
+      <field name="TXDS1" bitrange="3:3"/>
+      <field name="TXDS0" bitrange="2:2"/>
+      <field name="TXURF" bitrange="1:1"/>
+      <field name="TXFULL" bitrange="0:0"/>
+    </reg>
+    <reg name="TX8DMAINCTL" addr="0xE0">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAINSTA" bitrange="0:0"/>
+    </reg>
     <reg name="TX8DMALM_IADDR" addr="0xE4"></reg>
-    <reg name="TX9STAT" addr="0xE8"></reg>
-    <reg name="TX9CON" addr="0xEC"></reg>
-    <reg name="TX9BUF" addr="0xF0"></reg>
-    <reg name="TX9DMAINCTL" addr="0xF4"></reg>
-    <reg name="TX9DMALM_IADDR" addr="0xF8"></reg>
-    <reg name="RX10STAT" addr="0xFC"></reg>
-    <reg name="RX10CON" addr="0x100"></reg>
-    <reg name="RX10DMACTLO" addr="0x104"></reg>
-    <reg name="RX10DMAOUTLMADDR" addr="0x108"></reg>
-    <reg name="TX11STAT" addr="0x10C"></reg>
-    <reg name="TX11CON" addr="0x110"></reg>
-    <reg name="TX11BUF" addr="0x114"></reg>
-    <reg name="TX11DMAINCTL" addr="0x118"></reg>
+    <reg name="TX9STAT" addr="0xE8">
+      <field name="RESERVED31_20" bitrange="31:20"/>
+      <field name="TX_CF_INT" bitrange="19:19"/>
+      <field name="TXACK" bitrange="18:18"/>
+      <field name="TXERR" bitrange="17:17"/>
+      <field name="TXVOID" bitrange="16:16"/>
+      <field name="RESERVED15_11" bitrange="15:11"/>
+      <field name="TXLEN" bitrange="10:0"/>
+    </reg>
+    <reg name="TX9CON" addr="0xEC">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="TXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="TX_CF_INTE" bitrange="12:12"/>
+      <field name="TXENDP_NUM" bitrange="11:8"/>
+      <field name="RESERVED7" bitrange="7:7"/>
+      <field name="TXACKINTEN" bitrange="6:6"/>
+      <field name="TXERRINTEN" bitrange="5:5"/>
+      <field name="TXVOIDINTEN" bitrange="4:4"/>
+      <field name="TXEPEN" bitrange="3:3"/>
+      <field name="TXNAK" bitrange="2:2"/>
+      <field name="TXSTALL" bitrange="1:1"/>
+      <field name="TXCLR" bitrange="0:0"/>
+    </reg>
+    <reg name="TX9BUF" addr="0xF0">
+      <field name="RESERVED31_2" bitrange="31:2"/>
+      <field name="TXURF" bitrange="1:1"/>
+      <field name="TXFULL" bitrange="0:0"/>
+    </reg>
+    <reg name="TX9DMAINCTL" addr="0xF4">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAINSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="TX9DMALM_IADDR" addr="0xF8">
+      <field name="LMINADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
+    <reg name="RX10STAT" addr="0xFC">
+      <field name="RESERVED31_26" bitrange="31:26"/>
+      <field name="RXOVF" bitrange="25:25"/>
+      <field name="RXFULL" bitrange="24:24"/>
+      <field name="RESERVED23_20" bitrange="23:20"/>
+      <field name="RX_CF_INT" bitrange="19:19"/>
+      <field name="RXACK" bitrange="18:18"/>
+      <field name="RXERR" bitrange="17:17"/>
+      <field name="RXVOID" bitrange="16:16"/>
+      <field name="RESERVED15_11" bitrange="15:11"/>
+      <field name="RXCNT" bitrange="10:0"/>
+    </reg>
+    <reg name="RX10CON" addr="0x100">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="RXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="RX_CF_INTE" bitrange="12:12"/>
+      <field name="RXENDP_NUM" bitrange="11:8"/>
+      <field name="RXACKINTEN" bitrange="7:7"/>
+      <field name="RXERRINTEN" bitrange="6:6"/>
+      <field name="RXVOIDINTEN" bitrange="5:5"/>
+      <field name="EPEN" bitrange="4:4"/>
+      <field name="RXNAK" bitrange="3:3"/>
+      <field name="RXSTALL" bitrange="2:2"/>
+      <field name="RXCLR" bitrange="1:1"/>
+      <field name="RXFFRC" bitrange="0:0"/>
+    </reg>
+    <reg name="RX10DMACTLO" addr="0x104">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAOUTSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="RX10DMAOUTLMADDR" addr="0x108">
+      <field name="LMOUTADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
+    <reg name="TX11STAT" addr="0x10C">
+      <field name="RESERVED31_21" bitrange="31:21"/>
+      <field name="TX_CF_INT" bitrange="20:20"/>
+      <field name="TXDMA_DN" bitrange="19:19"/>
+      <field name="TXACK" bitrange="18:18"/>
+      <field name="TXERR" bitrange="17:17"/>
+      <field name="TXVOID" bitrange="16:16"/>
+      <field name="RESERVED15:11" bitrange="15:11"/>
+      <field name="TXLEN" bitrange="10:0"/>
+    </reg>
+    <reg name="TX11CON" addr="0x110">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="TXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="TX_CF_INTE" bitrange="12:12"/>
+      <field name="TXENDP_NUM" bitrange="11:8"/>
+      <field name="TXDMADN_EN" bitrange="7:7"/>
+      <field name="TXACKINTEN" bitrange="6:6"/>
+      <field name="TXERRINTEN" bitrange="5:5"/>
+      <field name="TXVOIDINTEN" bitrange="4:4"/>
+      <field name="TXEPEN" bitrange="3:3"/>
+      <field name="TXNAK" bitrange="2:2"/>
+      <field name="TXSTALL" bitrange="1:1"/>
+      <field name="TXCLR" bitrange="0:0"/>
+    </reg>
+    <reg name="TX11BUF" addr="0x114">
+      <field name="RESERVED31_4" bitrange="31:4"/>
+      <field name="TXDS1" bitrange="3:3"/>
+      <field name="TXDS0" bitrange="2:2"/>
+      <field name="TXURF" bitrange="1:1"/>
+      <field name="TXFULL" bitrange="0:0"/>
+    </reg>
+    <reg name="TX11DMAINCTL" addr="0x118">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAINSTA" bitrange="0:0"/>
+    </reg>
     <reg name="TX11DMALM_IADDR" addr="0x11C"></reg>
-    <reg name="TX12STAT" addr="0x120"></reg>
-    <reg name="TX12CON" addr="0x124"></reg>
-    <reg name="TX12BUF" addr="0x128"></reg>
-    <reg name="TX12DMAINCTL" addr="0x12C"></reg>
-    <reg name="TX12DMALM_IADDR" addr="0x130"></reg>
-    <reg name="RX13STAT" addr="0x134"></reg>
-    <reg name="RX13CON" addr="0x138"></reg>
-    <reg name="RX13DMACTLO" addr="0x13C"></reg>
-    <reg name="RX13DMAOUTLMADDR" addr="0x140"></reg>
-    <reg name="TX14STAT" addr="0x144"></reg>
-    <reg name="TX14CON" addr="0x148"></reg>
-    <reg name="TX14BUF" addr="0x14C"></reg>
-    <reg name="TX14DMAINCTL" addr="0x150"></reg>
+    <reg name="TX12STAT" addr="0x120">
+      <field name="RESERVED31_20" bitrange="31:20"/>
+      <field name="TX_CF_INT" bitrange="19:19"/>
+      <field name="TXACK" bitrange="18:18"/>
+      <field name="TXERR" bitrange="17:17"/>
+      <field name="TXVOID" bitrange="16:16"/>
+      <field name="RESERVED15_11" bitrange="15:11"/>
+      <field name="TXLEN" bitrange="10:0"/>
+    </reg>
+    <reg name="TX12CON" addr="0x124">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="TXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="TX_CF_INTE" bitrange="12:12"/>
+      <field name="TXENDP_NUM" bitrange="11:8"/>
+      <field name="RESERVED7" bitrange="7:7"/>
+      <field name="TXACKINTEN" bitrange="6:6"/>
+      <field name="TXERRINTEN" bitrange="5:5"/>
+      <field name="TXVOIDINTEN" bitrange="4:4"/>
+      <field name="TXEPEN" bitrange="3:3"/>
+      <field name="TXNAK" bitrange="2:2"/>
+      <field name="TXSTALL" bitrange="1:1"/>
+      <field name="TXCLR" bitrange="0:0"/>
+    </reg>
+    <reg name="TX12BUF" addr="0x128">
+      <field name="RESERVED31_2" bitrange="31:2"/>
+      <field name="TXURF" bitrange="1:1"/>
+      <field name="TXFULL" bitrange="0:0"/>
+    </reg>
+    <reg name="TX12DMAINCTL" addr="0x12C">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAINSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="TX12DMALM_IADDR" addr="0x130">
+      <field name="LMINADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
+    <reg name="RX13STAT" addr="0x134">
+      <field name="RESERVED31_26" bitrange="31:26"/>
+      <field name="RXOVF" bitrange="25:25"/>
+      <field name="RXFULL" bitrange="24:24"/>
+      <field name="RESERVED23_20" bitrange="23:20"/>
+      <field name="RX_CF_INT" bitrange="19:19"/>
+      <field name="RXACK" bitrange="18:18"/>
+      <field name="RXERR" bitrange="17:17"/>
+      <field name="RXVOID" bitrange="16:16"/>
+      <field name="RESERVED15_11" bitrange="15:11"/>
+      <field name="RXCNT" bitrange="10:0"/>
+    </reg>
+    <reg name="RX13CON" addr="0x138">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="RXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="RX_CF_INTE" bitrange="12:12"/>
+      <field name="RXENDP_NUM" bitrange="11:8"/>
+      <field name="RXACKINTEN" bitrange="7:7"/>
+      <field name="RXERRINTEN" bitrange="6:6"/>
+      <field name="RXVOIDINTEN" bitrange="5:5"/>
+      <field name="EPEN" bitrange="4:4"/>
+      <field name="RXNAK" bitrange="3:3"/>
+      <field name="RXSTALL" bitrange="2:2"/>
+      <field name="RXCLR" bitrange="1:1"/>
+      <field name="RXFFRC" bitrange="0:0"/>
+    </reg>
+    <reg name="RX13DMACTLO" addr="0x13C">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAOUTSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="RX13DMAOUTLMADDR" addr="0x140">
+      <field name="LMOUTADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
+    <reg name="TX14STAT" addr="0x144">
+      <field name="RESERVED31_21" bitrange="31:21"/>
+      <field name="TX_CF_INT" bitrange="20:20"/>
+      <field name="TXDMA_DN" bitrange="19:19"/>
+      <field name="TXACK" bitrange="18:18"/>
+      <field name="TXERR" bitrange="17:17"/>
+      <field name="TXVOID" bitrange="16:16"/>
+      <field name="RESERVED15:11" bitrange="15:11"/>
+      <field name="TXLEN" bitrange="10:0"/>
+    </reg>
+    <reg name="TX14CON" addr="0x148">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="TXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="TX_CF_INTE" bitrange="12:12"/>
+      <field name="TXENDP_NUM" bitrange="11:8"/>
+      <field name="TXDMADN_EN" bitrange="7:7"/>
+      <field name="TXACKINTEN" bitrange="6:6"/>
+      <field name="TXERRINTEN" bitrange="5:5"/>
+      <field name="TXVOIDINTEN" bitrange="4:4"/>
+      <field name="TXEPEN" bitrange="3:3"/>
+      <field name="TXNAK" bitrange="2:2"/>
+      <field name="TXSTALL" bitrange="1:1"/>
+      <field name="TXCLR" bitrange="0:0"/>
+    </reg>
+    <reg name="TX14BUF" addr="0x14C">
+      <field name="RESERVED31_4" bitrange="31:4"/>
+      <field name="TXDS1" bitrange="3:3"/>
+      <field name="TXDS0" bitrange="2:2"/>
+      <field name="TXURF" bitrange="1:1"/>
+      <field name="TXFULL" bitrange="0:0"/>
+    </reg>
+    <reg name="TX14DMAINCTL" addr="0x150">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAINSTA" bitrange="0:0"/>
+    </reg>
     <reg name="TX14DMALM_IADDR" addr="0x154"></reg>
-    <reg name="TX15STAT" addr="0x158"></reg>
-    <reg name="TX15CON" addr="0x15C"></reg>
-    <reg name="TX15BUF" addr="0x160"></reg>
-    <reg name="TX15DMAINCTL" addr="0x164"></reg>
-    <reg name="TX15DMALM_IADDR" addr="0x168"></reg>
+    <reg name="TX15STAT" addr="0x158">
+      <field name="RESERVED31_20" bitrange="31:20"/>
+      <field name="TX_CF_INT" bitrange="19:19"/>
+      <field name="TXACK" bitrange="18:18"/>
+      <field name="TXERR" bitrange="17:17"/>
+      <field name="TXVOID" bitrange="16:16"/>
+      <field name="RESERVED15_11" bitrange="15:11"/>
+      <field name="TXLEN" bitrange="10:0"/>
+    </reg>
+    <reg name="TX15CON" addr="0x15C">
+      <field name="RESERVED31_14" bitrange="31:14"/>
+      <field name="TXSTALL_AUTOCLR" bitrange="13:13"/>
+      <field name="TX_CF_INTE" bitrange="12:12"/>
+      <field name="TXENDP_NUM" bitrange="11:8"/>
+      <field name="RESERVED7" bitrange="7:7"/>
+      <field name="TXACKINTEN" bitrange="6:6"/>
+      <field name="TXERRINTEN" bitrange="5:5"/>
+      <field name="TXVOIDINTEN" bitrange="4:4"/>
+      <field name="TXEPEN" bitrange="3:3"/>
+      <field name="TXNAK" bitrange="2:2"/>
+      <field name="TXSTALL" bitrange="1:1"/>
+      <field name="TXCLR" bitrange="0:0"/>
+    </reg>
+    <reg name="TX15BUF" addr="0x160">
+      <field name="RESERVED31_2" bitrange="31:2"/>
+      <field name="TXURF" bitrange="1:1"/>
+      <field name="TXFULL" bitrange="0:0"/>
+    </reg>
+    <reg name="TX15DMAINCTL" addr="0x164">
+      <field name="RESERVED31_1" bitrange="31:1"/>
+      <field name="DMAINSTA" bitrange="0:0"/>
+    </reg>
+    <reg name="TX15DMALM_IADDR" addr="0x168">
+      <field name="LMINADDR" bitrange="31:2"/>
+      <field name="RESERVED1_0" bitrange="1:0"/>
+    </reg>
   </dev>
   <dev name="UHC" long_name="USB 2.0 Host Controller" desc="USB 2.0 Host Controller" version="1.0">
     <addr name="UHC" addr="0x180a4000" />
