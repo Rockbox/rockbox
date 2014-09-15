@@ -193,7 +193,6 @@ static bool tv_create_line_positions(void)
     cur_pos.line = 0;
     tv_reset_line_positions();
     res = tv_traverse_lines();
-    lines_per_page = cur_pos.line;
     tv_new_page();
 
     return res;
@@ -205,7 +204,7 @@ void tv_convert_fpos(off_t fpos, struct tv_screen_pos *pos)
 
     for (i = 0; i < last_page; i++)
     {
-        if (tv_get_fpos(i) <= fpos && tv_get_fpos(i + 1) > fpos)
+        if (tv_get_fpos(i + 1) > fpos)
             break;
     }
 
