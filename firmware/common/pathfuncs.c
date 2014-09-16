@@ -202,12 +202,15 @@ int path_strip_drive(const char *name, const char **nameptr, bool greedy)
  */
 size_t path_trim_whitespace(const char *name, const char **nameptr)
 {
+    /* NOTE: this won't currently treat DEL (0x7f) as non-printable */
+    const unsigned char *p = name;
     int c;
-    while ((c = *name) <= ' ' && c)
-        ++name;
 
-    const char *first = name;
-    const char *last = name;
+    while ((c = *p) <= ' ' && c)
+        ++p;
+
+    const unsigned char *first = p;
+    const unsigned char *last = p;
 
     while (1)
     {
@@ -217,9 +220,9 @@ size_t path_trim_whitespace(const char *name, const char **nameptr)
             return last - first;
         }
 
-        while ((c = *++name) > ' ');
-        last = name;
-        while (c == ' ') c = *++name;
+        while ((c = *++p) > ' ');
+        last = p;
+        while (c == ' ') c = *++p;
     }
 }
 
