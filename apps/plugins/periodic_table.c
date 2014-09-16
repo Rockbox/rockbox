@@ -71,8 +71,8 @@ static const struct periodic_element_t periodic_elements[] = {
     { 18,  3,  18, "Ar",  "Argon",         "39.948",      "1.7837",   "-189.2",   "-185.86",  'p',  9 , 9,    35},
     {  1,  4,  19, "K",   "Potassium",     "39.0983",     "0.862",    "63.65",    "765",      's',  1 , 10,   36},
     {  2,  4,  20, "Ca",  "Calcium",       "40.078",      "1.55",     "842",      "1503",     's',  2 , 11,   37},
-    {  3,  4,  21, "Sc",  "Scandium",      "44.955912",   "2.989",    "1539",     "2831",     'd',  3 , 38,   38},
-    {  4,  4,  22, "Ti",  "Titanium",      "47.867",      "4.54",     "1666",     "3289",     'd',  3 , 103,  39},
+    {  3,  4,  21, "Sc",  "Scandium",      "44.955912",   "2.989",    "1539",     "2831",     'd',  3 , 102,   38},
+    {  4,  4,  22, "Ti",  "Titanium",      "47.867",      "4.54",     "1666",     "3289",     'd',  3 , 88,  39},
     {  5,  4,  23, "V",   "Vanadium",      "50.9415",     "6.11",     "1917",     "3420",     'd',  3 , 104,  40},
     {  6,  4,  24, "Cr",  "Chromium",      "51.9961",     "7.20",     "1857",     "2682",     'd',  3 , 105,  41},
     {  7,  4,  25, "Mn",  "Manganese",     "54.938045",   "7.44",     "1246",     "2062",     'd',  3 , 106,  42},
@@ -89,7 +89,7 @@ static const struct periodic_element_t periodic_elements[] = {
     { 18,  4,  36, "Kr",  "Krypton",       "83.798",      "3.733",    "-156.6",   "-153.35",  'p',  9 , 17,   53},
     {  1,  5,  37, "Rb",  "Rubidium",      "85.4678",     "1.532",    "38.89",    "688",      's',  1 , 18,   54},
     {  2,  5,  38, "Sr",  "Strontium",     "87.62",       "2.54",     "777",      "1414",     's',  2 , 19,   55},
-    {  3,  5,  39, "Y",   "Yttrium",       "88.90585",    "4.469",    "1520",     "3388",     'd',  3 , 20,   20},
+    {  3,  5,  39, "Y",   "Yttrium",       "88.90585",    "4.469",    "1520",     "3388",     'd',  3 , 20,   70},
     {  4,  5,  40, "Zr",  "Zirconium",     "91.224",      "6.506",    "1852",     "4361",     'd',  3 , 21,   71},
     {  5,  5,  41, "Nb",  "Niobium",       "92.90638",    "8.57",     "2477",     "4744",     'd',  3 , 22,   72},
     {  6,  5,  42, "Mo",  "Molybdenum",    "95.96",       "10.22",    "2623",     "4682",     'd',  3 , 23,   73},
@@ -121,7 +121,7 @@ static const struct periodic_element_t periodic_elements[] = {
     { 13,  9,  68, "Er",  "Erbium",        "167.259",     "9.066",    "1529",     "2868",     'f', 10 , 99,   99},
     { 14,  9,  69, "Tm",  "Thulium",       "168.93421",   "9.321",    "1545",     "1950",     'f', 10 , 100,  100},
     { 15,  9,  70, "Yb",  "Ytterbium",     "173.054",     "6.965",    "819",      "1196",     'f', 10 , 101,  101},
-    { 16,  9,  71, "Lu",  "Lutetium",      "174.9668",    "9.840",    "1663",     "3402",     'f', 10 , 102,  102},
+    { 16,  9,  71, "Lu",  "Lutetium",      "174.9668",    "9.840",    "1663",     "3402",     'd', 10 , 38,  102},
     {  4,  6,  72, "Hf",  "Hafnium",       "178.49",      "13.31",    "2233",     "4603",     'd',  3 , 39,   103},
     {  5,  6,  73, "Ta",  "Tantalum",      "180.94788",   "16.654",   "2985",     "5510",     'd',  3 , 40,   104},
     {  6,  6,  74, "W",   "Tungsten",      "183.84",      "19.3",     "3407",     "5555",     'd',  3 , 41,   105},
@@ -153,7 +153,7 @@ static const struct periodic_element_t periodic_elements[] = {
     { 13, 10, 100, "Fm",  "Fermium",       "[257]",       "-",        "1527",     "-",        'f', 11 , 67,   67},
     { 14, 10, 101, "Md",  "Mendelevium",   "[258]",       "-",        "827",      "-",        'f', 11 , 68,   68},
     { 15, 10, 102, "No",  "Nobelium",      "[259]",       "-",        "827",      "-",        'f', 11 , 69,   69},
-    { 16, 10, 103, "Lr",  "Lawrencium",    "[262]",       "-",        "1627",     "-",        'f', 11 , 70,   70},
+    { 16, 10, 103, "Lr",  "Lawrencium",    "[262]",       "-",        "1627",     "-",        'f', 11 , 70,   20},
     {  4,  7, 104, "Rf",  "Rutherfordium", "[267]",       "-",        "-",        "-",        'd',  3 , 71,   21},
     {  5,  7, 105, "Db",  "Dubnium",       "[268]",       "-",        "-",        "-",        'd',  3 , 72,   22},
     {  6,  7, 106, "Sg",  "Seaborgium",    "[271]",       "-",        "-",        "-",        'd',  3 , 73,   23},
@@ -162,11 +162,11 @@ static const struct periodic_element_t periodic_elements[] = {
     {  9,  7, 109, "Mt",  "Meitnerium",    "[276]",       "-",        "-",        "-",        'd',  3 , 76,   26},
     { 10,  7, 110, "Ds",  "Darmstadtium",  "[281]",       "-",        "-",        "-",        'd',  3 , 77,   27},
     { 11,  7, 111, "Rg",  "Roentgenium",   "[280]",       "-",        "-",        "-",        'd',  3 , 78,   28},
-    { 12,  7, 112, "Uub", "Ununbium",      "[285]",       "-",        "-",        "-",        'd',  3 , 79,   29},
+    { 12,  7, 112, "Cn", "Copernicium",    "[285]",       "-",        "-",        "-",        'd',  3 , 79,   29},
     { 13,  7, 113, "Uut", "Ununtrium",     "[284]",       "-",        "-",        "-",        'p',  4 , 80,   4},
-    { 14,  7, 114, "Uuq", "Ununquadium",   "[289]",       "-",        "-",        "-",        'p',  4 , 81,   5},
+    { 14,  7, 114, "Fl", "Flerovium",      "[289]",       "-",        "-",        "-",        'p',  4 , 81,   5},
     { 15,  7, 115, "Uup", "Ununpentium",   "[288]",       "-",        "-",        "-",        'p',  4 , 82,   6},
-    { 16,  7, 116, "Uuh", "Ununhexium",    "[293]",       "-",        "-",        "-",        'p',  4 , 83,   7},
+    { 16,  7, 116, "Lv", "Livermorium",    "[293]",       "-",        "-",        "-",        'p',  4 , 83,   7},
     { 17,  7, 117, "Uus", "Ununseptium",   "[294]",        "-",        "-",        "-",       'p',  4 , 84,   8},
     { 18,  7, 118, "Uuo", "Ununoctium",    "[294]",       "-",        "-",        "-",        'p',  9 , 85,   1}
 };
@@ -271,15 +271,15 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 
 /* - - - SOME CONSTANTS - - - */
-#if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
 #define PERIODIC_COLOR_BLACK LCD_RGBPACK(0,0,0)
-#elif LCD_DEPTH > 1
+#else
 #define PERIODIC_COLOR_BLACK LCD_BLACK
 #endif
 
-#if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
 #define PERIODIC_COLOR_WHITE LCD_RGBPACK(255,255,255)
-#elif LCD_DEPTH > 1
+#else
 #define PERIODIC_COLOR_WHITE LCD_WHITE
 #endif
 
@@ -293,7 +293,7 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 static void periodic_makecols(void)
 {
-#if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
     int i = 0;
 
     periodic_color_palette[i++] = LCD_RGBPACK(255,255,255); /* 0 hydrogen */
@@ -328,13 +328,14 @@ static void periodic_makecols(void)
 
 static int periodic_fix_period(int p)
 {
-    /* lanthanides/actinides are periods 9/10 in the internal chart, but make them look like 6/7 in the displayed table */
+    /* lanthanides/actinides are periods 9/10 internally, but make them look like 6/7 in the displayed table */
     return (p>8)?(p-3):p;
 }
 
 static int periodic_fix_group(int g, int p)
 {
-    return (p>8)?0:g;
+    /* there is no agreed-upon group number for the lanthanides/actinides, but 3 is used sometimes */
+    return (p>8)?3:g;
 }
 
 static char * periodic_group_name(int i)
@@ -488,16 +489,8 @@ static void periodic_draw(void)
     rb->snprintf(buf, 40, "Name: %s", e.name);
     rb->lcd_putsxy(nx, 0, buf);
 
-    /* don't show period number for lanthanides/actinides */
-    if(e.period<9)
-    {
-        rb->snprintf(buf, 40, "Group: %d %s", periodic_fix_group(e.group, e.period),
-                     periodic_group_name(periodic_sel));
-    }
-    else
-    {
-        rb->snprintf(buf, 40, "Group: %s", periodic_group_name(periodic_sel));
-    }
+    rb->snprintf(buf, 40, "Group: %d %s", periodic_fix_group(e.group, e.period),
+                 periodic_group_name(periodic_sel));
     rb->lcd_putsxy(nx, font_height, buf);
 
 #else
@@ -632,36 +625,7 @@ enum plugin_status plugin_start(const void* parameter)
             break;
         case PERIODIC_KEY_BACK:
         case PERIODIC_KEY_BACK_RPT:
-            if(periodic_sel==103)
-            {
-                periodic_sel=87;
-            }
-            else if(periodic_sel==88)
-            {
-                periodic_sel=38;
-                break;
-            }
-            else if(periodic_sel==56)
-            {
-                periodic_sel=20;
-                break;
-            }
-            else if(periodic_sel==71)
-            {
-                periodic_sel=55;
-                break;
-            }
-            else if(periodic_sel==39)
-            {
-                periodic_sel=102;
-                break;
-            }
-            else if(periodic_sel==21)
-            {
-                periodic_sel=70;
-                break;
-            }
-            else if (periodic_sel > 0)
+            if (periodic_sel > 0)
             {
                 periodic_sel--;
             }
@@ -672,37 +636,7 @@ enum plugin_status plugin_start(const void* parameter)
             break;
         case PERIODIC_KEY_FORWARD:
         case PERIODIC_KEY_FORWARD_RPT:
-            if(periodic_sel==102)
-            {
-                periodic_sel=39;
-                break;
-            }
-            else if(periodic_sel==87)
-            {
-                periodic_sel=103;
-                break;
-            }
-            else if(periodic_sel==70)
-            {
-                periodic_sel=21;
-                break;
-            }
-            else if(periodic_sel==55)
-            {
-                periodic_sel=71;
-                break;
-            }
-            else if(periodic_sel==38)
-            {
-                periodic_sel=88;
-                break;
-            }
-            else if(periodic_sel==20)
-            {
-                periodic_sel=56;
-                break;
-            }
-            else if (periodic_sel < ELEMENTS_COUNT - 1)
+            if (periodic_sel < ELEMENTS_COUNT - 1)
             {
                 periodic_sel++;
             }
