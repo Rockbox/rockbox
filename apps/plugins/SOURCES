@@ -172,6 +172,7 @@ jewels.c
 minesweeper.c
 oscilloscope.c
 pegbox.c
+periodic_table.c
 pong.c
 sliding_puzzle.c
 snake.c
