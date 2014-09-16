@@ -10,15 +10,18 @@
 # Collect dummy C files in firmware/asm
 ASM_DUMMY_SRC := $(notdir $(call preprocess, $(FIRMDIR)/asm/SOURCES))
 
-# Get the corresponding real source files under firmware/asm/$ARCH (C or ASM)
-# strip arch_ prefix from $(ARCH)
-ASM_ARCH := $(subst arch_,,$(ARCH))
-ASM_C_SRC := $(addprefix $(FIRMDIR)/asm/$(ASM_ARCH)/,$(ASM_DUMMY_SRC))
-ASM_S_SRC := $(ASM_C_SRC:.c=.S)
+# WinceSDL port builds with wrong thumb code, this bypasses ASM building for now
+ifeq ($(NO_BUILD_ASM), )
+    # Get the corresponding real source files under firmware/asm/$ARCH (C or ASM)
+    # strip arch_ prefix from $(ARCH)
+    ASM_ARCH := $(subst arch_,,$(ARCH))
+    ASM_C_SRC := $(addprefix $(FIRMDIR)/asm/$(ASM_ARCH)/,$(ASM_DUMMY_SRC))
+    ASM_S_SRC := $(ASM_C_SRC:.c=.S)
 
-# ASM_SRC now contains only files that exist under $ARCH
-ASM_SRC := $(wildcard $(ASM_C_SRC))
-ASM_SRC += $(wildcard $(ASM_S_SRC))
+    # ASM_SRC now contains only files that exist under $ARCH
+    ASM_SRC := $(wildcard $(ASM_C_SRC))
+    ASM_SRC += $(wildcard $(ASM_S_SRC))
+endif
 
 # GEN_SRC now contains a .c for each file in ASM_DUMMY_SRC that's not in ASM_SRC
 # I.e. fallback to a generic C source if no corresponding file in $ARCH is found

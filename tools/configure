@@ -257,11 +257,15 @@ simcc () {
    prefixtools "$CROSS_COMPILE"
    fibers=`check_fiber`
    endian="little" # windows is little endian
-   echo "Enabling MMX support"
    # -mno-ms-bitfields is a workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=52991
    # mingw-gcc >= 4.7 defaults to -mms-bitfields which breaks __attribute__((packed))
    # disable it explicitly for the time being (it doesn't appear to be required for us)
-   GCCOPTS="$GCCOPTS -mmmx -mno-ms-bitfields"
+   if [ -n $enable_mmx ]; then
+     GCCOPTS="$GCCOPTS -mno-ms-bitfields"
+   else
+     echo "Enabling MMX support"
+     GCCOPTS="$GCCOPTS -mmmx -mno-ms-bitfields"
+   fi
  else
  case $uname in
    CYGWIN*)
@@ -320,8 +324,12 @@ simcc () {
  if [ "$winbuild" != "yes" ]; then
    GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
    if [ "`uname -m`" = "i686" ]; then
-     echo "Enabling MMX support"
-     GCCOPTS="$GCCOPTS -mmmx"
+     if [ -n $enable_mmx ]; then
+       GCCOPTS="$GCCOPTS"
+     else
+       echo "Enabling MMX support"
+       GCCOPTS="$GCCOPTS -mmmx"
+     fi
    fi
  fi
 
@@ -437,6 +445,20 @@ coldfirecc () {
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="big"
  gccchoice="4.5.2"
+}
+
+mingw32ce () {
+ GCCOPTIMIZE="-fomit-frame-pointer"
+ endian="little"
+ output="$output.exe"
+ winbuild="yes"
+ CROSS_COMPILE=${CROSS_COMPILE:-"arm-mingw32ce-"}
+ SHARED_CFLAGS=''
+ prefixtools "$CROSS_COMPILE"
+ GCCOPTS="$GCCOPTS -I/usr/local/arm-mingw32ce/libraries/include -I/usr/local/arm-mingw32ce/libraries/include/SDL -I$PNDSDK/arm-mingw32ce/include/ -I$PNDSDK"
+ LDOPTS="$LDOPTS -I$PNDSDK/arm-mingw32ce/lib/ -mconsole -L/usr/local/arm-mingw32ce/libraries/lib"
+ #GCCOPTS="$GCCOPTS `$PNDSDK/arm-mingw32ce/bin/sdl-config --cflags`"
+ #LDOPTS="$LDOPTS `$PNDSDK/arm-mingw32ce/bin/sdl-config --libs`"
 }
 
 arm7tdmicc () {
@@ -1339,6 +1361,7 @@ cat <<EOF
  206) Android MIPS
  207) Android x86
  208) Samsung YP-R1
+ 209) Wince SDL
 
 ==IHIFI==
  230) 760
@@ -3566,6 +3589,34 @@ fi
     t_model="ypr1"
     ;;
 
+   209|sdlappwince)
+    application="yes"
+    target_id=100
+    modelname="sdlappwince"
+    target="SDLAPP_WINCE"
+    app_set_paths
+    app_set_lcd_size
+    memory=8
+    uname=`uname`
+    simcc "sdl-app-cegcc"
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox"
+    bootoutput="rockbox"
+    appextra="recorder:gui"
+    plugins="no"
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="sdl"
+    t_model="app"
+    no_asm_build="1"
+    enable_mmx="no"
+    mingw32ce
+    ;;
+
    210|hifietma9)
     target_id=83
     modelname="hifietma9"
@@ -4389,6 +4440,7 @@ export LCDORIENTATION=${lcd_orientation}
 export ANDROID_ARCH=${ANDROID_ARCH}
 export ANDROID_NDK_PATH=${ANDROID_NDK_PATH}
 export ANDROID_SDK_PATH=${ANDROID_SDK_PATH}
+export NO_BUILD_ASM=${no_asm_build}
 
 CONFIGURE_OPTIONS=${cmdline}
 

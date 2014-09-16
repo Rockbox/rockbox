@@ -535,6 +535,8 @@ Lyre prototype 1 */
 #include "config/sansaconnect.h"
 #elif defined(SDLAPP)
 #include "config/sdlapp.h"
+#elif defined(SDLAPP_WINCE)
+#include "config/sdlappwince.h"
 #elif defined(ANDROID)
 #include "config/android.h"
 #elif defined(NOKIAN8XX)

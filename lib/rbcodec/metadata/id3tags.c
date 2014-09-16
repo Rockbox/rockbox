@@ -31,7 +31,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef WINCE
 #include <errno.h>
+#endif
 #include <stdbool.h>
 #include <stddef.h>
 #include <ctype.h>

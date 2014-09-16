@@ -18,7 +18,9 @@
 
 #include "config-tremor.h"
 #include <stdio.h>
+#ifndef WINCE
 #include <errno.h>
+#endif
 #include <string.h>
 #include <math.h>
 

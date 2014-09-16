@@ -18,7 +18,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef WINCE
 #include <errno.h>
+#endif
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

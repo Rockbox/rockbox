@@ -22,7 +22,9 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#ifndef WINCE
 #include <errno.h>
+#endif
 #include "string-extra.h"
 #include "config.h"
 #include "misc.h"
@@ -1010,7 +1012,9 @@ int read_line(int fd, char* buffer, int buffer_size)
     int count = 0;
     int num_read = 0;
 
-    errno = 0;
+    #ifndef WINCE
+        errno = 0;
+    #endif
 
     while (count < buffer_size)
     {
@@ -1032,7 +1036,11 @@ int read_line(int fd, char* buffer, int buffer_size)
 
     buffer[MIN(count, buffer_size - 1)] = 0;
 
-    return errno ? -1 : num_read;
+    #ifndef WINCE
+        return errno ? -1 : num_read;
+    #else
+        return 0;
+    #endif
 }
 
 
