@@ -24,8 +24,9 @@
 #include <ctype.h>
 #include <inttypes.h>
 #include "platform.h"
-
+#ifndef WINCE
 #include "errno.h"
+#endif
 #include "metadata.h"
 #include "metadata_common.h"
 #include "metadata_parsers.h"
