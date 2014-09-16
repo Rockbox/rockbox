@@ -20,7 +20,9 @@
  ****************************************************************************/
 #define RB_FILESYSTEM_OS
 #include <stdio.h>
+#ifndef WINCE
 #include <errno.h>
+#endif
 #include <ctype.h>
 #include <stdlib.h>
 #include "config.h"

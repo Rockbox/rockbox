@@ -40,7 +40,9 @@
 #include "version.h"
 #include "storage.h"
 #include "pcmbuf.h"
+#ifndef WINCE
 #include "errno.h"
+#endif
 #include "diacritic.h"
 #include "pathfuncs.h"
 #include "load_code.h"

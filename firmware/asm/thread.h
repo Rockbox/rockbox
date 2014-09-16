@@ -35,11 +35,15 @@ struct regs
     size_t stack_size;   /* stack size, not always used */
     uintptr_t stack;     /* pointer to start of the stack buffer */
 };
-  #include <errno.h>
+  #ifndef WINCE
+    #include <errno.h>
+  #endif
   #ifdef HAVE_SIGALTSTACK_THREADS
-    #include <signal.h>
-    /* MINSIGSTKSZ for the OS to deliver the signal + 0x3000 for us */
-    #define DEFAULT_STACK_SIZE (MINSIGSTKSZ+0x3000) /* Bytes */
+    #ifndef WINCE
+      #include <signal.h>
+      /* MINSIGSTKSZ for the OS to deliver the signal + 0x3000 for us */
+      #define DEFAULT_STACK_SIZE (MINSIGSTKSZ+0x3000) /* Bytes */
+    #endif
   #elif defined(HAVE_WIN32_FIBER_THREADS)
     #define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
   #endif
