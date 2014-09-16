@@ -293,7 +293,6 @@ bool soc_desc_parse_xml(const std::string& filename, soc_t& socs)
     bool ret = parse_root_elem(root_element, socs);
 
     xmlFreeDoc(doc);
-    xmlCleanupParser();
 
     return ret;
 }
@@ -966,4 +965,21 @@ bool soc_desc_evaluate_formula(const std::string& formula,
 {
     my_evaluator e(formula, var);
     return e.parse(result, error);
+}
+
+/** WARNING we need to call xmlInitParser() to init libxml2 but it needs to
+ * called from the main thread, which is a super strong requirement, so do it
+ * using a static constructor */
+namespace
+{
+class xml_parser_init
+{
+public:
+    xml_parser_init()
+    {
+        xmlInitParser();
+    }
+};
+
+xml_parser_init __xml_parser_init;
 }
