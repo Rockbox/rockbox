@@ -356,7 +356,6 @@ bool HWStubIoBackend::Reload()
  */
 HWStubBackendHelper::HWStubBackendHelper()
 {
-    libusb_init(NULL);
 #ifdef LIBUSB_NO_HOTPLUG
     m_hotplug = false;
 #else
@@ -371,7 +370,7 @@ HWStubBackendHelper::HWStubBackendHelper()
             &HWStubBackendHelper::HotPlugCallback, reinterpret_cast< void* >(this),
             &m_hotplug_handle);
     }
-#endif
+#endif /* LIBUSB_NO_HOTPLUG */
 }
 
 HWStubBackendHelper::~HWStubBackendHelper()
@@ -379,7 +378,7 @@ HWStubBackendHelper::~HWStubBackendHelper()
 #ifndef LIBUSB_NO_HOTPLUG
     if(m_hotplug)
         libusb_hotplug_deregister_callback(NULL, m_hotplug_handle);
-#endif
+#endif /* LIBUSB_NO_HOTPLUG */
 }
 
 QList< HWStubDevice* > HWStubBackendHelper::GetDevList()
@@ -420,14 +419,28 @@ int HWStubBackendHelper::HotPlugCallback(struct libusb_context *ctx, struct libu
     }
     return 0;
 }
-#endif
+#endif /* LIBUSB_NO_HOTPLUG */
 
 bool HWStubBackendHelper::HasHotPlugSupport()
 {
     return m_hotplug;
 }
 
-#endif
+namespace
+{
+class lib_usb_init
+{
+public:
+    lib_usb_init()
+    {
+        libusb_init(NULL);
+    }
+};
+
+lib_usb_init __lib_usb_init;
+}
+
+#endif /* HAVE_HWSTUB */
 
 /**
  * BackendHelper
