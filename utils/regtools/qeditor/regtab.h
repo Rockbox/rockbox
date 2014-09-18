@@ -88,6 +88,8 @@ private slots:
     void OnAnalyserClicked(QListWidgetItem *clicked);
     void OnReadOnlyClicked(bool);
     void OnDumpRegs(bool);
+    void OnBackendReload(bool);
+    void OnTypeChanged(int index);
 };
 
 #endif /* REGTAB_H */
