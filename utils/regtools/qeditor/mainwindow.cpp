@@ -14,11 +14,44 @@
 #include "regtab.h"
 #include "regedit.h"
 
+/**
+ * DocumentTab
+ */
+void DocumentTab::OnModified(bool modified)
+{
+    if(m_tab)
+        m_tab->SetTabModified(this, modified);
+}
+
+void DocumentTab::SetTabName(const QString& name)
+{
+    if(m_tab)
+        m_tab->SetTabName(this, name);
+}
+
+/**
+ * MyTabWidget
+ */
+
 MyTabWidget::MyTabWidget()
 {
     setMovable(true);
     setTabsClosable(true);
     connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(OnCloseTab(int)));
+}
+
+void MyTabWidget::SetTabModified(DocumentTab *doc, bool modified)
+{
+    int index = indexOf(doc->GetWidget());
+    if(modified)
+        setTabIcon(index, QIcon::fromTheme("document-save"));
+    else
+        setTabIcon(index, QIcon());
+}
+
+void MyTabWidget::SetTabName(DocumentTab *doc, const QString& name)
+{
+    setTabText(indexOf(doc->GetWidget()), name);
 }
 
 bool MyTabWidget::CloseTab(int index)
@@ -39,6 +72,10 @@ void MyTabWidget::OnCloseTab(int index)
 {
     CloseTab(index);
 }
+
+/**
+ * MainWindow
+ */
 
 MainWindow::MainWindow(Backend *backend)
     :m_backend(backend)
@@ -144,20 +181,10 @@ void MainWindow::OnLoadDesc()
     }
 }
 
-void MainWindow::OnTabModified(bool modified)
+void MainWindow::AddTab(DocumentTab *doc, const QString& title)
 {
-    QWidget *sender = qobject_cast< QWidget* >(QObject::sender());
-    int index = m_tab->indexOf(sender);
-    if(modified)
-        m_tab->setTabIcon(index, QIcon::fromTheme("document-save"));
-    else
-        m_tab->setTabIcon(index, QIcon());
-}
-
-void MainWindow::AddTab(QWidget *tab, const QString& title)
-{
-    connect(tab, SIGNAL(OnModified(bool)), this, SLOT(OnTabModified(bool)));
-    m_tab->setCurrentIndex(m_tab->addTab(tab, title));
+    m_tab->setCurrentIndex(m_tab->addTab(doc->GetWidget(), title));
+    doc->SetTabWidget(m_tab);
 }
 
 void MainWindow::OnNewRegTab()
