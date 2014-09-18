@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_9c860d64",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2014-09-18T13:37:26Z",
+      "side": 1,
+      "message": "We have a REC switch on Yh92x. It turns out that in both cases - previous and this version, changing the switch position causes a keys blockage until it will be set back. So in this case it ends up on blocking recording screen and the user have to set back the switch. But i really don\u0027t know what to do with this, so i just want to say that we should avoid the REC button whenever it\u0027s possible in future, because its functionality doesn\u0027t fit to convention of buttons in rockbox. Something like this: { ACTION_STD_REC, BUTTON_REC|BUTTON_REL, BUTTON_REC|BUTTON_REPEAT }, could block the main screen, instead of the recording (recording will appear after setting it back), but i don\u0027t know what\u0027s better.",
+      "revId": "a458504a6b80803184d2b0cf7f5205d725be8666",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_fc7bc179",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2014-09-18T13:37:26Z",
+      "side": 1,
+      "message": "Do we really need to have more than one action definition?\n\nThe case with REC is as same as above.",
+      "revId": "a458504a6b80803184d2b0cf7f5205d725be8666",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_3c96d994",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2014-09-18T13:37:26Z",
+      "side": 1,
+      "message": "The same questions as above.",
+      "revId": "a458504a6b80803184d2b0cf7f5205d725be8666",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
