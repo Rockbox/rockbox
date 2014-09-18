@@ -40,6 +40,8 @@ private:
     QTreeWidgetItem *AddClock(QTreeWidgetItem *parent, const QString& name, int freq, int mul = 1, int div = 1);
     int GetClockFreq(QTreeWidgetItem *item);
     void FillTree();
+    void FillTreeIMX233();
+    void FillTreeRK27XX();
 
 private:
     QGroupBox *m_group;
