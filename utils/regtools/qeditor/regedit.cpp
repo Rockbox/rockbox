@@ -47,13 +47,13 @@ SocEditPanel::SocEditPanel(SocRef ref, QWidget *parent)
 void SocEditPanel::OnNameEdited(const QString& text)
 {
     m_ref.GetSoc().name = text.toStdString();
-    emit OnModified(m_name_edit->isModified());
+    OnModified(m_name_edit->isModified());
 }
 
 void SocEditPanel::OnTextEdited()
 {
     m_ref.GetSoc().desc = m_desc_edit->GetTextHtml().toStdString();
-    emit OnModified(m_desc_edit->IsModified());
+    OnModified(m_desc_edit->IsModified());
 }
 
 /**
@@ -143,25 +143,25 @@ DevEditPanel::DevEditPanel(SocDevRef ref, QWidget *parent)
 void DevEditPanel::OnNameEdited(const QString& text)
 {
     m_ref.GetDev().name = text.toStdString();
-    emit OnModified(m_name_edit->isModified());
+    OnModified(m_name_edit->isModified());
 }
 
 void DevEditPanel::OnLongNameEdited(const QString& text)
 {
     m_ref.GetDev().long_name = text.toStdString();
-    emit OnModified(m_long_name_edit->isModified());
+    OnModified(m_long_name_edit->isModified());
 }
 
 void DevEditPanel::OnVersionEdited(const QString& text)
 {
     m_ref.GetDev().version = text.toStdString();
-    emit OnModified(m_version_edit->isModified());
+    OnModified(m_version_edit->isModified());
 }
 
 void DevEditPanel::OnDescEdited()
 {
     m_ref.GetDev().desc = m_desc_edit->GetTextHtml().toStdString();
-    emit OnModified(m_desc_edit->IsModified());
+    OnModified(m_desc_edit->IsModified());
 }
 
 void DevEditPanel::CreateNewRow(int row)
@@ -206,7 +206,7 @@ void DevEditPanel::OnInstActivated(int row, int column)
     {
         m_ref.GetDev().addr.erase(m_ref.GetDev().addr.begin() + row);
         m_instances_table->removeRow(row);
-        emit OnModified(true);
+        OnModified(true);
     }
     else if(type == DevInstNewType)
     {
@@ -228,12 +228,12 @@ void DevEditPanel::OnInstChanged(int row, int column)
     if(column == DevInstNameColumn)
     {
         m_ref.GetDev().addr[row].name =  item->text().toStdString();
-        emit OnModified(true);
+        OnModified(true);
     }
     else if(column == DevInstAddrColumn)
     {
         m_ref.GetDev().addr[row].addr = item->data(Qt::DisplayRole).toUInt();
-        emit OnModified(true);
+        OnModified(true);
     }
 }
 
@@ -389,7 +389,7 @@ void RegEditPanel::UpdateWarning(int row)
 void RegEditPanel::OnFormulaStringChanged(const QString& text)
 {
     m_ref.GetReg().formula.string = text.toStdString();
-    emit OnModified(true);
+    OnModified(true);
 }
 
 void RegEditPanel::OnFormulaGenerate(bool checked)
@@ -445,7 +445,7 @@ void RegEditPanel::OnFormulaChanged(int index)
         return;
     m_ref.GetReg().formula.type = static_cast< soc_reg_formula_type_t >(m_formula_combo->itemData(index).toInt());
     UpdateFormula();
-    emit OnModified(true);
+    OnModified(true);
 }
 
 void RegEditPanel::UpdateFormula()
@@ -470,7 +470,7 @@ void RegEditPanel::OnSctEdited(int state)
         m_ref.GetReg().flags |= REG_HAS_SCT;
     else
         m_ref.GetReg().flags &= ~REG_HAS_SCT;
-    emit OnModified(true);
+    OnModified(true);
 }
 
 void RegEditPanel::FillRow(int row, const soc_reg_addr_t& addr)
@@ -509,13 +509,13 @@ void RegEditPanel::CreateNewAddrRow(int row)
 void RegEditPanel::OnNameEdited(const QString& text)
 {
     m_ref.GetReg().name = text.toStdString();
-    emit OnModified(m_name_edit->isModified());
+    OnModified(m_name_edit->isModified());
 }
 
 void RegEditPanel::OnDescEdited()
 {
     m_ref.GetReg().desc = m_desc_edit->GetTextHtml().toStdString();
-    emit OnModified(m_desc_edit->IsModified());
+    OnModified(m_desc_edit->IsModified());
 }
 
 void RegEditPanel::OnInstActivated(int row, int column)
@@ -527,7 +527,7 @@ void RegEditPanel::OnInstActivated(int row, int column)
     {
         m_ref.GetReg().addr.erase(m_ref.GetReg().addr.begin() + row);
         m_instances_table->removeRow(row);
-        emit OnModified(true);
+        OnModified(true);
     }
     else if(type == RegInstNewType)
     {
@@ -549,12 +549,12 @@ void RegEditPanel::OnInstChanged(int row, int column)
     if(column == RegInstNameColumn)
     {
         m_ref.GetReg().addr[row].name = item->text().toStdString();
-        emit OnModified(true);
+        OnModified(true);
     }
     else if(column == RegInstAddrColumn)
     {
         m_ref.GetReg().addr[row].addr = item->data(Qt::DisplayRole).toUInt();
-        emit OnModified(true);
+        OnModified(true);
     }
 }
 
@@ -707,19 +707,19 @@ void FieldEditPanel::OnBitRangeEdited(const QString& input)
         UpdateWarning(row);
     // also updates delegates because they now have the wrong view of the field
     UpdateDelegates();
-    emit OnModified(true);
+    OnModified(true);
 }
 
 void FieldEditPanel::OnNameEdited(const QString& text)
 {
     m_ref.GetField().name = text.toStdString();
-    emit OnModified(m_name_edit->isModified());
+    OnModified(m_name_edit->isModified());
 }
 
 void FieldEditPanel::OnDescEdited()
 {
     m_ref.GetField().desc = m_desc_edit->GetTextHtml().toStdString();
-    emit OnModified(m_desc_edit->IsModified());
+    OnModified(m_desc_edit->IsModified());
 }
 
 void FieldEditPanel::OnValueActivated(int row, int column)
@@ -731,7 +731,7 @@ void FieldEditPanel::OnValueActivated(int row, int column)
     {
         m_ref.GetField().value.erase(m_ref.GetField().value.begin() + row);
         m_value_table->removeRow(row);
-        emit OnModified(true);
+        OnModified(true);
     }
     else if(type == FieldValueNewType)
     {
@@ -766,7 +766,7 @@ void FieldEditPanel::OnValueChanged(int row, int column)
     }
     else if(column == FieldValueDescColumn)
         m_ref.GetField().value[row].desc = item->text().toStdString();
-    emit OnModified(true);
+    OnModified(true);
 }
 
 namespace
@@ -952,6 +952,11 @@ RegEdit::RegEdit(Backend *backend, QWidget *parent)
         this, SLOT(OnSocItemActivated(QTreeWidgetItem*, int)));
 }
 
+QWidget *RegEdit::GetWidget()
+{
+    return this;
+}
+
 RegEdit::~RegEdit()
 {
 }
@@ -1052,6 +1057,12 @@ bool RegEdit::SaveSocFile(const QString& filename)
     return true;
 }
 
+void RegEdit::UpdateTabName()
+{
+    QFileInfo info(m_cur_socfile.GetFilename());
+    SetTabName(info.fileName());
+}
+
 void RegEdit::LoadSocFile(const QString& filename)
 {
     m_cur_socfile = SocFile(filename);
@@ -1064,6 +1075,7 @@ void RegEdit::LoadSocFile(const QString& filename)
     m_file_edit->setText(filename);
     SetModified(false, false);
     UpdateSocFile();
+    UpdateTabName();
 }
 
 void RegEdit::CreateNewFieldItem(QTreeWidgetItem *_parent)
@@ -1192,7 +1204,7 @@ void RegEdit::SetPanel(QWidget *panel)
 void RegEdit::SetModified(bool add, bool mod)
 {
     m_modified = add ? (m_modified || mod) : mod;
-    emit OnModified(mod);
+    OnModified(mod);
 }
 
 namespace
@@ -1360,7 +1372,7 @@ void RegEdit::AddDevice(QTreeWidgetItem *_item)
     item->parent()->insertChild(item->parent()->indexOfChild(item), dev_item);
     CreateNewRegisterItem(dev_item);
     m_soc_tree->setCurrentItem(dev_item);
-    emit OnModified(true);
+    OnModified(true);
 }
 
 void RegEdit::AddRegister(QTreeWidgetItem *_item)
@@ -1373,7 +1385,7 @@ void RegEdit::AddRegister(QTreeWidgetItem *_item)
     item->parent()->insertChild(item->parent()->indexOfChild(item), reg_item);
     CreateNewFieldItem(reg_item);
     m_soc_tree->setCurrentItem(reg_item);
-    emit OnModified(true);
+    OnModified(true);
 }
 
 void RegEdit::AddField(QTreeWidgetItem *_item)
@@ -1385,7 +1397,7 @@ void RegEdit::AddField(QTreeWidgetItem *_item)
     FixupEmptyItem(field_item);
     item->parent()->insertChild(item->parent()->indexOfChild(item), field_item);
     m_soc_tree->setCurrentItem(field_item);
-    emit OnModified(true);
+    OnModified(true);
 }
 
 bool RegEdit::Quit()

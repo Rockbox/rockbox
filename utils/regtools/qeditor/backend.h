@@ -99,6 +99,7 @@ public:
         { Q_UNUSED(addr); Q_UNUSED(value); Q_UNUSED(mode); return false; }
     virtual bool IsDirty() { return m_dirty; }
     virtual bool Commit();
+    QString GetFileName() { return m_filename; }
 
 protected:
     QString m_filename;
@@ -164,6 +165,7 @@ public:
     virtual bool WriteRegister(soc_addr_t addr, soc_word_t value, WriteMode mode);
     virtual bool IsDirty() { return false; }
     virtual bool Commit() { return true; }
+    HWStubDevice *GetDevice() { return m_dev; }
 
 protected:
     QString m_soc;
