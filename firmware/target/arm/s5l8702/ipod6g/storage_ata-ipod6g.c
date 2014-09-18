@@ -131,6 +131,7 @@ static int ata_wait_for_not_bsy(long timeout)
         uint8_t csd = ata_read_cbr(&ATA_PIO_CSD);
         if (!(csd & BIT(7))) return 0;
         if (TIMEOUT_EXPIRED(startusec, timeout)) RET_ERR(0);
+        yield();
     }
 }
 
@@ -143,6 +144,7 @@ static int ata_wait_for_rdy(long timeout)
         uint8_t dad = ata_read_cbr(&ATA_PIO_DAD);
         if (dad & BIT(6)) return 0;
         if (TIMEOUT_EXPIRED(startusec, timeout)) RET_ERR(1);
+        yield();
     }
 }
 
@@ -156,6 +158,7 @@ static int ata_wait_for_start_of_transfer(long timeout)
         if (dad & BIT(0)) RET_ERR(1);
         if ((dad & (BIT(7) | BIT(3))) == BIT(3)) return 0;
         if (TIMEOUT_EXPIRED(startusec, timeout)) RET_ERR(2);
+        yield();
     }
 }
 
