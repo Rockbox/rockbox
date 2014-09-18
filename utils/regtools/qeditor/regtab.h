@@ -17,6 +17,7 @@
 #include "backend.h"
 #include "settings.h"
 #include "mainwindow.h"
+#include "utils.h"
 
 class RegTabPanel
 {
@@ -47,15 +48,6 @@ signals:
     void OnModified(bool modified);
 
 protected:
-    enum
-    {
-        DataSelNothing,
-        DataSelFile,
-    #ifdef HAVE_HWSTUB
-        DataSelDevice,
-    #endif
-    };
-
     void FillDevSubTree(QTreeWidgetItem *item);
     void FillSocSubTree(QTreeWidgetItem *item);
     void FillRegTree();
@@ -69,37 +61,27 @@ protected:
     void UpdateSocFilename();
 
     QComboBox *m_soc_selector;
-#ifdef HAVE_HWSTUB
-    QComboBox *m_dev_selector;
-    HWStubBackendHelper m_hwstub_helper;
-#endif
+    BackendSelector *m_backend_selector;
     Backend *m_backend;
     QTreeWidget *m_reg_tree;
     SocRef m_cur_soc;
     QVBoxLayout *m_right_panel;
     RegTabPanel *m_right_content;
-    QLineEdit *m_data_sel_edit;
     QCheckBox *m_readonly_check;
     QLabel *m_data_soc_label;
     QPushButton *m_data_sel_reload;
     QPushButton *m_dump;
-    QComboBox *m_data_selector;
     IoBackend *m_io_backend;
     QTabWidget *m_type_selector;
     QListWidget *m_analysers_list;
 
 private slots:
-#ifdef HAVE_HWSTUB
-    void OnDevListChanged();
-    void OnDevChanged(int index);
-    void ClearDevList();
-#endif
     void SetReadOnlyIndicator();
     void OnSocChanged(int index);
     void OnSocListChanged();
     void OnRegItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
     void OnRegItemClicked(QTreeWidgetItem *clicked, int col);
-    void OnDataSelChanged(int index);
+    void OnBackendSelect(IoBackend *backend);
     void OnDataChanged();
     void OnDataSocActivated(const QString&);
     void OnAnalyserChanged(QListWidgetItem *current, QListWidgetItem *previous);

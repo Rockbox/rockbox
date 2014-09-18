@@ -798,3 +798,140 @@ bool MySwitchableTextEditor::IsModified()
         return false;
     return m_line_mode ? m_line->isModified() : m_edit->IsModified();
 }
+
+/**
+ * BackendSelector
+ */
+BackendSelector::BackendSelector(Backend *backend, QWidget *parent)
+    :QWidget(parent), m_backend(backend)
+{
+    m_data_selector = new QComboBox;
+    m_data_selector->addItem(QIcon::fromTheme("text-x-generic"), "Nothing...", QVariant(DataSelNothing));
+    m_data_selector->addItem(QIcon::fromTheme("document-open"), "File...", QVariant(DataSelFile));
+#ifdef HAVE_HWSTUB
+    m_data_selector->addItem(QIcon::fromTheme("multimedia-player"), "Device...", QVariant(DataSelDevice));
+#endif
+    m_data_sel_edit = new QLineEdit;
+    m_data_sel_edit->setReadOnly(true);
+    QHBoxLayout *data_sel_layout = new QHBoxLayout(this);
+    data_sel_layout->addWidget(m_data_selector);
+    data_sel_layout->addWidget(m_data_sel_edit, 1);
+    data_sel_layout->addStretch(0);
+#ifdef HAVE_HWSTUB
+    m_dev_selector = new QComboBox;
+    data_sel_layout->addWidget(m_dev_selector, 1);
+#endif
+
+    m_io_backend = m_backend->CreateDummyIoBackend();
+
+    connect(m_data_selector, SIGNAL(activated(int)),
+        this, SLOT(OnDataSelChanged(int)));
+#ifdef HAVE_HWSTUB
+    connect(m_dev_selector, SIGNAL(currentIndexChanged(int)),
+        this, SLOT(OnDevChanged(int)));
+#endif
+    OnDataSelChanged(0);
+}
+
+BackendSelector::~BackendSelector()
+{
+#ifdef HAVE_HWSTUB
+    ClearDevList();
+#endif
+    delete m_io_backend;
+}
+
+void BackendSelector::OnDataSelChanged(int index)
+{
+    if(index == -1)
+        return;
+    QVariant var = m_data_selector->itemData(index);
+    if(var == DataSelFile)
+    {
+        m_data_sel_edit->show();
+#ifdef HAVE_HWSTUB
+        m_dev_selector->hide();
+#endif
+        QFileDialog *fd = new QFileDialog(m_data_selector);
+        fd->setFilter("Textual files (*.txt);;All files (*)");
+        fd->setDirectory(Settings::Get()->value("loaddatadir", QDir::currentPath()).toString());
+        if(fd->exec())
+        {
+            QStringList filenames = fd->selectedFiles();
+            ChangeBackend(m_backend->CreateFileIoBackend(filenames[0]));
+            m_data_sel_edit->setText(filenames[0]);
+        }
+        Settings::Get()->setValue("loaddatadir", fd->directory().absolutePath());
+    }
+#ifdef HAVE_HWSTUB
+    else if(var == DataSelDevice)
+    {
+        m_data_sel_edit->hide();;
+        m_dev_selector->show();
+        OnDevListChanged();
+    }
+#endif
+    else
+    {
+        m_data_sel_edit->hide();
+#ifdef HAVE_HWSTUB
+        m_dev_selector->hide();
+#endif
+
+        ChangeBackend(m_backend->CreateDummyIoBackend());
+    }
+}
+
+#ifdef HAVE_HWSTUB
+void BackendSelector::OnDevListChanged()
+{
+    ClearDevList();
+    QList< HWStubDevice* > list = m_hwstub_helper.GetDevList();
+    foreach(HWStubDevice *dev, list)
+    {
+        QString name = QString("Bus %1 Device %2: %3").arg(dev->GetBusNumber())
+            .arg(dev->GetDevAddress()).arg(dev->GetTargetInfo().bName);
+        m_dev_selector->addItem(QIcon::fromTheme("multimedia-player"), name,
+            QVariant::fromValue((void *)dev));
+    }
+    if(list.size() > 0)
+        m_dev_selector->setCurrentIndex(0);
+}
+
+void BackendSelector::OnDevChanged(int index)
+{
+    if(index == -1)
+        return;
+    HWStubDevice *dev = reinterpret_cast< HWStubDevice* >(m_dev_selector->itemData(index).value< void* >());
+    delete m_io_backend;
+    /* NOTE: make a copy of the HWStubDevice device because the one in the list
+     * might get destroyed when clearing the list while the backend is still
+     * active: this would result in a double free when the backend is also destroyed */
+    m_io_backend = m_backend->CreateHWStubIoBackend(new HWStubDevice(dev));
+    emit OnSelect(m_io_backend);
+}
+
+void BackendSelector::ClearDevList()
+{
+    while(m_dev_selector->count() > 0)
+    {
+        HWStubDevice *dev = reinterpret_cast< HWStubDevice* >(m_dev_selector->itemData(0).value< void* >());
+        delete dev;
+        m_dev_selector->removeItem(0);
+    }
+}
+#endif
+
+IoBackend *BackendSelector::GetBackend()
+{
+    return m_io_backend;
+}
+
+void BackendSelector::ChangeBackend(IoBackend *new_backend)
+{
+    /* WARNING: delete old backend *after* calling the signal, otherwise the old backend
+     * might get used after delete */
+    emit OnSelect(new_backend);
+    delete m_io_backend;
+    m_io_backend = new_backend;
+}

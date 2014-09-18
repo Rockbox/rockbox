@@ -15,6 +15,9 @@
 #include <QHBoxLayout>
 #include <QItemEditorCreatorBase>
 #include <QStyledItemDelegate>
+#include <QComboBox>
+#include <QFileDialog>
+#include "settings.h"
 #include "backend.h"
 
 class SocBitRangeValidator : public QValidator
@@ -272,6 +275,46 @@ protected:
     QLabel *m_label;
     MyTextEditor *m_edit;
     QLineEdit *m_line;
+};
+
+class BackendSelector : public QWidget
+{
+    Q_OBJECT
+public:
+    BackendSelector(Backend *backend, QWidget *parent = 0);
+    virtual ~BackendSelector();
+    IoBackend *GetBackend();
+
+signals:
+    void OnSelect(IoBackend *backend);
+
+protected:
+    enum
+    {
+        DataSelNothing,
+        DataSelFile,
+#ifdef HAVE_HWSTUB
+        DataSelDevice,
+#endif
+    };
+
+    Backend *m_backend;
+    IoBackend *m_io_backend;
+    QComboBox *m_data_selector;
+    QLineEdit *m_data_sel_edit;
+#ifdef HAVE_HWSTUB
+    QComboBox *m_dev_selector;
+    HWStubBackendHelper m_hwstub_helper;
+#endif
+    void ChangeBackend(IoBackend *new_backend);
+
+private slots:
+#ifdef HAVE_HWSTUB
+    void OnDevListChanged();
+    void OnDevChanged(int index);
+    void ClearDevList();
+#endif
+    void OnDataSelChanged(int index);
 };
 
 #endif /* AUX_H */
