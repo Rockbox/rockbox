@@ -160,6 +160,11 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
     SetDataSocName("");
 }
 
+QWidget *RegTab::GetWidget()
+{
+    return this;
+}
+
 RegTab::~RegTab()
 {
     /* backend will be deleted by backend selector */
@@ -192,6 +197,32 @@ void RegTab::OnDataSocActivated(const QString& str)
         m_soc_selector->setCurrentIndex(index);
 }
 
+void RegTab::UpdateTabName()
+{
+    /* do it the ugly way: try to cast to the different possible backends */
+    FileIoBackend *file = dynamic_cast< FileIoBackend* >(m_io_backend);
+#ifdef HAVE_HWSTUB
+    HWStubIoBackend *hwstub = dynamic_cast< HWStubIoBackend* >(m_io_backend);
+#endif
+    if(file)
+    {
+        QFileInfo info(file->GetFileName());
+        SetTabName(info.fileName());
+    }
+#ifdef HAVE_HWSTUB
+    else if(hwstub)
+    {
+        HWStubDevice *dev = hwstub->GetDevice();
+        SetTabName(QString("HWStub %1.%2").arg(dev->GetBusNumber())
+            .arg(dev->GetDevAddress()));
+    }
+#endif
+    else
+    {
+        SetTabName("Register Tab");
+    }
+}
+
 void RegTab::OnBackendSelect(IoBackend *backend)
 {
     m_io_backend = backend;
@@ -199,6 +230,7 @@ void RegTab::OnBackendSelect(IoBackend *backend)
     SetDataSocName(m_io_backend->GetSocName());
     OnDataSocActivated(m_io_backend->GetSocName());
     OnDataChanged();
+    UpdateTabName();
 }
 
 void RegTab::SetReadOnlyIndicator()
