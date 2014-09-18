@@ -829,6 +829,8 @@ BackendSelector::BackendSelector(Backend *backend, QWidget *parent)
 #ifdef HAVE_HWSTUB
     connect(m_dev_selector, SIGNAL(currentIndexChanged(int)),
         this, SLOT(OnDevChanged(int)));
+    connect(&m_hwstub_helper, SIGNAL(OnDevListChanged(bool, struct libusb_device *)),
+        this, SLOT(OnDevListChanged2(bool, struct libusb_device *)));
 #endif
     OnDataSelChanged(0);
 }
@@ -883,6 +885,13 @@ void BackendSelector::OnDataSelChanged(int index)
 }
 
 #ifdef HAVE_HWSTUB
+void BackendSelector::OnDevListChanged2(bool arrived, struct libusb_device *dev)
+{
+    Q_UNUSED(arrived);
+    Q_UNUSED(dev);
+    OnDevListChanged();
+}
+
 void BackendSelector::OnDevListChanged()
 {
     ClearDevList();

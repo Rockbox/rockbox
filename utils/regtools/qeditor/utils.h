@@ -312,6 +312,7 @@ private slots:
 #ifdef HAVE_HWSTUB
     void OnDevListChanged();
     void OnDevChanged(int index);
+    void OnDevListChanged2(bool, struct libusb_device *);
     void ClearDevList();
 #endif
     void OnDataSelChanged(int index);
