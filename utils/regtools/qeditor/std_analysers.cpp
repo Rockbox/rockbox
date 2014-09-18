@@ -468,7 +468,7 @@ void EmiAnalyser::FillTable()
         ports.erase(ports.begin() + value / 6);
         int ord[6][3] = { {0, 1, 2}, {2, 0, 1}, {1, 2, 0}, {2, 1, 0}, {1, 0, 2}, {0, 2, 1} };
         for(int i = 0; i < 3; i++)
-            order += ", " + ports[ord[value][i]];
+            order += ", " + ports[ord[value % 6][i]];
         AddLine("Port Priority Order", value, "", order);
     }
 
