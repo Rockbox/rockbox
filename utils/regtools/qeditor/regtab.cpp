@@ -372,3 +372,20 @@ void RegTab::OnDumpRegs(bool c)
             "There was an error when dumping the registers");
     }
 }
+
+void RegTab::OnBackendReload(bool c)
+{
+    Q_UNUSED(c);
+    m_io_backend->Reload();
+    OnDataChanged();
+}
+
+void RegTab::OnTypeChanged(int index)
+{
+    if(index == -1)
+        return;
+    if(index == 0) /* registers */
+        OnRegItemClicked(m_reg_tree->currentItem(), 0);
+    else if(index == 1) /* analysers */
+        OnAnalyserClicked(m_analysers_list->currentItem());
+}
