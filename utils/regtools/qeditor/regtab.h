@@ -43,9 +43,7 @@ public:
     RegTab(Backend *backend, QWidget *parent = 0);
     ~RegTab();
     virtual bool Quit();
-
-signals:
-    void OnModified(bool modified);
+    virtual QWidget *GetWidget();
 
 protected:
     void FillDevSubTree(QTreeWidgetItem *item);
@@ -59,6 +57,7 @@ protected:
     void SetDataSocName(const QString& socname);
     void SetPanel(RegTabPanel *panel);
     void UpdateSocFilename();
+    void UpdateTabName();
 
     QComboBox *m_soc_selector;
     BackendSelector *m_backend_selector;

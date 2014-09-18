@@ -226,9 +226,7 @@ public:
     RegEdit(Backend *backend, QWidget *parent = 0);
     ~RegEdit();
     virtual bool Quit();
-
-signals:
-    void OnModified(bool mod);
+    virtual QWidget *GetWidget();
 
 protected slots:
     void OnSocItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
@@ -267,6 +265,7 @@ protected:
     void CreateNewDeviceItem(QTreeWidgetItem *parent);
     void CreateNewRegisterItem(QTreeWidgetItem *parent);
     void CreateNewFieldItem(QTreeWidgetItem *parent);
+    void UpdateTabName();
 
     QGroupBox *m_file_group;
     QToolButton *m_file_open;

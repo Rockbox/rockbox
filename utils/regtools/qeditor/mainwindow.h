@@ -7,11 +7,20 @@
 #include "backend.h"
 #include "settings.h"
 
+class MyTabWidget;
+
 class DocumentTab
 {
 public:
+    DocumentTab() { m_tab = 0; }
     virtual bool Quit() = 0;
-    virtual void OnModified(bool modified) = 0;
+    virtual QWidget *GetWidget() = 0;
+    void SetTabWidget(MyTabWidget *tab) { m_tab = tab; }
+
+protected:
+    void OnModified(bool modified);
+    void SetTabName(const QString& name);
+    MyTabWidget *m_tab;
 };
 
 class MyTabWidget : public QTabWidget
@@ -20,6 +29,8 @@ class MyTabWidget : public QTabWidget
 public:
     MyTabWidget();
     bool CloseTab(int index);
+    void SetTabModified(DocumentTab *tab, bool mod);
+    void SetTabName(DocumentTab *tab, const QString& name);
 
 private slots:
     void OnCloseTab(int index);
@@ -39,7 +50,7 @@ private:
     void closeEvent(QCloseEvent *event);
 
 protected:
-    void AddTab(QWidget *tab, const QString& title);
+    void AddTab(DocumentTab *tab, const QString& title);
     bool Quit();
 
 private slots:
@@ -49,7 +60,6 @@ private slots:
     void OnLoadDesc();
     void OnNewRegTab();
     void OnNewRegEdit();
-    void OnTabModified(bool modified);
 
 private:
     MyTabWidget *m_tab;
