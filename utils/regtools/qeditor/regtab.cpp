@@ -143,12 +143,12 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
     connect(m_soc_selector, SIGNAL(currentIndexChanged(int)),
         this, SLOT(OnSocChanged(int)));
     connect(m_backend, SIGNAL(OnSocListChanged()), this, SLOT(OnSocListChanged()));
-    connect(m_reg_tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
-        this, SLOT(OnRegItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
+    connect(m_reg_tree, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
+        this, SLOT(OnRegItemClicked(QTreeWidgetItem*, int)));
     connect(m_data_soc_label, SIGNAL(linkActivated(const QString&)), this,
         SLOT(OnDataSocActivated(const QString&)));
-    connect(m_analysers_list, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
-        this, SLOT(OnAnalyserChanged(QListWidgetItem *, QListWidgetItem *)));
+    connect(m_analysers_list, SIGNAL(itemClicked(QListWidgetItem *)),
+        this, SLOT(OnAnalyserClicked(QListWidgetItem *)));
     connect(m_backend_selector, SIGNAL(OnSelect(IoBackend *)),
         this, SLOT(OnBackendSelect(IoBackend *)));
     connect(m_readonly_check, SIGNAL(clicked(bool)), this, SLOT(OnReadOnlyClicked(bool)));
@@ -209,13 +209,7 @@ void RegTab::SetReadOnlyIndicator()
 
 void RegTab::OnDataChanged()
 {
-    OnRegItemChanged(m_reg_tree->currentItem(), m_reg_tree->currentItem());
-}
-
-void RegTab::OnRegItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
-{
-    Q_UNUSED(previous);
-    OnRegItemClicked(current, 0);
+    OnRegItemClicked(m_reg_tree->currentItem(), 0);
 }
 
 void RegTab::OnRegItemClicked(QTreeWidgetItem *current, int col)
@@ -238,12 +232,6 @@ void RegTab::OnRegItemClicked(QTreeWidgetItem *current, int col)
         DevTreeItem *item = dynamic_cast< DevTreeItem * >(current);
         DisplayDevice(item->GetRef());
     }
-}
-
-void RegTab::OnAnalyserChanged(QListWidgetItem *current, QListWidgetItem *previous)
-{
-    Q_UNUSED(previous);
-    OnAnalyserClicked(current);
 }
 
 void RegTab::OnAnalyserClicked(QListWidgetItem *current)

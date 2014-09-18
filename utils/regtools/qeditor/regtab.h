@@ -79,12 +79,10 @@ private slots:
     void SetReadOnlyIndicator();
     void OnSocChanged(int index);
     void OnSocListChanged();
-    void OnRegItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
     void OnRegItemClicked(QTreeWidgetItem *clicked, int col);
     void OnBackendSelect(IoBackend *backend);
     void OnDataChanged();
     void OnDataSocActivated(const QString&);
-    void OnAnalyserChanged(QListWidgetItem *current, QListWidgetItem *previous);
     void OnAnalyserClicked(QListWidgetItem *clicked);
     void OnReadOnlyClicked(bool);
     void OnDumpRegs(bool);
