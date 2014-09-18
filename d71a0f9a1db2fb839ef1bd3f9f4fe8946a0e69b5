@@ -1,0 +1,276 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_7c4b315a",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "Put these lines in a FillTree() functions which also contains the UI stuff:\nvoid FillTree()\n{\n  m_tree_widget-\u003eclear();\n  if(soc.GetSoc().name \u003d\u003d \"imx233\") FillTreeIMX233();\n  else if(soc.GetSoc().name \u003d\u003d \"rk27xx\") FillTreeRK27XX();\n  m_tree_widget-\u003eexpandAll();\n  m_tree_widget-\u003eresizeColumnToContents(0);\n}",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_5c48f55b",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "Remove this, put it in FillTree()",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_fc6d81cd",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "if the if(....) ever fails, arm_pll is never created and following code will segfault. Create a dummy clock in case of failure:\nelse\n  arm_pll \u003d AddClock(xtal_clk, \"arm pll\", INVALID);",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_dc7245ad",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "create dummy clock",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_3c6899ba",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "create dummy clock",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_1c65dde0",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "create dummy clock",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_7c6211da",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "create dummy clock",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_5c5f550e",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "create dummy clock",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_bc9ae9c3",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "create dummy clock",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_9c9f2db4",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "create dummy clock",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_fca46109",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "create dummy clock",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_dca9a5e1",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "create dummy clock",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_3caff9e4",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "create dummy clock",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_1cacbdec",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "create dummy clock",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_bc7309b4",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "Remove this, put in FillTree()",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_9c78cd91",
+        "filename": "utils/regtools/qeditor/std_analysers.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2014-09-18T09:20:20Z",
+      "side": 1,
+      "message": "Remove this, put in FillTree()",
+      "revId": "d71a0f9a1db2fb839ef1bd3f9f4fe8946a0e69b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
