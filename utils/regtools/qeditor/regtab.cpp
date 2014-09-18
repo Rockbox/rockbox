@@ -138,7 +138,7 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
     this->addWidget(w);
     this->setStretchFactor(1, 2);
 
-    m_io_backend = m_backend->CreateDummyIoBackend();
+    m_io_backend = m_backend_selector->GetBackend();
 
     connect(m_soc_selector, SIGNAL(currentIndexChanged(int)),
         this, SLOT(OnSocChanged(int)));
