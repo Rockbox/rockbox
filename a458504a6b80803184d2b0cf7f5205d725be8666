@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "7a1b2928_3ce7f913",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2014-09-19T15:07:19Z",
+      "side": 1,
+      "message": "I think it doesn\u0027t hurt to have multiple definitions, as long as it bears some logic across the target.\nMy idea is to use \"REC\" as the standard exit button in plugins, like the Vibe500 (maybe not so clever on YH920), and \"PLAY/REW\" is a commonly used yes/no or set/cancel combination.",
+      "parentUuid": "7a1b2928_fc7bc179",
+      "revId": "a458504a6b80803184d2b0cf7f5205d725be8666",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a1b2928_3c96d994",
         "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
         "patchSetId": 1
