@@ -2,74 +2,167 @@
 <soc name="rk27xx" desc="Rockchip rk27xx">
   <dev name="A2A_DMA" long_name="AHB-to-AHB bridge" desc="AHB-to-AHB bridge with DMA" version="1.0">
     <addr name="A2A_DMA" addr="0x18094000"/>
-    <reg name="CON0" desc="">
+    <reg name="CON" desc="">
       <addr name="CON0" addr="0x0"/>
-    </reg>
-    <reg name="ISRC0" desc="">
-      <addr name="ISRC0" addr="0x4"/>
-    </reg>
-    <reg name="IDST0" desc="">
-      <addr name="IDST0" addr="0x8"/>
-    </reg>
-    <reg name="ICNT0" desc="">
-      <addr name="ICNT0" addr="0xc"/>
-    </reg>
-    <reg name="CSRC0" desc="">
-      <addr name="CSRC0" addr="0x10"/>
-    </reg>
-    <reg name="CDST0" desc="">
-      <addr name="CDST0" addr="0x14"/>
-    </reg>
-    <reg name="CCNT0" desc="">
-      <addr name="CCNT0" addr="0x18"/>
-    </reg>
-    <reg name="CON1" desc="">
       <addr name="CON1" addr="0x1c"/>
+      <field name="RESERVED31_15" desc="" bitrange="31:15"/>
+      <field name="AUTO_RELOAD" desc="" bitrange="14:14">
+        <value name="DISABLE" value="0x0" desc=""/>
+        <value name="ENABLE" value="0x1" desc=""/>
+      </field>
+      <field name="DMA_HW_EN" desc="" bitrange="13:13">
+        <value name="DISABLE" value="0x0" desc=""/>
+        <value name="ENABLE" value="0x1" desc=""/>
+      </field>
+      <field name="INT_EN" desc="" bitrange="12:12">
+        <value name="DISABLE" value="0x0" desc=""/>
+        <value name="ENABLE" value="0x1" desc=""/>
+      </field>
+      <field name="ON_THE_FLY" desc="On the fly transfer can be applied on DMA which source and destination addresses are at the different bus domain.&#10;" bitrange="11:11">
+        <value name="DISABLE" value="0x0" desc=""/>
+        <value name="ENABLE" value="0x1" desc=""/>
+      </field>
+      <field name="XFER_MODE" desc="Burst size" bitrange="10:9">
+        <value name="SINGLE" value="0x0" desc=""/>
+        <value name="INCR4" value="0x1" desc=""/>
+        <value name="INCR8" value="0x2" desc=""/>
+        <value name="INCR16" value="0x3" desc=""/>
+      </field>
+      <field name="HDREQ_SRC" desc="" bitrange="8:7">
+        <value name="SDMMC" value="0x0" desc=""/>
+      </field>
+      <field name="SRC_INC" desc="" bitrange="6:6">
+        <value name="INCREMENT" value="0x0" desc=""/>
+        <value name="FIXED" value="0x1" desc=""/>
+      </field>
+      <field name="DST_INC" desc="" bitrange="5:5">
+        <value name="INCREMENT" value="0x0" desc=""/>
+        <value name="FIXED" value="0x1" desc=""/>
+      </field>
+      <field name="DMA_SW_CMD" desc="" bitrange="4:3">
+        <value name="NO_CMD" value="0x0" desc=""/>
+        <value name="START_SW_DMA" value="0x1" desc=""/>
+        <value name="PAUSE_SW_DMA" value="0x2" desc=""/>
+        <value name="CANCEL_SW_DMA" value="0x3" desc=""/>
+      </field>
+      <field name="XFER_WIDTH" desc="" bitrange="2:1">
+        <value name="BYTE" value="0x0" desc=""/>
+        <value name="HALFWORD" value="0x1" desc=""/>
+        <value name="WORD" value="0x2" desc=""/>
+        <value name="RESERVED" value="0x3" desc=""/>
+      </field>
+      <field name="DMA_MODE" desc="" bitrange="0:0">
+        <value name="HW_BLOCK_MODE" value="0x0" desc=""/>
+        <value name="SW_MODE" value="0x1" desc=""/>
+      </field>
     </reg>
-    <reg name="ISRC1" desc="">
+    <reg name="ISRC" desc="A2A DMA initial source address register.">
+      <addr name="ISRC0" addr="0x4"/>
       <addr name="ISRC1" addr="0x20"/>
     </reg>
-    <reg name="IDST1" desc="">
+    <reg name="IDST" desc="A2A DMA initial destination address register.">
+      <addr name="IDST0" addr="0x8"/>
       <addr name="IDST1" addr="0x24"/>
     </reg>
-    <reg name="ICNT1" desc="">
+    <reg name="ICNT" desc="">
+      <addr name="ICNT0" addr="0xc"/>
       <addr name="ICNT1" addr="0x28"/>
+      <field name="RESERVED31_16" desc="" bitrange="31:16"/>
+      <field name="CNT" desc="DMA initial terminate count register for channel x." bitrange="15:0"/>
     </reg>
-    <reg name="CSRC1" desc="">
+    <reg name="CSRC" desc="A2A DMA current source address register.">
+      <addr name="CSRC0" addr="0x10"/>
       <addr name="CSRC1" addr="0x2c"/>
     </reg>
-    <reg name="CDST1" desc="">
+    <reg name="CDST" desc="A2A DMA current destination address register.">
+      <addr name="CDST0" addr="0x14"/>
       <addr name="CDST1" addr="0x30"/>
     </reg>
-    <reg name="CCNT1" desc="">
+    <reg name="CCNT" desc="">
+      <addr name="CCNT0" addr="0x18"/>
       <addr name="CCNT1" addr="0x34"/>
+      <field name="RESERVED31_16" desc="" bitrange="31:16"/>
+      <field name="CNT" desc="" bitrange="15:0"/>
     </reg>
     <reg name="INT_STS" desc="">
       <addr name="INT_STS" addr="0x38"/>
+      <field name="RESERVED31_4" desc="" bitrange="31:4"/>
+      <field name="AHB2_ERR_INT" desc="" bitrange="3:3">
+        <value name="NO_ERROR" value="0x0" desc=""/>
+        <value name="ERROR" value="0x1" desc=""/>
+      </field>
+      <field name="AHB1_ERR_INT" desc="" bitrange="2:2">
+        <value name="NO_ERROR" value="0x0" desc=""/>
+        <value name="ERROR" value="0x1" desc=""/>
+      </field>
+      <field name="CHANNEL1_INT" desc="Channel 1 Interrupt active, clear interrupt after write." bitrange="1:1">
+        <value name="NOT_ACTIVE" value="0x0" desc=""/>
+        <value name="ACTIVE" value="0x1" desc=""/>
+      </field>
+      <field name="CHANNEL0_INT" desc="Channel 0 Interrupt active, clear interrupt after write." bitrange="0:0">
+        <value name="NOT_ACTIVE" value="0x0" desc=""/>
+        <value name="ACTIVE" value="0x1" desc=""/>
+      </field>
     </reg>
     <reg name="DMA_STS" desc="">
       <addr name="DMA_STS" addr="0x3c"/>
+      <field name="RESERVED31_2" desc="" bitrange="31:2"/>
+      <field name="CHANNEL1_BUSY" desc="" bitrange="1:1">
+        <value name="FREE" value="0x0" desc=""/>
+        <value name="BUSY" value="0x1" desc=""/>
+      </field>
+      <field name="CHANNEL0_BUSY" desc="" bitrange="0:0">
+        <value name="FREE" value="0x0" desc=""/>
+        <value name="BUSY" value="0x1" desc=""/>
+      </field>
     </reg>
-    <reg name="ERR_ADR0" desc="">
+    <reg name="ERR_ADR" desc="">
       <addr name="ERR_ADR0" addr="0x40"/>
-    </reg>
-    <reg name="ERR_OP0" desc="">
-      <addr name="ERR_OP0" addr="0x44"/>
-    </reg>
-    <reg name="ERR_ADR1" desc="">
       <addr name="ERR_ADR1" addr="0x48"/>
     </reg>
-    <reg name="ERR_OP1" desc="">
+    <reg name="ERR_OP" desc="">
+      <addr name="ERR_OP0" addr="0x44"/>
       <addr name="ERR_OP1" addr="0x4c"/>
+      <field name="RESERVED31_1" desc="" bitrange="31:1"/>
+      <field name="DIR" desc="" bitrange="0:0">
+        <value name="READ" value="0x0" desc=""/>
+        <value name="WRITE" value="0x1" desc=""/>
+      </field>
     </reg>
-    <reg name="LCNT0" desc="">
+    <reg name="LCNT" desc="">
       <addr name="LCNT0" addr="0x50"/>
-    </reg>
-    <reg name="LCNT1" desc="">
       <addr name="LCNT1" addr="0x54"/>
+      <field name="RESERVED31_3" desc="" bitrange="31:3"/>
+      <field name="LOCK_CNT" desc="Bus lock counts at on-the-fly mode." bitrange="2:0">
+        <value name="NEVER" value="0x0" desc=""/>
+        <value name="16BITS" value="0x1" desc=""/>
+        <value name="32BITS" value="0x2" desc=""/>
+        <value name="64BITS" value="0x3" desc=""/>
+        <value name="128BITS" value="0x4" desc=""/>
+        <value name="256BITS" value="0x5" desc=""/>
+        <value name="512BITS" value="0x6" desc=""/>
+        <value name="1024BITS" value="0x7" desc=""/>
+      </field>
     </reg>
     <reg name="DOMAIN" desc="">
       <addr name="DOMAIN" addr="0x58"/>
+      <field name="RESERVED31_4" desc="" bitrange="31:4"/>
+      <field name="CH1_DST_DOMAIN" desc="" bitrange="3:3">
+        <value name="AHB0" value="0x0" desc=""/>
+        <value name="AHB1" value="0x1" desc=""/>
+      </field>
+      <field name="CH1_SRC_DOMAIN" desc="" bitrange="2:2">
+        <value name="AHB0" value="0x0" desc=""/>
+        <value name="AHB1" value="0x1" desc=""/>
+      </field>
+      <field name="CH0_DST_DOMAIN" desc="" bitrange="1:1">
+        <value name="AHB0" value="0x0" desc=""/>
+        <value name="AHB1" value="0x1" desc=""/>
+      </field>
+      <field name="CH0_SRC_DOMAIN" desc="" bitrange="0:0">
+        <value name="AHB0" value="0x0" desc=""/>
+        <value name="AHB1" value="0x1" desc=""/>
+      </field>
     </reg>
   </dev>
   <dev name="ADC" long_name="ADC" desc="4 channels 10-bit SAR A/D converter" version="1.0">
@@ -183,21 +276,21 @@
   </dev>
   <dev name="DWDMA" long_name="DMA Controller" desc="DMA Controller" version="1.0">
     <addr name="DWDMA" addr="0x186f0000"/>
-    <reg name="DWDMA_SARn" desc="">
+    <reg name="DWDMA_SARn" desc="Source address register">
       <formula string="n*0x58+0x00"/>
       <addr name="SAR0" addr="0x0"/>
       <addr name="SAR1" addr="0x58"/>
       <addr name="SAR2" addr="0xb0"/>
       <addr name="SAR3" addr="0x108"/>
     </reg>
-    <reg name="DWDMA_DARn" desc="">
+    <reg name="DWDMA_DARn" desc="Destination address register">
       <formula string="n*0x58+0x08"/>
       <addr name="DAR0" addr="0x8"/>
       <addr name="DAR1" addr="0x60"/>
       <addr name="DAR2" addr="0xb8"/>
       <addr name="DAR3" addr="0x110"/>
     </reg>
-    <reg name="DWDMA_LLPn" desc="">
+    <reg name="DWDMA_LLPn" desc="Linked List pointer register">
       <formula string="n*0x58+0x10"/>
       <addr name="LLP0" addr="0x10"/>
       <addr name="LLP1" addr="0x68"/>
@@ -210,6 +303,61 @@
       <addr name="CTL_L1" addr="0x70"/>
       <addr name="CTL_L2" addr="0xc8"/>
       <addr name="CTL_L3" addr="0x120"/>
+      <field name="RESERVED31_29" desc="" bitrange="31:29"/>
+      <field name="LLP_SRC_EN" desc="" bitrange="28:28"/>
+      <field name="LLP_DST_EN" desc="" bitrange="27:27"/>
+      <field name="SMS" desc="" bitrange="26:25"/>
+      <field name="DMS" desc="" bitrange="24:23"/>
+      <field name="TT_FC" desc="" bitrange="22:20">
+        <value name="MEM2MEM" value="0x0" desc="flow controller DWDMA_AHB_DMAC"/>
+        <value name="MEM2PERI" value="0x1" desc="flow controller DWDMA_AHB_DMAC"/>
+        <value name="PERI2MEM" value="0x2" desc="flow controller DWDMA_AHB_DMAC"/>
+        <value name="PERI2PERI" value="0x3" desc="flow controller DWDMA_AHB_DMAC"/>
+        <value name="PERI2MEM" value="0x4" desc="flow controller Peripheral"/>
+        <value name="PERI2PERI" value="0x5" desc="flow controller Source Peripheral"/>
+        <value name="MEM2PERI" value="0x6" desc="flow controller Peripheral"/>
+        <value name="PERI2PERI" value="0x7" desc="flow controller Destination Peripheral"/>
+      </field>
+      <field name="RESERVED19" desc="" bitrange="19:19"/>
+      <field name="DST_SCATTER_EN" desc="" bitrange="18:18"/>
+      <field name="SRC_GATHER_EN" desc="" bitrange="17:17"/>
+      <field name="SRC_MSIZE" desc="Number of data items to be transferred (of width CTLx.SRC_TR_WIDTH or CTLx.DST_TR_WIDTH)&#10;" bitrange="16:14">
+        <value name="1" value="0x0" desc=""/>
+        <value name="4" value="0x1" desc=""/>
+        <value name="8" value="0x2" desc=""/>
+        <value name="16" value="0x3" desc=""/>
+        <value name="32" value="0x4" desc=""/>
+      </field>
+      <field name="DST_MSIZE" desc="" bitrange="13:11">
+        <value name="1" value="0x0" desc=""/>
+        <value name="4" value="0x1" desc=""/>
+        <value name="8" value="0x2" desc=""/>
+        <value name="16" value="0x3" desc=""/>
+        <value name="32" value="0x4" desc=""/>
+      </field>
+      <field name="SINC" desc="Source Address Increment." bitrange="10:9">
+        <value name="INCREMENT" value="0x0" desc=""/>
+        <value name="DECREMENT" value="0x1" desc=""/>
+        <value name="FIXED" value="0x2" desc=""/>
+        <value name="FIXED" value="0x3" desc=""/>
+      </field>
+      <field name="DINC" desc="" bitrange="8:7">
+        <value name="INCREMENT" value="0x0" desc=""/>
+        <value name="DECREMENT" value="0x1" desc=""/>
+        <value name="FIXED" value="0x2" desc=""/>
+        <value name="FIXED" value="0x3" desc=""/>
+      </field>
+      <field name="SRC_TR_WIDTH" desc="" bitrange="6:4">
+        <value name="BYTE" value="0x0" desc=""/>
+        <value name="HALFWORD" value="0x1" desc=""/>
+        <value name="WORD" value="0x2" desc=""/>
+      </field>
+      <field name="DST_TR_WIDTH" desc="" bitrange="3:1">
+        <value name="BYTE" value="0x0" desc=""/>
+        <value name="HALFWORD" value="0x1" desc=""/>
+        <value name="WORD" value="0x2" desc=""/>
+      </field>
+      <field name="INT_EN" desc="" bitrange="0:0"/>
     </reg>
     <reg name="DWDMA_CTL_Hn" desc="">
       <formula string="n*0x58+0x1c"/>
@@ -217,6 +365,9 @@
       <addr name="CTL_H1" addr="0x74"/>
       <addr name="CTL_H2" addr="0xcc"/>
       <addr name="CTL_H3" addr="0x124"/>
+      <field name="RESERVED31_13" desc="" bitrange="31:13"/>
+      <field name="DONE" desc="" bitrange="12:12"/>
+      <field name="BLOCK_TS" desc="" bitrange="12:0"/>
     </reg>
     <reg name="DWDMA_SSTATn" desc="">
       <formula string="n*0x58+0x20"/>
@@ -252,6 +403,38 @@
       <addr name="CFG_L1" addr="0x98"/>
       <addr name="CFG_L2" addr="0xf0"/>
       <addr name="CFG_L3" addr="0x148"/>
+      <field name="RELOAD_DST" desc="" bitrange="31:31"/>
+      <field name="CH_SUSP" desc="" bitrange="31:0">
+        <value name="SUSPEND" value="0x1" desc=""/>
+      </field>
+      <field name="RELOAD_SRC" desc="" bitrange="30:30"/>
+      <field name="MAX_ABRST" desc="" bitrange="29:20"/>
+      <field name="SRC_HS_POL" desc="Source Handshaking Interface Polarity." bitrange="19:19">
+        <value name="ACTIVE_HIGH" value="0x0" desc=""/>
+        <value name="ACTIVE_LOW" value="0x1" desc=""/>
+      </field>
+      <field name="DST_HS_POL" desc="Destination Handshaking Interface Polarity." bitrange="18:18">
+        <value name="ACTIVE_HIGH" value="0x0" desc=""/>
+        <value name="ACTIVE_LOW" value="0x1" desc=""/>
+      </field>
+      <field name="LOCK_B" desc="" bitrange="17:17"/>
+      <field name="LOCK_CH" desc="" bitrange="16:16"/>
+      <field name="LOCK_B_L" desc="" bitrange="15:14"/>
+      <field name="LOCK_CH_L" desc="" bitrange="13:12"/>
+      <field name="HS_SEL_SRC" desc="" bitrange="11:11">
+        <value name="HW" value="0x0" desc=""/>
+        <value name="SW" value="0x1" desc=""/>
+      </field>
+      <field name="HS_SEL_DST" desc="" bitrange="10:10">
+        <value name="HW" value="0x0" desc=""/>
+        <value name="SW" value="0x1" desc=""/>
+      </field>
+      <field name="FIFO_EMPTY" desc="Indicates if there is data left in the channel FIFO." bitrange="9:9">
+        <value name="NOT_EMPTY" value="0x0" desc=""/>
+        <value name="EMPTY" value="0x1" desc=""/>
+      </field>
+      <field name="CH_PRIOR" desc="Channel priority. A priority of 7 is the highest priority, and 0 is the lowest.&#10;" bitrange="7:5"/>
+      <field name="RESERVED4_0" desc="" bitrange="4:0"/>
     </reg>
     <reg name="DWDMA_CFG_Hn" desc="">
       <formula string="n*0x58+0x44"/>
@@ -260,7 +443,7 @@
       <addr name="CFG_H2" addr="0xf4"/>
       <addr name="CFG_H3" addr="0x14c"/>
     </reg>
-    <reg name="DWDMA_SGRn" desc="">
+    <reg name="DWDMA_SGRn" desc="Source Gather Register">
       <formula string="n*0x58+0x48"/>
       <addr name="SGR0" addr="0x48"/>
       <addr name="SGR1" addr="0xa0"/>
@@ -357,9 +540,28 @@
     </reg>
     <reg name="DMA_CFG" desc="">
       <addr name="DMA_CFG" addr="0x398"/>
+      <field name="RESERVED31_1" desc="" bitrange="31:1"/>
+      <field name="DMA_EN" desc="Global DMA enable." bitrange="0:0">
+        <value name="DISABLE" value="0x0" desc=""/>
+        <value name="ENABLE" value="0x1" desc=""/>
+      </field>
     </reg>
-    <reg name="DMA_CHEN" desc="">
+    <reg name="DMA_CHEN" desc="Channel enable register.">
       <addr name="DMA_CHEN" addr="0x3a0"/>
+      <field name="RESERVED_31_12" desc="" bitrange="31:12"/>
+      <field name="CHANNEL_EN_WR_EN" desc="Channel enable write enable." bitrange="11:8">
+        <value name="CH0_EN_WR_EN" value="0x1" desc=""/>
+        <value name="CH1_EN_WR_EN" value="0x2" desc=""/>
+        <value name="CH2_EN_WR_EN" value="0x4" desc=""/>
+        <value name="CH3_EN_WR_EN" value="0x8" desc=""/>
+      </field>
+      <field name="RESERVED7_4" desc="" bitrange="7:4"/>
+      <field name="CHANNEL_EN" desc="" bitrange="3:0">
+        <value name="CH0_EN" value="0x1" desc=""/>
+        <value name="CH1_EN" value="0x2" desc=""/>
+        <value name="CH2_EN" value="0x4" desc=""/>
+        <value name="CH3_EN" value="0x8" desc=""/>
+      </field>
     </reg>
   </dev>
   <dev name="GPIO" long_name="GPIO" desc="GPIO" version="1.0">
@@ -508,46 +710,32 @@
   </dev>
   <dev name="HDMA" long_name="AHB DMA" desc="AHB DMA" version="1.0">
     <addr name="HDMA" addr="0x18090000"/>
-    <reg name="CON0" desc="">
+    <reg name="CON" desc="">
       <addr name="CON0" addr="0x0"/>
-    </reg>
-    <reg name="CON1" desc="">
       <addr name="CON1" addr="0x4"/>
     </reg>
-    <reg name="ISRC0" desc="">
+    <reg name="ISRC" desc="">
       <addr name="ISRC0" addr="0x8"/>
-    </reg>
-    <reg name="IDST0" desc="">
-      <addr name="IDST0" addr="0xc"/>
-    </reg>
-    <reg name="ICNT0" desc="">
-      <addr name="ICNT0" addr="0x10"/>
-    </reg>
-    <reg name="ISRC1" desc="">
       <addr name="ISRC1" addr="0x14"/>
     </reg>
-    <reg name="IDST1" desc="">
+    <reg name="IDST" desc="">
+      <addr name="IDST0" addr="0xc"/>
       <addr name="IDST1" addr="0x18"/>
     </reg>
-    <reg name="ICNT1" desc="">
+    <reg name="ICNT" desc="">
+      <addr name="ICNT0" addr="0x10"/>
       <addr name="ICNT1" addr="0x1c"/>
     </reg>
-    <reg name="CSRC0" desc="">
+    <reg name="CSRC" desc="">
       <addr name="CSRC0" addr="0x20"/>
-    </reg>
-    <reg name="CDST0" desc="">
-      <addr name="CDST0" addr="0x24"/>
-    </reg>
-    <reg name="CCNT0" desc="">
-      <addr name="CCNT0" addr="0x28"/>
-    </reg>
-    <reg name="CSRC1" desc="">
       <addr name="CSRC1" addr="0x2c"/>
     </reg>
-    <reg name="CDST1" desc="">
+    <reg name="CDST" desc="">
+      <addr name="CDST0" addr="0x24"/>
       <addr name="CDST1" addr="0x30"/>
     </reg>
-    <reg name="CCNT1" desc="">
+    <reg name="CCNT" desc="">
+      <addr name="CCNT0" addr="0x28"/>
       <addr name="CCNT1" addr="0x34"/>
     </reg>
     <reg name="ISR" desc="">
@@ -556,46 +744,32 @@
     <reg name="DSR" desc="">
       <addr name="DSR" addr="0x3c"/>
     </reg>
-    <reg name="ISCNT0" desc="">
+    <reg name="ISCNT" desc="">
       <addr name="ISCNT0" addr="0x40"/>
-    </reg>
-    <reg name="IPNCNTD0" desc="">
-      <addr name="IPNCNTD0" addr="0x44"/>
-    </reg>
-    <reg name="IADDR_BS0" desc="">
-      <addr name="IADDR_BS0" addr="0x48"/>
-    </reg>
-    <reg name="ISCNT1" desc="">
       <addr name="ISCNT1" addr="0x4c"/>
     </reg>
-    <reg name="IPNCNTD1" desc="">
+    <reg name="IPNCNTD" desc="">
+      <addr name="IPNCNTD0" addr="0x44"/>
       <addr name="IPNCNTD1" addr="0x50"/>
     </reg>
-    <reg name="IADDR_BS1" desc="">
-      <addr name="IADDR_BS1" addr="0x54"/>
+    <reg name="IADDR_BS" desc="">
+      <addr name="IADDR_BS0" addr="0x48"/>
+      <addr name="IADDR_BS0" addr="0x54"/>
     </reg>
-    <reg name="CSCNT0" desc="">
+    <reg name="CSCNT" desc="">
       <addr name="CSCNT0" addr="0x58"/>
+      <addr name="CSCNT0" addr="0x64"/>
     </reg>
-    <reg name="CPNCNTD0" desc="">
+    <reg name="CPNCNTD" desc="">
       <addr name="CPNCNTD0" addr="0x5c"/>
-    </reg>
-    <reg name="CADDR_BS0" desc="">
-      <addr name="CADDR_BS0" addr="0x60"/>
-    </reg>
-    <reg name="CSCNT1" desc="">
-      <addr name="CSCNT1" addr="0x64"/>
-    </reg>
-    <reg name="CPNCNTD1" desc="">
       <addr name="CPNCNTD1" addr="0x68"/>
     </reg>
-    <reg name="CADDR_BS1" desc="">
+    <reg name="CADDR_BS" desc="">
+      <addr name="CADDR_BS0" addr="0x60"/>
       <addr name="CADDR_BS1" addr="0x6c"/>
     </reg>
-    <reg name="PACNT0" desc="">
+    <reg name="PACNT" desc="">
       <addr name="PACNT0" addr="0x70"/>
-    </reg>
-    <reg name="PACNT1" desc="">
       <addr name="PACNT1" addr="0x74"/>
     </reg>
   </dev>
@@ -654,27 +828,137 @@
     <addr name="I2S" addr="0x18028000"/>
     <reg name="OPR" desc="">
       <addr name="OPR" addr="0x0"/>
+      <field name="I2S_VERSION" desc="" bitrange="31:24"/>
+      <field name="RESERVED23_18" desc="" bitrange="23:18"/>
+      <field name="TX_RESET" desc="" bitrange="17:17"/>
+      <field name="RX_RESET" desc="" bitrange="16:16"/>
+      <field name="RESERVED15_7" desc="" bitrange="15:7"/>
+      <field name="HDMA_REQ1_DIS" desc="" bitrange="6:6">
+        <value name="ENABLE" value="0x0" desc=""/>
+        <value name="DISABLE" value="0x1" desc="HDMA REQ1 Always 1&#10;"/>
+      </field>
+      <field name="HDMA_REQ2_DIS" desc="" bitrange="5:5">
+        <value name="ENABLE" value="0x0" desc=""/>
+        <value name="DISABLE" value="0x1" desc="HDMA REQ2 Always 1"/>
+      </field>
+      <field name="HDMA_REQ1_CH" desc="This bit is to indicate the Hardware DMA IF1 is used for which FIFO&#10;" bitrange="4:4">
+        <value name="TX_FIFO" value="0x0" desc=""/>
+        <value name="RX_FIFO" value="0x1" desc=""/>
+      </field>
+      <field name="HDMA_REQ2_CH" desc="his bit is to indicate the Hardware DMA IF2 is used for which FIFO" bitrange="3:3">
+        <value name="TX_FIFO" value="0x0" desc=""/>
+        <value name="RX_FIFO" value="0x1" desc=""/>
+      </field>
+      <field name="I2S_LOOPBACK" desc="" bitrange="2:2">
+        <value name="NORMAL" value="0x0" desc=""/>
+        <value name="LOOPBACK" value="0x1" desc=""/>
+      </field>
+      <field name="I2S_TX_START" desc="" bitrange="1:1"/>
+      <field name="I2S_RX_START" desc="" bitrange="0:0"/>
     </reg>
-    <reg name="TXR" desc="">
+    <reg name="TXR" desc="I2S transmit FIFO">
       <addr name="TXR" addr="0x4"/>
     </reg>
-    <reg name="RXR" desc="">
+    <reg name="RXR" desc="I2S receive FIFO">
       <addr name="RXR" addr="0x8"/>
     </reg>
     <reg name="TXCTL" desc="">
       <addr name="TXCTL" addr="0xc"/>
+      <field name="RESERVED31_18" desc="" bitrange="31:18"/>
+      <field name="OVERSAMPLING" desc="Oversampling rate = LRCK / SCLK" bitrange="17:16">
+        <value name="32FS" value="0x0" desc=""/>
+        <value name="64FS" value="0x1" desc=""/>
+        <value name="128FS" value="0x2" desc=""/>
+        <value name="RESERVED" value="0x3" desc=""/>
+      </field>
+      <field name="MCLK_DIV" desc="" bitrange="15:8"/>
+      <field name="RESERVED7_6" desc="" bitrange="7:6"/>
+      <field name="SAMPLE_WIDTH" desc="" bitrange="5:4">
+        <value name="8BITS" value="0x0" desc=""/>
+        <value name="16BITS" value="0x1" desc=""/>
+      </field>
+      <field name="MONO_STEREO" desc="When the bit is set to 1, transmitter is at Mono mode and data output from left channel.&#10;" bitrange="3:3">
+        <value name="STEREO" value="0x0" desc=""/>
+        <value name="MONO" value="0x1" desc=""/>
+      </field>
+      <field name="IF_MODE" desc="" bitrange="2:1">
+        <value name="I2S" value="0x0" desc=""/>
+        <value name="LEFT_JUSTIFIED" value="0x1" desc=""/>
+        <value name="RIGHT_JUSTIFIED" value="0x2" desc=""/>
+      </field>
+      <field name="MASTER_SLAVE" desc="This bit decides that transmitter acts as a master or slave.&#10;" bitrange="0:0">
+        <value name="SLAVE" value="0x0" desc=""/>
+        <value name="MASTER" value="0x0" desc=""/>
+      </field>
     </reg>
     <reg name="RXCTL" desc="">
       <addr name="RXCTL" addr="0x10"/>
+      <field name="RESERVED31_25" desc="" bitrange="31:25"/>
+      <field name="RX_FIFO_RESET" desc="" bitrange="24:24"/>
+      <field name="RESERVED23_18" desc="" bitrange="23:18"/>
+      <field name="OVERSAMPLING" desc="Oversampling rate = LRCK / SCLK" bitrange="17:16">
+        <value name="32fs" value="0x0" desc=""/>
+        <value name="64fs" value="0x1" desc=""/>
+        <value name="128fs" value="0x2" desc=""/>
+      </field>
+      <field name="MCLK_DIV" desc="" bitrange="15:8"/>
+      <field name="RESERVED7_6" desc="" bitrange="7:6"/>
+      <field name="SAMPLE_WIDTH" desc="" bitrange="5:4">
+        <value name="8BITS" value="0x0" desc=""/>
+        <value name="16BITS" value="0x1" desc=""/>
+      </field>
+      <field name="MONO_STEREO" desc="" bitrange="3:3">
+        <value name="STEREO" value="0x0" desc=""/>
+        <value name="MONO" value="0x1" desc=""/>
+      </field>
+      <field name="IF_MODE" desc="" bitrange="2:1">
+        <value name="I2S" value="0x0" desc=""/>
+        <value name="LEFT_JUSTIFIED" value="0x1" desc=""/>
+        <value name="RIGHT_JUSTIFIED" value="0x2" desc=""/>
+      </field>
+      <field name="MASTER_SLAVE" desc="" bitrange="0:0">
+        <value name="MASTER" value="0x0" desc=""/>
+        <value name="SLAVE" value="0x1" desc=""/>
+      </field>
     </reg>
-    <reg name="FIFOSTS" desc="">
+    <reg name="FIFOSTS" desc="his register shows FIFO status and interrupts trigger level.">
       <addr name="FIFOSTS" addr="0x14"/>
+      <field name="RESERVED" desc="" bitrange="31:20"/>
+      <field name="TX_INT_TRIG" desc="Tx interrupt trigger level." bitrange="19:18">
+        <value name="ALMOST_EMPTY" value="0x0" desc=""/>
+        <value name="HALF_FULL" value="0x1" desc=""/>
+        <value name="ALMOST_FULL" value="0x2" desc=""/>
+      </field>
+      <field name="RX_INT_TRIG" desc="Rx interrupt trigger level." bitrange="17:16">
+        <value name="ALMOST_EMPTY" value="0x0" desc=""/>
+        <value name="HALF_FULL" value="0x1" desc=""/>
+        <value name="ALMOST_FULL" value="0x2" desc=""/>
+      </field>
+      <field name="RESERVED15_10" desc="" bitrange="15:10"/>
+      <field name="TX_FIFO_HALF" desc="" bitrange="9:9"/>
+      <field name="RX_FIFO_HALF" desc="" bitrange="8:8"/>
+      <field name="TX_FIFO_ALMOST_FULL" desc="" bitrange="7:7"/>
+      <field name="TX_FIFO_ALMOST_EMPTY" desc="" bitrange="6:6"/>
+      <field name="RX_FIFO_ALMOST_FULL" desc="" bitrange="5:5"/>
+      <field name="RX_FIFO_ALMOST_EMPTY" desc="" bitrange="4:4"/>
+      <field name="TX_FIFO_FULL" desc="" bitrange="3:3"/>
+      <field name="TX_FIFO_EMPTY" desc="" bitrange="2:2"/>
+      <field name="RX_FIFO_FULL" desc="" bitrange="1:1"/>
+      <field name="RX_FIFO_EMPTY" desc="" bitrange="0:0"/>
     </reg>
     <reg name="IER" desc="">
       <addr name="IER" addr="0x18"/>
+      <field name="RESERVED31_3" desc="" bitrange="31:3"/>
+      <field name="TX_FIFO_LEVEL_EN" desc="This bit enables the interrupt when Tx FIFO trigger level is reached." bitrange="2:2"/>
+      <field name="RX_FIFO_LEVEL_EN" desc="This bit enables the interrupt when Rx FIFO trigger level is reached." bitrange="1:1"/>
+      <field name="RX_FIFO_OVERRUN_EN" desc="This bit enables the interrupt when Rx FIFO overrun condition occurred." bitrange="0:0"/>
     </reg>
-    <reg name="ISR" desc="">
+    <reg name="ISR" desc="I2S interrupt status register">
       <addr name="ISR" addr="0x1c"/>
+      <field name="RESERVED31_3" desc="" bitrange="31:3"/>
+      <field name="TX_FIFO_LEVEL_INT" desc="" bitrange="2:2"/>
+      <field name="RX_FIFO_LEVEL_INT" desc="" bitrange="1:1"/>
+      <field name="RX_FIFO_OVERRUN_INT" desc="" bitrange="0:0"/>
     </reg>
   </dev>
   <dev name="INTC" long_name="Interrupt controller" desc="Interrupt controller" version="1.0">
