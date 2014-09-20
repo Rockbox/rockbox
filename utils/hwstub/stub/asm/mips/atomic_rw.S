@@ -20,7 +20,7 @@
 #include "mips.h"
 
     .set noreorder
-    .section   .text, "ax", %progbits
+    .section   .icode, "ax", %progbits
     .global    target_read8
     .type      target_read8, %function
     .global    target_read16

@@ -13,43 +13,22 @@ SECTIONS
 {
   .init.text :
         {
-            _irqbase = .;
             relocstart = .;
             oc_codestart = .;
-            *(.init.text*)
+            KEEP(*(.init.text*))
         } > IRAM
 
-  .exception.text (IRAM_ORIG + 0x200) :
+  .icode :
         {
-            *(.irq_vector*)
-        } > IRAM
-
-  .text :
-	{
-	    *(.text*)
             *(.icode*)
-	} > IRAM
+        } > IRAM
 
   .data :
 	{
             *(.rodata*)
 	    *(.data*)
             *(.rel.dyn)
-            relocend = .;
 	} > IRAM
-
-  .stack (NOLOAD) :
-        {
-            . = ALIGN(4);
-            stackbegin = .;
-            oc_stackstart = .;
-            . += 0x2000;
-            stackend = .;
-            irqstackbegin = .;
-            . += 0x400;
-            irqstackend = .;
-            oc_stackend = .;
-        } > IRAM
 
   .bss (NOLOAD) :
 	{
@@ -58,10 +37,53 @@ SECTIONS
 	    *(.bss*)
 	    *(COMMON)
             *(.scommon*)
+            . = ALIGN(4);
             bssend = .;
-            oc_codeend = .;
-            oc_bufferstart = .;
 	} > IRAM
+
+  .exception.tlb_refill (IRAM_ORIG + 0x1000) :
+        {
+            _irqbase = .;
+            KEEP(*(.exception.tlb_refill))
+        } > IRAM
+
+  .exception.cache_error (IRAM_ORIG + 0x1100) :
+        {
+            KEEP(*(.exception.cache_error))
+        } > IRAM
+
+  .exception.general_exception (IRAM_ORIG + 0x1180) :
+        {
+            KEEP(*(.exception.general_exception))
+        } > IRAM
+
+  .exception.irq (IRAM_ORIG + 0x1200) :
+        {
+            KEEP(*(.exception.irq))
+        } > IRAM
+
+  .text :
+	{
+	    *(.text*)
+            . = ALIGN(16);
+            relocend = .;
+	} > IRAM
+
+  .stack (NOLOAD) :
+        {
+            . = ALIGN(4);
+            stackbegin = .;
+            oc_codeend = .;
+            oc_stackstart = .;
+            . += 0x2000;
+            stackend = .;
+
+            irqstackbegin = .;
+            . += 0x400;
+            irqstackend = .;
+            oc_stackend = .;
+            oc_bufferstart = .;
+        } > IRAM
 
   .end IRAM_ORIG+IRAM_SIZE (NOLOAD) :
   {
