@@ -107,7 +107,7 @@ core_irq_setup:
     mtc0    t1, C0_CAUSE       # DC=1, IV=1
     mtc0    zero,C0_INTCTL     # VS = 0
 
-    # clear bss
+clear_bss:
     la t0, bssbegin
     la t1, bssend
     beq t0, t1, stack_setup
@@ -119,7 +119,6 @@ clear_bss_loop:
     addiu t0, 4
 
 stack_setup:
-    # setup stack
     la k0, irqstackend
     la sp, stackend
     la t0, stackbegin
@@ -135,8 +134,72 @@ stack_munge_loop:
     jr.hb t0
     ei
 
-    .set at
-    .set reorder
+    .extern data_abort_jmp_ctx_ptr
+    .global tlb_refill_handler
+    .section .exception.tlb_refill,"ax",%progbits
+
+tlb_refill_handler:
+    la k1, data_abort_jmp_ctx_ptr
+    lw s0,  0(k1)
+    lw s1,  4(k1)
+    lw s2,  8(k1)
+    lw s3, 12(k1)
+    lw s4, 16(k1)
+    lw s5, 20(k1)
+    lw s6, 24(k1)
+    lw s7, 28(k1)
+    lw sp, 32(k1)
+    lw s8, 36(k1)
+    lw k1, 40(k1)
+    mtc0 k1, C0_EPC
+    ehb
+    li v0, 1
+    eret
+    nop
+
+    .global cache_error_handler
+    .section .exception.cache_error,"ax",%progbits
+
+cache_error_handler:
+    la k1, data_abort_jmp_ctx_ptr
+    lw s0,  0(k1)
+    lw s1,  4(k1)
+    lw s2,  8(k1)
+    lw s3, 12(k1)
+    lw s4, 16(k1)
+    lw s5, 20(k1)
+    lw s6, 24(k1)
+    lw s7, 28(k1)
+    lw sp, 32(k1)
+    lw s8, 36(k1)
+    lw k1, 40(k1)
+    mtc0 k1, C0_EPC
+    ehb
+    li v0, 1
+    eret
+    nop
+
+    .global general_exception_handler
+    .section .exception.general_exception,"ax",%progbits
+
+general_exception_handler:
+    la k1, data_abort_jmp_ctx_ptr
+    lw s0,  0(k1)
+    lw s1,  4(k1)
+    lw s2,  8(k1)
+    lw s3, 12(k1)
+    lw s4, 16(k1)
+    lw s5, 20(k1)
+    lw s6, 24(k1)
+    lw s7, 28(k1)
+    lw sp, 32(k1)
+    lw s8, 36(k1)
+    lw k1, 40(k1)
+    mtc0 k1, C0_EPC
+    ehb
+    li v0, 1
+    eret
+    nop
 
 /* s0-s7 not saved as this are callee saved registers
  * CO_STATUS is not saved as nested interrupts are not supported
@@ -149,10 +212,7 @@ stack_munge_loop:
     .extern INT_UDC
 
     .global irq_handler
-    .set mips32r2
-    .set noreorder
-    .set noat
-    .section .irq_vector,"ax",%progbits
+    .section .exception.irq,"ax",%progbits
 
 irq_handler:
     move k1, sp
