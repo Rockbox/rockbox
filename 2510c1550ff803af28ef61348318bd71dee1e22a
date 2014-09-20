@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_9cbe0dd3",
+        "filename": "apps/plugins/periodic_table.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000220
+      },
+      "writtenOn": "2014-09-20T06:12:32Z",
+      "side": 1,
+      "message": "This is a much cleaner patch now.  Have you tested it on the sim for grey scale targets?",
+      "revId": "2510c1550ff803af28ef61348318bd71dee1e22a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_fcb3c108",
+        "filename": "apps/plugins/periodic_table.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1000220
+      },
+      "writtenOn": "2014-09-20T06:12:32Z",
+      "side": 1,
+      "message": "These make better sense while navigating, now",
+      "revId": "2510c1550ff803af28ef61348318bd71dee1e22a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_dcb885e8",
+        "filename": "apps/plugins/periodic_table.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 1000220
+      },
+      "writtenOn": "2014-09-20T06:12:32Z",
+      "side": 1,
+      "message": "Yes much cleaner and navigation is simplified +1",
+      "revId": "2510c1550ff803af28ef61348318bd71dee1e22a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
