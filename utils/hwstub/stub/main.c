@@ -26,6 +26,7 @@
 #include "usb_drv.h"
 #include "memory.h"
 #include "target.h"
+#include "system.h"
 
 extern unsigned char oc_codestart[];
 extern unsigned char oc_codeend[];
@@ -377,12 +378,21 @@ static void handle_read(struct usb_ctrlrequest *req)
     {
         if(id != last_id)
             return usb_drv_stall(EP_CONTROL, true, true);
-        memcpy(usb_buffer, (void *)last_addr, req->wLength);
-        asm volatile("nop" : : : "memory");
-        usb_drv_send(EP_CONTROL, usb_buffer, req->wLength);
-        usb_drv_recv(EP_CONTROL, NULL, 0);
+        if(set_data_abort_jmp() == 0)
+        {
+            memcpy(usb_buffer, (void *)last_addr, req->wLength);
+            asm volatile("nop" : : : "memory");
+            usb_drv_send(EP_CONTROL, usb_buffer, req->wLength);
+            usb_drv_recv(EP_CONTROL, NULL, 0);
+        }
+        else
+        {
+            logf("trapped read data abort in [0x%x,0x%x]\n", last_addr,
+                last_addr + req->wLength);
+            usb_drv_stall(EP_CONTROL, true, true);
+        }
     }
-};
+}
 
 static void handle_write(struct usb_ctrlrequest *req)
 {
@@ -392,8 +402,17 @@ static void handle_write(struct usb_ctrlrequest *req)
     int sz_hdr = sizeof(struct hwstub_write_req_t);
     if(size < sz_hdr)
         return usb_drv_stall(EP_CONTROL, true, true);
-    memcpy((void *)write->dAddress, usb_buffer + sz_hdr, size - sz_hdr);
-    usb_drv_send(EP_CONTROL, NULL, 0);
+    if(set_data_abort_jmp() == 0)
+    {
+        memcpy((void *)write->dAddress, usb_buffer + sz_hdr, size - sz_hdr);
+        usb_drv_send(EP_CONTROL, NULL, 0);
+    }
+    else
+    {
+        logf("trapped write data abort in [0x%x,0x%x]\n", write->dAddress,
+                write->dAddress + size - sz_hdr);
+        usb_drv_stall(EP_CONTROL, true, true);
+    }
 }
 
 static void handle_exec(struct usb_ctrlrequest *req)

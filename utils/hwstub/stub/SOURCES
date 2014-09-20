@@ -2,6 +2,7 @@
 asm/arm/memcpy.S
 asm/arm/memmove.S
 asm/arm/memset.S
+asm/arm/system.S
 #endif
 main.c
 logf.c

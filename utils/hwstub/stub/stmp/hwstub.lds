@@ -38,6 +38,7 @@ SECTIONS
     {
         _copystart = .;
         oc_codestart = .;
+        *(.vectors);
         *(.text*)
         *(.icode*)
         *(.data*)
