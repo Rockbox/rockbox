@@ -3,6 +3,7 @@ asm/arm/memcpy.S
 asm/arm/memmove.S
 asm/arm/memset.S
 asm/arm/atomic_rw.S
+asm/arm/system.S
 #elif defined(CPU_MIPS)
 asm/mips/memcpy.S
 asm/mips/memset.S
