@@ -38,6 +38,7 @@ SECTIONS
     {
         _copystart = .;
         oc_codestart = .;
+        *(.vectors);
         *(.text*)
         *(.icode*)
         *(.data*)
@@ -58,6 +59,9 @@ SECTIONS
         oc_stackstart = .;
         . += STACK_SIZE;
         oc_stackend = .;
+        oc_abortstackstart = .;
+        . += 0x100;
+        oc_abortstackend = .;
         oc_bufferstart = .;
     } > OCRAM
 
