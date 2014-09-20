@@ -114,5 +114,7 @@ static inline int disable_interrupt_save(int mask)
     return cpsr;
 }
 
+int set_data_abort_jmp(void);
+
 #endif /* __HWSTUB_SYSTEM__ */
  

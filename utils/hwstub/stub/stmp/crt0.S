@@ -1,10 +1,29 @@
+.section .vectors,"ax",%progbits
+.code 32
+    /* most handlers are in DRAM which is too far away for a relative jump */
+    b   start
+    b   start
+    b   start
+    b   start
+    b   data_abort_handler
+    b   start
+    b   start
+    b   start
+
 .section    .text,"ax",%progbits
 .code       32
 .align      0x04
 .global     start
 start:
+    /* Save running address */
     sub     r7, pc, #8 /* Copy running address */
-    msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
+    /* adjust the offset between start and beginning of the binary */
+    ldr     r0, =_copystart
+    ldr     r1, =start
+    add     r7, r0
+    sub     r7, r1
+    /* enter supervisor mode, disable IRQ/FIQ */
+    msr     cpsr_c, #0xd3
     /* The stub could be located at a virtual address so killing the MMU at
      * this point would be mere suicide. We assume that the remap location
      * is identically mapped and kill the MMU after the copy */
@@ -37,6 +56,9 @@ remap:
     cmp     r3, r2
     strhi   r4, [r2], #4
     bhi     1b
+    /* NOTE: we don't need an abort stack */
+    /* Switch to sys mode */
+    msr     cpsr_c, #0xdf
     /* jump to C code */
     ldr     sp, =oc_stackend
     b       main

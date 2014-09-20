@@ -26,6 +26,7 @@
 #include "usb_drv.h"
 #include "memory.h"
 #include "target.h"
+#include "system.h"
 
 extern unsigned char oc_codestart[];
 extern unsigned char oc_codeend[];
@@ -420,18 +421,41 @@ static void handle_read(struct usb_ctrlrequest *req)
     {
         if(id != last_id)
             return usb_drv_stall(EP_CONTROL, true, true);
+
         if(req->bRequest == HWSTUB_READ2_ATOMIC)
         {
-            if(!read_atomic(usb_buffer, (void *)last_addr, req->wLength))
+            if(set_data_abort_jmp() == 0)
+            {
+                if(!read_atomic(usb_buffer, (void *)last_addr, req->wLength))
+                    return usb_drv_stall(EP_CONTROL, true, true);
+            }
+            else
+            {
+                logf("trapped read data abort in [0x%x,0x%x]\n", last_addr,
+                    last_addr + req->wLength);
                 return usb_drv_stall(EP_CONTROL, true, true);
+            }
         }
         else
-            memcpy(usb_buffer, (void *)last_addr, req->wLength);
-        asm volatile("nop" : : : "memory");
+        {
+            if(set_data_abort_jmp() == 0)
+            {
+                memcpy(usb_buffer, (void *)last_addr, req->wLength);
+                asm volatile("nop" : : : "memory");
+            }
+            else
+            {
+                logf("trapped read data abort in [0x%x,0x%x]\n", last_addr,
+                    last_addr + req->wLength);
+                return usb_drv_stall(EP_CONTROL, true, true);
+            }
+
+        }
+
         usb_drv_send(EP_CONTROL, usb_buffer, req->wLength);
         usb_drv_recv(EP_CONTROL, NULL, 0);
     }
-};
+}
 
 static bool write_atomic(void *dst, void *src, size_t sz)
 {
@@ -452,13 +476,37 @@ static void handle_write(struct usb_ctrlrequest *req)
     int sz_hdr = sizeof(struct hwstub_write_req_t);
     if(size < sz_hdr)
         return usb_drv_stall(EP_CONTROL, true, true);
+
     if(req->bRequest == HWSTUB_WRITE_ATOMIC)
     {
-        if(!write_atomic((void *)write->dAddress, usb_buffer + sz_hdr, size - sz_hdr))
+        if(set_data_abort_jmp() == 0)
+        {
+            if(!write_atomic((void *)write->dAddress,
+                             usb_buffer + sz_hdr, size - sz_hdr))
+                return usb_drv_stall(EP_CONTROL, true, true);
+        }
+        else
+        {
+            logf("trapped write data abort in [0x%x,0x%x]\n", write->dAddress,
+                 write->dAddress + size - sz_hdr);
             return usb_drv_stall(EP_CONTROL, true, true);
+        }
     }
     else
-        memcpy((void *)write->dAddress, usb_buffer + sz_hdr, size - sz_hdr);
+    {
+        if(set_data_abort_jmp() == 0)
+        {
+            memcpy((void *)write->dAddress,
+                   usb_buffer + sz_hdr, size - sz_hdr);
+        }
+        else
+        {
+            logf("trapped write data abort in [0x%x,0x%x]\n", write->dAddress,
+                 write->dAddress + size - sz_hdr);
+            return usb_drv_stall(EP_CONTROL, true, true);
+        }
+    }
+
     usb_drv_send(EP_CONTROL, NULL, 0);
 }
 

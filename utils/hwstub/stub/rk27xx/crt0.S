@@ -31,7 +31,7 @@
     ldr     pc, =start
     ldr     pc, =start
     ldr     pc, =start
-    ldr     pc, =start
+    ldr     pc, =data_abort_handler
     ldr     pc, =start
     ldr     pc, =irq_handler
     ldr     pc, =start
