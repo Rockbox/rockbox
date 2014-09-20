@@ -1,10 +1,29 @@
+.section .vectors,"ax",%progbits
+.code 32
+    /* most handlers are in DRAM which is too far away for a relative jump */
+    b   start
+    b   start
+    b   start
+    b   start
+    b   data_abort_handler
+    b   start
+    b   start
+    b   start
+
 .section    .text,"ax",%progbits
 .code       32
 .align      0x04
 .global     start
 start:
+    /* Save running address */
     sub     r7, pc, #8 /* Copy running address */
-    msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
+    /* adjust the offset between start and beginning of the binary */
+    ldr     r0, =_copystart
+    ldr     r1, =start
+    add     r7, r0
+    sub     r7, r1
+    /* enter supervisor mode, disable IRQ/FIQ */
+    msr     cpsr_c, #0xd3
     /* The stub could be located at a virtual address so killing the MMU at
      * this point would be mere suicide. We assume that the remap location
      * is identically mapped and kill the MMU after the copy */
@@ -37,6 +56,46 @@ remap:
     cmp     r3, r2
     strhi   r4, [r2], #4
     bhi     1b
+    /* NOTE: we don't need an abort stack */
+    /* Switch to sys mode */
+    msr     cpsr_c, #0xdf
     /* jump to C code */
     ldr     sp, =oc_stackend
     b       main
+
+/* Handling of data abort:
+ * the code can register a "longjmp" buffer to restore the context in case of
+ * fault, otherwise the stub will be restarted */
+.data
+data_abort_jmp_ctx_ptr:
+/* buffer contains in order: cpsr,r4-r11,sp,lr,pc */
+.skip   48 /* = 4 * (cpsr +  11 registers) */
+
+.text
+/* Prototype: int set_data_abort_jmp()
+ * Return: 1 in case of data abort, 0 otherwise */
+.global set_data_abort_jmp
+set_data_abort_jmp:
+    mrs     r2, cpsr
+    ldr     r1, =data_abort_jmp_ctx_ptr
+    mov     r0, #0
+    stmia   r1, {r2,r4-r11,sp,lr,pc} /* see PC note below */
+    bx      lr
+    mov     r0, #1 /* <-- PC points here in stmia */
+    bx      lr
+
+data_abort_handler:
+    /* restore everything from context */
+    ldr     r1, =data_abort_jmp_ctx_ptr
+    /* NOTE: we need to restore sp_sys and lr_sys, for this we need the
+     * LDM  Rn, {}^
+     * variant, but we cannot restore PC from it because ^ has a different
+     * meaning and won't restore user/sys registers. On top of that, the
+     * non-PC ^ variant cannot do the register writeback, so on the PC restore,
+     * we reload all registers once again to avoid manually offseting the base
+     * register, it will trash sp_abt and lr_abr but those are unused anyway
+     * because we do not save the abort address and we don't use an abort stack */
+    ldmia   r1, {r0,r4-r11,sp,lr}^  /* this variant cannot have writeback (r1!) */
+    msr     spsr, r0
+    ldmia   r1, {r0,r4-r11,sp,lr,pc}^ /* reload some registers but we don't care */
+
