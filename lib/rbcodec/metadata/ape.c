@@ -53,7 +53,7 @@ struct apetag_header
 
 struct apetag_item_header 
 {
-    uint32_t length;
+    int32_t length;
     uint32_t flags;
 };
 
