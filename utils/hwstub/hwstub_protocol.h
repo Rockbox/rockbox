@@ -109,6 +109,7 @@ struct hwstub_pp_desc_t
 #define HWSTUB_TARGET_STMP      ('S' | 'T' << 8 | 'M' << 16 | 'P' << 24)
 #define HWSTUB_TARGET_RK27      ('R' | 'K' << 8 | '2' << 16 | '7' << 24)
 #define HWSTUB_TARGET_PP        ('P' | 'P' << 8 | ' ' << 16 | ' ' << 24)
+#define HWSTUB_TARGET_ATJ       ('A' | 'T' << 8 | 'J' << 16 | ' ' << 24)
 
 struct hwstub_target_desc_t
 {

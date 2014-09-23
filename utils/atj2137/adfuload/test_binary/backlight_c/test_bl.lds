@@ -5,7 +5,7 @@ SECTIONS
 {
 
 
-.text 0xa0001000 :
+.text 0x80000000 :
 	{
             relocstart = .;
             *(.init.text*)
@@ -21,6 +21,7 @@ SECTIONS
 
 .bss :
 	{
+            . = ALIGN(4);
             bssbegin = .;
             *(.sbss*)
 	    *(.bss*)
@@ -31,6 +32,7 @@ SECTIONS
 
 .stack (NOLOAD) :
         {
+            . = ALIGN(4);
             stackbegin = .;
             . += 0x2000;
             stackend = .;

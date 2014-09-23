@@ -10,12 +10,12 @@ AS		= $(TOOLCHAIN)as
 OBJCOPY	= $(TOOLCHAIN)objcopy
 OBJDUMP	= $(TOOLCHAIN)objdump
 
-CFLAGS	= -Wundef -march=4kec -nostdlib -Os -c
+CFLAGS	= -Wundef -march=mips32r2 -nostdlib -Os -c
 
 OBJS	= crt0.o test_bl.o
 LDSCRIPT= test_bl.lds
 
-LDFLAGS	= -Wundef -march=4kec -T$(LDSCRIPT) -nostartfiles  \
+LDFLAGS	= -Wundef -march=mips32r2 -T$(LDSCRIPT) -nostartfiles  \
 	-nostdlib -Xlinker -Map=$(TARGET).map
 
 all		: $(TARGET).bin

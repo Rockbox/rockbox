@@ -178,17 +178,17 @@ static void handle_std_dev_desc(struct usb_ctrlrequest *req)
         case USB_DT_OTHER_SPEED_CONFIG:
         case USB_DT_CONFIG:
         {
-            int max_packet_size;
+            /* int max_packet_size; */
 
             /* config desc */
-            if((req->wValue >> 8) ==USB_DT_CONFIG)
+            if((req->wValue >> 8) == USB_DT_CONFIG)
             {
-                max_packet_size = (usb_drv_port_speed() ? 512 : 64);
+                /* max_packet_size = (usb_drv_port_speed() ? 512 : 64); */
                 config_descriptor.bDescriptorType = USB_DT_CONFIG;
             }
             else
             {
-                max_packet_size = (usb_drv_port_speed() ? 64 : 512);
+                /* max_packet_size = (usb_drv_port_speed() ? 64 : 512); */
                 config_descriptor.bDescriptorType = USB_DT_OTHER_SPEED_CONFIG;
             }
             size = sizeof(struct usb_config_descriptor);
@@ -411,9 +411,12 @@ static void handle_exec(struct usb_ctrlrequest *req)
 
     if(exec->bmFlags & HWSTUB_EXEC_CALL)
     {
-#ifdef CPU_ARM
+#if defined(CPU_ARM)
         /* in case of call, respond after return */
         asm volatile("blx %0\n" : : "r"(addr) : "memory");
+        usb_drv_send(EP_CONTROL, NULL, 0);
+#elif defined(CPU_MIPS)
+        asm volatile("jalr %0\nnop\n" : : "r"(addr) : "memory");
         usb_drv_send(EP_CONTROL, NULL, 0);
 #else
 #warning call is unsupported on this platform
@@ -425,9 +428,11 @@ static void handle_exec(struct usb_ctrlrequest *req)
         /* in case of jump, respond immediately and disconnect usb */
         usb_drv_send(EP_CONTROL, NULL, 0);
         usb_drv_exit();
-#ifdef CPU_ARM
+#if defined(CPU_ARM)
         asm volatile("bx %0\n" : : "r" (addr) : "memory");
-#else
+#elif defined(CPU_MIPS)
+        asm volatile("jr %0\nnop\n" : : "r" (addr) : "memory");
+#else 
 #warning jump is unsupported on this platform
         usb_drv_stall(EP_CONTROL, true, true);
 #endif
