@@ -1,0 +1,220 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ *
+ * Copyright (C) 2014 by Marcin Bukat
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+#include "usb_drv.h"
+#include "config.h"
+#include "memory.h"
+#include "target.h"
+#include "atj213x.h"
+
+#define USB_FULL_SPEED 0
+#define USB_HIGH_SPEED 1
+
+volatile bool setup_data_valid = false;
+volatile int udc_speed = USB_FULL_SPEED;
+
+void INT_UDC(void)
+{
+    /* get possible sources */
+    unsigned int usbirq = OTG_USBIRQ;
+    unsigned int epinirq = OTG_IN04IRQ;
+    unsigned int epoutirq = OTG_OUT04IRQ;
+    unsigned int otgirq = OTG_OTGIRQ;
+    unsigned int usbeirq = OTG_USBEIRQ;
+
+    /* HS, Reset, Setup */
+    if (usbirq)
+    {
+
+        if (usbirq & (1<<5))
+        {
+            /* HS irq */
+            udc_speed = USB_HIGH_SPEED;
+        }
+        else if (usbirq & (1<<4))
+        {
+            /* Reset */
+            udc_speed = USB_FULL_SPEED;
+            
+            /* clear all pending irqs */
+            OTG_OUT04IRQ = 0xff;
+            OTG_IN04IRQ = 0xff;
+
+            /* flush all fifos */
+        }
+        else if (usbirq & (1<<0))
+        {
+            /* Setup data valid */
+            setup_data_valid = true;
+        }
+
+        /* clear irq flags */
+        OTG_USBIRQ = usbirq;        
+    }
+
+    if (epoutirq)
+    {
+        OTG_OUT04IRQ = epoutirq;
+    }
+
+    if (epinirq)
+    {
+blink(1);
+        OTG_IN04IRQ = epinirq;
+    }
+
+    if (otgirq)
+    {
+        OTG_OTGIRQ = otgirq;
+    }
+
+    //if (usbeirq)
+        OTG_USBEIRQ = 0x50;
+}
+
+void usb_drv_init(void)
+{
+    OTG_USBCS |= 0x40;                    /* soft disconnect */
+
+    OTG_ENDPRST = 0x10;                   /* reset all ep fifos */
+    OTG_ENDPRST = 0x70;
+    OTG_ENDPRST = 0x00;
+    OTG_ENDPRST = 0x60;
+
+    OTG_USBIRQ = 0xff;                    /* clear all pending interrupts */
+    OTG_OTGIRQ = 0xff;
+    OTG_IN04IRQ = 0xff;
+    OTG_OUT04IRQ = 0xff;
+    OTG_USBEIRQ = 0x50;                   /* UDC ? with 0x40 there is irq storm */
+
+    OTG_USBIEN = (1<<5) | (1<<4) | (1<<0); /* HS, Reset, Setup_data */
+    OTG_OTGIEN = 0;
+
+    /* enable interrupts from ep0 */
+    OTG_IN04IEN = 0;//1;
+    OTG_OUT04IEN = 0;//1;
+
+    INTC_MSK = (1<<4);
+
+    target_mdelay(100);
+
+    OTG_USBCS &= ~0x40;                  /* soft connect */
+}
+
+int usb_drv_recv_setup(struct usb_ctrlrequest *req)
+{
+    while (!setup_data_valid)
+        ;
+
+    memcpy(req, (void *)&OTG_SETUPDAT, sizeof(struct usb_ctrlrequest));
+    setup_data_valid = false;
+    return 0;
+}
+
+int usb_drv_port_speed(void)
+{
+    return (int)udc_speed;
+}
+
+/* Set the address (usually it's in a register).
+ * There is a problem here: some controller want the address to be set between
+ * control out and ack and some want to wait for the end of the transaction.
+ * In the first case, you need to write some code special code when getting
+ * setup packets and ignore this function (have a look at other drives)
+ */
+void usb_drv_set_address(int address)
+{
+    (void)address;
+    /* UDC sets this automaticaly */
+}
+
+// Adapt to irq scheme
+int usb_drv_send(int endpoint, void *ptr, int length)
+{
+    (void)endpoint;
+
+    int xfer_size, cnt = length;
+   
+    while (cnt)
+    {
+        xfer_size = MIN(cnt, 64);
+
+        /* copy data to ep0in buffer */
+        memcpy((void *)&OTG_EP0INDAT, ptr, xfer_size);
+
+        /* this marks data as ready to send */
+        OTG_IN0BC = xfer_size;
+//        /* clear NAK */
+//        if (xfer_size != 64)
+//            OTG_EP0CS = 0x02;
+
+        /* wait for the transfer end */
+        while(OTG_EP0CS & 0x04)
+            ;
+
+        OTG_IN04IRQ = 0x01; /* clear flag */
+
+        cnt -= xfer_size;
+        ptr += xfer_size;
+    }
+
+    return 0;
+}
+
+// Adapt to irq scheme
+int usb_drv_recv(int endpoint, void* ptr, int length)
+{
+   (void)endpoint;
+   int xfer_size, cnt = length;
+
+    if (!cnt)
+        OTG_EP0CS = 0x02;
+
+    while (cnt)
+    {
+        while(!(OTG_OUT04IRQ & 0x01)) // busy bit
+            ;
+
+        xfer_size = OTG_OUT0BC;
+
+        memcpy(ptr, (void *)&OTG_EP0OUTDAT, xfer_size);
+        OTG_OUT04IRQ = 0x01; /* clear flag */
+        cnt -= xfer_size;
+        ptr += xfer_size;
+    }
+
+    return length;
+}
+
+void usb_drv_stall(int endpoint, bool stall, bool in)
+{
+    (void)endpoint;
+    (void)in;
+
+    /* only EP0 in hwstub */
+    if (stall)
+        OTG_EP0CS |= 1;
+    else
+        OTG_EP0CS &= ~1;
+}
+
+void usb_drv_exit(void)
+{
+}
