@@ -2,6 +2,11 @@
 asm/arm/memcpy.S
 asm/arm/memmove.S
 asm/arm/memset.S
+#elif defined(CPU_MIPS)
+asm/mips/memcpy.S
+asm/mips/memset.S
+#else
+#error "Unimplemented ISA"
 #endif
 main.c
 logf.c
@@ -19,4 +24,8 @@ rk27xx/target.c
 pp/crt0.S
 pp/target.c
 usb_drv_arc.c
+#elif defined(CONFIG_ATJ213X)
+atj213x/crt0.S
+atj213x/target.c
+atj213x/usb_drv_atj213x.c
 #endif
