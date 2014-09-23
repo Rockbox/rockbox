@@ -32,7 +32,7 @@
 #define RETRY_MAX 5
 #define USB_TIMEOUT 512
 #define VENDORID  0x10d6
-#define PRODUCTID 0xff96
+#define PRODUCTID 0xff63
 
 #define OUT_EP  0x01
 #define IN_EP   0x82
