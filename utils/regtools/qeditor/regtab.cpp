@@ -178,6 +178,7 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
 
     OnSocListChanged();
     SetDataSocName("");
+    UpdateTabName();
 }
 
 QWidget *RegTab::GetWidget()
