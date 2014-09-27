@@ -961,6 +961,7 @@ RegEdit::RegEdit(Backend *backend, QWidget *parent)
     SetModified(false, false);
     m_right_panel = 0;
     SetPanel(new EmptyEditPanel(this));
+    UpdateTabName();
 
     connect(m_file_open, SIGNAL(clicked()), this, SLOT(OnOpen()));
     connect(m_file_save, SIGNAL(clicked()), this, SLOT(OnSave()));
@@ -1080,7 +1081,10 @@ bool RegEdit::SaveSocFile(const QString& filename)
 void RegEdit::UpdateTabName()
 {
     QFileInfo info(m_cur_socfile.GetFilename());
-    SetTabName(info.fileName());
+    if(info.exists())
+        SetTabName(info.fileName());
+    else
+        SetTabName("Register Editor");
 }
 
 void RegEdit::LoadSocFile(const QString& filename)
