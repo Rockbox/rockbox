@@ -114,6 +114,7 @@ FileIoBackend::FileIoBackend(const QString& filename, const QString& soc_name)
 {
     m_filename = filename;
     m_soc = soc_name;
+    m_valid = false;
     Reload();
 }
 
@@ -132,6 +133,7 @@ bool FileIoBackend::ReadRegister(const QString& name, soc_word_t& value)
 
 bool FileIoBackend::Reload()
 {
+    m_valid = false;
     QFile file(m_filename);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;
@@ -155,6 +157,7 @@ bool FileIoBackend::Reload()
 
     m_readonly = !QFileInfo(file).isWritable();
     m_dirty = false;
+    m_valid = true;
     return true;
 }
 
