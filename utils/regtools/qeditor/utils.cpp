@@ -825,17 +825,20 @@ bool MySwitchableTextEditor::IsModified()
 BackendSelector::BackendSelector(Backend *backend, QWidget *parent)
     :QWidget(parent), m_backend(backend)
 {
-    m_data_selector = new QComboBox;
+    m_data_selector = new QComboBox(this);
     m_data_selector->addItem(QIcon::fromTheme("text-x-generic"), "Nothing...", QVariant(DataSelNothing));
     m_data_selector->addItem(QIcon::fromTheme("document-open"), "File...", QVariant(DataSelFile));
 #ifdef HAVE_HWSTUB
     m_data_selector->addItem(QIcon::fromTheme("multimedia-player"), "Device...", QVariant(DataSelDevice));
 #endif
-    m_data_sel_edit = new QLineEdit;
+    m_data_sel_edit = new QLineEdit(this);
     m_data_sel_edit->setReadOnly(true);
+    m_nothing_text = new QLabel(this);
+    m_nothing_text->setTextFormat(Qt::RichText);
     QHBoxLayout *data_sel_layout = new QHBoxLayout(this);
     data_sel_layout->addWidget(m_data_selector);
     data_sel_layout->addWidget(m_data_sel_edit, 1);
+    data_sel_layout->addWidget(m_nothing_text, 1);
     data_sel_layout->addStretch(0);
 #ifdef HAVE_HWSTUB
     m_dev_selector = new QComboBox;
@@ -863,6 +866,11 @@ BackendSelector::~BackendSelector()
     delete m_io_backend;
 }
 
+void BackendSelector::SetNothingMessage(const QString& msg)
+{
+    m_nothing_text->setText(msg);
+}
+
 void BackendSelector::OnDataSelChanged(int index)
 {
     if(index == -1)
@@ -870,6 +878,7 @@ void BackendSelector::OnDataSelChanged(int index)
     QVariant var = m_data_selector->itemData(index);
     if(var == DataSelFile)
     {
+        m_nothing_text->hide();
         m_data_sel_edit->show();
 #ifdef HAVE_HWSTUB
         m_dev_selector->hide();
@@ -888,7 +897,8 @@ void BackendSelector::OnDataSelChanged(int index)
 #ifdef HAVE_HWSTUB
     else if(var == DataSelDevice)
     {
-        m_data_sel_edit->hide();;
+        m_nothing_text->hide();
+        m_data_sel_edit->hide();
         m_dev_selector->show();
         OnDevListChanged();
     }
@@ -896,6 +906,7 @@ void BackendSelector::OnDataSelChanged(int index)
     else
     {
         m_data_sel_edit->hide();
+        m_nothing_text->show();
 #ifdef HAVE_HWSTUB
         m_dev_selector->hide();
 #endif
