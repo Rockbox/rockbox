@@ -149,8 +149,10 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
     data_sel_layout->addWidget(m_data_sel_reload);
     data_sel_group->setLayout(data_sel_layout);
     m_data_soc_label->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
+    m_msg = new MessageWidget(this);
 
     m_right_panel->addWidget(data_sel_group, 0);
+    m_right_panel->addWidget(m_msg, 0);
     m_right_content = 0;
     SetPanel(new EmptyRegTabPanel);
     QWidget *w = new QWidget;
@@ -175,6 +177,9 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
     connect(m_dump, SIGNAL(clicked(bool)), this, SLOT(OnDumpRegs(bool)));
     connect(m_data_sel_reload, SIGNAL(clicked(bool)), this, SLOT(OnBackendReload(bool)));
     connect(m_type_selector, SIGNAL(currentChanged(int)), this, SLOT(OnTypeChanged(int)));
+
+    SetMessage(MessageWidget::Information,
+        "You can browse the registers. Select a data source to analyse the values.");
 
     OnSocListChanged();
     SetDataSocName("");
@@ -308,6 +313,11 @@ void RegTab::DisplayDevice(const SocDevRef& ref)
 void RegTab::DisplaySoc(const SocRef& ref)
 {
     SetPanel(new SocDisplayPanel(this, ref));
+}
+
+void RegTab::SetMessage(MessageWidget::MessageType type, const QString& msg)
+{
+    m_msg->SetMessage(type, msg);
 }
 
 void RegTab::SetPanel(RegTabPanel *panel)

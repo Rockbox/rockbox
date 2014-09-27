@@ -78,6 +78,7 @@ protected:
     void SetPanel(RegTabPanel *panel);
     void UpdateSocFilename();
     void UpdateTabName();
+    void SetMessage(MessageWidget::MessageType type, const QString& msg);
 
     QComboBox *m_soc_selector;
     BackendSelector *m_backend_selector;
@@ -93,6 +94,7 @@ protected:
     IoBackend *m_io_backend;
     QTabWidget *m_type_selector;
     QListWidget *m_analysers_list;
+    MessageWidget *m_msg;
 
 private slots:
     void SetReadOnlyIndicator();

@@ -338,4 +338,32 @@ private slots:
     void OnDataSelChanged(int index);
 };
 
+class MessageWidget : public QFrame
+{
+    Q_OBJECT
+public:
+    enum MessageType
+    {
+        Positive,
+        Information,
+        Warning,
+        Error
+    };
+
+    MessageWidget(QWidget *parent = 0);
+    virtual ~MessageWidget();
+    void SetMessage(MessageType type, const QString& msg);
+
+protected:
+    void UpdateType();
+
+    QLabel *m_icon;
+    QLabel *m_text;
+    QToolButton *m_close;
+    MessageType m_type;
+
+private slots:
+    void OnClose(bool clicked);
+};
+
 #endif /* AUX_H */

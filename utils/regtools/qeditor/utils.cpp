@@ -964,3 +964,83 @@ void BackendSelector::ChangeBackend(IoBackend *new_backend)
     delete m_io_backend;
     m_io_backend = new_backend;
 }
+
+/**
+ * MessageWidget
+ */
+MessageWidget::MessageWidget(QWidget *parent)
+    :QFrame(parent)
+{
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    m_icon = new QLabel(this);
+    m_icon->hide();
+    m_text = new QLabel(this);
+    m_text->setTextFormat(Qt::RichText);
+    m_close = new QToolButton(this);
+    m_close->setText("close");
+    m_close->setIcon(style()->standardIcon(QStyle::SP_DialogCloseButton));
+    m_close->setAutoRaise(true);
+
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->addWidget(m_icon, 0);
+    layout->addWidget(m_text, 1);
+    layout->addWidget(m_close, 0);
+
+    connect(m_close, SIGNAL(clicked(bool)), this, SLOT(OnClose(bool)));
+
+    hide();
+}
+
+MessageWidget::~MessageWidget()
+{
+}
+
+void MessageWidget::UpdateType()
+{
+    /* style stolen from KMessageWidget */
+    QColor bg, border;
+    switch(m_type)
+    {
+        case Positive:
+            bg.setRgb(140, 228, 124);
+            border.setRgb(56, 175, 58);
+            break;
+        case Information:
+            bg.setRgb(161, 178, 202);
+            border.setRgb(59, 79, 175);
+            break;
+        case Warning:
+            bg.setRgb(228, 227, 127);
+            border.setRgb(175, 169, 61);
+            break;
+        case Error:
+            bg.setRgb(233, 199, 196);
+            border.setRgb(175, 74, 60);
+            break;
+        default:
+            break;
+    }
+    setStyleSheet(QString(
+        "QFrame { background-color: %1;"
+            "border-radius: 5px;"
+            "border: 1px solid %2;"
+        "}"
+        "QLabel { border: none; }")
+        .arg(bg.name())
+        .arg(border.name()));
+}
+
+void MessageWidget::SetMessage(MessageType type, const QString& msg)
+{
+    m_type = type;
+    m_text->setText(msg);
+    UpdateType();
+    show();
+}
+
+void MessageWidget::OnClose(bool clicked)
+{
+    Q_UNUSED(clicked);
+    hide();
+}
