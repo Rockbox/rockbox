@@ -134,6 +134,7 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
     QGroupBox *data_sel_group = new QGroupBox("Data selection");
     QHBoxLayout *data_sel_layout = new QHBoxLayout;
     m_backend_selector = new BackendSelector(m_backend, this);
+    m_backend_selector->SetNothingMessage("<i>Select a data source to analyse its content.</i>");
     m_readonly_check = new QCheckBox("Read-only");
     m_readonly_check->setCheckState(Qt::Checked);
     m_data_soc_label = new QLabel;

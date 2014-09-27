@@ -304,11 +304,14 @@ public:
     BackendSelector(Backend *backend, QWidget *parent = 0);
     virtual ~BackendSelector();
     IoBackend *GetBackend();
+    void SetNothingMessage(const QString& msg);
 
 signals:
     void OnSelect(IoBackend *backend);
 
 protected:
+    void ChangeBackend(IoBackend *new_backend);
+
     enum
     {
         DataSelNothing,
@@ -326,7 +329,7 @@ protected:
     QComboBox *m_dev_selector;
     HWStubBackendHelper m_hwstub_helper;
 #endif
-    void ChangeBackend(IoBackend *new_backend);
+    QLabel *m_nothing_text;
 
 private slots:
 #ifdef HAVE_HWSTUB
