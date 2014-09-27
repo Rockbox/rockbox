@@ -35,12 +35,13 @@ public:
     DocumentTab() { m_tab = 0; }
     virtual bool Quit() = 0;
     virtual QWidget *GetWidget() = 0;
-    void SetTabWidget(MyTabWidget *tab) { m_tab = tab; }
+    void SetTabWidget(MyTabWidget *tab);
 
 protected:
     void OnModified(bool modified);
     void SetTabName(const QString& name);
     MyTabWidget *m_tab;
+    QString m_tabname;
 };
 
 class MyTabWidget : public QTabWidget
@@ -70,7 +71,7 @@ private:
     void closeEvent(QCloseEvent *event);
 
 protected:
-    void AddTab(DocumentTab *tab, const QString& title);
+    void AddTab(DocumentTab *tab);
     bool Quit();
 
 private slots:
