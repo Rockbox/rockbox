@@ -354,6 +354,12 @@ void usb_drv_exit(void)
 
     CGU_USB = 0;
     bitclr32(&CGU_PERI, CGU_USB_CLOCK_ENABLE);
+
+    /* reset USB_PHY to prevent power consumption */
+    CCU_SRC = CCU_SRC_USB_PHY_EN;
+    CCU_SRL = CCU_SRL_MAGIC_NUMBER;
+    CCU_SRL = 0;
+
 }
 #elif CONFIG_CPU == S5L8701 || CONFIG_CPU == S5L8702
 static void usb_reset(void)
