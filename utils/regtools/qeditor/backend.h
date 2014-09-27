@@ -53,6 +53,8 @@ public:
      * HW.dev.reg
      * where <dev> is the device name (including index like APPUART1)
      * and <reg> is the register name (including index like PRIORITY29) */
+    /* report whether backend is valid */
+    virtual bool IsValid() = 0;
     /* report whether backend supports register access type */
     virtual bool SupportAccess(AccessType type) = 0;
     /* get SoC name */
@@ -83,6 +85,7 @@ class DummyIoBackend : public IoBackend
 public:
     DummyIoBackend() {}
 
+    virtual bool IsValid() { return false; }
     virtual bool SupportAccess(AccessType type) { Q_UNUSED(type); return false; }
     virtual QString GetSocName() { return ""; }
     virtual bool ReadRegister(const QString& name, soc_word_t& value) 
@@ -107,6 +110,7 @@ class FileIoBackend : public IoBackend
 public:
     FileIoBackend(const QString& filename, const QString& soc_name = "");
 
+    virtual bool IsValid() { return m_valid; }
     virtual bool SupportAccess(AccessType type) { return type == ByName; }
     virtual QString GetSocName();
     virtual bool ReadRegister(const QString& name, soc_word_t& value);
@@ -126,6 +130,7 @@ protected:
     QString m_soc;
     bool m_readonly;
     bool m_dirty;
+    bool m_valid;
     QMap< QString, soc_word_t > m_map;
 };
 
@@ -173,6 +178,7 @@ public:
     HWStubIoBackend(HWStubDevice *dev);
     virtual ~HWStubIoBackend();
 
+    virtual bool IsValid() { return m_dev->IsValid(); }
     virtual bool SupportAccess(AccessType type) { return type == ByAddress; }
     virtual QString GetSocName();
     virtual bool ReadRegister(const QString& name, soc_word_t& value)
