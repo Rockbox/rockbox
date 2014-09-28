@@ -437,6 +437,7 @@ end:
     return false;
 }
 
+#if CONFIG_CPU == AS3525v2
 void adc_set_voltage_mux(int channel)
 {
     ascodec_lock();
@@ -444,6 +445,7 @@ void adc_set_voltage_mux(int channel)
     ascodec_write(AS3543_PMU_ENABLE, 8 | channel << 4 );
     ascodec_unlock();
 }
+#endif
 
 bool dbg_ports(void)
 {
