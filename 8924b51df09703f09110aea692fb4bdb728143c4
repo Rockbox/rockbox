@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a1b2928_fc34614b",
+        "filename": "firmware/sound.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1000348
+      },
+      "writtenOn": "2014-09-28T17:02:46Z",
+      "side": 1,
+      "message": "check if defined(DX50) or defined(DX90). and make sure their audiohw_set_volume () take l,r (not balance and volume).",
+      "revId": "8924b51df09703f09110aea692fb4bdb728143c4",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
