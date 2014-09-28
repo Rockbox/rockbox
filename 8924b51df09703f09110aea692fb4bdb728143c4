@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "7a1b2928_1c231d07",
+        "filename": "firmware/export/hosted_codec.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2014-09-28T18:26:57Z",
+      "side": 1,
+      "message": "As I stated above, line 28 is technically correct I suppose. It is cleaner to do what you suggest so that it simply does #define AUDIOHW_CAPS according to config and doesn\u0027t #define then #undef it, which could cause an unexpected trap.",
+      "parentUuid": "7a1b2928_dc1085ab",
+      "revId": "8924b51df09703f09110aea692fb4bdb728143c4",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a1b2928_7c4971d0",
         "filename": "firmware/export/hosted_codec.h",
         "patchSetId": 5
