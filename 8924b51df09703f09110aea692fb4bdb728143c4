@@ -16,6 +16,24 @@
       "revId": "8924b51df09703f09110aea692fb4bdb728143c4",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_3c3ff926",
+        "filename": "firmware/sound.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2014-09-28T17:09:37Z",
+      "side": 1,
+      "message": "Check sources for the definition of AUDIOHW_HAVE_MONO_VOLUME for what uses mono. If you have coarse volume control but want fine balance control, that should be defined since balance will be handled under its own mechanism.",
+      "parentUuid": "7a1b2928_fc34614b",
+      "revId": "8924b51df09703f09110aea692fb4bdb728143c4",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
