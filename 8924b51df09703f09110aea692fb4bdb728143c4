@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "7a1b2928_5c4635c0",
+        "filename": "firmware/export/hosted_codec.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2014-09-28T17:32:08Z",
+      "side": 1,
+      "message": "This should be moved to the proper header(s) in firmware/export/config.",
+      "revId": "8924b51df09703f09110aea692fb4bdb728143c4",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1b2928_7c4971d0",
+        "filename": "firmware/export/hosted_codec.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2014-09-28T17:32:08Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be done here. AUDIOHW_CAPS should not be removed from defined PP symbols.",
+      "revId": "8924b51df09703f09110aea692fb4bdb728143c4",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a1b2928_fc34614b",
         "filename": "firmware/sound.c",
         "patchSetId": 5
