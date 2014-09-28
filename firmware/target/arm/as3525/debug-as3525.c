@@ -437,6 +437,14 @@ end:
     return false;
 }
 
+void adc_set_voltage_mux(int channel)
+{
+    ascodec_lock();
+    /*this register also controls which subregister is subsequently written, so be careful*/
+    ascodec_write(AS3543_PMU_ENABLE, 8 | channel << 4 );
+    ascodec_unlock();
+}
+
 bool dbg_ports(void)
 {
     int line, btn, i;
@@ -510,10 +518,22 @@ bool dbg_ports(void)
             "I_CHGact",
             "I_CHGref",
         };
+
+        static const char *adc_mux_name[10] = {
+            NULL,
+            "AVDD27  ",
+            "AVDD17  ",
+            "PVDD1   ",
+            "PVDD2   ",
+            "CVDD1   ",
+            "CVDD2   ",
+            "RVDD    ",
+            "FVDD    ",
+            "PWGD    ",
+        };
 #endif
 
         lcd_clear_display();
-
         while(1)
         {
             line = 0;
@@ -550,6 +570,7 @@ bool dbg_ports(void)
             for(; i<16; i++)
                 lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i));
 #endif
+
             lcd_update();
 
             btn = button_get_w_tmo(HZ/10);
@@ -558,7 +579,25 @@ bool dbg_ports(void)
             else if(btn == (BUTTON_DOWN|BUTTON_REL))
                 break;
         }
-    }
+#if CONFIG_CPU == AS3525v2  /*extend AS3543 voltage registers*/
+       lcd_clear_display();
+        while(1)
+        {
+            line = 0;
+            for(i=1; i<9; i++){
+                adc_set_voltage_mux(i); /*change the voltage mux to a new channel*/
+                lcd_putsf(0, line++, "%s: %d mV", adc_mux_name[i], adc_read(5) * 5);
+            }
+            lcd_update();
+
+            btn = button_get_w_tmo(HZ/10);
+            if(btn == (DEBUG_CANCEL|BUTTON_REL))
+                goto end;
+            else if(btn == (BUTTON_DOWN|BUTTON_REL))
+                break;
+        }
+#endif
+     }
 
 end:
     lcd_setfont(FONT_UI);
