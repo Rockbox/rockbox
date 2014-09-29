@@ -428,6 +428,18 @@ sub buildzip {
         find(find_copyfile(qr/.*\.codec/, abs_path("$temp_dir/codecs/")), 'lib/rbcodec/codecs');
     }
 
+    # iBasso DX Players are hosted on android therefore need the shared lib filename
+    if ($modelname =~ /ibassodx/){
+        opendir(DIR,"$temp_dir/codecs/") or die "can't open CODECS temp dir";
+        my @codecs = readdir(DIR);
+        closedir(DIR);
+        foreach my $codec (@codecs) {
+            if ($codec =~ /(.*)\.codec/) {
+                move("$temp_dir/codecs/$1.codec", "$temp_dir/codecs/lib$1.so");
+            }
+        }
+    }
+
     # remove directory again if no codec was copied
     rmdir("$temp_dir/codecs");
 
