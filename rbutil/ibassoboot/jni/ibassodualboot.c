@@ -56,7 +56,9 @@
 #define PLAYER_FILE "/data/chosen_player"
 #define NOASK_FLAG "/data/no_ask_once"
 #define POLL_MS 10
-
+#define ROCKBOX_BIN "/.rockbox/rockbox"
+#define CHOOSER_BMP "/system/chooser.bmp"
+#define RBMISSING_BMP "/system/rbmissing.bmp"
 
 #define KEYCODE_HEADPHONES 114
 #define KEYCODE_HOLD 115
@@ -106,7 +108,6 @@ void checktime()
 static struct pollfd *ufds;
 static char **device_names;
 static int nfds;
-
 
 
 static int open_device(const char *device, int print_flags)
@@ -208,7 +209,7 @@ void button_init_device(void)
 }
 
 
-int draw()
+int draw(char * bitmapfile)
 {
     int fbfd = 0;
     struct fb_var_screeninfo vinfo;
@@ -280,7 +281,7 @@ int draw()
         exit(4);
     }
 
-    BMP* bmp = BMP_ReadFile("/system/rockbox/chooser.bmp");
+    BMP* bmp = BMP_ReadFile(bitmapfile);
     BMP_CHECK_ERROR( stderr, -1 );
 
     UCHAR r, g, b;
@@ -390,7 +391,7 @@ int main(int argc, char **argv)
 
     if(ask)
     {
-        draw();
+        draw(CHOOSER_BMP);
         button_init_device();
         int player_chosen_now = choose_player();
 
@@ -418,15 +419,35 @@ int main(int argc, char **argv)
 
     system("rm "NOASK_FLAG);
 
-    while(1)
+    while(1) /* run mango or rockbox and restart it if it crashes */
     {
-        if(last_chosen_player)
+        if(last_chosen_player) /* rockbox */
         {
-//            system("/system/bin/openadb");
-            system("/system/rockbox/lib/rockbox");
+            struct stat m1, m2;
+            stat("/mnt/", &m1);
+            do
+            {
+                /* waiting for storage to get mounted */
+                stat("/sdcard/", &m2);
+                usleep(100000);
+            }
+            while(m1.st_dev == m2.st_dev);
+            system("mount -o remount,exec /mnt/sdcard");     /* to be able to execute rockbox */
+            system("ln -s /mnt/sdcard/.rockbox /.rockbox");  /* for best compatibility */
+            if(access(ROCKBOX_BIN, F_OK) != -1)
+            {
+//              system("/system/bin/openadb");
+                system(ROCKBOX_BIN);
+            }
+            else
+            {
+                draw(RBMISSING_BMP);
+                sleep(600);
+                reboot(LINUX_REBOOT_CMD_POWER_OFF);
+            }
         }
-        else
-//            system("/system/bin/closeadb");
+        else /* mango */
+//          system("/system/bin/closeadb");
             system("/system/bin/MangoPlayer_original");
 
         sleep(1);
