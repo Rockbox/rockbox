@@ -124,11 +124,13 @@ void main(void)
 
 #ifdef USE_ROCKBOX_USB
     usb_init();
-    usb_start_monitoring();
 
     /* Enter USB mode if USB is plugged and SELECT button is pressed */
-    if(btn & BUTTON_SELECT && usb_detect() == USB_INSERTED)
-        usb_mode();
+    if(btn & BUTTON_SELECT) {
+        usb_start_monitoring();
+        if(usb_detect() == USB_INSERTED)
+            usb_mode();
+    }
 #endif /* USE_ROCKBOX_USB */
 
     while((ret = disk_mount_all()) <= 0)
