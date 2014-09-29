@@ -110,7 +110,7 @@ enum
 };
 
 #if CONFIG_CODEC == SWCODEC
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID) && !(defined(DX50) || defined(DX90))
 #define CODEC_EXTENSION "so"
 #define CODEC_PREFIX "lib"
 #else

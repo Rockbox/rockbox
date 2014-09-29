@@ -48,15 +48,13 @@
 
 #include "qdbmp.h"
 
-
-#define MIN_TIME 1395606821
-#define TIME_FILE "/data/time_store"
-#define TIME_CHECK_PERIOD 60 /* seconds */
 #define VOLD_LINK "/data/vold"
 #define PLAYER_FILE "/data/chosen_player"
 #define NOASK_FLAG "/data/no_ask_once"
 #define POLL_MS 10
-
+#define ROCKBOX_BIN "/.rockbox/rockbox"
+#define CHOOSER_BMP "/system/chooser.bmp"
+#define RBMISSING_BMP "/system/rbmissing.bmp"
 
 #define KEYCODE_HEADPHONES 114
 #define KEYCODE_HOLD 115
@@ -68,45 +66,12 @@
 #define KEYCODE_PREV 160
 #define KEYCODE_NEXT 162
 #define KEYCODE_PLAY 161
-
 #define KEY_HOLD_OFF 16
-
-void checktime()
-{
-    time_t t_stored=0, t_current=time(NULL);
-
-    FILE *f = fopen(TIME_FILE, "r");
-    if(f!=NULL)
-    {
-        fscanf(f, "%ld", &t_stored);
-        fclose(f);
-    }
-
-    printf("stored time: %ld, current time: %ld\n", t_stored, t_current);
-
-    if(t_stored<MIN_TIME)
-        t_stored=MIN_TIME;
-
-    if(t_stored<t_current)
-    {
-        f = fopen(TIME_FILE, "w");
-        fprintf(f, "%ld", t_current);
-        fclose(f);
-    }
-    else
-    {
-        t_stored += TIME_CHECK_PERIOD;
-        struct tm *t = localtime(&t_stored);
-        struct timeval tv = {mktime(t), 0};
-        settimeofday(&tv, 0);
-    }
-}
 
 
 static struct pollfd *ufds;
 static char **device_names;
 static int nfds;
-
 
 
 static int open_device(const char *device, int print_flags)
@@ -208,7 +173,7 @@ void button_init_device(void)
 }
 
 
-int draw()
+int draw(char * bitmapfile)
 {
     int fbfd = 0;
     struct fb_var_screeninfo vinfo;
@@ -280,7 +245,7 @@ int draw()
         exit(4);
     }
 
-    BMP* bmp = BMP_ReadFile("/system/rockbox/chooser.bmp");
+    BMP* bmp = BMP_ReadFile(bitmapfile);
     BMP_CHECK_ERROR( stderr, -1 );
 
     UCHAR r, g, b;
@@ -390,7 +355,7 @@ int main(int argc, char **argv)
 
     if(ask)
     {
-        draw();
+        draw(CHOOSER_BMP);
         button_init_device();
         int player_chosen_now = choose_player();
 
@@ -418,15 +383,35 @@ int main(int argc, char **argv)
 
     system("rm "NOASK_FLAG);
 
-    while(1)
+    while(1) /* run mango or rockbox and restart it if it crashes */
     {
-        if(last_chosen_player)
+        if(last_chosen_player) /* rockbox */
         {
-//            system("/system/bin/openadb");
-            system("/system/rockbox/lib/rockbox");
+            struct stat m1, m2;
+            stat("/mnt/", &m1);
+            do
+            {
+                /* waiting for storage to get mounted */
+                stat("/sdcard/", &m2);
+                usleep(100000);
+            }
+            while(m1.st_dev == m2.st_dev);
+            system("mount -o remount,exec /mnt/sdcard");     /* to be able to execute rockbox */
+            system("ln -s /mnt/sdcard/.rockbox /.rockbox");  /* for best compatibility */
+            if(access(ROCKBOX_BIN, F_OK) != -1)              /* check for rockbox installation */
+            {
+//              system("/system/bin/openadb");
+                system(ROCKBOX_BIN);
+            }
+            else
+            {
+                draw(RBMISSING_BMP);
+                sleep(600);
+                reboot(LINUX_REBOOT_CMD_POWER_OFF);
+            }
         }
-        else
-//            system("/system/bin/closeadb");
+        else /* mango */
+//          system("/system/bin/closeadb");
             system("/system/bin/MangoPlayer_original");
 
         sleep(1);
