@@ -3753,9 +3753,6 @@ fi
     target="DX50"
     app_type="android_standalone"
     lcd_orientation="landscape"
-    sharedir="/system/rockbox/app_rockbox/rockbox"
-    bindir="/system/rockbox/lib"
-    libdir="/system/rockbox/app_rockbox"
     memory=32
     uname=`uname`
     androidcc armeabi
@@ -3781,9 +3778,6 @@ fi
     target="DX90"
     app_type="android_standalone"
     lcd_orientation="landscape"
-    sharedir="/system/rockbox/app_rockbox/rockbox"
-    bindir="/system/rockbox/lib"
-    libdir="/system/rockbox/app_rockbox"
     memory=32
     uname=`uname`
     androidcc armeabi
