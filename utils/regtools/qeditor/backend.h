@@ -363,7 +363,11 @@ public:
     bool GetRegRef(const SocDevRef& dev, const QString& reg, SocRegRef& ref);
     bool GetFieldRef(const SocRegRef& reg, const QString& field, SocFieldRef& ref);
     bool GetRegisterAddress(const QString& dev, const QString& reg, soc_addr_t& addr);
-    bool DumpAllRegisters(const QString& filename);
+    /* NOTE: does not commit writes to the backend
+     * if ignore_errors is true, the dump will continue even on errors, and the
+     * function will return false if one or more errors occured */
+    bool DumpAllRegisters(IoBackend *backend, bool ignore_errors = true);
+    bool DumpAllRegisters(const QString& filename, bool ignore_errors = true);
 
 private:
     IoBackend *m_io_backend;

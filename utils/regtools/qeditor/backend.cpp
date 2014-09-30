@@ -587,10 +587,17 @@ bool BackendHelper::ReadRegisterField(const QString& dev, const QString& reg,
     return true;
 }
 
-bool BackendHelper::DumpAllRegisters(const QString& filename)
+bool BackendHelper::DumpAllRegisters(const QString& filename, bool ignore_errors)
 {
     FileIoBackend b(filename, QString::fromStdString(m_soc.GetSoc().name));
-    BackendHelper bh(&b, m_soc);
+    bool ret = DumpAllRegisters(&b, ignore_errors);
+    return ret && b.Commit();
+}
+
+bool BackendHelper::DumpAllRegisters(IoBackend *backend, bool ignore_errors)
+{
+    BackendHelper bh(backend, m_soc);
+    bool ret = true;
     for(size_t i = 0; i < m_soc.GetSoc().dev.size(); i++)
     {
         const soc_dev_t& dev = m_soc.GetSoc().dev[i];
@@ -605,12 +612,20 @@ bool BackendHelper::DumpAllRegisters(const QString& filename)
                     QString regname = QString::fromStdString(reg.addr[l].name);
                     soc_word_t val;
                     if(!ReadRegister(devname, regname, val))
-                        return false;
+                    {
+                        ret = false;
+                        if(!ignore_errors)
+                            return false;
+                    }
                     if(!bh.WriteRegister(devname, regname, val))
-                        return false;
+                    {
+                        ret = false;
+                        if(!ignore_errors)
+                            return false;
+                    }
                 }
             }
         }
     }
-    return b.Commit();
+    return ret;
 }
