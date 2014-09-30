@@ -102,9 +102,39 @@ public:
     virtual bool Commit() { return false; }
 };
 
+/** The RAM backend doesn't have any backend storage and stores all values in
+ * an associative map */
+class RamIoBackend : public IoBackend
+{
+    Q_OBJECT
+public:
+    RamIoBackend(const QString& soc_name = "");
+
+    virtual bool IsValid() { return m_soc != ""; }
+    virtual bool SupportAccess(AccessType type) { return type == ByName; }
+    virtual QString GetSocName() { return m_soc; }
+    virtual void SetSocName(const QString& soc_name) { m_soc = soc_name; }
+    virtual bool ReadRegister(const QString& name, soc_word_t& value);
+    virtual bool ReadRegister(soc_addr_t addr, soc_word_t& value)
+        { Q_UNUSED(addr); Q_UNUSED(value); return false; }
+    virtual bool Reload() { return false; }
+    virtual bool IsReadOnly() { return false; }
+    virtual bool WriteRegister(const QString& name, soc_word_t value, WriteMode mode);
+    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value, WriteMode mode)
+        { Q_UNUSED(addr); Q_UNUSED(value); Q_UNUSED(mode); return false; }
+    virtual bool IsDirty() { return false; }
+    virtual bool Commit() { return false; }
+    /* clear all entries of the backend */
+    virtual void DeleteAll();
+
+protected:
+    QString m_soc;
+    QMap< QString, soc_word_t > m_map;
+};
+
 /** NOTE the File backend makes a difference between writes and commits:
  * a write will *never* touch the underlying file unless it was committed. */
-class FileIoBackend : public IoBackend
+class FileIoBackend : public RamIoBackend
 {
     Q_OBJECT
 public:
@@ -112,26 +142,18 @@ public:
 
     virtual bool IsValid() { return m_valid; }
     virtual bool SupportAccess(AccessType type) { return type == ByName; }
-    virtual QString GetSocName();
-    virtual bool ReadRegister(const QString& name, soc_word_t& value);
-    virtual bool ReadRegister(soc_addr_t addr, soc_word_t& value)
-        { Q_UNUSED(addr); Q_UNUSED(value); return false; }
     virtual bool Reload();
     virtual bool IsReadOnly() { return m_readonly; }
     virtual bool WriteRegister(const QString& name, soc_word_t value, WriteMode mode);
-    virtual bool WriteRegister(soc_addr_t addr, soc_word_t value, WriteMode mode)
-        { Q_UNUSED(addr); Q_UNUSED(value); Q_UNUSED(mode); return false; }
     virtual bool IsDirty() { return m_dirty; }
     virtual bool Commit();
     QString GetFileName() { return m_filename; }
 
 protected:
     QString m_filename;
-    QString m_soc;
     bool m_readonly;
     bool m_dirty;
     bool m_valid;
-    QMap< QString, soc_word_t > m_map;
 };
 
 #ifdef HAVE_HWSTUB
