@@ -33,6 +33,7 @@
 #include "mainwindow.h"
 #include "regtab.h"
 #include "regedit.h"
+#include "regdiff.h"
 
 /**
  * DocumentTab
@@ -109,6 +110,7 @@ MainWindow::MainWindow(Backend *backend)
 {
     QAction *new_regtab_act = new QAction(QIcon::fromTheme("document-new"), tr("Register &Tab"), this);
     QAction *new_regedit_act = new QAction(QIcon::fromTheme("document-edit"), tr("Register &Editor"), this);
+    QAction *new_regdiff_act = new QAction(QIcon::fromTheme("system-search"), tr("Register &Diff"), this);
     QAction *load_desc_act = new QAction(QIcon::fromTheme("document-open"), tr("&Soc Description"), this);
     QAction *quit_act = new QAction(QIcon::fromTheme("application-exit"), tr("&Quit"), this);
     QAction *about_act = new QAction(QIcon::fromTheme("help-about"), tr("&About"), this);
@@ -116,6 +118,7 @@ MainWindow::MainWindow(Backend *backend)
 
     connect(new_regtab_act, SIGNAL(triggered()), this, SLOT(OnNewRegTab()));
     connect(new_regedit_act, SIGNAL(triggered()), this, SLOT(OnNewRegEdit()));
+    connect(new_regdiff_act, SIGNAL(triggered()), this, SLOT(OnNewRegDiff()));
     connect(load_desc_act, SIGNAL(triggered()), this, SLOT(OnLoadDesc()));
     connect(quit_act, SIGNAL(triggered()), this, SLOT(OnQuit()));
     connect(about_act, SIGNAL(triggered()), this, SLOT(OnAbout()));
