@@ -107,23 +107,14 @@ IoBackend *Backend::CreateHWStubIoBackend(HWStubDevice *dev)
 #endif
 
 /**
- * FileIoBackend
+ * RamIoBackend
  */
-
-FileIoBackend::FileIoBackend(const QString& filename, const QString& soc_name)
+RamIoBackend::RamIoBackend(const QString& soc_name)
 {
-    m_filename = filename;
     m_soc = soc_name;
-    m_valid = false;
-    Reload();
 }
 
-QString FileIoBackend::GetSocName()
-{
-    return m_soc;
-}
-
-bool FileIoBackend::ReadRegister(const QString& name, soc_word_t& value)
+bool RamIoBackend::ReadRegister(const QString& name, soc_word_t& value)
 {
     if(m_map.find(name) == m_map.end())
         return false;
@@ -131,13 +122,45 @@ bool FileIoBackend::ReadRegister(const QString& name, soc_word_t& value)
     return true;
 }
 
+void RamIoBackend::DeleteAll()
+{
+    m_map.clear();
+}
+
+bool RamIoBackend::WriteRegister(const QString& name, soc_word_t value, WriteMode mode)
+{
+    switch(mode)
+    {
+        case Write: m_map[name] = value; return true;
+        case Set: m_map[name] |= value; return true;
+        case Clear: m_map[name] &= ~value; return true;
+        case Toggle: m_map[name] ^= value; return true;
+        default: return false;
+    }
+}
+
+
+
+/**
+ * FileIoBackend
+ */
+
+FileIoBackend::FileIoBackend(const QString& filename, const QString& soc_name)
+    :RamIoBackend(soc_name)
+{
+    m_filename = filename;
+    m_valid = false;
+    Reload();
+}
+
+
 bool FileIoBackend::Reload()
 {
     m_valid = false;
     QFile file(m_filename);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;
-    m_map.clear();
+    DeleteAll();
 
     QTextStream in(&file);
     while(!in.atEnd())
@@ -152,7 +175,7 @@ bool FileIoBackend::Reload()
         if(key == "HW")
             m_soc = line.mid(idx + 1).trimmed();
         else if(ok)
-            m_map[key] = val;
+            RamIoBackend::WriteRegister(key, val, Write);
     }
 
     m_readonly = !QFileInfo(file).isWritable();
@@ -164,14 +187,7 @@ bool FileIoBackend::Reload()
 bool FileIoBackend::WriteRegister(const QString& name, soc_word_t value, WriteMode mode)
 {
     m_dirty = true;
-    switch(mode)
-    {
-        case Write: m_map[name] = value; return true;
-        case Set: m_map[name] |= value; return true;
-        case Clear: m_map[name] &= ~value; return true;
-        case Toggle: m_map[name] ^= value; return true;
-        default: return false;
-    }
+    return RamIoBackend::WriteRegister(name, value, mode);
 }
 
 bool FileIoBackend::Commit()
