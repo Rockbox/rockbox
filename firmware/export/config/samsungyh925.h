@@ -170,9 +170,9 @@
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
 #define USE_ROCKBOX_USB
-/* todo - check */
 #define USB_VENDOR_ID   0x04e8
 #define USB_PRODUCT_ID  0x5024
+#define HAVE_USB_HID_MOUSE
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
