@@ -885,14 +885,14 @@ void BackendSelector::OnDataSelChanged(int index)
 #endif
         QFileDialog *fd = new QFileDialog(m_data_selector);
         fd->setFilter("Textual files (*.txt);;All files (*)");
-        fd->setDirectory(Settings::Get()->value("loaddatadir", QDir::currentPath()).toString());
+        fd->setDirectory(Settings::Get()->value("regtab/loaddatadir", QDir::currentPath()).toString());
         if(fd->exec())
         {
             QStringList filenames = fd->selectedFiles();
             ChangeBackend(m_backend->CreateFileIoBackend(filenames[0]));
             m_data_sel_edit->setText(filenames[0]);
         }
-        Settings::Get()->setValue("loaddatadir", fd->directory().absolutePath());
+        Settings::Get()->setValue("regtab/loaddatadir", fd->directory().absolutePath());
     }
 #ifdef HAVE_HWSTUB
     else if(var == DataSelDevice)
