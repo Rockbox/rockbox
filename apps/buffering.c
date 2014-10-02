@@ -552,7 +552,6 @@ BUFFER SPACE MANAGEMENT
 =======================
 
 update_data_counters: Updates the values in data_counters
-buffer_is_low   : Returns true if the amount of useful data in the buffer is low
 buffer_handle   : Buffer data for a handle
 rebuffer_handle : Seek to a nonbuffered part of a handle by rebuffering the data
 shrink_handle   : Free buffer space by moving a handle
@@ -598,12 +597,6 @@ static int update_data_counters(struct data_counters *dc)
     dc->useful    = useful;
 
     return num;
-}
-
-static inline bool buffer_is_low(void)
-{
-    update_data_counters(NULL);
-    return data_counters.useful < BUF_WATERMARK / 2;
 }
 
 /* Q_BUFFER_HANDLE event and buffer data for the given handle.
