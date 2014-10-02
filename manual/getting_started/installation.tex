@@ -721,31 +721,15 @@ completely follow the manual uninstallation instructions below.}}
   \fname{\firmwarefilename} file.
 }
 
-\opt{iriverh10,iriverh10_5gb}{
+\opt{iriverh10,iriverh10_5gb,mrobe100,vibe500}{
   If you would like to go back to using the original \playerman{} software,
   connect the \dap{} to your computer, and delete the
-  \opt{iriverh10}{\fname{H10\_20GC.mi4}}\opt{iriverh10_5gb}{\fname{H10.mi4}}
-      file and rename \fname{OF.mi4} to \opt{iriverh10}{\fname{H10\_20GC.mi4}}%
-      \opt{iriverh10_5gb}{\fname{H10.mi4}} in the \fname{System} directory on
-      your \playertype{}. As in the installation, it may be necessary to first
-      put your device into UMS mode.
-  }
-
-\opt{vibe500}{
-  If you would like to go back to using the original \playerman{} software,
-  connect the \dap{} to your computer, and delete the
-  \fname{jukebox.mi4} file and rename
-  \fname{OF.mi4} to \fname{JUKEBOX.mi4}
-  in the \fname{System} directory on your \playertype{}. As in the installation,
-  it may be necessary to first put your device into UMS mode.
-}
-
-\opt{mrobe100}{
-  If you would like to go back to using the original \playerman{} software,
-  connect the \dap{} to your computer, and delete the
-  \fname{pp5020.mi4} file and rename
-  \fname{OF.mi4} to \fname{pp5020.mi4}
+  \originalfirmwarefilename{} file and rename
+  \fname{OF.mi4} to \originalfirmwarefilename{}
   in the \fname{System} directory on your \playertype{}.
+  \nopt{mrobe100}{As in the installation,
+  it may be necessary to first put your device into UMS mode.
+  }
 }
 
 \opt{e200}{
