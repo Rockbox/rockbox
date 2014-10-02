@@ -1022,12 +1022,12 @@ bool RegEdit::GetFilename(QString& filename, bool save)
     if(save)
         fd->setAcceptMode(QFileDialog::AcceptSave);
     fd->setFilter("Description files (*.xml);;All files (*)");
-    fd->setDirectory(Settings::Get()->value("loaddescdir", QDir::currentPath()).toString());
+    fd->setDirectory(Settings::Get()->value("regedit/loaddescdir", QDir::currentPath()).toString());
     if(fd->exec())
     {
         QStringList filenames = fd->selectedFiles();
         filename = filenames[0];
-        Settings::Get()->setValue("loaddescdir", fd->directory().absolutePath());
+        Settings::Get()->setValue("regedit/loaddescdir", fd->directory().absolutePath());
         return true;
     }
     else

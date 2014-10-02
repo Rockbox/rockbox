@@ -412,11 +412,11 @@ void RegTab::OnDumpRegs(bool c)
     QFileDialog *fd = new QFileDialog(this);
     fd->setAcceptMode(QFileDialog::AcceptSave);
     fd->setFilter("Textual files (*.txt);;All files (*)");
-    fd->setDirectory(Settings::Get()->value("loaddatadir", QDir::currentPath()).toString());
+    fd->setDirectory(Settings::Get()->value("regtab/loaddatadir", QDir::currentPath()).toString());
     if(!fd->exec())
         return;
     QStringList filenames = fd->selectedFiles();
-    Settings::Get()->setValue("loaddatadir", fd->directory().absolutePath());
+    Settings::Get()->setValue("regtab/loaddatadir", fd->directory().absolutePath());
     BackendHelper bh(m_io_backend, m_cur_soc);
     if(!bh.DumpAllRegisters(filenames[0]))
     {
