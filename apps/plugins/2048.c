@@ -27,6 +27,7 @@
 /* TODO
  * Sounds!
  * Better animations!
+ * Finish time elapsed and move count code
  */
 
 /* includes */
@@ -39,6 +40,7 @@
 #include "lib/highscore.h"
 #include "lib/playback_control.h"
 #include "lib/pluginlib_actions.h"
+#include "lib/pluginlib_bmp.h"
 #include "lib/pluginlib_exit.h"
 
 #ifdef HAVE_LCD_BITMAP
@@ -61,6 +63,9 @@
 #define VERT_SPACING 4
 #define WINNING_TILE 2048
 
+#define SCALE_FACTOR 1.1
+#define SCALE_OFFSET ((SCALE_FACTOR*BMPHEIGHT__2048_tiles-BMPHEIGHT__2048_tiles))
+
 /* screen-specific configuration */
 
 #if LCD_WIDTH<LCD_HEIGHT
@@ -68,7 +73,7 @@
 #define TITLE_X 0
 #define TITLE_Y 0
 #define BASE_Y (BMPHEIGHT__2048_tiles*1.5)
-#define BASE_X (BMPHEIGHT__2048_tiles*.5-MIN_SPACE)
+#define BASE_X ((LCD_WIDTH/2)-(BMPWIDTH__2048_background/2-(MIN_SPACE)))
 #define SCORE_X 0
 #define SCORE_Y (max_numeral_height)
 #define BEST_SCORE_X 0
@@ -105,15 +110,16 @@
 
 static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
-/* game data */
+/* save game data */
 struct game_ctx_t {
     int grid[GRID_SIZE][GRID_SIZE];
     int score;
-    int cksum; /* sum of grid, XORed by score */
     bool already_won;
-};
+    unsigned int time_elapsed; /* in seconds */
+    int moves;
+    int cksum; /* sum of grid, plus time elapsed, minus moves, XORed by score */
+} ctx_data;
 
-static struct game_ctx_t ctx_data;
 /* use a pointer to make save/load easier */
 static struct game_ctx_t *ctx=&ctx_data;
 
@@ -125,7 +131,9 @@ static int max_numeral_height=-1;
 static int max_numeral_width;
 #endif
 static bool loaded=false;
-
+static struct bitmap scaled_tiles;
+static fb_data scaled_data[(int)(BMPWIDTH__2048_tiles*SCALE_FACTOR)*(int)(BMPHEIGHT__2048_tiles*SCALE_FACTOR)];
+static bool just_merged[GRID_SIZE][GRID_SIZE];
 /* first init_game will set this, when it is exceeded, it will be updated in the slide functions */
 static int best_score;
 
@@ -195,6 +203,7 @@ static inline void slide_internal(int startx, int starty,
             {
                 /* Each merged tile cannot be merged again */
                 merged_grid[x+lookx][y+looky]=true;
+                just_merged[x+lookx][y+looky]=true;
                 ctx->grid[x+lookx][y+looky]=2*ctx->grid[x][y];
                 ctx->score+=ctx->grid[x+lookx][y+looky];
                 ctx->grid[x][y]=0;
@@ -294,7 +303,6 @@ static void draw(void)
     rb->lcd_set_background(BACKGROUND);
 #endif
     rb->lcd_clear_display();
-
     /* draw the background */
 
     rb->lcd_bitmap(_2048_background, BACKGROUND_X, BACKGROUND_Y, BMPWIDTH__2048_background, BMPWIDTH__2048_background);
@@ -309,11 +317,26 @@ static void draw(void)
     {
         for(int x=0;x<GRID_SIZE;++x)
         {
-            rb->lcd_bitmap_part(_2048_tiles, /* source */
-                                BMPWIDTH__2048_tiles-BMPHEIGHT__2048_tiles*ilog2(ctx->grid[x][y]), 0, /* source upper left corner */
-                                STRIDE(SCREEN_MAIN, BMPWIDTH__2048_tiles, BMPHEIGHT__2048_tiles), /* stride */
-                                (BMPHEIGHT__2048_tiles+MIN_SPACE)*x+BASE_X, (BMPHEIGHT__2048_tiles+MIN_SPACE)*y+BASE_Y, /* dest upper-left corner */
-                                BMPHEIGHT__2048_tiles, BMPHEIGHT__2048_tiles); /* size of the cut section */
+            /* if the tile has NOT just been merged, draw it at normal size */
+            if(!just_merged[x][y])
+            {
+                rb->lcd_bitmap_part(_2048_tiles, /* source */
+                                    BMPWIDTH__2048_tiles-BMPHEIGHT__2048_tiles*ilog2(ctx->grid[x][y]), 0, /* source upper left corner */
+                                    STRIDE(SCREEN_MAIN, BMPWIDTH__2048_tiles, BMPHEIGHT__2048_tiles), /* stride */
+                                    (BMPHEIGHT__2048_tiles+MIN_SPACE)*x+BASE_X, (BMPHEIGHT__2048_tiles+MIN_SPACE)*y+BASE_Y, /* dest upper-left corner */
+                                    BMPHEIGHT__2048_tiles, BMPHEIGHT__2048_tiles); /* size of the cut section */
+            }
+            else
+            {
+                rb->logf("Drawing scaled tile at (%d,%d) on screen at %d,%d", x,y,(int)((scaled_tiles.width-SCALE_OFFSET+MIN_SPACE)*x+BASE_X), (int)((scaled_tiles.height-SCALE_OFFSET+MIN_SPACE)*y+BASE_Y));
+                /* otherwise, draw the scaled version */
+                rb->lcd_bitmap_part(scaled_data,
+                                    scaled_tiles.width-scaled_tiles.height*ilog2(ctx->grid[x][y]), 0,
+                                    STRIDE(SCREEN_MAIN, scaled_tiles.width, scaled_tiles.height),
+                                    (int)((scaled_tiles.height-SCALE_OFFSET+MIN_SPACE)*x+BASE_X), (int)((scaled_tiles.height-SCALE_OFFSET+MIN_SPACE)*y+BASE_Y),
+                                    scaled_tiles.height, scaled_tiles.height);
+                just_merged[x][y]=false;
+            }
         }
     }
     /* draw the title */
@@ -344,9 +367,13 @@ static void draw(void)
         rb->lcd_putsxy(TITLE_X, TITLE_Y, buf);
     int score_y=TITLE_Y+h+VERT_SPACING;
     /* draw the score */
-    rb->snprintf(buf, 31, "Score: %d", ctx->score);
+    if(ctx->score<10000)
+        rb->snprintf(buf, 31, "Score: %d", ctx->score);
+    else
+        rb->snprintf(buf, 31, "Score: %d.%dk", ctx->score/1000, ctx->score%1000/100);
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
+
     rb->lcd_set_background(BOARD_BACKGROUND);
 #endif
     rb->lcd_setfont(FONT_UI);
@@ -362,21 +389,26 @@ static void draw(void)
             goto draw_lbl;
 
         /* now try with S: and FONT_UI */
-        rb->snprintf(buf, 31, "S: %d", ctx->score);
+        if(ctx->score<10000)
+            rb->snprintf(buf, 31, "S: %d", ctx->score);
+        else
+            rb->snprintf(buf, 31, "S: %d.%dk", ctx->score/1000, ctx->score%1000/100);
         rb->font_getstringsize(buf, &w, &h, FONT_UI);
         rb->lcd_setfont(FONT_UI);
         if(w+SCORE_X<BACKGROUND_X)
             goto draw_lbl;
 
         /* now try with S: and FONT_SYSFIXED */
-        rb->snprintf(buf, 31, "S: %d", ctx->score);
         rb->font_getstringsize(buf, &w, &h, FONT_SYSFIXED);
         rb->lcd_setfont(FONT_SYSFIXED);
         if(w+SCORE_X<BACKGROUND_X)
             goto draw_lbl;
 
         /* then try without Score: and FONT_UI */
-        rb->snprintf(buf, 31, "%d", ctx->score);
+        if(ctx->score<10000)
+            rb->snprintf(buf, 31, "%d", ctx->score);
+        else
+            rb->snprintf(buf, 31, "%d.%dk", ctx->score/1000, ctx->score%1000/100);
         rb->font_getstringsize(buf, &w, &h, FONT_UI);
         rb->lcd_setfont(FONT_UI);
         if(w+SCORE_X<BACKGROUND_X)
@@ -396,7 +428,10 @@ draw_lbl:
     score_y+=h+VERT_SPACING;
     /* draw the best score */
 skip_draw_score:
-    rb->snprintf(buf, 31, "Best: %d", best_score);
+    if(best_score<10000)
+        rb->snprintf(buf, 31, "Best: %d", best_score);
+    else
+        rb->snprintf(buf, 31, "Best: %d.%dk", best_score/1000, best_score%1000/100);
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(BOARD_BACKGROUND);
@@ -414,21 +449,26 @@ skip_draw_score:
             goto draw_best;
 
         /* now try with S: and FONT_UI */
-        rb->snprintf(buf, 31, "B: %d", best_score);
+        if(best_score<10000)
+            rb->snprintf(buf, 31, "B: %d", best_score);
+        else
+            rb->snprintf(buf, 31, "B: %d.%dk", best_score/1000, best_score%1000/100);
         rb->font_getstringsize(buf, &w, &h, FONT_UI);
         rb->lcd_setfont(FONT_UI);
         if(w+BEST_SCORE_X<BACKGROUND_X)
             goto draw_best;
 
         /* now try with S: and FONT_SYSFIXED */
-        rb->snprintf(buf, 31, "B: %d", best_score);
         rb->font_getstringsize(buf, &w, &h, FONT_SYSFIXED);
         rb->lcd_setfont(FONT_SYSFIXED);
         if(w+BEST_SCORE_X<BACKGROUND_X)
             goto draw_best;
 
         /* then try without Score: and FONT_UI */
-        rb->snprintf(buf, 31, "%d", best_score);
+        if(best_score<10000)
+            rb->snprintf(buf, 31, "%d", best_score);
+        else
+            rb->snprintf(buf, 31, "%d.%dk", best_score/1000, best_score%1000/100);
         rb->font_getstringsize(buf, &w, &h, FONT_UI);
         rb->lcd_setfont(FONT_UI);
         if(w+BEST_SCORE_X<BACKGROUND_X)
@@ -482,7 +522,10 @@ static void draw(void)
         }
     }
     /* Now draw the score, and the game title */
-    rb->snprintf(str, 31, "Score: %d", ctx->score);
+    if(ctx->score<10000)
+        rb->snprintf(str, 31, "Score: %d", ctx->score);
+    else
+        rb->snprintf(str, 31, "Score: %d.%dk", ctx->score/10000, ctx->score%1000/100);
     int str_width, str_height;
     rb->font_getstringsize(str, &str_width, &str_height, WHAT_FONT);
     int score_leftmost=LCD_WIDTH-str_width-1;
@@ -524,7 +567,7 @@ static void place_random(void)
 }
 
 /* copies old_grid to ctx->grid */
-static void restore_old_grid(void)
+static inline void restore_old_grid(void)
 {
     memcpy(&ctx->grid, &old_grid, sizeof(int)*SPACES);
 }
@@ -621,6 +664,8 @@ static void init_game(bool newgame)
         }
         ctx->score=0;
         ctx->already_won=false;
+        ctx->moves=0;
+        ctx->time_elapsed=0;
     }
     /* using the menu resets the font */
     /* set it again here */
@@ -632,6 +677,14 @@ static void init_game(bool newgame)
 #if LCD_DEPTH <= 1
     max_numeral_width=rb->font_get_width(rb->font_get(WHAT_FONT), '0');
 #endif
+
+    /* scale the tiles */
+    scaled_tiles.data=(char*)scaled_data;
+    scaled_tiles.height=(int)(SCALE_FACTOR*BMPHEIGHT__2048_tiles);
+    scaled_tiles.width=(int)(SCALE_FACTOR*BMPWIDTH__2048_tiles);
+    simple_resize_bitmap((struct bitmap*)&bm__2048_tiles,&scaled_tiles);
+    memset(just_merged, false, sizeof(just_merged)*sizeof(bool));
+
     backlight_ignore_timeout();
     rb->lcd_clear_display();
     draw();
@@ -650,6 +703,8 @@ static void save_game(void)
     for(int x=0;x<GRID_SIZE;++x)
         for(int y=0;y<GRID_SIZE;++y)
             ctx->cksum+=ctx->grid[x][y];
+    ctx->cksum+=ctx->time_elapsed;
+    ctx->cksum-=ctx->moves;
     ctx->cksum^=ctx->score;
     rb->write(fd, ctx,sizeof(struct game_ctx_t));
     rb->close(fd);
@@ -671,6 +726,8 @@ static bool load_game(void)
     for(int x=0;x<GRID_SIZE;++x)
         for(int y=0;y<GRID_SIZE;++y)
             calc+=ctx->grid[x][y];
+    calc+=ctx->time_elapsed;
+    calc-=ctx->moves;
     calc^=ctx->score;
     if(numread==sizeof(struct game_ctx_t) && calc==ctx->cksum)
         ++success;
@@ -706,7 +763,7 @@ static void hs_check_update(bool noshow)
     highscore_save(HISCORES_FILE,highscores,NUM_SCORES);
 }
 
-/* asks the user if they wish to quit */
+/* asks the user if they wish to quit, or do anything that would cause them to lose their game */
 static bool confirm_quit(void)
 {
     const struct text_message prompt={(const char*[]){"Are you sure?", "This will clear your current game."}, 2};
@@ -812,9 +869,11 @@ static enum plugin_status do_game(bool newgame)
                 up(true);
                 if(memcmp(grid_before_anim_step, ctx->grid, sizeof(int)*SPACES))
                 {
-                    rb->sleep(ANIM_SLEEPTIME);
                     draw();
+                    rb->sleep(ANIM_SLEEPTIME);
                 }
+                else
+                    break;
             }
             made_move=1;
             break;
@@ -825,9 +884,11 @@ static enum plugin_status do_game(bool newgame)
                 down(true);
                 if(memcmp(grid_before_anim_step, ctx->grid, sizeof(int)*SPACES))
                 {
-                    rb->sleep(ANIM_SLEEPTIME);
                     draw();
+                    rb->sleep(ANIM_SLEEPTIME);
                 }
+                else
+                    break;
             }
             made_move=1;
             break;
@@ -838,9 +899,11 @@ static enum plugin_status do_game(bool newgame)
                 left(true);
                 if(memcmp(grid_before_anim_step, ctx->grid, sizeof(int)*SPACES))
                 {
-                    rb->sleep(ANIM_SLEEPTIME);
                     draw();
+                    rb->sleep(ANIM_SLEEPTIME);
                 }
+                else
+                    break;
             }
             made_move=1;
             break;
@@ -851,9 +914,11 @@ static enum plugin_status do_game(bool newgame)
                 right(true);
                 if(memcmp(grid_before_anim_step, ctx->grid, sizeof(int)*SPACES))
                 {
-                    rb->sleep(ANIM_SLEEPTIME);
                     draw();
+                    rb->sleep(ANIM_SLEEPTIME);
                 }
+                else
+                    break;
             }
             made_move=1;
             break;
@@ -885,14 +950,16 @@ static enum plugin_status do_game(bool newgame)
         }
         if(made_move)
         {
-            /* Check if we actually moved, then add random */
+            /* Check if we actually moved, then add random and increment the move counter */
             if(memcmp(&old_grid, ctx->grid, sizeof(int)*SPACES))
             {
                 place_random();
+                ++ctx->moves;
             }
             memcpy(&old_grid, ctx->grid, sizeof(int)*SPACES);
             if(check_gameover())
                 return PLUGIN_OK;
+            memset(just_merged, false, sizeof(just_merged)*sizeof(bool));
             draw();
         }
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
