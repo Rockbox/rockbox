@@ -343,15 +343,35 @@ bool settings_load_config(const char* file, bool apply)
                         char storage[MAX_PATH];
                         if (settings[i].filename_setting->prefix)
                         {
+                            /* note that prefix is expected to include a trailing slash */
                             const char *dir = settings[i].filename_setting->prefix;
                             size_t len = strlen(dir);
+
                             if (!strncasecmp(value, dir, len))
                             {
                                 strlcpy(storage, &value[len], MAX_PATH);
                             }
-                            else strlcpy(storage, value, MAX_PATH);
+#ifdef APPLICATION
+                            /* special case to allow "/.rockbox/XXX" to be loaded when
+                             * ROCKBOX_DIR is different (to make themes more portable).
+                             * Only when prefix includes ROCKBOX_DIR AND if
+                             * ROCKBOX_DIR isn't /. rockbox already */
+                            else if (!strncmp(dir, ROCKBOX_DIR, ROCKBOX_DIR_LEN)
+                                && strncmp(ROCKBOX_DIR, "/.rockbox", ROCKBOX_DIR_LEN))
+                            {
+                                /* because prefix has a trailing slash, trailing should
+                                 * contain at list this slash */
+                                char *trailing = dir + ROCKBOX_DIR_LEN;
+                                len = snprintf(storage, MAX_PATH, "/.rockbox%s", trailing);
+                                if (!strncasecmp(value, storage, len) && LIKELY(len < MAX_PATH))
+                                    strlcpy(storage, &value[len], MAX_PATH);
+                            }
+#endif
+                            else
+                                strlcpy(storage, value, MAX_PATH);
                         }
-                        else strlcpy(storage, value, MAX_PATH);
+                        else
+                            strlcpy(storage, value, MAX_PATH);
                         if (settings[i].filename_setting->suffix)
                         {
                             char *s = strcasestr(storage,settings[i].filename_setting->suffix);
