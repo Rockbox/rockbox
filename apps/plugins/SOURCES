@@ -213,6 +213,8 @@ nim.c
 
 #if LCD_DEPTH > 1                  /* non-mono bitmap targets */
 
+/* 2048 runs on 1-bit LCDs, but it is unplayable */
+2048.c
 matrix.c
 
 #if (LCD_WIDTH > 138)
