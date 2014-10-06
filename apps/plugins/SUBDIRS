@@ -89,3 +89,9 @@ mpegplayer
 #if PLUGIN_BUFFER_SIZE >= 0x80000
 lua
 #endif
+
+#if defined(IRIVER_H300_SERIES) || (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+    (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
+/* xrick is confirmed to run on these player models. */
+xrick
+#endif
