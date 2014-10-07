@@ -1,0 +1,327 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_755508c5",
+        "filename": "apps/plugins/xrick/system/main_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "whitespace error",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_55528cde",
+        "filename": "apps/plugins/xrick/system/main_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "rockbox uses 4 spaces indentation with the exception of imported sources where we leave original indentation for the sake of easy sync with upstream",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_b55de0ee",
+        "filename": "apps/plugins/xrick/system/miniz_config.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "whitespace",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_956264ac",
+        "filename": "apps/plugins/xrick/system/rockboxcodes.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "tons of whitespace errors",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_f55758c8",
+        "filename": "apps/plugins/xrick/system/sysevt_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "tons of whitespace errors",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_d55cdcef",
+        "filename": "apps/plugins/xrick/system/sysevt_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "If you can afford sleep(1) here why don\u0027t you try\npluginlib_getaction(HZ/100, plugin_contexts, ... ) ?",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_3572707d",
+        "filename": "apps/plugins/xrick/system/sysfile_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "whitespace errors, tons of",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_156f7493",
+        "filename": "apps/plugins/xrick/system/sysfile_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "man 2 open\n\nGiven a pathname for a file, open() returns a file descriptor, a small, nonnegative integer for use in subsequent system calls (read(2), write(2),\n       lseek(2), fcntl(2), etc.).  The file descriptor returned by a successful call will be the lowest-numbered file descriptor not currently  open  for\n       the process.",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_756ce89c",
+        "filename": "apps/plugins/xrick/system/sysmem_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "whitespaces as usuall",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_5569ec8a",
+        "filename": "apps/plugins/xrick/system/sysmem_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "I don\u0027t know the memory usage patterns of this code. If simple push/pop i sufficient it should be the fastest solution if not could link tlfs and use \u0027regular\u0027 malloc \u0026 free.",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_b504c0c6",
+        "filename": "apps/plugins/xrick/system/sysmenu_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "red, red, I see red :-)",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_9509c4e0",
+        "filename": "apps/plugins/xrick/system/syssnd_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "you know what",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_f50e38e4",
+        "filename": "apps/plugins/xrick/system/syssnd_rockbox.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "no tabs please",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_d5133c0c",
+        "filename": "apps/plugins/xrick/system/system_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "WSE",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_35f9d0c9",
+        "filename": "apps/plugins/xrick/system/system_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "If you really need millisecond resolution you should configure separate user timer. ticks are 10ms",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_15f654d7",
+        "filename": "apps/plugins/xrick/system/sysvid_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "whitespace",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_750348b9",
+        "filename": "apps/plugins/xrick/system/sysvid_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "if you really want to clear you should call rb-\u003elcd_update() as well.",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_5500ccaa",
+        "filename": "apps/plugins/xrick/xrick.make",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "-Os/-O2/-O3 should be tested here as AFAIK PLUGINFLAGS does not set optimization by default",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_b52b2033",
+        "filename": "docs/CREDITS",
+        "patchSetId": 2
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-07T08:21:48Z",
+      "side": 1,
+      "message": "We usually credit original authors of imported sources",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
