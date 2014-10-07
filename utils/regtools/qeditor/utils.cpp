@@ -1042,12 +1042,19 @@ void MessageWidget::UpdateType()
         .arg(border.name()));
 }
 
-void MessageWidget::SetMessage(MessageType type, const QString& msg)
+int MessageWidget::SetMessage(MessageType type, const QString& msg)
 {
     m_type = type;
     m_text->setText(msg);
     UpdateType();
     show();
+    return ++m_id;
+}
+
+void MessageWidget::HideMessage(int id)
+{
+    if(m_id == id)
+        OnClose(true);
 }
 
 void MessageWidget::OnClose(bool clicked)
