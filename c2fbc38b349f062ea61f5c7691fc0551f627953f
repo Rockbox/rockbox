@@ -2,6 +2,176 @@
   "comments": [
     {
       "key": {
+        "uuid": "5a18252c_35cef083",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "Perhaps give some info on the original source here",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_15cbf473",
+        "filename": "apps/plugins/xrick/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "babble ;)",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_75c86875",
+        "filename": "apps/plugins/xrick/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "Real name?",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_55c56c59",
+        "filename": "apps/plugins/xrick/README.rockbox",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "This whole file is really not needed.",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_b5a040a7",
+        "filename": "apps/plugins/xrick/control.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "typedefs are bad!",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_95a544b7",
+        "filename": "apps/plugins/xrick/data/img.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "typedefs!",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_f5aab884",
+        "filename": "apps/plugins/xrick/data/pics.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "typedefs are bad",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_d5afbc92",
+        "filename": "apps/plugins/xrick/data/sounds.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "more typedefs",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_35955040",
+        "filename": "apps/plugins/xrick/e_rick.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "whitespace",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_1592d457",
+        "filename": "apps/plugins/xrick/e_rick.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "tabs!",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_755508c5",
         "filename": "apps/plugins/xrick/system/main_rockbox.c",
         "patchSetId": 2
@@ -30,6 +200,24 @@
       "writtenOn": "2014-10-07T08:21:48Z",
       "side": 1,
       "message": "rockbox uses 4 spaces indentation with the exception of imported sources where we leave original indentation for the sake of easy sync with upstream",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_d5e17c00",
+        "filename": "apps/plugins/xrick/system/main_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "So does this count?",
+      "parentUuid": "5a18252c_55528cde",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -70,6 +258,40 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_35e71014",
+        "filename": "apps/plugins/xrick/system/rockboxcodes.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "It\u0027d be nice to be able to use PLA for all the keymaps, but unfortunately it\u0027s not always possible given the limited number of keys on some DAPs.\nFor now, just good ol\u0027 keymaps are fine.",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_15e4940b",
+        "filename": "apps/plugins/xrick/system/sysarg_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "Instead of UNUSED(), you can use (void) argc; in the body to make it clearer.",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_f55758c8",
         "filename": "apps/plugins/xrick/system/sysevt_rockbox.c",
         "patchSetId": 2
@@ -104,6 +326,41 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_75f188cd",
+        "filename": "apps/plugins/xrick/system/sysevt_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "Or just yield()",
+      "parentUuid": "5a18252c_d55cdcef",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_95d70423",
+        "filename": "apps/plugins/xrick/system/sysfile_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "Tabs (replace with 8 spaces)!",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_3572707d",
         "filename": "apps/plugins/xrick/system/sysfile_rockbox.c",
         "patchSetId": 2
@@ -132,6 +389,41 @@
       "writtenOn": "2014-10-07T08:21:48Z",
       "side": 1,
       "message": "man 2 open\n\nGiven a pathname for a file, open() returns a file descriptor, a small, nonnegative integer for use in subsequent system calls (read(2), write(2),\n       lseek(2), fcntl(2), etc.).  The file descriptor returned by a successful call will be the lowest-numbered file descriptor not currently  open  for\n       the process.",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_b5d20033",
+        "filename": "apps/plugins/xrick/system/sysfile_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "So it will return a negative number on error, not zero.\nYou should only be checking for fd\u003c0.",
+      "parentUuid": "5a18252c_156f7493",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_f5dc7848",
+        "filename": "apps/plugins/xrick/system/sysfile_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "Is this really necessary?",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -189,6 +481,23 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_55ee0ced",
+        "filename": "apps/plugins/xrick/system/syssnd_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "Try to avoid typedefs",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_9509c4e0",
         "filename": "apps/plugins/xrick/system/syssnd_rockbox.c",
         "patchSetId": 2
@@ -200,6 +509,23 @@
       "writtenOn": "2014-10-07T08:21:48Z",
       "side": 1,
       "message": "you know what",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_b5b960ef",
+        "filename": "apps/plugins/xrick/system/syssnd_rockbox.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "typedefs are bad",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -257,6 +583,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_95bee4d2",
+        "filename": "apps/plugins/xrick/system/system_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "But also keep this as a fallback for timer-less devices (ex. ipod6g)",
+      "parentUuid": "5a18252c_35f9d0c9",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_15f654d7",
         "filename": "apps/plugins/xrick/system/sysvid_rockbox.c",
         "patchSetId": 2
@@ -285,6 +629,40 @@
       "writtenOn": "2014-10-07T08:21:48Z",
       "side": 1,
       "message": "if you really want to clear you should call rb-\u003elcd_update() as well.",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_f5b3d808",
+        "filename": "apps/plugins/xrick/system/sysvid_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "sizeof(U8) is really unnecessary here, but you can keep it for clarity.",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_d5b85ce8",
+        "filename": "apps/plugins/xrick/util.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-07T22:54:35Z",
+      "side": 1,
+      "message": "Tons of tabs",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
