@@ -179,8 +179,9 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
     connect(m_data_sel_reload, SIGNAL(clicked(bool)), this, SLOT(OnBackendReload(bool)));
     connect(m_type_selector, SIGNAL(currentChanged(int)), this, SLOT(OnTypeChanged(int)));
 
-    SetMessage(MessageWidget::Information,
+    m_msg_select_id = SetMessage(MessageWidget::Information,
         "You can browse the registers. Select a data source to analyse the values.");
+    m_msg_error_id = 0;
 
     OnSocListChanged();
     SetDataSocName("");
@@ -222,6 +223,12 @@ void RegTab::OnDataSocActivated(const QString& str)
     int index = m_soc_selector->findText(str);
     if(index != -1)
         m_soc_selector->setCurrentIndex(index);
+    else if(str.size() > 0)
+    {
+        m_msg_error_id = SetMessage(MessageWidget::Error,
+            "Description file for this SoC is not available.");
+        SetPanel(new EmptyRegTabPanel);
+    }
 }
 
 void RegTab::UpdateTabName()
@@ -252,6 +259,9 @@ void RegTab::UpdateTabName()
 
 void RegTab::OnBackendSelect(IoBackend *backend)
 {
+    /* Hide "Please select two SoC" and errors message */
+    HideMessage(m_msg_select_id);
+    HideMessage(m_msg_error_id);
     m_io_backend = backend;
     SetReadOnlyIndicator();
     SetDataSocName(m_io_backend->GetSocName());
@@ -316,9 +326,14 @@ void RegTab::DisplaySoc(const SocRef& ref)
     SetPanel(new SocDisplayPanel(this, ref));
 }
 
-void RegTab::SetMessage(MessageWidget::MessageType type, const QString& msg)
+int RegTab::SetMessage(MessageWidget::MessageType type, const QString& msg)
 {
-    m_msg->SetMessage(type, msg);
+    return m_msg->SetMessage(type, msg);
+}
+
+void RegTab::HideMessage(int id)
+{
+    m_msg->HideMessage(id);
 }
 
 void RegTab::SetPanel(RegTabPanel *panel)

@@ -355,7 +355,10 @@ public:
 
     MessageWidget(QWidget *parent = 0);
     virtual ~MessageWidget();
-    void SetMessage(MessageType type, const QString& msg);
+    /* returns message ID */
+    int SetMessage(MessageType type, const QString& msg);
+    /* clear message if ID match, nop otherwise */
+    void HideMessage(int id);
 
 protected:
     void UpdateType();
@@ -364,6 +367,7 @@ protected:
     QLabel *m_text;
     QToolButton *m_close;
     MessageType m_type;
+    int m_id;
 
 private slots:
     void OnClose(bool clicked);

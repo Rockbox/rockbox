@@ -998,6 +998,8 @@ MessageWidget::MessageWidget(QWidget *parent)
     layout->addWidget(m_text, 1);
     layout->addWidget(m_close, 0);
 
+    m_id = 0;
+
     connect(m_close, SIGNAL(clicked(bool)), this, SLOT(OnClose(bool)));
 
     hide();
@@ -1042,12 +1044,19 @@ void MessageWidget::UpdateType()
         .arg(border.name()));
 }
 
-void MessageWidget::SetMessage(MessageType type, const QString& msg)
+int MessageWidget::SetMessage(MessageType type, const QString& msg)
 {
     m_type = type;
     m_text->setText(msg);
     UpdateType();
     show();
+    return ++m_id;
+}
+
+void MessageWidget::HideMessage(int id)
+{
+    if(m_id == id)
+        OnClose(true);
 }
 
 void MessageWidget::OnClose(bool clicked)
