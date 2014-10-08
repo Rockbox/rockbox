@@ -482,7 +482,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
 
 void generate_c_source(char *id, char* header_dir, int width, int height,
                        const union RAWDATA *t_bitmap, int t_width,
-                       int t_height, int t_depth, bool t_mono, bool create_bm)
+                       int t_height, int t_depth, bool t_mono, bool create_bm, bool compress_bm)
 {
     FILE *f;
     FILE *fh;
@@ -506,22 +506,31 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
             debugf("error - can't open '%s'\n", header_name);
             return;
         }
-        fprintf(fh,
-                "#define BMPHEIGHT_%s %d\n"
-                "#define BMPWIDTH_%s %d\n",
-                id, height, id, width);
-        if (t_depth <= 8)
-            fprintf(fh, "extern const unsigned char %s[];\n", id);
-        else if (t_depth <= 16)
-            fprintf(fh, "extern const unsigned short %s[];\n", id);
-        else
-            fprintf(fh, "extern const fb_data %s[];\n", id);
-
-
-        if (create_bm)
+            fprintf(fh,
+                    "#define BMPHEIGHT_%s %d\n"
+                    "#define BMPWIDTH_%s %d\n",
+                    id, height, id, width);
+        if(!compress_bm)
         {
-            fprintf(f, "#include \"lcd.h\"\n");
-            fprintf(fh, "extern const struct bitmap bm_%s;\n", id);
+            if (t_depth <= 8)
+                fprintf(fh, "extern const unsigned char %s[];\n", id);
+            else if (t_depth <= 16)
+                fprintf(fh, "extern const unsigned short %s[];\n", id);
+            else
+                fprintf(fh, "extern const fb_data %s[];\n", id);
+
+
+            if (create_bm)
+            {
+                fprintf(f, "#include \"lcd.h\"\n");
+                fprintf(fh, "extern const struct bitmap bm_%s;\n", id);
+            }
+        }
+        else
+        {
+            fprintf(fh, "#define BMPRLE_%s\n", id);
+            fprintf(fh, "#define BMPSIZE_%s %d\n", id, height*width);
+            fprintf(fh, "extern const unsigned short rle_data_%s[];\n", id);
         }
         fclose(fh);
     } else {
@@ -535,33 +544,78 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
         fprintf(f, "#include \"%s\"\n", header_name);
     }
 
-    if (t_depth <= 8)
-        fprintf(f, "const unsigned char %s[] = {\n", id);
-    else if (t_depth == 16)
-        fprintf(f, "const unsigned short %s[] = {\n", id);
-    else if (t_depth == 24)
-        fprintf(f, "const fb_data %s[] = {\n", id);
-
-    for (i = 0; i < t_height; i++)
+    if(compress_bm)
     {
-        for (a = 0; a < t_width; a++)
-        {
-            if (t_depth <= 8)
-                fprintf(f, "0x%02x,%c", t_bitmap->d16[i * t_width + a],
-                        (a + 1) % 13 ? ' ' : '\n');
-            else if (t_depth == 16)
-                fprintf(f, "0x%04x,%c", t_bitmap->d16[i * t_width + a],
-                        (a + 1) % 10 ? ' ' : '\n');
-            else if (t_depth == 24)
-                fprintf(f, "{ .r = 0x%02x, .g = 0x%02x, .b = 0x%02x },%c",
-                        t_bitmap->d24[i * t_width + a].r,
-                        t_bitmap->d24[i * t_width + a].g,
-                        t_bitmap->d24[i * t_width + a].b,
-                        (a + 1) % 4 ? ' ' : '\n');
-        }
-        fprintf(f, "\n");
+        if(t_depth<=8)
+            fprintf(f, "const unsigned char %s[] = {\n", id);
+        if(t_depth==16)
+            fprintf(f, "const unsigned short rle_data_%s[] = {\n",id);
     }
-
+    else
+    {
+        if (t_depth <= 8)
+            fprintf(f, "const unsigned char %s[] = {\n", id);
+        else if (t_depth == 16)
+            fprintf(f, "const unsigned short %s[] = {\n", id);
+        else if (t_depth == 24)
+            fprintf(f, "const fb_data %s[] = {\n", id);
+    }
+    if(!compress_bm)
+    {
+        for (i = 0; i < t_height; i++)
+        {
+            for (a = 0; a < t_width; a++)
+            {
+                if (t_depth <= 8)
+                    fprintf(f, "0x%02x,%c", t_bitmap->d16[i * t_width + a],
+                            (a + 1) % 13 ? ' ' : '\n');
+                else if (t_depth == 16)
+                    fprintf(f, "0x%04x,%c", t_bitmap->d16[i * t_width + a],
+                            (a + 1) % 10 ? ' ' : '\n');
+                else if (t_depth == 24)
+                    fprintf(f, "{ .r = 0x%02x, .g = 0x%02x, .b = 0x%02x },%c",
+                            t_bitmap->d24[i * t_width + a].r,
+                            t_bitmap->d24[i * t_width + a].g,
+                            t_bitmap->d24[i * t_width + a].b,
+                            (a + 1) % 4 ? ' ' : '\n');
+            }
+            fprintf(f, "\n");
+        }
+    }
+    else
+    {
+        unsigned short last=t_bitmap->d16[0];
+        int written=0;
+        fprintf(f, "0x%04x, ", last);
+        ++written;
+        for(i = 1; i < t_height*t_width; i++)
+        {
+            unsigned short current=t_bitmap->d16[i];
+            if(current!=last)
+                fprintf(f, "0x%04x,%c", current, (written + 1)%10 ? ' ' : '\n');
+            else
+            {
+                /* two bytes repeated, do some RLE */
+                /* count how many MORE bytes are repeated */
+                unsigned short reps=0;
+                while(i<t_width*t_height-1 && reps<=0xFFFE)
+                {
+                    if(t_bitmap->d16[i+1]==current)
+                    {
+                        ++reps;
+                        ++i;
+                    }
+                    else
+                        break;
+                }
+                fprintf(f, "0x%04x,%c", current, (written + 1)%10? ' ' : '\n');
+                ++written;
+                fprintf(f, "0x%04x,%c", reps, (written + 1)%10 ? ' ' : '\n');
+            }
+            ++written;
+            last=current;
+        }
+    }
     fprintf(f, "\n};\n\n");
 
     if (create_bm) {
@@ -642,6 +696,7 @@ void print_usage(void)
            "\t-h <dir> Create header file in <dir>/<id>.h\n"
            "\t-a       Show ascii picture of bitmap\n"
            "\t-b       Create bitmap struct along with pixel array\n"
+           "\t-c       Generate RLE-compressed bitmap\n"
            "\t-r       Generate RAW file (little-endian)\n"
            "\t-f <n>   Generate destination format n, default = 0\n"
            "\t         0  Archos recorder, Ondio, Iriver H1x0 mono\n"
@@ -672,6 +727,7 @@ int main(int argc, char **argv)
     int t_width, t_height, t_depth;
     bool raw = false;
     bool create_bm = false;
+    bool compress_bm = false;
 
 
     for (i = 1;i < argc;i++)
@@ -720,6 +776,10 @@ int main(int argc, char **argv)
 
               case 'b':
                 create_bm = true;
+                break;
+
+              case 'c': /* use RLE */
+                compress_bm = true;
                 break;
 
               case 'r':   /* Raw File */
@@ -800,7 +860,7 @@ int main(int argc, char **argv)
         else
             generate_c_source(id, header_dir, width, height, &t_bitmap, 
                               t_width, t_height, t_depth,
-                              format <= 1, create_bm);
+                              format <= 1, create_bm, compress_bm);
     }
 
     return 0;
