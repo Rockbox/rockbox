@@ -42,6 +42,8 @@
 #define STATE_SPDIF_UNPLUGGED   32
 #define STATE_LINEOUT_UNPLUGGED 64
 
+/* for MODERN_UI */
+#define MODERN_UI_ONOFF_BUTTONS (BUTTON_POWER)
 
 /* Touchscreen area buttons 3x3 grid. */
 #define BUTTON_TOPLEFT      0x00001000

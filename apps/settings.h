@@ -665,7 +665,9 @@ struct user_settings
                                1=always,
                                then according to timeout_values[] */
     bool caption_backlight; /* turn on backlight at end and start of track */
+#ifndef MODERN_UI
     bool bl_filter_first_keypress;   /* filter first keypress when dark? */
+#endif
 #if CONFIG_CHARGING
     int backlight_timeout_plugged;
 #endif
@@ -703,7 +705,9 @@ struct user_settings
     bool remote_invert;            /* invert display */
     bool remote_flip_display;      /* turn display (and button layout) by 180 degrees */
     bool remote_caption_backlight; /* turn on backlight at end and start of track */
+#ifndef MODERN_UI
     bool remote_bl_filter_first_keypress; /* filter first remote keypress when remote dark? */
+#endif
     unsigned char remote_icon_file[MAX_FILENAME+1];
     unsigned char remote_viewers_icon_file[MAX_FILENAME+1];
 #ifdef HAS_REMOTE_BUTTON_HOLD
