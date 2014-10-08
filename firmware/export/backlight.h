@@ -49,6 +49,10 @@ void backlight_set_fade_in(bool value);
 void backlight_set_fade_out(bool value);
 #endif
 
+#ifdef MODERN_UI
+void backlight_reset_timeout(void);
+#endif
+
 void backlight_set_timeout_plugged(int value);
 
 #ifdef HAS_BUTTON_HOLD

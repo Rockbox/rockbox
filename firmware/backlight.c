@@ -475,7 +475,6 @@ static inline void do_backlight_off(void)
 /* Update state of backlight according to timeout setting */
 static void backlight_update_state(void)
 {
-
     int timeout = backlight_get_current_timeout();
 
     /* Backlight == OFF in the setting? */
@@ -523,6 +522,12 @@ static void remote_backlight_update_state(void)
     }
 }
 #endif /* HAVE_REMOTE_LCD */
+
+#ifdef MODERN_UI
+void backlight_reset_timeout(void){
+    backlight_timer = backlight_get_current_timeout();
+}
+#endif
 
 void backlight_thread(void)
 {
