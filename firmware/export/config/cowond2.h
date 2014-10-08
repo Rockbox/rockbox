@@ -173,3 +173,6 @@
 
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY
+
+/* Modern UI leaves backlight off when buttons are pressed except MODERN_UI_ONOFF_BUTTONS */
+//#define MODERN_UI

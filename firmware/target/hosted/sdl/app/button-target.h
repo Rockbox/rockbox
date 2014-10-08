@@ -22,6 +22,13 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
+#include <stdbool.h>
+
+#define HAS_BUTTON_HOLD
+
+/* for MODERN_UI */
+#define MODERN_UI_ONOFF_BUTTONS (BUTTON_POWER)
+
 /* Main unit's buttons */
 #define BUTTON_UP           0x00000001
 #define BUTTON_DOWN         0x00000002

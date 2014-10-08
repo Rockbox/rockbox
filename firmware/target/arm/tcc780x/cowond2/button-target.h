@@ -24,6 +24,9 @@
 
 #define HAS_BUTTON_HOLD
 
+/* for MODERN_UI */
+#define MODERN_UI_ONOFF_BUTTONS (BUTTON_POWER)
+
 /* Main unit's buttons */
 #define BUTTON_POWER      0x00000001
 #define BUTTON_PLUS       0x00000002
