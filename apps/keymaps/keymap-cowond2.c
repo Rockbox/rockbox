@@ -54,7 +54,9 @@ static const struct button_mapping button_context_standard[]  = {
 
 
 static const struct button_mapping button_context_wps[]  = {
-
+#ifdef MODERN_UI
+    { ACTION_WPS_BACKLIGHT_OFF, BUTTON_POWER,                    BUTTON_NONE },
+#endif
     { ACTION_WPS_VOLDOWN,       BUTTON_MINUS,                    BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,       BUTTON_MINUS|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_WPS_VOLUP,         BUTTON_PLUS,                     BUTTON_NONE },
@@ -103,6 +105,13 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settingsgraphical */
+
+static const struct button_mapping button_context_mainmenu[]  = {
+#ifdef MODERN_UI
+    { ACTION_TREE_WPS,           BUTTON_POWER,                   BUTTON_NONE },
+#endif
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_TREE),
+}; /* button_context_mainmenu */
 
 static const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,  BUTTON_MENU,  BUTTON_NONE },
@@ -174,6 +183,7 @@ const struct button_mapping* target_get_context_mapping(int context)
         case CONTEXT_LIST:
             return button_context_list;
         case CONTEXT_MAINMENU:
+            return button_context_mainmenu;
         case CONTEXT_TREE:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_listtree_scroll_without_combo;
