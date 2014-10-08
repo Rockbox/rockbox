@@ -45,7 +45,7 @@
 #include "statusbar.h" /* statusbar_vals enum*/
 #include "rbunicode.h"
 
-#ifdef HAVE_BACKLIGHT
+#if defined( HAVE_BACKLIGHT ) && !defined( MODERN_UI )
 static int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
@@ -101,9 +101,11 @@ MENUITEM_SETTING(caption_backlight, &global_settings.caption_backlight, NULL);
 MENUITEM_SETTING(backlight_fade_in, &global_settings.backlight_fade_in, NULL);
 MENUITEM_SETTING(backlight_fade_out, &global_settings.backlight_fade_out, NULL);
 #endif
+#ifndef MODERN_UI
 MENUITEM_SETTING(bl_filter_first_keypress, 
                     &global_settings.bl_filter_first_keypress, 
                     filterfirstkeypress_callback);
+#endif
 #ifdef HAVE_LCD_SLEEP_SETTING
 MENUITEM_SETTING(lcd_sleep_after_backlight_off,
                 &global_settings.lcd_sleep_after_backlight_off, NULL);
@@ -140,7 +142,9 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
     || defined(HAVE_BACKLIGHT_FADING_BOOL_SETTING)
             ,&backlight_fade_in, &backlight_fade_out
 #endif
+#ifndef MODERN_UI
             ,&bl_filter_first_keypress
+#endif
 # ifdef HAVE_LCD_SLEEP_SETTING
             ,&lcd_sleep_after_backlight_off
 # endif
@@ -182,9 +186,11 @@ MENUITEM_SETTING(remote_backlight_on_button_hold,
 
 MENUITEM_SETTING(remote_caption_backlight, 
                     &global_settings.remote_caption_backlight, NULL);
+#ifndef MODERN_UI
 MENUITEM_SETTING(remote_bl_filter_first_keypress, 
                     &global_settings.remote_bl_filter_first_keypress, 
                     filterfirstkeypress_callback);
+#endif
 MENUITEM_SETTING(remote_contrast, 
                     &global_settings.remote_contrast, NULL);
 MENUITEM_SETTING(remote_invert, 
@@ -220,7 +226,10 @@ MAKE_MENU(lcd_remote_settings, ID2P(LANG_LCD_REMOTE_MENU),
 #ifdef HAS_REMOTE_BUTTON_HOLD
             &remote_backlight_on_button_hold,
 #endif
-            &remote_caption_backlight, &remote_bl_filter_first_keypress,
+            &remote_caption_backlight,
+#ifndef MODERN_UI
+            &remote_bl_filter_first_keypress,
+#endif
             &remote_contrast, &remote_invert
             
 #ifdef HAVE_LCD_FLIP
