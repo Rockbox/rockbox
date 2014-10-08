@@ -50,8 +50,13 @@ static const struct button_mapping button_context_standard[]  = {
 }; /* button_context_standard */
 
 static const struct button_mapping button_context_wps[]  = {
+#ifdef MODERN_UI
+    { ACTION_WPS_BACKLIGHT_OFF, BUTTON_POWER,                   BUTTON_NONE },
+    { ACTION_WPS_MENU,          BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE },
+#else
     { ACTION_WPS_MENU,          BUTTON_POWER,                   BUTTON_NONE },
     { ACTION_WPS_CONTEXT,       BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE },
+#endif
     { ACTION_WPS_PLAY,          BUTTON_PLAY|BUTTON_REL,         BUTTON_NONE },
     { ACTION_WPS_SKIPNEXT,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_NONE },
     { ACTION_WPS_SKIPPREV,      BUTTON_LEFT|BUTTON_REL,         BUTTON_NONE },
