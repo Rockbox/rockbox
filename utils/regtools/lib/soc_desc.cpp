@@ -982,3 +982,4 @@ public:
 };
 
 xml_parser_init __xml_parser_init;
+}
