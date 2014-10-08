@@ -321,7 +321,12 @@ static void button_tick(void)
                     }
                     else
 #endif
-                        if (!filter_first_keypress || is_backlight_on(false)
+#ifdef MODERN_UI
+                        if (!(btn & MODERN_UI_ONOFF_BUTTONS)
+#else
+                        if (!filter_first_keypress
+#endif
+                           || is_backlight_on(false)
 #if BUTTON_REMOTE
                                 || (btn & BUTTON_REMOTE)
 #endif
@@ -334,18 +339,24 @@ static void button_tick(void)
 #endif
                     post = false;
                 }
+#ifdef MODERN_UI
+                if((btn & MODERN_UI_ONOFF_BUTTONS)
+                    || is_backlight_on(false)){
+#endif
 #ifdef HAVE_REMOTE_LCD
-                if(btn & BUTTON_REMOTE)
-                    remote_backlight_on();
-                else
+                    if(btn & BUTTON_REMOTE)
+                        remote_backlight_on();
+                    else
 #endif
-                {
-                    backlight_on();
+                    {
+                        backlight_on();
 #ifdef HAVE_BUTTON_LIGHT
-                    buttonlight_on();
+                        buttonlight_on();
 #endif
+                   }
+#ifdef MODERN_UI
                 }
-
+#endif
                 reset_poweroff_timer();
             }
         }
