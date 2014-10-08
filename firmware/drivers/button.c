@@ -50,7 +50,7 @@ static intptr_t button_data; /* data value from last message dequeued */
 #ifdef HAVE_LCD_BITMAP
 static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #endif
-#ifdef HAVE_BACKLIGHT
+#if defined( HAVE_BACKLIGHT ) && !defined( MODERN_UI )
 static bool filter_first_keypress;
 #ifdef HAVE_REMOTE_LCD
 static bool remote_filter_first_keypress;
@@ -309,8 +309,10 @@ static void button_tick(void)
 #ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                     if (btn & BUTTON_REMOTE) {
-                        if (!remote_filter_first_keypress 
-                            || is_remote_backlight_on(false)
+                        if (is_remote_backlight_on(false)
+#ifndef MODERN_UI
+                            || !remote_filter_first_keypress
+#endif
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
                             || (remote_type()==REMOTETYPE_H300_NONLCD)
 #endif
@@ -321,7 +323,13 @@ static void button_tick(void)
                     }
                     else
 #endif
-                        if (!filter_first_keypress || is_backlight_on(false)
+                        if (is_backlight_on(false)
+#ifdef MODERN_UI
+                            || !(btn & MODERN_UI_ONOFF_BUTTONS
+#else
+                            || !filter_first_keypress
+#endif
+                            )
 #if BUTTON_REMOTE
                                 || (btn & BUTTON_REMOTE)
 #endif
@@ -334,18 +342,24 @@ static void button_tick(void)
 #endif
                     post = false;
                 }
+#ifdef MODERN_UI
+                if((btn & MODERN_UI_ONOFF_BUTTONS)
+                    || is_backlight_on(false)){
+#endif
 #ifdef HAVE_REMOTE_LCD
-                if(btn & BUTTON_REMOTE)
-                    remote_backlight_on();
-                else
+                    if(btn & BUTTON_REMOTE)
+                        remote_backlight_on();
+                    else
 #endif
-                {
-                    backlight_on();
+                    {
+                        backlight_on();
 #ifdef HAVE_BUTTON_LIGHT
-                    buttonlight_on();
+                        buttonlight_on();
 #endif
+                   }
+#ifdef MODERN_UI
                 }
-
+#endif
                 reset_poweroff_timer();
             }
         }
@@ -457,7 +471,7 @@ void button_init(void)
 #ifdef HAVE_LCD_BITMAP
     flipped = false;
 #endif
-#ifdef HAVE_BACKLIGHT
+#if defined( HAVE_BACKLIGHT ) && !defined( MODERN_UI )
     filter_first_keypress = false;
 #ifdef HAVE_REMOTE_LCD
     remote_filter_first_keypress = false;
@@ -567,7 +581,7 @@ void button_set_flip(bool flip)
 }
 #endif /* HAVE_LCD_FLIP */
 
-#ifdef HAVE_BACKLIGHT
+#if defined( HAVE_BACKLIGHT ) && !defined( MODERN_UI )
 void set_backlight_filter_keypress(bool value)
 {
     filter_first_keypress = value;

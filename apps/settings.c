@@ -1050,7 +1050,7 @@ void settings_apply(bool read_disk)
     spdif_power_enable(global_settings.spdif_enable);
 #endif
 
-#ifdef HAVE_BACKLIGHT
+#if defined( HAVE_BACKLIGHT ) && !defined( MODERN_UI )
     set_backlight_filter_keypress(global_settings.bl_filter_first_keypress);
 #ifdef HAVE_REMOTE_LCD
     set_remote_backlight_filter_keypress(global_settings.remote_bl_filter_first_keypress);

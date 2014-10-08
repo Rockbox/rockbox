@@ -62,8 +62,13 @@ static const struct button_mapping button_context_standard[] =
 
 static const struct button_mapping button_context_wps[] =
 {
-    { ACTION_WPS_MENU,     BUTTON_POWER,                    BUTTON_NONE },
-    { ACTION_WPS_CONTEXT,  BUTTON_PLAY | BUTTON_REPEAT,     BUTTON_NONE },
+#ifdef MODERN_UI
+    { ACTION_WPS_BACKLIGHT_OFF, BUTTON_POWER,                   BUTTON_NONE },
+    { ACTION_WPS_MENU,          BUTTON_PLAY | BUTTON_REPEAT,      BUTTON_NONE },
+#else
+    { ACTION_WPS_MENU,          BUTTON_POWER,                   BUTTON_NONE },
+    { ACTION_WPS_CONTEXT,       BUTTON_PLAY | BUTTON_REPEAT,      BUTTON_NONE },
+#endif
     { ACTION_WPS_PLAY,     BUTTON_PLAY | BUTTON_REL,        BUTTON_NONE },
     { ACTION_WPS_SEEKBACK, BUTTON_LEFT | BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_WPS_SEEKFWD,  BUTTON_RIGHT | BUTTON_REPEAT,    BUTTON_NONE },
@@ -125,9 +130,11 @@ static const struct button_mapping button_context_settings_right_is_inc[] =
     LAST_ITEM_IN_LIST__NEXTLIST( CONTEXT_STD ),
 };
 
-
 static const struct button_mapping button_context_mainmenu[] =
 {
+#ifdef MODERN_UI
+    { ACTION_TREE_WPS,           BUTTON_POWER,                   BUTTON_NONE },
+#endif
     LAST_ITEM_IN_LIST__NEXTLIST( CONTEXT_TREE ),
 };
 
