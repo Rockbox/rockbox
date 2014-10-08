@@ -80,7 +80,7 @@ struct RGBQUAD
 union RAWDATA {
     void *d; /* unspecified */
     unsigned short *d16; /* depth <= 16 */
-    struct { unsigned char b, g, r; } *d24; /* depth = 24 BGR */
+    struct fb_data { unsigned char b, g, r; } *d24; /* depth = 24 BGR */
 };
 
 short readshort(void* value)
@@ -98,9 +98,29 @@ int readint(void* value)
 unsigned char brightness(struct RGBQUAD color)
 {
     return (3 * (unsigned int)color.rgbRed + 6 * (unsigned int)color.rgbGreen
-              + (unsigned int)color.rgbBlue) / 10;
+            + (unsigned int)color.rgbBlue) / 10;
 }
 
+/* write data as 24-bit BGR */
+void write_fb_data(const struct fb_data* data, FILE* f, int* written)
+{
+    fprintf(f, "0x%02x,%c0x%02x,%c0x%02x,%c",
+            data->b, (*written + 1)%13 ? ' ' : '\n',
+            data->g, (*written + 2)%13 ? ' ' : '\n',
+            data->r, (*written + 3)%13 ? ' ' : '\n');
+    *written+=3;
+}
+
+int compare_fb_data(const struct fb_data* right, const struct fb_data* left)
+{
+    if(right->r==left->r &&
+       right->g==left->g &&
+       right->b==left->b)
+    {
+        return 1;
+    }
+    return 0;
+}
 #ifndef O_BINARY
 #define O_BINARY 0 /* systems that don't have O_BINARY won't make a difference
                       on text and binary files */
@@ -205,7 +225,7 @@ int read_bmp_file(char* filename,
 
     switch (depth)
     {
-      case 1:
+    case 1:
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
@@ -215,7 +235,7 @@ int read_bmp_file(char* filename,
             }
         break;
 
-      case 4:
+    case 4:
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
@@ -225,7 +245,7 @@ int read_bmp_file(char* filename,
             }
         break;
 
-      case 8:
+    case 8:
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
@@ -234,7 +254,7 @@ int read_bmp_file(char* filename,
             }
         break;
 
-      case 16:
+    case 16:
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
@@ -249,7 +269,7 @@ int read_bmp_file(char* filename,
             }
         break;
 
-      case 24:
+    case 24:
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
@@ -261,7 +281,7 @@ int read_bmp_file(char* filename,
             }
         break;
 
-      case 32:
+    case 32:
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
@@ -273,7 +293,7 @@ int read_bmp_file(char* filename,
             }
         break;
 
-      default: /* should never happen */
+    default: /* should never happen */
         debugf("error - Unsupported bitmap depth %d.\n", depth);
         return 8;
     }
@@ -301,57 +321,57 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
 
     switch (format)
     {
-      case 0: /* Archos recorders, Ondio, Iriver H1x0 monochrome */
+    case 0: /* Archos recorders, Ondio, Iriver H1x0 monochrome */
         dst_w = width;
         dst_h = (height + 7) / 8;
         dst_d = 8;
         break;
 
-      case 1: /* Archos player graphics library */
+    case 1: /* Archos player graphics library */
         dst_w = (width + 7) / 8;
         dst_h = height;
         dst_d = 8;
         break;
 
-      case 2: /* Iriver H1x0 4-grey */
+    case 2: /* Iriver H1x0 4-grey */
         dst_w = width;
         dst_h = (height + 3) / 4;
         dst_d = 8;
         break;
 
-      case 3: /* Canonical 8-bit grayscale */
+    case 3: /* Canonical 8-bit grayscale */
         dst_w = width;
         dst_h = height;
         dst_d = 8;
         break;
 
-      case 4: /* 16-bit packed RGB (5-6-5) */
-      case 5: /* 16-bit packed and byte-swapped RGB (5-6-5) */
-      case 8: /* 16-bit packed RGB (5-6-5) vertical stride*/
+    case 4: /* 16-bit packed RGB (5-6-5) */
+    case 5: /* 16-bit packed and byte-swapped RGB (5-6-5) */
+    case 8: /* 16-bit packed RGB (5-6-5) vertical stride*/
         dst_w = width;
         dst_h = height;
         dst_d = 16;
         break;
 
-      case 6: /* greyscale iPods 4-grey */
+    case 6: /* greyscale iPods 4-grey */
         dst_w = (width + 3) / 4;
         dst_h = height;
         dst_d = 8;
         break;
 
-      case 7: /* greyscale X5 remote 4-grey */
+    case 7: /* greyscale X5 remote 4-grey */
         dst_w = width;
         dst_h = (height + 7) / 8;
         dst_d = 16;
         break;
 
-      case 9: /* 24-bit BGR */
+    case 9: /* 24-bit BGR */
         dst_w = width;
         dst_h = height;
         dst_d = 24;
         break;
 
-      default: /* unknown */
+    default: /* unknown */
         debugf("error - Undefined destination format\n");
         return 1;
     }
@@ -374,34 +394,34 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
 
     switch (format)
     {
-      case 0: /* Archos recorders, Ondio, Iriver H1x0 b&w */
+    case 0: /* Archos recorders, Ondio, Iriver H1x0 b&w */
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
                 dest.d16[(row/8) * dst_w + col] |=
-                       (~brightness(src[row * width + col]) & 0x80) >> (~row & 7);
+                    (~brightness(src[row * width + col]) & 0x80) >> (~row & 7);
             }
         break;
 
-      case 1: /* Archos player graphics library */
+    case 1: /* Archos player graphics library */
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
                 dest.d16[row * dst_w + (col/8)] |=
-                       (~brightness(src[row * width + col]) & 0x80) >> (col & 7);
+                    (~brightness(src[row * width + col]) & 0x80) >> (col & 7);
             }
         break;
 
-      case 2: /* Iriver H1x0 4-grey */
+    case 2: /* Iriver H1x0 4-grey */
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
                 dest.d16[(row/4) * dst_w + col] |=
-                       (~brightness(src[row * width + col]) & 0xC0) >> (2 * (~row & 3));
+                    (~brightness(src[row * width + col]) & 0xC0) >> (2 * (~row & 3));
             }
         break;
 
-      case 3: /* Canonical 8-bit grayscale */
+    case 3: /* Canonical 8-bit grayscale */
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
@@ -409,8 +429,8 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
             }
         break;
 
-      case 4: /* 16-bit packed RGB (5-6-5) */
-      case 5: /* 16-bit packed and byte-swapped RGB (5-6-5) */
+    case 4: /* 16-bit packed RGB (5-6-5) */
+    case 5: /* 16-bit packed and byte-swapped RGB (5-6-5) */
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
@@ -426,16 +446,16 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
             }
         break;
 
-      case 6: /* greyscale iPods 4-grey */
+    case 6: /* greyscale iPods 4-grey */
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
                 dest.d16[row * dst_w + (col/4)] |=
-                       (~brightness(src[row * width + col]) & 0xC0) >> (2 * (col & 3));
+                    (~brightness(src[row * width + col]) & 0xC0) >> (2 * (col & 3));
             }
         break;
 
-      case 7: /* greyscale X5 remote 4-grey */
+    case 7: /* greyscale X5 remote 4-grey */
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
@@ -446,7 +466,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
             }
         break;
         
-      case 8: /* 16-bit packed RGB (5-6-5) vertical stride*/
+    case 8: /* 16-bit packed RGB (5-6-5) vertical stride*/
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
@@ -459,7 +479,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
             }
         break;
 
-      case 9: /* 24-bit RGB */
+    case 9: /* 24-bit RGB */
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
@@ -482,7 +502,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
 
 void generate_c_source(char *id, char* header_dir, int width, int height,
                        const union RAWDATA *t_bitmap, int t_width,
-                       int t_height, int t_depth, bool t_mono, bool create_bm)
+                       int t_height, int t_depth, bool t_mono, bool create_bm, bool compress_bm)
 {
     FILE *f;
     FILE *fh;
@@ -510,18 +530,27 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
                 "#define BMPHEIGHT_%s %d\n"
                 "#define BMPWIDTH_%s %d\n",
                 id, height, id, width);
-        if (t_depth <= 8)
-            fprintf(fh, "extern const unsigned char %s[];\n", id);
-        else if (t_depth <= 16)
-            fprintf(fh, "extern const unsigned short %s[];\n", id);
-        else
-            fprintf(fh, "extern const fb_data %s[];\n", id);
-
-
-        if (create_bm)
+        if(!compress_bm)
         {
-            fprintf(f, "#include \"lcd.h\"\n");
-            fprintf(fh, "extern const struct bitmap bm_%s;\n", id);
+            if (t_depth <= 8)
+                fprintf(fh, "extern const unsigned char %s[];\n", id);
+            else if (t_depth <= 16)
+                fprintf(fh, "extern const unsigned short %s[];\n", id);
+            else
+                fprintf(fh, "extern const fb_data %s[];\n", id);
+
+
+            if (create_bm)
+            {
+                fprintf(f, "#include \"lcd.h\"\n");
+                fprintf(fh, "extern const struct bitmap bm_%s;\n", id);
+            }
+        }
+        else
+        {
+            fprintf(fh, "#define BMPRLE_%s\n", id);
+            fprintf(fh, "#define BMPSIZE_%s %d\n", id, height*width);
+            fprintf(fh, "extern const unsigned short rle_data_%s[];\n", id);
         }
         fclose(fh);
     } else {
@@ -535,46 +564,154 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
         fprintf(f, "#include \"%s\"\n", header_name);
     }
 
-    if (t_depth <= 8)
-        fprintf(f, "const unsigned char %s[] = {\n", id);
-    else if (t_depth == 16)
-        fprintf(f, "const unsigned short %s[] = {\n", id);
-    else if (t_depth == 24)
-        fprintf(f, "const fb_data %s[] = {\n", id);
-
-    for (i = 0; i < t_height; i++)
+    if(compress_bm)
     {
-        for (a = 0; a < t_width; a++)
-        {
-            if (t_depth <= 8)
-                fprintf(f, "0x%02x,%c", t_bitmap->d16[i * t_width + a],
-                        (a + 1) % 13 ? ' ' : '\n');
-            else if (t_depth == 16)
-                fprintf(f, "0x%04x,%c", t_bitmap->d16[i * t_width + a],
-                        (a + 1) % 10 ? ' ' : '\n');
-            else if (t_depth == 24)
-                fprintf(f, "{ .r = 0x%02x, .g = 0x%02x, .b = 0x%02x },%c",
-                        t_bitmap->d24[i * t_width + a].r,
-                        t_bitmap->d24[i * t_width + a].g,
-                        t_bitmap->d24[i * t_width + a].b,
-                        (a + 1) % 4 ? ' ' : '\n');
-        }
-        fprintf(f, "\n");
+        if(t_depth<=8 || t_depth==24)
+            fprintf(f, "const unsigned char %s[] = {\n", id);
+        else if(t_depth==16)
+            fprintf(f, "const unsigned short rle_data_%s[] = {\n",id);
+    }
+    else
+    {
+        if (t_depth <= 8)
+            fprintf(f, "const unsigned char %s[] = {\n", id);
+        else if (t_depth == 16)
+            fprintf(f, "const unsigned short %s[] = {\n", id);
+        else if (t_depth == 24)
+            fprintf(f, "const fb_data %s[] = {\n", id);
     }
 
+    if(!compress_bm)
+    {
+        for (i = 0; i < t_height; i++)
+        {
+            for (a = 0; a < t_width; a++)
+            {
+                if (t_depth <= 8)
+                    fprintf(f, "0x%02x,%c", t_bitmap->d16[i * t_width + a],
+                            (a + 1) % 13 ? ' ' : '\n');
+                else if (t_depth == 16)
+                    fprintf(f, "0x%04x,%c", t_bitmap->d16[i * t_width + a],
+                            (a + 1) % 10 ? ' ' : '\n');
+                else if (t_depth == 24)
+                    fprintf(f, "{ .r = 0x%02x, .g = 0x%02x, .b = 0x%02x },%c",
+                            t_bitmap->d24[i * t_width + a].r,
+                            t_bitmap->d24[i * t_width + a].g,
+                            t_bitmap->d24[i * t_width + a].b,
+                            (a + 1) % 4 ? ' ' : '\n');
+            }
+            fprintf(f, "\n");
+        }
+    }
+    else
+    {
+        if(t_depth<=16)
+        {
+            unsigned short last=t_bitmap->d16[0];
+            int written=0;
+            fprintf(f, "0x%04x, ", last);
+            ++written;
+            for(i = 1; i < t_height*t_width; i++)
+            {
+                unsigned short current=t_bitmap->d16[i];
+                if(current!=last)
+                {
+                    if(t_depth<=8)
+                        fprintf(f, "0x%02x,%c", current, (written + 1)%13 ? ' ' : '\n');
+                    else
+                        fprintf(f, "0x%04x,%c", current, (written + 1)%10 ? ' ' : '\n');
+                }
+                else
+                {
+                    /* two bytes repeated, do some RLE */
+                    /* count how many MORE bytes are repeated */
+                    unsigned short reps=0;
+                    while(i<t_width*t_height-1 && reps<=0xFFFE)
+                    {
+                        if(t_bitmap->d16[i+1]==current)
+                        {
+                            ++reps;
+                            ++i;
+                        }
+                        else
+                            break;
+                    }
+                    /* write the current byte first */
+                    if(t_depth<=8)
+                        fprintf(f, "0x%02x,%c", current, (written + 1)%13? ' ' : '\n');
+                    else
+                        fprintf(f, "0x%04x,%c", current, (written + 1)%10? ' ' : '\n');
+
+                    /* then write the number of repeats */
+                    if(t_depth<=8)
+                    {
+                        /* write num repeats as 16-bit BIG endian */
+                        fprintf(f, "0x%02x,%c0x%02x,%c", ((reps&0xFF00)>>8), (written + 1)%10? ' ' : '\n', (reps&0xFF), (written + 2)%10? ' ' : '\n');
+                        ++written;
+                    }
+                    else
+                    {
+                        fprintf(f, "0x%04x,%c", reps, (written + 1)%10 ? ' ' : '\n');
+                        ++written;
+                    }
+                }
+                ++written;
+                last=current;
+            }
+        }
+        else /* 24-bit!!! */
+        {
+            /* compressed as 1-byte-at-a-time BGR
+               - num repeats written as 2-byte BIG endian short
+            */
+            struct fb_data last=t_bitmap->d24[0];
+            int written=0;
+            write_fb_data(&last, f, &written);
+            for(i = 1; i < t_height*t_width; i++)
+            {
+                struct fb_data current=t_bitmap->d24[i];
+                if(!compare_fb_data(&current, &last))
+                {
+                    write_fb_data(&current, f, &written);
+                }
+                else
+                {
+                    /* two bytes repeated, do some RLE */
+                    /* count how many MORE bytes are repeated */
+                    unsigned short reps=0;
+                    while(i<t_width*t_height-1 && reps<=0xFFFE)
+                    {
+                        if(compare_fb_data(&t_bitmap->d24[i+1],&current))
+                        {
+                            ++reps;
+                            ++i;
+                        }
+                        else
+                            break;
+                    }
+                    /* write the current byte first */
+                    write_fb_data(&current, f, &written);
+                    /* then the number of repeats */
+                    fprintf(f, "0x%02x,%c0x%02x,%c", ((reps&0xFF00)>>8), (written + 1)%13 ? ' ' : '\n', (reps&0xFF), (written + 2)%13 ? ' ' : '\n');
+                    written+=2;
+                }
+                last=current;
+            }
+        }
+    }
     fprintf(f, "\n};\n\n");
 
     if (create_bm) {
         char format_line[] = "    .format = FORMAT_NATIVE, \n";
         fprintf(f, "const struct bitmap bm_%s = { \n"
-                   "    .width = BMPWIDTH_%s, \n"
-                   "    .height = BMPHEIGHT_%s, \n"
-                   "%s"
-                   "    .data = (unsigned char*)%s,\n"
-                   "};\n",
-                    id, id, id,
-                    t_mono ? "" : format_line,
-                    id);
+                "    .width = BMPWIDTH_%s, \n"
+                "    .height = BMPHEIGHT_%s, \n"
+                "%s"
+                "    .data = (unsigned char*)%s,\n"
+                "};\n",
+                id, id, id,
+                t_mono ? "" : format_line,
+                id);
     }
 }
 
@@ -642,6 +779,7 @@ void print_usage(void)
            "\t-h <dir> Create header file in <dir>/<id>.h\n"
            "\t-a       Show ascii picture of bitmap\n"
            "\t-b       Create bitmap struct along with pixel array\n"
+           "\t-c       Generate RLE-compressed bitmap\n"
            "\t-r       Generate RAW file (little-endian)\n"
            "\t-f <n>   Generate destination format n, default = 0\n"
            "\t         0  Archos recorder, Ondio, Iriver H1x0 mono\n"
@@ -672,6 +810,7 @@ int main(int argc, char **argv)
     int t_width, t_height, t_depth;
     bool raw = false;
     bool create_bm = false;
+    bool compress_bm = false;
 
 
     for (i = 1;i < argc;i++)
@@ -680,7 +819,7 @@ int main(int argc, char **argv)
         {
             switch (argv[i][1])
             {
-              case 'h':   /* .h filename */
+            case 'h':   /* .h filename */
                 if (argv[i][2])
                 {
                     header_dir = &argv[i][2];
@@ -697,7 +836,7 @@ int main(int argc, char **argv)
                 }
                 break;
 
-              case 'i':   /* ID */
+            case 'i':   /* ID */
                 if (argv[i][2])
                 {
                     id = &argv[i][2];
@@ -714,19 +853,23 @@ int main(int argc, char **argv)
                 }
                 break;
 
-              case 'a':   /* Ascii art */
+            case 'a':   /* Ascii art */
                 ascii = true;
                 break;
 
-              case 'b':
+            case 'b':
                 create_bm = true;
                 break;
 
-              case 'r':   /* Raw File */
+            case 'c': /* use RLE */
+                compress_bm = true;
+                break;
+
+            case 'r':   /* Raw File */
                 raw = true;
                 break;
 
-              case 'f':
+            case 'f':
                 if (argv[i][2])
                 {
                     format = atoi(&argv[i][2]);
@@ -743,7 +886,7 @@ int main(int argc, char **argv)
                 }
                 break;
 
-              default:
+            default:
                 print_usage();
                 exit(1);
                 break;
@@ -800,7 +943,7 @@ int main(int argc, char **argv)
         else
             generate_c_source(id, header_dir, width, height, &t_bitmap, 
                               t_width, t_height, t_depth,
-                              format <= 1, create_bm);
+                              format <= 1, create_bm, compress_bm);
     }
 
     return 0;
