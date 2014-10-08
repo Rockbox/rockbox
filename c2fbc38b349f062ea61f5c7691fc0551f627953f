@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_357c3020",
+        "filename": "apps/plugins/xrick/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-08T23:58:06Z",
+      "side": 1,
+      "message": "I was aware of that, but this is taken straight from the original README; it could be babble, it could Babel...I don\u0027t know. I\u0027ll ask the original author of xrick at some point.",
+      "parentUuid": "5a18252c_15cbf473",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_75c86875",
         "filename": "apps/plugins/xrick/README.md",
         "patchSetId": 2
@@ -47,6 +65,24 @@
       "writtenOn": "2014-10-07T22:54:35Z",
       "side": 1,
       "message": "Real name?",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_15793430",
+        "filename": "apps/plugins/xrick/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-08T23:58:06Z",
+      "side": 1,
+      "message": "There is no mention of his real name neither on his website, nor in the original README and I don\u0027t know if he is comfortable with sharing it. Again, I\u0027ll ask him.",
+      "parentUuid": "5a18252c_75c86875",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -70,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_7576a83f",
+        "filename": "apps/plugins/xrick/README.rockbox",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-08T23:58:06Z",
+      "side": 1,
+      "message": "I\u0027ve added it mostly for point 3, so that devs/testers know where to put game files. Of course It will become obsolete once we\u0027ll have a game manual; at that point I\u0027ll just delete it.\nFor now I\u0027m tempted to leave it as it is.",
+      "parentUuid": "5a18252c_55c56c59",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_b5a040a7",
         "filename": "apps/plugins/xrick/control.h",
         "patchSetId": 2
@@ -81,6 +135,24 @@
       "writtenOn": "2014-10-07T22:54:35Z",
       "side": 1,
       "message": "typedefs are bad!",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_f598f86c",
+        "filename": "apps/plugins/xrick/control.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-08T23:58:06Z",
+      "side": 1,
+      "message": "Who told you that?\n\nIt\u0027s a common workaround to avoid having to repeat enum x, struct x etc (particularly tedious for people, like me, used to C++), which IMHO improves readability (when not abused -e.g. chain of typedefs which make difficult to track down original type).\n\nPlease have a read at:\nhttp://stackoverflow.com/questions/10243149/why-is-typedef-struct-foo-foo-considered-harmful",
+      "parentUuid": "5a18252c_b5a040a7",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -224,6 +296,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_35a390a0",
+        "filename": "apps/plugins/xrick/system/main_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-08T23:58:06Z",
+      "side": 1,
+      "message": "Doh! Silly mistake, totally forgot to set formatting in my Linux editor (and of course forgot to double-check formatting before committing too).",
+      "parentUuid": "5a18252c_55528cde",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_b55de0ee",
         "filename": "apps/plugins/xrick/system/miniz_config.h",
         "patchSetId": 2
@@ -292,6 +382,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_15a01490",
+        "filename": "apps/plugins/xrick/system/sysarg_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-08T23:58:06Z",
+      "side": 1,
+      "message": "I\u0027m just reusing what the original xrick code provides here. Considering that the macro is already available, don\u0027t think there is any harm in reusing it, plus I think it\u0027s more readable than the usual \"(void) variable\" construct.\n\nAs a side note: the SDL (Windows/Linux/Mac) version of xrick generates a warnings on non-gnu compilers (due to UNUSED not being defined for them -it boils down to a compiler specific extension-), so I\u0027ll probably have to add the \"(void) variable\" construct regardless under SDL.\nHowever we know the rockbox port is compiled under gcc, so I\u0027m planning to leave it as it is for better clarity, unless you have strong opinions against it... ;)",
+      "parentUuid": "5a18252c_15e4940b",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_f55758c8",
         "filename": "apps/plugins/xrick/system/sysevt_rockbox.c",
         "patchSetId": 2
@@ -338,6 +446,42 @@
       "side": 1,
       "message": "Or just yield()",
       "parentUuid": "5a18252c_d55cdcef",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_75ad0888",
+        "filename": "apps/plugins/xrick/system/sysevt_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-08T23:58:06Z",
+      "side": 1,
+      "message": "in this specific case we can sleep for a (relatively) long time because the game is paused: nothing apart from button polling gets done.\nSo yes, I could use it, but line 73 still needs the normal (non-PLA) button polling, because it turns out PLA is not working for me when game running.\nNot sure why, but I think the PLA code is not fast enough to be able to detect button changes when a very busy loop involved, also I can\u0027t block main game loop for too long (when game not paused) because I need to perform sound mixing, video update etc, moreover it looks like PLA is doing a lot of things which can make the code run (unnecessarily) slower.\n\nDo you know if PLA can be used at all when busy loops involved?",
+      "parentUuid": "5a18252c_d55cdcef",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_55aa8c71",
+        "filename": "apps/plugins/xrick/system/sysevt_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-08T23:58:06Z",
+      "side": 1,
+      "message": "Indeed I could probably just use yield... I don\u0027t know the implementation details behind yield and sleep and thought sleep was better to help save battery... \nWhat should I do then?",
+      "parentUuid": "5a18252c_75f188cd",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -652,6 +796,42 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_95ba64bf",
+        "filename": "apps/plugins/xrick/system/sysvid_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-08T23:58:06Z",
+      "side": 1,
+      "message": "I know, just leaving there for clarity :)",
+      "parentUuid": "5a18252c_f5b3d808",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_b5b5e0d1",
+        "filename": "apps/plugins/xrick/system/sysvid_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-08T23:58:06Z",
+      "side": 1,
+      "message": "Technically, I\u0027m not clearing rockbox real video buffer here, only the game frame buffer.\n sysvid_update() is in charge of populating and updating the real frame buffer (and in fact lcd_update() will be called there)",
+      "parentUuid": "5a18252c_750348b9",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_d5b85ce8",
         "filename": "apps/plugins/xrick/util.c",
         "patchSetId": 2
@@ -686,6 +866,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_f5af587b",
+        "filename": "apps/plugins/xrick/xrick.make",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-08T23:58:06Z",
+      "side": 1,
+      "message": "Yes indeed, forgot to ask you about this.\nNot sure how to proceed: shall we wait for people to test the unoptimized version first and report success?\nShall we go on and set it regardless for all targets?\n\n(I can test it on my iPodVideo and iRiver at least...)",
+      "parentUuid": "5a18252c_5500ccaa",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_b52b2033",
         "filename": "docs/CREDITS",
         "patchSetId": 2
@@ -697,6 +895,24 @@
       "writtenOn": "2014-10-07T08:21:48Z",
       "side": 1,
       "message": "We usually credit original authors of imported sources",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_d5b4dcd2",
+        "filename": "docs/CREDITS",
+        "patchSetId": 2
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-08T23:58:06Z",
+      "side": 1,
+      "message": "Yes sure, but all I can put for now is \"BigOrno (the original author of xrick)\". No idea whether or not he is willing to use his real name (I\u0027ll ask him at some point). Shall I wait for his reply? Shall I put the aforementioned line in the meanwhile? If so, does it go at the end, where team names are (e.g. The gnucess team etc), or alongside my name?",
+      "parentUuid": "5a18252c_b52b2033",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
