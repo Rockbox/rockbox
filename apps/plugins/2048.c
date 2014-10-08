@@ -132,6 +132,53 @@ static int best_score;
 static bool abnormal_exit=true;
 static struct highscore highscores[NUM_SCORES];
 
+const unsigned short rle_data__2048_background[] = {
+0xbdf7, 0xbdf7, 0x0000, /* <-RLE */ 0x37d6, 0x74bd, 0x74bd, 0x00da, /* <-RLE */ 0x37ce, 0x9df7, 0x37d6, 0x53b5, 0x74bd, 0x74bd, 0x00da, /* <-RLE */ 0x53b5, 0x37ce, 0x74bd, 0x74bd, 0xc07e, /* <-RLE */ 0x37ce, 0x53b5,
+0x74bd, 0x74bd,
+0x00da,
+/* <-RLE */ 0x53b5, 0x37ce, 0x9df7, 0x37d6, 0x74bd, 0x74bd, 0x00da, /* <-RLE */ 0x37d6, 0xbdf7,
+};
+
+unsigned short test_rle_data[BMPSIZE__2048_background];
+static inline unsigned short byteswap(unsigned short in)
+{
+    return (in >> 8) | ((in & 0xFF) << 8);
+}
+static void uncompress_bmp(const unsigned short* in, unsigned int sz /* elements, not bytes */, unsigned short* out)
+{
+    rb->sleep(0); /* sync to tick */
+    unsigned long start_tick=*rb->current_tick;
+    if(sz==0)
+        return;
+    unsigned short last=in[0];
+    out[0]=last;
+    unsigned int out_point=0;
+    unsigned int i;
+    for(i=1;i<sz;++i)
+    {
+        unsigned short current=in[i];
+        if(current==last)
+        {
+            /* write current */
+            out[out_point]=current;
+            ++out_point;
+            int n=in[i+1];
+            ++i;
+            /* write num reps */
+            for(int j=0;j<n;++j)
+            {
+                out[out_point]=byteswap(current);
+                ++out_point;
+            }
+        }
+        else
+        {
+            out[out_point]=byteswap(current);
+            ++out_point;
+        }
+        last=current;
+    }
+}
 /* returns a random int between min and max */
 static inline int rand_range(int min, int max)
 {
@@ -297,7 +344,7 @@ static void draw(void)
 
     /* draw the background */
 
-    rb->lcd_bitmap(_2048_background, BACKGROUND_X, BACKGROUND_Y, BMPWIDTH__2048_background, BMPWIDTH__2048_background);
+    rb->lcd_bitmap(test_rle_data, BACKGROUND_X, BACKGROUND_Y, BMPWIDTH__2048_background, BMPWIDTH__2048_background);
 
     /*
       grey_gray_bitmap(_2048_background, BACKGROUND_X, BACKGROUND_Y, BMPWIDTH__2048_background, BMPHEIGHT__2048_background);
@@ -984,6 +1031,7 @@ enum plugin_status plugin_start(const void* param)
     load_hs();
     rb->lcd_setfont(WHAT_FONT);
 
+    uncompress_bmp(rle_data__2048_background, sizeof(rle_data__2048_background)/sizeof(unsigned short), test_rle_data);
     /* now start the game menu */
     enum plugin_status ret=do_2048_menu();
     highscore_save(HISCORES_FILE,highscores,NUM_SCORES);
