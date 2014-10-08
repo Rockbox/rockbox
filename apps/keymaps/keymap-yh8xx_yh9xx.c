@@ -255,10 +255,8 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_CURSOR_LEFT,  BUTTON_FFWD|BUTTON_LEFT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_KBD_CURSOR_RIGHT, BUTTON_FFWD|BUTTON_RIGHT,        BUTTON_NONE },
     { ACTION_KBD_CURSOR_RIGHT, BUTTON_FFWD|BUTTON_RIGHT|BUTTON_REPEAT,BUTTON_NONE },
-    { ACTION_KBD_SELECT,       BUTTON_PLAY|BUTTON_REL,          BUTTON_NONE },
-    { ACTION_KBD_PAGE_FLIP,    BUTTON_FFWD|BUTTON_REL,          BUTTON_FFWD },
-    { ACTION_KBD_DONE,         BUTTON_PLAY|BUTTON_REPEAT,       BUTTON_NONE },
-    { ACTION_KBD_DONE,         BUTTON_FFWD|BUTTON_PLAY,         BUTTON_NONE },
+    { ACTION_KBD_SELECT,       BUTTON_PLAY,                     BUTTON_NONE },
+    { ACTION_KBD_DONE,         BUTTON_FFWD|BUTTON_REL,          BUTTON_FFWD },
     { ACTION_KBD_ABORT,        BUTTON_FFWD|BUTTON_REW,          BUTTON_NONE },
     { ACTION_KBD_ABORT,        BUTTON_REC,                      BUTTON_NONE },
     { ACTION_KBD_BACKSPACE,    BUTTON_REW|BUTTON_REL,            BUTTON_REW },
@@ -422,6 +420,7 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_RECSCREEN:
             return button_context_recscreen;
         case CONTEXT_KEYBOARD:
+        case CONTEXT_MORSE_INPUT:
             return button_context_keyboard;
 #if CONFIG_TUNER
         case CONTEXT_FM:
