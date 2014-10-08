@@ -68,6 +68,7 @@
     || (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) \
     || (CONFIG_KEYPAD == PBELL_VIBE500_PAD) \
     || (CONFIG_KEYPAD == SANSA_CONNECT_PAD) \
+    || (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) \
     || (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
 
 /* certain key combos toggle input mode between keyboard input and Morse input */
