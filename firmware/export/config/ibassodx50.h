@@ -142,3 +142,5 @@
 /* No special storage */
 #define CONFIG_STORAGE STORAGE_HOSTFS
 #define HAVE_STORAGE_FLUSH
+
+#define MODERN_UI
