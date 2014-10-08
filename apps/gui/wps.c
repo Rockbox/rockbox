@@ -985,8 +985,14 @@ long gui_wps_show(void)
                 gwps_leave_wps();
                 return GO_TO_ROOT;
                 break;
-
-
+#ifdef MODERN_UI
+            case ACTION_WPS_BACKLIGHT_OFF:
+                if(backlight_get_current_timeout() != 0)
+                {
+                    backlight_off();
+                }
+                break;
+#endif
 #ifdef HAVE_QUICKSCREEN
             case ACTION_WPS_QUICKSCREEN:
             {

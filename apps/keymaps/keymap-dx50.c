@@ -50,8 +50,13 @@ static const struct button_mapping button_context_standard[]  = {
 }; /* button_context_standard */
 
 static const struct button_mapping button_context_wps[]  = {
+#ifdef MODERN_UI
+    { ACTION_WPS_BACKLIGHT_OFF, BUTTON_POWER,                   BUTTON_NONE },
+    { ACTION_WPS_MENU,          BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE },
+#else
     { ACTION_WPS_MENU,          BUTTON_POWER,                   BUTTON_NONE },
     { ACTION_WPS_CONTEXT,       BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE },
+#endif
     { ACTION_WPS_PLAY,          BUTTON_PLAY|BUTTON_REL,         BUTTON_NONE },
     { ACTION_WPS_SKIPNEXT,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_NONE },
     { ACTION_WPS_SKIPPREV,      BUTTON_LEFT|BUTTON_REL,         BUTTON_NONE },
@@ -103,7 +108,9 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
 }; /* button_context_settingsgraphical */
 
 static const struct button_mapping button_context_mainmenu[]  = {
-
+#ifdef MODERN_UI
+    { ACTION_TREE_WPS,           BUTTON_POWER,                   BUTTON_NONE },
+#endif
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_TREE),
 }; /* button_context_mainmenu */
 
