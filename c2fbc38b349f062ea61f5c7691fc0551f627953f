@@ -454,6 +454,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_75db481c",
+        "filename": "apps/plugins/xrick/system/sysarg_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-09T08:12:37Z",
+      "side": 1,
+      "message": "Never ever rely on particular compiler used. As a side note I am playing with compiling rocbox with clang.",
+      "parentUuid": "5a18252c_15a01490",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_f55758c8",
         "filename": "apps/plugins/xrick/system/sysevt_rockbox.c",
         "patchSetId": 2
@@ -950,6 +968,24 @@
       "side": 1,
       "message": "Yes indeed, forgot to ask you about this.\nNot sure how to proceed: shall we wait for people to test the unoptimized version first and report success?\nShall we go on and set it regardless for all targets?\n\n(I can test it on my iPodVideo and iRiver at least...)",
       "parentUuid": "5a18252c_5500ccaa",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_55d8cc1d",
+        "filename": "apps/plugins/xrick/xrick.make",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-09T08:12:37Z",
+      "side": 1,
+      "message": "You definitely need to test on real targets. It is known that on various architectures different optimization levels yield different results (and I personally hit one particular case that -O2 screws up the bin completely but only on coldfire). Usually -Os is good balance but your mileage may vary :-)",
+      "parentUuid": "5a18252c_f5af587b",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
