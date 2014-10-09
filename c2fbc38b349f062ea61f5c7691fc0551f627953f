@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_15c77446",
+        "filename": "apps/plugins/xrick/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-09T00:29:01Z",
+      "side": 1,
+      "message": "This will complicate licensing...",
+      "parentUuid": "5a18252c_15793430",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_55c56c59",
         "filename": "apps/plugins/xrick/README.rockbox",
         "patchSetId": 2
@@ -124,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_55c1ec2d",
+        "filename": "apps/plugins/xrick/README.rockbox",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-09T00:29:01Z",
+      "side": 1,
+      "message": "ahh yes",
+      "parentUuid": "5a18252c_7576a83f",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_b5a040a7",
         "filename": "apps/plugins/xrick/control.h",
         "patchSetId": 2
@@ -153,6 +189,24 @@
       "side": 1,
       "message": "Who told you that?\n\nIt\u0027s a common workaround to avoid having to repeat enum x, struct x etc (particularly tedious for people, like me, used to C++), which IMHO improves readability (when not abused -e.g. chain of typedefs which make difficult to track down original type).\n\nPlease have a read at:\nhttp://stackoverflow.com/questions/10243149/why-is-typedef-struct-foo-foo-considered-harmful",
       "parentUuid": "5a18252c_b5a040a7",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_b5dcc019",
+        "filename": "apps/plugins/xrick/control.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-09T00:29:01Z",
+      "side": 1,
+      "message": "I guess this is ok as long as you make it clear what\u0027s a type (suffix _t) as opposed to a var",
+      "parentUuid": "5a18252c_f598f86c",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -482,6 +536,24 @@
       "side": 1,
       "message": "Indeed I could probably just use yield... I don\u0027t know the implementation details behind yield and sleep and thought sleep was better to help save battery... \nWhat should I do then?",
       "parentUuid": "5a18252c_75f188cd",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_95e1c4d3",
+        "filename": "apps/plugins/xrick/system/sysevt_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-09T00:29:01Z",
+      "side": 1,
+      "message": "Yes, PLA should be able to be used.\nAlso, you may want to consider un-boosting the CPU if you want to save power instead of sleeping.",
+      "parentUuid": "5a18252c_75ad0888",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -913,6 +985,24 @@
       "side": 1,
       "message": "Yes sure, but all I can put for now is \"BigOrno (the original author of xrick)\". No idea whether or not he is willing to use his real name (I\u0027ll ask him at some point). Shall I wait for his reply? Shall I put the aforementioned line in the meanwhile? If so, does it go at the end, where team names are (e.g. The gnucess team etc), or alongside my name?",
       "parentUuid": "5a18252c_b52b2033",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_f5e638e7",
+        "filename": "docs/CREDITS",
+        "patchSetId": 2
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-09T00:29:01Z",
+      "side": 1,
+      "message": "Perhaps your name and \"The XRick team\" if you can\u0027t get his name",
+      "parentUuid": "5a18252c_d5b4dcd2",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
