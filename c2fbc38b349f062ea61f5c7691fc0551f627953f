@@ -647,6 +647,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_7577c802",
+        "filename": "apps/plugins/xrick/system/sysfile_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-10T01:12:00Z",
+      "side": 1,
+      "message": "If you read my code (and accompanying note) carefully, you\u0027ll notice It\u0027s just a defensive check for (fd \u003d\u003d 0) to report a more meaningful error to the user in case Rockbox uses 0 as a valid fd.\nThe main problem here is that the xrick file API returns NULL (which of course is 0) to report a failure when opening a file; if Rockbox happens to successfully open a file with descriptor 0, the xrick engine will fail regardless, because that fd is the same as NULL (which, as mentioned earlier, indicates failure inside xrick code).\nBy adding a defensive check I\u0027ve made the error message more verbose, so I can spot if this will ever happen on sim/real targets (and fix accordingly by e.g. adjusting a fd -plus one/minus one- every time I use it).\n\nAs I\u0027ve written in related note, I\u0027ve never seen this happening, so IMHO no point in adding extra overhead just to fix a basically nonexistent bug.",
+      "parentUuid": "5a18252c_156f7493",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_f5dc7848",
         "filename": "apps/plugins/xrick/system/sysfile_rockbox.c",
         "patchSetId": 2
@@ -692,6 +710,24 @@
       "writtenOn": "2014-10-07T08:21:48Z",
       "side": 1,
       "message": "I don\u0027t know the memory usage patterns of this code. If simple push/pop i sufficient it should be the fastest solution if not could link tlfs and use \u0027regular\u0027 malloc \u0026 free.",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_55744cfc",
+        "filename": "apps/plugins/xrick/system/sysmem_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-10T01:12:00Z",
+      "side": 1,
+      "message": "entire game engine uses stack-like allocations successfully (same code tested and debugged under Windows as well), so no need for malloc/free.",
+      "parentUuid": "5a18252c_5569ec8a",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -829,6 +865,24 @@
       "side": 1,
       "message": "But also keep this as a fallback for timer-less devices (ex. ipod6g)",
       "parentUuid": "5a18252c_35f9d0c9",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_754ea8c2",
+        "filename": "apps/plugins/xrick/system/system_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-10T01:12:00Z",
+      "side": 1,
+      "message": "Considering a)the game seems to run fine with just coarse-grained timers and b) ipod6 has no user timers, I\u0027ll leave this as it is until someone reports strange behaviours(e.g. stuttering sound if smaller mix buffer needed/used).",
+      "parentUuid": "5a18252c_95bee4d2",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
