@@ -69,7 +69,16 @@ struct usb_class_driver {
     /* Tells the driver that a usb transfer has been completed. Note that "dir"
        is relative to the host
        Optional function */
-    void (*transfer_complete)(int ep,int dir, int status, int length);
+    void (*transfer_complete)(int ep, int dir, int status, int length);
+
+    /* Similar to transfer_complete but called directly instead of going through
+     * the usb queue. Since it might be called in an interrupt context,
+     * processing should be kept to a minimum. This is mainly intented for
+     * isochronous transfers.
+     * The function must return true if it handled the completion, and false
+     * otherwise so that it is dispatched to the normal handler
+     * Optional function */
+    bool (*fast_transfer_complete)(int ep, int dir, int status, int length);
 
     /* Tells the driver that a control request has come in. If the driver is
        able to handle it, it should ack the request, and return true. Otherwise
@@ -83,6 +92,16 @@ struct usb_class_driver {
        Optional function */
     void (*notify_hotswap)(int volume, bool inserted);
 #endif
+
+    /* Tells the driver to select an alternate setting for a specific interface.
+     * Returns 0 on success and -1 on error.
+     * Mandatory function if alternate interface support is needed */
+    int (*set_interface)(int interface, int alt_setting);
+
+    /* Asks the driver what is the current alternate setting for a specific interface.
+     * Returns value on success and -1 on error.
+     * Mandatory function if alternate interface support is needed */
+    int (*get_interface)(int interface);
 };
 
 #define PACK_DATA(dest, data) pack_data(dest, &(data), sizeof(data))
