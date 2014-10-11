@@ -2420,18 +2420,32 @@ static bool dbg_talk(void)
 }
 
 #ifdef HAVE_USBSTACK
-#if defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL)
-static bool toggle_usb_serial(void)
+#if (defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL)) || defined(USB_ENABLE_AUDIO)
+static bool toggle_usb_core_driver(int driver, char *msg)
 {
-    bool enabled = !usb_core_driver_enabled(USB_DRIVER_SERIAL);
+    bool enabled = !usb_core_driver_enabled(driver);
 
-    usb_core_enable_driver(USB_DRIVER_SERIAL, enabled);
-    splashf(HZ, "USB Serial %sabled", enabled ? "en" : "dis");
+    usb_core_enable_driver(driver,enabled);
+    splashf(HZ, "%s %s", msg, enabled ? "enabled" : "disabled");
 
     return false;
 }
+
+#ifdef USB_ENABLE_SERIAL
+static bool toggle_usb_serial(void)
+{
+    return toggle_usb_core_driver(USB_DRIVER_SERIAL, "USB Serial");
+}
+#endif /* USB_ENABLE_SERIAL */
+
+#ifdef USB_ENABLE_AUDIO
+static bool toggle_usb_audio(void)
+{
+    return toggle_usb_core_driver(USB_DRIVER_AUDIO, "USB Audio");
+}
+#endif /* USB_ENABLE_AUDIO */
 #endif
-#endif
+#endif /* HAVE_USBSTACK */
 
 #if CONFIG_USBOTG == USBOTG_ISP1583
 extern int dbg_usb_num_items(void);
@@ -2667,6 +2681,9 @@ static const struct {
 #if defined(HAVE_USBSTACK)
 #if defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL)
         {"USB Serial driver (logf)", toggle_usb_serial },
+#endif
+#if defined(USB_ENABLE_AUDIO)
+        {"USB Audio", toggle_usb_audio },
 #endif
 #endif /* HAVE_USBSTACK */
 #ifdef CPU_BOOST_LOGGING

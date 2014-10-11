@@ -595,6 +595,11 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
     return prime_transfer(EP_NUM(endpoint), ptr, length, false, false);
 }
 
+int usb_drv_recv_blocking(int endpoint, void* ptr, int length)
+{
+    return prime_transfer(EP_NUM(endpoint), ptr, length, false, true);
+}
+
 int usb_drv_port_speed(void)
 {
     return (REG_PORTSC1 & 0x08000000) ? 1 : 0;
