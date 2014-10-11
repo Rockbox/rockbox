@@ -368,6 +368,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_9599c422",
+        "filename": "apps/plugins/xrick/system/main_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-11T15:14:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a18252c_35a390a0",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_b55de0ee",
         "filename": "apps/plugins/xrick/system/miniz_config.h",
         "patchSetId": 2
@@ -466,6 +484,24 @@
       "side": 1,
       "message": "Never ever rely on particular compiler used. As a side note I am playing with compiling rocbox with clang.",
       "parentUuid": "5a18252c_15a01490",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_f59e3806",
+        "filename": "apps/plugins/xrick/system/sysarg_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-11T15:14:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a18252c_75db481c",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -572,6 +608,24 @@
       "side": 1,
       "message": "Yes, PLA should be able to be used.\nAlso, you may want to consider un-boosting the CPU if you want to save power instead of sleeping.",
       "parentUuid": "5a18252c_75ad0888",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_d5a33c4e",
+        "filename": "apps/plugins/xrick/system/sysevt_rockbox.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-11T15:14:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a18252c_75f188cd",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -1046,6 +1100,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_3589d0cb",
+        "filename": "apps/plugins/xrick/xrick.make",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-11T15:14:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a18252c_55d8cc1d",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_b52b2033",
         "filename": "docs/CREDITS",
         "patchSetId": 2
@@ -1093,6 +1165,24 @@
       "side": 1,
       "message": "Perhaps your name and \"The XRick team\" if you can\u0027t get his name",
       "parentUuid": "5a18252c_d5b4dcd2",
+      "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_158654b9",
+        "filename": "docs/CREDITS",
+        "patchSetId": 2
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 1000430
+      },
+      "writtenOn": "2014-10-11T15:14:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a18252c_f5e638e7",
       "revId": "c2fbc38b349f062ea61f5c7691fc0551f627953f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
