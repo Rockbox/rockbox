@@ -39,6 +39,8 @@
 
 extern bool audio_is_initialized;
 
+static int sound_setting_volume = 0; // UGLY
+
 static const struct sound_setting_entry * get_setting_entry(int setting)
 {
     static const struct sound_settings_info default_info =
@@ -216,13 +218,18 @@ void sound_set_volume(int value)
 {
     if (!audio_is_initialized)
         return;
-
+    sound_setting_volume = value;
 #if defined(AUDIOHW_HAVE_CLIPPING)
     audiohw_set_volume(value);
 #else
     sound_prescaler.volume = sound_value_to_cb(SOUND_VOLUME, value);
     set_prescaled_volume();
 #endif
+}
+
+int sound_get_volume(void)
+{
+    return sound_setting_volume;
 }
 
 void sound_set_balance(int value)
