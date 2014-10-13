@@ -853,11 +853,20 @@ const struct settings_list settings[] = {
                   MAX_CONTRAST_SETTING, 1, NULL, NULL }}}},
 #endif
 #ifdef HAVE_BACKLIGHT
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_timeout, LANG_BACKLIGHT, 
+#if defined(HAVE_LCD_COLOR) || defined(HAVE_NEGATIVE_LCD)
+    /* do not allow "off" on Color LCD's and B/W OLED Screens */
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_timeout, LANG_BACKLIGHT,
+                    DEFAULT_BACKLIGHT_TIMEOUT,
+                  "backlight timeout", "on", UNIT_SEC, backlight_formatter,
+                  backlight_getlang, backlight_set_timeout, 19,
+                  0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
+#else
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_timeout, LANG_BACKLIGHT,
                     DEFAULT_BACKLIGHT_TIMEOUT,
                   "backlight timeout", off_on, UNIT_SEC, backlight_formatter,
                   backlight_getlang, backlight_set_timeout, 20,
                   -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
+#endif
 #if CONFIG_CHARGING
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_timeout_plugged,
                   LANG_BACKLIGHT_ON_WHEN_CHARGING, 10,
