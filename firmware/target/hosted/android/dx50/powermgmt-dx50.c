@@ -21,9 +21,11 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "config.h"
 #include "power.h"
 #include "powermgmt.h"
+
 
 unsigned int power_input_status(void)
 {
@@ -34,8 +36,31 @@ unsigned int power_input_status(void)
     return val?POWER_INPUT_MAIN_CHARGER:POWER_INPUT_NONE;
 }
 
-/* Values for stock PISEN battery. TODO: Needs optimization */
 
+/* Returns true, if battery is charging, false else. */
+bool charging_state( void )
+{
+    /* Full, Charging, Discharging */
+    char state[9];
+
+    /* true if charging. */
+    bool charging = false;
+
+    FILE *f = fopen( "/sys/class/power_supply/battery/status", "r" );
+    if( f != NULL )
+    {
+        if( fgets( state, 9, f ) != NULL )
+        {
+            charging = ( strcmp( state, "Charging" ) == 0 );
+        }
+    }
+    fclose( f );
+
+    return charging;
+}
+
+
+/* Values for stock PISEN battery. TODO: Needs optimization */
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     3380
@@ -52,10 +77,10 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
     { 3370, 3650, 3700, 3740, 3780, 3820, 3870, 3930, 4000, 4090, 4190 }
 };
 
-/* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
+/* Voltages (millivolt) of 0%, 10%, ... 100% when charging is enabled. */
 const unsigned short percent_to_volt_charge[11] =
 {
-    3540, 3860, 3930, 3980, 4000, 4020, 4040, 4080, 4130, 4180, 4220 /* LiPo */
+    3370, 3650, 3700, 3740, 3780, 3820, 3870, 3930, 4000, 4090, 4190
 };
 
 
