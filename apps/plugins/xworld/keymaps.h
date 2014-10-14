@@ -1,0 +1,58 @@
+#if (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
+#define BTN_UP         BUTTON_UP
+#define BTN_DOWN       BUTTON_DOWN
+#define BTN_LEFT       BUTTON_LEFT
+#define BTN_RIGHT      BUTTON_RIGHT
+#define BTN_UP_LEFT    BUTTON_BACK
+#define BTN_UP_RIGHT   BUTTON_PLAYPAUSE
+#define BTN_DOWN_LEFT  BUTTON_BOTTOMLEFT
+#define BTN_DOWN_RIGHT BUTTON_BOTTOMRIGHT
+#define BTN_FIRE       BUTTON_VOL_UP
+#define BTN_PAUSE      BUTTON_VOL_DOWN
+
+#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
+#define BTN_UP         BUTTON_UP
+#define BTN_DOWN       BUTTON_DOWN
+#define BTN_LEFT       BUTTON_LEFT
+#define BTN_RIGHT      BUTTON_RIGHT
+#define BTN_FIRE       BUTTON_HOME
+#define BTN_PAUSE      BUTTON_SELECT
+#define BTN_MENU       BUTTON_POWER
+
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
+#define BTN_UP         BUTTON_UP
+#define BTN_DOWN       BUTTON_DOWN
+#define BTN_LEFT       BUTTON_LEFT
+#define BTN_RIGHT      BUTTON_RIGHT
+#define BTN_FIRE       BUTTON_REC
+#define BTN_PAUSE      BUTTON_SELECT
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) ||         \
+      (CONFIG_KEYPAD == IPOD_3G_PAD) ||         \
+      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+#define BTN_UP         BUTTON_MENU
+#define BTN_DOWN       BUTTON_PLAY
+#define BTN_LEFT       BUTTON_LEFT
+#define BTN_RIGHT      BUTTON_RIGHT
+#define BTN_FIRE       BUTTON_SELECT
+#define BTN_PAUSE      (BUTTON_MENU | BUTTON_SELECT)
+
+#elif (CONFIG_KEYPAD == SANSA_CLIP_PAD)
+#define BTN_UP         BUTTON_UP
+#define BTN_DOWN       BUTTON_DOWN
+#define BTN_LEFT       BUTTON_LEFT
+#define BTN_RIGHT      BUTTON_RIGHT
+#define BTN_FIRE       BUTTON_SELECT
+#define BTN_PAUSE      BUTTON_POWER
+
+#elif (CONFIG_KEYPAD == CREATIVE_ZEN_PAD)
+#define BTN_UP         BUTTON_UP
+#define BTN_DOWN       BUTTON_DOWN
+#define BTN_LEFT       BUTTON_LEFT
+#define BTN_RIGHT      BUTTON_RIGHT
+#define BTN_FIRE       BUTTON_SELECT
+#define BTN_PAUSE      BUTTON_BACK
+
+#else
+#error Unsupported keypad
+#endif
