@@ -1,0 +1,44 @@
+/* Raw - Another World Interpreter
+ * Copyright (C) 2004 Gregory Montoir
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+#ifndef __INTERN_H__
+#define __INTERN_H__
+
+#include "plugin.h"
+#include "string.h"
+#include "stdlib.h"
+#include "assert.h"
+
+#include "awendian.h"
+#include "util.h"
+
+#define AWMAX(x,y) ((x)>(y)?(x):(y))
+#define AWMIN(x,y) ((x)<(y)?(x):(y))
+#define ARRAYSIZE(a) (sizeof(a)/sizeof(a[0]))
+
+struct Ptr {
+    uint8_t* pc;
+};
+
+uint8_t scriptPtr_fetchByte(struct Ptr*);
+uint16_t scriptPtr_fetchWord(struct Ptr*);
+struct Point {
+    int16_t x, y;
+};
+
+#endif
