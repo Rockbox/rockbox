@@ -991,4 +991,12 @@ resistor.128x128x16.bmp
 resistor.68x20x16.bmp
 #endif
 
+/* XWorld */
+
+#if (LCD_WIDTH >= 640)
+xworld_title.640x480x24.bmp
+#elif (LCD_WIDTH >= 320 || (LCD_WIDTH == 240 && LCD_HEIGHT == 320))
+xworld_title.320x240x24.bmp
+#endif
+
 #endif /* HAVE_LCD_BITMAP */
