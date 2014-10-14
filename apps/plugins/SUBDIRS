@@ -11,6 +11,7 @@ clock
 
 /* For all targets with a bitmap display */
 #ifdef HAVE_LCD_BITMAP
+xworld
 
 #if    (CONFIG_KEYPAD != ONDIO_PAD) /* not enough buttons */ \
     && (CONFIG_KEYPAD != SANSA_M200_PAD) /* not enough buttons */ \
