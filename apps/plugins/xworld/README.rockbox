@@ -1,0 +1,51 @@
+This is the Rockbox port of Fabien Sanglard's "Fabother World", an Another World
+interpreter.
+
+Porting process:
+----------------
+
+The original code abstracted most of the platform-specific tasks, such as file I/O,
+sound, input, and video. However, the original code was in C++, so it was converted
+to C class-by-class. The conversion was attempted to be as conservative as possible,
+so little code was rewritten during the conversion process.
+
+Notes:
+------
+
+ - Optimization is badly needed.
+ - Vertical stride support is almost there.
+ - The game looks terrible in B+W/grayscale. This was the primary reason no attempt
+   was made to support these targets.
+ - The game does not run well on devices that have an LCD with a vertical stride.
+   - The M:Robe 500 is the only color device that meets this criterion, so it is
+     disabled by default.
+ - Sound doesn't sound 100% like the PC version. Perhaps the frequency reported to
+   the mixer is incorrect, or the buffer size is too big so that short sounds are
+   being missed.
+
+To do (in no particular order):
+-------------------------------
+
+ - Support vertical stride LCD's
+ - Support grayscale/monochrome LCD's
+ - Optimize
+
+Credits:
+--------
+
+**************************************
+**************************************
+********** !!!ERIC CHAHI!!! **********
+**************************************
+**************************************
+<the original author of Another World>
+
+Gregory Montoir
+Piotr Padkowski
+Fabien Sanglard
+
+Rockbox porters:
+----------------
+
+Franklin Wei
+Benjamin Brown
