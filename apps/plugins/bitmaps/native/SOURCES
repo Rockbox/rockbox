@@ -990,5 +990,4 @@ resistor.128x128x16.bmp
 #else
 resistor.68x20x16.bmp
 #endif
-
 #endif /* HAVE_LCD_BITMAP */
