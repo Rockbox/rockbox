@@ -1944,6 +1944,8 @@ static void computer_allocate(void)
     }
     if(superdom_settings.compdiff>=AI_BUILD_INDS_FARMS_LEVEL && compres.cash>=PRICE_FACTORY)
     {
+        /* TODO: fix this code */
+        /*
         while(compres.cash>=PRICE_FACTORY)
         {
             if(compres.farms<compres.inds)
@@ -1973,6 +1975,7 @@ static void computer_allocate(void)
                 }
             }
         }
+        */
     }
     /* AI will buy nukes first if possible */
     if(compres.cash > PRICE_NUKE + PRICE_TANK && superdom_settings.compdiff>=AI_BUILD_NUKES_LEVEL)
