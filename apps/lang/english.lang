@@ -13254,3 +13254,71 @@
     swcodec: "Q"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_DX50_USB_MODE
+  desc: in Settings -> General -> System -> USB Mode
+  user: core
+  <source>
+    *: none
+    ibassodx50: "USB Mode"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "USB Mode"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "USB Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DX50_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> Display -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Mass Storage"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Mass Storage"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Mass Storage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DX50_USB_MODE_CHARGE_ONLY
+  desc: in Settings -> General -> Display -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Charge Only"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Charge Only"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Charge Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DX50_USB_MODE_ADB
+  desc: in Settings -> General -> Display -> USB Mode: ADB
+  user: core
+  <source>
+    *: none
+    ibassodx50: "ADB"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "ADB"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "ADB"
+  </voice>
+</phrase>

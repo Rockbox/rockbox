@@ -838,6 +838,10 @@ struct user_settings
     int play_frequency; /* core audio output frequency selection */
 #endif
     int volume_limit; /* maximum volume limit */
+    
+#ifdef DX50
+    int usb_mode;
+#endif
 };
 
 /** global variables **/

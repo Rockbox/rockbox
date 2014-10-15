@@ -133,6 +133,10 @@
 
 #include "talk.h"
 
+#ifdef DX50
+#include "usb-dx50.h"
+#endif
+
 static const char* threads_getname(int selected_item, void *data,
                                    char *buffer, size_t buffer_len)
 {
