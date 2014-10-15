@@ -285,16 +285,6 @@ static void setoptions (void)
 #elif CONFIG_KEYPAD == ONDAVX777_PAD
         options.MENU    = BUTTON_POWER;
 
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-        options.UP      = BUTTON_UP;
-        options.DOWN    = BUTTON_DOWN;
-
-        options.A       = BUTTON_PLAY;
-        options.B       = BUTTON_FFWD;
-        options.START   = BUTTON_REW;
-        options.SELECT  = BUTTON_RIGHT;
-        options.MENU    = BUTTON_LEFT;
-
 #elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
       (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
         options.UP      = BUTTON_UP;
