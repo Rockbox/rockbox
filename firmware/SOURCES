@@ -1828,6 +1828,7 @@ target/hosted/android/dx50/powermgmt-dx50.c
 target/hosted/android/dx50/backlight-dx50.c
 target/hosted/android/dx50/button-dx50.c
 target/hosted/android/dx50/lcd-dx50.c
+target/hosted/android/dx50/usb-dx50.c
 #endif
 #ifdef DEBUG
 target/hosted/android/debug-android.c

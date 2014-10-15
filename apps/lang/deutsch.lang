@@ -33,6 +33,7 @@
 # - Kaspar Rothenfußer
 # - Johannes Linke
 # - Kai Posadowsky
+# - Udo Schläpfer
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -13052,5 +13053,73 @@
   </dest>
   <voice>
     *: "Beschränke automatischen Verzeichniswechsel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DX50_USB_MODE
+  desc: in Settings -> General -> System -> USB Mode
+  user: core
+  <source>
+    *: none
+    ibassodx50: "USB Mode"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "USB Modus"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "USB Modus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DX50_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> Display -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Mass Storage"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Massenspeicher"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Massenspeicher"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DX50_USB_MODE_CHARGE_ONLY
+  desc: in Settings -> General -> Display -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Charge Only"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Nur laden"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Nur laden"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DX50_USB_MODE_ADB
+  desc: in Settings -> General -> Display -> USB Mode: ADB
+  user: core
+  <source>
+    *: none
+    ibassodx50: "ADB"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "ADB"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "ADB"
   </voice>
 </phrase>
