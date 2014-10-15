@@ -9,7 +9,8 @@ used in any kind of game with up to ten players.
     \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD%
         ,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_FUZE_PAD,SANSA_FUZEPLUS_PAD}
         {\ButtonRight{} / \ButtonLeft}
-    \opt{RECORDER_PAD,ONDIO_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD}
+    \opt{RECORDER_PAD,ONDIO_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD%
+        ,SAMSUNG_YH92X_PAD}
         {\ButtonUp{} / \ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack{} / \ButtonScrollFwd}
     \opt{MPIO_HD200_PAD}{\ButtonVolUp / \ButtonVolDown}
@@ -17,7 +18,7 @@ used in any kind of game with up to ten players.
        \opt{HAVEREMOTEKEYMAP}{& }
       & Increase / decrease displayed Value\\
     %
-    \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+    \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{\ButtonPlay}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
     \opt{ONDIO_PAD}{\ButtonRight}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
@@ -36,6 +37,7 @@ used in any kind of game with up to ten players.
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD,SANSA_FUZEPLUS_PAD}{\ButtonBack}
     \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
+    \opt{SAMSUNG_YH92X_PAD}{\ButtonRew}
        \opt{HAVEREMOTEKEYMAP}{& }
       & Move to previous screen\\
   \end{btnmap}
@@ -65,7 +67,7 @@ Keys are as follows:
     \opt{IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD,MROBE100_PAD}{\ButtonPower}
     \opt{SANSA_FUZE_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPower}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
-    \opt{PBELL_VIBE500_PAD}{\ButtonRec}
+    \opt{PBELL_VIBE500_PAD,SAMSUNG_YH92X_PAD}{\ButtonRec}
     \opt{MPIO_HD200_PAD}{\ButtonRec + \ButtonPlay}
     \opt{MPIO_HD300_PAD}{Long \ButtonMenu}
        \opt{HAVEREMOTEKEYMAP}{& }
@@ -75,7 +77,7 @@ Keys are as follows:
     \opt{RECORDER_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,PBELL_VIBE500_PAD}{\ButtonLeft}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IAUDIO_X5_PAD}{\ButtonPower}
-    \opt{IRIVER_H10_PAD}{\ButtonFF}
+    \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{\ButtonFF}
     \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_FUZE_PAD}{\ButtonDown}
     \opt{GIGABEAT_PAD}{\ButtonA}
     \opt{GIGABEAT_S_PAD}{\ButtonPrev}
@@ -90,13 +92,15 @@ Keys are as follows:
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD%
         ,MROBE100_PAD,SANSA_FUZE_PAD}
         {\ButtonSelect}
-    \opt{PBELL_VIBE500_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPlay}
+    \opt{PBELL_VIBE500_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD%
+        }{\ButtonPlay}
        \opt{HAVEREMOTEKEYMAP}{& }
       & Pause the time (press again to continue) \\
     %
     \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD%
         ,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_FUZE_PAD}{\ButtonRight}
-    \opt{RECORDER_PAD,ONDIO_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
+    \opt{RECORDER_PAD,ONDIO_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD%
+        ,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD}
         {\ButtonUp}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack}
        \opt{HAVEREMOTEKEYMAP}{& }
@@ -104,7 +108,8 @@ Keys are as follows:
     %
     \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD%
         ,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_FUZE_PAD}{\ButtonLeft}
-    \opt{RECORDER_PAD,ONDIO_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
+    \opt{RECORDER_PAD,ONDIO_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD%
+        ,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD}
         {\ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
     \opt{MPIO_HD200_PAD}{\ButtonVolDown}
@@ -121,11 +126,12 @@ Keys are as follows:
     \opt{IRIVER_H10_PAD}{\ButtonRew}
     \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_FUZE_PAD}{\ButtonUp}
     \opt{MPIO_HD200_PAD}{Long \ButtonFunc}
+    \opt{SAMSUNG_YH92X_PAD}{\ButtonLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
       & Open menu %
         \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H10_PAD}{(\ButtonPlay\ to select.)}%
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{(\ButtonOn\ to select.)}%
-        \opt{ONDIO_PAD}{(\ButtonRight\ to select.)}%
+        \opt{ONDIO_PAD,SAMSUNG_YH92X_PAD}{(\ButtonRight\ to select.)}%
         \opt{IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD%
             ,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_FUZE_PAD,SANSA_FUZEPLUS_PAD}
             {(\ButtonSelect\ to select.)}%

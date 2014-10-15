@@ -105,12 +105,13 @@ if you select Exit, so any unsaved changes will be lost.}
 
 \begin{btnmap}
     \nopt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{
-        \nopt{IRIVER_H300_PAD,GIGABEAT_S_PAD,SANSA_FUZE_PAD,PBELL_VIBE500_PAD}
+        \nopt{IRIVER_H300_PAD,GIGABEAT_S_PAD,SANSA_FUZE_PAD,PBELL_VIBE500_PAD%
+             ,SAMSUNG_YH92X_PAD}
             {\ButtonPower}
         \opt{IRIVER_H300_PAD}{\ButtonOff}
         \opt{GIGABEAT_S_PAD}{\ButtonBack}
         \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
-        \opt{PBELL_VIBE500_PAD}{\ButtonRec}
+        \opt{PBELL_VIBE500_PAD,SAMSUNG_YH92X_PAD}{\ButtonRec}
           \opt{HAVEREMOTEKEYMAP}{& }
         & Quits Rockpaint immediately.\\
     }
@@ -133,6 +134,7 @@ if you select Exit, so any unsaved changes will be lost.}
     \opt{IAUDIO_X5_PAD}{\ButtonPlay}%
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,COWON_D2_PAD,PBELL_VIBE500_PAD}{\ButtonMenu}%
     \opt{IRIVER_H10_PAD}{\ButtonPlay}%
+    \opt{SAMSUNG_YH92X_PAD}{\ButtonFF}%
       \opt{HAVEREMOTEKEYMAP}{& }
     & Displays the Main Menu.\\
 
@@ -141,18 +143,19 @@ if you select Exit, so any unsaved changes will be lost.}
     \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonLeft}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonMenu+\ButtonLeft}
     \opt{GIGABEAT_PAD}{\ButtonA}
-    \opt{IRIVER_H10_PAD}{\ButtonRew}
+    \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{\ButtonRew}
     \opt{GIGABEAT_S_PAD}{\ButtonPlay}
-\opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomLeft{} or \ButtonBottomRight}
+    \opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomLeft{} or \ButtonBottomRight}
     \opt{touchscreen}{\TouchBottomLeft}
     \opt{PBELL_VIBE500_PAD}{\ButtonOK}
       \opt{HAVEREMOTEKEYMAP}{& }
     & Displays the toolbar.\\
 
-    \nopt{IRIVER_H10_PAD,touchscreen,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}{\ButtonSelect}%
+    \nopt{IRIVER_H10_PAD,touchscreen,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD%
+         ,SAMSUNG_YH92X_PAD}{\ButtonSelect}%
     \opt{IRIVER_H10_PAD}{\ButtonFF}%
     \opt{touchscreen}{\TouchCenter}
-    \opt{PBELL_VIBE500_PAD}{\ButtonPlay}
+    \opt{PBELL_VIBE500_PAD,SAMSUNG_YH92X_PAD}{\ButtonPlay}
     \opt{SANSA_FUZEPLUS_PAD}{\ButtonVolUp}
       \opt{HAVEREMOTEKEYMAP}{& }
     & Toggles the brush and selects objects.\\

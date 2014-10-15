@@ -476,6 +476,29 @@ detail in the following paragraph.
   On the top on the \dap{} is the internal microphone on the left and the line-in socket on the 
   right, near the headphone socket.}
   %
+  \opt{samsungyh920,samsungyh925}{
+  Hold or lay the \dap{} so that the side with the controls and
+  LCD is facing towards you. Below the LCD is a four-way pad with the \ButtonDown{}, 
+  \ButtonUp{}, \ButtonLeft{} and \ButtonRight{} buttons.
+
+  There are three buttons at the top of the right hand side of the \dap{}: \ButtonFF{} on the top, 
+  \ButtonPlay{} in the middle and \ButtonRew{} underneath. Below these buttons is the \ButtonRec{}
+  switch. When the \ButtonRec{} switch is moved towards the top of the \dap{}, it acts like
+  a pressing regular button, but it blocks other actions in this position, so it have to be set 
+  back by the user.
+
+  On the top panel of the \dap{}, from left to right, you can find the following: headphone/remote 
+  socket, line-in socket, internal microphone, and the \ButtonHold{} switch. Note that when the 
+  \ButtonHold{} switch is moved towards the center of the \dap{}, hold is turned on and all the 
+  other controls are disabled. Be sure \ButtonHold{} is off before trying to use your player. 
+
+  At the top of the back side of the player, just under the \ButtonHold{} button is the reset hole,
+  if you need to perform a hardware reset. 
+
+  The USB/dock connector that is used to connect your \dap{} to your computer is on 
+  the bottom panel of the \dap{}.
+  }
+  %
   \opt{player}{
   The main controls of this player are a four-way button on the right below
   the screen, and two round buttons to the left of it. Hold the \dap{} with
@@ -537,7 +560,7 @@ detail in the following paragraph.
 To turn on and off your Rockbox enabled \dap{} use the following keys:
     \begin{btnmap}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
-      \opt{MPIO_HD200_PAD,MPIO_HD300_PAD}{Long \ButtonPlay}%
+      \opt{MPIO_HD200_PAD,MPIO_HD300_PAD,SAMSUNG_YH92X_PAD}{Long \ButtonPlay}%
       \opt{IPOD_4G_PAD}{\ButtonMenu{} / \ButtonSelect}%
       \opt{IPOD_3G_PAD}{\ButtonMenu{} / \ButtonPlay}%
       \opt{ONDIO_PAD}{\ButtonOff}\opt{RECORDER_PAD,PLAYER_PAD}%
@@ -557,7 +580,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
           \\
 
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{Long \ButtonOff}%
-      \opt{MPIO_HD200_PAD,MPIO_HD300_PAD}{Long \ButtonPlay}%
+      \opt{MPIO_HD200_PAD,MPIO_HD300_PAD,SAMSUNG_YH92X_PAD}{Long \ButtonPlay}%
       \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Long \ButtonPlay}%
       \opt{ONDIO_PAD,recorderv2fm}{Long \ButtonOff}%
       \opt{recorder}{Double tap \ButtonOff\ when playback is stopped}%
@@ -595,7 +618,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
   {\ButtonPower} until the \dap{} shuts off or reboots.
 }%
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_M3_PAD,IRIVER_H10_PAD,MROBE100_PAD
-,PBELL_VIBE500_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD}{%
+,PBELL_VIBE500_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD,SAMSUNG_YH92X_PAD}{%
   In the unlikely event of a software failure, a hardware reset can be
   performed by inserting a paperclip gently into the Reset hole.
 }%
@@ -720,6 +743,14 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
     the file \fname{/System/OF.mi4}. To boot into the original firmware press and release
     \ButtonPower{} and then immediately after the backlight turns on, press the \ButtonOK{}
     button and keep it pressed until the original firmware starts.
+    }
+
+  \opt{samsungyh}
+    {
+    Rockbox has a dual-boot feature. It loads the original firmware from
+    the file \fname{/System/OF.mi4}. To boot into the original firmware, press and hold 
+    for awhile the \ButtonPlay{} button and then immediately after the Samsung logo appears, 
+    press the \ButtonLeft{} button and keep it pressed until the original firmware starts.
     }
 
   \opt{ondavx777}

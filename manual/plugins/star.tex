@@ -14,7 +14,7 @@ could not otherwise reach. The block cannot take ``o''s.
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
         ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD%
         ,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD%
-        ,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
+        ,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD}
         {\ButtonLeft}
     \opt{COWON_D2_PAD}{\TouchMidLeft}
     \opt{MPIO_HD300_PAD}{\ButtonRew}
@@ -23,7 +23,7 @@ could not otherwise reach. The block cannot take ``o''s.
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
         ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD%
         ,GIGABEAT_S_PAD,MROBE100_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD%
-        ,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
+        ,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD}
         {\ButtonRight}
     \opt{MPIO_HD300_PAD}{\ButtonFF}
     \opt{COWON_D2_PAD}{\TouchMidRight}
@@ -31,7 +31,8 @@ could not otherwise reach. The block cannot take ``o''s.
         & Move Right\\
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
         ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD%
-        ,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
+        ,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD%
+        ,SAMSUNG_YH92X_PAD}
         {\ButtonUp}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
@@ -41,7 +42,8 @@ could not otherwise reach. The block cannot take ``o''s.
         & Move Up\\
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
         ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD%
-        ,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
+        ,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD%
+        ,SAMSUNG_YH92X_PAD}
         {\ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonPlay}
     \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
@@ -56,7 +58,7 @@ could not otherwise reach. The block cannot take ``o''s.
         ,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonSelect}
     \opt{IRIVER_H10_PAD}{\ButtonRew}
     \opt{COWON_D2_PAD}{\TouchCenter}
-    \opt{PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPlay}
+    \opt{PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD}{\ButtonPlay}
     \opt{MPIO_HD300_PAD}{\ButtonEnter}
       \opt{HAVEREMOTEKEYMAP}{& }
         & Switch between circle and square\\
@@ -71,6 +73,7 @@ could not otherwise reach. The block cannot take ``o''s.
     \opt{COWON_D2_PAD}{\TouchBottomLeft}
     \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
     \opt{MPIO_HD300_PAD}{\ButtonPlay + \ButtonRew}
+    \opt{SAMSUNG_YH92X_PAD}{\ButtonRew}
       \opt{HAVEREMOTEKEYMAP}{& }
         & Previous level\\
     \opt{RECORDER_PAD}{\ButtonFTwo}
@@ -85,6 +88,7 @@ could not otherwise reach. The block cannot take ``o''s.
     \opt{COWON_D2_PAD}{\TouchBottomRight}
     \opt{MPIO_HD300_PAD}{Long \ButtonPlay}
     \opt{SANSA_FUZEPLUS_PAD}{Long \ButtonBack}
+    \opt{SAMSUNG_YH92X_PAD}{\ButtonRew + \ButtonFF}
       \opt{HAVEREMOTEKEYMAP}{& }
         & Reset level \\
     \opt{RECORDER_PAD}{\ButtonFThree}
@@ -98,6 +102,7 @@ could not otherwise reach. The block cannot take ``o''s.
     \opt{COWON_D2_PAD}{\TouchTopLeft}
     \opt{PBELL_VIBE500_PAD}{\ButtonOK}
     \opt{MPIO_HD300_PAD}{\ButtonPlay + \ButtonFF}
+    \opt{SAMSUNG_YH92X_PAD}{\ButtonFF}
       \opt{HAVEREMOTEKEYMAP}{& }
         & Next level \\
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
@@ -106,7 +111,7 @@ could not otherwise reach. The block cannot take ``o''s.
         ,GIGABEAT_PAD,COWON_D2_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPower}
     \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
-    \opt{PBELL_VIBE500_PAD}{\ButtonRec}
+    \opt{PBELL_VIBE500_PAD,SAMSUNG_YH92X_PAD}{\ButtonRec}
     \opt{MPIO_HD300_PAD}{Long \ButtonMenu}
       \opt{HAVEREMOTEKEYMAP}{& 
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}

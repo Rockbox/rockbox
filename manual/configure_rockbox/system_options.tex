@@ -26,6 +26,7 @@
       \opt{gigabeats}{700~mAh}%
       \opt{cowond2}{1600~mAh}%
       \opt{mrobe100}{720~mAh}%
+      \opt{samsungyh920,samsungyh925}{900~mAh}%
       , which is the capacity value for the standard
       \opt{archos}{batteries}\nopt{archos}{battery} shipped with the \dap.
         Rockbox uses this value for runtime estimation, not battery percentage
@@ -257,19 +258,21 @@ therefore result in better runtime.
     functionality.
     \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD%
         ,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD%
-        ,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}{%
+        ,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD}{%
     Switching modes back and forth is done by pressing the
         \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}%
         \opt{GIGABEAT_S_PAD,SANSA_CLIP_PAD,MROBE100_PAD,IRIVER_H10_PAD,SANSA_FUZEPLUS_PAD}%
             {\ButtonPower}%
         \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonSelect+\ButtonRight}
         \opt{PBELL_VIBE500_PAD}{\ButtonOK+\ButtonLeft}
+        \opt{SAMSUNG_YH92X_PAD}{\ButtonRec+\ButtonRew}
     and
         \opt{SANSA_E200_PAD,SANSA_C200_PAD}{Long \ButtonRec}%
         \opt{GIGABEAT_S_PAD,SANSA_CLIP_PAD,MROBE100_PAD,IRIVER_H10_PAD,SANSA_FUZEPLUS_PAD}
             {Long \ButtonPower}%
         \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonSelect+\ButtonLeft}
         \opt{PBELL_VIBE500_PAD}{\ButtonOK+\ButtonRight}
+        \opt{SAMSUNG_YH92X_PAD}{\ButtonRec+\ButtonFF}
     keys, respectively.%
     }%
     \opt{HAVEREMOTEKEYMAP}{
@@ -294,7 +297,7 @@ therefore result in better runtime.
                 \opt{GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD}
                     {\ButtonVolUp{} / \ButtonVolDown}
                 \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
-                \opt{MROBE100_PAD,PBELL_VIBE500_PAD}{\ButtonUp{} / \ButtonDown}
+                \opt{MROBE100_PAD,PBELL_VIBE500_PAD,SAMSUNG_YH92X_PAD}{\ButtonUp{} / \ButtonDown}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}
@@ -309,6 +312,7 @@ therefore result in better runtime.
                 \opt{GIGABEAT_S_PAD,SANSA_FUZEPLUS_PAD}{\ButtonSelect; \ButtonBack}
                 \opt{IRIVER_H10_PAD}{\ButtonFF}
                 \opt{IRIVER_VIBE500_PAD}{\ButtonMenu}
+                \opt{SAMSUNG_YH92X_PAD}{\ButtonRight}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD}{Long \ButtonRCFF}%
@@ -320,7 +324,8 @@ therefore result in better runtime.
                 % Playback play / pause
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}{\ButtonUp}
                 \opt{IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD%
-                    ,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPlay}
+                    ,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD%
+                    ,SAMSUNG_YH92X_PAD}{\ButtonPlay}
                 \opt{GIGABEAT_S_PAD}{\ButtonPlay; \ButtonUp}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
@@ -340,6 +345,7 @@ therefore result in better runtime.
                 \opt{SANSA_FUZEPLUS_PAD}{Long \ButtonPlay}
                 \opt{PBELL_VIBE500_PAD}{\ButtonCancel; Long \ButtonPlay}
                 \opt{MROBE100_PAD}{\ButtonDisplay; Long {\ButtonPlay}}
+                \opt{SAMSUNG_YH92X_PAD}{\ButtonLeft}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD}{Long \ButtonRCPlay}%
@@ -354,6 +360,7 @@ therefore result in better runtime.
                     ,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
                     {\ButtonLeft}
                 \opt{GIGABEAT_RC_PAD}{\ButtonPrev; \ButtonLeft}%
+                \opt{SAMSUNG_YH92X_PAD}{\ButtonRew}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                 \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{\ButtonRCRew}%
@@ -367,6 +374,7 @@ therefore result in better runtime.
                     ,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
                     {\ButtonRight}
                 \opt{GIGABEAT_RC_PAD}{\ButtonNext; \ButtonRight}%
+                \opt{SAMSUNG_YH92X_PAD}{\ButtonFF}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{\ButtonRCFF}%
@@ -386,7 +394,8 @@ therefore result in better runtime.
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}{\ButtonUp}
                 \opt{GIGABEAT_S_PAD}{\ButtonPlay; \ButtonUp}
                 \opt{IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD%
-                    ,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPlay}
+                    ,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD%
+                    ,SAMSUNG_YH92X_PAD}{\ButtonPlay}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{\ButtonRCPlay}%
@@ -401,6 +410,7 @@ therefore result in better runtime.
                 \opt{IRIVER_H10_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}{Long \ButtonPlay}
                 \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{Long \ButtonPlay}
                 \opt{MROBE100_PAD}{\ButtonDisplay; Long \ButtonPlay}
+                \opt{SAMSUNG_YH92X_PAD}{\ButtonRec}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{Long \ButtonRCPlay}%
@@ -413,7 +423,7 @@ therefore result in better runtime.
                     ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
                     {\ButtonLeft}
                 \opt{GIGABEAT_S_PAD}{\ButtonPrev; \ButtonLeft}
-                \opt{IRIVER_H10_PAD}{\ButtonRew}
+                \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{\ButtonRew}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                   \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{\ButtonRCRew}%
@@ -426,7 +436,7 @@ therefore result in better runtime.
                     ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
                     {\ButtonRight}
                 \opt{GIGABEAT_S_PAD}{\ButtonNext; \ButtonRight}
-                \opt{IRIVER_H10_PAD}{\ButtonFF}
+                \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{\ButtonFF}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}{\ButtonRCFF}%
@@ -439,7 +449,7 @@ therefore result in better runtime.
                     ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
                     {Long \ButtonLeft}
                 \opt{GIGABEAT_S_PAD}{Long \ButtonPrev; Long \ButtonLeft}
-                \opt{IRIVER_H10_PAD}{Long \ButtonRew}
+                \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{Long \ButtonRew}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{MROBE100_RC_PAD}{Long \ButtonRCRew}%
@@ -452,7 +462,7 @@ therefore result in better runtime.
                     ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
                     {Long \ButtonRight}
                 \opt{GIGABEAT_S_PAD}{Long \ButtonNext; Long \ButtonRight}
-                \opt{IRIVER_H10_PAD}{Long \ButtonFF}
+                \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{Long \ButtonFF}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{MROBE100_RC_PAD}{Long \ButtonRCFF}%
@@ -464,7 +474,7 @@ therefore result in better runtime.
                 \opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomRight}
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD%
                     ,SANSA_CLIP_PAD}{\ButtonDown}
-                \opt{IRIVER_H10_PAD}{\ButtonLeft}
+                \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{\ButtonLeft}
                 \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
                     {\ButtonMenu}
                 \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
@@ -479,7 +489,7 @@ therefore result in better runtime.
                 \opt{SANSA_FUZEPLUS_PAD}{Long \ButtonBottomRight}
                 \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD%
                     ,SANSA_CLIP_PAD}{Long \ButtonDown}
-                \opt{IRIVER_H10_PAD}{Long \ButtonLeft}
+                \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{Long \ButtonLeft}
                 \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
                     {Long \ButtonMenu}
                 \opt{PBELL_VIBE500_PAD}{\ButtonMenu}
@@ -496,7 +506,7 @@ therefore result in better runtime.
                 \opt{GIGABEAT_S_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
                     {\ButtonVolUp / \ButtonVolDown}
                 \opt{IRIVER_H10_PAD}{\ButtonScrollUp / \ButtonScrollDown}
-                \opt{MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
+                \opt{MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD}
                     {\ButtonUp / \ButtonDown}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
@@ -511,7 +521,7 @@ therefore result in better runtime.
                     ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD,SANSA_FUZEPLUS_PAD}
                     {\ButtonSelect}
                 \opt{GIGABEAT_S_PAD}{\ButtonSelect; \ButtonBack}
-                \opt{IRIVER_H10_PAD}{\ButtonRight}
+                \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{\ButtonRight}
                 \opt{PBELL_VIBE500_PAD}{\ButtonOK}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
@@ -525,7 +535,7 @@ therefore result in better runtime.
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD%
                     ,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD,SANSA_FUZEPLUS_PAD}{Long \ButtonSelect}
                 \opt{GIGABEAT_S_PAD}{Long \ButtonSelect; Long \ButtonBack}
-                \opt{IRIVER_H10_PAD}{Long \ButtonRight}
+                \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{Long \ButtonRight}
                 \opt{PBELL_VIBE500_PAD}{Long \ButtonOK}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
@@ -549,7 +559,8 @@ therefore result in better runtime.
                 \opt{GIGABEAT_S_PAD}
                     {\ButtonPrev; \ButtonVolUp / \ButtonNext; \ButtonVolDown}
                 \opt{IRIVER_H10_PAD}{\ButtonScrollUp / \ButtonScrollDown}
-                \opt{MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}{\ButtonUp / \ButtonDown}
+                \opt{MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD}
+                    {\ButtonUp / \ButtonDown}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}
@@ -567,6 +578,7 @@ therefore result in better runtime.
                     \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
                         {\ButtonPlay / \ButtonMenu}
                     \opt{PBELL_VIBE500_PAD}{\ButtonOK / \ButtonCancel}
+                    \opt{SAMSUNG_YH92X_PAD}{\ButtonLeft / \ButtonRight}
                         &
                     \opt{HAVEREMOTEKEYMAP}{
                         \opt{MROBE100_RC_PAD}{\ButtonRCPlay / \ButtonRCDisplay}%
@@ -584,6 +596,7 @@ therefore result in better runtime.
                 \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD,MROBE100_PAD}
                     {Long \ButtonPlay / Long \ButtonMenu}
                 \opt{PBELL_VIBE500_PAD}{\ButtonPlay / \ButtonMenu}
+                \opt{SAMSUNG_YH92X_PAD}{Long \ButtonLeft / Long \ButtonRight}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD}{Long \ButtonRCFF / Long \ButtonRCRew}%
@@ -606,6 +619,7 @@ therefore result in better runtime.
                 \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
                     {Long \ButtonPlay+\ButtonMenu}
                 \opt{PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}{Long \ButtonPlay}
+                \opt{SAMSUNG_YH92X_PAD}{Long \ButtonLeft+\ButtonDown}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD}{Long \ButtonRCFF+\ButtonRCRew}%
@@ -619,6 +633,7 @@ therefore result in better runtime.
                     ,SANSA_CLIP_PAD,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD%
                     ,IPOD_1G2G_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
                     {\ButtonLeft / \ButtonRight}
+                \opt{SAMSUNG_YH92X_PAD}{\ButtonRew / \ButtonFF}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD,MROBE100_RC_PAD}
@@ -637,6 +652,7 @@ therefore result in better runtime.
                 \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
                     {Long \ButtonSelect+\ButtonMenu}
                 \opt{PBELL_VIBE500_PAD}{Long \ButtonCancel}
+                \opt{SAMSUNG_YH92X_PAD}{\ButtonPlay}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD}{Long \ButtonRCPlay}%
@@ -649,6 +665,7 @@ therefore result in better runtime.
                     ,SANSA_CLIP_PAD,IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD%
                     ,IPOD_1G2G_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
                     {Long \ButtonLeft / Long \ButtonRight}
+                \opt{SAMSUNG_YH92X_PAD}{Long \ButtonRew / Long \ButtonFF}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{MROBE100_RC_PAD}{Long \ButtonRCRew / Long \ButtonRCFF}%
@@ -665,6 +682,7 @@ therefore result in better runtime.
                 \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
                     {Long \ButtonSelect+\ButtonPlay}
                 \opt{PBELL_VIBE500_PAD}{Long \ButtonRec}
+                \opt{SAMSUNG_YH92X_PAD}{\ButtonRec}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{GIGABEAT_RC_PAD}{\ButtonRCPlay}%
@@ -681,7 +699,8 @@ therefore result in better runtime.
             \begin{btnmap}
                 % Cursor move up / down / left / right
                 \opt{SANSA_E200_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD%
-                    ,SANSA_CLIP_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}
+                    ,SANSA_CLIP_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD%
+                    ,SAMSUNG_YH92X_PAD}
                     {\ButtonUp / \ButtonDown / \ButtonLeft / \ButtonRight}
                 \opt{IRIVER_H10_PAD}{\ButtonScrollUp / \ButtonScrollDown / 
                     \ButtonLeft / \ButtonRight}
@@ -702,6 +721,7 @@ therefore result in better runtime.
                 \opt{GIGABEAT_S_PAD}{\ButtonSelect; \ButtonBack}
                 \opt{IRIVER_H10_PAD}{\ButtonPlay}
                 \opt{MROBE100_PAD,PBELL_VIBE500_PAD}{\ButtonMenu}
+                \opt{SAMSUNG_YH92X_PAD}{\ButtonRew}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{MROBE100_RC_PAD}{\ButtonRCHeart}%
@@ -709,12 +729,13 @@ therefore result in better runtime.
                 Left mouse button click
                 \nopt{IRIVER_H10_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{
                 \\
- 
+
                 % Mouse button right-click
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonPower}
                 \opt{GIGABEAT_S_PAD}{\ButtonMenu}
                 \opt{SANSA_CLIP_PAD}{\ButtonHome}
                 \opt{MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPlay}
+                \opt{SAMSUNG_YH92X_PAD}{\ButtonFF}
                 &
                 \opt{HAVEREMOTEKEYMAP}{
                     &}
@@ -734,6 +755,8 @@ therefore result in better runtime.
                     {\ButtonVolUp / \ButtonVolDown}
                 \opt{PBELL_VIBE500_PAD}
                     {\ButtonOK / \ButtonCancel}
+                \opt{SAMSUNG_YH92X_PAD}
+                    {\ButtonRec+\ButtonUp / \ButtonRec+\ButtonDown}
                 &
                 \opt{HAVEREMOTEKEYMAP}{
                     \opt{MROBE100_RC_PAD}{\ButtonRCVolUp / \ButtonRCVolDown}%

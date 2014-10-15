@@ -189,13 +189,15 @@ follow the instructions at
       \setting{gigabeat room}. Also, during installation, do not connect your
       \dap{} using the cradle but plug the USB cable directly to the \dap{}.
   }
-  \opt{vibe500}{
+  \opt{vibe500,samsungyh}{
     The installation requires you to use UMS mode.
     In order to start up your \playertype{} in UMS mode you need to:
       \begin{enumerate}
         \item Turn off the \dap{} (Original Firmware).
         \item Connect your \playertype{} to the computer using the data cable.
+        \opt{vibe500}{
         \item Push and hold \ButtonPower{} (for about 2 seconds) until the ``USB'' screen appears.
+        }
       \end{enumerate}
     The \dap{} will now appear as a regular disk on your computer.
   }
@@ -464,7 +466,8 @@ data partition.}}
   previous section.
 
 \item Connect your \dap{} to the computer via USB 
-  \opt{sansa,sansaAMS,iriverh10,iriverh10_5gb,vibe500,fuzeplus}{ in MSC mode }
+  \opt{sansa,sansaAMS,iriverh10,iriverh10_5gb,vibe500,fuzeplus,samsungyh}
+  { in MSC mode }
   \opt{ipod3g,ipod4g,ipodmini,ipodcolor}{ or Firewire }as described in
   the manual that came with your \dap{}.
 
@@ -516,6 +519,7 @@ structure that Rockbox needs.\\}
         \opt{vibe500}{\input{getting_started/vibe500_install.tex}}
         \opt{ondavx777}{\input{getting_started/ondavx777_install.tex}}
         \opt{IMX233}{\input{getting_started/IMX233_install.tex}}
+        \opt{samsungyh}{\input{getting_started/samsungyh_install.tex}}
     }
 }
 
@@ -547,7 +551,7 @@ structure that Rockbox needs.\\}
   \end{itemize}
 }
 
-\opt{iriverh10,iriverh10_5gb,ipod,mrobe100,sansa,archos,cowond2,vibe500,ondavx777}{
+\opt{iriverh10,iriverh10_5gb,ipod,mrobe100,sansa,archos,cowond2,vibe500,ondavx777,samsungyh}{
   Safely eject / unmount the USB drive, unplug the cable and restart.
 }
 
@@ -721,7 +725,7 @@ completely follow the manual uninstallation instructions below.}}
   \fname{\firmwarefilename} file.
 }
 
-\opt{iriverh10,iriverh10_5gb,mrobe100,vibe500}{
+\opt{iriverh10,iriverh10_5gb,mrobe100,vibe500,samsungyh}{
   If you would like to go back to using the original \playerman{} software,
   connect the \dap{} to your computer, and delete the
   \originalfirmwarefilename{} file and rename
