@@ -327,12 +327,9 @@
 #define  GBN_BUTTON_RETREAT            BUTTON_REW
 #define  GBN_BUTTON_ADVANCE            BUTTON_FFWD
 #define  GBN_BUTTON_MENU               BUTTON_PLAY | BUTTON_LEFT
-#define  GBN_BUTTON_PLAY               BUTTON_PLAY | BUTTON_RIGHT
+#define  GBN_BUTTON_PLAY               BUTTON_PLAY
 #define  GBN_BUTTON_CONTEXT            BUTTON_PLAY | BUTTON_DOWN
 #define  GBN_BUTTON_NEXT_VAR           BUTTON_PLAY | BUTTON_UP
-/* No context */
-/* No advance/retreat */
-/* no next var */
 
 #elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
 #define  GBN_BUTTON_UP                 BUTTON_UP

@@ -301,10 +301,10 @@ static void setoptions (void)
         options.DOWN    = BUTTON_DOWN;
 
         options.A       = BUTTON_PLAY;
-        options.B       = BUTTON_REW;
-        options.START   = BUTTON_REC;
-        options.SELECT  = BUTTON_FFWD;
-        options.MENU    = BUTTON_NONE;
+        options.B       = BUTTON_FFWD;
+        options.START   = BUTTON_REW;
+        options.SELECT  = BUTTON_NONE;
+        options.MENU    = BUTTON_REC;
 
 #elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
         options.UP     = BUTTON_OK;
