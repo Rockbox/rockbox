@@ -58,6 +58,8 @@ static const struct button_mapping button_context_standard[]  = {
     /* kludge: pressing 2 directional buttons is easy on this target  */
     { ACTION_STD_QUICKSCREEN,   BUTTON_LEFT|BUTTON_DOWN|BUTTON_REPEAT,
                                 BUTTON_LEFT|BUTTON_DOWN|BUTTON_REPEAT },
+    { ACTION_STD_MENU,          BUTTON_LEFT|BUTTON_UP|BUTTON_REPEAT,
+                                BUTTON_LEFT|BUTTON_UP|BUTTON_REPEAT },
     { ACTION_STD_REC,           BUTTON_REC|BUTTON_REPEAT,        BUTTON_REC },
 
     LAST_ITEM_IN_LIST
