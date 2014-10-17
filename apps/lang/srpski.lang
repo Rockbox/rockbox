@@ -2229,7 +2229,7 @@
     archosplayer: "Креирам БП %d пронађено"
   </dest>
   <voice>
-    *: ""
+    *: "пронађене ставке за базу"
   </voice>
 </phrase>
 <phrase>
@@ -2888,11 +2888,11 @@
   </source>
   <dest>
     *: none
-    remote_ticking: "Reduce Ticking"
+    remote_ticking: "Умањи треперење"
   </dest>
   <voice>
     *: none
-    remote_ticking: "Reduce Ticking"
+    remote_ticking: "Умањи треперење"
   </voice>
 </phrase>
 <phrase>
@@ -6994,7 +6994,7 @@
     *: "%s не постоји"
   </dest>
   <voice>
-    *: ""
+    *: "директоријум плејлисти не постоји"
   </voice>
 </phrase>
 <phrase>
@@ -7749,7 +7749,6 @@
   </dest>
   <voice>
     *: "Крај листе песама"
-    archosplayer: "Крај листе"
   </voice>
 </phrase>
 <phrase>
@@ -8071,7 +8070,7 @@
     sansafuzeplus: "BACK to abort"
   </source>
   <dest>
-    *: "OFF to abort"
+    *: "OFF за прекид"
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP за прекид"
     ipod*: "PLAY/PAUSE за прекид"
     iaudiox5,iaudiom5: "Long PLAY за прекид"
@@ -12079,15 +12078,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Појачање опсега %d"
+    gigabeats,samsungypr1: "Појачање опсега %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Појачање опсега %d"
+    gigabeats,samsungypr1: "Појачање опсега"
   </voice>
 </phrase>
 <phrase>
@@ -12147,15 +12146,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Широк"
+    gigabeats,samsungypr1: "Широк"
   </dest>
   <voice>
     *: none
-    gigabeats: "Широк"
+    gigabeats,samsungypr1: "Широк"
   </voice>
 </phrase>
 <phrase>
@@ -12232,15 +12231,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Уски"
+    gigabeats,samsungypr1: "Уски"
   </dest>
   <voice>
     *: none
-    gigabeats: "Уски"
+    gigabeats,samsungypr1: "Уски"
   </voice>
 </phrase>
 <phrase>
@@ -12297,15 +12296,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Напредна подешавања конпроле тона"
+    gigabeats,samsungypr1: "Напредна подешавања контроле тона"
   </dest>
   <voice>
     *: none
-    gigabeats: "Напредна подешавања конпроле тона"
+    gigabeats,samsungypr1: "Напредна подешавања контроле тона"
   </voice>
 </phrase>
 <phrase>
@@ -12314,15 +12313,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D побољшање"
+    depth_3d: "3-D побољшање"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D побољшање"
+    depth_3d: "3-D побољшање"
   </voice>
 </phrase>
 <phrase>
@@ -12362,15 +12361,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Фреквенција опсега %d"
+    gigabeats,samsungypr1: "Фреквенција опсега %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Фреквенција опсега"
+    gigabeats,samsungypr1: "Фреквенција опсега"
   </voice>
 </phrase>
 <phrase>
@@ -12379,15 +12378,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Ширина опсега %d"
+    gigabeats,samsungypr1: "Ширина опсега %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Ширина опсега"
+    gigabeats,samsungypr1: "Ширина опсега"
   </voice>
 </phrase>
 <phrase>
@@ -12475,15 +12474,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Тонске контроле"
+    gigabeats,samsungypr1: "Тонске контроле"
   </dest>
   <voice>
     *: none
-    gigabeats: "Тонске контроле"
+    gigabeats,samsungypr1: "Тонске контроле"
   </voice>
 </phrase>
 <phrase>
@@ -12899,7 +12898,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Једноставан"
+    swcodec: "Једноставан Мејеров"
   </voice>
 </phrase>
 <phrase>
@@ -13032,5 +13031,140 @@
   </dest>
   <voice>
     *: "Изаберите директоријуме за скенирање"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "Оштра"
+  </dest>
+  <voice>
+    *: "Оштра"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Блага"
+  </dest>
+  <voice>
+    *: "Блага"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "Мртва зона тачпеда"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "Мртва зона тачпеда"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Attack време"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Attack време"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "Стрмина DAC филтра"
+  </dest>
+  <voice>
+    *: "Стрмина DAC филтра"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Сепаратор линија"
+  </dest>
+  <voice>
+    *: "Сепаратор линија"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Ограничење максималне јачине"
+  </dest>
+  <voice>
+    *: "Ограничење максималне јачине"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Боја сепаратора линија"
+  </dest>
+  <voice>
+    *: "Боја сепаратора линија"
   </voice>
 </phrase>
