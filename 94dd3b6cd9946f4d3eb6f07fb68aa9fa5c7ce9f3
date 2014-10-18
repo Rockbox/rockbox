@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_58e4813a",
+        "filename": "apps/plugins/xworld/sfxplayer.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-18T16:33:52Z",
+      "side": 1,
+      "message": "no, but something similar can be done.\nsfxplay_create(struct SfxPlayer*){...}",
+      "parentUuid": "5a18252c_f8f2ad05",
+      "revId": "94dd3b6cd9946f4d3eb6f07fb68aa9fa5c7ce9f3",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_d8f7f1f3",
         "filename": "apps/plugins/xworld/sfxplayer.c",
         "patchSetId": 15
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_b8cf95b2",
+        "filename": "apps/plugins/xworld/sfxplayer.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-18T16:33:52Z",
+      "side": 1,
+      "message": "It\u0027s really a WIP right now, with some classes being half-converted (like this one)",
+      "parentUuid": "5a18252c_d8f7f1f3",
+      "revId": "94dd3b6cd9946f4d3eb6f07fb68aa9fa5c7ce9f3",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_38dd4571",
         "filename": "apps/plugins/xworld/vm.c",
         "patchSetId": 15
@@ -47,6 +83,24 @@
       "writtenOn": "2014-10-18T10:04:43Z",
       "side": 1,
       "message": "again C doesn\u0027t support default arguments",
+      "revId": "94dd3b6cd9946f4d3eb6f07fb68aa9fa5c7ce9f3",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_98d45948",
+        "filename": "apps/plugins/xworld/vm.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2014-10-18T16:33:52Z",
+      "side": 1,
+      "message": "Yes, that is correct.\nAgain, this is really a WIP, and this class is in the middle of being converted",
+      "parentUuid": "5a18252c_38dd4571",
       "revId": "94dd3b6cd9946f4d3eb6f07fb68aa9fa5c7ce9f3",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
