@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_f8f2ad05",
+        "filename": "apps/plugins/xworld/sfxplayer.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-18T10:04:43Z",
+      "side": 1,
+      "message": "C can\u0027t do that, can it?",
+      "revId": "94dd3b6cd9946f4d3eb6f07fb68aa9fa5c7ce9f3",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_d8f7f1f3",
+        "filename": "apps/plugins/xworld/sfxplayer.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-18T10:04:43Z",
+      "side": 1,
+      "message": "Whats the point of *sfx pointer other then provoking compiler to spit warning?\nAnd where is SfxPlayer struct defined actually? If you prefix function names what is the point of struct with (I assume) function pointers pointing previous methods?",
+      "revId": "94dd3b6cd9946f4d3eb6f07fb68aa9fa5c7ce9f3",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_38dd4571",
+        "filename": "apps/plugins/xworld/vm.c",
+        "patchSetId": 15
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-10-18T10:04:43Z",
+      "side": 1,
+      "message": "again C doesn\u0027t support default arguments",
+      "revId": "94dd3b6cd9946f4d3eb6f07fb68aa9fa5c7ce9f3",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
