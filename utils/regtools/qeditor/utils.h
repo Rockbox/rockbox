@@ -171,9 +171,20 @@ Q_DECLARE_METATYPE(SocFieldCachedValue)
 class SocFieldCachedItemDelegate : public QStyledItemDelegate
 {
 public:
-    SocFieldCachedItemDelegate(QObject *parent = 0):QStyledItemDelegate(parent) {}
+    enum DisplayMode
+    {
+        DisplayValueAndName, /* "value (name)" or "value" if no name */
+        DisplayName, /* "name" or "value" if no name */
+        DisplayValue, /* "value" */
+    };
 
+    SocFieldCachedItemDelegate(QObject *parent = 0):QStyledItemDelegate(parent) {}
     virtual QString displayText(const QVariant& value, const QLocale& locale) const;
+    void SetMode(DisplayMode mode) { m_mode = mode; }
+    DisplayMode GetMode() const { return m_mode; }
+
+protected:
+    DisplayMode m_mode;
 };
 
 class SocFieldCachedEditor : public SocFieldEditor
@@ -291,21 +302,12 @@ private:
     mutable QSize m_size;
 };
 
-class GrowingTextEdit : public QTextEdit
+class GrowingTableView : public QTableView
 {
     Q_OBJECT
 public:
-    GrowingTextEdit(QWidget *parent = 0);
-
-protected slots:
-    void TextChanged();
-};
-
-class GrowingTableWidget : public QTableWidget
-{
-    Q_OBJECT
-public:
-    GrowingTableWidget(QWidget *parent = 0);
+    GrowingTableView(QWidget *parent = 0);
+    virtual void setModel(QAbstractItemModel *model);
 
 protected slots:
     void DataChanged(const QModelIndex& tl, const QModelIndex& br);
