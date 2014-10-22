@@ -340,6 +340,26 @@ void SocFieldEditor::setField(uint field)
     setText(QString("0x%1").arg(field, digits, 16, QChar('0')));
 }
 
+void SocFieldEditor::SetRegField(const soc_reg_field_t& field)
+{
+    setValidator(0);
+    delete m_validator;
+    m_validator = new SocFieldValidator(field);
+    setValidator(m_validator);
+    m_reg_field = field;
+}
+
+/**
+ * SocFieldCachedValue
+ */
+SocFieldCachedValue::SocFieldCachedValue(const soc_reg_field_t& field, uint value)
+    :m_field(field), m_value(value)
+{
+    int idx = field.find_value(value);
+    if(idx != -1)
+        m_name = QString::fromStdString(field.value[idx].name);
+}
+
 /**
  * SocFieldCachedItemDelegate
  */

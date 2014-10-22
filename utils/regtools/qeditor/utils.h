@@ -129,7 +129,7 @@ public:
 
     uint field() const;
     void setField(uint field);
-    void SetRegField(const soc_reg_field_t& field) { m_reg_field = field; }
+    void SetRegField(const soc_reg_field_t& field);
 
 protected:
     SocFieldValidator *m_validator;
@@ -154,14 +154,16 @@ class SocFieldCachedValue
 {
 public:
     SocFieldCachedValue():m_value(0) {}
-    SocFieldCachedValue(const soc_reg_field_t& field, uint value)
-        :m_field(field), m_value(value) {}
+    SocFieldCachedValue(const soc_reg_field_t& field, uint value);
     virtual ~SocFieldCachedValue() {}
     const soc_reg_field_t& field() const { return m_field; }
     uint value() const { return m_value; }
+    /* return empty string if there no match */
+    QString value_name() const { return m_name; }
 protected:
     soc_reg_field_t m_field;
     uint m_value;
+    QString m_name;
 };
 
 Q_DECLARE_METATYPE(SocFieldCachedValue)
