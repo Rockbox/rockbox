@@ -428,6 +428,229 @@ QByteArray SocFieldCachedEditorCreator::valuePropertyName() const
 }
 
 /**
+ * RegFieldTableModel
+ */
+
+RegFieldTableModel::RegFieldTableModel(QObject *parent)
+    :QAbstractTableModel(parent)
+{
+    m_read_only = true;
+}
+
+int RegFieldTableModel::rowCount(const QModelIndex& /* parent */) const
+{
+    return m_reg.field.size();
+}
+
+int RegFieldTableModel::columnCount(const QModelIndex& /* parent */) const
+{
+    return ColumnCountOffset + m_value.size();
+}
+
+QVariant RegFieldTableModel::data(const QModelIndex& index, int role) const
+{
+    int section = index.column();
+    const soc_reg_field_t& field = m_reg.field[index.row()];
+    /* column independent code */
+    const RegThemeGroup *theme = 0;
+    switch(m_status[index.row()])
+    {
+        case Normal: theme = &m_theme.normal; break;
+        case Diff: theme = &m_theme.diff; break;
+        case Error: theme = &m_theme.error; break;
+        case None: default: break;
+    }
+    if(role == Qt::FontRole)
+        return theme ? QVariant(theme->font) : QVariant();
+    if(role == Qt::BackgroundRole)
+        return theme ? QVariant(theme->background) : QVariant();
+    if(role == Qt::ForegroundRole)
+        return theme ? QVariant(theme->foreground) : QVariant();
+    /* column dependent code */
+    if(section == BitRangeColumn)
+    {
+        if(role == Qt::DisplayRole)
+        {
+            if(field.first_bit == field.last_bit)
+                return QVariant(QString("%1").arg(field.first_bit));
+            else
+                return QVariant(QString("%1:%2").arg(field.last_bit).arg(field.first_bit));
+        }
+        else if(role == Qt::TextAlignmentRole)
+            return QVariant(Qt::AlignVCenter | Qt::AlignHCenter);
+        else
+            return QVariant();
+    }
+    if(section == NameColumn)
+    {
+        if(role == Qt::DisplayRole)
+            return QVariant(QString::fromStdString(field.name));
+        else
+            return QVariant();
+    }
+    if(section < FirstValueColumn + m_value.size())
+    {
+        int idx = section - FirstValueColumn;
+        if(role == Qt::DisplayRole)
+        {
+            if(!m_value[idx].isValid())
+                return QVariant("<error>");
+            return QVariant::fromValue(SocFieldCachedValue(field,
+                field.extract(m_value[idx].value< soc_word_t >())));
+        }
+        else if(role == Qt::EditRole)
+        {
+            if(!m_value[idx].isValid())
+                return QVariant();
+            return QVariant::fromValue(SocFieldCachedValue(field,
+                field.extract(m_value[idx].value< soc_word_t >())));
+        }
+        else if(role == Qt::TextAlignmentRole)
+            return QVariant(Qt::AlignVCenter | Qt::AlignHCenter);
+        else
+            return QVariant();
+    }
+    section -= m_value.size();
+    if(section == DescColumnOffset)
+    {
+        if(role == Qt::DisplayRole)
+            return QVariant(QString::fromStdString(field.desc));
+        else
+            return QVariant();
+    }
+    return QVariant();
+}
+
+bool RegFieldTableModel::setData(const QModelIndex& idx, const QVariant& value, int role)
+{
+    if(role != Qt::EditRole)
+        return false;
+    int section = idx.column();
+    if(section < FirstValueColumn || section >= FirstValueColumn + m_value.size())
+        return false;
+    section -= FirstValueColumn;
+    const SocFieldCachedValue& v = value.value< SocFieldCachedValue >();
+    if(!m_value[section].isValid())
+        return false;
+    soc_word_t old_val = m_value[section].value< soc_word_t >();
+    m_value[section] = QVariant(v.field().replace(old_val, v.value()));
+    // update column
+    RecomputeTheme();
+    emit dataChanged(index(0, section), index(rowCount() - 1, section));
+    emit OnValueModified(section);
+    return true;
+}
+
+Qt::ItemFlags RegFieldTableModel::flags(const QModelIndex& index) const
+{
+    Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    int section = index.column();
+    if(section < FirstValueColumn || section >= FirstValueColumn + m_value.size())
+        return flags;
+    section -= FirstValueColumn;
+    if(m_value[section].isValid() && !m_read_only)
+        flags |= Qt::ItemIsEditable;
+    return flags;
+}
+
+QVariant RegFieldTableModel::headerData(int section, Qt::Orientation orientation,
+    int role) const
+{
+    if(orientation == Qt::Vertical)
+        return QVariant();
+    if(role != Qt::DisplayRole)
+        return QVariant();
+    if(section == BitRangeColumn)
+        return QVariant("Bits");
+    if(section == NameColumn)
+        return QVariant("Name");
+    if(section < FirstValueColumn + m_value.size())
+    {
+        int idx = section - FirstValueColumn;
+        if(m_value.size() == 1)
+            return QVariant("Value");
+        else
+            return QVariant(QString("Value %1").arg((QChar)('A' + idx)));
+    }
+    section -= m_value.size();
+    if(section == DescColumnOffset)
+        return QVariant("Description");
+    return QVariant();
+}
+
+void RegFieldTableModel::SetReadOnly(bool en)
+{
+    if(en == m_read_only)
+        return;
+    m_read_only = en;
+}
+
+void RegFieldTableModel::SetRegister(const soc_reg_t& reg)
+{
+    /* remove all rows */
+    beginRemoveRows(QModelIndex(), 0, rowCount() - 1);
+    m_reg.field.clear();
+    endRemoveRows();
+    /* add them all */
+    beginInsertRows(QModelIndex(), 0, reg.field.size() - 1);
+    m_reg = reg;
+    RecomputeTheme();
+    endInsertRows();
+}
+
+void RegFieldTableModel::SetValues(const QVector< QVariant >& values)
+{
+    /* remove all value columns */
+    beginRemoveColumns(QModelIndex(), FirstValueColumn,
+        FirstValueColumn + m_value.size() - 1);
+    m_value.clear();
+    endRemoveColumns();
+    /* add them back */
+    beginInsertColumns(QModelIndex(), FirstValueColumn,
+        FirstValueColumn + values.size() - 1);
+    m_value = values;
+    RecomputeTheme();
+    endInsertColumns();
+}
+
+QVariant RegFieldTableModel::GetValue(int index)
+{
+    return m_value[index];
+}
+
+void RegFieldTableModel::SetTheme(const RegTheme& theme)
+{
+    m_theme = theme;
+    RecomputeTheme();
+    emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
+}
+
+void RegFieldTableModel::RecomputeTheme()
+{
+    m_status.resize(m_reg.field.size());
+    for(size_t i = 0; i < m_reg.field.size(); i++)
+    {
+        m_status[i] = None;
+        if(!m_theme.valid || m_value.size() == 0)
+            continue;
+        m_status[i] = Normal;
+        const soc_reg_field_t& field = m_reg.field[i];
+        QVariant val;
+        for(int j = 0; j < m_value.size(); j++)
+        {
+            QVariant val2 = m_value[j];
+            if(!val2.isValid())
+                continue;
+            val2 = QVariant(field.extract(val2.value< soc_word_t >()));
+            if(!val.isValid())
+                val = val2;
+            else if(val != val2)
+                m_status[i] = Diff;
+        }
+    }
+}
+
+/**
  * RegSexyDisplay
  */
 RegSexyDisplay::RegSexyDisplay(const SocRegRef& reg, QWidget *parent)
