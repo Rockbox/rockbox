@@ -46,7 +46,7 @@
  */
 
 #define SOCDESC_VERSION_MAJOR   1
-#define SOCDESC_VERSION_MINOR   1
+#define SOCDESC_VERSION_MINOR   4
 #define SOCDESC_VERSION_REV     1
 
 #define SOCDESC_VERSION__(maj,min,rev) #maj"."#min"."#rev
@@ -103,6 +103,7 @@ struct soc_reg_field_t
 
     soc_reg_field_t():first_bit(0), last_bit(31) {}
 
+    /** Return field bitmask in register */
     soc_word_t bitmask() const
     {
         // WARNING beware of the case where first_bit=0 and last_bit=31
@@ -112,9 +113,30 @@ struct soc_reg_field_t
             return ((1 << (last_bit - first_bit + 1)) - 1) << first_bit;
     }
 
+    /** Extract field value from register value */
+    soc_word_t extract(soc_word_t reg_val) const
+    {
+        return (reg_val & bitmask()) >> first_bit;
+    }
+
+    /** Replace the field value in a register value */
+    soc_word_t replace(soc_word_t reg_val, soc_word_t field_val) const
+    {
+        return (reg_val & ~bitmask()) | ((field_val << first_bit) & bitmask());
+    }
+
     bool is_reserved() const
     {
         return name.substr(0, 4) == "RSVD" || name.substr(0, 5) == "RSRVD";
+    }
+
+    /** Return field value index, or -1 if none */
+    int find_value(soc_word_t v) const
+    {
+        for(size_t i = 0; i < value.size(); i++)
+            if(value[i].value == v)
+                return i;
+        return -1;
     }
 
     std::vector< soc_reg_field_value_t > value;
