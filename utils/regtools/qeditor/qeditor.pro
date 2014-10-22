@@ -7,7 +7,7 @@ SOURCES += main.cpp mainwindow.cpp regtab.cpp backend.cpp analyser.cpp \
 LIBS += -L../lib/ -lsocdesc -lxml2
 INCLUDEPATH += ../lib/ ../../hwstub/lib
 
-VERSION = 2.0.2
+VERSION = 2.0.3
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
