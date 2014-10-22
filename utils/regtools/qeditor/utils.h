@@ -275,30 +275,6 @@ protected:
     QToolButton *m_underline_button;
 };
 
-class MySwitchableTextEditor : public QWidget
-{
-    Q_OBJECT
-public:
-    MySwitchableTextEditor(QWidget *parent = 0);
-    QString GetTextHtml();
-    void SetTextHtml(const QString& text);
-    void SetEditorMode(bool en);
-    MyTextEditor *GetEditor();
-    QLineEdit *GetLineEdit();
-    QLabel *GetLabel();
-    void SetLineMode(bool en);
-    bool IsModified();
-
-protected:
-    void UpdateVisibility();
-
-    bool m_editor_mode;
-    bool m_line_mode;
-    QLabel *m_label;
-    MyTextEditor *m_edit;
-    QLineEdit *m_line;
-};
-
 class BackendSelector : public QWidget
 {
     Q_OBJECT
