@@ -81,6 +81,7 @@ private slots:
     void OnLoadDesc();
     void OnNewRegTab();
     void OnNewRegEdit();
+    void OnNewRegDiff();
 
 private:
     MyTabWidget *m_tab;
