@@ -116,9 +116,10 @@ RamIoBackend::RamIoBackend(const QString& soc_name)
 
 bool RamIoBackend::ReadRegister(const QString& name, soc_word_t& value)
 {
-    if(m_map.find(name) == m_map.end())
+    QMap<QString, soc_word_t>::const_iterator it = m_map.find(name);
+    if(it == m_map.end())
         return false;
-    value = m_map[name];
+    value = it.value();
     return true;
 }
 
@@ -617,7 +618,7 @@ bool BackendHelper::DumpAllRegisters(IoBackend *backend, bool ignore_errors)
                         if(!ignore_errors)
                             return false;
                     }
-                    if(!bh.WriteRegister(devname, regname, val))
+                    else if(!bh.WriteRegister(devname, regname, val))
                     {
                         ret = false;
                         if(!ignore_errors)
