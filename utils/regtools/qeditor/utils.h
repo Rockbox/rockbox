@@ -201,6 +201,72 @@ public:
 protected:
 };
 
+struct RegThemeGroup
+{
+    QBrush foreground;
+    QBrush background;
+    QFont font;
+};
+
+struct RegTheme
+{
+    RegTheme():valid(false) {}
+    bool valid;
+    RegThemeGroup normal;
+    RegThemeGroup diff;
+    RegThemeGroup error;
+};
+
+class RegFieldTableModel : public QAbstractTableModel
+{
+    Q_OBJECT
+public:
+    RegFieldTableModel(QObject *parent);
+    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
+    virtual QVariant data(const QModelIndex & index, int role) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    virtual Qt::ItemFlags flags (const QModelIndex & index) const;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role);
+
+    void SetRegister(const soc_reg_t& reg);
+    /* values can either be an invalid QVariant() (means no value/error), or a
+     * QVariant containing a soc_word_t */
+    void SetValues(const QVector< QVariant >& values);
+    QVariant GetValue(int index);
+    void SetTheme(const RegTheme& theme);
+    void SetReadOnly(bool en);
+
+signals:
+    void OnValueModified(int index);
+
+protected:
+    void RecomputeTheme();
+
+    enum
+    {
+        BitRangeColumn = 0,
+        NameColumn,
+        FirstValueColumn,
+        DescColumnOffset = FirstValueColumn, /* offset from nr_values */
+        ColumnCountOffset, /* offset from nr_values */
+    };
+
+    enum ColorStatus
+    {
+        None,
+        Normal,
+        Diff,
+        Error
+    };
+
+    soc_reg_t m_reg;
+    QVector< QVariant > m_value;
+    QVector< ColorStatus > m_status;
+    RegTheme m_theme;
+    bool m_read_only;
+};
+
 class RegSexyDisplay : public QWidget
 {
     Q_OBJECT
