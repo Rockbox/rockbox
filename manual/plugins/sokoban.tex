@@ -17,14 +17,15 @@ information about the level format, see
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
     ,IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD%
     ,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD%
-    ,SAMSUNG_YH92X_PAD}
+    ,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}
     {\ButtonUp, \ButtonDown, }%
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu, \ButtonPlay, }%
 \opt{IRIVER_H10_PAD}{\ButtonScrollUp, \ButtonScrollDown, }%
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
     ,IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD%
     ,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,IPOD_4G_PAD,IPOD_3G_PAD%
-    ,IRIVER_H10_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD}
+    ,IRIVER_H10_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD%
+    ,SAMSUNG_YH820_PAD}
     {\ButtonLeft, \ButtonRight}
 \opt{COWON_D2_PAD}
     {\TouchTopMiddle, \TouchBottomMiddle, \TouchMidLeft, \TouchMidRight}
@@ -38,7 +39,7 @@ information about the level format, see
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
 \opt{GIGABEAT_S_PAD,COWON_D2_PAD}{\ButtonMenu}
 \opt{MPIO_HD300_PAD}{Long \ButtonMenu}
-\opt{PBELL_VIBE500_PAD,SAMSUNG_YH92X_PAD}{\ButtonRec}
+\opt{PBELL_VIBE500_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonRec}
        \opt{HAVEREMOTEKEYMAP}{&
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
          }
@@ -56,7 +57,7 @@ information about the level format, see
     \opt{COWON_D2_PAD}{\ButtonMinus}
     \opt{PBELL_VIBE500_PAD}{\ButtonOK+\ButtonLeft}
     \opt{MPIO_HD300_PAD}{\ButtonPlay + \ButtonRew}
-    \opt{SAMSUNG_YH92X_PAD}{\ButtonPlay + \ButtonDown}
+    \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay + \ButtonDown}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Back to previous level \\
 }
@@ -65,7 +66,7 @@ information about the level format, see
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonUp}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
     \opt{IAUDIO_X5_PAD}{\ButtonRec}
-    \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{\ButtonPlay+\ButtonRight}
+    \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay+\ButtonRight}
     \opt{GIGABEAT_PAD,MROBE100_PAD}{\ButtonMenu}
     \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}{\ButtonSelect+\ButtonRight}
     \opt{GIGABEAT_S_PAD}{\ButtonPlay}
@@ -89,7 +90,7 @@ information about the level format, see
     \opt{COWON_D2_PAD}{\ButtonPlus}
     \opt{PBELL_VIBE500_PAD}{\ButtonOK+\ButtonRight}
     \opt{MPIO_HD300_PAD}{\ButtonPlay + \ButtonFF}
-    \opt{SAMSUNG_YH92X_PAD}{\ButtonPlay + \ButtonUp}
+    \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay + \ButtonUp}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Go to next level \\
 }
@@ -98,7 +99,7 @@ information about the level format, see
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD,MROBE100_PAD%
      ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}{\ButtonSelect}
-\opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{\ButtonRew}
+\opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonRew}
 \opt{GIGABEAT_S_PAD}{\ButtonVolUp}
 \opt{COWON_D2_PAD}{\TouchTopRight}
 \opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomLeft}
@@ -111,7 +112,7 @@ information about the level format, see
 \opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown}
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}
-\opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD}{\ButtonFF}
+\opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonFF}
 \opt{GIGABEAT_PAD}{\ButtonA}
 \opt{GIGABEAT_S_PAD}{\ButtonVolDown}
 \opt{MROBE100_PAD}{\ButtonDisplay}
@@ -128,7 +129,7 @@ information about the level format, see
 \multicolumn{2}{c}{\textbf{Solution playback}} \\
 \hline
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD%
-    ,MPIO_HD300_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD}{\ButtonPlay}
+    ,MPIO_HD300_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay}
 \opt{ONDIO_PAD}{\ButtonMenu}
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
@@ -138,7 +139,8 @@ information about the level format, see
     & Pause/resume \\
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
     ,IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD%
-    ,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD}
+    ,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD%
+    ,SAMSUNG_YH820_PAD}
     {\ButtonUp/\ButtonDown}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu/\ButtonPlay}
 \opt{IRIVER_H10_PAD,MPIO_HD300_PAD}{\ButtonScrollUp/\ButtonScrollDown}
@@ -148,7 +150,7 @@ information about the level format, see
 \opt{RECORDER_PAD,ARCHOS_AV300_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD,ONDIO_PAD%
     ,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD%
     ,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD%
-    ,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD}
+    ,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}
     {\ButtonLeft/\ButtonRight}
 \opt{COWON_D2_PAD}{\TouchMidLeft/\TouchMidRight}
 \opt{MPIO_HD300_PAD}{\ButtonRew/\ButtonFF}
@@ -161,7 +163,7 @@ information about the level format, see
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
 \opt{GIGABEAT_S_PAD,COWON_D2_PAD}{\ButtonMenu}
 \opt{MPIO_HD300_PAD}{Long \ButtonMenu}
-\opt{SAMSUNG_YH92X_PAD}{\ButtonRec}
+\opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonRec}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Quit \\
 \end{btnmap}
