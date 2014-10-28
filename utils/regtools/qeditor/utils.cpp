@@ -388,6 +388,14 @@ QString SocFieldCachedItemDelegate::displayText(const QVariant& value, const QLo
                 return strval;
         }
     }
+    else if(value.type() == QVariant::UserType && value.userType() == qMetaTypeId< SocFieldBitRange >())
+    {
+        const SocFieldBitRange& br = value.value< SocFieldBitRange >();
+        if(br.GetFirstBit() == br.GetLastBit())
+            return QString("%1").arg(br.GetFirstBit());
+        else
+            return QString("%1:%2").arg(br.GetLastBit()).arg(br.GetFirstBit());
+    }
     else
         return QStyledItemDelegate::displayText(value, locale);
 }
@@ -485,12 +493,7 @@ QVariant RegFieldTableModel::data(const QModelIndex& index, int role) const
     if(section == BitRangeColumn)
     {
         if(role == Qt::DisplayRole)
-        {
-            if(field.first_bit == field.last_bit)
-                return QVariant(QString("%1").arg(field.first_bit));
-            else
-                return QVariant(QString("%1:%2").arg(field.last_bit).arg(field.first_bit));
-        }
+            return QVariant::fromValue(SocFieldBitRange(field));
         else if(role == Qt::TextAlignmentRole)
             return QVariant(Qt::AlignVCenter | Qt::AlignHCenter);
         else
@@ -603,9 +606,9 @@ void RegFieldTableModel::SetReadOnly(bool en)
 void RegFieldTableModel::SetRegister(const soc_reg_t& reg)
 {
     /* remove all rows */
-    beginRemoveRows(QModelIndex(), 0, rowCount() - 1);
+    beginResetModel();
     m_reg.field.clear();
-    endRemoveRows();
+    endResetModel();
     /* add them all */
     beginInsertRows(QModelIndex(), 0, reg.field.size() - 1);
     m_reg = reg;
