@@ -809,6 +809,258 @@ void RegSexyDisplay::paintEvent(QPaintEvent *event)
 }
 
 /**
+ * RegSexyDisplay2
+ */
+
+RegSexyDisplay2::RegSexyDisplay2(QWidget *parent)
+    :QAbstractItemView(parent)
+{
+    m_is_dirty = true;
+    // the frame around the register is ugly, disable it
+    setFrameShape(QFrame::NoFrame);
+}
+
+QModelIndex RegSexyDisplay2::indexAt(const QPoint& point) const
+{
+    Q_UNUSED(point);
+    return QModelIndex();
+}
+
+void RegSexyDisplay2::scrollTo(const QModelIndex& index, ScrollHint hint)
+{
+    Q_UNUSED(index);
+    Q_UNUSED(hint);
+}
+
+QRect RegSexyDisplay2::visualRect(const QModelIndex& index) const
+{
+    Q_UNUSED(index);
+    return QRect();
+}
+
+bool RegSexyDisplay2::isIndexHidden(const QModelIndex& index) const
+{
+    Q_UNUSED(index);
+    return false;
+}
+
+QModelIndex RegSexyDisplay2::moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers)
+{
+    Q_UNUSED(cursorAction);
+    Q_UNUSED(modifiers);
+    return QModelIndex();
+}
+
+void RegSexyDisplay2::setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags flags)
+{
+    Q_UNUSED(rect);
+    Q_UNUSED(flags);
+}
+
+int RegSexyDisplay2::verticalOffset() const
+{
+    return verticalScrollBar()->value();
+}
+
+int RegSexyDisplay2::horizontalOffset() const
+{
+    return horizontalScrollBar()->value();
+}
+
+void RegSexyDisplay2::scrollContentsBy(int dx, int dy)
+{
+    viewport()->scroll(dx, dy);
+}
+
+void RegSexyDisplay2::setModel(QAbstractItemModel *model)
+{
+    QAbstractItemView::setModel(model);
+    m_is_dirty = true;
+}
+
+void RegSexyDisplay2::dataChanged(const QModelIndex &topLeft,
+    const QModelIndex &bottomRight)
+{
+    m_is_dirty = true;
+    QAbstractItemView::dataChanged(topLeft, bottomRight);
+}
+
+void RegSexyDisplay2::rowsInserted(const QModelIndex &parent, int start, int end)
+{
+    m_is_dirty = true;
+    QAbstractItemView::rowsInserted(parent, start, end);
+}
+
+void RegSexyDisplay2::rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end)
+{
+    m_is_dirty = true;
+    QAbstractItemView::rowsAboutToBeRemoved(parent, start, end);
+}
+
+int RegSexyDisplay2::GetSeparatorSize() const
+{
+    return 1;
+}
+
+int RegSexyDisplay2::GetMarginSize() const
+{
+    return viewOptions().fontMetrics.height() / 3;
+}
+
+int RegSexyDisplay2::GetHeaderTextSep() const
+{
+    return GetMarginSize() / 2;
+}
+
+int RegSexyDisplay2::GetHeaderHeight() const
+{
+    return 2 * GetMarginSize() + GetHeaderTextSep() + 2 * viewOptions().fontMetrics.height();
+}
+
+int RegSexyDisplay2::GetColumnWidth() const
+{
+    return 2 * GetMarginSize() + viewOptions().fontMetrics.height();
+}
+
+int RegSexyDisplay2::GetMaxContentHeight() const
+{
+    int max = 0;
+    QFontMetrics metrics = viewOptions().fontMetrics;
+    if(model())
+    {
+        for(int i = 0; i < model()->rowCount(); i++)
+        {
+            QModelIndex index = model()->index(i, 1, rootIndex());
+            QString s = model()->data(index).toString();
+            max = qMax(max, metrics.boundingRect(s).width());
+        }
+    }
+    return 2 * GetMarginSize() + max;
+}
+
+int RegSexyDisplay2::GetGapHeight() const
+{
+    return GetMarginSize() / 2;
+}
+
+QRegion RegSexyDisplay2::visualRegionForSelection(const QItemSelection& selection) const
+{
+    Q_UNUSED(selection);
+    return QRegion();
+}
+
+void RegSexyDisplay2::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event);
+    int txt_h = viewOptions().fontMetrics.height();
+    int sep_sz = GetSeparatorSize();
+    int w = qMax(m_minimum_width, viewport()->width());
+    int h = qMax(m_minimum_height, viewport()->height());
+    int nr_bits = 32;
+    int col_w = (w - (nr_bits + 1) * sep_sz) / nr_bits;
+    int hdr_h = GetHeaderHeight();
+    int gap_h = GetGapHeight();
+    int tot_w = (nr_bits + 1) * sep_sz + nr_bits * col_w;
+    int margin = GetMarginSize();
+    int txt_sep = GetHeaderTextSep();
+    int tot_hdr_sz = 2 * sep_sz + hdr_h;
+
+    int x_shift = (w - tot_w) / 2;
+#define ith_col_x(i) (x_shift + (i) * (sep_sz + col_w))
+
+    QPainter painter(viewport());
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    painter.translate(-horizontalScrollBar()->value(), -verticalScrollBar()->value());
+    QStyleOptionViewItem option = viewOptions();
+    QBrush back_brush = option.palette.base();
+    QBrush line_brush = option.palette.dark();
+
+    // fill interesting zone with base
+    painter.fillRect(event->rect(), option.palette.window());
+    painter.fillRect(x_shift, 0, tot_w, h, back_brush);
+
+    // draw top and bottom lines
+    painter.setPen(QPen(line_brush, sep_sz));
+    painter.fillRect(x_shift, 0, tot_w, sep_sz, line_brush);
+    painter.fillRect(x_shift, h - sep_sz, tot_w, sep_sz, line_brush);
+    // draw intemediate lines
+    for(int i = 0; i <= 32; i++)
+        painter.fillRect(ith_col_x(i), 0, sep_sz, 2 * sep_sz + hdr_h, line_brush);
+    // draw bottom header lines
+    painter.fillRect(ith_col_x(0), sep_sz + hdr_h, tot_w, sep_sz, line_brush);
+    painter.fillRect(ith_col_x(0), tot_hdr_sz + gap_h, tot_w, sep_sz, line_brush);
+    // redraw some lines but wider
+    for(int i = 4; i < nr_bits; i += 4)
+        painter.fillRect(ith_col_x(i) - sep_sz, 0, 3 * sep_sz, tot_hdr_sz, line_brush);
+    // draw numbers in the header
+    painter.setPen(palette().brush(QPalette::ButtonText).color());
+    for(int i = 0; i < nr_bits; i++)
+    {
+        QRect r(ith_col_x(i), sep_sz + margin, col_w, txt_h);
+        painter.drawText(r, Qt::AlignCenter, QString("%1").arg((nr_bits - 1 - i) / 10));
+        r.translate(0, txt_h + txt_sep);
+        painter.drawText(r, Qt::AlignCenter, QString("%1").arg((nr_bits - 1 - i) % 10));
+    }
+    // display content
+    if(model())
+    {
+        for(int i = 0; i < model()->rowCount(); i++)
+        {
+            QVariant vrange = model()->data(model()->index(i, 0, rootIndex()));
+            if(!vrange.canConvert< SocFieldBitRange >())
+                continue;
+            SocFieldBitRange range = vrange.value< SocFieldBitRange >();
+            QString name = model()->data(model()->index(i, 1, rootIndex())).toString();
+            QRect r(QPoint(ith_col_x(nr_bits - 1 - range.GetLastBit()) + sep_sz, tot_hdr_sz),
+                QPoint(ith_col_x(nr_bits - range.GetFirstBit()), h - sep_sz));
+            painter.fillRect(r.x() - sep_sz, r.y(), sep_sz, r.height(), line_brush);
+            painter.fillRect(r.right(), r.y(), sep_sz, r.height(), line_brush);
+            r.setY(r.y() + gap_h + sep_sz);
+            // draw rotated text
+            painter.save();
+            painter.translate(r.bottomLeft());
+            painter.rotate(-90);
+            //painter.fillRect(QRect(0, 0, r.height(), r.width()), QBrush(Qt::red));
+            QRect r2(0, 0, r.height(), r.width());
+            painter.drawText(r2, Qt::AlignCenter, name);
+            painter.restore();
+        }
+    }
+#undef ith_col_x
+}
+
+void RegSexyDisplay2::RecomputeGeometry()
+{
+    if(!m_is_dirty)
+        return;
+    /* height: header + gap + sep + content + sep */
+    m_minimum_height = 0;
+    m_minimum_height += GetHeaderHeight() + GetGapHeight();
+    m_minimum_height += 2 * GetSeparatorSize() + GetMaxContentHeight();
+    /* width: sep + (col + sep) * n */
+    m_minimum_width = GetSeparatorSize() * 33 + GetColumnWidth() * 32;
+    m_is_dirty = false;
+    viewport()->update();
+}
+
+void RegSexyDisplay2::resizeEvent(QResizeEvent*)
+{
+    m_is_dirty = true;
+    RecomputeGeometry();
+    updateGeometries();
+}
+
+void RegSexyDisplay2::updateGeometries()
+{
+    horizontalScrollBar()->setSingleStep(1);
+    horizontalScrollBar()->setPageStep(viewport()->width());
+    horizontalScrollBar()->setRange(0, qMax(0, m_minimum_width - viewport()->width()));
+    verticalScrollBar()->setSingleStep(1);
+    verticalScrollBar()->setPageStep(viewport()->height());
+    verticalScrollBar()->setRange(0, qMax(0, m_minimum_height - viewport()->height()));
+}
+
+/**
  * GrowingTableView
  */
 GrowingTableView::GrowingTableView(QWidget *parent)
