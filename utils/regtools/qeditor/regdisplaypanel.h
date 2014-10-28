@@ -105,7 +105,7 @@ protected:
     const SocRegRef& m_reg;
     bool m_allow_write;
     RegLineEdit *m_raw_val_edit;
-    RegSexyDisplay *m_sexy_display;
+    Unscroll< RegSexyDisplay2 > *m_sexy_display2;
     GrowingTableView *m_value_table;
     RegFieldTableModel *m_value_model;
     QStyledItemDelegate *m_table_delegate;
