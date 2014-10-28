@@ -168,6 +168,20 @@ protected:
 
 Q_DECLARE_METATYPE(SocFieldCachedValue)
 
+class SocFieldBitRange
+{
+public:
+    SocFieldBitRange():m_first_bit(0),m_last_bit(0) {}
+    SocFieldBitRange(const soc_reg_field_t& field)
+        :m_first_bit(field.first_bit), m_last_bit(field.last_bit) {}
+    unsigned GetFirstBit() const { return m_first_bit; }
+    unsigned GetLastBit() const { return m_last_bit; }
+protected:
+    unsigned m_first_bit, m_last_bit;
+};
+
+Q_DECLARE_METATYPE(SocFieldBitRange)
+
 class SocFieldCachedItemDelegate : public QStyledItemDelegate
 {
 public:

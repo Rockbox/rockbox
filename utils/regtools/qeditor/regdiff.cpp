@@ -297,7 +297,9 @@ RegDiffDisplayPanel::RegDiffDisplayPanel(QWidget *parent, DiffReport *report, co
     m_value_table->resizeColumnsToContents();
     m_value_table->horizontalHeader()->setStretchLastSection(true);
     m_value_table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    m_value_table->setAlternatingRowColors(true);
+
+    SocFieldCachedItemDelegate *m_table_delegate = new SocFieldCachedItemDelegate(this);
+    m_value_table->setItemDelegate(m_table_delegate);
 
     m_sexy_display = new RegSexyDisplay(reg_ref, this);
     m_sexy_display->setFont(m_reg_font);
@@ -508,7 +510,7 @@ RegDiff::RegDiff(Backend *backend, QWidget *parent)
         SetDataSocName(i, "");
         connect(m_backend_selector[i], SIGNAL(OnSelect(IoBackend *)),
             this, SLOT(OnBackendSelect(IoBackend *)));
-        connect(m_data_sel_reload[i], SIGNAL(clicked(bool)), this, 
+        connect(m_data_sel_reload[i], SIGNAL(clicked(bool)), this,
             SLOT(OnBackendReload(bool)));
     }
     m_msg = new MessageWidget(this);
