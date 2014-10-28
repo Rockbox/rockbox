@@ -37,6 +37,7 @@
 #include <QStyledItemDelegate>
 #include <QComboBox>
 #include <QFileDialog>
+#include <QScrollBar>
 #include "settings.h"
 #include "backend.h"
 
@@ -292,28 +293,77 @@ protected:
     bool m_read_only;
 };
 
-class RegSexyDisplay : public QWidget
+class RegSexyDisplay2 : public QAbstractItemView
 {
     Q_OBJECT
 public:
-    RegSexyDisplay(const SocRegRef& reg, QWidget *parent = 0);
+    RegSexyDisplay2(QWidget *parent = 0);
+    virtual QModelIndex indexAt(const QPoint& point) const;
+    virtual void scrollTo(const QModelIndex& index, ScrollHint hint = EnsureVisible);
+    virtual QRect visualRect(const QModelIndex& index ) const;
+    virtual void setModel(QAbstractItemModel *model);
 
-    QSize minimumSizeHint() const;
-    QSize sizeHint() const;
+protected slots:
+    virtual void dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
+    virtual void rowsInserted(const QModelIndex &parent, int start, int end);
+    virtual void rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
+    virtual void scrollContentsBy(int dx, int dy);
+    virtual void updateGeometries();
 
 protected:
-    int marginSize() const;
-    int separatorSize() const;
-    int columnWidth() const;
-    int headerHeight() const;
-    int gapHeight() const;
-    int maxContentHeight() const;
-    int textSep() const;
-    void paintEvent(QPaintEvent *event);
+    int GetMarginSize() const; // margin in cells
+    int GetSeparatorSize() const; // size of lines betweens cells
+    int GetColumnWidth() const; // width of a 1-bit column (excluding separators)
+    int GetHeaderHeight() const; // height of the header (excluding separators)
+    int GetGapHeight() const; // height of gap between header and fields
+    int GetMaxContentHeight() const; // maximum height of field columns
+    int GetHeaderTextSep() const; // height between digits in header
+    void RecomputeGeometry();
 
-private:
-    SocRegRef m_reg;
-    mutable QSize m_size;
+    virtual bool isIndexHidden(const QModelIndex& index) const;
+    virtual QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers);
+    virtual void setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags flags);
+    virtual int verticalOffset() const;
+    virtual int horizontalOffset() const;
+    virtual QRegion visualRegionForSelection(const QItemSelection& selection) const;
+    virtual void paintEvent(QPaintEvent *event);
+    virtual void resizeEvent(QResizeEvent* event);
+
+    bool m_is_dirty;
+    int m_minimum_width, m_minimum_height;
+};
+
+/**
+ * The Qt designers chose to make QAbstractItemView a QAbstractScrollArea, so
+ * that the table scrolls when it doesn't fit. This might be a problem when
+ * one wants to put several tables on top of another, and the whole set into a
+ * big scrollable area, because QAbstractScrollArea provides dummy values as
+ * (minimum) size hints...So the big scroll area has no way of knowing the actual
+ * size of the widget inside and it ends being a scrollable table inside another
+ * scrollable, which is just super weird.
+ * The Unscroll<T> class provides a workaround this behaviour: it expects T
+ * to derive from QAbstractScrollArea and provides correct (minimum) size hints,
+ * based on the value of the scroll bars.
+ */
+template<typename T>
+class Unscroll : public T
+{
+public:
+    Unscroll(QWidget *parent = 0):T(parent) {}
+    virtual QSize sizeHint() const
+    {
+        QScrollBar *hsb = this->horizontalScrollBar();
+        QScrollBar *vsb = this->verticalScrollBar();
+        int w = hsb->maximum() - hsb->minimum() + hsb->pageStep();
+        int h = vsb->maximum() - vsb->minimum() + vsb->pageStep();
+        QMargins m = this->contentsMargins();
+        return QSize(m.left() + w + m.right(), m.top() + h + m.bottom());
+    }
+
+    virtual QSize minimumSizeHint() const
+    {
+        return sizeHint();
+    }
 };
 
 class GrowingTableView : public QTableView

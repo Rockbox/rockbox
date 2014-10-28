@@ -12,7 +12,7 @@ libsocdesc.commands = cd ../lib && make
 QMAKE_EXTRA_TARGETS += libsocdesc
 PRE_TARGETDEPS += libsocdesc
 
-VERSION = 2.0.3
+VERSION = 2.0.4
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
