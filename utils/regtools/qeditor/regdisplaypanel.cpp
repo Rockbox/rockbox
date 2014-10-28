@@ -196,7 +196,7 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const S
     raw_val_layout->addWidget(m_raw_val_edit);
     raw_val_layout->addStretch();
 
-    m_value_table = new GrowingTableView;
+    m_value_table = new GrowingTableView();
     m_value_model = new RegFieldTableModel(m_value_table); // view takes ownership
     m_value_model->SetRegister(m_reg.GetReg());
     m_value_model->SetReadOnly(read_only);
@@ -208,7 +208,7 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const S
     // FIXME we cannot use setAlternatingRowColors() because we override the
     // background color, should it be part of the model ?
 
-    SocFieldCachedItemDelegate *m_table_delegate = new SocFieldCachedItemDelegate(this);
+    m_table_delegate = new SocFieldCachedItemDelegate(this);
     m_table_edit_factory = new QItemEditorFactory();
     SocFieldCachedEditorCreator *m_table_edit_creator = new SocFieldCachedEditorCreator();
     // FIXME see QTBUG-30392
@@ -217,8 +217,10 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const S
     m_table_delegate->setItemEditorFactory(m_table_edit_factory);
     m_value_table->setItemDelegate(m_table_delegate);
 
-    m_sexy_display = new RegSexyDisplay(reg_ref, this);
-    m_sexy_display->setFont(m_reg_font);
+    m_sexy_display2 = new Unscroll<RegSexyDisplay2>(this);
+    m_sexy_display2->setFont(m_reg_font);
+    m_sexy_display2->setModel(m_value_model);
+    m_sexy_display2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_desc = new QLabel(this);
     m_desc->setTextFormat(Qt::RichText);
@@ -228,8 +230,9 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const S
     right_layout->addLayout(top_layout);
     if(raw_val_layout)
         right_layout->addLayout(raw_val_layout);
-    right_layout->addWidget(m_sexy_display);
+    right_layout->addWidget(m_sexy_display2);
     right_layout->addWidget(m_value_table);
+    right_layout->addStretch();
 
     setTitle("Register Description");
     m_viewport = new QWidget;

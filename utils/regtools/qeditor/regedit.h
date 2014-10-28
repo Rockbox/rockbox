@@ -185,10 +185,12 @@ protected:
     QComboBox *m_formula_combo;
     QLineEdit *m_formula_string_edit;
     QPushButton *m_formula_string_gen;
-    RegSexyDisplay *m_sexy_display;
+    Unscroll< RegSexyDisplay2 > *m_sexy_display2;
     MyTextEditor *m_desc_edit;
     QGroupBox *m_field_group;
-    QTableWidget *m_field_table;
+    QTableView *m_value_table;
+    RegFieldTableModel *m_value_model;
+    QStyledItemDelegate *m_table_delegate;
 };
 
 class FieldEditPanel : public QWidget, public AbstractRegEditPanel

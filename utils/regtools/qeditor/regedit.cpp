@@ -336,47 +336,33 @@ RegEditPanel::RegEditPanel(SocRegRef ref, QWidget *parent)
     top_layout->addLayout(name_layout);
     top_layout->addWidget(m_desc_group, 1);
 
-    m_sexy_display = new RegSexyDisplay(m_ref, this);
-    m_sexy_display->setFont(m_reg_font);
+    m_value_table = new QTableView(this);
+    m_value_model = new RegFieldTableModel(m_value_table); // view takes ownership
+    m_value_model->SetRegister(m_ref.GetReg());
+    m_value_model->SetReadOnly(true);
+    m_value_table->setModel(m_value_model);
+    m_value_table->verticalHeader()->setVisible(false);
+    m_value_table->horizontalHeader()->setStretchLastSection(true);
+    m_value_table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    // FIXME we cannot use setAlternatingRowColors() because we override the
+    // background color, should it be part of the model ?
+    m_table_delegate = new SocFieldCachedItemDelegate(this);
+    m_value_table->setItemDelegate(m_table_delegate);
+    m_value_table->resizeColumnsToContents();
 
-    m_field_table = new QTableWidget;
-    m_field_table->setRowCount(m_ref.GetReg().field.size());
-    m_field_table->setColumnCount(4);
-    for(size_t row = 0; row < m_ref.GetReg().field.size(); row++)
-    {
-        const soc_reg_field_t& field = m_ref.GetReg().field[row];
-        QString bits_str;
-        if(field.first_bit == field.last_bit)
-            bits_str.sprintf("%d", field.first_bit);
-        else
-            bits_str.sprintf("%d:%d", field.last_bit, field.first_bit);
-        QTableWidgetItem *item = new QTableWidgetItem(bits_str);
-        item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
-        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        m_field_table->setItem(row, 1, item);
-        item = new QTableWidgetItem(QString(field.name.c_str()));
-        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        m_field_table->setItem(row, 2, item);
-        item = new QTableWidgetItem(QString(field.desc.c_str()));
-        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-        m_field_table->setItem(row, 3, item);
-        UpdateWarning(row);
-    }
-    m_field_table->setHorizontalHeaderItem(0, new QTableWidgetItem(""));
-    m_field_table->setHorizontalHeaderItem(1, new QTableWidgetItem("Bits"));
-    m_field_table->setHorizontalHeaderItem(2, new QTableWidgetItem("Name"));
-    m_field_table->setHorizontalHeaderItem(3, new QTableWidgetItem("Description"));
-    m_field_table->verticalHeader()->setVisible(false);
-    m_field_table->resizeColumnsToContents();
-    m_field_table->horizontalHeader()->setStretchLastSection(true);
+    m_sexy_display2 = new Unscroll<RegSexyDisplay2>(this);
+    m_sexy_display2->setFont(m_reg_font);
+    m_sexy_display2->setModel(m_value_model);
+    m_sexy_display2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     QHBoxLayout *field_layout = new QHBoxLayout;
-    field_layout->addWidget(m_field_table);
+    field_layout->addWidget(m_value_table);
     m_field_group = new QGroupBox("Flags", this);
     m_field_group->setLayout(field_layout);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(top_layout, 0);
-    layout->addWidget(m_sexy_display, 0);
+    layout->addWidget(m_sexy_display2, 0);
     layout->addWidget(m_field_group);
 
     UpdateFormula();
