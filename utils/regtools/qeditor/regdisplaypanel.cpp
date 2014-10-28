@@ -219,6 +219,9 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const S
 
     m_sexy_display = new RegSexyDisplay(reg_ref, this);
     m_sexy_display->setFont(m_reg_font);
+    m_sexy_display2 = new RegSexyDisplay2(this);
+    m_sexy_display2->setFont(m_reg_font);
+    m_sexy_display2->setModel(m_value_model);
 
     m_desc = new QLabel(this);
     m_desc->setTextFormat(Qt::RichText);
@@ -229,6 +232,7 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const S
     if(raw_val_layout)
         right_layout->addLayout(raw_val_layout);
     right_layout->addWidget(m_sexy_display);
+    right_layout->addWidget(m_sexy_display2);
     right_layout->addWidget(m_value_table);
 
     setTitle("Register Description");
