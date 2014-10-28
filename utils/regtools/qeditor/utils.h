@@ -316,6 +316,37 @@ private:
     mutable QSize m_size;
 };
 
+class RegSexyDisplay2 : public QAbstractItemView
+{
+    Q_OBJECT
+public:
+    RegSexyDisplay2(QWidget *parent = 0);
+    virtual QModelIndex indexAt(const QPoint& point) const;
+    virtual void scrollTo(const QModelIndex& index, ScrollHint hint = EnsureVisible);
+    virtual QRect visualRect(const QModelIndex& index ) const;
+
+protected slots:
+     //virtual void dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
+
+protected:
+    int GetMarginSize() const; // margin in cells
+    int GetSeparatorSize() const; // size of lines betweens cells
+    int GetColumnWidth() const; // width of a 1-bit column (excluding separators)
+    int GetHeaderHeight() const; // height of the header (excluding separators)
+    int GetGapHeight() const; // height of gap between header and fields
+    int GetMaxContentHeight() const; // maximum height of field columns
+    int GetHeaderTextSep() const; // height between digits in header
+
+    virtual bool isIndexHidden(const QModelIndex& index) const;
+    virtual QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers);
+    virtual void setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags flags);
+    virtual int verticalOffset() const;
+    virtual int horizontalOffset() const;
+    virtual QRegion visualRegionForSelection(const QItemSelection& selection) const;
+    virtual void paintEvent(QPaintEvent *event);
+
+};
+
 class GrowingTableView : public QTableView
 {
     Q_OBJECT
