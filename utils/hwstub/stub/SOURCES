@@ -1,8 +1,17 @@
 #if defined(CPU_ARM)
+#if ARM_ARCH == 7
+asm/armv7/memcpy.S
+asm/armv7/memmove.S
+asm/armv7/memset.S
+#else
 asm/arm/memcpy.S
 asm/arm/memmove.S
 asm/arm/memset.S
+#endif /* ARM_ARCH */
+#else
+#error "Unimplemented ISA"
 #endif
+#endif /* CPU_* */
 main.c
 logf.c
 string.c
@@ -19,4 +28,8 @@ rk27xx/target.c
 pp/crt0.S
 pp/target.c
 usb_drv_arc.c
+#elif defined(CONFIG_RKNANO)
+rknano/crt0.S
+rknano/target.c
+usb_drv_synopsys.c
 #endif

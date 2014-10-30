@@ -1,10 +1,11 @@
 #
 # common
 #
-CC=arm-elf-eabi-gcc
-LD=arm-elf-eabi-gcc
-AS=arm-elf-eabi-gcc
-OC=arm-elf-eabi-objcopy
+TOOLCHAIN?=arm-elf-eabi-
+CC=$(TOOLCHAIN)gcc
+LD=$(TOOLCHAIN)gcc
+AS=$(TOOLCHAIN)gcc
+OC=$(TOOLCHAIN)objcopy
 SBTOOLS=$(CURDIR)/../../../imxtools/sbtools
 ELFTOSB=$(SBTOOLS)/elftosb
 ELFTOSB1=$(SBTOOLS)/elftosb1
