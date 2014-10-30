@@ -62,7 +62,7 @@ void vuprintf(
         width = 10*width + ch - '0';
         ch = *fmt++;
         }
-        
+
         precision = 0;
         if(ch == '.')
         {
