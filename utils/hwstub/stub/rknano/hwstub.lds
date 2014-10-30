@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2007 by Björn Stenberg
+ * Copyright (C) 2014 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,31 +18,58 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _USB_DRV_H
-#define _USB_DRV_H
+#include "config.h"
 
-#include "usb_ch9.h"
+ENTRY(start)
+OUTPUT_FORMAT(elf32-littlearm)
+OUTPUT_ARCH(arm)
+STARTUP(rknano/crt0.o)
 
-#define EP_CONTROL 0
+#define IRAM_END_ADDR   (IRAM_ORIG + IRAM_SIZE)
 
-#define DIR_OUT 0
-#define DIR_IN 1
+MEMORY
+{
+    OCRAM : ORIGIN = IRAM_ORIG, LENGTH = IRAM_SIZE
+}
 
-#define EP_DIR(ep) (((ep) & USB_ENDPOINT_DIR_MASK) ? DIR_IN : DIR_OUT)
-#define EP_NUM(ep) ((ep) & USB_ENDPOINT_NUMBER_MASK)
+SECTIONS
+{
+    .octext :
+    {
+        _copystart = .;
+        oc_codestart = .;
+        *(.text.start*)
+        *(.text*)
+        *(.icode*)
+        *(.data*)
+        *(.rodata*)
+        _copyend = .;
+    } > OCRAM
 
-void usb_drv_init(void);
-void usb_drv_exit(void);
-void usb_drv_stall(int endpoint, bool stall,bool in);
-int usb_drv_send(int endpoint, void* ptr, int length);
-int usb_drv_send_nonblocking(int endpoint, void* ptr, int length);
-int usb_drv_recv(int endpoint, void* ptr, int length);// blocking !
-int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length);
-int usb_drv_recv_setup(struct usb_ctrlrequest *req);
-void usb_drv_set_address(int address);
-int usb_drv_port_speed(void);
-void usb_drv_configure_endpoint(int ep_num, int type);
-void usb_drv_irq(void);
+    .bss (NOLOAD) :
+    {
+        bss_start = .;
+        *(.bss)
+        bss_end = .;
+    } > OCRAM
 
-#endif /* _USB_DRV_H */
+    .stack (NOLOAD) :
+    {
+        oc_codeend = .;
+        oc_stackstart = .;
+        . += STACK_SIZE;
+        oc_stackend = .;
+        oc_bufferstart = .;
+    } > OCRAM
+
+    .ocend IRAM_END_ADDR (NOLOAD) :
+    {
+        oc_bufferend = .;
+    } > OCRAM
+
+    /DISCARD/ :
+    {
+        *(.eh_frame)
+    } 
+}
  
