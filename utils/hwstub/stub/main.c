@@ -46,7 +46,7 @@ static bool g_exit = false;
  * 
  */
 
-static struct usb_device_descriptor device_descriptor=
+static struct usb_device_descriptor device_descriptor =
 {
     .bLength            = sizeof(struct usb_device_descriptor),
     .bDescriptorType    = USB_DT_DEVICE,
@@ -241,7 +241,7 @@ static void handle_std_dev_desc(struct usb_ctrlrequest *req)
         if(ptr != usb_buffer)
             memcpy(usb_buffer, ptr, length);
 
-        usb_drv_send(EP_CONTROL, usb_buffer, length);
+        usb_drv_send(EP_CONTROL, ptr, length);
         usb_drv_recv(EP_CONTROL, NULL, 0);
     }
     else
@@ -264,8 +264,13 @@ static void handle_std_dev_req(struct usb_ctrlrequest *req)
             handle_std_dev_desc(req);
             break;
         case USB_REQ_SET_ADDRESS:
+#ifdef USB_DRV_EARLY_SET_ADDRESS
+            usb_drv_set_address(req->wValue);
+            usb_drv_send(EP_CONTROL, NULL, 0);
+#else
             usb_drv_send(EP_CONTROL, NULL, 0);
             usb_drv_set_address(req->wValue);
+#endif
             break;
         case USB_REQ_GET_STATUS:
             usb_buffer[0] = 0;
