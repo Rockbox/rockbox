@@ -1135,7 +1135,7 @@ static int do_afi(uint8_t *buf, int size)
     cprintf_field("  Version: ", "%x.%x\n", afi->hdr.ver_id[0], afi->hdr.ver_id[1]);
     cprintf_field("  Ext Version: ", "%x.%x\n", afi->hdr.ext_ver_id[0],
         afi->hdr.ext_ver_id[1]);
-    cprintf_field("  Date: ", "%x/%x/%x%x\n", afi->hdr.day, afi->hdr.month,
+    cprintf_field("  Date: ", "%02x/%02x/%02x%02x\n", afi->hdr.day, afi->hdr.month,
         afi->hdr.year[0], afi->hdr.year[1]);
 
     cprintf_field("  AFI size: ", "%d ", afi->hdr.afi_size);
