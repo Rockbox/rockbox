@@ -42,6 +42,7 @@ struct elf_section_t
     uint32_t addr; /* virtual address */
     uint32_t size; /* virtual size */
     enum elf_section_type_t type;
+    char *name;
     /* <union> */
     void *section; /* data */
     uint32_t pattern; /* fill pattern */
@@ -49,6 +50,7 @@ struct elf_section_t
     struct elf_section_t *next;
     /* Internal to elf_write_file */
     uint32_t offset;
+    uint32_t name_offset;
 };
 
 struct elf_segment_t
@@ -68,6 +70,7 @@ struct elf_params_t
     struct elf_section_t *last_section;
     struct elf_segment_t *first_segment;
     struct elf_segment_t *last_segment;
+    int unique_index;
 };
 
 typedef bool (*elf_read_fn_t)(void *user, uint32_t addr, void *buf, size_t count);
@@ -77,7 +80,7 @@ typedef void (*elf_printf_fn_t)(void *user, bool error, const char *fmt, ...);
 
 void elf_init(struct elf_params_t *params);
 void elf_add_load_section(struct elf_params_t *params,
-    uint32_t load_addr, uint32_t size, const void *section);
+    uint32_t load_addr, uint32_t size, const void *section, const char *name);
 void elf_add_fill_section(struct elf_params_t *params,
     uint32_t fill_addr, uint32_t size, uint32_t pattern);
 uint32_t elf_translate_virtual_address(struct elf_params_t *params, uint32_t addr);
