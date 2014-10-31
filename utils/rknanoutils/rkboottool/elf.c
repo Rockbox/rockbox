@@ -21,6 +21,14 @@
 #include "elf.h"
 #include "misc.h"
 
+static char *strdup(const char *str)
+{
+    int len = strlen(str);
+    char *s = malloc(len + 1);
+    memcpy(s, str, len + 1);
+    return s;
+}
+
 /**
  * Definitions
  *   taken from elf.h linux header
@@ -189,43 +197,55 @@ static struct elf_segment_t *elf_add_segment(struct elf_params_t *params)
 }
 
 void elf_add_load_section(struct elf_params_t *params,
-    uint32_t load_addr, uint32_t size, const void *section)
+    uint32_t load_addr, uint32_t size, const void *section, const char *name)
 {
     struct elf_section_t *sec = elf_add_section(params);
+    char buffer[32];
+    if(name == NULL)
+    {
+        sprintf(buffer, ".text%d", params->unique_index++);
+        name = buffer;
+    }
 
     sec->type = EST_LOAD;
     sec->addr = load_addr;
     sec->size = size;
     sec->section = xmalloc(size);
+    sec->name = strdup(name);
     memcpy(sec->section, section, size);
 }
 
 void elf_add_fill_section(struct elf_params_t *params,
     uint32_t fill_addr, uint32_t size, uint32_t pattern)
 {
+    char buffer[32];
+    sprintf(buffer, ".bss%d", params->unique_index++);
+
     if(pattern != 0x00)
     {
         printf("oops, non-zero filling, ignore fill section\n");
         return;
     }
-    
+
     struct elf_section_t *sec = elf_add_section(params);
-    
+
     sec->type = EST_FILL;
     sec->addr = fill_addr;
     sec->size = size;
     sec->pattern = pattern;
+    sec->name = strdup(buffer);
 }
 
 void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
     elf_printf_fn_t printf, void *user)
 {
     (void) printf;
-    
+
     Elf32_Ehdr ehdr;
     uint32_t phnum = 0;
     struct elf_section_t *sec = params->first_section;
     uint32_t offset = 0;
+    uint32_t strtbl_size = 1; /* offset 0 is for the NULL name */
     Elf32_Phdr phdr;
     Elf32_Shdr shdr;
     memset(&ehdr, 0, EI_NIDENT);
@@ -241,7 +261,9 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
         {
             sec->offset = 0;
         }
-        
+        sec->name_offset = strtbl_size;
+        strtbl_size += strlen(sec->name) + 1;
+
         phnum++;
         sec = sec->next;
     }
@@ -275,16 +297,14 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
 
     write(user, 0, &ehdr, sizeof ehdr);
 
-    /* allocate enough size to hold any combinaison of .text/.bss in the string table:
-     * - one empty name ("\0")
-     * - at most N names of the form ".textXXXX\0" or ".bssXXXX\0"
-     * - one name ".shstrtab\0" */
-    char *strtbl_content = malloc(1 + strlen(".shstrtab") + 1 +
-        phnum * (strlen(".textXXXX") + 1));
-    
+    /* the last name offset gives the size of the section, we need to add a small
+     * amount of .shstrtab name */
+    uint32_t shstrtab_index = strtbl_size;
+    strtbl_size += strlen(".shstrtab") + 1;
+    char *strtbl_content = malloc(strtbl_size);
+    /* create NULL and shstrtab names */
     strtbl_content[0] = '\0';
-    strcpy(&strtbl_content[1], ".shstrtab");
-    uint32_t strtbl_index = 1 + strlen(".shstrtab") + 1;
+    strcpy(&strtbl_content[shstrtab_index], ".shstrtab");
 
     uint32_t data_offset = ehdr.e_ehsize + ehdr.e_phnum * ehdr.e_phentsize +
         ehdr.e_shnum * ehdr.e_shentsize;
@@ -294,7 +314,8 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
     while(sec)
     {
         sec->offset += data_offset;
-        
+        strcpy(&strtbl_content[sec->name_offset], sec->name);
+
         phdr.p_type = PT_LOAD;
         if(sec->type == EST_LOAD)
             phdr.p_offset = sec->offset;
@@ -336,21 +357,13 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
         offset += sizeof(Elf32_Shdr);
     }
 
-    uint32_t text_idx = 0;
-    uint32_t bss_idx = 0;
     while(sec)
     {
-        shdr.sh_name = strtbl_index;
+        shdr.sh_name = sec->name_offset;
         if(sec->type == EST_LOAD)
-        {
-            strtbl_index += 1 + sprintf(&strtbl_content[strtbl_index], ".text%d", text_idx++);
             shdr.sh_type = SHT_PROGBITS;
-        }
         else
-        {
-            strtbl_index += 1 + sprintf(&strtbl_content[strtbl_index], ".bss%d", bss_idx++);
             shdr.sh_type = SHT_NOBITS;
-        }
         shdr.sh_flags = SHF_ALLOC | SHF_EXECINSTR;
         shdr.sh_addr = sec->addr;
         shdr.sh_offset = sec->offset;
@@ -367,12 +380,12 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
     }
 
     {
-        shdr.sh_name = 1;
+        shdr.sh_name = shstrtab_index;
         shdr.sh_type = SHT_STRTAB;
         shdr.sh_flags = 0;
         shdr.sh_addr = 0;
         shdr.sh_offset = strtbl_offset + data_offset;
-        shdr.sh_size = strtbl_index;
+        shdr.sh_size = strtbl_size;
         shdr.sh_link = SHN_UNDEF;
         shdr.sh_info = 0;
         shdr.sh_addralign = 1;
@@ -391,7 +404,7 @@ void elf_write_file(struct elf_params_t *params, elf_write_fn_t write,
         sec = sec->next;
     }
 
-    write(user, strtbl_offset + data_offset, strtbl_content, strtbl_index);
+    write(user, strtbl_offset + data_offset, strtbl_content, strtbl_size);
     free(strtbl_content);
 }
 
@@ -399,7 +412,7 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
     elf_printf_fn_t printf, void *user)
 {
     #define error_printf(...) ({printf(user, true, __VA_ARGS__); return false;})
-    
+
     /* read header */
     Elf32_Ehdr ehdr;
     if(!read(user, 0, &ehdr, sizeof(ehdr)))
@@ -459,7 +472,7 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
             void *data = xmalloc(shdr.sh_size);
             if(!read(user, shdr.sh_offset, data, shdr.sh_size))
                 error_printf("error read self section data\n");
-            elf_add_load_section(params, shdr.sh_addr, shdr.sh_size, data);
+            elf_add_load_section(params, shdr.sh_addr, shdr.sh_size, data, NULL);
             free(data);
 
             if(strtab)
@@ -476,7 +489,6 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
             if(strtab)
                 printf(user, false, "filter out %s\n", &strtab[shdr.sh_name], shdr.sh_type);
         }
-        
     }
     free(strtab);
     /* run through segments */
@@ -562,6 +574,7 @@ void elf_release(struct elf_params_t *params)
         struct elf_section_t *next_sec = sec->next;
         if(sec->type == EST_LOAD)
             free(sec->section);
+        free(sec->name);
         free(sec);
         sec = next_sec;
     }

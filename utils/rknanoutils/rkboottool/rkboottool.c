@@ -15,6 +15,11 @@ bool g_debug = false;
 typedef uint8_t packed_bcd_uint8_t;
 typedef uint16_t packed_bcd_uint16_t;
 
+/**
+ * RKnanoFW
+ * contains resources and code stages
+ */
+
 struct rknano_date_t
 {
     packed_bcd_uint16_t year;
@@ -176,7 +181,7 @@ static void save_blob(const struct rknano_blob_t *b, void *buf, uint32_t size,
         }
         encode_page(buff_ptr, out_ptr, len);
     }
-    
+
     if(f)
     {
         fwrite(ptr, b->size, 1, f);
@@ -276,6 +281,11 @@ static int do_nanofw_image(uint8_t *buf, unsigned long size)
     return 0;
 }
 
+/**
+ * RKNano stage
+ * contains code and memory mapping
+ */
+
 struct rknano_stage_header_t
 {
     uint32_t addr;
@@ -283,21 +293,28 @@ struct rknano_stage_header_t
 } __attribute__((packed));
 
 /*
- * The [code_pa,code_pa+code_sz[ and [data_pa,data_pa+data_sz[ ranges
- * are consistent: they never overlap and have no gaps and fill the
- * entire space. Furthermore they match the code sequences so it's
- * reasonable to assume these fields are correct.
- * The other fields are still quite unsure. */
+ * NOTE this theory has not been tested against actual code, it's still a guess
+ * The firmware is too big to fit in memory so it's split into sections,
+ * each section having a "virtual address" and a "physical address".
+ * Except it gets tricky because the RKNano doesn't have a MMU but a MPU,
+ * so most probably the OF divides the memory into regions (8 would match
+ * hardware capabilities), each being able to contain one of the sections
+ * in the OF file. To gracefully handle jumps between sections, my guess is
+ * that the entire OF is linked as a flat image, cut into pieces and
+ * then each code section get relocated except for jump/calls outside of it:
+ * this will trigger an access fault when trying to access another section, which
+ * the OF can trap and then load the corresponding section.
+ */
 
 struct rknano_stage_section_t
 {
-    uint32_t code_pa;
     uint32_t code_va;
+    uint32_t code_pa;
     uint32_t code_sz;
-    uint32_t data_pa;
     uint32_t data_va;
+    uint32_t data_pa;
     uint32_t data_sz;
-    uint32_t bss_va;
+    uint32_t bss_pa;
     uint32_t bss_sz;
 } __attribute__((packed));
 
@@ -319,14 +336,14 @@ static void elf_write(void *user, uint32_t addr, const void *buf, size_t count)
     fwrite(buf, count, 1, f);
 }
 
-static void extract_elf_section(struct elf_params_t *elf, int count)
+static void extract_elf_section(struct elf_params_t *elf)
 {
     if(g_out_prefix == NULL)
         return;
     char *filename = xmalloc(strlen(g_out_prefix) + 32);
-    sprintf(filename, "%s%d.elf", g_out_prefix, count);
+    sprintf(filename, "%s.elf", g_out_prefix);
     if(g_debug)
-        printf("Write entry %d to %s\n", count, filename);
+        printf("Write stage to %s\n", filename);
 
     FILE *fd = fopen(filename, "wb");
     free(filename);
@@ -337,66 +354,148 @@ static void extract_elf_section(struct elf_params_t *elf, int count)
     fclose(fd);
 }
 
+struct range_t
+{
+    unsigned long start, size;
+    int section;
+    int type;
+};
+
+int range_cmp(const void *_a, const void *_b)
+{
+    const struct range_t *a = _a, *b = _b;
+    if(a->start == b->start)
+        return a->size - b->size;
+    return a->start - b->start;
+}
+
+#define RANGE_TXT   0
+#define RANGE_DAT   1
+
 static int do_nanostage_image(uint8_t *buf, unsigned long size)
 {
     if(size < sizeof(struct rknano_stage_section_t))
         return 1;
     struct rknano_stage_header_t *hdr = (void *)buf;
+    size_t hdr_size = sizeof(struct rknano_stage_header_t) +
+        hdr->count * sizeof(struct rknano_stage_section_t);
+    if(size < hdr_size)
+        return 1;
 
     cprintf(BLUE, "Header\n");
     cprintf(GREEN, "  Base Address: ");
     cprintf(YELLOW, "%#08x\n", hdr->addr);
-    cprintf(GREEN, "  Load count: ");
+    cprintf(GREEN, "  Section count: ");
     cprintf(YELLOW, "%d\n", hdr->count);
-    
-    struct rknano_stage_section_t *sec = (void *)(hdr + 1);
 
+    struct rknano_stage_section_t *sec = (void *)(hdr + 1);
+    struct elf_params_t elf;
+    elf_init(&elf);
+    bool error = false;
+    /* track range for overlap */
+    struct range_t *ranges = malloc(sizeof(struct range_t) * 2 * hdr->count);
+    int nr_ranges = 0;
     for(unsigned i = 0; i < hdr->count; i++, sec++)
     {
         cprintf(BLUE, "Section %d\n", i);
         cprintf(GREEN, "  Code: ");
-        cprintf(YELLOW, "0x%08x", sec->code_pa);
-        cprintf(RED, "-(txt)-");
-        cprintf(YELLOW, "0x%08x", sec->code_pa + sec->code_sz);
-        cprintf(BLUE, " |--> ");
         cprintf(YELLOW, "0x%08x", sec->code_va);
         cprintf(RED, "-(txt)-");
-        cprintf(YELLOW, "0x%08x\n", sec->code_va + sec->code_sz);
+        cprintf(YELLOW, "0x%08x", sec->code_va + sec->code_sz);
+        cprintf(BLUE, " |--> ");
+        cprintf(YELLOW, "0x%08x", sec->code_pa);
+        cprintf(RED, "-(txt)-");
+        cprintf(YELLOW, "0x%08x\n", sec->code_pa + sec->code_sz);
+
+        /* add ranges */
+        ranges[nr_ranges].start = sec->code_va;
+        ranges[nr_ranges].size = sec->code_sz;
+        ranges[nr_ranges].section = i;
+        ranges[nr_ranges].type = RANGE_TXT;
+        ranges[nr_ranges + 1].start = sec->data_va;
+        ranges[nr_ranges + 1].size = sec->data_sz;
+        ranges[nr_ranges + 1].section = i;
+        ranges[nr_ranges + 1].type = RANGE_DAT;
+        nr_ranges += 2;
 
         cprintf(GREEN, "  Data: ");
-        cprintf(YELLOW, "0x%08x", sec->data_pa);
-        cprintf(RED, "-(dat)-");
-        cprintf(YELLOW, "0x%08x", sec->data_pa + sec->data_sz);
-        cprintf(BLUE, " |--> ");
         cprintf(YELLOW, "0x%08x", sec->data_va);
         cprintf(RED, "-(dat)-");
-        cprintf(YELLOW, "0x%08x\n", sec->data_va + sec->data_sz);
+        cprintf(YELLOW, "0x%08x", sec->data_va + sec->data_sz);
+        cprintf(BLUE, " |--> ");
+        cprintf(YELLOW, "0x%08x", sec->data_pa);
+        cprintf(RED, "-(dat)-");
+        cprintf(YELLOW, "0x%08x\n", sec->data_pa + sec->data_sz);
 
         cprintf(GREEN, "  Data: ");
         cprintf(RED, "                           ");
         cprintf(BLUE, " |--> ");
-        cprintf(YELLOW, "0x%08x", sec->bss_va);
+        cprintf(YELLOW, "0x%08x", sec->bss_pa);
         cprintf(RED, "-(bss)-");
-        cprintf(YELLOW, "0x%08x\n", sec->bss_va + sec->bss_sz);
+        cprintf(YELLOW, "0x%08x\n", sec->bss_pa + sec->bss_sz);
 
-#if 0
-        struct rknano_blob_t blob;
-        blob.offset = sec->code_pa - hdr->addr;
-        blob.size = sec->code_sz;
-        save_blob(&blob, buf, size, "entry.", i, NO_ENC);
-#else
-        struct elf_params_t elf;
-        elf_init(&elf);
-        elf_add_load_section(&elf, sec->code_va, sec->code_sz, buf + sec->code_pa - hdr->addr);
-        elf_add_load_section(&elf, sec->data_va, sec->data_sz, buf + sec->data_pa - hdr->addr);
-        elf_add_fill_section(&elf, sec->bss_va, sec->bss_sz, 0);
-        extract_elf_section(&elf, i);
-        elf_release(&elf);
-#endif
+#define check_range_(start,sz) \
+        ((start) >= hdr_size && (start) + (sz) <= size)
+#define check_range(start,sz) \
+        ((start) >= hdr->addr && check_range_((start) - hdr->addr, sz))
+        /* check ranges */
+        if(sec->code_sz != 0 && !check_range(sec->code_va, sec->code_sz))
+        {
+            cprintf(GREY, "Invalid stage: out of bound code\n");
+            error = true;
+            break;
+        }
+        if(sec->data_sz != 0 && !check_range(sec->data_va, sec->data_sz))
+        {
+            cprintf(GREY, "Invalid stage: out of bound data\n");
+            error = true;
+            break;
+        }
+#undef check_range_
+#undef check_range
+
+        char buffer[32];
+        if(sec->code_sz != 0)
+        {
+            sprintf(buffer, ".text.%d", i);
+            elf_add_load_section(&elf, sec->code_va, sec->code_sz,
+                buf + sec->code_va - hdr->addr, buffer);
+        }
+        if(sec->data_sz != 0)
+        {
+            sprintf(buffer, ".data.%d", i);
+            elf_add_load_section(&elf, sec->data_va, sec->data_sz,
+                buf + sec->data_va - hdr->addr, buffer);
+        }
     }
+    /* sort ranges and check overlap */
+    qsort(ranges, nr_ranges, sizeof(struct range_t), range_cmp);
+    for(int i = 1; i < nr_ranges; i++)
+    {
+        if(ranges[i - 1].start + ranges[i - 1].size > ranges[i].start)
+        {
+            error = true;
+            static const char *type[] = {"txt", "dat"};
+            cprintf(GREY, "Section overlap: section %d %s intersects section %d %s\n",
+                ranges[i - 1].section, type[ranges[i - 1].type], ranges[i].section,
+                type[ranges[i].type]);
+            break;
+        }
+    }
+    if(!error)
+        extract_elf_section(&elf);
+    /* FIXME for full information, we could add segments to the ELF file to
+     * keep the mapping, but it's unclear if that would do any good */
+    elf_release(&elf);
+    free(ranges);
 
     return 0;
 }
+
+/**
+ * RKNano BOOT
+ * contains named bootloader stages
+ */
 
 #define MAGIC_BOOT      "BOOT"
 #define MAGIC_BOOT_SIZE 4
@@ -427,6 +526,8 @@ struct rknano_boot_header_t
     uint8_t field_2B[9];
     uint32_t field_34;
 } __attribute__((packed));
+
+#define BOOT_CHIP_RKNANO    0x30
 
 struct rknano_boot_entry_t
 {
@@ -588,7 +689,7 @@ static int do_boot_image(uint8_t *buf, unsigned long size)
         cprintf(RED, "OK\n");
     else
         cprintf(RED, "Mismatch\n");
-    
+
 #define print(str, name) cprintf(GREEN, "  "str": ");cprintf(YELLOW, "%#x\n", (unsigned)hdr->name)
 #define print_arr(str, name, sz) \
     cprintf(GREEN, "  "str":");for(int i = 0; i < sz; i++)cprintf(YELLOW, " %#x", (unsigned)hdr->name[i]);printf("\n")
@@ -602,8 +703,12 @@ static int do_boot_image(uint8_t *buf, unsigned long size)
         hdr->hour, hdr->minute, hdr->second);
 
     cprintf(GREEN, "  Chip: ");
-    cprintf(YELLOW, "%#x\n", hdr->chip);
-    
+    cprintf(YELLOW, "%#x ", hdr->chip);
+    if(hdr->chip == BOOT_CHIP_RKNANO)
+        cprintf(RED, "(RKNANO)\n");
+    else
+        cprintf(RED, "(unknown)\n");
+
     print_arr("field_2A", field_2B, 9);
     print("field_34", field_34);
 
@@ -625,9 +730,14 @@ static int do_boot_image(uint8_t *buf, unsigned long size)
         cprintf(RED, "OK\n");
     else
         cprintf(RED, "Mismatch\n");
-    
+
     return 0;
 }
+
+/**
+ * RKFW
+ * contains bootloader and update
+ */
 
 typedef struct rknano_blob_t rkfw_blob_t;
 
@@ -637,7 +747,7 @@ typedef struct rknano_blob_t rkfw_blob_t;
 struct rkfw_header_t
 {
     char magic[MAGIC_RKFW_SIZE];
-    uint16_t hdr_size; // UNSURE
+    uint16_t hdr_size;
     uint32_t version;
     uint32_t code;
     uint16_t year;
@@ -651,6 +761,8 @@ struct rkfw_header_t
     rkfw_blob_t update;
     uint8_t pad[61];
 } __attribute__((packed));
+
+#define RKFW_CHIP_RKNANO    0x30
 
 static int do_rkfw_image(uint8_t *buf, unsigned long size)
 {
@@ -686,8 +798,12 @@ static int do_rkfw_image(uint8_t *buf, unsigned long size)
         hdr->hour, hdr->minute, hdr->second);
 
     cprintf(GREEN, "  Chip: ");
-    cprintf(YELLOW, "%#x\n", hdr->chip);
-    
+    cprintf(YELLOW, "%#x ", hdr->chip);
+    if(hdr->chip == RKFW_CHIP_RKNANO)
+        cprintf(RED, "(RKNANO)\n");
+    else
+        cprintf(RED, "(unknown)\n");
+
     cprintf(GREEN, "  Loader: ");
     print_blob_interval(&hdr->loader);
     cprintf(OFF, "\n");
@@ -852,7 +968,7 @@ int main(int argc, char **argv)
         perror("Cannot read file");
         return 1;
     }
-    
+
     fclose(fin);
 
     if(try_nanofw && !do_nanofw_image(buf, size))
@@ -873,4 +989,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-
