@@ -28,6 +28,7 @@
 #include <readline/history.h>
 #include <lua.hpp>
 #include <unistd.h>
+#include <capstone/capstone.h>
 #include "soc_desc.hpp"
 
 #if LUA_VERSION_NUM < 502
@@ -46,6 +47,7 @@ struct hwstub_target_desc_t g_hwdev_target;
 struct hwstub_stmp_desc_t g_hwdev_stmp;
 struct hwstub_pp_desc_t g_hwdev_pp;
 lua_State *g_lua;
+csh cs_handle;
 
 /**
  * hw specific
@@ -228,6 +230,94 @@ int my_lua_udelay(lua_State *state)
     return 0;
 }
 
+#define DEFAULT_INSN_CNT 32
+#define DISASM_CHUNK (4*DEFAULT_INSN_CNT)
+void disasm(lua_State *state, soc_addr_t addr, int cnt)
+{
+    cs_insn *insn;
+    size_t count;
+    void *buf = malloc(DISASM_CHUNK);
+
+    if (!buf)
+    {
+        // error
+        return;
+    }
+
+
+    ssize_t buf_avl = 0;
+    uint8_t *ptr;
+
+    while(cnt)
+    {
+
+        if (buf_avl <= 0)
+        {
+            if(hwstub_rw_mem(g_hwdev, 1, addr, buf, DISASM_CHUNK) != DISASM_CHUNK)
+            {
+                // error accessing memory
+                luaL_error(state, "failed to read memory @ %p", addr);
+                free(buf);
+                return;
+            }
+
+            buf_avl = DISASM_CHUNK;
+            ptr = (uint8_t *)buf;
+        }
+ 
+        count = cs_disasm_ex(cs_handle, ptr, buf_avl, addr, cnt, &insn);
+
+        if (count > 0)
+        {
+            for (size_t j=0; j<count; j++)
+            {
+                printf("0x%08x:\t", (unsigned int)insn[j].address);
+                for(int sz=0; sz<insn[j].size; sz++)
+                    printf("%02x ", insn[j].bytes[sz]);
+
+                printf("\t%s\t%s\n", insn[j].mnemonic, insn[j].op_str);
+
+                addr += insn[j].size;
+                ptr += insn[j].size;
+                buf_avl -= insn[j].size;
+            }
+
+            cnt -= count;
+            cs_free(insn, count);
+        }
+        else
+        {
+            printf("0x%08x:\t%02x %02x %02x %02x \t???\n", addr, ptr[0], ptr[1], ptr[2], ptr[3]);
+            cnt--;
+            addr += 4;
+            ptr += 4;
+            buf_avl -= 4;
+        }
+    }
+
+    free(buf);
+}
+
+int my_lua_disasm(lua_State *state)
+{
+    int n = lua_gettop(state);
+    
+    if (n == 1)
+    {
+        disasm(state, luaL_checkunsigned(state, 1), DEFAULT_INSN_CNT);
+    }
+    else if (n == 2)
+    {
+        disasm(state, luaL_checkunsigned(state, 1), luaL_checkunsigned(state, 2));
+    }
+    else
+    {
+        luaL_error(state, "disasm takes one or two arguments");
+    }
+
+    return 0;
+}
+
 bool my_lua_import_hwstub()
 {
     int oldtop = lua_gettop(g_lua);
@@ -361,6 +451,9 @@ bool my_lua_import_hwstub()
     lua_setfield(g_lua, -2, "udelay");
 
     lua_setglobal(g_lua, "hwstub");
+
+    lua_pushcclosure(g_lua, my_lua_disasm, 0);
+    lua_setglobal(g_lua, "disasm");
 
     lua_pushcfunction(g_lua, my_lua_help);
     lua_setglobal(g_lua, "help");
@@ -734,6 +827,7 @@ enum exec_type { exec_cmd, exec_file };
 
 int main(int argc, char **argv)
 {
+
     const char *lua_init = "init.lua";
     std::vector< std::pair< exec_type, std::string > > startup_cmds;
     // parse command line
@@ -875,6 +969,24 @@ int main(int argc, char **argv)
             goto Lerr;
         }
     }
+
+    // init capstone disasm engine
+    if(g_hwdev_target.dID == HWSTUB_TARGET_ATJ)
+    {
+        if(cs_open(CS_ARCH_MIPS, CS_MODE_32, &cs_handle) != CS_ERR_OK)
+        {
+            printf("Error initializing capstone dissasembler library\n");
+            goto Lerr;
+        }
+    }
+    else
+    {
+        if(cs_open(CS_ARCH_ARM, CS_MODE_ARM, &cs_handle) != CS_ERR_OK)
+        {
+            printf("Error initializing capstone dissasembler library\n");
+            goto Lerr;
+        }
+    }
     /** Init lua */
 
     // create lua state
@@ -930,6 +1042,9 @@ int main(int argc, char **argv)
         lua_pop(g_lua, lua_gettop(g_lua));
         free(input);
     }
+
+    // release capstone handle
+    cs_close(&cs_handle);
 
     Lerr:
     // display log if handled

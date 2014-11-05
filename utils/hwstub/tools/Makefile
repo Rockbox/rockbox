@@ -5,7 +5,7 @@ HWSTUB_LIB_DIR=../lib
 REGTOOLS_LIB_DIR=../../regtools/lib
 CFLAGS=-Wall -O2 `pkg-config --cflags libusb-1.0` -std=c99 -g -I$(HWSTUB_LIB_DIR) -I$(REGTOOLS_LIB_DIR) `pkg-config --cflags lua5.2`
 CXXFLAGS=-Wall -O2 `pkg-config --cflags libusb-1.0` -g -I$(HWSTUB_LIB_DIR) -I$(REGTOOLS_LIB_DIR) `pkg-config --cflags lua5.2`
-LDFLAGS=`pkg-config --libs libusb-1.0`  `pkg-config --libs lua5.2` -lreadline -L$(HWSTUB_LIB_DIR) -L$(REGTOOLS_LIB_DIR) -lsocdesc -lhwstub `xml2-config --libs`
+LDFLAGS=`pkg-config --libs libusb-1.0`  `pkg-config --libs lua5.2` -lreadline -L$(HWSTUB_LIB_DIR) -L$(REGTOOLS_LIB_DIR) -lsocdesc -lhwstub `xml2-config --libs` -lcapstone
 EXEC=hwstub_shell hwstub_load
 SRC=$(wildcard *.c)
 SRCXX=$(wildcard *.cpp)
