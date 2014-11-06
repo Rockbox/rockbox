@@ -1,0 +1,759 @@
+<?xml version="1.0"?>
+<soc name="atj213x" desc="Actions atj213x">
+  <dev name="ADC" long_name="Analog to Digital Converter" desc="" version="1.0">
+    <addr name="ADC" addr="0xb0110000"/>
+  </dev>
+  <dev name="ATA" long_name="" desc="" version="1.0">
+    <addr name="ATA" addr="0xb0090000"/>
+    <reg name="CONFIG" desc="">
+      <addr name="CONFIG" addr="0x0"/>
+    </reg>
+    <reg name="UDMACTL" desc="">
+      <addr name="UDMACTL" addr="0x4"/>
+    </reg>
+    <reg name="DATA" desc="">
+      <addr name="DATA" addr="0x8"/>
+    </reg>
+    <reg name="FEATURE" desc="">
+      <addr name="FEATURE" addr="0xc"/>
+    </reg>
+    <reg name="SECCNT" desc="">
+      <addr name="SECCNT" addr="0x10"/>
+    </reg>
+    <reg name="SECNUM" desc="">
+      <addr name="SECNUM" addr="0x14"/>
+    </reg>
+    <reg name="CLDLOW" desc="">
+      <addr name="CLDL" addr="0x18"/>
+    </reg>
+    <reg name="CLDHI" desc="">
+      <addr name="CLDHIGH" addr="0x1c"/>
+    </reg>
+    <reg name="HEAD" desc="">
+      <addr name="HEAD" addr="0x20"/>
+    </reg>
+    <reg name="CMD" desc="">
+      <addr name="CMD" addr="0x24"/>
+    </reg>
+    <reg name="BYTECNT" desc="">
+      <addr name="BYTECNT" addr="0x28"/>
+    </reg>
+    <reg name="FIFOCTL" desc="">
+      <addr name="FIFOCTL" addr="0x2c"/>
+    </reg>
+    <reg name="FIFOCFG" desc="">
+      <addr name="FIFOCTL" addr="0x30"/>
+    </reg>
+    <reg name="ADDRDEC" desc="">
+      <addr name="ADDRDEC" addr="0x34"/>
+    </reg>
+    <reg name="IRQCTL" desc="">
+      <addr name="IRQCTL" addr="0x38"/>
+    </reg>
+  </dev>
+  <dev name="BOOT" long_name="" desc="" version="">
+    <addr name="BOOT" addr="0xb0038000"/>
+    <reg name="NORCTL" desc="">
+      <addr name="NORCTL" addr="0x0"/>
+    </reg>
+    <reg name="BROMCTL" desc="">
+      <addr name="BROMCTL" addr="0x4"/>
+    </reg>
+    <reg name="CHIPID" desc="">
+      <addr name="CHIPID" addr="0x8"/>
+    </reg>
+  </dev>
+  <dev name="BT" long_name="" desc="" version="">
+    <addr name="BT" addr="0xb00d0000"/>
+  </dev>
+  <dev name="CMU" long_name="Clock Management Unit" desc="" version="1.0">
+    <addr name="CMU" addr="0xb0010000"/>
+    <reg name="COREPLL" desc="">
+      <addr name="COREPLL" addr="0x0"/>
+    </reg>
+    <reg name="DSPPLL" desc="">
+      <addr name="DSPPLL" addr="0x4"/>
+    </reg>
+    <reg name="AUDIOPLL" desc="">
+      <addr name="AUDIOPLL" addr="0x8"/>
+    </reg>
+    <reg name="BUSCLK" desc="">
+      <addr name="BUSCLK" addr="0xc"/>
+    </reg>
+    <reg name="SDRCLK" desc="">
+      <addr name="SDRCLK" addr="0x10"/>
+    </reg>
+    <reg name="NANDCLK" desc="">
+      <addr name="NANDCLK" addr="0x18"/>
+    </reg>
+    <reg name="SDCLK" desc="">
+      <addr name="SDCLK" addr="0x1c"/>
+    </reg>
+    <reg name="MHACLK" desc="">
+      <addr name="MHACLK" addr="0x20"/>
+    </reg>
+    <reg name="UART2CLK" desc="">
+      <addr name="UART2CLK" addr="0x2c"/>
+    </reg>
+    <reg name="DMACLK" desc="">
+      <addr name="DMACLK" addr="0x30"/>
+    </reg>
+    <reg name="FMCLK" desc="">
+      <addr name="FMCLK" addr="0x34"/>
+    </reg>
+    <reg name="MCACLK" desc="">
+      <addr name="MCACLK" addr="0x38"/>
+    </reg>
+    <reg name="DEVCLKEN" desc="">
+      <addr name="DEVCLKEN" addr="0x80"/>
+    </reg>
+    <reg name="DEVRST" desc="">
+      <addr name="DEVRST" addr="0x84"/>
+    </reg>
+  </dev>
+  <dev name="DAC" long_name="Digital Analog Converter" desc="" version="1.0">
+    <addr name="DAC" addr="0xb0100000"/>
+  </dev>
+  <dev name="DMAC" long_name="Direct Memory Access Controller" desc="Channels 0-3 work with retular AHB bus, channels 4-7 work with 'special' bus." version="">
+    <addr name="DMAC" addr="0xb0060000"/>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x0"/>
+    </reg>
+    <reg name="IRQEN" desc="">
+      <addr name="IRQEN" addr="0x4"/>
+    </reg>
+    <reg name="IRQPD" desc="">
+      <addr name="IRQPD" addr="0x8"/>
+    </reg>
+    <reg name="DMA_MODE" desc="">
+      <addr name="DMA0_MODE" addr="0x100"/>
+      <addr name="DMA1_MODE" addr="0x200"/>
+      <addr name="DMA2_MODE" addr="0x300"/>
+      <addr name="DMA3_MODE" addr="0x400"/>
+      <addr name="DMA4_MODE" addr="0x500"/>
+      <addr name="DMA5_MODE" addr="0x600"/>
+      <addr name="DMA6_MODE" addr="0x700"/>
+      <addr name="DMA7_MODE" addr="0x800"/>
+      <field name="DBURLEN" desc="Destination burst length. If burst lenght is 4 or 8 DDIR must be 0, DFXA must be 0, DDSP must be 0, DCOL must be 0. Burst must not cross a 1kB address boundary." bitrange="31:29">
+        <value name="SINGLE" value="0x0" desc=""/>
+        <value name="INCR4" value="0x3" desc=""/>
+        <value name="INCR8" value="0x5" desc=""/>
+      </field>
+      <field name="RELO" desc="DMA Reload Bit." bitrange="28:28"/>
+      <field name="DDSP" desc="Destination DSP mode.&#10;" bitrange="27:27"/>
+      <field name="DCOL" desc="Destination Column Mode." bitrange="26:26"/>
+      <field name="DDIR" desc="Destination address direction. If DBURLEN is INCR4 or INCR8 only INCREASE is allowed." bitrange="25:25">
+        <value name="INCREASE" value="0x0" desc=""/>
+        <value name="DECREASE" value="0x1" desc=""/>
+      </field>
+      <field name="DFXA" desc="Destination Fixed Address bit." bitrange="24:24">
+        <value name="NOT_FIXED" value="0x0" desc=""/>
+        <value name="FIXED" value="0x1" desc=""/>
+      </field>
+      <field name="DTRG" desc="Destination DRQ Trig Source." bitrange="23:19">
+        <value name="DAC" value="0x6" desc=""/>
+        <value name="SDRAM" value="0x10" desc=""/>
+        <value name="IRAM" value="0x11" desc=""/>
+        <value name="SD" value="0x16" desc=""/>
+        <value name="OTG" value="0x17" desc=""/>
+        <value name="LCM" value="0x18" desc=""/>
+      </field>
+      <field name="DTRANWID" desc="" bitrange="18:17">
+        <value name="WIDTH8" value="0x0" desc=""/>
+        <value name="WIDTH16" value="0x1" desc=""/>
+        <value name="WIDTH32" value="0x2" desc=""/>
+      </field>
+      <field name="DFXS" desc="If DFXS=0, DMA will transfer in 8bit mode when remain counter is less than DTRANWID. &#10;If DFXS=1, DMA will always transfer in DTRANWID. &#10;" bitrange="16:16"/>
+      <field name="SBURLEN" desc="Source burst length. If burst lenght is 4 or 8 DDIR must be 0, DFXA must be 0, DDSP must be 0, DCOL must be 0. Burst must not cross a 1kB address boundary." bitrange="15:13">
+        <value name="SINGLE" value="0x0" desc=""/>
+        <value name="INCR4" value="0x3" desc=""/>
+        <value name="INCR8" value="0x5" desc=""/>
+      </field>
+      <field name="SDSP" desc="Source DSP mode. &#10;" bitrange="11:11"/>
+      <field name="SCOL" desc="Source Column Mode." bitrange="10:10"/>
+      <field name="SDIR" desc="Source address direction. If SBURLEN is INCR4 or INCR8 only INCREASE is allowed." bitrange="9:9">
+        <value name="INCREASE" value="0x0" desc=""/>
+        <value name="DECREASE" value="0x1" desc=""/>
+      </field>
+      <field name="SFXA" desc="Source Fixed Addres bit." bitrange="8:8">
+        <value name="NOT_FIXED" value="0x0" desc=""/>
+        <value name="FIXED" value="0x1" desc=""/>
+      </field>
+      <field name="STRG" desc="DRQ trig source." bitrange="7:3">
+        <value name="DAC" value="0x6" desc=""/>
+        <value name="SDRAM" value="0x10" desc=""/>
+        <value name="IRAM" value="0x11" desc=""/>
+        <value name="SD" value="0x16" desc=""/>
+        <value name="OTG" value="0x17" desc=""/>
+        <value name="LCM" value="0x18" desc=""/>
+      </field>
+      <field name="STRANWID" desc="" bitrange="2:1">
+        <value name="WIDTH8" value="0x0" desc=""/>
+        <value name="WIDTH16" value="0x1" desc=""/>
+        <value name="WIDTH32" value="0x2" desc=""/>
+      </field>
+      <field name="SFXS" desc="Source Fix Size. If DFXS=0, DMA will transfer in 8bit mode when remain counter is less than STRANWID. If SFXS=1, DMA will always transfer in STRANWID." bitrange="0:0"/>
+    </reg>
+    <reg name="DMA_SRC" desc="">
+      <addr name="DMA0_SRC" addr="0x104"/>
+      <addr name="DMA1_SRC" addr="0x204"/>
+      <addr name="DMA2_SRC" addr="0x304"/>
+      <addr name="DMA3_SRC" addr="0x404"/>
+      <addr name="DMA4_SRC" addr="0x504"/>
+      <addr name="DMA5_SRC" addr="0x604"/>
+      <addr name="DMA6_SRC" addr="0x704"/>
+      <addr name="DMA7_SRC" addr="0x804"/>
+    </reg>
+    <reg name="DMA_DST" desc="">
+      <addr name="DMA0_DST" addr="0x108"/>
+      <addr name="DMA1_DST" addr="0x208"/>
+      <addr name="DMA2_DST" addr="0x308"/>
+      <addr name="DMA3_DST" addr="0x408"/>
+      <addr name="DMA4_DST" addr="0x508"/>
+      <addr name="DMA5_DST" addr="0x608"/>
+      <addr name="DMA6_DST" addr="0x708"/>
+      <addr name="DMA7_DST" addr="0x808"/>
+    </reg>
+    <reg name="DMA_CNT" desc="">
+      <addr name="DMA0_CNT" addr="0x10c"/>
+      <addr name="DMA1_CNT" addr="0x20c"/>
+      <addr name="DMA2_CNT" addr="0x30c"/>
+      <addr name="DMA3_CNT" addr="0x40c"/>
+      <addr name="DMA4_CNT" addr="0x50c"/>
+      <addr name="DMA5_CNT" addr="0x60c"/>
+      <addr name="DMA6_CNT" addr="0x70c"/>
+      <addr name="DMA7_CNT" addr="0x80c"/>
+    </reg>
+    <reg name="DMA_REM" desc="">
+      <addr name="DMA0_REM" addr="0x110"/>
+      <addr name="DMA1_REM" addr="0x210"/>
+      <addr name="DMA2_REM" addr="0x310"/>
+      <addr name="DMA3_REM" addr="0x410"/>
+      <addr name="DMA4_REM" addr="0x510"/>
+      <addr name="DMA5_REM" addr="0x610"/>
+      <addr name="DMA6_REM" addr="0x710"/>
+      <addr name="DMA7_REM" addr="0x810"/>
+    </reg>
+    <reg name="DMA_CMD" desc="">
+      <addr name="DMA0_CMD" addr="0x114"/>
+      <addr name="DMA1_CMD" addr="0x214"/>
+      <addr name="DMA2_CMD" addr="0x314"/>
+      <addr name="DMA3_CMD" addr="0x414"/>
+      <addr name="DMA4_CMD" addr="0x514"/>
+      <addr name="DMA5_CMD" addr="0x614"/>
+      <addr name="DMA6_CMD" addr="0x714"/>
+      <addr name="DMA7_CMD" addr="0x814"/>
+    </reg>
+  </dev>
+  <dev name="DSP" long_name="Digital Signal Processor" desc="" version="1.0">
+    <addr name="DSP" addr="0xb0050000"/>
+    <reg name="HDR" desc="HIP data registers">
+      <addr name="HDR0" addr="0x0"/>
+      <addr name="HDR1" addr="0x4"/>
+      <addr name="HDR2" addr="0x8"/>
+      <addr name="HDR3" addr="0xc"/>
+      <addr name="HDR4" addr="0x10"/>
+      <addr name="HDR5" addr="0x14"/>
+      <addr name="HSR6" addr="0x18"/>
+      <addr name="HSR7" addr="0x1c"/>
+    </reg>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x20"/>
+    </reg>
+  </dev>
+  <dev name="GPIO" long_name="" desc="" version="1.0">
+    <addr name="GPIO" addr="0xb01c0000"/>
+  </dev>
+  <dev name="I2C" long_name="" desc="" version="1.0">
+    <addr name="I2C0" addr="0xb0180000"/>
+    <addr name="I2C1" addr="0xb0180020"/>
+  </dev>
+  <dev name="INTC" long_name="Interrupt Controller" desc="" version="1.0">
+    <addr name="INTC" addr="0xb0020000"/>
+    <reg name="PD" desc="">
+      <addr name="PD" addr="0x0"/>
+    </reg>
+    <reg name="MSK" desc="">
+      <addr name="MSK" addr="0x4"/>
+    </reg>
+    <reg name="CFG" desc="">
+      <addr name="CFG0" addr="0x8"/>
+      <addr name="CFG1" addr="0xc"/>
+      <addr name="CFG2" addr="0x10"/>
+    </reg>
+    <reg name="EXTCTL" desc="">
+      <addr name="EXTCTL" addr="0x14"/>
+    </reg>
+  </dev>
+  <dev name="IR" long_name="" desc="" version="1.0">
+    <addr name="IR" addr="0xb0160010"/>
+  </dev>
+  <dev name="KEY" long_name="" desc="" version="1.0">
+    <addr name="KEY" addr="0xb01a0000"/>
+  </dev>
+  <dev name="MCA" long_name="Motion Compensation Accelerator" desc="" version="1.0">
+    <addr name="MCA" addr="0xb0080000"/>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x0"/>
+    </reg>
+  </dev>
+  <dev name="MHA" long_name="Media Hardware Accelerator" desc="" version="1.0">
+    <addr name="MHA" addr="0xb00c0000"/>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x0"/>
+    </reg>
+    <reg name="CFG" desc="">
+      <addr name="CFG" addr="0x4"/>
+    </reg>
+    <reg name="DCSCLx" desc="">
+      <addr name="DCSCL0" addr="0x10"/>
+      <addr name="DCSCL1" addr="0x14"/>
+      <addr name="DCSCL2" addr="0x18"/>
+      <addr name="DCSCL3" addr="0x1c"/>
+    </reg>
+    <reg name="QSCL" desc="">
+      <addr name="QSCL" addr="0x20"/>
+    </reg>
+  </dev>
+  <dev name="NAND" long_name="NAND Flash Interface" desc="" version="1.0">
+    <addr name="NAND" addr="0xb00a0000"/>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x0"/>
+    </reg>
+    <reg name="STATUS" desc="">
+      <addr name="STATUS" addr="0x4"/>
+    </reg>
+    <reg name="FIFOTIM" desc="">
+      <addr name="FIFOTIM" addr="0x8"/>
+    </reg>
+    <reg name="CLKCTL" desc="">
+      <addr name="CLKCTL" addr="0xc"/>
+    </reg>
+    <reg name="BYTECNT" desc="">
+      <addr name="BYTECNT" addr="0x10"/>
+    </reg>
+    <reg name="ADDR01" desc="">
+      <addr name="ADDR01" addr="0x14"/>
+    </reg>
+    <reg name="ADDR23" desc="">
+      <addr name="ADDR23" addr="0x18"/>
+    </reg>
+    <reg name="ADDR45" desc="">
+      <addr name="ADDR45" addr="0x1c"/>
+    </reg>
+    <reg name="ADDR67" desc="">
+      <addr name="ADDR67" addr="0x20"/>
+    </reg>
+    <reg name="BUF" desc="">
+      <addr name="BUF0" addr="0x24"/>
+      <addr name="BUF1" addr="0x28"/>
+    </reg>
+    <reg name="CMD" desc="">
+      <addr name="CMD" addr="0x2c"/>
+    </reg>
+    <reg name="ECCCTL" desc="">
+      <addr name="ECCCTL" addr="0x30"/>
+    </reg>
+    <reg name="HAMECC" desc="">
+      <addr name="HAMECC0" addr="0x34"/>
+      <addr name="HAMECC1" addr="0x38"/>
+      <addr name="HAMECC2" addr="0x3c"/>
+    </reg>
+    <reg name="HAMCEC" desc="">
+      <addr name="HAMCEC" addr="0x40"/>
+    </reg>
+    <reg name="RSE" desc="">
+      <addr name="RSE0" addr="0x44"/>
+      <addr name="RSE1" addr="0x48"/>
+      <addr name="RSE2" addr="0x4c"/>
+      <addr name="RSE3" addr="0x50"/>
+    </reg>
+    <reg name="RSPS" desc="">
+      <addr name="RSPS0" addr="0x54"/>
+      <addr name="RSPS1" addr="0x58"/>
+      <addr name="RSPS2" addr="0x5c"/>
+    </reg>
+    <reg name="FIFODATA" desc="">
+      <addr name="FIFODATA" addr="0x60"/>
+    </reg>
+    <reg name="DEBUG" desc="">
+      <addr name="DEBUG" addr="0x70"/>
+    </reg>
+  </dev>
+  <dev name="PCM" long_name="" desc="" version="1.0">
+    <addr name="PCM" addr="0xb0150000"/>
+  </dev>
+  <dev name="PCNT" long_name="Performance Counters" desc="The base address is not clear!" version="1.0">
+    <addr name="PCNT" addr="0xb003c000"/>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x0"/>
+    </reg>
+    <reg name="PCx" desc="">
+      <addr name="PC0" addr="0x4"/>
+      <addr name="PC1" addr="0x8"/>
+    </reg>
+  </dev>
+  <dev name="PMU" long_name="Power Management Unit" desc="" version="1.0">
+    <addr name="PMU" addr="0xb0000000"/>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x0"/>
+    </reg>
+    <reg name="LRADC" desc="">
+      <addr name="LRADC" addr="0x4"/>
+    </reg>
+    <reg name="CHG" desc="">
+      <addr name="CHG" addr="0x8"/>
+    </reg>
+  </dev>
+  <dev name="RTCWDT" long_name="Real Time Clock, Timers and Watchdog" desc="" version="1.0">
+    <addr name="RTC" addr="0xb0018000"/>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x0"/>
+    </reg>
+    <reg name="DHMS" desc="">
+      <addr name="DHMS" addr="0x4"/>
+    </reg>
+    <reg name="YMD" desc="">
+      <addr name="YMD" addr="0x8"/>
+    </reg>
+    <reg name="DHMSALM" desc="">
+      <addr name="DHMSALM" addr="0xc"/>
+    </reg>
+    <reg name="YMDALM" desc="">
+      <addr name="YMDALM" addr="0x10"/>
+    </reg>
+    <reg name="WDCTL" desc="">
+      <addr name="WDCTL" addr="0x14"/>
+    </reg>
+    <reg name="TxCTL" desc="">
+      <addr name="T0CTL" addr="0x18"/>
+      <addr name="T1CTL" addr="0x20"/>
+    </reg>
+    <reg name="Tx" desc="">
+      <addr name="T0" addr="0x1c"/>
+      <addr name="T1" addr="0x24"/>
+    </reg>
+  </dev>
+  <dev name="SD" long_name="SD/MMC Interface" desc="" version="">
+    <addr name="SD" addr="0xb00b0000"/>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x0"/>
+    </reg>
+    <reg name="CMDRSP" desc="">
+      <addr name="CMDRSP" addr="0x4"/>
+    </reg>
+    <reg name="RW" desc="">
+      <addr name="RW" addr="0x8"/>
+    </reg>
+    <reg name="FIFOCTL" desc="">
+      <addr name="FIFOCTL" addr="0xc"/>
+    </reg>
+    <reg name="CMD" desc="">
+      <addr name="CMD" addr="0x10"/>
+    </reg>
+    <reg name="ARG" desc="">
+      <addr name="ARG" addr="0x14"/>
+    </reg>
+    <reg name="CRC7" desc="">
+      <addr name="CRC7" addr="0x18"/>
+    </reg>
+    <reg name="RSPBUFx" desc="">
+      <addr name="RSPBUF0" addr="0x1c"/>
+      <addr name="RSPBUF1" addr="0x20"/>
+      <addr name="RSPBUF2" addr="0x24"/>
+      <addr name="RSPBUF3" addr="0x28"/>
+      <addr name="RSPBUF4" addr="0x2c"/>
+    </reg>
+    <reg name="DAT" desc="">
+      <addr name="DAT" addr="0x30"/>
+    </reg>
+    <reg name="CLK" desc="">
+      <addr name="CLK" addr="0x34"/>
+    </reg>
+    <reg name="BYTECNT" desc="">
+      <addr name="BYTECNT" addr="0x38"/>
+    </reg>
+  </dev>
+  <dev name="SDR" long_name="SDRAM Interface" desc="" version="1.0">
+    <addr name="SDR" addr="0xb0070000"/>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x0"/>
+    </reg>
+    <reg name="ADDRCFG" desc="">
+      <addr name="ADDRCFG" addr="0x4"/>
+    </reg>
+    <reg name="EN" desc="">
+      <addr name="EN" addr="0x8"/>
+    </reg>
+    <reg name="CMD" desc="">
+      <addr name="CMD" addr="0xc"/>
+    </reg>
+    <reg name="STAT" desc="">
+      <addr name="STAT" addr="0x10"/>
+    </reg>
+    <reg name="RFSH" desc="">
+      <addr name="RFSH" addr="0x14"/>
+    </reg>
+    <reg name="MODE" desc="">
+      <addr name="MODE" addr="0x18"/>
+    </reg>
+    <reg name="MOBILE" desc="">
+      <addr name="MOBILE" addr="0x1c"/>
+    </reg>
+  </dev>
+  <dev name="SPDIF" long_name="Sony Philips Digital Interface" desc="" version="1.0">
+    <addr name="SPDIF" addr="0xb0140000"/>
+  </dev>
+  <dev name="SPI" long_name="" desc="" version="1.0">
+    <addr name="SPI" addr="0xb0190000"/>
+  </dev>
+  <dev name="SRAMOC" long_name="SRAM on Chip" desc="" version="1.0">
+    <addr name="SRAMOC" addr="0xb0030000"/>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x0"/>
+    </reg>
+    <reg name="STAT" desc="">
+      <addr name="STAT" addr="0x4"/>
+    </reg>
+  </dev>
+  <dev name="TP" long_name="" desc="" version="1.0">
+    <addr name="TP" addr="0xb0120000"/>
+  </dev>
+  <dev name="UART" long_name="" desc="" version="1.0">
+    <addr name="UART0" addr="0xb0160000"/>
+    <addr name="UART1" addr="0xb0160020"/>
+  </dev>
+  <dev name="UDC" long_name="Usb Device Controller" desc="CAST cusb2-otg IP core" version="1.0">
+    <addr name="UDC" addr="0xb00e0000"/>
+    <reg name="EP0BC" desc="ep0 byte count register">
+      <addr name="OUT0BC" addr="0x0"/>
+      <addr name="IN0BC" addr="0x1"/>
+      <field name="RESERVED" desc="" bitrange="31:8"/>
+      <field name="BC" desc="" bitrange="7:0"/>
+    </reg>
+    <reg name="EP0CS" desc="">
+      <addr name="EP0CS" addr="0x2"/>
+      <field name="RESERVED" desc="" bitrange="31:8"/>
+      <field name="OUT_BUSY" desc="" bitrange="3:3"/>
+      <field name="IN_BUSY" desc="" bitrange="2:2"/>
+      <field name="NAK" desc="Writing 1 clears" bitrange="1:1"/>
+      <field name="STALL" desc="" bitrange="0:0"/>
+    </reg>
+    <reg name="BCL" desc="Endpoint byte count LSB register">
+      <addr name="OUT1BCL" addr="0x8"/>
+      <addr name="IN1BCL" addr="0xc"/>
+      <addr name="OUT2BCL" addr="0x10"/>
+      <addr name="IN2BCL" addr="0x14"/>
+    </reg>
+    <reg name="BCH" desc="Endpoint byte count MSB">
+      <addr name="OUT1BCH" addr="0x9"/>
+      <addr name="IN1BCH" addr="0xd"/>
+      <addr name="OUT2BCH" addr="0x11"/>
+      <addr name="IN2BCH" addr="0x15"/>
+    </reg>
+    <reg name="CON" desc="Endpoint configuration register">
+      <addr name="OUT1CON" addr="0xa"/>
+      <addr name="IN1CON" addr="0xe"/>
+      <addr name="OUT2CON" addr="0x12"/>
+      <addr name="IN2CON" addr="0x16"/>
+      <field name="EP_ENABLE" desc="" bitrange="7:7"/>
+      <field name="STALL" desc="" bitrange="6:6"/>
+      <field name="EP_TYPE" desc="" bitrange="3:2">
+        <value name="RESERVED" value="0x0" desc=""/>
+        <value name="ISOCHRONOUS" value="0x1" desc=""/>
+        <value name="BULK" value="0x2" desc=""/>
+        <value name="INTERRUPT" value="0x3" desc=""/>
+      </field>
+      <field name="SUBFIFOS" desc="" bitrange="1:0">
+        <value name="SINGLE" value="0x0" desc=""/>
+        <value name="DOUBLE" value="0x1" desc=""/>
+        <value name="TRIPLE" value="0x2" desc=""/>
+        <value name="QUAD" value="0x3" desc=""/>
+      </field>
+    </reg>
+    <reg name="CS" desc="Endpoint status register">
+      <addr name="OUT1CS" addr="0xb"/>
+      <addr name="IN1CS" addr="0xf"/>
+      <addr name="OUT2CS" addr="0x13"/>
+      <addr name="IN2CS" addr="0x17"/>
+      <field name="AUTO" desc="" bitrange="4:4"/>
+      <field name="NPACK1" desc="" bitrange="3:3"/>
+      <field name="NPACK0" desc="" bitrange="2:2"/>
+      <field name="BUSY" desc="" bitrange="1:1"/>
+      <field name="ERROR" desc="" bitrange="0:0"/>
+    </reg>
+    <reg name="FIFODAT" desc="Endpoint FIFO">
+      <addr name="FIFO1DAT" addr="0x84"/>
+      <addr name="FIFO2DAT" addr="0x88"/>
+    </reg>
+    <reg name="EP0DAT" desc="Endpoint 0 buffers each 64 bytes long.">
+      <addr name="EP0INDAT" addr="0x100"/>
+      <addr name="EP0OUTDAT" addr="0x140"/>
+    </reg>
+    <reg name="SETUPDAT" desc="SETUP packet buffer">
+      <addr name="SETUPDAT" addr="0x180"/>
+    </reg>
+    <reg name="EPIRQ" desc="Endpoint irq flag register">
+      <addr name="IN04IRQ" addr="0x188"/>
+      <addr name="OUT04IRQ" addr="0x18a"/>
+      <field name="EP_NUM" desc="" bitrange="2:0"/>
+    </reg>
+    <reg name="USBIRQ" desc="General usb core irq flags">
+      <addr name="USBIRQ" addr="0x18c"/>
+      <field name="HS" desc="Enter high speed operation. Set by core on connection." bitrange="5:5"/>
+      <field name="RESET" desc="Asserted on usb reset." bitrange="4:4"/>
+      <field name="SUSPEND" desc="" bitrange="3:3"/>
+      <field name="SETUP_TOKEN" desc="" bitrange="2:2"/>
+      <field name="SOF" desc="" bitrange="1:1"/>
+      <field name="SETUP_DATA" desc="Setup data are ready to be accessed in SETUPDAT buffer." bitrange="0:0"/>
+    </reg>
+    <reg name="EPIEN" desc="Endpoint interrupt enable register">
+      <addr name="IN04IEN" addr="0x194"/>
+      <addr name="OUT04IEN" addr="0x196"/>
+      <field name="EP_NUM" desc="" bitrange="2:0"/>
+    </reg>
+    <reg name="USBIEN" desc="General usb interrupts enable register">
+      <addr name="USBIEN" addr="0x198"/>
+      <field name="HS" desc="" bitrange="5:5"/>
+      <field name="RESET" desc="" bitrange="4:4"/>
+      <field name="SUSPEND" desc="" bitrange="3:3"/>
+      <field name="SETUP_TOKEN" desc="" bitrange="2:2"/>
+      <field name="SOF" desc="" bitrange="1:1"/>
+      <field name="SETUP_DATA" desc="" bitrange="0:0"/>
+    </reg>
+    <reg name="IVECT" desc="Interrupt vector register&#10;known (guessed) values:&#10;0x00 - SETUP&#10;0x10 - RESET&#10;0x14 - HS&#10;0x28 - EPs&#10;0xD8 - OTG">
+      <addr name="IVECT" addr="0x1a0"/>
+    </reg>
+    <reg name="ENDPRST" desc="Endpoint reset register">
+      <addr name="ENDPRST" addr="0x1a2"/>
+      <field name="FIFO_RESET" desc="" bitrange="6:6"/>
+      <field name="TOGGLE_RESET" desc="" bitrange="5:5"/>
+      <field name="DIR" desc="" bitrange="4:4">
+        <value name="OUT" value="0x0" desc=""/>
+        <value name="IN" value="0x1" desc=""/>
+      </field>
+      <field name="EP_NUM" desc="" bitrange="2:0"/>
+    </reg>
+    <reg name="USBCS" desc="">
+      <addr name="USBCS" addr="0x1a3"/>
+      <field name="SOFT_CONNECT" desc="" bitrange="6:6"/>
+      <field name="SIGRESUME" desc="" bitrange="5:5"/>
+      <field name="USBSPEED" desc="" bitrange="1:1"/>
+      <field name="HCLSMODE" desc="" bitrange="0:0"/>
+    </reg>
+    <reg name="FIFOCTRL" desc="">
+      <addr name="FIFOCTRL" addr="0x1a8"/>
+      <field name="DMA" desc="" bitrange="31:0"/>
+      <field name="CPU_ACCESS" desc="" bitrange="7:7"/>
+      <field name="DIR" desc="" bitrange="4:4">
+        <value name="OUT" value="0x0" desc=""/>
+        <value name="IN" value="0x1" desc=""/>
+      </field>
+      <field name="EP_NUM" desc="" bitrange="2:0"/>
+    </reg>
+    <reg name="OTGIRQ" desc="">
+      <addr name="OTGIRQ" addr="0x1bc"/>
+      <field name="PERIPH" desc="" bitrange="4:4"/>
+      <field name="VBUSERR" desc="" bitrange="3:3"/>
+      <field name="LOCSOFT" desc="" bitrange="2:2"/>
+      <field name="SPRDET" desc="" bitrange="1:1"/>
+      <field name="OTG_IDLE" desc="" bitrange="0:0"/>
+    </reg>
+    <reg name="OTGSTATUS" desc="">
+      <addr name="OTGSTATUS" addr="0x1bf"/>
+    </reg>
+    <reg name="OTGIEN" desc="OTG interrupt enable register">
+      <addr name="OTGIEN" addr="0x1c0"/>
+    </reg>
+    <reg name="HCMAXPCKL" desc="High speed max packed size LSB">
+      <addr name="HCIN1MAXPCKL" addr="0x1e2"/>
+      <addr name="HCOUT2MAXPCKL" addr="0x3e4"/>
+    </reg>
+    <reg name="STADDR" desc="Endpoint buffer start address">
+      <addr name="OUT1STADDR " addr="0x304"/>
+      <addr name="IN2STADDR " addr="0x348"/>
+    </reg>
+    <reg name="USBEIRQ" desc="USB extended irq register">
+      <addr name="USBEIRQ" addr="0x400"/>
+      <field name="USB" desc="" bitrange="7:7"/>
+      <field name="WAKEUP" desc="" bitrange="6:6"/>
+      <field name="RESUME" desc="" bitrange="5:5"/>
+      <field name="CONDISCON" desc="" bitrange="4:4"/>
+      <field name="USBIEN" desc="" bitrange="3:3"/>
+      <field name="WAKEUPIEN" desc="" bitrange="2:2"/>
+      <field name="RESUMEIEN" desc="" bitrange="1:1"/>
+      <field name="CONDISCONIEN" desc="" bitrange="0:0"/>
+    </reg>
+    <reg name="USBERST" desc="">
+      <addr name="USBERST" addr="0x404"/>
+    </reg>
+    <reg name="DMAEPSEL" desc="">
+      <addr name="DMAEPSEL" addr="0x40c"/>
+      <field name="EP_SEL" desc="" bitrange="31:0">
+        <value name="UNKNOWN" value="0x0" desc=""/>
+        <value name="EP1_IN" value="0x1" desc=""/>
+        <value name="EP1_OUT" value="0x3" desc=""/>
+        <value name="EP2_IN" value="0x4" desc=""/>
+        <value name="EP2_OUT" value="0xc" desc=""/>
+      </field>
+    </reg>
+  </dev>
+  <dev name="YUV2RGB" long_name="Color Space Conversion Accelerator" desc="" version="">
+    <addr name="YUV2RGB" addr="0xb00f0000"/>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x0"/>
+      <field name="RESERVED" desc="" bitrange="31:22"/>
+      <field name="RFBM" desc="Read fifo block mode." bitrange="21:21"/>
+      <field name="WFBM" desc="Write fifo block mode" bitrange="20:20"/>
+      <field name="EN" desc="RGB Decoder enable." bitrange="19:19"/>
+      <field name="FES" desc="Fifo empty status." bitrange="18:18"/>
+      <field name="WDCS" desc="Write Data/Command Select" bitrange="17:16">
+        <value name="CMD" value="0x0" desc="Write LCD register address"/>
+        <value name="DATA" value="0x1" desc="Write LCD register data"/>
+        <value name="RGB" value="0x2" desc="RGB565 Data FrameBuffer Transfer"/>
+        <value name="YUV" value="0x3" desc="YCbCr/YUV Data FrameBuffer Transfer"/>
+      </field>
+      <field name="DEST" desc="RGB Decoder Destination." bitrange="15:15"/>
+      <field name="FORMATS" desc="RGB Format" bitrange="13:11">
+        <value name="RGB565_1" value="0x0" desc="16bit (RGB 565 1transfer)"/>
+        <value name="RGB666_1" value="0x1" desc="18bit (RGB 666 1transfer)"/>
+        <value name="RGB565_2" value="0x2" desc="8bit (RGB 565 2transfers)"/>
+        <value name="RGB666_2" value="0x3" desc="9bit (RGB 666 2transfers)"/>
+        <value name="RGB888_3" value="0x4" desc="8bit (RGB 888 3transfers)"/>
+        <value name="RGB666_3" value="0x5" desc="6bit (RGB 666 3transfers)"/>
+      </field>
+      <field name="SEQ" desc="RGB Sequence" bitrange="10:10">
+        <value name="RGB" value="0x0" desc=""/>
+        <value name="BGR" value="0x1" desc=""/>
+      </field>
+      <field name="FWCS" desc="FIFO write channel select." bitrange="9:9">
+        <value name="SPECIAL" value="0x0" desc=""/>
+        <value name="AHB" value="0x1" desc=""/>
+      </field>
+      <field name="FRCS" desc="FIFO read channel select" bitrange="8:8">
+        <value name="SPECIAL" value="0x0" desc=""/>
+        <value name="AHB" value="0x1" desc=""/>
+      </field>
+      <field name="EMDE" desc="FIFO Empty (Write) DRQ Enable." bitrange="7:7"/>
+      <field name="EMIE" desc="FIFO Empty (Write) IRQ Enable." bitrange="6:6"/>
+      <field name="FUDE" desc="FIFO Full (Read) DRQ Enable." bitrange="5:5"/>
+      <field name="FUIE" desc="FIFO Full (Read) IRQ Enable." bitrange="4:4"/>
+      <field name="EMCO" desc="FIFO Empty (Write) Condition." bitrange="3:3">
+        <value name="EMPTY_4_8" value="0x0" desc=""/>
+        <value name="EMPTY_0_8" value="0x1" desc=""/>
+      </field>
+      <field name="EMIP" desc="FIFO Empty (Write) IRQ Pending Bit." bitrange="2:2"/>
+      <field name="FUIP" desc="FIFO Full (Read) IRQ Pending Bit." bitrange="1:1"/>
+      <field name="ERP" desc="FIFO Error Pending Bit.  Write 1 to the bit to clear it and reset the FIFO." bitrange="0:0"/>
+    </reg>
+    <reg name="FIFODATA" desc="">
+      <addr name="FIFODATA" addr="0x4"/>
+    </reg>
+    <reg name="CLKCTL" desc="">
+      <addr name="CLKCTL" addr="0x8"/>
+    </reg>
+    <reg name="FRAMECOUNT" desc="">
+      <addr name="FRAMECOUNT" addr="0xc"/>
+    </reg>
+  </dev>
+</soc>
