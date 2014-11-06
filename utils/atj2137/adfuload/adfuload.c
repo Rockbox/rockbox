@@ -258,24 +258,29 @@ static void adfu_execute(libusb_device_handle *hdev, uint32_t address)
 
 static void usage(char *name)
 {
-    printf("usage: (sudo) %s [-e] -s1 stage1.bin -s2 stage2.bin\n", name);
-    printf("stage1.bin - binary of the stage1 (ADEC_N63.BIN for example)\n");
-    printf("stage2.bin - binary of the custom user code\n");
+    printf("usage: (sudo) %s [-u vid:pid] [-e] -s1 stage1.bin -s2 stage2.bin\n", name);
+    printf("stage1.bin          Binary of the stage1 (ADEC_N63.BIN for example)\n");
+    printf("stage2.bin          Binary of the custom user code\n");
     printf("\n");
     printf("options:\n");
-    printf("-e - encode stage1 binary as needed by brom adfu mode\n");
+    printf("-u|--usb vid:pid    Override device PID and PID (default 0x%04x:0x%04x)\n",
+           VENDORID, PRODUCTID);
+    printf("-e                  Encode stage1 binary as needed by brom adfu mode\n");
 }
 
 int main (int argc, char **argv)
 {
+    uint16_t pid = PRODUCTID;
+    uint16_t vid = VENDORID;
+
     libusb_device_handle *hdev;
     int ret = 0;
     int i = 1;
     uint8_t *buf;
     uint32_t filesize, filesize_round;
-    char *s1_filename, *s2_filename;
+    char *s1_filename = NULL, *s2_filename = NULL;
     bool encode = false;
-    FILE *fp;
+    FILE *fp = NULL;
 
     while (i < argc)
     {
@@ -306,11 +311,46 @@ int main (int argc, char **argv)
             s2_filename = argv[i];
             i++;
         }
+        else if ((strcmp(argv[i],"-u")==0) || (strcmp(argv[i],"--usb")==0))
+        {
+            if (i + 1 == argc)
+            {
+                fprintf(stderr,"Missing argument for USB IDs\n");
+                return -1;
+            }
+            char *svid = argv[i + 1];
+            char *spid = strchr(svid, ':');
+            if(svid == NULL)
+            {
+                fprintf(stderr,"Invalid argument for USB IDs (missing ':')\n");
+                return -2;
+            }
+            char *end;
+            vid = strtoul(svid, &end, 0);
+            if(*end != ':')
+            {
+                fprintf(stderr,"Invalid argument for USB VID\n");
+                return -3;
+            }
+            pid = strtoul(spid + 1, &end, 0);
+            if(*end)
+            {
+                fprintf(stderr,"Invalid argument for USB PID\n");
+                return -4;
+            }
+            i++;
+        }
         else
         {
             usage(argv[0]);
             return -3;
         }
+    }
+
+    if (!s1_filename)
+    {
+        usage(argv[0]);
+        return -3;
     }
 
     /* print banner */
@@ -322,10 +362,10 @@ int main (int argc, char **argv)
     /* initialize libusb */
     libusb_init(NULL);
 
-    hdev = libusb_open_device_with_vid_pid(NULL, VENDORID, PRODUCTID);
+    hdev = libusb_open_device_with_vid_pid(NULL, vid, pid);
     if (hdev == NULL)
     {
-        fprintf(stderr, "[error]: can't open device with VID:PID=0x%0x:0x%0x\n", VENDORID, PRODUCTID);
+        fprintf(stderr, "[error]: can't open device with VID:PID = 0x%0x:0x%0x\n", vid, pid);
         libusb_exit(NULL);
         return -4;
     }
@@ -401,7 +441,6 @@ int main (int argc, char **argv)
 
     fclose(fp);
 
-    fprintf(stderr, "[info]: file %s\n", s2_filename);
 
     if (encode)
     {
@@ -420,45 +459,52 @@ int main (int argc, char **argv)
     adfu_execute(hdev, 0xb4040000);
     /* Now ADEC_N63.BIN should be operational */
 
-    /* upload custom binary and run it */
-    fp = fopen(s2_filename, "rb");
-
-    if (fp == NULL)
+    if (s2_filename)
     {
-        fprintf(stderr, "[error]: could not open file \"%s\"\n", s2_filename);
-        ret = -20;
-        goto end;
+        fprintf(stderr, "[info]: file %s\n", s2_filename);
+
+        /* upload custom binary and run it */
+        fp = fopen(s2_filename, "rb");
+
+        if (fp == NULL)
+        {
+            fprintf(stderr, "[error]: could not open file \"%s\"\n", s2_filename);
+            ret = -20;
+            goto end;
+        }
+
+        fseek(fp, 0, SEEK_END);
+        filesize = (uint32_t)ftell(fp);
+        fseek(fp, 0, SEEK_SET);
+
+        buf = realloc(buf, filesize);
+
+        if (buf == NULL)
+        {
+            fprintf(stderr, "[error]: can't allocate %d bytes of memory\n", filesize);
+            ret = -21;
+            goto end_fclose;
+        }
+
+        if (fread(buf, 1, filesize, fp) != filesize)
+        {
+            fprintf(stderr, "[error]: can't read file: %s\n", s2_filename);
+            ret = -22;
+            goto end_free;
+        }
+
+        fprintf(stderr, "[info]: file %s\n", s2_filename);
+        /* upload binary to the begining of DRAM */
+        adfu_upload(hdev, buf, filesize, 0xa0000000);
+        adfu_execute(hdev, 0xa0000000);
     }
-
-    fseek(fp, 0, SEEK_END);
-    filesize = (uint32_t)ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-
-    buf = realloc(buf, filesize);
-
-    if (buf == NULL)
-    {
-        fprintf(stderr, "[error]: can't allocate %d bytes of memory\n", filesize);
-        ret = -21;
-        goto end_fclose;
-    }
-
-    if (fread(buf, 1, filesize, fp) != filesize)
-    {
-        fprintf(stderr, "[error]: can't read file: %s\n", s2_filename);
-        ret = -22;
-        goto end_free;
-    }
-
-    fprintf(stderr, "[info]: file %s\n", s2_filename);
-    /* upload binary to the begining of DRAM */
-    adfu_upload(hdev, buf, filesize, 0xa0000000);
-    adfu_execute(hdev, 0xa0000000);
+    else
+        fp = NULL;
 
 end_free:
-    free(buf);
+    if (buf) {free(buf);}
 end_fclose:
-    fclose(fp);
+    if (fp) {fclose(fp);}
 end:
     libusb_close(hdev);
     libusb_exit(NULL);
