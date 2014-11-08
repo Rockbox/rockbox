@@ -944,6 +944,7 @@ target/arm/sandisk/sansa-view/powermgmt-view.c
 #ifdef PHILIPS_SA9200
 #ifndef BOOTLOADER
 drivers/synaptics-mep.c
+target/arm/philips/piezo.c
 #endif /* BOOTLOADER */
 target/arm/philips/sa9200/backlight-sa9200.c
 target/arm/philips/sa9200/button-sa9200.c
@@ -956,6 +957,7 @@ target/arm/philips/sa9200/powermgmt-sa9200.c
 #if defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330)
 #ifndef BOOTLOADER
 drivers/synaptics-mep.c
+target/arm/philips/piezo.c
 #endif /* BOOTLOADER */
 target/arm/philips/power-hdd.c
 target/arm/philips/fmradio_i2c-hdd.c

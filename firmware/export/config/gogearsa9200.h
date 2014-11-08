@@ -60,6 +60,8 @@
 
 #define CONFIG_KEYPAD PHILIPS_SA9200_PAD
 
+#define HAVE_HARDWARE_CLICK
+
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 

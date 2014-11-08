@@ -29,18 +29,6 @@
 
 static int int_btn = BUTTON_NONE;
 
-/*
- * Generate a click sound from the player (not in headphones yet)
- * TODO: integrate this with the "key click" option
- */
-static void button_click(void)
-{
-    GPO32_ENABLE |= 0x2000;
-    GPO32_VAL |= 0x2000;
-    udelay(1000);
-    GPO32_VAL &= ~0x2000;
-}
-
 #ifndef BOOTLOADER
 void button_init_device(void)
 {
@@ -59,7 +47,7 @@ void button_int(void)
     int_btn = BUTTON_NONE;
 
     val = touchpad_read_device(data, 4);
-    
+
     if (val == MEP_BUTTON_HEADER)
     {
         /* Buttons packet */
@@ -96,7 +84,6 @@ bool button_hold(void)
  */
 int button_read_device(void)
 {
-    static int btn_old = BUTTON_NONE;
     int btn = int_btn;
 
     /* Hold */
@@ -110,11 +97,6 @@ int button_read_device(void)
     if (!(GPIOA_INPUT_VAL & 0x08)) btn |= BUTTON_VIEW;
     if (!(GPIOD_INPUT_VAL & 0x20)) btn |= BUTTON_PLAYLIST;
     if (!(GPIOD_INPUT_VAL & 0x40)) btn |= BUTTON_POWER;
-
-    if ((btn != btn_old) && (btn != BUTTON_NONE))
-        button_click();
-
-    btn_old = btn;
 
     return btn;
 }

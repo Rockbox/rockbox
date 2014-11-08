@@ -37,18 +37,6 @@ static int scroll_repeat = BUTTON_NONE;
 #endif
 static int repeat = 0;
 
-/*
- * Generate a click sound from the player (not in headphones yet)
- * TODO: integrate this with the "key click" option
- */
-static void button_click(void)
-{
-    GPO32_ENABLE |= 0x2000;
-    GPO32_VAL |= 0x2000;
-    udelay(1000);
-    GPO32_VAL &= ~0x2000;
-}
-
 #ifndef BOOTLOADER
 void button_init_device(void)
 {
@@ -142,7 +130,6 @@ bool button_hold(void)
  */
 int button_read_device(void)
 {
-    static int btn_old = BUTTON_NONE;
     int btn = int_btn;
 
     /* Hold */
@@ -166,11 +153,6 @@ int button_read_device(void)
         repeat = BUTTON_NONE;
         btn = BUTTON_NONE;
     }
-
-    if ((btn != btn_old) && (btn != BUTTON_NONE))
-        button_click();
-
-    btn_old = btn;
 
     return btn;
 }
