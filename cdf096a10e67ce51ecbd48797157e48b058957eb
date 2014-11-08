@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_78f21d9c",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2014-11-08T17:51:05Z",
+      "side": 1,
+      "message": "Should be ACTION_WPS_REC i guess",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_d839b143",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2014-11-08T17:51:05Z",
+      "side": 1,
+      "message": "This action is optional, i think it would be better to ignore it, you can always use the direction keys to flip pages. Then we get a free state of button which is priceless in this case (keyboard) and it can be used for the other functions (e.g. morse input after remapping or whatever). i mean, it\u0027s not about to use all of the actions we have. Better is to omit certain things in order to gain something.",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_383f0527",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2014-11-08T17:51:05Z",
+      "side": 1,
+      "message": "I don\u0027t like the combo here. I think it would be better to use the same button as backspace for both targets (like in previous version) and abort maybe on combo for YH-920, or use the rec button as a last resort, i don\u0027t know. I think the old version of keyboard map was slightly better.",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_78497dd0",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2014-11-08T17:51:05Z",
+      "side": 1,
+      "message": "Tested on both targets and it doesn\u0027t work correctly. You can\u0027t make a dash, only dots are working. Note that the play button can\u0027t be used in this case (same situation as in the HID_MOUSE).",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_982f39f6",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2014-11-08T17:51:05Z",
+      "side": 1,
+      "message": "It doesn\u0027t work without a proper definition in radio.c, but i think this action is optional and not needed, only one stable target uses it (Archos Ondio IIRC), and all the others do not. You can always record the radio from the recording screen and it\u0027s not worth to complicate the radio.c more in my opinion. But i\u0027m not very against it.",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_58ef61b0",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2014-11-08T17:51:05Z",
+      "side": 1,
+      "message": "Heh, this one is my bug, should be BUTTON_PLAY at the end.",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_b82af5e5",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2014-11-08T17:51:05Z",
+      "side": 1,
+      "message": "It won\u0027t work correctly, because BUTTON_PLAY is the power on/off button too, so if you hold it longer, which is possible in certain situations, you will reset or shut down the player. I don\u0027t remember exactly, but my player did something similar to reset (YH-920). So you should generally avoid using the play button in actions where it is holded longer. Should stay as it was for both targets IMO.",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_f8346d4b",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 1000064
+      },
+      "writtenOn": "2014-11-08T17:51:05Z",
+      "side": 1,
+      "message": "the same as above.",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
