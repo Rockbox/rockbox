@@ -48,8 +48,8 @@
 
 
 /** static, private data **/ 
-static uint8_t ceata_taskfile[16] __attribute__((aligned(16)));
-static uint16_t ata_identify_data[0x100] __attribute__((aligned(16)));
+static uint8_t ceata_taskfile[16] STORAGE_ALIGN_ATTR;
+static uint16_t ata_identify_data[0x100] STORAGE_ALIGN_ATTR;
 static bool ceata;
 static bool ata_swap;
 static bool ata_lba48;
@@ -68,7 +68,7 @@ static struct semaphore mmc_wakeup;
 static struct semaphore mmc_comp_wakeup;
 static int spinup_time = 0;
 static int dma_mode = 0;
-static char aligned_buffer[SECTOR_SIZE] __attribute__((aligned(0x10)));
+static char aligned_buffer[SECTOR_SIZE] STORAGE_ALIGN_ATTR;
 
 
 #ifdef ATA_HAVE_BBT

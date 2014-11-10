@@ -30,7 +30,7 @@
 
 #define TIMER_FREQ  54000000
 
-#define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
+#define CACHEALIGN_BITS (5) /* 2^5 = 32 bytes */
 
 #define DRAM_ORIG 0x08000000
 #define IRAM_ORIG 0
