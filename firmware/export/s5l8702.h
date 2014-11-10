@@ -28,8 +28,6 @@
 #define REG16_PTR_T volatile uint16_t *
 #define REG32_PTR_T volatile uint32_t *
 
-#define TIMER_FREQ  54000000
-
 #define CACHEALIGN_BITS (5) /* 2^5 = 32 bytes */
 
 #define DRAM_ORIG 0x08000000
@@ -65,6 +63,34 @@
 
 
 /////TIMER/////
+/* 16/32-bit timers:
+ *
+ * - Timers A..D: 16-bit counter, very similar to 16-bit timers described
+ *   in S5L8700 DS, it seems that the timers C and D are disabled or not
+ *   implemented.
+ *
+ * - Timers E..H: 32-bit counter, they are like 16-bit timers, but the
+ *   interrupt status for all 32-bit timers is located in TSTAT register.
+ *
+ * - Clock source configuration:
+ *
+ *   TCON[10:8] (Tx_CS)     TCON[6]=0           TCON[6]=1
+ *   ------------------     ---------           ---------
+ *   000                    PCLK / 2            ECLK / 2
+ *   001                    PCLK / 4            ECLK / 4
+ *   010                    PCLK / 16           ECLK / 16
+ *   011                    PCLK / 64           ECLK / 64
+ *   10x (timers E..H)      PCLK                ECLK
+ *   10x (timers A..D)      Ext. Clock 0        Ext. Clock 0
+ *   11x                    Ext. Clock 1        Ext. Clock 1
+ *
+ *   On Classic:
+ *   - Ext. Clock 0: not connected or disabled
+ *   - Ext. Clock 1: 32768 Hz, external OSC1?, PMU?
+ *   - ECLK: 12 MHz, external OSC0?
+ */
+#define TIMER_FREQ  12000000    /* ECLK */
+
 #define TACON        (*((uint32_t volatile*)(0x3C700000)))
 #define TACMD        (*((uint32_t volatile*)(0x3C700004)))
 #define TADATA0      (*((uint32_t volatile*)(0x3C700008)))
@@ -113,6 +139,7 @@
 #define THDATA1      (*((uint32_t volatile*)(0x3C70010C)))
 #define THPRE        (*((uint32_t volatile*)(0x3C700110)))
 #define THCNT        (*((uint32_t volatile*)(0x3C700114)))
+#define TSTAT        (*((uint32_t volatile*)(0x3C700118)))
 #define USEC_TIMER   TECNT
 
 
@@ -816,6 +843,7 @@ struct dma_lli
 
 
 /////INTERRUPTS/////
+#define IRQ_TIMER32 7
 #define IRQ_TIMER 8
 #define IRQ_USB_FUNC 19
 #define IRQ_DMAC(d) 16 + d

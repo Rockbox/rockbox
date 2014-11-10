@@ -39,15 +39,14 @@ default_interrupt(INT_IRQ3);
 default_interrupt(INT_IRQ4);
 default_interrupt(INT_IRQ5);
 default_interrupt(INT_IRQ6);
-default_interrupt(INT_IRQ7);
-default_interrupt(INT_TIMERA);
-default_interrupt(INT_TIMERB);
-default_interrupt(INT_TIMERC);
-default_interrupt(INT_TIMERD);
-default_interrupt(INT_TIMERE);
+default_interrupt(INT_TIMERE);  /* IRQ7: 32-bit timers */
 default_interrupt(INT_TIMERF);
 default_interrupt(INT_TIMERG);
 default_interrupt(INT_TIMERH);
+default_interrupt(INT_TIMERA);  /* IRQ8: 16-bit timers */
+default_interrupt(INT_TIMERB);
+default_interrupt(INT_TIMERC);
+default_interrupt(INT_TIMERD);
 default_interrupt(INT_IRQ9);
 default_interrupt(INT_IRQ10);
 default_interrupt(INT_IRQ11);
@@ -129,9 +128,16 @@ void INT_TIMER()
     if (TBCON & (TBCON >> 4) & 0x7000) INT_TIMERB();
     if (TCCON & (TCCON >> 4) & 0x7000) INT_TIMERC();
     if (TDCON & (TDCON >> 4) & 0x7000) INT_TIMERD();
-    if (TFCON & (TFCON >> 4) & 0x7000) INT_TIMERF();
-    if (TGCON & (TGCON >> 4) & 0x7000) INT_TIMERG();
-    if (THCON & (THCON >> 4) & 0x7000) INT_TIMERH();
+}
+
+void INT_TIMER32(void) ICODE_ATTR;
+void INT_TIMER32()
+{
+    uint32_t tstat = TSTAT;
+    /*if ((TECON >> 12) & 0x7 & (tstat >> 24)) INT_TIMERE();*/
+    if ((TFCON >> 12) & 0x7 & (tstat >> 16)) INT_TIMERF();
+    if ((TGCON >> 12) & 0x7 & (tstat >> 8)) INT_TIMERG();
+    if ((THCON >> 12) & 0x7 & tstat) INT_TIMERH();
 }
 
 void INT_DMAC0(void) ICODE_ATTR;
@@ -164,7 +170,7 @@ void INT_DMAC1()
 
 static void (* const irqvector[])(void) =
 {
-    INT_IRQ0,INT_IRQ1,INT_IRQ2,INT_IRQ3,INT_IRQ4,INT_IRQ5,INT_IRQ6,INT_IRQ7,
+    INT_IRQ0,INT_IRQ1,INT_IRQ2,INT_IRQ3,INT_IRQ4,INT_IRQ5,INT_IRQ6,INT_TIMER32,
     INT_TIMER,INT_IRQ9,INT_IRQ10,INT_IRQ11,INT_IRQ12,INT_IRQ13,INT_IRQ14,INT_IRQ15,
     INT_DMAC0,INT_DMAC1,INT_IRQ18,INT_USB_FUNC,INT_IRQ20,INT_IRQ21,INT_IRQ22,INT_WHEEL,
     INT_IRQ24,INT_IRQ25,INT_IRQ26,INT_IRQ27,INT_IRQ28,INT_ATA,INT_IRQ30,INT_IRQ31,
@@ -220,6 +226,7 @@ void system_init(void)
     VIC0INTENABLE = 1 << IRQ_WHEEL;
     VIC0INTENABLE = 1 << IRQ_ATA;
     VIC1INTENABLE = 1 << (IRQ_MMC - 32);
+    VIC0INTENABLE = 1 << IRQ_TIMER32;
 }
 
 void system_reboot(void)
