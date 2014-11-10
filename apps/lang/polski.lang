@@ -2535,7 +2535,7 @@
   </dest>
   <voice>
     *: none
-    hold_button: "Podświetlenie podczas blokady klawiszy"
+    hold_button: "Podświetlenie podczas blokady przycisków"
   </voice>
 </phrase>
 <phrase>
@@ -3665,13 +3665,13 @@
   </source>
   <dest>
     *: none
-    button_light: "Wygaszanie klawiszy"
-    sansafuze*,sansae200*: "Wygaszanie koła sterującego"
+    button_light: "Podświetlenie przycisków"
+    sansafuze*,sansae200*: "Podświetlenie koła sterującego"
   </dest>
   <voice>
     *: none
-    button_light: "Wygaszanie klawiszy"
-    sansafuze*,sansae200*: "Wygaszanie koła sterującego"
+    button_light: "Podświetlenie przycisków"
+    sansafuze*,sansae200*: "Podświetlenie koła sterującego"
   </voice>
 </phrase>
 <phrase>
@@ -7945,7 +7945,7 @@
     *: "Buttons Locked"
   </source>
   <dest>
-    *: "Klawisze zablokowane"
+    *: "Przyciski zablokowane"
   </dest>
   <voice>
     *: ""
@@ -7959,7 +7959,7 @@
     *: "Buttons Unlocked"
   </source>
   <dest>
-    *: "Klawisze odblokowane"
+    *: "Przyciski odblokowane"
   </dest>
   <voice>
     *: ""
@@ -10500,11 +10500,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Głośność dźwięku klawiszy"
+    swcodec: "Dźwięk przycisków"
   </dest>
   <voice>
     *: none
-    swcodec: "Głośność dźwięku klawiszy"
+    swcodec: "Dźwięk przycisków"
   </voice>
 </phrase>
 <phrase>
@@ -10517,11 +10517,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Powtarzaj dźwięk klawiszy"
+    swcodec: "Powtarzaj dźwięk przycisków"
   </dest>
   <voice>
     *: none
-    swcodec: "Powtarzaj dźwięk klawiszy"
+    swcodec: "Powtarzaj dźwięk przycisków"
   </voice>
 </phrase>
 <phrase>
@@ -11597,15 +11597,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Wzm. pasma %d"
+    gigabeats,samsungypr1: "Wzm. pasma %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Wzm. pasma %d"
+    gigabeats,samsungypr1: "Wzm. pasma %d"
   </voice>
 </phrase>
 <phrase>
@@ -11682,15 +11682,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Szeroko"
+    gigabeats,samsungypr1: "Szeroko"
   </dest>
   <voice>
     *: none
-    gigabeats: "Szeroko"
+    gigabeats,samsungypr1: "Szeroko"
   </voice>
 </phrase>
 <phrase>
@@ -11931,15 +11931,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Wąsko"
+    gigabeats,samsungypr1: "Wąsko"
   </dest>
   <voice>
     *: none
-    gigabeats: "Wąsko"
+    gigabeats,samsungypr1: "Wąsko"
   </voice>
 </phrase>
 <phrase>
@@ -12064,15 +12064,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Zaawansowane ustawienia dźwięku"
+    gigabeats,samsungypr1: "Zaawansowane ustawienia dźwięku"
   </dest>
   <voice>
     *: none
-    gigabeats: "Zaawansowane ustawienia dźwięku"
+    gigabeats,samsungypr1: "Zaawansowane ustawienia dźwięku"
   </voice>
 </phrase>
 <phrase>
@@ -12081,15 +12081,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Efekt 3D"
+    depth_3d: "Efekt 3D"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Efekt 3D"
+    depth_3d: "Efekt 3D"
   </voice>
 </phrase>
 <phrase>
@@ -12115,15 +12115,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Częstotliwość pasma %d"
+    gigabeats,samsungypr1: "Częstotliwość pasma %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Częstotliwość pasma"
+    gigabeats,samsungypr1: "Częstotliwość pasma"
   </voice>
 </phrase>
 <phrase>
@@ -12132,15 +12132,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Szerokość pasma %d"
+    gigabeats,samsungypr1: "Szerokość pasma %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Szerokość pasma"
+    gigabeats,samsungypr1: "Szerokość pasma"
   </voice>
 </phrase>
 <phrase>
@@ -12296,15 +12296,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Barwa dźwięku"
+    gigabeats,samsungypr1: "Barwa dźwięku"
   </dest>
   <voice>
     *: none
-    gigabeats: "Barwa dźwięku"
+    gigabeats,samsungypr1: "Barwa dźwięku"
   </voice>
 </phrase>
 <phrase>
@@ -13042,5 +13042,140 @@
   </dest>
   <voice>
     *: "Wybierz katalogi do przeskanowania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Powolny"
+  </dest>
+  <voice>
+    *: "Powolny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Czas ataku"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Czas ataku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "Martwa strefa touchpada"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "Martwa strefa touchpada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Kolor linii separującej"
+  </dest>
+  <voice>
+    *: "Kolor linii separującej"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "Gwałtowny"
+  </dest>
+  <voice>
+    *: "Gwałtowny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Maksymalny poziom głośności"
+  </dest>
+  <voice>
+    *: "Maksymalny poziom głośności"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Oddzielanie linii"
+  </dest>
+  <voice>
+    *: "Oddzielanie linii"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "Filtr roll-off DAC"
+  </dest>
+  <voice>
+    *: "Filtr roll off DAC"
   </voice>
 </phrase>
