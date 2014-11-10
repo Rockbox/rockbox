@@ -53,7 +53,7 @@ extern void lcd_write_yuv420_lines(fb_data *dst,
     /* stride => amount to jump from end of last row to start of next */
     stride -= width;
 
-    /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
+    /* upsampling, YUV->RGB conversion and reduction to RGB in one go */
 
     do
     {
@@ -143,7 +143,7 @@ extern void lcd_write_yuv420_lines(fb_data *dst,
             b = clamp(b, 0, 64*256-1);
         }
 
-        *dst = FB_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+        *dst = FB_RGBPACK(r >> 6, g >> 6, b >> 6);
 
 #if LCD_WIDTH >= LCD_HEIGHT
         dst++;
@@ -163,7 +163,7 @@ extern void lcd_write_yuv420_lines(fb_data *dst,
             b = clamp(b, 0, 64*256-1);
         }
 
-        *dst = FB_RGBPACK_LCD(r >> 9, g >> 8, b >> 9);
+        *dst = FB_RGBPACK(r >> 6, g >> 6, b >> 6);
 
 #if LCD_WIDTH >= LCD_HEIGHT
         dst++;
