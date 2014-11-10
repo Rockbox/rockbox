@@ -853,6 +853,13 @@ struct dma_lli
 #define IRQ_ATA 29
 #define IRQ_MMC 44
 
+#define IRQ_EXT0    0
+#define IRQ_EXT1    1
+#define IRQ_EXT2    2
+#define IRQ_EXT3    3
+#define IRQ_EXT4    31
+#define IRQ_EXT5    32
+#define IRQ_EXT6    33
 
 #endif
 

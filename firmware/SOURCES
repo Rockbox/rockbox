@@ -1597,6 +1597,7 @@ target/arm/s5l8702/ipod6g/powermgmt-ipod6g.c
 target/arm/s5l8702/ipod6g/power-ipod6g.c
 target/arm/s5l8702/kernel-s5l8702.c
 target/arm/s5l8702/system-s5l8702.c
+target/arm/s5l8702/gpio-s5l8702.c
 target/arm/s5l8702/ipod6g/lcd-ipod6g.c
 target/arm/s5l8702/ipod6g/lcd-asm-ipod6g.S
 #if 0 //TODO
