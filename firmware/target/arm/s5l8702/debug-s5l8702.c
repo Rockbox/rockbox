@@ -61,6 +61,11 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("speed: %d MHz", ((CLKCON0 & 1) ?
                                 CPUFREQ_NORMAL : CPUFREQ_MAX) / 1000000);
             _DEBUG_PRINTF("current_tick: %d", (unsigned int)current_tick);
+            uint32_t __res;
+            asm volatile ("mrc p15, 0, %0, c0, c0, 0" : "=r"(__res));
+            _DEBUG_PRINTF("ID code: %08x", __res);
+            asm volatile ("mrc p15, 0, %0, c0, c0, 1" : "=r"(__res));
+            _DEBUG_PRINTF("cache type: %08x", __res);
             line++;
 
             _DEBUG_PRINTF("LCD type: %d", lcd_type);
