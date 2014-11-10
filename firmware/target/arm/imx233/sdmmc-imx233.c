@@ -143,7 +143,7 @@ struct sdmmc_config_t sdmmc_config[] =
     },
     /* The Zen X-Fi uses pin #B0P10 for power*/
     {
-        .name = "microSD",
+        .name = "SD",
         .flags = POWER_PIN | REMOVABLE | DETECT_INVERTED | POWER_DELAY | WP_PIN,
         .power_pin = PIN(0, 10),
         .wp_pin = PIN(0, 11),
