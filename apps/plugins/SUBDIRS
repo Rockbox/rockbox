@@ -1,3 +1,6 @@
+#ifdef EXTRA_PLUGINS
+plugins-extra
+#endif
 /* For all targets */
 shortcuts
 text_viewer
