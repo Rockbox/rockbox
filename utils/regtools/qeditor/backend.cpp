@@ -266,7 +266,7 @@ bool HWStubDevice::ReadMem(soc_addr_t addr, size_t length, void *buffer)
 {
     if(!m_hwdev)
         return false;
-    int ret = hwstub_rw_mem(m_hwdev, 1, addr, buffer, length);
+    int ret = hwstub_rw_mem_atomic(m_hwdev, 1, addr, buffer, length);
     return ret >= 0 && (size_t)ret == length;
 }
 
@@ -274,7 +274,7 @@ bool HWStubDevice::WriteMem(soc_addr_t addr, size_t length, void *buffer)
 {
     if(!m_hwdev)
         return false;
-    int ret = hwstub_rw_mem(m_hwdev, 0, addr, buffer, length);
+    int ret = hwstub_rw_mem_atomic(m_hwdev, 0, addr, buffer, length);
     return ret >= 0 && (size_t)ret == length;
 }
 

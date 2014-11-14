@@ -53,8 +53,11 @@ int hwstub_get_desc(struct hwstub_device_t *dev, uint16_t desc, void *info, size
 int hwstub_get_log(struct hwstub_device_t *dev, void *buf, size_t sz);
 /* Returns number of bytes written/read or <0 on error */
 int hwstub_read(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz);
-int hwstub_write(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz);
+int hwstub_read_atomic(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz);
+int hwstub_write(struct hwstub_device_t *dev, uint32_t addr, const void *buf, size_t sz);
+int hwstub_write_atomic(struct hwstub_device_t *dev, uint32_t addr, const void *buf, size_t sz);
 int hwstub_rw_mem(struct hwstub_device_t *dev, int read, uint32_t addr, void *buf, size_t sz);
+int hwstub_rw_mem_atomic(struct hwstub_device_t *dev, int read, uint32_t addr, void *buf, size_t sz);
 /* Returns <0 on error */
 int hwstub_exec(struct hwstub_device_t *dev, uint32_t addr, uint16_t flags);
 int hwstub_call(struct hwstub_device_t *dev, uint32_t addr);

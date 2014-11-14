@@ -33,6 +33,14 @@ void target_get_config_desc(void *buffer, int *size);
 void target_udelay(int us);
 /* Wait for a short time (ms <= 1000) */
 void target_mdelay(int ms);
+/* Read a n-bit word atomically */
+uint8_t target_read8(const void *addr);
+uint16_t target_read16(const void *addr);
+uint32_t target_read32(const void *addr);
+/* Write a n-bit word atomically */
+void target_write8(void *addr, uint8_t val);
+void target_write16(void *addr, uint16_t val);
+void target_write32(void *addr, uint32_t val);
 
 /* mandatory for all targets */
 extern struct hwstub_target_desc_t target_descriptor;

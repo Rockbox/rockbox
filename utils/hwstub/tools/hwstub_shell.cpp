@@ -144,7 +144,7 @@ typedef void (*hw_writen_fn_t)(lua_State *state, soc_addr_t addr, soc_word_t val
 soc_word_t hw_read8(lua_State *state, soc_addr_t addr)
 {
     uint8_t u;
-    if(hwstub_rw_mem(g_hwdev, 1, addr, &u, sizeof(u)) != sizeof(u))
+    if(hwstub_rw_mem_atomic(g_hwdev, 1, addr, &u, sizeof(u)) != sizeof(u))
         luaL_error(state, "fail to read8 @ %p", addr);
     return u;
 }
@@ -152,7 +152,7 @@ soc_word_t hw_read8(lua_State *state, soc_addr_t addr)
 soc_word_t hw_read16(lua_State *state, soc_addr_t addr)
 {
     uint16_t u;
-    if(hwstub_rw_mem(g_hwdev, 1, addr, &u, sizeof(u)) != sizeof(u))
+    if(hwstub_rw_mem_atomic(g_hwdev, 1, addr, &u, sizeof(u)) != sizeof(u))
         luaL_error(state, "fail to read16 @ %p", addr);
     return u;
 }
@@ -160,7 +160,7 @@ soc_word_t hw_read16(lua_State *state, soc_addr_t addr)
 soc_word_t hw_read32(lua_State *state, soc_addr_t addr)
 {
     uint32_t u;
-    if(hwstub_rw_mem(g_hwdev, 1, addr, &u, sizeof(u)) != sizeof(u))
+    if(hwstub_rw_mem_atomic(g_hwdev, 1, addr, &u, sizeof(u)) != sizeof(u))
         luaL_error(state, "fail to read32 @ %p", addr);
     return u;
 }
@@ -168,21 +168,21 @@ soc_word_t hw_read32(lua_State *state, soc_addr_t addr)
 void hw_write8(lua_State *state, soc_addr_t addr, soc_word_t val)
 {
     uint8_t u = val;
-    if(hwstub_rw_mem(g_hwdev, 0, addr, &u, sizeof(u)) != sizeof(u))
+    if(hwstub_rw_mem_atomic(g_hwdev, 0, addr, &u, sizeof(u)) != sizeof(u))
         luaL_error(state, "fail to write8 @ %p", addr);
 }
 
 void hw_write16(lua_State *state, soc_addr_t addr, soc_word_t val)
 {
     uint16_t u = val;
-    if(hwstub_rw_mem(g_hwdev, 0, addr, &u, sizeof(u)) != sizeof(u))
+    if(hwstub_rw_mem_atomic(g_hwdev, 0, addr, &u, sizeof(u)) != sizeof(u))
         luaL_error(state, "fail to write16 @ %p", addr);
 }
 
 void hw_write32(lua_State *state, soc_addr_t addr, soc_word_t val)
 {
     uint32_t u = val;
-    if(hwstub_rw_mem(g_hwdev, 0, addr, &u, sizeof(u)) != sizeof(u))
+    if(hwstub_rw_mem_atomic(g_hwdev, 0, addr, &u, sizeof(u)) != sizeof(u))
         luaL_error(state, "fail to write32 @ %p", addr);
 }
 
