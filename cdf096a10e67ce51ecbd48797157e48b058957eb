@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_f89e2d06",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2014-11-14T01:15:58Z",
+      "side": 1,
+      "message": "Absolutely, you\u0027re right.",
+      "parentUuid": "5a18252c_78f21d9c",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_d839b143",
         "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2014-11-08T17:51:05Z",
       "side": 1,
       "message": "This action is optional, i think it would be better to ignore it, you can always use the direction keys to flip pages. Then we get a free state of button which is priceless in this case (keyboard) and it can be used for the other functions (e.g. morse input after remapping or whatever). i mean, it\u0027s not about to use all of the actions we have. Better is to omit certain things in order to gain something.",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_589001ed",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2014-11-14T01:15:58Z",
+      "side": 1,
+      "message": "I can live without, but I found page flip somewhat convenient: on a small screen (yh820 or custom keyboard) you can switch between upper and lower case with a single button hit! (So maybe map it to a button combo)",
+      "parentUuid": "5a18252c_d839b143",
       "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_78933dfb",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2014-11-14T01:15:58Z",
+      "side": 1,
+      "message": "This was the last combo that was still idle :) (Note that this combo is only necessary for backspace repeat, you can do single backspace with the REW button.)\nMaybe use FFWD+REW combo for abort on YH920?\nWe still have the record switch free on the YH920, maybe we can use this to switch to morse mode or to switch pages.",
+      "parentUuid": "5a18252c_383f0527",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_78497dd0",
         "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
         "patchSetId": 2
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_188689b9",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2014-11-14T01:15:58Z",
+      "side": 1,
+      "message": "Hm, works for me (YH820) :/\nNote that there\u0027s a maximum duration for dashes, maybe you morsed to slow ;)\nI don\u0027t think anyone will morse slow enough to shut down the player, so the play button could be used, if KBD_DONE is remapped (e.g. back to the FFWD button).",
+      "parentUuid": "5a18252c_78497dd0",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_982f39f6",
         "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
         "patchSetId": 2
@@ -81,6 +153,24 @@
       "writtenOn": "2014-11-08T17:51:05Z",
       "side": 1,
       "message": "It doesn\u0027t work without a proper definition in radio.c, but i think this action is optional and not needed, only one stable target uses it (Archos Ondio IIRC), and all the others do not. You can always record the radio from the recording screen and it\u0027s not worth to complicate the radio.c more in my opinion. But i\u0027m not very against it.",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_d8a3714e",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2014-11-14T01:15:58Z",
+      "side": 1,
+      "message": "I don\u0027t use the radio on any of my targets, this action just seemed to be ideal to place a BUTTON_REC_SW_*  :)",
+      "parentUuid": "5a18252c_982f39f6",
       "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -115,6 +205,24 @@
       "writtenOn": "2014-11-08T17:51:05Z",
       "side": 1,
       "message": "It won\u0027t work correctly, because BUTTON_PLAY is the power on/off button too, so if you hold it longer, which is possible in certain situations, you will reset or shut down the player. I don\u0027t remember exactly, but my player did something similar to reset (YH-920). So you should generally avoid using the play button in actions where it is holded longer. Should stay as it was for both targets IMO.",
+      "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_3889c5cb",
+        "filename": "apps/keymaps/keymap-yh8xx_yh9xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2014-11-14T01:15:58Z",
+      "side": 1,
+      "message": "Yes, you\u0027re right. I didn\u0027t think of long presses here.\nSadly the new record switch code will disable the record button combos for the YH920, and I have no idea how to implement the mouse wheel actions then :/\nThis is a good example for a keymap where the old rec-switch code outmatch the new one.",
+      "parentUuid": "5a18252c_b82af5e5",
       "revId": "cdf096a10e67ce51ecbd48797157e48b058957eb",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
