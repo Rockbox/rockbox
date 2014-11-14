@@ -6,6 +6,8 @@ elseif hwstub.dev.target.id == hwstub.dev.target.PP then
     require "pp"
 elseif hwstub.dev.target.id == hwstub.dev.target.RK27 then
     require "rk27xx"
+elseif hwstub.dev.target.id == hwstub.dev.target.ATJ then
+    require "atj"
 end
 
 require "dumper"
