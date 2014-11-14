@@ -13254,3 +13254,37 @@
     swcodec: "Q"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SCROLLSTRIP_SPEED
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    scrollstrip: "Scrollstrip speed"
+  </source>
+  <dest>
+    *: none
+    scrollstrip: "Scrollstrip speed"
+  </dest>
+  <voice>
+    *: none
+    scrollstrip: "Scrollstrip speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLSTRIP_AFTERSCROLL
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    scrollstrip: "Afterscroll"
+  </source>
+  <dest>
+    *: none
+    scrollstrip: "Afterscroll"
+  </dest>
+  <voice>
+    *: none
+    scrollstrip: "Afterscroll"
+  </voice>
+</phrase>

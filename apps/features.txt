@@ -203,6 +203,10 @@ touchscreen
 touchpad_deadzone
 #endif
 
+#if defined(HAVE_SCROLLSTRIP)
+scrollstrip
+#endif
+
 #if defined(HAVE_IMX233_CODEC) || defined(HAVE_WM8750) || defined(HAVE_WM8978)
 depth_3d
 #endif
