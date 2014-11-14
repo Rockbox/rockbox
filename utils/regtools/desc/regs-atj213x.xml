@@ -263,6 +263,24 @@
   </dev>
   <dev name="GPIO" long_name="" desc="" version="1.0">
     <addr name="GPIO" addr="0xb01c0000"/>
+    <reg name="OUTEN" desc="">
+      <addr name="AOUTEN" addr="0x0"/>
+      <addr name="BOUTEN" addr="0xc"/>
+    </reg>
+    <reg name="MFCTL1" desc="">
+      <addr name="MFCTL1" addr="0x0"/>
+    </reg>
+    <reg name="INEN" desc="">
+      <addr name="AINEN" addr="0x4"/>
+      <addr name="BINEN" addr="0x10"/>
+    </reg>
+    <reg name="DAT" desc="">
+      <addr name="ADAT" addr="0x8"/>
+      <addr name="BDAT" addr="0x14"/>
+    </reg>
+    <reg name="MFCTL0" desc="">
+      <addr name="MFCTLO" addr="0x1c"/>
+    </reg>
   </dev>
   <dev name="I2C" long_name="" desc="" version="1.0">
     <addr name="I2C0" addr="0xb0180000"/>
