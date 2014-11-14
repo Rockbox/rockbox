@@ -38,8 +38,8 @@ do
     h = HELP:create_topic("DEV");
     h:add("This variable redirects to hwstub.dev and provides direct access to the device.");
     h:add("It contains some information about the device and the following methods.");
-    h:add("* read8/16/32(a) reads a 8/16/32-bit integer at address a");
-    h:add("* write8/16/32(a, v) writes the 8/16/32-bit integer v at address a");
+    h:add("* read8/16/32(a) reads a 8/16/32-bit integer at address a atomically");
+    h:add("* write8/16/32(a, v) writes the 8/16/32-bit integer v at address a atomically");
     h:add("* print_log() prints the device log");
 
     h = HELP:create_topic("HW");
