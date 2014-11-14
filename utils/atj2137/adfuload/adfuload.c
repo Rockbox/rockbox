@@ -318,7 +318,8 @@ int main (int argc, char **argv)
                 fprintf(stderr,"Missing argument for USB IDs\n");
                 return -1;
             }
-            char *svid = argv[i + 1];
+            i++;
+            char *svid = argv[i];
             char *spid = strchr(svid, ':');
             if(svid == NULL)
             {
