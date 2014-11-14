@@ -539,8 +539,11 @@ void RbUtilQt::uninstallBootloader(void)
 
     BootloaderInstallBase::BootloaderType currentbl = bl->installed();
     if((bl->capabilities() & BootloaderInstallBase::Uninstall) == 0) {
-        logger->addItem(tr("Rockbox Utility can not uninstall the bootloader on this target. "
-                            "Try a normal firmware update to remove the booloader."), LOGERROR);
+        logger->addItem(tr("Rockbox Utility can not uninstall the bootloader on your player. "
+                           "Please perform a firmware update using your player vendors "
+                           "firmware update process."), LOGERROR);
+        logger->addItem(tr("Important: make sure to boot your player into the original "
+                           "firmware before using the vendors firmware update process."), LOGERROR);
         logger->setFinished();
         delete bl;
         return;
