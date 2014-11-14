@@ -283,6 +283,8 @@ bool my_lua_import_hwstub()
     lua_setfield(g_lua, -2, "PP");
     lua_pushinteger(g_lua, HWSTUB_TARGET_RK27);
     lua_setfield(g_lua, -2, "RK27");
+    lua_pushinteger(g_lua, HWSTUB_TARGET_ATJ);
+    lua_setfield(g_lua, -2, "ATJ");
     lua_setfield(g_lua, -2, "target");
 
     if(g_hwdev_target.dID == HWSTUB_TARGET_STMP)
