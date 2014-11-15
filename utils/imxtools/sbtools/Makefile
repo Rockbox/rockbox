@@ -1,9 +1,16 @@
+# to compile to windows, define WIN32:
+# make WIN32=1
 DEFINES=-DCRYPTO_LIBUSB
-CC=gcc
-LD=gcc
 CFLAGS=-O3 -g -std=c99 -W -Wall `pkg-config --cflags libusb-1.0` $(DEFINES)
+ifdef WIN32
+LDFLAGS=-lsetupapi -lhid
+BINS_OS=sbloader.exe
+else
 LDFLAGS=`pkg-config --libs libusb-1.0`
-BINS=elftosb sbtoelf sbloader rsrctool elftosb1
+BINS_OS=sbloader
+endif
+BINS=elftosb sbtoelf rsrctool elftosb1 $(BINS_OS)
+LD=$(CC)
 
 all: $(BINS)
 
@@ -20,6 +27,9 @@ elftosb1: elftosb1.o xorcrypt.o elf.o misc.o sb1.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 sbloader: sbloader.o
+	$(LD) -o $@ $^ $(LDFLAGS)
+
+sbloader.exe: sbloader_win.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 rsrctool: rsrctool.o rsrc.o misc.o
