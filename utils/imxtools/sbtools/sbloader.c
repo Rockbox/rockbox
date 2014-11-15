@@ -61,6 +61,7 @@ struct dev_info_t
 
 struct dev_info_t g_dev_info[] =
 {
+    {0x066f, 0x3700, 0, HID_DEVICE}, /* STMP37xx */
     {0x066f, 0x3780, 1024, HID_DEVICE}, /* i.MX233 / STMP3780 */
     {0x066f, 0x3770, 48, HID_DEVICE}, /* STMP3770 */
     {0x15A2, 0x004F, 1024, HID_DEVICE}, /* i.MX28 */
@@ -388,6 +389,8 @@ static bool hid_parse_item(uint8_t *buf, int size, struct hid_item_t *item)
 
 static int probe_hid_xfer_size(libusb_device_handle *dev)
 {
+    libusb_detach_kernel_driver(dev, 0);
+    libusb_claim_interface(dev, 0);
     // FIXME detahc kernel and claim interface here ?
     /* get HID descriptor */
     uint8_t buffer[1024];
