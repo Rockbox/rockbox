@@ -55,17 +55,14 @@ struct pcm;
                                    * second call to pcm_write will attempt to
                                    * restart the stream.
                                    */
+#define PCM_MONOTONIC  0x00000008 /* see pcm_get_htimestamp */
 
 /* PCM runtime states */
-#define    PCM_STATE_OPEN         0
-#define    PCM_STATE_SETUP        1
-#define    PCM_STATE_PREPARED     2
-#define    PCM_STATE_RUNNING      3
-#define    PCM_STATE_XRUN         4
-#define    PCM_STATE_DRAINING     5
-#define    PCM_STATE_PAUSED       6
-#define    PCM_STATE_SUSPENDED    7
-#define    PCM_STATE_DISCONNECTED 8
+#define PCM_STATE_RUNNING   3
+#define PCM_STATE_XRUN      4
+#define PCM_STATE_DRAINING  5
+#define PCM_STATE_SUSPENDED 7
+#define PCM_STATE_DISCONNECTED  8
 
 /* Bit formats */
 enum pcm_format {
@@ -75,6 +72,11 @@ enum pcm_format {
     PCM_FORMAT_S24_LE,
 
     PCM_FORMAT_MAX,
+};
+
+/* Bitmask has 256 bits (32 bytes) in asound.h */
+struct pcm_mask {
+    unsigned int bits[32 / sizeof(unsigned int)];
 };
 
 /* Configuration for a stream */
@@ -101,6 +103,11 @@ struct pcm_config {
 /* PCM parameters */
 enum pcm_param
 {
+    /* mask parameters */
+    PCM_PARAM_ACCESS,
+    PCM_PARAM_FORMAT,
+    PCM_PARAM_SUBFORMAT,
+    /* interval parameters */
     PCM_PARAM_SAMPLE_BITS,
     PCM_PARAM_FRAME_BITS,
     PCM_PARAM_CHANNELS,
@@ -138,14 +145,13 @@ int pcm_is_ready(struct pcm *pcm);
 struct pcm_params *pcm_params_get(unsigned int card, unsigned int device,
                                   unsigned int flags);
 void pcm_params_free(struct pcm_params *pcm_params);
+
+struct pcm_mask *pcm_params_get_mask(struct pcm_params *pcm_params,
+        enum pcm_param param);
 unsigned int pcm_params_get_min(struct pcm_params *pcm_params,
                                 enum pcm_param param);
 unsigned int pcm_params_get_max(struct pcm_params *pcm_params,
                                 enum pcm_param param);
-
-/* Set and get config */
-int pcm_get_config(struct pcm *pcm, struct pcm_config *config);
-int pcm_set_config(struct pcm *pcm, struct pcm_config *config);
 
 /* Returns a human readable reason for the last error */
 const char *pcm_get_error(struct pcm *pcm);
@@ -162,10 +168,9 @@ unsigned int pcm_get_buffer_size(struct pcm *pcm);
 unsigned int pcm_frames_to_bytes(struct pcm *pcm, unsigned int frames);
 unsigned int pcm_bytes_to_frames(struct pcm *pcm, unsigned int bytes);
 
-/* Returns the pcm latency in ms */
-unsigned int pcm_get_latency(struct pcm *pcm);
-
 /* Returns available frames in pcm buffer and corresponding time stamp.
+ * The clock is CLOCK_MONOTONIC if flag PCM_MONOTONIC was specified in pcm_open,
+ * otherwise the clock is CLOCK_REALTIME.
  * For an input stream, frames available are frames ready for the
  * application to read.
  * For an output stream, frames available are the number of empty frames available
@@ -185,21 +190,19 @@ int pcm_read(struct pcm *pcm, void *data, unsigned int count);
  * mmap() support.
  */
 int pcm_mmap_write(struct pcm *pcm, const void *data, unsigned int count);
+int pcm_mmap_read(struct pcm *pcm, void *data, unsigned int count);
 int pcm_mmap_begin(struct pcm *pcm, void **areas, unsigned int *offset,
                    unsigned int *frames);
 int pcm_mmap_commit(struct pcm *pcm, unsigned int offset, unsigned int frames);
 
-
+/* Prepare the PCM substream to be triggerable */
+int pcm_prepare(struct pcm *pcm);
 /* Start and stop a PCM channel that doesn't transfer data */
 int pcm_start(struct pcm *pcm);
 int pcm_stop(struct pcm *pcm);
 
 /* Interrupt driven API */
 int pcm_wait(struct pcm *pcm, int timeout);
-
-int pcm_avail_update(struct pcm *pcm);
-
-int pcm_state(struct pcm *pcm);
 
 
 /*

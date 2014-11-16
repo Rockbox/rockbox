@@ -105,6 +105,12 @@ struct system_status global_status;
 #include "lcd-remote.h"
 #endif
 
+#if defined( DX50 ) || defined( DX90 )
+#include "governor-ibasso.h"
+#include "usb-ibasso.h"
+#endif
+
+
 long lasttime = 0;
 
 /** NVRAM stuff, if the target doesnt have NVRAM it is saved in ROCKBOX_DIR /nvram.bin **/
@@ -1072,6 +1078,11 @@ void settings_apply(bool read_disk)
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(global_settings.touch_mode);
     memcpy(&calibration_parameters, &global_settings.ts_calibration_data, sizeof(struct touchscreen_parameter));
+#endif
+
+#if defined( DX50  ) || defined( DX90 )
+    set_governor( global_settings.governor );
+    set_usb_mode( global_settings.usb_mode );
 #endif
 
     /* This should stay last */
