@@ -215,6 +215,18 @@ static void button_tick(void)
             }
             else /* repeat? */
             {
+
+#if defined( DX50 ) || defined( DX90 )
+                /*
+                    Power button long press on these devices does not repeat long enough.
+                    Pressing long enought to register here will do a hard reboot.
+                */ 
+                if( btn & POWEROFF_BUTTON )
+                {
+                    sys_poweroff();
+                }
+#endif
+
                 if ( repeat )
                 {
                     if (!post)

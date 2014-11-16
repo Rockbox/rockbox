@@ -1,13 +1,15 @@
 /***************************************************************************
- *             __________               __   ___.
+ *             __________               __   ___
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2008 by Maurus Cuelenaere
+ * Copyright (C) 2014 by Ilia Sergachev: Initial Rockbox port to iBasso DX50
+ * Copyright (C) 2014 by headwhacker: iBasso DX90 port
+ * Copyright (C) 2014 by Simon Rothen: Initial Rockbox repository submission, additional features
+ * Copyright (C) 2014 by Udo Schläpfer: Code clean up, additional features
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,14 +20,25 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef BACKLIGHT_TARGET_H
-#define BACKLIGHT_TARGET_H
 
-#include <stdbool.h>
 
-bool _backlight_init(void);
-void _backlight_on(void);
-void _backlight_off(void);
-void _backlight_set_brightness(int brightness);
+#ifndef __LCD_TARGET_H__
+#define __LCD_TARGET_H__
 
-#endif /* BACKLIGHT_TARGET_H */
+
+#include "lcd.h"
+
+
+/*
+    Framebuffer device and framebuffer access.
+    See lcd-memframe.c
+*/
+extern fb_data *dev_fb;
+#define LCD_FRAMEBUF_ADDR( col, row ) ( dev_fb + row * LCD_WIDTH + col )
+
+
+/* See lcd-memframe.c */
+extern void lcd_set_active( bool active );
+
+
+#endif
