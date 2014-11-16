@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_db240bb1",
+        "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1000097
+      },
+      "writtenOn": "2014-11-16T18:56:46Z",
+      "side": 1,
+      "message": "I had doubts with this, finally i commented it mainly because it was missed in the old code.\n\nIt is the USEC_TIMER, already configured in emcore, really i think RB should initialize all hardware on start-up and not rely in booltloader configurations.",
+      "parentUuid": "5a18252c_f8b58d7e",
+      "revId": "7ffeb702bbd911b4c03ce131fcbe476aafc932b8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_d8ba516e",
         "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2014-11-14T09:06:59Z",
       "side": 1,
       "message": "Where does IRQ_TIMER get enabled, and why isn\u0027t this in the same place?\nWhereever it is, moving it here might be a good idea, if it doesn\u0027t break anything.",
+      "revId": "7ffeb702bbd911b4c03ce131fcbe476aafc932b8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_fb1f4759",
+        "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1000097
+      },
+      "writtenOn": "2014-11-16T18:56:46Z",
+      "side": 1,
+      "message": "I found it in kernel_init()-\u003einit_tick(), i agree here is a better place for it, not yet tested but seems it could be moved without breaking things.",
+      "parentUuid": "5a18252c_d8ba516e",
       "revId": "7ffeb702bbd911b4c03ce131fcbe476aafc932b8",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_3b3a5fce",
+        "filename": "firmware/target/arm/s5l8702/timer-s5l8702.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1000097
+      },
+      "writtenOn": "2014-11-16T18:56:46Z",
+      "side": 1,
+      "message": "I am more inclined to think it is an initialization hardware bug, it only occurs the first time the timer is used after power-up. I was thinking on launching it on initialization to allow to clear the bits before RB uses it, but casually discovered that it is not necessary if the timer is configured as explained.",
+      "parentUuid": "5a18252c_38b0a58b",
+      "revId": "7ffeb702bbd911b4c03ce131fcbe476aafc932b8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_18ade931",
         "filename": "firmware/target/arm/s5l8702/timer-s5l8702.c",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2014-11-14T09:06:59Z",
       "side": 1,
       "message": "Might be a good idea to add a \"clear\" to that comment for clarity.",
+      "revId": "7ffeb702bbd911b4c03ce131fcbe476aafc932b8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_1b37a3e4",
+        "filename": "firmware/target/arm/s5l8702/timer-s5l8702.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1000097
+      },
+      "writtenOn": "2014-11-16T18:56:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a18252c_18ade931",
       "revId": "7ffeb702bbd911b4c03ce131fcbe476aafc932b8",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
