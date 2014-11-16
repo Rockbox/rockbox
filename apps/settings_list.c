@@ -62,6 +62,11 @@
 #include "onplay.h"
 #endif
 
+#if defined( DX50 ) || defined( DX90 )
+#include "governor-ibasso.h"
+#include "usb-ibasso.h"
+#endif
+
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
      and you may need to update it if you edit this file */
@@ -2150,6 +2155,44 @@ const struct settings_list settings[] = {
                   NULL, "root menu order",
                   root_menu_load_from_cfg, root_menu_write_to_cfg,
                   root_menu_is_changed, root_menu_set_default),
+
+#if defined( DX50 ) || defined( DX90 )
+    CHOICE_SETTING( 0,
+                    governor,
+                    LANG_IBASSO_FREQ_SCALING_GOVERNOR,
+                    GOVERNOR_CONSERVATIVE,
+                    "freq scaling govornor",
+                    "conservative,ondemand,powersave,interactive,performance",
+                    NULL,
+                    5,
+                    ID2P( LANG_IBASSO_FREQ_SCALING_GOVERNOR_CONSERVATIVE ),
+                    ID2P( LANG_IBASSO_FREQ_SCALING_GOVERNOR_ONDEMAND ),
+                    ID2P( LANG_IBASSO_FREQ_SCALING_GOVERNOR_POWERSAVE ),
+                    ID2P( LANG_IBASSO_FREQ_SCALING_GOVERNOR_INTERACTIVE ),
+                    ID2P( LANG_IBASSO_FREQ_SCALING_GOVERNOR_PERFORMANCE ) ),
+    CHOICE_SETTING( 0,
+                    hold_switch_mode,
+                    LANG_IBASSO_HOLD_SWITCH_LOCK_MODE,
+                    HOLD_SWITCH_LOCK_ALL,
+                    "hold switch mode",
+                    "all,touch,touch power volume",
+                    NULL,
+                    3,
+                    ID2P( LANG_IBASSO_HOLD_SWITCH_MODE_LOCK_ALL ),
+                    ID2P( LANG_IBASSO_HOLD_SWITCH_MODE_LOCK_TOUCH ),
+                    ID2P( LANG_IBASSO_HOLD_SWITCH_MODE_LOCK_TOUCH_POWER_VOLUME ) ),
+    CHOICE_SETTING( 0,
+                    usb_mode,
+                    LANG_IBASSO_USB_MODE,
+                    USB_MODE_MASS_STORAGE,
+                    "usb mode",
+                    "mass storage,charge,adb",
+                    NULL,
+                    3,
+                    ID2P( LANG_IBASSO_USB_MODE_MASS_STORAGE ),
+                    ID2P( LANG_IBASSO_USB_MODE_CHARGE ),
+                    ID2P( LANG_IBASSO_USB_MODE_ADB ) ),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);
