@@ -145,10 +145,39 @@ void pcm_play_dma_pause(bool pause)
 /* set the configured PCM frequency */
 void pcm_dma_apply_settings(void)
 {
+    static uint16_t last_clkcon3l = 0;
+    uint16_t clkcon3l;
+    int fsel;
+
+    /* For unknown reasons, s5l8702 I2S controller does not synchronize
+     * with CS42L55 at 32000 Hz. To fix it, the CODEC is configured with
+     * a sample rate of 48000 Hz and MCLK is decreased 1/3 to 8 Mhz,
+     * obtaining 32 KHz in LRCK controller input and 8 MHz in SCLK input.
+     * OF uses this trick.
+     */
+    if (pcm_fsel == HW_FREQ_32) {
+        fsel = HW_FREQ_48;
+        clkcon3l = 0x3028;  /* PLL2 / 3 / 9 -> 8 MHz */
+    }
+    else {
+        fsel = pcm_fsel;
+        clkcon3l = 0;  /* OSC0 -> 12 MHz */
+    }
+
+    /* configure MCLK */
+    /* TODO: maybe all CLKCON management should be moved to
+       cscodec-ipod6g.c and system-s5l8702.c */
+    if (last_clkcon3l != clkcon3l) {
+        CLKCON3 = (CLKCON3 & ~0xffff) | 0x8000 | clkcon3l;
+        udelay(100);
+        CLKCON3 &= ~0x8000;  /* CLKCON3L on */
+        last_clkcon3l = clkcon3l;
+    }
+
     /* configure I2S clock ratio */
-    I2SCLKDIV = MCLK_FREQ / hw_freq_sampr[pcm_fsel];
+    I2SCLKDIV = MCLK_FREQ / hw_freq_sampr[fsel];
     /* select CS42L55 sample rate */
-    audiohw_set_frequency(pcm_fsel);
+    audiohw_set_frequency(fsel);
 }
 
 void pcm_play_dma_init(void)
