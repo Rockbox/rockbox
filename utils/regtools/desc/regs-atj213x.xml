@@ -106,6 +106,32 @@
     </reg>
     <reg name="DEVCLKEN" desc="">
       <addr name="DEVCLKEN" addr="0x80"/>
+      <field name="RESERVED31_27" desc="" bitrange="31:27"/>
+      <field name="GPIO" desc="" bitrange="26:26"/>
+      <field name="KEY" desc="" bitrange="25:25"/>
+      <field name="RESERVED24" desc="" bitrange="24:24"/>
+      <field name="I2C" desc="" bitrange="23:23"/>
+      <field name="UART" desc="" bitrange="22:22"/>
+      <field name="RESERVED21_19" desc="" bitrange="21:19"/>
+      <field name="ADC" desc="" bitrange="18:18"/>
+      <field name="DAC" desc="" bitrange="17:17"/>
+      <field name="DSPC" desc="" bitrange="16:16"/>
+      <field name="MCA" desc="" bitrange="15:15"/>
+      <field name="MHA" desc="" bitrange="14:14"/>
+      <field name="USBC" desc="" bitrange="13:13"/>
+      <field name="RESERVED12" desc="" bitrange="12:12"/>
+      <field name="SD" desc="" bitrange="11:11"/>
+      <field name="RESERVED10" desc="" bitrange="10:10"/>
+      <field name="NAND" desc="" bitrange="9:9"/>
+      <field name="DMAC" desc="" bitrange="8:8"/>
+      <field name="PCNT" desc="" bitrange="7:7"/>
+      <field name="SDRM" desc="" bitrange="6:6"/>
+      <field name="SDRC" desc="" bitrange="5:5"/>
+      <field name="DSPM" desc="" bitrange="4:4"/>
+      <field name="RESERVED3" desc="" bitrange="3:3"/>
+      <field name="RMOC" desc="" bitrange="2:2"/>
+      <field name="YUV" desc="" bitrange="1:1"/>
+      <field name="RESERVED0" desc="" bitrange="0:0"/>
     </reg>
     <reg name="DEVRST" desc="">
       <addr name="DEVRST" addr="0x84"/>
@@ -263,6 +289,24 @@
   </dev>
   <dev name="GPIO" long_name="" desc="" version="1.0">
     <addr name="GPIO" addr="0xb01c0000"/>
+    <reg name="OUTEN" desc="">
+      <addr name="AOUTEN" addr="0x0"/>
+      <addr name="BOUTEN" addr="0xc"/>
+    </reg>
+    <reg name="INEN" desc="">
+      <addr name="AINEN" addr="0x4"/>
+      <addr name="BINEN" addr="0x10"/>
+    </reg>
+    <reg name="DAT" desc="">
+      <addr name="ADAT" addr="0x8"/>
+      <addr name="BDAT" addr="0x14"/>
+    </reg>
+    <reg name="MFCTL0" desc="">
+      <addr name="MFCTLO" addr="0x18"/>
+    </reg>
+    <reg name="MFCTL1" desc="">
+      <addr name="MFCTL1" addr="0x1c"/>
+    </reg>
   </dev>
   <dev name="I2C" long_name="" desc="" version="1.0">
     <addr name="I2C0" addr="0xb0180000"/>
@@ -397,12 +441,84 @@
     <addr name="PMU" addr="0xb0000000"/>
     <reg name="CTL" desc="">
       <addr name="CTL" addr="0x0"/>
+      <field name="LBRM" desc="" bitrange="31:31"/>
+      <field name="VCVS" desc="" bitrange="30:28"/>
+      <field name="LBNM" desc="" bitrange="27:27"/>
+      <field name="VDVS" desc="" bitrange="26:24"/>
+      <field name="VCDE" desc="" bitrange="23:23"/>
+      <field name="VCVD" desc="" bitrange="22:20"/>
+      <field name="VDDE" desc="" bitrange="19:19"/>
+      <field name="VDVD" desc="" bitrange="18:16"/>
+      <field name="BLEN" desc="" bitrange="15:15"/>
+      <field name="VCOE" desc="" bitrange="14:14"/>
+      <field name="LA6E" desc="" bitrange="13:13"/>
+      <field name="LA4E" desc="" bitrange="12:12"/>
+      <field name="IBIAS" desc="" bitrange="11:10"/>
+      <field name="OSCFREQ" desc="" bitrange="9:8"/>
+      <field name="DC1M" desc="" bitrange="7:7"/>
+      <field name="DC2M" desc="" bitrange="6:6"/>
+      <field name="BLVS" desc="" bitrange="5:3"/>
+      <field name="VDV0" desc="" bitrange="2:2"/>
+      <field name="PWRM" desc="" bitrange="1:0"/>
     </reg>
     <reg name="LRADC" desc="">
       <addr name="LRADC" addr="0x4"/>
+      <field name="RESERVED31_28" desc="" bitrange="31:28"/>
+      <field name="REMOADC4" desc="" bitrange="27:24"/>
+      <field name="RESERVED23_20" desc="" bitrange="23:22"/>
+      <field name="BATADC6" desc="" bitrange="21:16"/>
+      <field name="RESERVED15_14" desc="" bitrange="15:14"/>
+      <field name="TEMPADC6" desc="" bitrange="13:8"/>
+      <field name="RESERVED7_0" desc="" bitrange="7:0"/>
     </reg>
     <reg name="CHG" desc="">
       <addr name="CHG" addr="0x8"/>
+      <field name="EN" desc="" bitrange="31:31"/>
+      <field name="CURRENT" desc="" bitrange="30:28">
+        <value name="CURRENT_50mA" value="0x0" desc=""/>
+        <value name="CURRENT_100mA" value="0x1" desc=""/>
+        <value name="CURRENT_150mA" value="0x2" desc=""/>
+        <value name="CURRENT_200mA" value="0x3" desc=""/>
+        <value name="CURRENT_250mA" value="0x4" desc=""/>
+        <value name="CURRENT_300mA" value="0x5" desc=""/>
+        <value name="CURRENT_400mA" value="0x6" desc=""/>
+        <value name="CURRENT_500mA" value="0x7" desc=""/>
+      </field>
+      <field name="STAT" desc="" bitrange="27:27">
+        <value name="DISCHARGING" value="0x0" desc=""/>
+        <value name="CHARGING" value="0x1" desc=""/>
+      </field>
+      <field name="CHGPHASE" desc="" bitrange="26:25">
+        <value name="RESERVED" value="0x0" desc=""/>
+        <value name="PRECHARGE" value="0x1" desc=""/>
+        <value name="CC" value="0x2" desc=""/>
+        <value name="CV" value="0x3" desc=""/>
+      </field>
+      <field name="RESERVED24_16" desc="" bitrange="24:16"/>
+      <field name="PBLS" desc="" bitrange="15:15"/>
+      <field name="PPHS" desc="" bitrange="14:14"/>
+      <field name="RESERVED13" desc="" bitrange="13:13"/>
+      <field name="PDUT" desc="" bitrange="12:8"/>
+      <field name="RESERVED7" desc="" bitrange="7:7"/>
+      <field name="BLV0" desc="" bitrange="6:6"/>
+      <field name="TMPSET" desc="" bitrange="5:4">
+        <value name="TEMP_40C" value="0x0" desc=""/>
+        <value name="TEMP_45C" value="0x1" desc=""/>
+        <value name="TEMP_50C" value="0x2" desc=""/>
+        <value name="TEMP_55C" value="0x3" desc=""/>
+      </field>
+      <field name="LBNMIVS" desc="" bitrange="3:2">
+        <value name="VOLTAGE_2_9" value="0x0" desc=""/>
+        <value name="VOLTAGE_3_1" value="0x1" desc=""/>
+        <value name="VOLTAGE_3_3" value="0x2" desc=""/>
+        <value name="VOLTAGE_3_5" value="0x3" desc=""/>
+      </field>
+      <field name="LBRVS" desc="" bitrange="1:0">
+        <value name="VOLTAGE_2_7" value="0x0" desc=""/>
+        <value name="VOLTAGE_2_9" value="0x1" desc=""/>
+        <value name="VOLTAGE_3_1" value="0x2" desc=""/>
+        <value name="VOLTAGE_3_3" value="0x3" desc=""/>
+      </field>
     </reg>
   </dev>
   <dev name="RTCWDT" long_name="Real Time Clock, Timers and Watchdog" desc="" version="1.0">
@@ -412,15 +528,43 @@
     </reg>
     <reg name="DHMS" desc="">
       <addr name="DHMS" addr="0x4"/>
+      <field name="RESERVED31_27" desc="" bitrange="31:27"/>
+      <field name="DAY" desc="" bitrange="26:24"/>
+      <field name="RESERVED23_21" desc="" bitrange="23:21"/>
+      <field name="HOUR" desc="" bitrange="20:16"/>
+      <field name="RESERVED15_14" desc="" bitrange="15:14"/>
+      <field name="MIN" desc="" bitrange="13:8"/>
+      <field name="RESERVED7_6" desc="" bitrange="7:6"/>
+      <field name="SEC" desc="" bitrange="5:0"/>
     </reg>
     <reg name="YMD" desc="">
       <addr name="YMD" addr="0x8"/>
+      <field name="RESERVED31" desc="" bitrange="31:31"/>
+      <field name="CENT" desc="" bitrange="30:24"/>
+      <field name="RESERVED23" desc="" bitrange="23:23"/>
+      <field name="YEAR" desc="" bitrange="22:16"/>
+      <field name="RESERVED15_12" desc="" bitrange="15:12"/>
+      <field name="MON" desc="" bitrange="11:8"/>
+      <field name="RESERVED7_5" desc="" bitrange="7:5"/>
+      <field name="DATE" desc="" bitrange="4:0"/>
     </reg>
     <reg name="DHMSALM" desc="">
       <addr name="DHMSALM" addr="0xc"/>
+      <field name="RESERVED31_21" desc="" bitrange="31:21"/>
+      <field name="HOURAL" desc="" bitrange="20:16"/>
+      <field name="RESERVED15_14" desc="" bitrange="15:14"/>
+      <field name="MINAL" desc="" bitrange="13:8"/>
+      <field name="RESERVED7_6" desc="" bitrange="7:6"/>
+      <field name="SECAL" desc="" bitrange="5:0"/>
     </reg>
     <reg name="YMDALM" desc="">
       <addr name="YMDALM" addr="0x10"/>
+      <field name="RESERVED31_23" desc="" bitrange="31:23"/>
+      <field name="YEARAL" desc="" bitrange="22:16"/>
+      <field name="RESERVED15_12" desc="" bitrange="15:12"/>
+      <field name="MONAL" desc="" bitrange="11:8"/>
+      <field name="RESERVED7_5" desc="" bitrange="7:5"/>
+      <field name="DATEAL" desc="" bitrange="4:0"/>
     </reg>
     <reg name="WDCTL" desc="">
       <addr name="WDCTL" addr="0x14"/>
