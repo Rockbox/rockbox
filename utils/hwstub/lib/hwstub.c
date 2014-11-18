@@ -140,7 +140,8 @@ int hwstub_get_log(struct hwstub_device_t *dev, void *buf, size_t sz)
         HWSTUB_GET_LOG, 0, dev->intf, buf, sz, 1000);
 }
 
-static int _hwstub_read(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz)
+static int _hwstub_read(struct hwstub_device_t *dev, uint8_t breq, uint32_t addr,
+    void *buf, size_t sz)
 {
     struct hwstub_read_req_t read;
     read.dAddress = addr;
@@ -151,10 +152,11 @@ static int _hwstub_read(struct hwstub_device_t *dev, uint32_t addr, void *buf, s
         return -1;
     return libusb_control_transfer(dev->handle,
         LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN,
-        HWSTUB_READ2, dev->id++, dev->intf, buf, sz, 1000);
+        breq, dev->id++, dev->intf, buf, sz, 1000);
 }
 
-static int _hwstub_write(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz)
+static int _hwstub_write(struct hwstub_device_t *dev, uint8_t breq, uint32_t addr,
+    const void *buf, size_t sz)
 {
     size_t hdr_sz = sizeof(struct hwstub_write_req_t);
     struct hwstub_write_req_t *req = malloc(sz + hdr_sz);
@@ -162,9 +164,25 @@ static int _hwstub_write(struct hwstub_device_t *dev, uint32_t addr, void *buf, 
     memcpy(req + 1, buf, sz);
     int size = libusb_control_transfer(dev->handle,
         LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT,
-        HWSTUB_WRITE, dev->id++, dev->intf, (void *)req, sz + hdr_sz, 1000);
+        breq, dev->id++, dev->intf, (void *)req, sz + hdr_sz, 1000);
     free(req);
     return size - hdr_sz;
+}
+
+int hwstub_read_atomic(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz)
+{
+    /* reject any read greater than the buffer, it makes no sense anyway */
+    if(sz > dev->buf_sz)
+        return -1;
+    return _hwstub_read(dev, HWSTUB_READ2_ATOMIC, addr, buf, sz);
+}
+
+int hwstub_write_atomic(struct hwstub_device_t *dev, uint32_t addr, const void *buf, size_t sz)
+{
+    /* reject any write greater than the buffer, it makes no sense anyway */
+    if(sz + sizeof(struct hwstub_write_req_t) > dev->buf_sz)
+        return -1;
+    return _hwstub_write(dev, HWSTUB_WRITE_ATOMIC, addr, buf, sz);
 }
 
 /* Intermediate function which make sure we don't overflow the device buffer */
@@ -173,7 +191,7 @@ int hwstub_read(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz
     int cnt = 0;
     while(sz > 0)
     {
-        int xfer = _hwstub_read(dev, addr, buf, MIN(sz, dev->buf_sz));
+        int xfer = _hwstub_read(dev, HWSTUB_READ2, addr, buf, MIN(sz, dev->buf_sz));
         if(xfer <  0)
             return xfer;
         sz -= xfer;
@@ -185,13 +203,13 @@ int hwstub_read(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz
 }
 
 /* Intermediate function which make sure we don't overflow the device buffer */
-int hwstub_write(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz)
+int hwstub_write(struct hwstub_device_t *dev, uint32_t addr, const void *buf, size_t sz)
 {
     int cnt = 0;
     while(sz > 0)
     {
-        int xfer = _hwstub_write(dev, addr, buf, MIN(sz, dev->buf_sz -
-            sizeof(struct hwstub_write_req_t)));
+        int xfer = _hwstub_write(dev, HWSTUB_WRITE, addr, buf, 
+            MIN(sz, dev->buf_sz - sizeof(struct hwstub_write_req_t)));
         if(xfer <  0)
             return xfer;
         sz -= xfer;
@@ -205,6 +223,12 @@ int hwstub_write(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t s
 int hwstub_rw_mem(struct hwstub_device_t *dev, int read, uint32_t addr, void *buf, size_t sz)
 {
     return read ? hwstub_read(dev, addr, buf, sz) : hwstub_write(dev, addr, buf, sz);
+}
+
+int hwstub_rw_mem_atomic(struct hwstub_device_t *dev, int read, uint32_t addr, void *buf, size_t sz)
+{
+    return read ? hwstub_read_atomic(dev, addr, buf, sz) :
+        hwstub_write_atomic(dev, addr, buf, sz);
 }
 
 int hwstub_exec(struct hwstub_device_t *dev, uint32_t addr, uint16_t flags)

@@ -26,7 +26,7 @@
  */
 
 #define HWSTUB_VERSION_MAJOR    4
-#define HWSTUB_VERSION_MINOR    0
+#define HWSTUB_VERSION_MINOR    1
 
 #define HWSTUB_VERSION__(maj, min) #maj"."#min
 #define HWSTUB_VERSION_(maj, min) HWSTUB_VERSION__(maj, min)
@@ -140,6 +140,8 @@ struct hwstub_device_desc_t
 #define HWSTUB_READ2    0x42
 #define HWSTUB_WRITE    0x43
 #define HWSTUB_EXEC     0x44
+#define HWSTUB_READ2_ATOMIC 0x45
+#define HWSTUB_WRITE_ATOMIC 0x46
 
 /**
  * HWSTUB_GET_LOG:
@@ -147,11 +149,14 @@ struct hwstub_device_desc_t
  */
 
 /**
- * HWSTUB_READ and HWSTUB_READ2:
+ * HWSTUB_READ and HWSTUB_READ2(_ATOMIC):
  * Read a range of memory. The request works in two steps: first the host
  * sends HWSTUB_READ with the parameters (address, length) and then
  * a HWSTUB_READ2 to retrieve the buffer. Both requests must use the same
  * ID in wValue, otherwise the second request will be STALLed.
+ * HWSTUB_READ2_ATOMIC behaves the same as HWSTUB_READ2 except that the read
+ * is guaranteed to be atomic (ie performed as a single memory access) and
+ * will be STALLed if atomicity can not be ensured.
  */
 
 struct hwstub_read_req_t
@@ -163,6 +168,7 @@ struct hwstub_read_req_t
  * HWSTUB_WRITE
  * Write a range of memory. The payload starts with the following header, everything
  * which follows is data.
+ * HWSTUB_WRITE_ATOMIC behaves the same except it is atomic. See HWSTUB_READ2_ATOMIC.
  */
 struct hwstub_write_req_t
 {

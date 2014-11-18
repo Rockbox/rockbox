@@ -2,9 +2,11 @@
 asm/arm/memcpy.S
 asm/arm/memmove.S
 asm/arm/memset.S
+asm/arm/atomic_rw.S
 #elif defined(CPU_MIPS)
 asm/mips/memcpy.S
 asm/mips/memset.S
+asm/mips/atomic_rw.S
 #else
 #error "Unimplemented ISA"
 #endif
