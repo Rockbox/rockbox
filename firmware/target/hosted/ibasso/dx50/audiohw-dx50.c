@@ -77,3 +77,33 @@ void audiohw_set_volume( int volume )
 
     fclose( f );
 }
+
+
+void audiohw_set_filter_roll_off( int val )
+{
+    DEBUGF( "%s: val: %d", __func__, val );
+
+    FILE *f = fopen( "/sys/class/codec/es9018_filter", "w" );
+    if( f == NULL )
+    {
+        DEBUGF( "ERROR %s: Can not open /sys/class/codec/es9018_filter for writing.", __func__ );
+        return;
+    }
+
+    if( val == 1 )
+    {
+        if( fputc( 1, f ) == EOF )
+        {
+            DEBUGF( "ERROR %s: Write failed for /sys/class/codec/es9018_filter.", __func__ );
+        }
+    }
+    else
+    {
+        if( fputc( 0, f ) == EOF )
+        {
+            DEBUGF( "ERROR %s: Write failed for /sys/class/codec/es9018_filter.", __func__ );
+        }
+    }
+
+    fclose( f );
+}

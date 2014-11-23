@@ -361,6 +361,13 @@ void pcm_play_dma_start( const void *addr, size_t size )
     */
     if( system( NULL ) )
     {
+        /*
+            DX50
+            Mute:   echo 'A' > /sys/class/codec/mute 
+            Unmute: echo 'B' > /sys/class/codec/mute
+
+            DX90?
+        */
         system( "/system/bin/muteopen" );
     }
     else
