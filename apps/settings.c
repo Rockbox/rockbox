@@ -106,6 +106,7 @@ struct system_status global_status;
 #endif
 
 #if defined( DX50 ) || defined( DX90 )
+#include "batterylog-ibasso.h"
 #include "governor-ibasso.h"
 #include "usb-ibasso.h"
 #endif
@@ -1083,6 +1084,14 @@ void settings_apply(bool read_disk)
 #if defined( DX50  ) || defined( DX90 )
     set_governor( global_settings.governor );
     set_usb_mode( global_settings.usb_mode );
+    if( global_settings.batterylog )
+    {
+        batterylog_start();
+    }
+    else
+    {
+        batterylog_stop();
+    }
 #endif
 
     /* This should stay last */

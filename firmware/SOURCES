@@ -1836,6 +1836,7 @@ target/hosted/filesystem-unix.c
 target/hosted/lc-unix.c
 target/hosted/ibasso/audiohw-ibasso.c
 target/hosted/ibasso/backlight-ibasso.c
+target/hosted/ibasso/batterylog-ibasso.c
 target/hosted/ibasso/button-ibasso.c
 #ifdef DEBUG
 target/hosted/ibasso/debug-ibasso.c
