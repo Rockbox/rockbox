@@ -302,10 +302,70 @@
       <addr name="BDAT" addr="0x14"/>
     </reg>
     <reg name="MFCTL0" desc="">
-      <addr name="MFCTLO" addr="0x18"/>
+      <addr name="MFCTL0" addr="0x18"/>
+      <field name="RESERVED31_25" desc="" bitrange="31:25"/>
+      <field name="GPIOA2_0" desc="" bitrange="24:22">
+        <value name="NAND_CLE_RB_ALE" value="0x1" desc=""/>
+        <value name="LCD_RS_WD9_WD0" value="0x2" desc=""/>
+        <value name="SD_CMD" value="0x4" desc=""/>
+      </field>
+      <field name="CEB6" desc="" bitrange="21:20">
+        <value name="LCD_CE" value="0x2" desc=""/>
+        <value name="SD_CLK" value="0x3" desc=""/>
+      </field>
+      <field name="RESERVED19_16" desc="" bitrange="19:16"/>
+      <field name="CEB3" desc="" bitrange="15:14">
+        <value name="NAND_CEB3" value="0x1" desc=""/>
+        <value name="LCD_CE" value="0x2" desc=""/>
+      </field>
+      <field name="CEB2" desc="" bitrange="13:12">
+        <value name="NAND_CEB2" value="0x1" desc=""/>
+        <value name="LCD_CE" value="0x2" desc=""/>
+      </field>
+      <field name="CEB1" desc="" bitrange="11:10">
+        <value name="NAND_CEB1" value="0x1" desc=""/>
+        <value name="LCD_CE" value="0x2" desc=""/>
+      </field>
+      <field name="CEB0" desc="" bitrange="9:8">
+        <value name="NAND_CEB0" value="0x1" desc=""/>
+        <value name="LCD_CE" value="0x2" desc=""/>
+      </field>
+      <field name="WRRD" desc="" bitrange="7:6">
+        <value name="NAND_WR_RD" value="0x1" desc=""/>
+        <value name="LCD_WRB_RDB" value="0x2" desc=""/>
+      </field>
+      <field name="NAND_D7_0" desc="" bitrange="5:3">
+        <value name="NAND_D7_0" value="0x1" desc=""/>
+        <value name="LCD_WD17_10" value="0x2" desc=""/>
+      </field>
+      <field name="NAND_D15_8" desc="" bitrange="2:0">
+        <value name="NAND_D15_8" value="0x1" desc=""/>
+        <value name="LCD_WD8_1" value="0x2" desc=""/>
+        <value name="SDR_D7_0" value="0x4" desc=""/>
+      </field>
     </reg>
     <reg name="MFCTL1" desc="">
       <addr name="MFCTL1" addr="0x1c"/>
+      <field name="MFEN" desc="" bitrange="31:31"/>
+      <field name="RESERVED30_18" desc="" bitrange="30:18"/>
+      <field name="SD2E" desc="" bitrange="17:17"/>
+      <field name="RBS" desc="" bitrange="16:16"/>
+      <field name="RESERVED15_12" desc="" bitrange="15:12"/>
+      <field name="SIR0" desc="" bitrange="11:11"/>
+      <field name="SPTR" desc="" bitrange="10:9">
+        <value name="I2C1_SCL_ADA" value="0x1" desc=""/>
+        <value name="UART2_TX_RX" value="0x2" desc=""/>
+      </field>
+      <field name="U2TR" desc="" bitrange="8:8">
+        <value name="UART2_TX_RX" value="0x0" desc=""/>
+        <value name="I2C2_SCL_SDA" value="0x1" desc=""/>
+      </field>
+      <field name="RESERVED7_6" desc="" bitrange="7:6"/>
+      <field name="I2C1SS" desc="" bitrange="5:4">
+        <value name="I2C1_SCL_SDA" value="0x0" desc=""/>
+        <value name="UART2_TX_RX" value="0x1" desc=""/>
+      </field>
+      <field name="RESERVED3_0" desc="" bitrange="3:0"/>
     </reg>
   </dev>
   <dev name="I2C" long_name="" desc="" version="1.0">
