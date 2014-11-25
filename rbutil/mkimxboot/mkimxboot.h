@@ -64,6 +64,7 @@ enum imx_model_t
     MODEL_ZENSTYLE, /* Style 100 and Style 300 */
     MODEL_NWZE370,
     MODEL_NWZE360,
+    MODEL_ZENXFI,
     /* new models go here */
 
     NUM_MODELS

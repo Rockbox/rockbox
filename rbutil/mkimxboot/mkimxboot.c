@@ -187,6 +187,12 @@ static const struct imx_md5sum_t imx_sums[] =
         /* Version 1.00.00 */
         MODEL_NWZE370, "412f8ccd453195c0bebcc1fd8376322f", "1.00.00",
         { [VARIANT_DEFAULT] = {0, 16429056 } }
+    },
+    /** Creative ZEN X-FI bootloader (FRESC) */
+    {
+        /* Version 1.04.08e */
+        MODEL_ZENXFI, "41f530825a21f563eb34ea72bf7947b2", "1.04.08e",
+        { [VARIANT_DEFAULT] = {0, 694672 } }
     }
 };
 
@@ -195,6 +201,14 @@ static struct crypto_key_t zero_key =
     .method = CRYPTO_KEY,
     .u.key = {0}
 };
+
+static struct crypto_key_t zenxfi_key =
+{
+    .method = CRYPTO_KEY,
+    .u.key = {0x01, 0x1f, 0x72, 0xbc, 0x2a, 0xc9, 0xf6, 0xdf,
+             0x0d, 0xb9, 0x63, 0x68, 0xd9, 0x7b, 0xeb, 0xb5 }
+};
+
 
 static const struct imx_model_desc_t imx_models[] =
 {
@@ -212,6 +226,8 @@ static const struct imx_model_desc_t imx_models[] =
                        1, &zero_key, 0, 0x40000000 },
     [MODEL_NWZE360] = {"NWZ-E360", dualboot_nwze360, sizeof(dualboot_nwze360), "e360", 89,
                        1, &zero_key, 0, 0x40000000 },
+    [MODEL_ZENXFI] = {"Zen X-Fi", NULL, 0, "zxfi", 86,
+                       1, &zenxfi_key, 0, 0x40000000 },
 };
 
 #define NR_IMX_SUMS     (sizeof(imx_sums) / sizeof(imx_sums[0]))
@@ -471,6 +487,9 @@ static enum imx_error_t patch_firmware(enum imx_model_t model,
         case MODEL_ZENXFISTYLE:
             /* The ZEN X-Fi Style uses the standard ____, host, play sections, patch after first
              * call in ____ section. */
+            return patch_std_zero_host_play(1, model, type, sb_file, boot_fw);
+        case MODEL_ZENXFI:
+            /* The ZEN X-Fi uses a single ____ section, patch after first call */
             return patch_std_zero_host_play(1, model, type, sb_file, boot_fw);
         default:
             return IMX_DONT_KNOW_HOW_TO_PATCH;

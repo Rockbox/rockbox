@@ -66,6 +66,7 @@ struct dev_info_t g_dev_info[] =
     {0x066f, 0x3770, 48, HID_DEVICE}, /* STMP3770 */
     {0x15A2, 0x004F, 1024, HID_DEVICE}, /* i.MX28 */
     {0x066f, 0x3600, 4096, RECOVERY_DEVICE}, /* STMP36xx */
+    {0x041e, 0x415a, 64, HID_DEVICE}, /* ZEN X-Fi recovery (STMP37xx) */
 };
 
 /* Command Block Descriptor (CDB) */
