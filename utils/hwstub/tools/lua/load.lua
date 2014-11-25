@@ -10,4 +10,5 @@ elseif hwstub.dev.target.id == hwstub.dev.target.ATJ then
     require "atj"
 end
 
+require "hwlib"
 require "dumper"
