@@ -206,6 +206,26 @@ int my_lua_writen(lua_State *state)
     return 0;
 }
 
+int my_lua_call(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 1)
+        luaL_error(state, "call takes target address argument");
+
+    hwstub_call(g_hwdev, luaL_checkunsigned(state, 1));
+    return 0;
+}
+
+int my_lua_jump(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 1)
+        luaL_error(state, "jump takes target address argument");
+
+    hwstub_jump(g_hwdev, luaL_checkunsigned(state, 1));
+    return 0;
+}
+
 int my_lua_printlog(lua_State *state)
 {
     print_log(g_hwdev);
@@ -329,6 +349,10 @@ bool my_lua_import_hwstub()
     lua_setfield(g_lua, -2, "write32");
     lua_pushcclosure(g_lua, my_lua_printlog, 0);
     lua_setfield(g_lua, -2, "print_log");
+    lua_pushcclosure(g_lua, my_lua_call, 0);
+    lua_setfield(g_lua, -2, "call");
+    lua_pushcclosure(g_lua, my_lua_jump, 0);
+    lua_setfield(g_lua, -2, "jump");
 
     lua_setfield(g_lua, -2, "dev");
 

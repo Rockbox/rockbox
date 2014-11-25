@@ -40,6 +40,8 @@ do
     h:add("It contains some information about the device and the following methods.");
     h:add("* read8/16/32(a) reads a 8/16/32-bit integer at address a atomically");
     h:add("* write8/16/32(a, v) writes the 8/16/32-bit integer v at address a atomically");
+    h:add("* jump(a) jump to specified address");
+    h:add("* call(a) call function at specified address and return to hwstub");
     h:add("* print_log() prints the device log");
 
     h = HELP:create_topic("HW");
