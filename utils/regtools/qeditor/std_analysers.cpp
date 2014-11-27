@@ -33,7 +33,7 @@ QWidget *ClockAnalyser::GetWidget()
 
 bool ClockAnalyser::SupportSoc(const QString& soc_name)
 {
-    return soc_name == "imx233" || soc_name == "rk27xx";
+    return (soc_name == "imx233" || soc_name == "rk27xx" || soc_name == "atj213x");
 }
 
 QString ClockAnalyser::GetFreq(unsigned freq)
@@ -84,8 +84,235 @@ void ClockAnalyser::FillTree()
     m_tree_widget->clear();
     if(m_soc.GetSoc().name == "imx233") FillTreeIMX233();
     else if(m_soc.GetSoc().name == "rk27xx") FillTreeRK27XX();
+    else if(m_soc.GetSoc().name == "atj213x") FillTreeATJ213X();
     m_tree_widget->expandAll();
     m_tree_widget->resizeColumnToContents(0);
+}
+
+void ClockAnalyser::FillTreeATJ213X()
+{
+    soc_word_t pllbypass, pllclk, en, coreclks, tmp0, tmp1, tmp2, tmp3;
+
+    BackendHelper helper(m_io_backend, m_soc);
+
+    // system oscillators 32.768k and 24M
+    QTreeWidgetItem *losc_clk = AddClock(0, "losc clk", 32768);
+    QTreeWidgetItem *hosc_clk = AddClock(0, "hosc clk", 24000000);
+
+    // core pll
+    QTreeWidgetItem *corepll = 0;
+    if (helper.ReadRegisterField("CMU", "COREPLL", "CPEN", en) &&
+        helper.ReadRegisterField("CMU", "COREPLL", "CPBY", pllbypass) &&
+        helper.ReadRegisterField("CMU", "COREPLL", "CPCK", pllclk))
+    {
+        corepll = AddClock(hosc_clk, "core pll", en ? FROM_PARENT : DISABLED,
+                           pllbypass ? 1 : pllclk, pllbypass ? 1 : 4);
+    }
+    else
+    {
+        corepll = AddClock(hosc_clk, "core pll", INVALID);
+    }
+
+    // dsp pll
+    QTreeWidgetItem *dsppll = 0;
+    if (helper.ReadRegisterField("CMU", "DSPPLL", "DPEN", en) &&
+        helper.ReadRegisterField("CMU", "DSPPLL", "DPCK", pllclk))
+    {
+        dsppll = AddClock(hosc_clk, "dsp pll", en ? FROM_PARENT : DISABLED,
+                           pllbypass ? 1 : pllclk, pllbypass ? 1 : 4);
+    }
+    else
+    {
+        dsppll = AddClock(hosc_clk, "dsp pll", INVALID);
+    }
+
+    // audio pll
+    QTreeWidgetItem *adcpll = 0;
+    QTreeWidgetItem *dacpll = 0;
+    if (helper.ReadRegisterField("CMU", "AUDIOPLL", "APEN", en) &&
+        helper.ReadRegisterField("CMU", "AUDIOPLL", "ADCCLK", tmp0) &&
+        helper.ReadRegisterField("CMU", "AUDIOPLL", "DACCLK", tmp1))
+    {
+        if (en)
+        {
+            adcpll = AddClock(hosc_clk, "audio adc pll", tmp0 ? 22579200 : 24576000);
+            dacpll = AddClock(hosc_clk, "audio dac pll", tmp1 ? 22579200 : 24576000);
+        }
+        else
+        {
+            adcpll = AddClock(hosc_clk, "audio adc pll", DISABLED);
+            dacpll = AddClock(hosc_clk, "audio dac pll", DISABLED);
+        }
+    }
+    else
+    {
+        adcpll = AddClock(hosc_clk, "audio adc pll", INVALID);
+        dacpll = AddClock(hosc_clk, "audio dac pll", INVALID);
+    }
+
+    // audio clocks
+    QTreeWidgetItem *adcclk = 0;
+    QTreeWidgetItem *dacclk = 0;
+    if (helper.ReadRegisterField("CMU", "AUDIOPLL", "ADCCLK", tmp0) &&
+        helper.ReadRegisterField("CMU", "AUDIOPLL", "DACCLK", tmp1))
+    {
+        adcclk = AddClock(adcpll, "audio adc clk", FROM_PARENT, 1, tmp0+1);
+        dacclk = AddClock(dacpll, "audio dac clk", FROM_PARENT, 1, tmp1+1);
+    }
+    else
+    {
+        adcclk = AddClock(adcpll, "audio adc clk", INVALID);
+        dacclk = AddClock(adcpll, "audio dac clk", INVALID);
+    }
+
+    // cpu clock
+    QTreeWidgetItem *cpuclk = 0;
+    if (helper.ReadRegisterField("CMU", "BUSCLK", "CORECLKS", coreclks) &&
+        helper.ReadRegisterField("CMU", "BUSCLK", "CCLKDIV", tmp0))
+    {
+        if (coreclks == 0)
+            cpuclk = AddClock(losc_clk, "cpu clk", FROM_PARENT, 1, tmp0+1);
+        else if (coreclks == 1)
+            cpuclk = AddClock(hosc_clk, "cpu clk", FROM_PARENT, 1, tmp0+1);
+        else if (coreclks == 2)
+            cpuclk = AddClock(corepll, "cpu clk", FROM_PARENT, 1, tmp0+1);
+        else
+            cpuclk = AddClock(corepll, "cpu clk", INVALID);
+    }
+    else
+    {
+        cpuclk = AddClock(corepll, "cpu clk", INVALID);
+    }
+
+    // system clock
+    QTreeWidgetItem *sysclk = 0;
+    if (helper.ReadRegisterField("CMU", "BUSCLK", "SCLKDIV", tmp0))
+        sysclk = AddClock(cpuclk, "system clk", FROM_PARENT, 1, tmp0+1);
+    else
+        sysclk = AddClock(cpuclk, "system clk", INVALID);
+
+    // peripherial clk
+    QTreeWidgetItem *pclk = 0;
+    if (helper.ReadRegisterField("CMU", "BUSCLK", "PCLKDIV", tmp0))
+        pclk = AddClock(sysclk, "peripherial clk", FROM_PARENT, 1, tmp0 ? tmp0+1 : 2);
+    else
+        pclk = AddClock(sysclk, "peripherial clk", INVALID);
+
+    // sdram clk
+    QTreeWidgetItem *sdrclk = 0;
+    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "SDRC", en) &&
+        helper.ReadRegisterField("CMU", "DEVCLKEN", "SDRM", tmp0) &&
+        helper.ReadRegisterField("SDR", "EN", "EN", tmp1) &&
+        helper.ReadRegisterField("CMU", "SDRCLK", "SDRDIV", tmp2))
+    {
+        en &= tmp0 & tmp1;
+        sdrclk = AddClock(sysclk, "sdram clk", en ? FROM_PARENT: DISABLED, 1, tmp2+1);
+    }
+    else
+        sdrclk = AddClock(sysclk, "sdram clk", INVALID);
+
+    // nand clk
+    QTreeWidgetItem *nandclk = 0;
+    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "NAND", en) &&
+        helper.ReadRegisterField("CMU", "NANDCLK", "NANDDIV", tmp0))
+        nandclk = AddClock(corepll, "nand clk", en ? FROM_PARENT : DISABLED, 1, tmp0+1);
+    else
+        nandclk = AddClock(corepll, "nand clk", INVALID);
+
+    // sd clk
+    QTreeWidgetItem *sdclk = 0;
+    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "SD", tmp0) &&
+        helper.ReadRegisterField("CMU", "SDCLK", "CKEN" , tmp1) &&
+        helper.ReadRegisterField("CMU", "SDCLK", "D128" , tmp2) &&
+        helper.ReadRegisterField("CMU", "SDCLK", "SDDIV" , tmp3))
+    {
+        en = tmp0 & tmp1;
+        sdclk = AddClock(corepll, "sd clk", en ? FROM_PARENT : DISABLED,
+                         1, tmp2 ? 128*(tmp3+1) : (tmp3));
+    }
+    else
+        sdclk = AddClock(corepll, "sd clk", INVALID);
+
+    // mha clk
+    QTreeWidgetItem *mhaclk = 0;
+    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "MHA", en) &&
+        helper.ReadRegisterField("CMU", "MHACLK", "MHADIV", tmp1))
+        mhaclk = AddClock(corepll, "mha clk", en ? FROM_PARENT : DISABLED,
+                          1, tmp1+1);
+    else
+        mhaclk = AddClock(corepll, "mha clk", INVALID);
+
+    // mca clk
+    QTreeWidgetItem *mcaclk = 0;
+    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "MCA", en) &&
+        helper.ReadRegisterField("CMU", "MCACLK", "MCADIV", tmp1))
+        mcaclk = AddClock(corepll, "mca clk", en ? FROM_PARENT : DISABLED,
+                          1, tmp1+1);
+    else
+        mcaclk = AddClock(corepll, "mca clk", INVALID);
+
+    // backlight pwm
+    QTreeWidgetItem *pwmclk = 0;
+    if (helper.ReadRegisterField("CMU", "FMCLK", "BCKE", en) &&
+        helper.ReadRegisterField("CMU", "FMCLK", "BCKS", tmp1) &&
+        helper.ReadRegisterField("CMU", "FMCLK", "BCKCON", tmp2))
+    {
+        if (tmp1)
+        {
+            // HOSC/8 input clk
+            pwmclk = AddClock(hosc_clk, "pwm clk", en ? FROM_PARENT : DISABLED,
+                              1, 3*(tmp2+1));
+        }
+        else
+        {
+            // LOSC input clk
+            pwmclk = AddClock(losc_clk, "pwm clk", en ? FROM_PARENT : DISABLED,
+                              1, tmp2+1);
+        }
+    }
+    else
+        pwmclk = AddClock(losc_clk, "pwm clk", INVALID);
+
+    // i2c clk
+    QTreeWidgetItem *i2c1clk = 0;
+    QTreeWidgetItem *i2c2clk = 0;
+    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "I2C", en) &&
+        helper.ReadRegisterField("I2C1", "CTL", "EN", tmp0) &&
+        helper.ReadRegisterField("I2C1", "CLKDIV", "CLKDIV", tmp1))
+    {
+        en &= tmp0;
+        i2c1clk = AddClock(pclk, "i2c1 clk", en ? FROM_PARENT : DISABLED,
+                           1, 16*(tmp1+1));
+    }
+    else
+    {
+        i2c1clk = AddClock(pclk, "i2c1 clk", INVALID);
+    }
+
+    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "I2C", en) &&
+        helper.ReadRegisterField("I2C2", "CTL", "EN", tmp0) &&
+        helper.ReadRegisterField("I2C2", "CLKDIV", "CLKDIV", tmp1))
+    {
+        en &= tmp0;
+        i2c2clk = AddClock(pclk, "i2c2 clk", en ? FROM_PARENT : DISABLED,
+                           1, 16*(tmp1+1));
+    }
+    else
+    {   
+        i2c2clk = AddClock(pclk, "i2c2 clk", INVALID);
+    }
+
+    Q_UNUSED(dsppll);
+    Q_UNUSED(adcclk);
+    Q_UNUSED(dacclk);
+    Q_UNUSED(sdrclk);
+    Q_UNUSED(nandclk);
+    Q_UNUSED(sdclk);
+    Q_UNUSED(mhaclk);
+    Q_UNUSED(mcaclk);
+    Q_UNUSED(pwmclk);
+    Q_UNUSED(i2c1clk);
+    Q_UNUSED(i2c2clk);
 }
 
 void ClockAnalyser::FillTreeRK27XX()
