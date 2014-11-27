@@ -60,6 +60,7 @@ pacbox
     || defined(SANSA_CLIPV2) || (LCD_DEPTH == 2)) \
     && (MEMORYSIZE > 2 && !defined(RB_PROFILE))
 doom
+wolf3d
 #endif
 
 /* For all the swcodec targets */
