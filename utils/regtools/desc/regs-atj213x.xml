@@ -70,41 +70,96 @@
     <addr name="CMU" addr="0xb0010000"/>
     <reg name="COREPLL" desc="">
       <addr name="COREPLL" addr="0x0"/>
+      <field name="RESERVED31_11" desc="" bitrange="31:11"/>
+      <field name="CPBY" desc="Core PLL Bypass " bitrange="10:10"/>
+      <field name="CPBI" desc="Core PLL Bias " bitrange="9:8"/>
+      <field name="CPEN" desc="Core PLL Enable " bitrange="7:7"/>
+      <field name="HOEN" desc="High Oscillator Enable" bitrange="6:6"/>
+      <field name="CPCK" desc="COREPLLout = CPCK * 6 (MHz) (in range 12 - 378MHz)" bitrange="5:0"/>
     </reg>
     <reg name="DSPPLL" desc="">
       <addr name="DSPPLL" addr="0x4"/>
+      <field name="RESERVED31_9" desc="" bitrange="31:9"/>
+      <field name="DPBI" desc="DSP PLL Bias" bitrange="8:7"/>
+      <field name="DPEN" desc="DSP PLL Enable" bitrange="6:6"/>
+      <field name="DPCK" desc="DSPPLLout = DPCK * 6 (MHz) (in range 12-378MHz)" bitrange="5:0"/>
     </reg>
     <reg name="AUDIOPLL" desc="">
       <addr name="AUDIOPLL" addr="0x8"/>
+      <field name="RESERVED31_12" desc="" bitrange="31:12"/>
+      <field name="ADCPLL" desc="Audio PLL CLk Control" bitrange="11:11"/>
+      <field name="ADCCLK" desc="ADC Clock Divisor, output is FS*256" bitrange="10:8"/>
+      <field name="RESERVED7" desc="" bitrange="7:7"/>
+      <field name="APBI" desc="Audio PLL Bias" bitrange="6:5"/>
+      <field name="APEN" desc="Audio PLL Enable" bitrange="4:4"/>
+      <field name="DACPLL" desc="DAC PLL CLk Control" bitrange="3:3"/>
+      <field name="DACCLK" desc="DAC Clock Divisor, output is FS*256" bitrange="2:0"/>
     </reg>
-    <reg name="BUSCLK" desc="">
+    <reg name="BUSCLK" desc="Bus CLK Control Register">
       <addr name="BUSCLK" addr="0xc"/>
+      <field name="KEYE" desc="Key Wakeup Enable" bitrange="31:31"/>
+      <field name="ALME" desc="Alarm Wakeup Enable" bitrange="30:30"/>
+      <field name="SIRE" desc="SIRQ Wakeup Enable" bitrange="29:29"/>
+      <field name="RESERVED28" desc="" bitrange="28:28"/>
+      <field name="USBE" desc="Usb Wakeup Enable" bitrange="27:27"/>
+      <field name="RESERVED26:12" desc="" bitrange="26:12"/>
+      <field name="PCLKDIV" desc="Peripheral CLK Divisor" bitrange="11:8"/>
+      <field name="CORECLKS" desc="CPU Clock Selection" bitrange="7:6"/>
+      <field name="SCLKDIV" desc="System Clock Divisor" bitrange="5:4"/>
+      <field name="CCLKDIV" desc="CPU Clock Divisor" bitrange="3:2"/>
+      <field name="DCEN" desc="Core CLK DC Enable" bitrange="1:1"/>
     </reg>
-    <reg name="SDRCLK" desc="">
+    <reg name="SDRCLK" desc="SDRAM Interface CLK Control Register">
       <addr name="SDRCLK" addr="0x10"/>
+      <field name="RESERVED31_2" desc="" bitrange="31:2"/>
+      <field name="SDRDIV" desc="" bitrange="1:0"/>
     </reg>
-    <reg name="NANDCLK" desc="">
+    <reg name="NANDCLK" desc="NAND Interface CLK Control Register">
       <addr name="NANDCLK" addr="0x18"/>
+      <field name="RESERVED31_4" desc="" bitrange="31:4"/>
+      <field name="NANDDIV" desc="" bitrange="3:0"/>
     </reg>
-    <reg name="SDCLK" desc="">
+    <reg name="SDCLK" desc="SD Interface CLK Control Register&#10;">
       <addr name="SDCLK" addr="0x1c"/>
+      <field name="RESERVED31_6" desc="" bitrange="31:6"/>
+      <field name="CKEN" desc="SD Interface Clock Enable" bitrange="5:5"/>
+      <field name="D128" desc="Enable Divide 128 circuit" bitrange="4:4"/>
+      <field name="SDDIV" desc="" bitrange="3:0"/>
     </reg>
-    <reg name="MHACLK" desc="">
+    <reg name="MHACLK" desc="MHA CLK Control Register">
       <addr name="MHACLK" addr="0x20"/>
+      <field name="RESERVED31_4" desc="" bitrange="31:4"/>
+      <field name="MHADIV" desc="" bitrange="3:0"/>
     </reg>
-    <reg name="UART2CLK" desc="">
+    <reg name="UART2CLK" desc="Uart2 CLK Control Register">
       <addr name="UART2CLK" addr="0x2c"/>
+      <field name="RESERVED31_17" desc="" bitrange="31:17"/>
+      <field name="U2EN" desc="Uart2 Clock Enable &#10;" bitrange="16:16"/>
+      <field name="UART2DIV" desc="" bitrange="15:0"/>
     </reg>
-    <reg name="DMACLK" desc="">
+    <reg name="DMACLK" desc="DMA CLK Control Register">
       <addr name="DMACLK" addr="0x30"/>
+      <field name="RESERVED31_4" desc="" bitrange="31:4"/>
+      <field name="D7EN" desc="DMA 7 (Special Channel) Clock Enable" bitrange="3:3"/>
+      <field name="D6EN" desc="DMA 6 (Special Channel) Clock Enable" bitrange="2:2"/>
+      <field name="D5EN" desc="DMA 5 (Special Channel) Clock Enable" bitrange="1:1"/>
+      <field name="D4EN" desc="DMA 4 (Special Channel) Clock Enable" bitrange="0:0"/>
     </reg>
-    <reg name="FMCLK" desc="">
+    <reg name="FMCLK" desc="FM CLK Control Register">
       <addr name="FMCLK" addr="0x34"/>
+      <field name="RESERVED31_6" desc="" bitrange="31:6"/>
+      <field name="BCKE" desc="PWM Back Light clock Enable" bitrange="5:5"/>
+      <field name="BCKS" desc="Back Light CLK source select" bitrange="4:4"/>
+      <field name="BCKCON" desc="Divided PWM Back Light Special Clock Control" bitrange="3:2"/>
+      <field name="CLKS" desc="FM Clock Output Selection" bitrange="1:1"/>
+      <field name="OUTE" desc="FM Clock Output Enable (From Test Pin)" bitrange="0:0"/>
     </reg>
-    <reg name="MCACLK" desc="">
+    <reg name="MCACLK" desc="MCA CLK Control Register">
       <addr name="MCACLK" addr="0x38"/>
+      <field name="RESERVED31_4" desc="" bitrange="31:4"/>
+      <field name="MCADIV" desc="" bitrange="3:0"/>
     </reg>
-    <reg name="DEVCLKEN" desc="">
+    <reg name="DEVCLKEN" desc="Device CLK Control Register">
       <addr name="DEVCLKEN" addr="0x80"/>
       <field name="RESERVED31_27" desc="" bitrange="31:27"/>
       <field name="GPIO" desc="" bitrange="26:26"/>
@@ -133,8 +188,36 @@
       <field name="YUV" desc="" bitrange="1:1"/>
       <field name="RESERVED0" desc="" bitrange="0:0"/>
     </reg>
-    <reg name="DEVRST" desc="">
+    <reg name="DEVRST" desc="Device Reset Control Register">
       <addr name="DEVRST" addr="0x84"/>
+      <field name="RESERVED31" desc="" bitrange="31:31"/>
+      <field name="GPIO" desc="" bitrange="30:30"/>
+      <field name="KEY" desc="" bitrange="29:29"/>
+      <field name="RESERVED28" desc="" bitrange="28:28"/>
+      <field name="I2C" desc="" bitrange="27:27"/>
+      <field name="UART" desc="" bitrange="26:26"/>
+      <field name="RESERVED25_23" desc="" bitrange="25:23"/>
+      <field name="ADC" desc="" bitrange="22:22"/>
+      <field name="DAC" desc="" bitrange="21:21"/>
+      <field name="DSPC" desc="DSP control block reset" bitrange="20:20"/>
+      <field name="INTC" desc="" bitrange="19:19"/>
+      <field name="RTC" desc="" bitrange="18:18"/>
+      <field name="PMU" desc="" bitrange="17:17"/>
+      <field name="RESERVED16_14" desc="" bitrange="16:14"/>
+      <field name="DSPM" desc="SRAM DSP MEM reset" bitrange="13:13"/>
+      <field name="TVENC" desc="" bitrange="12:12"/>
+      <field name="YUV" desc="" bitrange="11:11"/>
+      <field name="MCA" desc="" bitrange="10:10"/>
+      <field name="USB" desc="" bitrange="9:9"/>
+      <field name="RESERVED8" desc="" bitrange="8:8"/>
+      <field name="MHA" desc="" bitrange="7:7"/>
+      <field name="SD" desc="" bitrange="6:6"/>
+      <field name="NAND" desc="" bitrange="5:5"/>
+      <field name="RESERVED4" desc="" bitrange="4:4"/>
+      <field name="DMAC" desc="" bitrange="3:3"/>
+      <field name="PCNT" desc="" bitrange="2:2"/>
+      <field name="RESERVED1" desc="" bitrange="1:1"/>
+      <field name="SDR" desc="SDRAM Control register and SDRAM block Reset" bitrange="0:0"/>
     </reg>
   </dev>
   <dev name="DAC" long_name="Digital Analog Converter" desc="" version="1.0">
@@ -369,8 +452,56 @@
     </reg>
   </dev>
   <dev name="I2C" long_name="" desc="" version="1.0">
-    <addr name="I2C0" addr="0xb0180000"/>
-    <addr name="I2C1" addr="0xb0180020"/>
+    <addr name="I2C1" addr="0xb0180000"/>
+    <addr name="I2C2" addr="0xb0180020"/>
+    <reg name="CTL" desc="">
+      <addr name="CTL" addr="0x0"/>
+      <field name="RESERVED31_9" desc="" bitrange="31:9"/>
+      <field name="PUEN" desc="nternal Pull-up Resistor (4.7k) Enable" bitrange="8:8"/>
+      <field name="EN" desc="Block enable" bitrange="7:7"/>
+      <field name="SIE" desc="START Condition Generates IRQ Enable (only for slave mode)" bitrange="6:6"/>
+      <field name="IRQE" desc="IRQ Enable" bitrange="5:5"/>
+      <field name="MS" desc="Mode select" bitrange="4:4">
+        <value name="MASTER" value="0x0" desc=""/>
+        <value name="SLAVE" value="0x0" desc=""/>
+      </field>
+      <field name="GBCC" desc="Generating Bus Control Condition (only for master mode)" bitrange="3:2">
+        <value name="NOP" value="0x0" desc=""/>
+        <value name="START" value="0x1" desc=""/>
+        <value name="STOP" value="0x2" desc=""/>
+        <value name="REPEATED_START" value="0x3" desc=""/>
+      </field>
+      <field name="RB" desc="Release Bus. Writing 1 to this bit will release the clock and data line to idle. MCU should write 1 to this bit after transmitting or receiving the last bit of&#10;the whole transfer.&#10;" bitrange="1:1"/>
+      <field name="GRAS" desc="Generating/Receiving Acknowledge Signal" bitrange="0:0"/>
+    </reg>
+    <reg name="CLKDIV" desc="">
+      <addr name="CLKDIV" addr="0x4"/>
+      <field name="RESERVED31_8" desc="" bitrange="31:8"/>
+      <field name="CLKDIV" desc="Clock Divider Factor (only for master mode). I2Cx clock (SCL) can select standard (100kbps) mode and fast (400kbps) mode. Calculating SCL is as follows: SCL=PCLK/(CLKDIV*16)&#10;" bitrange="7:0"/>
+    </reg>
+    <reg name="STAT" desc="">
+      <addr name="STAT" addr="0x8"/>
+      <field name="RESERVED31_8" desc="" bitrange="31:8"/>
+      <field name="TRC" desc="Transmit/Receive Complete Bit" bitrange="7:7"/>
+      <field name="STPD" desc="STOP Detect Bit " bitrange="6:6"/>
+      <field name="STAD" desc="START Detect Bit" bitrange="5:5"/>
+      <field name="RWST" desc="Read/Write Status Bit (only for Slave mode)" bitrange="4:4"/>
+      <field name="LBST" desc="Last Byte Status Bit" bitrange="3:3"/>
+      <field name="IRQP" desc="IRQ Pending Bit" bitrange="2:2"/>
+      <field name="OVST" desc="Overflow Status Bit" bitrange="1:1"/>
+      <field name="WCO" desc="Writing Collision Bit" bitrange="0:0"/>
+    </reg>
+    <reg name="ADDR" desc="">
+      <addr name="ADDR" addr="0xc"/>
+      <field name="RESERVED31_8" desc="" bitrange="31:8"/>
+      <field name="SDAD" desc="Slave Device Address" bitrange="7:1"/>
+      <field name="RWCM" desc="Read/Write Control or Match" bitrange="0:0"/>
+    </reg>
+    <reg name="DAT" desc="">
+      <addr name="DAT" addr="0x10"/>
+      <field name="RESERVED31_8" desc="" bitrange="31:8"/>
+      <field name="TXRXDAT" desc="Transmit/Receive Data" bitrange="7:0"/>
+    </reg>
   </dev>
   <dev name="INTC" long_name="Interrupt Controller" desc="" version="1.0">
     <addr name="INTC" addr="0xb0020000"/>
@@ -688,6 +819,8 @@
     </reg>
     <reg name="EN" desc="">
       <addr name="EN" addr="0x8"/>
+      <field name="RESERVED31_1" desc="" bitrange="31:1"/>
+      <field name="EN" desc="" bitrange="0:0"/>
     </reg>
     <reg name="CMD" desc="">
       <addr name="CMD" addr="0xc"/>

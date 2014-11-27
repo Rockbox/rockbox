@@ -42,6 +42,7 @@ private:
     void FillTree();
     void FillTreeIMX233();
     void FillTreeRK27XX();
+    void FillTreeATJ213X();
 
 private:
     QGroupBox *m_group;
