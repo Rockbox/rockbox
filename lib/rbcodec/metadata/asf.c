@@ -279,13 +279,12 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                      * (little endian byte order) */
                     lseek(fd, 32, SEEK_CUR);
                     read_uint64le(fd, &wfx->numpackets);
-                    //DEBUGF("read packets:  %llx %lld\n", wfx->numpackets, wfx->numpackets);
+                    /*DEBUGF("read packets:  %llx %lld\n", wfx->numpackets, wfx->numpackets);*/
                     
                     /* Now get the play duration - uint64_t at offset 40 */
-                    //lseek(fd, 4, SEEK_CUR);
                     read_uint64le(fd, &play_duration);
                     id3->length = play_duration / 10000;
-                    //DEBUGF("****** length = %lums\n", id3->length);
+                    /*DEBUGF("****** length = %lums\n", id3->length);*/
 
                     /* Read the packet size - uint32_t at offset 68 */
                     lseek(fd, 20, SEEK_CUR);

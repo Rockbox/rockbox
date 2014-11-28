@@ -50,7 +50,7 @@ enum codec_status codec_run(void)
     int audiobufsize;           /* Payload size */
     int packetlength = 0;       /* Logical packet size (minus the header size) */          
     int outlen = 0;             /* Number of bytes written to the output buffer */
-    int pktcnt = 0;             /* Count of the packets played */
+    unsigned int pktcnt = 0;             /* Count of the packets played */
     uint8_t *data;              /* Pointer to decoder input buffer */
     int size;                   /* Size of the input frame to the decoder */
     intptr_t param;
