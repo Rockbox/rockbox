@@ -5,6 +5,7 @@
 
     .set mips32r2
     .set noreorder
+    .set noat
 
     .section .init.text,"ax",%progbits
 
@@ -18,6 +19,30 @@ load_addr:
                                # account for branch delay slot
                                # and very first 'di' instruction
 
+core_clk_setup:
+    la      t0, 0xb0010000     # CMU base
+    li      t1, 0x440          # HOSC enable, bypass
+    sw      t1, 0(t0)          # CMU_COREPLL
+
+    li      t1, 0x350          # CORECLKS 24M, CCLKDIV = 1, SCLKDIV = 2,
+                               # PCLKDIV = 4
+    sw      t1, 0x0c(t0)       # CMU_BUSCLK
+    li      t1, 0xc6           # HOSC enable, PLL enable, 6*6M = 36M
+    sw      t1, 0(t0)          # CMU_COREPLL
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop                        # arbitrary 300ns delay as there is no
+                               # PLL lock feedback
+    li      t1, 0x390          # CORECLKS COREPLL, CCLKDIV = 1, SCLKDIV = 2,
+                               # PCLKDIV = 4
+    sw      t1, 0x0c(t0)       # CMU_BUSCLK
+
+cache_setup:
     la      t0, 0x80000000     # an idx op should use an unmappable address
     ori     t1, t0, 0x4000     # 16kB cache
     mtc0    zero, C0_TAGLO
@@ -53,11 +78,13 @@ reloc_loop:
                                # icache invalidate
 
     addiu t0, t0, 16           # inc dst addr
-    blt t0, t1, reloc_loop
+    slt t2, t0, t1
+    bnez t2, reloc_loop
     addiu v0, v0, 16           # inc src addr
 
 entry_point_jump:
     la t0, entry_point
+    sync
     jr.hb t0
     nop
 
@@ -200,6 +227,7 @@ restore:
     addiu sp, sp, 84
     move sp, k1
     eret
+    nop
 
     .set reorder
     .set at
