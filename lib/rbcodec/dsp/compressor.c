@@ -185,7 +185,7 @@ static bool compressor_update(struct dsp_config *dsp,
                  auto_gain ? "Auto" : "Off");
          }
 
-        if (settings->ratio != cur_set.ratio)
+        if (settings->ratio != curr_set.ratio)
         {
             if (ratio)
                 { logf("   Compressor Ratio: %d:1", ratio); }
@@ -193,16 +193,16 @@ static bool compressor_update(struct dsp_config *dsp,
                 { logf("   Compressor Ratio: Limit"); }
         }
 
-        if (settings->knee != cur_set.knee)
+        if (settings->knee != curr_set.knee)
         {
             logf("   Compressor Knee: %s", soft_knee?"Soft":"Hard");
         }
 
-        if (settings->release_time != cur_set.release_time)
+        if (settings->release_time != curr_set.release_time)
         {
             logf("   Compressor Release: %d", release);
         }
-        if (settings->attack_time != cur_set.attack_time)
+        if (settings->attack_time != curr_set.attack_time)
         {
             logf("   Compressor Attack: %d", attack);
         }
@@ -357,7 +357,7 @@ static bool compressor_update(struct dsp_config *dsp,
     for (int i = 1; i <= 65; i++)
     {
         DEBUGF("%02d: %.6f  ", i, (float)comp_curve[i] / UNITY);
-        if (i % 4 == 0) DEBUGF("\n");
+        if (i % 4 == 0) { DEBUGF("\n"); }
     }
     DEBUGF("\n");
 

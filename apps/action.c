@@ -77,6 +77,10 @@ static inline int do_button_check(const struct button_mapping *items,
     {
         if (items[i].button_code == button)
         {
+            /*
+                CAVEAT: This will allways return the action without pre_button_code if it has a
+                lower index in the list.
+            */
             if ((items[i].pre_button_code == BUTTON_NONE)
                 || (items[i].pre_button_code == last_button))
             {
