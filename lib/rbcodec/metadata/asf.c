@@ -275,16 +275,16 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
 
                     fileprop = 1;
                     
-                    /* Get the number of logical packets - uint16_t at offset 31 
-                     * (Big endian byte order) */
-                    lseek(fd, 31, SEEK_CUR);
-                    read_uint16be(fd, &wfx->numpackets);
+                    /* Get the number of logical packets - uint64_t at offset 32
+                     * (little endian byte order) */
+                    lseek(fd, 32, SEEK_CUR);
+                    read_uint64le(fd, &wfx->numpackets);
+                    //DEBUGF("read packets:  %llx %lld\n", wfx->numpackets, wfx->numpackets);
                     
                     /* Now get the play duration - uint64_t at offset 40 */
-                    lseek(fd, 7, SEEK_CUR);
+                    //lseek(fd, 4, SEEK_CUR);
                     read_uint64le(fd, &play_duration);
                     id3->length = play_duration / 10000;
-
                     //DEBUGF("****** length = %lums\n", id3->length);
 
                     /* Read the packet size - uint32_t at offset 68 */
@@ -338,8 +338,22 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                         read_uint16le(fd, &wfx->bitspersample);
                         read_uint16le(fd, &wfx->datalen);
 
-                        /* Round bitrate to the nearest kbit */
-                        id3->bitrate = (wfx->bitrate + 500) / 1000;
+                        /*sanity check the included bitrate by comparing to file size and length*/
+                        unsigned int estimated_bitrate =  (wfx->packet_size*wfx->numpackets)/id3->length*8000;
+
+                        /*in theory we could just use the estimated bitrate always,
+                          but its safer to underestimate*/
+                        if( wfx->bitrate > estimated_bitrate)
+                        {
+                            /* Round bitrate to the nearest kbit */
+                            id3->bitrate = (estimated_bitrate + 500) / 1000;
+                        }
+                        else
+                        {
+                            /* Round bitrate to the nearest kbit */
+                            id3->bitrate = (wfx->bitrate + 500) / 1000;
+                        }
+                        /*DEBUGF("bitrate:  %d estimated:  %d\n", wfx->bitrate, estimated_bitrate);*/
                         id3->frequency = wfx->rate;
 
                         if (wfx->codec_id == ASF_CODEC_ID_WMAV1) {

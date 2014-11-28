@@ -33,7 +33,7 @@ struct asf_waveformatex_s {
     uint16_t blockalign;
     uint16_t bitspersample;
     uint16_t datalen;
-    uint16_t numpackets;
+    uint64_t numpackets;
     uint8_t data[46];
 };
 typedef struct asf_waveformatex_s asf_waveformatex_t;

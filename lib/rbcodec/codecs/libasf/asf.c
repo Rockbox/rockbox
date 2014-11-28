@@ -386,11 +386,17 @@ int asf_get_timestamp(int *duration)
 int asf_seek(int ms, asf_waveformatex_t* wfx)
 {
     int time, duration, delta, temp, count=0;
+    int bitrate = ci->id3->bitrate*1000/8;
 
     /*estimate packet number from bitrate*/
     int initial_packet = ci->curpos/wfx->packet_size;
-    int packet_num = (((int64_t)ms)*(wfx->bitrate>>3))/wfx->packet_size/1000;
-    int last_packet = ci->id3->filesize / wfx->packet_size;
+    int packet_num = (((int64_t)ms)*(bitrate))/wfx->packet_size/1000;
+    /*subtract header size in case theres a lot of metadata*/
+    int last_packet = (ci->id3->filesize-ci->id3->first_frame_offset) / wfx->packet_size;
+
+    /*
+    DEBUGF("bitrate:  %d\n", bitrate);
+    DEBUGF("attempting seek to: %d ms, initialp: %d, lastp: %d, estimating packet: %d, packet size:  %d\n", ms, initial_packet, last_packet, packet_num, wfx->packet_size);*/
 
     if (packet_num > last_packet) {
         packet_num = last_packet;
@@ -409,7 +415,7 @@ int asf_seek(int ms, asf_waveformatex_t* wfx)
 
         /*check the time stamp of our packet*/
         time = asf_get_timestamp(&duration);
-        /*DEBUGF("seeked to %d ms with duration %d\n", time, duration);*/
+        /*DEBUGF("seeked to %d ms (%d) with duration %d\n", time,packet_num, duration);*/
 
         if (time < 0) {
             /*unknown error, try to recover*/
@@ -427,7 +433,7 @@ int asf_seek(int ms, asf_waveformatex_t* wfx)
             delta = ms-time;
             /*estimate new packet number from bitrate and our current position*/
             temp += delta;
-            packet_num = ((temp/1000)*(wfx->bitrate>>3) - (wfx->packet_size>>1))/wfx->packet_size;  //round down!
+            packet_num = ((temp/1000)*(bitrate) - (wfx->packet_size<<1))/wfx->packet_size;  //round down!
             packet_offset = packet_num*wfx->packet_size;
             ci->seek_buffer(ci->id3->first_frame_offset+packet_offset);
         }
