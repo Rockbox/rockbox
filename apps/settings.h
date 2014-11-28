@@ -291,7 +291,7 @@ struct user_settings
     /* audio settings */
 
     int volume;     /* audio output volume in decibels range depends on the dac */
-    int balance;    /* stereo balance:          0-100 0=left  50=bal 100=right  */
+    int balance;    /* stereo balance: -100 - +100 -100=left  0=bal +100=right  */
     int bass;       /* bass boost/cut in decibels                               */
     int treble;     /* treble boost/cut in decibels                             */
     int channel_config; /* Stereo, Mono, Custom, Mono left, Mono right, Karaoke */
@@ -838,6 +838,12 @@ struct user_settings
     int play_frequency; /* core audio output frequency selection */
 #endif
     int volume_limit; /* maximum volume limit */
+
+#if defined( DX50 ) || defined( DX90 )
+    int governor;
+    int hold_switch_mode;
+    int usb_mode;
+#endif
 };
 
 /** global variables **/

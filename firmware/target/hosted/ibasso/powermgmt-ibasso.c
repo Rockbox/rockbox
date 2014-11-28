@@ -1,0 +1,82 @@
+/***************************************************************************
+ *             __________               __   ___
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ *
+ * Copyright (C) 2014 by Ilia Sergachev: Initial Rockbox port to iBasso DX50
+ * Copyright (C) 2014 by Mario Basister: iBasso DX90 port
+ * Copyright (C) 2014 by Simon Rothen: Initial Rockbox repository submission, additional features
+ * Copyright (C) 2014 by Udo Schläpfer: Code clean up, additional features
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+
+#include <stdio.h>
+
+#include "config.h"
+#include "debug.h"
+#include "panic.h"
+
+#include "debug-ibasso.h"
+#include "sysfs-ibasso.h"
+
+
+
+
+// Based on batterymonitor with stock Samsung battery.
+
+
+const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
+{
+    3550
+};
+
+
+const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+{
+    3500
+};
+
+
+/* The lower values are a bit fuzzy. */
+const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+{
+    { 3500, 3544, 3578, 3623, 3660, 3773, 3782, 3853, 3980, 4130, 4360 }
+};
+
+
+/* Copied from percent_to_volt_discharge. */
+const unsigned short percent_to_volt_charge[11] =
+{
+    3500, 3544, 3578, 3623, 3660, 3773, 3782, 3853, 3980, 4130, 4360
+};
+
+
+int _battery_voltage( void )
+{
+    //TRACE;
+
+    /*
+        /sys/class/power_supply/battery/voltage_now
+        Voltage in microvolt.
+    */
+    int val;
+    if( ! sysfs_get_int( SYSFS_BATTERY_VOLTAGE_NOW, &val ) )
+    {
+        DEBUGF( "ERROR %s: Can not get current battery voltage.", __func__ );
+        return 0;
+    }
+
+    return( val /  1000 );
+}

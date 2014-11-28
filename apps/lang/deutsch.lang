@@ -33,6 +33,7 @@
 # - Kaspar Rothenfußer
 # - Johannes Linke
 # - Kai Posadowsky
+# - Udo Schläpfer
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -13052,5 +13053,285 @@
   </dest>
   <voice>
     *: "Beschränke automatischen Verzeichniswechsel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE
+  desc: in Settings -> General -> System -> USB Mode
+  user: core
+  <source>
+    *: none
+    ibassodx50: "USB Mode"
+    ibassodx90: "USB Mode"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "USB Modus"
+    ibassodx90: "USB Modus"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "USB Modus"
+    ibassodx90: "USB Modus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> System -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Mass Storage"
+    ibassodx90: "Mass Storage"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Massenspeicher"
+    ibassodx90: "Massenspeicher"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Massenspeicher"
+    ibassodx90: "Massenspeicher"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_CHARGE
+  desc: in Settings -> General -> System -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Charge Only"
+    ibassodx90: "Charge Only"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Nur laden"
+    ibassodx90: "Nur laden"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Nur laden"
+    ibassodx90: "Nur laden"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_ADB
+  desc: in Settings -> General -> System -> USB Mode: ADB
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_HOLD_SWITCH_LOCK_MODE
+  desc: in Settings -> General -> System -> Hold Switch Lock Mode
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Hold Switch Lock Mode"
+    ibassodx90: "Hold Switch Lock Mode"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Tastensperre Modus"
+    ibassodx90: "Tastensperre Modus"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Tastensperre Modus"
+    ibassodx90: "Tastensperre Modus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_HOLD_SWITCH_MODE_LOCK_ALL
+  desc: in Settings -> General -> System -> Hold Switch Mode: All
+  user: core
+  <source>
+    *: none
+    ibassodx50: "All"
+    ibassodx90: "All"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Alle"
+    ibassodx90: "Alle"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Alle"
+    ibassodx90: "Alle"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_HOLD_SWITCH_MODE_LOCK_TOUCH
+  desc: in Settings -> General -> System -> Hold Switch Mode: Touchscreen Only
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Touchscreen Only"
+    ibassodx90: "Touchscreen Only"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Nur Touchscreen"
+    ibassodx90: "Nur Touchscreen"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Nur Touchscreen"
+    ibassodx90: "Nur Touchscreen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_HOLD_SWITCH_MODE_LOCK_TOUCH_POWER_VOLUME
+  desc: in Settings -> General -> System -> Hold Switch Mode: Touchscreen, Power, Volume
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Touchscreen, Power, Volume"
+    ibassodx90: "Touchscreen, Power, Volume"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Touchscreen, Ein-/Ausschalter, Lautstärke"
+    ibassodx90: "Touchscreen, Ein-/Ausschalter, Lautstärke"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Touchscreen, Ein-/Ausschalter, Lautstärke"
+    ibassodx90: "Touchscreen, Ein-/Ausschalter, Lautstärke"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
+  desc: in Settings -> General -> System -> Freq Scaling Governor
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR_CONSERVATIVE
+  desc: in Settings -> General -> System -> Freq Scaling Governor: Conservative
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Conservative"
+    ibassodx90: "Conservative"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Conservative"
+    ibassodx90: "Conservative"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Conservative"
+    ibassodx90: "Conservative"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR_ONDEMAND
+  desc: in Settings -> General -> System -> Freq Scaling Governor: Ondemand
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Ondemand"
+    ibassodx90: "Ondemand"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Ondemand"
+    ibassodx90: "Ondemand"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Ondemand"
+    ibassodx90: "Ondemand"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR_POWERSAVE
+  desc: in Settings -> General -> System -> Freq Scaling Governor: Powersave
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Powersave"
+    ibassodx90: "Powersave"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Powersave"
+    ibassodx90: "Powersave"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Powersave"
+    ibassodx90: "Powersave"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR_INTERACTIVE
+  desc: in Settings -> General -> System -> Freq Scaling Governor: Interactive
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Interactive"
+    ibassodx90: "Interactive"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Interactive"
+    ibassodx90: "Interactive"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Interactive"
+    ibassodx90: "Interactive"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR_PERFORMANCE
+  desc: in Settings -> General -> System -> Freq Scaling Governor: Performance
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Performance"
+    ibassodx90: "Performance"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Performance"
+    ibassodx90: "Performance"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Performance"
+    ibassodx90: "Performance"
   </voice>
 </phrase>
