@@ -1,4 +1,4 @@
-#ifndef HAVE_TOUCHSCREEN
+#if !defined(HAVE_TOUCHSCREEN) || defined(DX50) || defined(DX90)
 /* This is for devices having a keypad, running RockBox as an application */
 #include "SUBDIRS"
 

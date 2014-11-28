@@ -42,6 +42,13 @@
 #endif
 
 #ifndef SIMULATOR
+/*
+    Device specific implementation:
+    bool _backlight_init(void);
+    void _backlight_on(void);
+    void _backlight_off(void);
+    void _backlight_set_brightness(int brightness);
+*/
 #include "backlight-target.h"
 #else
 #include "backlight-sim.h"
