@@ -29,7 +29,6 @@
 #include "lcd.h"
 #include "../kernel-internal.h"
 #include "storage.h"
-#include "file_internal.h"
 #include "usb.h"
 #include "disk.h"
 #include "font.h"
@@ -203,7 +202,7 @@ static void rb_boot(void)
     if(rc)
         error(EATA, rc, true);
 
-    filesystem_init();
+    disk_init();
 
     rc = disk_mount_all();
     if (rc <= 0)

@@ -39,13 +39,10 @@ bool debug_wps = true;
 int wps_verbose_level = 0;
 char *skin_buffer;
 
-const char *sim_root_dir = ".";
+int errno;
+
 const struct settings_list *settings;
 const int nb_settings = 0;
-
-#ifdef SIMULATOR
-#error beep beep
-#endif
 
 /* static endianness conversion */
 #define SWAP_16(x) ((typeof(x))(unsigned short)(((unsigned short)(x) >> 8) | \

@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "config.h" /* for HAVE_MULTIDRIVE */
+#include "fat.h"
 #include "sdmmc.h"
 #include "gcc_extensions.h"
 #ifdef HAVE_HOTSWAP
@@ -1124,28 +1125,35 @@ static void sd_thread(void)
         {
 #ifdef HAVE_HOTSWAP
         case SYS_HOTSWAP_INSERTED:
-        case SYS_HOTSWAP_EXTRACTED:;
-            int success = 1;
+        case SYS_HOTSWAP_EXTRACTED:
+            fat_lock();          /* lock-out FAT activity first -
+                                    prevent deadlocking via disk_mount that
+                                    would cause a reverse-order attempt with
+                                    another thread */
+            mutex_lock(&sd_mtx); /* lock-out card activity - direct calls
+                                    into driver that bypass the fat cache */
 
-            disk_unmount(sd_first_drive+1); /* release "by force" */
+            /* We now have exclusive control of fat cache and ata */
 
-            mutex_lock(&sd_mtx); /* lock-out card activity */
+            disk_unmount(sd_first_drive+1); /* release "by force", ensure file
+                                        descriptors aren't leaked and any busy
+                                        ones are invalid if mounting */
 
             /* Force card init for new card, re-init for re-inserted one or
              * clear if the last attempt to init failed with an error. */
             card_info[1].initialized = 0;
             sd_status[1].retry = 0; 
 
+            if (ev.id == SYS_HOTSWAP_INSERTED)
+                disk_mount(sd_first_drive+1);
+
+            queue_broadcast(SYS_FS_CHANGED, 0);
+
             /* Access is now safe */
             mutex_unlock(&sd_mtx);
-
-            if (ev.id == SYS_HOTSWAP_INSERTED)
-                success = disk_mount(sd_first_drive+1); /* 0 if fail */
-
-            if (success)
-                queue_broadcast(SYS_FS_CHANGED, 0);
+            fat_unlock();
             break;
-#endif /* HAVE_HOTSWAP */
+#endif
         case SYS_TIMEOUT:
             if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
             {

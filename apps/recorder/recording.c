@@ -56,7 +56,7 @@
 #include "timefuncs.h"
 #include "debug.h"
 #include "misc.h"
-#include "pathfuncs.h"
+#include "filefuncs.h"
 #include "tree.h"
 #include "string.h"
 #include "dir.h"

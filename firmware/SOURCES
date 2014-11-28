@@ -59,27 +59,17 @@ target/hosted/sdl/lcd-remote-bitmap.c
 target/hosted/sdl/lcd-sdl.c
 target/hosted/sdl/system-sdl.c
 #ifdef HAVE_SDL_THREADS
-target/hosted/sdl/filesystem-sdl.c
+target/hosted/sdl/thread-sdl.c
+#else
 #endif
-target/hosted/sdl/load_code-sdl.c
 target/hosted/sdl/timer-sdl.c
 #ifdef HAVE_TOUCHSCREEN
 target/hosted/sdl/key_to_touch-sdl.c
 #endif
 #ifdef APPLICATION
-target/hosted/sdl/app/load_code-sdl-app.c
 target/hosted/sdl/app/button-application.c
-#ifdef WIN32
-target/hosted/filesystem-win32.c
-#else /* !WIN32 */
-target/hosted/filesystem-unix.c
-#endif /* WIN32 */
-#endif /* APPLICATION */
-#endif /* HAVE_SDL */
-
-#ifdef APPLICATION
-target/hosted/filesystem-app.c
-#endif /* APPLICATION */
+#endif
+#endif
 
 #if defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
 target/hosted/kernel-unix.c
@@ -173,19 +163,19 @@ common/crc32-mi4.c
 common/crc32-rkw.c
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-common/dir.c
-common/disk_cache.c
+common/dir_uncached.c
 common/file.c
-common/file_internal.c
 common/disk.c
-common/fileobj_mgr.c
 #endif /* PLATFORM_NATIVE */
 #ifdef HAVE_DIRCACHE
 common/dircache.c
 #endif /* HAVE_DIRCACHE */
-common/pathfuncs.c
+common/filefuncs.c
 common/format.c
 common/linked_list.c
+#ifdef APPLICATION
+common/rbpaths.c
+#endif
 common/strcasecmp.c
 common/strcasestr.c
 common/strnatcmp.c
@@ -1838,20 +1828,7 @@ target/hosted/android/system-android.c
 drivers/audio/android.c
 #endif
 
-#else /* defined(SIMULATOR) */
-
-#ifdef WIN32
-asm/mempcpy.c
-target/hosted/filesystem-win32.c
-#else /* !WIN32 */ 
-target/hosted/filesystem-unix.c
-#endif /* WIN32 */
-target/hosted/sdl/load_code-sdl.c
-#ifdef HAVE_SDL_THREADS
-target/hosted/sdl/filesystem-sdl.c
-#endif
-
-#endif /* !defined(SIMULATOR) */
+#endif /* defined(SIMULATOR) */
 
 #if defined(HAVE_TOUCHPAD) && !defined(HAS_BUTTON_HOLD)
 drivers/touchpad.c
@@ -1861,7 +1838,9 @@ drivers/touchpad.c
 #ifdef HAVE_CORELOCK_OBJECT
 kernel/corelock.c
 #endif
+#if 0 /* pending dependent code */
 kernel/mrsw_lock.c
+#endif
 kernel/mutex.c
 kernel/queue.c
 #ifdef HAVE_SEMAPHORE_OBJECTS

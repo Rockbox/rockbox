@@ -1,5 +1,4 @@
 #ifdef SIMULATOR
-
 lcd-common.c
 #ifdef HAVE_LCD_CHARCELLS
 font-player.c
@@ -9,20 +8,8 @@ sim_icons.c
 sim_tasks.c
 fmradio.c
 backlight-sim.c
-powermgmt-sim.c
-filesystem-sim.c
-
-#ifdef WIN32
-time-win32.c
-#endif
-
-#ifndef __PCTOOL__
-load_code-sim.c
-#endif
-
 stubs.c
+powermgmt-sim.c
+#endif
 
-#else
-dummylib.c /* for now, so the lib actually builds */
-#endif /* SIMULATOR */
-
+io.c

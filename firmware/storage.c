@@ -132,15 +132,6 @@ int storage_num_drives(void)
     return num_drives;
 }
 
-int storage_driver_type(int drive)
-{
-    if ((unsigned int)drive >= num_drives)
-        return -1;
-
-    unsigned int bit = (storage_drivers[drive] & DRIVER_MASK)>>DRIVER_OFFSET;
-    return bit ? find_first_set_bit(bit) : -1;
-}
-
 int storage_init(void)
 {
     int rc=0;

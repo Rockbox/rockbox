@@ -52,7 +52,7 @@
 #include "talk.h"
 #include "filetypes.h"
 #include "misc.h"
-#include "pathfuncs.h"
+#include "filefuncs.h"
 #include "filetree.h"
 #include "tagtree.h"
 #ifdef HAVE_RECORDING
@@ -1205,36 +1205,26 @@ void tree_flush(void)
 #endif
 
 #ifdef HAVE_DIRCACHE
-    int old_val = global_status.dircache_size;
-#ifdef HAVE_EEPROM_SETTINGS
-    bool savecache = false;
+    {
+        int old_val = global_status.dircache_size;
+        if (global_settings.dircache)
+        {
+            if (!dircache_is_initializing())
+                global_status.dircache_size = dircache_get_cache_size();
+# ifdef HAVE_EEPROM_SETTINGS
+            if (firmware_settings.initialized)
+                dircache_save();
+# endif
+            dircache_suspend();
+        }
+        else
+        {
+            global_status.dircache_size = 0;
+        }
+        if (old_val != global_status.dircache_size)
+            status_save();
+    }
 #endif
-
-    if (global_settings.dircache)
-    {
-        dircache_suspend();
-
-        struct dircache_info info;
-        dircache_get_info(&info);
-
-        global_status.dircache_size = info.last_size;
-    #ifdef HAVE_EEPROM_SETTINGS
-        savecache = firmware_settings.initialized;
-    #endif            
-    }
-    else
-    {
-        global_status.dircache_size = 0;
-    }
-
-    if (old_val != global_status.dircache_size)
-        status_save();
-
-    #ifdef HAVE_EEPROM_SETTINGS
-        if (savecache)
-            dircache_save();
-    #endif
-#endif /* HAVE_DIRCACHE */
 }
 
 void tree_restore(void)
@@ -1248,14 +1238,15 @@ void tree_restore(void)
 #endif
     
 #ifdef HAVE_DIRCACHE
-    if (global_settings.dircache && dircache_resume() > 0)
+    remove(DIRCACHE_FILE);
+    if (global_settings.dircache)
     {
         /* Print "Scanning disk..." to the display. */
         splash(0, str(LANG_SCANNING_DISK));
-        dircache_wait();
+
+        dircache_build(global_status.dircache_size);
     }
 #endif
-
 #ifdef HAVE_TAGCACHE
     tagcache_start_scan();
 #endif

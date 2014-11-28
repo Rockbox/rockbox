@@ -33,7 +33,6 @@
 #include "rb-loader.h"
 #include "loader_strerror.h"
 #include "storage.h"
-#include "file_internal.h"
 #include "disk.h"
 #include "string.h"
 #include "adc.h"
@@ -269,8 +268,6 @@ int main(void)
     backlight_init();
 
     show_logo();
-
-    filesystem_init();
 
     rc = storage_init();
     if(rc)

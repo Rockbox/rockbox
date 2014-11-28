@@ -27,21 +27,12 @@
 /* symbolic names for multiple choice configurations: */
 
 /* CONFIG_STORAGE (note these are combineable bit-flags) */
-#define STORAGE_ATA_NUM     0
-#define STORAGE_MMC_NUM     1
-#define STORAGE_SD_NUM      2
-#define STORAGE_NAND_NUM    3
-#define STORAGE_RAMDISK_NUM 4
-#define STORAGE_HOSTFS_NUM  5
-#define STORAGE_NUM_TYPES   6
-
-#define STORAGE_ATA         (1 << STORAGE_ATA_NUM)
-#define STORAGE_MMC         (1 << STORAGE_MMC_NUM)
-#define STORAGE_SD          (1 << STORAGE_SD_NUM)
-#define STORAGE_NAND        (1 << STORAGE_NAND_NUM)
-#define STORAGE_RAMDISK     (1 << STORAGE_RAMDISK_NUM)
- /* meant for APPLICATION targets (implicit for SIMULATOR) */
-#define STORAGE_HOSTFS      (1 << STORAGE_HOSTFS_NUM)
+#define STORAGE_ATA     0x01
+#define STORAGE_MMC     0x02
+#define STORAGE_SD      0x04
+#define STORAGE_NAND    0x08
+#define STORAGE_RAMDISK 0x10
+#define STORAGE_HOSTFS  0x20 /* meant for APPLICATION targets (implicit for SIMULATOR) */
 
 /* CONFIG_TUNER (note these are combineable bit-flags) */
 #define S1A0903X01 0x01 /* Samsung */
@@ -587,9 +578,6 @@ Lyre prototype 1 */
 #ifdef __PCTOOL__
 #undef CONFIG_CPU
 #define CONFIG_CPU 0
-#undef HAVE_MULTIVOLUME
-#undef HAVE_MULTIDRIVE
-#undef CONFIG_STORAGE
 #endif
 
 #ifdef APPLICATION
@@ -848,11 +836,9 @@ Lyre prototype 1 */
  * plenty of RAM. Both features can be enabled independently. */
 #if (MEMORYSIZE >= 8) && !defined(BOOTLOADER) && !defined(__PCTOOL__) \
     && !defined(APPLICATION)
-#ifndef SIMULATOR
 #define HAVE_DIRCACHE
-#endif
 #ifdef HAVE_TAGCACHE
-//#define HAVE_TC_RAMCACHE
+#define HAVE_TC_RAMCACHE
 #endif
 #endif
 
@@ -1197,7 +1183,7 @@ Lyre prototype 1 */
 /* This attribute can be used to enable to detection of plugin file handles leaks.
  * When enabled, the plugin core will monitor open/close/creat and when the plugin exits
  * will display an error message if the plugin leaked some file handles */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined (SIMULATOR)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #define HAVE_PLUGIN_CHECK_OPEN_CLOSE
 #endif
 

@@ -32,7 +32,7 @@
 #include "lang.h"
 #include "list.h"
 #include "misc.h"
-#include "pathfuncs.h"
+#include "filefuncs.h"
 #include "onplay.h"
 #include "playlist.h"
 #include "settings.h"

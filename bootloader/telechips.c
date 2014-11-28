@@ -30,7 +30,6 @@
 #include "lcd.h"
 #include "../kernel-internal.h"
 #include "storage.h"
-#include "file_internal.h"
 #include "fat.h"
 #include "disk.h"
 #include "font.h"
@@ -162,8 +161,6 @@ void* main(void)
         reset_screen();
         error(EATA, rc, true);
     }
-
-    filesystem_init();
 
     printf("mount");
     rc = disk_mount_all();

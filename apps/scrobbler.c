@@ -33,7 +33,7 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 #include "core_alloc.h"
 #include "settings.h"
 #include "ata_idle_notify.h"
-#include "pathfuncs.h"
+#include "filefuncs.h"
 #include "appevents.h"
 
 #if CONFIG_RTC

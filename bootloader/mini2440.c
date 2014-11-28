@@ -29,7 +29,6 @@
 #include "lcd.h"
 #include "../kernel-internal.h"
 #include "storage.h"
-#include "file_internal.h"
 #include "fat.h"
 #include "disk.h"
 #include "font.h"
@@ -89,7 +88,7 @@ int main(void)
         error(EATA, rc, true);
     }
 
-    filesystem_init();
+    disk_init(IF_MD(0));
     rc = disk_mount_all();
     if (rc<=0)
     {

@@ -37,7 +37,7 @@
 #include "misc.h"
 #include "tree.h"
 #include "splash.h"
-#include "pathfuncs.h"
+#include "filefuncs.h"
 #include "filetypes.h"
 #include "shortcuts.h"
 #include "onplay.h"

@@ -32,7 +32,6 @@
 #include "lcd.h"
 #include "i2c-s5l8700.h"
 #include "../kernel-internal.h"
-#include "file_internal.h"
 #include "storage.h"
 #include "fat.h"
 #include "disk.h"
@@ -214,8 +213,7 @@ void main(void)
         fatal_error();
     }
 
-    filesystem_init();
-
+    disk_init();
     rc = disk_mount_all();
     if (rc<=0)
     {

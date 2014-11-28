@@ -33,7 +33,6 @@
 #include "lcd.h"
 #include "font.h"
 #include "storage.h"
-#include "file_internal.h"
 #include "adc.h"
 #include "button.h"
 #include "disk.h"
@@ -292,7 +291,7 @@ void* main(void)
     int btn;
     int rc;
     int num_partitions;
-    struct partinfo pinfo;
+    struct partinfo* pinfo;
 #if !(CONFIG_STORAGE & STORAGE_SD)
     char buf[256];
     unsigned short* identify_info;
@@ -371,7 +370,7 @@ void* main(void)
     }
 #endif
 
-    filesystem_init();
+    disk_init(IF_MV(0));
     num_partitions = disk_mount_all();
     if (num_partitions<=0)
     {
@@ -382,9 +381,9 @@ void* main(void)
        that have more than that */
     for(i=0; i<NUM_PARTITIONS; i++)
     {
-        disk_partinfo(i, &pinfo);
+        pinfo = disk_partinfo(i);
         printf("Partition %d: 0x%02x %ld MB",
-                i, pinfo.type, pinfo.size / 2048);
+                i, pinfo->type, pinfo->size / 2048);
     }
 
     /* Now that storage is initialized, check for USB connection */
@@ -431,10 +430,10 @@ void* main(void)
 #if (CONFIG_STORAGE & STORAGE_SD)
         /* First try a (hidden) firmware partition */
         printf("Trying firmware partition");
-        disk_partinfo(1, &pinfo);
-        if(pinfo.type == PARTITION_TYPE_OS2_HIDDEN_C_DRIVE)
+        pinfo = disk_partinfo(1);
+        if(pinfo->type == PARTITION_TYPE_OS2_HIDDEN_C_DRIVE)
         {
-            rc = load_mi4_part(loadbuffer, &pinfo, MAX_LOADSIZE,
+            rc = load_mi4_part(loadbuffer, pinfo, MAX_LOADSIZE,
                                usb == USB_INSERTED);
             if (rc <= EFILE_EMPTY) {
                 printf("Can't load from partition");

@@ -28,11 +28,6 @@
 #include "thread.h"
 #include "debug.h"
 #include "usb.h"
-#include "mv.h"
-#include "ata_idle_notify.h"
-#ifdef WIN32
-#include <windows.h>
-#endif
 
 static void sim_thread(void);
 static long sim_thread_stack[DEFAULT_STACK_SIZE/sizeof(long)];
@@ -51,10 +46,6 @@ enum {
 #endif
 };
 
-#ifdef HAVE_MULTIDRIVE
-extern void sim_ext_extracted(int drive);
-#endif
-
 void sim_thread(void)
 {
     struct queue_event ev;
@@ -63,13 +54,9 @@ void sim_thread(void)
     
     while (1)
     {
-        queue_wait_w_tmo(&sim_queue, &ev, 5*HZ);
+        queue_wait(&sim_queue, &ev);
         switch(ev.id)
         {
-            case SYS_TIMEOUT:
-                call_storage_idle_notifys(false);
-                break;
-    
             case SIM_SCREENDUMP:
                 screen_dump();
 #ifdef HAVE_REMOTE_LCD
@@ -115,7 +102,6 @@ void sim_thread(void)
 #ifdef HAVE_MULTIDRIVE
             case SIM_EXT_INSERTED:
             case SIM_EXT_EXTRACTED:
-                sim_ext_extracted(ev.data);
                 queue_broadcast(ev.id == SIM_EXT_INSERTED ?
                                 SYS_HOTSWAP_INSERTED : SYS_HOTSWAP_EXTRACTED, 0);
                 sleep(HZ/20);
@@ -188,13 +174,11 @@ static bool is_ext_inserted;
 
 void sim_trigger_external(bool inserted)
 {
-    is_ext_inserted = inserted;
-
-    int drive = 1; /* Can do others! */
     if (inserted)
-        queue_post(&sim_queue, SIM_EXT_INSERTED, drive);
+        queue_post(&sim_queue, SIM_EXT_INSERTED, 0);
     else
-        queue_post(&sim_queue, SIM_EXT_EXTRACTED, drive);
+        queue_post(&sim_queue, SIM_EXT_EXTRACTED, 0);
+    is_ext_inserted = inserted;
 }
 
 bool hostfs_present(int drive)
@@ -219,13 +203,7 @@ bool volume_present(int volume)
     /* volume == drive for now */
     return hostfs_present(volume);
 }
-
-int volume_drive(int volume)
-{
-    /* volume == drive for now */
-    return volume;
-}
-#endif /* HAVE_MULTIVOLUME */
+#endif
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
 bool mmc_touched(void)
@@ -234,26 +212,4 @@ bool mmc_touched(void)
 }
 #endif
 
-#ifdef CONFIG_STORAGE_MULTI
-int hostfs_driver_type(int drive)
-{
-    /* Hack alert */
-#if (CONFIG_STORAGE & STORAGE_ATA)
- #define SIMEXT1_TYPE_NUM   STORAGE_ATA_NUM
-#elif (CONFIG_STORAGE & STORAGE_SD)
- #define SIMEXT1_TYPE_NUM   STORAGE_SD_NUM
-#elif (CONFIG_STORAGE & STORAGE_MMC)
- #define SIMEXT1_TYPE_NUM   STORAGE_MMC_NUM
-#elif (CONFIG_STORAGE & STORAGE_NAND)
- #define SIMEXT1_TYPE_NUM   STORAGE_NAND_NUM
-#elif (CONFIG_STORAGE & STORAGE_RAMDISK)
- #define SIMEXT1_TYPE_NUM   STORAGE_RAMDISK_NUM
-#else
-#error Unknown storage driver
-#endif /* CONFIG_STORAGE */
-
-    return drive > 0 ? SIMEXT1_TYPE_NUM : STORAGE_HOSTFS_NUM;
-}
-#endif /* CONFIG_STORAGE_MULTI */
-
-#endif /* CONFIG_STORAGE & STORAGE_MMC */
+#endif

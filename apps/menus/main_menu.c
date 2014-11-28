@@ -48,7 +48,6 @@
 #include "time.h"
 #include "wps.h"
 #include "skin_buffer.h"
-#include "disk.h"
 
 static const struct browse_folder_info config = {ROCKBOX_DIR, SHOW_CFG};
 
@@ -161,14 +160,14 @@ static const char* info_getname(int selected_item, void *data,
 #endif
     if (info->new_data)
     {
-        volume_size(IF_MV(0,) &info->size, &info->free);
+        fat_size(IF_MV(0,) &info->size, &info->free);
 #ifdef HAVE_MULTIVOLUME
 #ifndef APPLICATION
-        volume_size(1, &info->size2, &info->free2);
-#else
-        info->size2 = 0;
+        if (fat_ismounted(1))
+            fat_size(1, &info->size2, &info->free2);
+        else
 #endif
-
+            info->size2 = 0;
 #endif
         info->new_data = false;
     }
@@ -348,7 +347,12 @@ static int info_action_callback(int action, struct gui_synclist *lists)
         info->new_data = true;
         splash(0, ID2P(LANG_SCANNING_DISK));
         for (i = 0; i < NUM_VOLUMES; i++)
-            volume_recalc_free(IF_MV(i));
+        {
+#ifdef HAVE_HOTSWAP
+            if (fat_ismounted(i))
+#endif
+                fat_recalc_free(IF_MV(i));
+        }
 #else
         (void) lists;
 #endif

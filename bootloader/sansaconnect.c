@@ -21,7 +21,6 @@
 #include "lcd.h"
 #include "../kernel-internal.h"
 #include "storage.h"
-#include "file_internal.h"
 #include "disk.h"
 #include "font.h"
 #include "backlight.h"
@@ -73,7 +72,7 @@ void main(void)
     if(ret)
         printf("SD error: %d", ret);
 
-    filesystem_init();
+    disk_init(IF_MD(0));
 
     ret = disk_mount_all();
     if (ret <= 0)

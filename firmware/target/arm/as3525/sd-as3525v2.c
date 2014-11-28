@@ -598,13 +598,21 @@ static void sd_thread(void)
         {
 #ifdef HAVE_HOTSWAP
         case SYS_HOTSWAP_INSERTED:
-        case SYS_HOTSWAP_EXTRACTED:;
-            int success = 1;
+        case SYS_HOTSWAP_EXTRACTED:
+        {
+            int changed = 1;
+            fat_lock();          /* lock-out FAT activity first -
+                                    prevent deadlocking via disk_mount that
+                                    would cause a reverse-order attempt with
+                                    another thread */
+            mutex_lock(&sd_mtx); /* lock-out card activity - direct calls
+                                    into driver that bypass the fat cache */
 
-            disk_unmount(SD_SLOT_AS3525); /* release "by force" */
+            /* We now have exclusive control of fat cache and ata */
 
-            mutex_lock(&sd_mtx); /* lock-out card activity */
-
+            disk_unmount(SD_SLOT_AS3525);     /* release "by force", ensure file
+                                    descriptors aren't leaked and any busy
+                                    ones are invalid if mounting */
             /* Force card init for new card, re-init for re-inserted one or
              * clear if the last attempt to init failed with an error. */
             card_info[SD_SLOT_AS3525].initialized = 0;
@@ -612,25 +620,24 @@ static void sd_thread(void)
             if (ev.id == SYS_HOTSWAP_INSERTED)
             {
                 sd_enable(true);
-                success = sd_init_card(SD_SLOT_AS3525) == 0 ? 2 : 0;
-                sd_enable(false);
+                changed = (sd_init_card(SD_SLOT_AS3525) == 0) && disk_mount(SD_SLOT_AS3525); /* 0 if fail */
             }
-
-            mutex_unlock(&sd_mtx);
-
-            if (success > 1)
-                success = disk_mount(SD_SLOT_AS3525); /* 0 if fail */
 
             /*
              * Mount succeeded, or this was an EXTRACTED event,
              * in both cases notify the system about the changed filesystems
              */
-            if (success)
+            if (changed)
                 queue_broadcast(SYS_FS_CHANGED, 0);
 
-            break;
-#endif /* HAVE_HOTSWAP */
+            sd_enable(false);
 
+            /* Access is now safe */
+            mutex_unlock(&sd_mtx);
+            fat_unlock();
+            }
+            break;
+#endif
         case SYS_TIMEOUT:
             if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
             {

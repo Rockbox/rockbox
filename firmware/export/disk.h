@@ -24,8 +24,7 @@
 #include "config.h"
 #include "mv.h" /* for volume definitions */
 
-struct partinfo
-{
+struct partinfo {
     unsigned long start; /* first sector (LBA) */
     unsigned long size;  /* number of sectors */
     unsigned char type;
@@ -36,9 +35,11 @@ struct partinfo
 #define PARTITION_TYPE_FAT16                0x06
 #define PARTITION_TYPE_OS2_HIDDEN_C_DRIVE   0x84
 
-bool disk_init(IF_MD_NONVOID(int drive));
-bool disk_partinfo(int partition, struct partinfo *info);
+/* returns a pointer to an array of 8 partinfo structs */
+struct partinfo* disk_init(IF_MD_NONVOID(int drive));
+struct partinfo* disk_partinfo(int partition);
 
+void disk_init_subsystem(void) INIT_ATTR; /* Initialises mutexes */
 int disk_mount_all(void); /* returns the # of successful mounts */
 int disk_mount(int drive);
 int disk_unmount_all(void);
@@ -49,6 +50,4 @@ int disk_unmount(int drive);
 int disk_get_sector_multiplier(IF_MD_NONVOID(int drive));
 #endif
 
-bool disk_present(IF_MD_NONVOID(int drive));
-
-#endif /* _DISK_H_ */
+#endif

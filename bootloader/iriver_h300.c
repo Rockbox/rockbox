@@ -31,7 +31,6 @@
 #include "scroll_engine.h"
 #include "../kernel-internal.h"
 #include "storage.h"
-#include "file_internal.h"
 #include "usb.h"
 #include "disk.h"
 #include "font.h"
@@ -350,7 +349,8 @@ void main(void)
         while(!(button_get(true) & BUTTON_REL));
     }
 
-    filesystem_init();
+
+    disk_init();
 
     rc = disk_mount_all();
     if (rc<=0)

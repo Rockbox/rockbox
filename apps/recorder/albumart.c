@@ -27,7 +27,7 @@
 #include "buffering.h"
 #include "dircache.h"
 #include "misc.h"
-#include "pathfuncs.h"
+#include "filefuncs.h"
 #include "settings.h"
 #include "wps.h"
 
