@@ -58,6 +58,8 @@ static tCardInfo card_info;
 static long last_disk_activity = -1;
 
 static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x200)/sizeof(long)];
+static unsigned char aligned_buf[512] STORAGE_ALIGN_ATTR;
+
 static const char         sd_thread_name[] = "ata/sd";
 static struct mutex       sd_mtx SHAREDBSS_ATTR;
 static struct event_queue sd_queue;
@@ -460,9 +462,15 @@ int sd_init(void)
 
 static inline void read_sd_data(unsigned char **dst)
 {
-    commit_discard_dcache_range((const void *)*dst, 512);
+    void *buf = *dst;
 
-    A2A_IDST0 = (unsigned long)*dst;
+    if (!IS_ALIGNED(((unsigned long)*dst), CACHEALIGN_SIZE))
+        buf = aligned_buf;
+
+    commit_discard_dcache_range((const void *)buf, 512);
+
+
+    A2A_IDST0 = (unsigned long)buf;
     A2A_CON0  = (3<<9) |    /* burst 16 */
                 (1<<6) |    /* fixed src */
                 (1<<3) |    /* DMA start */
@@ -472,14 +480,25 @@ static inline void read_sd_data(unsigned char **dst)
     /* wait for DMA engine to finish transfer */
     while (A2A_DMA_STS & 1);
 
+    if (buf == aligned_buf)
+        memcpy(*dst, aligned_buf, 512);
+
     *dst += 512;
 }
 
 static inline void write_sd_data(unsigned char **src)
 {
-    commit_discard_dcache_range((const void *)*src, 512);
+    void *buf = *src;
 
-    A2A_ISRC1 = (unsigned long)*src;
+    if (!IS_ALIGNED(((unsigned long)*src), CACHEALIGN_SIZE))
+    {
+        buf = aligned_buf;
+        memcpy(aligned_buf, *src, 512);
+    }
+
+    commit_discard_dcache_range((const void *)buf, 512);
+
+    A2A_ISRC1 = (unsigned long)buf;
     A2A_CON1  = (3<<9) |    /* burst 16 */
                 (1<<5) |    /* fixed dst */
                 (1<<3) |    /* DMA start */
