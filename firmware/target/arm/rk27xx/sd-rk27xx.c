@@ -109,12 +109,12 @@ static void mmu_switch_buff(void)
     if (i++ & 0x01)
     {
         MMU_CTRL = MMU_MMU0_BUFII | MMU_CPU_BUFI | MMU_BUFII_RESET |
-                   MMU_BUFII_BYTE | MMU_BUFI_RESET | MMU_BUFI_WORD;
+                   MMU_BUFII_BYTE | MMU_BUFI_RESET | MMU_BUFI_BYTE;
     }
     else
     {
         MMU_CTRL = MMU_MMU0_BUFI | MMU_CPU_BUFII | MMU_BUFII_RESET |
-                   MMU_BUFII_WORD | MMU_BUFI_RESET | MMU_BUFI_BYTE;
+                   MMU_BUFII_BYTE | MMU_BUFI_RESET | MMU_BUFI_BYTE;
     }
 }
 
@@ -414,7 +414,7 @@ static void init_controller(void)
     MMU_PNRI = 0x1ff;
     MMU_PNRII = 0x1ff;
     MMU_CTRL = MMU_MMU0_BUFII | MMU_CPU_BUFI | MMU_BUFII_RESET |
-               MMU_BUFII_BYTE | MMU_BUFI_RESET | MMU_BUFI_WORD;
+               MMU_BUFII_BYTE | MMU_BUFI_RESET | MMU_BUFI_BYTE;
 
     /* setup A2A DMA CH0 for SD reads */
     A2A_ISRC0 = (unsigned long)(&MMU_DATA);
@@ -460,36 +460,14 @@ int sd_init(void)
 
 static inline void read_sd_data(unsigned char **dst)
 {
-    commit_discard_dcache_range((const void *)*dst, 512);
-
-    A2A_IDST0 = (unsigned long)*dst;
-    A2A_CON0  = (3<<9) |    /* burst 16 */
-                (1<<6) |    /* fixed src */
-                (1<<3) |    /* DMA start */
-                (2<<1) |    /* word transfer size */
-                (1<<0);     /* software mode */
-
-    /* wait for DMA engine to finish transfer */
-    while (A2A_DMA_STS & 1);
-
-    *dst += 512;
+    for (int i = 0; i < 512; i++)
+        *((*dst)++) = MMU_DATA;
 }
 
 static inline void write_sd_data(unsigned char **src)
 {
-    commit_discard_dcache_range((const void *)*src, 512);
-
-    A2A_ISRC1 = (unsigned long)*src;
-    A2A_CON1  = (3<<9) |    /* burst 16 */
-                (1<<5) |    /* fixed dst */
-                (1<<3) |    /* DMA start */
-                (2<<1) |    /* word transfer size */
-                (1<<0);     /* software mode */
-
-    /* wait for DMA engine to finish transfer */
-    while (A2A_DMA_STS & 2);
-
-    *src += 512;
+    for (int i = 0; i < 512; i++)
+        MMU_DATA = *((*src)++);
 }
 
 int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count,
