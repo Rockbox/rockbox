@@ -46,7 +46,7 @@
 #define HOME_DIR "/mnt/media0"
 #elif defined( DX50 ) || defined( DX90 )
 /* Where to put save files like recordings, playlists, screen dumps ...*/
-#define HOME_DIR "/sdcard"
+#define HOME_DIR "/mnt/sdcard"
 #else
 #define HOME_DIR "/"
 #endif

@@ -840,6 +840,7 @@ struct user_settings
     int volume_limit; /* maximum volume limit */
 
 #if defined( DX50 ) || defined( DX90 )
+    bool batterylog;
     int governor;
     int hold_switch_mode;
     int usb_mode;
