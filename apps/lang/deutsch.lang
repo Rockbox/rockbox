@@ -13335,3 +13335,23 @@
     ibassodx90: "Performance"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_IBASSO_BATTERY_LOG
+  desc: in Settings -> General -> System -> Battery -> Battery Log
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Battery Log"
+    ibassodx90: "Battery Log"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Batterielog"
+    ibassodx90: "Batterielog"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Batterielog"
+    ibassodx90: "Batterielog"
+  </voice>
+</phrase>
