@@ -134,6 +134,8 @@ int get_cpu_boost_counter(void);
     (size) = __a2 > __a1 ?  __a2 - __a1 : 0; \
 })
 
+#define IS_ALIGNED(x, a) (((x) & ((typeof(x))(a) - 1)) == 0)
+
 #define PTR_ADD(ptr, x) ((typeof(ptr))((char*)(ptr) + (x)))
 #define PTR_SUB(ptr, x) ((typeof(ptr))((char*)(ptr) - (x)))
 
