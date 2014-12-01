@@ -38,8 +38,10 @@ void INT_TIMERF(void)
 
 bool timer_set(long cycles, bool start)
 {
+    int tf_en = TFCMD & (1 << 0);   /* save TF_EN status */
+
     /* stop timer */
-    TFCMD = (0 << 0);       /* TF_ENABLE */
+    TFCMD = (0 << 0);       /* TF_EN = disable */
 
     /* optionally unregister any previously registered timer user */
     if (start) {
@@ -49,33 +51,34 @@ bool timer_set(long cycles, bool start)
         }
     }
 
-    /* There is an odd behaviour when the 32-bit timers are launched
-       for the first time, the interrupt status bits are set and an
-       unexpected interrupt is generated if they are enabled. A way to
-       workaround this is to write the data registers before clearing
-       the counter. */
-    TFDATA0 = cycles;
-    TFCMD = (1 << 1);       /* TF_CLR */
-
     /* configure timer */
     TFCON = (1 << 12) |     /* TF_INT0_EN */
-            (4 << 8) |      /* TF_CS, 4 = ECLK / 1 */
-            (1 << 6) |      /* use ECLK (12MHz) */
-            (0 << 4);       /* TF_MODE_SEL, 0 = interval mode */
+            (4 << 8) |      /* TF_CS = ECLK / 1 */
+            (1 << 6) |      /* select ECLK (12 MHz) */
+            (0 << 4);       /* TF_MODE_SEL = interval mode */
     TFPRE = 0;              /* no prescaler */
+    TFDATA0 = cycles;       /* set interval period */
 
-    TFCMD = (1 << 0);       /* TF_ENABLE */
+    /* After the configuration, we must write '1' in TF_CLR to
+     * initialize the timer (s5l8700 DS):
+     *  - Clear the counter register.
+     *  - The value of TF_START is set to TF_OUT.
+     *  - TF_DATA0 and TF_DATA1 are updated to the internal buffers.
+     *  - Initialize the state of the previously captured signal.
+     */
+    TFCMD = (1 << 1) |      /* TF_CLR = initialize timer */
+            (tf_en << 0);   /* TF_EN = restore previous status */
 
     return true;
 }
 
 bool timer_start(void)
 {
-    TFCMD = (1 << 0);       /* TF_ENABLE */
+    TFCMD = (1 << 0);       /* TF_EN = enable */
     return true;
 }
 
 void timer_stop(void)
 {
-    TFCMD = (0 << 0);       /* TF_ENABLE */
+    TFCMD = (0 << 0);       /* TF_EN = disable */
 }

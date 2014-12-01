@@ -134,7 +134,7 @@ void INT_TIMER32(void) ICODE_ATTR;
 void INT_TIMER32()
 {
     uint32_t tstat = TSTAT;
-    /*if ((TECON >> 12) & 0x7 & (tstat >> 24)) INT_TIMERE();*/
+    if ((TECON >> 12) & 0x7 & (tstat >> 24)) INT_TIMERE();
     if ((TFCON >> 12) & 0x7 & (tstat >> 16)) INT_TIMERF();
     if ((TGCON >> 12) & 0x7 & (tstat >> 8)) INT_TIMERG();
     if ((THCON >> 12) & 0x7 & tstat) INT_TIMERH();
@@ -226,6 +226,7 @@ void system_init(void)
     VIC0INTENABLE = 1 << IRQ_WHEEL;
     VIC0INTENABLE = 1 << IRQ_ATA;
     VIC1INTENABLE = 1 << (IRQ_MMC - 32);
+    VIC0INTENABLE = 1 << IRQ_TIMER;
     VIC0INTENABLE = 1 << IRQ_TIMER32;
 }
 
