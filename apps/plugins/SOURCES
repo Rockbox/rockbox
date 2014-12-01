@@ -3,6 +3,7 @@
 battery_bench.c
 #endif
 chessclock.c
+clicker.c
 credits.c
 cube.c
 dict.c
