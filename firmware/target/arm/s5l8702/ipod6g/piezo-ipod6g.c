@@ -31,10 +31,7 @@ void INT_TIMERA(void)
     /* clear interrupt */
     TACON = TACON;
     if (!(--duration))
-    {
-        beeping = 0;
-        TACMD = (1 << 1);   /* TA_CLR */
-    }
+        piezo_stop();
 }
 
 static void piezo_start(unsigned short cycles, unsigned short periods)
@@ -42,14 +39,16 @@ static void piezo_start(unsigned short cycles, unsigned short periods)
 #ifndef SIMULATOR
     duration = periods;
     beeping = 1;
-    /* configure timer for 100 kHz */
+    /* select TA_OUT function on GPIO ports */
+    PCON0 = (PCON0 & 0x00ffffff) | 0x53000000;
+    /* configure timer for 100 kHz (12 MHz / 4 / 30) */
     TACMD = (1 << 1);   /* TA_CLR */
-    TAPRE = 30 - 1;     /* prescaler */         /* 12 MHz / 4 / 30 = 100 kHz */
+    TAPRE = 30 - 1;     /* prescaler */
     TACON = (1 << 13) | /* TA_INT1_EN */
             (0 << 12) | /* TA_INT0_EN */
             (0 << 11) | /* TA_START */
-            (1 << 8) |  /* TA_CS = PCLK / 4 */
-            (1 << 6) |  /* UNKNOWN bit */       /* external 12 MHz clock ??? */
+            (1 << 8) |  /* TA_CS = ECLK / 4 */
+            (1 << 6) |  /* select ECLK (12 MHz) */
             (1 << 4);   /* TA_MODE_SEL = PWM mode */
     TADATA0 = cycles;   /* set interval period */
     TADATA1 = cycles << 1; /* set interval period */
@@ -60,7 +59,10 @@ static void piezo_start(unsigned short cycles, unsigned short periods)
 void piezo_stop(void)
 {
 #ifndef SIMULATOR
+    beeping = 0;
     TACMD = (1 << 1);   /* TA_CLR */
+    /* configure GPIO for the lowest power consumption */
+    PCON0 = (PCON0 & 0x00ffffff) | 0xee000000;
 #endif
 }
 
@@ -76,7 +78,7 @@ bool piezo_busy(void)
 
 void piezo_init(void)
 {
-    beeping = 0;
+    piezo_stop();
 }
 
 void piezo_button_beep(bool beep, bool force)
