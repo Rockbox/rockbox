@@ -42,7 +42,7 @@ function ATJ.gpio.outen(port, pin, en)
     end
 end
 
-function ATJ.gpio.inen(port, pin)
+function ATJ.gpio.inen(port, pin, en)
     if type(port) == "string" then
         if port == "PORTA" then
             HW.GPIO.AINEN.write(bit32.replace(HW.GPIO.AINEN.read(), en, pin, 1))
@@ -59,6 +59,25 @@ function ATJ.gpio.set(port, pin, val)
             HW.GPIO.ADAT.write(bit32.replace(HW.GPIO.ADAT.read(), val, pin, 1))
         elseif port == "PORTB" then
             HW.GPIO.BDAT.write(bit32.replace(HW.GPIO.BDAT.read(), val, pin, 1))
+        else error("Invalid port string " .. port)
+        end
+    end
+end
+
+function ATJ.gpio.get(port, pin)
+    if type(port) == "string" then
+        if port == "PORTA" then
+            if bit32.band(HW.GPIO.ADAT.read(), bit32.lshift(1, pin)) ~= 0 then
+                return 1
+            else
+                return 0
+            end
+        elseif port == "PORTB" then
+            if bit32.band(HW.GPIO.BDAT.read(), bit32.lshift(1, pin)) ~= 0 then
+                return 1
+            else
+                return 0
+            end
         else error("Invalid port string " .. port)
         end
     end

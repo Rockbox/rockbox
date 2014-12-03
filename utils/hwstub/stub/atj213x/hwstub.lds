@@ -63,7 +63,7 @@ SECTIONS
             oc_bufferstart = .;
 	} > IRAM
 
-  .end IRAM_ORIG+IRAM_SIZE (NOLOAD) :
+  .end IRAM_ORIG+IRAM_SIZE-1024 (NOLOAD) :
   {
       oc_bufferend = .;
   } > IRAM

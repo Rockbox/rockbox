@@ -11,4 +11,5 @@ elseif hwstub.dev.target.id == hwstub.dev.target.ATJ then
 end
 
 require "hwlib"
+require "sdlib"
 require "dumper"
