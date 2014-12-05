@@ -773,15 +773,85 @@
     <addr name="SD" addr="0xb00b0000"/>
     <reg name="CTL" desc="">
       <addr name="CTL" addr="0x0"/>
+      <field name="RESERVED31_11" desc="" bitrange="31:11"/>
+      <field name="RESE" desc="Built-in Pull up resistance enable" bitrange="10:10"/>
+      <field name="RESERVED9" desc="" bitrange="9:9"/>
+      <field name="CLKS" desc="SD MMC output pad CLK select" bitrange="8:8">
+        <value name="CLK_CEB6" value="0x0" desc=""/>
+        <value name="CLK_CEB2" value="0x1" desc=""/>
+      </field>
+      <field name="EN" desc="SD Enable" bitrange="7:7"/>
+      <field name="BSEL" desc="" bitrange="6:6">
+        <value name="BUS" value="0x0" desc=""/>
+        <value name="DMA" value="0x1" desc=""/>
+      </field>
+      <field name="RESERVED5_2" desc="" bitrange="5:2"/>
+      <field name="BUSWID" desc="" bitrange="1:0">
+        <value name="WIDTH_1BIT" value="0x0" desc=""/>
+        <value name="WIDTH_4BIT" value="0x1" desc=""/>
+        <value name="WIDTH_8BIT" value="0x2" desc=""/>
+        <value name="WIDTH_RESERVED" value="0x3" desc=""/>
+      </field>
     </reg>
     <reg name="CMDRSP" desc="">
       <addr name="CMDRSP" addr="0x4"/>
+      <field name="RESERVED31_6" desc="" bitrange="31:6"/>
+      <field name="RB" desc="Ready or Busy status" bitrange="5:5">
+        <value name="IDLE" value="0x0" desc=""/>
+        <value name="BUSY" value="0x1" desc=""/>
+      </field>
+      <field name="RSP2" desc="" bitrange="4:4"/>
+      <field name="RSP3" desc="" bitrange="3:3"/>
+      <field name="NRSP" desc="" bitrange="2:2"/>
+      <field name="RSP1" desc="" bitrange="1:1"/>
+      <field name="STAT" desc="CMD Responds Status" bitrange="0:0">
+        <value name="RSP_OK" value="0x0" desc=""/>
+        <value name="NO_RSP" value="0x1" desc=""/>
+      </field>
     </reg>
     <reg name="RW" desc="">
       <addr name="RW" addr="0x8"/>
+      <field name="RESERVED31_17" desc="" bitrange="31:17"/>
+      <field name="FC16" desc="CRC16 check&#10;" bitrange="16:16">
+        <value name="ENABLE" value="0x0" desc=""/>
+        <value name="DISABLE" value="0x1" desc=""/>
+      </field>
+      <field name="STWR" desc="Start Write" bitrange="15:15">
+        <value name="END" value="0x0" desc=""/>
+        <value name="START" value="0x1" desc=""/>
+      </field>
+      <field name="RESERVED14_10" desc="" bitrange="14:10"/>
+      <field name="WCEF" desc="Write CRC status End Flag" bitrange="9:9"/>
+      <field name="WCST" desc="Write CRC Status" bitrange="8:8"/>
+      <field name="STRD" desc="Start Read" bitrange="7:7"/>
+      <field name="RCST" desc="" bitrange="6:6"/>
+      <field name="RESERVED5_1" desc="" bitrange="5:1"/>
+      <field name="RWST" desc="Read Write Status flag" bitrange="0:0"/>
     </reg>
     <reg name="FIFOCTL" desc="">
       <addr name="FIFOCTL" addr="0xc"/>
+      <field name="RESERVED31_11" desc="" bitrange="31:11"/>
+      <field name="BLOC" desc="SD DMA block mode Enable" bitrange="10:10">
+        <value name="DEMAND" value="0x0" desc=""/>
+        <value name="BLOCK" value="0x1" desc=""/>
+      </field>
+      <field name="EMPTY" desc="" bitrange="9:9"/>
+      <field name="MODE" desc="" bitrange="8:8">
+        <value name="DMA" value="0x0" desc=""/>
+        <value name="CPU" value="0x1" desc=""/>
+      </field>
+      <field name="DRQF" desc="" bitrange="7:7"/>
+      <field name="RST" desc="FIFO reset. Write 1 to reset." bitrange="6:6"/>
+      <field name="THRH" desc="DRQ Threshold" bitrange="5:4">
+        <value name="THR_12_16" value="0x0" desc=""/>
+        <value name="THR_10_16" value="0x1" desc=""/>
+        <value name="THR_8_16" value="0x2" desc=""/>
+        <value name="THR_4_16" value="0x3" desc=""/>
+      </field>
+      <field name="FULL" desc="Full flag (write 1 clear)&#10;" bitrange="3:3"/>
+      <field name="IRQP" desc="FIFO IRQ Pending" bitrange="2:2"/>
+      <field name="IRQE" desc="FIFO IRQ enable (for CPU interrupt) &#10;" bitrange="1:1"/>
+      <field name="DRQE" desc="FIFO DRQ enable (for DMA ) &#10;" bitrange="0:0"/>
     </reg>
     <reg name="CMD" desc="">
       <addr name="CMD" addr="0x10"/>
@@ -804,9 +874,14 @@
     </reg>
     <reg name="CLK" desc="">
       <addr name="CLK" addr="0x34"/>
+      <field name="RESERVED31_8" desc="" bitrange="31:8"/>
+      <field name="INITCLKNUM" desc="" bitrange="7:1"/>
+      <field name="SNDC" desc="Send Clock (autoclear to 0 when finished)" bitrange="0:0"/>
     </reg>
     <reg name="BYTECNT" desc="">
       <addr name="BYTECNT" addr="0x38"/>
+      <field name="RESERVED31_16" desc="" bitrange="31:16"/>
+      <field name="BYTECNT" desc="" bitrange="15:0"/>
     </reg>
   </dev>
   <dev name="SDR" long_name="SDRAM Interface" desc="" version="1.0">
