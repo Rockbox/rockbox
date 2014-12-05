@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_db86cb12",
+        "filename": "apps/keymaps/keymap-touchscreen.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "I can\u0027t follow this change. Can you describe the rationale please?",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_3b7c1f20",
+        "filename": "apps/keymaps/keymap-touchscreen.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "See above",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_1b796330",
+        "filename": "apps/main.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "Please use !defined(DX50) \u0026\u0026 !defined(DX90) style, it\u0027s more readable",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_7b76973f",
+        "filename": "apps/plugins/SOURCES.app_build",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "Less spaces and parens please\n!defined(HAVE_TOUCHSCREEN) || defined(DX50) || defined(DX90)",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_5b73db4d",
+        "filename": "apps/scrobbler.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "defined(DX50) || defined(DX90)",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_9b93b34f",
+        "filename": "apps/settings.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "defined(DX50) || defined(DX90)",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_bb8e6f25",
+        "filename": "apps/settings.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 1083,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "defined(DX50) || defined(DX90)",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_fb98e76c",
+        "filename": "apps/settings.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "Did you change the stereo balance behavior or was the comment just wrong?",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_db9d2b5b",
+        "filename": "apps/settings_list.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "defined(DX50) || defined(DX90)",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_3ba37fa0",
+        "filename": "apps/settings_list.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 2159,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "defined(DX50) || defined(DX90)",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_1ba04390",
+        "filename": "firmware/SOURCES",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "Please, adapt to existing style instead of changing it.",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_7badf787",
+        "filename": "firmware/drivers/button.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "What does that mean? Are you saying the OS perfoms a reboot when pressing long enough for our own power-off reboot detection? Is there no other way to work around that? Power off on the first press seems bad",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_5baabb71",
+        "filename": "firmware/powermgmt.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "!defined(DX50) \u0026\u0026 !defined(DX90)",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_bbb5cfd1",
+        "filename": "firmware/target/hosted/cpuinfo-linux.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-05T16:04:35Z",
+      "side": 1,
+      "message": "Your coding style is not a perfect fit for Rockbox code base. Please try to follow our style",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
