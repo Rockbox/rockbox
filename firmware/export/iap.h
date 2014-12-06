@@ -34,5 +34,8 @@ extern void iap_periodic(void);
 extern void iap_handlepkt(void);
 extern void iap_send_pkt(const unsigned char * data, int len);
 const unsigned char *iap_get_serbuf(void);
+#ifdef HAVE_LINE_REC
+extern bool iap_record(bool onoff);
+#endif
 
 #endif
