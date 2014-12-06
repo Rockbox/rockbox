@@ -669,11 +669,18 @@
 #define I2SCLKDIV           (*((volatile uint32_t*)(0x3CA00040)))
 
 
+/////UART/////
+/* UC8702 uart controller */
+#define S5L8702_UART_BASE       0x3cc00000
+#define S5L8702_UART_PORT_MAX   4
+
+
 /////CLOCK GATES/////
 #define CLOCKGATE_USB_1 2
 #define CLOCKGATE_USB_2 35
 #define CLOCKGATE_DMAC0 25
 #define CLOCKGATE_DMAC1 26
+#define CLOCKGATE_UART  41
 
 
 /////INTERRUPTS/////
@@ -686,6 +693,13 @@
 #define IRQ_WHEEL 23
 #define IRQ_ATA 29
 #define IRQ_MMC 44
+
+#define IRQ_UART(i) (24+i)
+#define IRQ_UART0 24
+#define IRQ_UART1 25
+#define IRQ_UART2 26
+#define IRQ_UART3 27
+#define IRQ_UART4 28    /* obsolete/not implemented on s5l8702 ??? */
 
 #define IRQ_EXT0    0
 #define IRQ_EXT1    1
