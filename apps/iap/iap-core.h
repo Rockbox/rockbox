@@ -88,6 +88,7 @@ struct auth_t {
     enum authen_state state;        /* Current state of authentication */
     unsigned char max_section;      /* The maximum number of certificate sections */
     unsigned char next_section;     /* The next expected section number */
+    uint16_t version;               /* Authentication version */
 };
 
 /* State of GetAccessoryInfo */
