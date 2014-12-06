@@ -429,6 +429,9 @@ struct dma_lli
     uint32_t control;
 };
 #endif
+/* currently these definitions are not used, temporarily
+   removed to avoid conflicts with pl080.h */
+#if 0
 #define DMACINTSTS(d)       (*((uint32_t volatile*)(0x38200000 + 0x1700000 * (d))))
 #define DMACINTTCSTS(d)     (*((uint32_t volatile*)(0x38200004 + 0x1700000 * (d))))
 #define DMACINTTCCLR(d)     (*((uint32_t volatile*)(0x38200008 + 0x1700000 * (d))))
@@ -443,6 +446,7 @@ struct dma_lli
 #define DMACSOFTLSREQ(d)    (*((uint32_t volatile*)(0x3820002c + 0x1700000 * (d))))
 #define DMACCONFIG(d)       (*((uint32_t volatile*)(0x38200030 + 0x1700000 * (d))))
 #define DMACSYNC(d)         (*((uint32_t volatile*)(0x38200034 + 0x1700000 * (d))))
+#endif
 #define DMACCLLI(d, c)      (*((struct dma_lli volatile*)(0x38200100 + 0x1700000 * (d) + 0x20 * (c))))
 #define DMACCSRCADDR(d, c)  (*((const void* volatile*)(0x38200100 + 0x1700000 * (d) + 0x20 * (c))))
 #define DMACCDESTADDR(d, c) (*((void* volatile*)(0x38200104 + 0x1700000 * (d) + 0x20 * (c))))
