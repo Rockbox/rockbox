@@ -28,6 +28,7 @@
 #include "pmu-target.h"
 #include "power.h"
 #include "string.h"
+#include "dma-s5l8702.h"
 
 
 #define R_HORIZ_GRAM_ADDR_SET     0x200
@@ -49,10 +50,8 @@
 /** globals **/
 
 int lcd_type; /* also needed in debug-s5l8702.c */
-static struct dma_lli lcd_lli[(LCD_WIDTH * LCD_HEIGHT - 1) / 0xfff] CACHEALIGN_ATTR;
-static struct semaphore lcd_wakeup;
 static struct mutex lcd_mutex;
-static uint16_t lcd_dblbuf[LCD_HEIGHT][LCD_WIDTH];
+static uint16_t lcd_dblbuf[LCD_HEIGHT][LCD_WIDTH] CACHEALIGN_ATTR;
 static bool lcd_ispowered;
 
 #define SLEEP       0
@@ -197,6 +196,48 @@ static const unsigned short lcd_init_sequence_23[] =
 };
 #endif
 
+/* DMA configuration */
+
+/* one single transfer at once, needed LLIs:
+ *   screen_size / (DMAC_LLI_MAX_COUNT << swidth) =
+ *   (320*240*2) / (4095*2) = 19
+ */
+#define LCD_DMA_TSKBUF_SZ   1   /* N tasks, MUST be pow2 */
+#define LCD_DMA_LLIBUF_SZ   32  /* N LLIs, MUST be pow2 */
+
+static struct dmac_tsk lcd_dma_tskbuf[LCD_DMA_TSKBUF_SZ];
+static struct dmac_lli volatile \
+            lcd_dma_llibuf[LCD_DMA_LLIBUF_SZ] CACHEALIGN_ATTR;
+
+static struct dmac_ch lcd_dma_ch = {
+    .dmac = &s5l8702_dmac0,
+    .prio = DMAC_CH_PRIO(4),
+    .cb_fn = NULL,
+
+    .tskbuf = lcd_dma_tskbuf,
+    .tskbuf_mask = LCD_DMA_TSKBUF_SZ - 1,
+    .queue_mode = QUEUE_NORMAL,
+
+    .llibuf = lcd_dma_llibuf,
+    .llibuf_mask = LCD_DMA_LLIBUF_SZ - 1,
+    .llibuf_bus = DMAC_MASTER_AHB1,
+};
+
+static struct dmac_ch_cfg lcd_dma_ch_cfg = {
+    .srcperi = S5L8702_DMAC0_PERI_MEM,
+    .dstperi = S5L8702_DMAC0_PERI_LCD_WR,
+    .sbsize  = DMACCxCONTROL_BSIZE_1,
+    .dbsize  = DMACCxCONTROL_BSIZE_1,
+    .swidth  = DMACCxCONTROL_WIDTH_16,
+    .dwidth  = DMACCxCONTROL_WIDTH_16,
+    .sbus    = DMAC_MASTER_AHB1,
+    .dbus    = DMAC_MASTER_AHB1,
+    .sinc    = DMACCxCONTROL_INC_ENABLE,
+    .dinc    = DMACCxCONTROL_INC_DISABLE,
+    .prot    = DMAC_PROT_CACH | DMAC_PROT_BUFF | DMAC_PROT_PRIV,
+    .lli_xfer_max_count = DMAC_LLI_MAX_COUNT,
+};
+
 static inline void s5l_lcd_write_reg(int cmd, unsigned int data)
 {
     while (LCD_STATUS & 0x10);
@@ -328,11 +369,13 @@ void lcd_awake(void)
 void lcd_init_device(void)
 {
     /* Detect lcd type */
-    semaphore_init(&lcd_wakeup, 1, 0);
     mutex_init(&lcd_mutex);
     lcd_type = (PDAT6 & 0x30) >> 4;
     while (!(LCD_STATUS & 0x2));
     LCD_CONFIG = 0x80100db0;
+
+    /* Configure DMA channel */
+    dmac_ch_init(&lcd_dma_ch, &lcd_dma_ch_cfg);
 
     lcd_ispowered = true;
 }
@@ -362,8 +405,10 @@ extern void lcd_write_line(const fb_data *addr,
 static void displaylcd_setup(int x, int y, int width, int height) ICODE_ATTR;
 static void displaylcd_setup(int x, int y, int width, int height)
 {
+    /* TODO: ISR()->panicf()->lcd_update() blocks forever */
     mutex_lock(&lcd_mutex);
-    while (DMAC0C4CONFIG & 1) semaphore_wait(&lcd_wakeup, HZ / 10);
+    while (dmac_ch_running(&lcd_dma_ch))
+        yield();
 
     int xe = (x + width) - 1;           /* max horiz */
     int ye = (y + height) - 1;          /* max vert */
@@ -398,29 +443,10 @@ static void displaylcd_setup(int x, int y, int width, int height)
 static void displaylcd_dma(int pixels) ICODE_ATTR;
 static void displaylcd_dma(int pixels)
 {
-    int i;
-    void* data = lcd_dblbuf;
-    for (i = -1; i < (int)ARRAYLEN(lcd_lli) && pixels > 0; i++, pixels -= 0xfff)
-    {
-        bool last = i + 1 >= (int)ARRAYLEN(lcd_lli) || pixels <= 0xfff;
-        struct dma_lli* lli = i < 0 ? (struct dma_lli*)((int)&DMAC0C4LLI) : &lcd_lli[i];
-        lli->srcaddr = data;
-        lli->dstaddr = (void*)((int)&LCD_WDATA);
-        lli->nextlli = last ? NULL : &lcd_lli[i + 1];
-        lli->control = 0x70240000 | (last ? pixels : 0xfff)
-                     | (last ? 0x80000000 : 0) | 0x4000000;
-        data += 0x1ffe;
-    }
     commit_dcache();
-    DMAC0C4CONFIG = 0x88c1;
+    dmac_ch_queue(&lcd_dma_ch, lcd_dblbuf,
+            (void*)S5L8702_DADDR_PERI_LCD_WR, pixels*2, NULL);
     mutex_unlock(&lcd_mutex);
-}
-
-void INT_DMAC0C4(void) ICODE_ATTR;
-void INT_DMAC0C4(void)
-{
-    DMAC0INTTCCLR = 0x10;
-    semaphore_release(&lcd_wakeup);
 }
 
 /* Update a fraction of the display. */
