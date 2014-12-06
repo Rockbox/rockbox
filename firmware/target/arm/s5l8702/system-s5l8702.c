@@ -182,7 +182,7 @@ void fiq_dummy(void)
 
 void system_init(void)
 {
-    /*gpio_init();*/
+    gpio_init();
     pmu_init();
     dma_init();
     VIC0INTENABLE = 1 << IRQ_WHEEL;
