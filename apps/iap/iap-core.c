@@ -718,7 +718,8 @@ void iap_periodic(void)
              * is in the RX buffer right now.
              */
             IAP_TX_INIT(0x00, 0x17);
-            IAP_TX_PUT_DATA(iap_rxstart, 20);
+            IAP_TX_PUT_DATA(iap_rxstart,
+                        (device.auth.version == 0x100) ? 16 : 20);
             IAP_TX_PUT(0x01);
 
             iap_send_tx();
