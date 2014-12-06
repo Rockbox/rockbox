@@ -69,12 +69,12 @@ void accessory_supply_set(bool enable)
     if (enable)
     {
         /* Accessory voltage supply on */
-//TODO:        pmu_ldo_power_on(6);
+        pmu_ldo_power_on(6);
     }
     else
     {
         /* Accessory voltage supply off */
-//TODO:        pmu_ldo_power_off(6);
+        pmu_ldo_power_off(6);
     }
 }
 #endif
