@@ -22,6 +22,9 @@
 #include "cpu.h"
 #include "audio.h"
 #include "sound.h"
+#include "pmu-target.h"
+
+extern int rec_hw_ver;
 
 #if INPUT_SRC_CAPS != 0
 void audio_set_output_source(int source)
@@ -46,13 +49,42 @@ void audio_input_mux(int source, unsigned flags)
             {
                 audiohw_set_monitor(false);
                 audiohw_disable_recording();
+
+                /* Vcodec = 1800mV (900mV + value*100mV) */
+                pmu_ldo_set_voltage(3, 0x9);
+
+                if (rec_hw_ver == 1)
+                    GPIOCMD = 0xe070e;
             }
 #endif
         break;
+
+#ifdef HAVE_MIC_REC
+        case AUDIO_SRC_MIC:             /* recording only */
+            if (source != last_source)
+            {
+                if (rec_hw_ver == 1)
+                    GPIOCMD = 0xe070f;
+
+                /* Vcodec = 2400mV (900mV + value*100mV) */
+                pmu_ldo_set_voltage(3, 0xf);
+
+                audiohw_set_monitor(false);
+                audiohw_enable_recording(true);  /* source mic */
+            }
+        break;
+#endif
+
 #ifdef HAVE_LINE_REC
         case AUDIO_SRC_LINEIN:          /* recording only */
             if (source != last_source)
             {
+                if (rec_hw_ver == 1)
+                    GPIOCMD = 0xe070e;
+
+                /* Vcodec = 2400mV (900mV + value*100mV) */
+                pmu_ldo_set_voltage(3, 0xf);
+
                 audiohw_set_monitor(false);
                 audiohw_enable_recording(false); /* source line */
             }

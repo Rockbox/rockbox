@@ -39,6 +39,8 @@
 #define _DEBUG_PRINTF(a, varargs...) lcd_putsf(0, line++, (a), ##varargs);
 
 extern int lcd_type;
+extern int rec_hw_ver;
+
 bool dbg_hw_info(void)
 {
     int line;
@@ -69,6 +71,9 @@ bool dbg_hw_info(void)
             line++;
 
             _DEBUG_PRINTF("LCD type: %d", lcd_type);
+            line++;
+
+            _DEBUG_PRINTF("capture HW: %d", rec_hw_ver);
             line++;
         }
         else if(state==1)

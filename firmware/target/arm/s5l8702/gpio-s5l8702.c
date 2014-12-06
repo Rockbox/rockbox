@@ -26,6 +26,40 @@
 #include "gpio-s5l8702.h"
 #include "panic.h"
 
+int rec_hw_ver;
+
+void INIT_ATTR gpio_init(void)
+{
+    /* Capture hardware versions:
+     *
+     * HW version 1 includes an amplifier for the jack plug
+     * microphone, it is activated configuring GPIO E7 as output
+     * high. It is posible to detect capture HW version (even
+     * when HP are not plugged) reading GPIO E7:
+     *
+     *   Ver  GPIO E7  models       capture support
+     *   ---  -------  ------       ---------------
+     *   0    1        80/160fat    dock line-in
+     *   1    0        120/160slim  dock line-in + jack mic
+     */
+    GPIOCMD = 0xe0700;
+    rec_hw_ver = (PDAT(14) & (1 << 7)) ? 0 : 1;
+
+    /* default GPIO configuration */
+    GPIOCMD = 0xe070e;
+    if (rec_hw_ver == 0) {
+        GPIOCMD = 0xe060e;
+    }
+    else {
+        /* GPIO E6 is connected to mikey IRQ line (active low),
+           configure it as pull-up input */
+        GPIOCMD = 0xe0600;
+        PUNB(14) |= (1 << 6);
+    }
+
+    /* TODO: initialize GPIO ports for minimum power consumption */
+}
+
 
 /*
  * XXX: disabled, not used and never tested!
@@ -47,11 +81,6 @@ static int n_handlers = 0;
 
 
 /* API */
-void INIT_ATTR gpio_init(void)
-{
-    /* TODO: initialize GPIO ports for minimum power consumption */
-}
-
 uint32_t gpio_group_get(int group)
 {
     uint32_t pcon = PCON(group);
