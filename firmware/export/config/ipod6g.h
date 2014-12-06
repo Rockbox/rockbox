@@ -247,10 +247,14 @@
 #define USB_NUM_ENDPOINTS 6
 #define USB_DEVBSS_ATTR __attribute__((aligned(16)))
 
+#define HAVE_SERIAL
+/* Disable iAP when LOGF_SERIAL is enabled to avoid conflicts */
+#ifndef LOGF_SERIAL
+#define IPOD_ACCESSORY_PROTOCOL
+#endif
+
 /* Define this if you can switch on/off the accessory power supply */
 #define HAVE_ACCESSORY_SUPPLY
-//#define IPOD_ACCESSORY_PROTOCOL
-#define HAVE_SERIAL
 
 /* Define this, if you can switch on/off the lineout */
 #define HAVE_LINEOUT_POWEROFF
