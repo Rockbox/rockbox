@@ -26,6 +26,7 @@
 #include "pmu-target.h"
 #include "gpio-s5l8702.h"
 #include "dma-s5l8702.h"
+#include "uart-s5l8702.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -64,11 +65,11 @@ default_interrupt(INT_IRQ20);
 default_interrupt(INT_IRQ21);
 default_interrupt(INT_IRQ22);
 default_interrupt(INT_WHEEL);
-default_interrupt(INT_IRQ24);
-default_interrupt(INT_IRQ25);
-default_interrupt(INT_IRQ26);
-default_interrupt(INT_IRQ27);
-default_interrupt(INT_IRQ28);
+default_interrupt(INT_UART0);
+default_interrupt(INT_UART1);
+default_interrupt(INT_UART2);
+default_interrupt(INT_UART3);
+default_interrupt(INT_IRQ28);   /* obsolete/not implemented UART4 ??? */
 default_interrupt(INT_ATA);
 default_interrupt(INT_IRQ30);
 default_interrupt(INT_EXT4);    /* GPIOIC group 2 (not used) */
@@ -133,7 +134,7 @@ static void (* const irqvector[])(void) =
     INT_EXT0,INT_EXT1,INT_EXT2,INT_EXT3,INT_IRQ4,INT_IRQ5,INT_IRQ6,INT_TIMER32,
     INT_TIMER,INT_IRQ9,INT_IRQ10,INT_IRQ11,INT_IRQ12,INT_IRQ13,INT_IRQ14,INT_IRQ15,
     INT_DMAC0,INT_DMAC1,INT_IRQ18,INT_USB_FUNC,INT_IRQ20,INT_IRQ21,INT_IRQ22,INT_WHEEL,
-    INT_IRQ24,INT_IRQ25,INT_IRQ26,INT_IRQ27,INT_IRQ28,INT_ATA,INT_IRQ30,INT_EXT4,
+    INT_UART0,INT_UART1,INT_UART2,INT_UART3,INT_IRQ28,INT_ATA,INT_IRQ30,INT_EXT4,
     INT_EXT5,INT_EXT6,INT_IRQ34,INT_IRQ35,INT_IRQ36,INT_IRQ37,INT_IRQ38,INT_IRQ39,
     INT_IRQ40,INT_IRQ41,INT_IRQ42,INT_IRQ43,INT_MMC,INT_IRQ45,INT_IRQ46,INT_IRQ47,
     INT_IRQ48,INT_IRQ49,INT_IRQ50,INT_IRQ51,INT_IRQ52,INT_IRQ53,INT_IRQ54,INT_IRQ55,
@@ -185,6 +186,9 @@ void system_init(void)
     gpio_init();
     pmu_init();
     dma_init();
+#ifdef HAVE_SERIAL
+    uart_init();
+#endif
     VIC0INTENABLE = 1 << IRQ_WHEEL;
     VIC0INTENABLE = 1 << IRQ_ATA;
     VIC1INTENABLE = 1 << (IRQ_MMC - 32);
