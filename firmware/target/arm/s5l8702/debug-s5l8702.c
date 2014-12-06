@@ -44,7 +44,7 @@ bool dbg_hw_info(void)
     int line;
     int i;
     unsigned int state = 0;
-    const unsigned int max_states=3;
+    const unsigned int max_states=2;
 
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
@@ -94,16 +94,6 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("charging: %s", charging_state() ? "true" : "false");
             _DEBUG_PRINTF("backlight: %s", pmu_read(0x29) ? "on" : "off");
             _DEBUG_PRINTF("brightness value: %d", pmu_read(0x28));
-        }
-        else if(state==2)
-        {
-            _DEBUG_PRINTF("Audio DMA:");
-            _DEBUG_PRINTF(">%08X %08X %08X %08X %08X", DMAC0C0CONFIG, DMAC0C0SRCADDR,
-                          DMAC0C0DESTADDR, DMAC0C0NEXTLLI, DMAC0C0CONTROL);
-            for(i = 0; i < PCM_LLICOUNT; i++)
-                _DEBUG_PRINTF("%08X: %08X %08X %08X %08X", &pcm_lli[i], pcm_lli[i].srcaddr,
-                              pcm_lli[i].dstaddr, pcm_lli[i].nextlli, pcm_lli[i].control);
-            _DEBUG_PRINTF("chunk: %08X %08X", pcm_chunksize, pcm_remaining);
         }
         else
         {

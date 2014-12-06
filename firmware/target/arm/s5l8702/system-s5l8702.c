@@ -25,6 +25,7 @@
 #include "system-target.h"
 #include "pmu-target.h"
 #include "gpio-s5l8702.h"
+#include "dma-s5l8702.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -55,22 +56,8 @@ default_interrupt(INT_IRQ12);
 default_interrupt(INT_IRQ13);
 default_interrupt(INT_IRQ14);
 default_interrupt(INT_IRQ15);
-default_interrupt(INT_DMAC0C0);
-default_interrupt(INT_DMAC0C1);
-default_interrupt(INT_DMAC0C2);
-default_interrupt(INT_DMAC0C3);
-default_interrupt(INT_DMAC0C4);
-default_interrupt(INT_DMAC0C5);
-default_interrupt(INT_DMAC0C6);
-default_interrupt(INT_DMAC0C7);
-default_interrupt(INT_DMAC1C0);
-default_interrupt(INT_DMAC1C1);
-default_interrupt(INT_DMAC1C2);
-default_interrupt(INT_DMAC1C3);
-default_interrupt(INT_DMAC1C4);
-default_interrupt(INT_DMAC1C5);
-default_interrupt(INT_DMAC1C6);
-default_interrupt(INT_DMAC1C7);
+default_interrupt(INT_DMAC0);
+default_interrupt(INT_DMAC1);
 default_interrupt(INT_IRQ18);
 default_interrupt(INT_USB_FUNC);
 default_interrupt(INT_IRQ20);
@@ -141,34 +128,6 @@ void INT_TIMER32()
     if ((THCON >> 12) & 0x7 & tstat) INT_TIMERH();
 }
 
-void INT_DMAC0(void) ICODE_ATTR;
-void INT_DMAC0()
-{
-    uint32_t intsts = DMAC0INTSTS;
-    if (intsts & 1) INT_DMAC0C0();
-    if (intsts & 2) INT_DMAC0C1();
-    if (intsts & 4) INT_DMAC0C2();
-    if (intsts & 8) INT_DMAC0C3();
-    if (intsts & 0x10) INT_DMAC0C4();
-    if (intsts & 0x20) INT_DMAC0C5();
-    if (intsts & 0x40) INT_DMAC0C6();
-    if (intsts & 0x80) INT_DMAC0C7();
-}
-
-void INT_DMAC1(void) ICODE_ATTR;
-void INT_DMAC1()
-{
-    uint32_t intsts = DMAC1INTSTS;
-    if (intsts & 1) INT_DMAC1C0();
-    if (intsts & 2) INT_DMAC1C1();
-    if (intsts & 4) INT_DMAC1C2();
-    if (intsts & 8) INT_DMAC1C3();
-    if (intsts & 0x10) INT_DMAC1C4();
-    if (intsts & 0x20) INT_DMAC1C5();
-    if (intsts & 0x40) INT_DMAC1C6();
-    if (intsts & 0x80) INT_DMAC1C7();
-}
-
 static void (* const irqvector[])(void) =
 {
     INT_EXT0,INT_EXT1,INT_EXT2,INT_EXT3,INT_IRQ4,INT_IRQ5,INT_IRQ6,INT_TIMER32,
@@ -225,6 +184,7 @@ void system_init(void)
 {
     /*gpio_init();*/
     pmu_init();
+    dma_init();
     VIC0INTENABLE = 1 << IRQ_WHEEL;
     VIC0INTENABLE = 1 << IRQ_ATA;
     VIC1INTENABLE = 1 << (IRQ_MMC - 32);
