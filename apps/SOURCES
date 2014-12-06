@@ -64,6 +64,9 @@ scrobbler.c
 #ifdef IPOD_ACCESSORY_PROTOCOL
 iap/iap-core.c
 iap/iap-lingo0.c
+#ifdef HAVE_LINE_REC
+iap/iap-lingo1.c
+#endif
 iap/iap-lingo2.c
 iap/iap-lingo3.c
 iap/iap-lingo4.c
