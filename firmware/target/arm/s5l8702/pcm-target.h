@@ -23,18 +23,7 @@
 
 
 /* S5L8702 PCM driver tunables: */
-#define PCM_LLIMAX (2047)     /* Maximum number of samples per LLI */
-#define PCM_CHUNKSIZE (10747) /* Maximum number of samples to handle with one IRQ */
-                              /* (bigger chunks will be segmented internally)     */
 #define PCM_WATERMARK (512)   /* Number of remaining samples to schedule IRQ at */
-
-
-#define PCM_LLICOUNT ((PCM_CHUNKSIZE - PCM_WATERMARK + PCM_LLIMAX - 1) / PCM_LLIMAX + 1)
-
-
-extern struct dma_lli pcm_lli[PCM_LLICOUNT];
-extern size_t pcm_remaining;
-extern size_t pcm_chunksize;
 
 
 #endif /* __PCM_TARGET_H__ */
