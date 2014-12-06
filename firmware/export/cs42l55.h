@@ -23,13 +23,24 @@
 #define __CS42L55_H__
 
 #define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | BASS_CUTOFF_CAP | \
-                      TREBLE_CUTOFF_CAP | PRESCALER_CAP | LINEOUT_CAP)
+                      TREBLE_CUTOFF_CAP | PRESCALER_CAP | LINEOUT_CAP | \
+                      LIN_GAIN_CAP | MIC_GAIN_CAP)
 
 AUDIOHW_SETTING(VOLUME,       "dB", 0,  1, -60,  12, -25)
 AUDIOHW_SETTING(BASS,         "dB", 1, 15,-105, 120,   0)
 AUDIOHW_SETTING(TREBLE,       "dB", 1, 15,-105, 120,   0)
 AUDIOHW_SETTING(BASS_CUTOFF,    "", 0,  1,   1,   4,   2)
 AUDIOHW_SETTING(TREBLE_CUTOFF,  "", 0,  1,   1,   4,   1)
+#ifdef HAVE_RECORDING
+#define PGA_GAIN_DB     12  /* PGA fixed gain, range: -6 to +12 dB */
+AUDIOHW_SETTING(LEFT_GAIN,    "dB", 0,  1, -96,   0,   0)
+AUDIOHW_SETTING(RIGHT_GAIN,   "dB", 0,  1, -96,   0,   0)
+AUDIOHW_SETTING(MIC_GAIN,     "dB", 0,  1, -96,   0,   0, val + PGA_GAIN_DB)
+#endif /* HAVE_RECORDING */
+
+/* powered DSP modules */
+#define DSP_MODULE_TONE         (1 << 0)
+#define DSP_MODULE_MONITOR      (1 << 1)
 
 void audiohw_enable_lineout(bool enable);
 
