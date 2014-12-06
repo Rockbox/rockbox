@@ -603,8 +603,27 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
                 break;
             }
 
-            /* We only support version 2.0 */
-            if ((buf[2] != 2) || (buf[3] != 0)) {
+            device.auth.version = (buf[2] << 8) | buf[3];
+
+            /* We support authentication versions 1.0 and 2.0 */
+            if (device.auth.version == 0x100) {
+                /* If we could really do authentication we'd have to
+                 * check the certificate here. Since we can't, just acknowledge
+                 * the packet with an "everything OK" AckDevAuthenticationInfo
+                 *
+                 * Skip GetAccessoryInfo process, this command together with
+                 * authentication level 2 were added in iAP release 24, it is
+                 * not be supported by devices authenticating at level 1.
+                 */
+                IAP_TX_INIT(0x00, 0x16);
+                IAP_TX_PUT(0x00);
+
+                iap_send_tx();
+                device.auth.state = AUST_CERTDONE;
+                break;
+            }
+
+            if (device.auth.version != 0x200) {
                 /* Version mismatches are signalled by AckDevAuthenticationInfo
                  * with the status set to Authentication Information unsupported
                  */
