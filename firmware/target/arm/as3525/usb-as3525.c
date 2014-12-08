@@ -33,10 +33,21 @@ static int usb_status = USB_EXTRACTED;
 void usb_enable(bool on)
 {
 #if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
-    if (on)
+    if (on) {
+
+          cpu_boost(1);
+//        set_cpu_frequency(CPUFREQ_MAX);
+//        cpu_frequency_lock(true);
+//#endif
         usb_core_init();
-    else
+    } else {
         usb_core_exit();
+//#if CONFIG_CPU == AS3525v2
+        sleep(HZ);
+        cpu_boost(0);
+      //  cpu_frequency_lock(false);
+//#endif
+    }
 #else
     (void)on;
 #endif
