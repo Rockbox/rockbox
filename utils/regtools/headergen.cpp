@@ -76,9 +76,12 @@ std::string to_hex(const T& v)
 
 typedef std::pair< std::string, std::string > xml_ver_t;
 
-void fprint_copyright(FILE *f, const std::vector< xml_ver_t >& versions)
+void fprint_copyright(FILE *f, const std::vector< xml_ver_t >& versions, char const *author)
 {
     std::ostringstream ver;
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+
     for(size_t i = 0; i < versions.size(); i++)
         ver << " " << versions[i].first << ":" << versions[i].second;
 
@@ -96,7 +99,9 @@ void fprint_copyright(FILE *f, const std::vector< xml_ver_t >& versions)
         fprintf(f, " * XML versions:%s\n", ver.str().c_str());
     fprintf(f,"\
  *\n\
- * Copyright (C) 2013 by Amaury Pouly\n\
+ * Copyright (C) ");
+    fprintf(f, "%d by %s\n", 1900+tm.tm_year, author);
+    fprintf(f,"\
  *\n\
  * This program is free software; you can redistribute it and/or\n\
  * modify it under the terms of the GNU General Public License\n\
@@ -109,14 +114,14 @@ void fprint_copyright(FILE *f, const std::vector< xml_ver_t >& versions)
  ****************************************************************************/\n");
 }
 
-void fprint_copyright(FILE *f, const xml_ver_t& version)
+void fprint_copyright(FILE *f, const xml_ver_t& version, char const *author)
 {
-    fprint_copyright(f, std::vector< xml_ver_t >(1, version));
+    fprint_copyright(f, std::vector< xml_ver_t >(1, version), author);
 }
 
-void fprint_copyright(FILE *f)
+void fprint_copyright(FILE *f, char const *author)
 {
-    fprint_copyright(f, std::vector< xml_ver_t >());
+    fprint_copyright(f, std::vector< xml_ver_t >(), author);
 }
 
 void fprint_include_guard_ex(FILE *f, bool begin, const std::string& name)
@@ -280,15 +285,16 @@ void gen_soc_field(define_align_context_t& ctx, bool multidev, bool multireg, co
         ctx.add("BF_" + prefix + "_V(v)", "((BV_" + prefix + "__##v" + " << " + to_str(field.first_bit) + ") & 0x" + to_hex(field.bitmask()) + ")");
 }
 
-void gen_soc_reg(FILE *f, bool multidev, const soc_reg_t& reg)
+void gen_soc_reg(FILE *f, bool multidev, const soc_reg_t& reg, char const *author, char const *hwprefix)
 {
     bool multireg = reg.addr.size() > 1;
 
     static const char *suffix[] = {"", "_SET", "_CLR", "_TOG"};
     bool sct = !!(reg.flags & REG_HAS_SCT);
 
+    // comment generator
     fprintf(f, "/**\n");
-    fprintf(f, " * Register: HW_%s_%s\n", g_soc_dev.c_str(), g_soc_reg.c_str());
+    fprintf(f, " * Register: %s%s_%s\n", hwprefix, g_soc_dev.c_str(), g_soc_reg.c_str());
     fprintf(f, " * Address:");
     if(multireg && reg.formula.type == REG_FORMULA_STRING)
     {
@@ -307,47 +313,68 @@ void gen_soc_reg(FILE *f, bool multidev, const soc_reg_t& reg)
 
     define_align_context_t ctx;
 
-    for(int i = 0; i < (sct ? 4 : 1); i++)
+    if (multireg && reg.formula.type != REG_FORMULA_STRING)
     {
-        std::ostringstream name;
-        name << "HW_" << g_soc_dev << "_" << g_soc_reg << suffix[i];
-        if(multidev || multireg)
+        for(int i=0; i < (int)reg.addr.size(); i++)
         {
-            name << "(";
-            if(multidev)
-                name << "d";
-            if(multidev && multireg)
-                name << ",";
-            if(multireg)
-                name << "n";
-            name << ")";
-        }
-        std::ostringstream value;
-        value << "(*(volatile unsigned long *)(" << g_soc_dev_regs_base;
-        if(multidev)
-            value << "(d)";
-        value << " + ";
-        if(multireg)
-        {
-            if(reg.formula.type != REG_FORMULA_STRING)
-                printf("Warning: register HW_%s_%s has no formula !\n", g_soc_dev.c_str(), g_soc_reg.c_str());
-            std::string formula = reg.formula.string.c_str();
-            size_t pos = formula.find("n");
-            while(pos != std::string::npos)
+            std::ostringstream name, value;
+            name << hwprefix << g_soc_dev << "_" << reg.addr[i].name;
+            if (multidev)
             {
-                formula.replace(pos, 1, "(n)");
-                pos = formula.find("n", pos + 2);
+                name << "(d)";
             }
-            value << formula;
+            value << "(*(volatile unsigned long *)(" << g_soc_dev_regs_base;
+            if (multidev)
+            {
+                value << "(d)";
+            }
+            value << " + 0x" << std::hex << reg.addr[i].addr << "))";
+
+            ctx.add(name.str(), value.str());
         }
-        else
-            value << "0x" << std::hex << reg.addr[0].addr;
+    }
+    else
+    {
+        for(int i = 0; i < (sct ? 4 : 1); i++)
+        {
+            std::ostringstream name;
+            name << hwprefix << g_soc_dev << "_" << g_soc_reg << suffix[i];
+            if(multidev || multireg)
+            {
+                name << "(";
+                if(multidev)
+                    name << "d";
+                if(multidev && multireg)
+                    name << ",";
+                if(multireg)
+                    name << "n";
+                name << ")";
+            }
+            std::ostringstream value;
+            value << "(*(volatile unsigned long *)(" << g_soc_dev_regs_base;
+            if(multidev)
+                value << "(d)";
+            value << " + ";
+            if(multireg)
+            {
+                std::string formula = reg.formula.string.c_str();
+                size_t pos = formula.find("n");
+                while(pos != std::string::npos)
+                {
+                    formula.replace(pos, 1, "(n)");
+                    pos = formula.find("n", pos + 2);
+                }
+                value << formula;
+            }
+            else
+                value << "0x" << std::hex << reg.addr[0].addr;
 
-        if(sct)
-            value << " + 0x" << std::hex << (i * 4);
-        value << "))";
+            if(sct)
+                value << " + 0x" << std::hex << (i * 4);
+            value << "))";
 
-        ctx.add(name.str(), value.str());
+            ctx.add(name.str(), value.str());
+        }
     }
 
     for(size_t i = 0; i < reg.field.size(); i++)
@@ -361,7 +388,8 @@ void gen_soc_reg(FILE *f, bool multidev, const soc_reg_t& reg)
     fprintf(f, "\n");
 }
 
-void gen_soc_dev_header(const std::string& filename, const xml_ver_t& ver, const soc_dev_t& dev)
+void gen_soc_dev_header(const std::string& filename, const xml_ver_t& ver, const soc_dev_t& dev,
+                        char const *author, char const *hwprefix)
 {
     /*
     printf("Generate headers for soc %s, dev %s: use file %s\n", g_soc_name.c_str(),
@@ -373,7 +401,7 @@ void gen_soc_dev_header(const std::string& filename, const xml_ver_t& ver, const
         printf("Cannot open %s for writing: %m\n", filename.c_str());
         return;
     }
-    fprint_copyright(f, ver);
+    fprint_copyright(f, ver, author);
     fprint_include_guard(f, true);
     if(g_macro_filename.size() > 0)
         fprintf(f, "#include \"%s\"\n", g_macro_filename.c_str());
@@ -400,14 +428,14 @@ void gen_soc_dev_header(const std::string& filename, const xml_ver_t& ver, const
     for(size_t i = 0; i < dev.reg.size(); i++)
     {
         g_soc_reg = dev.reg[i].name;
-        gen_soc_reg(f, dev.addr.size() > 1, dev.reg[i]);
+        gen_soc_reg(f, dev.addr.size() > 1, dev.reg[i], author, hwprefix);
     }
 
     fprint_include_guard(f, false);
     fclose(f);
 }
 
-void gen_soc_headers(const std::string& prefix, const soc_t& soc)
+void gen_soc_headers(const std::string& prefix, const soc_t& soc, char const *author, char const *hwprefix)
 {
     printf("Generate headers for soc %s: use directory %s\n", soc.name.c_str(),
         prefix.c_str());
@@ -417,11 +445,11 @@ void gen_soc_headers(const std::string& prefix, const soc_t& soc)
     {
         g_soc_dev = soc.dev[i].name;
         xml_ver_t ver(soc.name, soc.dev[i].version);
-        gen_soc_dev_header(prefix + "/regs-" + tolower(g_soc_dev.c_str()) + ".h", ver, soc.dev[i]);
+        gen_soc_dev_header(prefix + "/regs-" + tolower(g_soc_dev.c_str()) + ".h", ver, soc.dev[i], author, hwprefix);
     }
 }
 
-void gen_headers(const std::string& prefix, const std::vector< soc_t >& socs)
+void gen_headers(const std::string& prefix, const std::vector< soc_t >& socs, char const *author, char const *hwprefix)
 {
     for(size_t i = 0; i < socs.size(); i++)
     {
@@ -429,7 +457,7 @@ void gen_headers(const std::string& prefix, const std::vector< soc_t >& socs)
         std::string dir = prefix;
         if(g_gen_selector)
             dir += "/" + socs[i].name;
-        gen_soc_headers(dir, socs[i]);
+        gen_soc_headers(dir, socs[i], author, hwprefix);
     }
 }
 
@@ -446,13 +474,13 @@ general_dev_list_t build_general_dev_list(const std::vector< soc_t >& socs)
 }
 
 void gen_select_header(const std::string& filename, const std::string& dev,
-    const std::vector< std::string >& socs, const std::vector< xml_ver_t >& ver)
+    const std::vector< std::string >& socs, const std::vector< xml_ver_t >& ver, char const *author)
 {
     std::string guard = "__SELECT__" + toupper(dev) + "__H__";
     FILE *f = fopen(filename.c_str(), "w");
     if(f == NULL)
         error("Cannot open file %s\n", filename.c_str());
-    fprint_copyright(f, ver);
+    fprint_copyright(f, ver, author);
     fprint_include_guard_ex(f, true, guard);
     if(g_macro_filename.size() > 0)
         fprintf(f, "#include \"%s\"\n", g_macro_filename.c_str());
@@ -474,7 +502,7 @@ void gen_select_header(const std::string& filename, const std::string& dev,
     fclose(f);
 }
 
-void gen_selectors(const std::string& prefix, const std::vector< soc_t >& socs)
+void gen_selectors(const std::string& prefix, const std::vector< soc_t >& socs, char const *author)
 {
     printf("Generate select headers: use directory %s\n",  prefix.c_str());
     general_dev_list_t map = build_general_dev_list(socs);
@@ -489,7 +517,7 @@ void gen_selectors(const std::string& prefix, const std::vector< soc_t >& socs)
             ver.push_back(std::make_pair(socs[soc_nr].name, socs[soc_nr].dev[dev_in_soc_nr].version));
             names.push_back(socs[soc_nr].name);
         }
-        gen_select_header(prefix + "/regs-" + it->first + ".h", it->first, names, ver);
+        gen_select_header(prefix + "/regs-" + it->first + ".h", it->first, names, ver, author);
     }
 }
 
@@ -510,7 +538,7 @@ void gen_macro_list(FILE *f, const std::string& prefix, int count, int nr_digits
     }
 }
 
-void gen_macro(const std::string& filename, bool variadic)
+void gen_macro(const std::string& filename, bool variadic, char const *author, char const *hwprefix)
 {
     printf("Generate %smacro header: use %s\n", variadic ? "": "non-variadic ",
         filename.c_str());
@@ -518,7 +546,7 @@ void gen_macro(const std::string& filename, bool variadic)
     FILE *f = fopen(filename.c_str(), "w");
     if(f == NULL)
         error("Cannot open file %s\n", filename.c_str());
-    fprint_copyright(f);
+    fprint_copyright(f, author);
     fprint_include_guard_ex(f, true, guard);
     fprintf(f, "\n");
 
@@ -537,33 +565,33 @@ void gen_macro(const std::string& filename, bool variadic)
     const int MAX_NARGS = 32;
 
     fprintf(f, "\
-#define BF_SET(reg, field)              "REG_WRITE"(HW_##reg##_SET, BM_##reg##_##field)\n\
-#define BF_CLR(reg, field)              "REG_WRITE"(HW_##reg##_CLR, BM_##reg##_##field)\n\
-#define BF_TOG(reg, field)              "REG_WRITE"(HW_##reg##_TOG, BM_##reg##_##field)\n\
+#define BF_SET(reg, field)              "REG_WRITE"(%1$s##reg##_SET, BM_##reg##_##field)\n\
+#define BF_CLR(reg, field)              "REG_WRITE"(%1$s##reg##_CLR, BM_##reg##_##field)\n\
+#define BF_TOG(reg, field)              "REG_WRITE"(%1$s##reg##_TOG, BM_##reg##_##field)\n\
 \n\
-#define BF_SETV(reg, field, v)          "REG_WRITE"(HW_##reg##_SET, BF_##reg##_##field(v))\n\
-#define BF_CLRV(reg, field, v)          "REG_WRITE"(HW_##reg##_CLR, BF_##reg##_##field(v))\n\
-#define BF_TOGV(reg, field, v)          "REG_WRITE"(HW_##reg##_TOG, BF_##reg##_##field(v))\n\
+#define BF_SETV(reg, field, v)          "REG_WRITE"(%1$s##reg##_SET, BF_##reg##_##field(v))\n\
+#define BF_CLRV(reg, field, v)          "REG_WRITE"(%1$s##reg##_CLR, BF_##reg##_##field(v))\n\
+#define BF_TOGV(reg, field, v)          "REG_WRITE"(%1$s##reg##_TOG, BF_##reg##_##field(v))\n\
 \n\
 #define BF_RDX(val, reg, field)         (("REG_READ"(val) & BM_##reg##_##field) >> BP_##reg##_##field)\n\
-#define BF_RD(reg, field)               BF_RDX("REG_READ"(HW_##reg), reg, field)\n\
+#define BF_RD(reg, field)               BF_RDX("REG_READ"(%1$s##reg), reg, field)\n\
 #define BF_WRX(val, reg, field, v)      "REG_WRITE"(val, ("REG_READ"(val) & ~BM_##reg##_##field) | (((v) << BP_##reg##_##field) & BM_##reg##_##field))\n\
-#define BF_WR(reg, field, v)            BF_WRX(HW_##reg, reg, field, v)\n\
+#define BF_WR(reg, field, v)            BF_WRX(%1$s##reg, reg, field, v)\n\
 #define BF_WR_V(reg, field, sy)         BF_WR(reg, field, BV_##reg##_##field##__##sy)\n\
 #define BF_WR_VX(val, reg, field, sy)   BF_WRX(val, reg, field, BV_##reg##_##field##__##sy)\n\
 \n\
-#define BF_SETn(reg, n, field)          "REG_WRITE"(HW_##reg##_SET(n), BM_##reg##_##field)\n\
-#define BF_CLRn(reg, n, field)          "REG_WRITE"(HW_##reg##_CLR(n), BM_##reg##_##field)\n\
-#define BF_TOGn(reg, n, field)          "REG_WRITE"(HW_##reg##_TOG(n), BM_##reg##_##field)\n\
+#define BF_SETn(reg, n, field)          "REG_WRITE"(%1$s##reg##_SET(n), BM_##reg##_##field)\n\
+#define BF_CLRn(reg, n, field)          "REG_WRITE"(%1$s##reg##_CLR(n), BM_##reg##_##field)\n\
+#define BF_TOGn(reg, n, field)          "REG_WRITE"(%1$s##reg##_TOG(n), BM_##reg##_##field)\n\
 \n\
-#define BF_SETVn(reg, n, field, v)      "REG_WRITE"(HW_##reg##_SET(n), BF_##reg##_##field(v))\n\
-#define BF_CLRVn(reg, n, field, v)      "REG_WRITE"(HW_##reg##_CLR(n), BF_##reg##_##field(v))\n\
-#define BF_TOGVn(reg, n, field, v)      "REG_WRITE"(HW_##reg##_TOG(n), BF_##reg##_##field(v))\n\
+#define BF_SETVn(reg, n, field, v)      "REG_WRITE"(%1$s##reg##_SET(n), BF_##reg##_##field(v))\n\
+#define BF_CLRVn(reg, n, field, v)      "REG_WRITE"(%1$s##reg##_CLR(n), BF_##reg##_##field(v))\n\
+#define BF_TOGVn(reg, n, field, v)      "REG_WRITE"(%1$s##reg##_TOG(n), BF_##reg##_##field(v))\n\
 \n\
-#define BF_RDn(reg, n, field)           BF_RDX(HW_##reg(n), reg, field)\n\
-#define BF_WRn(reg, n, field, v)        BF_WRX(HW_##reg(n), reg, field, v)\n\
+#define BF_RDn(reg, n, field)           BF_RDX(%1$s##reg(n), reg, field)\n\
+#define BF_WRn(reg, n, field, v)        BF_WRX(%1$s##reg(n), reg, field, v)\n\
 #define BF_WRn_V(reg, n, field, sy)     BF_WRn(reg, n, field, BV_##reg##_##field##__##sy)\n\
-\n");
+\n", hwprefix);
 
     for(int nargs = 1; nargs <= MAX_NARGS; nargs++)
     {
@@ -612,17 +640,21 @@ void usage()
 {
     printf("usage: headergen [options] <desc files...> <output directory>\n");
     printf("options:\n");
-    printf("  -?/--help         Dispaly this help\n");
-    printf("  -s/--selector     Always produce selector files\n");
-    printf("  -m/--no-macro     Do not generate a macro file with helpers\n");
-    printf("  -i/--no-include   Do not include the macro file in the headers\n");
-    printf("  -v/--no-variadic  Do not generate variadic macros\n");
+    printf("  -?/--help                   Dispaly this help\n");
+    printf("  -s/--selector               Always produce selector files\n");
+    printf("  -m/--no-macro               Do not generate a macro file with helpers\n");
+    printf("  -i/--no-include             Do not include the macro file in the headers\n");
+    printf("  -v/--no-variadic            Do not generate variadic macros\n");
+    printf("  -p/--reg-prefix \"prefix\"    Prefix register names\n");
+    printf("  -a/--author \"Author\"        Set author name in preamble\n");
+    printf("\n");
     printf("Default option is to generate a macro file with variadic macros.\n");
     printf("Default option is to include the macro file in the headers.\n");
     printf("Default option is to generate selector files only for two or more socs.\n");
     printf("Default option is to create one subdirectory per soc, except if no\n");
-    printf("selector files are needed. The subdirectories will be created if\n");
-    printf("necessary.\n");
+    printf("selector files are needed. The subdirectories will be created if necessary.\n");
+    printf("Default option is to not prefix register names\n");
+    printf("Default option is \"Unknown Author\" for author in preamble\n");
     exit(1);
 }
 
@@ -632,6 +664,9 @@ int main(int argc, char **argv)
     bool no_variadic = false;
     bool no_macro = false;
     bool no_include = false;
+    char const *author = "Unknown Author";
+    char const *hwprefix = "";
+
     if(argc <= 1)
         usage();
 
@@ -644,10 +679,12 @@ int main(int argc, char **argv)
             {"no-macro", no_argument, 0, 'm'},
             {"no-include", no_argument, 0, 'i'},
             {"no-variadic", no_argument, 0, 'v'},
+            {"reg-prefix", required_argument, 0, 'p'},
+            {"author", required_argument, 0, 'a'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?smiv", long_options, NULL);
+        int c = getopt_long(argc, argv, "?smivp:a:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -668,6 +705,12 @@ int main(int argc, char **argv)
                 break;
             case 'v':
                 no_variadic = true;
+                break;
+            case 'a' :
+                author = optarg;
+                break;
+            case 'p' :
+                hwprefix = optarg;
                 break;
             default:
                 abort();
@@ -691,16 +734,16 @@ int main(int argc, char **argv)
     if(!no_macro)
     {
         g_macro_filename = std::string(argv[argc - 1]) + "/regs-macro.h";
-        gen_macro(g_macro_filename, !no_variadic);
+        gen_macro(g_macro_filename, !no_variadic, author, hwprefix);
         g_macro_filename = "regs-macro.h";
         if(no_include)
            g_macro_filename.clear();
     }
     if(g_gen_selector)
     {
-        gen_selectors(argv[argc - 1], socs);
+        gen_selectors(argv[argc - 1], socs, author);
         g_macro_filename.clear();
     }
-    gen_headers(argv[argc - 1], socs);
+    gen_headers(argv[argc - 1], socs, author, hwprefix);
     return 0;
 }
