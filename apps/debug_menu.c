@@ -1507,6 +1507,205 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 #endif /* HAVE_ATA_DMA */
     return btn;
 }
+
+#ifdef HAVE_ATA_SMART
+static struct ata_smart_values *smart_data = NULL;
+
+static const char * ata_smart_get_attr_name(unsigned char id)
+{
+    switch (id)
+    {
+        case 1:     return "Raw Read Error Rate";
+        case 2:     return "Throughput Performance";
+        case 3:     return "Spin-Up Time";
+        case 4:     return "Start/Stop Count";
+        case 5:     return "Reallocated Sector Count";
+        case 7:     return "Seek Error Rate";
+        case 8:     return "Seek Time Performance";
+        case 9:     return "Power-On Hours Count";
+        case 10:    return "Spin-Up Retry Count";
+        case 12:    return "Power Cycle Count";
+        case 192:   return "Power-Off Retract Count";
+        case 193:   return "Load/Unload Cycle Count";
+        case 194:   return "HDA Temperature";
+        case 196:   return "Reallocated Event Count";
+        case 197:   return "Current Pending Sector Count";
+        case 198:   return "Uncorrectable Sector Count";
+        case 199:   return "UltraDMA CRC Error Count";
+        case 220:   return "Disk Shift";
+        case 222:   return "Loaded Hours";
+        case 223:   return "Load/Unload Retry Count";
+        case 224:   return "Load Friction";
+        case 226:   return "Load-In Time";
+        case 240:   return "Transfer Error Rate";   /* Fujitsu */
+        /*case 240:   return "Head Flying Hours";*/
+        default:    return "Unknown Attribute";
+    }
+};
+
+static int ata_smart_get_attr_rawfmt(unsigned char id)
+{
+    switch (id)
+    {
+        case 3:   /* Spin-up time */
+            return RAWFMT_RAW16_OPT_AVG16;
+
+        case 5:   /* Reallocated sector count */
+        case 196: /* Reallocated event count */
+            return RAWFMT_RAW16_OPT_RAW16;
+
+        case 190: /* Airflow Temperature */
+        case 194: /* HDA Temperature */
+            return RAWFMT_TEMPMINMAX;
+
+        default:
+            return RAWFMT_RAW48;
+    }
+};
+
+static int ata_smart_attr_to_string(
+                struct ata_smart_attribute *attr, char *str, int size)
+{
+    uint16_t w[3]; /* 3 words to store 6 bytes of raw data */
+    char buf[size]; /* temp string to store attribute data */
+    int len, slen;
+    int id = attr->id;
+
+    if (id == 0)
+        return 0; /* null attribute */
+
+    /* align and convert raw data */
+    memcpy(w, attr->raw, 6);
+    w[0] = letoh16(w[0]);
+    w[1] = letoh16(w[1]);
+    w[2] = letoh16(w[2]);
+
+    len = snprintf(buf, size, ": %u,%u ", attr->current, attr->worst);
+
+    switch (ata_smart_get_attr_rawfmt(id))
+    {
+        case RAWFMT_RAW16_OPT_RAW16:
+            len += snprintf(buf+len, size-len, "%u", w[0]);
+            if ((w[1] || w[2]) && (len < size))
+                len += snprintf(buf+len, size-len, " %u %u", w[1],w[2]);
+            break;
+
+        case RAWFMT_RAW16_OPT_AVG16:
+            len += snprintf(buf+len, size-len, "%u", w[0]);
+            if (w[1] && (len < size))
+                len += snprintf(buf+len, size-len, " Avg: %u", w[1]);
+            break;
+
+        case RAWFMT_TEMPMINMAX:
+            len += snprintf(buf+len, size-len, "%u -/+: %u/%u", w[0],w[1],w[2]);
+            break;
+
+        case RAWFMT_RAW48:
+        default:
+            /* shows first 4 bytes of raw data as uint32 LE,
+               and the ramaining 2 bytes as uint16 LE */
+            len += snprintf(buf+len, size-len, "%lu", letoh32(*((uint32_t*)w)));
+            if (w[2] && (len < size))
+                len += snprintf(buf+len, size-len, " %u", w[2]);
+            break;
+    }
+    /* ignore trailing \0 when truncated */
+    if (len >= size) len = size-1;
+
+    /* fill return string; when max. size is exceded: first truncate
+       attribute name, then attribute data and finally attribute id */
+    slen = snprintf(str, size, "%d ", id);
+    if (slen < size) {
+        /* maximum space disponible for attribute name,
+           including initial space separator */
+        int name_sz = size - (slen + len);
+        if (name_sz > 1) {
+            len = snprintf(str+slen, name_sz, " %s",
+                           ata_smart_get_attr_name(id));
+            if (len >= name_sz) len = name_sz-1;
+            slen += len;
+        }
+        snprintf(str+slen, size-slen, "%s", buf);
+    }
+
+    return 1; /* ok */
+}
+
+static bool ata_smart_dump(void)
+{
+    int fd;
+
+    fd = creat("/smart_data.bin", 0666);
+    if(fd >= 0)
+    {
+        write(fd, smart_data, sizeof(struct ata_smart_values));
+        close(fd);
+    }
+
+    fd = creat("/smart_data.txt", 0666);
+    if(fd >= 0)
+    {
+        int i;
+        char buf[128];
+        for (i = 0; i < NUMBER_ATA_SMART_ATTRIBUTES; i++)
+        {
+            if (ata_smart_attr_to_string(
+                    &smart_data->vendor_attributes[i], buf, sizeof(buf)))
+            {
+                write(fd, buf, strlen(buf));
+                write(fd, "\n", 1);
+            }
+        }
+        close(fd);
+    }
+
+    return false;
+}
+
+static int ata_smart_callback(int btn, struct gui_synclist *lists)
+{
+    (void)lists;
+
+    if (btn == ACTION_STD_CANCEL)
+    {
+        smart_data = NULL;
+        return btn;
+    }
+
+    /* read S.M.A.R.T. data only on first redraw */
+    if (!smart_data)
+    {
+        int i;
+        char buf[SIMPLELIST_MAX_LINELENGTH];
+        smart_data = ata_read_smart();
+        simplelist_set_line_count(0);
+        simplelist_addline("Id  Name:  Current,Worst  Raw");
+        for (i = 0; i < NUMBER_ATA_SMART_ATTRIBUTES; i++) {
+            if (ata_smart_attr_to_string(
+                        &smart_data->vendor_attributes[i], buf, sizeof(buf)))
+                simplelist_addline(buf);
+        }
+    }
+
+    if (btn == ACTION_STD_CONTEXT)
+    {
+        ata_smart_dump();
+        splashf(HZ, "S.M.A.R.T. data dumped");
+    }
+
+    return btn;
+}
+
+static bool dbg_ata_smart(void)
+{
+    struct simplelist_info info;
+    simplelist_info_init(&info, "S.M.A.R.T. Data [CONTEXT to dump]", 1, NULL);
+    info.action_callback = ata_smart_callback;
+    info.hide_selection = true;
+    info.scroll_all = true;
+    return simplelist_show_list(&info);
+}
+#endif /* HAVE_ATA_SMART */
 #else /* No SD, MMC or ATA */
 static int disk_callback(int btn, struct gui_synclist *lists)
 {
@@ -2383,6 +2582,9 @@ static const struct {
         { "View disk info", dbg_disk_info },
 #if (CONFIG_STORAGE & STORAGE_ATA)
         { "Dump ATA identify info", dbg_identify_info},
+#ifdef HAVE_ATA_SMART
+        { "View/Dump S.M.A.R.T. data", dbg_ata_smart},
+#endif
 #endif
 #endif
         { "Metadata log", dbg_metadatalog },

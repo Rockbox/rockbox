@@ -50,6 +50,9 @@
 /** static, private data **/ 
 static uint8_t ceata_taskfile[16] STORAGE_ALIGN_ATTR;
 static uint16_t ata_identify_data[0x100] STORAGE_ALIGN_ATTR;
+#ifdef HAVE_ATA_SMART
+static uint16_t ata_smart_data[0x100] STORAGE_ALIGN_ATTR;
+#endif
 static bool ceata;
 static bool ata_swap;
 static bool ata_lba48;
@@ -1210,6 +1213,62 @@ int ata_init(void)
                     IF_COP(, CPU));
     return 0;
 }
+
+#ifdef HAVE_ATA_SMART
+static int ata_smart(uint16_t* buf)
+{
+    mutex_lock(&ata_mutex);
+    ata_power_up();
+
+    if (ceata)
+    {
+        memset(ceata_taskfile, 0, 16);
+        ceata_taskfile[0xc] = 0x4f;
+        ceata_taskfile[0xd] = 0xc2;
+        ceata_taskfile[0xe] = 0x40; /* Device/Head Register, bit6: 0->CHS, 1->LBA */
+        ceata_taskfile[0xf] = 0xb0;
+        PASS_RC(ceata_wait_idle(), 3, 0);
+        if (((uint8_t*)ata_identify_data)[54] != 'A')  /* Model != aAmsung */
+        {
+            ceata_taskfile[0x9] = 0xd8; /* SMART enable operations */
+            PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 3, 1);
+            PASS_RC(ceata_check_error(), 3, 2);
+        }
+        ceata_taskfile[0x9] = 0xd0; /* SMART read data */
+        PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 3, 3);
+        PASS_RC(ceata_rw_multiple_block(false, buf, 1, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 3, 4);
+    }
+    else
+    {
+        int i;
+        uint32_t old = ATA_CFG;
+        ATA_CFG |= BIT(6);  /* 16bit big-endian */
+        PASS_RC(ata_wait_for_not_bsy(10000000), 3, 5);
+        ata_write_cbr(&ATA_PIO_DAD, 0);
+        ata_write_cbr(&ATA_PIO_FED, 0xd0);
+        ata_write_cbr(&ATA_PIO_SCR, 0);
+        ata_write_cbr(&ATA_PIO_LLR, 0);
+        ata_write_cbr(&ATA_PIO_LMR, 0x4f);
+        ata_write_cbr(&ATA_PIO_LHR, 0xc2);
+        ata_write_cbr(&ATA_PIO_DVR, BIT(6));
+        ata_write_cbr(&ATA_PIO_CSD, 0xb0);
+        PASS_RC(ata_wait_for_start_of_transfer(10000000), 3, 6);
+        for (i = 0; i < 0x100; i++) buf[i] = ata_read_cbr(&ATA_PIO_DTR);
+        ATA_CFG = old;
+    }
+
+    ata_set_active();
+    mutex_unlock(&ata_mutex);
+
+    return 0;
+}
+
+void* ata_read_smart(void)
+{
+    ata_smart(ata_smart_data);
+    return ata_smart_data;
+}
+#endif /* HAVE_ATA_SMART */
 
 #ifdef CONFIG_STORAGE_MULTI
 static int ata_num_drives(int first_drive)

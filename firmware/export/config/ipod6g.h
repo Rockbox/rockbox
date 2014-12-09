@@ -201,6 +201,8 @@
 
 #define STORAGE_NEEDS_ALIGN
 
+#define HAVE_ATA_SMART
+
 /* define this if the device has larger sectors when accessed via USB */
 /* (only relevant in disk.c, fat.c now always supports large virtual sectors) */
 //#define MAX_LOG_SECTOR_SIZE 4096
