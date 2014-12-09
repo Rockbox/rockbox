@@ -69,18 +69,22 @@ static const char *handle_special_links(const char* link, unsigned flags,
 {
     (void) flags;
     char vol_string[VOL_MAX_LEN + 1];
-    int len = get_volume_name(-1, vol_string);
+    int len;
 
-    /* link might be passed with or without HOME_DIR expanded. To handle
-     * both perform substring matching (VOL_NAMES is unique enough) */
-    const char *begin = strstr(link, vol_string);
-    if (begin)
+    for (int i = 1; i < NUM_VOLUMES; i++)
     {
-        /* begin now points to the start of vol_string within link,
-         * we want to copy the remainder of the paths, prefixed by
-         * the actual mount point (the remainder might be "") */
-        snprintf(buf, bufsize, MULTIDRIVE_DIR"%s", begin + len);
-        return buf;
+        len = get_volume_name(i, vol_string);
+        /* link might be passed with or without HOME_DIR expanded. To handle
+         * both perform substring matching (VOL_NAMES is unique enough) */
+        const char *begin = strstr(link, vol_string);
+        if (begin)
+        {
+            /* begin now points to the start of vol_string within link,
+             * we want to copy the remainder of the paths, prefixed by
+             * the actual mount point (the remainder might be "") */
+            snprintf(buf, bufsize, MULTIDRIVE_DIR"%s", begin + len);
+            return buf;
+        }
     }
 
     return link;
