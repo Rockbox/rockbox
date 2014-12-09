@@ -43,6 +43,44 @@ void power_init(void)
 
     /* DOWN1CTL: CPU DVM step time = 30us (default: no DVM) */
     pmu_write(0x20, 2);
+
+    /* USB power configuration:
+     *
+     * GPIO C0 is probably related to the LTC4066's CLPROG
+     * pin (see datasheet). Setting it high allows to double
+     * the maximum current selected by HPWR:
+     *
+     *  GPIO B6     GPIO C0     USB current
+     *  HPWR        CLPROG ???  limit (mA)
+     *  -------     ----------  -----------
+     *  0           0           100
+     *  1           0           500
+     *  0           1           200
+     *  1           1           1000 ??? (max.seen ~750mA)
+     *
+     * USB current limit includes battery charge and device
+     * consumption. Battery charge has it's own limit at
+     * 330~340 mA (configured using RPROG).
+     *
+     * Setting either of GPIO C1 or GPIO C2 disables battery
+     * charge, power needed for device consumptiom is drained
+     * from USB or AC adaptor when present. If external power
+     * is not present or it is insufficient or limited,
+     * additional required power is drained from battery.
+     */
+    PCONB = (PCONB & 0x000000ff)
+          | (0xe << 8)      /* route D+ to ADC2: off */
+          | (0xe << 12)     /* route D- to ADC2: off */
+          | (0x0 << 16)     /* USB related input, POL pin ??? */
+          | (0x0 << 20)     /* USB related input, !CHRG pin ??? */
+          | (0xe << 24)     /* HPWR: 100mA */
+          | (0xe << 28);    /* USB suspend: off */
+
+    PCONC = (PCONC & 0xffff0000)
+          | (0xe << 0)      /* double HPWR limit: off */
+          | (0xe << 4)      /* disable battery charge: off */
+          | (0xe << 8)      /* disable battery charge: off */
+          | (0x0 << 12);    /* USB inserted/not inserted */
 }
 
 void ide_power_enable(bool on)
