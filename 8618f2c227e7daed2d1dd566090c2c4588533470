@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_fbfd876f",
+        "filename": "firmware/target/arm/as3525/system-as3525.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-12-09T11:30:32Z",
+      "side": 0,
+      "message": "was restore_irq() superfluous?",
+      "revId": "8618f2c227e7daed2d1dd566090c2c4588533470",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}

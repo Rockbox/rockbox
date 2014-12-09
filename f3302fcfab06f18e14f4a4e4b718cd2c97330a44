@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_db024b6f",
+        "filename": "firmware/rolo.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-12-09T11:30:32Z",
+      "side": 1,
+      "message": "I don\u0027t like the idea of polluting generic function with target specific ifdefs. IMO specific cases should be treated in rolo_restart() implemented to be target specific if needed (like is done for imx31 and rk27xx)",
+      "revId": "f3302fcfab06f18e14f4a4e4b718cd2c97330a44",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_3bf89f7c",
+        "filename": "firmware/target/arm/as3525/clock-target.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-12-09T11:30:32Z",
+      "side": 1,
+      "message": "Why is this? Is fuzev2 really special here?",
+      "revId": "f3302fcfab06f18e14f4a4e4b718cd2c97330a44",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
