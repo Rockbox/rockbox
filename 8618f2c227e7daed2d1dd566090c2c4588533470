@@ -52,6 +52,24 @@
       "revId": "8618f2c227e7daed2d1dd566090c2c4588533470",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_db39ab43",
+        "filename": "firmware/target/arm/as3525/system-as3525.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2014-12-09T19:21:34Z",
+      "side": 0,
+      "message": "I wrote inaccurately. In old code we change two clock  - CGU_PERI and CGU_PROC. They should change one after another. If we have IRQ between it - player freeze. In new code we can change only CGU_PERI. It safe if we have IRQ between CGU_PERI and PMU or if we remove PUM at all.",
+      "parentUuid": "5a18252c_9b2f33f6",
+      "revId": "8618f2c227e7daed2d1dd566090c2c4588533470",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
