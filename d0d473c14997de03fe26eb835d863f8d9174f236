@@ -237,6 +237,57 @@
       "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_9b1613a6",
+        "filename": "firmware/target/hosted/ibasso/backlight-target.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-09T23:11:20Z",
+      "side": 1,
+      "message": "Thanks for your efforts to clear up copyright, it\u0027s much needed",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_bb114fb2",
+        "filename": "firmware/target/hosted/ibasso/backlight-target.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-09T23:11:20Z",
+      "side": 1,
+      "message": "Dont introduce needless changes like this, it only makes reviewing harder",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_fb0bc77b",
+        "filename": "firmware/target/hosted/ibasso/backlight-target.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2014-12-09T23:11:20Z",
+      "side": 1,
+      "message": "The spaces within parens violate our coding style",
+      "revId": "d0d473c14997de03fe26eb835d863f8d9174f236",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
