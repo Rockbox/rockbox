@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_dba36b4e",
+        "filename": "firmware/target/arm/s5l8702/ipod6g/storage_ata-ipod6g.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 587,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-12-11T20:45:09Z",
+      "side": 1,
+      "message": "Hope this is for test purpose only",
+      "revId": "cbdf2e04bc62013128d84e88c1f5d6581672fa0f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_dbec0b92",
+        "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-12-11T20:45:09Z",
+      "side": 1,
+      "message": "What about providing meaningful defines instead of magic values?",
+      "revId": "cbdf2e04bc62013128d84e88c1f5d6581672fa0f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_3b025f3f",
+        "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-12-11T20:45:09Z",
+      "side": 1,
+      "message": "see above",
+      "revId": "cbdf2e04bc62013128d84e88c1f5d6581672fa0f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_1bffa335",
+        "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-12-11T20:45:09Z",
+      "side": 1,
+      "message": "and here.",
+      "revId": "cbdf2e04bc62013128d84e88c1f5d6581672fa0f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_7bfcd73e",
+        "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-12-11T20:45:09Z",
+      "side": 1,
+      "message": ":-)",
+      "revId": "cbdf2e04bc62013128d84e88c1f5d6581672fa0f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_bb94afe8",
+        "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-12-11T20:45:09Z",
+      "side": 1,
+      "message": "again",
+      "revId": "cbdf2e04bc62013128d84e88c1f5d6581672fa0f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_9b99f322",
+        "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-12-11T20:45:09Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "cbdf2e04bc62013128d84e88c1f5d6581672fa0f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_fb9e2706",
+        "filename": "firmware/target/arm/s5l8702/system-s5l8702.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2014-12-11T20:45:09Z",
+      "side": 1,
+      "message": "and finally here",
+      "revId": "cbdf2e04bc62013128d84e88c1f5d6581672fa0f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
