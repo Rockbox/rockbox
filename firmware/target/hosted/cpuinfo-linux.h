@@ -40,6 +40,28 @@ struct time_state {
 
 int cpuusage_linux(struct cpuusage* u);
 int frequency_linux(int cpu, bool scaling);
+
+#if defined(DX50) || defined(DX90)
+/*
+    Get the current cpufreq scaling governor.
+    cpu [in]: The number of the cpu to query.
+    governor [out]: Buffer for the governor.
+    governor_size [in]: Size of the buffer for the governor.
+    Returns true on success, false else.
+*/
+bool current_scaling_governor(int cpu, char* governor, int governor_size);
+
+
+/*
+    Get the minimum, current or maximum cpufreq scaling frequency.
+    cpu [in]: The number of the cpu to query.
+    Returns -1 failure.
+*/
+int min_scaling_frequency(int cpu);
+int current_scaling_frequency(int cpu);
+int max_scaling_frequency(int cpu);
+#endif
+
 int cpustatetimes_linux(int cpu, struct time_state* data, int max_elements);
 int cpucount_linux(void);
 
