@@ -50,6 +50,10 @@
 #endif
 #include "folder_select.h"
 
+#if defined(DX50) || defined(DX90)
+#include "governor-ibasso.h"
+#endif
+
 /***********************************/
 /*    TAGCACHE MENU                */
 #ifdef HAVE_TAGCACHE
@@ -325,6 +329,22 @@ MENUITEM_SETTING(touchpad_deadzone, &global_settings.touchpad_deadzone, NULL);
 MENUITEM_SETTING(shortcuts_replaces_quickscreen, &global_settings.shortcuts_replaces_qs, NULL);
 #endif
 
+#if defined(DX50) || defined(DX90)
+static int governor_callback(int action, const struct menu_item_ex* this_item)
+{
+    (void) this_item;
+
+    if(action == ACTION_EXIT_MENUITEM)
+    {
+        set_governor(global_settings.governor);
+    }
+
+    return action;
+}
+
+MENUITEM_SETTING(governor, &global_settings.governor, governor_callback);
+#endif
+
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
           0, Icon_System_menu,
 #if (BATTERY_CAPACITY_INC > 0) || (BATTERY_TYPES_COUNT > 1)
@@ -376,6 +396,10 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
             &usb_skip_first_drive,
+#endif
+
+#if defined(DX50) || defined(DX90)
+            &governor,
 #endif
          );
 
