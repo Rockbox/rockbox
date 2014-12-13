@@ -838,6 +838,10 @@ struct user_settings
     int play_frequency; /* core audio output frequency selection */
 #endif
     int volume_limit; /* maximum volume limit */
+
+#if defined(DX50) || defined(DX90)
+    int governor;
+#endif
 };
 
 /** global variables **/

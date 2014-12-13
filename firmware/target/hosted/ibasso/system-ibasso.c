@@ -30,7 +30,6 @@
 
 #include "button-ibasso.h"
 #include "debug-ibasso.h"
-#include "governor-ibasso.h"
 #include "sysfs-ibasso.h"
 #include "usb-ibasso.h"
 
@@ -66,7 +65,6 @@ void system_init( void )
         DEBUGF( "ERROR %s: Can not set WM8740 lock.", __func__ );
     }
 
-    set_governor( GOVERNOR_POWERSAVE );
     set_usb_mode( USB_MODE_MASS_STORAGE );
 }
 
