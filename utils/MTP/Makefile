@@ -8,7 +8,7 @@ EXTRA_CFLAGS = $(shell printf \
 all: $(OUTPUT)
 
 $(OUTPUT): sendfirm.c
-	gcc $(EXTRA_CFLAGS) $(CFLAGS) $(LIBS) -o $(OUTPUT) sendfirm.c
+	gcc $(EXTRA_CFLAGS) $(CFLAGS) -o $(OUTPUT) sendfirm.c $(LIBS)
 
 $(OUTPUT).exe: sendfirm_win.c
 	mingw32-gcc $(CFLAGS) -o $(OUTPUT).exe sendfirm_win.c MTP_DLL.dll
