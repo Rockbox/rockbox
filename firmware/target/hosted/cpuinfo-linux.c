@@ -35,8 +35,14 @@
 #include "cpuinfo-linux.h"
 #include "gcc_extensions.h"
 
+#if defined(DX50) || defined(DX90)
+#include <limits.h>
+#include <string.h>
+#include "debug.h"
+#endif
+
 #undef open /* want the *real* open here, not sim_open or the like */
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID) || defined(DX50) || defined(DX90)
 #include "cpu-features.h"
 #define get_nprocs android_getCpuCount
 #endif
@@ -153,6 +159,132 @@ int frequency_linux(int cpu, bool scaling)
     close(cpu_dev);
     return ret;
 }
+
+#if defined(DX50) || defined(DX90)
+bool current_scaling_governor(int cpu, char* governor, int governor_size)
+{
+    if((cpu < 0) || (governor == NULL) || (governor_size <= 0))
+    {
+        return false;
+    }
+
+    char path[PATH_MAX];
+    snprintf(path,
+             sizeof(path),
+             "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_governor",
+             cpu);
+    FILE *f = fopen(path, "r");
+    if(f == NULL)
+    {
+        DEBUGF("ERROR %s: Can not open %s for reading.", __func__, path);
+        return false;
+    }
+
+    if(fgets(governor, governor_size, f) == NULL)
+    {
+        DEBUGF("ERROR %s: Read failed for %s.", __func__, path);
+        fclose(f);
+        return false;
+    }
+
+    if(strlen(governor) > 0)
+    {
+        governor[strlen(governor) - 1] = '\0';
+    }
+
+    fclose(f);
+    return true;
+}
+
+
+enum cpu_frequency_options
+{
+    SCALING_MIN_FREQ = 0,
+    SCALING_CUR_FREQ,
+    SCALING_MAX_FREQ
+};
+
+
+static int read_cpu_frequency(int cpu, enum cpu_frequency_options freqOpt)
+{
+    if(cpu < 0)
+    {
+        return -1;
+    }
+
+    char path[PATH_MAX];
+    switch(freqOpt)
+    {
+        case SCALING_MIN_FREQ:
+        {
+            snprintf(path,
+                     PATH_MAX,
+                     "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_min_freq",
+                     cpu);
+            break;
+        }
+
+        case SCALING_CUR_FREQ:
+        {
+            snprintf(path,
+                     PATH_MAX,
+                     "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq",
+                     cpu);
+            break;
+        }
+
+        case SCALING_MAX_FREQ:
+        {
+            snprintf(path,
+                     PATH_MAX,
+                     "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq",
+                     cpu);
+            break;
+        }
+
+        default:
+        {
+            DEBUGF("ERROR %s: Unknown CpuFrequencyOptions: %d.", __func__, freqOpt);
+            return -1;
+        }
+    }
+
+    FILE *f = fopen(path, "r");
+    if(f == NULL)
+    {
+        DEBUGF("ERROR %s: Can not open %s for reading.", __func__, path);
+        return -1;
+    }
+
+    int freq;
+    if(fscanf(f, "%d", &freq) == EOF)
+    {
+        DEBUGF("ERROR %s: Read failed for %s.", __func__, path);
+        freq = -1;
+    }
+
+    fclose(f);
+    return(freq);
+}
+
+
+int min_scaling_frequency(int cpu)
+{
+    return(read_cpu_frequency(cpu, SCALING_MIN_FREQ));
+}
+
+
+int current_scaling_frequency(int cpu)
+{
+    return(read_cpu_frequency(cpu, SCALING_CUR_FREQ));
+}
+
+
+int max_scaling_frequency(int cpu)
+{
+    return(read_cpu_frequency(cpu, SCALING_MAX_FREQ));
+}
+#endif
 
 int cpustatetimes_linux(int cpu, struct time_state* data, int max_elements)
 {
