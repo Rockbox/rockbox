@@ -31,6 +31,11 @@
 #endif
 #include "soc_desc.hpp"
 
+/* we don't want to import the entire soc_desc except for a few selected
+ * pieces */
+using soc_desc::soc_word_t;
+using soc_desc::soc_addr_t;
+
 class IoBackend : public QObject
 {
     Q_OBJECT
