@@ -32,7 +32,6 @@
 #include "debug-ibasso.h"
 #include "governor-ibasso.h"
 #include "sysfs-ibasso.h"
-#include "usb-ibasso.h"
 
 
 /* Fake stack. */
@@ -67,7 +66,6 @@ void system_init( void )
     }
 
     set_governor( GOVERNOR_POWERSAVE );
-    set_usb_mode( USB_MODE_MASS_STORAGE );
 }
 
 
