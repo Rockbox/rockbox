@@ -2,8 +2,9 @@ DEFINES=
 CC?=gcc
 CXX?=g++
 LD?=g++
-CFLAGS=-g -std=c99 -Wall $(DEFINES) -Ilib
-CXXFLAGS=-g -Wall $(DEFINES) -Ilib
+INCLUDE=-Iinclude/
+CFLAGS=-g -std=c99 -Wall $(DEFINES) $(INCLUDE)
+CXXFLAGS=-g -Wall $(DEFINES) $(INCLUDE)
 LDFLAGS=-Llib -lsocdesc `xml2-config --libs`
 SRC=$(wildcard *.c)
 SRCXX=$(wildcard *.cpp)
