@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<soc name="imx233" desc="i.MX233">
+  <dev name="APBH" long_name="APHB DMA" desc="AHB-to-APBH Bridge with DMA" version="3.2.0">
+    <addr name="APBH" addr="0x80004000"/>
+    <reg name="CTRL0" desc="" sct="yes">
+      <addr name="CTRL0" addr="0x0"/>
+      <field name="SFTRST" desc="" bitrange="31:31"/>
+      <field name="CLKGATE" desc="" bitrange="30:30"/>
+      <field name="AHB_BURST8_EN" desc="" bitrange="29:29"/>
+      <field name="APB_BURST4_EN" desc="" bitrange="28:28"/>
+      <field name="RSVD0" desc="" bitrange="27:24"/>
+      <field name="RESET_CHANNEL" desc="" bitrange="23:16">
+        <value name="SSP1" value="0x2" desc=""/>
+        <value name="SSP2" value="0x4" desc=""/>
+        <value name="ATA" value="0x10" desc=""/>
+        <value name="NAND0" value="0x10" desc=""/>
+        <value name="NAND1" value="0x20" desc=""/>
+        <value name="NAND2" value="0x40" desc=""/>
+        <value name="NAND3" value="0x80" desc=""/>
+      </field>
+      <field name="CLKGATE_CHANNEL" desc="" bitrange="15:8">
+        <value name="SSP1" value="0x2" desc=""/>
+        <value name="SSP2" value="0x4" desc=""/>
+        <value name="ATA" value="0x10" desc=""/>
+        <value name="NAND0" value="0x10" desc=""/>
+        <value name="NAND1" value="0x20" desc=""/>
+        <value name="NAND2" value="0x40" desc=""/>
+        <value name="NAND3" value="0x80" desc=""/>
+      </field>
+      <field name="FREEZE_CHANNEL" desc="" bitrange="7:0">
+        <value name="SSP1" value="0x2" desc=""/>
+        <value name="SSP2" value="0x4" desc=""/>
+        <value name="ATA" value="0x10" desc=""/>
+        <value name="NAND0" value="0x10" desc=""/>
+        <value name="NAND1" value="0x20" desc=""/>
+        <value name="NAND2" value="0x40" desc=""/>
+        <value name="NAND3" value="0x80" desc=""/>
+      </field>
+    </reg>
+    <reg name="CTRL1" desc="" sct="yes">
+      <addr name="CTRL1" addr="0x10"/>
+      <field name="RSVD1" desc="" bitrange="31:24"/>
+      <field name="CH_CMDCMPLT_IRQ_EN" desc="" bitrange="23:16"/>
+      <field name="RSVD0" desc="" bitrange="15:8"/>
+      <field name="CH_CMDCMPLT_IRQ" desc="" bitrange="7:0"/>
+    </reg>
+    <reg name="CHn_CMD" desc="">
+      <formula string="0x60+n*0x70"/>
+      <addr name="CH0_CMD" addr="0x60"/>
+      <addr name="CH1_CMD" addr="0xd0"/>
+      <addr name="CH2_CMD" addr="0x140"/>
+      <addr name="CH3_CMD" addr="0x1b0"/>
+      <addr name="CH4_CMD" addr="0x220"/>
+      <addr name="CH5_CMD" addr="0x290"/>
+      <addr name="CH6_CMD" addr="0x300"/>
+      <addr name="CH7_CMD" addr="0x370"/>
+      <field name="XFER_COUNT" desc="" bitrange="31:16"/>
+      <field name="CMDWORDS" desc="" bitrange="15:12"/>
+      <field name="RSVD1" desc="" bitrange="11:9"/>
+      <field name="HALTONTERMINATE" desc="" bitrange="8:8"/>
+      <field name="WAIT4ENDCMD" desc="" bitrange="7:7"/>
+      <field name="SEMAPHORE" desc="" bitrange="6:6"/>
+      <field name="NANDWAIT4READY" desc="" bitrange="5:5"/>
+      <field name="NANDLOCK" desc="" bitrange="4:4"/>
+      <field name="IRQONCMPLT" desc="" bitrange="3:3"/>
+      <field name="CHAIN" desc="" bitrange="2:2"/>
+      <field name="COMMAND" desc="" bitrange="1:0">
+        <value name="NO_DMA_XFER" value="0x0" desc=""/>
+        <value name="DMA_WRITE" value="0x1" desc=""/>
+        <value name="DMA_READ" value="0x2" desc=""/>
+        <value name="DMA_SENSE" value="0x3" desc=""/>
+      </field>
+    </reg>
+  </dev>
+  <dev name="SAIF" long_name="Sync Audio Interface" desc="Sync Audio Interface (SAIF)" version="3.2.0">
+    <addr name="SAIF1" addr="0x80042000"/>
+    <addr name="SAIF2" addr="0x80046000"/>
+    <reg name="DATA" desc="" sct="yes">
+      <addr name="DATA" addr="0x20"/>
+      <field name="PCM_RIGHT" desc="" bitrange="31:16"/>
+      <field name="PCM_LEFT" desc="" bitrange="15:0"/>
+    </reg>
+    <reg name="VERSION" desc="">
+      <addr name="VERSION" addr="0x30"/>
+      <field name="MAJOR" desc="" bitrange="31:24"/>
+      <field name="MINOR" desc="" bitrange="23:16"/>
+      <field name="STEP" desc="" bitrange="15:0"/>
+    </reg>
+  </dev>
+</soc>
+ 
