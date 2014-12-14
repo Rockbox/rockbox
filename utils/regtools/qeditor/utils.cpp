@@ -1004,7 +1004,7 @@ void MyTextEditor::SetReadOnly(bool en)
     if(en)
         m_toolbar->hide();
     else
-        m_toolbar->hide();
+        m_toolbar->show();
     m_edit->setReadOnly(en);
 }
 
