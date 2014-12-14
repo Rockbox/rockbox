@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<soc>
+  <name>vsoc</name>
+  <title>Virtual SOC</title>
+  <desc>Virtual SoC is a nice and powerful chip.</desc>
+  <author>Amaury Pouly</author>
+  <isa>ARM</isa>
+  <version>0.5</version>
+  <node>
+    <title>Interrupt Collector</title>
+    <desc>An interrupt collector controls the routing of interrupt to the processor</desc>
+    <instance>
+      <name>COP_INT</name>
+      <title>Co-processor interrupt collector</title>
+      <address>0x80000000</address>
+    </instance>
+    <instance>
+      <name>CPU_INT</name>
+      <title>CPU interrupt collectors 1 and 2</title>
+      <range>
+        <first>1</first>
+        <count>2</count>
+        <formula variable="n">0x80001000+(n-1)*0x1000</formula>
+      </range>
+    </instance>
+    <node>
+      <title>Interrupt's enable register</title>
+      <instance>
+        <name>ENABLEn</name>
+        <range>
+          <first>0</first>
+          <count>10</count>
+          <base>0x50</base>
+          <stride>0x10</stride>
+        </range>
+      </instance>
+      <register>
+        <width>32</width>
+        <field>
+          <name>DMA</name>
+          <desc>DMA interrupt enable</desc>
+          <position>0</position>
+          <width>2</width>
+          <enum>
+            <name>DISABLED</name>
+            <desc>Interrupt is disabled</desc>
+            <value>0</value>
+          </enum>
+          <enum>
+            <name>ENABLED</name>
+            <desc>Interrupt is enabled</desc>
+            <value>1</value>
+          </enum>
+          <enum>
+            <name>NMI</name>
+            <desc>Interrupt is non-maskable</desc>
+            <value>2</value>
+          </enum>
+        </field>
+      </register>
+      <!-- node which follows are variants of the register -->
+      <node>
+        <instance>
+          <name>SET</name>
+          <title>Set variant</title>
+          <address>4</address>
+        </instance>
+        <instance>
+          <name>CLR</name>
+          <title>Clear variant</title>
+          <address>8</address>
+        </instance>
+      </node>
+    </node>
+  </node>
+</soc>

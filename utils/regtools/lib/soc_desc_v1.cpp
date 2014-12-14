@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "soc_desc.hpp"
+#include "soc_desc_v1.hpp"
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xmlsave.h>
@@ -27,6 +27,9 @@
 #include <string.h>
 #include <algorithm>
 #include <cctype>
+
+namespace soc_desc_v1
+{
 
 #define XML_CHAR_TO_CHAR(s) ((const char *)(s))
 
@@ -281,7 +284,7 @@ bool parse_root_elem(xmlNode *node, soc_t& soc)
 
 }
 
-bool soc_desc_parse_xml(const std::string& filename, soc_t& socs)
+bool parse_xml(const std::string& filename, soc_t& socs)
 {
     LIBXML_TEST_VERSION
 
@@ -418,7 +421,7 @@ int produce_dev(xmlTextWriterPtr writer, const soc_dev_t& dev)
 
 }
 
-bool soc_desc_produce_xml(const std::string& filename, const soc_t& soc)
+bool produce_xml(const std::string& filename, const soc_t& soc)
 {
     LIBXML_TEST_VERSION
 
@@ -960,7 +963,7 @@ struct my_evaluator : public formula_evaluator
 
 }
 
-bool soc_desc_evaluate_formula(const std::string& formula,
+bool evaluate_formula(const std::string& formula,
     const std::map< std::string, soc_word_t>& var, soc_word_t& result, std::string& error)
 {
     my_evaluator e(formula, var);
@@ -983,3 +986,5 @@ public:
 
 xml_parser_init __xml_parser_init;
 }
+
+} // soc_desc_v1
