@@ -421,7 +421,7 @@ void RegEditPanel::OnFormulaGenerate(bool checked)
         map["n"] = n;
         std::string err;
         soc_word_t res;
-        if(!soc_desc_evaluate_formula(formula, map, res, err))
+        if(!evaluate_formula(formula, map, res, err))
         {
             qDebug() << "Cannot evaluator " << QString::fromStdString(formula) 
                 << "for n=" << n << ": " << QString::fromStdString(err);
@@ -1051,8 +1051,8 @@ void RegEdit::OnNew()
 
 bool RegEdit::SaveSocFile(const QString& filename)
 {
-    soc_desc_normalize(m_cur_socfile.GetSoc());
-    if(!soc_desc_produce_xml(filename.toStdString(), m_cur_socfile.GetSoc()))
+    normalize(m_cur_socfile.GetSoc());
+    if(!produce_xml(filename.toStdString(), m_cur_socfile.GetSoc()))
     {
         QMessageBox::warning(this, "The description was not saved",
             "There was an error when saving the file");

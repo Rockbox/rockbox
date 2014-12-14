@@ -29,7 +29,9 @@
 #ifdef HAVE_HWSTUB
 #include "hwstub.h"
 #endif
-#include "soc_desc.hpp"
+#include "soc_desc_v1.hpp"
+
+using namespace soc_desc_v1;
 
 class IoBackend : public QObject
 {

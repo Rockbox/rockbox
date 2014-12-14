@@ -161,12 +161,14 @@ void MainWindow::OnQuit()
 
 void MainWindow::OnAbout()
 {
+    QString soc_desc_ver = QString("%1.%2.%3").arg(MAJOR_VERSION)
+        .arg(MINOR_VERSION).arg(REVISION_VERSION);
     QMessageBox::about(this, "About", 
         "<h1>QEditor</h1>"
         "<h2>Version "APP_VERSION"</h2>"
         "<p>Written by Amaury Pouly</p>"
         "<p>Libraries:</p>"
-        "<ul><li>soc_desc: "SOCDESC_VERSION"</li>"
+        "<ul><li>soc_desc: " + soc_desc_ver + "</li>"
 #ifdef HAVE_HWSTUB
         "<li>hwstub: "HWSTUB_VERSION"</li>"
 #else
