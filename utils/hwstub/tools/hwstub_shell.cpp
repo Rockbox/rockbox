@@ -28,10 +28,13 @@
 #include <readline/history.h>
 #include <lua.hpp>
 #include <unistd.h>
+#include "soc_desc_v1.hpp"
 #include "soc_desc.hpp"
 extern "C" {
 #include "prompt.h"
 }
+
+using namespace soc_desc_v1;
 
 #if LUA_VERSION_NUM < 502
 #warning You need at least lua 5.2
@@ -49,6 +52,44 @@ struct hwstub_target_desc_t g_hwdev_target;
 struct hwstub_stmp_desc_t g_hwdev_stmp;
 struct hwstub_pp_desc_t g_hwdev_pp;
 lua_State *g_lua;
+
+/**
+ * debug
+ */
+
+void print_context(const std::string& file, const soc_desc::error_context_t& ctx)
+{
+    for(size_t j = 0; j < ctx.count(); j++)
+    {
+        soc_desc::error_t e = ctx.get(j);
+        switch(e.level())
+        {
+            case soc_desc::error_t::INFO: printf("[INFO]"); break;
+            case soc_desc::error_t::WARNING: printf("[WARN]"); break;
+            case soc_desc::error_t::FATAL: printf("[FATAL]"); break;
+            default: printf("[UNK]"); break;
+        }
+        if(e.location().size() != 0)
+            printf(" (%s) %s:", file.c_str(), e.location().c_str());
+        printf(" %s\n", e.message().c_str());
+    }
+}
+
+void my_lua_print_stack(lua_State *state = 0, int up_to = 0)
+{
+    if(state == 0)
+        state = g_lua;
+    up_to = lua_gettop(state) - up_to;
+    printf("stack:");
+    for(int i = -1; i >= -up_to; i--)
+    {
+        if(lua_isstring(state, i))
+            printf(" <%s>", lua_tostring(state, i));
+        else
+            printf(" [%s]", lua_typename(state, lua_type(state, i)));
+    }
+    printf("\n");
+}
 
 /**
  * hw specific
@@ -449,7 +490,7 @@ int my_lua_write_field(lua_State *state)
     soc_addr_t addr = lua_tounsigned(state, lua_upvalueindex(1));
     soc_word_t shift = lua_tounsigned(state, lua_upvalueindex(2));
     soc_word_t mask = lua_tounsigned(state, lua_upvalueindex(3));
-    bool is_sct = lua_toboolean(state, lua_upvalueindex(5));
+    char op = lua_tounsigned(state, lua_upvalueindex(5));
 
     soc_word_t value = mask;
     if(n == 1)
@@ -469,10 +510,17 @@ int my_lua_write_field(lua_State *state)
         value &= mask;
     }
 
-    if(!is_sct)
-        value = value << shift | (hw_read32(state, addr) & ~(mask << shift));
+    soc_word_t old_value = hw_read32(state, addr);
+    if(op == 'w')
+        value = value << shift | (old_value & ~(mask << shift));
+    else if(op == 's')
+        value = old_value | value << shift;
+    else if(op == 'c')
+        value = old_value & ~(value << shift);
+    else if(op == 't')
+        value = old_value ^ (value << shift);
     else
-        value <<= shift;
+        luaL_error(state, "write_field() internal error");
 
     hw_write32(state, addr, value);
     return 0;
@@ -501,222 +549,240 @@ int my_lua_sct_reg(lua_State *state)
     return 0;
 }
 
-void my_lua_create_field(soc_addr_t addr, const soc_reg_field_t& field, bool sct)
+/* lua stack on entry/exit: <reg table> */
+void my_lua_create_field(soc_addr_t addr, soc_desc::field_ref_t field)
 {
+    soc_desc::field_t *f = field.get();
+    /** create field table */
     lua_newtable(g_lua);
+    /* lua stack: <field table> <reg table> */
 
-    lua_pushstring(g_lua, field.name.c_str());
+    /** create various characteristics */
+    lua_pushstring(g_lua, f->name.c_str());
+    /* lua stack: <name> <field table> ... */
     lua_setfield(g_lua, -2, "name");
+    /* lua stack: <field table> ... */
 
     lua_pushunsigned(g_lua, addr);
+    /* lua stack: <addr> <field table> ... */
     lua_setfield(g_lua, -2, "addr");
+    /* lua stack: <field table> ... */
 
-    lua_pushboolean(g_lua, sct);
-    lua_setfield(g_lua, -2, "sct");
+    lua_pushunsigned(g_lua, f->pos);
+    /* lua stack: <pos> <field table> ... */
+    lua_setfield(g_lua, -2, "pos");
+    /* lua stack: <field table> ... */
 
-    lua_pushunsigned(g_lua, field.first_bit);
-    lua_setfield(g_lua, -2, "first_bit");
+    lua_pushunsigned(g_lua, f->width);
+    /* lua stack: <width> <field table> ... */
+    lua_setfield(g_lua, -2, "width");
+    /* lua stack: <field table> ... */
 
-    lua_pushunsigned(g_lua, field.last_bit);
-    lua_setfield(g_lua, -2, "last_bit");
-
-    lua_pushunsigned(g_lua, field.bitmask());
+    lua_pushunsigned(g_lua, f->bitmask());
+    /* lua stack: <bm> <field table> ... */
     lua_setfield(g_lua, -2, "bitmask");
+    /* lua stack: <field table> ... */
 
-    soc_word_t local_bitmask = field.bitmask() >> field.first_bit;
+    soc_word_t local_bitmask = f->bitmask() >> f->pos;
     lua_pushunsigned(g_lua, local_bitmask);
+    /* lua stack: <local_bm> <field table> ... */
     lua_setfield(g_lua, -2, "local_bitmask");
+    /* lua stack: <field table> ... */
 
+    /** create read routine */
     lua_pushunsigned(g_lua, addr);
-    lua_pushunsigned(g_lua, field.first_bit);
+    lua_pushunsigned(g_lua, f->pos);
     lua_pushunsigned(g_lua, local_bitmask);
+    /* lua stack: <local_bm> <pos> <addr> <field table> ... */
     lua_pushcclosure(g_lua, my_lua_read_field, 3);
+    /* lua stack: <my_lua_read_field> <field table> ... */
     lua_setfield(g_lua, -2, "read");
+    /* lua stack: <field table> ... */
+
+    /** create write/set/clr/tog routines */
+    static const char *name[] = {"write", "set", "clr", "tog"};
+    static const char arg[] = {'w', 's', 'c', 't'};
+    for(int i = 0; i < 4; i++)
+    {
+        lua_pushunsigned(g_lua, addr);
+        lua_pushunsigned(g_lua, f->pos);
+        lua_pushunsigned(g_lua, local_bitmask);
+        /* lua stack: <local_bm> <pos> <addr> <field table> ... */
+        lua_pushvalue(g_lua, -4);
+        /* lua stack: <field table> <local_bm> <pos> <addr> <field table> ... */
+        lua_pushunsigned(g_lua, arg[i]);
+        /* lua stack: <'wsct'> <field table> <local_bm> <pos> <addr> <field table> ... */
+        lua_pushcclosure(g_lua, my_lua_write_field, 5);
+        /* lua stack: <my_lua_write_field> <field table> ... */
+        lua_setfield(g_lua, -2, name[i]);
+        /* lua stack: <field table> ... */
+    }
+
+    /** create values */
+    for(size_t i = 0; i < f->enum_.size(); i++)
+    {
+        lua_pushunsigned(g_lua, f->enum_[i].value);
+        /* lua stack: <value> <field table> ... */
+        lua_setfield(g_lua, -2, f->enum_[i].name.c_str());
+        /* lua stack: <field table> ... */
+    }
+
+    /** register field */
+    lua_setfield(g_lua, -2, f->name.c_str());
+    /* lua stack: <reg table> */
+}
+
+/* lua stack on entry/exit: <inst table> */
+void my_lua_create_reg(soc_addr_t addr, soc_desc::register_ref_t reg)
+{
+    if(!reg.valid())
+        return;
+    /** create read/write routine */
+    lua_pushunsigned(g_lua, addr);
+    /* lua stack: <addr> <inst table> */
+    lua_pushcclosure(g_lua, my_lua_read_reg, 1);
+    /* lua stack: <my_lua_read_reg> <inst table> */
+    lua_setfield(g_lua, -2, "read");
+    /* lua stack: <inst table> */
 
     lua_pushunsigned(g_lua, addr);
-    lua_pushunsigned(g_lua, field.first_bit);
-    lua_pushunsigned(g_lua, local_bitmask);
-    lua_pushvalue(g_lua, -4);
-    lua_pushboolean(g_lua, false);
-    lua_pushcclosure(g_lua, my_lua_write_field, 5);
-    lua_setfield(g_lua, -2, "write");
-
-    if(sct)
-    {
-        lua_pushunsigned(g_lua, addr + 4);
-        lua_pushunsigned(g_lua, field.first_bit);
-        lua_pushunsigned(g_lua, local_bitmask);
-        lua_pushvalue(g_lua, -4);
-        lua_pushboolean(g_lua, true);
-        lua_pushcclosure(g_lua, my_lua_write_field, 5);
-        lua_setfield(g_lua, -2, "set");
-
-        lua_pushunsigned(g_lua, addr + 8);
-        lua_pushunsigned(g_lua, field.first_bit);
-        lua_pushunsigned(g_lua, local_bitmask);
-        lua_pushvalue(g_lua, -4);
-        lua_pushboolean(g_lua, true);
-        lua_pushcclosure(g_lua, my_lua_write_field, 5);
-        lua_setfield(g_lua, -2, "clr");
-
-        lua_pushunsigned(g_lua, addr + 12);
-        lua_pushunsigned(g_lua, field.first_bit);
-        lua_pushunsigned(g_lua, local_bitmask);
-        lua_pushvalue(g_lua, -4);
-        lua_pushboolean(g_lua, true);
-        lua_pushcclosure(g_lua, my_lua_write_field, 5);
-        lua_setfield(g_lua, -2, "tog");
-    }
-
-    for(size_t i = 0; i < field.value.size(); i++)
-    {
-        lua_pushunsigned(g_lua, field.value[i].value);
-        lua_setfield(g_lua, -2, field.value[i].name.c_str());
-    }
-}
-
-void my_lua_create_reg(soc_addr_t addr, size_t index, const soc_reg_t& reg)
-{
-    lua_newtable(g_lua);
-
-    lua_pushstring(g_lua, reg.addr[index].name.c_str());
-    lua_setfield(g_lua, -2, "name");
-
-    lua_pushunsigned(g_lua, addr + reg.addr[index].addr);
-    lua_setfield(g_lua, -2, "addr");
-
-    lua_pushboolean(g_lua, !!(reg.flags & REG_HAS_SCT));
-    lua_setfield(g_lua, -2, "sct");
-
-    lua_pushunsigned(g_lua, addr + reg.addr[index].addr);
-    lua_pushcclosure(g_lua, my_lua_read_reg, 1);
-    lua_setfield(g_lua, -2, "read");
-
-    lua_pushunsigned(g_lua, addr + reg.addr[index].addr);
+    /* lua stack: <addr> <inst table> */
     lua_pushcclosure(g_lua, my_lua_write_reg, 1);
+    /* lua stack: <my_lua_read_reg> <inst table> */
     lua_setfield(g_lua, -2, "write");
+    /* lua stack: <inst table> */
 
-    if(reg.flags & REG_HAS_SCT)
+    /** create set/clr/tog helpers */
+    static const char *name[] = {"set", "clr", "tog"};
+    static const char arg[] = {'s', 'c', 't'};
+    for(int i = 0; i < 3; i++)
     {
-        lua_pushunsigned(g_lua, addr + reg.addr[index].addr + 4);
-        lua_pushcclosure(g_lua, my_lua_write_reg, 1);
-        lua_setfield(g_lua, -2, "set");
-
-        lua_pushunsigned(g_lua, addr + reg.addr[index].addr + 8);
-        lua_pushcclosure(g_lua, my_lua_write_reg, 1);
-        lua_setfield(g_lua, -2, "clr");
-
-        lua_pushunsigned(g_lua, addr + reg.addr[index].addr + 12);
-        lua_pushcclosure(g_lua, my_lua_write_reg, 1);
-        lua_setfield(g_lua, -2, "tog");
-    }
-    else
-    {
-        lua_pushunsigned(g_lua, addr + reg.addr[index].addr);
-        lua_pushunsigned(g_lua, 's');
+        lua_pushunsigned(g_lua, addr);
+        /* lua stack: <addr> <inst table> */
+        lua_pushunsigned(g_lua, arg[i]);
+        /* lua stack: <'s'/'c'/'t'> <addr> <inst table> */
         lua_pushcclosure(g_lua, my_lua_sct_reg, 2);
-        lua_setfield(g_lua, -2, "set");
-
-        lua_pushunsigned(g_lua, addr + reg.addr[index].addr);
-        lua_pushunsigned(g_lua, 'c');
-        lua_pushcclosure(g_lua, my_lua_sct_reg, 2);
-        lua_setfield(g_lua, -2, "clr");
-
-        lua_pushunsigned(g_lua, addr + reg.addr[index].addr);
-        lua_pushunsigned(g_lua, 't');
-        lua_pushcclosure(g_lua, my_lua_sct_reg, 2);
-        lua_setfield(g_lua, -2, "tog");
+        /* lua stack: <my_lua_sct_reg> <inst table> */
+        lua_setfield(g_lua, -2, name[i]);
+        /* lua stack: <inst table> */
     }
 
-    for(size_t i = 0; i < reg.field.size(); i++)
-    {
-        my_lua_create_field(addr + reg.addr[index].addr, reg.field[i],
-            reg.flags & REG_HAS_SCT);
-        lua_setfield(g_lua, -2, reg.field[i].name.c_str());
-    }
+    /** create fields */
+    std::vector< soc_desc::field_ref_t > fields = reg.fields();
+    for(size_t i = 0; i < fields.size(); i++)
+        my_lua_create_field(addr, fields[i]);
 }
 
-void my_lua_create_dev(size_t index, const soc_dev_t& dev)
+/* lua stack on entry/exit: <parent table> */
+void my_lua_create_instances(const std::vector< soc_desc::node_inst_t >& inst)
 {
-    lua_newtable(g_lua);
-
-    lua_pushstring(g_lua, dev.addr[index].name.c_str());
-    lua_setfield(g_lua, -2, "name");
-
-    lua_pushunsigned(g_lua, dev.addr[index].addr);
-    lua_setfield(g_lua, -2, "addr");
-
-    for(size_t i = 0; i < dev.reg.size(); i++)
+    for(size_t i = 0; i < inst.size(); i++)
     {
-        bool table = dev.reg[i].addr.size() > 1;
-        if(table)
-            lua_newtable(g_lua);
-        else
-            lua_pushnil(g_lua);
-
-        for(size_t k = 0; k < dev.reg[i].addr.size(); k++)
+        /** if the instance is indexed, find the instance table, otherwise create it */
+        if(inst[i].is_indexed())
         {
-            my_lua_create_reg(dev.addr[index].addr, k, dev.reg[i]);
-            if(table)
+            /** try to get the instance table, otherwise create it */
+            lua_getfield(g_lua, -1, inst[i].name().c_str());
+            /* lua stack: <index table> <parent table> */
+            if(lua_isnil(g_lua, -1))
             {
-                lua_pushinteger(g_lua, k);
-                lua_pushvalue(g_lua, -2);
-                lua_settable(g_lua, -4);
+                lua_pop(g_lua, 1);
+                lua_newtable(g_lua);
+                /* lua stack: <index table> <parent table> */
+                lua_pushvalue(g_lua, -1);
+                /* lua stack: <index table> <index table> <parent table> */
+                lua_setfield(g_lua, -3, inst[i].name().c_str());
+                /* lua stack: <index table> <parent table> */
             }
-            lua_setfield(g_lua, -3, dev.reg[i].addr[k].name.c_str());
+            lua_pushinteger(g_lua, inst[i].index());
+            /* lua stack: <index> <index table> <parent table> */
         }
 
-        if(table)
-            lua_setfield(g_lua, -2, dev.reg[i].name.c_str());
-        else
+        /** create a new table for the instance */
+        lua_newtable(g_lua);
+        /* lua stack: <instance table> [<index> <index table>] <parent table> */
+
+        /** create name and desc fields */
+        lua_pushstring(g_lua, inst[i].node().get()->name.c_str());
+        /* lua stack: <node name> <instance table> ... */
+        lua_setfield(g_lua, -2, "name");
+        /* lua stack: <instance table> ... */
+
+        lua_pushstring(g_lua, inst[i].node().get()->desc.c_str());
+        /* lua stack: <node desc> <instance table> ... */
+        lua_setfield(g_lua, -2, "desc");
+        /* lua stack: <instance table> ... */
+
+        lua_pushstring(g_lua, inst[i].node().get()->title.c_str());
+        /* lua stack: <node title> <instance table> ... */
+        lua_setfield(g_lua, -2, "title");
+        /* lua stack: <instance table> ... */
+
+        lua_pushunsigned(g_lua, inst[i].addr());
+        /* lua stack: <node addr> <instance table> ... */
+        lua_setfield(g_lua, -2, "addr");
+        /* lua stack: <instance table> ... */
+
+        /** create register */
+        my_lua_create_reg(inst[i].addr(), inst[i].node().reg());
+
+        /** create subinstances */
+        my_lua_create_instances(inst[i].children());
+        /* lua stack: <instance table> [<index> <index table>] <parent table> */
+
+        if(inst[i].is_indexed())
+        {
+            /* lua stack: <instance table> <index> <index table> <parent table> */
+            lua_settable(g_lua, -3);
+            /* lua stack: <index table> <parent table> */
             lua_pop(g_lua, 1);
+        }
+        else
+        {
+            /* lua stack: <instance table> <parent table> */
+            lua_setfield(g_lua, -2, inst[i].name().c_str());
+        }
+        /* lua stack: <parent table> */
     }
 }
 
-bool my_lua_import_soc(const soc_t& soc)
+bool my_lua_import_soc(soc_desc::soc_t& soc)
 {
+    /** remember old stack index to check for unbalanced stack at the end */
     int oldtop = lua_gettop(g_lua);
 
+    /** find hwstub.soc table */
     lua_getglobal(g_lua, "hwstub");
+    /* lua stack: <hwstub table> */
     lua_getfield(g_lua, -1, "soc");
+    /* lua stack: <hwstub.soc table> <hwstub table> */
 
+    /** create a new table for the soc */
     lua_newtable(g_lua);
+    /* lua stack: <soc table> <hwstub.soc table> <hwstub table> */
 
+    /** create name and desc fields */
     lua_pushstring(g_lua, soc.name.c_str());
+    /* lua stack: <soc name> <soc table> <hwstub.soc table> <hwstub table> */
     lua_setfield(g_lua, -2, "name");
+    /* lua stack: <soc table> <hwstub.soc table> <hwstub table> */
 
     lua_pushstring(g_lua, soc.desc.c_str());
+    /* lua stack: <soc desc> <soc table> <hwstub.soc table> <hwstub table> */
     lua_setfield(g_lua, -2, "desc");
+    /* lua stack: <soc table> <hwstub.soc table> <hwstub table> */
 
-    for(size_t i = 0; i < soc.dev.size(); i++)
-    {
-        bool table = soc.dev[i].addr.size() > 1;
-        if(table)
-            lua_newtable(g_lua);
-        else
-            lua_pushnil(g_lua);
+    /** create instances */
+    soc_desc::soc_ref_t rsoc(&soc);
+    my_lua_create_instances(rsoc.root_inst().children());
+    /* lua stack: <soc table> <hwstub.soc table> <hwstub table> */
 
-        for(size_t k = 0; k < soc.dev[i].addr.size(); k++)
-        {
-            my_lua_create_dev(k, soc.dev[i]);
-            if(table)
-            {
-                lua_pushinteger(g_lua, k + 1);
-                lua_pushvalue(g_lua, -2);
-                lua_settable(g_lua, -4);
-            }
-            lua_setfield(g_lua, -3, soc.dev[i].addr[k].name.c_str());
-        }
-
-        if(table)
-            lua_setfield(g_lua, -2, soc.dev[i].name.c_str());
-        else
-            lua_pop(g_lua, 1);
-    }
-
+    /** put soc table at hwstub.soc.<soc name> */
     lua_setfield(g_lua, -2, soc.name.c_str());
+    /* lua stack: <hwstub.soc table> <hwstub table> */
 
     lua_pop(g_lua, 2);
+    /* lua stack: <> */
 
     if(lua_gettop(g_lua) != oldtop)
     {
@@ -726,7 +792,7 @@ bool my_lua_import_soc(const soc_t& soc)
     return true;
 }
 
-bool my_lua_import_soc(const std::vector< soc_t >& socs)
+bool my_lua_import_soc(std::vector< soc_desc::soc_t >& socs)
 {
     for(size_t i = 0; i < socs.size(); i++)
     {
@@ -803,15 +869,17 @@ int main(int argc, char **argv)
     }
 
     // load register descriptions
-    std::vector< soc_t > socs;
+    std::vector< soc_desc::soc_t > socs;
     for(int i = optind; i < argc; i++)
     {
-        socs.push_back(soc_t());
-        if(!soc_desc_parse_xml(argv[i], socs[socs.size() - 1]))
+        socs.push_back(soc_desc::soc_t());
+        soc_desc::error_context_t ctx;
+        if(!soc_desc::parse_xml(argv[i], socs[socs.size() - 1], ctx))
         {
-            printf("Cannot load description '%s'\n", argv[i]);
-            return 2;
+            printf("Cannot load description file '%s'\n", argv[i]);
+            socs.pop_back();
         }
+        print_context(argv[i], ctx);
     }
 
     // create usb context

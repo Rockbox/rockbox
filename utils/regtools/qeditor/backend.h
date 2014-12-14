@@ -29,7 +29,11 @@
 #ifdef HAVE_HWSTUB
 #include "hwstub.h"
 #endif
-#include "soc_desc.hpp"
+#include "soc_desc_v1.hpp"
+
+/* we don't want to import the entire soc_desc except for a few selected
+ * pieces */
+using namespace soc_desc_v1;
 
 class IoBackend : public QObject
 {

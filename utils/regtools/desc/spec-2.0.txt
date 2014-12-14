@@ -1,0 +1,373 @@
+This file describes the format of the register map based on XML, version 2.0.
+
+1) Overview
+-----------
+
+1.1) Nodes and instances
+------------------------
+
+This specification is based on the concept of "nodes". Nodes are containers
+which can contain other nodes and/or a register. Each node can have one or more
+addresses (addresses are always relative to the parent node). The idea is that
+this hierarchy of nodes generates a number of addresses recursively. The example
+below outlines this idea:
+
+<node>
+  <name>N</name>
+  <instance>
+    <name>A</name>
+    <address>X</address>
+  </instance>
+  <instance>
+    <name>B</name>
+    <address>Y</address>
+  </instance>
+  <!-- HERE -->
+</node>
+
+This example creates one node named N and two instances named A and B,
+at respective addresses X and Y. This means that all subnodes of this node will
+have two copies: one relative to X, which path will be prefixed by "A", and
+one relative to Y, which path will be prefixed by "B".
+This example below explores this idea in details:
+
+  <!-- HERE -->
+  <node>
+    <name>S_N</name>
+    <instance>
+      <name>C</name>
+      <address>U</address>
+    </instance>
+    <instance>
+      <name>D</name>
+      <address>V</address>
+    </instance>
+  </node>
+
+In this example, N generates two copies of the sub-node S_N.
+The sub-node S_N generates two instances C and D. The whole hierarchy thus generates
+four instances:
+- A.C at X+U
+- A.D at X+V
+- B.C at Y+U
+- B.D at Y+V
+
+As a note for later, notice that there really are two hierarchies in parallel:
+- the node hierarchy: it is composed of N and N.S_N
+- the instance hierarchy: it is made up of A, B, A.C, A.D, B.C and B.D
+
+1.2) Ranges
+-----------
+
+To make things more useful, in particular in case of multiple copies of a register,
+we introduce the concept of range addresses with an example:
+
+<node>
+  <name>N</name>
+  <instance>
+    <name>A</name>
+    <range>
+      <first>1</first>
+      <count>5</count>
+      <base>0x1000</base>
+      <stride>0x100</stride>
+    </range>
+  </instance>
+  <node>
+    <name>NN</name>
+    <instance>
+      <name>E</name>
+      <address>0x4</address>
+    </instance>
+  </node>
+</node>
+
+A range describes a contiguous set of adresses, indexed by a number. One can
+specify the first number in the range, and the number of copies. In the case
+of a regular pattern (base + n * stride), we can specify a stride
+to compute the address of the next copy. In this example, the top-level
+nodes generates five copies which path is A[1], A[2], ..., A[5]
+and which addresses are 0x1000+1*0x100, 0x1000+2*0x100, ..., 0x1000+5*0x100.
+If we add the sub-node to the picture, for each copy we create a instance E
+we offset 0x4 from the parent. Overall this generates 5 instances:
+- A[1].E at 0x1000+1*0x100+0x4 = 0x1104
+- A[2].E at 0x1000+2*0x100+0x4 = 0x1204
+- A[3].E at 0x1000+3*0x100+0x4 = 0x1304
+- A[4].E at 0x1000+4*0x100+0x4 = 0x1404
+- A[5].E at 0x1000+5*0x100+0x4 = 0x1504
+Note that the intermediate path also define instances, so there are 5 additional
+instances in reality:
+- A[1] at 0x1100
+- A[2] at 0x1200
+- A[3] at 0x1300
+- A[4] at 0x1400
+- A[5] at 0x1500
+
+For the record, there is a more general way of specifying a range when it does
+not follow a nice regular pattern. One can specify a formula where the parameter
+is the index. There are no restrictions on the formula except that it must use
+usual arithmetic operators. The example below illustrate such a use:
+
+<node>
+  <name>N</name>
+  <instance>
+    <name>F</name>
+    <range>
+      <first>0</first>
+      <count>4</count>
+      <formula variable="n">0x50+(n/2)*0x100+(n%2)*0x10</formula>
+    </range>
+  </instance>
+</node>
+
+In this example we generate four nodes F[0], ..., F[3] with a formula. Here "/"
+is the euclidian division and "%" is the modulo operator. Note the use of an
+attribute to specify which variable represents the index. The generated addresses
+are:
+- F[0] at 0x50+(0/2)*0x100+(0%2)*0x10 = 0x50
+- F[1] at 0x50+(1/2)*0x100+(1%2)*0x10 = 0x50+0x10 = 0x60
+- F[2] at 0x50+(2/2)*0x100+(2%2)*0x10 = 0x50+0x100 = 0x150
+- F[3] at 0x50+(3/2)*0x100+(3%2)*0x10 = 0x50+0x100+0x10 = 0x160
+
+1.3) Node description
+---------------------
+
+For documentation purposes, node can of course carry some description, as well
+as instances. More precisely, nodes can have a title, that is a short description
+very much like a chapter title, and a description, this is a free form and potentially
+lengthy description of the node. Instances too can have a title and a description.
+The following example illustrates this:
+
+<node>
+  <name>icoll</name>
+  <title>DMA Controller</title>
+  <desc>The DMA controller provides uniform DMA facilities to transfer data from
+        and to peripherals. It uses memory-mapped tables and support chained
+        transfers.</desc>
+  <instance>
+    <name>AHB_DMAC</name>
+    <address>0x80000000</address>
+    <title>AHB DMA Controller</title>
+    <desc>The AHB DMA controller provides DMA facilities for the peripherals
+          on the AHB bus like the SSP and PIX engines.</desc>
+  </instance>
+  <instance>
+    <name>APB_DMAC</name>
+    <address>0x8001000</address>
+    <title>APB DMA Controller</title>
+    <desc>The APB DMA controller provides DMA facilities for the peripherals
+          on the APB bus like the I2C and PCM engines.</desc>
+  </instance>
+</node>
+
+1.4) Register description
+--------------------------
+
+The goal of the register description is of course to describe registers!
+To see how registers relate to the node hierarchy, see 1.5, this section focuses
+only the description only.
+
+A register carries a lot of information, which is organise logically. A register
+can have a width, in bits. By default registers are assumed to be 32-bit wide.
+The most useful feature of register description is to describe the fields of
+the registers. Each field has a name, a start position and a width. Fields
+can also carry a description. Finally, each field can specify enumerated values,
+that is named values, for convenience. Enumerated values have a name, a value
+and an optional description. The example below illustrates all these concepts:
+
+<register>
+  <width>8</width>
+  <field>
+    <name>MODE</name>
+    <desc>Interrupt mode</desc>
+    <position>0</position>
+    <width>2</width>
+    <enum>
+      <name>DISABLED</name>
+      <desc>Interrupt is disabled</desc>
+      <value>0</value>
+    </enum>
+    <enum>
+      <name>ENABLED</name>
+      <desc>Interrupt is enabled</desc>
+      <value>1</value>
+    </enum>
+    <enum>
+      <name>NMI</name>
+      <desc>Interrupt is non-maskable</desc>
+      <value>2</value>
+    </enum>
+  </field>
+  <field>
+    <name>PRIORITY</name>
+    <desc>Interrupt priority, lower values are more prioritized.</desc>
+    <position>2</position>
+    <width>2</width>
+  </field>
+  <field>
+    <name>ARM_MODE</name>
+    <desc>Select between ARM's FIQ and IRQ mode</desc>
+    <position>4</position>
+    <width>1</width>
+    <enum>
+      <name>IRQ</name>
+      <value>0</value>
+    </enum>
+    <enum>
+      <name>FIQ</name>
+      <value>1</value>
+    </enum>
+  </field>
+</register>
+
+In this example, the 8-bit registers has three fields:
+- MODE(1:0): it has three named values DISABLED(0), ENABLED(1) and NMI(2)
+- PRIORITY(2:1): it has no named values
+- ARM_MODE(3): it has two named values IRQ(0) and FIQ(1)
+
+1.5) Register inheritance
+-------------------------
+
+The node hierarchy specifies instances, that is pairs of (path,address),
+and the register description describes the internal of a register. The placement
+of the register descriptions in the node hierarchy will specify which registers
+can be found at each address. More precisely, if a node contains a register
+description, it means that this node's and all sub-nodes' instances are registers
+following the description. It is forbidden for a node to contain a register
+description if one of its parents already contains one. The example below
+will make this concept clearer (for readability, we omitted some of the tags):
+
+<node>
+  <name>dma</name>
+  <instance><name>DMAC</name><address>0x80000000</address></instance>
+  <node>
+    <instance><name>PCM_CHAN</name><address>0x0</address></instance>
+    <instance><name>I2C_CHAN</name><address>0x10</address></instance>
+    <register><!--- blabla --></register>
+    <node>
+      <name>sct</name>
+      <instance><name>SET</name><address>0x4</address></instance>
+      <instance><name>CLR</name><address>0x8</address></instance>
+      <instance><name>TOG</name><address>0xC</address></instance>
+    </node>
+  </node>
+</node>
+
+This example describes one register (let's call it blabla) and 9 instances:
+- DMAC at 0x80000000, no register
+- DMAC.PCM_CHAN at 0x80000000, register blabla
+- DMAC.PCM_CHAN.SET at 0x80000004, register blabla
+- DMAC.PCM_CHAN.CLR at 0x80000008, register blabla
+- DMAC.PCM_CHAN.TOG at 0x8000000C, register blabla
+- DMAC.I2C_CHAN at 0x80000010, register blabla
+- DMAC.I2C_CHAN.SET at 0x80000014, register blabla
+- DMAC.I2C_CHAN.CLR at 0x80000018, register blabla
+- DMAC.I2C_CHAN.TOG at 0x8000001C, register blabla
+
+1.6) Soc description
+--------------------
+
+The description file must also specify some information about the system-on-chip
+itself. The entire description, including nodes, is contained in a "soc" tag
+which must at least specify the soc name. It can optionally specify the title
+and description, as well as the author(s) of the description, the ISA and
+the version.
+
+<soc>
+  <name>vsoc</name>
+  <title>Virtual SOC</title>
+  <desc>Virtual SoC is a nice and powerful chip.</desc>
+  <author>Amaury Pouly</author>
+  <isa>ARM</isa>
+  <version>0.5</version>
+  <!-- put nodes below -->
+</soc>
+
+2) Specification
+----------------
+
+Root
+----
+As any XML document, the content of the file should be enclosed in a "xml" tag.
+The root element must be "soc" tag.
+
+Example:
+<?xml version="1.0"?>
+<!-- desc -->
+</xml>
+
+Element: soc
+------------
+It must contain the following tags:
+- name: name of soc, only made of alphanumerical characters
+It can contain at most one of each of the following tags:
+- title: one line description of the soc
+- desc: free form description of the soc
+- isa: instruction set assembly
+- version: version of the description
+It can contain any number of the following tags:
+- author: author of the description
+- node: node description
+
+Element: node
+-------------
+It must contain the following tags:
+- name: name of node, only made of alphanumerical characters
+It can contain at most one of each of the following tags:
+- title: one line description of the node
+- desc: free form description of the node
+- register: register description
+It can contain any number of the following tags:
+- instance: author of the description
+- node: node description
+
+Element: instance
+-----------------
+It must contain the following tags:
+- name: name of instance, only made of alphanumerical characters
+It can contain at most one of each of the following tags:
+- title: one line description of the instance
+- desc: free form description of the instance
+- address: address for a single instance (non-negative number)
+- range: address range for multiple instances
+Note that address and range are mutually exclusive, and at least one of them
+must exists.
+
+Element: range
+--------------
+It must contain the following tags:
+- first: index of the first instance (non-negative number)
+- count: number of instances (positive number)
+It can contain at most one of each of the following tags:
+- base: base address (non-negative number)
+- stride: stride (number)
+- formula: free-form formula, must have a "variable" attribute
+Note that stride and formula are mutually exclusive, and at least one of them
+must exists. If stride is specified and base is omitted, it is taken to be 0.
+
+Element: register
+-----------------
+It can contain at most one of each of the following tags:
+- width: width in bits (positive number)
+It can contain any number of the following tags:
+- field: field description
+
+Element: field
+--------------
+It must contain the following tags:
+- name: name of field, only made of alphanumerical characters
+- position: least significant bit
+It can contain at most one of each of the following tags:
+- desc: free form description of the instance
+- width: width in bits
+It can contain any number of the following tags:
+- enum: enumerated value
+If the width is not specified, it is assumed to be 1.
+
+Element: enum
+-------------
+It must contain the following tags:
+- name: name of field, only made of alphanumerical characters
+- value: value (non-negative, must fit into the field's width)
+It can contain at most one of each of the following tags:
+- desc: free form description of the instance

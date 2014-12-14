@@ -18,11 +18,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "soc_desc.hpp"
+#include "soc_desc_v1.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <map>
 #include <cstring>
+
+using namespace soc_desc_v1;
 
 template< typename T >
 bool build_map(const char *type, const std::vector< T >& vec,
@@ -244,9 +246,9 @@ int do_compare(int argc, char **argv)
     if(argc != 2)
         return printf("compare mode expects two arguments\n");
     soc_t soc[2];
-    if(!soc_desc_parse_xml(argv[0], soc[0]))
+    if(!parse_xml(argv[0], soc[0]))
         return printf("cannot read file '%s'\n", argv[0]);
-    if(!soc_desc_parse_xml(argv[1], soc[1]))
+    if(!parse_xml(argv[1], soc[1]))
         return printf("cannot read file '%s'\n", argv[1]);
     if(compare_soc(soc[0], soc[1]))
         printf("Files are identical.\n");
@@ -258,9 +260,9 @@ int do_write(int argc, char **argv)
     if(argc != 2)
         return printf("write mode expects two arguments\n");
     soc_t soc;
-    if(!soc_desc_parse_xml(argv[0], soc))
+    if(!parse_xml(argv[0], soc))
         return printf("cannot read file '%s'\n", argv[0]);
-    if(!soc_desc_produce_xml(argv[1], soc))
+    if(!produce_xml(argv[1], soc))
         return printf("cannot write file '%s'\n", argv[1]);
     return 0;
 }
@@ -270,7 +272,7 @@ int do_check(int argc, char **argv)
     for(int i = 0; i < argc; i++)
     {
         soc_t soc;
-        if(!soc_desc_parse_xml(argv[i], soc))
+        if(!parse_xml(argv[i], soc))
         {
             printf("cannot read file '%s'\n", argv[i]);
             continue;
@@ -325,7 +327,7 @@ int do_eval(int argc, char **argv)
             map[name] = v;
             continue;
         }
-        if(!soc_desc_evaluate_formula(formula, map, result, error))
+        if(!evaluate_formula(formula, map, result, error))
             printf("error: %s\n", error.c_str());
         else
             printf("result: %lu (%#lx)\n", (unsigned long)result, (unsigned long)result);

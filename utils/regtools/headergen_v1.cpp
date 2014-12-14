@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/ 
-#include "soc_desc.hpp"
+#include "soc_desc_v1.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <algorithm>
@@ -27,6 +27,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <getopt.h>
+
+using namespace soc_desc_v1;
 
 #define HEADERGEN_VERSION   "2.1.8"
 
@@ -721,7 +723,7 @@ int main(int argc, char **argv)
     for(int i = optind; i < argc - 1; i++)
     {
         soc_t s;
-        if(!soc_desc_parse_xml(argv[i], s))
+        if(!parse_xml(argv[i], s))
         {
             printf("Cannot parse %s\n", argv[i]);
             return 1;

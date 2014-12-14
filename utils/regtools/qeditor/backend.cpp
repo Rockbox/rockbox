@@ -35,8 +35,8 @@ SocFile::SocFile()
 SocFile::SocFile(const QString& filename)
     :m_filename(filename)
 {
-    m_valid = soc_desc_parse_xml(filename.toStdString(), m_soc);
-    soc_desc_normalize(m_soc);
+    m_valid = parse_xml(filename.toStdString(), m_soc);
+    normalize(m_soc);
 }
 
 bool SocFile::IsValid()

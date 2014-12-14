@@ -5,14 +5,14 @@ HEADERS += mainwindow.h backend.h regtab.h analyser.h settings.h \
 SOURCES += main.cpp mainwindow.cpp regtab.cpp backend.cpp analyser.cpp \
     std_analysers.cpp settings.cpp utils.cpp regdisplaypanel.cpp regedit.cpp
 LIBS += -L../lib/ -lsocdesc -lxml2
-INCLUDEPATH += ../lib/ ../../hwstub/lib
+INCLUDEPATH += ../include/ ../../hwstub/lib
 DEPENDPATH += ../
 
 libsocdesc.commands = cd ../lib && make
 QMAKE_EXTRA_TARGETS += libsocdesc
 PRE_TARGETDEPS += libsocdesc
 
-VERSION = 2.0.4
+VERSION = 2.1.0
 
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
