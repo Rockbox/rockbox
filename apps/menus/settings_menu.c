@@ -325,6 +325,10 @@ MENUITEM_SETTING(touchpad_deadzone, &global_settings.touchpad_deadzone, NULL);
 MENUITEM_SETTING(shortcuts_replaces_quickscreen, &global_settings.shortcuts_replaces_qs, NULL);
 #endif
 
+#if defined(DX50) || defined(DX90)
+MENUITEM_SETTING(hold_switch_mode, &global_settings.hold_switch_mode, NULL);
+#endif
+
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
           0, Icon_System_menu,
 #if (BATTERY_CAPACITY_INC > 0) || (BATTERY_TYPES_COUNT > 1)
@@ -376,6 +380,10 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
             &usb_skip_first_drive,
+#endif
+
+#if defined(DX50) || defined(DX90)
+            &hold_switch_mode,
 #endif
          );
 
