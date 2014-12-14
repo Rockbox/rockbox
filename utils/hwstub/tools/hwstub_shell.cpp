@@ -28,7 +28,9 @@
 #include <readline/history.h>
 #include <lua.hpp>
 #include <unistd.h>
-#include "soc_desc.hpp"
+#include "soc_desc_v1.hpp"
+
+using namespace soc_desc_v1;
 
 #if LUA_VERSION_NUM < 502
 #warning You need at least lua 5.2
@@ -804,7 +806,7 @@ int main(int argc, char **argv)
     for(int i = optind; i < argc; i++)
     {
         socs.push_back(soc_t());
-        if(!soc_desc_parse_xml(argv[i], socs[socs.size() - 1]))
+        if(!parse_xml(argv[i], socs[socs.size() - 1]))
         {
             printf("Cannot load description '%s'\n", argv[i]);
             return 2;
