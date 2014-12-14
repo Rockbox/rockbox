@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "soc_desc.hpp"
+#include "soc_desc_v1.hpp"
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xmlsave.h>
@@ -27,6 +27,9 @@
 #include <string.h>
 #include <algorithm>
 #include <cctype>
+
+namespace soc_desc_v1
+{
 
 #define XML_CHAR_TO_CHAR(s) ((const char *)(s))
 
@@ -983,3 +986,5 @@ public:
 
 xml_parser_init __xml_parser_init;
 }
+
+} // soc_desc_v1
