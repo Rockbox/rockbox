@@ -176,17 +176,46 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const S
     raw_val_layout->addWidget(m_raw_val_edit);
     raw_val_layout->addStretch();
 
-    m_value_table = new GrowingTableView;
-    m_value_model = new RegFieldTableModel(m_value_table); // view takes ownership
-    m_value_model->SetRegister(m_reg.GetReg());
-    m_value_model->SetReadOnly(read_only);
-    m_value_table->setModel(m_value_model);
+    m_value_table = new GrowingTableWidget;
+    m_value_table->setRowCount(reg.field.size());
+    m_value_table->setColumnCount(5);
+    for(size_t row = 0; row < reg.field.size(); row++)
+    {
+        const soc_reg_field_t& field = reg.field[row];
+        QString bits_str;
+        if(field.first_bit == field.last_bit)
+            bits_str.sprintf("%d", field.first_bit);
+        else
+            bits_str.sprintf("%d:%d", field.last_bit, field.first_bit);
+        QTableWidgetItem *item = new QTableWidgetItem(bits_str);
+        item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        m_value_table->setItem(row, FieldBitsColumn, item);
+        item = new QTableWidgetItem(QString(field.name.c_str()));
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        m_value_table->setItem(row, FieldNameColumn, item);
+        item = new QTableWidgetItem();
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        item->setData(Qt::DisplayRole, QVariant::fromValue(SocFieldCachedValue()));
+        item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+        m_value_table->setItem(row, FieldValueColumn, item);
+        item = new QTableWidgetItem("");
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+        m_value_table->setItem(row, FieldMeaningColumn, item);
+        item = new QTableWidgetItem(QString(field.desc.c_str()));
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        m_value_table->setItem(row, FieldDescColumn, item);
+    }
+    m_value_table->setHorizontalHeaderItem(FieldBitsColumn, new QTableWidgetItem("Bits"));
+    m_value_table->setHorizontalHeaderItem(FieldNameColumn, new QTableWidgetItem("Name"));
+    m_value_table->setHorizontalHeaderItem(FieldValueColumn, new QTableWidgetItem("Value"));
+    m_value_table->setHorizontalHeaderItem(FieldMeaningColumn, new QTableWidgetItem("Meaning"));
+    m_value_table->setHorizontalHeaderItem(FieldDescColumn, new QTableWidgetItem("Description"));
     m_value_table->verticalHeader()->setVisible(false);
     m_value_table->resizeColumnsToContents();
     m_value_table->horizontalHeader()->setStretchLastSection(true);
     m_value_table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    // FIXME we cannot use setAlternatingRowColors() because we override the
-    // background color, should it be part of the model ?
 
     SocFieldCachedItemDelegate *m_table_delegate = new SocFieldCachedItemDelegate(this);
     m_table_edit_factory = new QItemEditorFactory();
@@ -224,13 +253,12 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const S
     setLayout(layout);
     AllowWrite(false);
 
+    m_ignore_cell_change = false;
     // load data
     Reload();
 
-    connect(m_raw_val_edit->GetLineEdit(), SIGNAL(returnPressed()), this,
-        SLOT(OnRawRegValueReturnPressed()));
-    connect(m_value_table->model(), SIGNAL(OnValueModified(int)), this,
-        SLOT(OnRegValueChanged(int)));
+    connect(m_raw_val_edit->GetLineEdit(), SIGNAL(returnPressed()), this, SLOT(OnRawRegValueReturnPressed()));
+    connect(m_value_table, SIGNAL(cellChanged(int, int)), this, SLOT(OnRegFieldValueChanged(int, int)));
 }
 
 RegDisplayPanel::~RegDisplayPanel()
@@ -252,14 +280,37 @@ void RegDisplayPanel::Reload()
         m_raw_val_name->show();
         m_raw_val_edit->show();
         m_raw_val_edit->GetLineEdit()->setText(QString().sprintf("0x%08x", value));
-        m_value_model->SetValues(QVector< QVariant >(1, QVariant(value)));
     }
     else
     {
         m_raw_val_name->hide();
         m_raw_val_edit->hide();
-        m_value_model->SetValues(QVector< QVariant >());
     }
+
+    m_ignore_cell_change = true;
+    for(size_t row = 0; row < reg.field.size(); row++)
+    {
+        const soc_reg_field_t& field = reg.field[row];
+        QTableWidgetItem *item = m_value_table->item(row, FieldValueColumn);
+        QTableWidgetItem *desc_item = m_value_table->item(row, FieldMeaningColumn);
+        if(has_value)
+        {
+            soc_word_t v = (value & field.bitmask()) >> field.first_bit;
+            QString value_name;
+            foreach(const soc_reg_field_value_t& rval, field.value)
+                if(v == rval.value)
+                    value_name = rval.name.c_str();
+            item->setData(Qt::DisplayRole, QVariant::fromValue(SocFieldCachedValue(field, v)));
+            if(value_name.size() != 0)
+                desc_item->setText(value_name);
+        }
+        else
+            item->setData(Qt::DisplayRole, QVariant::fromValue(SocFieldCachedValue()));
+        item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        if(m_allow_write)
+            item->setFlags(item->flags() | Qt::ItemIsEditable);
+    }
+    m_ignore_cell_change = false;
 
     m_value_table->resizeColumnsToContents();
     m_value_table->horizontalHeader()->setStretchLastSection(true);
@@ -269,10 +320,7 @@ void RegDisplayPanel::AllowWrite(bool en)
 {
     m_allow_write = en;
     if(m_raw_val_edit)
-    {
         m_raw_val_edit->SetReadOnly(m_io_backend->IsReadOnly() || !m_allow_write);
-        m_value_model->SetReadOnly(m_io_backend->IsReadOnly() || !m_allow_write);
-    }
     Reload();
 }
 
@@ -300,19 +348,23 @@ void RegDisplayPanel::OnRawRegValueReturnPressed()
     BackendHelper helper(m_io_backend, m_reg);
     helper.WriteRegister(m_reg.GetDevAddr().name.c_str(), m_reg.GetRegAddr().name.c_str(),
         val, mode);
-    // register write can change all fields
     Reload();
 }
 
-void RegDisplayPanel::OnRegValueChanged(int index)
+void RegDisplayPanel::OnRegFieldValueChanged(int row, int col)
 {
-    QVariant var = m_value_model->GetValue(index);
-    if(!var.isValid())
+    if(m_ignore_cell_change || col != FieldValueColumn)
         return;
+    QTableWidgetItem *item = m_value_table->item(row, col);
+    SocFieldCachedValue val = item->data(Qt::DisplayRole).value< SocFieldCachedValue >();
     BackendHelper helper(m_io_backend, m_reg);
+    soc_word_t regval;
+    if(!helper.ReadRegister(m_reg.GetDevAddr().name.c_str(), m_reg.GetRegAddr().name.c_str(), regval))
+        return;
+    regval = (regval & ~val.field().bitmask()) |
+        ((val.value() << val.field().first_bit) & val.field().bitmask());
     helper.WriteRegister(m_reg.GetDevAddr().name.c_str(), m_reg.GetRegAddr().name.c_str(),
-        var.value< soc_word_t >(), IoBackend::Write);
-    // register write can change all fields
+        regval, IoBackend::Write);
     Reload();
 }
 

@@ -86,8 +86,7 @@ protected:
     bool m_allow_write;
     RegLineEdit *m_raw_val_edit;
     RegSexyDisplay *m_sexy_display;
-    GrowingTableView *m_value_table;
-    RegFieldTableModel *m_value_model;
+    GrowingTableWidget *m_value_table;
     QStyledItemDelegate *m_table_delegate;
     QItemEditorFactory *m_table_edit_factory;
     RegItemEditorCreator *m_regedit_creator;
@@ -96,10 +95,11 @@ protected:
     QLabel *m_desc;
     QWidget *m_viewport;
     QScrollArea *m_scroll;
+    bool m_ignore_cell_change;
 
 private slots:
     void OnRawRegValueReturnPressed();
-    void OnRegValueChanged(int index);
+    void OnRegFieldValueChanged(int row, int col);
 };
 
 #endif /* REGDISPLAYPANEL_H */ 

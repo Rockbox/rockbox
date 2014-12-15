@@ -331,22 +331,7 @@ QString SocFieldCachedItemDelegate::displayText(const QVariant& value, const QLo
     {
         const SocFieldCachedValue& v = value.value< SocFieldCachedValue >();
         int bitcount = v.field().last_bit - v.field().first_bit;
-        QString name = v.value_name();
-        QString strval = QString("0x%1").arg(v.value(), (bitcount + 3) / 4, 16, QChar('0'));
-        switch(m_mode)
-        {
-            case DisplayName:
-                if(name.size() > 0)
-                    return name;
-                /* fallthrough */
-            case DisplayValueAndName:
-                if(name.size() > 0)
-                    return QString("%1 (%2)").arg(strval).arg(name);
-                /* fallthrough */
-            case DisplayValue:
-            default:
-                return strval;
-        }
+        return QString("0x%1").arg(v.value(), (bitcount + 3) / 4, 16, QChar('0'));
     }
     else
         return QStyledItemDelegate::displayText(value, locale);
@@ -543,25 +528,34 @@ void RegSexyDisplay::paintEvent(QPaintEvent *event)
 }
 
 /**
- * GrowingTableView
+ * GrowingTextEdit
  */
-GrowingTableView::GrowingTableView(QWidget *parent)
-    :QTableView(parent)
+GrowingTextEdit::GrowingTextEdit(QWidget *parent)
+    :QTextEdit(parent)
 {
+    connect(this, SIGNAL(textChanged()), this, SLOT(TextChanged()));
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
-void GrowingTableView::setModel(QAbstractItemModel *m)
+void GrowingTextEdit::TextChanged()
 {
-    if(model())
-        disconnect(model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
-        this, SLOT(DataChanged(const QModelIndex&, const QModelIndex&)));
-    QTableView::setModel(m);
+    int content_size = document()->documentLayout()->documentSize().height();
+    content_size = qMax(content_size, fontMetrics().height());
+    setFixedHeight(content_size + contentsMargins().top() + contentsMargins().bottom());
+}
+
+/**
+ * GrowingTableWidget
+ */
+GrowingTableWidget::GrowingTableWidget(QWidget *parent)
+    :QTableWidget(parent)
+{
     connect(model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
         this, SLOT(DataChanged(const QModelIndex&, const QModelIndex&)));
-    DataChanged(QModelIndex(), QModelIndex());
 }
 
-void GrowingTableView::DataChanged(const QModelIndex& tl, const QModelIndex& br)
+void GrowingTableWidget::DataChanged(const QModelIndex& tl, const QModelIndex& br)
 {
     Q_UNUSED(tl);
     Q_UNUSED(br);
@@ -569,7 +563,7 @@ void GrowingTableView::DataChanged(const QModelIndex& tl, const QModelIndex& br)
     resizeColumnsToContents();
     int h = contentsMargins().top() + contentsMargins().bottom();
     h += horizontalHeader()->height();
-    for(int i = 0; i < model()->rowCount(); i++)
+    for(int i = 0; i < rowCount(); i++)
         h += rowHeight(i);
     setMinimumHeight(h);
 }
