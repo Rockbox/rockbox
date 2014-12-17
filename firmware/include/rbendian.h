@@ -83,7 +83,7 @@
   #define __swap16_os(x)    __swap16(x)
   #define __swap32_os(x)    __swap32(x)
   #define __swap64_os(x)    __swap64(x)
-#elif defined (__MINGW32__)
+#elif defined (__MINGW32__) || (CONFIG_PLATFORM & PLATFORM_MAEMO)
   /* kinda hacky but works */
   #define __swap16_os(x)    SWAP16_CONST(x)
   #define __swap32_os(x)    SWAP32_CONST(x)
