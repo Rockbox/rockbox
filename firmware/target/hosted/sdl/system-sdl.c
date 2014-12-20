@@ -159,28 +159,26 @@ static int sdl_event_thread(void * param)
     if (background && picture_surface != NULL)
         SDL_BlitSurface(picture_surface, NULL, gui_surface, NULL);
 
-    /* let system_init proceed */
-    SDL_SemPost((SDL_sem *)param);
-
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO)
-    /* Start maemo thread: Listen to display on/off events and battery monitoring */
+    /* start maemo thread: Listen to display on/off events and battery monitoring */
     wait_for_maemo_startup = SDL_CreateSemaphore(0); /* 0-count so it blocks */
     SDL_Thread *maemo_thread = SDL_CreateThread(maemo_thread_func, wait_for_maemo_startup);
+
+    SDL_SemWait(wait_for_maemo_startup);
+    SDL_DestroySemaphore(wait_for_maemo_startup);
 #endif
+
+    /* let system_init proceed */
+    SDL_SemPost((SDL_sem *)param);
 
     /*
      * finally enter the button loop */
     gui_message_loop();
 
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
-    /* Ensure maemo thread is up and running */
-    SDL_SemWait(wait_for_maemo_startup);
-    SDL_DestroySemaphore(wait_for_maemo_startup);
-
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
     pcm_shutdown_gstreamer();
 #endif
-
+#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
     g_main_loop_quit (maemo_main_loop);
     g_main_loop_unref(maemo_main_loop);
     SDL_WaitThread(maemo_thread, NULL);
