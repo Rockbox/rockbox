@@ -259,7 +259,7 @@ void skin_backdrop_load_setting(void)
             if (global_settings.backdrop_file[0] &&
                 global_settings.backdrop_file[0] != '-')
             {
-                if (!backdrops[i].buflib_handle <= 0)
+                if (backdrops[i].buflib_handle <= 0)
                 {
                     backdrops[i].buflib_handle =
                             core_alloc_ex(global_settings.backdrop_file,
