@@ -175,7 +175,7 @@ static bool tv_is_line_break_char(unsigned short ch)
     if (preferences->word_mode == WM_CHOP)
         return false;
 
-    for (i = 0; i < sizeof(break_chars); i++)
+    for (i = 0; i < sizeof(break_chars)/sizeof(unsigned short); i++)
     {
         if (break_chars[i] == ch)
             return true;
@@ -190,7 +190,7 @@ static bool tv_isspace(unsigned short ch)
     if (ch < 128 && isspace(ch))
         return true;
 
-    for (i = 0; i < sizeof(extra_spaces); i++)
+    for (i = 0; i < sizeof(extra_spaces)/sizeof(unsigned short); i++)
     {
         if (extra_spaces[i] == ch)
             return true;
