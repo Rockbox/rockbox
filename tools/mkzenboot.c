@@ -1173,7 +1173,6 @@ int mkboot(const char* infile, const char* bootfile, const char* outfile, struct
     if(fwrite(&out_buffer[i+8+le2int(&out_buffer[i+4])], ciff_size-i-8-le2int(&out_buffer[i+4]), 1, outfd) != 1)
     {
         log_message("[ERR]  Short write\n");
-        fclose(bootfd);
         fclose(outfd);
         free(out_buffer);
         return -28;
