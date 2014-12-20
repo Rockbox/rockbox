@@ -48,6 +48,11 @@ static unsigned char backlight_target;
 /* Assumes that the backlight has been initialized */
 void _backlight_set_brightness(int brightness)
 {
+    if (brightness < 0)
+        brightness = 0;
+    else if(brightness > MAX_BRIGHTNESS_SETTING)
+        brightness = MAX_BRIGHTNESS_SETTING;
+
     /* stop the interrupt from messing us up */
     backlight_control = BACKLIGHT_CONTROL_IDLE;
     _backlight_brightness = log_brightness[brightness];
@@ -85,11 +90,14 @@ static void led_control_service(void)
             backlight_control = BACKLIGHT_CONTROL_IDLE;
             break;
         case BACKLIGHT_CONTROL_ON:
-            _backlight_set_brightness(255);
+            _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
             backlight_control = BACKLIGHT_CONTROL_IDLE;
             break;
         case BACKLIGHT_CONTROL_SET:
-            _backlight_set_brightness(255);
+            /* TODO: This is probably wrong since it sets a fixed value.
+            It was a fixed value of 255 before, but that was even more wrong
+            since it accessed the log_brightness buffer out of bounds */
+            _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
             backlight_control = BACKLIGHT_CONTROL_IDLE;
             break;
         case BACKLIGHT_CONTROL_FADE:
