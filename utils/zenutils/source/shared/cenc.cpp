@@ -209,7 +209,6 @@ int encode_run(byte* dst, int& dstidx, byte val, int len, int dstlen)
             int tmp = encode_run(dst, dstidx, val, len, dstlen);
             if (!tmp) return 0;
             ret += tmp;
-            len -= len;
         }
     }
 
