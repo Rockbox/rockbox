@@ -437,7 +437,7 @@ struct sb1_file_t *sb1_read_memory(void *_buf, size_t filesize, void *u,
 
     for(int i = 0; i < g_nr_keys; i++)
     {
-        if(!g_key_array[i].method == CRYPTO_XOR_KEY)
+        if(g_key_array[i].method != CRYPTO_XOR_KEY)
             continue;
         /* copy key and data because it's modified by the crypto code */
         memcpy(key, g_key_array[i].u.xor_key, sizeof(key));
