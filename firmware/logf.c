@@ -335,6 +335,7 @@ void _logdiskf(const char* file, const char level, const char *fmt, ...)
     {
         strcpy(&logdiskfbuffer[logdiskfindex-8], "LOGFULL");
         logdiskfindex=MAX_LOGDISKF_SIZE;
+        va_end(ap);
         return;
     }
 
