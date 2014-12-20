@@ -231,7 +231,7 @@ static int convert_m3u(char* buf, int buf_len, int buf_max, char* temp)
     char* dest;
 
     /* Locate EOL. */
-    while ((buf[i] != '\n') && (buf[i] != '\r') && (i < buf_len))
+    while ((i < buf_len) && (buf[i] != '\n') && (buf[i] != '\r'))
     {
         i++;
     }
