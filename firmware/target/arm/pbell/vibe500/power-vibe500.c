@@ -98,7 +98,7 @@ void ide_power_enable(bool on)
 
 bool ide_powered(void)
 {
-    return ((GPIOC_INPUT_VAL & 0x08) == 1);
+    return ((GPIOC_INPUT_VAL & 0x08) != 0);
 }
 
 void power_off(void)
