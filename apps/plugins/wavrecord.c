@@ -3669,7 +3669,7 @@ static int record_file(char *filename)
         if (sampr[i][0] == mas)
             break;
     }
-    if (!(update_wav_header(filename, sampr[i][1],
+    if (i == 9 || !(update_wav_header(filename, sampr[i][1],
                             (reccfg.channels + 1), bytes_written)))
     {
         rb->splash(HZ, "Updating WAV header failed");
