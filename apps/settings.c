@@ -1255,6 +1255,7 @@ bool set_option(const char* string, const void* variable, enum optiontype type,
         function, UNIT_INT, 0, numoptions-1, 1,
         set_option_formatter, set_option_get_talk_id
     };
+    memset(item, 0, sizeof(struct settings_list));
     set_option_options = options;
     item.int_setting = &data;
     item.flags = F_INT_SETTING|F_T_INT;
