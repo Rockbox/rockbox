@@ -674,7 +674,8 @@ static int interpret_tzx_header(byte *hb, struct seginfo *csp)
     rb->snprintf(seg_desc, DESC_LEN,"Tapefile Concatenation Point");
     csp->type    = ST_MISC;
     csp->segtype = SEG_SKIP;
-    
+    break;
+
   default:
     csp->type    = ST_MISC;
     csp->segtype = SEG_SKIP;
