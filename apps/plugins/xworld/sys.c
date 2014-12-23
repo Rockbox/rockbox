@@ -290,7 +290,6 @@ void sys_menu(struct System* sys)
     sys->loaded = engine_loadGameState(sys->e, 0);
     rb->lcd_update();
     mainmenu_sysptr = sys;
-    int sel = 0;
     MENUITEM_STRINGLIST(menu, "XWorld Menu", mainmenu_cb,
                         "Resume Game",          /* 0  */
                         "Start New Game",       /* 1  */
@@ -307,8 +306,7 @@ void sys_menu(struct System* sys)
     bool quit = false;
     while(!quit)
     {
-        int item;
-        switch(item = rb->do_menu(&menu, &sel, NULL, false))
+        switch(rb->do_menu(&menu, NULL, NULL, false))
         {
         case 0:
             quit = true;
