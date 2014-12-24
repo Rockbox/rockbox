@@ -71,7 +71,6 @@
       (CONFIG_KEYPAD == SANSA_CONNECT_PAD)    || \
       (CONFIG_KEYPAD == SANSA_C200_PAD)       || \
       (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)   || \
-      (CONFIG_KEYPAD == DX50_PAD)             || \
       (CONFIG_KEYPAD == ONDAVX747_PAD)
 #define BTN_FIRE       BUTTON_VOL_UP
 #define BTN_PAUSE      BUTTON_VOL_DOWN
@@ -169,7 +168,8 @@
 #define BTN_FIRE       BUTTON_PLUS
 #define BTN_PAUSE      BUTTON_MINUS
 
-#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD) || \
+      (CONFIG_KEYPAD == DX50_PAD)
 #define BTN_LEFT       BUTTON_LEFT
 #define BTN_RIGHT      BUTTON_RIGHT
 #define BTN_FIRE       BUTTON_BOTTOMLEFT
