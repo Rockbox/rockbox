@@ -290,7 +290,6 @@ void sys_menu(struct System* sys)
     sys->loaded = engine_loadGameState(sys->e, 0);
     rb->lcd_update();
     mainmenu_sysptr = sys;
-    int sel = 0;
     MENUITEM_STRINGLIST(menu, "XWorld Menu", mainmenu_cb,
                         "Resume Game",          /* 0  */
                         "Start New Game",       /* 1  */
@@ -307,8 +306,7 @@ void sys_menu(struct System* sys)
     bool quit = false;
     while(!quit)
     {
-        int item;
-        switch(item = rb->do_menu(&menu, &sel, NULL, false))
+        switch(rb->do_menu(&menu, NULL, NULL, false))
         {
         case 0:
             quit = true;
@@ -569,10 +567,17 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
 #ifdef HAVE_LCD_COLOR
                 int r, g, b;
                 fb_data pix = rb->lcd_framebuffer[y * LCD_WIDTH + x];
+#if (LCD_DEPTH == 24)
+                r = pix.r;
+                g = pix.g;
+                b = pix.b;
+                rb->lcd_framebuffer[y * LCD_WIDTH + x] = (fb_data) { b, g, r };
+#else
                 r = RGB_UNPACK_RED  (pix);
                 g = RGB_UNPACK_GREEN(pix);
                 b = RGB_UNPACK_BLUE (pix);
                 rb->lcd_framebuffer[y * LCD_WIDTH + x] = LCD_RGBPACK(0xff - r, 0xff - g, 0xff - b);
+#endif
 #else
                 rb->lcd_framebuffer[y * LCD_WIDTH + x] = LCD_BRIGHTNESS(0xff - rb->lcd_framebuffer[y * LCD_WIDTH + x]);
 #endif
