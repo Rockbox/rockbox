@@ -44,7 +44,11 @@
     (CONFIG_KEYPAD == CREATIVEZVM_PAD)      || \
     (CONFIG_KEYPAD == SAMSUNG_YPR0_PAD)     || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD)      || \
-    (CONFIG_KEYPAD == HM801_PAD)
+    (CONFIG_KEYPAD == HM801_PAD)            || \
+    (CONFIG_KEYPAD == COWON_D2_PAD)         || \
+    (CONFIG_KEYPAD == HM60X_PAD)            || \
+    (CONFIG_KEYPAD == ONDAVX747_PAD)
+
 #define BTN_UP         BUTTON_UP
 #define BTN_DOWN       BUTTON_DOWN
 #define BTN_LEFT       BUTTON_LEFT
@@ -158,6 +162,14 @@
 
 #elif (CONFIG_KEYPAD == ONDAVX777_PAD)
 #define BTN_FIRE       BUTTON_POWER
+
+#elif (CONFIG_KEYPAD == COWON_D2_PAD)
+#define BTN_FIRE       BUTTON_PLUS
+#define BTN_PAUSE      BUTTON_MINUS
+
+#elif (CONFIG_KEYPAD == HM60X_PAD)
+#define BTN_FIRE       BUTTON_POWER
+#define BTN_PAUSE      BUTTON_SELECT
 
 #elif (CONFIG_KEYPAD == DX50_PAD)
 #define BTN_FIRE       BUTTON_PLUS
