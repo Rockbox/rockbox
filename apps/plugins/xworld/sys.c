@@ -787,13 +787,13 @@ void sys_sleep(struct System* sys, uint32_t duration)
 {
     (void) sys;
     /* duration is in ms */
-    rb->sleep(duration / 10);
+    rb->sleep(duration / (1000/HZ));
 }
 
 uint32_t sys_getTimeStamp(struct System* sys)
 {
     (void) sys;
-    return (uint32_t) (*rb->current_tick) * 10;
+    return (uint32_t) (*rb->current_tick * (1000/HZ));
 }
 
 static int16_t rb_soundbuf [MAX_SOUNDBUF_SIZE] IBSS_ATTR;
