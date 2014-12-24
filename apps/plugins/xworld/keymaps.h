@@ -51,7 +51,9 @@
 #define BTN_LEFT       BUTTON_LEFT
 #define BTN_RIGHT      BUTTON_RIGHT
 
-#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#if (CONFIG_KEYPAD == ONDAVX747_PAD)
+/* if logic only catches directional buttons */
+#endif
 
 #if (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
 #define BTN_UP_LEFT    BUTTON_BACK
