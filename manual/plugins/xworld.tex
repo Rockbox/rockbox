@@ -3,8 +3,10 @@
 In this cinematic, award winning platform game by Éric Chahi, you must evade capture
 and do your best to escape an alien planet.  After an experiment goes awry the hero
 must team up with an unlikely ally, when they both become fugitives on another world.
-XWorld requires the data files, bank* and memlist.bin, from the original "Another World"
-PC game to be copied into the .rockbox/xworld/ directory before the game can be played.
+XWorld requires the data files, \fname{BANK*} and \fname{MEMLIST.BIN}, from the original ``Another World''
+PC game to be copied into the \fname{.rockbox/xworld/} directory before the game can be played.
+
+Additionally, ``extra'' data files that modify the in-game strings and font can be placed in the \fname{.rockbox/xworld/} directory with the names \fname{xworld.strings} and \fname{xworld.font}, respectively.
 
 \begin{btnmap}
     %
@@ -37,9 +39,9 @@ PC game to be copied into the .rockbox/xworld/ directory before the game can be 
         ,GIGABEAT_S_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD%
         ,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD%
         ,IRIVER_H10_PAD}
-        {\ButtonLeft / \ButtonRight}
-    \opt{HAVE_TOUCHSCREEN}{\TouchMidLeft / \TouchMidRight}
-    \opt{PBELL_VIBE500_PAD}{\ButtonMenu / \ButtonPlay}
+        {\ButtonLeft{} / \ButtonRight}
+    \opt{HAVE_TOUCHSCREEN}{\TouchMidLeft{} / \TouchMidRight}
+    \opt{PBELL_VIBE500_PAD}{\ButtonMenu{} / \ButtonPlay}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Move Left and Right\\
     %
@@ -75,7 +77,7 @@ PC game to be copied into the .rockbox/xworld/ directory before the game can be 
     \opt{HM801_PAD}{\ButtonNext}
     \opt{PBELL_VIBE500_PAD}{\ButtonRec}
     \opt{IRIVER_H10_PAD}{\ButtonPlay}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonMenu / \ButtonSelect}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{\ButtonMenu{} / \ButtonSelect}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Menu\\
 \end{btnmap}
