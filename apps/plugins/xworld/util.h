@@ -25,12 +25,16 @@
 
 #include "intern.h"
 
-/* #define XWORLD_DEBUG */
+#ifdef ROCKBOX_HAS_LOGF
+#define XWORLD_DEBUG
+#endif
 
 #ifdef XWORLD_DEBUG
 #define debug(m,f,...) debug_real(m, f, ##__VA_ARGS__)
+#define XWORLD_DEBUGMASK ~0
 #else
 #define debug(m,f,...)
+#define XWORLD_DEBUGMASK 0
 #endif
 
 enum {

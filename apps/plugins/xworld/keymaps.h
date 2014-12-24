@@ -21,8 +21,8 @@
 
 #ifndef _XWORLD_KEYMAPS_H
 #define _XWORLD_KEYMAPS_H
-#endif
 
+/* Handle the "nice" targets that have directional buttons with normal names */
 #if (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD)  || \
     (CONFIG_KEYPAD == PHILIPS_HDD6330_PAD)  || \
     (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)   || \
@@ -63,15 +63,15 @@
 #define BTN_PAUSE      BUTTON_SELECT
 #endif
 
-#if (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD)    || \
-      (CONFIG_KEYPAD == PHILIPS_HDD6330_PAD)  || \
-      (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)   || \
-      (CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD) || \
-      (CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD) || \
-      (CONFIG_KEYPAD == SANSA_CONNECT_PAD)    || \
-      (CONFIG_KEYPAD == SANSA_C200_PAD)       || \
-      (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)   || \
-      (CONFIG_KEYPAD == ONDAVX747_PAD)
+#if (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD)  || \
+    (CONFIG_KEYPAD == PHILIPS_HDD6330_PAD)  || \
+    (CONFIG_KEYPAD == PHILIPS_SA9200_PAD)   || \
+    (CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD) || \
+    (CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD) || \
+    (CONFIG_KEYPAD == SANSA_CONNECT_PAD)    || \
+    (CONFIG_KEYPAD == SANSA_C200_PAD)       || \
+    (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)   || \
+    (CONFIG_KEYPAD == ONDAVX747_PAD)
 #define BTN_FIRE       BUTTON_VOL_UP
 #define BTN_PAUSE      BUTTON_VOL_DOWN
 
@@ -124,8 +124,11 @@
       (CONFIG_KEYPAD == GIGABEAT_S_PAD)
 #define BTN_FIRE       BUTTON_VOL_UP
 #define BTN_PAUSE      BUTTON_MENU
+/* #if CONFIG_KEYPAD == PHILIPS_HDD1630_PAD */
 #endif
 
+/* ... and now for the bad ones that don't have
+ * standard names for the directional buttons */
 #elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
 #define BTN_UP         BUTTON_OK
 #define BTN_DOWN       BUTTON_CANCEL
@@ -185,12 +188,19 @@
 #define BTN_LEFT       BUTTON_LEFT
 #define BTN_RIGHT      BUTTON_RIGHT
 
-#if (CONFIG_KEYPAD == MROBE500_PAD) || (CONFIG_KEYPAD == ONDAVX777_PAD)
+#if (CONFIG_KEYPAD == MROBE500_PAD) || \
+    (CONFIG_KEYPAD == ONDAVX777_PAD)
 #define BTN_PAUSE      BUTTON_BOTTOMLEFT
 
-#elif CONFIG_KEYPAD == !COWON_D2_PAD || !DX50_PAD ||  !ONDAVX777_PAD
+#elif (CONFIG_KEYPAD == !COWON_D2_PAD) || \
+      (CONFIG_KEYPAD != !DX50_PAD)     || \
+      (CONFIG_KEYMAP != ONDAVX777_PAD)
 #define BTN_FIRE       BUTTON_BOTTOMLEFT
 #define BTN_PAUSE      BUTTON_TOPLEFT
-
 #endif
+
+/* HAVE_TOUCHSCREEN */
+#endif
+
+/* _XWORLD_KEYMAPS_H */
 #endif
