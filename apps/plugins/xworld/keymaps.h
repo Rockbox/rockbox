@@ -51,8 +51,6 @@
 #define BTN_LEFT       BUTTON_LEFT
 #define BTN_RIGHT      BUTTON_RIGHT
 
-#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
-
 #if (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
 #define BTN_UP_LEFT    BUTTON_BACK
 #define BTN_UP_RIGHT   BUTTON_PLAYPAUSE
@@ -170,6 +168,12 @@
 #elif (CONFIG_KEYPAD == COWON_D2_PAD)
 #define BTN_FIRE       BUTTON_PLUS
 #define BTN_PAUSE      BUTTON_MINUS
+
+#elif (CONFIG_KEYPAD == ONDAVX747_PAD)
+#define BTN_LEFT       BUTTON_LEFT
+#define BTN_RIGHT      BUTTON_RIGHT
+#define BTN_FIRE       BUTTON_BOTTOMLEFT
+#define BTN_PAUSE      BUTTON_TOPLEFT
 
 #else
 #error Unsupported keypad
