@@ -51,6 +51,7 @@
 #include "splash.h"
 #include "general.h"
 #include "rbpaths.h"
+#include "buflib.h"
 
 #define LOGF_ENABLE
 #include "logf.h"
@@ -147,6 +148,19 @@ struct codec_api ci = {
     NULL, /* enc_stream_write */
     round_value_to_list32,
 #endif /* HAVE_RECORDING */
+
+    /* the buflib memory management library */
+    buflib_init,
+    buflib_available,
+    buflib_alloc,
+    buflib_alloc_ex,
+    buflib_alloc_maximum,
+    buflib_buffer_in,
+    buflib_buffer_out,
+    buflib_free,
+    buflib_shrink,
+    buflib_get_data,
+    buflib_get_name,
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */

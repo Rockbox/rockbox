@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include "buffering.h" /* TYPE_PACKET_AUDIO */
 #include "kernel.h"
+#include "buflib.h"
 #include "codecs.h"
 #include "dsp_core.h"
 #include "metadata.h"
@@ -68,6 +69,16 @@ void debugf(const char *fmt, ...)
     va_start(ap, fmt);
     vfprintf(stderr, fmt, ap);
     va_end(ap);
+}
+
+void panicf(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+
+    exit (-1);
 }
 
 int find_first_set_bit(uint32_t value)
@@ -706,6 +717,19 @@ static struct codec_api ci = {
     ci_round_value_to_list32,
 
 #endif /* HAVE_RECORDING */
+
+    /* the buflib memory management library */
+    buflib_init,
+    buflib_available,
+    buflib_alloc,
+    buflib_alloc_ex,
+    buflib_alloc_maximum,
+    buflib_buffer_in,
+    buflib_buffer_out,
+    buflib_free,
+    buflib_shrink,
+    buflib_get_data,
+    buflib_get_name,
 };
 
 static void print_mp3entry(const struct mp3entry *id3, FILE *f)

@@ -64,6 +64,12 @@ off_t filesize(int fd);
                        putc('\n', stderr);           \
                   } while (0)
 #endif
+#ifndef panicf
+#define panicf(...) do { fprintf(stderr, __VA_ARGS__); \
+                         putc('\n', stderr);           \
+                         exit(-1);                     \
+                    } while (0)
+#endif
 #endif
 */
 
