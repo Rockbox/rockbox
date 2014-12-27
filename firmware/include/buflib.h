@@ -146,7 +146,7 @@ struct buflib_callbacks {
  * function. It's should be considered opaque, even though it is not yet
  * (that's to make inlining core_get_data() possible). The documentation
  * of the other functions will not describe the context
- * instance paramter further as it's obligatory.
+ * instance parameter further as it's obligatory.
  *
  * context: The new buflib instance to be initialized, allocated by the caller
  * size: The size of the memory pool
@@ -221,7 +221,7 @@ int buflib_alloc_ex(struct buflib_context *ctx, size_t size, const char *name,
  * this function.
  *
  * Note that this might return many more bytes than buflib_available() or
- * buflib_allocatable() return, because it agressively compacts the pool
+ * buflib_allocatable() return, because it aggressively compacts the pool
  * and even shrinks other allocations. However, do not depend on this behavior,
  * it may change.
  *
@@ -286,7 +286,7 @@ int buflib_free(struct buflib_context *context, int handle);
 /**
  * Moves the underlying buflib buffer up by size bytes (as much as
  * possible for size == 0) without moving the end. This effectively
- * reduces the available space by taking away managable space from the
+ * reduces the available space by taking away manageable space from the
  * front. This space is not available for new allocations anymore.
  *
  * To make space available in the front, everything is moved up.
@@ -337,7 +337,7 @@ void buflib_print_allocs(struct buflib_context *ctx, void (*print)(int, const ch
 
 /**
  * Prints an overview of all blocks in the buflib buffer, allocated
- * or unallocated, with the help pf the passted printer helper
+ * or unallocated, with the help of the passed printer helper
  *
  * This walks the entire buffer and prints unallocated space also.
  * The output is also different from buflib_print_allocs().
