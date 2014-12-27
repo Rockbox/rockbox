@@ -95,7 +95,15 @@
 #ifndef SIMULATOR
 
 /*TODO: implement USB data transfer management -> see safe mode script and think a way to implemtent it in the code */
-#define USB_NONE
+//#define USB_NONE
+//#define USE_ROCKBOX_USB // at the moment we don't offer usb storage - later by MTP protocol
+
+#define CONFIG_USBOTG USBOTG_GADGETFS
+
+#define HAVE_USBSTACK
+#define USB_VENDOR_ID 0x04e8
+#define USB_PRODUCT_ID 0x5041
+#define HAVE_USB_HID_MOUSE
 
 /* The YPR0 has a as3534 codec */
 #define HAVE_AS3514

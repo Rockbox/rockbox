@@ -365,6 +365,7 @@ Lyre prototype 1 */
 #define USBOTG_S3C6400X 6400 /* Samsung S3C6400X, also used in the S5L8701/S5L8702/S5L8720 */
 #define USBOTG_RK27XX   2700 /* Rockchip rk27xx */
 #define USBOTG_TNETV105 105  /* TI TNETV105 */
+#define USBOTG_GADGETFS 666 // TODO what is this ID ?!?!?!
 
 /* Multiple cores */
 #define CPU 0
@@ -911,6 +912,8 @@ Lyre prototype 1 */
 #elif CONFIG_USBOTG == USBOTG_RK27XX
 #define USB_STATUS_BY_EVENT
 #define USB_DETECT_BY_REQUEST
+#elif CONFIG_USBOTG == USBOTG_GADGETFS
+#define USB_DETECT_BY_REQUEST
 #endif /* CONFIG_USB == */
 #endif /* HAVE_USBSTACK */
 
@@ -1132,7 +1135,10 @@ Lyre prototype 1 */
 
 #ifndef SIMULATOR
 #if defined(HAVE_USBSTACK) || (CONFIG_STORAGE & STORAGE_NAND)
+// shouldn't this only happen when USB_ROCKBOX is in use, to provide storage?
+#ifndef SAMSUNG_YPR0
 #define STORAGE_GET_INFO
+#endif
 #endif
 #endif
 
@@ -1147,7 +1153,8 @@ Lyre prototype 1 */
 #elif (CONFIG_USBOTG == USBOTG_ARC) || \
     (CONFIG_USBOTG == USBOTG_JZ4740) || \
     (CONFIG_USBOTG == USBOTG_M66591) || \
-    (CONFIG_USBOTG == USBOTG_AS3525)
+    (CONFIG_USBOTG == USBOTG_AS3525) || \
+    (CONFIG_USBOTG == USBOTG_GADGETFS)
 #define USB_HAS_BULK
 #define USB_HAS_INTERRUPT
 #elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
@@ -1158,7 +1165,8 @@ Lyre prototype 1 */
 #endif /* CONFIG_USBOTG */
 
 #if (CONFIG_USBOTG == USBOTG_ARC) || \
-    (CONFIG_USBOTG == USBOTG_AS3525)
+    (CONFIG_USBOTG == USBOTG_AS3525) || \
+    (CONFIG_USBOTG == USBOTG_GADGETFS)
 #define USB_HAS_ISOCHRONOUS
 #endif
 
@@ -1175,7 +1183,7 @@ Lyre prototype 1 */
 
 #else /* BOOTLOADER */
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+//#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #ifdef USB_HAS_BULK
 //#define USB_ENABLE_SERIAL
 #ifdef USE_ROCKBOX_USB
@@ -1188,7 +1196,7 @@ Lyre prototype 1 */
 #else
 #define USB_ENABLE_CHARGING_ONLY
 #endif
-#endif
+//#endif
 
 #endif /* BOOTLOADER */
 

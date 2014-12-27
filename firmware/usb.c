@@ -51,7 +51,8 @@
      (defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB) && CONFIG_USBOTG == USBOTG_S3C6400X) || \
      defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
      (CONFIG_USBOTG == USBOTG_JZ4740) || \
-     (defined(USE_ROCKBOX_USB) && CONFIG_USBOTG == USBOTG_AS3525)
+     (defined(USE_ROCKBOX_USB) && CONFIG_USBOTG == USBOTG_AS3525) || \
+     (defined(SAMSUNG_YPR0))
 #define USB_FULL_INIT
 #endif
 
@@ -243,7 +244,7 @@ static inline void usb_slave_mode(bool on)
 #ifdef HAVE_PRIORITY_SCHEDULING
         thread_set_priority(thread_self(), PRIORITY_REALTIME);
 #endif
-        disk_unmount_all();
+//        disk_unmount_all();
         usb_attach();
     }
     else /* usb_state == USB_INSERTED (only!) */
@@ -252,9 +253,9 @@ static inline void usb_slave_mode(bool on)
         thread_set_priority(thread_self(), PRIORITY_SYSTEM);
 #endif
         /* Entered exclusive mode */
-        rc = disk_mount_all();
-        if(rc <= 0) /* no partition */
-            panicf("mount: %d",rc);
+//        rc = disk_mount_all();
+//        if(rc <= 0) /* no partition */
+//            panicf("mount: %d",rc);
 
         cancel_cpu_boost();
     }
@@ -337,7 +338,9 @@ static inline void usb_slave_mode(bool on)
     if(on)
     {
         DEBUGF("Entering USB slave mode\n");
+#ifndef SAMSUNG_YPR0
         disk_unmount_all();
+#endif
         storage_soft_reset();
         storage_init();
         storage_enable(false);
@@ -360,9 +363,11 @@ static inline void usb_slave_mode(bool on)
             panicf("storage: %d",rc);
 
         sleep(HZ/10);
+#ifndef SAMSUNG_YPR0
         rc = disk_mount_all();
         if(rc <= 0) /* no partition */
             panicf("mount: %d",rc);
+#endif
     }
 }
 #endif /* HAVE_USBSTACK */

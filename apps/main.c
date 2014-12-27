@@ -400,6 +400,8 @@ static void init(void)
 
     audio_init();
 
+    usb_init();
+
     settings_apply_skins();
 }
 

@@ -108,6 +108,7 @@ target/hosted/samsungypr/ypr0/backlight-ypr0.c
 target/hosted/samsungypr/ypr0/ascodec-ypr0.c
 target/hosted/samsungypr/ypr0/powermgmt-ypr0.c
 target/hosted/samsungypr/ypr0/audio-ypr0.c
+target/hosted/samsungypr/ypr0/usb-ypr0.c
 #endif
 
 #if defined(SAMSUNG_YPR1) && !defined(SIMULATOR)
