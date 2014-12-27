@@ -42,6 +42,7 @@ imageviewer
 sudoku
 reversi
 goban
+unitconv
 
 /* setjmp/longjmp are not implemented on sh */
 #if (CONFIG_CPU != SH7034)
