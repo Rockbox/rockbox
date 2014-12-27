@@ -237,7 +237,7 @@ int buflib_alloc_maximum(struct buflib_context* ctx, const char* name,
 
 /**
  * Queries the data pointer for the given handle. It's actually a cheap
- * operation, don't hesitate using it extensivly.
+ * operation, don't hesitate using it extensively.
  *
  * Notice that you need to re-query after every direct or indirect yield(),
  * because compaction can happen by other threads which may get your data
@@ -321,7 +321,7 @@ void buflib_buffer_in(struct buflib_context *ctx, int size);
  * handle: The handle indicating the allocation
  *
  * Returns: A pointer to the string identifier of the allocation, or NULL
- * if none was specified with buflib_alloc_ex/(.
+ * if none was specified with buflib_alloc_ex().
  */
 const char* buflib_get_name(struct buflib_context *ctx, int handle);
 
