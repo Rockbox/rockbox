@@ -124,6 +124,7 @@ test_greylib_bitmap_scale,viewers
 text_editor,apps
 text_viewer,viewers
 theme_remove,viewers
+unitconv,apps
 vbrfix,viewers
 video,viewers
 viewer,viewers
