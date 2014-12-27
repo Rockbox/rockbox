@@ -108,6 +108,7 @@ target/hosted/samsungypr/ypr0/backlight-ypr0.c
 target/hosted/samsungypr/ypr0/ascodec-ypr0.c
 target/hosted/samsungypr/ypr0/powermgmt-ypr0.c
 target/hosted/samsungypr/ypr0/audio-ypr0.c
+target/hosted/samsungypr/ypr0/usb-ypr0.c
 #endif
 
 #if defined(SAMSUNG_YPR1) && !defined(SIMULATOR)
@@ -768,6 +769,8 @@ target/arm/usb-s3c6400x.c
 drivers/isp1583.c
 #elif CONFIG_USBOTG == USBOTG_RK27XX
 target/arm/rk27xx/usb-drv-rk27xx.c
+#elif CONFIG_USBOTG == USBOTG_GADGETFS
+target/hosted/usb-drv-gadgetfs.c
 #endif
 #else /* !defined(HAVE_USBSTACK) */
 #if CONFIG_USBOTG == USBOTG_ISP1362	 
