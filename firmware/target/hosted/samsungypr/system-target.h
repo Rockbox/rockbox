@@ -24,5 +24,10 @@
 #include "kernel-unix.h"
 #include "system-hosted.h"
 
+// this has to be platform specific...
+// think this in a good way, to make gadgetfs also usable by other targets
+#define USB_NUM_ENDPOINTS   7
+#define USB_DEVBSS_ATTR   IBSS_ATTR
+
 #define NEED_GENERIC_BYTESWAPS
 #endif /* __SYSTEM_TARGET_H__ */
