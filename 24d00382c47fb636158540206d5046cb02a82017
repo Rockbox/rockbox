@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_7eade587",
+        "filename": "firmware/drivers/audio/as3514.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2014-12-28T21:26:04Z",
+      "side": 1,
+      "message": "This comment not correct - we connect dac directly to output stage only when volume \u003e\u003d-40dB. In this mode we can\u0027t reduce volume correctly, so we connect dac though mixer.",
+      "revId": "24d00382c47fb636158540206d5046cb02a82017",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
