@@ -131,8 +131,8 @@ void audiohw_preinit(void)
 
 #ifdef HAVE_AS3543
 
-    as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_DAC_GAIN_on);
-    as3514_write(AS3514_AUDIOSET2, AUDIOSET2_AGC_off | AUDIOSET2_HPH_QUALITY_LOW_POWER);
+    as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on);
+    as3514_write(AS3514_AUDIOSET2, AUDIOSET2_SUM_off | AUDIOSET2_AGC_off | AUDIOSET2_HPH_QUALITY_LOW_POWER);
     /* common ground on, delay playback unmuting when inserting headphones */
     as3514_write(AS3514_AUDIOSET3, AUDIOSET3_HPCM_on | AUDIOSET3_HP_LONGSTART);
 
@@ -144,8 +144,8 @@ void audiohw_preinit(void)
     /* Select Line 2 for FM radio */
     as3514_set(AS3514_LINE_IN1_R, LINE_IN_R_LINE_SELECT);
 #endif
-    /* Output SUM of microphone/line/DAC */
-    as3514_write(AS3514_HPH_OUT_R, HPH_OUT_R_HEADPHONES | HPH_OUT_R_HP_OUT_SUM);
+    /* Set LINEOUT to minimize pop-click noise in headphone on init stage  */
+    as3514_write(AS3514_HPH_OUT_R, HPH_OUT_R_LINEOUT | HPH_OUT_R_HP_OUT_DAC);
 
 #else
     /* as3514/as3515 */
@@ -216,6 +216,11 @@ void audiohw_preinit(void)
 
     /* DAC_Mute_off */
     as3514_set(AS3514_DAC_L, DAC_L_DAC_MUTE_off);
+
+#ifdef HAVE_AS3543
+    /* DAC direct - gain, mixer and limitter bypassed */
+    as3514_write(AS3514_HPH_OUT_R, HPH_OUT_R_HEADPHONES | HPH_OUT_R_HP_OUT_DAC);
+#endif
 }
 
 static void audiohw_mute(bool mute)
@@ -291,7 +296,21 @@ void audiohw_set_volume(int vol_l, int vol_r)
     } else {
         mix_l = MIXER_MAX_VOLUME;
         hph_l = vol_l - MIXER_MAX_VOLUME;
-    }    
+    }
+
+#ifdef HAVE_AS3543
+    if (!(as3514_regs[AS3514_HPH_OUT_R] & 0x40)) { /*if not radio or recording*/
+        if (!hph_l || !hph_r) { /*if volume higher, disable the mixer to slightly improve noise*/
+            as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_DAC_GAIN_on);
+            as3514_write(AS3514_AUDIOSET2, AUDIOSET2_AGC_off | AUDIOSET2_HPH_QUALITY_LOW_POWER);
+            as3514_write_masked(AS3514_HPH_OUT_R, HPH_OUT_R_HP_OUT_SUM, HPH_OUT_R_HP_OUT_MASK);
+        } else {
+            as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on);
+            as3514_write(AS3514_AUDIOSET2, AUDIOSET2_SUM_off | AUDIOSET2_AGC_off | AUDIOSET2_HPH_QUALITY_LOW_POWER);
+            as3514_write_masked(AS3514_HPH_OUT_R, HPH_OUT_R_HP_OUT_DAC, HPH_OUT_R_HP_OUT_MASK);
+        }
+    }
+#endif
 
     as3514_write_masked(AS3514_DAC_R, mix_r, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_DAC_L, mix_l, AS3514_VOL_MASK);
@@ -464,6 +483,9 @@ void audiohw_set_recvol(int left, int right, int type)
 void audiohw_set_monitor(bool enable)
 {
     if (enable) {
+#ifdef HAVE_AS3543
+        as3514_write_masked(AS3514_HPH_OUT_R, HPH_OUT_R_HP_OUT_LINE, HPH_OUT_R_HP_OUT_MASK);
+#endif
         /* select either LIN1 or LIN2 */
         as3514_write_masked(AS3514_AUDIOSET1, AUDIOSET1_LIN_on,
                             AUDIOSET1_LIN1_on | AUDIOSET1_LIN2_on);
@@ -471,6 +493,9 @@ void audiohw_set_monitor(bool enable)
         as3514_set(AS3514_LINE_IN_L, LINE_IN1_L_LI1L_MUTE_off);
     }
     else {
+#ifdef HAVE_AS3543
+        as3514_write_masked(AS3514_HPH_OUT_R, HPH_OUT_R_HP_OUT_DAC, HPH_OUT_R_HP_OUT_MASK);
+#endif
         /* turn off both LIN1 and LIN2 (if present) */
         as3514_clear(AS3514_LINE_IN1_R, LINE_IN1_R_LI1R_MUTE_off);
         as3514_clear(AS3514_LINE_IN1_L, LINE_IN1_L_LI1L_MUTE_off);
