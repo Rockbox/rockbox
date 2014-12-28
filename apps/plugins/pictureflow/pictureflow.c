@@ -1535,9 +1535,9 @@ static int read_pfraw(char* filename, int prio)
     int hid;
     do {
         hid = rb->buflib_alloc(&buf_ctx, size);
-    } while (hid < 0 && free_slide_prio(prio));
+    } while (hid <= 0 && free_slide_prio(prio));
 
-    if (hid < 0) {
+    if (hid <= 0) {
         rb->close( fh );
         return 0;
     }

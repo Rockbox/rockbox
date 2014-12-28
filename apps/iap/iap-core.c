@@ -422,7 +422,7 @@ static void iap_malloc(void)
 
 #ifdef IAP_MALLOC_DYNAMIC
     iap_buffer_handle = core_alloc_ex("iap", IAP_MALLOC_SIZE, &iap_buflib_callbacks);
-    if (iap_buffer_handle < 0)
+    if (iap_buffer_handle <= 0)
         panicf("Could not allocate buffer memory");
     iap_buffers = core_get_data(iap_buffer_handle);
 #else

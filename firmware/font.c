@@ -126,7 +126,7 @@ static int buflibmove_callback(int handle, void* current, void* new)
 }
 static void lock_font_handle(int handle, bool lock)
 {
-    if ( handle < 0 )
+    if ( handle <= 0 )
         return;
     struct buflib_alloc_data *alloc = core_get_data(handle);
     if ( lock )
@@ -502,7 +502,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
 
     for (font_id = FONT_FIRSTUSERFONT; font_id < MAXFONTS; font_id++)
     {
-        if (buflib_allocations[ font_id ] < 0)
+        if (buflib_allocations[ font_id ] <= 0)
         {
             open_slot = font_id;
             break;
@@ -590,7 +590,7 @@ void font_unload(int font_id)
     if ( font_id < 0 || font_id >= MAXFONTS )
         return;
     int handle = buflib_allocations[font_id];
-    if ( handle < 0 )
+    if ( handle <= 0 )
         return;
     struct buflib_alloc_data *pdata = core_get_data(handle);
     struct font* pf = &pdata->font;
@@ -629,7 +629,7 @@ static void font_disable(int font_id)
     if ( font_id < 0 || font_id >= MAXFONTS )
         return;
     int handle = buflib_allocations[font_id];
-    if ( handle < 0 )
+    if ( handle <= 0 )
         return;
     struct buflib_alloc_data *pdata = core_get_data(handle);
     struct font *pf = &pdata->font;
@@ -656,7 +656,7 @@ static void font_enable(int font_id)
     if ( font_id < 0 || font_id >= MAXFONTS )
         return;
     int handle = buflib_allocations[font_id];
-    if ( handle < 0 )
+    if ( handle <= 0 )
         return;
     struct buflib_alloc_data *pdata = core_get_data(handle);
     struct font *pf = &pdata->font;
@@ -899,7 +899,7 @@ static void glyph_cache_save(int font_id)
     if( font_id < 0 )
         return;
     int handle = buflib_allocations[font_id];
-    if ( handle < 0 )
+    if ( handle <= 0 )
         return;
 
     struct font *pf = pf_from_handle(handle);

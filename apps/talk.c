@@ -450,7 +450,7 @@ static void load_initial_clips(int fd)
             continue;
 
         handle = buflib_alloc(&clip_ctx, clipsize);
-        if (handle < 0)
+        if (handle <= 0)
             break;
 
         ret = read_clip_data(fd, index, handle);
@@ -485,7 +485,7 @@ static int get_clip(long id, struct queue_entry *q)
         ssize_t ret;
         cache_misses++;
         /* free clips from cache until this one succeeds to allocate */
-        while ((handle = buflib_alloc(&clip_ctx, clipsize)) < 0)
+        while ((handle = buflib_alloc(&clip_ctx, clipsize)) <= 0)
             oldest = free_oldest_clip();
         /* handle should now hold a valid alloc. Load from disk
          * and insert into cache */
@@ -526,7 +526,7 @@ static bool load_index_table(int fd, const struct voicefile_header *hdr)
 
     ssize_t alloc_size = (hdr->id1_max + hdr->id2_max) * sizeof(struct clip_entry);
     index_handle = core_alloc_ex("voice index", alloc_size, &talk_ops);
-    if (index_handle < 0)
+    if (index_handle <= 0)
         return false;
 
     ret = read_to_handle(fd, index_handle, 0, alloc_size);
@@ -566,7 +566,7 @@ static bool create_clip_buffer(size_t max_size)
     size_t alloc_size;
     /* just allocate, populate on an as-needed basis later */
     talk_handle = core_alloc_ex("voice data", max_size, &talk_ops);
-    if (talk_handle < 0)
+    if (talk_handle <= 0)
         goto alloc_err;
 
     buflib_init(&clip_ctx, core_get_data(talk_handle), max_size);
@@ -1084,7 +1084,7 @@ static int _talk_file(const char* filename,
 #endif
 
     /* free clips from cache until this one succeeds to allocate */
-    while ((handle = buflib_alloc(&clip_ctx, size)) < 0)
+    while ((handle = buflib_alloc(&clip_ctx, size)) <= 0)
         oldest = free_oldest_clip();
 
     size = read_to_handle_ex(fd, &clip_ctx, handle, 0, size);

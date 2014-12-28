@@ -458,7 +458,7 @@ void usb_storage_init_connection(void)
 
     // Add 31 to handle worst-case misalignment
     usb_handle = core_alloc_ex("usb storage", ALLOCATE_BUFFER_SIZE + MAX_CBW_SIZE + 31, &dummy_ops);
-    if (usb_handle < 0)
+    if (usb_handle <= 0)
         panicf("%s(): OOM", __func__);
 
     buffer = core_get_data(usb_handle);

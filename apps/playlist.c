@@ -2073,7 +2073,7 @@ int playlist_resume(void)
     static struct buflib_callbacks dummy_ops;
     /* use mp3 buffer for maximum load speed */
     handle = core_alloc_maximum("temp", &buflen, &dummy_ops);
-    if (handle < 0)
+    if (handle <= 0)
         panicf("%s(): OOM", __func__);
     buffer = core_get_data(handle);
 

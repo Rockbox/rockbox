@@ -114,7 +114,7 @@ int radio_get_art_hid(struct dim *requested_dim)
     preset_name = radio_get_preset_name(preset);
     for (int i=0; i<MAX_RADIOART_IMAGES; i++)
     {
-        if (radioart[i].handle < 0)
+        if (radioart[i].handle <= 0)
         {
             free_idx = i;
         }

@@ -572,7 +572,7 @@ void set_codepage(int cp)
         /* alloc and load must be done outside the lock */
         cp_lock_leave();
 
-        if (handle < 0 && (handle = alloc_and_load_cp_table(cp, NULL)) < 0)
+        if (handle <= 0 && (handle = alloc_and_load_cp_table(cp, NULL)) <= 0)
             return; /* OOM; change nothing */
 
         yield();
