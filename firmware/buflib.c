@@ -44,7 +44,7 @@
  * the buffer. The buffer is treated as an array of union buflib_data. Blocks
  * start with a length marker, which is included in their length. Free blocks
  * are marked by negative length. Allocated blocks have a positiv length marker,
- * and additional metadata forllowing that: It follows a pointer
+ * and additional metadata following that: It follows a pointer
  * (union buflib_data*) to the corresponding handle table entry. so that it can
  * be quickly found and updated during compaction. After that follows
  * the pointer to the struct buflib_callbacks associated with this allocation
@@ -62,7 +62,7 @@
  * |L|H|C|cccc|L2|crc|XXXXXX|-L|YYYYYYYYYYYYYYYY|L|H|C|cc|L2|crc|XXXXXXXXXXXXX|AAA|
  *
  * L - length marker (negative if block unallocated)
- * H - handle table enry pointer
+ * H - handle table entry pointer
  * C - pointer to struct buflib_callbacks
  * c - variable sized string identifier
  * L2 - second length marker for string identifier

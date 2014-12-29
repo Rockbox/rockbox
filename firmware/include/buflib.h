@@ -35,12 +35,15 @@
 
 union buflib_data
 {
-    intptr_t val;
-    char name[1]; /* actually a variable sized string */
-    struct buflib_callbacks* ops;
-    char* alloc;
-    union buflib_data *handle;
-    uint32_t crc;
+    intptr_t val;                 /* length of the block in n*sizeof(union buflib_data).
+                                     Includes buflib metadata overhead. A negative value
+                                     indicates block is unallocated */
+    char name[1];                 /* name, actually a variable sized string */
+    struct buflib_callbacks* ops; /* callback functions for move and shrink. Can be NULL */
+    char* alloc;                  /* start of allocated memory area */
+    union buflib_data *handle;    /* pointer to entry in the handle table.
+                                     Used during compaction for fast lookup */
+    uint32_t crc;                 /* checksum of this data to detect corruption */
 };
 
 struct buflib_context
