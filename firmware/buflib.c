@@ -107,7 +107,7 @@ void
 buflib_init(struct buflib_context *ctx, void *buf, size_t size)
 {
     union buflib_data *bd_buf = buf;
-    BDEBUGF("buflib initialized with %lu.%02lu kiB",
+    BDEBUGF("buflib initialized with %lu.%02lu kiB\n",
             (unsigned long)size / 1024, ((unsigned long)size%1000)/10);
 
     /* Align on sizeof(buflib_data), to prevent unaligned access */
