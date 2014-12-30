@@ -48,10 +48,10 @@
      (defined(HAVE_USBSTACK) && defined(HAVE_BOOTLOADER_USB_MODE)) || \
      (defined(HAVE_USBSTACK) && (defined(CREATIVE_ZVx))) || \
      (defined(HAVE_USBSTACK) && (defined(OLYMPUS_MROBE_500))) || \
-     (defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB) && CONFIG_USBOTG == USBOTG_S3C6400X) || \
+     (defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_S3C6400X) || \
      defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
      (CONFIG_USBOTG == USBOTG_JZ4740) || \
-     (defined(USE_ROCKBOX_USB) && CONFIG_USBOTG == USBOTG_AS3525)
+     (defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_AS3525)
 #define USB_FULL_INIT
 #endif
 
@@ -88,8 +88,7 @@ static long usb_last_broadcast_tick = 0;
 static bool usb_charging_only = false;
 #endif
 
-#if defined(USB_FIREWIRE_HANDLING) \
-    || (defined(HAVE_USBSTACK) && !defined(USE_ROCKBOX_USB))
+#if defined(USB_FIREWIRE_HANDLING)
 static void try_reboot(void)
 {
 #ifdef HAVE_DISK_STORAGE
@@ -111,7 +110,7 @@ static void try_reboot(void)
 
     system_reboot(); /* Reboot */
 }
-#endif /* USB_FIRWIRE_HANDLING || (HAVE_USBSTACK && !USE_ROCKBOX_USB) */
+#endif /* USB_FIRWIRE_HANDLING */
 
 /* Screen dump */
 #ifdef HAVE_LCD_BITMAP
@@ -232,7 +231,6 @@ static inline bool usb_configure_drivers(int for_state)
     return false;
 }
 
-#ifdef USE_ROCKBOX_USB
 static inline void usb_slave_mode(bool on)
 {
     int rc;
@@ -259,15 +257,6 @@ static inline void usb_slave_mode(bool on)
         cancel_cpu_boost();
     }
 }
-#else /* !USE_ROCKBOX_USB */
-static inline void usb_slave_mode(bool on)
-{
-    /* Until we have native mass-storage mode, we want to reboot on USB host
-     * connect */
-    if(on)
-        try_reboot();
-}
-#endif /* USE_ROCKBOX_USB */
 
 void usb_signal_transfer_completion(
     struct usb_transfer_completion_event_data* event_data)

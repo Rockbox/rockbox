@@ -9,7 +9,6 @@
 
 #if 0
 #define HAVE_USBSTACK
-#define USE_ROCKBOX_USB
 #define USB_VENDOR_ID 0x0e21
 #define USB_PRODUCT_ID 0x0800
 #endif

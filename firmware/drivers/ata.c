@@ -79,7 +79,7 @@
 static unsigned int ata_thread_id = 0;
 #endif
 
-#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+#if defined(HAVE_USBSTACK)
 #define ALLOW_USB_SPINDOWN
 #endif
 
