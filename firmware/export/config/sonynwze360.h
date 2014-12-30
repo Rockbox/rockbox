@@ -167,7 +167,6 @@
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
 //#define USB_HANDLED_BY_OF
-#define USE_ROCKBOX_USB
 #define USB_VENDOR_ID 0x054c
 #define USB_PRODUCT_ID 0x059b
 #define HAVE_USB_HID_MOUSE

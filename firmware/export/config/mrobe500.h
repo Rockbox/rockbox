@@ -211,7 +211,6 @@
 
 /* enable these for the usb stack */
 #define CONFIG_USBOTG       USBOTG_M66591
-#define USE_ROCKBOX_USB
 
 #define HAVE_USBSTACK
 //#define HAVE_USB_POWER
