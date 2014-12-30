@@ -194,7 +194,6 @@ No access to the NAND yet..
 
 #define CONFIG_USBOTG     USBOTG_JZ4740
 #define HAVE_USBSTACK
-#define USE_ROCKBOX_USB
 /* Connect by events, not by tick polling */
 #define USB_STATUS_BY_EVENT
 #define USB_VENDOR_ID     0x07C4

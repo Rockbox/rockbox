@@ -149,7 +149,6 @@
 
 /* USB */
 //#define HAVE_USBSTACK
-#define USE_ROCKBOX_USB
 #define USB_VENDOR_ID 0x04E8
 #define USB_PRODUCT_ID 0x5090
 

@@ -217,7 +217,6 @@
 #define CONFIG_USBOTG USBOTG_ARC
 
 /* enable these for the usb stack */
-#define USE_ROCKBOX_USB
 #define HAVE_USBSTACK
 /* usb stack and driver settings */
 #define USB_PORTSCX_PHY_TYPE PORTSCX_PTS_ULPI

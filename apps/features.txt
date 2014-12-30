@@ -258,7 +258,7 @@ scrollwheel
 usb_power
 #endif
 
-#if defined(HAVE_USBSTACK) && defined(USE_ROCKBOX_USB)
+#if defined(HAVE_USBSTACK)
 usbstack
 #endif
 
