@@ -64,5 +64,12 @@ mount --bind /mnt/media0/.rockbox /.rockbox
 mount --bind /mnt/media0/Playlists /Playlists
 
 MAINFILE="/mnt/media0/.rockbox/rockbox"
+# Attempt to copy the executable in the /tmp directory
+# This allows an easier USB Mass Storage Mode to be achieved (file handles)
+cp $MAINFILE /tmp/rockbox
+if [ $? -eq 0 ]
+then
+    MAINFILE="/tmp/rockbox"
+fi
 MAINFILE_ARGV=''
 MAINFILE_REDIRECT='>/dev/null 2>&1'
