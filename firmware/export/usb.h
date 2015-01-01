@@ -127,6 +127,13 @@ void usb_charging_enable(int state);
 #ifdef HAVE_USBSTACK
 void usb_charger_update(void);
 #endif /* HAVE_USBSTACK */
+/* hardware which knows how to control usb current should use one
+ * of the following to find out from the usb stack how much is ok
+ */
+/* implemented by target, called by usb when value changes */
+void usb_charging_maxcurrent_change(int maxcurrent);
+/* implemented by usb, called by target to get value */
+int usb_charging_maxcurrent(void);
 #endif /* HAVE_USB_CHARGING_ENABLE */
 #endif /* HAVE_USB_POWER */
 #ifdef HAVE_USBSTACK
