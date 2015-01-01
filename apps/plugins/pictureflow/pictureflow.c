@@ -443,6 +443,18 @@ static int track_list_visible_entries = 0;
 static int track_list_y;
 static int track_list_h;
 
+static int locked_buflib_handle;
+static int move_callback(int handle, void *current, void *new)
+{
+    (void)current; (void)new;
+    if (handle == locked_buflib_handle)
+        return BUFLIB_CB_CANNOT_MOVE;
+    return BUFLIB_CB_OK;
+}
+static struct buflib_callbacks pictureflow_ops = {
+    .move_callback = move_callback,
+};
+
 /*
     Proposals for transitions:
 
@@ -1534,7 +1546,7 @@ static int read_pfraw(char* filename, int prio)
 
     int hid;
     do {
-        hid = rb->buflib_alloc(&buf_ctx, size);
+        hid = rb->buflib_alloc_ex(&buf_ctx, size, "PictureFlow", &pictureflow_ops);
     } while (hid < 0 && free_slide_prio(prio));
 
     if (hid < 0) {
@@ -1544,6 +1556,7 @@ static int read_pfraw(char* filename, int prio)
 
     rb->yield(); /* allow audio to play when fast scrolling */
     struct dim *bm = rb->buflib_get_data(&buf_ctx, hid);
+    locked_buflib_handle = hid;
 
     bm->width = bmph.width;
     bm->height = bmph.height;
@@ -1555,6 +1568,7 @@ static int read_pfraw(char* filename, int prio)
         rb->read( fh, data , sizeof( pix_t ) * bm->width );
         data += bm->width;
     }
+    locked_buflib_handle = -1;
     rb->close( fh );
     return hid;
 }
@@ -1709,6 +1723,7 @@ static inline struct dim *get_slide(const int hid)
     struct dim *bmp;
 
     bmp = rb->buflib_get_data(&buf_ctx, hid);
+    locked_buflib_handle = hid;
 
     return bmp;
 }
@@ -2100,6 +2115,9 @@ static void render_all_slides(void)
     if (step != 0 && num_slides <= 2) /* fading out center slide */
         alpha = (step > 0) ? 256 - fade / 2 : 128 + fade / 2;
     render_slide(&center_slide, alpha);
+
+    /* free up lock on last used slide */
+    locked_buflib_handle = -1;
 }
 
 

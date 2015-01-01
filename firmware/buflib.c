@@ -677,7 +677,7 @@ buflib_free(struct buflib_context *ctx, int handle_num)
     else
     {
     /* Otherwise, set block to the newly-freed block, and mark it free, before
-     * continuing on, since the code below exects block to point to a free
+     * continuing on, since the code below expects block to point to a free
      * block which may have free space after it.
      */
         block = freed_block;
