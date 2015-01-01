@@ -238,7 +238,7 @@ static struct dircache
 } dircache;
 
 /* struct that is used only for the cache in main memory */
-struct dircache_runinfo
+static struct dircache_runinfo
 {
     /* cache setting and build info */
     int          suspended;        /* dircache suspend count */
