@@ -55,7 +55,7 @@
  * to find the start of the character array (and therefore the start of the
  * entire block) when only the handle or payload start is known.
  *
- * UPDATE BUFLIB_ALLOC_OVERHEAD (buflib.h) WHEN THIS COOKIE CHANGES!
+ * UPDATE BUFLIB_ALLOC_OVERHEAD (buflib.h) WHEN THE METADATA CHANGES!
  *
  * Example:
  * |<- alloc block #1 ->|<- unalloc block ->|<- alloc block #2      ->|<-handle table->|
@@ -66,7 +66,7 @@
  * C - pointer to struct buflib_callbacks
  * c - variable sized string identifier
  * L2 - second length marker for string identifier
- * crc - crc32 protecting buflib cookie integrity
+ * crc - crc32 protecting buflib metadata integrity
  * X - actual payload
  * Y - unallocated space
  * 
@@ -251,12 +251,12 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     union buflib_data *new_block, *tmp = block[1].handle, *crc_slot;
     struct buflib_callbacks *ops = block[2].ops;
     crc_slot = (union buflib_data*)tmp->alloc - 1;
-    int cookie_size = (crc_slot - block)*sizeof(union buflib_data);
-    uint32_t crc = crc_32((void *)block, cookie_size, 0xffffffff);
+    const int metadata_size = (crc_slot - block)*sizeof(union buflib_data);
+    uint32_t crc = crc_32((void *)block, metadata_size, 0xffffffff);
 
-    /* check for cookie validity */
+    /* check for metadata validity */
     if (crc != crc_slot->crc)
-        buflib_panic(ctx, "buflib cookie corrupted, crc: 0x%08x, expected: 0x%08x",
+        buflib_panic(ctx, "buflib metadata corrupted, crc: 0x%08x, expected: 0x%08x",
                (unsigned int)crc, (unsigned int)crc_slot->crc);
 
     if (!IS_MOVABLE(block))
@@ -827,7 +827,7 @@ bool
 buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t new_size)
 {
     union buflib_data *crc_slot;
-    int cookie_size;
+    int size_for_crc32;
     char* oldstart = buflib_get_data(ctx, handle);
     char* newstart = new_start;
     char* newend = newstart + new_size;
@@ -873,10 +873,10 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
         block = new_block;
     }
 
-    /* update crc of the cookie */
+    /* update crc of the metadata */
     crc_slot = (union buflib_data*)new_block[1].handle->alloc - 1;
-    cookie_size = (crc_slot - new_block)*sizeof(union buflib_data);
-    crc_slot->crc = crc_32((void *)new_block, cookie_size, 0xffffffff);
+    size_for_crc32 = (crc_slot - new_block)*sizeof(union buflib_data);
+    crc_slot->crc = crc_32((void *)new_block, size_for_crc32, 0xffffffff);
 
     /* Now deal with size changes that create free blocks after the allocation */
     if (old_next_block != new_next_block)
@@ -919,7 +919,7 @@ void *buflib_get_data(struct buflib_context *ctx, int handle)
 void buflib_check_valid(struct buflib_context *ctx)
 {
     union buflib_data *crc_slot;
-    int cookie_size;
+    int metadata_size;
     uint32_t crc;
 
     for(union buflib_data* this = ctx->buf_start;
@@ -931,8 +931,8 @@ void buflib_check_valid(struct buflib_context *ctx)
 
         crc_slot = (union buflib_data*)
                        ((union buflib_data*)this[1].handle)->alloc - 1;
-        cookie_size = (crc_slot - this)*sizeof(union buflib_data);
-        crc = crc_32((void *)this, cookie_size, 0xffffffff);
+        metadata_size = (crc_slot - this)*sizeof(union buflib_data);
+        crc = crc_32((void *)this, metadata_size, 0xffffffff);
 
         if (crc != crc_slot->crc)
             buflib_panic(ctx, "crc mismatch: 0x%08x, expected: 0x%08x",
