@@ -88,6 +88,8 @@ static long usb_last_broadcast_tick = 0;
 static bool usb_charging_only = false;
 #endif
 
+static int usb_release_exclusive_storage(void);
+
 #if defined(USB_FIREWIRE_HANDLING)
 static void try_reboot(void)
 {
