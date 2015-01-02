@@ -712,9 +712,7 @@ static const struct plugin_api rockbox_api = {
     charging_state,
 # endif
 #endif
-#ifdef HAVE_USB_POWER
-    usb_powered,
-#endif
+    usb_inserted,
 
     /* misc */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
