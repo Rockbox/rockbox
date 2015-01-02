@@ -83,6 +83,22 @@ struct shortcut_handle {
 static int first_handle = 0;
 static int shortcut_count = 0;
 
+static int buflib_move_lock;
+static int move_callback(int handle, void *current, void *new)
+{
+    (void)handle;
+    (void)current;
+    (void)new;
+
+    if (buflib_move_lock > 0)
+        return BUFLIB_CB_CANNOT_MOVE;
+
+    return BUFLIB_CB_OK;
+}
+static struct buflib_callbacks shortcut_ops = {
+    .move_callback = move_callback,
+};
+
 static void reset_shortcuts(void)
 {
     int current_handle = first_handle;
@@ -97,17 +113,18 @@ static void reset_shortcuts(void)
     }
     first_handle = 0;
     shortcut_count = 0;
-}   
+}
 
 static struct shortcut* get_shortcut(int index)
 {
     int handle_count, handle_index;
     int current_handle = first_handle;
     struct shortcut_handle *h = NULL;
-    
+
     if (first_handle == 0)
     {
-        first_handle = core_alloc("shortcuts_head", sizeof(struct shortcut_handle));
+        first_handle = core_alloc_ex("shortcuts_head",
+                                  sizeof(struct shortcut_handle), &shortcut_ops);
         if (first_handle <= 0)
             return NULL;
         h = core_get_data(first_handle);
@@ -126,7 +143,10 @@ static struct shortcut* get_shortcut(int index)
     {
         char buf[32];
         snprintf(buf, sizeof buf, "shortcuts_%d", index/SHORTCUTS_PER_HANDLE);
-        h->next_handle = core_alloc(buf, sizeof(struct shortcut_handle));
+        /* prevent invalidation of 'h' during compaction */
+        ++buflib_move_lock;
+        h->next_handle = core_alloc_ex(buf, sizeof(struct shortcut_handle), &shortcut_ops);
+        --buflib_move_lock;
         if (h->next_handle <= 0)
             return NULL;
         h = core_get_data(h->next_handle);
@@ -190,12 +210,17 @@ static void shortcuts_ata_idle_callback(void)
     char buf[MAX_PATH];
     int current_idx = first_idx_to_writeback;
     int append = overwrite_shortcuts ? O_TRUNC : O_APPEND;
-    
+
     if (first_idx_to_writeback < 0)
         return;
     fd = open(SHORTCUTS_FILENAME, append|O_RDWR|O_CREAT, 0644);
     if (fd < 0)
         return;
+
+    /* ensure pointer returned by get_shortcut()
+       survives the yield() of write() */
+    ++buflib_move_lock;
+
     while (current_idx < shortcut_count)
     {
         struct shortcut* sc = get_shortcut(current_idx++);
@@ -221,6 +246,7 @@ static void shortcuts_ata_idle_callback(void)
          reset_shortcuts();
          shortcuts_init();
     }
+    --buflib_move_lock;
     first_idx_to_writeback = -1;
 }
 
@@ -336,15 +362,25 @@ void shortcuts_init(void)
     fd = open_utf8(SHORTCUTS_FILENAME, O_RDONLY);
     if (fd < 0)
         return;
-    first_handle = core_alloc("shortcuts_head", sizeof(struct shortcut_handle));
+    first_handle = core_alloc_ex("shortcuts_head", sizeof(struct shortcut_handle), &shortcut_ops);
     if (first_handle <= 0)
         return;
     h = core_get_data(first_handle);
     h->next_handle = 0;
+
+    /* we enter readline_cb() multiple times with a buffer
+       obtained when we encounter a "[shortcut]" section.
+       fast_readline() might yield() -> protect buffer */
+    ++buflib_move_lock;
+
     fast_readline(fd, buf, sizeof buf, &param, readline_cb);
     close(fd);
     if (param && verify_shortcut(param))
         shortcut_count++;
+
+    /* invalidate at scope end since "param" contains
+       the shortcut pointer */
+    --buflib_move_lock;
 }
 
 static const char * shortcut_menu_get_name(int selected_item, void * data,
@@ -462,6 +498,10 @@ int do_shortcut_menu(void *ignored)
     }
     push_current_activity(ACTIVITY_SHORTCUTSMENU);
 
+    /* prevent buffer moves while the menu is active.
+       Playing talk files or other I/O actions call yield() */
+    ++buflib_move_lock;
+
     while (done == GO_TO_PREVIOUS)
     {
         if (simplelist_show_list(&list))
@@ -540,5 +580,7 @@ int do_shortcut_menu(void *ignored)
         }
     }
     pop_current_activity();
+    --buflib_move_lock;
+
     return done;
 }
