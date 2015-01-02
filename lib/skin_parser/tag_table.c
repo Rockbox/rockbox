@@ -43,7 +43,7 @@ static const struct tag_info legal_tags[] =
     { SKIN_TOKEN_BATTERY_SLEEPTIME,     "bs", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_BATTERY_CHARGING,      "bc", "", SKIN_REFRESH_DYNAMIC },
     { SKIN_TOKEN_BATTERY_CHARGER_CONNECTED, "bp", "", SKIN_REFRESH_DYNAMIC },
-    { SKIN_TOKEN_USB_POWERED,           "bu", "", SKIN_REFRESH_DYNAMIC },
+    { SKIN_TOKEN_USB_INSERTED,          "bu", "", SKIN_REFRESH_DYNAMIC },
     
     
     { SKIN_TOKEN_RTC_PRESENT,           "cc", "", FEATURE_TAG },

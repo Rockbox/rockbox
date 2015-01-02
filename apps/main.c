@@ -586,7 +586,8 @@ static void init(void)
                 mounted = true; /* mounting done @ end of USB mode */
             }
 #ifdef HAVE_USB_POWER
-        if (usb_powered())      /* avoid deadlock */
+        /* if there is no host or user requested no USB, skip this */
+        if (usb_powered_only())
             break;
 #endif
     }
