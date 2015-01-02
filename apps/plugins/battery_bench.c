@@ -358,11 +358,12 @@ static unsigned int charge_state(void)
         ret |= BIT_CHARGING;
 #endif
 #endif
+    /* USB insertion means nothing if USB cannot power the device */
 #ifdef HAVE_USB_POWER
-    if (rb->usb_powered())
+    if (rb->usb_inserted())
         ret |= BIT_USB_POWER;
 #endif
-    return ret; 
+    return ret;
 }
 #endif
 

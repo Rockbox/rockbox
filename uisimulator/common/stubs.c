@@ -313,7 +313,7 @@ bool is_new_player(void)
 #endif
 
 #ifdef HAVE_USB_POWER
-bool usb_powered(void)
+bool usb_powered_only(void)
 {
     return false;
 }
