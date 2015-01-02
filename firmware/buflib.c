@@ -481,7 +481,9 @@ buflib_buffer_in(struct buflib_context *ctx, int size)
     buflib_buffer_shift(ctx, -size);
 }
 
-/* Allocate a buffer of size bytes, returning a handle for it */
+/* Allocate a buffer of size bytes, returning a handle for it.
+ * Note: Buffers are movable since NULL is passed for "ops".
+         Don't pass them to functions that call yield() */
 int
 buflib_alloc(struct buflib_context *ctx, size_t size)
 {
@@ -492,8 +494,11 @@ buflib_alloc(struct buflib_context *ctx, size_t size)
  *
  * The additional name parameter gives the allocation a human-readable name,
  * the ops parameter points to caller-implemented callbacks for moving and
- * shrinking. NULL for default callbacks (which do nothing but don't
- * prevent moving or shrinking)
+ * shrinking.
+ *
+ * If you pass NULL for "ops", buffers are movable by default.
+ * Don't pass them to functions that call yield() like I/O.
+ * Buffers are only shrinkable when a shrink callback is given.
  */
 
 int

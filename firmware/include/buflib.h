@@ -94,8 +94,11 @@ struct buflib_callbacks {
      * Return: Return BUFLIB_CB_OK, or BUFLIB_CB_CANNOT_MOVE if movement
      * is impossible at this moment.
      *
-     * If NULL: this allocation must not be moved around by the buflib when
-     * compation occurs
+     * If NULL: this allocation must not be moved around
+     * by the buflib when compaction occurs. Attention: Don't confuse
+     * that with passing NULL for the whole callback structure
+     * to buflib_alloc_ex(). This would enable moving buffers by default.
+     * You have to pass NULL inside the "struct buflib_callbacks" structure.
      */
     int (*move_callback)(int handle, void* current, void* new);
     /**
@@ -193,6 +196,9 @@ bool buflib_context_relocate(struct buflib_context *ctx, void *buf);
  *
  * size: How many bytes to allocate
  *
+ * This function passes NULL for the callback structure "ops", so buffers
+ * are movable. Don't pass them to functions that yield().
+ *
  * Returns: A positive integer handle identifying this allocation, or
  * a negative value on error (0 is also not a valid handle)
  */
@@ -205,7 +211,8 @@ int buflib_alloc(struct buflib_context *context, size_t size);
  *
  * name: A string identifier giving this allocation a name
  * size: How many bytes to allocate
- * ops: a struct with pointers to callback functions (see above)
+ * ops: a struct with pointers to callback functions (see above).
+ *      if "ops" is NULL: Buffer is movable.
  *
  * Returns: A positive integer handle identifying this allocation, or
  * a negative value on error (0 is also not a valid handle)

@@ -52,6 +52,12 @@ bool core_test_free(void)
     return ret;
 }
 
+/* Allocate memory in the "core" context. See documentation
+ * of buflib_alloc_ex() for details.
+ *
+ * Note: Buffers allocated by this functions are movable.
+ *       Don't pass them to functions that call yield()
+ *       like disc input/output. */
 int core_alloc(const char* name, size_t size)
 {
     return buflib_alloc_ex(&core_ctx, size, name, NULL);
