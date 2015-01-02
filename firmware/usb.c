@@ -769,7 +769,7 @@ int usb_release_exclusive_storage(void)
 }
 
 #ifdef HAVE_USB_POWER
-bool usb_powered(void)
+bool usb_powered_only(void)
 {
     return usb_state == USB_POWERED;
 }

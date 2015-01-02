@@ -1149,12 +1149,10 @@ const char *get_token_value(struct gui_wps *gwps,
             }
         }
 #endif
-#ifdef HAVE_USB_POWER
-        case SKIN_TOKEN_USB_POWERED:
-            if (usb_powered())
+        case SKIN_TOKEN_USB_INSERTED:
+            if (usb_inserted())
                 return "u";
             return NULL;
-#endif
         case SKIN_TOKEN_BATTERY_SLEEPTIME:
         {
             if (get_sleep_timer() == 0)
