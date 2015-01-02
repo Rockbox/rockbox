@@ -1,0 +1,212 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage[a4paper]{geometry}
+\usepackage{hyperref}
+\author{Thomas Orgis}
+\title{Metronome acceleration}
+
+\newcommand\de[0]{\text d}
+\newcommand\ide[0]{\text d\,}
+\newcommand\dd[2]{\frac{\de #1}{\de #2}}
+\newcommand\ddq[2]{\frac{\de^2 #1}{\de {#2}^2}}
+\newcommand\dnd[1]{\frac{\de}{\de #1}}
+\newcommand\gkl[1]{\left( #1 \right)}
+
+\begin{document}
+\maketitle
+
+\section*{Spacetime Analogy}
+
+For some reason I keep confusing myself with the units in beat space and
+the definition of an acceleration in reciprocal time only. How's that
+with the usual motion over distance $s$ during time $t$?
+
+The speed is
+\begin{equation}
+	v = \dd st
+\;,
+\end{equation}
+while the acceleration is given as speed increase per covered distance,
+\begin{equation}
+	a = \dd vs = \dnd s \dd st
+\;.
+\end{equation}
+This definition allows to compute the speed after a certain covered
+distance,
+\begin{equation}
+\begin{aligned}
+\label{eq-speed}
+	v(s) &= v_0 + \int\limits_{s_0}^s a(s') \de s'
+\\
+\stackrel{a = \text{const}}{\Leftrightarrow}
+	v(s) &= v_0 + a(s-s_0)
+\;.
+\end{aligned}
+\end{equation}
+
+That can be again regarded as a differential equation linking
+space and time increments, to be solved for the time difference
+corresponding to two points in space,
+\begin{equation}
+\begin{aligned}
+	v =
+	\dd st &= v_0 + a(s-s_0)
+\\
+\Leftrightarrow
+	\de t &= \frac 1{v_0 + a(s-s_0)} \de s
+\\
+\Leftrightarrow
+	t_1 - t_0 &=
+	\int\limits_{s_0}^{s_1}  \frac 1{v_0 + a(s-s_0)} \de s
+\\\text{\ldots substituting \autoref{eq-speed} \ldots}
+\\
+	v = v_0 + a(s-s_0)
+	&\Rightarrow \dd vs = a
+	\Rightarrow \de s = \frac 1a \de v
+\\
+\Leftrightarrow
+        t_1 - t_0 &=                           
+        \frac 1a \int\limits_{v(s_0)}^{v(s_1)}  \frac 1v \de s
+\;.
+\end{aligned}
+\end{equation}
+Hence, the duration of a certain distance interval in time is given by
+\begin{equation}
+\label{eq-deltat}
+        \Delta t = t_1 - t_0
+	= \frac 1a \ln \frac {v(s_1)}{v(s_0)}
+\;.
+\end{equation}
+
+How should one interpret the dimension of the acceleration?
+The unit \si{s^{-1}} could be seen as \si{(m/s) / m},
+\si{h^{-1}} as  \si{(km/h) / km}. One mixed variant
+could be \si{(km/h) / m}, which boils down to \SI{1000}{h^{-1}}.
+
+
+\section*{Real Deal}
+
+The analogy can be carried forward, identifying the distance $s$ with
+the position in the score, counted in bars, beats, whatever you like.
+A sensible unit might be a whole note, denoted with the unit symbol \si{n}.
+A quarter note equals $\Delta s_{\text note} = \SI{1/4}{n}$, an eigth $\SI{1/8}{n}$.
+A bar in 6/8 meter has length $\Delta s_{\text{bar}} = \SI{3/4}{n}$,
+while in 4/4 meter it's an unsurprising $\Delta s_{\text{bar}} = \SI{1}{n}$.
+
+Dominic explained the meaning of the acceleration parameter $c$ as such:
+After $c$ bars, the tempo increased by \SI{1}{bpm}.
+The tempo is always related to quarter notes, so that one bar of three
+quarters length at constant tempo $v=\SI{120}{bpm}$, be it either in
+$3/4$ or in $6/8$ meter, takes \SI{1.5}s to complete. With the bar length
+
+The acceleration value, based on quarter beats per minute, is
+given by
+\begin{equation}
+\label{eq-acc1}
+	a \cdot (c \Delta s_{\text{bar}})
+	=
+	\SI{1}{bpm}
+	=
+	1 \frac {\SI{1/4}n}{\si{min}}
+\Leftrightarrow
+	\frac a { \si{min^{-1}} } =
+	\frac 1c \frac { \SI{1/4}n }{ \Delta s_{\text{bar}} }
+\;.
+\end{equation}
+The tempo $v(s)$ at a certain point into the score is given by
+\autoref{eq-speed} using this acceleration. Also, a time interval
+for a certain beat can be computed using \autoref{eq-deltat}
+and the tempo values at the beginning of the converned beat ($s_0$)
+and the beginning of the next one ($s_1$).
+
+It is evident from \autoref{eq-deltat} that all this is only applicable
+if there indeed is a non-zero acceleration $a$ and the tempo is
+always non-zero.
+The latter point is illustrative in the spacetime analogy with the
+conventional definition of a constant acceleration per time interval,
+\begin{align}
+	a &= \dd vt = \ddq st
+\;,
+\end{align}
+where everything is defined nicely. It {\em is} a difference whether
+the acceleration is defined using elapsed time or covered
+distance.
+If you start out with $v_0 = 0$ (in whatever units), an acceleration
+that is defined to increase $v$ with each increment of distance cannot
+take hold, as there is no infinitisemal distance to work on at the
+beginning. You can't get going if you're not going.
+The solution makes sense: In that case, there is no solution.
+
+Negative acceleration is of course allowed, as long as it is
+non-zero. For constant tempo, the trivial
+\begin{equation}
+	\Delta t = \frac{\Delta s}v
+\end{equation}
+applies.
+
+\subsection*{Derived Acceleration}
+
+Actually, the usual notion inside a score is to change tempo from $v_0$ to
+$v_1$ within a certain number of bars. In place of \autoref{eq-acc1}, the
+acceleration then simply is given by the ratio of the tempo difference and
+the corresponding distance in the score,
+\begin{equation}
+\label{eq-acc2}
+	a = \frac {v(s_1)-v(s_0)}{s_1 - s_0}
+	= \frac{\Delta v}{\Delta s}
+\;.
+\end{equation}
+
+This the obvious sensible default to use when a part length in bars is given
+without acceleration.
+
+\subsection*{Mean Tempo}
+
+To compare with Dominic's empirical mean tempo for a beat,
+\begin{equation}
+\bar v = \frac{v_0 - v_1}{\ln \frac{v_0}{v_1}}
+= -\frac{ v_1-v_0 }{ \ln \frac{v_0}{v_1} }
+=  \frac{ v_1-v_0 }{ \ln \frac{v_1}{v_0} }
+\end{equation}
+(written to avoid direct logarithms of quantities with units attached),
+the acceleration in \autoref{eq-deltat} can be replaced by
+\autoref{eq-acc2}. This yields
+\begin{equation}
+	\Delta t = \frac{\Delta s}{\Delta v}
+	\ln \frac {v_1}{v_0}
+\Leftrightarrow
+\bar v = \frac{\Delta s}{\Delta t}
+= \frac{\Delta v}{\ln \frac {v_1}{v_0}}
+\;,
+\end{equation}
+which is the same as Dominic's expression.
+
+\section*{In Terms of Time}
+
+% Note: I'm writing this sitting in a train called "Metronom"!
+One could also define the metronome tempo acceleration in terms of time.
+Instead of being given in units of inverse time, it would be
+beats-per-minute per minute.
+But how easy is it to solve for the length of a beat $\Delta s$ then?
+
+\begin{equation}
+\begin{aligned}
+v(t) &= v_0 + a(t - t_0)
+\\
+\Delta s &= \int\limits_{t_0}^{t_1} v_0 + a(t - t_0) \de t
+\\
+&= v_0 \Delta t + \frac a2 (\Delta t)^2
+\\
+0 &= (\Delta t)^2 + \frac 2a v_0 \Delta t - \frac 2a \Delta s
+\end{aligned}
+\end{equation}
+\begin{equation}
+\Delta t = - \frac {v_0}a \pm \sqrt{ \gkl{\frac{v_0}a}^2 + \frac 2a \Delta s }
+\end{equation}
+This is straightfoward, allowing for the choice of the positive $\Delta t$.
+Now, what is desired? Constant acceleration in space (beat count) or in time?
+
+\end{document}

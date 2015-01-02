@@ -8,10 +8,19 @@
  * $Id$
  *
  * Copyright (C) 2004 Matthias Wientapper, 2014 Thomas Orgis
+ *
+ * TODO:
+ *  - endless parts by omitting the count, zero meaning just zero
+ *  - tapping ... tempo editing? some kind of mode switching for the old
+ *    metronome behaviour; tracks edited by text editor only
+ *  - allow spaces at beginning of tempomap files
+ *
  * Changes by Thomas from original metronome plugin:
  * - tick and tock sounds (square sine)
  * - differing meters
  * - programmable tracks (parts with differing settings)
+ * -- smooth tempo changes in those tracks
+ * -- fancy beat patterns (tick/tock/silence)
  * - Interactive change of tempo, including tapping, has been disabled for now.
  *   A future merged plugin might add that back and know two UI modes:
  *   1. Opened without file, defaulting to endless meter without emphasis.
@@ -31,54 +40,58 @@
  *   hold for seeking around).
  * - Power/cancel: exit
  * 
- * Currently supported syntax in tempomap files (ending .tempo, associated with
- * metronome2 in Rockbox), a line for each part, [] optional:
- *    [name: ]bars [meter ]tempo[-tempo2/accel] [pattern]
+ * The syntax of programmed tracks in tempomap files follows the format
+ * defined by http://das.nasophon.de/klick/. Actually, the goal is to keep
+ * compatibility between klick and this Rockbox metronome.
+ *
+ * Files with ending .tempo are associated with the metronome in Rockbox
+ * so you can open them from the file browser. The parts of a track are
+ * specified one line each in this scheme (stuff in [] optional):
+ *
+ *    [name: ]bars [meter ]tempo[-tempo2[*accel|/accel] [pattern]
+ *
  * Example
  *    part_I: 12 3/4 133
  * for a part named "part_I" (no spaces!), 12 bars long, in 3/4 meter with
  * tempo 133. The tempo _always_ means quarter notes per minute, independent
- * of meter! That is what http://das.nasophon.de/klick/ does, from which the
- * file format originates.
- * 
- * Acceleration: This metronome can act as a speed trainer (or for tracks that
- * actually change tempo in increments between bars) with a tempomap file,
- * example:
- *   # speedtrainer.tempo
- *   100-200: 0 4/4 100-200/0.25
- *   90-130: 0 4/4 90-130/5
- *   130-90: 0 4/4 130-90/5
- * This offers three endless parts (extension to klick format with bars=0),
- * that you can switch between using the left/right controls, which operate
- * on whole parts when these are endless. The first one starts at 100 bpm and
- * increases by 1 bpm every 4 parts (as long as floating point arithmetic works
- * out), until it reaches 200 bpm, then staying there.
- * The second one starts at 90 bpm and goes up to 130 in steps of 5 bpm per bar.
- * The third one starts at 130 bpm and goes down to 90 in steps of 5 bpm per
- * bar.
- * 
+ * of meter!
+ *
+ * Lines starting with # are comments.
+ *
+ * Acceleration: Tempo changes indicated by specifying a range and the
+ * acceleration in one of these ways:
+ *
+ *   90-150: 0 4/4 90-150*0.25
+ *   150-90: 0 4/4 150-90/4
+ *   100-200: 16 4/4 100-200
+ *
+ * The first one goes from 90 to 150 bpm in an endless part with 0.25 bpm
+ * increase per bar. The second one goes down from 150 to 90 with
+ * 4 bars per bpm change, which is the same acceleration as in the first line.
+ * The last one is a part of 16 bars length that changes tempo from 100 to 200
+ * smoothly during its whole lifetime (6.25 bpm/bar).
+ *
  * Fancy patterns: You can provide a pattern that controls how the beats are
  * played:
+ *
  *   - 'X' for emphasized beat (Tick)
  *   - 'x' for normal beat (Tock)
  *   - '.' for silent beat
+ *
  * So,
  *    default: 0 4/4 120 Xxxx
  *    rockon2: 0 4/4 120 xXxX
  *    solea: 0 12/4 180 xxXxxXxXxXxX
  *    shuffle: 0 12/12 120 x.xX.xx.xX..
  *    funky: 0 16/16 120 x.x.X..X.Xx.X..X
+ *
  * The 12/12 for the shuffle create 1/4 triplets. Just do a bit of math;-)
  * This is still a metronome, not a drum machine, but it can act like a basic
  * one, helping you to figure out a certain rhythm within the meter.
  *
- * It is actually feasible to edit these small files using the text editor
- * plugin on the device itself. Thus, I'm not sure if editing capability
- * in the metronome plugin is that necessary. There is something reassuring
- * in knowing that using the metronome won't change you programmed track.
- * 
  * Oh: Development happens exclusively on a Sansa Clip+. I try to be
- * somewhat agnostic in the GUI.
+ * somewhat agnostic in the GUI, but might not look nice on other devices.
+ *
  * Alrighty then,
  * 
  * Thomas.
@@ -95,6 +108,9 @@
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/pluginlib_exit.h"
+/* I don't find these in a generic header. They're just used by plugins. */
+float rb_fabs(float);
+float rb_log(float);
 
 /* 1024 is around 1 ms resolution. Is plenty, unless you want ticks for
    32th notes and smaller for odd tempi. */
@@ -117,8 +133,15 @@ static signed short tock_sound[] = {
 };
 #endif
 
+/* Am I supposed to supply these functions with the plugin? */
 /* Grab atof() from someplace. */
 #include "metronome2/atof_from_pdbox.h"
+/* Also trivially contained in pdbox. */
+float rb_fabs(float x)
+{
+    return (x < 0.0f) ? -x : x;
+}
+#include "metronome2/log_from_pdbox.h"
 
 #define METRONOME_QUIT          PLA_EXIT
 
@@ -158,7 +181,7 @@ struct part
     unsigned int base_beat;     /* 4 in 3/4 to adjust bpm value */
     unsigned int bpm;           /* 1/4 notes per minute */
     unsigned int bpm2;          /* tempo limit (can be smaller for negative acceleration) */
-    float accel;                /* fractional acceleration per bar (always positive value) */
+    float accel;                /* acceleration in 1/min (really) */
     char pattern[64];           /* Store pattern characters verbatim for max. 64 beats
                                    (no string termination).
                                    One could save storage here by encoding things in bits, or
@@ -166,6 +189,7 @@ struct part
 };
 #define PART_MAX 200
 static struct part part_spec[PART_MAX];  /* Storage for parts 0 to 199. */
+static unsigned int bad_parts = 0; /* Count parts with parsing errors. */
 
 static unsigned int positive(unsigned int value)
 {
@@ -178,7 +202,11 @@ void set_part(unsigned int i, const char* label, unsigned int bars,
               char* pattern)
 {
     size_t pats;
-    struct part* ps = &part_spec[i];
+    struct part* ps;
+
+    if(i >= PART_MAX) return;
+
+    ps = &part_spec[i];
     strncpy(ps->label, label, sizeof(ps->label)-1);
     ps->label[sizeof(ps->label)-1] = 0;
     ps->bars = bars;
@@ -187,7 +215,7 @@ void set_part(unsigned int i, const char* label, unsigned int bars,
     ps->base_beat = positive(base_beat);
     ps->bpm = positive(bpm);
     ps->bpm2 = positive(bpm2);
-    ps->accel = accel >= 0. ? accel : -accel;
+    ps->accel = accel;
     rb->memset(ps->pattern, 'x', sizeof(ps->pattern));
     /* Carefully figure out the bumber of pattern bytes to copy. */
     pats = rb->strlen(pattern);
@@ -201,9 +229,10 @@ static unsigned int parts = 0; /* Number of preconfigured parts. */
 static int loop = 0; /* Needed? */
 static unsigned int beat = 0;
 static unsigned int bar  = 0; /* How big shall this become? */
-/* The currently active bpm value, set from calc_period(). */
+/* The currently (approximate) active bpm value, set from calc_period(). */
 static unsigned int bpm = 1;
 
+/* Should be unsigned? */
 static int period   = 0;
 static int minitick = 0;
 static bool beating = false; /* A beat is/was playing and count needs to increase. */
@@ -285,30 +314,71 @@ static void play_tock(void)
 
 #endif /* CONFIG_CODEC != SWCODEC */
 
+/* Sign of accel already covers the relation between beginning and goal.
+   Input offset is in quarter notes, resulting tempo in the usual
+   quarter-note-bpm. */
+float accel_tempo(struct part *ps, float offset)
+{
+    float v = ps->bpm + ps->accel * offset;
+    /* Offset could be negative, actually, so ensure tempo stays within both
+       bounds */
+    if(ps->accel >= 0.)
+    {
+        if(v < ps->bpm)  v = ps->bpm;
+        if(v > ps->bpm2) v = ps->bpm2;
+    }
+    else /* deceleration */
+    {
+        if(v > ps->bpm)  v = ps->bpm;
+        if(v < ps->bpm2) v = ps->bpm2;
+    }
+    return v;
+}
+
+/*
+    Calculate period to wait till next beat.
+    Note that the timer triggers the callback at a fixed interval,
+    recomputing the waiting period just changes the number of
+    miniticks the callback waits for. It's not that time-critical itself,
+    as it would be when reprogramming the timer, too.
+*/
 static void calc_period(void)
 {
     struct part *ps = &part_spec[part];
-    /* Play safe: Always start with first value, for jumping around. */
-    bpm = ps->bpm;
-    if(bar && bpm != ps->bpm2)
-    {
-        unsigned int increment = (unsigned int)(ps->accel*bar);
-        if(ps->bpm < ps->bpm2)
+    float deltat;
+    float beatlen = 4.f / ps->base_beat; /* in quarter notes */
+
+    if(ps->accel == 0.f)
+    { /* Fixed tempo. */
+        bpm = ps->bpm;
+       /* Minutes per base beat, from quarters per minute. */
+       deltat = beatlen/bpm;
+    }
+    else
+    { /* Acceleration, varying period with each beat. */
+        /* Always do full calculation from beginning of part, to be safe
+           with jumping around and not to accumulate errors. */
+        float v0, v1;
+        v0 = accel_tempo(ps, beatlen*(bar*ps->beats_per_bar + beat));
+        v1 = accel_tempo(ps, beatlen*(bar*ps->beats_per_bar + beat + 1));
+
+        /* Wait! If v0 == v1, the tempo limit got reached and we're in constant
+           tempo mode again.
+           What if the difference is very small? Is this a problem? */
+        if(rb_fabs(v1-v0) > 0.01f)
         {
-            bpm = ps->bpm + increment;
-            if(bpm > ps->bpm2) bpm = ps->bpm2;
+            deltat = 1.f / ps->accel * rb_log(v1/v0); /* always positive */
+            bpm = (unsigned int) (beatlen/deltat + 0.5f);
         }
-        else /* Take care not to decrement below bpm2. */
-        {
-            if(increment < ps->bpm - ps->bpm2)
-                bpm = ps->bpm - increment;
-            else
-                bpm = ps->bpm2;
+        else
+        { /* Arbitrarily choosing v1. */
+            bpm = (unsigned int) (v1+0.5f);
+            deltat = beatlen / v1;
         }
     }
-
-    /* (60*freq_div)/bpm always for quarter notes, half that for eights */
-    period = 60*timerfreq_div*4/ps->base_beat/bpm-1;
+    /* Is proper rounding really necessary?
+       Also, there used to be -1 at the end. Why? */
+    period = (int)( 60*timerfreq_div*deltat + 0.5f );
 }
 
 static void metronome_draw(struct screen* display, int state);
@@ -318,11 +388,11 @@ static void draw_display(int state)
         metronome_draw(rb->screens[i], state);
 }
 
+/* Last beat finished, to prepare for the next one. */
 void advance_beat(void)
 {
     struct part *ps = &part_spec[part];
 
-    /* Do as little as possible before calc_period() for adequate timing. */
     if(++beat == ps->beats_per_bar)
     {
         beat = 0;
@@ -338,16 +408,15 @@ void advance_beat(void)
                 if(!loop) sound_paused = true;
             }
         }
-        /* There can be a new period now for the changed part or just because
-           of completion of a bar with acceleration. */
-        calc_period();
     }
+    /* Always recompute period, as acceleration changes it for each beat. */
+    calc_period();
 }
 
 /* Stopping playback means incrementing the beat. Normally, it would be
    incremented after the passing of the current note duration, naturally
    while starting the next one. */
-static void pause(void)
+static void metronome_pause(void)
 {
     if(beating)
     {
@@ -359,14 +428,14 @@ static void pause(void)
     draw_display(0);
 }
 
-static void unpause(void)
+static void metronome_unpause(void)
 {
     sound_paused = false;
     minitick = period; /* Start playing immediately (or after a millisecond). */
     /* Display update will happen on the tick. */
 }
 
-/* Beat counting happens here. Assuming 4/4 for now. */
+/* Beat counting happens here. */
 static void play_ticktock(void)
 {
     if(beating) advance_beat();
@@ -500,8 +569,11 @@ static void change_volume(int delta)
     }
 }
 
+/* I presume the timer ensures that not more than one instance
+   of the callback is running at a given time. */
 static void timer_callback(void)
 {
+    ++minitick;
     if(!sound_paused && minitick == period/2)
     {
         /* Clear blinker. */
@@ -519,9 +591,6 @@ static void timer_callback(void)
 #endif
             rb->reset_poweroff_timer();
         }
-    }
-    else {
-        minitick++;
     }
 
     if (tap_count) {
@@ -617,14 +686,31 @@ void parse_part(char *line)
        you'll get rubbish. */
     if( (toktok = rb->strchr(token, '-')) )
     {
-       ps->bpm2 = positive(rb_atof(++toktok));
-       if( (toktok = rb->strchr(toktok, '/')) )
-       {
-           ps->accel = rb_atof(++toktok);
-           /* Ignore the sign. */
-           if(ps->accel < 0) ps->accel = -ps->accel;
-       }
-    }
+        char *subtok = toktok+1;
+        ps->bpm2 = positive(rb_atof(subtok));
+        /* Parse or compute accel in bpm/bar. */
+        if( (toktok = rb->strchr(subtok, '/')) )
+        { /* bars/bpm */
+            float c = rb_atof(++toktok);
+            if(rb_fabs(c) > 0.0001f)
+            ps->accel = 1./c;
+        }
+        else if( (toktok = rb->strchr(subtok, '*')) )
+        { /* bpm/bar */
+            ps->accel = rb_atof(++toktok);
+        }
+        else if(ps->bars > 0)
+        { /* Compute from tempo difference and bar count. */
+            ps->accel = ((float)ps->bpm2 - (float)ps->bpm)/ps->bars;
+        }
+        /* Correct sign for all cases, starting with positive value. */
+        if(ps->accel < 0) ps->accel = -ps->accel;
+        /* Negative only when end tempo is smaller. */
+        if(ps->bpm2 < ps->bpm) ps->accel = -ps->accel;
+        /* Convert (quarterbeats-per-minute per bar) -> 1/min, which could be
+           seen as beats-per-minute/beat */
+        ps->accel *= 1.f / (4.f/ps->base_beat * ps->beats_per_bar); /* 1/min */
+     }
     token = rb->strtok_r(NULL, " \t", &saveptr);
     if(token)
     {
@@ -644,6 +730,7 @@ void parse_part(char *line)
 
     /* Remove the added part after some error. */
 parse_part_revert:
+    ++bad_parts;
     --parts;
 }
 
@@ -716,19 +803,26 @@ enum plugin_status plugin_start(const void* file)
     if(file)
     {
         parts = 0;
+        bad_parts = 0;
+        char linebuf[128];
         int fd = rb->open(file, O_RDONLY);
         if(fd >= 0)
         {
-            char line[128];
             /* I'm assuming that read_line always terminates. */
-            while(rb->read_line(fd, line, sizeof(line)) > 0)
+            while(rb->read_line(fd, linebuf, sizeof(linebuf)) > 0)
             {
-                parse_part(line);
+               parse_part(linebuf);
             }
         }
         rb->close(fd);
+        if(bad_parts)
+        {
+            rb->snprintf(linebuf, sizeof(linebuf), "%u bad parts", bad_parts);
+            rb->splash(2*HZ, linebuf);
+        }
     }
-    /* Ensure that at least one part is always present, for now. */
+    /* Ensure that at least one part is always present, for now.
+       TODO: Add the old metronome mode in here. */
     if(!parts)
     {
         parts = 1;
@@ -761,8 +855,8 @@ enum plugin_status plugin_start(const void* file)
                 return PLUGIN_OK;
 
             case METRONOME_PLAY:
-                if(sound_paused) unpause();
-                else             pause();
+                if(sound_paused) metronome_unpause();
+                else             metronome_pause();
                 break;
             case METRONOME_VOL_UP:
             case METRONOME_VOL_UP_REP:
