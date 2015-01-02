@@ -234,7 +234,6 @@ bool usb_driver_enabled(int driver);
 /* returns whether exclusive storage is available for USB */
 bool usb_exclusive_storage(void);
 #endif /* HAVE_USBSTACK */
-int usb_release_exclusive_storage(void);
 
 #ifdef USB_FIREWIRE_HANDLING
 bool firewire_detect(void);
