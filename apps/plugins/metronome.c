@@ -89,9 +89,9 @@
  * So,
  *    default: 0 4/4 120 Xxxx
  *    rockon2: 0 4/4 120 xXxX
- *    solea: 0 12/4 180 xxXxxXxXxXxX
+ *      solea: 0 12/4 180 xxXxxXxXxXxX
  *    shuffle: 0 12/12 120 x.xX.xx.xX..
- *    funky: 0 16/16 120 x.x.X..X.Xx.X..X
+ *      funky: 0 16/16 120 x.x.X..X.Xx.X..X
  *
  * The 12/12 for the shuffle create 1/4 triplets. Just do a bit of math;-)
  * This is still a metronome, not a drum machine, but it can act like a basic
