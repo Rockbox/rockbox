@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_deecf991",
+        "filename": "apps/main.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1000005
+      },
+      "writtenOn": "2015-01-03T21:39:11Z",
+      "side": 1,
+      "message": "Is this just because you don\u0027t have an adc-target.h?  Would it be cleaner to just have a blank one so that the includes work the same as other targets?",
+      "revId": "16cd3af44a4a65d58f8d56ea02a9fd530f952b1a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_3e024d3f",
+        "filename": "firmware/target/hosted/ibasso/pcm-ibasso.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1000005
+      },
+      "writtenOn": "2015-01-03T21:39:11Z",
+      "side": 1,
+      "message": "We actually have an option for 48k playback, and the DSP is all 32 bit.  Maybe this hsould be a FIXME:  add 48k/24 support ?",
+      "revId": "16cd3af44a4a65d58f8d56ea02a9fd530f952b1a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
