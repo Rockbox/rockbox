@@ -9,7 +9,9 @@ LDFLAGS += -L. -lpthread
 .PHONY: clean all
 
 TARGETS_OBJ = test_main.o \
-			  test_main2.o
+			  test_main2.o \
+			  test_move.o \
+			  test_move2.o
 
 TARGETS = $(TARGETS_OBJ:.o=)
 
