@@ -20,9 +20,42 @@
 ****************************************************************************/
 #include "util.h"
 #include "stdio.h"
+#include "buflib.h"
+#include "system.h"
+
+void print_simple(const char *str)
+{
+    printf("%s\n", str);
+}
 
 void print_handle(int handle_num, const char *str)
 {
     (void)handle_num;
     printf("%s\n", str);
+}
+
+/* fake core_allocator_init() with a fixed 50kb buffer size */
+void UT_core_allocator_init()
+{
+    extern struct buflib_context core_ctx;
+    static char buf[50<<10];
+    unsigned char *raw_start = buf;
+    unsigned char *aligned_start = ALIGN_UP(raw_start, sizeof(intptr_t));
+
+    buflib_init(&core_ctx, aligned_start, sizeof(buf) - (aligned_start - raw_start));
+}
+
+/* TODO: those should be part of core_alloc */
+void core_print_blocks(void (*print)(const char*))
+{
+    (void)print;
+    extern struct buflib_context core_ctx;
+    buflib_print_blocks(&core_ctx, &print_handle);
+}
+
+void core_print_allocs(void (*print)(const char*))
+{
+    (void)print;
+    extern struct buflib_context core_ctx;
+    buflib_print_allocs(&core_ctx, &print_handle);
 }

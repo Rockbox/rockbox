@@ -22,6 +22,9 @@
 #ifndef _TEST_UTIL_H
 #define _TEST_UTIL_H
 
+void print_simple(const char *string);
 void print_handle(int handle_num, const char *string);
+
+void UT_core_allocator_init();
 
 #endif
