@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  * TODO:
- *  - endless parts by omitting the count, zero meaning just zero
+ *  - allow parts with zero bars, for whatever reason
  *
  * Changes by Thomas from original metronome plugin:
  * - square sine tick and tock sounds (more annoying, more useful;-)
@@ -1447,61 +1447,43 @@ static void cleanup(void)
     Parse part definitions from tempomap file (see header for format).
     Not bothering with encoding issues here.
 */
-void parse_part(char *line)
+
+/* parse meter spec into part structure if given token matches */
+bool parse_meter(char *token, struct part *ps)
 {
-    char *saveptr;
-    char *token;
     char *toktok;
-    struct part *ps;
-    size_t len;
-
-    /* Silently refuse to play more parts than possible. */
-    if(parts >= PART_MAX) return;
-
-    token = rb->strtok_r(line, " \t", &saveptr);
-    /* Skip comments quickly. */
-    if(!token || token[0] == '#') return;
-
-    ps = &part_spec[parts++];
-
-    ps->label[0] = 0;
-    len = rb->strlen(token);
-    if(token[len-1] == ':')
-    {
-        if(--len >= sizeof(ps->label)) len = sizeof(ps->label)-1;
-        rb->memcpy(ps->label, token, len);
-        ps->label[sizeof(ps->label)-1] = 0;
-        token = rb->strtok_r(NULL, " \t", &saveptr);
-    }
-    if(!token) goto parse_part_revert;
-
-    ps->bars = (unsigned int) rb->atoi(token);
-    token = rb->strtok_r(NULL, " \t", &saveptr);
-
-    /* At least tempo must follow now. */
-    if(!token) goto parse_part_revert;
-
-    /* But could be meter first. */
-    if( (toktok = rb->strchr(token, '/')) )
+    /* Careful not to misinterpret accelerated tempo specification:
+       120-150/4 -> tempo
+       3/4 -> meter */
+    if( !rb->strchr(token, '-') && (toktok = rb->strchr(token, '/')) )
     {
         /* Number before and after the '/'. */
-        ps->beats_per_bar = positive(rb->atoi(token));
-        ps->base_beat = positive(rb->atoi(++toktok));
-        token = rb->strtok_r(NULL, " \t", &saveptr);
+        int num[2];
+        num[0] = rb->atoi(token);
+        num[1] = rb->atoi(++toktok);
+        /* Only accept positive numbers. */
+        if(num[0] > 0 && num[1] > 0)
+        {
+            ps->beats_per_bar = (unsigned int) num[0];
+            ps->base_beat     = (unsigned int) num[1];
+            return true;
+        }
     }
-    else
-    {
-        /* Default to 4/4 */
-        ps->beats_per_bar = 4;
-        ps->base_beat = 4;
-    }
+    return false;
+}
 
-    /* Still, at least tempo must follow now. */
-    if(!token) goto parse_part_revert;
-
+/* Parse tempo, successful when getting a positive integer out of the token. */
+bool parse_tempo(char *token, struct part *ps)
+{
+    char *toktok;
     /* tempo[-tempo2/accel] ... first number always main tempo */
-    ps->bpm = positive(rb->atoi(token));
-    ps->bpm2 = bpm;
+    int num = rb->atoi(token);
+    /* Only positive numbers. This avoids the pattern string and general
+       strangeness, unless -150 should mean "from previous tempo to 150". */
+    if(num < 1) return false;
+
+    ps->bpm = positive(num);
+    ps->bpm2 = ps->bpm;
     ps->accel = 0.;
     /* This parser is not fool-proof. It parses valid data, but could
        do funny things if you provide tempo/tempo2-accel, for example.
@@ -1534,22 +1516,130 @@ void parse_part(char *line)
            seen as beats-per-minute/beat */
         ps->accel *= 1.f / (4.f/ps->base_beat * ps->beats_per_bar); /* 1/min */
     }
-    token = rb->strtok_r(NULL, " \t", &saveptr);
-    if(token)
-    {
-        /* The metronome pattern. */
-        size_t pats = rb->strlen(token);
-        if(pats > sizeof(ps->pattern)) pats = sizeof(ps->pattern);
+    return true;
+}
 
-        memcpy(ps->pattern, token, pats);
-    }
-    else
+/* The metronome pattern. */
+bool parse_pattern(char *token, struct part *ps)
+{
+    size_t pi;
+    size_t pats = rb->strlen(token);
+    /* First check if the pattern is valid, error out if not. */
+    for(pi=0; pi<pats; ++pi)
+    switch(token[pi])
     {
-        /* Default to emphasize every first beat. */
-        memset(ps->pattern, 'x', sizeof(ps->pattern));
-        ps->pattern[0] = 'X';
+        case 'X':
+        case 'x':
+        case '.':
+            break;
+        default: return false;
     }
-    return;
+    /* Now store it. */
+    memcpy(ps->pattern, token,
+           pats > sizeof(ps->pattern) ? sizeof(ps->pattern) : pats);
+    return true;
+}
+
+void parse_part(char *line)
+{
+    char *saveptr;
+    char *token[4];
+    struct part *ps;
+    size_t len;
+    size_t tokens = 0;
+
+    /* Silently refuse to play more parts than possible. */
+    if(parts >= PART_MAX) return;
+
+    token[0] = rb->strtok_r(line, " \t", &saveptr);
+    /* Skip comments quickly. */
+    if(!token[0] || token[0][0] == '#') return;
+
+    ps = &part_spec[parts++];
+    /* Minimal default settings for any part. */
+    ps->bars = 0;
+    ps->beats_per_bar = 4;
+    ps->base_beat = 4;
+    ps->bpm = 0; /* Needs to be changed for parser success. */
+    ps->bpm2 = 0;
+    ps->accel = 0.;
+    /* Default to emphasize every first beat. */
+    memset(ps->pattern, 'x', sizeof(ps->pattern));
+    ps->pattern[0] = 'X';
+
+    /* Check for and store label. */
+    ps->label[0] = 0;
+    len = rb->strlen(token[0]);
+    if(token[0][len-1] == ':')
+    {
+        if(--len >= sizeof(ps->label)) len = sizeof(ps->label)-1;
+        rb->memcpy(ps->label, token[0], len);
+        ps->label[sizeof(ps->label)-1] = 0;
+        token[0] = rb->strtok_r(NULL, " \t", &saveptr);
+    }
+    if(!token[0]) goto parse_part_revert;
+
+    tokens = 1; /* Got one already. */
+    /* After the optional label, there can be up to 4 tokens of interest.
+       Collect them in advance to make the parser code more sane. */
+    while(    tokens < 4
+          && (token[tokens] = rb->strtok_r(NULL, " \t", &saveptr)) )
+    ++tokens;
+
+    if(tokens == 1)
+    { /* Must be a non-zero tempo. */
+        if(!parse_tempo(token[0], ps)) goto parse_part_revert;
+    } else
+    if(tokens == 2)
+    {
+        /* <meter> <tempo> */
+        if(parse_meter(token[0], ps))
+        {
+            if(!parse_tempo(token[1], ps)) goto parse_part_revert;
+        } else
+        /* <tempo> <pattern> */
+        if(parse_pattern(token[1], ps))
+        {
+            if(!parse_tempo(token[0], ps)) goto parse_part_revert;
+        } else
+        /* <bars> <tempo> */
+        {
+            ps->bars = (unsigned int) rb->atoi(token[0]);
+            if(!parse_tempo(token[1], ps)) goto parse_part_revert;
+        }
+    } else
+    if(tokens == 3)
+    {
+        /* <meter> <tempo> <pattern> */
+        if(parse_meter(token[0], ps))
+        {
+            if(!parse_tempo(token[1], ps) || !parse_pattern(token[2], ps))
+                goto parse_part_revert;
+        } else
+        /* <bars> <tempo> <pattern> */
+        if(parse_pattern(token[2], ps))
+        {
+            ps->bars = (unsigned int) rb->atoi(token[0]);
+            if(!parse_tempo(token[1], ps)) goto parse_part_revert;
+        } else
+        /* <bars> <meter> <tempo> */
+        {
+            ps->bars = (unsigned int) rb->atoi(token[0]);
+            if(!parse_meter(token[1], ps) || !parse_tempo(token[2], ps))
+                goto parse_part_revert;
+        }
+    } else
+    if(tokens == 4)
+    {
+        /* <bars> <meter> <tempo> <pattern> */
+        ps->bars = (unsigned int) rb->atoi(token[0]);
+        if(    !parse_meter(token[1], ps)
+            || !parse_tempo(token[2], ps)
+            || !parse_pattern(token[3], ps) )
+            goto parse_part_revert;
+    }
+
+    return; /* all good */
 
     /* Remove the added part after some error. */
 parse_part_revert:
