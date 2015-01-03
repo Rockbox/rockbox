@@ -17,9 +17,6 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * TODO:
- *  - allow parts with zero bars, for whatever reason
- *
  * Changes by Thomas from original metronome plugin:
  * - square sine tick and tock sounds (more annoying, more useful;-)
  * - optical indication of tics on display
@@ -53,7 +50,7 @@
  * so you can open them from the file browser. The parts of a track are
  * specified one line each in this scheme (stuff in [] optional):
  *
- *    [name: ]bars [meter ]tempo[-tempo2[*accel|/accel] [pattern]
+ *    [name:] [bars] [meter ]tempo[-tempo2[*accel|/accel] [pattern]
  *
  * Example
  *    part_I: 12 3/4 133
