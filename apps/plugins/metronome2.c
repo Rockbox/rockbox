@@ -1006,6 +1006,7 @@ static unsigned int bpm = 1;
 static int period   = 0; /* beat interval in timer ticks */
 static int minitick = 0; /* elapsed ticks */
 static bool beating = false; /* A beat is/was playing and count needs to increase. */
+static int display_state = 0; /* Most recent display state code. */
 
 static bool sound_active = false;
 static bool sound_paused = true;
@@ -1097,6 +1098,7 @@ static void metronome_draw(struct screen* display, int state)
     ps = &part_spec[part];
     display->clear_display();
 
+    display_state = state;
 #ifdef HAVE_LCD_BITMAP
     display->setfont(FONT_SYSFIXED);
 #endif
@@ -1386,8 +1388,10 @@ static void change_bpm(int direction)
 
     if (bpm > 400) bpm = 400;
     if (bpm < 1) bpm = 1;
+
+    part_spec[part].bpm = bpm;
     calc_period();
-    draw_display(2);
+    draw_display(display_state);
     bpm_step_counter++;
 }
 
@@ -1739,6 +1743,7 @@ enum plugin_status plugin_start(const void* file)
                     break;
                 case METRONOME_LEFT:
                     bpm_step_counter = 0;
+                case METRONOME_LEFT_REP:
                     change_bpm(-1);
                     break;
                 case METRONOME_RIGHT:
