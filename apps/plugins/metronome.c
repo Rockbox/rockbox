@@ -7,38 +7,46 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 Matthias Wientapper, 2014 Thomas Orgis
+ * Copyright (C) 2004 Matthias Wientapper, 2014-2015 Thomas Orgis
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
  *
  * TODO:
  *  - endless parts by omitting the count, zero meaning just zero
  *  - allow spaces at beginning of tempomap files
  *
  * Changes by Thomas from original metronome plugin:
- * - tick and tock sounds (square sine)
- * - differing meters
- * - programmable tracks (parts with differing settings)
- * -- smooth tempo changes in those tracks
- * -- fancy beat patterns (tick/tock/silence)
- * - Interactive change of tempo, including tapping, has been disabled for now.
- *   A future merged plugin might add that back and know two UI modes:
- *   1. Opened without file, defaulting to endless meter without emphasis.
- *      User can change tempo and tap. Perhaps there's a way to configure
- *      some meters, but buttons are rare.
- *   2. Opened with tempomap file, acting as a player for the predefined
- *      click track.
+ * - square sine tick and tock sounds (more annoying, more useful;-)
+ * - optical indication of tics on display
+ * - operating in two modes now:
+ * -- 1. classic dumb metronome
+ * --- active when openened as application without file to open
+ * --- the usual functionality with tapping and bpm change
+ * --- controls indicated on display
+ * -- 2. track mode with programmable series of parts
+ * --- active when started as viewer for a .tempo file
+ * --- differing meters (4/4, 3/4, 6/8, etc.)
+ * --- patterns (tick/tock/silence on each beat)
+ * --- smooth tempo changes in those tracks
  * 
- * The second of the modes above is implemented right now, with mode 1
- * approximated by defaulting to 4/4@120 bpm (but no tempo change).
+ * About the track mode
+ * ====================
+ *
  * Controls:
  * - select: start/stop playback
  * - up/down: Volume control. Why can't I use the actual volume buttons? Would
  *   free up buttons for tempo change, for example, or better navigation.
- * - left/right: Advance by bars in each direction (would like to offer same
- *   as normal player; press once for beginning/end and jumping in playlist,
- *   hold for seeking around).
+ * - left/right: Advance by bars in each direction, by parts if endless (without
+ *   bar count)
  * - Power/cancel: exit
- * 
- * The syntax of programmed tracks in tempomap files follows the format
+ *
+ * The syntax of programmed tracks in tempomap (.tempo) files follows the format
  * defined by http://das.nasophon.de/klick/. Actually, the goal is to keep
  * compatibility between klick and this Rockbox metronome.
  *
@@ -90,21 +98,10 @@
  * This is still a metronome, not a drum machine, but it can act like a basic
  * one, helping you to figure out a certain rhythm within the meter.
  *
- * Oh: Development happens exclusively on a Sansa Clip+. I try to be
- * somewhat agnostic in the GUI, but might not look nice on other devices.
- *
- * Alrighty then,
+ * The UI is developed so that it fits into the display of a Sansa Clip+ and
+ * that is the hardware device it is tested on. It seems to work reasonably
+ * on some other models in the simulator.
  * 
- * Thomas.
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
- * KIND, either express or implied.
- *
  ****************************************************************************/
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
