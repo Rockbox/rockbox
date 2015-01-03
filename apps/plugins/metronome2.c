@@ -67,7 +67,10 @@
  * increase per bar. The second one goes down from 150 to 90 with
  * 4 bars per bpm change, which is the same acceleration as in the first line.
  * The last one is a part of 16 bars length that changes tempo from 100 to 200
- * smoothly during its whole lifetime (6.25 bpm/bar).
+ * smoothly during its whole lifetime (6.25 bpm/bar). For details on how the
+ * acceleration works, see
+ *      http://thomas.orgis.org/science/metronome-tempomath/tempomath.html
+ * .
  *
  * Fancy patterns: You can provide a pattern that controls how the beats are
  * played:
@@ -1478,9 +1481,6 @@ void parse_part(char *line)
     if(!token) goto parse_part_revert;
 
     ps->bars = (unsigned int) rb->atoi(token);
-#if 0
-    if(ps->bars < 1) ps->bars = 1; /* No endless part from file. */
-#endif /* Why not endless parts from file? It's useful for speed training. */
     token = rb->strtok_r(NULL, " \t", &saveptr);
 
     /* At least tempo must follow now. */
