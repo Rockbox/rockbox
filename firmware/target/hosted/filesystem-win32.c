@@ -229,7 +229,7 @@ int os_rmdir(const char *ospath)
 int os_dirfd(_WDIR *osdirp)
 {
 #ifdef ENOTSUP
-    errno = ENOTSUP
+    errno = ENOTSUP;
 #else
     errno = ENOSYS;
 #endif
