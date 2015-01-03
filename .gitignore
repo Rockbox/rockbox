@@ -35,6 +35,17 @@
 # android: eclipse stuff
 /android/.settings
 
+# buflib test code
+/firmware/test/buflib/test_main
+/firmware/test/buflib/test_main2
+/firmware/test/buflib/test_max
+/firmware/test/buflib/test_move
+/firmware/test/buflib/test_move2
+/firmware/test/buflib/test_shrink
+/firmware/test/buflib/test_shrink_cb
+/firmware/test/buflib/test_shrink_startchanged
+/firmware/test/buflib/test_shrink_unaligned
+
 # /rbutil/
 /rbutil/Makefile
 /rbutil/rbutil
