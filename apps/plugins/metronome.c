@@ -66,8 +66,8 @@
  * Acceleration: Tempo changes indicated by specifying a range and the
  * acceleration in one of these ways:
  *
- *   90-150: 0 4/4 90-150*0.25
- *   150-90: 0 4/4 150-90/4
+ *    90-150: 0 4/4 90-150*0.25
+ *    150-90: 0 4/4 150-90/4
  *   100-200: 16 4/4 100-200
  *
  * The first one goes from 90 to 150 bpm in an endless part with 0.25 bpm
