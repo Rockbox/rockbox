@@ -1136,7 +1136,7 @@ static void metronome_draw(struct screen* display, int state)
     ,   ps->beats_per_bar, ps->base_beat
     ,   bpm);
 #ifdef HAVE_LCD_BITMAP
-    display->puts(0,3, buffer);
+    display->puts(0,4, buffer);
 #else
     display->puts(0,0, buffer);
 #endif /* HAVE_LCD_BITMAP */
@@ -1145,7 +1145,7 @@ static void metronome_draw(struct screen* display, int state)
     rb->snprintf(buffer, sizeof(buffer), "V%d",
                  rb->global_settings->volume);
 #ifdef HAVE_LCD_BITMAP
-    display->puts(textlen-rb->strlen(buffer), 3, buffer);
+    display->puts(textlen-rb->strlen(buffer), 4, buffer);
 #else
     display->puts(0,1, buffer);
 #endif /* HAVE_LCD_BITMAP */
@@ -1153,12 +1153,16 @@ static void metronome_draw(struct screen* display, int state)
     if(rb->strlen(ps->label))
     {
         rb->snprintf(buffer, sizeof(buffer), "\"%s\"", ps->label);
-        display->puts((textlen-rb->strlen(buffer))/2, 4, buffer);
+        display->puts((textlen-rb->strlen(buffer))/2, 2, buffer);
     }
 
 /* Wildly guessing here with puts(). */
+    if(ps->bars)
     rb->snprintf(buffer, sizeof(buffer), "P%u/%u: B%u/%u+%u",
                  part+1, parts, bar+1, ps->bars, beat+1);
+    else
+    rb->snprintf(buffer, sizeof(buffer), "P%u/%u: B%u/_+%u",
+                 part+1, parts, bar+1, beat+1);
 #ifdef HAVE_LCD_BITMAP
     display->puts(0, 5, buffer);
 #else
