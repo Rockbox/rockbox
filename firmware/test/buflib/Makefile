@@ -1,7 +1,7 @@
 FIRMWARE=../..
 
 CC ?= gcc
-CFLAGS += -g -O2 -DDEBUG -D__PCTOOL__ -std=gnu99 -I$(FIRMWARE)/include -I$(FIRMWARE)/export -I.
+CFLAGS += -g -O2 -DDEBUG -D__PCTOOL__ -DBUFLIB_DEBUG_BLOCKS -std=gnu99 -I$(FIRMWARE)/include -I$(FIRMWARE)/export -I.
 LDFLAGS += -L. -lpthread
 
 .PHONY: clean all
@@ -11,7 +11,9 @@ TARGETS = $(TARGETS_OBJ:.o=)
 
 LIB_OBJ = 	buflib.o \
 			crc32.o \
-			strlcpy.o
+			strlcpy.o \
+			util.o
+
 LIB_FILE = libbuflib.a
 LIB = buflib
 

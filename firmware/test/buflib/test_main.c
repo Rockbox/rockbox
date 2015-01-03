@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "buflib.h"
+#include "util.h"
 
 #define BUFLIB_BUFFER_SIZE (12<<10)
 static char buflib_buffer[BUFLIB_BUFFER_SIZE];
@@ -59,16 +60,16 @@ int main(int argc, char **argv)
     strncpy(buflib_get_data(&ctx, id3), STR, sizeof STR);
     if (id > 0)
     {
-//        buflib_print_allocs(&ctx);
+        buflib_print_allocs(&ctx, &print_handle);
         buflib_free(&ctx, id);
-//        buflib_print_allocs(&ctx);
+        buflib_print_allocs(&ctx, &print_handle);
         buflib_free(&ctx, id2);
-//        buflib_print_allocs(&ctx);
+        buflib_print_allocs(&ctx, &print_handle);
 
         id = buflib_alloc_ex(&ctx, 3<<10, "should compact", &ops);
         if (id <= 0) printf("compacting alloc failed\n");
 
-//        buflib_print_allocs(&ctx);
+        buflib_print_allocs(&ctx, &print_handle);
 
         printf("id I: %p\n", buflib_get_data(&ctx, id3));
         id2 = buflib_alloc_ex(&ctx, 3<<10, "should fail", &ops);
@@ -80,7 +81,7 @@ int main(int argc, char **argv)
             buflib_free(&ctx, id);
 
         printf("Check string: \"%s\"\n", buflib_get_data(&ctx, id3));
-//        buflib_print_allocs(&ctx);
+        buflib_print_allocs(&ctx, &print_handle);
     }
 
     return 0;
