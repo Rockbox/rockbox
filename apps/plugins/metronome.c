@@ -30,7 +30,7 @@
  * --- differing meters (4/4, 3/4, 6/8, etc.)
  * --- patterns (tick/tock/silence on each beat)
  * --- smooth tempo changes in those tracks
- * 
+ *
  * About the track mode
  * ====================
  *
@@ -97,7 +97,7 @@
  * The UI is developed so that it fits into the display of a Sansa Clip+ and
  * that is the hardware device it is tested on. It seems to work reasonably
  * on some other models in the simulator.
- * 
+ *
  ****************************************************************************/
 #include "plugin.h"
 #include "lib/pluginlib_actions.h"
@@ -1037,7 +1037,7 @@ static void play_tick(void)
     sound_active = true;
     rb->led(1);
     rb->mp3_play_data(tick_sound, sizeof(tick_sound), callback);
-    rb->mp3_play_pause(true); /* kickoff audio */ 
+    rb->mp3_play_pause(true); /* kickoff audio */
 }
 
 static void play_tock(void)
@@ -1045,7 +1045,7 @@ static void play_tock(void)
     sound_active = true;
     rb->led(1);
     rb->mp3_play_data(tock_sound, sizeof(tock_sound), callback);
-    rb->mp3_play_pause(true); /* kickoff audio */ 
+    rb->mp3_play_pause(true); /* kickoff audio */
 }
 
 #else /*  CONFIG_CODEC == SWCODEC */
@@ -1169,7 +1169,7 @@ static void metronome_draw(struct screen* display, int state)
     else /* track mode */
     {
 
-#ifdef HAVE_LCD_BITMAP 
+#ifdef HAVE_LCD_BITMAP
     if(display->screen_type==SCREEN_MAIN)
     {
         display->puts(0, 5, "Select=TAP Rec=SYNC");
@@ -1385,7 +1385,7 @@ static void change_bpm(int direction)
     else if (bpm_step_counter < 60)
         bpm = bpm + direction * 2;
     else
-        bpm = bpm + direction * 9; 
+        bpm = bpm + direction * 9;
 
     if (bpm > 400) bpm = 400;
     if (bpm < 1) bpm = 1;
