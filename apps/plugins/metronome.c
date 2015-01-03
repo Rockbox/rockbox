@@ -1365,9 +1365,9 @@ static void change_volume(int delta)
     int maxvol = rb->sound_max(SOUND_VOLUME);
     int vol = rb->global_settings->volume + delta;
 
-    if (vol > maxvol) vol = maxvol;
-    else if (vol < minvol) vol = minvol;
-    if (vol != rb->global_settings->volume)
+    if     (vol > maxvol) vol = maxvol;
+    else if(vol < minvol) vol = minvol;
+    if(vol != rb->global_settings->volume)
     {
         rb->sound_set(SOUND_VOLUME, vol);
         rb->global_settings->volume = vol;
@@ -1382,13 +1382,13 @@ static void change_bpm(int direction)
             || (bpm > 389)
             || (bpm < 10))
         bpm = bpm + direction;
-    else if (bpm_step_counter < 60)
+    else if(bpm_step_counter < 60)
         bpm = bpm + direction * 2;
     else
         bpm = bpm + direction * 9;
 
-    if (bpm > 400) bpm = 400;
-    if (bpm < 1) bpm = 1;
+    if(bpm > 400) bpm = 400;
+    if(bpm < 1) bpm = 1;
 
     part_spec[part].bpm = bpm;
     calc_period();
@@ -1422,11 +1422,11 @@ static void timer_callback(void)
         }
     }
 
-    if (tap_count)
+    if(tap_count)
     {
         tap_time++;
-        if (tap_count > 1 && tap_time > tap_timeout)
-            tap_count = 0;
+        if(tap_count > 1 && tap_time > tap_timeout)
+           tap_count = 0;
     }
 }
 
@@ -1696,16 +1696,15 @@ static void tap(void)
     beat = 0;
     bar = 0;
 
-    if (tap_count == 0 || tap_time < tap_count)
-        tap_time = 0;
+    if(tap_count == 0 || tap_time < tap_count)
+       tap_time = 0;
     else
     {
-        if (tap_time > 0)
+        if(tap_time > 0)
         {
             ps->bpm = 61440/(tap_time/tap_count);
 
-            if (ps->bpm > 400)
-                ps->bpm = 400;
+            if(ps->bpm > 400) ps->bpm = 400;
         }
         tap_timeout = (tap_count+2)*tap_time/tap_count;
     }
@@ -1724,8 +1723,8 @@ enum plugin_status plugin_start(const void* file)
 
     atexit(cleanup);
 
-    if (MET_IS_PLAYING)
-        MET_PLAY_STOP; /* stop audio IS */
+    if(MET_IS_PLAYING)
+       MET_PLAY_STOP; /* stop audio IS */
 
 #if CONFIG_CODEC != SWCODEC
     rb->bitswap(sound, sizeof(sound));
@@ -1776,12 +1775,12 @@ enum plugin_status plugin_start(const void* file)
 
 
     /* main loop */
-    while (true)
+    while(true)
     {
         reset_tap = true;
 #if CONFIG_CODEC == SWCODEC
         button = pluginlib_getaction(TIMEOUT_NOBLOCK,plugin_contexts,PLA_ARRAY_COUNT);
-        if (need_to_play)
+        if(need_to_play)
         {
             need_to_play = false;
             play_ticktock();
@@ -1794,7 +1793,7 @@ enum plugin_status plugin_start(const void* file)
         common_action = false;
         if(track_mode)
         {
-            switch (button)
+            switch(button)
             {
                 case METRONOME_START:
                     if(sound_paused) metronome_unpause();
@@ -1816,7 +1815,7 @@ enum plugin_status plugin_start(const void* file)
         }
         else
         {
-            switch (button)
+            switch(button)
             {
                 case METRONOME_PAUSE:
                     if(!sound_paused) metronome_pause();
@@ -1848,7 +1847,7 @@ enum plugin_status plugin_start(const void* file)
         }
 
         if(common_action)
-        switch (button)
+        switch(button)
         {
             case METRONOME_QUIT:
                 /* get out of here */
@@ -1869,9 +1868,9 @@ enum plugin_status plugin_start(const void* file)
                 break;
         }
 
-        if (button)
+        if(button)
             last_button = button;
-        if (reset_tap)
+        if(reset_tap)
             tap_count = 0;
         rb->yield();
     }
