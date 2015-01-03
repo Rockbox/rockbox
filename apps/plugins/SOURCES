@@ -138,7 +138,6 @@ wavrecord.c
 
 #if CONFIG_CODEC == SWCODEC || !defined(SIMULATOR) /* Not for hwcodec sims */
 metronome.c
-metronome2.c
 #endif
 
 
