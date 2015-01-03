@@ -1957,7 +1957,7 @@ int fat_create_file(struct fat_file *parent, const char *name,
                     uint8_t attr, struct fat_file *file,
                     struct fat_direntry *fatent)
 {
-    DEBUGF("%s(\"%s\",%lx,%lx)\n", __func__, name, (long)file, (long)dir);
+    DEBUGF("%s(\"%s\",%lx,%lx)\n", __func__, name, (long)file, (long)parent);
     struct bpb * const fat_bpb = FAT_BPB(parent->volume);
     if (!fat_bpb)
         return -1;
@@ -2107,7 +2107,7 @@ int fat_remove(struct fat_file *file, enum fat_remove_op what)
     if (file->dircluster && (what & FAT_RM_DIRENTRIES))
     {
         /* free everything in the parent directory */
-        DEBUGF("Removing dir entries: %lX\n", info->dircluster);
+        DEBUGF("Removing dir entries: %lX\n", file->dircluster);
         rc = free_direntries(fat_bpb, file);
         if (rc <= 0)
             FAT_ERROR(rc * 10 - 3);
