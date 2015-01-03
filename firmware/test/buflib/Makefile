@@ -12,7 +12,11 @@ TARGETS_OBJ = test_main.o \
 			  test_main2.o \
 			  test_move.o \
 			  test_move2.o \
-			  test_max.o
+			  test_max.o \
+			  test_shrink.o \
+			  test_shrink_unaligned.o \
+			  test_shrink_startchanged.o \
+			  test_shrink_cb.o
 
 TARGETS = $(TARGETS_OBJ:.o=)
 
