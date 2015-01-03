@@ -11,7 +11,8 @@ LDFLAGS += -L. -lpthread
 TARGETS_OBJ = test_main.o \
 			  test_main2.o \
 			  test_move.o \
-			  test_move2.o
+			  test_move2.o \
+			  test_max.o
 
 TARGETS = $(TARGETS_OBJ:.o=)
 
