@@ -114,7 +114,7 @@ const unsigned int timerfreq_div = 1024;
 #define PART_MAX 200 /* maximum count of programmed parts */
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD) \
- || (CONFIG_KEYPAD == SANSA_E200_PAD) || (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) \
+ || (CONFIG_KEYPAD == SANSA_E200_PAD)  || (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) \
  || (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
 #define MET_SYNC
 #endif
@@ -143,12 +143,10 @@ const unsigned int timerfreq_div = 1024;
 #define METRONOME_START         PLA_SELECT
 
 #ifdef MET_SYNC
-enum {
-    METRONOME_SYNC  = LAST_PLUGINLIB_ACTION+1,
-};
+enum{ METRONOME_SYNC  = LAST_PLUGINLIB_ACTION+1 };
 static const struct button_mapping iriver_syncaction[] =
 {
-    {METRONOME_SYNC, BUTTON_REC, BUTTON_NONE },
+    { METRONOME_SYNC, BUTTON_REC, BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_PLUGIN)
 };
 #endif /* IRIVER_H100_PAD||IRIVER_H300_PAD */
@@ -164,7 +162,8 @@ const struct button_mapping *plugin_contexts[] =
 
 #if CONFIG_CODEC != SWCODEC
 /* MP3 tick sounds */
-static unsigned char tick_sound[] = {
+static unsigned char tick_sound[] =
+{
  255,251,112,196,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
 ,  0, 73,110,102,111,  0,  0,  0, 15,  0,  0,  0,  3,  0,  0,  4,229,  0, 85, 85
 , 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85
@@ -229,7 +228,8 @@ static unsigned char tick_sound[] = {
 , 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85
 , 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85
 };
-static unsigned char tock_sound[] = {
+static unsigned char tock_sound[] =
+{
  255,251,112,196,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
 ,  0, 73,110,102,111,  0,  0,  0, 15,  0,  0,  0,  3,  0,  0,  4,229,  0, 85, 85
 , 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85
@@ -296,7 +296,8 @@ static unsigned char tock_sound[] = {
 };
 #else
 /* raw PCM */
-static signed short tick_sound[] = {
+static signed short tick_sound[] =
+{
  32767,32764,32767,32767,32763,32767,32762,32767,32765,32767,32767
 ,32766,32767,32766,32767,32767,32765,32767,32764,32767,32764,32767
 ,32763,-32764,-32768,-32766,-32768,-32768,-32767,-32767,-32767,-32765,-32768
@@ -485,7 +486,8 @@ static signed short tick_sound[] = {
 ,-1,-2,2,-1,1,0,-1,1,-1,2,-3
 ,3,-3
 };
-static signed short tock_sound[] = {
+static signed short tock_sound[] =
+{
  32767,32761,32767,32762,32767,32763,32767,32765,32767,32767,32766
 ,32767,32764,32767,32765,32767,32763,32767,32761,32767,32765,32767
 ,32766,32767,32766,32767,32767,32764,32767,32763,32767,32767,32766
@@ -1369,7 +1371,8 @@ static void change_volume(int delta)
 
     if (vol > maxvol) vol = maxvol;
     else if (vol < minvol) vol = minvol;
-    if (vol != rb->global_settings->volume) {
+    if (vol != rb->global_settings->volume)
+    {
         rb->sound_set(SOUND_VOLUME, vol);
         rb->global_settings->volume = vol;
         draw_display(0);
@@ -1411,7 +1414,8 @@ static void timer_callback(void)
 
     if(minitick >= period){
         minitick = 0;
-        if(!sound_active && !sound_paused && !tap_count) {
+        if(!sound_active && !sound_paused && !tap_count)
+        {
 #if CONFIG_CODEC == SWCODEC
             /* On SWCODEC we can't call play_tock() directly from an ISR. */
             need_to_play = true;
@@ -1422,7 +1426,8 @@ static void timer_callback(void)
         }
     }
 
-    if (tap_count) {
+    if (tap_count)
+    {
         tap_time++;
         if (tap_count > 1 && tap_time > tap_timeout)
             tap_count = 0;
@@ -1535,7 +1540,7 @@ void parse_part(char *line)
         /* Convert (quarterbeats-per-minute per bar) -> 1/min, which could be
            seen as beats-per-minute/beat */
         ps->accel *= 1.f / (4.f/ps->base_beat * ps->beats_per_bar); /* 1/min */
-     }
+    }
     token = rb->strtok_r(NULL, " \t", &saveptr);
     if(token)
     {
@@ -1611,11 +1616,12 @@ static void tap(void)
     beat = 0;
     bar = 0;
 
-    if (tap_count == 0 || tap_time < tap_count) {
+    if (tap_count == 0 || tap_time < tap_count)
         tap_time = 0;
-    } 
-    else {
-        if (tap_time > 0) {
+    else
+    {
+        if (tap_time > 0)
+        {
             ps->bpm = 61440/(tap_time/tap_count);
 
             if (ps->bpm > 400)
@@ -1690,7 +1696,8 @@ enum plugin_status plugin_start(const void* file)
 
 
     /* main loop */
-    while (true){
+    while (true)
+    {
         reset_tap = true;
 #if CONFIG_CODEC == SWCODEC
         button = pluginlib_getaction(TIMEOUT_NOBLOCK,plugin_contexts,PLA_ARRAY_COUNT);
@@ -1784,9 +1791,8 @@ enum plugin_status plugin_start(const void* file)
 
         if (button)
             last_button = button;
-        if (reset_tap) {
+        if (reset_tap)
             tap_count = 0;
-        }
         rb->yield();
     }
 }
