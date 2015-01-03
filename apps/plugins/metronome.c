@@ -19,7 +19,6 @@
  *
  * TODO:
  *  - endless parts by omitting the count, zero meaning just zero
- *  - allow spaces at beginning of tempomap files
  *
  * Changes by Thomas from original metronome plugin:
  * - square sine tick and tock sounds (more annoying, more useful;-)
@@ -1445,14 +1444,8 @@ static void cleanup(void)
 }
 
 /*
-    Parse these lines:
-        [label:] bars [meter] tempo[-tempo2/accel] [pattern]
-    Pattern is such: Xxx.xxx ... X for tick, x for tock, "." for nothing.
-    Meter needs to contain "/", as 4/4, 6/8. Tempo always refers to 1/4 note.
-    "#" at beginning marks comment.
+    Parse part definitions from tempomap file (see header for format).
     Not bothering with encoding issues here.
-    Support for tempo > tempo2 seems to be an extension to what Klick does,
-    but an obvious one.
 */
 void parse_part(char *line)
 {
@@ -1464,12 +1457,12 @@ void parse_part(char *line)
 
     /* Silently refuse to play more parts than possible. */
     if(parts >= PART_MAX) return;
-    /* At least one byte is always there! Skip comments quickly. */
-    if(line[0] == '#') return;
+
+    token = rb->strtok_r(line, " \t", &saveptr);
+    /* Skip comments quickly. */
+    if(!token || token[0] == '#') return;
 
     ps = &part_spec[parts++];
-    token = rb->strtok_r(line, " \t", &saveptr);
-    if(!token) goto parse_part_revert;
 
     ps->label[0] = 0;
     len = rb->strlen(token);
