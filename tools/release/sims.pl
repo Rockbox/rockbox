@@ -6,7 +6,7 @@ use Cwd;
 
 require "tools/builds.pm";
 
-my $verbose, $strip, $update, $doonly, $version;
+my ($verbose, $strip, $update, $doonly, $version);
 my @doonly;
 
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time());
