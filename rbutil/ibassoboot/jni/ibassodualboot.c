@@ -48,7 +48,6 @@
 
 #include "qdbmp.h"
 
-#define VOLD_LINK "/data/vold"
 #define PLAYER_FILE "/data/chosen_player"
 #define NOASK_FLAG "/data/no_ask_once"
 #define POLL_MS 10
@@ -71,6 +70,181 @@
 #define KEYCODE_NEXT 162
 #define KEYCODE_PLAY 161
 #define KEY_HOLD_OFF 16
+
+
+/*-----------------------------------------------------------------------------------------------*/
+
+
+#ifdef DEBUG
+
+
+#include <android/log.h>
+
+
+static const char log_tag[] = "Rockbox Boot";
+
+
+void debugf( const char *fmt, ... )
+{
+    va_list ap;
+    va_start( ap, fmt );
+    __android_log_vprint( ANDROID_LOG_DEBUG, log_tag, fmt, ap );
+    va_end(ap);
+}
+
+
+void ldebugf( const char* file, int line, const char *fmt, ... )
+{
+    va_list ap;
+    /* 13: 5 literal chars and 8 chars for the line number. */
+    char buf[strlen( file ) + strlen( fmt ) + 13];
+    snprintf( buf, sizeof( buf ), "%s (%d): %s", file, line, fmt );
+    va_start( ap, fmt );
+    __android_log_vprint( ANDROID_LOG_DEBUG, log_tag, buf, ap );
+    va_end( ap );
+}
+
+
+void debug_trace( const char* function )
+{
+    static const char trace_tag[] = "TRACE: ";
+    char msg[strlen( trace_tag ) + strlen( function ) + 1];
+    snprintf( msg, sizeof( msg ), "%s%s", trace_tag, function );
+    __android_log_write( ANDROID_LOG_DEBUG, log_tag, msg );
+}
+
+
+#define DEBUGF  debugf
+#define TRACE debug_trace( __func__ )
+#else
+#define DEBUGF( ... )
+#define TRACE
+#endif
+
+
+#include <pthread.h>
+#include <stdbool.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/un.h>
+
+
+/*
+    Without this socket iBasso Vold will not start.
+    iBasso Vold uses this to send status messages about storage devices.
+*/
+static const char VOLD_SOCKET_NAME[] = "UNIX_domain\0";
+
+
+static int _device_fd = -1;
+
+
+static int open_socket( void )
+{
+    TRACE;
+
+    unlink( VOLD_SOCKET_NAME );
+
+    _device_fd = socket( AF_UNIX, SOCK_STREAM, 0 );
+
+    if( _device_fd < 0 )
+    {
+        _device_fd = -1;
+        return -1;
+    }
+
+    struct sockaddr_un addr;
+    memset( &addr, 0, sizeof( addr ) );
+    addr.sun_family = AF_UNIX;
+    strncpy( addr.sun_path, VOLD_SOCKET_NAME, sizeof( addr.sun_path ) -1 );
+
+    if( bind( _device_fd, (struct sockaddr*) &addr, sizeof( addr ) ) < 0 )
+    {
+        close( _device_fd );
+        unlink( VOLD_SOCKET_NAME );
+        _device_fd = -1;
+        return -1;
+    }
+
+    if( listen( _device_fd, 1 ) < 0 )
+    {
+        close( _device_fd );
+        unlink( VOLD_SOCKET_NAME );
+        _device_fd = -1;
+        return -1;
+    }
+
+    return _device_fd;
+}
+
+
+static void* vold_run( void* nothing )
+{
+    (void) nothing;
+
+    TRACE;
+
+    _device_fd = open_socket();
+
+    if( _device_fd < 0 )
+    {
+        goto end;
+    }
+
+    while( true )
+    {
+        int device_fd = accept( _device_fd, NULL, NULL );
+
+        if( device_fd < 0 )
+        {
+            close( _device_fd );
+            unlink( VOLD_SOCKET_NAME );
+            _device_fd = -1;
+            goto end;
+        }
+
+        while( true )
+        {
+            char msg[1024];
+            memset( msg, 0, sizeof( msg ) );
+            int length = read( device_fd, msg, sizeof( msg ) );
+
+            if( length < 0 )
+            {
+                close( device_fd );
+                close( _device_fd );
+                unlink( VOLD_SOCKET_NAME );
+                _device_fd = -1;
+                goto end;
+            }
+            else if( length == 0 )
+            {
+                close( device_fd );
+                break;
+            }
+
+            DEBUGF( "%s: msg: %s", __func__, msg );
+        }
+    }
+
+end:
+    DEBUGF( "%s: Thread end.", __func__ );
+    return NULL;
+}
+
+
+static void start_vold_monitor( void )
+{
+    TRACE;
+
+    pthread_t thread;
+    pthread_create( &thread, NULL, vold_run, NULL );
+}
+
+
+/*-----------------------------------------------------------------------------------------------*/
 
 
 static struct pollfd *ufds;
@@ -140,7 +314,6 @@ static int scan_dir(const char *dirname, int print_flags)
     closedir(dir);
     return 0;
 }
-
 
 
 void button_init_device(void)
@@ -346,6 +519,8 @@ bool check_for_hold()
 
 int main(int argc, char **argv)
 {
+    TRACE;
+
     FILE *f;
     int last_chosen_player = -1;
 
@@ -355,7 +530,7 @@ int main(int argc, char **argv)
         fscanf(f, "%d", &last_chosen_player);
         fclose(f);
     }
-    bool ask = (access(VOLD_LINK, F_OK) == -1) || ((access(NOASK_FLAG, F_OK) == -1) && check_for_hold()) || (last_chosen_player==-1);
+    bool ask = ((access(NOASK_FLAG, F_OK) == -1) && check_for_hold()) || (last_chosen_player==-1);
 
     if(ask)
     {
@@ -370,17 +545,9 @@ int main(int argc, char **argv)
             fclose(f);
         }
 
-        if(last_chosen_player!=player_chosen_now || (access(VOLD_LINK, F_OK) == -1))
+        if(last_chosen_player!=player_chosen_now)
         {
-            system("rm "VOLD_LINK);
-
-            if(player_chosen_now)
-                system("ln -s /system/bin/vold_rockbox "VOLD_LINK);
-            else
-                system("ln -s /system/bin/vold_original "VOLD_LINK);
-
             system("touch "NOASK_FLAG);
-            system("reboot");
         }
         last_chosen_player = player_chosen_now;
     }
@@ -389,6 +556,15 @@ int main(int argc, char **argv)
 
     /* true, Rockbox was started at least once. */
     bool rockboxStarted = false;
+
+    if( last_chosen_player )
+    {
+        /*
+            Create the iBasso Vold socket and monitor it.
+            Do this for Rockbox only.
+        */
+        start_vold_monitor();
+    }
 
     while(1)
     {
