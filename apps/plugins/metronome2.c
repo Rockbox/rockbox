@@ -11,8 +11,6 @@
  *
  * TODO:
  *  - endless parts by omitting the count, zero meaning just zero
- *  - tapping ... tempo editing? some kind of mode switching for the old
- *    metronome behaviour; tracks edited by text editor only
  *  - allow spaces at beginning of tempomap files
  *
  * Changes by Thomas from original metronome plugin:
