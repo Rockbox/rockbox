@@ -381,6 +381,16 @@ Lyre prototype 1 */
 #define IMX233_FREESCALE    (1 << 0) /* Freescale I.MX233 nonstandard two-level MBR */
 #define IMX233_CREATIVE     (1 << 1) /* Creative MBLK windowing */
 
+/* Bluetooth */
+#define BT_NONE         0 /* The target is not equipped with Bluetooth */
+#define BT_BCM20xx      1 /* BCM2070 (YP-R1), BCM2048 (YP-T10, P2) */
+#define BT_BTTZ0502SA   2 /* Embedding CSR-03 / BC352239 */
+#define BT_CSR_41814    3 /* Cowon S9 */
+
+#define BT_HCI_CUSTOM   0 /* Custom protocols */
+#define BT_HCI_UART     1
+#define BT_HCI_SPI      2
+
 /* now go and pick yours */
 #if defined(ARCHOS_PLAYER)
 #include "config/archosplayer.h"
@@ -709,6 +719,10 @@ Lyre prototype 1 */
 
 #ifndef BATTERY_CAPACITY_INC
 #define BATTERY_CAPACITY_INC 0
+#endif
+
+#ifndef CONFIG_BLUETOOTH
+#define CONFIG_BLUETOOTH BT_NONE
 #endif
 
 #ifndef CONFIG_ORIENTATION
