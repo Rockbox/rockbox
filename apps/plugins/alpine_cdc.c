@@ -718,7 +718,7 @@ void emu_process_packet(unsigned char* mbus_msg, int msg_size)
             {   /* seek to final position */
                 set_position(gEmu.time);
             }
-            else if (gEmu.set_state != EMU_PLAYING || gEmu.set_state != EMU_PAUSED)
+            else if (gEmu.set_state != EMU_PLAYING && gEmu.set_state != EMU_PAUSED)
             {   /* was not playing yet, better send disk message */
                 diskmsg_dirty = true;
             }
