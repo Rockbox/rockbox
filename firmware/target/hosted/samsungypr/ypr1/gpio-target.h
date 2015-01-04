@@ -55,6 +55,12 @@
 #define GPIO_VOL_DOWN_KEY           GPIO1_21
 #define GPIO_POWER_KEY              GPIO2_16
 
+/* Bluetooth (BCM2070) */
+
+#define GPIO_BT_REG_EN              GPIO1_25
+#define GPIO_BT_RST                 GPIO2_19
+#define GPIO_BT_WAKE                GPIO2_18
+
 #define GPIO_DEVICE                 "/dev/r1Gpio"
 /* Strangely for whatever reason magic differs from R0 (A vs. G) */
 #define GPIO_IOCTL_MAGIC            'A'
