@@ -31,31 +31,31 @@ int button_read_device(void)
     int key = BUTTON_NONE;
 
     /* Check for all the keys */
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_USER_KEY, 0, 0)) {
+    if (!gpio_get(GPIO_USER_KEY)) {
         key |= BUTTON_USER;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_CENTRAL_KEY, 0, 0)) {
+    if (!gpio_get(GPIO_CENTRAL_KEY)) {
         key |= BUTTON_SELECT;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_UP_KEY, 0, 0)) {
+    if (!gpio_get(GPIO_UP_KEY)) {
         key |= BUTTON_UP;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_DOWN_KEY, 0, 0)) {
+    if (!gpio_get(GPIO_DOWN_KEY)) {
         key |= BUTTON_DOWN;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_LEFT_KEY, 0, 0)) {
+    if (!gpio_get(GPIO_LEFT_KEY)) {
         key |= BUTTON_LEFT;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_RIGHT_KEY, 0, 0)) {
+    if (!gpio_get(GPIO_RIGHT_KEY)) {
         key |= BUTTON_RIGHT;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_MENU_KEY, 0, 0)) {
+    if (!gpio_get(GPIO_MENU_KEY)) {
         key |= BUTTON_MENU;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_BACK_KEY, 0, 0)) {
+    if (!gpio_get(GPIO_BACK_KEY)) {
         key |= BUTTON_BACK;
     }
-    if (gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_POWER_KEY, 0, 0)) {
+    if (gpio_get(GPIO_POWER_KEY)) {
         key |= BUTTON_POWER;
     }
 
@@ -65,14 +65,15 @@ int button_read_device(void)
 bool headphones_inserted(void)
 {
     /* GPIO low - 0 - means headphones inserted */
-    return !gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_HEADPHONE_SENSE, 0, 0);
+    return !gpio_get(GPIO_HEADPHONE_SENSE);
 }
 
 void button_init_device(void)
 {
     /* Setup GPIO pin for headphone sense, copied from OF */
-    gpio_control(DEV_CTRL_GPIO_SET_MUX, GPIO_HEADPHONE_SENSE, CONFIG_SION, PAD_CTL_47K_PU);
-    gpio_control(DEV_CTRL_GPIO_SET_INPUT, GPIO_HEADPHONE_SENSE, CONFIG_SION, PAD_CTL_47K_PU);
+    gpio_set_iomux(GPIO_HEADPHONE_SENSE, CONFIG_GPIO);
+    gpio_set_pad(GPIO_HEADPHONE_SENSE, PAD_CTL_47K_PU);
+    gpio_direction_input(GPIO_HEADPHONE_SENSE);
     
     /* No need to initialize any GPIO pin, since this is done loading the r0Btn module */
 }
@@ -82,6 +83,6 @@ void button_init_device(void)
 void button_close_device(void)
 {
     /* Don't know the precise meaning, but it's done as in the OF, so copied there */
-    gpio_control(DEV_CTRL_GPIO_UNSET_MUX, GPIO_HEADPHONE_SENSE, CONFIG_SION, 0);
+    gpio_free_iomux(GPIO_HEADPHONE_SENSE, CONFIG_GPIO);
 }
 #endif /* BUTTON_DRIVER_CLOSE */
