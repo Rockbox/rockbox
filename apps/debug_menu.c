@@ -2415,6 +2415,9 @@ static const struct {
      && !defined(IPOD_MINI) && !defined(SIMULATOR))
         {"Debug scrollwheel", dbg_scrollwheel },
 #endif
+#ifdef BLUETOOTH
+        {"Bluetooth", dbg_talk },
+#endif
         {"Talk engine stats", dbg_talk },
 };
 

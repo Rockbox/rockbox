@@ -142,6 +142,8 @@
 
 #define CONFIG_LCD LCD_SAMSUNGYPR1
 
+#define CONFIG_BLUETOOTH   BT_BCM20xx
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
