@@ -474,7 +474,8 @@ bool app_dir_exists(const char *dirname)
 struct dirinfo dir_get_info(DIR *dirp, struct dirent *entry)
 {
     struct __dir *this = (struct __dir *)dirp;
-    struct dirinfo ret = { .mtime = 0 };
+    struct dirinfo ret = { .attribute = 0,
+                           .mtime = 0 };
 
     if (!this)
         FILE_ERROR_RETURN(EBADF, ret);
