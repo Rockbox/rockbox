@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5a18252c_be493d91",
+        "filename": "apps/main.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1000428
+      },
+      "writtenOn": "2015-01-04T10:38:26Z",
+      "side": 1,
+      "message": "See my comment Patch Set 2 Nov 17 21:00.",
+      "parentUuid": "5a18252c_deecf991",
+      "revId": "16cd3af44a4a65d58f8d56ea02a9fd530f952b1a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a18252c_3e024d3f",
         "filename": "firmware/target/hosted/ibasso/pcm-ibasso.c",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2015-01-03T21:39:11Z",
       "side": 1,
       "message": "We actually have an option for 48k playback, and the DSP is all 32 bit.  Maybe this hsould be a FIXME:  add 48k/24 support ?",
+      "revId": "16cd3af44a4a65d58f8d56ea02a9fd530f952b1a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_9e4e0195",
+        "filename": "firmware/target/hosted/ibasso/pcm-ibasso.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1000428
+      },
+      "writtenOn": "2015-01-04T10:38:26Z",
+      "side": 1,
+      "message": "Can you please point me to the relevant options/source parts for 48k/24 playback?\nAll i could find was pcm buffer allways in 44.1/16. Thus no playback options change for ALSA.",
+      "parentUuid": "5a18252c_3e024d3f",
       "revId": "16cd3af44a4a65d58f8d56ea02a9fd530f952b1a",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
