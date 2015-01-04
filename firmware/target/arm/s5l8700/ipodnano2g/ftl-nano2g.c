@@ -1001,7 +1001,7 @@ static uint32_t ftl_vfl_write(uint32_t vpage, uint32_t count,
             }
     }
 
-    for (i = count < ftl_banks ? count : ftl_banks; i > 0; i--)
+    for (i = (count < ftl_banks ? count : ftl_banks); i > 0; i--)
         if (nand_write_page_collect(bank[i - 1]))
             if (nand_read_page(bank[i - 1], physpage[i - 1],
                                ftl_buffer, &ftl_sparebuffer[0], 1, 1) & 0x11F)
