@@ -74,6 +74,7 @@ static int send_msc_cmd(libusb_device_handle *hdev, void *cbwcb, uint32_t data_l
     struct CBW_t cbw;
     int ret, repeat, transferred;
 
+    repeat = 0;
     memset(&cbw, 0, sizeof(cbw));
     cbw.dCBWSignature = CBW_SIGNATURE;
     cbw.dCBWTag = 0;
