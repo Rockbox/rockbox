@@ -24,6 +24,20 @@
 /* Specifies device name and ioctl magic */
 #include "gpio-target.h"
 #include "sys/ioctl.h"
+#include "stdbool.h"
+
+// set to debug pinctrl use
+#define GPIO_DEBUG
+
+#ifdef GPIO_DEBUG
+void imx233_pinctrl_acquire(unsigned bank, unsigned pin, const char *name);
+void imx233_pinctrl_release(unsigned bank, unsigned pin, const char *name);
+const char *imx233_pinctrl_blame(unsigned bank, unsigned pin);
+#else
+#define imx233_pinctrl_acquire(...)
+#define imx233_pinctrl_release(...)
+#define imx233_pinctrl_get_pin_use(...) NULL
+#endif
 
 struct gpio_info {
     int num;
@@ -193,9 +207,16 @@ enum
     PAD_CTL_DRV_VOT_HIGH = 0x1 << 13,
 };
 
+/* Driver-related functions */
 void gpio_init(void);
 void gpio_close(void);
-int gpio_control_struct(int request, struct gpio_info pin);
-int gpio_control(int request, int num, int mode, int val);
 
+/* Exported API */
+void gpio_set_iomux(int pin, int iomux);
+void gpio_free_iomux(int pin, int iomux);
+void gpio_set_pad(int pin, int type);
+void gpio_direction_output(int pin);
+void gpio_direction_input(int pin);
+bool gpio_get(int pin);
+void gpio_set(int pin, bool value);
 #endif
