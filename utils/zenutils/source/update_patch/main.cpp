@@ -102,7 +102,7 @@ int process_arguments(int argc, char* argv[])
     if (verbose)
         std::cout << "[*] Parsing options file..." << std::endl;
 
-    GetPot optfile(options_name(updatername.c_str()).c_str());
+    GetPot optfile(options_name(updatername).c_str());
     if (verbose)
         optfile.print();
 
