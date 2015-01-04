@@ -88,7 +88,7 @@ bool hostfs_present(IF_MD_NONVOID(int drive))
 {
 #ifdef HAVE_MULTIDRIVE
     if (drive > 0) /* Active LOW */
-        return (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_SD_SENSE, 0, 0));
+        return (!gpio_get(GPIO_SD_SENSE));
     else
 #endif
         return true; /* internal: always present */
@@ -229,8 +229,9 @@ static void NORETURN_ATTR sd_thread(void)
 int hostfs_init(void)
 {
     /* Setup GPIO pin for microSD sense, copied from OF */
-    gpio_control(DEV_CTRL_GPIO_SET_MUX, GPIO_SD_SENSE, CONFIG_DEFAULT, 0);
-    gpio_control(DEV_CTRL_GPIO_SET_INPUT, GPIO_SD_SENSE, CONFIG_DEFAULT, 0);
+    gpio_set_iomux(GPIO_SD_SENSE, CONFIG_DEFAULT);
+    gpio_set_pad(GPIO_SD_SENSE, PAD_CTL_SRE_SLOW);
+    gpio_direction_input(GPIO_SD_SENSE);
 #ifdef HAVE_MULTIDRIVE
     if (storage_present(IF_MD(1)))
         mount_sd();

@@ -45,13 +45,13 @@ int button_read_device(int *data)
     struct mcs5000_raw_data touchpad_data;
 
     /* Check for all the keys */
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_VOL_UP_KEY, 0, 0)) {
+    if (!gpio_get(GPIO_VOL_UP_KEY)) {
         key |= BUTTON_VOL_UP;
     }
-    if (!gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_VOL_DOWN_KEY, 0, 0)) {
+    if (!gpio_get(GPIO_VOL_DOWN_KEY)) {
         key |= BUTTON_VOL_DOWN;
     }
-    if (gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_POWER_KEY, 0, 0)) {
+    if (gpio_get(GPIO_POWER_KEY)) {
         key |= BUTTON_POWER;
     }
 
@@ -99,7 +99,7 @@ void touchscreen_enable_device(bool en)
 bool headphones_inserted(void)
 {
     /* GPIO low - 0 - means headphones inserted */
-    return !gpio_control(DEV_CTRL_GPIO_IS_HIGH, GPIO_HEADPHONE_SENSE, 0, 0);
+    return !gpio_get(GPIO_HEADPHONE_SENSE);
 }
 
 void button_init_device(void)
@@ -107,8 +107,9 @@ void button_init_device(void)
     /* Setup GPIO pin for headphone sense, copied from OF
      * Pins for the other buttons are already set up by OF button module
      */
-    gpio_control(DEV_CTRL_GPIO_SET_MUX, GPIO_HEADPHONE_SENSE, 4, 0);
-    gpio_control(DEV_CTRL_GPIO_SET_INPUT, GPIO_HEADPHONE_SENSE, 4, 0);
+    gpio_set_iomux(GPIO_HEADPHONE_SENSE, CONFIG_ALT4);
+    gpio_set_pad(GPIO_HEADPHONE_SENSE, PAD_CTL_SRE_SLOW);
+    gpio_direction_input(GPIO_HEADPHONE_SENSE);
 
     /* Turn on touchscreen */
     mcs5000_init();
@@ -120,7 +121,7 @@ void button_init_device(void)
 /* I'm not sure it's called at shutdown...give a check! */
 void button_close_device(void)
 {
-    gpio_control(DEV_CTRL_GPIO_UNSET_MUX, GPIO_HEADPHONE_SENSE, 0, 0);
+    gpio_free_iomux(GPIO_HEADPHONE_SENSE, CONFIG_ALT4);
 
     /* Turn off touchscreen device */
     mcs5000_shutdown();
