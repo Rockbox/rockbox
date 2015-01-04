@@ -131,6 +131,10 @@
 #include "rds.h"
 #endif
 
+#if !(CONFIG_BLUETOOTH == BT_NONE)
+#include "bluetooth.h"
+#endif
+
 #include "talk.h"
 
 static const char* threads_getname(int selected_item, void *data,
@@ -2414,6 +2418,9 @@ static const struct {
 #if (defined(HAVE_WHEEL_ACCELERATION) && (CONFIG_KEYPAD==IPOD_4G_PAD) \
      && !defined(IPOD_MINI) && !defined(SIMULATOR))
         {"Debug scrollwheel", dbg_scrollwheel },
+#endif
+#if !(CONFIG_BLUETOOTH == BT_NONE)
+        {"Bluetooth", bluetooth_hw_dbg_screen },
 #endif
         {"Talk engine stats", dbg_talk },
 };

@@ -121,6 +121,10 @@ target/hosted/samsungypr/ypr1/powermgmt-ypr1.c
 target/hosted/samsungypr/ypr1/audio-ypr1.c
 target/hosted/samsungypr/ypr1/pmu-ypr1.c
 target/hosted/samsungypr/ypr1/wmcodec-ypr1.c
+target/hosted/samsungypr/ypr1/bluetooth-ypr1.c
+target/hosted/samsungypr/ypr1/bluetooth-transport-ypr1.c
+/* TODO move this to an appropriate section */
+target/hosted/uart-hosted.c
 #endif
 
 /* Maemo specific files */
@@ -194,6 +198,14 @@ common/strlcpy.c
 common/structec.c
 common/timefuncs.c
 common/unicode.c
+
+/* Bluetooth */
+#if !(CONFIG_BLUETOOTH == BT_NONE)
+#if CONFIG_BLUETOOTH == BT_BCM20xx
+drivers/bluetooth/bcm20xx.c
+#endif
+bluetooth.c
+#endif /* CONFIG_BLUETOOTH != BT_NONE */
 
 /* Display */
 scroll_engine.c
