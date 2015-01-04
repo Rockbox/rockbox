@@ -255,9 +255,9 @@ int read_data(usb_dev_handle* dh, int address, unsigned char *p, int len)
 
 unsigned int read_reg(usb_dev_handle* dh, int address, int size)
 {
-    int err;
+    int err;                 /* set by SEND_COMMAND macro */
     unsigned char buf[4];
-    
+
     SEND_COMMAND(VR_SET_DATA_ADDRESS, address);
     SEND_COMMAND(VR_SET_DATA_LENGTH, size);
     GET_DATA(buf, size);
@@ -274,20 +274,20 @@ unsigned int read_reg(usb_dev_handle* dh, int address, int size)
 
 int set_reg(usb_dev_handle* dh, int address, unsigned int val, int size)
 {
-    int err, i;
+    int err;                 /* set by SEND_COMMAND macro */
     unsigned char buf[4];
-    
+
     buf[0] = val & 0xff;
-    if(i > 1)
+    if(size > 1)
     {
         buf[1] = (val >> 8) & 0xff;
-        if(i > 2)
+        if(size > 2)
         {
             buf[2] = (val >> 16) & 0xff;
             buf[3] = (val >> 24) & 0xff;
         }
     }
-    
+
     SEND_COMMAND(VR_SET_DATA_ADDRESS, address);
     SEND_DATA(buf, size);
 
