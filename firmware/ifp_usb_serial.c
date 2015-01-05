@@ -250,7 +250,7 @@ static inline void usb_select_setup_endpoint(void)
     ISP1582_EPINDEX = 0x20;
 }
 
-void usb_setup_endpoint(int idx, int max_pkt_size, int type)
+static void usb_setup_endpoint(int idx, int max_pkt_size, int type)
 {
     struct usb_endpoint *ep;
 
@@ -271,7 +271,7 @@ void usb_setup_endpoint(int idx, int max_pkt_size, int type)
     ep->max_pkt_size[epidx_dir(idx)] = max_pkt_size;
 }
 
-void usb_disable_endpoint(int idx)
+static void usb_disable_endpoint(int idx)
 {
     usb_select_endpoint(idx);
     ISP1582_EPTYPE &= 8;
@@ -288,12 +288,12 @@ void usb_reconnect(void)
     ISP1582_MODE |= 1; /* SOFTCT on */
 }
 
-void usb_cleanup(void)
+static void usb_cleanup(void)
 {
     ISP1582_MODE &= ~1; /* SOFTCT off */
 }
 
-void usb_setup(int reset)
+static void usb_setup(int reset)
 {
     int i;
 
@@ -840,7 +840,7 @@ static void usb_handle_int(int i)
         
 }
 
-void usb_handle_interrupts(void)
+static void usb_handle_interrupts(void)
 {
 #ifdef LCD_DEBUG
     char s[20];
@@ -1002,7 +1002,7 @@ static void serial_free_out_fifo(int ep, unsigned char *buf, int len)
     serial_restart_output(ep);
 }
 
-void usb_serial_handle(void)
+static void usb_serial_handle(void)
 {
 #ifdef BUTTONS
     static int t = 0;

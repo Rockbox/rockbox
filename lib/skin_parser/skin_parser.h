@@ -160,9 +160,9 @@ struct skin_element* skin_parse(const char* document,
 struct skin_element* skin_parse(const char* document);
 #endif
 /* Memory management functions */
-struct skin_element* skin_alloc_element(void);
-OFFSETTYPE(struct skin_element*)* skin_alloc_children(int count);
-struct skin_tag_parameter* skin_alloc_params(int count);
+static struct skin_element* skin_alloc_element(void);
+static OFFSETTYPE(struct skin_element*)* skin_alloc_children(int count);
+static struct skin_tag_parameter* skin_alloc_params(int count);
 char* skin_alloc_string(int length);
 
 void skin_free_tree(struct skin_element* root);

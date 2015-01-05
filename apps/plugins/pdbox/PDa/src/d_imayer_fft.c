@@ -110,7 +110,7 @@ static long long halsec[TRIG_TAB_SIZE]= {1,2,3};
 #define SQRT2    ftofix(1.414213562373095048801688724209698)
 
 
-void imayer_fht(t_fixed *fz, int n)
+static void imayer_fht(t_fixed *fz, int n)
 {
  int  k,k1,k2,k3,k4,kx;
  t_fixed *fi,*fn,*gi;

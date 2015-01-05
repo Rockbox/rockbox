@@ -73,7 +73,7 @@ struct flash_disk
 
 static struct flash_disk flash_disk;
 
-void flash_select_chip(int no, int sel)
+static void flash_select_chip(int no, int sel)
 {
 #if CONFIG_FLASH == FLASH_IFP7XX
     if (sel)
@@ -115,7 +115,7 @@ static void flash_wait_ready(void)
 
 static unsigned char model_n_sectors_order[] = {0, 19, 20};
 
-int flash_map_sector(int sector, int* chip, int* chip_sector)
+static int flash_map_sector(int sector, int* chip, int* chip_sector)
 {
     int ord, c;
     if (flash_disk.model ==  FLASH_MODEL_NONE)
@@ -132,7 +132,7 @@ int flash_map_sector(int sector, int* chip, int* chip_sector)
     return 0;
 }
 
-int flash_read_id(int no) {
+static int flash_read_id(int no) {
     int id;
 
     flash_select_chip(no, 1);
@@ -146,7 +146,7 @@ int flash_read_id(int no) {
     return id;
 }
 
-int flash_read_sector(int sector, unsigned char* buf,
+static int flash_read_sector(int sector, unsigned char* buf,
                       unsigned char* oob)
 {
     unsigned long *bufl = (unsigned long *)buf;
@@ -204,7 +204,7 @@ int flash_read_sector(int sector, unsigned char* buf,
     return 0;
 }
 
-int flash_read_sector_oob(int sector, unsigned char* oob)
+static int flash_read_sector_oob(int sector, unsigned char* oob)
 {
     int chip, chip_sector;
     int i;
@@ -294,7 +294,7 @@ static int flash_get_logical_block_no(unsigned char* oob)
     return -1;
 }
 
-int flash_disk_scan(void)
+static int flash_disk_scan(void)
 {
     int n_segments, n_phblocks;
     unsigned char oob[16];
@@ -327,7 +327,7 @@ int flash_disk_scan(void)
     return 0;
 }
 
-int flash_disk_find_block(int block)
+static int flash_disk_find_block(int block)
 {
     int seg, bmod, phb;
     unsigned char oob[16];
@@ -356,7 +356,7 @@ int flash_disk_find_block(int block)
     return flash_disk.cur_phblock_start;
 }
 
-int flash_disk_read_sectors(unsigned long start,
+static int flash_disk_read_sectors(unsigned long start,
                             int count,
                             void* buf)
 {

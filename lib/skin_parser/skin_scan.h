@@ -31,8 +31,8 @@ extern "C"
 /* Scanning functions */
 void skip_tag(const char** document);
 void skip_comment(const char** document);
-void skip_arglist(const char** document);
-void skip_enumlist(const char** document);
+static void skip_arglist(const char** document);
+static void skip_enumlist(const char** document);
 char* scan_string(const char** document);
 int scan_int(const char** document);
 int check_viewport(const char* document); /* Checks for a viewport declaration */

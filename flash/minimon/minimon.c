@@ -21,7 +21,7 @@ int main(void);
 tpMain start_vector[] __attribute__ ((section (".startvector"))) = {main};
 
 
-UINT8 uart_read(void)
+static UINT8 uart_read(void)
 {
 	UINT8 byte;
 	while (!(SSR1 & SCI_RDRF)); // wait for char to be available
@@ -31,7 +31,7 @@ UINT8 uart_read(void)
 }
 
 
-void uart_write(UINT8 byte)
+static void uart_write(UINT8 byte)
 {
 	while (!(SSR1 & SCI_TDRE)); // wait for transmit buffer empty
 	TDR1 = byte;

@@ -69,7 +69,7 @@ UINT32 Read32(UINT8* pByte)
 }
 
 
-UINT32 CalcCRC32 (const UINT8* buf, UINT32 len) 
+static UINT32 CalcCRC32 (const UINT8* buf, UINT32 len)
 { 
 	static const UINT32 crc_table[256] = 
 	{	// CRC32 lookup table for polynomial 0x04C11DB7
@@ -127,7 +127,7 @@ UINT32 CalcCRC32 (const UINT8* buf, UINT32 len)
 } 
 
 
-UINT32 PlaceImage(char* filename, UINT32 pos, UINT8* pFirmware, UINT32 limit)
+static UINT32 PlaceImage(char* filename, UINT32 pos, UINT8* pFirmware, UINT32 limit)
 {
 	UINT32 size, read;
 	FILE* pFile;

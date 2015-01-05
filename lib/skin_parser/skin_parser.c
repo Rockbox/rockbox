@@ -1142,7 +1142,7 @@ static struct skin_element* skin_parse_code_as_arg(const char** document)
 }
 
 /* Memory management */
-struct skin_element* skin_alloc_element()
+static struct skin_element* skin_alloc_element()
 {
     struct skin_element* retval =  (struct skin_element*)
                                    skin_buffer_alloc(sizeof(struct skin_element));
@@ -1164,7 +1164,7 @@ struct skin_element* skin_alloc_element()
  * enough for any tag. params should be used straight away by the callback
  * so this is safe.
  */
-struct skin_tag_parameter* skin_alloc_params(int count)
+static struct skin_tag_parameter* skin_alloc_params(int count)
 {
     size_t size = sizeof(struct skin_tag_parameter) * count;
     return (struct skin_tag_parameter*)skin_buffer_alloc(size);
@@ -1176,7 +1176,7 @@ char* skin_alloc_string(int length)
     return (char*)skin_buffer_alloc(sizeof(char) * (length + 1));
 }
 
-OFFSETTYPE(struct skin_element*)* skin_alloc_children(int count)
+static OFFSETTYPE(struct skin_element*)* skin_alloc_children(int count)
 {
     return (OFFSETTYPE(struct skin_element*)*)
             skin_buffer_alloc(sizeof(struct skin_element*) * count);

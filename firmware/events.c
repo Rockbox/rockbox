@@ -81,7 +81,7 @@ bool add_event_ex(unsigned short id, bool oneshot, void (*handler)(unsigned shor
     return do_add_event(id, oneshot, true, handler, user_data);
 }
 
-void do_remove_event(unsigned short id, bool user_data_valid,
+static void do_remove_event(unsigned short id, bool user_data_valid,
                   void *handler, void *user_data)
 {
     int i;

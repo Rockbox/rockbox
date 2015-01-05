@@ -89,7 +89,7 @@ void skip_tag(const char** document)
         skip_enumlist(document);
 }
 
-void skip_arglist(const char** document)
+static void skip_arglist(const char** document)
 {
     if(**document == ARGLISTOPENSYM)
         (*document)++;
@@ -106,7 +106,7 @@ void skip_arglist(const char** document)
         (*document)++;
 }
 
-void skip_enumlist(const char** document)
+static void skip_enumlist(const char** document)
 {
     if(**document == ENUMLISTOPENSYM)
         (*document)++;
