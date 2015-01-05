@@ -41,6 +41,41 @@ void skip_comment(const char** document)
         (*document)++;
 }
 
+static void skip_arglist(const char** document)
+{
+    if(**document == ARGLISTOPENSYM)
+        (*document)++;
+    while(**document && **document != ARGLISTCLOSESYM)
+    {
+        if(**document == TAGSYM)
+            skip_tag(document);
+        else if(**document == COMMENTSYM)
+            skip_comment(document);
+        else
+            (*document)++;
+    }
+    if(**document == ARGLISTCLOSESYM)
+        (*document)++;
+}
+
+static void skip_enumlist(const char** document)
+{
+    if(**document == ENUMLISTOPENSYM)
+        (*document)++;
+    while(**document && **document != ENUMLISTCLOSESYM)
+    {
+        if(**document == TAGSYM)
+            skip_tag(document);
+        else if(**document == COMMENTSYM)
+            skip_comment(document);
+        else
+            (*document)++;
+    }
+
+    if(**document == ENUMLISTCLOSESYM)
+        (*document)++;
+}
+
 void skip_tag(const char** document)
 {
     char tag_name[MAX_TAG_LENGTH];
@@ -87,41 +122,6 @@ void skip_tag(const char** document)
 
     if (**document == ENUMLISTOPENSYM)
         skip_enumlist(document);
-}
-
-static void skip_arglist(const char** document)
-{
-    if(**document == ARGLISTOPENSYM)
-        (*document)++;
-    while(**document && **document != ARGLISTCLOSESYM)
-    {
-        if(**document == TAGSYM)
-            skip_tag(document);
-        else if(**document == COMMENTSYM)
-            skip_comment(document);
-        else
-            (*document)++;
-    }
-    if(**document == ARGLISTCLOSESYM)
-        (*document)++;
-}
-
-static void skip_enumlist(const char** document)
-{
-    if(**document == ENUMLISTOPENSYM)
-        (*document)++;
-    while(**document && **document != ENUMLISTCLOSESYM)
-    {
-        if(**document == TAGSYM)
-            skip_tag(document);
-        else if(**document == COMMENTSYM)
-            skip_comment(document);
-        else
-            (*document)++;
-    }
-
-    if(**document == ENUMLISTCLOSESYM)
-        (*document)++;
 }
 
 char* scan_string(const char** document)

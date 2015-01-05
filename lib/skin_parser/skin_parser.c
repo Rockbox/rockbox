@@ -43,6 +43,10 @@ static void* callback_data;
 #endif
 
 /* Auxiliary parsing functions (not visible at global scope) */
+static struct skin_element* skin_alloc_element(void);
+static OFFSETTYPE(struct skin_element*)* skin_alloc_children(int count);
+static struct skin_tag_parameter* skin_alloc_params(int count);
+
 static struct skin_element* skin_parse_viewport(const char** document);
 static struct skin_element* skin_parse_line(const char** document);
 static struct skin_element* skin_parse_line_optional(const char** document,
