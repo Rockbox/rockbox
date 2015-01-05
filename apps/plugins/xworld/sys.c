@@ -23,16 +23,17 @@
 /* vertical stride support (as of Dec. 2014, only the M:Robe 500 has a color,
    vertical stride LCD) */
 
-/* monochrome/grayscale support (many of these targets have vertical strides,
+/* monochrome/grayscale support (many grayscale targets have vertical strides,
    so get that working first!) */
 
 #include "plugin.h"
+
 #include "lib/display_text.h"
 #include "lib/helper.h"
-#include "lib/playback_control.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/pluginlib_bmp.h"
 #include "lib/pluginlib_exit.h"
+
 #include "sys.h"
 #include "parts.h"
 #include "engine.h"
@@ -293,16 +294,15 @@ void sys_menu(struct System* sys)
     MENUITEM_STRINGLIST(menu, "XWorld Menu", mainmenu_cb,
                         "Resume Game",          /* 0  */
                         "Start New Game",       /* 1  */
-                        "Playback Control",     /* 2  */
-                        "Video Settings",       /* 3  */
-                        "Sound Settings",       /* 4  */
-                        "Fast Mode",            /* 5  */
-                        "Help",                 /* 6  */
-                        "Reset Settings",       /* 7  */
-                        "Load",                 /* 8  */
-                        "Save",                 /* 9  */
-                        "Quit without Saving",  /* 10 */
-                        "Save and Quit");       /* 11 */
+                        "Video Settings",       /* 2  */
+                        "Sound Settings",       /* 3  */
+                        "Fast Mode",            /* 4  */
+                        "Help",                 /* 5  */
+                        "Reset Settings",       /* 6  */
+                        "Load",                 /* 7  */
+                        "Save",                 /* 8  */
+                        "Quit without Saving",  /* 9  */
+                        "Save and Quit");       /* 10 */
     bool quit = false;
     while(!quit)
     {
@@ -316,41 +316,38 @@ void sys_menu(struct System* sys)
             quit = true;
             break;
         case 2:
-            playback_control(NULL);
-            break;
-        case 3:
             do_video_settings(sys);
             break;
-        case 4:
+        case 3:
             do_sound_settings(sys);
             break;
-        case 5:
+        case 4:
             rb->set_bool("Fast Mode", &sys->e->vm._fastMode);
             sys_save_settings(sys);
             break;
-        case 6:
+        case 5:
             sys_do_help();
             break;
-        case 7:
+        case 6:
             sys_reset_settings(sys);
             sys_save_settings(sys);
             break;
-        case 8:
+        case 7:
             rb->splash(0, "Loading...");
             sys->loaded = engine_loadGameState(sys->e, 0);
             rb->lcd_update();
             break;
-        case 9:
+        case 8:
             sys->e->_stateSlot = 0;
             rb->splash(0, "Saving...");
             engine_saveGameState(sys->e, sys->e->_stateSlot, "quicksave");
             rb->lcd_update();
             break;
-        case 10:
+        case 9:
             engine_deleteGameState(sys->e, 0);
             exit(PLUGIN_OK);
             break;
-        case 11:
+        case 10:
             /* saves are NOT deleted on loading */
             exit(PLUGIN_OK);
             break;
@@ -606,16 +603,15 @@ static void do_pause_menu(struct System* sys)
     MENUITEM_STRINGLIST(menu, "XWorld Menu", NULL,
                         "Resume Game",         /* 0 */
                         "Start New Game",      /* 1 */
-                        "Playback Control",    /* 2 */
-                        "Video Settings",      /* 3 */
-                        "Sound Settings",      /* 4 */
-                        "Fast Mode",           /* 5 */
-                        "Enter Code",          /* 6 */
-                        "Help",                /* 7 */
-                        "Reset Settings",      /* 8 */
-                        "Load",                /* 9 */
-                        "Save",                /* 10 */
-                        "Quit");               /* 11 */
+                        "Video Settings",      /* 2 */
+                        "Sound Settings",      /* 3 */
+                        "Fast Mode",           /* 4 */
+                        "Enter Code",          /* 5 */
+                        "Help",                /* 6 */
+                        "Reset Settings",      /* 7 */
+                        "Load",                /* 8 */
+                        "Save",                /* 9 */
+                        "Quit");               /* 10 */
 
     bool quit = false;
     while(!quit)
@@ -630,42 +626,39 @@ static void do_pause_menu(struct System* sys)
             quit = true;
             break;
         case 2:
-            playback_control(NULL);
-            break;
-        case 3:
             do_video_settings(sys);
             break;
-        case 4:
+        case 3:
             do_sound_settings(sys);
             break;
-        case 5:
+        case 4:
             rb->set_bool("Fast Mode", &sys->e->vm._fastMode);
             sys_save_settings(sys);
             break;
-        case 6:
+        case 5:
             sys->input.code = true;
             quit = true;
             break;
-        case 7:
+        case 6:
             sys_do_help();
             break;
-        case 8:
+        case 7:
             sys_reset_settings(sys);
             sys_save_settings(sys);
             break;
-        case 9:
+        case 8:
             rb->splash(0, "Loading...");
             sys->loaded = engine_loadGameState(sys->e, 0);
             rb->lcd_update();
             quit = true;
             break;
-        case 10:
+        case 9:
             sys->e->_stateSlot = 0;
             rb->splash(0, "Saving...");
             engine_saveGameState(sys->e, sys->e->_stateSlot, "quicksave");
             rb->lcd_update();
             break;
-        case 11:
+        case 10:
             exit(PLUGIN_OK);
             break;
         }
