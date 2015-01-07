@@ -991,4 +991,8 @@ resistor.128x128x16.bmp
 resistor.68x20x16.bmp
 #endif
 
+/* XRacer */
+/* these sprites are one-size-fits-all */
+xracer_sprites.bmp
+
 #endif /* HAVE_LCD_BITMAP */
