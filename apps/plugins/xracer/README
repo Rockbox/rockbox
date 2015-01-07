@@ -1,0 +1,74 @@
+This file contains some quick notes about this plugin.
+======================================================
+
+Some useful links:
+------------------
+
+<http://codeincomplete.com/projects/racer/> - a very good tutorial on building a similar game in Javascript
+
+<http://www.extentofthejam.com/pseudo/> - excellent page on pseudo-3d
+
+Terminology:
+------------
+
+In the code, a "fixed-point" number is one that has a nonzero number of fractional bits.
+When dealing with these numbers, you must be careful to convert all operands to fixed-point, and use the correct function/macro to replace the operators.
+In the code, I've tried to make all fixed-point numbers of type 'long.'
+An "integer" is a number with zero fractional bits.
+
+(NOTE: I'm not sure if this "proper" terminology)
+
+Code structure:
+---------------
+
+generator.c: random map generator
+
+graphics.c: this is where almost all of the rendering takes place
+
+main.c: main loop
+
+sprite.c: static sprite data (offo
+util.c miscellaneous functions, also contains FOV calculation code
+
+Proposed map formats:
+---------------------
+
+There will be two map formats: one that can be compiled into the executable ("Internal format"), and one that can be loaded from a file ("Interchange format").
+
+Internal format:
+----------------
+
+This format is represented as a series of struct road_section's.
+
+struct road_section {
+    uchar type;
+    uint32 len;
+    int slope;
+    long curve; // <<< this is fixed-point with 8 fracbits
+};
+
+'type' can be any of the following:
+ 0: constant segment - all 3 parameters used
+ 1: up-hill - an up hill is added. actual length is len + 2*slope due to enters and exits
+ 2: down-hill - a down hill is added. actual length is len + 2*slope due to enters and exits
+
+Endianness is platform-dependent in the Internal format.
+
+Interchange format:
+-------------------
+
+NOTE: all numbers are BIG-ENDIAN unless otherwise specified!
+
+This format is essentially the Internal format serialized into a file, but with some minor differences.
+
+Current format version number: 0x0000
+
+- File header - 8 bytes
+  - 0x00-0x04: 'XMAP'
+  - 0x05-0x06: version number (see above)
+  - 0x07-0x08: 0xFF padding
+- Data blocks - 15 bytes each (corresponds to the "sections" of the Internal format)
+  - 0x00     : type
+  - 0x01-0x05: length
+  - 0x05-0x09: slope (signed two's complement)
+  - 0x09-0x0D: curve (signed two's complement)
