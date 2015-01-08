@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_49f951c8",
+        "filename": "utils/analysis/check_defines.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-01-08T22:55:18Z",
+      "side": 1,
+      "message": "Add something saying that the file can be downloaded at http://git.rockbox.org/?p\u003dwww.git;a\u003dblob;f\u003dbuildserver/builds;hb\u003dHEAD instead of checking out the repositry. Maybe the tool can download it if needed ?",
+      "revId": "5ff8703934c4fdca6f8afb7196dded61dfaea631",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
