@@ -98,7 +98,7 @@ void _backlight_pwm(int on)
     }
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     GPIOA_DIR |= 1<<5;
     if (c200v2_variant == 1) {
@@ -109,14 +109,14 @@ bool _backlight_init(void)
     return true;
 }
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     backlight_level = brightness_table[brightness];
 
     if (brightness > 0)
-        _backlight_on();
+        backlight_hw_on();
     else
-        _backlight_off();
+        backlight_hw_off();
 }
 
 static void _pwm_on(void)
@@ -130,7 +130,7 @@ static void _pwm_off(void)
         _set_timer2_pwm_ratio(0);
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     if (backlight_is_on == 1) {
         /* Update pwm ratio in case user changed the brightness */
@@ -146,7 +146,7 @@ void _backlight_on(void)
     backlight_is_on = 1;
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     if (backlight_is_on == 0)
         return;
@@ -159,7 +159,7 @@ void _backlight_off(void)
 #endif
 }
 
-void _buttonlight_on(void)
+void buttonlight_hw_on(void)
 {
     if (buttonlight_is_on == 1)
         return;
@@ -169,7 +169,7 @@ void _buttonlight_on(void)
     buttonlight_is_on = 1;
 }
 
-void _buttonlight_off(void)
+void buttonlight_hw_off(void)
 {
     if (buttonlight_is_on == 0)
         return;

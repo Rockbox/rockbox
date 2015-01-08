@@ -77,7 +77,7 @@ static const unsigned short lin_brightness[] = {
 };
 #endif
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     /* configure PD4 as output */
     GPIO_PDCON |= (1<<4);
@@ -105,7 +105,7 @@ bool _backlight_init(void)
     return true;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true);
@@ -120,7 +120,7 @@ void _backlight_on(void)
     PWMT0_CTRL |= (1<<3) | (1<<0);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     /* setup PWM0 pin as GPIO which is pulled low */
     SCU_IOMUXB_CON &= ~(1<<11);
@@ -135,7 +135,7 @@ void _backlight_off(void)
 #endif
 }
 
-void _backlight_set_brightness(int val)
+void backlight_hw_brightness(int val)
 {
     brightness = val & 0x1f;
     PWMT0_HRC = lin_brightness[brightness];

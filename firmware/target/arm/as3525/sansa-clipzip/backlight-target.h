@@ -21,11 +21,11 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-bool _backlight_init(void);
-void _backlight_on(void);
-void _backlight_off(void);
-void _backlight_set_brightness(int brightness);
+bool backlight_hw_init(void);
+void backlight_hw_on(void);
+void backlight_hw_off(void);
+void backlight_hw_brightness(int brightness);
 
-#define _backlight_panic_on() _backlight_on()
+#define _backlight_panic_on() backlight_hw_on()
 
 #endif

@@ -122,7 +122,7 @@ void lcd_shutdown(void) {
 #if defined(IPOD_NANO)
     _backlight_hw_enable(false);
 #elif defined(IPOD_COLOR)
-    _backlight_off();
+    backlight_hw_off();
 #endif
 
     if ((lcd_type&1) == 0) {

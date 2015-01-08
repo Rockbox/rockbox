@@ -32,12 +32,12 @@ void lcd_awake(void);
 void lcd_update(void);
 #endif
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     pmu_write(0x28, brightness);
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_SLEEP
     if (!lcd_active())
@@ -50,18 +50,18 @@ void _backlight_on(void)
     pmu_write(0x29, 1);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     pmu_write(0x29, 0);
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     pmu_write(0x2a, 6);
     pmu_write(0x28, 0x2e);
     pmu_write(0x2b, 20);
 
-    _backlight_on();
+    backlight_hw_on();
 
     return true;
 }

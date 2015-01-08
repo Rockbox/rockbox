@@ -63,7 +63,7 @@ void shutdown(void)
         ata_sleepnow();
     }
     
-    _backlight_off();
+    backlight_hw_off();
 
     power_off();
 }

@@ -24,15 +24,15 @@
 #include "config.h"
 #include "rtc.h"
 
-#define _backlight_init() true
+#define backlight_hw_init() true
 
-static inline void _backlight_on(void)
+static inline void backlight_hw_on(void)
 {
     rtc_write(0x13, 0x10); /* 32 kHz square wave */
     rtc_write(0x0a, rtc_read(0x0a) | 0x40); /* Enable square wave */
 }
 
-static inline void _backlight_off(void)
+static inline void backlight_hw_off(void)
 {
     /* While on, backlight is flashing at 32 kHz.  If the square wave output
        is disabled while the backlight is lit, it will become constantly lit,

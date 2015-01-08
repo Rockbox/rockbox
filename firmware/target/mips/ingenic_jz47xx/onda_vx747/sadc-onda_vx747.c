@@ -184,7 +184,7 @@ int button_read_device(int *data)
 #if CONFIG_ORIENTATION == SCREEN_LANDSCAPE
         *data = (*data & 0xFFFF) | ((LCD_HEIGHT - (*data >> 16)) << 16);
 #endif
-        if( UNLIKELY(!is_backlight_on(true)) )
+        if( UNLIKELY(!isbacklight_hw_on(true)) )
             *data = 0;
 
         old_data = *data;

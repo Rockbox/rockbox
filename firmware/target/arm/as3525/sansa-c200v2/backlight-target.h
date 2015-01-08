@@ -23,22 +23,22 @@
 
 #include <stdbool.h>
 
-bool _backlight_init(void);
+bool backlight_hw_init(void);
 void _backlight_pwm(int on);
-void _backlight_on(void);
-void _backlight_off(void);
+void backlight_hw_on(void);
+void backlight_hw_off(void);
 
 static inline void _backlight_panic_on(void)
 {
-    _backlight_on();
+    backlight_hw_on();
     _backlight_pwm(1);
 }
 
-void _backlight_set_brightness(int brightness);
+void backlight_hw_brightness(int brightness);
 int  __backlight_is_on(void);
 
-void _buttonlight_on(void);
-void _buttonlight_off(void);
+void buttonlight_hw_on(void);
+void buttonlight_hw_off(void);
 
 /*
  * FIXME: This may be better off in kernel.h, but...

@@ -24,12 +24,12 @@
 #include "backlight.h"
 #include "lcd.h"
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     GPIO3_SET = 1;
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     GPIO3_CLR = 1;
 }

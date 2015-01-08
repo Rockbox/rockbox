@@ -55,7 +55,7 @@ static void _backlight_write_brightness(int brightness)
     spi_block_transfer(SPI_target_BACKLIGHT, bl_command, 4, 0, 0);
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     lcd_awake(); /* power on lcd + visible display */
 
@@ -64,25 +64,25 @@ void _backlight_on(void)
 #endif
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     _backlight_write_brightness(0);
 }
 
 /* Assumes that the backlight has been initialized */
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     _backlight_write_brightness(brightness);
 }
 
 void __backlight_dim(bool dim_now)
 {
-    _backlight_set_brightness(dim_now ?
+    backlight_hw_brightness(dim_now ?
         DEFAULT_BRIGHTNESS_SETTING :
         DEFAULT_DIMNESS_SETTING);
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     short read_value;
 
@@ -102,7 +102,7 @@ bool _backlight_init(void)
 
     spi_block_transfer(SPI_target_BACKLIGHT, commands[2], 2, 0, 0);
 
-    _backlight_set_brightness(backlight_brightness);
+    backlight_hw_brightness(backlight_brightness);
     return true;
 }
 

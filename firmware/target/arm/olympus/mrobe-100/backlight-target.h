@@ -22,23 +22,20 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-bool _backlight_init(void); /* Returns backlight current state (true=ON). */
+bool backlight_hw_init(void); /* Returns backlight current state (true=ON). */
 void _backlight_hw_on(void);
 void _backlight_hw_off(void);
 
 #ifdef HAVE_REMOTE_LCD
-void _remote_backlight_on(void);
-void _remote_backlight_off(void);
+void remote_backlight_hw_on(void);
+void remote_backlight_hw_off(void);
 #endif
 
-#ifdef BOOTLOADER
-#define _backlight_on() _backlight_hw_on()
-#define _backlight_off() _backlight_hw_off()
-#else
-#define _backlight_on_isr() _backlight_hw_on()
-#define _backlight_off_isr() _backlight_hw_off()
-#define _backlight_on_normal() _backlight_hw_on()
-#define _backlight_off_normal() _backlight_hw_off()
+#ifndef BOOTLOADER
+#define _backlight_on_isr() backlight_hw_on()
+#define _backlight_off_isr() backlight_hw_off()
+#define _backlight_on_normal() backlight_hw_on()
+#define _backlight_off_normal() backlight_hw_off()
 #define _BACKLIGHT_FADE_BOOST
 #endif
 
@@ -53,8 +50,8 @@ void _remote_backlight_off(void);
                               BUTTONLIGHT_DISPLAY | BUTTONLIGHT_LEFT  | \
                               BUTTONLIGHT_RIGHT   | BUTTONLIGHT_SCROLL)
 
-void _buttonlight_set_brightness(int brightness);
-void _buttonlight_on(void);
-void _buttonlight_off(void);
+void buttonlight_hw_brightness(int brightness);
+void buttonlight_hw_on(void);
+void buttonlight_hw_off(void);
 
 #endif

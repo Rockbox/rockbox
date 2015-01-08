@@ -27,12 +27,12 @@
 #include "synaptics-mep.h"
 #include "lcd.h"
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     ascodec_write(AS3514_DCDC15, brightness);
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
@@ -40,13 +40,13 @@ void _backlight_on(void)
 #if (CONFIG_BACKLIGHT_FADING != BACKLIGHT_FADING_SW_SETTING) /* in bootloader/sim */
     /* if we set the brightness to the settings value, then fading up
      * is glitchy */
-    _backlight_set_brightness(backlight_brightness);
+    backlight_hw_brightness(backlight_brightness);
 #endif
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
-    _backlight_set_brightness(0);
+    backlight_hw_brightness(0);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif
@@ -58,7 +58,7 @@ void _backlight_off(void)
 #define BUTTONLIGHT_MAX  0x0f
 static unsigned short buttonlight_status = 0;
 
-void _buttonlight_on(void)
+void buttonlight_hw_on(void)
 {
     if (!buttonlight_status)
     {
@@ -68,7 +68,7 @@ void _buttonlight_on(void)
     }
 }
 
-void _buttonlight_off(void)
+void buttonlight_hw_off(void)
 {
     if (buttonlight_status)
     {

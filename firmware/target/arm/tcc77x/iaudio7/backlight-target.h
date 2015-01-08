@@ -26,7 +26,7 @@
 
 void power_touch_panel(bool on);
 
-static inline bool _backlight_init(void)
+static inline bool backlight_hw_init(void)
 {
     GPIOD_DIR |= 0x2;
     /* set backlight on by default, since the screen is unreadable without it */
@@ -34,13 +34,13 @@ static inline bool _backlight_init(void)
     return true;
 }
 
-static inline void _backlight_on(void)
+static inline void backlight_hw_on(void)
 {
     GPIOD |= 0x2;
     power_touch_panel(true);
 }
 
-static inline void _backlight_off(void)
+static inline void backlight_hw_off(void)
 {
     GPIOD &= ~0x2;
     power_touch_panel(false);

@@ -102,8 +102,8 @@ void shutdown(void)
 
     sleep(HZ*2);
     
-    _backlight_off();
-    _remote_backlight_off();
+    backlight_hw_off();
+    remote_backlight_hw_off();
     
     __reset_cookie();
     power_off();
@@ -184,10 +184,10 @@ void main(void)
     restore_irq(mask);
 
     /* Start with the main backlight OFF. */
-    _backlight_init();
-    _backlight_off();
+    backlight_hw_init();
+    backlight_hw_off();
     
-    _remote_backlight_on();
+    remote_backlight_hw_on();
 
     system_init();
     kernel_init();

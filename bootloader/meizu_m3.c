@@ -176,7 +176,7 @@ void main(void)
             | QT1106_DI | QT1106_SLD_SLIDER | QT1106_RES_256);
         snprintf(mystring, 64, "%x %2.2x",(slider & 0x008000)>>15, slider&0xff);
         lcd_puts(0,1,mystring);
-        _backlight_set_brightness((slider & 0xFF) >> 4);
+        backlight_hw_brightness((slider & 0xFF) >> 4);
         
         /*
         if(slider & 0x008000)

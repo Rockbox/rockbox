@@ -23,15 +23,15 @@
 
 #include "tcc77x.h"
 
-#define _backlight_init() true
+#define backlight_hw_init() true
 
-static inline void _backlight_on(void)
+static inline void backlight_hw_on(void)
 {
     /* Enable backlight */
     GPIOD |= 0x10;
 }
 
-static inline void _backlight_off(void)
+static inline void backlight_hw_off(void)
 {
     /* Disable backlight */
     GPIOD &= ~0x10;

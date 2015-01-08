@@ -21,10 +21,10 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-bool _backlight_init(void);
-void _backlight_on(void);
-void _backlight_off(void);
-void _remote_backlight_on(void);
-void _remote_backlight_off(void);
+bool backlight_hw_init(void);
+void backlight_hw_on(void);
+void backlight_hw_off(void);
+void remote_backlight_hw_on(void);
+void remote_backlight_hw_off(void);
 
 #endif

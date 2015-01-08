@@ -25,7 +25,7 @@
 #include "backlight-target.h"
 #include "lcd.h"
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
@@ -33,7 +33,7 @@ void _backlight_on(void)
     GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 0x20);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     GPIO_CLEAR_BITWISE(GPIOL_OUTPUT_VAL, 0x20);
 #ifdef HAVE_LCD_ENABLE

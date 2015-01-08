@@ -26,7 +26,7 @@
 #include "backlight-target.h"
 #include "pinctrl-imx233.h"
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     if(brightness != 0)
         brightness = MAX_BRIGHTNESS_SETTING + 1 - brightness;
@@ -39,17 +39,17 @@ void _backlight_set_brightness(int brightness)
     }
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     imx233_pinctrl_acquire(1, 28, "backlight");
     imx233_pinctrl_set_function(1, 28, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_set_drive(1, 28, PINCTRL_DRIVE_8mA);
     imx233_pinctrl_enable_gpio(1, 28, true);
-    _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
     return true;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
@@ -57,10 +57,10 @@ void _backlight_on(void)
     /* don't do anything special, the core will set the brightness */
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     /* there is no real on/off but we can set to 0 brightness */
-    _backlight_set_brightness(0);
+    backlight_hw_brightness(0);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif

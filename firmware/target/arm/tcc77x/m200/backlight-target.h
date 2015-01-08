@@ -23,19 +23,19 @@
 
 #include "tcc77x.h"
 
-static inline bool _backlight_init(void)
+static inline bool backlight_hw_init(void)
 {
     GPIOA_DIR |= 0x40;
     return true;
 }
 
-static inline void _backlight_on(void)
+static inline void backlight_hw_on(void)
 {
     /* Enable backlight */
     GPIOA |= 0x40;
 }
 
-static inline void _backlight_off(void)
+static inline void backlight_hw_off(void)
 {
     /* Disable backlight */
     GPIOA &= ~0x40;

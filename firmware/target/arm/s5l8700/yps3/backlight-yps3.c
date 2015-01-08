@@ -35,7 +35,7 @@
     are three individually controllable groups: menu/back, cursor, middle).
  */
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     /* pwm = round(16 * 16**(x/16)), where brightness level x = 1..16 */
     static const unsigned int logtable[] =
@@ -45,39 +45,39 @@ void _backlight_set_brightness(int brightness)
     TADATA0 = logtable[brightness];
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     /* configure backlight pin P0.0 as timer PWM output */
     PCON0 = ((PCON0 & ~(3 << 0)) | (2 << 0));
 
-    _backlight_set_brightness(backlight_brightness);
+    backlight_hw_brightness(backlight_brightness);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     /* configure backlight pin P0.0 as GPIO and switch off */
     PCON0 = ((PCON0 & ~(3 << 0)) | (1 << 0));
     PDAT0 &= ~(1 << 0);
 }
 
-void _buttonlight_on(void)
+void buttonlight_hw_on(void)
 {
     PDAT3 |= (3 << 2);
     PDAT4 |= (1 << 2);
 }
 
-void _buttonlight_off(void)
+void buttonlight_hw_off(void)
 {
     PDAT3 &= ~(3 << 2);
     PDAT4 &= ~(1 << 2);
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     /* Enable button LEDs: P3.2 (menu/back), P3.3 (cursor), P4.2 (middle) */
     PCON3 = (PCON3 & ~0x0000FF00) | 0x00001100;
     PCON4 = (PCON4 & ~0x00000F00) | 0x00000100;
-    _buttonlight_off();
+    buttonlight_hw_off();
 
     /* enable timer clock */
     PWRCON &= ~(1 << 4);
@@ -93,7 +93,7 @@ bool _backlight_init(void)
     TAPRE = 20;         /* prescaler */
     TACMD = (1 << 0);   /* TA_EN */
    
-    _backlight_on();
+    backlight_hw_on();
 
     return true;
 }

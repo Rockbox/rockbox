@@ -27,7 +27,7 @@
 #include "lcd.h"
 #include "synaptics-mep.h"
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
@@ -35,7 +35,7 @@ void _backlight_on(void)
     GPIO_SET_BITWISE(GPIOJ_OUTPUT_VAL, 0x01);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     GPIO_CLEAR_BITWISE(GPIOJ_OUTPUT_VAL, 0x01);
 #ifdef HAVE_LCD_ENABLE
@@ -47,7 +47,7 @@ void _backlight_off(void)
 static const int brightness_vals[16] =
                 {255,237,219,201,183,165,147,130,112,94,76,58,40,22,5,0};
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     /* From PB Vibe Bootloader and OF */
     DEV_INIT1&=0xFFFF3F3F;
@@ -60,7 +60,7 @@ void _backlight_set_brightness(int brightness)
 #ifdef HAVE_BUTTON_LIGHT
 static unsigned short buttonlight_status = 0;
 
-void _buttonlight_on(void)
+void buttonlight_hw_on(void)
 {
     if (!buttonlight_status)
     {
@@ -69,7 +69,7 @@ void _buttonlight_on(void)
     }
 }
 
-void _buttonlight_off(void)
+void buttonlight_hw_off(void)
 {
     if (buttonlight_status)
     {
@@ -78,7 +78,7 @@ void _buttonlight_off(void)
     }
 }
 
-void _buttonlight_set_brightness(int brightness)
+void buttonlight_hw_brightness(int brightness)
 {
     /* no brightness control, but lights stays on - for compatibility */
     (void)brightness;

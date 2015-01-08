@@ -24,22 +24,22 @@
 #include <stdbool.h>
 #include "cpu.h"
 
-void _backlight_on(void);
-void _backlight_off(void);
-#define _backlight_panic_on() _backlight_on()
+void backlight_hw_on(void);
+void backlight_hw_off(void);
+#define _backlight_panic_on() backlight_hw_on()
 
-static inline bool _backlight_init(void)
+static inline bool backlight_hw_init(void)
 {
     GPIOA_DIR |= 1<<5; /* for button light */
     return true;
 }
 
-static inline void _buttonlight_on(void)
+static inline void buttonlight_hw_on(void)
 {
     GPIOA_PIN(5) = 1<<5;
 }
 
-static inline void _buttonlight_off(void)
+static inline void buttonlight_hw_off(void)
 {
     GPIOA_PIN(5) = 0;
 }

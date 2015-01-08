@@ -53,19 +53,19 @@ static void set_backlight(int val)
     old_val = val;
 }
 
-static void set_backlight_on(void)
+static void setbacklight_hw_on(void)
 {
     __tcu_start_counter(BACKLIGHT_PWM);
     __tcu_enable_pwm_output(BACKLIGHT_PWM);
 }
 
-static void set_backlight_off(void)
+static void setbacklight_hw_off(void)
 {
     __tcu_disable_pwm_output(BACKLIGHT_PWM);
     __tcu_stop_counter(BACKLIGHT_PWM);
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     __gpio_as_pwm(BACKLIGHT_PWM);
     __tcu_start_timer_clock(BACKLIGHT_PWM);
@@ -88,24 +88,24 @@ bool _backlight_init(void)
     return true;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd */
 #endif
-    set_backlight_on();
+    setbacklight_hw_on();
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
-    set_backlight_off();
+    setbacklight_hw_off();
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off lcd */
 #endif
 }
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     set_backlight(brightness);
 }
@@ -115,6 +115,6 @@ void _backlight_set_brightness(int brightness)
 /* Turn off LED supply */
 void _backlight_lcd_sleep(void)
 {
-    _backlight_off();
+    backlight_hw_off();
 }
 #endif

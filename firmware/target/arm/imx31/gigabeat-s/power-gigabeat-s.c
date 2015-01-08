@@ -136,7 +136,7 @@ void power_off(void)
     dptc_stop();
 
     /* Cut backlight */
-    _backlight_off();
+    backlight_hw_off();
 
     /* Let it fade */
     sleep(5*HZ/4);

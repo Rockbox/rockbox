@@ -27,7 +27,7 @@
 #include "system.h"
 #include "backlight.h"
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #if 0
     int level = disable_irq_save();
@@ -36,7 +36,7 @@ void _backlight_on(void)
 #endif
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
 #if 0
     int level = disable_irq_save();

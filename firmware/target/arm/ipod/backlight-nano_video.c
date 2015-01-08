@@ -38,7 +38,7 @@ static int brightness = 1;   /* 1 to 32 */
 static int current_dim = 16; /* default after enabling the backlight dimmer */
 static bool enabled = false;
 
-void _backlight_set_brightness(int val)
+void backlight_hw_brightness(int val)
 {
     int oldlevel;
 
@@ -91,7 +91,7 @@ void _backlight_hw_enable(bool on)
         GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x80);
         sleep(HZ/100);
         current_dim = 16;
-        _backlight_set_brightness(brightness);
+        backlight_hw_brightness(brightness);
     }
     else
     {
@@ -116,7 +116,7 @@ void _backlight_led_off(void)
     GPIO_CLEAR_BITWISE(GPIOL_OUTPUT_VAL, 0x80);
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     GPIO_SET_BITWISE(GPIOB_ENABLE, 0x08);
     GPIO_SET_BITWISE(GPIOB_OUTPUT_EN, 0x08);

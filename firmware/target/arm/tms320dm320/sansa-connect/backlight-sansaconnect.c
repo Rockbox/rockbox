@@ -50,7 +50,7 @@ static void _backlight_write_brightness(int brightness)
     IO_CLK_PWM1H = brightness*70;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_SLEEP
     if (!lcd_active())
@@ -67,7 +67,7 @@ void _backlight_on(void)
 #endif
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     _backlight_write_brightness(0);
 
@@ -77,23 +77,23 @@ void _backlight_off(void)
 }
 
 /* Assumes that the backlight has been initialized */
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     _backlight_write_brightness(brightness);
 }
 
 void __backlight_dim(bool dim_now)
 {
-    _backlight_set_brightness(dim_now ?
+    backlight_hw_brightness(dim_now ?
         DEFAULT_BRIGHTNESS_SETTING :
         DEFAULT_DIMNESS_SETTING);
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     IO_CLK_PWM1C = 0x58D; /* as found in OF */
 
-    _backlight_set_brightness(backlight_brightness);
+    backlight_hw_brightness(backlight_brightness);
     return true;
 }
 

@@ -74,7 +74,7 @@ static unsigned char buttonlight_target;
 static unsigned short buttonlight_trigger_now;
 
 /* Assumes that the backlight has been initialized */
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     /* stop the interrupt from messing us up */
     backlight_control = BACKLIGHT_CONTROL_IDLE;
@@ -335,7 +335,7 @@ static void __backlight_dim(bool dim_now)
         backlight_control = BACKLIGHT_CONTROL_FADE;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
@@ -343,7 +343,7 @@ void _backlight_on(void)
     __backlight_dim(false);
 }    
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     __backlight_dim(true);
 }
@@ -373,12 +373,12 @@ static void __buttonlight_dim(bool dim_now)
         buttonlight_control = BUTTONLIGHT_CONTROL_FADE;
 }
 
-void _buttonlight_on(void)
+void buttonlight_hw_on(void)
 {
     __buttonlight_dim(false);
 }
 
-void _buttonlight_off(void)
+void buttonlight_hw_off(void)
 {
 #ifndef BOOTLOADER
     if(buttonlight_get_current_timeout() > 0)
@@ -388,7 +388,7 @@ void _buttonlight_off(void)
         __buttonlight_off();
 }
 
-void _buttonlight_set_brightness(int brightness)
+void buttonlight_hw_brightness(int brightness)
 {
     /* stop the interrupt from messing us up */
     buttonlight_control = BUTTONLIGHT_CONTROL_IDLE;
@@ -396,7 +396,7 @@ void _buttonlight_set_brightness(int brightness)
     buttonlight_control = BUTTONLIGHT_CONTROL_SET;
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     unsigned char brightness = log_brightness[DEFAULT_BRIGHTNESS_SETTING];
     buttonlight_brightness = brightness;

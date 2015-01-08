@@ -158,9 +158,9 @@ void shutdown(void)
     sleep(HZ*2);
     
     /* Backlight OFF */
-    _backlight_off();
+    backlight_hw_off();
 #ifdef HAVE_REMOTE_LCD
-    _remote_backlight_off();
+    remote_backlight_hw_off();
 #endif
     
     __reset_cookie();
@@ -418,12 +418,12 @@ void main(void)
     __uda1380_reset_hi();
     
     /* Start with the main backlight OFF. */
-    _backlight_init();
-    _backlight_off();
+    backlight_hw_init();
+    backlight_hw_off();
     
     /* Remote backlight ON */
 #ifdef HAVE_REMOTE_LCD
-    _remote_backlight_on();
+    remote_backlight_hw_on();
 #endif
 
     system_init();
@@ -576,7 +576,7 @@ void main(void)
             sleep(HZ);
 
             /* Backlight OFF */
-            _backlight_off();
+            backlight_hw_off();
         }
 
         cpu_idle_mode(false);

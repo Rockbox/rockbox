@@ -28,12 +28,12 @@
 
 int buttonlight_is_on = 0;
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     ascodec_write(AS3514_DCDC15, brightness);
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
@@ -45,7 +45,7 @@ void _backlight_on(void)
 #endif
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     ascodec_write(AS3514_DCDC15, 0x0);
 #ifdef HAVE_LCD_ENABLE
@@ -53,7 +53,7 @@ void _backlight_off(void)
 #endif
 }
 
-void _buttonlight_on(void)
+void buttonlight_hw_on(void)
 {
     /* Needed for buttonlight and MicroSD to work at the same time */
     /* Turn ROD control on, as the OF does */
@@ -63,7 +63,7 @@ void _buttonlight_on(void)
     buttonlight_is_on = 1;
 }
 
-void _buttonlight_off(void)
+void buttonlight_hw_off(void)
 {
     /* Needed for buttonlight and MicroSD to work at the same time */
     /* Turn ROD control off, as the OF does */

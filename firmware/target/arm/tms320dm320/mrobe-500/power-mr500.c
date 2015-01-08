@@ -75,7 +75,7 @@ bool ide_powered(void)
 void power_off(void)
 {
     /* turn off backlight and wait for 1 second */
-    _backlight_off();
+    backlight_hw_off();
 #if defined(HAVE_REMOTE_LCD)
     lcd_remote_sleep();
 #endif

@@ -26,19 +26,19 @@
 #include "backlight-target.h"
 #include "pwm-imx233.h"
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     imx233_pwm_setup_simple(4, 24000, brightness);
     imx233_pwm_enable(4, true);
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
-    _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
     return true;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
@@ -46,10 +46,10 @@ void _backlight_on(void)
     /* don't do anything special, the core will set the brightness */
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     /* there is no real on/off but we can set to 0 brightness */
-    _backlight_set_brightness(0);
+    backlight_hw_brightness(0);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif

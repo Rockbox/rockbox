@@ -98,9 +98,9 @@ void shutdown(void)
     sleep(HZ*2);
     
     /* Backlight OFF */
-    _backlight_off();
+    backlight_hw_off();
 #ifdef HAVE_REMOTE_LCD
-    _remote_backlight_off();
+    remote_backlight_hw_off();
 #endif
     
     __reset_cookie();

@@ -80,7 +80,7 @@ void scrollstrip_isr(void)
     static signed char prev_scroll_lines = -1;
     static signed char direction = 0;
     static unsigned char count = 0;
-    static long next_backlight_on = 0;
+    static long nextbacklight_hw_on = 0;
 
     signed int new_scroll_lines;
     signed int scroll_dir;
@@ -120,11 +120,11 @@ void scrollstrip_isr(void)
     }
 
     /* poke backlight */
-    if (TIME_AFTER(current_tick, next_backlight_on))
+    if (TIME_AFTER(current_tick, nextbacklight_hw_on))
     {
         backlight_on();
         reset_poweroff_timer();
-        next_backlight_on = current_tick + HZ/4;
+        nextbacklight_hw_on = current_tick + HZ/4;
     }
 
     /* apply sensitivity filter */

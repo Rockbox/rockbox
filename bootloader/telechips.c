@@ -82,10 +82,10 @@ void show_debug_screen(void)
         }
 #if 0
         if (button & BUTTON_SELECT){
-            _backlight_off();
+            backlight_hw_off();
         }
         else{
-            _backlight_on();
+            backlight_hw_on();
         }
 #endif
         printf("Btn: 0x%08x",button);
@@ -147,7 +147,7 @@ void* main(void)
     
     show_logo();
 
-    _backlight_on();
+    backlight_hw_on();
 
 /* Only load the firmware if TCCBOOT is defined - this ensures SDRAM_START is
    available for loading the firmware. Otherwise display the debug screen. */
