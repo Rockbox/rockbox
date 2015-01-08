@@ -25,7 +25,7 @@
 #include "lcd.h"
 #include "backlight.h"
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     GPIO_SET_BITWISE(GPIOD_ENABLE, 0x01);
     GPIO_SET_BITWISE(GPIOD_OUTPUT_EN, 0x01);
@@ -44,22 +44,22 @@ bool _backlight_init(void)
     return true;
 }
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     (void)brightness;
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_VAL, 0x01);
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x01);
 }
 
-void _buttonlight_off(void)
+void buttonlight_hw_off(void)
 {
     GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_VAL, 0x02); /* vertical buttonlight */
     GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_VAL, 0x01); /* horizontal buttonlight */
@@ -70,7 +70,7 @@ void _buttonlight_off(void)
     GPIO_CLEAR_BITWISE(GPIOR_OUTPUT_VAL, 0x10); /* scrollwheel left led */
 }
 
-void _buttonlight_on(void)
+void buttonlight_hw_on(void)
 {
     GPIO_SET_BITWISE(GPIOA_OUTPUT_VAL, 0x02); /* vertical buttonlight */
     GPIO_SET_BITWISE(GPIOA_OUTPUT_VAL, 0x01); /* horizontal buttonlight */

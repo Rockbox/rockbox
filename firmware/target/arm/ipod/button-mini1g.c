@@ -60,7 +60,7 @@ static void handle_scroll_wheel(int new_scroll)
     static int prev_scroll = -1;
     static int direction = 0;
     static int count = 0;
-    static long next_backlight_on = 0;
+    static long nextbacklight_hw_on = 0;
 
     int wheel_keycode = BUTTON_NONE;
     int scroll;
@@ -92,10 +92,10 @@ static void handle_scroll_wheel(int new_scroll)
     }
 
    /* poke backlight every 1/4s of activity */
-    if (TIME_AFTER(current_tick, next_backlight_on)) {
+    if (TIME_AFTER(current_tick, nextbacklight_hw_on)) {
         backlight_on();
         reset_poweroff_timer();
-        next_backlight_on = current_tick + HZ/4;
+        nextbacklight_hw_on = current_tick + HZ/4;
     }
 
     if (++count < WHEEL_BASE_SENSITIVITY)
@@ -144,7 +144,7 @@ static void handle_scroll_wheel(int new_scroll)
         wheel_velocity = v;
         /* ensure backlight never gets stuck for an extended period if tick
          * wrapped such that next poke is very far ahead */
-        next_backlight_on = current_tick - 1;
+        nextbacklight_hw_on = current_tick - 1;
     }
     else {
         /* some velocity filtering to smooth things out */

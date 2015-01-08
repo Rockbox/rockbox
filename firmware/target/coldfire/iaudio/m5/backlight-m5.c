@@ -26,14 +26,14 @@
 #include "pcf50606.h"
 #include "lcd.h"
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
-    _backlight_on();
+    backlight_hw_on();
 
     return true; /* Backlight always ON after boot. */
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     int level = disable_irq_save();
 
@@ -41,7 +41,7 @@ void _backlight_on(void)
     restore_irq(level);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     int level = disable_irq_save();
 
@@ -49,12 +49,12 @@ void _backlight_off(void)
     restore_irq(level);
 }
 
-void _remote_backlight_on(void)
+void remote_backlight_hw_on(void)
 {
     and_l(~0x00200000, &GPIO_OUT);
 }
 
-void _remote_backlight_off(void)
+void remote_backlight_hw_off(void)
 {
     or_l(0x00200000, &GPIO_OUT);
 }

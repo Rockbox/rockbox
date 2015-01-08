@@ -78,7 +78,7 @@ void power_init(void)
 void power_off(void)
 {
     /* Turn the backlight off first to avoid a bright stripe on power-off */
-    _backlight_off();
+    backlight_hw_off();
     sleep(HZ/10);
 
     /* Power off the player using the same mechanism as the OF */

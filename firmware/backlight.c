@@ -126,10 +126,10 @@ static void buttonlight_update_state(void)
     if (buttonlight_timer < 0)
     {
         buttonlight_timer = 0; /* Disable the timeout */
-        _buttonlight_off();
+        buttonlight_hw_off();
     }
     else
-        _buttonlight_on();
+        buttonlight_hw_on();
 }
 
 /* external interface */
@@ -421,7 +421,7 @@ static void backlight_setup_fade_up(void)
         if (backlight_fading_state == NOT_FADING)
         {
             /* make sure the backlight is at lowest level */
-            _backlight_on();
+            backlight_hw_on();
         }
         backlight_fading_state = FADING_UP;
     }
@@ -429,8 +429,8 @@ static void backlight_setup_fade_up(void)
     {
         backlight_fading_state = NOT_FADING;
         _backlight_fade_update_state(backlight_brightness);
-        _backlight_on();
-        _backlight_set_brightness(backlight_brightness);
+        backlight_hw_on();
+        backlight_hw_brightness(backlight_brightness);
     }
 }
 
@@ -444,11 +444,11 @@ static void backlight_setup_fade_down(void)
     {
         backlight_fading_state = NOT_FADING;
         _backlight_fade_update_state(MIN_BRIGHTNESS_SETTING-1);
-        _backlight_off();
+        backlight_hw_off();
 #if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
         /* write the lowest brightness level to the hardware so that
          * fading up is glitch free */
-        _backlight_set_brightness(MIN_BRIGHTNESS_SETTING);
+        backlight_hw_brightness(MIN_BRIGHTNESS_SETTING);
 #endif
 #ifdef HAVE_LCD_SLEEP
         backlight_lcd_sleep_countdown(true);
@@ -463,7 +463,7 @@ static inline void do_backlight_off(void)
 #if BACKLIGHT_FADE_IN_THREAD
     backlight_setup_fade_down();
 #else
-    _backlight_off();
+    backlight_hw_off();
     /* targets that have fading need to start the countdown when done with
      * fading */
 #ifdef HAVE_LCD_SLEEP
@@ -500,7 +500,7 @@ static void backlight_update_state(void)
 #if BACKLIGHT_FADE_IN_THREAD
         backlight_setup_fade_up();
 #else
-        _backlight_on();
+        backlight_hw_on();
 #endif
     }
 }
@@ -514,12 +514,12 @@ static void remote_backlight_update_state(void)
     if (timeout < 0)
     {
         remote_backlight_timer = 0; /* Disable the timeout */
-        _remote_backlight_off();
+        remote_backlight_hw_off();
     }
     else
     {
         remote_backlight_timer = timeout;
-        _remote_backlight_on();
+        remote_backlight_hw_on();
     }
 }
 #endif /* HAVE_REMOTE_LCD */
@@ -596,7 +596,7 @@ void backlight_thread(void)
 
             case REMOTE_BACKLIGHT_OFF:
                 remote_backlight_timer = 0; /* Disable the timeout */
-                _remote_backlight_off();
+                remote_backlight_hw_off();
                 break;
 #endif /* HAVE_REMOTE_LCD */
 
@@ -611,7 +611,7 @@ void backlight_thread(void)
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
             case BACKLIGHT_BRIGHTNESS_CHANGED:
                 backlight_brightness = (int)ev.data;
-                _backlight_set_brightness((int)ev.data);
+                backlight_hw_brightness((int)ev.data);
 #if  (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
     || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)
                 /* receive backlight brightness */
@@ -632,11 +632,11 @@ void backlight_thread(void)
 
             case BUTTON_LIGHT_OFF:
                 buttonlight_timer = 0;
-                _buttonlight_off();
+                buttonlight_hw_off();
                 break;
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
             case BUTTON_LIGHT_BRIGHTNESS_CHANGED:                
-                _buttonlight_set_brightness((int)ev.data);
+                buttonlight_hw_brightness((int)ev.data);
                 break;
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 #endif /* HAVE_BUTTON_LIGHT */
@@ -703,7 +703,7 @@ static void backlight_timeout_handler(void)
         remote_backlight_timer -= BACKLIGHT_THREAD_TIMEOUT;
         if(remote_backlight_timer <= 0)
         {
-            _remote_backlight_off();
+            remote_backlight_hw_off();
         }
     }
 #endif /* HAVE_REMOVE_LCD */
@@ -713,7 +713,7 @@ static void backlight_timeout_handler(void)
         buttonlight_timer -= BACKLIGHT_THREAD_TIMEOUT;
         if (buttonlight_timer <= 0)
         {
-            _buttonlight_off();
+            buttonlight_hw_off();
         }
     }
 #endif /* HAVE_BUTTON_LIGHT */
@@ -723,7 +723,7 @@ void backlight_init(void)
 {
     queue_init(&backlight_queue, true);
 
-    if (_backlight_init())
+    if (backlight_hw_init())
     {
 #if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM)
         /* If backlight is already on, don't fade in. */
@@ -962,8 +962,8 @@ void buttonlight_set_brightness(int val)
 #if defined(HAVE_BACKLIGHT) && !defined(BACKLIGHT_FULL_INIT)
 void backlight_init(void)
 {
-    (void)_backlight_init();
-    _backlight_on();
+    (void)backlight_hw_init();
+    backlight_hw_on();
 }
 #endif
 

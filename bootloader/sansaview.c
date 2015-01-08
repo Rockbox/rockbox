@@ -54,11 +54,11 @@ void main(void)
 
     while(1)
     {
-       _backlight_on();
-       _buttonlight_off();
+       backlight_hw_on();
+       buttonlight_hw_off();
        sleep(HZ/4);
-       _backlight_off();
-       _buttonlight_on();
+       backlight_hw_off();
+       buttonlight_hw_on();
        sleep(HZ/4);
     }
 }

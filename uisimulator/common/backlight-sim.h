@@ -24,18 +24,18 @@
 
 #include "config.h"
 
-bool _backlight_init(void);
-void _backlight_on(void);
-void _backlight_off(void);
+bool backlight_hw_init(void);
+void backlight_hw_on(void);
+void backlight_hw_off(void);
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-void _backlight_set_brightness(int val);
+void backlight_hw_brightness(int val);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 #ifdef HAVE_BUTTON_LIGHT
-void _buttonlight_on(void);
-void _buttonlight_off(void);
+voidbuttonlight_hw_on(void);
+voidbuttonlight_hw_off(void);
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-void _buttonlight_set_brightness(int val);
+voidbuttonlight_hw_set_brightness(int val);
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 #endif /* HAVE_BUTTON_LIGHT */
 

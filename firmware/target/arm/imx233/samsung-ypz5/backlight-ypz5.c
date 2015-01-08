@@ -77,7 +77,7 @@ static void aat3151_write(int addr, int data)
     udelay(TIME_LAT);
 }
 
-void _backlight_set_brightness(int level)
+void backlight_hw_brightness(int level)
 {
     /* Don't try to reset backlight if not necessary
      *  Moreover this helps to avoid flickering when
@@ -120,7 +120,7 @@ void _backlight_set_brightness(int level)
     current_level = level;
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     imx233_pinctrl_acquire(3, 13, "backlight");
     imx233_pinctrl_set_function(3, 13, PINCTRL_FUNCTION_GPIO);
@@ -130,19 +130,19 @@ bool _backlight_init(void)
     return true;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
     /* restore the previous backlight level */
-    _backlight_set_brightness(backlight_brightness);
+    backlight_hw_brightness(backlight_brightness);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     /* there is no real on/off but we can set to 0 brightness */
-    _backlight_set_brightness(0);
+    backlight_hw_brightness(0);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif

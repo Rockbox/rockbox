@@ -21,15 +21,13 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-bool _backlight_init(void); /* Returns backlight current state (true=ON). */
-void _backlight_hw_on(void);
-void _backlight_hw_off(void);
-void _backlight_set_brightness(int val);
+bool backlight_hw_init(void); /* Returns backlight current state (true=ON). */
+void backlight_hw_on(void);
+void backlight_hw_off(void);
+void backlight_hw_brightness(int val);
 
-#define _backlight_on() _backlight_hw_on()
-#define _backlight_off() _backlight_hw_off()
-#define _backlight_on_isr() _backlight_hw_on()
-#define _backlight_off_isr() _backlight_hw_off()
-#define _backlight_on_normal() _backlight_hw_on()
-#define _backlight_off_normal() _backlight_hw_off()
+#define backlight_hw_on_isr() backlight_hw_on()
+#define backlight_hw_off_isr() backlight_hw_off()
+#define backlight_hw_on_normal() backlight_hw_on()
+#define backlight_hw_off_normal() backlight_hw_off()
 #endif

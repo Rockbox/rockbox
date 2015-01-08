@@ -29,13 +29,13 @@
 static const int brightness_vals[16] =
                 {255,237,219,201,183,165,147,130,112,94,76,58,40,22,5,0};
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     outl(0x80000000 | (brightness_vals[brightness-1] << 16), 0x7000a000);
 }
 #endif
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true);
@@ -45,7 +45,7 @@ void _backlight_on(void)
     GPO32_VAL    |= 0x400;
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     GPO32_ENABLE |= 0x400;
     GPO32_VAL    &=~0x400;
@@ -60,7 +60,7 @@ void _backlight_off(void)
 static unsigned short buttonight_brightness = DEFAULT_BRIGHTNESS_SETTING - 1;
 static unsigned short buttonlight_status = 0;
 
-void _buttonlight_on(void)
+void buttonlight_hw_on(void)
 {
     if (!buttonlight_status)
     {
@@ -69,7 +69,7 @@ void _buttonlight_on(void)
     }
 }
  
-void _buttonlight_off(void)
+void buttonlight_hw_off(void)
 {
     if (buttonlight_status)
     {
@@ -78,7 +78,7 @@ void _buttonlight_off(void)
     }
 }
 
-void _buttonlight_set_brightness(int brightness)
+void buttonlight_hw_brightness(int brightness)
 {
     buttonight_brightness = brightness - 1;
     touchpad_set_buttonlights(BUTTONLIGHT_MASK, buttonight_brightness);

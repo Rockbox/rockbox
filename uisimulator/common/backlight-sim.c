@@ -30,7 +30,7 @@ extern void lcd_awake(void);
 /* in uisimulator/sdl/lcd-bitmap.c and lcd-charcell.c */
 extern void sim_backlight(int value);
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     return true;
 }
@@ -45,7 +45,7 @@ static inline int normalize_backlight(int val)
            (MAX_BRIGHTNESS_SETTING - MIN_BRIGHTNESS_SETTING + 1);
 }
 
-void _backlight_set_brightness(int val)
+void backlight_hw_brightness(int val)
 {
     sim_backlight(normalize_backlight(val));
 }
@@ -53,7 +53,7 @@ void _backlight_set_brightness(int val)
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #if defined(HAVE_LCD_ENABLE)
     lcd_enable(true);
@@ -72,7 +72,7 @@ void _backlight_on(void)
 #endif
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     sim_backlight(0);
 #ifdef HAVE_LCD_ENABLE
@@ -82,16 +82,16 @@ void _backlight_off(void)
 
 
 #ifdef HAVE_BUTTON_LIGHT
-void _buttonlight_on(void)
+void buttonlight_hw_on(void)
 {
 }
 
-void _buttonlight_off(void)
+void buttonlight_hw_off(void)
 {
 }
 
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-void _buttonlight_set_brightness(int val)
+void buttonlight_hw_brightness(int val)
 {
     (void)val;
 }
@@ -99,12 +99,12 @@ void _buttonlight_set_brightness(int val)
 #endif /* HAVE_BUTTON_LIGHT */
 
 #ifdef HAVE_REMOTE_LCD
-void _remote_backlight_on(void)
+void remote_backlight_hw_on(void)
 {
     sim_remote_backlight(100);
 }
 
-void _remote_backlight_off(void)
+void remote_backlight_hw_off(void)
 {
     sim_remote_backlight(0);
 }

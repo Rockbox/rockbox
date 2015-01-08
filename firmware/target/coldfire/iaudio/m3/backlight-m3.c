@@ -25,7 +25,7 @@
 #include "backlight.h"
 #include "backlight-target.h"
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     and_l(~0x00000008, &GPIO1_OUT);
     or_l(0x00000008, &GPIO1_ENABLE);
@@ -33,12 +33,12 @@ bool _backlight_init(void)
     return true; /* Backlight always ON after boot. */
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     and_l(~0x00000008, &GPIO1_OUT);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     or_l(0x00000008, &GPIO1_OUT);
 }

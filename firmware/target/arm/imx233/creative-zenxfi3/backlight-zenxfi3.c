@@ -27,19 +27,19 @@
 #include "pwm-imx233.h"
 #include "mpr121.h"
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     imx233_pwm_setup_simple(2, 24000, brightness);
     imx233_pwm_enable(2, true);
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
-    _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
     return true;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
@@ -47,29 +47,29 @@ void _backlight_on(void)
     /* don't do anything special, the core will set the brightness */
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     /* there is no real on/off but we can set to 0 brightness */
-    _backlight_set_brightness(0);
+    backlight_hw_brightness(0);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif
 }
 
 /* ELE8 is the button light GPIO */
-void _buttonlight_on(void)
+void buttonlight_hw_on(void)
 {
     /* assume mpr121 was initialized by button-zenxfi3.c */
     mpr121_set_gpio_output(8, ELE_GPIO_SET);
 }
 
-void _buttonlight_off(void)
+void buttonlight_hw_off(void)
 {
     /* assume mpr121 was initialized by button-zenxfi3.c */
     mpr121_set_gpio_output(8, ELE_GPIO_CLR);
 }
 
-void _buttonlight_set_brightness(int brightness)
+void buttonlight_hw_brightness(int brightness)
 {
     /* assume mpr121 was initialized by button-zenxfi3.c */
     /* since backlight brightness is the same for the screen and the button light,

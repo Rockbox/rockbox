@@ -27,7 +27,7 @@
 #include "pwm-imx233.h"
 #include "pinctrl-imx233.h"
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     bool en = brightness > 0;
     imx233_pwm_setup_simple(2, 24000, 100 - brightness);
@@ -35,17 +35,17 @@ void _backlight_set_brightness(int brightness)
     imx233_pinctrl_set_gpio(0, 10, en);
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     imx233_pinctrl_acquire(0, 10, "backlight_enable");
     imx233_pinctrl_set_function(0, 10, PINCTRL_FUNCTION_GPIO);
     imx233_pinctrl_enable_gpio(0, 10, true);
     imx233_pinctrl_set_gpio(0, 10, true);
-    _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
     return true;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
@@ -53,10 +53,10 @@ void _backlight_on(void)
     /* don't do anything special, the core will set the brightness */
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     /* there is no real on/off but we can set to 0 brightness */
-    _backlight_set_brightness(0);
+    backlight_hw_brightness(0);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif

@@ -19,27 +19,27 @@
  *
  ****************************************************************************/
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     (void)brightness;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
 
 }
 
-void _buttonlight_on(void)
+void buttonlight_hw_on(void)
 {
 
 }
 
-void _buttonlight_off(void)
+void buttonlight_hw_off(void)
 {
 
 }

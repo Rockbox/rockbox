@@ -969,7 +969,7 @@ void sd_enable(bool on)
         if (buttonlight_is_on)
             GPIOD_DIR &= ~(1<<7);
         else
-            _buttonlight_off();
+           buttonlight_hw_off();
 #endif
 
 #if defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE)
@@ -993,7 +993,7 @@ void sd_enable(bool on)
 #if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
         bitmod32(&CCU_IO, 0<<2, 3<<2);  /* XPD is general purpose IO (b3:2 = 00) */
         if (buttonlight_is_on)
-            _buttonlight_on();
+           buttonlight_hw_on();
 #endif
     }
 }

@@ -25,7 +25,7 @@
 #include "backlight-target.h"
 #include "lcd.h"
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_SLEEP
     backlight_lcd_sleep_countdown(false); /* stop counter */
@@ -36,7 +36,7 @@ void _backlight_on(void)
     GPIO_SET_BITWISE(GPIOF_OUTPUT_VAL, 0x1);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     GPIO_CLEAR_BITWISE(GPIOF_OUTPUT_VAL, 0x1);
 #ifdef HAVE_LCD_ENABLE

@@ -27,12 +27,12 @@
 #include "ascodec.h"
 #include "lcd-target.h"
 
-bool _backlight_init()
+bool backlight_hw_init()
 {
     return true;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     /* GPIO B1 controls backlight */
     GPIOB_DIR |= (1 << 1);
@@ -43,7 +43,7 @@ void _backlight_on(void)
 #endif
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false);
@@ -52,7 +52,7 @@ void _backlight_off(void)
     GPIOB_PIN(1) = 0;
 }
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     oled_brightness(brightness);
 }

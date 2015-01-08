@@ -360,7 +360,7 @@ void system_init(void)
 
 void system_reboot(void)
 {
-    _backlight_off();
+    backlight_hw_off();
 
     disable_irq();
 

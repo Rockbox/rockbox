@@ -272,7 +272,7 @@ void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
     lcd_set_viewport(NULL);
 #endif
     lcd_clear_display();
-    _backlight_on();
+    backlight_hw_on();
 
     lcd_puts(0, 0, parse_exception(cause));
     lcd_putsf(0, 1, "0x%08x at 0x%08x", read_c0_badvaddr(), epc);

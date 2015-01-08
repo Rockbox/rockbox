@@ -81,8 +81,8 @@ void power_off(void)
     int(*reboot_point)(void);
     reboot_point=(void*)(unsigned char*) 0x00000000;
     /* turn off backlight and wait for 1 second */
-    _backlight_off();
-    _buttonlight_off();
+    backlight_hw_off();
+    buttonlight_hw_off();
     sleep(HZ);
     
     /* Do this to allow the drive to properly reset when player restarts 

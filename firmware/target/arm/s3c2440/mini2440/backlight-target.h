@@ -23,9 +23,9 @@
 
 #define GPIO_LCD_PWR (1 << 4)   /* GPIO.G4 */
 
-bool _backlight_init(void);
-void _backlight_on(void);
-void _backlight_off(void);
-void _backlight_set_brightness(int brightness);
+bool backlight_hw_init(void);
+void backlight_hw_on(void);
+void backlight_hw_off(void);
+void backlight_hw_brightness(int brightness);
 
 #endif

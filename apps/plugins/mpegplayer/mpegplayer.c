@@ -1093,7 +1093,7 @@ static void osd_lcd_enable_hook(unsigned short id, void* param)
 }
 #endif
 
-static void osd_backlight_on_video_mode(bool video_on)
+static void osdbacklight_hw_on_video_mode(bool video_on)
 {
     if (video_on) {
         /* Turn off backlight timeout */
@@ -1779,7 +1779,7 @@ static int osd_play(uint32_t time)
     retval = stream_seek(time, SEEK_SET);
 
     if (retval >= STREAM_OK) {
-        osd_backlight_on_video_mode(true);
+        osdbacklight_hw_on_video_mode(true);
         osd_backlight_brightness_video_mode(true);
         stream_show_vo(true);
 
@@ -1826,7 +1826,7 @@ static int osd_pause(void)
 
     osd_set_status(OSD_STATUS_PAUSED);
 
-    osd_backlight_on_video_mode(false);
+    osdbacklight_hw_on_video_mode(false);
     /* Leave brightness alone and restore it when OSD is hidden */
 
     if (stream_can_seek() && rb->global_settings->pause_rewind) {
@@ -1847,7 +1847,7 @@ static void osd_resume(void)
     /* Cancel video and resume auto refresh - the resyc when starting
      * playback will perform those tasks */
     osd_set_hp_pause_flag(false);
-    osd_backlight_on_video_mode(true);
+    osdbacklight_hw_on_video_mode(true);
     osd_backlight_brightness_video_mode(true);
     osd_cancel_refresh(OSD_REFRESH_VIDEO | OSD_REFRESH_RESUME);
     osd_set_status(OSD_STATUS_PLAYING);
@@ -1871,7 +1871,7 @@ static void osd_stop(void)
     if (resume_time != INVALID_TIMESTAMP)
         settings.resume_time = resume_time;
 
-    osd_backlight_on_video_mode(false);
+    osdbacklight_hw_on_video_mode(false);
     osd_backlight_brightness_video_mode(false);
 }
 

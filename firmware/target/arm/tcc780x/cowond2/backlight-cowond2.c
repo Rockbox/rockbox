@@ -26,15 +26,15 @@
 #include "tcc780x.h"
 #include "pmu-target.h"
 
-int _backlight_init(void)
+int backlight_hw_init(void)
 {
-    _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
     /* set backlight on by default, since the screen is unreadable without it */
-    _backlight_on();
+    backlight_hw_on();
     return true;
 }
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     int level = disable_irq_save();
     
@@ -56,7 +56,7 @@ void _backlight_set_brightness(int brightness)
     restore_irq(level);
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     if (get_pmu_type() == PCF50606)
     {
@@ -70,7 +70,7 @@ void _backlight_on(void)
     }
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     if (get_pmu_type() == PCF50606)
     {

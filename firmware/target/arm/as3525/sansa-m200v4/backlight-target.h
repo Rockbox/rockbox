@@ -21,22 +21,22 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-static inline bool _backlight_init(void)
+static inline bool backlight_hw_init(void)
 {
     GPIOD_DIR |= (1<<1);
     return true;
 }
 
-static inline void _backlight_on(void)
+static inline void backlight_hw_on(void)
 {
     GPIOD_PIN(1) = (1<<1);
 }
 
-static inline void _backlight_off(void)
+static inline void backlight_hw_off(void)
 {
     GPIOD_PIN(1) = 0x00;
 }
 
-#define _backlight_panic_on() _backlight_on()
+#define _backlight_panic_on() backlight_hw_on()
 
 #endif

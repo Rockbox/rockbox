@@ -21,18 +21,18 @@
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
-#define _backlight_init() true
-void _backlight_on(void);
-void _backlight_off(void);
+#define backlight_hw_init() true
+void backlight_hw_on(void);
+void backlight_hw_off(void);
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-void _backlight_set_brightness(int brightness);
+void backlight_hw_brightness(int brightness);
 #endif
 
 #ifdef HAVE_BUTTON_LIGHT
-void _buttonlight_on(void);
-void _buttonlight_off(void);
-void _buttonlight_set_brightness(int brightness);
+voidbuttonlight_hw_on(void);
+voidbuttonlight_hw_off(void);
+voidbuttonlight_hw_set_brightness(int brightness);
 #endif
 
 #endif /* BACKLIGHT_TARGET.H */

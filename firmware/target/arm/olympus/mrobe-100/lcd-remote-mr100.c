@@ -552,13 +552,13 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
     rc_status |= RC_UPDATE_LCD;
 }
 
-void _remote_backlight_on(void)
+void remote_backlight_hw_on(void)
 {
     rc_status |= RC_BACKLIGHT_ON;
     rc_status |= RC_UPDATE_CONTROLLER;
 }
 
-void _remote_backlight_off(void)
+void remote_backlight_hw_off(void)
 {
     rc_status &= ~RC_BACKLIGHT_ON;
     rc_status |= RC_UPDATE_CONTROLLER;

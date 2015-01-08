@@ -111,7 +111,7 @@ bool ide_powered(void)
 
 void power_off(void)
 {
-    _backlight_off();
+    backlight_hw_off();
     sleep(HZ/10);
 
     /* power off bit */

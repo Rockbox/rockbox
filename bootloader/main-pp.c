@@ -320,7 +320,7 @@ void* main(void)
 #endif
 #if defined(SANSA_E200) || defined(PHILIPS_SA9200)
     i2c_init();
-    _backlight_on();
+    backlight_hw_on();
 #endif
 
     if (button_hold())

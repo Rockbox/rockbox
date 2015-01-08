@@ -105,7 +105,7 @@ void imx233_chip_reset(void)
 
 void system_reboot(void)
 {
-    _backlight_off();
+    backlight_hw_off();
 
     disable_irq();
 
@@ -119,8 +119,8 @@ void system_exception_wait(void)
     imx233_rtc_enable_watchdog(false);
     /* make sure lcd and backlight are on */
     lcd_update();
-    _backlight_on();
-    _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    backlight_hw_on();
+    backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
     /* wait until button release (if a button is pressed) */
 #ifdef HAVE_BUTTON_DATA
     int data;

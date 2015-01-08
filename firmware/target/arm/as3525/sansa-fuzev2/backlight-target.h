@@ -25,13 +25,13 @@
 #include "config.h"
 #include "ascodec.h"
 
-bool _backlight_init(void);
-void _backlight_on(void);
-void _backlight_off(void);
-#define _backlight_panic_on() _backlight_on()
-void _backlight_set_brightness(int brightness);
+bool backlight_hw_init(void);
+void backlight_hw_on(void);
+void backlight_hw_off(void);
+#define _backlight_panic_on() backlight_hw_on()
+void backlight_hw_brightness(int brightness);
 #ifdef HAVE_BUTTON_LIGHT
-void _buttonlight_on(void);
-void _buttonlight_off(void);
+void buttonlight_hw_on(void);
+void buttonlight_hw_off(void);
 #endif
 #endif

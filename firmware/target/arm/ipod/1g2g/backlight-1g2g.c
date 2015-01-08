@@ -24,13 +24,13 @@
 #include "backlight.h"
 #include "backlight-target.h"
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     LCD1_CONTROL |= 0x02;
     lcd_set_backlight_inversion(true);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     LCD1_CONTROL &= ~0x02;
     lcd_set_backlight_inversion(false);

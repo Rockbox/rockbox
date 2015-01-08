@@ -27,13 +27,13 @@
 #include <stdio.h>
 #include "unistd.h"
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     /* We have nothing to do */
     return true;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     FILE *f = fopen("/sys/power/state", "w");
     fputs("on", f);
@@ -41,7 +41,7 @@ void _backlight_on(void)
     lcd_enable(true);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     FILE * f;
 
@@ -62,7 +62,7 @@ void _backlight_off(void)
 
 }
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     /* Just another check... */
     if (brightness > MAX_BRIGHTNESS_SETTING)

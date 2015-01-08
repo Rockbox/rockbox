@@ -92,7 +92,7 @@ int button_read_device(int *data)
     if (!(GPIOA & 0x4))
         btn |= BUTTON_POWER;
 
-    if (btn & BUTTON_TOUCHSCREEN && !is_backlight_on(true))
+    if (btn & BUTTON_TOUCHSCREEN && !isbacklight_hw_on(true))
         old_data = *data = 0;
 
     return btn;

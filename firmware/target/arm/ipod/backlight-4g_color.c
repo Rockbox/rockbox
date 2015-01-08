@@ -44,11 +44,11 @@ static unsigned char log_brightness[32] = {
 static unsigned brightness = 100;   /* 1 to 255 */
 static bool enabled = false;
 
-/* Handling B03 in _backlight_on() and _backlight_off() makes backlight go off
+/* Handling B03 in backlight_hw_on() and backlight_hw_off() makes backlight go off
  * without delay. Not doing that does a short (fixed) fade out. Opt for the
  * latter. */
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     /* brightness full */
     outl(0x80000000 | (brightness << 16), 0x7000a010);
@@ -56,27 +56,27 @@ void _backlight_on(void)
     enabled = true;
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     outl(0x80000000, 0x7000a010);
     GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x08);
     enabled = false;
 }
 
-void _backlight_set_brightness(int val)
+void backlight_hw_brightness(int val)
 {
     brightness = log_brightness[val];
     if (enabled)
         outl(0x80000000 | (brightness << 16), 0x7000a010);
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     GPIO_SET_BITWISE(GPIOB_ENABLE, 0x0c); /* B02 and B03 enable */
     GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 0x08); /* B03 = 1 */
     GPO32_ENABLE &= ~0x2000000; /* D01 disable, so pwm takes over */
     DEV_EN |= DEV_PWM;   /* PWM enable */
 
-    _backlight_on();
+    backlight_hw_on();
     return true;
 }

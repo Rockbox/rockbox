@@ -65,8 +65,8 @@ void lcd_set_sleep_after_backlight_off(int index);
 #endif /* !HAVE_BACKLIGHT */
 
 #ifdef HAVE_REMOTE_LCD
-void _remote_backlight_on(void);
-void _remote_backlight_off(void);
+void remote_backlight_hw_on(void);
+void remote_backlight_hw_off(void);
 void remote_backlight_on(void);
 void remote_backlight_off(void);
 void remote_backlight_set_timeout(int value);

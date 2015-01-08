@@ -28,7 +28,7 @@
 #include "pinctrl-imx233.h"
 #include "pwm-imx233.h"
 
-void _backlight_set_brightness(int level)
+void backlight_hw_brightness(int level)
 {
 #if defined(CREATIVE_ZENXFISTYLE)
     imx233_pwm_setup_simple(4, 24000, level);
@@ -49,7 +49,7 @@ void _backlight_set_brightness(int level)
 #endif
 }
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
 #if !defined(CREATIVE_ZENV) && !defined(CREATIVE_ZENXFISTYLE)
     imx233_pinctrl_acquire(1, 12, "backlight_enable");
@@ -60,19 +60,19 @@ bool _backlight_init(void)
     return true;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
 #endif
     /* restore the previous backlight level */
-    _backlight_set_brightness(backlight_brightness);
+    backlight_hw_brightness(backlight_brightness);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     /* there is no real on/off but we can set to 0 brightness */
-    _backlight_set_brightness(0);
+    backlight_hw_brightness(0);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif

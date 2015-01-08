@@ -28,7 +28,7 @@
 #include "pcf50606.h"
 #include "lcd.h"
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     or_l(0x00020000, &GPIO1_ENABLE);
     or_l(0x00020000, &GPIO1_FUNCTION);
@@ -37,21 +37,21 @@ bool _backlight_init(void)
     return true; /* Backlight always ON after boot. */
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     lcd_enable(true);
     sleep(HZ/100); /* lcd needs time - avoid flashing for dark screens */
     or_l(0x00020000, &GPIO1_OUT);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     and_l(~0x00020000, &GPIO1_OUT);
     lcd_enable(false);
 }
 
 /* set brightness by changing the PWM */
-void _backlight_set_brightness(int val)
+void backlight_hw_brightness(int val)
 {
     /* disable IRQs while bitbanging */
     int old_irq_level = disable_irq_save();
@@ -60,12 +60,12 @@ void _backlight_set_brightness(int val)
     restore_irq(old_irq_level);
 }
 
-void _remote_backlight_on(void)
+void remote_backlight_hw_on(void)
 {
     and_l(~0x00000002, &GPIO1_OUT);
 }
 
-void _remote_backlight_off(void)
+void remote_backlight_hw_off(void)
 {
     or_l(0x00000002, &GPIO1_OUT);
 }

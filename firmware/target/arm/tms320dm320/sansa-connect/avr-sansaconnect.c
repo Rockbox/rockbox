@@ -92,15 +92,15 @@ static void handle_wheel(unsigned char wheel)
     static unsigned char velocity = 0;
     static unsigned long wheel_delta = 1ul << 24;
     static unsigned char wheel_prev = 0;
-    static long next_backlight_on = 0;
+    static long nextbacklight_hw_on = 0;
     static int prev_key = -1;
     static int prev_key_post = 0;
 
-    if (TIME_AFTER(current_tick, next_backlight_on))
+    if (TIME_AFTER(current_tick, nextbacklight_hw_on))
     {
         backlight_on();
         reset_poweroff_timer();
-        next_backlight_on = current_tick + HZ/4;
+        nextbacklight_hw_on = current_tick + HZ/4;
     }
 
     if (wheel_prev < wheel)

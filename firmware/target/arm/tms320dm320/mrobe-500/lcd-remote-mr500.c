@@ -292,13 +292,13 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
     remote_state_control=REMOTE_CONTROL_DRAW;
 }
 
-void _remote_backlight_on(void)
+void remote_backlight_hw_on(void)
 {
     remote_power|=0x40;
     remote_state_control_next=REMOTE_CONTROL_POWER;
 }
 
-void _remote_backlight_off(void)
+void remote_backlight_hw_off(void)
 {
     remote_power&=~(0x40);
     remote_state_control_next=REMOTE_CONTROL_POWER;

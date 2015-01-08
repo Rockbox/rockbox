@@ -27,32 +27,32 @@
 
 static bool backlight_on_status = true; /* Is on or off? */
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     /* We have nothing to do */
     return true;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
     if (!backlight_on_status) {
-        _backlight_set_brightness(backlight_brightness);
+        backlight_hw_brightness(backlight_brightness);
     }
 
     backlight_on_status = true;
 
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     if (backlight_on_status) {
-        _backlight_set_brightness(0);
+        backlight_hw_brightness(0);
     }
 
     backlight_on_status = false;
 }
 
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     /* Just another check... */
     if (brightness > MAX_BRIGHTNESS_SETTING) {

@@ -24,7 +24,7 @@
 #include "config.h"
 #include "cpu.h"
 
-static inline bool _backlight_init(void)
+static inline bool backlight_hw_init(void)
 {
     PACR1 &= ~0x3000;    /* Set PA14 (backlight control) to GPIO */
     and_b(~0x40, &PADRH); /* drive and set low */
@@ -32,13 +32,13 @@ static inline bool _backlight_init(void)
     return true;
 }
 
-static inline void _backlight_on(void)
+static inline void backlight_hw_on(void)
 {
     and_b(~0x40, &PADRH); /* drive and set low */
     or_b(0x40, &PAIORH);
 }
 
-static inline void _backlight_off(void)
+static inline void backlight_hw_off(void)
 {
     and_b(~0x40, &PAIORH); /* let it float (up) */
 }

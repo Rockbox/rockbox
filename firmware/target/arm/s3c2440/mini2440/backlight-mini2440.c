@@ -46,7 +46,7 @@ static unsigned char backlight_target;
 
 
 /* Assumes that the backlight has been initialized */
-void _backlight_set_brightness(int brightness)
+void backlight_hw_brightness(int brightness)
 {
     if (brightness < 0)
         brightness = 0;
@@ -86,22 +86,22 @@ static void led_control_service(void)
             backlight_control = BACKLIGHT_CONTROL_IDLE;
             break;
         case BACKLIGHT_CONTROL_OFF:
-            _backlight_set_brightness(0);
+            backlight_hw_brightness(0);
             backlight_control = BACKLIGHT_CONTROL_IDLE;
             break;
         case BACKLIGHT_CONTROL_ON:
-            _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+            backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
             backlight_control = BACKLIGHT_CONTROL_IDLE;
             break;
         case BACKLIGHT_CONTROL_SET:
             /* TODO: This is probably wrong since it sets a fixed value.
             It was a fixed value of 255 before, but that was even more wrong
             since it accessed the log_brightness buffer out of bounds */
-            _backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
+            backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
             backlight_control = BACKLIGHT_CONTROL_IDLE;
             break;
         case BACKLIGHT_CONTROL_FADE:
-            _backlight_set_brightness(0);
+            backlight_hw_brightness(0);
             backlight_control = BACKLIGHT_CONTROL_IDLE;
             break;
         default:
@@ -127,7 +127,7 @@ static void __backlight_dim(bool dim_now)
         backlight_control = BACKLIGHT_CONTROL_FADE;
 }
 
-void _backlight_on(void)
+void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
@@ -135,13 +135,13 @@ void _backlight_on(void)
     __backlight_dim(false);
 }
 
-void _backlight_off(void)
+void backlight_hw_off(void)
 {
     __backlight_dim(true);
 }
 
 
-bool _backlight_init(void)
+bool backlight_hw_init(void)
 {
     unsigned char brightness = log_brightness[DEFAULT_BRIGHTNESS_SETTING];
     _backlight_brightness = brightness;
