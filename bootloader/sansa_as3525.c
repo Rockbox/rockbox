@@ -29,10 +29,10 @@
 #include "gcc_extensions.h"
 #include "../kernel-internal.h"
 #include "lcd.h"
-#ifdef USE_ROCKBOX_USB
+#ifdef HAVE_BOOTLOADER_USB_MODE
 #include "usb.h"
 #include "sysfont.h"
-#endif /* USE_ROCKBOX_USB */
+#endif /* HAVE_BOOTLOADER_USB_MODE */
 #include "backlight.h"
 #include "button-target.h"
 #include "common.h"
@@ -46,7 +46,7 @@
 
 void show_logo(void);
 
-#ifdef USE_ROCKBOX_USB
+#ifdef HAVE_BOOTLOADER_USB_MODE
 static void usb_mode(void)
 {
     if(usb_detect() != USB_INSERTED)
@@ -73,7 +73,7 @@ static void usb_mode(void)
     reset_screen();
     lcd_update();
 }
-#endif /* USE_ROCKBOX_USB */
+#endif /* HAVE_BOOTLOADER_USB_MODE */
 
 void main(void) NORETURN_ATTR;
 void main(void)
@@ -122,7 +122,7 @@ void main(void)
 
     filesystem_init();
 
-#ifdef USE_ROCKBOX_USB
+#ifdef HAVE_BOOTLOADER_USB_MODE
     usb_init();
 
     /* Enter USB mode if USB is plugged and SELECT button is pressed */
@@ -131,11 +131,11 @@ void main(void)
         if(usb_detect() == USB_INSERTED)
             usb_mode();
     }
-#endif /* USE_ROCKBOX_USB */
+#endif /* HAVE_BOOTLOADER_USB_MODE */
 
     while((ret = disk_mount_all()) <= 0)
     {
-#ifdef USE_ROCKBOX_USB
+#ifdef HAVE_BOOTLOADER_USB_MODE
         error(EDISK, ret, false);
         usb_mode();
 #else
@@ -150,7 +150,7 @@ void main(void)
 
     while((ret = load_firmware(loadbuffer, BOOTFILE, buffer_size)) <= EFILE_EMPTY)
     {
-#ifdef USE_ROCKBOX_USB
+#ifdef HAVE_BOOTLOADER_USB_MODE
         error(EBOOTFILE, ret, false);
         usb_mode();
 #else
