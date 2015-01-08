@@ -95,6 +95,7 @@ static void usb_mode(int connect_timeout)
         powermgmt_init();
         adc_init();
 
+        /* ack the SYS_USB_CONNECTED polled from the button queue */
         usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
         while(1)
