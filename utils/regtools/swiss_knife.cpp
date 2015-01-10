@@ -586,6 +586,15 @@ void usage()
     printf("  convert <input file> <output file>\n");
     printf("  check <files...>\n");
     printf("  dump [--nodes] [--instances] [--registers] [--verbose] <files...>\n");
+    printf("\n");
+    printf("The following operations are performed in each mode:\n");
+    printf("* read: open and parse the files, reports any obvious errors\n");
+    printf("* write: open, parse a file and write it back, checks the parser/generator match\n");
+    printf("* eval: evaluate a formula with the formula parser\n");
+    printf("* convert: convert a description file from version 1 to version 2\n");
+    printf("* check: performs deep checks on description files\n");
+    printf("* dump: debug tool to dump internal structures\n");
+    printf("* convertdump: convert a register dump from version 1 to version 2\n");
     exit(1);
 }
 
