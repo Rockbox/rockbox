@@ -280,6 +280,12 @@ public:
     /** Compare this reference to another */
     bool operator==(const node_ref_t& r) const;
     inline bool operator!=(const node_ref_t& r) const { return !operator==(r); }
+    /** Delete the node (and children) pointed by the reference, invalidating it
+     * NOTE: if reference points to the root node, deletes all nodes
+     * NOTE: does nothing if the reference is not valid */
+    void remove();
+    /** Create a new child node and returns a reference to it */
+    node_ref_t create();
 };
 
 /** SoC register reference */
@@ -305,6 +311,9 @@ public:
     /** Compare this reference to another */
     bool operator==(const register_ref_t& r) const;
     inline bool operator!=(const register_ref_t& r) const { return !operator==(r); }
+    /** Delete the register pointed by the reference, invalidating it
+     * NOTE: does nothing if the reference is not valid */
+    void remove();
 };
 
 /** SoC register field reference */
