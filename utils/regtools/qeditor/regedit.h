@@ -38,6 +38,8 @@
 #include <QButtonGroup>
 #include <QDebug>
 #include <QScrollArea>
+#include <QSpinBox>
+#include <QFormLayout>
 #include "backend.h"
 #include "settings.h"
 #include "mainwindow.h"
@@ -48,7 +50,7 @@ class AbstractRegEditPanel
 public:
     AbstractRegEditPanel() {}
     virtual ~AbstractRegEditPanel() {}
-    virtual void OnModified(bool mod) = 0;
+    virtual void OnModified() = 0;
 };
 
 class EmptyEditPanel : public QWidget, public AbstractRegEditPanel
@@ -58,7 +60,7 @@ public:
     EmptyEditPanel(QWidget *parent);
 
 signals:
-    void OnModified(bool mod);
+    void OnModified();
 
 protected:
 };
@@ -67,178 +69,167 @@ class SocEditPanel : public QWidget, public AbstractRegEditPanel
 {
     Q_OBJECT
 public:
-    SocEditPanel(SocRef ref, QWidget *parent = 0);
+    SocEditPanel(const soc_desc::soc_ref_t& ref, QWidget *parent = 0);
 
 signals:
-    void OnModified(bool mod);
+    void OnModified();
 
 protected slots:
     void OnTextEdited();
     void OnNameEdited(const QString& text);
+    void OnTitleEdited(const QString& text);
+    void OnVersionEdited(const QString& text);
+    void OnIsaEdited(const QString& text);
+    void OnAuthorActivated(QTableWidgetItem *);
+    void OnAuthorChanged(QTableWidgetItem *);
 
 protected:
-    SocRef m_ref;
-    QGroupBox *m_name_group;
-    QLineEdit *m_name_edit;
-    QGroupBox *m_desc_group;
+    soc_desc::soc_ref_t m_ref;
+    QTableWidget *m_authors_list;
     MyTextEditor *m_desc_edit;
 };
 
-class DevEditPanel : public QWidget, public AbstractRegEditPanel
+class NodeInstanceEditPanel : public QWidget
 {
     Q_OBJECT
 public:
-    DevEditPanel(SocDevRef ref, QWidget *parent = 0);
+    NodeInstanceEditPanel(const soc_desc::node_ref_t& ref, soc_id_t inst_id,
+        QWidget *parent = 0);
+    soc_id_t GetId();
+    soc_desc::instance_t& GetInstance();
 
 signals:
-    void OnModified(bool mod);
+    void OnModified();
 
 protected slots:
-    void OnInstActivated(int row, int column);
-    void OnInstChanged(int row, int column);
     void OnNameEdited(const QString& text);
-    void OnLongNameEdited(const QString& text);
-    void OnVersionEdited(const QString& text);
-    void OnDescEdited();
+    void OnTitleEdited(const QString& text);
+    void OnDescEdited(const QString& text);
+    void OnTypeChanged(int index);
+    void OnAddrChanged(uint addr);
+    void OnBaseChanged(uint base);
+    void OnStrideChanged(uint stride);
+    void OnFirstChanged(int first);
+    void OnCountChanged(int count);
+    void OnFormulaChanged(const QString& formula);
+    void OnVariableChanged(const QString& variable);
+    void OnAddressActivated(QTableWidgetItem *);
+    void OnAddressChanged(QTableWidgetItem *);
 
 protected:
-    void FillRow(int row, const soc_dev_addr_t& addr);
-    void CreateNewRow(int row);
+    void UpdateType(int type);
 
-    enum
-    {
-        DevInstDeleteType = QTableWidgetItem::UserType,
-        DevInstNewType
-    };
+    soc_desc::node_ref_t m_ref;
+    soc_id_t m_id;
+    QComboBox *m_type_combo;
+    QWidget *m_single_group;
+    QWidget *m_range_group;
+    QWidget *m_formula_group;
+    QWidget *m_stride_group;
+    QWidget *m_list_group;
+    QStyledItemDelegate *m_table_delegate;
+    SocFieldEditorCreator *m_table_edit_factory;
+};
 
-    enum
-    {
-        DevInstIconColumn = 0,
-        DevInstNameColumn = 1,
-        DevInstAddrColumn = 2,
-    };
+class NodeEditPanel : public QWidget, public AbstractRegEditPanel
+{
+    Q_OBJECT
+public:
+    NodeEditPanel(const soc_desc::node_ref_t& ref, QWidget *parent = 0);
 
-    SocDevRef m_ref;
-    QGroupBox *m_name_group;
-    QLineEdit *m_name_edit;
-    QGroupBox *m_long_name_group;
-    QLineEdit *m_long_name_edit;
-    QGroupBox *m_version_group;
-    QLineEdit *m_version_edit;
-    QGroupBox *m_instances_group;
-    QTableWidget *m_instances_table;
-    QGroupBox *m_desc_group;
+signals:
+    void OnModified();
+
+protected slots:
+    void OnNameEdited(const QString& text);
+    void OnTitleEdited(const QString& text);
+    void OnDescEdited();
+    void OnInstRemove(int index);
+    void OnInstCreate();
+    void OnInstModified();
+
+protected:
+    soc_desc::instance_t *GetInstanceById(soc_id_t id);
+    soc_desc::instance_t *GetInstanceByRow(int row);
+    QString GuessName();
+
+    soc_desc::node_ref_t m_ref;
     MyTextEditor *m_desc_edit;
+    YTabWidget *m_instances_tab;
+};
+
+class RegFieldEditPanel : public QWidget
+{
+    Q_OBJECT
+public:
+    RegFieldEditPanel(const soc_desc::field_ref_t& ref, QWidget *parent = 0);
+    soc_desc::field_ref_t GetField();
+    void UpdateWidth();
+
+signals:
+    void OnModified();
+
+protected slots:
+    void OnFieldNameChanged(const QString& name);
+    void OnFieldRangeChanged(const QString& range);
+    void OnFieldDescChanged(const QString& name);
+    void OnFieldValueActivated(QTableWidgetItem *item);
+    void OnFieldValueChanged(QTableWidgetItem *item);
+
+protected:
+
+    soc_desc::field_ref_t m_ref;
+    QLineEdit *m_name_edit;
+    QLineEdit *m_range_edit;
+    SocBitRangeValidator *m_range_validator;
+    MyTextEditor *m_desc_edit;
+    QTableWidget *m_enum_table;
+    SocFieldItemDelegate *m_enum_delegate;
+    SocFieldEditorCreator *m_enum_editor;
 };
 
 class RegEditPanel : public QWidget, public AbstractRegEditPanel
 {
     Q_OBJECT
 public:
-    RegEditPanel(SocRegRef ref, QWidget *parent = 0);
+    RegEditPanel(const soc_desc::register_ref_t& ref, QWidget *parent = 0);
 
 signals:
-    void OnModified(bool mod);
+    void OnModified();
 
 protected slots:
-    void OnInstActivated(int row, int column);
-    void OnInstChanged(int row, int column);
-    void OnNameEdited(const QString& text);
+    void OnRegFieldActivated(const QModelIndex& index);
+    void OnRegDisplayContextMenu(QPoint point);
+    void OnRegFieldDelete();
+    void OnRegFieldNew();
+    void OnWidthChanged(int size);
+    void OnFieldModified();
     void OnDescEdited();
-    void OnSctEdited(int state);
-    void OnFormulaChanged(int index);
-    void OnFormulaStringChanged(const QString& text);
-    void OnFormulaGenerate(bool checked);
+    void OnVariantActivated(QTableWidgetItem *item);
+    void OnVariantValueChanged(QTableWidgetItem *item);
+    void OnFieldRemove(int index);
+    void OnFieldCreate();
 
 protected:
-    void CreateNewAddrRow(int row);
-    void FillRow(int row, const soc_reg_addr_t& addr);
-    void UpdateFormula();
-    void UpdateWarning(int row);
+    void DoModify();
+    int FindFreeBit(int preferred);
+    int IndexById(soc_id_t id); // tab index
+    void UpdateWidthRestrictions();
 
-    enum
-    {
-        RegInstDeleteType = QTableWidgetItem::UserType,
-        RegInstNewType
-    };
-
-    enum
-    {
-        RegInstIconColumn = 0,
-        RegInstNameColumn,
-        RegInstAddrColumn,
-        RegInstNrColumns,
-    };
-
-    SocRegRef m_ref;
-    QGroupBox *m_name_group;
-    QLineEdit *m_name_edit;
-    QGroupBox *m_instances_group;
-    QTableWidget *m_instances_table;
-    QGroupBox *m_desc_group;
-    QGroupBox *m_flags_group;
-    QCheckBox *m_sct_check;
+    MyTextEditor *m_desc_edit;
+    soc_desc::register_ref_t m_ref;
     QFont m_reg_font;
-    QGroupBox *m_formula_group;
-    QButtonGroup *m_formula_radio_group;
-    QLabel *m_formula_type_label;
-    QComboBox *m_formula_combo;
-    QLineEdit *m_formula_string_edit;
-    QPushButton *m_formula_string_gen;
-    Unscroll< RegSexyDisplay2 > *m_sexy_display2;
-    MyTextEditor *m_desc_edit;
-    QGroupBox *m_field_group;
-    QTableView *m_value_table;
+    Unscroll< YRegDisplay > *m_sexy_display2;
     RegFieldTableModel *m_value_model;
-    QStyledItemDelegate *m_table_delegate;
-};
-
-class FieldEditPanel : public QWidget, public AbstractRegEditPanel
-{
-    Q_OBJECT
-public:
-    FieldEditPanel(SocFieldRef ref, QWidget *parent = 0);
-
-signals:
-    void OnModified(bool mod);
-
-protected slots:
-    void OnDescEdited();
-    void OnNameEdited(const QString& text);
-    void OnBitRangeEdited(const QString& string);
-    void OnValueActivated(int row, int column);
-    void OnValueChanged(int row, int column);
-
-protected:
-    void CreateNewRow(int row);
-    void FillRow(int row, const soc_reg_field_value_t& val);
-    void UpdateWarning(int row);
-    void UpdateDelegates();
-
-    enum
-    {
-        FieldValueDeleteType = QTableWidgetItem::UserType,
-        FieldValueNewType,
-    };
-
-    enum
-    {
-        FieldValueIconColumn = 0,
-        FieldValueNameColumn,
-        FieldValueValueColumn,
-        FieldValueDescColumn,
-        FieldValueNrColumns,
-    };
-
-    SocFieldRef m_ref;
-    QGroupBox *m_name_group;
-    QLineEdit *m_name_edit;
-    QGroupBox *m_bitrange_group;
-    QLineEdit *m_bitrange_edit;
-    QGroupBox *m_desc_group;
-    MyTextEditor *m_desc_edit;
-    QGroupBox *m_value_group;
-    QTableWidget *m_value_table;
+    YTabWidget *m_fields_tab;
+    QTabWidget *m_view_tab;
+    QTableWidget *m_variant_table;
+    QAction *m_new_action;
+    QAction *m_delete_action;
+    QPoint m_menu_point;
+    SocFieldItemDelegate *m_variant_delegate;
+    SocFieldEditorCreator *m_variant_editor;
+    QButtonGroup *m_reg_size_group;
 };
 
 class RegEdit : public QWidget, public DocumentTab
@@ -252,43 +243,50 @@ public:
 
 protected slots:
     void OnSocItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
-    void OnSocItemActivated(QTreeWidgetItem *current, int column);
     void OnOpen();
     void OnSave();
     void OnSaveAs();
-    void OnSocModified(bool modified);
+    void OnSocModified();
     void OnNew();
     void OnSocItemDelete();
+    void OnSocItemNew();
+    void OnSocItemCreate();
+    void OnSocTreeContextMenu(QPoint point);
 
 protected:
     void LoadSocFile(const QString& filename);
     void UpdateSocFile();
     void FillSocTree();
-    void FillSocTreeItem(QTreeWidgetItem *_item);
-    void FillDevTreeItem(QTreeWidgetItem *_item);
-    void FillRegTreeItem(QTreeWidgetItem *_item);
+    void FillNodeTreeItem(QTreeWidgetItem *item);
     void SetPanel(QWidget *panel);
-    void DisplaySoc(SocRef ref);
-    void DisplayDev(SocDevRef ref);
-    void DisplayReg(SocRegRef ref);
-    void DisplayField(SocFieldRef ref);
+    void DisplaySoc(const soc_desc::soc_ref_t& ref);
+    void DisplayNode(const soc_desc::node_ref_t& ref);
+    void DisplayReg(const soc_desc::register_ref_t& ref);
     bool CloseSoc();
     bool SaveSoc();
     bool SaveSocAs();
     bool SaveSocFile(const QString& filename);
     bool GetFilename(QString& filename, bool save);
     void SetModified(bool add, bool mod);
-    void FixupEmptyItem(QTreeWidgetItem *item);
+    void FixupItem(QTreeWidgetItem *item);
+    QIcon GetIconFromType(int type);
     void MakeItalic(QTreeWidgetItem *item, bool it);
     void AddDevice(QTreeWidgetItem *item);
     void AddRegister(QTreeWidgetItem *_item);
     void UpdateName(QTreeWidgetItem *current);
     void AddField(QTreeWidgetItem *_item);
-    void CreateNewDeviceItem(QTreeWidgetItem *parent);
+    void CreateNewNodeItem(QTreeWidgetItem *parent);
     void CreateNewRegisterItem(QTreeWidgetItem *parent);
     void CreateNewFieldItem(QTreeWidgetItem *parent);
     void UpdateTabName();
+    bool ValidateName(const QString& name);
+    int SetMessage(MessageWidget::MessageType type, const QString& msg);
+    void HideMessage(int id);
 
+    QAction *m_delete_action;
+    QAction *m_new_action;
+    QAction *m_create_action;
+    QTreeWidgetItem *m_action_item;
     QGroupBox *m_file_group;
     QToolButton *m_file_open;
     QToolButton *m_file_save;
@@ -299,6 +297,10 @@ protected:
     bool m_modified;
     SocFile m_cur_socfile;
     QWidget *m_right_panel;
+    MessageWidget *m_msg;
+    QVBoxLayout *m_right_panel_layout;
+    int m_msg_welcome_id;
+    int m_msg_name_error_id;
 };
 
 #endif /* REGEDIT_H */ 
