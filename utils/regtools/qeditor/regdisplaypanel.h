@@ -47,7 +47,8 @@ class SocDisplayPanel : public QGroupBox, public RegTabPanel
 {
     Q_OBJECT
 public:
-    SocDisplayPanel(QWidget *parent, const SocRef& reg);
+    SocDisplayPanel(QWidget *parent, IoBackend *io_backend,
+        const soc_desc::soc_ref_t& reg);
     void Reload();
     void AllowWrite(bool en);
     QWidget *GetWidget();
@@ -55,16 +56,17 @@ public:
 
 protected:
 
-    const SocRef& m_soc;
+    soc_desc::soc_ref_t m_soc;
     QLabel *m_name;
     QLabel *m_desc;
 };
 
-class DevDisplayPanel : public QGroupBox, public RegTabPanel
+class NodeDisplayPanel : public QGroupBox, public RegTabPanel
 {
     Q_OBJECT
 public:
-    DevDisplayPanel(QWidget *parent, const SocDevRef& reg);
+    NodeDisplayPanel(QWidget *parent, IoBackend *io_backend,
+        const soc_desc::node_inst_t& reg);
     void Reload();
     void AllowWrite(bool en);
     QWidget *GetWidget();
@@ -72,7 +74,7 @@ public:
 
 protected:
 
-    const SocDevRef& m_dev;
+    soc_desc::node_inst_t m_node;
     QFont m_reg_font;
     QLabel *m_name;
     QLabel *m_desc;
@@ -82,7 +84,8 @@ class RegDisplayPanel : public QGroupBox, public RegTabPanel
 {
     Q_OBJECT
 public:
-    RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const SocRegRef& reg);
+    RegDisplayPanel(QWidget *parent, IoBackend *io_backend,
+        const soc_desc::node_inst_t& reg);
     ~RegDisplayPanel();
     void AllowWrite(bool en);
     void Reload();
@@ -102,7 +105,7 @@ protected:
     };
 
     IoBackend *m_io_backend;
-    const SocRegRef& m_reg;
+    soc_desc::node_inst_t m_node;
     bool m_allow_write;
     RegLineEdit *m_raw_val_edit;
     Unscroll< RegSexyDisplay2 > *m_sexy_display2;
@@ -113,6 +116,7 @@ protected:
     RegItemEditorCreator *m_regedit_creator;
     QLabel *m_raw_val_name;
     QFont m_reg_font;
+    QLabel *m_name;
     QLabel *m_desc;
     QWidget *m_viewport;
     QScrollArea *m_scroll;

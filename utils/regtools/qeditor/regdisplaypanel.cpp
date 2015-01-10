@@ -39,18 +39,20 @@ QByteArray RegItemEditorCreator::valuePropertyName () const
 /**
  * SocDisplayPanel
  */
-SocDisplayPanel::SocDisplayPanel(QWidget *parent, const SocRef& dev_ref)
-    :QGroupBox(parent), m_soc(dev_ref)
+SocDisplayPanel::SocDisplayPanel(QWidget *parent, IoBackend *io_backend,
+        const soc_desc::soc_ref_t& ref)
+    :QGroupBox(parent), m_soc(ref)
 {
+    Q_UNUSED(io_backend)
     QVBoxLayout *right_layout = new QVBoxLayout;
 
     m_name = new QLabel(this);
     m_name->setTextFormat(Qt::RichText);
-    m_name->setText("<h1>" + QString::fromStdString(m_soc.GetSoc().name) + "</h1>");
+    m_name->setText("<h1>" + QString::fromStdString(m_soc.get()->name) + "</h1>");
 
     m_desc = new QLabel(this);
     m_name->setTextFormat(Qt::RichText);
-    m_desc->setText(QString::fromStdString(m_soc.GetSoc().desc));
+    m_desc->setText(QString::fromStdString(m_soc.get()->desc));
 
     right_layout->addWidget(m_name, 0);
     right_layout->addWidget(m_desc, 0);
@@ -71,24 +73,24 @@ QWidget *SocDisplayPanel::GetWidget()
 }
 
 /**
- * DevDisplayPanel
+ * NodeDisplayPanel
  */
-DevDisplayPanel::DevDisplayPanel(QWidget *parent, const SocDevRef& dev_ref)
-    :QGroupBox(parent), m_dev(dev_ref), m_reg_font(font())
+NodeDisplayPanel::NodeDisplayPanel(QWidget *parent, IoBackend *io_backend,
+        const soc_desc::node_inst_t& ref)
+    :QGroupBox(parent), m_node(ref), m_reg_font(font())
 {
+    BackendHelper helper(io_backend, ref.soc());
     QVBoxLayout *right_layout = new QVBoxLayout;
-    const soc_dev_addr_t& dev_addr = m_dev.GetDevAddr();
 
     m_reg_font.setWeight(100);
     m_reg_font.setKerning(false);
 
-    QString dev_name;
-    dev_name.sprintf("HW_%s_BASE", dev_addr.name.c_str());
+    QString dev_name = helper.GetPath(ref);
 
     QLabel *label_names = new QLabel("<b>" + dev_name + "</b>");
     label_names->setTextFormat(Qt::RichText);
 
-    QLabel *label_addr = new QLabel("<b>" + QString().sprintf("0x%03x", dev_addr.addr) + "</b>");
+    QLabel *label_addr = new QLabel("<b>" + QString().sprintf("0x%03x", ref.addr()) + "</b>");
     label_addr->setTextFormat(Qt::RichText);
 
     QHBoxLayout *top_layout = new QHBoxLayout;
@@ -99,11 +101,11 @@ DevDisplayPanel::DevDisplayPanel(QWidget *parent, const SocDevRef& dev_ref)
 
     m_name = new QLabel(this);
     m_name->setTextFormat(Qt::RichText);
-    m_name->setText("<h1>" + QString::fromStdString(m_dev.GetDev().long_name) + "</h1>");
+    m_name->setText("<h1>" + QString::fromStdString(ref.node().get()->title) + "</h1>");
 
     m_desc = new QLabel(this);
     m_name->setTextFormat(Qt::RichText);
-    m_desc->setText(QString::fromStdString(m_dev.GetDev().desc));
+    m_desc->setText(QString::fromStdString(ref.node().get()->desc));
 
     right_layout->addWidget(m_name, 0);
     right_layout->addLayout(top_layout, 0);
@@ -114,12 +116,12 @@ DevDisplayPanel::DevDisplayPanel(QWidget *parent, const SocDevRef& dev_ref)
     setLayout(right_layout);
 }
 
-void DevDisplayPanel::AllowWrite(bool en)
+void NodeDisplayPanel::AllowWrite(bool en)
 {
     Q_UNUSED(en);
 }
 
-QWidget *DevDisplayPanel::GetWidget()
+QWidget *NodeDisplayPanel::GetWidget()
 {
     return this;
 }
@@ -128,26 +130,24 @@ QWidget *DevDisplayPanel::GetWidget()
  * RegDisplayPanel
  */
 
-RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const SocRegRef& reg_ref)
-    :QGroupBox(parent), m_io_backend(io_backend), m_reg(reg_ref), m_reg_font(font())
+RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend,
+        const soc_desc::node_inst_t& ref)
+    :QGroupBox(parent), m_io_backend(io_backend), m_node(ref), m_reg_font(font())
 {
     bool read_only = m_io_backend->IsReadOnly();
+    BackendHelper helper(m_io_backend, ref.soc());
 
     QVBoxLayout *right_layout = new QVBoxLayout;
-
-    const soc_dev_addr_t& dev_addr = m_reg.GetDevAddr();
-    const soc_reg_t& reg = m_reg.GetReg();
-    const soc_reg_addr_t& reg_addr = m_reg.GetRegAddr();
 
     m_reg_font.setWeight(100);
     m_reg_font.setKerning(false);
 
-    QString reg_name;
-    reg_name.sprintf("HW_%s_%s", dev_addr.name.c_str(), reg_addr.name.c_str());
+    QString reg_name = helper.GetPath(ref);
     QStringList names;
     QVector< soc_addr_t > addresses;
     names.append(reg_name);
-    addresses.append(reg_addr.addr);
+    addresses.append(ref.addr());
+    /*
     if(reg.flags & REG_HAS_SCT)
     {
         names.append(reg_name + "_SET");
@@ -157,6 +157,7 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const S
         addresses.append(reg_addr.addr + 8);
         addresses.append(reg_addr.addr + 12);
     }
+    */
 
     QString str;
     str += "<table align=left>";
@@ -188,7 +189,7 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const S
     m_raw_val_edit->SetReadOnly(read_only);
     m_raw_val_edit->GetLineEdit()->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     m_raw_val_edit->GetLineEdit()->setValidator(new SocFieldValidator(m_raw_val_edit));
-    m_raw_val_edit->EnableSCT(!!(reg.flags & REG_HAS_SCT));
+    //m_raw_val_edit->EnableSCT(!!(reg.flags & REG_HAS_SCT));
     m_raw_val_edit->GetLineEdit()->setFont(m_reg_font);
     QHBoxLayout *raw_val_layout = new QHBoxLayout;
     raw_val_layout->addStretch();
@@ -198,7 +199,7 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const S
 
     m_value_table = new GrowingTableView();
     m_value_model = new RegFieldTableModel(m_value_table); // view takes ownership
-    m_value_model->SetRegister(m_reg.GetReg());
+    m_value_model->SetRegister(*m_node.node().reg().get());
     m_value_model->SetReadOnly(read_only);
     m_value_table->setModel(m_value_model);
     m_value_table->verticalHeader()->setVisible(false);
@@ -222,10 +223,15 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const S
     m_sexy_display2->setModel(m_value_model);
     m_sexy_display2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    m_name = new QLabel(this);
+    m_name->setTextFormat(Qt::RichText);
+    m_name->setText("<h1>" + QString::fromStdString(ref.node().get()->title) + "</h1>");
+
     m_desc = new QLabel(this);
     m_desc->setTextFormat(Qt::RichText);
-    m_desc->setText(QString::fromStdString(m_reg.GetReg().desc));
+    m_desc->setText(QString::fromStdString(m_node.node().get()->desc));
 
+    right_layout->addWidget(m_name);
     right_layout->addWidget(m_desc);
     right_layout->addLayout(top_layout);
     if(raw_val_layout)
@@ -263,12 +269,9 @@ RegDisplayPanel::~RegDisplayPanel()
 
 void RegDisplayPanel::Reload()
 {
-    const soc_dev_addr_t& dev_addr = m_reg.GetDevAddr();
-    const soc_reg_t& reg = m_reg.GetReg();
-    const soc_reg_addr_t& reg_addr = m_reg.GetRegAddr();
     soc_word_t value;
-    BackendHelper helper(m_io_backend, m_reg);
-    bool has_value = helper.ReadRegister(dev_addr.name.c_str(), reg_addr.name.c_str(), value);
+    BackendHelper helper(m_io_backend, m_node.soc());
+    bool has_value = helper.ReadRegister(m_node,  value);
 
     if(has_value)
     {
@@ -320,9 +323,8 @@ void RegDisplayPanel::OnRawRegValueReturnPressed()
     if(state != QValidator::Acceptable)
         return;
     IoBackend::WriteMode mode = EditModeToWriteMode(m_raw_val_edit->GetMode());
-    BackendHelper helper(m_io_backend, m_reg);
-    helper.WriteRegister(m_reg.GetDevAddr().name.c_str(), m_reg.GetRegAddr().name.c_str(),
-        val, mode);
+    BackendHelper helper(m_io_backend, m_node.soc());
+    helper.WriteRegister(m_node, val, mode);
     // register write can change all fields
     Reload();
 }
@@ -332,9 +334,8 @@ void RegDisplayPanel::OnRegValueChanged(int index)
     QVariant var = m_value_model->GetValue(index);
     if(!var.isValid())
         return;
-    BackendHelper helper(m_io_backend, m_reg);
-    helper.WriteRegister(m_reg.GetDevAddr().name.c_str(), m_reg.GetRegAddr().name.c_str(),
-        var.value< soc_word_t >(), IoBackend::Write);
+    BackendHelper helper(m_io_backend, m_node.soc());
+    helper.WriteRegister(m_node, var.value< soc_word_t >(), IoBackend::Write);
     // register write can change all fields
     Reload();
 }
