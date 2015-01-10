@@ -177,6 +177,7 @@ and an optional description. The example below illustrates all these concepts:
 
 <register>
   <width>8</width>
+  <desc>This register controls the parameters of the interrupt: priority, IRQ/FIQ and enable</desc>
   <field>
     <name>MODE</name>
     <desc>Interrupt mode</desc>
@@ -218,6 +219,10 @@ and an optional description. The example below illustrates all these concepts:
       <value>1</value>
     </enum>
   </field>
+  <variant>
+    <type>set</type>
+    <offset>0x4</offset>
+  </variant>
 </register>
 
 In this example, the 8-bit registers has three fields:
@@ -350,7 +355,15 @@ Element: register
 It can contain at most one of each of the following tags:
 - width: width in bits (positive number)
 It can contain any number of the following tags:
+- desc: free form description of the register
 - field: field description
+- variant: variant description
+
+Element: variant
+--------------
+It must contain the following tags:
+- type: name of type, only made of alphanumerical characters
+- offset: offset with respect to register address
 
 Element: field
 --------------
