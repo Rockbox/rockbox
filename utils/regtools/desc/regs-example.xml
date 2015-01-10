@@ -17,7 +17,6 @@
         </instance>
         <node>
             <name>status</name>
-            <access>read-only</access>
             <title>Interrupt status register</title>
             <instance>
                 <name>STATUS</name>
@@ -30,6 +29,16 @@
                     <desc>VDDIO brownout interrupt status</desc>
                     <position>0</position>
                 </field>
+                <field>
+                    <name>VDDD_BO</name>
+                    <desc>VDDD brownout interrupt status</desc>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>VDDA_BO</name>
+                    <desc>VDDA brownout interrupt status</desc>
+                    <position>1</position>
+                </field>
             </register>
         </node>
         <node>
@@ -41,6 +50,7 @@
             </instance>
             <register>
                 <width>16</width>
+                <desc>This register controls the routing of the interrupt</desc>
                 <field>
                     <name>VDDIO_BO</name>
                     <desc>VDDIO brownout interrupt enable</desc>
@@ -62,15 +72,15 @@
                         <value>2</value>
                     </enum>
                 </field>
+                <variant>
+                    <type>set</type>
+                    <offset>4</offset>
+                </variant>
+                <variant>
+                    <type>clr</type>
+                    <offset>8</offset>
+                </variant>
             </register>
-            <variant>
-                <type>set</type>
-                <offset>4</offset>
-            </variant>
-            <variant>
-                <type>clr</type>
-                <offset>8</offset>
-            </variant>
         </node>
     </node>
     <node>
@@ -134,19 +144,19 @@
                         <position>0</position>
                         <width>8</width>
                     </field>
+                    <variant>
+                        <type>set</type>
+                        <offset>4</offset>
+                    </variant>
+                    <variant>
+                        <type>clr</type>
+                        <offset>8</offset>
+                    </variant>
+                    <variant>
+                        <type>mask</type>
+                        <offset>12</offset>
+                    </variant>
                 </register>
-                <variant>
-                    <type>set</type>
-                    <address>4</address>
-                </variant>
-                <variant>
-                    <type>clr</type>
-                    <address>8</address>
-                </variant>
-                <variant>
-                    <type>mask</type>
-                    <address>12</address>
-                </variant>
             </node>
         </node>
     </node>
