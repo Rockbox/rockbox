@@ -66,14 +66,13 @@ public:
     virtual QWidget *GetWidget();
 
 protected:
-    void FillDevSubTree(QTreeWidgetItem *item);
-    void FillSocSubTree(QTreeWidgetItem *item);
+    QTreeWidgetItem *MakeNode(const soc_desc::node_inst_t& inst, const QString& s);
+    soc_desc::node_inst_t NodeInst(QTreeWidgetItem *item);
+    void FillSubTree(QTreeWidgetItem *item);
     void FillRegTree();
     void FillAnalyserList();
     void UpdateSocList();
-    void DisplayRegister(const SocRegRef& ref);
-    void DisplayDevice(const SocDevRef& ref);
-    void DisplaySoc(const SocRef& ref);
+    void DisplayNode(const soc_desc::node_inst_t& ref);
     void SetDataSocName(const QString& socname);
     void SetPanel(RegTabPanel *panel);
     void UpdateSocFilename();
@@ -85,7 +84,7 @@ protected:
     BackendSelector *m_backend_selector;
     Backend *m_backend;
     QTreeWidget *m_reg_tree;
-    SocRef m_cur_soc;
+    soc_desc::soc_ref_t m_cur_soc;
     QVBoxLayout *m_right_panel;
     RegTabPanel *m_right_content;
     QCheckBox *m_readonly_check;
