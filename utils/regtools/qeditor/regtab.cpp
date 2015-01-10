@@ -35,42 +35,7 @@ namespace
 
 enum
 {
-    RegTreeDevType = QTreeWidgetItem::UserType,
-    RegTreeRegType,
-    RegTreeSocType
-};
-
-class SocTreeItem : public QTreeWidgetItem
-{
-public:
-    SocTreeItem(const QString& string, const SocRef& ref)
-        :QTreeWidgetItem(QStringList(string), RegTreeSocType), m_ref(ref) {}
-
-    const SocRef& GetRef() { return m_ref; }
-private:
-    SocRef m_ref;
-};
-
-class DevTreeItem : public QTreeWidgetItem
-{
-public:
-    DevTreeItem(const QString& string, const SocDevRef& ref)
-        :QTreeWidgetItem(QStringList(string), RegTreeDevType), m_ref(ref) {}
-
-    const SocDevRef& GetRef() { return m_ref; }
-private:
-    SocDevRef m_ref;
-};
-
-class RegTreeItem : public QTreeWidgetItem
-{
-public:
-    RegTreeItem(const QString& string, const SocRegRef& ref)
-        :QTreeWidgetItem(QStringList(string), RegTreeRegType), m_ref(ref) {}
-
-    const SocRegRef& GetRef() { return m_ref; }
-private:
-    SocRegRef m_ref;
+    NodeInstRole = Qt::UserRole,
 };
 
 }
@@ -165,7 +130,8 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
 
     connect(m_soc_selector, SIGNAL(currentIndexChanged(int)),
         this, SLOT(OnSocChanged(int)));
-    connect(m_backend, SIGNAL(OnSocListChanged()), this, SLOT(OnSocListChanged()));
+    connect(m_backend, SIGNAL(OnSocAdded(const SocFileRef&)), this,
+        SLOT(OnSocAdded(const SocFileRef&)));
     connect(m_reg_tree, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
         this, SLOT(OnRegItemClicked(QTreeWidgetItem*, int)));
     connect(m_data_soc_label, SIGNAL(linkActivated(const QString&)), this,
@@ -183,7 +149,9 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
         "You can browse the registers. Select a data source to analyse the values.");
     m_msg_error_id = 0;
 
-    OnSocListChanged();
+    QList< SocFileRef > socs = m_backend->GetSocFileList();
+    for(int i = 0; i < socs.size(); i++)
+        OnSocAdded(socs[i]);
     SetDataSocName("");
     UpdateTabName();
 }
@@ -286,21 +254,7 @@ void RegTab::OnRegItemClicked(QTreeWidgetItem *current, int col)
     Q_UNUSED(col);
     if(current == 0)
         return;
-    if(current->type() == RegTreeSocType)
-    {
-        SocTreeItem *item = dynamic_cast< SocTreeItem * >(current);
-        DisplaySoc(item->GetRef());
-    }
-    if(current->type() == RegTreeRegType)
-    {
-        RegTreeItem *item = dynamic_cast< RegTreeItem * >(current);
-        DisplayRegister(item->GetRef());
-    }
-    else if(current->type() == RegTreeDevType)
-    {
-        DevTreeItem *item = dynamic_cast< DevTreeItem * >(current);
-        DisplayDevice(item->GetRef());
-    }
+    DisplayNode(NodeInst(current));
 }
 
 void RegTab::OnAnalyserClicked(QListWidgetItem *current)
@@ -311,19 +265,14 @@ void RegTab::OnAnalyserClicked(QListWidgetItem *current)
     SetPanel(ana->Create(m_cur_soc, m_io_backend));
 }
 
-void RegTab::DisplayRegister(const SocRegRef& ref)
+void RegTab::DisplayNode(const soc_desc::node_inst_t& ref)
 {
-    SetPanel(new RegDisplayPanel(this, m_io_backend, ref));
-}
-
-void RegTab::DisplayDevice(const SocDevRef& ref)
-{
-    SetPanel(new DevDisplayPanel(this, ref));
-}
-
-void RegTab::DisplaySoc(const SocRef& ref)
-{
-    SetPanel(new SocDisplayPanel(this, ref));
+    if(ref.node().is_root())
+        SetPanel(new SocDisplayPanel(this, m_io_backend, ref.soc()));
+    else if(ref.node().reg().valid())
+        SetPanel(new RegDisplayPanel(this, m_io_backend, ref));
+    else
+        SetPanel(new NodeDisplayPanel(this, m_io_backend, ref));
 }
 
 int RegTab::SetMessage(MessageWidget::MessageType type, const QString& msg)
@@ -344,56 +293,45 @@ void RegTab::SetPanel(RegTabPanel *panel)
     m_right_panel->addWidget(m_right_content->GetWidget(), 1);
 }
 
-void RegTab::OnSocListChanged()
+void RegTab::OnSocAdded(const SocFileRef& ref)
 {
-    m_soc_selector->clear();
-    QList< SocRef > socs = m_backend->GetSocList();
-    for(int i = 0; i < socs.size(); i++)
-    {
-        QVariant v;
-        v.setValue(socs[i]);
-        m_soc_selector->addItem(QString::fromStdString(socs[i].GetSoc().name), v);
-    }
+    soc_desc::soc_ref_t soc = ref.GetSocFile()->GetSocRef();
+    QVariant v;
+    v.setValue(soc);
+    m_soc_selector->addItem(QString::fromStdString(soc.get()->name), v);
 }
 
-void RegTab::FillDevSubTree(QTreeWidgetItem *_item)
+QTreeWidgetItem *RegTab::MakeNode(const soc_desc::node_inst_t& inst, const QString& s)
 {
-    DevTreeItem *item = dynamic_cast< DevTreeItem* >(_item);
-    const soc_dev_t& dev = item->GetRef().GetDev();
-    for(size_t i = 0; i < dev.reg.size(); i++)
-    {
-        const soc_reg_t& reg = dev.reg[i];
-        for(size_t j = 0; j < reg.addr.size(); j++)
-        {
-            RegTreeItem *reg_item = new RegTreeItem(reg.addr[j].name.c_str(),
-                SocRegRef(item->GetRef(), i, j));
-            item->addChild(reg_item);
-        }
-    }
+    QTreeWidgetItem *item = new QTreeWidgetItem(QStringList(s));
+    item->setData(0, NodeInstRole, QVariant::fromValue(inst));
+    return item;
 }
 
-void RegTab::FillSocSubTree(QTreeWidgetItem *_item)
+soc_desc::node_inst_t RegTab::NodeInst(QTreeWidgetItem *item)
 {
-    SocTreeItem *item = dynamic_cast< SocTreeItem* >(_item);
-    const soc_t& soc = item->GetRef().GetSoc();
-    for(size_t i = 0; i < soc.dev.size(); i++)
+    return item->data(0, NodeInstRole).value< soc_desc::node_inst_t >();
+}
+
+void RegTab::FillSubTree(QTreeWidgetItem *item)
+{
+    std::vector< soc_desc::node_inst_t > list = NodeInst(item).children();
+    for(size_t i = 0; i < list.size(); i++)
     {
-        const soc_dev_t& dev = soc.dev[i];
-        for(size_t j = 0; j < dev.addr.size(); j++)
-        {
-            DevTreeItem *dev_item = new DevTreeItem(dev.addr[j].name.c_str(),
-                SocDevRef(m_cur_soc, i, j));
-            FillDevSubTree(dev_item);
-            item->addChild(dev_item);
-        }
+        QString name = QString::fromStdString(list[i].name());
+        if(list[i].is_indexed())
+            name = QString("%1[%2]").arg(name).arg(list[i].index());
+        QTreeWidgetItem *child = MakeNode(list[i], name);
+        FillSubTree(child);
+        item->addChild(child);
     }
 }
 
 void RegTab::FillRegTree()
 {
-    SocTreeItem *soc_item = new SocTreeItem(m_cur_soc.GetSoc().name.c_str(),
-        m_cur_soc);
-    FillSocSubTree(soc_item);
+    QTreeWidgetItem *soc_item = MakeNode(m_cur_soc.root_inst(),
+        QString::fromStdString(m_cur_soc.get()->name));
+    FillSubTree(soc_item);
     m_reg_tree->addTopLevelItem(soc_item);
     m_reg_tree->expandItem(soc_item);
 }
@@ -401,7 +339,8 @@ void RegTab::FillRegTree()
 void RegTab::FillAnalyserList()
 {
     m_analysers_list->clear();
-    m_analysers_list->addItems(AnalyserFactory::GetAnalysersForSoc(m_cur_soc.GetSoc().name.c_str()));
+    m_analysers_list->addItems(AnalyserFactory::GetAnalysersForSoc(
+        QString::fromStdString(m_cur_soc.get()->name)));
 }
 
 void RegTab::OnSocChanged(int index)
@@ -409,7 +348,7 @@ void RegTab::OnSocChanged(int index)
     if(index == -1)
         return;
     m_reg_tree->clear();
-    m_cur_soc = m_soc_selector->itemData(index).value< SocRef >();
+    m_cur_soc = m_soc_selector->itemData(index).value< soc_desc::soc_ref_t >();
     FillRegTree();
     FillAnalyserList();
 }
@@ -426,7 +365,10 @@ void RegTab::OnDumpRegs(bool c)
     Q_UNUSED(c);
     QFileDialog *fd = new QFileDialog(this);
     fd->setAcceptMode(QFileDialog::AcceptSave);
-    fd->setFilter("Textual files (*.txt);;All files (*)");
+    QStringList filters;
+    filters << "Textual files (*.txt)";
+    filters << "All files (*)";
+    fd->setNameFilters(filters);
     fd->setDirectory(Settings::Get()->value("regtab/loaddatadir", QDir::currentPath()).toString());
     if(!fd->exec())
         return;
