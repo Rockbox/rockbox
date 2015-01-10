@@ -20,10 +20,13 @@
  ****************************************************************************/
 #include "soc_desc.hpp"
 #include "soc_desc_v1.hpp"
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <map>
 #include <set>
+#include <cstring>
+#include <fstream>
+#include <sstream>
 #include <cstring>
 
 using namespace soc_desc;
@@ -32,12 +35,12 @@ void print_context(const error_context_t& ctx)
 {
     for(size_t j = 0; j < ctx.count(); j++)
     {
-        error_t e = ctx.get(j);
+        soc_desc::error_t e = ctx.get(j);
         switch(e.level())
         {
-            case error_t::INFO: printf("[INFO]"); break;
-            case error_t::WARNING: printf("[WARN]"); break;
-            case error_t::FATAL: printf("[FATAL]"); break;
+            case soc_desc::error_t::INFO: printf("[INFO]"); break;
+            case soc_desc::error_t::WARNING: printf("[WARN]"); break;
+            case soc_desc::error_t::FATAL: printf("[FATAL]"); break;
             default: printf("[UNK]"); break;
         }
         if(e.location().size() != 0)
@@ -88,7 +91,6 @@ bool convert_v1_to_v2(const soc_desc_v1::soc_reg_t& in, node_t& out, error_conte
 {
     std::string loc = _loc + "." + in.name;
     out.name = in.name;
-    out.desc = in.desc;
     if(in.formula.type == soc_desc_v1::REG_FORMULA_NONE)
     {
         out.instance.resize(in.addr.size());
@@ -108,7 +110,7 @@ bool convert_v1_to_v2(const soc_desc_v1::soc_reg_t& in, node_t& out, error_conte
         soc_word_t base = 0, stride = 0;
         if(in.addr.size() <= 1)
         {
-            ctx.add(error_t(error_t::WARNING, loc,
+            ctx.add(soc_desc::error_t(soc_desc::error_t::WARNING, loc,
                 "register uses a formula but has only one instance"));
             is_stride = false;
         }
@@ -123,7 +125,7 @@ bool convert_v1_to_v2(const soc_desc_v1::soc_reg_t& in, node_t& out, error_conte
 
         if(is_stride)
         {
-            ctx.add(error_t(error_t::INFO, loc, "promoted formula to base/stride"));
+            ctx.add(soc_desc::error_t(soc_desc::error_t::INFO, loc, "promoted formula to base/stride"));
             out.instance[0].range.type = range_t::STRIDE;
             out.instance[0].range.base = base;
             out.instance[0].range.stride = stride;
@@ -133,6 +135,7 @@ bool convert_v1_to_v2(const soc_desc_v1::soc_reg_t& in, node_t& out, error_conte
     }
     out.register_.resize(1);
     out.register_[0].width = 32;
+    out.register_[0].desc = in.desc;
     out.register_[0].field.resize(in.field.size());
     for(size_t i = 0; i < in.field.size(); i++)
         if(!convert_v1_to_v2(in.field[i], out.register_[0].field[i], ctx))
@@ -140,15 +143,12 @@ bool convert_v1_to_v2(const soc_desc_v1::soc_reg_t& in, node_t& out, error_conte
     /* sct */
     if(in.flags & soc_desc_v1::REG_HAS_SCT)
     {
-        out.node.resize(1);
-        out.node[0].name = "SCT";
-        out.node[0].instance.resize(3);
-        const char *names[3] = {"SET", "CLR", "TOG"};
+        out.register_[0].variant.resize(3);
+        const char *names[3] = {"set", "clr", "tog"};
         for(size_t i = 0; i < 3; i++)
         {
-            out.node[0].instance[i].name = names[i];
-            out.node[0].instance[i].type = instance_t::SINGLE;
-            out.node[0].instance[i].addr = 4 + i *4;
+            out.register_[0].variant[i].type = names[i];
+            out.register_[0].variant[i].offset = 4 + i *4;
         }
     }
     return true;
@@ -167,7 +167,7 @@ bool convert_v1_to_v2(const soc_desc_v1::soc_dev_t& in, node_t& out, error_conte
 {
     std::string loc = _loc + "." + in.name;
     if(!in.version.empty())
-        ctx.add(error_t(error_t::INFO, loc, "dropped version"));
+        ctx.add(soc_desc::error_t(soc_desc::error_t::INFO, loc, "dropped version"));
     out.name = in.name;
     out.title = in.long_name;
     out.desc = in.desc;
@@ -195,8 +195,21 @@ bool convert_v1_to_v2(const soc_desc_v1::soc_t& in, soc_t& out, error_context_t&
 
 int do_convert(int argc, char **argv)
 {
-    if(argc != 2)
-        return printf("convert mode expects two arguments\n");
+    std::vector< std::string > authors;
+    std::string version;
+    while(argc >= 2)
+    {
+        if(strcmp(argv[0], "--author") == 0)
+            authors.push_back(argv[1]);
+        else if(strcmp(argv[0], "--version") == 0)
+            version = argv[1];
+        else
+            break;
+        argc -= 2;
+        argv += 2;
+    }
+    if(argc < 2)
+        return printf("convert mode expects at least one description file and an output file\n");
     soc_desc_v1::soc_t soc;
     if(!soc_desc_v1::parse_xml(argv[0], soc))
         return printf("cannot read file '%s'\n", argv[0]);
@@ -207,6 +220,8 @@ int do_convert(int argc, char **argv)
         print_context(ctx);
         return printf("cannot convert from v1 to v2\n");
     }
+    new_soc.author = authors;
+    new_soc.version = version;
     if(!produce_xml(argv[1], new_soc, ctx))
     {
         print_context(ctx);
@@ -302,10 +317,10 @@ int do_write(int argc, char **argv)
 void check_name(const std::string& path, const std::string& name, error_context_t& ctx)
 {
     if(name.empty())
-        ctx.add(error_t(error_t::FATAL, path, "name is empty"));
+        ctx.add(soc_desc::error_t(soc_desc::error_t::FATAL, path, "name is empty"));
     for(size_t i = 0; i < name.size(); i++)
         if(!isalnum(name[i]) && name[i] != '_')
-            ctx.add(error_t(error_t::FATAL, path, "name '" + name +
+            ctx.add(soc_desc::error_t(soc_desc::error_t::FATAL, path, "name '" + name +
                 "' must only contain alphanumeric characters or '_'"));
 }
 
@@ -323,7 +338,7 @@ void check_instance(const std::string& _path, const instance_t& inst, error_cont
             var[inst.range.variable] = inst.range.first;
             soc_word_t res;
             if(!evaluate_formula(inst.range.formula, var, res, path + ".<formula>", ctx))
-                ctx.add(error_t(error_t::FATAL, path + ".<formula>",
+                ctx.add(soc_desc::error_t(soc_desc::error_t::FATAL, path + ".<formula>",
                     "cannot evaluate formula"));
         }
     }
@@ -334,7 +349,7 @@ void check_field(const std::string& _path, const field_t& field, error_context_t
     std::string path = _path + "." + field.name;
     check_name(path, field.name, ctx);
     if(field.width == 0)
-        ctx.add(error_t(error_t::WARNING, path, "field has width 0"));
+        ctx.add(soc_desc::error_t(soc_desc::error_t::WARNING, path, "field has width 0"));
     soc_word_t max = field.bitmask() >> field.pos;
     std::set< std::string > names;
     std::map< soc_word_t, std::string > map;
@@ -345,12 +360,12 @@ void check_field(const std::string& _path, const field_t& field, error_context_t
         std::string path_ = path + "." + n;
         check_name(path_, n, ctx);
         if(v > max)
-            ctx.add(error_t(error_t::FATAL, path_, "value does not fit into the field"));
+            ctx.add(soc_desc::error_t(soc_desc::error_t::FATAL, path_, "value does not fit into the field"));
         if(names.find(n) != names.end())
-            ctx.add(error_t(error_t::FATAL, path, "duplicate name '" + n + "' in enums"));
+            ctx.add(soc_desc::error_t(soc_desc::error_t::FATAL, path, "duplicate name '" + n + "' in enums"));
         names.insert(n);
         if(map.find(v) != map.end())
-            ctx.add(error_t(error_t::WARNING, path, "'" + n + "' and '" + map[v] + "' have the same value"));
+            ctx.add(soc_desc::error_t(soc_desc::error_t::WARNING, path, "'" + n + "' and '" + map[v] + "' have the same value"));
         map[v] = n;
     }
 }
@@ -359,7 +374,7 @@ void check_register(const std::string& _path, const soc_desc::register_t& reg, e
 {
     std::string path = _path + ".<register>";
     if(reg.width != 8 && reg.width != 16 && reg.width != 32)
-        ctx.add(error_t(error_t::WARNING, path, "width is not 8, 16 or 32"));
+        ctx.add(soc_desc::error_t(soc_desc::error_t::WARNING, path, "width is not 8, 16 or 32"));
     for(size_t i = 0; i < reg.field.size(); i++)
         check_field(path, reg.field[i], ctx);
     std::set< std::string > names;
@@ -368,16 +383,16 @@ void check_register(const std::string& _path, const soc_desc::register_t& reg, e
     {
         std::string n = reg.field[i].name;
         if(names.find(n) != names.end())
-            ctx.add(error_t(error_t::FATAL, path, "duplicate name '" + n + "' in fields"));
+            ctx.add(soc_desc::error_t(soc_desc::error_t::FATAL, path, "duplicate name '" + n + "' in fields"));
         if(reg.field[i].pos + reg.field[i].width > reg.width)
-            ctx.add(error_t(error_t::FATAL, path, "field '" + n + "' does not fit into the register"));
+            ctx.add(soc_desc::error_t(soc_desc::error_t::FATAL, path, "field '" + n + "' does not fit into the register"));
         names.insert(n);
         if(bitmap & reg.field[i].bitmask())
         {
             /* find the duplicate to ease debugging */
             for(size_t j = 0; j < i; j++)
                 if(reg.field[j].bitmask() & reg.field[i].bitmask())
-                    ctx.add(error_t(error_t::FATAL, path, "overlap between fields '" +
+                    ctx.add(soc_desc::error_t(soc_desc::error_t::FATAL, path, "overlap between fields '" +
                         reg.field[j].name + "' and '" + n + "'"));
         }
         bitmap |= reg.field[i].bitmask();
@@ -392,7 +407,7 @@ void check_node(const std::string& _path, const node_t& node, error_context_t& c
     std::string path = _path + "." + node.name;
     check_name(_path, node.name, ctx);
     if(node.instance.empty())
-        ctx.add(error_t(error_t::FATAL, path, "subnode with no instances"));
+        ctx.add(soc_desc::error_t(soc_desc::error_t::FATAL, path, "subnode with no instances"));
     for(size_t j = 0; j < node.instance.size(); j++)
         check_instance(path, node.instance[j], ctx);
     for(size_t i = 0; i < node.register_.size(); i++)
@@ -412,7 +427,7 @@ void check_nodes(const std::string& path, const std::vector< node_t >& nodes,
         {
             std::string n = nodes[i].instance[j].name;
             if(names.find(n) != names.end())
-                ctx.add(error_t(error_t::FATAL, path, "duplicate instance name '" +
+                ctx.add(soc_desc::error_t(soc_desc::error_t::FATAL, path, "duplicate instance name '" +
                     n + "' in subnodes"));
             names.insert(n);
         }
@@ -422,7 +437,7 @@ void check_nodes(const std::string& path, const std::vector< node_t >& nodes,
     {
         std::string n = nodes[i].name;
         if(names.find(n) != names.end())
-            ctx.add(error_t(error_t::FATAL, path, "duplicate node name '" + n +
+            ctx.add(soc_desc::error_t(soc_desc::error_t::FATAL, path, "duplicate node name '" + n +
                 "' in subnodes"));
         names.insert(n);
     }
@@ -506,6 +521,12 @@ void print_reg(register_ref_t reg, unsigned flags)
             printf(":[%u-%u]=", (unsigned)(f->pos + f->width - 1), (unsigned)f->pos);
         printf("%s\n", f->name.c_str());
     }
+    std::vector< variant_ref_t > variants = reg.variants();
+    for(size_t i = 0; i < variants.size(); i++)
+    {
+        print_path(node, false);
+        printf(":%s@+0x%x\n", variants[i].type().c_str(), variants[i].offset());
+    }
 }
 
 void do_dump(node_ref_t node, unsigned flags)
@@ -576,6 +597,178 @@ int do_dump(int argc, char **argv)
     return 0;
 }
 
+std::string trim(const std::string& s)
+{
+    std::string ss = s.substr(s.find_first_not_of(" \t"));
+    return ss.substr(0, ss.find_last_not_of(" \t") + 1);
+}
+
+bool parse_key(const std::string& key, std::string& dev, std::string& reg)
+{
+    if(key.substr(0, 3) != "HW.")
+        return false;
+    std::string s = key.substr(3);
+    size_t idx = s.find('.');
+    if(idx == std::string::npos)
+        return false;
+    dev = s.substr(0, idx);
+    reg = s.substr(idx + 1);
+    return true;
+}
+
+bool find_addr(const soc_desc_v1::soc_dev_t& dev,
+    const std::string& reg, soc_desc_v1::soc_addr_t& addr)
+{
+    for(size_t i = 0; i < dev.reg.size(); i++)
+        for(size_t j = 0; j < dev.reg[i].addr.size(); j++)
+            if(dev.reg[i].addr[j].name == reg)
+            {
+                addr += dev.reg[i].addr[j].addr;
+                return true;
+            }
+    return false;
+}
+
+bool find_addr(const soc_desc_v1::soc_t& soc, const std::string& dev,
+    const std::string& reg, soc_desc_v1::soc_addr_t& addr)
+{
+    addr = 0;
+    for(size_t i = 0; i < soc.dev.size(); i++)
+        for(size_t j = 0; j < soc.dev[i].addr.size(); j++)
+            if(soc.dev[i].addr[j].name == dev)
+            {
+                addr += soc.dev[i].addr[j].addr;
+                return find_addr(soc.dev[i], reg, addr);
+            }
+    return false;
+}
+
+int convert_dump(const std::map< std::string, std::string >& entries,
+    const soc_desc_v1::soc_t& soc, std::ofstream& fout)
+{
+    std::map< std::string, std::string >::const_iterator it = entries.begin();
+    for(; it != entries.end(); ++it)
+    {
+        char *end;
+        soc_desc_v1::soc_word_t v = strtoul(it->second.c_str(), &end, 0);
+        if(*end != 0)
+        {
+            printf("because of invalid value '%s': ignore key '%s'\n",
+                it->second.c_str(), it->first.c_str());
+            continue;
+        }
+        std::string dev, reg;
+        if(!parse_key(it->first, dev, reg))
+        {
+            printf("invalid key format, ignore key '%s'\n", it->first.c_str());
+            continue;
+        }
+        soc_desc_v1::soc_addr_t addr;
+        if(!find_addr(soc, dev, reg, addr))
+        {
+            printf("cannot find register in description, ignore key '%s'\n",
+                it->first.c_str());
+            continue;
+        }
+        fout << "0x" << std::hex << addr << " = 0x" << std::hex << v << "\n";
+    }
+    return 0;
+}
+
+int do_convertdump(int argc, char **argv)
+{
+    if(argc < 3)
+    {
+        printf("you must specify at least one description file, one input file and one output file\n");
+        return 1;
+    }
+    std::vector< soc_desc_v1::soc_t > socs;
+    for(int i = 0; i < argc - 2; i++)
+    {
+        socs.resize(socs.size() + 1);
+        if(!parse_xml(argv[i], socs.back()))
+        {
+            socs.pop_back();
+            printf("cannot parse description file '%s'\n", argv[i]);
+        }
+    }
+    std::ifstream fin(argv[argc - 2]);
+    if(!fin)
+    {
+        printf("cannot open input file\n");
+        return 1;
+    }
+    std::map< std::string, std::string > entries;
+    std::string line;
+    while(std::getline(fin, line))
+    {
+        size_t idx = line.find('=');
+        if(idx == std::string::npos)
+        {
+            printf("ignore invalid line '%s'\n", line.c_str());
+            continue;
+        }
+        std::string key = trim(line.substr(0, idx));
+        std::string value = trim(line.substr(idx + 1));
+        entries[key] = value;
+    }
+    if(entries.find("HW") == entries.end())
+    {
+        printf("invalid dump file: missing HW key\n");
+        return 1;
+    }
+    std::string soc = entries["HW"];
+    soc_desc_v1::soc_t *psoc = 0;
+    for(size_t i = 0; i < socs.size(); i++)
+        if(socs[i].name == soc)
+            psoc = &socs[i];
+    if(psoc == 0)
+    {
+        printf("cannot convert dump: please provide the description file for the soc '%s'\n", soc.c_str());
+        return 1;
+    }
+    entries.erase(entries.find("HW"));
+    std::ofstream fout(argv[argc - 1]);
+    if(!fout)
+    {
+        printf("cannot open output file\n");
+        return 1;
+    }
+    fout << "soc = " << soc << "\n";
+    return convert_dump(entries, *psoc, fout);
+}
+
+int do_normalize(int argc, char **argv)
+{
+    if(argc != 2)
+    {
+        printf("normalize takes two arguments\n");
+        return 1;
+    }
+    error_context_t ctx;
+    soc_t soc;
+    bool ret = parse_xml(argv[0], soc, ctx);
+    if(ctx.count() != 0)
+        printf("In file %s:\n", argv[0]);
+    print_context(ctx);
+    if(!ret)
+    {
+        printf("cannot parse file '%s'\n", argv[1]);
+        return 2;
+    }
+    normalize(soc);
+    ret = produce_xml(argv[1], soc, ctx);
+    if(ctx.count() != 0)
+        printf("In file %s:\n", argv[1]);
+    print_context(ctx);
+    if(!ret)
+    {
+        printf("cannot write file '%s'\n", argv[1]);
+        return 3;
+    }
+    return 0;
+}
+
 void usage()
 {
     printf("usage: swiss_knife <mode> [options]\n");
@@ -583,9 +776,22 @@ void usage()
     printf("  read <files...>\n");
     printf("  write <read file> <write file>\n");
     printf("  eval [<formula>|--var <name>=<val>]...\n");
-    printf("  convert <input file> <output file>\n");
+    printf("  convert [--author <auth>] [--version <ver>] <input file> <output file>\n");
     printf("  check <files...>\n");
     printf("  dump [--nodes] [--instances] [--registers] [--verbose] <files...>\n");
+    printf("  convertdump <desc file> ... <desc file> <input dump file> <output dump file>\n");
+    printf("  normalize <desc file> <output desc file>\n");
+    printf("\n");
+    printf("The following operations are performed in each mode:\n");
+    printf("* read: open and parse the files, reports any obvious errors\n");
+    printf("* write: open, parse a file and write it back, checks the parser/generator match\n");
+    printf("* eval: evaluate a formula with the formula parser\n");
+    printf("* convert: convert a description file from version 1 to version 2\n");
+    printf("* check: performs deep checks on description files\n");
+    printf("* dump: debug tool to dump internal structures\n");
+    printf("* convertdump: convert a register dump from version 1 to version 2\n");
+    printf("               NOTE: description file must be a v1 file\n");
+    printf("* normalize: normalise a description file\n");
     exit(1);
 }
 
@@ -606,6 +812,10 @@ int main(int argc, char **argv)
         return do_check(argc - 2, argv +  2);
     else if(mode == "dump")
         return do_dump(argc - 2, argv +  2);
+    else if(mode == "convertdump")
+        return do_convertdump(argc - 2, argv +  2);
+    else if(mode == "normalize")
+        return do_normalize(argc - 2, argv +  2);
     else
         usage();
     return 0;

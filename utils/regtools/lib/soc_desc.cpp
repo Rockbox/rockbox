@@ -308,13 +308,28 @@ bool parse_field_elem(xmlNode *node, field_t& field, error_context_t& ctx)
     return ret;
 }
 
+bool parse_variant_elem(xmlNode *node, variant_t& variant, error_context_t& ctx)
+{
+    bool ret = true;
+    bool has_type = false, has_offset = false;
+    BEGIN_NODE_MATCH(node->children)
+        MATCH_UNIQUE_TEXT_NODE("type", variant.type, has_type, parse_name_elem, ctx)
+        MATCH_UNIQUE_TEXT_NODE("offset", variant.offset, has_offset, parse_unsigned_elem, ctx)
+    END_NODE_MATCH()
+    CHECK_HAS(node, "type", has_type, ctx)
+    CHECK_HAS(node, "offset", has_offset, ctx)
+    return ret;
+}
+
 bool parse_register_elem(xmlNode *node, register_t& reg, error_context_t& ctx)
 {
     bool ret = true;
-    bool has_width = false;
+    bool has_width = false, has_desc = false;
     BEGIN_NODE_MATCH(node->children)
+        MATCH_UNIQUE_TEXT_NODE("desc", reg.desc, has_desc, parse_text_elem, ctx)
         MATCH_UNIQUE_TEXT_NODE("width", reg.width, has_width, parse_unsigned_elem, ctx)
         MATCH_ELEM_NODE("field", reg.field, parse_field_elem, ctx)
+        MATCH_ELEM_NODE("variant", reg.variant, parse_variant_elem, ctx)
     END_NODE_MATCH()
     if(!has_width)
         reg.width = 32;
@@ -400,7 +415,6 @@ bool parse_node_elem(xmlNode *node_, node_t& node, error_context_t& ctx)
         MATCH_ELEM_NODE("instance", node.instance, parse_instance_elem, ctx)
     END_NODE_MATCH()
     CHECK_HAS(node_, "name", has_name, ctx)
-    CHECK_HAS(node_, "instance", !node.instance.empty(), ctx)
     if(has_register)
         node.register_.push_back(reg);
     return ret;
@@ -463,6 +477,93 @@ bool parse_xml(const std::string& filename, soc_t& soc,
     xmlFreeDoc(doc);
 
     return ret;
+}
+
+/**
+ * Normalizer
+ */
+
+namespace
+{
+
+struct soc_sorter
+{
+    /* returns the first (lowest) address of an instance */
+    soc_addr_t first_addr(const instance_t& inst) const
+    {
+        if(inst.type == instance_t::SINGLE)
+            return inst.addr;
+        if(inst.range.type == range_t::STRIDE)
+            return inst.range.base;
+        soc_word_t res;
+        std::map< std::string, soc_word_t > vars;
+        vars[inst.range.variable] = inst.range.first;
+        error_context_t ctx;
+        if(!evaluate_formula(inst.range.formula, vars, res, "", ctx))
+            return 0xffffffff;
+        return res;
+    }
+
+    /* sort instances by first address */
+    bool operator()(const instance_t& a, const instance_t& b) const
+    {
+        return first_addr(a) < first_addr(b);
+    }
+
+    /* sort nodes by first address of first instance (which is the lowest of
+     * any instance if instances are sorted) */
+    bool operator()(const node_t& a, const node_t& b) const
+    {
+        /* borderline cases: no instances is lower than with instances */
+        if(a.instance.size() == 0)
+            return b.instance.size() > 0;
+        if(b.instance.size() == 0)
+            return false;
+        return first_addr(a.instance[0]) < first_addr(b.instance[0]);
+    }
+
+    /* sort fields by decreasing position */
+    bool operator()(const field_t& a, const field_t& b) const
+    {
+        return a.pos > b.pos;
+    }
+
+    /* sort enum values by value */
+    bool operator()(const enum_t& a, const enum_t& b) const
+    {
+        return a.value < b.value;
+    }
+};
+
+void normalize(field_t& field)
+{
+    std::sort(field.enum_.begin(), field.enum_.end(), soc_sorter());
+}
+
+void normalize(register_t& reg)
+{
+    for(size_t i = 0; i < reg.field.size(); i++)
+        normalize(reg.field[i]);
+    std::sort(reg.field.begin(), reg.field.end(), soc_sorter());
+}
+
+void normalize(node_t& node)
+{
+    for(size_t i = 0; i < node.register_.size(); i++)
+        normalize(node.register_[i]);
+    for(size_t i = 0; i < node.node.size(); i++)
+        normalize(node.node[i]);
+    std::sort(node.node.begin(), node.node.end(), soc_sorter());
+    std::sort(node.instance.begin(), node.instance.end(), soc_sorter());
+}
+
+}
+
+void normalize(soc_t& soc)
+{
+    for(size_t i = 0; i < soc.node.size(); i++)
+        normalize(soc.node[i]);
+    std::sort(soc.node.begin(), soc.node.end(), soc_sorter());
 }
 
 /**
@@ -575,6 +676,19 @@ int produce_field(xmlTextWriterPtr writer, const field_t& field, error_context_t
     return 0;
 }
 
+int produce_variant(xmlTextWriterPtr writer, const variant_t& variant, error_context_t& ctx)
+{
+    /* <variant> */
+    SAFE(xmlTextWriterStartElement(writer, BAD_CAST "variant"));
+    /* <name/> */
+    SAFE(xmlTextWriterWriteElement(writer, BAD_CAST "type", BAD_CAST variant.type.c_str()));
+    /* <position/> */
+    SAFE(xmlTextWriterWriteFormatElement(writer, BAD_CAST "offset", "%lu", (unsigned long)variant.offset));
+    /* </variant> */
+    SAFE(xmlTextWriterEndElement(writer));
+    return 0;
+}
+
 int produce_register(xmlTextWriterPtr writer, const register_t& reg, error_context_t& ctx)
 {
     /* <register> */
@@ -582,9 +696,15 @@ int produce_register(xmlTextWriterPtr writer, const register_t& reg, error_conte
     /* <width/> */
     if(reg.width != 32)
         SAFE(xmlTextWriterWriteFormatElement(writer, BAD_CAST "width", "%lu", reg.width));
+    /* <desc/> */
+    if(!reg.desc.empty())
+        SAFE(xmlTextWriterWriteElement(writer, BAD_CAST "desc", BAD_CAST reg.desc.c_str()));
     /* fields */
     for(size_t i = 0; i < reg.field.size(); i++)
         SAFE(produce_field(writer, reg.field[i], ctx));
+    /* variants */
+    for(size_t i = 0; i < reg.variant.size(); i++)
+        SAFE(produce_variant(writer, reg.variant[i], ctx));
     /* </register> */
     SAFE(xmlTextWriterEndElement(writer));
     return 0;
@@ -671,6 +791,24 @@ Lerr:
 }
 
 /**
+ * utils
+ */
+
+namespace
+{
+
+template< typename T >
+soc_id_t gen_fresh_id(const std::vector< T >& list)
+{
+    soc_id_t id = 0;
+    for(size_t i = 0; i < list.size(); i++)
+        id = std::max(id, list[i].id);
+    return id + 1;
+}
+
+}
+
+/**
  * soc_ref_t
  */
 
@@ -738,6 +876,8 @@ namespace
 
 std::vector< node_t > *get_children(node_ref_t node)
 {
+    if(!node.valid())
+        return 0;
     if(node.is_root())
         return &node.soc().get()->node;
     node_t *n = node.get();
@@ -789,12 +929,18 @@ soc_ref_t node_ref_t::soc() const
     return m_soc;
 }
 
-node_ref_t node_ref_t::parent() const
+node_ref_t node_ref_t::parent(unsigned level) const
 {
+    if(level > depth())
+        return node_ref_t();
     std::vector< soc_id_t > path = m_path;
-    if(!path.empty())
-        path.pop_back();
+    path.resize(depth() - level);
     return node_ref_t(m_soc, path);
+}
+
+unsigned node_ref_t::depth() const
+{
+    return m_path.size();
 }
 
 register_ref_t node_ref_t::reg() const
@@ -867,6 +1013,41 @@ bool node_ref_t::operator==(const node_ref_t& ref) const
     return m_soc == ref.m_soc && m_path == ref.m_path;
 }
 
+void node_ref_t::remove()
+{
+    if(is_root())
+    {
+        soc_t *s = soc().get();
+        if(s)
+            s->node.clear();
+    }
+    else
+    {
+        std::vector< node_t > *list = get_children(parent());
+        if(list == 0)
+            return;
+        for(size_t i = 0; i < list->size(); i++)
+            if((*list)[i].id == m_path.back())
+            {
+                list->erase(list->begin() + i);
+                return;
+            }
+    }
+}
+
+node_ref_t node_ref_t::create() const
+{
+    std::vector< node_t > *list = get_children(*this);
+    if(list == 0)
+        return node_ref_t();
+    node_t n;
+    n.id = gen_fresh_id(*list);
+    list->push_back(n);
+    std::vector< soc_id_t > path = m_path;
+    path.push_back(n.id);
+    return node_ref_t(soc(), path);
+}
+
 /**
  * register_ref_t
  */
@@ -909,6 +1090,17 @@ std::vector< field_ref_t > register_ref_t::fields() const
     return fields;
 }
 
+std::vector< variant_ref_t > register_ref_t::variants() const
+{
+    std::vector< variant_ref_t > variants;
+    register_t *r = get();
+    if(r == 0)
+        return variants;
+    for(size_t i = 0; i < r->variant.size(); i++)
+        variants.push_back(variant_ref_t(*this, r->variant[i].id));
+    return variants;
+}
+
 field_ref_t register_ref_t::field(const std::string& name) const
 {
     register_t *r = get();
@@ -918,6 +1110,46 @@ field_ref_t register_ref_t::field(const std::string& name) const
         if(r->field[i].name == name)
             return field_ref_t(*this, r->field[i].id);
     return field_ref_t();
+}
+
+variant_ref_t register_ref_t::variant(const std::string& type) const
+{
+    register_t *r = get();
+    if(r == 0)
+        return variant_ref_t();
+    for(size_t i = 0; i < r->variant.size(); i++)
+        if(r->variant[i].type == type)
+            return variant_ref_t(*this, r->variant[i].id);
+    return variant_ref_t();
+}
+
+void register_ref_t::remove()
+{
+    node_t *n = node().get();
+    if(n)
+        n->register_.clear();
+}
+
+field_ref_t register_ref_t::create_field() const
+{
+    register_t *r = get();
+    if(r == 0)
+        return field_ref_t();
+    field_t f;
+    f.id = gen_fresh_id(r->field);
+    r->field.push_back(f);
+    return field_ref_t(*this, f.id);
+}
+
+variant_ref_t register_ref_t::create_variant() const
+{
+    register_t *r = get();
+    if(r == 0)
+        return variant_ref_t();
+    variant_t v;
+    v.id = gen_fresh_id(r->variant);
+    r->variant.push_back(v);
+    return variant_ref_t(*this, v.id);
 }
 
 /**
@@ -949,9 +1181,112 @@ field_t *field_ref_t::get() const
     return 0;
 }
 
+enum_ref_t field_ref_t::enum_(const std::string& name) const
+{
+    std::vector< enum_ref_t > enums;
+    field_t *f = get();
+    if(f == 0)
+        return enum_ref_t();
+    for(size_t i = 0; i < f->enum_.size(); i++)
+        if(f->enum_[i].name == name)
+        return enum_ref_t(*this, f->enum_[i].id);
+    return enum_ref_t();
+}
+
+std::vector< enum_ref_t > field_ref_t::enums() const
+{
+    std::vector< enum_ref_t > enums;
+    field_t *f = get();
+    if(f == 0)
+        return enums;
+    for(size_t i = 0; i < f->enum_.size(); i++)
+        enums.push_back(enum_ref_t(*this, f->enum_[i].id));
+    return enums;
+}
+
 register_ref_t field_ref_t::reg() const
 {
     return m_reg;
+}
+
+/**
+ * enum_ref_t
+ */
+
+enum_ref_t::enum_ref_t(field_ref_t field, soc_id_t id)
+    :m_field(field), m_id(id)
+{
+}
+
+enum_ref_t::enum_ref_t()
+{
+}
+
+bool enum_ref_t::valid() const
+{
+    return get() != 0;
+}
+
+enum_t *enum_ref_t::get() const
+{
+    field_t *field = m_field.get();
+    if(field == 0)
+        return 0;
+    for(size_t i = 0; i < field->enum_.size(); i++)
+        if(field->enum_[i].id == m_id)
+            return &field->enum_[i];
+    return 0;
+}
+
+field_ref_t enum_ref_t::field() const
+{
+    return m_field;
+}
+
+/**
+ * variant_ref_t
+ */
+
+variant_ref_t::variant_ref_t(register_ref_t reg, soc_id_t id)
+    :m_reg(reg), m_id(id)
+{
+}
+
+variant_ref_t::variant_ref_t()
+{
+}
+
+bool variant_ref_t::valid() const
+{
+    return get() != 0;
+}
+
+variant_t *variant_ref_t::get() const
+{
+    register_t *reg = m_reg.get();
+    if(reg == 0)
+        return 0;
+    for(size_t i = 0; i < reg->variant.size(); i++)
+        if(reg->variant[i].id == m_id)
+            return &reg->variant[i];
+    return 0;
+}
+
+register_ref_t variant_ref_t::reg() const
+{
+    return m_reg;
+}
+
+std::string variant_ref_t::type() const
+{
+    variant_t *v = get();
+    return v ? v->type : std::string();
+}
+
+soc_word_t variant_ref_t::offset() const
+{
+    variant_t *v = get();
+    return v ? v->offset : 0;
 }
 
 /**
@@ -1027,7 +1362,7 @@ node_inst_t::node_inst_t()
 
 bool node_inst_t::valid() const
 {
-    return is_root() || get() != 0;
+    return m_node.valid() && (is_root() || get() != 0);
 }
 
 node_ref_t node_inst_t::node() const
@@ -1045,15 +1380,20 @@ bool node_inst_t::is_root() const
     return m_node.is_root();
 }
 
-node_inst_t node_inst_t::parent() const
+node_inst_t node_inst_t::parent(unsigned level) const
 {
+    if(level > depth())
+        return node_inst_t();
     std::vector< soc_id_t > ids = m_id_path;
     std::vector< size_t > indexes = m_index_path;
-    if(!ids.empty())
-        ids.pop_back();
-    if(!indexes.empty())
-        indexes.pop_back();
-    return node_inst_t(m_node.parent(), ids, indexes);
+    ids.resize(depth() - level);
+    indexes.resize(depth() - level);
+    return node_inst_t(m_node.parent(level), ids, indexes);
+}
+
+unsigned node_inst_t::depth() const
+{
+    return m_id_path.size();
 }
 
 instance_t *node_inst_t::get() const
@@ -1069,7 +1409,7 @@ instance_t *node_inst_t::get() const
 
 soc_addr_t node_inst_t::addr() const
 {
-    if(is_root())
+    if(!valid() || is_root())
         return 0;
     soc_addr_t addr = parent().addr();
     if(!get_inst_addr(get(), m_index_path.back(), addr))
@@ -1100,7 +1440,7 @@ node_inst_t node_inst_t::child(const std::string& name, size_t index) const
             std::vector< soc_id_t > ids = m_id_path;
             std::vector< size_t > indexes = m_index_path;
             ids.push_back(node.instance[j].id);
-            ids.push_back(index);
+            indexes.push_back(index);
             return node_inst_t(child_node, ids, indexes);
         }
         child_node.m_path.pop_back();

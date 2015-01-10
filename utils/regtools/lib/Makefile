@@ -2,7 +2,7 @@ CC?=gcc
 CXX?=g++
 AR?=ar
 INCLUDE=../include/
-CXXFLAGS=-Wall -O2 `xml2-config --cflags` -g -fPIC -I$(INCLUDE)
+CXXFLAGS=-Wall -std=c++11 `xml2-config --cflags` -g -fPIC -I$(INCLUDE)
 LIB=libsocdesc.a
 SRC=$(wildcard *.c)
 SRCXX=$(wildcard *.cpp)
