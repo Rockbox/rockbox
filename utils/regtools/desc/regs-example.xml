@@ -30,6 +30,16 @@
                     <desc>VDDIO brownout interrupt status</desc>
                     <position>0</position>
                 </field>
+                <field>
+                    <name>VDDD_BO</name>
+                    <desc>VDDD brownout interrupt status</desc>
+                    <position>2</position>
+                </field>
+                <field>
+                    <name>VDDA_BO</name>
+                    <desc>VDDA brownout interrupt status</desc>
+                    <position>1</position>
+                </field>
             </register>
         </node>
         <node>

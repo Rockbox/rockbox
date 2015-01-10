@@ -197,6 +197,12 @@ bool parse_xml(const std::string& filename, soc_t& soc, error_context_t& error_c
 /** Write a SoC description to a XML file, overwriting it. A file can contain
  * multiple Soc descriptions */
 bool produce_xml(const std::string& filename, const soc_t& soc, error_context_t& error_ctx);
+/** Normalise a soc description by reordering elements so that:
+ * - nodes are sorted by lowest address of an instance
+ * - instances are sorted by lowest address
+ * - fields are sorted by last bit
+ * - enum are sorted by value */
+void normalize(soc_t& soc);
 /** Formula parser: try to parse and evaluate a formula with some variables */
 bool evaluate_formula(const std::string& formula,
     const std::map< std::string, soc_word_t>& var, soc_word_t& result,
@@ -280,6 +286,12 @@ public:
     /** Compare this reference to another */
     bool operator==(const node_ref_t& r) const;
     inline bool operator!=(const node_ref_t& r) const { return !operator==(r); }
+    /** Delete the node (and children) pointed by the reference, invalidating it
+     * NOTE: if reference points to the root node, deletes all nodes
+     * NOTE: does nothing if the reference is not valid */
+    void remove();
+    /** Create a new child node and returns a reference to it */
+    node_ref_t create();
 };
 
 /** SoC register reference */
@@ -305,6 +317,9 @@ public:
     /** Compare this reference to another */
     bool operator==(const register_ref_t& r) const;
     inline bool operator!=(const register_ref_t& r) const { return !operator==(r); }
+    /** Delete the register pointed by the reference, invalidating it
+     * NOTE: does nothing if the reference is not valid */
+    void remove();
 };
 
 /** SoC register field reference */

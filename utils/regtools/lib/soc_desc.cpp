@@ -400,7 +400,6 @@ bool parse_node_elem(xmlNode *node_, node_t& node, error_context_t& ctx)
         MATCH_ELEM_NODE("instance", node.instance, parse_instance_elem, ctx)
     END_NODE_MATCH()
     CHECK_HAS(node_, "name", has_name, ctx)
-    CHECK_HAS(node_, "instance", !node.instance.empty(), ctx)
     if(has_register)
         node.register_.push_back(reg);
     return ret;
@@ -463,6 +462,93 @@ bool parse_xml(const std::string& filename, soc_t& soc,
     xmlFreeDoc(doc);
 
     return ret;
+}
+
+/**
+ * Normalizer
+ */
+
+namespace
+{
+
+struct soc_sorter
+{
+    /* returns the first (lowest) address of an instance */
+    soc_addr_t first_addr(const instance_t& inst) const
+    {
+        if(inst.type == instance_t::SINGLE)
+            return inst.addr;
+        if(inst.range.type == range_t::STRIDE)
+            return inst.range.base;
+        soc_word_t res;
+        std::map< std::string, soc_word_t > vars;
+        vars[inst.range.variable] = inst.range.first;
+        error_context_t ctx;
+        if(!evaluate_formula(inst.range.formula, vars, res, "", ctx))
+            return 0xffffffff;
+        return res;
+    }
+
+    /* sort instances by first address */
+    bool operator()(const instance_t& a, const instance_t& b) const
+    {
+        return first_addr(a) < first_addr(b);
+    }
+
+    /* sort nodes by first address of first instance (which is the lowest of
+     * any instance if instances are sorted) */
+    bool operator()(const node_t& a, const node_t& b) const
+    {
+        /* borderline cases: no instances is lower than with instances */
+        if(a.instance.size() == 0)
+            return b.instance.size() > 0;
+        if(b.instance.size() == 0)
+            return false;
+        return first_addr(a.instance[0]) < first_addr(b.instance[0]);
+    }
+
+    /* sort fields by decreasing position */
+    bool operator()(const field_t& a, const field_t& b) const
+    {
+        return a.pos > b.pos;
+    }
+
+    /* sort enum values by value */
+    bool operator()(const enum_t& a, const enum_t& b) const
+    {
+        return a.value < b.value;
+    }
+};
+
+void normalize(field_t& field)
+{
+    std::sort(field.enum_.begin(), field.enum_.end(), soc_sorter());
+}
+
+void normalize(register_t& reg)
+{
+    for(size_t i = 0; i < reg.field.size(); i++)
+        normalize(reg.field[i]);
+    std::sort(reg.field.begin(), reg.field.end(), soc_sorter());
+}
+
+void normalize(node_t& node)
+{
+    for(size_t i = 0; i < node.register_.size(); i++)
+        normalize(node.register_[i]);
+    for(size_t i = 0; i < node.node.size(); i++)
+        normalize(node.node[i]);
+    std::sort(node.node.begin(), node.node.end(), soc_sorter());
+    std::sort(node.instance.begin(), node.instance.end(), soc_sorter());
+}
+
+}
+
+void normalize(soc_t& soc)
+{
+    for(size_t i = 0; i < soc.node.size(); i++)
+        normalize(soc.node[i]);
+    std::sort(soc.node.begin(), soc.node.end(), soc_sorter());
 }
 
 /**
@@ -671,6 +757,24 @@ Lerr:
 }
 
 /**
+ * utils
+ */
+
+namespace
+{
+
+template< typename T >
+soc_id_t gen_fresh_id(const std::vector< T >& list)
+{
+    soc_id_t id = 0;
+    for(size_t i = 0; i < list.size(); i++)
+        id = std::max(id, list[i].id);
+    return id + 1;
+}
+
+}
+
+/**
  * soc_ref_t
  */
 
@@ -867,6 +971,41 @@ bool node_ref_t::operator==(const node_ref_t& ref) const
     return m_soc == ref.m_soc && m_path == ref.m_path;
 }
 
+void node_ref_t::remove()
+{
+    if(is_root())
+    {
+        soc_t *s = soc().get();
+        if(s)
+            s->node.clear();
+    }
+    else
+    {
+        std::vector< node_t > *list = get_children(parent());
+        if(list == 0)
+            return;
+        for(size_t i = 0; i < list->size(); i++)
+            if((*list)[i].id == m_path.back())
+            {
+                list->erase(list->begin() + i);
+                return;
+            }
+    }
+}
+
+node_ref_t node_ref_t::create()
+{
+    std::vector< node_t > *list = get_children(*this);
+    if(list == 0)
+        return node_ref_t();
+    node_t n;
+    n.id = gen_fresh_id(*list);
+    list->push_back(n);
+    std::vector< soc_id_t > path = m_path;
+    path.push_back(n.id);
+    return node_ref_t(soc(), path);
+}
+
 /**
  * register_ref_t
  */
@@ -918,6 +1057,13 @@ field_ref_t register_ref_t::field(const std::string& name) const
         if(r->field[i].name == name)
             return field_ref_t(*this, r->field[i].id);
     return field_ref_t();
+}
+
+void register_ref_t::remove()
+{
+    node_t *n = node().get();
+    if(n)
+        n->register_.clear();
 }
 
 /**
@@ -1069,7 +1215,7 @@ instance_t *node_inst_t::get() const
 
 soc_addr_t node_inst_t::addr() const
 {
-    if(is_root())
+    if(!valid() || is_root())
         return 0;
     soc_addr_t addr = parent().addr();
     if(!get_inst_addr(get(), m_index_path.back(), addr))
@@ -1100,7 +1246,7 @@ node_inst_t node_inst_t::child(const std::string& name, size_t index) const
             std::vector< soc_id_t > ids = m_id_path;
             std::vector< size_t > indexes = m_index_path;
             ids.push_back(node.instance[j].id);
-            ids.push_back(index);
+            indexes.push_back(index);
             return node_inst_t(child_node, ids, indexes);
         }
         child_node.m_path.pop_back();
