@@ -400,7 +400,6 @@ bool parse_node_elem(xmlNode *node_, node_t& node, error_context_t& ctx)
         MATCH_ELEM_NODE("instance", node.instance, parse_instance_elem, ctx)
     END_NODE_MATCH()
     CHECK_HAS(node_, "name", has_name, ctx)
-    CHECK_HAS(node_, "instance", !node.instance.empty(), ctx)
     if(has_register)
         node.register_.push_back(reg);
     return ret;
@@ -671,6 +670,24 @@ Lerr:
 }
 
 /**
+ * utils
+ */
+
+namespace
+{
+
+template< typename T >
+soc_id_t gen_fresh_id(const std::vector< T >& list)
+{
+    soc_id_t id = 0;
+    for(size_t i = 0; i < list.size(); i++)
+        id = std::max(id, list[i].id);
+    return id + 1;
+}
+
+}
+
+/**
  * soc_ref_t
  */
 
@@ -867,6 +884,41 @@ bool node_ref_t::operator==(const node_ref_t& ref) const
     return m_soc == ref.m_soc && m_path == ref.m_path;
 }
 
+void node_ref_t::remove()
+{
+    if(is_root())
+    {
+        soc_t *s = soc().get();
+        if(s)
+            s->node.clear();
+    }
+    else
+    {
+        std::vector< node_t > *list = get_children(parent());
+        if(list == 0)
+            return;
+        for(size_t i = 0; i < list->size(); i++)
+            if((*list)[i].id == m_path.back())
+            {
+                list->erase(list->begin() + i);
+                return;
+            }
+    }
+}
+
+node_ref_t node_ref_t::create()
+{
+    std::vector< node_t > *list = get_children(*this);
+    if(list == 0)
+        return node_ref_t();
+    node_t n;
+    n.id = gen_fresh_id(*list);
+    list->push_back(n);
+    std::vector< soc_id_t > path = m_path;
+    path.push_back(n.id);
+    return node_ref_t(soc(), path);
+}
+
 /**
  * register_ref_t
  */
@@ -918,6 +970,13 @@ field_ref_t register_ref_t::field(const std::string& name) const
         if(r->field[i].name == name)
             return field_ref_t(*this, r->field[i].id);
     return field_ref_t();
+}
+
+void register_ref_t::remove()
+{
+    node_t *n = node().get();
+    if(n)
+        n->register_.clear();
 }
 
 /**
@@ -1069,7 +1128,7 @@ instance_t *node_inst_t::get() const
 
 soc_addr_t node_inst_t::addr() const
 {
-    if(is_root())
+    if(!valid() || is_root())
         return 0;
     soc_addr_t addr = parent().addr();
     if(!get_inst_addr(get(), m_index_path.back(), addr))
