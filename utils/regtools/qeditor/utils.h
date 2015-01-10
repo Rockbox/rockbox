@@ -38,6 +38,7 @@
 #include <QComboBox>
 #include <QFileDialog>
 #include <QScrollBar>
+#include <QGroupBox>
 #include "settings.h"
 #include "backend.h"
 
@@ -58,7 +59,7 @@ class SocFieldValidator : public QValidator
     Q_OBJECT
 public:
     SocFieldValidator(QObject *parent = 0);
-    SocFieldValidator(const soc_reg_field_t& field, QObject *parent = 0);
+    SocFieldValidator(const soc_desc::field_t& field, QObject *parent = 0);
 
     virtual void fixup(QString& input) const;
     virtual State validate(QString& input, int& pos) const;
@@ -66,7 +67,7 @@ public:
     State parse(const QString& input, soc_word_t& val) const;
 
 protected:
-    soc_reg_field_t m_field;
+    soc_desc::field_t m_field;
 };
 
 class RegLineEdit : public QWidget
@@ -112,8 +113,8 @@ class SocFieldItemDelegate : public QStyledItemDelegate
 {
 public:
     SocFieldItemDelegate(QObject *parent = 0):QStyledItemDelegate(parent), m_bitcount(32) {}
-    SocFieldItemDelegate(const soc_reg_field_t& field, QObject *parent = 0)
-        :QStyledItemDelegate(parent), m_bitcount(field.last_bit - field.first_bit + 1) {}
+    SocFieldItemDelegate(const soc_desc::field_t& field, QObject *parent = 0)
+        :QStyledItemDelegate(parent), m_bitcount(field.width) {}
 
     virtual QString displayText(const QVariant& value, const QLocale& locale) const;
 protected:
@@ -125,44 +126,44 @@ class SocFieldEditor : public QLineEdit
     Q_OBJECT
     Q_PROPERTY(uint field READ field WRITE setField USER true)
 public:
-    SocFieldEditor(const soc_reg_field_t& field, QWidget *parent = 0);
+    SocFieldEditor(const soc_desc::field_t& field, QWidget *parent = 0);
     virtual ~SocFieldEditor();
 
     uint field() const;
     void setField(uint field);
-    void SetRegField(const soc_reg_field_t& field);
+    void SetRegField(const soc_desc::field_t& field);
 
 protected:
     SocFieldValidator *m_validator;
     uint m_field;
-    soc_reg_field_t m_reg_field;
+    soc_desc::field_t m_reg_field;
 };
 
 class SocFieldEditorCreator : public QItemEditorCreatorBase
 {
 public:
-    SocFieldEditorCreator() { m_field.first_bit = 0; m_field.last_bit = 31; }
-    SocFieldEditorCreator(const soc_reg_field_t& field):m_field(field) {}
+    SocFieldEditorCreator() { m_field.pos = 0; m_field.width = 32; }
+    SocFieldEditorCreator(const soc_desc::field_t& field):m_field(field) {}
 
     virtual QWidget *createWidget(QWidget *parent) const;
     virtual QByteArray valuePropertyName() const;
 
 protected:
-    soc_reg_field_t m_field;
+    soc_desc::field_t m_field;
 };
 
 class SocFieldCachedValue
 {
 public:
     SocFieldCachedValue():m_value(0) {}
-    SocFieldCachedValue(const soc_reg_field_t& field, uint value);
+    SocFieldCachedValue(const soc_desc::field_t& field, uint value);
     virtual ~SocFieldCachedValue() {}
-    const soc_reg_field_t& field() const { return m_field; }
+    const soc_desc::field_t& field() const { return m_field; }
     uint value() const { return m_value; }
     /* return empty string if there no match */
     QString value_name() const { return m_name; }
 protected:
-    soc_reg_field_t m_field;
+    soc_desc::field_t m_field;
     uint m_value;
     QString m_name;
 };
@@ -173,8 +174,8 @@ class SocFieldBitRange
 {
 public:
     SocFieldBitRange():m_first_bit(0),m_last_bit(0) {}
-    SocFieldBitRange(const soc_reg_field_t& field)
-        :m_first_bit(field.first_bit), m_last_bit(field.last_bit) {}
+    SocFieldBitRange(const soc_desc::field_t& field)
+        :m_first_bit(field.pos), m_last_bit(field.pos + field.width - 1) {}
     unsigned GetFirstBit() const { return m_first_bit; }
     unsigned GetLastBit() const { return m_last_bit; }
 protected:
@@ -255,7 +256,7 @@ public:
     virtual Qt::ItemFlags flags (const QModelIndex & index) const;
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role);
 
-    void SetRegister(const soc_reg_t& reg);
+    void SetRegister(const soc_desc::register_t& reg);
     /* values can either be an invalid QVariant() (means no value/error), or a
      * QVariant containing a soc_word_t */
     void SetValues(const QVector< QVariant >& values);
@@ -286,7 +287,7 @@ protected:
         Error
     };
 
-    soc_reg_t m_reg;
+    soc_desc::register_t m_reg;
     QVector< QVariant > m_value;
     QVector< ColorStatus > m_status;
     RegTheme m_theme;
@@ -481,6 +482,12 @@ protected:
 
 private slots:
     void OnClose(bool clicked);
+};
+
+class Misc
+{
+public:
+    static QGroupBox *EncloseInBox(const QString& name, QWidget *widget);
 };
 
 #endif /* AUX_H */
