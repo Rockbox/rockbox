@@ -1069,7 +1069,7 @@ instance_t *node_inst_t::get() const
 
 soc_addr_t node_inst_t::addr() const
 {
-    if(is_root())
+    if(!valid() || is_root())
         return 0;
     soc_addr_t addr = parent().addr();
     if(!get_inst_addr(get(), m_index_path.back(), addr))
