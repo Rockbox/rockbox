@@ -20,12 +20,19 @@
  ****************************************************************************/
 #include <QApplication>
 #include <QDir>
+#include <QTextCodec>
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     app.setApplicationVersion(APP_VERSION);
+    /** use the locale codec as the C-string codec, otherwise QString::toStdString()
+     * performs as toLatin1() which breaks conversion on virtually all systems.
+     * FIXME The documentation mentions that the C-string codec should produce ASCII
+     * compatible (ie 7-bit) encodings but nowadays most system are using UTF-8
+     * so I don't see why this is a problem */
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForLocale());
 
     Backend backend;;
     QDir dir(QCoreApplication::applicationDirPath());
