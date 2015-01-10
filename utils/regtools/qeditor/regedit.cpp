@@ -24,6 +24,7 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QStandardItemModel>
 
 /**
  * EmptyEditPanel
@@ -36,227 +37,512 @@ EmptyEditPanel::EmptyEditPanel(QWidget *parent)
 /**
  * SocEditPanel
  */
-SocEditPanel::SocEditPanel(SocRef ref, QWidget *parent)
+SocEditPanel::SocEditPanel(const soc_desc::soc_ref_t& ref, QWidget *parent)
     :QWidget(parent), m_ref(ref)
 {
-    m_name_group = new QGroupBox("Name", this);
-    m_name_edit = new QLineEdit(this);
-    m_name_edit->setText(QString::fromStdString(ref.GetSoc().name));
-    QVBoxLayout *name_group_layout = new QVBoxLayout;
-    name_group_layout->addWidget(m_name_edit);
-    m_name_group->setLayout(name_group_layout);
+    QLineEdit *name_edit = new QLineEdit(this);
+    name_edit->setText(QString::fromStdString(ref.get()->name));
+    QGroupBox *name_group = Misc::EncloseInBox("Name", name_edit);
 
-    m_desc_group = new QGroupBox("Description", this);
-    QHBoxLayout *group_layout = new QHBoxLayout;
+    QLineEdit *title_edit = new QLineEdit(this);
+    title_edit->setText(QString::fromStdString(ref.get()->title));
+    QGroupBox *title_group = Misc::EncloseInBox("Title", title_edit);
+
+    QLineEdit *isa_edit = new QLineEdit(this);
+    isa_edit->setText(QString::fromStdString(ref.get()->isa));
+    QGroupBox *isa_group = Misc::EncloseInBox("Instruction Set", isa_edit);
+
+    QLineEdit *version_edit = new QLineEdit(this);
+    version_edit->setText(QString::fromStdString(ref.get()->version));
+    QGroupBox *version_group = Misc::EncloseInBox("Version", version_edit);
+
+    m_authors_list = new QListWidget(this);
+    std::vector< std::string >& authors = ref.get()->author;
+    for(size_t i = 0; i < authors.size(); i++)
+        m_authors_list->addItem(QString::fromStdString(authors[i]));
+    QGroupBox *authors_group = Misc::EncloseInBox("Authors", m_authors_list);
+
     m_desc_edit = new MyTextEditor(this);
-    m_desc_edit->SetTextHtml(QString::fromStdString(ref.GetSoc().desc));
-    group_layout->addWidget(m_desc_edit);
-    m_desc_group->setLayout(group_layout);
+    m_desc_edit->SetTextHtml(QString::fromStdString(ref.get()->desc));
+    QGroupBox *desc_group = Misc::EncloseInBox("Description", m_desc_edit);
+
+    QVBoxLayout *banner_left_layout = new QVBoxLayout;
+    banner_left_layout->addWidget(name_group);
+    banner_left_layout->addWidget(title_group);
+    banner_left_layout->addWidget(isa_group);
+    banner_left_layout->addWidget(version_group);
+    banner_left_layout->addStretch(1);
+    QHBoxLayout *banner_layout = new QHBoxLayout;
+    banner_layout->addLayout(banner_left_layout);
+    banner_layout->addWidget(authors_group);
+    banner_left_layout->addStretch(1);
 
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(m_name_group);
-    layout->addWidget(m_desc_group);
+    layout->addLayout(banner_layout);
+    layout->addWidget(desc_group);
     layout->addStretch(1);
 
-    connect(m_name_edit, SIGNAL(textChanged(const QString&)), this, SLOT(OnNameEdited(const QString&)));
+    connect(name_edit, SIGNAL(textChanged(const QString&)), this,
+        SLOT(OnNameEdited(const QString&)));
     connect(m_desc_edit, SIGNAL(OnTextChanged()), this, SLOT(OnTextEdited()));
+    connect(title_edit, SIGNAL(textChanged(const QString&)), this,
+        SLOT(OnTitleEdited(const QString&)));
+    connect(version_edit, SIGNAL(textChanged(const QString&)), this,
+        SLOT(OnVersionEdited(const QString&)));
+    connect(isa_edit, SIGNAL(textChanged(const QString&)), this,
+        SLOT(OnIsaEdited(const QString&)));
 
     setLayout(layout);
 }
 
 void SocEditPanel::OnNameEdited(const QString& text)
 {
-    m_ref.GetSoc().name = text.toStdString();
-    OnModified(m_name_edit->isModified());
+    m_ref.get()->name = text.toStdString();
+    OnModified();
+}
+
+void SocEditPanel::OnTitleEdited(const QString& text)
+{
+    m_ref.get()->title = text.toStdString();
+    OnModified();
+}
+
+void SocEditPanel::OnVersionEdited(const QString& text)
+{
+    m_ref.get()->version = text.toStdString();
+    OnModified();
+}
+
+void SocEditPanel::OnIsaEdited(const QString& text)
+{
+    m_ref.get()->isa = text.toStdString();
+    OnModified();
 }
 
 void SocEditPanel::OnTextEdited()
 {
-    m_ref.GetSoc().desc = m_desc_edit->GetTextHtml().toStdString();
-    OnModified(m_desc_edit->IsModified());
+    m_ref.get()->desc = m_desc_edit->GetTextHtml().toStdString();
+    OnModified();
 }
 
 /**
- * DevEditPanel
+ * NodeInstanceEditPanel
  */
-DevEditPanel::DevEditPanel(SocDevRef ref, QWidget *parent)
+
+namespace
+{
+
+template< typename T >
+soc_id_t GetFreshId(const std::vector< T >& list)
+{
+    soc_id_t id = 0;
+    for(size_t i = 0; i < list.size(); i++)
+        id = std::max(id, list[i].id);
+    return id + 1;
+}
+
+soc_desc::instance_t *GetInstanceById(const soc_desc::node_ref_t& node, soc_id_t id)
+{
+    std::vector< soc_desc::instance_t >& inst_list = node.get()->instance;
+    for(size_t i = 0; i < inst_list.size(); i++)
+        if(inst_list[i].id == id)
+            return &inst_list[i];
+    return 0;
+}
+
+bool RemoveInstanceById(const soc_desc::node_ref_t& node, soc_id_t id)
+{
+    std::vector< soc_desc::instance_t >& inst_list = node.get()->instance;
+    for(size_t i = 0; i < inst_list.size(); i++)
+        if(inst_list[i].id == id)
+        {
+            inst_list.erase(inst_list.begin() + i);
+            return true;
+        }
+    return false;
+}
+
+enum
+{
+    InstTypeRole = Qt::UserRole,
+};
+
+}
+
+NodeInstanceEditPanel::NodeInstanceEditPanel(const soc_desc::node_ref_t& ref,
+    soc_id_t inst_id, QWidget *parent)
+    :QWidget(parent), m_ref(ref), m_id(inst_id)
+{
+    QLineEdit *name_edit = new QLineEdit(this);
+    QLineEdit *title_edit = new QLineEdit(this);
+    YPathBar *type_bar = new YPathBar(this);
+    m_type_choose_hint = new QLabel("Choose type...", this);
+    QFont f = m_type_choose_hint->font();
+    f.setItalic(true);
+    m_type_choose_hint->setFont(f);
+    QLabel *type_label = new QLabel("Type", this);
+    f = type_label->font();
+    f.setBold(true);
+    type_label->setFont(f);
+
+    QHBoxLayout *type_layout = new QHBoxLayout;
+    type_layout->addWidget(type_label);
+    type_layout->addWidget(type_bar);
+    type_layout->addWidget(m_type_choose_hint);
+    type_layout->addStretch(0);
+
+    soc_desc::field_t fake_field;
+    fake_field.pos = 0;
+    fake_field.width = 32;
+
+    m_single_group = new QWidget(this);
+    QHBoxLayout *sg_layout = new QHBoxLayout;
+    sg_layout->addWidget(new QLabel("Address:", m_single_group));
+    SocFieldEditor *addr_edit = new SocFieldEditor(fake_field, m_single_group);
+    sg_layout->addWidget(addr_edit);
+    m_single_group->setLayout(sg_layout);
+
+    m_range_group = new QWidget(this);
+    QGridLayout *rg_layout = new QGridLayout;
+    rg_layout->addWidget(new QLabel("First:", m_range_group), 0, 0);
+    QSpinBox *first_spin = new QSpinBox(m_range_group);
+    rg_layout->addWidget(first_spin, 0, 1);
+    rg_layout->addWidget(new QLabel("Count:", m_range_group), 1, 0);
+    QSpinBox *count_spin = new QSpinBox(m_range_group);
+    rg_layout->addWidget(count_spin, 1, 1);
+    m_range_group->setLayout(rg_layout);
+
+    m_stride_group = new QWidget(m_range_group);
+    QGridLayout *rsg_layout = new QGridLayout;
+    rsg_layout->addWidget(new QLabel("Base:", m_stride_group), 0, 0);
+    SocFieldEditor *base_edit = new SocFieldEditor(fake_field, m_stride_group);
+    rsg_layout->addWidget(base_edit, 0, 1);
+    rsg_layout->addWidget(new QLabel("Stride:", m_stride_group), 1, 0);
+    SocFieldEditor *stride_edit = new SocFieldEditor(fake_field, m_stride_group);
+    rsg_layout->addWidget(stride_edit, 1, 1);
+    m_stride_group->setLayout(rsg_layout);
+
+    m_formula_group = new QWidget(m_range_group);
+    QGridLayout *fsg_layout = new QGridLayout;
+    fsg_layout->addWidget(new QLabel("Variable:", m_formula_group), 0, 0);
+    QLineEdit *variable_edit = new QLineEdit(m_formula_group);
+    fsg_layout->addWidget(variable_edit, 0, 1);
+    fsg_layout->addWidget(new QLabel("Formula:", m_formula_group), 1, 0);
+    QLineEdit *formula_edit = new QLineEdit(m_formula_group);
+    fsg_layout->addWidget(formula_edit, 1, 1);
+    m_formula_group->setLayout(fsg_layout);
+
+    QHBoxLayout *inst_layout = new QHBoxLayout;
+    inst_layout->addWidget(m_single_group);
+    inst_layout->addWidget(m_range_group);
+    inst_layout->addWidget(m_stride_group);
+    inst_layout->addWidget(m_formula_group);
+    inst_layout->addStretch(0);
+
+    QGroupBox *inst_groupbox = new QGroupBox(this);
+    inst_groupbox->setLayout(inst_layout);
+
+    QHBoxLayout *iint_layout = new QHBoxLayout;
+    iint_layout->addWidget(Misc::EncloseInBox("Name", name_edit), 0);
+    iint_layout->addWidget(Misc::EncloseInBox("Title", title_edit), 1);
+    QLineEdit *desc_edit = new QLineEdit(this);
+    QVBoxLayout *ii_layout = new QVBoxLayout;
+    ii_layout->addLayout(iint_layout);
+    ii_layout->addWidget(Misc::EncloseInBox("Description", desc_edit));
+    ii_layout->addLayout(type_layout);
+    ii_layout->addWidget(inst_groupbox);
+    ii_layout->addStretch(1);
+
+    QStandardItemModel *type_model = new QStandardItemModel(this);
+    QStandardItem *single_item = new QStandardItem("Single");
+    single_item->setData(QVariant::fromValue(soc_desc::instance_t::SINGLE), InstTypeRole);
+    type_model->setItem(0, 0, single_item);
+    QStandardItem *range_item = new QStandardItem("Range");
+    range_item->setData(QVariant::fromValue(soc_desc::instance_t::RANGE), InstTypeRole);
+    type_model->setItem(1, 0, range_item);
+    QStandardItem *stride_item = new QStandardItem("Stride");
+    stride_item->setData(QVariant::fromValue(soc_desc::range_t::STRIDE), InstTypeRole);
+    range_item->setChild(0, 0, stride_item);
+    QStandardItem *formula_item = new QStandardItem("Formula");
+    formula_item->setData(QVariant::fromValue(soc_desc::range_t::FORMULA), InstTypeRole);
+    range_item->setChild(1, 0, formula_item);
+    type_bar->setModel(type_model);
+
+    /* fill info */
+    soc_desc::instance_t& inst = GetInstance();
+    name_edit->setText(QString::fromStdString(inst.name));
+    title_edit->setText(QString::fromStdString(inst.title));
+    desc_edit->setText(QString::fromStdString(inst.desc));
+    addr_edit->setField(inst.addr);
+    base_edit->setField(inst.range.base);
+    stride_edit->setField(inst.range.stride);
+    first_spin->setValue(inst.range.first);
+    count_spin->setValue(inst.range.count);
+    formula_edit->setText(QString::fromStdString(inst.range.formula));
+    variable_edit->setText(QString::fromStdString(inst.range.variable));
+
+    setLayout(ii_layout);
+
+    connect(name_edit, SIGNAL(textChanged(const QString&)), this,
+        SLOT(OnNameEdited(const QString&)));
+    connect(desc_edit, SIGNAL(textChanged(const QString&)), this,
+        SLOT(OnDescEdited(const QString&)));
+    connect(title_edit, SIGNAL(textChanged(const QString&)), this,
+        SLOT(OnTitleEdited(const QString&)));
+    connect(addr_edit, SIGNAL(editingFinished(uint)), this, SLOT(OnAddrChanged(uint)));
+    connect(base_edit, SIGNAL(editingFinished(uint)), this, SLOT(OnBaseChanged(uint)));
+    connect(stride_edit, SIGNAL(editingFinished(uint)), this, SLOT(OnStrideChanged(uint)));
+    connect(first_spin, SIGNAL(valueChanged(int)), this, SLOT(OnFirstChanged(int)));
+    connect(count_spin, SIGNAL(valueChanged(int)), this, SLOT(OnCountChanged(int)));
+    connect(formula_edit, SIGNAL(textChanged(const QString&)), this,
+        SLOT(OnFormulaChanged(const QString&)));
+    connect(variable_edit, SIGNAL(textChanged(const QString&)), this,
+        SLOT(OnVariableChanged(const QString&)));
+    connect(type_bar, SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+        this, SLOT(OnTypeChanged(const QModelIndex&, const QModelIndex&)));
+
+    /* fill info */
+    if(inst.type == soc_desc::instance_t::RANGE)
+    {
+        if(inst.range.type == soc_desc::range_t::STRIDE)
+            type_bar->setCurrentIndex(stride_item->index());
+        else
+            type_bar->setCurrentIndex(formula_item->index());
+    }
+    else
+        type_bar->setCurrentIndex(single_item->index());
+}
+
+soc_desc::instance_t& NodeInstanceEditPanel::GetInstance()
+{
+    return *GetInstanceById(m_ref, m_id);
+}
+
+void NodeInstanceEditPanel::OnNameEdited(const QString& text)
+{
+    GetInstance().name = text.toStdString();
+    OnModified();
+}
+
+void NodeInstanceEditPanel::OnTitleEdited(const QString& text)
+{
+    GetInstance().title = text.toStdString();
+    OnModified();
+}
+
+void NodeInstanceEditPanel::OnDescEdited(const QString& text)
+{
+    GetInstance().desc = text.toStdString();
+    OnModified();
+}
+
+void NodeInstanceEditPanel::OnAddrChanged(uint addr)
+{
+    GetInstance().addr = addr;
+    OnModified();
+}
+
+void NodeInstanceEditPanel::OnBaseChanged(uint base)
+{
+    GetInstance().range.base = base;
+    OnModified();
+}
+
+void NodeInstanceEditPanel::OnStrideChanged(uint stride)
+{
+    GetInstance().range.stride = stride;
+    OnModified();
+}
+
+void NodeInstanceEditPanel::OnFirstChanged(int first)
+{
+    GetInstance().range.first = first;
+    OnModified();
+}
+
+void NodeInstanceEditPanel::OnCountChanged(int count)
+{
+    GetInstance().range.count = count;
+    OnModified();
+}
+
+void NodeInstanceEditPanel::OnFormulaChanged(const QString& formula)
+{
+    GetInstance().range.formula = formula.toStdString();
+    OnModified();
+}
+
+void NodeInstanceEditPanel::OnVariableChanged(const QString& variable)
+{
+    GetInstance().range.variable = variable.toStdString();
+    OnModified();
+}
+
+bool NodeInstanceEditPanel::IsComplete(const QModelIndex& index)
+{
+    QVariant var = index.data(InstTypeRole);
+    return isUserType< soc_desc::range_t::type_t >(var) ||
+        (isUserType< soc_desc::instance_t::type_t >(var) &&
+            var.value< soc_desc::instance_t::type_t>() == soc_desc::instance_t::SINGLE);
+}
+
+void NodeInstanceEditPanel::OnTypeChanged(const QModelIndex& current,
+    const QModelIndex& previous)
+{
+    Q_UNUSED(previous);
+
+    m_single_group->hide();
+    m_range_group->hide();
+    m_stride_group->hide();
+    m_formula_group->hide();
+
+    QModelIndex idx = current;
+    while(idx.isValid())
+    {
+        QVariant var = idx.data(InstTypeRole);
+        if(isUserType< soc_desc::instance_t::type_t >(var))
+        {
+            soc_desc::instance_t::type_t type = var.value< soc_desc::instance_t::type_t >();
+            if(type == soc_desc::instance_t::SINGLE)
+            {
+                m_single_group->show();
+            }
+            else
+                m_range_group->show();
+            GetInstance().type = type;
+        }
+        else if(isUserType< soc_desc::range_t::type_t >(var))
+        {
+            soc_desc::range_t::type_t type = var.value< soc_desc::range_t::type_t >();
+            if(type == soc_desc::range_t::STRIDE)
+                m_stride_group->show();
+            else
+                m_formula_group->show();
+            GetInstance().range.type = type;
+            m_type_choose_hint->hide();
+        }
+        idx = idx.parent();
+    }
+    m_type_choose_hint->setVisible(!IsComplete(current));
+    OnModified();
+}
+
+soc_id_t NodeInstanceEditPanel::GetId()
+{
+    return m_id;
+}
+
+/**
+ * NodeEditPanel
+ */
+
+NodeEditPanel::NodeEditPanel(const soc_desc::node_ref_t& ref, QWidget *parent)
     :QWidget(parent), m_ref(ref)
 {
-    m_name_group = new QGroupBox("Name", this);
-    m_name_edit = new QLineEdit(this);
-    m_name_edit->setText(QString::fromStdString(ref.GetDev().name));
-    QVBoxLayout *name_group_layout = new QVBoxLayout;
-    name_group_layout->addWidget(m_name_edit);
-    m_name_group->setLayout(name_group_layout);
+    /* top layout: name, title then desc */
+    QLineEdit *name_edit = new QLineEdit(this);
+    name_edit->setText(QString::fromStdString(ref.get()->name));
+    QGroupBox *name_group = Misc::EncloseInBox("Name", name_edit);
 
-    m_long_name_group = new QGroupBox("Long Name", this);
-    m_long_name_edit = new QLineEdit(this);
-    m_long_name_edit->setText(QString::fromStdString(ref.GetDev().long_name));
-    QVBoxLayout *long_name_group_layout = new QVBoxLayout;
-    long_name_group_layout->addWidget(m_long_name_edit);
-    m_long_name_group->setLayout(long_name_group_layout);
+    QLineEdit *title_edit = new QLineEdit(this);
+    title_edit->setText(QString::fromStdString(ref.get()->title));
+    QGroupBox *title_group = Misc::EncloseInBox("Title", title_edit);
 
-    m_version_group = new QGroupBox("Version", this);
-    m_version_edit = new QLineEdit(this);
-    m_version_edit->setText(QString::fromStdString(ref.GetDev().version));
-    QVBoxLayout *version_group_layout = new QVBoxLayout;
-    version_group_layout->addWidget(m_version_edit);
-    m_version_group->setLayout(version_group_layout);
-
-    QVBoxLayout *name_ver_layout = new QVBoxLayout;
-    name_ver_layout->addWidget(m_name_group);
-    name_ver_layout->addWidget(m_long_name_group);
-    name_ver_layout->addWidget(m_version_group);
-    name_ver_layout->addStretch();
-
-    m_instances_table = new QTableWidget(this);
-    m_instances_table->setRowCount(ref.GetDev().addr.size() + 1);
-    m_instances_table->setColumnCount(3);
-    for(size_t row = 0; row < ref.GetDev().addr.size(); row++)
-        FillRow(row, ref.GetDev().addr[row]);
-    CreateNewRow(ref.GetDev().addr.size());
-    m_instances_table->setHorizontalHeaderItem(0, new QTableWidgetItem(""));
-    m_instances_table->setHorizontalHeaderItem(1, new QTableWidgetItem("Name"));
-    m_instances_table->setHorizontalHeaderItem(2, new QTableWidgetItem("Address"));
-    m_instances_table->verticalHeader()->setVisible(false);
-    m_instances_table->resizeColumnsToContents();
-    m_instances_table->horizontalHeader()->setStretchLastSection(true);
-    m_instances_table->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    m_instances_group = new QGroupBox("Instances", this);
-    QHBoxLayout *instances_group_layout = new QHBoxLayout;
-    instances_group_layout->addWidget(m_instances_table);
-    m_instances_group->setLayout(instances_group_layout);
-
-    QHBoxLayout *top_layout = new QHBoxLayout;
-    top_layout->addWidget(m_instances_group);
-    top_layout->addLayout(name_ver_layout);
-    top_layout->addStretch();
-
-    m_desc_group = new QGroupBox("Description", this);
-    QHBoxLayout *group_layout = new QHBoxLayout;
     m_desc_edit = new MyTextEditor(this);
-    m_desc_edit->SetTextHtml(QString::fromStdString(ref.GetDev().desc));
-    group_layout->addWidget(m_desc_edit);
-    m_desc_group->setLayout(group_layout);
+    m_desc_edit->SetTextHtml(QString::fromStdString(ref.get()->desc));
+    QGroupBox *desc_group = Misc::EncloseInBox("Description", m_desc_edit);
 
+    QHBoxLayout *name_title_layout = new QHBoxLayout;
+    name_title_layout->addWidget(name_group, 0);
+    name_title_layout->addWidget(title_group, 1);
+
+    /* instance tab */
+    m_instances_tab = new YTabWidget(0, this);
+    m_instances_tab->setTabOpenable(true);
+    std::vector< soc_desc::instance_t >& inst_list = m_ref.get()->instance;
+    m_instances_tab->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    m_instances_tab->setTabsClosable(true);
+    QGroupBox *instance_tab_group = Misc::EncloseInBox("Instances", m_instances_tab);
+    for(size_t i = 0; i < inst_list.size(); i++)
+    {
+        NodeInstanceEditPanel *p = new NodeInstanceEditPanel(m_ref, inst_list[i].id, this);
+        connect(p, SIGNAL(OnModified()), this, SLOT(OnInstModified()));
+        m_instances_tab->addTab(p, QString::fromStdString(inst_list[i].name));
+    }
+
+    /* boring */
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->addLayout(top_layout, 0);
-    layout->addWidget(m_desc_group, 1);
+    layout->addLayout(name_title_layout);
+    layout->addWidget(desc_group);
+    layout->addWidget(instance_tab_group);
+    layout->addStretch(1);
 
     setLayout(layout);
 
-    SocFieldItemDelegate *m_table_delegate = new SocFieldItemDelegate(this);
-    QItemEditorFactory *m_table_edit_factory = new QItemEditorFactory();
-    SocFieldEditorCreator *m_table_edit_creator = new SocFieldEditorCreator();
-    m_table_edit_factory->registerEditor(QVariant::UInt, m_table_edit_creator);
-    m_table_delegate->setItemEditorFactory(m_table_edit_factory);
-    m_instances_table->setItemDelegate(m_table_delegate);
-
-    connect(m_instances_table, SIGNAL(cellActivated(int,int)), this, SLOT(OnInstActivated(int,int)));
-    connect(m_instances_table, SIGNAL(cellChanged(int,int)), this, SLOT(OnInstChanged(int,int)));
-    connect(m_name_edit, SIGNAL(textChanged(const QString&)), this, SLOT(OnNameEdited(const QString&)));
-    connect(m_long_name_edit, SIGNAL(textChanged(const QString&)), this, SLOT(OnLongNameEdited(const QString&)));
-    connect(m_version_edit, SIGNAL(textChanged(const QString&)), this, SLOT(OnVersionEdited(const QString&)));
+    connect(name_edit, SIGNAL(textChanged(const QString&)), this,
+        SLOT(OnNameEdited(const QString&)));
     connect(m_desc_edit, SIGNAL(OnTextChanged()), this, SLOT(OnDescEdited()));
+    connect(title_edit, SIGNAL(textChanged(const QString&)), this,
+        SLOT(OnTitleEdited(const QString&)));
+    connect(m_instances_tab, SIGNAL(tabCloseRequested(int)), this,
+        SLOT(OnInstRemove(int)));
+    connect(m_instances_tab, SIGNAL(tabOpenRequested()), this, SLOT(OnInstCreate()));
 }
 
-void DevEditPanel::OnNameEdited(const QString& text)
+void NodeEditPanel::OnNameEdited(const QString& text)
 {
-    m_ref.GetDev().name = text.toStdString();
-    OnModified(m_name_edit->isModified());
+    m_ref.get()->name = text.toStdString();
+    OnModified();
 }
 
-void DevEditPanel::OnLongNameEdited(const QString& text)
+void NodeEditPanel::OnTitleEdited(const QString& text)
 {
-    m_ref.GetDev().long_name = text.toStdString();
-    OnModified(m_long_name_edit->isModified());
+    m_ref.get()->title = text.toStdString();
+    OnModified();
 }
 
-void DevEditPanel::OnVersionEdited(const QString& text)
+void NodeEditPanel::OnDescEdited()
 {
-    m_ref.GetDev().version = text.toStdString();
-    OnModified(m_version_edit->isModified());
+    m_ref.get()->desc = m_desc_edit->GetTextHtml().toStdString();
+    OnModified();
 }
 
-void DevEditPanel::OnDescEdited()
+void NodeEditPanel::OnInstRemove(int index)
 {
-    m_ref.GetDev().desc = m_desc_edit->GetTextHtml().toStdString();
-    OnModified(m_desc_edit->IsModified());
+    NodeInstanceEditPanel *panel =
+        dynamic_cast< NodeInstanceEditPanel * >(m_instances_tab->widget(index));
+    RemoveInstanceById(m_ref, panel->GetId());
+    m_instances_tab->removeTab(index);
+    delete panel;
 }
 
-void DevEditPanel::CreateNewRow(int row)
+void NodeEditPanel::OnInstModified()
 {
-    QTableWidgetItem *item = new QTableWidgetItem(QIcon::fromTheme("list-add"), "", DevInstNewType);
-    item->setToolTip("New?");
-    item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    m_instances_table->setItem(row, DevInstIconColumn, item);
-    item = new QTableWidgetItem("New instance...");
-    QFont font = item->font();
-    font.setItalic(true);
-    item->setFont(font);
-    item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    m_instances_table->setItem(row, DevInstNameColumn, item);
-    item = new QTableWidgetItem("");
-    item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    m_instances_table->setItem(row, DevInstAddrColumn, item);
+    int index = m_instances_tab->currentIndex();
+    NodeInstanceEditPanel *panel =
+        dynamic_cast< NodeInstanceEditPanel * >(m_instances_tab->widget(index));
+    m_instances_tab->setTabText(index, QString::fromStdString(panel->GetInstance().name));
+    OnModified();
 }
 
-void DevEditPanel::FillRow(int row, const soc_dev_addr_t& addr)
+void NodeEditPanel::OnInstCreate()
 {
-    QTableWidgetItem *item = new QTableWidgetItem(QString::fromStdString(addr.name));
-    item->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
-    item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
-    m_instances_table->setItem(row, DevInstNameColumn, item);
-    item = new QTableWidgetItem();
-    item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
-    item->setData(Qt::DisplayRole, QVariant(addr.addr));
-    m_instances_table->setItem(row, DevInstAddrColumn, item);
-    item = new QTableWidgetItem(QIcon::fromTheme("list-remove"), "", DevInstDeleteType);
-    item->setToolTip("Remove?");
-    item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    m_instances_table->setItem(row, DevInstIconColumn, item);
+    std::vector< soc_desc::instance_t >& inst_list = m_ref.get()->instance;
+    soc_desc::instance_t inst;
+    inst.id = GetFreshId(inst_list);
+    inst.name = "UNNAMED";
+    inst.type = soc_desc::instance_t::SINGLE;
+    inst.addr = 0;
+    inst.range.type = soc_desc::range_t::STRIDE;
+    inst.range.first = 0;
+    inst.range.count = 0;
+    inst.range.stride = 0;
+    inst_list.push_back(inst);
+    m_instances_tab->addTab(new NodeInstanceEditPanel(m_ref, inst.id, this),
+        QString::fromStdString(inst.name));
 }
 
-void DevEditPanel::OnInstActivated(int row, int column)
-{
-    if(column != 0)
-        return;
-    int type = m_instances_table->item(row, column)->type();
-    if(type == DevInstDeleteType)
-    {
-        m_ref.GetDev().addr.erase(m_ref.GetDev().addr.begin() + row);
-        m_instances_table->removeRow(row);
-        OnModified(true);
-    }
-    else if(type == DevInstNewType)
-    {
-        m_instances_table->insertRow(row);
-        soc_dev_addr_t addr;
-        addr.name = QString("UNNAMED_%1").arg(row).toStdString();
-        addr.addr = 0;
-        m_ref.GetDev().addr.push_back(addr);
-        FillRow(row, addr);
-    }
-}
-
-void DevEditPanel::OnInstChanged(int row, int column)
-{
-    /* ignore extra row for addition */
-    if(row >= (int)m_ref.GetDev().addr.size())
-        return;
-    QTableWidgetItem *item = m_instances_table->item(row, column);
-    if(column == DevInstNameColumn)
-    {
-        m_ref.GetDev().addr[row].name =  item->text().toStdString();
-        OnModified(true);
-    }
-    else if(column == DevInstAddrColumn)
-    {
-        m_ref.GetDev().addr[row].addr = item->data(Qt::DisplayRole).toUInt();
-        OnModified(true);
-    }
-}
-
+#if 0
 /**
  * RegEditPanel
  */
@@ -774,125 +1060,36 @@ void FieldEditPanel::OnValueChanged(int row, int column)
         m_ref.GetField().value[row].desc = item->text().toStdString();
     OnModified(true);
 }
+#endif
 
 namespace
 {
 
 enum
 {
-    SocTreeSocType = QTreeWidgetItem::UserType,
-    SocTreeDevType,
-    SocTreeRegType,
-    SocTreeFieldType,
-    SocTreeNewDevType,
-    SocTreeNewRegType,
-    SocTreeNewFieldType,
+    SocTreeSocType = QTreeWidgetItem::UserType, // SocRefRole -> node_ref_t to root
+    SocTreeNodeType, // SocRefRole -> node_ref_t
+    SocTreeRegType, // SocRefRole -> register_ref_t
 };
 
-/**
- * SocTreeItem
- */
-
-class SocTreeItem : public QTreeWidgetItem
+enum
 {
-public:
-    SocTreeItem(const QString& string, const SocRef& ref)
-        :QTreeWidgetItem(QStringList(string), SocTreeSocType), m_ref(ref) {}
-
-    const SocRef& GetRef() { return m_ref; }
-private:
-    SocRef m_ref;
+    SocRefRole = Qt::UserRole,
 };
 
-/**
- * NewDevTreeItem
- */
-
-class NewDevTreeItem : public QTreeWidgetItem
+template<typename T>
+T SocTreeItemVal(QTreeWidgetItem *item)
 {
-public:
-    NewDevTreeItem(const QString& string, const SocRef& ref)
-        :QTreeWidgetItem(QStringList(string), SocTreeNewDevType), m_ref(ref) {}
+    return item->data(0, SocRefRole).value<T>();
+}
 
-    const SocRef& GetRef() { return m_ref; }
-private:
-    SocRef m_ref;
-};
-
-/**
- * DevTreeItem
- */
-
-class DevTreeItem : public QTreeWidgetItem
+template<typename T>
+QTreeWidgetItem *MakeSocTreeItem(int type, const T& val)
 {
-public:
-    DevTreeItem(const QString& string, const SocDevRef& ref)
-        :QTreeWidgetItem(QStringList(string), SocTreeDevType), m_ref(ref) {}
-
-    const SocDevRef& GetRef() { return m_ref; }
-private:
-    SocDevRef m_ref;
-};
-
-/**
- * NewRegTreeItem
- */
-
-class NewRegTreeItem : public QTreeWidgetItem
-{
-public:
-    NewRegTreeItem(const QString& string, const SocDevRef& ref)
-        :QTreeWidgetItem(QStringList(string), SocTreeNewRegType), m_ref(ref) {}
-
-    const SocDevRef& GetRef() { return m_ref; }
-private:
-    SocDevRef m_ref;
-};
-
-/**
- * RegTreeItem
- */
-
-class RegTreeItem : public QTreeWidgetItem
-{
-public:
-    RegTreeItem(const QString& string, const SocRegRef& ref)
-        :QTreeWidgetItem(QStringList(string), SocTreeRegType), m_ref(ref) {}
-
-    const SocRegRef& GetRef() { return m_ref; }
-private:
-    SocRegRef m_ref;
-};
-
-/**
- * NewFieldTreeItem
- */
-
-class NewFieldTreeItem : public QTreeWidgetItem
-{
-public:
-    NewFieldTreeItem(const QString& string, const SocRegRef& ref)
-        :QTreeWidgetItem(QStringList(string), SocTreeNewFieldType), m_ref(ref) {}
-
-    const SocRegRef& GetRef() { return m_ref; }
-private:
-    SocRegRef m_ref;
-};
-
-/**
- * FieldTreeItem
- */
-
-class FieldTreeItem : public QTreeWidgetItem
-{
-public:
-    FieldTreeItem(const QString& string, const SocFieldRef& ref)
-        :QTreeWidgetItem(QStringList(string), SocTreeFieldType), m_ref(ref) {}
-
-    const SocFieldRef& GetRef() { return m_ref; }
-private:
-    SocFieldRef m_ref;
-};
+    QTreeWidgetItem *item = new QTreeWidgetItem(type);
+    item->setData(0, SocRefRole, QVariant::fromValue(val));
+    return item;
+}
 
 }
 
@@ -913,12 +1110,14 @@ RegEdit::RegEdit(Backend *backend, QWidget *parent)
     m_file_open->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     QMenu *file_open_menu = new QMenu(this);
     QAction *new_act = file_open_menu->addAction(QIcon::fromTheme("document-new"), "New...");
+    m_file_open->setPopupMode(QToolButton::MenuButtonPopup);
     m_file_open->setMenu(file_open_menu);
 
     m_file_save = new QToolButton(this);
     m_file_save->setText("Save");
     m_file_save->setIcon(QIcon::fromTheme("document-save"));
     m_file_save->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    m_file_save->setPopupMode(QToolButton::MenuButtonPopup);
     QMenu *file_save_menu = new QMenu(this);
     QAction *saveas_act = file_save_menu->addAction(QIcon::fromTheme("document-save-as"), "Save as...");
     m_file_save->setMenu(file_save_menu);
@@ -930,13 +1129,29 @@ RegEdit::RegEdit(Backend *backend, QWidget *parent)
     m_soc_tree = new QTreeWidget(this);
     m_soc_tree->setColumnCount(1);
     m_soc_tree->setHeaderLabel(QString("Name"));
-    m_soc_tree->setContextMenuPolicy(Qt::ActionsContextMenu);
-    QAction *soc_tree_delete_action = new QAction("&Delete", this);
-    soc_tree_delete_action->setIcon(QIcon::fromTheme("list-remove"));
-    connect(soc_tree_delete_action, SIGNAL(triggered()), this, SLOT(OnSocItemDelete()));
-    m_soc_tree->addAction(soc_tree_delete_action);
+    m_soc_tree->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    m_delete_action = new QAction("&Delete", this);
+    m_delete_action->setIcon(QIcon::fromTheme("list-remove"));
+    m_new_action = new QAction("&New", this);
+    m_new_action->setIcon(QIcon::fromTheme("list-add"));
+    m_create_action = new QAction("&Create register", this);
+    m_create_action->setIcon(QIcon::fromTheme("folder-new"));
+
     m_splitter->addWidget(m_soc_tree);
     m_splitter->setStretchFactor(0, 0);
+
+    m_msg = new MessageWidget(this);
+    QWidget *splitter_right = new QWidget(this);
+    m_right_panel_layout = new QVBoxLayout;
+    m_right_panel_layout->addWidget(m_msg, 0);
+    splitter_right->setLayout(m_right_panel_layout);
+    m_splitter->addWidget(splitter_right);
+    m_splitter->setStretchFactor(1, 2);
+
+    m_msg_welcome_id = SetMessage(MessageWidget::Information,
+        "Open a description file to edit, or create a new file from scratch.");
+    m_msg_name_error_id = 0;
 
     m_file_group->setLayout(m_file_group_layout);
     m_vert_layout->addWidget(m_file_group);
@@ -949,6 +1164,11 @@ RegEdit::RegEdit(Backend *backend, QWidget *parent)
     SetPanel(new EmptyEditPanel(this));
     UpdateTabName();
 
+    connect(m_soc_tree, SIGNAL(customContextMenuRequested(QPoint)), this,
+        SLOT(OnSocTreeContextMenu(QPoint)));
+    connect(m_delete_action, SIGNAL(triggered()), this, SLOT(OnSocItemDelete()));
+    connect(m_new_action, SIGNAL(triggered()), this, SLOT(OnSocItemNew()));
+    connect(m_create_action, SIGNAL(triggered()), this, SLOT(OnSocItemCreate()));
     connect(m_file_open, SIGNAL(clicked()), this, SLOT(OnOpen()));
     connect(m_file_save, SIGNAL(clicked()), this, SLOT(OnSave()));
     connect(new_act, SIGNAL(triggered()), this, SLOT(OnNew()));
@@ -966,6 +1186,16 @@ QWidget *RegEdit::GetWidget()
 
 RegEdit::~RegEdit()
 {
+}
+
+int RegEdit::SetMessage(MessageWidget::MessageType type, const QString& msg)
+{
+    return m_msg->SetMessage(type, msg);
+}
+
+void RegEdit::HideMessage(int id)
+{
+    m_msg->HideMessage(id);
 }
 
 void RegEdit::OnSave()
@@ -1051,8 +1281,8 @@ void RegEdit::OnNew()
 
 bool RegEdit::SaveSocFile(const QString& filename)
 {
-    normalize(m_cur_socfile.GetSoc());
-    if(!produce_xml(filename.toStdString(), m_cur_socfile.GetSoc()))
+    soc_desc::error_context_t ctx;
+    if(!soc_desc::produce_xml(filename.toStdString(), m_cur_socfile.GetSoc(), ctx))
     {
         QMessageBox::warning(this, "The description was not saved",
             "There was an error when saving the file");
@@ -1086,91 +1316,39 @@ void RegEdit::LoadSocFile(const QString& filename)
     SetModified(false, false);
     UpdateSocFile();
     UpdateTabName();
+    m_msg_welcome_id = SetMessage(MessageWidget::Information,
+        "Select items to edit in tree, or right-click on them to see available actions.");
 }
 
-void RegEdit::CreateNewFieldItem(QTreeWidgetItem *_parent)
+void RegEdit::FillNodeTreeItem(QTreeWidgetItem *item)
 {
-    RegTreeItem *parent = dynamic_cast< RegTreeItem* >(_parent);
-    NewFieldTreeItem *newdev_item = new NewFieldTreeItem("New field...", parent->GetRef());
-    MakeItalic(newdev_item, true);
-    newdev_item->setIcon(0, QIcon::fromTheme("list-add"));
-    parent->addChild(newdev_item);
-}
-
-void RegEdit::FillRegTreeItem(QTreeWidgetItem *_item)
-{
-    RegTreeItem *item = dynamic_cast< RegTreeItem* >(_item);
-    const soc_reg_t& reg = item->GetRef().GetReg();
-    for(size_t i = 0; i < reg.field.size(); i++)
+    soc_desc::node_ref_t node = SocTreeItemVal< soc_desc::node_ref_t >(item);
+    soc_desc::register_ref_t reg = node.reg();
+    /* put register if there, otherwise offer to create one */
+    if(reg.valid() && reg.node() == node)
     {
-        const soc_reg_field_t& field = reg.field[i];
-        FieldTreeItem *field_item = new FieldTreeItem(QString::fromStdString(field.name),
-            SocFieldRef(item->GetRef(), i));
-        FixupEmptyItem(field_item);
-        item->addChild(field_item);
-    }
-    CreateNewFieldItem(item);
-}
-
-void RegEdit::CreateNewRegisterItem(QTreeWidgetItem *_parent)
-{
-    DevTreeItem *parent = dynamic_cast< DevTreeItem* >(_parent);
-    NewRegTreeItem *newdev_item = new NewRegTreeItem("New register...", parent->GetRef());
-    MakeItalic(newdev_item, true);
-    newdev_item->setIcon(0, QIcon::fromTheme("list-add"));
-    parent->addChild(newdev_item);
-}
-
-void RegEdit::FillDevTreeItem(QTreeWidgetItem *_item)
-{
-    DevTreeItem *item = dynamic_cast< DevTreeItem* >(_item);
-    const soc_dev_t& dev = item->GetRef().GetDev();
-    for(size_t i = 0; i < dev.reg.size(); i++)
-    {
-        const soc_reg_t& reg = dev.reg[i];
-        RegTreeItem *reg_item = new RegTreeItem(QString::fromStdString(reg.name),
-            SocRegRef(item->GetRef(), i, -1));
-        FixupEmptyItem(reg_item);
-        FillRegTreeItem(reg_item);
+        QTreeWidgetItem *reg_item = MakeSocTreeItem(SocTreeRegType, reg);
+        FixupItem(reg_item);
         item->addChild(reg_item);
     }
-    CreateNewRegisterItem(item);
-}
-
-void RegEdit::CreateNewDeviceItem(QTreeWidgetItem *_parent)
-{
-    SocTreeItem *parent = dynamic_cast< SocTreeItem* >(_parent);
-    NewDevTreeItem *newdev_item = new NewDevTreeItem("New device...", parent->GetRef());
-    MakeItalic(newdev_item, true);
-    newdev_item->setIcon(0, QIcon::fromTheme("list-add"));
-    parent->addChild(newdev_item);
-}
-
-void RegEdit::FillSocTreeItem(QTreeWidgetItem *_item)
-{
-    SocTreeItem *item = dynamic_cast< SocTreeItem* >(_item);
-    const soc_t& soc = item->GetRef().GetSoc();
-    for(size_t i = 0; i < soc.dev.size(); i++)
+    std::vector< soc_desc::node_ref_t > list = node.children();
+    for(size_t i = 0; i < list.size(); i++)
     {
-        const soc_dev_t& reg = soc.dev[i];
-        DevTreeItem *dev_item = new DevTreeItem(QString::fromStdString(reg.name),
-            SocDevRef(item->GetRef(), i, -1));
-        FixupEmptyItem(dev_item);
-        FillDevTreeItem(dev_item);
-        item->addChild(dev_item);
+        QTreeWidgetItem *node_item = MakeSocTreeItem(SocTreeNodeType, list[i]);
+        FixupItem(node_item);
+        FillNodeTreeItem(node_item);
+        item->addChild(node_item);
     }
-    CreateNewDeviceItem(item);
 }
 
 void RegEdit::FillSocTree()
 {
-    SocRef ref = m_cur_socfile.GetSocRef();
-    SocTreeItem *soc_item = new SocTreeItem(
-        QString::fromStdString(ref.GetSoc().name), ref);
-    FixupEmptyItem(soc_item);
-    FillSocTreeItem(soc_item);
-    m_soc_tree->addTopLevelItem(soc_item);
-    soc_item->setExpanded(true);
+    soc_desc::soc_ref_t ref = m_cur_socfile.GetSocRef();
+    QTreeWidgetItem *root_item = MakeSocTreeItem(SocTreeSocType, ref.root());
+    FixupItem(root_item);
+    FillNodeTreeItem(root_item);
+    m_soc_tree->addTopLevelItem(root_item);
+    root_item->setExpanded(true);
 }
 
 void RegEdit::MakeItalic(QTreeWidgetItem *item, bool it)
@@ -1180,17 +1358,46 @@ void RegEdit::MakeItalic(QTreeWidgetItem *item, bool it)
     item->setFont(0, font);
 }
 
-void RegEdit::FixupEmptyItem(QTreeWidgetItem *item)
+QIcon RegEdit::GetIconFromType(int type)
 {
-    if(item->text(0).size() == 0)
+    switch(type)
+    {
+        case SocTreeSocType: return style()->standardIcon(QStyle::SP_ComputerIcon);
+        case SocTreeNodeType: return style()->standardIcon(QStyle::SP_DriveHDIcon);
+        case SocTreeRegType: return style()->standardIcon(QStyle::SP_DirIcon);
+        default: return QIcon();
+    }
+}
+
+bool RegEdit::ValidateName(const QString& name)
+{
+    if(name.size() == 0)
+        return false;
+    for(int i = 0; i < name.size(); i++)
+        if(!name[i].isLetterOrNumber() && name[i] != QChar('_'))
+            return false;
+    return true;
+}
+
+void RegEdit::FixupItem(QTreeWidgetItem *item)
+{
+    UpdateName(item);
+    if(!ValidateName(item->text(0)))
     {
         item->setIcon(0, QIcon::fromTheme("dialog-error"));
-        MakeItalic(item, true);
-        item->setText(0, "Unnamed");
+        if(item->text(0).size() == 0)
+        {
+            MakeItalic(item, true);
+            item->setText(0, "Unnamed");
+        }
+        m_msg_name_error_id = SetMessage(MessageWidget::Error,
+            "The item name is invalid. It must be non-empty and consists only "
+            "of alphanumerical or underscore characters");
     }
     else
     {
-        item->setIcon(0, QIcon::fromTheme("cpu"));
+        HideMessage(m_msg_name_error_id);
+        item->setIcon(0, GetIconFromType(item->type()));
         MakeItalic(item, false);
     }
 }
@@ -1206,9 +1413,9 @@ void RegEdit::SetPanel(QWidget *panel)
 {
     delete m_right_panel;
     m_right_panel = panel;
-    connect(m_right_panel, SIGNAL(OnModified(bool)), this, SLOT(OnSocModified(bool)));
-    m_splitter->addWidget(m_right_panel);
-    m_splitter->setStretchFactor(1, 2);
+    connect(m_right_panel, SIGNAL(OnModified()), this,
+        SLOT(OnSocModified()));
+    m_right_panel_layout->addWidget(m_right_panel, 1);
 }
 
 void RegEdit::SetModified(bool add, bool mod)
@@ -1228,6 +1435,14 @@ void my_remove_at(std::vector< T >& v, size_t at)
 
 }
 
+void RegEdit::OnSocItemNew()
+{
+}
+
+void RegEdit::OnSocItemCreate()
+{
+}
+
 void RegEdit::OnSocItemDelete()
 {
     QTreeWidgetItem *current = m_soc_tree->currentItem();
@@ -1240,13 +1455,14 @@ void RegEdit::OnSocItemDelete()
     int ret = msgbox.exec();
     if(ret != QMessageBox::Yes)
         return;
+#if 0
     if(current->type() == SocTreeSocType)
     {
-        SocTreeItem *item = dynamic_cast< SocTreeItem * >(current);
+        SocTreeItemVal< soc_desc::node_ref_t >(current).soc().get()->nodes.clear();
         item->GetRef().GetSoc().dev.clear();
-        item->takeChildren();
-        FillSocTreeItem(item);
-        m_soc_tree->expandItem(item);
+        current->takeChildren();
+        FillNodeTreeItem(current);
+        m_soc_tree->expandItem(current);
     }
     else if(current->type() == SocTreeDevType)
     {
@@ -1266,70 +1482,91 @@ void RegEdit::OnSocItemDelete()
         FillDevTreeItem(parent);
         m_soc_tree->expandItem(parent);
     }
-    else if(current->type() == SocTreeFieldType)
-    {
-        FieldTreeItem *item = dynamic_cast< FieldTreeItem * >(current);
-        my_remove_at(item->GetRef().GetReg().field, item->GetRef().GetFieldIndex());
-        QTreeWidgetItem *parent = item->parent();
-        parent->takeChildren();
-        FillRegTreeItem(parent);
-        m_soc_tree->expandItem(parent);
-    }
+#endif
 }
 
-void RegEdit::OnSocModified(bool modified)
+void RegEdit::OnSocModified()
 {
     // we might need to update the name in the tree
-    UpdateName(m_soc_tree->currentItem());
-    if(modified)
-        SetModified(true, true);
+    FixupItem(m_soc_tree->currentItem());
+    SetModified(true, true);
 }
 
-void RegEdit::DisplaySoc(SocRef ref)
+void RegEdit::DisplaySoc(const soc_desc::soc_ref_t& ref)
 {
     SetPanel(new SocEditPanel(ref, this));
 }
 
-void RegEdit::DisplayDev(SocDevRef ref)
+void RegEdit::DisplayNode(const soc_desc::node_ref_t& ref)
 {
-    SetPanel(new DevEditPanel(ref, this));
+    SetPanel(new NodeEditPanel(ref, this));
 }
 
-void RegEdit::DisplayReg(SocRegRef ref)
+void RegEdit::DisplayReg(const soc_desc::register_ref_t& ref)
 {
-    SetPanel(new RegEditPanel(ref, this));
+    //SetPanel(new RegEditPanel(ref, this));
 }
 
-void RegEdit::DisplayField(SocFieldRef ref)
+void RegEdit::DisplayField(const soc_desc::field_ref_t& ref)
 {
-    SetPanel(new FieldEditPanel(ref, this));
+    //SetPanel(new FieldEditPanel(ref, this));
 }
 
 void RegEdit::UpdateName(QTreeWidgetItem *current)
 {
     if(current == 0)
         return;
+
     if(current->type() == SocTreeSocType)
     {
-        SocTreeItem *item = dynamic_cast< SocTreeItem * >(current);
-        item->setText(0, QString::fromStdString(item->GetRef().GetSoc().name));
+        current->setText(0, QString::fromStdString(
+            SocTreeItemVal< soc_desc::node_ref_t >(current).soc().get()->name));
     }
-    else if(current->type() == SocTreeDevType)
+    else if(current->type() == SocTreeNodeType)
     {
-        DevTreeItem *item = dynamic_cast< DevTreeItem * >(current);
-        item->setText(0, QString::fromStdString(item->GetRef().GetDev().name));
+        current->setText(0, QString::fromStdString(
+            SocTreeItemVal< soc_desc::node_ref_t >(current).get()->name));
     }
     else if(current->type() == SocTreeRegType)
     {
-        RegTreeItem *item = dynamic_cast< RegTreeItem * >(current);
-        item->setText(0, QString::fromStdString(item->GetRef().GetReg().name));
+        current->setText(0, "register");
     }
-    else if(current->type() == SocTreeFieldType)
+}
+
+void RegEdit::OnSocTreeContextMenu(QPoint point)
+{
+    QTreeWidgetItem *item = m_soc_tree->itemAt(point);
+    if(item == 0)
+        return;
+    /* customise messages with item */
+    m_action_item = item;
+    QMenu *menu = new QMenu(this);
+    switch(item->type())
     {
-        FieldTreeItem *item = dynamic_cast< FieldTreeItem * >(current);
-        item->setText(0, QString::fromStdString(item->GetRef().GetField().name));
+        case SocTreeSocType:
+            m_new_action->setText("New node...");
+            m_delete_action->setText("Delete all nodes...");
+            menu->addAction(m_new_action);
+            menu->addAction(m_delete_action);
+            break;
+        case SocTreeNodeType:
+        {
+            m_new_action->setText("New node...");
+            m_delete_action->setText("Delete all nodes...");
+            soc_desc::node_ref_t node = SocTreeItemVal< soc_desc::node_ref_t >(item);
+            if(node.reg().node() != node)
+                menu->addAction(m_create_action);
+            menu->addAction(m_new_action);
+            menu->addAction(m_delete_action);
+            break;
+        }
+        case SocTreeRegType:
+            m_delete_action->setText("Delete register...");
+            menu->addAction(m_new_action);
+            menu->addAction(m_delete_action);
+            break;
     }
-    FixupEmptyItem(current);
+    menu->popup(m_soc_tree->viewport()->mapToGlobal(point));
 }
 
 void RegEdit::OnSocItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
@@ -1338,25 +1575,11 @@ void RegEdit::OnSocItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previo
     if(current == 0)
         return;
     if(current->type() == SocTreeSocType)
-    {
-        SocTreeItem *item = dynamic_cast< SocTreeItem * >(current);
-        DisplaySoc(item->GetRef());
-    }
-    else if(current->type() == SocTreeDevType)
-    {
-        DevTreeItem *item = dynamic_cast< DevTreeItem * >(current);
-        DisplayDev(item->GetRef());
-    }
+        DisplaySoc(SocTreeItemVal< soc_desc::node_ref_t >(current).soc());
+    else if(current->type() == SocTreeNodeType)
+        DisplayNode(SocTreeItemVal< soc_desc::node_ref_t >(current));
     else if(current->type() == SocTreeRegType)
-    {
-        RegTreeItem *item = dynamic_cast< RegTreeItem * >(current);
-        DisplayReg(item->GetRef());
-    }
-    else if(current->type() == SocTreeFieldType)
-    {
-        FieldTreeItem *item = dynamic_cast< FieldTreeItem * >(current);
-        DisplayField(item->GetRef());
-    }
+        DisplayReg(SocTreeItemVal< soc_desc::register_ref_t >(current));
 }
 
 void RegEdit::OnSocItemActivated(QTreeWidgetItem *current, int column)
@@ -1364,21 +1587,22 @@ void RegEdit::OnSocItemActivated(QTreeWidgetItem *current, int column)
     Q_UNUSED(column);
     if(current == 0)
         return;
-    if(current->type() == SocTreeNewDevType)
-        AddDevice(current);
+#if 0
+    if(current->type() == SocTreeNewNodeType)
+        AddNode(current);
     else if(current->type() == SocTreeNewRegType)
         AddRegister(current);
-    else if(current->type() == SocTreeNewFieldType)
-        AddField(current);
+#endif
 }
 
+#if 0
 void RegEdit::AddDevice(QTreeWidgetItem *_item)
 {
     NewDevTreeItem *item = dynamic_cast< NewDevTreeItem * >(_item);
     item->GetRef().GetSoc().dev.push_back(soc_dev_t());
     DevTreeItem *dev_item = new DevTreeItem("",
         SocDevRef(item->GetRef(), item->GetRef().GetSoc().dev.size() - 1, -1));
-    FixupEmptyItem(dev_item);
+    FixupItem(dev_item);
     item->parent()->insertChild(item->parent()->indexOfChild(item), dev_item);
     CreateNewRegisterItem(dev_item);
     m_soc_tree->setCurrentItem(dev_item);
@@ -1391,7 +1615,7 @@ void RegEdit::AddRegister(QTreeWidgetItem *_item)
     item->GetRef().GetDev().reg.push_back(soc_reg_t());
     RegTreeItem *reg_item = new RegTreeItem("",
         SocRegRef(item->GetRef(), item->GetRef().GetDev().reg.size() - 1, -1));
-    FixupEmptyItem(reg_item);
+    FixupItem(reg_item);
     item->parent()->insertChild(item->parent()->indexOfChild(item), reg_item);
     CreateNewFieldItem(reg_item);
     m_soc_tree->setCurrentItem(reg_item);
@@ -1404,11 +1628,12 @@ void RegEdit::AddField(QTreeWidgetItem *_item)
     item->GetRef().GetReg().field.push_back(soc_reg_field_t());
     FieldTreeItem *field_item = new FieldTreeItem("",
         SocFieldRef(item->GetRef(), item->GetRef().GetReg().field.size() - 1));
-    FixupEmptyItem(field_item);
+    FixupItem(field_item);
     item->parent()->insertChild(item->parent()->indexOfChild(item), field_item);
     m_soc_tree->setCurrentItem(field_item);
     OnModified(true);
 }
+#endif
 
 bool RegEdit::Quit()
 {

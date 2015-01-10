@@ -95,11 +95,11 @@ QValidator::State SocBitRangeValidator::parse(const QString& input, int& last, i
 SocFieldValidator::SocFieldValidator(QObject *parent)
     :QValidator(parent)
 {
-    m_field.first_bit = 0;
-    m_field.last_bit = 31;
+    m_field.pos = 0;
+    m_field.width = 32;
 }
 
-SocFieldValidator::SocFieldValidator(const soc_reg_field_t& field, QObject *parent)
+SocFieldValidator::SocFieldValidator(const soc_desc::field_t& field, QObject *parent)
     :QValidator(parent), m_field(field)
 {
 }
@@ -124,7 +124,7 @@ QValidator::State SocFieldValidator::parse(const QString& input, soc_word_t& val
         return Intermediate;
     // first check named values
     State state = Invalid;
-    foreach(const soc_reg_field_value_t& value, m_field.value)
+    foreach(const soc_desc::enum_t& value, m_field.enum_)
     {
         QString name = QString::fromLocal8Bit(value.name.c_str());
         // cannot be a substring if too long or empty
@@ -176,7 +176,7 @@ QValidator::State SocFieldValidator::parse(const QString& input, soc_word_t& val
     if(!ok)
         return state;
     // if ok, check if it fits in the number of bits
-    unsigned nr_bits = m_field.last_bit - m_field.first_bit + 1;
+    unsigned nr_bits = m_field.width;
     unsigned long max = nr_bits == 32 ? 0xffffffff : (1 << nr_bits) - 1;
     if(v <= max)
     {
@@ -311,16 +311,24 @@ QString SocFieldItemDelegate::displayText(const QVariant& value, const QLocale& 
 /**
  * SocFieldEditor
  */
-SocFieldEditor::SocFieldEditor(const soc_reg_field_t& field, QWidget *parent)
+SocFieldEditor::SocFieldEditor(const soc_desc::field_t& field, QWidget *parent)
     :QLineEdit(parent), m_reg_field(field)
 {
     m_validator = new SocFieldValidator(field);
     setValidator(m_validator);
+    connect(this, SIGNAL(editingFinished()), this, SLOT(editDone()));
+    setAlignment(Qt::AlignCenter);
+    setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
 }
 
 SocFieldEditor::~SocFieldEditor()
 {
     delete m_validator;
+}
+
+void SocFieldEditor::editDone()
+{
+    emit editingFinished(field());
 }
 
 uint SocFieldEditor::field() const
@@ -336,11 +344,11 @@ uint SocFieldEditor::field() const
 void SocFieldEditor::setField(uint field)
 {
     m_field = field;
-    int digits = (m_reg_field.last_bit - m_reg_field.first_bit + 4) / 4;
+    int digits = (m_reg_field.width + 3) / 4;
     setText(QString("0x%1").arg(field, digits, 16, QChar('0')));
 }
 
-void SocFieldEditor::SetRegField(const soc_reg_field_t& field)
+void SocFieldEditor::SetRegField(const soc_desc::field_t& field)
 {
     setValidator(0);
     delete m_validator;
@@ -352,12 +360,12 @@ void SocFieldEditor::SetRegField(const soc_reg_field_t& field)
 /**
  * SocFieldCachedValue
  */
-SocFieldCachedValue::SocFieldCachedValue(const soc_reg_field_t& field, uint value)
+SocFieldCachedValue::SocFieldCachedValue(const soc_desc::field_t& field, uint value)
     :m_field(field), m_value(value)
 {
     int idx = field.find_value(value);
     if(idx != -1)
-        m_name = QString::fromStdString(field.value[idx].name);
+        m_name = QString::fromStdString(field.enum_[idx].name);
 }
 
 /**
@@ -366,11 +374,10 @@ SocFieldCachedValue::SocFieldCachedValue(const soc_reg_field_t& field, uint valu
 
 QString SocFieldCachedItemDelegate::displayText(const QVariant& value, const QLocale& locale) const
 {
-    // FIXME see QTBUG-30392
-    if(value.type() == QVariant::UserType && value.userType() == qMetaTypeId< SocFieldCachedValue >())
+    if(isUserType< SocFieldCachedValue >(value))
     {
         const SocFieldCachedValue& v = value.value< SocFieldCachedValue >();
-        int bitcount = v.field().last_bit - v.field().first_bit;
+        int bitcount = v.field().width;
         QString name = v.value_name();
         QString strval = QString("0x%1").arg(v.value(), (bitcount + 3) / 4, 16, QChar('0'));
         switch(m_mode)
@@ -404,7 +411,7 @@ QString SocFieldCachedItemDelegate::displayText(const QVariant& value, const QLo
  * SocFieldCachedEditor
  */
 SocFieldCachedEditor::SocFieldCachedEditor(QWidget *parent)
-    :SocFieldEditor(soc_reg_field_t(), parent)
+    :SocFieldEditor(soc_desc::field_t(), parent)
 {
 }
 
@@ -473,7 +480,7 @@ int RegFieldTableModel::columnCount(const QModelIndex& /* parent */) const
 QVariant RegFieldTableModel::data(const QModelIndex& index, int role) const
 {
     int section = index.column();
-    const soc_reg_field_t& field = m_reg.field[index.row()];
+    const soc_desc::field_t& field = m_reg.field[index.row()];
     /* column independent code */
     const RegThemeGroup *theme = 0;
     switch(m_status[index.row()])
@@ -603,7 +610,7 @@ void RegFieldTableModel::SetReadOnly(bool en)
     m_read_only = en;
 }
 
-void RegFieldTableModel::SetRegister(const soc_reg_t& reg)
+void RegFieldTableModel::SetRegister(const soc_desc::register_t& reg)
 {
     /* remove all rows */
     beginResetModel();
@@ -652,7 +659,7 @@ void RegFieldTableModel::RecomputeTheme()
         if(!m_theme.valid || m_value.size() == 0)
             continue;
         m_status[i] = Normal;
-        const soc_reg_field_t& field = m_reg.field[i];
+        const soc_desc::field_t& field = m_reg.field[i];
         QVariant val;
         for(int j = 0; j < m_value.size(); j++)
         {
@@ -1246,6 +1253,153 @@ void BackendSelector::ChangeBackend(IoBackend *new_backend)
 }
 
 /**
+ * MyTabBarEdit
+ */
+
+MyTabBarEdit::MyTabBarEdit(QWidget* parent)
+    :QLineEdit(parent)
+{
+    setWindowFlags(Qt::CustomizeWindowHint);
+    connect(this, SIGNAL(editingFinished()), this, SLOT(acceptEdit()));
+    hide();
+}
+
+void MyTabBarEdit::setText(const QString &text)
+{
+    QLineEdit::setText(text);
+    setFocus();
+    selectAll();
+    show();
+}
+
+void MyTabBarEdit::keyPressEvent(QKeyEvent* event)
+{
+    QLineEdit::keyPressEvent(event);
+    if(event->key() == Qt::Key_Escape)
+        cancelEdit();
+}
+
+void MyTabBarEdit::focusOutEvent(QFocusEvent* event)
+{
+    QLineEdit::focusOutEvent(event);
+    cancelEdit();
+}
+
+void MyTabBarEdit::acceptEdit()
+{
+    emit editAccepted(text());
+    hide();
+}
+
+void MyTabBarEdit::cancelEdit()
+{
+    emit editCancelled();
+    hide();
+}
+
+#if 0
+/**
+ * MyTabBar
+ */
+
+MyTabBar::MyTabBar(QWidget *parent)
+    :QTabBar(parent)
+{
+    m_edit_index = -1;
+    m_tabs_editable = false;
+    m_edit_line = new MyTabBarEdit(this);
+    connect(m_edit_line, SIGNAL(editAccepted(const QString&)), this,
+        SLOT(acceptEdit(const QString&)));
+    connect(m_edit_line, SIGNAL(editCancelled()), this,
+        SLOT(cancelEdit()));
+}
+
+void MyTabBar::mousePressEvent(QMouseEvent *event)
+{
+    QTabBar::mousePressEvent(event);
+    if(event->type() == QEvent::MouseButtonDblClick && m_tabs_editable)
+    {
+        int id = tabAt(event->pos());
+        if(id != -1)
+            triggerEdit(id);
+    }
+}
+
+void MyTabBar::triggerEdit(int index)
+{
+    /* just to be sure, cancel any current edit */
+    finishEdit(true);
+    /* create and position edit */
+    m_edit_index = index;
+    m_edit_line->setText(tabText(m_edit_index));
+    QRect rect = tabRect(m_edit_index);
+    m_edit_line->setGeometry(rect);
+}
+
+void MyTabBar::finishEdit(bool cancel)
+{
+    if(m_edit_index == -1)
+        return;
+    if(!cancel)
+        emit tabEditRequested(m_edit_index, m_edit_line->text());
+}
+
+void MyTabBar::acceptEdit(const QString& text)
+{
+    finishEdit(false);
+}
+
+void MyTabBar::cancelEdit()
+{
+    finishEdit(true);
+}
+
+void MyTabBar::setTabsEditable(bool editable)
+{
+    if(!editable)
+        finishEdit(true);
+    m_tabs_editable = editable;
+}
+#endif
+
+/**
+ * YTabWidget
+ */
+YTabWidget::YTabWidget(QTabBar *bar, QWidget *parent)
+    :QTabWidget(parent)
+{
+    if(bar != 0)
+        setTabBar(bar);
+    m_tab_open_button = new QToolButton(this);
+    m_tab_open_button->setIcon(QIcon::fromTheme("list-add"));
+    m_tab_open_button->setAutoRaise(true);
+    m_tab_open_button->setPopupMode(QToolButton::InstantPopup);
+    /* the arrow with an icon only is pretty ugly and QToolButton has no way
+     * to remove the arrow programmaticaly, so use the CSS to do that */
+    m_tab_open_button->setStyleSheet("QToolButton::menu-indicator { image: none; }");
+    setCornerWidget(m_tab_open_button, Qt::TopLeftCorner);
+    setTabOpenable(false);
+    connect(m_tab_open_button, SIGNAL(clicked(bool)), this, SLOT(OnOpenButton(bool)));
+}
+
+void YTabWidget::setTabOpenable(bool openable)
+{
+    m_tab_openable = openable;
+    m_tab_open_button->setVisible(openable);
+}
+
+void YTabWidget::OnOpenButton(bool checked)
+{
+    Q_UNUSED(checked);
+    emit tabOpenRequested();
+}
+
+void YTabWidget::setTabOpenMenu(QMenu *menu)
+{
+    m_tab_open_button->setMenu(menu);
+}
+
+/**
  * MessageWidget
  */
 MessageWidget::MessageWidget(QWidget *parent)
@@ -1332,4 +1486,218 @@ void MessageWidget::OnClose(bool clicked)
 {
     Q_UNUSED(clicked);
     hide();
+}
+
+/**
+ * YPathButton
+ */
+
+YPathButton::YPathButton(QWidget *parent)
+    :QToolButton(parent)
+{
+    m_mode = Normal;
+    m_draw_hover = false;
+    setFocusPolicy(Qt::NoFocus);
+    setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
+}
+
+void YPathButton::setMode(Mode mode)
+{
+    m_mode = mode;
+}
+
+QSize YPathButton::sizeHint() const
+{
+    int h = QToolButton::sizeHint().height();
+    QFont f = font();
+    if(m_mode == Bold)
+        f.setBold(true);
+    int width = 4 * BorderWidth;
+    if(m_mode == Arrow)
+        width += h / 2; // approximate arrow size
+    else
+        width += QFontMetrics(f).width(text());
+    return QSize(width, h);
+}
+
+void YPathButton::enterEvent(QEvent* event)
+{
+    QToolButton::enterEvent(event);
+    m_draw_hover = true;
+    update();
+}
+
+void YPathButton::leaveEvent(QEvent* event)
+{
+    QToolButton::leaveEvent(event);
+    m_draw_hover = false;
+    update();
+}
+
+void YPathButton::paintEvent(QPaintEvent * event)
+{
+    Q_UNUSED(event);
+    QPainter painter(this);
+    if(m_mode == Bold)
+    {
+        QFont f = font();
+        f.setBold(true);
+        painter.setFont(f);
+    }
+
+    if(m_draw_hover)
+    {
+        QStyleOptionViewItemV4 option;
+        option.initFrom(this);
+        option.state = QStyle::State_Enabled | QStyle::State_MouseOver;
+        option.viewItemPosition = QStyleOptionViewItemV4::OnlyOne;
+        style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, &painter, this);
+    }
+
+    const QRect text_rect(0, 0, width(), height());
+    if(m_mode == Arrow)
+    {
+        QStyleOption option;
+        option.initFrom(this);
+        option.rect = text_rect;
+        style()->drawPrimitive(QStyle::PE_IndicatorArrowRight, &option, &painter, this);
+    }
+    else
+        painter.drawText(text_rect, Qt::AlignCenter, text());
+}
+
+/**
+ * YPathBar
+ */
+
+YPathBar::YPathBar(QWidget *parent)
+    :QWidget(parent)
+{
+    m_layout = new QHBoxLayout;
+    m_layout->setSpacing(0);
+    m_layout->setMargin(0);
+    setLayout(m_layout);
+    m_model = 0;
+    updateLayout();
+}
+
+void YPathBar::setModel(QAbstractItemModel *model)
+{
+    if(m_model && m_current.isValid())
+        emit currentChanged(m_current, QModelIndex());
+    m_model = model;
+    m_current = QModelIndex();
+    updateLayout();
+}
+
+QModelIndex YPathBar::currentIndex()
+{
+    return m_current;
+}
+
+void YPathBar::setCurrentIndex(const QModelIndex& index)
+{
+    if(index == m_current)
+        return;
+    emit currentChanged(index, m_current);
+    m_current = index;
+    updateLayout();
+}
+
+QVector< QModelIndex > YPathBar::computePath(QModelIndex index)
+{
+    QVector< QModelIndex > path;
+    if(m_model == 0)
+        return path;
+    while(true)
+    {
+        path.push_front(index);
+        if(!index.isValid())
+            break;
+        index = index.parent();
+    }
+    return path;
+}
+
+YPathButton *YPathBar::createButton(bool link)
+{
+    YPathButton *button = new YPathButton(this);
+    button->setAutoRaise(true);
+    if(link)
+    {
+        button->setPopupMode(QToolButton::InstantPopup);
+        button->setMenu(new QMenu(button));
+        button->setMode(YPathButton::Arrow);
+        connect(button->menu(), SIGNAL(triggered(QAction *)), this,
+            SLOT(onSelect(QAction *)));
+    }
+    else
+    {
+        button->setDefaultAction(new QAction(button));
+        connect(button, SIGNAL(triggered(QAction *)), this, SLOT(onSelect(QAction *)));
+    }
+    return button;
+}
+
+void YPathBar::setupButton(YPathButton *button, const QModelIndex& index, bool link)
+{
+    if(link)
+    {
+        QMenu *menu = button->menu();
+        menu->clear();
+        for(int i = 0; i < m_model->rowCount(index); i++)
+        {
+            QModelIndex child_index = m_model->index(i, 0, index);
+            QAction *act = new QAction(button);
+            act->setData(QVariant::fromValue(child_index));
+            act->setText(child_index.data().toString());
+            menu->addAction(act);
+        }
+        button->setVisible(m_model->rowCount(index) > 0);
+    }
+    else
+    {
+        button->defaultAction()->setText(index.data().toString());
+        button->defaultAction()->setData(QVariant::fromValue(index));
+        button->setMode(index == m_current ? YPathButton::Bold : YPathButton::Normal);
+    }
+}
+
+void YPathBar::onSelect(QAction *act)
+{
+    setCurrentIndex(act->data().value< QModelIndex >());
+}
+
+void YPathBar::updateLayout()
+{
+    QVector< QModelIndex > path = computePath(m_current);
+    /* shrink unneeded buttons if any */
+    while(m_button.size() > qMax(0, 2 * path.size() - 1))
+    {
+        delete m_button.last();
+        m_button.pop_back();
+    }
+    /* create new buttons */
+    while(m_button.size() < 2 * path.size() - 1)
+    {
+        YPathButton *button = createButton((m_button.size() % 2) == 0);
+        m_button.push_back(button);
+        m_layout->addWidget(button);
+    }
+    /* fixup buttons */
+    for(int i = 0; i < m_button.size(); i++)
+        setupButton(m_button[i], path[(i + 1) / 2], (i % 2) == 0);
+}
+
+/**
+ * Misc
+ */
+
+QGroupBox *Misc::EncloseInBox(const QString& name, QWidget *widget)
+{
+    QGroupBox *group = new QGroupBox(name);
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(widget);
+    group->setLayout(layout);
+    return group;
 }
