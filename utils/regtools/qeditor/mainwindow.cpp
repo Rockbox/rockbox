@@ -32,7 +32,7 @@
 
 #include "mainwindow.h"
 #include "regtab.h"
-#include "regedit.h"
+//#include "regedit.h"
 
 /**
  * DocumentTab
@@ -161,8 +161,8 @@ void MainWindow::OnQuit()
 
 void MainWindow::OnAbout()
 {
-    QString soc_desc_ver = QString("%1.%2.%3").arg(MAJOR_VERSION)
-        .arg(MINOR_VERSION).arg(REVISION_VERSION);
+    QString soc_desc_ver = QString("%1.%2.%3").arg(soc_desc::MAJOR_VERSION)
+        .arg(soc_desc::MINOR_VERSION).arg(soc_desc::REVISION_VERSION);
     QMessageBox::about(this, "About", 
         "<h1>QEditor</h1>"
         "<h2>Version "APP_VERSION"</h2>"
@@ -223,7 +223,7 @@ void MainWindow::OnNewRegTab()
 
 void MainWindow::OnNewRegEdit()
 {
-    AddTab(new RegEdit(m_backend, this));
+    //AddTab(new RegEdit(m_backend, this));
 }
 
 bool MainWindow::Quit()

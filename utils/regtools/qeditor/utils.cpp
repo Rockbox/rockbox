@@ -95,11 +95,11 @@ QValidator::State SocBitRangeValidator::parse(const QString& input, int& last, i
 SocFieldValidator::SocFieldValidator(QObject *parent)
     :QValidator(parent)
 {
-    m_field.first_bit = 0;
-    m_field.last_bit = 31;
+    m_field.pos = 0;
+    m_field.width = 32;
 }
 
-SocFieldValidator::SocFieldValidator(const soc_reg_field_t& field, QObject *parent)
+SocFieldValidator::SocFieldValidator(const soc_desc::field_t& field, QObject *parent)
     :QValidator(parent), m_field(field)
 {
 }
@@ -124,7 +124,7 @@ QValidator::State SocFieldValidator::parse(const QString& input, soc_word_t& val
         return Intermediate;
     // first check named values
     State state = Invalid;
-    foreach(const soc_reg_field_value_t& value, m_field.value)
+    foreach(const soc_desc::enum_t& value, m_field.enum_)
     {
         QString name = QString::fromLocal8Bit(value.name.c_str());
         // cannot be a substring if too long or empty
@@ -176,7 +176,7 @@ QValidator::State SocFieldValidator::parse(const QString& input, soc_word_t& val
     if(!ok)
         return state;
     // if ok, check if it fits in the number of bits
-    unsigned nr_bits = m_field.last_bit - m_field.first_bit + 1;
+    unsigned nr_bits = m_field.width;
     unsigned long max = nr_bits == 32 ? 0xffffffff : (1 << nr_bits) - 1;
     if(v <= max)
     {
@@ -311,7 +311,7 @@ QString SocFieldItemDelegate::displayText(const QVariant& value, const QLocale& 
 /**
  * SocFieldEditor
  */
-SocFieldEditor::SocFieldEditor(const soc_reg_field_t& field, QWidget *parent)
+SocFieldEditor::SocFieldEditor(const soc_desc::field_t& field, QWidget *parent)
     :QLineEdit(parent), m_reg_field(field)
 {
     m_validator = new SocFieldValidator(field);
@@ -336,11 +336,11 @@ uint SocFieldEditor::field() const
 void SocFieldEditor::setField(uint field)
 {
     m_field = field;
-    int digits = (m_reg_field.last_bit - m_reg_field.first_bit + 4) / 4;
+    int digits = (m_reg_field.width + 3) / 4;
     setText(QString("0x%1").arg(field, digits, 16, QChar('0')));
 }
 
-void SocFieldEditor::SetRegField(const soc_reg_field_t& field)
+void SocFieldEditor::SetRegField(const soc_desc::field_t& field)
 {
     setValidator(0);
     delete m_validator;
@@ -352,12 +352,12 @@ void SocFieldEditor::SetRegField(const soc_reg_field_t& field)
 /**
  * SocFieldCachedValue
  */
-SocFieldCachedValue::SocFieldCachedValue(const soc_reg_field_t& field, uint value)
+SocFieldCachedValue::SocFieldCachedValue(const soc_desc::field_t& field, uint value)
     :m_field(field), m_value(value)
 {
     int idx = field.find_value(value);
     if(idx != -1)
-        m_name = QString::fromStdString(field.value[idx].name);
+        m_name = QString::fromStdString(field.enum_[idx].name);
 }
 
 /**
@@ -370,7 +370,7 @@ QString SocFieldCachedItemDelegate::displayText(const QVariant& value, const QLo
     if(value.type() == QVariant::UserType && value.userType() == qMetaTypeId< SocFieldCachedValue >())
     {
         const SocFieldCachedValue& v = value.value< SocFieldCachedValue >();
-        int bitcount = v.field().last_bit - v.field().first_bit;
+        int bitcount = v.field().width;
         QString name = v.value_name();
         QString strval = QString("0x%1").arg(v.value(), (bitcount + 3) / 4, 16, QChar('0'));
         switch(m_mode)
@@ -404,7 +404,7 @@ QString SocFieldCachedItemDelegate::displayText(const QVariant& value, const QLo
  * SocFieldCachedEditor
  */
 SocFieldCachedEditor::SocFieldCachedEditor(QWidget *parent)
-    :SocFieldEditor(soc_reg_field_t(), parent)
+    :SocFieldEditor(soc_desc::field_t(), parent)
 {
 }
 
@@ -473,7 +473,7 @@ int RegFieldTableModel::columnCount(const QModelIndex& /* parent */) const
 QVariant RegFieldTableModel::data(const QModelIndex& index, int role) const
 {
     int section = index.column();
-    const soc_reg_field_t& field = m_reg.field[index.row()];
+    const soc_desc::field_t& field = m_reg.field[index.row()];
     /* column independent code */
     const RegThemeGroup *theme = 0;
     switch(m_status[index.row()])
@@ -603,7 +603,7 @@ void RegFieldTableModel::SetReadOnly(bool en)
     m_read_only = en;
 }
 
-void RegFieldTableModel::SetRegister(const soc_reg_t& reg)
+void RegFieldTableModel::SetRegister(const soc_desc::register_t& reg)
 {
     /* remove all rows */
     beginResetModel();
@@ -652,7 +652,7 @@ void RegFieldTableModel::RecomputeTheme()
         if(!m_theme.valid || m_value.size() == 0)
             continue;
         m_status[i] = Normal;
-        const soc_reg_field_t& field = m_reg.field[i];
+        const soc_desc::field_t& field = m_reg.field[i];
         QVariant val;
         for(int j = 0; j < m_value.size(); j++)
         {

@@ -252,8 +252,6 @@ protected:
 };
 #endif
 
-class SocRef;
-
 class SocFile
 {
 public:
@@ -261,14 +259,14 @@ public:
     SocFile(const QString& filename);
     bool IsValid();
 
-    SocRef GetSocRef();
+    soc_desc::soc_ref_t GetSocRef();
     QString GetFilename();
-    soc_t& GetSoc() { return m_soc; }
+    soc_desc::soc_t& GetSoc() { return m_soc; }
 
 protected:
     bool m_valid;
     QString m_filename;
-    soc_t m_soc;
+    soc_desc::soc_t m_soc;
 };
 
 class SocFileRef
@@ -284,55 +282,8 @@ protected:
 
 Q_DECLARE_METATYPE(SocFileRef)
 
-class SocRef : public SocFileRef
-{
-public:
-    SocRef() {}
-    SocRef(SocFile *file):SocFileRef(file) {}
-    soc_t& GetSoc() const { return GetSocFile()->GetSoc(); }
-};
-
-Q_DECLARE_METATYPE(SocRef)
-
-class SocDevRef : public SocRef
-{
-public:
-    SocDevRef() {}
-    SocDevRef(const SocRef& soc, int dev_idx, int dev_addr_idx)
-        :SocRef(soc), m_dev_idx(dev_idx), m_dev_addr_idx(dev_addr_idx) {}
-    int GetDevIndex() const { return m_dev_idx; }
-    soc_dev_t& GetDev() const { return GetSoc().dev[GetDevIndex()]; }
-    int GetDevAddrIndex() const { return m_dev_addr_idx; }
-    soc_dev_addr_t& GetDevAddr() const { return GetDev().addr[GetDevAddrIndex()]; }
-protected:
-    int m_dev_idx, m_dev_addr_idx;
-};
-
-class SocRegRef : public SocDevRef
-{
-public:
-    SocRegRef() {}
-    SocRegRef(const SocDevRef& dev, int reg_idx, int reg_addr_idx)
-        :SocDevRef(dev), m_reg_idx(reg_idx), m_reg_addr_idx(reg_addr_idx) {}
-    int GetRegIndex() const { return m_reg_idx; }
-    soc_reg_t& GetReg() const { return GetDev().reg[GetRegIndex()]; }
-    int GetRegAddrIndex() const { return m_reg_addr_idx; }
-    soc_reg_addr_t& GetRegAddr() const { return GetReg().addr[GetRegAddrIndex()]; }
-protected:
-    int m_reg_idx, m_reg_addr_idx;
-};
-
-class SocFieldRef : public SocRegRef
-{
-public:
-    SocFieldRef(){}
-    SocFieldRef(const SocRegRef& reg, int field_idx)
-        :SocRegRef(reg), m_field_idx(field_idx) {}
-    int GetFieldIndex() const { return m_field_idx; }
-    soc_reg_field_t& GetField() const { return GetReg().field[GetFieldIndex()]; }
-protected:
-    int m_field_idx;
-};
+Q_DECLARE_METATYPE(soc_desc::soc_ref_t)
+Q_DECLARE_METATYPE(soc_desc::node_inst_t)
 
 class Backend : public QObject
 {
@@ -341,7 +292,7 @@ public:
     Backend();
 
     QList< SocFileRef > GetSocFileList();
-    QList< SocRef > GetSocList();
+    QList< soc_desc::soc_ref_t > GetSocList();
     bool LoadSocDesc(const QString& filename);
     IoBackend *CreateDummyIoBackend();
     IoBackend *CreateFileIoBackend(const QString& filename);
@@ -352,31 +303,35 @@ public:
 signals:
     void OnSocListChanged();
 private:
+    /* store them as a list so that pointers are never invalidated */
     std::list< SocFile > m_socs;
 };
 
 class BackendHelper
 {
 public:
-    BackendHelper(IoBackend *io_backend, const SocRef& soc);
-    bool ReadRegister(const QString& dev, const QString& reg, soc_word_t& v);
-    bool ReadRegisterField(const QString& dev, const QString& reg,
-        const QString& field, soc_word_t& v);
-    bool WriteRegister(const QString& dev, const QString& reg, soc_word_t v,
+    BackendHelper(IoBackend *io_backend, const soc_desc::soc_ref_t& soc);
+    QString GetPath(const soc_desc::node_inst_t& inst);
+    soc_desc::node_inst_t ParsePath(const QString& path);
+    bool ReadRegister(const soc_desc::node_inst_t& inst, soc_word_t& v);
+    bool ReadRegisterField(const soc_desc::node_inst_t& inst, const QString& field,
+        soc_word_t& v);
+    bool WriteRegister(const soc_desc::node_inst_t& inst, soc_word_t v,
         IoBackend::WriteMode mode = IoBackend::Write);
-    bool GetDevRef(const QString& dev, SocDevRef& ref);
-    bool GetRegRef(const SocDevRef& dev, const QString& reg, SocRegRef& ref);
-    bool GetFieldRef(const SocRegRef& reg, const QString& field, SocFieldRef& ref);
-    bool GetRegisterAddress(const QString& dev, const QString& reg, soc_addr_t& addr);
+    bool GetRegisterAddress(const soc_desc::node_inst_t& inst, soc_addr_t& addr);
     /* NOTE: does not commit writes to the backend
      * if ignore_errors is true, the dump will continue even on errors, and the
      * function will return false if one or more errors occured */
     bool DumpAllRegisters(IoBackend *backend, bool ignore_errors = true);
     bool DumpAllRegisters(const QString& filename, bool ignore_errors = true);
 
+protected:
+    bool DumpAllRegisters(BackendHelper *bh, const soc_desc::node_inst_t& inst,
+        bool ignore_errors);
+
 private:
     IoBackend *m_io_backend;
-    const SocRef& m_soc;
+    const soc_desc::soc_ref_t& m_soc;
 };
 
 #endif /* __BACKEND_H__ */
