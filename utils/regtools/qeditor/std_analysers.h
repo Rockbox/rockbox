@@ -35,14 +35,28 @@
 #include <QLineEdit>
 #include "analyser.h"
 
+class AnalyserEx : public Analyser
+{
+public:
+    AnalyserEx(const soc_desc::soc_ref_t& soc, IoBackend *backend);
+protected:
+    bool ReadRegister(const QString& path, soc_word_t& val);
+    bool ReadRegisterOld(const QString& dev, const QString& reg, soc_word_t& val);
+    bool ReadField(const QString& path, const QString& field, soc_word_t& val);
+    bool ReadFieldOld(const QString& dev, const QString& reg, const QString& field,
+        soc_word_t& val);
+
+    BackendHelper m_helper;
+};
+
 /**
  * Clock analyser
  */
 
-class ClockAnalyser : public Analyser
+class ClockAnalyser : public AnalyserEx
 {
 public:
-    ClockAnalyser(const SocRef& soc, IoBackend *backend);
+    ClockAnalyser(const soc_desc::soc_ref_t& soc, IoBackend *backend);
     virtual ~ClockAnalyser();
     virtual QWidget *GetWidget();
     static bool SupportSoc(const QString& soc_name);
@@ -72,11 +86,11 @@ private:
 /**
  * EMI analyser
  */
-class EmiAnalyser : public QObject, public Analyser
+class EmiAnalyser : public QObject, public AnalyserEx
 {
     Q_OBJECT
 public:
-    EmiAnalyser(const SocRef& soc, IoBackend *backend);
+    EmiAnalyser(const soc_desc::soc_ref_t& soc, IoBackend *backend);
     virtual ~EmiAnalyser();
     virtual QWidget *GetWidget();
 
@@ -116,10 +130,10 @@ private:
 /**
  * PINCTRL analyzer
  */
-class PinAnalyser : public Analyser
+class PinAnalyser : public AnalyserEx
 {
 public:
-    PinAnalyser(const SocRef& soc, IoBackend *backend);
+    PinAnalyser(const soc_desc::soc_ref_t& soc, IoBackend *backend);
     virtual ~PinAnalyser();
     virtual QWidget *GetWidget();
 
