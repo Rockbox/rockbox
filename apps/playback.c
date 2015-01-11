@@ -115,7 +115,7 @@ static enum audio_buffer_state
 /** Main state control **/
 static bool ff_rw_mode SHAREDBSS_ATTR = false; /* Pre-ff-rewind mode (A,O-) */
 
-enum play_status
+static enum play_status
 {
     PLAY_STOPPED = 0,
     PLAY_PLAYING = AUDIO_STATUS_PLAY,
@@ -268,7 +268,7 @@ enum track_load_status
 /** Track change controls **/
 
 /* What sort of skip is pending globally? */
-enum track_skip_type
+static enum track_skip_type
 {
     /* Relative to what user is intended to see: */
     /* Codec: +0, Track List: +0, Playlist: +0 */

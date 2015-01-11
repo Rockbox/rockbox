@@ -56,7 +56,7 @@
 #endif
 
 /** Shared by sim **/
-int last_sent_battery_level = 100;
+static int last_sent_battery_level = 100;
 /* battery level (0-100%) */
 int battery_percent = -1;
 void send_battery_level_event(void);

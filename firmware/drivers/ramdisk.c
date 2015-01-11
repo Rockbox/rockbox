@@ -27,9 +27,9 @@
 #define SECTOR_SIZE 512
 #define NUM_SECTORS 16384
 
-unsigned char ramdisk[SECTOR_SIZE * NUM_SECTORS];
+static unsigned char ramdisk[SECTOR_SIZE * NUM_SECTORS];
 
-long last_disk_activity = -1;
+static long last_disk_activity = -1;
 
 int ramdisk_read_sectors(IF_MD(int drive,)
                      unsigned long start,

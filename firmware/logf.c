@@ -52,7 +52,7 @@
 #include "ata_idle_notify.h"
 
 unsigned char logdiskfbuffer[MAX_LOGDISKF_SIZE];
-int logdiskfindex;
+static int logdiskfindex;
 #endif
 
 /* Only provide all this if asked to */

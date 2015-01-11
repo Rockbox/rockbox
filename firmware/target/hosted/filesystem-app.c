@@ -41,7 +41,7 @@
 static const char rbhome[] = "/sdcard";
 #elif (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA)) \
         && !defined(__PCTOOL__)
-const char *rbhome;
+static const char *rbhome;
 #else
 /* YPR0, YPR1 */
 static const char rbhome[] = HOME_DIR;

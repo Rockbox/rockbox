@@ -85,8 +85,8 @@ static int wrcount = 0;
  */
 int long_delta;                     /* long term delta battery voltage */
 int short_delta;                    /* short term delta battery voltage */
-bool disk_activity_last_cycle = false;  /* flag set to aid charger time
-                                         * calculation */
+static bool disk_activity_last_cycle = false;  /* flag set to aid charger time
+                                                * calculation */
 char power_message[POWER_MESSAGE_LEN] = ""; /* message that's shown in
                                            debug menu */
                                         /* percentage at which charging
