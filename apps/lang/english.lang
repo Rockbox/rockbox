@@ -13254,3 +13254,123 @@
     swcodec: "Q"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
+  desc: in Settings -> General -> System -> Freq Scaling Governor
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR_CONSERVATIVE
+  desc: in Settings -> General -> System -> Freq Scaling Governor: Conservative
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Conservative"
+    ibassodx90: "Conservative"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Conservative"
+    ibassodx90: "Conservative"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Conservative"
+    ibassodx90: "Conservative"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR_ONDEMAND
+  desc: in Settings -> General -> System -> Freq Scaling Governor: Ondemand
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Ondemand"
+    ibassodx90: "Ondemand"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Ondemand"
+    ibassodx90: "Ondemand"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Ondemand"
+    ibassodx90: "Ondemand"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR_INTERACTIVE
+  desc: in Settings -> General -> System -> Freq Scaling Governor: Interactive
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Interactive"
+    ibassodx90: "Interactive"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Interactive"
+    ibassodx90: "Interactive"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Interactive"
+    ibassodx90: "Interactive"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR_POWERSAVE
+  desc: in Settings -> General -> System -> Freq Scaling Governor: Powersave
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Powersave"
+    ibassodx90: "Powersave"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Powersave"
+    ibassodx90: "Powersave"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Powersave"
+    ibassodx90: "Powersave"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR_PERFORMANCE
+  desc: in Settings -> General -> System -> Freq Scaling Governor: Performance
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Performance"
+    ibassodx90: "Performance"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Performance"
+    ibassodx90: "Performance"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Performance"
+    ibassodx90: "Performance"
+  </voice>
+</phrase>

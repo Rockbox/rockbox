@@ -22,66 +22,57 @@
  ****************************************************************************/
 
 
-#include <stdint.h>
-#include <sys/reboot.h>
+#include <stdio.h>
 
 #include "config.h"
+#include "cpufreq-linux.h"
 #include "debug.h"
 
-#include "button-ibasso.h"
 #include "debug-ibasso.h"
+#include "governor-ibasso.h"
 #include "sysfs-ibasso.h"
-#include "usb-ibasso.h"
 
 
-/* Fake stack. */
-uintptr_t* stackbegin;
-uintptr_t* stackend;
-
-
-void system_init( void )
+void set_governor( enum ibasso_governors governor )
 {
     TRACE;
 
-    /* Fake stack. */
-    volatile uintptr_t stack = 0;
-    stackbegin = stackend = (uintptr_t*) &stack;
-
-    /*
-        Prevent device from deep sleeping, which will interrupt playback.
-        /sys/power/wake_lock
-    */
-    if( ! sysfs_set_string( SYSFS_POWER_WAKE_LOCK, "rockbox" ) )
+    switch( governor )
     {
-        DEBUGF( "ERROR %s: Can not set suspend blocker.", __func__ );
+        case GOVERNOR_CONSERVATIVE:
+        {
+            cpufreq_set_governor( "conservative", CPUFREQ_ALL_CPUS );
+            break;
+        }
+
+        case GOVERNOR_ONDEMAND:
+        {
+            cpufreq_set_governor( "ondemand", CPUFREQ_ALL_CPUS );
+            break;
+        }
+
+        case GOVERNOR_POWERSAVE:
+        {
+            cpufreq_set_governor( "powersave", CPUFREQ_ALL_CPUS );
+            break;
+        }
+
+        case GOVERNOR_INTERACTIVE:
+        {
+            cpufreq_set_governor( "interactive", CPUFREQ_ALL_CPUS );
+            break;
+        }
+
+        case GOVERNOR_PERFORMANCE:
+        {
+            cpufreq_set_governor( "performance", CPUFREQ_ALL_CPUS );
+            break;
+        }
+
+        default:
+        {
+            DEBUGF( "ERROR %s: Unknown governor: %d.", __func__, governor );
+            break;
+        }
     }
-
-    /*
-        Prevent device to mute, which will cause tinyalsa pcm_writes to fail.
-        /sys/class/codec/wm8740_mute
-    */
-    if( ! sysfs_set_char( SYSFS_WM8740_MUTE, '0' ) )
-    {
-        DEBUGF( "ERROR %s: Can not set WM8740 lock.", __func__ );
-    }
-
-    set_usb_mode( USB_MODE_MASS_STORAGE );
-}
-
-
-void system_reboot( void )
-{
-    TRACE;
-
-    button_close_device();
-
-    reboot( RB_AUTOBOOT );
-}
-
-
-void system_exception_wait( void )
-{
-    TRACE;
-
-    while( 1 ) {};
 }
