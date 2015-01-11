@@ -47,10 +47,6 @@ volatile int maemo_display_on = 1;
 volatile int maemo_battery_level = 0;
 volatile int maemo_remaining_time_sec = 0;
 
-extern void send_battery_level_event(void);
-extern int last_sent_battery_level;
-extern int battery_percent;
-
 void display_status_callback(osso_display_state_t state, gpointer data)
 {
     (void)data;
