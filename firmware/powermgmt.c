@@ -24,7 +24,9 @@
 #include "kernel.h"
 #include "thread.h"
 #include "debug.h"
+#if !defined(DX50) && !defined(DX90)
 #include "adc.h"
+#endif
 #include "string.h"
 #include "storage.h"
 #include "power.h"

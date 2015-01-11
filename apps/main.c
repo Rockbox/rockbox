@@ -37,7 +37,9 @@
 #include "menu.h"
 #include "usb.h"
 #include "powermgmt.h"
+#if !defined(DX50) && !defined(DX90)
 #include "adc.h"
+#endif
 #include "i2c.h"
 #ifndef DEBUG
 #include "serial.h"
@@ -340,7 +342,7 @@ static void init(void)
 #ifdef SIMULATOR
     sim_tasks_init();
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID) && !defined(DX50) && !defined(DX90)
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
     notification_init();
 #endif
     lang_init(core_language_builtin, language_strings,
