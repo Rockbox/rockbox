@@ -112,16 +112,6 @@ typedef struct
     int8_t data[2];
 } hcb_bin_pair;
 
-hcb *hcb_table[];
-hcb_2_quad *hcb_2_quad_table[];
-hcb_2_pair *hcb_2_pair_table[];
-hcb_bin_pair *hcb_bin_table[];
-uint8_t hcbN[];
-uint8_t unsigned_cb[];
-int hcb_2_quad_table_size[];
-int hcb_2_pair_table_size[];
-int hcb_bin_table_size[];
-
 #include "codebook/hcb_1.h"
 #include "codebook/hcb_2.h"
 #include "codebook/hcb_3.h"

@@ -35,7 +35,7 @@
 /* Global variables for the parser */
 int skin_line = 0;
 char* skin_start = 0;
-int viewport_line = 0;
+static int viewport_line = 0;
 
 #ifdef ROCKBOX
 static skin_callback callback = NULL;

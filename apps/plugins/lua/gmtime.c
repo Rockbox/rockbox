@@ -4,7 +4,7 @@
 #define SPD 24*60*60
 
 /* days per month -- nonleap! */
-const short __spm[13] =
+static const short __spm[13] =
   { 0,
     (31),
     (31+28),

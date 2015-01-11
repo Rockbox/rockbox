@@ -381,16 +381,16 @@ void start (void);
 #define IO_VEC            33
 #define USER_VEC         127
 
-char in_nmi;   /* Set when handling an NMI, so we don't reenter */
-int dofault;  /* Non zero, bus errors will raise exception */
+static char in_nmi;   /* Set when handling an NMI, so we don't reenter */
+static int dofault;  /* Non zero, bus errors will raise exception */
 
-int *stub_sp;
+static int *stub_sp;
 
 /* debug > 0 prints ill-formed commands in valid packets & checksum errors */
-int remote_debug;
+static int remote_debug;
 
 /* jump buffer used for setjmp/longjmp */
-jmp_buf remcomEnv;
+static jmp_buf remcomEnv;
 
 enum regnames
 {
@@ -407,9 +407,9 @@ typedef struct
 }
 stepData;
 
-int registers[NUMREGBYTES / 4];
-stepData instrBuffer;
-char stepped;
+static int registers[NUMREGBYTES / 4];
+static stepData instrBuffer;
+static char stepped;
 static const char hexchars[] = "0123456789abcdef";
 static char remcomInBuffer[BUFMAX];
 static char remcomOutBuffer[BUFMAX];

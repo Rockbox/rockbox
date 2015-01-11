@@ -155,27 +155,27 @@ struct sidflt {
 };
 
 /* ------------------------ pseudo-constants (depending on mixing freq) */
-int  mixing_frequency IDATA_ATTR;
-unsigned long  freqmul IDATA_ATTR;
-int  filtmul IDATA_ATTR;
+static int  mixing_frequency IDATA_ATTR;
+static unsigned long  freqmul IDATA_ATTR;
+static int  filtmul IDATA_ATTR;
 #ifndef ROCKBOX
 unsigned long  attacks [16] IDATA_ATTR;
 unsigned long  releases[16] IDATA_ATTR;
 #endif
 
 /* ------------------------------------------------------------ globals */
-struct s6581 sid IDATA_ATTR;
-struct sidosc osc[3] IDATA_ATTR;
-struct sidflt filter IDATA_ATTR;
+static struct s6581 sid IDATA_ATTR;
+static struct sidosc osc[3] IDATA_ATTR;
+static struct sidflt filter IDATA_ATTR;
 
 /* ------------------------------------------------------ C64 Emu Stuff */
-unsigned char bval IDATA_ATTR;
-unsigned short wval IDATA_ATTR;
+static unsigned char bval IDATA_ATTR;
+static unsigned short wval IDATA_ATTR;
 /* -------------------------------------------------- Register & memory */
-unsigned char a,x,y,s,p IDATA_ATTR;
-unsigned short pc IDATA_ATTR;
+static unsigned char a,x,y,s,p IDATA_ATTR;
+static unsigned short pc IDATA_ATTR;
 
-unsigned char memory[65536];
+static unsigned char memory[65536];
 
 /* ----------------------------------------- Variables for sample stuff */
 static int sample_active IDATA_ATTR;

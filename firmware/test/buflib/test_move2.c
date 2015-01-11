@@ -80,7 +80,7 @@ struct buflib_callbacks ops = {
     .shrink_callback = NULL,
 };
 
-struct buflib_callbacks ops_no_move = {
+static struct buflib_callbacks ops_no_move = {
     .move_callback = NULL,
     .shrink_callback = NULL,
 };

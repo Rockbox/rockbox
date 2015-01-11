@@ -34,10 +34,10 @@ extern char* skin_start;
 extern char* skin_buffer;
 
 /* Global error variables */
-int error_line;
-int error_col;
-const char *error_line_start;
-char* error_message;
+static int error_line;
+static int error_col;
+static const char *error_line_start;
+static char* error_message;
 
 
 static inline struct skin_element*

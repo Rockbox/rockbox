@@ -31,7 +31,7 @@ struct imx_variant_t
     enum imx_firmware_variant_t variant;
 };
 
-struct imx_variant_t imx_variants[] =
+static struct imx_variant_t imx_variants[] =
 {
     { "default", VARIANT_DEFAULT },
     { "zenxfi2-recovery", VARIANT_ZENXFI2_RECOVERY },

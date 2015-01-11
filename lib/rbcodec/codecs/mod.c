@@ -234,9 +234,9 @@ struct s_mixer {
     struct s_channel channel[32];
 };
 
-struct s_song modsong IDATA_ATTR;               /* The Song */
-struct s_modplayer modplayer IDATA_ATTR;        /* The Module Player */
-struct s_mixer mixer IDATA_ATTR;
+static struct s_song modsong IDATA_ATTR;               /* The Song */
+static struct s_modplayer modplayer IDATA_ATTR;        /* The Module Player */
+static struct s_mixer mixer IDATA_ATTR;
 
 /* The Amiga Period Table (+1 because we use index 0 for period 0 = no new note) */
 static unsigned short s_periodtable[37*8+1] IDATA_ATTR = 
@@ -290,7 +290,7 @@ static signed short s_sintable[0x40] IDATA_ATTR =
     -255, -254, -250, -244, -235, -224, -211, -197,
     -180, -161, -141, -119,  -97,  -73,  -49,  -24};
 
-const unsigned short mixingrate = 44100;
+static const unsigned short mixingrate = 44100;
 
 static void mixer_playsample(int channel, int instrument) ICODE_ATTR;
 void mixer_playsample(int channel, int instrument)

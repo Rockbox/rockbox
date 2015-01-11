@@ -558,8 +558,8 @@ void raw_data_block(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
 
 /* Table 4.4.4 and */
 /* Table 4.4.9 */
-int16_t spec_data[FRAME_LEN] MEM_ALIGN_ATTR = {0};
-element sce;
+static int16_t spec_data[FRAME_LEN] MEM_ALIGN_ATTR = {0};
+static element sce;
 static uint8_t single_lfe_channel_element(NeAACDecHandle hDecoder, bitfile *ld,
                                           uint8_t channel, uint8_t *tag)
 {
@@ -604,9 +604,9 @@ static uint8_t single_lfe_channel_element(NeAACDecHandle hDecoder, bitfile *ld,
 
 /* Table 4.4.5 */
 
-int16_t spec_data1[FRAME_LEN] IBSS_ATTR MEM_ALIGN_ATTR;
-int16_t spec_data2[FRAME_LEN] IBSS_ATTR MEM_ALIGN_ATTR;
-element cpe;
+static int16_t spec_data1[FRAME_LEN] IBSS_ATTR MEM_ALIGN_ATTR;
+static int16_t spec_data2[FRAME_LEN] IBSS_ATTR MEM_ALIGN_ATTR;
+static element cpe;
 static uint8_t channel_pair_element(NeAACDecHandle hDecoder, bitfile *ld,
                                     uint8_t channels, uint8_t *tag)
 {

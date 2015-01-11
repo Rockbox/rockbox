@@ -9,9 +9,9 @@
 #include "mallocer.h"
 #include "codeclib.h"
 
-unsigned char* mallocbuffer[MEMPOOL_MAX];
-long memory_ptr[MEMPOOL_MAX];
-size_t buffersize[MEMPOOL_MAX];
+static unsigned char* mallocbuffer[MEMPOOL_MAX];
+static long memory_ptr[MEMPOOL_MAX];
+static size_t buffersize[MEMPOOL_MAX];
 
 int wpw_init_mempool(unsigned char mempool)
 {

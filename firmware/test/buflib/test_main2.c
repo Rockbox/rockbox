@@ -52,12 +52,12 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t size)
     return BUFLIB_CB_CANNOT_SHRINK;
 }
 
-struct buflib_callbacks ops = {
+static struct buflib_callbacks ops = {
     .move_callback = move_callback,
     .shrink_callback = shrink_callback,
 };
 
-struct buflib_callbacks ops2 = {
+static struct buflib_callbacks ops2 = {
     .move_callback = NULL,
     .shrink_callback = shrink_callback,
 };

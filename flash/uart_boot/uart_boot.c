@@ -10,7 +10,7 @@
 #include "flash.h" // flash high level functions
 
 // command line configuration: what shall we do?
-struct
+static struct
 {
 	char* szPort; // COM port to use
 	bool bRecorder; // it's a recorder

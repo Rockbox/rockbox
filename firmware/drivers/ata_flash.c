@@ -42,7 +42,7 @@
 
 #define SECTOR_SIZE     (512)
 
-long last_disk_activity = -1;
+static long last_disk_activity = -1;
 
 #if CONFIG_FLASH == FLASH_IFP7XX
 static unsigned char flash_ce[4] = {0x20, 0x02, 0x10, 0x08};
