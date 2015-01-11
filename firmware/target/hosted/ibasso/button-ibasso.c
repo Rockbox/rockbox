@@ -346,8 +346,33 @@ int button_read_device( int *data )
 
                     if( _hold )
                     {
-                        /* Hold switch engaged. Ignore all button events. */
-                        _last_btns = BUTTON_NONE;
+                        /* Hold switch engaged. */
+
+                        switch( global_settings.hold_switch_mode )
+                        {
+                            case HOLD_SWITCH_LOCK_ALL:
+                            {
+                                /* Ignore all button events. */
+                                _last_btns = BUTTON_NONE;
+                                break;
+                            }
+
+                            case HOLD_SWITCH_LOCK_TOUCH:
+                            {
+                                /* Touchscreen only lock. */
+                                break;
+                            }
+
+                            case HOLD_SWITCH_LOCK_TOUCH_POWER_VOLUME:
+                            {
+                                /* Ignore all buttons, except left, play and right. */
+                                _last_btns = _last_btns & ( ~(   BUTTON_POWER
+                                                               | BUTTON_POWER_LONG
+                                                               | BUTTON_VOL_UP
+                                                               | BUTTON_VOL_DOWN ) );
+                                break;
+                            }
+                        }
                     }
 
                     /*DEBUGF( "DEBUG %s: _last_btns: %#8.8x", __func__, _last_btns );*/
