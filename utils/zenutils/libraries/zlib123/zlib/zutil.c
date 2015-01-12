@@ -215,8 +215,9 @@ local ptr_table table[MAX_PTR];
 
 voidpf zcalloc (voidpf opaque, unsigned items, unsigned size)
 {
-    voidpf buf = opaque; /* just to make some compilers happy */
+    voidpf buf;
     ulg bsize = (ulg)items*size;
+    (void)opaque;
 
     /* If we allocate less than 65520 bytes, we assume that farmalloc
      * will return a usable pointer which doesn't have to be normalized.
@@ -255,7 +256,7 @@ void  zcfree (voidpf opaque, voidpf ptr)
         next_ptr--;
         return;
     }
-    ptr = opaque; /* just to make some compilers happy */
+    (void)opaque;
     Assert(0, "zcfree: ptr not found");
 }
 
@@ -274,13 +275,13 @@ void  zcfree (voidpf opaque, voidpf ptr)
 
 voidpf zcalloc (voidpf opaque, unsigned items, unsigned size)
 {
-    if (opaque) opaque = 0; /* to make compiler happy */
+    (void)opaque;
     return _halloc((long)items, size);
 }
 
 void  zcfree (voidpf opaque, voidpf ptr)
 {
-    if (opaque) opaque = 0; /* to make compiler happy */
+    (void)opaque;
     _hfree(ptr);
 }
 
@@ -302,7 +303,7 @@ voidpf zcalloc (opaque, items, size)
     unsigned items;
     unsigned size;
 {
-    if (opaque) items += size - size; /* make compiler happy */
+    (void)opaque;
     return sizeof(uInt) > 2 ? (voidpf)malloc(items * size) :
                               (voidpf)calloc(items, size);
 }
@@ -312,7 +313,7 @@ void  zcfree (opaque, ptr)
     voidpf ptr;
 {
     free(ptr);
-    if (opaque) return; /* make compiler happy */
+    (void)opaque;
 }
 
 #endif /* MY_ZCALLOC */
