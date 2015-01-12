@@ -618,7 +618,7 @@ UnwResult UnwStartArm(UnwState * const state)
                             }
                         }
 
-                        UnwPrintd2(" R%d = 0x%08x\n", r, state->regData[r].v);
+                        UnwPrintd3(" R%d = 0x%08x\n", r, state->regData[r].v);
                     }
 
                     if(!P) addr += U ? 4 : -4;
