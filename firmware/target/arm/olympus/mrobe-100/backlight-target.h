@@ -23,8 +23,8 @@
 #define BACKLIGHT_TARGET_H
 
 bool backlight_hw_init(void); /* Returns backlight current state (true=ON). */
-void _backlight_hw_on(void);
-void _backlight_hw_off(void);
+void backlight_hw_on(void);
+void backlight_hw_off(void);
 
 #ifdef HAVE_REMOTE_LCD
 void remote_backlight_hw_on(void);

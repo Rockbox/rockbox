@@ -30,9 +30,9 @@ void backlight_hw_brightness(int brightness);
 #endif
 
 #ifdef HAVE_BUTTON_LIGHT
-voidbuttonlight_hw_on(void);
-voidbuttonlight_hw_off(void);
-voidbuttonlight_hw_set_brightness(int brightness);
+void buttonlight_hw_on(void);
+void buttonlight_hw_off(void);
+void buttonlight_hw_set_brightness(int brightness);
 #endif
 
 #endif /* BACKLIGHT_TARGET.H */

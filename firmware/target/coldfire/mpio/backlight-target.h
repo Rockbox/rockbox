@@ -25,9 +25,4 @@ bool backlight_hw_init(void); /* Returns backlight current state (true=ON). */
 void backlight_hw_on(void);
 void backlight_hw_off(void);
 void backlight_hw_brightness(int val);
-
-#define backlight_hw_on_isr() backlight_hw_on()
-#define backlight_hw_off_isr() backlight_hw_off()
-#define backlight_hw_on_normal() backlight_hw_on()
-#define backlight_hw_off_normal() backlight_hw_off()
 #endif

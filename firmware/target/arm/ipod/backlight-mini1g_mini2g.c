@@ -34,12 +34,12 @@
 #include "backlight.h"
 #include "backlight-target.h"
 
-void _backlight_hw_on(void)
+void backlight_hw_on(void)
 {
     GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 0x08);
 }
 
-void _backlight_hw_off(void)
+void backlight_hw_off(void)
 {
     GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x08);
 }

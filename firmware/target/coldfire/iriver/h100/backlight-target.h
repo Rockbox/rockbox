@@ -26,10 +26,10 @@ void backlight_hw_on(void);
 void backlight_hw_off(void);
 
 #ifndef BOOTLOADER
-#define backlight_hw_on_isr() backlight_hw_on()
-#define backlight_hw_off_isr() backlight_hw_off()
-#define backlight_hw_on_normal() backlight_hw_on()
-#define backlight_hw_off_normal() backlight_hw_off()
+#define _backlight_on_isr() backlight_hw_on()
+#define _backlight_off_isr() backlight_hw_off()
+#define _backlight_on_normal() backlight_hw_on()
+#define _backlight_off_normal() backlight_hw_off()
 #define _BACKLIGHT_FADE_BOOST
 #endif
 

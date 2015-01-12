@@ -39,11 +39,11 @@ void lcd_awake(void);
 #define backlight_hw_off() do { _backlight_led_off(); \
                               _backlight_hw_enable(false); } while(0)
 #else /* !BOOTLOADER */
-#define backlight_hw_on_isr() _backlight_led_on()
-#define backlight_hw_off_isr() _backlight_led_off()
-#define backlight_hw_on_normal()  do { _backlight_hw_enable(true); \
+#define _backlight_on_isr() _backlight_led_on()
+#define _backlight_off_isr() _backlight_led_off()
+#define _backlight_on_normal()  do { _backlight_hw_enable(true); \
                                      _backlight_led_on(); } while(0)
-#define backlight_hw_off_normal() do { _backlight_led_off(); \
+#define _backlight_off_normal() do { _backlight_led_off(); \
                                      _backlight_hw_enable(false); } while(0)
 #define _BACKLIGHT_FADE_ENABLE
 #endif /* !BOOTLOADER */
@@ -58,17 +58,14 @@ void backlight_hw_brightness(int val);
 #elif defined(IPOD_MINI) || defined(IPOD_MINI2G)
 
 #define backlight_hw_init() true
-void _backlight_hw_on(void);
-void _backlight_hw_off(void);
+void backlight_hw_on(void);
+void backlight_hw_off(void);
 
-#ifdef BOOTLOADER
-#define backlight_hw_on() _backlight_hw_on()
-#define backlight_hw_off() _backlight_hw_off()
-#else
-#define backlight_hw_on_isr() _backlight_hw_on()
-#define backlight_hw_off_isr() _backlight_hw_off()
-#define backlight_hw_on_normal() _backlight_hw_on()
-#define backlight_hw_off_normal() _backlight_hw_off()
+#ifndef BOOTLOADER
+#define _backlight_on_isr() backlight_hw_on()
+#define _backlight_off_isr() backlight_hw_off()
+#define _backlight_on_normal() backlight_hw_on()
+#define _backlight_off_normal() backlight_hw_off()
 #endif
 
 #elif defined(IPOD_1G2G) || defined(IPOD_3G)

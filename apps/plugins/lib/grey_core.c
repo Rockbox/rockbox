@@ -469,7 +469,7 @@ static unsigned long _grey_get_pixel(int x, int y)
 static void _timer_isr(void)
 {
 #if defined(HAVE_BACKLIGHT_INVERSION) && !defined(SIMULATOR)
-    unsigned long check = rb->isbacklight_hw_on(true)
+    unsigned long check = rb->is_backlight_on(true)
                         ? 0 : _GREY_BACKLIGHT_ON;
     
     if ((_grey_info.flags & (_GREY_BACKLIGHT_ON|GREY_RAWMAPPED)) == check)
@@ -648,7 +648,7 @@ bool grey_init(unsigned char *gbuf, long gbuf_size,
     else
     {
 #if defined(HAVE_BACKLIGHT_INVERSION) && !defined(SIMULATOR)
-        if (rb->isbacklight_hw_on(true))
+        if (rb->is_backlight_on(true))
             _grey_info.flags |= _GREY_BACKLIGHT_ON;
 #endif
         fill_gvalues();
