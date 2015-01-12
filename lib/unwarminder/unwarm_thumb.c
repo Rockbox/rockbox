@@ -244,7 +244,7 @@ UnwResult UnwStartThumb(UnwState * const state)
                 case 3: /* SUB */
                     UnwPrintd5("SUB r%d, #0x%d\t; r%d %s",
                                rd, offset8, rd, M_Origin2Str(state->regData[rd].o));
-                    state->regData[rd].v += offset8;
+                    state->regData[rd].v -= offset8;
                     state->regData[rd].o |= REG_VAL_ARITHMETIC;
                     break;
             }
