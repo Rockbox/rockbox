@@ -308,7 +308,7 @@ UnwResult UnwStartArm(UnwState * const state)
 
                     if(shiftDist)
                     {
-                        UnwPrintd3("%s #%d",
+                        UnwPrintd3("%s #%u",
                                    shiftMnu[shiftType], shiftDist);
                     }
                     UnwPrintd3("\t; r%d %s", rm, M_Origin2Str(state->regData[rm].o));
@@ -618,7 +618,7 @@ UnwResult UnwStartArm(UnwState * const state)
                             }
                         }
 
-                        UnwPrintd2(" R%d = 0x%08x\n", r);
+                        UnwPrintd2(" R%d = 0x%08x\n", r, state->regData[r].v);
                     }
 
                     if(!P) addr += U ? 4 : -4;
