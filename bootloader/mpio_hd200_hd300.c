@@ -390,9 +390,9 @@ void main(void)
         if ( hold != last_hold )
         {
             if ( hold )
-                _backlight_hw_off();
+                backlight_hw_off();
             else
-                _backlight_hw_on();
+                backlight_hw_on();
 
             last_hold = hold;
         }

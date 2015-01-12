@@ -35,7 +35,7 @@ void backlight_hw_brightness(int val);
 void buttonlight_hw_on(void);
 void buttonlight_hw_off(void);
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-void buttonlight_hw_set_brightness(int val);
+void buttonlight_hw_brightness(int val);
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 #endif /* HAVE_BUTTON_LIGHT */
 
