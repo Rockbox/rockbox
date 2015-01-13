@@ -25,15 +25,15 @@
  
  unsigned char* rtc_send_command(short unk1, short unk2)
  {
-    unsigned char ret[12];
+    static unsigned char ret[12];
     i2c_write(I2C_ADDRESS, (unk2 & 0xFF) | (unk << 8), 1);
     i2c_read(I2C_ADDRESS, ret, 12);
     return ret;
  }
- 
+
  unsigned char* rtc_read(void)
  {
-    unsigned char ret[12];
+    static unsigned char ret[12];
     i2c_read(I2C_ADDRESS, ret, 12);
     return ret;
  }
