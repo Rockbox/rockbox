@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_89c40941",
+        "filename": "apps/plugins/metronome.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1329,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2015-01-13T01:16:57Z",
+      "side": 1,
+      "message": "I\u0027d prefer #defining the max/min bpm values. If you do so, remember to also change lines 1321 and 1322!",
+      "revId": "fa2b9914a69c563ff29beeee70bc1c24c823eaf7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_69c1ad2e",
+        "filename": "apps/plugins/metronome.c",
+        "patchSetId": 12
+      },
+      "lineNbr": 1330,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2015-01-13T01:16:57Z",
+      "side": 1,
+      "message": "A minimum bpm of 1 is imho useless for musical purposes. Maybe set this value to 20 bpm? (And remind line 122!)",
+      "revId": "fa2b9914a69c563ff29beeee70bc1c24c823eaf7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
