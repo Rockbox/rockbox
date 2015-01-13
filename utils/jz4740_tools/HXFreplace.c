@@ -107,7 +107,7 @@ static int checksum(FILE *file)
 
 int main(int argc, char *argv[])
 {
-    FILE *infile, *outfile, *fw;
+    FILE *infile, *outfile, *fw = NULL;
     
     fprintf(stderr, "HXFreplace v" VERSION " - (C) 2008 Maurus Cuelenaere\n");
     fprintf(stderr, "This is free software; see the source for copying conditions.  There is NO\n");
