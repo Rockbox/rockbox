@@ -2150,6 +2150,18 @@ const struct settings_list settings[] = {
                   NULL, "root menu order",
                   root_menu_load_from_cfg, root_menu_write_to_cfg,
                   root_menu_is_changed, root_menu_set_default),
+
+#if defined(DX50) || defined(DX90)
+    BOOL_SETTING(0,
+                 batterylog,
+                 LANG_IBASSO_BATTERY_LOG,
+                 false,
+                 "batterylog",
+                 off_on,
+                 LANG_SET_BOOL_YES,
+                 LANG_SET_BOOL_NO,
+                 NULL),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);
