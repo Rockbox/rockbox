@@ -850,6 +850,10 @@ struct user_settings
     int pbe_precut;
 
     int afr_enabled;
+
+#if defined(DX50) || defined(DX90)
+    int hold_switch_mode;
+#endif
 };
 
 /** global variables **/
