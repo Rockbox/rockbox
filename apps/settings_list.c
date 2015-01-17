@@ -2212,6 +2212,17 @@ const struct settings_list settings[] = {
                    "Interactive",
                    "Powersave",
                    "Performance"),
+    CHOICE_SETTING(0,
+                   hold_switch_mode,
+                   LANG_IBASSO_HOLD_SWITCH_LOCK_MODE,
+                   HOLD_SWITCH_LOCK_ALL,
+                   "hold switch mode",
+                   "all,touch,touch power volume",
+                   NULL,
+                   3,
+                   ID2P(LANG_IBASSO_HOLD_SWITCH_MODE_LOCK_ALL),
+                   ID2P(LANG_IBASSO_HOLD_SWITCH_MODE_LOCK_TOUCH),
+                   ID2P(LANG_IBASSO_HOLD_SWITCH_MODE_LOCK_TOUCH_POWER_VOLUME)),
 #endif
 };
 

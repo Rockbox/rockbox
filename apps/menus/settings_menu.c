@@ -331,6 +331,7 @@ MENUITEM_SETTING(shortcuts_replaces_quickscreen, &global_settings.shortcuts_repl
 
 #if defined(DX50) || defined(DX90)
 MENUITEM_SETTING(governor, &global_settings.governor, NULL);
+MENUITEM_SETTING(hold_switch_mode, &global_settings.hold_switch_mode, NULL);
 #endif
 
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
@@ -388,6 +389,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 
 #if defined(DX50) || defined(DX90)
             &governor,
+            &hold_switch_mode,
 #endif
          );
 
