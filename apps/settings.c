@@ -106,6 +106,7 @@ struct system_status global_status;
 #endif
 
 #if defined(DX50) || defined(DX90)
+#include "batterylog-ibasso.h"
 #include "governor-ibasso.h"
 #endif
 
@@ -1088,6 +1089,7 @@ void settings_apply(bool read_disk)
 
 #if defined(DX50) || defined(DX90)
     ibasso_set_governor(global_settings.governor);
+    ibasso_enable_batterylog(global_settings.batterylog);
 #endif
 
     /* This should stay last */
