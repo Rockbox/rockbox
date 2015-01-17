@@ -60,4 +60,23 @@
 #define POWEROFF_COUNT  0
 
 
+enum ibasso_hold_switch_mode
+{
+    /* Default Rockbox behaviour: hold switch engaged will lock all input. */
+    HOLD_SWITCH_LOCK_ALL = 0,
+
+    /*
+        Hold switch engaged will lock touch screen only.
+        Physical buttons continue to work.
+    */
+    HOLD_SWITCH_LOCK_TOUCH,
+
+    /*
+        Hold switch engaged will lock touch screen, power and volume buttons.
+        Left, play and right will continue to work.
+    */
+    HOLD_SWITCH_LOCK_TOUCH_POWER_VOLUME
+};
+
+
 #endif
