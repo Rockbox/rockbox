@@ -22,66 +22,33 @@
  ****************************************************************************/
 
 
-#include <stdint.h>
-#include <sys/reboot.h>
-
-#include "config.h"
-#include "debug.h"
-
-#include "button-ibasso.h"
-#include "debug-ibasso.h"
-#include "sysfs-ibasso.h"
-#include "usb-ibasso.h"
+#ifndef _GOVERNOR_IBASSO_H_
+#define _GOVERNOR_IBASSO_H_
 
 
-/* Fake stack. */
-uintptr_t* stackbegin;
-uintptr_t* stackend;
-
-
-void system_init(void)
+/* Supported freq scaling governors. */
+enum ibasso_governors
 {
-    TRACE;
+    /* Slow frequency switching. */
+    GOVERNOR_CONSERVATIVE = 0,
 
-    /* Fake stack. */
-    volatile uintptr_t stack = 0;
-    stackbegin = stackend = (uintptr_t*) &stack;
+    /* Fast frequency switching. */
+    GOVERNOR_ONDEMAND,
+    GOVERNOR_INTERACTIVE,
 
-    /*
-        Prevent device from deep sleeping, which will interrupt playback.
-        /sys/power/wake_lock
-    */
-    if(! sysfs_set_string(SYSFS_POWER_WAKE_LOCK, "rockbox"))
-    {
-        DEBUGF("ERROR %s: Can not set suspend blocker.", __func__);
-    }
+    /* Allways lowest frequency. */
+    GOVERNOR_POWERSAVE,
 
-    /*
-        Prevent device to mute, which will cause tinyalsa pcm_writes to fail.
-        /sys/class/codec/wm8740_mute
-    */
-    if(! sysfs_set_char(SYSFS_WM8740_MUTE, '0'))
-    {
-        DEBUGF("ERROR %s: Can not set WM8740 lock.", __func__);
-    }
-
-    ibasso_set_usb_mode(USB_MODE_MASS_STORAGE);
-}
+    /* Allways highest frequency. */
+    GOVERNOR_PERFORMANCE
+};
 
 
-void system_reboot(void)
-{
-    TRACE;
-
-    button_close_device();
-
-    reboot(RB_AUTOBOOT);
-}
+/*
+    Set the active freq scaling governor.
+    governor: ibasso_governors
+*/
+void ibasso_set_governor(int governor);
 
 
-void system_exception_wait(void)
-{
-    TRACE;
-
-    while(1) {};
-}
+#endif
