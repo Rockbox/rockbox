@@ -63,6 +63,7 @@
 #endif
 
 #if defined(DX50) || defined(DX90)
+#include "batterylog-ibasso.h"
 #include "governor-ibasso.h"
 #include "usb-ibasso.h"
 #endif
@@ -2200,6 +2201,15 @@ const struct settings_list settings[] = {
                   root_menu_is_changed, root_menu_set_default),
 
 #if defined(DX50) || defined(DX90)
+    BOOL_SETTING(0,
+                 batterylog,
+                 LANG_IBASSO_BATTERY_LOG,
+                 false,
+                 "batterylog",
+                 off_on,
+                 LANG_SET_BOOL_YES,
+                 LANG_SET_BOOL_NO,
+                 ibasso_enable_batterylog),
     CHOICE_SETTING(0,
                    governor,
                    LANG_IBASSO_FREQ_SCALING_GOVERNOR,

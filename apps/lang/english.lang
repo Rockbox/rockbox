@@ -13473,3 +13473,23 @@
     ibassodx90: "Android Debug Bridge"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_IBASSO_BATTERY_LOG
+  desc: in Settings -> General -> System -> Battery -> Battery Log
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Battery Log"
+    ibassodx90: "Battery Log"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Battery Log"
+    ibassodx90: "Battery Log"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Battery Log"
+    ibassodx90: "Battery Log"
+  </voice>
+</phrase>

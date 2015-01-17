@@ -51,6 +51,7 @@
 #include "folder_select.h"
 
 #if defined(DX50) || defined(DX90)
+#include "batterylog-ibasso.h"
 #include "governor-ibasso.h"
 #include "usb-ibasso.h"
 #endif
@@ -192,6 +193,11 @@ static int usbcharging_callback(int action,const struct menu_item_ex *this_item)
 }
 MENUITEM_SETTING(usb_charging, &global_settings.usb_charging, usbcharging_callback);
 #endif /* HAVE_USB_CHARGING_ENABLE */
+
+#if defined(DX50) || defined(DX90)
+MENUITEM_SETTING(batterylog, &global_settings.batterylog, NULL);
+#endif
+
 MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
 #if defined(BATTERY_CAPACITY_INC) && BATTERY_CAPACITY_INC > 0
             &battery_capacity,
@@ -201,6 +207,9 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
 #endif
 #ifdef HAVE_USB_CHARGING_ENABLE
             &usb_charging,
+#endif
+#if defined(DX50) || defined(DX90)
+            &batterylog,
 #endif
          );
 /* Disk */

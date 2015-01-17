@@ -852,6 +852,7 @@ struct user_settings
     int afr_enabled;
 
 #if defined(DX50) || defined(DX90)
+    bool batterylog;
     int governor;
     int usb_mode;
 #endif
