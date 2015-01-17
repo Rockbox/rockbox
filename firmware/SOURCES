@@ -1841,6 +1841,7 @@ target/hosted/ibasso/button-ibasso.c
 #ifdef DEBUG
 target/hosted/ibasso/debug-ibasso.c
 #endif
+target/hosted/ibasso/governor-ibasso.c
 target/hosted/ibasso/hostfs-ibasso.c
 target/hosted/ibasso/lcd-ibasso.c
 target/hosted/ibasso/pcm-ibasso.c
