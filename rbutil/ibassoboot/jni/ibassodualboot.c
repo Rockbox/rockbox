@@ -1,13 +1,15 @@
 /***************************************************************************
- *             __________               __   ___.
+ *             __________               __   ___
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2014 by Ilia Sergachev
+ * Copyright (C) 2014 by Ilia Sergachev: Initial Rockbox port to iBasso DX50
+ * Copyright (C) 2014 by Mario Basister: iBasso DX90 port
+ * Copyright (C) 2014 by Simon Rothen: Initial Rockbox repository submission, additional features
+ * Copyright (C) 2014 by Udo Schläpfer: Code clean up, additional features
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,421 +21,751 @@
  *
  ****************************************************************************/
 
-#include <dirent.h>
-#include <errno.h>
-#include <fcntl.h>
 
+#include <dirent.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <linux/fb.h>
 #include <linux/input.h>
-#include <linux/reboot.h>
-
-#include <stdbool.h>
-#include <string.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <time.h>
-
-#include <sys/limits.h>
 #include <sys/mman.h>
-#include <sys/inotify.h>
-#include <sys/ioctl.h>
 #include <sys/poll.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/types.h>
-
-#include <unistd.h>
+#include <sys/reboot.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <sys/wait.h>
 
 #include "qdbmp.h"
 
 
-#define MIN_TIME 1395606821
-#define TIME_FILE "/data/time_store"
-#define TIME_CHECK_PERIOD 60 /* seconds */
-#define VOLD_LINK "/data/vold"
-#define PLAYER_FILE "/data/chosen_player"
-#define NOASK_FLAG "/data/no_ask_once"
-#define POLL_MS 10
+/*- Android logcat ------------------------------------------------------------------------------*/
 
 
-#define KEYCODE_HEADPHONES 114
-#define KEYCODE_HOLD 115
-#define KEYCODE_PWR 116
-#define KEYCODE_PWR_LONG 117
-#define KEYCODE_SD 143
-#define KEYCODE_VOLPLUS 158
-#define KEYCODE_VOLMINUS 159
-#define KEYCODE_PREV 160
-#define KEYCODE_NEXT 162
-#define KEYCODE_PLAY 161
+#ifdef DEBUG
+#include <android/log.h>
 
-#define KEY_HOLD_OFF 16
 
-void checktime()
+static const char log_tag[] = "Rockbox Boot";
+
+
+void debugf(const char *fmt, ...)
 {
-    time_t t_stored=0, t_current=time(NULL);
+    va_list ap;
+    va_start(ap, fmt);
+    __android_log_vprint(ANDROID_LOG_DEBUG, log_tag, fmt, ap);
+    va_end(ap);
+}
 
-    FILE *f = fopen(TIME_FILE, "r");
-    if(f!=NULL)
+
+void ldebugf(const char* file, int line, const char *fmt, ...)
+{
+    va_list ap;
+    /* 13: 5 literal chars and 8 chars for the line number. */
+    char buf[strlen(file) + strlen(fmt) + 13];
+    snprintf(buf, sizeof(buf), "%s (%d): %s", file, line, fmt);
+    va_start(ap, fmt);
+    __android_log_vprint(ANDROID_LOG_DEBUG, log_tag, buf, ap);
+    va_end(ap);
+}
+
+
+void debug_trace(const char* function)
+{
+    static const char trace_tag[] = "TRACE: ";
+    char msg[strlen(trace_tag) + strlen(function) + 1];
+    snprintf(msg, sizeof(msg), "%s%s", trace_tag, function);
+    __android_log_write(ANDROID_LOG_DEBUG, log_tag, msg);
+}
+
+
+#define DEBUGF  debugf
+#define TRACE debug_trace(__func__)
+#else
+#define DEBUGF(...)
+#define TRACE
+#endif /* DEBUG */
+
+
+/*- Vold monitor --------------------------------------------------------------------------------*/
+
+
+/*
+    Without this socket iBasso Vold will not start.
+    iBasso Vold uses this to send status messages about storage devices.
+*/
+static const char VOLD_MONITOR_SOCKET_NAME[] = "UNIX_domain";
+static int _vold_monitor_socket_fd           = -1;
+
+
+static void vold_monitor_open_socket(void)
+{
+    TRACE;
+
+    unlink(VOLD_MONITOR_SOCKET_NAME);
+
+    _vold_monitor_socket_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+
+    if(_vold_monitor_socket_fd < 0)
     {
-        fscanf(f, "%ld", &t_stored);
-        fclose(f);
+        _vold_monitor_socket_fd = -1;
+        return;
     }
 
-    printf("stored time: %ld, current time: %ld\n", t_stored, t_current);
+    struct sockaddr_un addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, VOLD_MONITOR_SOCKET_NAME, sizeof(addr.sun_path) - 1);
 
-    if(t_stored<MIN_TIME)
-        t_stored=MIN_TIME;
-
-    if(t_stored<t_current)
+    if(bind(_vold_monitor_socket_fd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
     {
-        f = fopen(TIME_FILE, "w");
-        fprintf(f, "%ld", t_current);
-        fclose(f);
+        close(_vold_monitor_socket_fd);
+        unlink(VOLD_MONITOR_SOCKET_NAME);
+        _vold_monitor_socket_fd = -1;
+        return;
     }
-    else
+
+    if(listen(_vold_monitor_socket_fd, 1) < 0)
     {
-        t_stored += TIME_CHECK_PERIOD;
-        struct tm *t = localtime(&t_stored);
-        struct timeval tv = {mktime(t), 0};
-        settimeofday(&tv, 0);
+        close(_vold_monitor_socket_fd);
+        unlink(VOLD_MONITOR_SOCKET_NAME);
+        _vold_monitor_socket_fd = -1;
+        return;
     }
 }
 
 
-static struct pollfd *ufds;
-static char **device_names;
-static int nfds;
+/*
+    bionic does not have pthread_cancel.
+    0: Vold monitor thread stopped/ending.
+    1: Vold monitor thread started/running.
+*/
+static volatile sig_atomic_t _vold_monitor_active = 0;
 
 
+/* true: sdcard not mounted. */
+static bool _sdcard_not_mounted = true;
 
-static int open_device(const char *device, int print_flags)
+
+/* Mutex for sdcard mounted flag. */
+static pthread_mutex_t _sdcard_mount_mtx = PTHREAD_MUTEX_INITIALIZER;
+
+
+/* Signal condition for sdcard mounted flag. */
+static pthread_cond_t _sdcard_mount_cond = PTHREAD_COND_INITIALIZER;
+
+
+static void* vold_monitor_run(void* nothing)
 {
-    int fd;
-    struct pollfd *new_ufds;
-    char **new_device_names;
+    _vold_monitor_active = 1;
 
-    fd = open(device, O_RDWR);
-    if(fd < 0)
+    (void) nothing;
+
+    DEBUGF("DEBUG %s: Thread start.", __func__);
+
+    vold_monitor_open_socket();
+    if(_vold_monitor_socket_fd < 0)
     {
-        fprintf(stderr, "could not open %s, %s\n", device, strerror(errno));
-        return -1;
+        DEBUGF("ERROR %s: Thread end: No socket.", __func__);
+
+        _vold_monitor_active = 0;
+        return 0;
     }
 
-    new_ufds = realloc(ufds, sizeof(ufds[0]) * (nfds + 1));
-    if(new_ufds == NULL)
+    struct pollfd fds[1];
+    fds[0].fd     = _vold_monitor_socket_fd;
+    fds[0].events = POLLIN;
+
+    while(_vold_monitor_active == 1)
     {
-        fprintf(stderr, "out of memory\n");
-        return -1;
+        poll(fds, 1, 10);
+        if(! (fds[0].revents & POLLIN))
+        {
+            continue;
+        }
+
+        int socket_fd = accept(_vold_monitor_socket_fd, NULL, NULL);
+
+        if(socket_fd < 0)
+        {
+            DEBUGF("ERROR %s: accept failed.", __func__);
+
+            continue;
+        }
+
+        while(true)
+        {
+            char msg[1024];
+            memset(msg, 0, sizeof(msg));
+            int length = read(socket_fd, msg, sizeof(msg));
+
+            if(length <= 0)
+            {
+                close(socket_fd);
+                break;
+            }
+
+            DEBUGF("DEBUG %s: msg: %s", __func__, msg);
+
+            if(strcmp(msg, "Volume flash /mnt/sdcard state changed from 3 (Checking) to 4 (Mounted)") == 0)
+            {
+                pthread_mutex_lock(&_sdcard_mount_mtx);
+                _sdcard_not_mounted = false;
+                pthread_cond_signal(&_sdcard_mount_cond);
+                pthread_mutex_unlock(&_sdcard_mount_mtx);
+            }
+        }
     }
-    ufds = new_ufds;
-    new_device_names = realloc(device_names, sizeof(device_names[0]) * (nfds + 1));
+
+    close(_vold_monitor_socket_fd);
+    unlink(VOLD_MONITOR_SOCKET_NAME);
+    _vold_monitor_socket_fd = -1;
+
+    DEBUGF("DEBUG %s: Thread end.", __func__);
+
+    _vold_monitor_active = 0;
+    return 0;
+}
+
+
+/* Vold monitor thread. */
+static pthread_t _vold_monitor_thread;
+
+
+static void vold_monitor_start(void)
+{
+    TRACE;
+
+    if(_vold_monitor_active == 0)
+    {
+        pthread_create(&_vold_monitor_thread, NULL, vold_monitor_run, NULL);
+    }
+}
+
+
+static void vold_monitor_stop(void)
+{
+    TRACE;
+
+    if(_vold_monitor_active == 1)
+    {
+        _vold_monitor_active = 0;
+        int ret = pthread_join(_vold_monitor_thread, NULL);
+        DEBUGF("DEBUG %s: Thread joined: ret: %d.", __func__, ret);
+    }
+}
+
+
+/*- Input handler -------------------------------------------------------------------------------*/
+
+
+/* Input devices monitored with poll API. */
+static struct pollfd* _fds = NULL;
+
+
+/* Number of input devices monitored with poll API. */
+static nfds_t _nfds = 0;
+
+
+/* The names of the devices in _fds. */
+static char** _device_names = NULL;
+
+
+/* Open device device_name and add it to the list of polled devices. */
+static void open_device(const char* device_name)
+{
+    int fd = open(device_name, O_RDONLY);
+    if(fd == -1)
+    {
+        DEBUGF("ERROR %s: open failed on %s.", __func__, device_name);
+        exit(-1);
+    }
+
+    struct pollfd* new_fds = realloc(_fds, sizeof(struct pollfd) * (_nfds + 1));
+    if(new_fds == NULL)
+    {
+        DEBUGF("ERROR %s: realloc for _fds failed.", __func__);
+        exit(-1);
+    }
+
+    _fds = new_fds;
+    _fds[_nfds].fd = fd;
+    _fds[_nfds].events = POLLIN;
+
+    char** new_device_names = realloc(_device_names, sizeof(char*) * (_nfds + 1));
     if(new_device_names == NULL)
     {
-        fprintf(stderr, "out of memory\n");
-        return -1;
+        DEBUGF("ERROR %s: realloc for _device_names failed.", __func__);
+        exit(-1);
     }
-    device_names = new_device_names;
 
-    ufds[nfds].fd = fd;
-    ufds[nfds].events = POLLIN;
-    device_names[nfds] = strdup(device);
-    nfds++;
+    _device_names = new_device_names;
+    _device_names[_nfds] = strdup(device_name);
+    if(_device_names[_nfds] == NULL)
+    {
+        DEBUGF("ERROR %s: strdup failed.", __func__);
+        exit(-1);
+    }
 
-    return 0;
+    ++_nfds;
+
+    DEBUGF("DEBUG %s: Opened device %s.", __func__, device_name);
 }
 
 
-
-static int scan_dir(const char *dirname, int print_flags)
+static void button_init_device(void)
 {
-    char devname[PATH_MAX];
-    char *filename;
-    DIR *dir;
-    struct dirent *de;
-    dir = opendir(dirname);
+    TRACE;
+
+    if((_fds != NULL) || (_nfds != 0) || (_device_names != NULL))
+    {
+        DEBUGF("ERROR %s: Allready initialized.", __func__);
+        return;
+    }
+
+    /* The input device directory. */
+    static const char device_path[] = "/dev/input";
+
+    /* Path delimeter. */
+    static const char delimeter[] = "/";
+
+    /* Open all devices in device_path. */
+    DIR* dir = opendir(device_path);
     if(dir == NULL)
-        return -1;
-    strcpy(devname, dirname);
-    filename = devname + strlen(devname);
-    *filename++ = '/';
-    while((de = readdir(dir)))
     {
-        if(de->d_name[0] == '.' &&
-                (de->d_name[1] == '\0' ||
-                        (de->d_name[1] == '.' && de->d_name[2] == '\0')))
+        DEBUGF("ERROR %s: opendir failed: errno: %d.", __func__, errno);
+        exit(errno);
+    }
+
+    char device_name[PATH_MAX];
+    strcpy(device_name, device_path);
+    strcat(device_name, delimeter);
+    char* device_name_idx = device_name + strlen(device_name);
+
+    struct dirent* dir_entry;
+    while((dir_entry = readdir(dir)))
+    {
+        if(   ((dir_entry->d_name[0] == '.') && (dir_entry->d_name[1] == '\0'))
+           || ((dir_entry->d_name[0] == '.') && (dir_entry->d_name[1] == '.') && (dir_entry->d_name[2] == '\0')))
+        {
             continue;
-        strcpy(filename, de->d_name);
-        open_device(devname, print_flags);
+        }
+
+        strcpy(device_name_idx, dir_entry->d_name);
+
+        /* Open and add device to _fds. */
+        open_device(device_name);
     }
+
     closedir(dir);
-    return 0;
-}
 
-
-
-void button_init_device(void)
-{
-    int res;
-    int print_flags = 0;
-    const char *device = NULL;
-    const char *device_path = "/dev/input";
-
-    nfds = 1;
-    ufds = calloc(1, sizeof(ufds[0]));
-    ufds[0].fd = inotify_init();
-    ufds[0].events = POLLIN;
-    if(device)
+    /* Sanity check. */
+    if(_nfds < 2)
     {
-        res = open_device(device, print_flags);
-        if(res < 0) {
-             fprintf(stderr, "open device failed\n");
-        }
-    }
-    else
-    {
-        res = inotify_add_watch(ufds[0].fd, device_path, IN_DELETE | IN_CREATE);
-        if(res < 0)
-        {
-            fprintf(stderr, "could not add watch for %s, %s\n", device_path, strerror(errno));
-        }
-        res = scan_dir(device_path, print_flags);
-        if(res < 0)
-        {
-            fprintf(stderr, "scan dir failed for %s\n", device_path);
-        }
+        DEBUGF("ERROR %s: No input devices.", __func__);
+        exit(-1);
     }
 }
 
 
-int draw()
+#define EVENT_TYPE_BUTTON 1
+
+
+#define EVENT_CODE_BUTTON_PWR_LONG 117
+#define EVENT_CODE_BUTTON_REV      160
+#define EVENT_CODE_BUTTON_NEXT     162
+
+
+#define EVENT_TYPE_TOUCHSCREEN 3
+
+
+#define EVENT_CODE_TOUCHSCREEN_X 53
+
+
+enum user_choice
 {
-    int fbfd = 0;
-    struct fb_var_screeninfo vinfo;
-    struct fb_fix_screeninfo finfo;
-    long int screensize = 0;
-    char *fbp = 0;
-    int x = 0, y = 0;
-    long int location = 0;
-
-    /* Open the file for reading and writing */
-    fbfd = open("/dev/graphics/fb0", O_RDWR);
-    if (fbfd == -1)
-    {
-        perror("Error: cannot open framebuffer device");
-        exit(1);
-    }
-    /* Get fixed screen information */
-    if (ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo) == -1)
-    {
-        perror("Error reading fixed information");
-        exit(2);
-    }
-
-    /* Get variable screen information */
-    if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo) == -1)
-    {
-        perror("Error reading variable information");
-        exit(3);
-    }
-
-    /* Figure out the size of the screen in bytes */
-    screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
-
-    vinfo.xres = vinfo.xres_virtual = vinfo.width = 320;
-    vinfo.yres = vinfo.yres_virtual = vinfo.height = 240;
-    vinfo.xoffset = vinfo.yoffset = vinfo.sync = vinfo.vmode = 0;
-    vinfo.pixclock = 104377;
-    vinfo.left_margin = 20;
-    vinfo.right_margin = 50;
-    vinfo.upper_margin = 2;
-    vinfo.lower_margin = 4;
-    vinfo.hsync_len = 10;
-    vinfo.vsync_len = 2;
-    vinfo.red.offset = 11;
-    vinfo.red.length = 5;
-    vinfo.red.msb_right = 0;
-    vinfo.green.offset = 5;
-    vinfo.green.length = 6;
-    vinfo.green.msb_right = 0;
-    vinfo.blue.offset = 0;
-    vinfo.blue.length = 5;
-    vinfo.blue.msb_right = 0;
-    vinfo.transp.offset = vinfo.transp.length = vinfo.transp.msb_right = 0;
-    vinfo.nonstd = 4;
-
-    if (ioctl(fbfd, FBIOPUT_VSCREENINFO, &vinfo))
-    {
-        perror("fbset(ioctl)");
-        exit(4);
-    }
+    CHOICE_NONE = -1,
+    CHOICE_MANGO,
+    CHOICE_ROCKBOX,
+    CHOICE_POWEROFF
+};
 
 
-    /* Map the device to memory */
-    fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED,
-            fbfd, 0);
-    if ((int)fbp == -1)
-    {
-        perror("Error: failed to map framebuffer device to memory");
-        exit(4);
-    }
-
-    BMP* bmp = BMP_ReadFile("/system/rockbox/chooser.bmp");
-    BMP_CHECK_ERROR( stderr, -1 );
-
-    UCHAR r, g, b;
-    unsigned short int t;
-
-    for (y = 0; y < 240; y++)
-        for (x = 0; x < 320; x++)
-        {
-            location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
-                    (y+vinfo.yoffset) * finfo.line_length;
-
-            BMP_GetPixelRGB(bmp, x, y, &r, &g, &b);
-            t = (r>>3)<<11 | (g>>2) << 5 | (b>>3);
-            *((unsigned short int*)(fbp + location)) = t;
-        }
-
-    BMP_Free( bmp );
-
-    munmap(fbp, screensize);
-    close(fbfd);
-    return 0;
-}
-
-
-int choose_player()
+static int get_user_choice(void)
 {
-    int i;
-    int res;
-    struct input_event event;
+    TRACE;
 
-    while(true)
+    button_init_device();
+
+    enum user_choice choice = CHOICE_NONE;
+
+    while(choice == CHOICE_NONE)
     {
-        poll(ufds, nfds, POLL_MS);
-        for(i = 1; i < nfds; i++)
+        /* Poll all input devices. */
+        poll(_fds, _nfds, 0);
+
+        nfds_t fds_idx = 0;
+        for( ; fds_idx < _nfds; ++fds_idx)
         {
-            if(ufds[i].revents & POLLIN)
+            if(! (_fds[fds_idx].revents & POLLIN))
             {
-                res = read(ufds[i].fd, &event, sizeof(event));
-                if(res < (int)sizeof(event))
+                continue;
+            }
+
+            struct input_event event;
+            if(read(_fds[fds_idx].fd, &event, sizeof(event)) < (int) sizeof(event))
+            {
+                DEBUGF("ERROR %s: Read of input devices failed.", __func__);
+                continue;
+            }
+
+            DEBUGF("DEBUG %s: device: %s, event.type: %d, event.code: %d, event.value: %d", __func__, _device_names[fds_idx], event.type, event.code, event.value);
+
+            if(event.type == EVENT_TYPE_BUTTON)
+            {
+                switch(event.code)
                 {
-                    fprintf(stderr, "could not get event\n");
+                    case EVENT_CODE_BUTTON_REV:
+                    {
+                        choice = CHOICE_MANGO;
+                        break;
+                    }
+
+                    case EVENT_CODE_BUTTON_NEXT:
+                    {
+                        choice = CHOICE_ROCKBOX;
+                        break;
+                    }
+
+                    case EVENT_CODE_BUTTON_PWR_LONG:
+                    {
+                        choice = CHOICE_POWEROFF;
+                        break;
+                    }
                 }
-                if(event.type==1)
+            }
+            else if((event.type == EVENT_TYPE_TOUCHSCREEN) && (event.code == EVENT_CODE_TOUCHSCREEN_X))
+            {
+                if(event.value < 160)
                 {
-                    if(event.code==KEYCODE_NEXT)
-                    {
-                        puts("rockbox!");
-                        return 1;
-                    }
-                    else if(event.code==KEYCODE_PREV)
-                    {
-                        puts("mango!");
-                        return 0;
-                    }
-                    else if(event.code==KEYCODE_PWR || event.code==KEYCODE_PWR_LONG)
-                    {
-                        reboot(LINUX_REBOOT_CMD_POWER_OFF);
-                    }
+                    choice = CHOICE_MANGO;
                 }
-                else if(event.type==3)
+                else
                 {
-                    if(event.code==53) //x coord
-                    {
-                        if(event.value<160)
-                        {
-                            puts("mango!");
-                            return 0;
-                        }
-                        else
-                        {
-                            puts("rockbox!");
-                            return 1;
-                        }
-                    }
+                    choice = CHOICE_ROCKBOX;
                 }
             }
         }
     }
-    return true;
+
+    if(_fds)
+    {
+        nfds_t fds_idx = 0;
+        for( ; fds_idx < _nfds; ++fds_idx)
+        {
+            close(_fds[fds_idx].fd);
+        }
+        free(_fds);
+        _fds = NULL;
+    }
+
+    if(_device_names)
+    {
+        nfds_t fds_idx = 0;
+        for( ; fds_idx < _nfds; ++fds_idx)
+        {
+            free(_device_names[fds_idx]);
+        }
+        free(_device_names);
+        _device_names = NULL;
+    }
+
+    _nfds = 0;
+
+    return choice;
 }
 
-bool check_for_hold()
+
+/*
+    Changing bit, when hold switch is toggled.
+    Bit is off when hold switch is engaged.
+*/
+#define HOLD_SWITCH_BIT 16
+
+
+static bool check_for_hold(void)
 {
-    FILE *f = fopen("/sys/class/axppower/holdkey", "r");
-    char x;
-    fscanf(f, "%c", &x);
+    TRACE;
+
+    char hold_state;
+
+    FILE* f = fopen("/sys/class/axppower/holdkey", "r");
+    fscanf(f, "%c", &hold_state);
     fclose(f);
 
-    if(x & KEY_HOLD_OFF)
-      return false;
-    else
-      return true;
+    return(! (hold_state & HOLD_SWITCH_BIT));
 }
+
+
+/*- Display -------------------------------------------------------------------------------------*/
+
+
+static void draw(const char* file)
+{
+    DEBUGF("DEBUG %s: file: %s.", __func__, file);
+
+    int dev_fd = open("/dev/graphics/fb0", O_RDWR);
+    if(dev_fd == -1)
+    {
+        DEBUGF("ERROR %s: open failed on /dev/graphics/fb0, errno: %d.", __func__, errno);
+        exit(errno);
+    }
+
+    /* Get fixed screen information. */
+    struct fb_fix_screeninfo finfo;
+    if(ioctl(dev_fd, FBIOGET_FSCREENINFO, &finfo) < 0)
+    {
+        DEBUGF("ERROR %s: ioctl FBIOGET_FSCREENINFO failed on /dev/graphics/fb0, errno: %d.", __func__, errno);
+        exit(errno);
+    }
+
+    /* Get the changeable information. */
+    struct fb_var_screeninfo vinfo;
+    if(ioctl(dev_fd, FBIOGET_VSCREENINFO, &vinfo) < 0)
+    {
+        DEBUGF("ERROR %s: ioctl FBIOGET_VSCREENINFO failed on /dev/graphics/fb0, errno: %d.", __func__, errno);
+        exit(errno);
+    }
+
+    DEBUGF("DEBUG %s: bits_per_pixel: %u, width: %u, height: %u.", __func__, vinfo.bits_per_pixel, vinfo.width, vinfo.height);
+
+    size_t screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
+
+    /* ToDo: Is this needed? */
+    vinfo.xres             = 320;
+    vinfo.xres_virtual     = 320;
+    vinfo.width            = 320;
+    vinfo.yres             = 240;
+    vinfo.yres_virtual     = 240;
+    vinfo.height           = 240;
+    vinfo.xoffset          = 0;
+    vinfo.yoffset          = 0;
+    vinfo.sync             = 0;
+    vinfo.vmode            = 0;
+    vinfo.pixclock         = 104377;
+    vinfo.left_margin      = 20;
+    vinfo.right_margin     = 50;
+    vinfo.upper_margin     = 2;
+    vinfo.lower_margin     = 4;
+    vinfo.hsync_len        = 10;
+    vinfo.vsync_len        = 2;
+    vinfo.red.offset       = 11;
+    vinfo.red.length       = 5;
+    vinfo.red.msb_right    = 0;
+    vinfo.green.offset     = 5;
+    vinfo.green.length     = 6;
+    vinfo.green.msb_right  = 0;
+    vinfo.blue.offset      = 0;
+    vinfo.blue.length      = 5;
+    vinfo.blue.msb_right   = 0;
+    vinfo.transp.offset    = 0;
+    vinfo.transp.length    = 0;
+    vinfo.transp.msb_right = 0;
+    vinfo.nonstd           = 4;
+    if(ioctl(dev_fd, FBIOPUT_VSCREENINFO, &vinfo) < 0)
+    {
+        DEBUGF("ERROR %s: ioctl FBIOPUT_VSCREENINFO failed on /dev/graphics/fb0, errno: %d.", __func__, errno);
+        exit(errno);
+    }
+
+    /* Map the device to memory. */
+    char* dev_fb = (char*) mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, dev_fd, 0);
+    if(dev_fb == MAP_FAILED)
+    {
+        DEBUGF("ERROR %s: mmap failed on /dev/graphics/fb0, errno: %d.", __func__, errno);
+        exit(errno);
+    }
+
+    BMP* bmp = BMP_ReadFile(file);
+    if(BMP_GetError() != BMP_OK )
+    {
+        DEBUGF("ERROR %s: BMP_ReadFile failed on %s: %d.", __func__, file, BMP_GetError());
+        exit(BMP_GetError());
+    }
+
+    int y = 0;
+    for( ; y < 240; ++y)
+    {
+        int x = 0;
+        for( ; x < 320; ++x)
+        {
+            long int position =   (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8 )
+                                + (y + vinfo.yoffset) * finfo.line_length;
+            UCHAR r, g, b;
+            BMP_GetPixelRGB(bmp, x, y, &r, &g, &b);
+            unsigned short int pixel = (r >> 3) << 11 | (g >> 2) << 5 | (b >> 3);
+            *((unsigned short int*)(dev_fb + position)) = pixel;
+        }
+    }
+
+    BMP_Free(bmp);
+    munmap(dev_fb, screensize);
+    close(dev_fd);
+}
+
+
+/*-----------------------------------------------------------------------------------------------*/
+
+
+static const char ROCKBOX_BIN[]   = "/mnt/sdcard/.rockbox/rockbox";
+static const char OF_PLAYER_BIN[] = "/system/bin/MangoPlayer_original";
+static const char PLAYER_FILE[]   = "/data/chosen_player";
+
 
 int main(int argc, char **argv)
 {
-    FILE *f;
-    int last_chosen_player = -1;
+    TRACE;
 
-    f = fopen(PLAYER_FILE, "r");
-    if(f!=NULL)
+    /*
+        Create the iBasso Vold socket and monitor it. 
+        Do this early to not block Vold.
+    */
+    vold_monitor_start();
+
+    int last_chosen_player = CHOICE_NONE;
+
+    FILE* f = fopen(PLAYER_FILE, "r");
+    if(f != NULL)
     {
         fscanf(f, "%d", &last_chosen_player);
         fclose(f);
     }
-    bool ask = (access(VOLD_LINK, F_OK) == -1) || ((access(NOASK_FLAG, F_OK) == -1) && check_for_hold()) || (last_chosen_player==-1);
 
-    if(ask)
+    DEBUGF("DEBUG %s: Current player choice: %d.", __func__, last_chosen_player);
+
+    if(check_for_hold() || (last_chosen_player == CHOICE_NONE))
     {
-        draw();
-        button_init_device();
-        int player_chosen_now = choose_player();
+        draw("/system/chooser.bmp");
 
-        if(last_chosen_player!=player_chosen_now)
+        enum user_choice choice = get_user_choice();
+
+        if(choice == CHOICE_POWEROFF)
         {
+            reboot(RB_POWER_OFF);
+            while(true)
+            {
+                sleep(1);
+            }
+        }
+
+        if(choice != last_chosen_player)
+        {
+            last_chosen_player = choice;
+
             f = fopen(PLAYER_FILE, "w");
-            fprintf(f, "%d", player_chosen_now);
+            fprintf(f, "%d", last_chosen_player);
             fclose(f);
         }
 
-        if(last_chosen_player!=player_chosen_now || (access(VOLD_LINK, F_OK) == -1))
-        {
-            system("rm "VOLD_LINK);
-
-            if(player_chosen_now)
-                system("ln -s /system/bin/vold_rockbox "VOLD_LINK);
-            else
-                system("ln -s /system/bin/vold_original "VOLD_LINK);
-
-            system("touch "NOASK_FLAG);
-            system("reboot");
-        }
-        last_chosen_player = player_chosen_now;
+        DEBUGF("DEBUG %s: New player choice: %d.", __func__, last_chosen_player);
     }
 
-    system("rm "NOASK_FLAG);
+    /* true, Rockbox was started at least once. */
+    bool rockboxStarted = false;
 
-    while(1)
+    while(true)
     {
-        if(last_chosen_player)
-        {
-//            system("/system/bin/openadb");
-            system("/system/rockbox/lib/rockbox");
-        }
-        else
-//            system("/system/bin/closeadb");
-            system("/system/bin/MangoPlayer_original");
+        /* Excecute OF MangoPlayer or Rockbox and restart it if it crashes. */
 
-        sleep(1);
+        if(last_chosen_player == CHOICE_ROCKBOX)
+        {
+            if(rockboxStarted)
+            {
+                /*
+                    At this point it is assumed, that Rockbox has exited due to a USB connection
+                    triggering a remount of the internal storage for mass storage access.
+                    Rockbox will eventually restart, when /mnt/sdcard becomes available again.
+                */
+                draw("/system/usb.bmp");
+            }
+
+            pthread_mutex_lock(&_sdcard_mount_mtx);
+            while(_sdcard_not_mounted)
+            {
+                DEBUGF("DEBUG %s: Waiting on /mnt/sdcard/.", __func__);
+
+                pthread_cond_wait(&_sdcard_mount_cond, &_sdcard_mount_mtx);
+
+                DEBUGF("DEBUG %s: /mnt/sdcard/ available.", __func__);
+            }
+            pthread_mutex_unlock(&_sdcard_mount_mtx);
+
+            /* To be able to execute rockbox. */
+            system("mount -o remount,exec /mnt/sdcard");
+
+            /* This symlink is needed mainly to keep themes functional. */
+            system("ln -s /mnt/sdcard/.rockbox /.rockbox");
+
+            if(access(ROCKBOX_BIN, X_OK) != -1)
+            {
+                /* Start Rockbox. */
+
+                /* Rockbox has its own vold monitor. */
+                vold_monitor_stop();
+
+                DEBUGF("DEBUG %s: Excecuting %s.", __func__, ROCKBOX_BIN);
+
+                int ret_code = system(ROCKBOX_BIN);
+                rockboxStarted = true;
+
+                DEBUGF("DEBUG %s: ret_code: %d.", __func__, ret_code);
+
+                if(WIFEXITED(ret_code) && (WEXITSTATUS(ret_code) == 42))
+                {
+                    /*
+                        Rockbox terminated to prevent a froced shutdown due to a USB connection
+                        triggering a remount of the internal storage for mass storage access.
+                    */
+                    _sdcard_not_mounted = true;
+                }
+                /* else Rockbox crashed ... */
+
+                vold_monitor_start();
+            }
+            else
+            {
+                /* Rockbox executable missing. Show info screen for 30 seconds. */
+                draw("/system/rbmissing.bmp");
+                sleep(30);
+
+                /* Do not block Vold, so stop after sleep. */
+                vold_monitor_stop();
+
+#ifdef DEBUG
+                system("setprop persist.sys.usb.config adb");
+                system("setprop persist.usb.debug 1");
+#endif
+
+                DEBUGF("DEBUG %s: Rockbox missing, excecuting %s.", __func__, OF_PLAYER_BIN);
+
+                /* Start OF MangoPlayer. */
+                int ret_code = system(OF_PLAYER_BIN);
+
+                DEBUGF("DEBUG %s: ret_code: %d.", __func__, ret_code);
+            }
+        }
+        else /* if(last_chosen_player == CHOICE_MANGO) */
+        {
+            vold_monitor_stop();
+
+            DEBUGF("DEBUG %s: Excecuting %s.", __func__, OF_PLAYER_BIN);
+
+            int ret_code = system(OF_PLAYER_BIN);
+
+            DEBUGF("DEBUG %s: ret_code: %d.", __func__, ret_code);
+        }
     }
 
     return 0;
 }
-
-
-
