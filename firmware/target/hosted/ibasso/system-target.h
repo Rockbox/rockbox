@@ -1,11 +1,15 @@
 /***************************************************************************
- *             __________               __   ___.
+ *             __________               __   ___
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ *
+ * Copyright (C) 2014 by Ilia Sergachev: Initial Rockbox port to iBasso DX50
+ * Copyright (C) 2014 by Mario Basister: iBasso DX90 port
+ * Copyright (C) 2014 by Simon Rothen: Initial Rockbox repository submission, additional features
+ * Copyright (C) 2014 by Udo Schläpfer: Code clean up, additional features
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,13 +21,13 @@
  *
  ****************************************************************************/
 
-#ifndef __LCD_TARGET_H__
-#define __LCD_TARGET_H__
 
-extern fb_data *dev_fb;
-#define LCD_FRAMEBUF_ADDR(col, row) (dev_fb + row*LCD_WIDTH + col)
-#ifdef HAVE_LCD_ENABLE
-extern void lcd_set_active(bool active);
-extern void lcd_enable(bool enable);
-#endif
+#ifndef __SYSTEM_TARGET_H__
+#define __SYSTEM_TARGET_H__
+
+
+#include "kernel-unix.h"
+#include "system-hosted.h"
+
+
 #endif
