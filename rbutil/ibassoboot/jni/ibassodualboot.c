@@ -27,6 +27,7 @@
 #include <linux/input.h>
 #include <linux/reboot.h>
 
+#include <signal.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
@@ -40,6 +41,7 @@
 #include <sys/inotify.h>
 #include <sys/ioctl.h>
 #include <sys/poll.h>
+#include <sys/reboot.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -48,15 +50,15 @@
 
 #include "qdbmp.h"
 
-
-#define MIN_TIME 1395606821
-#define TIME_FILE "/data/time_store"
-#define TIME_CHECK_PERIOD 60 /* seconds */
-#define VOLD_LINK "/data/vold"
 #define PLAYER_FILE "/data/chosen_player"
-#define NOASK_FLAG "/data/no_ask_once"
 #define POLL_MS 10
 
+static const char ROCKBOX_BIN[]   = "/mnt/sdcard/.rockbox/rockbox";
+static const char OF_PLAYER_BIN[] = "/system/bin/MangoPlayer_original";
+
+#define CHOOSER_BMP "/system/chooser.bmp"
+#define RBMISSING_BMP "/system/rbmissing.bmp"
+#define USB_BMP "/system/usb.bmp"
 
 #define KEYCODE_HEADPHONES 114
 #define KEYCODE_HOLD 115
@@ -68,45 +70,258 @@
 #define KEYCODE_PREV 160
 #define KEYCODE_NEXT 162
 #define KEYCODE_PLAY 161
-
 #define KEY_HOLD_OFF 16
 
-void checktime()
+
+/*-----------------------------------------------------------------------------------------------*/
+
+
+#ifdef DEBUG
+
+
+#include <android/log.h>
+
+
+static const char log_tag[] = "Rockbox Boot";
+
+
+void debugf(const char *fmt, ...)
 {
-    time_t t_stored=0, t_current=time(NULL);
+    va_list ap;
+    va_start(ap, fmt);
+    __android_log_vprint(ANDROID_LOG_DEBUG, log_tag, fmt, ap);
+    va_end(ap);
+}
 
-    FILE *f = fopen(TIME_FILE, "r");
-    if(f!=NULL)
+
+void ldebugf(const char* file, int line, const char *fmt, ...)
+{
+    va_list ap;
+    /* 13: 5 literal chars and 8 chars for the line number. */
+    char buf[strlen(file) + strlen(fmt) + 13];
+    snprintf(buf, sizeof(buf), "%s (%d): %s", file, line, fmt);
+    va_start(ap, fmt);
+    __android_log_vprint(ANDROID_LOG_DEBUG, log_tag, buf, ap);
+    va_end(ap);
+}
+
+
+void debug_trace(const char* function)
+{
+    static const char trace_tag[] = "TRACE: ";
+    char msg[strlen(trace_tag) + strlen(function) + 1];
+    snprintf(msg, sizeof(msg), "%s%s", trace_tag, function);
+    __android_log_write(ANDROID_LOG_DEBUG, log_tag, msg);
+}
+
+
+#define DEBUGF  debugf
+#define TRACE debug_trace(__func__)
+#else
+#define DEBUGF(...)
+#define TRACE
+#endif
+
+
+#include <pthread.h>
+#include <stdbool.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/un.h>
+
+
+/*
+    Without this socket iBasso Vold will not start.
+    iBasso Vold uses this to send status messages about storage devices.
+*/
+static const char VOLD_MONITOR_SOCKET_NAME[] = "UNIX_domain\0";
+static int _vold_monitor_socket_fd           = -1;
+
+
+static int vold_monitor_open_socket(void)
+{
+    TRACE;
+
+    unlink(VOLD_MONITOR_SOCKET_NAME);
+
+    _vold_monitor_socket_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+
+    if(_vold_monitor_socket_fd < 0)
     {
-        fscanf(f, "%ld", &t_stored);
-        fclose(f);
+        _vold_monitor_socket_fd = -1;
+        return -1;
     }
 
-    printf("stored time: %ld, current time: %ld\n", t_stored, t_current);
+    struct sockaddr_un addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, VOLD_MONITOR_SOCKET_NAME, sizeof(addr.sun_path) -1);
 
-    if(t_stored<MIN_TIME)
-        t_stored=MIN_TIME;
-
-    if(t_stored<t_current)
+    if(bind(_vold_monitor_socket_fd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
     {
-        f = fopen(TIME_FILE, "w");
-        fprintf(f, "%ld", t_current);
-        fclose(f);
+        close(_vold_monitor_socket_fd);
+        unlink(VOLD_MONITOR_SOCKET_NAME);
+        _vold_monitor_socket_fd = -1;
+        return -1;
     }
-    else
+
+    if(listen(_vold_monitor_socket_fd, 1) < 0)
     {
-        t_stored += TIME_CHECK_PERIOD;
-        struct tm *t = localtime(&t_stored);
-        struct timeval tv = {mktime(t), 0};
-        settimeofday(&tv, 0);
+        close(_vold_monitor_socket_fd);
+        unlink(VOLD_MONITOR_SOCKET_NAME);
+        _vold_monitor_socket_fd = -1;
+        return -1;
+    }
+
+    return _vold_monitor_socket_fd;
+}
+
+
+/*
+    bionic does not have pthread_cancel.
+    0: Vold monitor thread stopped/ending.
+    1: Vold monitor thread started/running.
+*/
+static volatile sig_atomic_t _vold_monitor_active = 0;
+
+
+/* true: sdcard not mounted. */
+static bool _sdcard_not_mounted = true;
+
+
+/* Mutex for sdcard mounted flag. */
+static pthread_mutex_t _sdcard_mount_mtx = PTHREAD_MUTEX_INITIALIZER;
+
+
+/* Signal condition for sdcard mounted flag. */
+static pthread_cond_t _sdcard_mount_cond = PTHREAD_COND_INITIALIZER;
+
+
+static void* vold_monitor_run(void* nothing)
+{
+    _vold_monitor_active = 1;
+
+    (void*) nothing;
+
+    TRACE;
+
+    _vold_monitor_socket_fd = vold_monitor_open_socket();
+    if(_vold_monitor_socket_fd < 0)
+    {
+        goto end;
+    }
+
+    struct pollfd fds[1];
+    fds[0].fd     = _vold_monitor_socket_fd;
+    fds[0].events = POLLIN;
+
+    while(_vold_monitor_active == 1)
+    {
+        poll(fds, 1, 10);
+        if(! (fds[0].revents & POLLIN))
+        {
+            continue;
+        }
+
+        int socket_fd = accept(_vold_monitor_socket_fd, NULL, NULL);
+
+        if(socket_fd < 0)
+        {
+            goto end;
+        }
+
+        while(true)
+        {
+            char msg[1024];
+            memset(msg, 0, sizeof(msg));
+            int length = read(socket_fd, msg, sizeof(msg));
+
+            if(length < 0)
+            {
+                close(socket_fd);
+                goto end;
+            }
+            else if(length == 0)
+            {
+                close(socket_fd);
+                break;
+            }
+
+            DEBUGF("%s: msg: %s", __func__, msg);
+
+            if(   (strcmp(msg, "Volume flash /mnt/sdcard state changed from -1 (Initializing) to 0 (No-Media)") == 0)
+               || (strcmp(msg, "Volume flash /mnt/sdcard state changed from 0 (No-Media) to 1 (Idle-Unmounted)") == 0)
+               || (strcmp(msg, "Volume flash /mnt/sdcard state changed from 1 (Idle-Unmounted) to 3 (Checking)") == 0)
+               || (strcmp(msg, "Volume flash /mnt/sdcard state changed from 4 (Mounted) to 5 (Unmounting)") == 0)
+               || (strcmp(msg, "Volume flash /mnt/sdcard state changed from 5 (Unmounting) to 1 (Idle-Unmounted)") == 0)
+               || (strcmp(msg, "Volume flash /mnt/sdcard state changed from 1 (Idle-Unmounted) to 7 (Shared-Unmounted)") == 0)
+               || (strcmp(msg, "Volume flash /mnt/sdcard state changed from 7 (Shared-Unmounted) to 1 (Idle-Unmounted)") == 0))
+            {
+                pthread_mutex_lock(&_sdcard_mount_mtx);
+                _sdcard_not_mounted = true;
+                pthread_mutex_unlock(&_sdcard_mount_mtx);
+            }
+            else if(strcmp(msg, "Volume flash /mnt/sdcard state changed from 3 (Checking) to 4 (Mounted)") == 0)
+            {
+                pthread_mutex_lock(&_sdcard_mount_mtx);
+                _sdcard_not_mounted = false;
+                pthread_cond_signal(&_sdcard_mount_cond);
+                pthread_mutex_unlock(&_sdcard_mount_mtx);
+            }
+        }
+    }
+
+end:
+    if(_vold_monitor_socket_fd > -1)
+    {
+        close(_vold_monitor_socket_fd);
+        unlink(VOLD_MONITOR_SOCKET_NAME);
+    }
+
+    _vold_monitor_socket_fd = -1;
+
+    DEBUGF("%s: Thread end.", __func__);
+
+    _vold_monitor_active = 0;
+    return 0;
+}
+
+
+/* Thread id. */
+static pthread_t _vold_monitor_thread;
+
+
+static void vold_monitor_start(void)
+{
+    TRACE;
+
+    if(_vold_monitor_active == 0)
+    {
+        pthread_create(&_vold_monitor_thread, NULL, vold_monitor_run, NULL);
     }
 }
+
+
+static void vold_monitor_stop(void)
+{
+    TRACE;
+
+    if(_vold_monitor_active == 1)
+    {
+        _vold_monitor_active = 0;
+        pthread_join(_vold_monitor_thread, NULL);
+    }
+}
+
+
+/*-----------------------------------------------------------------------------------------------*/
 
 
 static struct pollfd *ufds;
 static char **device_names;
 static int nfds;
-
 
 
 static int open_device(const char *device, int print_flags)
@@ -173,7 +388,6 @@ static int scan_dir(const char *dirname, int print_flags)
 }
 
 
-
 void button_init_device(void)
 {
     int res;
@@ -208,7 +422,7 @@ void button_init_device(void)
 }
 
 
-int draw()
+int draw(char * bitmapfile)
 {
     int fbfd = 0;
     struct fb_var_screeninfo vinfo;
@@ -280,8 +494,8 @@ int draw()
         exit(4);
     }
 
-    BMP* bmp = BMP_ReadFile("/system/rockbox/chooser.bmp");
-    BMP_CHECK_ERROR( stderr, -1 );
+    BMP* bmp = BMP_ReadFile(bitmapfile);
+    BMP_CHECK_ERROR(stderr, -1);
 
     UCHAR r, g, b;
     unsigned short int t;
@@ -297,7 +511,7 @@ int draw()
             *((unsigned short int*)(fbp + location)) = t;
         }
 
-    BMP_Free( bmp );
+    BMP_Free(bmp);
 
     munmap(fbp, screensize);
     close(fbfd);
@@ -342,7 +556,7 @@ int choose_player()
                 }
                 else if(event.type==3)
                 {
-                    if(event.code==53) //x coord
+                    if(event.code==53) /* x coord */
                     {
                         if(event.value<160)
                         {
@@ -377,6 +591,8 @@ bool check_for_hold()
 
 int main(int argc, char **argv)
 {
+    TRACE;
+
     FILE *f;
     int last_chosen_player = -1;
 
@@ -386,11 +602,11 @@ int main(int argc, char **argv)
         fscanf(f, "%d", &last_chosen_player);
         fclose(f);
     }
-    bool ask = (access(VOLD_LINK, F_OK) == -1) || ((access(NOASK_FLAG, F_OK) == -1) && check_for_hold()) || (last_chosen_player==-1);
+    bool ask = check_for_hold() || (last_chosen_player==-1);
 
     if(ask)
     {
-        draw();
+        draw(CHOOSER_BMP);
         button_init_device();
         int player_chosen_now = choose_player();
 
@@ -401,39 +617,89 @@ int main(int argc, char **argv)
             fclose(f);
         }
 
-        if(last_chosen_player!=player_chosen_now || (access(VOLD_LINK, F_OK) == -1))
-        {
-            system("rm "VOLD_LINK);
-
-            if(player_chosen_now)
-                system("ln -s /system/bin/vold_rockbox "VOLD_LINK);
-            else
-                system("ln -s /system/bin/vold_original "VOLD_LINK);
-
-            system("touch "NOASK_FLAG);
-            system("reboot");
-        }
         last_chosen_player = player_chosen_now;
     }
 
-    system("rm "NOASK_FLAG);
+    /* true, Rockbox was started at least once. */
+    bool rockboxStarted = false;
 
     while(1)
     {
+        /* Excecute OF MangoPlayer or Rockbox and restart it if it crashes. */
+
         if(last_chosen_player)
         {
-//            system("/system/bin/openadb");
-            system("/system/rockbox/lib/rockbox");
+            /* Start Rockbox */
+
+            if(rockboxStarted)
+            {
+                /*
+                    This is a work around until we have better USB detection.
+                    At this point it is assumed, that Rockbox was forced closed due to a USB
+                    connection remounting sdcard for mass storage access.
+                    It will eventually restart, when the SDCard becomes available again.
+                */
+                draw(USB_BMP);
+            }
+
+            pthread_mutex_lock(&_sdcard_mount_mtx);
+
+            /*
+                Create the iBasso Vold socket and monitor it.
+                Do this for Rockbox only.
+            */
+            vold_monitor_start();
+
+            DEBUGF("%s: Waitung on /mnt/sdcard/.", __func__);
+            while(_sdcard_not_mounted)
+            {
+                pthread_cond_wait(&_sdcard_mount_cond, &_sdcard_mount_mtx);
+            }
+            pthread_mutex_unlock(&_sdcard_mount_mtx);
+
+            /* To be able to execute rockbox. */
+            system("mount -o remount,exec /mnt/sdcard");
+
+            /* This symlink is needed mainly to keep themes functional. */
+            system("ln -s /mnt/sdcard/.rockbox /.rockbox");
+
+            if(access(ROCKBOX_BIN, X_OK) != -1)
+            {
+                /*
+                    Rockbox executable present.
+                    Excecute Rockbox and wait for its termination.
+                */
+                DEBUGF("%s: Excecuting %s", __func__, ROCKBOX_BIN);
+                system(ROCKBOX_BIN);
+                DEBUGF("%s: Exit %s", __func__, ROCKBOX_BIN);
+                rockboxStarted = true;
+            }
+            else
+            {
+                vold_monitor_stop();
+
+                /*
+                    Rockbox executable missing.
+                    Show info screen for 30 seconds then excecute OF MangoPlayer.
+                */
+                draw(RBMISSING_BMP);
+                sleep(30);
+
+                DEBUGF("%s: Rockbox missing, excecuting %s", __func__, OF_PLAYER_BIN);
+                system(OF_PLAYER_BIN);
+                DEBUGF("%s: Exit %s", __func__, OF_PLAYER_BIN);
+            }
         }
         else
-//            system("/system/bin/closeadb");
-            system("/system/bin/MangoPlayer_original");
+        {
+            /* Excecute OF MangoPlayer and wait for its termination. */
+            DEBUGF("%s: Excecuting %s", __func__, OF_PLAYER_BIN);
+            system(OF_PLAYER_BIN);
+            DEBUGF("%s: Exit %s", __func__, OF_PLAYER_BIN);
+        }
 
         sleep(1);
     }
 
     return 0;
 }
-
-
-
