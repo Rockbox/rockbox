@@ -33,6 +33,7 @@
 # - Kaspar Rothenfußer
 # - Johannes Linke
 # - Kai Posadowsky
+# - Udo Schläpfer
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -13052,5 +13053,85 @@
   </dest>
   <voice>
     *: "Beschränke automatischen Verzeichniswechsel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_HOLD_SWITCH_LOCK_MODE
+  desc: in Settings -> General -> System -> Hold Switch Lock Mode
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Hold Switch Lock Mode"
+    ibassodx90: "Hold Switch Lock Mode"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Tastensperre Modus"
+    ibassodx90: "Tastensperre Modus"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Tastensperre Modus"
+    ibassodx90: "Tastensperre Modus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_HOLD_SWITCH_MODE_LOCK_ALL
+  desc: in Settings -> General -> System -> Hold Switch Mode: All
+  user: core
+  <source>
+    *: none
+    ibassodx50: "All"
+    ibassodx90: "All"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Alle"
+    ibassodx90: "Alle"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Alle"
+    ibassodx90: "Alle"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_HOLD_SWITCH_MODE_LOCK_TOUCH
+  desc: in Settings -> General -> System -> Hold Switch Mode: Touchscreen Only
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Touchscreen Only"
+    ibassodx90: "Touchscreen Only"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Nur Touchscreen"
+    ibassodx90: "Nur Touchscreen"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Nur Touchscreen"
+    ibassodx90: "Nur Touchscreen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_HOLD_SWITCH_MODE_LOCK_TOUCH_POWER_VOLUME
+  desc: in Settings -> General -> System -> Hold Switch Mode: Touchscreen, Power, Volume
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Touchscreen, Power, Volume"
+    ibassodx90: "Touchscreen, Power, Volume"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Touchscreen, Ein-/Ausschalter, Lautstärke"
+    ibassodx90: "Touchscreen, Ein-/Ausschalter, Lautstärke"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Touchscreen, Ein-/Ausschalter, Lautstärke"
+    ibassodx90: "Touchscreen, Ein-/Ausschalter, Lautstärke"
   </voice>
 </phrase>
