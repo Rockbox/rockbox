@@ -726,6 +726,58 @@ androidcc () {
     prefixtools $gcctarget
 }
 
+androidndkcc()
+{
+    if ! [ -d "$ANDROID_NDK_PATH" ]; then
+        echo "ERROR: You need the Android NDK installed (r16 or higher) and have the ANDROID_NDK_PATH"
+        echo "environment variable point to the root directory of the Android NDK."
+        exit
+    fi
+
+    make_toolchain="${ANDROID_NDK_PATH}/build/tools/make-standalone-toolchain.sh"
+
+    if ! [ -e "${make_toolchain}" ]; then
+        echo "ERROR: ${make_toolchain} could not be found."
+        exit
+    fi
+
+    buildhost=$(uname -s | tr "[:upper:]" "[:lower:]")
+    buildhost="${buildhost}-$(uname -m)"
+
+    GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
+    LDOPTS="$LDOPTS -ldl -llog"
+    SHARED_LDFLAG="-shared"
+    SHARED_CFLAGS=''
+    GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack"
+
+    # arch dependant stuff
+    case $1 in
+        armeabi)
+            endian="little"
+            gccchoice="4.6"
+            gcctarget="arm-linux-androideabi-"
+            echo "${make_toolchain} --system=${buildhost} --toolchain=arm-linux-androideabi-4.6 --platform=android-16 --install-dir=${pwd}/android-toolchain"
+            ${make_toolchain} --system=${buildhost} --toolchain=arm-linux-androideabi-4.6 --platform=android-16 --install-dir=${pwd}/android-toolchain
+            if [ ${?} != 0 ]; then
+                exit
+            fi
+            GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer --sysroot=${pwd}/android-toolchain/sysroot"
+            LDOPTS="$LDOPTS --sysroot=${pwd}/android-toolchain/sysroot"
+            ;;
+        *)
+            echo "ERROR: androidndkcc(): Unknown target architecture"
+            exit
+            ;;
+    esac
+
+    echo "Using endian ${endian}"
+    echo "Using gccchoice ${gccchoice}"
+    echo "Using gcctarget ${gcctarget}"
+
+    PATH=$PATH:${pwd}/android-toolchain/bin
+    prefixtools $gcctarget
+}
+
 whichadvanced () {
   atype=`echo "$1" | cut -c 2-`
   ##################################################################
@@ -3751,26 +3803,24 @@ fi
     target_id=94
     modelname="ibassodx50"
     target="DX50"
-    app_type="android_standalone"
+    app_type="android_ndk"
     lcd_orientation="landscape"
-    sharedir="/system/rockbox/app_rockbox/rockbox"
-    bindir="/system/rockbox/lib"
-    libdir="/system/rockbox/app_rockbox"
-    memory=32
+    # Actually 408260kB
+    memory=256
     uname=`uname`
-    androidcc armeabi
+    androidndkcc armeabi
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox"
     bootoutput="rockbox"
-    appextra="recorder:gui:radio:hosted/android"
+    appextra="recorder:gui:hosted"
     plugins="yes"
     swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
-    t_manufacturer="android"
+    t_manufacturer="ibasso"
     t_model="dx50"
     ;;
 
@@ -3779,27 +3829,24 @@ fi
     target_id=95
     modelname="ibassodx90"
     target="DX90"
-    app_type="android_standalone"
+    app_type="android_ndk"
     lcd_orientation="landscape"
-    sharedir="/system/rockbox/app_rockbox/rockbox"
-    bindir="/system/rockbox/lib"
-    libdir="/system/rockbox/app_rockbox"
-    memory=32
+    memory=256
     uname=`uname`
-    androidcc armeabi
+    androidndkcc armeabi
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox"
     bootoutput="rockbox"
-    appextra="recorder:gui:radio:hosted/android"
+    appextra="recorder:gui:hosted"
     plugins="yes"
     swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
-    t_manufacturer="android"
-    t_model="dx50"
+    t_manufacturer="ibasso"
+    t_model="dx90"
     ;;
 
    *)
@@ -4333,6 +4380,8 @@ if test -n "$t_cpu"; then
   elif [ "$simulator" = "yes" ]; then # a few more includes for the sim target tree
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/sdl"
     TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted"
+  elif [ "$t_manufacturer" = "ibasso" ]; then
+    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/hosted/ibasso/tinyalsa/include"
   fi
 
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"
