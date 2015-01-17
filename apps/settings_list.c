@@ -62,6 +62,10 @@
 #include "onplay.h"
 #endif
 
+#if defined(DX50) || defined(DX90)
+#include "batterylog-ibasso.h"
+#endif
+
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
      and you may need to update it if you edit this file */
@@ -2193,6 +2197,18 @@ const struct settings_list settings[] = {
                   NULL, "root menu order",
                   root_menu_load_from_cfg, root_menu_write_to_cfg,
                   root_menu_is_changed, root_menu_set_default),
+
+#if defined(DX50) || defined(DX90)
+    BOOL_SETTING(0,
+                 batterylog,
+                 LANG_IBASSO_BATTERY_LOG,
+                 false,
+                 "batterylog",
+                 off_on,
+                 LANG_SET_BOOL_YES,
+                 LANG_SET_BOOL_NO,
+                 ibasso_enable_batterylog),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);
