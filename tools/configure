@@ -3992,7 +3992,7 @@ fi
       toolset='';
       t_cpu='';
       GCCOPTS='';
-      extradefines="$extradefines  -DDEBUG"
+      extradefines="$extradefines  -DDEBUG -DWARBLE"
       output='warble.'${modelname};
       archosrom='';
       echo "Warble build selected"
