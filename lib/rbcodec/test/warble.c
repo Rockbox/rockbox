@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include "buffering.h" /* TYPE_PACKET_AUDIO */
 #include "kernel.h"
+#include "buflib.h"
 #include "codecs.h"
 #include "dsp_core.h"
 #include "metadata.h"
@@ -68,6 +69,16 @@ void debugf(const char *fmt, ...)
     va_start(ap, fmt);
     vfprintf(stderr, fmt, ap);
     va_end(ap);
+}
+
+void panicf(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+
+    exit (-1);
 }
 
 int find_first_set_bit(uint32_t value)
