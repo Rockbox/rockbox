@@ -66,6 +66,10 @@ size_t strlcpy(char *dst, const char *src, size_t siz);
 #  define logf(...) do { } while (0)
 # endif
 
+# ifndef panicf
+#  define panicf(...) do { } while (0)
+# endif
+
 #endif
 
 #ifndef ATTRIBUTE_PRINTF
