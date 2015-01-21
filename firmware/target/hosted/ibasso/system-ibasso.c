@@ -32,7 +32,6 @@
 #include "button-ibasso.h"
 #include "debug-ibasso.h"
 #include "sysfs-ibasso.h"
-#include "usb-ibasso.h"
 
 
 /* Fake stack. */
@@ -67,7 +66,6 @@ void system_init(void)
     }
 
     cpufreq_set_governor("powersave", CPUFREQ_ALL_CPUS);
-    set_usb_mode(USB_MODE_MASS_STORAGE);
 }
 
 
