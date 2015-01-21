@@ -853,6 +853,7 @@ struct user_settings
 
 #if defined(DX50) || defined(DX90)
     int governor;
+    int usb_mode;
 #endif
 };
 

@@ -64,6 +64,7 @@
 
 #if defined(DX50) || defined(DX90)
 #include "governor-ibasso.h"
+#include "usb-ibasso.h"
 #endif
 
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
@@ -2212,6 +2213,17 @@ const struct settings_list settings[] = {
                    "Interactive",
                    "Powersave",
                    "Performance"),
+    CHOICE_SETTING(0,
+                   usb_mode,
+                   LANG_IBASSO_USB_MODE,
+                   USB_MODE_MASS_STORAGE,
+                   "usb mode",
+                   "mass storage,charge,adb",
+                   ibasso_set_usb_mode,
+                   3,
+                   ID2P(LANG_IBASSO_USB_MODE_MASS_STORAGE),
+                   ID2P(LANG_IBASSO_USB_MODE_CHARGE),
+                   ID2P(LANG_IBASSO_USB_MODE_ADB)),
 #endif
 };
 

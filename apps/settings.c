@@ -107,6 +107,7 @@ struct system_status global_status;
 
 #if defined(DX50) || defined(DX90)
 #include "governor-ibasso.h"
+#include "usb-ibasso.h"
 #endif
 
 
@@ -1088,6 +1089,7 @@ void settings_apply(bool read_disk)
 
 #if defined(DX50) || defined(DX90)
     ibasso_set_governor(global_settings.governor);
+    ibasso_set_usb_mode(global_settings.usb_mode);
 #endif
 
     /* This should stay last */
