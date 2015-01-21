@@ -33,7 +33,6 @@
 #include "button-ibasso.h"
 #include "debug-ibasso.h"
 #include "sysfs-ibasso.h"
-#include "usb-ibasso.h"
 #include "vold-ibasso.h"
 
 
@@ -50,9 +49,8 @@ void system_init(void)
     volatile uintptr_t stack = 0;
     stackbegin = stackend = (uintptr_t*) &stack;
 
-    cpufreq_set_governor("powersave", CPUFREQ_ALL_CPUS);
-    vold_monitor_start();
-    ibasso_set_usb_mode(USB_MODE_MASS_STORAGE);
+	cpufreq_set_governor("powersave", CPUFREQ_ALL_CPUS);
+	vold_monitor_start();
 
     /*
         Prevent device from deep sleeping, which will interrupt playback.
