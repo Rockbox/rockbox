@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_09b6398a",
+        "filename": "apps/plugins/metronome.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 1360,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2015-01-21T02:16:57Z",
+      "side": 1,
+      "message": "if(!sound_paused \u0026\u0026 minitick \u003d\u003d period/2 \u0026\u0026 !sound_trigger)",
+      "revId": "7ffc4a6753e91a5a79147f577da311916c498465",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_e9badd6d",
+        "filename": "apps/plugins/metronome.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 1831,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2015-01-21T02:16:57Z",
+      "side": 1,
+      "message": "exchange the previous two lines (reset sound_trigger after playing ticktocks)",
+      "revId": "7ffc4a6753e91a5a79147f577da311916c498465",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
