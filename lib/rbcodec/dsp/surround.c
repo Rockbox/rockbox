@@ -96,18 +96,8 @@ static void dsp_surround_flush(void)
     if (!surround_enabled)
         return;
 
-    surround_buffer_get_data();
-
-    memset(b0,0,MAX_DLY/8 * sizeof(int32_t));
-    memset(b2,0,MAX_DLY   * sizeof(int32_t));
-    memset(bb,0,MAX_DLY/4 * sizeof(int32_t));
-    memset(hh,0,MAX_DLY/2 * sizeof(int32_t));
-    memset(cl,0,MAX_DLY   * sizeof(int32_t));
-    b0_r = 0;b0_w = dly_size/8 - 1;
-    b2_r = 0;b2_w = dly_size   - 1;
-    bb_r = 0;bb_w = dly_size/4 - 1;
-    hh_r = 0;hh_w = dly_size/2 - 1;
-    cl_r = 0;cl_w = dly_size   - 1;
+    unsigned int total_len = B0_DLY + B2_DLY + BB_DLY + HH_DLY + CL_DLY;
+    memset(core_get_data(handle),0,sizeof(int32_t) * total_len);
 }
 
 static void surround_update_filter(unsigned int fout)
@@ -186,6 +176,7 @@ void dsp_surround_enable(int var)
         core_free(handle);
         handle = -1;
     }
+    surround_enabled = now_enabled;
 
     struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
     dsp_proc_enable(dsp, DSP_PROC_SURROUND, now_enabled);

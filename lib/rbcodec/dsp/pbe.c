@@ -79,20 +79,14 @@ static void dsp_pbe_flush(void)
     if (pbe_strength == 0)
         return; /* Not currently enabled */
 
-    pbe_buffer_get_data();
-
-    memset(b0[0], 0, B0_DLY * sizeof(int32_t));
-    memset(b0[1], 0, B0_DLY * sizeof(int32_t));
-    memset(b2[0], 0, B2_DLY * sizeof(int32_t));
-    memset(b2[1], 0, B2_DLY * sizeof(int32_t));
-    memset(b3[0], 0, B3_DLY * sizeof(int32_t));
-    memset(b3[1], 0, B3_DLY * sizeof(int32_t));
-    b0_r[0] = 0; b0_w[0] = B0_DLY;
-    b0_r[1] = 0; b0_w[1] = B0_DLY;
-    b2_r[0] = 0; b2_w[0] = B2_DLY;
-    b2_r[1] = 0; b2_w[1] = B2_DLY;
-    b3_r[0] = 0; b3_w[0] = B3_DLY;
-    b3_r[1] = 0; b3_w[1] = B3_DLY;
+    unsigned int total_len = (B0_SIZE + B2_SIZE + B3_SIZE) * 2;
+    memset(core_get_data(handle),0,sizeof(int32_t) * total_len);
+    b0_r[0] = 0; b0_w[0] = 0;
+    b0_r[1] = 0; b0_w[1] = 0;
+    b2_r[0] = 0; b2_w[0] = 0;
+    b2_r[1] = 0; b2_w[1] = 0;
+    b3_r[0] = 0; b3_w[0] = 0;
+    b3_r[1] = 0; b3_w[1] = 0;
 
     for (int i = 0; i < 5; i++)
         filter_flush(&pbe_filter[i]);
