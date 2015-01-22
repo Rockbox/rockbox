@@ -111,11 +111,11 @@ enum {
 };
 
 typedef int __bitwise snd_pcm_access_t;
-#define SNDRV_PCM_ACCESS_MMAP_INTERLEAVED ((__force snd_pcm_access_t) 0)
-#define SNDRV_PCM_ACCESS_MMAP_NONINTERLEAVED ((__force snd_pcm_access_t) 1)
-#define SNDRV_PCM_ACCESS_MMAP_COMPLEX ((__force snd_pcm_access_t) 2)
-#define SNDRV_PCM_ACCESS_RW_INTERLEAVED ((__force snd_pcm_access_t) 3)
-#define SNDRV_PCM_ACCESS_RW_NONINTERLEAVED ((__force snd_pcm_access_t) 4)
+#define SNDRV_PCM_ACCESS_MMAP_INTERLEAVED ((__force snd_pcm_access_t) 0)  
+#define SNDRV_PCM_ACCESS_MMAP_NONINTERLEAVED ((__force snd_pcm_access_t) 1)  
+#define SNDRV_PCM_ACCESS_MMAP_COMPLEX ((__force snd_pcm_access_t) 2)  
+#define SNDRV_PCM_ACCESS_RW_INTERLEAVED ((__force snd_pcm_access_t) 3)  
+#define SNDRV_PCM_ACCESS_RW_NONINTERLEAVED ((__force snd_pcm_access_t) 4)  
 #define SNDRV_PCM_ACCESS_LAST SNDRV_PCM_ACCESS_RW_NONINTERLEAVED
 
 typedef int __bitwise snd_pcm_format_t;
@@ -125,42 +125,42 @@ typedef int __bitwise snd_pcm_format_t;
 #define SNDRV_PCM_FORMAT_S16_BE ((__force snd_pcm_format_t) 3)
 #define SNDRV_PCM_FORMAT_U16_LE ((__force snd_pcm_format_t) 4)
 #define SNDRV_PCM_FORMAT_U16_BE ((__force snd_pcm_format_t) 5)
-#define SNDRV_PCM_FORMAT_S24_LE ((__force snd_pcm_format_t) 6)
-#define SNDRV_PCM_FORMAT_S24_BE ((__force snd_pcm_format_t) 7)
-#define SNDRV_PCM_FORMAT_U24_LE ((__force snd_pcm_format_t) 8)
-#define SNDRV_PCM_FORMAT_U24_BE ((__force snd_pcm_format_t) 9)
+#define SNDRV_PCM_FORMAT_S24_LE ((__force snd_pcm_format_t) 6)  
+#define SNDRV_PCM_FORMAT_S24_BE ((__force snd_pcm_format_t) 7)  
+#define SNDRV_PCM_FORMAT_U24_LE ((__force snd_pcm_format_t) 8)  
+#define SNDRV_PCM_FORMAT_U24_BE ((__force snd_pcm_format_t) 9)  
 #define SNDRV_PCM_FORMAT_S32_LE ((__force snd_pcm_format_t) 10)
 #define SNDRV_PCM_FORMAT_S32_BE ((__force snd_pcm_format_t) 11)
 #define SNDRV_PCM_FORMAT_U32_LE ((__force snd_pcm_format_t) 12)
 #define SNDRV_PCM_FORMAT_U32_BE ((__force snd_pcm_format_t) 13)
-#define SNDRV_PCM_FORMAT_FLOAT_LE ((__force snd_pcm_format_t) 14)
-#define SNDRV_PCM_FORMAT_FLOAT_BE ((__force snd_pcm_format_t) 15)
-#define SNDRV_PCM_FORMAT_FLOAT64_LE ((__force snd_pcm_format_t) 16)
-#define SNDRV_PCM_FORMAT_FLOAT64_BE ((__force snd_pcm_format_t) 17)
-#define SNDRV_PCM_FORMAT_IEC958_SUBFRAME_LE ((__force snd_pcm_format_t) 18)
-#define SNDRV_PCM_FORMAT_IEC958_SUBFRAME_BE ((__force snd_pcm_format_t) 19)
+#define SNDRV_PCM_FORMAT_FLOAT_LE ((__force snd_pcm_format_t) 14)  
+#define SNDRV_PCM_FORMAT_FLOAT_BE ((__force snd_pcm_format_t) 15)  
+#define SNDRV_PCM_FORMAT_FLOAT64_LE ((__force snd_pcm_format_t) 16)  
+#define SNDRV_PCM_FORMAT_FLOAT64_BE ((__force snd_pcm_format_t) 17)  
+#define SNDRV_PCM_FORMAT_IEC958_SUBFRAME_LE ((__force snd_pcm_format_t) 18)  
+#define SNDRV_PCM_FORMAT_IEC958_SUBFRAME_BE ((__force snd_pcm_format_t) 19)  
 #define SNDRV_PCM_FORMAT_MU_LAW ((__force snd_pcm_format_t) 20)
 #define SNDRV_PCM_FORMAT_A_LAW ((__force snd_pcm_format_t) 21)
 #define SNDRV_PCM_FORMAT_IMA_ADPCM ((__force snd_pcm_format_t) 22)
 #define SNDRV_PCM_FORMAT_MPEG ((__force snd_pcm_format_t) 23)
 #define SNDRV_PCM_FORMAT_GSM ((__force snd_pcm_format_t) 24)
 #define SNDRV_PCM_FORMAT_SPECIAL ((__force snd_pcm_format_t) 31)
-#define SNDRV_PCM_FORMAT_S24_3LE ((__force snd_pcm_format_t) 32)
-#define SNDRV_PCM_FORMAT_S24_3BE ((__force snd_pcm_format_t) 33)
-#define SNDRV_PCM_FORMAT_U24_3LE ((__force snd_pcm_format_t) 34)
-#define SNDRV_PCM_FORMAT_U24_3BE ((__force snd_pcm_format_t) 35)
-#define SNDRV_PCM_FORMAT_S20_3LE ((__force snd_pcm_format_t) 36)
-#define SNDRV_PCM_FORMAT_S20_3BE ((__force snd_pcm_format_t) 37)
-#define SNDRV_PCM_FORMAT_U20_3LE ((__force snd_pcm_format_t) 38)
-#define SNDRV_PCM_FORMAT_U20_3BE ((__force snd_pcm_format_t) 39)
-#define SNDRV_PCM_FORMAT_S18_3LE ((__force snd_pcm_format_t) 40)
-#define SNDRV_PCM_FORMAT_S18_3BE ((__force snd_pcm_format_t) 41)
-#define SNDRV_PCM_FORMAT_U18_3LE ((__force snd_pcm_format_t) 42)
-#define SNDRV_PCM_FORMAT_U18_3BE ((__force snd_pcm_format_t) 43)
-#define SNDRV_PCM_FORMAT_G723_24 ((__force snd_pcm_format_t) 44)
-#define SNDRV_PCM_FORMAT_G723_24_1B ((__force snd_pcm_format_t) 45)
-#define SNDRV_PCM_FORMAT_G723_40 ((__force snd_pcm_format_t) 46)
-#define SNDRV_PCM_FORMAT_G723_40_1B ((__force snd_pcm_format_t) 47)
+#define SNDRV_PCM_FORMAT_S24_3LE ((__force snd_pcm_format_t) 32)  
+#define SNDRV_PCM_FORMAT_S24_3BE ((__force snd_pcm_format_t) 33)  
+#define SNDRV_PCM_FORMAT_U24_3LE ((__force snd_pcm_format_t) 34)  
+#define SNDRV_PCM_FORMAT_U24_3BE ((__force snd_pcm_format_t) 35)  
+#define SNDRV_PCM_FORMAT_S20_3LE ((__force snd_pcm_format_t) 36)  
+#define SNDRV_PCM_FORMAT_S20_3BE ((__force snd_pcm_format_t) 37)  
+#define SNDRV_PCM_FORMAT_U20_3LE ((__force snd_pcm_format_t) 38)  
+#define SNDRV_PCM_FORMAT_U20_3BE ((__force snd_pcm_format_t) 39)  
+#define SNDRV_PCM_FORMAT_S18_3LE ((__force snd_pcm_format_t) 40)  
+#define SNDRV_PCM_FORMAT_S18_3BE ((__force snd_pcm_format_t) 41)  
+#define SNDRV_PCM_FORMAT_U18_3LE ((__force snd_pcm_format_t) 42)  
+#define SNDRV_PCM_FORMAT_U18_3BE ((__force snd_pcm_format_t) 43)  
+#define SNDRV_PCM_FORMAT_G723_24 ((__force snd_pcm_format_t) 44)  
+#define SNDRV_PCM_FORMAT_G723_24_1B ((__force snd_pcm_format_t) 45)  
+#define SNDRV_PCM_FORMAT_G723_40 ((__force snd_pcm_format_t) 46)  
+#define SNDRV_PCM_FORMAT_G723_40_1B ((__force snd_pcm_format_t) 47)  
 #define SNDRV_PCM_FORMAT_LAST SNDRV_PCM_FORMAT_G723_40_1B
 
 #ifdef SNDRV_LITTLE_ENDIAN
@@ -190,33 +190,33 @@ typedef int __bitwise snd_pcm_subformat_t;
 #define SNDRV_PCM_SUBFORMAT_STD ((__force snd_pcm_subformat_t) 0)
 #define SNDRV_PCM_SUBFORMAT_LAST SNDRV_PCM_SUBFORMAT_STD
 
-#define SNDRV_PCM_INFO_MMAP 0x00000001
-#define SNDRV_PCM_INFO_MMAP_VALID 0x00000002
-#define SNDRV_PCM_INFO_DOUBLE 0x00000004
-#define SNDRV_PCM_INFO_BATCH 0x00000010
-#define SNDRV_PCM_INFO_INTERLEAVED 0x00000100
-#define SNDRV_PCM_INFO_NONINTERLEAVED 0x00000200
-#define SNDRV_PCM_INFO_COMPLEX 0x00000400
-#define SNDRV_PCM_INFO_BLOCK_TRANSFER 0x00010000
-#define SNDRV_PCM_INFO_OVERRANGE 0x00020000
-#define SNDRV_PCM_INFO_RESUME 0x00040000
-#define SNDRV_PCM_INFO_PAUSE 0x00080000
-#define SNDRV_PCM_INFO_HALF_DUPLEX 0x00100000
-#define SNDRV_PCM_INFO_JOINT_DUPLEX 0x00200000
-#define SNDRV_PCM_INFO_SYNC_START 0x00400000
-#define SNDRV_PCM_INFO_NO_PERIOD_WAKEUP 0x00800000
-#define SNDRV_PCM_INFO_FIFO_IN_FRAMES 0x80000000
+#define SNDRV_PCM_INFO_MMAP 0x00000001  
+#define SNDRV_PCM_INFO_MMAP_VALID 0x00000002  
+#define SNDRV_PCM_INFO_DOUBLE 0x00000004  
+#define SNDRV_PCM_INFO_BATCH 0x00000010  
+#define SNDRV_PCM_INFO_INTERLEAVED 0x00000100  
+#define SNDRV_PCM_INFO_NONINTERLEAVED 0x00000200  
+#define SNDRV_PCM_INFO_COMPLEX 0x00000400  
+#define SNDRV_PCM_INFO_BLOCK_TRANSFER 0x00010000  
+#define SNDRV_PCM_INFO_OVERRANGE 0x00020000  
+#define SNDRV_PCM_INFO_RESUME 0x00040000  
+#define SNDRV_PCM_INFO_PAUSE 0x00080000  
+#define SNDRV_PCM_INFO_HALF_DUPLEX 0x00100000  
+#define SNDRV_PCM_INFO_JOINT_DUPLEX 0x00200000  
+#define SNDRV_PCM_INFO_SYNC_START 0x00400000  
+#define SNDRV_PCM_INFO_NO_PERIOD_WAKEUP 0x00800000  
+#define SNDRV_PCM_INFO_FIFO_IN_FRAMES 0x80000000  
 
 typedef int __bitwise snd_pcm_state_t;
-#define SNDRV_PCM_STATE_OPEN ((__force snd_pcm_state_t) 0)
-#define SNDRV_PCM_STATE_SETUP ((__force snd_pcm_state_t) 1)
-#define SNDRV_PCM_STATE_PREPARED ((__force snd_pcm_state_t) 2)
-#define SNDRV_PCM_STATE_RUNNING ((__force snd_pcm_state_t) 3)
-#define SNDRV_PCM_STATE_XRUN ((__force snd_pcm_state_t) 4)
-#define SNDRV_PCM_STATE_DRAINING ((__force snd_pcm_state_t) 5)
-#define SNDRV_PCM_STATE_PAUSED ((__force snd_pcm_state_t) 6)
-#define SNDRV_PCM_STATE_SUSPENDED ((__force snd_pcm_state_t) 7)
-#define SNDRV_PCM_STATE_DISCONNECTED ((__force snd_pcm_state_t) 8)
+#define SNDRV_PCM_STATE_OPEN ((__force snd_pcm_state_t) 0)  
+#define SNDRV_PCM_STATE_SETUP ((__force snd_pcm_state_t) 1)  
+#define SNDRV_PCM_STATE_PREPARED ((__force snd_pcm_state_t) 2)  
+#define SNDRV_PCM_STATE_RUNNING ((__force snd_pcm_state_t) 3)  
+#define SNDRV_PCM_STATE_XRUN ((__force snd_pcm_state_t) 4)  
+#define SNDRV_PCM_STATE_DRAINING ((__force snd_pcm_state_t) 5)  
+#define SNDRV_PCM_STATE_PAUSED ((__force snd_pcm_state_t) 6)  
+#define SNDRV_PCM_STATE_SUSPENDED ((__force snd_pcm_state_t) 7)  
+#define SNDRV_PCM_STATE_DISCONNECTED ((__force snd_pcm_state_t) 8)  
 #define SNDRV_PCM_STATE_LAST SNDRV_PCM_STATE_DISCONNECTED
 
 enum {
@@ -248,30 +248,30 @@ struct snd_pcm_info {
 };
 
 typedef int snd_pcm_hw_param_t;
-#define SNDRV_PCM_HW_PARAM_ACCESS 0
-#define SNDRV_PCM_HW_PARAM_FORMAT 1
-#define SNDRV_PCM_HW_PARAM_SUBFORMAT 2
+#define SNDRV_PCM_HW_PARAM_ACCESS 0  
+#define SNDRV_PCM_HW_PARAM_FORMAT 1  
+#define SNDRV_PCM_HW_PARAM_SUBFORMAT 2  
 #define SNDRV_PCM_HW_PARAM_FIRST_MASK SNDRV_PCM_HW_PARAM_ACCESS
 #define SNDRV_PCM_HW_PARAM_LAST_MASK SNDRV_PCM_HW_PARAM_SUBFORMAT
 
-#define SNDRV_PCM_HW_PARAM_SAMPLE_BITS 8
-#define SNDRV_PCM_HW_PARAM_FRAME_BITS 9
-#define SNDRV_PCM_HW_PARAM_CHANNELS 10
-#define SNDRV_PCM_HW_PARAM_RATE 11
-#define SNDRV_PCM_HW_PARAM_PERIOD_TIME 12
-#define SNDRV_PCM_HW_PARAM_PERIOD_SIZE 13
-#define SNDRV_PCM_HW_PARAM_PERIOD_BYTES 14
-#define SNDRV_PCM_HW_PARAM_PERIODS 15
-#define SNDRV_PCM_HW_PARAM_BUFFER_TIME 16
-#define SNDRV_PCM_HW_PARAM_BUFFER_SIZE 17
-#define SNDRV_PCM_HW_PARAM_BUFFER_BYTES 18
-#define SNDRV_PCM_HW_PARAM_TICK_TIME 19
+#define SNDRV_PCM_HW_PARAM_SAMPLE_BITS 8  
+#define SNDRV_PCM_HW_PARAM_FRAME_BITS 9  
+#define SNDRV_PCM_HW_PARAM_CHANNELS 10  
+#define SNDRV_PCM_HW_PARAM_RATE 11  
+#define SNDRV_PCM_HW_PARAM_PERIOD_TIME 12  
+#define SNDRV_PCM_HW_PARAM_PERIOD_SIZE 13  
+#define SNDRV_PCM_HW_PARAM_PERIOD_BYTES 14  
+#define SNDRV_PCM_HW_PARAM_PERIODS 15  
+#define SNDRV_PCM_HW_PARAM_BUFFER_TIME 16  
+#define SNDRV_PCM_HW_PARAM_BUFFER_SIZE 17  
+#define SNDRV_PCM_HW_PARAM_BUFFER_BYTES 18  
+#define SNDRV_PCM_HW_PARAM_TICK_TIME 19  
 #define SNDRV_PCM_HW_PARAM_FIRST_INTERVAL SNDRV_PCM_HW_PARAM_SAMPLE_BITS
 #define SNDRV_PCM_HW_PARAM_LAST_INTERVAL SNDRV_PCM_HW_PARAM_TICK_TIME
 
-#define SNDRV_PCM_HW_PARAMS_NORESAMPLE (1<<0)
-#define SNDRV_PCM_HW_PARAMS_EXPORT_BUFFER (1<<1)
-#define SNDRV_PCM_HW_PARAMS_NO_PERIOD_WAKEUP (1<<2)
+#define SNDRV_PCM_HW_PARAMS_NORESAMPLE (1<<0)  
+#define SNDRV_PCM_HW_PARAMS_EXPORT_BUFFER (1<<1)  
+#define SNDRV_PCM_HW_PARAMS_NO_PERIOD_WAKEUP (1<<2)  
 
 struct snd_interval {
  unsigned int min, max;
@@ -359,9 +359,9 @@ struct snd_pcm_mmap_control {
  snd_pcm_uframes_t avail_min;
 };
 
-#define SNDRV_PCM_SYNC_PTR_HWSYNC (1<<0)
-#define SNDRV_PCM_SYNC_PTR_APPL (1<<1)
-#define SNDRV_PCM_SYNC_PTR_AVAIL_MIN (1<<2)
+#define SNDRV_PCM_SYNC_PTR_HWSYNC (1<<0)  
+#define SNDRV_PCM_SYNC_PTR_APPL (1<<1)  
+#define SNDRV_PCM_SYNC_PTR_AVAIL_MIN (1<<2)  
 
 struct snd_pcm_sync_ptr {
  unsigned int flags;
@@ -496,7 +496,7 @@ enum {
 #define SNDRV_TIMER_GLOBAL_HPET 2
 #define SNDRV_TIMER_GLOBAL_HRTIMER 3
 
-#define SNDRV_TIMER_FLG_SLAVE (1<<0)
+#define SNDRV_TIMER_FLG_SLAVE (1<<0)  
 
 struct snd_timer_id {
  int dev_class;
@@ -550,9 +550,9 @@ struct snd_timer_info {
  unsigned char reserved[64];
 };
 
-#define SNDRV_TIMER_PSFLG_AUTO (1<<0)
-#define SNDRV_TIMER_PSFLG_EXCLUSIVE (1<<1)
-#define SNDRV_TIMER_PSFLG_EARLY_EVENT (1<<2)
+#define SNDRV_TIMER_PSFLG_AUTO (1<<0)  
+#define SNDRV_TIMER_PSFLG_EXCLUSIVE (1<<1)  
+#define SNDRV_TIMER_PSFLG_EARLY_EVENT (1<<2)  
 
 struct snd_timer_params {
  unsigned int flags;
@@ -633,46 +633,46 @@ struct snd_ctl_card_info {
 };
 
 typedef int __bitwise snd_ctl_elem_type_t;
-#define SNDRV_CTL_ELEM_TYPE_NONE ((__force snd_ctl_elem_type_t) 0)
-#define SNDRV_CTL_ELEM_TYPE_BOOLEAN ((__force snd_ctl_elem_type_t) 1)
-#define SNDRV_CTL_ELEM_TYPE_INTEGER ((__force snd_ctl_elem_type_t) 2)
-#define SNDRV_CTL_ELEM_TYPE_ENUMERATED ((__force snd_ctl_elem_type_t) 3)
-#define SNDRV_CTL_ELEM_TYPE_BYTES ((__force snd_ctl_elem_type_t) 4)
-#define SNDRV_CTL_ELEM_TYPE_IEC958 ((__force snd_ctl_elem_type_t) 5)
-#define SNDRV_CTL_ELEM_TYPE_INTEGER64 ((__force snd_ctl_elem_type_t) 6)
+#define SNDRV_CTL_ELEM_TYPE_NONE ((__force snd_ctl_elem_type_t) 0)  
+#define SNDRV_CTL_ELEM_TYPE_BOOLEAN ((__force snd_ctl_elem_type_t) 1)  
+#define SNDRV_CTL_ELEM_TYPE_INTEGER ((__force snd_ctl_elem_type_t) 2)  
+#define SNDRV_CTL_ELEM_TYPE_ENUMERATED ((__force snd_ctl_elem_type_t) 3)  
+#define SNDRV_CTL_ELEM_TYPE_BYTES ((__force snd_ctl_elem_type_t) 4)  
+#define SNDRV_CTL_ELEM_TYPE_IEC958 ((__force snd_ctl_elem_type_t) 5)  
+#define SNDRV_CTL_ELEM_TYPE_INTEGER64 ((__force snd_ctl_elem_type_t) 6)  
 #define SNDRV_CTL_ELEM_TYPE_LAST SNDRV_CTL_ELEM_TYPE_INTEGER64
 
 typedef int __bitwise snd_ctl_elem_iface_t;
-#define SNDRV_CTL_ELEM_IFACE_CARD ((__force snd_ctl_elem_iface_t) 0)
-#define SNDRV_CTL_ELEM_IFACE_HWDEP ((__force snd_ctl_elem_iface_t) 1)
-#define SNDRV_CTL_ELEM_IFACE_MIXER ((__force snd_ctl_elem_iface_t) 2)
-#define SNDRV_CTL_ELEM_IFACE_PCM ((__force snd_ctl_elem_iface_t) 3)
-#define SNDRV_CTL_ELEM_IFACE_RAWMIDI ((__force snd_ctl_elem_iface_t) 4)
-#define SNDRV_CTL_ELEM_IFACE_TIMER ((__force snd_ctl_elem_iface_t) 5)
-#define SNDRV_CTL_ELEM_IFACE_SEQUENCER ((__force snd_ctl_elem_iface_t) 6)
+#define SNDRV_CTL_ELEM_IFACE_CARD ((__force snd_ctl_elem_iface_t) 0)  
+#define SNDRV_CTL_ELEM_IFACE_HWDEP ((__force snd_ctl_elem_iface_t) 1)  
+#define SNDRV_CTL_ELEM_IFACE_MIXER ((__force snd_ctl_elem_iface_t) 2)  
+#define SNDRV_CTL_ELEM_IFACE_PCM ((__force snd_ctl_elem_iface_t) 3)  
+#define SNDRV_CTL_ELEM_IFACE_RAWMIDI ((__force snd_ctl_elem_iface_t) 4)  
+#define SNDRV_CTL_ELEM_IFACE_TIMER ((__force snd_ctl_elem_iface_t) 5)  
+#define SNDRV_CTL_ELEM_IFACE_SEQUENCER ((__force snd_ctl_elem_iface_t) 6)  
 #define SNDRV_CTL_ELEM_IFACE_LAST SNDRV_CTL_ELEM_IFACE_SEQUENCER
 
 #define SNDRV_CTL_ELEM_ACCESS_READ (1<<0)
 #define SNDRV_CTL_ELEM_ACCESS_WRITE (1<<1)
 #define SNDRV_CTL_ELEM_ACCESS_READWRITE (SNDRV_CTL_ELEM_ACCESS_READ|SNDRV_CTL_ELEM_ACCESS_WRITE)
-#define SNDRV_CTL_ELEM_ACCESS_VOLATILE (1<<2)
-#define SNDRV_CTL_ELEM_ACCESS_TIMESTAMP (1<<3)
-#define SNDRV_CTL_ELEM_ACCESS_TLV_READ (1<<4)
-#define SNDRV_CTL_ELEM_ACCESS_TLV_WRITE (1<<5)
+#define SNDRV_CTL_ELEM_ACCESS_VOLATILE (1<<2)  
+#define SNDRV_CTL_ELEM_ACCESS_TIMESTAMP (1<<3)  
+#define SNDRV_CTL_ELEM_ACCESS_TLV_READ (1<<4)  
+#define SNDRV_CTL_ELEM_ACCESS_TLV_WRITE (1<<5)  
 #define SNDRV_CTL_ELEM_ACCESS_TLV_READWRITE (SNDRV_CTL_ELEM_ACCESS_TLV_READ|SNDRV_CTL_ELEM_ACCESS_TLV_WRITE)
-#define SNDRV_CTL_ELEM_ACCESS_TLV_COMMAND (1<<6)
-#define SNDRV_CTL_ELEM_ACCESS_INACTIVE (1<<8)
-#define SNDRV_CTL_ELEM_ACCESS_LOCK (1<<9)
-#define SNDRV_CTL_ELEM_ACCESS_OWNER (1<<10)
-#define SNDRV_CTL_ELEM_ACCESS_TLV_CALLBACK (1<<28)
-#define SNDRV_CTL_ELEM_ACCESS_USER (1<<29)
+#define SNDRV_CTL_ELEM_ACCESS_TLV_COMMAND (1<<6)  
+#define SNDRV_CTL_ELEM_ACCESS_INACTIVE (1<<8)  
+#define SNDRV_CTL_ELEM_ACCESS_LOCK (1<<9)  
+#define SNDRV_CTL_ELEM_ACCESS_OWNER (1<<10)  
+#define SNDRV_CTL_ELEM_ACCESS_TLV_CALLBACK (1<<28)   
+#define SNDRV_CTL_ELEM_ACCESS_USER (1<<29)  
 
-#define SNDRV_CTL_POWER_D0 0x0000
-#define SNDRV_CTL_POWER_D1 0x0100
-#define SNDRV_CTL_POWER_D2 0x0200
-#define SNDRV_CTL_POWER_D3 0x0300
-#define SNDRV_CTL_POWER_D3hot (SNDRV_CTL_POWER_D3|0x0000)
-#define SNDRV_CTL_POWER_D3cold (SNDRV_CTL_POWER_D3|0x0001)
+#define SNDRV_CTL_POWER_D0 0x0000  
+#define SNDRV_CTL_POWER_D1 0x0100  
+#define SNDRV_CTL_POWER_D2 0x0200  
+#define SNDRV_CTL_POWER_D3 0x0300  
+#define SNDRV_CTL_POWER_D3hot (SNDRV_CTL_POWER_D3|0x0000)  
+#define SNDRV_CTL_POWER_D3cold (SNDRV_CTL_POWER_D3|0x0001)  
 
 struct snd_ctl_elem_id {
  unsigned int numid;
@@ -786,11 +786,11 @@ enum sndrv_ctl_event_type {
  SNDRV_CTL_EVENT_LAST = SNDRV_CTL_EVENT_ELEM,
 };
 
-#define SNDRV_CTL_EVENT_MASK_VALUE (1<<0)
-#define SNDRV_CTL_EVENT_MASK_INFO (1<<1)
-#define SNDRV_CTL_EVENT_MASK_ADD (1<<2)
-#define SNDRV_CTL_EVENT_MASK_TLV (1<<3)
-#define SNDRV_CTL_EVENT_MASK_REMOVE (~0U)
+#define SNDRV_CTL_EVENT_MASK_VALUE (1<<0)  
+#define SNDRV_CTL_EVENT_MASK_INFO (1<<1)  
+#define SNDRV_CTL_EVENT_MASK_ADD (1<<2)  
+#define SNDRV_CTL_EVENT_MASK_TLV (1<<3)  
+#define SNDRV_CTL_EVENT_MASK_REMOVE (~0U)  
 
 struct snd_ctl_event {
  int type;
@@ -818,4 +818,3 @@ struct snd_ctl_event {
 #define SNDRV_CTL_NAME_IEC958(expl,direction,what) "IEC958 " expl SNDRV_CTL_NAME_##direction SNDRV_CTL_NAME_IEC958_##what
 
 #endif
-
