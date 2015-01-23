@@ -36,7 +36,7 @@
 #include "gcc_extensions.h"
 
 #undef open /* want the *real* open here, not sim_open or the like */
-#if (CONFIG_PLATFORM & PLATFORM_ANDROID)
+#if (CONFIG_PLATFORM & PLATFORM_ANDROID) || defined(DX50) || defined(DX90)
 #include "cpu-features.h"
 #define get_nprocs android_getCpuCount
 #endif

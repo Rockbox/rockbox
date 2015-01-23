@@ -1,13 +1,15 @@
 /***************************************************************************
- *             __________               __   ___.
+ *             __________               __   ___
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2008 by Maurus Cuelenaere
+ * Copyright (C) 2014 by Ilia Sergachev: Initial Rockbox port to iBasso DX50
+ * Copyright (C) 2014 by Mario Basister: iBasso DX90 port
+ * Copyright (C) 2014 by Simon Rothen: Initial Rockbox repository submission, additional features
+ * Copyright (C) 2014 by Udo Schläpfer: Code clean up, additional features
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,14 +20,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef BACKLIGHT_TARGET_H
-#define BACKLIGHT_TARGET_H
 
-#include <stdbool.h>
 
-bool backlight_hw_init(void);
-void backlight_hw_on(void);
-void backlight_hw_off(void);
-void backlight_hw_brightness(int brightness);
+#ifndef __SYSTEM_TARGET_H__
+#define __SYSTEM_TARGET_H__
 
-#endif /* BACKLIGHT_TARGET_H */
+
+#include "kernel-unix.h"
+#include "system-hosted.h"
+
+
+#endif
