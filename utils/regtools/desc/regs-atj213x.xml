@@ -235,14 +235,15 @@
       <addr name="IRQPD" addr="0x8"/>
     </reg>
     <reg name="DMA_MODE" desc="">
-      <addr name="DMA0_MODE" addr="0x100"/>
-      <addr name="DMA1_MODE" addr="0x200"/>
-      <addr name="DMA2_MODE" addr="0x300"/>
-      <addr name="DMA3_MODE" addr="0x400"/>
-      <addr name="DMA4_MODE" addr="0x500"/>
-      <addr name="DMA5_MODE" addr="0x600"/>
-      <addr name="DMA6_MODE" addr="0x700"/>
-      <addr name="DMA7_MODE" addr="0x800"/>
+      <formula string="0x100+n*0x20"/>
+      <addr name="DMA_MODE0" addr="0x100"/>
+      <addr name="DMA_MODE1" addr="0x120"/>
+      <addr name="DMA_MODE2" addr="0x140"/>
+      <addr name="DMA_MODE3" addr="0x160"/>
+      <addr name="DMA_MODE4" addr="0x180"/>
+      <addr name="DMA_MODE5" addr="0x1a0"/>
+      <addr name="DMA_MODE6" addr="0x1c0"/>
+      <addr name="DMA_MODE7" addr="0x1e0"/>
       <field name="DBURLEN" desc="Destination burst length. If burst lenght is 4 or 8 DDIR must be 0, DFXA must be 0, DDSP must be 0, DCOL must be 0. Burst must not cross a 1kB address boundary." bitrange="31:29">
         <value name="SINGLE" value="0x0" desc=""/>
         <value name="INCR4" value="0x3" desc=""/>
@@ -304,54 +305,59 @@
       <field name="SFXS" desc="Source Fix Size. If DFXS=0, DMA will transfer in 8bit mode when remain counter is less than STRANWID. If SFXS=1, DMA will always transfer in STRANWID." bitrange="0:0"/>
     </reg>
     <reg name="DMA_SRC" desc="">
-      <addr name="DMA0_SRC" addr="0x104"/>
-      <addr name="DMA1_SRC" addr="0x204"/>
-      <addr name="DMA2_SRC" addr="0x304"/>
-      <addr name="DMA3_SRC" addr="0x404"/>
-      <addr name="DMA4_SRC" addr="0x504"/>
-      <addr name="DMA5_SRC" addr="0x604"/>
-      <addr name="DMA6_SRC" addr="0x704"/>
-      <addr name="DMA7_SRC" addr="0x804"/>
+      <formula string="0x104+n*0x20"/>
+      <addr name="DMA_SRC0" addr="0x104"/>
+      <addr name="DMA_SRC1" addr="0x124"/>
+      <addr name="DMA_SRC2" addr="0x144"/>
+      <addr name="DMA_SRC3" addr="0x164"/>
+      <addr name="DMA_SRC4" addr="0x184"/>
+      <addr name="DMA_SRC5" addr="0x1a4"/>
+      <addr name="DMA_SRC6" addr="0x1c4"/>
+      <addr name="DMA_SRC7" addr="0x1e4"/>
     </reg>
     <reg name="DMA_DST" desc="">
-      <addr name="DMA0_DST" addr="0x108"/>
-      <addr name="DMA1_DST" addr="0x208"/>
-      <addr name="DMA2_DST" addr="0x308"/>
-      <addr name="DMA3_DST" addr="0x408"/>
-      <addr name="DMA4_DST" addr="0x508"/>
-      <addr name="DMA5_DST" addr="0x608"/>
-      <addr name="DMA6_DST" addr="0x708"/>
-      <addr name="DMA7_DST" addr="0x808"/>
+      <formula string="0x108+n*0x20"/>
+      <addr name="DMA_DST0" addr="0x108"/>
+      <addr name="DMA_DST1" addr="0x128"/>
+      <addr name="DMA_DST2" addr="0x148"/>
+      <addr name="DMA_DST3" addr="0x168"/>
+      <addr name="DMA_DST4" addr="0x188"/>
+      <addr name="DMA_DST5" addr="0x1a8"/>
+      <addr name="DMA_DST6" addr="0x1c8"/>
+      <addr name="DMA_DST7" addr="0x1e8"/>
     </reg>
     <reg name="DMA_CNT" desc="">
-      <addr name="DMA0_CNT" addr="0x10c"/>
-      <addr name="DMA1_CNT" addr="0x20c"/>
-      <addr name="DMA2_CNT" addr="0x30c"/>
-      <addr name="DMA3_CNT" addr="0x40c"/>
-      <addr name="DMA4_CNT" addr="0x50c"/>
-      <addr name="DMA5_CNT" addr="0x60c"/>
-      <addr name="DMA6_CNT" addr="0x70c"/>
-      <addr name="DMA7_CNT" addr="0x80c"/>
+      <formula string="0x10c+n*0x20"/>
+      <addr name="DMA_CNT0" addr="0x10c"/>
+      <addr name="DMA_CNT1" addr="0x12c"/>
+      <addr name="DMA_CNT2" addr="0x14c"/>
+      <addr name="DMA_CNT3" addr="0x16c"/>
+      <addr name="DMA_CNT4" addr="0x18c"/>
+      <addr name="DMA_CNT5" addr="0x1ac"/>
+      <addr name="DMA_CNT6" addr="0x1cc"/>
+      <addr name="DMA_CNT7" addr="0x1ec"/>
     </reg>
     <reg name="DMA_REM" desc="">
-      <addr name="DMA0_REM" addr="0x110"/>
-      <addr name="DMA1_REM" addr="0x210"/>
-      <addr name="DMA2_REM" addr="0x310"/>
-      <addr name="DMA3_REM" addr="0x410"/>
-      <addr name="DMA4_REM" addr="0x510"/>
-      <addr name="DMA5_REM" addr="0x610"/>
-      <addr name="DMA6_REM" addr="0x710"/>
-      <addr name="DMA7_REM" addr="0x810"/>
+      <formula string="0x110+n*0x20"/>
+      <addr name="DMA_REM0" addr="0x110"/>
+      <addr name="DMA_REM1" addr="0x130"/>
+      <addr name="DMA_REM2" addr="0x150"/>
+      <addr name="DMA_REM3" addr="0x170"/>
+      <addr name="DMA_REM4" addr="0x190"/>
+      <addr name="DMA_REM5" addr="0x1b0"/>
+      <addr name="DMA_REM6" addr="0x1d0"/>
+      <addr name="DMA_REM7" addr="0x1f0"/>
     </reg>
     <reg name="DMA_CMD" desc="">
-      <addr name="DMA0_CMD" addr="0x114"/>
-      <addr name="DMA1_CMD" addr="0x214"/>
-      <addr name="DMA2_CMD" addr="0x314"/>
-      <addr name="DMA3_CMD" addr="0x414"/>
-      <addr name="DMA4_CMD" addr="0x514"/>
-      <addr name="DMA5_CMD" addr="0x614"/>
-      <addr name="DMA6_CMD" addr="0x714"/>
-      <addr name="DMA7_CMD" addr="0x814"/>
+      <formula string="0x114+n*0x20"/>
+      <addr name="DMA_CMD0" addr="0x114"/>
+      <addr name="DMA_CMD1" addr="0x134"/>
+      <addr name="DMA_CMD2" addr="0x154"/>
+      <addr name="DMA_CMD3" addr="0x174"/>
+      <addr name="DMA_CMD4" addr="0x194"/>
+      <addr name="DMA_CMD5" addr="0x1b4"/>
+      <addr name="DMA_CMD6" addr="0x1d4"/>
+      <addr name="DMA_CMD7" addr="0x1f4"/>
     </reg>
   </dev>
   <dev name="DSP" long_name="Digital Signal Processor" desc="" version="1.0">
@@ -980,8 +986,8 @@
     </reg>
     <reg name="FIFOCTRL" desc="">
       <addr name="FIFOCTRL" addr="0x1a8"/>
-      <field name="DMA" desc="" bitrange="5:5"/>
       <field name="CPU_ACCESS" desc="" bitrange="7:7"/>
+      <field name="DMA" desc="" bitrange="5:5"/>
       <field name="DIR" desc="" bitrange="4:4">
         <value name="OUT" value="0x0" desc=""/>
         <value name="IN" value="0x1" desc=""/>
