@@ -97,7 +97,8 @@ static void dsp_surround_flush(void)
         return;
 
     unsigned int total_len = B0_DLY + B2_DLY + BB_DLY + HH_DLY + CL_DLY;
-    memset(core_get_data(handle),0,sizeof(int32_t) * total_len);
+    if (handle > 0)
+        memset(core_get_data(handle),0,sizeof(int32_t) * total_len);
 }
 
 static void surround_update_filter(unsigned int fout)

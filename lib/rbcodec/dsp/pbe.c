@@ -80,7 +80,8 @@ static void dsp_pbe_flush(void)
         return; /* Not currently enabled */
 
     unsigned int total_len = (B0_SIZE + B2_SIZE + B3_SIZE) * 2;
-    memset(core_get_data(handle),0,sizeof(int32_t) * total_len);
+    if (handle > 0)
+        memset(core_get_data(handle),0,sizeof(int32_t) * total_len);
     b0_r[0] = 0; b0_w[0] = 0;
     b0_r[1] = 0; b0_w[1] = 0;
     b2_r[0] = 0; b2_w[0] = 0;
