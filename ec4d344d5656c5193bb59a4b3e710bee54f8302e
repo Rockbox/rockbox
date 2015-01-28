@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_04f3c00b",
+        "filename": "manual/plugins/metronome.tex",
+        "patchSetId": 18
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2015-01-28T02:52:52Z",
+      "side": 1,
+      "message": "How about \"supports two modes?\"",
+      "revId": "ec4d344d5656c5193bb59a4b3e710bee54f8302e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_648d547b",
+        "filename": "manual/plugins/metronome.tex",
+        "patchSetId": 18
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2015-01-28T02:52:52Z",
+      "side": 1,
+      "message": "Perhaps making this section a bit more... formal would be a good idea :P",
+      "revId": "ec4d344d5656c5193bb59a4b3e710bee54f8302e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_84907097",
+        "filename": "manual/plugins/metronome.tex",
+        "patchSetId": 18
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2015-01-28T02:52:52Z",
+      "side": 1,
+      "message": "How about \"primary mode of operation\" instead?",
+      "revId": "ec4d344d5656c5193bb59a4b3e710bee54f8302e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_c4e8a819",
+        "filename": "manual/plugins/metronome.tex",
+        "patchSetId": 18
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2015-01-28T02:52:52Z",
+      "side": 1,
+      "message": "I think \"a constant tempo\" sounds better here",
+      "revId": "ec4d344d5656c5193bb59a4b3e710bee54f8302e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_a4edac27",
+        "filename": "manual/plugins/metronome.tex",
+        "patchSetId": 18
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2015-01-28T02:52:52Z",
+      "side": 1,
+      "message": "whitespace error",
+      "revId": "ec4d344d5656c5193bb59a4b3e710bee54f8302e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
