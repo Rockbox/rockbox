@@ -4387,6 +4387,9 @@ if test -n "$t_cpu"; then
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"
   test -n "$t_soc" && TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_soc"
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu"
+  if [ "$t_cpu" = "hosted" ]; then
+    TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/tinyalsa/include"
+  fi
   GCCOPTS="$GCCOPTS"
 fi
 

@@ -24,6 +24,7 @@
 #include "audio.h"
 #include "audiohw.h"
 #include "sound.h"
+#include "pcm-alsa.h"
 
 int audio_channels = 2;
 int audio_output_source = AUDIO_SRC_PLAYBACK;
@@ -67,3 +68,10 @@ void audio_input_mux(int source, unsigned flags)
     last_source = source;
 } /* audio_input_mux */
 
+void audiohw_preinit(void)
+{}
+
+void audiohw_close(void)
+{
+    pcm_close_device();
+}
