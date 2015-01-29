@@ -442,9 +442,13 @@ drivers/audio/pcm1792.c
 #if defined(SAMSUNG_YPR0) && defined(HAVE_AS3514)
 drivers/audio/as3514.c
 target/hosted/pcm-alsa.c
+target/hosted/tinyalsa/mixer.c
+target/hosted/tinyalsa/pcm.c
 #elif defined(SAMSUNG_YPR1) && defined(HAVE_WM8978)
 drivers/audio/wm8978.c
 target/hosted/pcm-alsa.c
+target/hosted/tinyalsa/mixer.c
+target/hosted/tinyalsa/pcm.c
 #elif defined(HAVE_SDL_AUDIO)
 drivers/audio/sdl.c
 #if CONFIG_CODEC == SWCODEC
