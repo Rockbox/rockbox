@@ -30,6 +30,7 @@
 #include "wmcodec.h"
 #include "audio.h"
 #include "panic.h"
+#include "pcm-alsa.h"
 #include "logf.h"
 
 
@@ -87,4 +88,12 @@ void audiohw_enable_headphone_jack(bool enable)
 {
     /* We don't use this facility: we have a separate GPIO for that */
     (void)enable;
+}
+
+void audiohw_preinit(void)
+{}
+
+void audiohw_close(void)
+{
+    pcm_close_device();
 }

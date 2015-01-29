@@ -1,14 +1,15 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2010 Thomas Martitz
- *
+ * Copyright (C) 2014 by Udo Schläpfer
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -20,544 +21,489 @@
  ****************************************************************************/
 
 
-/*
- * Based, but heavily modified, on the example given at
- * http://www.alsa-project.org/alsa-doc/alsa-lib/_2test_2pcm_8c-example.html
- *
- * This driver uses the so-called unsafe async callback method and hardcoded device
- * names. It fails when the audio device is busy by other apps.
- *
- * To make the async callback safer, an alternative stack is installed, since
- * it's run from a signal hanlder (which otherwise uses the user stack). If
- * tick tasks are run from a signal handler too, please install
- * an alternative stack for it too.
- *
- * TODO: Rewrite this to do it properly with multithreading
- *
- * Alternatively, a version using polling in a tick task is provided. While
- * supposedly safer, it appears to use more CPU (however I didn't measure it
- * accurately, only looked at htop). At least, in this mode the "default"
- * device works which doesnt break with other apps running.
- * device works which doesnt break with other apps running.
- */
-
-
-#include "autoconf.h"
-
-#include <stdlib.h>
+#include <pthread.h>
 #include <stdbool.h>
-#include <alsa/asoundlib.h>
-#include "system.h"
-#include "debug.h"
-#include "kernel.h"
+#include <unistd.h>
 
+#include "audiohw.h"
+#include "config.h"
+#include "debug.h"
+#include "panic.h"
 #include "pcm.h"
 #include "pcm-internal.h"
-#include "pcm_mixer.h"
-#include "pcm_sampr.h"
-#include "audiohw.h"
+#include "tick.h"
 
-#include <pthread.h>
-#include <signal.h>
+#include "sound/asound.h"
+#include "tinyalsa/asoundlib.h"
 
-#define USE_ASYNC_CALLBACK
-/* plughw:0,0 works with both, however "default" is recommended.
- * default doesnt seem to work with async callback but doesn't break
- * with multple applications running */
-static char device[] = "plughw:0,0";                    /* playback device */
-static const snd_pcm_access_t access_ = SND_PCM_ACCESS_RW_INTERLEAVED; /* access mode */
-static const snd_pcm_format_t format = SND_PCM_FORMAT_S16;    /* sample format */
-static const int channels = 2;                                /* count of channels */
-static unsigned int rate = 44100;                       /* stream rate */
 
-static snd_pcm_t *handle;
-static snd_pcm_sframes_t buffer_size = MIX_FRAME_SAMPLES * 32; /* ~16k */
-static snd_pcm_sframes_t period_size = MIX_FRAME_SAMPLES * 4;  /*  ~4k */
-static short *frames;
+/* Tiny alsa handle. */
+static struct pcm* _alsa_handle = NULL;
 
-static const void  *pcm_data = 0;
-static size_t       pcm_size = 0;
 
-#ifdef USE_ASYNC_CALLBACK
-static snd_async_handler_t *ahandler;
-static pthread_mutex_t pcm_mtx;
-static char signal_stack[SIGSTKSZ];
-#else
-static int recursion;
-#endif
+/* Bytes left in the Rockbox PCM frame buffer. */
+static size_t _pcm_buffer_size = 0;
 
-static int set_hwparams(snd_pcm_t *handle, unsigned sample_rate)
+
+/* Rockbox PCM frame buffer. */
+static const void* _pcm_buffer = NULL;
+
+
+/* Size of the internal PCM frame buffer. */
+static size_t _frame_buffer_size = 0;
+
+
+/* Internal PCM frame buffer. */
+static char* _frame_buffer = NULL;
+
+
+/*
+    1: PCM thread suspended.
+    0: PCM thread running.
+    These are used by pcm_play_[lock|unlock] or pcm_play_dma_[start|stop|pause]. These need to be
+    separated because of nested calls for locking and stopping.
+*/
+static volatile sig_atomic_t _dma_stopped = 1;
+static volatile sig_atomic_t _dma_locked  = 1;
+
+
+/* Mutex for PCM thread suspend/unsuspend. */
+static pthread_mutex_t _dma_suspended_mtx = PTHREAD_MUTEX_INITIALIZER;
+
+
+/* Signal condition for PCM thread suspend/unsuspend. */
+static pthread_cond_t _dma_suspended_cond = PTHREAD_COND_INITIALIZER;
+
+
+static void* pcm_thread_run(void* nothing)
 {
-    unsigned int rrate;
-    int err;
-    snd_pcm_hw_params_t *params;
-    snd_pcm_hw_params_malloc(&params);
+    (void) nothing;
 
+    DEBUGF("DEBUG %s: Thread start.", __func__);
 
-    /* choose all parameters */
-    err = snd_pcm_hw_params_any(handle, params);
-    if (err < 0)
+    while(true)
     {
-        printf("Broken configuration for playback: no configurations available: %s\n", snd_strerror(err));
-        goto error;
-    }
-    /* set the interleaved read/write format */
-    err = snd_pcm_hw_params_set_access(handle, params, access_);
-    if (err < 0)
-    {
-        printf("Access type not available for playback: %s\n", snd_strerror(err));
-        goto error;
-    }
-    /* set the sample format */
-    err = snd_pcm_hw_params_set_format(handle, params, format);
-    if (err < 0)
-    {
-        printf("Sample format not available for playback: %s\n", snd_strerror(err));
-        goto error;
-    }
-    /* set the count of channels */
-    err = snd_pcm_hw_params_set_channels(handle, params, channels);
-    if (err < 0)
-    {
-        printf("Channels count (%i) not available for playbacks: %s\n", channels, snd_strerror(err));
-        goto error;
-    }
-    /* set the stream rate */
-    rrate = sample_rate;
-    err = snd_pcm_hw_params_set_rate_near(handle, params, &rrate, 0);
-    if (err < 0)
-    {
-        printf("Rate %iHz not available for playback: %s\n", rate, snd_strerror(err));
-        goto error;
-    }
-    if (rrate != sample_rate)
-    {
-        printf("Rate doesn't match (requested %iHz, get %iHz)\n", sample_rate, err);
-        err = -EINVAL;
-        goto error;
-    }
-
-    /* set the buffer size */
-    err = snd_pcm_hw_params_set_buffer_size_near(handle, params, &buffer_size);
-    if (err < 0)
-    {
-        printf("Unable to set buffer size %ld for playback: %s\n", buffer_size, snd_strerror(err));
-        goto error;
-    }
-
-    /* set the period size */
-    err = snd_pcm_hw_params_set_period_size_near (handle, params, &period_size, NULL);
-    if (err < 0)
-    {
-        printf("Unable to set period size %ld for playback: %s\n", period_size, snd_strerror(err));
-        goto error;
-    }
-    if (!frames)
-        frames = malloc(period_size * channels * sizeof(short));
-
-    /* write the parameters to device */
-    err = snd_pcm_hw_params(handle, params);
-    if (err < 0)
-    {
-        printf("Unable to set hw params for playback: %s\n", snd_strerror(err));
-        goto error;
-    }
-
-    err = 0; /* success */
-error:
-    snd_pcm_hw_params_free(params);
-    return err;
-}
-
-/* Set sw params: playback start threshold and low buffer watermark */
-static int set_swparams(snd_pcm_t *handle)
-{
-    int err;
-
-    snd_pcm_sw_params_t *swparams;
-    snd_pcm_sw_params_malloc(&swparams);
-
-    /* get the current swparams */
-    err = snd_pcm_sw_params_current(handle, swparams);
-    if (err < 0)
-    {
-        printf("Unable to determine current swparams for playback: %s\n", snd_strerror(err));
-        goto error;
-    }
-    /* start the transfer when the buffer is haalmost full */
-    err = snd_pcm_sw_params_set_start_threshold(handle, swparams, buffer_size / 2);
-    if (err < 0)
-    {
-        printf("Unable to set start threshold mode for playback: %s\n", snd_strerror(err));
-        goto error;
-    }
-    /* allow the transfer when at least period_size samples can be processed */
-    err = snd_pcm_sw_params_set_avail_min(handle, swparams, period_size);
-    if (err < 0)
-    {
-        printf("Unable to set avail min for playback: %s\n", snd_strerror(err));
-        goto error;
-    }
-    /* write the parameters to the playback device */
-    err = snd_pcm_sw_params(handle, swparams);
-    if (err < 0)
-    {
-        printf("Unable to set sw params for playback: %s\n", snd_strerror(err));
-        goto error;
-    }
-
-    err = 0; /* success */
-error:
-    snd_pcm_sw_params_free(swparams);
-    return err;
-}
-
-/* copy pcm samples to a spare buffer, suitable for snd_pcm_writei() */
-static bool fill_frames(void)
-{
-    ssize_t copy_n, frames_left = period_size;
-    bool new_buffer = false;
-
-    while (frames_left > 0)
-    {
-        if (!pcm_size)
+        pthread_mutex_lock(&_dma_suspended_mtx);
+        while((_dma_stopped == 1) || (_dma_locked == 1))
         {
-            new_buffer = true;
-            if (!pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data,
-                                                &pcm_size))
+            DEBUGF("DEBUG %s: Playback suspended.", __func__);
+            pthread_cond_wait(&_dma_suspended_cond, &_dma_suspended_mtx);
+            DEBUGF("DEBUG %s: Playback resumed.", __func__);
+        }
+        pthread_mutex_unlock(&_dma_suspended_mtx);
+
+        size_t frame_buffer_size_left = _frame_buffer_size;
+        size_t frame_buffer_position  = 0;
+
+        memset(_frame_buffer, 0, _frame_buffer_size);
+
+        /* Fill the internal PCM buffer from the Rockbox PCM buffer. */
+        while(frame_buffer_size_left > 0)
+        {
+            if(_pcm_buffer_size == 0)
             {
-                return false;
+                /* Retrive a new PCM buffer from Rockbox. */
+                if(! pcm_play_dma_complete_callback(PCM_DMAST_OK, &_pcm_buffer, &_pcm_buffer_size))
+                {
+                    DEBUGF("DEBUG %s: No new buffer.", __func__);
+                    break;
+                }
+                pcm_play_dma_status_callback(PCM_DMAST_STARTED);
             }
+
+            DEBUGF("DEBUG %s: _pcm_buffer_size: %d, frame_buffer_size_left: %d, frame_buffer_position: %d.", __func__, _pcm_buffer_size, frame_buffer_size_left, frame_buffer_position);
+
+            /* Number of bytes to copy. */
+            size_t copy_now = MIN(_pcm_buffer_size, frame_buffer_size_left);
+
+            /* Copy Rockbox PCM buffer to internal PCM frame buffer. */
+            memcpy(&_frame_buffer[frame_buffer_position], _pcm_buffer, copy_now);
+
+            /* Adjust buffers. */
+            _pcm_buffer            += copy_now;
+            _pcm_buffer_size       -= copy_now;
+            frame_buffer_position  += copy_now;
+            frame_buffer_size_left -= copy_now;
         }
-        copy_n = MIN((ssize_t)pcm_size, frames_left*4);
-        memcpy(&frames[2*(period_size-frames_left)], pcm_data, copy_n);
 
-        pcm_data += copy_n;
-        pcm_size -= copy_n;
-        frames_left -= copy_n/4;
-
-        if (new_buffer)
+        if(pcm_write(_alsa_handle, _frame_buffer, _frame_buffer_size) != 0)
         {
-            new_buffer = false;
-            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+            DEBUGF("ERROR %s: pcm_write failed: %s.", __func__, pcm_get_error(_alsa_handle));
+
+            usleep( 10000 );
+            continue;
         }
-    }
-    return true;
-}
 
-#ifdef USE_ASYNC_CALLBACK
-static void async_callback(snd_async_handler_t *ahandler)
-{
-    snd_pcm_t *handle = snd_async_handler_get_pcm(ahandler);
-
-    if (pthread_mutex_trylock(&pcm_mtx) != 0)
-        return;
-#else
-static void pcm_tick(void)
-{
-    if (snd_pcm_state(handle) != SND_PCM_STATE_RUNNING)
-        return;
-#endif
-
-    while (snd_pcm_avail_update(handle) >= period_size)
-    {
-        if (fill_frames())
-        {
-            int err = snd_pcm_writei(handle, frames, period_size);
-            if (err < 0 && err != period_size && err != -EAGAIN)
-            {
-                printf("Write error: written %i expected %li\n", err, period_size);
-                break;
-            }
-        }
-        else
-        {
-            DEBUGF("%s: No Data.\n", __func__);
-            break;
-        }
-    }
-#ifdef USE_ASYNC_CALLBACK
-    pthread_mutex_unlock(&pcm_mtx);
-#endif
-}
-
-static int async_rw(snd_pcm_t *handle)
-{
-    int err;
-    snd_pcm_sframes_t sample_size;
-    short *samples;
-
-#ifdef USE_ASYNC_CALLBACK
-    /* assign alternative stack for the signal handlers */
-    stack_t ss = {
-        .ss_sp = signal_stack,
-        .ss_size = sizeof(signal_stack),
-        .ss_flags = 0
-    };
-    struct sigaction sa;
-
-    err = sigaltstack(&ss, NULL);
-    if (err < 0)
-    {
-        DEBUGF("Unable to install alternative signal stack: %s", strerror(err));
-        return err;
-    }
-    
-    err = snd_async_add_pcm_handler(&ahandler, handle, async_callback, NULL);
-    if (err < 0)
-    {
-        DEBUGF("Unable to register async handler: %s\n", snd_strerror(err));
-        return err;
+        /*DEBUGF("DEBUG %s: Thread running.", __func__);*/
     }
 
-    /* only modify the stack the handler runs on */
-    sigaction(SIGIO, NULL, &sa);
-    sa.sa_flags |= SA_ONSTACK;
-    err = sigaction(SIGIO, &sa, NULL);
-    if (err < 0)
-    {
-        DEBUGF("Unable to install alternative signal stack: %s", strerror(err));
-        return err;
-    }
-#endif
+    DEBUGF("DEBUG %s: Thread end.", __func__);
 
-    /* fill buffer with silence to initiate playback without noisy click */
-    sample_size = buffer_size;
-    samples = malloc(sample_size * channels * sizeof(short));
-
-    snd_pcm_format_set_silence(format, samples, sample_size);
-    err = snd_pcm_writei(handle, samples, sample_size);
-    free(samples);
-
-    if (err < 0)
-    {
-            DEBUGF("Initial write error: %s\n", snd_strerror(err));
-            return err;
-    }
-    if (err != (ssize_t)sample_size)
-    {
-            DEBUGF("Initial write error: written %i expected %li\n", err, sample_size);
-            return err;
-    }
-    if (snd_pcm_state(handle) == SND_PCM_STATE_PREPARED)
-    {
-            err = snd_pcm_start(handle);
-            if (err < 0)
-            {
-                DEBUGF("Start error: %s\n", snd_strerror(err));
-                return err;
-            }
-    }
     return 0;
 }
 
 
-void cleanup(void)
+#ifdef DEBUG
+
+/* https://github.com/tinyalsa/tinyalsa/blob/master/tinypcminfo.c */
+
+static const char* format_lookup[] =
 {
-    free(frames);
-    frames = NULL;
-    snd_pcm_close(handle);
+    /*[0] =*/ "S8",
+    "U8",
+    "S16_LE",
+    "S16_BE",
+    "U16_LE",
+    "U16_BE",
+    "S24_LE",
+    "S24_BE",
+    "U24_LE",
+    "U24_BE",
+    "S32_LE",
+    "S32_BE",
+    "U32_LE",
+    "U32_BE",
+    "FLOAT_LE",
+    "FLOAT_BE",
+    "FLOAT64_LE",
+    "FLOAT64_BE",
+    "IEC958_SUBFRAME_LE",
+    "IEC958_SUBFRAME_BE",
+    "MU_LAW",
+    "A_LAW",
+    "IMA_ADPCM",
+    "MPEG",
+    /*[24] =*/ "GSM",
+    [31] = "SPECIAL",
+    "S24_3LE",
+    "S24_3BE",
+    "U24_3LE",
+    "U24_3BE",
+    "S20_3LE",
+    "S20_3BE",
+    "U20_3LE",
+    "U20_3BE",
+    "S18_3LE",
+    "S18_3BE",
+    "U18_3LE",
+    /*[43] =*/ "U18_3BE"
+};
+
+
+static const char* pcm_get_format_name(unsigned int bit_index)
+{
+    return(bit_index < 43 ? format_lookup[bit_index] : NULL);
 }
+
+#endif
+
+
+/* Thread that copies the Rockbox PCM buffer to ALSA. */
+static pthread_t _pcm_thread;
+
+
+/* ALSA card and device. */
+static const unsigned int CARD   = 0;
+static const unsigned int DEVICE = 0;
+
+
+/* ALSA config. */
+static struct pcm_config _config;
 
 
 void pcm_play_dma_init(void)
 {
-    int err;
     audiohw_preinit();
 
-    if ((err = snd_pcm_open(&handle, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
+#ifdef DEBUG
+
+    struct pcm_params* params = pcm_params_get(CARD, DEVICE, PCM_OUT);
+    if(params == NULL)
     {
-        printf("%s(): Cannot open device %s: %s\n", __func__, device, snd_strerror(err));
-        exit(EXIT_FAILURE);
+        DEBUGF("ERROR %s: Card/device does not exist.", __func__);
+        panicf("ERROR %s: Card/device does not exist.", __func__);
         return;
     }
 
-    if ((err = snd_pcm_nonblock(handle, 1)))
-        printf("Could not set non-block mode: %s\n", snd_strerror(err));
-
-    if ((err = set_hwparams(handle, rate)) < 0)
+    struct pcm_mask* m = pcm_params_get_mask(params, PCM_PARAM_ACCESS);
+    if(m)
     {
-        printf("Setting of hwparams failed: %s\n", snd_strerror(err));
-        exit(EXIT_FAILURE);
-    }
-    if ((err = set_swparams(handle)) < 0)
-    {
-        printf("Setting of swparams failed: %s\n", snd_strerror(err));
-        exit(EXIT_FAILURE);
+        DEBUGF("DEBUG %s: Access: %#08x", __func__, m->bits[0]);
     }
 
-    pcm_dma_apply_settings();
+    m = pcm_params_get_mask(params, PCM_PARAM_FORMAT);
+    if(m)
+    {
+        DEBUGF("DEBUG %s: Format[0]: %#08x", __func__, m->bits[0]);
+        DEBUGF("DEBUG %s: Format[1]: %#08x", __func__, m->bits[1]);
 
-#ifdef USE_ASYNC_CALLBACK
-    pthread_mutexattr_t attr;
-    pthread_mutexattr_init(&attr);
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-    pthread_mutex_init(&pcm_mtx, &attr);
-#else
-    tick_add_task(pcm_tick);
+        unsigned int j;
+        unsigned int k;
+        const unsigned int bitcount = sizeof(m->bits[0]) * 8;
+        for(k = 0; k < 2; ++k)
+        {
+            for(j = 0; j < bitcount; ++j)
+            {
+                const char* name;
+                if(m->bits[k] & (1 << j))
+                {
+                    name = pcm_get_format_name(j + (k * bitcount));
+                    if(name)
+                    {
+                        DEBUGF("DEBUG %s: Format: %s", __func__, name);
+                    }
+                }
+            }
+        }
+    }
+
+    m = pcm_params_get_mask(params, PCM_PARAM_SUBFORMAT);
+    if(m)
+    {
+        DEBUGF("DEBUG %s: Subformat: %#08x", __func__, m->bits[0]);
+    }
+
+    unsigned int min = pcm_params_get_min(params, PCM_PARAM_RATE);
+    unsigned int max = pcm_params_get_max(params, PCM_PARAM_RATE) ;
+    DEBUGF("DEBUG %s: Rate: min = %uHz, max = %uHz", __func__, min, max);
+
+    min = pcm_params_get_min(params, PCM_PARAM_CHANNELS);
+    max = pcm_params_get_max(params, PCM_PARAM_CHANNELS);
+    DEBUGF("DEBUG %s: Channels: min = %u, max = %u", __func__, min, max);
+
+    min = pcm_params_get_min(params, PCM_PARAM_SAMPLE_BITS);
+    max = pcm_params_get_max(params, PCM_PARAM_SAMPLE_BITS);
+    DEBUGF("DEBUG %s: Sample bits: min=%u, max=%u", __func__, min, max);
+
+    min = pcm_params_get_min(params, PCM_PARAM_PERIOD_SIZE);
+    max = pcm_params_get_max(params, PCM_PARAM_PERIOD_SIZE);
+    DEBUGF("DEBUG %s: Period size: min=%u, max=%u", __func__, min, max);
+
+    min = pcm_params_get_min(params, PCM_PARAM_PERIODS);
+    max = pcm_params_get_max(params, PCM_PARAM_PERIODS);
+    DEBUGF("DEBUG %s: Period count: min=%u, max=%u", __func__, min, max);
+
+    pcm_params_free(params);
+
 #endif
 
-    atexit(cleanup);
-    return;
+    if((_alsa_handle != NULL) || (_frame_buffer != NULL))
+    {
+        DEBUGF("ERROR %s: Allready initialized.", __func__);
+        panicf("ERROR %s: Allready initialized.", __func__);
+        return;
+    }
+
+    /*
+        ToDo: This needs a interface to enable device specific config of ALSA.
+
+        Rockbox outputs 16 Bit/44.1kHz stereo by default.
+
+        ALSA frame buffer size = config.period_count * config.period_size * config.channels * (16 \ 8)
+                               = 4 * 256 * 2 * 2
+                               = 4096
+    */
+    _config.channels          = 2;
+    _config.rate              = 44100;
+    _config.period_size       = 256;
+    _config.period_count      = 4;
+    _config.format            = PCM_FORMAT_S16_LE;
+    _config.start_threshold   = 0;
+    _config.stop_threshold    = 0;
+    _config.silence_threshold = 0;
+
+    _alsa_handle = pcm_open(CARD, DEVICE, PCM_OUT, &_config);
+    if(! pcm_is_ready(_alsa_handle))
+    {
+        DEBUGF("ERROR %s: pcm_open failed: %s.", __func__, pcm_get_error(_alsa_handle));
+        panicf("ERROR %s: pcm_open failed: %s.", __func__, pcm_get_error(_alsa_handle));
+        return;
+    }
+
+    _frame_buffer_size = pcm_frames_to_bytes(_alsa_handle, pcm_get_buffer_size(_alsa_handle));
+
+    DEBUGF("DEBUG %s: ALSA PCM frame buffer size: %d.", __func__, _frame_buffer_size);
+
+    _frame_buffer = malloc(_frame_buffer_size);
+    if(_frame_buffer == NULL)
+    {
+        DEBUGF("ERROR %s: malloc for _frame_buffer failed.", __func__);
+        panicf("ERROR %s: malloc for _frame_buffer failed.", __func__);
+        return;
+    }
+
+    /* Create pcm thread in the suspended state. */
+    pthread_mutex_lock(&_dma_suspended_mtx);
+    _dma_stopped = 1;
+    _dma_locked  = 1;
+    pthread_create(&_pcm_thread, NULL, pcm_thread_run, NULL);
+    pthread_mutex_unlock(&_dma_suspended_mtx);
 }
 
 
-void pcm_play_lock(void)
+void pcm_play_dma_start(const void *addr, size_t size)
 {
-#ifdef USE_ASYNC_CALLBACK
-    pthread_mutex_lock(&pcm_mtx);
-#else
-    if (recursion++ == 0)
-        tick_remove_task(pcm_tick);
-#endif
-}
+    _pcm_buffer      = addr;
+    _pcm_buffer_size = size;
 
-void pcm_play_unlock(void)
-{
-#ifdef USE_ASYNC_CALLBACK
-    pthread_mutex_unlock(&pcm_mtx);
-#else
-    if (--recursion == 0)
-        tick_add_task(pcm_tick);
-#endif
-}
-
-static void pcm_dma_apply_settings_nolock(void)
-{
-    snd_pcm_drop(handle);
-    set_hwparams(handle, pcm_sampr);
-}
-
-void pcm_dma_apply_settings(void)
-{
-    pcm_play_lock();
-    pcm_dma_apply_settings_nolock();
-    pcm_play_unlock();
+    pthread_mutex_lock(&_dma_suspended_mtx);
+    _dma_stopped = 0;
+    pthread_cond_signal(&_dma_suspended_cond);
+    pthread_mutex_unlock(&_dma_suspended_mtx);
 }
 
 
 void pcm_play_dma_pause(bool pause)
 {
-    snd_pcm_pause(handle, pause);
+    pthread_mutex_lock(&_dma_suspended_mtx);
+    _dma_stopped = pause ? 1 : 0;
+    if(_dma_stopped == 0)
+    {
+        pthread_cond_signal(&_dma_suspended_cond);
+    }
+    pthread_mutex_unlock(&_dma_suspended_mtx);
 }
 
 
 void pcm_play_dma_stop(void)
 {
-    snd_pcm_drain(handle);
+    pthread_mutex_lock(&_dma_suspended_mtx);
+    _dma_stopped = 1;
+    pcm_stop(_alsa_handle);
+    pthread_mutex_unlock(&_dma_suspended_mtx);
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
-{
-    pcm_dma_apply_settings_nolock();
 
-    pcm_data = addr;
-    pcm_size = size;
+/* Unessecary play locks before pcm_play_dma_postinit. */
+static int _play_lock_recursion_count = -10000;
 
-    while (1)
-    {
-        snd_pcm_state_t state = snd_pcm_state(handle);
-        switch (state)
-        {
-            case SND_PCM_STATE_RUNNING:
-                return;
-            case SND_PCM_STATE_XRUN:
-            {
-                DEBUGF("Trying to recover from error\n");
-                int err = snd_pcm_recover(handle, -EPIPE, 0);
-                if (err < 0)
-                    DEBUGF("Recovery failed: %s\n", snd_strerror(err));
-                continue;
-            }
-            case SND_PCM_STATE_SETUP:
-            {
-                int err = snd_pcm_prepare(handle);
-                if (err < 0)
-                    printf("Prepare error: %s\n", snd_strerror(err));
-                /* fall through */
-            }
-            case SND_PCM_STATE_PREPARED:
-            {   /* prepared state, we need to fill the buffer with silence before
-                 * starting */
-                int err = async_rw(handle);
-                if (err < 0)
-                    printf("Start error: %s\n", snd_strerror(err));
-                return;
-            }
-            case SND_PCM_STATE_PAUSED:
-            {   /* paused, simply resume */
-                pcm_play_dma_pause(0);
-                return;
-            }
-            case SND_PCM_STATE_DRAINING:
-                /* run until drained */
-                continue;
-            default:
-                DEBUGF("Unhandled state: %s\n", snd_pcm_state_name(state));
-                return;
-        }
-    }
-}
-
-size_t pcm_get_bytes_waiting(void)
-{
-    return pcm_size;
-}
-
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    uintptr_t addr = (uintptr_t)pcm_data;
-    *count = pcm_size / 4;
-    return (void *)((addr + 3) & ~3);
-}
 
 void pcm_play_dma_postinit(void)
 {
     audiohw_postinit();
+    _play_lock_recursion_count = 0;
 }
 
 
-void pcm_set_mixer_volume(int volume)
+void pcm_play_lock(void)
 {
-    (void)volume;
+    ++_play_lock_recursion_count;
+
+    if(_play_lock_recursion_count == 1)
+    {
+        pthread_mutex_lock(&_dma_suspended_mtx);
+        _dma_locked = 1;
+        pthread_mutex_unlock(&_dma_suspended_mtx);
+    }
 }
+
+
+void pcm_play_unlock(void)
+{
+    --_play_lock_recursion_count;
+
+    if(_play_lock_recursion_count == 0)
+    {
+        pthread_mutex_lock(&_dma_suspended_mtx);
+        _dma_locked = 0;
+        pthread_cond_signal(&_dma_suspended_cond);
+        pthread_mutex_unlock(&_dma_suspended_mtx);
+    }
+}
+
+
+void pcm_dma_apply_settings(void)
+{
+    unsigned int rate = pcm_get_frequency();
+
+    DEBUGF("DEBUG %s: Current sample rate: %u, next sampe rate: %u.", __func__, _config.rate, rate);
+
+    if(_config.rate != rate)
+    {
+        _config.rate = rate;
+
+        pcm_close(_alsa_handle);
+        _alsa_handle = pcm_open(CARD, DEVICE, PCM_OUT, &_config);
+
+        if(! pcm_is_ready(_alsa_handle))
+        {
+            DEBUGF("ERROR %s: pcm_open failed: %s.", __func__, pcm_get_error(_alsa_handle));
+            panicf("ERROR %s: pcm_open failed: %s.", __func__, pcm_get_error(_alsa_handle));
+        }
+    }
+}
+
+
+size_t pcm_get_bytes_waiting(void)
+{
+    return _pcm_buffer_size;
+}
+
+
+const void* pcm_play_dma_get_peak_buffer(int* count)
+{
+    uintptr_t addr = (uintptr_t) _pcm_buffer;
+    *count = _pcm_buffer_size / 4;
+    return (void*) ((addr + 3) & ~3);
+}
+
+
+void pcm_close_device(void)
+{
+    pthread_mutex_lock(&_dma_suspended_mtx);
+    _dma_stopped = 1;
+    pthread_mutex_unlock(&_dma_suspended_mtx);
+
+    pcm_close(_alsa_handle);
+    _alsa_handle = NULL;
+
+    free(_frame_buffer);
+    _frame_buffer = NULL;
+}
+
+
 #ifdef HAVE_RECORDING
+
+
 void pcm_rec_lock(void)
-{
-}
+{}
+
 
 void pcm_rec_unlock(void)
-{
-}
+{}
+
 
 void pcm_rec_dma_init(void)
-{
-}
+{}
+
 
 void pcm_rec_dma_close(void)
-{
-}
+{}
+
 
 void pcm_rec_dma_start(void *start, size_t size)
 {
-    (void)start;
-    (void)size;
+    (void) start;
+    (void) size;
 }
+
 
 void pcm_rec_dma_stop(void)
-{
-}
+{}
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+
+const void* pcm_rec_dma_get_peak_buffer(void)
 {
     return NULL;
 }
 
+
 void audiohw_set_recvol(int left, int right, int type)
 {
-    (void)left;
-    (void)right;
-    (void)type;
+    (void) left;
+    (void) right;
+    (void) type;
 }
+
 
 #endif /* HAVE_RECORDING */
