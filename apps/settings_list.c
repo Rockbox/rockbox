@@ -62,6 +62,10 @@
 #include "onplay.h"
 #endif
 
+#if defined(DX50) || defined(DX90)
+#include "governor-ibasso.h"
+#endif
+
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
      and you may need to update it if you edit this file */
@@ -2193,6 +2197,22 @@ const struct settings_list settings[] = {
                   NULL, "root menu order",
                   root_menu_load_from_cfg, root_menu_write_to_cfg,
                   root_menu_is_changed, root_menu_set_default),
+
+#if defined(DX50) || defined(DX90)
+    CHOICE_SETTING(0,
+                   governor,
+                   LANG_IBASSO_FREQ_SCALING_GOVERNOR,
+                   GOVERNOR_POWERSAVE,
+                   "freq scaling governor",
+                   "conservative,ondemand,interactive,powersave,performance",
+                   ibasso_set_governor,
+                   5,
+                   "Conservative",
+                   "Ondemand",
+                   "Interactive",
+                   "Powersave",
+                   "Performance"),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

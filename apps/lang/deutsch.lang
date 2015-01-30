@@ -33,6 +33,7 @@
 # - Kaspar Rothenfußer
 # - Johannes Linke
 # - Kai Posadowsky
+# - Udo Schläpfer
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -13052,5 +13053,25 @@
   </dest>
   <voice>
     *: "Beschränke automatischen Verzeichniswechsel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
+  desc: in Settings -> General -> System -> Freq Scaling Governor
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
   </voice>
 </phrase>
