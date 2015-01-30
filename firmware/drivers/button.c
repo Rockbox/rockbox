@@ -215,6 +215,27 @@ static void button_tick(void)
             }
             else /* repeat? */
             {
+
+#if defined(DX50) || defined(DX90)
+                /*
+                    Power button on these devices reports two distinct key codes, which are
+                    triggerd by a short or medium duration press. Additionlly a long duration press
+                    will trigger a hard reset, which is hardwired.
+
+                    The time delta between medium and long duration press is not large enough to
+                    register here as power off repeat. A hard reset is triggered before Rockbox
+                    can power off.
+
+                    To cirumvent the hard reset, Rockbox will shutdown on the first POWEROFF_BUTTON
+                    repeat. POWEROFF_BUTTON is associated with the a medium duration press of the
+                    power button.
+                */
+                if(btn & POWEROFF_BUTTON)
+                {
+                    sys_poweroff();
+                }
+#endif
+
                 if ( repeat )
                 {
                     if (!post)

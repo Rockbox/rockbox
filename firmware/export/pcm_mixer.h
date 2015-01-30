@@ -30,13 +30,15 @@
 #if CONFIG_CPU == PP5002
 /* There's far less time to do mixing because HW FIFOs are short */
 #define MIX_FRAME_SAMPLES 64
-#elif (CONFIG_PLATFORM & PLATFORM_MAEMO5)
+#elif (CONFIG_PLATFORM & PLATFORM_MAEMO5) || defined(DX50) || defined(DX90)
 /* Maemo 5 needs 2048 samples for decent performance.
    Otherwise the locking overhead inside gstreamer costs too much */
+/* iBasso Devices: Match Rockbox PCM buffer size to ALSA PCM buffer size
+   to minimize memory transfers. */
 #define MIX_FRAME_SAMPLES 2048
+#else
 /* Assume HW DMA engine is available or sufficient latency exists in the
    PCM pathway */
-#else
 #define MIX_FRAME_SAMPLES 256
 #endif
 

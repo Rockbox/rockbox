@@ -1,9 +1,30 @@
-/*
- * This config file is for Rockbox as an application on Android
- */
+/***************************************************************************
+ *             __________               __   ___
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ *
+ * Copyright (C) 2014 by Ilia Sergachev: Initial Rockbox port to iBasso DX50
+ * Copyright (C) 2014 by Mario Basister: iBasso DX90 port
+ * Copyright (C) 2014 by Simon Rothen: Initial Rockbox repository submission, additional features
+ * Copyright (C) 2014 by Udo Schläpfer: Code clean up, additional features
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+/* This config file is for Rockbox as an application on Android without JVM. */
 
 /* We don't run on hardware directly */
-#define CONFIG_PLATFORM (PLATFORM_HOSTED|PLATFORM_ANDROID)
+#define CONFIG_PLATFORM PLATFORM_HOSTED
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 95
@@ -41,16 +62,14 @@
 #define LCD_PIXELFORMAT RGB565
 
 #define HAVE_LCD_ENABLE
+#define HAVE_LCD_SHUTDOWN
+#define HAVE_LCD_SLEEP
+#define HAVE_LCD_SLEEP_SETTING
 
 /* define this to indicate your device's keypad */
 #define HAVE_TOUCHSCREEN
 #define HAVE_BUTTON_DATA
-
-/* define this if you have RTC RAM available for settings */
-//#define HAVE_RTC_RAM
-
-/* define this if you have a real-time clock */
-//#define CONFIG_RTC APPLICATION
+#define HAS_BUTTON_HOLD
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
@@ -77,19 +96,16 @@
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
+#define HAVE_SW_TONE_CONTROLS
+#define HAVE_SW_VOLUME_CONTROL
+#define HW_SAMPR_CAPS SAMPR_CAP_ALL
+#define HAVE_PLAY_FREQ
 
 //#define HAVE_MULTIMEDIA_KEYS
 #define CONFIG_KEYPAD DX50_PAD
 
 /* define this if the target has volume keys which can be used in the lists */
 #define HAVE_VOLUME_IN_LIST
-
-/* define this if the host platform can change volume outside of rockbox */
-//#define PLATFORM_HAS_VOLUME_CHANGE
-
-#define HAVE_SW_TONE_CONTROLS
-
-#define HAVE_SW_VOLUME_CONTROL
 
 #define BATTERY_CAPACITY_DEFAULT 2100 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 1700 /* min. capacity selectable */
@@ -101,21 +117,13 @@
 
 #define CONFIG_CHARGING CHARGING_MONITOR
 
-#define NO_LOW_BATTERY_SHUTDOWN
-
 /* Define current usage levels. */
 #define CURRENT_NORMAL     210 /* 10 hours from a 2100 mAh battery */
 #define CURRENT_BACKLIGHT  30 /* TBD */
 #define CURRENT_RECORD     0  /* no recording */
 
-/* Define this to the CPU frequency */
-/*
-#define CPU_FREQ 48000000
-*/
-
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING
-
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
@@ -128,9 +136,6 @@
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY
 
-#define BOOTDIR "/.rockbox"
-
 /* No special storage */
 #define CONFIG_STORAGE STORAGE_HOSTFS
 #define HAVE_STORAGE_FLUSH
-
