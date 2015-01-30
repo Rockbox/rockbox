@@ -664,7 +664,7 @@ typedef int __bitwise snd_ctl_elem_iface_t;
 #define SNDRV_CTL_ELEM_ACCESS_INACTIVE (1<<8)
 #define SNDRV_CTL_ELEM_ACCESS_LOCK (1<<9)
 #define SNDRV_CTL_ELEM_ACCESS_OWNER (1<<10)
-#define SNDRV_CTL_ELEM_ACCESS_TLV_CALLBACK (1<<28)
+#define SNDRV_CTL_ELEM_ACCESS_TLV_CALLBACK (1<<28) 
 #define SNDRV_CTL_ELEM_ACCESS_USER (1<<29)
 
 #define SNDRV_CTL_POWER_D0 0x0000
@@ -818,4 +818,3 @@ struct snd_ctl_event {
 #define SNDRV_CTL_NAME_IEC958(expl,direction,what) "IEC958 " expl SNDRV_CTL_NAME_##direction SNDRV_CTL_NAME_IEC958_##what
 
 #endif
-
