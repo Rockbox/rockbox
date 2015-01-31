@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a18252c_c4d26834",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2015-01-31T10:50:02Z",
+      "side": 1,
+      "message": "I would be nice to see if there is a CPU usage improvement, memory size improvements or so ;)",
+      "revId": "77824b620a3be226b46b542455316d8857e6de6b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_6400b4ab",
+        "filename": "firmware/target/hosted/pcm-alsa.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2015-01-31T10:50:02Z",
+      "side": 1,
+      "message": "white space",
+      "revId": "77824b620a3be226b46b542455316d8857e6de6b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_c42b8832",
+        "filename": "firmware/target/hosted/pcm-alsa.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2015-01-31T10:50:02Z",
+      "side": 1,
+      "message": "static already suggests us and the compiler that the variable is private.\nI would suggest to remove the leading \"_\" character to improve readability.\n(This applies to all the variables here)",
+      "revId": "77824b620a3be226b46b542455316d8857e6de6b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_a4300ca0",
+        "filename": "firmware/target/hosted/pcm-alsa.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2015-01-31T10:50:02Z",
+      "side": 1,
+      "message": "This, perhaps, shall be handled but I\u0027m not sure it will work on every target. We have to do some experimentation.",
+      "revId": "77824b620a3be226b46b542455316d8857e6de6b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_04262068",
+        "filename": "firmware/target/hosted/pcm-alsa.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2015-01-31T10:50:02Z",
+      "side": 1,
+      "message": "Recording is not necessary as first patch, but of course it would be great, since on some targets this is perfectly possible. (On R0 I just have to understand the trick to \"reset\" internal driver state, otherwise once in recording mode, it won\u0027t go back in playback. Perhaps tinyalsa fixes this, something to experiment also here)",
+      "revId": "77824b620a3be226b46b542455316d8857e6de6b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_e42a042c",
+        "filename": "firmware/target/hosted/pcm-alsa.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2015-01-31T10:50:02Z",
+      "side": 1,
+      "message": "white space",
+      "revId": "77824b620a3be226b46b542455316d8857e6de6b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_4420184a",
+        "filename": "firmware/target/hosted/tinyalsa/include/sound/asound.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2015-01-31T10:50:02Z",
+      "side": 1,
+      "message": "Even if auto-generated, I would suggest to improve the indentation.",
+      "revId": "77824b620a3be226b46b542455316d8857e6de6b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_241d1c10",
+        "filename": "firmware/target/hosted/tinyalsa/include/sound/asound.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2015-01-31T10:50:02Z",
+      "side": 1,
+      "message": "white spaces, please remove",
+      "revId": "77824b620a3be226b46b542455316d8857e6de6b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_841a3016",
+        "filename": "firmware/target/hosted/tinyalsa/include/tinyalsa/asoundlib.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2015-01-31T10:50:02Z",
+      "side": 1,
+      "message": "Are we 100% compatible with this license (I have no idea about the android licensing thing), I assume yes, but did you check?",
+      "revId": "77824b620a3be226b46b542455316d8857e6de6b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a18252c_641714ee",
+        "filename": "tools/configure",
+        "patchSetId": 2
+      },
+      "lineNbr": 4341,
+      "author": {
+        "id": 1000092
+      },
+      "writtenOn": "2015-01-31T10:50:02Z",
+      "side": 1,
+      "message": "This includes the SDL ports if I\u0027m not mistaken, please check.",
+      "revId": "77824b620a3be226b46b542455316d8857e6de6b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
