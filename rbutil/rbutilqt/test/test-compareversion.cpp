@@ -27,17 +27,18 @@ class TestVersionCompare : public QObject
 {
     Q_OBJECT
         private slots:
-        void testMain();
+        void testCompare();
+        void testTrim();
 };
 
 
-struct testvector {
+struct compvector {
     const char* first;
     const char* second;
     const int expected;
 };
 
-const struct testvector testdata[] =
+const struct compvector compdata[] =
 {
     { "1.2.3",                  "1.2.3 ",                       0 },
     { "1.2.3",                  " 1.2.3",                       0 },
@@ -73,17 +74,44 @@ const struct testvector testdata[] =
     { "prog-1.2a-64bit.tar.bz2","prog-1.2.3-64bit.tar.bz2",     1 },
 };
 
+struct trimvector {
+    const char* input;
+    const QString expected;
+};
 
-void TestVersionCompare::testMain()
+const struct trimvector trimdata[] =
+{
+    { "prog-1.2-64bit.tar.bz2", "1.2"           },
+    { "prog-1.2.tar.bz2",       "1.2"           },
+    { "1.2.3",                  "1.2.3"         },
+    { " 1.2.3",                 "1.2.3"         },
+    { "1.2.3 ",                 "1.2.3"         },
+    { "10.22.33",               "10.22.33"      },
+    { "test-1.2.3",             "1.2.3"         },
+    { "1.2.3",                  "1.2.3"         },
+    { "test-1.2.3.tar.gz",      "1.2.3"         },
+    { "prog-1.2-64bit.tar.bz2", "1.2"           },
+    { "prog-1.2a.tar.bz2",      "1.2a"          },
+    { "prog-1.2a-64bit.tar.bz2","1.2a"          },
+};
+
+void TestVersionCompare::testCompare()
 {
     unsigned int i;
-    for(i = 0; i < sizeof(testdata) / sizeof(struct testvector); i++) {
-        QCOMPARE(Utils::compareVersionStrings(testdata[i].first,
-                testdata[i].second), testdata[i].expected);
+    for(i = 0; i < sizeof(compdata) / sizeof(struct compvector); i++) {
+        QCOMPARE(Utils::compareVersionStrings(compdata[i].first,
+                compdata[i].second), compdata[i].expected);
         // inverse test possible because function return values are symmetrical.
-        if(testdata[i].expected != 0)
-            QCOMPARE(Utils::compareVersionStrings(testdata[i].second,
-                    testdata[i].first), -testdata[i].expected);
+        if(compdata[i].expected != 0)
+            QCOMPARE(Utils::compareVersionStrings(compdata[i].second,
+                    compdata[i].first), -compdata[i].expected);
+    }
+}
+
+void TestVersionCompare::testTrim()
+{
+    for(int i = 0; i < sizeof(trimdata) / sizeof(struct trimvector); i++) {
+        QCOMPARE(Utils::trimVersionString(trimdata[i].input), trimdata[i].expected);
     }
 }
 

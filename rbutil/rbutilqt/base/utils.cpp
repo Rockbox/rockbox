@@ -342,6 +342,20 @@ QString Utils::checkEnvironment(bool permission)
     else
         return text;
 }
+
+/** @brief Trim version string from filename to version part only.
+ *  @param s Version string
+ *  @return Version part of string if found, input string on error.
+ */
+QString Utils::trimVersionString(QString s)
+{
+    QRegExp r = QRegExp(".*([\\d\\.]+\\d+[a-z]?).*");
+    if(r.indexIn(s) != -1) {
+        return r.cap(1);
+    }
+    return s;
+}
+
 /** @brief Compare two version strings.
  *  @param s1 first version string
  *  @param s2 second version string

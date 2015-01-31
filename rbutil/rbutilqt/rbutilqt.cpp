@@ -729,10 +729,11 @@ void RbUtilQt::downloadUpdateDone(bool error)
 #endif
             url += foundVersion;
 
-            QMessageBox::information(this,tr("RockboxUtility Update available"),
-                        tr("<b>New RockboxUtility Version available.</b> <br><br>"
-                        "Download it from here: <a href='%1'>%2</a>")
-                        .arg(url).arg(foundVersion));
+            QMessageBox::information(this,tr("Rockbox Utility Update available"),
+                        tr("<b>New Rockbox Utility version available.</b><br><br>"
+                           "You are currently using version %1. "
+                           "Get version %2 at <a href='%3'>%3</a>")
+                           .arg(VERSION).arg(Utils::trimVersionString(foundVersion)).arg(url));
             ui.statusbar->showMessage(tr("New version of Rockbox Utility available."));
         }
         else {

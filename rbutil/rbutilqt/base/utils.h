@@ -49,6 +49,7 @@ public:
     static QString findExecutable(QString name);
     static QString checkEnvironment(bool permission);
     static int compareVersionStrings(QString s1, QString s2);
+    static QString trimVersionString(QString s);
     static QString filesystemName(QString path);
     static QStringList mountpoints(enum MountpointsFilter type = MountpointsAll);
     static QString resolveDevicename(QString path);

@@ -21,6 +21,7 @@ Version 1.4
 * Fix manual link for Archos Recorder V2.
 
 Version 1.4.1
-* Fix crash on detecting player in MTP mode.
+* Fix crash on detecting player in MTP mode (FS#12989).
 * Extend hint when uninstallation requires reinstalling the Original Firmware.
+* Improve update check information dialog.
 
