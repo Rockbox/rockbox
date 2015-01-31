@@ -1794,22 +1794,22 @@ Please configure TTS engine.</source>
 <context>
     <name>InstallTalkWindow</name>
     <message>
-        <location filename="../installtalkwindow.cpp" line="96"/>
+        <location filename="../installtalkwindow.cpp" line="164"/>
         <source>Empty selection</source>
         <translation>Leere Auswahl</translation>
     </message>
     <message>
-        <location filename="../installtalkwindow.cpp" line="97"/>
+        <location filename="../installtalkwindow.cpp" line="165"/>
         <source>No files or folders selected. Please select files or folders first.</source>
         <translation>Keine Dateien oder Ordner ausgewählt. Bitte zuerst Dateien oder Ordner auswählen.</translation>
     </message>
     <message>
-        <location filename="../installtalkwindow.cpp" line="137"/>
+        <location filename="../installtalkwindow.cpp" line="205"/>
         <source>TTS error</source>
         <translation>TTS-Fehler</translation>
     </message>
     <message>
-        <location filename="../installtalkwindow.cpp" line="138"/>
+        <location filename="../installtalkwindow.cpp" line="206"/>
         <source>The selected TTS failed to initialize. You can&apos;t use this TTS.</source>
         <translation>Ausgewähltes TTS-System konnte nicht initialisiert werden. TTS-System kann nicht verwendet werden.</translation>
     </message>
@@ -2061,62 +2061,71 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
         <translation>Keine Deinstallationsmethode für dieses Gerät verfügbar.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="542"/>
         <source>Rockbox Utility can not uninstall the bootloader on this target. Try a normal firmware update to remove the booloader.</source>
-        <translation>Rockbox Utility kann den Bootloader auf diesem Gerät nicht entfernen. Bitte ein reguläres Firmware-Update versuchen um den Bootloader zu installieren.</translation>
+        <translation type="obsolete">Rockbox Utility kann den Bootloader auf diesem Gerät nicht entfernen. Bitte ein reguläres Firmware-Update versuchen um den Bootloader zu installieren.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="550"/>
+        <location filename="../rbutilqt.cpp" line="553"/>
         <source>No Rockbox bootloader found.</source>
         <translation>Kein Rockbox-Bootloader gefunden.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="568"/>
+        <location filename="../rbutilqt.cpp" line="571"/>
         <source>Confirm installation</source>
         <translation>Installation bestätigen</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="569"/>
+        <location filename="../rbutilqt.cpp" line="572"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Rockbox Utility wirklich auf dem Gerät installieren? Nach der Installation kann es von dem Laufwerk des Geräts ausgeführt werden.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="578"/>
+        <location filename="../rbutilqt.cpp" line="581"/>
         <source>Installing Rockbox Utility</source>
         <translation>Installiere Rockbox Utility</translation>
     </message>
     <message>
+        <location filename="../rbutilqt.cpp" line="732"/>
+        <source>Rockbox Utility Update available</source>
+        <translation>Update von Rockbox Utility verfügbar</translation>
+    </message>
+    <message>
         <location filename="../rbutilqt.cpp" line="733"/>
+        <source>&lt;b&gt;New Rockbox Utility version available.&lt;/b&gt;&lt;br&gt;&lt;br&gt;You are currently using version %1. Get version %2 at &lt;a href=&apos;%3&apos;&gt;%3&lt;/a&gt;</source>
+        <translation>&lt;b&gt;Neue Version von Rockbox Utility verfügbar.&lt;/b&gt;&lt;br&gt;&lt;br&gt;Aktuell verwendete Version ist %1. Version %2 ist verfügbar unter &lt;a href=&apos;%3&apos;&gt;%3&lt;/a&gt;</translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="737"/>
         <source>New version of Rockbox Utility available.</source>
         <translation>Neue Version von Rockbox Utility verfügbar.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="736"/>
+        <location filename="../rbutilqt.cpp" line="740"/>
         <source>Rockbox Utility is up to date.</source>
         <translation>Rockbox Utility ist aktuell.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="759"/>
+        <location filename="../rbutilqt.cpp" line="763"/>
         <source>Device ejected</source>
         <translation>Gerät ausgeworfen</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="760"/>
+        <location filename="../rbutilqt.cpp" line="764"/>
         <source>Device successfully ejected. You may now disconnect the player from the PC.</source>
         <translation>Gerät erfolgreich ausgeworfen. Es kann jetzt vom PC getrennt werden.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="764"/>
+        <location filename="../rbutilqt.cpp" line="768"/>
         <source>Ejecting failed</source>
         <translation>Auswerfen fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="765"/>
+        <location filename="../rbutilqt.cpp" line="769"/>
         <source>Ejecting the device failed. Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject funtionality.</source>
         <translation>Auswerfen fehlgeschlagen. Bitte sicherstellen dass keine anderen Programme auf Dateien auf dem Gerät zugreifen. Falls das Auswerfen dann immer noch fehltschlägt bitte die Auswerf-Funktion des Computers benutzen.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="582"/>
+        <location filename="../rbutilqt.cpp" line="585"/>
         <source>Mount point is wrong!</source>
         <translation>Falscher Einhängepunkt!</translation>
     </message>
@@ -2131,33 +2140,43 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
         <translation>Die installierte Version von Rockbox ist eine Entwicklerversion. Vorgenerierte Sprachdateien sind nur für Release-Versionen von Rockbox verfügbar. Bitte Sprachdatei mit der &quot;Sprachdatei erzeugen&quot;-Funktion generieren.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="596"/>
+        <location filename="../rbutilqt.cpp" line="542"/>
+        <source>Rockbox Utility can not uninstall the bootloader on your player. Please perform a firmware update using your player vendors firmware update process.</source>
+        <translation>Rockbox Utility kann den Bootloader auf dem Gerät nicht deinstallieren. Bitte ein Firmware-Update mit Hilfe des Update-Verfahrens des Herstellers durchführen.</translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="545"/>
+        <source>Important: make sure to boot your player into the original firmware before using the vendors firmware update process.</source>
+        <translation>Wichtig: bitte darauf achten das Gerät vor dem Update in die Herstellerfirmware zu booten. </translation>
+    </message>
+    <message>
+        <location filename="../rbutilqt.cpp" line="599"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Fehler beim installieren von Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="600"/>
+        <location filename="../rbutilqt.cpp" line="603"/>
         <source>Installing user configuration</source>
         <translation>Installiere Benutzerkonfiguration</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="604"/>
+        <location filename="../rbutilqt.cpp" line="607"/>
         <source>Error installing user configuration</source>
         <translation>Fehler beim installieren der Benutzerkonfiguration</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="608"/>
+        <location filename="../rbutilqt.cpp" line="611"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Rockbox Utility erfolgreich installiert.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="337"/>
-        <location filename="../rbutilqt.cpp" line="642"/>
+        <location filename="../rbutilqt.cpp" line="645"/>
         <source>Configuration error</source>
         <translation>Konfigurationsfehler</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="643"/>
+        <location filename="../rbutilqt.cpp" line="646"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Die Konfiguration ist ungültig. Bitte im Konfigurationsdialog sicherstellen, dass die Einstellungen korrekt sind.</translation>
     </message>
@@ -2224,19 +2243,17 @@ Netzwerkfehler: %1. Bitte Netzwerk- und Proxy-Einstellungen überprüfen.</trans
         <translation>Informationen über Builds heruntergeladen.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="664"/>
+        <location filename="../rbutilqt.cpp" line="667"/>
         <source>Checking for update ...</source>
         <translation>Prüfe auf Update ...</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="729"/>
         <source>RockboxUtility Update available</source>
-        <translation>Rockbox Utility Update verfügbar</translation>
+        <translation type="obsolete">Rockbox Utility Update verfügbar</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="730"/>
         <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
-        <translation>&lt;b&gt;Neue Version von Rockbox Utility verfügbar.&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Hier herunterladen: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
+        <translation type="obsolete">&lt;b&gt;Neue Version von Rockbox Utility verfügbar.&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Hier herunterladen: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
     </message>
 </context>
 <context>
@@ -3449,19 +3466,19 @@ HTTP Antwortcode: %1</translation>
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../base/utils.cpp" line="312"/>
+        <location filename="../base/utils.cpp" line="322"/>
         <source>&lt;li&gt;Permissions insufficient for bootloader installation.
 Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Bereichtigung für Bootloader-Installation nicht ausreichend.
 Administratorrechte sind notwendig.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/utils.cpp" line="324"/>
+        <location filename="../base/utils.cpp" line="334"/>
         <source>&lt;li&gt;Target mismatch detected.&lt;br/&gt;Installed target: %1&lt;br/&gt;Selected target: %2.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Abweichendes Gerät entdeckt.&lt;br/&gt;Installiertes Gerät: %1&lt;br/&gt;Ausgewähltes Gerät: %2&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/utils.cpp" line="331"/>
+        <location filename="../base/utils.cpp" line="341"/>
         <source>Problem detected:</source>
         <translation>Problem gefunden:</translation>
     </message>
