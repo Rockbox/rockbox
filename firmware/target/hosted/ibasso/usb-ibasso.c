@@ -28,7 +28,7 @@
 #include "debug.h"
 
 #include "debug-ibasso.h"
-#include "usb-ibasso.h"
+#include "usb.h"
 
 
 static void usb_enable_adb(void)
@@ -65,7 +65,7 @@ static void usb_enable_mass_storage(void)
 static int _last_usb_mode = -1;
 
 
-void ibasso_set_usb_mode(int mode)
+void usb_charging_enable(int mode)
 {
     DEBUGF("DEBUG %s: _last_usb_mode: %d, mode: %d.", __func__, _last_usb_mode, mode);
 
@@ -73,15 +73,16 @@ void ibasso_set_usb_mode(int mode)
     {
         switch(mode)
         {
-            case USB_MODE_MASS_STORAGE:
+            case USB_CHARGING_DISABLE:
             {
                 _last_usb_mode = mode;
                 usb_enable_mass_storage();
                 break;
             }
 
-            case USB_MODE_CHARGE: /* Work around. */
-            case USB_MODE_ADB:
+            /* Use adb as charging mode. */
+            case USB_CHARGING_ENABLE: 
+            case USB_CHARGING_FORCE:
             {
                 _last_usb_mode = mode;
                 usb_enable_adb();
@@ -89,4 +90,12 @@ void ibasso_set_usb_mode(int mode)
             }
         }
     }
+}
+
+
+bool usb_powered_only(void)
+{
+    TRACE;
+
+    return false;
 }

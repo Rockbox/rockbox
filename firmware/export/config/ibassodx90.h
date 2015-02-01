@@ -31,7 +31,12 @@
 
 #define MODEL_NAME   "iBasso DX90"
 
+/* We do not have control of the USB hardware ... */
 #define USB_NONE
+
+/* ... but we can influence which USB "mode" is used. */
+#define HAVE_USB_POWER
+#define HAVE_USB_CHARGING_ENABLE
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
