@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Copyright (C) 2009 by Maurus Cuelenaere
+ * Copyright (C) 2015 by Marcin Bukat
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -125,8 +125,28 @@ void mmu_init(void)
 */
 }
 
-#define SYNC_WB() __asm__ __volatile__ ("sync")
+#if CONFIG_CPU == JZ4732
+#define INVALIDATE_BTB()                     \
+do {                                         \
+        unsigned long tmp;                   \
+        __asm__ __volatile__(                \
+        "    .set noreorder       \n"        \
+        "    .set mips32          \n"        \
+        "    mfc0 %0, $16, 7      \n"        \
+        "    nop                  \n"        \
+        "    ori  %0, 2           \n"        \
+        "    mtc0 %0, $16, 7      \n"        \
+        "    nop                  \n"        \
+        "    .set mips0           \n"        \
+        "    .set reorder         \n"        \
+        : "=&r"(tmp));                       \
+    } while (0)
 
+#define SYNC_WB() __asm__ __volatile__ ("sync")
+#else
+#define INVALIDATE_BTB() do { while(0) }
+#define SYNC_WB() do { while(0) }
+#endif
 #define __CACHE_OP(op, addr)                 \
     __asm__ __volatile__(                    \
     "    .set    noreorder        \n"        \
@@ -135,15 +155,18 @@ void mmu_init(void)
     "    .set    mips0            \n"        \
     "    .set    reorder          \n"        \
     :                                        \
-    : "i" (op), "m" (*(unsigned char *)(addr)))
+    : "i" (op), "m"(*(unsigned char *)(addr)))
 
-void __flush_dcache_line(unsigned long addr)
-{
-    __CACHE_OP(DCHitWBInv, addr);
-    SYNC_WB();
-}
+/* rockbox cache api */
 
-void __icache_invalidate_all(void)
+/* Writeback whole D-cache
+ * on MIPS alias to commit_discard_dcache() as there is no index type
+ * variant of writeback only operation
+ */
+void commit_dcache(void) __attribute__((alias("commit_discard_dcache")));
+
+/* Writeback whole D-cache and invalidate D-cache lines */
+void commit_discard_dcache(void)
 {
     unsigned int i;
 
@@ -154,59 +177,71 @@ void __icache_invalidate_all(void)
                   ".set   mips0      \n"
                   ".set   reorder    \n"
                   );
-    for(i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHE_LINE_SIZE)
-        __CACHE_OP(ICIndexStTag, i);
 
-    /* invalidate btb */
-    asm volatile (
-        ".set mips32        \n"
-        "mfc0 %0, $16, 7    \n"
-        "nop                \n"
-        "ori  %0, 2         \n"
-        "mtc0 %0, $16, 7    \n"
-        ".set mips0         \n"
-        :
-        : "r" (i));
+    /* Use index type operation and iterate whole cache */
+    for (i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHE_LINE_SIZE)
+        __CACHE_OP(DCIndexWBInv, i);
+
+    SYNC_WB();
 }
 
-void __dcache_invalidate_all(void)
+/* Writeback lines of D-cache corresponding to address range and 
+ * invalidate those D-cache lines
+ */
+void commit_discard_dcache_range(const void *base, unsigned int size)
+{
+    char *s;
+
+    if (size > CACHE_SIZE)
+    {
+        commit_discard_dcache();
+        return;
+    }
+
+    for (s=(char *)base; s<(char *)base+size; s+=CACHE_LINE_SIZE)
+        __CACHE_OP(DCHitWBInv, s);
+
+    SYNC_WB();
+}
+
+/* Invalidate D-cache lines corresponding to address range
+ * WITHOUT writeback
+ */
+void discard_dcache_range(const void *base, unsigned int size)
+{
+    char *s;
+
+    if (size > CACHE_SIZE)
+    {
+        commit_discard_dcache();
+        return;
+    }
+
+    for (s=(char *)base; s<(char *)base+size; s+=CACHE_LINE_SIZE)
+        __CACHE_OP(DCHitInv, s);
+}
+
+/* Invalidate the entire I-cache
+ * and writeback + invalidate the entire D-cache
+ */
+void commit_discard_idcache(void)
 {
     unsigned int i;
 
     asm volatile (".set   noreorder  \n"
                   ".set   mips32     \n"
-                  "mtc0   $0, $28    \n"
-                  "mtc0   $0, $29    \n"
+                  "mtc0   $0, $28    \n" /* TagLo */
+                  "mtc0   $0, $29    \n" /* TagHi */
                   ".set   mips0      \n"
                   ".set   reorder    \n"
                   );
-    for (i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHE_LINE_SIZE)
-        __CACHE_OP(DCIndexStTag, i);
-}
 
-void __dcache_writeback_all(void) __attribute__ ((section(".icode")));
-void __dcache_writeback_all(void)
-{
-    unsigned int i;
     for(i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHE_LINE_SIZE)
-        __CACHE_OP(DCIndexWBInv, i);
-    
-    SYNC_WB();
-}
-
-void dma_cache_wback_inv(unsigned long addr, unsigned long size)
-{
-    unsigned long end, a;
-
-    if (size >= CACHE_SIZE)
-        __dcache_writeback_all();
-    else
     {
-        unsigned long dc_lsize = CACHE_LINE_SIZE;
-        
-        a = addr & ~(dc_lsize - 1);
-        end = (addr + size - 1) & ~(dc_lsize - 1);
-        for(; a < end; a += dc_lsize)
-            __flush_dcache_line(a);
+        __CACHE_OP(ICIndexStTag, i);
+        __CACHE_OP(DCIndexWBInv, i);
     }
+
+    INVALIDATE_BTB();
+    SYNC_WB();
 }

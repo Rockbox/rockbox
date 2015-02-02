@@ -88,7 +88,7 @@ static inline void set_dma(const void *addr, size_t size)
         burst_size = DMAC_DCMD_DS_16BYTE;
     }
 
-    __dcache_writeback_all();
+    commit_dcache();
     REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) = DMAC_DCCSR_NDES;
     REG_DMAC_DSAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)addr);
     REG_DMAC_DTAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)AIC_DR);
