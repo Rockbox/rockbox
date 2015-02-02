@@ -40,7 +40,7 @@
 #define __force
 #define __bitwise
 #define __user
-#include <tinyalsa/asound.h>
+#include <sound/asound.h>
 
 #include <tinyalsa/asoundlib.h>
 
@@ -259,14 +259,11 @@ unsigned int mixer_ctl_get_num_values(struct mixer_ctl *ctl)
 
 static int percent_to_int(struct snd_ctl_elem_info *ei, int percent)
 {
-    int range;
+    if ((percent > 100) || (percent < 0)) {
+        return -EINVAL;
+    }
 
-    if (percent > 100)
-        percent = 100;
-    else if (percent < 0)
-        percent = 0;
-
-    range = (ei->value.integer.max - ei->value.integer.min);
+    int range = (ei->value.integer.max - ei->value.integer.min);
 
     return ei->value.integer.min + (range * percent) / 100;
 }
@@ -389,11 +386,20 @@ int mixer_ctl_set_value(struct mixer_ctl *ctl, unsigned int id, int value)
         break;
 
     case SNDRV_CTL_ELEM_TYPE_INTEGER:
+        if ((value < mixer_ctl_get_range_min(ctl)) ||
+            (value > mixer_ctl_get_range_max(ctl))) {
+            return -EINVAL;
+        }
+
         ev.value.integer.value[id] = value;
         break;
 
     case SNDRV_CTL_ELEM_TYPE_ENUMERATED:
         ev.value.enumerated.item[id] = value;
+        break;
+
+    case SNDRV_CTL_ELEM_TYPE_BYTES:
+        ev.value.bytes.data[id] = value;
         break;
 
     default:
@@ -494,4 +500,3 @@ int mixer_ctl_set_enum_by_string(struct mixer_ctl *ctl, const char *string)
 
     return -EINVAL;
 }
-

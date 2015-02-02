@@ -1961,7 +1961,7 @@ static int audio_finish_load_track(struct track_info *info)
     resume_rewind_adjust_progress(track_id3, &elapsed, &offset);
 
     logf("%s: Set resume for %s to %lu %lX", __func__,
-         id3->title, elapsed, offset);
+         track_id3->title, elapsed, offset);
 
     enum data_type audiotype = rbcodec_format_is_atomic(track_id3->codectype) ?
                                       TYPE_ATOMIC_AUDIO : TYPE_PACKET_AUDIO;

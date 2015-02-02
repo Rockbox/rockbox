@@ -171,6 +171,13 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_CUSTOM|CONTEXT_SETTINGS)
 }; /* button_context_settingsgraphical */
 
+
+static const struct button_mapping button_context_mainmenu[] =
+{
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2 | CONTEXT_MAINMENU)
+};
+
+
 static const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,  BUTTON_TOPRIGHT,  BUTTON_NONE },
     { ACTION_YESNO_ACCEPT,  BUTTON_BOTTOMLEFT,  BUTTON_NONE },
@@ -389,7 +396,12 @@ const struct button_mapping* get_context_mapping(int context)
 
         case CONTEXT_LIST:
             return button_context_list;
+
         case CONTEXT_MAINMENU:
+        {
+            return button_context_mainmenu;
+        }
+
         case CONTEXT_TREE:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_listtree_scroll_without_combo;

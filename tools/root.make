@@ -132,8 +132,12 @@ else # core
     include $(ROOTDIR)/firmware/target/hosted/samsungypr/ypr1/ypr1.make
   endif
 
-  ifneq (,$(findstring android, $(APP_TYPE)))
-	include $(ROOTDIR)/android/android.make
+  ifneq (,$(findstring android_ndk, $(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/ibasso/android_ndk.make
+  else
+    ifneq (,$(findstring android, $(APP_TYPE)))
+	  include $(ROOTDIR)/android/android.make
+    endif
   endif
 
   ifneq (,$(findstring pandora, $(MODELNAME)))

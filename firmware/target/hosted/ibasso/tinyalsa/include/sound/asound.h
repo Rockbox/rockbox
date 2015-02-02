@@ -818,4 +818,3 @@ struct snd_ctl_event {
 #define SNDRV_CTL_NAME_IEC958(expl,direction,what) "IEC958 " expl SNDRV_CTL_NAME_##direction SNDRV_CTL_NAME_IEC958_##what
 
 #endif
-

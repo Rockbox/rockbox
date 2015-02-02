@@ -44,7 +44,7 @@
 #define __force
 #define __bitwise
 #define __user
-#include <tinyalsa/asound.h>
+#include <sound/asound.h>
 
 #include <tinyalsa/asoundlib.h>
 
@@ -159,6 +159,7 @@ struct pcm {
     int fd;
     unsigned int flags;
     int running:1;
+    int prepared:1;
     int underruns;
     unsigned int buffer_size;
     unsigned int boundary;
@@ -300,7 +301,7 @@ static void pcm_hw_munmap_status(struct pcm *pcm) {
 }
 
 static int pcm_areas_copy(struct pcm *pcm, unsigned int pcm_offset,
-                          const char *src, unsigned int src_offset,
+                          char *buf, unsigned int src_offset,
                           unsigned int frames)
 {
     int size_bytes = pcm_frames_to_bytes(pcm, frames);
@@ -308,12 +309,18 @@ static int pcm_areas_copy(struct pcm *pcm, unsigned int pcm_offset,
     int src_offset_bytes = pcm_frames_to_bytes(pcm, src_offset);
 
     /* interleaved only atm */
-    memcpy((char*)pcm->mmap_buffer + pcm_offset_bytes,
-           src + src_offset_bytes, size_bytes);
+    if (pcm->flags & PCM_IN)
+        memcpy(buf + src_offset_bytes,
+               (char*)pcm->mmap_buffer + pcm_offset_bytes,
+               size_bytes);
+    else
+        memcpy((char*)pcm->mmap_buffer + pcm_offset_bytes,
+               buf + src_offset_bytes,
+               size_bytes);
     return 0;
 }
 
-static int pcm_mmap_write_areas(struct pcm *pcm, const char *src,
+static int pcm_mmap_transfer_areas(struct pcm *pcm, char *buf,
                                 unsigned int offset, unsigned int size)
 {
     void *pcm_areas;
@@ -323,7 +330,7 @@ static int pcm_mmap_write_areas(struct pcm *pcm, const char *src,
     while (size > 0) {
         frames = size;
         pcm_mmap_begin(pcm, &pcm_areas, &pcm_offset, &frames);
-        pcm_areas_copy(pcm, pcm_offset, src, offset, frames);
+        pcm_areas_copy(pcm, pcm_offset, buf, offset, frames);
         commit = pcm_mmap_commit(pcm, pcm_offset, frames);
         if (commit < 0) {
             oops(pcm, commit, "failed to commit %d frames\n", frames);
@@ -386,14 +393,16 @@ int pcm_write(struct pcm *pcm, const void *data, unsigned int count)
 
     for (;;) {
         if (!pcm->running) {
-            if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_PREPARE))
-                return oops(pcm, errno, "cannot prepare channel");
+            int prepare_error = pcm_prepare(pcm);
+            if (prepare_error)
+                return prepare_error;
             if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_WRITEI_FRAMES, &x))
                 return oops(pcm, errno, "cannot write initial data");
             pcm->running = 1;
             return 0;
         }
         if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_WRITEI_FRAMES, &x)) {
+            pcm->prepared = 0;
             pcm->running = 0;
             if (errno == EPIPE) {
                 /* we failed to make our window -- try to restart if we are
@@ -429,6 +438,7 @@ int pcm_read(struct pcm *pcm, void *data, unsigned int count)
             }
         }
         if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_READI_FRAMES, &x)) {
+            pcm->prepared = 0;
             pcm->running = 0;
             if (errno == EPIPE) {
                     /* we failed to make our window -- try to restart */
@@ -494,6 +504,12 @@ void pcm_params_free(struct pcm_params *pcm_params)
 static int pcm_param_to_alsa(enum pcm_param param)
 {
     switch (param) {
+    case PCM_PARAM_ACCESS:
+        return SNDRV_PCM_HW_PARAM_ACCESS;
+    case PCM_PARAM_FORMAT:
+        return SNDRV_PCM_HW_PARAM_FORMAT;
+    case PCM_PARAM_SUBFORMAT:
+        return SNDRV_PCM_HW_PARAM_SUBFORMAT;
     case PCM_PARAM_SAMPLE_BITS:
         return SNDRV_PCM_HW_PARAM_SAMPLE_BITS;
         break;
@@ -534,6 +550,23 @@ static int pcm_param_to_alsa(enum pcm_param param)
     default:
         return -1;
     }
+}
+
+struct pcm_mask *pcm_params_get_mask(struct pcm_params *pcm_params,
+                                     enum pcm_param param)
+{
+    int p;
+    struct snd_pcm_hw_params *params = (struct snd_pcm_hw_params *)pcm_params;
+    if (params == NULL) {
+        return NULL;
+    }
+
+    p = pcm_param_to_alsa(param);
+    if (p < 0 || !param_is_mask(p)) {
+        return NULL;
+    }
+
+    return (struct pcm_mask *)param_to_mask(params, p);
 }
 
 unsigned int pcm_params_get_min(struct pcm_params *pcm_params,
@@ -582,6 +615,7 @@ int pcm_close(struct pcm *pcm)
 
     if (pcm->fd >= 0)
         close(pcm->fd);
+    pcm->prepared = 0;
     pcm->running = 0;
     pcm->buffer_size = 0;
     pcm->fd = -1;
@@ -706,7 +740,7 @@ struct pcm *pcm_open(unsigned int card, unsigned int device,
     pcm->boundary = sparams.boundary = pcm->buffer_size;
 
     while (pcm->boundary * 2 <= INT_MAX - pcm->buffer_size)
-		pcm->boundary *= 2;
+        pcm->boundary *= 2;
 
     if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_SW_PARAMS, &sparams)) {
         oops(pcm, errno, "cannot set sw params");
@@ -718,6 +752,17 @@ struct pcm *pcm_open(unsigned int card, unsigned int device,
         oops(pcm, rc, "mmap status failed");
         goto fail;
     }
+
+#ifdef SNDRV_PCM_IOCTL_TTSTAMP
+    if (pcm->flags & PCM_MONOTONIC) {
+        int arg = SNDRV_PCM_TSTAMP_TYPE_MONOTONIC;
+        rc = ioctl(pcm->fd, SNDRV_PCM_IOCTL_TTSTAMP, &arg);
+        if (rc < 0) {
+            oops(pcm, rc, "cannot set timestamp type");
+            goto fail;
+        }
+    }
+#endif
 
     pcm->underruns = 0;
     return pcm;
@@ -736,13 +781,26 @@ int pcm_is_ready(struct pcm *pcm)
     return pcm->fd >= 0;
 }
 
-int pcm_start(struct pcm *pcm)
+int pcm_prepare(struct pcm *pcm)
 {
+    if (pcm->prepared)
+        return 0;
+
     if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_PREPARE) < 0)
         return oops(pcm, errno, "cannot prepare channel");
 
+    pcm->prepared = 1;
+    return 0;
+}
+
+int pcm_start(struct pcm *pcm)
+{
+    int prepare_error = pcm_prepare(pcm);
+    if (prepare_error)
+        return prepare_error;
+
     if (pcm->flags & PCM_MMAP)
-	    pcm_sync_ptr(pcm, 0);
+        pcm_sync_ptr(pcm, 0);
 
     if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_START) < 0)
         return oops(pcm, errno, "cannot start channel");
@@ -756,6 +814,7 @@ int pcm_stop(struct pcm *pcm)
     if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_DROP) < 0)
         return oops(pcm, errno, "cannot stop channel");
 
+    pcm->prepared = 0;
     pcm->running = 0;
     return 0;
 }
@@ -831,7 +890,7 @@ int pcm_mmap_begin(struct pcm *pcm, void **areas, unsigned int *offset,
 
 int pcm_mmap_commit(struct pcm *pcm, unsigned int offset, unsigned int frames)
 {
-    (void)offset;
+    (void) offset;
     /* update the application pointer in userspace and kernel */
     pcm_mmap_appl_forward(pcm, frames);
     pcm_sync_ptr(pcm, 0);
@@ -895,7 +954,7 @@ int pcm_wait(struct pcm *pcm, int timeout)
     return 1;
 }
 
-int pcm_mmap_write(struct pcm *pcm, const void *buffer, unsigned int bytes)
+int pcm_mmap_transfer(struct pcm *pcm, const void *buffer, unsigned int bytes)
 {
     int err = 0, frames, avail;
     unsigned int offset = 0, count;
@@ -915,7 +974,7 @@ int pcm_mmap_write(struct pcm *pcm, const void *buffer, unsigned int bytes)
         }
 
         /* start the audio if we reach the threshold */
-	    if (!pcm->running &&
+        if (!pcm->running &&
             (pcm->buffer_size - avail) >= pcm->config.start_threshold) {
             if (pcm_start(pcm) < 0) {
                fprintf(stderr, "start error: hw 0x%x app 0x%x avail 0x%x\n",
@@ -937,6 +996,7 @@ int pcm_mmap_write(struct pcm *pcm, const void *buffer, unsigned int bytes)
 
             err = pcm_wait(pcm, time);
             if (err < 0) {
+                pcm->prepared = 0;
                 pcm->running = 0;
                 fprintf(stderr, "wait error: hw 0x%x app 0x%x avail 0x%x\n",
                     (unsigned int)pcm->mmap_status->hw_ptr,
@@ -956,7 +1016,7 @@ int pcm_mmap_write(struct pcm *pcm, const void *buffer, unsigned int bytes)
             break;
 
         /* copy frames from buffer */
-        frames = pcm_mmap_write_areas(pcm, buffer, offset, frames);
+        frames = pcm_mmap_transfer_areas(pcm, (void *)buffer, offset, frames);
         if (frames < 0) {
             fprintf(stderr, "write error: hw 0x%x app 0x%x avail 0x%x\n",
                     (unsigned int)pcm->mmap_status->hw_ptr,
@@ -970,4 +1030,20 @@ int pcm_mmap_write(struct pcm *pcm, const void *buffer, unsigned int bytes)
     }
 
     return 0;
+}
+
+int pcm_mmap_write(struct pcm *pcm, const void *data, unsigned int count)
+{
+    if ((~pcm->flags) & (PCM_OUT | PCM_MMAP))
+        return -ENOSYS;
+
+    return pcm_mmap_transfer(pcm, (void *)data, count);
+}
+
+int pcm_mmap_read(struct pcm *pcm, void *data, unsigned int count)
+{
+    if ((~pcm->flags) & (PCM_IN | PCM_MMAP))
+        return -ENOSYS;
+
+    return pcm_mmap_transfer(pcm, data, count);
 }

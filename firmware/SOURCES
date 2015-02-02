@@ -20,6 +20,7 @@ target/hosted/rtc.c
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID) == 0 && \
+    !defined(DX50) && !defined(DX90) && \
     (defined(DEBUG) || defined(SIMULATOR)) /* sim should define DEBUG instead */
 target/hosted/debug-hosted.c
 #endif
@@ -1814,29 +1815,51 @@ target/arm/rk27xx/ihifi/powermgmt-ihifi960.c
 target/hosted/kernel-unix.c
 target/hosted/filesystem-unix.c
 target/hosted/lc-unix.c
-#if !defined(DX50) && !defined(DX90)
 target/hosted/android/lcd-android.c
 target/hosted/android/button-android.c
+#ifdef DEBUG
+target/hosted/android/debug-android.c
+#endif
 target/hosted/android/pcm-android.c
 target/hosted/android/powermgmt-android.c
+target/hosted/android/system-android.c
 target/hosted/android/telephony-android.c
 #ifdef APPLICATION
 target/hosted/android/app/button-application.c
 #endif
-#else
-drivers/lcd-memframe.c
-target/hosted/android/dx50/pcm-dx50.c
-target/hosted/android/dx50/tinyalsa/pcm.c
-target/hosted/android/dx50/powermgmt-dx50.c
-target/hosted/android/dx50/backlight-dx50.c
-target/hosted/android/dx50/button-dx50.c
-target/hosted/android/dx50/lcd-dx50.c
-#endif
-#ifdef DEBUG
-target/hosted/android/debug-android.c
-#endif
-target/hosted/android/system-android.c
 drivers/audio/android.c
+#endif
+
+#if defined(DX50) || defined(DX90)
+drivers/lcd-memframe.c
+target/hosted/kernel-unix.c
+target/hosted/filesystem-unix.c
+target/hosted/lc-unix.c
+target/hosted/ibasso/audiohw-ibasso.c
+target/hosted/ibasso/backlight-ibasso.c
+target/hosted/ibasso/button-ibasso.c
+#ifdef DEBUG
+target/hosted/ibasso/debug-ibasso.c
+#endif
+target/hosted/ibasso/hostfs-ibasso.c
+target/hosted/ibasso/lcd-ibasso.c
+target/hosted/ibasso/pcm-ibasso.c
+target/hosted/ibasso/power-ibasso.c
+target/hosted/ibasso/powermgmt-ibasso.c
+target/hosted/ibasso/sysfs-ibasso.c
+target/hosted/ibasso/system-ibasso.c
+target/hosted/ibasso/usb-ibasso.c
+target/hosted/ibasso/vold-ibasso.c
+target/hosted/ibasso/tinyalsa/mixer.c
+target/hosted/ibasso/tinyalsa/pcm.c
+#ifdef DX50
+target/hosted/ibasso/dx50/audiohw-dx50.c
+target/hosted/ibasso/dx50/button-dx50.c
+#endif
+#ifdef DX90
+target/hosted/ibasso/dx90/audiohw-dx90.c
+target/hosted/ibasso/dx90/button-dx90.c
+#endif
 #endif
 
 #else /* defined(SIMULATOR) */
