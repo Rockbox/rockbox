@@ -43,6 +43,9 @@ static const char* SYSFS_PATHS[] =
     /* SYSFS_DX90_ES9018_VOLUME */
     "/sys/class/codec/es9018_volume",
 
+    /* SYSFS_ES9018_FILTER */
+    "/sys/class/codec/es9018_filter",
+
     /* SYSFS_MUTE */
     "/sys/class/codec/mute",
 
@@ -280,6 +283,7 @@ bool sysfs_set_char(enum sys_fs_interface_id id, char value)
     {
         case SYSFS_MUTE:
         case SYSFS_WM8740_MUTE:
+        case SYSFS_ES9018_FILTER:
         {
             break;
         }

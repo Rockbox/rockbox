@@ -26,7 +26,7 @@
 #define _CODEC_DX50_H_
 
 
-#define AUDIOHW_CAPS MONO_VOL_CAP
+#define AUDIOHW_CAPS (MONO_VOL_CAP | FILTER_ROLL_OFF_CAP)
 
 
 /*
@@ -46,6 +46,10 @@
     See audiohw.h, sound.c.
 */
 AUDIOHW_SETTING(VOLUME, "dB", 0, 1, -128, 0, -30)
+
+
+/* 1: slow roll off, 0: sharp roll off, sharp roll off default */
+AUDIOHW_SETTING(FILTER_ROLL_OFF, "", 0, 1, 0, 1, 0)
 
 
 #endif
