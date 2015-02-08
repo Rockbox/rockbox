@@ -881,6 +881,48 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_CHANNEL_SWAP
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Swap"
+  </source>
+  <dest>
+    *: "Swap"
+  </dest>
+  <voice>
+    *: "Swap"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAMPLE_DELAY_LEFT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Delay(Left)"
+  </source>
+  <dest>
+    *: "Delay(Left)"
+  </dest>
+  <voice>
+    *: "Delay(Left)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAMPLE_DELAY_RIGHT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Delay(Right)"
+  </source>
+  <dest>
+    *: "Delay(Right)"
+  </dest>
+  <voice>
+    *: "Delay(Right)"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_STEREO_WIDTH
   desc: in sound_settings
   user: core
@@ -892,6 +934,20 @@
   </dest>
   <voice>
     *: "Stereo Width"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAMPLE_DELAY
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Sample Delay"
+  </source>
+  <dest>
+    *: "Sample Delay"
+  </dest>
+  <voice>
+    *: "Sample Delay"
   </voice>
 </phrase>
 <phrase>
