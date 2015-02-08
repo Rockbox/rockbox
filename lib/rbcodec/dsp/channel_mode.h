@@ -23,5 +23,6 @@
 
 void channel_mode_set_config(int value);
 void channel_mode_custom_set_width(int value);
+void channel_mode_set_delay(int value);
 
 #endif /* CHANNEL_MODE_H */

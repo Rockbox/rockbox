@@ -855,6 +855,7 @@ struct user_settings
     int governor;
     int usb_mode;
 #endif
+    int channel_delay; /* 0 - 182 */
 };
 
 /** global variables **/

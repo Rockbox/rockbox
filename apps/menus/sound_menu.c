@@ -124,6 +124,13 @@ MENUITEM_SETTING(stereo_width, &global_settings.stereo_width,
 #endif
 );
 
+MENUITEM_SETTING(channel_delay, &global_settings.channel_delay,
+#if CONFIG_CODEC == SWCODEC
+    lowlatency_callback
+#else
+    NULL
+#endif
+);
 #ifdef AUDIOHW_HAVE_DEPTH_3D
 MENUITEM_SETTING(depth_3d, &global_settings.depth_3d, NULL);
 #endif
@@ -249,7 +256,7 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #ifdef AUDIOHW_HAVE_EQ
           ,&audiohw_eq_tone_controls
 #endif
-          ,&balance,&channel_config,&stereo_width
+          ,&balance,&channel_config,&stereo_width,&channel_delay
 #ifdef AUDIOHW_HAVE_DEPTH_3D
           ,&depth_3d
 #endif

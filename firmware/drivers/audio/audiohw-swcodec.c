@@ -39,6 +39,11 @@ void audiohw_set_stereo_width(int value)
     channel_mode_custom_set_width(value);
 }
 
+void audiohw_set_channel_delay(int value)
+{
+    channel_mode_set_delay(value);
+}
+
 #ifdef HAVE_SW_TONE_CONTROLS
 void audiohw_set_bass(int value)
 {
