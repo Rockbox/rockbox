@@ -40,6 +40,7 @@ void sound_set_bass(int value);
 void sound_set_treble(int value);
 void sound_set_channels(int value);
 void sound_set_stereo_width(int value);
+void sound_set_channel_delay(int value);
 #if defined(AUDIOHW_HAVE_BASS_CUTOFF)
 void sound_set_bass_cutoff(int value);
 #endif

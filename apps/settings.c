@@ -779,6 +779,7 @@ void sound_settings_apply(void)
 #endif
     sound_set(SOUND_CHANNELS, global_settings.channel_config);
     sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
+    sound_set(SOUND_CHANNEL_DELAY, global_settings.channel_delay);
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     sound_set(SOUND_LOUDNESS, global_settings.loudness);
     sound_set(SOUND_AVC, global_settings.avc);

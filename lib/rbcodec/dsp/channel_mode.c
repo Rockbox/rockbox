@@ -25,6 +25,7 @@
 #include "fracmul.h"
 #include "dsp_proc_entry.h"
 #include "channel_mode.h"
+#include "dsp_filter.h"
 #include <string.h>
 
 #if 0
@@ -43,6 +44,12 @@ void channel_mode_proc_custom(struct dsp_proc_entry *this,
                               struct dsp_buffer **buf_p);
 void channel_mode_proc_karaoke(struct dsp_proc_entry *this,
                                struct dsp_buffer **buf_p);
+void channel_mode_proc_swap(struct dsp_proc_entry *this,
+                               struct dsp_buffer **buf_p);
+void channel_mode_proc_delay_left(struct dsp_proc_entry *this,
+                               struct dsp_buffer **buf_p);
+void channel_mode_proc_delay_right(struct dsp_proc_entry *this,
+                               struct dsp_buffer **buf_p);
 
 static struct channel_mode_data
 {
@@ -55,6 +62,11 @@ static struct channel_mode_data
     .sw_cross = 0,
     .mode = SOUND_CHAN_STEREO
 };
+
+#define DLY_2MS 182
+#define DEFAULT_DLY 128 /* ~1.4ms */
+static int32_t ch_buf[DLY_2MS];
+static int r = 0, w = 0, ch_dly = DEFAULT_DLY;
 
 #if 0
 /* SOUND_CHAN_STEREO mode is a noop so has no function - just outline one for
@@ -149,6 +161,76 @@ void channel_mode_proc_mono_right(struct dsp_proc_entry *this,
     (void)this;
 }
 
+void channel_mode_proc_swap(struct dsp_proc_entry *this,
+                            struct dsp_buffer **buf_p)
+{
+    struct dsp_buffer *buf = *buf_p;
+    int32_t *sl = buf->p32[0];
+    int32_t *sr = buf->p32[1];
+    int count = buf->remcount;
+
+    do
+    {
+        int32_t swap = *sl;
+        *sl++ = *sr;
+        *sr++ = swap;
+    }
+    while (--count > 0);
+
+    (void)this;
+}
+
+void channel_mode_set_delay(int value)
+{
+    ch_dly = value;
+}
+
+void channel_mode_proc_delay_left(struct dsp_proc_entry *this,
+                                 struct dsp_buffer **buf_p)
+{
+    struct dsp_buffer *buf = *buf_p;
+    int count = buf->remcount;
+    static int dly = DEFAULT_DLY;
+    int32_t x;
+
+    if (dly != ch_dly) 
+    {
+        memset(ch_buf,0,sizeof(int32_t) * DLY_2MS);
+        dly = ch_dly;
+    }
+
+    for (int i = 0; i < count; i++)
+    {
+        x =  buf->p32[0][i];
+        buf->p32[0][i] = dequeue(ch_buf, &r, dly);
+        enqueue(x, ch_buf, &w, dly);
+    }
+    (void)this;
+}
+
+void channel_mode_proc_delay_right(struct dsp_proc_entry *this,
+                                 struct dsp_buffer **buf_p)
+{
+    struct dsp_buffer *buf = *buf_p;
+    int count = buf->remcount;
+    static int dly = DEFAULT_DLY;
+    int32_t x;
+
+    if (dly != ch_dly) 
+    {
+        memset(ch_buf,0,sizeof(int32_t) * DLY_2MS);
+        dly = ch_dly;
+    }
+
+    for (int i = 0; i < count; i++)
+    {
+        x =  buf->p32[1][i];
+        buf->p32[1][i] = dequeue(ch_buf, &r, dly);
+        enqueue(x, ch_buf, &w, dly);
+    }
+    (void)this;
+}
+
 void channel_mode_set_config(int value)
 {
     if (value < 0 || value >= SOUND_CHAN_NUM_MODES)
@@ -194,8 +276,12 @@ static void update_process_fn(struct dsp_proc_entry *this)
         [SOUND_CHAN_MONO_LEFT]  = channel_mode_proc_mono_left,
         [SOUND_CHAN_MONO_RIGHT] = channel_mode_proc_mono_right,
         [SOUND_CHAN_KARAOKE]    = channel_mode_proc_karaoke,
+        [SOUND_CHAN_SWAP]       = channel_mode_proc_swap,
+        [SOUND_CHAN_DLY_LEFT]   = channel_mode_proc_delay_left,
+        [SOUND_CHAN_DLY_RIGHT]  = channel_mode_proc_delay_right,
     };
 
+    memset(ch_buf,0,sizeof(int32_t) * DLY_2MS);
     this->process = fns[((struct channel_mode_data *)this->data)->mode];
 }
 
