@@ -10,6 +10,7 @@ dsp/dsp_core.c
 dsp/pbe.c
 dsp/afr.c
 dsp/surround.c
+dsp/sample_delay.c
 dsp/dsp_filter.c
 dsp/dsp_misc.c
 dsp/dsp_sample_input.c

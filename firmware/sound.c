@@ -304,6 +304,13 @@ void sound_set_stereo_width(int value)
     audiohw_set_stereo_width(value);
 }
 
+void sound_set_sample_delay(int value)
+{
+    if (!audio_is_initialized)
+        return;
+
+    audiohw_set_sample_delay(value);
+}
 #if defined(AUDIOHW_HAVE_DEPTH_3D)
 void sound_set_depth_3d(int value)
 {

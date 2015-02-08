@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2012 Michael Sevakis
+ * Copyright (C) 2015 Chiwen Chang
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +18,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef DSP_PROC_SETTINGS_H
-#define DSP_PROC_SETTINGS_H
+#ifndef SAMPLE_DELAY_H
+#define SAMPLE_DELAY_H
 
-/* Collect all headers together */
-#include "channel_mode.h"
-#include "compressor.h"
-#include "crossfeed.h"
-#include "dsp_misc.h"
-#include "eq.h"
-#include "pga.h"
-#include "surround.h"
-#include "afr.h"
-#include "pbe.h"
-#include "sample_delay.h"
-#ifdef HAVE_PITCHCONTROL
-#include "tdspeed.h"
-#endif
-#ifdef HAVE_SW_TONE_CONTROLS
-#include "tone_controls.h"
-#endif
+void dsp_sample_delay_config(int var);
 
-#endif /* DSP_PROC_SETTINGS_H */
+#endif /* SAMPLE_DELAY_H */

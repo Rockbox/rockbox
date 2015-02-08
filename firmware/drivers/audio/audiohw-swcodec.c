@@ -25,6 +25,7 @@
 #include "tone_controls.h"
 #endif
 #include "channel_mode.h"
+#include "sample_delay.h"
 #include "dsp_misc.h"
 
 /** Functions exported by audiohw.h but implemented in DSP **/
@@ -37,6 +38,11 @@ void audiohw_set_channel(int value)
 void audiohw_set_stereo_width(int value)
 {
     channel_mode_custom_set_width(value);
+}
+
+void audiohw_set_sample_delay(int value)
+{
+    dsp_sample_delay_config(value);
 }
 
 #ifdef HAVE_SW_TONE_CONTROLS

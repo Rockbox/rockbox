@@ -855,6 +855,7 @@ struct user_settings
     int governor;
     int usb_mode;
 #endif
+    int sample_delay; /*delay by number of samples.(SAMPLE_DELAY in AUDIO_SETTING macros) */
 };
 
 /** global variables **/

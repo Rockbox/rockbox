@@ -50,6 +50,7 @@ DSP_PROC_DB_START
     DSP_PROC_DB_ITEM(AFR)           /* auditory fatigue reduction */
     DSP_PROC_DB_ITEM(SURROUND)      /* haas surround */
     DSP_PROC_DB_ITEM(CHANNEL_MODE)  /* channel modes */
+    DSP_PROC_DB_ITEM(SAMPLE_DELAY)  /* sample delay */
     DSP_PROC_DB_ITEM(COMPRESSOR)    /* dynamic-range compressor */
 DSP_PROC_DB_STOP
 
