@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1531f4_f41f5859",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1000428
+      },
+      "writtenOn": "2015-02-09T20:06:58Z",
+      "side": 1,
+      "message": "Please clearify: 2ms @ 44.1kHz stereo",
+      "revId": "580b9ceb36b0b214ac739afadbd1f8069f4dead6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1531f4_942a647d",
+        "filename": "apps/settings.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 858,
+      "author": {
+        "id": 1000428
+      },
+      "writtenOn": "2015-02-09T20:06:58Z",
+      "side": 1,
+      "message": "Please comment on the unit of this value. Clarify that the actually range depends on the AUDIO_SETTING marcro.",
+      "revId": "580b9ceb36b0b214ac739afadbd1f8069f4dead6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1531f4_d424dcb0",
+        "filename": "firmware/export/audiohw.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 1000428
+      },
+      "writtenOn": "2015-02-09T20:06:58Z",
+      "side": 1,
+      "message": "Please add explaining comment.",
+      "revId": "580b9ceb36b0b214ac739afadbd1f8069f4dead6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
