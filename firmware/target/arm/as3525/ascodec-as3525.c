@@ -444,10 +444,12 @@ void ascodec_write_pmu(unsigned int index, unsigned int subreg,
      * i2c bus between selecting the sub register and writing to it */
     ascodec_async_write(AS3543_PMU_ENABLE, 8 | subreg, &reqs[0]);
     ascodec_async_write(index, value, &reqs[1]);
-    restore_irq(oldstatus);
 
     /* Wait for second request to finish */
     ascodec_wait(&reqs[1]);
+
+    /*restore IRQs after write is completed*/
+    restore_irq(oldstatus);
 }
 
 int ascodec_read_pmu(unsigned int index, unsigned int subreg)
@@ -459,10 +461,12 @@ int ascodec_read_pmu(unsigned int index, unsigned int subreg)
      * i2c bus between selecting the sub register and reading it */
     ascodec_async_write(AS3543_PMU_ENABLE, subreg, &reqs[0]);
     ascodec_async_read(index, 1, &reqs[1], NULL);
-    restore_irq(oldstatus);
 
     /* Wait for second request to finish */
     ascodec_wait(&reqs[1]);
+
+    /*restore IRQs after read is completed*/
+    restore_irq(oldstatus);
 
     return reqs[1].data[0];
 }
