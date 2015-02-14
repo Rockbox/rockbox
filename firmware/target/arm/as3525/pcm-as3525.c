@@ -83,7 +83,7 @@ static void play_start_pcm(void)
 
     dma_enable_channel(0, (void*)addr, (void*)I2SOUT_DATA, DMA_PERI_I2SOUT,
                 DMAC_FLOWCTRL_DMAC_MEM_TO_PERI, true, false, size >> 2,
-                DMA_S1, dma_callback);
+                DMA_S16, dma_callback);
 }
 
 static void dma_callback(void)
