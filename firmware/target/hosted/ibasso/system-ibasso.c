@@ -63,7 +63,7 @@ void system_init(void)
         Prevent device to mute, which will cause tinyalsa pcm_writes to fail.
         /sys/class/codec/wm8740_mute
     */
-    if(! sysfs_set_char(SYSFS_WM8740_MUTE, '0'))
+    if(! sysfs_set_char(SYSFS_WM8740_MUTE, 0))
     {
         DEBUGF("ERROR %s: Can not set WM8740 lock.", __func__);
     }
