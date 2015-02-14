@@ -159,21 +159,12 @@ static void ascodec_finish_req(struct ascodec_request *req)
      */
     while (i2c_busy());
 
-    /* disable clock */
-    bitclr32(&CGU_PERI, CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE);
-
     req->status = 1;
 
     if (req->callback) {
         req->callback(req->data, req_data_ptr - req->data);
     }
     semaphore_release(&req->complete);
-
-    req_head = req->next;
-    req->next = NULL;
-    if (req_head == NULL)
-        req_tail = NULL;
-
 }
 
 static int ascodec_continue_req(struct ascodec_request *req, int irq_status)
@@ -226,13 +217,12 @@ static void ascodec_start_req(struct ascodec_request *req)
 
 void INT_I2C_AUDIO(void)
 {
+    struct ascodec_request *req = req_head;
+
     int irq_status = I2C2_MIS;
-    int status = REQ_FINISHED;
+    int status = ascodec_continue_req(req, irq_status);
 
-    if (req_head != NULL)
-        status = ascodec_continue_req(req_head, irq_status);
-
-    I2C2_INT_CLR |= irq_status; /* clear interrupt status */
+    I2C2_INT_CLR = irq_status; /* clear interrupt status */
 
     if (status != REQ_UNFINISHED) {
         /* mask rx/tx interrupts */
@@ -240,15 +230,31 @@ void INT_I2C_AUDIO(void)
                       I2C2_IRQ_RXOVER|I2C2_IRQ_ACKTIMEO);
 
         if (status == REQ_FINISHED)
-            ascodec_finish_req(req_head);
+            ascodec_finish_req(req);
+
+        int oldlevel = disable_irq_save(); /* IRQs are stacked */
 
         /*
          * If status == REQ_RETRY, this will restart
          * the request because we didn't remove it from
          * the request list
          */
-        if (req_head)
+
+        if (status == REQ_FINISHED) {
+            req_head = req->next;
+            req->next = NULL;
+        }
+
+        if (req_head == NULL) {
+            req_tail = NULL;
+
+            /* disable clock */
+            bitclr32(&CGU_PERI, CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE);
+        } else {
             ascodec_start_req(req_head);
+        }
+
+        restore_irq(oldlevel);
     }
 }
 
@@ -278,7 +284,7 @@ void ascodec_init(void)
     I2C2_CNTRL = I2C2_CNTRL_DEFAULT;
 
     I2C2_IMR = 0x00;          /* disable interrupts */
-    I2C2_INT_CLR |= I2C2_RIS; /* clear interrupt status */
+    I2C2_INT_CLR = I2C2_RIS; /* clear interrupt status */
     VIC_INT_ENABLE = INTERRUPT_I2C_AUDIO;
     VIC_INT_ENABLE = INTERRUPT_AUDIO;
 
@@ -338,6 +344,8 @@ static void ascodec_submit(struct ascodec_request *req)
 
 static void ascodec_wait(struct ascodec_request *req)
 {
+    /* NOTE: Only safe from thread context */
+
     if (irq_enabled()) {
         semaphore_wait(&req->complete, TIMEOUT_BLOCK);
         return;
