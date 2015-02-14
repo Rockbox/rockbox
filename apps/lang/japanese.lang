@@ -9697,7 +9697,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "調整項目: %s %s"
+    swcodec: "Edit mode: %s %s"
   </dest>
   <voice>
     *: none
@@ -9714,7 +9714,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "カットオフ周波数"
+    swcodec: "Cutoff"
   </dest>
   <voice>
     *: none
@@ -9731,7 +9731,7 @@
   </source>
   <dest>
     *: none
-    swcodec: "ゲイン"
+    swcodec: "Gain"
   </dest>
   <voice>
     *: none
@@ -10608,6 +10608,23 @@
   <voice>
     *: none
     gigabeatfx,sansafuzeplus: "タッチパッド感度"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "タッチパッドのデッドゾーン"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "タッチパッドのデッドゾーン"
   </voice>
 </phrase>
 <phrase>
@@ -11829,6 +11846,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "アタックタイム"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "アタックタイム"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_COMPRESSOR_RELEASE
   desc: in sound settings
   user: core
@@ -12566,6 +12600,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "信号の強さ:"
+  </dest>
+  <voice>
+    *: none
+    radio: "信号の強さ:"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_FILESIZE
   desc: in record timesplit options and in track information viewer 
   user: core
@@ -12580,17 +12631,31 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CURRENT_PLAYLIST
-  desc: Used when you need to say playlist, also voiced
+  id: LANG_AUTORESUME_ENABLE
+  desc: deprecated
   user: core
   <source>
-    *: "Current Playlist"
+    *: ""
   </source>
   <dest>
-    *: "現在のプレイリスト"
+    *: ""
   </dest>
   <voice>
-    *: "現在のプレイリスト"
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12615,10 +12680,94 @@
     *: "Resume on automatic track change"
   </source>
   <dest>
-    *: "Resume on automatic track change"
+    *: "自動曲変更時にレジューム"
   </dest>
   <voice>
-    *: "Resume on automatic track change"
+    *: "自動曲変更時にレジューム"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "カスタムディレクトリ内のみ"
+  </dest>
+  <voice>
+    *: "カスタムディレクトリ内のみ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "一時停止での巻き戻し時間"
+  </dest>
+  <voice>
+    *: "一時停止での巻き戻し時間"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "プレイリストカタログのディレクトリとして設定"
+  </dest>
+  <voice>
+    *: "プレイリストカタログのディレクトリとして設定"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "プレイリストカタログのディレクトリをリセット"
+  </dest>
+  <voice>
+    *: "プレイリストカタログのディレクトリをリセット"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "現在のプレイリスト"
+  </dest>
+  <voice>
+    *: "現在のプレイリスト"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "変更を保存しますか?"
+  </dest>
+  <voice>
+    *: "変更を保存しますか?"
   </voice>
 </phrase>
 <phrase>
@@ -12639,20 +12788,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalogue dir
-  user: core
-  <source>
-    *: "Set As Playlist Catalogue Directory"
-  </source>
-  <dest>
-    *: "プレイリストカタログのディレクトリとして設定"
-  </dest>
-  <voice>
-    *: "プレイリストカタログのディレクトリとして設定"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_LIST_LINE_PADDING
   desc: list padding, in display settings
   user: core
@@ -12662,39 +12797,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Line Padding in Lists"
+    touchscreen: "リストの行間に線を引く"
   </dest>
   <voice>
     *: none
-    touchscreen: "Line Padding in Lists"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SAVE_CHANGES
-  desc: When you try to exit screens to confirm save
-  user: core
-  <source>
-    *: "Save Changes?"
-  </source>
-  <dest>
-    *: "変更を保存しますか?"
-  </dest>
-  <voice>
-    *: "変更を保存しますか?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PAUSE_REWIND
-  desc: Seconds to rewind when rewind on pause is enabled.
-  user: core
-  <source>
-    *: "Rewind on Pause"
-  </source>
-  <dest>
-    *: "一時停止での巻き戻し時間"
-  </dest>
-  <voice>
-    *: "一時停止での巻き戻し時間"
+    touchscreen: "リストの行間に線を引く"
   </voice>
 </phrase>
 <phrase>
@@ -12712,51 +12819,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AUTORESUME_ENABLE_YES
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
-  desc: shown instead of sleep timer when it's running
-  user: core
-  <source>
-    *: "Cancel Sleep Timer"
-  </source>
-  <dest>
-    *: "スリープタイマーをキャンセル"
-  </dest>
-  <voice>
-    *: "スリープタイマーをキャンセル"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_RSSI
-  desc: Signal strength of a received FM station
-  user: core
-  <source>
-    *: none
-    radio: "Signal strength:"
-  </source>
-  <dest>
-    *: none
-    radio: "信号の強さ:"
-  </dest>
-  <voice>
-    *: none
-    radio: "信号の強さ:"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SLEEP_TIMER_DURATION
   desc: default sleep timer duration in minutes (unused in UI)
   user: core
@@ -12768,34 +12830,6 @@
   </dest>
   <voice>
     *: "既定のスリープタイマー時間"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTORESUME_ENABLE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_PLAYLISTCAT_DIR
-  desc:
-  user: core
-  <source>
-    *: "Reset Playlist Catalogue Directory"
-  </source>
-  <dest>
-    *: "プレイリストカタログのディレクトリをリセット"
-  </dest>
-  <voice>
-    *: "プレイリストカタログのディレクトリをリセット"
   </voice>
 </phrase>
 <phrase>
@@ -12813,16 +12847,447 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AUTORESUME_CUSTOM
-  desc: enable customization of resume on automatic track change
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
   user: core
   <source>
-    *: "In custom directories only"
+    *: "Cancel Sleep Timer"
   </source>
   <dest>
-    *: "カスタムディレクトリ内のみ"
+    *: "スリープタイマーをキャンセル"
   </dest>
   <voice>
-    *: "カスタムディレクトリ内のみ"
+    *: "スリープタイマーをキャンセル"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "行セパレーター"
+  </dest>
+  <voice>
+    *: "行セパレーター"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "行セパレーターの色"
+  </dest>
+  <voice>
+    *: "行セパレーターの色"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "ショートカット"
+  </dest>
+  <voice>
+    *: "ショートカット"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "ヘッドホン"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "ヘッドホン"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "スピーカー"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "スピーカー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "キャッシュするグリフ数"
+  </dest>
+  <voice>
+    *: "キャッシュするグリフ数"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "起動/シャットダウン"
+  </dest>
+  <voice>
+    *: "起動/シャットダウン"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "キーでスリープタイマーを再スタート"
+  </dest>
+  <voice>
+    *: "キーでスリープタイマーを再スタート"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONSTRAIN_NEXT_FOLDER
+  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
+  user: core
+  <source>
+    *: "Constrain Auto-Change"
+  </source>
+  <dest>
+    *: "自動移動を初期ディレクトリ内に制限"
+  </dest>
+  <voice>
+    *: "自動移動を初期ディレクトリ内に制限"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "ショーカットメニューをクイック画面の代わりに使用"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "ショーカットメニューをクイック画面の代わりに使用"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_START_CURRENT
+  desc: shown when a sleep timer isn't running
+  user: core
+  <source>
+    *: "Start Sleep Timer"
+  </source>
+  <dest>
+    *: "スリープタイマーをスタート"
+  </dest>
+  <voice>
+    *: "スリープタイマーをスタート"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_WESTERN_EUROPEAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Western European (CP1252)"
+  </source>
+  <dest>
+    *: "西ヨーロッパ (CP1252)"
+  </dest>
+  <voice>
+    *: "西ヨーロッパ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Simple (Meier)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "シンプル (Meier)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "シンプル"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "カスタム"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "カスタム"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "ディレクトリを選択"
+  </dest>
+  <voice>
+    *: "ディレクトリを選択"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "スキャンするディレクトリを選択"
+  </dest>
+  <voice>
+    *: "スキャンするディレクトリを選択"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "DACフィルターロールオフ"
+  </dest>
+  <voice>
+    *: "DACフィルターロールオフ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "シャープ"
+  </dest>
+  <voice>
+    *: "シャープ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "スロー"
+  </dest>
+  <voice>
+    *: "スロー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "最大音量制限"
+  </dest>
+  <voice>
+    *: "最大音量制限"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PBE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </source>
+  <dest>
+    *: none
+    swcodec: "知覚低音増強"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "知覚低音増強"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </source>
+  <dest>
+    *: none
+    swcodec: "聴疲労減少"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "聴疲労減少"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Haas Surround"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ハース立体音響"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "ハース立体音響"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x1)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x1)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x1)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x2)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x2)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x2)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_METHOD2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "SIDE ONLY"
+  </source>
+  <dest>
+    *: none
+    swcodec: "サイドのみ"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "サイドのみ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_MIX
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ドライ/ウェット ミックス"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "ドライ/ウェット ミックス"
   </voice>
 </phrase>
