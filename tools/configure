@@ -1287,7 +1287,7 @@ fi
 echo Using temporary directory $tmpdir
 
 if test -r "configure"; then
- # this is a check for a configure script in the current directory, it there
+ # this is a check for a configure script in the current directory, if there
  # is one, try to figure out if it is this one!
 
  if { grep "^#   Jukebox" configure >/dev/null 2>&1 ; } then
@@ -1295,6 +1295,23 @@ if test -r "configure"; then
    echo "It will only cause you pain and grief. Instead do this:"
    echo ""
    echo " cd .."
+   echo " mkdir build-dir"
+   echo " cd build-dir"
+   echo " ../tools/configure"
+   echo ""
+   echo "Much happiness will arise from this. Enjoy"
+   exit 5
+ fi
+fi
+
+if test -r "tools/configure"; then
+ # this is a check for a configure script in the tools/ directory, if there
+ # is one, try to figure out if it is this one!
+
+ if { grep "^#   Jukebox" tools/configure >/dev/null 2>&1 ; } then
+   echo "WEEEEEEEEP. Don't run this configure script in the root of the tree."
+   echo "It will only cause you pain and grief. Instead do this:"
+   echo ""
    echo " mkdir build-dir"
    echo " cd build-dir"
    echo " ../tools/configure"
