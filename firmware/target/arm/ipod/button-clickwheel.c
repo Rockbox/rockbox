@@ -396,7 +396,7 @@ bool button_hold(void)
     else PCON15 = (PCON15 & ~0xffff0000) | 0x22220000;
     return value;
 #elif CONFIG_CPU==S5L8702
-    return ((PDATE & (1 << 2)) == 0);
+    return ((PDATE & (1 << 3)) == 0);
 #endif
 }
 
@@ -440,7 +440,7 @@ int button_read_device(void)
             PWRCONEXT |= 1;
 #elif CONFIG_CPU==S5L8702
             /* disable external (CY8C21x34) wheel controller */
-            GPIOCMD = 0xe040e;
+/*            GPIOCMD = 0xe040e;	*/
 
             /* disable internal (s5l8702) wheel controller */
             WHEEL00 = 0;
