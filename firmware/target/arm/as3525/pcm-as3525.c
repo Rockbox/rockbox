@@ -132,8 +132,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
     /* force writeback */
     commit_dcache_range(dma_start_addr, dma_start_size);
 
-    bitset32(&CGU_AUDIO, (1<<11));
-
     play_start_pcm();
 }
 
@@ -150,11 +148,6 @@ void pcm_play_dma_stop(void)
     dma_rem_size = 0;
 
     dma_release();
-
-#ifdef HAVE_RECORDING
-    if (!is_recording)
-        bitclr32(&CGU_AUDIO, (1<<11));
-#endif
 
     play_callback_pending = false;
 }
@@ -221,10 +214,10 @@ void pcm_dma_apply_settings(void)
              (0<<23) |               /* I2SI_MCLK_EN = disabled */
              (0<<14) |               /* I2SI_MCLK_DIV_SEL = unused */
              (0<<12) |               /* I2SI_MCLK_SEL = clk_main */
-                                     /* I2SO_MCLK_EN = unchanged */
+             (1<<11) |               /* I2SO_MCLK_EN */
              (mclk_divider() << 2) | /* I2SO_MCLK_DIV_SEL */
              (AS3525_MCLK_SEL << 0), /* I2SO_MCLK_SEL */
-             0x01fff7ff);
+             0x01ffffff);
 }
 
 size_t pcm_get_bytes_waiting(void)
@@ -386,9 +379,6 @@ void pcm_rec_dma_stop(void)
     rec_dma_addr = NULL;
     rec_dma_size = 0;
 
-    if (!is_playing)
-        bitclr32(&CGU_AUDIO, (1<<11));
-
     bitclr32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE);
 }
 
@@ -396,8 +386,6 @@ void pcm_rec_dma_stop(void)
 void pcm_rec_dma_start(void *addr, size_t size)
 {
     is_recording = true;
-
-    bitset32(&CGU_AUDIO, (1<<11));
 
     rec_dma_addr = addr;
     rec_dma_size = size;
