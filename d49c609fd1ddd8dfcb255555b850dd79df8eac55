@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1531f4_74906896",
+        "filename": "apps/lang/english.lang",
+        "patchSetId": 6
+      },
+      "lineNbr": 902,
+      "author": {
+        "id": 1000428
+      },
+      "writtenOn": "2015-02-15T12:14:10Z",
+      "side": 1,
+      "message": "Add space: \"Delay (Left)\", \"Delay (Right)\"",
+      "revId": "d49c609fd1ddd8dfcb255555b850dd79df8eac55",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1531f4_3496f094",
+        "filename": "firmware/export/audiohw.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 573,
+      "author": {
+        "id": 1000428
+      },
+      "writtenOn": "2015-02-15T12:14:10Z",
+      "side": 1,
+      "message": "Default value should be 0 (no delay).",
+      "revId": "d49c609fd1ddd8dfcb255555b850dd79df8eac55",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1531f4_d4805c49",
+        "filename": "manual/configure_rockbox/sound_settings.tex",
+        "patchSetId": 6
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1000428
+      },
+      "writtenOn": "2015-02-15T12:14:10Z",
+      "side": 1,
+      "message": "- \"Delay (Left)\" and \"Delay (Right)\" according to lang file.\n- Front? Centering? Grammar in \"Delay L.\".\nAdd a conversion example frames \u003c-\u003e time.",
+      "revId": "d49c609fd1ddd8dfcb255555b850dd79df8eac55",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
