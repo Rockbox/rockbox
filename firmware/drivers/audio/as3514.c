@@ -299,7 +299,9 @@ void audiohw_set_volume(int vol_l, int vol_r)
     }
 
 #ifdef HAVE_AS3543
-    if (!(as3514_regs[AS3514_HPH_OUT_R] & 0x40)) { /*if not radio or recording*/
+    /*if not radio or recording*/
+    if (!(as3514_regs[AS3514_HPH_OUT_R] & 0x40) &&
+        !(as3514_regs[AS3514_AUDIOSET1] & AUDIOSET1_ADC_on)) {
         if (!hph_l || !hph_r) { /*if volume higher, disable the mixer to slightly improve noise*/
             as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_DAC_GAIN_on);
             as3514_write(AS3514_AUDIOSET2, AUDIOSET2_AGC_off | AUDIOSET2_HPH_QUALITY_LOW_POWER);
