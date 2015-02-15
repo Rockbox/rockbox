@@ -65,6 +65,9 @@ static const struct button_mapping button_context_standard[]  = {
 
     { ACTION_STD_CONTEXT,               BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_SELECT },
     { ACTION_STD_CONTEXT,               BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_RIGHT },
+#ifdef ZEN_HAS_CONTROL
+    { ACTION_STD_CONTEXT,               BUTTON_MENU,                       BUTTON_NONE },
+#endif
 
     { ACTION_STD_CANCEL,                BUTTON_BACK,                       BUTTON_NONE },
     { ACTION_STD_CANCEL,                BUTTON_BACK|BUTTON_REPEAT,         BUTTON_NONE },
@@ -81,6 +84,9 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_STOP,                  BUTTON_PLAYPAUSE|BUTTON_REPEAT,    BUTTON_NONE },
 
     { ACTION_WPS_CONTEXT,               BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_NONE },
+#ifdef ZEN_HAS_CONTROL
+    { ACTION_WPS_CONTEXT,               BUTTON_MENU,                       BUTTON_NONE },
+#endif
 
     { ACTION_WPS_SKIPNEXT,              BUTTON_RIGHT|BUTTON_REL,           BUTTON_RIGHT },
     { ACTION_WPS_SEEKFWD,               BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_NONE },
@@ -172,6 +178,9 @@ static const struct button_mapping button_context_list[]  = {
 #ifdef CONFIG_TUNER
 static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_MENU,                  BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE },
+#ifdef ZEN_HAS_CONTROL
+    { ACTION_FM_MENU,                  BUTTON_MENU,                        BUTTON_NONE },
+#endif
     { ACTION_FM_PLAY,                  BUTTON_PLAYPAUSE|BUTTON_REL,        BUTTON_PLAYPAUSE },
     { ACTION_FM_STOP,                  BUTTON_PLAYPAUSE|BUTTON_REPEAT,     BUTTON_NONE },
 #ifdef ZEN_HAS_VOL
