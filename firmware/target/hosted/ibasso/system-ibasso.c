@@ -60,6 +60,20 @@ void system_init(void)
     }
 
     /*
+        DX50
+        /sys/class/codec/mute
+        Mute:   echo 'A' > /sys/class/codec/mute
+        Unmute: echo 'B' > /sys/class/codec/mute
+        DX90?
+    */
+    if(! sysfs_set_char(SYSFS_MUTE, 'B'))
+    {
+        DEBUGF("ERROR %s: Could not unmute.", __func__);
+        panicf("ERROR %s: Could not unmute.", __func__);
+    }
+
+
+    /*
         Prevent device to mute, which will cause tinyalsa pcm_writes to fail.
         /sys/class/codec/wm8740_mute
     */
