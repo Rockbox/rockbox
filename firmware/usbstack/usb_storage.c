@@ -1161,7 +1161,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
         default:
             logf("scsi unknown cmd %x",cbw->command_block[0x0]);
-            usb_drv_stall(ep_in, true,true);
             send_csw(UMS_STATUS_FAIL);
             cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
             cur_sense_data.asc=ASC_INVALID_COMMAND;
