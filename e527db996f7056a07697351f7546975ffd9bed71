@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1531f4_3472707d",
+        "filename": "utils/hwstub/tools/hwstub_server.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2015-02-19T15:15:24Z",
+      "side": 1,
+      "message": "This command could take flag param in \u0027data stage\u0027. That way it will be almost identical to WRITE and the whole thing will end up in only two cases - read-like functions and write-like functions",
+      "revId": "e527db996f7056a07697351f7546975ffd9bed71",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1531f4_d45cdcef",
+        "filename": "utils/hwstub/tools/hwstub_server.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2015-02-19T15:15:24Z",
+      "side": 1,
+      "message": "missing free()",
+      "revId": "e527db996f7056a07697351f7546975ffd9bed71",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
