@@ -1,6 +1,6 @@
 CC=gcc
 AR=ar
-CFLAGS=-W -Wall -O2 `pkg-config --cflags libusb-1.0` -std=c99 -g -fPIC
+CFLAGS=-W -Wall -O2 `pkg-config --cflags libusb-1.0` -std=c99 -g -fPIC -D_XOPEN_SOURCE
 LDFLAGS=`pkg-config --libs libusb-1.0` -fPIC
 LIB=libhwstub.a
 SRC=$(wildcard *.c)
