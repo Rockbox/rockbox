@@ -247,8 +247,9 @@ void RegTab::UpdateTabName()
     else if(hwstub)
     {
         HWStubDevice *dev = hwstub->GetDevice();
-        SetTabName(QString("HWStub %1.%2").arg(dev->GetBusNumber())
-            .arg(dev->GetDevAddress()));
+        //SetTabName(QString("HWStub %1.%2").arg(dev->GetBusNumber())
+        //    .arg(dev->GetDevAddress()));
+        SetTabName(dev->GetFriendlyName());
     }
 #endif
     else

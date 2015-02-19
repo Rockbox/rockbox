@@ -162,12 +162,13 @@ class HWStubDevice
 public:
     HWStubDevice(struct libusb_device *dev);
     HWStubDevice(const HWStubDevice *dev);
+    HWStubDevice(QString address, QString port);
     ~HWStubDevice();
     bool IsValid();
     bool Open();
+    bool Open(QString address, QString port);
     void Close();
-    int GetBusNumber();
-    int GetDevAddress();
+    QString GetFriendlyName();
     /* Calls below are cached and do not require the device to be opened */
     inline struct hwstub_version_desc_t GetVersionInfo() { return m_hwdev_ver; }
     inline struct hwstub_target_desc_t GetTargetInfo() { return m_hwdev_target; }
@@ -177,13 +178,21 @@ public:
     bool ReadMem(soc_addr_t addr, size_t length, void *buffer);
     bool WriteMem(soc_addr_t addr, size_t length, void *buffer);
 
+private:
+    int GetBusNumber();
+    int GetDevAddress();
+
 protected:
     bool Probe();
+    bool Probe(QString address, QString port);
     void Init(struct libusb_device *dev);
+    void Init(QString address, QString port);
 
     bool m_valid;
     struct libusb_device *m_dev;
     libusb_device_handle *m_handle;
+    QString m_address;
+    QString m_port;
     struct hwstub_device_t *m_hwdev;
     struct hwstub_version_desc_t m_hwdev_ver;
     struct hwstub_target_desc_t m_hwdev_target;

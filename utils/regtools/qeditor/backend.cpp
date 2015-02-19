@@ -224,6 +224,11 @@ HWStubDevice::HWStubDevice(const HWStubDevice *dev)
     Init(dev->m_dev);
 }
 
+HWStubDevice::HWStubDevice(QString address, QString port)
+{
+    Init(address, port);
+}
+
 void HWStubDevice::Init(struct libusb_device *dev)
 {
     libusb_ref_device(dev);
@@ -233,25 +238,77 @@ void HWStubDevice::Init(struct libusb_device *dev)
     m_valid = Probe();
 }
 
+void HWStubDevice::Init(QString address, QString port)
+{
+    m_dev = 0;
+    m_handle = 0;
+    m_hwdev = 0;
+    m_valid = Probe(address, port);
+}
+
 HWStubDevice::~HWStubDevice()
 {
     Close();
-    libusb_unref_device(m_dev);
+    if (m_dev)
+        libusb_unref_device(m_dev);
 }
 
 int HWStubDevice::GetBusNumber()
 {
+    if (m_dev == 0)
+        return 0;
+
     return libusb_get_bus_number(m_dev);
 }
 
 int HWStubDevice::GetDevAddress()
 {
+    if (m_dev == 0)
+        return 0;
+
     return libusb_get_device_address(m_dev);
+}
+
+QString HWStubDevice::GetFriendlyName()
+{
+    if (m_dev == 0)
+        return QString("TCP %1:%2").arg(m_address).arg(m_port);
+    else
+        return QString("Bus %1 Device %2").arg(GetBusNumber()).arg(GetDevAddress());
 }
 
 bool HWStubDevice::Probe()
 {
     if(!Open())
+        return false;
+    // get target
+    int ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_TARGET, &m_hwdev_target, sizeof(m_hwdev_target));
+    if(ret != sizeof(m_hwdev_target))
+        goto Lerr;
+    // get STMP information
+    if(m_hwdev_target.dID == HWSTUB_TARGET_STMP)
+    {
+        ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_STMP, &m_hwdev_stmp, sizeof(m_hwdev_stmp));
+        if(ret != sizeof(m_hwdev_stmp))
+            goto Lerr;
+    }
+    else if(m_hwdev_target.dID == HWSTUB_TARGET_PP)
+    {
+        ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_PP, &m_hwdev_pp, sizeof(m_hwdev_pp));
+        if(ret != sizeof(m_hwdev_pp))
+            goto Lerr;
+    }
+    Close();
+    return true;
+
+    Lerr:
+    Close();
+    return false;
+}
+
+bool HWStubDevice::Probe(QString address, QString port)
+{
+    if(!Open(address, port))
         return false;
     // get target
     int ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_TARGET, &m_hwdev_target, sizeof(m_hwdev_target));
@@ -292,6 +349,22 @@ bool HWStubDevice::Open()
     return true;
 }
 
+bool HWStubDevice::Open(QString address, QString port)
+{
+    QByteArray ba_address = address.toLatin1();
+    const char *c_address = ba_address.data();
+    QByteArray ba_port = port.toLatin1();
+    const char *c_port = ba_port.data();
+
+    m_hwdev = hwstub_open_tcp(c_address, c_port);
+    if (m_hwdev == 0)
+        return false;
+
+    m_address = address;
+    m_port = port;
+    return true;
+}
+
 void HWStubDevice::Close()
 {
     if(m_hwdev)
@@ -300,6 +373,10 @@ void HWStubDevice::Close()
     if(m_handle)
         libusb_close(m_handle);
     m_handle = 0;
+    if(!m_address.isNull())
+        m_address = QString();
+    if(!m_port.isNull())
+        m_port = QString();
 }
 
 bool HWStubDevice::ReadMem(soc_addr_t addr, size_t length, void *buffer)
@@ -331,7 +408,13 @@ bool HWStubDevice::IsValid()
 HWStubIoBackend::HWStubIoBackend(HWStubDevice *dev)
 {
     m_dev = dev;
-    m_dev->Open();
+
+    // FIXME: use proper Open() variant
+    //        TCP version needs address and port
+    //        stored somewhere
+    m_dev->Open("localhost", "8888");
+    //m_dev->Open();
+
     struct hwstub_target_desc_t target = m_dev->GetTargetInfo();
     if(target.dID == HWSTUB_TARGET_STMP)
     {
