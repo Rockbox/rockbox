@@ -29,7 +29,9 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QTextBlock>
+#include <QPushButton>
 
+#include <QMessageBox>
 /**
  * SocBitRangeValidator
  */
@@ -974,6 +976,28 @@ bool MyTextEditor::IsModified()
     return m_edit->document()->isModified();
 }
 
+TcpWidget::TcpWidget(QWidget *parent) : QWidget(parent)
+{
+    address_label = new QLabel(this);
+    address_label->setText("address");
+    port_label = new QLabel(this);
+    port_label->setText("port");
+
+    button = new QPushButton("Connect", this);
+    button->setIcon(QIcon::fromTheme("system-run"));
+    address = new QLineEdit(this);
+    port = new QLineEdit(this);
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->addWidget(address_label);
+    layout->addWidget(address);
+    layout->addWidget(port_label);
+    layout->addWidget(port);
+    layout->addWidget(button);
+    layout->addStretch(0);
+
+    connect(button, SIGNAL(clicked(bool)), this, SLOT(emitter(void)));
+}
+
 /**
  * BackendSelector
  */
@@ -984,7 +1008,8 @@ BackendSelector::BackendSelector(Backend *backend, QWidget *parent)
     m_data_selector->addItem(QIcon::fromTheme("text-x-generic"), "Nothing...", QVariant(DataSelNothing));
     m_data_selector->addItem(QIcon::fromTheme("document-open"), "File...", QVariant(DataSelFile));
 #ifdef HAVE_HWSTUB
-    m_data_selector->addItem(QIcon::fromTheme("multimedia-player"), "Device...", QVariant(DataSelDevice));
+    m_data_selector->addItem(QIcon::fromTheme("multimedia-player"), "USB Device...", QVariant(DataSelDevice));
+    m_data_selector->addItem(QIcon::fromTheme("network-wired"), "Hwstub server...", QVariant(DataSelServer));
 #endif
     m_data_sel_edit = new QLineEdit(this);
     m_data_sel_edit->setReadOnly(true);
@@ -998,6 +1023,8 @@ BackendSelector::BackendSelector(Backend *backend, QWidget *parent)
 #ifdef HAVE_HWSTUB
     m_dev_selector = new QComboBox;
     data_sel_layout->addWidget(m_dev_selector, 1);
+    m_tcp_selector = new TcpWidget(this);
+    data_sel_layout->addWidget(m_tcp_selector, 1);
 #endif
 
     m_io_backend = m_backend->CreateDummyIoBackend();
@@ -1009,6 +1036,8 @@ BackendSelector::BackendSelector(Backend *backend, QWidget *parent)
         this, SLOT(OnDevChanged(int)));
     connect(&m_hwstub_helper, SIGNAL(OnDevListChanged(bool, struct libusb_device *)),
         this, SLOT(OnDevListChanged2(bool, struct libusb_device *)));
+    connect(m_tcp_selector, SIGNAL(TcpAddress(QString, QString)),
+        this, SLOT(OnServerConnect(QString, QString)));
 #endif
     OnDataSelChanged(0);
 }
@@ -1037,6 +1066,7 @@ void BackendSelector::OnDataSelChanged(int index)
         m_data_sel_edit->show();
 #ifdef HAVE_HWSTUB
         m_dev_selector->hide();
+        m_tcp_selector->hide();
 #endif
         QFileDialog *fd = new QFileDialog(m_data_selector);
         fd->setFilter("Textual files (*.txt);;All files (*)");
@@ -1055,7 +1085,15 @@ void BackendSelector::OnDataSelChanged(int index)
         m_nothing_text->hide();
         m_data_sel_edit->hide();
         m_dev_selector->show();
+        m_tcp_selector->hide();
         OnDevListChanged();
+    }
+    else if(var == DataSelServer)
+    {
+        m_nothing_text->hide();
+        m_data_sel_edit->hide();
+        m_dev_selector->hide();
+        m_tcp_selector->show();
     }
 #endif
     else
@@ -1064,6 +1102,7 @@ void BackendSelector::OnDataSelChanged(int index)
         m_nothing_text->show();
 #ifdef HAVE_HWSTUB
         m_dev_selector->hide();
+        m_tcp_selector->hide();
 #endif
 
         ChangeBackend(m_backend->CreateDummyIoBackend());
@@ -1114,6 +1153,13 @@ void BackendSelector::ClearDevList()
         delete dev;
         m_dev_selector->removeItem(0);
     }
+}
+
+void BackendSelector::OnServerConnect(QString address, QString port)
+{
+     delete m_io_backend;
+     m_io_backend = m_backend->CreateHWStubIoBackend(new HWStubDevice(address, port));
+     emit OnSelect(m_io_backend);
 }
 #endif
 

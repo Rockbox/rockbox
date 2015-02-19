@@ -224,6 +224,11 @@ HWStubDevice::HWStubDevice(const HWStubDevice *dev)
     Init(dev->m_dev);
 }
 
+HWStubDevice::HWStubDevice(QString address, QString port)
+{
+    Init(address, port);
+}
+
 void HWStubDevice::Init(struct libusb_device *dev)
 {
     libusb_ref_device(dev);
@@ -231,6 +236,14 @@ void HWStubDevice::Init(struct libusb_device *dev)
     m_handle = 0;
     m_hwdev = 0;
     m_valid = Probe();
+}
+
+void HWStubDevice::Init(QString address, QString port)
+{
+    m_dev = 0;
+    m_handle = 0;
+    m_hwdev = 0;
+    m_valid = Probe(address, port);
 }
 
 HWStubDevice::~HWStubDevice()
@@ -278,6 +291,35 @@ bool HWStubDevice::Probe()
     return false;
 }
 
+bool HWStubDevice::Probe(QString address, QString port)
+{
+    if(!Open(address, port))
+        return false;
+    // get target
+    int ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_TARGET, &m_hwdev_target, sizeof(m_hwdev_target));
+    if(ret != sizeof(m_hwdev_target))
+        goto Lerr;
+    // get STMP information
+    if(m_hwdev_target.dID == HWSTUB_TARGET_STMP)
+    {
+        ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_STMP, &m_hwdev_stmp, sizeof(m_hwdev_stmp));
+        if(ret != sizeof(m_hwdev_stmp))
+            goto Lerr;
+    }
+    else if(m_hwdev_target.dID == HWSTUB_TARGET_PP)
+    {
+        ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_PP, &m_hwdev_pp, sizeof(m_hwdev_pp));
+        if(ret != sizeof(m_hwdev_pp))
+            goto Lerr;
+    }
+    Close();
+    return true;
+
+    Lerr:
+    Close();
+    return false;
+}
+
 bool HWStubDevice::Open()
 {
     if(libusb_open(m_dev, &m_handle))
@@ -289,6 +331,20 @@ bool HWStubDevice::Open()
         m_handle = 0;
         return false;
     }
+    return true;
+}
+
+bool HWStubDevice::Open(QString address, QString port)
+{
+    QByteArray ba_address = address.toLatin1();
+    const char *c_address = ba_address.data();
+    QByteArray ba_port = port.toLatin1();
+    const char *c_port = ba_port.data();
+
+    m_hwdev = hwstub_open_tcp(c_address, c_port);
+    if (m_hwdev == 0)
+        return false;
+
     return true;
 }
 
@@ -331,7 +387,7 @@ bool HWStubDevice::IsValid()
 HWStubIoBackend::HWStubIoBackend(HWStubDevice *dev)
 {
     m_dev = dev;
-    m_dev->Open();
+    //m_dev->Open();
     struct hwstub_target_desc_t target = m_dev->GetTargetInfo();
     if(target.dID == HWSTUB_TARGET_STMP)
     {

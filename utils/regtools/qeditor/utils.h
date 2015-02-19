@@ -343,6 +343,26 @@ protected:
     QToolButton *m_underline_button;
 };
 
+class TcpWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    TcpWidget(QWidget *parent = 0);
+
+signals:
+    void TcpAddress(QString address, QString port);
+
+private slots:
+    void emitter(void){emit TcpAddress(address->text(), port->text());}
+
+private:
+    QLabel *address_label;
+    QLabel *port_label;
+    QLineEdit *address;
+    QLineEdit *port;
+    QPushButton *button;
+};
+
 class BackendSelector : public QWidget
 {
     Q_OBJECT
@@ -364,6 +384,7 @@ protected:
         DataSelFile,
 #ifdef HAVE_HWSTUB
         DataSelDevice,
+        DataSelServer
 #endif
     };
 
@@ -373,6 +394,7 @@ protected:
     QLineEdit *m_data_sel_edit;
 #ifdef HAVE_HWSTUB
     QComboBox *m_dev_selector;
+    TcpWidget *m_tcp_selector;
     HWStubBackendHelper m_hwstub_helper;
 #endif
     QLabel *m_nothing_text;
@@ -383,6 +405,7 @@ private slots:
     void OnDevChanged(int index);
     void OnDevListChanged2(bool, struct libusb_device *);
     void ClearDevList();
+    void OnServerConnect(QString, QString);
 #endif
     void OnDataSelChanged(int index);
 };

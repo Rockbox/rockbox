@@ -162,9 +162,11 @@ class HWStubDevice
 public:
     HWStubDevice(struct libusb_device *dev);
     HWStubDevice(const HWStubDevice *dev);
+    HWStubDevice(QString address, QString port);
     ~HWStubDevice();
     bool IsValid();
     bool Open();
+    bool Open(QString address, QString port);
     void Close();
     int GetBusNumber();
     int GetDevAddress();
@@ -179,7 +181,9 @@ public:
 
 protected:
     bool Probe();
+    bool Probe(QString address, QString port);
     void Init(struct libusb_device *dev);
+    void Init(QString address, QString port);
 
     bool m_valid;
     struct libusb_device *m_dev;
