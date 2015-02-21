@@ -105,6 +105,14 @@ $releasenotes="/wiki/ReleaseNotes313";
         name => 'iAudio X5',
         status => 3,
     },
+    'ibassodx50' => {
+        name => 'iBasso DX50',
+        status => 2,
+    },
+    'ibassodx90' => {
+        name => 'iBasso DX90',
+        status => 2,
+    },
     'ipod1g2g' => {
         name => 'iPod 1st and 2nd gen',
         status => 3,
