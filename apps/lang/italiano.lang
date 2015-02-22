@@ -12837,7 +12837,7 @@ desc: deprecated
     *: "Tasti Rapidi"
   </dest>
   <voice>
-    *: "Tasti Rapidi"
+    *: "Scorciatoie"
   </voice>
 </phrase>
 <phrase>
@@ -12889,96 +12889,6 @@ desc: deprecated
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SELECT_FOLDER
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Select one or more directories"
-  </source>
-  <dest>
-    *: "Scegli una o più cartelle"
-  </dest>
-  <voice>
-    *: "Scegli una o più cartelle"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CROSSFEED_MEIER
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    swcodec: "Simple (Meier)"
-  </source>
-  <dest>
-    *: none
-    swcodec: "Semplice (Meier)"
-  </dest>
-  <voice>
-    *: none
-    swcodec: "Semplice"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SLEEP_TIMER_START_CURRENT
-  desc: shown when a sleep timer isn't running
-  user: core
-  <source>
-    *: "Start Sleep Timer"
-  </source>
-  <dest>
-    *: "Avvia Sleep Timer"
-  </dest>
-  <voice>
-    *: "Avvia Sleep Timer"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SELECT_DATABASE_DIRS
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Select directories to scan"
-  </source>
-  <dest>
-    *: "Selezione le cartelle da esaminare"
-  </dest>
-  <voice>
-    *: "Selezione le cartelle da esaminare"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_WESTERN_EUROPEAN
-  desc: in codepage setting menu
-  user: core
-  <source>
-    *: "Western European (CP1252)"
-  </source>
-  <dest>
-    *: "Europeo Occidentale (CP1252)"
-  </dest>
-  <voice>
-    *: "Europeo Occidentale"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CROSSFEED_CUSTOM
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    swcodec: "Custom"
-  </source>
-  <dest>
-    *: none
-    swcodec: "Personalizzato"
-  </dest>
-  <voice>
-    *: none
-    swcodec: "Personalizzato"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_STARTUP_SHUTDOWN
   desc: in the general settings menu
   user: core
@@ -13000,10 +12910,24 @@ desc: deprecated
     *: "Restart Sleep Timer On Keypress"
   </source>
   <dest>
-    *: "Riavvia Sleep Timer Al Tocco"
+    *: "Riavvia Tempo Spegnimento Al Tocco"
   </dest>
   <voice>
-    *: "Riavvia Sleep Timer Al Tocco"
+    *: "Riavvia Tempo Spegnimento Al Tocco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONSTRAIN_NEXT_FOLDER
+  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
+  user: core
+  <source>
+    *: "Constrain Auto-Change"
+  </source>
+  <dest>
+    *: "Forza camiamento automatico"
+  </dest>
+  <voice>
+    *: "Forza Cambiamento Automatico"
   </voice>
 </phrase>
 <phrase>
@@ -13016,24 +12940,142 @@ desc: deprecated
   </source>
   <dest>
     *: none
-    quickscreen: "Usa il Menu Shortcuts invece del Quick Screen"
+    quickscreen: "Usa il Menu Scorciatoie Invece del Menu Rapido"
   </dest>
   <voice>
     *: none
-    quickscreen: "Usa il Menu Shortcuts invece del Quick Screen"
+    quickscreen: "Usa il Menu Scorciatoie Invece del Menu Rapido"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CONSTRAIN_NEXT_FOLDER
-  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
+  id: LANG_SLEEP_TIMER_START_CURRENT
+  desc: shown when a sleep timer isn't running
   user: core
   <source>
-    *: "Constrain Auto-Change"
+    *: "Start Sleep Timer"
   </source>
   <dest>
-    *: "Costringi Auto-Change"
+    *: "Avvia Tempo Spegnimento"
   </dest>
   <voice>
-    *: "Costringi Auto-Change"
+    *: "Avvia Tempo Spegnimento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_WESTERN_EUROPEAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Western European (CP1252)"
+  </source>
+  <dest>
+    *: "Europeo Occidentale (CP1252)"
+  </dest>
+  <voice>
+    *: "Europeo Occidentale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Simple (Meier)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Semplice (Meier)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Semplice"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Personalizzato"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Personalizzato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Seleziona una o più cartelle"
+  </dest>
+  <voice>
+    *: "Seleziona Una o Più Cartelle"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Seleziona le cartelle da esaminare"
+  </dest>
+  <voice>
+    *: "Seleziona le cartelle da esaminare"
+	</voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "Filtro Roll-off del DAC"
+  </dest>
+  <voice>
+    *: "Filtro Roll-off del DAC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "Aspro"
+  </dest>
+  <voice>
+    *: "Aspro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Morbido"
+  </dest>
+  <voice>
+    *: "Morbido"
   </voice>
 </phrase>
