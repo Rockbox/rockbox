@@ -37,6 +37,7 @@ void remote_backlight_use_settings(void);
 
 #ifdef HAVE_BUTTON_LIGHT
 void buttonlight_force_on(void);
+void buttonlight_force_off(void);
 void buttonlight_ignore_timeout(void);
 void buttonlight_use_settings(void);
 #endif

@@ -45,6 +45,7 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 #   define LAMP_DOWN              PLA_SCROLL_BACK
 #   define LAMP_UP_REPEAT         PLA_SCROLL_FWD_REPEAT
 #   define LAMP_DOWN_REPEAT       PLA_SCROLL_BACK_REPEAT
+#   define LAMP_TOGGLE_BUTTON     PLA_SELECT
 #else
 #   define LAMP_LEFT              PLA_LEFT
 #   define LAMP_RIGHT             PLA_RIGHT
@@ -52,6 +53,7 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 #   define LAMP_DOWN              PLA_DOWN
 #   define LAMP_UP_REPEAT         PLA_UP_REPEAT
 #   define LAMP_DOWN_REPEAT       PLA_DOWN_REPEAT
+#   define LAMP_TOGGLE_BUTTON     PLA_SELECT
 #endif/* HAVE_SCROLLWHEEL */
 
 
@@ -87,6 +89,9 @@ enum plugin_status plugin_start(const void* parameter)
     int cs = 0;
     bool update = false;
 #endif /* HAVE_LCD_COLOR */
+#ifdef HAVE_BUTTON_LIGHT
+    bool buttonlight_on = true;
+#endif /* HAVE_BUTTON_LIGHT */
 
 #if LCD_DEPTH > 1
     unsigned bg_color = rb->lcd_get_background();
@@ -169,6 +174,20 @@ enum plugin_status plugin_start(const void* parameter)
                     backlight_brightness_set(--current_brightness);
                 break;
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
+#ifdef HAVE_BUTTON_LIGHT
+            case LAMP_TOGGLE_BUTTON:
+                if(buttonlight_on)
+                {
+                    buttonlight_force_off();
+                    buttonlight_on = false;
+                }
+                else
+                {
+                    buttonlight_force_on();
+                    buttonlight_on = true;
+                }
+                break;
+#endif /* HAVE_BUTTON_LIGHT */
             case LAMP_EXIT:
             case LAMP_EXIT2:
                 quit = true;

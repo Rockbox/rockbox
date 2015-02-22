@@ -106,6 +106,12 @@ void buttonlight_force_on(void)
     rb->buttonlight_set_timeout(0);
 }
 
+/*  Force the buttonlight off */
+void buttonlight_force_off(void)
+{
+    rb->buttonlight_set_timeout(-1);
+}
+
 /* Turn off backlight timeout */
 void buttonlight_ignore_timeout(void)
 {
