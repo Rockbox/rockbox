@@ -11176,15 +11176,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Largă"
+    gigabeats,samsungypr1: "Lăgime"
   </dest>
   <voice>
     *: none
-    gigabeats: "Largă"
+    gigabeats,samsungypr1: "Lărgime"
   </voice>
 </phrase>
 <phrase>
@@ -11227,15 +11227,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Îngustă"
+    gigabeats,samsungypr1: "Îngustime"
   </dest>
   <voice>
     *: none
-    gigabeats: "Îngustă"
+    gigabeats,samsungypr1: "Îngustime"
   </voice>
 </phrase>
 <phrase>
@@ -11326,15 +11326,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Frecvență %d de bandă"
+    gigabeats,samsungypr1: "Frecvenţă pentru banda %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Frecvență %d bandă"
+    gigabeats,samsungypr1: "frecvenţă pentru banda"
   </voice>
 </phrase>
 <phrase>
@@ -11343,15 +11343,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Lățime %d bandă"
+    gigabeats,samsungypr1: "Lăţimea bandei %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Lățime bandă"
+    gigabeats,samsungypr1: "Lăţimea bandei"
   </voice>
 </phrase>
 <phrase>
@@ -11459,15 +11459,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Setări tonuri"
+    gigabeats,samsungypr1: "Controale ton"
   </dest>
   <voice>
     *: none
-    gigabeats: "Setări tonuri"
+    gigabeats,samsungypr1: "Controale ton"
   </voice>
 </phrase>
 <phrase>
@@ -11631,15 +11631,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Amplificare %d bandă"
+    gigabeats,samsungypr1: "Amplificare banda %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Amplificare bandă"
+    gigabeats,samsungypr1: "Amplificare banda"
   </voice>
 </phrase>
 <phrase>
@@ -12295,15 +12295,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Setări avansate de control al tonalității"
+    gigabeats,samsungypr1: "Setări avansate de control ale tonului"
   </dest>
   <voice>
     *: none
-    gigabeats: "Setări avansate de control al tonalității"
+    gigabeats,samsungypr1: "Setări avansate de control ale tonului"
   </voice>
 </phrase>
 <phrase>
@@ -12312,15 +12312,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Amplificare 3-D"
+    depth_3d: "îmbunătăţire 3-D"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Amplificare 3-D"
+    depth_3d: "îmbunătăţire 3-D"
   </voice>
 </phrase>
 <phrase>
@@ -13039,5 +13039,140 @@
   </dest>
   <voice>
     *: "Blocheaza auto-schimbarea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "Ascuţime"
+  </dest>
+  <voice>
+    *: "Ascuţime"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Încet"
+  </dest>
+  <voice>
+    *: "Încet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Timp atac"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Timp atac"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Separator linii"
+  </dest>
+  <voice>
+    *: "Separator linii"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Culoare separator linii"
+  </dest>
+  <voice>
+    *: "Culoare separator linii"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "Zona moartă ecran tactil"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "Zona moartă ecran tactil"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "Pantă filtru DAC"
+  </dest>
+  <voice>
+    *: "Pantă filtru DAC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Limită maximă volum"
+  </dest>
+  <voice>
+    *: "Limită maximă volum"
   </voice>
 </phrase>
