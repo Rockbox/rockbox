@@ -1121,7 +1121,7 @@ Veuillez sélectionner manuellement le type de périphérique et le point de mon
     <message>
         <location filename="../configure.cpp" line="665"/>
         <source>%1 (%2 GiB of %3 GiB free)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2 GiB libres sur %3 GiB)</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="739"/>
@@ -1141,7 +1141,7 @@ Veuillez sélectionner manuellement le type de périphérique et le point de mon
     <message>
         <location filename="../configure.cpp" line="749"/>
         <source>%1 at %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 à %2</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="755"/>
@@ -2490,7 +2490,7 @@ Erreur réseau: %1. Veuillez vérifier vos paramètres réseau et proxy.</transl
     <message>
         <location filename="../rbutilqtfrm.ui" line="366"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Backup current installation.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Create a backup by archiving the contents of the Rockbox installation folder.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Sauvegarder l&apos;installation courante.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Créé une sauvegarde en archivant le contenu du dossier de Rockbox.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Sauvegarder l&apos;installation courante.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Créer une sauvegarde en archivant le contenu du dossier de Rockbox.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="539"/>
