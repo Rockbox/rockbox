@@ -12168,15 +12168,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Verstärkung Band %d"
+    gigabeats,samsungypr1: "Band %d Verstärkung"
   </dest>
   <voice>
     *: none
-    gigabeats: "Bandverstärkung"
+    gigabeats,samsungypr1: "Band %d Verstärkung"
   </voice>
 </phrase>
 <phrase>
@@ -12202,15 +12202,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Weit"
+    gigabeats,samsungypr1: "Breit"
   </dest>
   <voice>
     *: none
-    gigabeats: "Weit"
+    gigabeats,samsungypr1: "Breit"
   </voice>
 </phrase>
 <phrase>
@@ -12236,15 +12236,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Schmal"
+    gigabeats,samsungypr1: "Schmal"
   </dest>
   <voice>
     *: none
-    gigabeats: "Schmal"
+    gigabeats,samsungypr1: "Schmal"
   </voice>
 </phrase>
 <phrase>
@@ -12301,15 +12301,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Erweiterte Klangeinstellungen"
+    gigabeats,samsungypr1: "Erweiterte Klangeinstellungen"
   </dest>
   <voice>
     *: none
-    gigabeats: "Erweiterte Klangeinstellungen"
+    gigabeats,samsungypr1: "Erweiterte Klangeinstellungen"
   </voice>
 </phrase>
 <phrase>
@@ -12318,15 +12318,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Raumklangverbesserung"
+    depth_3d: "Raumklang"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Raumklangverbesserung"
+    depth_3d: "Raumklang"
   </voice>
 </phrase>
 <phrase>
@@ -12349,15 +12349,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Grenzfrequenz Band %d"
+    gigabeats,samsungypr1: "Band %d Grenzfrequenz"
   </dest>
   <voice>
     *: none
-    gigabeats: "Grenzfrequenz"
+    gigabeats,samsungypr1: "Band %d Grenzfrequenz"
   </voice>
 </phrase>
 <phrase>
@@ -12366,15 +12366,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Bandbreite Band %d"
+    gigabeats,samsungypr1: "Band %d Breite"
   </dest>
   <voice>
     *: none
-    gigabeats: "Bandbreite"
+    gigabeats,samsungypr1: "Band %d Breite"
   </voice>
 </phrase>
 <phrase>
@@ -12417,15 +12417,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Klangregelung"
+    gigabeats,samsungypr1: "Klangeinstellungen"
   </dest>
   <voice>
     *: none
-    gigabeats: "Klangregelung"
+    gigabeats,samsungypr1: "Klangeinstellungen"
   </voice>
 </phrase>
 <phrase>
@@ -13153,5 +13153,140 @@
     *: none
     ibassodx50: "Android Debug Bridge"
     ibassodx90: "Android Debug Bridge"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Zeilentrenner"
+  </dest>
+  <voice>
+    *: "Zeilentrenner"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "Flankensteilheit"
+  </dest>
+  <voice>
+    *: "Flankensteilheit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "Inaktive Berührungsfläche"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "Inaktive Berührungsfläche"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Langsam"
+  </dest>
+  <voice>
+    *: "Langsam"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Zeiltrennerfarbe"
+  </dest>
+  <voice>
+    *: "Zeilentrennerfarbe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Lautstärkenbegrenzung"
+  </dest>
+  <voice>
+    *: "Lautstärkenbegrenzung"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Einschwingzeit"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Einschwingzeit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "Scharf"
+  </dest>
+  <voice>
+    *: "Scharf"
   </voice>
 </phrase>
