@@ -7912,8 +7912,6 @@
     *: "Време"
   </voice>
 </phrase>
-/* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
- * the selector should probably be usb_charging_enable_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
   desc: in Battery menu
@@ -12271,15 +12269,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Настройки на тона"
+    gigabeats,samsungypr1: "Управление на тоновете"
   </dest>
   <voice>
     *: none
-    gigabeats: "Настройки на тона"
+    gigabeats,samsungypr1: "Управление на тоновете"
   </voice>
 </phrase>
 <phrase>
@@ -12288,15 +12286,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Разширени настройки на тоновете"
+    gigabeats,samsungypr1: "Разширени настройки за управление на тоновете"
   </dest>
   <voice>
     *: none
-    gigabeats: "Разширени настройки на тоновете"
+    gigabeats,samsungypr1: "Разширени настройки за управление на тоновете"
   </voice>
 </phrase>
 <phrase>
@@ -12305,15 +12303,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Лента %d Усилване"
+    gigabeats,samsungypr1: "Усилване на лента %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Усилване на лентата"
+    gigabeats,samsungypr1: "Усилване на лента"
   </voice>
 </phrase>
 <phrase>
@@ -12322,15 +12320,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Лента %d Честота"
+    gigabeats,samsungypr1: "Честота на лента %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Честота на лентата"
+    gigabeats,samsungypr1: "Честота на лента"
   </voice>
 </phrase>
 <phrase>
@@ -12339,15 +12337,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Лента %d ширина"
+    gigabeats,samsungypr1: "Ширина на лента %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Ширина на лентата"
+    gigabeats,samsungypr1: "Ширина на лента"
   </voice>
 </phrase>
 <phrase>
@@ -12356,15 +12354,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Стесняване"
+    gigabeats,samsungypr1: "Тясна"
   </dest>
   <voice>
     *: none
-    gigabeats: "Стесняване"
+    gigabeats,samsungypr1: "Тясна"
   </voice>
 </phrase>
 <phrase>
@@ -12373,15 +12371,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Разширяване"
+    gigabeats,samsungypr1: "Широка"
   </dest>
   <voice>
     *: none
-    gigabeats: "Разширяване"
+    gigabeats,samsungypr1: "Широка"
   </voice>
 </phrase>
 <phrase>
@@ -12390,15 +12388,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D подобрение"
+    depth_3d: "3-D подобрение"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D подобрение"
+    depth_3d: "3-D подобрение"
   </voice>
 </phrase>
 <phrase>
@@ -13037,5 +13035,140 @@
   </dest>
   <voice>
     *: "Изберете папки за сканиране"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Време за нападение"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Време за нападение"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Бавно"
+  </dest>
+  <voice>
+    *: "Бавно"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Цвят за разделителната линия"
+  </dest>
+  <voice>
+    *: "Цвят за разделителната линия"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "Остро"
+  </dest>
+  <voice>
+    *: "Остро"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Разделителна линия"
+  </dest>
+  <voice>
+    *: "Разделителна линия"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "Разтоварване на филтъра на ЦАП"
+  </dest>
+  <voice>
+    *: "Разтоварване на филтъра на ЦАП"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "Мъртва зона на тъчпада"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "Мъртва зона на тъчпада"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Ограничение за максимална сила на звука"
+  </dest>
+  <voice>
+    *: "Ограничение за максимална сила на звука"
   </voice>
 </phrase>
