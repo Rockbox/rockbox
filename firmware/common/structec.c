@@ -164,8 +164,8 @@ ssize_t ecwrite(int fd, const void *buf, size_t scount,
                 const char *ecinst, bool ec)
 {
     char tmp[MAX_STRUCT_SIZE];
-    size_t member_size = structec_size(ecinst);
-    
+    ssize_t member_size = structec_size(ecinst);
+
     if (ec)
     {
         const char *p = (const char *)buf;
@@ -178,7 +178,11 @@ ssize_t ecwrite(int fd, const void *buf, size_t scount,
 
             memcpy(tmp, p, member_size * amount);
             structec_convert(tmp, ecinst, amount, true);
-            write(fd, tmp, amount * member_size);
+            ssize_t ret = write(fd, tmp, amount * member_size);
+
+            if(ret != amount * member_size)
+                return ret;
+
             p += member_size * amount;
         }
 
