@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1531f4_94d70423",
+        "filename": "firmware/common/structec.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1000644
+      },
+      "writtenOn": "2015-02-24T22:23:16Z",
+      "side": 1,
+      "message": "Why not just ret !\u003d amount * member_size? If ret \u003c 0, ret also !\u003d amount * member_size, so the \u003c0 isn\u0027t actually needed.",
+      "revId": "b73b005c3f7ea3b2ea4d2bfa79d9a73807e80994",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
