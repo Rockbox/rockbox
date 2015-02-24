@@ -140,7 +140,11 @@ void screen_dump(void)
     }
     else
     {
-        write(fd, bmpheader, sizeof(bmpheader));
+        if(write(fd, bmpheader, sizeof(bmpheader)) != sizeof(bmpheader))
+        {
+            close(fd);
+            return;
+        }
 
         /* BMP image goes bottom up */
         for (y = LCD_HEIGHT - 1; y >= 0; y--)
@@ -243,7 +247,11 @@ void screen_dump(void)
             while (dst < dst_end);
 
 #endif /* LCD_DEPTH */
-            write(fd, linebuf, DUMP_BMP_LINESIZE);
+            if(write(fd, linebuf, DUMP_BMP_LINESIZE) != DUMP_BMP_LINESIZE)
+            {
+                close(fd);
+                return;
+            }
         }
     }
     close(fd);
