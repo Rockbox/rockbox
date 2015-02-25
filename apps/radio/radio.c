@@ -597,7 +597,7 @@ void radio_screen(void)
                     radio_start();
 
                 update_type = SKIN_REFRESH_NON_STATIC;
-                talk = false;
+                talk = true;
                 talk_shutup();
                 break;
 
