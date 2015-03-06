@@ -16,6 +16,24 @@
       "revId": "cbbff9f46137612f431266f3e9a2151a75e0d566",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a1531f4_14a01490",
+        "filename": "utils/regtools/qeditor/backend.cpp",
+        "patchSetId": 20
+      },
+      "lineNbr": 537,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-03-06T09:39:27Z",
+      "side": 1,
+      "message": "This will disappear when variants are introduced, so that the offset is not hardcoded.",
+      "parentUuid": "3a1531f4_d49dfc5a",
+      "revId": "cbbff9f46137612f431266f3e9a2151a75e0d566",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
