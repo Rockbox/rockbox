@@ -177,6 +177,7 @@ star.c
 starfield.c
 vu_meter.c
 wormlet.c
+zigzag.c
 
 /* Plugins needing the grayscale lib on low-depth LCDs */
 fire.c
