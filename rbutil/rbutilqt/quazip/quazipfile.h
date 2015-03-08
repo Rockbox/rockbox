@@ -2,41 +2,36 @@
 #define QUA_ZIPFILE_H
 
 /*
--- A kind of "standard" GPL license statement --
-QuaZIP - a Qt/C++ wrapper for the ZIP/UNZIP package
-Copyright (C) 2005-2008 Sergey A. Tachenov
+Copyright (C) 2005-2014 Sergey A. Tachenov
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2 of the License, or (at your
-option) any later version.
+This file is part of QuaZIP.
 
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-Public License for more details.
+QuaZIP is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 2.1 of the License, or
+(at your option) any later version.
 
-You should have received a copy of the GNU General Public License along
-with this program; if not, write to the Free Software Foundation, Inc.,
-59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+QuaZIP is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
 
--- A kind of "standard" GPL license statement ends here --
+You should have received a copy of the GNU Lesser General Public License
+along with QuaZIP.  If not, see <http://www.gnu.org/licenses/>.
 
-See COPYING file for GPL.
+See COPYING file for the full LGPL text.
 
-You are also permitted to use QuaZIP under the terms of LGPL (see
-COPYING.LGPL). You are free to choose either license, but please note
-that QuaZIP makes use of Qt, which is not licensed under LGPL. So if
-you are using Open Source edition of Qt, you therefore MUST use GPL for
-your code based on QuaZIP, since it would be also based on Qt in this
-case. If you are Qt commercial license owner, then you are free to use
-QuaZIP as long as you respect either GPL or LGPL for QuaZIP code.
+Original ZIP package is copyrighted by Gilles Vollant, see
+quazip/(un)zip.h files for details, basically it's zlib license.
  **/
 
 #include <QIODevice>
 
+#include "quazip_global.h"
 #include "quazip.h"
 #include "quazipnewinfo.h"
+
+class QuaZipFilePrivate;
 
 /// A file inside ZIP archive.
 /** \class QuaZipFile quazipfile.h <quazip/quazipfile.h>
@@ -51,6 +46,14 @@ QuaZIP as long as you respect either GPL or LGPL for QuaZIP code.
  * it will create internal QuaZip object. See constructors' descriptions
  * for details. Writing is only possible with the existing instance.
  *
+ * Note that due to the underlying library's limitation it is not
+ * possible to use multiple QuaZipFile instances to open several files
+ * in the same archive at the same time. If you need to write to
+ * multiple files in parallel, then you should write to temporary files
+ * first, then pack them all at once when you have finished writing. If
+ * you need to read multiple files inside the same archive in parallel,
+ * you should extract them all into a temporary directory first.
+ *
  * \section quazipfile-sequential Sequential or random-access?
  *
  * At the first thought, QuaZipFile has fixed size, the start and the
@@ -58,7 +61,7 @@ QuaZIP as long as you respect either GPL or LGPL for QuaZIP code.
  * there is one major obstacle to making it random-access: ZIP/UNZIP API
  * does not support seek() operation and the only way to implement it is
  * through reopening the file and re-reading to the required position,
- * but this is prohibitely slow.
+ * but this is prohibitively slow.
  *
  * Therefore, QuaZipFile is considered to be a sequential device. This
  * has advantage of availability of the ungetChar() operation (QIODevice
@@ -68,25 +71,14 @@ QuaZIP as long as you respect either GPL or LGPL for QuaZIP code.
  * this class.
  *
  **/
-class QuaZipFile: public QIODevice {
+class QUAZIP_EXPORT QuaZipFile: public QIODevice {
+  friend class QuaZipFilePrivate;
   Q_OBJECT
   private:
-    QuaZip *zip;
-    QString fileName;
-    QuaZip::CaseSensitivity caseSensitivity;
-    bool raw;
-    qint64 writePos;
-    // these two are for writing raw files
-    ulong uncompressedSize;
-    quint32 crc;
-    bool internal;
-    int zipError;
+    QuaZipFilePrivate *p;
     // these are not supported nor implemented
     QuaZipFile(const QuaZipFile& that);
     QuaZipFile& operator=(const QuaZipFile& that);
-    void resetZipError()const {setZipError(UNZ_OK);}
-    // const, but sets zipError!
-    void setZipError(int zipError)const;
   protected:
     /// Implementation of the QIODevice::readData().
     qint64 readData(char *data, qint64 maxSize);
@@ -212,7 +204,7 @@ class QuaZipFile: public QIODevice {
      * 
      * \sa getActualFileName
      **/
-    QString getFileName()const {return fileName;}
+    QString getFileName() const;
     /// Returns case sensitivity of the file name.
     /** This function returns case sensitivity argument you passed to
      * this object either by using
@@ -225,7 +217,7 @@ class QuaZipFile: public QIODevice {
      *
      * \sa getFileName
      **/
-    QuaZip::CaseSensitivity getCaseSensitivity()const {return caseSensitivity;}
+    QuaZip::CaseSensitivity getCaseSensitivity() const;
     /// Returns the actual file name in the archive.
     /** This is \em not a ZIP archive file name, but a name of file inside
      * archive. It is not necessary the same name that you have passed
@@ -265,7 +257,7 @@ class QuaZipFile: public QIODevice {
      *
      * \sa open(OpenMode,int*,int*,bool,const char*)
      **/
-    bool isRaw()const {return raw;}
+    bool isRaw() const;
     /// Binds to the existing QuaZip instance.
     /** This function destroys internal QuaZip object, if any, and makes
      * this QuaZipFile to use current file in the \a zip object for any
@@ -303,7 +295,7 @@ class QuaZipFile: public QIODevice {
      * Argument \a password specifies a password to decrypt the file. If
      * it is NULL then this function behaves just like open(OpenMode).
      **/
-    bool open(OpenMode mode, const char *password)
+    inline bool open(OpenMode mode, const char *password)
     {return open(mode, NULL, NULL, false, password);}
     /// Opens a file for reading.
     /** \overload
@@ -324,14 +316,21 @@ class QuaZipFile: public QIODevice {
      * specify correct timestamp (by default, current time will be
      * used). See QuaZipNewInfo.
      *
-     * Arguments \a password and \a crc provide necessary information
-     * for crypting. Note that you should specify both of them if you
-     * need crypting. If you do not, pass \c NULL as password, but you
-     * still need to specify \a crc if you are going to use raw mode
-     * (see below).
+     * The \a password argument specifies the password for crypting. Pass NULL
+     * if you don't need any crypting. The \a crc argument was supposed
+     * to be used for crypting too, but then it turned out that it's
+     * false information, so you need to set it to 0 unless you want to
+     * use the raw mode (see below).
      *
      * Arguments \a method and \a level specify compression method and
-     * level.
+     * level. The only method supported is Z_DEFLATED, but you may also
+     * specify 0 for no compression. If all of the files in the archive
+     * use both method 0 and either level 0 is explicitly specified or
+     * data descriptor writing is disabled with
+     * QuaZip::setDataDescriptorWritingEnabled(), then the
+     * resulting archive is supposed to be compatible with the 1.0 ZIP
+     * format version, should you need that. Except for this, \a level
+     * has no other effects with method 0.
      *
      * If \a raw is \c true, no compression is performed. In this case,
      * \a crc and uncompressedSize field of the \a info are required.
@@ -428,15 +427,30 @@ class QuaZipFile: public QIODevice {
      *
      * File must be open for reading before calling this function.
      *
-     * Returns \c false in the case of an error.
+     * \return \c false in the case of an error.
+     *
+     * This function doesn't support zip64, but will still work fine on zip64
+     * archives if file sizes are below 4 GB, otherwise the values will be set
+     * as if converted using QuaZipFileInfo64::toQuaZipFileInfo().
+     *
+     * \sa getFileInfo(QuaZipFileInfo64*)
      **/
     bool getFileInfo(QuaZipFileInfo *info);
+    /// Gets information about current file with zip64 support.
+    /**
+     * @overload
+     *
+     * \sa getFileInfo(QuaZipFileInfo*)
+     */
+    bool getFileInfo(QuaZipFileInfo64 *info);
     /// Closes the file.
     /** Call getZipError() to determine if the close was successful.
      **/
     virtual void close();
     /// Returns the error code returned by the last ZIP/UNZIP API call.
-    int getZipError()const {return zipError;}
+    int getZipError() const;
+    /// Returns the number of bytes available for reading.
+    virtual qint64 bytesAvailable() const;
 };
 
 #endif

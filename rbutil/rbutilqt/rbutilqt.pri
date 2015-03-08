@@ -72,9 +72,10 @@ SOURCES += \
  quazip/quazip.cpp \
  quazip/quazipfile.cpp \
  quazip/quazipnewinfo.cpp \
+ quazip/quazipfileinfo.cpp \
+ quazip/qioapi.cpp \
  quazip/unzip.c \
  quazip/zip.c \
- quazip/ioapi.c \
  base/ziputil.cpp \
  gui/comboboxviewdelegate.cpp \
  gui/selectiveinstallwidget.cpp \
@@ -160,8 +161,10 @@ HEADERS += \
  quazip/ioapi.h \
  quazip/quazipfile.h \
  quazip/quazipfileinfo.h \
+ quazip/quazipnewinfo.h \
  quazip/quazip.h \
  quazip/quazipnewinfo.h \
+ quazip/quazip_global.h \
  quazip/unzip.h \
  quazip/zip.h \
  base/ziputil.h \

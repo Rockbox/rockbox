@@ -163,7 +163,7 @@ dbg {
     message("release")
 }
 
-DEFINES += RBUTIL _LARGEFILE64_SOURCE CUTELOGGER_STATIC
+DEFINES += RBUTIL _LARGEFILE64_SOURCE CUTELOGGER_STATIC QUAZIP_STATIC
 
 # check version of Qt installation
 !contains(QT_MAJOR_VERSION, 5):!macx:!*-msvc* {

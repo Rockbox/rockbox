@@ -1,6 +1,9 @@
 This folder contains the quazip project for ZIP file compression/decompression.
-These files are distributed under the GPL v2 or later.
-The source files have been last synced with the projects release at
-http://sourceforge.net/projects/quazip/ on July 20, 2010
+These files are distributed under the LGPL v2.1 or later. Only source files
+actually used in Rockbox Utility are included, further sources have been left
+out. Check the quazip source distribution for those.
+
+The source files have been last synced with the projects release 0.7.1 at
+http://sourceforge.net/projects/quazip/ on March 8, 2015.
 
 
