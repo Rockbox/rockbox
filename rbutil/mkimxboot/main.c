@@ -52,7 +52,7 @@ static void usage(void)
     printf("  -i <file>   Set input file\n");
     printf("  -b <file>   Set boot file\n");
     printf("  -d/--debug  Enable debug output\n");
-    printf("  -t <type>   Set type (dualboot, singleboot, recovery)\n");
+    printf("  -t <type>   Set type (dualboot, singleboot, recovery, charge)\n");
     printf("  -v <v>      Set variant\n");
     printf("  -x          Dump device informations\n");
     printf("  -w          Extract the original firmware\n");
