@@ -258,6 +258,7 @@
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
+    creativezen*: "Select = Yes"
   </source>
   <dest>
     *: "PLAY = はい"
@@ -267,6 +268,7 @@
     mrobe500: "PLAY または POWER, top-right = はい"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = はい"
+    creativezen*: "Select = はい"
   </dest>
   <voice>
     *: ""
@@ -2240,6 +2242,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "データベース構築中... %d 件 (OFFで戻る)"
@@ -2248,6 +2251,7 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "データベース構築中... %d 件 (左で戻る)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "データベース構築中... %d 件 (PREVで戻る)"
     gogearsa9200: "データベース構築中... %d 件 (REWで戻る)"
+    archosplayer: "DB構築中... %d 件"
   </dest>
   <voice>
     *: "データベースに登録"
@@ -12219,15 +12223,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "トーン・コントロール"
+    gigabeats,samsungypr1: "トーン・コントロール"
   </dest>
   <voice>
     *: none
-    gigabeats: "トーン コントロール"
+    gigabeats,samsungypr1: "トーン・コントロール"
   </voice>
 </phrase>
 <phrase>
@@ -12236,15 +12240,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "トーン・コントロールの高度な設定"
+    gigabeats,samsungypr1: "トーン・コントロール詳細設定"
   </dest>
   <voice>
     *: none
-    gigabeats: "トーン コントロールの高度な設定"
+    gigabeats,samsungypr1: "トーン・コントロール詳細設定"
   </voice>
 </phrase>
 <phrase>
@@ -12253,15 +12257,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "バンド %d のゲイン"
+    gigabeats,samsungypr1: "バンド %d ゲイン"
   </dest>
   <voice>
     *: none
-    gigabeats: "バンドのゲイン"
+    gigabeats,samsungypr1: "バンド %d ゲイン"
   </voice>
 </phrase>
 <phrase>
@@ -12270,15 +12274,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "バンド %d の周波数"
+    gigabeats,samsungypr1: "バンド %d 周波数"
   </dest>
   <voice>
     *: none
-    gigabeats: "バンドの周波数"
+    gigabeats,samsungypr1: "バンド %d 周波数"
   </voice>
 </phrase>
 <phrase>
@@ -12287,15 +12291,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "バンド %d の幅"
+    gigabeats,samsungypr1: "バンド %d 幅"
   </dest>
   <voice>
     *: none
-    gigabeats: "バンド幅"
+    gigabeats,samsungypr1: "バンド %d 幅"
   </voice>
 </phrase>
 <phrase>
@@ -12304,15 +12308,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "ナロー"
+    gigabeats,samsungypr1: "ナロー"
   </dest>
   <voice>
     *: none
-    gigabeats: "ナロー"
+    gigabeats,samsungypr1: "ナロー"
   </voice>
 </phrase>
 <phrase>
@@ -12321,15 +12325,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "ワイド"
+    gigabeats,samsungypr1: "ワイド"
   </dest>
   <voice>
     *: none
-    gigabeats: "ワイド"
+    gigabeats,samsungypr1: "ワイド"
   </voice>
 </phrase>
 <phrase>
@@ -12338,15 +12342,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-Dエンハンスメント"
+    depth_3d: "3Dエンハンスメント"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-Dエンハンスメント"
+    depth_3d: "3Dエンハンスメント"
   </voice>
 </phrase>
 <phrase>
@@ -12708,7 +12712,7 @@
 </phrase>
 <phrase>
   id: LANG_SLEEP_TIMER_DURATION
-  desc: default sleep timer duration in minutes (unused in UI)
+  desc: default sleep timer duration in minutes
   user: core
   <source>
     *: "Default Sleep Timer Duration"
@@ -12774,5 +12778,570 @@
   </dest>
   <voice>
     *: "カスタムディレクトリ内のみ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "DACフィルター・ロールオフ"
+  </dest>
+  <voice>
+    *: "DACフィルター・ロールオフ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "アタック・タイム"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "アタック・タイム"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "起動／終了"
+  </dest>
+  <voice>
+    *: "起動／終了"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PBE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </source>
+  <dest>
+    *: none
+    swcodec: "パーペプチュアル低音増強"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "パーペプチュアル低音増強"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_WESTERN_EUROPEAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Western European (CP1252)"
+  </source>
+  <dest>
+    *: "西ヨーロッパ (CP1252)"
+  </dest>
+  <voice>
+    *: "西ヨーロッパ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "カスタム"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "カスタム"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "スピーカー・キークリック"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "スピーカー・キークリック"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_START_CURRENT
+  desc: shown when a sleep timer isn't running
+  user: core
+  <source>
+    *: "Start Sleep Timer"
+  </source>
+  <dest>
+    *: "スリープ・タイマー開始"
+  </dest>
+  <voice>
+    *: "スリープ・タイマー開始"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "キー押下でスリープ・タイマー再起動"
+  </dest>
+  <voice>
+    *: "キー押下でスリープ・タイマー再起動"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_CHARGE
+  desc: in Settings -> General -> System -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Charge Only"
+    ibassodx90: "Charge Only"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "充電のみ"
+    ibassodx90: "充電のみ"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "充電のみ"
+    ibassodx90: "充電のみ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE
+  desc: in Settings -> General -> System -> USB Mode
+  user: core
+  <source>
+    *: none
+    ibassodx50: "USB Mode"
+    ibassodx90: "USB Mode"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "USBモード"
+    ibassodx90: "USBモード"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "USBモード"
+    ibassodx90: "USBモード"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "スロー"
+  </dest>
+  <voice>
+    *: "スロー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "ボリューム上限"
+  </dest>
+  <voice>
+    *: "ボリューム上限"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONSTRAIN_NEXT_FOLDER
+  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
+  user: core
+  <source>
+    *: "Constrain Auto-Change"
+  </source>
+  <dest>
+    *: "自動変更を強制"
+  </dest>
+  <voice>
+    *: "自動変更を強制"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "クイック・スクリーンの代わりにショートカット・メニューを使う"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "クイック・スクリーンの代わりにショートカット・メニューを使う"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Simple (Meier)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "シンプル（メイヤー）"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "シンプル"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x2)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x2)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x2)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "ショートカット"
+  </dest>
+  <voice>
+    *: "ショートカット"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> System -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Mass Storage"
+    ibassodx90: "Mass Storage"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "マス・ストレージ"
+    ibassodx90: "マス・ストレージ"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "マス・ストレージ"
+    ibassodx90: "マス・ストレージ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_MIX
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ドライ／ウエット ミックス"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "ドライ／ウエット ミックス"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "ヘッドホン・キークリック"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "ヘッドホン・キークリック"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x1)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x1)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x1)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </source>
+  <dest>
+    *: none
+    swcodec: "聴覚疲労低減"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "聴覚疲労低減"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "行区切り"
+  </dest>
+  <voice>
+    *: "行区切り"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Haas Surround"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ハース・サラウンド"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "ハース・サラウンド"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "キャッシュするグリフ"
+  </dest>
+  <voice>
+    *: "キャッシュするグリフ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "シャープ"
+  </dest>
+  <voice>
+    *: "シャープ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "タッチパッド無効ゾーン"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "タッチパッド無効ゾーン"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_ADB
+  desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "スキャンするディレクトリを選択"
+  </dest>
+  <voice>
+    *: "スキャンするディレクトリを選択"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_METHOD2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "SIDE ONLY"
+  </source>
+  <dest>
+    *: none
+    swcodec: "サイドのみ"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "サイドのみ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "行区切りの色"
+  </dest>
+  <voice>
+    *: "行区切りの色"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
+  desc: in Settings -> General -> System -> Freq Scaling Governor
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "周波数スケーリング・ガバナー"
+    ibassodx90: "周波数スケーリング・ガバナー"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "周波数スケーリング・ガバナー"
+    ibassodx90: "周波数スケーリング・ガバナー"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "１つ以上のディレクトリを選択"
+  </dest>
+  <voice>
+    *: "１つ以上のディレクトリを選択"
   </voice>
 </phrase>
