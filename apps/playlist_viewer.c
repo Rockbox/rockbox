@@ -475,8 +475,8 @@ static bool update_playlist(bool force)
 }
 
 /* Menu of playlist commands.  Invoked via ON+PLAY on main viewer screen.
-   Returns -1 if USB attached, 0 if no playlist change, and 1 if playlist
-   changed. */
+   Returns -1 if USB attached, 0 if no playlist change, 1 if playlist
+   changed, 2 if a track was removed from the playlist */
 static int onplay_menu(int index)
 {
     int result, ret = 0;
@@ -533,7 +533,7 @@ static int onplay_menu(int index)
                         }
                     }
                 }
-                ret = 1;
+                ret = 2;
                 break;
             case 3:
                 /* move track */
@@ -818,7 +818,8 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                 else if (ret_val > 0)
                 {
                     /* Playlist changed */
-                    gui_synclist_del_item(&playlist_lists);
+                    if (ret_val == 2)
+                        gui_synclist_del_item(&playlist_lists);
                     update_playlist(true);
                     if (viewer.num_tracks <= 0)
                         exit = true;
