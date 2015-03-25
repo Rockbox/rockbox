@@ -69,13 +69,6 @@ SOURCES += \
  base/rockboxinfo.cpp \
  ../../tools/mkboot.c \
  ../../tools/iriver.c \
- quazip/quazip.cpp \
- quazip/quazipfile.cpp \
- quazip/quazipnewinfo.cpp \
- quazip/quazipfileinfo.cpp \
- quazip/qioapi.cpp \
- quazip/unzip.c \
- quazip/zip.c \
  base/ziputil.cpp \
  gui/comboboxviewdelegate.cpp \
  gui/selectiveinstallwidget.cpp \
@@ -88,11 +81,6 @@ SOURCES += \
  mspack/system-mspack.c \
  base/mspackutil.cpp \
  base/archiveutil.cpp \
- logger/AbstractAppender.cpp \
- logger/AbstractStringAppender.cpp \
- logger/ConsoleAppender.cpp \
- logger/FileAppender.cpp \
- logger/Logger.cpp \
 
 
 HEADERS += \
@@ -157,16 +145,6 @@ HEADERS += \
  base/rockboxinfo.h \
  ../../tools/mkboot.h \
  ../../tools/iriver.h \
- quazip/crypt.h \
- quazip/ioapi.h \
- quazip/quazipfile.h \
- quazip/quazipfileinfo.h \
- quazip/quazipnewinfo.h \
- quazip/quazip.h \
- quazip/quazipnewinfo.h \
- quazip/quazip_global.h \
- quazip/unzip.h \
- quazip/zip.h \
  base/ziputil.h \
  lame/lame.h \
  gui/comboboxviewdelegate.h \
