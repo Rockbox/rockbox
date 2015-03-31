@@ -2,9 +2,9 @@ DEFINES=
 CC?=gcc
 CXX?=g++
 LD?=g++
-CFLAGS=-g -std=c99 -Wall $(DEFINES) -Ilib
+CFLAGS=-g -std=c99 -Wall $(DEFINES) -Ilib `pkg-config --cflags libusb-1.0` $(DEFINES)
 CXXFLAGS=-g -Wall $(DEFINES)
-LDFLAGS=
+LDFLAGS=`pkg-config --libs libusb-1.0`
 SRC=$(wildcard *.c)
 SRCXX=$(wildcard *.cpp)
 EXEC=$(SRC:.c=) $(SRCXX:.cpp=)
