@@ -63,7 +63,7 @@ function Ball:new(o)
                 color = random_color(),
                 up_speed = Ball:generateSpeed(),
                 right_speed = Ball:generateSpeed(),
-                explosion_size = math.random(2*self.size, 4*self.size),
+                explosion_size = math.random(2*self.size, 4*self.size) * 4/3,
                 life_duration = math.random(rb.HZ, rb.HZ*5)
             }
     end
@@ -82,6 +82,26 @@ function Ball:generateSpeed()
     return speed
 end
 
+function drawCircle(x0, y0, radius)
+  x = radius
+  y = 0
+  radiusError = 1 - x
+  step = 0
+
+  while x >= y do
+    y = y + 1
+    if radiusError < 0 then
+      radiusError = radiusError + 2 * y + 1
+    else
+      rb.lcd_fillrect(x0 - x, y0 - y, 1, 2 * y)
+      rb.lcd_fillrect(x0 + x, y0 - y, 1, 2 * y)
+      rb.lcd_fillrect(x0 - y, y0 - x, 2 * y, 2 * x)
+      x = x - 1
+      radiusError = radiusError + (y - x) + 1
+    end
+  end
+end
+
 function Ball:draw()
     --[[
          I know these aren't circles, but as there's no current circle
@@ -89,7 +109,13 @@ function Ball:draw()
          circles from within Lua is far too slow).
     ]]--
     set_foreground(self.color)
-    rb.lcd_fillrect(self.x, self.y, self.size, self.size)
+
+    xm = math.floor(self.x + self.size / 2)
+    ym = math.floor(self.y + self.size / 2)
+
+    drawCircle(xm, ym, math.ceil(self.size / 2))
+
+    --[[ rb.lcd_fillrect(self.x, self.y, self.size, self.size) ]]--
 end
 
 function Ball:step()
@@ -119,8 +145,12 @@ function Ball:step()
 end
 
 function Ball:checkHit(other)
-    if (other.x + other.size >= self.x) and (self.x + self.size >= other.x) and
-       (other.y + other.size >= self.y) and (self.y + self.size >= other.y) then
+    dx = (other.x + other.size / 2) - (self.x + self.size / 2)
+    dy = (other.y + other.size / 2) - (self.y + self.size / 2)
+    ds = (other.size / 2 + self.size / 2)
+    if dx*dx + dy*dy   -- Distance between centers, squared
+       <=
+       ds * ds then    -- Sizes, squared
         assert(not self.exploded)
         self.exploded = true
         self.death_time = rb.current_tick() + self.life_duration
