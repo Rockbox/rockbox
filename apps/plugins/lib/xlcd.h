@@ -31,6 +31,11 @@
 void xlcd_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3);
 void xlcd_filltriangle_screen(struct screen* display,
                          int x1, int y1, int x2, int y2, int x3, int y3);
+void xlcd_fillcircle(int cx, int cy, int radius);
+void xlcd_fillcircle_screen(struct screen* display, int cx, int cy, int radius);
+void xlcd_drawcircle(int cx, int cy, int radius);
+void xlcd_drawcircle_screen(struct screen* display, int cx, int cy, int radius);
+
 #if LCD_DEPTH >= 8
 void xlcd_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
                            int stride, int x, int y, int width, int height);
