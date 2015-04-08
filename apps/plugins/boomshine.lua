@@ -103,19 +103,12 @@ function drawCircle(x0, y0, radius)
 end
 
 function Ball:draw()
-    --[[
-         I know these aren't circles, but as there's no current circle
-         implementation in Rockbox, rectangles will just do fine (drawing
-         circles from within Lua is far too slow).
-    ]]--
     set_foreground(self.color)
 
     xm = math.floor(self.x + self.size / 2)
     ym = math.floor(self.y + self.size / 2)
 
     drawCircle(xm, ym, math.ceil(self.size / 2))
-
-    --[[ rb.lcd_fillrect(self.x, self.y, self.size, self.size) ]]--
 end
 
 function Ball:step()
