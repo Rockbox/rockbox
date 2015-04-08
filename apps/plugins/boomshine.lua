@@ -353,6 +353,8 @@ if HAS_TOUCHSCREEN then
 end
 rb.backlight_force_on()
 
+math.randomseed(os.time())
+
 local idx, highscore = 1, 0
 while levels[idx] ~= nil do
     local goal, nrBalls = levels[idx][1], levels[idx][2]
