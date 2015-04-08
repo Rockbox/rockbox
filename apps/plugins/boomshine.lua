@@ -212,7 +212,7 @@ function random_color()
 end
 
 function start_round(level, goal, nrBalls, total)
-    local player_added, score, exit, nrExpandedBalls = false, 0, false, 0
+    local player_added, score, exit, nrExpendedBalls = false, 0, false, 0
     local balls, explodedBalls = {}, {}
     local cursor = Cursor:new()
 
@@ -257,7 +257,7 @@ function start_round(level, goal, nrBalls, total)
             for _, explodedBall in ipairs(explodedBalls) do
                 if ball:checkHit(explodedBall) then
                     score = score + 100*level
-                    nrExpandedBalls = nrExpandedBalls + 1
+                    nrExpendedBalls = nrExpendedBalls + 1
                     table.insert(explodedBalls, ball)
                     table.remove(balls, i)
                     break
@@ -280,7 +280,7 @@ function start_round(level, goal, nrBalls, total)
         rb.lcd_clear_display()
 
         set_foreground(DEFAULT_FOREGROUND_COLOR)
-        draw_positioned_string(0, 0, string.format("%d balls expanded", nrExpandedBalls))
+        draw_positioned_string(0, 0, string.format("%d balls expended", nrExpendedBalls))
         draw_positioned_string(0, 1, string.format("Level %d", level))
         draw_positioned_string(1, 1, string.format("%d level points", score))
         draw_positioned_string(1, 0, string.format("%d total points", total+score))
@@ -309,7 +309,7 @@ function start_round(level, goal, nrBalls, total)
         end
     end
 
-    return exit, score, nrExpandedBalls
+    return exit, score, nrExpendedBalls
 end
 
 -- Helper function to display a message
@@ -361,11 +361,11 @@ while levels[idx] ~= nil do
 
     display_message(rb.HZ*2, "Level %d: get %d out of %d balls", idx, goal, nrBalls)
 
-    local exit, score, nrExpandedBalls = start_round(idx, goal, nrBalls, highscore)
+    local exit, score, nrExpendedBalls = start_round(idx, goal, nrBalls, highscore)
     if exit then
         break -- Exiting..
     else
-        if nrExpandedBalls >= goal then
+        if nrExpendedBalls >= goal then
             display_message(rb.HZ*2, "You won!")
             idx = idx + 1
             highscore = highscore + score
