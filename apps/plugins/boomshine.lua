@@ -63,7 +63,7 @@ function Ball:new(o)
                 color = random_color(),
                 up_speed = Ball:generateSpeed(),
                 right_speed = Ball:generateSpeed(),
-                explosion_size = math.random(2*self.size, 4*self.size),
+                explosion_size = math.random(2*self.size, 4*self.size) * 4/3,
                 life_duration = math.random(rb.HZ, rb.HZ*5)
             }
     end
@@ -82,14 +82,48 @@ function Ball:generateSpeed()
     return speed
 end
 
+function drawCircle(x0, y0, radius)
+  x = radius
+  y = 0
+  radiusError = 1 - x
+  step = 0
+  lastx = x
+  lasty = y
+
+  while x >= y do
+    y = y + 1
+    if (lastx ~= x) then
+      rb.lcd_fillrect(x0 + lastx - 1, y0 - (y - 1), 1, 2 * (y - 1))
+      rb.lcd_fillrect(x0 - lastx, y0 - (y - 1), 1, 2 * (y - 1))
+      if (step == 0) then
+        rb.lcd_fillrect(x0 - (y - 1), y0 - lastx, 2 * (y - 1), 2 * lastx)
+      else
+        rb.lcd_fillrect(x0 - (y - 1), y0 - lastx, (y - lasty), 2 * lastx)
+        rb.lcd_fillrect(x0 + (y - 1) - (y - lasty), y0 - lastx, (y - lasty), 2 * lastx)
+      end
+      step = step + 1
+      lasty = y
+      lastx = x
+    end
+    if radiusError < 0 then
+      radiusError = radiusError + 2 * y + 1
+    else
+      x = x - 1
+      radiusError = radiusError + (y - x) + 1
+    end
+  end
+
+  rb.lcd_fillrect(x0 - lastx, y0 - lasty, 1, 2 * lasty)
+  rb.lcd_fillrect(x0 + lastx - 1, y0 - lasty, 1, 2 * lasty)
+end
+
 function Ball:draw()
-    --[[
-         I know these aren't circles, but as there's no current circle
-         implementation in Rockbox, rectangles will just do fine (drawing
-         circles from within Lua is far too slow).
-    ]]--
     set_foreground(self.color)
-    rb.lcd_fillrect(self.x, self.y, self.size, self.size)
+
+    xm = math.floor(self.x + self.size / 2)
+    ym = math.floor(self.y + self.size / 2)
+
+    drawCircle(xm, ym, math.ceil(self.size / 2))
 end
 
 function Ball:step()
@@ -119,8 +153,12 @@ function Ball:step()
 end
 
 function Ball:checkHit(other)
-    if (other.x + other.size >= self.x) and (self.x + self.size >= other.x) and
-       (other.y + other.size >= self.y) and (self.y + self.size >= other.y) then
+    dx = (other.x + other.size / 2) - (self.x + self.size / 2)
+    dy = (other.y + other.size / 2) - (self.y + self.size / 2)
+    ds = (other.size / 2 + self.size / 2)
+    if dx*dx + dy*dy   -- Distance between centers, squared
+       <=
+       ds * ds then    -- Sizes, squared
         assert(not self.exploded)
         self.exploded = true
         self.death_time = rb.current_tick() + self.life_duration
@@ -240,8 +278,8 @@ function start_round(level, goal, nrBalls, total)
         end
         if not player_added and cursor:do_action(action) then
             local player = Ball:new({
-                                x = cursor.x,
-                                y = cursor.y,
+                                x = cursor.x - 5,
+                                y = cursor.y - 5,
                                 color = DEFAULT_FOREGROUND_COLOR,
                                 size = 10,
                                 explosion_size = 3*DEFAULT_BALL_SIZE,
