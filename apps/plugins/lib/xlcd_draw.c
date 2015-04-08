@@ -170,6 +170,106 @@ void xlcd_filltriangle_screen(struct screen* display,
         xlcd_filltriangle_vertical(display, x1, y1, x2, y2, x3, y3);
 }
 
+static void xlcd_fillcircle_horizontal(struct screen* display,
+                                       int cx, int cy, int radius)
+{
+    int d = 3 - (radius * 2);
+    int x = 0;
+    int y = radius;
+    while(x <= y)
+    {
+        display->hline(cx - x, cx + x, cy + y);
+        display->hline(cx - x, cx + x, cy - y);
+        display->hline(cx - y, cx + y, cy + x);
+        display->hline(cx - y, cx + y, cy - x);
+        if(d < 0)
+        {
+            d += (x * 4) + 6;
+        }
+        else
+        {
+            d += ((x - y) * 4) + 10;
+            --y;
+        }
+        ++x;
+    }
+}
+
+static void xlcd_fillcircle_vertical(struct screen* display,
+                                     int cx, int cy, int radius)
+{
+    int d = 3 - (radius * 2);
+    int x = 0;
+    int y = radius;
+    while(x <= y)
+    {
+        display->vline(cx + x, cy + y, cy - y);
+        display->vline(cx - x, cy + y, cy - y);
+        display->vline(cy + x, cx + y, cx - y);
+        display->vline(cy - x, cx + y, cx - y);
+        if(d < 0)
+        {
+            d += (x * 4) + 6;
+        }
+        else
+        {
+            d += ((x - y) * 4) + 10;
+            --y;
+        }
+        ++x;
+    }
+}
+
+void xlcd_fillcircle_screen(struct screen* display,
+                            int cx, int cy, int radius)
+{
+    if(display->pixel_format == HORIZONTAL_PACKING || display->depth >= 8)
+        xlcd_fillcircle_horizontal(display, cx, cy, radius);
+    else
+        xlcd_fillcircle_vertical(display, cx, cy, radius);
+}
+
+void xlcd_fillcircle(int cx, int cy, int radius)
+{
+    xlcd_fillcircle_screen(rb->screens[SCREEN_MAIN], cx, cy, radius);
+}
+
+void xlcd_drawcircle_screen(struct screen* display,
+                                   int cx, int cy, int radius)
+{
+    int d = 3 - (radius * 2);
+    int x = 0;
+    int y = radius;
+    while(x <= y)
+    {
+        display->drawpixel(cx + x, cy + y);
+        display->drawpixel(cx - x, cy + y);
+        display->drawpixel(cx + x, cy - y);
+        display->drawpixel(cx - x, cy - y);
+        display->drawpixel(cx + y, cy + x);
+        display->drawpixel(cx - y, cy + x);
+        display->drawpixel(cx + y, cy - x);
+        display->drawpixel(cx - y, cy - x);
+        if(d < 0)
+        {
+            d += (x * 4) + 6;
+        }
+        else
+        {
+            d += ((x - y) * 4) + 10;
+            --y;
+        }
+        ++x;
+    }
+}
+
+void xlcd_drawcircle(int cx, int cy, int radius)
+{
+    /* default is main screen */
+    xlcd_drawcircle_screen(rb->screens[SCREEN_MAIN], cx, cy, radius);
+}
+
+
 #if LCD_DEPTH >= 8 && LCD_DEPTH <= 16
 
 #ifdef HAVE_LCD_COLOR
