@@ -87,19 +87,34 @@ function drawCircle(x0, y0, radius)
   y = 0
   radiusError = 1 - x
   step = 0
+  lastx = x
+  lasty = y
 
   while x >= y do
     y = y + 1
+    if (lastx ~= x) then
+      rb.lcd_fillrect(x0 + lastx - 1, y0 - (y - 1), 1, 2 * (y - 1))
+      rb.lcd_fillrect(x0 - lastx, y0 - (y - 1), 1, 2 * (y - 1))
+      if (step == 0) then
+        rb.lcd_fillrect(x0 - (y - 1), y0 - lastx, 2 * (y - 1), 2 * lastx)
+      else
+        rb.lcd_fillrect(x0 - (y - 1), y0 - lastx, (y - lasty), 2 * lastx)
+        rb.lcd_fillrect(x0 + (y - 1) - (y - lasty), y0 - lastx, (y - lasty), 2 * lastx)
+      end
+      step = step + 1
+      lasty = y
+      lastx = x
+    end
     if radiusError < 0 then
       radiusError = radiusError + 2 * y + 1
     else
-      rb.lcd_fillrect(x0 - x, y0 - y, 1, 2 * y)
-      rb.lcd_fillrect(x0 + x, y0 - y, 1, 2 * y)
-      rb.lcd_fillrect(x0 - y, y0 - x, 2 * y, 2 * x)
       x = x - 1
       radiusError = radiusError + (y - x) + 1
     end
   end
+
+  rb.lcd_fillrect(x0 - lastx, y0 - lasty, 1, 2 * lasty)
+  rb.lcd_fillrect(x0 + lastx - 1, y0 - lasty, 1, 2 * lasty)
 end
 
 function Ball:draw()
