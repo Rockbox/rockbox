@@ -263,8 +263,8 @@ function start_round(level, goal, nrBalls, total)
         end
         if not player_added and cursor:do_action(action) then
             local player = Ball:new({
-                                x = cursor.x,
-                                y = cursor.y,
+                                x = cursor.x - 5,
+                                y = cursor.y - 5,
                                 color = DEFAULT_FOREGROUND_COLOR,
                                 size = 10,
                                 explosion_size = 3*DEFAULT_BALL_SIZE,
