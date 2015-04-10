@@ -625,7 +625,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
 {
     int action = *actionptr;
 #ifdef HAVE_LCD_BITMAP
-    static bool scrolling_left = false;
+    static bool scrolling_left = true;
 #endif
 
 #ifdef HAVE_WHEEL_ACCELERATION
@@ -735,7 +735,9 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
             to skip to root. ACTION_TREE_ROOT_INIT must be defined in the
             keymaps as a repeated button press (the same as the repeated
             ACTION_TREE_PGLEFT) with the pre condition being the non-repeated
-            button press */
+            button press. Leave out ACTION_TREE_ROOT_INIT in your keymaps to
+            disable cancel action by PGLEFT key (e.g. if PGLEFT and CANCEL
+            are mapped to different keys) */
             if (lists->offset_position[0] == 0)
             {
                 scrolling_left = false;
