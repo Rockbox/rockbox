@@ -807,6 +807,7 @@ static int chopGameLoop(void)
 {
     int move_button, ret;
     bool exit=false;
+    bool showsplash=true;
     int end, i=0, bdelay=0, last_button=BUTTON_NONE;
 
     if (chopUpdateTerrainRecycling(&mGround) == 1)
@@ -816,8 +817,6 @@ static int chopGameLoop(void)
     ret = chopMenu(0);
     if (ret != -1)
         return PLUGIN_OK;
-
-    chopDrawScene();
 
     while (!exit) {
 
@@ -853,12 +852,18 @@ static int chopGameLoop(void)
         if(iCurrLevelMode == LEVEL_MODE_NORMAL)
             chopGenerateBlockIfNeeded();
 
+        if (showsplash) {
+            chopDrawScene();
+            rb->splash(HZ, "Get Ready!");
+            showsplash = false;
+        }
 
         move_button=rb->button_status();
         if (rb->button_get(false) == QUIT) {
             ret = chopMenu(1);
             if (ret != -1)
                 return PLUGIN_OK;
+            showsplash = true;
             bdelay = 0;
             last_button = BUTTON_NONE;
             move_button = BUTTON_NONE;
@@ -923,6 +928,7 @@ static int chopGameLoop(void)
            ret = chopMenu(0);
            if (ret != -1)
                return ret;
+           showsplash = true;
         }
 
         for (i=0; i < NUMBER_OF_BLOCKS; i++)
@@ -933,6 +939,7 @@ static int chopGameLoop(void)
                     ret = chopMenu(0);
                     if (ret != -1)
                         return ret;
+                    showsplash = true;
                 }
 
         if (TIME_BEFORE(*rb->current_tick, end))
