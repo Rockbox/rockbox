@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a1531f4_f798fa6c",
+        "filename": "apps/plugins/2048.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1000004
+      },
+      "writtenOn": "2015-04-19T11:18:23Z",
+      "side": 1,
+      "message": "This can crash (and did for me in the simulator), due to divide by zero.",
+      "revId": "77de25accfbb5076dc8644ed81cb799f33fa34bd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
