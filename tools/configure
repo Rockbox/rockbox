@@ -4249,10 +4249,10 @@ if [ -z "$arch" ]; then
     elif [ -n "$(echo $cpp_defines | grep -w __arm__)" ]; then
         arch="arm"
         # cpp defines like "#define __ARM_ARCH_4TE__ 1" (where we want to extract the 4)
-        arch_version="$(echo $cpp_defines | tr ' ' '\012' | grep __ARM_ARCH | sed -e 's,.*\([0-9]\).*,\1,')"
+        arch_version="$(echo $cpp_defines | tr ' ' '\012' | grep __ARM_ARCH | sed -e 's,.*\([0-9]\).*,\1,' | grep -v __ARM_ARCH)"
     elif [ -n "$(echo $cpp_defines | grep -w __mips__)" ]; then
         arch="mips"
-        arch_version="$(echo $cpp_defines | tr ' ' '\012' | grep _MIPS_ARCH_MIPS | sed -e 's,.*\([0-9][0-9]\).*,\1,')"
+        arch_version="$(echo $cpp_defines | tr ' ' '\012' | grep _MIPS_ARCH_MIPS | sed -e 's,.*\([0-9][0-9]\).*,\1,' | grep -v _MIPS_ARCH_MIPS)"
     elif [ -n "$(echo $cpp_defines | grep -w __i386__)" ]; then
         arch="x86"
     elif [ -n "$(echo $cpp_defines | grep -w __x86_64__)" ]; then
