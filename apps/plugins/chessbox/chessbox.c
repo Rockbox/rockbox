@@ -432,6 +432,11 @@ static struct cb_command cb_get_viewer_command (void) {
                 result.type = COMMAND_QUIT;
                 return result;
 #endif
+#ifdef CB_RESTART
+            case CB_RESTART:
+                result.type = COMMAND_RESTART;
+                return result;
+#endif
             case CB_MENU:
                 result.type = cb_menu_viewer();
                 return result;
@@ -575,6 +580,7 @@ static void cb_start_viewer(char* filename){
                         GNUChess_Initialize();
                         cb_drawboard();
                         curr_ply = selected_game->first_ply;
+                        break;
                     case COMMAND_SELECT:
                         exit_game = true;
                         break;
@@ -659,6 +665,11 @@ static struct cb_command cb_getcommand (void) {
                 result.type = COMMAND_QUIT;
                 return result;
 #endif
+#ifdef CB_RESTART
+            case CB_RESTART:
+                result.type = COMMAND_RESTART;
+                return result;
+#endif
             case CB_MENU:
                 result.type = cb_menu();
                 return result;
@@ -673,6 +684,9 @@ static struct cb_command cb_getcommand (void) {
                 result.type = COMMAND_PLAY;
                 return result;
             case CB_UP:
+#ifdef CB_SCROLL_UP
+            case CB_SCROLL_UP:
+#endif
                 if ( !from_marked ) cb_switch ( x , y );
                 y++;
                 if ( y == 8 ) {
@@ -688,6 +702,9 @@ static struct cb_command cb_getcommand (void) {
                 }
                 break;
             case CB_DOWN:
+#ifdef CB_SCROLL_DOWN
+            case CB_SCROLL_DOWN:
+#endif
                 if ( !from_marked ) cb_switch ( x , y );
                 y--;
                 if ( y < 0 ) {
@@ -703,6 +720,9 @@ static struct cb_command cb_getcommand (void) {
                 }
                 break;
             case CB_LEFT:
+#ifdef CB_SCROLL_LEFT
+            case CB_SCROLL_LEFT:
+#endif
                 if ( !from_marked ) cb_switch ( x , y );
                 x--;
                 if ( x < 0 ) {
@@ -718,6 +738,9 @@ static struct cb_command cb_getcommand (void) {
                 }
                 break;
             case CB_RIGHT:
+#ifdef CB_SCROLL_RIGHT
+            case CB_SCROLL_RIGHT:
+#endif
                 if ( !from_marked ) cb_switch ( x , y );
                 x++;
                 if ( x == 8 ) {
@@ -842,13 +865,11 @@ static void cb_play_game(void) {
                     cb_drawboard();
                 }
                 break;
-#ifdef COMMAND_RESTART
             case COMMAND_RESTART:
                 GNUChess_Initialize();
                 game = pgn_init_game();
                 cb_drawboard();
                 break;
-#endif
             case COMMAND_RESUME:
                 cb_drawboard();
                 break;
