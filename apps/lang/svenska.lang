@@ -212,10 +212,10 @@
     *: "Failed"
   </source>
   <dest>
-    *: "misslyckades"
+    *: "Misslyckades"
   </dest>
   <voice>
-    *: "misslyckades"
+    *: "Misslyckades"
   </voice>
 </phrase>
 <phrase>
@@ -499,7 +499,7 @@
     *: ", Shuffle"
   </source>
   <dest>
-    *: ", blanda"
+    *: ", Blanda"
   </dest>
   <voice>
     *: ""
@@ -527,10 +527,10 @@
     *: "Bookmark Actions"
   </source>
   <dest>
-    *: "Bokmärke"
+    *: "Bokmärkes åtgärder"
   </dest>
   <voice>
-    *: "Bokmärke"
+    *: "Bokmärkes åtgärder"
   </voice>
 </phrase>
 <phrase>
@@ -597,10 +597,10 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Kan inte skapa bokmärke"
+    *: "Kan inte skapa bokmärke!"
   </dest>
   <voice>
-    *: "Kan inte skapa bokmärke"
+    *: "Kan inte skapa bokmärke!"
   </voice>
 </phrase>
 <phrase>
@@ -611,10 +611,10 @@
     *: "Bookmark Empty"
   </source>
   <dest>
-    *: "Inga bokmärken"
+    *: "Tomt bokmärke"
   </dest>
   <voice>
-    *: "Inga bokmärken"
+    *: "Tomt bokmärke"
   </voice>
 </phrase>
 <phrase>
@@ -625,10 +625,10 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "Ljud"
+    *: "Ljudinställningar"
   </dest>
   <voice>
-    *: "Ljud"
+    *: "Ljudinställningar"
   </voice>
 </phrase>
 <phrase>
