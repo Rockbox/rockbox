@@ -37,12 +37,20 @@
 #if CONFIG_TUNER
 bool tuner_power(bool status)
 {
+#if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
     GPIO_SET_BITWISE(GPIOL_ENABLE, 0x04);
     GPIO_SET_BITWISE(GPIOL_OUTPUT_EN, 0x04);
     if (status)
         GPIO_CLEAR_BITWISE(GPIOL_OUTPUT_VAL, 0x04);
     else
         GPIO_SET_BITWISE(GPIOL_OUTPUT_VAL, 0x04);
+#else
+    GPO32_ENABLE |= 0x04;
+    if (status)
+        GPO32_VAL &= ~0x04;
+    else
+        GPO32_VAL |= 0x04;
+#endif
     return status;
 }
 #endif
