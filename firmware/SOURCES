@@ -1836,6 +1836,7 @@ target/arm/samsung/yh820/backlight-yh820.c
 target/arm/samsung/yh820/lcd-yh820.c
 target/arm/samsung/yh820/lcd-as-yh820.S
 target/arm/samsung/yh820/powermgmt-yh820.c
+target/arm/samsung/yh820/fmradio-yh820.c
 #endif /* SAMSUNG_YH820 */
 
 #ifdef SAMSUNG_YH920

@@ -11,7 +11,7 @@
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
-#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN )
+#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN | SRC_CAP_FMRADIO)
 
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_48 | SAMPR_CAP_44 | SAMPR_CAP_32 | \
@@ -132,6 +132,12 @@
 
 /* AK4537 has no tone controls, so we use the software ones */
 #define HAVE_SW_TONE_CONTROLS
+
+/* FM Tuner */
+#define CONFIG_TUNER      TEA5767
+#define CONFIG_TUNER_XTAL 32768
+/* Define this if the tuner uses 3-wire bus instead of classic i2c */
+#define CONFIG_TUNER_3WIRE
 
 #define AB_REPEAT_ENABLE
 
