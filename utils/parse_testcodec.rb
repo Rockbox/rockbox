@@ -65,6 +65,8 @@ private
                 self.codec = "Speex"
             when /pegase_l1.+/
                 self.codec = "MP1"
+            when /opus.+/
+                self.codec = "Opus"
             else
                 self.codec = "CODEC UNKNOWN (#{name})"
         end
