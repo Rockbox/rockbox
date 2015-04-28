@@ -96,7 +96,7 @@ typedef struct
 typedef struct
 {
     int      bitpos;   /* current bitpos for writing */
-    uint32_t bbuf[263];
+    uint32_t bbuf[362];
 } bf_data;
 
 struct huffcodetab
@@ -129,7 +129,7 @@ static int       mdct_freq   [576]          IBSS_ATTR; /* 2304 Bytes */
 static char      mdct_sign   [576]          IBSS_ATTR; /*  576 Bytes */
 static short     enc_data    [576]          IBSS_ATTR; /* 1152 Bytes */
 static uint32_t  scalefac    [22]           IBSS_ATTR; /*   88 Bytes */
-static bf_data   coded_data                 IBSS_ATTR; /* 1056 Bytes */
+static bf_data   coded_data                 IBSS_ATTR; /* 1448 Bytes */
 static uint8_t   band_scale_f[22]           IBSS_ATTR; /*   22 Bytes */
 
 #ifdef MP3_ENC_COP
