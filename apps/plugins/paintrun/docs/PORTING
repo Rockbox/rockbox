@@ -1,0 +1,4 @@
+Porting Guide
+=============
+
+The game relies on an abstraction layer to perform platform-specific tasks.
