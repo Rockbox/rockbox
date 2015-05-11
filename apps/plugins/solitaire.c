@@ -452,23 +452,40 @@
 CONFIG_KEYPAD == MROBE500_PAD
 #   define SOL_QUIT          BUTTON_POWER
 
-#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
-      (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
-#   define SOL_QUIT          BUTTON_REC
+#elif CONFIG_KEYPAD == SAMSUNG_YH820_PAD
+#   define SOL_QUIT          BUTTON_REW
 #   define SOL_UP            BUTTON_UP
 #   define SOL_DOWN          BUTTON_DOWN
 #   define SOL_LEFT          BUTTON_LEFT
 #   define SOL_RIGHT         BUTTON_RIGHT
 #   define SOL_MOVE          BUTTON_PLAY
 #   define SOL_DRAW          BUTTON_FFWD
-#   define SOL_REM2CUR       (BUTTON_FFWD | BUTTON_LEFT)
-#   define SOL_CUR2STACK     BUTTON_REW
-#   define SOL_REM2STACK     (BUTTON_REW | BUTTON_LEFT)
+#   define SOL_REM2CUR       (BUTTON_REC | BUTTON_DOWN)
+#   define SOL_CUR2STACK     (BUTTON_REC | BUTTON_UP)
+#   define SOL_REM2STACK     (BUTTON_REC | BUTTON_RIGHT)
 #   define HK_MOVE           "PLAY"
-#   define HK_DRAW           "REW.."
-#   define HK_REM2CUR        "FFWD"
-#   define HK_CUR2STACK      "REW"
-#   define HK_REM2STACK      "FFWD.."
+#   define HK_DRAW           "FFWD"
+#   define HK_REM2CUR        "REC+DOWN"
+#   define HK_CUR2STACK      "REC+UP"
+#   define HK_REM2STACK      "REC+RIGHT"
+
+#elif CONFIG_KEYPAD == SAMSUNG_YH920_PAD
+#   define SOL_QUIT          BUTTON_REW
+#   define SOL_UP            BUTTON_UP
+#   define SOL_DOWN          BUTTON_DOWN
+#   define SOL_LEFT          BUTTON_LEFT
+#   define SOL_RIGHT         BUTTON_RIGHT
+#   define SOL_MOVE_PRE      BUTTON_PLAY
+#   define SOL_MOVE          (BUTTON_PLAY | BUTTON_REL)
+#   define SOL_DRAW          BUTTON_FFWD
+#   define SOL_REM2CUR       (BUTTON_PLAY | BUTTON_DOWN)
+#   define SOL_CUR2STACK     (BUTTON_PLAY | BUTTON_UP)
+#   define SOL_REM2STACK     (BUTTON_PLAY | BUTTON_RIGHT)
+#   define HK_MOVE           "PLAY"
+#   define HK_DRAW           "FFWD"
+#   define HK_REM2CUR        "PLAY+DOWN"
+#   define HK_CUR2STACK      "PLAY+UP"
+#   define HK_REM2STACK      "PLAY+RIGHT"
 
 #elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
 #   define SOL_QUIT          BUTTON_REC
