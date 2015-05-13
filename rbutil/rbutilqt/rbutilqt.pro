@@ -95,7 +95,7 @@ RBLIBS = rbspeex ipodpatcher sansapatcher mkamsboot mktccboot \
 }
 win32-msvc* {
     INCLUDEPATH += msvc
-    LIBS += -L$$_PRO_FILE_/msvc
+    LIBS += -L$$_PRO_FILE_PWD_/msvc
     LIBS += -ladvapi32 # required for MSVC / Qt Creator combination
 }
 
