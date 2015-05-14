@@ -78,7 +78,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     LOG_INFO("compiled using gcc %i.%i.%i",
              __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 #elif defined(_MSC_VER)
-    LOG_INFO("compiled using MSVC %s", _MSC_FULL_VER);
+    LOG_INFO() << "compiled using MSVC" << _MSC_FULL_VER;
 #endif
     LOG_INFO() << "======================================";
 
