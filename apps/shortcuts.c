@@ -21,6 +21,7 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <dir.h>
 #include "config.h"
 #include "system.h"
 #include "powermgmt.h"
@@ -471,8 +472,74 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
 {
     (void)data;
     struct shortcut *sc = get_shortcut(selected_item);
-    if (sc && sc->talk_clip[0])
-        talk_file(NULL, NULL, sc->talk_clip, NULL, NULL, false);
+    if (sc)
+    {
+        if (sc->talk_clip[0])
+        {
+            talk_file(NULL, NULL, sc->talk_clip, NULL, NULL, false);
+        }
+        else
+        {
+            switch (sc->type)
+            {
+            case SHORTCUT_BROWSER:
+                {
+                    static char path[MAX_PATH];
+                    DIR* dir;
+                    struct dirent* entry;
+                    char* filename = strrchr(sc->u.path, PATH_SEPCH) + 1;
+                    if (*filename != '\0')
+                    {
+                        int dirlen = (filename - sc->u.path);
+                        strlcpy(path, sc->u.path, dirlen + 1);
+                        dir = opendir(path);
+                        if (dir)
+                        {
+                            while (0 != (entry = readdir(dir)))
+                            {
+                                if (!strcmp(entry->d_name, filename))
+                                {
+                                    struct dirinfo info = dir_get_info(dir, entry);
+                                    if (info.attribute & ATTR_DIRECTORY)
+                                        talk_dir_or_spell(sc->u.path, NULL, false);
+                                    else talk_file_or_spell(path, filename, NULL, false);
+                                    return 0;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        talk_dir_or_spell(sc->u.path, NULL, false);
+                        break;
+                    }
+                    talk_spell(sc->u.path, false);
+                }
+                break;
+            case SHORTCUT_FILE:
+            case SHORTCUT_PLAYLISTMENU:
+                talk_file_or_spell(NULL, sc->u.path, NULL, false);
+                break;
+            case SHORTCUT_SETTING:
+                talk_id(sc->u.setting->lang_id, false);
+                break;
+#if CONFIG_RTC
+            case SHORTCUT_TIME:
+                talk_id(LANG_TIME_MENU, false);
+                break;
+#endif
+            case SHORTCUT_SHUTDOWN:
+                if (!sc->name[0])
+                {
+                    talk_spell(type_strings[SHORTCUT_SHUTDOWN], false);
+                    break;
+                }
+            default:
+                talk_spell(sc->name[0] ? sc->name : sc->u.path, false);
+                break;
+            }
+        }
+    }
     return 0;
 }
 
