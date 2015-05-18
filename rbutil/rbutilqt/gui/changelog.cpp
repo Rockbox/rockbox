@@ -26,7 +26,7 @@ Changelog::Changelog(QWidget *parent) : QDialog(parent)
     ui.browserChangelog->setOpenExternalLinks(true);
     // FIXME: support translated changelog file (changelog.de.txt etc)
     ui.browserChangelog->setHtml(parseChangelogFile(":/docs/changelog.txt"));
-    ui.browserChangelog->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
+    ui.browserChangelog->moveCursor(QTextCursor::End, QTextCursor::MoveAnchor);
     ui.checkBoxShowAlways->setChecked(RbSettings::value(RbSettings::ShowChangelog).toBool());
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
 }
