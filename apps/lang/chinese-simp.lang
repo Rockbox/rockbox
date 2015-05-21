@@ -11200,11 +11200,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "阀值"
+    swcodec: "阈值"
   </dest>
   <voice>
     *: none
-    swcodec: "阀值"
+    swcodec: "阈值"
   </voice>
 </phrase>
 <phrase>
