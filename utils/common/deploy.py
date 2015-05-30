@@ -43,7 +43,6 @@ import getopt
 import time
 import hashlib
 import tempfile
-import string
 import gitscraper
 
 # modules that are not part of python itself.
@@ -537,12 +536,12 @@ def deploy():
         archivename = program + "-" + str(revision) + versionextra + "-src.tar.bz2"
         ver = str(revision)
         os.mkdir(sourcefolder)
+        print "Version: %s" % revision
     else:
         workfolder = "."
         sourcefolder = "."
         archivename = ""
     # check if project file explicitly given. If yes, don't get sources from svn
-    print "Version: %s" % revision
     if proj == "":
         proj = sourcefolder + project
         # get sources and pack source tarball
@@ -585,7 +584,7 @@ def deploy():
     else:
         # figure version from sources. Need to take path to project file into account.
         versionfile = re.subn('[\w\.]+$', "version.h", proj)[0]
-        ver = findversion(versionfile)
+        ver = findversion(versionfile) + "-dev"
     # append buildid if any.
     if buildid != None:
         ver += "-" + buildid
