@@ -127,13 +127,12 @@ def findversion(versionfile):
     h = open(versionfile, "r")
     c = h.read()
     h.close()
-    r = re.compile("#define +VERSION +\"(.[0-9\.a-z]+)\"")
-    m = re.search(r, c)
-    s = re.compile("\$Revision: +([0-9]+)")
-    n = re.search(s, c)
-    if n == None:
-        print "WARNING: Revision not found!"
-    return m.group(1)
+    version = dict()
+    for v in ['MAJOR', 'MINOR', 'MICRO']:
+        r = re.compile("#define +VERSION_" + v + " +([0-9a-z]+)")
+        m = re.search(r, c)
+        version[v] = m.group(1)
+    return "%s.%s.%s" % (version['MAJOR'], version['MINOR'], version['MICRO'])
 
 
 def findqt(cross=""):
