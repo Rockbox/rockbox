@@ -354,11 +354,7 @@ def zipball(programfiles, versionstring, buildfolder, platform=sys.platform):
     for root, dirs, files in os.walk(outfolder):
         for name in files:
             physname = os.path.normpath(os.path.join(root, name))
-            filename = string.replace(physname, os.path.normpath(buildfolder), "")
-            zf.write(physname, filename)
-        for name in dirs:
-            physname = os.path.normpath(os.path.join(root, name))
-            filename = string.replace(physname, os.path.normpath(buildfolder), "")
+            filename = os.path.relpath(physname, buildfolder)
             zf.write(physname, filename)
     zf.close()
     # remove output folder
