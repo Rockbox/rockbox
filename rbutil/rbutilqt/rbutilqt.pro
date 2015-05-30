@@ -111,11 +111,11 @@ win32:!cross {
 }
 lrelease.commands = $$LRELEASE -silent $$_PRO_FILE_
 QMAKE_EXTRA_TARGETS += lrelease
-exists(LRELEASE) {
+exists($$LRELEASE) {
     message("using lrelease at $$LRELEASE")
     PRE_TARGETDEPS += lrelease
 }
-!exists(LRELEASE) {
+!exists($$LRELEASE) {
     warning("could not find lrelease. Skipping translations.")
 }
 
