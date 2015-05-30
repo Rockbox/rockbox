@@ -105,14 +105,17 @@ tags.depends = $(SOURCES)
 QMAKE_EXTRA_TARGETS += tags
 
 # add a custom rule for making the translations
-LRELEASE = $$system(which $$[QT_INSTALL_BINS]/lrelease)
+LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+win32:!cross {
+    LRELEASE = $$[QT_INSTALL_BINS]/lrelease.exe
+}
 lrelease.commands = $$LRELEASE -silent $$_PRO_FILE_
 QMAKE_EXTRA_TARGETS += lrelease
-!isEmpty(LRELEASE) {
+exists(LRELEASE) {
     message("using lrelease at $$LRELEASE")
     PRE_TARGETDEPS += lrelease
 }
-isEmpty(LRELEASE) {
+!exists(LRELEASE) {
     warning("could not find lrelease. Skipping translations.")
 }
 
