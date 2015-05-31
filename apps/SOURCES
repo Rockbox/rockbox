@@ -23,7 +23,11 @@ menus/radio_menu.c
 #ifdef HAVE_WM8978
 menus/audiohw_eq_menu.c
 #endif
+#ifdef HAVE_TOUCHSCREEN
+menus/eq_menu-touchscreen.c
+#else
 menus/eq_menu.c
+#endif
 buffering.c
 voice_thread.c
 rbcodec_helpers.c
