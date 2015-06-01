@@ -137,6 +137,7 @@ void main(void)
     {
 #ifdef HAVE_BOOTLOADER_USB_MODE
         error(EDISK, ret, false);
+        usb_start_monitoring();
         usb_mode();
 #else
         error(EDISK, ret, true);
@@ -152,6 +153,7 @@ void main(void)
     {
 #ifdef HAVE_BOOTLOADER_USB_MODE
         error(EBOOTFILE, ret, false);
+        usb_start_monitoring();
         usb_mode();
 #else
         error(EBOOTFILE, ret, true);
