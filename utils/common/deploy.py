@@ -44,6 +44,7 @@ import time
 import hashlib
 import tempfile
 import gitscraper
+from datetime import datetime
 
 # modules that are not part of python itself.
 cpus = 1
@@ -584,7 +585,7 @@ def deploy():
     else:
         # figure version from sources. Need to take path to project file into account.
         versionfile = re.subn('[\w\.]+$', "version.h", proj)[0]
-        ver = findversion(versionfile) + "-dev"
+        ver = findversion(versionfile) + "-dev" + datetime.now().strftime('%Y%m%d%H%M%S')
     # append buildid if any.
     if buildid != None:
         ver += "-" + buildid
