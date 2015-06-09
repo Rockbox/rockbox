@@ -609,6 +609,23 @@ static int button_read(void)
 #endif /* HAVE_LCD_FLIP */
 
 #ifdef HAVE_TOUCHSCREEN
+#ifdef TOUCHSCREEN_DBS
+    /* Debounce touches */
+    int ts_status = (btn & BUTTON_TOUCHSCREEN);
+    static int ts_status_db = 0;
+    static int ts_db[TOUCHSCREEN_DBS];
+    int ts_cnt = 0;
+    for (int i = 0; i < TOUCHSCREEN_DBS; ++i)
+    {
+        ts_db[i] = (i + 1 < TOUCHSCREEN_DBS) ? ts_db[i + 1] : ts_status;
+        if (ts_db[i])
+            ++ts_cnt;
+    }
+    if ((ts_cnt == 0) || (ts_cnt == TOUCHSCREEN_DBS))
+        ts_status_db = ts_status;
+    ts_status = ts_status_db;
+    btn = (btn & ~BUTTON_TOUCHSCREEN) | ts_status;
+#endif
     if (btn & BUTTON_TOUCHSCREEN)
         last_touchscreen_touch = current_tick;
 #endif        

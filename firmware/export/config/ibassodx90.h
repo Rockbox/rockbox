@@ -71,6 +71,9 @@
 #define HAVE_BUTTON_DATA
 #define HAS_BUTTON_HOLD
 
+/* Touchscreen Debounce Intervals */
+#define TOUCHSCREEN_DBS 4
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
