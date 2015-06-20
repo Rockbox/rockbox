@@ -13,8 +13,10 @@ endif
 
 ifeq ($(OS),Windows_NT)
 mkdir = if not exist $(subst /,\,$(1)) mkdir $(subst /,\,$(1))
+rm = if exist $(subst /,\,$(1)) del /q /s $(subst /,\,$(1))
 else
 mkdir = mkdir -p $(1)
+rm = rm -rf $(1)
 endif
 
 SPEEXSRC = ../../lib/rbcodec/codecs/libspeex
@@ -100,6 +102,7 @@ $(TARGET_DIR)rbspeex.dll: $(OBJS) $(BUILD_DIR)/rbspeex.o
 
 $(TARGET_DIR)librbspeex.a: $(OBJS) $(BUILD_DIR)/rbspeex.o
 	@echo AR $(notdir $@)
+	$(SILENT)$(call rm,$@)
 	$(SILENT)$(CROSS)$(AR) rcs $@ $^
 
 librbspeex.a: $(TARGET_DIR)librbspeex.a
@@ -119,9 +122,9 @@ librbspeex.a: $(TARGET_DIR)librbspeex.a
 	$(SILENT)$(CROSS)$(CC) $(CFLAGS) $(ARCHFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(TARGET_DIR)librbspeex* ../rbspeexenc ../rbspeexdec
-	rm -f $(DEPS)
-	rm -rf build*
+	$(call rm,$(OBJS) $(TARGET_DIR)librbspeex* ../rbspeexenc ../rbspeexdec)
+	$(call rm,$(DEPS))
+	$(call rm,build*)
 
 $(BUILD_DIR):
 	@echo MKDIR $(BUILD_DIR)
