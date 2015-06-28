@@ -29,6 +29,9 @@
 #include <lua.hpp>
 #include <unistd.h>
 #include "soc_desc.hpp"
+extern "C" {
+#include "prompt.h"
+}
 
 #if LUA_VERSION_NUM < 502
 #warning You need at least lua 5.2
@@ -941,21 +944,8 @@ int main(int argc, char **argv)
             printf("error: %s\n", lua_tostring(g_lua, -1));
     }
 
-    // use readline to provide some history and completion
-    rl_bind_key('\t', rl_complete);
-    while(!g_exit)
-    {
-        char *input = readline("> ");
-        if(!input)
-            break;
-        add_history(input);
-        // evaluate string
-        if(luaL_dostring(g_lua, input))
-            printf("error: %s\n", lua_tostring(g_lua, -1));
-        // pop everything to start from a clean stack
-        lua_pop(g_lua, lua_gettop(g_lua));
-        free(input);
-    }
+    // start interactive shell
+    luap_enter(g_lua, &g_exit);
 
     Lerr:
     // display log if handled

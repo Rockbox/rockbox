@@ -22,6 +22,8 @@ function HWLIB.load_blob(filename, address)
     io.close(f)
 end
 
-function HWLIB.printf(s,...)
-    return io.write(s:format(...))
+function HWLIB.printf(...)
+   local function wrapper(...) io.write(string.format(...)) end
+   local status, result = pcall(wrapper, ...)
+   if not status then error(result, 2) end
 end

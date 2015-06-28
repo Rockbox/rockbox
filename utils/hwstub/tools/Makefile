@@ -26,7 +26,7 @@ $(REGTOOLS_LIB_DIR)/libsocdesc.a:
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-hwstub_shell: hwstub_shell.o $(LIBS)
+hwstub_shell: hwstub_shell.o prompt.o $(LIBS)
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 hwstub_load: hwstub_load.o $(LIBS)
