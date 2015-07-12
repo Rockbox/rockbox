@@ -631,9 +631,9 @@ static int keys(struct pong *p)
             return 2; /* Pause game */
 #endif
 
-        if(key & PONG_QUIT
+        if(key == PONG_QUIT
 #ifdef PONG_RC_QUIT
-           || key & PONG_RC_QUIT
+           || key == PONG_RC_QUIT
 #endif
         )
             return 0; /* exit game NOW */
@@ -719,13 +719,6 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* go go go */
     while(game > 0) {
-        if (game == 2) { /* Game Paused */
-            rb->splash(0, "PAUSED");
-            while(game == 2)
-                game = keys(&pong); /* short circuit */
-            rb->lcd_clear_display();
-        }
-
         if( pong.player[0].iscpu && pong.player[1].iscpu ) {
             if(blink_timer<blink_rate) {
                 ++blink_timer;
@@ -751,6 +744,13 @@ enum plugin_status plugin_start(const void* parameter)
         rb->lcd_update();
 
         game = keys(&pong); /* deal with keys */
+
+        if (game == 2) { /* Game Paused */
+            rb->splash(0, "PAUSED");
+            while(game == 2)
+                game = keys(&pong); /* short circuit */
+            rb->lcd_clear_display();
+        }
     }
 
     /* Turn on backlight timeout (revert to settings) */
