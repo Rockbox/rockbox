@@ -1432,6 +1432,10 @@ static void chip8_keyboard(void)
     case CHIP8_KEY9:                chip8_virtual_keys[9] = 1; break;
     case CHIP8_KEY9 | BUTTON_REL:   chip8_virtual_keys[9] = 0; break;
 #endif
+#ifdef CHIP8_KEYA
+    case CHIP8_KEYA:                chip8_virtual_keys[10] = 1; break;
+    case CHIP8_KEYA | BUTTON_REL:   chip8_virtual_keys[10] = 0; break;
+#endif
 
     default:
         if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
