@@ -320,13 +320,13 @@ enum plugin_status plugin_start(const void* parameter)
             continue;
         switch (button)
         {
-            case ACTION_STD_CONTEXT:
             case ACTION_STD_OK:
             {
                 changed |= toggle(cur_sel);
                 break;
             }
             case ACTION_STD_MENU:
+            case ACTION_STD_CONTEXT:
             {
                 switch(view)
                 {
@@ -338,7 +338,9 @@ enum plugin_status plugin_start(const void* parameter)
                                                   "Mark all items",
                                                   category_string,
                                                   "Revert to saved",
-                                                  "Show Playback Menu",);
+                                                  "Show Playback Menu",
+                                                  "Quit without saving",
+                                                  "Quit");
 
                         switch (rb->do_menu(&menu, NULL, NULL, false))
                         {
@@ -394,6 +396,20 @@ enum plugin_status plugin_start(const void* parameter)
                                 playback_control(NULL);
                                 break;
                             }
+                            case 6:
+                            {
+                                /* Quit without saving */
+                                exit = 1;
+                                break;
+                            }
+                            case 7:
+                            {
+                                /* Save and quit */
+                                if (changed)
+                                    save_changes();
+                                exit = 1;
+                                break;
+                            }
                             default:
                             {
                                 break;
@@ -409,7 +425,9 @@ enum plugin_status plugin_start(const void* parameter)
                                                   "Reset list",
                                                   category_string,
                                                   "Revert to saved",
-                                                  "Show Playback Menu",);
+                                                  "Show Playback Menu",
+                                                  "Quit without saving",
+                                                  "Quit");
 
                         switch (rb->do_menu(&menu, NULL, NULL, false))
                         {
@@ -452,6 +470,20 @@ enum plugin_status plugin_start(const void* parameter)
                             {
                                 /* playback menu */
                                 playback_control(NULL);
+                                break;
+                            }
+                            case 5:
+                            {
+                                /* Quit without saving */
+                                exit = 1;
+                                break;
+                            }
+                            case 6:
+                            {
+                                /* Save and quit */
+                                if (changed)
+                                    save_changes();
+                                exit = 1;
                                 break;
                             }
                             default:
