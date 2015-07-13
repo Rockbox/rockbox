@@ -2,4 +2,50 @@
 \subsection{Shopper}
 \label{ref:Shopperplugin}
 
-Shopper is a shopping list plugin which allows you to maintain reusable shopping lists.
+Shopper is a plugin which allows you to maintain reusable shopping lists.
+To create a list, use a text editor to write down a list of items (one per
+line; note that the line length should not exceed 40 characters) and save the
+file as \fname{<name>.shopper}. If you want to separate the items you can do
+so by creating categories, which are prepended with `\#'. To open a
+\fname{.shopper} file just ``play'' it from the file browser.
+
+\begin{example}
+    #groceries
+    bananas
+    cucumber
+    4 apples
+    6 apples
+    #dairy
+    milk
+    cheese
+\end{example}
+Note that it isn't possible to choose exact quantities, but you can create a
+number of entries with different quantities in the name of the item, such as
+for the apples in the above example.
+
+There are two modes, \emph{edit mode} and \emph{view mode}. The edit mode
+shows all the items, and it allows you to select which of the items you want
+to buy. When you have finished selecting the items, use the menu to go to the
+view mode, and you will see only the items you wish to buy. If you `select'
+an item in view mode then that item will be removed from the list.
+
+When you exit Shopper the last view is saved, including which items you have
+selected, so if you re-open the shopping list it will be as you left it. There
+are additional menu options for clearing the list, selecting all items, showing
+and hiding the categories, toggling the categories, and displaying the playback
+menu.
+
+\subsubsection{Shopper Keys}
+\begin{btnmap}
+    \ActionStdOk{}
+        \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdOk}
+     & Select or clear an item\\
+
+    \ActionStdMenu{} or \ActionStdContext{}
+      \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdMenu{} or \ActionRCStdContext}
+     & Show menu\\
+
+    \ActionStdCancel{}
+        \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdCancel}
+    & Exit\\
+\end{btnmap}
