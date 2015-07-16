@@ -688,14 +688,14 @@ static int ata_power_up(void)
         ata_dma = param ? true : false;
         dma_mode = param;
         PASS_RC(ata_set_feature(0x03, param), 3, 4);
+        if (ata_identify_data[82] & BIT(5))
+            PASS_RC(ata_set_feature(ata_bbt ? 0x82 : 0x02, 0), 3, 5);
+        if (ata_identify_data[82] & BIT(6)) PASS_RC(ata_set_feature(0xaa, 0), 3, 6);
         ATA_PIO_TIME = piotime;
         ATA_MDMA_TIME = mdmatime;
         ATA_UDMA_TIME = udmatime;
     }
     spinup_time = current_tick - spinup_start;
-    if (ata_identify_data[82] & BIT(5))
-        PASS_RC(ata_set_feature(ata_bbt ? 0x82 : 0x02, 0), 3, 5);
-    if (ata_identify_data[82] & BIT(6)) PASS_RC(ata_set_feature(0xaa, 0), 3, 6);
     if (ata_lba48)
         ata_total_sectors = ata_identify_data[100]
                             | (((uint64_t)ata_identify_data[101]) << 16)
@@ -1139,7 +1139,8 @@ int ata_bbt_reload(void)
             ata_virtual_sectors = ata_total_sectors;
         else if (!memcmp(buf, "emBIbbth", 8))
         {
-            if (ata_identify_data[82] & BIT(5)) PASS_RC(ata_set_feature(0x02, 0), 1, 1);
+            if (!ceata)
+                if (ata_identify_data[82] & BIT(5)) PASS_RC(ata_set_feature(0x02, 0), 1, 1);
             ata_virtual_sectors = (((uint64_t)buf[0x1fd]) << 32) | buf[0x1fc];
             uint32_t count = buf[0x1ff];
             if (count > ATA_BBT_PAGES / 64)
