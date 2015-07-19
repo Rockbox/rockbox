@@ -4129,6 +4129,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -4144,6 +4145,7 @@
     gigabeats: "BACK = Reverter"
     gogearsa9200: "LEFT = Reverter"
     vibe500: "C = Reverter"
+    samsungyh*: "REW = Reverter"
   </dest>
   <voice>
     *: none
@@ -4210,6 +4212,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -4217,6 +4220,7 @@
     iriverh100,iriverh120,iriverh300: "O Disco Está Cheio. Carregue STOP Para Continuar"
     iaudiom5,iaudiox5: "O Disco Está Cheio. Carregue POWER Para Continuar"
     sansae200*,sansac200*,vibe500: "O Disco Está Cheio. Carregue PREV Para Continuar"
+    samsungyh*: "O Disco Está Cheio. Carregue LEFT Para Continuar"
   </dest>
   <voice>
     *: none
@@ -7587,7 +7591,7 @@
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
@@ -7597,7 +7601,7 @@
     *: "PLAY = Sim"
     cowond2*: "MENU, ou canto superior direito = Sim"
     iriverh100,iriverh120,iriverh300: "NAVI = Sim"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECIONAR = Sim"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECIONAR = Sim"
     mrobe500: "PLAY, POWER, ou canto superior direito = Sim"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Sim"
@@ -7617,7 +7621,7 @@
     mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
@@ -7627,7 +7631,7 @@
     mrobe500: "HEART = Definir"
     iriverh100,iriverh120,iriverh300: "NAVI = Definir"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Definir"
-    gogearsa9200: "PLAY = Definir"
+    gogearsa9200,samsungyh*: "PLAY = Definir"
     vibe500: "OK = Definir"
     mpiohd300: "ENTER = Definir"
   </dest>
@@ -9675,7 +9679,7 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
     archosplayer: "Building DB %d found"
@@ -9684,7 +9688,7 @@
     *: "Construindo Base de Dados... %d encontrados (OFF para voltar)"
     iriverh100,iriverh120,iriverh300: "Construindo Base de Dados... %d encontrados (STOP para voltar)"
     ipod*: "Construindo Base de Dados... %d encontrado (PREV para voltar)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Construindo Base de Dados... %d encontrados (LEFT para voltar)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Construindo Base de Dados... %d encontrados (LEFT para voltar)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Construindo Base de Dados... %d encontrados (PREV para voltar)"
     gogearsa9200: "Construindo Base de Dados... %d encontrados (REW para voltar)"
     archosplayer: "Const. DB %d encontr."

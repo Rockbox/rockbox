@@ -256,7 +256,7 @@
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
@@ -265,7 +265,7 @@
     *: "PLAY = Tak"
     cowond2*: "MENU lub lewo-góra = Tak"
     iriverh100,iriverh120,iriverh300: "NAVI = Tak"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Tak"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Tak"
     mrobe500: "PLAY lub POWER = Tak"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Tak"
@@ -2239,7 +2239,7 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
     archosplayer: "Building DB %d found"
@@ -2248,7 +2248,7 @@
     *: "Budowanie biblioteki... %d znalezionych (OFF by wrócić)"
     iriverh100,iriverh120,iriverh300: "Budowanie biblioteki... %d znalezionych (STOP by wrócić)"
     ipod*: "Budowanie biblioteki... %d znalezionych (PREV by wrócić)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Budowanie biblioteki... %d znalezionych (LEFT by wrócić)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Budowanie biblioteki... %d znalezionych (LEFT by wrócić)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Budowanie biblioteki... %d znalezionych (PREV by wrócić)"
     gogearsa9200: "Budowanie biblioteki... %d znalezionych (REW by wrócić)"
     archosplayer: "Budowanie biblioteki %d znalezionych"
@@ -3955,7 +3955,7 @@
     mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
@@ -3965,13 +3965,13 @@
     mrobe500: "HEART = Ustaw"
     iriverh100,iriverh120,iriverh300: "NAVI = Ustaw"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Ustaw"
-    gogearsa9200:"PLAY = Ustaw"
+    gogearsa9200,samsungyh*:"PLAY = Ustaw"
     vibe500: "OK = Ustaw"
     mpiohd300: "ENTER = Ustaw"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: ""
+    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200,samsungyh*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3992,6 +3992,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -4007,6 +4008,7 @@
     gigabeats: "BACK = Przywróć"
     gogearsa9200: "LEFT = Przywróć"
     vibe500: "C = Przywróć"
+    samsungyh*: "REW = Przywróć"
   </dest>
   <voice>
     *: none
@@ -7991,6 +7993,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -7998,6 +8001,7 @@
     iriverh100,iriverh120,iriverh300: "Pamięć jest pełna. Wciśnij STOP żeby kontynuować."
     iaudiom5,iaudiox5: "Pamięć jest pełna. Wciśnij POWER żeby kontynuować."
     sansae200*,sansac200*,vibe500: "Pamięć jest pełna. Wciśnij PREV żeby kontynuować."
+    samsungyh*: "Pamięć jest pełna. Wciśnij LEFT żeby kontynuować."
   </dest>
   <voice>
     *: none

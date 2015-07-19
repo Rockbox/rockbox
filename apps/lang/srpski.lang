@@ -248,7 +248,7 @@
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
@@ -257,7 +257,7 @@
     *: "PLAY = Да"
     cowond2*: "MENU, или горе-десно = Да"
     iriverh100,iriverh120,iriverh300: "NAVI = Да"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Да"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Да"
     mrobe500: "PLAY, POWER, или горе-десно = Да"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Да"
@@ -2214,7 +2214,7 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
     archosplayer: "Building DB %d found"
@@ -2223,7 +2223,7 @@
     *: "Креирам базу података... %d пронађено (OFF за повратак)"
     iriverh100,iriverh120,iriverh300: "Креирам базу података... %d пронађено (STOP за повратак)"
     ipod*: "Креирам базу података... %d пронађено (PREV за повратак)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Креирам базу података... %d пронађено (LEFT за повратак)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Креирам базу података... %d пронађено (LEFT за повратак)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Креирам базу података... %d пронађено (PREV за повратак)"
     gogearsa9200: "Креирам базу података... %d пронађено (REW за повратак)"
     archosplayer: "Креирам БП %d пронађено"
@@ -3930,7 +3930,7 @@
     mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
@@ -3940,13 +3940,13 @@
     mrobe500: "HEART = Постави"
     iriverh100,iriverh120,iriverh300: "NAVI = Постави"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Постави"
-    gogearsa9200: "PLAY = Постави"
+    gogearsa9200,samsungyh*: "PLAY = Постави"
     vibe500: "OK = Постави"
     mpiohd300: "ENTER = Постави"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: ""
+    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200,samsungyh*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3967,6 +3967,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -3982,6 +3983,7 @@
     gigabeats: "BACK = Врати на старо"
     gogearsa9200: "LEFT = Врати на старо"
     vibe500: "CANCEL = Врати на старо"
+    samsungyh*: "REW = Врати на старо"
   </dest>
   <voice>
     *: none
@@ -7963,6 +7965,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -7970,6 +7973,7 @@
     iriverh100,iriverh120,iriverh300: "Диск је пун. Притисните STOP за наставак."
     iaudiom5,iaudiox5: "Диск је пун. Притисните POWER за наставак."
     sansae200*,sansac200*,vibe500: "Диск је пун. Притисните PREV за наставак."
+    samsungyh*: "Диск је пун. Притисните LEFT за наставак."
   </dest>
   <voice>
     *: none

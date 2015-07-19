@@ -553,7 +553,8 @@ static int scroll_bmp(struct image_info *info)
     static long ss_timeout = 0;
 
     int button;
-#if defined(IMGVIEW_ZOOM_PRE) || defined(IMGVIEW_MENU_PRE)
+#if defined(IMGVIEW_ZOOM_PRE) || defined(IMGVIEW_MENU_PRE) \
+    || defined(IMGVIEW_SLIDE_SHOW_PRE)
     int lastbutton = BUTTON_NONE;
 #endif
 
@@ -642,6 +643,13 @@ static int scroll_bmp(struct image_info *info)
 
 #ifdef IMGVIEW_SLIDE_SHOW
         case IMGVIEW_SLIDE_SHOW:
+#ifdef IMGVIEW_SLIDE_SHOW_PRE
+            if (lastbutton != IMGVIEW_SLIDE_SHOW_PRE)
+                break;
+#endif
+#ifdef IMGVIEW_SLIDE_SHOW2
+        case IMGVIEW_SLIDE_SHOW2:
+#endif
             iv_api.slideshow_enabled = !iv_api.slideshow_enabled;
             break;
 #endif
@@ -714,7 +722,7 @@ static int scroll_bmp(struct image_info *info)
             break;
 
         } /* switch */
-#if defined(IMGVIEW_ZOOM_PRE) || defined(IMGVIEW_MENU_PRE)
+#if defined(IMGVIEW_ZOOM_PRE) || defined(IMGVIEW_MENU_PRE) || defined(IMGVIEW_SLIDE_SHOW_PRE)
         if (button != BUTTON_NONE)
             lastbutton = button;
 #endif

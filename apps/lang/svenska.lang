@@ -254,7 +254,7 @@
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
@@ -263,7 +263,7 @@
     *: "SPELA = Ja"
     cowond2*: "MENY, eller överst-höger = Ja"
     iriverh100,iriverh120,iriverh300: "NAVI = Ja"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "VÄLJ = Ja"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "VÄLJ = Ja"
     mrobe500: "SPELA, PÅ/AV, eller överst-höger = Ja"
     archosplayer: "SPELA/STOPP"
     vibe500: "OK = Ja"
@@ -2237,7 +2237,7 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
     archosplayer: "Building DB %d found"
@@ -2246,7 +2246,7 @@
     *: "Skapar databas... %d hittade (AV = Återgå)"
     iriverh100,iriverh120,iriverh300: "Skapar databas... %d hittade (STOPP = Återgå)"
     ipod*: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Skapar databas... %d hittade (VÄNSTER = Återgå)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Skapar databas... %d hittade (VÄNSTER = Återgå)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Skapar databas... %d hittade (FÖREGÅENDE = Återgå)"
     gogearsa9200: "Skapar databas... %d hittade (REW = Återgå)"
     archosplayer: "Skapar DB %d hittade"
@@ -3953,7 +3953,7 @@
     mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
@@ -3963,13 +3963,13 @@
     mrobe500: "HJÄRTA = Ställ"
     iriverh100,iriverh120,iriverh300: "NAVI = Ställ"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "VÄLJ = Ställ"
-    gogearsa9200: "SPELA = Ställ"
+    gogearsa9200,samsungyh*: "SPELA = Ställ"
     vibe500: "OK = Ställ"
     mpiohd300: "ENTER = Ställ"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: ""
+    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200,samsungyh*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3990,6 +3990,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -4004,6 +4005,7 @@
     gigabeats: "BAKÅT = Avbryt"
     gogearsa9200: "VÄNSTER = Avbryt"
     vibe500: "C = Avbryt"
+    samsungyh*: "REW = Avbryt"
   </dest>
   <voice>
     *: none
@@ -7985,6 +7987,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -7992,6 +7995,7 @@
     iriverh100,iriverh120,iriverh300: "Disken är full. Tryck STOPP för att fortsätta."
     iaudiom5,iaudiox5: "Disken är full. Tryck PÅ/AV för att fortsätta."
     sansae200*,sansac200*,vibe500: "Disken är full. Tryck FÖREGÅENDE för att fortsätta."
+    samsungyh*: "Disken är full. Tryck LEFT för att fortsätta."
   </dest>
   <voice>
     *: none

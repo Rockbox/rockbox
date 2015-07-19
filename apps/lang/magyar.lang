@@ -248,7 +248,7 @@
     *: "PLAY = Yes"
     cowond2*: "MENU = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
   </source>
@@ -256,7 +256,7 @@
     *: "PLAY = Igen"
     cowond2*: "MENU = Igen"
     iriverh100,iriverh120,iriverh300: "NAVI = Igen"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Igen"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Igen"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Igen"
   </dest>
@@ -2214,7 +2214,7 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
   </source>
@@ -2222,7 +2222,7 @@
     *: "Készítem az adatbázist... %d-t találtam (OFF - vissza)"
     iriverh100,iriverh120,iriverh300: "Készítem az adatbázist... %d-t találtam (STOP - vissza)"
     ipod*: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Készítem az adatbázist... %d-t találtam (BAL - vissza)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Készítem az adatbázist... %d-t találtam (BAL - vissza)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
     gogearsa9200: "Készítem az adatbázist... %d-t találtam (REW - vissza)"
   </dest>
@@ -3927,7 +3927,7 @@
     mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
@@ -3937,7 +3937,7 @@
     mrobe500: "SZÍV = Beállít"
     iriverh100,iriverh120,iriverh300: "NAVI = Beállít"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Beállít"
-    gogearsa9200: "PLAY = Beállít"
+    gogearsa9200,samsungyh*: "PLAY = Beállít"
     vibe500: "OK = Beállít"
     mpiohd300: "ENTER = Beállít"
   </dest>
@@ -3963,6 +3963,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -3978,6 +3979,7 @@
     gigabeats: "VISSZA = mégsem"
     gogearsa9200: "BAL = mégsem"
     vibe500: "C = mégsem"
+    samsungyh*: "REW = mégsem"
   </dest>
   <voice>
     *: none
@@ -7957,6 +7959,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -7964,6 +7967,7 @@
     iriverh100,iriverh120,iriverh300: "A merevlemez tele van. Folytatáshoz nyomj STOP-ot."
     iaudiom5,iaudiox5: "A merevlemez tele van. Folytatáshoz nyomd meg a POWER gombot."
     sansae200*,sansac200*,vibe500: "A merevlemez tele van. Folytatáshoz nyomd meg a PREV gombot."
+    samsungyh*: "A merevlemez tele van. Folytatáshoz nyomd meg a LEFT gombot."
   </dest>
   <voice>
     *: none

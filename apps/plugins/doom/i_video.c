@@ -395,8 +395,19 @@ void I_ShutdownGraphics(void)
 #elif CONFIG_KEYPAD == ONDAVX777_PAD
 #define DOOMBUTTON_ESC     BUTTON_POWER
 
-#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
-      (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
+#elif CONFIG_KEYPAD == SAMSUNG_YH920_PAD
+#define DOOMBUTTON_UP      BUTTON_UP
+#define DOOMBUTTON_DOWN    BUTTON_DOWN
+#define DOOMBUTTON_LEFT    BUTTON_LEFT
+#define DOOMBUTTON_RIGHT   BUTTON_RIGHT
+#define DOOMBUTTON_SHOOT   BUTTON_PLAY
+#define DOOMBUTTON_OPEN    BUTTON_REW
+#define DOOMBUTTON_ESC     BUTTON_REC_SW_ON
+#define DOOMBUTTON_ESC2    BUTTON_REC_SW_OFF
+#define DOOMBUTTON_ENTER   BUTTON_PLAY
+#define DOOMBUTTON_WEAPON  BUTTON_FFWD
+
+#elif CONFIG_KEYPAD == SAMSUNG_YH820_PAD
 #define DOOMBUTTON_UP      BUTTON_UP
 #define DOOMBUTTON_DOWN    BUTTON_DOWN
 #define DOOMBUTTON_LEFT    BUTTON_LEFT
@@ -404,7 +415,7 @@ void I_ShutdownGraphics(void)
 #define DOOMBUTTON_SHOOT   BUTTON_PLAY
 #define DOOMBUTTON_OPEN    BUTTON_REW
 #define DOOMBUTTON_ESC     BUTTON_REC
-#define DOOMBUTTON_ENTER   BUTTON_FFWD
+#define DOOMBUTTON_ENTER   BUTTON_PLAY
 #define DOOMBUTTON_WEAPON  BUTTON_FFWD
 
 #elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
@@ -685,7 +696,11 @@ static inline void getkey()
          D_PostEvent(&event);
       }
 #ifdef DOOMBUTTON_ESC
-      if(released & DOOMBUTTON_ESC)
+      if(released & DOOMBUTTON_ESC
+#ifdef DOOMBUTTON_ESC2
+         || released & DOOMBUTTON_ESC2
+#endif
+        )
       {
          event.data1=KEY_ESCAPE;
          D_PostEvent(&event);
@@ -747,7 +762,11 @@ static inline void getkey()
          D_PostEvent(&event);
       }
 #ifdef DOOMBUTTON_ESC
-      if(pressed & DOOMBUTTON_ESC)
+      if(pressed & DOOMBUTTON_ESC
+#ifdef DOOMBUTTON_ESC2
+         || pressed & DOOMBUTTON_ESC2
+#endif
+        )
       {
          event.data1=KEY_ESCAPE;
          D_PostEvent(&event);

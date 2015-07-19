@@ -4458,6 +4458,7 @@
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -4471,6 +4472,7 @@
     mrobe100: "DISPLAY = 返回"
     gigabeats: "BACK = 返回"
     vibe500: "CANCEL = 返回"
+    samsungyh*: "REW = 返回"
   </dest>
   <voice>
     *: none
@@ -4482,6 +4484,7 @@
     gigabeatfx: ""
     mrobe100: ""
     gigabeats: ""
+    samsungyh*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4528,6 +4531,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -4535,6 +4539,7 @@
     iriverh100,iriverh120,iriverh300: "硬碟已滿, 按下 STOP 繼續."
     iaudiom5,iaudiox5: "硬碟已滿, 按下 POWER 繼續."
     sansae200*,sansac200*,vibe500: "硬碟已滿, 按下 PREV 繼續."
+    samsungyh*: "硬碟已滿, 按下 LEFT 繼續."
   </dest>
   <voice>
     *: none
@@ -7996,14 +8001,14 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "建立資料庫... 找到 %d 項 (OFF: 回上一畫面)"
     iriverh100,iriverh120,iriverh300: "建立資料庫... 找到 %d 項 (STOP: 回上一畫面)"
     ipod*: "建立資料庫... 找到 %d 項 (PREV: 回上一畫面)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "建立資料庫... 找到 %d 項 (LEFT: 回上一畫面)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "建立資料庫... 找到 %d 項 (LEFT: 回上一畫面)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "建立資料庫... 找到 %d 項 (PREV: 回上一畫面)"
   </dest>
   <voice>
@@ -8492,21 +8497,21 @@
   <source>
     *: "PLAY = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = 是"
     iriverh100,iriverh120,iriverh300: "NAVI = 是"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = 是"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = 是"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = 是"
   </dest>
   <voice>
     *: ""
     iriverh100,iriverh120,iriverh300: ""
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: ""
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: ""
     archosplayer: ""
   </voice>
 </phrase>
@@ -8518,7 +8523,8 @@
     *: none
     rtc: "ON = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100: "SELECT = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
@@ -8526,7 +8532,8 @@
     *: none
     rtc: "ON = 設定"
     iriverh100,iriverh120,iriverh300: "NAVI = 設定"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = 設定"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100: "SELECT = 設定"
+    gogearsa9200,samsungyh*: "PLAY = 設定"
     vibe500: "OK = 設定"
     mpiohd300: "ENTER = 設定"
   </dest>

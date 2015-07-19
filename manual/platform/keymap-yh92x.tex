@@ -7,7 +7,10 @@
 \newcommand{\ButtonDown}{\btnfnt{Down}}
 \newcommand{\ButtonRew}{\btnfnt{Rewind}}
 \newcommand{\ButtonFF}{\btnfnt{Forward}}
+% this is still needed for the QuickStart/Player's Controls section
 \newcommand{\ButtonRec}{\btnfnt{Rec}}
+\newcommand{\ButtonRecOn}{\btnfnt{\btnfnt{Rec}$\rightarrow$on}}
+\newcommand{\ButtonRecOff}{\btnfnt{\btnfnt{Rec}$\rightarrow$off}}
 \newcommand{\ButtonHold}{\btnfnt{Hold}}
 
 %Button actions, standard context
@@ -20,8 +23,8 @@
 \newcommand{\ActionStdMenu}{Long \ButtonLeft{}+Long \ButtonUp}
 \newcommand{\ActionStdContext}{Long \ButtonRight}
 \newcommand{\ActionStdQuickScreen}{Long \ButtonLeft{}+Long \ButtonDown}
-\newcommand{\ActionQuickScreenExit}{\ButtonPlay{} or \ButtonFF}
-\newcommand{\ActionStdRec}{Long \ButtonRec}
+\newcommand{\ActionQuickScreenExit}{\ButtonPlay{} or \ButtonRew}
+\newcommand{\ActionStdRec}{\ButtonRecOn}
 %a button without harmful side effects for USB charging
 \newcommand{\ActionStdUsbCharge}{\ButtonRew}
 
@@ -36,23 +39,23 @@
 \newcommand{\ActionWpsVolUp}{\ButtonUp}
 \newcommand{\ActionWpsBrowse}{\ButtonRight}
 \newcommand{\ActionWpsContext}{Long \ButtonRight}
-\newcommand{\ActionWpsHotkey}{\ButtonRec}
+\newcommand{\ActionWpsHotkey}{Long \ButtonRight{}+Long \ButtonDown}
 \newcommand{\ActionWpsPlaylist}{Long \ButtonLeft}
 \newcommand{\ActionWpsMenu}{\ButtonLeft}
 \newcommand{\ActionWpsQuickScreen}{Long \ButtonLeft{}+Long \ButtonDown}
-\newcommand{\ActionWpsAbSetBNextDir}{\ButtonPlay{} + \ButtonRight}
-\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonPlay{} + \ButtonLeft}
-\newcommand{\ActionWpsAbReset}{\ButtonPlay{} + \ButtonUp}
+\newcommand{\ActionWpsAbSetBNextDir}{\ButtonPlay{}+\ButtonRight}
+\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonPlay{}+\ButtonLeft}
+\newcommand{\ActionWpsAbReset}{\ButtonPlay{}+\ButtonUp{} or \ButtonPlay{}+\ButtonDown}
 
 %Button actions, tree context
 \newcommand{\ActionTreeWps}{\ButtonPlay}
 \newcommand{\ActionTreeStop}{Long \ButtonPlay}
 \newcommand{\ActionTreeEnter}{\ButtonRight}
 \newcommand{\ActionTreeParentDirectory}{\ButtonLeft}
-\newcommand{\ActionTreeHotkey}{\ButtonRec}
+\newcommand{\ActionTreeHotkey}{Long \ButtonRight{}+Long \ButtonDown}
 
 %Button actions, YesNo context
-\newcommand{\ActionYesNoAccept}{\ButtonRight}
+\newcommand{\ActionYesNoAccept}{\ButtonPlay}
 
 %Button actions, Setting context
 \newcommand{\ActionSettingInc}{\ButtonUp}
@@ -60,7 +63,7 @@
 
 %Button actions, Alarm screen
 \newcommand{\ActionAlarmSet}{\ButtonPlay}
-\newcommand{\ActionAlarmCancel}{Long \Buttonplay}
+\newcommand{\ActionAlarmCancel}{\ButtonRew}
 \newcommand{\ActionAlarmHoursDec}{\ButtonDown}
 \newcommand{\ActionAlarmHoursInc}{\ButtonUp}
 
@@ -68,14 +71,12 @@
 \newcommand{\ActionKbdLeft}{\ButtonLeft}
 \newcommand{\ActionKbdRight}{\ButtonRight}
 \newcommand{\ActionKbdSelect}{\ButtonPlay}
-\newcommand{\ActionKbdDone}{\ButtonFF}
-\newcommand{\ActionKbdAbort}{\ButtonFF{}+\ButtonRew{} or \ButtonRec}
+\newcommand{\ActionKbdDone}{Long \ButtonFF}
+\newcommand{\ActionKbdAbort}{Long \ButtonRew}
 \newcommand{\ActionKbdUp}{\ButtonUp}
 \newcommand{\ActionKbdDown}{\ButtonDown}
-\newcommand{\ActionKbdCursorLeft}{\ButtonFF{}+\ButtonLeft}
-\newcommand{\ActionKbdCursorRight}{\ButtonFF{}+\ButtonRight}
 \newcommand{\ActionKbdBackSpace}{\ButtonRew}
-\newcommand{\ActionKbdMorseInput}{Long \ButtonFF}
+\newcommand{\ActionKbdMorseInput}{\ButtonRecOn{} or \ButtonRecOff}
 \newcommand{\ActionKbdMorseSelect}{\ButtonPlay}
 
 %Button actions, Pitch Screen context
@@ -91,9 +92,9 @@
 
 %Button actions, Recording screen context
 \newcommand{\ActionRecNewfile}{\ButtonFF}
-\newcommand{\ActionRecMenu}{\ButtonRew}
+\newcommand{\ActionRecMenu}{Long \ButtonRew}
 \newcommand{\ActionRecPause}{\ButtonPlay}
-\newcommand{\ActionRecExit}{Long \ButtonRew{} or \ButtonRec}
+\newcommand{\ActionRecExit}{\ButtonRew{} or \ButtonRecOff}
 \newcommand{\ActionRecSettingsInc}{\ButtonRight}
 \newcommand{\ActionRecSettingsDec}{\ButtonLeft}
 \newcommand{\ActionRecPrev}{\ButtonUp}
@@ -124,6 +125,6 @@
 \newcommand{\PluginLeftRepeat}{Long \ButtonLeft}
 \newcommand{\PluginRightRepeat}{Long \ButtonRight}
 \newcommand{\PluginCancel}{\ButtonRew}
-\newcommand{\PluginExit}{\ButtonFF}
+\newcommand{\PluginExit}{Long \ButtonRew}
 \newcommand{\PluginSelect}{\ButtonPlay}
 \newcommand{\PluginSelectRepeat}{Long \ButtonPlay}

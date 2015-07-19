@@ -53,9 +53,9 @@ view a bigger file you may need to stop playback.}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
     \opt{IRIVER_H10_PAD}{\ButtonPlay}
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_FUZEPLUS_PAD}{\ButtonVolUp}
-    \opt{PBELL_VIBE500_PAD}{\ButtonRec+\ButtonUp}
+    \opt{PBELL_VIBE500_PAD,SAMSUNG_YH820_PAD}{\ButtonRec+\ButtonUp}
     \opt{MPIO_HD200_PAD,MPIO_HD300_PAD}{\ButtonPlay}
-    \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay+\ButtonUp}
+    \opt{SAMSUNG_YH92X_PAD}{\ButtonPlay+\ButtonUp}
     \opt{touchscreen}{\TouchTopRight}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Zoom in\\
@@ -67,9 +67,9 @@ view a bigger file you may need to stop playback.}
     \opt{IRIVER_H10_PAD}{Long \ButtonPlay}
     \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_FUZEPLUS_PAD}{\ButtonVolDown}
     \opt{MROBE100_PAD}{\ButtonPlay}
-    \opt{PBELL_VIBE500_PAD}{\ButtonRec+\ButtonDown}
+    \opt{PBELL_VIBE500_PAD,SAMSUNG_YH820_PAD}{\ButtonRec+\ButtonDown}
     \opt{MPIO_HD200_PAD,MPIO_HD300_PAD}{\ButtonRec}
-    \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay+\ButtonDown}
+    \opt{SAMSUNG_YH92X_PAD}{\ButtonPlay+\ButtonDown}
     \opt{touchscreen}{\TouchTopLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Zoom out\\
@@ -110,10 +110,13 @@ view a bigger file you may need to stop playback.}
     \opt{touchscreen}{\TouchBottomLeft}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Previous image in directory\\
-    \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD}{%currently only defined for the sansa pads
+    \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD%
+      ,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{%currently only defined for the sansa pads and samsung yh*
        \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}
        \opt{SANSA_CLIP_PAD}{\ButtonHome}
        \opt{SANSA_FUZEPLUS_PAD}{\ButtonPlay}
+       \opt{SAMSUNG_YH92X_PAD}{\ButtonRec\ switch}
+       \opt{SAMSUNG_YH820_PAD}{Long \ButtonPlay}
          \opt{HAVEREMOTEKEYMAP}{& }
         & Toggle slide show mode\\
     }
@@ -140,7 +143,7 @@ view a bigger file you may need to stop playback.}
         \opt{MPIO_HD200_PAD}{\ButtonRec + \ButtonPlay}
         \opt{MPIO_HD300_PAD}{Long \ButtonMenu}
         \opt{SANSA_FUZEPLUS_PAD}{\ButtonBack}
-        \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonRec}
+        \opt{SAMSUNG_YH820_PAD}{\ButtonRec+\ButtonPlay}
             \opt{HAVEREMOTEKEYMAP}{& }
         & Quit the viewer \\
     }

@@ -20,7 +20,7 @@
 \newcommand{\ActionStdMenu}{Long \ButtonLeft{}+Long \ButtonUp}
 \newcommand{\ActionStdContext}{Long \ButtonRight}
 \newcommand{\ActionStdQuickScreen}{Long \ButtonLeft{}+Long \ButtonDown}
-\newcommand{\ActionQuickScreenExit}{\ButtonPlay{} or \ButtonFF}
+\newcommand{\ActionQuickScreenExit}{\ButtonPlay{} or \ButtonRew}
 \newcommand{\ActionStdRec}{Long \ButtonRec}
 %a button without harmful side effects for USB charging
 \newcommand{\ActionStdUsbCharge}{\ButtonRew}
@@ -40,9 +40,9 @@
 \newcommand{\ActionWpsPlaylist}{Long \ButtonLeft}
 \newcommand{\ActionWpsMenu}{\ButtonLeft}
 \newcommand{\ActionWpsQuickScreen}{Long \ButtonLeft{}+Long \ButtonDown}
-\newcommand{\ActionWpsAbSetBNextDir}{\ButtonPlay{} + \ButtonRight}
-\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonPlay{} + \ButtonLeft}
-\newcommand{\ActionWpsAbReset}{\ButtonPlay{} + \ButtonUp}
+\newcommand{\ActionWpsAbSetBNextDir}{\ButtonRec{}+\ButtonFF}
+\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonRec{}+\ButtonRew}
+\newcommand{\ActionWpsAbReset}{\ButtonRec{}+\ButtonPlay}
 
 %Button actions, tree context
 \newcommand{\ActionTreeWps}{\ButtonPlay}
@@ -52,7 +52,7 @@
 \newcommand{\ActionTreeHotkey}{\ButtonRec}
 
 %Button actions, YesNo context
-\newcommand{\ActionYesNoAccept}{\ButtonRight}
+\newcommand{\ActionYesNoAccept}{\ButtonPlay}
 
 %Button actions, Setting context
 \newcommand{\ActionSettingInc}{\ButtonUp}
@@ -68,14 +68,14 @@
 \newcommand{\ActionKbdLeft}{\ButtonLeft}
 \newcommand{\ActionKbdRight}{\ButtonRight}
 \newcommand{\ActionKbdSelect}{\ButtonPlay}
-\newcommand{\ActionKbdDone}{\ButtonFF}
-\newcommand{\ActionKbdAbort}{\ButtonFF{}+\ButtonRew{} or \ButtonRec}
+\newcommand{\ActionKbdDone}{Long \ButtonFF}
+\newcommand{\ActionKbdAbort}{Long \ButtonRew}
 \newcommand{\ActionKbdUp}{\ButtonUp}
 \newcommand{\ActionKbdDown}{\ButtonDown}
-\newcommand{\ActionKbdCursorLeft}{\ButtonFF{}+\ButtonLeft}
-\newcommand{\ActionKbdCursorRight}{\ButtonFF{}+\ButtonRight}
-\newcommand{\ActionKbdBackSpace}{\ButtonRew}
-\newcommand{\ActionKbdMorseInput}{Long \ButtonFF}
+\newcommand{\ActionKbdCursorLeft}{\ButtonRec{}+\ButtonLeft}
+\newcommand{\ActionKbdCursorRight}{\ButtonRec{}+\ButtonRight}
+\newcommand{\ActionKbdBackSpace}{\ButtonRew{} or \ButtonRec{}+\ButtonRew}
+\newcommand{\ActionKbdMorseInput}{\ButtonRec{}+\ButtonFF}
 \newcommand{\ActionKbdMorseSelect}{\ButtonPlay}
 
 %Button actions, Pitch Screen context
@@ -91,9 +91,9 @@
 
 %Button actions, Recording screen context
 \newcommand{\ActionRecNewfile}{\ButtonFF}
-\newcommand{\ActionRecMenu}{\ButtonRew}
+\newcommand{\ActionRecMenu}{Long \ButtonRew}
 \newcommand{\ActionRecPause}{\ButtonPlay}
-\newcommand{\ActionRecExit}{Long \ButtonRew{} or \ButtonRec}
+\newcommand{\ActionRecExit}{\ButtonRew{} or \ButtonRec}
 \newcommand{\ActionRecSettingsInc}{\ButtonRight}
 \newcommand{\ActionRecSettingsDec}{\ButtonLeft}
 \newcommand{\ActionRecPrev}{\ButtonUp}

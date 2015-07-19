@@ -20,12 +20,15 @@
  ****************************************************************************/
 
 #include "system.h"
+#include "kernel.h"
 #include "button.h"
 #include "backlight.h"
 #if defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
+#include "powermgmt.h"
 #include "adc.h"
 
 static int int_btn = BUTTON_NONE;
+static unsigned int rec_switch;
 
 void button_init_device(void)
 {
@@ -44,6 +47,9 @@ void button_init_device(void)
     /* remote PLAY */
     GPIOD_ENABLE |= 0x02;
     GPIOD_OUTPUT_EN &= ~0x02;
+
+    /* current record switch state */
+    rec_switch = ~GPIOA_INPUT_VAL & 0x40;
 }
 
 /* Remote buttons */
@@ -117,7 +123,24 @@ int button_read_device(void)
         if (~GPIOA_INPUT_VAL & 0x08) btn |= BUTTON_DOWN;
         if (~GPIOA_INPUT_VAL & 0x02) btn |= BUTTON_FFWD;
         if (~GPIOA_INPUT_VAL & 0x80) btn |= BUTTON_REW;
+#if defined(SAMSUNG_YH820)
         if (~GPIOA_INPUT_VAL & 0x40) btn |= BUTTON_REC;
+#else
+        if ((~GPIOA_INPUT_VAL & 0x40) != rec_switch)
+        {
+            if (rec_switch) {
+                queue_post(&button_queue,BUTTON_REC_SW_OFF,0);
+                queue_post(&button_queue,BUTTON_REC_SW_OFF|BUTTON_REL,0);
+            }
+            else {
+                queue_post(&button_queue,BUTTON_REC_SW_ON,0);
+                queue_post(&button_queue,BUTTON_REC_SW_ON|BUTTON_REL,0);
+            }
+            rec_switch = ~GPIOA_INPUT_VAL & 0x40;
+            backlight_on();
+            reset_poweroff_timer();
+        }
+#endif
 #if defined(SAMSUNG_YH820)
         if ( GPIOB_INPUT_VAL & 0x80) btn |= BUTTON_PLAY;
 #elif defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)

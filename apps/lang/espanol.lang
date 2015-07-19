@@ -2896,6 +2896,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -2911,6 +2912,7 @@
     gigabeats: "ATRÁS = Cancelar"
     gogearsa9200: "IZQUIERDA = Cancelar"
     vibe500: "C = Cancelar"
+    samsungyh*: "REW = Cancelar"
   </dest>
   <voice>
     *: none
@@ -2960,6 +2962,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -2967,6 +2970,7 @@
     iriverh100,iriverh120,iriverh300: "Disco duro lleno. Pulse STOP para continuar"
     iaudiom5,iaudiox5: "Disco duro lleno. Pulse POWER para continuar"
     sansae200*,sansac200*,vibe500: "Disco duro lleno. Pulse PREV para continuar"
+    samsungyh*: "Disco duro lleno. Pulse LEFT para continuar"
   </dest>
   <voice>
     *: none
@@ -8466,7 +8470,7 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
     archosplayer: "Building DB %d found"
@@ -8475,7 +8479,7 @@
     *: "Construyendo base de datos... %d encontrados (OFF para volver)"
     iriverh100,iriverh120,iriverh300: "Construyendo base de datos... %d encontrados (STOP para volver)"
     ipod*: "Construyendo base de datos... %d encontrados (PREV para volver)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Construyendo base de datos... %d encontrados (LEFT para volver)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Construyendo base de datos... %d encontrados (LEFT para volver)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Construyendo base de datos... %d encontrados (PREV para volver)"
     gogearsa9200: "Construyendo base de datos... %d encontrados (REW para volver)"
     archosplayer: "Construyendo BD %d encontrados"
@@ -9075,7 +9079,7 @@
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
@@ -9084,7 +9088,7 @@
     *: "PLAY = Sí"
     cowond2*: "MENÚ o arriba-derecha = Sí"
     iriverh100,iriverh120,iriverh300: "NAVI = Sí"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Sí"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Sí"
     mrobe500: "PLAY, POWER o arriba-derecha = Sí"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Sí"
@@ -9103,7 +9107,7 @@
     mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
@@ -9113,7 +9117,7 @@
     mrobe500: "HEART = Fijar"
     iriverh100,iriverh120,iriverh300: "NAVI = Fijar"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Fijar"
-    gogearsa9200: "PLAY = Fijar"
+    gogearsa9200,samsungyh*: "PLAY = Fijar"
     vibe500: "OK = Fijar"
     mpiohd300: "ENTER = Fijar"
   </dest>

@@ -248,7 +248,7 @@
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
@@ -257,7 +257,7 @@
     *: "PLAY = Oo"
     cowond2*: "MENU = Oo"
     iriverh100,iriverh120,iriverh300: "NAVI = Oo"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Oo"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Oo"
     mrobe500: "PLAY, POWER, or top-right = Oo"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Oo"
@@ -2217,7 +2217,7 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
  </source>
@@ -2225,7 +2225,7 @@
     *: "Gumawa database... %d found (OFF sa pagbalik)"
     iriverh100,iriverh120,iriverh300: "Gumawa database... %d found (STOP sa pagbalik)"
     ipod*: "Gumawa database... %d found (PLAY/PAUSE sa pagbalik)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Gumawa database... %d found (LEFT sa pagbalik)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Gumawa database... %d found (LEFT sa pagbalik)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Gumawa database... %d found (PREV sa pagbalik)"
     gogearsa9200: "Gumawa database... %d found (REW sa pagbalik)"
  </dest>
@@ -3931,7 +3931,7 @@
     mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
  </source>
@@ -3941,7 +3941,7 @@
     mrobe500: "HEART =Ilagay"
     iriverh100,iriverh120,iriverh300: "NAVI = Ilagay"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Ilagay"
-    gogearsa9200: "PLAY = Ilagay"
+    gogearsa9200,samsungyh*: "PLAY = Ilagay"
     vibe500: "OK = Ilagay"
     mpiohd300: "ENTER = Ilagay"
  </dest>
@@ -3967,6 +3967,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
  </source>
  <dest>
     *: none
@@ -3982,6 +3983,7 @@
     gigabeats: "BACK = Mabalik"
     gogearsa9200: "LEFT = Mabalik"
     vibe500: "C = Mabalik"
+    samsungyh*: "REW = Mabalik"
  </dest>
  <voice>
     *: none
@@ -7162,6 +7164,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -7169,6 +7172,7 @@
     iriverh100,iriverh120,iriverh300: "Puno disk. Magpatuloy Pindutin STOP."
     iaudiom5,iaudiox5: "Puno disk. Magpatuloy Pindutin POWER."
     sansae200*,sansac200*,vibe500: "Puno disk. Magpatuloy Pindutin PREV."
+    samsungyh*: "Puno disk. Magpatuloy Pindutin LEFT."
   </dest>
   <voice>
     *: none

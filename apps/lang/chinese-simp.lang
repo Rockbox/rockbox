@@ -4459,6 +4459,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -4474,6 +4475,7 @@
     gigabeats: "BACK:取消"
     gogearsa9200: "LEFT:取消"
     vibe500: "CANCEL:取消"
+    samsungyh*: "REW:取消"
   </dest>
   <voice>
     *: none
@@ -4523,6 +4525,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -4530,6 +4533,7 @@
     iriverh100,iriverh120,iriverh300: "磁盘已满，按下STOP继续."
     iaudiom5,iaudiox5: "磁盘已满，按下POWER继续."
     sansae200*,sansac200*,vibe500: "磁盘，按下PREV继续."
+    samsungyh*: "磁盘，按下LEFT继续."
   </dest>
   <voice>
     *: none
@@ -7952,7 +7956,7 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
     archosplayer: "Building DB %d found"
@@ -7961,7 +7965,7 @@
     *: "数据库更新中...已找到%d个(按OFF键返回)"
     iriverh100,iriverh120,iriverh300: "数据库更新中...已找到%d个(按STOP键返回)"
     ipod*: "数据库更新中...已找到%d个(按PREV键返回)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "数据库更新中...已找到%d个(按LEFT键返回)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "数据库更新中...已找到%d个(按LEFT键返回)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "数据库更新中...已找到%d个(按PREV键返回)"
     gogearsa9200: "数据库更新中...已找到%d个(按REW键返回)"
     archosplayer: "数据库更新中...已找到%d个"
@@ -8448,7 +8452,7 @@
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
@@ -8457,7 +8461,7 @@
     *: "PLAY:是"
     cowond2*: "MENU或TOP-RIGHT:是"
     iriverh100,iriverh120,iriverh300: "NAVI=是"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT:是"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT:是"
     mrobe500: "PLAY,POWER或TOP-RIGHT:是"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK:是"
@@ -8476,7 +8480,7 @@
     mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
@@ -8486,7 +8490,7 @@
     mrobe500: "HEART:设置"
     iriverh100,iriverh120,iriverh300: "NAVI=设置"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT:设置"
-    gogearsa9200: "PLAY:设置"
+    gogearsa9200,samsungyh*: "PLAY:设置"
     vibe500: "OK:设置"
     mpiohd300: "ENTER:设置"
   </dest>

@@ -680,6 +680,10 @@ static struct cb_command cb_getcommand (void) {
 #ifdef CB_PLAY_PRE
                 if (lastbutton != CB_PLAY_PRE)
                     break;
+                /* fallthrough */
+#endif
+#ifdef CB_PLAY_ALT
+            case CB_PLAY_ALT:
 #endif
                 result.type = COMMAND_PLAY;
                 return result;

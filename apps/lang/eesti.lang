@@ -4099,6 +4099,7 @@
     gigabeatfx: "POWER = Revert"
     sansafuzeplus: "BACK = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: "OFF tagasi pöördumiseks"
@@ -4109,6 +4110,7 @@
     gigabeatfx: "POWER tagasi pöördumiseks"
     sansafuzeplus: "BACK tagasi pöördumiseks"
     vibe500: "C tagasi pöördumiseks"
+    samsungyh*: "REW tagasi pöördumiseks"
   </dest>
   <voice>
     *: ""
@@ -4192,11 +4194,13 @@
     *: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </dest>
   <voice>
     *: ""

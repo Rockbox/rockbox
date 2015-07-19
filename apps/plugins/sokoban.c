@@ -474,19 +474,34 @@
 #define SOKOBAN_MENU BUTTON_POWER
 #define SOKOBAN_MENU_NAME "[POWER]"
 
-#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
-      (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
+#elif CONFIG_KEYPAD == SAMSUNG_YH820_PAD
 #define SOKOBAN_LEFT         BUTTON_LEFT
 #define SOKOBAN_RIGHT        BUTTON_RIGHT
 #define SOKOBAN_UP           BUTTON_UP
 #define SOKOBAN_DOWN         BUTTON_DOWN
-#define SOKOBAN_MENU         BUTTON_REC
+#define SOKOBAN_MENU         BUTTON_PLAY
 #define SOKOBAN_UNDO         BUTTON_REW
-#define SOKOBAN_UNDO_PRE     (BUTTON_REW | BUTTON_LEFT)
+#define SOKOBAN_REDO         BUTTON_FFWD
+#define SOKOBAN_LEVEL_DOWN   (BUTTON_REC | BUTTON_DOWN)
+#define SOKOBAN_LEVEL_REPEAT (BUTTON_REC | BUTTON_RIGHT)
+#define SOKOBAN_LEVEL_UP     (BUTTON_REC | BUTTON_UP)
+#define SOKOBAN_QUIT_REPLAY  BUTTON_REW
+#define SOKOBAN_PAUSE        BUTTON_PLAY
+#define BUTTON_SAVE          BUTTON_PLAY
+#define BUTTON_SAVE_NAME "PLAY"
+
+#elif CONFIG_KEYPAD == SAMSUNG_YH920_PAD
+#define SOKOBAN_LEFT         BUTTON_LEFT
+#define SOKOBAN_RIGHT        BUTTON_RIGHT
+#define SOKOBAN_UP           BUTTON_UP
+#define SOKOBAN_DOWN         BUTTON_DOWN
+#define SOKOBAN_MENU         BUTTON_PLAY
+#define SOKOBAN_UNDO         BUTTON_REW
 #define SOKOBAN_REDO         BUTTON_FFWD
 #define SOKOBAN_LEVEL_DOWN   (BUTTON_PLAY | BUTTON_DOWN)
 #define SOKOBAN_LEVEL_REPEAT (BUTTON_PLAY | BUTTON_RIGHT)
 #define SOKOBAN_LEVEL_UP     (BUTTON_PLAY | BUTTON_UP)
+#define SOKOBAN_QUIT_REPLAY  BUTTON_REW
 #define SOKOBAN_PAUSE        BUTTON_PLAY
 #define BUTTON_SAVE          BUTTON_PLAY
 #define BUTTON_SAVE_NAME "PLAY"
@@ -660,6 +675,10 @@
 #define BUTTON_SAVE           BUTTON_CENTER
 #define BUTTON_SAVE_NAME      "CENTER"
 #endif
+#endif
+
+#ifndef SOKOBAN_QUIT_REPLAY
+#define SOKOBAN_QUIT_REPLAY   SOKOBAN_MENU
 #endif
 
 #define SOKOBAN_FONT FONT_SYSFIXED
@@ -1413,7 +1432,7 @@ static bool load(char *filename, bool silent)
 
                 while ((button = rb->button_get(false)) || paused) {
                     switch (button) {
-                        case SOKOBAN_MENU:
+                        case SOKOBAN_QUIT_REPLAY:
                             /* Pretend the level is complete so we'll quit */
                             current_info.level.boxes_to_go = 0;
                             return true;
@@ -1602,6 +1621,20 @@ static int sokoban_menu(void)
                 rb->lcd_putsxy(3, 36, "[VOL-] Previous Level");
                 rb->lcd_putsxy(3, 46, "[NEXT+PREV] Restart Level");
                 rb->lcd_putsxy(3, 56, "[VOL+] Next Level");
+#elif CONFIG_KEYPAD == SAMSUNG_YH920_PAD
+                rb->lcd_putsxy(3,  6, "[PLAY] Menu");
+                rb->lcd_putsxy(3, 16, "[REW]  Undo");
+                rb->lcd_putsxy(3, 26, "[FFWD] Redo");
+                rb->lcd_putsxy(3, 36, "[PLAY+DOWN] Previous Level");
+                rb->lcd_putsxy(3, 46, "[PLAY+RIGHT] Restart Level");
+                rb->lcd_putsxy(3, 56, "[PLAY+UP] Next Level");
+#elif CONFIG_KEYPAD == SAMSUNG_YH820_PAD
+                rb->lcd_putsxy(3,  6, "[PLAY] Menu");
+                rb->lcd_putsxy(3, 16, "[REW]  Undo");
+                rb->lcd_putsxy(3, 26, "[FFWD] Redo");
+                rb->lcd_putsxy(3, 36, "[REC+DOWN] Prev. Lvl");
+                rb->lcd_putsxy(3, 46, "[REC+RIGHT] Rest. Lvl");
+                rb->lcd_putsxy(3, 56, "[REC+UP] Next Level");
 #endif
 
 #ifdef HAVE_TOUCHSCREEN

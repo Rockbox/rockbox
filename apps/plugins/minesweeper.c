@@ -247,16 +247,27 @@ CONFIG_KEYPAD == ONDAVX777_PAD || \
 CONFIG_KEYPAD == MROBE500_PAD
 #   define MINESWP_QUIT     BUTTON_POWER
 
-#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
-      (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
+#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD)
 #   define MINESWP_LEFT     BUTTON_LEFT
 #   define MINESWP_RIGHT    BUTTON_RIGHT
 #   define MINESWP_UP       BUTTON_UP
 #   define MINESWP_DOWN     BUTTON_DOWN
-#   define MINESWP_QUIT     BUTTON_REC
+#   define MINESWP_QUIT     (BUTTON_REW|BUTTON_REPEAT)
 #   define MINESWP_TOGGLE   BUTTON_PLAY
-#   define MINESWP_DISCOVER BUTTON_REW
-#   define MINESWP_INFO     BUTTON_FFWD
+#   define MINESWP_DISCOVER BUTTON_FFWD
+#   define MINESWP_INFO     BUTTON_REC
+
+#elif (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
+#   define MINESWP_LEFT     BUTTON_LEFT
+#   define MINESWP_RIGHT    BUTTON_RIGHT
+#   define MINESWP_UP       BUTTON_UP
+#   define MINESWP_DOWN     BUTTON_DOWN
+#   define MINESWP_QUIT     (BUTTON_REW|BUTTON_REPEAT)
+#   define MINESWP_TOGGLE   (BUTTON_PLAY|BUTTON_REL)
+#   define MINESWP_TOGGLE_PRE BUTTON_PLAY
+#   define MINESWP_DISCOVER BUTTON_FFWD
+#   define MINESWP_INFO     (BUTTON_PLAY|BUTTON_REPEAT)
+#   define MINESWP_INFO_PRE BUTTON_PLAY
 
 #elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
 #   define MINESWP_LEFT     BUTTON_PREV
@@ -788,7 +799,7 @@ static enum minesweeper_status minesweeper( void )
 {
     int i, j;
     int button;
-#if defined(HAVE_TOUCHSCREEN) || defined(MINESWP_TOGGLE_PRE)
+#if defined(HAVE_TOUCHSCREEN) || defined(MINESWP_TOGGLE_PRE) || defined(MINESWP_INFO_PRE)
     int lastbutton = BUTTON_NONE;
 #endif
 
@@ -977,6 +988,10 @@ static enum minesweeper_status minesweeper( void )
             /* show how many mines you think you have found and how many
              * there really are on the game */
             case MINESWP_INFO:
+#ifdef MINESWP_INFO_PRE
+                if( lastbutton != MINESWP_INFO_PRE )
+                    break;
+#endif
                 if( no_mines )
                     break;
                 int flags_used = count_flags();
@@ -996,7 +1011,7 @@ static enum minesweeper_status minesweeper( void )
                     return MINESWEEPER_USB;
                 break;
         }
-#if defined(HAVE_TOUCHSCREEN) || defined(MINESWP_TOGGLE_PRE)
+#if defined(HAVE_TOUCHSCREEN) || defined(MINESWP_TOGGLE_PRE) || defined(MINESWP_INFO_PRE)
         if( button != BUTTON_NONE )
             lastbutton = button;
 #endif

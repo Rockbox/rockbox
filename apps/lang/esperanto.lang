@@ -4318,11 +4318,13 @@
     *: "OFF To Revert"
     vibe500: "CANCEL To Revert"
     mpiohd300: "MENU To Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: "OFF Por Malvalidigi"
     vibe500: "C Por Malvalidigi"
     mpiohd300: "MENU Por Malvalidigi"
+    samsungyh*: "REW Por Malvalidigi"
   </dest>
   <voice>
     *: ""
@@ -4404,9 +4406,11 @@
   user: core
   <source>
     *: "The disk is full. Press OFF to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: "Durdisko plena. Pesu OFF por kontinui."
+    samsungyh*: "Durdisko plena. Pesu LEFT por kontinui."
   </dest>
   <voice>
     *: ""

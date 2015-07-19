@@ -254,7 +254,7 @@
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
@@ -263,7 +263,7 @@
     *: "PLAY = はい"
     cowond2*: "MENU または top-right = はい"
     iriverh100,iriverh120,iriverh300: "NAVI = はい"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = はい"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = はい"
     mrobe500: "PLAY または POWER, top-right = はい"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = はい"
@@ -2237,7 +2237,7 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
   </source>
@@ -2245,7 +2245,7 @@
     *: "データベース構築中... %d 件 (OFFで戻る)"
     iriverh100,iriverh120,iriverh300: "データベース構築中... %d 件 (STOPで戻る)"
     ipod*: "データベース構築中... %d 件 (PLAY/PAUSEで戻る)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "データベース構築中... %d 件 (左で戻る)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "データベース構築中... %d 件 (左で戻る)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "データベース構築中... %d 件 (PREVで戻る)"
     gogearsa9200: "データベース構築中... %d 件 (REWで戻る)"
   </dest>
@@ -3951,7 +3951,7 @@
     mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
@@ -3961,13 +3961,13 @@
     mrobe500: "HEART = 設定"
     iriverh100,iriverh120,iriverh300: "NAVI = 設定"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = 設定"
-    gogearsa9200: "PLAY = 設定"
+    gogearsa9200,samsungyh*: "PLAY = 設定"
     vibe500: "OK = 設定"
     mpiohd300: "ENTER = 設定"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: ""
+    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200,samsungyh*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3988,6 +3988,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -4003,6 +4004,7 @@
     gigabeats: "BACK = 元に戻す"
     gogearsa9200: "LEFT = 元に戻す"
     vibe500: "CANCEL = 元に戻す"
+    samsungyh*: "REW = 元に戻す"
   </dest>
   <voice>
     *: none
@@ -7984,6 +7986,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -7991,6 +7994,7 @@
     iriverh100,iriverh120,iriverh300: "ディスクが一杯です. STOPボタンを押してください"
     iaudiom5,iaudiox5: "ディスクが一杯です. POWERボタンを押してください"
     sansae200*,sansac200*,vibe500: "ディスクが一杯です. PREVボタンを押してください"
+    samsungyh*: "ディスクが一杯です. LEFTボタンを押してください"
   </dest>
   <voice>
     *: none

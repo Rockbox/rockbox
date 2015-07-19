@@ -1116,14 +1116,14 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "डाटाबेस बन रहा है... %d मिले (OFF to बढ़)"
     iriverh100,iriverh120,iriverh300: "डाटाबेस बन रहा है... %d मिले (STOP to बढ़)"
     ipod*: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
-    iaudiox5,iaudiom5: "डाटाबेस बन रहा है... %d मिले (LEFT to बढ़)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "डाटाबेस बन रहा है... %d मिले (LEFT to बढ़)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
   </dest>
   <voice>
@@ -3811,6 +3811,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -3818,6 +3819,7 @@
     iriverh100,iriverh120,iriverh300: "दिसक भरी ह. Press STOP to continue."
     iaudiom5,iaudiox5: "दिसक भरी ह. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "दिसक भरी ह. Press PREV to continue."
+    samsungyh*: "दिसक भरी ह. Press LEFT to continue."
   </dest>
   <voice>
     *: none

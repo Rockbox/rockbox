@@ -3289,6 +3289,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -3304,6 +3305,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </dest>
   <voice>
     *: none
@@ -3371,6 +3373,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -3378,6 +3381,7 @@
     iriverh100,iriverh120,iriverh300: "Harði diskurinn er fullur. Ýtið á STOP til að halda áfram."
     iaudiom5,iaudiox5: "Harði diskurinn er fullur. Ýtið á POWER til að halda áfram."
     sansae200*,sansac200*,vibe500: "Harði diskurinn er fullur. Ýtið á PREV til að halda áfram."
+    samsungyh*: "Harði diskurinn er fullur. Ýtið á LEFT til að halda áfram."
   </dest>
   <voice>
     *: none
