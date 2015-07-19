@@ -3664,7 +3664,7 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
   </source>
@@ -3672,7 +3672,7 @@
     *: "جاري بناء قاعدة البيانات...  عثر على d% (إيقاف للعودة)"
     iriverh100,iriverh120,iriverh300: "جاري بناء قاعدة البيانات...  عثر على d% (إيقاف للعودة)"
     ipod*: "جاري بناء قاعدة البيانات...  عثر على d% (السابق للعودة)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
     gogearsa9200: "جاري بناء قاعدة البيانات...  عثر على d% (يسار للعودة)"
   </dest>
@@ -6568,6 +6568,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -6581,6 +6582,7 @@
     gigabeats: "خلف = إاغاء الأمر"
     gogearsa9200: "يسار = إاغاء الأمر"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </dest>
   <voice>
     *: none

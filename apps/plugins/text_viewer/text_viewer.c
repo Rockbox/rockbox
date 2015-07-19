@@ -98,6 +98,10 @@ enum plugin_status plugin_start(const void* file)
                 if (lastbutton != TV_AUTOSCROLL_PRE)
                     break;
 #endif
+#ifdef TV_AUTOSCROLL2
+                /* fallthrough */
+            case TV_AUTOSCROLL2:
+#endif
                 autoscroll = !autoscroll;
                 break;
 

@@ -4458,6 +4458,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -4471,8 +4472,9 @@
     sansafuzeplus: "BACK = Peruuta"
     mrobe100: "DISPLAY = Peruuta"
     gigabeats: "BACK = Peruuta"
-    gogearsa9200: "VASEN = Revert"
+    gogearsa9200: "VASEN = Peruuta"
     vibe500: "CANCEL = Peruuta"
+    samsungyh*: "REW = Peruuta"
   </dest>
   <voice>
     *: none
@@ -4522,6 +4524,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -4529,6 +4532,7 @@
     iriverh100,iriverh120,iriverh300: "Levy täynnä. Jatka painamalla STOP."
     iaudiom5,iaudiox5: "Levy täynnä. Jatka painamalla POWER."
     sansae200*,sansac200*,vibe500: "Levy täynnä. Jatka painamalla PREV."
+    samsungyh*: "Levy täynnä. Jatka painamalla LEFT."
   </dest>
   <voice>
     *: none
@@ -9042,7 +9046,7 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
     archosplayer: "Building DB %d found"
@@ -9051,7 +9055,7 @@
     *: "Luodaan tietokantaa... %d löytyi (OFF = palaa)"
     iriverh100,iriverh120,iriverh300: "Luodaan tietokantaa... %d löytyi (STOP = palaa)"
     ipod*: "Luodaan tietokantaa... %d löytyi (PREV = palaa)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Luodaan tietokantaa... %d löytyi (VASEN = palaa)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Luodaan tietokantaa... %d löytyi (VASEN = palaa)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Luodaan tietokantaa... %d löytyi (PREV = palaa)"
     gogearsa9200: "Luodaan tietokantaa... %d löytyi (REW = palaa)"
     archosplayer: "Luodaan tk %d löytyi"
@@ -9554,7 +9558,7 @@
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
@@ -9563,7 +9567,7 @@
     *: "PLAY = Kyllä"
     cowond2*: "MENU tai yläoikea = Kyllä"
     iriverh100,iriverh120,iriverh300: "NAVI = Kyllä"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Kyllä"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Kyllä"
     mrobe500: "PLAY, POWER tai yläoikea = Kyllä"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Kyllä"
@@ -9582,7 +9586,7 @@
     mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
@@ -9592,7 +9596,7 @@
     mrobe500: "HEART = Aseta"
     iriverh100,iriverh120,iriverh300: "NAVI = Aseta"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Aseta"
-    gogearsa9200: "PLAY = Aseta"
+    gogearsa9200,samsungyh*: "PLAY = Aseta"
     vibe500: "OK = Aseta"
     mpiohd300: "ENTER = Aseta"
   </dest>

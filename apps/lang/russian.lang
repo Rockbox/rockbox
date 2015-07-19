@@ -4180,6 +4180,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -4194,6 +4195,7 @@
     gigabeats: "НАЗАД = Отмена"
     gogearsa9200: "ЛЕВО = Отмена"
     vibe500: "C = Отмена"
+    samsungyh*: "REW = Отмена"
   </dest>
   <voice>
     *: none
@@ -4243,6 +4245,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -4250,6 +4253,7 @@
     iriverh100,iriverh120,iriverh300: "Диск заполнен. Нажмите СТОП для продолжения."
     iaudiom5,iaudiox5: "Диск заполнен. Нажмите ВЫКЛ. для продолжения."
     sansae200*,sansac200*,vibe500: "Диск заполнен. Нажмите ПРЕД. для продолжения."
+    samsungyh*: "Диск заполнен. Нажмите LEFT для продолжения."
   </dest>
   <voice>
     *: none
@@ -7472,7 +7476,7 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
     archosplayer: "Building DB %d found"
@@ -7481,7 +7485,7 @@
     *: "Построение базы... %d найдено (ВЫКЛ. для отмены)"
     iriverh100,iriverh120,iriverh300: "Построение базы... %d найдено (СТОП для отмены)"
     ipod*: "Построение базы... %d найдено (ПРЕД. для отмены)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Построение базы... %d найдено (ВЛЕВО для отмены)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Построение базы... %d найдено (ВЛЕВО для отмены)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Построение базы... %d найдено (ПРЕД. для отмены)"
     gogearsa9200: "Построение базы... %d найдено (РЕВЕРС. для отмены)"
     archosplayer: "Построение БД... %d найдено"
@@ -8182,7 +8186,7 @@
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
@@ -8191,7 +8195,7 @@
     *: "ВОСПР. = Да"
     cowond2*: "МЕНЮ или прав. верх. = Да"
     iriverh100,iriverh120,iriverh300: "НАВИГ. = Да"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "ВЫБОР = Да"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "ВЫБОР = Да"
     mrobe500: "ВОСПР., ВЫКЛ или прав. верх. = Да"
     archosplayer: "(ВОСПР./СТОП)"
     vibe500: "OK = Да"
@@ -8210,7 +8214,7 @@
     mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
@@ -8220,7 +8224,7 @@
     mrobe500: "СЕРДЦЕ = Установить"
     iriverh100,iriverh120,iriverh300: "НАВИГ. = Установить"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "ВЫБОР = Установить"
-    gogearsa9200: "ВОСПР. = Установить"
+    gogearsa9200,samsungyh*: "ВОСПР. = Установить"
     vibe500: "OK = Установить"
     mpiohd300: "ENTER = Установить"
   </dest>

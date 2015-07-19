@@ -2557,10 +2557,12 @@
   <source>
     *: "OFF To Revert"
     vibe500: "CANCEL To Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: "OFF = abbrächu"
     vibe500: "C = abbrächu"
+    samsungyh*: "REW = abbrächu"
   </dest>
   <voice>
     *: ""
@@ -2615,10 +2617,12 @@
   <source>
     *: "The disk is full. Press OFF to continue."
     vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: "Feschtplatta isch voll. Drick OFF."
     vibe500: "Feschtplatta isch voll. Drick PREV."
+    samsungyh*: "Feschtplatta isch voll. Drick LEFT."
   </dest>
   <voice>
     *: ""

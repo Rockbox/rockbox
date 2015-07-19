@@ -249,7 +249,7 @@
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
@@ -258,7 +258,7 @@
     *: "PLAY = ใช่"
     cowond2*: "MENU = ใช่"
     iriverh100,iriverh120,iriverh300: "NAVI = ใช่"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = ใช่"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = ใช่"
     mrobe500: "PLAY, POWER, หรือ มุมบนขวา = ใช่"
     archosplayer: "(เล่น/หยุด)"
     vibe500: "OK = ใช่"
@@ -2218,7 +2218,7 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
   </source>
@@ -2226,7 +2226,7 @@
     *: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (OFF เพื่อย้อนกลับ)"
     iriverh100,iriverh120,iriverh300: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (STOP เพื่อย้อนกลับ)"
     ipod*: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (LEFT เพื่อย้อนกลับ)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (LEFT เพื่อย้อนกลับ)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
     gogearsa9200: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (REW เพื่อย้อนกลับ)"
   </dest>
@@ -3915,7 +3915,7 @@
     mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
-    gogearsa9200: "PLAY = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
@@ -3925,7 +3925,7 @@
     mrobe500: "HEART = ตั้งค่า"
     iriverh100,iriverh120,iriverh300: "NAVI = ตั้งค่า"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = ตั้งค่า"
-    gogearsa9200: "PLAY = ตั้งค่า"
+    gogearsa9200,samsungyh*: "PLAY = ตั้งค่า"
     vibe500: "OK = ตั้งค่า"
     mpiohd300: "ENTER = ตั้งค่า"
   </dest>
@@ -3951,6 +3951,7 @@
     gigabeats: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -3966,6 +3967,7 @@
     gigabeats: "BACK = ยกเลิก"
     gogearsa9200: "LEFT = ยกเลิก"
     vibe500: "C = ยกเลิก"
+    samsungyh*: "REW = ยกเลิก"
   </dest>
   <voice>
     *: none
@@ -7946,6 +7948,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -7953,6 +7956,7 @@
     iriverh100,iriverh120,iriverh300: "ดีสก์เต็ม กดปุ่ม STOP เพื่อทำงานต่อ"
     iaudiom5,iaudiox5: "ดีสก์เต็ม กดปุ่ม POWER เพื่อทำงานต่อ"
     sansae200*,sansac200*,vibe500: "ดีสก์เต็ม กดปุ่ม PREV เพื่อทำงานต่อ"
+    samsungyh*: "ดีสก์เต็ม กดปุ่ม LEFT เพื่อทำงานต่อ"
   </dest>
   <voice>
     *: none
