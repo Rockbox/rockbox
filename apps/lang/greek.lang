@@ -251,14 +251,14 @@
   <source>
     *: "PLAY = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Επικύρωση"
     iriverh100,iriverh120,iriverh300: "NAVI = Επικύρωση"
-    samsungyh*,ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Επικύρωση"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Επικύρωση"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Επικύρωση"
   </dest>
@@ -2217,14 +2217,14 @@
     *: "Building database... %d found (OFF to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Building database... %d found (LEFT to return)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (OFF για επιστροφή)"
     iriverh100,iriverh120,iriverh300: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (STOP για επιστροφή)"
     ipod*: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (PREV για επιστροφή)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (LEFT για επιστροφή)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (LEFT για επιστροφή)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (PREV για επιστροφή)"
   </dest>
   <voice>
@@ -3927,7 +3927,8 @@
     *: none
     rtc: "ON = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100: "SELECT = Set"
+    gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
   </source>
@@ -3935,7 +3936,8 @@
     *: none
     rtc: "ON = Ρύθμιση"
     iriverh100,iriverh120,iriverh300: "NAVI = Ρύθμιση"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200: "SELECT = Ρύθμιση"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100: "SELECT = Ρύθμιση"
+    gogearsa9200,samsungyh*: "PLAY = Ρύθμιση"
     vibe500: "OK = Ρύθμιση"
     mpiohd300: "ENTER = Ρύθμιση"
   </dest>
@@ -3959,6 +3961,7 @@
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
     vibe500: "CANCEL = Revert"
+    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
@@ -3972,6 +3975,7 @@
     mrobe100: "DISPLAY = Ακύρωση"
     gigabeats: "BACK = Ακύρωση"
     vibe500: "C = Ακύρωση"
+    samsungyh*: "REW = Ακύρωση"
   </dest>
   <voice>
     *: none
@@ -7951,6 +7955,7 @@
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
     sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    samsungyh*: "Disk full. Press LEFT to continue."
   </source>
   <dest>
     *: none
@@ -7958,6 +7963,7 @@
     iriverh100,iriverh120,iriverh300: "Ο δίσκος είναι γεμάτος. Πατήστε STOP για συνέχεια."
     iaudiom5,iaudiox5: "Ο δίσκος είναι γεμάτος. Πατήστε POWER για συνέχεια.."
     sansae200*,sansac200*,vibe500: "Ο δίσκος είναι γεμάτος. Πατήστε PREV για συνέχεια."
+    samsungyh*: "Ο δίσκος είναι γεμάτος. Πατήστε LEFT για συνέχεια."
   </dest>
   <voice>
     *: none

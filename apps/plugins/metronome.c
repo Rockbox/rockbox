@@ -78,8 +78,7 @@ enum metronome_errors
 #define PART_MAX 10 /* maximum count of programmed parts */
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD) \
- || (CONFIG_KEYPAD == SANSA_E200_PAD)  || (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) \
- || (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
+ || (CONFIG_KEYPAD == SANSA_E200_PAD)  || (CONFIG_KEYPAD == SAMSUNG_YH820_PAD)
 #define MET_SYNC
 #endif
 

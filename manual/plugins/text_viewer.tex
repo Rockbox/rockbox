@@ -49,7 +49,7 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{MPIO_HD300_PAD}{\ButtonRew}
     \opt{touchscreen}{\TouchMidLeft}
     \nopt{PLAYER_PAD,GIGABEAT_S_PAD,touchscreen,IAUDIO_M3_PAD,MPIO_HD200_PAD%
-         ,MPIO_HD300_PAD}{\ButtonLeft}
+         ,MPIO_HD300_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonLeft}
     \opt{HAVEREMOTEKEYMAP}{&
         \opt{IAUDIO_M3_PAD}{\ButtonRCLeft}
     }
@@ -62,7 +62,7 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{MPIO_HD300_PAD}{\ButtonFF}
     \opt{touchscreen}{\TouchMidRight}
     \nopt{PLAYER_PAD,GIGABEAT_S_PAD,touchscreen,IAUDIO_M3_PAD,MPIO_HD200_PAD%
-         ,MPIO_HD300_PAD}{\ButtonRight}
+         ,MPIO_HD300_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonRight}
     \opt{HAVEREMOTEKEYMAP}{&
         \opt{IAUDIO_M3_PAD}{\ButtonRCRight}
     }
@@ -71,44 +71,54 @@ by using \emph{Open with} from the \emph{Context Menu}
 
     \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD%
         ,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD%
-        ,GIGABEAT_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}{%
+        ,GIGABEAT_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD%
+        ,SAMSUNG_YH820_PAD}{%
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonUp}
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollBack}
         \opt{SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD,PBELL_VIBE500_PAD}{\ButtonUp}
         \opt{GIGABEAT_PAD}{\ButtonA+\ButtonUp}
         \opt{SANSA_FUZEPLUS_PAD}{\ButtonVolUp}
+        \opt{SAMSUNG_YH92X_PAD}{\ButtonFF+\ButtonUp}
+        \opt{SAMSUNG_YH820_PAD}{\ButtonRec+\ButtonUp}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One line up\\
     }
 
     \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_E200_PAD%
         ,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD%
-        ,GIGABEAT_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD}{%
+        ,GIGABEAT_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD%
+        ,SAMSUNG_YH820_PAD}{%
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonDown}
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollFwd}
         \opt{SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_S_PAD,PBELL_VIBE500_PAD}{\ButtonDown}
         \opt{GIGABEAT_PAD}{\ButtonA+\ButtonDown}
         \opt{SANSA_FUZEPLUS_PAD}{\ButtonVolDown}
+        \opt{SAMSUNG_YH92X_PAD}{\ButtonFF+\ButtonDown}
+        \opt{SAMSUNG_YH820_PAD}{\ButtonRec+\ButtonDown}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One line down\\
     }
 
     \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,%
-        GIGABEAT_S_PAD,SANSA_FUZEPLUS_PAD}{
+        GIGABEAT_S_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonLeft}
         \opt{GIGABEAT_S_PAD}{\ButtonLeft}
         \opt{GIGABEAT_PAD}{\ButtonA+\ButtonLeft}
         \opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomLeft}
+        \opt{SAMSUNG_YH92X_PAD}{\ButtonFF+\ButtonLeft}
+        \opt{SAMSUNG_YH820_PAD}{\ButtonRec+\ButtonLeft}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One column left\\
     }
 
     \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,%
-        GIGABEAT_S_PAD,SANSA_FUZEPLUS_PAD}{
+        GIGABEAT_S_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonRight}
         \opt{GIGABEAT_S_PAD}{\ButtonRight}
         \opt{GIGABEAT_PAD}{\ButtonA+\ButtonRight}
         \opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomRight}
+        \opt{SAMSUNG_YH92X_PAD}{\ButtonFF+\ButtonRight}
+        \opt{SAMSUNG_YH820_PAD}{\ButtonRec+\ButtonRight}
     \opt{HAVEREMOTEKEYMAP}{& }
         & One column right\\
     }
@@ -123,9 +133,10 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{SANSA_CLIP_PAD}{\ButtonHome}
     \opt{SANSA_FUZE_PAD}{\ButtonDown+\ButtonSelect}
     \opt{MROBE100_PAD}{\ButtonDisplay}
+    \opt{SAMSUNG_YH820_PAD}{\ButtonFF}
+    \opt{SAMSUNG_YH92X_PAD}{\ButtonRecOn{} or \ButtonRecOff}
     \opt{MPIO_HD200_PAD}{FIXME}
     \opt{touchscreen}{\TouchCenter}
-    \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonRew}
     \opt{HAVEREMOTEKEYMAP}{&
         \opt{IAUDIO_M3_PAD}{\ButtonRCMode}
     }
@@ -136,12 +147,13 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonOff}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonSelect}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD}{\ButtonSelect}
-    \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonFF}
+    \opt{IRIVER_H10_PAD}{\ButtonFF}
     \opt{IAUDIO_X5_PAD}{\ButtonRec}
     \opt{SANSA_FUZEPLUS_PAD}{Long \ButtonSelect}
     \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}{\ButtonDown+\ButtonSelect}
     \opt{COWON_D2_PAD}{\ButtonMenu+\ButtonPlus}
     \opt{SANSA_FUZE_PAD}{\ButtonUp+\ButtonSelect}
+    \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay}
     \opt{PBELL_VIBE500_PAD}{\ButtonPower}
     \opt{MPIO_HD200_PAD}{\ButtonRec}
     \opt{MPIO_HD300_PAD}{\ButtonEnter}
@@ -158,10 +170,9 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{IAUDIO_X5_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,SANSA_E200_PAD}{\ButtonSelect}
     \opt{SANSA_FUZE_PAD}{Long \ButtonSelect}
     \opt{SANSA_FUZEPLUS_PAD}{\ButtonBack}
-    \opt{IRIVER_H10_PAD}{\ButtonRew}
+    \opt{IRIVER_H10_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonRew}
     \opt{COWON_D2_PAD}{\ButtonMenu{} / }%
     \opt{MPIO_HD200_PAD}{\ButtonFunc}
-    \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay}
     \opt{touchscreen}{\TouchTopRight}
     \opt{HAVEREMOTEKEYMAP}{&
         \opt{IAUDIO_M3_PAD}{\ButtonRCPlay}
@@ -177,7 +188,8 @@ by using \emph{Open with} from the \emph{Context Menu}
     \opt{GIGABEAT_S_PAD}{\ButtonBack}
     \opt{COWON_D2_PAD}{\ButtonPower{} / }%
     \opt{touchscreen}{\TouchTopLeft}
-    \opt{IAUDIO_M3_PAD,PBELL_VIBE500_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonRec}
+    \opt{IAUDIO_M3_PAD,PBELL_VIBE500_PAD}{\ButtonRec}
+    \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{Long \ButtonRew}
     \opt{MPIO_HD200_PAD}{\ButtonRec + \ButtonPlay}
     \opt{MPIO_HD300_PAD}{Long \ButtonMenu}
     \opt{HAVEREMOTEKEYMAP}{&

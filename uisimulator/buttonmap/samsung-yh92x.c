@@ -58,8 +58,11 @@ int key_to_button(int keyboard_button)
         case SDLK_PAGEDOWN:
             new_btn = BUTTON_REW;
             break;
+        case SDLK_KP_MINUS:
+            new_btn = BUTTON_REC_SW_ON;
+            break;
         case SDLK_KP_PLUS:
-            new_btn = BUTTON_REC;
+            new_btn = BUTTON_REC_SW_OFF;
             break;
     }
     return new_btn;
@@ -70,7 +73,8 @@ struct button_map bm[] = {
     { SDLK_KP5,     369,  84, 25, "Play" },
     { SDLK_KP5,     367, 125, 27, "Play" },
     { SDLK_KP3,     369, 188, 17, "Rew" },
-    { SDLK_KP_PLUS, 370, 330, 30, "Record" },
+    { SDLK_KP_MINUS,370, 315, 15, "Rec On" },
+    { SDLK_KP_PLUS, 370, 347, 15, "Rec Off" },
     { SDLK_KP4,     146, 252, 32, "Menu" },
     { SDLK_KP8,     204, 226, 27, "Up" },
     { SDLK_KP6,     257, 250, 34, "Select" },
