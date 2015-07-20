@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 
-#include "config.h"
 #include "system.h"
 #include "kernel.h"
 #include "button.h"
@@ -31,16 +30,12 @@
 /*#include "logf.h"*/
 
 static int int_btn = BUTTON_NONE;
-#ifndef BOOTLOADER
-static int old_pos = -1;
-static int scroll_repeat = BUTTON_NONE;
-#endif
-static int repeat = 0;
+static int strip_pos = -1;
 
 #ifndef BOOTLOADER
 void button_init_device(void)
 {
-    /* The touchpad is powered on and initialized in power-hdd1630.c
+    /* The touchpad is powered on and initialized in power-hdd.c
        since it needs to be ready for both buttons and button lights. */
 }
 
@@ -52,12 +47,12 @@ void button_int(void)
     char data[4];
     int val;
 
-    int_btn = BUTTON_NONE;
-
     val = touchpad_read_device(data, 4);
 
     if (data[0] == MEP_BUTTON_HEADER)
     {
+        int_btn &= ~(BUTTON_LEFT|BUTTON_MENU|BUTTON_RIGHT|BUTTON_VIEW);
+
         /* Buttons packet */
         if (data[1] & 0x1)
             int_btn |= BUTTON_LEFT;
@@ -68,22 +63,18 @@ void button_int(void)
         if (data[1] & 0x8)
             int_btn |= BUTTON_VIEW;
     }
-    else if ((data[1] & MEP_GESTURE) && (data[3] >> 6) == 0) /* index = 0 */
-    {
-        int_btn |= BUTTON_TAP;
-    }
     else if (data[0] == MEP_ABSOLUTE_HEADER)
     {
-        if (data[1] & MEP_FINGER)
+        /* The HDD63x0 actually has 2 scrollbars. One vertical and one horizontal
+        (where the prev, play, and next buttons are). Because of that, we need to know
+        which sensor is reporting data. */
+        if ((data[3] >> 6) == 1) /* index = 1 */
         {
             /* Absolute packet - the finger is on the horizontal strip.
-                Position ranges from 1-4095, with 1 at the bottom. */
+                Position ranges from 1-4095, with 1 at the left side. */
             val = ((data[1] >> 4) << 8) | data[2]; /* position */
-
-            /* The HDD63x0 actually has 2 scrollbars. One vertical and one horizontal 
-            (where the prev, play, and next buttons are). Because of that, we need to know
-            which sensor is reporting data. */
-            if ((data[3] >> 6) == 1) /* index = 1 */
+            int_btn &= ~(BUTTON_PREV|BUTTON_PLAY|BUTTON_NEXT);
+            if (data[1] & MEP_FINGER)
             {
                 if ((val > 0) && (val <= 1365))
                     int_btn |= BUTTON_PREV;
@@ -91,28 +82,21 @@ void button_int(void)
                     int_btn |= BUTTON_PLAY;
                 else if ((val > 2730) && (val <= 4095))
                     int_btn |= BUTTON_NEXT;
-            } else
-            {
-                int scr_pos = val >> 8; /* split the scrollstrip into 16 regions */
-                if ((old_pos<scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_UP;
-                if ((old_pos>scr_pos)&&(old_pos!=-1)) int_btn = BUTTON_DOWN;
-
-                old_pos = scr_pos;
-
-                /* repeat button */
-                repeat = 0;
-                if (int_btn != BUTTON_NONE)
-                {
-                    if (int_btn != scroll_repeat)
-                        scroll_repeat = int_btn;
-                    else repeat = BUTTON_REPEAT;
-                }
             }
         }
         else
         {
-            old_pos = -1;
-            scroll_repeat = BUTTON_NONE;
+            if (data[1] & MEP_FINGER)
+            {
+                /* Absolute packet - the finger is on the vertical strip.
+                    Position ranges from 1-4095, with 1 at the bottom. */
+                val = ((data[1] >> 4) << 8) | data[2]; /* position */
+                strip_pos = 4095-val;
+            }
+            else
+            {
+                strip_pos = -1;
+            }
         }
     }
 }
@@ -128,7 +112,11 @@ bool button_hold(void)
 /*
  * Get button pressed from hardware
  */
+#ifdef HAVE_SCROLLSTRIP
+int button_read_device(int *data)
+#else
 int button_read_device(void)
+#endif
 {
     int btn = int_btn;
 
@@ -141,18 +129,19 @@ int button_read_device(void)
     if (!(GPIOA_INPUT_VAL & 0x04)) btn |= BUTTON_VOL_DOWN;
     if (!(GPIOD_INPUT_VAL & 0x40)) btn |= BUTTON_POWER;
 
-    /* Scrollstrip direct button post - much better response */
-    if ((btn == BUTTON_UP) || (btn == BUTTON_DOWN))
-    {
-        queue_post(&button_queue,btn|repeat,0);
-        backlight_on();
-        buttonlight_on();
-        reset_poweroff_timer();
 
-        int_btn = BUTTON_NONE;
-        repeat = BUTTON_NONE;
-        btn = BUTTON_NONE;
+#ifdef HAVE_SCROLLSTRIP
+    /* Scrollstrip position. Note that the value is scaled up to
+       reduce rounding errors with integer math in the strip driver. */
+    *data = strip_pos<<4;
+#else
+    if (strip_pos >= 0) {
+        if (strip_pos < 4096/2-200)
+            btn |= BUTTON_UP;
+        else if (strip_pos > 4096/2+200)
+            btn |= BUTTON_DOWN;
     }
+#endif
 
     return btn;
 }

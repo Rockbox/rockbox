@@ -47,6 +47,9 @@
 #include "system.h"
 #include "general.h"
 #include "misc.h"
+#ifdef HAVE_SCROLLSTRIP
+#include "scrollstrip.h"
+#endif
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "font.h"
@@ -1069,6 +1072,11 @@ void settings_apply(bool read_disk)
     lcd_set_sleep_after_backlight_off(global_settings.lcd_sleep_after_backlight_off);
 #endif
 #endif /* HAVE_BACKLIGHT */
+
+#ifdef HAVE_SCROLLSTRIP
+    scrollstrip_set_speed(global_settings.scrollstrip_speed);
+    scrollstrip_set_afterscroll(global_settings.scrollstrip_afterscroll);
+#endif
 
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
     touchpad_set_sensitivity(global_settings.touchpad_sensitivity);

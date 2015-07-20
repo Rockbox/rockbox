@@ -25,7 +25,8 @@ target/hosted/rtc.c
 target/hosted/debug-hosted.c
 #endif
 
-#endif
+#endif /* (CONFIG_PLATFORM & PLATFORM_HOSTED) */
+
 system.c
 usb.c
 #if defined(ROCKBOX_HAS_LOGF) || defined(ROCKBOX_HAS_LOGDISKF)
@@ -93,7 +94,7 @@ target/hosted/samsungypr/gpio-ypr.c
 #if CONFIG_TUNER
 target/hosted/samsungypr/radio-ypr.c
 #endif
-#endif
+#endif /* defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) */
 
 #if defined(SAMSUNG_YPR0) && !defined(SIMULATOR)
 drivers/adc-as3514.c
@@ -110,7 +111,7 @@ target/hosted/samsungypr/ypr0/backlight-ypr0.c
 target/hosted/samsungypr/ypr0/ascodec-ypr0.c
 target/hosted/samsungypr/ypr0/powermgmt-ypr0.c
 target/hosted/samsungypr/ypr0/audio-ypr0.c
-#endif
+#endif /* defined(SAMSUNG_YPR0) && !defined(SIMULATOR) */
 
 #if defined(SAMSUNG_YPR1) && !defined(SIMULATOR)
 target/hosted/samsungypr/ypr1/mcs5000-ypr1.c
@@ -123,7 +124,7 @@ target/hosted/samsungypr/ypr1/powermgmt-ypr1.c
 target/hosted/samsungypr/ypr1/audio-ypr1.c
 target/hosted/samsungypr/ypr1/pmu-ypr1.c
 target/hosted/samsungypr/ypr1/wmcodec-ypr1.c
-#endif
+#endif /* defined(SAMSUNG_YPR1) && !defined(SIMULATOR) */
 
 /* Maemo specific files */
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO)
@@ -253,6 +254,9 @@ backlight-sw-fading.c
 /* Misc. */
 drivers/led.c
 drivers/button.c
+#ifdef HAVE_SCROLLSTRIP
+drivers/scrollstrip.c
+#endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #ifdef HAVE_DAC3550A
 drivers/audio/dac3550a.c

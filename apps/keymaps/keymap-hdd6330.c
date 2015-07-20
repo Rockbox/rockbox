@@ -51,7 +51,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_NEXT,          BUTTON_DOWN,                BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_LEFT,                BUTTON_NONE },
-    { ACTION_STD_OK,            BUTTON_TAP,                 BUTTON_NONE },
+    { ACTION_STD_OK,            BUTTON_RIGHT,               BUTTON_NONE },
     { ACTION_STD_MENU,          BUTTON_MENU|BUTTON_REL,     BUTTON_MENU },
     { ACTION_STD_CONTEXT,       BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU },
     { ACTION_STD_QUICKSCREEN,   BUTTON_VIEW|BUTTON_REPEAT,  BUTTON_VIEW },
@@ -162,7 +162,7 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
 }; /* button_context_settingsgraphical */
 
 static const struct button_mapping button_context_yesno[]  = {
-    { ACTION_YESNO_ACCEPT,          BUTTON_TAP,          BUTTON_NONE },
+    { ACTION_YESNO_ACCEPT,          BUTTON_RIGHT,          BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings_yesno */
 
@@ -185,7 +185,7 @@ static const struct button_mapping button_context_bmark[]  = {
 
 static const struct button_mapping button_context_time[]  = {
     { ACTION_STD_CANCEL,       BUTTON_MENU,  BUTTON_NONE },
-    { ACTION_STD_OK,           BUTTON_TAP,   BUTTON_NONE },
+    { ACTION_STD_OK,           BUTTON_RIGHT, BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
 }; /* button_context_time */
 
@@ -230,7 +230,7 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_UP,           BUTTON_UP|BUTTON_REPEAT,                BUTTON_NONE },
     { ACTION_KBD_DOWN,         BUTTON_DOWN,                            BUTTON_NONE },
     { ACTION_KBD_DOWN,         BUTTON_DOWN|BUTTON_REPEAT,              BUTTON_NONE },
-    { ACTION_KBD_SELECT,       BUTTON_TAP,                             BUTTON_NONE },
+    { ACTION_KBD_SELECT,       BUTTON_NEXT|BUTTON_REL,                 BUTTON_NEXT },
     { ACTION_KBD_BACKSPACE,    BUTTON_PREV|BUTTON_REL,                 BUTTON_PREV },
     { ACTION_KBD_PAGE_FLIP,    BUTTON_VOL_UP,                          BUTTON_NONE },
     { ACTION_KBD_DONE,         BUTTON_VIEW|BUTTON_REL,                 BUTTON_VIEW },
@@ -243,7 +243,7 @@ static const struct button_mapping button_context_keyboard[]  = {
 
 #ifdef HAVE_RECORDING
 const struct button_mapping button_context_recscreen[]  = {
-    { ACTION_REC_NEWFILE,        BUTTON_TAP|BUTTON_REL,              BUTTON_TAP },
+    { ACTION_REC_NEWFILE,        BUTTON_NEXT|BUTTON_REL,            BUTTON_NEXT },
     { ACTION_STD_MENU,           BUTTON_MENU|BUTTON_REPEAT,         BUTTON_MENU },
     { ACTION_REC_PAUSE,          BUTTON_PLAY|BUTTON_REL,            BUTTON_PLAY },
     { ACTION_STD_CANCEL,         BUTTON_MENU,                       BUTTON_NONE },

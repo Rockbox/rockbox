@@ -70,9 +70,6 @@ int key_to_button(int keyboard_button)
         case SDLK_KP_MINUS:
             new_btn = BUTTON_VOL_DOWN;
             break;
-        case SDLK_t:
-            new_btn = BUTTON_TAP;
-            break;
     }
     return new_btn;
 }
