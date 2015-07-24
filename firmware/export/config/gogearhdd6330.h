@@ -79,6 +79,9 @@
 
 #define HAVE_HARDWARE_CLICK
 
+/* Define this if you want to use the Scrollstrip. */
+#define HAVE_SCROLLSTRIP
+
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 

@@ -88,7 +88,12 @@ bool button_debug_screen(void)
         unsigned char sleep_mode = rmi_read_single(RMI_DEVICE_CONTROL) & RMI_SLEEP_MODE_BM;
         lcd_set_viewport(NULL);
         lcd_clear_display();
+#ifdef HAVE_SCROLLSTRIP
+        int dummy;
+        int btns = button_read_device(&dummy);
+#else
         int btns = button_read_device();
+#endif
         lcd_putsf(0, 0, "button bitmap: %x", btns);
         lcd_putsf(0, 1, "RMI: id=%s info=%s", product_id, product_info_str);
         lcd_putsf(0, 2, "xmax=%d ymax=%d res=%d", x_max, y_max, sensor_resol);
@@ -209,6 +214,12 @@ int button_mapping[3][3] =
 #define TOUCHPAD_HEIGHT     1975
 #define DEADZONE_MULTIPLIER 2 /* deadzone multiplier */
 
+#ifdef HAVE_SCROLLSTRIP
+#define SCROLLSTRIP_XMIN    (TOUCHPAD_WIDTH/3)
+#define SCROLLSTRIP_XMAX    (TOUCHPAD_WIDTH*2/3)
+static int strip_pos = -1;
+#endif
+
 static int touchpad_btns = 0;
 static long rmi_stack [DEFAULT_STACK_SIZE/sizeof(long)];
 static const char rmi_thread_name[] = "rmi";
@@ -229,6 +240,14 @@ static int find_button_no_deadzone(int x, int y)
 
 static int find_button(int x, int y)
 {
+#ifdef HAVE_SCROLLSTRIP
+    if (x >= SCROLLSTRIP_XMIN && x < SCROLLSTRIP_XMAX) {
+        strip_pos = TOUCHPAD_HEIGHT-y;
+        return 0;
+    }
+    else
+        strip_pos = -1;
+#endif
     /* find button ignoring deadzones */
     int btn = find_button_no_deadzone(x, y);
     /* To check if we are in a deadzone, we try to shift the coordinates
@@ -288,10 +307,20 @@ static void do_interrupt(void)
     int absolute_y = u.s.absolute.y_msb << 8 | u.s.absolute.y_lsb;
     int nr_fingers = u.s.absolute.misc & 7;
 
+#ifdef HAVE_SCROLLSTRIP
+    if(nr_fingers == 1) {
+        touchpad_btns = find_button(absolute_x, absolute_y);
+    }
+    else {
+        touchpad_btns = 0;
+        strip_pos = -1;
+    }
+#else
     if(nr_fingers == 1)
         touchpad_btns = find_button(absolute_x, absolute_y);
     else
         touchpad_btns = 0;
+#endif
 
     /* enable interrupt */
     imx233_pinctrl_setup_irq(0, 27, true, true, false, &rmi_attn_cb, 0);
@@ -416,7 +445,14 @@ void button_init_device(void)
     imx233_button_init();
 }
 
+#ifdef HAVE_SCROLLSTRIP
+int button_read_device(int *data)
+#else
 int button_read_device(void)
+#endif
 {
+#ifdef HAVE_SCROLLSTRIP
+    *data = strip_pos<<5;
+#endif
     return imx233_button_read(touchpad_filter(touchpad_read_device()));
 }

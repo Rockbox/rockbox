@@ -88,6 +88,9 @@
 #define MAX_TOUCHPAD_DEADSPACE_SETTING       100
 #endif
 
+/* Define this for Proof-of-Concept-Scrollstrip */
+#define HAVE_SCROLLSTRIP
+
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 
