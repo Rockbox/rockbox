@@ -207,7 +207,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             gui_scrollbar_draw(display,
                     (scrollbar_in_left? 0: 1), 0, SCROLLBAR_WIDTH-1, vp.height,
                     list->nb_items, list_start_item, list_start_item + nb_lines,
-                    VERTICAL);
+                    VERTICAL | (global_settings.scrollbar_border ? 0 : BORDER_NOFILL));
         }
         /* shift everything a bit in relation to the title */
         else if (!VP_IS_RTL(list_text_vp) && scrollbar_in_left)

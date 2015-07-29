@@ -123,6 +123,9 @@ enum { SHOW_PATH_OFF = 0, SHOW_PATH_CURRENT, SHOW_PATH_FULL };
 /* scrollbar visibility/position */
 enum { SCROLLBAR_OFF = 0, SCROLLBAR_LEFT, SCROLLBAR_RIGHT };
 
+/* scrollbar border */
+enum { SCROLLBAR_BORDERED = 0, SCROLLBAR_SIMPLE };
+
 /* autoresume settings */
 enum { AUTORESUME_NEXTTRACK_NEVER = 0, AUTORESUME_NEXTTRACK_ALWAYS,
        AUTORESUME_NEXTTRACK_CUSTOM};
@@ -537,6 +540,7 @@ struct user_settings
 #ifdef HAVE_LCD_BITMAP
     int scrollbar;    /* SCROLLBAR_* enum values */
     int scrollbar_width;
+    bool scrollbar_border;
 
 #ifdef HAVE_TOUCHSCREEN
     int list_line_padding;

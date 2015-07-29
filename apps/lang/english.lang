@@ -11641,6 +11641,23 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_SCROLLBAR_BORDER
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Border"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Scroll Bar Border"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scroll bar border"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SCROLLBAR_POSITION
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core

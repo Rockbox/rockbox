@@ -917,6 +917,8 @@ const struct settings_list settings[] = {
     INT_SETTING(F_THEMESETTING, scrollbar_width, LANG_SCROLLBAR_WIDTH, 6,
                 "scrollbar width",UNIT_INT, 3, MAX(LCD_WIDTH/10,25), 1,
                 NULL, NULL, NULL),
+    OFFON_SETTING(F_THEMESETTING|F_TEMPVAR, scrollbar_border, LANG_SCROLLBAR_BORDER,
+		    true ,"scrollbar_border", NULL),
 #ifdef HAVE_TOUCHSCREEN
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, list_line_padding, LANG_LIST_LINE_PADDING,
                   -1, "list padding", "auto,off", UNIT_PIXEL, list_pad_formatter,
