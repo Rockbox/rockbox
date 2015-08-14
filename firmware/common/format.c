@@ -132,10 +132,49 @@ void format(
         case 'l':
             ch = *fmt++;
             switch(ch) {
+            case 'x':
+            case 'X':
+                pad='0';
+                ulval = va_arg (ap, long);
+                do
+                {
+                    *--str = hexdigit[ulval & 0xf];
+                    ulval >>= 4;
+                }
+                while (ulval);
+                break;
+
+            case 'd':
+                lval = lsign = va_arg (ap, long);
+                if (lval < 0)
+                    lval = -lval;
+                do
+                {
+                    *--str = (lval % 10) + '0';
+                    lval /= 10;
+                }
+                while (lval > 0);
+                if (lsign < 0)
+                    *--str = '-';
+                break;
+
+            case 'u':
+                ulval = va_arg(ap, unsigned long);
+                do
+                {
+                    *--str = (ulval % 10) + '0';
+                    ulval /= 10;
+                }
+                while (ulval > 0);
+                break;
+
+            case 'l':
+                ch = *fmt++;
+                switch(ch) {
                 case 'x':
                 case 'X':
                     pad='0';
-                    ulval = va_arg (ap, long);
+                    ulval = va_arg (ap, long long);
                     do
                     {
                         *--str = hexdigit[ulval & 0xf];
@@ -143,8 +182,9 @@ void format(
                     }
                     while (ulval);
                     break;
+
                 case 'd':
-                    lval = lsign = va_arg (ap, long);
+                    lval = lsign = va_arg (ap, long long);
                     if (lval < 0)
                         lval = -lval;
                     do
@@ -158,7 +198,7 @@ void format(
                     break;
 
                 case 'u':
-                    ulval = va_arg(ap, unsigned long);
+                    ulval = va_arg(ap, unsigned long long);
                     do
                     {
                         *--str = (ulval % 10) + '0';
@@ -169,7 +209,14 @@ void format(
 
                 default:
                     *--str = 'l';
+                    *--str = 'l';
                     *--str = ch;
+                }
+                break;
+
+            default:
+                *--str = 'l';
+                *--str = ch;
             }
 
             break;
