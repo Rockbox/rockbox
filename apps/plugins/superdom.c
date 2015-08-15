@@ -1941,37 +1941,32 @@ static void computer_allocate(void)
             }
         }
     }
-    if(superdom_settings.compdiff>=AI_BUILD_INDS_FARMS_LEVEL && compres.cash>=PRICE_FACTORY)
+    if(superdom_settings.compdiff>=AI_BUILD_INDS_FARMS_LEVEL && compres.cash>=PRICE_FACTORY+100)
     {
-        while(compres.cash>=PRICE_FACTORY)
+        int i = 0;
+        do
         {
             if(compres.farms<compres.inds)
             {
-                while(compres.farms<compres.inds && compres.cash>=PRICE_FARM)
+                i = rb->rand()%BOARD_SIZE + 1;
+                j = rb->rand()%BOARD_SIZE + 1;
+                if(board[i][j].colour == COLOUR_DARK && !board[i][j].farm)
                 {
-                    i = rb->rand()%BOARD_SIZE + 1;
-                    j = rb->rand()%BOARD_SIZE + 1;
-                    if(board[i][j].colour == COLOUR_DARK && !board[i][j].farm)
-                    {
-                        buy_resources(COLOUR_DARK, 3, i, j, 0);
-                        break;
-                    }
+                    buy_resources(COLOUR_DARK, 3, i, j, 0);
+                    break;
                 }
             }
             else
             {
-                while(compres.inds<compres.farms && compres.cash>=PRICE_FACTORY)
+                i = rb->rand()%BOARD_SIZE + 1;
+                j = rb->rand()%BOARD_SIZE + 1;
+                if(board[i][j].colour == COLOUR_DARK && !board[i][j].ind)
                 {
-                    i = rb->rand()%BOARD_SIZE + 1;
-                    j = rb->rand()%BOARD_SIZE + 1;
-                    if(board[i][j].colour == COLOUR_DARK && !board[i][j].ind)
-                    {
-                        buy_resources(COLOUR_DARK, 4, i, j, 0);
-                        break;
-                    }
+                    buy_resources(COLOUR_DARK, 4, i, j, 0);
+                    break;
                 }
             }
-        }
+        } while(compres.cash>=PRICE_FACTORY + 100 && i++ < 3);
     }
     /* AI will buy nukes first if possible */
     if(compres.cash > PRICE_NUKE + PRICE_TANK && superdom_settings.compdiff>=AI_BUILD_NUKES_LEVEL)
