@@ -39,7 +39,8 @@ Head and Tail are stored
 #define WIDTH  28
 #define HEIGHT 16
 
-#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128)
+#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) \
+    || (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 96) && (LCD_DEPTH >= 16)
 #include "pluginbitmaps/snake2_header1.h"
 #include "pluginbitmaps/snake2_header2.h"
 #include "pluginbitmaps/snake2_left.h"
@@ -121,6 +122,18 @@ Head and Tail are stored
     #define TOP_X4 114
     #define TOP_Y1 4
     #define TOP_Y2 25
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 96) && (LCD_DEPTH >= 16)
+    #define MULTIPLIER 4
+    #define MODIFIER_1 4
+    #define MODIFIER_2 2
+    #define CENTER_X   8
+    #define CENTER_Y  24
+    #define TOP_X1    28
+    #define TOP_X2    96
+    #define TOP_X3    44
+    #define TOP_X4    83
+    #define TOP_Y1     2
+    #define TOP_Y2    13
 #elif (LCD_WIDTH == 96) && (LCD_HEIGHT == 96)
     #define MULTIPLIER 3
     #define MODIFIER_1 4
@@ -638,7 +651,8 @@ static void init_snake(void)
     new_level(level_from_file);
 }
 
-#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128)
+#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) \
+    || (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 96) && (LCD_DEPTH >= 16)
 static void draw_frame_bitmap(int header_type)
 {
     rb->lcd_bitmap(header_type==1? snake2_header1: snake2_header2, 0, 0,
@@ -670,7 +684,8 @@ static void draw_apple( void )
 {
     int x,y;
 
-#if LCD_WIDTH >= 160 && LCD_HEIGHT >= 128
+#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) \
+    || (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 96) && (LCD_DEPTH >= 16)
     draw_frame_bitmap(2);
 
     rb->snprintf(strbuf, sizeof(strbuf), "%d", applecount);
@@ -901,7 +916,8 @@ static void redraw (void)
         }
     }
 
-#if LCD_WIDTH >= 160 && LCD_HEIGHT >= 128
+#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) \
+    || (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 96) && (LCD_DEPTH >= 16)
     draw_frame_bitmap(2);
 
     rb->snprintf(strbuf, sizeof(strbuf), "%d", applecount);
@@ -1434,7 +1450,8 @@ static void select_maze(void)
 
     while (1)
     {
-#if LCD_WIDTH >= 160 && LCD_HEIGHT >= 128
+#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) \
+    || (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 96) && (LCD_DEPTH >= 16)
         draw_frame_bitmap(1);
 
         rb->snprintf(strbuf, sizeof(strbuf), "%d", level);
