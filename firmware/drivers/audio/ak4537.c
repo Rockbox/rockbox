@@ -176,6 +176,12 @@ void audiohw_close(void)
     /* power down the DAC */
     akc_clear(AK4537_PM2, PMDAC);
 
+    /* Let the common voltage fall down before powering down headphone amp,
+       or a pop noise will occur. The fall time depends on the capacitor value
+       connected with the MUTET pin and is 100k*C up to 250k*C.
+       For Samsung YH devices (4.7uF) a minimum time of 470ms is needed. */
+    udelay(800000);
+
     /* power down the headphone amp */
     akc_set(AK4537_SIGSEL2, HPL | HPR);
 
@@ -187,7 +193,6 @@ void audiohw_close(void)
 
     /* power down VCOM */
     akc_clear(AK4537_PM1, PMVCM);
-    udelay(100000);
 
     akcodec_close(); /* target-specific */
 }
