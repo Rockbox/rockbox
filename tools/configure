@@ -128,8 +128,14 @@ app_set_lcd_size () {
 }
 
 findarmgcc() {
-  prefixtools arm-elf-eabi-
-  gccchoice="4.4.4"
+    if [ -n "$ROCKBOX_5.2.0_ARM_NONE_EABI" ]; then
+        prefixtools arm-none-eabi-
+        gccchoice="5.2.0"
+        GCCOPTS="$CCOPTS -melf"
+    else
+        prefixtools arm-elf-eabi-
+        gccchoice="4.4.4"
+    fi
 }
 
 # scan the $PATH for the given command
