@@ -35,8 +35,6 @@ static struct thread_entry_item {
     struct thread_entry *entry;
 } entry_lookup[32];
 
-
-
 static struct thread_entry_item *__find_thread_entry(unsigned thread_id)
 {
     int i;
@@ -47,6 +45,11 @@ static struct thread_entry_item *__find_thread_entry(unsigned thread_id)
             return &entry_lookup[i];
     }
     return NULL;
+}
+
+bool thread_main()
+{
+    return (thread_self() == entry_lookup[0].thread_id);
 }
 
 static struct thread_entry *find_thread_entry(unsigned thread_id)

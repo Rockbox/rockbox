@@ -34,6 +34,8 @@ extern JNIEnv *env_ptr;
 extern jclass RockboxService_class;
 extern jobject RockboxService_instance;
 
+extern void jni_call(void(*fn)(void));
+
 static jmethodID updateNotification, finishNotification;
 static jobject NotificationManager_instance;
 static jstring title, artist, album, albumart;
@@ -42,12 +44,44 @@ static jstring title, artist, album, albumart;
 static const struct dim dim = { .width = 200, .height = 200 };
 #define NZV(a) (a && a[0])
 
+static struct mp3entry* id3 = NULL;
+
+JNIEXPORT jstring JNICALL
+Java_org_rockbox_Helper_RunForegroundManager_getTitle(JNIEnv *env, jobject this)
+{
+    (void)env;
+    (void)this;
+    return title;
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_rockbox_Helper_RunForegroundManager_getArtist(JNIEnv *env, jobject this)
+{
+    (void)env;
+    (void)this;
+    return artist;
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_rockbox_Helper_RunForegroundManager_getAlbum(JNIEnv *env, jobject this)
+{
+    (void)env;
+    (void)this;
+    return album;
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_rockbox_Helper_RunForegroundManager_getAlbumart(JNIEnv *env, jobject this)
+{
+    (void)env;
+    (void)this;
+    return albumart;
+}
+
 /*
  * notify about track change, and show track info */
-static void track_changed_callback(unsigned short id, void *param)
+static void track_changed_callback_(void)
 {
-    (void)id;
-    struct mp3entry* id3 = ((struct track_event *)param)->id3;
     JNIEnv e = *env_ptr;
     if (id3)
     {
@@ -101,21 +135,33 @@ static void track_changed_callback(unsigned short id, void *param)
         }
 
         e->CallVoidMethod(env_ptr, NotificationManager_instance,
-                      updateNotification, title, artist, album, albumart);
+                      updateNotification);
     }
+}
+
+static void track_changed_callback(unsigned short id, void *param)
+{
+    (void)id;
+    id3 = ((struct track_event *)param)->id3;
+    jni_call(track_changed_callback_);
 }
 
 /*
  * notify about track finishing */
+static void finish_notification(void)
+{
+    JNIEnv e = *env_ptr;
+    e->CallVoidMethod(env_ptr, NotificationManager_instance,
+                      finishNotification);
+}
+
 static void track_finished_callback(unsigned short id, void *param)
 {
     (void)id;
     if (((struct track_event *)param)->flags & TEF_REWIND)
         return; /* Not a true track end */
 
-    JNIEnv e = *env_ptr;
-    e->CallVoidMethod(env_ptr, NotificationManager_instance,
-                      finishNotification);
+    jni_call(finish_notification);
 
     /* delete temporary albumart file */
     char buf[MAX_PATH];
@@ -124,7 +170,7 @@ static void track_finished_callback(unsigned short id, void *param)
     unlink(buf);
 }
 
-void notification_init(void)
+void notification_init_(void)
 {
     JNIEnv e = *env_ptr;
     jfieldID nNM = e->GetFieldID(env_ptr, RockboxService_class,
@@ -138,14 +184,14 @@ void notification_init(void)
     }
 
     jclass class = e->GetObjectClass(env_ptr, NotificationManager_instance);
-    updateNotification = e->GetMethodID(env_ptr, class, "updateNotification",
-                                         "(Ljava/lang/String;"
-                                         "Ljava/lang/String;"
-                                         "Ljava/lang/String;"
-                                         "Ljava/lang/String;)V");
-    finishNotification = e->GetMethodID(env_ptr, class, "finishNotification",
-                                        "()V");
+    updateNotification = e->GetMethodID(env_ptr, class, "updateNotification","()V");
+    finishNotification = e->GetMethodID(env_ptr, class, "finishNotification","()V");
 
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, track_changed_callback);
     add_event(PLAYBACK_EVENT_TRACK_FINISH, track_finished_callback);
+}
+
+void notification_init(void)
+{
+    jni_call(notification_init_);
 }

@@ -44,6 +44,10 @@ struct core_entry __cores[NUM_CORES] IBSS_ATTR;
 static struct thread_entry __thread_entries[MAXTHREADS] IBSS_ATTR;
 struct thread_entry *__threads[MAXTHREADS] IBSS_ATTR;
 
+bool thread_main(void)
+{
+    return (thread_self() == THREAD_ID_SLOT(0));
+}
 
 /** Internal functions **/
 

@@ -676,7 +676,7 @@ androidcc () {
     fi
     SHARED_LDFLAG="-shared"
     SHARED_CFLAGS=''
-    GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack"
+    GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack -fuse-ld=bfd"
     ANDROID_ARCH=$1 # for android.make too
     gccchoice="4.6"
     # arch dependant stuff
@@ -686,7 +686,8 @@ androidcc () {
             gcctarget="arm-linux-androideabi-"
             # sigaltstack is not available in pre-android-9, however asm
             # threads work fine so far
-            thread_support="ASSEMBLER_THREADS"
+            #thread_support="ASSEMBLER_THREADS"
+            thread_support="HAVE_SIGALTSTACK_THREADS"
             GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer \
                     --sysroot=$ANDROID_NDK_PATH/platforms/android-16/arch-arm"
             LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-16/arch-arm"

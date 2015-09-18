@@ -91,7 +91,12 @@ public class RunForegroundManager
         mWidgetUpdate = null;
     }
 
-    public void updateNotification(final String title, final String artist, final String album, final String albumart)
+    private native String getTitle();
+    private native String getArtist();
+    private native String getAlbum();
+    private native String getAlbumart();
+
+    public void updateNotification()
     {
         /* do this on the main thread for 2 reasons
          * 1) Don't delay track switching with possibly costly albumart
@@ -99,6 +104,11 @@ public class RunForegroundManager
          * 2) Work around a bug in Android where decodeFile() fails outside
          *  of the main thread (http://stackoverflow.com/q/7228633)
          */
+        final String title = getTitle();
+        final String artist = getArtist();
+        final String album = getAlbum();
+        final String albumart = getAlbumart();
+
         mServiceHandler.post(new Runnable()
         {
             @Override

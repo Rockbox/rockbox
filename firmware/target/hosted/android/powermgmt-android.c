@@ -22,11 +22,14 @@
 
 #include <jni.h>
 #include <stdbool.h>
+#include "kernel.h"
+#include "button.h"
 #include "config.h"
 
 extern JNIEnv *env_ptr;
 extern jclass  RockboxService_class;
 extern jobject RockboxService_instance;
+extern void jni_call(void(*fn)(void));
 
 static jfieldID __battery_level;
 static jobject BatteryMonitor_instance;
@@ -51,7 +54,13 @@ static void new_battery_monitor(void)
 int _battery_level(void)
 {
     if (!BatteryMonitor_instance)
-        new_battery_monitor();
-    return (*env_ptr)->GetIntField(env_ptr, BatteryMonitor_instance, __battery_level);
+    {
+        jni_call(new_battery_monitor);
+        return -1;
+    }
+    else
+    {
+        return (*env_ptr)->GetIntField(env_ptr, BatteryMonitor_instance, __battery_level);
+    }
 }
 

@@ -28,8 +28,8 @@
 #include "system.h"
 #include "power.h"
 #include "button.h"
-
-
+#include "queue.h"
+#include "thread.h"
 
 /* global fields for use with various JNI calls */
 static JavaVM *vm_ptr;
@@ -111,8 +111,11 @@ Java_org_rockbox_RockboxService_main(JNIEnv *env, jobject this)
     {
         env_ptr = env;
 
-        RockboxService_instance = this;
-        RockboxService_class = (*env)->GetObjectClass(env, this);
+        //RockboxService_instance = this;
+        //RockboxService_class = (*env)->GetObjectClass(env, this);
+        RockboxService_instance = (*env)->NewGlobalRef(env_ptr,this);
+        jclass cls = (*env)->GetObjectClass(env, this);
+        RockboxService_class =(*env)->NewGlobalRef(env_ptr,cls);
 
         main();
     }
@@ -155,4 +158,12 @@ void set_rockbox_ready(void)
     pthread_cond_broadcast(&btn_cond);
 
     pthread_mutex_unlock(&btn_mtx);
+}
+
+void jni_call(void(*fn)(void))
+{
+    if (thread_main())
+        fn();
+    else
+        queue_post(&button_queue, SYS_JNI_CALL, (uintptr_t)fn);
 }

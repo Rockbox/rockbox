@@ -32,10 +32,10 @@ ANDROID_PLATFORM_VERSION=19
 ANDROID_PLATFORM=$(ANDROID_SDK_PATH)/platforms/android-$(ANDROID_PLATFORM_VERSION)
 
 # android tools
-BUILD_TOOLS_VERSION=$(notdir $(firstword $(wildcard $(ANDROID_SDK_PATH)/build-tools/$(ANDROID_PLATFORM_VERSION).*)))
+BUILD_TOOLS_VERSION=23.0.1
 AAPT=$(ANDROID_SDK_PATH)/build-tools/$(BUILD_TOOLS_VERSION)/aapt
 DX=$(ANDROID_SDK_PATH)/build-tools/$(BUILD_TOOLS_VERSION)/dx
-ZIPALIGN=$(ANDROID_SDK_PATH)/tools/zipalign
+ZIPALIGN=$(ANDROID_SDK_PATH)/build-tools/$(BUILD_TOOLS_VERSION)/zipalign
 KEYSTORE=$(HOME)/.android/debug.keystore
 ADB=$(ANDROID_SDK_PATH)/platform-tools/adb
 BUILDAPK=$(ANDROID_DIR)/buildapk.sh
