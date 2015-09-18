@@ -529,8 +529,13 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
     static bool resume = false;
 #endif
 
+    void ((*func)(void));
     switch(event)
     {
+        case SYS_JNI_CALL:
+            func = (void *)button_get_data();
+            func();
+            break;
         case SYS_BATTERY_UPDATE:
             if(global_settings.talk_battery_level)
             {

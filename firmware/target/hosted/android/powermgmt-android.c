@@ -22,6 +22,8 @@
 
 #include <jni.h>
 #include <stdbool.h>
+#include "kernel.h"
+#include "button.h"
 #include "config.h"
 
 extern JNIEnv *env_ptr;
@@ -51,7 +53,13 @@ static void new_battery_monitor(void)
 int _battery_level(void)
 {
     if (!BatteryMonitor_instance)
-        new_battery_monitor();
-    return (*env_ptr)->GetIntField(env_ptr, BatteryMonitor_instance, __battery_level);
+    {
+        queue_post(&button_queue, SYS_JNI_CALL, (uintptr_t)new_battery_monitor);
+        return -1;
+    }
+    else
+    {
+        return (*env_ptr)->GetIntField(env_ptr, BatteryMonitor_instance, __battery_level);
+    }
 }
 
