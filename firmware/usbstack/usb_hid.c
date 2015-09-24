@@ -581,7 +581,7 @@ int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_size)
 
     /* Endpoint descriptor */
     endpoint_descriptor.wMaxPacketSize = 8;
-    endpoint_descriptor.bInterval = 8;
+    endpoint_descriptor.bInterval = 1;
     endpoint_descriptor.bEndpointAddress = ep_in;
     PACK_DATA(&dest, endpoint_descriptor);
 

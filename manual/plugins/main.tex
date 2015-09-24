@@ -143,6 +143,9 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
       {}{}
     Shortcuts             & \fname{.link}                    &   \\
     Chip-8 Emulator       & \fname{.ch8}                     &   \\
+    \opt{usb_hid}{
+        Ducky++               & \fname{.ds}                      &   \\
+    }}
     Frotz                 & \fname{.z1 - .z8}                &   \\
     Image Viewer          & \fname{.bmp, .jpg, .jpeg, .png\opt{lcd_color}{, .ppm}}  &   \\
     Lua scripting language& \fname{.lua}                     &   \\
@@ -178,6 +181,8 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 {\input{plugins/shortcuts.tex}}
 
 \opt{lcd_bitmap}{\input{plugins/chip8emulator.tex}}
+
+\opt{usb_hid}{\input{plugins/ducky.tex}}
 
 \opt{lcd_bitmap}{\input{plugins/frotz.tex}}
 
