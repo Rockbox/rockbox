@@ -489,6 +489,10 @@ static const struct plugin_api rockbox_api = {
     usb_acknowledge,
 #ifdef USB_ENABLE_HID
     usb_hid_send,
+    /* dirty hack */
+#ifdef USB_FAKE_VID_PID
+    usb_change_id,
+#endif
 #endif
 #ifdef RB_PROFILE
     profile_thread,

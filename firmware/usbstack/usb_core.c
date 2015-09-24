@@ -271,6 +271,9 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .init = usb_hid_init,
         .disconnect = usb_hid_disconnect,
         .transfer_complete = usb_hid_transfer_complete,
+#ifdef USB_HAS_FAST_COMPLETION
+        .fast_transfer_complete = usb_hid_fast_transfer_complete,
+#endif
         .control_request = usb_hid_control_request,
 #ifdef HAVE_HOTSWAP
         .notify_hotswap = NULL,
@@ -529,6 +532,9 @@ void usb_core_release_endpoint(int ep)
     ep = EP_NUM(ep);
 
     ep_data[ep].completion_handler[dir] = NULL;
+#ifdef USB_HAS_FAST_COMPLETION
+    ep_data[ep].fast_completion_handler[dir] = NULL;
+#endif
     ep_data[ep].control_handler[dir] = NULL;
 }
 
