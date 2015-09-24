@@ -562,6 +562,11 @@ struct plugin_api {
 #ifdef USB_ENABLE_HID
     void (*usb_hid_send)(usage_page_t usage_page, int id);
 #endif
+
+#ifdef USB_FAKE_VID_PID
+    void (*usb_change_id)(uint16_t vid, uint16_t pid);
+#endif
+    
 #ifdef RB_PROFILE
     void (*profile_thread)(void);
     void (*profstop)(void);
