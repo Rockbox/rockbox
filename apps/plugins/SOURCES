@@ -35,6 +35,7 @@ shopper.c
 resistor.c
 
 #ifdef USB_ENABLE_HID
+ducky.c
 remote_control.c
 #endif
 
