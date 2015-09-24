@@ -488,6 +488,7 @@ static const struct plugin_api rockbox_api = {
 #endif
     usb_acknowledge,
 #ifdef USB_ENABLE_HID
+
     usb_hid_send,
 #endif
 #ifdef RB_PROFILE
