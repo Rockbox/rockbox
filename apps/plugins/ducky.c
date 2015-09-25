@@ -9,9 +9,21 @@
  *
  * Variables: there are 26 available variables, A-Z, *case-insensitive*
  *
- * "JUMP X" - jumps to line X in the file
- * "SET X Y" - loads constant Y into variable X
- * "ADD X Y" - Y = Y + X
+ * NOTE: in the lines below, a * before a variable denotes that it is a constant
+ *
+ * "JUMP *X" - jumps to line X in the file
+ * "JUMPZ X *Y" - if X == 0, jump to line Y
+ * "JUMPLZ X *Y" - if X < 0, jump to line Y
+ * "JUMPL X Y *Z" - if X < Y, jump to line Z
+ * "SET X *Y" - loads constant Y into variable X
+ * "MOV X Y" - Y = X
+ * "SWP X Y" - X <-> Y
+ * "NEG X"   - X = 0 - X
+ * "ADD X Y" - Y = X + Y
+ * "SUB X Y" - Y = X - Y
+ * "MUL X Y" - Y = X * Y
+ * "DIV X Y" - Y = X / Y
+ * "MOD X Y" - Y = X % Y
  */
 
 #define DEFAULT_DELAY 10
