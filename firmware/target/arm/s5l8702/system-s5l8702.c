@@ -27,6 +27,7 @@
 #include "gpio-s5l8702.h"
 #include "dma-s5l8702.h"
 #include "uart-s5l8702.h"
+#include "clocking-s5l8702.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -180,9 +181,24 @@ void fiq_dummy(void)
     );
 }
 
+static struct clocking_mode clk_modes[] =
+{
+   /* cdiv  hdiv  hprat  hsdiv */    /* CClk  HClk  PClk  SM1Clk  FPS */
+    { 1,    2,    2,     4 },        /* 216   108   54    27      42  */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    { 4,    4,    2,     2 },        /* 54    54    27    27      21  */
+#endif
+};
+#define N_CLK_MODES (sizeof(clk_modes) / sizeof(struct clocking_mode))
+
+enum {
+    CLK_BOOST = 0,
+    CLK_UNBOOST = N_CLK_MODES - 1,
+};
 
 void system_init(void)
 {
+    clocking_init(clk_modes, 0);
     gpio_init();
     pmu_init();
     dma_init();
@@ -223,61 +239,22 @@ int system_memory_guard(int newmode)
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-
 void set_cpu_frequency(long frequency)
 {
     if (cpu_frequency == frequency)
         return;
 
-    /*
-     * CPU scaling parameters:
-     * CPUFREQ_MAX:    CPU = 216MHz, AHB = 108MHz, Vcore = 1.200V
-     * CPUFREQ_NORMAL: CPU =  54MHz, AHB =  54MHz, Vcore = 1.050V
-     *
-     * CLKCON0 sets PLL2->FCLK divider (CPU clock)
-     * CLKCON1 sets FCLK->HCLK divider (AHB clock)
-     *
-     * HCLK is derived from FCLK, the system goes unstable if HCLK
-     * is out of the range 54-108 MHz, so two stages are required to
-     * switch FCLK (216 MHz <-> 54 MHz), adjusting HCLK in between
-     * to ensure system stability.
-     */
     if (frequency == CPUFREQ_MAX)
     {
-        /* Vcore = 1.200V */
-        pmu_write(0x1e, 0x17);
-
-        /* FCLK = PLL2 / 2  (FCLK = 108MHz, HCLK = 108MHz) */
-        CLKCON0 = 0x3011;
-        udelay(50);
-
-        /* HCLK = FCLK / 2  (HCLK = 54MHz) */
-        CLKCON1 = 0x404101;
-        udelay(50);
-
-        /* FCLK = PLL2  (FCLK = 216MHz, HCLK = 108MHz) */
-        CLKCON0 = 0x3000;
-        udelay(100);
+        pmu_write(0x1e, 0x13);  /* Vcore = 1100 mV */
+        set_clocking_level(CLK_BOOST);
     }
     else
     {
-        /* FCLK = PLL2 / 2  (FCLK = 108MHz, HCLK = 54MHz) */
-        CLKCON0 = 0x3011;
-        udelay(50);
-
-        /* HCLK = FCLK  (HCLK = 108MHz) */
-        CLKCON1 = 0x4001;
-        udelay(50);
-
-        /* FCLK = PLL2 / 4  (FCLK = 54MHz, HCLK = 54MHz) */
-        CLKCON0 = 0x3013;
-        udelay(100);
-
-        /* Vcore = 1.050V */
-        pmu_write(0x1e, 0x11);
+        set_clocking_level(CLK_UNBOOST);
+        pmu_write(0x1e, 0xf);   /* Vcore = 1000 mV */
     }
 
     cpu_frequency = frequency;
 }
-
 #endif
