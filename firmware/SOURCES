@@ -1600,6 +1600,7 @@ target/arm/s5l8702/system-s5l8702.c
 target/arm/s5l8702/gpio-s5l8702.c
 target/arm/s5l8702/pl080.c
 target/arm/s5l8702/dma-s5l8702.c
+target/arm/s5l8702/clocking-s5l8702.c
 target/arm/s5l8702/ipod6g/lcd-ipod6g.c
 target/arm/s5l8702/ipod6g/lcd-asm-ipod6g.S
 #if 0 //TODO
