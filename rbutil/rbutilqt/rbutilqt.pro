@@ -19,7 +19,7 @@
 # here.
 # Only do this if CC is gcc. Also, do this before ccache support is enabled.
 contains(QMAKE_CC,($$find(QMAKE_CC,.*gcc.*))) {
-    EXTRALIBS_OPTS = "EXTRALIBS_AR=\""$$replace(QMAKE_CC,gcc.*,ar)\"
+    EXTRALIBS_OPTS = EXTRALIBS_AR=\'$$replace(QMAKE_CC,gcc.*,ar)\'
 }
 # ccache
 unix:!mac:!noccache {
@@ -31,8 +31,8 @@ unix:!mac:!noccache {
     }
 }
 MACHINEFLAGS = $$find(QMAKE_CFLAGS, -m[63][42])
-EXTRALIBS_OPTS += EXTRALIBS_CC=\"$$QMAKE_CC\"
-EXTRALIBS_OPTS += EXTRALIB_CFLAGS=\"$$MACHINEFLAGS\" \
+EXTRALIBS_OPTS += EXTRALIBS_CC=\'$$QMAKE_CC\'
+EXTRALIBS_OPTS += EXTRALIB_CFLAGS=\'$$MACHINEFLAGS\'
 
 MYBUILDDIR = $$OUT_PWD/build/
 MYLIBBUILDDIR = $$MYBUILDDIR/libs/
@@ -46,6 +46,8 @@ RCC_DIR = $$MYBUILDDIR/rcc
 } else {
     VERBOSE =
 }
+
+DEFINES += DEBUG___USE_LOCAL_FILES
 
 # check version of Qt installation
 !contains(QT_MAJOR_VERSION, 5) {
@@ -79,7 +81,7 @@ message("using Rockbox basedir $$RBBASE_DIR")
 extralibs.commands = $$SILENT \
         $(MAKE) -f $$RBBASE_DIR/rbutil/rbutilqt/Makefile.libs \
         $$VERBOSE \
-        SYS_SPEEX=\"$$LIBSPEEX\" \
+        SYS_SPEEX=\'$$LIBSPEEX\' \
         BUILD_DIR=$$MYLIBBUILDDIR/ \
         TARGET_DIR=$$MYLIBBUILDDIR \
         RBBASE_DIR=$$RBBASE_DIR \
@@ -88,7 +90,7 @@ extralibs.commands = $$SILENT \
 # Note: order is important for RBLIBS! The libs are appended to the linker
 # flags in this order, put libucl at the end.
 RBLIBS = rbspeex ipodpatcher sansapatcher mkamsboot mktccboot \
-         mkmpioboot chinachippatcher mkimxboot ucl
+         mkmpioboot chinachippatcher mkimxboot mk6gboot ucl
 !win32-msvc* {
     QMAKE_EXTRA_TARGETS += extralibs
     PRE_TARGETDEPS += extralibs
@@ -186,6 +188,17 @@ win32 {
     DEFINES += _CRT_SECURE_NO_WARNINGS
     DEFINES += UNICODE
     LIBS += -lsetupapi -lnetapi32
+    # rbutil build using Qt5.1.1 and mingw32-gcc 4.8.1:
+    # - dinamic: libz is not linked implicitly, needs to add -lz here
+    # - static: static Qt libraries were compiled with no embedded lz,
+    #   so -lz is added implicitly, but adding it again should not harm.
+    #   The current source seems to fail to compile when using static
+    #   Qt5.1.1 with embedded lz support.
+    contains(QT_MAJOR_VERSION, 5) {
+        LIBS += -lz
+    }
+    # needed by libmk6gboot.a
+    LIBS += -lusb-1.0
 }
 win32:static {
     QMAKE_LFLAGS += -static-libgcc -static-libstdc++
