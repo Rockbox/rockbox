@@ -33,7 +33,9 @@
 #include "led.h"
 #include "ata_idle_notify.h"
 #include "disk_cache.h"
+#ifndef BOOTLOADER
 #include "splash.h"
+#endif
 
 
 #ifndef ATA_RETRIES
@@ -1193,6 +1195,7 @@ int ata_init(void)
     PASS_RC(ata_bbt_reload(), 0, 0);
 #endif
     
+#ifndef BOOTLOADER
     /* HDD data endianness check:
          During the transition period Rockbox needs to detect the HDD data
          endianness automatically and support both. We're now using the correct
@@ -1212,7 +1215,8 @@ int ata_init(void)
             splashf(5000, "Wrong HDD endianness, please update your emCORE version!");
         }
     }
-    
+#endif
+
     create_thread(ata_thread, ata_stack,
                     sizeof(ata_stack), 0, "ATA idle monitor"
                     IF_PRIO(, PRIORITY_USER_INTERFACE)
