@@ -55,6 +55,9 @@ public:
     static QString resolveDevicename(QString path);
     static QString resolveMountPoint(QString device);
     static QStringList findRunningProcess(QStringList names);
+    static unsigned int findProcessId(QString name);
+    static bool pauseProcess(unsigned int pid);
+    static bool resumeProcess(unsigned int pid);
     static bool ejectDevice(QString device);
 };
 

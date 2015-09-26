@@ -199,10 +199,28 @@ void HttpGet::networkError(QNetworkReply::NetworkError error)
     m_lastErrorString = m_reply->errorString();
 }
 
-
 bool HttpGet::getFile(const QUrl &url)
 {
     LOG_INFO() << "Get URI" << url.toString();
+#ifdef DEBUG___USE_LOCAL_FILES
+    QString fname = url.toString().remove(QRegExp("^file://"));
+    if (fname != url.toString()) {
+        QFile file(fname);
+        if (!file.open(QIODevice::ReadOnly)) {
+           m_lastErrorString = "cannot open file " + file.fileName();
+           LOG_ERROR() << m_lastErrorString;
+           emit done(true);
+           return false;
+        }
+        if(m_outputFile && m_outputFile->open(QIODevice::WriteOnly)) {
+            m_outputFile->write(file.readAll());
+            m_outputFile->close();
+        }
+        file.close();
+        emit done(false);
+        return false;
+    }
+#endif
     m_data.clear();
     startRequest(url);
 

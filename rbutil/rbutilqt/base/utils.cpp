@@ -502,13 +502,14 @@ QString Utils::resolveDevicename(QString path)
     // get the extents
     if(DeviceIoControl(h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
                 NULL, 0, extents, sizeof(buffer), &written, NULL)) {
-        if(extents->NumberOfDiskExtents > 1) {
-            LOG_INFO() << "resolving device name: volume spans multiple disks!";
-            return "";
+        if(extents->NumberOfDiskExtents == 1) {
+            CloseHandle(h);
+            LOG_INFO() << "device name is" << extents->Extents[0].DiskNumber;
+            return QString("%1").arg(extents->Extents[0].DiskNumber);
         }
-        LOG_INFO() << "device name is" << extents->Extents[0].DiskNumber;
-        return QString("%1").arg(extents->Extents[0].DiskNumber);
+        LOG_INFO() << "resolving device name: volume spans multiple disks!";
     }
+    CloseHandle(h);
 #endif
     return QString("");
 
@@ -748,6 +749,178 @@ QStringList Utils::findRunningProcess(QStringList names)
     }
     LOG_INFO() << "Found listed processes running:" << found;
     return found;
+}
+
+
+/** Check if a process with a given name is running
+ *  @param name of the process to check
+ *  @return PID for the process or 0 if process is not running.
+ */
+unsigned int Utils::findProcessId(QString name)
+{
+    unsigned int pid = 0;
+#if defined(Q_OS_WIN32)
+    HANDLE hdl;
+    PROCESSENTRY32 entry;
+    bool result;
+
+    hdl = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if(hdl == INVALID_HANDLE_VALUE) {
+        LOG_ERROR() << "CreateToolhelp32Snapshot failed.";
+        return pid;
+    }
+    entry.dwSize = sizeof(PROCESSENTRY32);
+    entry.szExeFile[0] = '\0';
+    if(!Process32First(hdl, &entry)) {
+        LOG_ERROR() << "Process32First failed.";
+        return pid;
+    }
+
+    do {
+        entry.dwSize = sizeof(PROCESSENTRY32);
+        entry.szExeFile[0] = '\0';
+        result = Process32Next(hdl, &entry);
+        if(result) {
+            if(QRegExp(name + "(\\.(e(x(e?)?)?)?)?").exactMatch(
+                            QString::fromWCharArray(entry.szExeFile))) {
+                pid = entry.th32ProcessID;
+                break;
+            }
+        }
+    } while(result);
+    CloseHandle(hdl);
+#endif
+#if defined(Q_OS_MACX)
+// XXX: never tested
+    ProcessSerialNumber psn = { 0, kNoProcess };
+    OSErr err;
+    do {
+        pid_t pid_;
+        err = GetNextProcess(&psn);
+        err = GetProcessPID(&psn, &pid_);
+        if(err == noErr) {
+            char buf[32] = {0};
+            ProcessInfoRec info;
+            memset(&info, 0, sizeof(ProcessInfoRec));
+            info.processName = (unsigned char*)buf;
+            info.processInfoLength = sizeof(ProcessInfoRec);
+            err = GetProcessInformation(&psn, &info);
+            if(err == noErr) {
+                // some processes start with nonprintable characters. Skip those.
+                int i;
+                for(i = 0; i < 32; i++) {
+                    if(isprint(buf[i])) break;
+                }
+                if(!name.compare(QString::fromUtf8(&buf[i]))) {
+                    pid = pid_;
+                    break;
+                }
+            }
+        }
+    } while(err == noErr);
+#endif
+    LOG_INFO() << "process:" << name << "PID:" << pid;
+    return pid;
+}
+
+
+/** Pauses a process
+ *  @param pid of the process to pause
+ *  @return true on success, false otherwise.
+ */
+bool Utils::pauseProcess(unsigned int pid)
+{
+    bool result = false;
+#if defined(Q_OS_WIN32)
+    HANDLE hdl;
+    THREADENTRY32 entry;
+
+    hdl = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+    if(hdl != INVALID_HANDLE_VALUE) {
+        entry.dwSize = sizeof(THREADENTRY32);
+        if(Thread32First(hdl, &entry)) {
+            int fails = 0;
+            int suspended = 0;
+            do {
+                if(entry.th32OwnerProcessID == pid) {
+                    HANDLE thr = OpenThread(THREAD_ALL_ACCESS,
+                                        FALSE, entry.th32ThreadID);
+                    if (SuspendThread(thr) == (DWORD)(-1)) {
+                        LOG_ERROR() << "SuspendThread" << entry.th32ThreadID
+                                    << "error" << GetLastError();
+                        fails++;
+                    }
+                    else {
+                        suspended++;
+                    }
+                    CloseHandle(thr);
+                }
+            } while (Thread32Next(hdl, &entry));
+            result = suspended && !fails;
+        }
+        else {
+            LOG_ERROR() << "Process32First error" << GetLastError();
+        }
+        CloseHandle(hdl);
+    }
+    else {
+        LOG_ERROR() << "CreateToolhelp32Snapshot error" << GetLastError();
+    }
+#else
+    // TODO: kill(pid, SIGSTOP)
+#endif
+    LOG_INFO() << "pauseProcess" << pid << result;
+    return result;
+}
+
+
+/** Resumes a process
+ *  @param pid of the process to resume
+ *  @return true on success, false otherwise.
+ */
+bool Utils::resumeProcess(unsigned int pid)
+{
+    bool result = false;
+#if defined(Q_OS_WIN32)
+    HANDLE hdl;
+    THREADENTRY32 entry;
+
+    hdl = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+    if(hdl != INVALID_HANDLE_VALUE) {
+        entry.dwSize = sizeof(THREADENTRY32);
+        if(Thread32First(hdl, &entry)) {
+            int fails = 0;
+            int resumed = 0;
+            do {
+                if(entry.th32OwnerProcessID == pid) {
+                    HANDLE thr = OpenThread(THREAD_ALL_ACCESS,
+                                        FALSE, entry.th32ThreadID);
+                    if(ResumeThread(thr) == (DWORD)(-1)) {
+                        LOG_ERROR() << "ResumeThread" << entry.th32ThreadID
+                                    << "error" << GetLastError();
+                        fails++;
+                    }
+                    else {
+                        resumed++;
+                    }
+                    CloseHandle(thr);
+                }
+            } while (Thread32Next(hdl, &entry));
+            result = resumed && !fails;
+        }
+        else {
+            LOG_ERROR() << "Process32First error" << GetLastError();
+        }
+        CloseHandle(hdl);
+    }
+    else {
+        LOG_ERROR() << "CreateToolhelp32Snapshot error" << GetLastError();
+    }
+#else
+    // TODO: kill(pid, SIGCONT)
+#endif
+    LOG_INFO() << "resumeProcess" << pid << result;
+    return result;
 }
 
 
