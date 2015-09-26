@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "system.h"
 #include "kernel.h"
@@ -71,68 +71,52 @@ void i2c_init()
     mutex_init(&i2c_mtx[1]);
 }
 
-int i2c_write(int bus, unsigned char slave, int address, int len, const unsigned char *data)
+int i2c_wr(int bus, unsigned char slave, int address, int len, const unsigned char *data)
 {
-    mutex_lock(&i2c_mtx[bus]);
     i2c_on(bus);
-    long timeout = current_tick + HZ / 50;
+    long timeout = USEC_TIMER + 20000;
 
     /* START */
     IICDS(bus) = slave & ~1;
     IICSTAT(bus) = 0xF0;
     IICCON(bus) = 0xB3;
     while ((IICCON(bus) & 0x10) == 0)
-        if (TIME_AFTER(current_tick, timeout))
-        {
-            mutex_unlock(&i2c_mtx[bus]);
+        if (TIME_AFTER(USEC_TIMER, timeout))
             return 1;
-        }
 
-    
     if (address >= 0) {
         /* write address */
         IICDS(bus) = address;
         IICCON(bus) = 0xB3;
         while ((IICCON(bus) & 0x10) == 0)
-            if (TIME_AFTER(current_tick, timeout))
-            {
-                mutex_unlock(&i2c_mtx[bus]);
+            if (TIME_AFTER(USEC_TIMER, timeout))
                 return 2;
-            }
     }
-    
+
     /* write data */
     while (len--) {
         IICDS(bus) = *data++;
         IICCON(bus) = 0xB3;
         while ((IICCON(bus) & 0x10) == 0)
-            if (TIME_AFTER(current_tick, timeout))
-            {
-                mutex_unlock(&i2c_mtx[bus]);
+            if (TIME_AFTER(USEC_TIMER, timeout))
                 return 4;
-            }
     }
 
     /* STOP */
     IICSTAT(bus) = 0xD0;
     IICCON(bus) = 0xB3;
     while ((IICSTAT(bus) & (1 << 5)) != 0)
-        if (TIME_AFTER(current_tick, timeout))
-        {
-            mutex_unlock(&i2c_mtx[bus]);
+        if (TIME_AFTER(USEC_TIMER, timeout))
             return 5;
-        }
-    
+
     i2c_off(bus);
-    mutex_unlock(&i2c_mtx[bus]);
     return 0;
 }
 
-int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *data)
+int i2c_rd(int bus, unsigned char slave, int address, int len, unsigned char *data)
 {
-    mutex_lock(&i2c_mtx[bus]);
     i2c_on(bus);
-    long timeout = current_tick + HZ / 50;
+    long timeout = USEC_TIMER + 20000;
 
     if (address >= 0) {
         /* START */
@@ -140,42 +124,30 @@ int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *
         IICSTAT(bus) = 0xF0;
         IICCON(bus) = 0xB3;
         while ((IICCON(bus) & 0x10) == 0)
-            if (TIME_AFTER(current_tick, timeout))
-            {
-                mutex_unlock(&i2c_mtx[bus]);
+            if (TIME_AFTER(USEC_TIMER, timeout))
                 return 1;
-            }
 
         /* write address */
         IICDS(bus) = address;
         IICCON(bus) = 0xB3;
         while ((IICCON(bus) & 0x10) == 0)
-            if (TIME_AFTER(current_tick, timeout))
-            {
-                mutex_unlock(&i2c_mtx[bus]);
+            if (TIME_AFTER(USEC_TIMER, timeout))
                 return 2;
-            }
     }
-    
+
     /* (repeated) START */
     IICDS(bus) = slave | 1;
     IICSTAT(bus) = 0xB0;
     IICCON(bus) = 0xB3;
     while ((IICCON(bus) & 0x10) == 0)
-        if (TIME_AFTER(current_tick, timeout))
-        {
-            mutex_unlock(&i2c_mtx[bus]);
+        if (TIME_AFTER(USEC_TIMER, timeout))
             return 3;
-        }
-    
+
     while (len--) {
         IICCON(bus) = (len == 0) ? 0x33 : 0xB3; /* NAK or ACK */
         while ((IICCON(bus) & 0x10) == 0)
-            if (TIME_AFTER(current_tick, timeout))
-            {
-                mutex_unlock(&i2c_mtx[bus]);
+            if (TIME_AFTER(USEC_TIMER, timeout))
                 return 4;
-            }
         *data++ = IICDS(bus);
     }
 
@@ -183,14 +155,61 @@ int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *
     IICSTAT(bus) = 0x90;
     IICCON(bus) = 0xB3;
     while ((IICSTAT(bus) & (1 << 5)) != 0)
-        if (TIME_AFTER(current_tick, timeout))
-        {
-            mutex_unlock(&i2c_mtx[bus]);
+        if (TIME_AFTER(USEC_TIMER, timeout))
             return 5;
-        }
-    
+
     i2c_off(bus);
-    mutex_unlock(&i2c_mtx[bus]);
     return 0;
 }
 
+int i2c_write(int bus, unsigned char slave, int address, int len, const unsigned char *data)
+{
+    int ret;
+    mutex_lock(&i2c_mtx[bus]);
+    ret = i2c_wr(bus, slave, address, len, data);
+    mutex_unlock(&i2c_mtx[bus]);
+    return ret;
+}
+
+int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *data)
+{
+    int ret;
+    mutex_lock(&i2c_mtx[bus]);
+    ret = i2c_rd(bus, slave, address, len, data);
+    mutex_unlock(&i2c_mtx[bus]);
+    return ret;
+}
+
+#ifdef BOOTLOADER
+#include "clocking-s5l8702.h"
+
+#define wait_rdy(bus) {while(IICUNK10(bus));}
+void i2c_preinit(int bus)
+{
+    clockgate_enable(CLOCKGATE_I2C0, true);
+    wait_rdy(bus);
+    IICADD(bus) = 0x40;   /* own slave address */
+    wait_rdy(bus);
+    IICUNK14(bus) = 0;
+    wait_rdy(bus);
+    IICUNK18(bus) = 0;
+    wait_rdy(bus);
+    IICSTAT(bus) = 0x80;  /* master Rx mode, Tx/Rx off */
+    wait_rdy(bus);
+    IICCON(bus) = 0;
+    wait_rdy(bus);
+    IICSTAT(bus) = 0;     /* slave Rx mode, Tx/Rx off */
+    wait_rdy(bus);
+    IICDS(bus) = 0x40;
+    wait_rdy(bus);
+    IICCON(bus) = (1 << 8) |  /* unknown */
+                  (1 << 7) |  /* ACK_GEN */
+                  (0 << 6) |  /* CLKSEL = PCLK/16 */
+                  (0 << 5) |  /* INT_EN = disabled */
+                  (4 << 0);   /* CK_REG */
+    wait_rdy(bus);
+    IICSTAT(bus) = 0x10;  /* slave Rx mode, Tx/Rx on */
+    wait_rdy(bus);
+    clockgate_enable(CLOCKGATE_I2C0, false);
+}
+#endif

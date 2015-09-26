@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id:
  *
- * Copyright (C) 2006-2007 Robert Keevil
+ * Copyright © 2009 Michael Sparmann
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,12 +18,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef __NOR_TARGET_H__
+#define __NOR_TARGET_H__
 
-void piezo_init(void);
-void piezo_stop(void);
-void piezo_clear(void);
-bool piezo_busy(void);
-void piezo_button_beep(bool beep, bool force);
-#ifdef BOOTLOADER
-void piezo_seq(uint16_t *seq);
-#endif
+void bootflash_init(int port);
+void bootflash_read(int port, uint32_t addr, uint32_t size, void* buf);
+void bootflash_write(int port, int offset, void* addr, int size);
+int bootflash_compare(int port, int offset, void* addr, int size);
+void bootflash_erase_blocks(int port, int first, int n);
+void bootflash_close(int port);
+
+#endif /* __NOR_TARGET_H__ */

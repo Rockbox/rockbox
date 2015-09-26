@@ -142,3 +142,87 @@ void pmu_write_rtc(unsigned char* buffer)
 {
     pmu_write_multiple(0x59, 7, buffer);
 }
+
+#ifdef BOOTLOADER
+int pmu_rd_multiple(int address, int count, unsigned char* buffer)
+{
+    return i2c_rd(0, 0xe6, address, count, buffer);
+}
+
+int pmu_wr_multiple(int address, int count, unsigned char* buffer)
+{
+    return i2c_wr(0, 0xe6, address, count, buffer);
+}
+
+unsigned char pmu_rd(int address)
+{
+    unsigned char val;
+    pmu_rd_multiple(address, 1, &val);
+    return val;
+}
+
+int pmu_wr(int address, unsigned char val)
+{
+    return pmu_wr_multiple(address, 1, &val);
+}
+
+void pmu_preinit(void)
+{
+    unsigned char rd_buf[8];
+
+    /* reset OOC shutdown register */
+    pmu_wr(PCF5063X_REG_OOCSHDWN, 0);
+
+    /* configure LDOs (mV = 900+100*val) */
+    pmu_wr_multiple(PCF5063X_REG_LDO1OUT, 14,
+            "\x15\x01"    /* LDO_UNK1:   3000 mV, enabled */
+            "\x15\x01"    /* LDO_UNK2:   3000 mV, enabled */
+            "\x15\x01"    /* LDO_LCD:    3000 mV, enabled */
+            "\x09\x01"    /* LDO_CODEC:  1800 mV, enabled */
+            "\x15\x01"    /* LDO_UNK5:   3000 mV, disabled */
+            "\x15\x04"    /* LDO_CWHEEL: 3000 mV, ON when GPIO2==1 */
+            "\x18\x00");  /* LDO_ACCY:   3300 mV, disabled */
+
+    /* LDO_CWHEEL is ON in standby state,
+       LDO_CWHEEL and MEMLDO are ON in UNKNOWN state (TBC) */
+    pmu_wr_multiple(PCF5063X_REG_STBYCTL1, 2, "\x00\x8C");
+
+    /* GPIO1,2 = input, GPIO3 = output */
+    pmu_wr_multiple(PCF5063X_REG_GPIOCTL, 3, "\x03\x00\x00");
+    /* GPO selection = fixed 0 */
+    pmu_wr(PCF5063X_REG_GPOCFG, 0);
+
+    /* DOWN2 converter (SDRAM): 1800 mV (625+25*val), enabled,
+       startup current limit = 15mA*0x10 (TBC) */
+    pmu_wr_multiple(PCF5063X_REG_DOWN2OUT, 4, "\x2F\x01\x00\x10");
+    /* MEMLDO: 1800 mV (900+100*val), enabled */
+    pmu_wr_multiple(PCF5063X_REG_MEMLDOOUT, 2, "\x09\x01");
+    /* AUTOLDO (HDD): 3400 mV (625+25*val), disabled,
+       current limit = 1000 mA (40mA*0x19), limit always active */
+    pmu_wr_multiple(PCF5063X_REG_AUTOOUT, 4, "\x6F\x00\x00\x59");
+    /* Vsysok = 3100 mV */
+    pmu_wr(PCF5063X_REG_SVMCTL, 0x08);
+
+    pmu_wr(0x58, 0); /* reserved */
+
+    /* configure PMU interrupt masks */
+    pmu_wr_multiple(PCF5063X_REG_INT1M, 5, "\xB0\x03\xFE\xFC\xFF");
+    pmu_wr(PCF50635_REG_INT6M, 0xFD);
+
+    /* OCCAWAKE: ONKEY, EXTON1..3, RTC, USB, AC adapter
+       wakeup on rising edge for EXTON1 and EXTON2,
+       wakeup on falling edge for EXTON3 and !ONKEY,
+       Vbat status has no effect in state machine */
+    pmu_wr_multiple(PCF5063X_REG_OOCWAKE, 5, "\xDF\xAA\x4A\x05\x27");
+
+    /* clear PMU interrupts */
+    pmu_rd_multiple(PCF5063X_REG_INT1, 5, rd_buf);
+    pmu_rd(PCF50635_REG_INT6);
+
+    /* GPO selection = LED external NFET drive signal */
+    pmu_wr(PCF5063X_REG_GPOCFG, 1);
+    /* LED converter OFF, overvoltage protection enabled,
+       OCP limit is 500 mA, led_dimstep = 16*0x06/32768 */
+    pmu_wr_multiple(PCF5063X_REG_LEDENA, 3, "\x00\x05\x06");
+}
+#endif /* BOOTLOADER */

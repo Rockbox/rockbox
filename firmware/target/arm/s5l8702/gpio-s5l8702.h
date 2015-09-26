@@ -142,4 +142,8 @@ void gpio_int_disable(int gpio_n);
 uint32_t gpio_group_get(int group);
 void gpio_group_set(int group, uint32_t mask, uint32_t cfg);
 
+#ifdef BOOTLOADER
+void gpio_preinit(void);
+#endif
+
 #endif /* __GPIO_S5L8702_H__ */
