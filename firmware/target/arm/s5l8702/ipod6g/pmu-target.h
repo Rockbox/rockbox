@@ -25,6 +25,26 @@
 #include <stdbool.h>
 #include "config.h"
 
+/* undocummented PMU registers */
+#define PCF50635_REG_INT6        0x85
+#define PCF50635_REG_INT6M       0x86
+#define PCF50635_REG_GPIOSTAT    0x87  /* bit1: GPIO2 status (TBC) */
+
+/* LDOs */
+#define LDO_UNK1        1   /* TBC: SoC voltage (USB) */
+#define LDO_UNK2        2   /* TBC: SoC voltage (I/O) */
+#define LDO_LCD         3
+#define LDO_CODEC       4
+#define LDO_UNK5        5   /* TBC: nano3g NAND */
+#define LDO_CWHEEL      6
+#define LDO_ACCY        7   /* HCLDO */
+/* other LDOs:
+ *  AUTOLDO: Hard Disk
+ *  DOWN1: CPU
+ *  DOWN2: SDRAM
+ *  MEMLDO: SDRAM self-refresh (TBC)
+ */
+
 unsigned char pmu_read(int address);
 int pmu_write(int address, unsigned char val);
 int pmu_read_multiple(int address, int count, unsigned char* buffer);
@@ -43,4 +63,10 @@ void pmu_read_rtc(unsigned char* buffer);
 void pmu_write_rtc(unsigned char* buffer);
 void pmu_hdd_power(bool on);
 
+#ifdef BOOTLOADER
+unsigned char pmu_rd(int address);
+int pmu_wr(int address, unsigned char val);
+int pmu_rd_multiple(int address, int count, unsigned char* buffer);
+int pmu_wr_multiple(int address, int count, unsigned char* buffer);
+#endif
 #endif

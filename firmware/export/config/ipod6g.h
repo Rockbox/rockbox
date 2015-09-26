@@ -249,10 +249,12 @@
 #define USB_NUM_ENDPOINTS 6
 #define USB_DEVBSS_ATTR __attribute__((aligned(16)))
 
+#ifndef BOOTLOADER
 #define HAVE_SERIAL
 /* Disable iAP when LOGF_SERIAL is enabled to avoid conflicts */
 #ifndef LOGF_SERIAL
 #define IPOD_ACCESSORY_PROTOCOL
+#endif
 #endif
 
 /* Define this if you can switch on/off the accessory power supply */

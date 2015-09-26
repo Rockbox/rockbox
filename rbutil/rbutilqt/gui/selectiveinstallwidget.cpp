@@ -247,6 +247,8 @@ void SelectiveInstallWidget::installBootloader(void)
         connect(bl, SIGNAL(done(bool)), this, SLOT(continueInstall(bool)));
         connect(bl, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
         connect(bl, SIGNAL(logProgress(int, int)), m_logger, SLOT(setProgress(int, int)));
+        // pass Abort button click signal to current installer
+        connect(m_logger, SIGNAL(aborted()), bl, SLOT(progressAborted()));
 
         // set bootloader filename. Do this now as installed() needs it.
         QStringList blfile = SystemInfo::value(SystemInfo::CurBootloaderFile).toStringList();
@@ -386,6 +388,16 @@ void SelectiveInstallWidget::installRockbox(void)
                 ServerInfo::CurDevelUrl).toString();
         else if(selected == "rc") url = ServerInfo::platformValue(m_target,
                 ServerInfo::RelCandidateUrl).toString();
+
+#ifdef DEBUG___USE_LOCAL_FILES
+        if (RbSettings::value(RbSettings::CurrentPlatform) == "ipod6g") {
+            url = "file://rockbox.zip";
+            QMessageBox::warning(this, NULL,
+                    tr("Experimental - gerrit patch set 5\n"
+                       "http://gerrit.rockbox.org/r/#/c/1221/5\n"
+                       "using local file %1").arg(QString(url).remove("file://")));
+        }
+#endif
 
         //! install build
         if(m_zipinstaller != NULL) m_zipinstaller->deleteLater();

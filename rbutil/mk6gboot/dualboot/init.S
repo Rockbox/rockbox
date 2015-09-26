@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id:
  *
- * Copyright (C) 2006-2007 Robert Keevil
+ * Copyright © 2009 Michael Sparmann
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,11 +19,25 @@
  *
  ****************************************************************************/
 
-void piezo_init(void);
-void piezo_stop(void);
-void piezo_clear(void);
-bool piezo_busy(void);
-void piezo_button_beep(bool beep, bool force);
-#ifdef BOOTLOADER
-void piezo_seq(uint16_t *seq);
-#endif
+    .section .init.text, "ax", %progbits
+    .global _start
+
+_start:
+    mov     r0, #0xD7
+    msr     CPSR_c, r0         @ Abort mode, IRQs/FIQs disabled
+    ldr     sp, =_exception_stack
+
+    mov     r0, #0xDB
+    msr     CPSR_c, r0         @ Undefined Instruction mode, IRQs/FIQs disabled
+    ldr     sp, =_exception_stack
+
+    mov     r0, #0xD3
+    msr     CPSR_c, r0         @ Supervisor mode, IRQs/FIQs disabled
+    ldr     sp, =_supervisor_stack
+
+    MOV R0, #0x00050000
+    ORR R0, #0x00000078
+    MCR p15, 0, R0, c1, c0, 0  @ Get rid of some CPU "features" likely to cause trouble
+
+    bl      main
+    .ltorg

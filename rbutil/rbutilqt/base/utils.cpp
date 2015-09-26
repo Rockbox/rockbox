@@ -502,13 +502,14 @@ QString Utils::resolveDevicename(QString path)
     // get the extents
     if(DeviceIoControl(h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
                 NULL, 0, extents, sizeof(buffer), &written, NULL)) {
-        if(extents->NumberOfDiskExtents > 1) {
-            LOG_INFO() << "resolving device name: volume spans multiple disks!";
-            return "";
+        if(extents->NumberOfDiskExtents == 1) {
+            CloseHandle(h);
+            LOG_INFO() << "device name is" << extents->Extents[0].DiskNumber;
+            return QString("%1").arg(extents->Extents[0].DiskNumber);
         }
-        LOG_INFO() << "device name is" << extents->Extents[0].DiskNumber;
-        return QString("%1").arg(extents->Extents[0].DiskNumber);
+        LOG_INFO() << "resolving device name: volume spans multiple disks!";
     }
+    CloseHandle(h);
 #endif
     return QString("");
 
@@ -751,6 +752,206 @@ QStringList Utils::findRunningProcess(QStringList names)
 }
 
 
+/** Check if a process with a given name is running
+ *  @param name of the process to check
+ *  @return PID for the process or 0 if process is not running.
+ */
+unsigned int Utils::findProcessId(QString name)
+{
+    unsigned int pid = 0;
+#if defined(Q_OS_WIN32)
+    HANDLE hdl;
+    PROCESSENTRY32 entry;
+    bool result;
+
+    hdl = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if(hdl == INVALID_HANDLE_VALUE) {
+        LOG_ERROR() << "CreateToolhelp32Snapshot failed.";
+        return pid;
+    }
+    entry.dwSize = sizeof(PROCESSENTRY32);
+    entry.szExeFile[0] = '\0';
+    if(!Process32First(hdl, &entry)) {
+        LOG_ERROR() << "Process32First failed.";
+        return pid;
+    }
+
+    do {
+        entry.dwSize = sizeof(PROCESSENTRY32);
+        entry.szExeFile[0] = '\0';
+        result = Process32Next(hdl, &entry);
+        if(result) {
+            if(QRegExp(name + "(\\.(e(x(e?)?)?)?)?").exactMatch(
+                            QString::fromWCharArray(entry.szExeFile))) {
+                pid = entry.th32ProcessID;
+                break;
+            }
+        }
+    } while(result);
+    CloseHandle(hdl);
+#endif
+#if defined(Q_OS_MACX)
+// XXX: never tested
+    ProcessSerialNumber psn = { 0, kNoProcess };
+    OSErr err;
+    do {
+        pid_t pid_;
+        err = GetNextProcess(&psn);
+        err = GetProcessPID(&psn, &pid_);
+        if(err == noErr) {
+            char buf[32] = {0};
+            ProcessInfoRec info;
+            memset(&info, 0, sizeof(ProcessInfoRec));
+            info.processName = (unsigned char*)buf;
+            info.processInfoLength = sizeof(ProcessInfoRec);
+            err = GetProcessInformation(&psn, &info);
+            if(err == noErr) {
+                // some processes start with nonprintable characters. Skip those.
+                int i;
+                for(i = 0; i < 32; i++) {
+                    if(isprint(buf[i])) break;
+                }
+                if(!name.compare(QString::fromUtf8(&buf[i]))) {
+                    pid = pid_;
+                    break;
+                }
+            }
+        }
+    } while(err == noErr);
+#endif
+    LOG_INFO() << "process:" << name << "PID:" << pid;
+    return pid;
+}
+
+
+/** Suspends/resumes a process
+ *  @param pid of the process to suspend/resume
+ *  @param suspend process if true, resume process if false
+ *  @return true on success, false otherwise.
+ */
+bool Utils::suspendResumeProcess(unsigned int pid, bool suspend)
+{
+    bool result = false;
+#if defined(Q_OS_WIN32)
+    LUID seDebugValue;
+    HANDLE hToken = NULL;
+    TOKEN_PRIVILEGES tNext, tPrev;
+    DWORD sPrev;
+    HANDLE hdl = INVALID_HANDLE_VALUE;
+    THREADENTRY32 entry;
+    int n_fails = 0;
+    int n_success = 0;
+
+    //
+    // enable debug privilege
+    //
+    if (!LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &seDebugValue)) {
+        LOG_ERROR() << "LookupPrivilegeValue error" << GetLastError();
+        goto bye;
+    }
+
+    if (!OpenProcessToken(GetCurrentProcess(),
+                TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
+        LOG_ERROR() << "OpenProcessToken error" << GetLastError();
+        goto bye;
+    }
+
+    memset(&tNext, 0, sizeof(tNext));
+    tNext.PrivilegeCount = 1;
+    tNext.Privileges[0].Luid = seDebugValue;
+    tNext.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+    if(!AdjustTokenPrivileges(hToken, FALSE, &tNext, sizeof(tNext),
+                                &tPrev, &sPrev) || GetLastError() != 0) {
+        LOG_ERROR() << "AdjustTokenPrivileges(next) error" << GetLastError();
+        goto bye;
+    }
+
+    //
+    // suspend/resume threads
+    //
+    hdl = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+
+    if (hdl == INVALID_HANDLE_VALUE) {
+        LOG_ERROR() << "CreateToolhelp32Snapshot error" << GetLastError();
+        goto bye;
+    }
+
+    entry.dwSize = sizeof(THREADENTRY32);
+
+    if (!Thread32First(hdl, &entry)) {
+        LOG_ERROR() << "Process32First error" << GetLastError();
+        goto bye;
+    }
+
+    do {
+        if (entry.th32OwnerProcessID != pid)
+            continue;
+
+        HANDLE thr = OpenThread(THREAD_SUSPEND_RESUME,
+                                FALSE, entry.th32ThreadID);
+
+        if (!thr) {
+            LOG_ERROR() << "OpenThread" << entry.th32ThreadID
+                        << "error" << GetLastError();
+            n_fails++;
+            continue;
+        }
+
+        // Execution of the specified thread is suspended and
+        // the thread's suspend count is incremented.
+        if (suspend && SuspendThread(thr) == (DWORD)(-1)) {
+            LOG_ERROR() << "SuspendThread" << entry.th32ThreadID
+                        << "error" << GetLastError();
+            n_fails++;
+        }
+        else
+        // Decrements a thread's suspend count. When the
+        // suspend count is decremented to zero, the
+        // execution of the thread is resumed.
+        if (!suspend && ResumeThread(thr) == (DWORD)(-1)) {
+            LOG_ERROR() << "ResumeThread" << entry.th32ThreadID
+                        << "error" << GetLastError();
+            n_fails++;
+        }
+        else {
+            n_success++;
+        }
+
+        CloseHandle(thr);
+
+    } while (Thread32Next(hdl, &entry));
+
+    result = n_success && !n_fails;
+
+    //
+    // restore previous debug privilege
+    //
+    if (!AdjustTokenPrivileges(hToken, FALSE,
+                        &tPrev, sPrev, NULL, NULL) || GetLastError() != 0) {
+        LOG_ERROR() << "AdjustTokenPrivileges(prev) error" << GetLastError();
+    }
+
+bye:
+    if (hdl != INVALID_HANDLE_VALUE)
+        CloseHandle(hdl);
+    if (hToken)
+        CloseHandle(hToken);
+#endif
+#if defined(Q_OS_LINUX)
+#if 0 // TODO
+    if (suspend)
+        result = (kill(pid, SIGSTOP) != -1);
+    else
+        result = (kill(pid, SIGCONT) != -1);
+#endif
+#endif
+    LOG_INFO() << "suspendResumeProcess" << pid
+               << (suspend ? "suspend" : "resume") << result;
+    return result;
+}
+
+
 /** Eject device from PC.
  *  Request the OS to eject the player.
  *  @param device mountpoint of the device
@@ -856,4 +1057,3 @@ bool Utils::ejectDevice(QString device)
 #endif
     return false;
 }
-

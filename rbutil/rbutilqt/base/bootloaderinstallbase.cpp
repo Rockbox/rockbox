@@ -102,6 +102,12 @@ void BootloaderInstallBase::installBlfile(void)
     LOG_INFO() << "installBlFile(void)";
 }
 
+void BootloaderInstallBase::progressAborted(void)
+{
+    LOG_INFO() << "progressAborted(void)";
+    emit installAborted();
+}
+
 
 //! @brief backup OF file.
 //! @param to folder to write backup file to. Folder will get created.
