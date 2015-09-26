@@ -1,0 +1,72 @@
+mkdfu
+-----
+
+A tool to install/uninstall a dual bootloader into a Classic 6G.
+
+Actually it generates a .dfu file that should be injected into iPod using
+ipoddfu.py or ipoddfu_c.
+
+TODO: integrate ipoddfu_c with mk6gboot
+
+
+Usage
+-----
+
+mk6gboot <boot file> <output file> [-u]
+
+<boot file> is the code you want to execute (a rockbox bootloader), previously
+    scrambled with tools/scramble utility.
+
+<output file> is the resulting DFU file which you'll have to inject into your
+    iPod using ipoddfu.py or ipoddfu_c.
+
+-u: generates a DFU uninstaller that removes RB dual bootloader from the iPod
+    and it is restored to it's original state (NOR).
+
+command line example:
+
+ ~/rockbox/rbutil/mk6gboot$ ./mk6gboot \
+        ../../build/bootloader-ipod6g.ipod dualboot-installer-ipod6g.dfu
+ ~/ipoddfu$ sudo python ./ipoddfu.py /path/to/dualboot-installer-ipod6g.dfu
+
+When the .dfu is loaded it emits a 2000Hz/100ms 'alive' tone. When RB loader
+is successfully installed then 1000Hz/100ms+2000Hz/150ms beep sounds and the
+device reboots. If something when bad then 330Hz/500ms tone is emited and
+the device reboots. When an intermitent 330Hz tone sounds forever then the
+NOR got corrupted and the device must be restored using iTunes (should not
+happen).
+
+
+Supported FW
+------------
+
+1.1.2
+2.0.4
+TODO?: 2.0.1
+
+
+Dual-Boot
+---------
+
+The purpose of this program is to provide dual-boot between the original
+firmware and the new (rockbox) firmware.
+
+Actually, when the bootloader starts it emits an 'alive' beep, the button
+press check is done 1 second after, then:
+
+  SELECT + MENU: reboot and enter DFU mode
+  SELECT + LEFT: enter OF diagnostics
+  SELECT + PLAY: enter OF diskmode
+  RIGTH: launch emCORE (not tested)
+  No button pressed and holdswitch unlocked: launch Rockbox
+  Any other combination: launch OF
+
+TODO: Probably we can save a default firmware selection into a PMU memory
+register, then define an unique button combination to change the default
+firmware selection.
+
+
+Hacking
+-------
+
+See comments in mkdfu.c and dualboot/dualboot.c for more information.
