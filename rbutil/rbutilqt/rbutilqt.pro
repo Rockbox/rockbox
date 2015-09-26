@@ -88,7 +88,7 @@ extralibs.commands = $$SILENT \
 # Note: order is important for RBLIBS! The libs are appended to the linker
 # flags in this order, put libucl at the end.
 RBLIBS = rbspeex ipodpatcher sansapatcher mkamsboot mktccboot \
-         mkmpioboot chinachippatcher mkimxboot ucl
+         mkmpioboot chinachippatcher mkimxboot mk6gboot ucl
 !win32-msvc* {
     QMAKE_EXTRA_TARGETS += extralibs
     PRE_TARGETDEPS += extralibs
@@ -186,6 +186,17 @@ win32 {
     DEFINES += _CRT_SECURE_NO_WARNINGS
     DEFINES += UNICODE
     LIBS += -lsetupapi -lnetapi32
+    # rbutil build using Qt5.1.1 and mingw32-gcc 4.8.1:
+    # - dinamic: libz is not linked implicitly, needs to add -lz here
+    # - static: static Qt libraries were compiled with no embedded lz,
+    #   so -lz is added implicitly, but adding it again should not harm.
+    #   The current source seems to fail to compile when using static
+    #   Qt5.1.1 with embedded lz support.
+    contains(QT_MAJOR_VERSION, 5) {
+        LIBS += -lz
+    }
+    # needed by libmk6gboot.a
+    LIBS += -lusb-1.0
 }
 win32:static {
     QMAKE_LFLAGS += -static-libgcc -static-libstdc++

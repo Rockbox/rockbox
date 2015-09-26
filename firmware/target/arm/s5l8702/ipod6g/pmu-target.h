@@ -76,5 +76,11 @@ void pmu_enter_standby(void);
 void pmu_read_rtc(unsigned char* buffer);
 void pmu_write_rtc(unsigned char* buffer);
 void pmu_hdd_power(bool on);
+#ifdef BOOTLOADER
+unsigned char pmu_rd(int address);
+int pmu_wr(int address, unsigned char val);
+int pmu_rd_multiple(int address, int count, unsigned char* buffer);
+int pmu_wr_multiple(int address, int count, unsigned char* buffer);
+#endif
 
 #endif

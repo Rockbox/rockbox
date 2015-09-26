@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id:
  *
- * Copyright (C) 2006-2007 Robert Keevil
+ * Copyright © 2009 Michael Sparmann
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,12 +18,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef __SPI_S5L8702_H__
+#define __SPI_S5L8702_H__
 
-void piezo_init(void);
-void piezo_stop(void);
-void piezo_clear(void);
-bool piezo_busy(void);
-void piezo_button_beep(bool beep, bool force);
-#ifdef BOOTLOADER
-void piezo_seq(uint16_t *seq);
-#endif
+void spi_init(int port, bool state);
+void spi_ce(int port, bool state);
+void spi_prepare(int port);
+void spi_release(int port);
+void spi_read(int port, uint32_t size, void* buf);
+uint32_t spi_write(int port, uint32_t data);
+
+#endif /* __SPI_S5L8702_H__ */
