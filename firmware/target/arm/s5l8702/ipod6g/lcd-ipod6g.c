@@ -54,147 +54,100 @@ static struct mutex lcd_mutex;
 static uint16_t lcd_dblbuf[LCD_HEIGHT][LCD_WIDTH] CACHEALIGN_ATTR;
 static bool lcd_ispowered;
 
-#define SLEEP       0
-#define CMD16       1
-#define DATA16      2
-#define REG15       3
+#define CMD         0   /* send command with N data */
+#define MREG        1   /* write multiple registers */
+#define SLEEP       2
 #define END         0xff
+
+#define CMD16(len)  (CMD | ((len) << 8))
+#define MREG16(len) (MREG | ((len) << 8))
+#define SLEEP16(t)  (SLEEP | ((t) << 8))
 
 /* powersave sequences */
 
-static const unsigned short lcd_sleep_sequence_01[] =
+static const unsigned char lcd_sleep_seq_01[] =
 {
-    CMD16,  0x028,  /* Display Off */
-    SLEEP,  0x005,  /* 50 ms */
-    CMD16,  0x010,  /* Sleep In Mode */
-    SLEEP,  0x005,  /* 50 ms */
+    CMD,   0x28,  0,  /* Display Off */
+    SLEEP, 5,         /* 50 ms */
+    CMD,   0x10,  0,  /* Sleep In Mode */
+    SLEEP, 5,         /* 50 ms */
     END
 };
 
-static const unsigned short lcd_deep_stby_sequence_23[] =
+static const unsigned short lcd_enter_deepstby_seq_23[] =
 {
     /* Display Off */
-    REG15,  0x007,  0x0172,
-    REG15,  0x030,  0x03ff,
-    SLEEP,  0x00a,
-    REG15,  0x007,  0x0120,
-    REG15,  0x030,  0x0000,
-    REG15,  0x100,  0x0780,
-    REG15,  0x007,  0x0000,
-    REG15,  0x101,  0x0260,
-    REG15,  0x102,  0x00a9,
-    SLEEP,  0x003,
-    REG15,  0x100,  0x0700,
+    MREG16(1),  0x007, 0x0172,
+    MREG16(1),  0x030, 0x03ff,
+    SLEEP16(9),
+    MREG16(1),  0x007, 0x0120,
+    MREG16(1),  0x030, 0x0000,
+    MREG16(1),  0x100, 0x0780,
+    MREG16(1),  0x007, 0x0000,
+    MREG16(1),  0x101, 0x0260,
+    MREG16(1),  0x102, 0x00a9,
+    SLEEP16(3),
+    MREG16(1),  0x100, 0x0700,
 
     /* Deep Standby Mode */
-    REG15,  0x100,  0x0704,
-    SLEEP,  0x005,
+    MREG16(1),  0x100, 0x0704,
+    SLEEP16(5),
     END
 };
 
 #ifdef HAVE_LCD_SLEEP
 /* init sequences */
 
-static const unsigned short lcd_init_sequence_01[] =
+static const unsigned char lcd_awake_seq_01[] =
 {
-    CMD16,  0x011,  /* Sleep Out Mode */
-    SLEEP,  0x006,  /* 60 ms */
-    CMD16,  0x029,  /* Display On */
+    CMD,   0x11,  0,  /* Sleep Out Mode */
+    SLEEP, 6,         /* 60 ms */
+    CMD,   0x29,  0,  /* Display On */
     END
 };
 
-static const unsigned short lcd_init_sequence_23[] =
+static const unsigned short lcd_init_seq_23[] =
 {
     /* Display settings */
-    REG15,  0x008,  0x0808,
-    REG15,  0x010,  0x0013,
-    REG15,  0x011,  0x0300,
-    REG15,  0x012,  0x0101,
-    REG15,  0x013,  0x0a03,
-    REG15,  0x014,  0x0a0e,
-    REG15,  0x015,  0x0a19,
-    REG15,  0x016,  0x2402,
-    REG15,  0x018,  0x0001,
-    REG15,  0x090,  0x0021,
+    MREG16(1),  0x008, 0x0808,
+    MREG16(7),  0x010, 0x0013, 0x0300, 0x0101, 0x0a03, 0x0a0e, 0x0a19, 0x2402,
+    MREG16(1),  0x018, 0x0001,
+    MREG16(1),  0x090, 0x0021,
 
     /* Gamma settings */
-    REG15,  0x300,  0x0307,
-    REG15,  0x301,  0x0003,
-    REG15,  0x302,  0x0402,
-    REG15,  0x303,  0x0303,
-    REG15,  0x304,  0x0300,
-    REG15,  0x305,  0x0407,
-    REG15,  0x306,  0x1c04,
-    REG15,  0x307,  0x0307,
-    REG15,  0x308,  0x0003,
-    REG15,  0x309,  0x0402,
-    REG15,  0x30a,  0x0303,
-    REG15,  0x30b,  0x0300,
-    REG15,  0x30c,  0x0407,
-    REG15,  0x30d,  0x1c04,
-
-    REG15,  0x310,  0x0707,
-    REG15,  0x311,  0x0407,
-    REG15,  0x312,  0x0306,
-    REG15,  0x313,  0x0303,
-    REG15,  0x314,  0x0300,
-    REG15,  0x315,  0x0407,
-    REG15,  0x316,  0x1c01,
-    REG15,  0x317,  0x0707,
-    REG15,  0x318,  0x0407,
-    REG15,  0x319,  0x0306,
-    REG15,  0x31a,  0x0303,
-    REG15,  0x31b,  0x0300,
-    REG15,  0x31c,  0x0407,
-    REG15,  0x31d,  0x1c01,
-
-    REG15,  0x320,  0x0206,
-    REG15,  0x321,  0x0102,
-    REG15,  0x322,  0x0404,
-    REG15,  0x323,  0x0303,
-    REG15,  0x324,  0x0300,
-    REG15,  0x325,  0x0407,
-    REG15,  0x326,  0x1c1f,
-    REG15,  0x327,  0x0206,
-    REG15,  0x328,  0x0102,
-    REG15,  0x329,  0x0404,
-    REG15,  0x32a,  0x0303,
-    REG15,  0x32b,  0x0300,
-    REG15,  0x32c,  0x0407,
-    REG15,  0x32d,  0x1c1f,
+    MREG16(14), 0x300, 0x0307, 0x0003, 0x0402, 0x0303, 0x0300, 0x0407, 0x1c04,
+                       0x0307, 0x0003, 0x0402, 0x0303, 0x0300, 0x0407, 0x1c04,
+    MREG16(14), 0x310, 0x0707, 0x0407, 0x0306, 0x0303, 0x0300, 0x0407, 0x1c01,
+                       0x0707, 0x0407, 0x0306, 0x0303, 0x0300, 0x0407, 0x1c01,
+    MREG16(14), 0x320, 0x0206, 0x0102, 0x0404, 0x0303, 0x0300, 0x0407, 0x1c1f,
+                       0x0206, 0x0102, 0x0404, 0x0303, 0x0300, 0x0407, 0x1c1f,
 
     /* GRAM and Base Imagen settings (ili9326ds) */
-    REG15,  0x400,  0x001d,
-    REG15,  0x401,  0x0001,
-    REG15,  0x205,  0x0060,
+    MREG16(2),  0x400, 0x001d, 0x0001,
+    MREG16(1),  0x205, 0x0060,
 
     /* Power settings */
-    REG15,  0x007,  0x0001,
-    REG15,  0x031,  0x0071,
-    REG15,  0x110,  0x0001,
-    REG15,  0x100,  0x17b0,
-    REG15,  0x101,  0x0220,
-    REG15,  0x102,  0x00bd,
-    REG15,  0x103,  0x1500,
-    REG15,  0x105,  0x0103,
-    REG15,  0x106,  0x0105,
+    MREG16(1),  0x007, 0x0001,
+    MREG16(1),  0x031, 0x0071,
+    MREG16(1),  0x110, 0x0001,
+    MREG16(6),  0x100, 0x17b0, 0x0220, 0x00bd, 0x1500, 0x0103, 0x0105,
 
     /* Display On */
-    REG15,  0x007,  0x0021,
-    REG15,  0x001,  0x0110,
-    REG15,  0x003,  0x0230,
-    REG15,  0x002,  0x0500,
-    REG15,  0x007,  0x0031,
-    REG15,  0x030,  0x0007,
-    SLEEP,  0x003,
-    REG15,  0x030,  0x03ff,
-    SLEEP,  0x006,
-    REG15,  0x007,  0x0072,
-    SLEEP,  0x00f,
-    REG15,  0x007,  0x0173,
+    MREG16(1),  0x007, 0x0021,
+    MREG16(1),  0x001, 0x0110,
+    MREG16(1),  0x003, 0x0230,
+    MREG16(1),  0x002, 0x0500,
+    MREG16(1),  0x007, 0x0031,
+    MREG16(1),  0x030, 0x0007,
+    SLEEP16(3),
+    MREG16(1),  0x030, 0x03ff,
+    SLEEP16(6),
+    MREG16(1),  0x007, 0x0072,
+    SLEEP16(15),
+    MREG16(1),  0x007, 0x0173,
     END
 };
-#endif
+#endif  /* HAVE_LCD_SLEEP */
 
 /* DMA configuration */
 
@@ -261,30 +214,54 @@ static inline void s5l_lcd_write_data(unsigned short data)
     LCD_WDATA = data;
 }
 
-static void lcd_run_sequence(const unsigned short *seq)
+static void lcd_run_seq8(const unsigned char *seq)
 {
-    unsigned short tmp;
+    int n;
 
     while (1) switch (*seq++)
     {
+        case CMD:
+            s5l_lcd_write_cmd(*seq++);
+            n = *seq++;
+            while (n--)
+                s5l_lcd_write_data(*seq++);
+            break;
         case SLEEP:
             sleep(*seq++);
-            break;
-        case CMD16:
-            s5l_lcd_write_cmd(*seq++);
-            break;
-        case DATA16:
-            s5l_lcd_write_data(*seq++);
-            break;
-        case REG15:
-            tmp = *seq++;   /* avoid compiler warning */
-            s5l_lcd_write_reg(tmp, *seq++);
             break;
         case END:
         default:
             /* bye */
             return;
-     }
+    }
+}
+
+static void lcd_run_seq16(const unsigned short *seq)
+{
+    int action, param;
+    unsigned short reg;
+
+    while (1)
+    {
+        action = *seq & 0xff;
+        param = *seq++ >> 8;
+
+        switch (action)
+        {
+            case MREG:
+                reg = *seq++;
+                while (param--)
+                    s5l_lcd_write_reg(reg++, *seq++);
+                break;
+            case SLEEP:
+                sleep(param);
+                break;
+            case END:
+            default:
+                /* bye */
+                return;
+        }
+    }
 }
 
 /*** hardware configuration ***/
@@ -314,36 +291,43 @@ bool lcd_active(void)
     return lcd_ispowered;
 }
 
-void lcd_shutdown(void)
-{
-    pmu_write(0x2b, 0);  /* Kill the backlight, instantly. */
-    pmu_write(0x29, 0);
-
-    lcd_sleep();
-}
-
-void lcd_sleep(void)
+void lcd_powersave(void)
 {
     mutex_lock(&lcd_mutex);
 
-    lcd_run_sequence((lcd_type & 2) ? lcd_deep_stby_sequence_23
-                                    : lcd_sleep_sequence_01);
+    if (lcd_type & 2)
+        lcd_run_seq16(lcd_enter_deepstby_seq_23);
+    else
+        lcd_run_seq8(lcd_sleep_seq_01);
 
     /* mask lcd controller clock gate */
-    PWRCON(0) |= (1 << 1);
+    PWRCON(0) |= (1 << CLOCKGATE_LCD);
 
     lcd_ispowered = false;
 
     mutex_unlock(&lcd_mutex);
 }
 
+void lcd_shutdown(void)
+{
+    pmu_write(0x2b, 0);  /* Kill the backlight, instantly. */
+    pmu_write(0x29, 0);
+
+    lcd_powersave();
+}
+
 #ifdef HAVE_LCD_SLEEP
+void lcd_sleep(void)
+{
+    lcd_powersave();
+}
+
 void lcd_awake(void)
 {
     mutex_lock(&lcd_mutex);
 
     /* unmask lcd controller clock gate */
-    PWRCON(0) &= ~(1 << 1);
+    PWRCON(0) &= ~(1 << CLOCKGATE_LCD);
 
     if (lcd_type & 2) {
         /* release from deep standby mode (ili9320ds s12.3) */
@@ -352,10 +336,10 @@ void lcd_awake(void)
             udelay(1000);
         }
 
-        lcd_run_sequence(lcd_init_sequence_23);
+        lcd_run_seq16(lcd_init_seq_23);
     }
     else
-        lcd_run_sequence(lcd_init_sequence_01);
+        lcd_run_seq8(lcd_awake_seq_01);
 
     lcd_ispowered = true;
 
@@ -368,11 +352,17 @@ void lcd_awake(void)
 /* LCD init */
 void lcd_init_device(void)
 {
-    /* Detect lcd type */
     mutex_init(&lcd_mutex);
+
+    /* unmask lcd controller clock gate */
+    PWRCON(0) &= ~(1 << CLOCKGATE_LCD);
+
+    /* Detect lcd type */
     lcd_type = (PDAT6 & 0x30) >> 4;
+
     while (!(LCD_STATUS & 0x2));
     LCD_CONFIG = 0x80100db0;
+    LCD_PHTIME = 0x33;
 
     /* Configure DMA channel */
     dmac_ch_init(&lcd_dma_ch, &lcd_dma_ch_cfg);
@@ -398,7 +388,7 @@ void lcd_update(void)
 }
 
 /* Line write helper function. */
-extern void lcd_write_line(const fb_data *addr, 
+extern void lcd_write_line(const fb_data *addr,
                            int pixelcount,
                            const unsigned int lcd_base_addr);
 
@@ -456,7 +446,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     int pixels = width * height;
     fb_data* p = FBADDR(x,y);
     uint16_t* out = lcd_dblbuf[0];
-    
+
 #ifdef HAVE_LCD_SLEEP
     if (!lcd_active()) return;
 #endif
@@ -495,7 +485,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
 {
     unsigned int z;
     unsigned char const * yuv_src[3];
-    
+
 #ifdef HAVE_LCD_SLEEP
     if (!lcd_active()) return;
 #endif
