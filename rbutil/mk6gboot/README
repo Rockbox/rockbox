@@ -1,0 +1,158 @@
+mk6gboot
+--------
+
+A tool to install/uninstall a dual bootloader into an iPod Classic 6G.
+
+
+Usage
+-----
+
+  mk6gboot --install-bl <bootloader.ipod> [--pid <pid>]
+  mk6gboot --uninstall-bl <bootloader.ipod> [--pid <pid>]
+  mk6gboot --mkdfu <bootloader.ipod> <outfile.dfu> [--uninstall]
+  mk6gboot --dfusend <infile.dfu> [--pid <pid>]
+  mk6gboot --dfuscan [--loop [seconds]] [--pid <pid>]
+  mk6gboot --dfureset [--pid <pid>]
+
+Commands:
+  --install-bl    installs bootloader.ipod into the device, if a
+                  RB bootloader already exists then it is updated.
+  --uninstall-bl  uninstalls bootloader.ipod from the device.
+
+  --mkdfu     creates outfile.dfu, it is a DFU image containing
+              an installer/uninstaller for bootloader.ipod.
+  --dfusend   sends a DFU image file to the device.
+  --dfuscan   scans for DFU USB devices and outputs the status.
+  --dfureset  resets DFU device USB bus.
+
+Options:
+  -p, --pid <PID>   use a specific PID (Product Id) USB device,
+                    if this option is ommited then it uses the
+                    first USB DFU device found.
+  -l, --loop [sec]  scan for a USB DFU device every 'sec' seconds,
+                    default period ('sec' ommited) is 3 seconds.
+  -u, --uninstall   create a file containing a DFU uninstaller.
+
+
+<bootloader.ipod> is the code you want to install (a rockbox bootloader),
+previously scrambled with tools/scramble utility. Command --mkdfu creates
+a DFU imagen into <outfile.dfu> containing an installer (or uninstaller)
+for <bootloader.ipod>, this DFU imagen should be send to the iPod using
+--dfusend. The process can be abbreviated in one step using the command
+--install-bl (or --uninstall-bl).
+
+
+
+Dual bootloader installation
+----------------------------
+
+Windows:
+
+  + An iPod Classic with Apple firmware installed and running, see list of
+    current supported versions below.
+
+  + The iPod must be formmated using FAT (Windows) filesystem, if your iPod
+    is formated using Apple partitions you must convert this ipod to FAT32
+    format (aka a "winpod"), see http://www.rockbox.org/twiki/bin/view/
+    Main/IpodConversionToFAT32
+
+  + If USB access is denied you will need to login as Administrator (or run
+    the needed utilities as Administrator).
+
+  * Yo must install the gerrit version of Rockbox (rockbox.zip) that matches
+    the patch set of the bootloader.ipod that you are going to install. ATM
+    the latest git versions of Rockbox doesn't work. Copy rockbox.zip to the
+    root directory of the iPod and uncompress it.
+
+  + If iTunes is installed:
+    - configure iTunes to use the iPod as mass storage media.
+    - close iTunes.
+    - kill (or pause) iTunesHelper.exe
+
+  + If iTunes is not installed, you must test if there is a valid USB driver
+    installed, some Windows versions (i.e. Win7) includes (or automatically
+    installs) drivers por Apple devices, other versions (i.e. XP) does not.
+    - put your device on DFU mode and execute "mk6gboot.exe --dfuscan", you
+      are expecting a result indicating that the device is found and the
+      state is dfuIDLE (state=2).
+    - if you received an error message, particulary like this:
+        [INFO] winapi: no DFU device found
+        [ERR] Could not open USB device: LIBUSB_ERROR_NOT_SUPPORTED
+      it means that the device was found but there are no valid drivers
+      installed, solve it installing one of these:
+      - pre built WinUSB driver for emCORE (http://www.freemyipod.org/
+        wiki/EmCORE_Installation/iPodClassic/DFUNoiTunes).
+      - Zadig driver (http://zadig.akeo.ie/), not tested.
+      - Apple Mobile Device USB driver (included with iTunes).
+
+  + put you device on DFU mode, you can notice when the device enters DFU
+    mode running "mk6gboot --dfuscan --loop" to scan the USB bus every 3
+    seconds.
+
+  + stop the previous --dfuscan command (if it is running) and send the DFU
+    imagen to the iPod:
+    mk6gboot --install-bl <bootloader.ipod>
+
+  When the DFU is loaded it emits a 2000Hz/100ms 'alive' tone. When RB loader
+  is successfully installed then 1000Hz/100ms+2000Hz/150ms beep sounds and the
+  device reboots. If something went bad then 330Hz/500ms tone is emited and
+  the device reboots. When three 330Hz tones sounds, it means that the NOR got
+  corrupted and the device must be restored using iTunes (should not happen).
+
+  Use the same process to update the RB bootloader if one is already installed
+  into the iPod.
+
+Linux:
+
+  Same as above, skip the steps related to iTunes and USB drivers.
+
+
+Supported FW
+------------
+
+1.1.2 (1G)
+2.0.1 (2G)
+2.0.4 (3G)
+2.0.5 (4G)
+
+
+Dual-Boot
+---------
+
+The purpose of this program is to provide dual-boot between the original
+firmware and the new (rockbox) firmware.
+
+Actually the button press check is done ~800 ms. after reboot, then:
+
+  SELECT + MENU: enter DFU mode (it takes about 12 seconds)
+  SELECT + LEFT: enter OF diagnostics
+  SELECT + PLAY: enter OF diskmode
+  SELECT + RIGHT: switchs the default FW to launch (Rockbox/Apple)
+  Any other combination: launch default FW
+
+Switch default firmware:
+
+  Apple is the current FW:
+  - stop playback and wait a few seconds for hard disk spin-down.
+  - press and hold SELECT+MENU, after ~5 seconds the LCD powers off and the
+    iPod resets.
+  - once the screen goes black, wait for about 2 seconds (even more), then
+    release MENU button and press and hold RIGHT button (CENTER button
+    remains pressed), you have about 1 second for the release/press action.
+  - the iPod should start to load RB firmware.
+
+  Rockbox is the current FW:
+  - power-off the iPod using Rockbox.
+  - once the iPod is powered off, press and hold SELECT+RIGHT buttons, it
+    is a bit tricky, try to press the buttons _firmly_, at the same moment
+    (dificult thing) or to press the SELECT button _slighly_ early.
+    The best way to solve this issue is not to switch to OF once you are
+    using Rockbox as the default FW ;)
+  - the iPod should start loading Apple firmware.
+
+
+Hacking
+-------
+
+See comments in mkdfu.c, ipoddfu.c, dualboot.c and bootloader/ipod6g.c for
+more information.

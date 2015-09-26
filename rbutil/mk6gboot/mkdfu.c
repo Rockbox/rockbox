@@ -1,0 +1,254 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) Cástor Muñoz
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+
+#include "mk6gboot.h"
+
+/* Header for ARM code binaries */
+#include "dualboot.h"
+
+/* Win32 compatibility */
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
+const struct ipod_models ipod_identity[] = {
+    [MODEL_IPOD6G] = {
+        "Classic 6G", "ip6g", 71,
+        dualboot_install_ipod6g,   sizeof(dualboot_install_ipod6g),
+        dualboot_uninstall_ipod6g, sizeof(dualboot_uninstall_ipod6g) },
+};
+
+struct Im3Info s5l8702hdr =
+{
+    .ident          = IM3_IDENT,
+    .version        = IM3_VERSION,
+    .enc_type       = 3,
+    .u.enc34 = {
+        .sign_off   = "\x00\x03\x00\x00",
+        .cert_off   = "\x50\xF8\xFF\xFF", /* -0x800 + CERT_OFFSET */
+        .cert_sz    = "\xBA\x02\x00\x00", /* CERT_SIZE */
+    },
+    .info_sign      = "\xC2\x54\x51\x31\xDC\xC0\x84\xA4"
+                      "\x7F\xD1\x45\x08\xE8\xFF\xE8\x1D",
+};
+
+unsigned char s5l8702pwnage[/*CERT_SIZE*/] =
+{
+    "\x30\x82\x00\x7A\x30\x66\x02\x00\x30\x0D\x06\x09\x2A\x86\x48\x86"
+    "\xF7\x0D\x01\x01\x05\x05\x00\x30\x0B\x31\x09\x30\x07\x06\x03\x55"
+    "\x04\x03\x13\x00\x30\x1E\x17\x0D\x00\x00\x00\x00\x00\x00\x00\x00"
+    "\x00\x00\x00\x00\x00\x17\x0D\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+    "\x00\x00\x00\x00\x30\x0B\x31\x09\x30\x07\x06\x03\x55\x04\x03\x13"
+    "\x00\x30\x19\x30\x0D\x06\x09\x2A\x86\x48\x86\xF7\x0D\x01\x01\x01"
+    "\x05\x00\x03\x08\x00\x30\x05\x02\x01\x00\x02\x00\x30\x0D\x06\x09"
+    "\x2A\x86\x48\x86\xF7\x0D\x01\x01\x05\x05\x00\x03\x01\x00\x30\x82"
+    "\x00\x7A\x30\x66\x02\x00\x30\x0D\x06\x09\x2A\x86\x48\x86\xF7\x0D"
+    "\x01\x01\x05\x05\x00\x30\x0B\x31\x09\x30\x07\x06\x03\x55\x04\x03"
+    "\x13\x00\x30\x1E\x17\x0D\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+    "\x00\x00\x00\x17\x0D\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+    "\x00\x00\x30\x0B\x31\x09\x30\x07\x06\x03\x55\x04\x03\x13\x00\x30"
+    "\x19\x30\x0D\x06\x09\x2A\x86\x48\x86\xF7\x0D\x01\x01\x01\x05\x00"
+    "\x03\x08\x00\x30\x05\x02\x01\x00\x02\x00\x30\x0D\x06\x09\x2A\x86"
+    "\x48\x86\xF7\x0D\x01\x01\x05\x05\x00\x03\x01\x00\x30\x82\x01\xBA"
+    "\x30\x50\x02\x00\x30\x0D\x06\x09\x2A\x86\x48\x86\xF7\x0D\x01\x01"
+    "\x05\x05\x00\x30\x00\x30\x1E\x17\x0D\x00\x00\x00\x00\x00\x00\x00"
+    "\x00\x00\x00\x00\x00\x00\x17\x0D\x00\x00\x00\x00\x00\x00\x00\x00"
+    "\x00\x00\x00\x00\x00\x30\x00\x30\x19\x30\x0D\x06\x09\x2A\x86\x48"
+    "\x86\xF7\x0D\x01\x01\x01\x05\x00\x03\x08\x00\x30\x05\x02\x01\x00"
+    "\x02\x00\x30\x0D\x06\x09\x2A\x86\x48\x86\xF7\x0D\x01\x01\x05\x05"
+    "\x00\x03\x82\x01\x55"
+};
+
+static uint32_t get_uint32le(unsigned char* p)
+{
+    return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+}
+
+static uint32_t get_uint32be(unsigned char* p)
+{
+    return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
+}
+
+static void put_uint32le(unsigned char* p, uint32_t x)
+{
+    p[0] = x & 0xff;
+    p[1] = (x >> 8) & 0xff;
+    p[2] = (x >> 16) & 0xff;
+    p[3] = (x >> 24) & 0xff;
+}
+
+#define ERROR(format, ...) \
+    do { \
+        snprintf(errstr, errstrsize, "[ERR] "format, __VA_ARGS__); \
+        goto error; \
+    } while(0)
+
+unsigned char *load_boot_file(char *filename, int *bufsize,
+                                const struct ipod_models** model,
+                                char* errstr, int errstrsize)
+{
+    int fd = -1;
+    unsigned char header[8];
+    int i;
+    struct stat s;
+    unsigned char *buf = NULL;
+    uint32_t sum;
+
+    fd = open(filename, O_RDONLY|O_BINARY);
+    if (fd < 0)
+        ERROR("Could not open %s for reading", filename);
+
+    /* Read Rockbox header */
+    if (read(fd, header, sizeof(header)) != sizeof(header))
+        ERROR("Could not read file %s", filename);
+
+    for (i = 0; i < NUM_MODELS; i++)
+        if (memcmp(ipod_identity[i].rb_model_name, header + 4, 4) == 0)
+            break;
+
+    if (i == NUM_MODELS)
+        ERROR("Model name \"%4.4s\" unknown. "
+                "Is this really a rockbox bootloader?", header + 4);
+
+    *model = &ipod_identity[i];
+
+    if (fstat(fd, &s) < 0)
+        ERROR("Checking filesize of input file %s", filename);
+
+    *bufsize = s.st_size - sizeof(header);
+
+    buf = malloc(*bufsize);
+    if (buf == NULL)
+        ERROR("Could not allocate memory for %s", filename);
+
+    if (read(fd, buf, *bufsize) != *bufsize)
+        ERROR("Could not read file %s", filename);
+
+    /* Check checksum */
+    sum = (*model)->rb_model_num;
+    for (i = 0; i < *bufsize; i++) {
+         /* add 8 unsigned bits but keep a 32 bit sum */
+         sum += buf[i];
+    }
+
+    if (sum != get_uint32be(header))
+        ERROR("Checksum mismatch in %s", filename);
+
+    close(fd);
+    return buf;
+
+error:
+    if (fd >= 0)
+        close(fd);
+    if (buf)
+        free(buf);
+    return NULL;
+}
+
+unsigned char *mkdfu(char *infile, int uninstall,
+                        int* dfu_size, char* errstr, int errstrsize)
+{
+    const struct ipod_models *model;
+    unsigned char *bl_buf;
+    unsigned char *dfu_buf = NULL;
+    int bl_size;
+    uint32_t padded_bl_size;
+    uint32_t cert_off, cert_sz;
+    off_t cur_off;
+
+    bl_buf = load_boot_file(infile, &bl_size, &model, errstr, errstrsize);
+    if (bl_buf == NULL)
+        goto error;
+
+    /* IM3 data size should be padded to 16 */
+    padded_bl_size = ((bl_size + 0xf) & ~0xf);
+
+    *dfu_size = BIN_OFFSET + ((uninstall)
+                   ? model->dualboot_uninstall_size
+                   : (model->dualboot_install_size +
+                     (IM3HDR_SZ - (int)IM3INFO_SZ) + (int)padded_bl_size));
+
+    if (*dfu_size > DFU_MAXSIZE)
+        ERROR("Not enought space for bootloader %s", infile);
+
+    dfu_buf = calloc(*dfu_size, 1);
+    if (dfu_buf == NULL)
+        ERROR("Could not allocate %d bytes for DFU image", *dfu_size);
+
+    cert_off = get_uint32le(s5l8702hdr.u.enc34.cert_off);
+    cert_sz  = get_uint32le(s5l8702hdr.u.enc34.cert_sz);
+
+    printf("[INFO] RB bootloader:\n");
+    printf("[INFO]  size:        %d\n", bl_size);
+    printf("[INFO]  model name:  %s\n", model->model_name);
+    printf("[INFO]  RB name:     %s\n", model->rb_model_name);
+    printf("[INFO]  RB num:      %d\n", model->rb_model_num);
+
+    memcpy(dfu_buf, &s5l8702hdr, sizeof(s5l8702hdr));
+
+    cur_off = IM3HDR_SZ + cert_off;
+
+    memcpy(dfu_buf + cur_off, s5l8702pwnage, sizeof(s5l8702pwnage));
+
+    /* set entry point */
+    cur_off += cert_sz - 4;
+    put_uint32le(dfu_buf + cur_off, DFU_LOADADDR + BIN_OFFSET);
+
+    cur_off = BIN_OFFSET;
+
+    if (uninstall)
+    {
+        /* copy the dualboot uninstaller binary */
+        memcpy(dfu_buf + cur_off, model->dualboot_uninstall,
+                                    model->dualboot_uninstall_size);
+    }
+    else
+    {
+        /* copy the dualboot installer binary */
+        memcpy(dfu_buf + cur_off, model->dualboot_install,
+                                    model->dualboot_install_size);
+
+        /* point to the start of the included IM3 header info */
+        cur_off += model->dualboot_install_size - IM3INFO_SZ;
+        /* set bootloader data size */
+        struct Im3Info *bl_info = (struct Im3Info*)(dfu_buf + cur_off);
+        put_uint32le(bl_info->data_sz, padded_bl_size);
+
+        /* add bootloader binary */
+        cur_off += IM3HDR_SZ;
+        memcpy(dfu_buf + cur_off, bl_buf, bl_size);
+    }
+
+    return dfu_buf;
+
+error:
+    if (dfu_buf)
+        free(dfu_buf);
+    return NULL;
+}
