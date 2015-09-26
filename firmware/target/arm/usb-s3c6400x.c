@@ -43,6 +43,10 @@
 #define UNCACHED_ADDR AS3525_UNCACHED_ADDR
 #define PHYSICAL_ADDR AS3525_PHYSICAL_ADDR
 static inline void discard_dma_buffer_cache(void) {}
+#elif CONFIG_CPU == S5L8702
+#define UNCACHED_ADDR S5L8702_UNCACHED_ADDR
+#define PHYSICAL_ADDR S5L8702_PHYSICAL_ADDR
+static inline void discard_dma_buffer_cache(void) {}
 #else
 #define UNCACHED_ADDR
 #define PHYSICAL_ADDR

@@ -5,9 +5,12 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id:$
  *
- * Copyright (C) 2006-2007 Robert Keevil
+ * Copyright (C) 2010 by Marcin Bukat
+ *
+ * code taken mostly from mkboot.c
+ * Copyright (C) 2005 by Linus Nielsen Feltzing
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,11 +22,29 @@
  *
  ****************************************************************************/
 
-void piezo_init(void);
-void piezo_stop(void);
-void piezo_clear(void);
-bool piezo_busy(void);
-void piezo_button_beep(bool beep, bool force);
-#ifdef BOOTLOADER
-void piezo_seq(uint16_t *seq);
-#endif
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "mkdfu.h"
+
+static void usage(void)
+{
+    printf("Usage: mk6gboot: <bootloader.ipod> <output file> [-u]\n");
+    exit(1);
+}
+
+int main(int argc, char* argv[])
+{
+    char *infile, *outfile;
+    int uninstall;
+
+    if (argc != 3 && (argc != 4 || strcmp(argv[3], "-u"))) {
+        usage();
+    }
+
+    infile = argv[1];
+    outfile = argv[2];
+    uninstall = (argc == 4);
+
+    return mkdfu(infile, outfile, uninstall);
+}
