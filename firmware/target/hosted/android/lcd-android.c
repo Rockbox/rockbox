@@ -27,6 +27,7 @@
 #include "kernel.h"
 #include "lcd.h"
 #include "button.h"
+#include "thread.h"
 
 extern JNIEnv *env_ptr;
 extern jobject RockboxService_instance;
@@ -78,10 +79,22 @@ void lcd_init_device(void)
 {
 }
 
+#include <android/log.h>
+#define LOG_TAG "RB"
+static void __debugf(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    __android_log_vprint(ANDROID_LOG_DEBUG, LOG_TAG, fmt, ap);
+    va_end(ap);
+}
+
 void lcd_update(void)
 {
     if (display_on)
     {
+        if (thread_main())
+        {
         JNIEnv e = *env_ptr;
         jobject buffer = e->NewDirectByteBuffer(env_ptr, lcd_framebuffer,
                                                (jlong) FRAMEBUFFER_SIZE);
@@ -89,6 +102,11 @@ void lcd_update(void)
         e->CallVoidMethod(env_ptr, RockboxFramebuffer_instance,
                                    java_lcd_update, buffer);
         e->DeleteLocalRef(env_ptr, buffer);
+        }
+        else
+        {
+        __debugf("lcd_update(): thread 0x%0x name: %s", (unsigned)thread_self(), thread_name(thread_self()));
+        }
     }
 }
 
@@ -96,6 +114,8 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     if (display_on)
     {
+        if (thread_main())
+        {
         JNIEnv e = *env_ptr;
         jobject buffer = e->NewDirectByteBuffer(env_ptr, lcd_framebuffer,
                                                    (jlong) FRAMEBUFFER_SIZE);
@@ -106,6 +126,11 @@ void lcd_update_rect(int x, int y, int width, int height)
 
         e->DeleteLocalRef(env_ptr, buffer);
         e->DeleteLocalRef(env_ptr, rect);
+        }
+        else
+        {
+            __debugf("lcd_update_rect(): thread 0x%0x name: %s", (unsigned)thread_self(), thread_name(thread_self()));
+        }
     }
 }
 

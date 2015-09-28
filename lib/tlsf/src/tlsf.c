@@ -159,7 +159,7 @@
 #define PREV_USED   (0x0)
 
 
-#define DEFAULT_AREA_SIZE (1024*10)
+#define DEFAULT_AREA_SIZE (1024*16) // 16kB
 
 #ifdef USE_MMAP
 #define PAGE_SIZE (getpagesize())
@@ -395,13 +395,13 @@ static __inline__ bhdr_t *FIND_SUITABLE_BLOCK(tlsf_t * _tlsf, int *_fl, int *_sl
         set_bit (_fl, &_tlsf -> fl_bitmap);                             \
     } while(0)
 
-#if defined(ROCKBOX)
+//#if defined(ROCKBOX)
 void * __attribute__((weak)) get_new_area(size_t * size)
 {
     (void)size;
     return ((void *) ~0);
 }
-#endif
+//#endif
 
 #if USE_SBRK || USE_MMAP
 static __inline__ void *get_new_area(size_t * size) 
@@ -623,7 +623,7 @@ void *tlsf_malloc(size_t size)
 /******************************************************************/
     void *ret;
 
-#if USE_MMAP || USE_SBRK || defined(ROCKBOX)
+//#if USE_MMAP || USE_SBRK || defined(ROCKBOX)
     if (!mp) {
         size_t area_size;
         void *area;
@@ -635,7 +635,7 @@ void *tlsf_malloc(size_t size)
             return NULL;        /* Not enough system memory */
         init_memory_pool(area_size, area);
     }
-#endif
+//#endif
 
     TLSF_ACQUIRE_LOCK(&((tlsf_t *)mp)->lock);
 
@@ -665,11 +665,11 @@ void *tlsf_realloc(void *ptr, size_t size)
 /******************************************************************/
     void *ret;
 
-#if USE_MMAP || USE_SBRK || defined(ROCKBOX)
+//#if USE_MMAP || USE_SBRK || defined(ROCKBOX)
     if (!mp) {
         return tlsf_malloc(size);
     }
-#endif
+//#endif
 
     TLSF_ACQUIRE_LOCK(&((tlsf_t *)mp)->lock);
 
@@ -685,6 +685,18 @@ void *tlsf_calloc(size_t nelem, size_t elem_size)
 {
 /******************************************************************/
     void *ret;
+
+    if (!mp) {
+        size_t area_size;
+        void *area;
+
+        area_size = sizeof(tlsf_t) + BHDR_OVERHEAD * 8; /* Just a safety constant */
+        area_size = (area_size > DEFAULT_AREA_SIZE) ? area_size : DEFAULT_AREA_SIZE;
+        area = get_new_area(&area_size);
+        if (area == ((void *) ~0))
+            return NULL;        /* Not enough system memory */
+        init_memory_pool(area_size, area);
+    }
 
     TLSF_ACQUIRE_LOCK(&((tlsf_t *)mp)->lock);
 
@@ -713,7 +725,7 @@ void *malloc_ex(size_t size, void *mem_pool)
        so they are not longer valid when the function fails */
     b = FIND_SUITABLE_BLOCK(tlsf, &fl, &sl);
 
-#if USE_MMAP || USE_SBRK || defined(ROCKBOX)
+//#if USE_MMAP || USE_SBRK || defined(ROCKBOX)
     if (!b) {
         size_t area_size;
         void *area;
@@ -729,7 +741,7 @@ void *malloc_ex(size_t size, void *mem_pool)
         /* Searching a free block */
         b = FIND_SUITABLE_BLOCK(tlsf, &fl, &sl);
     }
-#endif
+//#endif
     if (!b)
         return NULL;            /* Not found */
 

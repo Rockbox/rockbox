@@ -25,7 +25,7 @@ unsigned char *audiobufend = audiobuffer + sizeof(audiobuffer);
 #else /* APPLICATION */
 /* buflib uses malloc backend. create with fake buffer */
 unsigned char audiobuffer[1];
-unsigned char *audiobufend = audiobuffer + (MEMORYSIZE*1024*1024);
+unsigned char *audiobufend = audiobuffer + 2*1024*1024; //(MEMORYSIZE*1024*1024);
 #endif
 #endif
 

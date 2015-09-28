@@ -8,7 +8,7 @@
 * $Id$
 *
 * This is a memory allocator designed to provide reasonable management of free
-* space and fast access to allocated data. More than one allocator can be used
+* space and fast access to tlfs allocated data. More than one allocator can be used
 * at a time by initializing multiple contexts.
 *
 * Copyright (C) 2009 Andrew Mahone
@@ -25,12 +25,15 @@
 *
 ****************************************************************************/
 
+#include <unistd.h>
 #include <stdlib.h> /* for abs() */
 #include <stdio.h> /* for snprintf() */
 #include "buflib.h"
 #include "string-extra.h" /* strlcpy() */
 #include "debug.h"
 #include "system.h" /* for ALIGN_*() */
+#include "panic.h"
+#include "tlsf.h"
 
 /* This implements the buflib API with a malloc() backend. This avoids
  * move and shrink operations on platforms where malloc() is available.
@@ -57,12 +60,40 @@ struct buflib_buffer_inout_data {
 
 #define HANDLE_TABLE_QUANTUM 64
 
+#include <android/log.h>
+#define LOG_TAG "RB"
+static void __debugf(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    __android_log_vprint(ANDROID_LOG_DEBUG, LOG_TAG, fmt, ap);
+    va_end(ap);
+}
 static
 union buflib_data* buflib_data_new(int n)
 {
-    union buflib_data* ret = calloc(n, sizeof(union buflib_data));
+    union buflib_data* ret = tlsf_calloc(n, sizeof(union buflib_data));
     if (!ret) panicf("buflib: OOM\n");
     return ret;
+}
+
+#include <sys/mman.h>
+#define ROUNDUP(_x, _v)           ((((~(_x)) + 1) & ((_v)-1)) + (_x))
+#define _PAGE_SIZE (sysconf(_SC_PAGESIZE))
+/* Request memory chunk from the host OS */
+void *get_new_area(size_t * size)
+{
+    void *area;
+    *size = ROUNDUP(*size, _PAGE_SIZE);
+
+    if ((area = mmap(0, *size, PROT_READ | PROT_WRITE, 
+                     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0)) != MAP_FAILED)
+    {
+        __debugf("get_new_area(%d): 0x%0x", *size, (unsigned)area);
+        return area;
+    }
+
+    return ((void *) ~0);
 }
 
 /* Initialize buffer manager */
@@ -91,6 +122,33 @@ buflib_init(struct buflib_context *ctx, void *buf, size_t size)
 
     BDEBUGF("buflib initialized with %lu.%2lu kiB",
             (unsigned long)size / 1024, ((unsigned long)size%1000)/10);
+}
+
+bool buflib_context_relocate(struct buflib_context *ctx, void *buf)
+{
+    union buflib_data *handle, *bd_buf = buf;
+    ptrdiff_t diff = bd_buf - ctx->buf_start;
+
+    /* cannot continue if the buffer is not aligned, since we would need
+     * to reduce the size of the buffer for aligning */
+    if ((uintptr_t)buf & 0x3)
+        return false;
+
+    /* relocate the handle table entries  */
+    for (handle = ctx->last_handle; handle < ctx->handle_table; handle++)
+    {
+        if (handle->alloc)
+            handle->alloc += diff * sizeof(union buflib_data);
+    }
+    /* relocate the pointers in the context */
+    ctx->handle_table       += diff;
+    ctx->last_handle        += diff;
+    ctx->first_free_handle  += diff;
+    ctx->buf_start          += diff;
+    ctx->alloc_end          += diff;
+
+    __debugf("buflib_context_relocate(): 0x%0x", (unsigned)buf);
+    return true;
 }
 
 /* unit is entries, not bytes */
@@ -204,7 +262,7 @@ buflib_buffer_out(struct buflib_context *ctx, size_t *size)
     if (!data->ptr)
     {   /* first call: allocate buffer */
         data->len = (uintptr_t)ctx->buf_start;
-        data->ptr = malloc(data->len);
+        data->ptr = tlsf_malloc(data->len);
     }
     if (!data->len)
         return NULL;
@@ -229,7 +287,7 @@ buflib_buffer_in(struct buflib_context *ctx, int size)
     if (data->len >= (uintptr_t)ctx->buf_start)
     {
         /* all of the buffer was returned back, time to free */
-        free(data->ptr);
+        tlsf_free(data->ptr);
         data->ptr = NULL;
         data->len = 0;
     }
@@ -267,6 +325,9 @@ buflib_alloc_ex(struct buflib_context *ctx, size_t size, const char *name,
     if (!handle)
         return -1;
 
+    __debugf("buflib_alloc_ex(%d): handle: %d, name: %s",
+             size*sizeof(union buflib_data), ctx->handle_table - handle, name);
+
     block = buflib_data_new(size);
     /* Set up the allocated block, by marking the size allocated, and storing
      * a pointer to the handle.
@@ -291,7 +352,9 @@ buflib_free(struct buflib_context *ctx, int handle_num)
     union buflib_data *handle = ctx->handle_table - handle_num,
                       *freed_block = handle_to_block(ctx, handle_num);
     handle_free(ctx, handle);
-    free(freed_block);
+    tlsf_free(freed_block);
+
+    __debugf("buflib_free(): handle: %d", handle_num);
 
     return 0; /* unconditionally */
 }
@@ -320,6 +383,7 @@ buflib_alloc_maximum(struct buflib_context* ctx, const char* name, size_t *size,
     if (*size <= 0) /* OOM */
         return -1;
 
+    __debugf("buflib_alloc_maximum(): %s", name);
     return buflib_alloc_ex(ctx, *size, name, ops);
 }
 
@@ -330,67 +394,39 @@ buflib_alloc_maximum(struct buflib_context* ctx, const char* name, size_t *size,
 bool
 buflib_shrink(struct buflib_context* ctx, int handle, void** new_start, size_t new_size)
 {
-    /* to keep things simple, we simply make a new allocation and copy things
-     * over. This is also the only way to free memory the memory between
-     * the header and the new new_start (if any). We need to make sure
-     * that the old handle is still valid, i.e. the entry in the handle
-     * table stays the same */
-    void *data, *new_data;
-    union buflib_data *block, *new_block;
-    struct buflib_callbacks *ops;
-    int new_handle;
-    bool retval = true;
+    /* BIG FAT WARRNING!!!!
+     * We relay on the fact that tlsf_realloc() does not move block of memory
+     * when shrinking. In general it is not guaranteed for random realloc()
+     * hence this assumption only holds because we use specific implementation
+     */
+    void *realloc_ptr = NULL;
+    union buflib_data *block;
+
+    __debugf("buflib_shrink(): handle:%d new_size: %d", handle, new_size);
 
     block = handle_to_block(ctx, handle);
-    ops = block[2].ops;
-    new_handle = buflib_alloc_ex(ctx, new_size, block[3].name, ops);
-    if (new_handle < 0)
-        return false;
 
-    /* disable IRQs to make accessing the buffer from interrupt context safe. */
-    /* protect the move callback, as a cached global pointer might be updated
-     * in it. and protect "tmp->alloc = new_start" for buflib_get_data() */
-    /* call the callback before moving */
-    if (ops && ops->sync_callback)
-        ops->sync_callback(handle, true);
-    else
-        disable_irq();
+    size_t name_len = B_ALIGN_UP(strlen(block[3].name)+1);
+    new_size += name_len;
+    new_size = B_ALIGN_UP(new_size);
+   /* add 4 objects for alloc len, pointer to handle table entry,
+    * name length and pointer to callbacks */
+    new_size += 4*sizeof(union buflib_data);
 
-    /* copy data over */
-    data = buflib_get_data(ctx, handle);
-    new_data = buflib_get_data(ctx, new_handle);
+    disable_irq();
 
-    /* call user's move_callback since a new allocation changes pointers */
-    if (ops && ops->move_callback(handle, data, new_data) == BUFLIB_CB_CANNOT_MOVE)
+    realloc_ptr = tlsf_realloc((void *)block, new_size);
+    if (realloc_ptr)
+        block->val = new_size;
+
+    enable_irq();
+
+    if (!realloc_ptr || (void *)realloc_ptr != (void *)block)
     {
-        /* cannot move. undo and abort */
-        buflib_free(ctx, new_handle);
-        retval = false;
-        *new_start = data;
+       return false;
     }
-    else
-    {
-        /* success. replace alloc with new one */
-        memcpy(new_data, data, new_size);
-        /* fix header */
-        new_block = handle_to_block(ctx, new_handle);
-        /* replace the handle table entry to keep the old handle valid */
-        handle_free(ctx, new_block[1].handle);
-        new_block[1].handle = block[1].handle;
-        /* free old alloc. cannot call buflib_free() as it would
-         * free the handle table entry as well (which is still needed) */
-        free(block);
-        /* at last, fix handle table */
-        new_block[1].handle->alloc = new_data;
 
-        *new_start = new_data;
-    }
-    if (ops && ops->sync_callback)
-        ops->sync_callback(handle, false);
-    else
-        enable_irq();
-
-    return retval;
+    return true;
 }
 
 const char* buflib_get_name(struct buflib_context *ctx, int handle)
