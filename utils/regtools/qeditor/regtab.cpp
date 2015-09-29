@@ -247,8 +247,7 @@ void RegTab::UpdateTabName()
     else if(hwstub)
     {
         HWStubDevice *dev = hwstub->GetDevice();
-        SetTabName(QString("HWStub %1.%2").arg(dev->GetBusNumber())
-            .arg(dev->GetDevAddress()));
+        SetTabName(dev->GetFriendlyName());
     }
 #endif
     else
@@ -263,11 +262,20 @@ void RegTab::OnBackendSelect(IoBackend *backend)
     HideMessage(m_msg_select_id);
     HideMessage(m_msg_error_id);
     m_io_backend = backend;
-    SetReadOnlyIndicator();
-    SetDataSocName(m_io_backend->GetSocName());
-    OnDataSocActivated(m_io_backend->GetSocName());
-    OnDataChanged();
-    UpdateTabName();
+    /* Check if the backend is valid, otherwise it might confuse the user */
+    if(m_io_backend->IsValid())
+    {
+        SetReadOnlyIndicator();
+        SetDataSocName(m_io_backend->GetSocName());
+        OnDataSocActivated(m_io_backend->GetSocName());
+        OnDataChanged();
+        UpdateTabName();
+    }
+    else
+    {
+        m_msg_error_id = SetMessage(MessageWidget::Error,
+            "Data source is not available.");
+    }
 }
 
 void RegTab::SetReadOnlyIndicator()
