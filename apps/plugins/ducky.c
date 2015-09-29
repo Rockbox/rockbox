@@ -160,12 +160,24 @@ enum plugin_status plugin_start(const void *param)
     rb->lcd_clear_display();
     rb->lcd_update();
 
+    /* first, make sure that USB HID is enabled */
+    if(!rb->global_settings->usb_hid)
+    {
+        rb->splash(5*HZ, "USB HID is required for this plugin to function. Please enable it and try again.");
+        return PLUGIN_ERROR;
+    }
+
     const char *path = (const char*) param;
     int fd = rb->open(path, O_RDONLY);
 
     int line = 0;
 
     int default_delay = DEFAULT_DELAY, string_delay = STRING_DELAY;
+
+    /* HACK: fake our VID/PID to be a keyboard */
+#ifdef USB_FAKE_VID_PID
+    rb->usb_change_id(0x413C, 0x2107);
+#endif
 
     /* make sure USB isn't already inserted */
 
