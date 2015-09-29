@@ -161,17 +161,19 @@ protected:
 };
 
 #ifdef HAVE_HWSTUB
+/* Abstract Virtual Class from where TCP and USB backend
+ * child classes are derived
+ */
 class HWStubDevice
 {
 public:
-    HWStubDevice(struct libusb_device *dev);
-    HWStubDevice(const HWStubDevice *dev);
-    ~HWStubDevice();
+    /* implementation specific Pure Virtual methods */
+    virtual bool Open() = 0;
+    virtual void Close() = 0;
+    virtual QString GetFriendlyName() = 0;
+    virtual ~HWStubDevice() {};
+
     bool IsValid();
-    bool Open();
-    void Close();
-    int GetBusNumber();
-    int GetDevAddress();
     /* Calls below are cached and do not require the device to be opened */
     inline struct hwstub_version_desc_t GetVersionInfo() { return m_hwdev_ver; }
     inline struct hwstub_target_desc_t GetTargetInfo() { return m_hwdev_target; }
@@ -181,18 +183,53 @@ public:
     bool ReadMem(soc_addr_t addr, size_t length, void *buffer);
     bool WriteMem(soc_addr_t addr, size_t length, void *buffer);
 
+
 protected:
     bool Probe();
-    void Init(struct libusb_device *dev);
 
     bool m_valid;
-    struct libusb_device *m_dev;
-    libusb_device_handle *m_handle;
     struct hwstub_device_t *m_hwdev;
     struct hwstub_version_desc_t m_hwdev_ver;
     struct hwstub_target_desc_t m_hwdev_target;
     struct hwstub_stmp_desc_t m_hwdev_stmp;
     struct hwstub_pp_desc_t m_hwdev_pp;
+};
+
+/* USB backend HWStub subclass */
+class USBHWStubDevice : public HWStubDevice
+{
+public:
+    USBHWStubDevice(struct libusb_device *dev);
+    USBHWStubDevice(const USBHWStubDevice *dev);
+    ~USBHWStubDevice();
+    QString GetFriendlyName();
+    bool Open();
+    void Close();
+
+private:
+    int GetBusNumber();
+    int GetDevAddress();
+
+protected:
+    void Init(struct libusb_device *dev);
+    struct libusb_device *m_dev;
+    libusb_device_handle *m_handle;
+};
+
+/* TCP backend HWStub subclass */
+class TCPHWStubDevice : public HWStubDevice
+{
+public:
+    TCPHWStubDevice(QString address, QString port);
+    ~TCPHWStubDevice();
+    QString GetFriendlyName();
+    bool Open();
+    void Close();
+
+protected:
+    void Init(QString address, QString port);
+    QString m_address;
+    QString m_port;
 };
 
 /** NOTE the HWStub backend is never dirty: all writes are immediately committed */
@@ -235,7 +272,7 @@ public:
     HWStubBackendHelper();
     ~HWStubBackendHelper();
     bool HasHotPlugSupport();
-    QList< HWStubDevice* > GetDevList();
+    QList< USBHWStubDevice* > GetDevList();
 
 signals:
     void OnDevListChanged(bool arrived, struct libusb_device *dev);

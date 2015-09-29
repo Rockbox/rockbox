@@ -22,6 +22,11 @@
 #define __HWSTUB__
 
 #include <libusb.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
 #include "hwstub_protocol.h"
 
 #ifdef __cplusplus
@@ -33,6 +38,11 @@ extern "C" {
  * Low-Level interface
  *
  */
+enum hwstub_conn_type_t
+{
+    HWSTUB_CONN_USB,
+    HWSTUB_CONN_TCP
+};
 
 struct hwstub_device_t;
 
@@ -44,6 +54,7 @@ int hwstub_probe(libusb_device *dev);
 ssize_t hwstub_get_device_list(libusb_context *ctx, libusb_device ***list);
 /* Returns NULL on error */
 struct hwstub_device_t *hwstub_open(libusb_device_handle *handle);
+struct hwstub_device_t *hwstub_open_tcp(const char *host, const char *port);
 /* Returns 0 on success. Does *NOT* close the usb handle */
 int hwstub_release(struct hwstub_device_t *dev);
 
