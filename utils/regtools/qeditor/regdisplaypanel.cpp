@@ -264,7 +264,6 @@ RegDisplayPanel::~RegDisplayPanel()
 void RegDisplayPanel::Reload()
 {
     const soc_dev_addr_t& dev_addr = m_reg.GetDevAddr();
-    const soc_reg_t& reg = m_reg.GetReg();
     const soc_reg_addr_t& reg_addr = m_reg.GetRegAddr();
     soc_word_t value;
     BackendHelper helper(m_io_backend, m_reg);
