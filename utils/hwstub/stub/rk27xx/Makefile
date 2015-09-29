@@ -1,10 +1,11 @@
 #
 # common
 #
-CC=arm-elf-eabi-gcc
-LD=arm-elf-eabi-gcc
-AS=arm-elf-eabi-gcc
-OC=arm-elf-eabi-objcopy
+PREFIX?=arm-elf-eabi-
+CC=$(PREFIX)gcc
+LD=$(PREFIX)gcc
+AS=$(PREFIX)gcc
+OC=$(PREFIX)objcopy
 DEFINES=
 INCLUDES=-I$(CURDIR)
 GCCOPTS=-march=armv5te

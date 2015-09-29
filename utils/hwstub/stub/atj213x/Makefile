@@ -1,10 +1,11 @@
 #
 # common
 #
-CC=mipsel-elf-gcc
-LD=mipsel-elf-gcc
-AS=mipsel-elf-gcc
-OC=mipsel-elf-objcopy
+PREFIX?=mipsel-elf-
+CC=$(PREFIX)gcc
+LD=$(PREFIX)gcc
+AS=$(PREFIX)gcc
+OC=$(PREFIX)objcopy
 DEFINES=
 INCLUDES=-I$(CURDIR)
 GCCOPTS=-march=mips32r2 -G0 -msoft-float
