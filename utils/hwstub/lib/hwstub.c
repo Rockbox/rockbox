@@ -28,7 +28,9 @@
 
 struct hwstub_device_t
 {
-    libusb_device_handle *handle;
+    libusb_device_handle *usb_handle;
+    int tcp_handle;
+    enum hwstub_conn_type_t conn_type;
     int intf;
     unsigned buf_sz;
     uint16_t id;
@@ -91,10 +93,11 @@ struct hwstub_device_t *hwstub_open(libusb_device_handle *handle)
 {
     struct hwstub_device_t *dev = malloc(sizeof(struct hwstub_device_t));
     memset(dev, 0, sizeof(struct hwstub_device_t));
-    dev->handle = handle;
+    dev->conn_type = HWSTUB_CONN_USB;
+    dev->usb_handle = handle;
     dev->intf = -1;
     dev->buf_sz = 1024; /* default size */
-    libusb_device *mydev = libusb_get_device(dev->handle);
+    libusb_device *mydev = libusb_get_device(dev->usb_handle);
     dev->intf = hwstub_probe(mydev);
     if(dev->intf == -1)
         goto Lerr;
@@ -120,53 +123,237 @@ Lerr:
     return NULL;
 }
 
+struct hwstub_device_t *hwstub_open_tcp(const char *host, const char *port)
+{
+    struct addrinfo hints;
+    struct addrinfo *result;
+
+    struct hwstub_device_t *dev = malloc(sizeof(struct hwstub_device_t));
+    memset(dev, 0, sizeof(struct hwstub_device_t));
+    dev->tcp_handle = -1;
+
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_UNSPEC;    /* Allow IPv4 or IPv6 */
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = 0;
+    hints.ai_protocol = 0;          /* Any protocol */
+
+    int s = getaddrinfo(host, port, &hints, &result);
+    if(s != 0)
+        goto Lerr;
+
+    /* getaddrinfo() returns a list of address structures.
+     * Try each address until we successfully connect(2).
+     * If socket(2) (or connect(2)) fails, we (close the socket
+     * and) try the next address. */
+
+    for(struct addrinfo *rp = result; rp != NULL; rp = rp->ai_next)
+    {
+        dev->tcp_handle = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+        if(dev->tcp_handle == -1)
+            continue;
+
+        if(connect(dev->tcp_handle, rp->ai_addr, rp->ai_addrlen) != -1)
+            break;                  /* Success */
+        else
+            close(dev->tcp_handle);
+    }
+    freeaddrinfo(result);
+    if(dev->tcp_handle == -1)
+        goto Lerr;
+
+    struct timeval tv;
+    tv.tv_sec = 30;  /* 30 secs timeout */
+    tv.tv_usec = 0;  /* init this field to avoid strange errors */
+    setsockopt(dev->tcp_handle, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval));
+
+    dev->conn_type = HWSTUB_CONN_TCP;
+    dev->buf_sz = 1024; /* default size */
+
+    struct hwstub_version_desc_t m_hwdev_ver;
+    int sz = hwstub_get_desc(dev, HWSTUB_DT_VERSION, &m_hwdev_ver, sizeof(m_hwdev_ver));
+    if(sz != sizeof(m_hwdev_ver))
+        goto Lerr;
+    /* major version must match, minor version is taken to be the minimum between
+     * what library and device support */
+    if(m_hwdev_ver.bMajor != HWSTUB_VERSION_MAJOR)
+        goto Lerr;
+    dev->minor_ver = MIN(m_hwdev_ver.bMinor, HWSTUB_VERSION_MINOR);
+    /* try to get actual buffer size */
+    struct hwstub_layout_desc_t layout;
+    sz = hwstub_get_desc(dev, HWSTUB_DT_LAYOUT, &layout, sizeof(layout));
+    if(sz == (int)sizeof(layout))
+        dev->buf_sz = layout.dBufferSize;
+    return dev;
+
+Lerr:
+    free(dev);
+    return NULL;
+}
+
 int hwstub_release(struct hwstub_device_t *dev)
 {
+    if(dev->conn_type == HWSTUB_CONN_USB)
+        libusb_close(dev->usb_handle);
+    else if(dev->conn_type == HWSTUB_CONN_TCP)
+        close(dev->tcp_handle);
+
     free(dev);
     return 0;
 }
 
 int hwstub_get_desc(struct hwstub_device_t *dev, uint16_t desc, void *info, size_t sz)
 {
-    return libusb_control_transfer(dev->handle,
-        LIBUSB_REQUEST_TYPE_STANDARD | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN,
-        LIBUSB_REQUEST_GET_DESCRIPTOR, desc << 8, dev->intf, info, sz, 1000);
+    if(dev->conn_type == HWSTUB_CONN_USB)
+    {
+        return libusb_control_transfer(dev->usb_handle,
+            LIBUSB_REQUEST_TYPE_STANDARD | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN,
+            LIBUSB_REQUEST_GET_DESCRIPTOR, desc << 8, dev->intf, info, sz, 1000);
+    }
+    else if(dev->conn_type == HWSTUB_CONN_TCP)
+    {
+        struct hwstub_tcp_cmd_t p =
+        {
+            .cmd = HWSTUB_GET_DESC,
+            .addr = desc,
+            .len = (uint32_t)sz
+        };
+
+        /* write command */
+        int n = send(dev->tcp_handle, &p, sizeof(p), MSG_NOSIGNAL);
+        if(n < 0)
+            return 0;
+
+        /* get response */
+        n = recv(dev->tcp_handle, &p, sizeof(p), MSG_WAITALL);
+        if(n < 0)
+            return 0;
+
+        if(n == sizeof(p) && p.cmd == HWSTUB_GET_DESC_ACK && p.len > 0)
+        {
+            n = recv(dev->tcp_handle, info, p.len, MSG_WAITALL);
+            return (n == (ssize_t)p.len) ? n : 0;
+        }
+    }
+
+    return 0;
 }
 
 int hwstub_get_log(struct hwstub_device_t *dev, void *buf, size_t sz)
 {
-    return libusb_control_transfer(dev->handle,
-        LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN,
-        HWSTUB_GET_LOG, 0, dev->intf, buf, sz, 1000);
+    if(dev->conn_type == HWSTUB_CONN_USB)
+    {
+        return libusb_control_transfer(dev->usb_handle,
+            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN,
+            HWSTUB_GET_LOG, 0, dev->intf, buf, sz, 1000);
+    }
+    else if(dev->conn_type == HWSTUB_CONN_TCP)
+    {
+        struct hwstub_tcp_cmd_t p =
+        {
+            .cmd = HWSTUB_GET_LOG,
+            .addr = 0,
+            .len = (uint32_t)sz
+        };
+
+        /* write command */
+        int n = send(dev->tcp_handle, &p, sizeof(p), MSG_NOSIGNAL);
+        if(n < 0)
+            return 0;
+
+        /* get response */
+        n = recv(dev->tcp_handle, &p, sizeof(p), MSG_WAITALL);
+
+        if(n == sizeof(p) && p.cmd == HWSTUB_GET_LOG_ACK && p.len > 0)
+        {
+            n = recv(dev->tcp_handle, buf, p.len, MSG_WAITALL);
+            return (n == (ssize_t)p.len) ? n : 0;
+        }
+    }
+
+    return 0;
 }
 
 static int _hwstub_read(struct hwstub_device_t *dev, uint8_t breq, uint32_t addr,
     void *buf, size_t sz)
 {
-    struct hwstub_read_req_t read;
-    read.dAddress = addr;
-    int size = libusb_control_transfer(dev->handle,
-        LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT,
-        HWSTUB_READ, dev->id, dev->intf, (void *)&read, sizeof(read), 1000);
-    if(size != (int)sizeof(read))
-        return -1;
-    return libusb_control_transfer(dev->handle,
-        LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN,
-        breq, dev->id++, dev->intf, buf, sz, 1000);
+    if(dev->conn_type == HWSTUB_CONN_USB)
+    {
+        struct hwstub_read_req_t read;
+        read.dAddress = addr;
+        int size = libusb_control_transfer(dev->usb_handle,
+            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT,
+            HWSTUB_READ, dev->id, dev->intf, (void *)&read, sizeof(read), 1000);
+        if(size != (int)sizeof(read))
+            return -1;
+        return libusb_control_transfer(dev->usb_handle,
+            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN,
+            breq, dev->id++, dev->intf, buf, sz, 1000);
+    }
+    else if(dev->conn_type == HWSTUB_CONN_TCP)
+    {
+        struct hwstub_tcp_cmd_t p =
+        {
+            .cmd = (uint32_t)breq,
+            .addr = addr,
+            .len = (uint32_t)sz
+        };
+
+        /* write command */
+        int n = send(dev->tcp_handle, &p, sizeof(p), MSG_NOSIGNAL);
+        if(n < 0)
+            return -1;
+
+        /* get response */
+        n = recv(dev->tcp_handle, &p, sizeof(p), MSG_WAITALL);
+
+        if(n == sizeof(p) && p.cmd == (HWSTUB_ACK | breq) && p.len > 0)
+        {
+            n = read(dev->tcp_handle, buf, p.len);
+            return n;
+        }
+    }
+
+    return -1;
 }
 
 static int _hwstub_write(struct hwstub_device_t *dev, uint8_t breq, uint32_t addr,
     const void *buf, size_t sz)
 {
-    size_t hdr_sz = sizeof(struct hwstub_write_req_t);
-    struct hwstub_write_req_t *req = malloc(sz + hdr_sz);
-    req->dAddress = addr;
-    memcpy(req + 1, buf, sz);
-    int size = libusb_control_transfer(dev->handle,
-        LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT,
-        breq, dev->id++, dev->intf, (void *)req, sz + hdr_sz, 1000);
-    free(req);
-    return size - hdr_sz;
+    if(dev->conn_type == HWSTUB_CONN_USB)
+    {
+        size_t hdr_sz = sizeof(struct hwstub_write_req_t);
+        struct hwstub_write_req_t *req = malloc(sz + hdr_sz);
+        req->dAddress = addr;
+        memcpy(req + 1, buf, sz);
+        int size = libusb_control_transfer(dev->usb_handle,
+            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT,
+            breq, dev->id++, dev->intf, (void *)req, sz + hdr_sz, 1000);
+        free(req);
+        return size - hdr_sz;
+    }
+    else if(dev->conn_type == HWSTUB_CONN_TCP)
+    {
+        struct hwstub_tcp_cmd_t p =
+        {
+            .cmd = (uint32_t)breq,
+            .addr = addr,
+            .len = (uint32_t)sz
+        };
+
+        /* write command */
+        int n = send(dev->tcp_handle, &p, sizeof(p), MSG_NOSIGNAL);
+        if(n < 0)
+            return -1;
+
+        /* get response */
+        n = recv(dev->tcp_handle, &p, sizeof(p), MSG_WAITALL);
+
+        if(n == sizeof(p) && (p.cmd & HWSTUB_ACK))
+            return n;
+    }
+
+    return -1;
 }
 
 int hwstub_read_atomic(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz)
@@ -233,15 +420,40 @@ int hwstub_rw_mem_atomic(struct hwstub_device_t *dev, int read, uint32_t addr, v
 
 int hwstub_exec(struct hwstub_device_t *dev, uint32_t addr, uint16_t flags)
 {
-    struct hwstub_exec_req_t exec;
-    exec.dAddress = addr;
-    exec.bmFlags = flags;
-    int size = libusb_control_transfer(dev->handle,
-        LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT,
-        HWSTUB_EXEC, dev->id, dev->intf, (void *)&exec, sizeof(exec), 1000);
-    if(size != (int)sizeof(exec))
-        return -1;
-    return 0;
+    if(dev->conn_type == HWSTUB_CONN_USB)
+    {
+        struct hwstub_exec_req_t exec;
+        exec.dAddress = addr;
+        exec.bmFlags = flags;
+        int size = libusb_control_transfer(dev->usb_handle,
+            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT,
+            HWSTUB_EXEC, dev->id, dev->intf, (void *)&exec, sizeof(exec), 1000);
+        if(size != (int)sizeof(exec))
+            return -1;
+        return 0;
+    }
+    else if(dev->conn_type == HWSTUB_CONN_TCP)
+    {
+        struct hwstub_tcp_cmd_t p =
+        {
+            .cmd = HWSTUB_EXEC,
+            .addr = addr,
+            .len = flags
+        };
+
+        /* write command */
+        int n = send(dev->tcp_handle, &p, sizeof(p), MSG_NOSIGNAL);
+        if(n < 0)
+            return -1;
+
+        /* get response */
+        n = recv(dev->tcp_handle, &p, sizeof(p), MSG_WAITALL);
+
+        if(n == sizeof(p) && p.cmd == HWSTUB_EXEC_ACK)
+            return 0;
+    }
+
+    return -1;
 }
 
 int hwstub_call(struct hwstub_device_t *dev, uint32_t addr)

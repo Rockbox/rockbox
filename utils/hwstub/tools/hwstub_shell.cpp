@@ -810,10 +810,10 @@ bool my_lua_import_soc(std::vector< soc_desc::soc_t >& socs)
 
 void usage(void)
 {
-    printf("hwstub_tool, compiled with hwstub protocol %d.%d\n",
+    printf("hwstub_shell, compiled with hwstub protocol %d.%d\n",
         HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR);
     printf("\n");
-    printf("usage: hwstub_tool [options] <soc desc files>\n");
+    printf("usage: hwstub_shell [options] <soc desc files>\n");
     printf("options:\n");
     printf("  --help/-?   Display this help\n");
     printf("  --quiet/-q  Quiet non-command messages\n");
@@ -822,6 +822,10 @@ void usage(void)
     printf("  -f <file>   Execute <file> at startup\n");
     printf("Relative order of -e and -f commands are preserved.\n");
     printf("They are executed after init file.\n");
+    printf("  -P <usb|tcp> Select connection type\n");
+    printf("  -a <ip|hostname> Address of hwstub_server which you want to connect\n");
+    printf("  -p <port>   Port number for TCP connection\n");
+    printf("Default connection type is USB, default host is localhost, default port is 8888.\n");
     exit(1);
 }
 
@@ -829,6 +833,10 @@ enum exec_type { exec_cmd, exec_file };
 
 int main(int argc, char **argv)
 {
+    const char *address = "localhost";
+    const char *port = "8888";
+    enum hwstub_conn_type_t conn = HWSTUB_CONN_USB;
+
     const char *lua_init = "init.lua";
     std::vector< std::pair< exec_type, std::string > > startup_cmds;
     // parse command line
@@ -838,10 +846,16 @@ int main(int argc, char **argv)
         {
             {"help", no_argument, 0, '?'},
             {"quiet", no_argument, 0, 'q'},
+            {"init", required_argument, 0, 'i'},
+            {"startcmd", required_argument, 0, 'e'},
+            {"startfile", required_argument, 0, 'f'},
+            {"protocol", required_argument, 0, 'P'},
+            {"address", required_argument, 0, 'a'},
+            {"port", required_argument, 0, 'p'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?qi:e:f:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?qi:e:f:P:a:p:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -863,6 +877,23 @@ int main(int argc, char **argv)
             case 'f':
                 startup_cmds.push_back(std::make_pair(exec_file, std::string(optarg)));
                 break;
+            case 'P':
+                if(strcmp(optarg, "usb") == 0)
+                    conn = HWSTUB_CONN_USB;
+                else if(strcmp(optarg, "tcp") == 0)
+                    conn = HWSTUB_CONN_TCP;
+                else
+                {
+                    printf("Invalid connection type '%s'\n", optarg);
+                    return 1;
+                }
+                break;
+            case 'a':
+                address = optarg;
+                break;
+            case 'p':
+                port = optarg;
+                break;
             default:
                 abort();
         }
@@ -882,39 +913,52 @@ int main(int argc, char **argv)
         print_context(argv[i], ctx);
     }
 
-    // create usb context
-    libusb_context *ctx;
-    libusb_init(&ctx);
-    libusb_set_debug(ctx, 3);
-
-    // look for device
-    if(!g_quiet)
-        printf("Looking for hwstub device ...\n");
-    // open first device
-    libusb_device **list;
-    ssize_t cnt = hwstub_get_device_list(ctx, &list);
-    if(cnt <= 0)
+    if(conn == HWSTUB_CONN_USB)
     {
-        printf("No device found\n");
+        // create usb context
+        libusb_context *ctx;
+        libusb_init(&ctx);
+        libusb_set_debug(ctx, 3);
+
+        // look for device
+        if(!g_quiet)
+            printf("Looking for hwstub device ...\n");
+        // open first device
+        libusb_device **list;
+        ssize_t cnt = hwstub_get_device_list(ctx, &list);
+        if(cnt <= 0)
+        {
+            printf("No device found\n");
+            return 1;
+        }
+        libusb_device_handle *handle;
+        if(libusb_open(list[0], &handle) != 0)
+        {
+            printf("Cannot open device\n");
+            return 1;
+        }
+        libusb_free_device_list(list, 1);
+
+        // admin stuff
+        libusb_device *mydev = libusb_get_device(handle);
+        if(!g_quiet)
+        {
+            printf("device found at %d:%d\n",
+                libusb_get_bus_number(mydev),
+                libusb_get_device_address(mydev));
+        }
+        g_hwdev = hwstub_open(handle);
+    }
+    else if(conn == HWSTUB_CONN_TCP)
+    {
+        g_hwdev = hwstub_open_tcp(address, port);
+    }
+    else
+    {
+        printf("Unknown connection type: %d\n", conn);
         return 1;
     }
-    libusb_device_handle *handle;
-    if(libusb_open(list[0], &handle) != 0)
-    {
-        printf("Cannot open device\n");
-        return 1;
-    }
-    libusb_free_device_list(list, 1);
 
-    // admin stuff
-    libusb_device *mydev = libusb_get_device(handle);
-    if(!g_quiet)
-    {
-        printf("device found at %d:%d\n",
-            libusb_get_bus_number(mydev),
-            libusb_get_device_address(mydev));
-    }
-    g_hwdev = hwstub_open(handle);
     if(g_hwdev == NULL)
     {
         printf("Cannot open device!\n");
