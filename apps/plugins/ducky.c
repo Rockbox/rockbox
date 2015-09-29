@@ -167,6 +167,14 @@ enum plugin_status plugin_start(const void *param)
 
     int default_delay = DEFAULT_DELAY, string_delay = STRING_DELAY;
 
+    /* HACK: enable HID mode */
+    rb->global_settings->usb_hid = true;
+
+    /* HACK: fake our VID/PID to be a keyboard */
+#ifdef USB_FAKE_VID_PID
+    rb->usb_change_id(0x413C, 0x2107);
+#endif
+
     /* make sure USB isn't already inserted */
 
     if(rb->usb_inserted())
