@@ -559,6 +559,9 @@ struct plugin_api {
 #endif /* CONFIG_CODEC == SWCODEC */
 
     void (*usb_acknowledge)(long id);
+#ifdef USB_FAKE_VID_PID
+    void (*usb_change_id)(uint16_t vid, uint16_t pid);
+#endif
 #ifdef USB_ENABLE_HID
     void (*usb_hid_send)(usage_page_t usage_page, int id);
 #endif

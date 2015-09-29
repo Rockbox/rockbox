@@ -194,6 +194,9 @@ int usb_wait_for_disconnect_w_tmo(struct event_queue *q, int ticks);
 bool usb_inserted(void);
 /* check whether USB is plugged, note that this is the raw hardware value */
 int usb_detect(void);
+/* change our PID/VID, really a bad thing to do */
+#define USB_FAKE_VID_PID
+void usb_change_id(uint16_t vid, uint16_t pid);
 #ifdef USB_STATUS_BY_EVENT
 /* Notify USB insertion state (USB_INSERTED or USB_EXTRACTED) */
 void usb_status_event(int current_status);

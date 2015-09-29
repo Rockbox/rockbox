@@ -487,6 +487,9 @@ static const struct plugin_api rockbox_api = {
     queue_reply,
 #endif
     usb_acknowledge,
+#ifdef USB_FAKE_VID_PID
+    usb_change_id,
+#endif
 #ifdef USB_ENABLE_HID
     usb_hid_send,
 #endif
