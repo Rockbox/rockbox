@@ -59,7 +59,7 @@
 #define HWSTUB_DT_TARGET    0x43 /* mandatory */
 #define HWSTUB_DT_STMP      0x44 /* optional */
 #define HWSTUB_DT_PP        0x45 /* optional */
-#define HWSTUB_DT_DEVICE    0x46 /* optional */
+#define HWSTUB_DT_JZ        0x46 /* optional */
 
 struct hwstub_version_desc_t
 {
@@ -105,11 +105,20 @@ struct hwstub_pp_desc_t
     uint8_t bRevision[2]; /* 'B1' for B1 for example */
 } __attribute__((packed));
 
+struct hwstub_jz_desc_t
+{
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    /* Chip ID and revision */
+    uint16_t wChipID; /* 0x4760 for Jz4760 for example */
+} __attribute__((packed));
+
 #define HWSTUB_TARGET_UNK       ('U' | 'N' << 8 | 'K' << 16 | ' ' << 24)
 #define HWSTUB_TARGET_STMP      ('S' | 'T' << 8 | 'M' << 16 | 'P' << 24)
 #define HWSTUB_TARGET_RK27      ('R' | 'K' << 8 | '2' << 16 | '7' << 24)
 #define HWSTUB_TARGET_PP        ('P' | 'P' << 8 | ' ' << 16 | ' ' << 24)
 #define HWSTUB_TARGET_ATJ       ('A' | 'T' << 8 | 'J' << 16 | ' ' << 24)
+#define HWSTUB_TARGET_JZ        ('J' | 'Z' << 8 | '4' << 16 | '7' << 24)
 
 struct hwstub_target_desc_t
 {
@@ -118,13 +127,6 @@ struct hwstub_target_desc_t
     /* Target ID and name */
     uint32_t dID;
     char bName[58];
-} __attribute__((packed));
-
-struct hwstub_device_desc_t
-{
-    uint8_t bLength;
-    uint8_t bDescriptorType;
-    /* Give the bRequest value for */
 } __attribute__((packed));
 
 /**

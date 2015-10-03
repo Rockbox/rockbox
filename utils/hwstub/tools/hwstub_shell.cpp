@@ -50,6 +50,7 @@ struct hwstub_version_desc_t g_hwdev_ver;
 struct hwstub_layout_desc_t g_hwdev_layout;
 struct hwstub_target_desc_t g_hwdev_target;
 struct hwstub_stmp_desc_t g_hwdev_stmp;
+struct hwstub_jz_desc_t g_hwdev_jz;
 struct hwstub_pp_desc_t g_hwdev_pp;
 lua_State *g_lua;
 
@@ -349,6 +350,8 @@ bool my_lua_import_hwstub()
     lua_setfield(g_lua, -2, "RK27");
     lua_pushinteger(g_lua, HWSTUB_TARGET_ATJ);
     lua_setfield(g_lua, -2, "ATJ");
+    lua_pushinteger(g_lua, HWSTUB_TARGET_JZ);
+    lua_setfield(g_lua, -2, "JZ");
     lua_setfield(g_lua, -2, "target");
 
     if(g_hwdev_target.dID == HWSTUB_TARGET_STMP)
@@ -370,6 +373,13 @@ bool my_lua_import_hwstub()
         lua_pushlstring(g_lua, (const char *)g_hwdev_pp.bRevision, 2);
         lua_setfield(g_lua, -2, "rev");
         lua_setfield(g_lua, -2, "pp");
+    }
+    else if(g_hwdev_target.dID == HWSTUB_TARGET_JZ)
+    {
+        lua_newtable(g_lua); // jz
+        lua_pushinteger(g_lua, g_hwdev_jz.wChipID);
+        lua_setfield(g_lua, -2, "chipid");
+        lua_setfield(g_lua, -2, "jz");
     }
 
     lua_pushlightuserdata(g_lua, (void *)&hw_read8);
@@ -815,17 +825,14 @@ void usage(void)
     printf("\n");
     printf("usage: hwstub_shell [options] <soc desc files>\n");
     printf("options:\n");
-    printf("  --help/-?   Display this help\n");
-    printf("  --quiet/-q  Quiet non-command messages\n");
-    printf("  -i <init>   Set lua init file (default is init.lua)\n");
-    printf("  -e <cmd>    Execute <cmd> at startup\n");
-    printf("  -f <file>   Execute <file> at startup\n");
+    printf("  --help/-?       Display this help\n");
+    printf("  --quiet/-q      Quiet non-command messages\n");
+    printf("  -i <init>       Set lua init file (default is init.lua)\n");
+    printf("  -e <cmd>        Execute <cmd> at startup\n");
+    printf("  -f <file>       Execute <file> at startup\n");
+    printf("  --dev/-d <uri>  Device URI\n");
     printf("Relative order of -e and -f commands are preserved.\n");
-    printf("They are executed after init file.\n");
-    printf("  -P <usb|tcp> Select connection type\n");
-    printf("  -a <ip|hostname> Address of hwstub_server which you want to connect\n");
-    printf("  -p <port>   Port number for TCP connection\n");
-    printf("Default connection type is USB, default host is localhost, default port is 8888.\n");
+    hwstub_usage_uri(stdout);
     exit(1);
 }
 
@@ -833,9 +840,7 @@ enum exec_type { exec_cmd, exec_file };
 
 int main(int argc, char **argv)
 {
-    const char *address = "localhost";
-    const char *port = "8888";
-    enum hwstub_conn_type_t conn = HWSTUB_CONN_USB;
+    const char *dev_uri = "usb:";
 
     const char *lua_init = "init.lua";
     std::vector< std::pair< exec_type, std::string > > startup_cmds;
@@ -849,13 +854,11 @@ int main(int argc, char **argv)
             {"init", required_argument, 0, 'i'},
             {"startcmd", required_argument, 0, 'e'},
             {"startfile", required_argument, 0, 'f'},
-            {"protocol", required_argument, 0, 'P'},
-            {"address", required_argument, 0, 'a'},
-            {"port", required_argument, 0, 'p'},
+            {"dev", required_argument, 0, 'd'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?qi:e:f:P:a:p:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?qi:e:f:d:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -877,22 +880,8 @@ int main(int argc, char **argv)
             case 'f':
                 startup_cmds.push_back(std::make_pair(exec_file, std::string(optarg)));
                 break;
-            case 'P':
-                if(strcmp(optarg, "usb") == 0)
-                    conn = HWSTUB_CONN_USB;
-                else if(strcmp(optarg, "tcp") == 0)
-                    conn = HWSTUB_CONN_TCP;
-                else
-                {
-                    printf("Invalid connection type '%s'\n", optarg);
-                    return 1;
-                }
-                break;
-            case 'a':
-                address = optarg;
-                break;
-            case 'p':
-                port = optarg;
+            case 'd':
+                dev_uri = optarg;
                 break;
             default:
                 abort();
@@ -913,52 +902,11 @@ int main(int argc, char **argv)
         print_context(argv[i], ctx);
     }
 
-    if(conn == HWSTUB_CONN_USB)
-    {
-        // create usb context
-        libusb_context *ctx;
-        libusb_init(&ctx);
-        libusb_set_debug(ctx, 3);
-
-        // look for device
-        if(!g_quiet)
-            printf("Looking for hwstub device ...\n");
-        // open first device
-        libusb_device **list;
-        ssize_t cnt = hwstub_get_device_list(ctx, &list);
-        if(cnt <= 0)
-        {
-            printf("No device found\n");
-            return 1;
-        }
-        libusb_device_handle *handle;
-        if(libusb_open(list[0], &handle) != 0)
-        {
-            printf("Cannot open device\n");
-            return 1;
-        }
-        libusb_free_device_list(list, 1);
-
-        // admin stuff
-        libusb_device *mydev = libusb_get_device(handle);
-        if(!g_quiet)
-        {
-            printf("device found at %d:%d\n",
-                libusb_get_bus_number(mydev),
-                libusb_get_device_address(mydev));
-        }
-        g_hwdev = hwstub_open(handle);
-    }
-    else if(conn == HWSTUB_CONN_TCP)
-    {
-        g_hwdev = hwstub_open_tcp(address, port);
-    }
-    else
-    {
-        printf("Unknown connection type: %d\n", conn);
-        return 1;
-    }
-
+    /* create usb context */
+    libusb_context *ctx;
+    libusb_init(&ctx);
+    libusb_set_debug(ctx, 3);
+    g_hwdev = hwstub_open_uri(ctx, stdout, dev_uri);
     if(g_hwdev == NULL)
     {
         printf("Cannot open device!\n");
@@ -1013,6 +961,17 @@ int main(int argc, char **argv)
         if(ret != sizeof(g_hwdev_pp))
         {
             printf("Cannot get pp: %d\n", ret);
+            goto Lerr;
+        }
+    }
+
+    // get JZ specific information
+    if(g_hwdev_target.dID == HWSTUB_TARGET_JZ)
+    {
+        ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_JZ, &g_hwdev_jz, sizeof(g_hwdev_jz));
+        if(ret != sizeof(g_hwdev_jz))
+        {
+            printf("Cannot get jz: %d\n", ret);
             goto Lerr;
         }
     }
