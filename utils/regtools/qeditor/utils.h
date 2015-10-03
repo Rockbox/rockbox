@@ -193,7 +193,7 @@ public:
         DisplayValue, /* "value" */
     };
 
-    SocFieldCachedItemDelegate(QObject *parent = 0):QStyledItemDelegate(parent) {}
+    SocFieldCachedItemDelegate(QObject *parent = 0);
     virtual QString displayText(const QVariant& value, const QLocale& locale) const;
     void SetMode(DisplayMode mode) { m_mode = mode; }
     DisplayMode GetMode() const { return m_mode; }

@@ -364,6 +364,12 @@ SocFieldCachedValue::SocFieldCachedValue(const soc_reg_field_t& field, uint valu
  * SocFieldCachedItemDelegate
  */
 
+SocFieldCachedItemDelegate::SocFieldCachedItemDelegate(QObject *parent)
+    :QStyledItemDelegate(parent)
+{
+    m_mode = DisplayValueAndName;
+}
+
 QString SocFieldCachedItemDelegate::displayText(const QVariant& value, const QLocale& locale) const
 {
     // FIXME see QTBUG-30392
