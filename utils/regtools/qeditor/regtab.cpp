@@ -271,7 +271,8 @@ void RegTab::OnBackendSelect(IoBackend *backend)
         OnDataChanged();
         UpdateTabName();
     }
-    else
+    /* But don't display it for the dummy backend either */
+    else if(dynamic_cast< DummyIoBackend * >(m_io_backend) == 0)
     {
         m_msg_error_id = SetMessage(MessageWidget::Error,
             "Data source is not available.");

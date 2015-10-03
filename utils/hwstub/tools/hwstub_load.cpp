@@ -104,9 +104,10 @@ void usage(void)
 {
     printf("usage: hwstub_load [options] <addr> <file>\n");
     printf("options:\n");
-    printf("  --help/-?     Display this help\n");
-    printf("  --quiet/-q    Quiet output\n");
-    printf("  --type/-t <t> Override file type\n");
+    printf("  --help/-?       Display this help\n");
+    printf("  --quiet/-q      Quiet output\n");
+    printf("  --type/-t <t>   Override file type\n");
+    printf("  --dev/-d <uri>  Device URI (see below)\n");
     printf("file types:\n");
     printf("  raw      Load a raw binary blob\n");
     printf("  rockbox  Load a rockbox image produced by scramble\n");
@@ -115,6 +116,7 @@ void usage(void)
     for(int i = 0; players[i].name; i++)
         printf(" %s", players[i].name);
     printf("\n");
+    hwstub_usage_uri(stdout);
     exit(1);
 }
 
@@ -123,6 +125,7 @@ int main(int argc, char **argv)
     bool quiet = false;
     struct hwstub_device_t *hwdev;
     enum image_type_t type = IT_DETECT;
+    const char *uri = "usb:";
 
     // parse command line
     while(1)
@@ -132,10 +135,11 @@ int main(int argc, char **argv)
             {"help", no_argument, 0, '?'},
             {"quiet", no_argument, 0, 'q'},
             {"type", required_argument, 0, 't'},
+            {"dev", required_argument, 0, 'd'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?qt:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?qt:d:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -160,6 +164,9 @@ int main(int argc, char **argv)
                     fprintf(stderr, "Unknown file type '%s'\n", optarg);
                     return 1;
                 }
+                break;
+            case 'd':
+                uri = optarg;
                 break;
             default:
                 abort();
@@ -224,49 +231,14 @@ int main(int argc, char **argv)
     libusb_init(&ctx);
     libusb_set_debug(ctx, 3);
 
-    // look for device
-    if(!quiet)
-        printf("Looking for device %#04x:%#04x...\n", HWSTUB_USB_VID, HWSTUB_USB_PID);
-
-    libusb_device_handle *handle = libusb_open_device_with_vid_pid(ctx,
-        HWSTUB_USB_VID, HWSTUB_USB_PID);
-    if(handle == NULL)
-    {
-        fprintf(stderr, "No device found\n");
-        return 1;
-    }
-
-    // admin stuff
-    libusb_device *mydev = libusb_get_device(handle);
-    if(!quiet)
-    {
-        printf("device found at %d:%d\n",
-            libusb_get_bus_number(mydev),
-            libusb_get_device_address(mydev));
-    }
-    hwdev = hwstub_open(handle);
+    hwdev = hwstub_open_uri(ctx, stdout, uri);
     if(hwdev == NULL)
     {
-        fprintf(stderr, "Cannot probe device!\n");
+        fprintf(stderr, "Cannot open device!\n");
         return 1;
     }
 
-    // get hwstub information
-    struct hwstub_version_desc_t hwdev_ver;
-    int ret = hwstub_get_desc(hwdev, HWSTUB_DT_VERSION, &hwdev_ver, sizeof(hwdev_ver));
-    if(ret != sizeof(hwdev_ver))
-    {
-        fprintf(stderr, "Cannot get version!\n");
-        goto Lerr;
-    }
-    if(hwdev_ver.bMajor != HWSTUB_VERSION_MAJOR || hwdev_ver.bMinor < HWSTUB_VERSION_MINOR)
-    {
-        printf("Warning: this tool is possibly incompatible with your device:\n");
-        printf("Device version: %d.%d.%d\n", hwdev_ver.bMajor, hwdev_ver.bMinor, hwdev_ver.bRevision);
-        printf("Host version: %d.%d\n", HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR);
-    }
-
-    ret = hwstub_rw_mem(hwdev, 0, addr, buffer, size);
+    int ret = hwstub_rw_mem(hwdev, 0, addr, buffer, size);
     if(ret != (int)size)
     {
         fprintf(stderr, "Image write failed: %d\n", ret);

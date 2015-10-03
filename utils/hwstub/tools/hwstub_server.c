@@ -191,8 +191,10 @@ static void usage(void)
         HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR);
     printf("\n");
     printf("usage: hwstub_server [options]\n");
-    printf("    --help/-h    Display this help\n");
-    printf("    --port/-p    TCP port server is listening\n");
+    printf("    --help/-h       Display this help\n");
+    printf("    --port/-p       TCP port server is listening\n");
+    printf("    --dev/-d <uri>  Device URI\n");
+    hwstub_usage_uri(stdout);
     exit(1);
 }
 
@@ -204,15 +206,17 @@ int main (int argc, char **argv)
     struct sockaddr_in serv_addr;
     struct sigaction act;
     pid_t pid;
+    const char *dev_uri = "usb:";
 
     const struct option long_options[] =
     {
         {"help", no_argument,       0, 'h'},
         {"port", required_argument, 0, 'p'},
+        {"dev", required_argument, 0, 'd'},
         {0,      0,                 0,  0}
     };
 
-    while ((c = getopt_long(argc, argv, "hp:", long_options, NULL)) != -1)
+    while ((c = getopt_long(argc, argv, "hp:d:", long_options, NULL)) != -1)
     {
         switch(c)
         {
@@ -222,6 +226,10 @@ int main (int argc, char **argv)
 
             case 'p':
                 server_port = atoi(optarg);
+                break;
+
+            case 'd':
+                dev_uri = optarg;
                 break;
 
             default:
@@ -235,42 +243,11 @@ int main (int argc, char **argv)
     libusb_init(&ctx);
     libusb_set_debug(ctx, 3);
 
-    /* look for device */
-    printf("Looking for device %#04x:%#04x...\n", HWSTUB_USB_VID, HWSTUB_USB_PID);
-
-    libusb_device_handle *handle = libusb_open_device_with_vid_pid(ctx,
-        HWSTUB_USB_VID, HWSTUB_USB_PID);
-    if(handle == NULL)
-    {
-        fprintf(stderr, "No device found\n");
-        return 1;
-    }
-
-    /* admin stuff */
-    libusb_device *mydev = libusb_get_device(handle);
-    printf("device found at %d:%d\n",
-           libusb_get_bus_number(mydev),
-           libusb_get_device_address(mydev));
-
-    hwdev = hwstub_open(handle);
+    hwdev = hwstub_open_uri(ctx, stdout, dev_uri);
     if(hwdev == NULL)
     {
         fprintf(stderr, "Cannot probe device!\n");
         return 1;
-    }
-
-    /* get hwstub information */
-    int ret = hwstub_get_desc(hwdev, HWSTUB_DT_VERSION, &hwdev_ver, sizeof(hwdev_ver));
-    if(ret != sizeof(hwdev_ver))
-    {
-        fprintf(stderr, "Cannot get version!\n");
-        goto Lerr;
-    }
-    if(hwdev_ver.bMajor != HWSTUB_VERSION_MAJOR || hwdev_ver.bMinor < HWSTUB_VERSION_MINOR)
-    {
-        printf("Warning: this tool is possibly incompatible with your device:\n");
-        printf("Device version: %d.%d.%d\n", hwdev_ver.bMajor, hwdev_ver.bMinor, hwdev_ver.bRevision);
-        printf("Host version: %d.%d\n", HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR);
     }
 
     /* tcp stuff */
@@ -331,7 +308,7 @@ int main (int argc, char **argv)
             tv.tv_usec = 0;  /* init this field to avoid strange errors */
             setsockopt(connfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
 
-            ret = hwstub_tcp_handler(connfd);
+            int ret = hwstub_tcp_handler(connfd);
 
             printf("DBG: Client disconnect reason: %d\n", ret);
             close(connfd);
@@ -344,7 +321,6 @@ int main (int argc, char **argv)
     }
 
     printf("Hwstub server close\n");
-    Lerr:
     /* display log if handled */
     fprintf(stderr, "Device log:\n");
     do
