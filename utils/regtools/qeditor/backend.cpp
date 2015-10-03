@@ -278,15 +278,12 @@ USBHWStubDevice::USBHWStubDevice(const USBHWStubDevice *dev)
 USBHWStubDevice::~USBHWStubDevice()
 {
     Close();
-    if(m_dev)
-        libusb_unref_device(m_dev);
+    libusb_unref_device(m_dev);
 }
 
 void USBHWStubDevice::Init(struct libusb_device *dev)
 {
-    libusb_ref_device(dev);
-    m_dev = dev;
-    m_handle = 0;
+    m_dev = libusb_ref_device(dev);
     m_hwdev = 0;
     m_valid = Probe();
 }
@@ -309,29 +306,15 @@ int USBHWStubDevice::GetDevAddress()
 
 bool USBHWStubDevice::Open()
 {
-    if(libusb_open(m_dev, &m_handle))
-        return false;
-    m_hwdev = hwstub_open(m_handle);
-    if(m_hwdev == 0)
-    {
-        libusb_close(m_handle);
-        m_handle = 0;
-        return false;
-    }
-    return true;
+    m_hwdev = hwstub_open_usb(m_dev);
+    return m_hwdev != NULL;
 }
 
 void USBHWStubDevice::Close()
 {
     if(m_hwdev)
         hwstub_release(m_hwdev);
-
     m_hwdev = 0;
-
-    if(m_handle)
-        libusb_close(m_handle);
-
-    m_handle = 0;
 }
 
 QString USBHWStubDevice::GetFriendlyName()

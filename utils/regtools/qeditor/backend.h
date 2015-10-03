@@ -199,6 +199,7 @@ protected:
 class USBHWStubDevice : public HWStubDevice
 {
 public:
+    /* NOTE: constructor will add a reference to the device, destructor will unref it */
     USBHWStubDevice(struct libusb_device *dev);
     USBHWStubDevice(const USBHWStubDevice *dev);
     ~USBHWStubDevice();
@@ -213,7 +214,6 @@ private:
 protected:
     void Init(struct libusb_device *dev);
     struct libusb_device *m_dev;
-    libusb_device_handle *m_handle;
 };
 
 /* TCP backend HWStub subclass */
