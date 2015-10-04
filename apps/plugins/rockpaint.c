@@ -3085,6 +3085,10 @@ static bool rockpaint_loop( void )
     int button = 0, i, j;
     bool bigstep;
 
+    #ifdef HAVE_TOUCHPAD
+    struct touchpad_relative_data rel;
+    #endif
+
     x = 10;
     toolbar();
     x = 0; y = 0;
@@ -3097,6 +3101,27 @@ static bool rockpaint_loop( void )
 
         switch(button)
         {
+            #ifdef HAVE_TOUCHPAD
+            case BUTTON_SELECT:
+                rel = rb->touchpad_get_relative();
+                    while(rel.nr_fingers == 1)
+                    {
+                        inv_cursor(false);
+
+                        x += rel.x*2;
+                        y += -rel.y*2;
+
+                        inv_cursor(true);
+
+                        if( tool == Brush && state == State1 )
+                        {draw_brush( x, y );}
+                        if( preview && tools[tool].preview_func )
+                        {tools[tool].preview_func();}
+
+                        rel = rb->touchpad_get_relative();
+                    }
+                    break;
+            #endif
             case ROCKPAINT_QUIT:
                 if (state != State0)
                 {

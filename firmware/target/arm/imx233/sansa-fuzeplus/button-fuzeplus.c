@@ -216,6 +216,7 @@ static struct event_queue rmi_queue;
 static unsigned last_activity = 0;
 static bool t_enable = true;
 static int deadzone;
+struct touchpad_relative_data current_relative_data = {.x = 0, .y = 0, .nr_fingers = 0};
 
 /* Ignore deadzone function. If outside of the pad, project to border. */
 static int find_button_no_deadzone(int x, int y)
@@ -292,6 +293,10 @@ static void do_interrupt(void)
         touchpad_btns = find_button(absolute_x, absolute_y);
     else
         touchpad_btns = 0;
+
+    current_relative_data.x = (int)u.s.relative.x;
+    current_relative_data.y = (int)u.s.relative.y;
+    current_relative_data.nr_fingers = u.s.absolute.misc & 7;
 
     /* enable interrupt */
     imx233_pinctrl_setup_irq(0, 27, true, true, false, &rmi_attn_cb, 0);
@@ -419,4 +424,9 @@ void button_init_device(void)
 int button_read_device(void)
 {
     return imx233_button_read(touchpad_filter(touchpad_read_device()));
+}
+
+struct touchpad_relative_data touchpad_get_relative(void)
+{
+    return current_relative_data;
 }

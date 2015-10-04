@@ -160,7 +160,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 233
+#define PLUGIN_API_VERSION 234
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -188,7 +188,7 @@ enum plugin_status {
 struct plugin_api {
 
     /* lcd */
-    
+
 #ifdef HAVE_LCD_CONTRAST
     void (*lcd_set_contrast)(int x);
 #endif
@@ -370,7 +370,7 @@ struct plugin_api {
                               int width, int height);
 #endif
     void (*viewport_set_defaults)(struct viewport *vp,
-                                  const enum screen_type screen);                                  
+                                  const enum screen_type screen);
 #ifdef HAVE_LCD_BITMAP
     void (*viewportmanager_theme_enable)(enum screen_type screen, bool enable,
                                          struct viewport *viewport);
@@ -977,6 +977,9 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+       #ifdef HAVE_TOUCHPAD
+       struct touchpad_relative_data (*touchpad_get_relative)(void);
+       #endif
 };
 
 /* plugin header */
