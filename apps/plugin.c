@@ -334,7 +334,7 @@ static const struct plugin_api rockbox_api = {
     viewportmanager_theme_undo,
     viewport_set_fullscreen,
 #endif
-    
+
     /* list */
     gui_synclist_init,
     gui_synclist_set_nb_items,
@@ -369,7 +369,7 @@ static const struct plugin_api rockbox_api = {
     touchscreen_set_mode,
     touchscreen_get_mode,
 #endif
-    
+
 #ifdef HAVE_BUTTON_LIGHT
     buttonlight_set_timeout,
     buttonlight_off,
@@ -541,7 +541,7 @@ static const struct plugin_api rockbox_api = {
     utf8encode,
     utf8length,
     utf8seek,
-    
+
     /* the buflib memory management library */
     buflib_init,
     buflib_available,
@@ -731,7 +731,7 @@ static const struct plugin_api rockbox_api = {
     plugin_get_buffer,
     plugin_get_audio_buffer,     /* defined in plugin.c */
     plugin_release_audio_buffer, /* defined in plugin.c */
-    plugin_tsr,                  /* defined in plugin.c */ 
+    plugin_tsr,                  /* defined in plugin.c */
     plugin_get_current_filename,
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
@@ -838,6 +838,9 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+   #ifdef HAVE_TOUCHPAD
+   touchpad_get_relative,
+   #endif
 };
 
 static int plugin_buffer_handle;
@@ -872,7 +875,7 @@ int plugin_load(const char* plugin, const void* parameter)
     p_hdr = lc_get_header(current_plugin_handle);
 
     hdr = p_hdr ? &p_hdr->lc_hdr : NULL;
-    
+
 
     if (hdr == NULL
         || hdr->magic != PLUGIN_MAGIC
@@ -916,7 +919,7 @@ int plugin_load(const char* plugin, const void* parameter)
 
     FOR_NB_SCREENS(i)
        viewportmanager_theme_enable(i, false, NULL);
-    
+
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
@@ -927,7 +930,7 @@ int plugin_load(const char* plugin, const void* parameter)
     plugin_check_open_close__enter();
 
     int rc = p_hdr->entry_point(parameter);
-    
+
     tree_unlock_cache(tree_get_context());
     pop_current_activity();
 

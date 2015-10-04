@@ -21,11 +21,18 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
+struct touchpad_relative_data {
+    int x;
+    int y;
+    int nr_fingers;
+};
+
 #include <stdbool.h>
 bool button_debug_screen(void);
 void touchpad_set_sensitivity(int level);
 void touchpad_set_deadzone(int touchpad_deadzone);
 void touchpad_enable_device(bool en);
+struct touchpad_relative_data touchpad_get_relative(void);
 
 /* Main unit's buttons */
 #define BUTTON_POWER                0x00000001

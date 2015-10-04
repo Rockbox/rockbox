@@ -420,3 +420,23 @@ int button_read_device(void)
 {
     return imx233_button_read(touchpad_filter(touchpad_read_device()));
 }
+
+struct touchpad_relative_data touchpad_get_relative(void)
+{
+    union
+    {
+        unsigned char data[10];
+        struct
+        {
+            struct rmi_2d_absolute_data_t absolute;
+            struct rmi_2d_relative_data_t relative;
+            struct rmi_2d_gesture_data_t gesture;
+        }s;
+    }u;
+    rmi_read(RMI_DATA_REGISTER(0), 10, u.data);
+    struct touchpad_relative_data out;
+    out.x = (int)u.s.relative.x;
+    out.y = (int)u.s.relative.y;
+    out.nr_fingers = u.s.absolute.misc & 7;
+    return out;
+}
