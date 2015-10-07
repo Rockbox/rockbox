@@ -142,7 +142,7 @@ Lend:
 
 struct hwstub_device_t *hwstub_open_tcp(const char *host, const char *port)
 {
-    return hwstub_open_internal(hwstub_tcp_open(host, port));
+    return hwstub_tcp_open(host, port);
 }
 
 void hwstub_release(struct hwstub_device_t *dev)
