@@ -52,6 +52,8 @@ struct hwstub_target_desc_t g_hwdev_target;
 struct hwstub_stmp_desc_t g_hwdev_stmp;
 struct hwstub_jz_desc_t g_hwdev_jz;
 struct hwstub_pp_desc_t g_hwdev_pp;
+
+int32_t devid = -1;
 lua_State *g_lua;
 
 /**
@@ -277,6 +279,21 @@ int my_lua_printlog(lua_State *state)
     return 0;
 }
 
+int my_lua_hwserver_get_dev_list(lua_State *state)
+{
+    struct dev_info_t devlist[8];
+    int n = hwserver_get_dev_list(g_hwdev, devlist, sizeof(devlist));
+    n = n/sizeof(struct dev_info_t);
+
+    printf("=== Available device list ===\n");
+    for (int i=0; i<n; i++)
+    {
+        printf("%d: %s%s\n", devlist[i].id, devlist[i].hwdesc.bName,
+               (devid == i) ? " <--" : "");
+    }
+    return 0;
+}
+
 int my_lua_quit(lua_State *state)
 {
     g_exit = true;
@@ -291,6 +308,223 @@ int my_lua_udelay(lua_State *state)
     long usec = lua_tointeger(state, -1);
     usleep(usec);
     return 0;
+}
+
+int my_lua_hwserver_dev_open(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 1)
+        luaL_error(state, "hwserver_dev_open takes one argument");
+    int32_t id = lua_tointeger(state, -1);
+    int ret = hwserver_dev_open(g_hwdev, id);
+    if (ret != HWERR_OK)
+    {
+        printf("Cannot open device: %d\n", id);
+        goto Lerr;
+    }
+
+    // register
+    devid = id;
+
+    // get hwstub information
+    ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_VERSION, &g_hwdev_ver, sizeof(g_hwdev_ver));
+    if(ret != sizeof(g_hwdev_ver))
+    {
+        printf("Cannot get version!\n");
+        goto Lerr;
+    }
+
+    if(g_hwdev_ver.bMajor != HWSTUB_VERSION_MAJOR || g_hwdev_ver.bMinor < HWSTUB_VERSION_MINOR)
+    {
+        printf("Warning: this tool is possibly incompatible with your device:\n");
+        printf("Device version: %d.%d.%d\n", g_hwdev_ver.bMajor, g_hwdev_ver.bMinor, g_hwdev_ver.bRevision);
+        printf("Host version: %d.%d\n", HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR);
+    }
+
+    // hwstub
+    lua_getglobal(state, "hwstub");
+    // hwstub.dev
+    lua_getfield(state, -1, "dev");
+
+    // get memory layout information
+    ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_LAYOUT, &g_hwdev_layout, sizeof(g_hwdev_layout));
+    if(ret != sizeof(g_hwdev_layout))
+    {
+        printf("Cannot get layout: %d\n", ret);
+        goto Lerr;
+    }
+
+    // hwstub.dev.version
+    lua_getfield(state, -1, "version");
+
+    // hwstub.dev.version.major = g_hwdev_ver.bMajor
+    lua_pushstring(state, "major");
+    lua_pushinteger(state, g_hwdev_ver.bMajor);
+    lua_settable(state, -3);
+
+    // hwstub.dev.version.minor = g_hwdev_ver.bMinor
+    lua_pushstring(state, "minor");
+    lua_pushinteger(state, g_hwdev_ver.bMinor);
+    lua_settable(state, -3);
+    lua_pop(state, 1);
+
+    // hwstub.dev.layout
+    lua_getfield(state, -1, "layout");
+
+    // hwstub.dev.layout.code
+    lua_getfield(state, -1, "code");
+
+    // hwstub.dev.layout.code.start = g_hwdev_layout.dCodeStart
+    lua_pushstring(state, "start");
+    lua_pushinteger(state, g_hwdev_layout.dCodeStart);
+    lua_settable(state, -3);
+
+    // hwstub.dev.layout.code.size = g_hwdev_layout.dCodeSize
+    lua_pushstring(state, "size");
+    lua_pushinteger(state, g_hwdev_layout.dCodeSize);
+    lua_settable(state, -3);
+
+    lua_pop(state, 1);
+
+    // hwstub.dev.layout.stack
+    lua_getfield(state, -1, "stack");
+
+    // hwstub.dev.layout.stack.start = g_hwdev_layout.dStackStart
+    lua_pushstring(state, "start");
+    lua_pushinteger(state, g_hwdev_layout.dStackStart);
+    lua_settable(state, -3);
+
+    // hwstub.dev.layout.stack.size = g_hwdev_layout.dStackSize
+    lua_pushstring(state, "size");
+    lua_pushinteger(state, g_hwdev_layout.dStackSize);
+    lua_settable(state, -3);
+
+    lua_pop(state, 1);
+
+    // hwstub.dev.layout.buffer
+    lua_getfield(state, -1, "buffer");
+
+    // hwstub.dev.layout.buffer.start = g_hwdev_layout.dBufferStart
+    lua_pushstring(state, "start");
+    lua_pushinteger(state, g_hwdev_layout.dBufferStart);
+    lua_settable(state, -3);
+
+    // hwstub.dev.layout.buffer.size = g_hwdev_layout.dBufferSize
+    lua_pushstring(state, "size");
+    lua_pushinteger(state, g_hwdev_layout.dBufferSize);
+    lua_settable(state, -3);
+
+    lua_pop(state, 2); // hwstub.dev
+
+    // get target
+    ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_TARGET, &g_hwdev_target, sizeof(g_hwdev_target));
+    if(ret != sizeof(g_hwdev_target))
+    {
+        printf("Cannot get target: %d\n", ret);
+        goto Lerr;
+    }
+
+    // hwstub.dev.target
+    lua_getfield(state, -1, "target");
+
+    // hwstub.dev.target.id = g_hwdev_target.dID
+    lua_pushstring(state, "id");
+    lua_pushinteger(state, g_hwdev_target.dID);
+    lua_settable(state, -3);
+
+    // hwstub.dev.target.name = g_hwdev_target.bName
+    lua_pushstring(state, "name");
+    lua_pushstring(state, g_hwdev_target.bName);
+    lua_settable(state, -3);
+
+    lua_pop(state, 1); // hwstub.dev
+
+    // get STMP specific information
+    if(g_hwdev_target.dID == HWSTUB_TARGET_STMP)
+    {
+        ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_STMP, &g_hwdev_stmp, sizeof(g_hwdev_stmp));
+        if(ret != sizeof(g_hwdev_stmp))
+        {
+            printf("Cannot get stmp: %d\n", ret);
+            goto Lerr;
+        }
+
+        // hwstub.dev.stmp
+        lua_getfield(state, -1, "stmp");
+
+        // hwstub.dev.stmp.chipid = g_hwdev_stmp.wChipID
+        lua_pushstring(state, "chipid");
+        lua_pushinteger(state, g_hwdev_stmp.wChipID);
+        lua_settable(state, -3);
+
+        // hwstub.dev.stmp.rev = g_hwdev_stmp.bRevision
+        lua_pushstring(state, "rev");
+        lua_pushinteger(state, g_hwdev_stmp.bRevision);
+        lua_settable(state, -3);
+
+        // hwstub.dev.stmp.package = g_hwdev_stmp.bPackage
+        lua_pushstring(state, "package");
+        lua_pushinteger(state, g_hwdev_stmp.bPackage);
+        lua_settable(state, -3);
+    }
+
+    // get PP specific information
+    if(g_hwdev_target.dID == HWSTUB_TARGET_PP)
+    {
+        ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_PP, &g_hwdev_pp, sizeof(g_hwdev_pp));
+        if(ret != sizeof(g_hwdev_pp))
+        {
+            printf("Cannot get pp: %d\n", ret);
+            goto Lerr;
+        }
+
+        // hwstub.dev.pp
+        lua_getfield(state, -1, "pp");
+
+        // hwstub.dev.pp.chipid = g_hwdev_pp.wChipID
+        lua_pushstring(state, "chipid");
+        lua_pushinteger(state, g_hwdev_pp.wChipID);
+        lua_settable(state, -3);
+
+        // hwstub.dev.pp.rev = g_hwdev_pp.bRevision
+        lua_pushstring(state, "rev");
+        lua_pushlstring(state, (const char *)g_hwdev_pp.bRevision, 2);
+        lua_settable(state, -3);
+    }
+
+    // get JZ specific information
+    if(g_hwdev_target.dID == HWSTUB_TARGET_JZ)
+    {
+        ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_JZ, &g_hwdev_jz, sizeof(g_hwdev_jz));
+        if(ret != sizeof(g_hwdev_jz))
+        {
+            printf("Cannot get jz: %d\n", ret);
+            goto Lerr;
+        }
+
+        // hwstub.dev.jz
+        lua_getfield(state, -1, "jz");
+
+        // hwstub.dev.jz.chipid = g_hwdev_jz.wChipID
+        lua_pushstring(state, "chipid");
+        lua_pushinteger(state, g_hwdev_jz.wChipID);
+        lua_settable(state, -3);
+    }
+    lua_pop(state, 3);
+    return 0;
+
+Lerr:
+    return -1;
+}
+
+int my_lua_hwserver_dev_close(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 1)
+        luaL_error(state, "hwserver_dev_close takes one argument");
+    int32_t id = lua_tointeger(state, -1);
+    devid = -1;
+    return hwserver_dev_close(g_hwdev, id);
 }
 
 bool my_lua_import_hwstub()
@@ -354,33 +588,26 @@ bool my_lua_import_hwstub()
     lua_setfield(g_lua, -2, "JZ");
     lua_setfield(g_lua, -2, "target");
 
-    if(g_hwdev_target.dID == HWSTUB_TARGET_STMP)
-    {
-        lua_newtable(g_lua); // stmp
-        lua_pushinteger(g_lua, g_hwdev_stmp.wChipID);
-        lua_setfield(g_lua, -2, "chipid");
-        lua_pushinteger(g_lua, g_hwdev_stmp.bRevision);
-        lua_setfield(g_lua, -2, "rev");
-        lua_pushinteger(g_lua, g_hwdev_stmp.bPackage);
-        lua_setfield(g_lua, -2, "package");
-        lua_setfield(g_lua, -2, "stmp");
-    }
-    else if(g_hwdev_target.dID == HWSTUB_TARGET_PP)
-    {
-        lua_newtable(g_lua); // pp
-        lua_pushinteger(g_lua, g_hwdev_pp.wChipID);
-        lua_setfield(g_lua, -2, "chipid");
-        lua_pushlstring(g_lua, (const char *)g_hwdev_pp.bRevision, 2);
-        lua_setfield(g_lua, -2, "rev");
-        lua_setfield(g_lua, -2, "pp");
-    }
-    else if(g_hwdev_target.dID == HWSTUB_TARGET_JZ)
-    {
-        lua_newtable(g_lua); // jz
-        lua_pushinteger(g_lua, g_hwdev_jz.wChipID);
-        lua_setfield(g_lua, -2, "chipid");
-        lua_setfield(g_lua, -2, "jz");
-    }
+    lua_newtable(g_lua); // stmp
+    lua_pushinteger(g_lua, 0);
+    lua_setfield(g_lua, -2, "chipid");
+    lua_pushinteger(g_lua, 0);
+    lua_setfield(g_lua, -2, "rev");
+    lua_pushinteger(g_lua, 0);
+    lua_setfield(g_lua, -2, "package");
+    lua_setfield(g_lua, -2, "stmp");
+
+    lua_newtable(g_lua); // pp
+    lua_pushinteger(g_lua, 0);
+    lua_setfield(g_lua, -2, "chipid");
+    lua_pushstring(g_lua, "");
+    lua_setfield(g_lua, -2, "rev");
+    lua_setfield(g_lua, -2, "pp");
+
+    lua_newtable(g_lua); // jz
+    lua_pushinteger(g_lua, 0);
+    lua_setfield(g_lua, -2, "chipid");
+    lua_setfield(g_lua, -2, "jz");
 
     lua_pushlightuserdata(g_lua, (void *)&hw_read8);
     lua_pushcclosure(g_lua, my_lua_readn, 1);
@@ -442,6 +669,14 @@ bool my_lua_import_hwstub()
 
     lua_setglobal(g_lua, "hwstub");
 
+    lua_pushcfunction(g_lua, my_lua_hwserver_get_dev_list);
+    lua_setglobal(g_lua, "hwserver_get_dev_list");
+
+    lua_pushcclosure(g_lua, my_lua_hwserver_dev_open, 0);
+    lua_setglobal(g_lua, "hwserver_dev_open");
+
+    lua_pushcclosure(g_lua, my_lua_hwserver_dev_close, 0);
+    lua_setglobal(g_lua, "hwserver_dev_close");
     lua_pushcfunction(g_lua, my_lua_help);
     lua_setglobal(g_lua, "help");
 
@@ -903,78 +1138,16 @@ int main(int argc, char **argv)
     }
 
     /* create usb context */
-    libusb_context *ctx;
-    libusb_init(&ctx);
-    libusb_set_debug(ctx, 3);
-    g_hwdev = hwstub_open_uri(ctx, stdout, dev_uri);
+    libusb_context *ctx = NULL;
+//    libusb_init(&ctx);
+//    libusb_set_debug(ctx, 3);
+    g_hwdev = hwstub_open_tcp("localhost", "8888");//hwstub_open_uri(ctx, stdout, dev_uri);
     if(g_hwdev == NULL)
     {
         printf("Cannot open device!\n");
         return 1;
     }
 
-    // get hwstub information
-    int ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_VERSION, &g_hwdev_ver, sizeof(g_hwdev_ver));
-    if(ret != sizeof(g_hwdev_ver))
-    {
-        printf("Cannot get version!\n");
-        goto Lerr;
-    }
-    if(g_hwdev_ver.bMajor != HWSTUB_VERSION_MAJOR || g_hwdev_ver.bMinor < HWSTUB_VERSION_MINOR)
-    {
-        printf("Warning: this tool is possibly incompatible with your device:\n");
-        printf("Device version: %d.%d.%d\n", g_hwdev_ver.bMajor, g_hwdev_ver.bMinor, g_hwdev_ver.bRevision);
-        printf("Host version: %d.%d\n", HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR);
-    }
-
-    // get memory layout information
-    ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_LAYOUT, &g_hwdev_layout, sizeof(g_hwdev_layout));
-    if(ret != sizeof(g_hwdev_layout))
-    {
-        printf("Cannot get layout: %d\n", ret);
-        goto Lerr;
-    }
-
-    // get target
-    ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_TARGET, &g_hwdev_target, sizeof(g_hwdev_target));
-    if(ret != sizeof(g_hwdev_target))
-    {
-        printf("Cannot get target: %d\n", ret);
-        goto Lerr;
-    }
-
-    // get STMP specific information
-    if(g_hwdev_target.dID == HWSTUB_TARGET_STMP)
-    {
-        ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_STMP, &g_hwdev_stmp, sizeof(g_hwdev_stmp));
-        if(ret != sizeof(g_hwdev_stmp))
-        {
-            printf("Cannot get stmp: %d\n", ret);
-            goto Lerr;
-        }
-    }
-
-    // get PP specific information
-    if(g_hwdev_target.dID == HWSTUB_TARGET_PP)
-    {
-        ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_PP, &g_hwdev_pp, sizeof(g_hwdev_pp));
-        if(ret != sizeof(g_hwdev_pp))
-        {
-            printf("Cannot get pp: %d\n", ret);
-            goto Lerr;
-        }
-    }
-
-    // get JZ specific information
-    if(g_hwdev_target.dID == HWSTUB_TARGET_JZ)
-    {
-        ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_JZ, &g_hwdev_jz, sizeof(g_hwdev_jz));
-        if(ret != sizeof(g_hwdev_jz))
-        {
-            printf("Cannot get jz: %d\n", ret);
-            goto Lerr;
-        }
-    }
     /** Init lua */
 
     // create lua state
@@ -1018,7 +1191,6 @@ int main(int argc, char **argv)
     // start interactive shell
     luap_enter(g_lua, &g_exit);
 
-    Lerr:
     // display log if handled
     if(!g_quiet)
         printf("Device log:\n");
