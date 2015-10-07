@@ -90,6 +90,9 @@ int hwstub_exec(struct hwstub_device_t *dev, uint32_t addr, uint16_t flags);
 int hwstub_call(struct hwstub_device_t *dev, uint32_t addr);
 int hwstub_jump(struct hwstub_device_t *dev, uint32_t addr);
 
+int hwserver_get_dev_list(struct hwstub_device_t *dev, void *buf, size_t sz);
+int hwserver_dev_open(struct hwstub_device_t *dev, int32_t ref);
+int hwserver_dev_close(struct hwstub_device_t *dev, int32_t ref);
 #ifdef __cplusplus
 } // extern "C"
 #endif

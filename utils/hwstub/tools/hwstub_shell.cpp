@@ -109,6 +109,8 @@ void print_log(struct hwstub_device_t *hwdev)
     }while(1);
 }
 
+
+
 /**
  * Lua specific
  */
@@ -277,6 +279,19 @@ int my_lua_printlog(lua_State *state)
     return 0;
 }
 
+int my_lua_hwserver_get_dev_list(lua_State *state)
+{
+    struct dev_info_t devlist[8];
+    int n = hwserver_get_dev_list(g_hwdev, devlist, sizeof(devlist));
+    n = n/sizeof(struct dev_info_t);
+
+    for (int i=0; i<n; i++)
+    {
+        printf("%d: %s\n", devlist[i].dev_ref, devlist[i].hwdesc.bName);
+    }
+    return 0;
+}
+
 int my_lua_quit(lua_State *state)
 {
     g_exit = true;
@@ -291,6 +306,24 @@ int my_lua_udelay(lua_State *state)
     long usec = lua_tointeger(state, -1);
     usleep(usec);
     return 0;
+}
+
+int my_lua_hwserver_dev_open(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 1)
+        luaL_error(state, "hwserver_dev_open takes one argument");
+    int32_t ref = lua_tointeger(state, -1);
+    return hwserver_dev_open(g_hwdev, ref);
+}
+
+int my_lua_hwserver_dev_close(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 1)
+        luaL_error(state, "hwserver_dev_close takes one argument");
+    int32_t ref = lua_tointeger(state, -1);
+    return hwserver_dev_close(g_hwdev, ref);
 }
 
 bool my_lua_import_hwstub()
@@ -439,6 +472,15 @@ bool my_lua_import_hwstub()
 
     lua_pushcclosure(g_lua, my_lua_udelay, 0);
     lua_setfield(g_lua, -2, "udelay");
+
+    lua_pushcclosure(g_lua, my_lua_hwserver_get_dev_list, 0);
+    lua_setfield(g_lua, -2, "hwserver_get_dev_list");
+
+    lua_pushcclosure(g_lua, my_lua_hwserver_dev_open, 0);
+    lua_setfield(g_lua, -2, "hwserver_dev_open");
+
+    lua_pushcclosure(g_lua, my_lua_hwserver_dev_close, 0);
+    lua_setfield(g_lua, -2, "hwserver_dev_close");
 
     lua_setglobal(g_lua, "hwstub");
 
@@ -903,9 +945,9 @@ int main(int argc, char **argv)
     }
 
     /* create usb context */
-    libusb_context *ctx;
-    libusb_init(&ctx);
-    libusb_set_debug(ctx, 3);
+    libusb_context *ctx = NULL;
+//    libusb_init(&ctx);
+//    libusb_set_debug(ctx, 3);
     g_hwdev = hwstub_open_uri(ctx, stdout, dev_uri);
     if(g_hwdev == NULL)
     {
@@ -913,6 +955,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
+#if 0
     // get hwstub information
     int ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_VERSION, &g_hwdev_ver, sizeof(g_hwdev_ver));
     if(ret != sizeof(g_hwdev_ver))
@@ -975,6 +1018,7 @@ int main(int argc, char **argv)
             goto Lerr;
         }
     }
+#endif
     /** Init lua */
 
     // create lua state
