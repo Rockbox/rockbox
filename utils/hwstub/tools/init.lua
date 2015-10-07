@@ -65,7 +65,8 @@ end
 -- INFO
 --
 
-if not hwstub.options.quiet then
+function hwstub.info()
+--- if not hwstub.options.quiet then
     print("information")
     print("  hwstub")
     print("    version: " .. string.format("%d.%d", hwstub.host.version.major,
