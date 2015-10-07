@@ -24,6 +24,7 @@ struct hwstub_tcp_device_t
 {
     struct hwstub_device_t dev;
     int handle;
+    int32_t id;
 };
 
 #define TCP_DEV(to, from) struct hwstub_tcp_device_t *to = (void *)from; 
@@ -40,6 +41,7 @@ static int hwstub_tcp_get_desc(struct hwstub_device_t *_dev, uint16_t desc, void
     TCP_DEV(dev, _dev)
     struct hwstub_tcp_cmd_t p =
     {
+        .id = dev->id,
         .cmd = HWSTUB_GET_DESC,
         .addr = desc,
         .len = (uint32_t)sz
@@ -67,6 +69,7 @@ static int hwstub_tcp_get_log(struct hwstub_device_t *_dev, void *buf, size_t sz
     TCP_DEV(dev, _dev)
     struct hwstub_tcp_cmd_t p =
     {
+        .id = dev->id,
         .cmd = HWSTUB_GET_LOG,
         .addr = 0,
         .len = (uint32_t)sz
@@ -95,6 +98,7 @@ static int hwstub_tcp_read(struct hwstub_device_t *_dev, uint8_t breq, uint32_t 
     TCP_DEV(dev, _dev)
     struct hwstub_tcp_cmd_t p =
     {
+        .id = dev->id,
         .cmd = (uint32_t)breq,
         .addr = addr,
         .len = (uint32_t)sz
@@ -108,7 +112,7 @@ static int hwstub_tcp_read(struct hwstub_device_t *_dev, uint8_t breq, uint32_t 
     /* get response */
     n = recv(dev->handle, &p, sizeof(p), MSG_WAITALL);
 
-    if(n == sizeof(p) && p.cmd == (HWSTUB_ACK | breq) && p.len > 0)
+    if(n == sizeof(p) && p.cmd == (HWSTUB_ACK(breq)) && p.len > 0)
     {
         n = read(dev->handle, buf, p.len);
         return n;
@@ -124,6 +128,7 @@ static int hwstub_tcp_write(struct hwstub_device_t *_dev, uint8_t breq, uint32_t
     TCP_DEV(dev, _dev)
     struct hwstub_tcp_cmd_t p =
     {
+        .id = dev->id,
         .cmd = (uint32_t)breq,
         .addr = addr,
         .len = (uint32_t)sz
@@ -142,7 +147,7 @@ static int hwstub_tcp_write(struct hwstub_device_t *_dev, uint8_t breq, uint32_t
     /* get response */
     n = recv(dev->handle, &p, sizeof(p), MSG_WAITALL);
 
-    if(n == sizeof(p) && (p.cmd & HWSTUB_ACK))
+    if(n == sizeof(p) && (p.cmd & HWSTUB_ACK_MASK))
         return n;
     else
         return -1;
@@ -153,6 +158,7 @@ static int hwstub_tcp_exec(struct hwstub_device_t *_dev, uint32_t addr, uint16_t
     TCP_DEV(dev, _dev)
     struct hwstub_tcp_cmd_t p =
     {
+        .id = dev->id,
         .cmd = HWSTUB_EXEC,
         .addr = addr,
         .len = flags
@@ -185,6 +191,9 @@ static struct hwstub_device_vtable_t hwstub_tcp_vtable =
 struct hwstub_device_t *hwstub_tcp_open(const char *host, const char *port)
 {
     struct hwstub_tcp_device_t *dev = malloc(sizeof(struct hwstub_tcp_device_t));
+    if (dev == NULL)
+        goto Lerr;
+
     memset(dev, 0, sizeof(struct hwstub_tcp_device_t));
     dev->dev.vtable = hwstub_tcp_vtable;
     dev->handle = -1;
@@ -224,9 +233,91 @@ struct hwstub_device_t *hwstub_tcp_open(const char *host, const char *port)
     tv.tv_sec = 30;  /* 30 secs timeout */
     tv.tv_usec = 0;  /* init this field to avoid strange errors */
     setsockopt(dev->handle, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval));
-    return &dev->dev;
+    return (struct hwstub_device_t *)dev;
 
 Lerr:
-    free(dev);
+    if (dev) { free(dev); }
     return NULL;
+}
+
+int hwserver_get_dev_list(struct hwstub_device_t *_dev, void *buf, size_t sz)
+{
+    TCP_DEV(dev, _dev)
+    struct hwstub_tcp_cmd_t p =
+    {
+        .id = dev->id,
+        .cmd = HWSERVER_GET_DEV_LIST,
+        .addr = 0,
+        .len = (uint32_t)sz
+    };
+
+    /* write command */
+    int n = send(dev->handle, &p, sizeof(p), MSG_NOSIGNAL);
+    if(n < 0)
+        return -1;
+
+    /* get response */
+    n = recv(dev->handle, &p, sizeof(p), MSG_WAITALL);
+
+    if(n == sizeof(p) && p.cmd == HWSERVER_GET_DEV_LIST_ACK && p.len > 0)
+    {
+        n = recv(dev->handle, buf, p.len, MSG_WAITALL);
+        return (n == (ssize_t)p.len) ? n : 0;
+    }
+    else
+        return -1;
+}
+
+
+int hwserver_dev_open(struct hwstub_device_t *_dev, int32_t _id)
+{
+    TCP_DEV(dev, _dev)
+    struct hwstub_tcp_cmd_t p =
+    {
+        .id = _id,
+        .cmd = HWSERVER_DEV_OPEN,
+        .addr = 0,
+        .len = 0
+    };
+
+    /* write command */
+    int n = send(dev->handle, &p, sizeof(p), MSG_NOSIGNAL);
+    if(n < 0)
+        return -1;
+
+    /* get response */
+    n = recv(dev->handle, &p, sizeof(p), MSG_WAITALL);
+
+    if(n == sizeof(p) && p.cmd == HWSERVER_DEV_OPEN_ACK)
+    {
+        dev->id = _id;
+        return 0;
+    }
+    else
+        return -1;
+}
+
+int hwserver_dev_close(struct hwstub_device_t *_dev, int32_t _id)
+{
+    TCP_DEV(dev, _dev)
+    struct hwstub_tcp_cmd_t p =
+    {
+        .id = _id,
+        .cmd = HWSERVER_DEV_CLOSE,
+        .addr = 0,
+        .len = 0
+    };
+
+    /* write command */
+    int n = send(dev->handle, &p, sizeof(p), MSG_NOSIGNAL);
+    if(n < 0)
+        return -1;
+
+    /* get response */
+    n = recv(dev->handle, &p, sizeof(p), MSG_WAITALL);
+
+    if(n == sizeof(p) && p.cmd == HWSERVER_DEV_CLOSE_ACK)
+        return 0;
+    else
+        return -1;
 }
