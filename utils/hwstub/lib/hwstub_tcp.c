@@ -108,7 +108,7 @@ static int hwstub_tcp_read(struct hwstub_device_t *_dev, uint8_t breq, uint32_t 
     /* get response */
     n = recv(dev->handle, &p, sizeof(p), MSG_WAITALL);
 
-    if(n == sizeof(p) && p.cmd == (HWSTUB_ACK | breq) && p.len > 0)
+    if(n == sizeof(p) && p.cmd == (HWSTUB_ACK(breq)) && p.len > 0)
     {
         n = read(dev->handle, buf, p.len);
         return n;
@@ -142,7 +142,7 @@ static int hwstub_tcp_write(struct hwstub_device_t *_dev, uint8_t breq, uint32_t
     /* get response */
     n = recv(dev->handle, &p, sizeof(p), MSG_WAITALL);
 
-    if(n == sizeof(p) && (p.cmd & HWSTUB_ACK))
+    if(n == sizeof(p) && (p.cmd & HWSTUB_ACK_MASK))
         return n;
     else
         return -1;

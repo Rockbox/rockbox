@@ -28,12 +28,50 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <signal.h>
+#include <stdbool.h>
 
 #include "hwstub.h"
 
 static volatile int exit_flag = 0;
-struct hwstub_device_t *hwdev;
 struct hwstub_version_desc_t hwdev_ver;
+static libusb_hotplug_callback_handle hotplug_handle;
+static bool hotplug_support = false;
+
+struct dev_info_t {
+    int32_t dev_ref;
+    struct hwstub_target_desc_t hwdesc;
+};
+
+struct dev_node_t {
+    struct libusb_device *dev;
+    struct hwstub_device_t *hwdev;
+    struct dev_info_t devinfo;
+    int32_t ref_cnt;
+};
+
+/* (L)inked (L)ist (D)double
+ *
+ * Format:
+ *
+ *      0<-XX<->YY<->ZZ->0
+ * head----^         ^
+ * tail--------------+
+ */
+struct lld_head
+{
+    struct lld_node *head; /* First list item */
+    struct lld_node *tail; /* Last list item (to make insert_last O(1)) */
+    size_t cnt;            /* Number of nodes */
+};
+
+struct lld_node
+{
+    struct lld_node *next; /* Next list item */
+    struct lld_node *prev; /* Previous list item */
+    void *data;
+};
+
+static struct lld_head dev_list = { .head = NULL, .tail = NULL, .cnt = 0 };
 
 void signal_handler(int signum)
 {
@@ -57,11 +95,104 @@ static int hwstub_tcp_send(int connfd, uint32_t cmd, void *buf, uint32_t len)
     return n;
 }
 
+/**
+ * Adds a node to a doubly-linked list using "insert last"
+ */
+void lld_insert_last(struct lld_head *list, struct lld_node *node)
+{
+    struct lld_node *tail = list->tail;
+
+    list->tail = node;
+
+    if (tail == NULL)
+        list->head = node;
+    else
+        tail->next = node;
+
+    node->next = NULL;
+    node->prev = tail;
+    list->cnt++;
+}
+
+/**
+ * Removes a node from a doubly-linked list
+ */
+void lld_remove(struct lld_head *list, struct lld_node *node)
+{
+    struct lld_node *next = node->next;
+    struct lld_node *prev = node->prev;
+
+    if (node == list->head)
+        list->head = next;
+
+    if (node == list->tail)
+        list->tail = prev;
+
+    if (prev != NULL)
+        prev->next = next;
+
+    if (next != NULL)
+        next->prev = prev;
+
+    list->cnt--;
+}
+
+void lld_remove_free(struct lld_head *list, struct lld_node *node)
+{
+    lld_remove(list, node);
+    if (node->data) free(node->data);
+    if (node) free(node);
+}
+
+static struct lld_node *find_node_by_dev(struct lld_head *list, struct libusb_device *dev)
+{
+    if (list->head)
+    {
+        struct lld_node *n = list->head;
+
+        do
+        {
+            struct dev_node_t *devnode = (struct dev_node_t *)(n->data);
+            if (devnode->dev == dev)
+                return n;
+        } while (n->next);
+    }
+
+    return NULL;
+
+}
+
+static struct lld_node *find_node_by_ref(struct lld_head *list, int ref)
+{
+    if (list->head)
+    {
+        struct lld_node *n = list->head;
+
+        do
+        {
+            struct dev_node_t *devnode = (struct dev_node_t *)(n->data);
+            if (devnode->devinfo.dev_ref == ref)
+                return n;
+        } while (n->next);
+    }
+
+    return NULL;
+}
+
+static bool opened_ref(struct lld_head *list, int32_t ref)
+{
+    return (find_node_by_ref(list, ref) != NULL);
+}
+
 static int hwstub_tcp_handler(int connfd)
 {
      struct hwstub_tcp_cmd_t p;
      ssize_t n;
      void *buf;
+
+     struct lld_head reflist = {.head = NULL, .tail = NULL, .cnt = 0};
+     struct lld_node *node;
+     struct dev_node_t *dev;
 
      while (1)
      {
@@ -75,29 +206,59 @@ static int hwstub_tcp_handler(int connfd)
          }
 
          printf("got cmd: 0x%08x addr: 0x%08x len: 0x%08x\n", p.cmd, p.addr, p.len);
+
          switch (p.cmd)
          {
              case HWSTUB_GET_LOG:
+                 node = find_node_by_ref(&dev_list, p.ref);
+                 if (!node)
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_INVALID_REF);
+                     break;
+                 }
+
+                 if (!opened_ref(&reflist, p.ref));
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_NOTOPEN_REF);
+                     break;
+                 }
+
+                 dev = (struct dev_node_t *)(node->data);
                  buf = malloc(p.len);
 
                  if (buf == NULL)
                      return -2;
 
-                 if ((n =  hwstub_get_log(hwdev, buf, p.len)) >= 0)
+                 if ((n =  hwstub_get_log(dev->hwdev, buf, p.len)) >= 0)
                      hwstub_tcp_send(connfd, HWSTUB_GET_LOG_ACK, buf, n);
                  else
-                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, buf, 0);
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_FAIL);
 
                  free(buf);
              break;
 
              case HWSTUB_READ2:
+                 node = find_node_by_ref(&dev_list, p.ref);
+                 if (!node)
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_INVALID_REF);
+                     break;
+                 }
+
+                 if (!opened_ref(&reflist, p.ref));
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_NOTOPEN_REF);
+                     break;
+                 }
+
+                 dev = (struct dev_node_t *)(node->data);
+
                  buf = malloc(p.len);
 
                  if (buf == NULL)
                      return -2;
 
-                 if ((n = hwstub_rw_mem(hwdev, 1, p.addr, buf, p.len)) == p.len)
+                 if ((n = hwstub_rw_mem(dev->hwdev, 1, p.addr, buf, p.len)) == p.len)
                      hwstub_tcp_send(connfd, HWSTUB_READ2_ACK, buf, n);
                  else
                      hwstub_tcp_send(connfd, HWSTUB_READ2_NACK, buf, n);
@@ -106,6 +267,21 @@ static int hwstub_tcp_handler(int connfd)
              break;
 
              case HWSTUB_WRITE:
+                 node = find_node_by_ref(&dev_list, p.ref);
+                 if (!node)
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_INVALID_REF);
+                     break;
+                 }
+
+                 if (!opened_ref(&reflist, p.ref));
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_NOTOPEN_REF);
+                     break;
+                 }
+
+                 dev = (struct dev_node_t *)(node->data);
+
                  buf = malloc(p.len);
 
                  if (buf == NULL)
@@ -115,7 +291,7 @@ static int hwstub_tcp_handler(int connfd)
                  if (n <= 0)
                      return -3; /* error or client disconnect */
 
-                 if ((n = hwstub_rw_mem(hwdev, 0, p.addr, buf, p.len)) == p.len)
+                 if ((n = hwstub_rw_mem(dev->hwdev, 0, p.addr, buf, p.len)) == p.len)
                      hwstub_tcp_send(connfd, HWSTUB_WRITE_ACK, NULL, n);
                  else
                      hwstub_tcp_send(connfd, HWSTUB_WRITE_NACK, NULL, n);
@@ -124,19 +300,48 @@ static int hwstub_tcp_handler(int connfd)
              break;
 
              case HWSTUB_EXEC:
-                 if (hwstub_exec(hwdev, p.addr, p.len))
+                 node = find_node_by_ref(&dev_list, p.ref);
+                 if (!node)
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_INVALID_REF);
+                     break;
+                 }
+
+                 if (!opened_ref(&reflist, p.ref));
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_NOTOPEN_REF);
+                     break;
+                 }
+
+                 dev = (struct dev_node_t *)(node->data);
+
+                 if (hwstub_exec(dev->hwdev, p.addr, p.len))
                      hwstub_tcp_send(connfd, HWSTUB_EXEC_NACK, NULL, 0);
                  else
                      hwstub_tcp_send(connfd, HWSTUB_EXEC_ACK, NULL, 0);
              break;
 
              case HWSTUB_READ2_ATOMIC:
+                 node = find_node_by_ref(&dev_list, p.ref);
+                 if (!node)
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_INVALID_REF);
+                     break;
+                 }
+
+                 if (!opened_ref(&reflist, p.ref));
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_NOTOPEN_REF);
+                     break;
+                 }
+
+                 dev = (struct dev_node_t *)(node->data);
                  buf = malloc(p.len);
 
                  if (buf == NULL)
                      return -2;
 
-                 if ((n = hwstub_rw_mem_atomic(hwdev, 1, p.addr, buf, p.len)) == p.len)
+                 if ((n = hwstub_rw_mem_atomic(dev->hwdev, 1, p.addr, buf, p.len)) == p.len)
                      hwstub_tcp_send(connfd, HWSTUB_READ2_ATOMIC_ACK, buf, n);
                  else
                      hwstub_tcp_send(connfd, HWSTUB_READ2_ATOMIC_NACK, buf, n);
@@ -145,6 +350,20 @@ static int hwstub_tcp_handler(int connfd)
              break;
 
              case HWSTUB_WRITE_ATOMIC:
+                 node = find_node_by_ref(&dev_list, p.ref);
+                 if (!node)
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_INVALID_REF);
+                     break;
+                 }
+
+                 if (!opened_ref(&reflist, p.ref));
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_NOTOPEN_REF);
+                     break;
+                 }
+
+                 dev = (struct dev_node_t *)(node->data);
                  buf = malloc(p.len);
 
                  if (buf == NULL)
@@ -154,7 +373,7 @@ static int hwstub_tcp_handler(int connfd)
                  if (n <= 0)
                      return -3; /*error or client disconnect */
 
-                 if ((n = hwstub_rw_mem_atomic(hwdev, 0, p.addr, buf, p.len)) == p.len)
+                 if ((n = hwstub_rw_mem_atomic(dev->hwdev, 0, p.addr, buf, p.len)) == p.len)
                      hwstub_tcp_send(connfd, HWSTUB_WRITE_ATOMIC_ACK, NULL, n);
                  else
                      hwstub_tcp_send(connfd, HWSTUB_WRITE_ATOMIC_NACK, NULL, n);
@@ -163,17 +382,135 @@ static int hwstub_tcp_handler(int connfd)
              break;
 
              case HWSTUB_GET_DESC:
+                 node = find_node_by_ref(&dev_list, p.ref);
+                 if (!node)
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_INVALID_REF);
+                     break;
+                 }
+
+                 if (!opened_ref(&reflist, p.ref));
+                 {
+                     hwstub_tcp_send(connfd, HWSTUB_GET_LOG_NACK, NULL, HWERR_NOTOPEN_REF);
+                     break;
+                 }
+
+                 dev = (struct dev_node_t *)(node->data);
                  buf = malloc(p.len);
 
                  if (buf == NULL)
                      return -2;
 
-                 if ((n = hwstub_get_desc(hwdev, p.addr, buf, p.len)) == p.len)
+                 if ((n = hwstub_get_desc(dev->hwdev, p.addr, buf, p.len)) == p.len)
                      hwstub_tcp_send(connfd, HWSTUB_GET_DESC_ACK, buf, n);
                  else
                      hwstub_tcp_send(connfd, HWSTUB_GET_DESC_NACK, NULL, 0);
 
                  free(buf);
+             break;
+
+             case HWSERVER_GET_DEV_LIST:
+                 n = dev_list.cnt*sizeof(struct dev_info_t);
+                 buf = malloc(n);
+
+                 if (buf == NULL)
+                     return -2;
+
+                 struct dev_info_t *ptr = (struct dev_info_t *)buf;
+                 node = dev_list.head;
+                 if (node)
+                 {
+                     dev = (struct dev_node_t *)(node->data);
+                     for(int i=0; i<dev_list.cnt; i++)
+                     {
+                         memcpy(ptr++, &dev->devinfo, sizeof(struct dev_info_t));
+                         node = node->next;
+                     }
+                 }
+
+                 hwstub_tcp_send(connfd, HWSERVER_GET_DEV_LIST_ACK, buf, n);
+                 free(buf);
+             break;
+
+             case HWSERVER_DEV_OPEN:
+                 node = find_node_by_ref(&dev_list, p.ref);
+                 if (node)
+                 {
+                     struct dev_node_t *dev = (struct dev_node_t *)(node->data);
+                     if (dev->hwdev)
+                     {
+                         if (!opened_ref(&reflist, p.ref))
+                         {
+                             // FIXME
+                             struct lld_node *refnode = malloc(sizeof(struct lld_node));
+                             refnode->data = (void *)dev;
+                             lld_insert_last(&reflist, refnode);
+
+                             dev->ref_cnt++; // increase global reference counter
+                         }
+
+                         hwstub_tcp_send(connfd, HWSERVER_DEV_OPEN_ACK, NULL, n);
+                     }
+                     else
+                     {
+                         // open usb device
+                         dev->hwdev = hwstub_open_usb(dev->dev);
+                         if (dev->hwdev)
+                         {
+                             // report success
+                             lld_insert_last(&reflist, node);
+                             dev->ref_cnt++;
+                             hwstub_tcp_send(connfd, HWSERVER_DEV_OPEN_ACK, NULL, n);
+                         }
+                         else
+                         {
+                             // report failure
+                             hwstub_tcp_send(connfd, HWSERVER_DEV_OPEN_NACK, NULL, -1);
+                         }
+                     }
+                 }
+                 else
+                 {
+                     // report no device found
+                     hwstub_tcp_send(connfd, HWSERVER_DEV_OPEN_NACK, NULL, -2);
+                 }
+             break;
+
+             case HWSERVER_DEV_CLOSE:
+                 // check if ref is valid
+                 node = find_node_by_ref(&dev_list, p.ref);
+                 if (node)
+                 {
+                     // check if we opened this ref
+                     struct lld_node *refnode = find_node_by_ref(&reflist, p.ref);
+                     if (refnode)
+                     {
+                         dev = (struct dev_node_t *)(node->data);
+
+                         // prevent feeing global dev_node_t structure
+                         refnode->data = NULL;
+                         //remove from reflist
+                         lld_remove_free(&reflist, refnode);
+                         // decrement global ref counter
+                         dev->ref_cnt--;
+
+                         // release dev if not in use
+                         if (dev->ref_cnt == 0)
+                             hwstub_release(dev->hwdev);
+
+                         hwstub_tcp_send(connfd, HWSERVER_DEV_CLOSE_ACK, NULL, 0);
+                     }
+                     else
+                     {
+                         // not owned device
+                         hwstub_tcp_send(connfd, HWSERVER_DEV_CLOSE_NACK, NULL, -1);
+                     }
+                 }
+                 else
+                 {
+                     // invalid ref
+                     hwstub_tcp_send(connfd, HWSERVER_DEV_CLOSE_NACK, NULL, -2);
+                 }
              break;
 
              default:
@@ -183,6 +520,122 @@ static int hwstub_tcp_handler(int connfd)
      } /* while */
 
      return 0;
+}
+
+
+void add_dev_to_list(struct lld_head *list, struct libusb_device *dev)
+{
+    static int ref = 0;
+
+    // try to open the device
+    struct hwstub_device_t *hwstub_dev = hwstub_open_usb(dev);
+    if (hwstub_dev)
+    {
+        // allocate memory
+        struct lld_node *item = malloc(sizeof(struct lld_node));
+        if (item)
+        {
+            struct dev_node_t *dev_node = malloc(sizeof(struct dev_node_t));
+            if (dev_node)
+            {
+                // get target descriptor
+                int sz = hwstub_get_desc(hwstub_dev, HWSTUB_DT_TARGET,
+                                         &(dev_node->devinfo.hwdesc),
+                                         sizeof(struct hwstub_target_desc_t));
+
+                if (sz != sizeof(struct hwstub_target_desc_t))
+                {
+                    // error - free memory and close the dev
+                    free(item);
+                    free(dev_node);
+                    hwstub_release(hwstub_dev);
+                    return;
+                }
+
+                dev_node->dev = dev;
+                dev_node->devinfo.dev_ref = ref++;
+                dev_node->ref_cnt = 0;
+                item->data = dev_node;
+
+                lld_insert_last(list, item);
+            }
+            else
+            {
+                free(item);
+                hwstub_release(hwstub_dev);
+                return;
+            }
+        }
+        hwstub_release(hwstub_dev);
+    }
+}
+
+void del_dev_from_list(struct lld_head *list, struct libusb_device *dev)
+{
+    struct lld_node *node = find_node_by_dev(list, dev);
+    if (node)
+        lld_remove_free(list, node);
+}
+
+
+
+int hotplug_cb(struct libusb_context *ctx, struct libusb_device *dev,
+               libusb_hotplug_event event, void *user_data)
+{
+    switch(event)
+    {
+        case LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED:
+            if (hwstub_probe(dev) >= 0)
+                add_dev_to_list(&dev_list, dev);
+            break;
+
+        case LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT:
+                del_dev_from_list(&dev_list, dev);
+            break;
+    }
+
+    return 0;
+}
+
+static void device_search_init(void)
+{
+    int ret;
+
+    libusb_init(NULL);
+
+    hotplug_support = libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG);
+
+    if (hotplug_support)
+    {
+        int evt = LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED |
+                  LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT;
+
+        ret = libusb_hotplug_register_callback(
+                  NULL, (libusb_hotplug_event)evt, LIBUSB_HOTPLUG_ENUMERATE,
+                  LIBUSB_HOTPLUG_MATCH_ANY, LIBUSB_HOTPLUG_MATCH_ANY,
+                  LIBUSB_HOTPLUG_MATCH_ANY, hotplug_cb, NULL, &hotplug_handle);
+    }
+}
+
+static void device_search_fini(void)
+{
+    if (hotplug_support)
+        libusb_hotplug_deregister_callback(NULL, hotplug_handle);
+
+    for (int i=0; i<dev_list.cnt; i++)
+    {
+        struct lld_node *node = dev_list.head;
+        if (node)
+        {
+            struct dev_node_t *dev = (struct dev_node_t *)(node->data);
+            if (dev->hwdev)
+                hwstub_release(dev->hwdev);
+
+            lld_remove_free(&dev_list, node);
+        }
+    }
+
+    libusb_exit(NULL);
 }
 
 static void usage(void)
@@ -238,17 +691,7 @@ int main (int argc, char **argv)
         }
     }
 
-    /* create usb context */
-    libusb_context *ctx;
-    libusb_init(&ctx);
-    libusb_set_debug(ctx, 3);
-
-    hwdev = hwstub_open_uri(ctx, stdout, dev_uri);
-    if(hwdev == NULL)
-    {
-        fprintf(stderr, "Cannot probe device!\n");
-        return 1;
-    }
+    device_search_init();
 
     /* tcp stuff */
     if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -322,6 +765,7 @@ int main (int argc, char **argv)
 
     printf("Hwstub server close\n");
     /* display log if handled */
+#if 0
     fprintf(stderr, "Device log:\n");
     do
     {
@@ -332,8 +776,8 @@ int main (int argc, char **argv)
         buffer[length] = 0;
         fprintf(stderr, "%s", buffer);
     }while(1);
-
-    if (hwdev) hwstub_release(hwdev);
+#endif
+    device_search_fini();
     if (listenfd > 0) close(listenfd);
     return 0;
 }
