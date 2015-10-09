@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_90d7f422",
+        "filename": "firmware/target/arm/imx233/sansa-fuzeplus/button-fuzeplus.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2015-10-09T00:12:15Z",
+      "side": 1,
+      "message": "iirc the fuze+ touchpad is not multi-touch capable, and any number of fingers !\u003d 1 just mean \"data not valid\". So it\u0027s probably better to just zero the relative data in this case instead of saving the finger number.",
+      "revId": "e42cbec64da24c83593261d6ab1cb4a99547e0ff",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
