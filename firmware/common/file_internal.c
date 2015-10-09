@@ -546,8 +546,8 @@ int open_stream_internal(const char *path, unsigned int callflags,
                          struct filestr_base *stream,
                          struct path_component_info *compinfo)
 {
-    DEBUGF("%s(path=\"%s\",flg=%X,str=%p,compinfo=%p)\n", path, callflags,
-           stream, compinfo);
+    DEBUGF("%s(path=\"%s\",flg=%X,str=%p,compinfo=%p)\n", __func__,
+           path, callflags, stream, compinfo);
     int rc;
 
     filestr_base_init(stream);

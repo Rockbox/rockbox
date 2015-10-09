@@ -595,8 +595,8 @@ static inline ssize_t readwrite_partial(struct filestr_desc *file,
 static ssize_t readwrite(struct filestr_desc *file, void *buf, size_t nbyte,
                          bool write)
 {
-    DEBUGF("readwrite(%p,%lx,%ld,%s)\n",
-           file, (long)buf, nbyte, write ? "write" : "read");
+    DEBUGF("readwrite(%p,%lx,%lu,%s)\n",
+           file, (long)buf, (unsigned long)nbyte, write ? "write" : "read");
 
     const file_size_t size = *file->sizep;
     file_size_t filerem;
@@ -705,8 +705,8 @@ static ssize_t readwrite(struct filestr_desc *file, void *buf, size_t nbyte,
             rc = fat_readwrite(&file->stream.fatstr, runlen, buf, write);
             if (rc < 0)
             {
-                DEBUGF("I/O error %sing %ld sectors\n", sectors,
-                       write ? "writ" : "read");
+                DEBUGF("I/O error %sing %ld sectors\n",
+                       write ? "writ" : "read", runlen);
                 FILE_ERROR(rc == FAT_RC_ENOSPC ? ENOSPC : EIO,
                            rc * 10 - 6);
             }
@@ -874,7 +874,7 @@ int fsync(int fildes)
 
     if (!(file->stream.flags & FD_WRITE))
     {
-        DEBUGF("Descriptor is read-only mode\n", fd);
+        DEBUGF("Descriptor is read-only mode\n");
         FILE_ERROR(EINVAL, -2);
     }
 
@@ -917,7 +917,8 @@ ssize_t read(int fildes, void *buf, size_t nbyte)
     if (file->stream.flags & FD_WRONLY)
     {
         DEBUGF("read(fd=%d,buf=%p,nb=%lu) - "
-               "descriptor is write-only mode\n", fildes, buf, nbyte);
+               "descriptor is write-only mode\n",
+               fildes, buf, (unsigned long)nbyte);
         FILE_ERROR(EBADF, -2);
     }
 
@@ -942,7 +943,8 @@ ssize_t write(int fildes, const void *buf, size_t nbyte)
     if (!(file->stream.flags & FD_WRITE))
     {
         DEBUGF("write(fd=%d,buf=%p,nb=%lu) - "
-               "descriptor is read-only mode\n", fildes, buf, nbyte);
+               "descriptor is read-only mode\n",
+               fildes, buf, (unsigned long)nbyte);
         FILE_ERROR(EBADF, -2);
     }
 
@@ -981,7 +983,7 @@ int rename(const char *old, const char *new)
     open1rc = open_stream_internal(old, FF_ANYTYPE, &oldstr, &oldinfo);
     if (open1rc <= 0)
     {
-        DEBUGF("Failed opening old: %d\n", rc);
+        DEBUGF("Failed opening old: %d\n", open1rc);
         if (open1rc == 0)
             FILE_ERROR(ENOENT, -1);
         else
@@ -1006,7 +1008,7 @@ int rename(const char *old, const char *new)
     open2rc = open_stream_internal(new, callflags, &newstr, &newinfo);
     if (open2rc < 0)
     {
-        DEBUGF("Failed opening new file: %d\n", rc);
+        DEBUGF("Failed opening new file: %d\n", open2rc);
         FILE_ERROR(ERRNO, open2rc * 10 - 2);
     }
 
@@ -1165,7 +1167,7 @@ int relate(const char *path1, const char *path2)
     open1rc = open_stream_internal(path1, FF_ANYTYPE, &str1, &info1);
     if (open1rc <= 0)
     {
-        DEBUGF("Failed opening path1: %d\n", rc);
+        DEBUGF("Failed opening path1: %d\n", open1rc);
         if (open1rc < 0)
             FILE_ERROR(ERRNO, open1rc * 10 - 1);
         else
@@ -1177,7 +1179,7 @@ int relate(const char *path1, const char *path2)
                                    &str2, &info2);
     if (open2rc < 0)
     {
-        DEBUGF("Failed opening path2: %d\n", rc);
+        DEBUGF("Failed opening path2: %d\n", open2rc);
         FILE_ERROR(ERRNO, open2rc * 10 - 2);
     }
 

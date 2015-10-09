@@ -950,8 +950,7 @@ static void update_fsinfo32(struct bpb *fat_bpb)
     uint8_t *fsinfo = cache_sector(fat_bpb, fat_bpb->bpb_fsinfo);
     if (!fsinfo)
     {
-        DEBUGF("%s() - Couldn't read FSInfo"
-               " (err code %d)", __func__, rc);
+        DEBUGF("%s() - Couldn't read FSInfo", __func__);
         return;
     }
 
@@ -972,7 +971,7 @@ static long get_next_cluster32(struct bpb *fat_bpb, long startcluster)
     if (!sec)
     {
         dc_unlock_cache();
-        DEBUGF("%s: Could not cache sector %d\n", __func__, sector);
+        DEBUGF("%s: Could not cache sector %lu\n", __func__, sector);
         return -1;
     }
 
@@ -1045,7 +1044,7 @@ static int update_fat_entry32(struct bpb *fat_bpb, unsigned long entry,
     if (!sec)
     {
         dc_unlock_cache();
-        DEBUGF("Could not cache sector %u\n", sector);
+        DEBUGF("Could not cache sector %lu\n", sector);
         return -1;
     }
 
@@ -1544,7 +1543,8 @@ static int write_longname(struct bpb *fat_bpb, struct fat_filestr *parentstr,
                           unsigned int flags)
 {
     DEBUGF("%s(file:%lx, first:%d, num:%d, name:%s)\n", __func__,
-           parent->info->firstcluster, firstentry, numentries, name);
+           file->firstcluster, file->e.entry - file->e.entries + 1,
+           file->e.entries, name);
 
     int rc;
     union raw_dirent *ent;
@@ -1901,7 +1901,8 @@ static int free_direntries(struct bpb *fat_bpb, struct fat_file *file)
          entries; entries--, entry++)
     {
         DEBUGF("Clearing dir entry %d (%d/%d)\n",
-               entry, entry - numentries + 1, numentries);
+               entry, entries - file->e.entries + 1, file->e.entries);
+
 
         dc_lock_cache();
 
@@ -2374,7 +2375,7 @@ static long transfer(struct bpb *fat_bpb, unsigned long start, long count,
 
     if (rc < 0)
     {
-        DEBUGF("Couldn't %s sector %lx (err %d)\n",
+        DEBUGF("Couldn't %s sector %lx (err %ld)\n",
                write ? "write":"read", start, rc);
         return rc;
     }
@@ -2803,7 +2804,7 @@ int fat_mount(IF_MV(int volume,) IF_MD(int drive,) unsigned long startsector)
     DEBUGF("Freecount: %ld\n", (unsigned long)fat_bpb->fsinfo.freecount);
     DEBUGF("Nextfree: 0x%lx\n", (unsigned long)fat_bpb->fsinfo.nextfree);
     DEBUGF("Cluster count: 0x%lx\n", fat_bpb->dataclusters);
-    DEBUGF("Sectors per cluster: %d\n", fat_bpb->bpb_secperclus);
+    DEBUGF("Sectors per cluster: %lu\n", fat_bpb->bpb_secperclus);
     DEBUGF("FAT sectors: 0x%lx\n", fat_bpb->fatsize);
 
     rc = 0;
