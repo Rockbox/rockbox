@@ -1,0 +1,259 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_f0aac084",
+        "filename": "utils/hwstub/hwstub_protocol.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "It seems to me that INVALID_REF is not the same as DISCONNECTED. shouldn\u0027t these be different errors ?",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_10cb0474",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "Explain what this reference is.",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_b0a038a7",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "Document somewhere the management of references (ie who has reference to the usb devices).",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_30ce0884",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "Add comment to explain what this static variable is used for.",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_709ff05f",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "Since you make dev_node a class, I think you should move logic to it by adding two functions and making most variables private:\nstruct hwstub_device_t *open(); // increment ref count, open if not already open\nvoid close(); // dec ref count, close if count is down to 1.\nbool connected(); // obvious\nvoid devinfo(struct dev_info_t\u0026 info); // fill info",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_70c89075",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "You should check if this is NULL",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_50c58c59",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "throwing an exception is a bad idea, it\u0027s probably better to have a flag in the structure saying this device is unusable ?",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_30956840",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "Can you prefix global variables with a g_ or something to make it more obvious it\u0027s global ? This is especially important because of locking.",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_90a534b7",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "In C++ you usually don\u0027t put static everywhere because you cannot use a undeclared symbol, unlike C. If you really want to ensure private functions, put them in an anonymous namespace.",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_d0afbc92",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "See comment in hwstub_protocol.h, I think this should be a different error like HWERR_DISCONNECTED",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_1092e457",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "I *think* GET_DEV_LIST should lock the list mutex, because a device may disappear during enumeration.",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_509c6c69",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "move this into dev_node",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_b0879811",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "move this into dev_node",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f08120fd",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "The doc says under some circumstances, you can get a ARRIVED event twice for a device, so check if device does not already exists.",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_908c1437",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-11T13:03:02Z",
+      "side": 1,
+      "message": "The doc says you can receive events for devices not initially enumerated, so you better check if node is not NULL.",
+      "revId": "bfb3a2f9f684c6a8c6fa02f5a9026119237a9eca",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
