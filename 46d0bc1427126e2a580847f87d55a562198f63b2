@@ -1,0 +1,429 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_30a3a8a0",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "remove static, useless in C++\napplies to other variables",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_d09dfc5a",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "Is this variable used ?",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f098006d",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "/* A device node represents an available device.\n * Schematically, there are two types of devices:\n * - connected devices: those are connected and may or may not be in use\n * - disconnected devices: those stay in the list until all the handles to it have been released, device will reject any operations.\n * As long as a dev_node exists, it maintins a positive (\u003e\u003d1) reference count on the libusb_device given to the constructor.\n */",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f0e640e7",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "rename to unique_id",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_10a02490",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "/* Once a device is disconnected, this variable will be set to false and the dev_node cannot be used anymore */",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_70ad3088",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "/* Number of times the dev_node has been opened. A dev_node exists as long as the following two conditions are satisfies:\n * - device is connected\n * - ref_cnt is nonzero\n * In particular, a disconnected device will continue to exist until ref_cnt is 0 (ie all users have closed it) */",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_10c78446",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "/* Creates a dev_node and adds a reference to dev.\n * Note that if the constructor will probe the device to get some information about. If it fails to do so, the device will be marked as disconnected. */",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_50aaac71",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "/* Add a reference to the device, opening it if necessary.\n * If it returns true then hwdev handle can be used to send requests to the device and stays valid until close() is called.\n * If the device fails to open, the function returns false and no reference is added. */",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_b0b5d8d1",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "/* Remove a reference to the device, close it if no one is using it anymore. */",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_90ba54bf",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "/* Check if the device is still connected. */",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f0af607b",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "/* Marks the device as disconnected. */",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_d0b4dcd2",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "Return true if anyone still has a reference to the device (ie open()\u0027d but not close()\u0027d)",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_90e1b4d3",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "rename to unique_id",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_30ca8850",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "change to \"ref_cnt \u003c\u003d 0\"",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_70c41040",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "call libusb_ref_device(_dev) right at the beginning of the ctor",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_b0dcb819",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "move this at the top of ctor",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_50c10c2e",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "remove ref_cnt\u003d1",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_d0eb3caf",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "devinfo.id \u003d unique_id++",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_30d1e8fc",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "maybe add a sanity check like:\nif(ref_cnt !\u003d 0)\n  throw std::runtime_error(\"dev_node destroyed with references on it\");",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_10ce645a",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "global list of devices protected by a mutex",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_b0031876",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "Create a function:\n/* Remove any device from the global list if they meet the deletion criteria: no references and disconnected.\n * NOTE: will lock the global list */\nvoid hwstub_cleanup_devices()\n{\n  pthread_mutex_lock(\u0026devlist_mutex);\n  for(int i \u003d 0; i \u003c (int)g_devlist.size(); i++)\n  {\n     if(!g_devlist[i]-\u003econnected() \u0026\u0026 !g_devlist[i]-\u003eis_referenced())\n     {\n        delete g_devlist[i].\n        g_devlist.erase(g_devlist.begin() + i);\n        i--;\n     }\n  }\n  pthread_mutex_unlock(\u0026devlist_mutex);\n}",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_90089493",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "/* Close every device in this list and clear the list. This function will cleanup the global list if necessary.\n * NOTE: will lock the global list */",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f0fda06f",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "New implementation of this whole function:\nfor(size_t i \u003d 0; i \u003c list.size(); i++)\n  list[i]-\u003eclose();\nlist.clear();\nhwstub_cleanup_devices();\n}",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_50d8ec1d",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "code is duplicate, move this code to a function called hwstub_cleanup_devices()",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_70db701c",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T14:17:23Z",
+      "side": 1,
+      "message": "this code is duplicate, remove by a call to\nhwstub_cleanup_devices() with a single device in a list",
+      "revId": "46d0bc1427126e2a580847f87d55a562198f63b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
