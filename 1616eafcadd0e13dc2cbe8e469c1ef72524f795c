@@ -1,0 +1,378 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_501d8cbc",
+        "filename": "utils/hwstub/hwstub_protocol.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "replace HWERR_INVALID_REF by two errors:\nHWERR_INVALID_ID /* device ID does not exist */\nHWERR_DISCONNECTED /* device has been disconnected */",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_907d34ea",
+        "filename": "utils/hwstub/hwstub_protocol.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "rename to HWERR_NOT_OPENED",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_70f2509c",
+        "filename": "utils/hwstub/lib/Makefile",
+        "patchSetId": 11
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "change back to -O2 for final version",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f00be07b",
+        "filename": "utils/hwstub/lib/hwstub.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "change ref to id",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_50ef4cb0",
+        "filename": "utils/hwstub/lib/hwstub_tcp.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "change to id",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_b02af8e5",
+        "filename": "utils/hwstub/lib/hwstub_tcp.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "remove space",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_902ff4f5",
+        "filename": "utils/hwstub/lib/hwstub_tcp.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "change to id",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f034804b",
+        "filename": "utils/hwstub/lib/hwstub_tcp.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "change to id",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_d0397c43",
+        "filename": "utils/hwstub/lib/hwstub_tcp.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "change to id",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_303f2827",
+        "filename": "utils/hwstub/lib/hwstub_tcp.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "change to id",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_103ca42e",
+        "filename": "utils/hwstub/lib/hwstub_tcp.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "change to id",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_7049b0d0",
+        "filename": "utils/hwstub/lib/hwstub_tcp.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "change to id",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_50462cc0",
+        "filename": "utils/hwstub/lib/hwstub_tcp.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "id",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_b01158b2",
+        "filename": "utils/hwstub/lib/hwstub_tcp.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "id",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_9016d4a5",
+        "filename": "utils/hwstub/lib/hwstub_tcp.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "id",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_d0105cab",
+        "filename": "utils/hwstub/tools/Makefile",
+        "patchSetId": 11
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "change back to O2",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_30260817",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "remove space",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_702090f8",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "remove commented code",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_10230407",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "do not unref here, the dtor will unref unconditionnaly",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f082c0c7",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "HWERR_INVALID_ID",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_d087bcd5",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "HWERR_DISCONNECTED",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_306d6833",
+        "filename": "utils/hwstub/tools/hwstub_server.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 479,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-12T15:25:50Z",
+      "side": 1,
+      "message": "HWERR_INVALID_ID",
+      "revId": "1616eafcadd0e13dc2cbe8e469c1ef72524f795c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
