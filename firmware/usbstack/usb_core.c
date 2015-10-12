@@ -189,12 +189,16 @@ static int usb_no_host_callback(struct timeout *tmo)
 static int usb_core_num_interfaces;
 
 typedef void (*completion_handler_t)(int ep, int dir, int status, int length);
+typedef bool (*fast_completion_handler_t)(int ep, int dir, int status, int length);
 typedef bool (*control_handler_t)(struct usb_ctrlrequest* req,
     unsigned char* dest);
 
 static struct
 {
     completion_handler_t completion_handler[2];
+#ifdef USB_HAS_FAST_COMPLETION
+    fast_completion_handler_t fast_completion_handler[2];
+#endif
     control_handler_t control_handler[2];
     struct usb_transfer_completion_event_data completion_event[2];
 } ep_data[USB_NUM_ENDPOINTS];
@@ -271,6 +275,9 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .init = usb_hid_init,
         .disconnect = usb_hid_disconnect,
         .transfer_complete = usb_hid_transfer_complete,
+#ifdef USB_HAS_FAST_COMPLETION
+        .fast_transfer_complete = usb_hid_fast_transfer_complete,
+#endif
         .control_request = usb_hid_control_request,
 #ifdef HAVE_HOTSWAP
         .notify_hotswap = NULL,
@@ -514,6 +521,9 @@ int usb_core_request_endpoint(int type, int dir, struct usb_class_driver* drv)
     ep = EP_NUM(ret);
 
     ep_data[ep].completion_handler[dir] = drv->transfer_complete;
+#ifdef USB_HAS_FAST_COMPLETION
+    ep_data[ep].fast_completion_handler[dir] = drv->fast_transfer_complete;
+#endif
     ep_data[ep].control_handler[dir] = drv->control_request;
 
     return ret;
@@ -529,6 +539,9 @@ void usb_core_release_endpoint(int ep)
     ep = EP_NUM(ep);
 
     ep_data[ep].completion_handler[dir] = NULL;
+#ifdef USB_HAS_FAST_COMPLETION
+    ep_data[ep].fast_completion_handler[dir] = NULL;
+#endif
     ep_data[ep].control_handler[dir] = NULL;
 }
 
@@ -570,16 +583,46 @@ static void control_request_handler_drivers(struct usb_ctrlrequest* req)
         if(drivers[i].enabled &&
                 drivers[i].control_request &&
                 drivers[i].first_interface <= interface &&
-                drivers[i].last_interface > interface)
-        {
+                drivers[i].last_interface > interface) {
+            /* Check for SET_INTERFACE and GET_INTERFACE */
+            if((req->bRequestType & USB_RECIP_MASK) == USB_RECIP_INTERFACE &&
+                    (req->bRequestType & USB_TYPE_MASK) == USB_TYPE_STANDARD) {
+
+                if(req->bRequest == USB_REQ_SET_INTERFACE) {
+                    logf("usb_core: SET INTERFACE 0x%x 0x%x", req->wValue, req->wIndex);
+                    if(drivers[i].set_interface &&
+                            drivers[i].set_interface(req->wIndex, req->wValue) >= 0) {
+                        usb_drv_send(EP_CONTROL, NULL, 0); /* ack */
+                        handled = true;
+                    }
+                    break;
+                }
+                else if(req->bRequest == USB_REQ_GET_INTERFACE) {
+                    int alt = -1;
+                    logf("usb_core: GET INTERFACE 0x%x", req->wIndex);
+
+                    if(drivers[i].get_interface)
+                        alt = drivers[i].get_interface(req->wIndex);
+
+                    if(alt >= 0 && alt < 255) {
+                        response_data[0] = alt;
+                        usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
+                        usb_drv_send(EP_CONTROL, response_data, 1);
+                        handled = true;
+                    }
+                    break;
+                }
+                /* fallback */
+            }
+
             handled = drivers[i].control_request(req, response_data);
-            if(handled)
-                break;
+            break; /* no other driver can handle it because it's interface specific */
         }
     }
     if(!handled) {
         /* nope. flag error */
-        logf("bad req:desc %d:%d", req->bRequest, req->wValue >> 8);
+        logf("bad req 0x%x:0x%x:0x%x:0x%x:0x%x", req->bRequestType,req->bRequest,
+            req->wValue, req->wIndex, req->wLength);
         usb_drv_stall(EP_CONTROL, true, true);
     }
 }
@@ -775,15 +818,8 @@ static void request_handler_interface_standard(struct usb_ctrlrequest* req)
     switch (req->bRequest)
     {
         case USB_REQ_SET_INTERFACE:
-            logf("usb_core: SET_INTERFACE");
-            usb_drv_send(EP_CONTROL, NULL, 0);
-            break;
-
         case USB_REQ_GET_INTERFACE:
-            logf("usb_core: GET_INTERFACE");
-            response_data[0] = 0;
-            usb_drv_recv(EP_CONTROL, NULL, 0);
-            usb_drv_send(EP_CONTROL, response_data, 1);
+            control_request_handler_drivers(req);
             break;
         case USB_REQ_CLEAR_FEATURE:
             break;
@@ -832,7 +868,8 @@ static void request_handler_endoint_drivers(struct usb_ctrlrequest* req)
     
     if(!handled) {
         /* nope. flag error */
-        logf("usb bad req %d", req->bRequest);
+        logf("bad req 0x%x:0x%x:0x%x:0x%x:0x%x", req->bRequestType,req->bRequest,
+             req->wValue, req->wIndex, req->wLength);
         usb_drv_stall(EP_CONTROL, true, true);
     }
 }
@@ -937,24 +974,25 @@ void usb_core_bus_reset(void)
 void usb_core_transfer_complete(int endpoint, int dir, int status, int length)
 {
     struct usb_transfer_completion_event_data *completion_event;
+    if(endpoint == EP_CONTROL)
+        return; /* already handled */
 
-    switch (endpoint) {
-        case EP_CONTROL:
-            /* already handled */
-            break;
+#ifdef USB_HAS_FAST_COMPLETION
+    /* Fast notification */
+    fast_completion_handler_t handler = ep_data[endpoint].fast_completion_handler[EP_DIR(dir)];
+    if(handler != NULL && handler(endpoint, dir, status, length))
+        return; /* do not dispatch to the queue if handled */
+#endif
+    /* Normal notification */
+    completion_event = &ep_data[endpoint].completion_event[EP_DIR(dir)];
 
-        default:
-            completion_event = &ep_data[endpoint].completion_event[EP_DIR(dir)];
-
-            completion_event->endpoint = endpoint;
-            completion_event->dir = dir;
-            completion_event->data = 0;
-            completion_event->status = status;
-            completion_event->length = length;
-            /* All other endpoints. Let the thread deal with it */
-            usb_signal_transfer_completion(completion_event);
-            break;
-    }
+    completion_event->endpoint = endpoint;
+    completion_event->dir = dir;
+    completion_event->data = 0;
+    completion_event->status = status;
+    completion_event->length = length;
+    /* All other endpoints. Let the thread deal with it */
+    usb_signal_transfer_completion(completion_event);
 }
 
 void usb_core_handle_notify(long id, intptr_t data)

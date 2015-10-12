@@ -184,7 +184,7 @@ static bool currently_sending = false;
 static int ep_in;
 static int usb_interface;
 
-static void usb_hid_try_send_drv(void);
+static void usb_hid_try_send_drv(bool irq_context);
 
 static void pack_parameter(unsigned char **dest, bool is_signed, bool mark_size,
         uint8_t parameter, uint32_t value)
@@ -618,6 +618,14 @@ void usb_hid_disconnect(void)
     currently_sending = false;
 }
 
+static void do_completion(bool irq_context)
+{
+    send_buffer_len[cur_buf_send] = 0;
+    HID_BUF_INC(cur_buf_send);
+    currently_sending = false;
+    usb_hid_try_send_drv(irq_context);
+}
+
 /* called by usb_core_transfer_complete() */
 void usb_hid_transfer_complete(int ep, int dir, int status, int length)
 {
@@ -627,12 +635,27 @@ void usb_hid_transfer_complete(int ep, int dir, int status, int length)
     logf("HID: transfer complete: %d %d %d %d",ep,dir,status,length);
     if (dir == USB_DIR_IN && !status)
     {
-        send_buffer_len[cur_buf_send] = 0;
-        HID_BUF_INC(cur_buf_send);
-        currently_sending = false;
-        usb_hid_try_send_drv();
+        do_completion(false);
+        
     }
 }
+
+#ifdef USB_HAS_FAST_COMPLETION
+/* WARNING: this might be called from IRQ context so *DO NOT BLOCK* */
+bool usb_hid_fast_transfer_complete(int ep, int dir, int status, int length)
+{
+    (void)ep;
+    (void)length;
+
+    if (dir == USB_DIR_IN && !status)
+    {
+        do_completion(true);
+        return true;
+    }
+    else
+        return false;
+}
+#endif
 
 /* The DAP is registered as a keyboard with several LEDs, therefore the OS sends
  * LED report to notify the DAP whether Num Lock / Caps Lock etc. are enabled.
@@ -745,7 +768,8 @@ bool usb_hid_control_request(struct usb_ctrlrequest *req, unsigned char *dest)
     return false;
 }
 
-static void usb_hid_try_send_drv(void)
+/* WARNING: if called in IRQ context, *DO NOT BLOCK* */
+static void usb_hid_try_send_drv(bool irq_context)
 {
     int rc;
     int length = send_buffer_len[cur_buf_send];
@@ -755,11 +779,13 @@ static void usb_hid_try_send_drv(void)
 
     if (currently_sending)
     {
-        logf("HID: Already sending");
+        if(!irq_context)
+            logf("HID: Already sending");
         return;
     }
 
-    logf("HID: Sending %d bytes",length);
+    if(!irq_context)
+        logf("HID: Sending %d bytes",length);
     rc = usb_drv_send_nonblocking(ep_in, send_buffer[cur_buf_send], length);
     currently_sending = true;
     if (rc)
@@ -825,5 +851,5 @@ void usb_hid_send(usage_page_t usage_page, int id)
         usb_hid_queue(buf, length);
     }
 
-    usb_hid_try_send_drv();
+    usb_hid_try_send_drv(false);
 }
