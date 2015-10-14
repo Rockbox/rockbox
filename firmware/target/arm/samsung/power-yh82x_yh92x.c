@@ -98,13 +98,8 @@ bool ide_powered(void)
 
 void power_off(void)
 {
-    /* Disable interrupts on this core */
-    disable_interrupt(IRQ_FIQ_STATUS);
-
-    /* Mask them on both cores */
-    CPU_INT_DIS = -1;
-    COP_INT_DIS = -1;
-
-    while (1)
-        DEV_RS = -1;
+    /* power off bit */
+    GPIOK_ENABLE |= 0x40;
+    GPIOK_OUTPUT_VAL &= ~0x40;
+    GPIOK_OUTPUT_EN |= 0x40;
 }
