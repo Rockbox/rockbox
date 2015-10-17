@@ -103,8 +103,8 @@
 /* Define this to have CPU boosted while scrolling in the UI */
 #define HAVE_GUI_BOOST
 
-//#define AB_REPEAT_ENABLE
-//#define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
+#define AB_REPEAT_ENABLE
+#define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
 
 /* define this if you have a disk storage, i.e. something
    that needs spinups and can cause skips when shaked */
