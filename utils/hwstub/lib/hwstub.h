@@ -30,37 +30,80 @@
 
 #include "hwstub_protocol.h"
 
+#error deprecated
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- *
- * Low-Level interface
- *
- */
-struct hwstub_device_t;
+/** Errors */
+#define HWSTUB_SUCCESS  0
+#define HWSTUB_ERROR    -1
 
-/* Returns 0 if a device interface is usable, or -1 if none was found */
-int hwstub_probe(libusb_device *dev);
-/* Helper function that returns a list of all hwstub devices found. The caller
- * must unref all of them when done, possibly using libusb_free_device_list().
- * Return number of devices or <0 on error */
-ssize_t hwstub_get_device_list(libusb_context *ctx, libusb_device ***list);
-/* Helper function that filter the device list. The function will note destroy
- * or unref the previous list. The callack function must return 1 to keep the
- * device and 0 to drop it.
- * NOTE all devices in the new list will have one more reference */
-typedef int (*hwstub_dev_list_filter_fn_t)(libusb_device *dev, void *user);
-ssize_t hwstub_filter_device_list_by_vid_pid(libusb_device **list, ssize_t size,
-    libusb_device ***new_list, hwstub_dev_list_filter_fn_t filter, void *user);
-/* Returns NULL on error
- * NOTE: hwstub_open() will add a reference to the device and
- *       hwstub_release() will unref it */
-struct hwstub_device_t *hwstub_open_usb(libusb_device *dev);
-struct hwstub_device_t *hwstub_open_tcp(const char *host, const char *port);
-/* Release device, will unref the usb device if any */
-void hwstub_release(struct hwstub_device_t *dev);
+typedef void hwstub_context_t;
+typedef void hwstub_device_t;
+typedef void hwstub_handle_t;
+
+/** Context
+ * A context provides two major operations:
+ * - device listing
+ * - device opening
+ * A typical context is USB, another is TCP to relay another remote context
+ */
+
+/* Open the default context */
+int hwstub_init_default(hwstub_context_t **ctx);
+/* Open a USB context, assuming the libusb context was initialised */
+int hwstub_init_usb(libusb_context *ctx, hwstub_context_t **out_ctx);
+/* Open a TCP context */
+int hwstub_init_tcp(const char *host, const char *port, hwstub_context_t **out_ctx);
+/* Exit a context, make sure that all handles and so on are closed */
+void hwstub_exit(hwstub_context_t *ctx);
+/* Return the list of available devices. The returned value is the number of
+ * devices in the list (>=0) or an error (<0). The list is always NULL terminated
+ * so the actual list size is one greater than the returned size */
+ssize_t hwstub_get_device_list(hwstub_context_t *ctx, hwstub_device_t ***list);
+/* Free a device list built by hwstub_get_device_list, optionally unreferences all devices in it */
+void hwstub_free_device_list(hwstub_device_t *list, int unref_devices);
+/* Get the target ID of a device. This function cannot fail or block */
+uint32_t hwstub_get_target_id(hwstub_device_t *dev);
+/* Get the target name of a device. This function cannot fail or block.
+ * If the buffer is too small, it will be truncate and zero-terminated (except
+ * if size is 0). It returns the size of *full* string in all cases (not including 0) */
+size_t hwstub_get_target_name(hwstub_device_t *dev, char *buffer, size_t size);
+/* Add a reference to the device, and return the device */
+hwstub_device_t *hwstub_ref_device(hwstub_device_t *dev);
+/* Remove a reference to the device. If there are no more references to the device,
+ * it will be destroyed */
+void hwstub_unref_device(hwstub_device_t *dev);
+/* Check wether a device is still connected. Return 1 if connected, 0 otherwise */
+int hwstub_is_connected(hwstub_device_t *dev);
+/* Open a device and obtain a handle to communicate with it. Internally adds a
+ * reference to the device that is removed on close. */
+int hwstub_open(hwstub_device_t *dev, hwstub_handle_t **handle);
+/* Close a device handle. Internally unreference the device added on open. */
+void hwstub_close(hwstub_handle_t *handle);
+/* Return the device associated with the handle */
+hwstub_device_t *hwstub_get_device(hwstub_handle_t *handle);
+/* Retrieve a descriptor from the device. Returns number of bytes filled or <0 on error */
+int hwstub_get_desc(hwstub_handle_t *dev, uint16_t desc, void *info, size_t sz);
+/* Retrieve part of the device log. Returns number of bytes filled or <0 on error */
+int hwstub_get_log(hwstub_handle_t *dev, void *buf, size_t sz);
+/* Read/write from/to the device. Returns number of bytes written/read or <0 on error.
+ * Atomic operations guarantee that the entire buffer is read/written atomically
+ * and as such might only be available on some targets and for a restricted set
+ * of buffer sizes. */
+int hwstub_read(hwstub_handle_t *dev, uint32_t addr, void *buf, size_t sz);
+int hwstub_read_atomic(hwstub_handle_t *dev, uint32_t addr, void *buf, size_t sz);
+int hwstub_write(hwstub_handle_t *dev, uint32_t addr, const void *buf, size_t sz);
+int hwstub_write_atomic(hwstub_handle_t *dev, uint32_t addr, const void *buf, size_t sz);
+int hwstub_rw_mem(hwstub_handle_t *dev, int read, uint32_t addr, void *buf, size_t sz);
+int hwstub_rw_mem_atomic(hwstub_handle_t *dev, int read, uint32_t addr, void *buf, size_t sz);
+/* Execute code on the device. Returns <0 on error */
+int hwstub_exec(hwstub_handle_t *dev, uint32_t addr, uint16_t flags);
+int hwstub_call(hwstub_handle_t *dev, uint32_t addr);
+int hwstub_jump(hwstub_handle_t *dev, uint32_t addr);
+
 /* Open an URI. The general format is as follows:
  *   scheme:[//domain:[port]][/][path[?query]]
  * The following schemes are recognized:
@@ -70,29 +113,10 @@ void hwstub_release(struct hwstub_device_t *dev);
  * to the output. If the URI format is not valid, a message is printed to the output
  * and NULL is returned.
  */
-struct hwstub_device_t *hwstub_open_uri(libusb_context *usb_context, FILE *msg, const char *uri);
+hwstub_device_t *hwstub_open_uri(libusb_context *usb_context, FILE *msg, const char *uri);
 /* Print URI usage() on output file */
 void hwstub_usage_uri(FILE *f);
 
-/* Returns number of bytes filled */
-int hwstub_get_desc(struct hwstub_device_t *dev, uint16_t desc, void *info, size_t sz);
-/* Returns number of bytes filled */
-int hwstub_get_log(struct hwstub_device_t *dev, void *buf, size_t sz);
-/* Returns number of bytes written/read or <0 on error */
-int hwstub_read(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz);
-int hwstub_read_atomic(struct hwstub_device_t *dev, uint32_t addr, void *buf, size_t sz);
-int hwstub_write(struct hwstub_device_t *dev, uint32_t addr, const void *buf, size_t sz);
-int hwstub_write_atomic(struct hwstub_device_t *dev, uint32_t addr, const void *buf, size_t sz);
-int hwstub_rw_mem(struct hwstub_device_t *dev, int read, uint32_t addr, void *buf, size_t sz);
-int hwstub_rw_mem_atomic(struct hwstub_device_t *dev, int read, uint32_t addr, void *buf, size_t sz);
-/* Returns <0 on error */
-int hwstub_exec(struct hwstub_device_t *dev, uint32_t addr, uint16_t flags);
-int hwstub_call(struct hwstub_device_t *dev, uint32_t addr);
-int hwstub_jump(struct hwstub_device_t *dev, uint32_t addr);
-
-int hwserver_get_dev_list(struct hwstub_device_t *dev, void *buf, size_t sz);
-int hwserver_dev_open(struct hwstub_device_t *dev, int32_t ref);
-int hwserver_dev_close(struct hwstub_device_t *dev, int32_t ref);
 #ifdef __cplusplus
 } // extern "C"
 #endif

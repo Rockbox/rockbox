@@ -24,9 +24,36 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifndef MIN
-#define MIN(a,b) ((a) <= (b) ? (a) : (b))
-#endif
+int hwstub_init_context(hwstub_context_t *ctx, struct hwstub_context_vtable_t *vtable)
+{
+    ctx->vtable = vtable;
+    if(pthread_mutex_init(&ctx->mutex, NULL) != 0)
+        return HWSTUB_ERROR;
+    return HWSTUB_SUCCESS;
+}
+
+void hwstub_exit_context(hwstub_context_t *ctx)
+{
+    pthread_mutex_destroy(&ctx->mutex);
+}
+
+int hwstub_lock_context(hwstub_context_t *ctx)
+{
+    if(pthread_mutex_lock(&ctx->mutex) == 0)
+        return HWSTUB_ERROR;
+    else
+        return HWSTUB_SUCCESS;
+}
+
+int hwstub_unlock_context(hwstub_context_t *ctx)
+{
+    if(pthread_mutex_unlock(&ctx->mutex) == 0)
+        return HWSTUB_ERROR;
+    else
+        return HWSTUB_SUCCESS;
+}
+
+int hwstub_unlock_context(hwstub_context_t *ctx);
 
 int hwstub_probe(libusb_device *dev)
 {

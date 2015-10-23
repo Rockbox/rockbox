@@ -18,23 +18,27 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "hwstub.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
 #include <stdbool.h>
+#include <sstream>
+#include <iomanip>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <lua.hpp>
 #include <unistd.h>
 #include "soc_desc_v1.hpp"
 #include "soc_desc.hpp"
+#include "hwstub.hpp"
+#include "hwstub_usb.hpp"
 extern "C" {
 #include "prompt.h"
 }
 
 using namespace soc_desc_v1;
+using namespace hwstub;
 
 #if LUA_VERSION_NUM < 502
 #warning You need at least lua 5.2
@@ -45,15 +49,16 @@ using namespace soc_desc_v1;
  */
 bool g_quiet = false;
 bool g_exit = false;
-struct hwstub_device_t *g_hwdev;
+std::shared_ptr<context> g_hwctx;
+std::shared_ptr<handle> g_hwdev;
 struct hwstub_version_desc_t g_hwdev_ver;
 struct hwstub_layout_desc_t g_hwdev_layout;
 struct hwstub_target_desc_t g_hwdev_target;
 struct hwstub_stmp_desc_t g_hwdev_stmp;
 struct hwstub_jz_desc_t g_hwdev_jz;
 struct hwstub_pp_desc_t g_hwdev_pp;
+std::vector<std::shared_ptr<device>> g_devlist;
 
-int32_t devid = -1;
 lua_State *g_lua;
 
 /**
@@ -98,13 +103,14 @@ void my_lua_print_stack(lua_State *state = 0, int up_to = 0)
  * hw specific
  */
 
-void print_log(struct hwstub_device_t *hwdev)
+void print_log(std::shared_ptr<handle> hwdev)
 {
     do
     {
         char buffer[128];
-        int length = hwstub_get_log(hwdev, buffer, sizeof(buffer) - 1);
-        if(length <= 0)
+        size_t length = sizeof(buffer) - 1;
+        error err = hwdev->get_log(buffer, length);
+        if(err != error::SUCCESS)
             break;
         buffer[length] = 0;
         printf("%s", buffer);
@@ -191,7 +197,9 @@ typedef void (*hw_writen_fn_t)(lua_State *state, soc_addr_t addr, soc_word_t val
 soc_word_t hw_read8(lua_State *state, soc_addr_t addr)
 {
     uint8_t u;
-    if(hwstub_rw_mem_atomic(g_hwdev, 1, addr, &u, sizeof(u)) != sizeof(u))
+    size_t sz = sizeof(u);
+    error ret = g_hwdev->read(addr, &u, sz, true);
+    if(ret != error::SUCCESS || sz != sizeof(u))
         luaL_error(state, "fail to read8 @ %p", addr);
     return u;
 }
@@ -199,7 +207,9 @@ soc_word_t hw_read8(lua_State *state, soc_addr_t addr)
 soc_word_t hw_read16(lua_State *state, soc_addr_t addr)
 {
     uint16_t u;
-    if(hwstub_rw_mem_atomic(g_hwdev, 1, addr, &u, sizeof(u)) != sizeof(u))
+    size_t sz = sizeof(u);
+    error ret = g_hwdev->read(addr, &u, sz, true);
+    if(ret != error::SUCCESS || sz != sizeof(u))
         luaL_error(state, "fail to read16 @ %p", addr);
     return u;
 }
@@ -207,7 +217,9 @@ soc_word_t hw_read16(lua_State *state, soc_addr_t addr)
 soc_word_t hw_read32(lua_State *state, soc_addr_t addr)
 {
     uint32_t u;
-    if(hwstub_rw_mem_atomic(g_hwdev, 1, addr, &u, sizeof(u)) != sizeof(u))
+    size_t sz = sizeof(u);
+    error ret = g_hwdev->read(addr, &u, sz, true);
+    if(ret != error::SUCCESS || sz != sizeof(u))
         luaL_error(state, "fail to read32 @ %p", addr);
     return u;
 }
@@ -215,21 +227,27 @@ soc_word_t hw_read32(lua_State *state, soc_addr_t addr)
 void hw_write8(lua_State *state, soc_addr_t addr, soc_word_t val)
 {
     uint8_t u = val;
-    if(hwstub_rw_mem_atomic(g_hwdev, 0, addr, &u, sizeof(u)) != sizeof(u))
+    size_t sz = sizeof(u);
+    error ret = g_hwdev->write(addr, &u, sz, true);
+    if(ret != error::SUCCESS || sz != sizeof(u))
         luaL_error(state, "fail to write8 @ %p", addr);
 }
 
 void hw_write16(lua_State *state, soc_addr_t addr, soc_word_t val)
 {
     uint16_t u = val;
-    if(hwstub_rw_mem_atomic(g_hwdev, 0, addr, &u, sizeof(u)) != sizeof(u))
+    size_t sz = sizeof(u);
+    error ret = g_hwdev->write(addr, &u, sz, true);
+    if(ret != error::SUCCESS || sz != sizeof(u))
         luaL_error(state, "fail to write16 @ %p", addr);
 }
 
 void hw_write32(lua_State *state, soc_addr_t addr, soc_word_t val)
 {
     uint32_t u = val;
-    if(hwstub_rw_mem_atomic(g_hwdev, 0, addr, &u, sizeof(u)) != sizeof(u))
+    size_t sz = sizeof(u);
+    error ret = g_hwdev->write(addr, &u, sz, true);
+    if(ret != error::SUCCESS || sz != sizeof(u))
         luaL_error(state, "fail to write32 @ %p", addr);
 }
 
@@ -259,7 +277,7 @@ int my_lua_call(lua_State *state)
     if(n != 1)
         luaL_error(state, "call takes target address argument");
 
-    hwstub_call(g_hwdev, luaL_checkunsigned(state, 1));
+    g_hwdev->exec(luaL_checkunsigned(state, 1), HWSTUB_EXEC_CALL);
     return 0;
 }
 
@@ -269,7 +287,7 @@ int my_lua_jump(lua_State *state)
     if(n != 1)
         luaL_error(state, "jump takes target address argument");
 
-    hwstub_jump(g_hwdev, luaL_checkunsigned(state, 1));
+   g_hwdev->exec(luaL_checkunsigned(state, 1), HWSTUB_EXEC_JUMP);
     return 0;
 }
 
@@ -279,17 +297,50 @@ int my_lua_printlog(lua_State *state)
     return 0;
 }
 
-int my_lua_hwserver_get_dev_list(lua_State *state)
+std::string get_dev_name(std::shared_ptr<device> dev)
 {
-    struct dev_info_t devlist[8];
-    int n = hwserver_get_dev_list(g_hwdev, devlist, sizeof(devlist));
-    n = n/sizeof(struct dev_info_t);
+    std::ostringstream name;
+    usb::device *udev = dynamic_cast<usb::device*>(dev.get());
+    if(udev)
+    {
+        name << "USB Bus " << (unsigned)udev->get_bus_number() <<
+            " Device " << std::setw(2) << std::hex << (unsigned)udev->get_address() << ": ";
+    }
+    // try to open device
+    std::shared_ptr<handle> h;
+    error ret = dev->open(h);
+    if(ret != error::SUCCESS)
+    {
+        name << "<cannot open dev>";
+        return name.str();
+    }
+    // get target information
+    hwstub_target_desc_t desc;
+    ret = h->get_target_desc(desc);
+    if(ret !=error::SUCCESS)
+    {
+        name << "<cannot get name: " << error_string(ret) << ">";
+        return name.str();
+    }
+    name << desc.bName;
+    return name.str();
+}
+
+int my_lua_get_dev_list(lua_State *state)
+{
+    error ret = g_hwctx->get_device_list(g_devlist);
+    if(ret != error::SUCCESS)
+    {
+        printf("Cannot device list\n");
+        return -1;
+    }
 
     printf("=== Available device list ===\n");
-    for (int i=0; i<n; i++)
+    for(size_t i = 0; i < g_devlist.size(); i++)
     {
-        printf("%d: %s%s\n", devlist[i].id, devlist[i].hwdesc.bName,
-               (devid == i) ? " <--" : "");
+        std::string name = get_dev_name(g_devlist[i]);
+        printf("%zu: %s%s\n", i, name.c_str(),
+               g_devlist[i] == g_hwdev->get_device() ? " <--" : "");
     }
     return 0;
 }
@@ -310,49 +361,57 @@ int my_lua_udelay(lua_State *state)
     return 0;
 }
 
-int my_lua_hwserver_dev_open(lua_State *state)
+int fetch_dev_info()
 {
-    int n = lua_gettop(state);
-    if(n != 1)
-        luaL_error(state, "hwserver_dev_open takes one argument");
-    int32_t id = lua_tointeger(state, -1);
-    int ret = hwserver_dev_open(g_hwdev, id);
-    if (ret != HWERR_OK)
+    // get memory layout information
+    error ret = g_hwdev->get_layout_desc(g_hwdev_layout);
+    if(ret != error::SUCCESS)
     {
-        printf("Cannot open device: %d\n", id);
+        printf("Cannot get layout descriptor: %s\n", error_string(ret).c_str());
         goto Lerr;
     }
-
-    // register
-    devid = id;
-
     // get hwstub information
-    ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_VERSION, &g_hwdev_ver, sizeof(g_hwdev_ver));
-    if(ret != sizeof(g_hwdev_ver))
+    ret = g_hwdev->get_version_desc(g_hwdev_ver);
+    if(ret != error::SUCCESS)
     {
-        printf("Cannot get version!\n");
+        printf("Cannot get version descriptor: %s\n", error_string(ret).c_str());
         goto Lerr;
     }
-
-    if(g_hwdev_ver.bMajor != HWSTUB_VERSION_MAJOR || g_hwdev_ver.bMinor < HWSTUB_VERSION_MINOR)
+    // get target
+    ret = g_hwdev->get_target_desc(g_hwdev_target);
+    if(ret != error::SUCCESS)
     {
-        printf("Warning: this tool is possibly incompatible with your device:\n");
-        printf("Device version: %d.%d.%d\n", g_hwdev_ver.bMajor, g_hwdev_ver.bMinor, g_hwdev_ver.bRevision);
-        printf("Host version: %d.%d\n", HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR);
+        printf("Cannot get target descriptor: %s\n", error_string(ret).c_str());
+        goto Lerr;
     }
+    if(g_hwdev_target.dID == HWSTUB_TARGET_STMP)
+        ret = g_hwdev->get_stmp_desc(g_hwdev_stmp);
+    // get PP specific information
+    else if(g_hwdev_target.dID == HWSTUB_TARGET_PP)
+        ret = g_hwdev->get_pp_desc(g_hwdev_pp);
+    // get JZ specific information
+    else if(g_hwdev_target.dID == HWSTUB_TARGET_JZ)
+        ret = g_hwdev->get_jz_desc(g_hwdev_jz);
+    if(ret != error::SUCCESS)
+    {
+        printf("Cannot get soc specific descriptor: %s\n", error_string(ret).c_str());
+        goto Lerr;
+    }
+    return 0;
+Lerr:
+    return -1;
+}
 
+int update_dev_lua_state(lua_State *state)
+{
+    // fetch info before starting to mess with the lua state
+    int ret = fetch_dev_info();
+    if(ret < 0)
+        return ret;
     // hwstub
     lua_getglobal(state, "hwstub");
     // hwstub.dev
     lua_getfield(state, -1, "dev");
-
-    // get memory layout information
-    ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_LAYOUT, &g_hwdev_layout, sizeof(g_hwdev_layout));
-    if(ret != sizeof(g_hwdev_layout))
-    {
-        printf("Cannot get layout: %d\n", ret);
-        goto Lerr;
-    }
 
     // hwstub.dev.version
     lua_getfield(state, -1, "version");
@@ -384,6 +443,7 @@ int my_lua_hwserver_dev_open(lua_State *state)
     lua_pushinteger(state, g_hwdev_layout.dCodeSize);
     lua_settable(state, -3);
 
+    // hwstub.dev.layout
     lua_pop(state, 1);
 
     // hwstub.dev.layout.stack
@@ -399,6 +459,7 @@ int my_lua_hwserver_dev_open(lua_State *state)
     lua_pushinteger(state, g_hwdev_layout.dStackSize);
     lua_settable(state, -3);
 
+    // hwstub.dev.layout
     lua_pop(state, 1);
 
     // hwstub.dev.layout.buffer
@@ -414,15 +475,8 @@ int my_lua_hwserver_dev_open(lua_State *state)
     lua_pushinteger(state, g_hwdev_layout.dBufferSize);
     lua_settable(state, -3);
 
-    lua_pop(state, 2); // hwstub.dev
-
-    // get target
-    ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_TARGET, &g_hwdev_target, sizeof(g_hwdev_target));
-    if(ret != sizeof(g_hwdev_target))
-    {
-        printf("Cannot get target: %d\n", ret);
-        goto Lerr;
-    }
+    // hwstub.dev
+    lua_pop(state, 2);
 
     // hwstub.dev.target
     lua_getfield(state, -1, "target");
@@ -442,13 +496,6 @@ int my_lua_hwserver_dev_open(lua_State *state)
     // get STMP specific information
     if(g_hwdev_target.dID == HWSTUB_TARGET_STMP)
     {
-        ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_STMP, &g_hwdev_stmp, sizeof(g_hwdev_stmp));
-        if(ret != sizeof(g_hwdev_stmp))
-        {
-            printf("Cannot get stmp: %d\n", ret);
-            goto Lerr;
-        }
-
         // hwstub.dev.stmp
         lua_getfield(state, -1, "stmp");
 
@@ -467,17 +514,9 @@ int my_lua_hwserver_dev_open(lua_State *state)
         lua_pushinteger(state, g_hwdev_stmp.bPackage);
         lua_settable(state, -3);
     }
-
     // get PP specific information
-    if(g_hwdev_target.dID == HWSTUB_TARGET_PP)
+    else if(g_hwdev_target.dID == HWSTUB_TARGET_PP)
     {
-        ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_PP, &g_hwdev_pp, sizeof(g_hwdev_pp));
-        if(ret != sizeof(g_hwdev_pp))
-        {
-            printf("Cannot get pp: %d\n", ret);
-            goto Lerr;
-        }
-
         // hwstub.dev.pp
         lua_getfield(state, -1, "pp");
 
@@ -491,17 +530,9 @@ int my_lua_hwserver_dev_open(lua_State *state)
         lua_pushlstring(state, (const char *)g_hwdev_pp.bRevision, 2);
         lua_settable(state, -3);
     }
-
     // get JZ specific information
-    if(g_hwdev_target.dID == HWSTUB_TARGET_JZ)
+    else if(g_hwdev_target.dID == HWSTUB_TARGET_JZ)
     {
-        ret = hwstub_get_desc(g_hwdev, HWSTUB_DT_JZ, &g_hwdev_jz, sizeof(g_hwdev_jz));
-        if(ret != sizeof(g_hwdev_jz))
-        {
-            printf("Cannot get jz: %d\n", ret);
-            goto Lerr;
-        }
-
         // hwstub.dev.jz
         lua_getfield(state, -1, "jz");
 
@@ -510,21 +541,49 @@ int my_lua_hwserver_dev_open(lua_State *state)
         lua_pushinteger(state, g_hwdev_jz.wChipID);
         lua_settable(state, -3);
     }
+    // pop all globals
     lua_pop(state, 3);
     return 0;
-
-Lerr:
-    return -1;
 }
 
-int my_lua_hwserver_dev_close(lua_State *state)
+int my_lua_dev_open(lua_State *state)
 {
     int n = lua_gettop(state);
     if(n != 1)
-        luaL_error(state, "hwserver_dev_close takes one argument");
+        luaL_error(state, "open_dev takes one argument");
     int32_t id = lua_tointeger(state, -1);
-    devid = -1;
-    return hwserver_dev_close(g_hwdev, id);
+    if(id < 0 || (size_t)id >= g_devlist.size())
+        luaL_error(state, "invalid device id");
+    std::shared_ptr<handle> h;
+    error ret = g_devlist[id]->open(h);
+    if(ret != error::SUCCESS)
+        luaL_error(state, "Cannot open device: %s. The current device was NOT changed.\n", error_string(ret).c_str());
+    else
+        g_hwdev = h;
+    if(update_dev_lua_state(state) < 0)
+        return -1;
+    if(luaL_dostring(state, "init()"))
+        luaL_error(state, "error in init: %s\n", lua_tostring(state, -1));
+    lua_pop(state, lua_gettop(state));
+    return 0;
+}
+
+int my_lua_dev_close(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 0)
+        luaL_error(state, "close_dev takes no argument");
+    std::shared_ptr<device> dev;
+    error ret = g_hwctx->get_dummy_device(dev);
+    if(ret != error::SUCCESS)
+        luaL_error(state, "Cannot get dummy device: %s. The current device was NOT closed.\n", error_string(ret).c_str());
+    std::shared_ptr<handle> h;
+    ret = dev->open(h);
+    if(ret != error::SUCCESS)
+        luaL_error(state, "Cannot open dummy device: %s. The current device was NOT changed.\n", error_string(ret).c_str());
+    else
+        g_hwdev = h;
+    return update_dev_lua_state(state);
 }
 
 bool my_lua_import_hwstub()
@@ -651,7 +710,7 @@ bool my_lua_import_hwstub()
 
     lua_newtable(g_lua); // help
     lua_pushinteger(g_lua, 1);
-    lua_pushstring(g_lua, "This is the help for hwstub_tool. This tools uses Lua to interpret commands.");
+    lua_pushstring(g_lua, "This is the help for tool. This tools uses Lua to interpret commands.");
     lua_settable(g_lua, -3);
     lua_pushinteger(g_lua, 2);
     lua_pushstring(g_lua, "You can get help by running help(). Help is organised in topics and subtopics and so on.");
@@ -667,16 +726,17 @@ bool my_lua_import_hwstub()
     lua_pushcclosure(g_lua, my_lua_udelay, 0);
     lua_setfield(g_lua, -2, "udelay");
 
+    lua_pushcfunction(g_lua, my_lua_get_dev_list);
+    lua_setfield(g_lua, -2, "get_dev_list");
+
+    lua_pushcclosure(g_lua, my_lua_dev_open, 0);
+    lua_setfield(g_lua, -2, "open_dev");
+
+    lua_pushcclosure(g_lua, my_lua_dev_close, 0);
+    lua_setfield(g_lua, -2, "close_dev");
+
     lua_setglobal(g_lua, "hwstub");
 
-    lua_pushcfunction(g_lua, my_lua_hwserver_get_dev_list);
-    lua_setglobal(g_lua, "hwserver_get_dev_list");
-
-    lua_pushcclosure(g_lua, my_lua_hwserver_dev_open, 0);
-    lua_setglobal(g_lua, "hwserver_dev_open");
-
-    lua_pushcclosure(g_lua, my_lua_hwserver_dev_close, 0);
-    lua_setglobal(g_lua, "hwserver_dev_close");
     lua_pushcfunction(g_lua, my_lua_help);
     lua_setglobal(g_lua, "help");
 
@@ -685,6 +745,8 @@ bool my_lua_import_hwstub()
 
     lua_pushcfunction(g_lua, my_lua_quit);
     lua_setglobal(g_lua, "quit");
+    
+    update_dev_lua_state(g_lua);
 
     if(lua_gettop(g_lua) != oldtop)
     {
@@ -1055,10 +1117,10 @@ bool my_lua_import_soc(std::vector< soc_desc::soc_t >& socs)
 
 void usage(void)
 {
-    printf("hwstub_shell, compiled with hwstub protocol %d.%d\n",
+    printf("shell, compiled with hwstub protocol %d.%d\n",
         HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR);
     printf("\n");
-    printf("usage: hwstub_shell [options] <soc desc files>\n");
+    printf("usage: shell [options] <soc desc files>\n");
     printf("options:\n");
     printf("  --help/-?       Display this help\n");
     printf("  --quiet/-q      Quiet non-command messages\n");
@@ -1067,7 +1129,7 @@ void usage(void)
     printf("  -f <file>       Execute <file> at startup\n");
     printf("  --dev/-d <uri>  Device URI\n");
     printf("Relative order of -e and -f commands are preserved.\n");
-    hwstub_usage_uri(stdout);
+    //usage_uri(stdout);
     exit(1);
 }
 
@@ -1138,13 +1200,25 @@ int main(int argc, char **argv)
     }
 
     /* create usb context */
-    libusb_context *ctx = NULL;
-//    libusb_init(&ctx);
-//    libusb_set_debug(ctx, 3);
-    g_hwdev = hwstub_open_tcp("localhost", "8888");//hwstub_open_uri(ctx, stdout, dev_uri);
-    if(g_hwdev == NULL)
+    libusb_init(nullptr);
+    g_hwctx = usb::context::create(nullptr, true); // cleanup context on exit
+    std::vector<std::shared_ptr<device>> list;
+    error ret = g_hwctx->get_device_list(list);
+    if(ret != error::SUCCESS)
     {
-        printf("Cannot open device!\n");
+        printf("Cannot get device list: %s\n", error_string(ret).c_str());
+        return 1;
+    }
+    if(list.size() == 0)
+    {
+        printf("No hwstub device detected!\n");
+        return 1;
+    }
+    /* open first device */
+    ret = list[0]->open(g_hwdev);
+    if(ret != error::SUCCESS)
+    {
+        printf("Cannot open device: %s\n", error_string(ret).c_str());
         return 1;
     }
 
@@ -1172,7 +1246,10 @@ int main(int argc, char **argv)
 
     /** start interactive mode */
     if(!g_quiet)
+    {
         printf("Starting interactive lua session. Type 'help()' to get some help\n");
+        luaL_dostring(g_lua, "hwstub.info()");
+    }
 
     /** run startup commands */
     for(size_t i = 0; i < startup_cmds.size(); i++)
@@ -1195,6 +1272,5 @@ int main(int argc, char **argv)
     if(!g_quiet)
         printf("Device log:\n");
     print_log(g_hwdev);
-    hwstub_release(g_hwdev);
     return 1;
 }
