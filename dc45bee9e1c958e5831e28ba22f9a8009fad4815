@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bab6814e_70fc103f",
+        "filename": "utils/hwstub/lib/hwstub.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-23T13:35:12Z",
+      "side": 1,
+      "message": "Yes, this is written in the doc of the function.",
+      "parentUuid": "bab6814e_10d824ef",
+      "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bab6814e_b0edd890",
         "filename": "utils/hwstub/lib/hwstub.hpp",
         "patchSetId": 1
@@ -47,6 +65,24 @@
       "writtenOn": "2015-10-23T11:52:16Z",
       "side": 1,
       "message": "What is actuall difference between open() and do_open()? The prototypes are the same. This confusing.",
+      "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_50f90c4d",
+        "filename": "utils/hwstub/lib/hwstub.hpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-23T13:35:12Z",
+      "side": 1,
+      "message": "This is all written in the comments: do_open() does the actual opening, open() manages the fact that so devies may only be opened once with do_open(), in which case some more work is needed. Anyway, do_open() is protected and implementation dependent.",
+      "parentUuid": "bab6814e_f0e760aa",
       "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -87,6 +123,24 @@
     },
     {
       "key": {
+        "uuid": "bab6814e_b094b8e8",
+        "filename": "utils/hwstub/lib/hwstub_usb.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-23T13:35:12Z",
+      "side": 1,
+      "message": "Yes, I will when the context has support for hotplug (at the moment it does nothing).",
+      "parentUuid": "bab6814e_3002883f",
+      "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bab6814e_50e2aca0",
         "filename": "utils/hwstub/tools/hwstub_test.cpp",
         "patchSetId": 1
@@ -104,6 +158,24 @@
     },
     {
       "key": {
+        "uuid": "bab6814e_9099b422",
+        "filename": "utils/hwstub/tools/hwstub_test.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-23T13:35:12Z",
+      "side": 1,
+      "message": "why ?",
+      "parentUuid": "bab6814e_50e2aca0",
+      "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bab6814e_d0ecdc91",
         "filename": "utils/hwstub/tools/hwstub_test.cpp",
         "patchSetId": 1
@@ -115,6 +187,24 @@
       "writtenOn": "2015-10-23T11:52:16Z",
       "side": 1,
       "message": "Is this expected mechanism to keep g_devlist updated? Shouldn\u0027t context creation spawn thread to do that?",
+      "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f09e4006",
+        "filename": "utils/hwstub/tools/hwstub_test.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2015-10-23T13:35:12Z",
+      "side": 1,
+      "message": "I don\u0027t know yet. Maybe the context will have an helper function to poll regularly if hotplug is unsupported.",
+      "parentUuid": "bab6814e_d0ecdc91",
       "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
