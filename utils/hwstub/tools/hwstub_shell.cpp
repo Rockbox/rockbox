@@ -45,7 +45,7 @@ using namespace soc_desc_v1;
  */
 bool g_quiet = false;
 bool g_exit = false;
-struct hwstub_device_t *g_hwdev;
+hwstub_device_t *g_hwdev;
 struct hwstub_version_desc_t g_hwdev_ver;
 struct hwstub_layout_desc_t g_hwdev_layout;
 struct hwstub_target_desc_t g_hwdev_target;
@@ -98,7 +98,7 @@ void my_lua_print_stack(lua_State *state = 0, int up_to = 0)
  * hw specific
  */
 
-void print_log(struct hwstub_device_t *hwdev)
+void print_log(hwstub_device_t *hwdev)
 {
     do
     {
