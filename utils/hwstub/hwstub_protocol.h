@@ -21,6 +21,12 @@
 #ifndef __HWSTUB_PROTOCOL__
 #define __HWSTUB_PROTOCOL__
 
+#include <stdint.h>
+
+/**
+ * This file contains the data structures used in the USB and TCP protocol.
+ */
+
 /**
  * HWStub protocol version
  */
@@ -130,19 +136,16 @@ struct hwstub_target_desc_t
 } __attribute__((packed));
 
 /**
- * TCP command packet
+ * Socket command packet header: any transfer (in both directions) start with this.
+ * All data is transmitted in network byte order.
  */
-struct dev_info_t {
-    int32_t id;
-    struct hwstub_target_desc_t hwdesc;
-};
+#define HWSTUB_NET_ARGS 4
 
-struct hwstub_tcp_cmd_t
+struct hwstub_net_hdr_t
 {
-    int32_t id;
-    uint32_t cmd;
-    uint32_t addr;
-    uint32_t len;
+    uint32_t cmd; /* command (OR'ed with (N)ACK on response) */
+    uint32_t length; /* length of the data following this header */
+    uint32_t args[HWSTUB_NET_ARGS]; /* command arguments */
 } __attribute__((packed));
 
 /**
@@ -151,58 +154,31 @@ struct hwstub_tcp_cmd_t
  * These commands are sent to the interface, using the standard bRequest field
  * of the SETUP packet. The wIndex contains the interface number. The wValue
  * contains an ID which is used for requests requiring several transfers.
- *
- * The ACK and NACK commands are for TCP only.
  */
+#define HWSTUB_GET_LOG              0x40
+#define HWSTUB_READ                 0x41
+#define HWSTUB_READ2                0x42
+#define HWSTUB_WRITE                0x43
+#define HWSTUB_EXEC                 0x44
+#define HWSTUB_READ2_ATOMIC         0x45
+#define HWSTUB_WRITE_ATOMIC         0x46
+#define HWSTUB_GET_DESC             0x48
+
+/* the following commands and the ACK/NACK mechanism are net only */
 #define HWSTUB_ACK(n) (0x100|(n))
 #define HWSTUB_ACK_MASK 0x100
 #define HWSTUB_NACK(n) (0x200|(n))
 
-#define HWSTUB_GET_LOG              0x40
-#define HWSTUB_GET_LOG_ACK          HWSTUB_ACK(HWSTUB_GET_LOG)
-#define HWSTUB_GET_LOG_NACK         HWSTUB_NACK(HWSTUB_GET_LOG)
+#define HWSERVER_HELLO              0x400
+#define HWSERVER_GET_DEV_LIST       0x401
+#define HWSERVER_DEV_OPEN           0x402
+#define HWSERVER_DEV_CLOSE          0x403
 
-#define HWSTUB_READ                 0x41
-#define HWSTUB_READ2                0x42
-#define HWSTUB_READ2_ACK            HWSTUB_ACK(HWSTUB_READ2)
-#define HWSTUB_READ2_NACK           HWSTUB_NACK(HWSTUB_READ2)
-
-#define HWSTUB_WRITE                0x43
-#define HWSTUB_WRITE_ACK            HWSTUB_ACK(HWSTUB_WRITE)
-#define HWSTUB_WRITE_NACK           HWSTUB_NACK(HWSTUB_WRITE)
-
-#define HWSTUB_EXEC                 0x44
-#define HWSTUB_EXEC_ACK             HWSTUB_ACK(HWSTUB_EXEC)
-#define HWSTUB_EXEC_NACK            HWSTUB_NACK(HWSTUB_EXEC)
-
-#define HWSTUB_READ2_ATOMIC         0x45
-#define HWSTUB_READ2_ATOMIC_ACK     HWSTUB_ACK(HWSTUB_READ2_ATOMIC)
-#define HWSTUB_READ2_ATOMIC_NACK    HWSTUB_NACK(HWSTUB_READ2_ATOMIC)
-
-#define HWSTUB_WRITE_ATOMIC         0x46
-#define HWSTUB_WRITE_ATOMIC_ACK     HWSTUB_ACK(HWSTUB_WRITE_ATOMIC)
-#define HWSTUB_WRITE_ATOMIC_NACK    HWSTUB_NACK(HWSTUB_WRITE_ATOMIC)
-
-#define HWSTUB_GET_DESC             0x48
-#define HWSTUB_GET_DESC_ACK         HWSTUB_ACK(HWSTUB_GET_DESC)
-#define HWSTUB_GET_DESC_NACK        HWSTUB_NACK(HWSTUB_GET_DESC)
-
-#define HWSERVER_GET_DEV_LIST       0x400
-#define HWSERVER_GET_DEV_LIST_ACK   HWSTUB_ACK(HWSERVER_GET_DEV_LIST)
-
-#define HWSERVER_DEV_OPEN           0x401
-#define HWSERVER_DEV_OPEN_ACK       HWSTUB_ACK(HWSERVER_DEV_OPEN)
-#define HWSERVER_DEV_OPEN_NACK      HWSTUB_NACK(HWSERVER_DEV_OPEN)
-
-#define HWSERVER_DEV_CLOSE          0x402
-#define HWSERVER_DEV_CLOSE_ACK      HWSTUB_ACK(HWSERVER_DEV_CLOSE)
-#define HWSERVER_DEV_CLOSE_NACK     HWSTUB_NACK(HWSERVER_DEV_CLOSE)
-
+/* net errors (always in arg[0] if command is NACKed) */
 #define HWERR_OK            0    /* success */
-#define HWERR_FAIL         -1    /* general error from hwstub */
-#define HWERR_INVALID_ID   -2    /* invalid id of the device */
-#define HWERR_NOT_OPEN     -3    /* device present but not opened */
-#define HWERR_DISCONNECTED -4    /* device got disconnected */
+#define HWERR_FAIL          1    /* general error from hwstub */
+#define HWERR_INVALID_ID    2    /* invalid id of the device */
+#define HWERR_DISCONNECTED  3    /* device got disconnected */
 
 /**
  * HWSTUB_GET_LOG:
@@ -226,7 +202,7 @@ struct hwstub_read_req_t
 } __attribute__((packed));
 
 /**
- * HWSTUB_WRITE
+ * HWSTUB_WRITE:
  * Write a range of memory. The payload starts with the following header, everything
  * which follows is data.
  * HWSTUB_WRITE_ATOMIC behaves the same except it is atomic. See HWSTUB_READ2_ATOMIC.
@@ -252,5 +228,20 @@ struct hwstub_exec_req_t
     uint32_t dAddress;
     uint16_t bmFlags;
 } __attribute__((packed));
+
+/**
+ * HWSERVER_HELLO:
+ * Say hello to the server, give protocol version and get server version.
+ * Send: args[0] = major << 8 | minor, no data
+ * Receive: args[0] = major << 8 | minor, no data
+ */
+
+/**
+ * HWSERVER_GET_DEV_LIST:
+ * Get device list.
+ * Send: no argument, no data.
+ * Receive: no argument, data contains a list of device IDs, each ID is a uint32_t
+ *          transmitted in network byte order.
+ */
 
 #endif /* __HWSTUB_PROTOCOL__ */

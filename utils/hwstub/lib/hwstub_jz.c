@@ -20,10 +20,6 @@
  ****************************************************************************/
 #include "hwstub_internal.h"
 
-#ifndef MIN
-#define MIN(a,b) ((a) <= (b) ? (a) : (b))
-#endif
-
 struct hwstub_jz_device_t
 {
     struct hwstub_device_t dev;
