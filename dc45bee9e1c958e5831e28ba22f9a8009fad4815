@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_10d824ef",
+        "filename": "utils/hwstub/lib/hwstub.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2015-10-23T11:52:16Z",
+      "side": 1,
+      "message": "That means that caller is responsible for unreferencing this when not needed, right?",
+      "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_b0edd890",
+        "filename": "utils/hwstub/lib/hwstub.hpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2015-10-23T11:52:16Z",
+      "side": 1,
+      "message": "IMO this should be in separate header file like hwstub_usb.hpp",
+      "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f0e760aa",
+        "filename": "utils/hwstub/lib/hwstub.hpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2015-10-23T11:52:16Z",
+      "side": 1,
+      "message": "What is actuall difference between open() and do_open()? The prototypes are the same. This confusing.",
+      "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_90f2546e",
+        "filename": "utils/hwstub/lib/hwstub.hpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2015-10-23T11:52:16Z",
+      "side": 1,
+      "message": "IMO should be in hwstub_usb.hpp or something",
+      "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_3002883f",
+        "filename": "utils/hwstub/lib/hwstub_usb.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2015-10-23T11:52:16Z",
+      "side": 1,
+      "message": "return libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG);",
+      "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_50e2aca0",
+        "filename": "utils/hwstub/tools/hwstub_test.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2015-10-23T11:52:16Z",
+      "side": 1,
+      "message": "g_ctx should be checked if not NULL",
+      "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_d0ecdc91",
+        "filename": "utils/hwstub/tools/hwstub_test.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2015-10-23T11:52:16Z",
+      "side": 1,
+      "message": "Is this expected mechanism to keep g_devlist updated? Shouldn\u0027t context creation spawn thread to do that?",
+      "revId": "dc45bee9e1c958e5831e28ba22f9a8009fad4815",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
