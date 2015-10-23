@@ -18,13 +18,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "hwstub.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include "hwstub.hpp"
+#include "hwstub_usb.hpp"
 
 struct player_info_t
 {
@@ -102,7 +103,7 @@ bool could_be_rockbox(unsigned char *buffer, size_t size)
 
 void usage(void)
 {
-    printf("usage: hwstub_load [options] <addr> <file>\n");
+    printf("usage: hwstub::load [options] <addr> <file>\n");
     printf("options:\n");
     printf("  --help/-?       Display this help\n");
     printf("  --quiet/-q      Quiet output\n");
@@ -116,14 +117,13 @@ void usage(void)
     for(int i = 0; players[i].name; i++)
         printf(" %s", players[i].name);
     printf("\n");
-    hwstub_usage_uri(stdout);
+    //hwstub::usage_uri(stdout);
     exit(1);
 }
 
 int main(int argc, char **argv)
 {
     bool quiet = false;
-    struct hwstub_device_t *hwdev;
     enum image_type_t type = IT_DETECT;
     const char *uri = "usb:";
 
@@ -227,26 +227,38 @@ int main(int argc, char **argv)
     }
 
     // create usb context
-    libusb_context *ctx;
-    libusb_init(&ctx);
-    libusb_set_debug(ctx, 3);
-
-    hwdev = hwstub_open_uri(ctx, stdout, uri);
-    if(hwdev == NULL)
+    std::shared_ptr<hwstub::context> hwctx = hwstub::usb::context::create(nullptr, true); // cleanup context on exit
+    std::vector<std::shared_ptr<hwstub::device>> list;
+    hwstub::error ret = hwctx->get_device_list(list);
+    if(ret != hwstub::error::SUCCESS)
     {
-        fprintf(stderr, "Cannot open device!\n");
+        printf("Cannot get device list: %d\n", (int)ret);
+        return 1;
+    }
+    if(list.size() == 0)
+    {
+        printf("No hwstub device detected!\n");
+        return 1;
+    }
+    /* open first device */
+    std::shared_ptr<hwstub::handle> hwdev;
+    ret = list[0]->open(hwdev);
+    if(ret != hwstub::error::SUCCESS)
+    {
+        printf("Cannot open device: %d\n", (int)ret);
         return 1;
     }
 
-    int ret = hwstub_rw_mem(hwdev, 0, addr, buffer, size);
-    if(ret != (int)size)
+    size_t out_size = size;
+    ret = hwdev->write(addr, buffer, out_size, false);
+    if(ret != hwstub::error::SUCCESS || out_size != size)
     {
-        fprintf(stderr, "Image write failed: %d\n", ret);
+        fprintf(stderr, "Image write failed: %s, %zu/%zu\n", error_string(ret).c_str(),
+            out_size, size);
         goto Lerr;
     }
-    hwstub_jump(hwdev, addr);
+    hwdev->exec(addr, HWSTUB_EXEC_JUMP);
 
-    hwstub_release(hwdev);
     return 0;
 
     Lerr:
@@ -255,13 +267,13 @@ int main(int argc, char **argv)
     do
     {
         char buffer[128];
-        int length = hwstub_get_log(hwdev, buffer, sizeof(buffer) - 1);
-        if(length <= 0)
+        size_t size = sizeof(buffer) - 1;
+        hwstub::error err = hwdev->get_log(buffer, size);
+        if(err != hwstub::error::SUCCESS)
             break;
-        buffer[length] = 0;
+        buffer[size] = 0;
         fprintf(stderr, "%s", buffer);
     }while(1);
-    hwstub_release(hwdev);
     return 1;
 }
  
