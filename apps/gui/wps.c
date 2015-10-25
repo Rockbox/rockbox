@@ -915,13 +915,10 @@ long gui_wps_show(void)
 #ifdef AB_REPEAT_ENABLE
                 /* if we're in A/B repeat mode and the current position
                    is past the A marker, jump back to the A marker... */
-                if ( ab_repeat_mode_enabled() )
+                if ( ab_repeat_mode_enabled() && ab_after_A_marker(state->id3->elapsed) )
                 {
-                    if ( ab_after_A_marker(state->id3->elapsed) )
-                    {
-                        ab_jump_to_A_marker();
-                        break;
-                    }
+                    ab_jump_to_A_marker();
+                    break;
                 }
                 else
                 /* ...otherwise, do it normally */
