@@ -22,6 +22,47 @@
       "revId": "ce26212138d53147e3e2e91f7b864d5deada344f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_904ed494",
+        "filename": "apps/gui/wps.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 917,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2015-11-10T13:26:48Z",
+      "side": 1,
+      "message": "See below...",
+      "parentUuid": "bab6814e_7081b08f",
+      "range": {
+        "startLine": 917,
+        "startChar": 70,
+        "endLine": 917,
+        "endChar": 72
+      },
+      "revId": "ce26212138d53147e3e2e91f7b864d5deada344f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bab6814e_f043e06a",
+        "filename": "apps/gui/wps.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2015-11-10T13:26:48Z",
+      "side": 1,
+      "message": "This should be executed, if ab-repeat is enabled and the current playback position is before the A marker. In the original code however, the whole else branch is skipped whenever ab-repeat is enabled, so this line can never be reached.",
+      "revId": "ce26212138d53147e3e2e91f7b864d5deada344f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
