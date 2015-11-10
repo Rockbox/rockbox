@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bab6814e_7081b08f",
+        "filename": "apps/gui/wps.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 917,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2015-11-10T08:24:49Z",
+      "side": 1,
+      "message": "Honestly I can\u0027t see logical difference betwee this two\nnested ifs are equivalent to logical and so whats the deal?",
+      "range": {
+        "startLine": 917,
+        "startChar": 70,
+        "endLine": 917,
+        "endChar": 72
+      },
+      "revId": "ce26212138d53147e3e2e91f7b864d5deada344f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
