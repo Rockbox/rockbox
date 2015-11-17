@@ -37,21 +37,21 @@ end
 -- specified number of miliseconds before stoping DSP
 -- Then you can inspect DSP memories from MIPS side
 function ATJ.dsp.run(msec)
-    DSP.stop()
-    DSP.start()
+    ATJ.dsp.stop()
+    ATJ.dsp.start()
     hwstub.mdelay(msec)
-    DSP.stop()
+    ATJ.dsp.stop()
 end
 
 -- Clear DSP program memory
 function ATJ.dsp.clearPM()
-    DSP.stop()
+    ATJ.dsp.stop()
     for i=0,16*1024-1,4 do DEV.write32(0xb4040000+i, 0) end
 end
 
 -- Clear DSP data memory
 function ATJ.dsp.clearDM()
-    DSP.stop()
+    ATJ.dsp.stop()
     for i=0,16*1024-1,4 do DEV.write32(0xb4050000+i, 0) end
 end
 
@@ -83,9 +83,9 @@ function ATJ.dsp.prog(opcodes, base, type)
     end
 
     local offset=0
-    DSP.stop()
+    ATJ.dsp.stop()
     for i,opcode in ipairs(opcodes) do
-        DSP.write(base+4*offset, opcode)
+        ATJ.dsp.write(base+4*offset, opcode)
         offset=offset+1
     end
 end
@@ -112,7 +112,7 @@ function ATJ.dsp.progfile(path)
         -- Search for header describing target memory
         if string.find(line, '@PA') ~= nil then
             type = 'p'
-        elseif string.find(line, '@PD' ~= nil) then
+        elseif string.find(line, '@PD') ~= nil then
             type = 'd'
          end
 
@@ -148,7 +148,7 @@ function ATJ.dsp.progfile(path)
              end
 
              -- Write to DSP memory
-             DSP.prog(opcodes, addr, type)
+             ATJ.dsp.prog(opcodes, addr, type)
              opcodes={}
              addr = nil
              type = nil
