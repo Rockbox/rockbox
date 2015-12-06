@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7aa08908_4e1a1370",
+        "filename": "firmware/target/hosted/android/pcm-android.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1000348
+      },
+      "writtenOn": "2015-12-06T04:17:32Z",
+      "side": 1,
+      "message": "this function is called by jni_call, I think should be static void.",
+      "revId": "ac770444289852d983cc8f79178838aa4b06822c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
