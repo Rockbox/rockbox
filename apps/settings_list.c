@@ -159,7 +159,7 @@
 /*  for settings which use the set_int() setting screen.
     unit is the UNIT_ define to display/talk.
     the first one saves a string to the config file,
-    the second one saves the variable value to the config file */    
+    the second one saves the variable value to the config file */
 #define INT_SETTING_W_CFGVALS(flags, var, lang_id, default, name, cfg_vals, \
                     unit, min, max, step, formatter, get_talk_id, cb)       \
             {flags|F_INT_SETTING|F_T_INT, &global_settings.var,             \
@@ -864,7 +864,7 @@ const struct settings_list settings[] = {
                   MAX_CONTRAST_SETTING, 1, NULL, NULL }}}},
 #endif
 #ifdef HAVE_BACKLIGHT
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_timeout, LANG_BACKLIGHT, 
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_timeout, LANG_BACKLIGHT,
                     DEFAULT_BACKLIGHT_TIMEOUT,
                   "backlight timeout", off_on, UNIT_SEC, backlight_formatter,
                   backlight_getlang, backlight_set_timeout, 20,
@@ -957,7 +957,7 @@ const struct settings_list settings[] = {
                   0,1,2,3,4,5,6,7,8,9,10,15,30,45,60),
     SYSTEM_SETTING(NVRAM(4), runtime, 0),
     SYSTEM_SETTING(NVRAM(4), topruntime, 0),
-    INT_SETTING(F_BANFROMQS, max_files_in_playlist, 
+    INT_SETTING(F_BANFROMQS, max_files_in_playlist,
                 LANG_MAX_FILES_IN_PLAYLIST,
 #if MEMORYSIZE > 1
                   10000,
@@ -1351,7 +1351,7 @@ const struct settings_list settings[] = {
                    ID2P(LANG_TIME), ID2P(LANG_FILESIZE)),
     {F_T_INT|F_RECSETTING, &global_settings.rec_source, LANG_RECORDING_SOURCE,
         INT(0), "rec source",
-        &HAVE_MIC_REC_(",mic") 
+        &HAVE_MIC_REC_(",mic")
         HAVE_LINE_REC_(",line")
         HAVE_SPDIF_REC_(",spdif")
         HAVE_FMRADIO_REC_(",fmradio")[1],
@@ -1427,17 +1427,17 @@ const struct settings_list settings[] = {
     INT_SETTING(F_RECSETTING, rec_stop_thres_linear, LANG_RECORD_STOP_THRESHOLD, 10,
         "trigger stop threshold linear", UNIT_PERCENT, 0, 100, 1, NULL, NULL, NULL),
     TABLE_SETTING(F_RECSETTING, rec_start_duration, LANG_MIN_DURATION, 0,
-        "trigger start duration", 
+        "trigger start duration",
         "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min",
         UNIT_SEC, NULL, NULL, NULL, 13,
         0,1,2,5,10,15,20,25,30,60,120,300,600),
     TABLE_SETTING(F_RECSETTING, rec_stop_postrec, LANG_MIN_DURATION, 0,
-        "trigger stop duration", 
+        "trigger stop duration",
         "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min",
         UNIT_SEC, NULL, NULL, NULL, 13,
         0,1,2,5,10,15,20,25,30,60,120,300,600),
     TABLE_SETTING(F_RECSETTING, rec_stop_gap, LANG_RECORD_STOP_GAP, 1,
-        "trigger min gap", 
+        "trigger min gap",
         "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min",
         UNIT_SEC, NULL, NULL, NULL, 13,
         0,1,2,5,10,15,20,25,30,60,120,300,600),
@@ -1469,7 +1469,7 @@ const struct settings_list settings[] = {
                  LANG_SET_BOOL_YES, LANG_SET_BOOL_NO, NULL),
 
 #ifdef HAVE_TAGCACHE
-#if CONFIG_CODEC == SWCODEC 
+#if CONFIG_CODEC == SWCODEC
     BOOL_SETTING(0, autoresume_enable, LANG_AUTORESUME, false,
                  "autoresume enable", off_on,
                  LANG_SET_BOOL_YES, LANG_SET_BOOL_NO, NULL),
@@ -1482,7 +1482,7 @@ const struct settings_list settings[] = {
                    ID2P(LANG_AUTORESUME_CUSTOM)),
     TEXT_SETTING(0, autoresume_paths, "autoresume next track paths",
                  "/podcast:/podcasts", NULL, NULL),
-#endif                  
+#endif
 
     OFFON_SETTING(0, runtimedb, LANG_RUNTIMEDB_ACTIVE, false,
                   "gather runtime data", NULL),
@@ -1564,115 +1564,32 @@ const struct settings_list settings[] = {
                        "eq precut", UNIT_DB, 0, 240, 1, eq_precut_format,
                        get_precut_talkid, dsp_set_eq_precut),
 
-    /* 0..32768 Hz */
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[0].cutoff, LANG_EQUALIZER_BAND_CUTOFF,
-                       32, "eq band 0 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[1].cutoff, LANG_EQUALIZER_BAND_CENTER,
-                       64, "eq band 1 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[2].cutoff, LANG_EQUALIZER_BAND_CENTER,
-                       125, "eq band 2 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[3].cutoff, LANG_EQUALIZER_BAND_CENTER,
-                       250, "eq band 3 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[4].cutoff, LANG_EQUALIZER_BAND_CENTER,
-                       500, "eq band 4 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[5].cutoff, LANG_EQUALIZER_BAND_CENTER,
-                       1000, "eq band 5 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[6].cutoff, LANG_EQUALIZER_BAND_CENTER,
-                       2000, "eq band 6 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[7].cutoff, LANG_EQUALIZER_BAND_CENTER,
-                       4000, "eq band 7 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[8].cutoff, LANG_EQUALIZER_BAND_CENTER,
-                       8000, "eq band 8 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[9].cutoff, LANG_EQUALIZER_BAND_CUTOFF,
-                       16000, "eq band 9 cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN,
-                       EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL),
-    /* 0..64 (or 0.0 to 6.4) */
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[0].q, LANG_EQUALIZER_BAND_Q, 7,
-                       "eq band 0 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[1].q, LANG_EQUALIZER_BAND_Q, 10,
-                       "eq band 1 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[2].q, LANG_EQUALIZER_BAND_Q, 10,
-                       "eq band 2 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[3].q, LANG_EQUALIZER_BAND_Q, 10,
-                       "eq band 3 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[4].q, LANG_EQUALIZER_BAND_Q, 10,
-                       "eq band 4 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[5].q, LANG_EQUALIZER_BAND_Q, 10,
-                       "eq band 5 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[6].q, LANG_EQUALIZER_BAND_Q, 10,
-                       "eq band 6 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[7].q, LANG_EQUALIZER_BAND_Q, 10,
-                       "eq band 7 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[8].q, LANG_EQUALIZER_BAND_Q, 10,
-                       "eq band 8 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[9].q, LANG_EQUALIZER_BAND_Q, 7,
-                       "eq band 9 q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP,
-                       eq_q_format, get_dec_talkid, NULL),
-    /* -240..240 (or -24db to +24db) */
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[0].gain, LANG_GAIN, 0,
-                       "eq band 0 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[1].gain, LANG_GAIN, 0,
-                       "eq band 1 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[2].gain, LANG_GAIN, 0,
-                       "eq band 2 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[3].gain, LANG_GAIN, 0,
-                       "eq band 3 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[4].gain, LANG_GAIN, 0,
-                       "eq band 4 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[5].gain, LANG_GAIN, 0,
-                       "eq band 5 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[6].gain, LANG_GAIN, 0,
-                       "eq band 6 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[7].gain, LANG_GAIN, 0,
-                       "eq band 7 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[8].gain, LANG_GAIN, 0,
-                       "eq band 8 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
-    INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[9].gain, LANG_GAIN, 0,
-                       "eq band 9 gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX,
-                       EQ_GAIN_STEP, db_format, get_dec_talkid, NULL),
 
-#define EQ_BAND(id, string) \
+#define EQ_BAND(id, default_cutoff, default_q, default_gain, name_string) \
+        INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[id].cutoff, LANG_EQUALIZER_BAND_CUTOFF, \
+                   default_cutoff, "eq band"#id"cutoff", UNIT_HERTZ, EQ_CUTOFF_MIN, \
+                   EQ_CUTOFF_MAX, EQ_CUTOFF_STEP, NULL, NULL, NULL), \
+        INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[id].q, LANG_EQUALIZER_BAND_Q, default_q, \
+                   "eq band"#id"q", UNIT_INT, EQ_Q_MIN, EQ_Q_MAX, EQ_Q_STEP, \
+                    eq_q_format, get_dec_talkid, NULL), \
+        INT_SETTING_NOWRAP(F_DEPRECATED|F_EQSETTING, eq_band_settings[id].gain, LANG_GAIN, default_gain, \
+                    "eq band"#id"gain", UNIT_DB, EQ_GAIN_MIN, EQ_GAIN_MAX, \
+                    EQ_GAIN_STEP, db_format, get_dec_talkid, NULL), \
         CUSTOM_SETTING(F_EQSETTING, eq_band_settings[id], -1,   \
-                  &eq_defaults[id], string,                     \
+                  &eq_defaults[id], name_string,                     \
                   eq_load_from_cfg, eq_write_to_cfg,            \
                   eq_is_changed, eq_set_default)
-    EQ_BAND(0, "eq low shelf filter"),
-    EQ_BAND(1, "eq peak filter 1"),
-    EQ_BAND(2, "eq peak filter 2"),
-    EQ_BAND(3, "eq peak filter 3"),
-    EQ_BAND(4, "eq peak filter 4"),
-    EQ_BAND(5, "eq peak filter 5"),
-    EQ_BAND(6, "eq peak filter 6"),
-    EQ_BAND(7, "eq peak filter 7"),
-    EQ_BAND(8, "eq peak filter 8"),
-    EQ_BAND(9, "eq high shelf filter"),
+    /* cutoff: 0..32768 Hz, q: 0..64 (or 0.0 to 6.4), gain: -240..240 (or -24db to +24db) */
+    EQ_BAND(0, 32,     7, 0, "eq low shelf filter"),
+    EQ_BAND(1, 64,    10, 0, "eq peak filter 1"),
+    EQ_BAND(2, 125,   10, 0, "eq peak filter 2"),
+    EQ_BAND(3, 250,   10, 0, "eq peak filter 3"),
+    EQ_BAND(4, 500,   10, 0, "eq peak filter 4"),
+    EQ_BAND(5, 1000,  10, 0, "eq peak filter 5"),
+    EQ_BAND(6, 2000,  10, 0, "eq peak filter 6"),
+    EQ_BAND(7, 4000,  10, 0, "eq peak filter 7"),
+    EQ_BAND(8, 8000,  10, 0, "eq peak filter 8"),
+    EQ_BAND(9, 16000,  7, 0, "eq high shelf filter"),
 #undef EQ_BAND
 
     /* dithering */
@@ -1741,11 +1658,11 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(F_SOUNDSETTING|F_NO_WRAP, compressor_settings.knee,
                    LANG_COMPRESSOR_KNEE, 1, "compressor knee",
                    "hard knee,soft knee", compressor_set, 2,
-                   ID2P(LANG_COMPRESSOR_HARD_KNEE), ID2P(LANG_COMPRESSOR_SOFT_KNEE)), 
+                   ID2P(LANG_COMPRESSOR_HARD_KNEE), ID2P(LANG_COMPRESSOR_SOFT_KNEE)),
     INT_SETTING_NOWRAP(F_SOUNDSETTING, compressor_settings.attack_time,
                        LANG_COMPRESSOR_ATTACK, 5,
                        "compressor attack time", UNIT_MS, 0, 30,
-                       5, NULL, NULL, compressor_set),                  
+                       5, NULL, NULL, compressor_set),
     INT_SETTING_NOWRAP(F_SOUNDSETTING, compressor_settings.release_time,
                        LANG_COMPRESSOR_RELEASE, 500,
                        "compressor release time", UNIT_MS, 100, 1000,
@@ -1933,38 +1850,38 @@ const struct settings_list settings[] = {
                   UNIT_SEC, formatter_unit_0_is_skip_track,
                   getlang_unit_0_is_skip_track, NULL,
                   19, -1,0,1,2,3,5,7,10,15,20,30,45,60,90,120,180,300,600,900),
-    CHOICE_SETTING(0, start_in_screen, LANG_START_SCREEN, 1, 
+    CHOICE_SETTING(0, start_in_screen, LANG_START_SCREEN, 1,
                    "start in screen", "previous,root,files,"
-#ifdef HAVE_TAGCACHE 
+#ifdef HAVE_TAGCACHE
 #define START_DB_COUNT 1
                    "db,"
-#else 
+#else
 #define START_DB_COUNT 0
 #endif
                    "wps,menu,"
 #ifdef HAVE_RECORDING
 #define START_REC_COUNT 1
                    "recording,"
-#else 
+#else
 #define START_REC_COUNT 0
 #endif
 #if CONFIG_TUNER
 #define START_TUNER_COUNT 1
                    "radio,"
-#else 
+#else
 #define START_TUNER_COUNT 0
 #endif
                    "bookmarks"
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
 #define START_PF_COUNT 1
                    ",pictureflow"
-#else 
+#else
 #define START_PF_COUNT 0
 #endif
                    , NULL,
     (6 + START_DB_COUNT + START_REC_COUNT + START_TUNER_COUNT + START_PF_COUNT),
                    ID2P(LANG_PREVIOUS_SCREEN), ID2P(LANG_MAIN_MENU),
-                   ID2P(LANG_DIR_BROWSER), 
+                   ID2P(LANG_DIR_BROWSER),
 #ifdef HAVE_TAGCACHE
                    ID2P(LANG_TAGCACHE),
 #endif
@@ -2025,7 +1942,7 @@ const struct settings_list settings[] = {
                 2, "list_accel_start_delay", UNIT_SEC, 0, 10, 1,
                 formatter_unit_0_is_off, getlang_unit_0_is_off, NULL),
     INT_SETTING(0, list_accel_wait, LANG_LISTACCEL_ACCEL_SPEED,
-                3, "list_accel_wait", UNIT_SEC, 1, 10, 1, 
+                3, "list_accel_wait", UNIT_SEC, 1, 10, 1,
                 scanaccel_formatter, getlang_unit_0_is_off, NULL),
 #endif /* HAVE_WHEEL_ACCELERATION */
 #if CONFIG_CODEC == SWCODEC
@@ -2108,7 +2025,7 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(0, touch_mode, LANG_TOUCHSCREEN_MODE, DEFAULT_TOUCHSCREEN_MODE,
                    "touchscreen mode", "point,grid", NULL, 2,
                    ID2P(LANG_TOUCHSCREEN_POINT), ID2P(LANG_TOUCHSCREEN_GRID)),
-    CUSTOM_SETTING(0, ts_calibration_data, -1, 
+    CUSTOM_SETTING(0, ts_calibration_data, -1,
                     &default_calibration_parameters, "touchscreen calibration",
                     tsc_load_from_cfg, tsc_write_to_cfg,
                     tsc_is_changed, tsc_set_default),
@@ -2165,21 +2082,21 @@ const struct settings_list settings[] = {
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, hotkey_wps,
         LANG_HOTKEY_WPS, HOTKEY_VIEW_PLAYLIST, "hotkey wps",
         "off,view playlist,show track info,pitchscreen,open with,delete"
-#ifdef HAVE_PICTUREFLOW_INTEGRATION        
+#ifdef HAVE_PICTUREFLOW_INTEGRATION
         ",pictureflow"
 #endif
-        ,UNIT_INT, hotkey_formatter, hotkey_getlang, NULL, 
-#ifdef HAVE_PICTUREFLOW_INTEGRATION        
-        7, 
+        ,UNIT_INT, hotkey_formatter, hotkey_getlang, NULL,
+#ifdef HAVE_PICTUREFLOW_INTEGRATION
+        7,
 #else
         6,
 #endif
         HOTKEY_OFF,
         HOTKEY_VIEW_PLAYLIST, HOTKEY_SHOW_TRACK_INFO, HOTKEY_PITCHSCREEN,
         HOTKEY_OPEN_WITH, HOTKEY_DELETE
-#ifdef HAVE_PICTUREFLOW_INTEGRATION        
+#ifdef HAVE_PICTUREFLOW_INTEGRATION
         , HOTKEY_PICTUREFLOW
-#endif        
+#endif
         ),
     TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, hotkey_tree,
         LANG_HOTKEY_FILE_BROWSER, HOTKEY_OFF, "hotkey tree",
