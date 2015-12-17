@@ -168,7 +168,7 @@ void irq_handler(void)
             irqvector[current_irq]();
     VIC0ADDRESS = NULL;
     VIC1ADDRESS = NULL;
-        
+
     asm volatile(   "add   sp, sp, #8           \n"   /* Cleanup stack   */
                     "ldmfd sp!, {r0-r7, ip, lr} \n"   /* Restore context */
                     "subs  pc, lr, #4           \n"); /* Return from IRQ */
@@ -258,3 +258,22 @@ void set_cpu_frequency(long frequency)
     cpu_frequency = frequency;
 }
 #endif
+
+static void set_page_tables(void)
+{
+    /* map RAM to itself and enable caching for it */
+    map_section(0, 0, 0x380, CACHE_ALL);
+
+    /* disable caching for I/O area */
+    map_section(0x38000000, 0x38000000, 0x80, CACHE_NONE);
+
+    /* map RAM uncached addresses */
+    map_section(0, S5L8702_UNCACHED_ADDR(0x0), 0x380, CACHE_NONE);
+}
+
+void memory_init(void)
+{
+    ttb_init();
+    set_page_tables();
+    enable_mmu();
+}

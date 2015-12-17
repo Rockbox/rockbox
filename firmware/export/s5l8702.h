@@ -31,13 +31,13 @@
 #define CACHEALIGN_BITS (5) /* 2^5 = 32 bytes */
 
 #define DRAM_ORIG 0x08000000
-#define IRAM_ORIG 0
+#define IRAM_ORIG 0x22000000
 
 #define DRAM_SIZE (MEMORYSIZE * 0x100000)
 #define IRAM_SIZE 0x40000
 
-#define TTB_SIZE                  0x4000
-#define TTB_BASE_ADDR             (DRAM_ORIG + DRAM_SIZE - TTB_SIZE)
+#define TTB_SIZE        0x4000
+#define TTB_BASE_ADDR   (DRAM_ORIG + DRAM_SIZE - TTB_SIZE)
 
 #define IRAM0_ORIG      0x22000000
 #define IRAM0_SIZE      0x20000
@@ -66,6 +66,29 @@
                                              ((i) == 2 ? 0x58 : \
                                              ((i) == 1 ? 0x4C : \
                                                          0x48)))))))
+/* SW Reset Control Register */
+#define SWRCON      (*((volatile uint32_t*)(0x3C500050)))
+/* Reset Status Register */
+#define RSTSR       (*((volatile uint32_t*)(0x3C500054)))
+#define RSTSR_WDR_BIT   (1 << 2)
+#define RSTSR_SWR_BIT   (1 << 1)
+#define RSTSR_HWR_BIT   (1 << 0)
+
+
+/////WATCHDOG/////
+#define WDTCON      (*((volatile uint32_t*)(0x3C800000)))
+#define WDTCNT      (*((volatile uint32_t*)(0x3C800004)))
+
+
+/////MEMCONTROLLER/////
+#define MIU_BASE        (0x38100000)
+#define MIU_REG(off)    (*((uint32_t volatile*)(MIU_BASE + (off))))
+/* following registers are similar to s5l8700x */
+#define MIUCON          (*((uint32_t volatile*)(0x38100000)))
+#define MIUCOM          (*((uint32_t volatile*)(0x38100004)))
+#define MIUAREF         (*((uint32_t volatile*)(0x38100008)))
+#define MIUMRS          (*((uint32_t volatile*)(0x3810000C)))
+#define MIUSDPARA       (*((uint32_t volatile*)(0x38100010)))
 
 
 /////TIMER/////
@@ -160,10 +183,13 @@
 #define I2CCLKGATE(i)   ((i) == 1 ? CLOCKGATE_I2C1 : \
                                     CLOCKGATE_I2C0)
 
-#define IICCON(bus)  (*((uint32_t volatile*)(0x3C600000 + 0x300000 * (bus))))
-#define IICSTAT(bus) (*((uint32_t volatile*)(0x3C600004 + 0x300000 * (bus))))
-#define IICADD(bus)  (*((uint32_t volatile*)(0x3C600008 + 0x300000 * (bus))))
-#define IICDS(bus)   (*((uint32_t volatile*)(0x3C60000C + 0x300000 * (bus))))
+#define IICCON(bus)     (*((uint32_t volatile*)(0x3C600000 + 0x300000 * (bus))))
+#define IICSTAT(bus)    (*((uint32_t volatile*)(0x3C600004 + 0x300000 * (bus))))
+#define IICADD(bus)     (*((uint32_t volatile*)(0x3C600008 + 0x300000 * (bus))))
+#define IICDS(bus)      (*((uint32_t volatile*)(0x3C60000C + 0x300000 * (bus))))
+#define IICUNK10(bus)   (*((uint32_t volatile*)(0x3C600010 + 0x300000 * (bus))))
+#define IICUNK14(bus)   (*((uint32_t volatile*)(0x3C600014 + 0x300000 * (bus))))
+#define IICUNK18(bus)   (*((uint32_t volatile*)(0x3C600018 + 0x300000 * (bus))))
 
 
 /////INTERRUPT CONTROLLERS/////
@@ -344,6 +370,7 @@
 #define PDAT(i)       (*((uint32_t volatile*)(0x3cf00004 + ((i) << 5))))
 #define PUNA(i)       (*((uint32_t volatile*)(0x3cf00008 + ((i) << 5))))
 #define PUNB(i)       (*((uint32_t volatile*)(0x3cf0000c + ((i) << 5))))
+#define PUNC(i)       (*((uint32_t volatile*)(0x3cf00010 + ((i) << 5))))
 #define PCON0         (*((uint32_t volatile*)(0x3cf00000)))
 #define PDAT0         (*((uint32_t volatile*)(0x3cf00004)))
 #define PCON1         (*((uint32_t volatile*)(0x3cf00020)))
@@ -392,12 +419,12 @@
 #define SPICTRL(i)    (*((uint32_t volatile*)(SPIBASE(i))))
 #define SPISETUP(i)   (*((uint32_t volatile*)(SPIBASE(i) + 0x4)))
 #define SPISTATUS(i)  (*((uint32_t volatile*)(SPIBASE(i) + 0x8)))
-#define SPIUNKREG1(i) (*((uint32_t volatile*)(SPIBASE(i) + 0xc)))
+#define SPIPIN(i)     (*((uint32_t volatile*)(SPIBASE(i) + 0xc)))
 #define SPITXDATA(i)  (*((uint32_t volatile*)(SPIBASE(i) + 0x10)))
 #define SPIRXDATA(i)  (*((uint32_t volatile*)(SPIBASE(i) + 0x20)))
 #define SPICLKDIV(i)  (*((uint32_t volatile*)(SPIBASE(i) + 0x30)))
 #define SPIRXLIMIT(i) (*((uint32_t volatile*)(SPIBASE(i) + 0x34)))
-#define SPIUNKREG3(i) (*((uint32_t volatile*)(SPIBASE(i) + 0x38)))
+#define SPIDD(i)      (*((uint32_t volatile*)(SPIBASE(i) + 0x38)))  /* TBC */
 
 
 /////AES/////
