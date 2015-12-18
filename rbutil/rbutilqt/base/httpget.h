@@ -34,7 +34,7 @@ class HttpGet : public QObject
     public:
         HttpGet(QObject *parent = 0);
 
-        bool getFile(const QUrl &url);
+        void getFile(const QUrl &url);
         void setProxy(const QUrl &url);
         void setProxy(bool);
         QString errorString(void);

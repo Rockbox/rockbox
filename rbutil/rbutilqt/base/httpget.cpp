@@ -44,8 +44,9 @@ HttpGet::HttpGet(QObject *parent)
 }
 
 
-//! @brief set cache path
-//  @param d new directory to use as cache path
+/** @brief set cache path
+ *  @param d new directory to use as cache path
+ */
 void HttpGet::setCache(const QDir& d)
 {
     if(m_cache && m_cachedir == d.absolutePath())
@@ -95,6 +96,9 @@ QByteArray HttpGet::readAll()
 }
 
 
+/** @brief Set and enable Proxy to use.
+ *  @param proxy Proxy URL.
+ */
 void HttpGet::setProxy(const QUrl &proxy)
 {
     LOG_INFO() << "Proxy set to" << proxy;
@@ -107,6 +111,9 @@ void HttpGet::setProxy(const QUrl &proxy)
 }
 
 
+/** @brief Enable or disable use of previously set proxy.
+ *  @param enable Enable proxy.
+ */
 void HttpGet::setProxy(bool enable)
 {
     if(enable) m_mgr->setProxy(m_proxy);
@@ -114,6 +121,14 @@ void HttpGet::setProxy(bool enable)
 }
 
 
+/** @brief Set output file.
+ *
+ *  Set filename for storing the downloaded file to. If no file is set the
+ *  downloaded file will not be stored to disk but kept in memory. The result
+ *  can then be retrieved using readAll().
+ *
+ *  @param file Output file.
+ */
 void HttpGet::setFile(QFile *file)
 {
     m_outputFile = file;
@@ -202,22 +217,34 @@ void HttpGet::networkError(QNetworkReply::NetworkError error)
 }
 
 
-bool HttpGet::getFile(const QUrl &url)
+/** @brief Retrieve the file pointed to by url.
+ *
+ *  Note: This also handles file:// URLs. Be aware that QUrl requires file://
+ *  URLs to be absolute, i.e. file://filename.txt doesn't work. Use
+ *  QDir::absoluteFilePath() to convert to an absolute path first.
+ *
+ *  @param url URL to download.
+ */
+void HttpGet::getFile(const QUrl &url)
 {
     LOG_INFO() << "Get URI" << url.toString();
     m_data.clear();
     startRequest(url);
-
-    return false;
 }
 
 
+/** @brief Retrieve string representation for most recent error.
+ *  @return Error string.
+ */
 QString HttpGet::errorString(void)
 {
     return m_lastErrorString;
 }
 
 
+/** @brief Return last HTTP response code.
+ *  @return Response code.
+ */
 int HttpGet::httpResponse(void)
 {
     return m_lastStatusCode;
