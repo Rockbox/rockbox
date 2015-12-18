@@ -118,6 +118,7 @@ class TestHttpGet : public QObject
 {
     Q_OBJECT
     private slots:
+        void testFileUrlRequest(void);
         void testCachedRequest(void);
         void testUncachedRepeatedRequest(void);
         void testUncachedMovedRequest(void);
@@ -187,6 +188,27 @@ void TestHttpGet::cleanup(void)
     if(m_daemon) delete m_daemon;
     if(m_doneSpy) delete m_doneSpy;
 }
+
+void TestHttpGet::testFileUrlRequest(void)
+{
+    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, SLOT(waitTimeout(void)));
+
+    QString teststring = "The quick brown fox jumps over the lazy dog.";
+    QTemporaryFile datafile;
+    datafile.open();
+    datafile.write(teststring.toLatin1());
+    m_getter->getFile("file://" + datafile.fileName());
+    datafile.close();
+    while(m_doneSpy->count() == 0 && m_waitTimeoutOccured == false)
+        QCoreApplication::processEvents();
+
+    QCOMPARE(m_doneSpy->count(), 1);
+    QCOMPARE(m_waitTimeoutOccured, false);
+    QCOMPARE(m_daemon->lastRequestData().size(), 0);
+    QCOMPARE(m_getter->readAll(), teststring.toLatin1());
+    QCOMPARE(m_getter->httpResponse(), 200);
+}
+
 
 /* On uncached requests, HttpGet is supposed to sent a GET request only.
  */

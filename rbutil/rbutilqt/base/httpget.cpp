@@ -17,7 +17,6 @@
  ****************************************************************************/
 
 #include <QtNetwork>
-#include <QtDebug>
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -155,7 +154,10 @@ void HttpGet::requestFinished(QNetworkReply* reply)
         startRequest(url);
         return;
     }
-    else if(m_lastStatusCode == 200) {
+    else if(m_lastStatusCode == 200 ||
+            (reply->url().isLocalFile() && reply->error() == 0)) {
+        // callers might not be aware if the request is file:// so fake 200.
+        m_lastStatusCode = 200;
         m_data = reply->readAll();
         if(m_outputFile && m_outputFile->open(QIODevice::WriteOnly)) {
             m_outputFile->write(m_data);
