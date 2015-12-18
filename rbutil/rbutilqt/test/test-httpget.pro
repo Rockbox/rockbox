@@ -18,7 +18,7 @@ include(tests.pri)
 
 TEMPLATE = app
 TARGET = test-httpget
-INCLUDEPATH += . ../base
+INCLUDEPATH += . ../base stubs
 QT += network
 
 # Input
