@@ -467,9 +467,10 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
 
         if(buffer) {
             // convert buffer text to upper case to avoid depending on the case of
-            // the keys (W7 uses different casing than XP at least).
-            QString data = QString::fromWCharArray(buffer);
-            QRegExp rex("USB\\\\VID_([0-9a-fA-F]{4})&PID_([0-9a-fA-F]{4}).*");
+            // the keys (W7 uses different casing than XP at least), in addition
+            // XP may use "Vid_" and "Pid_".
+            QString data = QString::fromWCharArray(buffer).toUpper();
+            QRegExp rex("USB\\\\VID_([0-9A-F]{4})&PID_([0-9A-F]{4}).*");
             if(rex.indexIn(data) >= 0) {
                 uint32_t id;
                 id = rex.cap(1).toUInt(0, 16) << 16 | rex.cap(2).toUInt(0, 16);
