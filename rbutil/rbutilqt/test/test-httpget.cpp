@@ -169,8 +169,9 @@ class TestHttpGet : public QObject
         bool m_waitTimeoutOccured;
         QString m_now;
         QDir m_cachedir;
-        HttpGet *m_getter = NULL;
-        QSignalSpy *m_doneSpy = NULL;
+        HttpGet *m_getter;
+        QSignalSpy *m_doneSpy;
+        QSignalSpy *m_progressSpy;
 };
 
 
@@ -183,6 +184,7 @@ void TestHttpGet::init(void)
     m_cachedir = temporaryFolder();
     m_getter = new HttpGet(this);
     m_doneSpy = new QSignalSpy(m_getter, SIGNAL(done(bool)));
+    m_progressSpy = new QSignalSpy(m_getter, SIGNAL(dataReadProgress(int, int)));
     m_waitTimeoutOccured = false;
 }
 
@@ -194,6 +196,7 @@ void TestHttpGet::cleanup(void)
     }
     if(m_daemon) { delete m_daemon; m_daemon = NULL; }
     if(m_doneSpy) { delete m_doneSpy; m_doneSpy = NULL; }
+    if(m_progressSpy) { delete m_progressSpy; m_progressSpy = NULL; }
 }
 
 void TestHttpGet::testFileUrlRequest(void)
@@ -214,6 +217,7 @@ void TestHttpGet::testFileUrlRequest(void)
     QCOMPARE(m_daemon->lastRequestData().size(), 0);
     QCOMPARE(m_getter->readAll(), teststring.toLatin1());
     QCOMPARE(m_getter->httpResponse(), 200);
+    QCOMPARE(m_progressSpy->at(0).at(0).toInt(), 0);
 }
 
 
@@ -423,6 +427,8 @@ void TestHttpGet::testContentToBuffer(void)
     QCOMPARE(m_getter->readAll(), QByteArray(TEST_BINARY_BLOB));
     // sizeof(TEST_BINARY_BLOB) will include an additional terminating NULL.
     QCOMPARE((unsigned long)m_getter->readAll().size(), sizeof(TEST_BINARY_BLOB) - 1);
+    QCOMPARE(m_progressSpy->at(m_progressSpy->count() - 1).at(0).toInt(), (int)sizeof(TEST_BINARY_BLOB) - 1);
+    QCOMPARE(m_progressSpy->at(m_progressSpy->count() - 1).at(1).toInt(), (int)sizeof(TEST_BINARY_BLOB) - 1);
 }
 
 void TestHttpGet::testContentToFile(void)
