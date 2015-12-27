@@ -170,7 +170,7 @@ zchar do_input(int timeout, bool show_cursor)
         case PLA_SELECT:
             return ZC_RETURN;
 
-        case PLA_DOWN:
+        case PLA_UP:
             return ZC_BAD;
 
         default:
