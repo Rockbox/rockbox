@@ -467,7 +467,13 @@ static int loopit(void)
 enum plugin_status plugin_start(const void* parameter)
 {
     int w, h;
-    char *off = "[Off] to stop";
+    char *off =
+#if (CONFIG_KEYPAD == SAMSUNG_YH920_PAD) || \
+    (CONFIG_KEYPAD == SAMSUNG_YH820_PAD)
+        "[Rew] to stop";
+#else
+        "[Off] to stop";
+#endif
 
     (void)(parameter);
 

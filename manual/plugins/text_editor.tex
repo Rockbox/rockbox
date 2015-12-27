@@ -27,12 +27,15 @@ the \setting{Virtual Keyboard} (see \reference{sec:virtual_keyboard}).
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdCancel} 
     & Exit / Abort Editing\\
 
-    \ActionStdMenu 
+    \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ActionStdContext}
+    \nopt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ActionStdMenu}
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdMenu} 
     & Show Item Menu\\
 
-    \ActionStdContext 
-      \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdContext} 
-    & Delete Line\\
+    \nopt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{
+        \ActionStdContext
+          \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdContext}
+        & Delete Line\\
+    }
 \end{btnmap}
 

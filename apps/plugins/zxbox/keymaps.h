@@ -198,7 +198,8 @@
 #define ZX_LEFT         BUTTON_LEFT
 #define ZX_RIGHT        BUTTON_RIGHT
 #define ZX_SELECT       BUTTON_PLAY
-#define ZX_MENU         BUTTON_FFWD
+#define ZX_SELECT2      BUTTON_FFWD
+#define ZX_MENU         BUTTON_REW
 
 #elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
 

@@ -457,6 +457,9 @@ enum plugin_status plugin_start(const void* parameter)
             }
             break;
             case ACTION_STD_CONTEXT:
+/* These targets have unintuitive STD_MENU keymaps, so we use context keymap instead;
+   We don't need the "delete line" action, since this can be done via the menu. */
+#if !(defined(SAMSUNG_YH920_PAD) || defined(SAMSUNG_YH820_PAD))
                 if (!line_count) break;
                 rb->strlcpy(copy_buffer, do_action(ACTION_GET, 0, cur_sel),
                             MAX_LINE_LEN);
@@ -464,6 +467,7 @@ enum plugin_status plugin_start(const void* parameter)
                 changed = true;
             break;
             case ACTION_STD_MENU:
+#endif
             {
                 /* do the item menu */
                 switch (do_item_menu(cur_sel))

@@ -187,7 +187,11 @@ void spkb_process_events( int evenframe )
                 spkb_kbstate[ki].state = 0;
             }
 
-            if ( buttons & ZX_SELECT ){
+            if ( buttons & ZX_SELECT
+#ifdef ZX_SELECT2
+                || buttons & ZX_SELECT2
+#endif
+            ){
                  ki = KS_TO_KEY(SK_KP_Insert);
                 spkb_kbstate[ki].state = 1;
             }

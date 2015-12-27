@@ -391,9 +391,6 @@ static int gameProc( void )
 #ifdef PACMAN_RC_MENU
             || status == PACMAN_RC_MENU
 #endif
-#ifdef PACMAN_MENU2
-            || status == PACMAN_MENU2
-#endif
         ) {
             bool menu_res;
 

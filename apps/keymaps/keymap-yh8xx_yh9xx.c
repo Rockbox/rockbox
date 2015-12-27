@@ -307,7 +307,7 @@ static const struct button_mapping button_context_keyboard[]  = {
 #endif
     { ACTION_KBD_SELECT,       BUTTON_PLAY,                     BUTTON_NONE },
     { ACTION_KBD_PAGE_FLIP,    BUTTON_FFWD|BUTTON_REL,          BUTTON_FFWD },
-    { ACTION_KBD_DONE,         BUTTON_FFWD|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_KBD_DONE,         BUTTON_FFWD|BUTTON_REL, BUTTON_FFWD|BUTTON_REPEAT },
     { ACTION_KBD_BACKSPACE,    BUTTON_REW|BUTTON_REL,           BUTTON_REW  },
     { ACTION_KBD_ABORT,        BUTTON_REW|BUTTON_REPEAT,        BUTTON_NONE },
 #ifdef SAMSUNG_YH820
