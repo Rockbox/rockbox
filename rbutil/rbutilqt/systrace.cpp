@@ -54,6 +54,8 @@ void SysTrace::refresh(void)
             color = "orange";
         else if(line.contains("ERROR"))
             color = "red";
+        else if(line.contains("DEBUG"))
+            color = "blue";
 #if 0
         else if(line.contains("INFO"))
             color = "green";
