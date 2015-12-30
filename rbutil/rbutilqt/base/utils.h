@@ -54,7 +54,7 @@ public:
     static QStringList mountpoints(enum MountpointsFilter type = MountpointsAll);
     static QString resolveDevicename(QString path);
     static QString resolveMountPoint(QString device);
-    static QStringList findRunningProcess(QStringList names);
+    static QMap<QString, QList<int> > findRunningProcess(QStringList names);
     static bool ejectDevice(QString device);
 };
 
