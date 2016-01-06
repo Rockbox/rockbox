@@ -139,7 +139,6 @@ struct bitstream
 #define HUFFTAB   0x0001 /* with huffman table */
 #define QUANTTAB  0x0002 /* with quantization table */
 #define APP0_JFIF 0x0004 /* with APP0 segment following JFIF standard */
-#define FILL_FF   0x0008 /* with 0xFF padding bytes at begin/end */
 #define SOF0      0x0010 /* with SOF0-Segment */
 #define DHT       0x0020 /* with Definition of huffman tables */
 #define SOS       0x0040 /* with Start-of-Scan segment */

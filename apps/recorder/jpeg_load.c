@@ -956,25 +956,25 @@ static int process_markers(struct jpeg* p_jpeg)
     int marker_size; /* variable length of marker segment */
     int i, j, n;
     int ret = 0; /* returned flags */
+    bool done = false;
 
-    while ((c = e_getc(p_jpeg, -1)))
+    while (!done && (c = e_getc(p_jpeg, -1)))
     {
         if (c != 0xFF) /* no marker? */
         {
             JDEBUGF("Non-marker data\n");
-            jpeg_putc(p_jpeg);
-            break; /* exit marker processing */
+            continue; /* discard */
         }
 
         c = e_getc(p_jpeg, -1);
         JDEBUGF("marker value %X\n",c);
         switch (c)
         {
-        case 0xFF: /* Fill byte */
-            ret |= FILL_FF;
-        case 0x00: /* Zero stuffed byte - entropy data */
-            jpeg_putc(p_jpeg);
+        case 0xFF: /* Previous FF was fill byte */
+            jpeg_putc(p_jpeg); /* This FF could be start of a marker */
             continue;
+        case 0x00: /* Zero stuffed byte */
+            break; /* discard */
 
         case 0xC0: /* SOF Huff  - Baseline DCT */
             {
@@ -1132,6 +1132,7 @@ static int process_markers(struct jpeg* p_jpeg)
                 }
                 /* skip spectral information */
                 e_skip_bytes(p_jpeg, marker_size);
+                done = true;
             }
             break;
 

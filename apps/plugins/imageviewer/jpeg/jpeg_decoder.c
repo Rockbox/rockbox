@@ -507,29 +507,27 @@ static void idct8x8(unsigned char* p_byte, int* inptr, int* quantptr, int skip_l
 /* Preprocess the JPEG JFIF file */
 int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
 {
-    unsigned char* p_bytes = p_src;
+    unsigned char* p_end = p_src + size;
     int marker_size; /* variable length of marker segment */
     int i, j, n;
     int ret = 0; /* returned flags */
 
-    p_jpeg->p_entropy_end = p_src + size;
+    p_jpeg->p_entropy_end = p_end;
 
-    while (p_src < p_bytes + size)
+    while (p_src < p_end)
     {
         if (*p_src++ != 0xFF) /* no marker? */
         {
-            p_src--; /* it's image data, put it back */
-            p_jpeg->p_entropy_data = p_src;
-            break; /* exit marker processing */
+            continue; /* discard */
         }
 
         switch (*p_src++)
         {
-        case 0xFF: /* Fill byte */
-            ret |= FILL_FF;
-        case 0x00: /* Zero stuffed byte - entropy data */
-            p_src--; /* put it back */
+        case 0xFF: /* Previous FF was fill byte */
+            p_src--; /* This FF could be start of a marker */
             continue;
+        case 0x00: /* Zero stuffed byte - discard */
+            break;
 
         case 0xC0: /* SOF Huff  - Baseline DCT */
             {
@@ -657,6 +655,8 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
                     p_jpeg->scanheader[i].AC_select = *p_src++ & 0x0F;
                 }
                 p_src += 3; /* skip spectral information */
+                p_jpeg->p_entropy_data = p_src;
+                p_end = p_src; /* exit while loop */
             }
             break;
 
