@@ -34,6 +34,7 @@ puzzles
     && (defined(HAVE_LCD_COLOR) || (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) || \
                                    (LCD_HEIGHT == 128) && (LCD_DEPTH == 2))
 rockboy
+infones
 #endif
 
 #if defined(HAVE_TAGCACHE)
