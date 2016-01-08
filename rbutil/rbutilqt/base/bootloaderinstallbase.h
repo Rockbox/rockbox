@@ -73,6 +73,7 @@ class BootloaderInstallBase : public QObject
         void downloadReqFinished(int id, bool error);
         void downloadBlFinish(bool error);
         void installBlfile(void);
+        void progressAborted(void);
 
         // NOTE: we need to keep this slot even on targets that don't need it
         // -- using the preprocessor here confused moc.
@@ -101,6 +102,7 @@ class BootloaderInstallBase : public QObject
 
     signals:
         void downloadDone(void); //! internal signal sent when download finished.
+        void installAborted(void); //! internal signal sent on abort button click.
         void done(bool);
         void logItem(QString, int); //! set logger item
         void logProgress(int, int); //! set progress bar.
