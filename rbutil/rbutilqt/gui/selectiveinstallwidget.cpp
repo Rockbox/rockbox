@@ -247,6 +247,8 @@ void SelectiveInstallWidget::installBootloader(void)
         connect(bl, SIGNAL(done(bool)), this, SLOT(continueInstall(bool)));
         connect(bl, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
         connect(bl, SIGNAL(logProgress(int, int)), m_logger, SLOT(setProgress(int, int)));
+        // pass Abort button click signal to current installer
+        connect(m_logger, SIGNAL(aborted()), bl, SLOT(progressAborted()));
 
         // set bootloader filename. Do this now as installed() needs it.
         QStringList blfile = SystemInfo::value(SystemInfo::CurBootloaderFile).toStringList();
