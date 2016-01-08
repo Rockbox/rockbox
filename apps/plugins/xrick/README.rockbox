@@ -1,0 +1,20 @@
+xrick on Rockbox
+----------------
+
+* Installation
+
+  1. Extract "rockbox.zip" on your music player.
+
+     $ unzip ~/rockbox/build/rockbox.zip -d /mnt/myMp3Player
+
+  2. If you did not build xrick yourself, or just want to update it, place game binary
+     into Rockbox game folder on your music player.
+
+     $ cp ~/rockbox/build/apps/plugins/xrick/xrick.rock  /mnt/myMp3Player/.rockbox/rocks/games/
+
+  3. Create "xrick" folder into Rockbox game folder and extract xrick "data.zip"
+     archive into it.
+
+     $ mkdir /mnt/myMp3Player/.rockbox/rocks/games/xrick
+     $ unzip ~/xrick/game/data.zip -d /mnt/myMp3Player/.rockbox/rocks/games/xrick
+

@@ -88,3 +88,10 @@ mpegplayer
 lua
 lua_scripts
 #endif
+
+#if defined(IRIVER_H300_SERIES) || (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+    (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD) || \
+    (CONFIG_KEYPAD == SAMSUNG_YH920_PAD) || (CONFIG_KEYPAD == SAMSUNG_YH820_PAD)
+/* xrick is confirmed to run on these player models. */
+xrick
+#endif

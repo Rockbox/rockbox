@@ -1,0 +1,99 @@
+% $Id$ %
+\subsection{xrick}
+\screenshot{plugins/images/ss-xrick}{xrick}{img:xrick}
+xrick is a clone of the platform game
+\emph{'Rick Dangerous'}
+(\url{http://en.wikipedia.org/wiki/Rick_Dangerous}),
+originally written by 'BigOrno'
+(\url{http://www.bigorno.net/xrick/}),
+modified and ported to Rockbox by Pierluigi Vicinanza
+(\url{https://github.com/pierluigi-vicinanza/xrick}).
+
+Walk through the maps, avoid traps, kill the Bad Guys... and
+try to stay alive long enough to accomplish your mission!
+
+Rick can fire bullets, lay sticks of dynamite, walk, crawl,
+climb, and also poke walls or Bad Guys with his stick.
+Poking walls can trigger traps, open doors, etc. although
+sometimes a dynamite stick or a bullet is needed.
+Go figure.
+
+\subsubsection{Getting started}
+For the game to run you need \fname{.dat} game files located in
+\fname{/.rockbox/rocks/games/xrick} on your \dap.
+Create the directory and extract xrick \fname{data.zip} archive into it.
+The needed files can be found at
+\url{https://github.com/pierluigi-vicinanza/xrick/blob/master/game/data.zip}.
+
+\subsubsection{Controls}
+By holding down \emph{Fire} and pressing \emph{Left} or \emph{Right},
+you can poke a wall (or anything else) with your stick.
+By holding down \emph{Fire} and pressing \emph{Down}, you can lay a stick of dynamite.
+By holding down \emph{Fire} and pressing \emph{Up}, you can fire a bullet.
+
+Throughout the game, use these buttons to control Rick:
+
+\begin{btnmap}
+%
+    \opt{iriverh300}{\ButtonUp/\ButtonRec}
+    \opt{fuzeplus}{\ButtonUp}
+    \opt{ipodvideo}{\ButtonMenu}
+      \opt{HAVEREMOTEKEYMAP}{& }
+    & Jump or Climb Up\\
+%
+    \opt{fuzeplus}{\ButtonPlay & Jump Right or Climb Up and Right\\}
+%
+    \opt{fuzeplus}{\ButtonBack & Jump Left or Climb Up and Left\\}
+%
+    \opt{iriverh300}{\ButtonDown/\ButtonMode}
+    \opt{fuzeplus}{\ButtonDown}
+    \opt{ipodvideo}{\ButtonPlay}
+      \opt{HAVEREMOTEKEYMAP}{& }
+    & Crouch or Climb Down\\
+%
+    \opt{fuzeplus}{\ButtonBottomRight & Crouch and Move Right or Climb Down and Right\\}
+%
+    \opt{fuzeplus}{\ButtonBottomLeft & Crouch and Move Left or Climb Down and Left\\}
+%
+    \opt{iriverh300,fuzeplus,ipodvideo}{\ButtonLeft}
+      \opt{HAVEREMOTEKEYMAP}{& }
+    & Move Left\\
+%
+    \opt{iriverh300,fuzeplus,ipodvideo}{\ButtonRight}
+      \opt{HAVEREMOTEKEYMAP}{& }
+    & Move Right\\
+%
+    \opt{iriverh300}{\ButtonOn}
+    \opt{fuzeplus}{\ButtonVolDown}
+    \opt{ipodvideo}{\ButtonSelect}
+      \opt{HAVEREMOTEKEYMAP}{& }
+    & Fire\\
+%
+    \opt{iriverh300}{\ButtonSelect}
+    \opt{fuzeplus}{\ButtonVolUp}
+    \opt{ipodvideo}{\ButtonScrollBack}
+      \opt{HAVEREMOTEKEYMAP}{& }
+    & Pause\\
+%
+    \opt{iriverh300}{\ButtonOff}
+    \opt{fuzeplus}{\ButtonPower}
+    \opt{ipodvideo}{\ButtonScrollFwd}
+    \opt{hold_button}{/\ButtonHold}
+      \opt{HAVEREMOTEKEYMAP}{& }
+    & Menu\\
+%
+\end{btnmap}
+
+\subsubsection{Menu}
+\begin{description}
+  \item[Resume Game. ] Resume the game
+  \item[Restart Game. ] Restart the game
+  \item[Cheat Settings. ] This menu has the following options:
+
+  \emph{Enable Unlimited Lives/Ammo Mode. } Toggle trainer mode (always six bullets, six sticks, six Rick).\\
+  \emph{Enable Never Die Mode. } Toggle 'never die' mode (nothing can kill Rick). Use with care.
+        Although it lets you walk through Bad Guys unharmed, it can produce strange results.\\
+  \emph{Enable Expose Mode. } Toggle 'expose' mode (see all entities).%\\
+
+  \item[Quit. ] Quit the game
+\end{description}
