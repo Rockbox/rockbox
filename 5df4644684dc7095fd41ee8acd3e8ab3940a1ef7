@@ -16,6 +16,24 @@
       "revId": "5df4644684dc7095fd41ee8acd3e8ab3940a1ef7",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_a94c5d77",
+        "filename": "apps/plugins/bitmaps/native/SOURCES",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2016-01-08T23:05:31Z",
+      "side": 1,
+      "message": "The Sansa Clip Zip has a 96x96 screen. Normally the playfield is in the top right, leaving space for the score to be displayed to the left. With \"MIN(LCD_WIDTH, LCD_HEIGHT) \u003e\u003d 96\" these images will be used on it. The playfield will take up the whole screen and look better, but the score will not be visible.",
+      "parentUuid": "dada55a8_093769e4",
+      "revId": "5df4644684dc7095fd41ee8acd3e8ab3940a1ef7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
