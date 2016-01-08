@@ -53,6 +53,7 @@ public:
         QuakeUrl,
         Wolf3DUrl,
         XWorldUrl,
+        XRickUrl,
         MidiPatchsetUrl,
     };
     enum DeviceInfo {

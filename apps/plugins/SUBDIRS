@@ -89,3 +89,7 @@ lua
 lua_scripts
 picross
 #endif
+
+#if (LCD_DEPTH > 1)
+xrick
+#endif

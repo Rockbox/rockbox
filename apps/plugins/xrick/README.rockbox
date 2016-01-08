@@ -1,0 +1,16 @@
+xrick on Rockbox
+----------------
+
+Based on the upstream #021212 release.
+
+Currently enabled on all players that have at least 2-bit (ie greyscale)
+display, but is optimized for color displays of 320x200 or larger.
+
+You will need the data files extracted into your player's root
+directory.  For example:
+
+  $ unzip xrick-data.zip -d /mnt/myMp3Player
+
+Note that most players do not have a tuned keymap for xrick, instead
+relying on the standard "pluginlib" bindings that are most likely
+sub-optimal.  Patches welcome!

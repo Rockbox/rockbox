@@ -49,6 +49,7 @@ const static struct {
     { PlayerBuildInfo::PuzzFontsUrl,      "other/puzzfonts_url" },
     { PlayerBuildInfo::QuakeUrl,          "other/quake_url"     },
     { PlayerBuildInfo::Wolf3DUrl,         "other/wolf3d_url"    },
+    { PlayerBuildInfo::XRickUrl,          "other/xrick_url"     },
     { PlayerBuildInfo::XWorldUrl,         "other/xworld_url"    },
     { PlayerBuildInfo::MidiPatchsetUrl,   "other/patcheset_url" },
 };
