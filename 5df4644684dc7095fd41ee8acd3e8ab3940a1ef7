@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dada55a8_093769e4",
+        "filename": "apps/plugins/bitmaps/native/SOURCES",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2016-01-08T03:50:54Z",
+      "side": 1,
+      "message": "This should be MIN(LCD_WIDTH, LCD_HEIGHT) \u003e\u003d 96, that way it works for all screens bigger than 96x96, regardless of aspect ratio.",
+      "revId": "5df4644684dc7095fd41ee8acd3e8ab3940a1ef7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
