@@ -15,6 +15,9 @@ _2048_background.121x121x24.bmp
 #elif MIN(LCD_WIDTH, LCD_HEIGHT)>=110
 _2048_tiles.22x22x24.bmp
 _2048_background.103x103x24.bmp
+#elif LCD_HEIGHT>=96 && LCD_WIDTH>=128
+_2048_tiles.19x19x24.bmp
+_2048_background.88x88x24.bmp
 #else
 /* default to smallest bitmaps */
 _2048_tiles.12x12x24.bmp
