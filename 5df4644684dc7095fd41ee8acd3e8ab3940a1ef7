@@ -34,6 +34,24 @@
       "revId": "5df4644684dc7095fd41ee8acd3e8ab3940a1ef7",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dada55a8_e9565505",
+        "filename": "apps/plugins/bitmaps/native/SOURCES",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2016-01-08T23:32:08Z",
+      "side": 1,
+      "message": "Hmm, I guess I wasn\u0027t thinking about that fact when I wrote that.\n\nIt really depends on how often people look at, and care about, the score. If it\u0027s important enough, it probably shouldn\u0027t be obscured, and otherwise, just do away with it. A compromise would be to add a menu entry that would show you your score.\n\nIt\u0027s really been a while since I wrote this plugin, so my opinions are really just as good as anyone else\u0027s at this point.",
+      "parentUuid": "dada55a8_a94c5d77",
+      "revId": "5df4644684dc7095fd41ee8acd3e8ab3940a1ef7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
