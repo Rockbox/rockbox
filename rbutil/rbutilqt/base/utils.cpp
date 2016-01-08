@@ -502,13 +502,14 @@ QString Utils::resolveDevicename(QString path)
     // get the extents
     if(DeviceIoControl(h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS,
                 NULL, 0, extents, sizeof(buffer), &written, NULL)) {
-        if(extents->NumberOfDiskExtents > 1) {
-            LOG_INFO() << "resolving device name: volume spans multiple disks!";
-            return "";
+        if(extents->NumberOfDiskExtents == 1) {
+            CloseHandle(h);
+            LOG_INFO() << "device name is" << extents->Extents[0].DiskNumber;
+            return QString("%1").arg(extents->Extents[0].DiskNumber);
         }
-        LOG_INFO() << "device name is" << extents->Extents[0].DiskNumber;
-        return QString("%1").arg(extents->Extents[0].DiskNumber);
+        LOG_INFO() << "resolving device name: volume spans multiple disks!";
     }
+    CloseHandle(h);
 #endif
     return QString("");
 
