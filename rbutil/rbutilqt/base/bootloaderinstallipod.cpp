@@ -174,6 +174,7 @@ bool BootloaderInstallIpod::uninstall(void)
     if (delete_bootloader(&ipod)==0) {
         emit logItem(tr("Successfully removed bootloader"), LOGOK);
         logInstall(LogRemove);
+        emit logProgress(1, 1);
         emit done(false);
         ipod_close(&ipod);
         return true;
