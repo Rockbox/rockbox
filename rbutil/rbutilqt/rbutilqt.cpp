@@ -545,6 +545,8 @@ void RbUtilQt::uninstallBootloader(void)
                 + blfile.at(a));
     }
     bl->setBlFile(blfilepath);
+    bl->setLogfile(RbSettings::value(RbSettings::Mountpoint).toString()
+            + "/.rockbox/rbutil.log");
 
     BootloaderInstallBase::BootloaderType currentbl = bl->installed();
     if((bl->capabilities() & BootloaderInstallBase::Uninstall) == 0) {
