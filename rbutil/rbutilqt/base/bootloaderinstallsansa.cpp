@@ -194,6 +194,7 @@ bool BootloaderInstallSansa::uninstall(void)
     if (sansa_delete_bootloader(&sansa)==0) {
         emit logItem(tr("Successfully removed bootloader"), LOGOK);
         logInstall(LogRemove);
+        emit logProgress(1, 1);
         emit done(false);
         sansa_close(&sansa);
         return true;

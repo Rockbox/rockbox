@@ -523,7 +523,6 @@ void RbUtilQt::uninstallBootloader(void)
            QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) return;
     // create logger
     ProgressLoggerGui* logger = new ProgressLoggerGui(this);
-    logger->setProgressVisible(false);
     logger->show();
 
     QString platform = RbSettings::value(RbSettings::Platform).toString();
