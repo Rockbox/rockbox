@@ -185,6 +185,7 @@ bool BootloaderInstallAms::uninstall(void)
     emit logItem(tr("To uninstall, perform a normal upgrade with an unmodified "
                     "original firmware"), LOGINFO);
     logInstall(LogRemove);
+    emit done(true);
     return false;
 }
 

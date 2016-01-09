@@ -91,6 +91,7 @@ bool BootloaderInstallMi4::uninstall(void)
     emit logItem(tr("Checking for Rockbox bootloader"), LOGINFO);
     if(installed() != BootloaderRockbox) {
         emit logItem(tr("No Rockbox bootloader found"), LOGERROR);
+        emit done(true);
         return false;
     }
 
@@ -101,6 +102,7 @@ bool BootloaderInstallMi4::uninstall(void)
 
     if(Utils::resolvePathCase(original).isEmpty()) {
         emit logItem(tr("Error finding original firmware file"), LOGERROR);
+        emit done(true);
         return false;
     }
 
