@@ -129,6 +129,7 @@ bool BootloaderInstallFile::uninstall(void)
     }
     emit logItem(tr("Original bootloader restored successfully."), LOGOK);
     logInstall(LogRemove);
+    emit logProgress(1, 1);
     emit done(false);
 
     return true;
