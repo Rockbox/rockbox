@@ -236,6 +236,7 @@ bool BootloaderInstallHex::uninstall(void)
 {
     emit logItem(tr("Uninstallation not possible, only installation info removed"), LOGINFO);
     logInstall(LogRemove);
+    emit done(true);
     return false;
 }
 
