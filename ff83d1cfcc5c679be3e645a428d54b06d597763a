@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dada55a8_c97271ad",
+        "filename": "apps/plugins/SUBDIRS",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2016-01-10T01:13:54Z",
+      "side": 1,
+      "message": "Plugin doesn\u0027t compile for greyscale targets, so better encapsulate it in it\u0027s own #if.",
+      "revId": "ff83d1cfcc5c679be3e645a428d54b06d597763a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
