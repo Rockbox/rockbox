@@ -169,7 +169,7 @@ def checkqt(qmakebin):
         m = re.search(r, ou)
         if not m == None:
             print "Qt found: %s" % m.group(1)
-            s = re.compile("4\..*")
+            s = re.compile("[45]\..*")
             n = re.search(s, m.group(1))
             if not n == None:
                 result = qmakebin
