@@ -25,6 +25,40 @@
 #include <stdbool.h>
 #include "config.h"
 
+#include <pcf5063x.h>
+
+/* undocummented PMU registers */
+#define PCF50635_REG_INT6        0x85
+#define PCF50635_REG_INT6M       0x86
+#define PCF50635_REG_GPIOSTAT    0x87  /* bit1: GPIO2 status (TBC) */
+
+/* LDOs */
+#define LDO_UNK1        1   /* TBC: SoC voltage (USB) */
+#define LDO_UNK2        2   /* TBC: SoC voltage (I/O) */
+#define LDO_LCD         3
+#define LDO_CODEC       4
+#define LDO_UNK5        5   /* TBC: nano3g NAND */
+#define LDO_CWHEEL      6
+#define LDO_ACCY        7   /* HCLDO */
+
+/* Other LDOs:
+ *  AUTOLDO: Hard Disk
+ *  DOWN1: CPU
+ *  DOWN2: SDRAM
+ *  MEMLDO: SDRAM self-refresh (TBC)
+ *
+ * EXTON inputs:
+ *  EXTON1: button/holdswitch related (TBC)
+ *  EXTON2: USB Vbus (High when present)
+ *  EXTON3: ACCESORY (Low when present)
+ *
+ * GPIO:
+ *  GPIO1: input, Mikey (jack remote ctrl) interrupt (TBC)
+ *  GPIO2: input, hold switch (TBC)
+ *  GPIO3: output, unknown
+ */
+
+
 unsigned char pmu_read(int address);
 int pmu_write(int address, unsigned char val);
 int pmu_read_multiple(int address, int count, unsigned char* buffer);
