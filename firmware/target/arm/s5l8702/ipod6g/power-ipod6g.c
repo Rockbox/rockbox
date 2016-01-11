@@ -31,7 +31,9 @@ static int idepowered;
 
 void power_off(void)
 {
-    pmu_set_wake_condition(0x42); /* USB inserted or EXTON1 */
+    /* USB inserted or EXTON1 */
+    pmu_set_wake_condition(
+            PCF5063X_OOCWAKE_EXTON2 | PCF5063X_OOCWAKE_EXTON1);
     pmu_enter_standby();
 
     while(1);
