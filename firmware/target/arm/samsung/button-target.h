@@ -44,10 +44,6 @@ void remote_int(void);
 #else /* virtual buttons for record switch state change on YH92x */
 #define BUTTON_REC_SW_ON    0x00000080
 #define BUTTON_REC_SW_OFF   0x00000100
-/* TODO: most of the plugin keymaps rely on the REC button,
-   so I kept the following line to prevent compile errors.
-   This line has to be removed as soon as all plugin keymaps are fixed! */
-#define BUTTON_REC          0x00000200
 #endif
 
 #if defined(SAMSUNG_YH820)
