@@ -13229,12 +13229,12 @@
   </source>
   <dest>
     *: none
-    ibassodx50: "Charge Only"
+    ibassodx50: "Tylko ładowanie"
     ibassodx90: "Tylko ładowanie"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Charge Only"
+    ibassodx50: "Tylko ładowanie"
     ibassodx90: "Tylko ładowanie"
   </voice>
 </phrase>
@@ -13266,12 +13266,12 @@
   </source>
   <dest>
     *: none
-    ibassodx50: "USB Mode"
+    ibassodx50: "Tryb USB"
     ibassodx90: "Tryb USB"
   </dest>
   <voice>
     *: none
-    ibassodx50: "USB Mode"
+    ibassodx50: "Tryb USB"
     ibassodx90: "Tryb USB"
   </voice>
 </phrase>
@@ -13340,12 +13340,12 @@
   </source>
   <dest>
     *: none
-    ibassodx50: "Mass Storage"
+    ibassodx50: "Pamięć masowa"
     ibassodx90: "Pamięć masowa"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Mass Storage"
+    ibassodx50: "Pamięć masowa"
     ibassodx90: "Pamięć masowa"
   </voice>
 </phrase>
