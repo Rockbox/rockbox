@@ -109,7 +109,7 @@ bool BootloaderInstallMi4::uninstall(void)
     QFile blfile(resolved);
     blfile.remove();
 
-    QFile::rename(Utils::resolvePathCase(original), m_blfile);
+    QFile::rename(Utils::resolvePathCase(original), resolved);
     emit logItem(tr("Rockbox bootloader successful removed"), LOGINFO);
     logInstall(LogRemove);
     emit done(false);
