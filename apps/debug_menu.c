@@ -792,7 +792,8 @@ static bool dbg_cpufreq(void)
     {
         line = 0;
 
-        lcd_putsf(0, line++, "Frequency: %ld", FREQ);
+        int temp = FREQ/1000000;
+        lcd_putsf(0, line++, "Frequency: %ld.%ld MHz", temp, (FREQ-temp*1000000)/100000);
         lcd_putsf(0, line++, "boost_counter: %d", get_cpu_boost_counter());
 
         lcd_update();
