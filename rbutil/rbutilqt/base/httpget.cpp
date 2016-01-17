@@ -170,7 +170,7 @@ void HttpGet::requestFinished(QNetworkReply* reply)
         return;
     }
     else if(m_lastStatusCode == 200 ||
-            (reply->url().isLocalFile() && reply->error() == 0)) {
+            (reply->url().scheme() == "file" && reply->error() == 0)) {
         // callers might not be aware if the request is file:// so fake 200.
         m_lastStatusCode = 200;
         m_data = reply->readAll();
