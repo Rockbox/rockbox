@@ -118,10 +118,7 @@ bool button_hold(void)
 #ifdef SANSA_CLIPV2
     GPIOA_DIR |= 1<<7;
     GPIOA_PIN(7) = 1<<7;
-
-    int delay = 50;
-    while(delay--)
-        asm("nop");
+    udelay(2);
 #endif
 
     bool hold_button = (GPIOA_PIN(3) != 0);
@@ -129,6 +126,7 @@ bool button_hold(void)
 #ifdef SANSA_CLIPV2
     GPIOA_PIN(7) = 0;
     GPIOA_DIR &= ~(1<<7);
+    udelay(4);
 #endif
 
 #ifndef BOOTLOADER
