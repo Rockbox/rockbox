@@ -70,11 +70,8 @@
  * - bit 12  = unknown (always set to 1)
  * Fpll = Fin * F / (R * OD), where Fin = 12 MHz
  */
-#define AS3525_PLLA_FREQ        240000000
-#define AS3525_PLLA_SETTING     0x113B
-
-#define AS3525_PLLB_FREQ        192000000   /* allows 44.1kHz with 0.04% error*/
-#define AS3525_PLLB_SETTING     0x155F
+#define AS3525_PLLA_FREQ        192000000   /* allows 44.1kHz with 0.04% error*/
+#define AS3525_PLLA_SETTING     0x155F
 
 #define AS3525_FCLK_PREDIV      0
 #define AS3525_FCLK_FREQ        AS3525_PLLA_FREQ
@@ -86,13 +83,9 @@
  * Also note that CGU_PERI is based on fclk, not PLLA
  */
 
-#ifdef SANSA_FUZEV2
-/* display is unbearably slow at 24MHz
- * 34285715 HZ works ok but 40MHz works even better*/
-#define AS3525_DRAM_FREQ        40000000    /* Initial DRAM frequency  */
-#else
-#define AS3525_DRAM_FREQ        24000000    /* Initial DRAM frequency  */
-#endif /* SANSA_FUZEV2 */
+
+
+#define AS3525_DRAM_FREQ        96000000    /* Initial DRAM frequency  */
 
 #else
 /* AS3525v1 */
@@ -131,8 +124,8 @@
 
 /* Tell the software what frequencies we're running */
 #define CPUFREQ_MAX              AS3525_FCLK_FREQ
-#define CPUFREQ_DEFAULT          AS3525_PCLK_FREQ
-#define CPUFREQ_NORMAL           AS3525_PCLK_FREQ
+#define CPUFREQ_DEFAULT          38400000
+#define CPUFREQ_NORMAL           CPUFREQ_DEFAULT
 
 /* FCLK */
 #define AS3525_FCLK_SEL          AS3525_CLK_PLLA
@@ -145,21 +138,8 @@
 #endif /* CONFIG_CPU == AS3525v2 */
 
 /* MCLK */
-#if CONFIG_CPU == AS3525v2
-/* on AMSv2 we can enable PLLB for MCLK to increase PCM sample rate accuracy
-   with no significant impact on battery life */
-#define AS3525_MCLK_SEL          AS3525_CLK_PLLB
-#else
 #define AS3525_MCLK_SEL          AS3525_CLK_PLLA
-#endif /* CONFIG_CPU == AS3525v2 */
-
-#if (AS3525_MCLK_SEL==AS3525_CLK_PLLA)
 #define AS3525_MCLK_FREQ         AS3525_PLLA_FREQ
-#elif (AS3525_MCLK_SEL==AS3525_CLK_PLLB)
-#define AS3525_MCLK_FREQ         AS3525_PLLB_FREQ
-#else
-#error Choose either PLLA or PLLB for MCLK!
-#endif
 
 /* PCLK */
 

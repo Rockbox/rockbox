@@ -306,8 +306,6 @@ void system_init(void)
 
     CGU_PERI |= CGU_ROM_ENABLE; /* needed for rebooting */
 
-    set_cpu_frequency(CPUFREQ_DEFAULT);
-
 #if 0 /* the GPIO clock is already enabled by the dualboot function */
     CGU_PERI |= CGU_GPIO_CLOCK_ENABLE;
 #endif
@@ -335,10 +333,8 @@ void system_init(void)
     ascodec_write_pmu(0x18, 1, 0x35);
     /* AVDD17:    set AVDD17 power supply to 2.5V */
     ascodec_write_pmu(0x18, 7, 0x31);
-#ifdef SANSA_CLIPZIP
-    /* CVDD2:     set CVDD2 power supply to 2.8V */
-    ascodec_write_pmu(0x17, 2, 0xF4);
-#endif
+    /* CVDD2:     set CVDD2 power supply (digital for DAC/SD/etc) to 2.65V */
+    ascodec_write_pmu(0x17, 2, 0x80 | 113);
 #else /* HAVE_AS3543 */
     ascodec_write(AS3514_CVDD_DCDC3, AS314_CP_DCDC3_SETTING);
 #endif /* HAVE_AS3543 */
@@ -460,23 +456,18 @@ void set_cpu_frequency(long frequency)
     }
 }
 #else   /* as3525v2  */
-/* FIXME : disabled for now, seems to cause buggy memory accesses
- * Disabling MMU or putting the function in uncached memory seems to help? */
 void set_cpu_frequency(long frequency)
 {
-    int oldstatus = disable_irq_save();
-
-    /* We only have 2 settings */
-    cpu_frequency = (frequency == CPUFREQ_MAX) ? frequency : CPUFREQ_NORMAL;
-
     if(frequency == CPUFREQ_MAX)
     {
-        /* Change PCLK while FCLK is low, so it doesn't go too high */
-        CGU_PERI = (CGU_PERI & ~(0xF << 2)) | (AS3525_PCLK_DIV0 << 2);
+        /* Set CVDD1 power supply */
+        /*ascodec_write_pmu(0x17, 1, 0x80 | 47);*/
 
         CGU_PROC = ((AS3525_FCLK_POSTDIV << 4) |
                     (AS3525_FCLK_PREDIV  << 2) |
                     AS3525_FCLK_SEL);
+
+        cpu_frequency = CPUFREQ_MAX;
     }
     else
     {
@@ -484,11 +475,17 @@ void set_cpu_frequency(long frequency)
                     (AS3525_FCLK_PREDIV  << 2) |
                     AS3525_FCLK_SEL);
 
-        /* Change PCLK after FCLK is low, so it doesn't go too high */
-        CGU_PERI = (CGU_PERI & ~(0xF << 2)) | (AS3525_PCLK_DIV0_UNBOOSTED << 2);
-    }
+        cpu_frequency = CPUFREQ_NORMAL;
 
-    restore_irq(oldstatus);
+        /* Set CVDD1 power supply */
+        /*
+#ifdef SANSA_CLIPZIP
+        ascodec_write_pmu(0x17, 1, 0x80 | 19);
+#else
+        ascodec_write_pmu(0x17, 1, 0x80 | 22);
+#endif
+        */
+    }
 }
 #endif
 
