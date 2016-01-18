@@ -33,10 +33,13 @@ static int usb_status = USB_EXTRACTED;
 void usb_enable(bool on)
 {
 #if defined(HAVE_USBSTACK)
-    if (on)
+    if (on){
+        cpu_boost(1);
         usb_core_init();
-    else
+    } else {
         usb_core_exit();
+        cpu_boost(0);
+    }
 #else
     (void)on;
 #endif
