@@ -246,12 +246,13 @@ int button_read_device(void)
     GPIOB_DIR &= ~(1<<1);
 
     GPIOB_PIN(0) = 1<<0;
-    udelay(4);
+    /*note that lower delays (4, 2 us) work without frequency scaling*/
+    udelay(20);
 
     gpiod6 = GPIOD_PIN(6);
 
     GPIOB_PIN(0) = 0;
-    udelay(2);
+    udelay(5);
 
     btn = GPIOC_PIN_MASK(0x3e) | (GPIOB_PIN(1) >> 1);
 
