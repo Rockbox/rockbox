@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7ac969e8_0610fa4d",
+        "filename": "firmware/target/arm/as3525/clock-target.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2016-01-20T12:38:38Z",
+      "side": 1,
+      "message": "Even if it works, with this changes we got too high CPU clock (60.96MHz) in normal (unboosted) mode .",
+      "parentUuid": "7ac969e8_e6083e2b",
+      "range": {
+        "startLine": 73,
+        "startChar": 32,
+        "endLine": 73,
+        "endChar": 41
+      },
+      "revId": "ad18fa37531a680636b89a441eb41a4fce72a650",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7ac969e8_c60d4239",
         "filename": "firmware/target/arm/as3525/system-as3525.c",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2016-01-20T08:36:05Z",
       "side": 1,
       "message": "What is this voltage powering? \n\n113 \u003d 0x71 and \"0x71 – 0x7F: 2.6V + (VSEL-0x70) * 50mV\" so this seems to be setting 2.65V.\n\nPrevious Sansa Clip Zip was 0z74 so 2.6 + 0.5 * 4 \u003d 2.8V like the comment said.",
+      "range": {
+        "startLine": 337,
+        "startChar": 37,
+        "endLine": 337,
+        "endChar": 38
+      },
+      "revId": "ad18fa37531a680636b89a441eb41a4fce72a650",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ac969e8_661d6e66",
+        "filename": "firmware/target/arm/as3525/system-as3525.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2016-01-20T12:38:38Z",
+      "side": 1,
+      "message": "Yes, you right - should be 2.65V.\n\nCVDD2 connected to PVDD1 (digital part for DAC/ADC), SD card, and probably to something else. On clip+ we have extremely big difference after changing it.\n\nhttp://forums.rockbox.org/index.php/topic,48549.msg232613.html#msg232613",
+      "parentUuid": "7ac969e8_c60d4239",
       "range": {
         "startLine": 337,
         "startChar": 37,
