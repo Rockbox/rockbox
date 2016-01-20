@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ac969e8_e6083e2b",
+        "filename": "firmware/target/arm/as3525/clock-target.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2016-01-20T08:36:05Z",
+      "side": 1,
+      "message": "I ran a program to see if I could find a better frequency for 44.1kHz\n12 * 127 / 5 \u003d 304.8 should give 0.0063%\nI\u0027m not even sure if the PLL works with the extreme F \u003d\u003d 127\nThis is not an objection, just curiosity.",
+      "range": {
+        "startLine": 73,
+        "startChar": 32,
+        "endLine": 73,
+        "endChar": 41
+      },
+      "revId": "ad18fa37531a680636b89a441eb41a4fce72a650",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ac969e8_c60d4239",
+        "filename": "firmware/target/arm/as3525/system-as3525.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2016-01-20T08:36:05Z",
+      "side": 1,
+      "message": "What is this voltage powering? \n\n113 \u003d 0x71 and \"0x71 – 0x7F: 2.6V + (VSEL-0x70) * 50mV\" so this seems to be setting 2.65V.\n\nPrevious Sansa Clip Zip was 0z74 so 2.6 + 0.5 * 4 \u003d 2.8V like the comment said.",
+      "range": {
+        "startLine": 337,
+        "startChar": 37,
+        "endLine": 337,
+        "endChar": 38
+      },
+      "revId": "ad18fa37531a680636b89a441eb41a4fce72a650",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
