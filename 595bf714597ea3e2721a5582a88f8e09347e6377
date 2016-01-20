@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ac969e8_a6fe4603",
+        "filename": "apps/radio/radio.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2016-01-20T01:16:35Z",
+      "side": 1,
+      "message": "SAMSUNG_YH920_PAD is already there; I don\u0027t think SAMSUNG_YH925_PAD is even defined :)",
+      "revId": "595bf714597ea3e2721a5582a88f8e09347e6377",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
