@@ -490,7 +490,7 @@
 #define BUTTON_SAVE          BUTTON_PLAY
 #define BUTTON_SAVE_NAME "PLAY"
 
-#elif CONFIG_KEYPAD == SAMSUNG_YH920_PAD
+#elif CONFIG_KEYPAD == SAMSUNG_YH92X_PAD
 #define SOKOBAN_LEFT         BUTTON_LEFT
 #define SOKOBAN_RIGHT        BUTTON_RIGHT
 #define SOKOBAN_UP           BUTTON_UP
@@ -1622,7 +1622,7 @@ static int sokoban_menu(void)
                 rb->lcd_putsxy(3, 36, "[VOL-] Previous Level");
                 rb->lcd_putsxy(3, 46, "[NEXT+PREV] Restart Level");
                 rb->lcd_putsxy(3, 56, "[VOL+] Next Level");
-#elif CONFIG_KEYPAD == SAMSUNG_YH920_PAD
+#elif CONFIG_KEYPAD == SAMSUNG_YH92X_PAD
                 rb->lcd_putsxy(3,  6, "[PLAY] Menu");
                 rb->lcd_putsxy(3, 16, "[REW]  Undo");
                 rb->lcd_putsxy(3, 26, "[FFWD] Redo");

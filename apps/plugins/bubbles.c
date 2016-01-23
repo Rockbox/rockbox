@@ -83,7 +83,7 @@ enum {
 
 /* these are better off shooting with up */
 #if (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) \
- || (CONFIG_KEYPAD == SAMSUNG_YH920_PAD) \
+ || (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD) \
  || (CONFIG_KEYPAD == ONDIO_PAD) \
  || (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #define SHOOT_WITH_UP

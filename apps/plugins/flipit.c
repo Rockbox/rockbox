@@ -345,7 +345,7 @@
 #define FLIPIT_QUIT         BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
-      (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
+      (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD)
 
 #define FLIPIT_LEFT         BUTTON_LEFT
 #define FLIPIT_RIGHT        BUTTON_RIGHT
@@ -941,7 +941,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_putsxy(2, 28, "[VOL+] shuffle");
     rb->lcd_putsxy(2, 38, "[PREV] solution");
     rb->lcd_putsxy(2, 48, "[NEXT] step by step");
-#elif (CONFIG_KEYPAD == SAMSUNG_YH920_PAD) || \
+#elif (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD) || \
       (CONFIG_KEYPAD == SAMSUNG_YH820_PAD)
     rb->lcd_putsxy(2, 8, "Long [REW] to stop");
     rb->lcd_putsxy(2, 18, "[PLAY] toggle");

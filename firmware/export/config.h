@@ -163,7 +163,7 @@
 #define SAMSUNG_YPZ5_PAD   59
 #define IHIFI_PAD          60
 #define SAMSUNG_YPR1_PAD  61
-#define SAMSUNG_YH920_PAD  62
+#define SAMSUNG_YH92X_PAD  62
 #define DX50_PAD           63
 
 /* CONFIG_REMOTE_KEYPAD */

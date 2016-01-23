@@ -191,7 +191,7 @@
 #define ZX_MENU         BUTTON_POWER
 
 #elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
-      (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
+      (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD)
 
 #define ZX_UP           BUTTON_UP
 #define ZX_DOWN         BUTTON_DOWN
