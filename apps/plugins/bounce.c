@@ -468,7 +468,7 @@ enum plugin_status plugin_start(const void* parameter)
 {
     int w, h;
     char *off =
-#if (CONFIG_KEYPAD == SAMSUNG_YH920_PAD) || \
+#if (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD) || \
     (CONFIG_KEYPAD == SAMSUNG_YH820_PAD)
         "[Rew] to stop";
 #else

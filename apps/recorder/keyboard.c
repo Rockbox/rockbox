@@ -69,7 +69,7 @@
     || (CONFIG_KEYPAD == PBELL_VIBE500_PAD) \
     || (CONFIG_KEYPAD == SANSA_CONNECT_PAD) \
     || (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) \
-    || (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
+    || (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD)
 
 /* certain key combos toggle input mode between keyboard input and Morse input */
 #define KBD_TOGGLE_INPUT

@@ -395,7 +395,7 @@ void I_ShutdownGraphics(void)
 #elif CONFIG_KEYPAD == ONDAVX777_PAD
 #define DOOMBUTTON_ESC     BUTTON_POWER
 
-#elif CONFIG_KEYPAD == SAMSUNG_YH920_PAD
+#elif CONFIG_KEYPAD == SAMSUNG_YH92X_PAD
 #define DOOMBUTTON_UP      BUTTON_UP
 #define DOOMBUTTON_DOWN    BUTTON_DOWN
 #define DOOMBUTTON_LEFT    BUTTON_LEFT
@@ -617,7 +617,7 @@ static inline void getkey()
          hswitch=0;
       }
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_1G2G_PAD) || (CONFIG_KEYPAD == SAMSUNG_YH920_PAD)
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD) || (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD)
       /* Bring up the menu */
       event.data1=KEY_ESCAPE;
 #else

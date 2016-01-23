@@ -90,7 +90,7 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
-#define CONFIG_KEYPAD SAMSUNG_YH920_PAD
+#define CONFIG_KEYPAD SAMSUNG_YH92X_PAD
 
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
