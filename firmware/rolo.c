@@ -51,6 +51,10 @@
 #define LOAD_FIRMWARE(a,b,c) load_firmware(a,b,c)
 #endif
 
+#if CONFIG_CPU == AS3525v2
+#include "ascodec.h"
+#endif
+
 #if !defined(IRIVER_IFP7XX_SERIES)
 /* FIX: this doesn't work on iFP */
 
