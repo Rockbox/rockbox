@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ac665da_25136e5e",
+        "filename": "firmware/target/arm/s5l8702/ipod6g/power-ipod6g.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1000097
+      },
+      "writtenOn": "2016-01-27T11:27:22Z",
+      "side": 1,
+      "message": "On Classic, it seems that the 100/500mA limit applies only to USB chargers, when FW is connected it supplies all the power (even if USB is also connected) and  USB current limit does not affect.",
+      "range": {
+        "startLine": 89,
+        "startChar": 41,
+        "endLine": 92,
+        "endChar": 6
+      },
+      "revId": "fa86fec4fb089b47f5c2c3b1f2f3dbc97551895b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
