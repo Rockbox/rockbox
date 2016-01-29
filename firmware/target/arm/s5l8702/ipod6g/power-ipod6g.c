@@ -75,7 +75,7 @@ void power_init(void)
           | (0xe << 12)     /* route D- to ADC2: off */
           | (0x0 << 16)     /* USB related input, POL pin ??? */
           | (0x0 << 20)     /* USB related input, !CHRG pin ??? */
-          | (0xf << 24)     /* HPWR: 500mA */
+          | (0xe << 24)     /* HPWR: 100mA */
           | (0xe << 28);    /* USB suspend: off */
 
     PCONC = (PCONC & 0xffff0000)
