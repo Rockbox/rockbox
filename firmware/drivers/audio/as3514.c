@@ -130,6 +130,8 @@ void audiohw_preinit(void)
     ascodec_readbytes(0x0, AS3514_NUM_AUDIO_REGS, as3514_regs);
 
 #ifdef HAVE_AS3543
+    /* Prevent increasing noise and power consumption if booted through rolo */
+    as3514_write(AS3514_HPH_OUT_L, 0x0);
 
     as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on);
     as3514_write(AS3514_AUDIOSET2, AUDIOSET2_SUM_off | AUDIOSET2_AGC_off | AUDIOSET2_HPH_QUALITY_LOW_POWER);
