@@ -105,7 +105,7 @@ struct imx233_button_map_t
 
 #define IMX233_BUTTON__(btn_, path_, ...) \
     {.btn = btn_, IMX233_BUTTON_PATH_##path_, \
-     REG_VARIADIC(IMX233_BUTTON_NAMEFLAGS, dummy, __VA_ARGS__)}
+     __VAR_EXPAND(IMX233_BUTTON_NAMEFLAGS, dummy, __VA_ARGS__)}
 #define IMX233_BUTTON_(btn_, path_, ...) \
     IMX233_BUTTON__(IMX233_BUTTON_##btn_, path_, __VA_ARGS__)
 #define IMX233_BUTTON(btn_, path_, ...) \

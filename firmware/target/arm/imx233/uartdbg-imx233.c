@@ -22,6 +22,8 @@
 #include "pinctrl-imx233.h"
 #include "clkctrl-imx233.h"
 
+#include "regs-v2/regs-uartdbg.h"
+
 void imx233_uartdbg_init(unsigned long baud)
 {
     /* Enable UART clock */
@@ -47,7 +49,7 @@ void imx233_uartdbg_init(unsigned long baud)
 void imx233_uartdbg_send(unsigned char data)
 {
     /* Wait to transmit if TX FIFO buffer is full*/
-    while (BF_RD(UARTDBG_FR, TXFF));
+    while (BR_UARTDBG_FR(TXFF));
     BF_WR(UARTDBG_DR, DATA, data);
 }
 
@@ -64,7 +66,7 @@ unsigned int uart_rx(char* rx_buf, unsigned int len)
     while(i < len)
     {
         /* Check if the UART Rx Buffer has something into -> RXFE */
-        if(!BF_RD(UARTDBG_FR, RXFE))
+        if(!BR_UARTDBG_FR(RXFE))
         {
             rx_buf[i] = HW_UARTDBG_DR;
             i++;

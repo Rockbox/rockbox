@@ -35,7 +35,7 @@
 #endif
 #include "dma-imx233.h"
 
-#include "regs/regs-lcdif.h"
+#include "regs-v2/regs-lcdif.h"
 
 /**
  * NOTE
@@ -243,9 +243,9 @@ void lcd_update(void)
     /* We can safely do the transfer in a single shot, since 160 * 128 * 2 < 65k,
      * the maximum transfer size!
      */
-    lcdif_dma.dma.cmd |= BF_OR3(APB_CHx_CMD, CMDWORDS(1), XFER_COUNT(size), COMMAND(2));
+    lcdif_dma.dma.cmd |= BF_OR(APB_CHx_CMD, CMDWORDS(1), XFER_COUNT(size), COMMAND(2));
     lcdif_dma.ctrl0 = HW_LCDIF_CTRL & ~BM_LCDIF_CTRL_COUNT;
-    lcdif_dma.ctrl0 |= BF_OR2(LCDIF_CTRL, COUNT(size/2), DATA_SELECT(1));
+    lcdif_dma.ctrl0 |= BF_OR(LCDIF_CTRL, COUNT(size/2), DATA_SELECT(1));
     lcdif_dma.dma.buffer = FBADDR(0,0);
     lcdif_dma.dma.cmd |= BM_APB_CHx_CMD_SEMAPHORE;
 

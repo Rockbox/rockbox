@@ -28,7 +28,6 @@
  * where STMP3600 has laser fuses. */
 
 #if IMX233_SUBTARGET >= 3700
-#include "regs/regs-ocotp.h"
 
 #define IMX233_NUM_OCOTP_CUST   4
 #define IMX233_NUM_OCOTP_CRYPTO 4
@@ -37,16 +36,18 @@
 #define IMX233_NUM_OCOTP_UN     3
 #define IMX233_NUM_OCOTP_ROM    8
 
+#include "regs-v2/regs-ocotp.h"
+
 static inline void imx233_ocotp_open_banks(bool open)
 {
     if(open)
     {
-        BF_CLR(OCOTP_CTRL, ERROR);
-        BF_SET(OCOTP_CTRL, RD_BANK_OPEN);
-        while(BF_RD(OCOTP_CTRL, BUSY));
+        BM_OCOTP_CTRL_CLR(ERROR);
+        BM_OCOTP_CTRL_SET(RD_BANK_OPEN);
+        while(BR_OCOTP_CTRL(BUSY));
     }
     else
-        BF_CLR(OCOTP_CTRL, RD_BANK_OPEN);
+        BM_OCOTP_CTRL_CLR(RD_BANK_OPEN);
 }
 
 static inline uint32_t imx233_ocotp_read(volatile uint32_t *reg)
@@ -56,8 +57,13 @@ static inline uint32_t imx233_ocotp_read(volatile uint32_t *reg)
     imx233_ocotp_open_banks(false);
     return val;
 }
-#else
-#include "regs/regs-rtc.h"
+
+static inline uint32_t imx233_ocotp_read_ops(unsigned idx)
+{
+    return imx233_ocotp_read(&HW_OCOTP_OPSn(idx));
+}
+
+#else /* IMX233_SUBTARGET < 3700 */
 
 #define IMX233_NUM_OCOTP_LASERFUSE  12
 

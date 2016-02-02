@@ -43,6 +43,9 @@
 #include "button.h"
 #include "button-imx233.h"
 
+#include "regs-v2/regs-timrot.h"
+#include "regs-v2/regs-usbphy.h"
+
 #define ACT_NONE    0
 #define ACT_CANCEL  1
 #define ACT_OK      2
@@ -667,7 +670,7 @@ bool dbg_hw_info_ocotp(void)
         }
         if(i < top_user)
             top_user = i - 1;
-        
+
         lcd_update();
         yield();
     }
@@ -742,12 +745,12 @@ bool dbg_hw_info_usb(void)
         switch(button)
         {
             case ACT_NEXT:
-                BF_SET(USBPHY_CTRL, ENOTGIDDETECT);
-                BF_SET(USBPHY_CTRL, ENDEVPLUGINDETECT);
+                BM_USBPHY_CTRL_SET(ENOTGIDDETECT);
+                BM_USBPHY_CTRL_SET(ENDEVPLUGINDETECT);
                 break;
             case ACT_PREV:
-                BF_CLR(USBPHY_CTRL, ENOTGIDDETECT);
-                BF_CLR(USBPHY_CTRL, ENDEVPLUGINDETECT);
+                BM_USBPHY_CTRL_CLR(ENOTGIDDETECT);
+                BM_USBPHY_CTRL_CLR(ENDEVPLUGINDETECT);
                 break;
             case ACT_OK:
                 lcd_setfont(FONT_UI);
@@ -760,17 +763,17 @@ bool dbg_hw_info_usb(void)
         lcd_clear_display();
         int line = 0;
 #if IMX233_SUBTARGET >= 3700
-        lcd_putsf(0, line++, "VBUS valid: %d/%d", BF_RD(POWER_STS, VBUSVALID), BF_RD(POWER_STS, VBUSVALID_STATUS));
-        lcd_putsf(0, line++, "A valid: %d/%d", BF_RD(POWER_STS, AVALID), BF_RD(POWER_STS, AVALID_STATUS));
-        lcd_putsf(0, line++, "B valid: %d/%d", BF_RD(POWER_STS, BVALID), BF_RD(POWER_STS, BVALID_STATUS));
+        lcd_putsf(0, line++, "VBUS valid: %d/%d", BR_POWER_STS(VBUSVALID), BR_POWER_STS(VBUSVALID_STATUS));
+        lcd_putsf(0, line++, "A valid: %d/%d", BR_POWER_STS(AVALID), BR_POWER_STS(AVALID_STATUS));
+        lcd_putsf(0, line++, "B valid: %d/%d", BR_POWER_STS(BVALID), BR_POWER_STS(BVALID_STATUS));
 #else
-        lcd_putsf(0, line++, "VBUS valid: %d/%d", BF_RD(POWER_STS, VBUSVALID));
-        lcd_putsf(0, line++, "A valid: %d/%d", BF_RD(POWER_STS, AVALID));
-        lcd_putsf(0, line++, "B valid: %d/%d", BF_RD(POWER_STS, BVALID));
+        lcd_putsf(0, line++, "VBUS valid: %d/%d", BR_POWER_STS(VBUSVALID));
+        lcd_putsf(0, line++, "A valid: %d/%d", BR_POWER_STS(AVALID));
+        lcd_putsf(0, line++, "B valid: %d/%d", BR_POWER_STS(BVALID));
 #endif
-        lcd_putsf(0, line++, "session end: %d", BF_RD(POWER_STS, SESSEND));
-        lcd_putsf(0, line++, "dev plugin: %d", BF_RD(USBPHY_STATUS, DEVPLUGIN_STATUS));
-        lcd_putsf(0, line++, "OTG ID: %d", BF_RD(USBPHY_STATUS, OTGID_STATUS));
+        lcd_putsf(0, line++, "session end: %d", BR_POWER_STS(SESSEND));
+        lcd_putsf(0, line++, "dev plugin: %d", BR_USBPHY_STATUS(DEVPLUGIN_STATUS));
+        lcd_putsf(0, line++, "OTG ID: %d", BR_USBPHY_STATUS(OTGID_STATUS));
 
         lcd_update();
         yield();

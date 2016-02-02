@@ -30,6 +30,8 @@
 #include "audio-target.h"
 #include "power-imx233.h"
 
+#include "regs-v2/regs-audioout.h"
+
 #ifndef IMX233_AUDIO_COUPLING_MODE
 #error You must define IMX233_AUDIO_COUPLING_MODE
 #endif
@@ -46,7 +48,7 @@ static int hp_unmute_cb(struct timeout *tmo)
 {
     (void) tmo;
     /* unmute HP */
-    BF_CLR(AUDIOOUT_HPVOL, MUTE);
+    BM_AUDIOOUT_HPVOL_CLR(MUTE);
     return 0;
 }
 
@@ -58,37 +60,37 @@ void imx233_audioout_preinit(void)
     /* Enable digital filter clock */
     imx233_clkctrl_enable(CLK_FILT, true);
     /* Enable DAC */
-    BF_CLR(AUDIOOUT_ANACLKCTRL, CLKGATE);
+    BM_AUDIOOUT_ANACLKCTRL_CLR(CLKGATE);
     /* Set capless mode */
 #if IMX233_AUDIO_COUPLING_MODE == ACM_CAP
-    BF_SET(AUDIOOUT_PWRDN, CAPLESS);
+    BM_AUDIOOUT_PWRDN_SET(CAPLESS);
 #else
-    BF_CLR(AUDIOOUT_PWRDN, CAPLESS);
+    BM_AUDIOOUT_PWRDN_CLR(CAPLESS);
 #endif
     /* Set word-length to 16-bit */
-    BF_SET(AUDIOOUT_CTRL, WORD_LENGTH);
+    BM_AUDIOOUT_CTRL_SET(WORD_LENGTH);
     /* Power up DAC */
-    BF_CLR(AUDIOOUT_PWRDN, DAC);
+    BM_AUDIOOUT_PWRDN_CLR(DAC);
     /* Hold HP to ground to avoid pop, then release and power up HP */
-    BF_SET(AUDIOOUT_ANACTRL, HP_HOLD_GND);
-    BF_CLR(AUDIOOUT_PWRDN, HEADPHONE);
+    BM_AUDIOOUT_ANACTRL_SET(HP_HOLD_GND);
+    BM_AUDIOOUT_PWRDN_CLR(HEADPHONE);
     /* Set HP mode to AB */
-    BF_SET(AUDIOOUT_ANACTRL, HP_CLASSAB);
+    BM_AUDIOOUT_ANACTRL_SET(HP_CLASSAB);
     /* change bias to -50% */
     BF_WR(AUDIOOUT_TEST, HP_I1_ADJ, 1);
     BF_WR(AUDIOOUT_REFCTRL, BIAS_CTRL, 1);
 #if IMX233_SUBTARGET >= 3700
-    BF_SET(AUDIOOUT_REFCTRL, RAISE_REF);
+    BM_AUDIOOUT_REFCTRL_SET(RAISE_REF);
 #endif
-    BF_SET(AUDIOOUT_REFCTRL, XTAL_BGR_BIAS);
+    BM_AUDIOOUT_REFCTRL_SET(XTAL_BGR_BIAS);
     /* Stop holding to ground */
-    BF_CLR(AUDIOOUT_ANACTRL, HP_HOLD_GND);
+    BM_AUDIOOUT_ANACTRL_CLR(HP_HOLD_GND);
     /* Set dmawait count to 31 (see errata, workaround random stop) */
     BF_WR(AUDIOOUT_CTRL, DMAWAIT_COUNT, 31);
     /* start converting audio */
-    BF_SET(AUDIOOUT_CTRL, RUN);
+    BM_AUDIOOUT_CTRL_SET(RUN);
     /* unmute DAC */
-    HW_AUDIOOUT_DACVOLUME_CLR = BM_OR2(AUDIOOUT_DACVOLUME, MUTE_LEFT, MUTE_RIGHT);
+    BM_AUDIOOUT_DACVOLUME_CLR(MUTE_LEFT, MUTE_RIGHT);
     /* send a few samples to avoid pop */
     HW_AUDIOOUT_DATA = 0;
     HW_AUDIOOUT_DATA = 0;
@@ -105,23 +107,23 @@ void imx233_audioout_postinit(void)
 void imx233_audioout_close(void)
 {
     /* Switch to class A */
-    BF_CLR(AUDIOOUT_ANACTRL, HP_CLASSAB);
+    BM_AUDIOOUT_ANACTRL_CLR(HP_CLASSAB);
     /* Hold HP to ground */
-    BF_SET(AUDIOOUT_ANACTRL, HP_HOLD_GND);
+    BM_AUDIOOUT_ANACTRL_SET(HP_HOLD_GND);
     /* Mute HP and power down */
-    BF_SET(AUDIOOUT_HPVOL, MUTE);
+    BM_AUDIOOUT_HPVOL_SET(MUTE);
     /* Power down HP */
-    BF_SET(AUDIOOUT_PWRDN, HEADPHONE);
+    BM_AUDIOOUT_PWRDN_SET(HEADPHONE);
     /* Mute DAC */
-    HW_AUDIOOUT_DACVOLUME_SET = BM_OR2(AUDIOOUT_DACVOLUME, MUTE_LEFT, MUTE_RIGHT);
+    BM_AUDIOOUT_DACVOLUME_SET(MUTE_LEFT, MUTE_RIGHT);
     /* Power down DAC */
-    BF_SET(AUDIOOUT_PWRDN, DAC);
+    BM_AUDIOOUT_PWRDN_SET(DAC);
     /* Gate off DAC */
-    BF_SET(AUDIOOUT_ANACLKCTRL, CLKGATE);
+    BM_AUDIOOUT_ANACLKCTRL_SET(CLKGATE);
     /* Disable digital filter clock */
     imx233_clkctrl_enable(CLK_FILT, false);
     /* will also gate off the module */
-    BF_CLR(AUDIOOUT_CTRL, RUN);
+    BM_AUDIOOUT_CTRL_CLR(RUN);
 }
 
 /* volume in half dB
@@ -133,8 +135,7 @@ static void set_dac_vol(int vol_l, int vol_r)
     vol_r = MAX(-200, MIN(vol_r, 0));
     /* unmute, enable zero cross and set volume.
      * 0xff is 0dB */
-    HW_AUDIOOUT_DACVOLUME = BF_OR3(AUDIOOUT_DACVOLUME,
-        VOLUME_LEFT(0xff + vol_l), VOLUME_RIGHT(0xff + vol_r), EN_ZCD(1));
+    BW_AUDIOOUT_DACVOLUME(VOLUME_LEFT(0xff + vol_l), VOLUME_RIGHT(0xff + vol_r), EN_ZCD(1));
 }
 
 /* volume in half dB
@@ -150,11 +151,11 @@ static void set_hp_vol(int vol_l, int vol_r)
     vol_r = MAX(min, MIN(vol_r, max));
     /* unmute, enable zero cross and set volume.*/
 #if IMX233_SUBTARGET >= 3700
-    unsigned mstr_zcd = BM_AUDIOOUT_HPVOL_EN_MSTR_ZCD;
+    unsigned mstr_zcd = BM_OR(AUDIOOUT_HPVOL, EN_MSTR_ZCD);
 #else
     unsigned mstr_zcd = 0;
 #endif
-    HW_AUDIOOUT_HPVOL = mstr_zcd | BF_OR3(AUDIOOUT_HPVOL, SELECT(input_line1),
+    HW_AUDIOOUT_HPVOL = mstr_zcd | BF_OR(AUDIOOUT_HPVOL, SELECT(input_line1),
         VOL_LEFT(max - vol_l), VOL_RIGHT(max - vol_r));
 }
 
@@ -206,10 +207,10 @@ void imx233_audioout_set_freq(int fsel)
         HW_HAVE_96_([HW_FREQ_96] = { 0x2, 0x0, 0xf, 0x13ff },)
     };
 
-    HW_AUDIOOUT_DACSRR = BF_OR4(AUDIOOUT_DACSRR,
+    BW_AUDIOOUT_DACSRR(
         SRC_FRAC(dacssr[fsel].src_frac), SRC_INT(dacssr[fsel].src_int),
         SRC_HOLD(dacssr[fsel].src_hold), BASEMULT(dacssr[fsel].base_mult));
-    
+
     #if 0
     /* Select base_mult and src_hold depending on the audio range:
      *     0 < f <= 12000   --> base_mult = 1, src_hold = 3 (div by 4)
@@ -272,13 +273,13 @@ void imx233_audioout_enable_spkr(bool en)
 #if IMX233_SUBTARGET >= 3780
     if(en)
     {
-        BF_CLR(AUDIOOUT_PWRDN, SPEAKER);
-        BF_CLR(AUDIOOUT_SPEAKERCTRL, MUTE);
+        BM_AUDIOOUT_PWRDN_CLR(SPEAKER);
+        BM_AUDIOOUT_SPEAKERCTRL_CLR(MUTE);
     }
     else
     {
-        BF_SET(AUDIOOUT_SPEAKERCTRL, MUTE);
-        BF_SET(AUDIOOUT_PWRDN, SPEAKER);
+        BM_AUDIOOUT_SPEAKERCTRL_SET(MUTE);
+        BM_AUDIOOUT_PWRDN_SET(SPEAKER);
     }
 #elif IMX233_SUBTARGET >= 3700
     /* assume speaker is wired to lineout */
@@ -288,19 +289,19 @@ void imx233_audioout_enable_spkr(bool en)
         BF_WR(AUDIOOUT_LINEOUTCTRL, CHARGE_CAP, 2);
         /** 2) set min gain, nominal vag levels and zerocross desires */
         /* volume is decreasing with the value in the register */
-        BF_SET(AUDIOOUT_LINEOUTCTRL, VOLUME_LEFT);
-        BF_SET(AUDIOOUT_LINEOUTCTRL, VOLUME_RIGHT);
-        BF_SET(AUDIOOUT_LINEOUTCTRL, EN_LINEOUT_ZCD);
+        BM_AUDIOOUT_LINEOUTCTRL_SET(VOLUME_LEFT);
+        BM_AUDIOOUT_LINEOUTCTRL_SETVOLUME_RIGHT);
+        BM_AUDIOOUT_LINEOUTCTRL_SET(EN_LINEOUT_ZCD);
         /* vag should be set to VDDIO/2, 0 is 1.725V, 15 is 1.350V, 25mV steps */
         int vddio;
         imx233_power_get_regulator(REGULATOR_VDDIO, &vddio, NULL);
         BF_WR(AUDIOOUT_LINEOUTCTRL, VAG_CTRL, 15 - (vddio / 2 - 1350) / 25);
         /** 3) Power up lineout */
-        BF_CLR(AUDIOOUT_PWRDN, LINEOUT);
+        BM_AUDIOOUT_PWRDN_CLR(LINEOUT);
         /** 4) Ramp the vag */
         BF_WR(AUDIOOUT_LINEOUTCTRL, CHARGE_CAP, 1);
         /** 5) Unmute */
-        BF_CLR(AUDIOOUT_LINEOUTCTRL, MUTE);
+        BM_AUDIOOUT_LINEOUTCTRL_CLR(MUTE);
         /** 6) Ramp volume */
         BF_WR(AUDIOOUT_LINEOUTCTRL, VOLUME_LEFT, 0);
         BF_WR(AUDIOOUT_LINEOUTCTRL, VOLUME_RIGHT, 0);
@@ -308,9 +309,9 @@ void imx233_audioout_enable_spkr(bool en)
     else
     {
         /** Reverse procedure */
-        BF_SET(AUDIOOUT_LINEOUTCTRL, MUTE);
+        BM_AUDIOOUT_LINEOUTCTRL_SET(MUTE);
         BF_WR(AUDIOOUT_LINEOUTCTRL, CHARGE_CAP, 2);
-        BF_SET(AUDIOOUT_PWRDN, LINEOUT);
+        BM_AUDIOOUT_PWRDN_SET(LINEOUT);
     }
 #else
     (void) en;
@@ -322,36 +323,36 @@ struct imx233_audioout_info_t imx233_audioout_get_info(void)
     struct imx233_audioout_info_t info;
     memset(&info, 0, sizeof(info));
     /* 6*10^6*basemult/(src_frac*8*(src_hold+1)) in Hz */
-    info.freq = 60000000 * BF_RD(AUDIOOUT_DACSRR, BASEMULT) / 8 /
-        BF_RD(AUDIOOUT_DACSRR, SRC_FRAC) / (1 + BF_RD(AUDIOOUT_DACSRR, SRC_HOLD));
-    info.hpselect = BF_RD(AUDIOOUT_HPVOL, SELECT);
+    info.freq = 60000000 * BR_AUDIOOUT_DACSRR(BASEMULT) / 8 /
+        BR_AUDIOOUT_DACSRR(SRC_FRAC) / (1 + BR_AUDIOOUT_DACSRR(SRC_HOLD));
+    info.hpselect = BR_AUDIOOUT_HPVOL(SELECT);
     /* convert half-dB to tenth-dB */
-    info.dacvol[0] = MAX((int)BF_RD(AUDIOOUT_DACVOLUME, VOLUME_LEFT) - 0xff, -100) * 5;
-    info.dacvol[1] = MAX((int)BF_RD(AUDIOOUT_DACVOLUME, VOLUME_RIGHT) - 0xff, -100) * 5;
-    info.dacmute[0] = BF_RD(AUDIOOUT_DACVOLUME, MUTE_LEFT);
-    info.dacmute[1] = BF_RD(AUDIOOUT_DACVOLUME, MUTE_RIGHT);
-    info.hpvol[0] = (info.hpselect ? 120 : 60) - 5 * BF_RD(AUDIOOUT_HPVOL, VOL_LEFT);
-    info.hpvol[1] = (info.hpselect ? 120 : 60) - 5 * BF_RD(AUDIOOUT_HPVOL, VOL_RIGHT);
-    info.hpmute[0] = info.hpmute[1] = BF_RD(AUDIOOUT_HPVOL, MUTE);
+    info.dacvol[0] = MAX((int)BR_AUDIOOUT_DACVOLUME(VOLUME_LEFT) - 0xff, -100) * 5;
+    info.dacvol[1] = MAX((int)BR_AUDIOOUT_DACVOLUME(VOLUME_RIGHT) - 0xff, -100) * 5;
+    info.dacmute[0] = BR_AUDIOOUT_DACVOLUME(MUTE_LEFT);
+    info.dacmute[1] = BR_AUDIOOUT_DACVOLUME(MUTE_RIGHT);
+    info.hpvol[0] = (info.hpselect ? 120 : 60) - 5 * BR_AUDIOOUT_HPVOL(VOL_LEFT);
+    info.hpvol[1] = (info.hpselect ? 120 : 60) - 5 * BR_AUDIOOUT_HPVOL(VOL_RIGHT);
+    info.hpmute[0] = info.hpmute[1] = BR_AUDIOOUT_HPVOL(MUTE);
 #if IMX233_SUBTARGET >= 3780
     info.spkrvol[0] = info.spkrvol[1] = 155; // volume is fixed to 15.5 dB gain
-    info.spkrmute[0] = info.spkrmute[1] = BF_RD(AUDIOOUT_SPEAKERCTRL, MUTE);
-    info.spkr = !BF_RD(AUDIOOUT_PWRDN, SPEAKER);
+    info.spkrmute[0] = info.spkrmute[1] = BR_AUDIOOUT_SPEAKERCTRL(MUTE);
+    info.spkr = !BR_AUDIOOUT_PWRDN(SPEAKER);
 #elif IMX233_SUBTARGET < 3700
     /* convert 2-dB to tenth-dB */
-    info.spkrvol[0] = MIN(info.spkrvol[1] = BF_RD(AUDIOOUT_SPKRVOL, VOL), 6) * 20;
-    info.spkrmute[0] = info.spkrmute[1] = BF_RD(AUDIOOUT_SPKRVOL, MUTE);
-    info.spkr = !BF_RD(AUDIOOUT_PWRDN, SPEAKER);
+    info.spkrvol[0] = MIN(info.spkrvol[1] = BR_AUDIOOUT_SPKRVOL(VOL), 6) * 20;
+    info.spkrmute[0] = info.spkrmute[1] = BR_AUDIOOUT_SPKRVOL(MUTE);
+    info.spkr = !BR_AUDIOOUT_PWRDN(SPEAKER);
 #else
     /* STMP3700/3770 has not speaker amplifier */
     info.spkrvol[0] = info.spkrvol[1] = 0;
     info.spkrmute[0] = info.spkrmute[1] = true;
     info.spkr = false;
 #endif
-    info.ss3d = BF_RD(AUDIOOUT_CTRL, SS3D_EFFECT);
+    info.ss3d = BR_AUDIOOUT_CTRL(SS3D_EFFECT);
     info.ss3d = info.ss3d == 0 ? 0 : 15 * (1 + info.ss3d);
-    info.hp = !BF_RD(AUDIOOUT_PWRDN, HEADPHONE);
-    info.dac = !BF_RD(AUDIOOUT_PWRDN, DAC);
-    info.capless = BF_RD(AUDIOOUT_PWRDN, CAPLESS);
+    info.hp = !BR_AUDIOOUT_PWRDN(HEADPHONE);
+    info.dac = !BR_AUDIOOUT_PWRDN(DAC);
+    info.capless = BR_AUDIOOUT_PWRDN(CAPLESS);
     return info;
 }

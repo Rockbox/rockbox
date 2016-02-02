@@ -26,6 +26,8 @@
 #include "pinctrl-imx233.h"
 #include "string.h"
 
+#include "regs-v2/regs-i2c.h"
+
 /**
  * Driver Architecture:
  * The driver has two interfaces: the good'n'old i2c_* api and a more
@@ -102,9 +104,9 @@ static void imx233_i2c_reset(void)
      * this issue.
      */
 #if IMX233_SUBTARGET >= 3780
-    BF_SET(I2C_CTRL1, ACK_MODE);
+    BM_I2C_CTRL1_SET(ACK_MODE);
 #endif
-    BF_SET(I2C_CTRL0, CLKGATE);
+    BM_I2C_CTRL0_SET(CLKGATE);
     /* Fast-mode @ 400K */
     HW_I2C_TIMING0 = 0x000F0007; /* tHIGH=0.6us, read at 0.3us */
     HW_I2C_TIMING1 = 0x001F000F; /* tLOW=1.3us, write at 0.6us */
@@ -113,7 +115,7 @@ static void imx233_i2c_reset(void)
 
 void imx233_i2c_init(void)
 {
-    BF_SET(I2C_CTRL0, SFTRST);
+    BM_I2C_CTRL0_SET(SFTRST);
     /* setup pins (must be done when shutdown) */
     imx233_pinctrl_setup_vpin(VPIN_I2C_SCL, "i2c scl", PINCTRL_DRIVE_4mA, true);
     imx233_pinctrl_setup_vpin(VPIN_I2C_SDA, "i2c sda", PINCTRL_DRIVE_4mA, true);
@@ -126,7 +128,7 @@ void imx233_i2c_begin(void)
 {
     mutex_lock(&i2c_mutex);
     /* wakeup */
-    BF_CLR(I2C_CTRL0, CLKGATE);
+    BM_I2C_CTRL0_CLR(CLKGATE);
     i2c_nr_stages = 0;
     i2c_buffer_end = 0;
 }
@@ -155,7 +157,7 @@ enum imx233_i2c_error_t imx233_i2c_add(bool start, bool transmit, void *buffer, 
         i2c_stage[i2c_nr_stages].src = i2c_buffer + start_off;
         i2c_stage[i2c_nr_stages].dst = buffer;
     }
-    
+
     if(i2c_nr_stages > 0)
     {
         i2c_stage[i2c_nr_stages - 1].dma.next = &i2c_stage[i2c_nr_stages].dma;
@@ -165,11 +167,11 @@ enum imx233_i2c_error_t imx233_i2c_add(bool start, bool transmit, void *buffer, 
     }
     i2c_stage[i2c_nr_stages].dma.buffer = i2c_buffer + start_off;
     i2c_stage[i2c_nr_stages].dma.next = NULL;
-    i2c_stage[i2c_nr_stages].dma.cmd = BF_OR4(APB_CHx_CMD,
+    i2c_stage[i2c_nr_stages].dma.cmd = BF_OR(APB_CHx_CMD,
         COMMAND(transmit ? BV_APB_CHx_CMD_COMMAND__READ : BV_APB_CHx_CMD_COMMAND__WRITE),
         WAIT4ENDCMD(1), CMDWORDS(1), XFER_COUNT(size));
     /* assume that any read is final (send nak on last) */
-    i2c_stage[i2c_nr_stages].ctrl0 = BF_OR6(I2C_CTRL0,
+    i2c_stage[i2c_nr_stages].ctrl0 = BF_OR(I2C_CTRL0,
         XFER_COUNT(size), DIRECTION(transmit), SEND_NAK_ON_LAST(!transmit),
         PRE_SEND_START(start), POST_SEND_STOP(stop), MASTER_MODE(1));
     i2c_nr_stages++;
@@ -192,9 +194,10 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
 {
     if(i2c_nr_stages == 0)
         return I2C_ERROR;
-    i2c_stage[i2c_nr_stages - 1].dma.cmd |= BM_APB_CHx_CMD_SEMAPHORE | BM_APB_CHx_CMD_IRQONCMPLT;
+    i2c_stage[i2c_nr_stages - 1].dma.cmd |= BM_OR(APB_CHx_CMD, SEMAPHORE, IRQONCMPLT);
 
-    BF_CLR(I2C_CTRL1, ALL_IRQ);
+    BM_I2C_CTRL1_CLR(SLAVE_IRQ, SLAVE_STOP_IRQ, MASTER_LOSS_IRQ, EARLY_TERM_IRQ,
+        OVERSIZE_XFER_TERM_IRQ, NO_SLAVE_ACK_IRQ, DATA_ENGINE_CMPLT_IRQ, BUS_FREE_IRQ);
     imx233_dma_reset_channel(APB_I2C);
     imx233_icoll_enable_interrupt(INT_SRC_I2C_DMA, true);
     imx233_icoll_enable_interrupt(INT_SRC_I2C_ERROR, true);
@@ -208,24 +211,24 @@ enum imx233_i2c_error_t imx233_i2c_end(unsigned timeout)
         imx233_i2c_reset();
         ret = I2C_TIMEOUT;
     }
-    else if(BF_RD(I2C_CTRL1, MASTER_LOSS_IRQ))
+    else if(BR_I2C_CTRL1(MASTER_LOSS_IRQ))
         ret = I2C_MASTER_LOSS;
-    else if(BF_RD(I2C_CTRL1, NO_SLAVE_ACK_IRQ))
+    else if(BR_I2C_CTRL1(NO_SLAVE_ACK_IRQ))
     {
         /* the core doesn't like this error, this is a workaround to prevent lock up */
 #if IMX233_SUBTARGET >= 3780
-        BF_SET(I2C_CTRL1, CLR_GOT_A_NAK);
+        BM_I2C_CTRL1_SET(CLR_GOT_A_NAK);
 #endif
         imx233_dma_reset_channel(APB_I2C);
         imx233_i2c_reset();
         ret = I2C_NO_SLAVE_ACK;
     }
-    else if(BF_RD(I2C_CTRL1, EARLY_TERM_IRQ))
+    else if(BR_I2C_CTRL1(EARLY_TERM_IRQ))
         ret = I2C_SLAVE_NAK;
     else
         ret = imx233_i2c_finalize();
     /* sleep */
-    BF_SET(I2C_CTRL0, CLKGATE);
+    BM_I2C_CTRL0_SET(CLKGATE);
     mutex_unlock(&i2c_mutex);
     return ret;
 }

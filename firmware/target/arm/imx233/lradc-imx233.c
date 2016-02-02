@@ -24,6 +24,18 @@
 #include "kernel-imx233.h"
 #include "stdlib.h"
 
+#include "regs-v2/regs-lradc.h"
+
+/** additional defines */
+#define BP_LRADC_CTRL4_LRADCxSELECT(x)  (4 * (x))
+#define BM_LRADC_CTRL4_LRADCxSELECT(x)  (0xf << (4 * (x)))
+
+#define BP_LRADC_CTRL1_LRADCx_IRQ(x)    (x)
+#define BM_LRADC_CTRL1_LRADCx_IRQ(x)    (1 << (x))
+
+#define BP_LRADC_CTRL1_LRADCx_IRQ_EN(x)    (16 + (x))
+#define BM_LRADC_CTRL1_LRADCx_IRQ_EN(x)    (1 << (16 + (x)))
+
 /* channels */
 #if IMX233_SUBTARGET >= 3700
 static struct channel_arbiter_t channel_arbiter;
@@ -69,22 +81,22 @@ void imx233_lradc_set_channel_irq_callback(int channel, lradc_irq_fn_t cb)
 void imx233_lradc_setup_source(int channel, bool div2, int src)
 {
     if(div2)
-        BF_SETV(LRADC_CTRL2, DIVIDE_BY_TWO, 1 << channel);
+        BW_LRADC_CTRL2_SET(DIVIDE_BY_TWO(1 << channel));
     else
-        BF_CLRV(LRADC_CTRL2, DIVIDE_BY_TWO, 1 << channel);
+        BW_LRADC_CTRL2_CLR(DIVIDE_BY_TWO(1 << channel));
 #if IMX233_SUBTARGET >= 3700
     HW_LRADC_CTRL4_CLR = BM_LRADC_CTRL4_LRADCxSELECT(channel);
     HW_LRADC_CTRL4_SET = src << BP_LRADC_CTRL4_LRADCxSELECT(channel);
 #else
     if(channel == 6)
     {
-        BF_CLR(LRADC_CTRL2, LRADC6SELECT);
-        BF_SETV(LRADC_CTRL2, LRADC6SELECT, src);
+        BM_LRADC_CTRL2_CLR(LRADC6SELECT);
+        BW_LRADC_CTRL2_SET(LRADC6SELECT(src));
     }
     else if(channel == 7)
     {
-        BF_CLR(LRADC_CTRL2, LRADC7SELECT);
-        BF_SETV(LRADC_CTRL2, LRADC7SELECT, src);
+        BM_LRADC_CTRL2_CLR(LRADC7SELECT);
+        BW_LRADC_CTRL2_SET(LRADC7SELECT(src));
     }
     else if(channel != src)
         panicf("cannot configure channel %d for source %d", channel, src);
@@ -93,45 +105,45 @@ void imx233_lradc_setup_source(int channel, bool div2, int src)
 
 void imx233_lradc_setup_sampling(int channel, bool acc, int nr_samples)
 {
-    HW_LRADC_CHn_CLR(channel) = BM_OR2(LRADC_CHn, NUM_SAMPLES, ACCUMULATE);
-    HW_LRADC_CHn_SET(channel) = BF_OR2(LRADC_CHn, NUM_SAMPLES(nr_samples), ACCUMULATE(acc));
+    BM_LRADC_CHn_CLR(channel, NUM_SAMPLES, ACCUMULATE);
+    BW_LRADC_CHn_SET(channel, NUM_SAMPLES(nr_samples), ACCUMULATE(acc));
 }
 
 void imx233_lradc_setup_delay(int dchan, int trigger_lradc, int trigger_delays,
     int loop_count, int delay)
 {
-    HW_LRADC_DELAYn(dchan) = BF_OR4(LRADC_DELAYn, TRIGGER_LRADCS(trigger_lradc),
+    BW_LRADC_DELAYn(dchan, TRIGGER_LRADCS(trigger_lradc),
         TRIGGER_DELAYS(trigger_delays), LOOP_COUNT(loop_count), DELAY(delay));
 }
 
 void imx233_lradc_clear_channel_irq(int channel)
 {
-    BF_CLR(LRADC_CTRL1, LRADCx_IRQ(channel));
+    BM_LRADC_CTRL1_CLR(LRADCx_IRQ(channel));
 }
 
 bool imx233_lradc_read_channel_irq(int channel)
 {
-    return BF_RD(LRADC_CTRL1, LRADCx_IRQ(channel));
+    return BR_LRADC_CTRL1(LRADCx_IRQ(channel));
 }
 
 void imx233_lradc_enable_channel_irq(int channel, bool enable)
 {
     if(enable)
-        BF_SET(LRADC_CTRL1, LRADCx_IRQ_EN(channel));
+        BM_LRADC_CTRL1_SET(LRADCx_IRQ_EN(channel));
     else
-        BF_CLR(LRADC_CTRL1, LRADCx_IRQ_EN(channel));
+        BM_LRADC_CTRL1_CLR(LRADCx_IRQ_EN(channel));
     imx233_lradc_clear_channel_irq(channel);
 }
 
 void imx233_lradc_kick_channel(int channel)
 {
     imx233_lradc_clear_channel_irq(channel);
-    BF_SETV(LRADC_CTRL0, SCHEDULE, 1 << channel);
+    BW_LRADC_CTRL0_SET(SCHEDULE(1 << channel));
 }
 
 void imx233_lradc_kick_delay(int dchan)
 {
-    BF_SETn(LRADC_DELAYn, dchan, KICK);
+    BM_LRADC_DELAYn_SET(dchan, KICK);
 }
 
 void imx233_lradc_wait_channel(int channel)
@@ -143,12 +155,12 @@ void imx233_lradc_wait_channel(int channel)
 
 int imx233_lradc_read_channel(int channel)
 {
-    return BF_RDn(LRADC_CHn, channel, VALUE);
+    return BR_LRADC_CHn(channel, VALUE);
 }
 
 void imx233_lradc_clear_channel(int channel)
 {
-    BF_CLRn(LRADC_CHn, channel, VALUE);
+    BM_LRADC_CHn_CLR(channel, VALUE);
 }
 
 #if IMX233_SUBTARGET >= 3700
@@ -211,7 +223,7 @@ int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan)
     imx233_lradc_setup_source(pmos_chan, false, LRADC_SRC_PMOS_THIN);
     imx233_lradc_setup_sampling(pmos_chan, false, 0);
     // mux sensors
-    BF_CLR(LRADC_CTRL2, TEMPSENSE_PWD);
+    BM_LRADC_CTRL2_CLR(TEMPSENSE_PWD);
     imx233_lradc_clear_channel(nmos_chan);
     imx233_lradc_clear_channel(pmos_chan);
     // schedule both channels
@@ -221,7 +233,7 @@ int imx233_lradc_sense_die_temperature(int nmos_chan, int pmos_chan)
     imx233_lradc_wait_channel(nmos_chan);
     imx233_lradc_wait_channel(pmos_chan);
     // mux sensors
-    BF_SET(LRADC_CTRL2, TEMPSENSE_PWD);
+    BM_LRADC_CTRL2_SET(TEMPSENSE_PWD);
     // do the computation
     int diff = imx233_lradc_read_channel(nmos_chan) - imx233_lradc_read_channel(pmos_chan);
     // return diff * 1.012 / 4
@@ -280,52 +292,52 @@ int imx233_lradc_sense_ext_temperature(int chan, int sensor)
     }
     /* disable sensor current */
     imx233_lradc_set_temp_isrc(sensor, BV_LRADC_CTRL2_TEMP_ISRC0__ZERO);
-    
+
     return (abs(b - a) / EXT_TEMP_ACC_COUNT) * 1104 / 1000;
 }
 
 void imx233_lradc_setup_battery_conversion(bool automatic, unsigned long scale_factor)
 {
-    BF_CLR(LRADC_CONVERSION, SCALE_FACTOR);
-    BF_SETV(LRADC_CONVERSION, SCALE_FACTOR, scale_factor);
+    BM_LRADC_CONVERSION_CLR(SCALE_FACTOR);
+    BW_LRADC_CONVERSION_SET(SCALE_FACTOR(scale_factor));
     if(automatic)
-        BF_SET(LRADC_CONVERSION, AUTOMATIC);
+        BM_LRADC_CONVERSION_SET(AUTOMATIC);
     else
-        BF_CLR(LRADC_CONVERSION, AUTOMATIC);
+        BM_LRADC_CONVERSION_CLR(AUTOMATIC);
 }
 
 int imx233_lradc_read_battery_voltage(void)
 {
-    return BF_RD(LRADC_CONVERSION, SCALED_BATT_VOLTAGE);
+    return BR_LRADC_CONVERSION(SCALED_BATT_VOLTAGE);
 }
 
 void imx233_lradc_setup_touch(bool xminus_enable, bool yminus_enable,
     bool xplus_enable, bool yplus_enable, bool touch_detect)
 {
-    HW_LRADC_CTRL0_CLR = BM_OR5(LRADC_CTRL0, XMINUS_ENABLE, YMINUS_ENABLE,
-        XPLUS_ENABLE, YPLUS_ENABLE, TOUCH_DETECT_ENABLE);
-    HW_LRADC_CTRL0_SET = BF_OR5(LRADC_CTRL0, XMINUS_ENABLE(xminus_enable),
-        YMINUS_ENABLE(yminus_enable), XPLUS_ENABLE(xplus_enable),
-        YPLUS_ENABLE(yplus_enable), TOUCH_DETECT_ENABLE(touch_detect));
+    BM_LRADC_CTRL0_CLR(XMINUS_ENABLE, YMINUS_ENABLE, XPLUS_ENABLE, YPLUS_ENABLE,
+        TOUCH_DETECT_ENABLE);
+    BW_LRADC_CTRL0_SET(XMINUS_ENABLE(xminus_enable), YMINUS_ENABLE(yminus_enable),
+        XPLUS_ENABLE(xplus_enable), YPLUS_ENABLE(yplus_enable),
+        TOUCH_DETECT_ENABLE(touch_detect));
 }
 
 void imx233_lradc_enable_touch_detect_irq(bool enable)
 {
     if(enable)
-        BF_SET(LRADC_CTRL1, TOUCH_DETECT_IRQ_EN);
+        BM_LRADC_CTRL1_SET(TOUCH_DETECT_IRQ_EN);
     else
-        BF_CLR(LRADC_CTRL1, TOUCH_DETECT_IRQ_EN);
+        BM_LRADC_CTRL1_CLR(TOUCH_DETECT_IRQ_EN);
     imx233_lradc_clear_touch_detect_irq();
 }
 
 void imx233_lradc_clear_touch_detect_irq(void)
 {
-    BF_CLR(LRADC_CTRL1, TOUCH_DETECT_IRQ);
+    BM_LRADC_CTRL1_CLR(TOUCH_DETECT_IRQ);
 }
 
 bool imx233_lradc_read_touch_detect(void)
 {
-    return BF_RD(LRADC_STATUS, TOUCH_DETECT_RAW);
+    return BR_LRADC_STATUS(TOUCH_DETECT_RAW);
 }
 
 void imx233_lradc_init(void)
@@ -343,16 +355,16 @@ void imx233_lradc_init(void)
     // enable block
     imx233_reset_block(&HW_LRADC_CTRL0);
     // disable ground ref
-    BF_CLR(LRADC_CTRL0, ONCHIP_GROUNDREF);
+    BM_LRADC_CTRL0_CLR(ONCHIP_GROUNDREF);
     // disable temperature sensors
-    BF_CLR(LRADC_CTRL2, TEMP_SENSOR_IENABLE0);
-    BF_CLR(LRADC_CTRL2, TEMP_SENSOR_IENABLE1);
+    BM_LRADC_CTRL2_CLR(TEMP_SENSOR_IENABLE0);
+    BM_LRADC_CTRL2_CLR(TEMP_SENSOR_IENABLE1);
 #if IMX233_SUBTARGET >= 3700
-    BF_SET(LRADC_CTRL2, TEMPSENSE_PWD);
+    BM_LRADC_CTRL2_SET(TEMPSENSE_PWD);
 #endif
     // set frequency
-    BF_CLR(LRADC_CTRL3, CYCLE_TIME);
-    BF_SETV(LRADC_CTRL3, CYCLE_TIME_V, 6MHZ);
+    BM_LRADC_CTRL3_CLR(CYCLE_TIME);
+    BW_LRADC_CTRL3_SET(CYCLE_TIME_V(6MHZ));
     // setup battery
     battery_chan = 7;
     imx233_lradc_reserve_channel(battery_chan);

@@ -87,37 +87,37 @@ static struct current_step_bit_t g_4p2_charge_limit_bits[] =
 bool imx233_power_usb_detect(void)
 {
 #ifdef USE_VBUSVALID
-    return BF_RD(POWER_STS, VBUSVALID);
+    return BR_POWER_STS(VBUSVALID);
 #else
-    return BF_RD(POWER_STS, VDD5V_GT_VDDIO);
+    return BR_POWER_STS(VDD5V_GT_VDDIO);
 #endif
 }
 
 void INT_VDD5V(void)
 {
 #ifdef USE_VBUSVALID
-    if(BF_RD(POWER_CTRL, VBUSVALID_IRQ))
+    if(BR_POWER_CTRL(VBUSVALID_IRQ))
     {
-        if(BF_RD(POWER_STS, VBUSVALID))
+        if(BR_POWER_STS(VBUSVALID))
             usb_insert_int();
         else
             usb_remove_int();
         /* reverse polarity */
-        BF_TOG(POWER_CTRL, POLARITY_VBUSVALID);
+        BM_POWER_CTRL_TOG(POLARITY_VBUSVALID);
         /* clear int */
-        BF_CLR(POWER_CTRL, VBUSVALID_IRQ);
+        BM_POWER_CTRL_CLR(VBUSVALID_IRQ);
     }
 #else
-    if(BF_RD(POWER_CTRL, VDD5V_GT_VDDIO_IRQ))
+    if(BR_POWER_CTRL(VDD5V_GT_VDDIO_IRQ))
     {
-        if(BF_RD(POWER_STS, VDD5V_GT_VDDIO))
+        if(BR_POWER_STS(VDD5V_GT_VDDIO))
             usb_insert_int();
         else
             usb_remove_int();
         /* reverse polarity */
-        BF_TOG(POWER_CTRL, POLARITY_VDD5V_GT_VDDIO);
+        BM_POWER_CTRL_TOG(POLARITY_VDD5V_GT_VDDIO);
         /* clear int */
-        BF_CLR(POWER_CTRL, VDD5V_GT_VDDIO_IRQ);
+        BM_POWER_CTRL_CLR(VDD5V_GT_VDDIO_IRQ);
     }
 #endif
 }
@@ -125,50 +125,50 @@ void INT_VDD5V(void)
 void imx233_power_init(void)
 {
 #if IMX233_SUBTARGET >= 3700
-    BF_CLR(POWER_MINPWR, HALF_FETS);
+    BM_POWER_MINPWR_CLR(HALF_FETS);
 #endif
     /* setup vbusvalid parameters: set threshold to 4v and power up comparators */
-    BF_CLR(POWER_5VCTRL, VBUSVALID_TRSH);
-    BF_SETV(POWER_5VCTRL, VBUSVALID_TRSH, 1);
+    BM_POWER_5VCTRL_CLR(VBUSVALID_TRSH);
+    BW_POWER_5VCTRL_SET(VBUSVALID_TRSH(1));
 #if IMX233_SUBTARGET >= 3780
-    BF_SET(POWER_5VCTRL, PWRUP_VBUS_CMPS);
+    BM_POWER_5VCTRL_SET(PWRUP_VBUS_CMPS);
 #else
-    BF_SET(POWER_5VCTRL, OTG_PWRUP_CMPS);
+    BM_POWER_5VCTRL_SET(OTG_PWRUP_CMPS);
 #endif
     /* enable vbusvalid detection method for the dcdc (improves efficiency) */
-    BF_SET(POWER_5VCTRL, VBUSVALID_5VDETECT);
+    BM_POWER_5VCTRL_SET(VBUSVALID_5VDETECT);
     /* disable shutdown on 5V fail */
-    BF_CLR(POWER_5VCTRL, PWDN_5VBRNOUT);
+    BM_POWER_5VCTRL_CLR(PWDN_5VBRNOUT);
 #ifdef USE_VBUSVALID
     /* make sure VBUSVALID is unlocked */
-    BF_CLR(POWER_DEBUG, VBUSVALIDPIOLOCK);
+    BM_POWER_DEBUG_CLR(VBUSVALIDPIOLOCK);
     /* clear vbusvalid irq and set correct polarity */
-    BF_CLR(POWER_CTRL, VBUSVALID_IRQ);
-    if(BF_RD(POWER_STS, VBUSVALID))
-        BF_CLR(POWER_CTRL, POLARITY_VBUSVALID);
+    BM_POWER_CTRL_CLR(VBUSVALID_IRQ);
+    if(BR_POWER_STS(VBUSVALID))
+        BM_POWER_CTRL_CLR(POLARITY_VBUSVALID);
     else
-        BF_SET(POWER_CTRL, POLARITY_VBUSVALID);
-    BF_SET(POWER_CTRL, ENIRQ_VBUS_VALID);
+        BM_POWER_CTRL_SET(POLARITY_VBUSVALID);
+    BM_POWER_CTRL_SET(ENIRQ_VBUS_VALID);
     /* make sure old detection way is not enabled */
-    BF_CLR(POWER_CTRL, ENIRQ_VDD5V_GT_VDDIO);
+    BM_POWER_CTRL_CLR(ENIRQ_VDD5V_GT_VDDIO);
 #else
-    BF_CLR(POWER_CTRL,  VDD5V_GT_VDDIO_IRQ);
-    if(BF_RD(POWER_STS, VDD5V_GT_VDDIO))
-        BF_CLR(POWER_CTRL, POLARITY_VDD5V_GT_VDDIO);
+    BM_POWER_CTRL_CLR(VDD5V_GT_VDDIO_IRQ);
+    if(BR_POWER_STS(VDD5V_GT_VDDIO))
+        BM_POWER_CTRL_CLR(POLARITY_VDD5V_GT_VDDIO);
     else
-        BF_SET(POWER_CTRL, POLARITY_VDD5V_GT_VDDIO);
-    BF_SET(POWER_CTRL, ENIRQ_VDD5V_GT_VDDIO);
+        BM_POWER_CTRL_SET(POLARITY_VDD5V_GT_VDDIO);
+    BM_POWER_CTRL_SET(ENIRQ_VDD5V_GT_VDDIO);
     /* make the vbusvalid detection way is not enabled */
 #if IMX233_SUBTARGET >= 3700
-    BF_CLR(POWER_CTRL, ENIRQ_VBUS_VALID);
+    BM_POWER_CTRL_CLR(ENIRQ_VBUS_VALID);
 #endif
 #endif
     /* the VDD5V IRQ is shared by several sources, disable them */
 #if IMX233_SUBTARGET >= 3700
-    BF_CLR(POWER_CTRL, ENIRQ_PSWITCH);
-    BF_CLR(POWER_CTRL, ENIRQ_DC_OK);
+    BM_POWER_CTRL_CLR(ENIRQ_PSWITCH);
+    BM_POWER_CTRL_CLR(ENIRQ_DC_OK);
 #if IMX233_SUBTARGET < 3780
-    BF_CLR(POWER_CTRL, ENIRQ_LINREG_OK);
+    BM_POWER_CTRL_CLR(ENIRQ_LINREG_OK);
 #endif /* IMX233_SUBTARGET < 3780 */
 #endif /* IMX233_SUBTARGET >= 3700 */
     imx233_icoll_enable_interrupt(INT_SRC_VDD5V, true);
@@ -190,7 +190,7 @@ void power_off(void)
     imx233_pinctrl_set_gpio(0, 9, true);
 #endif
     /* power down */
-    HW_POWER_RESET = BM_OR2(POWER_RESET, UNLOCK, PWD);
+    BM_POWER_RESET(UNLOCK, PWD);
     while(1);
 }
 
@@ -202,15 +202,15 @@ unsigned int power_input_status(void)
 
 bool charging_state(void)
 {
-    return BF_RD(POWER_STS, CHRGSTS);
+    return BR_POWER_STS(CHRGSTS);
 }
 
 void imx233_power_set_charge_current(unsigned current)
 {
 #if IMX233_SUBTARGET >= 3700
-    BF_CLR(POWER_CHARGE, BATTCHRG_I);
+    BM_POWER_CHARGE_CLR(BATTCHRG_I);
 #else
-    BF_CLR(POWER_BATTCHRG, BATTCHRG_I);
+    BM_POWER_BATTCHRG(BATTCHRG_I);
 #endif
     /* find closest current LOWER THAN OR EQUAL TO the expected current */
     for(unsigned i = 0; i < ARRAYLEN(g_charger_current_bits); i++)
@@ -218,9 +218,9 @@ void imx233_power_set_charge_current(unsigned current)
         {
             current -= g_charger_current_bits[i].current;
 #if IMX233_SUBTARGET >= 3700
-            BF_SETV(POWER_CHARGE, BATTCHRG_I, g_charger_current_bits[i].bit);
+            BW_POWER_CHARGE_SET(BATTCHRG_I(g_charger_current_bits[i].bit));
 #else
-            BF_SETV(POWER_BATTCHRG, BATTCHRG_I, g_charger_current_bits[i].bit);
+            BW_POWER_BATTCHRG_SET(BATTCHRG_I(g_charger_current_bits[i].bit));
 #endif
         }
 }
@@ -228,9 +228,9 @@ void imx233_power_set_charge_current(unsigned current)
 void imx233_power_set_stop_current(unsigned current)
 {
 #if IMX233_SUBTARGET >= 3700
-    BF_CLR(POWER_CHARGE, STOP_ILIMIT);
+    BM_POWER_CHARGE_CLR(STOP_ILIMIT);
 #else
-    BF_CLR(POWER_BATTCHRG, STOP_ILIMIT);
+    BM_POWER_BATTCHRG_CLR(STOP_ILIMIT);
 #endif
     /* find closest current GREATHER THAN OR EQUAL TO the expected current */
     unsigned sum = 0;
@@ -243,9 +243,9 @@ void imx233_power_set_stop_current(unsigned current)
         {
             current -= g_charger_stop_current_bits[i].current;
 #if IMX233_SUBTARGET >= 3700
-            BF_SETV(POWER_CHARGE, STOP_ILIMIT, g_charger_stop_current_bits[i].bit);
+            BW_POWER_CHARGE_SET(STOP_ILIMIT(g_charger_stop_current_bits[i].bit));
 #else
-            BF_SETV(POWER_BATTCHRG, STOP_ILIMIT, g_charger_stop_current_bits[i].bit);
+            BW_POWER_BATTCHRG_SET(STOP_ILIMIT(g_charger_stop_current_bits[i].bit));
 #endif
         }
     }
@@ -363,7 +363,7 @@ static void update_dcfuncv(void)
     imx233_power_get_regulator(REGULATOR_VDDA, &vdda, NULL);
     imx233_power_get_regulator(REGULATOR_VDDIO, &vddio, NULL);
     // assume Li-Ion, to divide by 6.25, do *100 and /625
-    HW_POWER_DCFUNCV = BF_OR2(POWER_DCFUNCV, VDDIO(((vddio - vdda) * 100) / 625),
+    BW_POWER_DCFUNCV(VDDIO(((vddio - vdda) * 100) / 625),
         VDDD(((vdda - vddd) * 100) / 625));
 }
 #endif
@@ -380,7 +380,7 @@ void imx233_power_set_regulator(enum imx233_regulator_t reg, unsigned value_mv,
     raw_bo_offset += regulator_info[reg].off;
     // clear dc-dc ok flag
 #if IMX233_SUBTARGET >= 3700
-    BF_SET(POWER_CTRL, DC_OK_IRQ);
+    BM_POWER_CTRL_SET(DC_OK_IRQ);
 #endif
     // update
     uint32_t reg_val = (*regulator_info[reg].reg) & ~regulator_info[reg].trg_bm;
@@ -398,12 +398,12 @@ void imx233_power_set_regulator(enum imx233_regulator_t reg, unsigned value_mv,
 #if IMX233_SUBTARGET >= 3700
     sleep(1);
 #else
-    if(!BF_RD(POWER_5VCTRL, EN_DCDC1) || !BF_RD(POWER_5VCTRL, EN_DCDC2))
+    if(!BR_POWER_5VCTRL(EN_DCDC1) || !BR_POWER_5VCTRL(EN_DCDC2))
         panicf("regulator %d: wait for voltage stabilize in linreg mode !", reg);
     unsigned timeout = current_tick + (HZ * 20) / 1000;
-    while(!BF_RD(POWER_STS, DC1_OK) || !BF_RD(POWER_STS, DC2_OK) || !TIME_AFTER(current_tick, timeout))
+    while(!BR_POWER_STS(DC1_OK) || !BR_POWER_STS(DC2_OK) || !TIME_AFTER(current_tick, timeout))
         yield();
-    if(!BF_RD(POWER_STS, DC1_OK) || !BF_RD(POWER_STS, DC2_OK))
+    if(!BR_POWER_STS(DC1_OK) || !BR_POWER_STS(DC2_OK))
         panicf("regulator %d: failed to stabilize", reg);
 #endif
     /* On STMP37xx, we need to update the weird HW_POWER_DCFUNCV register */
@@ -447,13 +447,13 @@ int imx233_power_sense_die_temperature(int *min, int *max)
         -50, -40, -30, -20, -10, 0, 15, 25, 35, 45, 55, 70, 85, 95, 105, 115, 130
     };
     /* power up temperature sensor */
-    BF_CLRV(POWER_SPEEDTEMP, TEMP_CTRL, 1 << 3);
+    BW_POWER_SPEEDTEMP_CLR(TEMP_CTRL(1 << 3));
     /* read temp */
-    int sense = BF_RD(POWER_SPEEDTEMP, TEMP_STS);
+    int sense = BR_POWER_SPEEDTEMP(TEMP_STS);
     *min = die_temp[sense];
     *max = die_temp[sense + 1];
     /* power down temperature sensor */
-    BF_SETV(POWER_SPEEDTEMP, TEMP_CTRL, 1 << 3);
+    BW_POWER_SPEEDTEMP_SET(TEMP_CTRL(1 << 3));
     return 0;
 }
 #endif
@@ -477,18 +477,18 @@ struct imx233_power_info_t imx233_power_get_info(unsigned flags)
 #if IMX233_SUBTARGET >= 3700
     if(flags & POWER_INFO_DCDC)
     {
-        s.dcdc_sel_pllclk = BF_RD(POWER_MISC, SEL_PLLCLK);
-        s.dcdc_freqsel = dcdc_freqsel[BF_RD(POWER_MISC, FREQSEL)];
+        s.dcdc_sel_pllclk = BR_POWER_MISC(SEL_PLLCLK);
+        s.dcdc_freqsel = dcdc_freqsel[BR_POWER_MISC(FREQSEL)];
     }
 #endif
     if(flags & POWER_INFO_CHARGE)
     {
 #if IMX233_SUBTARGET >= 3700
-        uint32_t current = BF_RD(POWER_CHARGE, BATTCHRG_I);
-        uint32_t stop_current = BF_RD(POWER_CHARGE, STOP_ILIMIT);
+        uint32_t current = BR_POWER_CHARGE(BATTCHRG_I);
+        uint32_t stop_current = BR_POWER_CHARGE(STOP_ILIMIT);
 #else
-        uint32_t current = BF_RD(POWER_BATTCHRG, BATTCHRG_I);
-        uint32_t stop_current = BF_RD(POWER_BATTCHRG, STOP_ILIMIT);
+        uint32_t current = BR_POWER_BATTCHRG(BATTCHRG_I);
+        uint32_t stop_current = BR_POWER_BATTCHRG(STOP_ILIMIT);
 #endif
         for(unsigned i = 0; i < ARRAYLEN(g_charger_current_bits); i++)
             if(current & g_charger_current_bits[i].bit)
@@ -496,49 +496,49 @@ struct imx233_power_info_t imx233_power_get_info(unsigned flags)
         for(unsigned i = 0; i < ARRAYLEN(g_charger_stop_current_bits); i++)
             if(stop_current & g_charger_stop_current_bits[i].bit)
                 s.stop_current += g_charger_stop_current_bits[i].current;
-        s.charging = BF_RD(POWER_STS, CHRGSTS);
+        s.charging = BR_POWER_STS(CHRGSTS);
 #if IMX233_SUBTARGET >= 3700
-        s.batt_adj = BF_RD(POWER_BATTMONITOR, EN_BATADJ);
+        s.batt_adj = BR_POWER_BATTMONITOR(EN_BATADJ);
 #else
-        s.batt_adj = BF_RD(POWER_DC1MULTOUT, EN_BATADJ);
+        s.batt_adj = BR_POWER_DC1MULTOUT(EN_BATADJ);
 #endif
     }
 #if IMX233_SUBTARGET >= 3780
     if(flags & POWER_INFO_4P2)
     {
-        s._4p2_enable = BF_RD(POWER_DCDC4P2, ENABLE_4P2);
-        s._4p2_dcdc = BF_RD(POWER_DCDC4P2, ENABLE_DCDC);
-        s._4p2_cmptrip = BF_RD(POWER_DCDC4P2, CMPTRIP);
-        s._4p2_dropout = BF_RD(POWER_DCDC4P2, DROPOUT_CTRL);
+        s._4p2_enable = BR_POWER_DCDC4P2(ENABLE_4P2);
+        s._4p2_dcdc = BR_POWER_DCDC4P2(ENABLE_DCDC);
+        s._4p2_cmptrip = BR_POWER_DCDC4P2(CMPTRIP);
+        s._4p2_dropout = BR_POWER_DCDC4P2(DROPOUT_CTRL);
     }
 #endif
     if(flags & POWER_INFO_5V)
     {
 #if IMX233_SUBTARGET >= 3780
-        s._5v_pwd_charge_4p2 = BF_RD(POWER_5VCTRL, PWD_CHARGE_4P2);
+        s._5v_pwd_charge_4p2 = BR_POWER_5VCTRL(PWD_CHARGE_4P2);
 #endif
-        s._5v_dcdc_xfer = BF_RD(POWER_5VCTRL, DCDC_XFER);
+        s._5v_dcdc_xfer = BR_POWER_5VCTRL(DCDC_XFER);
 #if IMX233_SUBTARGET >= 3700
-        s._5v_enable_dcdc = BF_RD(POWER_5VCTRL, ENABLE_DCDC);
+        s._5v_enable_dcdc = BR_POWER_5VCTRL(ENABLE_DCDC);
 #else
-        s._5v_enable_dcdc = BF_RD(POWER_5VCTRL, EN_DCDC1) && BF_RD(POWER_5VCTRL, EN_DCDC2);
+        s._5v_enable_dcdc = BR_POWER_5VCTRL(EN_DCDC1) && BR_POWER_5VCTRL(EN_DCDC2);
 #endif
 #if IMX233_SUBTARGET >= 3780
-        uint32_t charge_4p2_ilimit = BF_RD(POWER_5VCTRL, CHARGE_4P2_ILIMIT);
+        uint32_t charge_4p2_ilimit = BR_POWER_5VCTRL(CHARGE_4P2_ILIMIT);
         for(unsigned i = 0; i < ARRAYLEN(g_4p2_charge_limit_bits); i++)
             if(charge_4p2_ilimit & g_4p2_charge_limit_bits[i].bit)
                 s._5v_charge_4p2_limit += g_4p2_charge_limit_bits[i].current;
 #endif
-        s._5v_vbusvalid_detect = BF_RD(POWER_5VCTRL, VBUSVALID_5VDETECT);
+        s._5v_vbusvalid_detect = BR_POWER_5VCTRL(VBUSVALID_5VDETECT);
 #if IMX233_SUBTARGET >= 3780
-        s._5v_vbus_cmps = BF_RD(POWER_5VCTRL, PWRUP_VBUS_CMPS);
+        s._5v_vbus_cmps = BR_POWER_5VCTRL(PWRUP_VBUS_CMPS);
 #else
-        s._5v_vbus_cmps = BF_RD(POWER_5VCTRL, OTG_PWRUP_CMPS);
+        s._5v_vbus_cmps = BR_POWER_5VCTRL(OTG_PWRUP_CMPS);
 #endif
         s._5v_vbusvalid_thr =
-            BF_RD(POWER_5VCTRL, VBUSVALID_TRSH) == 0 ?
+            BR_POWER_5VCTRL(VBUSVALID_TRSH) == 0 ?
                 2900
-                : 3900 + BF_RD(POWER_5VCTRL, VBUSVALID_TRSH) * 100;
+                : 3900 + BR_POWER_5VCTRL(VBUSVALID_TRSH) * 100;
     }
     return s;
 }

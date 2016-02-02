@@ -25,7 +25,7 @@
 #include "system-target.h"
 #include "cpu.h"
 
-#include "regs/regs-power.h"
+#include "regs-v2/regs-power.h"
 
 #define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__10mA    (1 << 0)
 #define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__20mA    (1 << 1)
@@ -122,9 +122,9 @@ static inline void imx233_power_set_dcdc_freq(bool pll, unsigned freq)
 static inline unsigned imx233_power_read_pswitch(void)
 {
 #if IMX233_SUBTARGET >= 3700
-    return BF_RD(POWER_STS, PSWITCH);
+    return BR_POWER_STS(PSWITCH);
 #else
-    return BF_RD(DIGCTL_STATUS, PSWITCH);
+    return BR_DIGCTL_STATUS(PSWITCH);
 #endif
 }
 

@@ -25,20 +25,6 @@
 #include "system.h"
 #include "cpu.h"
 
-#include "regs/regs-clkctrl.h"
-
-static inline void core_sleep(void)
-{
-    BF_WR(CLKCTRL_CPU, INTERRUPT_WAIT, 1);
-    asm volatile (
-        "mcr p15, 0, %0, c7, c0, 4 \n" /* Wait for interrupt */
-        "nop\n" /* Datasheet unclear: "The lr sent to handler points here after RTI"*/
-        "nop\n"
-        : : "r"(0)
-    );
-    enable_irq();
-}
-
 enum imx233_clock_t
 {
     CLK_SSP, /* freq, div, bypass, enable */
@@ -84,5 +70,13 @@ void imx233_clkctrl_set_auto_slow_div(unsigned div);
 unsigned imx233_clkctrl_get_auto_slow_div(void);
 void imx233_clkctrl_enable_auto_slow(bool enable);
 bool imx233_clkctrl_is_auto_slow_enabled(void);
+/* don't use this directly */
+void imx233_clkctrl_wait_for_interrupt(void);
+
+static inline void core_sleep(void)
+{
+    imx233_clkctrl_wait_for_interrupt();
+    enable_irq();
+}
 
 #endif /* CLKCTRL_IMX233_H */

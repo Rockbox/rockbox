@@ -25,9 +25,6 @@
 #include "system.h"
 #include "system-target.h"
 
-#include "regs/regs-apbh.h"
-#include "regs/regs-apbx.h"
-
 /************
  * CHANNELS *
  ************/

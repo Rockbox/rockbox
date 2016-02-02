@@ -22,6 +22,8 @@
 #include "pinctrl-imx233.h"
 #include "icoll-imx233.h"
 
+#include "regs-v2/regs-lcdif.h"
+
 #if IMX233_SUBTARGET >= 3700
 static lcdif_irq_cb_t g_cur_frame_cb = NULL;
 static lcdif_irq_cb_t g_vsync_edge_cb = NULL;
@@ -32,23 +34,23 @@ static lcdif_irq_cb_t g_underflow_cb = NULL;
 #if IMX233_SUBTARGET >= 3700
 void INT_LCDIF_ERROR(void)
 {
-    if(BF_RD(LCDIF_CTRL1, CUR_FRAME_DONE_IRQ))
+    if(BR_LCDIF_CTRL1(CUR_FRAME_DONE_IRQ))
     {
         if(g_cur_frame_cb)
             g_cur_frame_cb();
-        BF_CLR(LCDIF_CTRL1, CUR_FRAME_DONE_IRQ);
+        BM_LCDIF_CTRL1_CLR(CUR_FRAME_DONE_IRQ);
     }
-    if(BF_RD(LCDIF_CTRL1, VSYNC_EDGE_IRQ))
+    if(BR_LCDIF_CTRL1(VSYNC_EDGE_IRQ))
     {
         if(g_vsync_edge_cb)
             g_vsync_edge_cb();
-        BF_CLR(LCDIF_CTRL1, VSYNC_EDGE_IRQ);
+        BM_LCDIF_CTRL1_CLR(VSYNC_EDGE_IRQ);
     }
-    if(BF_RD(LCDIF_CTRL1, UNDERFLOW_IRQ))
+    if(BR_LCDIF_CTRL1(UNDERFLOW_IRQ))
     {
         if(g_underflow_cb)
             g_underflow_cb();
-        BF_CLR(LCDIF_CTRL1, UNDERFLOW_IRQ);
+        BM_LCDIF_CTRL1_CLR(UNDERFLOW_IRQ);
     }
 }
 #endif
@@ -56,23 +58,23 @@ void INT_LCDIF_ERROR(void)
 void imx233_lcdif_enable(bool enable)
 {
     if(enable)
-        BF_CLR(LCDIF_CTRL, CLKGATE);
+        BM_LCDIF_CTRL_CLR(CLKGATE);
     else
-        BF_SET(LCDIF_CTRL, CLKGATE);
+        BM_LCDIF_CTRL_SET(CLKGATE);
 }
 
 void imx233_lcdif_reset_lcd(bool enable)
 {
 #if IMX233_SUBTARGET < 3700
     if(enable)
-        BF_SET(LCDIF_CTRL, RESET);
+        BM_LCDIF_CTRL_SET(RESET);
     else
-        BF_CLR(LCDIF_CTRL, RESET);
+        BM_LCDIF_CTRL_CLR(RESET);
 #else
     if(enable)
-        BF_SET(LCDIF_CTRL1, RESET);
+        BM_LCDIF_CTRL1_SET(RESET);
     else
-        BF_CLR(LCDIF_CTRL1, RESET);
+        BM_LCDIF_CTRL1_CLR(RESET);
 #endif
 }
 
@@ -87,8 +89,8 @@ void imx233_lcdif_init(void)
 void imx233_lcdif_set_timings(unsigned data_setup, unsigned data_hold,
     unsigned cmd_setup, unsigned cmd_hold)
 {
-    HW_LCDIF_TIMING = BF_OR4(LCDIF_TIMING, DATA_SETUP(data_setup),
-        DATA_HOLD(data_hold), CMD_SETUP(cmd_setup), CMD_HOLD(cmd_hold));
+    BW_LCDIF_TIMING(DATA_SETUP(data_setup), DATA_HOLD(data_hold),
+        CMD_SETUP(cmd_setup), CMD_HOLD(cmd_hold));
 }
 
 void imx233_lcdif_set_word_length(unsigned word_length)
@@ -109,7 +111,7 @@ void imx233_lcdif_set_word_length(unsigned word_length)
 
 void imx233_lcdif_wait_ready(void)
 {
-    while(BF_RD(LCDIF_CTRL, RUN));
+    while(BR_LCDIF_CTRL(RUN));
 }
 
 void imx233_lcdif_set_data_swizzle(unsigned swizzle)
@@ -124,9 +126,9 @@ void imx233_lcdif_set_data_swizzle(unsigned swizzle)
 void imx233_lcdif_wait_fifo(void)
 {
 #if IMX233_SUBTARGET >= 3700
-    while(BF_RD(LCDIF_STAT, TXFIFO_FULL));
+    while(BR_LCDIF_STAT(TXFIFO_FULL));
 #else
-    while(!BF_RD(LCDIF_CTRL, FIFO_STATUS));
+    while(!BR_LCDIF_CTRL(FIFO_STATUS));
 #endif
 }
 
@@ -160,11 +162,11 @@ static void pio_send(unsigned len, unsigned bpp, uint8_t *buf)
     /* starting from now, all read are 32-bit */
     uint32_t *wbuf = (void *)buf;
 #if IMX233_SUBTARGET >= 3780
-    HW_LCDIF_TRANSFER_COUNT = BF_OR2(LCDIF_TRANSFER_COUNT, V_COUNT(1), H_COUNT(len));
+    BW_LCDIF_TRANSFER_COUNT(V_COUNT(1), H_COUNT(len));
 #else
     BF_WR(LCDIF_CTRL, COUNT, len);
 #endif
-    BF_SET(LCDIF_CTRL, RUN);
+    BM_LCDIF_CTRL_SET(RUN);
     while(count > 0)
     {
         uint32_t val = *wbuf++;
@@ -192,11 +194,11 @@ void imx233_lcdif_pio_send(bool data_mode, unsigned len, void *buf)
     imx233_lcdif_enable_bus_master(false);
 #endif
     if(data_mode)
-        BF_SET(LCDIF_CTRL, DATA_SELECT);
+        BM_LCDIF_CTRL_SET(DATA_SELECT);
     else
-        BF_CLR(LCDIF_CTRL, DATA_SELECT);
+        BM_LCDIF_CTRL_CLR(DATA_SELECT);
 
-    switch(BF_RD(LCDIF_CTRL, WORD_LENGTH))
+    switch(BR_LCDIF_CTRL(WORD_LENGTH))
     {
         case BV_LCDIF_CTRL_WORD_LENGTH__8_BIT: pio_send(len, 1, buf); break;
         case BV_LCDIF_CTRL_WORD_LENGTH__16_BIT: pio_send(len, 2, buf); break;
@@ -212,9 +214,9 @@ void imx233_lcdif_dma_send(void *buf, unsigned width, unsigned height)
 #if IMX233_SUBTARGET >= 3780
     imx233_lcdif_enable_bus_master(true);
     HW_LCDIF_CUR_BUF = (uint32_t)buf;
-    HW_LCDIF_TRANSFER_COUNT = BF_OR2(LCDIF_TRANSFER_COUNT, V_COUNT(height), H_COUNT(width));
-    BF_SET(LCDIF_CTRL, DATA_SELECT);
-    BF_SET(LCDIF_CTRL, RUN);
+    BW_LCDIF_TRANSFER_COUNT(V_COUNT(height), H_COUNT(width));
+    BM_LCDIF_CTRL_SET(DATA_SELECT);
+    BM_LCDIF_CTRL_SET(RUN);
 #else
     (void) buf;
     (void) width;
@@ -295,17 +297,14 @@ void imx233_lcdif_setup_dotclk(unsigned v_pulse_width, unsigned v_period,
     unsigned v_wait_cnt, unsigned v_active, unsigned h_pulse_width,
     unsigned h_period, unsigned h_wait_cnt, unsigned h_active, bool enable_present)
 {
-    HW_LCDIF_VDCTRL0 = BF_OR4(LCDIF_VDCTRL0, ENABLE_PRESENT(enable_present),
-        VSYNC_PERIOD_UNIT(1), VSYNC_PULSE_WIDTH_UNIT(1),
-         DOTCLK_V_VALID_DATA_CNT(v_active));
-    HW_LCDIF_VDCTRL1 = BF_OR2(LCDIF_VDCTRL1, VSYNC_PERIOD(v_period),
-        VSYNC_PULSE_WIDTH(v_pulse_width));
-    HW_LCDIF_VDCTRL2 = BF_OR3(LCDIF_VDCTRL2, HSYNC_PULSE_WIDTH(h_pulse_width),
-        HSYNC_PERIOD(h_period), DOTCLK_H_VALID_DATA_CNT(h_active));
-    HW_LCDIF_VDCTRL3 = BF_OR2(LCDIF_VDCTRL3, VERTICAL_WAIT_CNT(v_wait_cnt),
-        HORIZONTAL_WAIT_CNT(h_wait_cnt));
+    BW_LCDIF_VDCTRL0(ENABLE_PRESENT(enable_present), VSYNC_PERIOD_UNIT(1),
+        VSYNC_PULSE_WIDTH_UNIT(1), DOTCLK_V_VALID_DATA_CNT(v_active));
+    BW_LCDIF_VDCTRL1(VSYNC_PERIOD(v_period), VSYNC_PULSE_WIDTH(v_pulse_width));
+    BW_LCDIF_VDCTRL2(HSYNC_PULSE_WIDTH(h_pulse_width), HSYNC_PERIOD(h_period),
+        DOTCLK_H_VALID_DATA_CNT(h_active));
+    BW_LCDIF_VDCTRL3(VERTICAL_WAIT_CNT(v_wait_cnt), HORIZONTAL_WAIT_CNT(h_wait_cnt));
     // setup dotclk mode, always bypass count, apparently data select is needed
-    HW_LCDIF_CTRL_SET = BM_OR3(LCDIF_CTRL, DOTCLK_MODE, BYPASS_COUNT, DATA_SELECT);
+    BM_LCDIF_CTRL_SET(DOTCLK_MODE, BYPASS_COUNT, DATA_SELECT);
 }
 
 void imx233_lcdif_setup_dotclk_ex(unsigned v_pulse_width, unsigned v_back_porch,
@@ -324,10 +323,10 @@ void imx233_lcdif_setup_dotclk_ex(unsigned v_pulse_width, unsigned v_back_porch,
 void imx233_lcdif_enable_frame_done_irq(bool en)
 {
     if(en)
-        BF_SET(LCDIF_CTRL1, CUR_FRAME_DONE_IRQ_EN);
+        BM_LCDIF_CTRL1_SET(CUR_FRAME_DONE_IRQ_EN);
     else
-        BF_CLR(LCDIF_CTRL1, CUR_FRAME_DONE_IRQ_EN);
-    BF_CLR(LCDIF_CTRL1, CUR_FRAME_DONE_IRQ);
+        BM_LCDIF_CTRL1_CLR(CUR_FRAME_DONE_IRQ_EN);
+    BM_LCDIF_CTRL1_CLR(CUR_FRAME_DONE_IRQ);
 }
 
 void imx233_lcdif_set_frame_done_cb(lcdif_irq_cb_t cb)
@@ -338,10 +337,10 @@ void imx233_lcdif_set_frame_done_cb(lcdif_irq_cb_t cb)
 void imx233_lcdif_enable_vsync_edge_irq(bool en)
 {
     if(en)
-        BF_SET(LCDIF_CTRL1, VSYNC_EDGE_IRQ_EN);
+        BM_LCDIF_CTRL1_SET(VSYNC_EDGE_IRQ_EN);
     else
-        BF_CLR(LCDIF_CTRL1, VSYNC_EDGE_IRQ_EN);
-    BF_CLR(LCDIF_CTRL1, VSYNC_EDGE_IRQ);
+        BM_LCDIF_CTRL1_CLR(VSYNC_EDGE_IRQ_EN);
+    BM_LCDIF_CTRL1_CLR(VSYNC_EDGE_IRQ);
 }
 
 void imx233_lcdif_set_vsync_edge_cb(lcdif_irq_cb_t cb)
@@ -352,10 +351,10 @@ void imx233_lcdif_set_vsync_edge_cb(lcdif_irq_cb_t cb)
 void imx233_lcdif_enable_underflow_irq(bool en)
 {
     if(en)
-        BF_SET(LCDIF_CTRL1, UNDERFLOW_IRQ_EN);
+        BM_LCDIF_CTRL1_SET(UNDERFLOW_IRQ_EN);
     else
-        BF_CLR(LCDIF_CTRL1, UNDERFLOW_IRQ_EN);
-    BF_CLR(LCDIF_CTRL1, UNDERFLOW_IRQ);
+        BM_LCDIF_CTRL1_CLR(UNDERFLOW_IRQ_EN);
+    BM_LCDIF_CTRL1_CLR(UNDERFLOW_IRQ);
 }
 
 void imx233_lcdif_set_underflow_cb(lcdif_irq_cb_t cb)
@@ -382,16 +381,16 @@ void imx233_lcdif_set_lcd_databus_width(unsigned width)
 void imx233_lcdif_enable_underflow_recover(bool enable)
 {
     if(enable)
-        BF_SET(LCDIF_CTRL1, RECOVER_ON_UNDERFLOW);
+        BM_LCDIF_CTRL1_SET(RECOVER_ON_UNDERFLOW);
     else
-        BF_CLR(LCDIF_CTRL1, RECOVER_ON_UNDERFLOW);
+        BM_LCDIF_CTRL1_CLR(RECOVER_ON_UNDERFLOW);
 }
 
 void imx233_lcdif_enable_bus_master(bool enable)
 {
     if(enable)
-        BF_SET(LCDIF_CTRL, LCDIF_MASTER);
+        BM_LCDIF_CTRL_SET(LCDIF_MASTER);
     else
-        BF_CLR(LCDIF_CTRL, LCDIF_MASTER);
+        BM_LCDIF_CTRL_CLR(LCDIF_MASTER);
 }
 #endif

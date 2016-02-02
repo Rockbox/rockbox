@@ -22,6 +22,12 @@
 #include "clkctrl-imx233.h"
 #include "string.h"
 
+#include "regs-v2/regs-clkctrl.h"
+#include "regs-v2/regs-emi.h"
+#include "regs-v2/regs-dram.h"
+
+#define HW_DRAM_CTLxx(xx) (*(&HW_DRAM_CTL00 + (xx)))
+
 struct emi_reg_t
 {
     int index;
@@ -148,7 +154,7 @@ void imx233_emi_set_frequency(unsigned long freq)
     /* put DRAM into self-refresh mode */
     HW_DRAM_CTL08 |= BM_DRAM_CTL08_SREFRESH;
     /* wait for DRAM to be halted */
-    while(!BF_RD(EMI_STAT, DRAM_HALTED));
+    while(!BR_EMI_STAT(DRAM_HALTED));
     /* load timings */
     struct emi_reg_t *regs;
     switch(freq)
@@ -169,30 +175,30 @@ void imx233_emi_set_frequency(unsigned long freq)
         HW_DRAM_CTLxx(regs->index) = regs->value;
     while((regs++)->index != 40);
     /* switch emi to xtal */
-    BF_SET(CLKCTRL_CLKSEQ, BYPASS_EMI);
+    BM_CLKCTRL_CLKSEQ_SET(BYPASS_EMI);
     /* wait for transition */
-    while(BF_RD(CLKCTRL_EMI, BUSY_REF_XTAL));
+    while(BR_CLKCTRL_EMI(BUSY_REF_XTAL));
     /* put emi dll into reset mode */
     // FIXME Unsure about what to do for stmp37xx
 #if IMX233_SUBTARGET >= 3780
-    HW_EMI_CTRL_SET = BM_EMI_CTRL_DLL_RESET | BM_EMI_CTRL_DLL_SHIFT_RESET;
+    BM_EMI_CTRL_SET(DLL_RESET, DLL_SHIFT_RESET);
 #endif
     /* load the new frequency dividers */
     set_frequency(freq);
     /* switch emi back to pll */
-    BF_CLR(CLKCTRL_CLKSEQ, BYPASS_EMI);
+    BM_CLKCTRL_CLKSEQ_CLR(BYPASS_EMI);
     /* wait for transition */
-    while(BF_RD(CLKCTRL_EMI, BUSY_REF_EMI));
+    while(BR_CLKCTRL_EMI(BUSY_REF_EMI));
     /* allow emi dll to lock again */
 #if IMX233_SUBTARGET >= 3780
-    HW_EMI_CTRL_CLR = BM_EMI_CTRL_DLL_RESET | BM_EMI_CTRL_DLL_SHIFT_RESET;
+    BM_EMI_CTRL_CLR(DLL_RESET, DLL_SHIFT_RESET);
 #endif
     /* wait for lock */
-    while(!BF_RD(DRAM_CTL04, DLLLOCKREG));
+    while(!BR_DRAM_CTL04(DLLLOCKREG));
     /* get DRAM out of self-refresh mode */
     HW_DRAM_CTL08 &= ~BM_DRAM_CTL08_SREFRESH;
     /* wait for DRAM to be to run again */
-    while(HW_EMI_STAT & BM_EMI_STAT_DRAM_HALTED);
+    while(BR_EMI_STAT(DRAM_HALTED));
 
     restore_interrupt(oldstatus);
 }
@@ -203,11 +209,11 @@ struct imx233_emi_info_t imx233_emi_get_info(void)
     struct imx233_emi_info_t info;
     memset(&info, 0,  sizeof(info));
 #if IMX233_SUBTARGET >= 3700
-    info.rows = 13 - BF_RD(DRAM_CTL10, ADDR_PINS);
-    info.columns = 12 - BF_RD(DRAM_CTL11, COLUMN_SIZE);
-    info.cas = BF_RD(DRAM_CTL13, CASLAT_LIN);
+    info.rows = 13 - BR_DRAM_CTL10(ADDR_PINS);
+    info.columns = 12 - BR_DRAM_CTL11(COLUMN_SIZE);
+    info.cas = BR_DRAM_CTL13(CASLAT_LIN);
     info.banks = 4;
-    info.chips = __builtin_popcount(BF_RD(DRAM_CTL14, CS_MAP));
+    info.chips = __builtin_popcount(BR_DRAM_CTL14(CS_MAP));
     info.size = 2 * (1 << (info.rows + info.columns)) * info.chips * info.banks;
 #endif
     return info;

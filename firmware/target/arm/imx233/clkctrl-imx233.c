@@ -22,6 +22,8 @@
 #include "string.h"
 #include "debug.h"
 
+#include "regs-v2/regs-clkctrl.h"
+
 void imx233_clkctrl_enable(enum imx233_clock_t clk, bool enable)
 {
     /* NOTE some registers like HW_CLKCTRL_PIX don't have a CLR/SET variant ! */
@@ -41,11 +43,11 @@ void imx233_clkctrl_enable(enum imx233_clock_t clk, bool enable)
             /* pll is a special case */
             if(enable)
             {
-                BF_SET(CLKCTRL_PLLCTRL0, POWER);
-                while(!BF_RD(CLKCTRL_PLLCTRL1, LOCK));
+                BM_CLKCTRL_PLLCTRL0_SET(POWER);
+                while(!BR_CLKCTRL_PLLCTRL1(LOCK));
             }
             else
-                BF_CLR(CLKCTRL_PLLCTRL0, POWER);
+                BM_CLKCTRL_PLLCTRL0_CLR(POWER);
             break;
         default:
             break;
@@ -58,16 +60,16 @@ bool imx233_clkctrl_is_enabled(enum imx233_clock_t clk)
 {
     switch(clk)
     {
-        case CLK_PLL: return BF_RD(CLKCTRL_PLLCTRL0, POWER);
+        case CLK_PLL: return BR_CLKCTRL_PLLCTRL0(POWER);
 #if IMX233_SUBTARGET >= 3700
-        case CLK_PIX: return !BF_RD(CLKCTRL_PIX, CLKGATE);
+        case CLK_PIX: return !BR_CLKCTRL_PIX(CLKGATE);
 #endif
-        case CLK_SSP: return !BF_RD(CLKCTRL_SSP, CLKGATE);
-        case CLK_DRI: return !BF_RD(CLKCTRL_XTAL, DRI_CLK24M_GATE);
-        case CLK_PWM: return !BF_RD(CLKCTRL_XTAL, PWM_CLK24M_GATE);
-        case CLK_UART: return !BF_RD(CLKCTRL_XTAL, UART_CLK_GATE);
-        case CLK_FILT: return !BF_RD(CLKCTRL_XTAL, FILT_CLK24M_GATE);
-        case CLK_TIMROT: return !BF_RD(CLKCTRL_XTAL, TIMROT_CLK32K_GATE);
+        case CLK_SSP: return !BR_CLKCTRL_SSP(CLKGATE);
+        case CLK_DRI: return !BR_CLKCTRL_XTAL(DRI_CLK24M_GATE);
+        case CLK_PWM: return !BR_CLKCTRL_XTAL(PWM_CLK24M_GATE);
+        case CLK_UART: return !BR_CLKCTRL_XTAL(UART_CLK_GATE);
+        case CLK_FILT: return !BR_CLKCTRL_XTAL(FILT_CLK24M_GATE);
+        case CLK_TIMROT: return !BR_CLKCTRL_XTAL(TIMROT_CLK32K_GATE);
         default: return true;
     }
 }
@@ -99,16 +101,16 @@ int imx233_clkctrl_get_div(enum imx233_clock_t clk)
     switch(clk)
     {
 #if IMX233_SUBTARGET >= 3700
-        case CLK_PIX: return BF_RD(CLKCTRL_PIX, DIV);
-        case CLK_CPU: return BF_RD(CLKCTRL_CPU, DIV_CPU);
-        case CLK_EMI: return BF_RD(CLKCTRL_EMI, DIV_EMI);
+        case CLK_PIX: return BR_CLKCTRL_PIX(DIV);
+        case CLK_CPU: return BR_CLKCTRL_CPU(DIV_CPU);
+        case CLK_EMI: return BR_CLKCTRL_EMI(DIV_EMI);
 #else
-        case CLK_CPU: return BF_RD(CLKCTRL_CPU, DIV);
-        case CLK_EMI: return BF_RD(CLKCTRL_EMI, DIV);
+        case CLK_CPU: return BR_CLKCTRL_CPU(DIV);
+        case CLK_EMI: return BR_CLKCTRL_EMI(DIV);
 #endif
-        case CLK_SSP: return BF_RD(CLKCTRL_SSP, DIV);
-        case CLK_HBUS: return BF_RD(CLKCTRL_HBUS, DIV);
-        case CLK_XBUS: return BF_RD(CLKCTRL_XBUS, DIV);
+        case CLK_SSP: return BR_CLKCTRL_SSP(DIV);
+        case CLK_HBUS: return BR_CLKCTRL_HBUS(DIV);
+        case CLK_XBUS: return BR_CLKCTRL_XBUS(DIV);
         default: return 0;
     }
 }
@@ -119,10 +121,10 @@ void imx233_clkctrl_set_frac_div(enum imx233_clock_t clk, int fracdiv)
 #define handle_frac(dev) \
     case CLK_##dev: \
         if(fracdiv == 0) \
-            BF_SET(CLKCTRL_FRAC, CLKGATE##dev); \
+            BM_CLKCTRL_FRAC_SET(CLKGATE##dev); \
         else { \
             BF_WR(CLKCTRL_FRAC, dev##FRAC, fracdiv); \
-            BF_CLR(CLKCTRL_FRAC, CLKGATE##dev); } \
+            BM_CLKCTRL_FRAC_CLR(CLKGATE##dev); } \
         break;
     switch(clk)
     {
@@ -139,10 +141,10 @@ int imx233_clkctrl_get_frac_div(enum imx233_clock_t clk)
 {
 #define handle_frac(dev) \
     case CLK_##dev:\
-        if(BF_RD(CLKCTRL_FRAC, CLKGATE##dev)) \
+        if(BR_CLKCTRL_FRAC(CLKGATE##dev)) \
             return 0; \
         else \
-            return BF_RD(CLKCTRL_FRAC, dev##FRAC);
+            return BR_CLKCTRL_FRAC(dev##FRAC);
     switch(clk)
     {
 #if IMX233_SUBTARGET >= 3700
@@ -162,11 +164,11 @@ void imx233_clkctrl_set_bypass(enum imx233_clock_t clk, bool bypass)
     switch(clk)
     {
 #if IMX233_SUBTARGET >= 3700
-        case CLK_PIX: msk = BM_CLKCTRL_CLKSEQ_BYPASS_PIX; break;
+        case CLK_PIX: msk = BM_OR(CLKCTRL_CLKSEQ, BYPASS_PIX); break;
 #endif
-        case CLK_SSP: msk = BM_CLKCTRL_CLKSEQ_BYPASS_SSP; break;
-        case CLK_CPU: msk = BM_CLKCTRL_CLKSEQ_BYPASS_CPU; break;
-        case CLK_EMI: msk = BM_CLKCTRL_CLKSEQ_BYPASS_EMI; break;
+        case CLK_SSP: msk = BM_OR(CLKCTRL_CLKSEQ, BYPASS_SSP); break;
+        case CLK_CPU: msk = BM_OR(CLKCTRL_CLKSEQ, BYPASS_CPU); break;
+        case CLK_EMI: msk = BM_OR(CLKCTRL_CLKSEQ, BYPASS_EMI); break;
         default: return;
     }
 
@@ -181,11 +183,11 @@ bool imx233_clkctrl_get_bypass(enum imx233_clock_t clk)
     switch(clk)
     {
 #if IMX233_SUBTARGET >= 3700
-        case CLK_PIX: return BF_RD(CLKCTRL_CLKSEQ, BYPASS_PIX);
+        case CLK_PIX: return BR_CLKCTRL_CLKSEQ(BYPASS_PIX);
 #endif
-        case CLK_SSP: return BF_RD(CLKCTRL_CLKSEQ, BYPASS_SSP);
-        case CLK_CPU: return BF_RD(CLKCTRL_CLKSEQ, BYPASS_CPU);
-        case CLK_EMI: return BF_RD(CLKCTRL_CLKSEQ, BYPASS_EMI);
+        case CLK_SSP: return BR_CLKCTRL_CLKSEQ(BYPASS_SSP);
+        case CLK_CPU: return BR_CLKCTRL_CLKSEQ(BYPASS_CPU);
+        case CLK_EMI: return BR_CLKCTRL_CLKSEQ(BYPASS_EMI);
         default: return false;
     }
 }
@@ -226,14 +228,14 @@ void imx233_clkctrl_set_cpu_hbus_div(int cpu_idiv, int cpu_fdiv, int hbus_div)
 void imx233_clkctrl_enable_usb(bool enable)
 {
     if(enable)
-        BF_SET(CLKCTRL_PLLCTRL0, EN_USB_CLKS);
+        BM_CLKCTRL_PLLCTRL0_SET(EN_USB_CLKS);
     else
-        BF_CLR(CLKCTRL_PLLCTRL0, EN_USB_CLKS);
+        BM_CLKCTRL_PLLCTRL0_CLR(EN_USB_CLKS);
 }
 
 bool imx233_clkctrl_is_usb_enabled(void)
 {
-    return BF_RD(CLKCTRL_PLLCTRL0, EN_USB_CLKS);
+    return BR_CLKCTRL_PLLCTRL0(EN_USB_CLKS);
 }
 
 void imx233_clkctrl_set_auto_slow_div(unsigned div)
@@ -247,7 +249,7 @@ void imx233_clkctrl_set_auto_slow_div(unsigned div)
 
 unsigned imx233_clkctrl_get_auto_slow_div(void)
 {
-    return BF_RD(CLKCTRL_HBUS, SLOW_DIV);
+    return BR_CLKCTRL_HBUS(SLOW_DIV);
 }
 
 void imx233_clkctrl_enable_auto_slow(bool enable)
@@ -258,7 +260,7 @@ void imx233_clkctrl_enable_auto_slow(bool enable)
 
 bool imx233_clkctrl_is_auto_slow_enabled(void)
 {
-    return BF_RD(CLKCTRL_HBUS, AUTO_SLOW_MODE);
+    return BR_CLKCTRL_HBUS(AUTO_SLOW_MODE);
 }
 
 unsigned imx233_clkctrl_get_freq(enum imx233_clock_t clk)
@@ -280,9 +282,9 @@ unsigned imx233_clkctrl_get_freq(enum imx233_clock_t clk)
             {
                 ref = imx233_clkctrl_get_freq(CLK_XTAL);
                 /* Integer divide mode vs fractional divide mode */
-                if(BF_RD(CLKCTRL_CPU, DIV_XTAL_FRAC_EN))
+                if(BR_CLKCTRL_CPU(DIV_XTAL_FRAC_EN))
 
-                    return (ref * BF_RD(CLKCTRL_CPU, DIV_XTAL)) / 32;
+                    return (ref * BR_CLKCTRL_CPU(DIV_XTAL)) / 32;
                 else
                     return ref / imx233_clkctrl_get_div(CLK_CPU);
             }
@@ -360,10 +362,10 @@ unsigned imx233_clkctrl_get_freq(enum imx233_clock_t clk)
             if(imx233_clkctrl_get_bypass(CLK_EMI))
             {
                 ref = imx233_clkctrl_get_freq(CLK_XTAL);
-                if(BF_RD(CLKCTRL_EMI, CLKGATE))
+                if(BR_CLKCTRL_EMI(CLKGATE))
                     return 0;
                 else
-                    return ref / BF_RD(CLKCTRL_EMI, DIV_XTAL);
+                    return ref / BR_CLKCTRL_EMI(DIV_XTAL);
             }
             else
             {
@@ -387,15 +389,26 @@ void imx233_clkctrl_init(void)
 {
     /* set auto-slow monitor to all */
 #if IMX233_SUBTARGET >= 3700
-    HW_CLKCTRL_HBUS_SET = BF_OR6(CLKCTRL_HBUS,
-        APBHDMA_AS_ENABLE(1), TRAFFIC_JAM_AS_ENABLE(1), TRAFFIC_AS_ENABLE(1),
-        APBXDMA_AS_ENABLE(1), CPU_INSTR_AS_ENABLE(1), CPU_DATA_AS_ENABLE(1));
+    BM_CLKCTRL_HBUS_SET(
+        APBHDMA_AS_ENABLE, TRAFFIC_JAM_AS_ENABLE, TRAFFIC_AS_ENABLE,
+        APBXDMA_AS_ENABLE, CPU_INSTR_AS_ENABLE, CPU_DATA_AS_ENABLE);
 #else
-    HW_CLKCTRL_HBUS = HW_CLKCTRL_HBUS | BF_OR7(CLKCTRL_HBUS, EMI_BUSY_FAST(1),
-        APBHDMA_BUSY_FAST(1), APBXDMA_BUSY_FAST(1), TRAFFIC_JAM_FAST(1),
-        TRAFFIC_FAST(1), CPU_DATA_FAST(1), CPU_INSTR_FAST(1));
+    HW_CLKCTRL_HBUS = HW_CLKCTRL_HBUS | BM_OR(CLKCTRL_HBUS, EMI_BUSY_FAST,
+        APBHDMA_BUSY_FAST, APBXDMA_BUSY_FAST, TRAFFIC_JAM_FAST,
+        TRAFFIC_FAST, CPU_DATA_FAST, CPU_INSTR_FAST);
 #endif
 #if IMX233_SUBTARGET >= 3780
-    HW_CLKCTRL_HBUS_SET = BF_OR2(CLKCTRL_HBUS, DCP_AS_ENABLE(1), PXP_AS_ENABLE(1));
+    BM_CLKCTRL_HBUS_SET(DCP_AS_ENABLE, PXP_AS_ENABLE);
 #endif
+}
+
+void imx233_clkctrl_wait_for_interrupt()
+{
+    BF_WR(CLKCTRL_CPU, INTERRUPT_WAIT, 1);
+    asm volatile (
+        "mcr p15, 0, %0, c7, c0, 4 \n" /* Wait for interrupt */
+        "nop\n" /* Datasheet unclear: "The lr sent to handler points here after RTI"*/
+        "nop\n"
+        : : "r"(0)
+    );
 }

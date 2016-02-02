@@ -111,8 +111,8 @@ void rtc_get_alarm(int *h, int *m)
 
 void rtc_enable_alarm(bool enable)
 {
-    BF_CLR(RTC_CTRL, ALARM_IRQ_EN);
-    BF_CLR(RTC_CTRL, ALARM_IRQ);
+    BM_RTC_CTRL_CLR(ALARM_IRQ_EN);
+    BM_RTC_CTRL_CLR(ALARM_IRQ);
     uint32_t val = imx233_rtc_read_persistent(0);
     BF_WRX(val, RTC_PERSISTENT0, ALARM_EN, enable);
     BF_WRX(val, RTC_PERSISTENT0, ALARM_WAKE_EN, enable);
@@ -136,5 +136,5 @@ bool rtc_check_alarm_started(bool release_alarm)
  */
 bool rtc_check_alarm_flag(void)
 {
-    return BF_RD(RTC_CTRL, ALARM_IRQ);
+    return BR_RTC_CTRL(ALARM_IRQ);
 }

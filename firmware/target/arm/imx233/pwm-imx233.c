@@ -24,6 +24,12 @@
 #include "clkctrl-imx233.h"
 #include "pinctrl-imx233.h"
 
+#include "regs-v2/regs-pwm.h"
+
+/* fake field for simpler programming */
+#define BP_PWM_CTRL_PWMx_ENABLE(x)  (x)
+#define BM_PWM_CTRL_PWMx_ENABLE(x)  (1 << (x))
+
 /* list of divisors + register value by increasing order of divisors */
 static int pwm_cdiv_table[] =
 {
@@ -40,15 +46,15 @@ void imx233_pwm_init(void)
 
 bool imx233_pwm_is_enabled(int channel)
 {
-    return BF_RD(PWM_CTRL, PWMx_ENABLE(channel));
+    return BR_PWM_CTRL(PWMx_ENABLE(channel));
 }
 
 void imx233_pwm_enable(int channel, bool enable)
 {
     if(enable)
-        BF_SET(PWM_CTRL, PWMx_ENABLE(channel));
+        BM_PWM_CTRL_SET(PWMx_ENABLE(channel));
     else
-        BF_CLR(PWM_CTRL, PWMx_ENABLE(channel));
+        BM_PWM_CTRL_CLR(PWMx_ENABLE(channel));
 }
 
 void imx233_pwm_setup(int channel, int period, int cdiv, int active,
@@ -62,9 +68,9 @@ void imx233_pwm_setup(int channel, int period, int cdiv, int active,
     imx233_pinctrl_setup_vpin(VPIN_PWM(channel), "pwm", PINCTRL_DRIVE_4mA, false);
     /* watch the order ! active THEN period
      * NOTE: the register value is period-1 */
-    HW_PWM_ACTIVEn(channel) = BF_OR2(PWM_ACTIVEn, ACTIVE(active), INACTIVE(inactive));
-    HW_PWM_PERIODn(channel) = BF_OR4(PWM_PERIODn, PERIOD(period - 1),
-        ACTIVE_STATE(active_state), INACTIVE_STATE(inactive_state), CDIV(cdiv));
+    BW_PWM_ACTIVEn(channel, ACTIVE(active), INACTIVE(inactive));
+    BW_PWM_PERIODn(channel, PERIOD(period - 1), ACTIVE_STATE(active_state),
+        INACTIVE_STATE(inactive_state), CDIV(cdiv));
     /* restore */
     imx233_pwm_enable(channel, enable);
 }
@@ -120,11 +126,11 @@ struct imx233_pwm_info_t imx233_pwm_get_info(int channel)
     struct imx233_pwm_info_t info;
     memset(&info, 0, sizeof(info));
     info.enabled = imx233_pwm_is_enabled(channel);
-    info.cdiv = pwm_cdiv_table[BF_RDn(PWM_PERIODn, channel, CDIV)];
-    info.period = BF_RDn(PWM_PERIODn, channel, PERIOD) + 1;
-    info.active = BF_RDn(PWM_ACTIVEn, channel, ACTIVE);
-    info.inactive = BF_RDn(PWM_ACTIVEn, channel, INACTIVE);
-    info.active_state = active_state[BF_RDn(PWM_PERIODn, channel, ACTIVE_STATE)];
-    info.inactive_state = inactive_state[BF_RDn(PWM_PERIODn, channel, INACTIVE_STATE)];
+    info.cdiv = pwm_cdiv_table[BR_PWM_PERIODn(channel, CDIV)];
+    info.period = BR_PWM_PERIODn(channel, PERIOD) + 1;
+    info.active = BR_PWM_ACTIVEn(channel, ACTIVE);
+    info.inactive = BR_PWM_ACTIVEn(channel, INACTIVE);
+    info.active_state = active_state[BR_PWM_PERIODn(channel, ACTIVE_STATE)];
+    info.inactive_state = inactive_state[BR_PWM_PERIODn(channel, INACTIVE_STATE)];
     return info;
 }

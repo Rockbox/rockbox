@@ -22,6 +22,10 @@
 #include "pcm_sampr.h"
 #include "string.h"
 
+#include "regs-v2/regs-audioin.h"
+/* some audioout registers impact audioin */
+#include "regs-v2/regs-audioout.h"
+
 /* values in half-dB, one for each setting */
 static int audioin_vol[2][4]; /* 0=left, 1=right */
 static int audioin_select[2]; /* idem */
@@ -31,9 +35,9 @@ void imx233_audioin_preinit(void)
     /* Enable AUDIOIN block */
     imx233_reset_block(&HW_AUDIOIN_CTRL);
     /* Set word-length to 16-bit */
-    BF_SET(AUDIOIN_CTRL, WORD_LENGTH);
+    BM_AUDIOIN_CTRL_SET(WORD_LENGTH);
     /* Gate Off */
-    BF_SET(AUDIOIN_CTRL, CLKGATE);
+    BM_AUDIOIN_CTRL_SET(CLKGATE);
 }
 
 void imx233_audioin_postinit(void)
@@ -43,25 +47,25 @@ void imx233_audioin_postinit(void)
 void imx233_audioin_open(void)
 {
     /* Gate On */
-    BF_CLR(AUDIOIN_CTRL, CLKGATE);
+    BM_AUDIOIN_CTRL_CLR(CLKGATE);
     /* Enable ADC clock */
-    BF_CLR(AUDIOIN_ANACLKCTRL, CLKGATE);
+    BM_AUDIOIN_ANACLKCTRL_CLR(CLKGATE);
     /* Power up ADC (WARNING audioout register) */
-    BF_CLR(AUDIOOUT_PWRDN, ADC);
+    BM_AUDIOOUT_PWRDN_CLR(ADC);
     /* Start ADC */
-    BF_SET(AUDIOIN_CTRL, RUN);
+    BM_AUDIOIN_CTRL_SET(RUN);
 }
 
 void imx233_audioin_close(void)
 {
     /* Stop ADC (doc says it gate off the module but that's not the case) */
-    BF_CLR(AUDIOIN_CTRL, RUN);
+    BM_AUDIOIN_CTRL_CLR(RUN);
     /* Disable ADC clock */
-    BF_SET(AUDIOIN_ANACLKCTRL, CLKGATE);
+    BM_AUDIOIN_ANACLKCTRL_SET(CLKGATE);
     /* Power down ADC (WARNING audioout register) */
-    BF_SET(AUDIOOUT_PWRDN, ADC);
+    BM_AUDIOOUT_PWRDN_SET(ADC);
     /* Gate Off */
-    BF_SET(AUDIOIN_CTRL, CLKGATE);
+    BM_AUDIOIN_CTRL_SET(CLKGATE);
 }
 
 static void apply_config(void)
@@ -87,7 +91,7 @@ static void apply_config(void)
     {
         /* take lowest microphone gain to get back into the -100..22 range
          * achievable with mux+adc.*/
-        
+
         /* from 52.5 dB and beyond: 40dB gain */
         if(vol_l > 52 * 2)
         {
@@ -115,15 +119,15 @@ static void apply_config(void)
     vol_r = MIN(vol_r, 44);
     /* we use the mux volume to reach the volume or higher with 1.5dB steps
      * and then we use the ADC to go below 0dB or to obtain 0.5dB accuracy */
-    
+
     int mux_vol_l = MAX(0, (vol_l + 2) / 3); /* 1.5dB = 3 * 0.5dB */
     int mux_vol_r = MAX(0, (vol_r + 2) / 3);
 #if IMX233_SUBTARGET >= 3700
-    unsigned adc_zcd = BM_AUDIOIN_ADCVOL_EN_ADC_ZCD;
+    unsigned adc_zcd = BM_OR(AUDIOIN_ADCVOL, EN_ADC_ZCD);
 #else
     unsigned adc_zcd = 0;
 #endif
-    HW_AUDIOIN_ADCVOL = adc_zcd | BF_OR4(AUDIOIN_ADCVOL, SELECT_LEFT(select_l),
+    HW_AUDIOIN_ADCVOL = adc_zcd | BF_OR(AUDIOIN_ADCVOL, SELECT_LEFT(select_l),
         SELECT_RIGHT(select_r), GAIN_LEFT(mux_vol_l), GAIN_RIGHT(mux_vol_r));
 
     vol_l -= mux_vol_l * 3; /* mux vol is in 1.5dB = 3 * 0.5dB steps */
@@ -133,8 +137,7 @@ static void apply_config(void)
 
     /* unmute, enable zero cross and set volume.
      * 0xfe is -0.5dB */
-    HW_AUDIOIN_ADCVOLUME = BF_OR3(AUDIOIN_ADCVOLUME, EN_ZCD(1),
-        VOLUME_LEFT(0xff + vol_l), VOLUME_RIGHT(0xff + vol_r));
+    BW_AUDIOIN_ADCVOLUME(EN_ZCD(1), VOLUME_LEFT(0xff + vol_l), VOLUME_RIGHT(0xff + vol_r));
 }
 
 void imx233_audioin_select_mux_input(bool right, int select)
@@ -185,7 +188,7 @@ void imx233_audioin_set_freq(int fsel)
         HW_HAVE_96_([HW_FREQ_96] = { 0x2, 0x0, 0xf, 0x13ff },)
     };
 
-    HW_AUDIOIN_ADCSRR = BF_OR4(AUDIOIN_ADCSRR,
+    BW_AUDIOIN_ADCSRR(
         SRC_FRAC(dacssr[fsel].src_frac), SRC_INT(dacssr[fsel].src_int),
         SRC_HOLD(dacssr[fsel].src_hold), BASEMULT(dacssr[fsel].base_mult));
 }
@@ -195,22 +198,22 @@ struct imx233_audioin_info_t imx233_audioin_get_info(void)
     struct imx233_audioin_info_t info;
     memset(&info, 0, sizeof(info));
     /* 6*10^6*basemult/(src_frac*8*(src_hold+1)) in Hz */
-    info.freq = 60000000 * BF_RD(AUDIOIN_ADCSRR, BASEMULT) / 8 /
-        BF_RD(AUDIOIN_ADCSRR, SRC_FRAC) / (1 + BF_RD(AUDIOIN_ADCSRR, SRC_HOLD));
-    info.muxselect[0] = BF_RD(AUDIOIN_ADCVOL, SELECT_LEFT);
-    info.muxselect[1] = BF_RD(AUDIOIN_ADCVOL, SELECT_RIGHT);
+    info.freq = 60000000 * BR_AUDIOIN_ADCSRR(BASEMULT) / 8 /
+        BR_AUDIOIN_ADCSRR(SRC_FRAC) / (1 + BR_AUDIOIN_ADCSRR(SRC_HOLD));
+    info.muxselect[0] = BR_AUDIOIN_ADCVOL(SELECT_LEFT);
+    info.muxselect[1] = BR_AUDIOIN_ADCVOL(SELECT_RIGHT);
     /* convert half-dB to tenth-dB */
-    info.muxvol[0] = BF_RD(AUDIOIN_ADCVOL, GAIN_LEFT) * 15;
-    info.muxvol[1] = BF_RD(AUDIOIN_ADCVOL, GAIN_RIGHT) * 15;
-    info.muxmute[0] = info.adcmute[1] = BF_RD(AUDIOIN_ADCVOL, MUTE);
-    info.adcvol[0] = MAX((int)BF_RD(AUDIOIN_ADCVOLUME, VOLUME_LEFT) - 0xff, -100) * 5;
-    info.adcvol[1] = MAX((int)BF_RD(AUDIOIN_ADCVOLUME, VOLUME_RIGHT) - 0xff, -100) * 5;
+    info.muxvol[0] = BR_AUDIOIN_ADCVOL(GAIN_LEFT) * 15;
+    info.muxvol[1] = BR_AUDIOIN_ADCVOL(GAIN_RIGHT) * 15;
+    info.muxmute[0] = info.adcmute[1] = BR_AUDIOIN_ADCVOL(MUTE);
+    info.adcvol[0] = MAX((int)BR_AUDIOIN_ADCVOLUME(VOLUME_LEFT) - 0xff, -100) * 5;
+    info.adcvol[1] = MAX((int)BR_AUDIOIN_ADCVOLUME(VOLUME_RIGHT) - 0xff, -100) * 5;
     info.adcmute[0] = info.adcmute[1] = false;
-    info.micvol[0] = BF_RD(AUDIOIN_MICLINE, MIC_GAIN);
+    info.micvol[0] = BR_AUDIOIN_MICLINE(MIC_GAIN);
     if(info.micvol[0] != 0)
         info.micvol[0] = info.micvol[1] = info.micvol[0] * 100 + 100;
     info.micmute[0] = info.micmute[1] = false;
-    info.adc = !BF_RD(AUDIOOUT_PWRDN, ADC);
+    info.adc = !BR_AUDIOOUT_PWRDN(ADC);
     info.mic = info.mux = true;
     return info;
 }

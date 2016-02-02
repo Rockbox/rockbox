@@ -25,6 +25,18 @@
 #include "string.h"
 #include "timrot-imx233.h"
 
+#include "regs-v2/regs-icoll.h"
+
+/* helpers */
+#if IMX233_SUBTARGET >= 3600 && IMX233_SUBTARGET < 3780
+#define BP_ICOLL_PRIORITYn_ENABLEx(x)   (2 + 8 * (x))
+#define BM_ICOLL_PRIORITYn_ENABLEx(x)   (1 << (2 + 8 * (x)))
+#define BP_ICOLL_PRIORITYn_PRIORITYx(x) (0 + 8 * (x))
+#define BM_ICOLL_PRIORITYn_PRIORITYx(x) (3 << (0 + 8 * (x)))
+#define BP_ICOLL_PRIORITYn_SOFTIRQx(x)  (3 + 8 * (x))
+#define BM_ICOLL_PRIORITYn_SOFTIRQx(x)  (1 << (3 + 8 * (x)))
+#endif
+
 #define default_interrupt(name) \
     extern __attribute__((weak, alias("UIRQ"))) void name(void)
 
@@ -130,9 +142,9 @@ static uint32_t irq_count[INT_SRC_COUNT];
 unsigned imx233_icoll_get_priority(int src)
 {
 #if IMX233_SUBTARGET < 3780
-    return BF_RDn(ICOLL_PRIORITYn, src / 4, PRIORITYx(src % 4));
+    return BR_ICOLL_PRIORITYn(src / 4, PRIORITYx(src % 4));
 #else
-    return BF_RDn(ICOLL_INTERRUPTn, src, PRIORITY);
+    return BR_ICOLL_INTERRUPTn(src, PRIORITY);
 #endif
 }
 
@@ -140,9 +152,9 @@ struct imx233_icoll_irq_info_t imx233_icoll_get_irq_info(int src)
 {
     struct imx233_icoll_irq_info_t info;
 #if IMX233_SUBTARGET < 3780
-    info.enabled = BF_RDn(ICOLL_PRIORITYn, src / 4, ENABLEx(src % 4));
+    info.enabled = BR_ICOLL_PRIORITYn(src / 4, ENABLEx(src % 4));
 #else
-    info.enabled = BF_RDn(ICOLL_INTERRUPTn, src, ENABLE);
+    info.enabled = BR_ICOLL_INTERRUPTn(src, ENABLE);
 #endif
     info.priority = imx233_icoll_get_priority(src);
     info.freq = irq_count_old[src];
@@ -218,14 +230,14 @@ void imx233_icoll_force_irq(unsigned src, bool enable)
 {
 #if IMX233_SUBTARGET < 3780
     if(enable)
-        BF_SETn(ICOLL_PRIORITYn, src / 4, SOFTIRQx(src % 4));
+        BM_ICOLL_PRIORITYn_SET(src / 4, SOFTIRQx(src % 4));
     else
-        BF_CLRn(ICOLL_PRIORITYn, src / 4, SOFTIRQx(src % 4));
+        BM_ICOLL_PRIORITYn_CLR(src / 4, SOFTIRQx(src % 4));
 #else
     if(enable)
-        BF_SETn(ICOLL_INTERRUPTn, src, SOFTIRQ);
+        BM_ICOLL_INTERRUPTn_SET(src, SOFTIRQ);
     else
-        BF_CLRn(ICOLL_INTERRUPTn, src, SOFTIRQ);
+        BM_ICOLL_INTERRUPTn_CLR(src, SOFTIRQ);
 #endif
 }
 
@@ -233,14 +245,14 @@ void imx233_icoll_enable_interrupt(int src, bool enable)
 {
 #if IMX233_SUBTARGET < 3780
     if(enable)
-        BF_SETn(ICOLL_PRIORITYn, src / 4, ENABLEx(src % 4));
+        BM_ICOLL_PRIORITYn_SET(src / 4, ENABLEx(src % 4));
     else
-        BF_CLRn(ICOLL_PRIORITYn, src / 4, ENABLEx(src % 4));
+        BM_ICOLL_PRIORITYn_CLR(src / 4, ENABLEx(src % 4));
 #else
     if(enable)
-        BF_SETn(ICOLL_INTERRUPTn, src, ENABLE);
+        BM_ICOLL_INTERRUPTn_SET(src, ENABLE);
     else
-        BF_CLRn(ICOLL_INTERRUPTn, src, ENABLE);
+        BM_ICOLL_INTERRUPTn_CLR(src, ENABLE);
 #endif
 }
 
@@ -257,7 +269,7 @@ void imx233_icoll_init(void)
 {
     imx233_reset_block(&HW_ICOLL_CTRL);
     /* enable read side-effect mode for nested interrupts */
-    BF_SET(ICOLL_CTRL, ARM_RSE_MODE);
+    BM_ICOLL_CTRL_SET(ARM_RSE_MODE);
     /* disable all interrupts */
     /* priority = 0, disable, disable fiq */
 #if IMX233_SUBTARGET >= 3780
@@ -270,5 +282,5 @@ void imx233_icoll_init(void)
     /* setup vbase as isr_table */
     HW_ICOLL_VBASE = (uint32_t)&isr_table;
     /* enable final irq bit */
-    BF_SET(ICOLL_CTRL, IRQ_FINAL_ENABLE);
+    BM_ICOLL_CTRL_SET(IRQ_FINAL_ENABLE);
 }

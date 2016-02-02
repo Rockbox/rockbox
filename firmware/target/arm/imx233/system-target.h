@@ -27,9 +27,16 @@
 #include "clkctrl-imx233.h"
 #include "icoll-imx233.h"
 #include "clock-target.h" /* CPUFREQ_* are defined here */
+#include "regs-v2/regs-macro.h"
 
-#include "regs/regs-digctl.h"
-#include "regs/regs-usbphy.h"
+/** Extra macros that are useful */
+#define BF_RDX(val, reg, field)         (((val) & BM_##reg##_##field) >> BP_##reg##_##field)
+#define BF_WRX(val, reg, field, v)      (val) = ((val) & ~BM_OR(reg, field)) | BF_OR(reg, field(v))
+#define BF_WR(reg, field, v)            BF_WRX(HW_##reg, reg, field, v)
+#define BF_WR_V(reg, field, sy)         BF_WR(reg, field, BV_##reg##_##field##__##sy)
+#define BF_WR_VX(val, reg, field, sy)   BF_WRX(val, reg, field, BV_##reg##_##field##__##sy)
+#define BF_WRn(reg, n, field, v)        BF_WRX(HW_##reg(n), reg, field, v)
+#define BF_WRn_V(reg, n, field, sy)     BF_WRn(reg, n, field, BV_##reg##_##field##__##sy)
 
 /**
  * Absolute maximum CPU speed: 454.74 MHz (STMP3780), 320.00 MHz (STMP3700)

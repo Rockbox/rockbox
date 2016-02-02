@@ -43,7 +43,7 @@ static int timeout_4p2_ilimit_increase; /* timeout before increasing 4p2 ilimit 
 int _battery_voltage(void)
 {
     /* battery value is in 8mV LSB */
-    return BF_RD(POWER_BATTMONITOR, BATT_VAL) * 8;
+    return BR_POWER_BATTMONITOR(BATT_VAL) * 8;
 }
 
 void imx233_powermgmt_init(void)
@@ -59,12 +59,12 @@ void imx233_powermgmt_init(void)
     BF_WR(POWER_VDDACTRL, LINREG_OFFSET, 2);
     BF_WR(POWER_VDDIOCTRL, LINREG_OFFSET, 2);
     /* enable a few bits controlling the DC-DC as recommended by Freescale */
-    BF_SET(POWER_LOOPCTRL, TOGGLE_DIF);
-    BF_SET(POWER_LOOPCTRL, EN_CM_HYST);
-    BF_CLR(POWER_LOOPCTRL, EN_RCSCALE);
-    BF_SETV(POWER_LOOPCTRL, EN_RCSCALE, 1);
+    BM_POWER_LOOPCTRL_SET(TOGGLE_DIF);
+    BM_POWER_LOOPCTRL_SET(EN_CM_HYST);
+    BM_POWER_LOOPCTRL_CLR(EN_RCSCALE);
+    BW_POWER_LOOPCTRL_SET(EN_RCSCALE(1));
 #else
-    BF_SET(POWER_5VCTRL, LINREG_OFFSET);
+    BM_POWER_5VCTR_SET(LINREG_OFFSET);
 #endif
 }
 
@@ -84,12 +84,12 @@ void charging_algorithm_step(void)
         logf("pwrmgmt: * -> discharging");
         logf("pwrmgmt: disable charger and 4p2"); 
         /* 5V has been lost: disable 4p2 power rail */
-        BF_SET(POWER_CHARGE, PWD_BATTCHRG);
+        BM_POWER_CHARGE_SET(PWD_BATTCHRG);
 #if IMX233_SUBTARGET >= 3780
         BF_WR(POWER_DCDC4P2, ENABLE_DCDC, 0);
         BF_WR(POWER_DCDC4P2, ENABLE_4P2, 0);
         BF_WR(POWER_5VCTRL, CHARGE_4P2_ILIMIT, 1);
-        BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
+        BM_POWER_5VCTRL_SET(PWD_CHARGE_4P2);
 #endif
         charge_state = DISCHARGING;
     }
@@ -106,8 +106,8 @@ void charging_algorithm_step(void)
          * is safe: it will never disable the DCDC and will not reduce the charge
          * limit on the 4P2 rail. */
         BF_WR(POWER_DCDC4P2, ENABLE_4P2, 1);
-        BF_SET(POWER_CHARGE, ENABLE_LOAD);
-        BF_CLR(POWER_5VCTRL, PWD_CHARGE_4P2);// FIXME: manual error ?
+        BM_POWER_CHARGE_SET(ENABLE_LOAD);
+        BM_POWER_5VCTRL_CLR(PWD_CHARGE_4P2);// FIXME: manual error ?
         BF_WR(POWER_DCDC4P2, ENABLE_DCDC, 1);
 #endif
         timeout_4p2_ilimit_increase = current_tick + HZ / 100;
@@ -118,7 +118,7 @@ void charging_algorithm_step(void)
 #if IMX233_SUBTARGET >= 3780
         /* if 4.2V current limit has not reached 780mA, increase it slowly to
          * charge the 4.2V capacitance */
-        if(BF_RD(POWER_5VCTRL, CHARGE_4P2_ILIMIT) != 0x3f)
+        if(BR_POWER_5VCTRL(CHARGE_4P2_ILIMIT) != 0x3f)
         {
             //logf("pwrmgmt: incr 4.2 ilimit");
             HW_POWER_5VCTRL += BF_POWER_5VCTRL_CHARGE_4P2_ILIMIT(1);
@@ -136,10 +136,10 @@ void charging_algorithm_step(void)
             BF_WR(POWER_DCDC4P2, DROPOUT_CTRL, 0xe); /* select greater, 200 mV drop */
 #endif
             /* switch to DCDC */
-            BF_CLR(POWER_5VCTRL, DCDC_XFER);
-            BF_SET(POWER_5VCTRL, ENABLE_DCDC);
+            BM_POWER_5VCTRL_CLR(DCDC_XFER);
+            BM_POWER_5VCTRL_SET(ENABLE_DCDC);
             /* enable battery charging */
-            BF_CLR(POWER_CHARGE, PWD_BATTCHRG);
+            BM_POWER_CHARGE_CLR(PWD_BATTCHRG);
             charge_state = CHARGING;
             timeout_charging = current_tick + IMX233_CHARGING_TIMEOUT;
         }
@@ -151,13 +151,13 @@ void charging_algorithm_step(void)
         logf("pwrmgmt: charging -> error");
         /* stop charging */
 #if IMX233_SUBTARGET >= 3780
-        BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
+        BM_POWER_5VCTRL_SET(PWD_CHARGE_4P2);
 #endif
-        BF_SET(POWER_CHARGE, PWD_BATTCHRG);
+        BM_POWER_CHARGE_SET(PWD_BATTCHRG);
         /* goto error state */
         charge_state = CHARGE_STATE_ERROR;
     }
-    else if(charge_state == CHARGING && !BF_RD(POWER_STS, CHRGSTS))
+    else if(charge_state == CHARGING && !BR_POWER_STS(CHRGSTS))
     {
         logf("pwrmgmt: topping off");
         logf("pwrmgmt: charging -> topoff");
@@ -170,9 +170,9 @@ void charging_algorithm_step(void)
         logf("pwrmgmt: topoff -> disabled");
         /* stop charging */
 #if IMX233_SUBTARGET >= 3780
-        BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
+        BM_POWER_5VCTRL_SET(PWD_CHARGE_4P2);
 #endif
-        BF_SET(POWER_CHARGE, PWD_BATTCHRG);
+        BM_POWER_CHARGE_SET(PWD_BATTCHRG);
         charge_state = CHARGE_STATE_DISABLED;
     }
 #endif

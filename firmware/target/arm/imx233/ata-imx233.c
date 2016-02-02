@@ -28,7 +28,7 @@
 #include "ata-target.h"
 #include "ata-defines.h"
 
-#include "regs/regs-gpmi.h"
+#include "regs-v2/regs-gpmi.h"
 
 struct pio_timing_t
 {
@@ -50,7 +50,7 @@ static struct pio_timing_t pio_timing[] =
 
 static void imx233_ata_wait_ready(void)
 {
-    while(BF_RD(GPMI_CTRL0, RUN))
+    while(BR_GPMI_CTRL0(RUN))
         yield();
 }
 
@@ -60,14 +60,12 @@ static uint16_t imx233_ata_read_reg(unsigned reg)
     imx233_ata_wait_ready();
 
     /* setup command */
-    HW_GPMI_CTRL0 = BF_OR6(GPMI_CTRL0, RUN(1),
-        COMMAND_MODE(BV_GPMI_CTRL0_COMMAND_MODE__READ),
-        WORD_LENGTH(BV_GPMI_CTRL0_WORD_LENGTH__16_BIT),
+    BW_GPMI_CTRL0(RUN(1), COMMAND_MODE_V(READ), WORD_LENGTH_V(16_BIT),
         CS(IMX233_ATA_REG_CS(reg)), ADDRESS(IMX233_ATA_REG_ADDR(reg)),
         XFER_COUNT(1));
 
     /* wait for completion */
-    while(BF_RD(GPMI_STAT, FIFO_EMPTY));
+    while(BR_GPMI_STAT(FIFO_EMPTY));
 
     /* get data */
     return HW_GPMI_DATA & 0xffff;
@@ -79,9 +77,7 @@ static void imx233_ata_write_reg(unsigned reg, uint16_t data)
     imx233_ata_wait_ready();
 
     /* setup command */
-    HW_GPMI_CTRL0 = BF_OR6(GPMI_CTRL0, RUN(1),
-        COMMAND_MODE(BV_GPMI_CTRL0_COMMAND_MODE__WRITE),
-        WORD_LENGTH(BV_GPMI_CTRL0_WORD_LENGTH__16_BIT),
+    BW_GPMI_CTRL0(RUN(1), COMMAND_MODE_V(WRITE), WORD_LENGTH_V(16_BIT),
         CS(IMX233_ATA_REG_CS(reg)), ADDRESS(IMX233_ATA_REG_ADDR(reg)),
         XFER_COUNT(1));
 
@@ -123,8 +119,8 @@ void ata_set_pio_timings(int mode)
     adjust_to_clock(t.data_setup);
     /* write */
     imx233_ata_wait_ready();
-    HW_GPMI_TIMING0 = BF_OR3(GPMI_TIMING0, ADDRESS_SETUP(t.addr_setup),
-        DATA_HOLD(t.data_hold), DATA_SETUP(t.data_setup));
+    BW_GPMI_TIMING0(ADDRESS_SETUP(t.addr_setup), DATA_HOLD(t.data_hold),
+        DATA_SETUP(t.data_setup));
 }
 
 void ata_reset(void)

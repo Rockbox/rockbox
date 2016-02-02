@@ -23,9 +23,9 @@
 
 static void imx233_rtc_write_reg(volatile uint32_t *reg, uint32_t val)
 {
-    while(BF_RD(RTC_STAT, NEW_REGS) != 0);
+    while(BR_RTC_STAT(NEW_REGS) != 0);
     *reg = val;
-    while(BF_RD(RTC_STAT, NEW_REGS) != 0);
+    while(BR_RTC_STAT(NEW_REGS) != 0);
 }
 
 void imx233_rtc_write_seconds(uint32_t seconds)
@@ -51,9 +51,9 @@ struct imx233_rtc_info_t imx233_rtc_get_info(void)
     for(int i = 0; i < 6; i++)
         info.persistent[i] = HW_RTC_PERSISTENTn(i);
     info.alarm = imx233_rtc_read_alarm();
-    info.alarm_en = BF_RD(RTC_PERSISTENT0, ALARM_EN);
-    info.alarm_wake_en = BF_RD(RTC_PERSISTENT0, ALARM_WAKE_EN);
-    info.alarm_wake = BF_RD(RTC_PERSISTENT0, ALARM_WAKE);
-    info.alarm_irq = BF_RD(RTC_CTRL, ALARM_IRQ);
+    info.alarm_en = BR_RTC_PERSISTENT0(ALARM_EN);
+    info.alarm_wake_en = BR_RTC_PERSISTENT0(ALARM_WAKE_EN);
+    info.alarm_wake = BR_RTC_PERSISTENT0(ALARM_WAKE);
+    info.alarm_irq = BR_RTC_CTRL(ALARM_IRQ);
     return info;
 }

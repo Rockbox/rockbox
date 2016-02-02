@@ -25,7 +25,7 @@
 #include "system.h"
 #include "cpu.h"
 
-#include "regs/regs-rtc.h"
+#include "regs-v2/regs-rtc.h"
 
 #define HW_RTC_PERSISTENTn(n)   *(&HW_RTC_PERSISTENT0 + 4 * (n))
 
@@ -49,16 +49,16 @@ static inline uint32_t imx233_rtc_read_persistent(int idx)
 
 static inline void imx233_rtc_clear_msec_irq(void)
 {
-    BF_CLR(RTC_CTRL, ONEMSEC_IRQ);
+    BM_RTC_CTRL_CLR(ONEMSEC_IRQ);
 }
 
 static inline void imx233_rtc_enable_msec_irq(bool enable)
 {
     imx233_rtc_clear_msec_irq();
     if(enable)
-        BF_SET(RTC_CTRL, ONEMSEC_IRQ_EN);
+        BM_RTC_CTRL_SET(ONEMSEC_IRQ_EN);
     else
-        BF_CLR(RTC_CTRL, ONEMSEC_IRQ_EN);
+        BM_RTC_CTRL_CLR(ONEMSEC_IRQ_EN);
 }
 
 static inline uint32_t imx233_rtc_read_alarm(void)
@@ -69,9 +69,9 @@ static inline uint32_t imx233_rtc_read_alarm(void)
 static inline void imx233_rtc_enable_watchdog(bool en)
 {
     if(en)
-        BF_SET(RTC_CTRL, WATCHDOGEN);
+        BM_RTC_CTRL_SET(WATCHDOGEN);
     else
-        BF_CLR(RTC_CTRL, WATCHDOGEN);
+        BM_RTC_CTRL_CLR(WATCHDOGEN);
 }
 
 static inline void imx233_rtc_reset_watchdog(uint32_t ms)
@@ -81,7 +81,7 @@ static inline void imx233_rtc_reset_watchdog(uint32_t ms)
 
 static inline void imx233_rtc_init(void)
 {
-    BF_CLR(RTC_CTRL, CLKGATE);
+    BM_RTC_CTRL_CLR(CLKGATE);
     imx233_rtc_enable_watchdog(false);
 }
 

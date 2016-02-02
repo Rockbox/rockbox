@@ -45,6 +45,11 @@
 #include "fmradio_i2c.h"
 #include "powermgmt-imx233.h"
 
+#include "regs-v2/regs-clkctrl.h"
+#include "regs-v2/regs-digctl.h"
+#include "regs-v2/regs-usbphy.h"
+#include "regs-v2/regs-timrot.h"
+
 #define WATCHDOG_HW_DELAY   (10 * HZ)
 #define WATCHDOG_SW_DELAY   (5 * HZ)
 
@@ -97,9 +102,9 @@ static void watchdog_init(void)
 void imx233_chip_reset(void)
 {
 #if IMX233_SUBTARGET >= 3700
-    HW_CLKCTRL_RESET = BM_CLKCTRL_RESET_CHIP;
+    BM_CLKCTRL_RESET(CHIP);
 #else
-    HW_POWER_RESET = BF_OR2(POWER_RESET, UNLOCK_V(KEY), RST_DIG(1));
+    BW_POWER_RESET(UNLOCK_V(KEY), RST_DIG(1));
 #endif
 }
 
@@ -243,11 +248,10 @@ void udelay(unsigned us)
 void imx233_digctl_set_arm_cache_timings(unsigned timings)
 {
 #if IMX233_SUBTARGET >= 3780
-    HW_DIGCTL_ARMCACHE = BF_OR5(DIGCTL_ARMCACHE, ITAG_SS(timings),
-        DTAG_SS(timings), CACHE_SS(timings), DRTY_SS(timings), VALID_SS(timings));
+    BW_DIGCTL_ARMCACHE(ITAG_SS(timings), DTAG_SS(timings), CACHE_SS(timings),
+        DRTY_SS(timings), VALID_SS(timings));
 #else
-    HW_DIGCTL_ARMCACHE = BF_OR3(DIGCTL_ARMCACHE, ITAG_SS(timings),
-        DTAG_SS(timings), CACHE_SS(timings));
+    BW_DIGCTL_ARMCACHE(ITAG_SS(timings), DTAG_SS(timings), CACHE_SS(timings));
 #endif
 }
 
@@ -348,23 +352,23 @@ void set_cpu_frequency(long frequency)
 void imx233_enable_usb_controller(bool enable)
 {
     if(enable)
-        BF_CLR(DIGCTL_CTRL, USB_CLKGATE);
+        BM_DIGCTL_CTRL_CLR(USB_CLKGATE);
     else
-        BF_SET(DIGCTL_CTRL, USB_CLKGATE);
+        BM_DIGCTL_CTRL_SET(USB_CLKGATE);
 }
 
 void imx233_enable_usb_phy(bool enable)
 {
     if(enable)
     {
-        BF_CLR(USBPHY_CTRL, SFTRST);
-        BF_CLR(USBPHY_CTRL, CLKGATE);
+        BM_USBPHY_CTRL_CLR(SFTRST);
+        BM_USBPHY_CTRL_CLR(CLKGATE);
         HW_USBPHY_PWD_CLR = 0xffffffff;
     }
     else
     {
         HW_USBPHY_PWD_SET = 0xffffffff;
-        BF_SET(USBPHY_CTRL, SFTRST);
-        BF_SET(USBPHY_CTRL, CLKGATE);
+        BM_USBPHY_CTRL_SET(SFTRST);
+        BM_USBPHY_CTRL_SET(CLKGATE);
     }
 }
