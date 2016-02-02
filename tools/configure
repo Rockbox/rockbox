@@ -51,6 +51,12 @@ input() {
 
 prefixtools () {
  prefix="$1"
+ if [ -n "$ARG_COMPILER_PREFIX" ]; then
+  echo "WARNING: asked to override target toolchain $1 with $ARG_COMPILER_PREFIX"
+  echo "WARNING: overriding the toolchain means you are running an untested configuration"
+  echo "WARNING: you build might be broken because of that"
+  prefix="$ARG_COMPILER_PREFIX"
+ fi
  CC=${prefix}gcc
  CPP=${prefix}cpp
  WINDRES=${prefix}windres
@@ -1229,6 +1235,7 @@ help() {
                       behavior of falling back to them if no native thread
                       support was found.
     --prefix          Target installation directory
+    --compiler-prefix Override compiler prefix (inherently dangerous)
     --help            Shows this message (must not be used with other options)
 
 EOF
@@ -1271,6 +1278,7 @@ for arg in "$@"; do
         --no-sdl-threads)
                       ARG_THREAD_SUPPORT=0;;
         --prefix=*)   ARG_PREFIX=`echo "$arg" | cut -d = -f 2`;;
+        --compiler-prefix=*)   ARG_COMPILER_PREFIX=`echo "$arg" | cut -d = -f 2`;;
 		--help)       help;;
 		*)            err=1; echo "[ERROR] Option '$arg' unsupported";;
 	esac
