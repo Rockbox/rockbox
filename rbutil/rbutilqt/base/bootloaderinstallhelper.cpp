@@ -31,6 +31,7 @@
 #include "bootloaderinstalltcc.h"
 #include "bootloaderinstallmpio.h"
 #include "bootloaderinstallimx.h"
+#include "bootloaderinstall6g.h"
 
 BootloaderInstallBase* BootloaderInstallHelper::createBootloaderInstaller(QObject* parent, QString type)
 {
@@ -63,6 +64,9 @@ BootloaderInstallBase* BootloaderInstallHelper::createBootloaderInstaller(QObjec
     }
     else if(type == "imx") {
         return new BootloaderInstallImx(parent);
+    }
+    else if(type == "6g") {
+        return new BootloaderInstall6g(parent);
     }
     else {
         return NULL;
