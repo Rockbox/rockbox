@@ -142,3 +142,27 @@ void pmu_write_rtc(unsigned char* buffer)
 {
     pmu_write_multiple(0x59, 7, buffer);
 }
+
+#ifdef BOOTLOADER
+int pmu_rd_multiple(int address, int count, unsigned char* buffer)
+{
+    return i2c_rd(0, 0xe6, address, count, buffer);
+}
+
+int pmu_wr_multiple(int address, int count, unsigned char* buffer)
+{
+    return i2c_wr(0, 0xe6, address, count, buffer);
+}
+
+unsigned char pmu_rd(int address)
+{
+    unsigned char val;
+    pmu_rd_multiple(address, 1, &val);
+    return val;
+}
+
+int pmu_wr(int address, unsigned char val)
+{
+    return pmu_wr_multiple(address, 1, &val);
+}
+#endif /* BOOTLOADER */
