@@ -88,7 +88,7 @@ extralibs.commands = $$SILENT \
 # Note: order is important for RBLIBS! The libs are appended to the linker
 # flags in this order, put libucl at the end.
 RBLIBS = rbspeex ipodpatcher sansapatcher mkamsboot mktccboot \
-         mkmpioboot chinachippatcher mkimxboot ucl
+         mkmpioboot chinachippatcher mkimxboot mk6gboot ucl
 !win32-msvc* {
     QMAKE_EXTRA_TARGETS += extralibs
     PRE_TARGETDEPS += extralibs
@@ -186,6 +186,13 @@ win32 {
     DEFINES += _CRT_SECURE_NO_WARNINGS
     DEFINES += UNICODE
     LIBS += -lsetupapi -lnetapi32
+    contains(QT_MAJOR_VERSION, 5) {
+        # always link against libz, it seems that it does not hurt on Qt5
+        # buids/installations that are linking libz implictly
+        LIBS += -lz
+    }
+    # required for libmk6gboot.a
+    LIBS += -lusb-1.0
 }
 win32:static {
     QMAKE_LFLAGS += -static-libgcc -static-libstdc++
