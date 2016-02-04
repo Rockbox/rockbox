@@ -179,3 +179,37 @@ int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *
     mutex_unlock(&i2c_mtx[bus]);
     return ret;
 }
+
+#ifdef BOOTLOADER
+#include "clocking-s5l8702.h"
+
+#define wait_rdy(bus) {while(IICUNK10(bus));}
+void i2c_preinit(int bus)
+{
+    clockgate_enable(CLOCKGATE_I2C0, true);
+    wait_rdy(bus);
+    IICADD(bus) = 0x40;   /* own slave address */
+    wait_rdy(bus);
+    IICUNK14(bus) = 0;
+    wait_rdy(bus);
+    IICUNK18(bus) = 0;
+    wait_rdy(bus);
+    IICSTAT(bus) = 0x80;  /* master Rx mode, Tx/Rx off */
+    wait_rdy(bus);
+    IICCON(bus) = 0;
+    wait_rdy(bus);
+    IICSTAT(bus) = 0;     /* slave Rx mode, Tx/Rx off */
+    wait_rdy(bus);
+    IICDS(bus) = 0x40;
+    wait_rdy(bus);
+    IICCON(bus) = (1 << 8) |  /* unknown */
+                  (1 << 7) |  /* ACK_GEN */
+                  (0 << 6) |  /* CLKSEL = PCLK/16 */
+                  (0 << 5) |  /* INT_EN = disabled */
+                  (4 << 0);   /* CK_REG */
+    wait_rdy(bus);
+    IICSTAT(bus) = 0x10;  /* slave Rx mode, Tx/Rx on */
+    wait_rdy(bus);
+    clockgate_enable(CLOCKGATE_I2C0, false);
+}
+#endif
