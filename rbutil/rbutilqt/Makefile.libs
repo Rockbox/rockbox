@@ -31,7 +31,7 @@ export CFLAGS=$(EXTRALIB_CFLAGS)
 export CC=$(EXTRALIBS_CC)
 export AR=$(EXTRALIBS_AR)
 
-libs: librbspeex libucl libipodpatcher libsansapatcher libmkamsboot libmktccboot libmkmpioboot libchinachippatcher libmkimxboot
+libs: librbspeex libucl libipodpatcher libsansapatcher libmkamsboot libmktccboot libmkmpioboot libchinachippatcher libmkimxboot libmk6gboot
 
 
 librbspeex:
@@ -61,3 +61,5 @@ libchinachippatcher:
 libmkimxboot:
 	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/mkimxboot BUILD_DIR=$(BUILD_DIR)/mkimxboot libmkimxboot.a
 
+libmk6gboot:
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/mk6gboot BUILD_DIR=$(BUILD_DIR)/mk6gboot libmk6gboot.a
