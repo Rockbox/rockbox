@@ -40,8 +40,8 @@
 #define LDO_UNK5        5   /* TBC: nano3g NAND */
 #define LDO_CWHEEL      6
 #define LDO_ACCY        7   /* HCLDO */
-
-/* Other LDOs:
+/*
+ * Other LDOs:
  *  AUTOLDO: Hard Disk
  *  DOWN1: CPU
  *  DOWN2: SDRAM
@@ -50,9 +50,9 @@
  * EXTON inputs:
  *  EXTON1: button/holdswitch related (TBC)
  *  EXTON2: USB Vbus (High when present)
- *  EXTON3: ACCESORY (Low when present)
+ *  EXTON3: ACCESSORY (Low when present)
  *
- * GPIO:
+ * PMU GPIO:
  *  GPIO1: input, Mikey (jack remote ctrl) interrupt (TBC)
  *  GPIO2: input, hold switch (TBC)
  *  GPIO3: output, unknown
@@ -82,6 +82,7 @@ unsigned char pmu_rd(int address);
 int pmu_wr(int address, unsigned char val);
 int pmu_rd_multiple(int address, int count, unsigned char* buffer);
 int pmu_wr_multiple(int address, int count, unsigned char* buffer);
+void pmu_preinit(void);
 #endif
 
 #endif /* __PMU_TARGET_H__ */

@@ -214,3 +214,22 @@ void ICODE_ATTR INT_EXT6(void)
     gpio_handler(0);
 }
 #endif
+
+#ifdef BOOTLOADER
+static uint32_t gpio_data[16] =
+{
+    0x5322222F, 0xEEEEEE00, 0x2332EEEE, 0x3333E222,
+    0x33333333, 0x33333333, 0x3F000E33, 0xEEEEEEEE,
+    0xEEEEEEEE, 0xEEEEEEEE, 0xE0EEEEEE, 0xEE00EE0E,
+    0xEEEE0EEE, 0xEEEEEEEE, 0xEE2222EE, 0xEEEE0EEE
+};
+
+void gpio_preinit(void)
+{
+    for (int i = 0; i < 16; i++) {
+        PCON(i) = gpio_data[i];
+        PUNB(i) = 0;
+        PUNC(i) = 0;
+    }
+}
+#endif

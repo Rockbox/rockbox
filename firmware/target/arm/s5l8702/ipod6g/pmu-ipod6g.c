@@ -165,4 +165,113 @@ int pmu_wr(int address, unsigned char val)
 {
     return pmu_wr_multiple(address, 1, &val);
 }
+
+void pmu_preinit(void)
+{
+    static const char init_data[] =
+    {
+        /* reset OOC shutdown register */
+        PCF5063X_REG_OOCSHDWN,  0x0,
+
+        /* LDO_UNK1: 3000 mV, enabled */
+        PCF5063X_REG_LDO1OUT,   0x15,
+        PCF5063X_REG_LDO1ENA,   0x1,
+
+        /* LDO_UNK2: 3000 mV, enabled */
+        PCF5063X_REG_LDO2OUT,   0x15,
+        PCF5063X_REG_LDO2ENA,   0x1,
+
+        /* LDO_LCD: 3000 mV, enabled */
+        PCF5063X_REG_LDO3OUT,   0x15,
+        PCF5063X_REG_LDO3ENA,   0x1,
+
+        /* LDO_CODEC: 1800 mV, enabled */
+        PCF5063X_REG_LDO4OUT,   0x9,
+        PCF5063X_REG_LDO4ENA,   0x1,
+
+        /* LDO_UNK5: 3000 mV, disabled */
+        PCF5063X_REG_LDO5OUT,   0x15,
+        PCF5063X_REG_LDO5ENA,   0x0,
+
+        /* LDO_CWHEEL: 3000 mV, ON when GPIO2 High */
+        PCF5063X_REG_LDO6OUT,   0x15,
+        PCF5063X_REG_LDO6ENA,   0x4,
+
+        /* LDO_ACCY: 3300 mV, disabled */
+        PCF5063X_REG_HCLDOOUT,  0x18,
+        PCF5063X_REG_HCLDOENA,  0x0,
+
+        /* LDO_CWHEEL is ON in STANDBY state,
+           LDO_CWHEEL and MEMLDO are ON in UNKNOWN state (TBC) */
+        PCF5063X_REG_STBYCTL1,  0x0,
+        PCF5063X_REG_STBYCTL2,  0x8c,
+
+        /* GPIO1,2 = input, GPIO3 = output */
+        PCF5063X_REG_GPIOCTL,   0x3,
+        PCF5063X_REG_GPIO1CFG,  0x0,
+        PCF5063X_REG_GPIO2CFG,  0x0,
+
+        /* DOWN2 converter (SDRAM): 1800 mV, enabled,
+           startup current limit = 15mA*0x10 (TBC) */
+        PCF5063X_REG_DOWN2OUT,  0x2f,
+        PCF5063X_REG_DOWN2ENA,  0x1,
+        PCF5063X_REG_DOWN2CTL,  0x0,
+        PCF5063X_REG_DOWN2MXC,  0x10,
+
+        /* MEMLDO: 1800 mV, enabled */
+        PCF5063X_REG_MEMLDOOUT, 0x9,
+        PCF5063X_REG_MEMLDOENA, 0x1,
+
+        /* AUTOLDO (HDD): 3400 mV, disabled,
+           limit = 1000 mA (40mA*0x19), limit always active */
+        PCF5063X_REG_AUTOOUT,   0x6f,
+        PCF5063X_REG_AUTOENA,   0x0,
+        PCF5063X_REG_AUTOCTL,   0x0,
+        PCF5063X_REG_AUTOMXC,   0x59,
+
+        /* Vsysok = 3100 mV */
+        PCF5063X_REG_SVMCTL,    0x8,
+
+        /* Reserved */
+        0x58,                   0x0,
+
+        /* Mask all PMU interrupts */
+        PCF5063X_REG_INT1M,     0xff,
+        PCF5063X_REG_INT2M,     0xff,
+        PCF5063X_REG_INT3M,     0xff,
+        PCF5063X_REG_INT4M,     0xff,
+        PCF5063X_REG_INT5M,     0xff,
+        PCF50635_REG_INT6M,     0xff,
+
+        /* Wakeup on rising edge for EXTON1 and EXTON2,
+           wakeup on falling edge for EXTON3 and !ONKEY,
+           wakeup on RTC alarm, wakeup on adapter insert,
+           Vbat status has no effect in state machine */
+        PCF5063X_REG_OOCWAKE,   0xdf,
+        PCF5063X_REG_OOCTIM1,   0xaa,
+        PCF5063X_REG_OOCTIM2,   0x4a,
+        PCF5063X_REG_OOCMODE,   0x5,
+        PCF5063X_REG_OOCCTL,    0x27,
+
+        /* GPO selection = LED external NFET drive signal */
+        PCF5063X_REG_GPOCFG,    0x1,
+        /* LED converter OFF, overvoltage protection enabled,
+           OCP limit is 500 mA, led_dimstep = 16*0x6/32768 */
+        PCF5063X_REG_LEDENA,    0x0,
+        PCF5063X_REG_LEDCTL,    0x5,
+        PCF5063X_REG_LEDDIM,    0x6,
+
+        /* end marker */
+        0
+    };
+
+    const char* ptr;
+    for (ptr = init_data; *ptr != 0; ptr += 2)
+        pmu_wr(ptr[0], ptr[1]);
+
+    /* clear PMU interrupts */
+    unsigned char rd_buf[5];
+    pmu_rd_multiple(PCF5063X_REG_INT1, 5, rd_buf);
+    pmu_rd(PCF50635_REG_INT6);
+}
 #endif /* BOOTLOADER */

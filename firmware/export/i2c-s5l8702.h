@@ -29,6 +29,7 @@ int i2c_write(int bus, unsigned char slave, int address, int len, const unsigned
 int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *data);
 
 #ifdef BOOTLOADER
+void i2c_preinit(int bus);
 int i2c_wr(int bus, unsigned char slave, int address, int len, const unsigned char *data);
 int i2c_rd(int bus, unsigned char slave, int address, int len, unsigned char *data);
 #endif

@@ -277,3 +277,124 @@ void memory_init(void)
     set_page_tables();
     enable_mmu();
 }
+
+#ifdef BOOTLOADER
+#include "i2c-s5l8702.h"
+
+static void syscon_preinit(void)
+{
+    /* after ROM boot, CG16_SYS is using PLL0 @108 MHz
+       CClk = 108 MHz, HClk = 54 MHz, PClk = 27 MHz */
+
+    CLKCON0 &= ~CLKCON0_SDR_DISABLE_BIT;
+
+    PLLMODE &= ~PLLMODE_OSCSEL_BIT; /* CG16_SEL_OSC = OSC0 */
+    cg16_config(&CG16_SYS, true, CG16_SEL_OSC, 1, 1);
+    soc_set_system_divs(1, 1, 1);
+
+    /* stop all PLLs */
+    for (int pll = 0; pll < 3; pll++)
+        pll_onoff(pll, false);
+
+    pll_config(2, PLLOP_DM, 1, 36, 1, 32400);
+    pll_onoff(2, true);
+    soc_set_system_divs(1, 2, 2 /*hprat*/);
+    cg16_config(&CG16_SYS,   true,  CG16_SEL_PLL2, 1, 1);
+    cg16_config(&CG16_2L,    false, CG16_SEL_OSC,  1, 1);
+    cg16_config(&CG16_SVID,  false, CG16_SEL_OSC,  1, 1);
+    cg16_config(&CG16_AUD0,  false, CG16_SEL_OSC,  1, 1);
+    cg16_config(&CG16_AUD1,  false, CG16_SEL_OSC,  1, 1);
+    cg16_config(&CG16_AUD2,  false, CG16_SEL_OSC,  1, 1);
+    cg16_config(&CG16_RTIME, true,  CG16_SEL_OSC,  1, 1);
+    cg16_config(&CG16_5L,    false, CG16_SEL_OSC,  1, 1);
+
+    soc_set_hsdiv(1);
+
+    PWRCON_AHB = ~((1 << CLOCKGATE_SMx) |
+                   (1 << CLOCKGATE_SM1));
+    PWRCON_APB = ~((1 << (CLOCKGATE_TIMER - 32)) |
+                   (1 << (CLOCKGATE_GPIO - 32)));
+}
+
+static void miu_preinit(bool selfrefreshing)
+{
+    if (selfrefreshing)
+        MIUCON = 0x11;      /* TBC: self-refresh -> IDLE */
+
+    MIUCON = 0x80D;         /* remap = 1 (IRAM mapped to 0x0),
+                               TBC: SDRAM bank and column configuration */
+    MIU_REG(0xF0) = 0x0;
+
+    MIUAREF = 0x6105D;      /* Auto-Refresh enabled,
+                               Row refresh interval = 0x5d/12MHz = 7.75 uS */
+    MIUSDPARA = 0x1FB621;
+
+    MIU_REG(0x200) = 0x1845;
+    MIU_REG(0x204) = 0x1845;
+    MIU_REG(0x210) = 0x1800;
+    MIU_REG(0x214) = 0x1800;
+    MIU_REG(0x220) = 0x1845;
+    MIU_REG(0x224) = 0x1845;
+    MIU_REG(0x230) = 0x1885;
+    MIU_REG(0x234) = 0x1885;
+    MIU_REG(0x14) = 0x19;       /* 2^19 = 0x2000000 = SDRAMSIZE (32Mb) */
+    MIU_REG(0x18) = 0x19;       /* 2^19 = 0x2000000 = SDRAMSIZE (32Mb) */
+    MIU_REG(0x1C) = 0x790682B;
+    MIU_REG(0x314) &= ~0x10;
+
+    for (int i = 0; i < 0x24; i++)
+        MIU_REG(0x2C + i*4) &= ~(1 << 24);
+
+    MIU_REG(0x1CC) = 0x540;
+    MIU_REG(0x1D4) |= 0x80;
+
+    MIUCOM = 0x33;     /* No action CMD */
+    MIUCOM = 0x33;
+    MIUCOM = 0x233;    /* Precharge all banks CMD */
+    MIUCOM = 0x33;
+    MIUCOM = 0x33;
+    MIUCOM = 0x33;
+    MIUCOM = 0x333;    /* Auto-refresh CMD */
+    MIUCOM = 0x33;
+    MIUCOM = 0x33;
+    MIUCOM = 0x33;
+    MIUCOM = 0x333;    /* Auto-refresh CMD */
+    MIUCOM = 0x33;
+    MIUCOM = 0x33;
+    MIUCOM = 0x33;
+
+    if (!selfrefreshing)
+    {
+        MIUMRS = 0x33;    /* MRS: Bust Length = 8, CAS = 3 */
+        MIUCOM = 0x133;   /* Mode Register Set CMD */
+        MIUCOM = 0x33;
+        MIUCOM = 0x33;
+        MIUCOM = 0x33;
+        MIUMRS = 0x8040;  /* EMRS: Strength = 1/4, Self refresh area = Full */
+        MIUCOM = 0x133;   /* Mode Register Set CMD */
+        MIUCOM = 0x33;
+        MIUCOM = 0x33;
+        MIUCOM = 0x33;
+    }
+
+    MIUAREF |= 0x61000;   /* Auto-refresh enabled */
+}
+
+/* Preliminary HW initialization */
+void system_preinit(void)
+{
+    bool gpio3out, coldboot;
+
+    syscon_preinit();
+    gpio_preinit();
+    i2c_preinit(0);
+
+    /* get (previously) configured output selection for GPIO3 */
+    gpio3out = (pmu_rd(PCF5063X_REG_GPIO3CFG) & 7);
+    /* coldboot: when set, device has been in NoPower state */
+    coldboot = (pmu_rd(PCF5063X_REG_OOCSHDWN) & PCF5063X_OOCSHDWN_COLDBOOT);
+    pmu_preinit();
+
+    miu_preinit(!coldboot && !gpio3out);
+}
+#endif

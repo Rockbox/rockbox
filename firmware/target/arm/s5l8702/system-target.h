@@ -47,4 +47,8 @@ static inline void udelay(unsigned usecs)
     while (TIME_BEFORE(USEC_TIMER, stop));
 }
 
+#ifdef BOOTLOADER
+void system_preinit(void);
+#endif
+
 #endif /* SYSTEM_TARGET_H */
