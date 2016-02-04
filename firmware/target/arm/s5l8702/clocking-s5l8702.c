@@ -213,6 +213,125 @@ void set_clocking_level(int level)
     udelay(50); /* TBC: probably not needed */
 }
 
+#ifdef BOOTLOADER
+int pll_config(int pll, int op_mode, int p, int m, int s, int lock_time)
+{
+    PLLPMS(pll) = ((p & PLLPMS_PDIV_MSK) << PLLPMS_PDIV_POS)
+                | ((m & PLLPMS_MDIV_MSK) << PLLPMS_MDIV_POS)
+                | ((s & PLLPMS_SDIV_MSK) << PLLPMS_SDIV_POS);
+
+    /* lock_time are PClk ticks */
+    PLLCNT(pll) = lock_time & PLLCNT_MSK;
+
+    if (pll < 2)
+    {
+        if (op_mode == PLLOP_MM) {
+            PLLMODE &= ~PLLMODE_PMSMOD_BIT(pll);  /* MM */
+            return 0;
+        }
+
+        PLLMODE |= PLLMODE_PMSMOD_BIT(pll);
+
+        if (op_mode == PLLOP_DM) {
+            PLLMOD2 &= ~PLLMOD2_DMOSC_BIT(pll);   /* DM */
+            return 0;
+        }
+
+        PLLMOD2 |= PLLMOD2_DMOSC_BIT(pll);
+    }
+    else
+    {
+        if (op_mode == PLLOP_MM)
+            return -1;  /* PLL2 does not support MM */
+
+        if (op_mode == PLLOP_DM) {
+            PLLMODE &= ~PLLMODE_PLL2DMOSC_BIT;    /* DM */
+            return 0;
+        }
+
+        PLLMODE |= PLLMODE_PLL2DMOSC_BIT;
+    }
+
+    /* ALTOSCx */
+    PLLMOD2 = (PLLMOD2 & ~PLLMOD2_ALTOSC_BIT(pll)) |
+                ((op_mode == PLLOP_ALT0) ? 0 : PLLMOD2_ALTOSC_BIT(pll));
+
+    return 0;
+}
+
+int pll_onoff(int pll, bool onoff)
+{
+    if (onoff)
+    {
+        PLLMODE |= PLLMODE_EN_BIT(pll); /* start PLL */
+        while (!(PLLLOCK & PLLLOCK_LCK_BIT(pll))); /* locking... */
+        PLLMODE |= PLLMODE_PLLOUT_BIT(pll); /* slow mode OFF */
+
+        /* returns DMLCK status, only meaningful for Divisor Mode (DM) */
+        return (PLLLOCK & PLLLOCK_DMLCK_BIT(pll)) ? 1 : 0;
+    }
+    else
+    {
+        PLLMODE &= ~PLLMODE_PLLOUT_BIT(pll); /* slow mode ON */
+        udelay(50); /* TBC: needed when current F_in is 0 Hz */
+        PLLMODE &= ~PLLMODE_EN_BIT(pll); /* stop PLL */
+
+        return 0;
+    }
+}
+
+/* configure and enable/disable 16-bit clockgate */
+void cg16_config(volatile uint16_t* cg16,
+                    bool onoff, int clksel, int div1, int div2)
+{
+    uint16_t val16 = ((clksel & CG16_SEL_MSK) << CG16_SEL_POS)
+                   | (((div1 - 1) & CG16_DIV1_MSK) << CG16_DIV1_POS)
+                   | (((div2 - 1) & CG16_DIV2_MSK) << CG16_DIV2_POS)
+                   | (onoff ? 0 : CG16_DISABLE_BIT);
+
+    volatile uint32_t* reg32 = (uint32_t *)((int)cg16 & ~3);
+    int shift = ((int)cg16 & 2) << 3;
+
+    *reg32 = (*reg32 & (0xffff0000 >> shift)) | (val16 << shift);
+
+    /*udelay(100);*/  /* probably not needed */
+
+    while (*cg16 != val16);
+}
+
+void clockgate_enable(int gate, bool enable)
+{
+    int i = (gate >> 5) & 1;
+    uint32_t bit = 1 << (gate & 0x1f);
+    if (enable) PWRCON(i) &= ~bit;
+    else PWRCON(i) |= bit;
+}
+
+/* Configures EClk for USEC_TIMER. DRAM refresh also depends on EClk,
+ * this clock should be initialized by the bootloader, so USEC_TIMER
+ * is ready to use for RB.
+ */
+void usec_timer_init(void)
+{
+    /* select OSC0 for CG16 SEL_OSC */
+    PLLMODE &= ~PLLMODE_OSCSEL_BIT;
+
+    /* configure and enable ECLK */
+    cg16_config(&CG16_RTIME, true, CG16_SEL_OSC, 1, 1);
+
+    /* unmask timer controller clock gate */
+    clockgate_enable(CLOCKGATE_TIMER, true);
+
+    /* configure and start timer E */
+    TECON = (4 << 8) |      /* TE_CS = ECLK / 1 */
+            (1 << 6) |      /* select ECLK (12 MHz on Classic) */
+            (0 << 4);       /* TE_MODE_SEL = interval mode */
+    TEPRE = (S5L8702_OSC0_HZ / 1000000) - 1;  /* prescaler */
+    TEDATA0 = ~0;
+    TECMD = (1 << 1) |      /* TE_CLR = initialize timer */
+            (1 << 0);       /* TE_EN = enable */
+}
+
 #if 0
 /* - This function is mainly to documment how s5l8702 ROMBOOT and iPod
  *   Classic diagnostic OF detects primary external clock.
@@ -228,3 +347,5 @@ unsigned soc_get_osc0(void)
     return (PDAT3 & 0x20) ? 24000000 : 12000000;
 }
 #endif
+
+#endif  /* BOOTLOADER */
