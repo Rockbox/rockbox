@@ -5,8 +5,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>315</width>
-    <height>302</height>
+    <!-- Larger progress window - quick workaround to avoid user confusion
+         during iPod Classic 6G bootloader installation. Due to progress
+         scroll, many users (including me) are confused and do not realize
+         an important action message.
+    -->
+    <width>360</width>
+    <height>560</height>
    </rect>
   </property>
   <property name="windowTitle" >
