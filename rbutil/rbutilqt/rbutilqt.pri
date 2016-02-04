@@ -66,6 +66,7 @@ SOURCES += \
  base/bootloaderinstalltcc.cpp \
  base/bootloaderinstallmpio.cpp \
  base/bootloaderinstallimx.cpp \
+ base/bootloaderinstalls5l.cpp \
  base/rockboxinfo.cpp \
  ../../tools/mkboot.c \
  ../../tools/iriver.c \
@@ -142,6 +143,7 @@ HEADERS += \
  base/bootloaderinstalltcc.h \
  base/bootloaderinstallmpio.h \
  base/bootloaderinstallimx.h \
+ base/bootloaderinstalls5l.h \
  base/rockboxinfo.h \
  ../../tools/mkboot.h \
  ../../tools/iriver.h \

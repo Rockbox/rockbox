@@ -25,3 +25,4 @@ Version 1.4.1
 * Extend hint when uninstallation requires reinstalling the Original Firmware.
 * Improve update check information dialog.
 * Correct USB IDs for Sandisk Sansa c200v2.
+* Add support for iPod Classic 6G bootloader.
