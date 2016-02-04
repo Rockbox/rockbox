@@ -1,0 +1,209 @@
+mks5lboot
+---------
+
+A tool to install/uninstall a dual bootloader into a s5l8702 based
+device:
+
+  - iPod Classic 6G
+  - iPod Nano 3G (TODO)
+
+
+Usage
+-----
+
+  mks5lboot --bl-inst <bootloader.ipod> [-p <pid>] [--single]
+            --bl-uninst <platform> [-p <pid>]
+            --dfuscan [--loop [<sec>]] [-p <pid>]
+            --dfusend <infile.dfu> [-p <pid>]
+            --dfureset [--loop [<sec>]] [-p <pid>]
+            --mkdfu-inst <bootloader.ipod> <outfile.dfu> [--single]
+            --mkdfu-uninst <platform> <outfile.dfu>
+            --mkdfu-raw <filename.bin> <outfile.dfu>
+
+Commands:
+  --bl-inst    Install file <bootloader.ipod> into an iPod device
+               (same as --mkdfu-inst and --dfusend).
+  --bl-uninst  Remove a bootloader from an iPod device (same as
+               --mkdfu-uninst and --dfusend).
+
+  --dfuscan    scan for DFU USB devices and outputs the status.
+  --dfusend    send DFU image <infile.dfu> to the device.
+  --dfureset   reset DFU USB device bus.
+
+  --mkdfu-inst    Build a DFU image containing an installer for
+                  <bootloader.ipod>, save it as <outfile.dfu>.
+  --mkdfu-uninst  Build a DFU image containing an uninstaler for
+                  <platform> devices, save it as <outfile.dfu>.
+  --mkdfu-raw     Build a DFU image containing raw executable
+                  code, save it as <outfile.dfu>. <infile.bin>
+                  is the code you want to run, it is loaded at
+                  address 0x2200030c and executed.
+
+  <bootloader.ipod> is the rockbox bootloader that you want to
+  install (previously scrambled with tools/scramble utility).
+
+  <platform> is the name of the platform (type of device) for
+  which the DFU uninstaller will be built. Currently supported
+  platform names are:
+    ipod6g:  iPod Classic 6G
+
+Options:
+  -p, --pid <pid>   Use a specific <pid> (Product Id) USB device,
+                    if this option is ommited then it uses the
+                    first USB DFU device found.
+  -l, --loop <sec>  Run the command every <sec> seconds, default
+                    period (<sec> ommited) is 1 seconds.
+  -S, --single      Be careful using this option. The bootloader
+                    is installed for single boot, the original
+                    Apple NOR boot is destroyed (if it exists),
+                    and only Rockbox can be used.
+
+
+Dual bootloader installation
+----------------------------
+
+Prerequisites:
+
+  - An iPod Classic 6th with Apple firmware installed and running, current
+    supported FW versions for existing models:
+
+    Classic 6th 80/160 Late 2007 (1G):  1.1.2
+    Classic 6th 120 Late 2008 (2G):     2.0.1
+    Classic 6th 160 Late 2009 (3G):     2.0.4
+    Classic 6th 160 Late 2012 (4G):     2.0.5
+
+  - If your iPod is formated using Apple partitions you must convert this
+    ipod to FAT32 format (aka a "winpod"), see http://www.rockbox.org/
+    wiki/IpodConversionToFAT32
+
+  - It is recommended to install the RB firmware before installing the dual
+    bootloader for the first time. Install Rockbox using RockboxUtility or
+    download the latest daily build and uncompress it into the root folder
+    of the iPod.
+
+  Windows only:
+
+  - If iTunes is installed:
+    . Configure iTunes: Summary -> Options -> check "Enable disk use".
+
+  - If iTunes is not installed:
+    . You need a DFU USB driver for your device. To check if there is a
+      valid USB driver installed, put your device on DFU mode and choose
+      one of either:
+        a) Use Windows Device Manager to verify if you USB DFU device is
+           present.
+        b) Use mks5lboot tool running "mks5lboot --dfuscan", common output:
+           . When the DFU device is found and a valid driver is installed:
+             [INFO] DFU device state: 2
+           . When the device is found but there is no driver installed:
+             [ERR] Could not open USB device: LIBUSB_ERROR_NOT_SUPPORTED
+           . Then the device is found but driver is not valid (probably a
+             libusb-win32 driver is installed):
+             [ERR] Could not set USB configuration: LIBUSB_ERROR_NOT_FOUND
+    . If there is no valid DFU driver installed, try one of these:
+        a) Use Zadig (http://zadig.akeo.ie/) to build and install a WinUSB
+           (libusb.info) or libusbK driver for your device. Note that
+           libusb-win32 (libusb0) drivers are not valid for mks5lboot.
+        b) Use Apple Mobile Device USB driver (included with iTunes).
+
+Command line install:
+
+  - If you are using iTunes on Windows, close iTunes and kill (or pause)
+    iTunesHelper.exe before entering DFU mode.
+
+  - Put you device on DFU mode by pressing and holding SELECT+MENU buttons
+    for about 12 seconds.
+
+    You can notice when the device enters DFU mode running the next command
+    to scan the USB bus every second (press Ctrl-C to abort the scan):
+      mks5lboot --dfuscan --loop
+
+  - To install or update a bootloader, build the DFU installer and send it
+    to the device:
+      mks5lboot --bl-inst /path/to/bootloader-ipod6g.ipod
+
+    When the DFU imagen is loaded and executed, the device emits an 'alive'
+    tone (2000Hz/100ms). When the bootloader is successfully installed then
+    a dual tone beep sounds (1000Hz/100ms+2000Hz/150ms) and the device
+    reboots. If something went bad then 330Hz/500ms tone is emited and the
+    device reboots. When three 330Hz tones sounds, it means that the NOR
+    got corrupted and the device must be restored using iTunes (should not
+    happen).
+
+  - To remove a previously installed bootloader, build the DFU uninstaler
+    and send it to the device:
+      mks5lboot --bl-uninst ipod6g
+
+  If USB access is denied, try to run the mks5lboot tool using a privileged
+  user (i.e. Administrator or root).
+
+
+Dual-Boot
+---------
+
+The purpose of this program is to provide dual-boot between the original
+firmware and the new (rockbox) firmware.
+
+The button press check is done ~800 ms. after power-up or reboot, then:
+
+  SELECT + MENU: resets the device after ~5 seconds, then if SELECT+MENU
+                 remains pressed the device enters DFU mode after an
+                 additional period of ~8 seconds.
+  SELECT + LEFT: enter OF diagnostics (after ~7 seconds).
+  SELECT + PLAY: enter OF diskmode (after ~7 seconds).
+  SELECT + RIGHT: enter bootloader USB mode.
+  MENU: enter OF
+  Hold Switch locked: enter OF (see below for details).
+  Any other combination: launch Rockbox.
+
+Switch current firmware:
+
+  Tries to behave like ipod Video, see http://download.rockbox.org/manual/
+  rockbox-ipodvideo/rockbox-buildch3.html#x5-290003.1.3
+
+  Apple is the current FW:
+  - Stop playback and wait a few seconds for hard disk spin-down.
+  - Press and hold SELECT+MENU, after ~5 seconds the player hard resets,
+    release the buttons when the screen goes black.
+
+  Rockbox is the current FW:
+  - Shut down the device using "Long Play" key press.
+  - Once the device is powered off, there are three ways to enter OF:
+    1) Press and hold MENU button for at least ~800 ms.
+    2) Turn on the Hold switch immediately after turning the player on,
+       it must be done before "Loading Rockbox..." message appears (~3
+       seconds from power-on). Be careful, if the hold switch is locked
+       when Rockbox starts then your RB settings will be cleared!
+    3) You can also load the original firmware by shutting down the
+       device, then clicking the Hold switch on and connecting the iPod
+       to your computer.
+
+
+Single-Boot
+-----------
+
+Use --single option if the Apple firmware is not installed on your iPod
+and/or you want to force the installation of the bootloader to use Rockbox
+as unique firmware. The single-boot installer writes the bootloader on the
+NOR with no previous check, the original Apple NOR boot is destroyed if it
+exists.
+
+To build the DFU single-boot installer and send it to the device:
+  mks5lboot --bl-inst --single /path/to/bootloader-ipod6g.ipod
+
+
+Compilation
+-----------
+
+Needs libusb > 1.0 installed, tested on:
+
+Linux: gcc-4.9.2 + libusb-1.0.19
+Windows XP: mingw32-gcc-4.8.1 + libusbx-1.0.15
+OS X 10.11: clang-7.3.0 + libusb-1.0.20
+
+
+Hacking
+-------
+
+See comments in mkdfu.c, ipoddfu.c, dualboot.c and bootloader/ipod6g.c for
+more information.
