@@ -1,0 +1,3 @@
+build/
+*.arm-bin
+bin2c
