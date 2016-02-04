@@ -764,6 +764,128 @@ QMap<QString, QList<int> > Utils::findRunningProcess(QStringList names)
 }
 
 
+/** Suspends/resumes processes
+ *  @param pidlist a list of PIDs to suspend/resume
+ *  @param suspend processes are suspended if true, or resumed when false
+ *  @return a list of PIDs successfully suspended/resumed
+ */
+QList<int> Utils::suspendProcess(QList<int> pidlist, bool suspend)
+{
+    QList<int> result;
+#if defined(Q_OS_WIN32)
+    // Enable debug privilege
+    HANDLE hToken = NULL;
+    LUID seDebugValue;
+    TOKEN_PRIVILEGES tNext, tPrev;
+    DWORD sPrev;
+    if(LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &seDebugValue)) {
+        if(OpenProcessToken(GetCurrentProcess(),
+                    TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
+            memset(&tNext, 0, sizeof(tNext));
+            tNext.PrivilegeCount = 1;
+            tNext.Privileges[0].Luid = seDebugValue;
+            tNext.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+            if(!AdjustTokenPrivileges(hToken, FALSE, &tNext, sizeof(tNext),
+                                        &tPrev, &sPrev) || GetLastError() != 0) {
+                CloseHandle(hToken);
+                hToken = NULL;
+                LOG_ERROR() << "AdjustTokenPrivileges(next) error" << GetLastError();
+            }
+        }
+        else {
+            LOG_ERROR() << "OpenProcessToken error" << GetLastError();
+        }
+    }
+    else {
+        LOG_ERROR() << "LookupPrivilegeValue error" << GetLastError();
+    }
+
+    // Suspend/resume threads
+    for(int i = 0; i < pidlist.size(); i++) {
+        HANDLE hdl = INVALID_HANDLE_VALUE;
+        THREADENTRY32 entry;
+        int n_fails = 0;
+
+        hdl = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+        if(hdl == INVALID_HANDLE_VALUE) {
+            LOG_ERROR() << "CreateToolhelp32Snapshot error" << GetLastError();
+            continue;
+        }
+        entry.dwSize = sizeof(THREADENTRY32);
+        if(!Thread32First(hdl, &entry)) {
+            LOG_ERROR() << "Process32First error" << GetLastError();
+            CloseHandle(hdl);
+            continue;
+        }
+
+        do {
+            if(entry.th32OwnerProcessID != (DWORD)(pidlist[i]))
+                continue;
+            HANDLE thr = OpenThread(THREAD_SUSPEND_RESUME,
+                                        FALSE, entry.th32ThreadID);
+            if(!thr) {
+                LOG_ERROR() << "OpenThread" << entry.th32ThreadID
+                            << "error" << GetLastError();
+                n_fails++;
+                continue;
+            }
+            if(suspend) {
+                // Execution of the specified thread is suspended and
+                // the thread's suspend count is incremented.
+                if(SuspendThread(thr) == (DWORD)(-1)) {
+                    LOG_ERROR() << "SuspendThread" << entry.th32ThreadID
+                                << "error" << GetLastError();
+                    n_fails++;
+                }
+            }
+            else {
+                // Decrements a thread's suspend count. When the
+                // suspend count is decremented to zero, the
+                // execution of the thread is resumed.
+                if(ResumeThread(thr) == (DWORD)(-1)) {
+                    LOG_ERROR() << "ResumeThread" << entry.th32ThreadID
+                                << "error" << GetLastError();
+                    n_fails++;
+                }
+            }
+            CloseHandle(thr);
+        } while(Thread32Next(hdl, &entry));
+        if (!n_fails)
+            result.append(pidlist[i]);
+        CloseHandle(hdl);
+    }
+
+    // Restore previous debug privilege
+    if (hToken) {
+        if(!AdjustTokenPrivileges(hToken, FALSE,
+                    &tPrev, sPrev, NULL, NULL) || GetLastError() != 0) {
+            LOG_ERROR() << "AdjustTokenPrivileges(prev) error" << GetLastError();
+        }
+        CloseHandle(hToken);
+    }
+#endif
+#if defined(Q_OS_MACX)
+    int signal = suspend ? SIGSTOP : SIGCONT;
+    for(int i = 0; i < pidlist.size(); i++) {
+        pid_t pid = pidlist[i];
+        if(kill(pid, signal) != 0) {
+            LOG_ERROR() << "kill signal" << signal
+                        << "for PID" << pid << "error:" << errno;
+        }
+        else {
+            result.append(pidlist[i]);
+        }
+    }
+#endif
+#if defined(Q_OS_LINUX)
+    // not implemented for Linux!
+#endif
+    LOG_INFO() << (suspend ? "Suspending" : "Resuming")
+               << "PIDs" << pidlist << "result" << result;
+    return result;
+}
+
+
 /** Eject device from PC.
  *  Request the OS to eject the player.
  *  @param device mountpoint of the device
