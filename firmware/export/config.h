@@ -872,8 +872,12 @@ Lyre prototype 1 */
 #ifdef HAVE_BOOTLOADER_USB_MODE
 /* Priority in bootloader is wanted */
 #define HAVE_PRIORITY_SCHEDULING
+#if (CONFIG_CPU == S5L8702)
+#define USB_DRIVER_CLOSE
+#else
 #define USB_STATUS_BY_EVENT
 #define USB_DETECT_BY_REQUEST
+#endif
 #if defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_ARC
 #define INCLUDE_TIMEOUT_API
 #define USB_DRIVER_CLOSE
