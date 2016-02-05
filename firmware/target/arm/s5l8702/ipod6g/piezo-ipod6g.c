@@ -95,3 +95,31 @@ void piezo_button_beep(bool beep, bool force)
             piezo_start(40, 4);
     }
 }
+
+#ifdef BOOTLOADER
+void piezo_tone(uint32_t period /*uS*/, int32_t duration /*ms*/)
+{
+    int32_t stop = USEC_TIMER + duration*1000;
+    uint32_t level = 0;
+
+    while ((int32_t)USEC_TIMER - stop < 0)
+    {
+        level ^= 1;
+        GPIOCMD = 0x0060e | level;
+        udelay(period >> 1);
+    }
+
+    GPIOCMD = 0x0060e;
+}
+
+void piezo_seq(uint16_t *seq)
+{
+    uint16_t period;
+
+    while ((period = *seq++) != 0)
+    {
+        piezo_tone(period, *seq++);
+        udelay(*seq++ * 1000);
+    }
+}
+#endif
