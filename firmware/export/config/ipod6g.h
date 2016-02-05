@@ -196,6 +196,10 @@
 
 #define ATA_HAVE_BBT
 #define ATA_BBT_PAGES 4096
+#ifndef BOOTLOADER
+/* TODO: probably this check is no longer needed and might be removed */
+#define CHECK_ATA_SWAP
+#endif
 
 #define SECTOR_SIZE 4096
 
