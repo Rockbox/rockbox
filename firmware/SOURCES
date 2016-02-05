@@ -1608,6 +1608,7 @@ target/arm/s5l8702/dma-s5l8702.c
 target/arm/s5l8702/clocking-s5l8702.c
 target/arm/s5l8702/ipod6g/lcd-ipod6g.c
 target/arm/s5l8702/ipod6g/lcd-asm-ipod6g.S
+target/arm/s5l8702/ipod6g/piezo-ipod6g.c
 #if 0 //TODO
 target/arm/s5l8702/postmortemstub.S
 #endif
@@ -1625,7 +1626,6 @@ target/arm/s5l8702/debug-s5l8702.c
 target/arm/s5l8702/pcm-s5l8702.c
 target/arm/s5l8702/ipod6g/audio-ipod6g.c
 target/arm/s5l8702/ipod6g/adc-ipod6g.c
-target/arm/s5l8702/ipod6g/piezo-ipod6g.c
 #endif
 #endif
 
