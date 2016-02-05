@@ -46,17 +46,20 @@ newstart2:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
 
 #ifdef BOOTLOADER
-    /* Relocate ourself to IRAM - we have been loaded to DRAM */
-    mov     r0, #0x08000000   /* source (DRAM) */
-    mov     r1, #0x22000000   /* dest (IRAM) */
-    ldr     r2, =_dataend
+    /* Relocate ourself to IRAM1 - we have been loaded to IRAM0 */
+    ldr     r0, =_dfuloadaddr
+    ldr     r1, =_movestart
+    ldr     r2, =_moveend
 1:
-    cmp     r2, r1
-    ldrhi   r3, [r0], #4
-    strhi   r3, [r1], #4
-    bhi     1b
+    ldmia   r0!, {r3-r10}
+    stmia   r1!, {r3-r10}
+    cmp     r1, r2
+    blt     1b
 
     ldr     pc, =start_loc    /* jump to the relocated start_loc: */
+
+    .section .init.text,"ax",%progbits
+    .global  start_loc
 start_loc:
 #endif
 
@@ -66,11 +69,11 @@ start_loc:
     mcr     p15, 0, r0, c1, c0, 0   /* disable caches and protection unit */
 
 .cleancache:
-    mrc     p15, 0, r15,c7,c10,3
+    mrc     p15, 0, r15, c7, c10, 3 /* test and clean dcache */
     bne     .cleancache
     mov     r0, #0
-    mcr     p15, 0, r0,c7,c10,4
-    mcr     p15, 0, r0,c7,c5,0
+    mcr     p15, 0, r0, c7, c10, 4  /* drain write buffer */
+    mcr     p15, 0, r0, c7, c5, 0   /* invalidate icache */
 
     /* reset VIC controller */
     ldr     r1, =0x38e00000
@@ -86,7 +89,15 @@ start_loc:
     str     r0, [r1,#0x14]
     str     r0, [r2,#0x14]
 
-#if !defined(BOOTLOADER)
+#if defined(BOOTLOADER)
+    /* SPI speed is limited when icache is not active. Not worth
+     * activating dcache, it is almost useless on pre-init stage
+     * and the TLB needs 16Kb in detriment of the bootloader.
+     */
+    mrc     p15, 0, r0, c1, c0, 0
+    orr     r0, r0, #1<<12           /* enable icache */
+    mcr     p15, 0, r0, c1, c0, 0
+#else
     bl      memory_init
 
     /* Copy interrupt vectors to iram */
@@ -98,7 +109,6 @@ start_loc:
     ldrhi   r1, [r4], #4
     strhi   r1, [r2], #4
     bhi     1b
-#endif
 
     /* Initialise bss section to zero */
     ldr     r2, =_edata
@@ -109,7 +119,6 @@ start_loc:
     strhi   r4, [r2], #4
     bhi     1b
 
-#ifndef BOOTLOADER
     /* Copy icode and data to ram */
     ldr     r2, =_iramstart
     ldr     r3, =_iramend
@@ -159,3 +168,33 @@ start_loc:
     bhi     1b
 
     b       main
+
+#ifdef BOOTLOADER
+    /* Initialise bss section to zero */
+    .global bss_init
+    .type   bss_init, %function
+
+bss_init:
+    stmfd   sp!, {r4-r9,lr}
+
+    ldr     r0, =_edata
+    ldr     r1, =_end
+    mov     r2, #0
+    mov     r3, #0
+    mov     r4, #0
+    mov     r5, #0
+    mov     r6, #0
+    mov     r7, #0
+    mov     r8, #0
+    mov     r9, #0
+    b       2f
+    .align  5   /* cache line size */
+1:
+    stmia   r0!, {r2-r9}
+2:
+    cmp     r0, r1
+    blt     1b
+
+    ldmpc   regs=r4-r9
+    .ltorg
+#endif
