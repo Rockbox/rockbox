@@ -33,7 +33,9 @@
 #include "led.h"
 #include "ata_idle_notify.h"
 #include "disk_cache.h"
+#ifdef CHECK_ATA_SWAP
 #include "splash.h"
+#endif
 
 
 #ifndef ATA_RETRIES
@@ -51,7 +53,9 @@
 static uint8_t ceata_taskfile[16] STORAGE_ALIGN_ATTR;
 static uint16_t ata_identify_data[0x100] STORAGE_ALIGN_ATTR;
 static bool ceata;
+#ifdef CHECK_ATA_SWAP
 static bool ata_swap;
+#endif
 static bool ata_lba48;
 static bool ata_dma;
 static uint64_t ata_total_sectors;
@@ -532,14 +536,18 @@ static int ata_identify(uint16_t* buf)
     }
     else
     {
+#ifdef CHECK_ATA_SWAP
         uint32_t old = ATA_CFG;
         ATA_CFG |= BIT(6);
+#endif
         PASS_RC(ata_wait_for_not_bsy(10000000), 1, 0);
         ata_write_cbr(&ATA_PIO_DVR, 0);
         ata_write_cbr(&ATA_PIO_CSD, 0xec);
         PASS_RC(ata_wait_for_start_of_transfer(10000000), 1, 1);
         for (i = 0; i < 0x100; i++) buf[i] = ata_read_cbr(&ATA_PIO_DTR);
+#ifdef CHECK_ATA_SWAP
         ATA_CFG = old;
+#endif
     }
     return 0;
 }
@@ -628,7 +636,11 @@ static int ata_power_up(void)
         sleep(HZ / 5);
         ATA_PIO_TIME = 0x191f7;
         ATA_PIO_LHR = 0;
+#ifdef CHECK_ATA_SWAP
         if (!ata_swap) ATA_CFG = BIT(6);
+#else
+        ATA_CFG = BIT(6);
+#endif
         while (!(ATA_PIO_READY & BIT(1))) yield();
         PASS_RC(ata_identify(ata_identify_data), 3, 3);
         uint32_t piotime = 0x11f3;
@@ -1184,13 +1196,16 @@ int ata_init(void)
     semaphore_init(&mmc_wakeup, 1, 0);
     semaphore_init(&mmc_comp_wakeup, 1, 0);
     ceata = PDAT(11) & BIT(1);
+#ifdef CHECK_ATA_SWAP
     ata_swap = false;
+#endif
     ata_powered = false;
     ata_total_sectors = 0;
 #ifdef ATA_HAVE_BBT
     PASS_RC(ata_bbt_reload(), 0, 0);
 #endif
     
+#ifdef CHECK_ATA_SWAP
     /* HDD data endianness check:
          During the transition period Rockbox needs to detect the HDD data
          endianness automatically and support both. We're now using the correct
@@ -1210,7 +1225,16 @@ int ata_init(void)
             splashf(5000, "Wrong HDD endianness, please update your emCORE version!");
         }
     }
-    
+#else
+#ifndef ATA_HAVE_BBT
+    /* get ata_identify_data */
+    mutex_lock(&ata_mutex);
+    int rc = ata_power_up();
+    mutex_unlock(&ata_mutex);
+    if (IS_ERR(rc)) return rc;
+#endif
+#endif
+
     create_thread(ata_thread, ata_stack,
                     sizeof(ata_stack), 0, "ATA idle monitor"
                     IF_PRIO(, PRIORITY_USER_INTERFACE)
@@ -1243,8 +1267,10 @@ static int ata_smart(uint16_t* buf)
     else
     {
         int i;
+#ifdef CHECK_ATA_SWAP
         uint32_t old = ATA_CFG;
         ATA_CFG |= BIT(6);  /* 16bit big-endian */
+#endif
         PASS_RC(ata_wait_for_not_bsy(10000000), 3, 6);
         ata_write_cbr(&ATA_PIO_FED, 0xd0);
         ata_write_cbr(&ATA_PIO_LMR, 0x4f);
@@ -1253,7 +1279,9 @@ static int ata_smart(uint16_t* buf)
         ata_write_cbr(&ATA_PIO_CSD, 0xb0);
         PASS_RC(ata_wait_for_start_of_transfer(10000000), 3, 7);
         for (i = 0; i < 0x100; i++) buf[i] = ata_read_cbr(&ATA_PIO_DTR);
+#ifdef CHECK_ATA_SWAP
         ATA_CFG = old;
+#endif
     }
     ata_set_active();
     return 0;
