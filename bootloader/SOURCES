@@ -2,6 +2,8 @@ common.c
 
 #if defined(IPOD_NANO2G)
 ipodnano2g.c
+#elif defined(IPOD_6G)
+ipod6g.c
 #elif defined(IPOD_ARCH)
 ipod.c
 #elif defined(GIGABEAT_F)
