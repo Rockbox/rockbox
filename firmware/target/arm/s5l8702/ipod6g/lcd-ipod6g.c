@@ -95,9 +95,9 @@ static const unsigned short lcd_enter_deepstby_seq_23[] =
     END
 };
 
-#ifdef HAVE_LCD_SLEEP
 /* init sequences */
 
+#ifdef HAVE_LCD_SLEEP
 static const unsigned char lcd_awake_seq_01[] =
 {
     CMD,   0x11,  0,  /* Sleep Out Mode */
@@ -105,7 +105,9 @@ static const unsigned char lcd_awake_seq_01[] =
     CMD,   0x29,  0,  /* Display On */
     END
 };
+#endif
 
+#if defined(HAVE_LCD_SLEEP) || defined(BOOTLOADER)
 static const unsigned short lcd_init_seq_23[] =
 {
     /* Display settings */
@@ -147,7 +149,59 @@ static const unsigned short lcd_init_seq_23[] =
     MREG16(1),  0x007, 0x0173,
     END
 };
-#endif  /* HAVE_LCD_SLEEP */
+#endif  /* HAVE_LCD_SLEEP || BOOTLOADER */
+
+#ifdef BOOTLOADER
+static const unsigned char lcd_init_seq_0[] =
+{
+    CMD,   0x11,  0,        /* Sleep Out Mode */
+    SLEEP, 0x03,            /* 30 ms */
+    CMD,   0x35,  1, 0x00,  /* TEON (TBC) */
+    CMD,   0x3a,  1, 0x06,  /* COLMOD (TBC) */
+    CMD,   0x36,  1, 0x00,  /* MADCTR (TBC) */
+    CMD,   0x13,  0,        /* NORON: Normal Mode On (Partial
+                               Mode Off, Scroll Mode Off) */
+    CMD,   0x29,  0,        /* Display On */
+    END
+};
+
+static const unsigned char lcd_init_seq_1[] =
+{
+    CMD,   0xb0, 21, 0x3a, 0x3a, 0x80, 0x80, 0x0a, 0x0a, 0x0a, 0x0a,
+                     0x0a, 0x0a, 0x0a, 0x0a, 0x3c, 0x30, 0x0f, 0x00,
+                     0x01, 0x54, 0x06, 0x66, 0x66,
+    CMD,   0xb8,  1, 0xd8,
+    CMD,   0xb1, 30, 0x14, 0x59, 0x00, 0x15, 0x57, 0x27, 0x04, 0x85,
+                     0x14, 0x59, 0x00, 0x15, 0x57, 0x27, 0x04, 0x85,
+                     0x14, 0x09, 0x15, 0x57, 0x27, 0x04, 0x05,
+                     0x14, 0x09, 0x15, 0x57, 0x27, 0x04, 0x05,
+    CMD,   0xd2,  1, 0x01,
+
+    /* Gamma settings (TBC) */
+    CMD,   0xe0, 13, 0x00, 0x00, 0x00, 0x05, 0x0b, 0x12, 0x16, 0x1f,
+                     0x25, 0x22, 0x24, 0x29, 0x1c,
+    CMD,   0xe1, 13, 0x08, 0x01, 0x01, 0x06, 0x0b, 0x11, 0x15, 0x1f,
+                     0x27, 0x26, 0x29, 0x2f, 0x1e,
+    CMD,   0xe2, 13, 0x07, 0x01, 0x01, 0x05, 0x09, 0x0f, 0x13, 0x1e,
+                     0x26, 0x25, 0x28, 0x2e, 0x1e,
+    CMD,   0xe3, 13, 0x00, 0x00, 0x00, 0x05, 0x0b, 0x12, 0x16, 0x1f,
+                     0x25, 0x22, 0x24, 0x29, 0x1c,
+    CMD,   0xe4, 13, 0x08, 0x01, 0x01, 0x06, 0x0b, 0x11, 0x15, 0x1f,
+                     0x27, 0x26, 0x29, 0x2f, 0x1e,
+    CMD,   0xe5, 13, 0x07, 0x01, 0x01, 0x05, 0x09, 0x0f, 0x13, 0x1e,
+                     0x26, 0x25, 0x28, 0x2e, 0x1e,
+
+    CMD,   0x3a,  1, 0x06,  /* COLMOD (TBC) */
+    CMD,   0xc2,  1, 0x00,  /* Power Control 3 (TBC) */
+    CMD,   0x35,  1, 0x00,  /* TEON (TBC) */
+    CMD,   0x11,  0,        /* Sleep Out Mode */
+    SLEEP, 0x06,            /* 60 ms */
+    CMD,   0x13,  0,        /* NORON: Normal Mode On (Partial
+                               Mode Off, Scroll Mode Off) */
+    CMD,   0x29,  0,        /* Display On */
+    END
+};
+#endif
 
 /* DMA configuration */
 
@@ -366,6 +420,14 @@ void lcd_init_device(void)
 
     /* Configure DMA channel */
     dmac_ch_init(&lcd_dma_ch, &lcd_dma_ch_cfg);
+
+#ifdef BOOTLOADER
+    switch (lcd_type) {
+        case 0: lcd_run_seq8(lcd_init_seq_0); break;
+        case 1: lcd_run_seq8(lcd_init_seq_1); break;
+        default: lcd_run_seq16(lcd_init_seq_23); break;
+    }
+#endif
 
     lcd_ispowered = true;
 }
