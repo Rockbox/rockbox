@@ -38,8 +38,21 @@
 #include <QComboBox>
 #include <QFileDialog>
 #include <QScrollBar>
+#include <QGroupBox>
+#include <QSortFilterProxyModel>
 #include "settings.h"
 #include "backend.h"
+
+// FIXME see QTBUG-30392
+namespace
+{
+template< typename T >
+inline bool isUserType(const QVariant& var)
+{
+    return var.type() == QVariant::UserType && var.userType() == qMetaTypeId< T >();
+}
+
+}
 
 class SocBitRangeValidator : public QValidator
 {
@@ -51,6 +64,13 @@ public:
     virtual State validate(QString& input, int& pos) const;
     /* validate and return the interpreted value */
     State parse(const QString& input, int& last_bit, int& first_bit) const;
+    /* create a valid string from range */
+    QString generate(int last_bit, int first_bit) const;
+    /* set maximum width in bits */
+    void setWidth(int nr_bits);
+
+protected:
+    int m_width;
 };
 
 class SocFieldValidator : public QValidator
@@ -58,7 +78,7 @@ class SocFieldValidator : public QValidator
     Q_OBJECT
 public:
     SocFieldValidator(QObject *parent = 0);
-    SocFieldValidator(const soc_reg_field_t& field, QObject *parent = 0);
+    SocFieldValidator(const soc_desc::field_t& field, QObject *parent = 0);
 
     virtual void fixup(QString& input) const;
     virtual State validate(QString& input, int& pos) const;
@@ -66,7 +86,7 @@ public:
     State parse(const QString& input, soc_word_t& val) const;
 
 protected:
-    soc_reg_field_t m_field;
+    soc_desc::field_t m_field;
 };
 
 class RegLineEdit : public QWidget
@@ -112,10 +132,11 @@ class SocFieldItemDelegate : public QStyledItemDelegate
 {
 public:
     SocFieldItemDelegate(QObject *parent = 0):QStyledItemDelegate(parent), m_bitcount(32) {}
-    SocFieldItemDelegate(const soc_reg_field_t& field, QObject *parent = 0)
-        :QStyledItemDelegate(parent), m_bitcount(field.last_bit - field.first_bit + 1) {}
+    SocFieldItemDelegate(const soc_desc::field_t& field, QObject *parent = 0)
+        :QStyledItemDelegate(parent), m_bitcount(field.width) {}
 
     virtual QString displayText(const QVariant& value, const QLocale& locale) const;
+    void setWidth(int bitcount);
 protected:
     int m_bitcount;
 };
@@ -125,44 +146,54 @@ class SocFieldEditor : public QLineEdit
     Q_OBJECT
     Q_PROPERTY(uint field READ field WRITE setField USER true)
 public:
-    SocFieldEditor(const soc_reg_field_t& field, QWidget *parent = 0);
+    SocFieldEditor(const soc_desc::field_t& field, QWidget *parent = 0);
     virtual ~SocFieldEditor();
 
     uint field() const;
     void setField(uint field);
-    void SetRegField(const soc_reg_field_t& field);
+    void SetRegField(const soc_desc::field_t& field);
+
+signals:
+    void editingFinished(uint value);
+
+protected slots:
+    void editDone();
 
 protected:
     SocFieldValidator *m_validator;
     uint m_field;
-    soc_reg_field_t m_reg_field;
+    soc_desc::field_t m_reg_field;
 };
 
 class SocFieldEditorCreator : public QItemEditorCreatorBase
 {
 public:
-    SocFieldEditorCreator() { m_field.first_bit = 0; m_field.last_bit = 31; }
-    SocFieldEditorCreator(const soc_reg_field_t& field):m_field(field) {}
+    SocFieldEditorCreator() { m_field.pos = 0; m_field.width = 32; }
+    SocFieldEditorCreator(const soc_desc::field_t& field):m_field(field) {}
 
     virtual QWidget *createWidget(QWidget *parent) const;
     virtual QByteArray valuePropertyName() const;
 
+    void setWidth(int bitcount);
+
 protected:
-    soc_reg_field_t m_field;
+    soc_desc::field_t m_field;
 };
 
 class SocFieldCachedValue
 {
 public:
     SocFieldCachedValue():m_value(0) {}
-    SocFieldCachedValue(const soc_reg_field_t& field, uint value);
+    SocFieldCachedValue(const soc_desc::field_t& field, uint value);
     virtual ~SocFieldCachedValue() {}
-    const soc_reg_field_t& field() const { return m_field; }
+    const soc_desc::field_t& field() const { return m_field; }
     uint value() const { return m_value; }
     /* return empty string if there no match */
     QString value_name() const { return m_name; }
+
+    bool operator<(const SocFieldCachedValue& o) const;
 protected:
-    soc_reg_field_t m_field;
+    soc_desc::field_t m_field;
     uint m_value;
     QString m_name;
 };
@@ -172,11 +203,14 @@ Q_DECLARE_METATYPE(SocFieldCachedValue)
 class SocFieldBitRange
 {
 public:
-    SocFieldBitRange():m_first_bit(0),m_last_bit(0) {}
-    SocFieldBitRange(const soc_reg_field_t& field)
-        :m_first_bit(field.first_bit), m_last_bit(field.last_bit) {}
+    SocFieldBitRange():m_first_bit(0), m_last_bit(0) {}
+    SocFieldBitRange(const soc_desc::field_t& field)
+        :m_first_bit(field.pos), m_last_bit(field.pos + field.width - 1) {}
+    SocFieldBitRange(int first, int last):m_first_bit(first), m_last_bit(last) {}
     unsigned GetFirstBit() const { return m_first_bit; }
     unsigned GetLastBit() const { return m_last_bit; }
+
+    bool operator<(const SocFieldBitRange& o) const;
 protected:
     unsigned m_first_bit, m_last_bit;
 };
@@ -248,14 +282,16 @@ class RegFieldTableModel : public QAbstractTableModel
     Q_OBJECT
 public:
     RegFieldTableModel(QObject *parent);
-    virtual int rowCount(const QModelIndex & parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex & parent = QModelIndex()) const;
-    virtual QVariant data(const QModelIndex & index, int role) const;
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+    virtual QVariant data(const QModelIndex& index, int role) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    virtual Qt::ItemFlags flags (const QModelIndex & index) const;
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const;
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role);
 
-    void SetRegister(const soc_reg_t& reg);
+    void SetRegister(const soc_desc::register_t& reg);
+    void UpdateRegister(const soc_desc::register_t& reg);
+    soc_desc::register_t GetRegister() const;
     /* values can either be an invalid QVariant() (means no value/error), or a
      * QVariant containing a soc_word_t */
     void SetValues(const QVector< QVariant >& values);
@@ -286,22 +322,44 @@ protected:
         Error
     };
 
-    soc_reg_t m_reg;
+    soc_desc::register_t m_reg;
     QVector< QVariant > m_value;
     QVector< ColorStatus > m_status;
     RegTheme m_theme;
     bool m_read_only;
 };
 
-class RegSexyDisplay2 : public QAbstractItemView
+class RegFieldProxyModel : public QSortFilterProxyModel
+{
+public:
+    RegFieldProxyModel(QObject *parent):QSortFilterProxyModel(parent) {}
+protected:
+    bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
+};
+
+class YRegDisplayItemDelegate : public QStyledItemDelegate
+{
+public:
+    YRegDisplayItemDelegate(QObject *parent = 0);
+    virtual void paint(QPainter * painter, const QStyleOptionViewItem& option,
+        const QModelIndex & index) const;
+    virtual QSize sizeHint(const QStyleOptionViewItem& option,
+        const QModelIndex & index) const;
+};
+
+class YRegDisplay : public QAbstractItemView
 {
     Q_OBJECT
 public:
-    RegSexyDisplay2(QWidget *parent = 0);
+    YRegDisplay(QWidget *parent = 0);
     virtual QModelIndex indexAt(const QPoint& point) const;
     virtual void scrollTo(const QModelIndex& index, ScrollHint hint = EnsureVisible);
-    virtual QRect visualRect(const QModelIndex& index ) const;
+    virtual QRect visualRect(const QModelIndex& index) const;
     virtual void setModel(QAbstractItemModel *model);
+    /* specify the number of bits to display */
+    void setWidth(int nr_bits);
+    /* returns the bit column at a point, or -1 if none except if closest=true */
+    int bitColumnAt(const QPoint& point, bool closest = true) const;
 
 protected slots:
     virtual void dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
@@ -311,14 +369,20 @@ protected slots:
     virtual void updateGeometries();
 
 protected:
-    int GetMarginSize() const; // margin in cells
-    int GetSeparatorSize() const; // size of lines betweens cells
-    int GetColumnWidth() const; // width of a 1-bit column (excluding separators)
-    int GetHeaderHeight() const; // height of the header (excluding separators)
-    int GetGapHeight() const; // height of gap between header and fields
-    int GetMaxContentHeight() const; // maximum height of field columns
-    int GetHeaderTextSep() const; // height between digits in header
-    void RecomputeGeometry();
+    int marginSize() const; // margin in cells
+    int separatorSize() const; // size of lines betweens cells
+    int minColumnWidth() const; // minimum width of a column (excluding separators)
+    int maxColumnWidth() const; // maximum width of a column (excluding separators)
+    int columnWidth(int col) const; // width of a 1-bit column (excluding separators)
+    int headerHeight() const; // height of the header (excluding separators)
+    int gapHeight() const; // height of gap between header and fields
+    int maxContentHeight() const; // maximum height of field columns
+    int headerTextSep() const; // height between digits in header
+    int columnOffset(int col) const; // column offset
+    int bitToColumn(int bit) const; // bit -> column
+    void recomputeGeometry();
+    QRect itemRect(const SocFieldBitRange& range, int col) const;
+    QRect itemRect(const QModelIndex& index) const;
 
     virtual bool isIndexHidden(const QModelIndex& index) const;
     virtual QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers);
@@ -328,9 +392,13 @@ protected:
     virtual QRegion visualRegionForSelection(const QItemSelection& selection) const;
     virtual void paintEvent(QPaintEvent *event);
     virtual void resizeEvent(QResizeEvent* event);
+    virtual bool viewportEvent(QEvent * event);
 
     bool m_is_dirty;
     int m_minimum_width, m_minimum_height;
+    int m_range_col, m_data_col;
+    int m_nr_bits;
+    QModelIndex m_hover;
 };
 
 /**
@@ -387,8 +455,10 @@ public:
     void SetTextHtml(const QString& text);
     QString GetTextHtml();
     bool IsModified();
+
 signals:
     void OnTextChanged();
+    void OnTextChanged(const QString& text_html);
 
 protected slots:
     void OnInternalTextChanged();
@@ -398,6 +468,8 @@ protected slots:
     void OnCharFormatChanged(const QTextCharFormat& fmt);
 
 protected:
+    virtual bool eventFilter(QObject *object, QEvent *event);
+
     bool m_growing_mode;
     bool m_read_only;
     QToolBar *m_toolbar;
@@ -481,6 +553,37 @@ protected:
 
 private slots:
     void OnClose(bool clicked);
+};
+
+Q_DECLARE_METATYPE(QModelIndex)
+
+class YTabWidget : public QTabWidget
+{
+    Q_OBJECT
+    Q_PROPERTY(bool tabOpenable READ tabOpenable WRITE setTabOpenable)
+public:
+    YTabWidget(QTabBar *tabbar = 0, QWidget *parent = 0);
+
+    inline bool tabOpenable() const { return m_tab_openable; }
+    void setTabOpenable(bool openable);
+    void setTabOpenMenu(QMenu *menu);
+
+signals:
+    void tabOpenRequested();
+
+protected slots:
+    void OnOpenButton(bool checked);
+
+protected:
+    bool m_tab_openable;
+    QToolButton *m_tab_open_button;
+};
+
+class Misc
+{
+public:
+    static QGroupBox *EncloseInBox(const QString& name, QWidget *widget);
+    static QGroupBox *EncloseInBox(const QString& name, QLayout *layout);
 };
 
 #endif /* AUX_H */

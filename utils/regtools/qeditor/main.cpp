@@ -20,12 +20,22 @@
  ****************************************************************************/
 #include <QApplication>
 #include <QDir>
+#include <QTextCodec>
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     app.setApplicationVersion(APP_VERSION);
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    /** NOTE: Qt4 only
+     * use the locale codec as the C-string codec, otherwise QString::toStdString()
+     * performs as toLatin1() which breaks conversion on virtually all systems.
+     * FIXME The documentation mentions that the C-string codec should produce ASCII
+     * compatible (ie 7-bit) encodings but nowadays most system are using UTF-8
+     * so I don't see why this is a problem */
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForLocale());
+#endif
 
     Backend backend;;
     QDir dir(QCoreApplication::applicationDirPath());
@@ -47,4 +57,4 @@ int main(int argc, char *argv[])
     MainWindow win(&backend);
     win.show();
     return app.exec();
-} 
+}

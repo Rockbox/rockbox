@@ -28,15 +28,15 @@
  * SocFile
  */
 SocFile::SocFile()
-    :m_valid(false)
+    :m_valid(true)
 {
 }
 
 SocFile::SocFile(const QString& filename)
     :m_filename(filename)
 {
-    m_valid = parse_xml(filename.toStdString(), m_soc);
-    normalize(m_soc);
+    soc_desc::error_context_t ctx;
+    m_valid = soc_desc::parse_xml(filename.toStdString(), m_soc, ctx);
 }
 
 bool SocFile::IsValid()
@@ -44,9 +44,12 @@ bool SocFile::IsValid()
     return m_valid;
 }
 
-SocRef SocFile::GetSocRef()
+soc_desc::soc_ref_t SocFile::GetSocRef()
 {
-    return SocRef(this);
+    if(m_valid)
+        return soc_desc::soc_ref_t(&m_soc);
+    else
+        return soc_desc::soc_ref_t();
 }
 
 QString SocFile::GetFilename()
@@ -67,15 +70,22 @@ QList< SocFileRef > Backend::GetSocFileList()
 {
     QList< SocFileRef > list;
     for(std::list< SocFile >::iterator it = m_socs.begin(); it != m_socs.end(); ++it)
-        list.append(SocFileRef(&(*it)));
+    {
+        if(it->IsValid())
+            list.append(SocFileRef(&(*it)));
+    }
     return list;
 }
 
-QList< SocRef > Backend::GetSocList()
+QList< soc_desc::soc_ref_t > Backend::GetSocList()
 {
-    QList< SocRef > list;
+    QList< soc_desc::soc_ref_t > list;
     for(std::list< SocFile >::iterator it = m_socs.begin(); it != m_socs.end(); ++it)
-        list.append(it->GetSocRef());
+    {
+        soc_desc::soc_ref_t r = it->GetSocRef();
+        if(r.valid())
+            list.append(r);
+    }
     return list;
 }
 
@@ -85,7 +95,7 @@ bool Backend::LoadSocDesc(const QString& filename)
     if(!f.IsValid())
         return false;
     m_socs.push_back(f);
-    emit OnSocListChanged();
+    emit OnSocAdded(SocFileRef(&m_socs.back()));
     return true;
 }
 
@@ -107,6 +117,63 @@ IoBackend *Backend::CreateHWStubIoBackend(HWStubDevice *dev)
 #endif
 
 /**
+ * DummyIoBackend
+ */
+
+DummyIoBackend::DummyIoBackend()
+{
+}
+
+bool DummyIoBackend::IsValid()
+{
+    return false;
+}
+
+QString DummyIoBackend::GetSocName()
+{
+    return "";
+}
+
+bool DummyIoBackend::ReadRegister(soc_addr_t addr, soc_word_t& value,
+    unsigned width)
+{
+    Q_UNUSED(addr);
+    Q_UNUSED(value);
+    Q_UNUSED(width);
+    return false;
+}
+
+bool DummyIoBackend::Reload()
+{
+    return false;
+}
+
+bool DummyIoBackend::IsReadOnly()
+{
+    return true;
+}
+
+bool DummyIoBackend::WriteRegister(soc_addr_t addr, soc_word_t value,
+    unsigned width, WriteMode mode)
+{
+    Q_UNUSED(addr);
+    Q_UNUSED(value);
+    Q_UNUSED(mode);
+    Q_UNUSED(width);
+    return false;
+}
+
+bool DummyIoBackend::IsDirty()
+{
+    return false;
+}
+
+bool DummyIoBackend::Commit()
+{
+    return false;
+}
+
+/**
  * RamIoBackend
  */
 RamIoBackend::RamIoBackend(const QString& soc_name)
@@ -114,9 +181,36 @@ RamIoBackend::RamIoBackend(const QString& soc_name)
     m_soc = soc_name;
 }
 
-bool RamIoBackend::ReadRegister(const QString& name, soc_word_t& value)
+bool RamIoBackend::IsValid()
 {
-    QMap<QString, soc_word_t>::const_iterator it = m_map.find(name);
+    return m_soc != "";
+}
+
+QString RamIoBackend::GetSocName()
+{
+    return m_soc;
+}
+
+void RamIoBackend::SetSocName(const QString& soc_name)
+{
+    m_soc = soc_name;
+}
+
+bool RamIoBackend::RamIoBackend::Reload()
+{
+    return false;
+}
+
+bool RamIoBackend::IsReadOnly()
+{
+    return false;
+}
+
+bool RamIoBackend::ReadRegister(soc_addr_t addr, soc_word_t& value,
+    unsigned width)
+{
+    Q_UNUSED(width);
+    QMap<soc_addr_t, soc_word_t>::const_iterator it = m_map.find(addr);
     if(it == m_map.end())
         return false;
     value = it.value();
@@ -128,19 +222,29 @@ void RamIoBackend::DeleteAll()
     m_map.clear();
 }
 
-bool RamIoBackend::WriteRegister(const QString& name, soc_word_t value, WriteMode mode)
+bool RamIoBackend::WriteRegister(soc_addr_t addr, soc_word_t value,
+    unsigned width, WriteMode mode)
 {
+    Q_UNUSED(width);
     switch(mode)
     {
-        case Write: m_map[name] = value; return true;
-        case Set: m_map[name] |= value; return true;
-        case Clear: m_map[name] &= ~value; return true;
-        case Toggle: m_map[name] ^= value; return true;
+        case Write: m_map[addr] = value; return true;
+        case Set: m_map[addr] |= value; return true;
+        case Clear: m_map[addr] &= ~value; return true;
+        case Toggle: m_map[addr] ^= value; return true;
         default: return false;
     }
 }
 
+bool RamIoBackend::IsDirty()
+{
+    return false;
+}
 
+bool RamIoBackend::Commit()
+{
+    return false;
+}
 
 /**
  * FileIoBackend
@@ -154,6 +258,10 @@ FileIoBackend::FileIoBackend(const QString& filename, const QString& soc_name)
     Reload();
 }
 
+bool FileIoBackend::IsValid()
+{
+    return m_valid;
+}
 
 bool FileIoBackend::Reload()
 {
@@ -170,25 +278,27 @@ bool FileIoBackend::Reload()
         int idx = line.indexOf('=');
         if(idx == -1)
             continue;
-        QString key = line.left(idx).trimmed();
-        bool ok;
-        soc_word_t val = line.mid(idx + 1).trimmed().toULong(&ok, 0);
-        if(key == "HW")
-            m_soc = line.mid(idx + 1).trimmed();
-        else if(ok)
-            RamIoBackend::WriteRegister(key, val, Write);
+        QString key_str = line.left(idx).trimmed();
+        QString val_str = line.mid(idx + 1).trimmed();
+        bool key_ok,val_ok;
+        soc_word_t val = val_str.toULong(&val_ok, 0);
+        soc_word_t key = key_str.toULong(&key_ok, 0);
+        if(key_str == "soc")
+            m_soc = val_str;
+        else if(key_ok && val_ok)
+            RamIoBackend::WriteRegister(key, val, 32, Write);
     }
-
     m_readonly = !QFileInfo(file).isWritable();
     m_dirty = false;
     m_valid = true;
     return true;
 }
 
-bool FileIoBackend::WriteRegister(const QString& name, soc_word_t value, WriteMode mode)
+bool FileIoBackend::WriteRegister(soc_addr_t addr, soc_word_t value,
+    unsigned width, WriteMode mode)
 {
     m_dirty = true;
-    return RamIoBackend::WriteRegister(name, value, mode);
+    return RamIoBackend::WriteRegister(addr, value, width, mode);
 }
 
 bool FileIoBackend::Commit()
@@ -199,15 +309,30 @@ bool FileIoBackend::Commit()
     if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
         return false;
     QTextStream out(&file);
-    out << "HW = " << m_soc << "\n";
-    QMapIterator< QString, soc_word_t > it(m_map);
+    out << "soc = " << m_soc << "\n";
+    QMapIterator< soc_addr_t, soc_word_t > it(m_map);
     while(it.hasNext())
     {
         it.next();
-        out << it.key() << " = " << hex << showbase << it.value() << "\n";
+        out << hex << showbase << it.key() << " = " << hex << showbase << it.value() << "\n";
     }
     out.flush();
     return file.flush();
+}
+
+bool FileIoBackend::IsReadOnly()
+{
+    return m_readonly;
+}
+
+bool FileIoBackend::IsDirty()
+{
+    return m_dirty;
+}
+
+QString FileIoBackend::GetFileName()
+{
+    return m_filename;
 }
 
 #ifdef HAVE_HWSTUB
@@ -355,6 +480,8 @@ HWStubIoBackend::HWStubIoBackend(HWStubDevice *dev)
         else
             m_soc = QString("pp%1").arg(pp.wChipID, 4, 16, QChar('0'));
     }
+    else if(target.dID == HWSTUB_TARGET_ATJ)
+        m_soc = "atj213x";
     else
         m_soc = target.bName;
 }
@@ -369,13 +496,44 @@ HWStubIoBackend::~HWStubIoBackend()
     delete m_dev;
 }
 
-bool HWStubIoBackend::ReadRegister(soc_addr_t addr, soc_word_t& value)
+bool HWStubIoBackend::IsValid()
 {
-    return m_dev->ReadMem(addr, sizeof(value), &value);
+    return m_dev->IsValid();
 }
 
-bool HWStubIoBackend::WriteRegister(soc_addr_t addr, soc_word_t value, WriteMode mode)
+bool HWStubIoBackend::IsReadOnly()
 {
+    return false;
+}
+
+bool HWStubIoBackend::IsDirty()
+{
+    return false;
+}
+
+bool HWStubIoBackend::Commit()
+{
+    return true;
+}
+
+HWStubDevice *HWStubIoBackend::GetDevice()
+{
+    return m_dev;
+}
+
+bool HWStubIoBackend::ReadRegister(soc_addr_t addr, soc_word_t& value,
+    unsigned width)
+{
+    if(width != 8 && width != 16 && width != 32)
+        return false;
+    return m_dev->ReadMem(addr, width / 8, &value);
+}
+
+bool HWStubIoBackend::WriteRegister(soc_addr_t addr, soc_word_t value,
+    unsigned width, WriteMode mode)
+{
+    if(width != 8 && width != 16 && width != 32)
+        return false;
     switch(mode)
     {
         case Set: addr += 4; break;
@@ -383,7 +541,7 @@ bool HWStubIoBackend::WriteRegister(soc_addr_t addr, soc_word_t value, WriteMode
         case Toggle: addr += 12; break;
         default: break;
     }
-    return m_dev->WriteMem(addr, sizeof(value), &value);
+    return m_dev->WriteMem(addr, width / 8, &value);
 }
 
 bool HWStubIoBackend::Reload()
@@ -486,146 +644,146 @@ lib_usb_init __lib_usb_init;
  * BackendHelper
  */
 
-BackendHelper::BackendHelper(IoBackend *io_backend, const SocRef& soc)
+BackendHelper::BackendHelper(IoBackend *io_backend, const soc_desc::soc_ref_t& soc)
     :m_io_backend(io_backend), m_soc(soc)
 {
 }
 
-bool BackendHelper::ReadRegister(const QString& dev, const QString& reg, soc_word_t& v)
+QString BackendHelper::GetPath(const soc_desc::node_inst_t& inst)
 {
-    if(m_io_backend->SupportAccess(IoBackend::ByName))
-        return m_io_backend->ReadRegister("HW." + dev + "." + reg, v);
-    if(m_io_backend->SupportAccess(IoBackend::ByAddress))
-    {
-        soc_addr_t addr;
-        if(GetRegisterAddress(dev, reg, addr))
-            return m_io_backend->ReadRegister(addr, v);
-    }
-    return false;
+    if(!inst.valid() || inst.is_root())
+        return QString();
+    QString s = GetPath(inst.parent());
+    if(!s.isEmpty())
+        s += ".";
+    s += inst.name().c_str();
+    if(inst.is_indexed())
+        s = QString("%1[%2]").arg(s).arg(inst.index());
+    return s;
 }
 
-bool BackendHelper::WriteRegister(const QString& dev, const QString& reg,
+soc_desc::node_inst_t BackendHelper::ParsePath(const QString& path)
+{
+    soc_desc::node_inst_t inst = m_soc.root_inst();
+    /* empty path is root */
+    if(path.isEmpty())
+        return inst;
+    int pos = 0;
+    while(pos < path.size())
+    {
+        /* try to find the next separator */
+        int next = path.indexOf('.', pos);
+        if(next == -1)
+            next = path.size();
+        /* try to find the index, if any */
+        int lidx = path.indexOf('[', pos);
+        if(lidx == -1 || lidx > next)
+            lidx = next;
+        /* extract name */
+        std::string name = path.mid(pos, lidx - pos).toStdString();
+        /* and index */
+        if(lidx < next)
+        {
+            int ridx = path.indexOf(']', lidx + 1);
+            /* syntax error ? */
+            if(ridx == -1 || ridx > next)
+                return soc_desc::node_inst_t();
+            /* invalid number ? */
+            bool ok = false;
+            size_t idx = path.mid(lidx + 1, ridx - lidx - 1).toUInt(&ok);
+            if(ok)
+                inst = inst.child(name, idx);
+            else
+                inst = soc_desc::node_inst_t();
+        }
+        else
+            inst = inst.child(name);
+        /* advance right after the separator */
+        pos = next + 1;
+    }
+    return inst;
+}
+
+bool BackendHelper::ReadRegister(const soc_desc::node_inst_t& inst,
+    soc_word_t& v)
+{
+    soc_addr_t addr;
+    if(!GetRegisterAddress(inst, addr))
+        return false;
+    return m_io_backend->ReadRegister(addr, v, inst.node().reg().get()->width);
+}
+
+bool BackendHelper::WriteRegister(const soc_desc::node_inst_t& inst,
     soc_word_t v, IoBackend::WriteMode mode)
 {
-    if(m_io_backend->SupportAccess(IoBackend::ByName))
-        return m_io_backend->WriteRegister("HW." + dev + "." + reg, v, mode);
-    if(m_io_backend->SupportAccess(IoBackend::ByAddress))
-    {
-        soc_addr_t addr;
-        if(GetRegisterAddress(dev, reg, addr))
-            return m_io_backend->WriteRegister(addr, v, mode);
-    }
-    return false;
+    soc_addr_t addr;
+    if(!GetRegisterAddress(inst, addr))
+        return false;
+    return m_io_backend->WriteRegister(addr, v, inst.node().reg().get()->width, mode);
 }
 
-bool BackendHelper::GetDevRef(const QString& sdev, SocDevRef& ref)
-{
-    for(size_t i = 0; i < m_soc.GetSoc().dev.size(); i++)
-    {
-        const soc_dev_t& dev = m_soc.GetSoc().dev[i];
-        for(size_t j = 0; j < dev.addr.size(); j++)
-            if(dev.addr[j].name.c_str() == sdev)
-            {
-                ref = SocDevRef(m_soc, i, j);
-                return true;
-            }
-    }
-    return false;
-}
-
-bool BackendHelper::GetRegRef(const SocDevRef& dev, const QString& sreg, SocRegRef& ref)
-{
-    const soc_dev_t& sdev = dev.GetDev();
-    for(size_t i = 0; i < sdev.reg.size(); i++)
-    {
-        const soc_reg_t& reg = sdev.reg[i];
-        for(size_t j = 0; j < reg.addr.size(); j++)
-        {
-            if(reg.addr[j].name.c_str() == sreg)
-            {
-                ref = SocRegRef(dev, i, j);
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool BackendHelper::GetFieldRef(const SocRegRef& reg, const QString& sfield, SocFieldRef& ref)
-{
-    for(size_t i = 0; i < reg.GetReg().field.size(); i++)
-        if(reg.GetReg().field[i].name.c_str() == sfield)
-        {
-            ref = SocFieldRef(reg, i);
-            return true;
-        }
-    return false;
-}
-
-bool BackendHelper::GetRegisterAddress(const QString& dev, const QString& reg,
+bool BackendHelper::GetRegisterAddress(const soc_desc::node_inst_t& inst,
     soc_addr_t& addr)
 {
-    SocDevRef dev_ref;
-    SocRegRef reg_ref;
-    if(!GetDevRef(dev, dev_ref) || !GetRegRef(dev_ref, reg, reg_ref))
+    if(!inst.valid())
         return false;
-    addr = dev_ref.GetDevAddr().addr + reg_ref.GetRegAddr().addr;
+    addr = inst.addr();
     return true;
 }
 
-bool BackendHelper::ReadRegisterField(const QString& dev, const QString& reg,
+bool BackendHelper::ReadRegisterField(const soc_desc::node_inst_t& inst,
     const QString& field, soc_word_t& v)
 {
-    SocDevRef dev_ref;
-    SocRegRef reg_ref;
-    SocFieldRef field_ref;
-    if(!GetDevRef(dev, dev_ref) || !GetRegRef(dev_ref, reg, reg_ref) || 
-            !GetFieldRef(reg_ref, field, field_ref))
+    soc_desc::field_ref_t ref = inst.node().reg().field(field.toStdString());
+    if(!ref.valid())
         return false;
-    if(!ReadRegister(dev, reg, v))
+    if(!ReadRegister(inst, v))
         return false;
-    v = (v & field_ref.GetField().bitmask()) >> field_ref.GetField().first_bit;
+    v = (v & ref.get()->bitmask()) >> ref.get()->pos;
     return true;
 }
 
 bool BackendHelper::DumpAllRegisters(const QString& filename, bool ignore_errors)
 {
-    FileIoBackend b(filename, QString::fromStdString(m_soc.GetSoc().name));
+    FileIoBackend b(filename, QString::fromStdString(m_soc.get()->name));
     bool ret = DumpAllRegisters(&b, ignore_errors);
     return ret && b.Commit();
 }
 
 bool BackendHelper::DumpAllRegisters(IoBackend *backend, bool ignore_errors)
 {
-    BackendHelper bh(backend, m_soc);
+    BackendHelper helper(backend, m_soc);
+    return DumpAllRegisters(&helper, m_soc.root_inst(), ignore_errors);
+}
+
+bool BackendHelper::DumpAllRegisters(BackendHelper *bh,
+    const soc_desc::node_inst_t& inst, bool ignore_errors)
+{
     bool ret = true;
-    for(size_t i = 0; i < m_soc.GetSoc().dev.size(); i++)
+    if(inst.node().reg().valid())
     {
-        const soc_dev_t& dev = m_soc.GetSoc().dev[i];
-        for(size_t j = 0; j < dev.addr.size(); j++)
+        soc_word_t val;
+        if(!ReadRegister(inst, val))
         {
-            QString devname = QString::fromStdString(dev.addr[j].name);
-            for(size_t k = 0; k < dev.reg.size(); k++)
-            {
-                const soc_reg_t& reg = dev.reg[k];
-                for(size_t l = 0; l < reg.addr.size(); l++)
-                {
-                    QString regname = QString::fromStdString(reg.addr[l].name);
-                    soc_word_t val;
-                    if(!ReadRegister(devname, regname, val))
-                    {
-                        ret = false;
-                        if(!ignore_errors)
-                            return false;
-                    }
-                    else if(!bh.WriteRegister(devname, regname, val))
-                    {
-                        ret = false;
-                        if(!ignore_errors)
-                            return false;
-                    }
-                }
-            }
+            ret = false;
+            if(!ignore_errors)
+                return false;
+        }
+        else if(!bh->WriteRegister(inst, val))
+        {
+            ret = false;
+            if(!ignore_errors)
+                return false;
+        }
+    }
+    std::vector< soc_desc::node_inst_t > list = inst.children();
+    for(size_t i = 0; i < list.size(); i++)
+    {
+        if(!DumpAllRegisters(bh, list[i], ignore_errors))
+        {
+            ret = false;
+            if(!ignore_errors)
+                return false;
         }
     }
     return ret;

@@ -19,13 +19,44 @@
  *
  ****************************************************************************/
 #include "std_analysers.h"
+#include <QDebug>
+
+/**
+ * AnalyserEx
+ */
+
+AnalyserEx::AnalyserEx(const soc_desc::soc_ref_t& soc, IoBackend *backend)
+    :Analyser(soc, backend), m_helper(backend, soc)
+{
+}
+
+bool AnalyserEx::ReadRegister(const QString& path, soc_word_t& val)
+{
+    return m_helper.ReadRegister(m_helper.ParsePath(path), val);
+}
+
+bool AnalyserEx::ReadRegisterOld(const QString& dev, const QString& reg, soc_word_t& val)
+{
+    return ReadRegister(dev + "." + reg, val);
+}
+
+bool AnalyserEx::ReadField(const QString& path, const QString& field, soc_word_t& val)
+{
+    return m_helper.ReadRegisterField(m_helper.ParsePath(path), field, val);
+}
+
+bool AnalyserEx::ReadFieldOld(const QString& dev, const QString& reg,
+    const QString& field, soc_word_t& val)
+{
+    return ReadField(dev + "." + reg, field, val);
+}
 
 /**
  * Clock analyser
  */
 
-ClockAnalyser::ClockAnalyser(const SocRef& soc, IoBackend *backend)
-        :Analyser(soc, backend)
+ClockAnalyser::ClockAnalyser(const soc_desc::soc_ref_t& soc, IoBackend *backend)
+        :AnalyserEx(soc, backend)
 {
     m_group = new QGroupBox("Clock Analyser");
     QVBoxLayout *layout = new QVBoxLayout;
@@ -75,7 +106,8 @@ QString ClockAnalyser::GetFreq(unsigned freq)
     return QString().sprintf("%d Hz", freq);
 }
 
-QTreeWidgetItem *ClockAnalyser::AddClock(QTreeWidgetItem *parent, const QString& name, int freq, int mul, int div)
+QTreeWidgetItem *ClockAnalyser::AddClock(QTreeWidgetItem *parent, const QString& name,
+    int freq, int mul, int div)
 {
     if(freq == FROM_PARENT)
     {
@@ -102,9 +134,9 @@ int ClockAnalyser::GetClockFreq(QTreeWidgetItem *item)
 void ClockAnalyser::FillTree()
 {
     m_tree_widget->clear();
-    if(m_soc.GetSoc().name == "imx233") FillTreeIMX233();
-    else if(m_soc.GetSoc().name == "rk27xx") FillTreeRK27XX();
-    else if(m_soc.GetSoc().name == "atj213x") FillTreeATJ213X();
+    if(m_soc.get()->name == "imx233") FillTreeIMX233();
+    else if(m_soc.get()->name == "rk27xx") FillTreeRK27XX();
+    else if(m_soc.get()->name == "atj213x") FillTreeATJ213X();
     m_tree_widget->expandAll();
     m_tree_widget->resizeColumnToContents(0);
 }
@@ -113,17 +145,15 @@ void ClockAnalyser::FillTreeATJ213X()
 {
     soc_word_t pllbypass, pllclk, en, coreclks, tmp0, tmp1, tmp2, tmp3;
 
-    BackendHelper helper(m_io_backend, m_soc);
-
     // system oscillators 32.768k and 24M
     QTreeWidgetItem *losc_clk = AddClock(0, "losc clk", 32768);
     QTreeWidgetItem *hosc_clk = AddClock(0, "hosc clk", 24000000);
 
     // core pll
     QTreeWidgetItem *corepll = 0;
-    if (helper.ReadRegisterField("CMU", "COREPLL", "CPEN", en) &&
-        helper.ReadRegisterField("CMU", "COREPLL", "CPBY", pllbypass) &&
-        helper.ReadRegisterField("CMU", "COREPLL", "CPCK", pllclk))
+    if(ReadFieldOld("CMU", "COREPLL", "CPEN", en) &&
+        ReadFieldOld("CMU", "COREPLL", "CPBY", pllbypass) &&
+        ReadFieldOld("CMU", "COREPLL", "CPCK", pllclk))
     {
         corepll = AddClock(hosc_clk, "core pll", en ? FROM_PARENT : DISABLED,
                            pllbypass ? 1 : pllclk, pllbypass ? 1 : 4);
@@ -135,8 +165,8 @@ void ClockAnalyser::FillTreeATJ213X()
 
     // dsp pll
     QTreeWidgetItem *dsppll = 0;
-    if (helper.ReadRegisterField("CMU", "DSPPLL", "DPEN", en) &&
-        helper.ReadRegisterField("CMU", "DSPPLL", "DPCK", pllclk))
+    if(ReadFieldOld("CMU", "DSPPLL", "DPEN", en) &&
+        ReadFieldOld("CMU", "DSPPLL", "DPCK", pllclk))
     {
         dsppll = AddClock(hosc_clk, "dsp pll", en ? FROM_PARENT : DISABLED,
                            pllbypass ? 1 : pllclk, pllbypass ? 1 : 4);
@@ -149,11 +179,11 @@ void ClockAnalyser::FillTreeATJ213X()
     // audio pll
     QTreeWidgetItem *adcpll = 0;
     QTreeWidgetItem *dacpll = 0;
-    if (helper.ReadRegisterField("CMU", "AUDIOPLL", "APEN", en) &&
-        helper.ReadRegisterField("CMU", "AUDIOPLL", "ADCCLK", tmp0) &&
-        helper.ReadRegisterField("CMU", "AUDIOPLL", "DACCLK", tmp1))
+    if(ReadFieldOld("CMU", "AUDIOPLL", "APEN", en) &&
+        ReadFieldOld("CMU", "AUDIOPLL", "ADCCLK", tmp0) &&
+        ReadFieldOld("CMU", "AUDIOPLL", "DACCLK", tmp1))
     {
-        if (en)
+        if(en)
         {
             adcpll = AddClock(hosc_clk, "audio adc pll", tmp0 ? 22579200 : 24576000);
             dacpll = AddClock(hosc_clk, "audio dac pll", tmp1 ? 22579200 : 24576000);
@@ -173,8 +203,8 @@ void ClockAnalyser::FillTreeATJ213X()
     // audio clocks
     QTreeWidgetItem *adcclk = 0;
     QTreeWidgetItem *dacclk = 0;
-    if (helper.ReadRegisterField("CMU", "AUDIOPLL", "ADCCLK", tmp0) &&
-        helper.ReadRegisterField("CMU", "AUDIOPLL", "DACCLK", tmp1))
+    if(ReadFieldOld("CMU", "AUDIOPLL", "ADCCLK", tmp0) &&
+        ReadFieldOld("CMU", "AUDIOPLL", "DACCLK", tmp1))
     {
         adcclk = AddClock(adcpll, "audio adc clk", FROM_PARENT, 1, tmp0+1);
         dacclk = AddClock(dacpll, "audio dac clk", FROM_PARENT, 1, tmp1+1);
@@ -187,14 +217,14 @@ void ClockAnalyser::FillTreeATJ213X()
 
     // cpu clock
     QTreeWidgetItem *cpuclk = 0;
-    if (helper.ReadRegisterField("CMU", "BUSCLK", "CORECLKS", coreclks) &&
-        helper.ReadRegisterField("CMU", "BUSCLK", "CCLKDIV", tmp0))
+    if(ReadFieldOld("CMU", "BUSCLK", "CORECLKS", coreclks) &&
+        ReadFieldOld("CMU", "BUSCLK", "CCLKDIV", tmp0))
     {
-        if (coreclks == 0)
+        if(coreclks == 0)
             cpuclk = AddClock(losc_clk, "cpu clk", FROM_PARENT, 1, tmp0+1);
-        else if (coreclks == 1)
+        else if(coreclks == 1)
             cpuclk = AddClock(hosc_clk, "cpu clk", FROM_PARENT, 1, tmp0+1);
-        else if (coreclks == 2)
+        else if(coreclks == 2)
             cpuclk = AddClock(corepll, "cpu clk", FROM_PARENT, 1, tmp0+1);
         else
             cpuclk = AddClock(corepll, "cpu clk", INVALID);
@@ -206,24 +236,24 @@ void ClockAnalyser::FillTreeATJ213X()
 
     // system clock
     QTreeWidgetItem *sysclk = 0;
-    if (helper.ReadRegisterField("CMU", "BUSCLK", "SCLKDIV", tmp0))
+    if(ReadFieldOld("CMU", "BUSCLK", "SCLKDIV", tmp0))
         sysclk = AddClock(cpuclk, "system clk", FROM_PARENT, 1, tmp0+1);
     else
         sysclk = AddClock(cpuclk, "system clk", INVALID);
 
     // peripherial clk
     QTreeWidgetItem *pclk = 0;
-    if (helper.ReadRegisterField("CMU", "BUSCLK", "PCLKDIV", tmp0))
+    if(ReadFieldOld("CMU", "BUSCLK", "PCLKDIV", tmp0))
         pclk = AddClock(sysclk, "peripherial clk", FROM_PARENT, 1, tmp0 ? tmp0+1 : 2);
     else
         pclk = AddClock(sysclk, "peripherial clk", INVALID);
 
     // sdram clk
     QTreeWidgetItem *sdrclk = 0;
-    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "SDRC", en) &&
-        helper.ReadRegisterField("CMU", "DEVCLKEN", "SDRM", tmp0) &&
-        helper.ReadRegisterField("SDR", "EN", "EN", tmp1) &&
-        helper.ReadRegisterField("CMU", "SDRCLK", "SDRDIV", tmp2))
+    if(ReadFieldOld("CMU", "DEVCLKEN", "SDRC", en) &&
+        ReadFieldOld("CMU", "DEVCLKEN", "SDRM", tmp0) &&
+        ReadFieldOld("SDR", "EN", "EN", tmp1) &&
+        ReadFieldOld("CMU", "SDRCLK", "SDRDIV", tmp2))
     {
         en &= tmp0 & tmp1;
         sdrclk = AddClock(sysclk, "sdram clk", en ? FROM_PARENT: DISABLED, 1, tmp2+1);
@@ -233,18 +263,18 @@ void ClockAnalyser::FillTreeATJ213X()
 
     // nand clk
     QTreeWidgetItem *nandclk = 0;
-    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "NAND", en) &&
-        helper.ReadRegisterField("CMU", "NANDCLK", "NANDDIV", tmp0))
+    if(ReadFieldOld("CMU", "DEVCLKEN", "NAND", en) &&
+        ReadFieldOld("CMU", "NANDCLK", "NANDDIV", tmp0))
         nandclk = AddClock(corepll, "nand clk", en ? FROM_PARENT : DISABLED, 1, tmp0+1);
     else
         nandclk = AddClock(corepll, "nand clk", INVALID);
 
     // sd clk
     QTreeWidgetItem *sdclk = 0;
-    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "SD", tmp0) &&
-        helper.ReadRegisterField("CMU", "SDCLK", "CKEN" , tmp1) &&
-        helper.ReadRegisterField("CMU", "SDCLK", "D128" , tmp2) &&
-        helper.ReadRegisterField("CMU", "SDCLK", "SDDIV" , tmp3))
+    if(ReadFieldOld("CMU", "DEVCLKEN", "SD", tmp0) &&
+        ReadFieldOld("CMU", "SDCLK", "CKEN" , tmp1) &&
+        ReadFieldOld("CMU", "SDCLK", "D128" , tmp2) &&
+        ReadFieldOld("CMU", "SDCLK", "SDDIV" , tmp3))
     {
         en = tmp0 & tmp1;
         sdclk = AddClock(corepll, "sd clk", en ? FROM_PARENT : DISABLED,
@@ -255,8 +285,8 @@ void ClockAnalyser::FillTreeATJ213X()
 
     // mha clk
     QTreeWidgetItem *mhaclk = 0;
-    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "MHA", en) &&
-        helper.ReadRegisterField("CMU", "MHACLK", "MHADIV", tmp1))
+    if(ReadFieldOld("CMU", "DEVCLKEN", "MHA", en) &&
+        ReadFieldOld("CMU", "MHACLK", "MHADIV", tmp1))
         mhaclk = AddClock(corepll, "mha clk", en ? FROM_PARENT : DISABLED,
                           1, tmp1+1);
     else
@@ -264,8 +294,8 @@ void ClockAnalyser::FillTreeATJ213X()
 
     // mca clk
     QTreeWidgetItem *mcaclk = 0;
-    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "MCA", en) &&
-        helper.ReadRegisterField("CMU", "MCACLK", "MCADIV", tmp1))
+    if(ReadFieldOld("CMU", "DEVCLKEN", "MCA", en) &&
+        ReadFieldOld("CMU", "MCACLK", "MCADIV", tmp1))
         mcaclk = AddClock(corepll, "mca clk", en ? FROM_PARENT : DISABLED,
                           1, tmp1+1);
     else
@@ -273,11 +303,11 @@ void ClockAnalyser::FillTreeATJ213X()
 
     // backlight pwm
     QTreeWidgetItem *pwmclk = 0;
-    if (helper.ReadRegisterField("CMU", "FMCLK", "BCKE", en) &&
-        helper.ReadRegisterField("CMU", "FMCLK", "BCKS", tmp1) &&
-        helper.ReadRegisterField("CMU", "FMCLK", "BCKCON", tmp2))
+    if(ReadFieldOld("CMU", "FMCLK", "BCKE", en) &&
+        ReadFieldOld("CMU", "FMCLK", "BCKS", tmp1) &&
+        ReadFieldOld("CMU", "FMCLK", "BCKCON", tmp2))
     {
-        if (tmp1)
+        if(tmp1)
         {
             // HOSC/8 input clk
             pwmclk = AddClock(hosc_clk, "pwm clk", en ? FROM_PARENT : DISABLED,
@@ -296,9 +326,9 @@ void ClockAnalyser::FillTreeATJ213X()
     // i2c clk
     QTreeWidgetItem *i2c1clk = 0;
     QTreeWidgetItem *i2c2clk = 0;
-    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "I2C", en) &&
-        helper.ReadRegisterField("I2C1", "CTL", "EN", tmp0) &&
-        helper.ReadRegisterField("I2C1", "CLKDIV", "CLKDIV", tmp1))
+    if(ReadFieldOld("CMU", "DEVCLKEN", "I2C", en) &&
+        ReadFieldOld("I2C1", "CTL", "EN", tmp0) &&
+        ReadFieldOld("I2C1", "CLKDIV", "CLKDIV", tmp1))
     {
         en &= tmp0;
         i2c1clk = AddClock(pclk, "i2c1 clk", en ? FROM_PARENT : DISABLED,
@@ -309,16 +339,16 @@ void ClockAnalyser::FillTreeATJ213X()
         i2c1clk = AddClock(pclk, "i2c1 clk", INVALID);
     }
 
-    if (helper.ReadRegisterField("CMU", "DEVCLKEN", "I2C", en) &&
-        helper.ReadRegisterField("I2C2", "CTL", "EN", tmp0) &&
-        helper.ReadRegisterField("I2C2", "CLKDIV", "CLKDIV", tmp1))
+    if(ReadFieldOld("CMU", "DEVCLKEN", "I2C", en) &&
+        ReadFieldOld("I2C2", "CTL", "EN", tmp0) &&
+        ReadFieldOld("I2C2", "CLKDIV", "CLKDIV", tmp1))
     {
         en &= tmp0;
         i2c2clk = AddClock(pclk, "i2c2 clk", en ? FROM_PARENT : DISABLED,
                            1, 16*(tmp1+1));
     }
     else
-    {   
+    {
         i2c2clk = AddClock(pclk, "i2c2 clk", INVALID);
     }
 
@@ -340,17 +370,15 @@ void ClockAnalyser::FillTreeRK27XX()
     soc_word_t value, value2, value3, value4;
     soc_word_t bypass, clkr, clkf, clkod, pll_off;
 
-    BackendHelper helper(m_io_backend, m_soc);
-
     QTreeWidgetItem *xtal_clk = AddClock(0, "xtal clk", 24000000);
 
     // F = (Fref*F)/R/OD = (Fref*F)/R/OD
     QTreeWidgetItem *arm_pll = 0;
-    if (helper.ReadRegisterField("SCU", "PLLCON1", "ARM_PLL_BYPASS", bypass) &&
-        helper.ReadRegisterField("SCU", "PLLCON1", "ARM_PLL_CLKR", clkr) &&
-        helper.ReadRegisterField("SCU", "PLLCON1", "ARM_PLL_CLKF", clkf) &&
-        helper.ReadRegisterField("SCU", "PLLCON1", "ARM_PLL_CLKOD", clkod) &&
-        helper.ReadRegisterField("SCU", "PLLCON1", "ARM_PLL_POWERDOWN", pll_off))
+    if(ReadFieldOld("SCU", "PLLCON1", "ARM_PLL_BYPASS", bypass) &&
+        ReadFieldOld("SCU", "PLLCON1", "ARM_PLL_CLKR", clkr) &&
+        ReadFieldOld("SCU", "PLLCON1", "ARM_PLL_CLKF", clkf) &&
+        ReadFieldOld("SCU", "PLLCON1", "ARM_PLL_CLKOD", clkod) &&
+        ReadFieldOld("SCU", "PLLCON1", "ARM_PLL_POWERDOWN", pll_off))
     {
         arm_pll = AddClock(xtal_clk, "arm pll", pll_off ? DISABLED : FROM_PARENT,
                            bypass ? 1 : clkf+1, bypass ? 1 : (clkr+1)*(clkod+1));
@@ -363,9 +391,9 @@ void ClockAnalyser::FillTreeRK27XX()
     QTreeWidgetItem *arm_clk = 0;
     QTreeWidgetItem *hclk = 0;
     QTreeWidgetItem *pclk = 0;
-    if(helper.ReadRegisterField("SCU", "DIVCON1", "ARM_SLOW_MODE", value) &&
-       helper.ReadRegisterField("SCU", "DIVCON1", "ARM_CLK_DIV", value2) &&
-       helper.ReadRegisterField("SCU", "DIVCON1", "PCLK_CLK_DIV", value3))
+    if(ReadFieldOld("SCU", "DIVCON1", "ARM_SLOW_MODE", value) &&
+       ReadFieldOld("SCU", "DIVCON1", "ARM_CLK_DIV", value2) &&
+       ReadFieldOld("SCU", "DIVCON1", "PCLK_CLK_DIV", value3))
     {
         arm_clk = AddClock(value ? xtal_clk : arm_pll, "arm clk", FROM_PARENT, 1, value2 ? 2 : 1);
         hclk = AddClock(arm_clk, "hclk", FROM_PARENT, 1, value2 ? 1 : 2);
@@ -379,11 +407,11 @@ void ClockAnalyser::FillTreeRK27XX()
     }
 
     QTreeWidgetItem *dsp_pll = 0;
-    if (helper.ReadRegisterField("SCU", "PLLCON2", "DSP_PLL_BYPASS", bypass) &&
-        helper.ReadRegisterField("SCU", "PLLCON2", "DSP_PLL_CLKR", clkr) &&
-        helper.ReadRegisterField("SCU", "PLLCON2", "DSP_PLL_CLKF", clkf) &&
-        helper.ReadRegisterField("SCU", "PLLCON2", "DSP_PLL_CLKOD", clkod) &&
-        helper.ReadRegisterField("SCU", "PLLCON2", "DSP_PLL_POWERDOWN", pll_off))
+    if(ReadFieldOld("SCU", "PLLCON2", "DSP_PLL_BYPASS", bypass) &&
+        ReadFieldOld("SCU", "PLLCON2", "DSP_PLL_CLKR", clkr) &&
+        ReadFieldOld("SCU", "PLLCON2", "DSP_PLL_CLKF", clkf) &&
+        ReadFieldOld("SCU", "PLLCON2", "DSP_PLL_CLKOD", clkod) &&
+        ReadFieldOld("SCU", "PLLCON2", "DSP_PLL_POWERDOWN", pll_off))
     {
         dsp_pll = AddClock(xtal_clk, "dsp pll", pll_off ? DISABLED : FROM_PARENT,
                            bypass ? 1 : clkf+1, bypass ? 1 : (clkr+1)*(clkod+1));
@@ -396,11 +424,11 @@ void ClockAnalyser::FillTreeRK27XX()
     QTreeWidgetItem *dsp_clk = AddClock(dsp_pll, "dsp clk", FROM_PARENT);
 
     QTreeWidgetItem *codec_pll = 0;
-    if (helper.ReadRegisterField("SCU", "PLLCON3", "CODEC_PLL_BYPASS", bypass) &&
-       helper.ReadRegisterField("SCU", "PLLCON3", "CODEC_PLL_CLKR", clkr) &&
-       helper.ReadRegisterField("SCU", "PLLCON3", "CODEC_PLL_CLKF", clkf) &&
-       helper.ReadRegisterField("SCU", "PLLCON3", "CODEC_PLL_CLKOD", clkod) &&
-       helper.ReadRegisterField("SCU", "PLLCON3", "CODEC_PLL_POWERDOWN", pll_off))
+    if(ReadFieldOld("SCU", "PLLCON3", "CODEC_PLL_BYPASS", bypass) &&
+       ReadFieldOld("SCU", "PLLCON3", "CODEC_PLL_CLKR", clkr) &&
+       ReadFieldOld("SCU", "PLLCON3", "CODEC_PLL_CLKF", clkf) &&
+       ReadFieldOld("SCU", "PLLCON3", "CODEC_PLL_CLKOD", clkod) &&
+       ReadFieldOld("SCU", "PLLCON3", "CODEC_PLL_POWERDOWN", pll_off))
     {
         codec_pll = AddClock(xtal_clk, "codec pll", pll_off ? DISABLED : FROM_PARENT,
                              bypass ? 1 : clkf+1, bypass ? 1 : (clkr+1)*(clkod+1));
@@ -411,8 +439,8 @@ void ClockAnalyser::FillTreeRK27XX()
     }
 
     QTreeWidgetItem *codec_clk = 0;
-    if (helper.ReadRegisterField("SCU", "DIVCON1", "CODEC_CLK_SRC", value) &&
-        helper.ReadRegisterField("SCU", "DIVCON1", "CODEC_CLK_DIV", value2))
+    if(ReadFieldOld("SCU", "DIVCON1", "CODEC_CLK_SRC", value) &&
+        ReadFieldOld("SCU", "DIVCON1", "CODEC_CLK_DIV", value2))
     {
         codec_clk = AddClock(value ? xtal_clk : codec_pll, "codec clk", FROM_PARENT, 1, value ? 1 : (value2 + 1));
     }
@@ -422,7 +450,7 @@ void ClockAnalyser::FillTreeRK27XX()
     }
 
     QTreeWidgetItem *lsadc_clk = 0;
-    if (helper.ReadRegisterField("SCU", "DIVCON1", "LSADC_CLK_DIV", value))
+    if(ReadFieldOld("SCU", "DIVCON1", "LSADC_CLK_DIV", value))
     {
         lsadc_clk = AddClock(pclk, "lsadc clk", FROM_PARENT, 1, (value+1));
     }
@@ -432,11 +460,11 @@ void ClockAnalyser::FillTreeRK27XX()
     }
 
     QTreeWidgetItem *lcdc_clk = 0;
-    if (helper.ReadRegisterField("SCU", "DIVCON1", "LCDC_CLK", value) &&
-        helper.ReadRegisterField("SCU", "DIVCON1", "LCDC_CLK_DIV", value2) &&
-        helper.ReadRegisterField("SCU", "DIVCON1", "LCDC_CLK_DIV_SRC", value3))
+    if(ReadFieldOld("SCU", "DIVCON1", "LCDC_CLK", value) &&
+        ReadFieldOld("SCU", "DIVCON1", "LCDC_CLK_DIV", value2) &&
+        ReadFieldOld("SCU", "DIVCON1", "LCDC_CLK_DIV_SRC", value3))
     {
-        if (value)
+        if(value)
         {
             lcdc_clk = AddClock(xtal_clk, "lcdc clk", FROM_PARENT);
         }
@@ -456,9 +484,9 @@ void ClockAnalyser::FillTreeRK27XX()
     }
 
     QTreeWidgetItem *pwm0_clk = 0;
-    if(helper.ReadRegisterField("PWM0", "LRC", "TR", value) &&
-       helper.ReadRegisterField("PWM0", "CTRL", "PRESCALE", value3) &&
-       helper.ReadRegisterField("PWM0", "CTRL", "PWM_EN", value4))
+    if(ReadFieldOld("PWM0", "LRC", "TR", value) &&
+       ReadFieldOld("PWM0", "CTRL", "PRESCALE", value3) &&
+       ReadFieldOld("PWM0", "CTRL", "PWM_EN", value4))
     {
         pwm0_clk = AddClock(pclk, "pwm0 clk", value4 ? FROM_PARENT : DISABLED, 1, 2*value*(1<<value3));
     }
@@ -468,9 +496,9 @@ void ClockAnalyser::FillTreeRK27XX()
     }
 
     QTreeWidgetItem *pwm1_clk = 0;
-    if(helper.ReadRegisterField("PWM1", "LRC", "TR", value) &&
-       helper.ReadRegisterField("PWM1", "CTRL", "PRESCALE", value3) &&
-       helper.ReadRegisterField("PWM1", "CTRL", "PWM_EN", value4))
+    if(ReadFieldOld("PWM1", "LRC", "TR", value) &&
+       ReadFieldOld("PWM1", "CTRL", "PRESCALE", value3) &&
+       ReadFieldOld("PWM1", "CTRL", "PWM_EN", value4))
     {
         pwm1_clk = AddClock(pclk, "pwm1 clk", value4 ? FROM_PARENT : DISABLED, 1, 2*value*(1<<value3));
     }
@@ -480,9 +508,9 @@ void ClockAnalyser::FillTreeRK27XX()
     }
 
     QTreeWidgetItem *pwm2_clk = 0;
-    if(helper.ReadRegisterField("PWM2", "LRC", "TR", value) &&
-       helper.ReadRegisterField("PWM2", "CTRL", "PRESCALE", value3) &&
-       helper.ReadRegisterField("PWM2", "CTRL", "PWM_EN", value4))
+    if(ReadFieldOld("PWM2", "LRC", "TR", value) &&
+       ReadFieldOld("PWM2", "CTRL", "PRESCALE", value3) &&
+       ReadFieldOld("PWM2", "CTRL", "PWM_EN", value4))
     {
         pwm2_clk = AddClock(pclk, "pwm2 clk", value4 ? FROM_PARENT : DISABLED, 1, 2*value*(1<<value3));
     }
@@ -492,9 +520,9 @@ void ClockAnalyser::FillTreeRK27XX()
     }
 
     QTreeWidgetItem *pwm3_clk = 0;
-    if(helper.ReadRegisterField("PWM3", "LRC", "TR", value) &&
-       helper.ReadRegisterField("PWM3", "CTRL", "PRESCALE", value3) &&
-       helper.ReadRegisterField("PWM3", "CTRL", "PWM_EN", value4))
+    if(ReadFieldOld("PWM3", "LRC", "TR", value) &&
+       ReadFieldOld("PWM3", "CTRL", "PRESCALE", value3) &&
+       ReadFieldOld("PWM3", "CTRL", "PWM_EN", value4))
     {
         pwm3_clk = AddClock(pclk, "pwm3", value4 ? FROM_PARENT : DISABLED, 1, 2*value*(1<<value3));
     }
@@ -504,7 +532,7 @@ void ClockAnalyser::FillTreeRK27XX()
     }
 
     QTreeWidgetItem *sdmmc_clk = 0;
-    if(helper.ReadRegisterField("SD", "CTRL", "DIVIDER", value))
+    if(ReadFieldOld("SD", "CTRL", "DIVIDER", value))
     {
         sdmmc_clk = AddClock(pclk, "sd clk", FROM_PARENT, 1, value+1);
     }
@@ -526,73 +554,72 @@ void ClockAnalyser::FillTreeRK27XX()
 
 void ClockAnalyser::FillTreeIMX233()
 {
-    BackendHelper helper(m_io_backend, m_soc);
     soc_word_t value, value2, value3;
 
     QTreeWidgetItem *ring_osc = 0;
-    if(helper.ReadRegisterField("POWER", "MINPWR", "ENABLE_OSC", value))
+    if(ReadFieldOld("POWER", "MINPWR", "ENABLE_OSC", value))
         ring_osc = AddClock(0, "ring_clk24m", value ? 24000000 : DISABLED);
     else
         ring_osc = AddClock(0, "ring_clk24m", INVALID);
     QTreeWidgetItem *xtal_osc = 0;
-    if(helper.ReadRegisterField("POWER", "MINPWR", "PWD_XTAL24", value))
+    if(ReadFieldOld("POWER", "MINPWR", "PWD_XTAL24", value))
         xtal_osc = AddClock(0, "xtal_clk24m", value ? DISABLED : 24000000);
     else
         xtal_osc = AddClock(0, "xtal_clk24m", INVALID);
     QTreeWidgetItem *ref_xtal = 0;
-    if(helper.ReadRegisterField("POWER", "MINPWR", "SELECT_OSC", value))
+    if(ReadFieldOld("POWER", "MINPWR", "SELECT_OSC", value))
         ref_xtal = AddClock(value ? ring_osc : xtal_osc, "ref_xtal", FROM_PARENT);
     else
         ref_xtal = AddClock(0, "ref_xtal", INVALID);
 
     QTreeWidgetItem *ref_pll = 0;
-    if(helper.ReadRegisterField("CLKCTRL", "PLLCTRL0", "POWER", value))
+    if(ReadFieldOld("CLKCTRL", "PLLCTRL0", "POWER", value))
         ref_pll = AddClock(ref_xtal, "ref_pll", FROM_PARENT, 20);
     else
         ref_pll = AddClock(0, "ref_pll", INVALID);
 
     QTreeWidgetItem *ref_io = 0;
-    if(helper.ReadRegisterField("CLKCTRL", "FRAC", "CLKGATEIO", value) &&
-            helper.ReadRegisterField("CLKCTRL", "FRAC", "IOFRAC", value2))
+    if(ReadFieldOld("CLKCTRL", "FRAC", "CLKGATEIO", value) &&
+            ReadFieldOld("CLKCTRL", "FRAC", "IOFRAC", value2))
         ref_io = AddClock(ref_pll, "ref_io", value ? DISABLED : FROM_PARENT, 18, value2);
     else
         ref_io = AddClock(ref_pll, "ref_io", INVALID);
 
     QTreeWidgetItem *ref_pix = 0;
-    if(helper.ReadRegisterField("CLKCTRL", "FRAC", "CLKGATEPIX", value) &&
-            helper.ReadRegisterField("CLKCTRL", "FRAC", "PIXFRAC", value2))
+    if(ReadFieldOld("CLKCTRL", "FRAC", "CLKGATEPIX", value) &&
+            ReadFieldOld("CLKCTRL", "FRAC", "PIXFRAC", value2))
         ref_pix = AddClock(ref_pll, "ref_pix", value ? DISABLED : FROM_PARENT, 18, value2);
     else
         ref_pix = AddClock(ref_pll, "ref_pix", INVALID);
 
     QTreeWidgetItem *ref_emi = 0;
-    if(helper.ReadRegisterField("CLKCTRL", "FRAC", "CLKGATEEMI", value) &&
-            helper.ReadRegisterField("CLKCTRL", "FRAC", "EMIFRAC", value2))
+    if(ReadFieldOld("CLKCTRL", "FRAC", "CLKGATEEMI", value) &&
+            ReadFieldOld("CLKCTRL", "FRAC", "EMIFRAC", value2))
         ref_emi = AddClock(ref_pll, "ref_emi", value ? DISABLED : FROM_PARENT, 18, value2);
     else
         ref_emi = AddClock(ref_pll, "ref_emi", INVALID);
 
     QTreeWidgetItem *ref_cpu = 0;
-    if(helper.ReadRegisterField("CLKCTRL", "FRAC", "CLKGATECPU", value) &&
-            helper.ReadRegisterField("CLKCTRL", "FRAC", "CPUFRAC", value2))
+    if(ReadFieldOld("CLKCTRL", "FRAC", "CLKGATECPU", value) &&
+            ReadFieldOld("CLKCTRL", "FRAC", "CPUFRAC", value2))
         ref_cpu = AddClock(ref_pll, "ref_cpu", value ? DISABLED : FROM_PARENT, 18, value2);
     else
         ref_cpu = AddClock(ref_pll, "ref_cpu", INVALID);
 
     QTreeWidgetItem *clk_p = 0;
-    if(helper.ReadRegisterField("CLKCTRL", "CLKSEQ", "BYPASS_CPU", value))
+    if(ReadFieldOld("CLKCTRL", "CLKSEQ", "BYPASS_CPU", value))
     {
         if(!value)
         {
-            if(helper.ReadRegisterField("CLKCTRL", "CPU", "DIV_CPU", value2))
+            if(ReadFieldOld("CLKCTRL", "CPU", "DIV_CPU", value2))
                 clk_p = AddClock(ref_cpu, "clk_p", FROM_PARENT, 1, value2);
             else
                 clk_p = AddClock(ref_cpu, "clk_p", INVALID);
         }
         else
         {
-            if(helper.ReadRegisterField("CLKCTRL", "CPU", "DIV_XTAL_FRAC_EN", value) &&
-                    helper.ReadRegisterField("CLKCTRL", "CPU", "DIV_XTAL", value2))
+            if(ReadFieldOld("CLKCTRL", "CPU", "DIV_XTAL_FRAC_EN", value) &&
+                    ReadFieldOld("CLKCTRL", "CPU", "DIV_XTAL", value2))
                 clk_p = AddClock(ref_xtal, "clk_p", FROM_PARENT, value ? 1024 : 1, value2);
             else
                 clk_p = AddClock(ref_xtal, "clk_p", INVALID);
@@ -602,101 +629,101 @@ void ClockAnalyser::FillTreeIMX233()
         clk_p = AddClock(ref_xtal, "clk_p", INVALID);
 
     QTreeWidgetItem *clk_h = 0;
-    if(helper.ReadRegisterField("CLKCTRL", "HBUS", "DIV_FRAC_EN", value) &&
-            helper.ReadRegisterField("CLKCTRL", "HBUS", "DIV", value2))
+    if(ReadFieldOld("CLKCTRL", "HBUS", "DIV_FRAC_EN", value) &&
+            ReadFieldOld("CLKCTRL", "HBUS", "DIV", value2))
         clk_h = AddClock(clk_p, "clk_h", FROM_PARENT, value ? 32 : 1, value2);
     else
         clk_h = AddClock(clk_p, "clk_h", INVALID);
 
     QTreeWidgetItem *clk_x = 0;
-    if(helper.ReadRegisterField("CLKCTRL", "XBUS", "DIV", value))
+    if(ReadFieldOld("CLKCTRL", "XBUS", "DIV", value))
         clk_x = AddClock(ref_xtal, "clk_x", FROM_PARENT, 1, value);
     else
         clk_x = AddClock(ref_xtal, "clk_x", INVALID);
 
-    if(helper.ReadRegisterField("CLKCTRL", "XTAL", "UART_CLK_GATE", value))
+    if(ReadFieldOld("CLKCTRL", "XTAL", "UART_CLK_GATE", value))
         AddClock(ref_xtal, "clk_uart", value ? DISABLED : FROM_PARENT);
     else
         AddClock(ref_xtal, "clk_uart", INVALID);
 
-    if(helper.ReadRegisterField("CLKCTRL", "XTAL", "FILT_CLK24M_GATE", value))
+    if(ReadFieldOld("CLKCTRL", "XTAL", "FILT_CLK24M_GATE", value))
         AddClock(ref_xtal, "clk_filt24m", value ? DISABLED : FROM_PARENT);
     else
         AddClock(ref_xtal, "clk_filt24m", INVALID);
 
-    if(helper.ReadRegisterField("CLKCTRL", "XTAL", "PWM_CLK24M_GATE", value))
+    if(ReadFieldOld("CLKCTRL", "XTAL", "PWM_CLK24M_GATE", value))
         AddClock(ref_xtal, "clk_pwm24m", value ? DISABLED : FROM_PARENT);
     else
         AddClock(ref_xtal, "clk_pwm24m", INVALID);
 
-    if(helper.ReadRegisterField("CLKCTRL", "XTAL", "DRI_CLK24M_GATE", value))
+    if(ReadFieldOld("CLKCTRL", "XTAL", "DRI_CLK24M_GATE", value))
         AddClock(ref_xtal, "clk_dri24m", value ? DISABLED : FROM_PARENT);
     else
         AddClock(ref_xtal, "clk_dri24m", INVALID);
 
-    if(helper.ReadRegisterField("CLKCTRL", "XTAL", "DIGCTRL_CLK1M_GATE", value))
+    if(ReadFieldOld("CLKCTRL", "XTAL", "DIGCTRL_CLK1M_GATE", value))
         AddClock(ref_xtal, "clk_1m", value ? DISABLED : FROM_PARENT, 1, 24);
     else
         AddClock(ref_xtal, "clk_1m", INVALID);
 
     QTreeWidgetItem *clk_32k = 0;
-    if(helper.ReadRegisterField("CLKCTRL", "XTAL", "TIMROT_CLK32K_GATE", value))
+    if(ReadFieldOld("CLKCTRL", "XTAL", "TIMROT_CLK32K_GATE", value))
         clk_32k = AddClock(ref_xtal, "clk_32k", value ? DISABLED : FROM_PARENT, 1, 750);
     else
         clk_32k = AddClock(ref_xtal, "clk_32k", INVALID);
 
     AddClock(clk_32k, "clk_adc", FROM_PARENT, 1, 16);
 
-    if(helper.ReadRegisterField("CLKCTRL", "CLKSEQ", "BYPASS_PIX", value) &&
-            helper.ReadRegisterField("CLKCTRL", "PIX", "DIV", value2))
+    if(ReadFieldOld("CLKCTRL", "CLKSEQ", "BYPASS_PIX", value) &&
+            ReadFieldOld("CLKCTRL", "PIX", "DIV", value2))
         AddClock(value ? ref_xtal : ref_pix, "clk_pix", FROM_PARENT, 1, value2);
     else
         AddClock(ref_xtal, "clk_p", INVALID);
 
     QTreeWidgetItem *clk_ssp = 0;
-    if(helper.ReadRegisterField("CLKCTRL", "CLKSEQ", "BYPASS_SSP", value) &&
-            helper.ReadRegisterField("CLKCTRL", "SSP", "DIV", value2) &&
-            helper.ReadRegisterField("CLKCTRL", "SSP", "CLKGATE", value3))
+    if(ReadFieldOld("CLKCTRL", "CLKSEQ", "BYPASS_SSP", value) &&
+            ReadFieldOld("CLKCTRL", "SSP", "DIV", value2) &&
+            ReadFieldOld("CLKCTRL", "SSP", "CLKGATE", value3))
         clk_ssp = AddClock(value ? ref_xtal : ref_io, "clk_ssp", value3 ? DISABLED : FROM_PARENT, 1, value2);
     else
         clk_ssp = AddClock(ref_xtal, "clk_p", INVALID);
 
-    if(helper.ReadRegisterField("SSP1", "TIMING", "CLOCK_DIVIDE", value) &&
-            helper.ReadRegisterField("SSP1", "TIMING", "CLOCK_RATE", value2) &&
-            helper.ReadRegisterField("SSP1", "CTRL0", "CLKGATE", value3))
+    if(ReadFieldOld("SSP1", "TIMING", "CLOCK_DIVIDE", value) &&
+            ReadFieldOld("SSP1", "TIMING", "CLOCK_RATE", value2) &&
+            ReadFieldOld("SSP1", "CTRL0", "CLKGATE", value3))
         AddClock(clk_ssp, "clk_ssp1", value3 ? DISABLED : FROM_PARENT, 1, value * (1 + value2));
     else
         AddClock(clk_ssp, "clk_ssp1", INVALID);
 
-    if(helper.ReadRegisterField("SSP2", "TIMING", "CLOCK_DIVIDE", value) &&
-            helper.ReadRegisterField("SSP2", "TIMING", "CLOCK_RATE", value2) &&
-            helper.ReadRegisterField("SSP2", "CTRL0", "CLKGATE", value3))
+    if(ReadFieldOld("SSP2", "TIMING", "CLOCK_DIVIDE", value) &&
+            ReadFieldOld("SSP2", "TIMING", "CLOCK_RATE", value2) &&
+            ReadFieldOld("SSP2", "CTRL0", "CLKGATE", value3))
         AddClock(clk_ssp, "clk_ssp2", value3 ? DISABLED : FROM_PARENT, 1, value * (1 + value2));
     else
         AddClock(clk_ssp, "clk_ssp2", INVALID);
 
     QTreeWidgetItem *clk_gpmi = 0;
-    if(helper.ReadRegisterField("CLKCTRL", "CLKSEQ", "BYPASS_GPMI", value) &&
-            helper.ReadRegisterField("CLKCTRL", "GPMI", "DIV", value2) &&
-            helper.ReadRegisterField("CLKCTRL", "GPMI", "CLKGATE", value3))
+    if(ReadFieldOld("CLKCTRL", "CLKSEQ", "BYPASS_GPMI", value) &&
+            ReadFieldOld("CLKCTRL", "GPMI", "DIV", value2) &&
+            ReadFieldOld("CLKCTRL", "GPMI", "CLKGATE", value3))
         clk_gpmi = AddClock(value ? ref_xtal : ref_io, "clk_gpmi", value3 ? DISABLED : FROM_PARENT, 1, value2);
     else
         clk_gpmi = AddClock(ref_xtal, "clk_p", INVALID);
 
-    if(helper.ReadRegisterField("CLKCTRL", "CLKSEQ", "BYPASS_EMI", value))
+    if(ReadFieldOld("CLKCTRL", "CLKSEQ", "BYPASS_EMI", value))
     {
         if(!value)
         {
-            if(helper.ReadRegisterField("CLKCTRL", "EMI", "DIV_EMI", value2) &&
-                    helper.ReadRegisterField("CLKCTRL", "EMI", "CLKGATE", value3))
+            if(ReadFieldOld("CLKCTRL", "EMI", "DIV_EMI", value2) &&
+                    ReadFieldOld("CLKCTRL", "EMI", "CLKGATE", value3))
                 AddClock(ref_emi, "clk_emi", value3 ? DISABLED : FROM_PARENT, 1, value2);
             else
                 AddClock(ref_emi, "clk_emi", INVALID);
         }
         else
         {
-            if(helper.ReadRegisterField("CLKCTRL", "EMI", "DIV_XTAL", value2) &&
-                    helper.ReadRegisterField("CLKCTRL", "EMI", "CLKGATE", value3))
+            if(ReadFieldOld("CLKCTRL", "EMI", "DIV_XTAL", value2) &&
+                    ReadFieldOld("CLKCTRL", "EMI", "CLKGATE", value3))
                 AddClock(ref_xtal, "clk_emi", value3 ? DISABLED : FROM_PARENT, 1, value2);
             else
                 AddClock(ref_xtal, "clk_emi", INVALID);
@@ -707,27 +734,27 @@ void ClockAnalyser::FillTreeIMX233()
 
     QTreeWidgetItem *ref_vid = AddClock(ref_pll, "clk_vid", FROM_PARENT);
 
-    if(helper.ReadRegisterField("CLKCTRL", "TV", "CLK_TV108M_GATE", value) &&
-            helper.ReadRegisterField("CLKCTRL", "TV", "CLK_TV_GATE", value2))
+    if(ReadFieldOld("CLKCTRL", "TV", "CLK_TV108M_GATE", value) &&
+            ReadFieldOld("CLKCTRL", "TV", "CLK_TV_GATE", value2))
     {
         QTreeWidgetItem *clk_tv108m = AddClock(ref_vid, "clk_tv108m", value ? DISABLED : FROM_PARENT, 1, 4);
         AddClock(clk_tv108m, "clk_tv54m", value2 ? DISABLED : FROM_PARENT, 1, 2);
         AddClock(clk_tv108m, "clk_tv27m", value2 ? DISABLED : FROM_PARENT, 1, 4);
     }
 
-    if(helper.ReadRegisterField("CLKCTRL", "PLLCTRL0", "EN_USB_CLKS", value))
+    if(ReadFieldOld("CLKCTRL", "PLLCTRL0", "EN_USB_CLKS", value))
         AddClock(ref_pll, "utmi_clk480m", value ? FROM_PARENT : DISABLED);
     else
         AddClock(ref_pll, "utmi_clk480m", INVALID);
 
     QTreeWidgetItem *xtal_clk32k = 0;
-    if(helper.ReadRegisterField("RTC", "PERSISTENT0", "XTAL32_FREQ", value) &&
-            helper.ReadRegisterField("RTC", "PERSISTENT0", "XTAL32KHZ_PWRUP", value2))
+    if(ReadFieldOld("RTC", "PERSISTENT0", "XTAL32_FREQ", value) &&
+            ReadFieldOld("RTC", "PERSISTENT0", "XTAL32KHZ_PWRUP", value2))
         xtal_clk32k = AddClock(0, "xtal_clk32k", value2 == 0 ? DISABLED : value ? 32000 : 32768);
     else
         xtal_clk32k = AddClock(0, "xtal_clk32k", INVALID);
 
-    if(helper.ReadRegisterField("RTC", "PERSISTENT0", "CLOCKSOURCE", value))
+    if(ReadFieldOld("RTC", "PERSISTENT0", "CLOCKSOURCE", value))
         AddClock(value ? xtal_clk32k : ref_xtal, "clk_rtc32k", FROM_PARENT, 1, value ? 1 : 768);
     else
         AddClock(ref_xtal, "clk_rtc32k", INVALID);
@@ -742,8 +769,8 @@ static TmplAnalyserFactory< ClockAnalyser > g_clock_factory(true, "Clock Analyse
 /**
  * EMI analyser
  */
-EmiAnalyser::EmiAnalyser(const SocRef& soc, IoBackend *backend)
-    :Analyser(soc, backend)
+EmiAnalyser::EmiAnalyser(const soc_desc::soc_ref_t& soc, IoBackend *backend)
+    :AnalyserEx(soc, backend)
 {
     m_display_mode = DisplayCycles;
     m_group = new QGroupBox("EMI Analyser");
@@ -870,26 +897,25 @@ void EmiAnalyser::FillTable()
 {
     while(m_panel->count() > 0)
         m_panel->removeItem(0);
-    BackendHelper helper(m_io_backend, m_soc);
     soc_word_t value;
 
     m_emi_freq = 0;
-    if(helper.ReadRegisterField("CLKCTRL", "CLKSEQ", "BYPASS_EMI", value))
+    if(ReadFieldOld("CLKCTRL", "CLKSEQ", "BYPASS_EMI", value))
     {
         bool ret;
         if(value)
         {
             m_emi_freq = 24000000;
-            ret = helper.ReadRegisterField("CLKCTRL", "EMI", "DIV_XTAL", value);
+            ret = ReadFieldOld("CLKCTRL", "EMI", "DIV_XTAL", value);
         }
         else
         {
             m_emi_freq = 480000000;
-            if(helper.ReadRegisterField("CLKCTRL", "FRAC", "EMIFRAC", value))
+            if(ReadFieldOld("CLKCTRL", "FRAC", "EMIFRAC", value))
                 m_emi_freq = 18 * (int64_t)m_emi_freq / value;
             else
                 m_emi_freq = 0;
-            ret = helper.ReadRegisterField("CLKCTRL", "EMI", "DIV_EMI", value);
+            ret = ReadFieldOld("CLKCTRL", "EMI", "DIV_EMI", value);
         }
         if(ret)
             m_emi_freq /= value;
@@ -900,7 +926,7 @@ void EmiAnalyser::FillTable()
     m_emi_freq_label->setText(QString().sprintf("%.3f", m_emi_freq / 1000000.0));
 
     NewGroup("Control Parameters");
-    if(helper.ReadRegisterField("EMI", "CTRL", "PORT_PRIORITY_ORDER", value))
+    if(ReadFieldOld("EMI", "CTRL", "PORT_PRIORITY_ORDER", value))
     {
         QStringList ports;
         ports << "AXI0" << "AHB1" << "AHB2" << "AHB3";
@@ -913,38 +939,38 @@ void EmiAnalyser::FillTable()
         AddLine("Port Priority Order", value, "", order);
     }
 
-    if(helper.ReadRegisterField("EMI", "CTRL", "MEM_WIDTH", value))
+    if(ReadFieldOld("EMI", "CTRL", "MEM_WIDTH", value))
         AddLine("Memory Width", value ? 16 : 8, "-bit");
 
-    if(helper.ReadRegisterField("DRAM", "CTL03", "AP", value))
+    if(ReadFieldOld("DRAM", "CTL03", "AP", value))
         AddLine("Auto Pre-Charge", NONE, value ? "Yes" : "No");
 
     bool bypass_mode = false;
-    if(helper.ReadRegisterField("DRAM", "CTL04", "DLL_BYPASS_MODE", value))
+    if(ReadFieldOld("DRAM", "CTL04", "DLL_BYPASS_MODE", value))
     {
         bypass_mode = value == 1;
         AddLine("DLL Bypass Mode", NONE, value ? "Yes" : "No");
     }
 
-    if(helper.ReadRegisterField("DRAM", "CTL05", "EN_LOWPOWER_MODE", value))
+    if(ReadFieldOld("DRAM", "CTL05", "EN_LOWPOWER_MODE", value))
         AddLine("Low Power Mode", NONE, value ? "Enabled" : "Disabled");
 
-    if(helper.ReadRegisterField("DRAM", "CTL08", "SREFRESH", value))
+    if(ReadFieldOld("DRAM", "CTL08", "SREFRESH", value))
         AddLine("Self Refresh", NONE, value ? "Yes" : "No");
 
-    if(helper.ReadRegisterField("DRAM", "CTL08", "SDR_MODE", value))
+    if(ReadFieldOld("DRAM", "CTL08", "SDR_MODE", value))
         AddLine("Mode", NONE, value ? "SDR" : "DDR");
 
-    if(helper.ReadRegisterField("DRAM", "CTL10", "ADDR_PINS", value))
+    if(ReadFieldOld("DRAM", "CTL10", "ADDR_PINS", value))
         AddLine("Address Pins", 13 - value, "");
 
-    if(helper.ReadRegisterField("DRAM", "CTL11", "COLUMN_SIZE", value))
+    if(ReadFieldOld("DRAM", "CTL11", "COLUMN_SIZE", value))
         AddLine("Column Size", 12 - value, "-bit");
 
-    if(helper.ReadRegisterField("DRAM", "CTL11", "CASLAT", value))
+    if(ReadFieldOld("DRAM", "CTL11", "CASLAT", value))
         AddLine("Encoded CAS", value, "", "Memory device dependent");
 
-    if(helper.ReadRegisterField("DRAM", "CTL14", "CS_MAP", value))
+    if(ReadFieldOld("DRAM", "CTL14", "CS_MAP", value))
     {
         QString v;
         for(int i = 0; i < 4; i++)
@@ -957,12 +983,12 @@ void EmiAnalyser::FillTable()
         AddLine("Chip Select Pins", NONE, v, "");
     }
 
-    if(helper.ReadRegisterField("DRAM", "CTL37", "TREF_ENABLE", value))
+    if(ReadFieldOld("DRAM", "CTL37", "TREF_ENABLE", value))
         AddLine("Refresh Commands", NONE, value ? "Enabled" : "Disabled", "Issue self-refresh every TREF cycles");
 
     NewGroup("Frequency Parameters");
 
-    if(helper.ReadRegisterField("DRAM", "CTL13", "CASLAT_LIN_GATE", value))
+    if(ReadFieldOld("DRAM", "CTL13", "CASLAT_LIN_GATE", value))
     {
         if(value >= 3 && value <= 10 && value != 9)
         {
@@ -972,7 +998,7 @@ void EmiAnalyser::FillTable()
         else
             AddLine("CAS Gate", NONE, "Reserved", "Reserved value");
     }
-    if(helper.ReadRegisterField("DRAM", "CTL13", "CASLAT_LIN", value))
+    if(ReadFieldOld("DRAM", "CTL13", "CASLAT_LIN", value))
     {
         if(value >= 3 && value <= 10 && value != 9)
         {
@@ -983,97 +1009,97 @@ void EmiAnalyser::FillTable()
             AddLine("CAS Latency", NONE, "Reserved", "Reserved value");
     }
 
-    if(helper.ReadRegisterField("DRAM", "CTL12", "TCKE", value))
+    if(ReadFieldOld("DRAM", "CTL12", "TCKE", value))
         AddCycleLine("tCKE", value, value, 0, "Minimum CKE pulse width");
 
-    if(helper.ReadRegisterField("DRAM", "CTL15", "TDAL", value))
+    if(ReadFieldOld("DRAM", "CTL15", "TDAL", value))
         AddCycleLine("tDAL", value, value, 0, "Auto pre-charge write recovery time");
 
-    if(helper.ReadRegisterField("DRAM", "CTL31", "TDLL", value))
+    if(ReadFieldOld("DRAM", "CTL31", "TDLL", value))
         AddCycleLine("tDLL", value, value, 0, "DLL lock time");
 
-    if(helper.ReadRegisterField("DRAM", "CTL10", "TEMRS", value))
+    if(ReadFieldOld("DRAM", "CTL10", "TEMRS", value))
         AddCycleLine("tEMRS", value, value, 0, "Extended mode parameter set time");
 
-    if(helper.ReadRegisterField("DRAM", "CTL34", "TINIT", value))
+    if(ReadFieldOld("DRAM", "CTL34", "TINIT", value))
         AddCycleLine("tINIT", value, value, 0, "Initialisation time");
 
-    if(helper.ReadRegisterField("DRAM", "CTL16", "TMRD", value))
+    if(ReadFieldOld("DRAM", "CTL16", "TMRD", value))
         AddCycleLine("tMRD", value, value, 0, "Mode register set command time");
 
-    if(helper.ReadRegisterField("DRAM", "CTL40", "TPDEX", value))
+    if(ReadFieldOld("DRAM", "CTL40", "TPDEX", value))
         AddCycleLine("tPDEX", value, value, 0, "Power down exit time");
 
-    if(helper.ReadRegisterField("DRAM", "CTL32", "TRAS_MAX", value))
+    if(ReadFieldOld("DRAM", "CTL32", "TRAS_MAX", value))
         AddCycleLine("tRAS Max", value, value, 0, "Maximum row activate time");
 
-    if(helper.ReadRegisterField("DRAM", "CTL20", "TRAS_MIN", value))
+    if(ReadFieldOld("DRAM", "CTL20", "TRAS_MIN", value))
         AddCycleLine("tRAS Min", value, value, 0, "Minimum row activate time");
 
-    if(helper.ReadRegisterField("DRAM", "CTL17", "TRC", value))
+    if(ReadFieldOld("DRAM", "CTL17", "TRC", value))
         AddCycleLine("tRC", value, value, 0, "Activate to activate delay (same bank)");
 
-    if(helper.ReadRegisterField("DRAM", "CTL20", "TRCD_INT", value))
+    if(ReadFieldOld("DRAM", "CTL20", "TRCD_INT", value))
         AddCycleLine("tRCD", value, value, 0, "RAS to CAS");
 
-    if(helper.ReadRegisterField("DRAM", "CTL26", "TREF", value))
+    if(ReadFieldOld("DRAM", "CTL26", "TREF", value))
         AddCycleLine("tREF", value, value, 0, "Refresh to refresh time");
 
-    if(helper.ReadRegisterField("DRAM", "CTL21", "TRFC", value))
+    if(ReadFieldOld("DRAM", "CTL21", "TRFC", value))
         AddCycleLine("tRFC", value, value, 0, "Refresh command time");
 
-    if(helper.ReadRegisterField("DRAM", "CTL15", "TRP", value))
+    if(ReadFieldOld("DRAM", "CTL15", "TRP", value))
         AddCycleLine("tRP", value, value, 0, "Pre-charge command time");
 
-    if(helper.ReadRegisterField("DRAM", "CTL12", "TRRD", value))
+    if(ReadFieldOld("DRAM", "CTL12", "TRRD", value))
         AddCycleLine("tRRD", value, value, 0, "Activate to activate delay (different banks)");
 
-    if(helper.ReadRegisterField("DRAM", "CTL12", "TWR_INT", value))
+    if(ReadFieldOld("DRAM", "CTL12", "TWR_INT", value))
         AddCycleLine("tWR", value, value, 0, "Write recovery time");
 
-    if(helper.ReadRegisterField("DRAM", "CTL13", "TWTR", value))
+    if(ReadFieldOld("DRAM", "CTL13", "TWTR", value))
         AddCycleLine("tWTR", value, value, 0, "Write to read delay");
 
-    if(helper.ReadRegisterField("DRAM", "CTL32", "TXSNR", value))
+    if(ReadFieldOld("DRAM", "CTL32", "TXSNR", value))
         AddCycleLine("tXSNR", value, value, 0, "");
 
-    if(helper.ReadRegisterField("DRAM", "CTL33", "TXSR", value))
+    if(ReadFieldOld("DRAM", "CTL33", "TXSR", value))
         AddCycleLine("tXSR", value, value, 0, "Self-refresh exit time");
 
     NewGroup("DLL Parameters");
 
     if(bypass_mode)
     {
-        if(helper.ReadRegisterField("DRAM", "CTL19", "DLL_DQS_DELAY_BYPASS_0", value))
+        if(ReadFieldOld("DRAM", "CTL19", "DLL_DQS_DELAY_BYPASS_0", value))
             AddLine("DLL DQS Delay 0", value, "", "In 1/128 fraction of a cycle (bypass mode)");
 
-        if(helper.ReadRegisterField("DRAM", "CTL19", "DLL_DQS_DELAY_BYPASS_0", value))
+        if(ReadFieldOld("DRAM", "CTL19", "DLL_DQS_DELAY_BYPASS_0", value))
             AddLine("DLL DQS Delay 1", value, "", "In 1/128 fraction of a cycle (bypass mode)");
 
-        if(helper.ReadRegisterField("DRAM", "CTL19", "DQS_OUT_SHIFT_BYPASS", value))
+        if(ReadFieldOld("DRAM", "CTL19", "DQS_OUT_SHIFT_BYPASS", value))
             AddLine("DQS Out Delay", value, "", "(bypass mode)");
 
-        if(helper.ReadRegisterField("DRAM", "CTL20", "WR_DQS_SHIFT_BYPASS", value))
+        if(ReadFieldOld("DRAM", "CTL20", "WR_DQS_SHIFT_BYPASS", value))
             AddLine("DQS Write Delay", value, "", "(bypass mode)");
     }
     else
     {
-        if(helper.ReadRegisterField("DRAM", "CTL17", "DLL_START_POINT", value))
+        if(ReadFieldOld("DRAM", "CTL17", "DLL_START_POINT", value))
             AddLine("DLL Start Point", value, "", "Initial delay count");
 
-        if(helper.ReadRegisterField("DRAM", "CTL17", "DLL_INCREMENT", value))
+        if(ReadFieldOld("DRAM", "CTL17", "DLL_INCREMENT", value))
             AddLine("DLL Increment", value, "", "Delay increment");
 
-        if(helper.ReadRegisterField("DRAM", "CTL18", "DLL_DQS_DELAY_0", value))
+        if(ReadFieldOld("DRAM", "CTL18", "DLL_DQS_DELAY_0", value))
             AddLine("DLL DQS Delay 0", value, "", "In 1/128 fraction of a cycle");
 
-        if(helper.ReadRegisterField("DRAM", "CTL18", "DLL_DQS_DELAY_1", value))
+        if(ReadFieldOld("DRAM", "CTL18", "DLL_DQS_DELAY_1", value))
             AddLine("DLL DQS Delay 1", value, "", "In 1/128 fraction of a cycle");
 
-        if(helper.ReadRegisterField("DRAM", "CTL19", "DQS_OUT_SHIFT", value))
+        if(ReadFieldOld("DRAM", "CTL19", "DQS_OUT_SHIFT", value))
             AddLine("DQS Out Delay", value, "", "");
 
-        if(helper.ReadRegisterField("DRAM", "CTL20", "WR_DQS_SHIFT", value))
+        if(ReadFieldOld("DRAM", "CTL20", "WR_DQS_SHIFT", value))
             AddLine("DQS Write Delay", value, "", "");
     }
 
@@ -1090,8 +1116,8 @@ namespace pin_desc
 #include "../../imxtools/misc/map.h"
 }
 
-PinAnalyser::PinAnalyser(const SocRef& soc, IoBackend *backend)
-        :Analyser(soc, backend)
+PinAnalyser::PinAnalyser(const soc_desc::soc_ref_t& soc, IoBackend *backend)
+        :AnalyserEx(soc, backend)
 {
     m_group = new QGroupBox("Pin Analyser");
     QVBoxLayout *layout = new QVBoxLayout;
@@ -1129,7 +1155,6 @@ bool PinAnalyser::SupportSoc(const QString& soc_name)
 
 void PinAnalyser::FillList()
 {
-    BackendHelper helper(m_io_backend, m_soc);
     soc_word_t value;
 
     while(m_panel->count() > 0)
@@ -1140,7 +1165,7 @@ void PinAnalyser::FillList()
         "bga169", "bga100", "lqfp100", "lqfp128", 0, 0, 0, 0
     };
 
-    if(!helper.ReadRegisterField("DIGCTL", "STATUS", "PACKAGE_TYPE", value))
+    if(!ReadFieldOld("DIGCTL", "STATUS", "PACKAGE_TYPE", value))
     {
         m_package_edit->setText("<read error>");
         return;
@@ -1199,21 +1224,21 @@ void PinAnalyser::FillList()
         uint32_t muxsel[2], drive[4], pull, in, out, oe;
         bool error = false;
         for(int i = 0; i < 2; i++)
-            if(!helper.ReadRegister("PINCTRL", QString("MUXSEL%1").arg(bank * 2 + i), muxsel[i]))
+            if(!ReadRegisterOld("PINCTRL", QString("MUXSELn[%1]").arg(bank * 2 + i), muxsel[i]))
                 error = true;
         /* don't make an error for those since some do not exist */
         for(int i = 0; i < 4; i++)
-            if(!helper.ReadRegister("PINCTRL", QString("DRIVE%1").arg(bank * 4 + i), drive[i]))
+            if(!ReadRegisterOld("PINCTRL", QString("DRIVEn[%1]").arg(bank * 4 + i), drive[i]))
                 drive[i] = 0;
         if(error)
             continue;
-        if(!helper.ReadRegister("PINCTRL", QString("PULL%1").arg(bank), pull))
+        if(!ReadRegisterOld("PINCTRL", QString("PULLn[%1]").arg(bank), pull))
             pull = 0;
-        if(!helper.ReadRegister("PINCTRL", QString("DIN%1").arg(bank), in))
+        if(!ReadRegisterOld("PINCTRL", QString("DINn[%1]").arg(bank), in))
             in = 0;
-        if(!helper.ReadRegister("PINCTRL", QString("DOUT%1").arg(bank), out))
+        if(!ReadRegisterOld("PINCTRL", QString("DOUTn[%1]").arg(bank), out))
             out = 0;
-        if(!helper.ReadRegister("PINCTRL", QString("DOE%1").arg(bank), oe))
+        if(!ReadRegisterOld("PINCTRL", QString("DOEn[%1]").arg(bank), oe))
             oe = 0;
 
         for(int pin = 0; pin < 32; pin++)

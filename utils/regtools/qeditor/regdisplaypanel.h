@@ -35,19 +35,12 @@
 #include "utils.h"
 #include "regtab.h"
 
-class RegItemEditorCreator : public QItemEditorCreatorBase
-{
-public:
-    RegItemEditorCreator() {}
-    virtual QWidget *createWidget(QWidget * parent) const;
-    virtual QByteArray  valuePropertyName () const;
-};
-
 class SocDisplayPanel : public QGroupBox, public RegTabPanel
 {
     Q_OBJECT
 public:
-    SocDisplayPanel(QWidget *parent, const SocRef& reg);
+    SocDisplayPanel(QWidget *parent, IoBackend *io_backend,
+        const soc_desc::soc_ref_t& reg);
     void Reload();
     void AllowWrite(bool en);
     QWidget *GetWidget();
@@ -55,16 +48,17 @@ public:
 
 protected:
 
-    const SocRef& m_soc;
+    soc_desc::soc_ref_t m_soc;
     QLabel *m_name;
     QLabel *m_desc;
 };
 
-class DevDisplayPanel : public QGroupBox, public RegTabPanel
+class NodeDisplayPanel : public QGroupBox, public RegTabPanel
 {
     Q_OBJECT
 public:
-    DevDisplayPanel(QWidget *parent, const SocDevRef& reg);
+    NodeDisplayPanel(QWidget *parent, IoBackend *io_backend,
+        const soc_desc::node_inst_t& reg);
     void Reload();
     void AllowWrite(bool en);
     QWidget *GetWidget();
@@ -72,17 +66,18 @@ public:
 
 protected:
 
-    const SocDevRef& m_dev;
-    QFont m_reg_font;
+    soc_desc::node_inst_t m_node;
     QLabel *m_name;
-    QLabel *m_desc;
+    QLabel *m_node_desc;
+    QLabel *m_inst_desc;
 };
 
 class RegDisplayPanel : public QGroupBox, public RegTabPanel
 {
     Q_OBJECT
 public:
-    RegDisplayPanel(QWidget *parent, IoBackend *io_backend, const SocRegRef& reg);
+    RegDisplayPanel(QWidget *parent, IoBackend *io_backend,
+        const soc_desc::node_inst_t& reg);
     ~RegDisplayPanel();
     void AllowWrite(bool en);
     void Reload();
@@ -102,17 +97,19 @@ protected:
     };
 
     IoBackend *m_io_backend;
-    const SocRegRef& m_reg;
+    soc_desc::node_inst_t m_node;
     bool m_allow_write;
     RegLineEdit *m_raw_val_edit;
-    Unscroll< RegSexyDisplay2 > *m_sexy_display2;
+    Unscroll< YRegDisplay > *m_sexy_display2;
     GrowingTableView *m_value_table;
     RegFieldTableModel *m_value_model;
     QStyledItemDelegate *m_table_delegate;
     QItemEditorFactory *m_table_edit_factory;
-    RegItemEditorCreator *m_regedit_creator;
     QLabel *m_raw_val_name;
     QFont m_reg_font;
+    QLabel *m_name;
+    QLabel *m_node_desc;
+    QLabel *m_inst_desc;
     QLabel *m_desc;
     QWidget *m_viewport;
     QScrollArea *m_scroll;
@@ -120,6 +117,7 @@ protected:
 private slots:
     void OnRawRegValueReturnPressed();
     void OnRegValueChanged(int index);
+    void OnRegFieldActivated(const QModelIndex& index);
 };
 
 #endif /* REGDISPLAYPANEL_H */ 

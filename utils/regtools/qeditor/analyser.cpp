@@ -20,7 +20,7 @@
  ****************************************************************************/
 #include "analyser.h"
 
-Analyser::Analyser(const SocRef& soc, IoBackend *backend)
+Analyser::Analyser(const soc_desc::soc_ref_t& soc, IoBackend *backend)
     :m_soc(soc), m_io_backend(backend)
 {
 }

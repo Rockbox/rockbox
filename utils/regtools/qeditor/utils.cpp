@@ -29,6 +29,7 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QTextBlock>
+#include <QApplication>
 
 /**
  * SocBitRangeValidator
@@ -36,6 +37,7 @@
 SocBitRangeValidator::SocBitRangeValidator(QObject *parent)
     :QValidator(parent)
 {
+    m_width = 32;
 }
 
 void SocBitRangeValidator::fixup(QString& input) const
@@ -66,11 +68,11 @@ QValidator::State SocBitRangeValidator::parse(const QString& input, int& last, i
         // parse last bit and check it's between 0 and 31
         bool ok = false;
         last = input.left(pos).toInt(&ok);
-        if(!ok || last < 0 || last >= 32)
+        if(!ok || last < 0 || last >= m_width)
             return Invalid;
     }
     else
-        last = 31;
+        last = m_width - 1;
     // parse first bit
     if(pos < input.size() - 1)
     {
@@ -88,6 +90,19 @@ QValidator::State SocBitRangeValidator::parse(const QString& input, int& last, i
     return Acceptable;
 }
 
+void SocBitRangeValidator::setWidth(int nr_bits)
+{
+    m_width = nr_bits;
+}
+
+QString SocBitRangeValidator::generate(int last_bit, int first_bit) const
+{
+    if(last_bit == first_bit)
+        return QString("%1").arg(first_bit);
+    else
+        return QString("%1:%2").arg(last_bit).arg(first_bit);
+}
+
 /**
  * SocFieldValidator
  */
@@ -95,11 +110,11 @@ QValidator::State SocBitRangeValidator::parse(const QString& input, int& last, i
 SocFieldValidator::SocFieldValidator(QObject *parent)
     :QValidator(parent)
 {
-    m_field.first_bit = 0;
-    m_field.last_bit = 31;
+    m_field.pos = 0;
+    m_field.width = 32;
 }
 
-SocFieldValidator::SocFieldValidator(const soc_reg_field_t& field, QObject *parent)
+SocFieldValidator::SocFieldValidator(const soc_desc::field_t& field, QObject *parent)
     :QValidator(parent), m_field(field)
 {
 }
@@ -124,7 +139,7 @@ QValidator::State SocFieldValidator::parse(const QString& input, soc_word_t& val
         return Intermediate;
     // first check named values
     State state = Invalid;
-    foreach(const soc_reg_field_value_t& value, m_field.value)
+    foreach(const soc_desc::enum_t& value, m_field.enum_)
     {
         QString name = QString::fromLocal8Bit(value.name.c_str());
         // cannot be a substring if too long or empty
@@ -176,7 +191,7 @@ QValidator::State SocFieldValidator::parse(const QString& input, soc_word_t& val
     if(!ok)
         return state;
     // if ok, check if it fits in the number of bits
-    unsigned nr_bits = m_field.last_bit - m_field.first_bit + 1;
+    unsigned nr_bits = m_field.width;
     unsigned long max = nr_bits == 32 ? 0xffffffff : (1 << nr_bits) - 1;
     if(v <= max)
     {
@@ -308,19 +323,32 @@ QString SocFieldItemDelegate::displayText(const QVariant& value, const QLocale& 
         return QStyledItemDelegate::displayText(value, locale);
 }
 
+void SocFieldItemDelegate::setWidth(int bitcount)
+{
+    m_bitcount = bitcount;
+}
+
 /**
  * SocFieldEditor
  */
-SocFieldEditor::SocFieldEditor(const soc_reg_field_t& field, QWidget *parent)
+SocFieldEditor::SocFieldEditor(const soc_desc::field_t& field, QWidget *parent)
     :QLineEdit(parent), m_reg_field(field)
 {
     m_validator = new SocFieldValidator(field);
     setValidator(m_validator);
+    connect(this, SIGNAL(editingFinished()), this, SLOT(editDone()));
+    setAlignment(Qt::AlignCenter);
+    setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
 }
 
 SocFieldEditor::~SocFieldEditor()
 {
     delete m_validator;
+}
+
+void SocFieldEditor::editDone()
+{
+    emit editingFinished(field());
 }
 
 uint SocFieldEditor::field() const
@@ -336,11 +364,11 @@ uint SocFieldEditor::field() const
 void SocFieldEditor::setField(uint field)
 {
     m_field = field;
-    int digits = (m_reg_field.last_bit - m_reg_field.first_bit + 4) / 4;
+    int digits = (m_reg_field.width + 3) / 4;
     setText(QString("0x%1").arg(field, digits, 16, QChar('0')));
 }
 
-void SocFieldEditor::SetRegField(const soc_reg_field_t& field)
+void SocFieldEditor::SetRegField(const soc_desc::field_t& field)
 {
     setValidator(0);
     delete m_validator;
@@ -352,12 +380,30 @@ void SocFieldEditor::SetRegField(const soc_reg_field_t& field)
 /**
  * SocFieldCachedValue
  */
-SocFieldCachedValue::SocFieldCachedValue(const soc_reg_field_t& field, uint value)
+SocFieldCachedValue::SocFieldCachedValue(const soc_desc::field_t& field, uint value)
     :m_field(field), m_value(value)
 {
     int idx = field.find_value(value);
     if(idx != -1)
-        m_name = QString::fromStdString(field.value[idx].name);
+        m_name = QString::fromStdString(field.enum_[idx].name);
+}
+
+bool SocFieldCachedValue::operator<(const SocFieldCachedValue& o) const
+{
+    return m_value < o.m_value;
+}
+
+/**
+ * SocFieldBitRange
+ */
+
+bool SocFieldBitRange::operator<(const SocFieldBitRange& o) const
+{
+    if(m_first_bit < o.m_first_bit)
+        return true;
+    if(m_first_bit > o.m_first_bit)
+        return false;
+    return m_last_bit < o.m_last_bit;
 }
 
 /**
@@ -372,11 +418,10 @@ SocFieldCachedItemDelegate::SocFieldCachedItemDelegate(QObject *parent)
 
 QString SocFieldCachedItemDelegate::displayText(const QVariant& value, const QLocale& locale) const
 {
-    // FIXME see QTBUG-30392
-    if(value.type() == QVariant::UserType && value.userType() == qMetaTypeId< SocFieldCachedValue >())
+    if(isUserType< SocFieldCachedValue >(value))
     {
         const SocFieldCachedValue& v = value.value< SocFieldCachedValue >();
-        int bitcount = v.field().last_bit - v.field().first_bit;
+        int bitcount = v.field().width;
         QString name = v.value_name();
         QString strval = QString("0x%1").arg(v.value(), (bitcount + 3) / 4, 16, QChar('0'));
         switch(m_mode)
@@ -410,7 +455,7 @@ QString SocFieldCachedItemDelegate::displayText(const QVariant& value, const QLo
  * SocFieldCachedEditor
  */
 SocFieldCachedEditor::SocFieldCachedEditor(QWidget *parent)
-    :SocFieldEditor(soc_reg_field_t(), parent)
+    :SocFieldEditor(soc_desc::field_t(), parent)
 {
 }
 
@@ -441,6 +486,11 @@ QWidget *SocFieldEditorCreator::createWidget(QWidget *parent) const
 QByteArray SocFieldEditorCreator::valuePropertyName() const
 {
     return QByteArray("field");
+}
+
+void SocFieldEditorCreator::setWidth(int bitcount)
+{
+    m_field.width = bitcount;
 }
 
 /**
@@ -478,8 +528,10 @@ int RegFieldTableModel::columnCount(const QModelIndex& /* parent */) const
 
 QVariant RegFieldTableModel::data(const QModelIndex& index, int role) const
 {
+    if(index.row() < 0 || (size_t)index.row() >= m_reg.field.size())
+        return QVariant();
     int section = index.column();
-    const soc_reg_field_t& field = m_reg.field[index.row()];
+    const soc_desc::field_t& field = m_reg.field[index.row()];
     /* column independent code */
     const RegThemeGroup *theme = 0;
     switch(m_status[index.row()])
@@ -609,7 +661,7 @@ void RegFieldTableModel::SetReadOnly(bool en)
     m_read_only = en;
 }
 
-void RegFieldTableModel::SetRegister(const soc_reg_t& reg)
+void RegFieldTableModel::SetRegister(const soc_desc::register_t& reg)
 {
     /* remove all rows */
     beginResetModel();
@@ -620,6 +672,18 @@ void RegFieldTableModel::SetRegister(const soc_reg_t& reg)
     m_reg = reg;
     RecomputeTheme();
     endInsertRows();
+}
+
+void RegFieldTableModel::UpdateRegister(const soc_desc::register_t& reg)
+{
+    m_reg = reg;
+    RecomputeTheme();
+    emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
+}
+
+soc_desc::register_t RegFieldTableModel::GetRegister() const
+{
+    return m_reg;
 }
 
 void RegFieldTableModel::SetValues(const QVector< QVariant >& values)
@@ -658,7 +722,7 @@ void RegFieldTableModel::RecomputeTheme()
         if(!m_theme.valid || m_value.size() == 0)
             continue;
         m_status[i] = Normal;
-        const soc_reg_field_t& field = m_reg.field[i];
+        const soc_desc::field_t& field = m_reg.field[i];
         QVariant val;
         for(int j = 0; j < m_value.size(); j++)
         {
@@ -675,120 +739,269 @@ void RegFieldTableModel::RecomputeTheme()
 }
 
 /**
- * RegSexyDisplay2
+ * RegFieldProxyModel
  */
 
-RegSexyDisplay2::RegSexyDisplay2(QWidget *parent)
+bool RegFieldProxyModel::lessThan(const QModelIndex& left,
+    const QModelIndex& right) const
+{
+    QVariant ldata = sourceModel()->data(left);
+    QVariant rdata = sourceModel()->data(right);
+    if(isUserType< SocFieldBitRange >(ldata) &&
+            isUserType< SocFieldBitRange >(rdata))
+    {
+        return ldata.value< SocFieldBitRange >() <
+                rdata.value< SocFieldBitRange >();
+    }
+    else if(isUserType< SocFieldCachedValue >(ldata) &&
+            isUserType< SocFieldCachedValue >(rdata))
+    {
+        return ldata.value< SocFieldCachedValue >() <
+                rdata.value< SocFieldCachedValue >();
+    }
+    else
+        return QSortFilterProxyModel::lessThan(left, right);
+}
+
+/**
+ * YRegDisplayItemDelegate
+ */
+
+YRegDisplayItemDelegate::YRegDisplayItemDelegate(QObject *parent)
+    :QStyledItemDelegate(parent)
+{
+}
+
+ void YRegDisplayItemDelegate::paint(QPainter *painter,
+    const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    QStyleOptionViewItemV4 opt = option;
+    // default alignment is centered unless specified
+    opt.displayAlignment = Qt::AlignHCenter | Qt::AlignVCenter;
+    initStyleOption(&opt, index);
+
+    painter->save();
+    // draw everything rotated, requires careful manipulation of the
+    // rects involved
+    painter->translate(opt.rect.bottomLeft());
+    painter->rotate(-90);
+    opt.rect = QRect(0, 0, opt.rect.height(), opt.rect.width());
+    QStyle *style = opt.widget ? opt.widget->style() : QApplication::style();
+    style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, opt.widget);
+    painter->restore();
+
+}
+
+QSize YRegDisplayItemDelegate::sizeHint(const QStyleOptionViewItem& option,
+    const QModelIndex& index) const
+{
+    Q_UNUSED(option);
+    Q_UNUSED(index);
+    return QSize();
+}
+
+/**
+ * YRegDisplay
+ */
+
+YRegDisplay::YRegDisplay(QWidget *parent)
     :QAbstractItemView(parent)
 {
     m_is_dirty = true;
+    m_range_col = 0;
+    m_data_col = 1;
+    m_nr_bits = 32;
     // the frame around the register is ugly, disable it
     setFrameShape(QFrame::NoFrame);
+    setSelectionMode(SingleSelection);
+    setItemDelegate(new YRegDisplayItemDelegate());
 }
 
-QModelIndex RegSexyDisplay2::indexAt(const QPoint& point) const
+void YRegDisplay::setWidth(int nr_bits)
 {
-    Q_UNUSED(point);
+    m_nr_bits = nr_bits;
+    m_is_dirty = true;
+    recomputeGeometry();
+    updateGeometries();
+}
+
+int YRegDisplay::bitColumnAt(const QPoint& point, bool closest) const
+{
+    int wx = point.x() + horizontalScrollBar()->value();
+    for(int bit = 0; bit < m_nr_bits; bit++)
+    {
+        int off = columnOffset(bitToColumn(bit));
+        int w = columnWidth(bitToColumn(bit));
+        if(wx >= off && wx < off + w)
+            return bit;
+        if(wx >= off + w && closest)
+            return bit;
+    }
+    return closest ? m_nr_bits - 1 : -1;
+}
+
+QModelIndex YRegDisplay::indexAt(const QPoint& point) const
+{
+    if(!model())
+        return QModelIndex();
+    int wx = point.x() + horizontalScrollBar()->value();
+    int wy = point.y() + verticalScrollBar()->value();
+
+    for(int i = 0; i < model()->rowCount(); i++)
+    {
+        QModelIndex index =  model()->index(i, m_data_col, rootIndex());
+        QRect r = itemRect(index);
+        if(!r.isValid())
+            continue;
+        if(r.contains(wx, wy))
+            return index;
+    }
     return QModelIndex();
 }
 
-void RegSexyDisplay2::scrollTo(const QModelIndex& index, ScrollHint hint)
+void YRegDisplay::scrollTo(const QModelIndex& index, ScrollHint hint)
 {
     Q_UNUSED(index);
     Q_UNUSED(hint);
 }
 
-QRect RegSexyDisplay2::visualRect(const QModelIndex& index) const
+QRect YRegDisplay::visualRect(const QModelIndex &index) const
 {
-    Q_UNUSED(index);
-    return QRect();
+    QRect rect = itemRect(index);
+    if(rect.isValid())
+        return QRect(rect.left() - horizontalScrollBar()->value(),
+                    rect.top() - verticalScrollBar()->value(),
+                    rect.width(), rect.height());
+    else
+        return rect;
 }
 
-bool RegSexyDisplay2::isIndexHidden(const QModelIndex& index) const
+bool YRegDisplay::isIndexHidden(const QModelIndex& index) const
 {
     Q_UNUSED(index);
     return false;
 }
 
-QModelIndex RegSexyDisplay2::moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers)
+QModelIndex YRegDisplay::moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers)
 {
     Q_UNUSED(cursorAction);
     Q_UNUSED(modifiers);
     return QModelIndex();
 }
 
-void RegSexyDisplay2::setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags flags)
+void YRegDisplay::setSelection(const QRect& r, QItemSelectionModel::SelectionFlags flags)
 {
-    Q_UNUSED(rect);
-    Q_UNUSED(flags);
+    if(!model())
+        return;
+    QRect rect = r.translated(horizontalScrollBar()->value(),
+        verticalScrollBar()->value()).normalized();
+
+    QItemSelection sel;
+    for(int i = 0; i < model()->rowCount(); i++)
+    {
+        QModelIndex index =  model()->index(i, m_data_col, rootIndex());
+        QRect r = itemRect(index);
+        if(!r.isValid())
+            continue;
+        if(r.intersects(rect))
+            sel.select(index, index);
+    }
+    selectionModel()->select(sel, flags);
 }
 
-int RegSexyDisplay2::verticalOffset() const
+int YRegDisplay::verticalOffset() const
 {
     return verticalScrollBar()->value();
 }
 
-int RegSexyDisplay2::horizontalOffset() const
+int YRegDisplay::horizontalOffset() const
 {
     return horizontalScrollBar()->value();
 }
 
-void RegSexyDisplay2::scrollContentsBy(int dx, int dy)
+void YRegDisplay::scrollContentsBy(int dx, int dy)
 {
     viewport()->scroll(dx, dy);
 }
 
-void RegSexyDisplay2::setModel(QAbstractItemModel *model)
+void YRegDisplay::setModel(QAbstractItemModel *model)
 {
     QAbstractItemView::setModel(model);
     m_is_dirty = true;
 }
 
-void RegSexyDisplay2::dataChanged(const QModelIndex &topLeft,
+void YRegDisplay::dataChanged(const QModelIndex &topLeft,
     const QModelIndex &bottomRight)
 {
     m_is_dirty = true;
     QAbstractItemView::dataChanged(topLeft, bottomRight);
 }
 
-void RegSexyDisplay2::rowsInserted(const QModelIndex &parent, int start, int end)
+void YRegDisplay::rowsInserted(const QModelIndex &parent, int start, int end)
 {
     m_is_dirty = true;
     QAbstractItemView::rowsInserted(parent, start, end);
 }
 
-void RegSexyDisplay2::rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end)
+void YRegDisplay::rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end)
 {
     m_is_dirty = true;
     QAbstractItemView::rowsAboutToBeRemoved(parent, start, end);
 }
 
-int RegSexyDisplay2::GetSeparatorSize() const
+int YRegDisplay::separatorSize() const
 {
     return 1;
 }
 
-int RegSexyDisplay2::GetMarginSize() const
+int YRegDisplay::marginSize() const
 {
     return viewOptions().fontMetrics.height() / 3;
 }
 
-int RegSexyDisplay2::GetHeaderTextSep() const
+int YRegDisplay::headerTextSep() const
 {
-    return GetMarginSize() / 2;
+    return marginSize() / 2;
 }
 
-int RegSexyDisplay2::GetHeaderHeight() const
+int YRegDisplay::headerHeight() const
 {
-    return 2 * GetMarginSize() + GetHeaderTextSep() + 2 * viewOptions().fontMetrics.height();
+    return 2 * marginSize() + headerTextSep() + 2 * viewOptions().fontMetrics.height();
 }
 
-int RegSexyDisplay2::GetColumnWidth() const
+int YRegDisplay::minColumnWidth() const
 {
-    return 2 * GetMarginSize() + viewOptions().fontMetrics.height();
+    return 2 * marginSize() + viewOptions().fontMetrics.height();
 }
 
-int RegSexyDisplay2::GetMaxContentHeight() const
+int YRegDisplay::maxColumnWidth() const
+{
+    return 2 * minColumnWidth();
+}
+
+int YRegDisplay::columnWidth(int col) const
+{
+    int avail = width() - (m_nr_bits + 1) * separatorSize();
+    int small_w = qMin(avail / m_nr_bits, maxColumnWidth());
+    int nr_big = avail - small_w * m_nr_bits;
+    if(col < nr_big)
+        return small_w + 1;
+    else
+        return small_w;
+}
+
+int YRegDisplay::columnOffset(int col) const
+{
+    int off = separatorSize();
+    for(int i = 0; i < col; i++)
+        off += columnWidth(i) + separatorSize();
+    int all_w = off;
+    for(int i = col; i < m_nr_bits; i++)
+        all_w += columnWidth(i) + separatorSize();
+    return off + (width() - all_w) / 2;
+}
+
+int YRegDisplay::maxContentHeight() const
 {
     int max = 0;
     QFontMetrics metrics = viewOptions().fontMetrics;
@@ -796,127 +1009,180 @@ int RegSexyDisplay2::GetMaxContentHeight() const
     {
         for(int i = 0; i < model()->rowCount(); i++)
         {
-            QModelIndex index = model()->index(i, 1, rootIndex());
+            QModelIndex index = model()->index(i, m_data_col, rootIndex());
             QString s = model()->data(index).toString();
             max = qMax(max, metrics.boundingRect(s).width());
         }
     }
-    return 2 * GetMarginSize() + max;
+    return 2 * marginSize() + max;
 }
 
-int RegSexyDisplay2::GetGapHeight() const
+int YRegDisplay::gapHeight() const
 {
-    return GetMarginSize() / 2;
+    return marginSize() / 2;
 }
 
-QRegion RegSexyDisplay2::visualRegionForSelection(const QItemSelection& selection) const
+int YRegDisplay::bitToColumn(int bit) const
 {
-    Q_UNUSED(selection);
-    return QRegion();
+    return m_nr_bits - 1 - bit;
 }
 
-void RegSexyDisplay2::paintEvent(QPaintEvent *event)
+QRegion YRegDisplay::visualRegionForSelection(const QItemSelection& selection) const
+{
+    QRegion region;
+    foreach(const QItemSelectionRange &range, selection)
+    {
+        for(int row = range.top(); row <= range.bottom(); ++row)
+        {
+            for(int column = range.left(); column < range.right(); ++column)
+            {
+                QModelIndex index = model()->index(row, column, rootIndex());
+                region += visualRect(index);
+            }
+        }
+    }
+    return region;
+}
+
+QRect YRegDisplay::itemRect(const QModelIndex& index) const
+{
+    if(!index.isValid())
+        return QRect();
+    QVariant vrange = model()->data(model()->index(index.row(), m_range_col, rootIndex()));
+    if(!vrange.canConvert< SocFieldBitRange >())
+        return QRect();
+    SocFieldBitRange range = vrange.value< SocFieldBitRange >();
+    return itemRect(range, index.column());
+}
+
+QRect YRegDisplay::itemRect(const SocFieldBitRange& range, int col) const
+{
+    int top, bot;
+    if(col == m_range_col)
+    {
+        top = separatorSize();
+        bot = separatorSize() + headerHeight() - 1;
+    }
+    else if(col == m_data_col)
+    {
+        top = headerHeight() + 3 * separatorSize() + gapHeight();
+        bot = height() - separatorSize() - 1;
+    }
+    else
+        return QRect();
+    int first_col = bitToColumn(range.GetFirstBit());
+    return QRect(QPoint(columnOffset(bitToColumn(range.GetLastBit())), top),
+        QPoint(columnOffset(first_col) + columnWidth(first_col) - 1, bot));
+}
+
+void YRegDisplay::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
-    int txt_h = viewOptions().fontMetrics.height();
-    int sep_sz = GetSeparatorSize();
-    int w = qMax(m_minimum_width, viewport()->width());
-    int h = qMax(m_minimum_height, viewport()->height());
-    int nr_bits = 32;
-    int col_w = (w - (nr_bits + 1) * sep_sz) / nr_bits;
-    int hdr_h = GetHeaderHeight();
-    int gap_h = GetGapHeight();
-    int tot_w = (nr_bits + 1) * sep_sz + nr_bits * col_w;
-    int margin = GetMarginSize();
-    int txt_sep = GetHeaderTextSep();
-    int tot_hdr_sz = 2 * sep_sz + hdr_h;
-
-    int x_shift = (w - tot_w) / 2;
-#define ith_col_x(i) (x_shift + (i) * (sep_sz + col_w))
-
     QPainter painter(viewport());
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     painter.translate(-horizontalScrollBar()->value(), -verticalScrollBar()->value());
     QStyleOptionViewItem option = viewOptions();
+    int txt_h = option.fontMetrics.height();
+    int grid_hint = style()->styleHint(QStyle::SH_Table_GridLineColor, &option, this);
+    QBrush grid_brush(static_cast< QRgb >(grid_hint));
     QBrush back_brush = option.palette.base();
-    QBrush line_brush = option.palette.dark();
+    int sep_sz = separatorSize();
+    QItemSelectionModel *selections = selectionModel();
 
-    // fill interesting zone with base
-    painter.fillRect(event->rect(), option.palette.window());
-    painter.fillRect(x_shift, 0, tot_w, h, back_brush);
+    // paint header
+    for(int bit = 0; bit < m_nr_bits; bit++)
+    {
+        QRect r = itemRect(SocFieldBitRange(bit, bit), m_range_col);
+        // paint background
+        painter.fillRect(r, back_brush);
+        // paint top digit
+        r.setTop(r.top() + marginSize());
+        r.setBottom(r.top() + txt_h);
+        style()->drawItemText(&painter, r, Qt::AlignHCenter, option.palette,
+            true, QString("%1").arg(bit / 10), foregroundRole());
+        // paint bottom digit
+        r.setTop(r.bottom() + headerTextSep());
+        r.setBottom(r.top() + txt_h);
+        style()->drawItemText(&painter, r, Qt::AlignHCenter, option.palette,
+            true, QString("%1").arg(bit % 10), foregroundRole());
+    }
+    // paint header grid
+    for(int bit = 1; bit < m_nr_bits; bit++)
+    {
+        QRect r = itemRect(SocFieldBitRange(bit, bit), m_range_col);
+        r.setCoords(r.right() + 1, r.top(), r.right() + sep_sz, r.bottom());
+        if((bit % 4) == 0)
+            r.setCoords(r.left() - sep_sz, r.top(), r.right() + sep_sz, r.bottom());
+        painter.fillRect(r, grid_brush);
+    }
+    QRect hdr_r = itemRect(SocFieldBitRange(0, m_nr_bits - 1), m_range_col);
+    painter.fillRect(QRect(hdr_r.left(), hdr_r.top() - sep_sz, hdr_r.width(), sep_sz), grid_brush);
+    painter.fillRect(QRect(hdr_r.left(), hdr_r.bottom() + 1, hdr_r.width(), sep_sz), grid_brush);
+    // paint header gap
+    QRect gap_r(hdr_r.left(), hdr_r.bottom() + sep_sz + 1, hdr_r.width(), gapHeight());
+    painter.fillRect(gap_r, back_brush);
+    // paint header bottom line
+    painter.fillRect(QRect(gap_r.left(), gap_r.bottom() + 1, gap_r.width(), sep_sz), grid_brush);
+    // paint background
+    QRect data_r = itemRect(SocFieldBitRange(0, m_nr_bits - 1), m_data_col);
+    //painter.fillRect(data_r, back_brush);
+    // paint data bottom line
+    painter.fillRect(QRect(data_r.left(), data_r.bottom() + 1, data_r.width(), sep_sz), grid_brush);
+    // paint left/right lines
+    painter.fillRect(QRect(hdr_r.left() - sep_sz, hdr_r.top() - sep_sz, sep_sz, height()), grid_brush);
+    painter.fillRect(QRect(hdr_r.right() + 1, hdr_r.top() - sep_sz, sep_sz, height()), grid_brush);
 
-    // draw top and bottom lines
-    painter.setPen(QPen(line_brush, sep_sz));
-    painter.fillRect(x_shift, 0, tot_w, sep_sz, line_brush);
-    painter.fillRect(x_shift, h - sep_sz, tot_w, sep_sz, line_brush);
-    // draw intemediate lines
-    for(int i = 0; i <= 32; i++)
-        painter.fillRect(ith_col_x(i), 0, sep_sz, 2 * sep_sz + hdr_h, line_brush);
-    // draw bottom header lines
-    painter.fillRect(ith_col_x(0), sep_sz + hdr_h, tot_w, sep_sz, line_brush);
-    painter.fillRect(ith_col_x(0), tot_hdr_sz + gap_h, tot_w, sep_sz, line_brush);
-    // redraw some lines but wider
-    for(int i = 4; i < nr_bits; i += 4)
-        painter.fillRect(ith_col_x(i) - sep_sz, 0, 3 * sep_sz, tot_hdr_sz, line_brush);
-    // draw numbers in the header
-    painter.setPen(palette().brush(QPalette::ButtonText).color());
-    for(int i = 0; i < nr_bits; i++)
+    // paint model
+    if(!model())
+        return;
+
+    for(int i = 0; i < model()->rowCount(); i++)
     {
-        QRect r(ith_col_x(i), sep_sz + margin, col_w, txt_h);
-        painter.drawText(r, Qt::AlignCenter, QString("%1").arg((nr_bits - 1 - i) / 10));
-        r.translate(0, txt_h + txt_sep);
-        painter.drawText(r, Qt::AlignCenter, QString("%1").arg((nr_bits - 1 - i) % 10));
+        QModelIndex index = model()->index(i, m_data_col, rootIndex());
+        QRect r = itemRect(index);
+        if(!r.isValid())
+            continue;
+        QString name = index.data().toString();
+        // paint background
+        QStyleOptionViewItem opt = viewOptions();
+        opt.rect = r;
+        //opt.showDecorationSelected = true;
+        style()->drawPrimitive(QStyle::PE_PanelItemViewRow, &opt, &painter, this);
+        if(selections->isSelected(index))
+            opt.state |= QStyle::State_Selected;
+        if(currentIndex() == index)
+            opt.state |= QStyle::State_HasFocus;
+        if(m_hover == index)
+            opt.state |= QStyle::State_MouseOver;
+        itemDelegate(index)->paint(&painter, opt, index);
+        // paint left/right lines
+        painter.fillRect(QRect(r.left() - sep_sz, r.top(), sep_sz, r.height()), grid_brush);
+        painter.fillRect(QRect(r.right() + 1, r.top(), sep_sz, r.height()), grid_brush);
     }
-    // display content
-    if(model())
-    {
-        for(int i = 0; i < model()->rowCount(); i++)
-        {
-            QVariant vrange = model()->data(model()->index(i, 0, rootIndex()));
-            if(!vrange.canConvert< SocFieldBitRange >())
-                continue;
-            SocFieldBitRange range = vrange.value< SocFieldBitRange >();
-            QString name = model()->data(model()->index(i, 1, rootIndex())).toString();
-            QRect r(QPoint(ith_col_x(nr_bits - 1 - range.GetLastBit()) + sep_sz, tot_hdr_sz),
-                QPoint(ith_col_x(nr_bits - range.GetFirstBit()), h - sep_sz));
-            painter.fillRect(r.x() - sep_sz, r.y(), sep_sz, r.height(), line_brush);
-            painter.fillRect(r.right(), r.y(), sep_sz, r.height(), line_brush);
-            r.setY(r.y() + gap_h + sep_sz);
-            // draw rotated text
-            painter.save();
-            painter.translate(r.bottomLeft());
-            painter.rotate(-90);
-            //painter.fillRect(QRect(0, 0, r.height(), r.width()), QBrush(Qt::red));
-            QRect r2(0, 0, r.height(), r.width());
-            painter.drawText(r2, Qt::AlignCenter, name);
-            painter.restore();
-        }
-    }
-#undef ith_col_x
 }
 
-void RegSexyDisplay2::RecomputeGeometry()
+void YRegDisplay::recomputeGeometry()
 {
     if(!m_is_dirty)
         return;
     /* height: header + gap + sep + content + sep */
     m_minimum_height = 0;
-    m_minimum_height += GetHeaderHeight() + GetGapHeight();
-    m_minimum_height += 2 * GetSeparatorSize() + GetMaxContentHeight();
+    m_minimum_height += headerHeight() + gapHeight();
+    m_minimum_height += 2 * separatorSize() + maxContentHeight();
     /* width: sep + (col + sep) * n */
-    m_minimum_width = GetSeparatorSize() * 33 + GetColumnWidth() * 32;
+    m_minimum_width = separatorSize() * (m_nr_bits + 1) + minColumnWidth() * m_nr_bits;
     m_is_dirty = false;
     viewport()->update();
 }
 
-void RegSexyDisplay2::resizeEvent(QResizeEvent*)
+void YRegDisplay::resizeEvent(QResizeEvent*)
 {
     m_is_dirty = true;
-    RecomputeGeometry();
+    recomputeGeometry();
     updateGeometries();
 }
 
-void RegSexyDisplay2::updateGeometries()
+void YRegDisplay::updateGeometries()
 {
     horizontalScrollBar()->setSingleStep(1);
     horizontalScrollBar()->setPageStep(viewport()->width());
@@ -924,6 +1190,35 @@ void RegSexyDisplay2::updateGeometries()
     verticalScrollBar()->setSingleStep(1);
     verticalScrollBar()->setPageStep(viewport()->height());
     verticalScrollBar()->setRange(0, qMax(0, m_minimum_height - viewport()->height()));
+}
+
+bool YRegDisplay::viewportEvent(QEvent *event)
+{
+    /* FIXME Apparently QAbstractItemView tracks the hovered index but keeps it
+     * in its private part which is not accessible, which makes it useless...
+     * This code reimplements it */
+    switch (event->type())
+    {
+        case QEvent::HoverEnter:
+            m_hover = indexAt(static_cast<QHoverEvent*>(event)->pos());
+            update(m_hover);
+            break;
+        case QEvent::HoverLeave:
+            update(m_hover); // update old
+            m_hover = QModelIndex();
+            break;
+        case QEvent::HoverMove:
+        {
+            QModelIndex old = m_hover;
+            m_hover = indexAt(static_cast<QHoverEvent*>(event)->pos());
+            if(m_hover != old)
+                viewport()->update(visualRect(old)|visualRect(m_hover));
+            break;
+        }
+        default:
+            break;
+    }
+    return QAbstractItemView::viewportEvent(event);
 }
 
 /**
@@ -966,6 +1261,12 @@ MyTextEditor::MyTextEditor(QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout;
     m_toolbar = new QToolBar(this);
     m_edit = new QTextEdit(this);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+    /* Qt 5.2 have a hardcoded sizeHint for QAbstractScrollArea which makes it
+     * hard to have a good behaviour for the text editor. Fortunately 5.2 introduces
+     * a new option to adjust this to the content. */
+    m_edit->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+#endif
     layout->addWidget(m_toolbar, 0);
     layout->addWidget(m_edit, 1);
     setLayout(layout);
@@ -1000,8 +1301,11 @@ MyTextEditor::MyTextEditor(QWidget *parent)
     connect(m_edit, SIGNAL(currentCharFormatChanged(const QTextCharFormat&)),
         this, SLOT(OnCharFormatChanged(const QTextCharFormat&)));
 
+    m_edit->installEventFilter(this);
+
     SetGrowingMode(false);
     SetReadOnly(false);
+    m_toolbar->hide();
 }
 
 void MyTextEditor::SetReadOnly(bool en)
@@ -1021,7 +1325,7 @@ void MyTextEditor::SetGrowingMode(bool en)
     {
         m_edit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
         m_edit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        OnTextChanged();
+        OnInternalTextChanged();
     }
     else
     {
@@ -1036,10 +1340,11 @@ void MyTextEditor::OnInternalTextChanged()
     {
         int content_size = m_edit->document()->documentLayout()->documentSize().height();
         content_size = qMax(content_size, m_edit->fontMetrics().height());
-        m_edit->setMinimumHeight(content_size + m_edit->contentsMargins().top() + 
+        m_edit->setMinimumHeight(content_size + m_edit->contentsMargins().top() +
             m_edit->contentsMargins().bottom());
     }
     emit OnTextChanged();
+    emit OnTextChanged(GetTextHtml());
 }
 
 void MyTextEditor::OnTextBold(bool checked)
@@ -1092,6 +1397,19 @@ QString MyTextEditor::GetTextHtml()
 bool MyTextEditor::IsModified()
 {
     return m_edit->document()->isModified();
+}
+
+bool MyTextEditor::eventFilter(QObject *object, QEvent *event)
+{
+    if(object != m_edit)
+        return false;
+    if(m_read_only)
+        return false;
+    if(event->type() == QEvent::FocusIn)
+        m_toolbar->show();
+    else if(event->type() == QEvent::FocusOut)
+        m_toolbar->hide();
+    return false;
 }
 
 /**
@@ -1159,7 +1477,10 @@ void BackendSelector::OnDataSelChanged(int index)
         m_dev_selector->hide();
 #endif
         QFileDialog *fd = new QFileDialog(m_data_selector);
-        fd->setFilter("Textual files (*.txt);;All files (*)");
+        QStringList filters;
+        filters << "Textual files (*.txt)";
+        filters << "All files (*)";
+        fd->setNameFilters(filters);
         fd->setDirectory(Settings::Get()->value("regtab/loaddatadir", QDir::currentPath()).toString());
         if(fd->exec())
         {
@@ -1252,6 +1573,47 @@ void BackendSelector::ChangeBackend(IoBackend *new_backend)
 }
 
 /**
+ * YTabWidget
+ */
+YTabWidget::YTabWidget(QTabBar *bar, QWidget *parent)
+    :QTabWidget(parent)
+{
+    if(bar != 0)
+        setTabBar(bar);
+    m_tab_open_button = new QToolButton(this);
+    m_tab_open_button->setIcon(QIcon::fromTheme("list-add"));
+    m_tab_open_button->setAutoRaise(true);
+    m_tab_open_button->setPopupMode(QToolButton::InstantPopup);
+    /* the arrow with an icon only is pretty ugly and QToolButton has no way
+     * to remove the arrow programmaticaly, so use the CSS to do that */
+    m_tab_open_button->setStyleSheet("QToolButton::menu-indicator { image: none; }");
+    setCornerWidget(m_tab_open_button, Qt::TopLeftCorner);
+    setTabOpenable(false);
+    connect(m_tab_open_button, SIGNAL(clicked(bool)), this, SLOT(OnOpenButton(bool)));
+    /* there is a quirk in the default QStyle: if the tab bar is empty, it
+     * returns the minimum size of the corner widget, which is 0 for tool buttons */
+    //setMinimumHeight(m_tab_open_button->height());
+    //m_tab_open_button->setMinimumHeight(m_tab_open_button->sizeHint().height());
+}
+
+void YTabWidget::setTabOpenable(bool openable)
+{
+    m_tab_openable = openable;
+    m_tab_open_button->setVisible(openable);
+}
+
+void YTabWidget::OnOpenButton(bool checked)
+{
+    Q_UNUSED(checked);
+    emit tabOpenRequested();
+}
+
+void YTabWidget::setTabOpenMenu(QMenu *menu)
+{
+    m_tab_open_button->setMenu(menu);
+}
+
+/**
  * MessageWidget
  */
 MessageWidget::MessageWidget(QWidget *parent)
@@ -1338,4 +1700,22 @@ void MessageWidget::OnClose(bool clicked)
 {
     Q_UNUSED(clicked);
     hide();
+}
+
+/**
+ * Misc
+ */
+
+QGroupBox *Misc::EncloseInBox(const QString& name, QWidget *widget)
+{
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(widget);
+    return Misc::EncloseInBox(name, layout);
+}
+
+QGroupBox *Misc::EncloseInBox(const QString& name, QLayout *layout)
+{
+    QGroupBox *group = new QGroupBox(name);
+    group->setLayout(layout);
+    return group;
 }
