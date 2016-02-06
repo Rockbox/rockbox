@@ -125,11 +125,30 @@ struct field_t
     }
 };
 
+/** Register variant information
+ *
+ * A register variant provides an alternative access to the register, potentially
+ * we special semantics. Although there are no constraints on the type string,
+ * the following types have well-defined semantics:
+ * - alias: the same register at another address
+ * - set: writing to this register will set the 1s bits and ignore the 0s
+ * - clr: writing to this register will clear the 1s bits and ignore the 0s
+ * - tog: writing to this register will toggle the 1s bits and ignore the 0s
+ */
+struct variant_t
+{
+    soc_id_t id; /** ID (must be unique among register variants) */
+    std::string type; /** type of the variant */
+    soc_addr_t offset; /** offset of the variant */
+};
+
 /** Register information */
 struct register_t
 {
     size_t width; /** Size in bits */
+    std::string desc; /** Optional description of the register */
     std::vector< field_t > field; /** List of fields */
+    std::vector< variant_t > variant; /** List of variants */
 };
 
 /** Node address range information */
@@ -138,16 +157,24 @@ struct range_t
     enum type_t
     {
         STRIDE, /** Addresses are given by a base address and a stride */
-        FORMULA /** Addresses are given by a formula */
+        FORMULA, /** Addresses are given by a formula */
+        LIST, /** Addresses are given by a list */
     };
 
     type_t type; /** Range type */
     size_t first; /** First index in the range */
-    size_t count; /** Number of indexes in the range */
+    size_t count; /** Number of indexes in the range (for STRIDE and RANGE) */
     soc_word_t base; /** Base address (for STRIDE) */
     soc_word_t stride; /** Stride value (for STRIDE) */
     std::string formula; /** Formula (for FORMULA) */
     std::string variable; /** Formula variable name (for FORMULA) */
+    std::vector< soc_word_t > list; /** Address list (for LIST) */
+
+    /** Return the number of indexes (based on count or list) */
+    size_t size()
+    {
+        return type == LIST ? list.size() : count;
+    }
 };
 
 /** Node instance information */
@@ -197,6 +224,12 @@ bool parse_xml(const std::string& filename, soc_t& soc, error_context_t& error_c
 /** Write a SoC description to a XML file, overwriting it. A file can contain
  * multiple Soc descriptions */
 bool produce_xml(const std::string& filename, const soc_t& soc, error_context_t& error_ctx);
+/** Normalise a soc description by reordering elements so that:
+ * - nodes are sorted by lowest address of an instance
+ * - instances are sorted by lowest address
+ * - fields are sorted by last bit
+ * - enum are sorted by value */
+void normalize(soc_t& soc);
 /** Formula parser: try to parse and evaluate a formula with some variables */
 bool evaluate_formula(const std::string& formula,
     const std::map< std::string, soc_word_t>& var, soc_word_t& result,
@@ -219,6 +252,8 @@ class soc_ref_t;
 class node_ref_t;
 class register_ref_t;
 class field_ref_t;
+class enum_ref_t;
+class variant_ref_t;
 class node_inst_t;
 
 /** SoC reference */
@@ -241,6 +276,9 @@ public:
     /** Compare this reference to another */
     bool operator==(const soc_ref_t& r) const;
     inline bool operator!=(const soc_ref_t& r) const { return !operator==(r); }
+    bool operator<(const soc_ref_t& r) const { return m_soc < r.m_soc; }
+    /** Make this reference invalid */
+    void reset();
 };
 
 /** SoC node reference
@@ -265,8 +303,10 @@ public:
     node_t *get() const;
     /** Returns a reference to the soc */
     soc_ref_t soc() const;
-    /** Returns a reference to the parent node */
-    node_ref_t parent() const;
+    /** Returns a reference to the n-th parent node, 0-th is itself, 1-th is parent */
+    node_ref_t parent(unsigned level = 1) const;
+    /** Returns reference depth, root is 0, below root is 1 and so on */
+    unsigned depth() const;
     /** Returns a reference to the register (which may be on a parent node) */
     register_ref_t reg() const;
     /** Returns a list of references to the sub-nodes */
@@ -280,6 +320,16 @@ public:
     /** Compare this reference to another */
     bool operator==(const node_ref_t& r) const;
     inline bool operator!=(const node_ref_t& r) const { return !operator==(r); }
+    /** Delete the node (and children) pointed by the reference, invalidating it
+     * NOTE: if reference points to the root node, deletes all nodes
+     * NOTE: does nothing if the reference is not valid */
+    void remove();
+    /** Create a new child node and returns a reference to it */
+    node_ref_t create() const;
+    /** Create a register and returns a reference to it */
+    register_ref_t create_reg(size_t width = 32) const;
+    /** Make this reference invalid */
+    void reset();
 };
 
 /** SoC register reference */
@@ -300,11 +350,24 @@ public:
     node_ref_t node() const;
     /** Returns a list of references to the fields of the register */
     std::vector< field_ref_t > fields() const;
+    /** Returns a list of references to the variants of the register */
+    std::vector< variant_ref_t > variants() const;
     /** Returns a reference to a particular field */
     field_ref_t field(const std::string& name) const;
+    /** Returns a reference to a particular variant */
+    variant_ref_t variant(const std::string& type) const;
     /** Compare this reference to another */
     bool operator==(const register_ref_t& r) const;
     inline bool operator!=(const register_ref_t& r) const { return !operator==(r); }
+    /** Delete the register pointed by the reference, invalidating it
+     * NOTE: does nothing if the reference is not valid */
+    void remove();
+    /** Create a new field and returns a reference to it */
+    field_ref_t create_field() const;
+    /** Create a new variant and returns a reference to it */
+    variant_ref_t create_variant() const;
+    /** Make this reference invalid */
+    void reset();
 };
 
 /** SoC register field reference */
@@ -312,7 +375,7 @@ class field_ref_t
 {
     friend class register_ref_t;
     register_ref_t m_reg; /* reference to the register */
-    soc_id_t m_id; /* field name */
+    soc_id_t m_id; /* field id */
 
     field_ref_t(register_ref_t reg, soc_id_t id);
 public:
@@ -324,9 +387,67 @@ public:
     field_t *get() const;
     /** Returns a reference to the register containing the field */
     register_ref_t reg() const;
+    /** Returns a list of references to the enums of the field */
+    std::vector< enum_ref_t > enums() const;
     /** Compare this reference to another */
     bool operator==(const field_ref_t& r) const;
     inline bool operator!=(const field_ref_t& r) const { return !operator==(r); }
+    /** Make this reference invalid */
+    void reset();
+    /** Create a new enum and returns a reference to it */
+    enum_ref_t create_enum() const;
+};
+
+/** SoC register field enum reference */
+class enum_ref_t
+{
+    friend class field_ref_t;
+    field_ref_t m_field; /* reference to the field */
+    soc_id_t m_id; /* enum id */
+
+    enum_ref_t(field_ref_t reg, soc_id_t id);
+public:
+    /** Builds an invalid reference */
+    enum_ref_t();
+    /** Check whether this reference is valid/exists */
+    bool valid() const;
+    /** Returns a pointer to the enum, or 0 */
+    enum_t *get() const;
+    /** Returns a reference to the field containing the enum */
+    field_ref_t field() const;
+    /** Compare this reference to another */
+    bool operator==(const field_ref_t& r) const;
+    inline bool operator!=(const field_ref_t& r) const { return !operator==(r); }
+    /** Make this reference invalid */
+    void reset();
+};
+
+/** SoC register variant reference */
+class variant_ref_t
+{
+    friend class register_ref_t;
+    register_ref_t m_reg; /* reference to the register */
+    soc_id_t m_id; /* variant name */
+
+    variant_ref_t(register_ref_t reg, soc_id_t id);
+public:
+    /** Builds an invalid reference */
+    variant_ref_t();
+    /** Check whether this reference is valid/exists */
+    bool valid() const;
+    /** Returns a pointer to the variant, or 0 */
+    variant_t *get() const;
+    /** Returns a reference to the register containing the field */
+    register_ref_t reg() const;
+    /** Returns variant type */
+    std::string type() const;
+    /** Returns variant offset */
+    soc_word_t offset() const;
+    /** Compare this reference to another */
+    bool operator==(const variant_ref_t& r) const;
+    inline bool operator!=(const variant_ref_t& r) const { return !operator==(r); }
+    /** Make this reference invalid */
+    void reset();
 };
 
 /** SoC node instance
@@ -353,8 +474,10 @@ public:
     node_ref_t node() const;
     /** Check whether this reference is the root node instance */
     bool is_root() const;
-    /** Returns a reference to the parent instance */
-    node_inst_t parent() const;
+    /** Returns a reference to the n-th parent instance, 0-th is itself, and so on */
+    node_inst_t parent(unsigned level = 1) const;
+    /** Returns reference depth, 0 is root, and so on */
+    unsigned depth() const;
      /** Returns a pointer to the instance of the node, or 0 */
     instance_t *get() const;
     /** Returns the address of this instance */
@@ -377,6 +500,8 @@ public:
     /** Compare this reference to another */
     bool operator==(const node_inst_t& r) const;
     inline bool operator!=(const node_inst_t& r) const { return !operator==(r); }
+    /** Make this reference invalid */
+    void reset();
 };
 
 } // soc_desc

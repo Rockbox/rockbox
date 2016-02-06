@@ -1,0 +1,396 @@
+<?xml version="1.0"?>
+<soc version="2">
+    <name>vsoc2000</name>
+    <title>Virtual SOC 2000</title>
+    <desc>Virtual SoC 2000 is a nice chip. Its quad-core architecture with trustzone makes it super powerful.</desc>
+    <author>Amaury Pouly</author>
+    <isa>ARM</isa>
+    <version>0.5</version>
+    <node>
+        <name>int</name>
+        <title>Interrupt Collector</title>
+        <desc>The interrupt collector controls the routing of the interrupts to the processors. It has 32 interrupts sources, which can be routed as FIQ or IRQ to the either processor.</desc>
+        <instance>
+            <name>ICOLL</name>
+            <title>Interrupt collector</title>
+            <address>0x80000000</address>
+        </instance>
+        <node>
+            <name>ctrl</name>
+            <title>Control register</title>
+            <instance>
+                <name>CTRL</name>
+                <address>0x0</address>
+            </instance>
+            <register>
+                <width>8</width>
+                <field>
+                    <name>CLKGATE</name>
+                    <desc>Clock gating control. This bit can be protected by TZ lock.</desc>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>SFTRST</name>
+                    <desc>Soft reset, the bit will automatically reset to 0 when reset is completed. This bit can be protected by TZ lock.</desc>
+                    <position>6</position>
+                </field>
+                <field>
+                    <name>TZ_LOCK</name>
+                    <desc>Trust Zone lock</desc>
+                    <position>5</position>
+                    <enum>
+                        <name>UNLOCKED</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>LOCKED</name>
+                        <desc>When the interrupt collector is locked, only a secured processor can modify protected fields.</desc>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <variant>
+                    <type>set</type>
+                    <offset>4</offset>
+                </variant>
+                <variant>
+                    <type>clr</type>
+                    <offset>8</offset>
+                </variant>
+            </register>
+        </node>
+        <node>
+            <name>status</name>
+            <title>Interrupt status register</title>
+            <instance>
+                <name>STATUS</name>
+                <address>0x10</address>
+            </instance>
+            <register>
+                <field>
+                    <name>STATUS</name>
+                    <desc>Bit is set to 1 is the interrupt is pending, write a 1 to the clear variant to clear it. Secured interrupts can only be cleared or polled by secured processors (non-secure will always read 0 for those).</desc>
+                    <position>0</position>
+                    <width>32</width>
+                </field>
+                <variant>
+                    <type>clr</type>
+                    <offset>8</offset>
+                </variant>
+            </register>
+        </node>
+        <node>
+            <name>enable</name>
+            <title>Interrupt enable register</title>
+            <instance>
+                <name>ENABLE</name>
+                <range>
+                    <first>0</first>
+                    <count>32</count>
+                    <base>0x20</base>
+                    <stride>0x10</stride>
+                </range>
+            </instance>
+            <register>
+                <width>16</width>
+                <desc>This register controls the routing of the interrupt</desc>
+                <field>
+                    <name>CPU3_PRIO</name>
+                    <desc>Interrupt priority</desc>
+                    <position>14</position>
+                    <width>2</width>
+                    <enum>
+                        <name>MASKED</name>
+                        <desc>Interrupt is masked</desc>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>LOW</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>HIGH</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>NMI</name>
+                        <desc>Interrupt is non maskable</desc>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CPU3_TYPE</name>
+                    <desc>Interrupt type</desc>
+                    <position>13</position>
+                    <enum>
+                        <name>IRQ</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>FIQ</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CPU3_TZ</name>
+                    <desc>Trust Zone interrupt: when set, only a secured processor can modify the parameters for secured interrupts.</desc>
+                    <position>12</position>
+                </field>
+                <field>
+                    <name>CPU2_PRIO</name>
+                    <position>10</position>
+                    <width>2</width>
+                    <enum>
+                        <name>MASKED</name>
+                        <desc>Interrupt is masked</desc>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>LOW</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>HIGH</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>NMI</name>
+                        <desc>Interrupt is non maskable</desc>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CPU2_TYPE</name>
+                    <desc>Interrupt type</desc>
+                    <position>9</position>
+                    <enum>
+                        <name>IRQ</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>FIQ</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CPU2_TZ</name>
+                    <desc>Trust Zone interrupt: when set, only a secured processor can modify the parameters for secured interrupts.</desc>
+                    <position>8</position>
+                </field>
+                <field>
+                    <name>CPU1_PRIO</name>
+                    <desc>Interrupt priority</desc>
+                    <position>6</position>
+                    <width>2</width>
+                    <enum>
+                        <name>MASKED</name>
+                        <desc>Interrupt is masked</desc>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>LOW</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>HIGH</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>NMI</name>
+                        <desc>Interrupt is non maskable</desc>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CPU1_TYPE</name>
+                    <desc>Interrupt type</desc>
+                    <position>5</position>
+                    <enum>
+                        <name>IRQ</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>FIQ</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CPU1_TZ</name>
+                    <desc>Trust Zone interrupt: when set, only a secured processor can modify the parameters for secured interrupts.</desc>
+                    <position>4</position>
+                </field>
+                <field>
+                    <name>CPU0_PRIO</name>
+                    <desc>Interrupt priority</desc>
+                    <position>2</position>
+                    <width>2</width>
+                    <enum>
+                        <name>MASKED</name>
+                        <desc>Interrupt will never be sent to the CPU</desc>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>LOW</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>HIGH</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>NMI</name>
+                        <desc>Interrupt is non maskable</desc>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CPU0_TYPE</name>
+                    <desc>Interrupt type</desc>
+                    <position>1</position>
+                    <enum>
+                        <name>IRQ</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>FIQ</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CPU0_TZ</name>
+                    <desc>Trust Zone interrupt: when set, only a secured processor can modify the parameters for secured interrupts.</desc>
+                    <position>0</position>
+                </field>
+                <variant>
+                    <type>set</type>
+                    <offset>4</offset>
+                </variant>
+                <variant>
+                    <type>clr</type>
+                    <offset>8</offset>
+                </variant>
+            </register>
+        </node>
+    </node>
+    <node>
+        <name>gpio</name>
+        <title>GPIO controller</title>
+        <desc>A GPIO controller manages several ports.</desc>
+        <instance>
+            <name>CPU_GPIO</name>
+            <title>CPU GPIO controllers 1 through 7</title>
+            <range>
+                <first>1</first>
+                <count>8</count>
+                <formula variable="n">0x80001000+(n-1)*0x1000</formula>
+            </range>
+        </instance>
+        <node>
+            <name>port</name>
+            <title>GPIO port</title>
+            <instance>
+                <name>PORT</name>
+                <range>
+                    <first>0</first>
+                    <count>2</count>
+                    <base>0x0</base>
+                    <stride>0x100</stride>
+                </range>
+            </instance>
+            <node>
+                <name>input</name>
+                <title>Input register</title>
+                <instance>
+                    <name>IN</name>
+                    <address>0x0</address>
+                </instance>
+                <register>
+                    <width>8</width>
+                    <field>
+                        <name>VALUE</name>
+                        <position>0</position>
+                        <width>8</width>
+                    </field>
+                </register>
+            </node>
+            <node>
+                <name>output_enable</name>
+                <title>Output enable register</title>
+                <instance>
+                    <name>OE</name>
+                    <address>0x10</address>
+                </instance>
+                <register>
+                    <width>8</width>
+                    <field>
+                        <name>ENABLE</name>
+                        <position>0</position>
+                        <width>8</width>
+                    </field>
+                    <variant>
+                        <type>set</type>
+                        <offset>4</offset>
+                    </variant>
+                    <variant>
+                        <type>clr</type>
+                        <offset>8</offset>
+                    </variant>
+                    <variant>
+                        <type>mask</type>
+                        <offset>12</offset>
+                    </variant>
+                </register>
+            </node>
+        </node>
+    </node>
+    <node>
+        <name>tz</name>
+        <title>Trust Zone</title>
+        <instance>
+            <name>TZ</name>
+            <address>0xa0000000</address>
+        </instance>
+        <node>
+            <name>ctrl</name>
+            <title>Control Register</title>
+            <instance>
+                <name>CTRL</name>
+                <address>0x0</address>
+            </instance>
+            <register>
+                <width>8</width>
+                <field>
+                    <name>SCRATCH</name>
+                    <desc>TZ protected scratch value</desc>
+                    <position>4</position>
+                    <width>4</width>
+                </field>
+                <field>
+                    <name>DISABLE</name>
+                    <desc>One bit per CPU: set to 1 to prevent the processor from being able to enter TZ mode. Can only be set by a secured processor. By default all processors can enter TZ mode.</desc>
+                    <position>0</position>
+                    <width>4</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>debug</name>
+            <title>Debug register</title>
+            <instance>
+                <name>DEBUG</name>
+                <title>Debug register</title>
+                <desc>Don't touch it!</desc>
+                <range>
+                    <first>42</first>
+                    <address>0x50</address>
+                    <address>0x60</address>
+                    <address>0x90</address>
+                    <address>0x110</address>
+                    <address>0x130</address>
+                </range>
+            </instance>
+            <register>
+                <width>8</width>
+            </register>
+        </node>
+    </node>
+</soc>

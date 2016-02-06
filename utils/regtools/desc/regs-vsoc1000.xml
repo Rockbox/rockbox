@@ -1,0 +1,248 @@
+<?xml version="1.0"?>
+<soc version="2">
+    <name>vsoc1000</name>
+    <title>Virtual SOC 1000</title>
+    <desc>Virtual SoC 1000 is a nice chip. Its dual-core architecture makes it super powerful.</desc>
+    <author>Amaury Pouly</author>
+    <isa>ARM</isa>
+    <version>0.5</version>
+    <node>
+        <name>int</name>
+        <title>Interrupt Collector</title>
+        <desc>The interrupt collector controls the routing of the interrupts to the processors. It has 32 interrupts sources, which can be routed as FIQ or IRQ to the main processor or the coprocessor.</desc>
+        <instance>
+            <name>ICOLL</name>
+            <title>Interrupt collector</title>
+            <address>0x80000000</address>
+        </instance>
+        <node>
+            <name>ctrl</name>
+            <title>Control register</title>
+            <instance>
+                <name>CTRL</name>
+                <address>0x0</address>
+            </instance>
+            <register>
+                <width>8</width>
+                <field>
+                    <name>CLKGATE</name>
+                    <desc>Clock gating control</desc>
+                    <position>7</position>
+                </field>
+                <field>
+                    <name>SFTRST</name>
+                    <desc>Soft reset, the bit will automatically reset to 0 when reset is completed</desc>
+                    <position>6</position>
+                </field>
+                <variant>
+                    <type>set</type>
+                    <offset>4</offset>
+                </variant>
+                <variant>
+                    <type>clr</type>
+                    <offset>8</offset>
+                </variant>
+            </register>
+        </node>
+        <node>
+            <name>status</name>
+            <title>Interrupt status register</title>
+            <instance>
+                <name>STATUS</name>
+                <address>0x10</address>
+            </instance>
+            <register>
+                <field>
+                    <name>STATUS</name>
+                    <desc>Bit is set to 1 is the interrupt is pending, write a 1 to the clear variant to clear it</desc>
+                    <position>0</position>
+                    <width>32</width>
+                </field>
+                <variant>
+                    <type>clr</type>
+                    <offset>8</offset>
+                </variant>
+            </register>
+        </node>
+        <node>
+            <name>enable</name>
+            <title>Interrupt enable register</title>
+            <instance>
+                <name>ENABLE</name>
+                <range>
+                    <first>0</first>
+                    <count>32</count>
+                    <base>0x20</base>
+                    <stride>0x10</stride>
+                </range>
+            </instance>
+            <register>
+                <width>16</width>
+                <desc>This register controls the routing of the interrupt</desc>
+                <field>
+                    <name>COP_PRIO</name>
+                    <desc>Coprocessor priority</desc>
+                    <position>5</position>
+                    <width>2</width>
+                    <enum>
+                        <name>MASKED</name>
+                        <desc>Interrupt is masked</desc>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>LOW</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>HIGH</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>NMI</name>
+                        <desc>Interrupt is non maskable</desc>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>COP_TYPE</name>
+                    <desc>Interrupt type</desc>
+                    <position>4</position>
+                    <enum>
+                        <name>IRQ</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>FIQ</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CPU_PRIO</name>
+                    <desc>CPU priority</desc>
+                    <position>2</position>
+                    <width>2</width>
+                    <enum>
+                        <name>MASKED</name>
+                        <desc>Interrupt will never be sent to the CPU</desc>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>LOW</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>HIGH</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>NMI</name>
+                        <desc>Interrupt is non maskable</desc>
+                        <value>0x3</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>CPU_TYPE</name>
+                    <desc>Interrupt type</desc>
+                    <position>1</position>
+                    <enum>
+                        <name>IRQ</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>FIQ</name>
+                        <value>0x1</value>
+                    </enum>
+                </field>
+                <field>
+                    <name>ENABLE</name>
+                    <position>0</position>
+                </field>
+                <variant>
+                    <type>set</type>
+                    <offset>4</offset>
+                </variant>
+                <variant>
+                    <type>clr</type>
+                    <offset>8</offset>
+                </variant>
+            </register>
+        </node>
+    </node>
+    <node>
+        <name>gpio</name>
+        <title>GPIO controller</title>
+        <desc>A GPIO controller manages several ports</desc>
+        <instance>
+            <name>CPU_GPIO</name>
+            <title>CPU GPIO controller 1 through 3</title>
+            <range>
+                <first>1</first>
+                <count>3</count>
+                <formula variable="n">0x80001000+(n-1)*0x1000</formula>
+            </range>
+        </instance>
+        <instance>
+            <name>COP_GPIO</name>
+            <title>Companion processor GPIO controller</title>
+            <desc>Although the companion processor GPIO controller is accessible from the CPU, it incurs an extra penalty on the bus</desc>
+            <address>0x90000000</address>
+        </instance>
+        <node>
+            <name>port</name>
+            <title>GPIO port</title>
+            <instance>
+                <name>PORT</name>
+                <range>
+                    <first>0</first>
+                    <count>2</count>
+                    <base>0x0</base>
+                    <stride>0x100</stride>
+                </range>
+            </instance>
+            <node>
+                <name>input</name>
+                <title>Input register</title>
+                <instance>
+                    <name>IN</name>
+                    <address>0x0</address>
+                </instance>
+                <register>
+                    <width>8</width>
+                    <field>
+                        <name>VALUE</name>
+                        <position>0</position>
+                        <width>8</width>
+                    </field>
+                </register>
+            </node>
+            <node>
+                <name>output_enable</name>
+                <title>Output enable register</title>
+                <instance>
+                    <name>OE</name>
+                    <address>0x10</address>
+                </instance>
+                <register>
+                    <width>8</width>
+                    <field>
+                        <name>ENABLE</name>
+                        <position>0</position>
+                        <width>8</width>
+                    </field>
+                    <variant>
+                        <type>set</type>
+                        <offset>4</offset>
+                    </variant>
+                    <variant>
+                        <type>clr</type>
+                        <offset>8</offset>
+                    </variant>
+                    <variant>
+                        <type>mask</type>
+                        <offset>12</offset>
+                    </variant>
+                </register>
+            </node>
+        </node>
+    </node>
+</soc>

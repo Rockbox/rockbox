@@ -214,7 +214,7 @@ bool parse_xml(const std::string& filename, soc_t& soc);
 /** Write a SoC description to a XML file, overwriting it. A file can contain
  * multiple Soc descriptions */
 bool produce_xml(const std::string& filename, const soc_t& soc);
-/** Normalise a soc description by reordering elemnts so that:
+/** Normalise a soc description by reordering elements so that:
  * - devices are sorted by first name
  * - registers are sorted by first address
  * - fields are sorted by last bit
