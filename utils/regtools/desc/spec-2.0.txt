@@ -120,6 +120,23 @@ usual arithmetic operators. The example below illustrate such a use:
   </instance>
 </node>
 
+In the case when the addresses do not follow a regular pattern or a formula would
+be too complicated, it is always possible to specify the addresses as a list:
+
+<node>
+  <name>N</name>
+  <instance>
+    <name>F</name>
+    <range>
+      <first>0</first>
+      <address>0x50</address>
+      <address>0x60</address>
+      <address>0x90</address>
+      <address>0x110</address>
+    </range>
+  </instance>
+</node>
+
 In this example we generate four nodes F[0], ..., F[3] with a formula. Here "/"
 is the euclidian division and "%" is the modulo operator. Note the use of an
 attribute to specify which variable represents the index. The generated addresses
@@ -177,6 +194,7 @@ and an optional description. The example below illustrates all these concepts:
 
 <register>
   <width>8</width>
+  <desc>This register controls the parameters of the interrupt: priority, IRQ/FIQ and enable</desc>
   <field>
     <name>MODE</name>
     <desc>Interrupt mode</desc>
@@ -218,6 +236,10 @@ and an optional description. The example below illustrates all these concepts:
       <value>1</value>
     </enum>
   </field>
+  <variant>
+    <type>set</type>
+    <offset>0x4</offset>
+  </variant>
 </register>
 
 In this example, the 8-bit registers has three fields:
@@ -350,7 +372,15 @@ Element: register
 It can contain at most one of each of the following tags:
 - width: width in bits (positive number)
 It can contain any number of the following tags:
+- desc: free form description of the register
 - field: field description
+- variant: variant description
+
+Element: variant
+--------------
+It must contain the following tags:
+- type: name of type, only made of alphanumerical characters
+- offset: offset with respect to register address
 
 Element: field
 --------------
