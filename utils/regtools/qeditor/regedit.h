@@ -165,6 +165,7 @@ public:
     RegFieldEditPanel(const soc_desc::field_ref_t& ref, QWidget *parent = 0);
     soc_desc::field_ref_t GetField();
     void UpdateWidth();
+    void UpdateRange();
 
 signals:
     void OnModified();
@@ -203,12 +204,14 @@ protected slots:
     void OnRegFieldDelete();
     void OnRegFieldNew();
     void OnWidthChanged(int size);
+    void OnAccessChanged(int access);
     void OnFieldModified();
     void OnDescEdited();
     void OnVariantActivated(QTableWidgetItem *item);
     void OnVariantValueChanged(QTableWidgetItem *item);
     void OnFieldRemove(int index);
     void OnFieldCreate();
+    void OnBitrangeModified(int index);
 
 protected:
     void DoModify();
@@ -228,8 +231,10 @@ protected:
     QAction *m_delete_action;
     QPoint m_menu_point;
     SocFieldItemDelegate *m_variant_delegate;
+    SocAccessItemDelegate *m_access_delegate;
     SocFieldEditorCreator *m_variant_editor;
     QButtonGroup *m_reg_size_group;
+    QButtonGroup *m_reg_access_group;
 };
 
 class RegEdit : public QWidget, public DocumentTab
