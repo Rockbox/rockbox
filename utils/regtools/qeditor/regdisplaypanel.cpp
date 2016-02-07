@@ -46,7 +46,7 @@ SocDisplayPanel::SocDisplayPanel(QWidget *parent, IoBackend *io_backend,
     right_layout->addWidget(m_desc, 0);
     right_layout->addStretch(1);
 
-    setTitle("System-on-Chip Description");
+    setTitle("");
     setLayout(right_layout);
 }
 
@@ -108,7 +108,7 @@ NodeDisplayPanel::NodeDisplayPanel(QWidget *parent, IoBackend *io_backend,
     right_layout->addWidget(m_inst_desc, 0);
     right_layout->addStretch(1);
 
-    setTitle("Device Description");
+    setTitle("");
     setLayout(right_layout);
 }
 
@@ -250,7 +250,7 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend,
     right_layout->addWidget(m_value_table);
     right_layout->addStretch();
 
-    setTitle("Register Description");
+    setTitle("");
     m_viewport = new QWidget;
     m_viewport->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_viewport->setLayout(right_layout);
