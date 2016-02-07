@@ -30,6 +30,9 @@
 #include <QXmlStreamWriter>
 #include <QTextBlock>
 #include <QApplication>
+#include <QPushButton>
+#include <QMessageBox>
+#include <QStandardItemModel>
 
 /**
  * SocBitRangeValidator
@@ -406,6 +409,11 @@ bool SocFieldBitRange::operator<(const SocFieldBitRange& o) const
     return m_last_bit < o.m_last_bit;
 }
 
+bool SocFieldBitRange::operator!=(const SocFieldBitRange& o) const
+{
+    return m_first_bit != o.m_first_bit || m_last_bit != o.m_last_bit;
+}
+
 /**
  * SocFieldCachedItemDelegate
  */
@@ -476,6 +484,53 @@ void SocFieldCachedEditor::setValue(SocFieldCachedValue val)
 }
 
 /**
+ * SocAccessItemDelegate
+ */
+QString SocAccessItemDelegate::displayText(const QVariant& value, const QLocale& locale) const
+{
+    if(isUserType< soc_desc::access_t >(value))
+    {
+        soc_desc::access_t acc = value.value< soc_desc::access_t >();
+        switch(acc)
+        {
+            case soc_desc::UNSPECIFIED: return m_unspec_text;
+            case soc_desc::READ_ONLY: return "Read-Only";
+            case soc_desc::READ_WRITE: return "Read-Write";
+            case soc_desc::WRITE_ONLY: return "Write-Only";
+            default: return "<bug>";
+        }
+    }
+    else
+        return QStyledItemDelegate::displayText(value, locale);
+}
+
+/**
+ * SocAccessEditor
+ */
+SocAccessEditor::SocAccessEditor(const QString& unspec_text, QWidget *parent)
+    :QComboBox(parent)
+{
+    addItem(unspec_text, QVariant::fromValue(soc_desc::UNSPECIFIED));
+    addItem("Read-Only", QVariant::fromValue(soc_desc::READ_ONLY));
+    addItem("Read-Write", QVariant::fromValue(soc_desc::READ_WRITE));
+    addItem("Write-Only", QVariant::fromValue(soc_desc::WRITE_ONLY));
+}
+
+SocAccessEditor::~SocAccessEditor()
+{
+}
+
+soc_desc::access_t SocAccessEditor::access() const
+{
+    return itemData(currentIndex()).value< soc_desc::access_t >();
+}
+
+void SocAccessEditor::setAccess(soc_desc::access_t acc)
+{
+    setCurrentIndex(findData(QVariant::fromValue(acc)));
+}
+
+/**
  * SocFieldEditorCreator
  */
 QWidget *SocFieldEditorCreator::createWidget(QWidget *parent) const
@@ -491,6 +546,19 @@ QByteArray SocFieldEditorCreator::valuePropertyName() const
 void SocFieldEditorCreator::setWidth(int bitcount)
 {
     m_field.width = bitcount;
+}
+
+/**
+ * SocAccessEditorCreator
+ */
+QWidget *SocAccessEditorCreator::createWidget(QWidget *parent) const
+{
+    return new SocAccessEditor(m_unspec_text, parent);
+}
+
+QByteArray SocAccessEditorCreator::valuePropertyName() const
+{
+    return QByteArray("access");
 }
 
 /**
@@ -602,8 +670,22 @@ bool RegFieldTableModel::setData(const QModelIndex& idx, const QVariant& value, 
     if(role != Qt::EditRole)
         return false;
     int section = idx.column();
+    if(section == BitRangeColumn)
+    {
+        if(idx.row() < 0 || idx.row() >= rowCount())
+            return false;
+        if(value.type() != QVariant::UserType && value.userType() == qMetaTypeId< SocFieldBitRange >())
+            return false;
+        SocFieldBitRange bitrange = value.value< SocFieldBitRange >();
+        m_reg.field[idx.row()].pos = bitrange.GetFirstBit();
+        m_reg.field[idx.row()].width = bitrange.GetLastBit() - bitrange.GetFirstBit() + 1;
+        emit OnBitrangeModified(idx.row());
+    }
     if(section < FirstValueColumn || section >= FirstValueColumn + m_value.size())
+    {
+        qDebug() << "ignore setData to column " << section;
         return false;
+    }
     section -= FirstValueColumn;
     const SocFieldCachedValue& v = value.value< SocFieldCachedValue >();
     if(!m_value[section].isValid())
@@ -622,7 +704,12 @@ Qt::ItemFlags RegFieldTableModel::flags(const QModelIndex& index) const
     Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     int section = index.column();
     if(section < FirstValueColumn || section >= FirstValueColumn + m_value.size())
+    {
+        /* bitrange or name */
+        if(!m_read_only)
+            flags |= Qt::ItemIsEditable;
         return flags;
+    }
     section -= FirstValueColumn;
     if(m_value[section].isValid() && !m_read_only)
         flags |= Qt::ItemIsEditable;
@@ -764,6 +851,207 @@ bool RegFieldProxyModel::lessThan(const QModelIndex& left,
 }
 
 /**
+ * YRegDisplayItemEditor
+ */
+YRegDisplayItemEditor::YRegDisplayItemEditor(QWidget *parent, YRegDisplay *display,
+        YRegDisplayItemDelegate *delegate, QModelIndex bitrange_index,
+        QModelIndex name_index)
+    :QWidget(parent), m_display_delegate(delegate),
+    m_display(display), m_state(Idle)
+{
+    m_col_width = m_display->BitrangeRect(SocFieldBitRange(0, 0)).width();
+    m_resize_margin = m_col_width / 4;
+    setEditorData(bitrange_index, name_index);
+    setMouseTracking(true);
+    setAutoFillBackground(true);
+    setFocusPolicy(Qt::StrongFocus); // QItemDelegate says it's important
+}
+
+void YRegDisplayItemEditor::setEditorData(QModelIndex bitrange_index, QModelIndex name_index)
+{
+    if(m_state != Idle)
+    {
+        m_state = Idle;
+        QApplication::restoreOverrideCursor();
+    }
+    m_bitrange_index = bitrange_index;
+    m_name_index = name_index;
+    m_bitrange = bitrange_index.data().value< SocFieldBitRange >();
+}
+
+void YRegDisplayItemEditor::getEditorData(QVariant& name, QVariant& bitrange)
+{
+    name = QVariant(); /* don't touch the name */
+    bitrange = QVariant::fromValue(m_bitrange);
+}
+
+YRegDisplayItemEditor::~YRegDisplayItemEditor()
+{
+    /* make sure to restore cursor if modified */
+    if(m_state != Idle)
+    {
+        m_state = Idle;
+        QApplication::restoreOverrideCursor();
+    }
+}
+
+YRegDisplayItemEditor::Zone YRegDisplayItemEditor::GetZone(const QPoint& pt)
+{
+    if(!rect().contains(pt))
+        return NoZone;
+    if(pt.x() >= 0 && pt.x() <= m_resize_margin)
+        return ResizeLeftZone;
+    if(pt.x() >= width() - m_resize_margin && pt.x() <= width())
+        return ResizeRightZone;
+    return MoveZone;
+}
+
+void YRegDisplayItemEditor::mouseMoveEvent(QMouseEvent *event)
+{
+    Zone zone = GetZone(event->pos());
+    bool in_resize_zone = (zone == ResizeLeftZone || zone == ResizeRightZone);
+    /* resizing/moving has priority */
+    if(m_state == ResizingLeft || m_state == ResizingRight || m_state == Moving)
+    {
+        SocFieldBitRange new_bitrange = m_bitrange;
+        if(m_state == Moving)
+        {
+            /* Compute new bitrange: we know the offset of the mouse relative to the
+            * left of the register: use that offset to compute the new position of
+            * the MSB bit. To make it more natural, add half of a column of margin
+            * so that the register does not move until half of a bit column displacement
+            * was made */
+            int bit = m_display->bitColumnAt(mapTo(m_display,
+                event->pos() - QPoint(m_move_offset - m_col_width / 2, 0)));
+            new_bitrange.SetLastBit(bit);
+            int w = m_bitrange.GetLastBit() - m_bitrange.GetFirstBit();
+            /* make sure range is valid */
+            if(bit - w < 0)
+                return;
+            new_bitrange.SetFirstBit(bit - w);
+        }
+        else
+        {
+            /* Compute new bitrange. To make it more natural, add quarter of a column of margin
+            * so that the register does not resize until quarter of a bit column displacement
+            * was made */
+            int bit = m_display->bitColumnAt(mapTo(m_display, event->pos()
+                + QPoint(m_col_width / 4, 0)));
+            if(m_state == ResizingLeft)
+                new_bitrange.SetLastBit(bit);
+            else
+                new_bitrange.SetFirstBit(bit);
+            /* make sure range is valid */
+            if(new_bitrange.GetLastBit() < new_bitrange.GetFirstBit())
+                return;
+        }
+        /* make sure range does not overlap with other fields */
+        /* TODO */
+        /* update current bitrange (display only) and resize widget */
+        if(m_bitrange != new_bitrange)
+        {
+            m_bitrange = new_bitrange;
+            /* resize widget */
+            QRect rect = m_display->BitrangeRect(m_bitrange);
+            rect.moveTopLeft(parentWidget()->mapFromGlobal(m_display->mapToGlobal(rect.topLeft())));
+            setGeometry(rect);
+        }
+    }
+    /* any zone -> resize zone */
+    else if(in_resize_zone)
+    {
+        /* don't do unnecessary changes */
+        if(m_state != InResizeZone)
+        {
+            /* restore old cursor if needed */
+            if(m_state != Idle)
+                QApplication::restoreOverrideCursor();
+            m_state = InResizeZone;
+            QApplication::setOverrideCursor(QCursor(Qt::SizeHorCursor));
+        }
+    }
+    /* any zone -> move zone */
+    else if(zone == MoveZone)
+    {
+        /* don't do unnecessary changes */
+        if(m_state != InMoveZone)
+        {
+            /* restore old cursor if needed */
+            if(m_state != Idle)
+                QApplication::restoreOverrideCursor();
+            m_state = InMoveZone;
+            QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
+        }
+    }
+    /* any zone -> no zone */
+    else if(zone == NoZone)
+    {
+        if(m_state != Idle)
+        {
+            m_state = Idle;
+            QApplication::restoreOverrideCursor();
+        }
+    }
+}
+
+void YRegDisplayItemEditor::leaveEvent(QEvent *event)
+{
+    Q_UNUSED(event);
+    if(m_state == InResizeZone)
+    {
+        m_state = Idle;
+        QApplication::restoreOverrideCursor();
+    }
+}
+
+void YRegDisplayItemEditor::mousePressEvent(QMouseEvent *event)
+{
+    /* just in case the mouseMove event was not done */
+    mouseMoveEvent(event);
+    /* we need to track mouse outside of widget but Qt already grabs the mouse
+     * for us on mouse press in widget */
+    if(m_state == InResizeZone)
+    {
+        if(GetZone(event->pos()) == ResizeLeftZone)
+            m_state = ResizingLeft;
+        else
+            m_state = ResizingRight;
+    }
+    else if(m_state == InMoveZone)
+    {
+        m_state = Moving;
+        /* store offset from the left, to keep relative position of the register
+         * with respect to the mouse */
+        m_move_offset = event->pos().x();
+    }
+}
+
+void YRegDisplayItemEditor::mouseReleaseEvent(QMouseEvent *event)
+{
+    if(m_state == ResizingLeft ||  m_state == ResizingRight || m_state == Moving)
+    {
+        QApplication::restoreOverrideCursor();
+        m_state = Idle;
+        /* update cursor */
+        mouseMoveEvent(event);
+    }
+}
+
+void YRegDisplayItemEditor::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event);
+    QPainter painter(this);
+    /* reuse delegate code to paint */
+    QStyleOptionViewItemV4 opt = m_display->viewOptions();
+    opt.state |= QStyle::State_HasFocus | QStyle::State_Selected | QStyle::State_Active;
+    opt.displayAlignment = Qt::AlignHCenter | Qt::AlignVCenter;
+    opt.rect = rect();
+    opt.showDecorationSelected = true;
+    m_display_delegate->initStyleOption(&opt, m_name_index);
+    m_display_delegate->MyPaint(&painter, opt);
+}
+
+/**
  * YRegDisplayItemDelegate
  */
 
@@ -772,14 +1060,9 @@ YRegDisplayItemDelegate::YRegDisplayItemDelegate(QObject *parent)
 {
 }
 
- void YRegDisplayItemDelegate::paint(QPainter *painter,
-    const QStyleOptionViewItem& option, const QModelIndex& index) const
+void YRegDisplayItemDelegate::MyPaint(QPainter *painter, const QStyleOptionViewItemV4& option) const
 {
     QStyleOptionViewItemV4 opt = option;
-    // default alignment is centered unless specified
-    opt.displayAlignment = Qt::AlignHCenter | Qt::AlignVCenter;
-    initStyleOption(&opt, index);
-
     painter->save();
     // draw everything rotated, requires careful manipulation of the
     // rects involved
@@ -789,15 +1072,56 @@ YRegDisplayItemDelegate::YRegDisplayItemDelegate(QObject *parent)
     QStyle *style = opt.widget ? opt.widget->style() : QApplication::style();
     style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, opt.widget);
     painter->restore();
+}
+
+void YRegDisplayItemDelegate::paint(QPainter *painter,
+    const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    QStyleOptionViewItemV4 opt = option;
+    // default alignment is centered unless specified
+    opt.displayAlignment = Qt::AlignHCenter | Qt::AlignVCenter;
+    initStyleOption(&opt, index);
+
+    MyPaint(painter, opt);
 
 }
 
 QSize YRegDisplayItemDelegate::sizeHint(const QStyleOptionViewItem& option,
     const QModelIndex& index) const
 {
+    /* useless in our case, the view ignores this */
     Q_UNUSED(option);
     Q_UNUSED(index);
     return QSize();
+}
+
+QWidget *YRegDisplayItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem& option,
+    const QModelIndex& index) const
+{
+    Q_UNUSED(option);
+    Q_UNUSED(index);
+    YRegDisplay *display = dynamic_cast< YRegDisplay* >(parent->parent());
+    Q_ASSERT(display != nullptr);
+    /* column 0 is name, column 1 is range */
+    return new YRegDisplayItemEditor(parent, display, const_cast< YRegDisplayItemDelegate* >(this),
+        index.sibling(index.row(), 0), index.sibling(index.row(), 1));
+}
+
+void YRegDisplayItemDelegate::setEditorData(QWidget *editor, const QModelIndex& index) const
+{
+    dynamic_cast< YRegDisplayItemEditor* >(editor)->setEditorData(
+        index.sibling(index.row(), 0), index.sibling(index.row(), 1));
+}
+
+void YRegDisplayItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+    const QModelIndex& index) const
+{
+    QVariant name, bitrange;
+    dynamic_cast< YRegDisplayItemEditor* >(editor)->getEditorData(name, bitrange);
+    if(name.isValid())
+        model->setData(index.sibling(index.row(), 1), name);
+    if(bitrange.isValid())
+        model->setData(index.sibling(index.row(), 0), bitrange);
 }
 
 /**
@@ -814,7 +1138,8 @@ YRegDisplay::YRegDisplay(QWidget *parent)
     // the frame around the register is ugly, disable it
     setFrameShape(QFrame::NoFrame);
     setSelectionMode(SingleSelection);
-    setItemDelegate(new YRegDisplayItemDelegate());
+    setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked);
+    setItemDelegate(new YRegDisplayItemDelegate(this));
 }
 
 void YRegDisplay::setWidth(int nr_bits)
@@ -1055,6 +1380,11 @@ QRect YRegDisplay::itemRect(const QModelIndex& index) const
     return itemRect(range, index.column());
 }
 
+QRect YRegDisplay::BitrangeRect(const SocFieldBitRange& range) const
+{
+    return itemRect(range, m_data_col);
+}
+
 QRect YRegDisplay::itemRect(const SocFieldBitRange& range, int col) const
 {
     int top, bot;
@@ -1276,17 +1606,17 @@ MyTextEditor::MyTextEditor(QWidget *parent)
     m_edit->setAutoFormatting(QTextEdit::AutoAll);
 
     m_bold_button = new QToolButton(this);
-    m_bold_button->setIcon(QIcon::fromTheme("format-text-bold"));
+    m_bold_button->setIcon(YIconManager::Get()->GetIcon(YIconManager::FormatTextBold));
     m_bold_button->setText("bold");
     m_bold_button->setCheckable(true);
 
     m_italic_button = new QToolButton(this);
-    m_italic_button->setIcon(QIcon::fromTheme("format-text-italic"));
+    m_italic_button->setIcon(YIconManager::Get()->GetIcon(YIconManager::FormatTextItalic));
     m_italic_button->setText("italic");
     m_italic_button->setCheckable(true);
 
     m_underline_button = new QToolButton(this);
-    m_underline_button->setIcon(QIcon::fromTheme("format-text-underline"));
+    m_underline_button->setIcon(YIconManager::Get()->GetIcon(YIconManager::FormatTextUnderline));
     m_underline_button->setText("underline");
     m_underline_button->setCheckable(true);
 
@@ -1419,10 +1749,13 @@ BackendSelector::BackendSelector(Backend *backend, QWidget *parent)
     :QWidget(parent), m_backend(backend)
 {
     m_data_selector = new QComboBox(this);
-    m_data_selector->addItem(QIcon::fromTheme("text-x-generic"), "Nothing...", QVariant(DataSelNothing));
-    m_data_selector->addItem(QIcon::fromTheme("document-open"), "File...", QVariant(DataSelFile));
+    m_data_selector->addItem(YIconManager::Get()->GetIcon(YIconManager::TextGeneric),
+        "Nothing...", QVariant(DataSelNothing));
+    m_data_selector->addItem(YIconManager::Get()->GetIcon(YIconManager::DocumentOpen),
+        "File...", QVariant(DataSelFile));
 #ifdef HAVE_HWSTUB
-    m_data_selector->addItem(QIcon::fromTheme("multimedia-player"), "Device...", QVariant(DataSelDevice));
+    m_data_selector->addItem(YIconManager::Get()->GetIcon(YIconManager::MultimediaPlayer),
+        "USB Device...", QVariant(DataSelDevice));
 #endif
     m_data_sel_edit = new QLineEdit(this);
     m_data_sel_edit->setReadOnly(true);
@@ -1435,7 +1768,18 @@ BackendSelector::BackendSelector(Backend *backend, QWidget *parent)
     data_sel_layout->addStretch(0);
 #ifdef HAVE_HWSTUB
     m_dev_selector = new QComboBox;
+    m_ctx_model = new HWStubContextModel;
+    m_ctx_model->EnableDummy(true, "Please select a device...");
+    m_dev_selector->setModel(m_ctx_model); /* m_dev_selector will delete m_ctx_model */
+    m_ctx_selector = new QComboBox;
+    m_ctx_manager = HWStubManager::Get();
+    m_ctx_selector->setModel(m_ctx_manager);
+    m_ctx_manage_button = new QPushButton();
+    m_ctx_manage_button->setIcon(YIconManager::Get()->GetIcon(YIconManager::Preferences));
+    m_ctx_manage_button->setToolTip("Manage contexts");
     data_sel_layout->addWidget(m_dev_selector, 1);
+    data_sel_layout->addWidget(m_ctx_selector);
+    data_sel_layout->addWidget(m_ctx_manage_button);
 #endif
 
     m_io_backend = m_backend->CreateDummyIoBackend();
@@ -1443,18 +1787,25 @@ BackendSelector::BackendSelector(Backend *backend, QWidget *parent)
     connect(m_data_selector, SIGNAL(activated(int)),
         this, SLOT(OnDataSelChanged(int)));
 #ifdef HAVE_HWSTUB
-    connect(m_dev_selector, SIGNAL(currentIndexChanged(int)),
-        this, SLOT(OnDevChanged(int)));
-    connect(&m_hwstub_helper, SIGNAL(OnDevListChanged(bool, struct libusb_device *)),
-        this, SLOT(OnDevListChanged2(bool, struct libusb_device *)));
+    connect(m_ctx_selector, SIGNAL(currentIndexChanged(int)), this,
+        SLOT(OnContextSelChanged(int)));
+    connect(m_dev_selector, SIGNAL(currentIndexChanged(int)), this,
+        SLOT(OnDeviceSelChanged(int)));
+    connect(m_dev_selector, SIGNAL(activated(int)), this,
+        SLOT(OnDeviceSelActivated(int)));
+#endif
+
+#ifdef HAVE_HWSTUB
+    OnContextSelChanged(0);
 #endif
     OnDataSelChanged(0);
 }
 
 BackendSelector::~BackendSelector()
 {
+    /* avoid m_ctx_selector from deleting HWStubManager */
 #ifdef HAVE_HWSTUB
-    ClearDevList();
+    m_ctx_selector->setModel(new QStandardItemModel());
 #endif
     delete m_io_backend;
 }
@@ -1475,6 +1826,8 @@ void BackendSelector::OnDataSelChanged(int index)
         m_data_sel_edit->show();
 #ifdef HAVE_HWSTUB
         m_dev_selector->hide();
+        m_ctx_selector->hide();
+        m_ctx_manage_button->hide();
 #endif
         QFileDialog *fd = new QFileDialog(m_data_selector);
         QStringList filters;
@@ -1496,7 +1849,10 @@ void BackendSelector::OnDataSelChanged(int index)
         m_nothing_text->hide();
         m_data_sel_edit->hide();
         m_dev_selector->show();
-        OnDevListChanged();
+        m_ctx_selector->show();
+        m_ctx_manage_button->show();
+        /* explicitely change the backend now */
+        OnDeviceSelActivated(m_dev_selector->currentIndex());
     }
 #endif
     else
@@ -1505,58 +1861,13 @@ void BackendSelector::OnDataSelChanged(int index)
         m_nothing_text->show();
 #ifdef HAVE_HWSTUB
         m_dev_selector->hide();
+        m_ctx_selector->hide();
+        m_ctx_manage_button->hide();
 #endif
 
         ChangeBackend(m_backend->CreateDummyIoBackend());
     }
 }
-
-#ifdef HAVE_HWSTUB
-void BackendSelector::OnDevListChanged2(bool arrived, struct libusb_device *dev)
-{
-    Q_UNUSED(arrived);
-    Q_UNUSED(dev);
-    OnDevListChanged();
-}
-
-void BackendSelector::OnDevListChanged()
-{
-    ClearDevList();
-    QList< HWStubDevice* > list = m_hwstub_helper.GetDevList();
-    foreach(HWStubDevice *dev, list)
-    {
-        QString name = QString("Bus %1 Device %2: %3").arg(dev->GetBusNumber())
-            .arg(dev->GetDevAddress()).arg(dev->GetTargetInfo().bName);
-        m_dev_selector->addItem(QIcon::fromTheme("multimedia-player"), name,
-            QVariant::fromValue((void *)dev));
-    }
-    if(list.size() > 0)
-        m_dev_selector->setCurrentIndex(0);
-}
-
-void BackendSelector::OnDevChanged(int index)
-{
-    if(index == -1)
-        return;
-    HWStubDevice *dev = reinterpret_cast< HWStubDevice* >(m_dev_selector->itemData(index).value< void* >());
-    delete m_io_backend;
-    /* NOTE: make a copy of the HWStubDevice device because the one in the list
-     * might get destroyed when clearing the list while the backend is still
-     * active: this would result in a double free when the backend is also destroyed */
-    m_io_backend = m_backend->CreateHWStubIoBackend(new HWStubDevice(dev));
-    emit OnSelect(m_io_backend);
-}
-
-void BackendSelector::ClearDevList()
-{
-    while(m_dev_selector->count() > 0)
-    {
-        HWStubDevice *dev = reinterpret_cast< HWStubDevice* >(m_dev_selector->itemData(0).value< void* >());
-        delete dev;
-        m_dev_selector->removeItem(0);
-    }
-}
-#endif
 
 IoBackend *BackendSelector::GetBackend()
 {
@@ -1572,16 +1883,46 @@ void BackendSelector::ChangeBackend(IoBackend *new_backend)
     m_io_backend = new_backend;
 }
 
+#ifdef HAVE_HWSTUB
+void BackendSelector::OnContextSelChanged(int index)
+{
+    m_ctx_model->SetContext(m_ctx_manager->GetContext(index));
+    m_dev_selector->setCurrentIndex(0);
+}
+
+void BackendSelector::OnDeviceSelChanged(int index)
+{
+    /* if current selection is -1, because device was removed or a new context
+     * was selected, select entry 0, which is dummy. Not that this will not
+     * call activate(), we don't want to change the current backend if the user
+     * is using another type of backend. */
+    if(index == -1)
+        m_dev_selector->setCurrentIndex(0);
+}
+
+void BackendSelector::OnDeviceSelActivated(int index)
+{
+    auto dev = new HWStubDevice(m_ctx_model->GetDevice(index));
+    if(!dev->IsValid())
+    {
+        delete dev;
+        ChangeBackend(m_backend->CreateDummyIoBackend()); 
+    }
+    else
+        ChangeBackend(new HWStubIoBackend(dev));
+}
+#endif
+
 /**
  * YTabWidget
  */
 YTabWidget::YTabWidget(QTabBar *bar, QWidget *parent)
-    :QTabWidget(parent)
+    :QTabWidget(parent), m_other_button(0)
 {
     if(bar != 0)
         setTabBar(bar);
     m_tab_open_button = new QToolButton(this);
-    m_tab_open_button->setIcon(QIcon::fromTheme("list-add"));
+    m_tab_open_button->setIcon(YIconManager::Get()->GetIcon(YIconManager::ListAdd));
     m_tab_open_button->setAutoRaise(true);
     m_tab_open_button->setPopupMode(QToolButton::InstantPopup);
     /* the arrow with an icon only is pretty ugly and QToolButton has no way
@@ -1592,8 +1933,8 @@ YTabWidget::YTabWidget(QTabBar *bar, QWidget *parent)
     connect(m_tab_open_button, SIGNAL(clicked(bool)), this, SLOT(OnOpenButton(bool)));
     /* there is a quirk in the default QStyle: if the tab bar is empty, it
      * returns the minimum size of the corner widget, which is 0 for tool buttons */
-    //setMinimumHeight(m_tab_open_button->height());
-    //m_tab_open_button->setMinimumHeight(m_tab_open_button->sizeHint().height());
+    m_tab_open_button->setMinimumSize(m_tab_open_button->sizeHint());
+    setMinimumSize(m_tab_open_button->sizeHint());
 }
 
 void YTabWidget::setTabOpenable(bool openable)
@@ -1613,6 +1954,28 @@ void YTabWidget::setTabOpenMenu(QMenu *menu)
     m_tab_open_button->setMenu(menu);
 }
 
+void YTabWidget::setOtherMenu(QMenu *menu)
+{
+    if(menu == nullptr)
+    {
+        if(m_other_button)
+            delete m_other_button;
+        m_other_button = nullptr;
+    }
+    else
+    {
+        if(m_other_button == nullptr)
+        {
+            m_other_button = new QToolButton(this);
+            m_other_button->setText("Menu");
+            m_other_button->setAutoRaise(true);
+            m_other_button->setPopupMode(QToolButton::InstantPopup);
+            setCornerWidget(m_other_button, Qt::TopRightCorner);
+        }
+        m_other_button->setMenu(menu);
+    }
+}
+
 /**
  * MessageWidget
  */
@@ -1625,6 +1988,7 @@ MessageWidget::MessageWidget(QWidget *parent)
     m_icon->hide();
     m_text = new QLabel(this);
     m_text->setTextFormat(Qt::RichText);
+    m_text->setWordWrap(true);
     m_close = new QToolButton(this);
     m_close->setText("close");
     m_close->setIcon(style()->standardIcon(QStyle::SP_DialogCloseButton));
@@ -1700,6 +2064,102 @@ void MessageWidget::OnClose(bool clicked)
 {
     Q_UNUSED(clicked);
     hide();
+}
+
+/*
+ * YIconManager
+ */
+YIconManager *YIconManager::m_singleton = nullptr;
+
+YIconManager::YIconManager()
+{
+    m_icon_name[ListAdd] = "list-add";
+    m_icon_name[ListRemove] = "list-remove";
+    m_icon_name[DocumentNew] = "document-new";
+    m_icon_name[DocumentEdit] = "document-edit";
+    m_icon_name[DocumentOpen] = "document-open";
+    m_icon_name[DocumentSave] = "document-save";
+    m_icon_name[DocumentSaveAs] = "document-save-as";
+    m_icon_name[Preferences] = "preferences-system";
+    m_icon_name[FolderNew] = "folder-new";
+    m_icon_name[Computer] = "computer";
+    m_icon_name[Cpu] = "cpu";
+    m_icon_name[DialogError] = "dialog-error";
+    m_icon_name[ViewRefresh] = "view-refresh";
+    m_icon_name[SytemRun] = "system-run";
+    m_icon_name[ApplicationExit] = "application-exit";
+    m_icon_name[HelpAbout] = "help-about";
+    m_icon_name[FormatTextBold] = "format-text-bold";
+    m_icon_name[FormatTextItalic] = "format-text-italic";
+    m_icon_name[FormatTextUnderline] = "format-text-underline";
+    m_icon_name[TextGeneric] = "text-x-generic";
+    m_icon_name[MultimediaPlayer] = "multimedia-player";
+}
+
+YIconManager::~YIconManager()
+{
+}
+
+YIconManager *YIconManager::Get()
+{
+    if(m_singleton == nullptr)
+        m_singleton = new YIconManager();
+    return m_singleton;
+}
+
+QIcon YIconManager::GetIcon(IconType type)
+{
+    if(type < 0 || type >= MaxIcon)
+        return QIcon();
+    if(QIcon::hasThemeIcon(m_icon_name[type]))
+        return QIcon::fromTheme(m_icon_name[type]);
+    /* render icon if needed */
+    if(m_icon[type].isNull())
+        Render(type);
+    return m_icon[type];
+}
+
+namespace
+{
+    void RenderListAdd(QIcon& icon)
+    {
+        QPixmap pix(64, 64);
+        pix.fill(Qt::transparent);
+        QPainter paint(&pix);
+        paint.fillRect(30, 12, 4, 40, QColor(255, 0, 0));
+        paint.fillRect(12, 30, 40, 4, QColor(255, 0, 0));
+        icon = QIcon(pix);
+    }
+
+    void RenderListRemove(QIcon& icon)
+    {
+        QPixmap pix(64, 64);
+        pix.fill(Qt::transparent);
+        QPainter paint(&pix);
+        paint.setPen(QColor(255, 0, 0));
+        paint.drawLine(12, 12, 52, 52);
+        paint.drawLine(12, 52, 52, 16);
+        icon = QIcon(pix);
+    }
+
+    void RenderUnknown(QIcon& icon)
+    {
+        QPixmap pix(64, 64);
+        pix.fill();
+        QPainter paint(&pix);
+        paint.fillRect(0, 0, 64, 64, QColor(255, 0, 0));
+        icon = QIcon(pix);
+    }
+}
+
+void YIconManager::Render(IconType type)
+{
+    switch(type)
+    {
+        case ListAdd: RenderListAdd(m_icon[type]); break;
+        case ListRemove: RenderListRemove(m_icon[type]); break;
+        default: RenderUnknown(m_icon[type]); break;
+    }
 }
 
 /**
