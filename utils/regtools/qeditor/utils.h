@@ -509,18 +509,20 @@ protected:
     QLineEdit *m_data_sel_edit;
 #ifdef HAVE_HWSTUB
     QComboBox *m_dev_selector;
-    HWStubBackendHelper m_hwstub_helper;
+    QComboBox *m_ctx_selector;
+    QPushButton *m_ctx_manage_button;
+    HWStubContextModel *m_ctx_model;
+    HWStubManager *m_ctx_manager;
 #endif
     QLabel *m_nothing_text;
 
 private slots:
-#ifdef HAVE_HWSTUB
-    void OnDevListChanged();
-    void OnDevChanged(int index);
-    void OnDevListChanged2(bool, struct libusb_device *);
-    void ClearDevList();
-#endif
     void OnDataSelChanged(int index);
+#ifdef HAVE_HWSTUB
+    void OnContextSelChanged(int index);
+    void OnDeviceSelChanged(int index);
+    void OnDeviceSelActivated(int index);
+#endif
 };
 
 class MessageWidget : public QFrame

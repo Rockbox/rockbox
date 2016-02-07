@@ -142,6 +142,10 @@ MainWindow::MainWindow(Backend *backend)
     setCentralWidget(m_tab);
 
     ReadSettings();
+#ifdef HAVE_HWSTUB
+    /* acquire hwstub manager */
+    HWStubManager::Get()->setParent(this);
+#endif
 
     OnNewRegTab();
 }
@@ -167,12 +171,12 @@ void MainWindow::OnAbout()
         .arg(soc_desc::MINOR_VERSION).arg(soc_desc::REVISION_VERSION);
     QMessageBox::about(this, "About", 
         "<h1>QEditor</h1>"
-        "<h2>Version "APP_VERSION"</h2>"
+        "<h2>Version " APP_VERSION "</h2>"
         "<p>Written by Amaury Pouly</p>"
         "<p>Libraries:</p>"
         "<ul><li>soc_desc: " + soc_desc_ver + "</li>"
 #ifdef HAVE_HWSTUB
-        "<li>hwstub: "HWSTUB_VERSION"</li>"
+        "<li>hwstub: " HWSTUB_VERSION "</li>"
 #else
         "<li>hwstub: not compiled in</li>"
 #endif
