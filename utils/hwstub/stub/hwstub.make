@@ -1,4 +1,4 @@
-INCLUDES+=-I$(ROOT_DIR)
+INCLUDES+=-I$(ROOT_DIR) -I$(ROOT_DIR)/../include/
 LINKER_FILE=hwstub.lds
 TMP_LDS=$(BUILD_DIR)/link.lds
 TMP_MAP=$(BUILD_DIR)/hwstub.map
@@ -45,7 +45,7 @@ $(TMP_LDS): $(LINKER_FILE)
 $(EXEC_ELF): $(OBJ) $(TMP_LDS)
 	$(call PRINTS,LD $(@F))
 	$(SILENT)$(LD) $(LDFLAGS) -o $@ $(OBJ_EXCEPT_CRT0)
-	
+
 $(EXEC_BIN): $(EXEC_ELF)
 	$(call PRINTS,OC $(@F))
 	$(SILENT)$(OC) -O binary $< $@
