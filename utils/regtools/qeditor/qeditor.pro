@@ -7,6 +7,7 @@ SOURCES += main.cpp mainwindow.cpp regtab.cpp backend.cpp analyser.cpp \
 LIBS += -L../lib/ -lsocdesc -lxml2
 INCLUDEPATH += ../include/ ../../hwstub/lib
 DEPENDPATH += ../
+CONFIG += c++11
 
 libsocdesc.commands = cd ../lib && make
 QMAKE_EXTRA_TARGETS += libsocdesc
