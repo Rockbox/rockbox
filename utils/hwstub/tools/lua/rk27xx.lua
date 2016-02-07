@@ -4,5 +4,8 @@
 
 RK27XX = {}
 
-hwstub.soc:select("rk27xx")
-require 'rk27xx/lcdif'
+function RK27XX.init()
+    hwstub.soc:select("rk27xx")
+end
+
+require 'rk27xx/lradc'
