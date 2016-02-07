@@ -1,7 +1,6 @@
 ---
 --- Chip Identification
 ---
-
 STMP = { info = {} }
 
 local h = HELP:create_topic("STMP")
@@ -49,18 +48,6 @@ function STMP.is_stmp3600()
     return hwstub.dev.stmp.chipid >= 0x3600 and hwstub.dev.stmp.chipid < 0x3700
 end
 
-if STMP.is_imx233() then
-    identify("STMP3780 (aka i.MX233)", "imx233", "imx233")
-elseif STMP.is_stmp3700() then
-    identify("STMP3700", "stmp3700", "stmp3700")
-elseif STMP.is_stmp3770() then
-    identify("STMP3770", "stmp3770", "stmp3700")
-elseif STMP.is_stmp3600() then
-    identify("STMP3600", "stmp3600", "stmp3600")
-else
-    print(string.format("Unable to identify this chip as a STMP: chipid=0x%x", hwstub.dev.stmp.chipid));
-end
-
 hh = h:create_topic("debug")
 hh:add("STMP.debug(...) prints some debug output if STMP.debug_on is true and does nothing otherwise.")
 
@@ -70,11 +57,24 @@ function STMP.debug(...)
     if STMP.debug_on then print(...) end
 end
 
-if STMP.info.chip ~= nil then
-    require "stmp/digctl"
-    require "stmp/pinctrl"
-    require "stmp/lcdif"
-    require "stmp/pwm"
-    require "stmp/clkctrl"
-    require "stmp/i2c"
+-- init
+function STMP.init()
+    if STMP.is_imx233() then
+        identify("STMP3780 (aka i.MX233)", "imx233", "imx233")
+    elseif STMP.is_stmp3700() then
+        identify("STMP3700", "stmp3700", "stmp3700")
+    elseif STMP.is_stmp3770() then
+        identify("STMP3770", "stmp3770", "stmp3700")
+    elseif STMP.is_stmp3600() then
+        identify("STMP3600", "stmp3600", "stmp3600")
+    else
+        print(string.format("Unable to identify this chip as a STMP: chipid=0x%x", hwstub.dev.stmp.chipid));
+    end
 end
+
+require "stmp/digctl"
+require "stmp/pinctrl"
+require "stmp/lcdif"
+require "stmp/pwm"
+require "stmp/clkctrl"
+require "stmp/i2c"
