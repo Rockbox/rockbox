@@ -146,7 +146,9 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
     connect(m_type_selector, SIGNAL(currentChanged(int)), this, SLOT(OnTypeChanged(int)));
 
     m_msg_select_id = SetMessage(MessageWidget::Information,
-        "You can browse the registers. Select a data source to analyse the values.");
+        "You can browse the registers using the left panel. "
+        "Select a data source at the top to analyse the values. "
+        "You can also use the analyzers available in the left panel, if any.");
     m_msg_error_id = 0;
 
     QList< SocFileRef > socs = m_backend->GetSocFileList();
@@ -215,8 +217,7 @@ void RegTab::UpdateTabName()
     else if(hwstub)
     {
         HWStubDevice *dev = hwstub->GetDevice();
-        SetTabName(QString("HWStub %1.%2").arg(dev->GetBusNumber())
-            .arg(dev->GetDevAddress()));
+        SetTabName(dev->GetFriendlyName());
     }
 #endif
     else
@@ -231,11 +232,21 @@ void RegTab::OnBackendSelect(IoBackend *backend)
     HideMessage(m_msg_select_id);
     HideMessage(m_msg_error_id);
     m_io_backend = backend;
-    SetReadOnlyIndicator();
-    SetDataSocName(m_io_backend->GetSocName());
-    OnDataSocActivated(m_io_backend->GetSocName());
-    OnDataChanged();
-    UpdateTabName();
+    /* Check if the backend is valid, otherwise it might confuse the user */
+    if(m_io_backend->IsValid())
+    {
+        SetReadOnlyIndicator();
+        SetDataSocName(m_io_backend->GetSocName());
+        OnDataSocActivated(m_io_backend->GetSocName());
+        OnDataChanged();
+        UpdateTabName();
+    }
+    /* But don't display it for the dummy backend either */
+    else if(dynamic_cast< DummyIoBackend * >(m_io_backend) == 0)
+    {
+        m_msg_error_id = SetMessage(MessageWidget::Error,
+            "Data source is not available.");
+    }
 }
 
 void RegTab::SetReadOnlyIndicator()
@@ -267,6 +278,7 @@ void RegTab::OnAnalyserClicked(QListWidgetItem *current)
 
 void RegTab::DisplayNode(const soc_desc::node_inst_t& ref)
 {
+    HideMessage(m_msg_select_id);
     if(ref.node().is_root())
         SetPanel(new SocDisplayPanel(this, m_io_backend, ref.soc()));
     else if(ref.node().reg().valid())
