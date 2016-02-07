@@ -30,6 +30,9 @@
 #include <QXmlStreamWriter>
 #include <QTextBlock>
 #include <QApplication>
+#include <QPushButton>
+#include <QMessageBox>
+#include <QStandardItemModel>
 
 /**
  * SocBitRangeValidator
@@ -814,7 +817,7 @@ YRegDisplay::YRegDisplay(QWidget *parent)
     // the frame around the register is ugly, disable it
     setFrameShape(QFrame::NoFrame);
     setSelectionMode(SingleSelection);
-    setItemDelegate(new YRegDisplayItemDelegate());
+    setItemDelegate(new YRegDisplayItemDelegate(this));
 }
 
 void YRegDisplay::setWidth(int nr_bits)
@@ -1422,7 +1425,7 @@ BackendSelector::BackendSelector(Backend *backend, QWidget *parent)
     m_data_selector->addItem(QIcon::fromTheme("text-x-generic"), "Nothing...", QVariant(DataSelNothing));
     m_data_selector->addItem(QIcon::fromTheme("document-open"), "File...", QVariant(DataSelFile));
 #ifdef HAVE_HWSTUB
-    m_data_selector->addItem(QIcon::fromTheme("multimedia-player"), "Device...", QVariant(DataSelDevice));
+    m_data_selector->addItem(QIcon::fromTheme("multimedia-player"), "USB Device...", QVariant(DataSelDevice));
 #endif
     m_data_sel_edit = new QLineEdit(this);
     m_data_sel_edit->setReadOnly(true);
@@ -1435,7 +1438,18 @@ BackendSelector::BackendSelector(Backend *backend, QWidget *parent)
     data_sel_layout->addStretch(0);
 #ifdef HAVE_HWSTUB
     m_dev_selector = new QComboBox;
+    m_ctx_model = new HWStubContextModel;
+    m_ctx_model->EnableDummy(true, "Please select a device...");
+    m_dev_selector->setModel(m_ctx_model); /* m_dev_selector will delete m_ctx_model */
+    m_ctx_selector = new QComboBox;
+    m_ctx_manager = HWStubManager::Get();
+    m_ctx_selector->setModel(m_ctx_manager);
+    m_ctx_manage_button = new QPushButton();
+    m_ctx_manage_button->setIcon(QIcon::fromTheme("preferences-system"));
+    m_ctx_manage_button->setToolTip("Manage contexts");
     data_sel_layout->addWidget(m_dev_selector, 1);
+    data_sel_layout->addWidget(m_ctx_selector);
+    data_sel_layout->addWidget(m_ctx_manage_button);
 #endif
 
     m_io_backend = m_backend->CreateDummyIoBackend();
@@ -1443,18 +1457,25 @@ BackendSelector::BackendSelector(Backend *backend, QWidget *parent)
     connect(m_data_selector, SIGNAL(activated(int)),
         this, SLOT(OnDataSelChanged(int)));
 #ifdef HAVE_HWSTUB
-    connect(m_dev_selector, SIGNAL(currentIndexChanged(int)),
-        this, SLOT(OnDevChanged(int)));
-    connect(&m_hwstub_helper, SIGNAL(OnDevListChanged(bool, struct libusb_device *)),
-        this, SLOT(OnDevListChanged2(bool, struct libusb_device *)));
+    connect(m_ctx_selector, SIGNAL(currentIndexChanged(int)), this,
+        SLOT(OnContextSelChanged(int)));
+    connect(m_dev_selector, SIGNAL(currentIndexChanged(int)), this,
+        SLOT(OnDeviceSelChanged(int)));
+    connect(m_dev_selector, SIGNAL(activated(int)), this,
+        SLOT(OnDeviceSelActivated(int)));
+#endif
+
+#ifdef HAVE_HWSTUB
+    OnContextSelChanged(0);
 #endif
     OnDataSelChanged(0);
 }
 
 BackendSelector::~BackendSelector()
 {
+    /* avoid m_ctx_selector from deleting HWStubManager */
 #ifdef HAVE_HWSTUB
-    ClearDevList();
+    m_ctx_selector->setModel(new QStandardItemModel());
 #endif
     delete m_io_backend;
 }
@@ -1475,6 +1496,8 @@ void BackendSelector::OnDataSelChanged(int index)
         m_data_sel_edit->show();
 #ifdef HAVE_HWSTUB
         m_dev_selector->hide();
+        m_ctx_selector->hide();
+        m_ctx_manage_button->hide();
 #endif
         QFileDialog *fd = new QFileDialog(m_data_selector);
         QStringList filters;
@@ -1496,7 +1519,10 @@ void BackendSelector::OnDataSelChanged(int index)
         m_nothing_text->hide();
         m_data_sel_edit->hide();
         m_dev_selector->show();
-        OnDevListChanged();
+        m_ctx_selector->show();
+        m_ctx_manage_button->show();
+        /* explicitely change the backend now */
+        OnDeviceSelActivated(m_dev_selector->currentIndex());
     }
 #endif
     else
@@ -1505,58 +1531,13 @@ void BackendSelector::OnDataSelChanged(int index)
         m_nothing_text->show();
 #ifdef HAVE_HWSTUB
         m_dev_selector->hide();
+        m_ctx_selector->hide();
+        m_ctx_manage_button->hide();
 #endif
 
         ChangeBackend(m_backend->CreateDummyIoBackend());
     }
 }
-
-#ifdef HAVE_HWSTUB
-void BackendSelector::OnDevListChanged2(bool arrived, struct libusb_device *dev)
-{
-    Q_UNUSED(arrived);
-    Q_UNUSED(dev);
-    OnDevListChanged();
-}
-
-void BackendSelector::OnDevListChanged()
-{
-    ClearDevList();
-    QList< HWStubDevice* > list = m_hwstub_helper.GetDevList();
-    foreach(HWStubDevice *dev, list)
-    {
-        QString name = QString("Bus %1 Device %2: %3").arg(dev->GetBusNumber())
-            .arg(dev->GetDevAddress()).arg(dev->GetTargetInfo().bName);
-        m_dev_selector->addItem(QIcon::fromTheme("multimedia-player"), name,
-            QVariant::fromValue((void *)dev));
-    }
-    if(list.size() > 0)
-        m_dev_selector->setCurrentIndex(0);
-}
-
-void BackendSelector::OnDevChanged(int index)
-{
-    if(index == -1)
-        return;
-    HWStubDevice *dev = reinterpret_cast< HWStubDevice* >(m_dev_selector->itemData(index).value< void* >());
-    delete m_io_backend;
-    /* NOTE: make a copy of the HWStubDevice device because the one in the list
-     * might get destroyed when clearing the list while the backend is still
-     * active: this would result in a double free when the backend is also destroyed */
-    m_io_backend = m_backend->CreateHWStubIoBackend(new HWStubDevice(dev));
-    emit OnSelect(m_io_backend);
-}
-
-void BackendSelector::ClearDevList()
-{
-    while(m_dev_selector->count() > 0)
-    {
-        HWStubDevice *dev = reinterpret_cast< HWStubDevice* >(m_dev_selector->itemData(0).value< void* >());
-        delete dev;
-        m_dev_selector->removeItem(0);
-    }
-}
-#endif
 
 IoBackend *BackendSelector::GetBackend()
 {
@@ -1572,6 +1553,36 @@ void BackendSelector::ChangeBackend(IoBackend *new_backend)
     m_io_backend = new_backend;
 }
 
+#ifdef HAVE_HWSTUB
+void BackendSelector::OnContextSelChanged(int index)
+{
+    m_ctx_model->SetContext(m_ctx_manager->GetContext(index));
+    m_dev_selector->setCurrentIndex(0);
+}
+
+void BackendSelector::OnDeviceSelChanged(int index)
+{
+    /* if current selection is -1, because device was removed or a new context
+     * was selected, select entry 0, which is dummy. Not that this will not
+     * call activate(), we don't want to change the current backend if the user
+     * is using another type of backend. */
+    if(index == -1)
+        m_dev_selector->setCurrentIndex(0);
+}
+
+void BackendSelector::OnDeviceSelActivated(int index)
+{
+    auto dev = new HWStubDevice(m_ctx_model->GetDevice(index));
+    if(!dev->IsValid())
+    {
+        delete dev;
+        ChangeBackend(m_backend->CreateDummyIoBackend()); 
+    }
+    else
+        ChangeBackend(new HWStubIoBackend(dev));
+}
+#endif
+
 /**
  * YTabWidget
  */
@@ -1581,7 +1592,7 @@ YTabWidget::YTabWidget(QTabBar *bar, QWidget *parent)
     if(bar != 0)
         setTabBar(bar);
     m_tab_open_button = new QToolButton(this);
-    m_tab_open_button->setIcon(QIcon::fromTheme("list-add"));
+    m_tab_open_button->setIcon(YIconManager::Get()->GetIcon(YIconManager::ListAdd));
     m_tab_open_button->setAutoRaise(true);
     m_tab_open_button->setPopupMode(QToolButton::InstantPopup);
     /* the arrow with an icon only is pretty ugly and QToolButton has no way
@@ -1592,8 +1603,8 @@ YTabWidget::YTabWidget(QTabBar *bar, QWidget *parent)
     connect(m_tab_open_button, SIGNAL(clicked(bool)), this, SLOT(OnOpenButton(bool)));
     /* there is a quirk in the default QStyle: if the tab bar is empty, it
      * returns the minimum size of the corner widget, which is 0 for tool buttons */
-    //setMinimumHeight(m_tab_open_button->height());
-    //m_tab_open_button->setMinimumHeight(m_tab_open_button->sizeHint().height());
+    m_tab_open_button->setMinimumSize(m_tab_open_button->sizeHint());
+    setMinimumSize(m_tab_open_button->sizeHint());
 }
 
 void YTabWidget::setTabOpenable(bool openable)
@@ -1625,6 +1636,7 @@ MessageWidget::MessageWidget(QWidget *parent)
     m_icon->hide();
     m_text = new QLabel(this);
     m_text->setTextFormat(Qt::RichText);
+    m_text->setWordWrap(true);
     m_close = new QToolButton(this);
     m_close->setText("close");
     m_close->setIcon(style()->standardIcon(QStyle::SP_DialogCloseButton));
@@ -1700,6 +1712,83 @@ void MessageWidget::OnClose(bool clicked)
 {
     Q_UNUSED(clicked);
     hide();
+}
+
+/*
+ * YIconManager
+ */
+YIconManager *YIconManager::m_singleton = nullptr;
+
+YIconManager::YIconManager()
+{
+    m_icon_name[ListAdd] = "list-add";
+    m_icon_name[ListRemove] = "list-remove";
+}
+
+YIconManager::~YIconManager()
+{
+}
+
+YIconManager *YIconManager::Get()
+{
+    if(m_singleton == nullptr)
+        m_singleton = new YIconManager();
+    return m_singleton;
+}
+
+QIcon YIconManager::GetIcon(IconType type)
+{
+    if(type < 0 || type >= MaxIcon)
+        return QIcon();
+    if(QIcon::hasThemeIcon(m_icon_name[type]) && false)
+        return QIcon::fromTheme(m_icon_name[type]);
+    /* render icon if needed */
+    if(m_icon[type].isNull())
+        Render(type);
+    return m_icon[type];
+}
+
+namespace
+{
+    void RenderListAdd(QIcon& icon)
+    {
+        QPixmap pix(64, 64);
+        pix.fill(Qt::transparent);
+        QPainter paint(&pix);
+        paint.fillRect(30, 12, 4, 40, QColor(255, 0, 0));
+        paint.fillRect(12, 30, 40, 4, QColor(255, 0, 0));
+        icon = QIcon(pix);
+    }
+
+    void RenderListRemove(QIcon& icon)
+    {
+        QPixmap pix(64, 64);
+        pix.fill(Qt::transparent);
+        QPainter paint(&pix);
+        paint.setPen(QColor(255, 0, 0));
+        paint.drawLine(12, 12, 52, 52);
+        paint.drawLine(12, 52, 52, 16);
+        icon = QIcon(pix);
+    }
+
+    void RenderUnknown(QIcon& icon)
+    {
+        QPixmap pix(64, 64);
+        pix.fill();
+        QPainter paint(&pix);
+        paint.fillRect(0, 0, 64, 64, QColor(255, 0, 0));
+        icon = QIcon(pix);
+    }
+}
+
+void YIconManager::Render(IconType type)
+{
+    switch(type)
+    {
+        case ListAdd: RenderListAdd(m_icon[type]); break;
+        case ListRemove: RenderListRemove(m_icon[type]); break;
+        default: RenderUnknown(m_icon[type]); break;
+    }
 }
 
 /**

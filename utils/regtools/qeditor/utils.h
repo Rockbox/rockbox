@@ -509,18 +509,20 @@ protected:
     QLineEdit *m_data_sel_edit;
 #ifdef HAVE_HWSTUB
     QComboBox *m_dev_selector;
-    HWStubBackendHelper m_hwstub_helper;
+    QComboBox *m_ctx_selector;
+    QPushButton *m_ctx_manage_button;
+    HWStubContextModel *m_ctx_model;
+    HWStubManager *m_ctx_manager;
 #endif
     QLabel *m_nothing_text;
 
 private slots:
-#ifdef HAVE_HWSTUB
-    void OnDevListChanged();
-    void OnDevChanged(int index);
-    void OnDevListChanged2(bool, struct libusb_device *);
-    void ClearDevList();
-#endif
     void OnDataSelChanged(int index);
+#ifdef HAVE_HWSTUB
+    void OnContextSelChanged(int index);
+    void OnDeviceSelChanged(int index);
+    void OnDeviceSelActivated(int index);
+#endif
 };
 
 class MessageWidget : public QFrame
@@ -577,6 +579,32 @@ protected slots:
 protected:
     bool m_tab_openable;
     QToolButton *m_tab_open_button;
+};
+
+class YIconManager : public QObject
+{
+    Q_OBJECT
+protected:
+    YIconManager();
+public:
+    virtual ~YIconManager();
+    /* list of icons */
+    enum IconType
+    {
+        ListAdd = 0,
+        ListRemove,
+        MaxIcon
+    };
+    /* return instance */
+    static YIconManager *Get();
+    QIcon GetIcon(IconType it);
+
+protected:
+    void Render(IconType type);
+
+    static YIconManager *m_singleton; // single instance
+    QIcon m_icon[MaxIcon]; /* list add icon */
+    QString m_icon_name[MaxIcon]; /* icon name from theme */
 };
 
 class Misc
