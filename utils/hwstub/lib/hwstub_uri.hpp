@@ -1,0 +1,108 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2016 by Amaury Pouly
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+#ifndef __HWSTUB_URI_HPP__
+#define __HWSTUB_URI_HPP__
+
+#include "hwstub.hpp"
+#include "hwstub_net.hpp"
+
+namespace hwstub {
+namespace uri {
+
+/** HWSTUB URIs
+ *
+ * They are of the form:
+ * 
+ * scheme:[//domain[:port]][/][path[?query]]
+ * 
+ * The scheme is mandatory and controls the type of context that is created.
+ * The following scheme are recognized:
+ *   usb      USB context
+ *   tcp      TCP context
+ *   unix     Unix domain context
+ *   default  Default context (This is the default)
+ *
+ * When creating a USB context, the domain and port must be empty.
+ *
+ * When creating a TCP context, the domain and port are given as argument to
+ * the context. See hwstub::socket::context documentation more details.
+ *
+ * When creating a Unix context, the domain is given as argument to
+ * the context, it is invalid to specify a port. If the name begins with '#'
+ * then an abstract unix domain socket is created.
+ * See hwstub::net::context documentation more details.
+ */
+
+/** URI
+ * 
+ * Represents an URI and allows queries on it */
+class uri
+{
+public:
+    uri(const std::string& uri);
+    /** Return whether the URI is syntactically correct */
+    bool valid() const;
+    /** Return error description if URI is invalid */
+    std::string error() const;
+    /** Return the original URI */
+    std::string full_uri() const;
+    /** Return the scheme */
+    std::string scheme() const;
+    /** Return the domain, or empty is none */
+    std::string domain() const;
+    /** Return the port, or empty is none */
+    std::string port() const;
+    /** Return the path, or empty is none */
+    std::string path() const;
+
+protected:
+    void parse();
+    bool validate_scheme();
+    bool validate_domain();
+    bool validate_port();
+
+    std::string m_uri; /* original uri */
+    bool m_valid; /* did it parse correctly ? */
+    std::string m_scheme; /* scheme (extracted from URI) */
+    std::string m_domain; /* domain (extracted from URI) */
+    std::string m_port; /* port (extracted from URI) */
+    std::string m_path; /* path (extracted from URI) */
+    std::string m_error; /* error string (for invalid URIs) */
+};
+
+/** Create a context based on a URI. This function only uses the scheme/domain/port
+ * parts of the URI. This function may fail and return a empty pointer. An optional
+ * string can receive a description of the error */
+std::shared_ptr<context> create_context(const uri& uri, std::string *error = nullptr);
+/** Create a server based on a URI. This function only uses the scheme/domain/port
+ * parts of the URI. This function may fail and return a empty pointer. An optional
+ * string can receive a description of the error */
+std::shared_ptr<net::server> create_server(std::shared_ptr<context> ctx,
+    const uri& uri, std::string *error = nullptr);
+/** Return a safe default for a URI */
+uri default_uri();
+/** Return a safe default for a server URI */
+uri default_server_uri();
+
+} // namespace uri
+} // namespace hwstub
+
+#endif /* __HWSTUB_URI_HPP__ */
