@@ -46,7 +46,7 @@ SocDisplayPanel::SocDisplayPanel(QWidget *parent, IoBackend *io_backend,
     right_layout->addWidget(m_desc, 0);
     right_layout->addStretch(1);
 
-    setTitle("System-on-Chip Description");
+    setTitle("");
     setLayout(right_layout);
 }
 
@@ -108,7 +108,7 @@ NodeDisplayPanel::NodeDisplayPanel(QWidget *parent, IoBackend *io_backend,
     right_layout->addWidget(m_inst_desc, 0);
     right_layout->addStretch(1);
 
-    setTitle("Device Description");
+    setTitle("");
     setLayout(right_layout);
 }
 
@@ -126,6 +126,21 @@ QWidget *NodeDisplayPanel::GetWidget()
  * RegDisplayPanel
  */
 
+namespace
+{
+    QString access_string(soc_desc::access_t acc, QString dflt = "")
+    {
+        switch(acc)
+        {
+            case soc_desc::UNSPECIFIED: return dflt;
+            case soc_desc::READ_ONLY: return "Read only";
+            case soc_desc::READ_WRITE: return "Read-write";
+            case soc_desc::WRITE_ONLY: return "Write-only";
+            default: return "";
+        }
+    }
+}
+
 RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend,
         const soc_desc::node_inst_t& ref)
     :QGroupBox(parent), m_io_backend(io_backend), m_node(ref), m_reg_font(font())
@@ -139,16 +154,18 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend,
     m_reg_font.setKerning(false);
 
     QString reg_name = helper.GetPath(ref);
-    QStringList names;
+    QStringList names, access;
     QVector< soc_addr_t > addresses;
     names.append(reg_name);
     addresses.append(ref.addr());
+    access.append(access_string(ref.node().reg().get()->access));
 
     std::vector< soc_desc::variant_ref_t > variants = ref.node().reg().variants();
     for(size_t i = 0; i < variants.size(); i++)
     {
         names.append(reg_name + "/" + QString::fromStdString(variants[i].get()->type));
         addresses.append(ref.addr() + variants[i].get()->offset);
+        access.append(access_string(ref.node().reg().get()->access, access[0]));
     }
 
     QString str;
@@ -169,10 +186,20 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend,
     label_addr->setTextFormat(Qt::RichText);
     label_addr->setText(str_addr);
 
+    QString str_acc;
+    str_acc += "<table align=left>";
+    for(int i = 0; i < names.size(); i++)
+        str_acc += "<tr><td><b>" + access[i] + "</b></td></tr>";
+    str_acc += "</table>";
+    QLabel *label_access = new QLabel;
+    label_access->setTextFormat(Qt::RichText);
+    label_access->setText(str_acc);
+
     QHBoxLayout *top_layout = new QHBoxLayout;
     top_layout->addStretch();
     top_layout->addWidget(label_names);
     top_layout->addWidget(label_addr);
+    top_layout->addWidget(label_access);
     top_layout->addStretch();
 
     m_raw_val_name = new QLabel;
@@ -250,7 +277,7 @@ RegDisplayPanel::RegDisplayPanel(QWidget *parent, IoBackend *io_backend,
     right_layout->addWidget(m_value_table);
     right_layout->addStretch();
 
-    setTitle("Register Description");
+    setTitle("");
     m_viewport = new QWidget;
     m_viewport->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_viewport->setLayout(right_layout);

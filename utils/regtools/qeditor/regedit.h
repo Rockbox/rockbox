@@ -203,6 +203,7 @@ protected slots:
     void OnRegFieldDelete();
     void OnRegFieldNew();
     void OnWidthChanged(int size);
+    void OnAccessChanged(int access);
     void OnFieldModified();
     void OnDescEdited();
     void OnVariantActivated(QTableWidgetItem *item);
@@ -228,8 +229,10 @@ protected:
     QAction *m_delete_action;
     QPoint m_menu_point;
     SocFieldItemDelegate *m_variant_delegate;
+    SocAccessItemDelegate *m_access_delegate;
     SocFieldEditorCreator *m_variant_editor;
     QButtonGroup *m_reg_size_group;
+    QButtonGroup *m_reg_access_group;
 };
 
 class RegEdit : public QWidget, public DocumentTab
