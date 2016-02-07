@@ -40,7 +40,8 @@ namespace soc_desc
 #define XML_CHAR_TO_CHAR(s) ((const char *)(s))
 
 #define BEGIN_ATTR_MATCH(attr) \
-    for(xmlAttr *a = attr; a; a = a->next) {
+    for(xmlAttr *a = attr; a; a = a->next) { \
+        bool used = false;
 
 #define MATCH_UNIQUE_ATTR(attr_name, val, has, parse_fn, ctx) \
     if(strcmp(XML_CHAR_TO_CHAR(a->name), attr_name) == 0) { \
@@ -50,13 +51,20 @@ namespace soc_desc
         xmlChar *str = NULL; \
         if(!parse_text_attr_internal(a, str, ctx) || !parse_fn(a, val, str, ctx)) \
             ret = false; \
+        used = true; \
+    }
+
+#define MATCH_UNUSED_ATTR(parse_fn, ctx) \
+    if(!used) { \
+        ret = ret && parse_fn(a, ctx); \
     }
 
 #define END_ATTR_MATCH() \
     }
 
 #define BEGIN_NODE_MATCH(node) \
-    for(xmlNode *sub = node; sub; sub = sub->next) {
+    for(xmlNode *sub = node; sub; sub = sub->next) { \
+        bool used = false; \
 
 #define MATCH_ELEM_NODE(node_name, array, parse_fn, ctx) \
     if(sub->type == XML_ELEMENT_NODE && strcmp(XML_CHAR_TO_CHAR(sub->name), node_name) == 0) { \
@@ -64,6 +72,7 @@ namespace soc_desc
         if(!parse_fn(sub, array.back(), ctx)) \
             ret = false; \
         array.back().id = array.size(); \
+        used = true; \
     }
 
 #define MATCH_TEXT_NODE(node_name, array, parse_fn, ctx) \
@@ -74,6 +83,7 @@ namespace soc_desc
         array.resize(array.size() + 1); \
         ret = ret &&  parse_fn(sub, array.back(), content, ctx); \
         xmlFree(content); \
+        used = true; \
     }
 
 #define MATCH_UNIQUE_ELEM_NODE(node_name, val, has, parse_fn, ctx) \
@@ -83,6 +93,7 @@ namespace soc_desc
         has = true; \
         if(!parse_fn(sub, val, ctx)) \
             ret = false; \
+        used = true; \
     }
 
 #define MATCH_UNIQUE_TEXT_NODE(node_name, val, has, parse_fn, ctx) \
@@ -95,6 +106,12 @@ namespace soc_desc
         xmlChar *content = xmlNodeGetContent(sub); \
         ret = ret && parse_fn(sub, val, content, ctx); \
         xmlFree(content); \
+        used = true; \
+    }
+
+#define MATCH_UNUSED_NODE(parse_fn, ctx) \
+    if(!used) { \
+        ret = ret && parse_fn(sub, ctx); \
     }
 
 #define END_NODE_MATCH() \
@@ -235,6 +252,16 @@ bool parse_name_elem(xmlNode *node, std::string& name, xmlChar *content, error_c
     return true;
 }
 
+bool parse_unknown_elem(xmlNode *node, error_context_t& ctx)
+{
+    /* ignore blank nodes */
+    if(xmlIsBlankNode(node))
+        return true;
+    std::ostringstream oss;
+    oss << "unknown <" << XML_CHAR_TO_CHAR(node->name) << "> element";
+    return add_fatal(ctx, node, oss.str());
+}
+
 template<typename T, typename U>
 bool parse_unsigned_text(U *node, T& res, xmlChar *content, error_context_t& ctx)
 {
@@ -276,6 +303,14 @@ bool parse_text_attr(xmlAttr *attr, std::string& res, xmlChar *content, error_co
     return true;
 }
 
+bool parse_unknown_attr(xmlAttr *attr, error_context_t& ctx)
+{
+    std::ostringstream oss;
+    oss << "unknown '" << XML_CHAR_TO_CHAR(attr->name) << "' attribute";
+    return add_fatal(ctx, attr, oss.str());
+}
+
+
 bool parse_enum_elem(xmlNode *node, enum_t& reg, error_context_t& ctx)
 {
     bool ret = true;
@@ -284,6 +319,7 @@ bool parse_enum_elem(xmlNode *node, enum_t& reg, error_context_t& ctx)
         MATCH_UNIQUE_TEXT_NODE("name", reg.name, has_name, parse_name_elem, ctx)
         MATCH_UNIQUE_TEXT_NODE("value", reg.value, has_value, parse_unsigned_elem, ctx)
         MATCH_UNIQUE_TEXT_NODE("desc", reg.desc, has_desc, parse_text_elem, ctx)
+        MATCH_UNUSED_NODE(parse_unknown_elem, ctx)
     END_NODE_MATCH()
     CHECK_HAS(node, "name", has_name, ctx)
     CHECK_HAS(node, "value", has_value, ctx)
@@ -300,6 +336,7 @@ bool parse_field_elem(xmlNode *node, field_t& field, error_context_t& ctx)
         MATCH_UNIQUE_TEXT_NODE("width", field.width, has_width, parse_unsigned_elem, ctx)
         MATCH_UNIQUE_TEXT_NODE("desc", field.desc, has_desc, parse_text_elem, ctx)
         MATCH_ELEM_NODE("enum", field.enum_, parse_enum_elem, ctx)
+        MATCH_UNUSED_NODE(parse_unknown_elem, ctx)
     END_NODE_MATCH()
     CHECK_HAS(node, "name", has_name, ctx)
     CHECK_HAS(node, "position", has_pos, ctx)
@@ -315,6 +352,7 @@ bool parse_variant_elem(xmlNode *node, variant_t& variant, error_context_t& ctx)
     BEGIN_NODE_MATCH(node->children)
         MATCH_UNIQUE_TEXT_NODE("type", variant.type, has_type, parse_name_elem, ctx)
         MATCH_UNIQUE_TEXT_NODE("offset", variant.offset, has_offset, parse_unsigned_elem, ctx)
+        MATCH_UNUSED_NODE(parse_unknown_elem, ctx)
     END_NODE_MATCH()
     CHECK_HAS(node, "type", has_type, ctx)
     CHECK_HAS(node, "offset", has_offset, ctx)
@@ -330,6 +368,7 @@ bool parse_register_elem(xmlNode *node, register_t& reg, error_context_t& ctx)
         MATCH_UNIQUE_TEXT_NODE("width", reg.width, has_width, parse_unsigned_elem, ctx)
         MATCH_ELEM_NODE("field", reg.field, parse_field_elem, ctx)
         MATCH_ELEM_NODE("variant", reg.variant, parse_variant_elem, ctx)
+        MATCH_UNUSED_NODE(parse_unknown_elem, ctx)
     END_NODE_MATCH()
     if(!has_width)
         reg.width = 32;
@@ -342,6 +381,7 @@ bool parse_formula_elem(xmlNode *node, range_t& range, error_context_t& ctx)
     bool has_var = false;
     BEGIN_ATTR_MATCH(node->properties)
         MATCH_UNIQUE_ATTR("variable", range.variable, has_var, parse_text_attr, ctx)
+        MATCH_UNUSED_ATTR(parse_unknown_attr, ctx)
     END_NODE_MATCH()
     CHECK_HAS_ATTR(node, "variable", has_var, ctx)
     return ret;
@@ -360,6 +400,7 @@ bool parse_range_elem(xmlNode *node, range_t& range, error_context_t& ctx)
         MATCH_UNIQUE_ELEM_NODE("formula", range, has_formula_attr, parse_formula_elem, ctx)
         MATCH_UNIQUE_TEXT_NODE("formula", range.formula, has_formula, parse_text_elem, ctx)
         MATCH_TEXT_NODE("address", range.list, parse_unsigned_elem, ctx)
+        MATCH_UNUSED_NODE(parse_unknown_elem, ctx)
     END_NODE_MATCH()
     CHECK_HAS(node, "first", has_first, ctx)
     if(range.list.size() == 0)
@@ -404,6 +445,7 @@ bool parse_instance_elem(xmlNode *node, instance_t& inst, error_context_t& ctx)
         MATCH_UNIQUE_TEXT_NODE("desc", inst.desc, has_desc, parse_text_elem, ctx)
         MATCH_UNIQUE_TEXT_NODE("address", inst.addr, has_address, parse_unsigned_elem, ctx)
         MATCH_UNIQUE_ELEM_NODE("range", inst.range, has_range, parse_range_elem, ctx)
+        MATCH_UNUSED_NODE(parse_unknown_elem, ctx)
     END_NODE_MATCH()
     CHECK_HAS(node, "name", has_name, ctx)
     if(!has_address && !has_range)
@@ -429,6 +471,7 @@ bool parse_node_elem(xmlNode *node_, node_t& node, error_context_t& ctx)
         MATCH_UNIQUE_ELEM_NODE("register", reg, has_register, parse_register_elem, ctx)
         MATCH_ELEM_NODE("node", node.node, parse_node_elem, ctx)
         MATCH_ELEM_NODE("instance", node.instance, parse_instance_elem, ctx)
+        MATCH_UNUSED_NODE(parse_unknown_elem, ctx)
     END_NODE_MATCH()
     CHECK_HAS(node_, "name", has_name, ctx)
     if(has_register)
@@ -449,6 +492,7 @@ bool parse_soc_elem(xmlNode *node, soc_t& soc, error_context_t& ctx)
         MATCH_UNIQUE_TEXT_NODE("isa", soc.isa, has_isa, parse_text_elem, ctx)
         MATCH_TEXT_NODE("author", soc.author, parse_text_elem, ctx)
         MATCH_ELEM_NODE("node", soc.node, parse_node_elem, ctx)
+        MATCH_UNUSED_NODE(parse_unknown_elem, ctx)
     END_NODE_MATCH()
     CHECK_HAS(node, "name", has_name, ctx)
     return ret;
@@ -461,6 +505,7 @@ bool parse_root_elem(xmlNode *node, soc_t& soc, error_context_t& ctx)
     bool has_soc = false, has_version = false;
     BEGIN_ATTR_MATCH(node->properties)
         MATCH_UNIQUE_ATTR("version", ver, has_version, parse_unsigned_attr, ctx)
+        MATCH_UNUSED_ATTR(parse_unknown_attr, ctx)
     END_ATTR_MATCH()
     if(!has_version)
     {
@@ -471,6 +516,7 @@ bool parse_root_elem(xmlNode *node, soc_t& soc, error_context_t& ctx)
         return parse_wrong_version_error(node, ctx);
     BEGIN_NODE_MATCH(node)
         MATCH_UNIQUE_ELEM_NODE("soc", soc, has_soc, parse_soc_elem, ctx)
+        MATCH_UNUSED_NODE(parse_unknown_elem, ctx)
     END_NODE_MATCH()
     CHECK_HAS(node, "soc", has_soc, ctx)
     return ret;
