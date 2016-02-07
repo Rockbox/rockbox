@@ -107,12 +107,18 @@ void DocumentTabWidget::OnCloseTab(int index)
 MainWindow::MainWindow(Backend *backend)
     :m_backend(backend)
 {
-    QAction *new_regtab_act = new QAction(QIcon::fromTheme("document-new"), tr("Register &Tab"), this);
-    QAction *new_regedit_act = new QAction(QIcon::fromTheme("document-edit"), tr("Register &Editor"), this);
-    QAction *load_desc_act = new QAction(QIcon::fromTheme("document-open"), tr("&Soc Description"), this);
-    QAction *quit_act = new QAction(QIcon::fromTheme("application-exit"), tr("&Quit"), this);
-    QAction *about_act = new QAction(QIcon::fromTheme("help-about"), tr("&About"), this);
-    QAction *about_qt_act = new QAction(QIcon::fromTheme("help-about"), tr("About &Qt"), this);
+    QAction *new_regtab_act = new QAction(YIconManager::Get()->GetIcon(YIconManager::DocumentNew),
+        tr("Register &Tab"), this);
+    QAction *new_regedit_act = new QAction(YIconManager::Get()->GetIcon(YIconManager::DocumentEdit),
+        tr("Register &Editor"), this);
+    QAction *load_desc_act = new QAction(YIconManager::Get()->GetIcon(YIconManager::DocumentOpen),
+        tr("&Soc Description"), this);
+    QAction *quit_act = new QAction(YIconManager::Get()->GetIcon(YIconManager::ApplicationExit),
+        tr("&Quit"), this);
+    QAction *about_act = new QAction(YIconManager::Get()->GetIcon(YIconManager::HelpAbout),
+        tr("&About"), this);
+    QAction *about_qt_act = new QAction(YIconManager::Get()->GetIcon(YIconManager::HelpAbout),
+        tr("About &Qt"), this);
 
     connect(new_regtab_act, SIGNAL(triggered()), this, SLOT(OnNewRegTab()));
     connect(new_regedit_act, SIGNAL(triggered()), this, SLOT(OnNewRegEdit()));
@@ -121,9 +127,10 @@ MainWindow::MainWindow(Backend *backend)
     connect(about_act, SIGNAL(triggered()), this, SLOT(OnAbout()));
     connect(about_qt_act, SIGNAL(triggered()), this, SLOT(OnAboutQt()));
 
-    QMenu *file_menu = menuBar()->addMenu(tr("&File"));
-    QMenu *new_submenu = file_menu->addMenu(QIcon::fromTheme("document-new"), "&New");
-    QMenu *load_submenu = file_menu->addMenu(QIcon::fromTheme("document-open"), "&Load");
+    QMenu *app_menu = new QMenu;
+    QMenu *file_menu = app_menu->addMenu(tr("&File"));
+    QMenu *new_submenu = file_menu->addMenu(YIconManager::Get()->GetIcon(YIconManager::DocumentNew), "&New");
+    QMenu *load_submenu = file_menu->addMenu(YIconManager::Get()->GetIcon(YIconManager::DocumentOpen), "&Load");
     file_menu->addAction(quit_act);
 
     new_submenu->addAction(new_regtab_act);
@@ -131,17 +138,24 @@ MainWindow::MainWindow(Backend *backend)
 
     load_submenu->addAction(load_desc_act);
 
-    QMenu *about_menu = menuBar()->addMenu(tr("&About"));
+    QMenu *about_menu = app_menu->addMenu(tr("&About"));
     about_menu->addAction(about_act);
     about_menu->addAction(about_qt_act);
 
     m_tab = new DocumentTabWidget();
     m_tab->setTabOpenable(true);
     m_tab->setTabOpenMenu(new_submenu);
+    m_tab->setOtherMenu(app_menu);
 
     setCentralWidget(m_tab);
 
     ReadSettings();
+#ifdef HAVE_HWSTUB
+    /* acquire hwstub manager */
+    HWStubManager::Get()->setParent(this);
+#endif
+    /* acquire icon manager */
+    YIconManager::Get()->setParent(this);
 
     OnNewRegTab();
 }
@@ -167,12 +181,12 @@ void MainWindow::OnAbout()
         .arg(soc_desc::MINOR_VERSION).arg(soc_desc::REVISION_VERSION);
     QMessageBox::about(this, "About", 
         "<h1>QEditor</h1>"
-        "<h2>Version "APP_VERSION"</h2>"
+        "<h2>Version " APP_VERSION "</h2>"
         "<p>Written by Amaury Pouly</p>"
         "<p>Libraries:</p>"
         "<ul><li>soc_desc: " + soc_desc_ver + "</li>"
 #ifdef HAVE_HWSTUB
-        "<li>hwstub: "HWSTUB_VERSION"</li>"
+        "<li>hwstub: " HWSTUB_VERSION "</li>"
 #else
         "<li>hwstub: not compiled in</li>"
 #endif

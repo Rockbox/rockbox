@@ -28,7 +28,9 @@
 #include <QMetaType>
 #include <QAbstractItemModel>
 #ifdef HAVE_HWSTUB
-#include "hwstub.h"
+#include "hwstub.hpp"
+#include "hwstub_usb.hpp"
+#include "hwstub_uri.hpp"
 #endif
 #include "soc_desc.hpp"
 
@@ -139,41 +141,124 @@ protected:
 };
 
 #ifdef HAVE_HWSTUB
+/* HWStub context manager: provides a centralized place to add/remove/get
+ * contexts */
+class HWStubManager : public QAbstractTableModel
+{
+    Q_OBJECT
+protected:
+    HWStubManager();
+public:
+    virtual ~HWStubManager();
+    /* Get manager */
+    static HWStubManager *Get();
+    /* Clear the context list */
+    void Clear();
+    bool Add(const QString& name, const QString& uri);
+    /* Model */
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+    virtual QVariant data(const QModelIndex& index, int role) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role);
+    /* return predefined columns */
+    int GetNameColumn() const;
+    int GetUriColumn() const;
+    std::shared_ptr< hwstub::context > GetContext(int row);
+    /* return a friendly name for a device */
+    static QString GetFriendlyName(std::shared_ptr< hwstub::device > device);
+
+protected:
+    struct Context
+    {
+        std::shared_ptr< hwstub::context > context;
+        QString name;
+        QString uri;
+    };
+
+    std::vector< Context > m_list; /* list of context */
+    static HWStubManager *g_inst; /* unique instance */
+};
+
+/* HWStub context model: provides access to the device list using Qt MVC model. */
+class HWStubContextModel : public QAbstractTableModel
+{
+    Q_OBJECT
+public:
+    HWStubContextModel(QObject *parent = 0);
+    virtual ~HWStubContextModel();
+    void SetContext(std::shared_ptr< hwstub::context > context);
+    /* Model */
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+    virtual QVariant data(const QModelIndex& index, int role) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+    /* return predefined columns */
+    int GetNameColumn() const;
+    std::shared_ptr< hwstub::device > GetDevice(int row);
+    /* Add an entry in the model for "no selection", which will correspond to
+     * a dummy device. This function also allows the text to be customised. */
+    void EnableDummy(bool en, const QString& text = "");
+
+private slots:
+    void OnDevChangeUnsafe(void *data);
+protected:
+    QString GetFriendlyName(std::shared_ptr< hwstub::device > device);
+    void OnDevChangeLow(std::shared_ptr< hwstub::context > ctx, bool arrived,
+        std::shared_ptr< hwstub::device > device);
+    void OnDevChange(std::shared_ptr< hwstub::context > ctx, bool arrived,
+        std::shared_ptr< hwstub::device > device);
+
+    struct Device
+    {
+        QString name;
+        std::shared_ptr< hwstub::device > device;
+    };
+
+    std::vector< Device > m_list;
+    std::weak_ptr< hwstub::context > m_context;
+    hwstub::context::callback_ref_t m_callback_ref;
+    bool m_has_dummy;
+    QString m_dummy_text;
+};
+
+/* Abstract Virtual Class from where TCP and USB backend
+ * child classes are derived
+ */
 class HWStubDevice
 {
 public:
-    HWStubDevice(struct libusb_device *dev);
-    HWStubDevice(const HWStubDevice *dev);
-    ~HWStubDevice();
+    HWStubDevice(std::shared_ptr<hwstub::device> device);
+    virtual ~HWStubDevice();
+
+    QString GetFriendlyName();
     bool IsValid();
-    bool Open();
-    void Close();
-    int GetBusNumber();
-    int GetDevAddress();
-    /* Calls below are cached and do not require the device to be opened */
+    /* Calls below are cached */
     inline struct hwstub_version_desc_t GetVersionInfo() { return m_hwdev_ver; }
     inline struct hwstub_target_desc_t GetTargetInfo() { return m_hwdev_target; }
     inline struct hwstub_stmp_desc_t GetSTMPInfo() { return m_hwdev_stmp; }
     inline struct hwstub_pp_desc_t GetPPInfo() { return m_hwdev_pp; }
-    /* Calls below require the device to be opened */
+    inline struct hwstub_jz_desc_t GetJZInfo() { return m_hwdev_jz; }
     bool ReadMem(soc_addr_t addr, size_t length, void *buffer);
     bool WriteMem(soc_addr_t addr, size_t length, void *buffer);
 
 protected:
-    bool Probe();
-    void Init(struct libusb_device *dev);
+    bool Probe(std::shared_ptr<hwstub::device> device);
 
+    std::shared_ptr<hwstub::handle> m_handle;
     bool m_valid;
-    struct libusb_device *m_dev;
-    libusb_device_handle *m_handle;
     struct hwstub_device_t *m_hwdev;
     struct hwstub_version_desc_t m_hwdev_ver;
     struct hwstub_target_desc_t m_hwdev_target;
     struct hwstub_stmp_desc_t m_hwdev_stmp;
     struct hwstub_pp_desc_t m_hwdev_pp;
+    struct hwstub_jz_desc_t m_hwdev_jz;
+    QString m_name;
 };
 
-/** NOTE the HWStub backend is never dirty: all writes are immediately committed */
+/** NOTE the HWStub backend is never dirty: all wrnew ites are immediately committed */
 class HWStubIoBackend : public IoBackend
 {
     Q_OBJECT
@@ -196,32 +281,6 @@ public:
 protected:
     QString m_soc;
     HWStubDevice *m_dev;
-};
-
-#if LIBUSB_API_VERSION < 0x01000102
-#define LIBUSB_NO_HOTPLUG
-#endif
-
-class HWStubBackendHelper : public QObject
-{
-    Q_OBJECT
-public:
-    HWStubBackendHelper();
-    ~HWStubBackendHelper();
-    bool HasHotPlugSupport();
-    QList< HWStubDevice* > GetDevList();
-
-signals:
-    void OnDevListChanged(bool arrived, struct libusb_device *dev);
-
-protected:
-#ifndef LIBUSB_NO_HOTPLUG
-    void OnHotPlug(bool arrived, struct libusb_device *dev);
-    static int HotPlugCallback(struct libusb_context *ctx, struct libusb_device *dev,
-        libusb_hotplug_event event, void *user_data);
-    libusb_hotplug_callback_handle m_hotplug_handle;
-#endif
-    bool m_hotplug;
 };
 #endif
 
