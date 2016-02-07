@@ -339,41 +339,6 @@ QString FileIoBackend::GetFileName()
 /**
  * HWStubDevice
  */
-HWStubDevice::HWStubDevice(struct libusb_device *dev)
-{
-    Init(dev);
-}
-
-HWStubDevice::HWStubDevice(const HWStubDevice *dev)
-{
-    Init(dev->m_dev);
-}
-
-void HWStubDevice::Init(struct libusb_device *dev)
-{
-    libusb_ref_device(dev);
-    m_dev = dev;
-    m_handle = 0;
-    m_hwdev = 0;
-    m_valid = Probe();
-}
-
-HWStubDevice::~HWStubDevice()
-{
-    Close();
-    libusb_unref_device(m_dev);
-}
-
-int HWStubDevice::GetBusNumber()
-{
-    return libusb_get_bus_number(m_dev);
-}
-
-int HWStubDevice::GetDevAddress()
-{
-    return libusb_get_device_address(m_dev);
-}
-
 bool HWStubDevice::Probe()
 {
     if(!Open())
@@ -403,30 +368,6 @@ bool HWStubDevice::Probe()
     return false;
 }
 
-bool HWStubDevice::Open()
-{
-    if(libusb_open(m_dev, &m_handle))
-        return false;
-    m_hwdev = hwstub_open(m_handle);
-    if(m_hwdev == 0)
-    {
-        libusb_close(m_handle);
-        m_handle = 0;
-        return false;
-    }
-    return true;
-}
-
-void HWStubDevice::Close()
-{
-    if(m_hwdev)
-        hwstub_release(m_hwdev);
-    m_hwdev = 0;
-    if(m_handle)
-        libusb_close(m_handle);
-    m_handle = 0;
-}
-
 bool HWStubDevice::ReadMem(soc_addr_t addr, size_t length, void *buffer)
 {
     if(!m_hwdev)
@@ -448,6 +389,110 @@ bool HWStubDevice::IsValid()
     return m_valid;
 }
 
+/* USB backend */
+USBHWStubDevice::USBHWStubDevice(struct libusb_device *dev)
+{
+    Init(dev);
+}
+
+USBHWStubDevice::USBHWStubDevice(const USBHWStubDevice *dev)
+{
+    Init(dev->m_dev);
+}
+
+USBHWStubDevice::~USBHWStubDevice()
+{
+    Close();
+    libusb_unref_device(m_dev);
+}
+
+void USBHWStubDevice::Init(struct libusb_device *dev)
+{
+    m_dev = libusb_ref_device(dev);
+    m_hwdev = 0;
+    m_valid = Probe();
+}
+
+int USBHWStubDevice::GetBusNumber()
+{
+    if(m_dev == 0)
+        return 0;
+
+    return libusb_get_bus_number(m_dev);
+}
+
+int USBHWStubDevice::GetDevAddress()
+{
+    if(m_dev == 0)
+        return 0;
+
+    return libusb_get_device_address(m_dev);
+}
+
+bool USBHWStubDevice::Open()
+{
+    m_hwdev = hwstub_open_usb(m_dev);
+    return m_hwdev != NULL;
+}
+
+void USBHWStubDevice::Close()
+{
+    if(m_hwdev)
+        hwstub_release(m_hwdev);
+    m_hwdev = 0;
+}
+
+QString USBHWStubDevice::GetFriendlyName()
+{
+    if (m_dev == 0)
+        return QString();
+    else
+        return QString("USB Bus %1 Device %2").arg(GetBusNumber()).arg(GetDevAddress());
+}
+
+/* TCP backend */
+TCPHWStubDevice::TCPHWStubDevice(QString address, QString port)
+{
+    Init(address, port);
+}
+
+TCPHWStubDevice::~TCPHWStubDevice()
+{
+    Close();
+}
+
+void TCPHWStubDevice::Init(QString address, QString port)
+{
+    m_hwdev = 0;
+    m_address = address;
+    m_port = port;
+    m_valid = Probe();
+}
+
+bool TCPHWStubDevice::Open()
+{
+    QByteArray ba_address = m_address.toLatin1();
+    QByteArray ba_port = m_port.toLatin1();
+
+    m_hwdev = hwstub_open_tcp(ba_address.data(), ba_port.data());
+    if(m_hwdev == 0)
+        return false;
+
+    return true;
+}
+
+void TCPHWStubDevice::Close()
+{
+    if(m_hwdev)
+        hwstub_release(m_hwdev);
+
+    m_hwdev = 0;
+}
+
+QString TCPHWStubDevice::GetFriendlyName()
+{
+    return QString("%1:%2").arg(m_address).arg(m_port);
+}
 
 /**
  * HWStubIoBackend
@@ -457,6 +502,7 @@ HWStubIoBackend::HWStubIoBackend(HWStubDevice *dev)
 {
     m_dev = dev;
     m_dev->Open();
+
     struct hwstub_target_desc_t target = m_dev->GetTargetInfo();
     if(target.dID == HWSTUB_TARGET_STMP)
     {
@@ -579,14 +625,14 @@ HWStubBackendHelper::~HWStubBackendHelper()
 #endif /* LIBUSB_NO_HOTPLUG */
 }
 
-QList< HWStubDevice* > HWStubBackendHelper::GetDevList()
+QList< USBHWStubDevice* > HWStubBackendHelper::GetDevList()
 {
-    QList< HWStubDevice* > list;
+    QList< USBHWStubDevice* > list;
     libusb_device **dev_list;
     ssize_t cnt = hwstub_get_device_list(NULL, &dev_list);
     for(int i = 0; i < cnt; i++)
     {
-        HWStubDevice *dev = new HWStubDevice(dev_list[i]);
+        USBHWStubDevice *dev = new USBHWStubDevice(dev_list[i]);
         /* filter out non-hwstub devices */
         if(dev->IsValid())
             list.push_back(dev);
