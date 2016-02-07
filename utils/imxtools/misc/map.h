@@ -79,7 +79,7 @@ struct soc_t
 #define PIN_GROUP_PREFIX_NONE   ""
 
 #define R(group,name,block) {PIN_GROUP_PREFIX_##group name, PIN_GROUP_##group, block}
-#define Q(group,block,name) R(group,STR(block)"_"name, block)
+#define Q(group,block,name) R(group,STR(block) "_" name, block)
 #define P(group,name) R(group,name,PIN_NO_BLOCK)
 
 #define IO      P(GPIO,"gpio")

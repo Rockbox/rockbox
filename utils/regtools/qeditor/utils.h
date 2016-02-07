@@ -40,6 +40,7 @@
 #include <QScrollBar>
 #include <QGroupBox>
 #include <QSortFilterProxyModel>
+#include <QDebug>
 #include "settings.h"
 #include "backend.h"
 
@@ -180,6 +181,50 @@ protected:
     soc_desc::field_t m_field;
 };
 
+Q_DECLARE_METATYPE(soc_desc::access_t)
+
+class SocAccessItemDelegate: public QStyledItemDelegate
+{
+public:
+    SocAccessItemDelegate(const QString& unspec_text, QObject *parent = 0)
+        :QStyledItemDelegate(parent), m_unspec_text(unspec_text) {}
+
+    virtual QString displayText(const QVariant& value, const QLocale& locale) const;
+protected:
+    QString m_unspec_text;
+};
+
+class SocAccessEditor : public QComboBox
+{
+    Q_OBJECT
+    Q_PROPERTY(soc_desc::access_t access READ access WRITE setAccess USER true)
+public:
+    SocAccessEditor(const QString& unspec_text, QWidget *parent = 0);
+    virtual ~SocAccessEditor();
+
+    soc_desc::access_t access() const;
+    void setAccess(soc_desc::access_t acc);
+
+protected slots:
+    /* bla */
+
+protected:
+    soc_desc::access_t m_access;
+};
+
+class SocAccessEditorCreator : public QItemEditorCreatorBase
+{
+public:
+    SocAccessEditorCreator(const QString& unspec_text = "Unspecified")
+        :m_unspec_text(unspec_text) {}
+
+    virtual QWidget *createWidget(QWidget *parent) const;
+    virtual QByteArray valuePropertyName() const;
+
+protected:
+    QString m_unspec_text;
+};
+
 class SocFieldCachedValue
 {
 public:
@@ -209,8 +254,11 @@ public:
     SocFieldBitRange(int first, int last):m_first_bit(first), m_last_bit(last) {}
     unsigned GetFirstBit() const { return m_first_bit; }
     unsigned GetLastBit() const { return m_last_bit; }
+    void SetFirstBit(unsigned bit) { m_first_bit = bit; }
+    void SetLastBit(unsigned bit) { m_last_bit = bit; }
 
     bool operator<(const SocFieldBitRange& o) const;
+    bool operator!=(const SocFieldBitRange& o) const;
 protected:
     unsigned m_first_bit, m_last_bit;
 };
@@ -301,6 +349,7 @@ public:
 
 signals:
     void OnValueModified(int index);
+    void OnBitrangeModified(int index);
 
 protected:
     void RecomputeTheme();
@@ -337,19 +386,79 @@ protected:
     bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
 };
 
+class YRegDisplay;
+class YRegDisplayItemDelegate;
+
+class YRegDisplayItemEditor : public QWidget
+{
+    Q_OBJECT
+public:
+    YRegDisplayItemEditor(QWidget *parent, YRegDisplay *display,
+        YRegDisplayItemDelegate *delegate, QModelIndex bitrange_index,
+        QModelIndex name_index);
+    virtual ~YRegDisplayItemEditor();
+    void setEditorData(QModelIndex bitrange_index, QModelIndex name_index);
+    void getEditorData(QVariant& name, QVariant& birange);
+
+protected:
+    virtual void paintEvent(QPaintEvent *event);
+    virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event);
+    virtual void leaveEvent(QEvent *event);
+
+    enum Zone
+    {
+        NoZone,
+        MoveZone,
+        ResizeLeftZone,
+        ResizeRightZone
+    };
+
+    Zone GetZone(const QPoint& pt);
+
+    YRegDisplayItemDelegate *m_display_delegate;
+    YRegDisplay *m_display;
+    QModelIndex m_bitrange_index, m_name_index;
+    enum
+    {
+        Idle,
+        InResizeZone,
+        InMoveZone,
+        Moving,
+        ResizingLeft,
+        ResizingRight,
+    }m_state;
+    int m_col_width;
+    int m_resize_margin;
+    int m_move_offset;
+    SocFieldBitRange m_bitrange;
+};
+
 class YRegDisplayItemDelegate : public QStyledItemDelegate
 {
+    Q_OBJECT
+    friend class YRegDisplayItemEditor;
 public:
     YRegDisplayItemDelegate(QObject *parent = 0);
-    virtual void paint(QPainter * painter, const QStyleOptionViewItem& option,
-        const QModelIndex & index) const;
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem& option,
+        const QModelIndex& index) const;
+    virtual void MyPaint(QPainter *painter, const QStyleOptionViewItemV4& option) const;
     virtual QSize sizeHint(const QStyleOptionViewItem& option,
-        const QModelIndex & index) const;
+        const QModelIndex& index) const;
+    /* don't bother using the item factory and such, we only use this delegate
+     * for very specific models anyway */
+    virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem& option,
+        const QModelIndex& index) const;
+    virtual void setEditorData(QWidget *editor, const QModelIndex& index) const;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model,
+        const QModelIndex& index) const;
 };
 
 class YRegDisplay : public QAbstractItemView
 {
     Q_OBJECT
+    friend class YRegDisplayItemEditor;
 public:
     YRegDisplay(QWidget *parent = 0);
     virtual QModelIndex indexAt(const QPoint& point) const;
@@ -360,6 +469,8 @@ public:
     void setWidth(int nr_bits);
     /* returns the bit column at a point, or -1 if none except if closest=true */
     int bitColumnAt(const QPoint& point, bool closest = true) const;
+    /* return rect for a bitrange */
+    QRect BitrangeRect(const SocFieldBitRange& range) const;
 
 protected slots:
     virtual void dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
@@ -509,18 +620,20 @@ protected:
     QLineEdit *m_data_sel_edit;
 #ifdef HAVE_HWSTUB
     QComboBox *m_dev_selector;
-    HWStubBackendHelper m_hwstub_helper;
+    QComboBox *m_ctx_selector;
+    QPushButton *m_ctx_manage_button;
+    HWStubContextModel *m_ctx_model;
+    HWStubManager *m_ctx_manager;
 #endif
     QLabel *m_nothing_text;
 
 private slots:
-#ifdef HAVE_HWSTUB
-    void OnDevListChanged();
-    void OnDevChanged(int index);
-    void OnDevListChanged2(bool, struct libusb_device *);
-    void ClearDevList();
-#endif
     void OnDataSelChanged(int index);
+#ifdef HAVE_HWSTUB
+    void OnContextSelChanged(int index);
+    void OnDeviceSelChanged(int index);
+    void OnDeviceSelActivated(int index);
+#endif
 };
 
 class MessageWidget : public QFrame
@@ -567,6 +680,7 @@ public:
     inline bool tabOpenable() const { return m_tab_openable; }
     void setTabOpenable(bool openable);
     void setTabOpenMenu(QMenu *menu);
+    void setOtherMenu(QMenu *menu);
 
 signals:
     void tabOpenRequested();
@@ -577,6 +691,52 @@ protected slots:
 protected:
     bool m_tab_openable;
     QToolButton *m_tab_open_button;
+    QToolButton *m_other_button;
+};
+
+class YIconManager : public QObject
+{
+    Q_OBJECT
+protected:
+    YIconManager();
+public:
+    virtual ~YIconManager();
+    /* list of icons */
+    enum IconType
+    {
+        ListAdd = 0,
+        ListRemove,
+        DocumentNew,
+        DocumentEdit,
+        DocumentOpen,
+        DocumentSave,
+        DocumentSaveAs,
+        Preferences,
+        FolderNew,
+        Computer,
+        Cpu,
+        DialogError,
+        ViewRefresh,
+        SytemRun,
+        ApplicationExit,
+        HelpAbout,
+        FormatTextBold,
+        FormatTextItalic,
+        FormatTextUnderline,
+        TextGeneric,
+        MultimediaPlayer,
+        MaxIcon
+    };
+    /* return instance */
+    static YIconManager *Get();
+    QIcon GetIcon(IconType it);
+
+protected:
+    void Render(IconType type);
+
+    static YIconManager *m_singleton; // single instance
+    QIcon m_icon[MaxIcon]; /* list add icon */
+    QString m_icon_name[MaxIcon]; /* icon name from theme */
 };
 
 class Misc

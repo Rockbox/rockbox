@@ -22,6 +22,7 @@
 #include <QTextStream>
 #include <QDebug>
 #include <QFileInfo>
+#include <QFont>
 #include "backend.h"
 
 /**
@@ -337,110 +338,436 @@ QString FileIoBackend::GetFileName()
 
 #ifdef HAVE_HWSTUB
 /**
+ * HWStubManager
+ */
+HWStubManager *HWStubManager::g_inst = nullptr;
+
+HWStubManager::HWStubManager()
+{
+    Add("Default", QString::fromStdString(hwstub::uri::default_uri().full_uri()));
+}
+
+HWStubManager::~HWStubManager()
+{
+}
+
+HWStubManager *HWStubManager::Get()
+{
+    if(g_inst == nullptr)
+        g_inst = new HWStubManager();
+    return g_inst;
+}
+
+bool HWStubManager::Add(const QString& name, const QString& uri)
+{
+    struct Context ctx;
+    ctx.name = name;
+    ctx.uri = uri;
+    ctx.context = hwstub::uri::create_context(uri.toStdString());
+    if(!ctx.context)
+        return false;
+    ctx.context->start_polling();
+    beginInsertRows(QModelIndex(), m_list.size(), m_list.size());
+    m_list.push_back(ctx);
+    endInsertRows();
+    return true;
+}
+
+void HWStubManager::Clear()
+{
+    m_list.clear();
+}
+
+int HWStubManager::rowCount(const QModelIndex& parent) const
+{
+    Q_UNUSED(parent);
+    return m_list.size();
+}
+
+int HWStubManager::columnCount(const QModelIndex& parent) const
+{
+    Q_UNUSED(parent);
+    return 2;
+}
+
+std::shared_ptr< hwstub::context > HWStubManager::GetContext(int row)
+{
+    if(row < 0 || (size_t)row >= m_list.size())
+        return std::shared_ptr< hwstub::context >();
+    else
+        return m_list[row].context;
+}
+
+QVariant HWStubManager::data(const QModelIndex& index, int role) const
+{
+    if(index.row() < 0 || (size_t)index.row() >= m_list.size())
+        return QVariant();
+    int section = index.column();
+    const Context& ctx = m_list[index.row()];
+    if(section == GetNameColumn())
+    {
+        if(role == Qt::DisplayRole || role == Qt::EditRole)
+            return QVariant(ctx.name);
+    }
+    else if(section == GetUriColumn())
+    {
+        if(role == Qt::DisplayRole)
+            return QVariant(ctx.uri);
+    }
+    return QVariant();
+}
+
+QVariant HWStubManager::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if(orientation == Qt::Vertical)
+        return QVariant();
+    if(role != Qt::DisplayRole)
+        return QVariant();
+    if(section == GetNameColumn())
+        return QVariant("Name");
+    else if(section == GetUriColumn())
+        return QVariant("URI");
+    return QVariant();
+}
+
+Qt::ItemFlags HWStubManager::flags(const QModelIndex& index) const
+{
+    Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    int section = index.column();
+    if(section == GetNameColumn())
+        flags |= Qt::ItemIsEditable;
+    return flags;
+}
+
+bool HWStubManager::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+    if(role != Qt::EditRole)
+        return false;
+    if(index.row() < 0 || (size_t)index.row() >= m_list.size())
+        return false;
+    if(index.column() != GetNameColumn())
+        return false;
+    m_list[index.row()].name = value.toString();
+    emit dataChanged(index, index);
+    return true;
+}
+
+int HWStubManager::GetNameColumn() const
+{
+    return 0;
+}
+
+int HWStubManager::GetUriColumn() const
+{
+    return 1;
+}
+
+QString HWStubManager::GetFriendlyName(std::shared_ptr< hwstub::device > device)
+{
+    /* try to open the device */
+    std::shared_ptr< hwstub::handle > handle;
+    hwstub::error err = device->open(handle);
+    if(err != hwstub::error::SUCCESS)
+        goto Lfallback;
+    /* get target descriptor */
+    struct hwstub_target_desc_t target_desc;
+    err = handle->get_target_desc(target_desc);
+    if(err != hwstub::error::SUCCESS)
+        goto Lfallback;
+    return QString::fromStdString(target_desc.bName);
+
+    /* fallback: don't open the device */
+Lfallback:
+    hwstub::usb::device *udev = dynamic_cast< hwstub::usb::device* >(device.get());
+    if(udev)
+    {
+        return QString("USB Bus %1 Device %2: ID %3:%4")
+            .arg(udev->get_bus_number()).arg(udev->get_address(), 3, 10, QChar('0'))
+            .arg(udev->get_vid(), 4, 16, QChar('0')).arg(udev->get_pid(), 4, 16, QChar('0'));
+    }
+    else
+        return QString("<Unknown device>");
+}
+
+/**
+ * HWStubContextModel
+ */
+HWStubContextModel::HWStubContextModel(QObject *parent)
+    :QAbstractTableModel(parent), m_has_dummy(false)
+{
+}
+
+HWStubContextModel::~HWStubContextModel()
+{
+    SetContext(std::shared_ptr< hwstub::context >());
+}
+
+void HWStubContextModel::SetContext(std::shared_ptr< hwstub::context > context)
+{
+    int first_row = m_has_dummy ? 1: 0;
+    /* clear previous model if any */
+    if(m_list.size() > 0)
+    {
+        beginRemoveRows(QModelIndex(), first_row, first_row + m_list.size() - 1);
+        m_list.clear();
+        endRemoveRows();
+    }
+    /* don't forget to unregister callback if context still exists */
+    std::shared_ptr< hwstub::context > ctx = m_context.lock();
+    if(ctx)
+        ctx->unregister_callback(m_callback_ref);
+    /* get new context */
+    m_context = context;
+    if(context)
+    {
+        /* register new callback */
+        m_callback_ref = context->register_callback(
+            std::bind(&HWStubContextModel::OnDevChangeLow, this, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3));
+        /* get dev list */
+        std::vector< std::shared_ptr< hwstub::device > > list;
+        hwstub::error err = context->get_device_list(list);
+        if(err == hwstub::error::SUCCESS)
+        {
+            beginInsertRows(QModelIndex(), first_row, first_row + list.size() - 1);
+            for(auto& d : list)
+            {
+                Device dev;
+                dev.name = GetFriendlyName(d);
+                dev.device = d;
+                m_list.push_back(dev);
+            }
+            endInsertRows();
+        }
+    }
+}
+
+void HWStubContextModel::EnableDummy(bool en, const QString& text)
+{
+    /* if needed, create/remove raw */
+    if(m_has_dummy && !en)
+    {
+        /* remove row */
+        beginRemoveRows(QModelIndex(), 0, 0);
+        m_has_dummy = false;
+        endRemoveRows();
+    }
+    else if(!m_has_dummy && en)
+    {
+        /* add row */
+        beginInsertRows(QModelIndex(), 0, 0);
+        m_has_dummy = true;
+        m_dummy_text = text;
+        endInsertRows();
+    }
+    else if(en)
+    {
+        /* text change only */
+        emit dataChanged(index(0, GetNameColumn()), index(0, GetNameColumn()));
+    }
+}
+
+int HWStubContextModel::rowCount(const QModelIndex& parent) const
+{
+    Q_UNUSED(parent);
+    return m_list.size() + (m_has_dummy ? 1 : 0);
+}
+
+int HWStubContextModel::columnCount(const QModelIndex& parent) const
+{
+    Q_UNUSED(parent);
+    return 1;
+}
+
+QVariant HWStubContextModel::data(const QModelIndex& index, int role) const
+{
+    int first_row = m_has_dummy ? 1: 0;
+    /* special case for dummy */
+    if(m_has_dummy && index.row() == 0)
+    {
+        int section = index.column();
+        if(section == GetNameColumn())
+        {
+            if(role == Qt::DisplayRole)
+                return QVariant(m_dummy_text);
+            else if(role == Qt::FontRole)
+            {
+                QFont font;
+                font.setItalic(true);
+                return QVariant(font);
+            }
+        }
+        return QVariant();
+    }
+
+    if(index.row() < first_row || (size_t)index.row() >= first_row + m_list.size())
+        return QVariant();
+    int section = index.column();
+    if(section == GetNameColumn())
+    {
+        if(role == Qt::DisplayRole)
+            return QVariant(m_list[index.row() - first_row].name);
+    }
+    return QVariant();
+}
+
+QVariant HWStubContextModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if(orientation == Qt::Vertical)
+        return QVariant();
+    if(role != Qt::DisplayRole)
+        return QVariant();
+    if(section == GetNameColumn())
+        return QVariant("Friendly name");
+    return QVariant();
+}
+
+Qt::ItemFlags HWStubContextModel::flags(const QModelIndex& index) const
+{
+    Q_UNUSED(index);
+    return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+}
+
+int HWStubContextModel::GetNameColumn() const
+{
+    return 0;
+}
+
+std::shared_ptr< hwstub::device > HWStubContextModel::GetDevice(int row)
+{
+    int first_row = m_has_dummy ? 1: 0;
+    /* special case for dummy */
+    if(row < first_row || (size_t)row >= first_row + m_list.size())
+        return std::shared_ptr< hwstub::device >();
+    else
+        return m_list[row - first_row].device;
+}
+
+QString HWStubContextModel::GetFriendlyName(std::shared_ptr< hwstub::device > device)
+{
+    return HWStubManager::GetFriendlyName(device);
+}
+
+namespace
+{
+    struct dev_change_t
+    {
+        std::shared_ptr< hwstub::context > ctx;
+        bool arrived;
+        std::shared_ptr< hwstub::device > device;
+    };
+}
+
+void HWStubContextModel::OnDevChangeLow(std::shared_ptr< hwstub::context > ctx,
+    bool arrived, std::shared_ptr< hwstub::device > device)
+{
+    /* calling Qt function from non-Qt thread is unsafe. Since the polling thread
+     * is a pthread, the safest way to use Qt invoke mecanism to make it run
+     * on the event loop */
+    dev_change_t *evt = new dev_change_t;
+    evt->ctx = ctx;
+    evt->arrived = arrived;
+    evt->device = device;
+    QMetaObject::invokeMethod(this, "OnDevChangeUnsafe", Q_ARG(void *, (void *)evt));
+}
+
+void HWStubContextModel::OnDevChangeUnsafe(void *data)
+{
+    dev_change_t *evt = (dev_change_t *)data;
+    OnDevChange(evt->ctx, evt->arrived, evt->device);
+    delete evt;
+}
+
+void HWStubContextModel::OnDevChange(std::shared_ptr< hwstub::context > ctx, bool arrived,
+    std::shared_ptr< hwstub::device > device)
+{
+    int first_row = m_has_dummy ? 1: 0;
+    Q_UNUSED(ctx);
+    if(arrived)
+    {
+        Device dev;
+        dev.name = GetFriendlyName(device);
+        dev.device = device;
+        beginInsertRows(QModelIndex(), first_row + m_list.size(),
+            first_row + m_list.size());
+        m_list.push_back(dev);
+        endInsertRows();
+    }
+    else
+    {
+        /* find device in the list */
+        auto it = m_list.begin();
+        int idx = 0;
+        for(; it != m_list.end(); ++it, ++idx)
+            if(it->device == device)
+                break;
+        if(it == m_list.end())
+            return;
+        /* remove it */
+        beginRemoveRows(QModelIndex(), first_row + idx, first_row + idx);
+        m_list.erase(it);
+        endRemoveRows();
+    }
+}
+
+/**
  * HWStubDevice
  */
-HWStubDevice::HWStubDevice(struct libusb_device *dev)
+HWStubDevice::HWStubDevice(std::shared_ptr< hwstub::device > device)
 {
-    Init(dev);
-}
-
-HWStubDevice::HWStubDevice(const HWStubDevice *dev)
-{
-    Init(dev->m_dev);
-}
-
-void HWStubDevice::Init(struct libusb_device *dev)
-{
-    libusb_ref_device(dev);
-    m_dev = dev;
-    m_handle = 0;
-    m_hwdev = 0;
-    m_valid = Probe();
+    m_valid = Probe(device);
 }
 
 HWStubDevice::~HWStubDevice()
 {
-    Close();
-    libusb_unref_device(m_dev);
 }
 
-int HWStubDevice::GetBusNumber()
+bool HWStubDevice::Probe(std::shared_ptr<hwstub::device> device)
 {
-    return libusb_get_bus_number(m_dev);
-}
-
-int HWStubDevice::GetDevAddress()
-{
-    return libusb_get_device_address(m_dev);
-}
-
-bool HWStubDevice::Probe()
-{
-    if(!Open())
+    if(!device)
         return false;
-    // get target
-    int ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_TARGET, &m_hwdev_target, sizeof(m_hwdev_target));
-    if(ret != sizeof(m_hwdev_target))
-        goto Lerr;
-    // get STMP information
+    hwstub::error err = device->open(m_handle);
+    if(err != hwstub::error::SUCCESS)
+        return false;
+    // get target information
+    err = m_handle->get_target_desc(m_hwdev_target);
+    if(err != hwstub::error::SUCCESS)
+        return false;
+    // get STMP/PP information
     if(m_hwdev_target.dID == HWSTUB_TARGET_STMP)
     {
-        ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_STMP, &m_hwdev_stmp, sizeof(m_hwdev_stmp));
-        if(ret != sizeof(m_hwdev_stmp))
-            goto Lerr;
+        err = m_handle->get_stmp_desc(m_hwdev_stmp);
+        if(err != hwstub::error::SUCCESS)
+            return false;
     }
     else if(m_hwdev_target.dID == HWSTUB_TARGET_PP)
     {
-        ret = hwstub_get_desc(m_hwdev, HWSTUB_DT_PP, &m_hwdev_pp, sizeof(m_hwdev_pp));
-        if(ret != sizeof(m_hwdev_pp))
-            goto Lerr;
+        err = m_handle->get_pp_desc(m_hwdev_pp);
+        if(err != hwstub::error::SUCCESS)
+            return false;
     }
-    Close();
-    return true;
-
-    Lerr:
-    Close();
-    return false;
-}
-
-bool HWStubDevice::Open()
-{
-    if(libusb_open(m_dev, &m_handle))
-        return false;
-    m_hwdev = hwstub_open(m_handle);
-    if(m_hwdev == 0)
+    else if(m_hwdev_target.dID == HWSTUB_TARGET_JZ)
     {
-        libusb_close(m_handle);
-        m_handle = 0;
-        return false;
+        err = m_handle->get_jz_desc(m_hwdev_jz);
+        if(err != hwstub::error::SUCCESS)
+            return false;
     }
+    m_name = HWStubManager::GetFriendlyName(device);
     return true;
-}
-
-void HWStubDevice::Close()
-{
-    if(m_hwdev)
-        hwstub_release(m_hwdev);
-    m_hwdev = 0;
-    if(m_handle)
-        libusb_close(m_handle);
-    m_handle = 0;
 }
 
 bool HWStubDevice::ReadMem(soc_addr_t addr, size_t length, void *buffer)
 {
-    if(!m_hwdev)
-        return false;
-    int ret = hwstub_rw_mem_atomic(m_hwdev, 1, addr, buffer, length);
-    return ret >= 0 && (size_t)ret == length;
+    size_t len = length;
+    hwstub::error err = m_handle->read(addr, buffer, len, true);
+    return err == hwstub::error::SUCCESS && len == length;
 }
 
 bool HWStubDevice::WriteMem(soc_addr_t addr, size_t length, void *buffer)
 {
-    if(!m_hwdev)
-        return false;
-    int ret = hwstub_rw_mem_atomic(m_hwdev, 0, addr, buffer, length);
-    return ret >= 0 && (size_t)ret == length;
+    size_t len = length;
+    hwstub::error err = m_handle->write(addr, buffer, len, true);
+    return err == hwstub::error::SUCCESS && len == length;
 }
 
 bool HWStubDevice::IsValid()
@@ -448,6 +775,10 @@ bool HWStubDevice::IsValid()
     return m_valid;
 }
 
+QString HWStubDevice::GetFriendlyName()
+{
+    return m_name;
+}
 
 /**
  * HWStubIoBackend
@@ -456,7 +787,7 @@ bool HWStubDevice::IsValid()
 HWStubIoBackend::HWStubIoBackend(HWStubDevice *dev)
 {
     m_dev = dev;
-    m_dev->Open();
+
     struct hwstub_target_desc_t target = m_dev->GetTargetInfo();
     if(target.dID == HWSTUB_TARGET_STMP)
     {
@@ -469,6 +800,13 @@ HWStubIoBackend::HWStubIoBackend(HWStubDevice *dev)
             m_soc = "stmp3600";
         else
             m_soc = QString("stmp%1").arg(stmp.wChipID, 4, 16, QChar('0'));
+    }
+    else if(target.dID == HWSTUB_TARGET_JZ)
+    {
+        struct hwstub_jz_desc_t jz = m_dev->GetJZInfo();
+        m_soc = QString("jz%1").arg(jz.wChipID, 4, 16, QChar('0'));
+        if(jz.bRevision != 0)
+            m_soc.append(QChar(jz.bRevision).toLower());
     }
     else if(target.dID == HWSTUB_TARGET_RK27)
         m_soc = "rk27x";
@@ -547,95 +885,6 @@ bool HWStubIoBackend::WriteRegister(soc_addr_t addr, soc_word_t value,
 bool HWStubIoBackend::Reload()
 {
     return true;
-}
-
-/**
- * HWStubBackendHelper
- */
-HWStubBackendHelper::HWStubBackendHelper()
-{
-#ifdef LIBUSB_NO_HOTPLUG
-    m_hotplug = false;
-#else
-    m_hotplug = libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG);
-    if(m_hotplug)
-    {
-        int evt = LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED |
-            LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT;
-        m_hotplug = LIBUSB_SUCCESS == libusb_hotplug_register_callback(
-            NULL, (libusb_hotplug_event)evt, LIBUSB_HOTPLUG_ENUMERATE,
-            LIBUSB_HOTPLUG_MATCH_ANY, LIBUSB_HOTPLUG_MATCH_ANY, LIBUSB_HOTPLUG_MATCH_ANY,
-            &HWStubBackendHelper::HotPlugCallback, reinterpret_cast< void* >(this),
-            &m_hotplug_handle);
-    }
-#endif /* LIBUSB_NO_HOTPLUG */
-}
-
-HWStubBackendHelper::~HWStubBackendHelper()
-{
-#ifndef LIBUSB_NO_HOTPLUG
-    if(m_hotplug)
-        libusb_hotplug_deregister_callback(NULL, m_hotplug_handle);
-#endif /* LIBUSB_NO_HOTPLUG */
-}
-
-QList< HWStubDevice* > HWStubBackendHelper::GetDevList()
-{
-    QList< HWStubDevice* > list;
-    libusb_device **dev_list;
-    ssize_t cnt = hwstub_get_device_list(NULL, &dev_list);
-    for(int i = 0; i < cnt; i++)
-    {
-        HWStubDevice *dev = new HWStubDevice(dev_list[i]);
-        /* filter out non-hwstub devices */
-        if(dev->IsValid())
-            list.push_back(dev);
-        else
-            delete dev;
-    }
-    libusb_free_device_list(dev_list, 1);
-    return list;
-}
-
-#ifndef LIBUSB_NO_HOTPLUG
-void HWStubBackendHelper::OnHotPlug(bool arrived, struct libusb_device *dev)
-{
-    /* signal it */
-    emit OnDevListChanged(arrived, dev);
-}
-
-int HWStubBackendHelper::HotPlugCallback(struct libusb_context *ctx, struct libusb_device *dev,
-    libusb_hotplug_event event, void *user_data)
-{
-    Q_UNUSED(ctx);
-    HWStubBackendHelper *helper = reinterpret_cast< HWStubBackendHelper* >(user_data);
-    switch(event)
-    {
-        case LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED: helper->OnHotPlug(true, dev); break;
-        case LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT: helper->OnHotPlug(false, dev); break;
-        default: break;
-    }
-    return 0;
-}
-#endif /* LIBUSB_NO_HOTPLUG */
-
-bool HWStubBackendHelper::HasHotPlugSupport()
-{
-    return m_hotplug;
-}
-
-namespace
-{
-class lib_usb_init
-{
-public:
-    lib_usb_init()
-    {
-        libusb_init(NULL);
-    }
-};
-
-lib_usb_init __lib_usb_init;
 }
 
 #endif /* HAVE_HWSTUB */

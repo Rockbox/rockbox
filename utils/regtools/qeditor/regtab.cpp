@@ -75,10 +75,11 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
     QVBoxLayout *left_layout = new QVBoxLayout;
     left->setLayout(left_layout);
 
-    QGroupBox *top_group = new QGroupBox("SOC selection");
-    QVBoxLayout *top_group_layout = new QVBoxLayout;
+    QGroupBox *top_group = new QGroupBox("");
+    QHBoxLayout *top_group_layout = new QHBoxLayout;
     m_soc_selector = new QComboBox;
-    top_group_layout->addWidget(m_soc_selector);
+    top_group_layout->addWidget(new QLabel("SOC:"));
+    top_group_layout->addWidget(m_soc_selector, 1);
     top_group->setLayout(top_group_layout);
 
     m_reg_tree = new QTreeWidget();
@@ -96,7 +97,7 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
     left_layout->addWidget(m_type_selector);
 
     m_right_panel = new QVBoxLayout;
-    QGroupBox *data_sel_group = new QGroupBox("Data selection");
+    QGroupBox *data_sel_group = new QGroupBox("");
     QHBoxLayout *data_sel_layout = new QHBoxLayout;
     m_backend_selector = new BackendSelector(m_backend, this);
     m_backend_selector->SetNothingMessage("<i>Select a data source to analyse its content.</i>");
@@ -108,6 +109,7 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
     m_data_sel_reload = new QPushButton(this);
     m_data_sel_reload->setIcon(QIcon::fromTheme("view-refresh"));
     m_data_sel_reload->setToolTip("Reload data");
+    data_sel_layout->addWidget(new QLabel("Data:"));
     data_sel_layout->addWidget(m_backend_selector);
     data_sel_layout->addWidget(m_readonly_check);
     data_sel_layout->addWidget(m_data_soc_label);
@@ -146,7 +148,9 @@ RegTab::RegTab(Backend *backend, QWidget *parent)
     connect(m_type_selector, SIGNAL(currentChanged(int)), this, SLOT(OnTypeChanged(int)));
 
     m_msg_select_id = SetMessage(MessageWidget::Information,
-        "You can browse the registers. Select a data source to analyse the values.");
+        "You can browse the registers using the left panel. "
+        "Select a data source at the top to analyse the values. "
+        "You can also use the analyzers available in the left panel, if any.");
     m_msg_error_id = 0;
 
     QList< SocFileRef > socs = m_backend->GetSocFileList();
@@ -215,8 +219,7 @@ void RegTab::UpdateTabName()
     else if(hwstub)
     {
         HWStubDevice *dev = hwstub->GetDevice();
-        SetTabName(QString("HWStub %1.%2").arg(dev->GetBusNumber())
-            .arg(dev->GetDevAddress()));
+        SetTabName(dev->GetFriendlyName());
     }
 #endif
     else
@@ -231,11 +234,21 @@ void RegTab::OnBackendSelect(IoBackend *backend)
     HideMessage(m_msg_select_id);
     HideMessage(m_msg_error_id);
     m_io_backend = backend;
-    SetReadOnlyIndicator();
-    SetDataSocName(m_io_backend->GetSocName());
-    OnDataSocActivated(m_io_backend->GetSocName());
-    OnDataChanged();
-    UpdateTabName();
+    /* Check if the backend is valid, otherwise it might confuse the user */
+    if(m_io_backend->IsValid())
+    {
+        SetReadOnlyIndicator();
+        SetDataSocName(m_io_backend->GetSocName());
+        OnDataSocActivated(m_io_backend->GetSocName());
+        OnDataChanged();
+        UpdateTabName();
+    }
+    /* But don't display it for the dummy backend either */
+    else if(dynamic_cast< DummyIoBackend * >(m_io_backend) == 0)
+    {
+        m_msg_error_id = SetMessage(MessageWidget::Error,
+            "Data source is not available.");
+    }
 }
 
 void RegTab::SetReadOnlyIndicator()
@@ -267,6 +280,7 @@ void RegTab::OnAnalyserClicked(QListWidgetItem *current)
 
 void RegTab::DisplayNode(const soc_desc::node_inst_t& ref)
 {
+    HideMessage(m_msg_select_id);
     if(ref.node().is_root())
         SetPanel(new SocDisplayPanel(this, m_io_backend, ref.soc()));
     else if(ref.node().reg().valid())

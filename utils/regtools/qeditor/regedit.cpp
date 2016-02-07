@@ -107,14 +107,15 @@ SocEditPanel::SocEditPanel(const soc_desc::soc_ref_t& ref, QWidget *parent)
     for(size_t i = 0; i < authors.size(); i++)
     {
         QTableWidgetItem *item = new QTableWidgetItem(
-            QIcon::fromTheme("list-remove"), "", SocEditPanelDelType);
+            YIconManager::Get()->GetIcon(YIconManager::ListRemove), "", SocEditPanelDelType);
+        item->setToolTip("Remove this author");
         item->setFlags(Qt::ItemIsEnabled);
         m_authors_list->setItem(i, 0, item);
         item = new QTableWidgetItem(QString::fromStdString(authors[i]));
         m_authors_list->setItem(i, 1, item);
     }
     QTableWidgetItem *new_item = new QTableWidgetItem(
-        QIcon::fromTheme("list-add"), "", SocEditPanelAddType);
+        YIconManager::Get()->GetIcon(YIconManager::ListAdd), "", SocEditPanelAddType);
     new_item->setFlags(Qt::ItemIsEnabled);
     m_authors_list->setItem(authors.size(), 0, new_item);
     new_item = new QTableWidgetItem("New author...", QTableWidgetItem::UserType);
@@ -188,7 +189,8 @@ void SocEditPanel::OnAuthorActivated(QTableWidgetItem *item)
         m_ref.get()->author.push_back("Anonymous");
         m_authors_list->insertRow(row);
         QTableWidgetItem *item = new QTableWidgetItem(
-            QIcon::fromTheme("list-remove"), "", SocEditPanelDelType);
+            YIconManager::Get()->GetIcon(YIconManager::ListRemove), "", SocEditPanelDelType);
+        item->setToolTip("Remove this author");
         item->setFlags(Qt::ItemIsEnabled);
         m_authors_list->setItem(row, 0, item);
         item = new QTableWidgetItem(QString::fromStdString(m_ref.get()->author.back()));
@@ -386,7 +388,8 @@ NodeInstanceEditPanel::NodeInstanceEditPanel(const soc_desc::node_ref_t& ref,
     for(size_t i = 0; i < addrs.size(); i++)
     {
         QTableWidgetItem *item = new QTableWidgetItem(
-            QIcon::fromTheme("list-remove"), "", NodeInstEditPanelDelType);
+            YIconManager::Get()->GetIcon(YIconManager::ListRemove), "", NodeInstEditPanelDelType);
+        item->setToolTip("Remove this address");
         item->setFlags(Qt::ItemIsEnabled);
         addr_list->setItem(i, 0, item);
         item = new QTableWidgetItem();
@@ -394,7 +397,7 @@ NodeInstanceEditPanel::NodeInstanceEditPanel(const soc_desc::node_ref_t& ref,
         addr_list->setItem(i, 1, item);
     }
     QTableWidgetItem *new_item = new QTableWidgetItem(
-        QIcon::fromTheme("list-add"), "", NodeInstEditPanelAddType);
+        YIconManager::Get()->GetIcon(YIconManager::ListAdd), "", NodeInstEditPanelAddType);
     new_item->setFlags(Qt::ItemIsEnabled);
     addr_list->setItem(addrs.size(), 0, new_item);
     new_item = new QTableWidgetItem("New address...", QTableWidgetItem::UserType);
@@ -535,7 +538,8 @@ void NodeInstanceEditPanel::OnAddressActivated(QTableWidgetItem *item)
         GetInstance().range.list.push_back(new_addr);
         table->insertRow(row);
         QTableWidgetItem *item = new QTableWidgetItem(
-            QIcon::fromTheme("list-remove"), "", NodeInstEditPanelDelType);
+            YIconManager::Get()->GetIcon(YIconManager::ListRemove), "", NodeInstEditPanelDelType);
+        item->setToolTip("Remove this address");
         item->setFlags(Qt::ItemIsEnabled);
         table->setItem(row, 0, item);
         item = new QTableWidgetItem();
@@ -828,7 +832,8 @@ RegFieldEditPanel::RegFieldEditPanel(const soc_desc::field_ref_t& ref, QWidget *
     for(size_t i = 0; i  < field.enum_.size(); i++)
     {
         QTableWidgetItem *item = new QTableWidgetItem(
-            QIcon::fromTheme("list-remove"), "", RegFieldEditPanelDelType);
+            YIconManager::Get()->GetIcon(YIconManager::ListRemove), "", RegFieldEditPanelDelType);
+        item->setToolTip("Remove this enum");
         item->setFlags(Qt::ItemIsEnabled);
         m_enum_table->setItem(i, 0, item);
         item = new QTableWidgetItem(QString::fromStdString(field.enum_[i].name));
@@ -840,7 +845,7 @@ RegFieldEditPanel::RegFieldEditPanel(const soc_desc::field_ref_t& ref, QWidget *
         m_enum_table->setItem(i, 3, item);
     }
     QTableWidgetItem *new_item = new QTableWidgetItem(
-        QIcon::fromTheme("list-add"), "", RegFieldEditPanelAddType);
+        YIconManager::Get()->GetIcon(YIconManager::ListAdd), "", RegFieldEditPanelAddType);
     new_item->setFlags(Qt::ItemIsEnabled);
     m_enum_table->setItem(field.enum_.size(), 0, new_item);
     new_item = new QTableWidgetItem("New field...");
@@ -875,6 +880,13 @@ void RegFieldEditPanel::UpdateWidth()
     m_range_validator->setWidth(m_ref.reg().get()->width);
 }
 
+void RegFieldEditPanel::UpdateRange()
+{
+    soc_desc::field_t *field = m_ref.get();
+    m_range_edit->setText(m_range_validator->generate(
+        field->pos + field->width - 1, field->pos));
+}
+
 void RegFieldEditPanel::OnFieldValueActivated(QTableWidgetItem *item)
 {
     if(item->type() == RegFieldEditPanelDelType)
@@ -895,7 +907,8 @@ void RegFieldEditPanel::OnFieldValueActivated(QTableWidgetItem *item)
         field.enum_.push_back(new_enum);
         m_enum_table->insertRow(row);
         QTableWidgetItem *item = new QTableWidgetItem(
-            QIcon::fromTheme("list-remove"), "", RegFieldEditPanelDelType);
+            YIconManager::Get()->GetIcon(YIconManager::ListRemove), "", RegFieldEditPanelDelType);
+        item->setToolTip("Remove this enum");
         item->setFlags(Qt::ItemIsEnabled);
         m_enum_table->setItem(row, 0, item);
         item = new QTableWidgetItem(QString::fromStdString(new_enum.name));
@@ -977,7 +990,7 @@ RegEditPanel::RegEditPanel(const soc_desc::register_ref_t& ref, QWidget *parent)
 
     m_value_model = new RegFieldTableModel(this); // view takes ownership
     m_value_model->SetRegister(*ref.get());
-    m_value_model->SetReadOnly(true);
+    m_value_model->SetReadOnly(false);
 
     m_sexy_display2 = new Unscroll<YRegDisplay>(this);
     m_sexy_display2->setFont(m_reg_font);
@@ -1016,29 +1029,61 @@ RegEditPanel::RegEditPanel(const soc_desc::register_ref_t& ref, QWidget *parent)
     width_group_layout->addWidget(reg_size_32);
     width_group_layout->addWidget(reg_size_16);
     width_group_layout->addWidget(reg_size_8);
-    width_group_layout->addStretch(0);
     QGroupBox *width_group = new QGroupBox("Width");
     width_group->setLayout(width_group_layout);
 
+    m_reg_access_group = new QButtonGroup(this);
+    QRadioButton *reg_dflt = new QRadioButton("Unspecified");
+    QRadioButton *reg_rw = new QRadioButton("Read-Write");
+    QRadioButton *reg_ro = new QRadioButton("Read-Only");
+    QRadioButton *reg_wo = new QRadioButton("Write-Only");
+    m_reg_access_group->addButton(reg_dflt, soc_desc::UNSPECIFIED);
+    m_reg_access_group->addButton(reg_rw, soc_desc::READ_WRITE);
+    m_reg_access_group->addButton(reg_ro, soc_desc::READ_ONLY);
+    m_reg_access_group->addButton(reg_wo, soc_desc::WRITE_ONLY);
+    if(m_reg_access_group->button(m_ref.get()->access))
+        m_reg_access_group->button(m_ref.get()->access)->click();
+    QVBoxLayout *access_group_layout = new QVBoxLayout;
+    access_group_layout->addWidget(reg_dflt);
+    access_group_layout->addWidget(reg_rw);
+    access_group_layout->addWidget(reg_ro);
+    access_group_layout->addWidget(reg_wo);
+    QGroupBox *access_group = new QGroupBox("Access");
+    access_group->setLayout(access_group_layout);
+
+    QVBoxLayout *width_access_layout = new QVBoxLayout;
+    width_access_layout->addWidget(width_group);
+    width_access_layout->addWidget(access_group);
+    width_access_layout->addStretch(0);
+
     m_variant_table = new QTableWidget;
-    m_variant_table->setColumnCount(3);
+    m_variant_table->setColumnCount(4);
     m_variant_table->setHorizontalHeaderItem(0, new QTableWidgetItem(""));
     m_variant_table->setHorizontalHeaderItem(1, new QTableWidgetItem("Type"));
     m_variant_table->setHorizontalHeaderItem(2, new QTableWidgetItem("Offset"));
+    m_variant_table->setHorizontalHeaderItem(3, new QTableWidgetItem("Access"));
     m_variant_table->verticalHeader()->setVisible(false);
     m_variant_table->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_variant_delegate = new SocFieldItemDelegate(this);
     m_variant_delegate->setItemEditorFactory(new QItemEditorFactory);
-    m_variant_editor = new SocFieldEditorCreator;
-    m_variant_delegate->itemEditorFactory()->registerEditor(QVariant::UInt, m_variant_editor);
+    m_variant_delegate->itemEditorFactory()->registerEditor(QVariant::UInt,
+        new SocFieldEditorCreator);
     m_variant_table->setItemDelegate(m_variant_delegate);
+    m_access_delegate = new SocAccessItemDelegate("Unspecified", this);
+    m_access_delegate->setItemEditorFactory(new QItemEditorFactory);
+    // FIXME see QTBUG-30392
+    m_access_delegate->itemEditorFactory()->registerEditor(
+        (QVariant::Type)qMetaTypeId< soc_desc::access_t >(),
+        new SocAccessEditorCreator);
+    m_variant_table->setItemDelegateForColumn(3, m_access_delegate);
 
     std::vector< soc_desc::variant_ref_t > variants = m_ref.variants();
     m_variant_table->setRowCount(variants.size() + 1);
     for(size_t i = 0; i  < variants.size(); i++)
     {
         QTableWidgetItem *item = new QTableWidgetItem(
-            QIcon::fromTheme("list-remove"), "", RegVariantEditPanelDelType);
+            YIconManager::Get()->GetIcon(YIconManager::ListRemove), "", RegVariantEditPanelDelType);
+        item->setToolTip("Remove this variant");
         item->setFlags(Qt::ItemIsEnabled);
         m_variant_table->setItem(i, 0, item);
         item = new QTableWidgetItem(QString::fromStdString(variants[i].get()->type));
@@ -1046,9 +1091,12 @@ RegEditPanel::RegEditPanel(const soc_desc::register_ref_t& ref, QWidget *parent)
         item = new QTableWidgetItem();
         item->setData(Qt::EditRole, QVariant(variants[i].get()->offset));
         m_variant_table->setItem(i, 2, item);
+        item = new QTableWidgetItem();
+        item->setData(Qt::EditRole, QVariant::fromValue(variants[i].get()->access));
+        m_variant_table->setItem(i, 3, item);
     }
     QTableWidgetItem *new_item = new QTableWidgetItem(
-        QIcon::fromTheme("list-add"), "", RegVariantEditPanelAddType);
+        YIconManager::Get()->GetIcon(YIconManager::ListAdd), "", RegVariantEditPanelAddType);
     new_item->setFlags(Qt::ItemIsEnabled);
     m_variant_table->setItem(variants.size(), 0, new_item);
     new_item = new QTableWidgetItem("New variant...");
@@ -1069,7 +1117,7 @@ RegEditPanel::RegEditPanel(const soc_desc::register_ref_t& ref, QWidget *parent)
     m_desc_edit->SetTextHtml(QString::fromStdString(ref.get()->desc));
 
     QHBoxLayout *top_info_layout = new QHBoxLayout;
-    top_info_layout->addWidget(width_group);
+    top_info_layout->addLayout(width_access_layout);
     top_info_layout->addWidget(Misc::EncloseInBox("Variants", m_variant_table));
     top_info_layout->addWidget(Misc::EncloseInBox("Description", m_desc_edit));
 
@@ -1087,9 +1135,9 @@ RegEditPanel::RegEditPanel(const soc_desc::register_ref_t& ref, QWidget *parent)
     main_layout->addWidget(m_view_tab, 2);
 
     m_delete_action = new QAction("&Delete", this);
-    m_delete_action->setIcon(QIcon::fromTheme("list-remove"));
+    m_delete_action->setIcon(YIconManager::Get()->GetIcon(YIconManager::ListRemove));
     m_new_action = new QAction("&New field", this);
-    m_new_action->setIcon(QIcon::fromTheme("list-add"));
+    m_new_action->setIcon(YIconManager::Get()->GetIcon(YIconManager::ListAdd));
 
     setLayout(main_layout);
 
@@ -1101,6 +1149,7 @@ RegEditPanel::RegEditPanel(const soc_desc::register_ref_t& ref, QWidget *parent)
     connect(m_sexy_display2, SIGNAL(customContextMenuRequested(QPoint)), this,
         SLOT(OnRegDisplayContextMenu(QPoint)));
     connect(m_reg_size_group, SIGNAL(buttonClicked(int)), this, SLOT(OnWidthChanged(int)));
+    connect(m_reg_access_group, SIGNAL(buttonClicked(int)), this, SLOT(OnAccessChanged(int)));
     connect(m_delete_action, SIGNAL(triggered()), this, SLOT(OnRegFieldDelete()));
     connect(m_new_action, SIGNAL(triggered()), this, SLOT(OnRegFieldNew()));
     connect(m_variant_table, SIGNAL(itemActivated(QTableWidgetItem *)), this,
@@ -1110,6 +1159,7 @@ RegEditPanel::RegEditPanel(const soc_desc::register_ref_t& ref, QWidget *parent)
     connect(m_desc_edit, SIGNAL(OnTextChanged()), this, SLOT(OnDescEdited()));
     connect(m_fields_tab, SIGNAL(tabCloseRequested(int)), this, SLOT(OnFieldRemove(int)));
     connect(m_fields_tab, SIGNAL(tabOpenRequested()), this, SLOT(OnFieldCreate()));
+    connect(m_value_model, SIGNAL(OnBitrangeModified(int)), this, SLOT(OnBitrangeModified(int)));
 }
 
 void RegEditPanel::UpdateWidthRestrictions()
@@ -1148,6 +1198,22 @@ void RegEditPanel::OnWidthChanged(int w)
     OnModified();
 }
 
+void RegEditPanel::OnBitrangeModified(int index)
+{
+    soc_desc::register_t reg = m_value_model->GetRegister();
+    m_ref.get()->field[index].pos = reg.field[index].pos;
+    m_ref.get()->field[index].width = reg.field[index].width;
+    for(int i = 0; i < m_fields_tab->count(); i++)
+        dynamic_cast< RegFieldEditPanel * >(m_fields_tab->widget(i))->UpdateRange();
+    OnModified();
+}
+
+void RegEditPanel::OnAccessChanged(int acc)
+{
+    m_ref.get()->access = (soc_desc::access_t)acc;
+    OnModified();
+}
+
 void RegEditPanel::OnDescEdited()
 {
     m_ref.get()->desc = m_desc_edit->GetTextHtml().toStdString();
@@ -1169,9 +1235,11 @@ void RegEditPanel::OnVariantActivated(QTableWidgetItem *item)
         soc_desc::variant_t& variant = *m_ref.create_variant().get();
         variant.type = "untyped";
         variant.offset = 0;
+        variant.access = soc_desc::UNSPECIFIED;
         m_variant_table->insertRow(row);
         QTableWidgetItem *item = new QTableWidgetItem(
-            QIcon::fromTheme("list-remove"), "", RegVariantEditPanelDelType);
+            YIconManager::Get()->GetIcon(YIconManager::ListRemove), "", RegVariantEditPanelDelType);
+        item->setToolTip("Remove this variant");
         item->setFlags(Qt::ItemIsEnabled);
         m_variant_table->setItem(row, 0, item);
         item = new QTableWidgetItem(QString::fromStdString(variant.type));
@@ -1179,6 +1247,9 @@ void RegEditPanel::OnVariantActivated(QTableWidgetItem *item)
         item = new QTableWidgetItem();
         item->setData(Qt::EditRole, QVariant(variant.offset));
         m_variant_table->setItem(row, 2, item);
+        item = new QTableWidgetItem();
+        item->setData(Qt::EditRole, QVariant::fromValue(variant.access));
+        m_variant_table->setItem(row, 3, item);
         OnModified();
     }
 }
@@ -1193,6 +1264,8 @@ void RegEditPanel::OnVariantValueChanged(QTableWidgetItem *item)
         var.type = item->text().toStdString();
     else if(item->column() == 2)
         var.offset = item->data(Qt::EditRole).value< soc_word_t >();
+    else if(item->column() == 3)
+        var.access = item->data(Qt::EditRole).value< soc_desc::access_t >();
     OnModified();
 }
 
@@ -1346,20 +1419,22 @@ RegEdit::RegEdit(Backend *backend, QWidget *parent)
     m_file_edit->setReadOnly(true);
     m_file_open = new QToolButton(this);
     m_file_open->setText("Open");
-    m_file_open->setIcon(QIcon::fromTheme("document-open"));
+    m_file_open->setIcon(YIconManager::Get()->GetIcon(YIconManager::DocumentOpen));
     m_file_open->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     QMenu *file_open_menu = new QMenu(this);
-    QAction *new_act = file_open_menu->addAction(QIcon::fromTheme("document-new"), "New...");
+    QAction *new_act = file_open_menu->addAction(YIconManager::Get()->GetIcon(YIconManager::DocumentNew),
+        "New...");
     m_file_open->setPopupMode(QToolButton::MenuButtonPopup);
     m_file_open->setMenu(file_open_menu);
 
     m_file_save = new QToolButton(this);
     m_file_save->setText("Save");
-    m_file_save->setIcon(QIcon::fromTheme("document-save"));
+    m_file_save->setIcon(YIconManager::Get()->GetIcon(YIconManager::DocumentSave));
     m_file_save->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     m_file_save->setPopupMode(QToolButton::MenuButtonPopup);
     QMenu *file_save_menu = new QMenu(this);
-    QAction *saveas_act = file_save_menu->addAction(QIcon::fromTheme("document-save-as"), "Save as...");
+    QAction *saveas_act = file_save_menu->addAction(YIconManager::Get()->GetIcon(YIconManager::DocumentSaveAs),
+        "Save as...");
     m_file_save->setMenu(file_save_menu);
 
     QHBoxLayout *file_group_layout = new QHBoxLayout();
@@ -1375,11 +1450,11 @@ RegEdit::RegEdit(Backend *backend, QWidget *parent)
     m_soc_tree->setContextMenuPolicy(Qt::CustomContextMenu);
 
     m_delete_action = new QAction("&Delete", this);
-    m_delete_action->setIcon(QIcon::fromTheme("list-remove"));
+    m_delete_action->setIcon(YIconManager::Get()->GetIcon(YIconManager::ListRemove));
     m_new_action = new QAction("&New", this);
-    m_new_action->setIcon(QIcon::fromTheme("list-add"));
+    m_new_action->setIcon(YIconManager::Get()->GetIcon(YIconManager::ListAdd));
     m_create_action = new QAction("&Create register", this);
-    m_create_action->setIcon(QIcon::fromTheme("folder-new"));
+    m_create_action->setIcon(YIconManager::Get()->GetIcon(YIconManager::FolderNew));
 
     m_splitter->addWidget(m_soc_tree);
     m_splitter->setStretchFactor(0, 0);
@@ -1605,8 +1680,8 @@ QIcon RegEdit::GetIconFromType(int type)
 {
     switch(type)
     {
-        case SocTreeSocType: return QIcon::fromTheme("computer");
-        case SocTreeNodeType: return QIcon::fromTheme("cpu");
+        case SocTreeSocType: return YIconManager::Get()->GetIcon(YIconManager::Computer);
+        case SocTreeNodeType: return YIconManager::Get()->GetIcon(YIconManager::Cpu);
         case SocTreeRegType: return style()->standardIcon(QStyle::SP_ArrowRight);
         default: return QIcon();
     }
@@ -1627,7 +1702,7 @@ void RegEdit::FixupItem(QTreeWidgetItem *item)
     UpdateName(item);
     if(!ValidateName(item->text(0)))
     {
-        item->setIcon(0, QIcon::fromTheme("dialog-error"));
+        item->setIcon(0, YIconManager::Get()->GetIcon(YIconManager::DialogError));
         if(item->text(0).size() == 0)
         {
             MakeItalic(item, true);
@@ -1688,6 +1763,7 @@ void RegEdit::OnSocItemCreate()
         return;
     soc_desc::register_t reg;
     reg.width = 32;
+    reg.access = soc_desc::UNSPECIFIED;
     soc_desc::node_ref_t node = SocTreeItemVal< soc_desc::node_ref_t >(current);
     node.get()->register_.push_back(reg);
     QTreeWidgetItem *reg_item = MakeSocTreeItem(SocTreeRegType, node.reg());
