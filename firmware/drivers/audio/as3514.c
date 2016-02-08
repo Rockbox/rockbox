@@ -278,7 +278,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
 /*AS3543 mixer can go a little louder then the as3514, although 
  * it might be possible to go louder on the as3514 as well */
  
-#if CONFIG_CPU == AS3525v2 
+#ifdef HAVE_AS3543
 #define MIXER_MAX_VOLUME 0x1b
 #else /* lets leave the AS3514 alone until its better tested*/
 #define MIXER_MAX_VOLUME 0x16
