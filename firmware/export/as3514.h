@@ -31,11 +31,11 @@
 #define AUDIOHW_CAPS    (LIN_GAIN_CAP | MIC_GAIN_CAP)
 
 /*different volume ranges for different AMS chips*/
-#if CONFIG_CPU == AS3525v2 
+#ifdef HAVE_AS3543
 AUDIOHW_SETTING(VOLUME,     "dB",   0,   1, -82,   6, -25)
-#else /* AS3525v1 */
+#else /* !HAVE_AS3543 */
 AUDIOHW_SETTING(VOLUME,     "dB",   0,   1, -74,   6, -25)
-#endif /* CONFIG_CPU == AS3525v2 */
+#endif /* HAVE_AS3543 */
 
 #ifdef HAVE_RECORDING
 AUDIOHW_SETTING(MIC_GAIN,   "dB",   1,   1,   0,  39,  23, (val - 23) * 15)
