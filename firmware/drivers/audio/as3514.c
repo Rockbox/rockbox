@@ -34,7 +34,7 @@
 #include "i2s.h"
 #include "ascodec.h"
 
-#if CONFIG_CPU == AS3525v2 
+#ifdef HAVE_AS3543
 /* Headphone volume goes from -81.0 ... +6dB */
 #define VOLUME_MIN -820
 #define VOLUME_MAX   60
@@ -48,7 +48,7 @@
  * This drivers supports:
  * as3514 , as used in the PP targets
  * as3515 , as used in the as3525 targets
- * as3543 , as used in the as3525v2 targets
+ * as3543 , as used in the as3525v2 and other as3543 targets
  */
 
 #if CONFIG_CPU == AS3525
@@ -278,7 +278,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
 /*AS3543 mixer can go a little louder then the as3514, although 
  * it might be possible to go louder on the as3514 as well */
  
-#if CONFIG_CPU == AS3525v2 
+#ifdef HAVE_AS3543
 #define MIXER_MAX_VOLUME 0x1b
 #else /* lets leave the AS3514 alone until its better tested*/
 #define MIXER_MAX_VOLUME 0x16
@@ -303,14 +303,10 @@ void audiohw_set_volume(int vol_l, int vol_r)
 #ifdef HAVE_AS3543
     /*if not radio or recording*/
     if (!(as3514_regs[AS3514_AUDIOSET1] & (AUDIOSET1_ADC_on | AUDIOSET1_LIN1_on))) {
-        if (!hph_l || !hph_r) { /*if volume higher, disable the mixer to slightly improve noise*/
+        if (!hph_l || !hph_r) { /* if volume is low, enable the mixer */
             as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_DAC_GAIN_on);
             as3514_write(AS3514_AUDIOSET2, AUDIOSET2_AGC_off | AUDIOSET2_HPH_QUALITY_LOW_POWER);
             as3514_write_masked(AS3514_HPH_OUT_R, HPH_OUT_R_HP_OUT_SUM, HPH_OUT_R_HP_OUT_MASK);
-        } else {
-            as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on);
-            as3514_write(AS3514_AUDIOSET2, AUDIOSET2_SUM_off | AUDIOSET2_AGC_off | AUDIOSET2_HPH_QUALITY_LOW_POWER);
-            as3514_write_masked(AS3514_HPH_OUT_R, HPH_OUT_R_HP_OUT_DAC, HPH_OUT_R_HP_OUT_MASK);
         }
     }
 #endif
@@ -323,6 +319,17 @@ void audiohw_set_volume(int vol_l, int vol_r)
 #endif
     as3514_write_masked(AS3514_HPH_OUT_R, hph_r, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_HPH_OUT_L, hph_l, AS3514_VOL_MASK);
+
+#ifdef HAVE_AS3543
+    /*if not radio or recording*/
+    if (!(as3514_regs[AS3514_AUDIOSET1] & (AUDIOSET1_ADC_on | AUDIOSET1_LIN1_on))) {
+        if (hph_l && hph_r) { /* if volume is high, disable the mixer to slightly improve noise*/
+            as3514_write_masked(AS3514_HPH_OUT_R, HPH_OUT_R_HP_OUT_DAC, HPH_OUT_R_HP_OUT_MASK);
+            as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on);
+            as3514_write(AS3514_AUDIOSET2, AUDIOSET2_SUM_off | AUDIOSET2_AGC_off | AUDIOSET2_HPH_QUALITY_LOW_POWER);
+        }
+    }
+#endif
 
     audiohw_mute(false);
 }
