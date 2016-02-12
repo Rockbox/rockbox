@@ -74,7 +74,7 @@ static int ata_reset(void);
 static void ata_power_down(void);
 
 #ifdef ATA_HAVE_BBT
-char ata_bbt_buf[ATA_BBT_PAGES * 64];
+char ata_bbt_buf[ATA_BBT_PAGES * 64] STORAGE_ALIGN_ATTR;
 uint16_t (*ata_bbt)[0x20];
 uint64_t ata_virtual_sectors;
 uint32_t ata_last_offset;
@@ -679,10 +679,13 @@ static int ata_power_up(void)
                 udmatime = 0x3050a52;
                 param = 0x41;
             }
+            else if (ata_identify_data[88] & BIT(0))
+            {
+                param = 0x40;
+            }
             if (ata_identify_data[88] & BITRANGE(0, 4))
             {
                 ata_dma_flags = BIT(2) | BIT(3) | BIT(9) | BIT(10);
-                param |= 0x40;
             }
         }
         ata_dma = param ? true : false;
@@ -907,7 +910,7 @@ int ata_bbt_translate(uint64_t sector, uint32_t count, uint64_t* phys, uint32_t*
 
 static int ata_rw_sectors(uint64_t sector, uint32_t count, void* buffer, bool write)
 {
-    if (((uint32_t)buffer) & 0xf)
+    if (STORAGE_OVERLAP((uint32_t)buffer))
     {
         while (count)
         {
