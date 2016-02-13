@@ -172,7 +172,7 @@ int ata_get_dma_mode(void);
 
 #ifdef HAVE_ATA_SMART
 /* Returns current S.M.A.R.T. data */
-void* ata_read_smart(void);
+int ata_read_smart(struct ata_smart_values*);
 #endif
 
 #endif /* __ATA_H__ */
