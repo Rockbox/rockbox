@@ -70,6 +70,8 @@ static int spinup_time = 0;
 static int dma_mode = 0;
 static char aligned_buffer[SECTOR_SIZE] STORAGE_ALIGN_ATTR;
 
+static int ata_reset(void);
+static void ata_power_down(void);
 
 #ifdef ATA_HAVE_BBT
 char ata_bbt_buf[ATA_BBT_PAGES * 64];
@@ -78,8 +80,6 @@ uint64_t ata_virtual_sectors;
 uint32_t ata_last_offset;
 uint64_t ata_last_phys;
 
-static int ata_reset(void);
-static void ata_power_down(void);
 int ata_rw_sectors_internal(uint64_t sector, uint32_t count,
                             void* buffer, bool write);
 
@@ -689,7 +689,11 @@ static int ata_power_up(void)
         dma_mode = param;
         PASS_RC(ata_set_feature(0x03, param), 3, 4);
         if (ata_identify_data[82] & BIT(5))
+#ifdef ATA_HAVE_BBT
             PASS_RC(ata_set_feature(ata_bbt ? 0x82 : 0x02, 0), 3, 5);
+#else
+            PASS_RC(ata_set_feature(0x02, 0), 3, 5);
+#endif
         if (ata_identify_data[82] & BIT(6)) PASS_RC(ata_set_feature(0xaa, 0), 3, 6);
         ATA_PIO_TIME = piotime;
         ATA_MDMA_TIME = mdmatime;
@@ -947,8 +951,8 @@ static int ata_rw_sectors(uint64_t sector, uint32_t count, void* buffer, bool wr
 int ata_rw_sectors_internal(uint64_t sector, uint32_t count, void* buffer, bool write)
 {
 #endif
-    if (sector + count > ata_total_sectors) RET_ERR(0);
     if (!ata_powered) ata_power_up();
+    if (sector + count > ata_total_sectors) RET_ERR(0);
     ata_set_active();
     if (ata_dma && write) commit_dcache();
     else if (ata_dma) commit_discard_dcache();
