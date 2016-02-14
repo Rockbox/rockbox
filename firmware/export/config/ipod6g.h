@@ -247,7 +247,7 @@
 #define USB_VENDOR_ID 0x05AC
 #define USB_PRODUCT_ID 0x1261
 #define USB_NUM_ENDPOINTS 6
-#define USB_DEVBSS_ATTR __attribute__((aligned(16)))
+#define USB_DEVBSS_ATTR __attribute__((aligned(32)))
 
 #define HAVE_SERIAL
 /* Disable iAP when LOGF_SERIAL is enabled to avoid conflicts */
