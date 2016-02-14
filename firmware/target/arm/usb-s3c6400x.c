@@ -97,7 +97,7 @@ static struct ep_type endpoints[USB_NUM_ENDPOINTS][2];
 static union {
     struct usb_ctrlrequest header; /* 8 bytes */
     unsigned char payload[64];
-} _ep0_setup_pkt USB_DEVBSS_ATTR;
+} _ep0_setup_pkt USB_DEVBSS_ATTR __attribute__((aligned(32)));
 
 static struct usb_ctrlrequest *ep0_setup_pkt = UNCACHED_ADDR(&_ep0_setup_pkt.header);
 
