@@ -151,7 +151,7 @@ static void ep_transfer(int ep, void *ptr, int len, bool out)
     else
         commit_dcache_range(ptr, len);
 
-    logf("pkt=%d dma=%lx", nb_packets, DEPDMA(ep, out));
+    logf("pkt=%d dma=%lx", nb_packets, (unsigned long)DEPDMA(ep, out));
 
 //    if (!out) while (((GNPTXSTS & 0xffff) << 2) < MIN(mps, length));
 
@@ -507,7 +507,7 @@ static void handle_ep_int(int ep, bool out)
             panicf("usb-drv: setup not on EP0, this is impossible");
         if((DEPTSIZ(ep, true) & DEPTSIZ_xfersize_bits) != 0)
         {
-            logf("usb-drv: ignore spurious setup (xfersize=%ld)", DOEPTSIZ(ep) & DEPTSIZ_xfersize_bits);
+            logf("usb-drv: ignore spurious setup (xfersize=%ld)", DEPTSIZ(ep, true) & DEPTSIZ_xfersize_bits);
             prepare_setup_ep0();
         }
         else
