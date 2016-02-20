@@ -432,7 +432,7 @@ void usb_drv_exit(void)
     ORSTCON = 7;  /* Put the PHY into reset (needed to get current down) */
     udelay(10);
     PCGCCTL = 1;  /* Shut down PHY clock */
-    
+
 #if CONFIG_CPU==S5L8701
     PWRCON |= 0x4000;
     PWRCONEXT |= 0x800;
@@ -619,7 +619,7 @@ int usb_drv_send(int ep, void *ptr, int len)
     struct ep_type *endpoint = &endpoints[ep][1];
     endpoint->done = false;
     ep_transfer(ep, ptr, len, false);
-    while (endpoint->busy && !endpoint->done)
-        semaphore_wait(&endpoint->complete, TIMEOUT_BLOCK);
+    while (endpoint->busy && !endpoint->done && usb_detect() != USB_EXTRACTED)
+        semaphore_wait(&endpoint->complete, HZ);
     return endpoint->status;
 }
