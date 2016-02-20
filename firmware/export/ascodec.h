@@ -37,15 +37,13 @@ void ascodec_close(void);
 void ascodec_lock(void);
 void ascodec_unlock(void);
 
-int ascodec_write(unsigned int index, unsigned int value);
+void ascodec_write(unsigned int index, unsigned int value);
 
 int ascodec_read(unsigned int index);
 
-int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data);
+void ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data);
 
-void ascodec_wait_adc_finished(void);
-
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 bool ascodec_endofch(void);
 bool ascodec_chg_status(void);
 void ascodec_monitor_endofch(void);
