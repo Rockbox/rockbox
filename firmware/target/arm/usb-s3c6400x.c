@@ -198,8 +198,6 @@ void usb_drv_set_test_mode(int mode)
 
 void usb_attach(void)
 {
-    usb_enable(true); // s5l only ?
-    /* Nothing to do */
 }
 
 static void prepare_setup_ep0(void)
