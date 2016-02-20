@@ -137,7 +137,6 @@ static const struct { int source; void (*isr) (void); } vec_int_srcs[] =
     { INT_SRC_USB, INT_USB_FUNC, },
     { INT_SRC_TIMER1, INT_TIMER1 },
     { INT_SRC_TIMER2, INT_TIMER2 },
-    { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
     { INT_SRC_AUDIO, INT_AUDIO },
     /* Lowest priority at the end of the list */
 };
