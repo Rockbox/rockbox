@@ -347,7 +347,11 @@ void audiohw_set_sampr_dividers(int fsel);
     #define PLLMODE_LRCK_8_23       (0x2 << 1)
 
 /* ADC channels */
+#if CONFIG_CPU == AS3525v2
+#define NUM_ADC_CHANNELS 16
+#else
 #define NUM_ADC_CHANNELS 13
+#endif
 
 #define ADC_BVDD         0  /* Battery voltage of 4V LiIo accumulator */
 #define ADC_RTCSUP       1  /* RTC backup battery voltage */
