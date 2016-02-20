@@ -460,9 +460,12 @@ void set_cpu_frequency(long frequency)
 {
     if(frequency == CPUFREQ_MAX)
     {
+#if 0
         /* Set CVDD1 power supply */
-        /*ascodec_write_pmu(0x17, 1, 0x80 | 47);*/
-
+        ascodec_write_pmu(0x17, 1, 0x80 | 47);
+        /* dely for voltage rising */
+        udelay(50);
+#endif
         CGU_PROC = ((AS3525_FCLK_POSTDIV << 4) |
                     (AS3525_FCLK_PREDIV  << 2) |
                     AS3525_FCLK_SEL);
@@ -478,13 +481,13 @@ void set_cpu_frequency(long frequency)
         cpu_frequency = CPUFREQ_NORMAL;
 
         /* Set CVDD1 power supply */
-        /*
+#if 0
 #ifdef SANSA_CLIPZIP
         ascodec_write_pmu(0x17, 1, 0x80 | 19);
 #else
         ascodec_write_pmu(0x17, 1, 0x80 | 22);
 #endif
-        */
+#endif
     }
 }
 #endif
