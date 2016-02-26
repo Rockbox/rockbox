@@ -867,13 +867,6 @@ sd_transfer_retry_with_reinit:
 
         MCI_BYTCNT = transfer * SD_BLOCK_SIZE;
 
-        ret = sd_wait_for_tran_state(drive);
-        if (ret < 0)
-        {
-            ret -= 25;
-            goto sd_transfer_error;
-        }
-
         int arg = start;
         if(!(card_info[drive].ocr & (1<<30))) /* not SDHC */
             arg *= SD_BLOCK_SIZE;
@@ -906,6 +899,18 @@ sd_transfer_retry_with_reinit:
             ret = -22;
             goto sd_transfer_error;
         }
+
+        ret = sd_wait_for_tran_state(drive);
+        if (ret < 0)
+        {
+            ret -= 25;
+            goto sd_transfer_error;
+        }
+
+        /* According to datasheet DMA channel should be automatically disabled
+         * when transfer completes. But it not true for DMA_PERI_SD.
+         * Disable DMA channel manually to prevent problems with DMA. */
+        dma_disable_channel(1);
 
         if(!retry)
         {
