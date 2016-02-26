@@ -925,6 +925,9 @@ sd_transfer_retry_with_reinit:
                 ;
             if (--retry_data >= 0)
                 continue;
+
+            ret -= 24;
+            goto sd_transfer_error;
         }
 
         break;
