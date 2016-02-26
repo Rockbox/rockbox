@@ -777,7 +777,7 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
     bool aligned = !((uintptr_t)buf & (CACHEALIGN_SIZE - 1));
     int const retry_all_max = 1;
     int retry_all = 0;
-    int const retry_data_max = 100; /* Generous, methinks */
+    int const retry_data_max = 3;
     int retry_data;
     unsigned int real_numblocks;
 
