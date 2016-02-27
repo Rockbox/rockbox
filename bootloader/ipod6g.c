@@ -57,10 +57,22 @@
 #include "i2c-s5l8702.h"
 #include "pmu-target.h"
 #include "nor-target.h"
+#ifdef WITH_DEVEL_BOOTLOADER
+#include "piezo.h"
+#endif
 
 
 #define FW_ROCKBOX  0
 #define FW_APPLE    1
+#ifdef WITH_DEVEL_BOOTLOADER
+#define FW_EMCORE   2   /* devel FW */
+#define FW_NONE     -1
+
+#define FLAG_VERB   (1<<0)
+#define FLAG_BEEP   (1<<1)
+
+#define EMCORE_BIN "/.boot/emcore-ipodclassic.bin"
+#endif
 
 /* Safety measure - maximum allowed firmware image size.
    The largest known current (October 2009) firmware is about 6.2MB so
@@ -70,6 +82,12 @@
 
 #define LCD_RBYELLOW    LCD_RGBPACK(255,192,0)
 #define LCD_REDORANGE   LCD_RGBPACK(255,70,0)
+#ifdef WITH_DEVEL_BOOTLOADER
+#define LCD_DARKYELLOW  LCD_RGBPACK(200,150,0)
+
+/* tone sequences: period (uS), duration (ms), silence (ms) */
+static uint16_t alive[] = { 500,100,0, 0 };
+#endif
 
 extern void bss_init(void);
 extern uint32_t _movestart;
@@ -239,6 +257,100 @@ static void battery_trap(void)
     printf("Battery status ok: %d mV            ", vbat);
 }
 
+#ifdef WITH_DEVEL_BOOTLOADER
+static void menu_print_flags(int oflags, int opts_line)
+{
+    line = opts_line;
+    printf(" verb: %s", (oflags & FLAG_VERB) ? "On " : "Off");
+    printf(" beep: %s", (oflags & FLAG_BEEP) ? "On " : "Off");
+}
+
+static int menu_select_opts(int *oflags)
+{
+    int fw = FW_NONE;
+    int opts_line;
+
+    verbose = true;
+
+    line++;
+    lcd_set_foreground(LCD_RBYELLOW);
+    printf("Choose a default FW to use:");
+    printf(" <MENU>    emCORE");
+    printf(" <SELECT>  RockBox");
+    printf(" <PLAY>    Apple");
+    line++;
+    lcd_set_foreground(LCD_DARKYELLOW);
+    printf("Optionally, <LEFT> toogles flags:");
+    opts_line = line;
+    menu_print_flags(*oflags, opts_line);
+    line++;
+    printf("Or <RIGHT> to power-off");
+
+    while (button_status() != BUTTON_NONE);
+
+    while (fw == FW_NONE)
+    {
+        lcd_set_foreground(LCD_REDORANGE);
+        lcd_puts(0, opts_line+5, button_hold() ? "Hold switch on!"
+                                               : "               ");
+        lcd_update();
+
+        switch (button_status())
+        {
+            case BUTTON_MENU:   fw = FW_EMCORE;  break;
+            case BUTTON_SELECT: fw = FW_ROCKBOX; break;
+            case BUTTON_PLAY:   fw = FW_APPLE;   break;
+            case BUTTON_LEFT:
+                lcd_set_foreground(LCD_DARKYELLOW);
+                menu_print_flags(++(*oflags), opts_line);
+                while (button_status() != BUTTON_NONE);
+                break;
+            case BUTTON_RIGHT:
+                power_off();
+                break;
+        }
+    }
+    line = opts_line+5;
+    lcd_set_foreground(LCD_WHITE);
+
+    *oflags &= 3;
+    return fw;
+}
+
+/* On Classic MEMBYTE0..5 are used by OF */
+#define PMU_REG_MEMBYTE PCF5063X_REG_MEMBYTE7
+
+#define OPT2MEMBYTE(flags, fw) \
+            ((0xA << 4) | (((flags) & 3) << 2) | ((fw) & 3))
+
+static void update_boot_opts(int oflags, int fw)
+{
+    pmu_write(PMU_REG_MEMBYTE, OPT2MEMBYTE(oflags, fw));
+}
+
+static bool get_saved_opts(int *oflags, int *fw)
+{
+    uint8_t occshdwn = pmu_rd(PCF5063X_REG_OOCSHDWN);
+    uint8_t membyte = pmu_rd(PMU_REG_MEMBYTE);
+    /* restore OCCSHDWN status, ONB needs it */
+    pmu_wr(PCF5063X_REG_OOCSHDWN, occshdwn);
+
+    if ((membyte >> 4) != 0xA)
+        return 0; /* no valid data */
+    *oflags = (membyte >> 2) & 3;
+    *fw = membyte & 3;
+    return 1;
+}
+
+static void save_opts(int oflags, int fw)
+{
+    uint8_t occshdwn = pmu_rd(PCF5063X_REG_OOCSHDWN);
+    pmu_wr(PMU_REG_MEMBYTE, OPT2MEMBYTE(oflags, fw));
+    /* restore OCCSHDWN status, ONB needs it */
+    pmu_wr(PCF5063X_REG_OOCSHDWN, occshdwn);
+}
+#endif
+
 static int launch_onb(void)
 {
     /* actually IRAM1_ORIG contains current RB bootloader IM3 header,
@@ -316,6 +428,10 @@ static bool pmu_is_hibernated(void)
 void main(void)
 {
     int fw = FW_ROCKBOX;
+#ifdef WITH_DEVEL_BOOTLOADER
+    int oflags = FLAG_VERB;
+    char *filename, *bootname;
+#endif
     int rc = 0;
     unsigned char *loadbuffer;
     int (*kernel_entry)(void);
@@ -326,6 +442,14 @@ void main(void)
     /* configure I2C */
     PCON3 = (PCON3 & ~0x00000ff0) | 0x00000220;
     i2c_preinit(0);
+
+#ifdef WITH_DEVEL_BOOTLOADER
+    /* load options, the alive beep sounds even when hibernated */
+    if (!get_saved_opts(&oflags, &fw))
+        save_opts(oflags, fw);
+    if (oflags & FLAG_BEEP)
+        piezo_seq(alive);
+#endif
 
     if (pmu_is_hibernated()) {
         fw = FW_APPLE;
@@ -369,6 +493,13 @@ void main(void)
                 || (btn == (BUTTON_SELECT|BUTTON_LEFT))
                 || (btn == (BUTTON_SELECT|BUTTON_PLAY))) {
             fw = FW_APPLE;
+#ifdef WITH_DEVEL_BOOTLOADER
+        }
+        else if (btn == (BUTTON_RIGHT)) {
+            fw = FW_NONE; /* show devel menu */
+        }
+        if (fw == FW_APPLE) {
+#endif
             rc = launch_onb(); /* only returns on error */
         }
     }
@@ -382,12 +513,25 @@ void main(void)
     lcd_update();
     sleep(HZ/40);
 
+#ifdef WITH_DEVEL_BOOTLOADER
+    verbose = !!(oflags & FLAG_VERB);
+#else
     verbose = true;
+#endif
 
     printf("Rockbox boot loader");
     printf("Version: %s", rbversion);
 
     backlight_init(); /* Turns on the backlight */
+
+#ifdef WITH_DEVEL_BOOTLOADER
+    if (fw == FW_NONE) {
+        fw = menu_select_opts(&oflags);
+        update_boot_opts(oflags, fw);
+        if (fw == FW_APPLE)
+            rc = launch_onb(); /* only returns on error */
+    }
+#endif
 
     if (rc == 0) {
         /* Wait until there is enought power to spin-up HDD */
@@ -427,18 +571,42 @@ void main(void)
         fatal_error(RB_ERR);
     }
 
+#ifdef WITH_DEVEL_BOOTLOADER
+     loadbuffer = (unsigned char *)DRAM_ORIG;
+     if (fw == FW_ROCKBOX) {
+         bootname = "Rockbox";
+         filename = BOOTFILE;
+         printf("Loading %s...", bootname);
+         rc = load_firmware(loadbuffer, filename, MAX_LOADSIZE);
+     }
+     else {
+         bootname = "emCORE";
+         filename = EMCORE_BIN;
+         printf("Loading %s...", bootname);
+         rc = load_raw_firmware(loadbuffer, filename, MAX_LOADSIZE);
+    }
+#else
     printf("Loading Rockbox...");
     loadbuffer = (unsigned char *)DRAM_ORIG;
     rc = load_firmware(loadbuffer, BOOTFILE, MAX_LOADSIZE);
+#endif
 
     if (rc <= EFILE_EMPTY) {
         printf("Error!");
+#ifdef WITH_DEVEL_BOOTLOADER
+        printf("Can't load %s: ", filename);
+#else
         printf("Can't load " BOOTFILE ": ");
+#endif
         printf(loader_strerror(rc));
         fatal_error(RB_ERR);
     }
 
+#ifdef WITH_DEVEL_BOOTLOADER
+    printf("%s loaded.", bootname);
+#else
     printf("Rockbox loaded.");
+#endif
 
     /* If we get here, we have a new firmware image at 0x08000000, run it */
     disable_irq();
