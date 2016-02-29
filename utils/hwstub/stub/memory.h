@@ -28,3 +28,4 @@ void memcpy(void *dst, const void *src, size_t n);
 void memmove(void *dst, const void *src, size_t n);
 
 #endif /* __HWSTUB_MEMORY__ */
+
