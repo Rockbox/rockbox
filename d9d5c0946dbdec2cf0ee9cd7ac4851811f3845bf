@@ -46,6 +46,30 @@
       "revId": "d9d5c0946dbdec2cf0ee9cd7ac4851811f3845bf",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a89bdaa_9f2533b0",
+        "filename": "firmware/target/arm/as3525/sd-as3525v2.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 903,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2016-03-13T22:21:05Z",
+      "side": 1,
+      "message": "Ok, I checked sd spec and indeed thats not wrong per se, however state diagram 4-13 on page 33 of simplified spec says that card can\u0027t be in different state after CMD12.\n\nI am not commenting dma_disable_channel(1) part.",
+      "parentUuid": "9a89bdaa_5f1d6b65",
+      "range": {
+        "startLine": 903,
+        "startChar": 42,
+        "endLine": 903,
+        "endChar": 44
+      },
+      "revId": "d9d5c0946dbdec2cf0ee9cd7ac4851811f3845bf",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
