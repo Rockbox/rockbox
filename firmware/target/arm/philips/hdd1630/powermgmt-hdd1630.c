@@ -24,11 +24,6 @@
 #include "adc.h"
 #include "powermgmt.h"
 
-#define SMLAL(lo, hi, x, y)              \
-    asm volatile ("smlal %0, %1, %2, %3" \
-     : "+r" (lo), "+r" (hi)              \
-     : "%r" (x), "r" (y))
-
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     3500
