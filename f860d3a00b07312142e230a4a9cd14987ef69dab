@@ -22,6 +22,30 @@
       "revId": "f860d3a00b07312142e230a4a9cd14987ef69dab",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a89bdaa_1f13e35d",
+        "filename": "firmware/target/arm/usb-s3c6400x.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2016-03-13T21:08:36Z",
+      "side": 1,
+      "message": "\u003e This loop is executed only once actually.\n\nBut why it not just \u0027if\u0027 in this case?\n\n\u003e If extraction happens after executing semaphore_wait() but before transfer end it may still cause lockup.\n\nWhat your proposing?",
+      "parentUuid": "9a89bdaa_df089b2b",
+      "range": {
+        "startLine": 622,
+        "startChar": 77,
+        "endLine": 622,
+        "endChar": 78
+      },
+      "revId": "f860d3a00b07312142e230a4a9cd14987ef69dab",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
