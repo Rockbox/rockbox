@@ -158,7 +158,9 @@
 #define CONFIG_I2C I2C_PP5020
 
 /* define this if the hardware can be powered off while charging */
-#define HAVE_POWEROFF_WHILE_CHARGING
+/* It doesn't make sense because original bootloader starts the DAP
+   right after */
+/* #define HAVE_POWEROFF_WHILE_CHARGING */
 
 /* The start address index for ROM builds */
 #define ROM_START 0x00000000
