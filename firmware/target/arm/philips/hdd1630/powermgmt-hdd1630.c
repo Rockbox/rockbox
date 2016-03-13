@@ -31,42 +31,33 @@
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3550
+    3500
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
-    3500
+    3400
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3480, 3550, 3590, 3610, 3630, 3650, 3700, 3760, 3800, 3910, 3990 },
+    { 3400, 3550, 3630, 3690 ,3730, 3770, 3810, 3850, 3890, 3930, 3980 },
 };
 
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    3480, 3550, 3590, 3610, 3630, 3650, 3700, 3760, 3800, 3910, 3990
+    3400, 3650, 3822, 3910 ,3950, 3990, 4030, 4070, 4110, 4150, 4200
 };
 #endif /* CONFIG_CHARGING */
 
-#define BATTERY_SCALE_FACTOR 4200
+#define BATTERY_SCALE_FACTOR 4536
 /* full-scale ADC readout (2^10) in millivolt */
 
 /* Returns battery voltage from ADC [millivolts] */
 int _battery_voltage(void)
 {
-    /* return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10; */
-
-    /* This may be overly complicated (pulled from the OF) */
-    int lo = 0;
-    int val = adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR;
-
-    SMLAL(lo, val, 0x8a42f871, val);
-    val>>= 9;
-    val -= (val >> 31);
-    return val;
+    return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) >> 10;
 }
