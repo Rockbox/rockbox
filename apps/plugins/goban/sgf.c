@@ -1261,6 +1261,13 @@ read_comment_sgf (char *buffer, size_t buffer_size)
         return -1;
     }
 
+    if (!(read_char_no_whitespace (unhandled_fd) == 'C') ||
+        !(read_char_no_whitespace (unhandled_fd) == '['))
+    {
+        DEBUGF ("comment prop points to incorrect place in unhandled_fd!!\n");
+        return -1;
+    }
+
     /* make output a string, the lazy way */
     rb->memset (buffer, 0, buffer_size);
     ++bytes_read;
@@ -1351,7 +1358,16 @@ write_comment_sgf (char *string)
 
   start_of_write_wcs:
 
-    if (!overwriting)
+    if (overwriting)
+    {
+        if (!(read_char_no_whitespace (unhandled_fd) == 'C') ||
+            !(read_char_no_whitespace (unhandled_fd) == '['))
+        {
+            DEBUGF ("non-comment while overwriting!!\n");
+            return -1;
+        }
+    }
+    else
     {
         start_of_comment = rb->lseek (unhandled_fd, 0, SEEK_END);
 
