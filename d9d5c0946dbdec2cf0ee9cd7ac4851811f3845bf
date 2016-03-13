@@ -94,6 +94,30 @@
       "revId": "d9d5c0946dbdec2cf0ee9cd7ac4851811f3845bf",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a89bdaa_5f348bdd",
+        "filename": "firmware/target/arm/as3525/sd-as3525v2.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 903,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2016-03-13T23:21:40Z",
+      "side": 1,
+      "message": "CMD12 doesn\u0027t stop internal write. The spec states that you can issue write multiple block command, transfer data, deselect card and internal write will continue in background despite the fact that card is deselected. I am only saying that, according to spec, after CMD12 card should enter TRAN state unconditionally.",
+      "parentUuid": "9a89bdaa_1f3a03ce",
+      "range": {
+        "startLine": 903,
+        "startChar": 42,
+        "endLine": 903,
+        "endChar": 44
+      },
+      "revId": "d9d5c0946dbdec2cf0ee9cd7ac4851811f3845bf",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
