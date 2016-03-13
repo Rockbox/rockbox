@@ -70,6 +70,30 @@
       "revId": "d9d5c0946dbdec2cf0ee9cd7ac4851811f3845bf",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a89bdaa_1f3a03ce",
+        "filename": "firmware/target/arm/as3525/sd-as3525v2.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 903,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2016-03-13T22:51:17Z",
+      "side": 1,
+      "message": "I am not sure how that possibly but I have real test case. Probably my sd card (or internal memory) exit before transfer completed, even after CMD12.\n\nAlso not sure is it related but I see in spec 4.6.2.2 page 65:\nWrite busy after CMD12 is maximum 250ms (500ms for SDXC).",
+      "parentUuid": "9a89bdaa_9f2533b0",
+      "range": {
+        "startLine": 903,
+        "startChar": 42,
+        "endLine": 903,
+        "endChar": 44
+      },
+      "revId": "d9d5c0946dbdec2cf0ee9cd7ac4851811f3845bf",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
