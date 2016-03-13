@@ -44,7 +44,7 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    3400, 3550, 3630, 3690 ,3730, 3770, 3810, 3850, 3890, 3930, 3980
+    3400, 3650, 3822, 3910 ,3950, 3990, 4030, 4070, 4110, 4150, 4200
 };
 #endif /* CONFIG_CHARGING */
 
