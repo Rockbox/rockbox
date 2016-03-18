@@ -18,7 +18,7 @@
  *
  ****************************************************************************/
 
-#define _BSD_SOURCE /* htole64 from endian.h */
+#define _DEFAULT_SOURCE /* htole64 from endian.h */
 #include <sys/types.h>
 #include <SDL.h>
 #include <dlfcn.h>
