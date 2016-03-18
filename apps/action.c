@@ -224,9 +224,7 @@ static int get_action_worker(int context, int timeout,
     static struct timeout gui_unboost;
     /* Boost the CPU in case of wheel scrolling activity in the defined contexts. 
      * Call unboost with a timeout of GUI_BOOST_TIMEOUT. */
-    if ((button&(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD)) && 
-        (context == CONTEXT_STD      || context == CONTEXT_LIST ||
-         context == CONTEXT_MAINMENU || context == CONTEXT_TREE))
+    if (button != BUTTON_NONE)
     {
         gui_boost(true);
         timeout_register(&gui_unboost, gui_unboost_callback, GUI_BOOST_TIMEOUT, 0);

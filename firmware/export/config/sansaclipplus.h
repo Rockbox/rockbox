@@ -97,6 +97,8 @@
 /* define this if the target has volume keys which can be used in the lists */
 #define HAVE_VOLUME_IN_LIST
 
+#define HAVE_GUI_BOOST
+
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 /* There is no hardware tone control */
