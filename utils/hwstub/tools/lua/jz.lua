@@ -24,3 +24,7 @@ function JZ.init()
         print("Looking for soc " .. desc .. ": not found. Please load a soc by hand.")
     end
 end
+
+require "jz/gpio"
+require "jz/lcd"
+require "jz/nand"
