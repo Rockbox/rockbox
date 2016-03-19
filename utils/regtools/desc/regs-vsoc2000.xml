@@ -390,6 +390,12 @@
             </instance>
             <register>
                 <width>8</width>
+                <access>read-only</access>
+                <variant>
+                    <type>debug</type>
+                    <offset>4</offset>
+                    <access>write-only</access>
+                </variant>
             </register>
         </node>
     </node>

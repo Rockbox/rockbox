@@ -262,6 +262,20 @@ bool parse_unknown_elem(xmlNode *node, error_context_t& ctx)
     return add_fatal(ctx, node, oss.str());
 }
 
+bool parse_access_elem(xmlNode *node, access_t& acc, xmlChar *content, error_context_t& ctx)
+{
+    const char *text = XML_CHAR_TO_CHAR(content);
+    if(strcmp(text, "read-only") == 0)
+        acc = READ_ONLY;
+    else if(strcmp(text, "read-write") == 0)
+        acc = READ_WRITE;
+    else if(strcmp(text, "write-only") == 0)
+        acc = WRITE_ONLY;
+    else
+        return add_fatal(ctx, node, "unknown access type " + std::string(text));
+    return true;
+}
+
 template<typename T, typename U>
 bool parse_unsigned_text(U *node, T& res, xmlChar *content, error_context_t& ctx)
 {
@@ -348,30 +362,36 @@ bool parse_field_elem(xmlNode *node, field_t& field, error_context_t& ctx)
 bool parse_variant_elem(xmlNode *node, variant_t& variant, error_context_t& ctx)
 {
     bool ret = true;
-    bool has_type = false, has_offset = false;
+    bool has_type = false, has_offset = false, has_access = false;
     BEGIN_NODE_MATCH(node->children)
         MATCH_UNIQUE_TEXT_NODE("type", variant.type, has_type, parse_name_elem, ctx)
         MATCH_UNIQUE_TEXT_NODE("offset", variant.offset, has_offset, parse_unsigned_elem, ctx)
+        MATCH_UNIQUE_TEXT_NODE("access", variant.access, has_access, parse_access_elem, ctx)
         MATCH_UNUSED_NODE(parse_unknown_elem, ctx)
     END_NODE_MATCH()
     CHECK_HAS(node, "type", has_type, ctx)
     CHECK_HAS(node, "offset", has_offset, ctx)
+    if(!has_access)
+        variant.access = UNSPECIFIED;
     return ret;
 }
 
 bool parse_register_elem(xmlNode *node, register_t& reg, error_context_t& ctx)
 {
     bool ret = true;
-    bool has_width = false, has_desc = false;
+    bool has_width = false, has_desc = false, has_access = false;
     BEGIN_NODE_MATCH(node->children)
         MATCH_UNIQUE_TEXT_NODE("desc", reg.desc, has_desc, parse_text_elem, ctx)
         MATCH_UNIQUE_TEXT_NODE("width", reg.width, has_width, parse_unsigned_elem, ctx)
+        MATCH_UNIQUE_TEXT_NODE("access", reg.access, has_access, parse_access_elem, ctx)
         MATCH_ELEM_NODE("field", reg.field, parse_field_elem, ctx)
         MATCH_ELEM_NODE("variant", reg.variant, parse_variant_elem, ctx)
         MATCH_UNUSED_NODE(parse_unknown_elem, ctx)
     END_NODE_MATCH()
     if(!has_width)
         reg.width = 32;
+    if(!has_access)
+        reg.access = UNSPECIFIED;
     return ret;
 }
 
@@ -746,6 +766,17 @@ int produce_field(xmlTextWriterPtr writer, const field_t& field, error_context_t
     return 0;
 }
 
+const char *access_string(access_t acc)
+{
+    switch(acc)
+    {
+        case READ_ONLY: return "read-only";
+        case READ_WRITE: return "read-write";
+        case WRITE_ONLY: return "write-only";
+        default: return "bug-invalid-access";
+    }
+}
+
 int produce_variant(xmlTextWriterPtr writer, const variant_t& variant, error_context_t& ctx)
 {
     /* <variant> */
@@ -754,6 +785,9 @@ int produce_variant(xmlTextWriterPtr writer, const variant_t& variant, error_con
     SAFE(xmlTextWriterWriteElement(writer, BAD_CAST "type", BAD_CAST variant.type.c_str()));
     /* <position/> */
     SAFE(xmlTextWriterWriteFormatElement(writer, BAD_CAST "offset", "%lu", (unsigned long)variant.offset));
+    /* <access/> */
+    if(variant.access != UNSPECIFIED)
+        SAFE(xmlTextWriterWriteElement(writer, BAD_CAST "access", BAD_CAST access_string(variant.access)));
     /* </variant> */
     SAFE(xmlTextWriterEndElement(writer));
     return 0;
@@ -769,6 +803,9 @@ int produce_register(xmlTextWriterPtr writer, const register_t& reg, error_conte
     /* <desc/> */
     if(!reg.desc.empty())
         SAFE(xmlTextWriterWriteElement(writer, BAD_CAST "desc", BAD_CAST reg.desc.c_str()));
+    /* <access/> */
+    if(reg.access != UNSPECIFIED)
+        SAFE(xmlTextWriterWriteElement(writer, BAD_CAST "access", BAD_CAST access_string(reg.access)));
     /* fields */
     for(size_t i = 0; i < reg.field.size(); i++)
         SAFE(produce_field(writer, reg.field[i], ctx));
