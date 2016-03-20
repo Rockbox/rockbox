@@ -186,7 +186,8 @@ QString System::osVersionString(void)
     ret = uname(&u);
 
 #if defined(Q_OS_MACX)
-    ItemCount cores = MPProcessors();
+    SInt32 cores;
+    Gestalt(gestaltCountOfCPUs, &cores);
 #else
     long cores = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
@@ -202,28 +203,27 @@ QString System::osVersionString(void)
     SInt32 major;
     SInt32 minor;
     SInt32 bugfix;
-    OSErr error;
-    error = Gestalt(gestaltSystemVersionMajor, &major);
-    error = Gestalt(gestaltSystemVersionMinor, &minor);
-    error = Gestalt(gestaltSystemVersionBugFix, &bugfix);
+    Gestalt(gestaltSystemVersionMajor, &major);
+    Gestalt(gestaltSystemVersionMinor, &minor);
+    Gestalt(gestaltSystemVersionBugFix, &bugfix);
 
     result += QString("<br/>OS X %1.%2.%3 ").arg(major).arg(minor).arg(bugfix);
     // 1: 86k, 2: ppc, 10: i386
     SInt32 arch;
-    error = Gestalt(gestaltSysArchitecture, &arch);
+    Gestalt(gestaltSysArchitecture, &arch);
     switch(arch) {
         case 1:
-        result.append("(86k)");
-        break;
-    case 2:
-        result.append("(ppc)");
-        break;
-    case 10:
-        result.append("(x86)");
-        break;
-    default:
-        result.append("(unknown)");
-        break;
+            result.append("(86k)");
+            break;
+        case 2:
+            result.append("(ppc)");
+            break;
+        case 10:
+            result.append("(x86)");
+            break;
+        default:
+            result.append("(unknown)");
+            break;
     }
 #endif
 #endif
