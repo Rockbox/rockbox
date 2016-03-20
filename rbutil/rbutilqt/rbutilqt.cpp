@@ -86,7 +86,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 
     QString c = RbSettings::value(RbSettings::CachePath).toString();
     HttpGet::setGlobalCache(c.isEmpty() ? QDir::tempPath() : c);
-    HttpGet::setGlobalUserAgent("rbutil/"VERSION);
+    HttpGet::setGlobalUserAgent("rbutil/" VERSION);
     HttpGet::setGlobalProxy(proxy());
     // init startup & autodetection
     ui.setupUi(this);

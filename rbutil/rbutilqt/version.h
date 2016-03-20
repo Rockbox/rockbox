@@ -40,5 +40,5 @@
 // PUREVERSION should identify the build uniquely. Use version string for now.
 #define PUREVERSION "$Rev$"
 
-#define FULLVERSION VERSION" ("PUREVERSION"), built "__DATE__" "__TIME__
+#define FULLVERSION VERSION " (" PUREVERSION "), built " __DATE__ " " __TIME__
 
