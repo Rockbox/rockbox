@@ -249,7 +249,7 @@ unsigned long TTSCarbon::be2u32(unsigned char* buf)
 
 unsigned long TTSCarbon::be2u16(unsigned char* buf)
 {
-    return buf[1]&0xff | (buf[0]&0xff)<<8;
+    return (buf[1]&0xff) | (buf[0]&0xff)<<8;
 }
 
 
