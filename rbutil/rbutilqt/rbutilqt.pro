@@ -218,14 +218,22 @@ macx:!intel {
     QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
 }
 macx:intel {
-    QMAKE_LFLAGS_X86=-mmacosx-version-min=10.5 -arch i386
     contains(QT_MAJOR_VERSION, 5) {
         QMAKE_MAC_SDK=macosx
+        greaterThan(QT_MINOR_VERSION, 5) {
+            QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
+            message("Qt 5.6+ detected: setting deploy target to 10.7")
+        }
+        !greaterThan(QT_MINOR_VERSION, 5) {
+            QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.6
+            message("Qt up to 5.5 detected: setting deploy target to 10.6")
+        }
     }
     !contains(QT_MAJOR_VERSION, 5) {
         QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.5.sdk
+        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
+        QMAKE_LFLAGS_X86=-mmacosx-version-min=10.5 -arch i386
     }
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
 }
 macx {
     CONFIG += x86
