@@ -333,8 +333,8 @@ void system_init(void)
     ascodec_write_pmu(0x18, 1, 0x35);
     /* AVDD17:    set AVDD17 power supply to 2.5V */
     ascodec_write_pmu(0x18, 7, 0x31);
-    /* CVDD2:     set CVDD2 power supply (digital for DAC/SD/etc) to 2.65V */
-    ascodec_write_pmu(0x17, 2, 0x80 | 113);
+    /* CVDD2:     set CVDD2 power supply (digital for DAC/SD/etc) to 2.70V */
+    ascodec_write_pmu(0x17, 2, 0x80 | 114);
 #else /* HAVE_AS3543 */
     ascodec_write(AS3514_CVDD_DCDC3, AS314_CP_DCDC3_SETTING);
 #endif /* HAVE_AS3543 */
