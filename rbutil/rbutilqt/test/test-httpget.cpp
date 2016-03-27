@@ -426,7 +426,7 @@ void TestHttpGet::testContentToBuffer(void)
     QCOMPARE(m_waitTimeoutOccured, false);
     QCOMPARE(m_getter->readAll(), QByteArray(TEST_BINARY_BLOB));
     // sizeof(TEST_BINARY_BLOB) will include an additional terminating NULL.
-    QCOMPARE((unsigned long)m_getter->readAll().size(), sizeof(TEST_BINARY_BLOB) - 1);
+    QCOMPARE(m_getter->readAll().size(), (int)sizeof(TEST_BINARY_BLOB) - 1);
     QCOMPARE(m_progressSpy->at(m_progressSpy->count() - 1).at(0).toInt(), (int)sizeof(TEST_BINARY_BLOB) - 1);
     QCOMPARE(m_progressSpy->at(m_progressSpy->count() - 1).at(1).toInt(), (int)sizeof(TEST_BINARY_BLOB) - 1);
 }
