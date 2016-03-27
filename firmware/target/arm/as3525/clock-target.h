@@ -86,6 +86,8 @@
 
 
 #define AS3525_DRAM_FREQ        96000000    /* Initial DRAM frequency  */
+#define AS3525_PCLK_FREQ      (AS3525_DRAM_FREQ/1)   /* PCLK divided from DRAM freq */
+#define AS3525_DBOP_FREQ      (AS3525_PCLK_FREQ/2)   /* DBOP divided from PCLK freq */
 
 #else
 /* AS3525v1 */
@@ -113,12 +115,11 @@
 #define AS3525_FCLK_FREQ      248000000            /* Boosted FCLK frequency  */
 #define AS3525_DRAM_FREQ       62000000            /* Initial DRAM frequency  */
 /* AS3525_PCLK_FREQ != AS3525_DRAM_FREQ/1 will boot to white lcd screen */
+#define AS3525_PCLK_FREQ      (AS3525_DRAM_FREQ/1)   /* PCLK divided from DRAM freq */
+#define AS3525_DBOP_FREQ      (AS3525_PCLK_FREQ/1)   /* DBOP divided from PCLK freq */
 
 #endif  /* CONFIG_CPU == AS3525v2 */
 
-#define AS3525_PCLK_FREQ      (AS3525_DRAM_FREQ/1)   /* PCLK divided from DRAM freq */
-
-#define AS3525_DBOP_FREQ      (AS3525_PCLK_FREQ/1)   /* DBOP divided from PCLK freq */
 
 /** ****************************************************************************/
 
