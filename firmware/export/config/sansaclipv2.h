@@ -194,6 +194,9 @@
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 
+/*define this to enable CPU voltage scaling on AMS devices*/
+#define HAVE_ADJUSTABLE_CPU_VOLTAGE
+
 #define BOOTFILE_EXT    "sansa"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"

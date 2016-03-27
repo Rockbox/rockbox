@@ -460,7 +460,7 @@ void set_cpu_frequency(long frequency)
 {
     if(frequency == CPUFREQ_MAX)
     {
-#if 0
+#ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
         /* Set CVDD1 power supply */
         ascodec_write_pmu(0x17, 1, 0x80 | 47);
         /* dely for voltage rising */
@@ -481,7 +481,7 @@ void set_cpu_frequency(long frequency)
         cpu_frequency = CPUFREQ_NORMAL;
 
         /* Set CVDD1 power supply */
-#if 0
+#ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
 #ifdef SANSA_CLIPZIP
         ascodec_write_pmu(0x17, 1, 0x80 | 19);
 #else
