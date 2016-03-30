@@ -155,7 +155,7 @@ static void plugin_check_open_close__exit(void)
     if (open_files_bitmap_is_clear(&open_files_bitmap))
         return;
 
-    logf("Plugin '%s' leaks file handles", plugin);
+    logf("Plugin '%s' leaks file handles", current_plugin);
 
     static const char *lines[] =
         { ID2P(LANG_PLUGIN_ERROR), "#leak-file-handles" };

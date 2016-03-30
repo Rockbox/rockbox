@@ -1704,7 +1704,7 @@ static bool audio_buffer_codec(struct track_info *track_info,
 
     if (track_info->codec_hid >= 0)
     {
-        logf("Buffered codec: %d", afmt);
+        logf("Buffered codec: %d", track_info->codec_hid);
         return true;
     }
 
