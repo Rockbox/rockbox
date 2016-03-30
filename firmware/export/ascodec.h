@@ -45,7 +45,7 @@ int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data)
 
 void ascodec_wait_adc_finished(void);
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 bool ascodec_endofch(void);
 bool ascodec_chg_status(void);
 void ascodec_monitor_endofch(void);
