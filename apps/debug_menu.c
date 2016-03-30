@@ -111,7 +111,7 @@
 #endif
 #include "appevents.h"
 
-#if defined(HAVE_AS3514) && defined(CONFIG_CHARGING)
+#if defined(HAVE_AS3514) && CONFIG_CHARGING
 #include "ascodec.h"
 #endif
 
@@ -1108,7 +1108,7 @@ static bool view_battery(void)
                     lcd_puts(0, line++, "T Battery: ?");
                 }
                     
-#elif defined(HAVE_AS3514) && defined(CONFIG_CHARGING)
+#elif defined(HAVE_AS3514) && CONFIG_CHARGING
                 static const char * const chrgstate_strings[] =
                 {
                     [CHARGE_STATE_DISABLED - CHARGE_STATE_DISABLED]= "Disabled",

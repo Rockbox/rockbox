@@ -297,7 +297,7 @@ void ascodec_init(void)
 
     /* Generate irq for usb+charge status change */
     ascodec_write(AS3514_IRQ_ENRD0,
-#ifdef CONFIG_CHARGING /* m200v4 can't charge */
+#if CONFIG_CHARGING /* m200v4 can't charge */
         IRQ_CHGSTAT | IRQ_ENDOFCH |
 #endif
         IRQ_USBSTAT);
@@ -530,7 +530,7 @@ void ascodec_wait_adc_finished(void)
     semaphore_wait(&adc_done_sem, TIMEOUT_BLOCK);
 }
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 bool ascodec_endofch(void)
 {
     bool ret = ascodec_enrd0_shadow & CHG_ENDOFCH;
