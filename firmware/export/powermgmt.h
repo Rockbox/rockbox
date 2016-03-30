@@ -49,7 +49,7 @@ enum charge_state_type
 /* tells what the charger is doing */
 extern enum charge_state_type charge_state;
 
-#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING
 /*
  * Flag that the charger has been plugged in/removed: this is set for exactly
  * one time through the power loop when the charger has been plugged in.
