@@ -322,7 +322,9 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
         }
 #endif
 
+#ifdef HAVE_DISK_STORAGE
         if (batt_safe) /* do not save on critical battery */
+#endif
         {
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
             if (audio_stat & AUDIO_STATUS_RECORD)
@@ -376,7 +378,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
             }
 #endif
         }
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && defined(HAVE_DISK_STORAGE)
         else
             dircache_disable();
 #endif
