@@ -196,6 +196,7 @@ bool settings_load_config(const char* file, bool apply);
 
 void status_save(void);
 int settings_save(void);
+void reset_runtime(void);
 /* defines for the options paramater */
 enum {
     SETTINGS_SAVE_CHANGED = 0,
