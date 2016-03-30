@@ -576,8 +576,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
 
         case SYS_CHARGER_DISCONNECTED:
             car_adapter_mode_processing(false);
-            /*reset rockbox battery runtime*/
-            global_status.runtime = 0;
+            reset_runtime();
             return SYS_CHARGER_DISCONNECTED;
 
         case SYS_CAR_ADAPTER_RESUME:

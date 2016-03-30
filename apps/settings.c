@@ -608,6 +608,11 @@ static void flush_config_block_callback(void)
     settings_write_config(CONFIGFILE, SETTINGS_SAVE_CHANGED);
 }
 
+void reset_runtime(void) {
+    lasttime = current_tick;
+    global_status.runtime = 0;
+}
+
 /*
  * persist all runtime user settings to disk or RTC RAM
  */

@@ -96,8 +96,7 @@ static int handle_usb_events(void)
             case SYS_USB_DISCONNECTED:
                 return 1;
             case SYS_CHARGER_DISCONNECTED:
-                /*reset rockbox battery runtime*/
-                global_status.runtime = 0;
+                reset_runtime();
                 break;
             case SYS_TIMEOUT:
                 break;
