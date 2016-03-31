@@ -62,6 +62,7 @@ static int logdiskfindex;
 unsigned char logfbuffer[MAX_LOGF_SIZE];
 int logfindex;
 bool logfwrap;
+bool logfenabled = true;
 #endif
 
 #ifdef HAVE_REMOTE_LCD
@@ -214,6 +215,9 @@ static int logf_push(void *userp, unsigned char c)
 
 void _logf(const char *fmt, ...)
 {
+    if (!logfenabled)
+        return;
+
     #ifdef USB_ENABLE_SERIAL
     int old_logfindex = logfindex;
     #endif

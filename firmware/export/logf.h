@@ -34,6 +34,7 @@
 extern unsigned char logfbuffer[MAX_LOGF_SIZE];
 extern int logfindex;
 extern bool logfwrap;
+extern bool logfenabled;
 #endif /* __PCTOOL__ */
 
 #define logf _logf
