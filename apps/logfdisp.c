@@ -218,42 +218,44 @@ bool logfdisplay(void)
 }
 #endif /* HAVE_LCD_BITMAP */
 
-/* Store the logf log to logf.txt in the .rockbox directory. The order of the
- * entries will be "reversed" so that the most recently logged entry is on the
- * top of the file */
 bool logfdump(void)
 {
     int fd;
 
     splashf(HZ, "Log File Dumped");
-    
+
     /* nothing to print ? */
     if(logfindex == 0 && !logfwrap)
         /* nothing is logged just yet */
         return false;
-    
+
+    logfenabled = false;
+
     fd = open(ROCKBOX_DIR "/logf.txt", O_CREAT|O_WRONLY|O_TRUNC, 0666);
     if(-1 != fd) {
         int i;
-        
+
         if(logfwrap)
             i = logfindex;
         else
             i = 0;
-        
+
         do {
             if(logfbuffer[i]=='\0')
                 fdprintf(fd, "\n");
             else
                 fdprintf(fd, "%c", logfbuffer[i]);
-                
+
             i++;
             if(i >= MAX_LOGF_SIZE)
                 i = 0;
         } while(i != logfindex);
-        
+
         close(fd);
     }
+
+    logfenabled = true;
+
     return false;
 }
 
