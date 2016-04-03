@@ -42,6 +42,7 @@ function arm.sign32(v)
         return v
     end
 end
+
 function arm.sign_extend(val, bits)
     return arm.sign32(bit32.arshift(bit32.lshift(val, 32 - bits), 32 - bits))
 end

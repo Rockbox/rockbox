@@ -17,6 +17,7 @@ In the hwp table:
 - read(fw, addr, len)           Read data from a firmware
 - write(fw, addr, data)         Write data to a firmware
 - section_info(fw, sec)         Return information about a section in a table (or nil)
+- move_section(fw, addr)        Change the address of a section (addr contains both section and address)
 - md5sum(filename)              Compute the MD5 sum of a file
 - crc_buf(crc_type, buf)        Compute the CRC of a byte buffer and return a byte buffer
 - crc(crc_type, fw, addr, len)  Compute the CRC of a firmware part

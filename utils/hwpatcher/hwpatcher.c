@@ -75,6 +75,7 @@ struct crc_type_desc_t
 
 struct bin_file_t
 {
+    uint32_t vaddr; // virtual address, initally 0 but can be changed
     size_t size;
     void *data;
 };
@@ -593,6 +594,12 @@ static bool fw_sb2_rw(struct sb_file_t *sb_file, fw_addr_t addr, void *buffer, s
 
 static bool fw_bin_rw(struct bin_file_t *bin_file, fw_addr_t addr, void *buffer, size_t size, bool read)
 {
+    if(addr.addr < bin_file->vaddr)
+    {
+        printf("Unsupport read/write outside boundary in binary firmware\n");
+        return false;
+    }
+    addr.addr -= bin_file->vaddr;
     if(addr.addr + size > bin_file->size)
     {
         printf("Unsupport read/write accross boundary in binary firmware\n");
@@ -686,8 +693,17 @@ static bool fw_bin_section_info(struct bin_file_t *obj, const char *sec, struct 
     // the only valid section names are NULL and ""
     if(sec != NULL && strlen(sec) != 0)
         return false;
-    out->addr = 0;
+    out->addr = obj->vaddr;
     out->size = obj->size;
+    return true;
+}
+
+static bool fw_bin_move_section(struct bin_file_t *obj, fw_addr_t addr)
+{
+    // the only valid section names are NULL and ""
+    if(addr.section != NULL && strlen(addr.section) != 0)
+        return false;
+    obj->vaddr = addr.addr;
     return true;
 }
 
@@ -698,6 +714,17 @@ static bool fw_section_info(struct fw_object_t *obj, const char *sec, struct fw_
         case FW_BIN: return fw_bin_section_info(obj->u.bin, sec, out);
         default:
             printf("Error: unimplemented get section info for type %d\n", obj->type);
+            return false;
+    }
+}
+
+static bool fw_move_section(struct fw_object_t *obj, fw_addr_t addr)
+{
+    switch(obj->type)
+    {
+        case FW_BIN: return fw_bin_move_section(obj->u.bin, addr);
+        default:
+            printf("Error: unimplemented move section for type %d\n", obj->type);
             return false;
     }
 }
@@ -863,6 +890,18 @@ int my_lua_section_info(lua_State *state)
     return 1;
 }
 
+int my_lua_move_section(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 2)
+        return luaL_error(state, "move_section takes two arguments: a firmware and an address");
+    struct fw_object_t *obj = my_lua_get_object(state, 1);
+    fw_addr_t addr = my_lua_get_addr(state, 2);
+    if(!fw_move_section(obj, addr))
+        luaL_error(state, "cannot move section");
+    return 0;
+}
+
 unsigned crc_rkw(uint8_t *buf, size_t len)
 {
     /* polynomial 0x04c10db7 */
@@ -1015,6 +1054,9 @@ static bool init_lua_hwp(void)
 
     lua_pushcfunction(g_lua, my_lua_section_info);
     lua_setfield(g_lua, -2, "section_info");
+
+    lua_pushcfunction(g_lua, my_lua_move_section);
+    lua_setfield(g_lua, -2, "move_section");
 
     lua_pushcfunction(g_lua, my_lua_md5sum);
     lua_setfield(g_lua, -2, "md5sum");
