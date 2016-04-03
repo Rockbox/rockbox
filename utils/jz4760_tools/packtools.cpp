@@ -96,6 +96,9 @@ const uint32_t jz4760_crc_key[256] =
     0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0,
 };
 
+/* This table is generated programmatically: it contains two copies of a 172-bytes
+ * table. This table contains the lower 8-bit of the first 172 prime numbers:
+ * 2, 3, 5, 7, ..., 251(=0xfb), 257(=0x101 -> 0x01), ... */
 const unsigned JZ4760_XOR_KEY_SIZE = 344;
 uint8_t jz4760_xor_key[JZ4760_XOR_KEY_SIZE] =
 {
@@ -530,7 +533,7 @@ int descramble(int argc, char **argv)
 
 void usage()
 {
-    printf("usage: [--pack|--unpack|--descramble] <options>\n");
+    printf("usage: [--pack|--unpack|--descramble|--scramble] <options>\n");
     printf("  unpack options:\n");
     printf("    -i <file>  Input file\n");
     printf("    -o <dir>   Output directory\n");
@@ -541,7 +544,7 @@ void usage()
     printf("    -m <mach>  Machine flags\n");
     printf("    -v         Verbose output\n");
     printf("    -t <time>  Override date/time (dd/mm/yy hh:mm)\n");
-    printf("  descramble options:\n");
+    printf("  (de)scramble options:\n");
     printf("    -i <file>  Input file\n");
     printf("    -o <file>  Output file\n");
     exit(1);
@@ -555,7 +558,7 @@ int main(int argc, char **argv)
         return unpack(argc - 1, argv + 1);
     if(strcmp(argv[1], "--pack") == 0)
         return pack(argc - 1, argv + 1);
-    if(strcmp(argv[1], "--descramble") == 0)
+    if(strcmp(argv[1], "--descramble") == 0 || strcmp(argv[1], "--scramble") == 0)
         return descramble(argc - 1, argv + 1);
     usage();
     return 1;
