@@ -100,18 +100,12 @@ int ascodec_read_pmu(unsigned int index, unsigned int subreg)
         return retval;
 }
 
-int ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data)
+void ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data)
 {
-    int i, val, ret = 0;
+    unsigned int i;
 
-    for (i = 0; i < (int)len; i++)
-    {
-        val = ascodec_read(i + index);
-        if (val >= 0) data[i] = val;
-        else ret = -1;
-    }
-
-    return (ret ?: (int)len);
+    for (i = 0; i < len; i++)
+        data[i] = ascodec_read(i + index);
 }
 
 /*
