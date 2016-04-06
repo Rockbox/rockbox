@@ -78,7 +78,7 @@ int ascodec_read(unsigned int reg)
 
 void ascodec_readbytes(unsigned int addr, unsigned int len, unsigned char *data)
 {
-    void i2c_readbytes(AS3514_I2C_ADDR, addr, len, data);
+    i2c_readbytes(AS3514_I2C_ADDR, addr, len, data);
 }
 
 void ascodec_lock(void)
