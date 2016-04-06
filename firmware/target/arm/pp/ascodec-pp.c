@@ -66,9 +66,9 @@ void audiohw_init(void)
     audiohw_preinit();
 }
 
-int ascodec_write(unsigned int reg, unsigned int value)
+void ascodec_write(unsigned int reg, unsigned int value)
 {
-    return pp_i2c_send(AS3514_I2C_ADDR, reg, value);
+    pp_i2c_send(AS3514_I2C_ADDR, reg, value);
 }
 
 int ascodec_read(unsigned int reg)

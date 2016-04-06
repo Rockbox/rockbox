@@ -61,13 +61,11 @@ void ascodec_close(void)
         close(afe_dev);
 }
 
-/* Write register.
- * Returns >= 0 if success, -1 if fail
- */
-int ascodec_write(unsigned int reg, unsigned int value)
+/* Write register */
+void ascodec_write(unsigned int reg, unsigned int value)
 {
     struct codec_req_struct r = { .reg = reg, .value = value };
-    return ioctl(afe_dev, IOCTL_REG_WRITE, &r);
+    ioctl(afe_dev, IOCTL_REG_WRITE, &r);
 }
 
 /* Read register.
