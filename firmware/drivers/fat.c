@@ -812,7 +812,7 @@ static long get_next_cluster16(struct bpb *fat_bpb, long startcluster)
     if (!sec)
     {
         dc_unlock_cache();
-        DEBUGF("%s: Could not cache sector %d\n", __func__, sector);
+        DEBUGF("%s: Could not cache sector %lu\n", __func__, sector);
         return -1;
     }
 
@@ -851,7 +851,7 @@ static long find_free_cluster16(struct bpb *fat_bpb, long startcluster)
                 if (c < 2 || c > fat_bpb->dataclusters + 1)
                     continue;
 
-                DEBUGF("%s(%lx) == %x\n", __func__, startcluster, c);
+                DEBUGF("%s(%lx) == %lx\n", __func__, startcluster, c);
 
                 fat_bpb->fsinfo.nextfree = c;
                 return c;
@@ -887,7 +887,7 @@ static int update_fat_entry16(struct bpb *fat_bpb, unsigned long entry,
     if (!sec)
     {
         dc_unlock_cache();
-        DEBUGF("Could not cache sector %u\n", sector);
+        DEBUGF("Could not cache sector %lu\n", sector);
         return -1;
     }
 
@@ -2101,7 +2101,7 @@ int fat_remove(struct fat_file *file, enum fat_remove_op what)
     if (file->firstcluster == fat_bpb->bpb_rootclus)
     {
         DEBUGF("Trying to remove root of volume %d\n",
-               IF_MV_VOL(info->volume));
+               IF_MV_VOL(file->volume));
         FAT_ERROR(-2);
     }
 
