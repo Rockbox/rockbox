@@ -20,7 +20,7 @@ include(tests.pri)
 
 TEMPLATE = app
 TARGET = test-compareversion
-INCLUDEPATH += . ../base
+INCLUDEPATH += . ../base stubs
 
 # Input
 SOURCES += \

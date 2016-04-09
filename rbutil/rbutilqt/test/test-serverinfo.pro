@@ -18,7 +18,7 @@ include(tests.pri)
 
 TEMPLATE = app
 TARGET = test-serverinfo
-INCLUDEPATH += . ../base
+INCLUDEPATH += . ../base stubs
 
 # Input
 SOURCES += \
