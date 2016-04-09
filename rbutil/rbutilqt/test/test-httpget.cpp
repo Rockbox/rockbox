@@ -207,7 +207,7 @@ void TestHttpGet::testFileUrlRequest(void)
     QTemporaryFile datafile;
     datafile.open();
     datafile.write(teststring.toLatin1());
-    m_getter->getFile(QUrl("file://" + datafile.fileName()));
+    m_getter->getFile(QUrl::fromLocalFile(datafile.fileName()));
     datafile.close();
     while(m_doneSpy->count() == 0 && m_waitTimeoutOccured == false)
         QCoreApplication::processEvents();
