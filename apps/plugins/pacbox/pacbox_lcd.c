@@ -35,7 +35,7 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
     int x,y;
 
 #ifdef HAVE_LCD_COLOR
-#if (LCD_WIDTH >= 224) && (LCD_HEIGHT >= 288)
+#if LCD_SCALE==100 && LCD_ROTATE==0
         /* Native resolution = 224x288 */
         (void)next_dst;
         dst=&lcd_framebuffer[YOFS*LCD_WIDTH+XOFS];
@@ -45,7 +45,7 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
             }
             dst += XOFS*2;
         }
-#elif (LCD_WIDTH >= 288) && (LCD_HEIGHT >= 224)
+#elif LCD_SCALE==100 && LCD_ROTATE==1
         /* Native resolution - rotated 90 degrees = 288x224 */
         next_dst=&lcd_framebuffer[YOFS*LCD_WIDTH+XOFS+ScreenHeight-1];
         for( y=ScreenHeight-1; y>=0; y-- ) {
@@ -55,7 +55,7 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
                 dst+=LCD_WIDTH;
             }
         }
-#elif (LCD_WIDTH >= 216) && (LCD_HEIGHT >= 168)
+#elif LCD_SCALE==75 && LCD_ROTATE==1
         /* 0.75 scaling - display 3 out of 4 pixels - rotated = 216x168 
            Skipping pixel #2 out of 4 seems to give the most legible display 
          */
@@ -74,7 +74,7 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
                 vbuf+=ScreenWidth;
             }
         }
-#elif (LCD_WIDTH >= 168) && (LCD_HEIGHT >= 216)
+#elif LCD_SCALE==75 && LCD_ROTATE==0
         /* 0.75 scaling - display 3 out of 4 pixels - = 168x216
            Skipping pixel #2 out of 4 seems to give the most legible display 
          */
@@ -93,7 +93,7 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
                 vbuf+=ScreenWidth;
             }
         }
-#elif (LCD_WIDTH >= 144) && (LCD_HEIGHT >= 112)
+#elif LCD_SCALE==50 && LCD_ROTATE==1
         /* 0.5 scaling - display every other pixel - rotated = 144x112 */
         next_dst=&lcd_framebuffer[YOFS*LCD_WIDTH+XOFS+ScreenHeight/2-1];
         for (y=(ScreenHeight/2)-1;y >= 0; y--) {
@@ -105,7 +105,7 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
             }
             vbuf+=ScreenWidth;
         }
-#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128)
+#elif LCD_SCALE==50 && LCD_ROTATE==0
         /* 0.5 scaling - display every other pixel
          * LCD_HEIGHT < 144: 112x144, crop to 112x128
          * else center vertically without clipping */
@@ -126,7 +126,7 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
         }
 #endif
 #else  /* Greyscale LCDs */
-#if (LCD_WIDTH >= 144) && (LCD_HEIGHT >= 112)
+#if LCD_SCALE==50 && LCD_ROTATE==1
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
         /* 0.5 scaling - display every other pixel = 144x112 */
         next_dst=&lcd_framebuffer[YOFS/4*LCD_WIDTH+XOFS+ScreenHeight/2-1];
@@ -140,6 +140,6 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
             vbuf+=ScreenWidth;
         }
 #endif /* Vertical Packing */
-#endif /* Size >= 144x112 */
+#endif /* scale 50% rotated */
 #endif /* Not Colour */
 }

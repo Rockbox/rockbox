@@ -373,22 +373,42 @@
 #endif
 #endif
 
-#if (LCD_HEIGHT >= 288)
+/* Calculate scaling and screen offset/clipping.
+   Put native portrait mode before landscape, if a screen resulution allows both.
+ */
+#if (LCD_WIDTH >= 224) && (LCD_HEIGHT >= 288)
+#define LCD_SCALE  100
+#define LCD_ROTATE 0
 #define XOFS ((LCD_WIDTH-224)/2)
 #define YOFS ((LCD_HEIGHT-288)/2)
-#elif (LCD_WIDTH >= 288)
+
+#elif (LCD_WIDTH >= 288) && (LCD_HEIGHT >= 224)
+#define LCD_SCALE  100
+#define LCD_ROTATE 1
 #define XOFS ((LCD_WIDTH-288)/2)
 #define YOFS ((LCD_HEIGHT-224)/2)
-#elif (LCD_WIDTH >= 220)
-#define XOFS ((LCD_WIDTH-(288*3/4))/2)
-#define YOFS ((LCD_HEIGHT-(224*3/4))/2)
+
 #elif (LCD_WIDTH >= 168) && (LCD_HEIGHT >= 216)
+#define LCD_SCALE  75
+#define LCD_ROTATE 0
 #define XOFS ((LCD_WIDTH-(224*3/4))/2)
 #define YOFS ((LCD_HEIGHT-(288*3/4))/2)
-#elif (LCD_WIDTH >= 144)
+
+#elif (LCD_WIDTH >= 216) && (LCD_HEIGHT >= 168)
+#define LCD_SCALE  75
+#define LCD_ROTATE 1
+#define XOFS ((LCD_WIDTH-(288*3/4))/2)
+#define YOFS ((LCD_HEIGHT-(224*3/4))/2)
+
+#elif (LCD_WIDTH >= 144) && (LCD_HEIGHT >= 112)
+#define LCD_SCALE  50
+#define LCD_ROTATE 1
 #define XOFS ((LCD_WIDTH-288/2)/2)
 #define YOFS ((LCD_HEIGHT-224/2)/2)
-#elif (LCD_WIDTH >= 128)
+
+#elif (LCD_WIDTH >= 112) && (LCD_HEIGHT >= 128)
+#define LCD_SCALE  50
+#define LCD_ROTATE 0
 #define XOFS ((LCD_WIDTH-224/2)/2)
 #if LCD_HEIGHT < 144
 #define YCLIP ((288-2*LCD_HEIGHT)/2)
@@ -397,6 +417,9 @@
 #define YCLIP 0
 #define YOFS ((LCD_HEIGHT-288/2)/2)
 #endif
+
+#else
+#error "unsupported screen resolution"
 #endif
 
 /* How many video frames (out of a possible 60) we display each second.
