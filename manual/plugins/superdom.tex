@@ -1,0 +1,53 @@
+\subsection{Superdom}
+
+Superdom is a turn based strategy game, where the aim is to defeat the computer
+player by overpowering them using your army.
+
+When the game starts the player is given roughly 50% of the tiles on the map,
+two farms, and two factories. To overpower the enemy, you must place resources
+in adjacent tiles (diagonals do not count), such that your strength is greater
+than the computers, then attack the square.
+
+Each ``year'' is broken up into three phases: purchasing, movement, and war.
+During the purchasing phase you are allocated money and food, may purchase
+units/buildings, and may access the bank.
+
+During the movement phase you can move your units only to adjacent squares
+(except planes, which may move anywhere), at a cost of 1 move per unit you move.
+(Men are considered to be one unit, no matter how many you move). You can change
+the number of moves you receive by default in the settings, and you may purchase
+additional moves for \$100 each. You may also launch nuclear weapons if you have
+purchased any.
+
+During the war phase you can attack the enemy. This is where the strengths come
+into play. Each tile has its own strength for both the computer, and the human
+player. If you attack a square owned by the computer player where your strength
+is greater than the computer's, you will win the tile - and take control of any
+building that were on it. If the strengths are equal, a victor is chosen at
+random.
+
+The bank (in the purchasing phase) is a place where you can store your money
+and earn interest (usually about 10% p.a.), however, while the money is in the
+bank, it is not accessible until the next purchasing phase.
+
+\subsubsection{Notes on food}
+Each year you are allocated an amount of food based on the number of farms you
+control. Food is used to feed your men, but if you do not have enough food to
+feed your population of men, some will die of starvation.
+
+\subsubsection{Summary of units}
+\begin{table}
+    \begin{rbtabular}{\textwidth}{lccX}%
+        {\textbf{Unit} & \textbf{Cost} & \textbf{Individual strength}%
+         & \textbf{Special abilities}}{}{}
+        Men       & \$1 each & 1.33 per 100 & No square population limit, however %
+                                              require 1 food each per year\\
+        Tanks     & \$300    & 3 & None\\
+        Planes    & \$600    & 4 & Can move to any human controlled point on the map\\
+        Farms     & \$1150   & 3 & Generates additional food at start of year\\
+        Factories & \$1300   & 3 & Generates additional food at start of year\\
+        Nukes     & \$2000   & 2 & During the movement phase you may lauch a nuke %
+                                   to destroy all units on a given tile\\
+    \end{rbtabular}
+\end{table}
+Also note that the colour of the adjacent tiles also count towards your strength.
