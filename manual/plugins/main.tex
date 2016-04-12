@@ -19,13 +19,17 @@ text files%
 
 \section{Games}
 \opt{lcd_bitmap}
-    {See also the Chip{}-8 emulator in \reference{ref:Chip8emulator}
+    {See also the Chip{}-8 emulator in \reference{ref:Chip8emulator},
+    Frotz in \reference{ref:Frotz},
     \opt{archosrecorder,archosfmrecorder,iriverh100,iaudiom5,lcd_color}
-    {and Rockboy in \reference{ref:Rockboy}}.}
+    {Rockboy in \reference{ref:Rockboy}}
+    and ZXBox in \reference{ref:ZXBox}.}
 
 \opt{lcd_bitmap}{\input{plugins/2048.tex}}
 
 \opt{lcd_bitmap}{\input{plugins/blackjack.tex}}
+
+\opt{large_plugin_buffer}{\input{plugins/boomshine.tex}}
 
 \opt{lcd_bitmap}{\input{plugins/brickmania.tex}}
 
@@ -33,9 +37,9 @@ text files%
 
 \opt{lcd_bitmap}{\input{plugins/chessbox.tex}}
 
-\opt{lcd_color}{\input{plugins/clix.tex}}
-
 \opt{lcd_bitmap}{\input{plugins/chopper.tex}}
+
+\opt{lcd_color}{\input{plugins/clix.tex}}
 
 \opt{lcd_color}{\input{plugins/codebuster.tex}}
 
@@ -53,6 +57,8 @@ text files%
 {\input{plugins/jackpot.tex}}
 
 \opt{lcd_bitmap}{\input{plugins/jewels.tex}}
+
+\opt{lcd_bitmap}{\input{plugins/maze.tex}}
 
 \opt{lcd_bitmap}{\input{plugins/mazezam.tex}}
 
@@ -90,6 +96,9 @@ text files%
 
 \opt{lcd_bitmap}{\input{plugins/sudoku.tex}}
 
+\opt{lcd_non-mono}{\nopt{iriverh10_5gb,ipodmini1g,c200,c200v2,mpiohd200,clipzip,samsungyh820}{
+  \input{plugins/superdom.tex}}}
+
 \opt{lcd_bitmap}{\input{plugins/wormlet.tex}}
 
 \opt{lcd_bitmap}{\input{plugins/xobox.tex}}
@@ -106,11 +115,15 @@ text files%
 
 \opt{lcd_bitmap}{\input{plugins/demystify.tex}}
 
+\opt{swcodec}{\input{plugins/fft.tex}}
+
 \opt{lcd_bitmap}{\input{plugins/fire.tex}}
 
 \opt{lcd_bitmap}{\input{plugins/fractals.tex}}
 
 {\input{plugins/logo.tex}}
+
+\opt{lcd_bitmap}{\input{plugins/matrix.tex}}
 
 {\input{plugins/mosaic.tex}}
 
@@ -193,6 +206,9 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 
 \opt{swcodec}{\input{plugins/mp3_encoder.tex}}
 
+\opt{iriverh300,iriverh100,SANSA_FUZE_PAD,SANSA_E200_PAD,IPOD_4G_PAD,IPOD_3G_PAD%
+    ,IPOD_1G2G_PAD,SAMSUNG_YPR0_PAD}{
+  \input{plugins/pdbox.tex}}
 
 \opt{archosrecorder,archosfmrecorder,ondio}{\input{plugins/rockbox_flash.tex}}
 
@@ -236,6 +252,8 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 
 \opt{rtc}{\input{plugins/clock.tex}}
 
+{\input{plugins/dict.tex}}
+
 {\input{plugins/disktidy.tex}}
 
 \opt{archosplayer}{\input{plugins/euro_converter.tex}}
@@ -247,6 +265,8 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 \opt{HAVE_BACKLIGHT}{\input{plugins/lamp.tex}}
 
 \opt{lcd_bitmap}{\input{plugins/lrcplayer.tex}}
+
+{\input{plugins/main_menu_config.tex}}
 
 {\input{plugins/md5sum.tex}}
 

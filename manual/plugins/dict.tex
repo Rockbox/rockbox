@@ -1,0 +1,23 @@
+\subsection{Dict}
+
+\subsubsection{Prerequisites for using the plugin}
+To use the plugin, firstly you need to have the dictionary files which contain
+the words (index) and their description -- \fname{dict.index} and
+\fname{dict.desc}, respectively -- on \fname{/.rockbox/rocks/apps/} folder.
+
+The dictionary files can be created by yourself, or you can get them crafted
+from the web. More information can be found at \wikilink{PluginDict}.
+
+\subsubsection{Using the plugin}
+Now that you already have the two necessary files in place, you can launch the
+dict plugin (under Applications on the Browse plugins menu). The first thing
+you will see is the text input screen.
+
+Type part of a word (or the whole word) or anything the dict files have a
+definition to and accept the text input. The plugin will search for matching
+entries on the \fname{dict.index} file and display according description/meaning
+contained in the \fname{dict.desc} file.
+
+If no matches are found on the dictionary, a ``Not found'' message will be
+displayed and the plugin will exit. You can do another search by relaunching
+the plugin.
