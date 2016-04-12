@@ -123,6 +123,17 @@
 #define PACMAN_COIN     (BUTTON_SELECT | BUTTON_DOWN)
 #define PACMAN_MENU     BUTTON_HOME
 
+#elif CONFIG_KEYPAD == SANSA_CLIP_PAD
+
+#define PACMAN_UP       BUTTON_UP
+#define PACMAN_DOWN     BUTTON_DOWN
+#define PACMAN_LEFT     BUTTON_LEFT
+#define PACMAN_RIGHT    BUTTON_RIGHT
+#define PACMAN_1UP      BUTTON_SELECT
+#define PACMAN_COIN_PRE BUTTON_SELECT
+#define PACMAN_COIN     (BUTTON_SELECT | BUTTON_DOWN)
+#define PACMAN_MENU     BUTTON_HOME
+
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 
 #if defined(IRIVER_H10_5GB)
@@ -417,6 +428,18 @@
 #define YCLIP 0
 #define YOFS ((LCD_HEIGHT-288/2)/2)
 #endif
+
+#elif (LCD_WIDTH >= 116) && (LCD_HEIGHT >= 90)
+#define LCD_SCALE  40
+#define LCD_ROTATE 1
+#define XOFS  ((LCD_HEIGHT-224*2/5)/2)
+#define YOFS  ((LCD_WIDTH-288*2/5)/2)
+
+#elif (LCD_WIDTH >= 75) && (LCD_HEIGHT >= 96)
+#define LCD_SCALE  33
+#define LCD_ROTATE 0
+#define XOFS  ((LCD_HEIGHT-224/3)/2)
+#define YOFS  ((LCD_WIDTH-288/3)/2)
 
 #else
 #error "unsupported screen resolution"
