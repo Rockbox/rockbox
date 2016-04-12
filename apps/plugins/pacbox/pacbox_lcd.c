@@ -124,7 +124,46 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
             dst += XOFS*2;
             vbuf+=ScreenWidth;
         }
+#elif LCD_SCALE==40 && LCD_ROTATE==1
+        /* 0.4 scaling - rotated = 116x90 */
+        /* show 2 out of 5 pixels: 1st and 3rd anf 4th merged together */
+        next_dst=&lcd_framebuffer[XOFS*LCD_WIDTH+YOFS+ScreenHeight*2/5-1];
+        for (y=(ScreenHeight*2/5)-1;y >= 0; y--) {
+            dst = (next_dst--);
+            for (x=0;x<ScreenWidth*2/5;x++) {
+                *dst = palette[*(vbuf)] | palette[*(vbuf+ScreenWidth+1)];
+                /* every odd row number merge 2 source lines as one */
+                if (y & 1) *dst |= palette[*(vbuf+ScreenWidth*2)];
+                vbuf+=2;
+                dst+=LCD_WIDTH;
+
+                x++;
+                /* every odd column merge 2 colums together */
+                *dst = palette[*(vbuf)] |  palette[*(vbuf+1)] |palette[*(vbuf+ScreenWidth+2)];
+                if (y & 1) *dst |= palette[*(vbuf+ScreenWidth*2+1)];
+                vbuf+=3;
+                dst+=LCD_WIDTH;
+            }
+            vbuf+=ScreenWidth-1;
+            if (y & 1) vbuf+=ScreenWidth;
+        }
+#elif LCD_SCALE==33 && LCD_ROTATE==0
+        /* 1/3 scaling - display every third pixel - 75x96 */
+        (void)next_dst;
+        dst=&lcd_framebuffer[YOFS*LCD_WIDTH+XOFS];
+
+        for (y=0;y<ScreenHeight/3;y++) {
+            for (x=0;x<ScreenWidth/3;x++) {
+                *(dst++) = palette[*(vbuf)]
+                         | palette[*(vbuf+ScreenWidth+1)]
+                         | palette[*(vbuf+ScreenWidth*2+2)];
+                vbuf+=3;
+            }
+            dst += XOFS*2;
+            vbuf+=ScreenWidth*2+2;
+        }
 #endif
+
 #else  /* Greyscale LCDs */
 #if LCD_SCALE==50 && LCD_ROTATE==1
 #if LCD_PIXELFORMAT == VERTICAL_PACKING

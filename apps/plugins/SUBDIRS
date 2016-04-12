@@ -65,7 +65,8 @@ zxbox
 #endif /* HAVE_LCD_BITMAP */
 
 /* For all big enough colour screens, iriver H1x0 and iAudio M5 */
-#if defined(HAVE_LCD_COLOR) && LCD_HEIGHT > 96\
+#if defined(HAVE_LCD_COLOR) && ( (LCD_HEIGHT >= 90 && LCD_WIDTH >=116) \
+                              || (LCD_HEIGHT >= 96 && LCD_WIDTH >=75) ) \
  || defined(IRIVER_H100_SERIES) || defined(IAUDIO_M5)
 pacbox
 #endif
