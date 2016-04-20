@@ -192,9 +192,10 @@
 #define FIRMWARE_OFFSET_FILE_CRC    0x0
 #define FIRMWARE_OFFSET_FILE_DATA   0x8
 
-#ifndef BOOTLOADER
 #define HAVE_MULTIDRIVE
 #define NUM_DRIVES 2
+
+#ifndef BOOTLOADER
 #define HAVE_HOTSWAP
 #endif
 

@@ -172,9 +172,10 @@
 /* Type of LCD : Samsung S6B33B2 */
 #define CONFIG_LCD LCD_C200
 
-#ifndef BOOTLOADER
 #define HAVE_MULTIDRIVE
 #define NUM_DRIVES 2
+
+#ifndef BOOTLOADER
 #define HAVE_HOTSWAP
 #endif /* BOOTLOADER */
 
