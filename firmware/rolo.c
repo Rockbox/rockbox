@@ -275,6 +275,11 @@ int rolo_load(const char* filename)
     /* Set CVDD1 power supply to default*/
     ascodec_write_pmu(0x17, 1, 0);
 #endif
+#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS) || defined(SANSA_CLIPZIP)
+    /* It is necessary for proper detection AMSv2 variant 1 */
+    if (amsv2_variant == 1)
+        GPIOB_PIN(5) = 1 << 5;
+#endif
 
 #if CONFIG_CPU != IMX31L /* We're not finished yet */
 #ifdef CPU_ARM
