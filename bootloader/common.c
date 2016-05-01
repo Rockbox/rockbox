@@ -154,6 +154,8 @@ int load_raw_firmware(unsigned char* buf, char* firmware, int buffer_size)
     return len;
 }
 
+/* FIXME?: unused broken code */
+#if 0
 #ifdef ROCKBOX_HAS_LOGF /* Logf display helper for the bootloader */
 
 #define LINES   (LCD_HEIGHT/SYSFONT_HEIGHT)
@@ -232,4 +234,5 @@ void display_logf(void) /* Doesn't return! */
         sleep(HZ/16);
     }
 }
+#endif
 #endif
