@@ -34,9 +34,7 @@ static void tick_timer(void)
 void tick_start(unsigned int interval_in_ms)
 {
     /* use the 1-kHz XTAL clock source */
-    imx233_timrot_setup(TIMER_TICK, true, interval_in_ms,
-        BV_TIMROT_TIMCTRLn_SELECT__1KHZ_XTAL, BV_TIMROT_TIMCTRLn_PRESCALE__DIV_BY_1,
-        false, &tick_timer);
+    imx233_timrot_setup_simple(TIMER_TICK, true, interval_in_ms, TIMER_SRC_1KHZ, &tick_timer);
 }
 
 void arbiter_init(struct channel_arbiter_t *a, unsigned count)
