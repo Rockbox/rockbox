@@ -35,6 +35,7 @@ enum
     TIMER_TICK, /* for tick task */
     TIMER_USER, /* for user timer */
     TIMER_WATCHDOG, /* for watchdog */
+    TIMER_DPC, /* for DPC */
 };
 
 /* timer sources */

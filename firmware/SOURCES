@@ -554,6 +554,7 @@ target/arm/imx233/lcdif-imx233.c
 target/arm/imx233/clkctrl-imx233.c
 target/arm/imx233/system-imx233.c
 target/arm/imx233/timrot-imx233.c
+target/arm/imx233/dpc-imx233.c
 target/arm/imx233/kernel-imx233.c
 # if (CONFIG_STORAGE & (STORAGE_SD | STORAGE_MMC))
 target/arm/imx233/sdmmc-imx233.c

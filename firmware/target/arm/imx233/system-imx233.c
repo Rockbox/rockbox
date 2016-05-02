@@ -33,6 +33,7 @@
 #if IMX233_SUBTARGET >= 3700
 #include "dcp-imx233.h"
 #endif
+#include "dpc-imx233.h"
 #include "pwm-imx233.h"
 #include "icoll-imx233.h"
 #include "lradc-imx233.h"
@@ -172,6 +173,7 @@ void system_init(void)
     imx233_icoll_init();
     imx233_pinctrl_init();
     imx233_timrot_init();
+    imx233_dpc_init();
     imx233_dma_init();
     imx233_ssp_init();
 #if IMX233_SUBTARGET >= 3700
