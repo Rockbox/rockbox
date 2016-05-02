@@ -41,13 +41,13 @@
 static const char *imx233_adc_channel_name[NUM_ADC_CHANNELS] =
 {
     [ADC_BATTERY] = "Battery(raw)",
-    [ADC_DIE_TEMP] = "Die temperature(°C)",
+    [ADC_DIE_TEMP] = "Die temp(°C)",
     [ADC_VDDIO] = "VddIO(mV)",
 #if IMX233_SUBTARGET >= 3700
     [ADC_VDD5V] = "Vdd5V(mV)",
 #endif
 #ifdef IMX233_BATT_TEMP_SENSOR
-    [ADC_BATT_TEMP] = "Battery temperature(raw)",
+    [ADC_BATT_TEMP] = "Battery temp(raw)",
 #endif
 };
 
