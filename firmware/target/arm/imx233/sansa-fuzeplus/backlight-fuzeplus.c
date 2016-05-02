@@ -25,18 +25,37 @@
 #include "backlight.h"
 #include "backlight-target.h"
 #include "pinctrl-imx233.h"
+#include "dpc-imx233.h"
+
+/* see comments in next function */
+void backlight_hw_brightness_pulse(struct imx233_dpc_ctx_t *ctx, intptr_t user)
+{
+    (void) ctx;
+    int brightness = user;
+    while(brightness-- > 0)
+    {
+        imx233_pinctrl_set_gpio(1, 28, false);
+        imx233_pinctrl_set_gpio(1, 28, true);
+    }
+}
 
 void backlight_hw_brightness(int brightness)
 {
     if(brightness != 0)
         brightness = MAX_BRIGHTNESS_SETTING + 1 - brightness;
     imx233_pinctrl_set_gpio(1, 28, false);
-    udelay(600);
-    while(brightness-- > 0)
+    /* The 600us delay is very long, especially when fading where the code will
+     * repeat a lot of those without yielding. Using a DPC we can achieve good
+     * accuracy (the timing is important) without blocking the entire system.
+     * However this function may be called with IRQ disabled, for example in
+     * panic(). In this case, we just a udelay. */
+    if(!irq_enabled())
     {
-        imx233_pinctrl_set_gpio(1, 28, false);
-        imx233_pinctrl_set_gpio(1, 28, true);
+        udelay(600);
+        backlight_hw_brightness_pulse(NULL, brightness);
     }
+    else
+        imx233_dpc_start(true, 600, backlight_hw_brightness_pulse, brightness);
 }
 
 bool backlight_hw_init(void)
