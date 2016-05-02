@@ -123,26 +123,4 @@ struct rmi_2d_gesture_data_t
     unsigned char flick;
 } __attribute__((packed));
 
-/* Initialize the RMI driver, the i2c_bus_index is the bus index returned by
- * the generic_i2c driver; the i2c_dev_addr is the i2c address of the device.
- * NOTE: the driver automatically handles the page select mechanism used for
- *       RMI over i2c and assumes a standard page select register at 0xff. */
-int rmi_init(int i2c_dev_addr);
-/* Read one or more registers.
- * WARNING: don't cross a page boundary ! */
-int rmi_read(int address, int byte_count, unsigned char *buffer);
-/* Read a single register (return -1 on error)
- * WARNING: beware of register consistency (N x read 1 byte != reads N bytes) */
-int rmi_read_single(int address); /* return byte value or <0 in case of error */
-/* Write one of more register
- * WARNING: don't cross a page boundary ! */
-int rmi_write(int address, int byte_count, const unsigned char *buffer);
-/* Write one register
- * WARNING: don't cross a page boundary ! */
-int rmi_write_single(int address, unsigned char byte);
-/* set the device to the given sleep mode */
-void rmi_set_sleep_mode(unsigned char sleep_mode);
-/* set the device's report rate to the given value */
-void rmi_set_report_rate(unsigned char report_rate);
-
 #endif

@@ -1465,7 +1465,6 @@ target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* SANSA_FUZEV2 */
 
 #ifdef SANSA_FUZEPLUS
-drivers/synaptics-rmi.c
 #ifndef BOOTLOADER
 drivers/generic_i2c.c
 target/arm/imx233/fmradio-imx233.c
