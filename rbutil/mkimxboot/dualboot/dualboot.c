@@ -160,8 +160,10 @@ static int local_decision(void)
      * if back is pressed, boot to OF
      * if play is pressed, boot RB
      * otherwise power off */
+#ifdef SONY_NWZE360
     if(read_gpio(0, 9) == 0)
         return BOOT_STOP;
+#endif
     if(val >= 1050 && val < 1150)
         return BOOT_OF;
     if(val >= 1420 && val < 1520)
@@ -172,7 +174,9 @@ static int local_decision(void)
 static int boot_decision(int context)
 {
     setup_lradc(0); // setup LRADC channel 0 to read keys
+#ifdef SONY_NWZE360
     HW_PINCTRL_PULLn_SET(0) = 1 << 9; // enable pullup on hold key (B0P09)
+#endif
     /* make a decision */
     int decision = local_decision();
     /* in USB or alarm context, stick to it */
