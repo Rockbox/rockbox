@@ -26,6 +26,7 @@
 #include "lcd.h"
 #include "font.h"
 #include "adc.h"
+#include "usb.h"
 #include "power-imx233.h"
 #include "clkctrl-imx233.h"
 #include "powermgmt-imx233.h"
@@ -410,6 +411,86 @@ bool dbg_hw_info_powermgmt(void)
             "<unknown>");
         lcd_putsf(0, 1, "charging tmo: %d", info.charging_timeout);
         lcd_putsf(0, 2, "topoff tmo: %d", info.topoff_timeout);
+
+        lcd_update();
+        yield();
+    }
+}
+
+bool dbg_hw_info_power2(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+    bool holding_select = false;
+    int select_hold_time = 0;
+
+    while(1)
+    {
+        int button = my_get_action(HZ / 10);
+        if(button == ACT_NEXT || button == ACT_PREV)
+        {
+            lcd_setfont(FONT_UI);
+            return true;
+        }
+        else if(button == ACT_CANCEL)
+        {
+            lcd_setfont(FONT_UI);
+            return false;
+        }
+
+        button = my_get_status();
+        if(button == ACT_OK && !holding_select)
+        {
+            holding_select = true;
+            select_hold_time = current_tick;
+        }
+        else if(button != ACT_OK && holding_select)
+        {
+            holding_select = false;
+        }
+
+        /* disable feature if unsafe: we need 4.2 and dcdc fully operational */
+        bool feat_safe = usb_detect() == USB_INSERTED && BF_RD(POWER_DCDC4P2, ENABLE_DCDC)
+            && BF_RD(POWER_DCDC4P2, ENABLE_4P2) && BF_RD(POWER_5VCTRL, ENABLE_DCDC)
+            && !BF_RD(POWER_5VCTRL, PWD_CHARGE_4P2);
+        bool batt_disabled = (BF_RD(POWER_DCDC4P2, DROPOUT_CTRL) == 0xc);
+        if(holding_select && TIME_AFTER(current_tick, select_hold_time + HZ))
+        {
+            if(batt_disabled)
+            {
+                BF_CLR(POWER_CHARGE, PWD_BATTCHRG); /* enable charger again */
+                BF_WR(POWER_DCDC4P2, DROPOUT_CTRL, 0xe); /* select greater, 200 mV drop */
+            }
+            else if(feat_safe)
+            {
+                BF_WR(POWER_DCDC4P2, DROPOUT_CTRL, 0xc); /* always select 4.2, 200 mV drop */
+                BF_CLR(POWER_CHARGE, PWD_BATTCHRG); /* disable charger */
+            }
+            batt_disabled = !batt_disabled;
+            holding_select = false;
+        }
+
+        lcd_clear_display();
+        if(!batt_disabled)
+        {
+            lcd_putsf(0, 0, "Hold select for 1 sec");
+            lcd_putsf(0, 1, "to disable battery.");
+            lcd_putsf(0, 3, "WARNING");
+            lcd_putsf(0, 4, "This is a debug");
+            lcd_putsf(0, 5, "feature !");
+            if(!feat_safe)
+            {
+                lcd_putsf(0, 7, "NOTE: unavailable");
+                lcd_putsf(0, 8, "Plug USB to enable.");
+            }
+        }
+        else
+        {
+            lcd_putsf(0, 0, "Battery is DISABLED.");
+            lcd_putsf(0, 1, "Hold select for 1 sec");
+            lcd_putsf(0, 2, "to renable battery.");
+            lcd_putsf(0, 4, "WARNING");
+            lcd_putsf(0, 5, "Do not unplug USB !");
+        }
 
         lcd_update();
         yield();
@@ -1183,6 +1264,7 @@ static struct
     {"dma", dbg_hw_info_dma},
     {"lradc", dbg_hw_info_lradc},
     {"power", dbg_hw_info_power},
+    {"power2", dbg_hw_info_power2},
     {"powermgmt", dbg_hw_info_powermgmt},
     {"rtc", dbg_hw_info_rtc},
     {"dcp", dbg_hw_info_dcp},
