@@ -49,14 +49,11 @@ bool timer_set(long cycles, bool start)
 
 bool timer_start(IF_COP_VOID(int core))
 {
-    imx233_timrot_setup(TIMER_USER, true, timer_cycles,
-        BV_TIMROT_TIMCTRLn_SELECT__32KHZ_XTAL, BV_TIMROT_TIMCTRLn_PRESCALE__DIV_BY_1,
-        false, &timer_fn);
+    imx233_timrot_setup_simple(TIMER_USER, true, timer_cycles, TIMER_SRC_32KHZ, &timer_fn);
     return true;
 }
 
 void timer_stop(void)
 {
-    imx233_timrot_setup(TIMER_USER, false, 0, BV_TIMROT_TIMCTRLn_SELECT__NEVER_TICK,
-        BV_TIMROT_TIMCTRLn_PRESCALE__DIV_BY_1, false, NULL);
+    imx233_timrot_setup_simple(TIMER_USER, false, 0, TIMER_SRC_STOP, NULL);
 }

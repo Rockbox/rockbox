@@ -65,6 +65,49 @@ void imx233_timrot_set_priority(unsigned timer_nr, unsigned prio)
     imx233_icoll_set_priority(INT_SRC_TIMER(timer_nr), prio);
 }
 
+static unsigned map_src(enum imx233_timrot_src_t src, unsigned *prescale)
+{
+    *prescale = BV_TIMROT_TIMCTRLn_PRESCALE__DIV_BY_1;
+    switch(src)
+    {
+        case TIMER_SRC_24MHZ:
+            return BV_TIMROT_TIMCTRLn_SELECT__TICK_ALWAYS;
+        case TIMER_SRC_12MHZ:
+            *prescale = BV_TIMROT_TIMCTRLn_PRESCALE__DIV_BY_2;
+            return BV_TIMROT_TIMCTRLn_SELECT__TICK_ALWAYS;
+        case TIMER_SRC_6MHZ:
+            *prescale = BV_TIMROT_TIMCTRLn_PRESCALE__DIV_BY_4;
+            return BV_TIMROT_TIMCTRLn_SELECT__TICK_ALWAYS;
+        case TIMER_SRC_3MHZ:
+            *prescale = BV_TIMROT_TIMCTRLn_PRESCALE__DIV_BY_8;
+            return BV_TIMROT_TIMCTRLn_SELECT__TICK_ALWAYS;
+        case TIMER_SRC_32KHZ:
+            return BV_TIMROT_TIMCTRLn_SELECT__32KHZ_XTAL;
+        case TIMER_SRC_8KHZ:
+            return BV_TIMROT_TIMCTRLn_SELECT__8KHZ_XTAL;
+        case TIMER_SRC_4KHZ:
+            return BV_TIMROT_TIMCTRLn_SELECT__4KHZ_XTAL;
+        case TIMER_SRC_1KHZ:
+            return BV_TIMROT_TIMCTRLn_SELECT__1KHZ_XTAL;
+        case TIMER_SRC_STOP:
+        default:
+            return BV_TIMROT_TIMCTRLn_SELECT__NEVER_TICK;
+    }
+}
+
+void imx233_timrot_setup_simple(unsigned timer_nr, bool periodic, unsigned count,
+    enum imx233_timrot_src_t src, imx233_timer_fn_t fn)
+{
+    unsigned prescale;
+    unsigned hw_src = map_src(src, &prescale);
+    imx233_timrot_setup(timer_nr, periodic, count, hw_src, prescale, false, fn);
+}
+
+unsigned imx233_timrot_get_count(unsigned timer_nr)
+{
+    return BF_RD(TIMROT_TIMCOUNTn(timer_nr), RUNNING_COUNT);
+}
+
 struct imx233_timrot_info_t imx233_timrot_get_info(unsigned timer_nr)
 {
     struct imx233_timrot_info_t info;
