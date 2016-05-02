@@ -760,10 +760,10 @@ androidndkcc()
     case $1 in
         armeabi)
             endian="little"
-            gccchoice="4.6"
+            gccchoice="4.9"
             gcctarget="arm-linux-androideabi-"
-            echo "${make_toolchain} --system=${buildhost} --toolchain=arm-linux-androideabi-4.6 --platform=android-16 --install-dir=${pwd}/android-toolchain"
-            ${make_toolchain} --system=${buildhost} --toolchain=arm-linux-androideabi-4.6 --platform=android-16 --install-dir=${pwd}/android-toolchain
+            echo "${make_toolchain} --toolchain=arm-linux-androideabi-4.9 --platform=android-16 --install-dir=${pwd}/android-toolchain"
+            ${make_toolchain} --toolchain=arm-linux-androideabi-4.9 --platform=android-16 --install-dir=${pwd}/android-toolchain
             if [ ${?} != 0 ]; then
                 exit
             fi
