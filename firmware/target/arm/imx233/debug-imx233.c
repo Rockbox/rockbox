@@ -38,6 +38,7 @@
 #include "audioin-imx233.h"
 #include "audioout-imx233.h"
 #include "timrot-imx233.h"
+#include "dpc-imx233.h"
 #include "string.h"
 #include "stdio.h"
 #include "button.h"
@@ -1077,6 +1078,101 @@ bool dbg_hw_info_button(void)
     }
 }
 
+struct dpc_test_result
+{
+    bool passed;
+    unsigned min, max, avg;
+};
+
+struct dpc_test_arg
+{
+    volatile uint32_t time; /* will be replaced by delay when fired */
+    volatile bool fired;
+};
+
+void dpc_simple_test_cb(struct imx233_dpc_ctx_t *ctx, intptr_t user)
+{
+    (void) ctx;
+    struct dpc_test_arg *arg = (void *)user;
+    arg->fired = true;
+    arg->time = HW_DIGCTL_MICROSECONDS - arg->time;
+}
+
+void dpc_simple_test(struct dpc_test_result *res, int delay_us, int repeat_cnt, bool block)
+{
+    static volatile struct dpc_test_arg arg;
+    res->passed = false;
+    for(int i = 0; i < repeat_cnt; i++)
+    {
+        arg.fired = false;
+        arg.time = HW_DIGCTL_MICROSECONDS;
+        imx233_dpc_start(block, delay_us, dpc_simple_test_cb, (intptr_t)&arg);
+        if(!block)
+            udelay(2 * delay_us);
+        if(!arg.fired)
+            return; /* not passed */
+        if(i == 0)
+            res->avg = res->min = res->max = arg.time;
+        else
+        {
+            res->min = MIN(res->min, arg.time);
+            res->max = MAX(res->max, arg.time);
+            res->avg += arg.time;
+        }
+    }
+    res->passed = true;
+    res->avg /= repeat_cnt;
+}
+
+bool dbg_hw_info_dpc(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        int button = my_get_action(HZ / 10);
+        switch(button)
+        {
+            case ACT_NEXT:
+            case ACT_PREV:
+            case ACT_OK:
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACT_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        lcd_clear_display();
+        int line = 0;
+        lcd_putsf(0, line++, "DPC testing...");
+        /* do some testing */
+        struct dpc_test_result result;
+#define PRINT_RES(name) \
+    if(result.passed) \
+        lcd_putsf(0, line++, name ": %d/%d/%d", result.min, result.avg, result.max); \
+    else \
+        lcd_putsf(0, line++, name ": failed");
+        dpc_simple_test(&result, 50, 100, false);
+        PRINT_RES("50us");
+        dpc_simple_test(&result, 500, 30, false);
+        PRINT_RES("500us");
+        dpc_simple_test(&result, 5000, 10, false);
+        PRINT_RES("5ms");
+        dpc_simple_test(&result, 50000, 3, false);
+        PRINT_RES("50ms");
+        dpc_simple_test(&result, 50, 100, true);
+        PRINT_RES("b50us");
+        dpc_simple_test(&result, 500, 30, true);
+        PRINT_RES("b500us");
+        dpc_simple_test(&result, 5000, 10, true);
+        PRINT_RES("b5ms");
+#undef PRINT_RES
+        lcd_update();
+        yield();
+    }
+}
+
 static struct
 {
     const char *name;
@@ -1099,6 +1195,7 @@ static struct
     {"audio", dbg_hw_info_audio},
     {"timrot", dbg_hw_info_timrot},
     {"button", dbg_hw_info_button},
+    {"dpc", dbg_hw_info_dpc},
     {"target", dbg_hw_target_info},
 };
 
