@@ -143,6 +143,13 @@
 
 #define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
 
+/* define current usage levels */
+#define CURRENT_NORMAL     90  /* All values are estimations from my battery */
+#define CURRENT_BACKLIGHT  50  /* benches and may need some tuning */
+#if defined(HAVE_RECORDING)
+#define CURRENT_RECORD     5
+#endif
+
 /* Hardware controlled charging */
 #define CONFIG_CHARGING CHARGING_SIMPLE
 
