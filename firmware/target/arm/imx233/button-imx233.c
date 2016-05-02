@@ -42,6 +42,11 @@ static int hold_idx = -1; /* index of hold button in map */
 static int jack_idx = -1; /* index of jack detect in map */
 #endif
 
+/* LRADC margin for buttons */
+#ifndef IMX233_BUTTON_LRADC_MARGIN
+#define IMX233_BUTTON_LRADC_MARGIN  30
+#endif
+
 /* shortcut of button map */
 #define MAP imx233_button_map
 
@@ -89,7 +94,21 @@ static bool imx233_button_read_cooked(int idx)
         int rel = MAP[idx].u.lradc.relative;
         if(rel != -1)
             raw = (raw * MAP[rel].u.lradc.value) / imx233_button_read_raw(rel);
-        res = abs(raw - MAP[idx].u.lradc.value) <= 30;
+        switch(MAP[idx].u.lradc.op)
+        {
+            case IMX233_BUTTON_EQ:
+                res = abs(raw - MAP[idx].u.lradc.value) <= MAP[idx].u.lradc.margin;
+                break;
+            case IMX233_BUTTON_GT:
+                res = raw > MAP[idx].u.lradc.value;
+                break;
+            case IMX233_BUTTON_LT:
+                res = raw < MAP[idx].u.lradc.value;
+                break;
+            default:
+                res = false;
+                break;
+        }
     }
     else if(MAP[idx].periph == IMX233_BUTTON_PSWITCH)
     {
@@ -214,6 +233,9 @@ void imx233_button_init(void)
         }
         else if(MAP[i].periph == IMX233_BUTTON_LRADC)
         {
+            /* use default value for margin */
+            if(MAP[i].u.lradc.margin == 0)
+                MAP[i].u.lradc.margin = IMX233_BUTTON_LRADC_MARGIN;
             int src = MAP[i].u.lradc.src;
             /* if channel was already acquired, there is nothing to do */
             if(src_mask & (1 << src))
