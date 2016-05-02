@@ -146,6 +146,11 @@ struct imx233_button_map_t
  * 
  * The driver also provides default implementations for headphones_inserted()
  * and button_hold() which can be overriden since they have weak linkage.
+ *
+ * The button-target.h header can also define IMX233_BUTTON_LRADC_MARGIN
+ * to control the error margin allowed for button using LRADC. The default
+ * margin is 30. Obviously, the margin should be less than M/2 where M is the
+ * minimum LRADC value between two buttons.
  */
 
 extern struct imx233_button_map_t imx233_button_map[];

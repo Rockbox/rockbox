@@ -42,6 +42,11 @@ static int hold_idx = -1; /* index of hold button in map */
 static int jack_idx = -1; /* index of jack detect in map */
 #endif
 
+/* LRADC margin for buttons */
+#ifndef IMX233_BUTTON_LRADC_MARGIN
+#define IMX233_BUTTON_LRADC_MARGIN  30
+#endif
+
 /* shortcut of button map */
 #define MAP imx233_button_map
 
@@ -89,7 +94,7 @@ static bool imx233_button_read_cooked(int idx)
         int rel = MAP[idx].u.lradc.relative;
         if(rel != -1)
             raw = (raw * MAP[rel].u.lradc.value) / imx233_button_read_raw(rel);
-        res = abs(raw - MAP[idx].u.lradc.value) <= 30;
+        res = abs(raw - MAP[idx].u.lradc.value) <= IMX233_BUTTON_LRADC_MARGIN;
     }
     else if(MAP[idx].periph == IMX233_BUTTON_PSWITCH)
     {
