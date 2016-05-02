@@ -32,6 +32,8 @@ bool button_debug_screen(void);
 #define HAS_BUTTON_HOLD
 #endif
 
+#define IMX233_BUTTON_LRADC_MARGIN  100
+
 /* Main unit's buttons */
 #define BUTTON_POWER                0x00000001
 #define BUTTON_BACK                 0x00000002
