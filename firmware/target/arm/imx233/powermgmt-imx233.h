@@ -31,7 +31,6 @@ struct imx233_powermgmt_info_t
     enum charge_state_type state;
     int charging_timeout; /* time in tick before timeout, -1 if n/a */
     int topoff_timeout; /* ditto */
-    int incr_4p2_ilimit_timeout; /* ditto */
 };
 
 struct imx233_powermgmt_info_t imx233_powermgmt_get_info(void);

@@ -27,6 +27,7 @@
 //#define LOGF_ENABLE
 #include "logf.h"
 #include "powermgmt-imx233.h"
+#include "dpc-imx233.h"
 
 #if !defined(IMX233_CHARGE_CURRENT) || !defined(IMX233_STOP_CURRENT) \
     || !defined(IMX233_CHARGING_TIMEOUT) || !defined(IMX233_TOPOFF_TIMEOUT)
@@ -37,7 +38,6 @@
 /* charger state is maintained in charge_state (see powermgmt.h) */
 static int timeout_charging; /* timeout before charging will be declared broken */
 static int timeout_topping_off; /* timeout before stopping charging after topping off */
-static int timeout_4p2_ilimit_increase; /* timeout before increasing 4p2 ilimit */
 
 /* Returns battery voltage from ADC [millivolts] */
 int _battery_voltage(void)
@@ -71,6 +71,21 @@ void imx233_powermgmt_init(void)
 void powermgmt_init_target(void)
 {
     charge_state = DISCHARGING;
+}
+
+#define MAX_4P2_ILIMIT  0x3f
+
+static void ramp_up_4p2_rail(struct imx233_dpc_ctx_t *ctx, intptr_t user)
+{
+    (void) user;
+    /* only ramp up in the TRICKLE state and if we haven't reached the maximum yet */
+    if(charge_state == TRICKLE && BF_RD(POWER_5VCTRL, CHARGE_4P2_ILIMIT) < MAX_4P2_ILIMIT)
+    {
+        HW_POWER_5VCTRL += BF_POWER_5VCTRL_CHARGE_4P2_ILIMIT(1);
+        /* schedule next ramp in 10ms if necessary */
+        if(BF_RD(POWER_5VCTRL, CHARGE_4P2_ILIMIT) < MAX_4P2_ILIMIT)
+            imx233_dpc_continue(ctx, 10000, &ramp_up_4p2_rail, 0);
+    }
 }
 
 void charging_algorithm_step(void)
@@ -110,23 +125,19 @@ void charging_algorithm_step(void)
         BF_WR(POWER_5VCTRL, CHARGE_4P2_ILIMIT, 1); /* start by drawing 10mA only */
         BF_CLR(POWER_5VCTRL, PWD_CHARGE_4P2);// FIXME: manual error ?
         BF_WR(POWER_DCDC4P2, ENABLE_DCDC, 1);
+        /* we will slowly ramp up the current in the rail every 10ms */
+        imx233_dpc_start(false, 10000, &ramp_up_4p2_rail, 0);
 #endif
-        timeout_4p2_ilimit_increase = current_tick + HZ / 100;
         charge_state = TRICKLE;
     }
-    else if(charge_state == TRICKLE && TIME_AFTER(current_tick, timeout_4p2_ilimit_increase))
+    /* trickle -> charging transition */
+    else if(charge_state == TRICKLE)
     {
 #if IMX233_SUBTARGET >= 3780
-        /* if 4.2V current limit has not reached 780mA, increase it slowly to
-         * charge the 4.2V capacitance */
-        if(BF_RD(POWER_5VCTRL, CHARGE_4P2_ILIMIT) != 0x3f)
-        {
-            //logf("pwrmgmt: incr 4.2 ilimit");
-            HW_POWER_5VCTRL += BF_POWER_5VCTRL_CHARGE_4P2_ILIMIT(1);
-            timeout_4p2_ilimit_increase = current_tick + HZ / 100;
-        }
-        /* we've reached the maximum, take action */
-        else
+        /* If 4.2V current limit has not reached 780mA, don't do anything, the
+         * DPC is still running */
+        /* If we've reached the maximum, take action */
+        if(BF_RD(POWER_5VCTRL, CHARGE_4P2_ILIMIT) == MAX_4P2_ILIMIT)
 #endif
         {
             logf("pwrmgmt: enable dcdc and charger");
@@ -191,7 +202,5 @@ struct imx233_powermgmt_info_t imx233_powermgmt_get_info(void)
         charge_state == CHARGING ? timeout_charging - current_tick : 0;
     info.topoff_timeout =
         charge_state == TOPOFF ? timeout_topping_off - current_tick : 0;
-    info.incr_4p2_ilimit_timeout =
-        charge_state == TRICKLE ? timeout_4p2_ilimit_increase - current_tick : 0;
     return info;
 }
