@@ -124,17 +124,15 @@ void system_exception_wait(void)
     lcd_update();
     backlight_hw_on();
     backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
-    /* wait until button release (if a button is pressed) */
-#ifdef HAVE_BUTTON_DATA
-    int data;
-    while(button_read_device(&data));
-    /* then wait until next button press */
-    while(!button_read_device(&data));
-#else
-    while(button_read_device());
-    /* then wait until next button press */
-    while(!button_read_device());
-#endif
+    /* wait until button release (if a button is pressed)
+     * NOTE at this point, interrupts are off so that rules out touchpad and
+     * ADC, so we are pretty much left with PSWITCH only. If other buttons are
+     * wanted, it is possible to implement a busy polling version of button
+     * reading for GPIO and ADC in button-imx233 but this is not done at the
+     * moment. */
+    while(imx233_power_read_pswitch() != 0) {}
+    while(imx233_power_read_pswitch() == 0) {}
+    while(imx233_power_read_pswitch() != 0) {}
 }
 
 int system_memory_guard(int newmode)
