@@ -389,7 +389,7 @@ do
                     ;;
             esac
             build "binutils" "arm-elf-eabi" "2.20.1" "binutils-2.20.1-ld-thumb-interwork-long-call.diff binutils-2.20.1-texinfo-fix.diff" "$binopts --disable-werror"
-            build "gcc" "arm-elf-eabi" "4.4.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff" "$gccopts MAKEINFO=missing" "gmp mpfr"
+            build "gcc" "arm-elf-eabi" "4.4.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff gcc-c11-toplev.diff" "$gccopts MAKEINFO=missing" "gmp mpfr"
             ;;
         [Rr])
             build_ctng "ypr0" "alsalib.tar.gz" "arm" "linux-gnueabi"
