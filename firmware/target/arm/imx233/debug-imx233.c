@@ -55,13 +55,8 @@
 #define ACT_RIGHT   6
 #define ACT_REPEAT  0x1000
 
-int my_get_action(int tmo)
+int xlate_button(int btn)
 {
-    int btn = button_get_w_tmo(tmo);
-    while(btn & BUTTON_REL)
-        btn = button_get_w_tmo(tmo);
-    bool repeat = btn & BUTTON_REPEAT;
-    int act = ACT_NONE;
     switch(btn)
     {
         case BUTTON_POWER:
@@ -72,8 +67,7 @@ int my_get_action(int tmo)
 #else
 #error no key for ACT_CANCEL
 #endif
-            act = ACT_CANCEL;
-            break;
+            return ACT_CANCEL;
 #if defined(BUTTON_SELECT)
         case BUTTON_SELECT:
 #elif defined(BUTTON_PLAY)
@@ -83,17 +77,28 @@ int my_get_action(int tmo)
 #else
 #error no key for ACT_OK
 #endif
-            act = ACT_OK;
-            break;
+            return ACT_OK;
         case BUTTON_UP:
-            act = ACT_PREV;
-            break;
+            return ACT_PREV;
         case BUTTON_DOWN:
-            act = ACT_NEXT;
-            break;
+            return ACT_NEXT;
         default:
-            yield();
+            return ACT_NONE;
     }
+}
+
+int my_get_status(void)
+{
+    return xlate_button(button_status());
+}
+
+int my_get_action(int tmo)
+{
+    int btn = button_get_w_tmo(tmo);
+    while(btn & BUTTON_REL)
+        btn = button_get_w_tmo(tmo);
+    bool repeat = btn & BUTTON_REPEAT;
+    int act = xlate_button(btn & ~BUTTON_REPEAT);
     if(repeat)
         act |= ACT_REPEAT;
     return act;
@@ -217,7 +222,7 @@ bool dbg_hw_info_power(void)
         bool en;
         int linreg;
         char buf[16];
-        
+
         lcd_putsf(0, line++, "name  value bo linreg");
 #define DISP_REGULATOR(name) \
         imx233_power_get_regulator(REGULATOR_##name, &trg, &bo); \
@@ -254,7 +259,7 @@ bool dbg_hw_info_power(void)
 bool dbg_hw_info_lradc(void)
 {
     lcd_setfont(FONT_SYSFIXED);
-    
+
     while(1)
     {
         int button = my_get_action(HZ / 25);
@@ -679,7 +684,7 @@ bool dbg_hw_info_ocotp(void)
         }
         if(i < top_user)
             top_user = i - 1;
-        
+
         lcd_update();
         yield();
     }
