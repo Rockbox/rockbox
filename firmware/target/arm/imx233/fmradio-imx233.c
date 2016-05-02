@@ -24,7 +24,7 @@
 #include "fmradio-imx233.h"
 #include "fmradio-target.h"
 #include "pinctrl-imx233.h"
-#include "i2c.h"
+#include "i2c-imx233.h"
 #include "generic_i2c.h"
 
 #ifndef IMX233_FMRADIO_I2C
