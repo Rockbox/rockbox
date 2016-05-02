@@ -42,6 +42,11 @@
 #define IMX233_BUTTON_INVERTED  (1 << 0) /* invert button detection */
 #define IMX233_BUTTON_PULLUP    (1 << 1) /* pin needs a pullup (GPIO) */
 
+/* values for the .op field */
+#define IMX233_BUTTON_EQ    0 /* channel is equal to value up to error margin */
+#define IMX233_BUTTON_GT    1 /* channel is greater than value */
+#define IMX233_BUTTON_LT    2 /* channel is less than value */
+
 /** target-defined
  * NOTE for proper operation:
  * - the table must end which a dummy entry of type IMX233_BUTTON_END
@@ -68,7 +73,9 @@ struct imx233_button_map_t
         struct
         {
             int src; /* source channel */
-            int value; /* expected value */
+            int value; /* comparison value */
+            int op; /* comparison operation */
+            int margin; /* error margin for equal operation (0 means default) */
             int relative; /* button to which it is relative or -1 if none */
         }lradc;
         struct
@@ -84,12 +91,17 @@ struct imx233_button_map_t
     int threshold; /* round threshold for acceptance */
 };
 
-/* macros for the common cases */
+/* macros for the common cases (see below for explanation) */
+
 #define IMX233_BUTTON_PATH_GPIO(bank_, pin_) .periph = IMX233_BUTTON_GPIO, \
     .u = {.gpio = {.bank = bank_, .pin = pin_}}
-#define IMX233_BUTTON_PATH_LRADC_REL(src_, val_, rel_) .periph = IMX233_BUTTON_LRADC, \
-    .u = {.lradc = {.src = src_, .value = val_, .relative = rel_}}
-#define IMX233_BUTTON_PATH_LRADC(src_, val_) IMX233_BUTTON_PATH_LRADC_REL(src_, val_, -1)
+#define IMX233_BUTTON_PATH_LRADC_EX(src_, op_, val_, rel_, margin_) .periph = IMX233_BUTTON_LRADC, \
+    .u = {.lradc = {.src = src_, .value = val_, .relative = rel_, .margin = margin_, \
+    .op = IMX233_BUTTON_##op_}}
+#define IMX233_BUTTON_PATH_LRADC_REL(src_, val_, rel_) \
+    IMX233_BUTTON_PATH_LRADC_EX(src_, EQ, val_, rel_, 0)
+#define IMX233_BUTTON_PATH_LRADC(src_, val_) \
+    IMX233_BUTTON_PATH_LRADC_REL(src_, val_, -1)
 #define IMX233_BUTTON_PATH_PSWITCH(lvl_) .periph = IMX233_BUTTON_PSWITCH, \
     .u = {.pswitch = {.level = lvl_}}
 #define IMX233_BUTTON_PATH_END() .periph = -1
@@ -126,6 +138,10 @@ struct imx233_button_map_t
  * - GPIO(bank, pin)
  * - LRADC(src, value)
  * - LRADC_REL(src, value, rel_idx)
+ * - LRADC_EX(src, op, val, rel_idx, margin) where op must one of EQ, GT, LT
+ *     and margin is the error margin for EQ (use 0 for default value). Operation
+ *     EQ means the src value must match val within error margin. Operation GT
+ *     (resp. LT) means src value must greater (resp. lower) than val.
  * - PSWITCH(level)
  * - END()
  * The optional flags are specified as a list, without the IMX233_BUTTON_ prefix.
@@ -146,6 +162,12 @@ struct imx233_button_map_t
  * 
  * The driver also provides default implementations for headphones_inserted()
  * and button_hold() which can be overriden since they have weak linkage.
+ *
+ * The button-target.h header can also define IMX233_BUTTON_LRADC_MARGIN
+ * to control the error margin allowed for button using LRADC. The default
+ * margin is 30. Obviously, the margin should be less than M/2 where M is the
+ * minimum LRADC value between two buttons. The margin can be overriden one a
+ * per button basis using LRADC_EX.
  */
 
 extern struct imx233_button_map_t imx233_button_map[];

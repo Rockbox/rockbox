@@ -1039,36 +1039,50 @@ bool dbg_hw_info_button(void)
         {
             bool val = imx233_button_read_btn(i);
             int raw = imx233_button_read_raw(i);
+            char type[20];
             char path[128];
             char flags[128];
             if(MAP[i].periph == IMX233_BUTTON_GPIO)
-                snprintf(path, sizeof(path), "gpio(%d,%d)", MAP[i].u.gpio.bank, MAP[i].u.gpio.pin);
+            {
+                snprintf(type, sizeof(type), "gpio");
+                snprintf(path, sizeof(path), "bank=%d pin=%d", MAP[i].u.gpio.bank, MAP[i].u.gpio.pin);
+            }
             else if(MAP[i].periph == IMX233_BUTTON_LRADC)
             {
-                if(MAP[i].u.lradc.relative == -1)
-                    snprintf(path, sizeof(path), "adc(%d,%d)", MAP[i].u.lradc.src,
-                        MAP[i].u.lradc.value);
+                static const char *op_name[] =
+                {
+                    [IMX233_BUTTON_EQ] = "eq",
+                    [IMX233_BUTTON_GT] = "gt",
+                    [IMX233_BUTTON_LT] = "lt"
+                };
+                char rel_name[20];
+                snprintf(type, sizeof(type), "adc");
+                if(MAP[i].u.lradc.relative != -1)
+                    snprintf(rel_name, sizeof(rel_name), " %s", MAP[MAP[i].u.lradc.relative].name);
                 else
-                    snprintf(path, sizeof(path), "adc(%d,%d,%s)", MAP[i].u.lradc.src,
-                        MAP[i].u.lradc.value, MAP[MAP[i].u.lradc.relative].name);
+                    rel_name[0] = 0;
+                snprintf(path, sizeof(path), "%d %s %d%s %d", MAP[i].u.lradc.src,
+                    op_name[MAP[i].u.lradc.op], MAP[i].u.lradc.value, rel_name,
+                    MAP[i].u.lradc.margin);
             }
             else if(MAP[i].periph == IMX233_BUTTON_PSWITCH)
-                snprintf(path, sizeof(path), "pswith(%d)", MAP[i].u.pswitch.level);
+            {
+                snprintf(type, sizeof(type), "psw");
+                snprintf(path, sizeof(path), "level=%d", MAP[i].u.pswitch.level);
+            }
             else
+            {
+                snprintf(type, sizeof(type), "unk");
                 snprintf(path, sizeof(path), "unknown");
+            }
             flags[0] = 0;
             if(MAP[i].flags & IMX233_BUTTON_INVERTED)
                 strcat(flags, " inv");
             if(MAP[i].flags & IMX233_BUTTON_PULLUP)
                 strcat(flags, " pull");
-#if LCD_WIDTH < 240
-            lcd_putsf(0, line++, "%s: %d[%d/%d] r=%d", MAP[i].name, val,
-                MAP[i].rounds, MAP[i].threshold, raw);
-            lcd_putsf(0, line++, "    %s%s", path, flags);
-#else
-            lcd_putsf(0, line++, "%s: %d[%d/%d] r=%d %s%s", MAP[i].name, val,
-                MAP[i].rounds, MAP[i].threshold, raw, path, flags);
-#endif
+            lcd_putsf(0, line++, "%s %d %d/%d %d %s", MAP[i].name, val,
+                MAP[i].rounds, MAP[i].threshold, raw, type);
+            lcd_putsf(0, line++, "  %s%s", path, flags);
         }
 #undef MAP
 
