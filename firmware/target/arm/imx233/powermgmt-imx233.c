@@ -108,6 +108,7 @@ void charging_algorithm_step(void)
          * limit on the 4P2 rail. */
         BF_WR(POWER_DCDC4P2, ENABLE_4P2(1));
         BF_SET(POWER_CHARGE, ENABLE_LOAD);
+        BF_WR(POWER_5VCTRL, CHARGE_4P2_ILIMIT(1)); /* start by drawing 10mA only */
         BF_CLR(POWER_5VCTRL, PWD_CHARGE_4P2);// FIXME: manual error ?
         BF_WR(POWER_DCDC4P2, ENABLE_DCDC(1));
 #endif
@@ -145,19 +146,19 @@ void charging_algorithm_step(void)
             timeout_charging = current_tick + IMX233_CHARGING_TIMEOUT;
         }
     }
+    /* charging -> error transition */
     else if(charge_state == CHARGING && TIME_AFTER(current_tick, timeout_charging))
     {
         /* we have charged for a too long time, declare charger broken */
         logf("pwrmgmt: charging timeout exceeded!");
         logf("pwrmgmt: charging -> error");
-        /* stop charging */
-#if IMX233_SUBTARGET >= 3780
-        BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
-#endif
+        /* stop charging, note that we leave the 4.2 rail active so that the DCDC
+         * keep drawing current from the 4.2 only and leave the battery untouched */
         BF_SET(POWER_CHARGE, PWD_BATTCHRG);
         /* goto error state */
         charge_state = CHARGE_STATE_ERROR;
     }
+    /* charging -> topoff transition */
     else if(charge_state == CHARGING && !BF_RD(POWER_STS, CHRGSTS))
     {
         logf("pwrmgmt: topping off");
@@ -165,14 +166,13 @@ void charging_algorithm_step(void)
         charge_state = TOPOFF;
         timeout_topping_off = current_tick + IMX233_TOPOFF_TIMEOUT;
     }
+    /* topoff -> disabled transition */
     else if(charge_state == TOPOFF && TIME_AFTER(current_tick, timeout_topping_off))
     {
         logf("pwrmgmt: charging finished");
         logf("pwrmgmt: topoff -> disabled");
-        /* stop charging */
-#if IMX233_SUBTARGET >= 3780
-        BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
-#endif
+        /* stop charging, note that we leave the 4.2 rail active so that the DCDC
+         * keep drawing current from the 4.2 only and leave the battery untouched */
         BF_SET(POWER_CHARGE, PWD_BATTCHRG);
         charge_state = CHARGE_STATE_DISABLED;
     }
