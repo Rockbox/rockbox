@@ -195,7 +195,7 @@ void system_init(void)
     imx233_clkctrl_enable_auto_slow(false);
     imx233_clkctrl_set_auto_slow_div(BV_CLKCTRL_HBUS_SLOW_DIV__BY8);
 
-    cpu_frequency = imx233_clkctrl_get_freq(CLK_CPU);
+    cpu_frequency = imx233_clkctrl_get_freq(CLK_CPU) * 1000; /* variable in Hz */
 
 #if !defined(BOOTLOADER) && CONFIG_TUNER != 0
     fmradio_i2c_init();
