@@ -23,6 +23,7 @@
  ***************************************************************************/
 
 #include "backtrace.h"
+#include "symbols.h"
 #include "safe_read.h"
 
 /***************************************************************************
@@ -77,9 +78,10 @@ static Boolean CliReport(void *data, Int32 address)
     unsigned *line = (unsigned *)data;
 
 
-    lcd_putsf(0, (*line)++, "    %c: %08x",
+    lcd_putsf(0, (*line)++, "    %c: 0x%08x %s",
               (address & 0x1) ? 'T' : 'A',
-              address & (~0x1));
+              address & (~0x1),
+              sym_get_function_name(address));
     lcd_update();
 
     return TRUE;

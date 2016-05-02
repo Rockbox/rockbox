@@ -4293,6 +4293,11 @@ if test -n "$ccache"; then
   CC="$ccache $CC"
 fi
 
+if test "$arch" = "arm"; then
+  extradefines="$extradefines -DPOKE_FUNCTION_NAME"
+  GCCOPTS="$GCCOPTS -mpoke-function-name"
+fi
+
 if test "$ARG_ARM_THUMB" = "1"; then
   extradefines="$extradefines -DUSE_THUMB"
   CC="$toolsdir/thumb-cc.py $CC"
