@@ -407,7 +407,6 @@ bool dbg_hw_info_powermgmt(void)
             "<unknown>");
         lcd_putsf(0, 1, "charging tmo: %d", info.charging_timeout);
         lcd_putsf(0, 2, "topoff tmo: %d", info.topoff_timeout);
-        lcd_putsf(0, 3, "4p2ilimit tmo: %d", info.incr_4p2_ilimit_timeout);
 
         lcd_update();
         yield();
