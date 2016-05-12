@@ -18,15 +18,21 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __UART_S5L8702_H__
-#define __UART_S5L8702_H__
+#ifndef __UART_TARGET_H__
+#define __UART_TARGET_H__
 
-#include "uc8702.h"
+/* Define this to show debug data on "View HW Info" */
+/* #define UC870X_DEBUG */
 
-/* s5l8702 low level routines */
-void uart_init (void);
-void uart_close(void);
-void uart_port_init (struct uartc_port *port);
-void uart_port_close (struct uartc_port *port);
+void uart_init(void);
 
-#endif /* __UART_S5L8702_H__ */
+/* s5l870x low level routines */
+void uart_target_enable_clocks(int uart_id);
+void uart_target_disable_clocks(int uart_id);
+void uart_target_enable_irq(int uart_id, int port_id);
+void uart_target_disable_irq(int uart_id, int port_id);
+void uart_target_clear_irq(int uart_id, int port_id);
+void uart_target_enable_gpio(int uart_id, int port_id);
+void uart_target_disable_gpio(int uart_id, int port_id);
+
+#endif /* __UART_TARGET_H__ */

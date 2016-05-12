@@ -18,110 +18,133 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-/* Include Standard files */
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "config.h"
 #include "cpu.h"
 #include "system.h"
-#include "kernel.h"
 
 #include "s5l8702.h"
-#include "uc8702.h"
-#include "uart-s5l8702.h"
+#include "uc870x.h"
 
 
-/* s5l8702 UART configuration */
-struct uartc s5l8702_uart = {
-     .baddr = S5L8702_UART_BASE
+/*
+ * s5l8702 UC870X HW: 1 UARTC, 4 ports
+ */
+static struct uartc_port *uartc_port_l[UARTC_N_PORTS];
+const struct uartc s5l8702_uartc =
+{
+    .id       = 0,
+    .baddr    = UARTC_BASE_ADDR,
+    .port_off = UARTC_PORT_OFFSET,
+    .n_ports  = UARTC_N_PORTS,
+    .port_l   = uartc_port_l,
 };
 
 /*
  * Device level functions specific to S5L8702
  */
-void uart_gpio_control(int port_id, bool onoff)
+void uart_target_enable_gpio(int uart_id, int port_id)
 {
-    if (onoff) {
-        switch (port_id) {
-            case 0:
-                /* configure UART0 Tx/Rx GPIO ports */
-                PCON0 = (PCON0 & 0xff00ffff) | 0x00220000;
-                break;
-            case 1:
-                /* configure UART1 GPIO ports, including RTS/CTS signals */
-                PCOND = (PCOND & 0xff0000ff) | 0x00222200;
-                break;
-            case 2:
-            case 3:
-                /* unknown, probably UART3/4 not routed on s5l8702 */
-            default:
-                break;
-        }
+    (void) uart_id;
+    switch (port_id) {
+        case 0:
+            /* configure UART0 Tx/Rx GPIO ports */
+            PCON0 = (PCON0 & 0xff00ffff) | 0x00220000;
+            break;
+        case 1:
+            /* configure UART1 GPIO ports, including RTS/CTS signals */
+            PCOND = (PCOND & 0xff0000ff) | 0x00222200;
+            break;
+        case 2:
+        case 3:
+            /* unknown */
+        default:
+            break;
     }
-    else {
+}
+
+void uart_target_disable_gpio(int uart_id, int port_id)
+{
+    (void) uart_id;
+    switch (port_id) {
         /* configure minimal power consumption */
-        switch (port_id) {
-            case 0:
-                PCON0 = (PCON0 & 0xff00ffff) | 0x00ee0000;
-                break;
-            case 1:
-                PCOND = (PCOND & 0xff0000ff) | 0x00eeee00;
-                break;
-            case 2:
-            case 3:
-            default:
-                break;
-        }
+        case 0:
+            PCON0 = (PCON0 & 0xff00ffff) | 0x00ee0000;
+            break;
+        case 1:
+            PCOND = (PCOND & 0xff0000ff) | 0x00eeee00;
+            break;
+        case 2:
+        case 3:
+        default:
+            break;
     }
 }
 
-/* reset s5l8702 uart related hardware */
-static void s5l8702_uart_hw_init(void)
+void uart_target_enable_irq(int uart_id, int port_id)
 {
-    for (int id = 0; id < S5L8702_UART_PORT_MAX; id++) {
-        VIC0INTENCLEAR = 1 << IRQ_UART(id); /* mask INT */
-        uart_gpio_control(id, 0);
-    }
+    (void) uart_id;
+    VIC0INTENABLE = 1 << IRQ_UART(port_id);
 }
 
-void uart_init(void)
+void uart_target_disable_irq(int uart_id, int port_id)
 {
-    s5l8702_uart_hw_init();
-    PWRCON(1) &= ~(1 << (CLOCKGATE_UART - 32)); /* on */
-    uartc_open(&s5l8702_uart);
+    (void) uart_id;
+    VIC0INTENCLEAR = 1 << IRQ_UART(port_id);
 }
 
-void uart_close(void)
+void uart_target_clear_irq(int uart_id, int port_id)
 {
-    uartc_close(&s5l8702_uart);
-    PWRCON(1) |= (1 << (CLOCKGATE_UART - 32)); /* off */
-    s5l8702_uart_hw_init();
+    (void) uart_id;
+    (void) port_id;
 }
 
-void uart_port_init(struct uartc_port *port)
+void uart_target_enable_clocks(int uart_id)
 {
-    uart_gpio_control(port->id, 1);
-    uartc_port_open(port);
-    VIC0INTENABLE = 1 << IRQ_UART(port->id); /* unmask INT */
+    (void) uart_id;
+    PWRCON(1) &= ~(1 << (CLOCKGATE_UARTC - 32));
 }
 
-void uart_port_close(struct uartc_port *port)
+void uart_target_disable_clocks(int uart_id)
 {
-    VIC0INTENCLEAR = 1 << IRQ_UART(port->id); /* mask INT */
-    uartc_port_close(port);
-    uart_gpio_control(port->id, 0);
+    (void) uart_id;
+    PWRCON(1) |= (1 << (CLOCKGATE_UARTC - 32));
 }
 
-/* ISRs */
+/*
+ * ISRs
+ */
+
+/* On Classic, PORT0 interrupts are not used when iAP is disabled */
+#if !defined(IPOD_6G) || defined(IPOD_ACCESSORY_PROTOCOL)
 void ICODE_ATTR INT_UART0(void)
 {
-    uartc_callback(&s5l8702_uart, 0);
+    uartc_callback(&s5l8702_uartc, 0);
 }
+#endif
 
+/* PORT1,2,3 not used on Classic */
+#ifndef IPOD_6G
 void ICODE_ATTR INT_UART1(void)
 {
-    uartc_callback(&s5l8702_uart, 1);
+    uartc_callback(&s5l8702_uartc, 1);
+}
+
+void ICODE_ATTR INT_UART2(void)
+{
+    uartc_callback(&s5l8702_uartc, 2);
+}
+
+void ICODE_ATTR INT_UART3(void)
+{
+    uartc_callback(&s5l8702_uartc, 3);
+}
+#endif
+
+/* Main init */
+void uart_init(void)
+{
+    uartc_open(&s5l8702_uartc);
 }

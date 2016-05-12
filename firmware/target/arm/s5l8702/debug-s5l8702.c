@@ -31,7 +31,8 @@
 #include "pmu-target.h"
 #include "pcm-target.h"
 #ifdef HAVE_SERIAL
-#include "uc8702.h"
+#include "uart-target.h"
+#include "uc870x.h"
 #endif
 #include "clocking-s5l8702.h"
 
@@ -50,7 +51,7 @@ bool dbg_hw_info(void)
     int line;
     int i;
     unsigned int state = 0;
-#ifdef UC8702_DEBUG
+#ifdef UC870X_DEBUG
     const unsigned int max_states=3;
 #else
     const unsigned int max_states=2;
@@ -120,20 +121,18 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("backlight: %s", pmu_read(0x29) ? "on" : "off");
             _DEBUG_PRINTF("brightness value: %d", pmu_read(0x28));
         }
-#ifdef UC8702_DEBUG
+#ifdef UC870X_DEBUG
         else if(state==2)
         {
             extern struct uartc_port ser_port;
             int tx_stat, rx_stat, tx_speed, rx_speed;
             char line_cfg[4];
             int abr_stat;
-            unsigned int abr_cnt;
-
+            uint32_t abr_cnt;
             char *abrstatus[] = {"Idle", "Launched", "Counting", "Abnormal"};
 
-            uartc_port_get_line_info(&ser_port, &tx_stat, &rx_stat,
-                                        &tx_speed, &rx_speed, line_cfg);
-
+            uartc_port_get_line_info(&ser_port,
+                        &tx_stat, &rx_stat, &tx_speed, &rx_speed, line_cfg);
             abr_stat = uartc_port_get_abr_info(&ser_port, &abr_cnt);
 
             _DEBUG_PRINTF("UART %d:", ser_port.id);
@@ -141,7 +140,7 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("line: %s", line_cfg);
             _DEBUG_PRINTF("Tx: %s, speed: %d", tx_stat ? "On":"Off", tx_speed);
             _DEBUG_PRINTF("Rx: %s, speed: %d", rx_stat ? "On":"Off", rx_speed);
-            _DEBUG_PRINTF("ABR: %s, cnt: %d", abrstatus[abr_stat], abr_cnt);
+            _DEBUG_PRINTF("ABR: %s, cnt: %u", abrstatus[abr_stat], abr_cnt);
             line++;
             _DEBUG_PRINTF("n_tx_bytes: %u", ser_port.n_tx_bytes);
             _DEBUG_PRINTF("n_rx_bytes: %u", ser_port.n_rx_bytes);
@@ -149,10 +148,8 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("n_parity_err: %u", ser_port.n_parity_err);
             _DEBUG_PRINTF("n_frame_err: %u", ser_port.n_frame_err);
             _DEBUG_PRINTF("n_break_detect: %u", ser_port.n_break_detect);
-            _DEBUG_PRINTF("n_abnormal0: %u", ser_port.n_abnormal0);
-            _DEBUG_PRINTF("n_abnormal1: %u", ser_port.n_abnormal1);
-
-            sleep(HZ/20);
+            _DEBUG_PRINTF("ABR n_abnormal: %u %u",
+                        ser_port.n_abnormal0, ser_port.n_abnormal1);
         }
 #endif
         else

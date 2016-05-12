@@ -19,79 +19,100 @@
  *
  ****************************************************************************/
 #include <stdint.h>
-#include "kernel.h"
-#include "uc8702.h"
+#include <stdbool.h>
+
+#include "config.h"
+#include "system.h"
+
+#include "uart-target.h"
+#include "uc870x.h"
 
 
 /*
- * s5l8702 UART controller (UC8702)
+ * UC870x: UART controller for s5l870x
  */
 
 /* Rx related masks */
+#if CONFIG_CPU == S5L8700
+#define UTRSTAT_RX_RELATED_INTS (UTRSTAT_RX_INT_BIT | UTRSTAT_ERR_INT_BIT)
+#define UCON_RX_RELATED_INTS    (UCON_RX_INT_BIT | UCON_ERR_INT_BIT)
+
+#elif CONFIG_CPU == S5L8701
 #define UTRSTAT_RX_RELATED_INTS \
-                (UTRSTAT_RX_INT_BIT | UTRSTAT_RX_TOUT_INT_BIT | \
-                UTRSTAT_ERR_INT_BIT | UTRSTAT_AUTOBR_INT_BIT)
+        (UTRSTAT_RX_INT_BIT | UTRSTAT_ERR_INT_BIT | UTRSTAT_AUTOBR_INT_BIT)
 #define UCON_RX_RELATED_INTS \
-                (UCON_RX_INT_BIT | UCON_RX_TOUT_INT_BIT | \
-                UCON_ERR_INT_BIT | UCON_AUTOBR_INT_BIT)
+        (UCON_RX_INT_BIT | UCON_ERR_INT_BIT | UCON_AUTOBR_INT_BIT)
+
+#else /* CONFIG_CPU == S5L8702 */
+#define UTRSTAT_RX_RELATED_INTS \
+        (UTRSTAT_RX_INT_BIT | UTRSTAT_ERR_INT_BIT | \
+        UTRSTAT_AUTOBR_INT_BIT | UTRSTAT_RX_TOUT_INT_BIT)
+#define UCON_RX_RELATED_INTS \
+        (UCON_RX_INT_BIT | UCON_ERR_INT_BIT | \
+        UCON_AUTOBR_INT_BIT | UCON_RX_TOUT_INT_BIT)
+#endif
+
+#define UART_PORT_BASE(u,i)     (((u)->baddr) + (u)->port_off * (i))
 
 /* Initialization */
-static void uartc_port_id_reset(struct uartc* uartc, int id)
+static void uartc_reset_port_id(const struct uartc* uartc, int port_id)
 {
-    uint32_t baddr = UART_PORT_BASE(uartc->baddr, id);
+    uart_target_disable_irq(uartc->id, port_id);
+    uart_target_disable_gpio(uartc->id, port_id);
 
     /* set port registers to default reset values */
+    uint32_t baddr = UART_PORT_BASE(uartc, port_id);
     UCON(baddr) = 0;
     ULCON(baddr) = 0;
     UMCON(baddr) = 0;
     UFCON(baddr) = UFCON_RX_FIFO_RST_BIT | UFCON_TX_FIFO_RST_BIT;
-    /* clear all interrupts */
-    UTRSTAT(baddr) = UTRSTAT_RX_RELATED_INTS
-                   | UTRSTAT_TX_INT_BIT
-                   | UTRSTAT_MODEM_INT_BIT;
+    UTRSTAT(baddr) = ~0; /* clear all interrupts */
     UBRDIV(baddr) = 0;
+#if CONFIG_CPU == S5L8702
     UBRCONTX(baddr) = 0;
     UBRCONRX(baddr) = 0;
+#endif
 
-    uartc->port_l[id] = (void*)0;
+    uartc->port_l[port_id] = (void*)0;
 }
 
-static void uartc_reset(struct uartc* uartc)
+static void uartc_reset(const struct uartc* uartc)
 {
-    for (int id = 0; id < UART_PORT_MAX; id++)
-        uartc_port_id_reset(uartc, id);
+    for (int port_id = 0; port_id < uartc->n_ports; port_id++)
+        uartc_reset_port_id(uartc, port_id);
 }
 
-void uartc_open(struct uartc* uartc)
-                __attribute__((alias("uartc_reset")));
+void uartc_open(const struct uartc *uartc)
+{
+    uart_target_enable_clocks(uartc->id);
+    uartc_reset(uartc);
+}
 
-void uartc_close(struct uartc* uartc)
-                __attribute__((alias("uartc_reset")));
+void uartc_close(const struct uartc *uartc)
+{
+    uartc_reset(uartc);
+    uart_target_disable_clocks(uartc->id);
+}
 
 void uartc_port_open(struct uartc_port *port)
 {
-    struct uartc *uartc = port->uartc;
-    uint32_t baddr = UART_PORT_BASE(uartc->baddr, port->id);
+    const struct uartc *uartc = port->uartc;
+    uint32_t baddr = UART_PORT_BASE(uartc, port->id);
 
-    port->baddr = baddr;
-    port->utrstat_int_mask = (port->rx_cb ? UTRSTAT_RX_RELATED_INTS : 0)
-                           | (port->tx_cb ? UTRSTAT_TX_INT_BIT : 0);
-    port->abr_aborted = 0;
+    uart_target_enable_gpio(uartc->id, port->id);
 
     /* disable Tx/Rx and mask all interrupts */
     UCON(baddr) = 0;
 
     /* clear all interrupts */
-    UTRSTAT(baddr) = UTRSTAT_RX_RELATED_INTS
-                   | UTRSTAT_TX_INT_BIT
-                   | UTRSTAT_MODEM_INT_BIT;
+    UTRSTAT(baddr) = ~0;
 
     /* configure registers */
     UFCON(baddr) = UFCON_FIFO_ENABLE_BIT
-             | UFCON_RX_FIFO_RST_BIT
-             | UFCON_TX_FIFO_RST_BIT
-             | ((port->rx_trg & UFCON_RX_FIFO_TRG_MASK) << UFCON_RX_FIFO_TRG_POS)
-             | ((port->tx_trg & UFCON_TX_FIFO_TRG_MASK) << UFCON_TX_FIFO_TRG_POS);
+         | UFCON_RX_FIFO_RST_BIT
+         | UFCON_TX_FIFO_RST_BIT
+         | ((port->rx_trg & UFCON_RX_FIFO_TRG_MASK) << UFCON_RX_FIFO_TRG_POS)
+         | ((port->tx_trg & UFCON_TX_FIFO_TRG_MASK) << UFCON_TX_FIFO_TRG_POS);
 
     UMCON(baddr) = UMCON_RTS_BIT; /* activate nRTS (low level) */
 
@@ -101,38 +122,59 @@ void uartc_port_open(struct uartc_port *port)
                 | (port->rx_cb ? UCON_RX_RELATED_INTS|UCON_RX_TOUT_EN_BIT : 0)
                 | (port->tx_cb ? UCON_TX_INT_BIT : 0);
 
-    /* register port on parent controller */
+    /* init and register port struct */
+    port->baddr = baddr;
+    port->utrstat_int_mask = (port->rx_cb ? UTRSTAT_RX_RELATED_INTS : 0)
+                           | (port->tx_cb ? UTRSTAT_TX_INT_BIT : 0);
+#if CONFIG_CPU != S5L8700
+    port->abr_aborted = 0;
+#endif
     uartc->port_l[port->id] = port;
+
+    /* enable interrupts */
+    uart_target_clear_irq(uartc->id, port->id);
+    /*if (port->utrstat_int_mask)*/
+    uart_target_enable_irq(uartc->id, port->id);
 }
 
 void uartc_port_close(struct uartc_port *port)
 {
-    uartc_port_id_reset(port->uartc, port->id);
+    uartc_reset_port_id(port->uartc, port->id);
 }
 
 /* Configuration */
-void uartc_port_config(struct uartc_port *port, unsigned int speed,
-                    uint8_t data_bits, uint8_t parity, uint8_t stop_bits)
+void uartc_port_config(struct uartc_port *port,
+                uint8_t data_bits, uint8_t parity, uint8_t stop_bits)
 {
-    uint32_t baddr = port->baddr;
-
-    ULCON(baddr) = ((parity & ULCON_PARITY_MASK) << ULCON_PARITY_POS)
-                 | ((stop_bits & ULCON_STOP_BITS_MASK) << ULCON_STOP_BITS_POS)
-                 | ((data_bits & ULCON_DATA_BITS_MASK) << ULCON_DATA_BITS_POS);
-
-    uartc_port_set_bitrate(port, speed);
+    ULCON(port->baddr) = ((parity & ULCON_PARITY_MASK) << ULCON_PARITY_POS)
+                | ((stop_bits & ULCON_STOP_BITS_MASK) << ULCON_STOP_BITS_POS)
+                | ((data_bits & ULCON_DATA_BITS_MASK) << ULCON_DATA_BITS_POS);
 }
 
-void uartc_port_set_bitrate(struct uartc_port *port, unsigned int speed)
+/* set bitrate using precalculated values */
+void uartc_port_set_bitrate_raw(struct uartc_port *port, uint32_t brdata)
 {
     uint32_t baddr = port->baddr;
+    UBRDIV(baddr) = brdata & 0xff;
+#if CONFIG_CPU == S5L8702
+    UBRCONRX(baddr) = brdata >> 8;
+    UBRCONTX(baddr) = brdata >> 8;
+#endif
+}
+
+#if 0
+/* calculate values to set real bitrate as close as possible to the
+   requested speed */
+void uartc_port_set_bitrate(struct uartc_port *port, unsigned int speed)
+{
     int uclk = port->clkhz;
 
     /* Real baud width in UCLK/16 ticks: trunc(UCLK/(16*speed) + 0.5) */
     int brdiv = (uclk + (speed << 3)) / (speed << 4);
 
-    UBRDIV(baddr) = brdiv - 1;
+    uint32_t brdata = brdiv - 1;
 
+#if CONFIG_CPU == S5L8702
     /* Fine adjust:
      *
      * Along the whole frame, insert/remove "jittered" bauds when needed
@@ -158,7 +200,6 @@ void uartc_port_set_bitrate(struct uartc_port *port, unsigned int speed)
 
     int err_width = 0;
     uint32_t brcon = 0;
-    /* TODO: for (bit < configured frame length) */
     for (int bit = 0; bit < UC_FRAME_MAX_LEN; bit++) {
         err_width += baud_err_width;
         /* adjust to the nearest width */
@@ -168,24 +209,25 @@ void uartc_port_set_bitrate(struct uartc_port *port, unsigned int speed)
         }
     }
 
-    UBRCONRX(baddr) = brcon;
-    UBRCONTX(baddr) = brcon;
-}
+    brdata |= (brcon << 8);
+#endif /* CONFIG_CPU == S5L8702 */
 
-/* TODO: uarc_port_set_bitrate_raw() using precalculated values */
+    uartc_port_set_rawbr(port, brdata);
+}
+#endif
 
 /* Select Tx/Rx modes: disabling Tx/Rx resets HW, including
    FIFOs and shift registers */
 void uartc_port_set_rx_mode(struct uartc_port *port, uint32_t mode)
 {
     UCON(port->baddr) = (mode << UCON_RX_MODE_POS) |
-            (UCON(port->baddr) & ~(UCON_RX_MODE_MASK << UCON_RX_MODE_POS));
+        (_UCON_RD(port->baddr) & ~(UCON_RX_MODE_MASK << UCON_RX_MODE_POS));
 }
 
 void uartc_port_set_tx_mode(struct uartc_port *port, uint32_t mode)
 {
     UCON(port->baddr) = (mode << UCON_TX_MODE_POS) |
-            (UCON(port->baddr) & ~(UCON_TX_MODE_MASK << UCON_TX_MODE_POS));
+        (_UCON_RD(port->baddr) & ~(UCON_TX_MODE_MASK << UCON_TX_MODE_POS));
 }
 
 /* Transmit */
@@ -197,7 +239,7 @@ bool uartc_port_tx_ready(struct uartc_port *port)
 void uartc_port_tx_byte(struct uartc_port *port, uint8_t ch)
 {
     UTXH(port->baddr) = ch;
-#ifdef UC8702_DEBUG
+#ifdef UC870X_DEBUG
     port->n_tx_bytes++;
 #endif
 }
@@ -227,6 +269,7 @@ uint8_t uartc_port_read_byte(struct uartc_port *port)
     return uartc_port_rx_byte(port);
 }
 
+#if CONFIG_CPU != S5L8700
 /* Autobauding */
 static inline int uartc_port_abr_status(struct uartc_port *port)
 {
@@ -236,7 +279,7 @@ static inline int uartc_port_abr_status(struct uartc_port *port)
 void uartc_port_abr_start(struct uartc_port *port)
 {
     port->abr_aborted = 0;
-    UCON(port->baddr) |= UCON_AUTOBR_START_BIT;
+    UCON(port->baddr) = _UCON_RD(port->baddr) | UCON_AUTOBR_START_BIT;
 }
 
 void uartc_port_abr_stop(struct uartc_port *port)
@@ -255,13 +298,14 @@ void uartc_port_abr_stop(struct uartc_port *port)
          */
         port->abr_aborted = 1;
     else
-        UCON(port->baddr) &= ~UCON_AUTOBR_START_BIT;
+        UCON(port->baddr) = _UCON_RD(port->baddr) & ~UCON_AUTOBR_START_BIT;
 }
+#endif /* CONFIG_CPU != S5L8700 */
 
 /* ISR */
-void ICODE_ATTR uartc_callback(struct uartc *uartc, int id)
+void ICODE_ATTR uartc_callback(const struct uartc* uartc, int port_id)
 {
-    struct uartc_port *port = uartc->port_l[id];
+    struct uartc_port *port = uartc->port_l[port_id];
     uint32_t baddr = port->baddr;
 
     /* filter registered interrupts */
@@ -274,23 +318,25 @@ void ICODE_ATTR uartc_callback(struct uartc *uartc, int id)
     if (ints & UTRSTAT_RX_RELATED_INTS)
     {
         int len = 0;
+#if CONFIG_CPU != S5L8700
         uint32_t abr_cnt = 0;
 
         if (ints & UTRSTAT_AUTOBR_INT_BIT)
         {
             if (uartc_port_abr_status(port) == UABRSTAT_STATUS_COUNTING) {
-                #ifdef UC8702_DEBUG
-                if (UCON(baddr) & UCON_AUTOBR_START_BIT) port->n_abnormal0++;
+                #ifdef UC870X_DEBUG
+                if (_UCON_RD(baddr) & UCON_AUTOBR_START_BIT) port->n_abnormal0++;
                 else port->n_abnormal1++;
                 #endif
                 /* try to fix abnormal situations */
-                UCON(baddr) |= UCON_AUTOBR_START_BIT;
+                UCON(baddr) = _UCON_RD(baddr) | UCON_AUTOBR_START_BIT;
             }
             else if (!port->abr_aborted)
                 abr_cnt = UABRCNT(baddr);
         }
 
         if (ints & (UTRSTAT_RX_RELATED_INTS ^ UTRSTAT_AUTOBR_INT_BIT))
+#endif /* CONFIG_CPU != S5L8700 */
         {
             /* get FIFO count */
             uint32_t ufstat = UFSTAT(baddr);
@@ -304,15 +350,19 @@ void ICODE_ATTR uartc_callback(struct uartc *uartc, int id)
             }
         }
 
-        /* 'abr_cnt' is zero when no ABR interrupt exists, 'len'
-         * might be zero due to RX_TOUT interrupts are raised by
-         * the hardware even when RX FIFO is empty.
-         * When overrun, it is marked on the first readed error:
+        /* 'len' might be zero due to RX_TOUT interrupts are
+         * raised by the hardware even when RX FIFO is empty.
+         * When overrun, it is marked on the first error:
          * overrun = len ? (rx_err[0] & UERSTAT_OVERRUN_BIT) : 0
          */
+#if CONFIG_CPU == S5L8700
+        port->rx_cb(len, port->rx_data, port->rx_err);
+#else
+        /* 'abr_cnt' is zero when no ABR interrupt exists */
         port->rx_cb(len, port->rx_data, port->rx_err, abr_cnt);
+#endif
 
-        #ifdef UC8702_DEBUG
+#ifdef UC870X_DEBUG
         if (len) {
             port->n_rx_bytes += len;
             if (port->rx_err[0] & UERSTAT_OVERRUN_BIT)
@@ -326,24 +376,25 @@ void ICODE_ATTR uartc_callback(struct uartc *uartc, int id)
                     port->n_break_detect++;
             }
         }
-        #endif
+#endif
     }
 
-    #if 0
+#if 0
     /* not used and not tested */
     if (ints & UTRSTAT_TX_INT_BIT)
     {
         port->tx_cb(UART_FIFO_SIZE - ((UFSTAT(baddr) & \
                     UFSTAT_TX_FIFO_CNT_MASK) >> UFSTAT_TX_FIFO_CNT_POS));
     }
-    #endif
+#endif
 }
 
 
-#ifdef UC8702_DEBUG
+#ifdef UC870X_DEBUG
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
+#if CONFIG_CPU == S5L8702
 static int get_bitrate(int uclk, int brdiv, int brcon, int frame_len)
 {
     logf("get_bitrate(%d, %d, 0x%08x, %d)", uclk, brdiv, brcon, frame_len);
@@ -375,6 +426,7 @@ static int get_bitrate(int uclk, int brdiv, int brcon, int frame_len)
 
     return avg_speed;
 }
+#endif /* CONFIG_CPU == S5L8702 */
 
 void uartc_port_get_line_info(struct uartc_port *port,
                 int *tx_status, int *rx_status,
@@ -382,25 +434,32 @@ void uartc_port_get_line_info(struct uartc_port *port,
 {
     uint32_t baddr = port->baddr;
 
-    uint32_t ucon = UCON(baddr);
-    if (*tx_status)
+    uint32_t ucon = _UCON_RD(baddr);
+    if (tx_status)
         *tx_status = ((ucon >> UCON_TX_MODE_POS) & UCON_TX_MODE_MASK) ? 1 : 0;
-    if (*rx_status)
+    if (rx_status)
         *rx_status = ((ucon >> UCON_RX_MODE_POS) & UCON_RX_MODE_MASK) ? 1 : 0;
 
     uint32_t ulcon = ULCON(baddr);
     int n_data = ((ulcon >> ULCON_DATA_BITS_POS) & ULCON_DATA_BITS_MASK) + 5;
     int n_stop = ((ulcon >> ULCON_STOP_BITS_POS) & ULCON_STOP_BITS_MASK) + 1;
     int parity = (ulcon >> ULCON_PARITY_POS) & ULCON_PARITY_MASK;
-    int frame_len = 1 + n_data + (parity ? 1 : 0) + n_stop;
 
     uint32_t brdiv = UBRDIV(baddr) + 1;
-    if (*tx_speed)
+#if CONFIG_CPU == S5L8702
+    int frame_len = 1 + n_data + (parity ? 1 : 0) + n_stop;
+    if (tx_speed)
         *tx_speed = get_bitrate(port->clkhz, brdiv, UBRCONTX(baddr), frame_len);
-    if (*rx_speed)
+    if (rx_speed)
         *rx_speed = get_bitrate(port->clkhz, brdiv, UBRCONRX(baddr), frame_len);
+#else
+    /* speed = truncate(UCLK/(16*brdiv) + 0.5) */
+    int speed = (port->clkhz + (brdiv << 3)) / (brdiv << 4);
+    if (tx_speed) *tx_speed = speed;
+    if (rx_speed) *rx_speed = speed;
+#endif
 
-    if (*line_cfg) {
+    if (line_cfg) {
         line_cfg[0] = '0' + n_data;
         line_cfg[1] = ((parity == ULCON_PARITY_NONE)    ? 'N' :
                       ((parity == ULCON_PARITY_EVEN)    ? 'E' :
@@ -412,18 +471,18 @@ void uartc_port_get_line_info(struct uartc_port *port,
     }
 }
 
+#if CONFIG_CPU != S5L8700
 /* Autobauding */
-int uartc_port_get_abr_info(struct uartc_port *port, unsigned int *abr_cnt)
+int uartc_port_get_abr_info(struct uartc_port *port, uint32_t *abr_cnt)
 {
     int status;
     uint32_t abr_status;
-    uint32_t baddr = port->baddr;
 
     int flags = disable_irq_save();
 
     abr_status = uartc_port_abr_status(port);
 
-    if (UCON(port->baddr) & UCON_AUTOBR_START_BIT) {
+    if (_UCON_RD(port->baddr) & UCON_AUTOBR_START_BIT) {
         if (abr_status == UABRSTAT_STATUS_COUNTING)
             status = ABR_INFO_ST_COUNTING;  /* waiting for rising edge */
         else
@@ -436,11 +495,12 @@ int uartc_port_get_abr_info(struct uartc_port *port, unsigned int *abr_cnt)
             status = ABR_INFO_ST_IDLE;
     }
 
-    if (*abr_cnt)
-        *abr_cnt = UABRCNT(baddr);
+    if (abr_cnt)
+        *abr_cnt = UABRCNT(port->baddr);
 
     restore_irq(flags);
 
     return status;
 }
-#endif  /* UC8702_DEBUG */
+#endif /* CONFIG_CPU != S5L8700 */
+#endif /* UC870X_DEBUG */

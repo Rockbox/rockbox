@@ -1610,7 +1610,7 @@ target/arm/s5l8702/ipod6g/pmu-ipod6g.c
 target/arm/s5l8702/ipod6g/rtc-ipod6g.c
 target/arm/s5l8700/usb-nano2g-6g.c
 #ifdef HAVE_SERIAL
-target/arm/s5l8702/uc8702.c
+target/arm/uc870x.c
 target/arm/s5l8702/uart-s5l8702.c
 target/arm/s5l8702/ipod6g/serial-ipod6g.c
 #endif

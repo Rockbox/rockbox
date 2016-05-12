@@ -24,9 +24,9 @@
 #include "panic.h"
 #include "system-target.h"
 #include "pmu-target.h"
+#include "uart-target.h"
 #include "gpio-s5l8702.h"
 #include "dma-s5l8702.h"
-#include "uart-s5l8702.h"
 #include "clocking-s5l8702.h"
 
 #define default_interrupt(name) \

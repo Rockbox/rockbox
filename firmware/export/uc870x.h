@@ -18,32 +18,27 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __UC8702_H__
-#define __UC8702_H__
+#ifndef __UC870X_H__
+#define __UC870X_H__
 
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "config.h"
+#include "system.h"
+#include "uart-target.h"
 
-/* s5l8702 UART controller (UC8702):
+
+/*
+ * UC870x: UART controller for s5l870x
  *
- * This UART is similar to the UART included in s5l8700 (see also
- * s3c2416 and s3c6400 datasheets), UC8702 adds fine tunning for
- * Tx/Rx bitrate and autobauding.
+ * This UART is similar to the UART described in s5l8700 datasheet,
+ * (see also s3c2416 and s3c6400 datasheets). On s5l8701/2 the UC870x
+ * includes autobauding, and fine tunning for Tx/Rx on s5l8702.
  */
 
-/*#define UC8702_DEBUG*/
-
 /*
- * uc8702 HW definitions
- */
-#define UART_PORT_MAX           4
-#define UART_FIFO_SIZE          16
-
-#define UART_PORT_BASE(b,i)     ((b) + 0x4000 * (i))
-
-/*
- * controller registers
+ * Controller registers
  */
 #define REG32_PTR_T volatile uint32_t *
 
@@ -58,10 +53,14 @@
 #define UTXH(ba)        (*((REG32_PTR_T)((ba) + 0x20))) /* transmission hold */
 #define URXH(ba)        (*((REG32_PTR_T)((ba) + 0x24))) /* receive buffer */
 #define UBRDIV(ba)      (*((REG32_PTR_T)((ba) + 0x28))) /* baud rate divisor */
+#if CONFIG_CPU != S5L8700
 #define UABRCNT(ba)     (*((REG32_PTR_T)((ba) + 0x2c))) /* autobaud counter */
 #define UABRSTAT(ba)    (*((REG32_PTR_T)((ba) + 0x30))) /* autobaud status */
+#endif
+#if CONFIG_CPU == S5L8702
 #define UBRCONTX(ba)    (*((REG32_PTR_T)((ba) + 0x34))) /* Tx frame config */
 #define UBRCONRX(ba)    (*((REG32_PTR_T)((ba) + 0x38))) /* Rx frame config */
+#endif
 
 /* ULCON register */
 #define ULCON_DATA_BITS_MASK        0x3
@@ -107,13 +106,31 @@
 #define UCON_CLKSEL_PCLK            0   /* internal */
 #define UCON_CLKSEL_ECLK            1   /* external */
 
+#if CONFIG_CPU == S5L8702
 #define UCON_RX_TOUT_INT_BIT        (1 << 11)   /* Rx timeout INT enable */
+#endif
 #define UCON_RX_INT_BIT             (1 << 12)   /* Rx INT enable */
 #define UCON_TX_INT_BIT             (1 << 13)   /* Tx INT enable */
 #define UCON_ERR_INT_BIT            (1 << 14)   /* Rx error INT enable */
 #define UCON_MODEM_INT_BIT          (1 << 15)   /* modem INT enable (TBC) */
+#if CONFIG_CPU != S5L8700
 #define UCON_AUTOBR_INT_BIT         (1 << 16)   /* autobauding INT enable */
 #define UCON_AUTOBR_START_BIT       (1 << 17)   /* autobauding start/stop */
+#endif
+
+#if CONFIG_CPU == S5L8701
+/* WTF! ABR bits are swapped on reads, so don't forget to
+   always use this workaround to read the UCON register. */
+static inline uint32_t _UCON_RD(uint32_t ba)
+{
+    uint32_t ucon = UCON(ba);
+    return ((ucon & 0xffff) |
+           ((ucon & UCON_AUTOBR_INT_BIT) << 1) |
+           ((ucon & UCON_AUTOBR_START_BIT) >> 1));
+}
+#else
+#define _UCON_RD(ba) UCON(ba)
+#endif
 
 /* UFCON register */
 #define UFCON_FIFO_ENABLE_BIT       (1 << 0)
@@ -142,12 +159,16 @@
 #define UTRSTAT_RXBUF_RDY_BIT       (1 << 0)
 #define UTRSTAT_TXBUF_EMPTY_BIT     (1 << 1)
 #define UTRSTAT_TX_EMPTY_BIT        (1 << 2)
+#if CONFIG_CPU == S5L8702
 #define UTRSTAT_RX_TOUT_INT_BIT     (1 << 3)    /* Rx timeout INT status */
+#endif
 #define UTRSTAT_RX_INT_BIT          (1 << 4)
 #define UTRSTAT_TX_INT_BIT          (1 << 5)
 #define UTRSTAT_ERR_INT_BIT         (1 << 6)
-#define UTRSTAT_MODEM_INT_BIT       (1 << 7)    /* modem INT status (TBC) */
+#define UTRSTAT_MODEM_INT_BIT       (1 << 7)    /* modem INT status */
+#if CONFIG_CPU != S5L8700
 #define UTRSTAT_AUTOBR_INT_BIT      (1 << 8)    /* autobauding INT status */
+#endif
 
 /* UERSTAT register */
 #define UERSTAT_OVERRUN_BIT         (1 << 0)
@@ -170,6 +191,8 @@
 #define UMSTAT_CTS_ACTIVE_BIT       (1 << 0)
 #define UMSTAT_CTS_DELTA_BIT        (1 << 4)
 
+
+#if CONFIG_CPU == S5L8702
 /* Bitrate:
  *
  * Master UCLK clock is divided by 16 to serialize data, UBRDIV is
@@ -192,7 +215,10 @@
 #define UBRCON_JITTER_INC           1   /* increment 1/16 bit width */
 #define UBRCON_JITTER_UNUSED        2   /* does nothing */
 #define UBRCON_JITTER_DEC           3   /* decremet 1/16 bit width */
+#endif /* CONFIG_CPU == S5L8702 */
 
+
+#if CONFIG_CPU != S5L8700
 /* Autobauding:
  *
  * Initial UABRSTAT is NOT_INIT, it goes to READY when either of
@@ -223,6 +249,13 @@
 #define UABRSTAT_STATUS_NOT_INIT    0   /* initial status */
 #define UABRSTAT_STATUS_READY       1   /* machine is ready */
 #define UABRSTAT_STATUS_COUNTING    2   /* count in progress */
+#endif /* CONFIG_CPU != S5L8700 */
+
+
+/*
+ * other HW definitions
+ */
+#define UART_FIFO_SIZE      16
 
 
 /*
@@ -231,58 +264,70 @@
 struct uartc
 {
     /* static configuration */
-    const uint32_t baddr;
-    /* private */
-    struct uartc_port *port_l[UART_PORT_MAX];
+    uint8_t id;
+    uint8_t n_ports;
+    uint16_t port_off;
+    uint32_t baddr;
+    struct uartc_port **port_l;
 };
 
 struct uartc_port
 {
     /* static configuration */
-    struct uartc * const uartc;
+    const struct uartc * const uartc;
     const uint8_t id;                   /* port number */
     const uint8_t rx_trg;               /* UFCON_RX_FIFO_TRG_xxx */
     const uint8_t tx_trg;               /* UFCON_TX_FIFO_TRG_xxx */
     const uint8_t clksel;               /* UFCON_CLKSEL_xxx */
     const uint32_t clkhz;               /* UCLK (PCLK or ECLK) frequency */
     void (* const tx_cb) (int len);     /* ISRs */
+#if CONFIG_CPU != S5L8700
     void (* const rx_cb) (int len, char *data, char *err, uint32_t abr_cnt);
+#else
+    void (* const rx_cb) (int len, char *data, char *err);
+#endif
 
     /* private */
     uint32_t baddr;
     uint32_t utrstat_int_mask;
-    bool abr_aborted;
     uint8_t rx_data[UART_FIFO_SIZE];    /* data buffer for rx_cb */
     uint8_t rx_err[UART_FIFO_SIZE];     /* error buffer for rx_cb */
+#if CONFIG_CPU != S5L8700
+    bool abr_aborted;
+#endif
 
-#ifdef UC8702_DEBUG
+#ifdef UC870X_DEBUG
     uint32_t n_tx_bytes;
     uint32_t n_rx_bytes;
     uint32_t n_ovr_err;
     uint32_t n_parity_err;
     uint32_t n_frame_err;
     uint32_t n_break_detect;
+#if CONFIG_CPU != S5L8700
+    /* autobauding */
     uint32_t n_abnormal0;
     uint32_t n_abnormal1;
+#endif
 #endif
 };
 
 
 /*
- * uc8702 low level API
+ * uc870x low level API
  */
 
 /* Initialization */
-void uartc_open(struct uartc* uartc);
-void uartc_close(struct uartc* uartc);
+void uartc_open(const struct uartc* uartc);
+void uartc_close(const struct uartc* uartc);
 void uartc_port_open(struct uartc_port *port);
 void uartc_port_close(struct uartc_port *port);
 void uartc_port_rx_onoff(struct uartc_port *port, bool onoff);
 void uartc_port_tx_onoff(struct uartc_port *port, bool onoff);
 
 /* Configuration */
-void uartc_port_config(struct uartc_port *port, unsigned int speed,
-                    uint8_t data_bits, uint8_t parity, uint8_t stop_bits);
+void uartc_port_config(struct uartc_port *port,
+                uint8_t data_bits, uint8_t parity, uint8_t stop_bits);
+void uartc_port_set_bitrate_raw(struct uartc_port *port, uint32_t brdata);
 void uartc_port_set_bitrate(struct uartc_port *port, unsigned int speed);
 void uartc_port_set_rx_mode(struct uartc_port *port, uint32_t mode);
 void uartc_port_set_tx_mode(struct uartc_port *port, uint32_t mode);
@@ -297,14 +342,22 @@ bool uartc_port_rx_ready(struct uartc_port *port);
 uint8_t uartc_port_rx_byte(struct uartc_port *port);
 uint8_t uartc_port_read_byte(struct uartc_port *port);
 
+#if CONFIG_CPU != S5L8700
 /* Autobauding */
 void uartc_port_abr_start(struct uartc_port *port);
 void uartc_port_abr_stop(struct uartc_port *port);
+#endif
 
 /* ISR */
-void uartc_callback(struct uartc *uartc, int dev);
+void uartc_callback(const struct uartc *uartc, int port_id);
 
-#ifdef UC8702_DEBUG
+/* Debug */
+#ifdef UC870X_DEBUG
+void uartc_port_get_line_info(struct uartc_port *port,
+                int *tx_status, int *rx_status,
+                int *tx_speed, int *rx_speed, char *line_cfg);
+
+#if CONFIG_CPU != S5L8700
 enum {
     ABR_INFO_ST_IDLE,
     ABR_INFO_ST_LAUNCHED,
@@ -312,10 +365,8 @@ enum {
     ABR_INFO_ST_ABNORMAL
 };
 
-void uartc_port_get_line_info(struct uartc_port *port,
-                int *tx_status, int *rx_status,
-                int *tx_speed, int *rx_speed, char *line_cfg);
-
-int uartc_port_get_abr_info(struct uartc_port *port, unsigned int *abr_cnt);
+int uartc_port_get_abr_info(struct uartc_port *port, uint32_t *abr_cnt);
 #endif
-#endif /* __UC8702_H__ */
+#endif /* UC870X_DEBUG */
+
+#endif /* __UC870X_H__ */
