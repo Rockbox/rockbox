@@ -232,7 +232,9 @@
 /* Define this if you can switch on/off the accessory power supply */
 #define HAVE_ACCESSORY_SUPPLY
 //#define IPOD_ACCESSORY_PROTOCOL
-//#define HAVE_SERIAL
+#ifdef LOGF_SERIAL
+#define HAVE_SERIAL
+#endif
 
 /* Define this, if you can switch on/off the lineout */
 #define HAVE_LINEOUT_POWEROFF

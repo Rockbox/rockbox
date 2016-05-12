@@ -1582,6 +1582,11 @@ target/arm/s5l8700/ipodnano2g/nand-nano2g.c
 target/arm/s5l8700/ipodnano2g/pmu-nano2g.c
 target/arm/s5l8700/ipodnano2g/rtc-nano2g.c
 target/arm/s5l8700/usb-nano2g-6g.c
+#ifdef HAVE_SERIAL
+target/arm/uc870x.c
+target/arm/s5l8700/uart-s5l8701.c
+target/arm/s5l8700/ipodnano2g/serial-nano2g.c
+#endif
 #ifndef BOOTLOADER
 target/arm/s5l8700/ipodnano2g/audio-nano2g.c
 target/arm/s5l8700/ipodnano2g/piezo-nano2g.c
