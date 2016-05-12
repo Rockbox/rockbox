@@ -118,6 +118,13 @@
 #define PLLLOCK                 (*(REG32_PTR_T)(0x3C500020))     /* PLL lock status register */
 #define PLLCON                  (*(REG32_PTR_T)(0x3C500024))     /* PLL control register */
 #define PWRCON                  (*(REG32_PTR_T)(0x3C500028))     /* Clock power control register */
+#if CONFIG_CPU==S5L8701
+#define    CLOCKGATE_UARTC0     8
+#define    CLOCKGATE_UARTC1     9
+#define    CLOCKGATE_UARTC2     13
+#else /* S5L8700 */
+#define    CLOCKGATE_UARTC      8
+#endif
 #define PWRMODE                 (*(REG32_PTR_T)(0x3C50002C))     /* Power mode control register */
 #define SWRCON                  (*(REG32_PTR_T)(0x3C500030))     /* Software reset control register */
 #define RSTSR                   (*(REG32_PTR_T)(0x3C500034))     /* Reset status register */
@@ -136,11 +143,16 @@
 #define    INTMSK_TIMERD        (1<<5)
 #define    INTMSK_ECC           (1<<19)
 #define    INTMSK_USB_OTG       (1<<16)
+#define    INTMSK_UART0         (0)     /* Unknown */
+#define    INTMSK_UART1         (1<<12)
+#define    INTMSK_UART2         (1<<7)
 #else
 #define    INTMSK_TIMERA        (1<<5)
 #define    INTMSK_TIMERB        (1<<7)
 #define    INTMSK_TIMERC        (1<<8)
 #define    INTMSK_TIMERD        (1<<9)
+#define    INTMSK_UART0         (1<<22)
+#define    INTMSK_UART1         (1<<14)
 #endif
 #define PRIORITY                (*(REG32_PTR_T)(0x39C0000C))     /* IRQ priority control register */
 #define INTPND                  (*(REG32_PTR_T)(0x39C00010))     /* Indicates the interrupt request status. */
@@ -577,6 +589,29 @@
 #define PCON_SDRAM              (*(REG32_PTR_T)(0x3CF000F4))     /* Configures the pins of port sdram */
 
 /* 25. UART */
+#if CONFIG_CPU==S5L8701
+/* s5l8701 UC870X HW: 3 UARTC, 1 port per UARTC */
+#define S5L8701_N_UARTC         3
+#define S5L8701_N_PORTS         3
+
+#define UARTC0_BASE_ADDR        0x3CC00000
+#define UARTC0_N_PORTS          1
+#define UARTC0_PORT_OFFSET      0x0
+#define UARTC1_BASE_ADDR        0x3CC08000
+#define UARTC1_N_PORTS          1
+#define UARTC1_PORT_OFFSET      0x0
+#define UARTC2_BASE_ADDR        0x3CC0C000
+#define UARTC2_N_PORTS          1
+#define UARTC2_PORT_OFFSET      0x0
+
+#else
+/* s5l8700 UC870X HW: 1 UARTC, 2 ports */
+#define S5L8700_N_UARTC         1
+#define S5L8700_N_PORTS         2
+
+#define UARTC_BASE_ADDR         0x3CC00000
+#define UARTC_N_PORTS           2
+#define UARTC_PORT_OFFSET       0x8000
 
 /* UART 0 */
 #define ULCON0                  (*(REG32_PTR_T)(0x3CC00000))     /* Line Control Register */
@@ -603,6 +638,7 @@
 #define UTXH1                   (*(REG32_PTR_T)(0x3CC08020))     /* Transmit Buffer Register */
 #define URXH1                   (*(REG32_PTR_T)(0x3CC08024))     /* Receive Buffer Register */
 #define UBRDIV1                 (*(REG32_PTR_T)(0x3CC08028))     /* Baud Rate Divisor Register */
+#endif
 
 /* 26. LCD INTERFACE CONTROLLER */
 #if CONFIG_CPU==S5L8700

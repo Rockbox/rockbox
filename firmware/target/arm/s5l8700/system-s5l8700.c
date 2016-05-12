@@ -27,6 +27,7 @@
 #include "storage.h"
 #include "pmu-target.h"
 #endif
+#include "uart-target.h"
 
 /* MIUSDPARA_BOOST taken from OF (see crt0.S). MIUSDPARA_UNBOOST is derived
  * from MIUSDPARA_BOOST due to the fact that the minimum allowed DRAM timings 
@@ -63,7 +64,7 @@ default_interrupt(INT_DMA);
 default_interrupt(INT_ALARM_RTC);
 default_interrupt(INT_PRI_RTC);
 default_interrupt(RESERVED1);
-default_interrupt(INT_UART);
+default_interrupt(INT_UART1);
 default_interrupt(INT_USB_HOST);
 default_interrupt(INT_USB_FUNC);
 default_interrupt(INT_LCDC_0);
@@ -81,9 +82,10 @@ default_interrupt(RESERVED2);
 default_interrupt(INT_MSTICK);
 default_interrupt(INT_ADC_WAKEUP);
 default_interrupt(INT_ADC);
-default_interrupt(INT_UNK1);
-default_interrupt(INT_UNK2);
-default_interrupt(INT_UNK3);
+#if CONFIG_CPU==S5L8701
+default_interrupt(INT_UNK);
+default_interrupt(INT_UART2);
+#endif
 
 
 void INT_TIMER(void)
@@ -98,16 +100,16 @@ void INT_TIMER(void)
 #if CONFIG_CPU==S5L8701
 static void (* const irqvector[])(void) =
 { /* still 90% unverified and probably incorrect */
-    EXT0,EXT1,EXT2,EINT_VBUS,EINTG,INT_TIMER,INT_WDT,INT_UNK1,
-    INT_UNK2,INT_UNK3,INT_DMA,INT_ALARM_RTC,INT_PRI_RTC,RESERVED1,INT_UART,INT_USB_HOST,
-    INT_USB_FUNC,INT_LCDC_0,INT_LCDC_1,INT_CALM,INT_ATA,INT_UART0,INT_SPDIF_OUT,INT_ECC,
+    EXT0,EXT1,EXT2,EINT_VBUS,EINTG,INT_TIMER,INT_WDT,INT_UART2,
+    INT_UNK,INT_UNK,INT_DMA,INT_ALARM_RTC,INT_UART1,INT_UNK,INT_UNK,INT_USB_HOST,
+    INT_USB_FUNC,INT_LCDC_0,INT_LCDC_1,INT_CALM,INT_ATA,INT_UNK,INT_SPDIF_OUT,INT_ECC,
     INT_SDCI,INT_LCD,INT_WHEEL,INT_IIC,RESERVED2,INT_MSTICK,INT_ADC_WAKEUP,INT_ADC
 };
 #else
 static void (* const irqvector[])(void) =
 {
     EXT0,EXT1,EXT2,EINT_VBUS,EINTG,INT_TIMERA,INT_WDT,INT_TIMERB,
-    INT_TIMERC,INT_TIMERD,INT_DMA,INT_ALARM_RTC,INT_PRI_RTC,RESERVED1,INT_UART,INT_USB_HOST,
+    INT_TIMERC,INT_TIMERD,INT_DMA,INT_ALARM_RTC,INT_PRI_RTC,RESERVED1,INT_UART1,INT_USB_HOST,
     INT_USB_FUNC,INT_LCDC_0,INT_LCDC_1,INT_ECC,INT_CALM,INT_ATA,INT_UART0,INT_SPDIF_OUT,
     INT_SDCI,INT_LCD,INT_WHEEL,INT_IIC,RESERVED2,INT_MSTICK,INT_ADC_WAKEUP,INT_ADC
 };
@@ -116,16 +118,16 @@ static void (* const irqvector[])(void) =
 #if CONFIG_CPU==S5L8701
 static const char * const irqname[] =
 { /* still 90% unverified and probably incorrect */
-    "EXT0","EXT1","EXT2","EINT_VBUS","EINTG","INT_TIMER","INT_WDT","INT_UNK1",
-    "INT_UNK2","INT_UNK3","INT_DMA","INT_ALARM_RTC","INT_PRI_RTC","Reserved","INT_UART","INT_USB_HOST",
-    "INT_USB_FUNC","INT_LCDC_0","INT_LCDC_1","INT_CALM","INT_ATA","INT_UART0","INT_SPDIF_OUT","INT_ECC",
+    "EXT0","EXT1","EXT2","EINT_VBUS","EINTG","INT_TIMER","INT_WDT","INT_UART2",
+    "INT_UNK1","INT_UNK2","INT_DMA","INT_ALARM_RTC","INT_UART1","INT_UNK3","INT_UNK4","INT_USB_HOST",
+    "INT_USB_FUNC","INT_LCDC_0","INT_LCDC_1","INT_CALM","INT_ATA","INT_UNK5","INT_SPDIF_OUT","INT_ECC",
     "INT_SDCI","INT_LCD","INT_WHEEL","INT_IIC","Reserved","INT_MSTICK","INT_ADC_WAKEUP","INT_ADC"
 };
 #else
 static const char * const irqname[] =
 {
     "EXT0","EXT1","EXT2","EINT_VBUS","EINTG","INT_TIMERA","INT_WDT","INT_TIMERB",
-    "INT_TIMERC","INT_TIMERD","INT_DMA","INT_ALARM_RTC","INT_PRI_RTC","Reserved","INT_UART","INT_USB_HOST",
+    "INT_TIMERC","INT_TIMERD","INT_DMA","INT_ALARM_RTC","INT_PRI_RTC","Reserved","INT_UART1","INT_USB_HOST",
     "INT_USB_FUNC","INT_LCDC_0","INT_LCDC_1","INT_ECC","INT_CALM","INT_ATA","INT_UART0","INT_SPDIF_OUT",
     "INT_SDCI","INT_LCD","INT_WHEEL","INT_IIC","Reserved","INT_MSTICK","INT_ADC_WAKEUP","INT_ADC"
 };
@@ -171,6 +173,9 @@ void system_init(void)
 {
 #ifdef IPOD_NANO2G
     pmu_init();
+#endif
+#ifdef HAVE_SERIAL
+    uart_init();
 #endif
 }
 
