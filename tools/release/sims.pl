@@ -148,22 +148,11 @@ sub runone {
     print "Zip up the sim and associated files\n" if ($verbose);
     mkpath(dirname($newo));
     system("mv build-$dir $newo");
-    if ($cross) {
-        print "Find and copy SDL.dll\n" if ($verbose);
-        open(MAKE, "$newo/Makefile");
-        my $GCCOPTS=(grep(/^export GCCOPTS=/, <MAKE>))[0];
-        chomp($GCCOPTS);
-        (my $sdldll = $GCCOPTS) =~ s/^export GCCOPTS=.*-I([^ ]+)\/include\/SDL.*$/$1\/bin\/SDL.dll/;
-        print "Found $sdldll\n" if ($verbose);
-        `cp $sdldll ./$newo/`;
-        close(MAKE);
-    }
     my $toplevel = getcwd();
     chdir(dirname($newo));
     $cmd = "zip -9 -r -q \"".basename($newo)."\" "
        . "\"".basename($newo)."\"/rockboxui* "
        . "\"".basename($newo)."\"/UI256.bmp "
-       . "\"".basename($newo)."\"/SDL.dll "
        . "\"".basename($newo)."\"/simdisk ";
     print("$cmd\n") if($verbose);
     `$cmd`;

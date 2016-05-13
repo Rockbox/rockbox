@@ -255,7 +255,7 @@ simcc () {
  if [ "$win32crosscompile" = "yes" ]; then
    # We are crosscompiling
    # add cross-compiler option(s)
-   LDOPTS="$LDOPTS -mconsole"
+   LDOPTS="$LDOPTS -mconsole -static"
    output="$output.exe"
    winbuild="yes"
    CROSS_COMPILE=${CROSS_COMPILE:-"i586-mingw32msvc-"}
@@ -342,7 +342,7 @@ simcc () {
     else 
         # generic sdl-config checker
         GCCOPTS="$GCCOPTS `$sdl --cflags`"
-        LDOPTS="$LDOPTS `$sdl --libs`"
+        LDOPTS="$LDOPTS `$sdl --static-libs`"
     fi
  fi
  
