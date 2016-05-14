@@ -969,6 +969,8 @@ menu:
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     if (boost)
         rb->cpu_boost(true);
+    else
+        rb->cpu_boost(false);   /*force unboost at start to be safe*/
 #endif
 
     if (scandir) {
