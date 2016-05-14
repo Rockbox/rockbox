@@ -68,7 +68,7 @@ static uint8_t clockgate_uartc[S5L8701_N_UARTC] = {
     CLOCKGATE_UARTC0, CLOCKGATE_UARTC1, CLOCKGATE_UARTC2 };
 
 static int intmsk_uart[S5L8701_N_UARTC] = {
-    INTMSK_UART0, INTMSK_UART1, INTMSK_UART2 };
+    INTMSK_EINTG0, INTMSK_UART1, INTMSK_UART2 };
 
 /*
  * Device level functions specific to S5L8701
@@ -107,6 +107,7 @@ void uart_target_disable_gpio(int uart_id, int port_id)
 void uart_target_enable_irq(int uart_id, int port_id)
 {
     (void) port_id;
+    if (uart_id == 0) GPIOIC_INTEN(0) = 0x200;
     INTMSK |= intmsk_uart[uart_id];
 }
 
@@ -114,11 +115,13 @@ void uart_target_disable_irq(int uart_id, int port_id)
 {
     (void) port_id;
     INTMSK &= ~intmsk_uart[uart_id];
+    if (uart_id == 0) GPIOIC_INTEN(0) = 0;
 }
 
 void uart_target_clear_irq(int uart_id, int port_id)
 {
     (void) port_id;
+    if (uart_id == 0) GPIOIC_INTSTAT(0) = 0x200;
     SRCPND |= intmsk_uart[uart_id];
 }
 
@@ -135,10 +138,20 @@ void uart_target_disable_clocks(int uart_id)
 /*
  * ISRs
  */
-void ICODE_ATTR INT_UART0(void)
+
+/* On Nano2G, PORT0 interrupts are not used when iAP is disabled */
+#if !defined(IPOD_NANO2G) || defined(IPOD_ACCESSORY_PROTOCOL)
+/*
+ * UART0 IRQ is connected to EINTG0, this is a quick patch, a "real"
+ * EINT handler will be needed if in future we use more than one IRQ
+ * on this group.
+ */
+void ICODE_ATTR EINT_G0(void)
 {
+    GPIOIC_INTSTAT(0) = 0x200;  /* clear external IRQ */
     uartc_callback(&s5l8701_uartc0, 0);
 }
+#endif
 
 /* UARTC1,2 not used on Nano2G */
 #ifndef IPOD_NANO2G

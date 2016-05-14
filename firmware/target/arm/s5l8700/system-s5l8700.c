@@ -85,6 +85,10 @@ default_interrupt(INT_ADC);
 #if CONFIG_CPU==S5L8701
 default_interrupt(INT_UNK);
 default_interrupt(INT_UART2);
+default_interrupt(EINT_G0);
+default_interrupt(EINT_G1);
+default_interrupt(EINT_G2);
+default_interrupt(EINT_G3);
 #endif
 
 
@@ -99,8 +103,8 @@ void INT_TIMER(void)
 
 #if CONFIG_CPU==S5L8701
 static void (* const irqvector[])(void) =
-{ /* still 90% unverified and probably incorrect */
-    EXT0,EXT1,EXT2,EINT_VBUS,EINTG,INT_TIMER,INT_WDT,INT_UART2,
+{ /* still 80% unverified and probably incorrect */
+    EXT0,EINT_G0,EINT_G1,EINT_G2,EINT_G3,INT_TIMER,INT_WDT,INT_UART2,
     INT_UNK,INT_UNK,INT_DMA,INT_ALARM_RTC,INT_UART1,INT_UNK,INT_UNK,INT_USB_HOST,
     INT_USB_FUNC,INT_LCDC_0,INT_LCDC_1,INT_CALM,INT_ATA,INT_UNK,INT_SPDIF_OUT,INT_ECC,
     INT_SDCI,INT_LCD,INT_WHEEL,INT_IIC,RESERVED2,INT_MSTICK,INT_ADC_WAKEUP,INT_ADC
@@ -117,8 +121,8 @@ static void (* const irqvector[])(void) =
 
 #if CONFIG_CPU==S5L8701
 static const char * const irqname[] =
-{ /* still 90% unverified and probably incorrect */
-    "EXT0","EXT1","EXT2","EINT_VBUS","EINTG","INT_TIMER","INT_WDT","INT_UART2",
+{ /* still 80% unverified and probably incorrect */
+    "EXT0","EINT_G0","EINT_G1","EINT_G2","EINT_G3","INT_TIMER","INT_WDT","INT_UART2",
     "INT_UNK1","INT_UNK2","INT_DMA","INT_ALARM_RTC","INT_UART1","INT_UNK3","INT_UNK4","INT_USB_HOST",
     "INT_USB_FUNC","INT_LCDC_0","INT_LCDC_1","INT_CALM","INT_ATA","INT_UNK5","INT_SPDIF_OUT","INT_ECC",
     "INT_SDCI","INT_LCD","INT_WHEEL","INT_IIC","Reserved","INT_MSTICK","INT_ADC_WAKEUP","INT_ADC"

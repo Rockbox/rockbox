@@ -133,33 +133,61 @@
 #define PWRCONEXT               (*(REG32_PTR_T)(0x3C500040))     /* Clock power control register 2 */
 
 /* 06. INTERRUPT CONTROLLER UNIT */
+#if CONFIG_CPU==S5L8700
 #define SRCPND                  (*(REG32_PTR_T)(0x39C00000))     /* Indicates the interrupt request status. */
 #define INTMOD                  (*(REG32_PTR_T)(0x39C00004))     /* Interrupt mode register. */
 #define INTMSK                  (*(REG32_PTR_T)(0x39C00008))     /* Determines which interrupt source is masked. The */
-#if CONFIG_CPU==S5L8701
-#define    INTMSK_TIMERA        (1<<5)
-#define    INTMSK_TIMERB        (1<<5)
-#define    INTMSK_TIMERC        (1<<5)
-#define    INTMSK_TIMERD        (1<<5)
-#define    INTMSK_ECC           (1<<19)
-#define    INTMSK_USB_OTG       (1<<16)
-#define    INTMSK_UART0         (0)     /* Unknown */
-#define    INTMSK_UART1         (1<<12)
-#define    INTMSK_UART2         (1<<7)
-#else
 #define    INTMSK_TIMERA        (1<<5)
 #define    INTMSK_TIMERB        (1<<7)
 #define    INTMSK_TIMERC        (1<<8)
 #define    INTMSK_TIMERD        (1<<9)
 #define    INTMSK_UART0         (1<<22)
 #define    INTMSK_UART1         (1<<14)
-#endif
 #define PRIORITY                (*(REG32_PTR_T)(0x39C0000C))     /* IRQ priority control register */
 #define INTPND                  (*(REG32_PTR_T)(0x39C00010))     /* Indicates the interrupt request status. */
 #define INTOFFSET               (*(REG32_PTR_T)(0x39C00014))     /* Indicates the IRQ interrupt request source */
 #define EINTPOL                 (*(REG32_PTR_T)(0x39C00018))     /* Indicates external interrupt polarity */
 #define EINTPEND                (*(REG32_PTR_T)(0x39C0001C))     /* Indicates whether external interrupts are pending. */
 #define EINTMSK                 (*(REG32_PTR_T)(0x39C00020))     /* Indicates whether external interrupts are masked */
+#else /* S5L8701 */
+#define SRCPND                  (*(REG32_PTR_T)(0x39C00000))     /* Indicates the interrupt request status. */
+#define INTMOD                  (*(REG32_PTR_T)(0x39C00004))     /* Interrupt mode register. */
+#define INTMSK                  (*(REG32_PTR_T)(0x39C00008))     /* Determines which interrupt source is masked. The */
+#define    INTMSK_EINTG0        (1<<1)
+#define    INTMSK_EINTG1        (1<<2)
+#define    INTMSK_EINTG2        (1<<3)
+#define    INTMSK_EINTG3        (1<<4)
+#define    INTMSK_TIMERA        (1<<5)
+#define    INTMSK_TIMERB        (1<<5)
+#define    INTMSK_TIMERC        (1<<5)
+#define    INTMSK_TIMERD        (1<<5)
+#define    INTMSK_ECC           (1<<19)
+#define    INTMSK_USB_OTG       (1<<16)
+#define    INTMSK_UART0         (0)     /* (AFAIK) no IRQ to ICU, uses EINTG0 */
+#define    INTMSK_UART1         (1<<12)
+#define    INTMSK_UART2         (1<<7)
+#define PRIORITY                (*(REG32_PTR_T)(0x39C0000C))     /* IRQ priority control register */
+#define INTPND                  (*(REG32_PTR_T)(0x39C00010))     /* Indicates the interrupt request status. */
+#define INTOFFSET               (*(REG32_PTR_T)(0x39C00014))     /* Indicates the IRQ interrupt request source */
+/*
+ * s5l8701 GPIO (External) Interrupt Controller.
+ *
+ * At first glance it looks very similar to gpio-s5l8702, but
+ * not fully tested, so this information could be wrong.
+ *
+ *  Group0[31:10] Not used
+ *        [9]     UART0 IRQ
+ *        [8]     VBUS
+ *        [7:0]   PDAT1
+ *  Group1[31:0]  PDAT5:PDAT4:PDAT3:PDAT2
+ *  Group2[31:0]  PDAT11:PDAT10:PDAT7:PDAT6
+ *  Group3[31:0]  PDAT15:PDAT14:PDAT13:PDAT12
+ */
+#define GPIOIC_INTLEVEL(g)      (*(REG32_PTR_T)(0x39C00018 + 4*(g)))
+#define GPIOIC_INTSTAT(g)       (*(REG32_PTR_T)(0x39C00028 + 4*(g)))
+#define GPIOIC_INTEN(g)         (*(REG32_PTR_T)(0x39C00038 + 4*(g)))
+#define GPIOIC_INTTYPE(g)       (*(REG32_PTR_T)(0x39C00048 + 4*(g)))
+#endif
 
 /* 07. MEMORY INTERFACE UNIT (MIU) */
 
