@@ -127,6 +127,16 @@ struct field_t
             return ((1 << width) - 1) << pos;
     }
 
+    /** Returns the unshifted bit mask of the field */
+    soc_word_t unshifted_bitmask() const
+    {
+        // WARNING beware of the case where width is 32
+        if(width == 32)
+            return 0xffffffff;
+        else
+            return (1 << width) - 1;
+    }
+
     /** Extract field value from register value */
     soc_word_t extract(soc_word_t reg_val) const
     {
