@@ -66,16 +66,30 @@
                 <address>0x10</address>
             </instance>
             <register>
+                <access>read-only</access>
                 <field>
                     <name>STATUS</name>
-                    <desc>Bit is set to 1 is the interrupt is pending, write a 1 to the clear variant to clear it. Secured interrupts can only be cleared or polled by secured processors (non-secure will always read 0 for those).</desc>
+                    <desc>Bit is set to 1 is the interrupt is pending. Secured interrupts can only be polled by secured processors (non-secure will always read 0 for those).</desc>
                     <position>0</position>
                     <width>32</width>
                 </field>
-                <variant>
-                    <type>clr</type>
-                    <offset>8</offset>
-                </variant>
+            </register>
+        </node>
+        <node>
+            <name>clear</name>
+            <title>Interrupt clear register</title>
+            <instance>
+                <name>CLEAR</name>
+                <address>0x14</address>
+            </instance>
+            <register>
+                <access>write-only</access>
+                <field>
+                    <name>CLEAR</name>
+                    <desc>Write 1 to clear a pending interrupt. Secured interrupts can only be cleared by secured processors.</desc>
+                    <position>0</position>
+                    <width>32</width>
+                </field>
             </register>
         </node>
         <node>
@@ -335,7 +349,7 @@
                         <offset>8</offset>
                     </variant>
                     <variant>
-                        <type>mask</type>
+                        <type>tog</type>
                         <offset>12</offset>
                     </variant>
                 </register>
@@ -391,11 +405,6 @@
             <register>
                 <width>8</width>
                 <access>read-only</access>
-                <variant>
-                    <type>debug</type>
-                    <offset>4</offset>
-                    <access>write-only</access>
-                </variant>
             </register>
         </node>
     </node>
