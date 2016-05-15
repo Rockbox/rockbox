@@ -200,12 +200,24 @@ int renumerate(libusb_device_handle **dev)
     return 0;
 }
 
+int jz_stage1(libusb_device_handle *dev, unsigned long addr, const char *file)
+{
+    int ret = jz_set_addr(dev, addr);
+    if(ret != 0)
+        return ret;
+    ret = jz_download(dev, file);
+    if(ret != 0)
+        return ret;
+    return jz_start1(dev, addr);
+}
+
 void usage()
 {
     printf("Usage: usbboot [options]\n");
     printf("\n");
     printf("Basic options:\n");
     printf("  --stage1 <file>     Upload first stage program (<=16Kio)\n");
+    printf("  --s1-addr <addr>    Change first stage address (default is 0x80000000)\n");
     printf("  --stage2 <file>     Upload second stage program to SDRAM\n");
     printf("  --s2-addr <addr>    Change second stage address (default is 0x80000000)\n");
     printf("  --ram <target>      Setup SDRAM for <target>, see list below\n");
@@ -253,9 +265,11 @@ int main(int argc, char **argv)
     enum
     {
         OPT_ADDR = 0x100, OPT_LENGTH, OPT_UPLOAD, OPT_CPUINFO, OPT_DOWNLOAD,
-        OPT_START1, OPT_WAIT, OPT_RENUMERATE, OPT_START2, OPT_FLUSH_CACHES
+        OPT_START1, OPT_WAIT, OPT_RENUMERATE, OPT_START2, OPT_FLUSH_CACHES,
+        OPT_S1_ADDR, OPT_STAGE1
     };
     unsigned long last_length = 0;
+    unsigned long s1_addr = 0x80000000;
     while(1)
     {
         static struct option long_options[] =
@@ -271,13 +285,16 @@ int main(int argc, char **argv)
             {"renumerate", no_argument, 0, OPT_RENUMERATE},
             {"start2", required_argument, 0, OPT_START2},
             {"flush-caches", no_argument, 0, OPT_FLUSH_CACHES},
+            {"s1-addr", required_argument, 0, OPT_S1_ADDR},
+            {"stage1", required_argument, 0, OPT_STAGE1},
             {0, 0, 0, 0}
         };
 
         int c = getopt_long(argc, argv, "hv", long_options, NULL);
         char *end = 0;
         unsigned long param;
-        if(c == OPT_ADDR || c == OPT_LENGTH || c == OPT_START1 || c== OPT_WAIT)
+        if(c == OPT_ADDR || c == OPT_LENGTH || c == OPT_START1 || c == OPT_WAIT
+                || c == OPT_S1_ADDR)
         {
             param = strtoul(optarg, &end, 0);
             if(*end)
@@ -332,6 +349,12 @@ int main(int argc, char **argv)
                 break;
             case OPT_FLUSH_CACHES:
                 ret = jz_flush_caches(dev);
+                break;
+            case OPT_S1_ADDR:
+                s1_addr = param;
+                break;
+            case OPT_STAGE1:
+                ret = jz_stage1(dev, s1_addr, optarg);
                 break;
         }
         if(ret != 0)
