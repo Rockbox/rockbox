@@ -23,7 +23,9 @@
 
 #include "target-config.h"
 
+#ifndef STACK_SIZE
 #define STACK_SIZE      0x1000
+#endif
 #define MAX_LOGF_SIZE   128
 
 #if defined(CPU_ARM) && defined(__ASSEMBLER__)
