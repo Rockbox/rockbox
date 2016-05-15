@@ -537,6 +537,25 @@ static int ata_set_feature(uint32_t feature, uint32_t param)
     return 0;
 }
 
+/*
+ * ATA_UDMA_TIME register is documented on s3c6400 datasheet, information
+ * included in s5l8700 datasheet is wrong or not valid for s5l8702.
+ *
+ * On Classic (boosted):
+ *  HClk = 108 MHz. -> T = ~9.26 ns.
+ *
+ * Configured values (in nanoseconds):
+ *
+ *  UDMA  ATA_UDMA_TIME  tACK  tRP    tSS   tDVS  tDVH  Tcyc   WR(MB/s)
+ *  0     0x4071152      27.8  166.7  55.6  74.1  46.3  120.4  16.6
+ *  1     0x2050d52      27.8  129.6  55.6  55.6  27.8   83.4  24
+ *  2     0x2030a52      27.8  101.8  55.6  37    27.8   64.8  30.9
+ *  3     0x1020a52      27.8  101.8  55.6  27.8  18.5   46.3  43.2
+ *  4     0x1010a52      27.8  101.8  55.6  18.5  18.5   37    54
+ *
+ *  Tcyc = tDVS+tDVH
+ *  WR[bytes/s] = 1/Tcyc[s] * 2[bytes]
+ */
 static int ata_power_up(void)
 {
     ata_set_active();
@@ -592,7 +611,7 @@ static int ata_power_up(void)
         PASS_RC(ata_identify(ata_identify_data), 3, 3);
         uint32_t piotime = 0x11f3;
         uint32_t mdmatime = 0x1c175;
-        uint32_t udmatime = 0x5071152;
+        uint32_t udmatime = 0x4071152;
         uint32_t param = 0;
         ata_dma_flags = 0;
         ata_lba48 = ata_identify_data[83] & BIT(10) ? true : false;
@@ -620,22 +639,22 @@ static int ata_power_up(void)
         {
             if (ata_identify_data[88] & BIT(4))
             {
-                udmatime = 0x2010a52;
+                udmatime = 0x1010a52;
                 param = 0x44;
             }
             else if (ata_identify_data[88] & BIT(3))
             {
-                udmatime = 0x2020a52;
+                udmatime = 0x1020a52;
                 param = 0x43;
             }
             else if (ata_identify_data[88] & BIT(2))
             {
-                udmatime = 0x3030a52;
+                udmatime = 0x2030a52;
                 param = 0x42;
             }
             else if (ata_identify_data[88] & BIT(1))
             {
-                udmatime = 0x3050a52;
+                udmatime = 0x2050d52;
                 param = 0x41;
             }
             else if (ata_identify_data[88] & BIT(0))
