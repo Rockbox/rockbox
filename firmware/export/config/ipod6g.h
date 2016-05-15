@@ -246,6 +246,8 @@
 #define USB_NUM_ENDPOINTS 6
 #define USB_DEVBSS_ATTR __attribute__((aligned(32)))
 
+#define USB_READ_BUFFER_SIZE (1024*24)
+
 #define HAVE_SERIAL
 /* Disable iAP when LOGF_SERIAL is enabled to avoid conflicts */
 #ifndef LOGF_SERIAL
@@ -257,8 +259,6 @@
 
 /* Define this, if you can switch on/off the lineout */
 #define HAVE_LINEOUT_POWEROFF
-
-#define USB_WRITE_BUFFER_SIZE (1024*64)
 
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY
