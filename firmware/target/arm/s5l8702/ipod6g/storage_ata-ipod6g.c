@@ -692,7 +692,6 @@ static int ata_power_up(void)
 static void ata_power_down(void)
 {
     if (!ata_powered) return;
-    ata_powered = false;
     if (ceata)
     {
         memset(ceata_taskfile, 0, 16);
@@ -720,6 +719,7 @@ static void ata_power_down(void)
     PCON(10) &= ~0xffff;
     PCON(11) &= ~0xf;
     ide_power_enable(false);
+    ata_powered = false;
 }
 
 static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bool write)
