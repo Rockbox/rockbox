@@ -121,9 +121,11 @@ _start:
     ldr     r2, =_vectorsend
     bl      _copy_section
 
+#if !defined(SANSA_CONNECT)
     /* Add some delay time to make sure JTAG can be accessed cleanly */
     mov     r0, #0x100000
     bl      _delay_cycles
+#endif
 
 #if defined(BOOTLOADER)
     /* Copy the DRAM */
