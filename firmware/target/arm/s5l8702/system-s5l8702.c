@@ -206,6 +206,7 @@ void system_init(void)
     pmu_preinit();
 #endif
     gpio_init();
+    eint_init();
     pmu_init();
     dma_init();
 #ifdef HAVE_SERIAL

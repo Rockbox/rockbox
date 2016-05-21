@@ -23,6 +23,69 @@
 #define __GPIO_S5L8702_H__
 #include <stdint.h>
 
+
+#define REG32_PTR_T volatile uint32_t *
+
+/*
+ * s5l8702 External (GPIO) Interrupt Controller
+ *
+ * 7 groups of 32 interrupts, GPIO pins are seen as 'wired'
+ * to groups 6..3 in reverse order.
+ * On group 3, last four bits are dissbled (GPIO 124..127).
+ * All bits in groups 1 and 2 are disabled (not used).
+ * On group 0, all bits are masked except bits 0 and 2:
+ *  bit 0: if unmasked, EINT6 is generated when ALVTCNT
+ *         reachs ALVTEND.
+ *  bit 2: if unmasked, EINT6 is generated when USB cable
+ *         is plugged and/or(TBC) unplugged.
+ *
+ * IC_GROUP0..6 are connected to EINT6..0 of the VIC.
+ */
+#define EIC_N_GROUPS    7
+
+/* get EIC group and bit for a given GPIO port */
+#define EIC_GROUP(n)    (6 - (n >> 5))
+#define EIC_INDEX(n)    ((0x18 - (n & 0x18)) | (n & 0x7))
+
+/* SoC EINTs uses these 'gpio' numbers */
+#define GPIO_EINT_USB       0xd8
+#define GPIO_EINT_ALIVE     0xda
+
+/* probably a part of the system controller */
+#define EIC_BASE 0x39a00000
+
+#define EIC_INTLEVEL(g) (*((REG32_PTR_T)(EIC_BASE + 0x80 + 4*(g))))
+#define EIC_INTSTAT(g)  (*((REG32_PTR_T)(EIC_BASE + 0xA0 + 4*(g))))
+#define EIC_INTEN(g)    (*((REG32_PTR_T)(EIC_BASE + 0xC0 + 4*(g))))
+#define EIC_INTTYPE(g)  (*((REG32_PTR_T)(EIC_BASE + 0xE0 + 4*(g))))
+
+#define EIC_INTLEVEL_LOW    0
+#define EIC_INTLEVEL_HIGH   1
+
+#define EIC_INTTYPE_EDGE    0
+#define EIC_INTTYPE_LEVEL   1
+
+
+struct eint_handler {
+    uint8_t gpio_n;
+    uint8_t type;       /* EIC_INTTYPE_ */
+    uint8_t level;      /* EIC_INTLEVEL_ */
+    uint8_t autoflip;
+    void (*isr)(struct eint_handler*);
+};
+
+void eint_register(struct eint_handler *h);
+void eint_unregister(struct eint_handler *h);
+void eint_init(void);
+
+void gpio_init(void);
+/* get/set configuration for GPIO groups (0..15) */
+uint32_t gpio_group_get(int group);
+void gpio_group_set(int group, uint32_t mask, uint32_t cfg);
+
+void gpio_preinit(void);
+
+
 /* This is very preliminary work in progress, ATM this region is called
  * system 'alive' because it seems there are similiarities when mixing
  * concepts from:
@@ -47,9 +110,6 @@
  *                                          +-->| 1/UNKDIV  |--> Unknown
  *                                              |___________|
  */
-
-#define REG32_PTR_T volatile uint32_t *
-
 #define SYSALV_BASE 0x39a00000
 
 #define ALVCON          (*((REG32_PTR_T)(SYSALV_BASE + 0x0)))
@@ -81,67 +141,21 @@
 
 /*
  * System Alive timer
- */
-/* ALVCOM_RUN_BIT starts/stops count on ALVTCNT, counter frequency
+ *
+ * ALVCOM_RUN_BIT starts/stops count on ALVTCNT, counter frequency
  * is SClk / ALVTDIV. When count reachs ALVTEND then ALVTSTAT[0]
  * and ALVUNK4[0] are set, optionally an interrupt is generated (see
  * GPIO_IC below). Writing 1 to ALVTCOM_RST_BIT clears ALVSTAT[0]
  * and ALVUNK4[0] and initializes ALVTCNT to zero.
  */
-#define ALVTCOM     (*((REG32_PTR_T)(SYSALV_BASE + 0x6c)))
+#define ALVTCOM         (*((REG32_PTR_T)(SYSALV_BASE + 0x6c)))
 #define ALVTCOM_RUN_BIT     (1 << 0)  /* 0 -> Stop, 1 -> Start */
 #define ALVTCOM_RST_BIT     (1 << 1)  /* 1 -> Reset */
 
-#define ALVTEND     (*((REG32_PTR_T)(SYSALV_BASE + 0x70)))
-#define ALVTDIV     (*((REG32_PTR_T)(SYSALV_BASE + 0x74)))
+#define ALVTEND         (*((REG32_PTR_T)(SYSALV_BASE + 0x70)))
+#define ALVTDIV         (*((REG32_PTR_T)(SYSALV_BASE + 0x74)))
 
-#define ALVTCNT     (*((REG32_PTR_T)(SYSALV_BASE + 0x78)))
-#define ALVTSTAT    (*((REG32_PTR_T)(SYSALV_BASE + 0x7c)))
-
-
-/*
- * s5l8702 GPIO Interrupt Controller
- */
-#define GPIOIC_BASE 0x39a00000 /* probably a part of the system controller */
-
-#define GPIOIC_INTLEVEL(g)  (*((REG32_PTR_T)(GPIOIC_BASE + 0x80 + 4*(g))))
-#define GPIOIC_INTSTAT(g)   (*((REG32_PTR_T)(GPIOIC_BASE + 0xA0 + 4*(g))))
-#define GPIOIC_INTEN(g)     (*((REG32_PTR_T)(GPIOIC_BASE + 0xC0 + 4*(g))))
-#define GPIOIC_INTTYPE(g)   (*((REG32_PTR_T)(GPIOIC_BASE + 0xE0 + 4*(g))))
-
-#define GPIOIC_INTLEVEL_LOW     0
-#define GPIOIC_INTLEVEL_HIGH    1
-
-#define GPIOIC_INTTYPE_EDGE     0
-#define GPIOIC_INTTYPE_LEVEL    1
-
-/* 7 groups of 32 interrupts, GPIO pins are seen as 'wired'
- * to groups 6..3 in reverse order.
- * On group 3, last four bits are dissbled (GPIO 124..127).
- * All bits in groups 1 and 2 are disabled (not used).
- * On group 0, all bits are masked except bits 0 and 2:
- *  bit 0: if unmasked, EINT6 is generated when ALVTCNT
- *         reachs ALVTEND.
- *  bit 2: if unmasked, EINT6 is generated when USB cable
- *         is plugged and/or(TBC) unplugged.
- *
- * IC_GROUP0..6 are connected to EINT6..0 of the VIC.
- */
-
-/* get GPIOIC group and bit for a given GPIO port */
-#define IC_GROUP(n)  (6 - (n >> 5))
-#define IC_IDX(n)    ((0x18 - (n & 0x18)) | (n & 0x7))
-
-void gpio_init(void);
-void gpio_int_register(int gpio_n, void *isr,
-                        int type, int level, int autoflip);
-void gpio_int_enable(int gpio_n);
-void gpio_int_disable(int gpio_n);
-
-/* get/set configuration for GPIO groups (0..15) */
-uint32_t gpio_group_get(int group);
-void gpio_group_set(int group, uint32_t mask, uint32_t cfg);
-
-void gpio_preinit(void);
+#define ALVTCNT         (*((REG32_PTR_T)(SYSALV_BASE + 0x78)))
+#define ALVTSTAT        (*((REG32_PTR_T)(SYSALV_BASE + 0x7c)))
 
 #endif /* __GPIO_S5L8702_H__ */

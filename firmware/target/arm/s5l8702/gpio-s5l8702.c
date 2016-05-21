@@ -23,10 +23,29 @@
 
 #include "config.h"
 #include "system.h"
-#include "gpio-s5l8702.h"
 #include "panic.h"
 
+#include "gpio-s5l8702.h"
+
+
 int rec_hw_ver;
+
+static uint32_t gpio_data[] =
+{
+    0x5322222F, 0xEEEEEE00, 0x2332EEEE, 0x3333E222,
+    0x33333333, 0x33333333, 0x3F000E33, 0xEEEEEEEE,
+    0xEEEEEEEE, 0xEEEEEEEE, 0xE0EEEEEE, 0xEE00EE0E,
+    0xEEEE0EEE, 0xEEEEEEEE, 0xEE2222EE, 0xEEEE0EEE
+};
+
+void INIT_ATTR gpio_preinit(void)
+{
+    for (int i = 0; i < 16; i++) {
+        PCON(i) = gpio_data[i];
+        PUNB(i) = 0;
+        PUNC(i) = 0;
+    }
+}
 
 void INIT_ATTR gpio_init(void)
 {
@@ -44,9 +63,8 @@ void INIT_ATTR gpio_init(void)
      */
     GPIOCMD = 0xe0700;
     rec_hw_ver = (PDAT(14) & (1 << 7)) ? 0 : 1;
+    GPIOCMD = 0xe070e;  /* restore default configuration */
 
-    /* default GPIO configuration */
-    GPIOCMD = 0xe070e;
     if (rec_hw_ver == 0) {
         GPIOCMD = 0xe060e;
     }
@@ -56,31 +74,9 @@ void INIT_ATTR gpio_init(void)
         GPIOCMD = 0xe0600;
         PUNB(14) |= (1 << 6);
     }
-
-    /* TODO: initialize GPIO ports for minimum power consumption */
 }
 
-
-/*
- * XXX: disabled, not used and never tested!
- */
 #if 0
-/* handlers list */
-#define GPIOIC_MAX_HANDLERS  2
-
-#define FLAG_TYPE_LEVEL  (1 << 0)
-#define FLAG_AUTOFLIP    (1 << 1)
-
-struct gpio_handler {
-    int gpio_n;
-    void (*isr)(void);
-    int flags;
-};
-static struct gpio_handler l_handlers[GPIOIC_MAX_HANDLERS] IDATA_ATTR;
-static int n_handlers = 0;
-
-
-/* API */
 uint32_t gpio_group_get(int group)
 {
     uint32_t pcon = PCON(group);
@@ -103,131 +99,128 @@ void gpio_group_set(int group, uint32_t mask, uint32_t cfg)
 {
     PCON(group) = (PCON(group) & ~mask) | (cfg & mask);
 }
+#endif
 
-void gpio_int_register(int gpio_n, void *isr, int type, int level, int autoflip)
+
+/*
+ * eINT API
+ */
+#ifndef EINT_MAX_HANDLERS
+#define EINT_MAX_HANDLERS 1
+#endif
+static struct eint_handler* l_handlers[EINT_MAX_HANDLERS] IDATA_ATTR;
+
+void INIT_ATTR eint_init(void)
 {
-    if (n_handlers >= GPIOIC_MAX_HANDLERS)
-        panicf("gpio_int_register(): too many handlers!");
-
-    int group = IC_GROUP(gpio_n);
-    int index = IC_IDX(gpio_n);
-
-    int flags = disable_irq_save();
-
-    /* fill handler struct */
-    struct gpio_handler *handler = &l_handlers[n_handlers++];
-
-    handler->gpio_n = gpio_n;
-    handler->isr = isr;
-    handler->flags = (type ? FLAG_TYPE_LEVEL : 0)
-                   | (autoflip ? FLAG_AUTOFLIP : 0);
-
-    /* configure */
-    GPIOIC_INTTYPE(group) |=
-            (type ? GPIOIC_INTTYPE_LEVEL : GPIOIC_INTTYPE_EDGE) << index;
-    GPIOIC_INTLEVEL(group) |=
-            (level ? GPIOIC_INTLEVEL_HIGH : GPIOIC_INTLEVEL_LOW) << index;
-
-    restore_irq(flags);
-
-    /* XXX: valid only for gpio_n = 0..127 (IRQ_EXT0..IRQ_EXT3) */
-    VIC0INTENABLE = 1 << (IRQ_EXT0 + (gpio_n >> 5));
+    /* disable external interrupts */
+    for (int i = 0; i < EIC_N_GROUPS; i++)
+        EIC_INTEN(i) = 0;
 }
 
-void gpio_int_enable(int gpio_n)
-{
-    int group = IC_GROUP(gpio_n);
-    uint32_t bit_mask = 1 << IC_IDX(gpio_n);
-
-    int flags = disable_irq_save();
-    GPIOIC_INTSTAT(group) = bit_mask; /* clear */
-    GPIOIC_INTEN(group) |= bit_mask; /* enable */
-    restore_irq(flags);
-}
-
-void gpio_int_disable(int gpio_n)
-{
-    int group = IC_GROUP(gpio_n);
-    uint32_t bit_mask = 1 << IC_IDX(gpio_n);
-
-    int flags = disable_irq_save();
-    GPIOIC_INTEN(group) &= ~bit_mask; /* disable */
-    GPIOIC_INTSTAT(group) = bit_mask; /* clear */
-    restore_irq(flags);
-}
-
-
-/* ISR */
-void ICODE_ATTR gpio_handler(int group)
+void eint_register(struct eint_handler *h)
 {
     int i;
-    struct gpio_handler *handler;
-    uint32_t ints, bit_mask;
+    int flags = disable_irq_save();
 
-    ints = GPIOIC_INTSTAT(group) & GPIOIC_INTEN(group);
+    for (i = 0; i < EINT_MAX_HANDLERS; i++) {
+        if (!l_handlers[i]) {
+            int group = EIC_GROUP(h->gpio_n);
+            int index = EIC_INDEX(h->gpio_n);
 
-    for (i = 0; i < n_handlers; i++) {
-        handler = &l_handlers[i];
+            EIC_INTTYPE(group) |= (h->type << index);
+            EIC_INTLEVEL(group) |= (h->level << index);
+            EIC_INTSTAT(group) = (1 << index); /* clear */
+            EIC_INTEN(group) |= (1 << index); /* enable */
 
-        if (IC_GROUP(handler->gpio_n) != group)
+            /* XXX: valid only for gpio_n = 0..127 (IRQ_EXT0..IRQ_EXT3) */
+            VIC0INTENABLE = 1 << (IRQ_EXT0 + (h->gpio_n >> 5));
+
+            l_handlers[i] = h;
+            break;
+        }
+    }
+
+    restore_irq(flags);
+
+    if (i == EINT_MAX_HANDLERS)
+        panicf("%s(): too many handlers!", __func__);
+}
+
+void eint_unregister(struct eint_handler *h)
+{
+    int flags = disable_irq_save();
+
+    for (int i = 0; i < EINT_MAX_HANDLERS; i++) {
+        if (l_handlers[i] == h) {
+            int group = EIC_GROUP(h->gpio_n);
+            int index = EIC_INDEX(h->gpio_n);
+
+            EIC_INTEN(group) &= ~(1 << index); /* disable */
+
+            /* XXX: valid only for gpio_n = 0..127 (IRQ_EXT0..IRQ_EXT3) */
+            if (EIC_INTEN(group) == 0)
+                VIC0INTENCLEAR = 1 << (IRQ_EXT0 + (h->gpio_n >> 5));
+
+            l_handlers[i] = NULL;
+            break;
+        }
+    }
+
+    restore_irq(flags);
+}
+
+/* ISR */
+void ICODE_ATTR eint_handler(int group)
+{
+    int i;
+    uint32_t ints;
+
+    ints = EIC_INTSTAT(group) & EIC_INTEN(group);
+
+    for (i = 0; i < EINT_MAX_HANDLERS; i++) {
+        struct eint_handler *h = l_handlers[i];
+
+        if (!h || (EIC_GROUP(h->gpio_n) != group))
             continue;
 
-        bit_mask = 1 << IC_IDX(handler->gpio_n);
+        uint32_t bit = 1 << EIC_INDEX(h->gpio_n);
 
-        if (ints & bit_mask) {
-            if ((handler->flags & FLAG_TYPE_LEVEL) == 0)
-                GPIOIC_INTSTAT(group) = bit_mask; /* clear */
+        if (ints & bit) {
+            /* Clear INTTYPE_EDGE interrupt, to clear INTTYPE_LEVEL
+               interrupts the source (line level) must be "cleared" */
+            if (h->type == EIC_INTTYPE_EDGE)
+                EIC_INTSTAT(group) = bit; /* clear */
 
-            if (handler->flags & FLAG_AUTOFLIP)
-                GPIOIC_INTLEVEL(group) ^= bit_mask; /* swap level */
+            if (h->autoflip)
+                EIC_INTLEVEL(group) ^= bit; /* swap level */
 
-            if (handler->isr)
-                handler->isr(); /* exec GPIO handler */
-
-            GPIOIC_INTSTAT(group) = bit_mask; /* clear */
+            if (h->isr)
+                h->isr(h); /* exec GPIO handler */
         }
     }
 }
 
 void ICODE_ATTR INT_EXT0(void)
 {
-    gpio_handler(6);
+    eint_handler(6);
 }
 
 void ICODE_ATTR INT_EXT1(void)
 {
-    gpio_handler(5);
+    eint_handler(5);
 }
 
 void ICODE_ATTR INT_EXT2(void)
 {
-    gpio_handler(4);
+    eint_handler(4);
 }
 
 void ICODE_ATTR INT_EXT3(void)
 {
-    gpio_handler(3);
+    eint_handler(3);
 }
 
 void ICODE_ATTR INT_EXT6(void)
 {
-    gpio_handler(0);
-}
-#endif
-
-static uint32_t gpio_data[16] =
-{
-    0x5322222F, 0xEEEEEE00, 0x2332EEEE, 0x3333E222,
-    0x33333333, 0x33333333, 0x3F000E33, 0xEEEEEEEE,
-    0xEEEEEEEE, 0xEEEEEEEE, 0xE0EEEEEE, 0xEE00EE0E,
-    0xEEEE0EEE, 0xEEEEEEEE, 0xEE2222EE, 0xEEEE0EEE
-};
-
-void gpio_preinit(void)
-{
-    for (int i = 0; i < 16; i++) {
-        PCON(i) = gpio_data[i];
-        PUNB(i) = 0;
-        PUNC(i) = 0;
-    }
+    eint_handler(0);
 }
