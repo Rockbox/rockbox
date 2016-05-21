@@ -426,6 +426,7 @@ struct clocking_mode
 void clocking_init(struct clocking_mode *modes, int init_level);
 void set_clocking_level(int level);
 unsigned get_system_freqs(unsigned *cclk, unsigned *hclk, unsigned *pclk);
+void clockgate_enable(int gate, bool enable);
 
 /* debug */
 unsigned pll_get_cfg_freq(int pll);
@@ -437,7 +438,6 @@ int soc_get_hsdiv(void);
 #include <stdbool.h>
 
 void usec_timer_init(void);
-void clockgate_enable(int gate, bool enable);
 
 void soc_set_system_divs(unsigned cdiv, unsigned hdiv, unsigned hprat);
 unsigned soc_get_system_divs(unsigned *cdiv, unsigned *hdiv, unsigned *pdiv);

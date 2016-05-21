@@ -215,7 +215,6 @@ void ICODE_ATTR INT_EXT6(void)
 }
 #endif
 
-#ifdef BOOTLOADER
 static uint32_t gpio_data[16] =
 {
     0x5322222F, 0xEEEEEE00, 0x2332EEEE, 0x3333E222,
@@ -232,4 +231,3 @@ void gpio_preinit(void)
         PUNC(i) = 0;
     }
 }
-#endif

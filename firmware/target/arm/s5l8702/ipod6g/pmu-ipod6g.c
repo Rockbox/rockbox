@@ -143,7 +143,9 @@ void pmu_write_rtc(unsigned char* buffer)
     pmu_write_multiple(0x59, 7, buffer);
 }
 
-#ifdef BOOTLOADER
+/*
+ * preinit
+ */
 int pmu_rd_multiple(int address, int count, unsigned char* buffer)
 {
     return i2c_rd(0, 0xe6, address, count, buffer);
@@ -225,7 +227,9 @@ void pmu_preinit(void)
         /* AUTOLDO (HDD): 3400 mV, disabled,
            limit = 1000 mA (40mA*0x19), limit always active */
         PCF5063X_REG_AUTOOUT,   0x6f,
+#ifdef BOOTLOADER
         PCF5063X_REG_AUTOENA,   0x0,
+#endif
         PCF5063X_REG_AUTOCTL,   0x0,
         PCF5063X_REG_AUTOMXC,   0x59,
 
@@ -257,7 +261,9 @@ void pmu_preinit(void)
         PCF5063X_REG_GPOCFG,    0x1,
         /* LED converter OFF, overvoltage protection enabled,
            OCP limit is 500 mA, led_dimstep = 16*0x6/32768 */
+#ifdef BOOTLOADER
         PCF5063X_REG_LEDENA,    0x0,
+#endif
         PCF5063X_REG_LEDCTL,    0x5,
         PCF5063X_REG_LEDDIM,    0x6,
 
@@ -274,4 +280,3 @@ void pmu_preinit(void)
     pmu_rd_multiple(PCF5063X_REG_INT1, 5, rd_buf);
     pmu_rd(PCF50635_REG_INT6);
 }
-#endif /* BOOTLOADER */

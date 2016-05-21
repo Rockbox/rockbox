@@ -23,6 +23,7 @@
 #include "system.h"
 #include "panic.h"
 #include "system-target.h"
+#include "i2c-s5l8702.h"
 #include "pmu-target.h"
 #include "uart-target.h"
 #include "gpio-s5l8702.h"
@@ -199,6 +200,11 @@ enum {
 void system_init(void)
 {
     clocking_init(clk_modes, 0);
+#ifndef BOOTLOADER
+    gpio_preinit();
+    i2c_preinit(0);
+    pmu_preinit();
+#endif
     gpio_init();
     pmu_init();
     dma_init();
@@ -279,7 +285,7 @@ void memory_init(void)
 }
 
 #ifdef BOOTLOADER
-#include "i2c-s5l8702.h"
+#include <stdbool.h>
 
 static void syscon_preinit(void)
 {

@@ -23,6 +23,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "i2c-s5l8702.h"
+#include "clocking-s5l8702.h"
 
 /*  Driver for the s5l8700 built-in I2C controller in master mode
     
@@ -180,9 +181,6 @@ int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *
     return ret;
 }
 
-#ifdef BOOTLOADER
-#include "clocking-s5l8702.h"
-
 static void wait_rdy(int bus)
 {
     while (IICUNK10(bus));
@@ -206,4 +204,3 @@ void i2c_preinit(int bus)
     wait_rdy(bus);
     clockgate_enable(I2CCLKGATE(bus), false);
 }
-#endif

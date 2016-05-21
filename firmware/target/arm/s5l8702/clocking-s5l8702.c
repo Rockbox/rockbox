@@ -213,6 +213,14 @@ void set_clocking_level(int level)
     udelay(50); /* TBC: probably not needed */
 }
 
+void clockgate_enable(int gate, bool enable)
+{
+    int i = (gate >> 5) & 1;
+    uint32_t bit = 1 << (gate & 0x1f);
+    if (enable) PWRCON(i) &= ~bit;
+    else PWRCON(i) |= bit;
+}
+
 #ifdef BOOTLOADER
 int pll_config(int pll, int op_mode, int p, int m, int s, int lock_time)
 {
@@ -297,14 +305,6 @@ void cg16_config(volatile uint16_t* cg16,
     /*udelay(100);*/  /* probably not needed */
 
     while (*cg16 != val16);
-}
-
-void clockgate_enable(int gate, bool enable)
-{
-    int i = (gate >> 5) & 1;
-    uint32_t bit = 1 << (gate & 0x1f);
-    if (enable) PWRCON(i) &= ~bit;
-    else PWRCON(i) |= bit;
 }
 
 /* Configures EClk for USEC_TIMER. DRAM refresh also depends on EClk,
