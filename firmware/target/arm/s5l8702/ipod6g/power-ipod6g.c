@@ -41,6 +41,8 @@ void power_off(void)
 
 void power_init(void)
 {
+    pmu_init();
+
     idepowered = false;
 
     /* DOWN1CTL: CPU DVM step time = 30us (default: no DVM) */

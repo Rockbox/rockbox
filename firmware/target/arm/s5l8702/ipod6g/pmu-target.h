@@ -30,7 +30,21 @@
 /* undocummented PMU registers */
 #define PCF50635_REG_INT6        0x85
 #define PCF50635_REG_INT6M       0x86
-#define PCF50635_REG_GPIOSTAT    0x87  /* bit1: GPIO2 status (TBC) */
+#define PCF50635_REG_GPIOSTAT    0x87
+
+enum pcf50635_reg_int6 {
+        PCF50635_INT6_GPIO1     = 0x01, /* TBC */
+        PCF50635_INT6_GPIO2     = 0x02,
+};
+
+enum pcf50635_reg_gpiostat {
+        PCF50635_GPIOSTAT_GPIO1 = 0x01, /* TBC */
+        PCF50635_GPIOSTAT_GPIO2 = 0x02,
+};
+
+
+/* GPIO for external PMU interrupt */
+#define GPIO_EINT_PMU   0x7b
 
 /* LDOs */
 #define LDO_UNK1        1   /* TBC: SoC voltage (USB) */
@@ -76,6 +90,15 @@ void pmu_enter_standby(void);
 void pmu_read_rtc(unsigned char* buffer);
 void pmu_write_rtc(unsigned char* buffer);
 void pmu_hdd_power(bool on);
+
+int pmu_holdswitch_locked(void);
+int pmu_usb_present(void);
+#if CONFIG_CHARGING
+int pmu_firewire_present(void);
+#endif
+#ifdef IPOD_ACCESSORY_PROTOCOL
+int pmu_accessory_present(void);
+#endif
 
 void pmu_preinit(void);
 #ifdef BOOTLOADER

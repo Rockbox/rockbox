@@ -207,7 +207,6 @@ void system_init(void)
 #endif
     gpio_init();
     eint_init();
-    pmu_init();
     dma_init();
 #ifdef HAVE_SERIAL
     uart_init();

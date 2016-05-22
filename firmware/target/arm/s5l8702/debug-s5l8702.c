@@ -102,14 +102,14 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("PMU:");
             for(i=0;i<7;i++)
             {
-                char *device[] = {"(unknown)", 
-                                  "(unknown)", 
-                                  "(unknown)", 
-                                  "(unknown)", 
-                                  "(unknown)", 
-                                  "(unknown)",
-                                  "(unknown)"};
-                _DEBUG_PRINTF("ldo%d %s: %dmV %s",i,
+                char *device[] = {"unknown",
+                                  "unknown",
+                                  "LCD",
+                                  "AUDIO",
+                                  "unknown",
+                                  "CLICKWHEEL",
+                                  "ACCESSORY"};
+                _DEBUG_PRINTF("ldo%d %s: %dmV (%s)",i,
                     pmu_read(0x2e + (i << 1))?" on":"off",
                     900 + pmu_read(0x2d + (i << 1))*100,
                     device[i]);
@@ -120,6 +120,19 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("charging: %s", charging_state() ? "true" : "false");
             _DEBUG_PRINTF("backlight: %s", pmu_read(0x29) ? "on" : "off");
             _DEBUG_PRINTF("brightness value: %d", pmu_read(0x28));
+            line++;
+            _DEBUG_PRINTF("USB present: %s",
+                            pmu_usb_present() ? "true" : "false");
+#if CONFIG_CHARGING
+            _DEBUG_PRINTF("FW present: %s",
+                            pmu_firewire_present() ? "true" : "false");
+#endif
+            _DEBUG_PRINTF("holdswitch locked: %s",
+                            pmu_holdswitch_locked() ? "true" : "false");
+#ifdef IPOD_ACCESSORY_PROTOCOL
+            _DEBUG_PRINTF("accessory present: %s",
+                            pmu_accessory_present() ? "true" : "false");
+#endif
         }
 #ifdef UC870X_DEBUG
         else if(state==2)

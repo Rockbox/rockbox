@@ -21,8 +21,12 @@
 
 #include "config.h"
 #include "kernel.h"
-#include "i2c-s5l8702.h"
+#include "thread.h"
+
 #include "pmu-target.h"
+#include "i2c-s5l8702.h"
+#include "gpio-s5l8702.h"
+
 
 static struct mutex pmu_adc_mutex;
 
@@ -48,11 +52,6 @@ unsigned char pmu_read(int address)
 int pmu_write(int address, unsigned char val)
 {
     return pmu_write_multiple(address, 1, &val);
-}
-
-void pmu_init(void)
-{
-    mutex_init(&pmu_adc_mutex);
 }
 
 int pmu_read_adc(unsigned int adc)
@@ -141,6 +140,157 @@ void pmu_read_rtc(unsigned char* buffer)
 void pmu_write_rtc(unsigned char* buffer)
 {
     pmu_write_multiple(0x59, 7, buffer);
+}
+
+/*
+ * eINT
+ */
+#define Q_EINT  0
+
+static char pmu_thread_stack[DEFAULT_STACK_SIZE/4];
+static struct event_queue pmu_queue;
+static unsigned char ints_msk[6];
+
+static void pmu_eint_isr(struct eint_handler*);
+
+static struct eint_handler pmu_eint = {
+    .gpio_n = GPIO_EINT_PMU,
+    .type   = EIC_INTTYPE_LEVEL,
+    .level  = EIC_INTLEVEL_LOW,
+    .isr    = pmu_eint_isr,
+};
+
+static int pmu_input_holdswitch;
+static int pmu_input_usb;
+
+int pmu_holdswitch_locked(void)
+{
+   return pmu_input_holdswitch;
+}
+
+int pmu_usb_present(void)
+{
+   return pmu_input_usb;
+}
+
+#ifdef IPOD_ACCESSORY_PROTOCOL
+static int pmu_input_accessory;
+
+int pmu_accessory_present(void)
+{
+   return pmu_input_accessory;
+}
+#endif
+
+#if CONFIG_CHARGING
+static int pmu_input_firewire;
+
+int pmu_firewire_present(void)
+{
+   return pmu_input_firewire;
+}
+
+static void pmu_read_inputs_mbcs(void)
+{
+    pmu_input_firewire = !!(pmu_read(PCF5063X_REG_MBCS1)
+                                & PCF5063X_MBCS1_ADAPTPRES);
+}
+#endif
+
+static void pmu_read_inputs_gpio(void)
+{
+    pmu_input_holdswitch = !(pmu_read(PCF50635_REG_GPIOSTAT)
+                                & PCF50635_GPIOSTAT_GPIO2);
+}
+
+static void pmu_read_inputs_ooc(void)
+{
+    unsigned char oocstat = pmu_read(PCF5063X_REG_OOCSTAT);
+    pmu_input_usb = !!(oocstat & PCF5063X_OOCSTAT_EXTON2);
+#ifdef IPOD_ACCESSORY_PROTOCOL
+    pmu_input_accessory = !(oocstat & PCF5063X_OOCSTAT_EXTON3);
+#endif
+}
+
+static void pmu_eint_isr(struct eint_handler *h)
+{
+     eint_unregister(h);
+     queue_post(&pmu_queue, Q_EINT, 0);
+}
+
+static void NORETURN_ATTR pmu_thread(void)
+{
+    struct queue_event ev;
+    unsigned char ints[6];
+
+    while (true)
+    {
+        queue_wait_w_tmo(&pmu_queue, &ev, TIMEOUT_BLOCK);
+        switch (ev.id)
+        {
+            case Q_EINT:
+                /* read (clear) PMU interrupts, this will also
+                   raise the PMU IRQ pin */
+                pmu_read_multiple(PCF5063X_REG_INT1, 2, ints);
+                ints[5] = pmu_read(PCF50635_REG_INT6);
+
+#if CONFIG_CHARGING
+                if (ints[0] & ~ints_msk[0]) pmu_read_inputs_mbcs();
+#endif
+                if (ints[1] & ~ints_msk[1]) pmu_read_inputs_ooc();
+                if (ints[5] & ~ints_msk[5]) pmu_read_inputs_gpio();
+
+                eint_register(&pmu_eint);
+                break;
+
+            case SYS_TIMEOUT:
+                break;
+        }
+    }
+}
+
+/* main init */
+void pmu_init(void)
+{
+    mutex_init(&pmu_adc_mutex);
+    queue_init(&pmu_queue, false);
+
+    create_thread(pmu_thread,
+            pmu_thread_stack, sizeof(pmu_thread_stack), 0,
+            "PMU" IF_PRIO(, PRIORITY_SYSTEM) IF_COP(, CPU));
+
+    /* configure PMU interrutps */
+    for (int i = 0; i < 6; i++)
+        ints_msk[i] = 0xff;
+
+#if CONFIG_CHARGING
+    ints_msk[0] &= ~PCF5063X_INT1_ADPINS &    /* FireWire */
+                   ~PCF5063X_INT1_ADPREM;
+#endif
+    ints_msk[1] &= ~PCF5063X_INT2_EXTON2R &   /* USB */
+                   ~PCF5063X_INT2_EXTON2F;
+#ifdef IPOD_ACCESSORY_PROTOCOL
+    ints_msk[1] &= ~PCF5063X_INT2_EXTON3R &   /* Accessory */
+                   ~PCF5063X_INT2_EXTON3F;
+#endif
+    ints_msk[5] &= ~PCF50635_INT6_GPIO2;      /* Holdswitch */
+
+    pmu_write_multiple(PCF5063X_REG_INT1M, 5, ints_msk);
+    pmu_write(PCF50635_REG_INT6M, ints_msk[5]);
+
+    /* clear all */
+    unsigned char ints[5];
+    pmu_read_multiple(PCF5063X_REG_INT1, 5, ints);
+    pmu_read(PCF50635_REG_INT6);
+
+    /* get initial values */
+#if CONFIG_CHARGING
+    pmu_read_inputs_mbcs();
+#endif
+    pmu_read_inputs_ooc();
+    pmu_read_inputs_gpio();
+
+    eint_register(&pmu_eint);
 }
 
 /*

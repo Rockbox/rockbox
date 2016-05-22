@@ -159,6 +159,17 @@ enum pcf5063X_reg_oocwake {
         PCF5063X_OOCWAKE_ADP            = 0x80,
 };
 
+enum pcf5063X_reg_oocstat {
+        PCF5063X_OOCSTAT_ONKEY          = 0x01,
+        PCF5063X_OOCSTAT_EXTON1         = 0x02,
+        PCF5063X_OOCSTAT_EXTON2         = 0x04,
+        PCF5063X_OOCSTAT_EXTON3         = 0x08,
+        PCF5063X_OOCSTAT_BUBPRES        = 0x10,
+        PCF5063X_OOCSTAT_SYSOK          = 0x20,
+        PCF5063X_OOCSTAT_BATOK          = 0x40,
+        PCF5063X_OOCSTAT_TMPOK          = 0x80,
+};
+
 enum pcf5063X_reg_mbcc1 {
         PCF5063X_MBCC1_CHGENA           = 0x01, /* Charger enable */
         PCF5063X_MBCC1_AUTOSTOP         = 0x02,
