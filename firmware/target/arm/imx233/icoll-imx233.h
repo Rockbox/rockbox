@@ -24,8 +24,6 @@
 #include "config.h"
 #include "system.h"
 
-#include "regs/regs-icoll.h"
-
 #define INT_SRC_VDD5V       3
 #define INT_SRC_DAC_DMA     5
 #define INT_SRC_DAC_ERROR   6
@@ -66,16 +64,6 @@
 #elif IMX233_SUBTARGET >= 3600
 #define INT_SRC_SOFTWARE(x) (60 + (x))
 #define INT_SRC_COUNT       64
-#endif
-
-/* helpers */
-#if IMX233_SUBTARGET >= 3600 && IMX233_SUBTARGET < 3780
-#define BP_ICOLL_PRIORITYn_ENABLEx(x)   (2 + 8 * (x))
-#define BM_ICOLL_PRIORITYn_ENABLEx(x)   (1 << (2 + 8 * (x)))
-#define BP_ICOLL_PRIORITYn_PRIORITYx(x) (0 + 8 * (x))
-#define BM_ICOLL_PRIORITYn_PRIORITYx(x) (3 << (0 + 8 * (x)))
-#define BP_ICOLL_PRIORITYn_SOFTIRQx(x)  (3 + 8 * (x))
-#define BM_ICOLL_PRIORITYn_SOFTIRQx(x)  (1 << (3 + 8 * (x)))
 #endif
 
 /* Interrupt priorities for typical tasks */

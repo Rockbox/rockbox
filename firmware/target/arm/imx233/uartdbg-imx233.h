@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "system.h"
-#include "regs/regs-uartdbg.h"
 
 /* This values below are valid with a XCLK of 24MHz */
 #define BAUD_9600               (uint32_t)(156 << 16 | 16)

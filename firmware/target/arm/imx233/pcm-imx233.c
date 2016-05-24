@@ -71,7 +71,7 @@ static void play(void)
 
     dac_dma.dma.next = NULL;
     dac_dma.dma.buffer = (void *)dac_buf;
-    dac_dma.dma.cmd = BF_OR4(APB_CHx_CMD, COMMAND_V(READ),
+    dac_dma.dma.cmd = BF_OR(APB_CHx_CMD, COMMAND_V(READ),
         IRQONCMPLT(1), SEMAPHORE(1), XFER_COUNT(xfer));
     /* dma subsystem will make sure cached stuff is written to memory */
     dac_state = DAC_PLAYING;
@@ -252,7 +252,7 @@ static void rec(void)
 
     adc_dma.dma.next = NULL;
     adc_dma.dma.buffer = (void *)adc_buf;
-    adc_dma.dma.cmd = BF_OR4(APB_CHx_CMD, COMMAND_V(WRITE),
+    adc_dma.dma.cmd = BF_OR(APB_CHx_CMD, COMMAND_V(WRITE),
         IRQONCMPLT(1), SEMAPHORE(1), XFER_COUNT(xfer));
     /* dma subsystem will make sure cached stuff is written to memory */
     adc_state = ADC_RECORDING;

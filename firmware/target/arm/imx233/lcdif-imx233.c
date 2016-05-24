@@ -22,6 +22,8 @@
 #include "pinctrl-imx233.h"
 #include "icoll-imx233.h"
 
+#include "regs/lcdif.h"
+
 #if IMX233_SUBTARGET >= 3700
 static lcdif_irq_cb_t g_cur_frame_cb = NULL;
 static lcdif_irq_cb_t g_vsync_edge_cb = NULL;
@@ -87,7 +89,7 @@ void imx233_lcdif_init(void)
 void imx233_lcdif_set_timings(unsigned data_setup, unsigned data_hold,
     unsigned cmd_setup, unsigned cmd_hold)
 {
-    HW_LCDIF_TIMING = BF_OR4(LCDIF_TIMING, DATA_SETUP(data_setup),
+    BF_WR_ALL(LCDIF_TIMING, DATA_SETUP(data_setup),
         DATA_HOLD(data_hold), CMD_SETUP(cmd_setup), CMD_HOLD(cmd_hold));
 }
 
@@ -95,11 +97,11 @@ void imx233_lcdif_set_word_length(unsigned word_length)
 {
     switch(word_length)
     {
-        case 8: BF_WR_V(LCDIF_CTRL, WORD_LENGTH, 8_BIT); break;
-        case 16: BF_WR_V(LCDIF_CTRL, WORD_LENGTH, 16_BIT); break;
+        case 8: BF_WR(LCDIF_CTRL, WORD_LENGTH_V(8_BIT)); break;
+        case 16: BF_WR(LCDIF_CTRL, WORD_LENGTH_V(16_BIT)); break;
 #if IMX233_SUBTARGET >= 3780
-        case 18: BF_WR_V(LCDIF_CTRL, WORD_LENGTH, 18_BIT); break;
-        case 24: BF_WR_V(LCDIF_CTRL, WORD_LENGTH, 24_BIT); break;
+        case 18: BF_WR(LCDIF_CTRL, WORD_LENGTH_V(18_BIT)); break;
+        case 24: BF_WR(LCDIF_CTRL, WORD_LENGTH_V(24_BIT)); break;
 #endif
         default:
             panicf("this chip cannot handle a lcd word length of %d", word_length);
@@ -115,9 +117,9 @@ void imx233_lcdif_wait_ready(void)
 void imx233_lcdif_set_data_swizzle(unsigned swizzle)
 {
 #if IMX233_SUBTARGET >= 3780
-    BF_WR(LCDIF_CTRL, INPUT_DATA_SWIZZLE, swizzle);
+    BF_WR(LCDIF_CTRL, INPUT_DATA_SWIZZLE(swizzle));
 #else
-    BF_WR(LCDIF_CTRL, DATA_SWIZZLE, swizzle);
+    BF_WR(LCDIF_CTRL, DATA_SWIZZLE(swizzle));
 #endif
 }
 
@@ -160,9 +162,9 @@ static void pio_send(unsigned len, unsigned bpp, uint8_t *buf)
     /* starting from now, all read are 32-bit */
     uint32_t *wbuf = (void *)buf;
 #if IMX233_SUBTARGET >= 3780
-    HW_LCDIF_TRANSFER_COUNT = BF_OR2(LCDIF_TRANSFER_COUNT, V_COUNT(1), H_COUNT(len));
+    BF_WR_ALL(LCDIF_TRANSFER_COUNT, V_COUNT(1), H_COUNT(len));
 #else
-    BF_WR(LCDIF_CTRL, COUNT, len);
+    BF_WR(LCDIF_CTRL, COUNT(len));
 #endif
     BF_SET(LCDIF_CTRL, RUN);
     while(count > 0)
@@ -212,7 +214,7 @@ void imx233_lcdif_dma_send(void *buf, unsigned width, unsigned height)
 #if IMX233_SUBTARGET >= 3780
     imx233_lcdif_enable_bus_master(true);
     HW_LCDIF_CUR_BUF = (uint32_t)buf;
-    HW_LCDIF_TRANSFER_COUNT = BF_OR2(LCDIF_TRANSFER_COUNT, V_COUNT(height), H_COUNT(width));
+    BF_WR_ALL(LCDIF_TRANSFER_COUNT, V_COUNT(height), H_COUNT(width));
     BF_SET(LCDIF_CTRL, DATA_SELECT);
     BF_SET(LCDIF_CTRL, RUN);
 #else
@@ -281,31 +283,31 @@ void imx233_lcdif_setup_dotclk_pins(unsigned bus_width, bool have_enable)
 
 void imx233_lcdif_set_byte_packing_format(unsigned byte_packing)
 {
-    BF_WR(LCDIF_CTRL1, BYTE_PACKING_FORMAT, byte_packing);
+    BF_WR(LCDIF_CTRL1, BYTE_PACKING_FORMAT(byte_packing));
 }
 #endif
 
 #if IMX233_SUBTARGET >= 3700 && IMX233_SUBTARGET < 3780
 void imx233_lcdif_enable_sync_signals(bool en)
 {
-    BF_WR(LCDIF_VDCTRL3, SYNC_SIGNALS_ON, en);
+    BF_WR(LCDIF_VDCTRL3, SYNC_SIGNALS_ON(en));
 }
 
 void imx233_lcdif_setup_dotclk(unsigned v_pulse_width, unsigned v_period,
     unsigned v_wait_cnt, unsigned v_active, unsigned h_pulse_width,
     unsigned h_period, unsigned h_wait_cnt, unsigned h_active, bool enable_present)
 {
-    HW_LCDIF_VDCTRL0 = BF_OR4(LCDIF_VDCTRL0, ENABLE_PRESENT(enable_present),
+    BF_WR_ALL(LCDIF_VDCTRL0, ENABLE_PRESENT(enable_present),
         VSYNC_PERIOD_UNIT(1), VSYNC_PULSE_WIDTH_UNIT(1),
          DOTCLK_V_VALID_DATA_CNT(v_active));
-    HW_LCDIF_VDCTRL1 = BF_OR2(LCDIF_VDCTRL1, VSYNC_PERIOD(v_period),
+    BF_WR_ALL(LCDIF_VDCTRL1, VSYNC_PERIOD(v_period),
         VSYNC_PULSE_WIDTH(v_pulse_width));
-    HW_LCDIF_VDCTRL2 = BF_OR3(LCDIF_VDCTRL2, HSYNC_PULSE_WIDTH(h_pulse_width),
+    BF_WR_ALL(LCDIF_VDCTRL2, HSYNC_PULSE_WIDTH(h_pulse_width),
         HSYNC_PERIOD(h_period), DOTCLK_H_VALID_DATA_CNT(h_active));
-    HW_LCDIF_VDCTRL3 = BF_OR2(LCDIF_VDCTRL3, VERTICAL_WAIT_CNT(v_wait_cnt),
+    BF_WR_ALL(LCDIF_VDCTRL3, VERTICAL_WAIT_CNT(v_wait_cnt),
         HORIZONTAL_WAIT_CNT(h_wait_cnt));
     // setup dotclk mode, always bypass count, apparently data select is needed
-    HW_LCDIF_CTRL_SET = BM_OR3(LCDIF_CTRL, DOTCLK_MODE, BYPASS_COUNT, DATA_SELECT);
+    BF_SET(LCDIF_CTRL, DOTCLK_MODE, BYPASS_COUNT, DATA_SELECT);
 }
 
 void imx233_lcdif_setup_dotclk_ex(unsigned v_pulse_width, unsigned v_back_porch,
@@ -369,10 +371,10 @@ void imx233_lcdif_set_lcd_databus_width(unsigned width)
 {
     switch(width)
     {
-        case 8: BF_WR_V(LCDIF_CTRL, LCD_DATABUS_WIDTH, 8_BIT); break;
-        case 16: BF_WR_V(LCDIF_CTRL, LCD_DATABUS_WIDTH, 16_BIT); break;
-        case 18: BF_WR_V(LCDIF_CTRL, LCD_DATABUS_WIDTH, 18_BIT); break;
-        case 24: BF_WR_V(LCDIF_CTRL, LCD_DATABUS_WIDTH, 24_BIT); break;
+        case 8: BF_WR(LCDIF_CTRL, LCD_DATABUS_WIDTH_V(8_BIT)); break;
+        case 16: BF_WR(LCDIF_CTRL, LCD_DATABUS_WIDTH_V(16_BIT)); break;
+        case 18: BF_WR(LCDIF_CTRL, LCD_DATABUS_WIDTH_V(18_BIT)); break;
+        case 24: BF_WR(LCDIF_CTRL, LCD_DATABUS_WIDTH_V(24_BIT)); break;
         default:
             panicf("this chip cannot handle a lcd bus width of %d", width);
             break;

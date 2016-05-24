@@ -101,11 +101,11 @@ struct imx233_button_map_t
 #define IMX233_BUTTON_NAMEFLAGS3(_,name_,f1,f2)   .name = name_, \
     .flags = IMX233_BUTTON_##f1 | IMX233_BUTTON_##f2
 #define IMX233_BUTTON_NAMEFLAGS4(_,name_,f1,f2,f3)    .name = name_, \
-    .flags =IMX233_BUTTON_##f1 | IMX233_BUTTON_##f2 | IMX233_BUTTON_##f3
+    .flags = IMX233_BUTTON_##f1 | IMX233_BUTTON_##f2 | IMX233_BUTTON_##f3
 
 #define IMX233_BUTTON__(btn_, path_, ...) \
     {.btn = btn_, IMX233_BUTTON_PATH_##path_, \
-     REG_VARIADIC(IMX233_BUTTON_NAMEFLAGS, dummy, __VA_ARGS__)}
+     __VAR_EXPAND(IMX233_BUTTON_NAMEFLAGS, dummy, __VA_ARGS__)}
 #define IMX233_BUTTON_(btn_, path_, ...) \
     IMX233_BUTTON__(IMX233_BUTTON_##btn_, path_, __VA_ARGS__)
 #define IMX233_BUTTON(btn_, path_, ...) \

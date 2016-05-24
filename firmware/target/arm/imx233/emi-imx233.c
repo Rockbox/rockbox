@@ -22,6 +22,12 @@
 #include "clkctrl-imx233.h"
 #include "string.h"
 
+#include "regs/clkctrl.h"
+#include "regs/emi.h"
+#include "regs/dram.h"
+
+#define HW_DRAM_CTLxx(xx) (*(&HW_DRAM_CTL00 + (xx)))
+
 struct emi_reg_t
 {
     int index;
@@ -108,10 +114,10 @@ static void set_frequency(unsigned long freq)
              * clk_emi@64 MHz */
             break;
     }
-    BF_WR(CLKCTRL_FRAC, CLKGATEEMI, 0);
-    BF_WR(CLKCTRL_FRAC, EMIFRAC, fracdiv);
-    BF_WR(CLKCTRL_EMI, CLKGATE, 0);
-    BF_WR(CLKCTRL_EMI, DIV_EMI, div);
+    BF_WR(CLKCTRL_FRAC, CLKGATEEMI(0));
+    BF_WR(CLKCTRL_FRAC, EMIFRAC(fracdiv));
+    BF_WR(CLKCTRL_EMI, CLKGATE(0));
+    BF_WR(CLKCTRL_EMI, DIV_EMI(div));
 }
 
 void imx233_emi_set_frequency(unsigned long freq) ICODE_ATTR;

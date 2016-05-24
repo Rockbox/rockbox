@@ -26,6 +26,9 @@
 #include "lcd.h"
 #include "string.h"
 
+#include "regs/apbh.h"
+#include "regs/apbx.h"
+
 // statistics about unaligned transfers
 static int apb_nr_unaligned[32];
 
@@ -42,16 +45,16 @@ void imx233_dma_reset_channel(unsigned chan)
     if(APB_IS_APBX_CHANNEL(chan))
     {
 #if IMX233_SUBTARGET < 3780
-        BF_SETV(APBX_CTRL0, RESET_CHANNEL, bm);
+        BF_WR(APBX_CTRL0_SET, RESET_CHANNEL(bm));
         while(BF_RD(APBX_CTRL0, RESET_CHANNEL) & bm);
 #else
-        BF_SETV(APBX_CHANNEL_CTRL, RESET_CHANNEL, bm);
+        BF_WR(APBX_CHANNEL_CTRL_SET, RESET_CHANNEL(bm));
         while(BF_RD(APBX_CHANNEL_CTRL, RESET_CHANNEL) & bm);
 #endif
     }
     else
     {
-        BF_SETV(APBH_CTRL0, RESET_CHANNEL, bm);
+        BF_WR(APBH_CTRL0_SET, RESET_CHANNEL(bm));
         while(BF_RD(APBH_CTRL0, RESET_CHANNEL) & bm);
     }
 }
@@ -61,9 +64,9 @@ void imx233_dma_clkgate_channel(unsigned chan, bool enable_clock)
     if(APB_IS_APBX_CHANNEL(chan))
         return;
     if(enable_clock)
-        BF_CLRV(APBH_CTRL0, CLKGATE_CHANNEL, 1 << APB_GET_DMA_CHANNEL(chan));
+        BF_WR(APBH_CTRL0_CLR, CLKGATE_CHANNEL(1 << APB_GET_DMA_CHANNEL(chan)));
     else
-        BF_SETV(APBH_CTRL0, CLKGATE_CHANNEL, 1 << APB_GET_DMA_CHANNEL(chan));
+        BF_WR(APBH_CTRL0_SET, CLKGATE_CHANNEL(1 << APB_GET_DMA_CHANNEL(chan)));
 }
 
 void imx233_dma_freeze_channel(unsigned chan, bool freeze)
@@ -73,22 +76,22 @@ void imx233_dma_freeze_channel(unsigned chan, bool freeze)
     {
 #if IMX233_SUBTARGET < 3780
         if(freeze)
-            BF_SETV(APBX_CTRL0, FREEZE_CHANNEL, bm);
+            BF_WR(APBX_CTRL0_SET, FREEZE_CHANNEL(bm));
         else
-            BF_CLRV(APBX_CTRL0, FREEZE_CHANNEL, bm);
+            BF_WR(APBX_CTRL0_CLR, FREEZE_CHANNEL(bm));
 #else
         if(freeze)
-            BF_SETV(APBX_CHANNEL_CTRL, FREEZE_CHANNEL, bm);
+            BF_WR(APBX_CHANNEL_CTRL_SET, FREEZE_CHANNEL(bm));
         else
-            BF_CLRV(APBX_CHANNEL_CTRL, FREEZE_CHANNEL, bm);
+            BF_WR(APBX_CHANNEL_CTRL_CLR, FREEZE_CHANNEL(bm));
 #endif
     }
     else
     {
         if(freeze)
-            BF_SETV(APBH_CTRL0, FREEZE_CHANNEL, bm);
+            BF_WR(APBH_CTRL0_SET, FREEZE_CHANNEL(bm));
         else
-            BF_CLRV(APBH_CTRL0, FREEZE_CHANNEL, bm);
+            BF_WR(APBH_CTRL0_CLR, FREEZE_CHANNEL(bm));
     }
 }
 
@@ -98,16 +101,16 @@ void imx233_dma_enable_channel_interrupt(unsigned chan, bool enable)
     if(APB_IS_APBX_CHANNEL(chan))
     {
         if(enable)
-            BF_SETV(APBX_CTRL1, CH_CMDCMPLT_IRQ_EN, bm);
+            BF_WR(APBX_CTRL1_SET, CH_CMDCMPLT_IRQ_EN(bm));
         else
-            BF_CLRV(APBX_CTRL1, CH_CMDCMPLT_IRQ_EN, bm);
+            BF_WR(APBX_CTRL1_CLR, CH_CMDCMPLT_IRQ_EN(bm));
     }
     else
     {
         if(enable)
-            BF_SETV(APBH_CTRL1, CH_CMDCMPLT_IRQ_EN, bm);
+            BF_WR(APBH_CTRL1_SET, CH_CMDCMPLT_IRQ_EN(bm));
         else
-            BF_CLRV(APBH_CTRL1, CH_CMDCMPLT_IRQ_EN, bm);
+            BF_WR(APBH_CTRL1_CLR, CH_CMDCMPLT_IRQ_EN(bm));
     }
     imx233_dma_clear_channel_interrupt(chan);
 }
@@ -117,20 +120,20 @@ void imx233_dma_clear_channel_interrupt(unsigned chan)
     uint32_t bm = 1 << APB_GET_DMA_CHANNEL(chan);
     if(APB_IS_APBX_CHANNEL(chan))
     {
-        BF_CLRV(APBX_CTRL1, CH_CMDCMPLT_IRQ, bm);
+        BF_WR(APBX_CTRL1_CLR, CH_CMDCMPLT_IRQ(bm));
 #if IMX233_SUBTARGET >= 3780
-        BF_CLRV(APBX_CTRL2, CH_ERROR_IRQ, bm);
+        BF_WR(APBX_CTRL2_CLR, CH_ERROR_IRQ(bm));
 #elif IMX233_SUBTARGET >= 3700
-        BF_CLRV(APBX_CTRL1, CH_AHB_ERROR_IRQ, bm);
+        BF_WR(APBX_CTRL1_CLR, CH_AHB_ERROR_IRQ(bm));
 #endif
     }
     else
     {
-        BF_CLRV(APBH_CTRL1, CH_CMDCMPLT_IRQ, bm);
+        BF_WR(APBH_CTRL1_CLR, CH_CMDCMPLT_IRQ(bm));
 #if IMX233_SUBTARGET >= 3780
-        BF_CLRV(APBH_CTRL2, CH_ERROR_IRQ, bm);
+        BF_WR(APBH_CTRL2_CLR, CH_ERROR_IRQ(bm));
 #elif IMX233_SUBTARGET >= 3700
-        BF_CLRV(APBH_CTRL1, CH_AHB_ERROR_IRQ, bm);
+        BF_WR(APBH_CTRL1_CLR, CH_AHB_ERROR_IRQ(bm));
 #endif
     }
 }
@@ -168,7 +171,7 @@ void imx233_dma_prepare_command(unsigned chan, struct apb_dma_command_t *cmd)
 
     while(BF_RDX(cur->cmd, APB_CHx_CMD, UNUSED) != BV_APB_CHx_CMD_UNUSED__MAGIC)
     {
-        BF_WR_VX(cur->cmd, APB_CHx_CMD, UNUSED, MAGIC);
+        BF_WRX(cur->cmd, APB_CHx_CMD, UNUSED_V(MAGIC));
         int op = BF_RDX(cur->cmd, APB_CHx_CMD, COMMAND);
         int sz = BF_RDX(cur->cmd, APB_CHx_CMD, XFER_COUNT);
         /* device > host: discard */
@@ -191,7 +194,7 @@ void imx233_dma_prepare_command(unsigned chan, struct apb_dma_command_t *cmd)
     cur = cmd;
     while(BF_RDX(cur->cmd, APB_CHx, CMD_UNUSED) != 0)
     {
-        BF_WRX(cur->cmd, APB_CHx, CMD_UNUSED, 0);
+        BF_WRX(cur->cmd, APB_CHx, CMD_UNUSED(0));
         int sz = BF_RDX(cur->cmd, APB_CHx_CMD, CMDWORDS) * sizeof(uint32_t);
         /* commit descriptor and discard descriptor */
         /* chain ? */
@@ -238,10 +241,10 @@ int imx233_dma_wait_completion(unsigned chan, unsigned tmo)
     tmo += current_tick;
     int value = 0;
     if(APB_IS_APBX_CHANNEL(chan))
-        while((value = BF_RDn(APBX_CHn_SEMA, APB_GET_DMA_CHANNEL(chan), PHORE)) && !TIME_AFTER(current_tick, tmo))
+        while((value = BF_RD(APBX_CHn_SEMA(APB_GET_DMA_CHANNEL(chan)), PHORE)) && !TIME_AFTER(current_tick, tmo))
             yield();
     else
-        while((value = BF_RDn(APBH_CHn_SEMA, APB_GET_DMA_CHANNEL(chan), PHORE)) && !TIME_AFTER(current_tick, tmo))
+        while((value = BF_RD(APBH_CHn_SEMA(APB_GET_DMA_CHANNEL(chan)), PHORE)) && !TIME_AFTER(current_tick, tmo))
             yield();
 
     return value;
@@ -263,9 +266,9 @@ struct imx233_dma_info_t imx233_dma_get_info(unsigned chan, unsigned flags)
     if(flags & DMA_INFO_BAR)
         s.bar = apbx ? HW_APBX_CHn_BAR(dmac) : HW_APBH_CHn_BAR(dmac);
     if(flags & DMA_INFO_AHB_BYTES)
-        s.ahb_bytes = apbx ? BF_RDn(APBX_CHn_DEBUG2, dmac, AHB_BYTES) : BF_RDn(APBH_CHn_DEBUG2, dmac, AHB_BYTES);
+        s.ahb_bytes = apbx ? BF_RD(APBX_CHn_DEBUG2(dmac), AHB_BYTES) : BF_RD(APBH_CHn_DEBUG2(dmac),  AHB_BYTES);
     if(flags & DMA_INFO_APB_BYTES)
-        s.apb_bytes = apbx ? BF_RDn(APBX_CHn_DEBUG2, dmac, APB_BYTES) : BF_RDn(APBH_CHn_DEBUG2, dmac, APB_BYTES);
+        s.apb_bytes = apbx ? BF_RD(APBX_CHn_DEBUG2(dmac), APB_BYTES) : BF_RD(APBH_CHn_DEBUG2(dmac),  APB_BYTES);
     if(flags & DMA_INFO_FROZEN)
 #if IMX233_SUBTARGET < 3780
         s.frozen = !!((apbx ? BF_RD(APBX_CTRL0, FREEZE_CHANNEL) : BF_RD(APBH_CTRL0, FREEZE_CHANNEL)) & bm);

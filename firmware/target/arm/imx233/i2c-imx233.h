@@ -26,12 +26,6 @@
 #include "system-target.h"
 #include "i2c.h"
 
-#include "regs/regs-i2c.h"
-
-#define BM_I2C_CTRL1_ALL_IRQ \
-    BM_OR8(I2C_CTRL1, SLAVE_IRQ, SLAVE_STOP_IRQ, MASTER_LOSS_IRQ, EARLY_TERM_IRQ, \
-        OVERSIZE_XFER_TERM_IRQ, NO_SLAVE_ACK_IRQ, DATA_ENGINE_CMPLT_IRQ, BUS_FREE_IRQ)
-
 enum imx233_i2c_error_t
 {
     I2C_SUCCESS = 0,

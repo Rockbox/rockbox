@@ -28,7 +28,7 @@
 #include "ata-target.h"
 #include "ata-defines.h"
 
-#include "regs/regs-gpmi.h"
+#include "regs/gpmi.h"
 
 struct pio_timing_t
 {
@@ -60,11 +60,8 @@ static uint16_t imx233_ata_read_reg(unsigned reg)
     imx233_ata_wait_ready();
 
     /* setup command */
-    HW_GPMI_CTRL0 = BF_OR6(GPMI_CTRL0, RUN(1),
-        COMMAND_MODE(BV_GPMI_CTRL0_COMMAND_MODE__READ),
-        WORD_LENGTH(BV_GPMI_CTRL0_WORD_LENGTH__16_BIT),
-        CS(IMX233_ATA_REG_CS(reg)), ADDRESS(IMX233_ATA_REG_ADDR(reg)),
-        XFER_COUNT(1));
+    BF_WR_ALL(GPMI_CTRL0, RUN(1), COMMAND_MODE_V(READ), WORD_LENGTH_V(16_BIT),
+        CS(IMX233_ATA_REG_CS(reg)), ADDRESS(IMX233_ATA_REG_ADDR(reg)), XFER_COUNT(1));
 
     /* wait for completion */
     while(BF_RD(GPMI_STAT, FIFO_EMPTY));
@@ -79,11 +76,8 @@ static void imx233_ata_write_reg(unsigned reg, uint16_t data)
     imx233_ata_wait_ready();
 
     /* setup command */
-    HW_GPMI_CTRL0 = BF_OR6(GPMI_CTRL0, RUN(1),
-        COMMAND_MODE(BV_GPMI_CTRL0_COMMAND_MODE__WRITE),
-        WORD_LENGTH(BV_GPMI_CTRL0_WORD_LENGTH__16_BIT),
-        CS(IMX233_ATA_REG_CS(reg)), ADDRESS(IMX233_ATA_REG_ADDR(reg)),
-        XFER_COUNT(1));
+    BF_WR_ALL(GPMI_CTRL0, RUN(1), COMMAND_MODE_V(WRITE), WORD_LENGTH_V(16_BIT),
+        CS(IMX233_ATA_REG_CS(reg)), ADDRESS(IMX233_ATA_REG_ADDR(reg)), XFER_COUNT(1));
 
     /* send data */
     HW_GPMI_DATA = data;
@@ -123,16 +117,16 @@ void ata_set_pio_timings(int mode)
     adjust_to_clock(t.data_setup);
     /* write */
     imx233_ata_wait_ready();
-    HW_GPMI_TIMING0 = BF_OR3(GPMI_TIMING0, ADDRESS_SETUP(t.addr_setup),
-        DATA_HOLD(t.data_hold), DATA_SETUP(t.data_setup));
+    BF_WR_ALL(GPMI_TIMING0, ADDRESS_SETUP(t.addr_setup), DATA_HOLD(t.data_hold),
+        DATA_SETUP(t.data_setup));
 }
 
 void ata_reset(void)
 {
     /* reset device */
-    BF_WR_V(GPMI_CTRL1, DEV_RESET, ENABLED);
+    BF_WR(GPMI_CTRL1, DEV_RESET_V(ENABLED));
     sleep(HZ / 10);
-    BF_WR_V(GPMI_CTRL1, DEV_RESET, DISABLED);
+    BF_WR(GPMI_CTRL1, DEV_RESET_V(DISABLED));
 }
 
 void ata_enable(bool on)
@@ -212,7 +206,7 @@ void ata_device_init(void)
     imx233_pinctrl_setup_vpin(VPIN_GPMI_RDn, "ata rd", PINCTRL_DRIVE_4mA, false);
     imx233_pinctrl_setup_vpin(VPIN_GPMI_WRn, "ata wr", PINCTRL_DRIVE_4mA, false);
     /* setup ata mode */
-    BF_WR_V(GPMI_CTRL1, GPMI_MODE, ATA);
+    BF_WR(GPMI_CTRL1, GPMI_MODE_V(ATA));
     /* reset device */
     ata_reset();
     ata_enable(true);

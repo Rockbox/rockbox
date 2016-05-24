@@ -23,6 +23,4 @@
 
 #include "system.h"
 
-#include "regs/regs-gpmi.h"
-
 #endif /* __GPMI_IMX233_H__ */

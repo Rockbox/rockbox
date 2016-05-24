@@ -29,6 +29,57 @@
 #include "pinctrl-imx233.h"
 #include "fmradio_i2c.h"
 
+#include "regs/power.h"
+
+#define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__10mA    (1 << 0)
+#define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__20mA    (1 << 1)
+#define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__50mA    (1 << 2)
+#define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__100mA   (1 << 3)
+#define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__200mA   (1 << 4)
+#define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__400mA   (1 << 5)
+
+
+#define BV_POWER_CHARGE_BATTCHRG_I__10mA   (1 << 0)
+#define BV_POWER_CHARGE_BATTCHRG_I__20mA   (1 << 1)
+#define BV_POWER_CHARGE_BATTCHRG_I__50mA   (1 << 2)
+#define BV_POWER_CHARGE_BATTCHRG_I__100mA  (1 << 3)
+#define BV_POWER_CHARGE_BATTCHRG_I__200mA  (1 << 4)
+#define BV_POWER_CHARGE_BATTCHRG_I__400mA  (1 << 5)
+
+#define BV_POWER_CHARGE_STOP_ILIMIT__10mA  (1 << 0)
+#define BV_POWER_CHARGE_STOP_ILIMIT__20mA  (1 << 1)
+#define BV_POWER_CHARGE_STOP_ILIMIT__50mA  (1 << 2)
+#define BV_POWER_CHARGE_STOP_ILIMIT__100mA (1 << 3)
+
+#if IMX233_SUBTARGET >= 3700
+#define HW_POWER_VDDDCTRL__TRG_STEP 25 /* mV */
+#define HW_POWER_VDDDCTRL__TRG_MIN  800 /* mV */
+
+#define HW_POWER_VDDACTRL__TRG_STEP 25 /* mV */
+#define HW_POWER_VDDACTRL__TRG_MIN  1500 /* mV */
+
+#define HW_POWER_VDDIOCTRL__TRG_STEP    25 /* mV */
+#define HW_POWER_VDDIOCTRL__TRG_MIN 2800 /* mV */
+
+#define HW_POWER_VDDMEMCTRL__TRG_STEP    50 /* mV */
+#define HW_POWER_VDDMEMCTRL__TRG_MIN 1700 /* mV */
+#else
+/* don't use the full available range because of the weird encodings for
+ * extreme values which are useless anyway */
+#define HW_POWER_VDDDCTRL__TRG_STEP 32 /* mV */
+#define HW_POWER_VDDDCTRL__TRG_MIN  1280 /* mV */
+#define HW_POWER_VDDDCTRL__TRG_OFF  8 /* below 8, the register value doesn't encode linearly */
+#endif
+
+#define BV_POWER_MISC_FREQSEL__RES         0
+#define BV_POWER_MISC_FREQSEL__20MHz       1
+#define BV_POWER_MISC_FREQSEL__24MHz       2
+#define BV_POWER_MISC_FREQSEL__19p2MHz     3
+#define BV_POWER_MISC_FREQSEL__14p4MHz     4
+#define BV_POWER_MISC_FREQSEL__18MHz       5
+#define BV_POWER_MISC_FREQSEL__21p6MHz     6
+#define BV_POWER_MISC_FREQSEL__17p28MHz    7
+
 struct current_step_bit_t
 {
     unsigned current;
@@ -103,7 +154,7 @@ void INT_VDD5V(void)
         else
             usb_remove_int();
         /* reverse polarity */
-        BF_TOG(POWER_CTRL, POLARITY_VBUSVALID);
+        BF_WR(POWER_CTRL_TOG, POLARITY_VBUSVALID(1));
         /* clear int */
         BF_CLR(POWER_CTRL, VBUSVALID_IRQ);
     }
@@ -115,7 +166,7 @@ void INT_VDD5V(void)
         else
             usb_remove_int();
         /* reverse polarity */
-        BF_TOG(POWER_CTRL, POLARITY_VDD5V_GT_VDDIO);
+        BF_WR(POWER_CTRL_TOG, POLARITY_VDD5V_GT_VDDIO(1));
         /* clear int */
         BF_CLR(POWER_CTRL, VDD5V_GT_VDDIO_IRQ);
     }
@@ -128,8 +179,7 @@ void imx233_power_init(void)
     BF_CLR(POWER_MINPWR, HALF_FETS);
 #endif
     /* setup vbusvalid parameters: set threshold to 4v and power up comparators */
-    BF_CLR(POWER_5VCTRL, VBUSVALID_TRSH);
-    BF_SETV(POWER_5VCTRL, VBUSVALID_TRSH, 1);
+    BF_CS(POWER_5VCTRL, VBUSVALID_TRSH(1));
 #if IMX233_SUBTARGET >= 3780
     BF_SET(POWER_5VCTRL, PWRUP_VBUS_CMPS);
 #else
@@ -190,7 +240,7 @@ void power_off(void)
     imx233_pinctrl_set_gpio(0, 9, true);
 #endif
     /* power down */
-    HW_POWER_RESET = BM_OR2(POWER_RESET, UNLOCK, PWD);
+    HW_POWER_RESET = BM_OR(POWER_RESET, UNLOCK, PWD); // FIXME bug
     while(1);
 }
 
@@ -218,9 +268,9 @@ void imx233_power_set_charge_current(unsigned current)
         {
             current -= g_charger_current_bits[i].current;
 #if IMX233_SUBTARGET >= 3700
-            BF_SETV(POWER_CHARGE, BATTCHRG_I, g_charger_current_bits[i].bit);
+            BF_WR(POWER_CHARGE_SET, BATTCHRG_I(g_charger_current_bits[i].bit));
 #else
-            BF_SETV(POWER_BATTCHRG, BATTCHRG_I, g_charger_current_bits[i].bit);
+            BF_WR(POWER_BATTCHRG_SET, BATTCHRG_I(g_charger_current_bits[i].bit));
 #endif
         }
 }
@@ -243,9 +293,9 @@ void imx233_power_set_stop_current(unsigned current)
         {
             current -= g_charger_stop_current_bits[i].current;
 #if IMX233_SUBTARGET >= 3700
-            BF_SETV(POWER_CHARGE, STOP_ILIMIT, g_charger_stop_current_bits[i].bit);
+            BF_WR(POWER_CHARGE_SET, STOP_ILIMIT(g_charger_stop_current_bits[i].bit));
 #else
-            BF_SETV(POWER_BATTCHRG, STOP_ILIMIT, g_charger_stop_current_bits[i].bit);
+            BF_WR(POWER_BATTCHRG_SET, STOP_ILIMIT(g_charger_stop_current_bits[i].bit));
 #endif
         }
     }
@@ -363,7 +413,7 @@ static void update_dcfuncv(void)
     imx233_power_get_regulator(REGULATOR_VDDA, &vdda, NULL);
     imx233_power_get_regulator(REGULATOR_VDDIO, &vddio, NULL);
     // assume Li-Ion, to divide by 6.25, do *100 and /625
-    HW_POWER_DCFUNCV = BF_OR2(POWER_DCFUNCV, VDDIO(((vddio - vdda) * 100) / 625),
+    BF_WR_ALL(POWER_DCFUNCV, VDDIO(((vddio - vdda) * 100) / 625),
         VDDD(((vdda - vddd) * 100) / 625));
 }
 #endif
@@ -447,13 +497,13 @@ int imx233_power_sense_die_temperature(int *min, int *max)
         -50, -40, -30, -20, -10, 0, 15, 25, 35, 45, 55, 70, 85, 95, 105, 115, 130
     };
     /* power up temperature sensor */
-    BF_CLRV(POWER_SPEEDTEMP, TEMP_CTRL, 1 << 3);
+    BF_WR(POWER_SPEEDTEMP_CLR, TEMP_CTRL(1 << 3));
     /* read temp */
     int sense = BF_RD(POWER_SPEEDTEMP, TEMP_STS);
     *min = die_temp[sense];
     *max = die_temp[sense + 1];
     /* power down temperature sensor */
-    BF_SETV(POWER_SPEEDTEMP, TEMP_CTRL, 1 << 3);
+    BF_WR(POWER_SPEEDTEMP_SET, TEMP_CTRL(1 << 3));
     return 0;
 }
 #endif
