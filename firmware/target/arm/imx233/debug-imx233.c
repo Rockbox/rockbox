@@ -43,6 +43,9 @@
 #include "button.h"
 #include "button-imx233.h"
 
+#include "regs/usbphy.h"
+#include "regs/timrot.h"
+
 #define ACT_NONE    0
 #define ACT_CANCEL  1
 #define ACT_OK      2

@@ -25,7 +25,7 @@
 #include "system.h"
 #include "cpu.h"
 
-#include "regs/regs-rtc.h"
+#include "regs/rtc.h"
 
 #define HW_RTC_PERSISTENTn(n)   *(&HW_RTC_PERSISTENT0 + 4 * (n))
 

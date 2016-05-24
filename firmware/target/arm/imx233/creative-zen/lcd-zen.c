@@ -38,6 +38,8 @@
 #include "action.h"
 #endif
 
+#include "regs/lcdif.h"
+
 /**
  * DMA
  */
@@ -321,15 +323,15 @@ void lcd_init_device(void)
     {
         unsigned xfer = MIN(IMX233_MAX_SINGLE_DMA_XFER_SIZE, size);
         lcdif_dma[i].dma.next = &lcdif_dma[(i + 1) % NR_CMDS].dma;
-        lcdif_dma[i].dma.cmd = BF_OR3(APB_CHx_CMD, CHAIN(1),
+        lcdif_dma[i].dma.cmd = BF_OR(APB_CHx_CMD, CHAIN(1),
             COMMAND(BV_APB_CHx_CMD_COMMAND__READ), XFER_COUNT(xfer));
         lcdif_dma[i].dma.buffer =  frame_p;
         size -= xfer;
         frame_p += xfer;
     }
     // first transfer: enable run, dotclk and so on
-    lcdif_dma[0].dma.cmd |= BF_OR1(APB_CHx_CMD, CMDWORDS(1));
-    lcdif_dma[0].ctrl = BF_OR4(LCDIF_CTRL, BYPASS_COUNT(1), DOTCLK_MODE(1),
+    lcdif_dma[0].dma.cmd |= BF_OR(APB_CHx_CMD, CMDWORDS(1));
+    lcdif_dma[0].ctrl = BF_OR(LCDIF_CTRL, BYPASS_COUNT(1), DOTCLK_MODE(1),
         RUN(1), WORD_LENGTH(1));
     // enable
     lcd_enable(true);

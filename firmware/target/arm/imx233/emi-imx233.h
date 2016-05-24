@@ -25,11 +25,6 @@
 #include "system.h"
 #include "system-target.h"
 
-#include "regs/regs-emi.h"
-#include "regs/regs-dram.h"
-
-#define HW_DRAM_CTLxx(xx) (*(&HW_DRAM_CTL00 + (xx)))
-
 struct imx233_emi_info_t
 {
     int cas; // 1/2 cycle unit

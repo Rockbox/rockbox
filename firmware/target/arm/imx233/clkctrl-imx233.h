@@ -25,11 +25,11 @@
 #include "system.h"
 #include "cpu.h"
 
-#include "regs/regs-clkctrl.h"
+#include "regs/clkctrl.h"
 
 static inline void core_sleep(void)
 {
-    BF_WR(CLKCTRL_CPU, INTERRUPT_WAIT, 1);
+    BF_WR(CLKCTRL_CPU, INTERRUPT_WAIT(1));
     asm volatile (
         "mcr p15, 0, %0, c7, c0, 4 \n" /* Wait for interrupt */
         "nop\n" /* Datasheet unclear: "The lr sent to handler points here after RTI"*/

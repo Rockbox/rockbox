@@ -28,18 +28,6 @@
 #include "system.h"
 #include "system-target.h"
 
-#include "regs/regs-lradc.h"
-
-/** additional defines */
-#define BP_LRADC_CTRL4_LRADCxSELECT(x)  (4 * (x))
-#define BM_LRADC_CTRL4_LRADCxSELECT(x)  (0xf << (4 * (x)))
-
-#define BP_LRADC_CTRL1_LRADCx_IRQ(x)    (x)
-#define BM_LRADC_CTRL1_LRADCx_IRQ(x)    (1 << (x))
-
-#define BP_LRADC_CTRL1_LRADCx_IRQ_EN(x)    (16 + (x))
-#define BM_LRADC_CTRL1_LRADCx_IRQ_EN(x)    (1 << (16 + (x)))
-
 #define LRADC_NUM_CHANNELS  8
 #define LRADC_NUM_DELAYS    4
 #define LRADC_NUM_SOURCES   16

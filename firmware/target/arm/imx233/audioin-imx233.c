@@ -22,6 +22,10 @@
 #include "pcm_sampr.h"
 #include "string.h"
 
+#include "regs/audioin.h"
+/* some audioout registers impact audioin */
+#include "regs/audioout.h"
+
 /* values in half-dB, one for each setting */
 static int audioin_vol[2][4]; /* 0=left, 1=right */
 static int audioin_select[2]; /* idem */
@@ -87,35 +91,35 @@ static void apply_config(void)
     {
         /* take lowest microphone gain to get back into the -100..22 range
          * achievable with mux+adc.*/
-        
+
         /* from 52.5 dB and beyond: 40dB gain */
         if(vol_l > 52 * 2)
         {
-            BF_WR_V(AUDIOIN_MICLINE, MIC_GAIN, 40dB);
+            BF_WR(AUDIOIN_MICLINE, MIC_GAIN_V(40dB));
             vol_l -= 40 * 2;
         }
         /* from 42.5 dB to 52dB: 30dB gain */
         else if(vol_l > 42 * 2)
         {
-            BF_WR_V(AUDIOIN_MICLINE, MIC_GAIN, 30dB);
+            BF_WR(AUDIOIN_MICLINE, MIC_GAIN_V(30dB));
             vol_l -= 30 * 2;
         }
         /* from 22.5 dB to 42dB: 20dB gain */
         else if(vol_l > 22 * 2)
         {
-            BF_WR_V(AUDIOIN_MICLINE, MIC_GAIN, 20dB);
+            BF_WR(AUDIOIN_MICLINE, MIC_GAIN_V(20dB));
             vol_l -= 20 * 2;
         }
         /* otherwise 0dB gain */
         else
-            BF_WR_V(AUDIOIN_MICLINE, MIC_GAIN, 0dB);
+            BF_WR(AUDIOIN_MICLINE, MIC_GAIN_V(0dB));
     }
     /* max is 22dB */
     vol_l = MIN(vol_l, 44);
     vol_r = MIN(vol_r, 44);
     /* we use the mux volume to reach the volume or higher with 1.5dB steps
      * and then we use the ADC to go below 0dB or to obtain 0.5dB accuracy */
-    
+
     int mux_vol_l = MAX(0, (vol_l + 2) / 3); /* 1.5dB = 3 * 0.5dB */
     int mux_vol_r = MAX(0, (vol_r + 2) / 3);
 #if IMX233_SUBTARGET >= 3700
@@ -123,7 +127,7 @@ static void apply_config(void)
 #else
     unsigned adc_zcd = 0;
 #endif
-    HW_AUDIOIN_ADCVOL = adc_zcd | BF_OR4(AUDIOIN_ADCVOL, SELECT_LEFT(select_l),
+    HW_AUDIOIN_ADCVOL = adc_zcd | BF_OR(AUDIOIN_ADCVOL, SELECT_LEFT(select_l),
         SELECT_RIGHT(select_r), GAIN_LEFT(mux_vol_l), GAIN_RIGHT(mux_vol_r));
 
     vol_l -= mux_vol_l * 3; /* mux vol is in 1.5dB = 3 * 0.5dB steps */
@@ -133,7 +137,7 @@ static void apply_config(void)
 
     /* unmute, enable zero cross and set volume.
      * 0xfe is -0.5dB */
-    HW_AUDIOIN_ADCVOLUME = BF_OR3(AUDIOIN_ADCVOLUME, EN_ZCD(1),
+    BF_WR_ALL(AUDIOIN_ADCVOLUME, EN_ZCD(1),
         VOLUME_LEFT(0xff + vol_l), VOLUME_RIGHT(0xff + vol_r));
 }
 
@@ -153,12 +157,12 @@ void imx233_audioin_enable_mic(bool enable)
 {
     if(enable)
     {
-        BF_WR_V(AUDIOIN_MICLINE, MIC_RESISTOR, 2KOhm);
-        BF_WR(AUDIOIN_MICLINE, MIC_BIAS, 4);
-        BF_WR(AUDIOIN_MICLINE, MIC_SELECT, 1);
+        BF_WR(AUDIOIN_MICLINE, MIC_RESISTOR_V(2KOhm));
+        BF_WR(AUDIOIN_MICLINE, MIC_BIAS(4));
+        BF_WR(AUDIOIN_MICLINE, MIC_SELECT(1));
     }
     else
-        BF_WR_V(AUDIOIN_MICLINE, MIC_RESISTOR, Off);
+        BF_WR(AUDIOIN_MICLINE, MIC_RESISTOR_V(Off));
 }
 
 void imx233_audioin_set_freq(int fsel)
@@ -185,7 +189,7 @@ void imx233_audioin_set_freq(int fsel)
         HW_HAVE_96_([HW_FREQ_96] = { 0x2, 0x0, 0xf, 0x13ff },)
     };
 
-    HW_AUDIOIN_ADCSRR = BF_OR4(AUDIOIN_ADCSRR,
+    BF_WR_ALL(AUDIOIN_ADCSRR,
         SRC_FRAC(dacssr[fsel].src_frac), SRC_INT(dacssr[fsel].src_int),
         SRC_HOLD(dacssr[fsel].src_hold), BASEMULT(dacssr[fsel].base_mult));
 }

@@ -114,9 +114,9 @@ void rtc_enable_alarm(bool enable)
     BF_CLR(RTC_CTRL, ALARM_IRQ_EN);
     BF_CLR(RTC_CTRL, ALARM_IRQ);
     uint32_t val = imx233_rtc_read_persistent(0);
-    BF_WRX(val, RTC_PERSISTENT0, ALARM_EN, enable);
-    BF_WRX(val, RTC_PERSISTENT0, ALARM_WAKE_EN, enable);
-    BF_WRX(val, RTC_PERSISTENT0, ALARM_WAKE, 0);
+    BF_WRX(val, RTC_PERSISTENT0, ALARM_EN(enable));
+    BF_WRX(val, RTC_PERSISTENT0, ALARM_WAKE_EN(enable));
+    BF_WRX(val, RTC_PERSISTENT0, ALARM_WAKE(0));
     imx233_rtc_write_persistent(0, val);
 }
 

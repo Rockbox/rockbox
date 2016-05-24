@@ -25,10 +25,6 @@
 #include "cpu.h"
 #include "system.h"
 
-#include "regs/regs-audioin.h"
-/* some audioout registers impact audioin */
-#include "regs/regs-audioout.h"
-
 #define AUDIOIN_SELECT_MICROPHONE   0
 #define AUDIOIN_SELECT_LINE1        1
 #define AUDIOIN_SELECT_HEADPHONE    2

@@ -26,8 +26,6 @@
 #include "system.h"
 #include "system-target.h"
 
-#include "regs/regs-lcdif.h"
-
 typedef void (*lcdif_irq_cb_t)(void);
 
 void imx233_lcdif_enable(bool enable);

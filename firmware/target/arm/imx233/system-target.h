@@ -28,9 +28,6 @@
 #include "icoll-imx233.h"
 #include "clock-target.h" /* CPUFREQ_* are defined here */
 
-#include "regs/regs-digctl.h"
-#include "regs/regs-usbphy.h"
-
 /**
  * Absolute maximum CPU speed: 454.74 MHz (STMP3780), 320.00 MHz (STMP3700)
  * Intermediate CPU speeds: 261.82 MHz, 64 MHz

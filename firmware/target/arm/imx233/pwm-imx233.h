@@ -23,12 +23,6 @@
 
 #include "system.h"
 
-#include "regs/regs-pwm.h"
-
-/* fake field for simpler programming */
-#define BP_PWM_CTRL_PWMx_ENABLE(x)  (x)
-#define BM_PWM_CTRL_PWMx_ENABLE(x)  (1 << (x))
-
 #define IMX233_PWM_MAX_PERIOD   (1 << 16)
 
 #define IMX233_PWM_NR_CHANNELS  5

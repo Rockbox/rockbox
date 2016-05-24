@@ -34,8 +34,9 @@
 #include "action.h"
 #endif
 #include "dma-imx233.h"
+#include "kernel.h"
 
-#include "regs/regs-lcdif.h"
+#include "regs/lcdif.h"
 
 /**
  * NOTE
@@ -208,7 +209,7 @@ static void setup_parameters(void)
     imx233_lcdif_set_word_length(16);
     imx233_lcdif_set_data_swizzle(false);
     imx233_lcdif_set_timings(2, 1, 1, 1);
-    BF_WR_V(LCDIF_CTRL, MODE86, 8080_MODE);
+    BF_WR(LCDIF_CTRL, MODE86_V(8080_MODE));
 
     imx233_lcdif_reset_lcd(true);
     udelay(50);
@@ -243,9 +244,9 @@ void lcd_update(void)
     /* We can safely do the transfer in a single shot, since 160 * 128 * 2 < 65k,
      * the maximum transfer size!
      */
-    lcdif_dma.dma.cmd |= BF_OR3(APB_CHx_CMD, CMDWORDS(1), XFER_COUNT(size), COMMAND(2));
+    lcdif_dma.dma.cmd |= BF_OR(APB_CHx_CMD, CMDWORDS(1), XFER_COUNT(size), COMMAND(2));
     lcdif_dma.ctrl0 = HW_LCDIF_CTRL & ~BM_LCDIF_CTRL_COUNT;
-    lcdif_dma.ctrl0 |= BF_OR2(LCDIF_CTRL, COUNT(size/2), DATA_SELECT(1));
+    lcdif_dma.ctrl0 |= BF_OR(LCDIF_CTRL, COUNT(size/2), DATA_SELECT(1));
     lcdif_dma.dma.buffer = FBADDR(0,0);
     lcdif_dma.dma.cmd |= BM_APB_CHx_CMD_SEMAPHORE;
 

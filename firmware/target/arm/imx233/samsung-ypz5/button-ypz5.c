@@ -21,6 +21,7 @@
 #include "system.h"
 #include "lcd.h"
 #include "string.h"
+#include "kernel.h"
 #include "pinctrl-imx233.h"
 #include "power-imx233.h"
 #include "button-lradc-imx233.h"

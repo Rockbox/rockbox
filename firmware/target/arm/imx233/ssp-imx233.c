@@ -25,6 +25,43 @@
 #include "pinctrl-imx233.h"
 #include "dma-imx233.h"
 
+#include "regs/ssp.h"
+
+#if IMX233_SUBTARGET < 3700
+#define IMX233_NR_SSP  1
+#else
+#define IMX233_NR_SSP  2
+#endif
+
+/* ssp can value 1 or 2 */
+#if IMX233_NR_SSP >= 2
+#define __SSP_SELECT(ssp, ssp1, ssp2) ((ssp) == 1 ? (ssp1) : (ssp2))
+#else
+#define __SSP_SELECT(ssp, ssp1, ssp2) (ssp1)
+#endif
+
+#define INT_SRC_SSP_DMA(ssp)    __SSP_SELECT(ssp, INT_SRC_SSP1_DMA, INT_SRC_SSP2_DMA)
+#define INT_SRC_SSP_ERROR(ssp)  __SSP_SELECT(ssp, INT_SRC_SSP1_ERROR, INT_SRC_SSP2_ERROR)
+
+#if IMX233_SUBTARGET < 3700
+#define ALL_IRQ \
+    SDIO_IRQ, RESP_ERR_IRQ, RESP_TIMEOUT_IRQ, DATA_TIMEOUT_IRQ, \
+        DATA_CRC_IRQ, RECV_TIMEOUT_IRQ, RECV_OVRFLW_IRQ
+#define ALL_IRQ_EN \
+    SDIO_IRQ_EN, RESP_ERR_IRQ_EN, RESP_TIMEOUT_IRQ_EN, DATA_TIMEOUT_IRQ_EN, \
+        DATA_CRC_IRQ_EN, RECV_TIMEOUT_IRQ_EN, RECV_OVRFLW_IRQ_EN
+#else
+#define ALL_IRQ \
+    SDIO_IRQ, RESP_ERR_IRQ, RESP_TIMEOUT_IRQ, DATA_TIMEOUT_IRQ, \
+        DATA_CRC_IRQ, FIFO_UNDERRUN_IRQ, RECV_TIMEOUT_IRQ, FIFO_OVERRUN_IRQ
+#define ALL_IRQ_EN \
+    SDIO_IRQ_EN, RESP_ERR_IRQ_EN, RESP_TIMEOUT_IRQ_EN, DATA_TIMEOUT_IRQ_EN, \
+        DATA_CRC_IRQ_EN, FIFO_UNDERRUN_EN, RECV_TIMEOUT_IRQ_EN, FIFO_OVERRUN_IRQ_EN
+#endif
+
+#define TIMEOUT_IRQ \
+    RESP_TIMEOUT_IRQ, DATA_TIMEOUT_IRQ, RECV_TIMEOUT_IRQ
+
 /* for debug purpose */
 #if 0
 #define ASSERT_SSP(ssp) if(ssp < 1 || ssp > 2) panicf("ssp=%d in %s", ssp, __func__);
@@ -37,15 +74,13 @@
 #define SSP_SETn(reg, n, field) BF_SET(reg, field)
 #define SSP_CLRn(reg, n, field) BF_CLR(reg, field)
 #define SSP_RDn(reg, n, field) BF_RD(reg, field)
-#define SSP_WRn(reg, n, field, val) BF_WR(reg, field, val)
-#define SSP_WRn_V(reg, n, field, val) BF_WR_V(reg, field, val)
+#define SSP_WRn(reg, n, field, val) BF_WR(reg, field(val))
 #define SSP_REGn(reg, n) HW_##reg
 #else
-#define SSP_SETn(reg, n, field) BF_SETn(reg, n, field)
-#define SSP_CLRn(reg, n, field) BF_CLRn(reg, n, field)
-#define SSP_RDn(reg, n, field) BF_RDn(reg, n, field)
-#define SSP_WRn(reg, n, field, val) BF_WRn(reg, n, field, val)
-#define SSP_WRn_V(reg, n, field, val) BF_WRn_V(reg, n, field, val)
+#define SSP_SETn(reg, n, field) BF_SET(reg(n), field)
+#define SSP_CLRn(reg, n, field) BF_CLR(reg(n), field)
+#define SSP_RDn(reg, n, field) BF_RD(reg(n), field)
+#define SSP_WRn(reg, n, field, val) BF_WR(reg(n), field(val))
 #define SSP_REGn(reg, n) HW_##reg(n)
 #endif
 
@@ -176,7 +211,7 @@ void imx233_ssp_set_timings(int ssp, int divide, int rate, int timeout)
     ASSERT_SSP(ssp)
     if(divide == 0 || (divide % 2) == 1)
         panicf("SSP timing divide must be event");
-    SSP_REGn(SSP_TIMING, ssp) = BF_OR3(SSP_TIMING, CLOCK_DIVIDE(divide),
+    SSP_REGn(SSP_TIMING, ssp) = BF_OR(SSP_TIMING, CLOCK_DIVIDE(divide),
         CLOCK_RATE(rate), TIMEOUT(timeout));
 }
 
@@ -262,7 +297,7 @@ void imx233_ssp_set_mode(int ssp, unsigned mode)
     switch(mode)
     {
         case BV_SSP_CTRL1_SSP_MODE__SD_MMC:
-            SSP_WRn_V(SSP_CTRL1, ssp, WORD_LENGTH, EIGHT_BITS);
+            SSP_WRn(SSP_CTRL1, ssp, WORD_LENGTH_V, EIGHT_BITS);
             SSP_SETn(SSP_CTRL1, ssp, POLARITY);
             SSP_SETn(SSP_CTRL1, ssp, DMA_ENABLE);
             break;
@@ -311,14 +346,14 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
     unsigned xfer_size = block_count * (1 << ssp_log_block_size[ssp - 1]);
 
 #if IMX233_SUBTARGET < 3700
-    ssp_dma_cmd[ssp - 1].cmd0 = BF_OR1(SSP_CMD0, CMD(cmd));
+    ssp_dma_cmd[ssp - 1].cmd0 = BF_OR(SSP_CMD0, CMD(cmd));
 #else
-    ssp_dma_cmd[ssp - 1].cmd0 = BF_OR4(SSP_CMD0, CMD(cmd), APPEND_8CYC(1),
+    ssp_dma_cmd[ssp - 1].cmd0 = BF_OR(SSP_CMD0, CMD(cmd), APPEND_8CYC(1),
         BLOCK_SIZE(ssp_log_block_size[ssp - 1]), BLOCK_COUNT(block_count - 1));
 #endif
     ssp_dma_cmd[ssp - 1].cmd1 = cmd_arg;
     /* setup all flags and run */
-    ssp_dma_cmd[ssp - 1].ctrl0 = BF_OR9(SSP_CTRL0, XFER_COUNT(xfer_size),
+    ssp_dma_cmd[ssp - 1].ctrl0 = BF_OR(SSP_CTRL0, XFER_COUNT(xfer_size),
         ENABLE(1), IGNORE_CRC(buffer == NULL), WAIT_FOR_IRQ(wait4irq),
         GET_RESP(resp != SSP_NO_RESP), LONG_RESP(resp == SSP_LONG_RESP),
         BUS_WIDTH(ssp_bus_width[ssp - 1]), DATA_XFER(buffer != NULL),
@@ -326,7 +361,7 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
     /* setup the dma parameters */
     ssp_dma_cmd[ssp - 1].dma.buffer = buffer;
     ssp_dma_cmd[ssp - 1].dma.next = NULL;
-    ssp_dma_cmd[ssp - 1].dma.cmd = BF_OR6(APB_CHx_CMD,
+    ssp_dma_cmd[ssp - 1].dma.cmd = BF_OR(APB_CHx_CMD,
         COMMAND(buffer == NULL ? BV_APB_CHx_CMD_COMMAND__NO_XFER :
         read ? BV_APB_CHx_CMD_COMMAND__WRITE : BV_APB_CHx_CMD_COMMAND__READ),
         IRQONCMPLT(1), SEMAPHORE(1), WAIT4ENDCMD(1), CMDWORDS(3), XFER_COUNT(xfer_size));
@@ -343,9 +378,9 @@ enum imx233_ssp_error_t imx233_ssp_sd_mmc_transfer(int ssp, uint8_t cmd,
         imx233_dma_reset_channel(APB_SSP(ssp));
         ret = SSP_TIMEOUT;
     }
-    else if((SSP_REGn(SSP_CTRL1, ssp) & BM_SSP_CTRL1_ALL_IRQ) == 0)
+    else if((SSP_REGn(SSP_CTRL1, ssp) & BM_OR(SSP_CTRL1, ALL_IRQ)) == 0)
         ret =  SSP_SUCCESS;
-    else if((SSP_REGn(SSP_CTRL1, ssp) & BM_SSP_CTRL1_TIMEOUT_IRQ))
+    else if((SSP_REGn(SSP_CTRL1, ssp) & BM_OR(SSP_CTRL1, TIMEOUT_IRQ)))
         ret = SSP_TIMEOUT;
     else
         ret = SSP_ERROR;

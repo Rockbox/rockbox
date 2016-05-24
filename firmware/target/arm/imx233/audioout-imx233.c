@@ -30,6 +30,8 @@
 #include "audio-target.h"
 #include "power-imx233.h"
 
+#include "regs/audioout.h"
+
 #ifndef IMX233_AUDIO_COUPLING_MODE
 #error You must define IMX233_AUDIO_COUPLING_MODE
 #endif
@@ -75,8 +77,8 @@ void imx233_audioout_preinit(void)
     /* Set HP mode to AB */
     BF_SET(AUDIOOUT_ANACTRL, HP_CLASSAB);
     /* change bias to -50% */
-    BF_WR(AUDIOOUT_TEST, HP_I1_ADJ, 1);
-    BF_WR(AUDIOOUT_REFCTRL, BIAS_CTRL, 1);
+    BF_WR(AUDIOOUT_TEST, HP_I1_ADJ(1));
+    BF_WR(AUDIOOUT_REFCTRL, BIAS_CTRL(1));
 #if IMX233_SUBTARGET >= 3700
     BF_SET(AUDIOOUT_REFCTRL, RAISE_REF);
 #endif
@@ -84,11 +86,11 @@ void imx233_audioout_preinit(void)
     /* Stop holding to ground */
     BF_CLR(AUDIOOUT_ANACTRL, HP_HOLD_GND);
     /* Set dmawait count to 31 (see errata, workaround random stop) */
-    BF_WR(AUDIOOUT_CTRL, DMAWAIT_COUNT, 31);
+    BF_WR(AUDIOOUT_CTRL, DMAWAIT_COUNT(31));
     /* start converting audio */
     BF_SET(AUDIOOUT_CTRL, RUN);
     /* unmute DAC */
-    HW_AUDIOOUT_DACVOLUME_CLR = BM_OR2(AUDIOOUT_DACVOLUME, MUTE_LEFT, MUTE_RIGHT);
+    BF_CLR(AUDIOOUT_DACVOLUME, MUTE_LEFT, MUTE_RIGHT);
     /* send a few samples to avoid pop */
     HW_AUDIOOUT_DATA = 0;
     HW_AUDIOOUT_DATA = 0;
@@ -113,7 +115,7 @@ void imx233_audioout_close(void)
     /* Power down HP */
     BF_SET(AUDIOOUT_PWRDN, HEADPHONE);
     /* Mute DAC */
-    HW_AUDIOOUT_DACVOLUME_SET = BM_OR2(AUDIOOUT_DACVOLUME, MUTE_LEFT, MUTE_RIGHT);
+    BF_SET(AUDIOOUT_DACVOLUME, MUTE_LEFT, MUTE_RIGHT);
     /* Power down DAC */
     BF_SET(AUDIOOUT_PWRDN, DAC);
     /* Gate off DAC */
@@ -133,8 +135,8 @@ static void set_dac_vol(int vol_l, int vol_r)
     vol_r = MAX(-200, MIN(vol_r, 0));
     /* unmute, enable zero cross and set volume.
      * 0xff is 0dB */
-    HW_AUDIOOUT_DACVOLUME = BF_OR3(AUDIOOUT_DACVOLUME,
-        VOLUME_LEFT(0xff + vol_l), VOLUME_RIGHT(0xff + vol_r), EN_ZCD(1));
+    BF_WR_ALL(AUDIOOUT_DACVOLUME, VOLUME_LEFT(0xff + vol_l),
+        VOLUME_RIGHT(0xff + vol_r), EN_ZCD(1));
 }
 
 /* volume in half dB
@@ -154,7 +156,7 @@ static void set_hp_vol(int vol_l, int vol_r)
 #else
     unsigned mstr_zcd = 0;
 #endif
-    HW_AUDIOOUT_HPVOL = mstr_zcd | BF_OR3(AUDIOOUT_HPVOL, SELECT(input_line1),
+    HW_AUDIOOUT_HPVOL = mstr_zcd | BF_OR(AUDIOOUT_HPVOL, SELECT(input_line1),
         VOL_LEFT(max - vol_l), VOL_RIGHT(max - vol_r));
 }
 
@@ -206,10 +208,10 @@ void imx233_audioout_set_freq(int fsel)
         HW_HAVE_96_([HW_FREQ_96] = { 0x2, 0x0, 0xf, 0x13ff },)
     };
 
-    HW_AUDIOOUT_DACSRR = BF_OR4(AUDIOOUT_DACSRR,
+    BF_WR_ALL(AUDIOOUT_DACSRR,
         SRC_FRAC(dacssr[fsel].src_frac), SRC_INT(dacssr[fsel].src_int),
         SRC_HOLD(dacssr[fsel].src_hold), BASEMULT(dacssr[fsel].base_mult));
-    
+
     #if 0
     /* Select base_mult and src_hold depending on the audio range:
      *     0 < f <= 12000   --> base_mult = 1, src_hold = 3 (div by 4)
@@ -250,15 +252,15 @@ void imx233_audioout_set_3d_effect(int val)
     switch(val)
     {
         /* 0 and 1.5dB: off */
-        case 0: case 1: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT, 0); break;
+        case 0: case 1: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT(0)); break;
         /* 3dB: low */
-        case 2: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT, 1); break;
+        case 2: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT(1)); break;
         /* 4.5dB: low */
-        case 3: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT, 2); break;
+        case 3: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT(2)); break;
         /* 6dB: low */
-        case 4: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT, 3); break;
+        case 4: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT(3)); break;
         /* others: off */
-        default: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT, 0); break;
+        default: BF_WR(AUDIOOUT_CTRL, SS3D_EFFECT(0)); break;
     }
 }
 
@@ -285,7 +287,7 @@ void imx233_audioout_enable_spkr(bool en)
     if(en)
     {
         /** 1) make sure charge capacitors are discharged */
-        BF_WR(AUDIOOUT_LINEOUTCTRL, CHARGE_CAP, 2);
+        BF_WR(AUDIOOUT_LINEOUTCTRL, CHARGE_CAP(2));
         /** 2) set min gain, nominal vag levels and zerocross desires */
         /* volume is decreasing with the value in the register */
         BF_SET(AUDIOOUT_LINEOUTCTRL, VOLUME_LEFT);
@@ -294,22 +296,22 @@ void imx233_audioout_enable_spkr(bool en)
         /* vag should be set to VDDIO/2, 0 is 1.725V, 15 is 1.350V, 25mV steps */
         int vddio;
         imx233_power_get_regulator(REGULATOR_VDDIO, &vddio, NULL);
-        BF_WR(AUDIOOUT_LINEOUTCTRL, VAG_CTRL, 15 - (vddio / 2 - 1350) / 25);
+        BF_WR(AUDIOOUT_LINEOUTCTRL, VAG_CTRL(15 - (vddio / 2 - 1350) / 25));
         /** 3) Power up lineout */
         BF_CLR(AUDIOOUT_PWRDN, LINEOUT);
         /** 4) Ramp the vag */
-        BF_WR(AUDIOOUT_LINEOUTCTRL, CHARGE_CAP, 1);
+        BF_WR(AUDIOOUT_LINEOUTCTRL, CHARGE_CAP(1));
         /** 5) Unmute */
         BF_CLR(AUDIOOUT_LINEOUTCTRL, MUTE);
         /** 6) Ramp volume */
-        BF_WR(AUDIOOUT_LINEOUTCTRL, VOLUME_LEFT, 0);
-        BF_WR(AUDIOOUT_LINEOUTCTRL, VOLUME_RIGHT, 0);
+        BF_WR(AUDIOOUT_LINEOUTCTRL, VOLUME_LEFT(0));
+        BF_WR(AUDIOOUT_LINEOUTCTRL, VOLUME_RIGHT(0));
     }
     else
     {
         /** Reverse procedure */
         BF_SET(AUDIOOUT_LINEOUTCTRL, MUTE);
-        BF_WR(AUDIOOUT_LINEOUTCTRL, CHARGE_CAP, 2);
+        BF_WR(AUDIOOUT_LINEOUTCTRL, CHARGE_CAP(2));
         BF_SET(AUDIOOUT_PWRDN, LINEOUT);
     }
 #else

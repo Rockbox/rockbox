@@ -35,6 +35,8 @@
 #include "ata_idle_notify.h"
 #include "led.h"
 
+#include "regs/ssp.h"
+
 /** NOTE For convenience, this drivers relies on the many similar commands
  * between SD and MMC. The following assumptions are made:
  * - SD_SEND_STATUS = MMC_SEND_STATUS

@@ -25,9 +25,6 @@
 #include "system.h"
 #include "system-target.h"
 
-#include "regs/regs-apbh.h"
-#include "regs/regs-apbx.h"
-
 /************
  * CHANNELS *
  ************/
@@ -138,7 +135,10 @@ struct imx233_dma_info_t
 #define BP_APB_CHx_CMD_UNUSED           8
 #define BM_APB_CHx_CMD_UNUSED           (0xf << 8)
 #define BF_APB_CHx_CMD_UNUSED(v)        (((v) & 0xf) << 8)
+#define BF_APB_CHx_CMD_UNUSED_V(n)      BF_APB_CHx_CMD_UNUSED(BV_APB_CHx_CMD_UNUSED__##n)
+#define BFM_APB_CHx_CMD_UNUSED(v)       BM_APB_CHx_CMD_UNUSED
 #define BV_APB_CHx_CMD_UNUSED__MAGIC    0xa
+#define BFM_APB_CHx_CMD_UNUSED_V(v)     BM_APB_CHx_CMD_UNUSED
 
 /* A single descriptor cannot transfer more than 2^16 bytes but because of the
  * weird 0=64KiB, it's safer to restrict to 2^15 */
