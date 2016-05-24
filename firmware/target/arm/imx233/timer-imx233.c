@@ -22,6 +22,8 @@
 #include "timrot-imx233.h"
 #include "timer.h"
 
+#include "regs/timrot.h"
+
 static long timer_cycles = 0;
 
 static void timer_fn(void)
@@ -33,7 +35,7 @@ static void timer_fn(void)
 bool timer_set(long cycles, bool start)
 {
     timer_stop();
-    
+
     if(start && pfn_unregister)
     {
         pfn_unregister();

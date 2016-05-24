@@ -25,7 +25,7 @@
 
 #include "config.h"
 #include "system.h"
-#include "regs/regs-pinctrl.h"
+#include "regs/pinctrl.h"
 
 // set to debug pinctrl use
 #define IMX233_PINCTRL_DEBUG
@@ -59,7 +59,7 @@ typedef void (*pin_irq_cb_t)(int bank, int pin, intptr_t user);
 
 static inline void imx233_pinctrl_init(void)
 {
-    HW_PINCTRL_CTRL_CLR = BM_OR2(PINCTRL_CTRL, CLKGATE, SFTRST);
+    BF_CLR(PINCTRL_CTRL, CLKGATE, SFTRST);
 }
 
 #if IMX233_SUBTARGET >= 3700

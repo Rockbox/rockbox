@@ -45,6 +45,10 @@
 #include "fmradio_i2c.h"
 #include "powermgmt-imx233.h"
 
+#include "regs/digctl.h"
+#include "regs/usbphy.h"
+#include "regs/timrot.h"
+
 #define WATCHDOG_HW_DELAY   (10 * HZ)
 #define WATCHDOG_SW_DELAY   (5 * HZ)
 
@@ -99,7 +103,7 @@ void imx233_chip_reset(void)
 #if IMX233_SUBTARGET >= 3700
     HW_CLKCTRL_RESET = BM_CLKCTRL_RESET_CHIP;
 #else
-    HW_POWER_RESET = BF_OR2(POWER_RESET, UNLOCK_V(KEY), RST_DIG(1));
+    BF_WR_ALL(POWER_RESET, UNLOCK_V(KEY), RST_DIG(1));
 #endif
 }
 
@@ -243,10 +247,10 @@ void udelay(unsigned us)
 void imx233_digctl_set_arm_cache_timings(unsigned timings)
 {
 #if IMX233_SUBTARGET >= 3780
-    HW_DIGCTL_ARMCACHE = BF_OR5(DIGCTL_ARMCACHE, ITAG_SS(timings),
+    BF_WR_ALL(DIGCTL_ARMCACHE, ITAG_SS(timings),
         DTAG_SS(timings), CACHE_SS(timings), DRTY_SS(timings), VALID_SS(timings));
 #else
-    HW_DIGCTL_ARMCACHE = BF_OR3(DIGCTL_ARMCACHE, ITAG_SS(timings),
+    BF_WR_ALL(DIGCTL_ARMCACHE, ITAG_SS(timings),
         DTAG_SS(timings), CACHE_SS(timings));
 #endif
 }

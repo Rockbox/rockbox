@@ -25,8 +25,6 @@
 #include "cpu.h"
 #include "icoll-imx233.h"
 
-#include "regs/regs-timrot.h"
-
 /* list of timers */
 enum
 {

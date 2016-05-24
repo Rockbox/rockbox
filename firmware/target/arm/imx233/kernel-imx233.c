@@ -23,6 +23,8 @@
 #include "clkctrl-imx233.h"
 #include "kernel-imx233.h"
 
+#include "regs/timrot.h"
+
 static void tick_timer(void)
 {
     /* Run through the list of tick tasks */

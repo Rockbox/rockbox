@@ -25,57 +25,8 @@
 #include "system-target.h"
 #include "cpu.h"
 
-#include "regs/regs-power.h"
-
-#define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__10mA    (1 << 0)
-#define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__20mA    (1 << 1)
-#define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__50mA    (1 << 2)
-#define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__100mA   (1 << 3)
-#define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__200mA   (1 << 4)
-#define BV_POWER_5VCTRL_CHARGE_4P2_ILIMIT__400mA   (1 << 5)
-
-
-#define BV_POWER_CHARGE_BATTCHRG_I__10mA   (1 << 0)
-#define BV_POWER_CHARGE_BATTCHRG_I__20mA   (1 << 1)
-#define BV_POWER_CHARGE_BATTCHRG_I__50mA   (1 << 2)
-#define BV_POWER_CHARGE_BATTCHRG_I__100mA  (1 << 3)
-#define BV_POWER_CHARGE_BATTCHRG_I__200mA  (1 << 4)
-#define BV_POWER_CHARGE_BATTCHRG_I__400mA  (1 << 5)
-
-#define BV_POWER_CHARGE_STOP_ILIMIT__10mA  (1 << 0)
-#define BV_POWER_CHARGE_STOP_ILIMIT__20mA  (1 << 1)
-#define BV_POWER_CHARGE_STOP_ILIMIT__50mA  (1 << 2)
-#define BV_POWER_CHARGE_STOP_ILIMIT__100mA (1 << 3)
-
-#if IMX233_SUBTARGET >= 3700
-#define HW_POWER_VDDDCTRL__TRG_STEP 25 /* mV */
-#define HW_POWER_VDDDCTRL__TRG_MIN  800 /* mV */
-
-#define HW_POWER_VDDACTRL__TRG_STEP 25 /* mV */
-#define HW_POWER_VDDACTRL__TRG_MIN  1500 /* mV */
-
-#define HW_POWER_VDDIOCTRL__TRG_STEP    25 /* mV */
-#define HW_POWER_VDDIOCTRL__TRG_MIN 2800 /* mV */
-
-#define HW_POWER_VDDMEMCTRL__TRG_STEP    50 /* mV */
-#define HW_POWER_VDDMEMCTRL__TRG_MIN 1700 /* mV */
-#else
-/* don't use the full available range because of the weird encodings for
- * extreme values which are useless anyway */
-#define HW_POWER_VDDDCTRL__TRG_STEP 32 /* mV */
-#define HW_POWER_VDDDCTRL__TRG_MIN  1280 /* mV */
-#define HW_POWER_VDDDCTRL__TRG_OFF  8 /* below 8, the register value doesn't encode linearly */
-#endif
-
-#define BV_POWER_MISC_FREQSEL__RES         0
-#define BV_POWER_MISC_FREQSEL__20MHz       1
-#define BV_POWER_MISC_FREQSEL__24MHz       2
-#define BV_POWER_MISC_FREQSEL__19p2MHz     3
-#define BV_POWER_MISC_FREQSEL__14p4MHz     4
-#define BV_POWER_MISC_FREQSEL__18MHz       5
-#define BV_POWER_MISC_FREQSEL__21p6MHz     6
-#define BV_POWER_MISC_FREQSEL__17p28MHz    7
-
+#include "regs/power.h"
+#include "regs/digctl.h"
 
 void imx233_power_init(void);
 
@@ -114,8 +65,8 @@ void imx233_power_set_regulator_linreg(enum imx233_regulator_t reg,
 static inline void imx233_power_set_dcdc_freq(bool pll, unsigned freq)
 {
     if(pll)
-        BF_WR(POWER_MISC, FREQSEL, freq);
-    BF_WR(POWER_MISC, SEL_PLLCLK, pll);
+        BF_WR(POWER_MISC, FREQSEL(freq));
+    BF_WR(POWER_MISC, SEL_PLLCLK(pll));
 }
 #endif
 
