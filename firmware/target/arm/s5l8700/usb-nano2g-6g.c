@@ -27,7 +27,6 @@
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
 #include "usb_drv.h"
-#include "power.h"
 
 void usb_enable(bool on)
 {
@@ -35,12 +34,40 @@ void usb_enable(bool on)
     else usb_core_exit();
 }
 
+#if CONFIG_CPU==S5L8701
+#include "power.h"
+
 int usb_detect(void)
 {
     if (power_input_status() & POWER_INPUT_USB)
         return USB_INSERTED;
     return USB_EXTRACTED;
 }
+
+#elif CONFIG_CPU==S5L8702
+static int usb_status = USB_EXTRACTED;
+
+int usb_detect(void)
+{
+    return usb_status;
+}
+
+void usb_insert_int(void)
+{
+    usb_status = USB_INSERTED;
+#ifdef USB_STATUS_BY_EVENT
+    usb_status_event(USB_INSERTED);
+#endif
+}
+
+void usb_remove_int(void)
+{
+    usb_status = USB_EXTRACTED;
+#ifdef USB_STATUS_BY_EVENT
+    usb_status_event(USB_EXTRACTED);
+#endif
+}
+#endif /* S5L8702 */
 
 void usb_init_device(void)
 {
@@ -59,7 +86,8 @@ void usb_init_device(void)
 
     usb_drv_exit();
 }
-#else
+
+#else /* !HAVE_STACK */
 void usb_enable(bool on)
 {
     (void)on;

@@ -161,16 +161,10 @@ static struct eint_handler pmu_eint = {
 };
 
 static int pmu_input_holdswitch;
-static int pmu_input_usb;
 
 int pmu_holdswitch_locked(void)
 {
    return pmu_input_holdswitch;
-}
-
-int pmu_usb_present(void)
-{
-   return pmu_input_usb;
 }
 
 #ifdef IPOD_ACCESSORY_PROTOCOL
@@ -206,7 +200,10 @@ static void pmu_read_inputs_gpio(void)
 static void pmu_read_inputs_ooc(void)
 {
     unsigned char oocstat = pmu_read(PCF5063X_REG_OOCSTAT);
-    pmu_input_usb = !!(oocstat & PCF5063X_OOCSTAT_EXTON2);
+    if (oocstat & PCF5063X_OOCSTAT_EXTON2)
+        usb_insert_int();
+    else
+        usb_remove_int();
 #ifdef IPOD_ACCESSORY_PROTOCOL
     pmu_input_accessory = !(oocstat & PCF5063X_OOCSTAT_EXTON3);
 #endif

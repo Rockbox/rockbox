@@ -122,7 +122,7 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("brightness value: %d", pmu_read(0x28));
             line++;
             _DEBUG_PRINTF("USB present: %s",
-                            pmu_usb_present() ? "true" : "false");
+                    (power_input_status() & POWER_INPUT_USB) ? "true" : "false");
 #if CONFIG_CHARGING
             _DEBUG_PRINTF("FW present: %s",
                             pmu_firewire_present() ? "true" : "false");

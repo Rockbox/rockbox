@@ -92,7 +92,6 @@ void pmu_write_rtc(unsigned char* buffer);
 void pmu_hdd_power(bool on);
 
 int pmu_holdswitch_locked(void);
-int pmu_usb_present(void);
 #if CONFIG_CHARGING
 int pmu_firewire_present(void);
 #endif
