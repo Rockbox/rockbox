@@ -26,6 +26,7 @@
 #include "timrot-imx233.h"
 
 #include "regs/icoll.h"
+#include "regs/digctl.h"
 
 /* helpers */
 #if IMX233_SUBTARGET >= 3600 && IMX233_SUBTARGET < 3780
@@ -140,6 +141,10 @@ static isr_t isr_table[INT_SRC_COUNT] =
 
 static uint32_t irq_count_old[INT_SRC_COUNT];
 static uint32_t irq_count[INT_SRC_COUNT];
+static uint32_t irq_max_time_old[INT_SRC_COUNT];
+static uint32_t irq_max_time[INT_SRC_COUNT];
+static uint32_t irq_tot_time_old[INT_SRC_COUNT];
+static uint32_t irq_tot_time[INT_SRC_COUNT];
 
 unsigned imx233_icoll_get_priority(int src)
 {
@@ -160,6 +165,8 @@ struct imx233_icoll_irq_info_t imx233_icoll_get_irq_info(int src)
 #endif
     info.priority = imx233_icoll_get_priority(src);
     info.freq = irq_count_old[src];
+    info.max_time = irq_max_time_old[src];
+    info.total_time = irq_tot_time_old[src];
     return info;
 }
 
@@ -172,6 +179,10 @@ static void do_irq_stat(void)
         counter = 0;
         memcpy(irq_count_old, irq_count, sizeof(irq_count));
         memset(irq_count, 0, sizeof(irq_count));
+        memcpy(irq_max_time_old, irq_max_time, sizeof(irq_max_time));
+        memset(irq_max_time, 0, sizeof(irq_max_time));
+        memcpy(irq_tot_time_old, irq_tot_time, sizeof(irq_tot_time));
+        memset(irq_tot_time, 0, sizeof(irq_tot_time));
     }
 }
 
@@ -195,8 +206,12 @@ void _irq_handler(void)
         do_irq_stat();
     /* enable interrupts again */
     //enable_irq();
+    uint32_t time = HW_DIGCTL_MICROSECONDS;
     /* process interrupt */
     (*(isr_t *)vec)();
+    time = HW_DIGCTL_MICROSECONDS - time;
+    irq_max_time[irq_nr] = MAX(irq_max_time[irq_nr], time);
+    irq_tot_time[irq_nr] += time;
     /* acknowledge completion of IRQ */
     HW_ICOLL_LEVELACK = 1 << imx233_icoll_get_priority(irq_nr);
 }

@@ -74,9 +74,11 @@
 
 struct imx233_icoll_irq_info_t
 {
-    bool enabled;
-    unsigned freq;
-    unsigned priority;
+    bool enabled; /* is IRQ currently enabled ? */
+    unsigned freq; /* how many times was IRQ fired in the past second */
+    unsigned priority; /* IRQ priority (0-3) */
+    unsigned max_time; /* maximum time spent in one IRQ during the past second (in us) */
+    unsigned total_time; /* total time spent in IRQ during the past second (in us) */
 };
 
 void imx233_icoll_init(void);
