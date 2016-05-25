@@ -42,6 +42,10 @@
 #ifdef IPOD_NANO2G
 #include "pmu-target.h"
 #endif
+#ifdef IPOD_6G
+#include "pmu-target.h"
+#include "clocking-s5l8702.h"
+#endif
 
 #define WHEEL_FAST_OFF_TIMEOUT   250000 /* timeout for acceleration = 250ms */
 #define WHEEL_REPEAT_TIMEOUT     250000 /* timeout for button repeat = 250ms */
@@ -271,12 +275,6 @@ static inline int ipod_4g_button_read(void)
             semaphore_release(&button_init_wakeup);
         }
 #endif
-#if CONFIG_CPU==S5L8702
-        else if (status == 0xAAAAAAAA)
-        {
-            GPIOCMD = 0xe040f;  /* DOUT = Output High */
-        }
-#endif
 
 #ifdef CPU_PP    
     }
@@ -368,11 +366,9 @@ static void s5l_clickwheel_init(void)
     WHEEL04 |= 1;
     PDAT10 &= ~2;
 #elif CONFIG_CPU==S5L8702
-    PWRCON(1) &= ~(1 << 1); /* unmask clockgate */
-    WHEEL00 = 0;            /* stop s5l8702 controller */
-    PUNB(14) &= ~(1 << 2);  /* disable pull-up for GPIO E2 */
-    udelay(100);
-    PCON(14) = (PCON(14) & ~0x00ffff00) | 0x00222200;
+    clockgate_enable(CLOCKGATE_CWHEEL, true);
+    PCONE = (PCONE & ~0x00ffff00) | 0x00222200;
+    WHEEL00 = 0; /* stop s5l8702 controller */
     WHEELINT = 7;
     WHEEL10 = 1;
     WHEEL00 = 0x380000;
@@ -390,12 +386,6 @@ void button_init_device(void)
 #endif
     s5l_clickwheel_init();
     semaphore_wait(&button_init_wakeup, HZ / 10);
-#if CONFIG_CPU==S5L8702
-    /* configure GPIO E2 as pull-up input */
-    PUNB(14) |= (1 << 2);
-    udelay(100);
-    GPIOCMD = 0xe0200;
-#endif
 }
 
 bool button_hold(void)
@@ -407,7 +397,7 @@ bool button_hold(void)
     else PCON15 = (PCON15 & ~0xffff0000) | 0x22220000;
     return value;
 #elif CONFIG_CPU==S5L8702
-    return ((PDATE & (1 << 2)) == 0);
+    return pmu_holdswitch_locked();
 #endif
 }
 
@@ -450,7 +440,9 @@ int button_read_device(void)
             WHEEL10 = 0;
             PWRCONEXT |= 1;
 #elif CONFIG_CPU==S5L8702
-            GPIOCMD = 0xe040e;  /* DOUT = Output Low */
+            WHEEL00 = 0;
+            PCONE = (PCONE & ~0x00ffff00) | 0x000e0e00;
+            clockgate_enable(CLOCKGATE_CWHEEL, false);
 #endif
         }
         else
@@ -463,7 +455,7 @@ int button_read_device(void)
             pmu_ldo_power_on(1); /* enable clickwheel power supply */
             s5l_clickwheel_init();
 #elif CONFIG_CPU==S5L8702
-            GPIOCMD = 0xe040f;  /* DOUT = Output High */
+            s5l_clickwheel_init();
 #endif
         }
     }
