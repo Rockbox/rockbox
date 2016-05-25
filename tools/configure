@@ -748,7 +748,15 @@ androidndkcc()
     fi
 
     buildhost=$(uname -s | tr "[:upper:]" "[:lower:]")
-    buildhost="${buildhost}-$(uname -m)"
+    # the prebuild android NDK only supports intel architecture anyway, so we can take shortcuts
+    case $(getconf LONG_BIT) in
+        32)
+            buildhost="${buildhost}-x86"
+            ;;
+        64)
+            buildhost="${buildhost}-x86_64"
+            ;;
+    esac
 
     GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
     LDOPTS="$LDOPTS -ldl -llog"
