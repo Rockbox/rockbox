@@ -138,22 +138,26 @@ bool dbg_hw_info(void)
         else if(state==2)
         {
             extern struct uartc_port ser_port;
-            int tx_stat, rx_stat, tx_speed, rx_speed;
-            char line_cfg[4];
-            int abr_stat;
-            uint32_t abr_cnt;
-            char *abrstatus[] = {"Idle", "Launched", "Counting", "Abnormal"};
+            bool opened = !!ser_port.uartc->port_l[ser_port.id];
+            _DEBUG_PRINTF("UART %d: %s", ser_port.id, opened ? "opened":"closed");
+            if (opened)
+            {
+                int tx_stat, rx_stat, tx_speed, rx_speed;
+                char line_cfg[4];
+                int abr_stat;
+                uint32_t abr_cnt;
+                char *abrstatus[] = {"Idle", "Launched", "Counting", "Abnormal"};
 
-            uartc_port_get_line_info(&ser_port,
-                        &tx_stat, &rx_stat, &tx_speed, &rx_speed, line_cfg);
-            abr_stat = uartc_port_get_abr_info(&ser_port, &abr_cnt);
+                uartc_port_get_line_info(&ser_port,
+                            &tx_stat, &rx_stat, &tx_speed, &rx_speed, line_cfg);
+                abr_stat = uartc_port_get_abr_info(&ser_port, &abr_cnt);
 
-            _DEBUG_PRINTF("UART %d:", ser_port.id);
-            line++;
-            _DEBUG_PRINTF("line: %s", line_cfg);
-            _DEBUG_PRINTF("Tx: %s, speed: %d", tx_stat ? "On":"Off", tx_speed);
-            _DEBUG_PRINTF("Rx: %s, speed: %d", rx_stat ? "On":"Off", rx_speed);
-            _DEBUG_PRINTF("ABR: %s, cnt: %u", abrstatus[abr_stat], abr_cnt);
+                line++;
+                _DEBUG_PRINTF("line: %s", line_cfg);
+                _DEBUG_PRINTF("Tx: %s, speed: %d", tx_stat ? "On":"Off", tx_speed);
+                _DEBUG_PRINTF("Rx: %s, speed: %d", rx_stat ? "On":"Off", rx_speed);
+                _DEBUG_PRINTF("ABR: %s, cnt: %u", abrstatus[abr_stat], abr_cnt);
+            }
             line++;
             _DEBUG_PRINTF("n_tx_bytes: %u", ser_port.n_tx_bytes);
             _DEBUG_PRINTF("n_rx_bytes: %u", ser_port.n_rx_bytes);
@@ -162,7 +166,7 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("n_frame_err: %u", ser_port.n_frame_err);
             _DEBUG_PRINTF("n_break_detect: %u", ser_port.n_break_detect);
             _DEBUG_PRINTF("ABR n_abnormal: %u %u",
-                        ser_port.n_abnormal0, ser_port.n_abnormal1);
+                            ser_port.n_abnormal0, ser_port.n_abnormal1);
         }
 #endif
         else
