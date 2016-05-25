@@ -750,18 +750,20 @@
 /////INTERRUPTS/////
 #define IRQ_TIMER32     7
 #define IRQ_TIMER       8
-#define IRQ_SPI(i)      (9+i) /* TBC */
+#define IRQ_SPI(i)      (9+(i)) /* TBC */
 #define IRQ_SPI0        9
 #define IRQ_SPI1        10
 #define IRQ_SPI2        11
 #define IRQ_LCD         14
-#define IRQ_DMAC(d)     (16+d)
+#define IRQ_DMAC(d)     (16+(d))
 #define IRQ_DMAC0       16
 #define IRQ_DMAC1       17
 #define IRQ_USB_FUNC    19
-#define IRQ_I2C         21    /* TBC */
+#define IRQ_I2C(i)      (21+(i))
+#define IRQ_I2C0        21
+#define IRQ_I2C1        22
 #define IRQ_WHEEL       23
-#define IRQ_UART(i)     (24+i)
+#define IRQ_UART(i)     (24+(i))
 #define IRQ_UART0       24
 #define IRQ_UART1       25
 #define IRQ_UART2       26
