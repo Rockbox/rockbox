@@ -1,0 +1,44 @@
+% $Id$ %
+\subsection{OTP Client}
+This plugin provides the ability to generate one-time-passwords for
+authentication purposes. It implements an HMAC-based One-Time Password
+Algorithm (RFC 4226), and on targets which support it, a Time-Based
+One-Time Password Algorithm (RFC 6238).
+
+\opt{rtc}{ It is important to note that for TOTP accounts to work
+  properly, the clock on your device MUST be accurate to no less than
+  30 seconds from the time on the authentication server. See
+  \reference{ref:Timeanddateactual} for more information.  }
+
+\subsubsection{Adding Accounts}
+The plugin supports two methods of adding accounts: URI import, and
+manual entry.
+
+\subsubsection{URI Import}
+This method of adding an account reads a list of URIs from a file. It
+expects each URI to be on a line by itself in the following format:
+
+\begin{verbatim}
+otpauth://[hotp OR totp]/[account name]?secret=[Base32 secret][&counter=X][&period=X][&digits=X]
+\end{verbatim}
+
+An example is shown below, provisioning a TOTP key for an account called ``bob'':
+
+\begin{verbatim}
+otpauth://totp/bob?secret=JBSWY3DPEHPK3PXP
+\end{verbatim}
+
+Any other options are not supported and will be ignored.
+
+Most services will provide a scannable QR code that encodes a OTP
+URI. In order to use those, first scan the QR code and save the URI to
+a file on your device. If necessary, rewrite the URI so it is in the
+format shown above.
+
+\subsection{Manual Import}
+If URI import is not possible, the plugin supports the manual entry of
+data associated with an account. While some services provide you with
+a base32-encoded string to use as the shared secret, others may
+not. In this case, you can scan the QR code provided and enter secret
+parameter as provided. Be careful not to make a mistake while entering
+the Base32 secret for an account.
