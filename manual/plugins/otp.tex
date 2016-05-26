@@ -1,0 +1,72 @@
+% $Id$ %
+\subsection{One-Time Password Client}
+This plugin provides the ability to generate one-time passwords (OTPs)
+for authentication purposes. It implements an HMAC-based One-Time
+Password Algorithm (RFC 4226), and on targets which support it, a
+Time-based One-Time Password Algorithm (RFC 6238).
+
+\subsubsection{Adding Accounts}
+The plugin supports two methods of adding accounts: URI import, and
+manual entry.
+
+\opt{rtc}{ It is important to note that for TOTP (time-based) accounts
+  to work properly, the clock on your device MUST be accurate to no
+  less than 30 seconds from the time on the authentication server, and
+  the correct time zone must be configured in the plugin.  See
+  \reference{ref:Timeanddateactual} for more information.  }
+
+\subsubsection{URI Import}
+This method of adding an account reads a list of URIs from a file. It
+expects each URI to be on a line by itself in the following format:
+
+\begin{verbatim}
+otpauth://[hotp OR totp]/[account name]?secret=[Base32 secret][&counter=X][&period=X][&digits=X]
+\end{verbatim}
+
+An example is shown below, provisioning a TOTP key for an account called ``bob'':
+
+\begin{verbatim}
+otpauth://totp/bob?secret=JBSWY3DPEHPK3PXP
+\end{verbatim}
+
+Any other URI options are not supported and will be ignored.
+
+Most services will provide a scannable QR code that encodes a OTP
+URI. In order to use those, first scan the QR code separately and save
+the URI to a file on your device. If necessary, rewrite the URI so it
+is in the format shown above. For example, GitHub's URI has a slash
+after the provider. In order for this URI to be properly parsed, you
+must rewrite the account name so that it does not contain a slash.
+
+\subsubsection{Manual Import}
+If direct URI import is not possible, the plugin supports the manual
+entry of data associated with an account. After you select the
+``Manual Entry'' option, it will prompt you for an account name. You
+may type anything you wish, but it should be memorable. It will then
+prompt you for the Base32-encoded secret. Most services will provide
+this to you directly, but some may only provide you with a QR code. In
+these cases, you must scan the QR code separately, and then enter the
+string following the ``secret='' parameter on your Rockbox device
+manually.
+
+On devices with a real-time clock, \opt{rtc}{like yours,} the plugin
+will ask whether the account is a time-based account
+(TOTP). \opt{rtc}{If you answer ``yes'' to this question, it will ask
+  for further information regarding the account. Usually it is safe to
+  accept the defaults here. } However, if your device lacks a
+real-time clock, the plugin's functionality will be restricted to
+HMAC-based (HOTP) accounts only. If this is the case, the plugin will
+prompt you for information regarding the HOTP setup.
+
+\opt{rtc} {
+  \subsection{Advanced Settings}
+  \subsubsection{Time Zone Configuration}
+  In order for TOTP accounts to work properly, the plugin must be able
+  to determine the current UTC time. This means that, first, your
+  device's clock must be synchronized with UTC time, and second, that
+  the plugin knows what time zone the clock is using. The plugin will
+  prompt you on its first run for this piece of information. However,
+  should this setting need changing at a later time, possibly due to
+  Daylight Saving Time adjustment, it is located under the
+  ``Advanced'' submenu. NOTE: in the UI simulator, use the ``UTC''
+  setting no matter what the clock may read. }
