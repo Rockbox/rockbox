@@ -33,6 +33,7 @@ disktidy.c
 flipit.c
 shopper.c
 resistor.c
+otp.c
 
 #ifdef USB_ENABLE_HID
 remote_control.c
