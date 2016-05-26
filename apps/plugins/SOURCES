@@ -6,6 +6,7 @@ chessclock.c
 credits.c
 cube.c
 dict.c
+hotp.c
 jackpot.c
 keybox.c
 logo.c
