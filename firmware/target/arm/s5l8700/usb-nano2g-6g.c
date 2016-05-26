@@ -87,7 +87,7 @@ void usb_init_device(void)
     usb_drv_exit();
 }
 
-#else /* !HAVE_STACK */
+#else /* !HAVE_USBSTACK */
 void usb_enable(bool on)
 {
     (void)on;

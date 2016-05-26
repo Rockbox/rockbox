@@ -39,13 +39,13 @@
  *  bit 2: if unmasked, EINT6 is generated when USB cable
  *         is plugged and/or(TBC) unplugged.
  *
- * IC_GROUP0..6 are connected to EINT6..0 of the VIC.
+ * EIC_GROUP0..6 are connected to EINT6..0 of the VIC.
  */
 #define EIC_N_GROUPS    7
 
 /* get EIC group and bit for a given GPIO port */
-#define EIC_GROUP(n)    (6 - (n >> 5))
-#define EIC_INDEX(n)    ((0x18 - (n & 0x18)) | (n & 0x7))
+#define EIC_GROUP(n)    (6 - ((n) >> 5))
+#define EIC_INDEX(n)    ((0x18 - ((n) & 0x18)) | ((n) & 0x7))
 
 /* SoC EINTs uses these 'gpio' numbers */
 #define GPIO_EINT_USB       0xd8
@@ -74,19 +74,19 @@ struct eint_handler {
     void (*isr)(struct eint_handler*);
 };
 
+void eint_init(void);
 void eint_register(struct eint_handler *h);
 void eint_unregister(struct eint_handler *h);
-void eint_init(void);
 
+void gpio_preinit(void);
 void gpio_init(void);
 /* get/set configuration for GPIO groups (0..15) */
 uint32_t gpio_group_get(int group);
 void gpio_group_set(int group, uint32_t mask, uint32_t cfg);
 
-void gpio_preinit(void);
 
-
-/* This is very preliminary work in progress, ATM this region is called
+/*
+ * This is very preliminary work in progress, ATM this region is called
  * system 'alive' because it seems there are similiarities when mixing
  * concepts from:
  *  - s3c2440 datasheet (figure 7-12, Sleep mode) and
@@ -145,8 +145,8 @@ void gpio_preinit(void);
  * ALVCOM_RUN_BIT starts/stops count on ALVTCNT, counter frequency
  * is SClk / ALVTDIV. When count reachs ALVTEND then ALVTSTAT[0]
  * and ALVUNK4[0] are set, optionally an interrupt is generated (see
- * GPIO_IC below). Writing 1 to ALVTCOM_RST_BIT clears ALVSTAT[0]
- * and ALVUNK4[0] and initializes ALVTCNT to zero.
+ * GPIO_EINT_ALIVE). Writing 1 to ALVTCOM_RST_BIT clears ALVSTAT[0]
+ * and ALVUNK4[0], and initializes ALVTCNT to zero.
  */
 #define ALVTCOM         (*((REG32_PTR_T)(SYSALV_BASE + 0x6c)))
 #define ALVTCOM_RUN_BIT     (1 << 0)  /* 0 -> Stop, 1 -> Start */

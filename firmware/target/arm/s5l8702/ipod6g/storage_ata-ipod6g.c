@@ -46,7 +46,7 @@
 #define CEATA_MMC_RCA 1
 
 
-/** static, private data **/ 
+/** static, private data **/
 static uint8_t ceata_taskfile[16] STORAGE_ALIGN_ATTR;
 static uint16_t ata_identify_data[0x100] STORAGE_ALIGN_ATTR;
 static bool ceata;
@@ -131,13 +131,13 @@ static int ata_wait_for_end_of_transfer(long timeout)
     if (dad & BIT(0)) RET_ERR(1);
     if ((dad & (BIT(3) | BITRANGE(5, 7))) == BIT(6)) return 0;
     RET_ERR(2);
-}    
+}
 
 static int mmc_dsta_check_command_success(bool disable_crc)
 {
     int rc = 0;
     uint32_t dsta = SDCI_DSTA;
-    if (dsta & SDCI_DSTA_RESTOUTE) rc |= 1; 
+    if (dsta & SDCI_DSTA_RESTOUTE) rc |= 1;
     if (dsta & SDCI_DSTA_RESENDE) rc |= 2;
     if (dsta & SDCI_DSTA_RESINDE) rc |= 4;
     if (!disable_crc)
@@ -363,7 +363,7 @@ static int ceata_init(int buswidth)
 {
     uint32_t result;
     PASS_RC(mmc_send_command(SDCI_CMD_CMD_NUM(MMC_CMD_SWITCH) | SDCI_CMD_RES_BUSY
-                           | SDCI_CMD_CMD_TYPE_AC | SDCI_CMD_RES_TYPE_R1 
+                           | SDCI_CMD_CMD_TYPE_AC | SDCI_CMD_RES_TYPE_R1
                            | SDCI_CMD_RES_SIZE_48 | SDCI_CMD_NCR_NID_NCR,
                              MMC_CMD_SWITCH_ACCESS_WRITE_BYTE
                            | MMC_CMD_SWITCH_INDEX(MMC_CMD_SWITCH_FIELD_HS_TIMING)
@@ -1093,7 +1093,7 @@ static int ata_num_drives(int first_drive)
 {
     /* We don't care which logical drive number(s) we have been assigned */
     (void)first_drive;
-    
+
     return 1;
 }
 #endif

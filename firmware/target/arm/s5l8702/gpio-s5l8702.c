@@ -170,7 +170,7 @@ void eint_unregister(struct eint_handler *h)
 }
 
 /* ISR */
-void ICODE_ATTR eint_handler(int group)
+static void ICODE_ATTR eint_handler(int group)
 {
     int i;
     uint32_t ints;
@@ -195,7 +195,7 @@ void ICODE_ATTR eint_handler(int group)
                 EIC_INTLEVEL(group) ^= bit; /* swap level */
 
             if (h->isr)
-                h->isr(h); /* exec GPIO handler */
+                h->isr(h); /* exec app handler */
         }
     }
 }

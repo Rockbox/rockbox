@@ -133,9 +133,9 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("accessory present: %s",
                             pmu_accessory_present() ? "true" : "false");
 #endif
-            extern unsigned long i2c_rd_err, i2c_wr_err;
             line++;
-            _DEBUG_PRINTF("i2c rd/wr errors:: %lu/%lu", i2c_rd_err, i2c_wr_err);
+            extern unsigned long i2c_rd_err, i2c_wr_err;
+            _DEBUG_PRINTF("i2c rd/wr errors: %lu/%lu", i2c_rd_err, i2c_wr_err);
         }
 #ifdef UC870X_DEBUG
         else if(state==2)

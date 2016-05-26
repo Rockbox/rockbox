@@ -28,6 +28,8 @@ bool piezo_busy(void);
 void piezo_button_beep(bool beep, bool force);
 
 #ifdef BOOTLOADER
+#include <inttypes.h>
+void piezo_tone(uint32_t period, int32_t duration);
 void piezo_seq(uint16_t *seq);
 #endif
 
