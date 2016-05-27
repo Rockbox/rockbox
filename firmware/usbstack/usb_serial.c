@@ -154,6 +154,13 @@ void usb_serial_disconnect(void)
     active = false;
 }
 
+#define ALIGNED_BUFFER_QUICK_PATCH
+
+#ifdef ALIGNED_BUFFER_QUICK_PATCH
+static unsigned char aligned_buffer[32]
+    USB_DEVBSS_ATTR __attribute__((aligned(4)));
+#endif
+
 static void sendout(void)
 {
     buffer_transitlength = MIN(buffer_length,BUFFER_SIZE-buffer_start);
@@ -163,8 +170,13 @@ static void sendout(void)
     if(buffer_transitlength > 0)
     {
         buffer_length -= buffer_transitlength;
+#ifdef ALIGNED_BUFFER_QUICK_PATCH
+        memcpy(aligned_buffer, &send_buffer[buffer_start], buffer_transitlength);
+        usb_drv_send_nonblocking(ep_in, aligned_buffer, buffer_transitlength);
+#else
         usb_drv_send_nonblocking(ep_in, &send_buffer[buffer_start],
                 buffer_transitlength);
+#endif
     }
 }
 

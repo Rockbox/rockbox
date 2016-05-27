@@ -182,7 +182,17 @@
 #define CONFIG_LCD LCD_CLIPZIP
 
 /* USB On-the-go */
+#if 1 /* try USBOTG_DESIGNWARE */
+#define CONFIG_USBOTG USBOTG_DESIGNWARE
+/* these are the USBOTG_S3C6400X settings, seems to work well
+   using USBOTG_DESIGNWARE default settings */
+//#define USB_DW_TURNAROUND 0
+//#define USB_DW_TOUTCAL 7
+/* logf() over USB serial (http://www.rockbox.org/wiki/PortalPlayerUsb) */
+//#define USB_ENABLE_SERIAL
+#else
 #define CONFIG_USBOTG USBOTG_S3C6400X
+#endif
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK

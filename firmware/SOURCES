@@ -766,6 +766,8 @@ target/arm/usb-drv-arc.c
 target/arm/as3525/usb-drv-as3525.c
 #elif CONFIG_USBOTG == USBOTG_S3C6400X
 target/arm/usb-s3c6400x.c
+#elif CONFIG_USBOTG == USBOTG_DESIGNWARE
+target/arm/usb-designware.c
 #elif CONFIG_USBOTG == USBOTG_ISP1583
 drivers/isp1583.c
 #elif CONFIG_USBOTG == USBOTG_RK27XX
@@ -1581,7 +1583,11 @@ target/arm/s5l8700/ipodnano2g/ftl-nano2g.c
 target/arm/s5l8700/ipodnano2g/nand-nano2g.c
 target/arm/s5l8700/ipodnano2g/pmu-nano2g.c
 target/arm/s5l8700/ipodnano2g/rtc-nano2g.c
+#if CONFIG_USBOTG == USBOTG_DESIGNWARE
+target/arm/s5l8700/usb-s5l8701.c
+#else
 target/arm/s5l8700/usb-nano2g-6g.c
+#endif
 #ifdef HAVE_SERIAL
 target/arm/uc870x.c
 target/arm/s5l8700/uart-s5l8701.c
@@ -1614,7 +1620,11 @@ target/arm/s5l8702/postmortemstub.S
 #endif
 target/arm/s5l8702/ipod6g/pmu-ipod6g.c
 target/arm/s5l8702/ipod6g/rtc-ipod6g.c
+#if CONFIG_USBOTG == USBOTG_DESIGNWARE
+target/arm/s5l8702/usb-s5l8702.c
+#else
 target/arm/s5l8700/usb-nano2g-6g.c
+#endif
 #ifdef HAVE_SERIAL
 target/arm/uc870x.c
 target/arm/s5l8702/uart-s5l8702.c

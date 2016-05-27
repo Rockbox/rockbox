@@ -45,4 +45,14 @@
 #undef USB_DEVBSS_ATTR
 #define USB_DEVBSS_ATTR __attribute__((aligned(32)))
 
+#if CONFIG_USBOTG == USBOTG_DESIGNWARE
+/* 7 available EPs, 6 used */
+#define USB_ENDPOINTS 0b00000000010101010000000000101011
+/*#define USB_NUM_ENDPOINTS 6*/
+
+/* Define this if the DWC implemented on this SoC does not support
+   DMA or you want to disable it. */
+/* #define USB_DW_ARCH_SLAVE */
+#endif
+
 #endif /* __AS3525V2_H__ */
