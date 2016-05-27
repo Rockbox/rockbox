@@ -60,6 +60,11 @@ static unsigned char send_buffer[BUFFER_SIZE]
     USB_DEVBSS_ATTR __attribute__((aligned(32)));
 static unsigned char receive_buffer[32]
     USB_DEVBSS_ATTR __attribute__((aligned(32)));
+#if CONFIG_USBOTG == USBOTG_DESIGNWARE
+/* Aligned transit buffer */
+static unsigned char transit_buffer[32]
+    USB_DEVBSS_ATTR __attribute__((aligned(4)));
+#endif
 
 static void sendout(void);
 
@@ -163,8 +168,13 @@ static void sendout(void)
     if(buffer_transitlength > 0)
     {
         buffer_length -= buffer_transitlength;
+#if CONFIG_USBOTG == USBOTG_DESIGNWARE
+        memcpy(transit_buffer,&send_buffer[buffer_start],buffer_transitlength);
+        usb_drv_send_nonblocking(ep_in,transit_buffer,buffer_transitlength);
+#else
         usb_drv_send_nonblocking(ep_in, &send_buffer[buffer_start],
                 buffer_transitlength);
+#endif
     }
 }
 

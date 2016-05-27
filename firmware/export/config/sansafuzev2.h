@@ -203,7 +203,13 @@
 #endif
 
 /* USB On-the-go */
+#if 1
+#define CONFIG_USBOTG USBOTG_DESIGNWARE
+/* logf() over USB serial (http://www.rockbox.org/wiki/PortalPlayerUsb) */
+//#define USB_ENABLE_SERIAL
+#else
 #define CONFIG_USBOTG USBOTG_S3C6400X
+#endif
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
