@@ -420,6 +420,8 @@ bool dbg_hw_info_powermgmt(void)
     }
 }
 
+#if IMX233_SUBTARGET >= 3780
+/* stmp < 3780 does not have a 4.2V rail and thus cannot do this magic trick */
 bool dbg_hw_info_power2(void)
 {
     lcd_setfont(FONT_SYSFIXED);
@@ -504,6 +506,7 @@ bool dbg_hw_info_power2(void)
         yield();
     }
 }
+#endif /* IMX233_SUBTARGET >= 3780 */
 
 bool dbg_hw_info_rtc(void)
 {
@@ -1192,7 +1195,9 @@ static struct
     {"dma", dbg_hw_info_dma},
     {"lradc", dbg_hw_info_lradc},
     {"power", dbg_hw_info_power},
+#if IMX233_SUBTARGET >= 3780
     {"power2", dbg_hw_info_power2},
+#endif
     {"powermgmt", dbg_hw_info_powermgmt},
     {"rtc", dbg_hw_info_rtc},
     {"dcp", dbg_hw_info_dcp},

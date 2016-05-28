@@ -70,6 +70,7 @@ void imx233_powermgmt_init(void)
 
 #define MAX_4P2_ILIMIT  0x3f
 
+#if IMX233_SUBTARGET >= 3780
 /* The code below assumes HZ = 100 so that it runs every 10ms */
 #if HZ != 100
 #warning The ramp_up_4p2_rail() tick task assumes HZ = 100, this may break charging
@@ -81,11 +82,15 @@ static void ramp_up_4p2_rail(void)
     if(charge_state == TRICKLE && BF_RD(POWER_5VCTRL, CHARGE_4P2_ILIMIT) < MAX_4P2_ILIMIT)
         HW_POWER_5VCTRL += BF_POWER_5VCTRL_CHARGE_4P2_ILIMIT(1);
 }
+#endif /* IMX233_SUBTARGET >= 3780 */
 
 void powermgmt_init_target(void)
 {
     charge_state = DISCHARGING;
+    /* stmp < 3780 does not have a 4.2 rail */
+#if IMX233_SUBTARGET >= 3780
     tick_add_task(&ramp_up_4p2_rail);
+#endif
 }
 
 void charging_algorithm_step(void)
@@ -191,7 +196,9 @@ void charging_algorithm_step(void)
 
 void charging_algorithm_close(void)
 {
+#if IMX233_SUBTARGET >= 3780
     tick_remove_task(&ramp_up_4p2_rail);
+#endif
 }
 
 struct imx233_powermgmt_info_t imx233_powermgmt_get_info(void)
