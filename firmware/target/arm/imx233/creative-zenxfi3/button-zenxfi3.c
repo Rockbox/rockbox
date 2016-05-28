@@ -34,10 +34,10 @@
 struct imx233_button_map_t imx233_button_map[] =
 {
     [I_VDDIO] = IMX233_BUTTON_(VDDIO, VDDIO(3640), "vddio"), /* we need VDDIO for relative */
-    IMX233_BUTTON_(HOLD, GPIO(0, 4), "jack", INVERTED),
+    IMX233_BUTTON_(HOLD, GPIO(0, 4), "hold", INVERTED),
     IMX233_BUTTON(VOL_DOWN, GPIO(2, 7), "vol_down", INVERTED),
     IMX233_BUTTON(VOL_UP, GPIO(2, 8), "vol_up", INVERTED),
-    IMX233_BUTTON_(JACK, LRADC_REL(5, 3520, I_VDDIO), "jack"),
+    IMX233_BUTTON_(JACK, LRADC_EX(5, GT, 2000, I_VDDIO, 0), "jack"),
     IMX233_BUTTON(POWER, PSWITCH(1), "power"),
     IMX233_BUTTON_(END, END(), "")
 };
