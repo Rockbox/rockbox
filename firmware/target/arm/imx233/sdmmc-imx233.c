@@ -171,7 +171,7 @@ const struct sdmmc_config_t sdmmc_config[] =
 #elif defined(SONY_NWZE370) || defined(SONY_NWZE360)
     /* The Sony NWZ-E370 uses #B1P29 for power */
     {
-        .name = "internal/SD",
+        .name = "eMMC",
         .flags = POWER_PIN | POWER_INVERTED | WINDOW,
         .power_pin = PIN(1, 29),
         .ssp = 2,
@@ -529,6 +529,10 @@ static int init_mmc_drive(int drive)
     uint32_t status;
     if(!send_cmd(drive, MMC_SET_RELATIVE_ADDR, SDMMC_RCA(drive), MCI_RESP, &status))
         return -4;
+    /* CMD9 send CSD */
+    if(!send_cmd(drive, SD_SEND_CSD, SDMMC_RCA(drive), MCI_RESP|MCI_LONG_RESP,
+            SDMMC_INFO(drive).csd))
+        return -14;
     /* Select card */
     if(!send_cmd(drive, MMC_SELECT_CARD, SDMMC_RCA(drive), MCI_RESP, &status))
         return -5;
@@ -556,14 +560,12 @@ static int init_mmc_drive(int drive)
     SDMMC_STATUS(drive).hs_enabled = true;
 
     /* read extended CSD */
-    {
-        uint8_t *ext_csd = aligned_buffer[drive];
-        if(imx233_ssp_sd_mmc_transfer(ssp, 8, 0, SSP_SHORT_RESP, aligned_buffer[drive], 1, true, true, &status))
-            return -12;
-        uint32_t *sec_count = (void *)&ext_csd[212];
-        window_start[drive] = 0;
-        window_end[drive] = *sec_count;
-    }
+    if(imx233_ssp_sd_mmc_transfer(ssp, 8, 0, SSP_SHORT_RESP, aligned_buffer[drive], 1, true, true, &status))
+        return -12;
+    /* parse and set window */
+    mmc_parse_csd(&SDMMC_INFO(drive), aligned_buffer[drive]);
+    window_start[drive] = 0;
+    window_end[drive] = SDMMC_INFO(drive).numblocks;
     /* deselect card */
     if(!send_cmd(drive, MMC_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
         return -13;
@@ -908,7 +910,7 @@ int sd_init(void)
     return 0;
 }
 
-tCardInfo *card_get_info_target(int sd_card_no)
+tCardInfo *sd_card_info(int sd_card_no)
 {
     return &SDMMC_INFO(sd_map[sd_card_no]);
 }
@@ -983,19 +985,6 @@ int mmc_init(void)
     return 0;
 }
 
-void mmc_get_info(IF_MD(int mmc_drive,) struct storage_info *info)
-{
-#ifndef HAVE_MULTIDRIVE
-    int mmc_drive = 0;
-#endif
-    int drive = mmc_map[mmc_drive];
-    info->sector_size = 512;
-    info->num_sectors = window_end[drive] - window_start[drive];
-    info->vendor = "Rockbox";
-    info->product = "Internal Storage";
-    info->revision = "0.00";
-}
-
 int mmc_num_drives(int first_drive)
 {
     mmc_first_drive = first_drive;
@@ -1025,10 +1014,6 @@ void mmc_enable(bool on)
     (void) on;
 }
 
-void mmc_sleep(void)
-{
-}
-
 void mmc_sleepnow(void)
 {
 }
@@ -1052,15 +1037,6 @@ int mmc_soft_reset(void)
 int mmc_flush(void)
 {
     return 0;
-}
-
-void mmc_spin(void)
-{
-}
-
-void mmc_spindown(int seconds)
-{
-    (void) seconds;
 }
 
 int mmc_spinup_time(void)

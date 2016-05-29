@@ -939,7 +939,7 @@ long sd_last_disk_activity(void)
     return last_disk_activity;
 }
 
-tCardInfo *card_get_info_target(int card_no)
+tCardInfo *sd_card_info(int card_no)
 {    
     return &card_info[card_no];
 }

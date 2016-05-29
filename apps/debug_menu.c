@@ -1237,17 +1237,25 @@ static bool view_battery(void)
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
 
-#if (CONFIG_STORAGE & STORAGE_MMC)
-#define CARDTYPE "MMC"
-#elif (CONFIG_STORAGE & STORAGE_SD)
-#define CARDTYPE "microSD"
+struct sdmmc_callback_data
+{
+    int card_no; /* current card number */
+#if (CONFIG_STORAGE & STORAGE_MMC) && (CONFIG_STORAGE & STORAGE_SD)
+    bool list_sd; /* when true, currently listing SD card, otherwise listing MMC */
 #endif
+#if CONFIG_STORAGE & STORAGE_SD
+    int num_sd_drives; /* number of SD drives */
+#endif
+#if CONFIG_STORAGE & STORAGE_MMC
+    int num_mmc_drives; /* number of MMC drives */
+#endif
+};
 
 static int disk_callback(int btn, struct gui_synclist *lists)
 {
+    struct sdmmc_callback_data *cb_data = (void *)lists->data;
     tCardInfo *card;
-    int *cardnum = (int*)lists->data;
-    unsigned char card_name[6];
+    unsigned char card_name[7]; /* card name(6 chars) + 0 */
     unsigned char pbuf[32];
     char *title = lists->title;
     static const unsigned char i_vmin[] = { 0, 1, 5, 10, 25, 35, 60, 100 };
@@ -1256,98 +1264,110 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     static const unsigned char * const nsec_units[] = { "ns", "µs", "ms" };
 #if (CONFIG_STORAGE & STORAGE_MMC)
     static const char * const mmc_spec_vers[] = { "1.0-1.2", "1.4", "2.0-2.2",
-        "3.1-3.31", "4.0" };
+        "3.1-3.31", "4.0-5.1" };
 #endif
 
     if ((btn == ACTION_STD_OK) || (btn == SYS_FS_CHANGED) || (btn == ACTION_REDRAW))
     {
-#ifdef HAVE_HOTSWAP
         if (btn == ACTION_STD_OK)
         {
-            *cardnum ^= 0x1; /* change cards */
-        }
+            /* change card: keep type (sd/mmc) and only change after the last one */
+            cb_data->card_no++;
+#if (CONFIG_STORAGE & STORAGE_MMC) && (CONFIG_STORAGE & STORAGE_SD)
+            if((cb_data->list_sd && cb_data->card_no == cb_data->num_sd_drives) ||
+                    (!cb_data->list_sd && cb_data->card_no == cb_data->num_mmc_drives))
+            {
+                cb_data->list_sd = !cb_data->list_sd;
+                cb_data->card_no = 0;
+            }
+#elif (CONFIG_STORAGE & STORAGE_MMC)
+            cb_data->card_no = cb_data->card_no % cb_data->num_mmc_drives;
+#else /* (CONFIG_STORAGE & STORAGE_SD) */
+            cb_data->card_no = cb_data->card_no % cb_data->num_sd_drives;
 #endif
+        }
 
         simplelist_set_line_count(0);
 
-        card = card_get_info(*cardnum);
+        /* get sd or mmc card info */
+#if (CONFIG_STORAGE & STORAGE_MMC) && (CONFIG_STORAGE & STORAGE_SD)
+        bool is_sd = cb_data->list_sd;
+        if(cb_data->list_sd)
+            card = sd_card_info(cb_data->card_no);
+        else
+            card = mmc_card_info(cb_data->card_no);
+#elif (CONFIG_STORAGE & STORAGE_MMC)
+        bool is_sd = false;
+        card = mmc_card_info(cb_data->card_no);
+#else /* (CONFIG_STORAGE & STORAGE_SD) */
+        bool is_sd = true;
+        card = sd_card_info(cb_data->card_no);
+#endif
 
+        /* The following code uses is_sd to determine if the card is SD or MMC.
+         * I could have made everything conditional using #ifdef but that would
+         * be unreadable. */
         if (card->initialized > 0)
         {
-            unsigned i;
-            for (i=0; i<sizeof(card_name); i++)
-            {
-                card_name[i] = card_extract_bits(card->cid, (103-8*i), 8);
-            }
-            strlcpy(card_name, card_name, sizeof(card_name));
+            /* extract name: read 6 chars */
+            for (unsigned i = 0; i < 6; i++)
+                card_name[i] = card_extract_bits(card->cid, 103 - 8 * i, 8);
+            /* but SD only has 5, so adjust the position of the final 0 accordingly */
+            if(is_sd)
+                card_name[5] = 0;
+            else
+                card_name[6] = 0;
             simplelist_addline(
                     "%s Rev %d.%d", card_name,
                     (int) card_extract_bits(card->cid, 63, 4),
                     (int) card_extract_bits(card->cid, 59, 4));
+            /* manufacturing date (SD and MMC use different offsets and dates) */
             simplelist_addline(
-                    "Prod: %d/%d",
-#if (CONFIG_STORAGE & STORAGE_SD)
-                    (int) card_extract_bits(card->cid, 11, 4),
-                    (int) card_extract_bits(card->cid, 19, 8) + 2000
-#elif (CONFIG_STORAGE & STORAGE_MMC)
-                    (int) card_extract_bits(card->cid, 15, 4),
-                    (int) card_extract_bits(card->cid, 11, 4) + 1997
-#endif
-                    );
+                    "Prod: %lu/%lu",
+                    is_sd ? card_extract_bits(card->cid, 11, 4) :
+                        card_extract_bits(card->cid, 15, 4),
+                    is_sd ? card_extract_bits(card->cid, 19, 8) + 2000 :
+                        card_extract_bits(card->cid, 11, 4) + 1997);
+            /* serial number (again different offsets) */
             simplelist_addline(
-#if (CONFIG_STORAGE & STORAGE_SD)
                     "Ser#: 0x%08lx",
-                    card_extract_bits(card->cid, 55, 32)
-#elif (CONFIG_STORAGE & STORAGE_MMC)
-                    "Ser#: 0x%04lx",
-                    card_extract_bits(card->cid, 47, 16)
-#endif
-                    );
-
-            simplelist_addline("M=%02x, "
-#if (CONFIG_STORAGE & STORAGE_SD)
-                    "O=%c%c",
-                    (int) card_extract_bits(card->cid, 127, 8),
-                    card_extract_bits(card->cid, 119, 8),
-                    card_extract_bits(card->cid, 111, 8)
-#elif (CONFIG_STORAGE & STORAGE_MMC)
-                    "O=%04x",
-                    (int) card_extract_bits(card->cid, 127, 8),
-                    (int) card_extract_bits(card->cid, 119, 16)
-#endif
-                    );
+                    is_sd ? card_extract_bits(card->cid, 55, 32) :
+                        card_extract_bits(card->cid, 47, 32));
+            /* manufacturer ID and OID: the OID seems to vary in the MMC spec,
+             * it is not even clear that vendor follow the spec on this field. */
+            simplelist_addline("M=%02lx, O=%04lx (%c%c)",
+                    card_extract_bits(card->cid, 127, 8),
+                    card_extract_bits(card->cid, 119, 16),
+                    (int) card_extract_bits(card->cid, 119, 8),
+                    (int) card_extract_bits(card->cid, 111, 8));
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
-            int temp = card_extract_bits(card->csd, 125, 4);
-            simplelist_addline(
-                     "MMC v%s", temp < 5 ?
-                            mmc_spec_vers[temp] : "?.?");
-#endif
-            simplelist_addline(
-                    "Blocks: 0x%08lx", card->numblocks);
-            output_dyn_value(pbuf, sizeof pbuf, card->speed / 1000,
-                                            kbit_units, false);
-            simplelist_addline(
-                    "Speed: %s", pbuf);
-            output_dyn_value(pbuf, sizeof pbuf, card->taac,
-                            nsec_units, false);
-            simplelist_addline(
-                    "Taac: %s", pbuf);
-            simplelist_addline(
-                    "Nsac: %d clk", card->nsac);
-            simplelist_addline(
-                    "R2W: *%d", card->r2w_factor);
-#if (CONFIG_STORAGE & STORAGE_SD)
-            int csd_structure = card_extract_bits(card->csd, 127, 2);
-            if (csd_structure == 0) /* CSD version 1.0 */
-#endif
+            if(!is_sd)
             {
-            simplelist_addline(
-                    "IRmax: %d..%d mA",
+                int temp = card_extract_bits(card->csd, 125, 4);
+                simplelist_addline("MMC v%s", temp < 5 ? mmc_spec_vers[temp] : "?.?");
+            }
+#endif
+
+            /* block count */
+            simplelist_addline("Blocks: 0x%08lx", card->numblocks);
+            /* speed (non-hs for MMC) */
+            output_dyn_value(pbuf, sizeof pbuf, card->speed / 1000, kbit_units, false);
+            simplelist_addline("Speed: %s", pbuf);
+            /* Taac */
+            output_dyn_value(pbuf, sizeof pbuf, card->taac, nsec_units, false);
+            simplelist_addline("Taac: %s", pbuf);
+            /* Nsac */
+            simplelist_addline("Nsac: %d clk", card->nsac);
+            /* Read-to-write factor */
+            simplelist_addline("R2W: *%d", card->r2w_factor);
+            /* current (SD and CSD version 1.0 only) */
+            if (is_sd && card_extract_bits(card->csd, 127, 2) == 0)
+            {
+                simplelist_addline("IRmax: %d..%d mA",
                     i_vmin[card_extract_bits(card->csd, 61, 3)],
                     i_vmax[card_extract_bits(card->csd, 58, 3)]);
-            simplelist_addline(
-                    "IWmax: %d..%d mA",
+                simplelist_addline("IWmax: %d..%d mA",
                     i_vmin[card_extract_bits(card->csd, 55, 3)],
                     i_vmax[card_extract_bits(card->csd, 52, 3)]);
             }
@@ -1356,13 +1376,12 @@ static int disk_callback(int btn, struct gui_synclist *lists)
         {
             simplelist_addline("Not Found!");
         }
-#if (CONFIG_STORAGE & STORAGE_SD)
         else /* card->initialized < 0 */
         {
             simplelist_addline("Init Error! (%d)", card->initialized);
         }
-#endif
-        snprintf(title, 16, "[" CARDTYPE " %d]", *cardnum);
+
+        snprintf(title, 16, "[%s %d]", is_sd ? "microSD" : "MMC", cb_data->card_no);
         gui_synclist_set_title(lists, title, Icon_NOICON);
         gui_synclist_set_nb_items(lists, simplelist_get_line_count());
         gui_synclist_select_item(lists, 0);
@@ -1762,8 +1781,22 @@ static bool dbg_disk_info(void)
     simplelist_info_init(&info, "Disk Info", 1, NULL);
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
     char title[16];
-    int card = 0;
-    info.callback_data = (void*)&card;
+    struct sdmmc_callback_data data;
+    memset(&data, 0, sizeof(data));
+#if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
+    for(int drive = 0; drive < storage_num_drives(); drive++)
+    {
+#if CONFIG_STORAGE & STORAGE_MMC
+        if(storage_driver_type(drive) == STORAGE_MMC_NUM)
+            data.num_mmc_drives++;
+#endif
+#if CONFIG_STORAGE & STORAGE_SD
+        if(storage_driver_type(drive) == STORAGE_SD_NUM)
+            data.num_sd_drives++;
+#endif
+    }
+#endif
+    info.callback_data = (void *)&data;
     info.title = title;
 #endif
     info.action_callback = disk_callback;

@@ -1245,7 +1245,7 @@ static inline bool card_detect_target(void)
     return (jz_sd_chkcard() == 1);
 }
 
-tCardInfo* card_get_info_target(int card_no)
+tCardInfo* sd_card_info(int card_no)
 {
     (void)card_no;
     return &card;

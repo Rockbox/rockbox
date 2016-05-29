@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright © 2009 by Rafaël Carré
+ * Copyright © 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,25 +29,21 @@ static const unsigned char sd_mantissa[] = {  /* *10 */
 static const unsigned int sd_exponent[] = {  /* use varies */
     1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000 };
 
-void sd_parse_csd(tCardInfo *card)
+void mmc_parse_csd(tCardInfo *card, unsigned char *extended_csd)
 {
-    unsigned int c_size, c_mult;
-    const int csd_version = card_extract_bits(card->csd, 127, 2);
-    if(csd_version == 0)
+    /* if we have an extended CSD, always use it because the CSD can only be
+     * used for size up to 4GB in theory and spec limits it to 2GB */
+    if(extended_csd)
     {
-        /* CSD version 1.0 */
-        int max_read_bl_len;
-
-        c_size = card_extract_bits(card->csd, 73, 12) + 1;
-        c_mult = 4 << card_extract_bits(card->csd, 49, 3);
-        max_read_bl_len = 1 << card_extract_bits(card->csd, 83, 4);
-        card->numblocks = c_size * c_mult * (max_read_bl_len/512);
+        card->numblocks = extended_csd[212] | extended_csd[213] << 8;
+        card->numblocks |= extended_csd[214] << 16 | extended_csd[215] << 24;
     }
-    else if(csd_version == 1)
+    else
     {
-        /* CSD version 2.0 */
-        c_size = card_extract_bits(card->csd, 69, 22) + 1;
-        card->numblocks = c_size << 10;
+        unsigned c_size = card_extract_bits(card->csd, 73, 12) + 1;
+        unsigned c_mult = 4 << card_extract_bits(card->csd, 49, 3);
+        unsigned max_read_bl_len = 1 << card_extract_bits(card->csd, 83, 4);
+        card->numblocks = c_size * c_mult * (max_read_bl_len/512);
     }
 
     card->blocksize = 512;  /* Always use 512 byte blocks */
@@ -61,42 +57,40 @@ void sd_parse_csd(tCardInfo *card)
                  sd_exponent[card_extract_bits(card->csd, 114, 3)];
 
     card->r2w_factor = card_extract_bits(card->csd, 28, 3);
-
-    logf("CSD%d.0 numblocks:%ld speed:%ld", csd_version+1, card->numblocks, card->speed);
-    logf("nsac: %d taac: %ld r2w: %d", card->nsac, card->taac, card->r2w_factor);
 }
 
-void sd_sleep(void)
+void mmc_sleep(void)
 {
 }
 
-void sd_spin(void)
+void mmc_spin(void)
 {
 }
 
-void sd_spindown(int seconds)
+void mmc_spindown(int seconds)
 {
     (void)seconds;
 }
 
 #ifdef STORAGE_GET_INFO
-void sd_get_info(IF_MD(int drive,) struct storage_info *info)
+void mmc_get_info(IF_MD(int drive,) struct storage_info *info)
 {
 #ifndef HAVE_MULTIDRIVE
     const int drive=0;
 #endif
 
-    tCardInfo *card = sd_card_info(drive);
+    tCardInfo *card = mmc_card_info(drive);
 
     info->sector_size=card->blocksize;
     info->num_sectors=card->numblocks;
     info->vendor="Rockbox";
 #if CONFIG_STORAGE == STORAGE_SD
-    info->product = (drive==0) ? "Internal Storage" : "SD Card Slot";
+    info->product = (drive==0) ? "Internal Storage" : "MMC Card Slot";
 #else   /* Internal storage is not SD */
-    info->product = "SD Card Slot";
+    info->product = "MMC Card Slot";
 #endif
     info->revision="0.00";
 }
 #endif
 
+ 

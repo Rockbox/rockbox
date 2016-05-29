@@ -286,6 +286,9 @@ drivers/ata.c
 #if (CONFIG_STORAGE & STORAGE_SD)
 drivers/sd.c
 #endif
+#if (CONFIG_STORAGE & STORAGE_MMC)
+drivers/mmc.c
+#endif
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
 drivers/ramdisk.c
 #endif

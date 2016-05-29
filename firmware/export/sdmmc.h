@@ -53,18 +53,20 @@ typedef struct
 #if (CONFIG_STORAGE & STORAGE_SD)
 
 #include "sd.h"
-#define card_get_info          card_get_info_target
-tCardInfo *card_get_info_target(int card_no);
+tCardInfo *sd_card_info(int card_no);
 void sd_parse_csd(tCardInfo *card);
 
-#else /* STORAGE_MMC */
+#endif /* STORAGE_SD */
+
+#if (CONFIG_STORAGE & STORAGE_MMC)
 
 #include "ata_mmc.h"
-#define card_get_info          mmc_card_info
 tCardInfo *mmc_card_info(int card_no);
-#define card_touched           mmc_touched
-
-#endif
+/* parse CSD and update card information. If extended CSD is available, it will
+ * be used (in particular for device size), otherwise just pass NULL to only
+ * use CSD. */
+void mmc_parse_csd(tCardInfo *card, unsigned char *extended_csd);
+#endif  /* STORAGE_MMC */
 
 /* helper function to extract n (<=32) bits from an arbitrary position.
    counting from MSB to LSB */

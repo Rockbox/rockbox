@@ -998,7 +998,7 @@ void sd_enable(bool on)
     }
 }
 
-tCardInfo *card_get_info_target(int card_no)
+tCardInfo *sd_card_info(int card_no)
 {
     return &card_info[card_no];
 }

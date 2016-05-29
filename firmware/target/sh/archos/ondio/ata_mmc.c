@@ -952,27 +952,6 @@ long mmc_last_disk_activity(void)
     return last_disk_activity;
 }
 
-#ifdef STORAGE_GET_INFO
-void mmc_get_info(IF_MD(int drive,) struct storage_info *info)
-{
-#ifndef HAVE_MULTIDRIVE
-    const int drive=0;
-#endif
-    info->sector_size=card_info[drive].blocksize;
-    info->num_sectors=card_info[drive].numblocks;
-    info->vendor="Rockbox";
-    if(drive==0)
-    {
-        info->product="Internal Storage";
-    }
-    else
-    {
-        info->product="MMC Card Slot";
-    }
-    info->revision="0.00";
-}
-#endif
-
 #ifdef HAVE_HOTSWAP
 bool mmc_removable(IF_MD_NONVOID(int drive))
 {
@@ -997,20 +976,6 @@ bool mmc_present(IF_MD_NONVOID(int drive))
     }
 }
 #endif
-
-
-void mmc_sleep(void)
-{
-}
-
-void mmc_spin(void)
-{
-}
-
-void mmc_spindown(int seconds)
-{
-    (void)seconds;
-}
 
 #ifdef CONFIG_STORAGE_MULTI
 int mmc_num_drives(int first_drive)
