@@ -471,8 +471,8 @@ static int init_sd_card(int drive)
      * gives bitrate of 96 / 4 / 1 = 24MHz
      * gives bitrate of 96 / 2 / 1 = 48MHz */
     SDMMC_STATUS(drive).hs_capable = sd_hs;
-    SDMMC_STATUS(drive).hs_enabled = false;
-    if(/*sd_hs*/false)
+    SDMMC_STATUS(drive).hs_enabled = sd_hs;
+    if(sd_hs)
         imx233_ssp_set_timings(ssp, 2, 0, 0xffff);
     else
         imx233_ssp_set_timings(ssp, 4, 0, 0xffff);

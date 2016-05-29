@@ -219,7 +219,7 @@ void imx233_ssp_setup_ssp1_sd_mmc_pins(bool enable_pullups, unsigned bus_width, 
 {
     (void) use_alt;
     unsigned clk_drive = PINCTRL_DRIVE_8mA;
-    unsigned dat_drive = PINCTRL_DRIVE_4mA;
+    unsigned dat_drive = PINCTRL_DRIVE_8mA;
     /* SSP_{CMD,SCK} */
     imx233_pinctrl_setup_vpin(VPIN_SSP1_CMD, "ssp1_cmd", dat_drive, enable_pullups);
     imx233_pinctrl_setup_vpin(VPIN_SSP1_SCK, "ssp1_sck", clk_drive, false);
@@ -263,7 +263,7 @@ void imx233_ssp_setup_ssp2_sd_mmc_pins(bool enable_pullups, unsigned bus_width)
     (void) enable_pullups;
     (void) bus_width;
     unsigned clk_drive = PINCTRL_DRIVE_8mA;
-    unsigned dat_drive = PINCTRL_DRIVE_4mA;
+    unsigned dat_drive = PINCTRL_DRIVE_8mA;
 #ifdef VPIN_SSP2_CMD
     /* SSP_{CMD,SCK} */
     imx233_pinctrl_setup_vpin(VPIN_SSP2_CMD, "ssp2_cmd", dat_drive, enable_pullups);
