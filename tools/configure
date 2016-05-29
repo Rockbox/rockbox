@@ -342,7 +342,12 @@ simcc () {
     else 
         # generic sdl-config checker
         GCCOPTS="$GCCOPTS `$sdl --cflags`"
-        LDOPTS="$LDOPTS `$sdl --static-libs`"
+        if sdl-config --static-libs &> /dev/null ; then
+            LDOPTS="$LDOPTS `$sdl --static-libs`"
+        else
+            echo "Your sdl-config does not know about static libs, falling back to shared library"
+            LDOPTS="$LDOPTS `$sdl --libs`"
+        fi
     fi
  fi
  
