@@ -476,7 +476,10 @@ static int init_sd_card(int drive)
         imx233_ssp_set_timings(ssp, 2, 0, 0xffff);
     else
         imx233_ssp_set_timings(ssp, 4, 0, 0xffff);
-
+    /* deselect card */
+    if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
+        return -13;
+    /* successfully initialised */
     SDMMC_INFO(drive).initialized = 1;
 
     return 0;
@@ -566,7 +569,7 @@ static int init_mmc_drive(int drive)
         return -13;
 
     /* MMC always support CMD23 */
-    SDMMC_STATUS(drive).has_sbc = false;
+    SDMMC_STATUS(drive).has_sbc = true;
     SDMMC_INFO(drive).initialized = 1;
 
     return 0;
