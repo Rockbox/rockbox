@@ -55,6 +55,7 @@
 #error SD/MMC mismatch
 #endif
 
+/* static configuration */
 struct sdmmc_config_t
 {
     const char *name; /* name(for debug) */
@@ -85,7 +86,7 @@ struct sdmmc_config_t
 #define PIN2BANK(v) ((v) >> 5)
 #define PIN2PIN(v) ((v) & 0x1f)
 
-struct sdmmc_config_t sdmmc_config[] =
+const struct sdmmc_config_t sdmmc_config[] =
 {
 #ifdef SANSA_FUZEPLUS
     /* The Fuze+ uses pin #B0P8 for power */
@@ -181,6 +182,15 @@ struct sdmmc_config_t sdmmc_config[] =
 #endif
 };
 
+/* drive status */
+struct sdmmc_status_t
+{
+    int bus_width; /* bus width (1, 4 or 8) */
+    bool hs_capable; /* HS capable device */
+    bool hs_enabled; /* HS enabled */
+    bool has_sbc; /* support SET_BLOCK_COUNT */
+};
+
 #define SDMMC_NUM_DRIVES    (sizeof(sdmmc_config) / sizeof(sdmmc_config[0]))
 
 #define SDMMC_CONF(drive) sdmmc_config[drive]
@@ -200,11 +210,12 @@ static uint8_t aligned_buffer[SDMMC_NUM_DRIVES][512] CACHEALIGN_ATTR;
 static tCardInfo sdmmc_card_info[SDMMC_NUM_DRIVES];
 static struct mutex mutex[SDMMC_NUM_DRIVES];
 static int disk_last_activity[SDMMC_NUM_DRIVES];
-static bool support_set_block_count[SDMMC_NUM_DRIVES];
+static struct sdmmc_status_t sdmmc_status[SDMMC_NUM_DRIVES];
 #define MIN_YIELD_PERIOD    5
 
 #define SDMMC_INFO(drive) sdmmc_card_info[drive]
 #define SDMMC_RCA(drive) SDMMC_INFO(drive).rca
+#define SDMMC_STATUS(drive) sdmmc_status[drive]
 
 /* sd only */
 static long sdmmc_stack[(DEFAULT_STACK_SIZE*2 + 0x200)/sizeof(long)];
@@ -425,6 +436,7 @@ static int init_sd_card(int drive)
 
     /* Switch to 4-bit */
     imx233_ssp_set_bus_width(ssp, 4);
+    SDMMC_STATUS(drive).bus_width = 4;
 
     /* Try to switch V2 cards to HS timings, non HS seem to ignore this */
     if(sd_v2)
@@ -441,7 +453,7 @@ static int init_sd_card(int drive)
     }
 
     /* probe for CMD23 support */
-    support_set_block_count[drive] = false;
+    SDMMC_STATUS(drive).has_sbc = false;
     /* ACMD51, only transfer 8 bytes */
     imx233_ssp_set_block_size(ssp, /*log2(8)*/3);
     if(send_cmd(drive, SD_APP_CMD, SDMMC_RCA(drive), MCI_RESP, &resp))
@@ -450,7 +462,7 @@ static int init_sd_card(int drive)
             aligned_buffer[drive], 1, true, true, NULL) == SSP_SUCCESS)
         {
             if(aligned_buffer[drive][3] & 2)
-                support_set_block_count[drive] = true;
+                SDMMC_STATUS(drive).has_sbc = true;
         }
     }
     imx233_ssp_set_block_size(ssp, /*log2(512)*/9);
@@ -458,6 +470,8 @@ static int init_sd_card(int drive)
     /* SSPCLK @ 96MHz
      * gives bitrate of 96 / 4 / 1 = 24MHz
      * gives bitrate of 96 / 2 / 1 = 48MHz */
+    SDMMC_STATUS(drive).hs_capable = sd_hs;
+    SDMMC_STATUS(drive).hs_enabled = false;
     if(/*sd_hs*/false)
         imx233_ssp_set_timings(ssp, 2, 0, 0xffff);
     else
@@ -534,6 +548,9 @@ static int init_mmc_drive(int drive)
     /* SSPCLK @ 96MHz
      * gives bitrate of 96 / 2 / 1 = 48MHz */
     imx233_ssp_set_timings(ssp, 2, 0, 0xffff);
+    SDMMC_STATUS(drive).bus_width = 8;
+    SDMMC_STATUS(drive).hs_capable = true;
+    SDMMC_STATUS(drive).hs_enabled = true;
 
     /* read extended CSD */
     {
@@ -549,7 +566,7 @@ static int init_mmc_drive(int drive)
         return -13;
 
     /* MMC always support CMD23 */
-    support_set_block_count[drive] = false;
+    SDMMC_STATUS(drive).has_sbc = false;
     SDMMC_INFO(drive).initialized = 1;
 
     return 0;
@@ -565,7 +582,7 @@ static int __xfer_sectors(int drive, unsigned long start, int count, void *buf, 
     {
         int this_count = MIN(count, IMX233_MAX_SINGLE_DMA_XFER_SIZE / 512);
         bool need_stop = true;
-        if(support_set_block_count[drive] && send_cmd(drive, 23, this_count, MCI_RESP, &resp))
+        if(SDMMC_STATUS(drive).has_sbc && send_cmd(drive, 23, this_count, MCI_RESP, &resp))
             need_stop = false;
         /* Set bank_start to the correct unit (blocks or bytes).
          * MMC drives use block addressing, SD cards bytes or blocks */
@@ -1069,4 +1086,46 @@ tCardInfo *mmc_card_info(int card_no)
     return &SDMMC_INFO(mmc_map[card_no]);
 }
 
+#endif
+
+/** Information about SD/MMC slot */
+struct sdmmc_info_t
+{
+    int drive; /* drive number (for queries like storage_removable(drive) */
+    const char *slot_name; /* name of the slot: 'internal' or 'microsd' */
+    bool window; /* is window enabled for this slot? */
+    int bus_width; /* current bus width */
+    bool hs_capable; /* is device high-speed capable? */
+    bool hs_enabled; /* is high-speed enabled? */
+    bool has_sbc; /* device support SET_BLOCK_COUNT */
+};
+
+struct sdmmc_info_t imx233_sdmmc_get_info(int drive, int storage_drive)
+{
+    struct sdmmc_info_t info;
+    memset(&info, 0, sizeof(info));
+    info.drive = storage_drive;
+    info.slot_name = SDMMC_CONF(drive).name;
+    info.window = !!(SDMMC_CONF(drive).flags & WINDOW);
+    info.bus_width = SDMMC_STATUS(drive).bus_width;
+    info.hs_capable = SDMMC_STATUS(drive).hs_capable;
+    info.hs_enabled = SDMMC_STATUS(drive).hs_enabled;
+    info.has_sbc = SDMMC_STATUS(drive).has_sbc;
+    return info;
+}
+
+#if CONFIG_STORAGE & STORAGE_SD
+/* return information about a particular sd device (use regular drive number) */
+struct sdmmc_info_t imx233_sd_get_info(int card_no)
+{
+    return imx233_sdmmc_get_info(sd_map[card_no], sd_first_drive + card_no);
+}
+#endif
+
+#if CONFIG_STORAGE & STORAGE_MMC
+/* return information about a particular mmc device (use regular drive number) */
+struct sdmmc_info_t imx233_mmc_get_info(int card_no)
+{
+    return imx233_sdmmc_get_info(mmc_map[card_no], mmc_first_drive + card_no);
+}
 #endif
