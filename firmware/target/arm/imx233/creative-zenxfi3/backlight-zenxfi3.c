@@ -25,7 +25,7 @@
 #include "backlight.h"
 #include "backlight-target.h"
 #include "pwm-imx233.h"
-#include "mpr121.h"
+#include "mpr121-zenxfi3.h"
 
 void backlight_hw_brightness(int brightness)
 {
