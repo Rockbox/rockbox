@@ -1231,10 +1231,10 @@ target/arm/imx233/creative-zenxfi2/powermgmt-zenxfi2.c
 #endif
 
 #ifdef CREATIVE_ZENXFI3
-drivers/mpr121.c
 #ifndef BOOTLOADER
 target/arm/imx233/fmradio-imx233.c
 #endif
+target/arm/imx233/creative-zenxfi3/mpr121-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/backlight-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/lcd-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/button-zenxfi3.c
