@@ -18,16 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "button-target.h"
 #include "system.h"
-#include "system-target.h"
-#include "pinctrl-imx233.h"
-#include "power-imx233.h"
+#include "tick.h"
 #include "button-imx233.h"
-#include "string.h"
-#include "usb.h"
-#include "backlight.h"
-#include "mpr121.h"
+#include "mpr121-zenxfi3.h"
 
 #define I_VDDIO 0 /* index in the table */
 
@@ -42,7 +36,8 @@ struct imx233_button_map_t imx233_button_map[] =
     IMX233_BUTTON_(END, END(), "")
 };
 
-static struct mpr121_config_t config =
+/* MPR121 configuration, mostly extracted from OF */
+static struct mpr121_config_t mpr121_config =
 {
     .ele =
     {
@@ -73,74 +68,11 @@ static struct mpr121_config_t config =
     .cal_lock = CL_TRACK
 };
 
-#define MPR121_INTERRUPT    1
-
-static int touchpad_btns = 0;
-static long mpr121_stack[DEFAULT_STACK_SIZE/sizeof(long)];
-static const char mpr121_thread_name[] = "mpr121";
-static struct event_queue mpr121_queue;
-
-static void mpr121_irq_cb(int bank, int pin, intptr_t user)
-{
-    (void) bank;
-    (void) pin;
-    (void) user;
-    /* the callback will not be fired until interrupt is enabled back so
-     * the queue will not overflow or contain multiple MPR121_INTERRUPT events */
-    queue_post(&mpr121_queue, MPR121_INTERRUPT, 0);
-}
-
-static void mpr121_thread(void)
-{
-    struct queue_event ev;
-
-    while(1)
-    {
-        queue_wait(&mpr121_queue, &ev);
-        /* handle usb connect and ignore all messages except rmi interrupts */
-        if(ev.id == SYS_USB_CONNECTED)
-        {
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
-            continue;
-        }
-        else if(ev.id != MPR121_INTERRUPT)
-            continue;
-        /* clear interrupt and get status */
-        unsigned status;
-        touchpad_btns = 0;
-        if(!mpr121_get_touch_status(&status))
-        {
-            /* ELE3: up
-             * ELE4: back
-             * ELE5: menu
-             * ELE6: down
-             * ELE7: play */
-            if(status & 0x8) touchpad_btns |= BUTTON_UP;
-            if(status & 0x10) touchpad_btns |= BUTTON_BACK;
-            if(status & 0x20) touchpad_btns |= BUTTON_MENU;
-            if(status & 0x40) touchpad_btns |= BUTTON_DOWN;
-            if(status & 0x80) touchpad_btns |= BUTTON_PLAY;
-        }
-        /* enable interrupt */
-        imx233_pinctrl_setup_irq(0, 18, true, true, false, &mpr121_irq_cb, 0);
-    }
-}
-
 /* B0P18 is #IRQ line of the touchpad */
 void button_init_device(void)
 {
-    mpr121_init(0xb4);
-    mpr121_soft_reset();
-    mpr121_set_config(&config);
-
-    queue_init(&mpr121_queue, true);
-    create_thread(mpr121_thread, mpr121_stack, sizeof(mpr121_stack), 0,
-        mpr121_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
-    /* enable interrupt */
-    imx233_pinctrl_acquire(0, 18, "mpr121_int");
-    imx233_pinctrl_set_function(0, 18, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_enable_gpio(0, 18, false);
-    imx233_pinctrl_setup_irq(0, 18, true, true, false, &mpr121_irq_cb, 0);
+    mpr121_init();
+    mpr121_set_config(&mpr121_config);
     /* generic part */
     imx233_button_init();
 }
@@ -151,7 +83,6 @@ int button_read_device(void)
      * for one second after hold is released */
     static int power_ignore_counter = 0;
     static bool old_hold;
-    /* light handling */
     bool hold = button_hold();
     if(hold != old_hold)
     {
@@ -159,6 +90,20 @@ int button_read_device(void)
         if(!hold)
             power_ignore_counter = HZ;
     }
+    /* interpret touchpad status */
+    unsigned status = mpr121_get_touch_status();
+    unsigned touchpad_btns = 0;
+    /* ELE3: up
+     * ELE4: back
+     * ELE5: menu
+     * ELE6: down
+     * ELE7: play */
+    if(status & 0x8) touchpad_btns |= BUTTON_UP;
+    if(status & 0x10) touchpad_btns |= BUTTON_BACK;
+    if(status & 0x20) touchpad_btns |= BUTTON_MENU;
+    if(status & 0x40) touchpad_btns |= BUTTON_DOWN;
+    if(status & 0x80) touchpad_btns |= BUTTON_PLAY;
+    /* feed it to generic code */
     int res = imx233_button_read(touchpad_btns);
     if(power_ignore_counter > 0)
     {
