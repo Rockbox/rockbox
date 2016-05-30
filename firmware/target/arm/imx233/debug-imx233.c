@@ -1176,7 +1176,7 @@ bool dbg_hw_info_button(void)
                 strcat(flags, " inv");
             if(MAP[i].flags & IMX233_BUTTON_PULLUP)
                 strcat(flags, " pull");
-#if LCD_WHITE <= LCD_HEIGHT
+#if LCD_WIDTH <= LCD_HEIGHT
             lcd_putsf(0, line++, "%s %d %d/%d %d %s", MAP[i].name, val,
                 MAP[i].rounds, MAP[i].threshold, raw, type);
             lcd_putsf(0, line++, "  %s%s", path, flags);
