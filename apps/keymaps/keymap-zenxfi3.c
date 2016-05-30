@@ -43,13 +43,12 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_NEXT,                  BUTTON_DOWN,                       BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,            BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
 
-    { ACTION_STD_CONTEXT,               BUTTON_MENU|BUTTON_REPEAT,         BUTTON_MENU },
+    { ACTION_STD_CONTEXT,               BUTTON_MENU|BUTTON_REL,            BUTTON_MENU },
+    { ACTION_STD_MENU,                  BUTTON_MENU|BUTTON_REPEAT,         BUTTON_MENU },
 
     { ACTION_STD_CANCEL,                BUTTON_LEFT,                       BUTTON_NONE },
     { ACTION_STD_CANCEL,                BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE },
-    { ACTION_STD_OK,                    BUTTON_PLAY|BUTTON_REL,           BUTTON_PLAY },
-
-    { ACTION_STD_KEYLOCK,               BUTTON_POWER,                      BUTTON_NONE },
+    { ACTION_STD_OK,                    BUTTON_PLAY|BUTTON_REL,            BUTTON_PLAY },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
@@ -72,6 +71,8 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_VOLDOWN,               BUTTON_VOL_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
 
     { ACTION_WPS_MENU,                  BUTTON_BACK,                       BUTTON_NONE },
+
+    { ACTION_WPS_QUICKSCREEN,           BUTTON_MENU,                       BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_wps */
@@ -97,12 +98,11 @@ static const struct button_mapping button_context_keyboard[]  = {
 }; /* button_context_keyboard */
 
 static const struct button_mapping button_context_quickscreen[]  = {
-    { ACTION_STD_CANCEL,                BUTTON_POWER,                      BUTTON_NONE },
     { ACTION_STD_CANCEL,                BUTTON_MENU,                       BUTTON_NONE },
     { ACTION_QS_TOP,                    BUTTON_UP,                         BUTTON_NONE },
     { ACTION_QS_DOWN,                   BUTTON_DOWN,                       BUTTON_NONE },
     { ACTION_QS_LEFT,                   BUTTON_LEFT,                       BUTTON_NONE },
-    { ACTION_QS_RIGHT,                  BUTTON_PLAY,                      BUTTON_NONE },
+    { ACTION_QS_RIGHT,                  BUTTON_PLAY,                       BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_quickscreen */
