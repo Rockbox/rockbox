@@ -302,6 +302,7 @@
 #define DTD_RESERVED_IN_USE                  0x80000000
 #define DTD_RESERVED_PIPE_MASK               0x0ff00000
 #define DTD_RESERVED_PIPE_OFFSET             20
+#define DTD_RESERVED_LOOP                    0x40000000
 /*-------------------------------------------------------------------------*/
 
 /* 4 transfer descriptors per endpoint allow 64k transfers, which is the usual MSC
@@ -364,6 +365,7 @@ static const unsigned int pipe2mask[] = {
 static void transfer_completed(void);
 static void control_received(void);
 static int prime_transfer(int ep_num, void* ptr, int len, bool send, bool wait);
+static int prime_transfer_loop(int ep_num, void* ptr, int len, bool send);
 static void prepare_td(struct transfer_descriptor* td,
         struct transfer_descriptor* previous_td, void *ptr, int len,int pipe);
 static void bus_reset(void);
@@ -595,6 +597,16 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
     return prime_transfer(EP_NUM(endpoint), ptr, length, false, false);
 }
 
+int usb_drv_recv_loop(int endpoint, void* ptr, int length)
+{
+    return prime_transfer_loop(EP_NUM(endpoint), ptr, length, false);
+}
+
+int usb_drv_send_loop(int endpoint, void* ptr, int length)
+{
+    return prime_transfer_loop(EP_NUM(endpoint), ptr, length, true);
+}
+
 int usb_drv_port_speed(void)
 {
     return (REG_PORTSC1 & 0x08000000) ? 1 : 0;
@@ -766,6 +778,44 @@ pt_error:
     return rc;
 }
 
+static int prime_transfer_loop(int ep_num, void* ptr, int len, bool send)
+{
+    int rc = 0;
+    int pipe = ep_num * 2 + (send ? 1 : 0);
+    unsigned int mask = pipe2mask[pipe];
+    struct queue_head* qh = &qh_array[pipe];
+    static long last_tick;
+    struct transfer_descriptor *new_td, *cur_td, *prev_td;
+
+    int oldlevel = disable_irq_save();
+    qh->status = 0;
+    qh->wait = false;
+
+    new_td=&td_array[pipe*NUM_TDS_PER_EP];
+    cur_td=new_td;
+    prev_td=0;
+    int tdlen;
+
+    do
+    {
+        tdlen=MIN(len,16384);
+        prepare_td(cur_td, prev_td, ptr, tdlen,pipe);
+        cur_td->reserved |= DTD_RESERVED_LOOP;
+        ptr+=tdlen;
+        prev_td=cur_td;
+        cur_td++;
+        len-=tdlen;
+    }while(len>0);
+
+    qh->dtd.next_td_ptr = (unsigned int)new_td;
+    qh->dtd.size_ioc_sts &= ~(QH_STATUS_HALT | QH_STATUS_ACTIVE);
+
+    REG_ENDPTPRIME |= mask;
+
+    restore_irq(oldlevel);
+    return 0;
+}
+
 void usb_drv_cancel_all_transfers(void)
 {
     int i;
@@ -891,8 +941,12 @@ static void transfer_completed(void)
 
                 int length=0;
                 struct transfer_descriptor* td=&td_array[pipe*NUM_TDS_PER_EP];
+                bool loop = false;
+
                 while(td!=(struct transfer_descriptor*)DTD_NEXT_TERMINATE && td!=0)
                 {
+                    if(td->reserved & DTD_RESERVED_LOOP)
+                        loop = true;
                     /* It seems that the controller sets the pipe bit to one even if the TD
                      * dosn't have the IOC bit set. So we have the rely the active status bit
                      * to check that all the TDs of the transfer are really finished and let
@@ -905,6 +959,25 @@ static void transfer_completed(void)
                     length += ((td->reserved & DTD_RESERVED_LENGTH_MASK) -
                         ((td->size_ioc_sts & DTD_PACKET_SIZE) >> DTD_LENGTH_BIT_POS));
                     td=(struct transfer_descriptor*) td->next_td_ptr;
+                }
+
+                if(loop)
+                {
+                    struct transfer_descriptor* new_td = &td_array[pipe*NUM_TDS_PER_EP];
+                    td = new_td;
+                    while(td!=(struct transfer_descriptor*)DTD_NEXT_TERMINATE && td!=0)
+                    {
+                        int len = td->reserved & DTD_RESERVED_LENGTH_MASK;
+                        td->size_ioc_sts = (len<< DTD_LENGTH_BIT_POS) |
+                            DTD_STATUS_ACTIVE | DTD_IOC;
+                        if(td->next_td_ptr != DTD_NEXT_TERMINATE)
+                            td->size_ioc_sts &= ~DTD_IOC;
+                        td=(struct transfer_descriptor*) td->next_td_ptr;
+                    }
+                    qh->dtd.next_td_ptr = (unsigned int)new_td;
+                    qh->dtd.size_ioc_sts &= ~(QH_STATUS_HALT | QH_STATUS_ACTIVE);
+                    REG_ENDPTPRIME |= pipe2mask[pipe];
+                    goto Lskip;
                 }
                 if(qh->wait) {
                     qh->wait=0;
