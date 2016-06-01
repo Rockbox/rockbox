@@ -1253,7 +1253,7 @@ void iap_handlepkt(void)
     if(iap_repeatbtn)
     {
         queue_post(&iap_queue, IAP_EV_MSG_RCVD, 0);
-        sleep(1);
+        sleep(HZ/100);
         return;
     }
 

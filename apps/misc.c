@@ -332,7 +332,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
                 rec_command(RECORDING_CMD_STOP);
                 /* wait for stop to complete */
                 while (audio_status() & AUDIO_STATUS_RECORD)
-                    sleep(1);
+                    sleep(HZ/100);
             }
 #endif
             bookmark_autobookmark(false);
@@ -346,7 +346,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #if CONFIG_CODEC != SWCODEC
             /* wait for audio_stop or audio_stop_recording to complete */
             while (audio_status())
-                sleep(1);
+                sleep(HZ/100);
 #endif
 
 #if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC

@@ -1771,7 +1771,7 @@ static int brickmania_game_loop(void)
                                     if (life>=0)
                                     {
                                         brickmania_init_game(false);
-                                        brickmania_sleep(2);
+                                        brickmania_sleep(HZ/50);
                                     }
                                     break;
                                 case POWER_TYPE_PADDLE_STICKY:
@@ -2096,7 +2096,7 @@ static int brickmania_game_loop(void)
                             {
                                 /* No lives left reset game */
                                 brickmania_init_game(false);
-                                brickmania_sleep(2);
+                                brickmania_sleep(HZ/50);
                                 rb->button_clear_queue();
                             }
                         }
@@ -2256,7 +2256,7 @@ static int brickmania_game_loop(void)
                     if (difficulty==NORMAL)
                         score+=SCORE_LEVEL_COMPLETED;
                     brickmania_init_game(true);
-                    brickmania_sleep(2);
+                    brickmania_sleep(HZ/50);
                     rb->button_clear_queue();
                 }
                 else
@@ -2276,7 +2276,7 @@ static int brickmania_game_loop(void)
 #endif
                     vscore=score;
                     rb->lcd_update();
-                    brickmania_sleep(2);
+                    brickmania_sleep(HZ/50);
                     return 0;
                 }
             }
@@ -2458,7 +2458,7 @@ static int brickmania_game_loop(void)
                            INT3(GAMEOVER_WIDTH),INT3(GAMEOVER_HEIGHT) );
 #endif
             rb->lcd_update();
-            brickmania_sleep(2);
+            brickmania_sleep(HZ/50);
             return 0;
         }
 

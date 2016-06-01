@@ -49,7 +49,7 @@
 #elif (LCD_HEIGHT * LCD_WIDTH >= 30000)
 #define STAR_SLEEP rb->sleep(0);
 #else
-#define STAR_SLEEP rb->sleep(1);
+#define STAR_SLEEP rb->sleep(HZ/100);
 #endif
 
 /* value of ball and block control */

@@ -195,7 +195,7 @@ void fade(bool fade_in, bool updatewps)
         while (fp_volume < fp_global_vol - fp_step) {
             fp_volume += fp_step;
             sound_set_volume(fp_volume >> 8);
-            sleep(1);
+            sleep(HZ/100);
         }
         sound_set_volume(global_settings.volume);
     }
@@ -209,7 +209,7 @@ void fade(bool fade_in, bool updatewps)
         while (fp_volume > fp_min_vol + fp_step) {
             fp_volume -= fp_step;
             sound_set_volume(fp_volume >> 8);
-            sleep(1);
+            sleep(HZ/100);
         }
         audio_pause();
 

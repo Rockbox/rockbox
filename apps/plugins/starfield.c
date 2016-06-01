@@ -217,7 +217,7 @@ static int plugin_main(void)
 
     while (true)
     {
-        rb->sleep(1);
+        rb->sleep(HZ/100);
         rb->lcd_clear_display();
 
 #if ((CONFIG_CODEC == SWCODEC)  || !defined(SIMULATOR) && \

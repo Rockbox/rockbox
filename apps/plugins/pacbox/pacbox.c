@@ -476,7 +476,7 @@ static int gameProc( void )
             /* Keep the framerate at Pacman's 60fps */
             end_time = start_time + (video_frames*HZ)/FPS;
             while (TIME_BEFORE(*rb->current_tick,end_time)) {
-                rb->sleep(1);
+                rb->sleep(HZ/100);
             }
         }
     }

@@ -3288,7 +3288,7 @@ void mas_restore(void)
     
     i2c_random_write(MAS_ADR, MAS_CONTROL, resetdsp, sizeof(resetdsp));
     /* mas_direct_config_write(MAS_CONTROL, 0x8d00); in core implementation */
-    rb->sleep(1);
+    rb->sleep(HZ/100);
     i2c_random_write(MAS_ADR, MAS_CONTROL, initdsp, sizeof(initdsp));
     /* mas_direct_config_write(MAS_CONTROL, 0x8c00); in core implementation */
     

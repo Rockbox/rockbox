@@ -718,7 +718,7 @@ static int STORAGE_INIT_ATTR check_registers(void)
             ((ATA_IN8(ATA_HCYL) & 0xff) == TEST_PATTERN4))
             return 0;
 
-        sleep(1);
+        sleep(HZ/100);
     }
     return -2;
 }
@@ -989,7 +989,7 @@ static int perform_soft_reset(void)
 
     ATA_OUT8(ATA_SELECT, SELECT_LBA | ata_device );
     ATA_OUT8(ATA_CONTROL, CONTROL_nIEN|CONTROL_SRST );
-    sleep(1); /* >= 5us */
+    sleep(HZ/100); /* >= 5us */
 
 #ifdef HAVE_ATA_DMA
     /* DMA requires INTRQ be enabled */
@@ -997,7 +997,7 @@ static int perform_soft_reset(void)
 #else
     ATA_OUT8(ATA_CONTROL, CONTROL_nIEN);
 #endif
-    sleep(1); /* >2ms */
+    sleep(HZ/100); /* >2ms */
 
     /* This little sucker can take up to 30 seconds */
     retry_count = 8;

@@ -1320,7 +1320,7 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
     int i;
 
     while (read_lock)
-        sleep(1);
+        sleep(HZ/100);
     
     memset(tcs, 0, sizeof(struct tagcache_search));
     if (tc_stat.commit_step > 0 || !tc_stat.ready)
@@ -2941,7 +2941,7 @@ static bool commit(void)
     logf("committing tagcache");
     
     while (write_lock)
-        sleep(1);
+        sleep(HZ/100);
 
     tmpfd = open(TAGCACHE_FILE_TEMP, O_RDONLY);
     if (tmpfd < 0)
@@ -3284,7 +3284,7 @@ static void queue_command(int cmd, long idx_id, int tag, long data)
         
         /* Queue is full, try again later... */
         mutex_unlock(&command_queue_mutex);
-        sleep(1);
+        sleep(HZ/100);
     }
 }
 
@@ -3296,7 +3296,7 @@ long tagcache_increase_serial(void)
         return -2;
     
     while (read_lock)
-        sleep(1);
+        sleep(HZ/100);
     
     old = current_tcmh.serial++;
     queue_command(CMD_UPDATE_MASTER_HEADER, 0, 0, 0);
@@ -3499,7 +3499,7 @@ bool tagcache_import_changelog(void)
         return false;
     
     while (read_lock)
-        sleep(1);
+        sleep(HZ/100);
     
     clfd = open(TAGCACHE_FILE_CHANGELOG, O_RDONLY);
     if (clfd < 0)
@@ -3995,7 +3995,7 @@ static bool load_tagcache(void)
 
 # ifdef HAVE_DIRCACHE
     while (dircache_is_initializing())
-        sleep(1);
+        sleep(HZ/100);
 
     dircache_set_appflag(DIRCACHE_APPFLAG_TAGCACHE);    
 # endif
@@ -4512,7 +4512,7 @@ void do_tagcache_build(const char *path[])
     
 #ifdef HAVE_DIRCACHE
     while (dircache_is_initializing())
-        sleep(1);
+        sleep(HZ/100);
 #endif
     
     logf("updating tagcache");
@@ -4773,7 +4773,7 @@ bool tagcache_prepare_shutdown(void)
     
     tagcache_stop_scan();
     while (read_lock || write_lock)
-        sleep(1);
+        sleep(HZ/100);
     
     return true;
 }
