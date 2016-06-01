@@ -180,6 +180,7 @@ static inline bool usb_configure_drivers(int for_state)
     switch(for_state)
     {
     case USB_POWERED:
+        usb_core_enable_driver(USB_DRIVER_TEST, true);
 #ifdef USB_ENABLE_STORAGE
         usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, false);
 #endif
@@ -201,6 +202,7 @@ static inline bool usb_configure_drivers(int for_state)
         /* USB_POWERED: */
     
     case USB_INSERTED:
+        usb_core_enable_driver(USB_DRIVER_TEST, true);
 #ifdef USB_ENABLE_STORAGE
         usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, true);
 #endif

@@ -147,6 +147,7 @@ enum
 #endif
 
 #ifdef HAVE_USBSTACK
+#define USB_ENABLE_TEST /* always enable it */
 /* USB class drivers */
 enum {
 #ifdef USB_ENABLE_STORAGE
@@ -161,6 +162,7 @@ enum {
 #ifdef USB_ENABLE_HID
     USB_DRIVER_HID,
 #endif
+    USB_DRIVER_TEST,
     USB_NUM_DRIVERS
 };
 
