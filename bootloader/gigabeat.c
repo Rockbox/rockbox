@@ -177,7 +177,7 @@ void main(void)
     printf("Rockbox boot loader");
     printf("Version %s", rbversion);
 
-    sleep(50); /* ATA seems to error without this pause */
+    sleep(HZ/2); /* ATA seems to error without this pause */
 
     rc = storage_init();
     if(rc)

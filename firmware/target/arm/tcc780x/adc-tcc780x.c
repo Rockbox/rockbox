@@ -103,6 +103,6 @@ void adc_init(void)
     
     tick_add_task(adc_tick);
     
-    sleep(2);    /* Ensure valid readings when adc_init returns */
+    sleep(HZ/50);    /* Ensure valid readings when adc_init returns */
 #endif
 }

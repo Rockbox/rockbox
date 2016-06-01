@@ -36,11 +36,11 @@ void ata_reset(void)
 {
     /* state HRR0 */
     and_b(~0x02, &PADRH); /* assert _RESET */
-    sleep(1); /* > 25us */
+    sleep(HZ/100); /* > 25us */
 
     /* state HRR1 */
     or_b(0x02, &PADRH); /* negate _RESET */
-    sleep(1); /* > 2ms */
+    sleep(HZ/100); /* > 2ms */
 }
 
 void ata_enable(bool on)

@@ -105,7 +105,7 @@ void adc_init(void)
     tick_add_task(adc_tick);
     
     while (!data_ready)
-        sleep(1);             /* Ensure valid readings when adc_init returns */
+        sleep(HZ/100);             /* Ensure valid readings when adc_init returns */
 }
 
 /* The ADC (most probably the PIC12F675) obviously has a slow and buggy I²C
@@ -117,5 +117,5 @@ void adc_close(void)
     tick_remove_task(adc_tick);
 
     while (MBSR2 & IBB)       /* Wait for an ongoing transfer to finish */
-        sleep(1);
+        sleep(HZ/100);
 }

@@ -115,7 +115,7 @@ void gui_thread(void)
         if(update)
             pd_gui_draw(widget, widgets);
 
-        rb->sleep(1);
+        rb->sleep(HZ/100);
     }
 
     rb->thread_exit();
@@ -146,7 +146,7 @@ void core_thread(void)
         while(sys_send_dacs() != SENDDACS_NO)
             sched_tick(sys_time + sys_time_per_dsp_tick);
 
-        rb->sleep(1);
+        rb->sleep(HZ/100);
     }
 
     rb->thread_exit();
@@ -254,7 +254,7 @@ enum plugin_status plugin_start(const void* parameter)
         runningtime += (1000 / HZ);
 
         /* Sleep to the next time slice. */
-        rb->sleep(1);
+        rb->sleep(HZ/100);
     }
     
     /* Restore backlight. */

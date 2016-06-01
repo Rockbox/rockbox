@@ -103,11 +103,11 @@ void lcd_init_device(void)
     or_l(0x00004008, &GPIO1_FUNCTION);
 
     /* Reset LCD */
-    sleep(1);
+    sleep(HZ/100);
     and_l(~0x00004000, &GPIO1_OUT);
-    sleep(1);
+    sleep(HZ/100);
     or_l(0x00004000, &GPIO1_OUT);
-    sleep(1);
+    sleep(HZ/100);
 
     lcd_write_command(LCD_CNTL_COLUMN_ADDRESS_DIR | 0);   /* Normal */
     lcd_write_command(LCD_CNTL_COMMON_OUTPUT_STATUS | 1); /* Reverse dir */

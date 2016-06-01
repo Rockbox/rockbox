@@ -39,7 +39,7 @@ bool tuner_power(bool status)
     if (status)
     {
         and_b(~0x04, &PADRL); /* drive PA2 low for tuner enable */
-        sleep(1); /* let the voltage settle */
+        sleep(HZ/100); /* let the voltage settle */
     }
     else
         or_b(0x04, &PADRL); /* drive PA2 high for tuner disable */

@@ -786,7 +786,7 @@ static int clix_click(struct clix_game_state_t* state)
                 return 1;
         break;
         default:
-            rb->sleep(10);  /* prevent repeating clicks */
+            rb->sleep(HZ/10);  /* prevent repeating clicks */
         break;
     }
     return 0;

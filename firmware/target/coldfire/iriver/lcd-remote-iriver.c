@@ -157,14 +157,14 @@ void lcd_remote_on(void)
     lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_BIAS | 0x0);
 
     lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x5);
-    sleep(1);
+    sleep(HZ/100);
     lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x6);
-    sleep(1);
+    sleep(HZ/100);
     lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x7);
 
     lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_REGULATOR | 0x4); // 0x4 Select regulator @ 5.0 (default);
 
-    sleep(1);
+    sleep(HZ/100);
 
     lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
     lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | 0x0); // page address

@@ -70,7 +70,7 @@ void backlight_hw_brightness(int val)
 #endif
 
     and_l(~(1<<28),&GPIO_OUT);
-    sleep(4);
+    sleep(HZ/25);
 
     for (i=0;i<val;i++)
     {

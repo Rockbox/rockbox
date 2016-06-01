@@ -403,7 +403,7 @@ static int initialize_card(int card_no)
     /* initialize card */
     for (i = HZ;;)                /* try for 1 second*/
     {
-        sleep(1);
+        sleep(HZ/100);
         if (send_cmd(CMD_SEND_OP_COND, 0, NULL) == 0)
             break;
         if (--i <= 0)

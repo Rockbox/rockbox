@@ -88,7 +88,7 @@ static bool remote_wait_ready(int ready_mask)
             if (SER1_LSR & ready_mask)
                 return true;
 
-            //~ sleep(1);
+            //~ sleep(HZ/100);
 
             current = USEC_TIMER;
         } while (current < timeout);
@@ -100,7 +100,7 @@ static bool remote_wait_ready(int ready_mask)
             if (SER1_LSR & ready_mask)
                 return true;
 
-            //~ sleep(1);
+            //~ sleep(HZ/100);
 
             current = USEC_TIMER - POLL_TIMEOUT;
         } while (current < start);

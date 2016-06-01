@@ -150,14 +150,14 @@ static void _display_on(void)
     /** Sequence according to datasheet, p. 132 **/
     
     lcd_write_reg(R_START_OSC, 0x0001); /* Start Oscilation */
-    sleep(1);
+    sleep(HZ/100);
 
     /* zero everything*/
     lcd_write_reg(R_POWER_CONTROL1, 0x0000); /* STB = 0, SLP = 0 */
     lcd_write_reg(R_DISP_CONTROL1, 0x0000);  /* GON = 0, DTE = 0, D1-0 = 00b */
     lcd_write_reg(R_POWER_CONTROL3, 0x0000); /* PON = 0 */
     lcd_write_reg(R_POWER_CONTROL4, 0x0000); /* VCOMG = 0 */
-    sleep(1);
+    sleep(HZ/100);
 
     /* initialise power supply */
     
@@ -176,7 +176,7 @@ static void _display_on(void)
     lcd_write_reg(R_POWER_CONTROL1, 0x0044); /* AP2-0 = 100b, DK = 1 */
     lcd_write_reg(R_POWER_CONTROL3, 0x0018); /* PON = 1 */
 
-    sleep(4); /* Step-up circuit stabilising time */
+    sleep(HZ/25); /* Step-up circuit stabilising time */
     
     /* start power supply */
 
@@ -233,17 +233,17 @@ static void _display_on(void)
     display_on=true;  /* must be done before calling lcd_update() */
     lcd_update();
     
-    sleep(4); /* op-amp stabilising time */
+    sleep(HZ/25); /* op-amp stabilising time */
  
     /** Sequence according to datasheet, p. 130 **/
 
     lcd_write_reg(R_POWER_CONTROL1, 0x4540); /* SAP2-0=100, BT2-0=101, AP2-0=100 */
     lcd_write_reg(R_DISP_CONTROL1, 0x0005);  /* GON=0, DTE=0, REV=1, D1-0=01 */
-    sleep(2);
+    sleep(HZ/50);
     
     lcd_write_reg(R_DISP_CONTROL1, 0x0025);  /* GON=1, DTE=0, REV=1, D1-0=01 */
     lcd_write_reg(R_DISP_CONTROL1, 0x0027);  /* GON=1, DTE=0, REV=1, D1-0=11 */
-    sleep(2);
+    sleep(HZ/50);
 
     lcd_write_reg(R_DISP_CONTROL1, 0x0037);  /* GON=1, DTE=1, REV=1, D1-0=11 */
 }
@@ -258,9 +258,9 @@ void lcd_init_device(void)
 
     /* Reset LCD */
     and_l(~0x00004000, &GPIO1_OUT);
-    sleep(1);
+    sleep(HZ/100);
     or_l(0x00004000, &GPIO1_OUT);
-    sleep(1);
+    sleep(HZ/100);
 
     DAR3 = 0xf0000002; /* Configure DMA channel 3 */
     DSR3 = 1;
@@ -288,10 +288,10 @@ void lcd_enable(bool on)
 
             lcd_write_reg(R_FRAME_CYCLE_CONTROL, 0x0002); /* EQ=0, 18 clks/line */
             lcd_write_reg(R_DISP_CONTROL1, 0x0036);  /* GON=1, DTE=1, REV=1, D1-0=10 */
-            sleep(2);
+            sleep(HZ/50);
 
             lcd_write_reg(R_DISP_CONTROL1, 0x0026);  /* GON=1, DTE=0, REV=1, D1-0=10 */
-            sleep(2);
+            sleep(HZ/50);
 
             lcd_write_reg(R_DISP_CONTROL1, 0x0000);  /* GON=0, DTE=0, D1-0=00 */
 

@@ -447,7 +447,7 @@ void main(void)
     usb_init();
     /* A small delay after usb_init is necessary to read the I/O port correctly
        (if ports are read _immediately_ after the init). */
-    /* sleep(1); */
+    /* sleep(HZ/100); */
 
     adc_init();
     button_init();

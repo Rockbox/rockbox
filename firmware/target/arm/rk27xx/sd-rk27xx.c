@@ -254,7 +254,7 @@ static int sd_init_card(void)
     if(!send_cmd(SD_GO_IDLE_STATE, 0, RES_NO, NULL))
         return -1;
     
-    sleep(1);
+    sleep(HZ/100);
 
     /* CMD8 Check for v2 sd card.  Must be sent before using ACMD41
       Non v2 cards will not respond to this command*/
@@ -275,7 +275,7 @@ static int sd_init_card(void)
         if(!send_cmd(SD_APP_CMD, card_info.rca, RES_R1, &response))
             return -3;
 
-        sleep(1); /* bus conflict otherwise */
+        sleep(HZ/100); /* bus conflict otherwise */
 
          /* ACMD41 For v2 cards set HCS bit[30] & send host voltage range to all */
         if(!send_cmd(SD_APP_OP_COND, (0x00FF8000 | (sd_v2 ? 1<<30 : 0)),
@@ -397,7 +397,7 @@ static void init_controller(void)
 {
     /* reset SD module */
     SCU_RSTCFG |= RSTCFG_SD;
-    sleep(1);
+    sleep(HZ/100);
     SCU_RSTCFG &= ~RSTCFG_SD;
 
     /* set pins functions as SD signals */

@@ -64,9 +64,9 @@ void button_init_device(void)
 
     /* initial reading */
     button_read_device();
-    sleep(1);
+    sleep(HZ/100);
     button_read_device();
-    sleep(1);
+    sleep(HZ/100);
 }
 
 int button_read_device(void)

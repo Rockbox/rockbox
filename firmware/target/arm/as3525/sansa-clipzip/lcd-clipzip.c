@@ -116,10 +116,10 @@ static void lcd_init_type0(void)
 {
     lcd_write(0x01, 0x00);  /* SOFT_RESET */
     lcd_write(0x14, 0x01);  /* STANDBY_ON_OFF */
-    sleep(1);   /* actually only 5 ms needed */
+    sleep(HZ/100);   /* actually only 5 ms needed */
 
     lcd_write(0x14, 0x00);  /* STANDBY_ON_OFF */
-    sleep(1);   /* actually only 5 ms needed */
+    sleep(HZ/100);   /* actually only 5 ms needed */
 
     lcd_write(0x0F, 0x41);  /* ANALOG_CONTROL */
     lcd_write(0xEA, 0x0A);  /* ? */

@@ -54,7 +54,7 @@ void serial_setup (void)
     /* Let the hardware settle. The serial port needs to wait "at least
        the interval required to transmit or receive one bit" before it
        can be used. */
-    sleep(1);
+    sleep(HZ/100);
 
     SCR1 = 0x10; /* Enable the receiver, no interrupt */
 }

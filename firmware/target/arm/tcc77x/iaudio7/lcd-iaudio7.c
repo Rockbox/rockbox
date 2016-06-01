@@ -148,10 +148,10 @@ void lcd_enable(bool on)
         /** Off sequence according to datasheet, p. 130 **/
         lcd_write_reg(R_FRAME_CYCLE_CONTROL, 0x0002);   /* EQ=0, 18 clks/line */
         lcd_write_reg(R_DISP_CONTROL1, 0x0036); /* GON=1, DTE=1, REV=1, D1-0=10 */
-        sleep(2);
+        sleep(HZ/50);
 
         lcd_write_reg(R_DISP_CONTROL1, 0x0026); /* GON=1, DTE=0, REV=1, D1-0=10 */
-        sleep(2);
+        sleep(HZ/50);
 
         lcd_write_reg(R_DISP_CONTROL1, 0x0000); /* GON=0, DTE=0, D1-0=00 */
 

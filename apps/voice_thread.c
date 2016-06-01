@@ -328,7 +328,7 @@ void voice_wait(void)
      * ever require knowing the very clip you requested has finished. */
 
     while (voice_playing)
-        sleep(1);
+        sleep(HZ/100);
 }
 
 /* Initialize voice thread data that must be valid upon starting and the

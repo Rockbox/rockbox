@@ -104,11 +104,11 @@ int s1a0903x01_set(int setting, int value)
         case RADIO_SCAN_FREQUENCY:
             /* Tune in and delay */
             s1a0903x01_set(RADIO_FREQUENCY, value);
-            sleep(1);
+            sleep(HZ/100);
             /* Start IF measurement */
             fm_in1 |= 4;
             fmradio_set(1, fm_in1);
-            sleep(1);
+            sleep(HZ/100);
             val = s1a0903x01_get(RADIO_TUNED);
             break;
 

@@ -48,7 +48,7 @@ void usb_enable(bool on)
     {
         /* Power on the Cypress chip */
         or_l(0x01000000, &GPIO_OUT); /* Turn on only GPIO24 (USB_EN). GPOI6 (USB_POW_ON) still at high state (off) */
-        sleep(2);
+        sleep(HZ/50);
     }
     else
     {

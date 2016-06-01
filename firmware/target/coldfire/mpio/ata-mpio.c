@@ -31,10 +31,10 @@ void ata_reset(void)
 {
     /* GPIO19 */
     and_l(~(1<<19), &GPIO_OUT);
-    sleep(1); /* > 25us */
+    sleep(HZ/100); /* > 25us */
 
     or_l((1<<19), &GPIO_OUT);
-    sleep(1); /* > 25us */
+    sleep(HZ/100); /* > 25us */
 }
 
 void ata_enable(bool on)
@@ -56,7 +56,7 @@ void ata_enable(bool on)
         if ( !init )
         {
             ide_power_enable(false);
-            sleep(1);
+            sleep(HZ/100);
             ide_power_enable(true);
         }
 #endif
@@ -66,7 +66,7 @@ void ata_enable(bool on)
     {
 #ifndef BOOTLOADER
         ide_power_enable(false);
-        sleep(1);
+        sleep(HZ/100);
         ide_power_enable(true);
 #endif
         or_l((1<<4), &GPIO1_OUT);

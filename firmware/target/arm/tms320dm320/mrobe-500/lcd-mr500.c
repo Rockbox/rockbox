@@ -91,7 +91,7 @@ void lcd_awake(void)
         bitset16(&IO_OSD_OSDWINMD0, 0x01);
         bitset16(&IO_VID_ENC_VMOD, 0x01);
     
-        sleep(2);
+        sleep(HZ/50);
         IO_GIO_BITSET2      = 1<<4;
         
         lcd_update();

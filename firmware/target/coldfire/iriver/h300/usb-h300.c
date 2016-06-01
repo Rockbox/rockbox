@@ -49,7 +49,7 @@ void usb_enable(bool on)
     {
         /* Power on the Cypress chip */
         and_l(~0x00000008,&GPIO1_OUT);
-        sleep(2);
+        sleep(HZ/50);
     }
     else
     {

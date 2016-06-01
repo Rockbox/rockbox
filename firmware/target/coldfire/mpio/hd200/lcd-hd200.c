@@ -134,9 +134,9 @@ void lcd_init_device(void)
     or_l(0x00000004, &GPIO1_FUNCTION);  /* switch to secondary function - GPIO */
    
     and_l(~0x00000004, &GPIO1_OUT);     /* RESET low */
-    sleep(1);                           /* delay at least 1000 ns */
+    sleep(HZ/100);                           /* delay at least 1000 ns */
     or_l(0x00000004, &GPIO1_OUT);       /* RESET high */
-    sleep(1);
+    sleep(HZ/100);
 
     /* parameters setup taken from original firmware */
     lcd_write_command(LCD_RESET);

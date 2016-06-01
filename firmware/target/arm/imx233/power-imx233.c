@@ -446,7 +446,7 @@ void imx233_power_set_regulator(enum imx233_regulator_t reg, unsigned value_mv,
      * Otherwise it is unreliable (doesn't work when lowering voltage on linregs)
      * It usually takes between 0.5ms and 2.5ms */
 #if IMX233_SUBTARGET >= 3700
-    sleep(1);
+    sleep(HZ/100);
 #else
     if(!BF_RD(POWER_5VCTRL, EN_DCDC1) || !BF_RD(POWER_5VCTRL, EN_DCDC2))
         panicf("regulator %d: wait for voltage stabilize in linreg mode !", reg);

@@ -117,5 +117,5 @@ void adc_init(void)
 
     tick_add_task(adc_tick);
 
-    sleep(2);   /* Ensure adc_data[] contains data before returning */
+    sleep(HZ/50);   /* Ensure adc_data[] contains data before returning */
 }

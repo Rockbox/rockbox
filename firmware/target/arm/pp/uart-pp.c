@@ -66,7 +66,7 @@ void serial_setup (void)
     CPU_HI_INT_DIS = SER1_MASK;
 
     DEV_RS |= DEV_SER1;
-    sleep(1);
+    sleep(HZ/100);
     DEV_RS &= ~DEV_SER1;
 
     SER1_LCR = 0x80; /* Divisor latch enable */
@@ -95,7 +95,7 @@ void serial_setup (void)
     CPU_HI_INT_DIS = SER0_MASK;
 
     DEV_RS |= DEV_SER0;
-    sleep(1);
+    sleep(HZ/100);
     DEV_RS &= ~DEV_SER0;
 
     SER0_LCR = 0x80; /* Divisor latch enable */
@@ -127,7 +127,7 @@ void serial_setup (void)
     CPU_HI_INT_DIS = SER0_MASK;
 
     DEV_RS |= DEV_SER0;
-    sleep(1);
+    sleep(HZ/100);
     DEV_RS &= ~DEV_SER0;
 
     SER0_LCR = 0x80; /* Divisor latch enable */

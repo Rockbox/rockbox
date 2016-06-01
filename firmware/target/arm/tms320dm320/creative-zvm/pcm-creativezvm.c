@@ -34,7 +34,7 @@ void pcm_play_dma_init(void)
     IO_CLK_O1DIV = 3;
     /* Set GIO25 to CLKOUT1A */
     IO_GIO_FSEL2 |= 3;
-    sleep(5);
+    sleep(HZ/20);
 
     audiohw_init();
 

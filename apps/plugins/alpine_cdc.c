@@ -382,7 +382,7 @@ void uart_init(unsigned baudrate)
                  
     IPRE = (IPRE & ~0xf000) | 0xc000; /* interrupt on level 12 */
 
-    rb->sleep(1); /* hardware needs to settle for at least one bit interval */
+    rb->sleep(HZ/100); /* hardware needs to settle for at least one bit interval */
 
     and_b(~(SCI_RDRF | SCI_ORER | SCI_FER | SCI_PER), &SSR1); /* clear any receiver flag */
     or_b(SCI_RE | SCI_RIE , &SCR1); /* enable the receiver with interrupt */
@@ -522,7 +522,7 @@ int mbus_send(unsigned char* p_msg, int digits)
 {
     /* wait for previous transmit/receive to end */
     while(gTimer.mode != TM_OFF) /* wait for "free line" */
-        rb->sleep(1);
+        rb->sleep(HZ/100);
     
     /* fill in our part */
     rb->memcpy(gSendIRQ.send_buf, p_msg, digits);
@@ -552,7 +552,7 @@ int mbus_send(unsigned char* p_msg, int digits)
 
     /* last chance to wait for a new detected receive to end */
     while(gTimer.mode != TM_OFF) /* wait for "free line" */
-        rb->sleep(1);
+        rb->sleep(HZ/100);
     
     and_b(~0x30, PBCR1_ADDR+1); /* GPIO for PB10 */
     timer_set_mode(TM_TRANSMIT); /* run */
@@ -561,7 +561,7 @@ int mbus_send(unsigned char* p_msg, int digits)
     rb->sleep(digits*4*HZ/MBUS_BIT_FREQ); /* should take this long */
 
     while(gSendIRQ.busy) /* poll in case it lasts longer */
-        rb->sleep(1); /* (should not happen) */
+        rb->sleep(HZ/100); /* (should not happen) */
 
     /* debug output, to be removed */
     if (gTread.foreground)
@@ -608,7 +608,7 @@ int mbus_receive(unsigned char* p_msg, unsigned bufsize, int timeout)
             if (timeout != -1 && timeout != 0) /* if not infinite or expired */
                 timeout--;
     
-            rb->sleep(1); /* wait a while */
+            rb->sleep(HZ/100); /* wait a while */
         }
 
     } while (timeout != 0 || gTimer.mode != TM_OFF);

@@ -117,7 +117,7 @@ void ide_power_enable(bool on)
     if (on)
     {
         GPO32_VAL &= ~0x40000000;
-        sleep(1);  /* only need 4 ms */
+        sleep(HZ/100);  /* only need 4 ms */
         DEV_EN |= DEV_IDE0;
         GPIOG_ENABLE = 0;
         GPIOH_ENABLE = 0;

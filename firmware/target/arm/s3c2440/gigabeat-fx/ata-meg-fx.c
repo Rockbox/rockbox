@@ -40,9 +40,9 @@
 void ata_reset(void)
 {
     ATA_RESET_ENABLE;
-    sleep(1); /* > 25us */
+    sleep(HZ/100); /* > 25us */
     ATA_RESET_DISABLE;
-    sleep(1); /* > 2ms */
+    sleep(HZ/100); /* > 2ms */
 }
 
 /* This function is called before enabling the USB bus */

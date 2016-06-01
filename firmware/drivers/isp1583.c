@@ -427,7 +427,7 @@ void usb_drv_init(void)
 
     /* Soft reset the device */
     ISP1583_INIT_MODE = INIT_MODE_SFRESET;
-    sleep(10);
+    sleep(HZ/10);
     /* Enable CLKAON & GLINTENA */
     ISP1583_INIT_MODE = STANDARD_INIT_MODE;
 

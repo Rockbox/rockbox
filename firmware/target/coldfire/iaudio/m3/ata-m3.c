@@ -30,9 +30,9 @@
 void ata_reset(void)
 {
     and_l(~0x00000040, &GPIO1_OUT);
-    sleep(1); /* > 25us */
+    sleep(HZ/100); /* > 25us */
     or_l(0x00000040, &GPIO1_OUT);
-    sleep(1); /* > 2ms */
+    sleep(HZ/100); /* > 2ms */
 }
 
 void ata_enable(bool on)

@@ -246,7 +246,7 @@ static int stat_battery_reading(int type)
     {
         int reading = ADC_READ_ERROR;
 
-        sleep(2); /* Get unique readings */
+        sleep(HZ/50); /* Get unique readings */
 
         switch (type)
         {

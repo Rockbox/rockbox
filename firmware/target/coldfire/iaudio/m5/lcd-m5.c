@@ -101,9 +101,9 @@ void lcd_init_device(void)
     and_l(~0x00000010, &GPIO1_OUT);
     or_l(0x00000010, &GPIO1_ENABLE);
     or_l(0x00000010, &GPIO1_FUNCTION);
-    sleep(1);
+    sleep(HZ/100);
     or_l(0x00000010, &GPIO1_OUT);
-    sleep(1);
+    sleep(HZ/100);
 
     lcd_write_command(LCD_CNTL_ON_OFF | 1); /* LCD ON */
     lcd_write_command(LCD_CNTL_OFF_MODE | 1); /* OFF -> VCC on drivers */

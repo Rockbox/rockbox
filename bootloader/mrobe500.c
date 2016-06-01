@@ -114,7 +114,7 @@ void main(void)
         lcd_update();
     }
     
-    sleep(50);
+    sleep(HZ/2);
 
     printf("ATA");
     rc = storage_init();
