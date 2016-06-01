@@ -40,6 +40,7 @@ struct imx233_button_map_t imx233_button_map[] =
     IMX233_BUTTON_(END, END(), "")
 };
 
+#ifndef BOOTLOADER
 /**
  * RMI API
  */
@@ -231,7 +232,6 @@ static void rmi_init(void)
  * Touchpad API
  */
 
-#ifndef BOOTLOADER
 /* we emulate a 3x3 grid, this gives the button mapping */
 int button_mapping[3][3] =
 {
