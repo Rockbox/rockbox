@@ -13,96 +13,267 @@
     </node>
     <node>
         <name>CPM</name>
+        <title>Clock, Reset and Power Module</title>
         <instance>
             <name>CPM</name>
             <address>0xb0000000</address>
         </instance>
         <node>
-            <name>CTRL</name>
+            <name>SYSCLK</name>
             <title>Clock control register</title>
             <instance>
-                <name>CTRL</name>
+                <name>SYSCLK</name>
                 <address>0x0</address>
             </instance>
             <register>
                 <field>
-                    <name>ECS</name>
+                    <name>EXCLK_DIV</name>
+                    <desc>Only applies to APB periperals: UART, I2S, I2C, SSI, SADC, OTG, etc</desc>
                     <position>31</position>
+                    <enum>
+                        <name>BY_1</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>BY_2</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>MEM</name>
+                    <name>MEM_TYPE</name>
                     <position>30</position>
+                    <enum>
+                        <name>MDDR_SDRAM</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>DDR_DD2</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>SDIV</name>
+                    <name>SCLK_DIV</name>
                     <position>24</position>
                     <width>4</width>
+                    <enum>
+                        <name>BY_1</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>BY_2</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>BY_3</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>BY_4</name>
+                        <value>0x3</value>
+                    </enum>
+                    <enum>
+                        <name>BY_6</name>
+                        <value>0x4</value>
+                    </enum>
+                    <enum>
+                        <name>BY_8</name>
+                        <value>0x5</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>CE</name>
+                    <name>EN_CHANGE</name>
                     <position>22</position>
                 </field>
                 <field>
-                    <name>PCS</name>
+                    <name>PLL_DIV</name>
+                    <desc>Only applies to MSC, I2S, LCD, UHC, OTG, SSI, PCM, GPU and GPS.</desc>
                     <position>21</position>
+                    <enum>
+                        <name>BY_2</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>BY_1</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>H2DIV</name>
+                    <name>H2CLK_DIV</name>
                     <position>16</position>
                     <width>4</width>
+                    <enum>
+                        <name>BY_1</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>BY_2</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>BY_3</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>BY_4</name>
+                        <value>0x3</value>
+                    </enum>
+                    <enum>
+                        <name>BY_6</name>
+                        <value>0x4</value>
+                    </enum>
+                    <enum>
+                        <name>BY_8</name>
+                        <value>0x5</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>MDIV</name>
+                    <name>MCLK_DIV</name>
                     <position>12</position>
                     <width>4</width>
+                    <enum>
+                        <name>BY_1</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>BY_2</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>BY_3</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>BY_4</name>
+                        <value>0x3</value>
+                    </enum>
+                    <enum>
+                        <name>BY_6</name>
+                        <value>0x4</value>
+                    </enum>
+                    <enum>
+                        <name>BY_8</name>
+                        <value>0x5</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>PDIV</name>
+                    <name>PCLK_DIV</name>
                     <position>8</position>
                     <width>4</width>
+                    <enum>
+                        <name>BY_1</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>BY_2</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>BY_3</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>BY_4</name>
+                        <value>0x3</value>
+                    </enum>
+                    <enum>
+                        <name>BY_6</name>
+                        <value>0x4</value>
+                    </enum>
+                    <enum>
+                        <name>BY_8</name>
+                        <value>0x5</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>HDIV</name>
+                    <name>HCLK_DIV</name>
                     <position>4</position>
                     <width>4</width>
+                    <enum>
+                        <name>BY_1</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>BY_2</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>BY_3</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>BY_4</name>
+                        <value>0x3</value>
+                    </enum>
+                    <enum>
+                        <name>BY_6</name>
+                        <value>0x4</value>
+                    </enum>
+                    <enum>
+                        <name>BY_8</name>
+                        <value>0x5</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>CDIV</name>
+                    <name>CCLK_DIV</name>
                     <position>0</position>
                     <width>4</width>
+                    <enum>
+                        <name>BY_1</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>BY_2</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>BY_3</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>BY_4</name>
+                        <value>0x3</value>
+                    </enum>
+                    <enum>
+                        <name>BY_6</name>
+                        <value>0x4</value>
+                    </enum>
+                    <enum>
+                        <name>BY_8</name>
+                        <value>0x5</value>
+                    </enum>
                 </field>
             </register>
         </node>
         <node>
-            <name>LOW</name>
+            <name>LOWPWR</name>
             <title>Low power control register</title>
             <instance>
-                <name>LOW</name>
+                <name>LOWPWR</name>
                 <address>0x4</address>
             </instance>
             <register>
                 <field>
-                    <name>PDAHB1</name>
+                    <name>AHB1_PWD</name>
                     <position>30</position>
                 </field>
                 <field>
-                    <name>VBATIR</name>
+                    <name>VBAT_IR</name>
                     <position>29</position>
                 </field>
                 <field>
-                    <name>PDGPS</name>
+                    <name>GPS_PWD</name>
                     <position>28</position>
                 </field>
                 <field>
-                    <name>PDAHB1S</name>
+                    <name>AHB1S_PWD</name>
                     <position>26</position>
                 </field>
                 <field>
-                    <name>PDGPSS</name>
+                    <name>GPSS_PWD</name>
                     <position>24</position>
                 </field>
                 <field>
-                    <name>PST</name>
+                    <name>PWR_STABILITY_TIME</name>
                     <position>8</position>
                     <width>12</width>
                 </field>
@@ -116,7 +287,7 @@
                     <position>2</position>
                 </field>
                 <field>
-                    <name>LPM</name>
+                    <name>SLEEP_MODE</name>
                     <position>0</position>
                     <width>2</width>
                     <enum>
@@ -134,46 +305,65 @@
             <name>RESET</name>
             <title>Reset status register</title>
             <instance>
-                <name>RESET</name>
+                <name>RESETSTS</name>
                 <address>0x8</address>
             </instance>
             <register>
                 <field>
-                    <name>P0R</name>
+                    <name>PWRUP_STS</name>
                     <position>2</position>
                 </field>
                 <field>
-                    <name>WR</name>
+                    <name>WATCHDOG_STS</name>
                     <position>1</position>
                 </field>
                 <field>
-                    <name>PR</name>
+                    <name>PWRON_STS</name>
                     <position>0</position>
                 </field>
             </register>
         </node>
         <node>
-            <name>PLL0</name>
+            <name>PLLCTRL0</name>
             <title>PLL control register 0</title>
             <instance>
-                <name>PL</name>
+                <name>PLLCTRL0</name>
                 <address>0x10</address>
             </instance>
             <register>
                 <field>
-                    <name>PLLM</name>
+                    <name>FEED_DIV</name>
+                    <desc>PLLM</desc>
                     <position>24</position>
                     <width>7</width>
                 </field>
                 <field>
-                    <name>PLLN</name>
+                    <name>IN_DIV</name>
+                    <desc>PLLN</desc>
                     <position>18</position>
                     <width>4</width>
                 </field>
                 <field>
-                    <name>PLLOD</name>
+                    <name>OUT_DIV</name>
+                    <desc>PLLOD</desc>
                     <position>16</position>
                     <width>2</width>
+                    <enum>
+                        <name>BY_1</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>BY_2</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>BY_4</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>BY_8</name>
+                        <value>0x3</value>
+                    </enum>
                 </field>
                 <field>
                     <name>LOCK</name>
@@ -181,23 +371,23 @@
                     <position>15</position>
                 </field>
                 <field>
-                    <name>ENLOCK</name>
+                    <name>EN_LOCK</name>
                     <position>14</position>
                 </field>
                 <field>
-                    <name>PLLS</name>
+                    <name>STABLE</name>
                     <position>10</position>
                 </field>
                 <field>
-                    <name>PLLBP</name>
+                    <name>BYPASS</name>
                     <position>9</position>
                 </field>
                 <field>
-                    <name>PLLEN</name>
+                    <name>ENABLE</name>
                     <position>8</position>
                 </field>
                 <field>
-                    <name>PLLST</name>
+                    <name>STABILIZE_TIME</name>
                     <position>0</position>
                     <width>8</width>
                 </field>
@@ -212,48 +402,72 @@
             </instance>
             <register>
                 <field>
-                    <name>PLLOFF</name>
+                    <name>OFF_STS</name>
                     <position>31</position>
                 </field>
                 <field>
-                    <name>PLLBP</name>
+                    <name>BYPASS_STS</name>
                     <position>30</position>
                 </field>
                 <field>
-                    <name>PLLON</name>
+                    <name>ON_STS</name>
                     <position>29</position>
                 </field>
                 <field>
-                    <name>PS</name>
+                    <name>ENABLE_STS</name>
                     <position>28</position>
                 </field>
                 <field>
-                    <name>FS</name>
+                    <name>FREQ_STS</name>
                     <position>27</position>
                 </field>
                 <field>
-                    <name>CS</name>
+                    <name>SRC_STS</name>
                     <position>26</position>
                 </field>
                 <field>
-                    <name>SM</name>
+                    <name>SYS_CHANGE_MODE</name>
                     <position>2</position>
+                    <enum>
+                        <name>HW</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>STOP</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>PM</name>
+                    <name>SRC_SWITCH_MODE</name>
                     <position>1</position>
+                    <enum>
+                        <name>SLOW</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>FAST</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>FM</name>
+                    <name>FREQ_CHANGE_MODE</name>
                     <position>0</position>
+                    <enum>
+                        <name>SLOW</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>FAST</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
             </register>
         </node>
         <node>
-            <name>GATE0</name>
+            <name>CLKGATE0</name>
             <title>Clock gate register 0</title>
             <instance>
-                <name>GATE0</name>
+                <name>CLKGATE0</name>
                 <address>0x20</address>
             </instance>
             <register>
@@ -388,51 +602,58 @@
             </register>
         </node>
         <node>
-            <name>OSC</name>
+            <name>OSCPWR</name>
             <title>Oscillator and power control register</title>
             <instance>
-                <name>OSC</name>
+                <name>OSCPWR</name>
                 <address>0x24</address>
             </instance>
             <register>
                 <field>
-                    <name>O1ST</name>
+                    <name>STABILIZE_TIME</name>
                     <position>8</position>
                     <width>8</width>
                 </field>
                 <field>
-                    <name>OTGPHY_ENABLE</name>
-                    <desc>SPENDN bit</desc>
+                    <name>OTG_SUSPEND</name>
                     <position>7</position>
                 </field>
                 <field>
-                    <name>GPSEN</name>
+                    <name>GPS_ENABLE</name>
                     <position>6</position>
                 </field>
                 <field>
-                    <name>UHCPHY_DISABLE</name>
+                    <name>UHC_SUSPEND</name>
                     <desc>SPENDH bit</desc>
                     <position>5</position>
                 </field>
                 <field>
-                    <name>O1SE</name>
+                    <name>OSC_SLEEP</name>
                     <position>4</position>
                 </field>
                 <field>
-                    <name>PD</name>
+                    <name>P0_SLEEP</name>
                     <position>3</position>
                 </field>
                 <field>
-                    <name>ERCS</name>
+                    <name>SRC_SEL</name>
                     <position>2</position>
+                    <enum>
+                        <name>EXCLK_DIV_512</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>RTCLK</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
             </register>
         </node>
         <node>
-            <name>GATE1</name>
+            <name>CLKGATE1</name>
             <title>Clock gate register 1</title>
             <instance>
-                <name>GATE1</name>
+                <name>CLKGATE1</name>
                 <address>0x28</address>
             </instance>
             <register>
@@ -487,43 +708,67 @@
             </register>
         </node>
         <node>
-            <name>PLL1</name>
+            <name>PLLCTRL1</name>
             <title>PLL control register 1</title>
             <instance>
-                <name>PLL1</name>
+                <name>PLLCTRL1</name>
                 <address>0x30</address>
             </instance>
             <register>
                 <field>
-                    <name>PLL1M</name>
+                    <name>FEED_DIV</name>
                     <position>24</position>
                     <width>7</width>
                 </field>
                 <field>
-                    <name>PLL1N</name>
+                    <name>IN_DIV</name>
                     <position>18</position>
                     <width>4</width>
                 </field>
                 <field>
-                    <name>PLL1OD</name>
+                    <name>OUT_DIV</name>
                     <position>16</position>
                     <width>2</width>
+                    <enum>
+                        <name>BY_1</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>BY_2</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>BY_4</name>
+                        <value>0x2</value>
+                    </enum>
+                    <enum>
+                        <name>BY_8</name>
+                        <value>0x3</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>P1SCS</name>
+                    <name>SRC_SEL</name>
                     <position>15</position>
+                    <enum>
+                        <name>EXCLK</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL0</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>P1SDIV</name>
+                    <name>PLL0_DIV</name>
                     <position>9</position>
                     <width>6</width>
                 </field>
                 <field>
-                    <name>PLL1EN</name>
+                    <name>ENABLE</name>
                     <position>7</position>
                 </field>
                 <field>
-                    <name>PLL1S</name>
+                    <name>STABLE</name>
                     <position>6</position>
                 </field>
                 <field>
@@ -532,11 +777,11 @@
                     <position>2</position>
                 </field>
                 <field>
-                    <name>PLL1OFF</name>
+                    <name>OFF</name>
                     <position>1</position>
                 </field>
                 <field>
-                    <name>PLL1ON</name>
+                    <name>ON</name>
                     <position>0</position>
                 </field>
             </register>
@@ -560,10 +805,10 @@
             <register/>
         </node>
         <node>
-            <name>USBPARAM</name>
+            <name>USBCTRL</name>
             <title>OTG parameter control register</title>
             <instance>
-                <name>USBPARAM</name>
+                <name>USBCTRL</name>
                 <address>0x3c</address>
             </instance>
             <register>
@@ -686,139 +931,205 @@
             <register/>
         </node>
         <node>
-            <name>USB</name>
+            <name>USBCLK</name>
             <title>OTG PHY clock divider register</title>
             <instance>
-                <name>USB</name>
+                <name>USBCLK</name>
                 <address>0x50</address>
             </instance>
             <register>
                 <field>
-                    <name>UCS</name>
+                    <name>SRC_SEL</name>
                     <position>31</position>
+                    <enum>
+                        <name>EXCLK</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>UPCS</name>
+                    <name>PLL_SEL</name>
                     <position>30</position>
+                    <enum>
+                        <name>PLL0</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL1</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>OTGDIV</name>
-                    <desc>USBCDR bit</desc>
+                    <name>DIV</name>
                     <position>0</position>
                     <width>6</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>I2S</name>
+            <name>I2SCLK</name>
             <title>I2S device clock divider register</title>
             <instance>
-                <name>I2S</name>
+                <name>I2SCLK</name>
                 <address>0x60</address>
             </instance>
             <register>
                 <field>
-                    <name>I2CS</name>
+                    <name>SRC_SEL</name>
                     <position>31</position>
+                    <enum>
+                        <name>EXCLK</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>I2PCS</name>
+                    <name>PLL_SEL</name>
                     <position>30</position>
+                    <enum>
+                        <name>PLL0</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL1</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>I2SDIV</name>
-                    <desc>I2SCDR bit</desc>
+                    <name>DIV</name>
                     <position>0</position>
                     <width>9</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>LCD</name>
+            <name>LCDCLK</name>
             <title>LCD pix clock divider register</title>
             <instance>
-                <name>LCD</name>
+                <name>LCDCLK</name>
                 <address>0x64</address>
             </instance>
             <register>
                 <field>
-                    <name>LTCS</name>
+                    <name>SRC_SEL</name>
                     <position>30</position>
+                    <enum>
+                        <name>EXCLK</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>LPCS</name>
+                    <name>PLL_SEL</name>
                     <position>29</position>
+                    <enum>
+                        <name>PLL0</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL1</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>PIXDIV</name>
-                    <desc>LPCDR bit</desc>
+                    <name>DIV</name>
                     <position>0</position>
                     <width>11</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>MSC</name>
+            <name>MSCCLK</name>
             <title>MSC clock divider register</title>
             <instance>
-                <name>MSC</name>
+                <name>MSCCLK</name>
                 <address>0x68</address>
             </instance>
             <register>
                 <field>
-                    <name>MCS</name>
+                    <name>SRC_SEL</name>
                     <position>31</position>
+                    <enum>
+                        <name>EXCLK</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>MSCDIV</name>
-                    <desc>MSCCDR bit</desc>
+                    <name>DIV</name>
                     <position>0</position>
                     <width>6</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>UHC</name>
+            <name>UHCCLK</name>
             <title>UHC device clock divider register</title>
             <instance>
-                <name>UHC</name>
+                <name>UHCCLK</name>
                 <address>0x6c</address>
             </instance>
             <register>
                 <field>
-                    <name>UHPCS</name>
+                    <name>PLL_SEL</name>
                     <position>31</position>
+                    <enum>
+                        <name>PLL0</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL1</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>UHCDIV</name>
-                    <desc>UHCCDR bit</desc>
+                    <name>DIV</name>
                     <position>0</position>
                     <width>4</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>SSI</name>
+            <name>SSICLK</name>
             <title>SSI clock divider register</title>
             <instance>
-                <name>SSI</name>
+                <name>SSICLK</name>
                 <address>0x74</address>
             </instance>
             <register>
                 <field>
-                    <name>SCS</name>
+                    <name>SRC_SEL</name>
                     <position>31</position>
+                    <enum>
+                        <name>EXCLK</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>SSIDIV</name>
-                    <desc>SSICDR bit</desc>
+                    <name>DIV</name>
                     <position>0</position>
                     <width>6</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>CIM</name>
+            <name>CIMCLK</name>
             <title>CIM mclk clock divider register</title>
             <instance>
                 <name>CIM</name>
@@ -826,15 +1137,14 @@
             </instance>
             <register>
                 <field>
-                    <name>CIMDIV</name>
-                    <desc>CIMCDR bit</desc>
+                    <name>DIV</name>
                     <position>0</position>
                     <width>8</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>GPS</name>
+            <name>GPSCLK</name>
             <title>GPS clock divider register</title>
             <instance>
                 <name>GPS</name>
@@ -842,35 +1152,58 @@
             </instance>
             <register>
                 <field>
-                    <name>GPCS</name>
+                    <name>PLL_SEL</name>
                     <position>31</position>
+                    <enum>
+                        <name>PLL0</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL1</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>GPSDIV</name>
-                    <desc>GPSCDR bit</desc>
+                    <name>DIV</name>
                     <position>0</position>
                     <width>4</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>PCM</name>
+            <name>PCMCLK</name>
             <title>PCM device clock divider register</title>
             <instance>
-                <name>PCM</name>
+                <name>PCMCLK</name>
                 <address>0x84</address>
             </instance>
             <register>
                 <field>
-                    <name>PCMS</name>
+                    <name>SRC_SEL</name>
                     <position>31</position>
+                    <enum>
+                        <name>EXCLK</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>PCMPCS</name>
+                    <name>PLL_SEL</name>
                     <position>30</position>
+                    <enum>
+                        <name>PLL0</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL1</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>PCMDIV</name>
+                    <name>DIV</name>
                     <desc>PCMCDR bit</desc>
                     <position>0</position>
                     <width>9</width>
@@ -878,19 +1211,26 @@
             </register>
         </node>
         <node>
-            <name>GPU</name>
+            <name>GPUCLK</name>
             <instance>
-                <name>GPU</name>
+                <name>GPUCLK</name>
                 <address>0x88</address>
             </instance>
             <register>
                 <field>
-                    <name>GPCS</name>
+                    <name>PLL_SEL</name>
                     <position>31</position>
+                    <enum>
+                        <name>PLL0</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>PLL1</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>GPUDIV</name>
-                    <desc>GPUCDR bit</desc>
+                    <name>DIV</name>
                     <position>0</position>
                     <width>3</width>
                 </field>
@@ -937,9 +1277,9 @@
             <address>0xb0001000</address>
         </instance>
         <node>
-            <name>ISR</name>
+            <name>STATUS</name>
             <instance>
-                <name>ISR</name>
+                <name>STATUS</name>
                 <range>
                     <first>0</first>
                     <count>2</count>
@@ -949,45 +1289,30 @@
             <register/>
         </node>
         <node>
-            <name>IMR</name>
+            <name>MASK</name>
             <instance>
-                <name>IMR</name>
+                <name>MASK</name>
                 <range>
                     <first>0</first>
                     <count>2</count>
                     <formula variable="n">0x04 + (n) * 0x20</formula>
                 </range>
             </instance>
-            <register/>
+            <register>
+                <variant>
+                    <type>set</type>
+                    <offset>4</offset>
+                </variant>
+                <variant>
+                    <type>clr</type>
+                    <offset>8</offset>
+                </variant>
+            </register>
         </node>
         <node>
-            <name>IMSR</name>
+            <name>PENDING</name>
             <instance>
-                <name>IMSR</name>
-                <range>
-                    <first>0</first>
-                    <count>2</count>
-                    <formula variable="n">0x08 + (n) * 0x20</formula>
-                </range>
-            </instance>
-            <register/>
-        </node>
-        <node>
-            <name>IMCR</name>
-            <instance>
-                <name>IMCR</name>
-                <range>
-                    <first>0</first>
-                    <count>2</count>
-                    <formula variable="n">0x0c + (n) * 0x20</formula>
-                </range>
-            </instance>
-            <register/>
-        </node>
-        <node>
-            <name>IPR</name>
-            <instance>
-                <name>IPR</name>
+                <name>PENDING</name>
                 <range>
                     <first>0</first>
                     <count>2</count>
@@ -1014,11 +1339,11 @@
             <register>
                 <width>16</width>
                 <field>
-                    <name>OSTEN</name>
+                    <name>OST</name>
                     <position>15</position>
                 </field>
                 <field>
-                    <name>TCEN</name>
+                    <name>TIMER</name>
                     <position>0</position>
                     <width>8</width>
                 </field>
@@ -1041,15 +1366,15 @@
             </instance>
             <register>
                 <field>
-                    <name>WDT_STOP</name>
+                    <name>WDT</name>
                     <position>16</position>
                 </field>
                 <field>
-                    <name>OST_STOP</name>
+                    <name>OST</name>
                     <position>15</position>
                 </field>
                 <field>
-                    <name>TIMER_STOP</name>
+                    <name>TIMER</name>
                     <position>0</position>
                     <width>8</width>
                 </field>
@@ -1072,16 +1397,16 @@
             </instance>
             <register>
                 <field>
-                    <name>HFLAG</name>
+                    <name>HALF</name>
                     <position>16</position>
                     <width>8</width>
                 </field>
                 <field>
-                    <name>OSTFLAG</name>
+                    <name>OST</name>
                     <position>15</position>
                 </field>
                 <field>
-                    <name>FFLAG</name>
+                    <name>FULL</name>
                     <position>0</position>
                     <width>8</width>
                 </field>
@@ -1104,16 +1429,16 @@
             </instance>
             <register>
                 <field>
-                    <name>HMASK</name>
+                    <name>HALF</name>
                     <position>16</position>
                     <width>8</width>
                 </field>
                 <field>
-                    <name>OSTMASK</name>
+                    <name>OST</name>
                     <position>15</position>
                 </field>
                 <field>
-                    <name>FMASK</name>
+                    <name>FULL</name>
                     <position>0</position>
                     <width>8</width>
                 </field>
@@ -1141,7 +1466,7 @@
             <register>
                 <width>16</width>
                 <field>
-                    <name>TDFR</name>
+                    <name>COUNT</name>
                     <position>0</position>
                     <width>16</width>
                 </field>
@@ -1161,7 +1486,7 @@
             <register>
                 <width>16</width>
                 <field>
-                    <name>TDHR</name>
+                    <name>COUNT</name>
                     <position>0</position>
                     <width>16</width>
                 </field>
@@ -1181,7 +1506,7 @@
             <register>
                 <width>16</width>
                 <field>
-                    <name>TCNT</name>
+                    <name>COUNT</name>
                     <position>0</position>
                     <width>16</width>
                 </field>
@@ -1201,15 +1526,23 @@
             <register>
                 <width>16</width>
                 <field>
-                    <name>CLRZ</name>
+                    <name>CLEAR_TO_ZERO</name>
                     <position>10</position>
                 </field>
                 <field>
-                    <name>SD_ABRUPT</name>
+                    <name>SHUTDOWN</name>
                     <position>9</position>
+                    <enum>
+                        <name>GRACEFUL</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>ABRUPT</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
-                    <name>INITL_HIGH</name>
+                    <name>PMW_INIT_LVL</name>
                     <position>8</position>
                 </field>
                 <field>
@@ -1342,12 +1675,20 @@
             <register>
                 <width>16</width>
                 <field>
-                    <name>CNT_MD</name>
+                    <name>IGNORE_COMPARE</name>
                     <position>15</position>
                 </field>
                 <field>
-                    <name>SD</name>
+                    <name>SHUTDOWN</name>
                     <position>9</position>
+                    <enum>
+                        <name>GRACEFUL</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>ABRUPT</name>
+                        <value>0x1</value>
+                    </enum>
                 </field>
                 <field>
                     <name>PRESCALE</name>
@@ -1758,7 +2099,7 @@
             </register>
         </node>
         <node>
-            <name>FLGC</name>
+            <name>FLAG_CLEAR</name>
             <instance>
                 <name>FLGC</name>
                 <range>
@@ -1812,10 +2153,10 @@
             </register>
         </node>
         <node>
-            <name>FUN</name>
+            <name>FUNCTION</name>
             <title>Function</title>
             <instance>
-                <name>FUN</name>
+                <name>FUNCTION</name>
                 <range>
                     <first>0</first>
                     <count>6</count>
@@ -1834,10 +2175,10 @@
             </register>
         </node>
         <node>
-            <name>SEL</name>
+            <name>SELECT</name>
             <title>Select</title>
             <instance>
-                <name>SEL</name>
+                <name>SELECT</name>
                 <range>
                     <first>0</first>
                     <count>6</count>
@@ -1878,7 +2219,7 @@
             </register>
         </node>
         <node>
-            <name>TRG</name>
+            <name>TRIGGER</name>
             <title>Trigger</title>
             <instance>
                 <name>TRG</name>
@@ -1900,7 +2241,7 @@
             </register>
         </node>
         <node>
-            <name>FLG</name>
+            <name>FLAG</name>
             <title>Flag</title>
             <instance>
                 <name>FLG</name>
@@ -2896,10 +3237,10 @@
             <address>0xb0070000</address>
         </instance>
         <node>
-            <name>ADENA</name>
+            <name>ENABLE</name>
             <title>ADC Enable Register</title>
             <instance>
-                <name>ADENA</name>
+                <name>ENABLE</name>
                 <address>0x0</address>
             </instance>
             <register>
@@ -2909,33 +3250,33 @@
                     <position>7</position>
                 </field>
                 <field>
-                    <name>SLP_MD</name>
+                    <name>SLEEP</name>
                     <position>6</position>
                 </field>
                 <field>
-                    <name>TCHEN</name>
+                    <name>TOUCH_EN</name>
                     <position>2</position>
                 </field>
                 <field>
-                    <name>VBATEN</name>
+                    <name>VBAT_EN</name>
                     <position>1</position>
                 </field>
                 <field>
-                    <name>AUXEN</name>
+                    <name>AUX_EN</name>
                     <position>0</position>
                 </field>
             </register>
         </node>
         <node>
-            <name>ADCFG</name>
+            <name>CFG</name>
             <title>ADC Configure Register</title>
             <instance>
-                <name>ADCFG</name>
+                <name>CFG</name>
                 <address>0x4</address>
             </instance>
             <register>
                 <field>
-                    <name>SPZZ</name>
+                    <name>SP_ZZ</name>
                     <position>31</position>
                 </field>
                 <field>
@@ -2960,7 +3301,7 @@
                     </enum>
                 </field>
                 <field>
-                    <name>SNUM</name>
+                    <name>SAMPLE_COUNT</name>
                     <position>10</position>
                     <width>3</width>
                 </field>
@@ -2968,120 +3309,132 @@
                     <name>CMD</name>
                     <position>0</position>
                     <width>2</width>
+                    <enum>
+                        <name>AUX</name>
+                        <value>0x0</value>
+                    </enum>
+                    <enum>
+                        <name>AUX1</name>
+                        <value>0x1</value>
+                    </enum>
+                    <enum>
+                        <name>AUX2_VBAT</name>
+                        <value>0x2</value>
+                    </enum>
                 </field>
             </register>
         </node>
         <node>
-            <name>ADCTRL</name>
+            <name>CTRL</name>
             <title>ADC Control Register</title>
             <instance>
-                <name>ADCTRL</name>
+                <name>CTRL</name>
                 <address>0x8</address>
             </instance>
             <register>
                 <width>8</width>
                 <field>
-                    <name>SLPENDM</name>
+                    <name>SLEEP_PEN_DOWN_MASK</name>
                     <position>5</position>
                 </field>
                 <field>
-                    <name>PENDM</name>
+                    <name>PEN_DOWN_MASK</name>
                     <position>4</position>
                 </field>
                 <field>
-                    <name>PENUM</name>
+                    <name>PEN_UP_MASK</name>
                     <position>3</position>
                 </field>
                 <field>
-                    <name>DTCHM</name>
+                    <name>TOUCH_MASK</name>
                     <position>2</position>
                 </field>
                 <field>
-                    <name>VRDYM</name>
+                    <name>VBAT_MASK</name>
                     <position>1</position>
                 </field>
                 <field>
-                    <name>ARDYM</name>
+                    <name>AUX_MASK</name>
                     <position>0</position>
                 </field>
             </register>
         </node>
         <node>
-            <name>ADSTATE</name>
+            <name>STATUS</name>
             <title>ADC Status Register</title>
             <instance>
-                <name>ADSTATE</name>
+                <name>STATUS</name>
                 <address>0xc</address>
             </instance>
             <register>
                 <width>8</width>
                 <field>
-                    <name>SLP_RDY</name>
+                    <name>SLEEP_RDY</name>
                     <position>7</position>
                 </field>
                 <field>
-                    <name>SLPEND</name>
+                    <name>SLEEP_PEN_DOWN</name>
                     <position>5</position>
                 </field>
                 <field>
-                    <name>PEND</name>
+                    <name>PEN_DOWN</name>
                     <position>4</position>
                 </field>
                 <field>
-                    <name>PENU</name>
+                    <name>PEN_UP</name>
                     <position>3</position>
                 </field>
                 <field>
-                    <name>DTCH</name>
+                    <name>TOUCH</name>
                     <position>2</position>
                 </field>
                 <field>
-                    <name>VRDY</name>
+                    <name>VBAT</name>
                     <position>1</position>
                 </field>
                 <field>
-                    <name>ARDY</name>
+                    <name>AUX</name>
                     <position>0</position>
                 </field>
             </register>
         </node>
         <node>
-            <name>ADSAME</name>
+            <name>SAMEPOINT</name>
             <title>ADC Same Point Time Register</title>
             <instance>
-                <name>ADSAME</name>
+                <name>SAME_POINT</name>
                 <address>0x10</address>
             </instance>
             <register>
                 <width>16</width>
                 <field>
-                    <name>SCNT</name>
+                    <name>DELAY_US</name>
                     <position>0</position>
                     <width>16</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>ADWAIT</name>
+            <name>PENWAIT</name>
             <title>ADC Wait Pen Down Time Register</title>
             <instance>
-                <name>ADWAIT</name>
+                <name>PEN_WAIT</name>
                 <address>0x14</address>
             </instance>
             <register>
                 <width>16</width>
                 <field>
-                    <name>WCNT</name>
+                    <name>DELAY_MS</name>
                     <position>0</position>
                     <width>16</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>ADTCH</name>
+            <name>TOUCH</name>
             <title>ADC Touch Screen Data Register</title>
             <instance>
-                <name>ADTCH</name>
+                <name>TOUCH</name>
                 <address>0x18</address>
             </instance>
             <register>
@@ -3106,23 +3459,23 @@
             </register>
         </node>
         <node>
-            <name>ADVDAT</name>
+            <name>VBAT</name>
             <title>ADC VBAT Date Register</title>
             <instance>
-                <name>ADVDAT</name>
+                <name>VBAT</name>
                 <address>0x1c</address>
             </instance>
             <register>
                 <width>16</width>
                 <field>
-                    <name>VDATA</name>
+                    <name>DATA</name>
                     <position>0</position>
                     <width>12</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>ADADAT</name>
+            <name>AUX</name>
             <title>ADC AUX Data Register</title>
             <instance>
                 <name>ADADAT</name>
@@ -3131,52 +3484,52 @@
             <register>
                 <width>16</width>
                 <field>
-                    <name>ADATA</name>
+                    <name>DATA</name>
                     <position>0</position>
                     <width>12</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>ADFLT</name>
+            <name>FILTER</name>
             <title>ADC Filter Register</title>
             <instance>
-                <name>ADFLT</name>
+                <name>FILTER</name>
                 <address>0x24</address>
             </instance>
             <register>
                 <width>16</width>
                 <field>
-                    <name>FLT_EN</name>
+                    <name>ENABLE</name>
                     <position>15</position>
                 </field>
                 <field>
-                    <name>FLT_D</name>
+                    <name>DATA</name>
                     <position>0</position>
                     <width>12</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>ADCLK</name>
+            <name>CLK</name>
             <title>ADC Clock Divide Register</title>
             <instance>
-                <name>ADCLK</name>
+                <name>CLK</name>
                 <address>0x28</address>
             </instance>
             <register>
                 <field>
-                    <name>CLKDIV_MS</name>
+                    <name>MS_DIV</name>
                     <position>16</position>
                     <width>16</width>
                 </field>
                 <field>
-                    <name>CLKDIV_US</name>
+                    <name>US_DIV</name>
                     <position>8</position>
                     <width>8</width>
                 </field>
                 <field>
-                    <name>CLKDIV</name>
+                    <name>ADC_DIV</name>
                     <position>0</position>
                     <width>8</width>
                 </field>
@@ -6690,141 +7043,40 @@
             <register/>
         </node>
         <node>
-            <name>CNUM</name>
-            <title>DMA Command Counter Register 1</title>
+            <name>XYP</name>
+            <title>Foreground 1 XY Position Register</title>
             <instance>
-                <name>CNUM</name>
+                <name>XYP</name>
                 <range>
                     <first>0</first>
-                    <address>0x68</address>
-                    <address>0x78</address>
-                </range>
-            </instance>
-            <register/>
-        </node>
-        <node>
-            <name>DESSIZE</name>
-            <title>Foreground Size in Descriptor 1 Register</title>
-            <instance>
-                <name>DESSIZE</name>
-                <range>
-                    <first>0</first>
-                    <address>0x6c</address>
-                    <address>0x7c</address>
+                    <address>0x120</address>
+                    <address>0x124</address>
                 </range>
             </instance>
             <register>
                 <field>
-                    <name>HEIGHT</name>
-                    <desc>height of foreground 1</desc>
+                    <name>YPOS</name>
+                    <desc>Y position bit of foreground 0 or 1</desc>
                     <position>16</position>
                     <width>16</width>
                 </field>
                 <field>
-                    <name>WIDTH</name>
-                    <desc>width of foreground 1</desc>
+                    <name>XPOS</name>
+                    <desc>X position bit of foreground 0 or 1</desc>
                     <position>0</position>
                     <width>16</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>PW</name>
-            <title>DMA Page Width Register 1</title>
+            <name>SIZE</name>
+            <title>Foreground 1 Size Register</title>
             <instance>
-                <name>PW</name>
+                <name>SIZE</name>
                 <range>
                     <first>0</first>
-                    <address>0x64</address>
-                    <address>0x74</address>
-                </range>
-            </instance>
-            <register/>
-        </node>
-        <node>
-            <name>OFFS</name>
-            <title>DMA Offsize Register 1</title>
-            <instance>
-                <name>OFFS</name>
-                <range>
-                    <first>0</first>
-                    <address>0x60</address>
-                    <address>0x70</address>
-                </range>
-            </instance>
-            <register/>
-        </node>
-        <node>
-            <name>CMD</name>
-            <title>DMA Command Register 1</title>
-            <instance>
-                <name>CMD</name>
-                <range>
-                    <first>0</first>
-                    <address>0x4c</address>
-                    <address>0x5c</address>
-                </range>
-            </instance>
-            <register>
-                <field>
-                    <name>SOFINT</name>
-                    <position>31</position>
-                </field>
-                <field>
-                    <name>EOFINT</name>
-                    <position>30</position>
-                </field>
-                <field>
-                    <name>CMD</name>
-                    <desc>indicate command in slcd mode</desc>
-                    <position>29</position>
-                </field>
-                <field>
-                    <name>PAL</name>
-                    <position>28</position>
-                </field>
-                <field>
-                    <name>LEN</name>
-                    <position>0</position>
-                    <width>24</width>
-                </field>
-            </register>
-        </node>
-        <node>
-            <name>FID</name>
-            <title>Frame ID Register 1</title>
-            <instance>
-                <name>FID</name>
-                <range>
-                    <first>0</first>
-                    <address>0x48</address>
-                    <address>0x58</address>
-                </range>
-            </instance>
-            <register/>
-        </node>
-        <node>
-            <name>SA</name>
-            <title>Source Address Register 1</title>
-            <instance>
-                <name>SA</name>
-                <range>
-                    <first>0</first>
-                    <address>0x44</address>
-                    <address>0x54</address>
-                </range>
-            </instance>
-            <register/>
-        </node>
-        <node>
-            <name>DA</name>
-            <title>Descriptor Address Register 1</title>
-            <instance>
-                <name>DA</name>
-                <range>
-                    <first>0</first>
-                    <address>0x40</address>
-                    <address>0x50</address>
+                    <address>0x128</address>
+                    <address>0x12c</address>
                 </range>
             </instance>
             <register/>
@@ -6872,43 +7124,144 @@
             </register>
         </node>
         <node>
-            <name>SIZE</name>
-            <title>Foreground 1 Size Register</title>
+            <name>DA</name>
+            <title>Descriptor Address Register 1</title>
             <instance>
-                <name>SIZE</name>
+                <name>DA</name>
                 <range>
                     <first>0</first>
-                    <address>0x128</address>
-                    <address>0x12c</address>
+                    <address>0x40</address>
+                    <address>0x50</address>
                 </range>
             </instance>
             <register/>
         </node>
         <node>
-            <name>XYP</name>
-            <title>Foreground 1 XY Position Register</title>
+            <name>SA</name>
+            <title>Source Address Register 1</title>
             <instance>
-                <name>XYP</name>
+                <name>SA</name>
                 <range>
                     <first>0</first>
-                    <address>0x120</address>
-                    <address>0x124</address>
+                    <address>0x44</address>
+                    <address>0x54</address>
+                </range>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>FID</name>
+            <title>Frame ID Register 1</title>
+            <instance>
+                <name>FID</name>
+                <range>
+                    <first>0</first>
+                    <address>0x48</address>
+                    <address>0x58</address>
+                </range>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CMD</name>
+            <title>DMA Command Register 1</title>
+            <instance>
+                <name>CMD</name>
+                <range>
+                    <first>0</first>
+                    <address>0x4c</address>
+                    <address>0x5c</address>
                 </range>
             </instance>
             <register>
                 <field>
-                    <name>YPOS</name>
-                    <desc>Y position bit of foreground 0 or 1</desc>
+                    <name>SOFINT</name>
+                    <position>31</position>
+                </field>
+                <field>
+                    <name>EOFINT</name>
+                    <position>30</position>
+                </field>
+                <field>
+                    <name>CMD</name>
+                    <desc>indicate command in slcd mode</desc>
+                    <position>29</position>
+                </field>
+                <field>
+                    <name>PAL</name>
+                    <position>28</position>
+                </field>
+                <field>
+                    <name>LEN</name>
+                    <position>0</position>
+                    <width>24</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>OFFS</name>
+            <title>DMA Offsize Register 1</title>
+            <instance>
+                <name>OFFS</name>
+                <range>
+                    <first>0</first>
+                    <address>0x60</address>
+                    <address>0x70</address>
+                </range>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>PW</name>
+            <title>DMA Page Width Register 1</title>
+            <instance>
+                <name>PW</name>
+                <range>
+                    <first>0</first>
+                    <address>0x64</address>
+                    <address>0x74</address>
+                </range>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DESSIZE</name>
+            <title>Foreground Size in Descriptor 1 Register</title>
+            <instance>
+                <name>DESSIZE</name>
+                <range>
+                    <first>0</first>
+                    <address>0x6c</address>
+                    <address>0x7c</address>
+                </range>
+            </instance>
+            <register>
+                <field>
+                    <name>HEIGHT</name>
+                    <desc>height of foreground 1</desc>
                     <position>16</position>
                     <width>16</width>
                 </field>
                 <field>
-                    <name>XPOS</name>
-                    <desc>X position bit of foreground 0 or 1</desc>
+                    <name>WIDTH</name>
+                    <desc>width of foreground 1</desc>
                     <position>0</position>
                     <width>16</width>
                 </field>
             </register>
+        </node>
+        <node>
+            <name>CNUM</name>
+            <title>DMA Command Counter Register 1</title>
+            <instance>
+                <name>CNUM</name>
+                <range>
+                    <first>0</first>
+                    <address>0x68</address>
+                    <address>0x78</address>
+                </range>
+            </instance>
+            <register/>
         </node>
     </node>
     <node>
@@ -6927,7 +7280,7 @@
             </instance>
             <register>
                 <field>
-                    <name>DWIDTH</name>
+                    <name>DATA_WIDTH</name>
                     <position>10</position>
                     <width>3</width>
                     <enum>
@@ -6960,7 +7313,7 @@
                     </enum>
                 </field>
                 <field>
-                    <name>CWIDTH</name>
+                    <name>CMD_WIDTH</name>
                     <position>8</position>
                     <width>2</width>
                     <enum>
@@ -9214,27 +9567,6 @@
         <instance>
             <name>CABAC</name>
             <address>0xb3290000</address>
-        </instance>
-    </node>
-    <node>
-        <name>TCSM0</name>
-        <instance>
-            <name>TCSM0</name>
-            <address>0xb32b0000</address>
-        </instance>
-    </node>
-    <node>
-        <name>TCSM1</name>
-        <instance>
-            <name>TCSM1</name>
-            <address>0xb32c0000</address>
-        </instance>
-    </node>
-    <node>
-        <name>SRAM</name>
-        <instance>
-            <name>SRAM</name>
-            <address>0xb32d0000</address>
         </instance>
     </node>
     <node>
