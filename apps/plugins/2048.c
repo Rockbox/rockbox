@@ -865,19 +865,19 @@ static void exit_handler(void)
 
 static bool check_hs;
 
+int buttons[] = { PLA_LEFT, PLA_DOWN, PLA_RIGHT, PLA_DOWN };
+
 /* main game loop */
-static enum plugin_status do_game(bool newgame)
+static enum plugin_status do_scripted_game(void)
 {
-    init_game(newgame);
+    init_game(true);
     rb_atexit(exit_handler);
     int made_move = 0;
-    while(1)
+    for(int j = 0; j < 20; ++j)
+    for(int i = 0; i < ARRAYLEN(buttons); ++i)
     {
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-        rb->cpu_boost(false); /* Save battery when idling */
-#endif
         /* Wait for a button press */
-        int button = pluginlib_getaction(-1, plugin_contexts, ARRAYLEN(plugin_contexts));
+        int button = buttons[i];
         made_move = 0;
 
         memset(&merged_grid, 0, SPACES*sizeof(bool));
@@ -888,6 +888,7 @@ static enum plugin_status do_game(bool newgame)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         rb->cpu_boost(true); /* doing work now... */
 #endif
+
         switch(button)
         {
         case KEY_UP:
@@ -897,8 +898,7 @@ static enum plugin_status do_game(bool newgame)
                 up(true);
                 if(memcmp(grid_before_anim_step, ctx->grid, sizeof(ctx->grid)))
                 {
-                    rb->sleep(ANIM_SLEEPTIME);
-                    draw();
+                    ;
                 }
             }
             made_move = 1;
@@ -910,8 +910,7 @@ static enum plugin_status do_game(bool newgame)
                 down(true);
                 if(memcmp(grid_before_anim_step, ctx->grid, sizeof(ctx->grid)))
                 {
-                    rb->sleep(ANIM_SLEEPTIME);
-                    draw();
+                    ;
                 }
             }
             made_move = 1;
@@ -923,8 +922,7 @@ static enum plugin_status do_game(bool newgame)
                 left(true);
                 if(memcmp(grid_before_anim_step, ctx->grid, sizeof(ctx->grid)))
                 {
-                    rb->sleep(ANIM_SLEEPTIME);
-                    draw();
+                    ;
                 }
             }
             made_move = 1;
@@ -936,8 +934,7 @@ static enum plugin_status do_game(bool newgame)
                 right(true);
                 if(memcmp(grid_before_anim_step, ctx->grid, sizeof(ctx->grid)))
                 {
-                    rb->sleep(ANIM_SLEEPTIME);
-                    draw();
+                    ;
                 }
             }
             made_move = 1;
@@ -978,7 +975,6 @@ static enum plugin_status do_game(bool newgame)
             memcpy(&old_grid, ctx->grid, sizeof(ctx->grid));
             if(check_gameover())
                 return PLUGIN_OK;
-            draw();
         }
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         rb->cpu_boost(false); /* back to idle */
@@ -1000,74 +996,9 @@ static int mainmenu_cb(int action, const struct menu_item_ex *this_item)
 /* show the main menu */
 static enum plugin_status do_2048_menu(void)
 {
-    int sel = 0;
-    loaded = load_game();
-    MENUITEM_STRINGLIST(menu,
-                        "2048 Menu",
-                        mainmenu_cb,
-                        "Resume Game",
-                        "Start New Game",
-                        "High Scores",
-                        "Playback Control",
-                        "Help",
-                        "Quit without Saving",
-                        "Quit");
-    bool quit = false;
-    while(!quit)
-    {
-        switch(rb->do_menu(&menu, &sel, NULL, false))
-        {
-        case 0: /* Start new game or resume a game */
-        case 1:
-        {
-            if(sel == 1 && loaded)
-            {
-                if(!confirm_quit())
-                    break;
-            }
-            enum plugin_status ret = do_game(sel == 1);
-            switch(ret)
-            {
-            case PLUGIN_OK:
-            {
-                loaded = false;
-                rb->remove(RESUME_FILE);
-                hs_check_update(false);
-                break;
-            }
-            case PLUGIN_USB_CONNECTED:
-                save_game();
-                /* Don't bother showing the high scores... */
-                return ret;
-            case PLUGIN_ERROR: /* exit without menu */
-                if(check_hs)
-                    hs_check_update(false);
-                return PLUGIN_OK;
-            default:
-                break;
-            }
-            break;
-        }
-        case 2:
-            highscore_show(-1, highscores, NUM_SCORES, true);
-            break;
-        case 3:
-            playback_control(NULL);
-            break;
-        case 4:
-            do_help();
-            break;
-        case 5:
-            if(confirm_quit())
-                return PLUGIN_OK;
-        case 6:
-            if(loaded)
-                save_game();
-            return PLUGIN_OK;
-        default:
-            break;
-        }
-    }
+    do_scripted_game();
+    draw();
+    rb->screen_dump();
     return PLUGIN_OK;
 }
 
@@ -1075,7 +1006,7 @@ static enum plugin_status do_2048_menu(void)
 enum plugin_status plugin_start(const void* param)
 {
     (void)param;
-    rb->srand(*rb->current_tick);
+    rb->srand(42);
     load_hs();
     rb->lcd_setfont(WHAT_FONT);
 
