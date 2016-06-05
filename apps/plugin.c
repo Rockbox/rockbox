@@ -836,6 +836,8 @@ static const struct plugin_api rockbox_api = {
     root_menu_load_from_cfg,
     settings_save,
 
+    screen_dump,
+
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 };

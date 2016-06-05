@@ -975,6 +975,8 @@ struct plugin_api {
     void (*root_menu_load_from_cfg)(void* setting, char *value);
     int (*settings_save)(void);
 
+    void (*screen_dump)(void);
+    
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 };
