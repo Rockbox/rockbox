@@ -145,7 +145,7 @@
 #endif
 #endif
 
-/*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
+#define AUTOROCK /* define this to check for "autostart.rock" on boot */
 
 static void init(void);
 /* main(), and various functions called by main() and init() may be
@@ -186,17 +186,19 @@ int main(void)
         char filename[MAX_PATH];
         const char *file =
 #ifdef APPLICATION
-                                ROCKBOX_DIR
+            ROCKBOX_DIR
 #else
-                                PLUGIN_APPS_DIR
+            PLUGIN_GAMES_DIR
 #endif
-                                    "/autostart.rock";
+            "/2048.rock";
         if(file_exists(file)) /* no complaint if it doesn't exist */
         {
             plugin_load(file, NULL); /* start if it does */
         }
     }
 #endif /* #ifdef AUTOROCK */
+
+    return;
 
     global_status.last_volume_change = 0;
     /* no calls INIT_ATTR functions after this point anymore!
