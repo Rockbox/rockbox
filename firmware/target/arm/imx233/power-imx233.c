@@ -28,6 +28,7 @@
 #include "power-imx233.h"
 #include "pinctrl-imx233.h"
 #include "fmradio_i2c.h"
+#include "rtc-imx233.h"
 
 #include "regs/power.h"
 
@@ -232,6 +233,11 @@ void power_off(void)
 {
     /* wait a bit, useful for the user to stop touching anything */
     sleep(HZ / 2);
+    /* disable watchdog just in case since we will disable interrupts */
+    imx233_rtc_enable_watchdog(false);
+    /* disable interrupts, it's probably better to avoid any action so close
+     * to shutdown */
+    disable_interrupt(IRQ_FIQ_STATUS);
 #ifdef SANSA_FUZEPLUS
     /* This pin seems to be important to shutdown the hardware properly */
     imx233_pinctrl_acquire(0, 9, "power off");
@@ -240,7 +246,7 @@ void power_off(void)
     imx233_pinctrl_set_gpio(0, 9, true);
 #endif
     /* power down */
-    HW_POWER_RESET = BM_OR(POWER_RESET, UNLOCK, PWD); // FIXME bug
+    HW_POWER_RESET = BF_OR(POWER_RESET, UNLOCK_V(KEY), PWD(1));
     while(1);
 }
 
