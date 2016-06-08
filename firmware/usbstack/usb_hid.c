@@ -25,7 +25,7 @@
 #include "kernel.h"
 #include "usb_hid.h"
 #include "usb_class_driver.h"
-/*#define LOGF_ENABLE*/
+#define LOGF_ENABLE
 #include "logf.h"
 
 /* Documents avaiable here: http://www.usb.org/developers/devclass_docs/ */
@@ -169,6 +169,7 @@ typedef struct
 } usb_hid_report_t;
 
 static usb_hid_report_t usb_hid_reports[REPORT_ID_COUNT];
+static uint8_t usb_hid_led_buf;
 
 static unsigned char report_descriptor[HID_BUF_SIZE_REPORT]
     USB_DEVBSS_ATTR __attribute__((aligned(32)));
@@ -669,6 +670,11 @@ static int usb_hid_set_report(struct usb_ctrlrequest *req)
 
     memset(buf, 0, length);
     usb_drv_recv(EP_CONTROL, buf, length);
+    /* wait for data to arrive in the buffer, since usb_drv_recv is non-blocking
+     * this code is clearly incorrect */
+    sleep(HZ / 10);
+    logf("leds: %x", buf[1]);
+    usb_hid_led_buf = buf[1];
 
 #ifdef LOGF_ENABLE
     if (buf[1] & 0x01)
@@ -686,6 +692,11 @@ static int usb_hid_set_report(struct usb_ctrlrequest *req)
     /* Defining other LEDs and setting them from the USB host (OS) can be used
      * to send messages to the DAP */
     return 0;
+}
+
+uint8_t usb_hid_leds(void)
+{
+    return usb_hid_led_buf;
 }
 
 /* called by usb_core_control_request() */
