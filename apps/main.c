@@ -468,7 +468,11 @@ static void init(void)
     debug_init();
 #else
 #ifdef HAVE_SERIAL
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+    serial_setup(0); /* default serial port (Dock Connector) for devices with more than one*/
+#else
     serial_setup();
+#endif
 #endif
 #endif
 
@@ -717,7 +721,11 @@ static void init(void)
     car_adapter_mode_init();
 #endif
 #ifdef IPOD_ACCESSORY_PROTOCOL
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+    iap_setup(global_settings.serial_bitrate,global_settings.serial_port);
+#else
     iap_setup(global_settings.serial_bitrate);
+#endif
 #endif
 #ifdef HAVE_ACCESSORY_SUPPLY
     accessory_supply_set(global_settings.accessory_supply);

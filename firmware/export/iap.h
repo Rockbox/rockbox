@@ -28,7 +28,12 @@
 #define TX_BUFLEN 128
 
 extern bool iap_getc(unsigned char x);
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+extern void iap_setup(int ratenum,int port);
+extern void iap_serial_port_set(int port);
+#else
 extern void iap_setup(int ratenum);
+#endif
 extern void iap_bitrate_set(int ratenum);
 extern void iap_periodic(void);
 extern void iap_handlepkt(void);

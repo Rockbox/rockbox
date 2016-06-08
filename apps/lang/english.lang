@@ -13479,3 +13479,54 @@
     ibassodx90: "Android Debug Bridge"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SERIAL_PORT
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "IAP Serial Port"
+  </source>
+  <dest>
+    *: none
+    serial_port: "IAP Serial Port"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "IAP Serial Port"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_PORT_DOCK
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Dock Connector Serial Port"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Dock Connector Serial Port"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Dock Connector Serial Port"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SERIAL_PORT_AUX
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    serial_port: "Aux Connector Serial Port"
+  </source>
+  <dest>
+    *: none
+    serial_port: "Aux Connector Serial Port"
+  </dest>
+  <voice>
+    *: none
+    serial_port: "Aux Connector Serial Port"
+  </voice>
+</phrase>

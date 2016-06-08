@@ -1003,6 +1003,11 @@ const struct settings_list settings[] = {
                   LANG_CAR_ADAPTER_MODE, false, "car adapter mode", NULL),
 #endif
 #ifdef IPOD_ACCESSORY_PROTOCOL
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+    CHOICE_SETTING(0, serial_port, LANG_SERIAL_PORT, 0, "serial port",
+                   "0,1", iap_serial_port_set, 2, ID2P(LANG_SERIAL_PORT_DOCK),
+           ID2P(LANG_SERIAL_PORT_AUX)),
+#endif
     CHOICE_SETTING(0, serial_bitrate, LANG_SERIAL_BITRATE, 0, "serial bitrate",
                    "auto,9600,19200,38400,57600", iap_bitrate_set, 5, ID2P(LANG_SERIAL_BITRATE_AUTO),
            ID2P(LANG_SERIAL_BITRATE_9600),ID2P(LANG_SERIAL_BITRATE_19200),

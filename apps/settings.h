@@ -729,6 +729,9 @@ struct user_settings
 #endif
 
 #ifdef IPOD_ACCESSORY_PROTOCOL
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+    int serial_port; /*0 = Dock (Default), 1=Aux */
+#endif
     int serial_bitrate; /* 0=auto 1=9600 2=19200 3=38400 4=57600 */
 #endif
 #ifdef HAVE_ACCESSORY_SUPPLY

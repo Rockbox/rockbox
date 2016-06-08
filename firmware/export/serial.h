@@ -22,7 +22,11 @@
 #ifndef __SERIAL_H__
 #define __SERIAL_H__
 
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+extern void serial_setup(int port);
+#else
 extern void serial_setup(void);
+#endif
 extern void serial_bitrate(int rate);
 extern int remote_control_rx(void);
 extern void serial_tx(const unsigned char *buf);

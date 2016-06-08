@@ -44,44 +44,11 @@ static void set_bitrate(unsigned int rate)
     *base_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
 }
 
+#if defined(IPOD_NANO) || defined(IPOD_VIDEO)
 void serial_setup (void)
 {
     int tmp;
-
-#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
-
-    /* Route the Tx/Rx pins.  4G Ipod, MINI & MINI2G ser1, dock connector */
-    GPIO_CLEAR_BITWISE(GPIOD_ENABLE, 0x6);
-    GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_EN, 0x6);
-
-    outl(0x70000018, inl(0x70000018) & ~0xc00);
-
-    base_RBR = &SER1_RBR;
-    base_THR = &SER1_THR;
-    base_LCR = &SER1_LCR;
-    base_LSR = &SER1_LSR;
-    base_DLL = &SER1_DLL;
-
-    DEV_EN |= DEV_SER1;
-    CPU_HI_INT_DIS = SER1_MASK;
-
-    DEV_RS |= DEV_SER1;
-    sleep(1);
-    DEV_RS &= ~DEV_SER1;
-
-    SER1_LCR = 0x80; /* Divisor latch enable */
-    SER1_DLM = 0x00;
-    SER1_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
-    SER1_IER = 0x01;
-
-    SER1_FCR = 0x07; /* Tx+Rx FIFO reset and FIFO enable */
-
-    CPU_INT_EN = HI_MASK;
-    CPU_HI_INT_EN = SER1_MASK;
-    tmp = SER1_RBR;
-
-#elif defined(IPOD_NANO) || defined(IPOD_VIDEO)
-    /* Route the Tx/Rx pins.  5G Ipod */
+    /* Route the Tx/Rx pins.  Dock Connector 5G Ipod */
     (*(volatile unsigned long *)(0x7000008C)) &= ~0x0C;
     GPO32_ENABLE &= ~0x0C;
 
@@ -109,40 +76,75 @@ void serial_setup (void)
     CPU_HI_INT_EN = SER0_MASK;
     tmp = SER0_RBR;
 
-#else
+#elif defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+void serial_setup (int port)
+{
+    int tmp;
+    if(port==0)
+    {
+      /* Route the Tx/Rx pins.  4G Ipod, MINI & MINI2G ser1, dock connector */
+      GPIO_CLEAR_BITWISE(GPIOD_ENABLE, 0x6);
+      GPIO_CLEAR_BITWISE(GPIOD_OUTPUT_EN, 0x6);
 
-    /* Default Route the Tx/Rx pins.  4G Ipod, ser0, top connector */
+      outl(0x70000018, inl(0x70000018) & ~0xc00);
 
-    GPIO_CLEAR_BITWISE(GPIOC_INT_EN, 0x8);
-    GPIO_CLEAR_BITWISE(GPIOC_INT_LEV, 0x8);
-    GPIOC_INT_CLR = 0x8;
+      base_RBR = &SER1_RBR;
+      base_THR = &SER1_THR;
+      base_LCR = &SER1_LCR;
+      base_LSR = &SER1_LSR;
+      base_DLL = &SER1_DLL;
 
-    base_RBR = &SER0_RBR;
-    base_THR = &SER0_THR;
-    base_LCR = &SER0_LCR;
-    base_LSR = &SER0_LSR;
-    base_DLL = &SER0_DLL;
+      DEV_EN |= DEV_SER1;
+      CPU_HI_INT_DIS = SER1_MASK;
 
-    DEV_EN |= DEV_SER0;
-    CPU_HI_INT_DIS = SER0_MASK;
+      DEV_RS |= DEV_SER1;
+      sleep(1);
+      DEV_RS &= ~DEV_SER1;
 
-    DEV_RS |= DEV_SER0;
-    sleep(1);
-    DEV_RS &= ~DEV_SER0;
+      SER1_LCR = 0x80; /* Divisor latch enable */
+      SER1_DLM = 0x00;
+      SER1_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+      SER1_IER = 0x01;
 
-    SER0_LCR = 0x80; /* Divisor latch enable */
-    SER0_DLM = 0x00;
-    SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
-    SER0_IER = 0x01;
+      SER1_FCR = 0x07; /* Tx+Rx FIFO reset and FIFO enable */
 
-    SER0_FCR = 0x07; /* Tx+Rx FIFO reset and FIFO enable */
+      CPU_INT_EN = HI_MASK;
+      CPU_HI_INT_EN = SER1_MASK;
+      tmp = SER1_RBR;
+    }
+    else
+    {
+      /* Default Route the Tx/Rx pins.  4G Ipod, ser0, top connector */
 
-    CPU_INT_EN = HI_MASK;
-    CPU_HI_INT_EN = SER0_MASK;
-    tmp = SER0_RBR;
+      GPIO_CLEAR_BITWISE(GPIOC_INT_EN, 0x8);
+      GPIO_CLEAR_BITWISE(GPIOC_INT_LEV, 0x8);
+      GPIOC_INT_CLR = 0x8;
 
+      base_RBR = &SER0_RBR;
+      base_THR = &SER0_THR;
+      base_LCR = &SER0_LCR;
+      base_LSR = &SER0_LSR;
+      base_DLL = &SER0_DLL;
+
+      DEV_EN |= DEV_SER0;
+      CPU_HI_INT_DIS = SER0_MASK;
+
+      DEV_RS |= DEV_SER0;
+      sleep(1);
+      DEV_RS &= ~DEV_SER0;
+
+      SER0_LCR = 0x80; /* Divisor latch enable */
+      SER0_DLM = 0x00;
+      SER0_LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+      SER0_IER = 0x01;
+
+      SER0_FCR = 0x07; /* Tx+Rx FIFO reset and FIFO enable */
+
+      CPU_INT_EN = HI_MASK;
+      CPU_HI_INT_EN = SER0_MASK;
+      tmp = SER0_RBR;
+    }
 #endif
-
     serial_bitrate(0);
 }
 

@@ -290,6 +290,9 @@ MENUITEM_SETTING(line_in, &global_settings.line_in, linein_callback);
 MENUITEM_SETTING(car_adapter_mode, &global_settings.car_adapter_mode, NULL);
 #endif
 #ifdef IPOD_ACCESSORY_PROTOCOL
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+MENUITEM_SETTING(serial_port, &global_settings.serial_port, NULL);
+#endif
 MENUITEM_SETTING(serial_bitrate, &global_settings.serial_bitrate, NULL);
 #endif
 #ifdef HAVE_ACCESSORY_SUPPLY
@@ -357,6 +360,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &car_adapter_mode,
 #endif
 #ifdef IPOD_ACCESSORY_PROTOCOL
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+            &serial_port,
+#endif
             &serial_bitrate,
 #endif
 #ifdef HAVE_ACCESSORY_SUPPLY

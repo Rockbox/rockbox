@@ -376,8 +376,19 @@ static void iap_track_changed(unsigned short id, void *ignored)
  *
  * Please note that a lot of additional work is done by iap_start()
  */
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IPOD_MINI2G)
+void iap_serial_port_set(const int port)
+{
+    serial_setup(port);
+}
+
+void iap_setup(const int ratenum,const int port)
+{
+    iap_serial_port_set(port);
+#else
 void iap_setup(const int ratenum)
 {
+#endif
     iap_bitrate_set(ratenum);
     iap_remotebtn = BUTTON_NONE;
     iap_setupflag = true;
