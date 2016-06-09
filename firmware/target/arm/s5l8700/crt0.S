@@ -82,12 +82,24 @@ newstart2:
 
     mov r0, #0
     mov r1, #0x39c00000
-    str r0, [r1,#0x08] // mask all interrupts
-    str r0, [r1,#0x20] // mask all external interrupts
+    str r0, [r1,#0x08]  /* mask all interrupts */
+#if CONFIG_CPU==S5L8701
+    str r0, [r1,#0x38]  /* mask all external interrupts */
+    str r0, [r1,#0x3c]
+    str r0, [r1,#0x40]
+    str r0, [r1,#0x44]
     mvn r0, #0
-    str r0, [r1,#0x1c] // clear pending external interrupts
-    str r0, [r1] // irq priority
-    str r0, [r1,#0x10] // clear pending interrupts
+    str r0, [r1,#0x28]  /* clear pending external interrupts */
+    str r0, [r1,#0x2c]
+    str r0, [r1,#0x30]
+    str r0, [r1,#0x34]
+#else
+    str r0, [r1,#0x20]  /* mask all external interrupts */
+    mvn r0, #0
+    str r0, [r1,#0x1c]  /* clear pending external interrupts */
+#endif
+    str r0, [r1]        /* irq priority */
+    str r0, [r1,#0x10]  /* clear pending interrupts */
 
 //    ldr r1, =0x3cf00000
 //    ldr r0, [r1]
