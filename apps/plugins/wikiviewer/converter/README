@@ -1,0 +1,26 @@
+Wikipedia XML dump converter
+
+btconvert utility written by Frederik Vestre
+
+wikipedia-dump to media wiki viewer converter rewritten by Matthias Larisch from the
+original converter written by Frederik Vestre. Great improvement in functionality by Adam Gashlin.
+
+help:
+
+make all compiles all neccessary tools
+
+
+usage help:
+
+./xmlconv your_wikipedia_file output_prefix
+
+./btcreate output_prefix.wwt output_prefix.wwr output_prefix.wwi
+
+copy output_prefix.wwi and output_prefix0.wwa to your rockboxdevice
+
+for big wikidumps, there will be more than one .wwa file (named 0-N)
+
+
+Bugs:
+
+- does not work under cygwin (segfault)

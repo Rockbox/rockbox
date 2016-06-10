@@ -1,0 +1,6 @@
+wikiviewer.c
+mwdb.c
+mallocer.c
+inflate.c
+btsearch.c
+bbfuncs.c
