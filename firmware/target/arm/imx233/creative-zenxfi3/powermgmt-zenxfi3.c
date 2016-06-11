@@ -34,13 +34,13 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    /* Toshiba Gigabeat S Li Ion 700mAH figured from discharge curve */
-    { 3659, 3719, 3745, 3761, 3785, 3813, 3856, 3926, 3984, 4040, 4121 },
+    /* figured from discharge curve */
+    { 3631, 3697, 3762, 3784, 3805, 3838, 3902, 3961, 4016, 4091, 4178 },
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-    /* Toshiba Gigabeat S Li Ion 700mAH figured from charge curve */
-    4028, 4063, 4087, 4111, 4135, 4156, 4173, 4185, 4194, 4202, 4208
+    /* figured from charge curve */
+    3833, 3866, 3910, 3923, 3943, 3969, 4009, 4047, 4095, 4154,  4192
 };
