@@ -33,6 +33,7 @@ bool usb_drv_stalled(int endpoint,bool in);
 int usb_drv_send(int endpoint, void* ptr, int length);
 int usb_drv_send_nonblocking(int endpoint, void* ptr, int length);
 int usb_drv_recv(int endpoint, void* ptr, int length);
+int usb_drv_recv_blocking(int endpoint, void* ptr, int length);
 void usb_drv_ack(struct usb_ctrlrequest* req);
 void usb_drv_set_address(int address);
 void usb_drv_reset_endpoint(int endpoint, bool send);
