@@ -113,4 +113,18 @@ int
 hmac_sha1 (const void *key, size_t keylen,
            const void *in, size_t inlen, void *resbuf);
 
+/* like hmac_sha1(), but the input can be in chunks */
+
+struct hmac_ctx {
+    struct sha1_ctx inner, outer;
+    char block[64];
+    char optkeybuf[20];
+    const void *key;
+    size_t keylen;
+};
+
+void hmac_sha1_init(struct hmac_ctx *ctx, const void *key, size_t keylen);
+void hmac_sha1_process_bytes(struct hmac_ctx *ctx, const void *in, size_t inlen);
+void hmac_sha1_finish_ctx(struct hmac_ctx *ctx, void *resbuf);
+
 #endif /* HMAC_H */

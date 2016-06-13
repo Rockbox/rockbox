@@ -432,3 +432,55 @@ hmac_sha1 (const void *key, size_t keylen,
 
   return 0;
 }
+
+/* code below by Franklin Wei */
+
+void hmac_sha1_init(struct hmac_ctx *ctx, const void *key, size_t keylen)
+{
+    /* Reduce the key's size, so that it becomes <= 64 bytes large.  */
+    ctx->key = key;
+    ctx->keylen = keylen;
+
+    if (ctx->keylen > 64)
+    {
+        struct sha1_ctx keyhash;
+
+        sha1_init_ctx (&keyhash);
+        sha1_process_bytes (ctx->key, ctx->keylen, &keyhash);
+        sha1_finish_ctx (&keyhash, ctx->optkeybuf);
+
+        ctx->key = ctx->optkeybuf;
+        ctx->keylen = 20;
+    }
+
+    sha1_init_ctx(&ctx->inner);
+
+    memset (ctx->block, IPAD, sizeof (ctx->block));
+    memxor (ctx->block, ctx->key, ctx->keylen);
+
+    sha1_process_block (ctx->block, 64, &ctx->inner);
+}
+
+void hmac_sha1_process_bytes(struct hmac_ctx *ctx, const void *in, size_t inlen)
+{
+    sha1_process_bytes(in, inlen, &ctx->inner);
+}
+
+void hmac_sha1_finish_ctx(struct hmac_ctx *ctx, void *resbuf)
+{
+    char innerhash[20];
+
+    sha1_finish_ctx (&ctx->inner, innerhash);
+
+    /* Compute result from KEY and INNERHASH.  */
+
+    sha1_init_ctx (&ctx->outer);
+
+    memset (ctx->block, OPAD, sizeof (ctx->block));
+    memxor (ctx->block, ctx->key, ctx->keylen);
+
+    sha1_process_block (ctx->block, 64, &ctx->outer);
+    sha1_process_bytes (innerhash, 20, &ctx->outer);
+
+    sha1_finish_ctx (&ctx->outer, resbuf);
+}
