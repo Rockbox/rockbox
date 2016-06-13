@@ -489,6 +489,7 @@ static const struct plugin_api rockbox_api = {
     usb_acknowledge,
 #ifdef USB_ENABLE_HID
     usb_hid_send,
+    usb_hid_leds,
 #endif
 #ifdef RB_PROFILE
     profile_thread,
@@ -838,6 +839,11 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+#if CONFIG_CPU == S5L8702 && !defined(SIMULATOR)
+    s5l8702_hwkeyaes,
+    s5l8702_sha1,
+#endif
 };
 
 static int plugin_buffer_handle;
