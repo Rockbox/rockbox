@@ -514,6 +514,27 @@ static void add_acct(void)
     }
 }
 
+/* core algorithm */
+static int next_code(int acct)
+{
+    if(!accounts[acct].is_totp)
+    {
+        int ret = HOTP(accounts[acct].secret,
+                       accounts[acct].sec_len,
+                       accounts[acct].hotp_counter,
+                       accounts[acct].digits);
+        ++accounts[acct].hotp_counter;
+        return ret;
+    }
+    else
+    {
+        return TOTP(accounts[acct].secret,
+                    accounts[acct].sec_len,
+                    accounts[acct].totp_period,
+                    accounts[acct].digits);
+    }
+}
+
 static void show_code(int acct)
 {
     /* rockbox's printf doesn't support a variable field width afaik */
@@ -521,20 +542,13 @@ static void show_code(int acct)
     if(!accounts[acct].is_totp)
     {
         rb->snprintf(format_buf, sizeof(format_buf), "%%0%dd", accounts[acct].digits);
-        rb->splashf(0, format_buf, HOTP(accounts[acct].secret,
-                                        accounts[acct].sec_len,
-                                        accounts[acct].hotp_counter,
-                                        accounts[acct].digits));
-        ++accounts[acct].hotp_counter;
+        rb->splashf(0, format_buf, next_code(acct));
     }
 #if CONFIG_RTC
     else
     {
         rb->snprintf(format_buf, sizeof(format_buf), "%%0%dd (%%ld second(s) left)", accounts[acct].digits);
-        rb->splashf(0, format_buf, TOTP(accounts[acct].secret,
-                                        accounts[acct].sec_len,
-                                        accounts[acct].totp_period,
-                                        accounts[acct].digits),
+        rb->splashf(0, format_buf, next_code(acct),
                     accounts[acct].totp_period - get_utc() % accounts[acct].totp_period);
     }
 #else
@@ -556,7 +570,7 @@ static void show_code(int acct)
     rb->lcd_clear_display();
 }
 
-static void gen_codes(void)
+static void acct_menu(const char *title, void (*cb)(int acct))
 {
     rb->lcd_clear_display();
     /* native menus don't seem to support dynamic names easily, so we
@@ -565,7 +579,7 @@ static void gen_codes(void)
     int idx = 0;
     if(next_slot > 0)
     {
-        rb->lcd_putsf(0, 0, "Generate Code");
+        rb->lcd_puts(0, 0, title);
         rb->lcd_putsf(0, 1, "%s", accounts[0].name);
         rb->lcd_update();
     }
@@ -590,7 +604,7 @@ static void gen_codes(void)
                 idx = 0;
             break;
         case PLA_SELECT:
-            show_code(idx);
+            cb(idx);
             break;
         case PLA_CANCEL:
         case PLA_EXIT:
@@ -600,10 +614,15 @@ static void gen_codes(void)
             break;
         }
         rb->lcd_clear_display();
-        rb->lcd_putsf(0, 0, "Generate Code");
+        rb->lcd_puts(0, 0, title);
         rb->lcd_putsf(0, 1, "%s", accounts[idx].name);
         rb->lcd_update();
     }
+}
+
+static void gen_codes(void)
+{
+    acct_menu("Generate Code", show_code);
 }
 
 static bool danger_confirm(void)
@@ -648,6 +667,9 @@ static void edit_menu(int acct)
                         "Change HOTP Counter",
                         "Change Digit Count",
                         "Change Shared Secret",
+#ifdef CONFIG_RTC
+                        "Change Type",
+#endif
                         "Back");
 
     MENUITEM_STRINGLIST(menu_2, "Edit Account", NULL,
@@ -656,7 +678,10 @@ static void edit_menu(int acct)
                         "Change TOTP Period", // 2
                         "Change Digit Count", // 3
                         "Change Shared Secret", // 4
-                        "Back"); // 5
+#ifdef CONFIG_RTC
+                        "Change Type", // 5
+#endif
+                        "Back"); // 6
 
     const struct menu_item_ex *menu = (accounts[acct].is_totp) ? &menu_2 : &menu_1;
 
@@ -740,7 +765,31 @@ static void edit_menu(int acct)
             save_accts();
             rb->splash(HZ, "Success.");
             break;
+#ifdef CONFIG_RTC
         case 5:
+        {
+            MENUITEM_STRINGLIST(type_menu, "Choose Type", NULL,
+                                "TOTP",
+                                "HOTP",
+                                "Cancel");
+            int sel = accounts[acct].is_totp ? 0 : 1;
+
+            switch(rb->do_menu(&type_menu, &sel, NULL, false))
+            {
+            case 0:
+                accounts[acct].is_totp = true;
+                break;
+            case 1:
+                accounts[acct].is_totp = false;
+                break;
+            case 2:
+                break;
+            }
+        }
+        case 6:
+#else
+        case 5:
+#endif
             quit = true;
             break;
         default:
@@ -751,61 +800,12 @@ static void edit_menu(int acct)
 
 static void edit_accts(void)
 {
-    rb->lcd_clear_display();
-    /* native menus don't seem to support dynamic names easily, so we
-     * roll our own */
-    static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
-    int idx = 0;
-    if(next_slot > 0)
-    {
-        rb->lcd_putsf(0, 0, "Edit Account");
-        rb->lcd_putsf(0, 1, "%s", accounts[0].name);
-        rb->lcd_update();
-    }
-    else
-    {
-        rb->splash(HZ * 2, "No accounts configured!");
-        return;
-    }
-    while(1)
-    {
-        int button = pluginlib_getaction(-1, plugin_contexts, ARRAYLEN(plugin_contexts));
-        switch(button)
-        {
-        case PLA_LEFT:
-            --idx;
-            if(idx < 0)
-                idx = next_slot - 1;
-            break;
-        case PLA_RIGHT:
-            ++idx;
-            if(idx >= next_slot)
-                idx = 0;
-            break;
-        case PLA_SELECT:
-            edit_menu(idx);
-            if(!next_slot)
-                return;
-            if(idx == next_slot)
-                idx = 0;
-            break;
-        case PLA_CANCEL:
-        case PLA_EXIT:
-            return;
-        default:
-            exit_on_usb(button);
-            break;
-        }
-        rb->lcd_clear_display();
-        rb->lcd_putsf(0, 0, "Edit Account");
-        rb->lcd_putsf(0, 1, "%s", accounts[idx].name);
-        rb->lcd_update();
-    }
+    acct_menu("Edit Account", edit_menu);
 }
 
 #if CONFIG_RTC
 
-/* label is like this: [+/-]HH:MM ... */
+/* label is like this: UTC([+/-]HH:MM ...) */
 static int get_time_seconds(const char *label)
 {
     if(!rb->strcmp(label, "UTC"))
@@ -1028,6 +1028,140 @@ static void show_help(void)
     display_text(ARRAYLEN(help_text), help_text, style, NULL, true);
 }
 
+#ifdef USB_ENABLE_HID
+
+#define FORCE_EXEC_THRES (HZ/3)
+#define TYPE_DELAY (HZ / 25)
+
+static bool wait_for_usb(void)
+{
+    if(!rb->usb_inserted())
+    {
+        /* wait for a USB connection */
+
+        rb->splash(0, "Waiting for USB, hold any button to cancel...");
+
+        int oldbutton = 0;
+        int ticks_held = 0;
+        long last_tick = 0;
+        while(1)
+        {
+            int button = rb->button_get(true);
+            if(button == SYS_USB_CONNECTED)
+            {
+                break;
+            }
+            else if(button)
+            {
+                /* check if a key's being held down */
+
+                if(oldbutton == 0)
+                {
+                    oldbutton = button;
+
+                    ticks_held = 0;
+                    last_tick = *rb->current_tick;
+                }
+                else if(button == oldbutton || button == (oldbutton | BUTTON_REPEAT))
+                {
+                    int dt = *rb->current_tick - last_tick;
+                    if(dt)
+                    {
+                        ticks_held += dt;
+                        last_tick = *rb->current_tick;
+                        if(ticks_held >= FORCE_EXEC_THRES)
+                            return false;
+                    }
+                }
+            }
+        }
+
+        /* wait a bit to let the host recognize us... */
+        rb->sleep(HZ / 2);
+    }
+    return true;
+}
+
+static void type_code(int acct)
+{
+    wait_for_usb();
+    int code = next_code(acct);
+
+    /* hackery to get around the lack of %*d support */
+    char fmt_buf[64], buf[64];
+
+    rb->snprintf(fmt_buf, sizeof(fmt_buf), "%%0%dd", accounts[acct].digits);
+    rb->snprintf(buf, sizeof(buf), fmt_buf, code);
+
+    char *ptr = buf;
+    /* check numlock led */
+    bool change_numlock = !(rb->usb_hid_leds() & 0x1);
+    if(change_numlock)
+        rb->usb_hid_send(HID_USAGE_PAGE_KEYBOARD_KEYPAD, HID_KEYPAD_NUM_LOCK_AND_CLEAR);
+    while(*ptr)
+    {
+        char c = *ptr++;
+        if(c == '0')
+            rb->usb_hid_send(HID_USAGE_PAGE_KEYBOARD_KEYPAD, HID_KEYPAD_0_AND_INSERT);
+        else
+            rb->usb_hid_send(HID_USAGE_PAGE_KEYBOARD_KEYPAD, c - '1'  + HID_KEYPAD_1_AND_END);
+        rb->sleep(TYPE_DELAY);
+    }
+    if(change_numlock)
+        rb->usb_hid_send(HID_USAGE_PAGE_KEYBOARD_KEYPAD, HID_KEYPAD_NUM_LOCK_AND_CLEAR);
+}
+
+static void type_codes(void)
+{
+    rb->lcd_clear_display();
+    /* native menus don't seem to support dynamic names easily, so we
+     * roll our own */
+    static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
+    int idx = 0;
+    if(next_slot > 0)
+    {
+        rb->lcd_putsf(0, 0, "Type Code Over USB");
+        rb->lcd_putsf(0, 1, "%s", accounts[0].name);
+        rb->lcd_update();
+    }
+    else
+    {
+        rb->splash(HZ * 2, "No accounts configured!");
+        return;
+    }
+    while(1)
+    {
+        int button = pluginlib_getaction(-1, plugin_contexts, ARRAYLEN(plugin_contexts));
+        switch(button)
+        {
+        case PLA_LEFT:
+            --idx;
+            if(idx < 0)
+                idx = next_slot - 1;
+            break;
+        case PLA_RIGHT:
+            ++idx;
+            if(idx >= next_slot)
+                idx = 0;
+            break;
+        case PLA_SELECT:
+            type_code(idx);
+            break;
+        case PLA_CANCEL:
+        case PLA_EXIT:
+            exit_on_usb(button);
+            return;
+        default:
+            break;
+        }
+        rb->lcd_clear_display();
+        rb->lcd_putsf(0, 0, "Type Code Over USB");
+        rb->lcd_putsf(0, 1, "%s", accounts[idx].name);
+        rb->lcd_update();
+    }
+}
+#endif
+
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
@@ -1055,11 +1189,14 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     MENUITEM_STRINGLIST(menu, "One-Time Password Manager", NULL,
-                        "Add Account",
-                        "Generate Code",
-                        "Help",
-                        "Advanced",
-                        "Quit");
+                        "Add Account", // 0
+                        "Generate Code", // 1
+#ifdef USB_ENABLE_HID
+                        "Type Code Over USB", // 2
+#endif
+                        "Help", // 2/3
+                        "Advanced", // 3/4
+                        "Quit"); // 4/5
 
     bool quit = false;
     int sel = 0;
@@ -1073,6 +1210,20 @@ enum plugin_status plugin_start(const void* parameter)
         case 1:
             gen_codes();
             break;
+#ifdef USB_ENABLE_HID
+        case 2:
+            type_codes();
+            break;
+        case 3:
+            show_help();
+            break;
+        case 4:
+            adv_menu();
+            break;
+        case 5:
+            quit = 1;
+            break;
+#else
         case 2:
             show_help();
             break;
@@ -1084,6 +1235,7 @@ enum plugin_status plugin_start(const void* parameter)
             break;
         default:
             break;
+#endif
         }
     }
 
