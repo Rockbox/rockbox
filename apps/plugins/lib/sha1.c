@@ -111,6 +111,10 @@ sha1_finish_ctx (struct sha1_ctx *ctx, void *resbuf)
    digest.  */
 void *sha1_buffer (const char *buffer, size_t len, void *resblock)
 {
+#if CONFIG_CPU == S5L8702 && !defined(SIMULATOR)
+    rb->s5l8702_sha1((char*)buffer, len, resblock);
+    return resblock;
+#else
   struct sha1_ctx ctx;
 
   /* Initialize the computation context.  */
@@ -121,6 +125,7 @@ void *sha1_buffer (const char *buffer, size_t len, void *resblock)
 
   /* Put result in desired memory area.  */
   return sha1_finish_ctx (&ctx, resblock);
+#endif
 }
 
 void
@@ -396,11 +401,7 @@ hmac_sha1 (const void *key, size_t keylen,
 
   if (keylen > 64)
     {
-      struct sha1_ctx keyhash;
-
-      sha1_init_ctx (&keyhash);
-      sha1_process_bytes (key, keylen, &keyhash);
-      sha1_finish_ctx (&keyhash, optkeybuf);
+      sha1_buffer(key, keylen, optkeybuf);
 
       key = optkeybuf;
       keylen = 20;
@@ -432,3 +433,97 @@ hmac_sha1 (const void *key, size_t keylen,
 
   return 0;
 }
+
+/* code below by Franklin Wei */
+
+void hmac_sha1_init(struct hmac_ctx *ctx, const void *key, size_t keylen)
+{
+    /* Reduce the key's size, so that it becomes <= 64 bytes large.  */
+    ctx->key = key;
+    ctx->keylen = keylen;
+
+    if (ctx->keylen > 64)
+    {
+        struct sha1_ctx keyhash;
+
+        sha1_init_ctx (&keyhash);
+        sha1_process_bytes (ctx->key, ctx->keylen, &keyhash);
+        sha1_finish_ctx (&keyhash, ctx->optkeybuf);
+
+        ctx->key = ctx->optkeybuf;
+        ctx->keylen = 20;
+    }
+
+    sha1_init_ctx(&ctx->inner);
+
+    memset (ctx->block, IPAD, sizeof (ctx->block));
+    memxor (ctx->block, ctx->key, ctx->keylen);
+
+    sha1_process_block (ctx->block, 64, &ctx->inner);
+}
+
+void hmac_sha1_process_bytes(struct hmac_ctx *ctx, const void *in, size_t inlen)
+{
+    sha1_process_bytes(in, inlen, &ctx->inner);
+}
+
+void hmac_sha1_finish_ctx(struct hmac_ctx *ctx, void *resbuf)
+{
+    char innerhash[20];
+
+    sha1_finish_ctx (&ctx->inner, innerhash);
+
+    /* Compute result from KEY and INNERHASH.  */
+
+    sha1_init_ctx (&ctx->outer);
+
+    memset (ctx->block, OPAD, sizeof (ctx->block));
+    memxor (ctx->block, ctx->key, ctx->keylen);
+
+    sha1_process_block (ctx->block, 64, &ctx->outer);
+    sha1_process_bytes (innerhash, 20, &ctx->outer);
+
+    sha1_finish_ctx (&ctx->outer, resbuf);
+}
+
+#if CONFIG_CPU == S5L8702 && !defined(SIMULATOR)
+
+/* HACK ALERT!!! */
+/* in must point to 64 bytes into region of at least 64 + MAX(inlen, 20) bytes */
+/* trades logic for speed */
+/* will overwrite in */
+/* can operate in-place (in = resbuf) */
+int
+hmac_sha1_hwaccel (const void *key, size_t keylen,
+                   void *in, size_t inlen, void *resbuf)
+{
+  char optkeybuf[20];
+  char *block = in - 64;
+
+  /* Reduce the key's size, so that it becomes <= 64 bytes large.  */
+
+  if (keylen > 64)
+  {
+      rb->s5l8702_sha1((void*)key, keylen, optkeybuf);
+
+      key = optkeybuf;
+      keylen = 20;
+  }
+
+  /* Compute INNERHASH from KEY and IN.  */
+
+  memset (block, IPAD, 64);
+  memxor (block, key, keylen);
+
+  rb->s5l8702_sha1(block, 64 + inlen, in); // 64 bytes past block is `in'
+
+  /* Compute result from KEY and INNERHASH.  */
+
+  memset (block, OPAD, 64);
+  memxor (block, key, keylen);
+
+  rb->s5l8702_sha1(block, 64 + 20, resbuf);
+
+  return 0;
+}
+#endif

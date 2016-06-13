@@ -116,6 +116,9 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "rbpaths.h"
 #include "core_alloc.h"
 #include "screen_access.h"
+#if CONFIG_CPU == S5L8702
+#include "crypto-s5l8702.h"
+#endif
 
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
@@ -160,12 +163,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 233
+#define PLUGIN_API_VERSION 235
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 233
+#define PLUGIN_MIN_API_VERSION 234
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -561,6 +564,7 @@ struct plugin_api {
     void (*usb_acknowledge)(long id);
 #ifdef USB_ENABLE_HID
     void (*usb_hid_send)(usage_page_t usage_page, int id);
+    uint8_t (*usb_hid_leds)(void);
 #endif
 #ifdef RB_PROFILE
     void (*profile_thread)(void);
@@ -977,6 +981,13 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+#if CONFIG_CPU == S5L8702 && !defined(SIMULATOR)
+    void (*s5l8702_hwkeyaes)(enum hwkeyaes_direction direction,
+                             uint32_t keyidx, void* data, uint32_t size);
+
+    void (*s5l8702_sha1)(const void* data, uint32_t size, void* hash);
+#endif
 };
 
 /* plugin header */
