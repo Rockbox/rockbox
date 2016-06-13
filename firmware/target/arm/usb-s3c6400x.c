@@ -621,3 +621,14 @@ int usb_drv_send(int ep, void *ptr, int len)
         semaphore_wait(&endpoint->complete, HZ);
     return endpoint->status;
 }
+
+int usb_drv_recv_blocking(int ep, void *ptr, int len)
+{
+    ep = EP_NUM(ep);
+    struct ep_type *endpoint = &endpoints[ep][0];
+    endpoint->done = false;
+    ep_transfer(ep, ptr, len, true);
+    while (endpoint->busy && !endpoint->done && usb_detect() != USB_EXTRACTED)
+        semaphore_wait(&endpoint->complete, HZ);
+    return endpoint->status;
+}
