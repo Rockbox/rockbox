@@ -25,17 +25,22 @@
 
 #include "plugin.h"
 
+#include "lib/aes.h"
 #include "lib/display_text.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/pluginlib_exit.h"
 #include "lib/sha1.h"
 
+/* don't change these if you want to maintain backwards compatibility */
 #define MAX_NAME   50
 #define SECRET_MAX 256
 #define URI_MAX    256
 #define ACCT_FILE  PLUGIN_APPS_DATA_DIR "/otp.dat"
+#define PASS_MAX 32
 
 #define MAX(a, b) (((a)>(b))?(a):(b))
+
+#define assert(x) (!(x)?assert_fail():0)
 
 struct account_t {
     char name[MAX_NAME];
@@ -53,15 +58,41 @@ struct account_t {
     int sec_len;
 };
 
-static int max_accts = 0;
-
 /* in plugin buffer */
 static struct account_t *accounts = NULL;
 
+/* global variables */
+
+static int max_accts = 0; // dynamic, depends on plugin buffer size
 static int next_slot = 0;
 
 /* in SECONDS, asked for on first run */
 static int time_offs = 0;
+static bool encrypted = false;
+
+static char enc_password[PASS_MAX + 1]; // encryption password
+static char data_buf[MAX(MAX_NAME, MAX(SECRET_MAX * 2, sizeof(struct account_t)))];
+static char temp_sec[SECRET_MAX];
+
+static void wipe_buf(void *ptr, size_t len)
+{
+    rb->memset(ptr, 0, len);
+}
+
+static void erase_sensitive_info(void)
+{
+    wipe_buf(accounts, sizeof(struct account_t) * max_accts);
+    wipe_buf(enc_password, sizeof(enc_password));
+    wipe_buf(temp_sec, sizeof(temp_sec));
+}
+
+static void acct_menu(const char *title, void (*cb)(int acct));
+
+static void assert_fail(void)
+{
+    rb->splashf(HZ * 2, "Assertion failed! REPORT ME!");
+    exit(0);
+}
 
 static int HOTP(unsigned char *secret, size_t sec_len, uint64_t ctr, int digits)
 {
@@ -96,6 +127,8 @@ static time_t get_utc(void)
 
 static int TOTP(unsigned char *secret, size_t sec_len, uint64_t step, int digits)
 {
+    if(!step)
+        return -1;
     uint64_t tm = get_utc() / step;
     return HOTP(secret, sec_len, tm, digits);
 }
@@ -128,78 +161,78 @@ static bool acct_exists(const char *name)
 // limitations under the License.
 
 static int base32_decode(uint8_t *result, int bufSize, const uint8_t *encoded) {
-  int buffer = 0;
-  int bitsLeft = 0;
-  int count = 0;
-  for (const uint8_t *ptr = encoded; count < bufSize && *ptr; ++ptr) {
-    uint8_t ch = *ptr;
-    if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n' || ch == '-') {
-      continue;
-    }
-    buffer <<= 5;
+    int buffer = 0;
+    int bitsLeft = 0;
+    int count = 0;
+    for (const uint8_t *ptr = encoded; count < bufSize && *ptr; ++ptr) {
+        uint8_t ch = *ptr;
+        if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n' || ch == '-') {
+            continue;
+        }
+        buffer <<= 5;
 
-    // Deal with commonly mistyped characters
-    if (ch == '0') {
-      ch = 'O';
-    } else if (ch == '1') {
-      ch = 'L';
-    } else if (ch == '8') {
-      ch = 'B';
-    }
+        // Deal with commonly mistyped characters
+        if (ch == '0') {
+            ch = 'O';
+        } else if (ch == '1') {
+            ch = 'L';
+        } else if (ch == '8') {
+            ch = 'B';
+        }
 
-    // Look up one base32 digit
-    if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
-      ch = (ch & 0x1F) - 1;
-    } else if (ch >= '2' && ch <= '7') {
-      ch -= '2' - 26;
-    } else {
-      return -1;
-    }
+        // Look up one base32 digit
+        if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
+            ch = (ch & 0x1F) - 1;
+        } else if (ch >= '2' && ch <= '7') {
+            ch -= '2' - 26;
+        } else {
+            return -1;
+        }
 
-    buffer |= ch;
-    bitsLeft += 5;
-    if (bitsLeft >= 8) {
-      result[count++] = buffer >> (bitsLeft - 8);
-      bitsLeft -= 8;
+        buffer |= ch;
+        bitsLeft += 5;
+        if (bitsLeft >= 8) {
+            result[count++] = buffer >> (bitsLeft - 8);
+            bitsLeft -= 8;
+        }
     }
-  }
-  if (count < bufSize) {
-    result[count] = '\000';
-  }
-  return count;
+    if (count < bufSize) {
+        result[count] = '\000';
+    }
+    return count;
 }
 
 static int base32_encode(const uint8_t *data, int length, uint8_t *result,
                          int bufSize) {
-  if (length < 0 || length > (1 << 28)) {
-    return -1;
-  }
-  int count = 0;
-  if (length > 0) {
-    int buffer = data[0];
-    int next = 1;
-    int bitsLeft = 8;
-    while (count < bufSize && (bitsLeft > 0 || next < length)) {
-      if (bitsLeft < 5) {
-        if (next < length) {
-          buffer <<= 8;
-          buffer |= data[next++] & 0xFF;
-          bitsLeft += 8;
-        } else {
-          int pad = 5 - bitsLeft;
-          buffer <<= pad;
-          bitsLeft += pad;
-        }
-      }
-      int index = 0x1F & (buffer >> (bitsLeft - 5));
-      bitsLeft -= 5;
-      result[count++] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"[index];
+    if (length < 0 || length > (1 << 28)) {
+        return -1;
     }
-  }
-  if (count < bufSize) {
-    result[count] = '\000';
-  }
-  return count;
+    int count = 0;
+    if (length > 0) {
+        int buffer = data[0];
+        int next = 1;
+        int bitsLeft = 8;
+        while (count < bufSize && (bitsLeft > 0 || next < length)) {
+            if (bitsLeft < 5) {
+                if (next < length) {
+                    buffer <<= 8;
+                    buffer |= data[next++] & 0xFF;
+                    bitsLeft += 8;
+                } else {
+                    int pad = 5 - bitsLeft;
+                    buffer <<= pad;
+                    bitsLeft += pad;
+                }
+            }
+            int index = 0x1F & (buffer >> (bitsLeft - 5));
+            bitsLeft -= 5;
+            result[count++] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"[index];
+        }
+    }
+    if (count < bufSize) {
+        result[count] = '\000';
+    }
+    return count;
 }
 
 /***********************************************************************
@@ -222,16 +255,68 @@ static bool browse( char *dst, int dst_size, const char *start )
     return (browse.flags & BROWSE_SELECTED);
 }
 
+/* a simple AES128-CTR implementation */
+
+struct aes_ctr_ctx {
+    char key[16];
+    union {
+        char bytes[16];
+        uint64_t half[2];
+    } counter;
+    /* one block */
+    char keystream[16];
+    uint8_t bytes_left;
+};
+
+static void aes_ctr_init(struct aes_ctr_ctx *ctx, const char *key, uint64_t nonce)
+{
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(true);
+#endif
+    rb->memcpy(ctx->key, key, 16);
+    ctx->counter.half[0] = nonce;
+    ctx->counter.half[1] = 0;
+    ctx->bytes_left = 0;
+}
+
+static void aes_ctr_nextblock(struct aes_ctr_ctx *ctx)
+{
+    AES128_ECB_encrypt((char*)&ctx->counter, ctx->key, ctx->keystream);
+    ctx->counter.half[1]++;
+    ctx->bytes_left = 16;
+}
+
+/* should be safe to operate in-place */
+static void aes_ctr_process(struct aes_ctr_ctx *ctx, const unsigned char *in, unsigned char *out, size_t len)
+{
+    while(len--)
+    {
+        if(!ctx->bytes_left)
+            aes_ctr_nextblock(ctx);
+        *out++ = *in++ ^ ctx->keystream[16 - ctx->bytes_left--];
+    }
+}
+
+static void aes_ctr_destroy(struct aes_ctr_ctx *ctx)
+{
+    wipe_buf(ctx, sizeof(*ctx));
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(false);
+#endif
+}
+
 static bool read_accts(void)
 {
     int fd = rb->open(ACCT_FILE, O_RDONLY);
     if(fd < 0)
         return false;
 
-    char buf[4];
-    char magic[4] = { 'O', 'T', 'P', '1' };
+    unsigned char buf[4];
+    /* two versions to maintain backwards-compatibility */
+    const char *magic_old = "OTP1";
+    const char *magic = "OTP2";
     rb->read(fd, buf, 4);
-    if(memcmp(magic, buf, 4))
+    if(rb->memcmp(magic, buf, 4) && rb->memcmp(magic_old, buf, 4))
     {
         rb->splash(HZ * 2, "Corrupt save data!");
         rb->close(fd);
@@ -239,6 +324,86 @@ static bool read_accts(void)
     }
 
     rb->read(fd, &time_offs, sizeof(time_offs));
+
+    if(!rb->memcmp(magic, buf, 4))
+    {
+        /* version 2 */
+        rb->read(fd, &encrypted, sizeof(encrypted));
+        if(encrypted)
+        {
+            uint64_t nonce;
+            rb->read(fd, &nonce, sizeof(nonce));
+
+            /* read in the hash, which is encrypted */
+            /* in order to detect proper decryption, we must decrypt
+             * the hash and account data, and ensure that the
+             * calculated hash matches the given hash */
+            char hash_enc[20];
+            rb->read(fd, hash_enc, sizeof(hash_enc));
+
+            /* also read the encrypted data into memory */
+            while(next_slot < max_accts)
+            {
+                if(rb->read(fd, accounts + next_slot, sizeof(struct account_t)) != sizeof(struct account_t))
+                    break;
+                ++next_slot;
+            }
+
+            rb->close(fd);
+
+            for(int i = 0; i < 3; ++i)
+            {
+                rb->splash(HZ * 2, "Enter password:");
+                enc_password[0] = '\0';
+                if(rb->kbd_input(enc_password, sizeof(enc_password)) < 0)
+                {
+                    rb->close(fd);
+                    exit(PLUGIN_ERROR);
+                }
+
+                /* decrypt the data with AES128-CTR */
+                /* the HMAC-SHA-1 of the password and nonce is
+                 * truncated to form the key */
+                char key[20];
+
+                hmac_sha1(&nonce, sizeof(nonce), enc_password, rb->strlen(enc_password), key);
+
+                struct aes_ctr_ctx aes_ctx;
+
+                aes_ctr_init(&aes_ctx, key, nonce);
+
+                char hash_given[20];
+                aes_ctr_process(&aes_ctx, hash_enc, hash_given, sizeof(hash_given));
+
+                aes_ctr_process(&aes_ctx, (const unsigned char*)accounts, (char*)accounts, sizeof(struct account_t) * next_slot);
+
+                char hash_calculated[20];
+                sha1_buffer((const char*)accounts, sizeof(struct account_t) * next_slot, hash_calculated);
+
+                aes_ctr_destroy(&aes_ctx);
+
+                if(rb->memcmp(hash_calculated, hash_given, 20) != 0)
+                {
+                    /* failed attempt, we restore the account data
+                     * which was decrypted in-place by encrypting it
+                     * again with the given parameters */
+                    aes_ctr_init(&aes_ctx, key, nonce);
+                    aes_ctr_process(&aes_ctx, hash_enc, hash_given, sizeof(hash_given));
+                    aes_ctr_process(&aes_ctx, (const unsigned char*)accounts, (char*)accounts, sizeof(struct account_t) * next_slot);
+                    aes_ctr_destroy(&aes_ctx);
+                    rb->splash(HZ, "Wrong password!");
+                    continue;
+                }
+
+                /* successful decryption */
+                return true;
+            }
+
+            exit(PLUGIN_ERROR);
+        }
+    }
+
+    /* plain, unencrypted format */
 
     while(next_slot < max_accts)
     {
@@ -254,13 +419,68 @@ static bool read_accts(void)
 static void save_accts(void)
 {
     int fd = rb->open(ACCT_FILE, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-    rb->fdprintf(fd, "OTP1");
+
+    rb->fdprintf(fd, "OTP2");
 
     rb->write(fd, &time_offs, sizeof(time_offs));
+    rb->write(fd, &encrypted, sizeof(encrypted));
 
-    for(int i = 0; i < next_slot; ++i)
-        rb->write(fd, accounts + i, sizeof(struct account_t));
+    assert(sizeof(data_buf) >= sizeof(struct account_t));
+    assert(sizeof(data_buf) >= 20); // needs to hold an SHA-1 hash
+
+    if(encrypted)
+    {
+        /* encrypt the data with AES128-CTR */
+
+        /* generate/write the nonce */
+        uint64_t nonce = *rb->current_tick;
+#if CONFIG_RTC
+        nonce |= (uint64_t)get_utc() << 32;
+#endif
+
+        rb->write(fd, &nonce, sizeof(nonce));
+
+        /* the HMAC-SHA-1 of the password and nonce is truncated to
+         * 128 bits to form the AES key. a salted MD5 would work, but
+         * an HMAC is more readily available and better suited to this
+         * purpose */
+        char key[20];
+
+        hmac_sha1(&nonce, sizeof(nonce), enc_password, rb->strlen(enc_password), key);
+
+        struct aes_ctr_ctx aes_ctx;
+        aes_ctr_init(&aes_ctx, key, nonce);
+
+        /* write the encrypted SHA-1 of the data to ensure integrity
+         * and alert the decrypting end of validity */
+        sha1_buffer((const char*)accounts, sizeof(struct account_t) * next_slot, data_buf);
+        aes_ctr_process(&aes_ctx, data_buf, data_buf, 20);
+        rb->write(fd, data_buf, 20);
+
+        for(int i = 0; i < next_slot; ++i)
+        {
+            aes_ctr_process(&aes_ctx, (unsigned char*)(accounts + i), data_buf, sizeof(struct account_t));
+            rb->write(fd, data_buf, sizeof(struct account_t));
+        }
+
+        aes_ctr_destroy(&aes_ctx);
+    }
+    else
+        for(int i = 0; i < next_slot; ++i)
+            rb->write(fd, accounts + i, sizeof(struct account_t));
+
     rb->close(fd);
+}
+
+static int compare_acct(const void *a, const void *b)
+{
+    const struct account_t *a1 = a, *b1 = b;
+    return rb->strcmp(a1->name, b1->name);
+}
+
+static void sort_accts(void)
+{
+    rb->qsort(accounts, next_slot, sizeof(struct account_t), compare_acct);
 }
 
 static void add_acct_file(void)
@@ -272,7 +492,7 @@ static void add_acct_file(void)
     {
         int fd = rb->open(fname, O_RDONLY);
         do {
-            memset(accounts + next_slot, 0, sizeof(struct account_t));
+            rb->memset(accounts + next_slot, 0, sizeof(struct account_t));
 
             accounts[next_slot].digits = 6;
 
@@ -397,6 +617,7 @@ static void add_acct_file(void)
     else
     {
         rb->splashf(HZ * 2, "Added %d account(s).", next_slot - before);
+        sort_accts();
         save_accts();
     }
 }
@@ -408,9 +629,9 @@ static void add_acct_manual(void)
         rb->splashf(HZ * 2, "Account limit reached!");
         return;
     }
-    memset(accounts + next_slot, 0, sizeof(struct account_t));
+    rb->memset(accounts + next_slot, 0, sizeof(struct account_t));
 
-    rb->splash(HZ * 1, "Enter account name.");
+    rb->splash(HZ * 1, "Enter account name:");
     if(rb->kbd_input(accounts[next_slot].name, sizeof(accounts[next_slot].name)) < 0)
         return;
 
@@ -420,10 +641,10 @@ static void add_acct_manual(void)
         return;
     }
 
-    rb->splash(HZ * 2, "Enter base32-encoded secret.");
+    rb->splash(HZ * 2, "Enter Base32-encoded secret:");
 
     char temp_buf[SECRET_MAX * 2];
-    memset(temp_buf, 0, sizeof(temp_buf));
+    rb->memset(temp_buf, 0, sizeof(temp_buf));
 
     if(rb->kbd_input(temp_buf, sizeof(temp_buf)) < 0)
         return;
@@ -435,7 +656,7 @@ static void add_acct_manual(void)
     }
 
 #if CONFIG_RTC
-    const struct text_message prompt = { (const char*[]) {"Is this a TOTP account?", "The protocol can be determined from the URI."}, 2};
+    const struct text_message prompt = { (const char*[]) {"Is this a TOTP (time-based) account?", "The protocol can be determined from the URI."}, 2};
     enum yesno_res response = rb->gui_syncyesno_run(&prompt, NULL, NULL);
     if(response == YESNO_NO)
         accounts[next_slot].is_totp = false;
@@ -443,16 +664,16 @@ static void add_acct_manual(void)
         accounts[next_slot].is_totp = true;
 #endif
 
-    memset(temp_buf, 0, sizeof(temp_buf));
+    rb->memset(temp_buf, 0, sizeof(temp_buf));
 
     if(!accounts[next_slot].is_totp)
     {
-        rb->splash(HZ * 2, "Enter counter (0 is normal).");
+        rb->splash(HZ * 2, "Enter counter (0 is typical):");
         temp_buf[0] = '0';
     }
     else
     {
-        rb->splash(HZ * 2, "Enter time step (30 is normal).");
+        rb->splash(HZ * 2, "Enter time step (30 is typical):");
         temp_buf[0] = '3';
         temp_buf[1] = '0';
     }
@@ -465,9 +686,9 @@ static void add_acct_manual(void)
     else
         accounts[next_slot].totp_period = rb->atoi(temp_buf);
 
-    rb->splash(HZ * 2, "Enter code length (6 is normal).");
+    rb->splash(HZ * 2, "Enter code length (6 is typical):");
 
-    memset(temp_buf, 0, sizeof(temp_buf));
+    rb->memset(temp_buf, 0, sizeof(temp_buf));
     temp_buf[0] = '6';
 
     if(rb->kbd_input(temp_buf, sizeof(temp_buf)) < 0)
@@ -483,6 +704,7 @@ static void add_acct_manual(void)
 
     ++next_slot;
 
+    sort_accts();
     save_accts();
 
     rb->splashf(HZ * 2, "Success.");
@@ -490,8 +712,8 @@ static void add_acct_manual(void)
 
 static void add_acct(void)
 {
-    MENUITEM_STRINGLIST(menu, "Add Account", NULL,
-                        "From URI on disk",
+    MENUITEM_STRINGLIST(menu, "Import Account(s)", NULL,
+                        "From URI List",
                         "Manual Entry",
                         "Back");
     int sel = 0;
@@ -514,6 +736,30 @@ static void add_acct(void)
     }
 }
 
+/* core algorithm */
+static int next_code(int acct)
+{
+    if(!accounts[acct].is_totp)
+    {
+        int ret = HOTP(accounts[acct].secret,
+                       accounts[acct].sec_len,
+                       accounts[acct].hotp_counter,
+                       accounts[acct].digits);
+        ++accounts[acct].hotp_counter;
+        return ret;
+    }
+#if CONFIG_RTC
+    else
+    {
+        return TOTP(accounts[acct].secret,
+                    accounts[acct].sec_len,
+                    accounts[acct].totp_period,
+                    accounts[acct].digits);
+    }
+#endif
+    return 0;
+}
+
 static void show_code(int acct)
 {
     /* rockbox's printf doesn't support a variable field width afaik */
@@ -521,20 +767,13 @@ static void show_code(int acct)
     if(!accounts[acct].is_totp)
     {
         rb->snprintf(format_buf, sizeof(format_buf), "%%0%dd", accounts[acct].digits);
-        rb->splashf(0, format_buf, HOTP(accounts[acct].secret,
-                                        accounts[acct].sec_len,
-                                        accounts[acct].hotp_counter,
-                                        accounts[acct].digits));
-        ++accounts[acct].hotp_counter;
+        rb->splashf(0, format_buf, next_code(acct));
     }
 #if CONFIG_RTC
     else
     {
         rb->snprintf(format_buf, sizeof(format_buf), "%%0%dd (%%ld second(s) left)", accounts[acct].digits);
-        rb->splashf(0, format_buf, TOTP(accounts[acct].secret,
-                                        accounts[acct].sec_len,
-                                        accounts[acct].totp_period,
-                                        accounts[acct].digits),
+        rb->splashf(0, format_buf, next_code(acct),
                     accounts[acct].totp_period - get_utc() % accounts[acct].totp_period);
     }
 #else
@@ -553,57 +792,12 @@ static void show_code(int acct)
     }
 
     save_accts();
-    rb->lcd_clear_display();
+    rb->lcd_update();
 }
 
 static void gen_codes(void)
 {
-    rb->lcd_clear_display();
-    /* native menus don't seem to support dynamic names easily, so we
-     * roll our own */
-    static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
-    int idx = 0;
-    if(next_slot > 0)
-    {
-        rb->lcd_putsf(0, 0, "Generate Code");
-        rb->lcd_putsf(0, 1, "%s", accounts[0].name);
-        rb->lcd_update();
-    }
-    else
-    {
-        rb->splash(HZ * 2, "No accounts configured!");
-        return;
-    }
-    while(1)
-    {
-        int button = pluginlib_getaction(-1, plugin_contexts, ARRAYLEN(plugin_contexts));
-        switch(button)
-        {
-        case PLA_LEFT:
-            --idx;
-            if(idx < 0)
-                idx = next_slot - 1;
-            break;
-        case PLA_RIGHT:
-            ++idx;
-            if(idx >= next_slot)
-                idx = 0;
-            break;
-        case PLA_SELECT:
-            show_code(idx);
-            break;
-        case PLA_CANCEL:
-        case PLA_EXIT:
-            exit_on_usb(button);
-            return;
-        default:
-            break;
-        }
-        rb->lcd_clear_display();
-        rb->lcd_putsf(0, 0, "Generate Code");
-        rb->lcd_putsf(0, 1, "%s", accounts[idx].name);
-        rb->lcd_update();
-    }
+    acct_menu("Generate Code", show_code);
 }
 
 static bool danger_confirm(void)
@@ -632,10 +826,6 @@ static bool danger_confirm(void)
     }
 }
 
-char data_buf[MAX(MAX_NAME, SECRET_MAX * 2)];
-char temp_sec[SECRET_MAX];
-size_t old_len;
-
 static void edit_menu(int acct)
 {
     rb->splashf(HZ, "Editing account `%s'.", accounts[acct].name);
@@ -648,6 +838,9 @@ static void edit_menu(int acct)
                         "Change HOTP Counter",
                         "Change Digit Count",
                         "Change Shared Secret",
+#ifdef CONFIG_RTC
+                        "Change Type",
+#endif
                         "Back");
 
     MENUITEM_STRINGLIST(menu_2, "Edit Account", NULL,
@@ -656,7 +849,10 @@ static void edit_menu(int acct)
                         "Change TOTP Period", // 2
                         "Change Digit Count", // 3
                         "Change Shared Secret", // 4
-                        "Back"); // 5
+#ifdef CONFIG_RTC
+                        "Change Type", // 5
+#endif
+                        "Back"); // 6
 
     const struct menu_item_ex *menu = (accounts[acct].is_totp) ? &menu_2 : &menu_1;
 
@@ -667,7 +863,7 @@ static void edit_menu(int acct)
         switch(rb->do_menu(menu, &sel, NULL, false))
         {
         case 0: // rename
-            rb->splash(HZ, "Enter new name.");
+            rb->splash(HZ, "Enter new name:");
             rb->strlcpy(data_buf, accounts[acct].name, sizeof(data_buf));
             if(rb->kbd_input(data_buf, sizeof(data_buf)) < 0)
                 break;
@@ -677,8 +873,10 @@ static void edit_menu(int acct)
                 break;
             }
             rb->strlcpy(accounts[acct].name, data_buf, sizeof(accounts[acct].name));
+            sort_accts();
             save_accts();
-            break;
+            rb->splash(HZ, "Success.");
+            return;
         case 1: // delete
             if(danger_confirm())
             {
@@ -693,7 +891,7 @@ static void edit_menu(int acct)
             break;
         case 2: // HOTP counter OR TOTP period
             if(accounts[acct].is_totp)
-                rb->snprintf(data_buf, sizeof(data_buf), "%d", (int)accounts[acct].hotp_counter);
+                rb->snprintf(data_buf, sizeof(data_buf), "%u", (unsigned int) accounts[acct].hotp_counter);
             else
                 rb->snprintf(data_buf, sizeof(data_buf), "%d", accounts[acct].totp_period);
 
@@ -720,8 +918,12 @@ static void edit_menu(int acct)
             rb->splash(HZ, "Success.");
             break;
         case 4: // secret
-            old_len = accounts[acct].sec_len;
-            memcpy(temp_sec, accounts[acct].secret, accounts[acct].sec_len);
+        {
+            /* save the old secret */
+            size_t old_len = accounts[acct].sec_len;
+            rb->memcpy(temp_sec, accounts[acct].secret, accounts[acct].sec_len);
+
+            /* encode */
             base32_encode(accounts[acct].secret, accounts[acct].sec_len, data_buf, sizeof(data_buf));
 
             if(rb->kbd_input(data_buf, sizeof(data_buf)) < 0)
@@ -730,7 +932,7 @@ static void edit_menu(int acct)
             int ret = base32_decode(accounts[acct].secret, sizeof(accounts[acct].secret), data_buf);
             if(ret <= 0)
             {
-                memcpy(accounts[acct].secret, temp_sec, SECRET_MAX);
+                rb->memcpy(accounts[acct].secret, temp_sec, SECRET_MAX);
                 accounts[acct].sec_len = old_len;
                 rb->splash(HZ * 2, "Invalid Base32 secret!");
                 break;
@@ -738,9 +940,38 @@ static void edit_menu(int acct)
             accounts[acct].sec_len = ret;
 
             save_accts();
+
             rb->splash(HZ, "Success.");
+
             break;
+        }
+#ifdef CONFIG_RTC
         case 5:
+        {
+            MENUITEM_STRINGLIST(type_menu, "Choose Type", NULL,
+                                "TOTP",
+                                "HOTP",
+                                "Back");
+            int sel = accounts[acct].is_totp ? 0 : 1;
+
+            switch(rb->do_menu(&type_menu, &sel, NULL, false))
+            {
+            case 0:
+                accounts[acct].is_totp = true;
+                break;
+            case 1:
+                accounts[acct].is_totp = false;
+                break;
+            case 2:
+                break;
+            }
+            menu = (accounts[acct].is_totp) ? &menu_2 : &menu_1;
+            break;
+        }
+        case 6:
+#else
+        case 5:
+#endif
             quit = true;
             break;
         default:
@@ -751,61 +982,12 @@ static void edit_menu(int acct)
 
 static void edit_accts(void)
 {
-    rb->lcd_clear_display();
-    /* native menus don't seem to support dynamic names easily, so we
-     * roll our own */
-    static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
-    int idx = 0;
-    if(next_slot > 0)
-    {
-        rb->lcd_putsf(0, 0, "Edit Account");
-        rb->lcd_putsf(0, 1, "%s", accounts[0].name);
-        rb->lcd_update();
-    }
-    else
-    {
-        rb->splash(HZ * 2, "No accounts configured!");
-        return;
-    }
-    while(1)
-    {
-        int button = pluginlib_getaction(-1, plugin_contexts, ARRAYLEN(plugin_contexts));
-        switch(button)
-        {
-        case PLA_LEFT:
-            --idx;
-            if(idx < 0)
-                idx = next_slot - 1;
-            break;
-        case PLA_RIGHT:
-            ++idx;
-            if(idx >= next_slot)
-                idx = 0;
-            break;
-        case PLA_SELECT:
-            edit_menu(idx);
-            if(!next_slot)
-                return;
-            if(idx == next_slot)
-                idx = 0;
-            break;
-        case PLA_CANCEL:
-        case PLA_EXIT:
-            return;
-        default:
-            exit_on_usb(button);
-            break;
-        }
-        rb->lcd_clear_display();
-        rb->lcd_putsf(0, 0, "Edit Account");
-        rb->lcd_putsf(0, 1, "%s", accounts[idx].name);
-        rb->lcd_update();
-    }
+    acct_menu("Edit Account", edit_menu);
 }
 
 #if CONFIG_RTC
 
-/* label is like this: [+/-]HH:MM ... */
+/* label is like this: UTC([+/-]HH:MM ...) */
 static int get_time_seconds(const char *label)
 {
     if(!rb->strcmp(label, "UTC"))
@@ -831,7 +1013,7 @@ static int get_time_seconds(const char *label)
 /* returns the offset in seconds associated with a time zone */
 static int get_time_offs(void)
 {
-    MENUITEM_STRINGLIST(menu, "Select Time Offset", NULL,
+    MENUITEM_STRINGLIST(menu, "Select Time Zone", NULL,
                         "UTC-12:00", // 0
                         "UTC-11:00", // 1
                         "UTC-10:00 (HAST)", // 2
@@ -891,7 +1073,8 @@ static int get_time_offs(void)
     return get_time_seconds(label);
 
 #if 0
-    /* provided in case menu internals change */
+    /* kept just in case menu internals change and the above code
+     * breaks */
     switch(rb->do_menu(&menu, &sel, NULL, false))
     {
     case 0: case 1: case 2:
@@ -954,13 +1137,164 @@ static int get_time_offs(void)
 }
 #endif
 
+static void export_uri_list(void)
+{
+    static char buf[MAX(MAX_PATH, SECRET_MAX * 2)];
+    buf[0] = '/';
+    buf[1] = '\0';
+    rb->splash(HZ * 2, "Enter output filename:");
+    if(rb->kbd_input(buf, sizeof(buf)) < 0)
+        return;
+
+    if(rb->file_exists(buf))
+    {
+        rb->splash(HZ, "File already exists!");
+        return;
+    }
+
+    int fd = rb->open(buf, O_WRONLY | O_CREAT | O_TRUNC);
+    if(fd < 0)
+    {
+        rb->splashf(HZ, "Couldn't open file.");
+        return;
+    }
+
+    for(int i = 0; i < next_slot ; ++i)
+    {
+        base32_encode(accounts[i].secret, accounts[i].sec_len, buf, sizeof(buf));
+        rb->fdprintf(fd, "otpauth://%s/%s?secret=%s&digits=%d", accounts[i].is_totp ? "totp" : "hotp",
+                     accounts[i].name, buf, accounts[i].digits);
+
+        if(accounts[i].is_totp)
+            rb->fdprintf(fd, "&period=%d", accounts[i].totp_period);
+        else
+            rb->fdprintf(fd, "&counter=%u", (unsigned) accounts[i].hotp_counter);
+        rb->fdprintf(fd, "\n");
+    }
+
+    rb->close(fd);
+
+    rb->splash(HZ, "Success.");
+}
+
+static void export_menu(void)
+{
+    MENUITEM_STRINGLIST(menu, "Export Accounts", NULL,
+                        "To URI List",
+                        "Back");
+
+    int sel = 0;
+
+    switch(rb->do_menu(&menu, &sel, NULL, false))
+    {
+    case 0:
+        export_uri_list();
+        break;
+    case 1:
+        return;
+    }
+}
+
+static void encrypt_menu(void)
+{
+    MENUITEM_STRINGLIST(encrypt_menu_1, "Encryption", NULL,
+                        "Change Password",
+                        "Disable",
+                        "Back");
+
+    MENUITEM_STRINGLIST(encrypt_menu_2, "Encryption", NULL,
+                        "Enable",
+                        "Back");
+
+    const struct menu_item_ex *menu = encrypted ? &encrypt_menu_1 : &encrypt_menu_2;
+
+    switch(rb->do_menu(menu, NULL, NULL, false))
+    {
+    case 0:
+    {
+        char temp_pass[sizeof(enc_password)];
+        char temp_pass2[sizeof(enc_password)];
+
+        temp_pass[0] = '\0';
+
+        if(encrypted)
+        {
+            rb->splash(HZ * 2, "Enter current password:");
+
+            if(rb->kbd_input(temp_pass, sizeof(temp_pass)) < 0)
+                break;
+
+            if(rb->strcmp(enc_password, temp_pass))
+            {
+                rb->splashf(HZ * 2, "Wrong password!");
+                break;
+            }
+
+            temp_pass[0] = '\0';
+        }
+
+        rb->splash(HZ * 2, "Enter new password:");
+
+        if(rb->kbd_input(temp_pass, sizeof(temp_pass)) < 0)
+            break;
+
+        temp_pass2[0] = '\0';
+
+        rb->splash(HZ * 2, "Re-enter new password:");
+
+        if(rb->kbd_input(temp_pass2, sizeof(temp_pass2)) < 0)
+            break;
+
+        if(rb->strcmp(temp_pass, temp_pass2))
+        {
+            rb->splash(HZ * 2, "Passwords do not match!");
+            break;
+        }
+
+        rb->strlcpy(enc_password, temp_pass, sizeof(enc_password));
+
+        encrypted = true;
+        rb->splash(HZ * 2, "Success.");
+        break;
+    }
+    case 1:
+    {
+        if(menu == &encrypt_menu_1)
+        {
+            char temp_pass[sizeof(enc_password)];
+            temp_pass[0] = '\0';
+
+            rb->splash(HZ * 2, "Enter current password:");
+
+            if(rb->kbd_input(temp_pass, sizeof(temp_pass)) < 0)
+                break;
+
+            if(rb->strcmp(enc_password, temp_pass))
+            {
+                rb->splash(HZ * 2, "Wrong password!");
+                break;
+            }
+
+            rb->splash(HZ * 2, "Success.");
+            encrypted = false;
+        }
+        /* fall through */
+    }
+    case 2:
+    default:
+        break;
+    }
+}
+
 static void adv_menu(void)
 {
     MENUITEM_STRINGLIST(menu, "Advanced", NULL,
                         "Edit Account",
-                        "Delete ALL accounts",
+                        "Export Accounts",
+                        "Encryption",
+                        "Delete ALL Accounts",
 #if CONFIG_RTC
-                        "Change Time Offset",
+                        "Select Time Zone",
 #endif
                         "Back");
 
@@ -974,6 +1308,14 @@ static void adv_menu(void)
             edit_accts();
             break;
         case 1:
+            export_menu();
+            break;
+        case 2:
+        {
+            encrypt_menu();
+            break;
+        }
+        case 3:
             if(danger_confirm())
             {
                 next_slot = 0;
@@ -984,12 +1326,12 @@ static void adv_menu(void)
                 rb->splash(HZ, "Not confirmed.");
             break;
 #if CONFIG_RTC
-        case 2:
+        case 4:
             time_offs = get_time_offs();
             break;
-        case 3:
+        case 5:
 #else
-        case 2:
+        case 4:
 #endif
             quit = 1;
             break;
@@ -1013,19 +1355,275 @@ static void show_help(void)
 #endif
 
     static char *help_text[] = { "One-Time Password Manager", "",
+                                 "",
                                  "Introduction", "",
-                                 "This", "plugin", "allows", "you", "to", "generate", "one-time", "passwords", "to", "provide", "a", "second", "factor", "of", "authentication", "for", "services", "that", "support", "it.",
-                                 "It", "suppports", "both", "event-based", "(HOTP),", "and", "time-based", "(TOTP)", "password", "schemes.",
-                                 "In", "order", "to", "ensure", "proper", "functioning", "of", "time-based", "passwords", "ensure", "that", "the", "clock", "is", "accurate", "to", "within", "30", "seconds", "of", "actual", "time."
-                                 "Note", "that", "some", "devices", "lack", "a", "real-time", "clock,", "so", "time-based", "passwords", "are", "not", "supported", "on", "those", "targets." };
-
+                                 "This", "plugin", "allows", "you", "to", "generate", "one-time", "passwords", "as", "a", "second", "factor", "of", "authentication", "for", "online", "services", "which", "support", "it,", "such", "as", "GitHub", "and", "Google.",
+                                 "This", "plugin", "supports", "both", "counter-based", "(HOTP),", "and", "time-based", "(TOTP)", "password", "schemes.",
+                                 "",
+                                 "",
+                                 "Time Zone Configuration", "",
+                                 "On", "the", "first", "run", "of", "the", "plugin,", "you", "are", "asked", "for", "the", "time", "zone", "to", "which", "your", "system", "clock", "is", "set.",
+                                 "If", "you", "need", "to", "change", "this", "setting", "later,", "it", "is", "available", "under", "the", "'Advanced'", "menu", "option.",
+                                 "",
+                                 "",
+                                 "Account Setup", "",
+                                 "To", "add", "a", "new", "account,", "choose", "the", "'Import", "Account(s)'", "menu", "option.",
+                                 "There", "are", "two", "ways", "to", "import", "an", "account,", "either", "from", "a", "file", "containing", "account", "information", "in", "URI", "format,", "or", "manual", "entry.",
+                                 "",
+                                 "",
+                                 "URI Import", "",
+                                 "This", "method", "of", "adding", "an", "account", "reads", "a", "list", "of", "URIs", "from", "a", "file.",
+                                 "It", "expects", "each", "URI", "to", "be", "on", "a", "line", "by", "itself", "in", "the", "following", "format:", "",
+                                 "",
+                                 "otpauth://[hotp", "OR", "totp]/[account", "name]?secret=[Base32", "secret][&counter=X][&period=X][&digits=X]", "",
+                                 "",
+                                 "An", "example", "is", "shown", "below,", "provisioning", "a", "TOTP", "key", "for", "an", "account", "called", "``bob'':", "",
+                                 "",
+                                 "otpauth://totp/bob?secret=JBSWY3DPEHPK3PXP", "",
+                                 "",
+                                 "Any", "other", "URI", "options", "are", "not", "supported", "and", "will", "be", "ignored.",
+                                 "",
+                                 "Most", "services", "will", "provide", "a", "scannable", "QR", "code", "that", "encodes", "a", "OTP", "URI.",
+                                 "In", "order", "to", "use", "those,", "first", "scan", "the", "QR", "code", "separately", "and", "save", "the", "URI", "to", "a", "file", "on", "your", "device.",
+                                 "If", "necessary,", "rewrite", "the", "URI", "so", "it", "is", "in", "the", "format", "shown", "above.",
+                                 "For", "example,", "GitHub's", "URI", "has", "a", "slash", "after", "the", "provider.",
+                                 "In", "order", "for", "this", "URI", "to", "be", "properly", "parsed,", "you", "must", "rewrite", "the", "account", "name", "so", "that", "it", "does", "not", "contain", "a", "slash.",
+                                 "",
+                                 "",
+                                 "Manual Import", "",
+                                 "If", "direct", "URI", "import", "is", "not", "possible,", "the", "plugin", "supports", "the", "manual", "entry", "of", "data", "associated", "with", "an", "account.",
+                                 "After", "you", "select", "the", "'Manual", "Entry'", "option,", "it", "will", "prompt", "you", "for", "an", "account", "name.",
+                                 "You", "may", "type", "anything", "you", "wish,", "but", "it", "should", "be", "memorable.",
+                                 "It", "will", "then", "prompt", "you", "for", "the", "Base32-encoded", "secret.",
+                                 "Most", "services", "will", "provide", "this", "to", "you", "directly,", "but", "some", "may", "only", "provide", "you", "with", "a", "QR", "code.",
+                                 "In", "these", "cases,", "you", "must", "scan", "the", "QR", "code", "separately,", "and", "then", "enter", "the", "string", "following", "the", "'secret='", "parameter", "on", "your", "Rockbox", "device", "manually.",
+                                 "",
+                                 "On", "devices", "with", "a", "real-time", "clock,", "the", "plugin", "will", "ask", "whether", "the", "account", "is", "a", "time-based", "account", "(TOTP).",
+                                 "If", "you", "answer", "'yes'", "to", "this", "question,", "it", "will", "ask", "for", "further", "information", "regarding", "the", "account.",
+                                 "Usually", "it", "is", "safe", "to", "accept", "the", "defaults", "here.",
+                                 "However,", "if", "your", "device", "lacks", "a", "real-time", "clock,", "the", "plugin's", "functionality", "will", "be", "restricted", "to", "HMAC-based", "(HOTP)", "accounts", "only.",
+                                 "If", "this", "is", "the", "case,", "the", "plugin", "will", "prompt", "you", "for", "information", "regarding", "the", "HOTP", "setup.",
+                                 "Again,", "it", "is", "usually", "safe", "to", "accept", "the", "defaults.",
+                                 "",
+                                 "",
+                                 "Account Export", "",
+                                 "This", "plugin", "allows", "you", "to", "export", "account", "data", "to", "a", "file", "for", "backup", "and", "transfer", "purposes.",
+                                 "This", "option", "is", "located", "under", "the", "'Advanced'", "menu.",
+                                 "It", "will", "prompt", "for", "for", "a", "filename,", "and", "will", "write", "all", "your", "account", "data", "to", "the", "specified", "file.",
+                                 "This", "file", "can", "be", "imported", "by", "this", "plugin", "using", "the", "'From", "URI", "List'", "option", "when", "importing.",
+                                 "",
+                                 "",
+                                 "Encryption", "",
+                                 "This", "plugin", "supports", "the", "optional", "encryption", "of", "account", "data", "while", "stored", "on", "disk.",
+                                 "This", "feature", "is", "located", "under", "the", "'Advanced'", "menu", "option.",
+                                 "Upon", "enabling", "this", "feature,", "you", "must", "enter", "an", "encryption", "password", "that", "will", "need", "to", "be", "entered", "each", "time", "the", "plugin", "starts", "up.",
+                                 "It", "is", "recommended", "that", "you", "use", "a", "strong,", "alphanumeric", "password", "of", "at", "least", "8", "characters", "in", "order", "to", "frustrate", "attempts", "to", "crack", "the", "encryption.",
+                                 "Be", "sure", "not", "to", "forget", "this", "password.",
+                                 "In", "the", "event", "that", "the", "password", "is", "lost,", "it", "is", "nearly", "impossible", "to", "recover", "your", "account", "data.",
+                                 "",
+                                 "",
+                                 "Implementation Details", "",
+                                 "Account", "data", "is", "encrypted", "with", "128-bit", "AES", "encryption", "in", "counter", "mode,", "keyed", "with", "the", "truncated", "HMAC-SHA-1", "of", "your", "password", "and", "a", "nonce.",
+                                 "The", "nonce", "is", "generated", "from", "the", "system's", "current", "tick", "and", "the", "real-time", "clock,", "if", "available.",
+                                 "",
+                                 "",
+                                 "Troubleshooting", "",
+#if CONFIG_RTC
+                                 "If", "time-based", "passwords", "and", "not", "working", "properly,", "ensure", "that", "your", "system", "clock", "is", "accurate", "to", "within", "30", "seconds", "of", "the", "authenticating", "server's", "clock,", "and", "that", "the", "proper", "time", "zone", "is", "configured", "within", "the", "plugin.",
+                                 "Be", "sure", "to", "account", "for", "Daylight", "Savings", "Time,", "if", "applicable.",
+                                 "",
+#else
+                                 "Please", "note", "that", "your", "device", "lacks", "a", "real-time", "clock,", "and", "thus", "time-based", "passwords", "are", "not", "supported.",
+                                 "",
+#endif
+    };
     struct style_text style[] = {
-        {0,  TEXT_CENTER | TEXT_UNDERLINE},
-        {2,  C_RED},
+        { 0, TEXT_CENTER | TEXT_UNDERLINE },
+        { 3, C_RED },
+        { 43, C_RED },
+        { 84, C_RED },
+        { 120, C_RED },
+        { 273, C_RED },
+        { 461, C_RED },
+        { 523, C_RED },
+        { 619, C_RED },
+        { 660, C_RED },
         LAST_STYLE_ITEM
     };
 
     display_text(ARRAYLEN(help_text), help_text, style, NULL, true);
+}
+
+#ifdef USB_ENABLE_HID
+
+#define FORCE_EXEC_THRES (HZ/3)
+#define TYPE_DELAY (HZ / 25)
+
+static bool wait_for_usb(void)
+{
+    if(!rb->usb_inserted())
+    {
+        /* wait for a USB connection */
+
+        rb->splash(0, "Waiting for USB, hold any button to abort...");
+
+        int oldbutton = 0;
+        int ticks_held = 0;
+        long last_tick = 0;
+        while(1)
+        {
+            int button = rb->button_get(true);
+            if(button == SYS_USB_CONNECTED)
+            {
+                break;
+            }
+            else if(button)
+            {
+                /* check if a key is being held down */
+
+                if(oldbutton == 0)
+                {
+                    oldbutton = button;
+
+                    ticks_held = 0;
+                    last_tick = *rb->current_tick;
+                }
+                else if(button == oldbutton || button == (oldbutton | BUTTON_REPEAT))
+                {
+                    int dt = *rb->current_tick - last_tick;
+                    if(dt)
+                    {
+                        ticks_held += dt;
+                        last_tick = *rb->current_tick;
+                        if(ticks_held >= FORCE_EXEC_THRES)
+                            return false;
+                    }
+                }
+            }
+        }
+
+        /* wait a bit to let the host recognize us... */
+        rb->sleep(HZ / 2);
+    }
+    return true;
+}
+
+static void type_code(int acct)
+{
+    if(!wait_for_usb())
+        return;
+
+    int code = next_code(acct);
+
+    /* hackery to get around the lack of %*d support */
+    char fmt_buf[64], buf[64];
+
+    rb->snprintf(fmt_buf, sizeof(fmt_buf), "%%0%dd", accounts[acct].digits);
+    rb->snprintf(buf, sizeof(buf), fmt_buf, code);
+
+    char *ptr = buf;
+
+    /* check numlock led */
+    bool change_numlock = !(rb->usb_hid_leds() & 0x1);
+    if(change_numlock)
+        rb->usb_hid_send(HID_USAGE_PAGE_KEYBOARD_KEYPAD, HID_KEYPAD_NUM_LOCK_AND_CLEAR);
+
+    while(*ptr)
+    {
+        char c = *ptr++;
+        if(c == '0')
+            rb->usb_hid_send(HID_USAGE_PAGE_KEYBOARD_KEYPAD, HID_KEYPAD_0_AND_INSERT);
+        else
+            rb->usb_hid_send(HID_USAGE_PAGE_KEYBOARD_KEYPAD, c - '1'  + HID_KEYPAD_1_AND_END);
+        rb->sleep(TYPE_DELAY);
+    }
+
+    rb->usb_hid_send(HID_USAGE_PAGE_KEYBOARD_KEYPAD, HID_KEYBOARD_RETURN);
+
+    if(change_numlock)
+        rb->usb_hid_send(HID_USAGE_PAGE_KEYBOARD_KEYPAD, HID_KEYPAD_NUM_LOCK_AND_CLEAR);
+
+    rb->splash(0, "Done.");
+
+    /* wait a while to prevent accidental code generation */
+    rb->sleep(HZ / 2);
+    while(1)
+    {
+        int button = rb->button_get(true);
+        if(button && !(button & BUTTON_REL))
+            break;
+        rb->yield();
+    }
+
+    rb->lcd_update();
+}
+
+static void type_codes(void)
+{
+    if(!rb->global_settings->usb_hid)
+    {
+        rb->splashf(HZ * 4, "Please enable USB HID in the system settings.");
+    }
+    acct_menu("Type Code", type_code);
+}
+#endif
+
+static void acct_menu(const char *title, void (*cb)(int acct))
+{
+    rb->lcd_clear_display();
+    /* native menus don't seem to support dynamic names easily, so we
+     * roll our own */
+    static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
+    int idx = 0;
+    if(next_slot > 0)
+    {
+        rb->lcd_puts(0, 0, title);
+        rb->lcd_putsf(0, 1, "%s", accounts[0].name);
+        rb->lcd_update();
+    }
+    else
+    {
+        rb->splash(HZ * 2, "No accounts configured!");
+        return;
+    }
+    while(1)
+    {
+        int button = pluginlib_getaction(-1, plugin_contexts, ARRAYLEN(plugin_contexts));
+        switch(button)
+        {
+        case PLA_LEFT:
+            --idx;
+            if(idx < 0)
+                idx = next_slot - 1;
+            break;
+        case PLA_RIGHT:
+            ++idx;
+            if(idx >= next_slot)
+                idx = 0;
+            break;
+        case PLA_SELECT:
+            cb(idx);
+            if(idx >= next_slot)
+                idx = 0;
+            if(next_slot == 0)
+                return;
+            break;
+        case PLA_UP:
+        case PLA_CANCEL:
+        case PLA_EXIT:
+            return;
+        default:
+#ifdef USB_ENABLE_HID
+            if(cb != type_code)
+#endif
+                exit_on_usb(button);
+            break;
+        }
+        rb->lcd_clear_display();
+        rb->lcd_puts(0, 0, title);
+        rb->lcd_putsf(0, 1, "%s", accounts[idx].name);
+        rb->lcd_update();
+    }
 }
 
 /* this is the plugin entry point */
@@ -1036,6 +1634,7 @@ enum plugin_status plugin_start(const void* parameter)
     /* self-test with RFC 4226 values */
     if(HOTP("12345678901234567890", rb->strlen("12345678901234567890"), 1, 6) != 287082)
     {
+        rb->splashf(HZ * 4, "ERROR: self-test failed! Report me!");
         return PLUGIN_ERROR;
     }
 
@@ -1043,9 +1642,12 @@ enum plugin_status plugin_start(const void* parameter)
     accounts = rb->plugin_get_buffer(&bufsz);
     max_accts = bufsz / sizeof(struct account_t);
 
+    atexit(erase_sensitive_info);
+
     if(!read_accts())
 #if CONFIG_RTC
     {
+        /* first-run config */
         time_offs = get_time_offs();
     }
 #else
@@ -1055,11 +1657,14 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     MENUITEM_STRINGLIST(menu, "One-Time Password Manager", NULL,
-                        "Add Account",
-                        "Generate Code",
-                        "Help",
-                        "Advanced",
-                        "Quit");
+                        "Generate Code", // 0
+#ifdef USB_ENABLE_HID
+                        "Type Code", // 1
+#endif
+                        "Import Account(s)", // 1,2
+                        "Help", // 2,3
+                        "Advanced", // 3,4
+                        "Quit"); // 4,5
 
     bool quit = false;
     int sel = 0;
@@ -1068,10 +1673,27 @@ enum plugin_status plugin_start(const void* parameter)
         switch(rb->do_menu(&menu, &sel, NULL, false))
         {
         case 0:
+            gen_codes();
+            break;
+#ifdef USB_ENABLE_HID
+        case 1:
+            type_codes();
+            break;
+        case 2:
             add_acct();
             break;
+        case 3:
+            show_help();
+            break;
+        case 4:
+            adv_menu();
+            break;
+        case 5:
+            quit = 1;
+            break;
+#else
         case 1:
-            gen_codes();
+            add_acct();
             break;
         case 2:
             show_help();
@@ -1084,6 +1706,7 @@ enum plugin_status plugin_start(const void* parameter)
             break;
         default:
             break;
+#endif
         }
     }
 
