@@ -669,7 +669,10 @@ static int usb_hid_set_report(struct usb_ctrlrequest *req)
     }
 
     memset(buf, 0, length);
-    usb_drv_recv_blocking(EP_CONTROL, buf, length);
+    usb_drv_recv(EP_CONTROL, buf, length);
+    sleep(HZ/10);
+
+    usb_hid_led_buf = buf[1];
 
 #ifdef LOGF_ENABLE
     if (buf[1] & 0x01)
