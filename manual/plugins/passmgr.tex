@@ -1,13 +1,15 @@
 % $Id$ %
-\subsection{One-Time Password Client}
-This plugin provides the ability to generate one-time passwords (OTPs)
-for authentication purposes. It implements an HMAC-based One-Time
-Password Algorithm (RFC 4226), and on targets which support it, a
-Time-based One-Time Password Algorithm (RFC 6238).
+\subsection{Password Manager}
+This plugin allows you to generate one-time passwords as a second
+factor of authentication for online services which support it, such as
+GitHub and Google. This plugin supports both counter-based (HOTP), and
+time-based (TOTP) password schemes. It also supports storing static
+passwords securely.
 
 \subsubsection{Adding Accounts}
-The plugin supports two methods of adding accounts: URI import, and
-manual entry.
+To add a new account, choose the ``Import Account(s)'' menu
+option. There are two ways to import an account, either from a file
+containing account information in URI format, or manual entry.
 
 \opt{rtc}{ It is important to note that for TOTP (time-based) accounts
   to work properly, the clock on your device MUST be accurate to no
@@ -30,6 +32,9 @@ otpauth://totp/bob?secret=JBSWY3DPEHPK3PXP
 \end{verbatim}
 
 Any other URI options are not supported and will be ignored.
+
+This option will also look for ``username:password'' lines and import
+those as static passwords.
 
 Most services will provide a scannable QR code that encodes a OTP
 URI. In order to use those, first scan the QR code separately and save
@@ -58,8 +63,42 @@ real-time clock, the plugin's functionality will be restricted to
 HMAC-based (HOTP) accounts only. If this is the case, the plugin will
 prompt you for information regarding the HOTP setup.
 
+\subsubsection{Account Export}
+This plugin allows you to export account data to a file for backup and
+transfer purposes. This option is located under the ``Advanced''
+menu. It will prompt for for a filename, and will write all your
+account data to the specified file. This file can be imported by this
+plugin using the ``From URI List'' option when importing. Please note
+that you should not attempt to copy the ``passmgr.dat'' from the
+.rockbox directory to another device.
+
+\subsubsection{Encryption}
+This plugin supports the optional encryption of account data while
+stored on disk. This feature is located under the ``Advanced'' menu
+option. Upon enabling this feature, you must enter an encryption
+password that will need to be entered each time the plugin starts
+up. It is recommended that you use a strong, alphanumeric password of
+at least 8 characters in order to frustrate attempts to guess the
+password. Be sure not to forget this password. In the event that the
+password is lost, it is nearly impossible to recover your account
+data.
+
+Account data is encrypted with 128-bit AES encryption in counter
+mode. The key is derived from the your password and a nonce by using
+PBKDF2-HMAC-SHA1, with a variable number of iterations, calibrated by
+default to take 250 milliseconds. This parameter can be adjusted using
+the ``Change KDF Delay'' option under the ``Encryption'' submenu. The
+nonce is generated from the system's current tick and the real-time
+clock, if available, making collision unlikely. Some later-model iPods
+have a hardware AES core with a hardcoded, device-specific key that
+cannot easily be extracted. When available, the device-specific key is
+used to encrypt the actual encryption key, tying the ciphertext to the
+device, making a brute-force attack more difficult. One should note
+that this does not rely completely rely on the hardware encryption
+key, it merely utilizes it as part of defense in depth.
+
+
 \opt{rtc} {
-  \subsection{Advanced Settings}
   \subsubsection{Time Zone Configuration}
   In order for TOTP accounts to work properly, the plugin must be able
   to determine the current UTC time. This means that, first, your
