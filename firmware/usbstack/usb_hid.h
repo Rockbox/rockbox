@@ -35,6 +35,9 @@ void usb_hid_transfer_complete(int ep, int dir, int status, int length);
 bool usb_hid_control_request(struct usb_ctrlrequest* req, unsigned char* dest);
 
 void usb_hid_send(usage_page_t usage_page, int id);
+/* return led bitmap: bit 0 is num lock, 1 is caps lock, 2 is scroll lock,
+ * 3 is compose, 4 is kana */
+uint8_t usb_hid_leds(void);
 
 #endif
 
