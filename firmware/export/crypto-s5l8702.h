@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id:
  *
- * Copyright (C) 2009 by Tomer Shalev
+ * Copyright © 2009 Michael Sparmann
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,26 +18,29 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef USB_HID_H
-#define USB_HID_H
+#ifndef __CRYPTO_S5L8702_H__
+#define __CRYPTO_S5L8702_H__
 
-#include "usb_ch9.h"
-#include "usb_core.h"
-#include "usb_hid_usage_tables.h"
+#include <stdint.h>
 
-int usb_hid_request_endpoints(struct usb_class_driver *drv);
-int usb_hid_set_first_interface(int interface);
-int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_size);
-void usb_hid_init_connection(void);
-void usb_hid_init(void);
-void usb_hid_disconnect(void);
-void usb_hid_transfer_complete(int ep, int dir, int status, int length);
-bool usb_hid_control_request(struct usb_ctrlrequest* req, unsigned char* dest);
+#include "config.h"
 
-void usb_hid_send(usage_page_t usage_page, int id);
-/* return led bitmap: bit 0 is num lock, 1 is caps lock, 2 is scroll lock,
- * 3 is compose, 4 is kana */
-uint8_t usb_hid_leds(void);
+#define SHA1_SZ     20  /* bytes */
 
-#endif
+enum hwkeyaes_direction
+{
+    HWKEYAES_DECRYPT = 0,
+    HWKEYAES_ENCRYPT = 1
+};
 
+enum hwkeyaes_keyidx
+{
+    HWKEYAES_GKEY = 1,  /* device model key */
+    HWKEYAES_UKEY = 2   /* device unique key */
+};
+
+void s5l8702_hwkeyaes(enum hwkeyaes_direction direction,
+        uint32_t keyidx, void* data, uint32_t size);
+void s5l8702_sha1(const void* data, uint32_t size, void* hash);
+
+#endif /* __CRYPTO_S5L8702_H__ */

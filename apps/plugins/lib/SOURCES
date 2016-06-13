@@ -1,3 +1,4 @@
+aes.c
 sha1.c
 gcc-support.c
 pluginlib_actions.c

@@ -71,6 +71,8 @@ doom
 /* For all the swcodec targets */
 #if CONFIG_CODEC == SWCODEC
 
+passmgr /* some features are disabled on a per-target basis */
+
 #if MEMORYSIZE > 2 /* we need a lot of RAM for instruments */
 midi
 mikmod
