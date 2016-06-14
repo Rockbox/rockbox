@@ -74,12 +74,6 @@
 \Configure{UndefinedSec}{likesection}
 \Configure{UndefinedSec}{likesubsection}
 \def\tableofcontents{%
-   \ifx\contentsname\empty \else
-      %
-\chapter*{\contentsname}%
-      %
-%
-   \fi
    \:tableofcontents}
 
 
@@ -188,12 +182,6 @@ A script of the form
 \NewConfigure{listof}{6}
 
 \def\tableofcontents{%
-   \ifx\contentsname\empty \else
-      %
-\chapter*{\contentsname}%
-      %
-%
-   \fi
    \:tableofcontents}
 
 \edef\:TOC{%
