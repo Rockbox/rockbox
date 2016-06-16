@@ -203,6 +203,10 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
             pathlen = snprintf(path, sizeof(path),
                             "%scover%s." EXT, dir, size_string);
             found = try_exts(path, pathlen);
+
+            /* hack to look for ".jpg" in the current dir */
+            pathlen = snprintf(path, sizeof(path), "%s.", dir);
+            found = try_exts(path, pathlen);
         }
 
 #ifdef USE_JPEG_COVER
