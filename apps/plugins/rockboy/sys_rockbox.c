@@ -294,7 +294,7 @@ void vid_update(int scanline)
         scanline-=16;
     else if (fb.mode==2)
         scanline-=8;
-    scanline_remapped = (scanline / 16 + 7) % 8;
+    scanline_remapped = scanline / 16;
     frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {
         balance += LCD_WIDTH;
