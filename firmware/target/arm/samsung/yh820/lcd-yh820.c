@@ -25,6 +25,9 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "system.h"
+#ifdef HAVE_LCD_SHUTDOWN
+#include "backlight-target.h"  /* included for backlight_hw_off() prototype */
+#endif
 
 /* Display status */
 static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
@@ -235,10 +238,43 @@ void lcd_enable(bool yesno)
 }
 #endif
 
+#ifdef HAVE_LCD_SLEEP
+void lcd_sleep(void)
+{
+    if (is_lcd_enabled)
+    {
+        is_lcd_enabled = false;
+        lcd_send_command(R_STANDBY_ON);
+    }
+}
+
+void lcd_awake(void)
+{
+    if (!is_lcd_enabled)
+    {
+        is_lcd_enabled = true;
+        lcd_send_command(R_STANDBY_OFF);
+        lcd_send_command(R_DISPLAY_ON);
+        send_event(LCD_EVENT_ACTIVATION, NULL);
+    }
+}
+#endif
+
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 bool lcd_active(void)
 {
     return is_lcd_enabled;
+}
+#endif
+
+#if defined(HAVE_LCD_SHUTDOWN)
+void lcd_shutdown(void)
+{
+    backlight_hw_off();
+#ifndef HAVE_LCD_ENABLE
+    /* already done by backlight_hw_off() */
+    lcd_send_command(R_STANDBY_ON);
+#endif
 }
 #endif
 
@@ -338,6 +374,11 @@ void lcd_update(void)
 void lcd_update_rect(int x, int y, int width, int height)
 {
     const fb_data *addr;
+
+#if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
+    if (!is_lcd_enabled)
+        return;
+#endif
     
     if (x + width >= LCD_WIDTH)
         width = LCD_WIDTH - x;

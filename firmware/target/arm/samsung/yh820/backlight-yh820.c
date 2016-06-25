@@ -28,7 +28,7 @@
 void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_SLEEP
-    backlight_lcd_sleep_countdown(false); /* stop counter */
+    lcd_awake(); /* power on lcd + visible display */
 #endif
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
@@ -41,8 +41,5 @@ void backlight_hw_off(void)
     GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x2);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
-#endif
-#ifdef HAVE_LCD_SLEEP
-    backlight_lcd_sleep_countdown(true); /* start countdown */
 #endif
 }
