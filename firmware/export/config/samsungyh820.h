@@ -34,6 +34,9 @@
 #define LCD_DEPTH  16   /* 65536 colours */
 #define LCD_PIXELFORMAT RGB565
 
+/* LCD stays visible without backlight - simulator hint */
+#define HAVE_TRANSFLECTIVE_LCD
+
 #ifndef BOOTLOADER
 
 /* define this if you have a real-time clock */
@@ -42,12 +45,16 @@
 //#define HAVE_RTC_ALARM
 
 /* Define this if your LCD can be enabled/disabled */
-#define HAVE_LCD_ENABLE
+/* #define HAVE_LCD_ENABLE */
 
 /* Define this if your LCD can be put to sleep.
-   HAVE_LCD_ENABLE should be defined as well. */
-/* todo #define HAVE_LCD_SLEEP*/
-/* todo #define HAVE_LCD_SLEEP_SETTING */
+   HAVE_LCD_ENABLE should be defined as well.
+   Note: with a transflective display, HAVE_LCD_ENABLE shouldn't be defined.
+   LCD gets disabled when setting to sleep. */
+#define HAVE_LCD_SLEEP
+#define HAVE_LCD_SLEEP_SETTING
+/* The same code may also be used when shutting down */
+#define HAVE_LCD_SHUTDOWN
 #endif /* !BOOTLOADER */
 
 /* Define this for LCD backlight available */
