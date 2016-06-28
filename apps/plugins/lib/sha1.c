@@ -26,7 +26,7 @@
 #include "plugin.h"
 #include "sha1.h"
 
-#ifdef WORDS_BIGENDIAN
+#ifdef ROCKBOX_BIG_ENDIAN
 # define SWAP(n) (n)
 #else
 # define SWAP(n) \
