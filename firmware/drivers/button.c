@@ -41,6 +41,9 @@
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
+#if defined(HAVE_TRANSFLECTIVE_LCD) && defined(HAVE_LCD_SLEEP)
+#include "lcd.h"       /* lcd_active() prototype */
+#endif
 
 struct event_queue button_queue SHAREDBSS_ATTR;
 
@@ -354,7 +357,12 @@ static void button_tick(void)
                     }
                     else
 #endif
-                        if (!filter_first_keypress || is_backlight_on(false)
+                        if (!filter_first_keypress
+#if defined(HAVE_TRANSFLECTIVE_LCD) && defined(HAVE_LCD_SLEEP)
+                                || (is_backlight_on(false) && lcd_active())
+#else
+                                || is_backlight_on(false)
+#endif
 #if BUTTON_REMOTE
                                 || (btn & BUTTON_REMOTE)
 #endif
