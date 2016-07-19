@@ -1516,7 +1516,8 @@ static int sokoban_menu(void)
     int prev_level = current_info.level.index;
 
     MENUITEM_STRINGLIST(menu, "Sokoban Menu", NULL,
-                        "Resume", "Select Level", "Audio Playback", "Keys",
+                        "Resume", "Restart Current Level",
+                        "Select Level", "Audio Playback", "Keys",
                         "Load Default Level Set", "Quit Without Saving",
                         "Save Progress & Quit");
 
@@ -1528,7 +1529,12 @@ static int sokoban_menu(void)
             case 0: /* Resume */
                 break;
 
-            case 1: /* Select level */
+            case 1: /* Restart current level */
+                init_undo();
+                load_level();
+                break;
+
+            case 2: /* Select level */
                 current_info.level.index++;
                 rb->set_int("Select Level", "", UNIT_INT,
                             &current_info.level.index, NULL, 1, 1,
@@ -1541,12 +1547,12 @@ static int sokoban_menu(void)
                     menu_quit = false;
                 break;
 
-            case 2: /* Audio playback control */
+            case 3: /* Audio playback control */
                 playback_control(NULL);
                 menu_quit = false;
                 break;
 
-            case 3: /* Keys */
+            case 4: /* Keys */
                 FOR_NB_SCREENS(i)
                     rb->screens[i]->clear_display();
                 rb->lcd_setfont(SOKOBAN_FONT);
@@ -1659,17 +1665,17 @@ static int sokoban_menu(void)
                 menu_quit = false;
                 break;
 
-            case 4: /* Load default levelset */
+            case 5: /* Load default levelset */
                 init_boards();
                 if (!read_levels(true))
                     return 5; /* Quit */
                 load_level();
                 break;
 
-            case 5: /* Quit */
+            case 6: /* Quit */
                 break;
 
-            case 6: /* Save & quit */
+            case 7: /* Save & quit */
                 save(SOKOBAN_SAVE_FILE, false);
                 rb->reload_directory();
         }
@@ -1714,8 +1720,8 @@ static bool sokoban_loop(void)
             case SOKOBAN_RC_MENU:
 #endif
                 switch (sokoban_menu()) {
-                    case 5: /* Quit */
-                    case 6: /* Save & quit */
+                    case 6: /* Quit */
+                    case 7: /* Save & quit */
                         return PLUGIN_OK;
                 }
                 update_screen();
@@ -1915,8 +1921,8 @@ static bool sokoban_loop(void)
                 current_info.level.index = 0;
 
                 switch (sokoban_menu()) {
-                    case 5: /* Quit */
-                    case 6: /* Save & quit */
+                    case 6: /* Quit */
+                    case 7: /* Save & quit */
                         return PLUGIN_OK;
                 }
             }
