@@ -1615,7 +1615,7 @@ target/arm/s5l8702/postmortemstub.S
 #endif
 target/arm/s5l8702/ipod6g/pmu-ipod6g.c
 target/arm/s5l8702/ipod6g/rtc-ipod6g.c
-target/arm/s5l8700/usb-nano2g-6g.c
+target/arm/s5l8702/usb-s5l8702.c
 #ifdef HAVE_SERIAL
 target/arm/uc870x.c
 target/arm/s5l8702/uart-s5l8702.c

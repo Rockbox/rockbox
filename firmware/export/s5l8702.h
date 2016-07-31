@@ -175,8 +175,21 @@
 /////USB/////
 #define OTGBASE 0x38400000
 #define PHYBASE 0x3C400000
-#define SYNOPSYSOTG_CLOCK 0
-#define SYNOPSYSOTG_AHBCFG (GAHBCFG_dma_enable | (GAHBCFG_INT_DMA_BURST_INCR8 << GAHBCFG_hburstlen_bitp) | GAHBCFG_glblintrmsk)
+
+/* OTG PHY control registers */
+#define OPHYPWR     (*((uint32_t volatile*)(PHYBASE + 0x000)))
+#define OPHYCLK     (*((uint32_t volatile*)(PHYBASE + 0x004)))
+#define ORSTCON     (*((uint32_t volatile*)(PHYBASE + 0x008)))
+#define OPHYUNK3    (*((uint32_t volatile*)(PHYBASE + 0x018)))
+#define OPHYUNK1    (*((uint32_t volatile*)(PHYBASE + 0x01c)))
+#define OPHYUNK2    (*((uint32_t volatile*)(PHYBASE + 0x044)))
+
+/* 9 available EPs (0b00000001111101010000000111101011), 6 used */
+#define USB_NUM_ENDPOINTS 6
+
+/* Define this if the DWC implemented on this SoC does not support
+   DMA or you want to disable it. */
+// #define USB_DW_ARCH_SLAVE
 
 
 /////I2C/////
