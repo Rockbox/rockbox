@@ -221,12 +221,15 @@
 #define DEFAULT_BRIGHTNESS_SETTING  0x20
 
 /* USB defines */
+#define CONFIG_USBOTG USBOTG_DESIGNWARE
+#define USB_DW_CLOCK 0
+#define USB_DW_TURNAROUND 5
+/* logf() over USB serial (http://www.rockbox.org/wiki/PortalPlayerUsb) */
+//#define USB_ENABLE_SERIAL
 #define HAVE_USBSTACK
 #define HAVE_USB_HID_MOUSE
-#define CONFIG_USBOTG USBOTG_S3C6400X
 #define USB_VENDOR_ID 0x05AC
 #define USB_PRODUCT_ID 0x1260
-#define USB_NUM_ENDPOINTS 6
 #define USB_DEVBSS_ATTR __attribute__((aligned(16)))
 
 /* Define this if you can switch on/off the accessory power supply */

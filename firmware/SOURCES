@@ -1582,7 +1582,7 @@ target/arm/s5l8700/ipodnano2g/ftl-nano2g.c
 target/arm/s5l8700/ipodnano2g/nand-nano2g.c
 target/arm/s5l8700/ipodnano2g/pmu-nano2g.c
 target/arm/s5l8700/ipodnano2g/rtc-nano2g.c
-target/arm/s5l8700/usb-nano2g-6g.c
+target/arm/s5l8700/usb-s5l8701.c
 #ifdef HAVE_SERIAL
 target/arm/uc870x.c
 target/arm/s5l8700/uart-s5l8701.c
