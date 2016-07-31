@@ -37,12 +37,16 @@
 #define CGU_SDSLOT         (*(volatile unsigned long *)(CGU_BASE + 0x3C))
 
 #undef USB_NUM_ENDPOINTS
-
+/* 7 available EPs (0b00000000010101010000000000101011), 6 used */
 #define USB_NUM_ENDPOINTS   6
 
 #define CCU_USB         (*(volatile unsigned long *)(CCU_BASE + 0x20))
 
 #undef USB_DEVBSS_ATTR
 #define USB_DEVBSS_ATTR __attribute__((aligned(32)))
+
+/* Define this if the DWC implemented on this SoC does not support
+   DMA or you want to disable it. */
+// #define USB_DW_ARCH_SLAVE
 
 #endif /* __AS3525V2_H__ */
