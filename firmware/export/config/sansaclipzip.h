@@ -182,7 +182,9 @@
 #define CONFIG_LCD LCD_CLIPZIP
 
 /* USB On-the-go */
-#define CONFIG_USBOTG USBOTG_S3C6400X
+#define CONFIG_USBOTG USBOTG_DESIGNWARE
+/* logf() over USB serial (http://www.rockbox.org/wiki/PortalPlayerUsb) */
+//#define USB_ENABLE_SERIAL
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
