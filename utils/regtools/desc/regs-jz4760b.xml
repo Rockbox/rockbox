@@ -1017,14 +1017,14 @@
             </instance>
             <register>
                 <field>
-                    <name>SRC_SEL</name>
+                    <name>OUT_SEL</name>
                     <position>30</position>
                     <enum>
-                        <name>EXCLK</name>
+                        <name>LCD_PANEL</name>
                         <value>0x0</value>
                     </enum>
                     <enum>
-                        <name>PLL</name>
+                        <name>TV_ENC</name>
                         <value>0x1</value>
                     </enum>
                 </field>
@@ -1427,7 +1427,7 @@
         <node>
             <name>COUNTH_BUF</name>
             <instance>
-                <name>OSTCNTH_BUF</name>
+                <name>COUNTH_BUF</name>
                 <address>0xfc</address>
             </instance>
             <register/>
@@ -2222,7 +2222,7 @@
             <name>TRIGGER</name>
             <title>Trigger</title>
             <instance>
-                <name>TRG</name>
+                <name>TRIGGER</name>
                 <range>
                     <first>0</first>
                     <count>6</count>
