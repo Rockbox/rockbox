@@ -41,6 +41,10 @@ uint32_t target_read32(const void *addr);
 void target_write8(void *addr, uint8_t val);
 void target_write16(void *addr, uint16_t val);
 void target_write32(void *addr, uint32_t val);
+#ifdef CONFIG_FLUSH_CACHES
+/* flush cache: commit dcache and invalidate icache */
+void target_flush_caches(void);
+#endif
 
 /* mandatory for all targets */
 extern struct hwstub_target_desc_t target_descriptor;

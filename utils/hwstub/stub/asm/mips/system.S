@@ -18,6 +18,7 @@
  *
  ****************************************************************************/
 #include "mips.h"
+#include "target-config.h"
 
 /* Handling of data abort:
  * the code can register a "longjmp" buffer to restore the context in case of
@@ -49,3 +50,25 @@ set_data_abort_jmp:
     jr ra
     move v0, zero
 .set reorder
+
+.set noreorder
+.text
+.global target_flush_caches
+target_flush_caches:
+    /* commit dcache and invalidate icache */
+    la      t0, 0x80000000   /* an idx op should use an unmappable address */
+    ori     t1, t0, DCACHE_SIZE   /* cache size */
+reloc_dcache_loop:
+    cache   DCIndexWBInv, 0(t0) /* invalidate and write-back dcache index */
+    addiu   t0, t0, DCACHE_LINE_SIZE /* bytes per cache line */
+    bne     t0, t1, reloc_dcache_loop
+    nop
+    la      t0, 0x80000000   /* an idx op should use an unmappable address */
+    ori     t1, t0, ICACHE_SIZE   /* cache size */
+reloc_icache_loop:
+    cache   ICIndexInv, 0(t0) /* invalidate icache index */
+    addiu   t0, t0, ICACHE_LINE_SIZE  /* bytes per cache line */
+    bne     t0, t1, reloc_icache_loop
+    nop
+    jr      ra
+    nop
