@@ -558,6 +558,8 @@ protected:
         MN_FIELD_READ, /// register's field read
         MN_FIELD_READX, /// register value field read
         MN_REG_WRITE, /// register write
+        MN_REG_SET, /// register set
+        MN_REG_CLEAR, /// register clear
         MN_REG_CLEAR_SET, /// register clear then set
         MN_FIELD_WRITE, /// register's field(s) write
         MN_FIELD_WRITEX, /// register's field(s) write
@@ -1386,13 +1388,54 @@ bool common_generator::generate_macro_header(error_context_t& ectx)
     {
         std::string set_var = sct_variant(MN_FIELD_SET);
         std::string clr_var = sct_variant(MN_FIELD_CLEAR);
+
+        /* print REG_SET */
+        std::string reg_set = macro_name(MN_REG_SET);
+        fout << "/** " << reg_set << "\n";
+        fout << " *\n";
+        fout << " * usage: " << reg_set << "(register, set_value)\n";
+        fout << " *\n";
+        fout << " * effect: set some bits using " << set_var << " variant\n";
+        fout << " * note: register must be fully qualified if indexed\n";
+        fout << " *\n";
+        fout << " * example: " << reg_set << "(ICOLL_CTRL, 0x42)\n";
+        fout << " *          " << reg_set << "(ICOLL_ENABLE(3), 0x37)\n";
+        fout << " */\n";
+        fout << "#define " << reg_set << "(name, sval) "
+            << reg_set << "_(" << macro_name(MN_GET_VARIANT) << "(name, "
+            << variant_xfix(set_var, true) << ", " << variant_xfix(set_var, false)
+            << "), sval)\n";
+        fout << "#define " << reg_set << "_(sname, sval) "
+            << macro_name(MN_REG_WRITE) << "(sname, sval)\n";
+        fout << "\n";
+
+        /* print REG_CLR */
+        std::string reg_clr = macro_name(MN_REG_CLEAR);
+        fout << "/** " << reg_clr << "\n";
+        fout << " *\n";
+        fout << " * usage: " << reg_clr << "(register, clr_value)\n";
+        fout << " *\n";
+        fout << " * effect: clear some bits using " << clr_var << " variant\n";
+        fout << " * note: register must be fully qualified if indexed\n";
+        fout << " *\n";
+        fout << " * example: " << reg_clr << "(ICOLL_CTRL, 0x42)\n";
+        fout << " *          " << reg_clr << "(ICOLL_ENABLE(3), 0x37)\n";
+        fout << " */\n";
+        fout << "#define " << reg_clr << "(name, cval) "
+            << reg_clr << "_(" << macro_name(MN_GET_VARIANT) << "(name, "
+            << variant_xfix(clr_var, true) << ", " << variant_xfix(clr_var, false)
+            << "), cval)\n";
+        fout << "#define " << reg_clr << "_(cname, cval) "
+            << macro_name(MN_REG_WRITE) << "(cname, cval)\n";
+        fout << "\n";
+
         /* print REG_CS */
         std::string reg_cs = macro_name(MN_REG_CLEAR_SET);
         fout << "/** " << reg_cs << "\n";
         fout << " *\n";
         fout << " * usage: " << reg_cs << "(register, clear_value, set_value)\n";
         fout << " *\n";
-        fout << " * effect: clear some bits using " << set_var << " variant and then set some using " << set_var << " variant\n";
+        fout << " * effect: clear some bits using " << clr_var << " variant and then set some using " << set_var << " variant\n";
         fout << " * note: register must be fully qualified if indexed\n";
         fout << " *\n";
         fout << " * example: " << reg_cs << "(ICOLL_CTRL, 0xff, 0x42)\n";
@@ -1607,6 +1650,8 @@ class jz_generator : public common_generator
             case MN_FIELD_READ: return "jz_readf";
             case MN_FIELD_READX: return "jz_vreadf";
             case MN_REG_WRITE: return "jz_write";
+            case MN_REG_SET: return "jz_set";
+            case MN_REG_CLEAR: return "jz_clr";
             case MN_FIELD_WRITE: return "jz_writef";
             case MN_FIELD_OVERWRITE: return "jz_overwritef";
             case MN_FIELD_WRITEX: return "jz_vwritef";
@@ -1765,6 +1810,8 @@ class imx_generator : public common_generator
             case MN_FIELD_READ: return "BF_RD";
             case MN_FIELD_READX: return "BF_RDX";
             case MN_REG_WRITE: return "REG_WR";
+            case MN_REG_SET: return ""; // no macro for this
+            case MN_REG_CLEAR: return ""; // no macro for this
             case MN_FIELD_WRITE: return "BF_WR";
             case MN_FIELD_OVERWRITE: return "BF_WR_ALL";
             case MN_FIELD_WRITEX: return "BF_WRX";
