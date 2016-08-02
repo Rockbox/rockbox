@@ -518,10 +518,17 @@ static void handle_exec(struct usb_ctrlrequest *req)
     if(size != sizeof(struct hwstub_exec_req_t))
         return usb_drv_stall(EP_CONTROL, true, true);
     uint32_t addr = exec->dAddress;
+
+#if defined(CPU_ARM)
     if(exec->bmFlags & HWSTUB_EXEC_THUMB)
         addr |= 1;
     else
         addr &= ~1;
+#endif
+
+#ifdef CONFIG_FLUSH_CACHES
+    target_flush_caches();
+#endif
 
     if(exec->bmFlags & HWSTUB_EXEC_CALL)
     {
@@ -540,11 +547,13 @@ static void handle_exec(struct usb_ctrlrequest *req)
     else
     {
         /* in case of jump, respond immediately and disconnect usb */
+#if defined(CPU_ARM)
         usb_drv_send(EP_CONTROL, NULL, 0);
         usb_drv_exit();
-#if defined(CPU_ARM)
         asm volatile("bx %0\n" : : "r" (addr) : "memory");
 #elif defined(CPU_MIPS)
+        usb_drv_send(EP_CONTROL, NULL, 0);
+        usb_drv_exit();
         asm volatile("jr %0\nnop\n" : : "r" (addr) : "memory");
 #else 
 #warning jump is unsupported on this platform
