@@ -1017,14 +1017,14 @@
             </instance>
             <register>
                 <field>
-                    <name>SRC_SEL</name>
+                    <name>OUT_SEL</name>
                     <position>30</position>
                     <enum>
-                        <name>EXCLK</name>
+                        <name>LCD_PANEL</name>
                         <value>0x0</value>
                     </enum>
                     <enum>
-                        <name>PLL</name>
+                        <name>TV_ENC</name>
                         <value>0x1</value>
                     </enum>
                 </field>
@@ -1736,7 +1736,7 @@
         <node>
             <name>COUNTH_BUF</name>
             <instance>
-                <name>OSTCNTH_BUF</name>
+                <name>COUNTH_BUF</name>
                 <address>0xfc</address>
             </instance>
             <register/>
@@ -2222,7 +2222,7 @@
             <name>TRIGGER</name>
             <title>Trigger</title>
             <instance>
-                <name>TRG</name>
+                <name>TRIGGER</name>
                 <range>
                     <first>0</first>
                     <count>6</count>
@@ -7043,40 +7043,141 @@
             <register/>
         </node>
         <node>
-            <name>XYP</name>
-            <title>Foreground 1 XY Position Register</title>
+            <name>CNUM</name>
+            <title>DMA Command Counter Register 1</title>
             <instance>
-                <name>XYP</name>
+                <name>CNUM</name>
                 <range>
                     <first>0</first>
-                    <address>0x120</address>
-                    <address>0x124</address>
+                    <address>0x68</address>
+                    <address>0x78</address>
+                </range>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DESSIZE</name>
+            <title>Foreground Size in Descriptor 1 Register</title>
+            <instance>
+                <name>DESSIZE</name>
+                <range>
+                    <first>0</first>
+                    <address>0x6c</address>
+                    <address>0x7c</address>
                 </range>
             </instance>
             <register>
                 <field>
-                    <name>YPOS</name>
-                    <desc>Y position bit of foreground 0 or 1</desc>
+                    <name>HEIGHT</name>
+                    <desc>height of foreground 1</desc>
                     <position>16</position>
                     <width>16</width>
                 </field>
                 <field>
-                    <name>XPOS</name>
-                    <desc>X position bit of foreground 0 or 1</desc>
+                    <name>WIDTH</name>
+                    <desc>width of foreground 1</desc>
                     <position>0</position>
                     <width>16</width>
                 </field>
             </register>
         </node>
         <node>
-            <name>SIZE</name>
-            <title>Foreground 1 Size Register</title>
+            <name>PW</name>
+            <title>DMA Page Width Register 1</title>
             <instance>
-                <name>SIZE</name>
+                <name>PW</name>
                 <range>
                     <first>0</first>
-                    <address>0x128</address>
-                    <address>0x12c</address>
+                    <address>0x64</address>
+                    <address>0x74</address>
+                </range>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>OFFS</name>
+            <title>DMA Offsize Register 1</title>
+            <instance>
+                <name>OFFS</name>
+                <range>
+                    <first>0</first>
+                    <address>0x60</address>
+                    <address>0x70</address>
+                </range>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>CMD</name>
+            <title>DMA Command Register 1</title>
+            <instance>
+                <name>CMD</name>
+                <range>
+                    <first>0</first>
+                    <address>0x4c</address>
+                    <address>0x5c</address>
+                </range>
+            </instance>
+            <register>
+                <field>
+                    <name>SOFINT</name>
+                    <position>31</position>
+                </field>
+                <field>
+                    <name>EOFINT</name>
+                    <position>30</position>
+                </field>
+                <field>
+                    <name>CMD</name>
+                    <desc>indicate command in slcd mode</desc>
+                    <position>29</position>
+                </field>
+                <field>
+                    <name>PAL</name>
+                    <position>28</position>
+                </field>
+                <field>
+                    <name>LEN</name>
+                    <position>0</position>
+                    <width>24</width>
+                </field>
+            </register>
+        </node>
+        <node>
+            <name>FID</name>
+            <title>Frame ID Register 1</title>
+            <instance>
+                <name>FID</name>
+                <range>
+                    <first>0</first>
+                    <address>0x48</address>
+                    <address>0x58</address>
+                </range>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>SA</name>
+            <title>Source Address Register 1</title>
+            <instance>
+                <name>SA</name>
+                <range>
+                    <first>0</first>
+                    <address>0x44</address>
+                    <address>0x54</address>
+                </range>
+            </instance>
+            <register/>
+        </node>
+        <node>
+            <name>DA</name>
+            <title>Descriptor Address Register 1</title>
+            <instance>
+                <name>DA</name>
+                <range>
+                    <first>0</first>
+                    <address>0x40</address>
+                    <address>0x50</address>
                 </range>
             </instance>
             <register/>
@@ -7124,144 +7225,43 @@
             </register>
         </node>
         <node>
-            <name>DA</name>
-            <title>Descriptor Address Register 1</title>
+            <name>SIZE</name>
+            <title>Foreground 1 Size Register</title>
             <instance>
-                <name>DA</name>
+                <name>SIZE</name>
                 <range>
                     <first>0</first>
-                    <address>0x40</address>
-                    <address>0x50</address>
+                    <address>0x128</address>
+                    <address>0x12c</address>
                 </range>
             </instance>
             <register/>
         </node>
         <node>
-            <name>SA</name>
-            <title>Source Address Register 1</title>
+            <name>XYP</name>
+            <title>Foreground 1 XY Position Register</title>
             <instance>
-                <name>SA</name>
+                <name>XYP</name>
                 <range>
                     <first>0</first>
-                    <address>0x44</address>
-                    <address>0x54</address>
-                </range>
-            </instance>
-            <register/>
-        </node>
-        <node>
-            <name>FID</name>
-            <title>Frame ID Register 1</title>
-            <instance>
-                <name>FID</name>
-                <range>
-                    <first>0</first>
-                    <address>0x48</address>
-                    <address>0x58</address>
-                </range>
-            </instance>
-            <register/>
-        </node>
-        <node>
-            <name>CMD</name>
-            <title>DMA Command Register 1</title>
-            <instance>
-                <name>CMD</name>
-                <range>
-                    <first>0</first>
-                    <address>0x4c</address>
-                    <address>0x5c</address>
+                    <address>0x120</address>
+                    <address>0x124</address>
                 </range>
             </instance>
             <register>
                 <field>
-                    <name>SOFINT</name>
-                    <position>31</position>
-                </field>
-                <field>
-                    <name>EOFINT</name>
-                    <position>30</position>
-                </field>
-                <field>
-                    <name>CMD</name>
-                    <desc>indicate command in slcd mode</desc>
-                    <position>29</position>
-                </field>
-                <field>
-                    <name>PAL</name>
-                    <position>28</position>
-                </field>
-                <field>
-                    <name>LEN</name>
-                    <position>0</position>
-                    <width>24</width>
-                </field>
-            </register>
-        </node>
-        <node>
-            <name>OFFS</name>
-            <title>DMA Offsize Register 1</title>
-            <instance>
-                <name>OFFS</name>
-                <range>
-                    <first>0</first>
-                    <address>0x60</address>
-                    <address>0x70</address>
-                </range>
-            </instance>
-            <register/>
-        </node>
-        <node>
-            <name>PW</name>
-            <title>DMA Page Width Register 1</title>
-            <instance>
-                <name>PW</name>
-                <range>
-                    <first>0</first>
-                    <address>0x64</address>
-                    <address>0x74</address>
-                </range>
-            </instance>
-            <register/>
-        </node>
-        <node>
-            <name>DESSIZE</name>
-            <title>Foreground Size in Descriptor 1 Register</title>
-            <instance>
-                <name>DESSIZE</name>
-                <range>
-                    <first>0</first>
-                    <address>0x6c</address>
-                    <address>0x7c</address>
-                </range>
-            </instance>
-            <register>
-                <field>
-                    <name>HEIGHT</name>
-                    <desc>height of foreground 1</desc>
+                    <name>YPOS</name>
+                    <desc>Y position bit of foreground 0 or 1</desc>
                     <position>16</position>
                     <width>16</width>
                 </field>
                 <field>
-                    <name>WIDTH</name>
-                    <desc>width of foreground 1</desc>
+                    <name>XPOS</name>
+                    <desc>X position bit of foreground 0 or 1</desc>
                     <position>0</position>
                     <width>16</width>
                 </field>
             </register>
-        </node>
-        <node>
-            <name>CNUM</name>
-            <title>DMA Command Counter Register 1</title>
-            <instance>
-                <name>CNUM</name>
-                <range>
-                    <first>0</first>
-                    <address>0x68</address>
-                    <address>0x78</address>
-                </range>
-            </instance>
-            <register/>
         </node>
     </node>
     <node>
