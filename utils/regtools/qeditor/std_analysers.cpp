@@ -84,7 +84,10 @@ QWidget *ClockAnalyser::GetWidget()
 
 bool ClockAnalyser::SupportSoc(const QString& soc_name)
 {
-    return (soc_name == "imx233" || soc_name == "rk27xx" || soc_name == "atj213x");
+    return soc_name == "imx233"
+        || soc_name == "rk27xx"
+        || soc_name == "atj213x"
+        || soc_name == "jz4760b";
 }
 
 QString ClockAnalyser::GetFreq(unsigned freq)
@@ -137,8 +140,85 @@ void ClockAnalyser::FillTree()
     if(m_soc.get()->name == "imx233") FillTreeIMX233();
     else if(m_soc.get()->name == "rk27xx") FillTreeRK27XX();
     else if(m_soc.get()->name == "atj213x") FillTreeATJ213X();
+    else if(m_soc.get()->name == "jz4760b") FillTreeJZ4760B();
     m_tree_widget->expandAll();
     m_tree_widget->resizeColumnToContents(0);
+}
+
+void ClockAnalyser::FillTreeJZ4760B()
+{
+    AddClock(0, "RTCLK", 32768);
+    // assume EXCLK is 12MHz, we have no way to knowing for sure but this is the
+    // recommended value anyway
+    QTreeWidgetItem *exclk = AddClock(0, "EXCLK", 12000000);
+    // PLL0
+    soc_word_t pllm, plln, pllod, pllbypass;
+    QTreeWidgetItem *pll0 = 0;
+    if(ReadFieldOld("CPM", "PLLCTRL0", "FEED_DIV", pllm) &&
+            ReadFieldOld("CPM", "PLLCTRL0", "IN_DIV", plln) &&
+            ReadFieldOld("CPM", "PLLCTRL0", "OUT_DIV", pllod) &&
+            ReadFieldOld("CPM", "PLLCTRL0", "BYPASS", pllbypass))
+    {
+        pll0 = AddClock(exclk, "PLL0", FROM_PARENT, pllbypass ? 1 : 2 * pllm,
+            pllbypass ? 1 : plln * (1 << pllod));
+    }
+    else
+        pll0 = AddClock(exclk, "PLL0", INVALID);
+    // PLL1
+    soc_word_t plldiv, src_sel;
+    QTreeWidgetItem *pll1 = 0;
+    if(ReadFieldOld("CPM", "PLLCTRL1", "FEED_DIV", pllm) &&
+            ReadFieldOld("CPM", "PLLCTRL1", "IN_DIV", plln) &&
+            ReadFieldOld("CPM", "PLLCTRL1", "OUT_DIV", pllod) &&
+            ReadFieldOld("CPM", "PLLCTRL1", "SRC_SEL", src_sel) &&
+            ReadFieldOld("CPM", "PLLCTRL1", "PLL0_DIV", plldiv))
+    {
+        pll1 = AddClock(src_sel ? pll0 : exclk, "PLL1", FROM_PARENT, 2 * pllm,
+            plln * (1 << pllod) * (src_sel ? plldiv : 1));
+    }
+    else
+        pll1 = AddClock(exclk, "PLL1", INVALID);
+    // system clocks
+    const int NR_SYSCLK = 6;
+    const char *sysclk[NR_SYSCLK] = { "CCLK", "SCLK", "PCLK", "HCLK", "H2CLK", "MCLK"};
+    for(int i = 0; i < NR_SYSCLK; i++)
+    {
+        soc_word_t div = 0;
+        std::string field = std::string(sysclk[i]) + "_DIV";
+        if(ReadFieldOld("CPM", "SYSCLK", field.c_str(), div))
+        {
+            switch(div)
+            {
+                case 0: div = 1; break;
+                case 1: div = 2; break;
+                case 2: div = 3; break;
+                case 3: div = 4; break;
+                case 4: div = 6; break;
+                case 5: div = 8; break;
+                default: div = 0; break;
+            }
+        }
+        if(div != 0)
+            AddClock(pll0, sysclk[i], FROM_PARENT, 1, div);
+        else
+            AddClock(pll0, sysclk[i], INVALID);
+    }
+    // common to msc, i2s, lcd, uhc, otg, ssi, pcm, gpu, gps
+    soc_word_t pll_div;
+    if(ReadFieldOld("CPM", "SYSCLK", "PLL_DIV", pll_div))
+        pll_div = pll_div ? 1 : 2;
+    else
+        pll_div = 1; // error
+    // lcd
+    soc_word_t pll_sel, div;
+    if(ReadFieldOld("CPM", "LCDCLK", "DIV", div) &&
+            ReadFieldOld("CPM", "LCDCLK", "PLL_SEL", pll_sel))
+    {
+        AddClock(pll_sel ? pll1 : pll0, "LCDCLK",
+            FROM_PARENT, 1, pll_div * (div + 1));
+    }
+    else
+        AddClock(exclk, "LCDCLK", INVALID);
 }
 
 void ClockAnalyser::FillTreeATJ213X()
