@@ -111,6 +111,8 @@ void usage(void)
     printf("  --quiet/-q      Quiet output\n");
     printf("  --type/-t <t>   Override file type\n");
     printf("  --dev/-d <uri>  Device URI (see below)\n");
+    printf("  --noload        Skip loading stage and only execute the given address\n");
+    printf("  --noexec        Skip execute stage and only load data the given address\n");
     printf("file types:\n");
     printf("  raw      Load a raw binary blob\n");
     printf("  rockbox  Load a rockbox image produced by scramble\n");
@@ -127,7 +129,8 @@ int main(int argc, char **argv)
 {
     bool quiet = false;
     enum image_type_t type = IT_DETECT;
-    const char *uri = "usb:";
+    const char *uri = hwstub::uri::default_uri().full_uri().c_str();
+    bool no_load = false, no_exec = false;
 
     // parse command line
     while(1)
@@ -138,10 +141,12 @@ int main(int argc, char **argv)
             {"quiet", no_argument, 0, 'q'},
             {"type", required_argument, 0, 't'},
             {"dev", required_argument, 0, 'd'},
+            {"noload", no_argument, 0, 'e'},
+            {"noexec", no_argument, 0, 'l'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?qt:d:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?qt:d:el", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -169,6 +174,12 @@ int main(int argc, char **argv)
                 break;
             case 'd':
                 uri = optarg;
+                break;
+            case 'e':
+                no_load = true;
+                break;
+            case 'l':
+                no_exec = true;
                 break;
             default:
                 abort();
@@ -257,15 +268,33 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    size_t out_size = size;
-    ret = hwdev->write(addr, buffer, out_size, false);
-    if(ret != hwstub::error::SUCCESS || out_size != size)
+    /* load */
+    if(!no_load)
     {
-        fprintf(stderr, "Image write failed: %s, %zu/%zu\n", error_string(ret).c_str(),
-            out_size, size);
-        goto Lerr;
+        size_t out_size = size;
+        ret = hwdev->write(addr, buffer, out_size, false);
+        if(ret != hwstub::error::SUCCESS || out_size != size)
+        {
+            fprintf(stderr, "Image write failed: %s, %zu/%zu\n", error_string(ret).c_str(),
+                out_size, size);
+            goto Lerr;
+        }
     }
-    hwdev->exec(addr, HWSTUB_EXEC_JUMP);
+    else
+        printf("Skip load as requested\n");
+
+    /* exec */
+    if(!no_exec)
+    {
+        ret = hwdev->exec(addr, HWSTUB_EXEC_JUMP);
+        if(ret != hwstub::error::SUCCESS)
+        {
+            fprintf(stderr, "Exec failed: %s\n", error_string(ret).c_str());
+            goto Lerr;
+        }
+    }
+    else
+        printf("Skip exec as requested\n");
 
     return 0;
 

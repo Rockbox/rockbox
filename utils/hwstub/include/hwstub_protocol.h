@@ -315,4 +315,11 @@ struct hwstub_exec_req_t
  * Receive: no data
  */
 
+/**
+ * HWSERVER_EXEC:
+ * Execute code.
+ * Send: args[0] = handle ID, args[1] = addr, args[2] = flags, no data
+ * Receive: no data
+ */
+
 #endif /* __HWSTUB_PROTOCOL__ */
