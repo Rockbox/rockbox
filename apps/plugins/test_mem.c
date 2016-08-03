@@ -210,7 +210,7 @@ enum plugin_status plugin_start(const void* parameter)
         rb->screens[0]->clear_display();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         TEST_MEM_PRINTF("%s", boost?"boosted":"unboosted");
-        TEST_MEM_PRINTF("clock: %d Hz", *rb->cpu_frequency);
+        TEST_MEM_PRINTF("clock: %3d.%d MHz", (*rb->cpu_frequency)/1000000, (*rb->cpu_frequency)%1000000);
 #endif
         TEST_MEM_PRINTF("loop#: %d", ++count);
 
