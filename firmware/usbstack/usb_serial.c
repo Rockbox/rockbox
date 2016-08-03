@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "string.h"
-#include "config.h"
 #include "system.h"
 #include "usb_core.h"
 #include "usb_drv.h"
@@ -56,16 +55,19 @@ static struct usb_endpoint_descriptor __attribute__((aligned(2)))
     .bInterval        = 0
 };
 
+/* send_buffer: local ring buffer.
+ * transit_buffer: used to store aligned data that will be sent by the USB
+ * driver. PP502x needs boost for high speed USB, but still works up to
+ * around 100 bytes without boost, we play safe and limit packet size to 32
+ * bytes, it doesn't hurt because data can be sent over several transfers.
+ */
 #define BUFFER_SIZE 512
-static unsigned char send_buffer[BUFFER_SIZE]
-    USB_DEVBSS_ATTR __attribute__((aligned(32)));
+#define TRANSIT_BUFFER_SIZE 32
+static unsigned char send_buffer[BUFFER_SIZE];
+static unsigned char transit_buffer[TRANSIT_BUFFER_SIZE]
+    USB_DEVBSS_ATTR __attribute__((aligned(4)));
 static unsigned char receive_buffer[32]
     USB_DEVBSS_ATTR __attribute__((aligned(32)));
-#if CONFIG_USBOTG == USBOTG_DESIGNWARE
-/* Aligned transit buffer */
-static unsigned char transit_buffer[32]
-    USB_DEVBSS_ATTR __attribute__((aligned(4)));
-#endif
 
 static void sendout(void);
 
@@ -163,19 +165,12 @@ void usb_serial_disconnect(void)
 static void sendout(void)
 {
     buffer_transitlength = MIN(buffer_length,BUFFER_SIZE-buffer_start);
-    /* For unknown reasons packets larger than 96 bytes are not sent. We play
-     * safe and limit to 32. TODO: find the real bug */
-    buffer_transitlength = MIN(buffer_transitlength,32);
     if(buffer_transitlength > 0)
     {
+        buffer_transitlength = MIN(buffer_transitlength,TRANSIT_BUFFER_SIZE);
         buffer_length -= buffer_transitlength;
-#if CONFIG_USBOTG == USBOTG_DESIGNWARE
         memcpy(transit_buffer,&send_buffer[buffer_start],buffer_transitlength);
         usb_drv_send_nonblocking(ep_in,transit_buffer,buffer_transitlength);
-#else
-        usb_drv_send_nonblocking(ep_in, &send_buffer[buffer_start],
-                buffer_transitlength);
-#endif
     }
 }
 
