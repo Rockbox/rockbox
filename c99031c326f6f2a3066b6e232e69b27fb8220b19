@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_4d03f90e",
+        "filename": "utils/hwstub/lib/hwstub_net.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1239,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2016-08-03T13:24:49Z",
+      "side": 1,
+      "message": "copy/paste, should be exec",
+      "range": {
+        "startLine": 1239,
+        "startChar": 47,
+        "endLine": 1239,
+        "endChar": 52
+      },
+      "revId": "c99031c326f6f2a3066b6e232e69b27fb8220b19",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_6dfeb506",
+        "filename": "utils/hwstub/tools/hwstub_load.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1000040
+      },
+      "writtenOn": "2016-08-03T13:24:49Z",
+      "side": 1,
+      "message": "split this diff and put it in another commit",
+      "revId": "c99031c326f6f2a3066b6e232e69b27fb8220b19",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
