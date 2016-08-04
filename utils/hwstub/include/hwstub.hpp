@@ -62,6 +62,8 @@ enum class error
     NET_ERROR, /** Network error */
     TIMEOUT, /** Operation timed out */
     OVERFLW, /** Operation stopped to prevent buffer overflow */
+    UNIMPLEMENTED, /** Operation has not been implemented */
+    UNSUPPORTED, /** Operation is not supported by device/protocol */
 };
 
 /** Return a string explaining the error */
@@ -266,6 +268,15 @@ public:
      *       according to the buffer size and call read_dev() and write_dev() */
     error read(uint32_t addr, void *buf, size_t& sz, bool atomic);
     error write(uint32_t addr, const void *buf, size_t& sz, bool atomic);
+    /** Execute a general cop operation: if out_data is not null, data is appended to header,
+     * if in_data is not null, a read operation follows to retrieve some data.
+     * The in_data parameters is updated to reflect the number of transfered bytes */
+    error cop_op(uint8_t op, uint8_t args[HWSTUB_COP_ARGS], const void *out_data,
+        size_t out_size, void *in_data, size_t *in_size);
+    /** Execute a coprocessor read operation */
+    error read32_cop(uint8_t args[HWSTUB_COP_ARGS], uint32_t& value);
+    /** Execute a coprocessor write operation */
+    error write32_cop(uint8_t args[HWSTUB_COP_ARGS], uint32_t value);
     /** Get device buffer size: any read() or write() greater than this size
      * will be split into several transaction to avoid overflowing device
      * buffer. */
@@ -303,6 +314,11 @@ protected:
     virtual error get_dev_desc(uint16_t desc, void *buf, size_t& buf_sz) = 0;
     virtual error get_dev_log(void *buf, size_t& buf_sz) = 0;
     virtual error exec_dev(uint32_t addr, uint16_t flags) = 0;
+    /* cop operation: if out_data is not null, data is appended to header, if
+     * in_data is not null, a READ2 operation follows to retrieve some data
+     * The in_data parameters is updated to reflect the number of transfered bytes*/
+    virtual error cop_dev(uint8_t op, uint8_t args[HWSTUB_COP_ARGS], const void *out_data,
+        size_t out_size, void *in_data, size_t *in_size) = 0;
 
     std::shared_ptr<device> m_dev; /* pointer to device */
     std::atomic<int> m_refcnt; /* reference count */
@@ -338,6 +354,8 @@ protected:
     virtual error get_dev_desc(uint16_t desc, void *buf, size_t& buf_sz);
     virtual error get_dev_log(void *buf, size_t& buf_sz);
     virtual error exec_dev(uint32_t addr, uint16_t flags);
+    virtual error cop_dev(uint8_t op, uint8_t args[HWSTUB_COP_ARGS], const void *out_data,
+        size_t out_size, void *in_data, size_t *in_size);
     virtual error status() const;
     virtual size_t get_buffer_size();
 
