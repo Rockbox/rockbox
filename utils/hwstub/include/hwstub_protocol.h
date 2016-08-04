@@ -33,7 +33,7 @@
  */
 
 #define HWSTUB_VERSION_MAJOR    4
-#define HWSTUB_VERSION_MINOR    2
+#define HWSTUB_VERSION_MINOR    3
 
 #define HWSTUB_VERSION__(maj, min) #maj"."#min
 #define HWSTUB_VERSION_(maj, min) HWSTUB_VERSION__(maj, min)
@@ -169,6 +169,7 @@ struct hwstub_net_hdr_t
 #define HWSTUB_EXEC                 0x44
 #define HWSTUB_READ2_ATOMIC         0x45
 #define HWSTUB_WRITE_ATOMIC         0x46
+#define HWSTUB_COPROCESSOR_OP       0x47
 
 /* the following commands and the ACK/NACK mechanism are net only */
 #define HWSERVER_ACK(n) (0x100|(n))
@@ -250,6 +251,35 @@ struct hwstub_exec_req_t
     uint32_t dAddress;
     uint16_t bmFlags;
 } __attribute__((packed));
+
+/**
+ * HWSTUB_COPROCESSOR_OP
+ * Execute a coprocessor operation. The operation is describe in the header of
+ * the structure. There are currently two supported operations:
+ * - read: following the HWSTUB_COPROCESSOR_OP, the host can retrieve the data
+ *         by sending a HWSTUB_READ2 request (just like a regular read) of
+ *         the appropriate size
+ * - write: the header is followed by the data to write.
+ * If the request has two parts (second being READ2) then both requests must use
+ * the same ID in wValue, otherwise the second request will be STALLed.
+ * If a particular operation is not supported, it must be STALLed by the device.
+ */
+
+#define HWSTUB_COP_READ     0 /* read operation */
+#define HWSTUB_COP_WRITE    1 /* write operation */
+/* for MIPS */
+#define HWSTUB_COP_MIPS_COP 0 /* coprocessor number */
+#define HWSTUB_COP_MIPS_REG 1 /* coprocessor register */
+#define HWSTUB_COP_MIPS_SEL 2 /* coprocessor select */
+
+#define HWSTUB_COP_ARGS     7 /* maximum number of arguments */
+
+struct hwstub_cop_req_t
+{
+    uint8_t bOp; /* operation to execute */
+    uint8_t bArgs[HWSTUB_COP_ARGS]; /* arguments to the operation */
+    /* followed by data for WRITE operation */
+};
 
 /**
  * HWSERVER_HELLO:

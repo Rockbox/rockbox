@@ -735,6 +735,18 @@ error handle::exec_dev(uint32_t addr, uint16_t flags)
     return error::SUCCESS;
 }
 
+error handle::cop_dev(uint8_t op, uint8_t args[HWSTUB_COP_ARGS],
+    const void *out_data, size_t out_size, void *in_data, size_t *in_size)
+{
+    (void) op;
+    (void) args;
+    (void) out_data;
+    (void) out_size;
+    (void) in_data;
+    (void) in_size;
+    return error::UNIMPLEMENTED;
+}
+
 error handle::status() const
 {
     return hwstub::handle::status();
