@@ -292,9 +292,11 @@ int my_lua_call(lua_State *state)
 {
     int n = lua_gettop(state);
     if(n != 1)
-        luaL_error(state, "call takes target address argument");
+        luaL_error(state, "call takes one argument: target address");
 
-    g_hwdev->exec(luaL_checkunsigned(state, 1), HWSTUB_EXEC_CALL);
+    error ret = g_hwdev->exec(luaL_checkunsigned(state, 1), HWSTUB_EXEC_CALL);
+    if(ret != error::SUCCESS)
+        luaL_error(state, "call failed");
     return 0;
 }
 
@@ -302,9 +304,67 @@ int my_lua_jump(lua_State *state)
 {
     int n = lua_gettop(state);
     if(n != 1)
-        luaL_error(state, "jump takes target address argument");
+        luaL_error(state, "jump takes one argument: target address");
 
-   g_hwdev->exec(luaL_checkunsigned(state, 1), HWSTUB_EXEC_JUMP);
+    error ret = g_hwdev->exec(luaL_checkunsigned(state, 1), HWSTUB_EXEC_JUMP);
+    if(ret != error::SUCCESS)
+        luaL_error(state, "jump failed");
+    return 0;
+}
+
+int my_lua_read32_cop(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 1)
+        luaL_error(state, "read32_cop takes one argument: arguments (array)");
+    uint8_t args[HWSTUB_COP_ARGS] = {0};
+    /* parse array */
+    luaL_checktype(state, 1, LUA_TTABLE);
+    size_t sz = lua_rawlen(state, 1);
+    if(sz > HWSTUB_COP_ARGS)
+        luaL_error(state, "coprocessor operation take at most %d arguments", HWSTUB_COP_ARGS);
+    for(size_t i = 0; i < sz; i++)
+    {
+        lua_pushinteger(state, i + 1); /* index start at 1 */
+        lua_gettable(state, 1);
+        /* check it is an integer */
+        args[i] = luaL_checkunsigned(state, -1);
+        /* pop it */
+        lua_pop(state, 1);
+    }
+
+    uint32_t val;
+    error ret = g_hwdev->read32_cop(args, val);
+    if(ret != error::SUCCESS)
+        luaL_error(state, "coprocessor read failed");
+    lua_pushunsigned(state, val);
+    return 1;
+}
+
+int my_lua_write32_cop(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 2)
+        luaL_error(state, "write32_cop takes two arguments: arguments (array) and value");
+    uint8_t args[HWSTUB_COP_ARGS] = {0};
+    /* parse array */
+    luaL_checktype(state, 1, LUA_TTABLE);
+    size_t sz = lua_rawlen(state, 1);
+    if(sz > HWSTUB_COP_ARGS)
+        luaL_error(state, "coprocessor operation take at most %d arguments", HWSTUB_COP_ARGS);
+    for(size_t i = 0; i < sz; i++)
+    {
+        lua_pushinteger(state, i + 1); /* index start at 1 */
+        lua_gettable(state, 1);
+        /* check it is an integer */
+        args[i] = luaL_checkunsigned(state, -1);
+        /* pop it */
+        lua_pop(state, 1);
+    }
+
+    error ret = g_hwdev->write32_cop(args, luaL_checkunsigned(state, 2));
+    if(ret != error::SUCCESS)
+        luaL_error(state, "coprocessor write failed");
     return 0;
 }
 
@@ -735,6 +795,10 @@ bool my_lua_import_hwstub()
     lua_setfield(g_lua, -2, "call");
     lua_pushcclosure(g_lua, my_lua_jump, 0);
     lua_setfield(g_lua, -2, "jump");
+    lua_pushcclosure(g_lua, my_lua_read32_cop, 0);
+    lua_setfield(g_lua, -2, "read32_cop");
+    lua_pushcclosure(g_lua, my_lua_write32_cop, 0);
+    lua_setfield(g_lua, -2, "write32_cop");
 
     lua_setfield(g_lua, -2, "dev");
 

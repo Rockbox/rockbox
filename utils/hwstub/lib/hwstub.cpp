@@ -45,6 +45,8 @@ std::string error_string(error err)
         case error::PROTOCOL_ERROR: return "network protocol error";
         case error::TIMEOUT: return "timeout";
         case error::OVERFLW: return "overflow";
+        case error::UNIMPLEMENTED: return "operation is not implemented";
+        case error::UNSUPPORTED: return "operation unsupported";
         default: return "unknown error";
     }
 }
@@ -454,6 +456,38 @@ error handle::write(uint32_t addr, const void *buf, size_t& sz, bool atomic)
     return error::SUCCESS;
 }
 
+error handle::cop_op(uint8_t op, uint8_t args[HWSTUB_COP_ARGS], const void *out_data,
+    size_t out_size, void *in_data, size_t *in_size)
+{
+    std::unique_lock<std::recursive_mutex> lock(m_mutex);
+    /* get a pointer so that it's not destroyed during the runtime of the function,
+     * the pointer will be released at the end of the function */
+    std::shared_ptr<context> ctx = m_dev->get_context();
+    if(!ctx)
+        return error::NO_CONTEXT;
+    /* ensure valid status */
+    error err = status();
+    if(err != error::SUCCESS)
+        return err;
+    return cop_dev(op, args, out_data, out_size, in_data, in_size);
+}
+
+error handle::read32_cop(uint8_t args[HWSTUB_COP_ARGS], uint32_t& value)
+{
+    size_t sz = sizeof(value);
+    error err = cop_op(HWSTUB_COP_READ, args, nullptr, 0, &value, &sz);
+    if(err != error::SUCCESS)
+        return err;
+    if(sz != sizeof(value))
+        return error::ERROR;
+    return error::SUCCESS;
+}
+
+error handle::write32_cop(uint8_t args[HWSTUB_COP_ARGS], uint32_t value)
+{
+    return cop_op(HWSTUB_COP_WRITE, args, &value, sizeof(value), nullptr, nullptr);
+}
+
 error handle::status() const
 {
     /* check context */
@@ -610,6 +644,18 @@ error dummy_handle::exec_dev(uint32_t addr, uint16_t flags)
 {
     (void) addr;
     (void) flags;
+    return error::DUMMY;
+}
+
+error dummy_handle::cop_dev(uint8_t op, uint8_t args[HWSTUB_COP_ARGS],
+    const void *out_data, size_t out_size, void *in_data, size_t *in_size)
+{
+    (void) op;
+    (void) args;
+    (void) out_data;
+    (void) out_size;
+    (void) in_data;
+    (void) in_size;
     return error::DUMMY;
 }
 

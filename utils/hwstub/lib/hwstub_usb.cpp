@@ -293,8 +293,7 @@ rb_handle::rb_handle(std::shared_ptr<hwstub::device> dev,
         m_probe_status = get_version_desc(ver_desc);
         if(m_probe_status == error::SUCCESS)
         {
-            if(ver_desc.bMajor != HWSTUB_VERSION_MAJOR ||
-                    ver_desc.bMinor < HWSTUB_VERSION_MINOR)
+            if(ver_desc.bMajor != HWSTUB_VERSION_MAJOR)
                 m_probe_status = error::PROBE_FAILURE;
         }
     }
@@ -379,6 +378,46 @@ error rb_handle::write_dev(uint32_t addr, const void *buf, size_t& sz, bool atom
         (unsigned char *)req, sz + hdr_sz, m_timeout), sz + hdr_sz);
     delete[] tmp_buf;
     return ret;
+}
+
+error rb_handle::cop_dev(uint8_t op, uint8_t args[HWSTUB_COP_ARGS],
+    const void *out_data, size_t out_size, void *in_data, size_t *in_size)
+{
+    (void) op;
+    (void) args;
+    (void) out_data;
+    (void) out_size;
+    (void) in_data;
+    (void) in_size;
+    std::shared_ptr<hwstub::context> hctx = get_device()->get_context();
+    if(!hctx)
+        return error::NO_CONTEXT;
+
+    /* construct out request: header followed by (optional) data */
+    size_t hdr_sz = sizeof(struct hwstub_cop_req_t);
+    uint8_t *tmp_buf = new uint8_t[out_size + hdr_sz];
+    struct hwstub_cop_req_t *req = reinterpret_cast<struct hwstub_cop_req_t *>(tmp_buf);
+    req->bOp = op;
+    for(int i = 0; i < HWSTUB_COP_ARGS; i++)
+        req->bArgs[i] = args[i];
+    if(out_size > 0)
+        memcpy(tmp_buf + hdr_sz, out_data, out_size);
+    error ret = interpret_libusb_error(libusb_control_transfer(m_handle,
+        LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT,
+        HWSTUB_COPROCESSOR_OP, m_transac_id++, m_intf,
+        (unsigned char *)req, out_size + hdr_sz, m_timeout), out_size + hdr_sz);
+    delete[] tmp_buf;
+    /* return errors if any */
+    if(ret != error::SUCCESS)
+        return ret;
+    /* return now if there is no read stage */
+    if(in_data == nullptr)
+        return error::SUCCESS;
+    /* perform read stage (use the same transaction ID) */
+    return interpret_libusb_size(libusb_control_transfer(m_handle,
+        LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN,
+        HWSTUB_READ2, m_transac_id - 1, m_intf,
+        (unsigned char *)in_data, *in_size, m_timeout), *in_size);
 }
 
 bool rb_handle::find_intf(struct libusb_device_descriptor *dev,
@@ -654,6 +693,18 @@ error jz_handle::write_dev(uint32_t addr, const void *buf, size_t& sz, bool atom
     if(ret == error::SUCCESS)
         ret = jz_download(buf, sz);
     return ret;
+}
+
+error jz_handle::cop_dev(uint8_t op, uint8_t args[HWSTUB_COP_ARGS],
+    const void *out_data, size_t out_size, void *in_data, size_t *in_size)
+{
+    (void) op;
+    (void) args;
+    (void) out_data;
+    (void) out_size;
+    (void) in_data;
+    (void) in_size;
+    return error::UNSUPPORTED;
 }
 
 bool jz_handle::is_boot_dev(struct libusb_device_descriptor *dev,
