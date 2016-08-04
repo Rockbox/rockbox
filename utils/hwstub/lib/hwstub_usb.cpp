@@ -525,7 +525,9 @@ error jz_handle::probe()
      * this code will leaves registers and ram is the same state as before.
      * In case of failure, simply assume JZ4760. */
     if(m_desc_jz.wChipID == 0x4760)
-        probe_jz4760b();
+        m_probe_status = probe_jz4760b();
+    else
+        m_probe_status = error::SUCCESS;
 
     /** Fill descriptors */
     m_desc_version.bLength = sizeof(m_desc_version);
