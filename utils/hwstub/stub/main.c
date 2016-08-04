@@ -400,10 +400,12 @@ static bool read_atomic(void *dst, void *src, size_t sz)
     }
 }
 
+static void *last_read_addr = 0;
+static uint16_t last_read_id = 0xffff;
+static size_t last_read_max_size = 0;
+
 static void handle_read(struct usb_ctrlrequest *req)
 {
-    static uint32_t last_addr = 0;
-    static uint16_t last_id = 0xffff;
     uint16_t id = req->wValue;
 
     if(req->bRequest == HWSTUB_READ)
@@ -413,26 +415,29 @@ static void handle_read(struct usb_ctrlrequest *req)
             return usb_drv_stall(EP_CONTROL, true, true);
         asm volatile("nop" : : : "memory");
         struct hwstub_read_req_t *read = (void *)usb_buffer;
-        last_addr = read->dAddress;
-        last_id = id;
+        last_read_addr = (void *)read->dAddress;
+        last_read_max_size = usb_buffer_size;
+        last_read_id = id;
         usb_drv_send(EP_CONTROL, NULL, 0);
     }
     else
     {
-        if(id != last_id)
+        /* NOTE: READ2 is also called after a coprocessor operation */
+        if(id != last_read_id)
             return usb_drv_stall(EP_CONTROL, true, true);
+        size_t len = MIN(req->wLength, last_read_max_size);
 
         if(req->bRequest == HWSTUB_READ2_ATOMIC)
         {
             if(set_data_abort_jmp() == 0)
             {
-                if(!read_atomic(usb_buffer, (void *)last_addr, req->wLength))
+                if(!read_atomic(usb_buffer, last_read_addr, len))
                     return usb_drv_stall(EP_CONTROL, true, true);
             }
             else
             {
-                logf("trapped read data abort in [0x%x,0x%x]\n", last_addr,
-                    last_addr + req->wLength);
+                logf("trapped read data abort in [0x%x,0x%x]\n", last_read_addr,
+                    last_read_addr + len);
                 return usb_drv_stall(EP_CONTROL, true, true);
             }
         }
@@ -440,19 +445,19 @@ static void handle_read(struct usb_ctrlrequest *req)
         {
             if(set_data_abort_jmp() == 0)
             {
-                memcpy(usb_buffer, (void *)last_addr, req->wLength);
+                memcpy(usb_buffer, last_read_addr, len);
                 asm volatile("nop" : : : "memory");
             }
             else
             {
-                logf("trapped read data abort in [0x%x,0x%x]\n", last_addr,
-                    last_addr + req->wLength);
+                logf("trapped read data abort in [0x%x,0x%x]\n", last_read_addr,
+                    last_read_addr + len);
                 return usb_drv_stall(EP_CONTROL, true, true);
             }
 
         }
 
-        usb_drv_send(EP_CONTROL, usb_buffer, req->wLength);
+        usb_drv_send(EP_CONTROL, usb_buffer, len);
         usb_drv_recv(EP_CONTROL, NULL, 0);
     }
 }
@@ -562,6 +567,153 @@ static void handle_exec(struct usb_ctrlrequest *req)
     }
 }
 
+#ifdef CPU_MIPS
+static uint32_t rw_cp0_inst_buffer[3];
+typedef uint32_t (*read_cp0_inst_buffer_fn_t)(void);
+typedef void (*write_cp0_inst_buffer_fn_t)(uint32_t);
+
+uint32_t mips_read_cp0(unsigned reg, unsigned sel)
+{
+    /* ok this is tricky because the coprocessor read instruction encoding
+     * contains the register and select, so we need to generate the instruction
+     * on the fly, we generate a "function like" buffer with three instructions:
+     * mfc0 v0, reg, sel
+     * jr ra
+     * nop
+     */
+    rw_cp0_inst_buffer[0] = 0x40000000 | /*v0*/2 << 16 | (sel & 0x7) | (reg & 0x1f) << 11;
+    rw_cp0_inst_buffer[1] = /*ra*/31 << 21 | 0x8; /* jr ra */
+    rw_cp0_inst_buffer[2] = 0; /* nop */
+    target_flush_caches();
+    read_cp0_inst_buffer_fn_t fn = (read_cp0_inst_buffer_fn_t)rw_cp0_inst_buffer;
+    return fn();
+}
+
+void mips_write_cp0(unsigned reg, unsigned sel, uint32_t val)
+{
+    /* ok this is tricky because the coprocessor write instruction encoding
+     * contains the register and select, so we need to generate the instruction
+     * on the fly, we generate a "function like" buffer with three instructions:
+     * mtc0 a0, reg, sel
+     * jr ra
+     * nop
+     */
+    rw_cp0_inst_buffer[0] = 0x40800000 | /*a0*/4 << 16 | (sel & 0x7) | (reg & 0x1f) << 11;
+    rw_cp0_inst_buffer[1] = /*ra*/31 << 21 | 0x8; /* jr ra */
+    rw_cp0_inst_buffer[2] = 0; /* nop */
+    target_flush_caches();
+    write_cp0_inst_buffer_fn_t fn = (write_cp0_inst_buffer_fn_t)rw_cp0_inst_buffer;
+    fn(val);
+}
+#endif
+
+/* coprocessor read: return <0 on error (-2 for dull dump), or size to return
+ * to host otherwise */
+int cop_read(uint8_t args[HWSTUB_COP_ARGS], void *out_data, size_t out_max_sz)
+{
+    /* virtually all targets do register-based operation, so 32-bit */
+    if(out_max_sz < 4)
+    {
+        logf("cop read failed: output buffer is too small\n");
+        return -1;
+    }
+#ifdef CPU_MIPS
+    if(args[HWSTUB_COP_MIPS_COP] != 0)
+    {
+        logf("cop read failed: only mips cp0 is supported\n");
+        return -2;
+    }
+    *(uint32_t *)out_data = mips_read_cp0(args[HWSTUB_COP_MIPS_REG],  args[HWSTUB_COP_MIPS_SEL]);
+    return 4;
+#else
+    logf("cop read failed: unsupported cpu\n");
+    return -1;
+#endif
+}
+
+/* coprocessor write: return <0 on error (-2 for dull dump), or 0 on success */
+int cop_write(uint8_t args[HWSTUB_COP_ARGS], const void *in_data, size_t in_sz)
+{
+    /* virtually all targets do register-based operation, so 32-bit */
+    if(in_sz != 4)
+    {
+        logf("cop read failed: input buffer has wrong size\n");
+        return -1;
+    }
+#ifdef CPU_MIPS
+    if(args[HWSTUB_COP_MIPS_COP] != 0)
+    {
+        logf("cop read failed: only mips cp0 is supported\n");
+        return -2;
+    }
+    mips_write_cp0(args[HWSTUB_COP_MIPS_REG],  args[HWSTUB_COP_MIPS_SEL], *(uint32_t *)in_data);
+    return 0;
+#else
+    logf("cop write failed: unsupported cpu\n");
+    return -1;
+#endif
+}
+
+/* return size to return to host or <0 on error */
+int do_cop_op(struct hwstub_cop_req_t *cop, void *in_data, size_t in_sz,
+    void *out_data, size_t out_max_sz)
+{
+    int ret = -2; /* -2 means full debug dump */
+    /* handle operations */
+    if(cop->bOp == HWSTUB_COP_READ)
+    {
+        /* read cannot have extra data */
+        if(in_sz > 0)
+            goto Lerr;
+        ret = cop_read(cop->bArgs, out_data, out_max_sz);
+    }
+    else if(cop->bOp == HWSTUB_COP_WRITE)
+    {
+        ret = cop_write(cop->bArgs, in_data, in_sz);
+    }
+
+Lerr:
+    if(ret == -2)
+    {
+        /* debug output */
+        logf("invalid cop op: %d, ", cop->bOp);
+        for(int i = 0; i < HWSTUB_COP_ARGS; i++)
+            logf("%c0x%x", i == 0 ? '[' : ',', cop->bArgs[i]);
+        logf("] in:%d\n", in_sz);
+    }
+    return ret;
+}
+
+static void handle_cop(struct usb_ctrlrequest *req)
+{
+    int size = usb_drv_recv(EP_CONTROL, usb_buffer, req->wLength);
+    int hdr_sz = sizeof(struct hwstub_cop_req_t);
+    asm volatile("nop" : : : "memory");
+    struct hwstub_cop_req_t *cop = (void *)usb_buffer;
+    /* request should at least contain the header */
+    if(size < hdr_sz)
+        return usb_drv_stall(EP_CONTROL, true, true);
+    /* perform coprocessor operation: put output buffer after the input one,
+     * limit output buffer size to maximum buffer size */
+    uint8_t *in_buf = usb_buffer + hdr_sz;
+    size_t in_sz = req->wLength - hdr_sz;
+    uint8_t *out_buf = in_buf + in_sz;
+    size_t out_max_sz = usb_buffer_size - req->wLength;
+    int ret = do_cop_op(cop, in_buf, in_sz, out_buf, out_max_sz);
+    /* STALL on error */
+    if(ret < 0)
+        return usb_drv_stall(EP_CONTROL, true, true);
+    /* acknowledge */
+    usb_drv_send(EP_CONTROL, NULL, 0);
+    /* if there is a read stage, prepare everything for the READ2 */
+    if(ret > 0)
+    {
+        last_read_id = req->wValue;
+        last_read_addr = out_buf;
+        last_read_max_size = ret;
+    }
+}
+
 static void handle_class_intf_req(struct usb_ctrlrequest *req)
 {
     unsigned intf = req->wIndex & 0xff;
@@ -581,6 +733,8 @@ static void handle_class_intf_req(struct usb_ctrlrequest *req)
             return handle_write(req);
         case HWSTUB_EXEC:
             return handle_exec(req);
+        case HWSTUB_COPROCESSOR_OP:
+            return handle_cop(req);
         default:
             usb_drv_stall(EP_CONTROL, true, true);
     }
