@@ -184,6 +184,8 @@ protected:
     virtual error get_dev_desc(uint16_t desc, void *buf, size_t& buf_sz);
     virtual error get_dev_log(void *buf, size_t& buf_sz);
     virtual error exec_dev(uint32_t addr, uint16_t flags);
+    virtual error cop_dev(uint8_t op, uint8_t args[HWSTUB_COP_ARGS], const void *out_data,
+        size_t out_size, void *in_data, size_t *in_size);
     virtual error status() const;
     virtual size_t get_buffer_size();
 
