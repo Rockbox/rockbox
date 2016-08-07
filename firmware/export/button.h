@@ -68,6 +68,10 @@ void set_backlight_filter_keypress(bool value);
 void set_remote_backlight_filter_keypress(bool value);
 #endif
 #endif
+#ifdef HAVE_LCD_FLIP
+int button_flip(int button);    /* flipping is sometimes done from     */
+bool button_get_flip(void);     /* external drivers (e.g. scrollstrip) */
+#endif
 
 #ifdef HAVE_HEADPHONE_DETECTION
 bool headphones_inserted(void);

@@ -61,6 +61,9 @@
 #ifdef HAVE_HOTKEY
 #include "onplay.h"
 #endif
+#ifdef HAVE_SCROLLSTRIP
+#include "scrollstrip.h"
+#endif
 
 #if defined(DX50) || defined(DX90)
 #include "governor-ibasso.h"
@@ -441,6 +444,27 @@ static const char* scanaccel_formatter(char *buffer, size_t buffer_size,
     return buffer;
 }
 #endif
+
+#ifdef HAVE_SCROLLSTRIP
+static const char* scrollstrip_formatter(char *buffer, size_t buffer_size,
+        int val, const char *unit)
+{
+    (void)unit;
+    if (val <= -100)
+        return str(LANG_OFF);
+    else
+        snprintf(buffer, buffer_size, "speed setting %d", val);
+    return buffer;
+}
+
+static int32_t scrollstrip_getlang(int value, int unit)
+{
+    if (value <= -100)
+        return LANG_OFF;
+    else
+        return TALK_ID(value, unit);
+}
+#endif /* HAVE_SCROLLSTRIP */
 
 #if CONFIG_CODEC == SWCODEC
 static void crossfeed_cross_set(int val)
@@ -2020,6 +2044,22 @@ const struct settings_list settings[] = {
                 MAX_BRIGHTNESS_SETTING, 1, NULL, NULL,
                 buttonlight_set_brightness),
 #endif
+#ifdef HAVE_SCROLLSTRIP
+    CHOICE_SETTING(0, scrollstrip_type, LANG_SCROLLSTRIP_TYPE, 0,
+                   "scrollstrip handling",
+                   "doubleclick 3 buttons,doubleclick centre only,long press 3 buttons,long press centre only,off", 
+                   scrollstrip_set_type, 5,
+                   ID2P(LANG_DOUBLECLICK_3), ID2P(LANG_DOUBLECLICK_C),
+                   ID2P(LANG_LONGPRESS_3), ID2P(LANG_LONGPRESS_C), ID2P(LANG_OFF)),
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, scrollstrip_speed,
+                LANG_SCROLLSTRIP_SPEED, 0, "Scrollstrip speed",
+                off_on, UNIT_INT, scrollstrip_formatter, scrollstrip_getlang,
+                scrollstrip_set_speed, 9, -4,-3,-2,-1,0,1,2,3,4),
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, scrollstrip_afterscroll,
+                LANG_SCROLLSTRIP_AFTERSCROLL, 0, "Scrollstrip afterscroll",
+                off_on, UNIT_INT, scrollstrip_formatter, scrollstrip_getlang,
+                scrollstrip_set_afterscroll, 8, -100,-3,-2,-1,0,1,2,3),
+#endif /* HAVE_SCROLLSTRIP */
 #ifndef HAVE_WHEEL_ACCELERATION
     INT_SETTING(0, list_accel_start_delay, LANG_LISTACCEL_START_DELAY,
                 2, "list_accel_start_delay", UNIT_SEC, 0, 10, 1,

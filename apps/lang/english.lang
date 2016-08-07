@@ -13479,3 +13479,122 @@
     ibassodx90: "Android Debug Bridge"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SCROLLSTRIP_TYPE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    scrollstrip: "Scrollstrip handling"
+  </source>
+  <dest>
+    *: none
+    scrollstrip: "Scrollstrip handling"
+  </dest>
+  <voice>
+    *: none
+    scrollstrip: "Scrollstrip handling"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLSTRIP_SPEED
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    scrollstrip: "Scrollstrip speed"
+  </source>
+  <dest>
+    *: none
+    scrollstrip: "Scrollstrip speed"
+  </dest>
+  <voice>
+    *: none
+    scrollstrip: "Scrollstrip speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLSTRIP_AFTERSCROLL
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    scrollstrip: "Afterscroll"
+  </source>
+  <dest>
+    *: none
+    scrollstrip: "Afterscroll"
+  </dest>
+  <voice>
+    *: none
+    scrollstrip: "Afterscroll"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DOUBLECLICK_3
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    scrollstrip: "Doubleclick mode, 3 buttons"
+  </source>
+  <dest>
+    *: none
+    scrollstrip: "Doubleclick mode, 3 buttons"
+  </dest>
+  <voice>
+    *: none
+    scrollstrip: "Doubleclick mode, 3 buttons"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DOUBLECLICK_C
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    scrollstrip: "Doubleclick mode, centre only"
+  </source>
+  <dest>
+    *: none
+    scrollstrip: "Doubleclick mode, centre only"
+  </dest>
+  <voice>
+    *: none
+    scrollstrip: "Doubleclick mode, centre only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LONGPRESS_3
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    scrollstrip: "Long press mode, 3 buttons"
+  </source>
+  <dest>
+    *: none
+    scrollstrip: "Long press mode, 3 buttons"
+  </dest>
+  <voice>
+    *: none
+    scrollstrip: "Long press mode, 3 buttons"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LONGPRESS_C
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    scrollstrip: "Long press mode, centre only"
+  </source>
+  <dest>
+    *: none
+    scrollstrip: "Long press mode, centre only"
+  </dest>
+  <voice>
+    *: none
+    scrollstrip: "Long press mode, centre only"
+  </voice>
+</phrase>

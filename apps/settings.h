@@ -465,6 +465,12 @@ struct user_settings
     int touchpad_deadzone;
 #endif
 
+#ifdef HAVE_SCROLLSTRIP
+    int scrollstrip_speed;
+    int scrollstrip_afterscroll;
+    int scrollstrip_type; /* fuze+ POC: type of long button press emulation */
+#endif
+
     int  pause_rewind; /* time in s to rewind when pausing */
 #ifdef HAVE_HEADPHONE_DETECTION
     int  unplug_mode; /* pause on headphone unplug */

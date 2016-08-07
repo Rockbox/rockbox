@@ -1124,6 +1124,11 @@ Lyre prototype 1 */
 #define HAVE_SKIN_VARIABLES
 #endif /* HAVE_TOUCHSCREEN */
 
+#ifdef HAVE_SCROLLSTRIP
+/* button_read_device() returns strip position */
+#define HAVE_BUTTON_DATA
+#endif /* HAVE_SCROLLSTRIP */
+
 #if defined(HAVE_USB_CHARGING_ENABLE) && defined(HAVE_USBSTACK)
 /* USB charging support in the USB stack requires timeout objects */
 #define INCLUDE_TIMEOUT_API

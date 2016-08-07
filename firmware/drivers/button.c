@@ -41,6 +41,9 @@
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
+#ifdef HAVE_SCROLLSTRIP
+#include "scrollstrip.h"
+#endif
 
 struct event_queue button_queue SHAREDBSS_ATTR;
 
@@ -94,7 +97,8 @@ static int button_read(void);
 
 #ifdef HAVE_TOUCHSCREEN
 static int last_touchscreen_touch;
-#endif    
+#endif
+
 #if defined(HAVE_HEADPHONE_DETECTION)
 static struct timeout hp_detect_timeout; /* Debouncer for headphone plug/unplug */
 /* This callback can be used for many different functions if needed -
@@ -138,6 +142,7 @@ static bool button_try_post(int button, int data)
     return ret;
 }
 
+
 static void button_tick(void)
 {
     static int count = 0;
@@ -171,6 +176,11 @@ static void button_tick(void)
 #else
     btn = button_read();
 #endif
+
+#if defined(HAVE_SCROLLSTRIP) && !defined(HAVE_SDL)
+    btn |= handle_scrollstrip(btn, data);
+#endif
+
 #if defined(HAVE_HEADPHONE_DETECTION)
     if (headphones_inserted() != phones_present)
     {
@@ -490,7 +500,7 @@ void button_close(void)
 /*
  * helper function to swap LEFT/RIGHT, UP/DOWN (if present), and F1/F3 (Recorder)
  */
-static int button_flip(int button)
+int button_flip(int button)
 {
     int newbutton = button;
 
@@ -510,9 +520,11 @@ static int button_flip(int button)
     (CONFIG_KEYPAD == GIGABEAT_PAD) || (CONFIG_KEYPAD == GIGABEAT_S_PAD)
         | BUTTON_VOL_UP | BUTTON_VOL_DOWN
 #endif
+#if (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) || (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
+        | BUTTON_NEXT | BUTTON_PREV
+#endif
 #if CONFIG_KEYPAD == PHILIPS_SA9200_PAD
         | BUTTON_VOL_UP | BUTTON_VOL_DOWN
-        | BUTTON_NEXT | BUTTON_PREV
 #endif
         );
 
@@ -545,15 +557,17 @@ static int button_flip(int button)
     if (button & BUTTON_VOL_DOWN)
         newbutton |= BUTTON_VOL_UP;
 #endif
+#if (CONFIG_KEYPAD == PHILIPS_SA9200_PAD) || (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
+    if (button & BUTTON_NEXT)
+        newbutton |= BUTTON_PREV;
+    if (button & BUTTON_PREV)
+        newbutton |= BUTTON_NEXT;
+#endif
 #if CONFIG_KEYPAD == PHILIPS_SA9200_PAD
     if (button & BUTTON_VOL_UP)
         newbutton |= BUTTON_VOL_DOWN;
     if (button & BUTTON_VOL_DOWN)
         newbutton |= BUTTON_VOL_UP;
-    if (button & BUTTON_NEXT)
-        newbutton |= BUTTON_PREV;
-    if (button & BUTTON_PREV)
-        newbutton |= BUTTON_NEXT;
 #endif
 #endif /* !SIMULATOR */
     return newbutton;
@@ -573,6 +587,16 @@ void button_set_flip(bool flip)
         flipped = flip;
         restore_irq(oldlevel);
     }
+}
+
+/**
+ * get the button flip flag. Needed by external button drivers
+ * which post button events directly.
+ * @return      returns non-zero when using upside-down-mode
+ */
+bool button_get_flip(void)
+{
+    return flipped;
 }
 #endif /* HAVE_LCD_FLIP */
 
