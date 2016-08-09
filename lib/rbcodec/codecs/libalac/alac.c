@@ -75,7 +75,7 @@ void alac_set_info(alac_file *alac, char *inputbuffer)
   alac->setinfo_rice_initialhistory = *ptr++;
   alac->setinfo_rice_kmodifier = *ptr++;
   alac->setinfo_7f = *ptr++;
-  ptr += 1;
+
   alac->setinfo_80 = get_uint16be(ptr);
   ptr += 2;
   alac->setinfo_82 = get_uint32be(ptr);
