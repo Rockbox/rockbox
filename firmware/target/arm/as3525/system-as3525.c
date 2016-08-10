@@ -481,8 +481,10 @@ void set_cpu_frequency(long frequency)
 
         /* Set CVDD1 power supply */
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
-#ifdef SANSA_CLIPZIP
+#if defined(SANSA_CLIPZIP)
         ascodec_write_pmu(0x17, 1, 0x80 | 19);
+#elif defined(SANSA_CLIPPLUS)
+        ascodec_write_pmu(0x17, 1, 0x80 | 26);
 #else
         ascodec_write_pmu(0x17, 1, 0x80 | 22);
 #endif
