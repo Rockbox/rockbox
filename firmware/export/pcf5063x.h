@@ -198,12 +198,12 @@ enum pcf5063X_reg_mbcc2 {
 
 enum pcf5063X_reg_adcc1 {
         PCF5063X_ADCC1_ADCSTART         = 0x01,
-        PCF5063X_ADCC1_RES_10BIT        = 0x02,
+        PCF5063X_ADCC1_RES_10BIT        = 0x00,
+        PCF5063X_ADCC1_RES_8BIT         = 0x02,
         PCF5063X_ADCC1_AVERAGE_NO       = 0x00,
         PCF5063X_ADCC1_AVERAGE_4        = 0x04,
         PCF5063X_ADCC1_AVERAGE_8        = 0x08,
         PCF5063X_ADCC1_AVERAGE_16       = 0x0c,
-
         PCF5063X_ADCC1_MUX_BATSNS_RES   = 0x00,
         PCF5063X_ADCC1_MUX_BATSNS_SUBTR = 0x10,
         PCF5063X_ADCC1_MUX_ADCIN2_RES   = 0x20,
@@ -211,6 +211,7 @@ enum pcf5063X_reg_adcc1 {
         PCF5063X_ADCC1_MUX_BATTEMP      = 0x60,
         PCF5063X_ADCC1_MUX_ADCIN1       = 0x70,
 };
+#define PCF5063X_ADCC1_RES_MASK         0x02
 #define PCF5063X_ADCC1_AVERAGE_MASK     0x0c
 #define PCF5063X_ADCC1_ADCMUX_MASK      0xf0
 
@@ -219,9 +220,11 @@ enum pcf5063X_reg_adcc2 {
         PCF5063X_ADCC2_RATIO_BATTEMP    = 0x01,
         PCF5063X_ADCC2_RATIO_ADCIN1     = 0x02,
         PCF5063X_ADCC2_RATIO_BOTH       = 0x03,
+        PCF5063X_ADCC2_RATIOSETTL_10US  = 0x00,
         PCF5063X_ADCC2_RATIOSETTL_100US = 0x04,
 };
 #define PCF5063X_ADCC2_RATIO_MASK       0x03
+#define PCF5063X_ADCC2_RATIOSETTL_MASK  0x04
 
 enum pcf5063X_reg_adcc3 {
         PCF5063X_ADCC3_ACCSW_EN         = 0x01,
@@ -229,6 +232,7 @@ enum pcf5063X_reg_adcc3 {
         PCF5063X_ADCC3_RES_DIV_TWO      = 0x10,
         PCF5063X_ADCC3_RES_DIV_THREE    = 0x00,
 };
+#define PCF5063X_ADCC3_RES_DIV_MASK     0x10
 
 enum pcf5063X_reg_adcs3 {
         PCF5063X_ADCS3_REF_NTCSW        = 0x00,

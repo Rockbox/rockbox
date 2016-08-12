@@ -24,11 +24,10 @@
 #include "thread.h"
 
 #include "pmu-target.h"
+#include "adc-target.h"
 #include "i2c-s5l8702.h"
 #include "gpio-s5l8702.h"
 
-
-static struct mutex pmu_adc_mutex;
 
 int pmu_read_multiple(int address, int count, unsigned char* buffer)
 {
@@ -52,35 +51,6 @@ unsigned char pmu_read(int address)
 int pmu_write(int address, unsigned char val)
 {
     return pmu_write_multiple(address, 1, &val);
-}
-
-int pmu_read_adc(unsigned int adc)
-{
-    int data = 0;
-    mutex_lock(&pmu_adc_mutex);
-    pmu_write(0x54, 5 | (adc << 4));
-    while ((data & 0x80) == 0)
-    {
-        yield();
-        data = pmu_read(0x57);
-    }
-    int value = (pmu_read(0x55) << 2) | (data & 3);
-    mutex_unlock(&pmu_adc_mutex);
-    return value;
-}
-
-/* millivolts */
-int pmu_read_battery_voltage(void)
-{
-    return (pmu_read_adc(1) * 2000 / 1023) + 2250;
-}
-
-/* milliamps */
-int pmu_read_battery_current(void)
-{
-//TODO: Figure out how to read the battery current
-//    return pmu_read_adc(2);
-    return 0;
 }
 
 void pmu_ldo_on_in_standby(unsigned int ldo, int onoff)
@@ -143,17 +113,86 @@ void pmu_write_rtc(unsigned char* buffer)
 }
 
 /*
+ * ADC
+ */
+#define ADC_FULL_SCALE          2000
+#define ADC_FULL_SCALE_VISA     2400
+#define ADC_SUBTR_OFFSET        2250
+
+static struct mutex pmu_adc_mutex;
+
+/* converts raw 8/10-bit value to millivolts */
+unsigned short pmu_adc_raw2mv(
+        const struct pmu_adc_channel *ch, unsigned short raw)
+{
+    int full_scale = ADC_FULL_SCALE;
+    int offset = 0;
+
+    switch (ch->adcc1 & PCF5063X_ADCC1_ADCMUX_MASK)
+    {
+        case PCF5063X_ADCC1_MUX_BATSNS_RES:
+        case PCF5063X_ADCC1_MUX_ADCIN2_RES:
+            full_scale *= ((ch->adcc1 & PCF5063X_ADCC3_RES_DIV_MASK) ==
+                                        PCF5063X_ADCC3_RES_DIV_TWO) ? 2 : 3;
+            break;
+        case PCF5063X_ADCC1_MUX_BATSNS_SUBTR:
+        case PCF5063X_ADCC1_MUX_ADCIN2_SUBTR:
+            offset = ADC_SUBTR_OFFSET;
+            break;
+        case PCF5063X_ADCC1_MUX_BATTEMP:
+            if (ch->adcc2 & PCF5063X_ADCC2_RATIO_BATTEMP)
+                full_scale = ADC_FULL_SCALE_VISA;
+            break;
+        case PCF5063X_ADCC1_MUX_ADCIN1:
+            if (ch->adcc2 & PCF5063X_ADCC2_RATIO_ADCIN1)
+                full_scale = ADC_FULL_SCALE_VISA;
+            break;
+    }
+
+    int nrb = ((ch->adcc1 & PCF5063X_ADCC1_RES_MASK) ==
+                                PCF5063X_ADCC1_RES_8BIT) ? 8 : 10;
+    return (raw * full_scale / ((1<<nrb)-1)) + offset;
+}
+
+/* returns raw value, 8 or 10-bit resolution */
+unsigned short pmu_read_adc(const struct pmu_adc_channel *ch)
+{
+    mutex_lock(&pmu_adc_mutex);
+
+    pmu_write(PCF5063X_REG_ADCC3, ch->adcc3);
+    if (ch->bias_dly)
+        sleep(ch->bias_dly);
+    uint8_t buf[2] = { ch->adcc2, ch->adcc1 | PCF5063X_ADCC1_ADCSTART };
+    pmu_write_multiple(PCF5063X_REG_ADCC2, 2, buf);
+
+    int adcs3 = 0;
+    while (!(adcs3 & PCF5063X_ADCS3_ADCRDY))
+    {
+        yield();
+        adcs3 = pmu_read(PCF5063X_REG_ADCS3);
+    }
+
+    int raw = pmu_read(PCF5063X_REG_ADCS1);
+    if ((ch->adcc1 & PCF5063X_ADCC1_RES_MASK) == PCF5063X_ADCC1_RES_10BIT)
+        raw = (raw << 2) | (adcs3 & PCF5063X_ADCS3_ADCDAT1L_MASK);
+
+    mutex_unlock(&pmu_adc_mutex);
+    return raw;
+}
+
+/*
  * eINT
  */
 #define Q_EINT  0
 
-static char pmu_thread_stack[DEFAULT_STACK_SIZE/4];
+static char pmu_thread_stack[DEFAULT_STACK_SIZE/2];
 static struct event_queue pmu_queue;
 static unsigned char ints_msk[6];
 
 static void pmu_eint_isr(struct eint_handler*);
 
-static struct eint_handler pmu_eint = {
+static struct eint_handler pmu_eint =
+{
     .gpio_n = GPIO_EINT_PMU,
     .type   = EIC_INTTYPE_LEVEL,
     .level  = EIC_INTLEVEL_LOW,
@@ -355,10 +394,11 @@ void pmu_preinit(void)
         PCF5063X_REG_STBYCTL1,  0x0,
         PCF5063X_REG_STBYCTL2,  0x8c,
 
-        /* GPIO1,2 = input, GPIO3 = output */
+        /* GPIO1,2 = input, GPIO3 = output High (NoPower default) */
         PCF5063X_REG_GPIOCTL,   0x3,
         PCF5063X_REG_GPIO1CFG,  0x0,
         PCF5063X_REG_GPIO2CFG,  0x0,
+        PCF5063X_REG_GPIO3CFG,  0x7,
 
         /* DOWN2 converter (SDRAM): 1800 mV, enabled,
            startup current limit = 15mA*0x10 (TBC) */

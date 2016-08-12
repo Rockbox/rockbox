@@ -24,6 +24,7 @@
 #include "pmu-target.h"
 #include "power.h"
 #include "audiohw.h"
+#include "adc-target.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
@@ -49,19 +50,11 @@ const unsigned short percent_to_volt_charge[11] =
 };
 #endif /* CONFIG_CHARGING */
 
-/* ADC should read 0x3ff=6.00V */
-#define BATTERY_SCALE_FACTOR 6000
-/* full-scale ADC readout (2^10) in millivolt */
-
-
 /* Returns battery voltage from ADC [millivolts] */
 int _battery_voltage(void)
 {
-    int compensation = (10 * (pmu_read_battery_current() - 7)) / 12;
-    if (charging_state()) return pmu_read_battery_voltage() - compensation;
-    return pmu_read_battery_voltage() + compensation;
+    return adc_read_battery_voltage();
 }
-
 
 #ifdef HAVE_ACCESSORY_SUPPLY
 void accessory_supply_set(bool enable)

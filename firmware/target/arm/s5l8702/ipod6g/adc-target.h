@@ -21,13 +21,23 @@
 #ifndef _ADC_TARGET_H_
 #define _ADC_TARGET_H_
 
-#define NUM_ADC_CHANNELS 4
+#include <stdbool.h>
+#include "config.h"
 
-#define ADC_UNKNOWN_0   0
-#define ADC_UNKNOWN_1   1
-#define ADC_BATTERY     2
-#define ADC_UNKNOWN_3   3
+enum
+{
+    ADC_BATTERY = 0,
+    ADC_USBDATA,
+    ADC_ACCESSORY,
+    NUM_ADC_CHANNELS
+};
 
 #define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
+
+unsigned short adc_read_millivolts(int channel);
+unsigned int adc_read_battery_voltage(void);
+unsigned int adc_read_usbdata_voltage(bool dp);
+int adc_read_accessory_resistor(void);
+const char *adc_name(int channel);
 
 #endif

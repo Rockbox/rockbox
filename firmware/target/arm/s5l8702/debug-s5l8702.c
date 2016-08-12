@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 
+#include <stdio.h>
 #include <stdbool.h>
 #include "system.h"
 #include "config.h"
@@ -28,6 +29,7 @@
 #include "font.h"
 #include "storage.h"
 #include "power.h"
+#include "adc.h"
 #include "pmu-target.h"
 #include "pcm-target.h"
 #ifdef HAVE_SERIAL
@@ -134,11 +136,19 @@ bool dbg_hw_info(void)
                             pmu_accessory_present() ? "true" : "false");
 #endif
             line++;
+            _DEBUG_PRINTF("ADC:");
+            _DEBUG_PRINTF("%s: %d mV", adc_name(ADC_BATTERY),
+                            adc_read_battery_voltage());
+            _DEBUG_PRINTF("%s: %d Ohms", adc_name(ADC_ACCESSORY),
+                            adc_read_accessory_resistor());
+            _DEBUG_PRINTF("USB D+: %d mV", adc_read_usbdata_voltage(true));
+            _DEBUG_PRINTF("USB D-: %d mV", adc_read_usbdata_voltage(false));
+            line++;
             extern unsigned long i2c_rd_err, i2c_wr_err;
             _DEBUG_PRINTF("i2c rd/wr errors: %lu/%lu", i2c_rd_err, i2c_wr_err);
         }
 #ifdef UC870X_DEBUG
-        else if(state==2)
+        else if(state==(max_states-1))
         {
             extern struct uartc_port ser_port;
             bool opened = !!ser_port.uartc->port_l[ser_port.id];

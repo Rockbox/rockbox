@@ -22,6 +22,7 @@
 #ifndef __PMU_TARGET_H__
 #define __PMU_TARGET_H__
 
+#include <stdint.h>
 #include <stdbool.h>
 #include "config.h"
 
@@ -72,14 +73,22 @@ enum pcf50635_reg_gpiostat {
  *  GPIO3: output, unknown
  */
 
+struct pmu_adc_channel
+{
+    const char *name;
+    uint8_t adcc1;
+    uint8_t adcc2;
+    uint8_t adcc3;
+    uint8_t bias_dly; /* RB ticks */
+};
 
 unsigned char pmu_read(int address);
 int pmu_write(int address, unsigned char val);
 int pmu_read_multiple(int address, int count, unsigned char* buffer);
 int pmu_write_multiple(int address, int count, unsigned char* buffer);
-int pmu_read_adc(unsigned int adc);
-int pmu_read_battery_voltage(void);
-int pmu_read_battery_current(void);
+unsigned short pmu_read_adc(const struct pmu_adc_channel *ch);
+unsigned short pmu_adc_raw2mv(
+        const struct pmu_adc_channel *ch, unsigned short raw);
 void pmu_init(void);
 void pmu_ldo_on_in_standby(unsigned int ldo, int onoff);
 void pmu_ldo_set_voltage(unsigned int ldo, unsigned char voltage);
