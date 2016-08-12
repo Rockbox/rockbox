@@ -237,6 +237,9 @@ simcc () {
  GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
 
  GCCOPTS="$GCCOPTS -fno-builtin -g"
+ # Some linux setups like to warn about unused results. They are correct,
+ # but cleaning this up is a lot of work.
+ GCCOPTS="$GCCOPTS -Wno-unused-result"
  GCCOPTIMIZE=''
  LDOPTS="$LDOPTS -lm" # button-sdl.c uses sqrt()
  sigaltstack=""
@@ -4187,6 +4190,12 @@ else
    # disable warning about "warning: initialized field overwritten" as gcc 4.2
    # and later would throw it for several valid cases
    GCCOPTS="$GCCOPTS -Wno-override-init"
+ fi
+
+ if test "$gccnum" -ge "601"; then
+   # gcc 6 adds a lot of warnings that while useful are too time-consuming
+   # to clean up right away
+   GCCOPTS="$GCCOPTS -Wno-shift-negative-value -Wno-unused-const-variable -Wno-nonnull-compare -Wno-tautological-compare"
  fi
 
  case $prefix in
