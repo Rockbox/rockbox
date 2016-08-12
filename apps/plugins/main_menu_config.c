@@ -173,12 +173,12 @@ enum plugin_status plugin_start(const void* parameter)
                     case 1:
                         if (cur_sel == 0)
                             break;
-                            swap_items(cur_sel, cur_sel - 1);
+                        swap_items(cur_sel, cur_sel - 1);
                         break;
                     case 2:
                         if (cur_sel + 1 == menu_item_count)
                             break;
-                            swap_items(cur_sel, cur_sel + 1);
+                        swap_items(cur_sel, cur_sel + 1);
                         break;
                     case 4:
                         rb->root_menu_set_default(&rb->global_settings->root_menu_customized, NULL);

@@ -1469,8 +1469,8 @@ const char *get_token_value(struct gui_wps *gwps,
                      pitch / PITCH_SPEED_PRECISION,
              (pitch  % PITCH_SPEED_PRECISION) / (PITCH_SPEED_PRECISION / 10));
 
-        if (intval)
-            *intval = pitch_speed_enum(limit, pitch,
+            if (intval)
+                *intval = pitch_speed_enum(limit, pitch,
                            PITCH_SPEED_PRECISION * 100);
             return buf;
         }
@@ -1491,7 +1491,7 @@ const char *get_token_value(struct gui_wps *gwps,
         if (intval)
             *intval = pitch_speed_enum(limit, speed,
                            PITCH_SPEED_PRECISION * 100);
-            return buf;
+        return buf;
     }
 #endif
 

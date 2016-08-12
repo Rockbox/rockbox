@@ -2792,9 +2792,11 @@ boolean G_CheckDemoStatus (void)
    if (demoplayback)
    {
       if (singledemo)
+      {
          I_Error("Done Playing Demo");
          return false;
 //         exit(0);  // killough
+      }
 
       if (demolumpnum != -1) {
          // cph - unlock the demo lump

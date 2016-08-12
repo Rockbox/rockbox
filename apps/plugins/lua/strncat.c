@@ -8,11 +8,27 @@ char *strncat(char *s, const char *t, size_t n) {
   s+=strlen(s);
   if (__unlikely((max=s+n)==s)) goto fini;
   for (;;) {
-    if (__unlikely(!(*s = *t))) break; if (__unlikely(++s==max)) break; ++t;
+    if (__unlikely(!(*s = *t)))
+        break;
+    if (__unlikely(++s==max))
+        break;
+    ++t;
 #ifndef WANT_SMALL_STRING_ROUTINES
-    if (__unlikely(!(*s = *t))) break; if (__unlikely(++s==max)) break; ++t;
-    if (__unlikely(!(*s = *t))) break; if (__unlikely(++s==max)) break; ++t;
-    if (__unlikely(!(*s = *t))) break; if (__unlikely(++s==max)) break; ++t;
+    if (__unlikely(!(*s = *t)))
+        break;
+    if (__unlikely(++s==max))
+        break;
+    ++t;
+    if (__unlikely(!(*s = *t)))
+        break;
+    if (__unlikely(++s==max))
+        break;
+    ++t;
+    if (__unlikely(!(*s = *t)))
+        break;
+    if (__unlikely(++s==max))
+        break;
+    ++t;
 #endif
   }
   *s=0;
