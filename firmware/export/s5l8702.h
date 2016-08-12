@@ -196,6 +196,20 @@
 #define I2CCLKGATE(i)   ((i) == 1 ? CLOCKGATE_I2C1 : \
                                     CLOCKGATE_I2C0)
 
+/*  s5l8702 I2C controller is similar to s5l8700, known differences are:
+
+    * IICCON[5] is not used in s5l8702.
+    * IICCON[13:8] are used to enable interrupts.
+      IICSTA2[13:8] are used to read the status and write-clear interrupts.
+      Known interrupts:
+       [13] STOP on bus (TBC)
+       [12] START on bus (TBC)
+       [8] byte transmited or received in Master mode (not tested in Slave)
+    * IICCON[4] does not clear interrupts, it is enabled when a byte is
+      transmited or received, in Master mode the tx/rx of the next byte
+      starts when it is written as "1".
+*/
+
 #define IICCON(bus)     (*((uint32_t volatile*)(0x3C600000 + 0x300000 * (bus))))
 #define IICSTAT(bus)    (*((uint32_t volatile*)(0x3C600004 + 0x300000 * (bus))))
 #define IICADD(bus)     (*((uint32_t volatile*)(0x3C600008 + 0x300000 * (bus))))
@@ -203,6 +217,7 @@
 #define IICUNK10(bus)   (*((uint32_t volatile*)(0x3C600010 + 0x300000 * (bus))))
 #define IICUNK14(bus)   (*((uint32_t volatile*)(0x3C600014 + 0x300000 * (bus))))
 #define IICUNK18(bus)   (*((uint32_t volatile*)(0x3C600018 + 0x300000 * (bus))))
+#define IICSTA2(bus)    (*((uint32_t volatile*)(0x3C600020 + 0x300000 * (bus))))
 
 
 /////INTERRUPT CONTROLLERS/////

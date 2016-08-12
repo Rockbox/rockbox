@@ -144,8 +144,6 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("USB D+: %d mV", adc_read_usbdata_voltage(true));
             _DEBUG_PRINTF("USB D-: %d mV", adc_read_usbdata_voltage(false));
             line++;
-            extern unsigned long i2c_rd_err, i2c_wr_err;
-            _DEBUG_PRINTF("i2c rd/wr errors: %lu/%lu", i2c_rd_err, i2c_wr_err);
         }
 #ifdef UC870X_DEBUG
         else if(state==(max_states-1))
