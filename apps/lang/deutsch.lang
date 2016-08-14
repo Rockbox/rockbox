@@ -272,15 +272,17 @@
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
+    creativezen*: "Select = Yes"
   </source>
   <dest>
-    *: "PLAY = Ja"
-    cowond2*: "MENU oder rechts oben= Ja"
+    *: "WIEDERGABE = Ja"
+    cowond2*: "MENÜ oder rechts oben= Ja"
     iriverh100,iriverh120,iriverh300: "NAVI = Ja"
     ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Ja"
-    mrobe500: "PLAY, POWER oder rechts oben = Ja"
-    archosplayer: "(PLAY/STOP)"
+    mrobe500: "WIEDERGABE, POWER oder rechts oben = Ja"
+    archosplayer: "(WIEDERGABE/STOP)"
     vibe500: "OK = Ja"
+    creativezen*: "Select = Ja"
   </dest>
   <voice>
     *: ""
@@ -13292,5 +13294,124 @@
   </dest>
   <voice>
     *: "Scharf"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Reduzierung der Gehörermüdung"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Haas Surround"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Haas Surround"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Haas Surround"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_MIX
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Verhältnis Original / Geändertes Signal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PBE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Anhebung der Basswahrnehmung"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x2)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x2)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x2)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_METHOD2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "SIDE ONLY"
+  </source>
+  <dest>
+    *: none
+    swcodec: "SIDE ONLY"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "NUR SEITE"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x1)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x1)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x1)"
   </voice>
 </phrase>
