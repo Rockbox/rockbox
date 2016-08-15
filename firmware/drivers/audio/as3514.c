@@ -78,6 +78,8 @@
 
 /* Shadow registers */
 static uint8_t as3514_regs[AS3514_NUM_AUDIO_REGS]; /* 8-bit registers */
+/* Keep track of volume */
+static int current_vol_l, current_vol_r;
 
 /*
  * little helper method to set register values.
@@ -264,6 +266,10 @@ void audiohw_set_volume(int vol_l, int vol_r)
     unsigned int hph_r, hph_l;
     unsigned int mix_l, mix_r;
 
+    /* remember volume */
+    current_vol_l = vol_l;
+    current_vol_r = vol_r;
+
     vol_l = vol_tenthdb2hw(vol_l);
     vol_r = vol_tenthdb2hw(vol_r);
 
@@ -273,13 +279,17 @@ void audiohw_set_volume(int vol_l, int vol_r)
     }
 
     /* We combine the mixer/DAC channel volume range with the headphone volume
-       range - keep first stage as loud as possible */
+     * range. There are two different situations:
+     * - in DAC only mode, we want to keep the mixer volume as high as possible
+     *   and bypass the mixer volume as low as possible.
+     *   to avoid distortions
+     * - in recording/line-in mode (ie when monitor is on), we want both DAC and
+     *   line-in volume to be the same, so we want to use headphone volume
 
-/*AS3543 mixer can go a little louder then the as3514, although 
- * it might be possible to go louder on the as3514 as well */
- 
+    /*AS3543 mixer can go a little louder then the as3514, although
+     * it might be possible to go louder on the as3514 as well */
 #ifdef HAVE_AS3543
-#define MIXER_MAX_VOLUME 0x1b
+#define MIXER_MAX_VOLUME 0x1b /* corresponds to a volume of 0dB (see below) */
 #else /* lets leave the AS3514 alone until its better tested*/
 #define MIXER_MAX_VOLUME 0x16
 #endif
@@ -303,15 +313,26 @@ void audiohw_set_volume(int vol_l, int vol_r)
 #ifdef HAVE_AS3543
     /*if not radio or recording*/
     if (!(as3514_regs[AS3514_AUDIOSET1] & (AUDIOSET1_ADC_on | AUDIOSET1_LIN1_on))) {
-        if (!hph_l || !hph_r) { /*if volume higher, disable the mixer to slightly improve noise*/
+        if (hph_l == 0 || hph_r == 0) {
             as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on | AUDIOSET1_DAC_GAIN_on);
             as3514_write(AS3514_AUDIOSET2, AUDIOSET2_AGC_off | AUDIOSET2_HPH_QUALITY_LOW_POWER);
             as3514_write_masked(AS3514_HPH_OUT_R, HPH_OUT_R_HP_OUT_SUM, HPH_OUT_R_HP_OUT_MASK);
         } else {
+            /* if both left and right volume are higher than MIXER_MAX_VOLUME,
+             * we disable and bypass the mixer to slightly improve noise.
+             *
+             * WARNING this works because MIXER_MAX_VOLUME corresponds to a mixer
+             * volume of 0dB, thus it's the same to bypass the mixer or set its
+             * level to MIXER_MAX_VOLUME, except that bypassing is less noisy */
             as3514_write(AS3514_AUDIOSET1, AUDIOSET1_DAC_on);
             as3514_write(AS3514_AUDIOSET2, AUDIOSET2_SUM_off | AUDIOSET2_AGC_off | AUDIOSET2_HPH_QUALITY_LOW_POWER);
             as3514_write_masked(AS3514_HPH_OUT_R, HPH_OUT_R_HP_OUT_DAC, HPH_OUT_R_HP_OUT_MASK);
         }
+    }
+    else
+    {
+        /* make sure we consider use the mixer */
+        as3514_write_masked(AS3514_HPH_OUT_R, HPH_OUT_R_HP_OUT_SUM, HPH_OUT_R_HP_OUT_MASK);
     }
 #endif
 
@@ -485,20 +506,38 @@ void audiohw_set_recvol(int left, int right, int type)
  */
 void audiohw_set_monitor(bool enable)
 {
+    /* On AS3543 we play with DAC mixer bypass to decrease noise. This means that
+     * even in DAC mode, the headphone mux might be set to HPH_OUT_R_HP_OUT_SUM or
+     * HPH_OUT_R_HP_OUT_DAC depending on the volume. Care must be taken when
+     * changing monitor.
+     *
+     * When enabling monitor, if the mux was using HPH_OUT_R_HP_OUT_DAC then
+     * DAC mixer is bypassed so switching to HPH_OUT_R_HP_OUT_SUM will completely mute
+     * the DAC (until the next volume change).
+     *
+     * When disabling monitor, if the volume was low, then switching from
+     * HPH_OUT_R_HP_OUT_SUM to HPH_OUT_R_HP_OUT_DAC will effectively bypass the
+     * DAC mixer (which should be low). This will result in a HUGE sound gap,
+     * potentially dangerous to the user.
+     *
+     * The only safe procedure is to first change the Audioset1 register to enable/disable
+     * monitor, then call audiohw_set_volume to safely set the volumes, then
+     * mute/unmute lines-in. */
     if (enable) {
-#ifdef HAVE_AS3543
-        as3514_write_masked(AS3514_HPH_OUT_R, HPH_OUT_R_HP_OUT_SUM, HPH_OUT_R_HP_OUT_MASK);
-#endif
-        /* select either LIN1 or LIN2 */
+        /* select either LIN1 or LIN2 but keep them muted for now */
         as3514_write_masked(AS3514_AUDIOSET1, AUDIOSET1_LIN_on,
                             AUDIOSET1_LIN1_on | AUDIOSET1_LIN2_on);
+        /* change audio routing */
+        audiohw_set_volume(current_vol_l, current_vol_r);
+        /* finally unmute lines */
         as3514_set(AS3514_LINE_IN_R, LINE_IN1_R_LI1R_MUTE_off);
         as3514_set(AS3514_LINE_IN_L, LINE_IN1_L_LI1L_MUTE_off);
+#ifndef HAVE_AS3543
+        as3514_set(AS3514_LINE_IN2_R, LINE_IN2_R_LI2R_MUTE_off);
+        as3514_set(AS3514_LINE_IN2_L, LINE_IN2_L_LI2L_MUTE_off);
+#endif
     }
     else {
-#ifdef HAVE_AS3543
-        as3514_write_masked(AS3514_HPH_OUT_R, HPH_OUT_R_HP_OUT_DAC, HPH_OUT_R_HP_OUT_MASK);
-#endif
         /* turn off both LIN1 and LIN2 (if present) */
         as3514_clear(AS3514_LINE_IN1_R, LINE_IN1_R_LI1R_MUTE_off);
         as3514_clear(AS3514_LINE_IN1_L, LINE_IN1_L_LI1L_MUTE_off);
@@ -506,7 +545,10 @@ void audiohw_set_monitor(bool enable)
         as3514_clear(AS3514_LINE_IN2_R, LINE_IN2_R_LI2R_MUTE_off);
         as3514_clear(AS3514_LINE_IN2_L, LINE_IN2_L_LI2L_MUTE_off);
 #endif
+        /* disable line-in */
         as3514_clear(AS3514_AUDIOSET1, AUDIOSET1_LIN1_on | AUDIOSET1_LIN2_on);
+        /* change audio routing */
+        audiohw_set_volume(current_vol_l, current_vol_r);
     }
 }
 #endif /* HAVE_RECORDING || HAVE_FMRADIO_IN */
