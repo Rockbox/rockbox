@@ -58,24 +58,6 @@ enum keysig_search_method_t g_keysig_search = KEYSIG_SEARCH_NONE;
     { cprintf(RED, str_bad); let_the_force_flow(__LINE__); } \
     else { cprintf(RED, str_ok); }
 
-static void print_hex(void *p, int size, int unit)
-{
-    uint8_t *p8 = p;
-    uint16_t *p16 = p;
-    uint32_t *p32 = p;
-    for(int i = 0; i < size; i += unit, p8++, p16++, p32++)
-    {
-        if(i != 0 && (i % 16) == 0)
-            printf("\n");
-        if(unit == 1)
-            printf(" %02x", *p8);
-        else if(unit == 2)
-            printf(" %04x", *p16);
-        else
-            printf(" %08x", *p32);
-    }
-}
-
 static void usage(void);
 
 /* key and signature */
@@ -118,8 +100,10 @@ struct upg_entry_t
 
 struct nwz_model_t g_model_list[] =
 {
-    { "nwz-e463", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, {"89d813f8f966efdebd9c9e0ea98156d2"}, "eb4431eb", "4f1d9cac" },
-    { "nwz-a86x", HAS_KEY | HAS_SIG, {""}, "c824e4e2", "7c262bb0" },
+    { "nwz-e46x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, {"89d813f8f966efdebd9c9e0ea98156d2"}, "eb4431eb", "4f1d9cac" },
+    { "nwz-a86x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, {"a7c4af6c28b8900a783f307c1ba538c5"}, "c824e4e2", "7c262bb0" },
+    /* The following keys were obtained by brute forcing firmware upgrades,
+     * someone with a device needs to confirm that they work */
     { "nw-a82x", HAS_KEY | HAS_SIG, {""}, "4df06482", "07fa0b6e" },
 };
 

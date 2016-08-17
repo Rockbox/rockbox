@@ -1,0 +1,59 @@
+This directory contains various scripts that can be used to help development
+process on the Sony NWZ players. The proper way to use it is to use the Makefile.
+
+In case of doubt, run
+  make
+to get the up-to-date documentation.
+
+*****************************
+Performing a firmware upgrade
+*****************************
+
+To perform a firmware upgrade, first copy the firmware upgrade file to the root of
+the device, and make sure its named
+  NW_WM_FW.UPG
+Another other name WILL NOT WORK. You've been warned.
+
+DO NOT FORGET TO UNMOUNT YOUR DEVICE PROPERLY BEFORE DOING WHAT FOLLOWS
+
+Once once, you need to tell the device to reboot in firmware upgrade mode.
+At the moment, we only support this operation in UMS/MSC (Mass Storage) mode. So if
+your device appears as a MTP device, go to the preference settings of your device
+and make sure your device is set to UMS/MSC or Auto.
+You need to identify the linux device associated with your device. There are
+plenty of tutorials on the net on how to do that, you can use mount or dmesg.
+Assuming the linux device corresponding to your player is
+  /dev/sdx
+run AS ROOT OR USING SUDO
+  make do_fw_upgrade NWZ_DEV=/dev/sdx
+
+If everything goes well, the device should reboot and perform the firmware upgrade.
+
+********************************
+Building a firmware upgrade that
+dumps important stuff
+********************************
+
+In early development stage, the most useful thing you can do is to dump important
+stuff from your device:
+- dmesg and mount output
+- FU (firmware upgrade) initrd
+- root FS (file system)
+We carefully wrote a script that does the following. First make sure that your device
+has enough free space (at least 300MB to be safe). You need to know the model of
+your device to build this firmware upgrade. Once you known it, run
+  make list_targets
+to list all available targets. For example if your targets is one of the
+NWZ-E460 series, the corresponding target is nwz-e46x.
+Once you have identified the target. Run
+  make dump_rootfs NWZ_TARGET=nwz-exyz
+(replace nwz-exyz with your target)
+This command will produce a firmware upgrade file called
+  dump_rootfs.upg
+
+In order to run this firmware upgrade, you need to follows the instruction
+on how to perform a firmware upgrade.
+
+When performing the firmware upgrade, the script will perform various operation
+and create several files. Once the "upgrade" is finish and the device has rebooted,
+you should find the files in the dump_rootfs/ directory at the root of your device.
