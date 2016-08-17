@@ -782,6 +782,37 @@ int do_normalize(int argc, char **argv)
     return 0;
 }
 
+int do_simplify(int argc, char **argv)
+{
+    if(argc != 2)
+    {
+        printf("simplify takes two arguments\n");
+        return 1;
+    }
+    error_context_t ctx;
+    soc_t soc;
+    bool ret = parse_xml(argv[0], soc, ctx);
+    if(ctx.count() != 0)
+        printf("In file %s:\n", argv[0]);
+    print_context(ctx);
+    if(!ret)
+    {
+        printf("cannot parse file '%s'\n", argv[1]);
+        return 2;
+    }
+    simplify(soc, ctx);
+    ret = produce_xml(argv[1], soc, ctx);
+    if(ctx.count() != 0)
+        printf("In file %s:\n", argv[1]);
+    print_context(ctx);
+    if(!ret)
+    {
+        printf("cannot write file '%s'\n", argv[1]);
+        return 3;
+    }
+    return 0;
+}
+
 void usage()
 {
     printf("usage: swiss_knife <mode> [options]\n");
@@ -794,6 +825,7 @@ void usage()
     printf("  dump [--nodes] [--instances] [--registers] [--verbose] <files...>\n");
     printf("  convertdump <desc file> ... <desc file> <input dump file> <output dump file>\n");
     printf("  normalize <desc file> <output desc file>\n");
+    printf("  simplify <desc file> <output desc file>\n");
     printf("\n");
     printf("The following operations are performed in each mode:\n");
     printf("* read: open and parse the files, reports any obvious errors\n");
@@ -805,6 +837,7 @@ void usage()
     printf("* convertdump: convert a register dump from version 1 to version 2\n");
     printf("               NOTE: description file must be a v1 file\n");
     printf("* normalize: normalise a description file\n");
+    printf("* simplify: simplify description file (formula -> stride promotion for example)\n");
     exit(1);
 }
 
@@ -829,6 +862,8 @@ int main(int argc, char **argv)
         return do_convertdump(argc - 2, argv +  2);
     else if(mode == "normalize")
         return do_normalize(argc - 2, argv +  2);
+    else if(mode == "simplify")
+        return do_simplify(argc - 2, argv +  2);
     else
         usage();
     return 0;

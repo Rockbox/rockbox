@@ -1283,7 +1283,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="n">0x00 + (n) * 0x20</formula>
+                    <base>0x0</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register/>
@@ -1295,7 +1296,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="n">0x04 + (n) * 0x20</formula>
+                    <base>0x4</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register>
@@ -1316,7 +1318,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="n">0x10 + (n) * 0x20</formula>
+                    <base>0x10</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register/>
@@ -1571,7 +1574,8 @@
                 <range>
                     <first>0</first>
                     <count>8</count>
-                    <formula variable="n">(n) * 0x10 + 0x40</formula>
+                    <base>0x40</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register>
@@ -1591,7 +1595,8 @@
                 <range>
                     <first>0</first>
                     <count>8</count>
-                    <formula variable="n">(n) * 0x10 + 0x44</formula>
+                    <base>0x44</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register>
@@ -1611,7 +1616,8 @@
                 <range>
                     <first>0</first>
                     <count>8</count>
-                    <formula variable="n">(n) * 0x10 + 0x48</formula>
+                    <base>0x48</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register>
@@ -1631,7 +1637,8 @@
                 <range>
                     <first>0</first>
                     <count>8</count>
-                    <formula variable="n">(n) * 0x10 + 0x4c</formula>
+                    <base>0x4c</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register>
@@ -2071,7 +2078,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0x00</formula>
+                    <base>0x0</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register/>
@@ -2084,7 +2092,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0x10</formula>
+                    <base>0x10</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -2105,7 +2114,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0x14</formula>
+                    <base>0x14</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register/>
@@ -2117,7 +2127,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0x20</formula>
+                    <base>0x20</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -2138,7 +2149,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0x30</formula>
+                    <base>0x30</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -2160,7 +2172,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0x40</formula>
+                    <base>0x40</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -2182,7 +2195,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0x50</formula>
+                    <base>0x50</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -2204,7 +2218,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0x60</formula>
+                    <base>0x60</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -2226,7 +2241,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0x70</formula>
+                    <base>0x70</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -2248,7 +2264,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0x80</formula>
+                    <base>0x80</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register/>
@@ -2261,7 +2278,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0xc0</formula>
+                    <base>0xc0</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -2282,7 +2300,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0xd0</formula>
+                    <base>0xd0</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -2303,7 +2322,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0xe0</formula>
+                    <base>0xe0</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -2325,7 +2345,8 @@
                 <range>
                     <first>0</first>
                     <count>6</count>
-                    <formula variable="n">(n)*0x100 + 0xf0</formula>
+                    <base>0xf0</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -2986,9 +3007,9 @@
             <name>MSC</name>
             <range>
                 <first>0</first>
-                <address>0xb0021000</address>
-                <address>0xb0022000</address>
-                <address>0xb0023000</address>
+                <count>3</count>
+                <base>0xb0021000</base>
+                <stride>0x1000</stride>
             </range>
         </instance>
         <node>
@@ -3578,10 +3599,9 @@
             <name>UART</name>
             <range>
                 <first>0</first>
-                <address>0xb0030000</address>
-                <address>0xb0031000</address>
-                <address>0xb0032000</address>
-                <address>0xb0033000</address>
+                <count>4</count>
+                <base>0xb0030000</base>
+                <stride>0x1000</stride>
             </range>
         </instance>
         <node>
@@ -4142,9 +4162,9 @@
             <name>SSI</name>
             <range>
                 <first>0</first>
-                <address>0xb0043000</address>
-                <address>0xb0044000</address>
-                <address>0xb0045000</address>
+                <count>3</count>
+                <base>0xb0043000</base>
+                <stride>0x1000</stride>
             </range>
         </instance>
         <node>
@@ -5565,8 +5585,9 @@
             <name>PCM</name>
             <range>
                 <first>0</first>
-                <address>0xb0071000</address>
-                <address>0xb0074000</address>
+                <count>2</count>
+                <base>0xb0071000</base>
+                <stride>0x3000</stride>
             </range>
         </instance>
         <node>
@@ -6258,7 +6279,8 @@
                 <range>
                     <first>0</first>
                     <count>16</count>
-                    <formula variable="n">0x20 + 4*(n)</formula>
+                    <base>0x20</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register>
@@ -6453,7 +6475,8 @@
                 <range>
                     <first>0</first>
                     <count>7</count>
-                    <formula variable="n">0x10 + (n)*4</formula>
+                    <base>0x10</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register>
@@ -6538,7 +6561,8 @@
                 <range>
                     <first>0</first>
                     <count>5</count>
-                    <formula variable="n">0x30 + (n)*4</formula>
+                    <base>0x30</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register>
@@ -6799,7 +6823,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="n">0x90 + (n)*4</formula>
+                    <base>0x90</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register>
@@ -7793,7 +7818,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="n">0x24 + 4*(n)</formula>
+                    <base>0x24</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register>
@@ -8108,7 +8134,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="n">(0x00 + (n) * 0x20)</formula>
+                    <base>0x0</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register/>
@@ -8121,7 +8148,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="n">(0x04 + (n) * 0x20)</formula>
+                    <base>0x4</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register/>
@@ -8135,7 +8163,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="n">(0x08 + (n) * 0x20)</formula>
+                    <base>0x8</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register/>
@@ -8148,7 +8177,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="n">(0x0c + (n) * 0x20)</formula>
+                    <base>0xc</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register/>
@@ -8161,7 +8191,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="n">(0x10 + (n) * 0x20)</formula>
+                    <base>0x10</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register/>
@@ -8174,7 +8205,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="n">(0x14 + (n) * 0x20)</formula>
+                    <base>0x14</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register/>
@@ -8187,7 +8219,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="n">(0x18 + (n) * 0x20)</formula>
+                    <base>0x18</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register/>
@@ -8200,7 +8233,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="n">(0xc0 + (n) * 0x04)</formula>
+                    <base>0xc0</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register/>
@@ -9032,14 +9066,9 @@
                 <name>PPL_POS</name>
                 <range>
                     <first>0</first>
-                    <address>0x280</address>
-                    <address>0x288</address>
-                    <address>0x290</address>
-                    <address>0x298</address>
-                    <address>0x2a0</address>
-                    <address>0x2a8</address>
-                    <address>0x2b0</address>
-                    <address>0x2b8</address>
+                    <count>8</count>
+                    <base>0x280</base>
+                    <stride>0x8</stride>
                 </range>
             </instance>
             <register>
@@ -9061,13 +9090,9 @@
                 <name>PPL_SIZE</name>
                 <range>
                     <first>1</first>
-                    <address>0x28c</address>
-                    <address>0x294</address>
-                    <address>0x29c</address>
-                    <address>0x2a4</address>
-                    <address>0x2ac</address>
-                    <address>0x2b4</address>
-                    <address>0x2bc</address>
+                    <count>7</count>
+                    <base>0x28c</base>
+                    <stride>0x8</stride>
                 </range>
             </instance>
             <register>
@@ -9756,8 +9781,9 @@
                 <name>DA</name>
                 <range>
                     <first>0</first>
-                    <address>0x40</address>
-                    <address>0x50</address>
+                    <count>2</count>
+                    <base>0x40</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register/>
@@ -9769,8 +9795,9 @@
                 <name>SA</name>
                 <range>
                     <first>0</first>
-                    <address>0x44</address>
-                    <address>0x54</address>
+                    <count>2</count>
+                    <base>0x44</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register/>
@@ -9782,8 +9809,9 @@
                 <name>FID</name>
                 <range>
                     <first>0</first>
-                    <address>0x48</address>
-                    <address>0x58</address>
+                    <count>2</count>
+                    <base>0x48</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register/>
@@ -9795,8 +9823,9 @@
                 <name>CMD</name>
                 <range>
                     <first>0</first>
-                    <address>0x4c</address>
-                    <address>0x5c</address>
+                    <count>2</count>
+                    <base>0x4c</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register>
@@ -9831,8 +9860,9 @@
                 <name>OFFS</name>
                 <range>
                     <first>0</first>
-                    <address>0x60</address>
-                    <address>0x70</address>
+                    <count>2</count>
+                    <base>0x60</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register/>
@@ -9844,8 +9874,9 @@
                 <name>PW</name>
                 <range>
                     <first>0</first>
-                    <address>0x64</address>
-                    <address>0x74</address>
+                    <count>2</count>
+                    <base>0x64</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register/>
@@ -9857,8 +9888,9 @@
                 <name>CNUM</name>
                 <range>
                     <first>0</first>
-                    <address>0x68</address>
-                    <address>0x78</address>
+                    <count>2</count>
+                    <base>0x68</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register/>
@@ -9870,8 +9902,9 @@
                 <name>DESSIZE</name>
                 <range>
                     <first>0</first>
-                    <address>0x6c</address>
-                    <address>0x7c</address>
+                    <count>2</count>
+                    <base>0x6c</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register>
@@ -10119,8 +10152,9 @@
                 <name>KEY</name>
                 <range>
                     <first>0</first>
-                    <address>0x110</address>
-                    <address>0x114</address>
+                    <count>2</count>
+                    <base>0x110</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register>
@@ -10187,8 +10221,9 @@
                 <name>XYP</name>
                 <range>
                     <first>0</first>
-                    <address>0x120</address>
-                    <address>0x124</address>
+                    <count>2</count>
+                    <base>0x120</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register>
@@ -10213,8 +10248,9 @@
                 <name>SIZE</name>
                 <range>
                     <first>0</first>
-                    <address>0x128</address>
-                    <address>0x12c</address>
+                    <count>2</count>
+                    <base>0x128</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register/>
@@ -11813,12 +11849,9 @@
                 <name>SMC</name>
                 <range>
                     <first>1</first>
-                    <address>0x14</address>
-                    <address>0x18</address>
-                    <address>0x1c</address>
-                    <address>0x20</address>
-                    <address>0x24</address>
-                    <address>0x28</address>
+                    <count>6</count>
+                    <base>0x14</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register>
@@ -11893,12 +11926,9 @@
                 <name>SMA</name>
                 <range>
                     <first>1</first>
-                    <address>0x34</address>
-                    <address>0x38</address>
-                    <address>0x3c</address>
-                    <address>0x40</address>
-                    <address>0x44</address>
-                    <address>0x48</address>
+                    <count>6</count>
+                    <base>0x34</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register>
@@ -12478,7 +12508,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="m">0x0300 + 0x100 * (m)</formula>
+                    <base>0x300</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -12554,7 +12585,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="m">0x0304 + 0x100 * (m)</formula>
+                    <base>0x304</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -12598,7 +12630,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="m">0x0308 + 0x100 * (m)</formula>
+                    <base>0x308</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -12642,7 +12675,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="m">0x030C + 0x100 * (m)</formula>
+                    <base>0x30c</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register>
@@ -12685,7 +12719,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="m">0x0310 + 0x100 * (m)</formula>
+                    <base>0x310</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register/>
@@ -12697,7 +12732,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="m">0x0314 + 0x100 * (m)</formula>
+                    <base>0x314</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register/>
@@ -12709,7 +12745,8 @@
                 <range>
                     <first>0</first>
                     <count>2</count>
-                    <formula variable="m">0x0318 + 0x100 * (m)</formula>
+                    <base>0x318</base>
+                    <stride>0x100</stride>
                 </range>
             </instance>
             <register/>
@@ -13145,8 +13182,9 @@
                 <name>CNTL</name>
                 <range>
                     <first>1</first>
-                    <address>0x204</address>
-                    <address>0x214</address>
+                    <count>2</count>
+                    <base>0x204</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register>
@@ -13196,8 +13234,9 @@
                 <name>ADDR</name>
                 <range>
                     <first>1</first>
-                    <address>0x208</address>
-                    <address>0x218</address>
+                    <count>2</count>
+                    <base>0x208</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register/>
@@ -13209,8 +13248,9 @@
                 <name>COUNT</name>
                 <range>
                     <first>1</first>
-                    <address>0x20c</address>
-                    <address>0x21c</address>
+                    <count>2</count>
+                    <base>0x20c</base>
+                    <stride>0x10</stride>
                 </range>
             </instance>
             <register/>
@@ -13231,7 +13271,8 @@
                 <range>
                     <first>0</first>
                     <count>3</count>
-                    <formula variable="n">(0x00 + (n) * 0x20)</formula>
+                    <base>0x0</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register/>
@@ -13244,7 +13285,8 @@
                 <range>
                     <first>0</first>
                     <count>3</count>
-                    <formula variable="n">(0x04 + (n) * 0x20)</formula>
+                    <base>0x4</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register/>
@@ -13257,7 +13299,8 @@
                 <range>
                     <first>0</first>
                     <count>3</count>
-                    <formula variable="n">(0x08 + (n) * 0x20)</formula>
+                    <base>0x8</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register/>
@@ -13270,7 +13313,8 @@
                 <range>
                     <first>0</first>
                     <count>3</count>
-                    <formula variable="n">(0x0c + (n) * 0x20)</formula>
+                    <base>0xc</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register>
@@ -13313,7 +13357,8 @@
                 <range>
                     <first>0</first>
                     <count>3</count>
-                    <formula variable="n">(0x10 + (n) * 0x20)</formula>
+                    <base>0x10</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register>
@@ -13389,7 +13434,8 @@
                 <range>
                     <first>0</first>
                     <count>3</count>
-                    <formula variable="n">(0x14 + (n) * 0x20)</formula>
+                    <base>0x14</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register>
@@ -13546,7 +13592,8 @@
                 <range>
                     <first>0</first>
                     <count>3</count>
-                    <formula variable="n">(0x18 + (n) * 0x20)</formula>
+                    <base>0x18</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register>
@@ -13572,7 +13619,8 @@
                 <range>
                     <first>0</first>
                     <count>3</count>
-                    <formula variable="n">(0x1c + (n) * 0x20)</formula>
+                    <base>0x1c</base>
+                    <stride>0x20</stride>
                 </range>
             </instance>
             <register>
@@ -13598,7 +13646,8 @@
                 <range>
                     <first>0</first>
                     <count>3</count>
-                    <formula variable="n">(0xc0 + (n) * 0x04)</formula>
+                    <base>0xc0</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register>
@@ -13896,7 +13945,8 @@
                 <range>
                     <first>0</first>
                     <count>12</count>
-                    <formula variable="n">0x14 + 4 *(n)</formula>
+                    <base>0x14</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register/>
@@ -13909,7 +13959,8 @@
                 <range>
                     <first>0</first>
                     <count>12</count>
-                    <formula variable="n">0x3C + 4*(n)</formula>
+                    <base>0x3c</base>
+                    <stride>0x4</stride>
                 </range>
             </instance>
             <register>

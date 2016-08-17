@@ -14,12 +14,14 @@ function FIIOX1.get_hw_type()
 end
 
 function FIIOX1.hw_detect()
-    -- PA12 is used to detect hardware version
-    JZ.gpio.pin(0, 12).std_gpio_out(1)
-    FIIOX1.hw_type = JZ.gpio.pin(0, 12).read()
-    -- PA13 is used to detect backlight type
-    JZ.gpio.pin(0, 13).std_gpio_out(1)
-    FIIOX1.bl_type = JZ.gpio.pin(0, 13).read()
+    -- PA28 is used to detect hardware version
+    JZ.gpio.pin(0, 28).std_gpio_out(1)
+    FIIOX1.hw_type = JZ.gpio.pin(0, 28).read()
+    JZ.gpio.pin(0, 28).write(0)
+    -- PA29 is used to detect backlight type
+    JZ.gpio.pin(0, 29).std_gpio_out(1)
+    FIIOX1.bl_type = JZ.gpio.pin(0, 29).read()
+    JZ.gpio.pin(0, 29).write(0)
 
     if FIIOX1.hw_type == 1 then
         print("Fiio X1: hardware version: V01")

@@ -720,7 +720,9 @@ target/arm/crt0.S
 target/mips/mmu-mips.c
 #if CONFIG_CPU==JZ4732
 target/mips/ingenic_jz47xx/crt0.S
-#endif /* CONFIG_CPU == JZ4732 */
+#elif CONFIG_CPU==JZ4760B
+target/mips/jz4760b/crt0.S
+#endif /* CONFIG_CPU == * */
 
 #else
 
@@ -1719,6 +1721,20 @@ target/mips/ingenic_jz47xx/onda_vx767/lcd-onda_vx767.c
 target/mips/ingenic_jz47xx/onda_vx767/power-onda_vx767.c
 target/mips/ingenic_jz47xx/onda_vx767/sadc-onda_vx767.c
 #endif /* ONDA_VX767 */
+
+#if CONFIG_CPU == JZ4760B
+target/mips/jz4760b/kernel-jz4760b.c
+target/mips/jz4760b/i2c-jz4760b.c
+target/mips/jz4760b/lcd-jz4760b.c
+target/mips/jz4760b/system-jz4760b.c
+target/mips/jz4760b/usb-jz4760b.c
+target/mips/jz4760b/timer-jz4760b.c
+#endif /* CONFIG_CPU == JZ4760B */
+
+#if defined(FIIO_X1)
+target/mips/jz4760b/fiio-x1/backlight-fiiox1.c
+target/mips/jz4760b/fiio-x1/system-fiiox1.c
+#endif
 
 #if defined(LYRE_PROTO1)
 target/arm/at91sam/lyre_proto1/adc-lyre_proto1.c
