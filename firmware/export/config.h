@@ -82,6 +82,7 @@
 #define S5L8701      8701
 #define S5L8702      8702
 #define JZ4732       4732
+#define JZ4760B      4760
 #define AS3525       3525
 #define AT91SAM9260  9260
 #define AS3525v2    35252
@@ -165,6 +166,7 @@
 #define SAMSUNG_YPR1_PAD  61
 #define SAMSUNG_YH92X_PAD  62
 #define DX50_PAD           63
+#define FIIO_X1_PAD        65
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -277,6 +279,7 @@
 #define LCD_IHIFI         60 /* as used by IHIFI 760/960 */
 #define LCD_CREATIVEZENXFISTYLE 61 /* as used by Creative Zen X-Fi Style */
 #define LCD_SAMSUNGYPR1   62 /* as used by Samsung YP-R1 */
+#define LCD_FIIOX1    64 /* as used by Fiio X1 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -317,6 +320,7 @@ Lyre prototype 1 */
 #define I2C_S5L8702 16 /* Same as S5L8700, but with two channels */
 #define I2C_IMX233  17
 #define I2C_RK27XX  18
+#define I2C_JZ4760B 19
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
@@ -361,6 +365,7 @@ Lyre prototype 1 */
 #define USBOTG_M5636    5636 /* iAudio X5 */
 #define USBOTG_ARC      5020 /* PortalPlayer 502x and IMX233 */
 #define USBOTG_JZ4740   4740 /* Ingenic Jz4740/Jz4732 */
+#define USBOTG_JZ4760   4760 /* Ingenic Jz4760(B) */
 #define USBOTG_AS3525   3525 /* AMS AS3525 */
 #define USBOTG_S3C6400X 6400 /* Samsung S3C6400X, also used in the S5L8701/S5L8702/S5L8720 */
 #define USBOTG_DESIGNWARE 6401 /* Synopsys DesignWare OTG, used in S5L8701/S5L8702/S5L8720/AS3252v2 */
@@ -581,6 +586,8 @@ Lyre prototype 1 */
 #include "config/ibassodx50.h"
 #elif defined(DX90)
 #include "config/ibassodx90.h"
+#elif defined(FIIO_X1)
+#include "config/fiiox1.h"
 #else
 /* no known platform */
 #endif
@@ -920,7 +927,7 @@ Lyre prototype 1 */
 
 #endif /* BOOTLOADER */
 
-#if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) \
+#if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) || (CONFIG_CPU == JZ4760B) \
     || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2) \
     || defined(CPU_S5L870X) || (CONFIG_CPU == S3C2440) \
     || defined(APPLICATION) || (CONFIG_CPU == PP5002) \
@@ -995,14 +1002,16 @@ Lyre prototype 1 */
     (CONFIG_CPU == TCC7801) || \
     (CONFIG_CPU == IMX233 && !defined(PLUGIN) && !defined(CODEC)) || /* IMX233: core only */ \
     defined(CPU_S5L870X)) || /* Samsung S5L8700: core, plugins, codecs */ \
-    (CONFIG_CPU == JZ4732 && !defined(PLUGIN) && !defined(CODEC)) /* Jz4740: core only */
+    (CONFIG_CPU == JZ4732 && !defined(PLUGIN) && !defined(CODEC)) || /* Jz4740: core only */ \
+    (CONFIG_CPU == JZ4760B && !defined(PLUGIN) && !defined(CODEC)) /* Jz4760b: core only */
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))
 #define IDATA_ATTR      __attribute__ ((section(".idata")))
 #define IBSS_ATTR       __attribute__ ((section(".ibss")))
 #define USE_IRAM
 #if CONFIG_CPU != SH7034 && (CONFIG_CPU != AS3525 || MEMORYSIZE > 2) \
-    && CONFIG_CPU != JZ4732 && CONFIG_CPU != AS3525v2 && CONFIG_CPU != IMX233
+    && CONFIG_CPU != JZ4732 && CONFIG_CPU != AS3525v2 && CONFIG_CPU != IMX233 \
+    && CONFIG_CPU != JZ4760B
 #define PLUGIN_USE_IRAM
 #endif
 #else
@@ -1150,6 +1159,7 @@ Lyre prototype 1 */
 #define USB_HAS_BULK
 #elif (CONFIG_USBOTG == USBOTG_ARC) || \
     (CONFIG_USBOTG == USBOTG_JZ4740) || \
+    (CONFIG_USBOTG == USBOTG_JZ4760) || \
     (CONFIG_USBOTG == USBOTG_M66591) || \
     (CONFIG_USBOTG == USBOTG_DESIGNWARE) || \
     (CONFIG_USBOTG == USBOTG_AS3525)
