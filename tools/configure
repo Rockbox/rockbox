@@ -1498,6 +1498,8 @@ cat <<EOF
  207) Android x86         230) 760               232) DX50
  208) Samsung YP-R1       231) 960               233) DX90
 
+ ==Fiio==
+ 250) X1
 
 EOF
 
@@ -3948,6 +3950,47 @@ fi
     t_cpu="hosted"
     t_manufacturer="ibasso"
     t_model="dx90"
+    ;;
+
+ 64|sansafuzeplus)
+    target_id=80
+    modelname="sansafuzeplus"
+    target="SANSA_FUZEPLUS"
+    memory=64
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=fuz+"
+    output="rockbox.sansa"
+    bootoutput="bootloader-fuzeplus.sansa"
+    appextra="gui:recorder:radio"
+    plugins="yes"
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="sansa-fuzeplus"
+    arm926ejscc
+    ;;
+
+   250|fiiox1)
+    target_id=95
+    modelname="fiiox1"
+    target="FIIO_X1"
+    memory=64
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=fix1"
+    output="rockbox.fiio"
+    bootoutput="bootloader-x1.fiio"
+    appextra="gui"
+    plugins="yes"
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="jz4760b"
+    t_model="fiio-x1"
+    mipselcc
     ;;
 
    *)
