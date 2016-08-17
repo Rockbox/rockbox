@@ -379,13 +379,17 @@ $releasenotes="/wiki/ReleaseNotes313";
         name => 'Creative Zen Mozaic',
         status => 3
     },
+    'fiiox1' => {
+        name => 'Fiio X1',
+        status => 1
+    },
 );
 
 sub manualname {
     my $m = shift @_;
 
     return $builds{$m}{manual} ? "$builds{$m}{manual}" : $m;
-}    
+}
 
 sub voicename {
     my $m = shift @_;

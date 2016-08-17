@@ -77,4 +77,6 @@ show_logo.c
 #elif defined(SANSA_CONNECT)
 sansaconnect.c
 show_logo.c
+#elif CONFIG_CPU==JZ4760B
+jz4760b.c
 #endif
