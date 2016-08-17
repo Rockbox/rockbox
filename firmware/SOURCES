@@ -719,7 +719,9 @@ target/arm/crt0.S
 target/mips/mmu-mips.c
 #if CONFIG_CPU==JZ4732
 target/mips/ingenic_jz47xx/crt0.S
-#endif /* CONFIG_CPU == JZ4732 */
+#elif CONFIG_CPU==JZ4760B
+target/mips/jz4760b/crt0.S
+#endif /* CONFIG_CPU == * */
 
 #else
 
@@ -1702,6 +1704,15 @@ target/mips/ingenic_jz47xx/pcm-jz4740.c
 #endif /* BOOTLOADER */
 drivers/nand_id.c
 #endif /* CONFIG_CPU == JZ4732 */
+
+#if CONFIG_CPU == JZ4760B
+target/mips/jz4760b/kernel-jz4760b.c
+target/mips/jz4760b/i2c-jz4760b.c
+target/mips/jz4760b/lcd-jz4760b.c
+target/mips/jz4760b/system-jz4760b.c
+target/mips/jz4760b/usb-jz4760b.c
+target/mips/jz4760b/timer-jz4760b.c
+#endif /* CONFIG_CPU == JZ4760B */
 
 #if defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX777)
 target/mips/ingenic_jz47xx/onda_vx747/backlight-onda_vx7X7.c

@@ -286,7 +286,7 @@
  *
  * usage: REG_CS(register, clear_value, set_value)
  *
- * effect: clear some bits using set variant and then set some using set variant
+ * effect: clear some bits using clr variant and then set some using set variant
  * note: register must be fully qualified if indexed
  *
  * example: REG_CS(ICOLL_CTRL, 0xff, 0x42)

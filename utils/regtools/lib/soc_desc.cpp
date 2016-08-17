@@ -690,6 +690,76 @@ void normalize(soc_t& soc)
 }
 
 /**
+ * Simplifier
+ */
+
+namespace
+{
+
+void simplify(instance_t& inst, error_context_t& err)
+{
+    if(inst.type != instance_t::RANGE)
+        return;
+    // stride are already simple(mostly a speedup, the procedure would obviously work on a stride)
+    if(inst.range.type == range_t::STRIDE)
+        return;
+    bool is_stride = true;
+    soc_word_t base = 0, stride = 0;
+    for(size_t offset = 0; offset < inst.range.size(); offset++)
+    {
+        size_t index = inst.range.first + offset;
+        soc_word_t addr = 0;
+        if(inst.range.type == range_t::LIST)
+        {
+            addr = inst.range.list[offset];
+        }
+        else if(inst.range.type == range_t::FORMULA)
+        {
+            std::map< std::string, soc_word_t > vars;
+            error_context_t err;
+            vars[inst.range.variable] = index;
+            if(!evaluate_formula(inst.range.formula, vars, addr, inst.name, err))
+                is_stride = false; // don't simplify if we do not understand the type
+        }
+        else
+            is_stride = false; // don't simplify if we do not understand the type
+        // on first iteration, remember base
+        if(offset == 0)
+            base = addr;
+        // on second iteration, remember stride
+        else if(offset == 1)
+            stride = addr - base;
+        // then check invariant
+        else if(addr != base + offset * stride)
+            is_stride = false;
+    }
+    // promote to stride
+    if(!is_stride)
+        return;
+    err.add(err_t(err_t::INFO, inst.name, "Promote to stride"));
+    inst.range.count = inst.range.size();
+    inst.range.type = range_t::STRIDE;
+    inst.range.base = base;
+    inst.range.stride = stride;
+}
+
+void simplify(node_t& node, error_context_t& err)
+{
+    for(size_t i = 0; i < node.node.size(); i++)
+        simplify(node.node[i], err);
+    for(size_t i = 0; i < node.instance.size(); i++)
+        simplify(node.instance[i], err);
+}
+
+} /* namespace */
+
+void simplify(soc_t& soc, error_context_t& err)
+{
+    for(size_t i = 0; i < soc.node.size(); i++)
+        simplify(soc.node[i], err);
+}
+
+/**
  * Producer
  */
 
