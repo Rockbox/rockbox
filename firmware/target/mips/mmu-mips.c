@@ -25,6 +25,13 @@
 #include "system.h"
 #include "mmu-mips.h"
 
+#if CONFIG_CPU == JZ4740 || CONFIG_CPU == JZ4760B
+/* XBurst core has 32 JTLB entries */
+#define NR_TLB_ENTRIES  32
+#else
+#error please define NR_TLB_ENTRIES
+#endif
+
 #define BARRIER                            \
     __asm__ __volatile__(                  \
     "    .set    noreorder          \n"    \
@@ -43,22 +50,24 @@
 #define VPN2_SHIFT               S_EntryHiVPN2
 #define PFN_SHIFT                S_EntryLoPFN
 #define PFN_MASK                 0xffffff
+
 static void local_flush_tlb_all(void)
 {
     unsigned long old_ctx;
     int entry;
     unsigned int old_irq = disable_irq_save();
-    
+
     /* Save old context and create impossible VPN2 value */
     old_ctx = read_c0_entryhi();
     write_c0_entrylo0(0);
     write_c0_entrylo1(0);
     BARRIER;
 
-    /* Blast 'em all away. */
-    for(entry = 0; entry < 32; entry++)
+    /* blast all entries except the wired one */
+    for(entry = read_c0_wired(); entry < NR_TLB_ENTRIES; entry++)
     {
-        /* Make sure all entries differ. */
+        /* Make sure all entries differ and are in unmapped space, making them
+         * impossible to match */
         write_c0_entryhi(UNIQUE_ENTRYHI(entry, DEFAULT_PAGE_SHIFT));
         write_c0_index(entry);
         BARRIER;
@@ -66,7 +75,7 @@ static void local_flush_tlb_all(void)
     }
     BARRIER;
     write_c0_entryhi(old_ctx);
-    
+
     restore_irq(old_irq);
 }
 
@@ -77,7 +86,7 @@ static void add_wired_entry(unsigned long entrylo0, unsigned long entrylo1,
     unsigned long old_pagemask;
     unsigned long old_ctx;
     unsigned int  old_irq = disable_irq_save();
-    
+
     old_ctx = read_c0_entryhi() & ASID_MASK;
     old_pagemask = read_c0_pagemask();
     wired = read_c0_wired();
@@ -119,10 +128,6 @@ void mmu_init(void)
     write_c0_framemask(0);
     
     local_flush_tlb_all();
-/*
-    map_address(0x80000000, 0x80000000, 0x4000, K_CacheAttrC);
-    map_address(0x80004000, 0x80004000, MEMORYSIZE * 0x100000, K_CacheAttrC);
-*/
 }
 
 #define SYNC_WB() __asm__ __volatile__ ("sync")

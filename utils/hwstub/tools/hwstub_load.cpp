@@ -148,7 +148,6 @@ int main(int argc, char **argv)
             {"verbose", no_argument, 0, 'v'},
             {"noload", no_argument, 0, 'e'},
             {"noexec", no_argument, 0, 'l'},
-            {"verbose", no_argument, 0, 'v'},
             {0, 0, 0, 0}
         };
 
