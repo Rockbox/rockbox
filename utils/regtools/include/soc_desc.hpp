@@ -200,14 +200,14 @@ struct range_t
 {
     enum type_t
     {
-        STRIDE, /** Addresses are given by a base address and a stride */
+        STRIDE, /** Addresses are given by a base address and a stride: base + (index - first) * stride */
         FORMULA, /** Addresses are given by a formula */
         LIST, /** Addresses are given by a list */
     };
 
     type_t type; /** Range type */
     size_t first; /** First index in the range */
-    size_t count; /** Number of indexes in the range (for STRIDE and RANGE) */
+    size_t count; /** Number of indexes in the range (for STRIDE and FORMULA) */
     soc_word_t base; /** Base address (for STRIDE) */
     soc_word_t stride; /** Stride value (for STRIDE) */
     std::string formula; /** Formula (for FORMULA) */
@@ -283,6 +283,9 @@ bool produce_xml(const std::string& filename, const soc_t& soc, error_context_t&
  * - fields are sorted by last bit
  * - enum are sorted by value */
 void normalize(soc_t& soc);
+/** Simplify a soc description:
+ * - lists/formulas that follow a pattern are promoted to stride */
+void simplify(soc_t& soc, error_context_t& error_ctx);
 /** Formula parser: try to parse and evaluate a formula with some variables */
 bool evaluate_formula(const std::string& formula,
     const std::map< std::string, soc_word_t>& var, soc_word_t& result,
