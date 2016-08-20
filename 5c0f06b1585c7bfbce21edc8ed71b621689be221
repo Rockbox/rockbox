@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_8203da0d",
+        "filename": "firmware/drivers/audio/as3514.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2016-08-20T12:28:35Z",
+      "side": 1,
+      "message": "we don\u0027t need this",
+      "range": {
+        "startLine": 522,
+        "startChar": 0,
+        "endLine": 525,
+        "endChar": 6
+      },
+      "revId": "5c0f06b1585c7bfbce21edc8ed71b621689be221",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff82abbf_2208ce26",
+        "filename": "firmware/drivers/audio/as3514.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 534,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2016-08-20T12:28:35Z",
+      "side": 1,
+      "message": "should be replace by:\nas3514_clear(AS3514_LINE_IN_R, LINE_IN1_R_LI1R_MUTE_off);\nas3514_clear(AS3514_LINE_IN_L, LINE_IN1_L_LI1L_MUTE_off);",
+      "range": {
+        "startLine": 529,
+        "startChar": 0,
+        "endLine": 534,
+        "endChar": 6
+      },
+      "revId": "5c0f06b1585c7bfbce21edc8ed71b621689be221",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
