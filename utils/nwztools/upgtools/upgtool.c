@@ -60,12 +60,6 @@ enum keysig_search_method_t g_keysig_search = KEYSIG_SEARCH_NONE;
 
 static void usage(void);
 
-/* key and signature */
-struct nwz_kas_t
-{
-    char kas[NWZ_KAS_SIZE];
-};
-
 #define HAS_KAS     (1 << 0)
 #define HAS_KEY     (1 << 1)
 #define HAS_SIG     (1 << 2)
@@ -75,7 +69,7 @@ struct nwz_model_t
 {
     const char *model;
     unsigned flags;
-    struct nwz_kas_t kas;
+    char kas[NWZ_KAS_SIZE]; /* key and signature */
     char key[8];
     char sig[8];
 };
@@ -100,8 +94,8 @@ struct upg_entry_t
 
 struct nwz_model_t g_model_list[] =
 {
-    { "nwz-e46x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, {"89d813f8f966efdebd9c9e0ea98156d2"}, "eb4431eb", "4f1d9cac" },
-    { "nwz-a86x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, {"a7c4af6c28b8900a783f307c1ba538c5"}, "c824e4e2", "7c262bb0" },
+    { "nwz-e46x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, "89d813f8f966efdebd9c9e0ea98156d2", "eb4431eb", "4f1d9cac" },
+    { "nwz-a86x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, "a7c4af6c28b8900a783f307c1ba538c5", "c824e4e2", "7c262bb0" },
     /* The following keys were obtained by brute forcing firmware upgrades,
      * someone with a device needs to confirm that they work */
     { "nw-a82x", HAS_KEY | HAS_SIG, {""}, "4df06482", "07fa0b6e" },
@@ -178,10 +172,10 @@ static int do_upg(void *buf, long size)
         return 1;
     }
 
-    struct nwz_kas_t kas;
+    char kas[NWZ_KAS_SIZE];
     char keysig[NWZ_KEYSIG_SIZE];
 
-    memset(kas.kas, '?', NWZ_KAS_SIZE);
+    memset(kas, '?', NWZ_KAS_SIZE);
     memset(keysig, '?', NWZ_KEYSIG_SIZE);
     keysig[32] = keysig[41] = keysig[50] = 0;
 
@@ -235,7 +229,7 @@ static int do_upg(void *buf, long size)
     else
     {
         if(g_model_list[g_model_index].flags & HAS_KAS)
-            g_kas = g_model_list[g_model_index].kas.kas;
+            g_kas = g_model_list[g_model_index].kas;
         if(g_model_list[g_model_index].flags & HAS_KEY)
             g_key = g_model_list[g_model_index].key;
         if(g_model_list[g_model_index].flags & HAS_SIG)
@@ -270,22 +264,22 @@ static int do_upg(void *buf, long size)
         fwp_setkey("ed295076");
         if(g_key)
         {
-            memcpy(kas.kas, g_key, 8);
-            fwp_crypt(kas.kas, 8, 0);
+            memcpy(kas, g_key, 8);
+            fwp_crypt(kas, 8, 0);
             for(int i = 0; i < 8; i++)
             {
-                g_kas[2 * i] = hex_digit((kas.kas[i] >> 4) & 0xf);
-                g_kas[2 * i + 1] = hex_digit(kas.kas[i] & 0xf);
+                g_kas[2 * i] = hex_digit((kas[i] >> 4) & 0xf);
+                g_kas[2 * i + 1] = hex_digit(kas[i] & 0xf);
             }
         }
         if(g_sig)
         {
-            memcpy(kas.kas + 8, g_sig, 8);
-            fwp_crypt(kas.kas + 8, 8, 0);
+            memcpy(kas + 8, g_sig, 8);
+            fwp_crypt(kas + 8, 8, 0);
             for(int i = 8; i < 16; i++)
             {
-                g_kas[2 * i] = hex_digit((kas.kas[i] >> 4) & 0xf);
-                g_kas[2 * i + 1] = hex_digit(kas.kas[i] & 0xf);
+                g_kas[2 * i] = hex_digit((kas[i] >> 4) & 0xf);
+                g_kas[2 * i + 1] = hex_digit(kas[i] & 0xf);
             }
         }
     }
@@ -429,10 +423,10 @@ static int create_upg(int argc, char **argv)
         return 1;
     }
 
-    struct nwz_kas_t kas;
+    char kas[NWZ_KAS_SIZE];
     char keysig[NWZ_KEYSIG_SIZE];
 
-    memset(kas.kas, '?', NWZ_KAS_SIZE);
+    memset(kas, '?', NWZ_KAS_SIZE);
     memset(keysig, '?', NWZ_KEYSIG_SIZE);
     keysig[32] = keysig[41] = keysig[50] = 0;
 
@@ -473,7 +467,7 @@ static int create_upg(int argc, char **argv)
     else if(g_model_index != -1)
     {
         if(g_model_list[g_model_index].flags & HAS_KAS)
-            g_kas = g_model_list[g_model_index].kas.kas;
+            g_kas = g_model_list[g_model_index].kas;
         if(g_model_list[g_model_index].flags & HAS_KEY)
             g_key = g_model_list[g_model_index].key;
         if(g_model_list[g_model_index].flags & HAS_SIG)
@@ -510,19 +504,19 @@ static int create_upg(int argc, char **argv)
     {
         g_kas = keysig;
         fwp_setkey("ed295076");
-        memcpy(kas.kas, g_key, 8);
-        fwp_crypt(kas.kas, 8, 0);
+        memcpy(kas, g_key, 8);
+        fwp_crypt(kas, 8, 0);
         for(int i = 0; i < 8; i++)
         {
-            g_kas[2 * i] = hex_digit((kas.kas[i] >> 4) & 0xf);
-            g_kas[2 * i + 1] = hex_digit(kas.kas[i] & 0xf);
+            g_kas[2 * i] = hex_digit((kas[i] >> 4) & 0xf);
+            g_kas[2 * i + 1] = hex_digit(kas[i] & 0xf);
         }
-        memcpy(kas.kas + 8, g_sig, 8);
-        fwp_crypt(kas.kas + 8, 8, 0);
+        memcpy(kas + 8, g_sig, 8);
+        fwp_crypt(kas + 8, 8, 0);
         for(int i = 8; i < 16; i++)
         {
-            g_kas[2 * i] = hex_digit((kas.kas[i] >> 4) & 0xf);
-            g_kas[2 * i + 1] = hex_digit(kas.kas[i] & 0xf);
+            g_kas[2 * i] = hex_digit((kas[i] >> 4) & 0xf);
+            g_kas[2 * i + 1] = hex_digit(kas[i] & 0xf);
         }
     }
 
@@ -733,7 +727,7 @@ int main(int argc, char **argv)
             if(g_model_list[i].flags & HAS_KAS)
             {
                 cprintf(RED, " kas=");
-                cprintf(YELLOW, "%."STR(NWZ_KAS_SIZE)"s", g_model_list[i].kas.kas);
+                cprintf(YELLOW, "%."STR(NWZ_KAS_SIZE)"s", g_model_list[i].kas);
             }
             if(g_model_list[i].flags & HAS_KEY)
             {
