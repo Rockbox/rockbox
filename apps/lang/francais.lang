@@ -285,7 +285,7 @@
   </source>
   <dest>
     *: "PLAY = Oui"
-    cowond2*: "MENU ou en haut àgauche = Oui"
+    cowond2*: "MENU ou en haut à gauche = Oui"
     iriverh100,iriverh120,iriverh300: "NAVI = Oui"
     ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Oui"
     mrobe500: "PLAY, POWER, ou en haut à gauche = Oui"
@@ -12423,11 +12423,11 @@
   </source>
   <dest>
     *: none
-    depth_3d: "Amélioration des effets 3D"
+    depth_3d: "Effet 3D"
   </dest>
   <voice>
     *: none
-    depth_3d: "Amélioration des effets 3D"
+    depth_3d: "Effet 3 D"
   </voice>
 </phrase>
 <phrase>
