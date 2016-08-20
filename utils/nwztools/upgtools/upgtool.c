@@ -94,6 +94,7 @@ struct upg_entry_t
 
 struct nwz_model_t g_model_list[] =
 {
+    { "nwz-e45x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, "8a01b624bfbfde4a1662a1772220e3c5", "6173819e", "30b82e5c"},
     { "nwz-e46x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, "89d813f8f966efdebd9c9e0ea98156d2", "eb4431eb", "4f1d9cac" },
     { "nwz-a86x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, "a7c4af6c28b8900a783f307c1ba538c5", "c824e4e2", "7c262bb0" },
     /* The following keys were obtained by brute forcing firmware upgrades,

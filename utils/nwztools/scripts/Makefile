@@ -25,7 +25,7 @@ else
 endif
 
 clean:
-	rm -rf *.UPG
+	rm -rf *.upg
 
 list_targets:
 	$(upgtool) -m ?; true # upgtool returns an error in this case, ignore it
