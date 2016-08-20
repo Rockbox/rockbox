@@ -57,6 +57,102 @@ struct sound_settings_info
 };
 
 #undef AUDIOHW_SETTING /* will have been #defined in config.h as empty */
+/* Use AUDIOHW_SETTING to create an audio setting. There are two ways to use this
+ * macro:
+ * AUDIOHW_SETTING(name, unit, nr_decimals, step, min, max, default)
+ * AUDIOHW_SETTING(name, unit, nr_decimals, step, min, max, default, expr)
+ *
+ * It is important to understand that each setting has two scales: the hardware
+ * scale and the user scale. In the first form of the macro, they coincide.
+ * In the second form, the conversion from hardware to user is done by the
+ * expression [expr] provided in the extra argument (see examples below). The
+ * hardware scale ranges from [min] to [max], in steps of [step]. The default value
+ * is [default]. Furthermore, when displaying the value to the user, [nr_decimals]
+ * gives the number of decimal points to display. Thus if [nr_decimals] is 0 then
+ * a value of x means x [unit]. If [nr_decimals] is 1 then a value of x means
+ * x/10 [unit] and so on. Note that both [nr_decimals] and [unit] are irrelevant
+ * to the hardware, they simply provide a flexible way to show natural value to
+ * the user. When you want the user scale to be different than the hardware scale,
+ * you must provide [expr], an expression that can use the variable "val", which
+ * represents the hardware value, and converts it to the user value. The [expr]
+ * can involved a function call in very complicated/nonlinear cases, as long as
+ * the function does not have any side-effect. Finally, the [name] parameter
+ * must be one of the settings listed in audiohw_setting.h
+ *
+ * Examples:
+ *
+ *   AUDIOHW_SETTING(VOLUME, "dB", 0, 1, -100,  12,  -25)
+ * This describes the volume setting. The values are in dB (no decimal). The
+ * minimum value is -100 and the maximum is 12, with a step of 1 and a default
+ * value of -25. This means that the hardware can take any of the following value:
+ *   -100, -99, -98, ..., 11,12
+ * Since there is are decimals and no conversion expression, a hardware value of
+ * x means x dB. So a value of -25 means -25 dB, a value of 5 means 5 dB.
+ * WARNING VOLUME is actually special: whatever scale you choose, the sound code
+ * will always set the volume by calling audiohw_set_volume() with a centibel
+ * value (ie it will not perform any conversion). Thus it is strongly advised
+ * that you always choose a VOLUME scale with precision 1 (centibels) and no
+ * hardware conversion.
+ *
+ *   AUDIOHW_SETTING(MDB_CENTER,   "Hz",  0, 10,  20, 300,  60)
+ * This describes the MDB (dynbamic bass) center. The values are in Hz (no
+ * decimal). The minimum value is 20 and the maximum is 300, in steps of 10
+ * and a default of 60. Thus hardware can take any of the following value:
+ *   20, 30, 40, ... 290, 300
+ * Since there are no decimals and no conversion expression, a hardware of x
+ * means x Hz. So a value of 60 means 60 Hz.
+ *
+ *   AUDIOHW_SETTING(BASS, "dB", 1, 15,  -60,   90,    0)
+ * This describes the bass control. Since there is one decimal, the values are
+ * in tenth of dB. The minimum value is -60 and the maximum is 90, in steps of
+ * 15 and a default value of 0. Thus hardware can take any of the following value:
+ *   -60, -45, -30, ... 60, 75, 90
+ * Since there is one decimal, a hardware value of x means x/10 Hz. So a value
+ * of 60 means 60/10 = 6 dB. A value of -45 means -45/10 = -4.5 dB.
+ *
+ *   AUDIOHW_SETTING(DEPTH_3D, "%", 0,  1, 0,   15,    0, (100 * val + 8) / 15)
+ * This describes 3D enhancement control. The values are in percentage (no
+ * decimal). This setting makes a difference between hardware and user scale.
+ * The minimal hardware value is 0 and the maximum is 15, in steps of 1 and
+ * a default of 0. Thus hardware can take any of the following value:
+ *   0, 1, 2, ... 14, 15
+ * Because of the conversion expression, a hardware value of x means
+ * (100 * val + 8) / 15) %. A hardware value of 0 means (100 * 0 + 8) / 15) = 0 %
+ * because the result must be an integer (8 / 15 = 0). A hardware value of 1
+ * means (100 * 1 + 8) / 15 = 7 %. A hardware value of 15 means
+ * (100 * 15 + 8) / 15 = 100 %. In fact, from the user point of view, the range
+ * of available values is:
+ *   0%, 7%, 13%, 20%, ..., 93%, 100%
+ *
+ *   AUDIOHW_SETTING(LEFT_GAIN, "dB", 2, 15,-345, 1200, 0, val * 5)
+ * This describes the left gain. Since there are two decimals, the values are in
+ * hundredth of dB. This setting makes a difference between hardware and user scale.
+ * The minimal hardware value is -345 and the maximum is 1200, in steps of 15 and
+ * a default of 0. Thus hardware can take any of the following value:
+ *   -345, -330, -315, ..., 1185, 1200
+ * Because of the conversion expression, a hardware value of x means
+ * val * 5 hundredth of dB or, in other words, (val * 5)/100 dB (where we keep two
+ * decimals). A hardware value of -345 means -345 * 5 = -1725 hundredth of dB
+ * = -17,25 dB. A value of -330 means -330*5 = -1650 hundredth of dB = -16,50 dB.
+ * A value of 1200 means 1200 * 5 = 6000 hundredth of dB = 60 dB. In fact,
+ * from the user point of view, the range of available values is:
+ *   -17.25 dB, -16.60 dB, ..., 59.25 dB, 60dB.
+ *
+ *   AUDIOHW_SETTING(DEPTH_3D, "dB", 0, 1, 0, 3, 0, depth3d_phys2_val(val))
+ * This describes 3D enhancement control. The values are in dB (no
+ * decimal). This setting makes a difference between hardware and user scale.
+ * The minimal hardware value is 0 and the maximum is 3, in steps of 1 and
+ * a default of 0. Thus hardware can take any of the following value:
+ *   0, 1, 2, 3
+ * Because of the conversion expression, a hardware value of x means
+ * depth3d_phys2_val(x) dB. If for example the conversion functions is:
+ *   int depth3d_phys2_val(int val)
+ *   {
+ *     return val == 0 ? 0 : val * 5 + 30;
+ *   }
+ * then from the user point of view, the range of available values is:
+ *   0 dB, 35 dB, 40 dB, 45 dB
+ */
 #define AUDIOHW_SETTING(name, us, nd, st, minv, maxv, defv, expr...) \
     static const struct sound_settings_info _audiohw_setting_##name = \
     { .unit = us, .numdecimals = nd, .steps = st, \
@@ -323,7 +419,7 @@ void audiohw_close(void);
 #ifdef AUDIOHW_HAVE_MONO_VOLUME
   /**
  * Set new volume value
- * @param val to set.
+ * @param val to set in centibels.
  * NOTE: AUDIOHW_CAPS need to contain
  *          CLIPPING_CAP
  */
@@ -331,8 +427,8 @@ void audiohw_set_volume(int val);
 #else /* Stereo volume */
 /**
  * Set new volume value for each channel
- * @param vol_l sets left channel volume
- * @param vol_r sets right channel volume
+ * @param vol_l sets left channel volume in centibels.
+ * @param vol_r sets right channel volume in centibels.
  */
 void audiohw_set_volume(int vol_l, int vol_r);
 #endif /* AUDIOHW_HAVE_MONO_VOLUME */
@@ -351,7 +447,7 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r);
     || defined(AUDIOHW_HAVE_EQ)
 /**
  * Set new prescaler value.
- * @param val to set.
+ * @param val to set in centibels.
  * NOTE: AUDIOHW_CAPS need to contain
  *          PRESCALER_CAP
  */
