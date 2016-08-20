@@ -93,9 +93,7 @@ void audiohw_set_recvol(int left, int right, int type)
 
 void audiohw_set_depth_3d(int val)
 {
-    /* input is raw value ranging from 0dB to 6dB in tenth of dB
-     * convert to value in 1.5dB steps */
-    imx233_audioout_set_3d_effect(val / 15);
+    imx233_audioout_set_3d_effect(val);
 }
 
 void audiohw_set_monitor(bool enable)
