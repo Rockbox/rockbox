@@ -281,15 +281,17 @@
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
+    creativezen*: "Select = Yes"
   </source>
   <dest>
     *: "PLAY = Oui"
-    cowond2*: "MENU = Oui"
+    cowond2*: "MENU ou en haut àgauche = Oui"
     iriverh100,iriverh120,iriverh300: "NAVI = Oui"
     ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Oui"
-    mrobe500: "PLAY ou POWER = Oui"
+    mrobe500: "PLAY, POWER, ou en haut à gauche = Oui"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Oui"
+    creativezen*: "Select = Oui"
   </dest>
   <voice>
     *: ""
@@ -12298,15 +12300,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Egaliseur intégré"
+    gigabeats,samsungypr1: "Egaliseur intégré"
   </dest>
   <voice>
     *: none
-    gigabeats: "égaliseur intégré"
+    gigabeats,samsungypr1: "égaliseur intégré"
   </voice>
 </phrase>
 <phrase>
@@ -12315,15 +12317,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Réglages avancés"
+    gigabeats,samsungypr1: "Réglages avancés de l'égaliseur"
   </dest>
   <voice>
     *: none
-    gigabeats: "Réglages avancés de l'égaliseur"
+    gigabeats,samsungypr1: "Réglages avancés de l'égaliseur"
   </voice>
 </phrase>
 <phrase>
@@ -12332,15 +12334,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Gain Bande %d"
+    gigabeats,samsungypr1: "Gain Bande %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Gain par bande"
+    gigabeats,samsungypr1: "Gain par bande"
   </voice>
 </phrase>
 <phrase>
@@ -12349,15 +12351,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Fréquence Bande %d"
+    gigabeats,samsungypr1: "Fréquence Bande %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Fréquence par bande"
+    gigabeats,samsungypr1: "Fréquence par bande"
   </voice>
 </phrase>
 <phrase>
@@ -12366,15 +12368,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Largeur Bande %d"
+    gigabeats,samsungypr1: "Largeur Bande %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Largeur par bande"
+    gigabeats,samsungypr1: "Largeur par bande"
   </voice>
 </phrase>
 <phrase>
@@ -12383,15 +12385,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Large"
+    gigabeats,samsungypr1: "Large"
   </dest>
   <voice>
     *: none
-    gigabeats: "Large"
+    gigabeats,samsungypr1: "Large"
   </voice>
 </phrase>
 <phrase>
@@ -12400,15 +12402,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Réduit"
+    gigabeats,samsungypr1: "Réduit"
   </dest>
   <voice>
     *: none
-    gigabeats: "Réduit"
+    gigabeats,samsungypr1: "Réduit"
   </voice>
 </phrase>
 <phrase>
@@ -12417,15 +12419,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Amélioration des effets 3D"
+    depth_3d: "Amélioration des effets 3D"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Amélioration des effets 3D"
+    depth_3d: "Amélioration des effets 3D"
   </voice>
 </phrase>
 <phrase>
@@ -13009,7 +13011,7 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: "Europe de l'Est (CP1252)"
+    *: "Western European (CP1252)"
   </source>
   <dest>
     *: "Europe de l'Est (CP1252)"
@@ -13064,5 +13066,359 @@
   </dest>
   <voice>
     *: "Restreindre le changement de répertoire auto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Lent"
+  </dest>
+  <voice>
+    *: "Lent"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
+  desc: in Settings -> General -> System -> Freq Scaling Governor
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Stratégie d'ajustement de la fréquence"
+    ibassodx90: "Stratégie d'ajustement de la fréquence"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Stratégie d'ajustement de la fréquence"
+    ibassodx90: "Stratégie d'ajustement de la fréquence"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_METHOD2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "SIDE ONLY"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Différence seulement"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Différence seulement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> System -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Mass Storage"
+    ibassodx90: "Mass Storage"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Stockage de masse"
+    ibassodx90: "Stockage de masse"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Stockage de masse"
+    ibassodx90: "Stockage de masse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Séparateur de lignes"
+  </dest>
+  <voice>
+    *: "Séparateur de lignes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_MIX
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Mixage original / affecté"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Mixage original affecté"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x2)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x2)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x2)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x1)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x1)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x1)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "Filtre d'atténuation du convertisseur N/A"
+  </dest>
+  <voice>
+    *: "Filtre d'atténuation du convertisseur N A"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PBE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Amélioration de la perception des basses"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Amélioration de la perception des basses"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Temps d'attaque"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Temps d'attaque"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "Zone morte du pavé tactile"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "Zone morte du pavé tactile"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Limite de volume"
+  </dest>
+  <voice>
+    *: "Limite de volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Réduction de la fatigue auditive"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Réduction de la fatigue auditive"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_CHARGE
+  desc: in Settings -> General -> System -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Charge Only"
+    ibassodx90: "Charge Only"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Charge seulement"
+    ibassodx90: "Charge seulement"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Charge seulement"
+    ibassodx90: "Charge seulement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_ADB
+  desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Pont de débogage Android"
+    ibassodx90: "Pont de débogage Android"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Pont de débogage Android"
+    ibassodx90: "Pont de débogage Android"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "Rapide"
+  </dest>
+  <voice>
+    *: "Rapide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Haas Surround"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Effet Haas"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Effet Haas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Couleur de ligne de séparation"
+  </dest>
+  <voice>
+    *: "Couleur de ligne de séparation"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE
+  desc: in Settings -> General -> System -> USB Mode
+  user: core
+  <source>
+    *: none
+    ibassodx50: "USB Mode"
+    ibassodx90: "USB Mode"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Mode USB"
+    ibassodx90: "Mode USB"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Mode USB"
+    ibassodx90: "Mode USB"
   </voice>
 </phrase>
