@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff82abbf_a21b7e71",
+        "filename": "firmware/drivers/audio/as3514.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2016-08-20T13:59:33Z",
+      "side": 1,
+      "message": "I think this comment incorrect and should be replace with something like:  /* mute line-in */",
+      "range": {
+        "startLine": 524,
+        "startChar": 8,
+        "endLine": 524,
+        "endChar": 54
+      },
+      "revId": "49302412dea4e8e682f85771ac6c93c2635e8e8c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
