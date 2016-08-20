@@ -21,12 +21,12 @@
 #ifndef __IMX233_CODEC_H_
 #define __IMX233_CODEC_H_
 
-/* i.MX233 can boost up to 6dB in DAC mode and 12dB in line mode. Since mic/line
- * already have adjustable gain, keep lowest of both. With chained DAC volume
- * and headphone volume, the i.MX233 can achieve < -100dB but stay at -100dB. */
 #define AUDIOHW_CAPS    (DEPTH_3D_CAP | BASS_CAP | TREBLE_CAP | \
                          LIN_GAIN_CAP | MIC_GAIN_CAP)
 
+/* i.MX233 can boost up to 6dB in DAC mode and 12dB in line mode. Pretend we can
+ * do 12dB (but we cap at 6dB in DAC mode). With chained DAC volume
+ * and headphone volume, the i.MX233 can achieve < -100dB but stay at -100dB. */
 AUDIOHW_SETTING(VOLUME,     "dB", 0, 1, -100,  12,  -25)
 /* HAVE_SW_TONE_CONTROLS */
 #ifdef HAVE_RECORDING
@@ -38,7 +38,16 @@ AUDIOHW_SETTING(LEFT_GAIN,  "dB", 0, 1, -100,  22,   0)
 AUDIOHW_SETTING(RIGHT_GAIN, "dB", 0, 1, -100,  22,   0)
 AUDIOHW_SETTING(MIC_GAIN,   "dB", 0, 1, -100,  60,  20)
 #endif /* HAVE_RECORDING */
-/* i.MX233 has four settings: 0dB, 3dB, 4.5dB, 6dB so fake 1.5dB steps */
-AUDIOHW_SETTING(DEPTH_3D,   "dB", 1,15,   0,   60,   0)
+/* i.MX233 has four settings: 0dB, 3dB, 4.5dB, 6dB */
+/* depth_3d setting: 0=0dB, 1=3dB, 2=4.5dB, 3=6dB. Return value in tenth of dB */
+static inline int imx233_depth_3d_val2phys(int val)
+{
+    if(val == 0)
+        return 0; /* 0dB */
+    else
+        return 15 * (val + 1); /* 3dB + 1.5dB per step */
+}
+AUDIOHW_SETTING(DEPTH_3D,   "dB", 1, 1,    0,   3,   0, imx233_depth_3d_val2phys(val))
+
 
 #endif /* __IMX233_CODEC_H_ */
