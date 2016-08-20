@@ -189,6 +189,20 @@ change to customise your listening experience.
   the effect of widening the stereo field. A value of 100\% will leave the
   stereo field unaltered.
 
+\opt{depth_3d}{
+  \section{3D Enhancement}
+  3D Enhancement increases the perceived separation between the left and right
+  channels.
+  \opt{IMX233}{%
+    It works by subtracting a portion of the opposite channel's content for each
+    channel. This setting controls the amount of opposite channel content that
+    is subtracted. A value of 0dB leaves the audio signal unmodified.}%
+  \opt{HAVE_WM8750,HAVE_WM8978}{%
+    This settings controls the degree of stereo expansion. A value of 0\%
+    leaves the audio signal unmodified.
+  }%
+}
+
 \opt{masf}{
   \section{Loudness}
   When listening at low volumes, the ear will tend to make bass and treble
