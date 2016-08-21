@@ -57,12 +57,19 @@ AUDIOHW_SETTING(EQ_BAND5_FREQUENCY, "", 0,   1,   0,   3,   0)
 AUDIOHW_SETTING(EQ_BAND2_WIDTH,     "", 0,   1,   0,   1,   0)
 AUDIOHW_SETTING(EQ_BAND3_WIDTH,     "", 0,   1,   0,   1,   0)
 AUDIOHW_SETTING(EQ_BAND4_WIDTH,     "", 0,   1,   0,   1,   0)
+/* Percentage from 0% to 100% in steps of 6.66%:
+ * Values: 0, 1, 2, ... 14, 15
+ *      => 0%, 6%, 14%, ..., 93%, 100%
+ */
 AUDIOHW_SETTING(DEPTH_3D,          "%", 0,   1,   0,  15,   0, (100*val + 8) / 15)
 #ifdef HAVE_RECORDING
-    /* Digital: -119.0dB to +8.0dB in 0.5dB increments
-     * Analog:  Relegated to volume control
-     * Circumstances unfortunately do not allow a great deal of positive
-     * gain. */
+/* Digital: -119.0dB to +8.0dB in 0.5dB increments
+ * Analog:  Relegated to volume control
+ * Circumstances unfortunately do not allow a great deal of positive
+ * gain.
+ *
+ * Values: -238, -237, ..., 16
+ *     => -119.0 dB, -118.5dB, ..., 8.0dB */
 AUDIOHW_SETTING(LEFT_GAIN,        "dB", 1,   1,-238,  16,   0, val * 5)
 AUDIOHW_SETTING(RIGHT_GAIN,       "dB", 1,   1,-238,  16,   0, val * 5)
 #if 0 /* whenever it's needed - none on GBS */

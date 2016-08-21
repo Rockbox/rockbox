@@ -409,7 +409,8 @@ void audiohw_set_prescaler(int val)
     sync_prescaler();
 }
 
-/* Set the depth of the 3D effect */
+/* Set the depth of the 3D effect
+ * value in 0 .. 15, corresponds to 0% .. 100% in 6.66% steps */
 void audiohw_set_depth_3d(int val)
 {
     wmc_vol.enh_3d_prescaler = 10*val / 15; /* -5 dB @ full setting */
@@ -583,11 +584,17 @@ void audiohw_set_recsrc(int source, bool recording)
     }
 }
 
+/* volume in -238 .. 16, corresponds to -119dB .. 8dB in 0.5dB steps */
 void audiohw_set_recvol(int left, int right, int type)
 {
     switch (type)
     {
     case AUDIO_GAIN_LINEIN:
+        /* 0 is digital mute, 1 = -127dB, 2 = -126.dB, ..., 63 = 0dB
+         * line-in has an extra 20dB boost before ADC.
+         * FIXME then why -127db + 20db != -119dB ???
+         *       I think the range -119dB .. 8dB is wrong, it should be
+         *       -107dB .. 20dB or I am missing 12dB somewhere*/
         wmc_write_masked(WMC_LEFT_ADC_DIGITAL_VOL, left + 239, WMC_DVOL);
         wmc_write_masked(WMC_RIGHT_ADC_DIGITAL_VOL, right + 239, WMC_DVOL);
         return;
