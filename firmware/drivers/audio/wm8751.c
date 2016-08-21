@@ -385,7 +385,8 @@ void audiohw_set_frequency(int fsel)
 
 #ifdef HAVE_WM8750
 #ifdef AUDIOHW_HAVE_DEPTH_3D
-/* Set the depth of the 3D effect */
+/* Set the depth of the 3D effect
+ * value in 0 .. 15, corresponds to 0% .. 100% in 6.66% steps */
 void audiohw_set_depth_3d(int val)
 {
     if (val > 0)
@@ -631,6 +632,7 @@ static int pga_gain2hw(int value)
     return ((4 * value) / 300) + 23;
 }
 
+/* volume in hundredth of dB in -1725 .. 6000 */
 void audiohw_set_recvol(int vol_l, int vol_r, int type)
 {
     int d_vol_l = 0;

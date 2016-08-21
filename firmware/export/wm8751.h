@@ -25,18 +25,21 @@
 #define AUDIOHW_CAPS (BASS_CAP | TREBLE_CAP | PRESCALER_CAP | \
                       BASS_CUTOFF_CAP | TREBLE_CUTOFF_CAP | \
                       DEPTH_3D_CAP | LIN_GAIN_CAP | MIC_GAIN_CAP)
-
+/* Percentage from 0% to 100% in steps of 6.66%:
+ * Values: 0, 1, 2, ... 14, 15
+ *      => 0%, 6%, 14%, ..., 93%, 100%
+ */
 AUDIOHW_SETTING(DEPTH_3D,        "%", 0,  1,    0,   15,    0, (100 * val + 8) / 15)
 #ifdef HAVE_RECORDING
     /* PGA -17.25dB to 30.0dB in 0.75dB increments 64 steps
      * digital gain 0dB to 30.0dB in 0.5dB increments
      * we use 0.75dB fake steps through whole range
      *
-     * This combined gives -17.25 to 60.0dB 
+     * This combined gives -17.25 to 60.0dB
      */
-AUDIOHW_SETTING(LEFT_GAIN,      "dB", 2, 75,-1725, 6000,    0, val * 5)
-AUDIOHW_SETTING(RIGHT_GAIN,     "dB", 2, 75,-1725, 6000,    0, val * 5)
-AUDIOHW_SETTING(MIC_GAIN,       "dB", 2, 75,-1725, 6000, 3000, val * 5)
+AUDIOHW_SETTING(LEFT_GAIN,      "dB", 2, 75,-1725, 6000,    0)
+AUDIOHW_SETTING(RIGHT_GAIN,     "dB", 2, 75,-1725, 6000,    0)
+AUDIOHW_SETTING(MIC_GAIN,       "dB", 2, 75,-1725, 6000, 3000)
 
 void audiohw_set_recsrc(int source, bool recording);
 #endif /* HAVE_RECORDING */
