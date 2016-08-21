@@ -29,8 +29,13 @@ AUDIOHW_SETTING(VOLUME,     "dB", 0, 1, -74,  6, -25)
 AUDIOHW_SETTING(BASS,       "dB", 0, 1,  -6,  9,   0)
 AUDIOHW_SETTING(TREBLE,     "dB", 0, 1,  -6,  9,   0)
 #ifdef HAVE_RECORDING
+/* The input PGAs have a gain range from -17.25dB .. 30dB in steps of 0.75dB
+ * Values: 0, 1, ..., 63
+ *      => -17.25, -16.5dB, ..., 30.0dB */
 AUDIOHW_SETTING(LEFT_GAIN,  "dB", 1, 1,   0, 63,  23, ((val - 23) * 15) / 2)
 AUDIOHW_SETTING(RIGHT_GAIN, "dB", 1, 1,   0, 63,  23, ((val - 23) * 15) / 2)
+/* The microphone has an extra 20dB boost before the input PGA so 0 .. 63
+ * corresponds to 2.75dB .. 50dB */
 AUDIOHW_SETTING(MIC_GAIN,   "dB", 1, 1,   0, 63,   0, ((val - 23) * 15) / 2 + 200)
 #endif /* HAVE_RECORDING */
 

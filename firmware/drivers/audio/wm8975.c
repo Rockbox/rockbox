@@ -296,6 +296,8 @@ void audiohw_disable_recording(void)
     wm8975_write(PWRMGMT1, wm8975_regs[PWRMGMT1]);
 }
 
+/* volume in 0 .. 63, corresponds to -17.25dB .. 30dB in steps of 0.75dB
+ * microphone has an extra 20dB boost so 0 .. 63 corresponds to 2.75dB .. 50dB */
 void audiohw_set_recvol(int left, int right, int type)
 {
     switch (type)
