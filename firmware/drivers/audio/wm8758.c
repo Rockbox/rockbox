@@ -305,6 +305,7 @@ void audiohw_disable_recording(void)
     wmcodec_write(PWRMGMT2, PWRMGMT2_ROUT1EN | PWRMGMT2_LOUT1EN);
 }
 
+/* volume in 0 .. 63, corresponds to -12dB .. +35.25dB in 0.75dB steps */
 void audiohw_set_recvol(int left, int right, int type)
 {
     switch (type)
