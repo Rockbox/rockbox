@@ -4220,6 +4220,9 @@ fi
 
 echo "Using $LD $ldver"
 
+makever=`make --version | head -1`
+echo "Detected make $makever"
+
 # check the compiler for SH platforms
 if test "$CC" = "sh-elf-gcc"; then
   if test "$gccnum" -lt "400"; then
