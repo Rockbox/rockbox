@@ -32,9 +32,12 @@ AUDIOHW_SETTING(TREBLE,      "dB", 0,  1, -12,  12,   0)
 AUDIOHW_SETTING(BASS_CUTOFF,   "", 0,  1,   1,   4,   1)
 AUDIOHW_SETTING(TREBLE_CUTOFF, "", 0,  1,   1,   4,   1)
 #ifdef HAVE_RECORDING
-AUDIOHW_SETTING(LEFT_GAIN,   "dB", 1,  1,   0,  63,  16, ((val - 23) * 15) / 2 + 200)
-AUDIOHW_SETTING(RIGHT_GAIN,  "dB", 1,  1,   0,  63,  16, ((val - 23) * 15) / 2 + 200)
-AUDIOHW_SETTING(MIC_GAIN,    "dB", 1,  1,   0,  63,  16, ((val - 23) * 15) / 2 + 200)
+/* The input PGAs have a gain range from -12dB to +35.25dB in 0.75dB steps
+ * Values: 0, 1, ..., 63
+ *      => -12dB, -11.25dB, ..., 35.25dB */
+AUDIOHW_SETTING(LEFT_GAIN,   "dB", 1,  1,   0,  63,  16, ((val) * 15) / 2 - 120)
+AUDIOHW_SETTING(RIGHT_GAIN,  "dB", 1,  1,   0,  63,  16, ((val) * 15) / 2 - 120)
+AUDIOHW_SETTING(MIC_GAIN,    "dB", 1,  1,   0,  63,  16, ((val) * 15) / 2 - 120)
 #endif /* HAVE_RECORDING */
 
 void audiohw_enable_lineout(bool enable);
