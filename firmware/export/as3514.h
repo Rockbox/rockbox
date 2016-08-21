@@ -28,7 +28,7 @@
 #define AUDIOHW_CAPS    (LINEOUT_CAP | LIN_GAIN_CAP | MIC_GAIN_CAP)
 #endif
 
-#define AUDIOHW_CAPS    (LIN_GAIN_CAP | MIC_GAIN_CAP)
+#define AUDIOHW_CAPS    (LIN_GAIN_CAP | MIC_GAIN_CAP | MONITOR_CAP)
 
 /*different volume ranges for different AMS chips*/
 #ifdef HAVE_AS3543

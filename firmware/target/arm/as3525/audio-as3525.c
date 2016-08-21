@@ -72,7 +72,7 @@ void audio_input_mux(int source, unsigned flags)
             {
                 audio_channels = 2;
 #if defined(HAVE_RECORDING) || defined(HAVE_FMRADIO_IN)
-                audiohw_set_monitor(false);
+                sound_set_monitor(false);
 #endif
 #ifdef HAVE_RECORDING
                 audiohw_disable_recording();
@@ -85,7 +85,7 @@ void audio_input_mux(int source, unsigned flags)
             if (source != last_source)
             {
                 audio_channels = 1;
-                audiohw_set_monitor(false);
+                sound_set_monitor(false);
                 audiohw_enable_recording(true);  /* source mic */
             }
             break;
@@ -107,7 +107,7 @@ void audio_input_mux(int source, unsigned flags)
 
             if (recording)
             {
-                audiohw_set_monitor(false);
+                sound_set_monitor(false);
                 audiohw_enable_recording(false);
             }
             else
@@ -117,7 +117,7 @@ void audio_input_mux(int source, unsigned flags)
                 audiohw_disable_recording();
 #endif
 #if defined(HAVE_RECORDING) || defined(HAVE_FMRADIO_IN)
-                audiohw_set_monitor(true); /* line 2 analog audio path */
+                sound_set_monitor(true); /* line 2 analog audio path */
 #endif
             }
             break;

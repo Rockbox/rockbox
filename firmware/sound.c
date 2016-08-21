@@ -134,6 +134,9 @@ static struct
 #if defined(AUDIOHW_HAVE_EQ)
     int eq_gain[AUDIOHW_EQ_BAND_NUM]; /* tenth dB */
 #endif
+#if defined(AUDIOHW_HAVE_MONITOR)
+    bool monitor;                     /* disabled/enabled */
+#endif
 } sound_prescaler;
 
 #if defined(AUDIOHW_HAVE_BASS) || defined (AUDIOHW_HAVE_TREBLE) \
@@ -149,40 +152,46 @@ static void set_prescaled_volume(void)
     int volume = sound_prescaler.volume;
 
 #if defined(TONE_PRESCALER)
-    int prescale = 0;
+#if defined(AUDIOHW_HAVE_MONITOR)
+    if (!sound_prescaler.monitor)
+#endif
+    {
+        int prescale = 0;
 
-    /* Note: Having Tone + EQ isn't prohibited */
+        /* Note: Having Tone + EQ isn't prohibited */
 #if defined(AUDIOHW_HAVE_BASS) && defined(AUDIOHW_HAVE_TREBLE)
-    prescale = MAX(sound_prescaler.bass, sound_prescaler.treble);
+        prescale = MAX(sound_prescaler.bass, sound_prescaler.treble);
 #endif
 
 #if defined(AUDIOHW_HAVE_EQ)
-    for (int i = 0; i < AUDIOHW_EQ_BAND_NUM; i++)
-        prescale = MAX(sound_prescaler.eq_gain[i], prescale);
+        for (int i = 0; i < AUDIOHW_EQ_BAND_NUM; i++)
+            prescale = MAX(sound_prescaler.eq_gain[i], prescale);
 #endif
 
-    if (prescale < 0)
-        prescale = 0;  /* no need to prescale if we don't boost
-                          bass, treble or eq band */
+        if (prescale < 0)
+            prescale = 0;  /* no need to prescale if we don't boost
+                              bass, treble or eq band */
 
-    /* Gain up the analog volume to compensate the prescale gain reduction,
-     * but if this would push the volume over the top, reduce prescaling
-     * instead (might cause clipping). */
-    const int maxvol = sound_value_to_cb(SOUND_VOLUME, sound_max(SOUND_VOLUME));
+        /* Gain up the analog volume to compensate the prescale gain reduction,
+         * but if this would push the volume over the top, reduce prescaling
+         * instead (might cause clipping). */
+        const int maxvol =
+            sound_value_to_cb(SOUND_VOLUME, sound_max(SOUND_VOLUME));
 
-    if (volume + prescale > maxvol)
-        prescale = maxvol - volume;
+        if (volume + prescale > maxvol)
+            prescale = maxvol - volume;
 
-    audiohw_set_prescaler(prescale);
+        audiohw_set_prescaler(prescale);
 
-    if (volume <= minvol)
-        prescale = 0;  /* Make sure the audio gets muted */
+        if (volume <= minvol)
+            prescale = 0;  /* Make sure the audio gets muted */
 
 #ifndef AUDIOHW_HAVE_MONO_VOLUME
-    /* At the moment, such targets have lousy volume resolution and so minute
-       boost won't work how we'd like */
-    volume += prescale;
+        /* At the moment, such targets have lousy volume resolution and so
+           minute boost won't work how we'd like */
+        volume += prescale;
 #endif
+    }
 #endif /* TONE_PRESCALER */
 
 #if defined(AUDIOHW_HAVE_MONO_VOLUME)
@@ -323,6 +332,21 @@ void sound_set_filter_roll_off(int value)
     audiohw_set_filter_roll_off(value);
 }
 #endif
+
+#if defined(AUDIOHW_HAVE_MONITOR)
+void sound_set_monitor(bool value)
+{
+    if (!audio_is_initialized)
+        return;
+
+    audiohw_set_monitor(value);
+
+#if !defined(AUDIOHW_HAVE_CLIPPING)
+    sound_prescaler.monitor = value;
+    set_prescaled_volume();
+#endif
+}
+#endif /* AUDIOHW_HAVE_MONITOR */
 
 #if defined(AUDIOHW_HAVE_EQ)
 int sound_enum_hw_eq_band_setting(unsigned int band,

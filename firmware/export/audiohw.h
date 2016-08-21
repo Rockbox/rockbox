@@ -41,6 +41,7 @@
 #define LIN_GAIN_CAP          (1 << 11)
 #define MIC_GAIN_CAP          (1 << 12)
 #define FILTER_ROLL_OFF_CAP   (1 << 13)
+#define MONITOR_CAP           (1 << 14) /* analog passthrought */
 
 /* Used by every driver to export its min/max/default values for its audio
    settings. */
@@ -279,6 +280,12 @@ enum AUDIOHW_EQ_SETTINGS
 
 #if (AUDIOHW_CAPS & FILTER_ROLL_OFF_CAP)
 #define AUDIOHW_HAVE_FILTER_ROLL_OFF
+#endif
+
+#if defined(HAVE_RECORDING) || defined(HAVE_FMRADIO_IN)
+#if (AUDIOHW_CAPS & MONITOR_CAP)
+#define AUDIOHW_HAVE_MONITOR
+#endif
 #endif
 
 #endif /* AUDIOHW_CAPS */

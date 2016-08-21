@@ -55,6 +55,10 @@ void sound_set_depth_3d(int value);
 void sound_set_filter_roll_off(int value);
 #endif
 
+#if defined(AUDIOHW_HAVE_MONITOR)
+void sound_set_monitor(bool value);
+#endif
+
 #ifdef AUDIOHW_HAVE_EQ
 /*
  * band = SOUND_EQ_BANDb
