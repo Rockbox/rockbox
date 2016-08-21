@@ -38,6 +38,9 @@ AUDIOHW_SETTING(VOLUME,     "dB",   0,   1, -74,   6, -25)
 #endif /* HAVE_AS3543 */
 
 #ifdef HAVE_RECORDING
+/* Line in   : 0 .. 23 .. 31 =>  Volume -34.5 .. +00.0 .. +12.0 dB
+ * Mic (left): 0 .. 23 .. 39 =>  Volume -34.5 .. +00.0 .. +24.0 dB
+ */
 AUDIOHW_SETTING(MIC_GAIN,   "dB",   1,   1,   0,  39,  23, (val - 23) * 15)
 AUDIOHW_SETTING(LEFT_GAIN,  "dB",   1,   1,   0,  31,  23, (val - 23) * 15)
 AUDIOHW_SETTING(RIGHT_GAIN, "dB",   1,   1,   0,  31,  23, (val - 23) * 15)
