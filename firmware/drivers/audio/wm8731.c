@@ -268,6 +268,8 @@ void audiohw_disable_recording(void)
     codec_set_active(true);
 }
 
+/* Line in: 0 .. 31 => Volume -34.5 .. +12 dB
+ * Microphone: 0 or 20 dB */
 void audiohw_set_recvol(int left, int right, int type)
 {
     switch (type)

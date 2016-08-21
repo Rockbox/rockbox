@@ -28,10 +28,10 @@
 
 AUDIOHW_SETTING(VOLUME,     "dB", 0,  1, -74,   6, -25)
 #if defined(HAVE_WM8731) && defined(HAVE_RECORDING)
-/* (x - 23)/1.5 *10 */
+/* Line in: 0 .. 31 => Volume -34.5 .. +12 dB */
 AUDIOHW_SETTING(LEFT_GAIN,  "dB", 1,  1,   0,  31,  23, (val - 23) * 15)
 AUDIOHW_SETTING(RIGHT_GAIN, "dB", 1,  1,   0,  31,  23, (val - 23) * 15)
-/* 0 or 20 dB */
+/* Microphone: 0 or 20 dB */
 AUDIOHW_SETTING(MIC_GAIN,   "dB", 1,  1,   0,   1,   0, val * 200)
 #endif /* defined(HAVE_WM8731) && defined(HAVE_RECORDING) */
 
