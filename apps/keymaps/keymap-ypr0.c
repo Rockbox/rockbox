@@ -105,14 +105,26 @@ static const struct button_mapping button_context_tree[]  = {
 }; /* button_context_tree */
 
 static const struct button_mapping button_context_settings[]  = {
+    { ACTION_SETTINGS_INC,       BUTTON_UP,                     BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_UP|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_DOWN,                   BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_STD_PREV,           BUTTON_LEFT,                   BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,     BUTTON_LEFT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_RIGHT,                  BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,    BUTTON_NONE },
 
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_TREE)
+}; /* button_context_settings */
+
+static const struct button_mapping button_context_settings_right_is_inc[] = {
     { ACTION_SETTINGS_INC,       BUTTON_RIGHT,                  BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT, BUTTON_RIGHT|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_SETTINGS_DEC,       BUTTON_LEFT,                   BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT, BUTTON_LEFT|BUTTON_REPEAT,     BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_TREE)
-}; /* button_context_settings */
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+}; /* button_context_settings_right_is_inc */
 
 static const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_SELECT,              BUTTON_NONE },
@@ -254,6 +266,10 @@ const struct button_mapping* get_context_mapping(int context)
 
         case CONTEXT_SETTINGS:
             return button_context_settings;
+
+        case CONTEXT_CUSTOM|CONTEXT_SETTINGS:
+        case CONTEXT_SETTINGS_RECTRIGGER:
+            return button_context_settings_right_is_inc;
 
         case CONTEXT_SETTINGS_COLOURCHOOSER:
             return button_context_colorchooser;
