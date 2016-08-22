@@ -330,7 +330,7 @@ void audiohw_close(void);
 void audiohw_set_volume(int val);
 #else /* Stereo volume */
 /**
- * Set new voluem value for each channel
+ * Set new volume value for each channel
  * @param vol_l sets left channel volume
  * @param vol_r sets right channel volume
  */
@@ -339,7 +339,7 @@ void audiohw_set_volume(int vol_l, int vol_r);
 
 #ifdef AUDIOHW_HAVE_LINEOUT
  /**
- * Set new voluem value for each channel
+ * Set new volume value for each channel
  * @param vol_l sets left channel volume
  * @param vol_r sets right channel volume
  */
