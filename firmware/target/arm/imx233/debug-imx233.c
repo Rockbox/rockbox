@@ -533,8 +533,9 @@ bool dbg_hw_info_rtc(void)
         struct imx233_rtc_info_t info = imx233_rtc_get_info();
 
         lcd_putsf(0, 0, "seconds: %lu", info.seconds);
+        lcd_putsf(0, 1, "alarm: %lu", info.alarm);
         for(int i = 0; i < 6; i++)
-            lcd_putsf(0, i + 1, "persist%d: 0x%lx", i, info.persistent[i]);
+            lcd_putsf(0, i + 2, "persist%d: 0x%lx", i, info.persistent[i]);
 
         lcd_update();
         yield();
