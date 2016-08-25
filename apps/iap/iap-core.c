@@ -42,6 +42,7 @@
 #include "sound.h"
 #include "action.h"
 #include "powermgmt.h"
+#include "usb.h"
 
 #include "tuner.h"
 #include "ipod_remote_tuner.h"
@@ -346,6 +347,13 @@ static void iap_thread(void)
             case SYS_POWEROFF:
             {
                 iap_shutdown = true;
+                break;
+            }
+
+            /* Ack USB thread */
+            case SYS_USB_CONNECTED:
+            {
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 break;
             }
         }
