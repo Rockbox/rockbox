@@ -449,6 +449,7 @@ enum codec_status codec_run(void)
                     }
 
                     /* report progress */
+                    ci->set_offset((size_t) ci->curpos);
                     ci->set_elapsed((granule_pos - header.preskip) / 48);
 
                     /* Decode audio packets */
