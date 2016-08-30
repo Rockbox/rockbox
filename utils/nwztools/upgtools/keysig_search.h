@@ -23,6 +23,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "fwp.h"
 
 enum keysig_search_method_t
 {
@@ -34,7 +35,8 @@ enum keysig_search_method_t
 };
 
 /* notify returns true if the key seems ok */
-typedef bool (*keysig_notify_fn_t)(void *user, uint8_t key[8], uint8_t sig[8]);
+typedef bool (*keysig_notify_fn_t)(void *user, uint8_t key[NWZ_KEY_SIZE],
+    uint8_t sig[NWZ_SIG_SIZE]);
 /* returns true if a key was accepted by notify */
 typedef bool (*keysig_search_fn_t)(uint8_t *cipher, keysig_notify_fn_t notify, void *user);
 

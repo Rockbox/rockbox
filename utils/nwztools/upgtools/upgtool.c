@@ -69,9 +69,9 @@ struct nwz_model_t
 {
     const char *model;
     unsigned flags;
-    char kas[NWZ_KAS_SIZE]; /* key and signature */
-    char key[8];
-    char sig[8];
+    char *kas;
+    char *key;
+    char *sig;
 };
 
 struct upg_md5_t
@@ -81,7 +81,7 @@ struct upg_md5_t
 
 struct upg_header_t
 {
-    char sig[8];
+    char sig[NWZ_SIG_SIZE];
     uint32_t nr_files;
     uint32_t pad; // make sure structure size is a multiple of 8
 } __attribute__((packed));
@@ -92,6 +92,72 @@ struct upg_entry_t
     uint32_t size;
 } __attribute__((packed));
 
+/** KAS / Key / Signature
+ *
+ * Since this is all very confusing, we need some terminology and notations:
+ * - [X, Y, Z] is a sequence of bytes, for example:
+ *     [8, 0x89, 42]
+ *   is a sequence of three bytes.
+ * - "abcdef" is a string: it is a sequences of bytes where each byte happens to
+ *   be the ASCII encoding of a letter. So for example:
+ *     "abc" = [97, 98, 99]
+ *   because 'a' has ASCII encoding 97 and so one
+ * - HexString(Seq) refers to the string where each byte of the original sequence
+ *   is represented in hexadecimal by two ASCII characters. For example:
+ *     HexString([8, 0x89, 42]) = "08892a"
+ *   because 8 = 0x08 so it represented by "08" and 42 = 0x2a. Note that the length
+ *   of HexString(Seq) is always exactly twice the length of Seq.
+ * - DES(Seq,Pass) is the result of encrypting Seq with Pass using the DES cipher.
+ *   Seq must be a sequence of 8 bytes (known as a block) and Pass must be a
+ *   sequence of 8 bytes. The result is also a 8-byte sequence.
+ * - ECB_DES([Block0, Block1, ..., BlockN], Pass)
+ *     = [DES(Block0,Pass), DES(Block1,Pass), ..., DES(BlockN,Pass)]
+ *   where Blocki is a block (8 byte).
+ *
+ *
+ * A firmware upgrade file is always encrypted using a Key. To authenticate it,
+ * the upgrade file (before encryption) contains a Sig(nature). The pair (Key,Sig)
+ * is refered to as KeySig and is specific to each series. For example all
+ * NWZ-E46x use the same KeySig but the NWZ-E46x and NWZ-A86x use different KeySig.
+ * In the details, a Key is a sequence of 8 bytes and a Sig is also a sequence
+ * of 8 bytes. A KeySig is a simply the concatenation of the Key followed by
+ * the Sig, so it is a sequence of 16 bytes. Probably in an attempt to obfuscate
+ * things a little further, Sony never provides the KeySig directly but instead
+ * encrypts it using DES in ECB mode using a hardcoded password and provides
+ * the hexadecimal string of the result, known as the KAS, which is thus a string
+ * of 32 ASCII characters.
+ * Note that since DES works on blocks of 8 bytes and ECB encrypts blocks
+ * independently, it is the same to encrypt the KeySig as once or encrypt the Key
+ * and Sig separately.
+ *
+ * To summarize:
+ *   Key = [K0, K1, K2, ..., K7] (8 bytes) (model specific)
+ *   Sig = [S0, S1, S2, ..., S7] (8 bytes) (model specific)
+ *   KeySig = [Key, Sig] = [K0, ... K7, S0, ..., S7] (16 bytes)
+ *   FwpPass = "ed295076" (8 bytes) (never changes)
+ *   EncKeySig = ECB_DES(KeySig, FwpPass) = [DES(Key, FwpPass), DES(Sig, FwpPass)]
+ *   KAS = HexString(EncKeySig) (32 characters)
+ *
+ * In theory, the Key and Sig can be any 8-byte sequence. In practice, they always
+ * are strings, probably to make it easier to write them down. In many cases, the
+ * Key and Sig are even the hexadecimal string of 4-byte sequences but it is
+ * unclear if this is the result of pure luck, confused engineers, lazyness on
+ * Sony's part or by design. The following code assumes that Key and Sig are
+ * strings (though it could easily be fixed to work with anything if this is
+ * really needed).
+ *
+ *
+ * Here is a real example, from the NWZ-E46x Series:
+ *   Key = "6173819e" (note that this is a string and even a hex string in this case)
+ *   Sig = "30b82e5c"
+ *   KeySig = [Key, Sig] = "6173819e30b82e5c"
+ *   FwpPass = "ed295076" (never changes)
+ *   EncKeySig = ECB_DES(KeySig, FwpPass)
+ *             = [0x8a, 0x01, 0xb6, ..., 0xc5] (16 bytes)
+ *   KAS = HexString(EncKeySig) = "8a01b624bfbfde4a1662a1772220e3c5"
+ *
+ */
+
 struct nwz_model_t g_model_list[] =
 {
     { "nwz-e45x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, "8a01b624bfbfde4a1662a1772220e3c5", "6173819e", "30b82e5c"},
@@ -99,7 +165,7 @@ struct nwz_model_t g_model_list[] =
     { "nwz-a86x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, "a7c4af6c28b8900a783f307c1ba538c5", "c824e4e2", "7c262bb0" },
     /* The following keys were obtained by brute forcing firmware upgrades,
      * someone with a device needs to confirm that they work */
-    { "nw-a82x", HAS_KEY | HAS_SIG, {""}, "4df06482", "07fa0b6e" },
+    { "nw-a82x", HAS_KEY | HAS_SIG, "", "4df06482", "07fa0b6e" },
 };
 
 static int digit_value(char c)
@@ -115,15 +181,14 @@ static char hex_digit(unsigned v)
     return (v < 10) ? v + '0' : (v < 16) ? v - 10 + 'a' : 'x';
 }
 
-static int decrypt_keysig(char keysig[NWZ_KEYSIG_SIZE])
+static int decrypt_keysig(const char kas[NWZ_KAS_SIZE], char key[NWZ_KEY_SIZE],
+    char sig[NWZ_SIG_SIZE])
 {
-    uint8_t src[16];
-    for(int i = 32; i < NWZ_KEYSIG_SIZE; i++)
-        keysig[i] = 0;
-    for(int index = 0; index < 16; index++)
+    uint8_t src[NWZ_KAS_SIZE / 2];
+    for(int index = 0; index < NWZ_KAS_SIZE / 2; index++)
     {
-        int a = digit_value(keysig[index * 2]);
-        int b = digit_value(keysig[index * 2 + 1]);
+        int a = digit_value(kas[index * 2]);
+        int b = digit_value(kas[index * 2 + 1]);
         if(a < 0 || b < 0)
         {
             cprintf(GREY, "Invalid KAS !\n");
@@ -133,16 +198,135 @@ static int decrypt_keysig(char keysig[NWZ_KEYSIG_SIZE])
     }
     fwp_setkey("ed295076");
     fwp_crypt(src, sizeof(src), 1);
-    memcpy(keysig + 33, src, 8);
-    memcpy(keysig + 42, src + 8, 8);
+    memcpy(key, src, NWZ_KEY_SIZE);
+    memcpy(sig, src + NWZ_KEY_SIZE, NWZ_SIG_SIZE);
     return 0;
 }
 
-static bool upg_notify_keysig(void *user, uint8_t key[8], uint8_t sig[8])
+static void encrypt_keysig(char kas[NWZ_KEY_SIZE],
+    const char key[NWZ_SIG_SIZE], const char sig[NWZ_KAS_SIZE])
 {
-    memcpy(user + 33, key, 8);
-    memcpy(user + 42, sig, 8);
+    uint8_t src[NWZ_KAS_SIZE / 2];
+    fwp_setkey("ed295076");
+    memcpy(src, key, NWZ_KEY_SIZE);
+    memcpy(src + NWZ_KEY_SIZE, sig, NWZ_SIG_SIZE);
+    fwp_crypt(src, sizeof(src), 0);
+    for(int i = 0; i < NWZ_KAS_SIZE / 2; i++)
+    {
+        kas[2 * i] = hex_digit((src[i] >> 4) & 0xf);
+        kas[2 * i + 1] = hex_digit(src[i] & 0xf);
+    }
+}
+
+/* user needs to be pointer to a NWZ_KEYSIG_SIZE-byte buffer, on success g_key
+ * and g_sig are updated to point to the key and sig in the buffer */
+static bool upg_notify_keysig(void *user, uint8_t key[NWZ_KEY_SIZE],
+    uint8_t sig[NWZ_SIG_SIZE])
+{
+    g_key = user;
+    g_sig = user + NWZ_KEY_SIZE;
+    memcpy(g_key, key, NWZ_KEY_SIZE);
+    memcpy(g_sig, sig, NWZ_SIG_SIZE);
     return true;
+}
+
+static int get_key_and_sig(bool is_extract, void *encrypted_hdr)
+{
+    static char keysig[NWZ_KEYSIG_SIZE];
+    static char kas[NWZ_KAS_SIZE];
+    /* database lookup */
+    if(g_model_index != -1)
+    {
+        if(g_model_list[g_model_index].flags & HAS_KAS)
+            g_kas = g_model_list[g_model_index].kas;
+        if(g_model_list[g_model_index].flags & HAS_KEY)
+            g_key = g_model_list[g_model_index].key;
+        if(g_model_list[g_model_index].flags & HAS_SIG)
+            g_sig = g_model_list[g_model_index].sig;
+    }
+
+    /* always prefer KAS because it contains everything */
+    if(g_kas)
+    {
+        if(strlen(g_kas) != NWZ_KAS_SIZE)
+        {
+            cprintf(GREY, "The KAS has wrong length (must be %d hex digits)\n", NWZ_KAS_SIZE);
+            return 4;
+        }
+        g_key = keysig;
+        g_sig = keysig + NWZ_KEY_SIZE;
+        decrypt_keysig(g_kas, g_key, g_sig);
+    }
+    /* fall back to key and signature otherwise. The signature is not required
+     * when extracting but prevents from checking decryption */
+    else if(g_key && (is_extract || g_sig))
+    {
+        if(strlen(g_key) != 8)
+        {
+            cprintf(GREY, "The specified key has wrong length (must be 8 hex digits)\n");
+            return 4;
+        }
+
+        /* if there is a signature, it must have the correct size */
+        if(g_sig)
+        {
+            if(strlen(g_sig) != 8)
+            {
+                cprintf(GREY, "The specified sig has wrong length (must be 8 hex digits)\n");
+                return 5;
+            }
+        }
+        else
+        {
+            cprintf(GREY, "Warning: you have specified a key but no sig, I won't be able to do any checks\n");
+        }
+    }
+    /* for extraction, we offer a brute force search method from the MD5 */
+    else if(is_extract && g_keysig_search != KEYSIG_SEARCH_NONE)
+    {
+        cprintf(BLUE, "keysig Search\n");
+        cprintf_field("  Method: ", "%s\n", keysig_search_desc[g_keysig_search].name);
+        bool ok = keysig_search_desc[g_keysig_search].fn(encrypted_hdr, &upg_notify_keysig, keysig);
+        cprintf(GREEN, "  Result: ");
+        cprintf(ok ? YELLOW : RED, "%s\n", ok ? "Key found" : "No key found");
+        if(!ok)
+            return 2;
+    }
+    else
+    {
+        cprintf(GREY, "A KAS or a keysig is needed to decrypt the firmware\n");
+        cprintf(GREY, "You have the following options(see help for more details):\n");
+        cprintf(GREY, "- select a model with a known KAS\n");
+        cprintf(GREY, "- specify an explicit KAS or key+sig\n");
+        if(is_extract)
+            cprintf(GREY, "- let me try to find the keysig(slow !)\n");
+        return 1;
+    }
+
+    /* If we only have the key and signature, we can create a "fake" KAS
+     * that decrypts to the same key and signature. Since it is not unique,
+     * it will generally not match the "official" one from Sony but will produce
+     * valid files anyway */
+    if(!g_kas)
+    {
+        if(!g_sig)
+        {
+            /* if we extract and don't have a signature, just use a random
+             * one, we cannot check it anyway */
+            g_sig = keysig;
+            memset(g_sig, '?', NWZ_SIG_SIZE);
+        }
+        g_kas = kas;
+        encrypt_keysig(g_kas, g_key, g_sig);
+    }
+
+    cprintf(BLUE, "Keys\n");
+    cprintf_field("  KAS: ", "%."STR(NWZ_KAS_SIZE)"s\n", g_kas);
+    cprintf_field("  Key: ", "%."STR(NWZ_KEY_SIZE)"s\n", g_key);
+    if(g_sig)
+        cprintf_field("  Sig: ", "%."STR(NWZ_SIG_SIZE)"s\n", g_sig);
+
+    return 0;
 }
 
 static int do_upg(void *buf, long size)
@@ -163,136 +347,12 @@ static int do_upg(void *buf, long size)
     }
     check_field(memcmp(actual_md5, md5->md5, 16), 0, "Ok\n", "Mismatch\n");
 
-    if(g_model_index == -1 && g_keysig_search == KEYSIG_SEARCH_NONE && g_key == NULL && g_kas == NULL)
-    {
-        cprintf(GREY, "A KAS or a keysig is needed to decrypt the firmware\n");
-        cprintf(GREY, "You have the following options(see help for more details):\n");
-        cprintf(GREY, "- select a model with a known KAS\n");
-        cprintf(GREY, "- specify an explicit KAS or key(+optional sig)\n");
-        cprintf(GREY, "- let me try to find the keysig(slow !)\n");
-        return 1;
-    }
-
-    char kas[NWZ_KAS_SIZE];
-    char keysig[NWZ_KEYSIG_SIZE];
-
-    memset(kas, '?', NWZ_KAS_SIZE);
-    memset(keysig, '?', NWZ_KEYSIG_SIZE);
-    keysig[32] = keysig[41] = keysig[50] = 0;
-
-    if(g_kas)
-    {
-        if(strlen(g_kas) != NWZ_KAS_SIZE)
-        {
-            cprintf(GREY, "The specified KAS has wrong length (must be %d hex digits)\n", NWZ_KAS_SIZE);
-            return 4;
-        }
-        memcpy(keysig, g_kas, NWZ_KAS_SIZE);
-        decrypt_keysig(keysig);
-        g_kas = keysig;
-        g_key = keysig + 33;
-        g_sig = keysig + 42;
-    }
-    else if(g_key)
-    {
-        if(strlen(g_key) != 8)
-        {
-            cprintf(GREY, "The specified key has wrong length (must be 8 hex digits)\n");
-            return 4;
-        }
-        if(g_sig && strlen(g_sig) != 8)
-        {
-            cprintf(GREY, "The specified sig has wrong length (must be 8 hex digits)\n");
-            return 5;
-        }
-        
-        memcpy(keysig + 33, g_key, 8);
-        if(!g_sig)
-            cprintf(GREY, "Warning: you have specified a key but no sig, I won't be able to do any checks\n");
-        else
-            memcpy(keysig + 42, g_sig, 8);
-        g_key = keysig + 33;
-        if(g_sig)
-            g_sig = keysig + 42;
-    }
-    else if(g_model_index == -1)
-    {
-        cprintf(BLUE, "keysig Search\n");
-        cprintf_field("  Method: ", "%s\n", keysig_search_desc[g_keysig_search].name);
-        bool ok = keysig_search_desc[g_keysig_search].fn((void *)(md5 + 1), &upg_notify_keysig, keysig);
-        cprintf(GREEN, "  Result: ");
-        cprintf(ok ? YELLOW : RED, "%s\n", ok ? "Key found" : "No key found");
-        if(!ok)
-            return 2;
-        g_key = keysig + 33;
-        g_sig = keysig + 42;
-    }
-    else
-    {
-        if(g_model_list[g_model_index].flags & HAS_KAS)
-            g_kas = g_model_list[g_model_index].kas;
-        if(g_model_list[g_model_index].flags & HAS_KEY)
-            g_key = g_model_list[g_model_index].key;
-        if(g_model_list[g_model_index].flags & HAS_SIG)
-            g_sig = g_model_list[g_model_index].sig;
-
-        if(g_kas)
-        {
-            memcpy(keysig, g_kas, NWZ_KAS_SIZE);
-            decrypt_keysig(keysig);
-            g_kas = keysig;
-            g_key = keysig + 33;
-            g_sig = keysig + 42;
-        }
-        else
-        {
-            if(g_key)
-            {
-                memcpy(keysig + 33, g_key, 8);
-                g_key = keysig + 33;
-            }
-            if(g_sig)
-            {
-                memcpy(keysig + 42, g_sig, 8);
-                g_sig = keysig + 42;
-            }
-        }
-    }
-
-    if(!g_kas)
-    {
-        g_kas = keysig;
-        fwp_setkey("ed295076");
-        if(g_key)
-        {
-            memcpy(kas, g_key, 8);
-            fwp_crypt(kas, 8, 0);
-            for(int i = 0; i < 8; i++)
-            {
-                g_kas[2 * i] = hex_digit((kas[i] >> 4) & 0xf);
-                g_kas[2 * i + 1] = hex_digit(kas[i] & 0xf);
-            }
-        }
-        if(g_sig)
-        {
-            memcpy(kas + 8, g_sig, 8);
-            fwp_crypt(kas + 8, 8, 0);
-            for(int i = 8; i < 16; i++)
-            {
-                g_kas[2 * i] = hex_digit((kas[i] >> 4) & 0xf);
-                g_kas[2 * i + 1] = hex_digit(kas[i] & 0xf);
-            }
-        }
-    }
-
-    cprintf(BLUE, "Keys\n");
-    cprintf_field("  KAS: ", "%."STR(NWZ_KAS_SIZE)"s\n", g_kas);
-    cprintf_field("  Key: ", "%s\n", g_key);
-    if(g_sig)
-        cprintf_field("  Sig: ", "%s\n", g_sig);
+    int ret = get_key_and_sig(true, md5 + 1);
+    if(ret != 0)
+        return ret;
 
     struct upg_header_t *hdr = (void *)(md5 + 1);
-    int ret = fwp_read(hdr, sizeof(struct upg_header_t), hdr, (void *)g_key);
+    ret = fwp_read(hdr, sizeof(struct upg_header_t), hdr, (void *)g_key);
     if(ret)
         return ret;
 
@@ -336,7 +396,6 @@ static int do_upg(void *buf, long size)
                     return ret;
                 // but write the *good* amount of data
                 fwrite(buf + entry->offset, 1, entry->size, f);
-                
                 fclose(f);
             }
             else
@@ -414,118 +473,10 @@ static int create_upg(int argc, char **argv)
         printf("You must specify a firmware filename\n");
         usage();
     }
-    
-    if(g_model_index == -1 && (g_key == NULL || g_sig == NULL) && g_kas == NULL)
-    {
-        cprintf(GREY, "A KAS or a keysig is needed to encrypt the firmware\n");
-        cprintf(GREY, "You have the following options(see help for more details):\n");
-        cprintf(GREY, "- select a model with a known KAS\n");
-        cprintf(GREY, "- specify an explicit KAS or key+sig\n");
-        return 1;
-    }
 
-    char kas[NWZ_KAS_SIZE];
-    char keysig[NWZ_KEYSIG_SIZE];
-
-    memset(kas, '?', NWZ_KAS_SIZE);
-    memset(keysig, '?', NWZ_KEYSIG_SIZE);
-    keysig[32] = keysig[41] = keysig[50] = 0;
-
-    if(g_kas)
-    {
-        if(strlen(g_kas) != NWZ_KAS_SIZE)
-        {
-            cprintf(GREY, "The specified KAS has wrong length (must be %d hex digits)\n", NWZ_KAS_SIZE);
-            return 4;
-        }
-        memcpy(keysig, g_kas, NWZ_KAS_SIZE);
-        decrypt_keysig(keysig);
-        g_kas = keysig;
-        g_key = keysig + 33;
-        g_sig = keysig + 42;
-    }
-    else if(g_key)
-    {
-        if(strlen(g_key) != 8)
-        {
-            cprintf(GREY, "The specified key has wrong length (must be 8 hex digits)\n");
-            return 4;
-        }
-        if(strlen(g_sig) != 8)
-        {
-            cprintf(GREY, "The specified sig has wrong length (must be 8 hex digits)\n");
-            return 5;
-        }
-
-        memcpy(keysig + 33, g_key, 8);
-        if(!g_sig)
-            cprintf(GREY, "Warning: you have specified a key but no sig, I won't be able to do any checks\n");
-        else
-            memcpy(keysig + 42, g_sig, 8);
-        g_key = keysig + 33;
-        g_sig = keysig + 42;
-    }
-    else if(g_model_index != -1)
-    {
-        if(g_model_list[g_model_index].flags & HAS_KAS)
-            g_kas = g_model_list[g_model_index].kas;
-        if(g_model_list[g_model_index].flags & HAS_KEY)
-            g_key = g_model_list[g_model_index].key;
-        if(g_model_list[g_model_index].flags & HAS_SIG)
-            g_sig = g_model_list[g_model_index].sig;
-
-        if(g_key && g_sig)
-        {
-            memcpy(keysig + 33, g_key, 8);
-            g_key = keysig + 33;
-            memcpy(keysig + 42, g_sig, 8);
-            g_sig = keysig + 42;
-        }
-        else if(g_kas)
-        {
-            memcpy(keysig, g_kas, NWZ_KAS_SIZE);
-            decrypt_keysig(keysig);
-            g_kas = keysig;
-            g_key = keysig + 33;
-            g_sig = keysig + 42;
-        }
-        else
-        {
-            printf("Target doesn't have enough information to get key and sig\n");
-            return 1;
-        }
-    }
-    else
-    {
-        printf("Kill me\n");
-        return 1;
-    }
-
-    if(!g_kas)
-    {
-        g_kas = keysig;
-        fwp_setkey("ed295076");
-        memcpy(kas, g_key, 8);
-        fwp_crypt(kas, 8, 0);
-        for(int i = 0; i < 8; i++)
-        {
-            g_kas[2 * i] = hex_digit((kas[i] >> 4) & 0xf);
-            g_kas[2 * i + 1] = hex_digit(kas[i] & 0xf);
-        }
-        memcpy(kas + 8, g_sig, 8);
-        fwp_crypt(kas + 8, 8, 0);
-        for(int i = 8; i < 16; i++)
-        {
-            g_kas[2 * i] = hex_digit((kas[i] >> 4) & 0xf);
-            g_kas[2 * i + 1] = hex_digit(kas[i] & 0xf);
-        }
-    }
-
-    cprintf(BLUE, "Keys\n");
-    cprintf_field("  KAS: ", "%."STR(NWZ_KAS_SIZE)"s\n", g_kas);
-    cprintf_field("  Key: ", "%s\n", g_key);
-    if(g_sig)
-        cprintf_field("  Sig: ", "%s\n", g_sig);
+    int ret = get_key_and_sig(false, NULL);
+    if(ret != 0)
+        return ret;
 
     FILE *fout = fopen(argv[0], "wb");
     if(fout == NULL)
@@ -558,8 +509,8 @@ static int create_upg(int argc, char **argv)
     memcpy(hdr.sig, g_sig, 8);
     hdr.nr_files = nr_files;
     hdr.pad = 0;
-    
-    int ret = fwp_write(&hdr, sizeof(hdr), &hdr, (void *)g_key);
+
+    ret = fwp_write(&hdr, sizeof(hdr), &hdr, (void *)g_key);
     if(ret)
         return ret;
     MD5_Update(&c, &hdr, sizeof(hdr));
@@ -573,7 +524,7 @@ static int create_upg(int argc, char **argv)
         entry.offset = offset;
         entry.size = filesize(files[i]);
         offset += ROUND_UP(entry.size, 8); // do it before encryption !!
-        
+
         ret = fwp_write(&entry, sizeof(entry), &entry, (void *)g_key);
         if(ret)
             return ret;

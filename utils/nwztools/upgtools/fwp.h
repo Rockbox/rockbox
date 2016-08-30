@@ -28,8 +28,9 @@ extern "C" {
 #endif
 
 #define NWZ_KAS_SIZE    32
-#define NWZ_KEYSIG_SIZE 51
+#define NWZ_KEYSIG_SIZE 16
 #define NWZ_KEY_SIZE    8
+#define NWZ_SIG_SIZE    8
 #define NWZ_EXPKEY_SIZE (NWZ_KEY_SIZE * NWZ_KEY_SIZE)
 #define NWZ_DES_BLOCK   8
 
