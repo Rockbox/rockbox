@@ -1,0 +1,7 @@
+picoTTS text input buffer is 4 + 256 = 260 bytes
+
+for en_GB picoTTS needs ~2MB of memory
+
+There is a bug in picosig2.c:555 which causes 4 bytes overflow in memset which in turn
+makes size filed bogus in other struct which gives segfault when releasing the resources.
+Thanks to http://dept-info.labri.fr/~thibault/gdb.html.en
