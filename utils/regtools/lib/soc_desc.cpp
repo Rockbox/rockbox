@@ -149,23 +149,23 @@ std::string xml_loc(xmlAttr *attr)
 }
 
 template<typename T>
-bool add_error(error_context_t& ctx, error_t::level_t lvl, T *node,
+bool add_error(error_context_t& ctx, err_t::level_t lvl, T *node,
     const std::string& msg)
 {
-    ctx.add(error_t(lvl, xml_loc(node), msg));
+    ctx.add(err_t(lvl, xml_loc(node), msg));
     return false;
 }
 
 template<typename T>
 bool add_fatal(error_context_t& ctx, T *node, const std::string& msg)
 {
-    return add_error(ctx, error_t::FATAL, node, msg);
+    return add_error(ctx, err_t::FATAL, node, msg);
 }
 
 template<typename T>
 bool add_warning(error_context_t& ctx, T *node, const std::string& msg)
 {
-    return add_error(ctx, error_t::WARNING, node, msg);
+    return add_error(ctx, err_t::WARNING, node, msg);
 }
 
 bool parse_wrong_version_error(xmlNode *node, error_context_t& ctx)
@@ -529,7 +529,7 @@ bool parse_root_elem(xmlNode *node, soc_t& soc, error_context_t& ctx)
     END_ATTR_MATCH()
     if(!has_version)
     {
-        ctx.add(error_t(error_t::FATAL, xml_loc(node), "no version attribute, is this a v1 file ?"));
+        ctx.add(err_t(err_t::FATAL, xml_loc(node), "no version attribute, is this a v1 file ?"));
         return false;
     }
     if(ver != MAJOR_VERSION)
@@ -660,7 +660,7 @@ namespace
         if((x) < 0) { \
             std::ostringstream oss; \
             oss << __FILE__ << ":" << __LINE__; \
-            ctx.add(error_t(error_t::FATAL, oss.str(), "write error")); \
+            ctx.add(err_t(err_t::FATAL, oss.str(), "write error")); \
             return -1; \
         } \
     }while(0)
@@ -1575,7 +1575,6 @@ node_inst_t node_inst_t::child(const std::string& name) const
 {
     return child(name, INST_NO_INDEX);
 }
-
 
 node_inst_t node_inst_t::child(const std::string& name, size_t index) const
 {

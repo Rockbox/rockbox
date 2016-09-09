@@ -35,12 +35,12 @@ void print_context(const error_context_t& ctx)
 {
     for(size_t j = 0; j < ctx.count(); j++)
     {
-        error_t e = ctx.get(j);
+        err_t e = ctx.get(j);
         switch(e.level())
         {
-            case error_t::INFO: printf("[INFO]"); break;
-            case error_t::WARNING: printf("[WARN]"); break;
-            case error_t::FATAL: printf("[FATAL]"); break;
+            case err_t::INFO: printf("[INFO]"); break;
+            case err_t::WARNING: printf("[WARN]"); break;
+            case err_t::FATAL: printf("[FATAL]"); break;
             default: printf("[UNK]"); break;
         }
         if(e.location().size() != 0)
@@ -110,7 +110,7 @@ bool convert_v1_to_v2(const soc_desc_v1::soc_reg_t& in, node_t& out, error_conte
         soc_word_t base = 0, stride = 0;
         if(in.addr.size() <= 1)
         {
-            ctx.add(error_t(error_t::WARNING, loc,
+            ctx.add(err_t(err_t::WARNING, loc,
                 "register uses a formula but has only one instance"));
             is_stride = false;
         }
@@ -125,7 +125,7 @@ bool convert_v1_to_v2(const soc_desc_v1::soc_reg_t& in, node_t& out, error_conte
 
         if(is_stride)
         {
-            ctx.add(error_t(error_t::INFO, loc, "promoted formula to base/stride"));
+            ctx.add(err_t(err_t::INFO, loc, "promoted formula to base/stride"));
             out.instance[0].range.type = range_t::STRIDE;
             out.instance[0].range.base = base;
             out.instance[0].range.stride = stride;
@@ -167,7 +167,7 @@ bool convert_v1_to_v2(const soc_desc_v1::soc_dev_t& in, node_t& out, error_conte
 {
     std::string loc = _loc + "." + in.name;
     if(!in.version.empty())
-        ctx.add(error_t(error_t::INFO, loc, "dropped version"));
+        ctx.add(err_t(err_t::INFO, loc, "dropped version"));
     out.name = in.name;
     out.title = in.long_name;
     out.desc = in.desc;
@@ -330,10 +330,10 @@ int do_write(int argc, char **argv)
 void check_name(const std::string& path, const std::string& name, error_context_t& ctx)
 {
     if(name.empty())
-        ctx.add(error_t(error_t::FATAL, path, "name is empty"));
+        ctx.add(err_t(err_t::FATAL, path, "name is empty"));
     for(size_t i = 0; i < name.size(); i++)
         if(!isalnum(name[i]) && name[i] != '_')
-            ctx.add(error_t(error_t::FATAL, path, "name '" + name +
+            ctx.add(err_t(err_t::FATAL, path, "name '" + name +
                 "' must only contain alphanumeric characters or '_'"));
 }
 
@@ -351,7 +351,7 @@ void check_instance(const std::string& _path, const instance_t& inst, error_cont
             var[inst.range.variable] = inst.range.first;
             soc_word_t res;
             if(!evaluate_formula(inst.range.formula, var, res, path + ".<formula>", ctx))
-                ctx.add(error_t(error_t::FATAL, path + ".<formula>",
+                ctx.add(err_t(err_t::FATAL, path + ".<formula>",
                     "cannot evaluate formula"));
         }
     }
@@ -362,7 +362,7 @@ void check_field(const std::string& _path, const field_t& field, error_context_t
     std::string path = _path + "." + field.name;
     check_name(path, field.name, ctx);
     if(field.width == 0)
-        ctx.add(error_t(error_t::WARNING, path, "field has width 0"));
+        ctx.add(err_t(err_t::WARNING, path, "field has width 0"));
     soc_word_t max = field.bitmask() >> field.pos;
     std::set< std::string > names;
     std::map< soc_word_t, std::string > map;
@@ -373,12 +373,12 @@ void check_field(const std::string& _path, const field_t& field, error_context_t
         std::string path_ = path + "." + n;
         check_name(path_, n, ctx);
         if(v > max)
-            ctx.add(error_t(error_t::FATAL, path_, "value does not fit into the field"));
+            ctx.add(err_t(err_t::FATAL, path_, "value does not fit into the field"));
         if(names.find(n) != names.end())
-            ctx.add(error_t(error_t::FATAL, path, "duplicate name '" + n + "' in enums"));
+            ctx.add(err_t(err_t::FATAL, path, "duplicate name '" + n + "' in enums"));
         names.insert(n);
         if(map.find(v) != map.end())
-            ctx.add(error_t(error_t::WARNING, path, "'" + n + "' and '" + map[v] + "' have the same value"));
+            ctx.add(err_t(err_t::WARNING, path, "'" + n + "' and '" + map[v] + "' have the same value"));
         map[v] = n;
     }
 }
@@ -387,7 +387,7 @@ void check_register(const std::string& _path, const soc_desc::register_t& reg, e
 {
     std::string path = _path + ".<register>";
     if(reg.width != 8 && reg.width != 16 && reg.width != 32)
-        ctx.add(error_t(error_t::WARNING, path, "width is not 8, 16 or 32"));
+        ctx.add(err_t(err_t::WARNING, path, "width is not 8, 16 or 32"));
     for(size_t i = 0; i < reg.field.size(); i++)
         check_field(path, reg.field[i], ctx);
     std::set< std::string > names;
@@ -396,16 +396,16 @@ void check_register(const std::string& _path, const soc_desc::register_t& reg, e
     {
         std::string n = reg.field[i].name;
         if(names.find(n) != names.end())
-            ctx.add(error_t(error_t::FATAL, path, "duplicate name '" + n + "' in fields"));
+            ctx.add(err_t(err_t::FATAL, path, "duplicate name '" + n + "' in fields"));
         if(reg.field[i].pos + reg.field[i].width > reg.width)
-            ctx.add(error_t(error_t::FATAL, path, "field '" + n + "' does not fit into the register"));
+            ctx.add(err_t(err_t::FATAL, path, "field '" + n + "' does not fit into the register"));
         names.insert(n);
         if(bitmap & reg.field[i].bitmask())
         {
             /* find the duplicate to ease debugging */
             for(size_t j = 0; j < i; j++)
                 if(reg.field[j].bitmask() & reg.field[i].bitmask())
-                    ctx.add(error_t(error_t::FATAL, path, "overlap between fields '" +
+                    ctx.add(err_t(err_t::FATAL, path, "overlap between fields '" +
                         reg.field[j].name + "' and '" + n + "'"));
         }
         bitmap |= reg.field[i].bitmask();
@@ -420,7 +420,7 @@ void check_node(const std::string& _path, const node_t& node, error_context_t& c
     std::string path = _path + "." + node.name;
     check_name(_path, node.name, ctx);
     if(node.instance.empty())
-        ctx.add(error_t(error_t::WARNING, path, "subnode with no instances"));
+        ctx.add(err_t(err_t::WARNING, path, "subnode with no instances"));
     for(size_t j = 0; j < node.instance.size(); j++)
         check_instance(path, node.instance[j], ctx);
     for(size_t i = 0; i < node.register_.size(); i++)
@@ -440,7 +440,7 @@ void check_nodes(const std::string& path, const std::vector< node_t >& nodes,
         {
             std::string n = nodes[i].instance[j].name;
             if(names.find(n) != names.end())
-                ctx.add(error_t(error_t::FATAL, path, "duplicate instance name '" +
+                ctx.add(err_t(err_t::FATAL, path, "duplicate instance name '" +
                     n + "' in subnodes"));
             names.insert(n);
         }
@@ -450,7 +450,7 @@ void check_nodes(const std::string& path, const std::vector< node_t >& nodes,
     {
         std::string n = nodes[i].name;
         if(names.find(n) != names.end())
-            ctx.add(error_t(error_t::FATAL, path, "duplicate node name '" + n +
+            ctx.add(err_t(err_t::FATAL, path, "duplicate node name '" + n +
                 "' in subnodes"));
         names.insert(n);
     }

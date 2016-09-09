@@ -24,7 +24,7 @@ struct formula_evaluator
         va_start(args, fmt);
         vsnprintf(buffer,sizeof(buffer), fmt, args);
         va_end(args);
-        ctx.add(error_t(error_t::FATAL, m_loc, buffer));
+        ctx.add(err_t(err_t::FATAL, m_loc, buffer));
         return false;
     }
 

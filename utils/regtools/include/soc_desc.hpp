@@ -43,7 +43,7 @@ typedef int soc_id_t;
 const soc_id_t DEFAULT_ID = 0xcafebabe;
 
 /** Error class */
-class error_t
+class err_t
 {
 public:
     enum level_t
@@ -52,7 +52,7 @@ public:
         WARNING,
         FATAL
     };
-    error_t(level_t lvl, const std::string& loc, const std::string& msg)
+    err_t(level_t lvl, const std::string& loc, const std::string& msg)
         :m_level(lvl), m_loc(loc), m_msg(msg) {}
     level_t level() const { return m_level; }
     std::string location() const { return m_loc; }
@@ -66,11 +66,11 @@ protected:
 class error_context_t
 {
 public:
-    void add(const error_t& err) { m_list.push_back(err); }
+    void add(const err_t& err) { m_list.push_back(err); }
     size_t count() const { return m_list.size(); }
-    error_t get(size_t i) const { return m_list[i]; }
+    err_t get(size_t i) const { return m_list[i]; }
 protected:
-    std::vector< error_t > m_list;
+    std::vector< err_t > m_list;
 };
 
 /**

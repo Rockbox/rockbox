@@ -87,12 +87,12 @@ void print_context(const error_context_t& ctx)
 {
     for(size_t j = 0; j < ctx.count(); j++)
     {
-        error_t e = ctx.get(j);
+        err_t e = ctx.get(j);
         switch(e.level())
         {
-            case error_t::INFO: printf("[INFO]"); break;
-            case error_t::WARNING: printf("[WARN]"); break;
-            case error_t::FATAL: printf("[FATAL]"); break;
+            case err_t::INFO: printf("[INFO]"); break;
+            case err_t::WARNING: printf("[WARN]"); break;
+            case err_t::FATAL: printf("[FATAL]"); break;
             default: printf("[UNK]"); break;
         }
         if(e.location().size() != 0)
