@@ -567,28 +567,28 @@ void gen_macro(const std::string& filename, bool variadic, char const *author, c
     const int MAX_NARGS = 32;
 
     fprintf(f, "\
-#define BF_SET(reg, field)              "REG_WRITE"(%1$s##reg##_SET, BM_##reg##_##field)\n\
-#define BF_CLR(reg, field)              "REG_WRITE"(%1$s##reg##_CLR, BM_##reg##_##field)\n\
-#define BF_TOG(reg, field)              "REG_WRITE"(%1$s##reg##_TOG, BM_##reg##_##field)\n\
+#define BF_SET(reg, field)              " REG_WRITE "(%1$s##reg##_SET, BM_##reg##_##field)\n\
+#define BF_CLR(reg, field)              " REG_WRITE "(%1$s##reg##_CLR, BM_##reg##_##field)\n\
+#define BF_TOG(reg, field)              " REG_WRITE "(%1$s##reg##_TOG, BM_##reg##_##field)\n\
 \n\
-#define BF_SETV(reg, field, v)          "REG_WRITE"(%1$s##reg##_SET, BF_##reg##_##field(v))\n\
-#define BF_CLRV(reg, field, v)          "REG_WRITE"(%1$s##reg##_CLR, BF_##reg##_##field(v))\n\
-#define BF_TOGV(reg, field, v)          "REG_WRITE"(%1$s##reg##_TOG, BF_##reg##_##field(v))\n\
+#define BF_SETV(reg, field, v)          " REG_WRITE "(%1$s##reg##_SET, BF_##reg##_##field(v))\n\
+#define BF_CLRV(reg, field, v)          " REG_WRITE "(%1$s##reg##_CLR, BF_##reg##_##field(v))\n\
+#define BF_TOGV(reg, field, v)          " REG_WRITE "(%1$s##reg##_TOG, BF_##reg##_##field(v))\n\
 \n\
-#define BF_RDX(val, reg, field)         (("REG_READ"(val) & BM_##reg##_##field) >> BP_##reg##_##field)\n\
-#define BF_RD(reg, field)               BF_RDX("REG_READ"(%1$s##reg), reg, field)\n\
-#define BF_WRX(val, reg, field, v)      "REG_WRITE"(val, ("REG_READ"(val) & ~BM_##reg##_##field) | (((v) << BP_##reg##_##field) & BM_##reg##_##field))\n\
+#define BF_RDX(val, reg, field)         ((" REG_READ "(val) & BM_##reg##_##field) >> BP_##reg##_##field)\n\
+#define BF_RD(reg, field)               BF_RDX(" REG_READ "(%1$s##reg), reg, field)\n\
+#define BF_WRX(val, reg, field, v)      " REG_WRITE "(val, (" REG_READ "(val) & ~BM_##reg##_##field) | (((v) << BP_##reg##_##field) & BM_##reg##_##field))\n\
 #define BF_WR(reg, field, v)            BF_WRX(%1$s##reg, reg, field, v)\n\
 #define BF_WR_V(reg, field, sy)         BF_WR(reg, field, BV_##reg##_##field##__##sy)\n\
 #define BF_WR_VX(val, reg, field, sy)   BF_WRX(val, reg, field, BV_##reg##_##field##__##sy)\n\
 \n\
-#define BF_SETn(reg, n, field)          "REG_WRITE"(%1$s##reg##_SET(n), BM_##reg##_##field)\n\
-#define BF_CLRn(reg, n, field)          "REG_WRITE"(%1$s##reg##_CLR(n), BM_##reg##_##field)\n\
-#define BF_TOGn(reg, n, field)          "REG_WRITE"(%1$s##reg##_TOG(n), BM_##reg##_##field)\n\
+#define BF_SETn(reg, n, field)          " REG_WRITE "(%1$s##reg##_SET(n), BM_##reg##_##field)\n\
+#define BF_CLRn(reg, n, field)          " REG_WRITE "(%1$s##reg##_CLR(n), BM_##reg##_##field)\n\
+#define BF_TOGn(reg, n, field)          " REG_WRITE "(%1$s##reg##_TOG(n), BM_##reg##_##field)\n\
 \n\
-#define BF_SETVn(reg, n, field, v)      "REG_WRITE"(%1$s##reg##_SET(n), BF_##reg##_##field(v))\n\
-#define BF_CLRVn(reg, n, field, v)      "REG_WRITE"(%1$s##reg##_CLR(n), BF_##reg##_##field(v))\n\
-#define BF_TOGVn(reg, n, field, v)      "REG_WRITE"(%1$s##reg##_TOG(n), BF_##reg##_##field(v))\n\
+#define BF_SETVn(reg, n, field, v)      " REG_WRITE "(%1$s##reg##_SET(n), BF_##reg##_##field(v))\n\
+#define BF_CLRVn(reg, n, field, v)      " REG_WRITE "(%1$s##reg##_CLR(n), BF_##reg##_##field(v))\n\
+#define BF_TOGVn(reg, n, field, v)      " REG_WRITE "(%1$s##reg##_TOG(n), BF_##reg##_##field(v))\n\
 \n\
 #define BF_RDn(reg, n, field)           BF_RDX(%1$s##reg(n), reg, field)\n\
 #define BF_WRn(reg, n, field, v)        BF_WRX(%1$s##reg(n), reg, field, v)\n\
