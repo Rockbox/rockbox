@@ -1511,7 +1511,7 @@ node_inst_t::node_inst_t()
 
 bool node_inst_t::valid() const
 {
-    return is_root() || get() != 0;
+    return (is_root() && node().valid()) || get() != 0;
 }
 
 void node_inst_t::reset()
