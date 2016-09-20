@@ -16,7 +16,7 @@ __get_sp:
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     mrs r1, cpsr         /* save current state */
     orr r0, r1, #0xc0
-    msr cpsr, r0         /* disable IRQ and FIQ */
+    msr cpsr_c, r0       /* disable IRQ and FIQ */
     and r0, r1, #0x1f    /* get current mode */
     cmp r0, #0x1f        /* are we in sys mode? */
     beq get_sp       
@@ -24,12 +24,12 @@ call_from_exception:
     mrs r0, spsr         /* get saved state */
     and r0, r0, #0x1f    /* get mode bits */
     orr r0, r0, #0xc0    /* no FIQ no IRQ */
-    msr cpsr, r0         /* change mode */
+    msr cpsr_c, r0       /* change mode */
 get_sp:
 #endif
     mov r0, sp           /* get SP */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-    msr cpsr, r1         /* restore mode */
+    msr cpsr_c, r1       /* restore mode */
 #endif
     bx  lr
 .size __get_sp, . - __get_sp
