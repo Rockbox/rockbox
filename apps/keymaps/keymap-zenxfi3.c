@@ -138,10 +138,11 @@ static const struct button_mapping button_context_radio[]  = {
 #ifdef HAVE_RECORDING
 static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_REC_PAUSE,                BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY },
-    { ACTION_SETTINGS_INC,             BUTTON_UP,                          BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT,       BUTTON_UP|BUTTON_REPEAT,            BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,             BUTTON_DOWN,                        BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT,       BUTTON_DOWN|BUTTON_REPEAT,          BUTTON_NONE },
+    /* we need up/down to switch between settings, so use volume up/down to adjust */
+    { ACTION_SETTINGS_INC,             BUTTON_VOL_UP,                      BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,       BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,             BUTTON_VOL_DOWN,                    BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,       BUTTON_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
