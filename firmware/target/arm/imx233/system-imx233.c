@@ -52,15 +52,16 @@
 #define WATCHDOG_HW_DELAY   (10 * HZ)
 #define WATCHDOG_SW_DELAY   (5 * HZ)
 
+void UIE(unsigned int pc, unsigned int num);
+
 static void woof_woof(void)
 {
-    /* stop hadrware watchdog, we catched the error */
+    /* stop hardware watchdog, we catched the error */
     imx233_rtc_enable_watchdog(false);
+    /* recover current PC and trigger abort, so in the hope to get a useful
+     * backtrace */
     uint32_t pc = HW_DIGCTL_SCRATCH0;
-    /* write a "SWI #0xdead" instruction at the faulty instruction so that it
-     * will trigger a proper backtrace */
-    *(uint32_t *)pc = 0xef00dead;
-    commit_discard_idcache();
+    UIE(pc, 4);
 }
 
 static void good_dog(void)
