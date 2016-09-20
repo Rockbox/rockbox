@@ -881,6 +881,7 @@ int plugin_load(const char* plugin, const void* parameter)
         || hdr->load_addr != pluginbuf
         || hdr->end_addr > pluginbuf + PLUGIN_BUFFER_SIZE
 #endif
+        || hdr->compile_flags != LC_COMPILE_FLAGS
         )
     {
         lc_close(current_plugin_handle);

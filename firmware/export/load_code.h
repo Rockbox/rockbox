@@ -71,6 +71,29 @@ struct lc_header {
     unsigned short api_version;
     unsigned char *load_addr;
     unsigned char *end_addr;
+    /* these fields are at the end so that older versions of the struct will
+     * be parsed correctly and be rejected based on api_version */
+    unsigned long compile_flags;
 };
+
+/* compile flags that might affect the layout of the API structure and need to
+ * be taken into account */
+#ifdef DEBUG
+#define LC_CF_DEBUG     (1 << 0)
+#else
+#define LC_CF_DEBUG     0
+#endif /* DEBUG */
+#ifdef RB_PROFILE
+#define LC_CF_PROFILE   (1 << 1)
+#else
+#define LC_CF_PROFILE   0
+#endif /* RB_PROFILE */
+#ifdef ROCKBOX_HAS_LOGF
+#define LC_CF_LOGF      (1 << 2)
+#else
+#define LC_CF_LOGF      0
+#endif
+
+#define LC_COMPILE_FLAGS (LC_CF_DEBUG | LC_CF_PROFILE | LC_CF_LOGF)
 
 #endif /* __LOAD_CODE_H__ */

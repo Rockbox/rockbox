@@ -85,7 +85,8 @@ enum plugin_status run_overlay(const void* parameter,
 
     
     if (hdr->api_version > PLUGIN_API_VERSION
-        || hdr->api_version < PLUGIN_MIN_API_VERSION)
+        || hdr->api_version < PLUGIN_MIN_API_VERSION
+        || hdr->compile_flags != LC_COMPILE_FLAGS)
     {
         rb->splashf(2*HZ, "%s overlay: Incompatible version.", name);
         goto error_close;

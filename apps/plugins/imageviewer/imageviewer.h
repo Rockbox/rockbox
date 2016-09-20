@@ -157,7 +157,8 @@ extern const struct image_decoder image_decoder;
         const struct imgdec_header __header \
         __attribute__ ((section (".header")))= { \
         { PLUGIN_MAGIC, TARGET_ID, IMGDEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr }, &image_decoder, &rb, &iv };
+        plugin_start_addr, plugin_end_addr, LC_COMPILE_FLAGS }, \
+        &image_decoder, &rb, &iv };
 #else /* PLATFORM_HOSTED */
 #define IMGDEC_HEADER \
         const struct plugin_api *rb DATA_ATTR; \
@@ -165,7 +166,7 @@ extern const struct image_decoder image_decoder;
         const struct imgdec_header __header \
         __attribute__((visibility("default"))) = { \
         { PLUGIN_MAGIC, TARGET_ID, IMGDEC_API_VERSION, \
-        NULL, NULL }, &image_decoder, &rb, &iv };
+        NULL, NULL, LC_COMPILE_FLAGS }, &image_decoder, &rb, &iv };
 #endif /* CONFIG_PLATFORM */
 #endif
 
