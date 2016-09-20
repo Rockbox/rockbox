@@ -38,6 +38,7 @@
  *
  * The available values of IMX233_FMRADIO_I2C are:
  * - FMI_HW: use hardware i2c driver
+ *   + FMI_HW_SPEED: FMI_{100,400}_KHZ (default is 100)
  * - FMI_SW: use software i2c driver, needs additional defines:
  *   + FMI_SW_SDA_BANK: the SDA pin bank
  *   + FMI_SW_SDA_PIN: the SDA pin within bank
@@ -55,6 +56,10 @@
 /* i2c method */
 #define FMI_HW      0
 #define FMI_SW      1
+
+/* i2c speed */
+#define FMI_100_KHZ     false /* fast_mode = false */
+#define FMI_400_KHZ     true  /* fast_mode = true */
 
 /* power method */
 #define FMP_NONE    0

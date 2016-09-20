@@ -22,6 +22,7 @@
 #define _FMRADIO_TARGET_H_
 
 #define IMX233_FMRADIO_I2C  FMI_HW
+#define FMI_HW_SPEED        FMI_400_KHZ /* STFM1000 supports fast mode */
 
 #define IMX233_FMRADIO_POWER    FMP_NONE
 

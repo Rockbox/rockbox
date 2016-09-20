@@ -37,18 +37,23 @@
 
 /** Hardware I2C */
 #if IMX233_FMRADIO_I2C == FMI_HW
+
+#ifndef FMI_HW_SPEED
+#define FMI_HW_SPEED    FMI_100_KHZ
+#endif
+
 void fmradio_i2c_init(void)
 {
 }
 
 int fmradio_i2c_write(unsigned char address, const unsigned char* buf, int count)
 {
-    return i2c_write(address, buf, count);
+    return imx233_i2c_write(address, buf, count, FMI_HW_SPEED);
 }
 
 int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 {
-    return i2c_read(address, buf, count);
+    return imx233_i2c_read(address, buf, count, FMI_HW_SPEED);
 }
 /** Software I2C */
 #elif IMX233_FMRADIO_I2C == FMI_SW

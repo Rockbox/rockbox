@@ -251,8 +251,8 @@ void imx233_i2c_init(void)
 {
     BF_SET(I2C_CTRL0, SFTRST);
     /* setup pins (must be done when shutdown) */
-    imx233_pinctrl_setup_vpin(VPIN_I2C_SCL, "i2c scl", PINCTRL_DRIVE_4mA, true);
-    imx233_pinctrl_setup_vpin(VPIN_I2C_SDA, "i2c sda", PINCTRL_DRIVE_4mA, true);
+    imx233_pinctrl_setup_vpin(VPIN_I2C_SCL, "i2c scl", PINCTRL_DRIVE_8mA, true);
+    imx233_pinctrl_setup_vpin(VPIN_I2C_SDA, "i2c sda", PINCTRL_DRIVE_8mA, true);
     imx233_i2c_reset();
     i2c_head = i2c_tail = NULL;
 }
@@ -440,7 +440,6 @@ static int i2c_sync_transfer(struct imx233_i2c_sync_xfer_t *xfer)
     /* common init */
     xfer->xfer.next = NULL;
     xfer->xfer.callback = &i2c_sync_callback;
-    xfer->xfer.fast_mode = true;
     xfer->xfer.tmo_ms = 1000;
     /* kick */
     imx233_i2c_transfer(&xfer->xfer);
@@ -449,7 +448,7 @@ static int i2c_sync_transfer(struct imx233_i2c_sync_xfer_t *xfer)
     return (int)xfer->status;
 }
 
-int i2c_write(int device, const unsigned char* buf, int count)
+int imx233_i2c_write(int device, const unsigned char* buf, int count, bool fast)
 {
     struct imx233_i2c_sync_xfer_t xfer;
     xfer.xfer.dev_addr = device;
@@ -457,10 +456,11 @@ int i2c_write(int device, const unsigned char* buf, int count)
     xfer.xfer.count[0] = count;
     xfer.xfer.data[0] = (void *)buf;
     xfer.xfer.count[1] = 0;
+    xfer.xfer.fast_mode = fast;
     return i2c_sync_transfer(&xfer);
 }
 
-int i2c_read(int device, unsigned char* buf, int count)
+int imx233_i2c_read(int device, unsigned char* buf, int count, bool fast)
 {
     struct imx233_i2c_sync_xfer_t xfer;
     xfer.xfer.dev_addr = device;
@@ -468,10 +468,11 @@ int i2c_read(int device, unsigned char* buf, int count)
     xfer.xfer.count[0] = 0;
     xfer.xfer.count[1] = count;
     xfer.xfer.data[1] = buf;
+    xfer.xfer.fast_mode = fast;
     return i2c_sync_transfer(&xfer);
 }
 
-int i2c_readmem(int device, int address, unsigned char* buf, int count)
+int imx233_i2c_readmem(int device, int address, unsigned char* buf, int count, bool fast)
 {
     uint8_t addr = address; /* assume 1 byte */
     struct imx233_i2c_sync_xfer_t xfer;
@@ -481,10 +482,11 @@ int i2c_readmem(int device, int address, unsigned char* buf, int count)
     xfer.xfer.data[0] = &addr;
     xfer.xfer.count[1] = count;
     xfer.xfer.data[1] = buf;
+    xfer.xfer.fast_mode = fast;
     return i2c_sync_transfer(&xfer);
 }
 
-int i2c_writemem(int device, int address, const unsigned char* buf, int count)
+int imx233_i2c_writemem(int device, int address, const unsigned char* buf, int count, bool fast)
 {
     uint8_t addr = address; /* assume 1 byte */
     struct imx233_i2c_sync_xfer_t xfer;
@@ -494,5 +496,26 @@ int i2c_writemem(int device, int address, const unsigned char* buf, int count)
     xfer.xfer.data[0] = &addr;
     xfer.xfer.count[1] = count;
     xfer.xfer.data[1] = (void *)buf;
+    xfer.xfer.fast_mode = fast;
     return i2c_sync_transfer(&xfer);
+}
+
+int i2c_write(int device, const unsigned char* buf, int count)
+{
+    return imx233_i2c_write(device, buf, count, false);
+}
+
+int i2c_read(int device, unsigned char* buf, int count)
+{
+    return imx233_i2c_read(device, buf, count, false);
+}
+
+int i2c_readmem(int device, int address, unsigned char* buf, int count)
+{
+    return imx233_i2c_readmem(device, address, buf, count, false);
+}
+
+int i2c_writemem(int device, int address, const unsigned char* buf, int count)
+{
+    return imx233_i2c_writemem(device, address, buf, count, false);
 }

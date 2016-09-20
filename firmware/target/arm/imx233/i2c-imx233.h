@@ -55,6 +55,11 @@ int i2c_write(int device, const unsigned char* buf, int count);
 int i2c_read(int device, unsigned char* buf, int count);
 int i2c_readmem(int device, int address, unsigned char* buf, int count);
 int i2c_writemem(int device, int address, const unsigned char* buf, int count);
+/* alternative version with speed switch (slow = 100 kHz, fast = 400 kHz) */
+int imx233_i2c_write(int device, const unsigned char* buf, int count, bool fast);
+int imx233_i2c_read(int device, unsigned char* buf, int count, bool fast);
+int imx233_i2c_readmem(int device, int address, unsigned char* buf, int count, bool fast);
+int imx233_i2c_writemem(int device, int address, const unsigned char* buf, int count, bool fast);
 
 /** Advanced API */
 struct imx233_i2c_xfer_t;
