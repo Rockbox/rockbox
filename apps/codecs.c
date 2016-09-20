@@ -196,6 +196,7 @@ static int codec_load_ram(struct codec_api *api)
         || hdr->load_addr != codecbuf
         || hdr->end_addr > codecbuf + CODEC_SIZE
 #endif
+        || hdr->compile_flags != LC_COMPILE_FLAGS
         )
     {
         logf("codec header error");

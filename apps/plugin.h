@@ -160,12 +160,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 233
+#define PLUGIN_API_VERSION 234
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 233
+#define PLUGIN_MIN_API_VERSION 234
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -184,6 +184,14 @@ enum plugin_status {
          remember to increase PLUGIN_API_VERSION.  If you make changes to the
          existing APIs then also update PLUGIN_MIN_API_VERSION to current
          version
+
+   NOTE: any build flag that is not device specific and changes the API
+         layout must be recorded in the compile_flags field of the codec header
+         (see firmware/export/load_code.h). At the moment, the following define
+         cause breakage:
+         DEBUG
+         RB_PROFILE
+         ROCKBOX_HAS_LOGF
  */
 struct plugin_api {
 
@@ -995,14 +1003,14 @@ extern unsigned char plugin_end_addr[];
         const struct plugin_header __header \
         __attribute__ ((section (".header")))= { \
         { PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
-        plugin_start_addr, plugin_end_addr }, plugin__start, &rb };
+        plugin_start_addr, plugin_end_addr, LC_COMPILE_FLAGS }, plugin__start, &rb };
 #else /* PLATFORM_HOSTED */
 #define PLUGIN_HEADER \
         const struct plugin_api *rb DATA_ATTR; \
         const struct plugin_header __header \
         __attribute__((visibility("default"))) = { \
-        { PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, NULL, NULL }, \
-        plugin__start, &rb };
+        { PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, NULL, NULL \
+        LC_COMPILE_FLAGS}, plugin__start, &rb };
 #endif /* CONFIG_PLATFORM */
 #endif /* PLUGIN */
 
