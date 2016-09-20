@@ -54,7 +54,6 @@ static int hp_unmute_cb(struct timeout *tmo)
 
 void imx233_audioout_preinit(void)
 {
-
     /* Enable AUDIOOUT block */
     imx233_reset_block(&HW_AUDIOOUT_CTRL);
     /* Enable digital filter clock */

@@ -49,6 +49,7 @@ void audiohw_close(void)
 /* volume in centibels */
 void audiohw_set_volume(int vol_l, int vol_r)
 {
+    /* convert to half-dB */
     imx233_audioout_set_hp_vol(vol_l / 5, vol_r / 5);
 }
 
@@ -72,11 +73,11 @@ void audiohw_disable_recording(void)
     imx233_audioin_close();
 }
 
-/* volume in centibels */
+/* volume in decibels */
 void audiohw_set_recvol(int left, int right, int type)
 {
-    left /= 5;
-    right /= 5;
+    left *= 2; /* convert to half-dB */
+    right *= 2;
     if(type == AUDIO_GAIN_LINEIN)
     {
         imx233_audioin_set_vol(false, left, AUDIOIN_SELECT_LINE1);
