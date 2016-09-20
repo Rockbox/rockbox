@@ -30,7 +30,6 @@ ifdef APP_TYPE
  CODECFLAGS += $(SHARED_CFLAGS) # <-- from Makefile
 else
  CODECLDFLAGS = -T$(CODECLINK_LDS) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map
- CODECFLAGS += -UDEBUG -DNDEBUG
 endif
 CODECLDFLAGS += $(GLOBAL_LDOPTS)
 
