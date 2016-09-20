@@ -28,5 +28,11 @@
 #define IMX233_AUDIO_SPKR_GATE_PIN  12
 #endif
 
+#if defined(CREATIVE_ZENXFISTYLE)
+#define IMX233_AUDIO_MIC_SELECT 0 /* lradc0 */
+#define IMX233_AUDIO_MIC_BIAS   0 /* 1.21V */
+#define IMX233_AUDIO_MIC_RESISTOR   2KOhm
+#endif
+
 #endif /* __audio_target__ */
  

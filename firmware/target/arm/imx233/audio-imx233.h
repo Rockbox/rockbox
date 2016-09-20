@@ -36,6 +36,12 @@
  * IMX233_AUDIO_SPKR_GATE_BANK (gpio bank)
  * IMX233_AUDIO_SPKR_GATE_PIN (gpio pin)
  * IMX233_AUDIO_SPKR_GATE_INVERTED (define if inverted)
+ *
+ * target can override those to control microphone parameters
+ * NOTE by default, mic select is 1, mic bias is 0 and mic resistor is 2KOhm
+ * IMX233_AUDIO_MIC_SELECT (mic bias pin: 0=lradc0, 1=lradc1)
+ * IMX233_AUDIO_MIC_BIAS (mic bias, 0=1.21V, 1=1.46, ..., 7=2.96V (0.25mV inc)
+ * IMX233_AUDIO_MIC_RESISTOR (mic resistor: 2KOhm, 4KOhm, 8KOhm)
  */
 // do some initialisation related to next functions
 void imx233_audio_preinit(void);

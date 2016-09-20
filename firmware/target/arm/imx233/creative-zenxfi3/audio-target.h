@@ -29,4 +29,8 @@
 
 #define IMX233_AUDIO_COUPLING_MODE ACM_CAPLESS
 
+#define IMX233_AUDIO_MIC_SELECT 1 /* lradc1 */
+#define IMX233_AUDIO_MIC_BIAS   0 /* 1.21V */
+#define IMX233_AUDIO_MIC_RESISTOR   2KOhm
+
 #endif /* __audio_target__ */

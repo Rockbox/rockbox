@@ -26,4 +26,8 @@
 #define IMX233_AUDIO_SPKR_GATE_BANK 0
 #define IMX233_AUDIO_SPKR_GATE_PIN  12
 
+#define IMX233_AUDIO_MIC_SELECT 0 /* lradc0 */
+#define IMX233_AUDIO_MIC_BIAS   0 /* 1.21V */
+#define IMX233_AUDIO_MIC_RESISTOR   2KOhm
+
 #endif /* __audio_target__ */

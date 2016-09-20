@@ -26,6 +26,20 @@
 /* some audioout registers impact audioin */
 #include "regs/audioout.h"
 
+#include "audio-target.h"
+
+#ifndef IMX233_AUDIO_MIC_SELECT
+#define IMX233_AUDIO_MIC_SELECT 1 /* lradc1 */
+#endif
+
+#ifndef IMX233_AUDIO_MIC_BIAS
+#define IMX233_AUDIO_MIC_BIAS   0 /* 1.21V */
+#endif
+
+#ifndef IMX233_AUDIO_MIC_RESISTOR
+#define IMX233_AUDIO_MIC_RESISTOR   2KOhm
+#endif
+
 /* values in half-dB, one for each setting */
 static int audioin_vol[2][4]; /* 0=left, 1=right */
 static int audioin_select[2]; /* idem */
@@ -58,7 +72,7 @@ void imx233_audioin_open(void)
 
 void imx233_audioin_close(void)
 {
-    /* Stop ADC (doc says it gate off the module but that's not the case) */
+    /* Stop ADC (doc says it gates off the module but that's not the case) */
     BF_CLR(AUDIOIN_CTRL, RUN);
     /* Disable ADC clock */
     BF_SET(AUDIOIN_ANACLKCTRL, CLKGATE);
@@ -157,9 +171,9 @@ void imx233_audioin_enable_mic(bool enable)
 {
     if(enable)
     {
-        BF_WR(AUDIOIN_MICLINE, MIC_RESISTOR_V(2KOhm));
-        BF_WR(AUDIOIN_MICLINE, MIC_BIAS(4));
-        BF_WR(AUDIOIN_MICLINE, MIC_SELECT(1));
+        BF_WR(AUDIOIN_MICLINE, MIC_RESISTOR_V(IMX233_AUDIO_MIC_RESISTOR));
+        BF_WR(AUDIOIN_MICLINE, MIC_BIAS(IMX233_AUDIO_MIC_BIAS));
+        BF_WR(AUDIOIN_MICLINE, MIC_SELECT(IMX233_AUDIO_MIC_SELECT));
     }
     else
         BF_WR(AUDIOIN_MICLINE, MIC_RESISTOR_V(Off));
