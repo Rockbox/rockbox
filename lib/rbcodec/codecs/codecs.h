@@ -72,12 +72,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 47
+#define CODEC_API_VERSION 48
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 47
+#define CODEC_MIN_API_VERSION 48
 
 /* reasons for calling codec main entrypoint */
 enum codec_entry_call_reason {
@@ -106,6 +106,14 @@ enum codec_command_action {
          remember to increase CODEC_API_VERSION.  If you make changes to the
          existing APIs then also update CODEC_MIN_API_VERSION to current
          version
+
+   NOTE: any build flag that is not device specific and changes the API
+         layout must be recorded in the compile_flags field of the codec header
+         (see firmware/export/load_code.h). At the moment, the following define
+         cause breakage:
+         DEBUG
+         RB_PROFILE
+         ROCKBOX_HAS_LOGF
  */
 struct codec_api {
     off_t  filesize;          /* Total file length */
@@ -239,14 +247,14 @@ extern unsigned char plugin_end_addr[];
         const struct codec_header __header \
         __attribute__ ((section (".header")))= { \
         { CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr }, codec_start, \
+        plugin_start_addr, plugin_end_addr, LC_COMPILE_FLAGS }, codec_start, \
         codec_run, &ci };
 /* encoders */
 #define CODEC_ENC_HEADER \
         const struct codec_header __header \
         __attribute__ ((section (".header")))= { \
         { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
-        plugin_start_addr, plugin_end_addr }, codec_start, \
+        plugin_start_addr, plugin_end_addr, LC_COMPILE_FLAGS }, codec_start, \
         codec_run, &ci, { enc_callback } };
 
 #else /* def SIMULATOR */
@@ -254,14 +262,14 @@ extern unsigned char plugin_end_addr[];
 #define CODEC_HEADER \
         const struct codec_header __header \
         __attribute__((visibility("default"))) = { \
-        { CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL }, \
-        codec_start, codec_run, &ci };
+        { CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL, \
+        LC_COMPILE_FLAGS }, codec_start, codec_run, &ci };
 /* encoders */
 #define CODEC_ENC_HEADER \
         const struct codec_header __header \
         __attribute__((visibility("default"))) = { \
-        { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL }, \
-        codec_start, codec_run, &ci, { enc_callback } };
+        { CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, NULL, NULL, \
+        LC_COMPILE_FLAGS }, codec_start, codec_run, &ci, { enc_callback } };
 #endif /* SIMULATOR */
 #endif /* CODEC */
 
