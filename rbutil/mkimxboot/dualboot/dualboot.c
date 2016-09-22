@@ -18,11 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "regs-pinctrl.h"
-#include "regs-power.h"
-#include "regs-lradc.h"
-#include "regs-digctl.h"
-#include "regs-clkctrl.h"
+#include "pinctrl.h"
+#include "power.h"
+#include "lradc.h"
+#include "digctl.h"
+#include "clkctrl.h"
 
 #define BOOT_ROM_CONTINUE   0 /* continue boot */
 #define BOOT_ROM_SECTION    1 /* switch to new section *result_id */
@@ -76,8 +76,8 @@ static inline void __attribute__((always_inline)) setup_lradc(int src)
     HW_LRADC_CTRL4_CLR = BM_LRADC_CTRL4_LRADCxSELECT(src);
     HW_LRADC_CTRL4_SET = src << BP_LRADC_CTRL4_LRADCxSELECT(src);
 #endif
-    HW_LRADC_CHn_CLR(src) = BM_OR2(LRADC_CHn, NUM_SAMPLES, ACCUMULATE);
-    BF_SETV(LRADC_CTRL2, DIVIDE_BY_TWO, 1 << src);
+    HW_LRADC_CHn_CLR(src) = BM_OR(LRADC_CHn, NUM_SAMPLES, ACCUMULATE);
+    BF_WR(LRADC_CTRL2_SET, DIVIDE_BY_TWO(1 << src));
 }
 
 #define BP_LRADC_CTRL1_LRADCx_IRQ(x)    (x)
@@ -86,9 +86,9 @@ static inline void __attribute__((always_inline)) setup_lradc(int src)
 static inline int __attribute__((always_inline)) read_lradc(int src)
 {
     BF_CLR(LRADC_CTRL1, LRADCx_IRQ(src));
-    BF_SETV(LRADC_CTRL0, SCHEDULE, 1 << src);
+    BF_WR(LRADC_CTRL0_SET, SCHEDULE(1 << src));
     while(!BF_RD(LRADC_CTRL1, LRADCx_IRQ(src)));
-    return BF_RDn(LRADC_CHn, src, VALUE);
+    return BF_RD(LRADC_CHn(src), VALUE);
 }
 
 static inline void __attribute__((noreturn)) power_down()
@@ -100,7 +100,7 @@ static inline void __attribute__((noreturn)) power_down()
     HW_PINCTRL_DOUTn(0) = 1 << 9;
 #endif
     /* power down */
-    HW_POWER_RESET = BM_OR2(POWER_RESET, UNLOCK, PWD);
+    HW_POWER_RESET = BM_OR(POWER_RESET, UNLOCK, PWD);
     while(1);
 }
 
@@ -244,23 +244,23 @@ static inline void do_charge(void)
 {
     BF_CLR(LRADC_CTRL0, SFTRST);
     BF_CLR(LRADC_CTRL0, CLKGATE);
-    BF_WRn(LRADC_DELAYn, 0, TRIGGER_LRADCS, 0x80);
-    BF_WRn(LRADC_DELAYn, 0, TRIGGER_DELAYS, 0x1);
-    BF_WRn(LRADC_DELAYn, 0, DELAY, 200);
-    BF_SETn(LRADC_DELAYn, 0, KICK);
+    BF_WR(LRADC_DELAYn(0), TRIGGER_LRADCS(0x80));
+    BF_WR(LRADC_DELAYn(0), TRIGGER_DELAYS(0x1));
+    BF_WR(LRADC_DELAYn(0), DELAY(200));
+    BF_SET(LRADC_DELAYn(0), KICK);
     BF_SET(LRADC_CONVERSION, AUTOMATIC);
-    BF_WR_V(LRADC_CONVERSION, SCALE_FACTOR, LI_ION);
-    BF_WR(POWER_CHARGE, STOP_ILIMIT, 1);
-    BF_WR(POWER_CHARGE, BATTCHRG_I, 0x10);
+    BF_WR(LRADC_CONVERSION, SCALE_FACTOR_V(LI_ION));
+    BF_WR(POWER_CHARGE, STOP_ILIMIT(1));
+    BF_WR(POWER_CHARGE, BATTCHRG_I(0x10));
     BF_CLR(POWER_CHARGE, PWD_BATTCHRG);
 #if IMX233_SUBTARGET >= 3780
-    BF_WR(POWER_DCDC4P2, ENABLE_4P2, 1);
+    BF_WR(POWER_DCDC4P2, ENABLE_4P2(1));
     BF_CLR(POWER_5VCTRL, PWD_CHARGE_4P2);
-    BF_WR(POWER_5VCTRL, CHARGE_4P2_ILIMIT, 0x10);
+    BF_WR(POWER_5VCTRL, CHARGE_4P2_ILIMIT(0x10));
 #endif
     while(1)
     {
-        BF_WR(CLKCTRL_CPU, INTERRUPT_WAIT, 1);
+        BF_WR(CLKCTRL_CPU, INTERRUPT_WAIT(1));
         asm volatile (
             "mcr p15, 0, %0, c7, c0, 4 \n" /* Wait for interrupt */
             "nop\n" /* Datasheet unclear: "The lr sent to handler points here after RTI"*/
