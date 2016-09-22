@@ -1,0 +1,24 @@
+\subsection{Pixel Painter}
+\screenshot{plugins/images/ss-pixelpainter}{Pixel Painter}{img:pixelpainter}
+This game is written in LUA and based on the game of the same name by
+Pavel Bakhilau (\url{http://js1k.com/2010-first/demo/453}).
+
+Select a colour to flood-fill the board with that colour, starting from the
+top-left pixel (meaning that any pixel which is connected to the top-left
+through other pixels of the same colour will be changed to the selected colour).
+Try to paint the entire board with as few moves as possible.
+
+\begin{btnmap}
+    \ifnum\dapdisplaywidth<\dapdisplayheight
+        \PluginLeft{} / \PluginRight
+    \else
+        \PluginUp{} / \PluginDown
+    \fi
+    & Move colour selector\\
+
+    \PluginSelect
+    & Fill screen with selected colour\\
+
+    \PluginCancel, \PluginExit
+    & Enter game menu\\
+\end{btnmap}
