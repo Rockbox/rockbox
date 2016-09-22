@@ -236,15 +236,15 @@ $releasenotes="/wiki/ReleaseNotes313";
     },
     'samsungyh820' => {
         name => 'Samsung YH-820',
-        status => 2,
+        status => 3,
     },
     'samsungyh920' => {
         name => 'Samsung YH-920',
-        status => 2,
+        status => 3,
     },
     'samsungyh925' => {
         name => 'Samsung YH-925',
-        status => 2,
+        status => 3,
     },
     'samsungypr0' => {
         name => 'Samsung YP-R0',
