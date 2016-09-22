@@ -254,6 +254,7 @@ bool dbg_hw_info_power(void)
         lcd_putsf(0, line++, "5v: dcdc: %d  xfer: %d", info._5v_enable_dcdc, info._5v_dcdc_xfer);
         lcd_putsf(0, line++, "5v: thr: %d mV", info._5v_vbusvalid_thr);
         lcd_putsf(0, line++, "5v: use: %d cmps: %d", info._5v_vbusvalid_detect, info._5v_vbus_cmps);
+        lcd_putsf(0, line++, "pwrup: %x", BF_RD(POWER_STS, PWRUP_SOURCE));
 
         lcd_update();
         yield();
