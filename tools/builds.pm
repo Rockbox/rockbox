@@ -55,15 +55,15 @@ $releasenotes="/wiki/ReleaseNotes313";
     },
     'gogearhdd1630' => {
         name => 'Philips GoGear HDD1630',
-        status => 2,
+        status => 3,
     },
     'gogearhdd6330' => {
         name => 'Philips GoGear HDD6330',
-        status => 2,
+        status => 3,
     },
     'gogearsa9200' => {
         name => 'Philips GoGear SA9200',
-        status => 2,
+        status => 3,
     },
     'hifietma9' => {
         name => 'HiFi E.T MA9',
