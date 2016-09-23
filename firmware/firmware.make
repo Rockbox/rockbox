@@ -46,7 +46,10 @@ $(BUILDDIR)/sysfont.o: $(SYSFONT) $(BUILDDIR)/sysfont.h
 	$(call PRINTS,CONVBDF $(subst $(ROOTDIR)/,,$<))$(TOOLSDIR)/convbdf -l $(MAXCHAR) -c -o $(BUILDDIR)/sysfont.c $<
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$(BUILDDIR)/sysfont.c))$(CC) $(CFLAGS) -c $(BUILDDIR)/sysfont.c -o $@
 
-SVNVERSION:=$(shell $(TOOLSDIR)/version.sh $(ROOTDIR))
+# GNU make (at least) has a bug/feature that exported variable are not available
+# in the shell function (but are in recipe). Thus we need to explicitely pass
+# the VERSION environement variable
+SVNVERSION:=$(shell VERSION='$(VERSION)' $(TOOLSDIR)/version.sh $(ROOTDIR))
 OLDSVNVERSION:=$(shell grep 'RBVERSION' $(BUILDDIR)/rbversion.h 2>/dev/null|cut -d '"' -f 2 || echo "NOREVISION")
 
 ifneq ($(SVNVERSION),$(OLDSVNVERSION))
@@ -54,4 +57,4 @@ ifneq ($(SVNVERSION),$(OLDSVNVERSION))
 endif
 
 $(BUILDDIR)/rbversion.h:
-	$(call PRINTS,GEN $(@F))$(TOOLSDIR)/genversion.sh $(BUILDDIR) $(TOOLSDIR)/version.sh $(ROOTDIR)
+	$(call PRINTS,GEN $(@F))$(TOOLSDIR)/genversion.sh $(BUILDDIR) $(SVNVERSION)
