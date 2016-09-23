@@ -270,6 +270,8 @@ static ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
 }
 #endif /* !ATA_OPTIMIZED_WRITING */
 
+static int perform_soft_reset(void);
+
 static int ata_transfer_sectors(unsigned long start,
                                 int incount,
                                 void* inbuf,
@@ -301,6 +303,9 @@ static int ata_transfer_sectors(unsigned long start,
     if ( sleeping ) {
         sleeping = false; /* set this now since it'll be on */
         spinup = true;
+#ifdef PHILIPS_HDD6330
+        perform_soft_reset();
+#endif
 #ifdef HAVE_ATA_POWER_OFF
         if (poweroff) {
             if (ata_power_on()) {
@@ -875,6 +880,9 @@ static void ata_thread(void)
                     ata_led(true);
                     sleeping = false; /* set this now since it'll be on */
 
+#ifdef PHILIPS_HDD6330
+                    perform_soft_reset();
+#endif
 #ifdef HAVE_ATA_POWER_OFF
                     if (poweroff) {
                         ata_power_on();
@@ -1273,11 +1281,15 @@ int STORAGE_INIT_ATTR ata_init(void)
          * may return at any point without having to unlock */
         mutex_unlock(&ata_mtx);
 
+#ifdef PHILIPS_HDD6330
+        perform_soft_reset();
+#else
         if (!ide_powered()) /* somebody has switched it off */
         {
             ide_power_enable(true);
             sleep(HZ/4); /* allow voltage to build up */
         }
+#endif
 
 #ifdef HAVE_ATA_DMA
         /* DMA requires INTRQ be enabled */
