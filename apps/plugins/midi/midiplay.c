@@ -333,6 +333,9 @@ static inline void synthbuf(void)
     int32_t *outptr;
     int i = BUF_SIZE;
 
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+    rb->cpu_boost(true);
+#endif
 #ifndef SYNC
     if (lastswap == swap)
         return;
@@ -363,6 +366,9 @@ static inline void synthbuf(void)
 
     /* how many samples did we write to the buffer? */
     samples_in_buf = BUF_SIZE-i;
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+    rb->cpu_boost(false);
+#endif
 }
 
 static void get_more(const void** start, size_t* size)
@@ -395,18 +401,29 @@ static int midimain(const void * filename)
     int a, notes_used, vol;
     bool is_playing = true;  /* false = paused */
 
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+    rb->cpu_boost(true);
+#endif
     midi_debug("Loading file");
     mf = loadFile(filename);
 
     if (mf == NULL)
     {
         midi_debug("Error loading file.");
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+        rb->cpu_boost(false);
+#endif
         return -1;
     }
 
     if (initSynth(mf, ROCKBOX_DIR "/patchset/patchset.cfg",
         ROCKBOX_DIR "/patchset/drums.cfg") == -1)
+    {
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+        rb->cpu_boost(false);
+#endif
         return -1;
+    }
 
     rb->pcm_play_stop();
 #if INPUT_SRC_CAPS != 0
@@ -441,6 +458,10 @@ static int midimain(const void * filename)
                 notes_used++;
         tick();
     } while (notes_used == 0);
+
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+    rb->cpu_boost(false);
+#endif
 
     playing_time = 0;
     samples_this_second = 0;
@@ -492,7 +513,13 @@ static int midimain(const void * filename)
                 /* Rewinding is tricky. Basically start the file over */
                 /* but run through the tracks without the synth running */
                 rb->pcm_play_stop();
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+                rb->cpu_boost(true);
+#endif
                 seekBackward(5);
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+                rb->cpu_boost(false);
+#endif
                 lastswap = !swap;
                 synthbuf();
                 midi_debug("Rewind to %d:%02d\n", playing_time/60, playing_time%60);
@@ -550,10 +577,6 @@ enum plugin_status plugin_start(const void* parameter)
     }
     rb->lcd_setfont(FONT_SYSFIXED);
 
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(true);
-#endif
-
     midi_debug("%s", parameter);
     /*   rb->splash(HZ, true, parameter); */
 
@@ -570,9 +593,6 @@ enum plugin_status plugin_start(const void* parameter)
     rb->pcm_play_stop();
     rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(false);
-#endif
     rb->splash(HZ, "FINISHED PLAYING");
 
     if (retval == -1)
