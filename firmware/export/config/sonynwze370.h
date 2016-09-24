@@ -1,5 +1,5 @@
 /*
- * This config file is for the Sony NWZ-E370 series
+ * This config file is for the Sony NWZ-E370/E380 series
  */
 #define IMX233_SUBTARGET    3780
 #define IMX233_PACKAGE      IMX233_BGA169
@@ -7,7 +7,7 @@
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 88
-#define MODEL_NAME   "Sony NWZ-E370 series"
+#define MODEL_NAME   "Sony NWZ-E370/E380 series"
 
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
@@ -175,6 +175,12 @@
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
+
+/* Define this on iMX233 if the boot process uses a dualboot stub */
+#define HAVE_DUALBOOT_STUB
+
+/* Define this if Rockbox has the capability to reboot to the OF */
+#define HAVE_REBOOT_TO_OF
 
 #define BOOTFILE_EXT    "sony"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT

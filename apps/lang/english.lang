@@ -13479,3 +13479,17 @@
     ibassodx90: "Android Debug Bridge"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_REBOOT_TO_OF
+  desc: in Settings -> Reboot to OF
+  user: core
+  <source>
+    *: "Reboot to Original Firmware"
+  </source>
+  <dest>
+    *: "Reboot to Original Firmware"
+  </dest>
+  <voice>
+    *: "Reboot to Original Firmware"
+  </voice>
+</phrase>

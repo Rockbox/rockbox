@@ -31,6 +31,7 @@
 #include "clkctrl-imx233.h"
 #include "powermgmt-imx233.h"
 #include "rtc-imx233.h"
+#include "dualboot-imx233.h"
 #include "dcp-imx233.h"
 #include "pinctrl-imx233.h"
 #include "ocotp-imx233.h"
@@ -535,10 +536,24 @@ bool dbg_hw_info_rtc(void)
         lcd_clear_display();
         struct imx233_rtc_info_t info = imx233_rtc_get_info();
 
-        lcd_putsf(0, 0, "seconds: %lu", info.seconds);
-        lcd_putsf(0, 1, "alarm: %lu", info.alarm);
+        int line = 0;
+        lcd_putsf(0, line++, "seconds: %lu", info.seconds);
+        lcd_putsf(0, line++, "alarm: %lu", info.alarm);
         for(int i = 0; i < 6; i++)
-            lcd_putsf(0, i + 2, "persist%d: 0x%lx", i, info.persistent[i]);
+            lcd_putsf(0, line++, "persist%d: 0x%lx", i, info.persistent[i]);
+#ifdef HAVE_DUALBOOT_STUB
+        unsigned cap_boot = imx233_dualboot_get_field(DUALBOOT_CAP_BOOT);
+        lcd_putsf(0, line++, "dualboot:");
+        lcd_putsf(0, line++, "  cap_boot: %s", cap_boot ? "yes" : "no");
+        if(cap_boot)
+        {
+            unsigned boot = imx233_dualboot_get_field(DUALBOOT_BOOT);
+            lcd_putsf(0, line++, "  boot: %s",
+                boot == IMX233_BOOT_NORMAL ? "normal"
+                : boot == IMX233_BOOT_OF ? "of"
+                : boot == IMX233_BOOT_UPDATER ? "updater" : "?");
+        }
+#endif
 
         lcd_update();
         yield();
@@ -1255,6 +1270,20 @@ bool dbg_hw_info_sdmmc(void)
     }
 }
 
+#ifdef HAVE_DUALBOOT_STUB
+bool dbg_reboot_of(void)
+{
+    imx233_dualboot_set_field(DUALBOOT_BOOT, IMX233_BOOT_OF);
+    return false;
+}
+
+bool dbg_reboot_updater(void)
+{
+    imx233_dualboot_set_field(DUALBOOT_BOOT, IMX233_BOOT_UPDATER);
+    return false;
+}
+#endif
+
 static struct
 {
     const char *name;
@@ -1282,6 +1311,10 @@ static struct
     {"button", dbg_hw_info_button},
     {"sdmmc", dbg_hw_info_sdmmc},
     {"target", dbg_hw_target_info},
+#ifdef HAVE_DUALBOOT_STUB
+    {"reboot_of", dbg_reboot_of},
+    {"reboot_updater", dbg_reboot_updater},
+#endif
 };
 
 bool dbg_hw_info(void)

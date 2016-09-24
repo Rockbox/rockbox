@@ -179,6 +179,12 @@
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 
+/* Define this on iMX233 if the boot process uses a dualboot stub */
+#define HAVE_DUALBOOT_STUB
+
+/* Define this if Rockbox has the capability to reboot to the OF */
+#define HAVE_REBOOT_TO_OF
+
 #define BOOTFILE_EXT    "sony"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"

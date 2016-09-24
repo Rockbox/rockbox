@@ -371,6 +371,22 @@ static bool show_info(void)
     info.action_callback = info_action_callback;
     return simplelist_show_list(&info);
 }
+#ifdef HAVE_REBOOT_TO_OF
+static bool reboot_to_of(void)
+{
+    /*
+    static const char *lines[] = {ID2P(LANG_WARN_REBOOT_TO_OF)};
+    static const struct text_message message={lines, 1};
+
+    if(gui_syncyesno_run(&message, NULL, NULL) == YESNO_YES)
+    {
+        system_set_boot_mode(BOOT_);
+    }
+    */
+    return false;
+}
+#endif
+
 MENUITEM_FUNCTION(show_info_item, 0, ID2P(LANG_ROCKBOX_INFO),
                    (menu_function)show_info, NULL, NULL, Icon_NOICON);
 
@@ -386,6 +402,10 @@ MENUITEM_FUNCTION(show_runtime_item, 0, ID2P(LANG_RUNNING_TIME),
                    (menu_function)view_runtime, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(debug_menu_item, 0, ID2P(LANG_DEBUG),
                    (menu_function)debug_menu, NULL, NULL, Icon_NOICON);
+#ifdef HAVE_REBOOT_TO_OF
+MENUITEM_FUNCTION(rebooot_to_of_item, 0, ID2P(LANG_REBOOT_TO_OF),
+                   (menu_function)reboot_to_of, NULL, NULL, Icon_NOICON);
+#endif /* HAVE_REBOOT_TO_OF */
 
 MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_System_menu,
           &show_info_item, &show_credits_item,
