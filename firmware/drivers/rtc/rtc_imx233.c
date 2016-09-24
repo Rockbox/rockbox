@@ -26,6 +26,108 @@
 #include "timefuncs.h"
 #include "rtc-imx233.h"
 
+/** Persistent registers usage by the OF based on the Firmware SDK
+ * (this includes the Fuze+, ZEN X-Fi3, NWZ-E360/E370/E380)
+ *
+ * The following are used:
+ * - PERSISTENT0: mostly standard stuff described in the datasheet
+ * - PERSISTENT1: mostly proprietary stuff + some bits described in the datasheet
+ * - PERSISTENT2: used to keep track of time (see below)
+ * - PERSISTENT3: proprietary stuff
+ *
+ * In particular, the following bits are involved in the firmware upgrade process
+ * and thus worth mentioning (Px means PERSISTENTx). Some of this information
+ * might not be entirely accurate:
+ * - P1[18]: when 0, indicates to the freescale boot stub to start the updater
+ *           rather than the main firmware (play) or the usb firmware (host)
+ * - P1[22]: when 0, indicates that the OF database/store should be rebuilt
+ * - P3[10]: when 0, indicates that the firmware has been upgraded
+ * - P3[11]: when 1, indicates to the freescale boot stub to boot without
+ *           requiring the user to hold the power button for a small delay
+ * - P3[12]: when 1, indicates that the internal drive or micro-sd card was
+ *           modified in USB mode
+ * - P3[16]: when 1, indicates that a firmware upgrade was attempted but aborted
+ *           due to a too low battery
+ *
+ * To understand how all this works out together, recall that the boot sequence
+ * usually looks as follows (fslx = freescale boot stub stage x, in section 0
+ * of the firmware; rb = rockbox dualboot stub), where arrows indicate boot flow
+ * (since every stage can choose to continue in the same section or jump to another):
+ *
+ *                                 +---> host (usb)
+ *                                 |
+ * fsl0 -> fsl1 -> fsl2 -> rb -> fsl3 -> fsl4 (updater)
+ *                         |       |
+ *                         |       +---> play (firmware)
+ *                         |
+ *                         +-----------> rock (bootloader) (-> loads rockbox)
+ *
+ * The fsl3 decides which stage to boot based on the following logic (order is
+ * important):
+ * - if P1[18] is 0, it goes to fsl4, to perform a firmware upgrade
+ * - if usb is plugged, it goes to host, the OF USB mode
+ * - if P1[22] is 1, it requires the user to hold the power button for small
+ *   delay and aborts boot if this is not the case
+ * - it goes to play, the OF normal firmware
+ *
+ * The fsl4 (updater) performs the following action:
+ * - it clears P1[18] so that next boot will be a normal boot (ie NOT updater)
+ * - if firmware.sb does not exist or is invalid, it reboots
+ * - if the battery is too low for an upgrade, it sets P3[16]
+ *   otherwise, it performs a firmware upgrade and clear P1[22]
+ * - it shutdowns
+ *
+ * The play (firmware) performs the following actions:
+ * - if P1[22] is 0 or P3[12] is 1, it rebuilds the store (the 'loading' screen)
+ *   and set P1[22] to 1 and P3[12] to 0
+ * - if P3[16] is 1, it displays a 'battery was too low to upgrade' message
+ *   and clears P3[16]
+ * - if P3[10] is 0, it displays a 'firmware was successfully upgraded' message
+ *   and sets P3[10] to 1
+ * - it performs its usual (crappy) functions
+ *
+ * The host (USB) performs the following actions:
+ * - it clears P1[18] so that the next boot will run the updater
+ * - it sets P3[11] to 1 so that the device will reboot without user intervention
+ *   at the end
+ * - if the host modifies the internal drive or micro-SD card, it sets P3[12]
+ *   to 1 and clears P1[22]
+ * - after USB is unplugged, it reboots
+ *
+ * Thus a typical firmware upgrade sequence will look like this:
+ * - initially, the main firmware is running and flags are in the following state:
+ *     P1[18] = 1 (normal boot)
+ *     P1[22] = 1 (store is clean)
+ *     P3[10] = 1 (firmware has not been upgraded)
+ *     P3[11] = 0 (user needs to hold power button to boot)
+ *     P3[12] = 0 (drive is clean)
+ * - the user plugs the USB cable, play reboots, fsl3 boots to host because
+ *   P1[18] = 1, the users put firmware.sb on the drive, thus modifying its
+ *   content and then unplugs the drive; the device reboots with the following
+ *   flags:
+ *     P1[18] = 0 (updater boot)
+ *     P1[22] = 0 (store is dirty)
+ *     P3[10] = 1 (firmware has not been upgraded)
+ *     P3[11] = 1 (user does not needs to hold power button to boot)
+ *     P3[12] = 1 (drive is dirty)
+ * - fsl3 boots to the updater because P1[18] = 0, the updater sees firmware.sb
+ *   and performs a firmware upgrade; the device then shutdowns with the following
+ *   flags:
+ *     P1[18] = 1 (normal boot)
+ *     P1[22] = 0 (store is dirty)
+ *     P3[10] = 0 (firmware has been upgraded)
+ *     P3[11] = 1 (user does not needs to hold power button to boot)
+ *     P3[12] = 1 (drive is dirty)
+ * - the user presses the power button, fsl3 boots to play (firmware) because
+ *   P1[18] = 1, it rebuilds the store because P1[22] is clear, it then display
+ *   a message to the user saying that the firmware has been upgraded because
+ *   P3[10] is 0, and it resets the flags to same state as initially
+ *
+ * Note that the OF is lazy: it reboots to updater after USB mode in all cases
+ * (even if firmware.sb was not present). In this case, the updater simply clears
+ * the update flags and reboot immediately, thus it looks like a normal boot.
+ */
+
 #define YEAR1980    315532800   /* 1980/1/1 00:00:00 in UTC */
 
 #if defined(SANSA_FUZEPLUS) || defined(CREATIVE_ZENXFI3) || defined(SONY_NWZE360) || \
