@@ -99,14 +99,31 @@ unsigned int power_input_status(void)
 
 void ide_power_enable(bool on)
 {
+#if defined(PHILIPS_HDD6330)
+    if (on)
+    {
+        GPIO_SET_BITWISE(GPIOC_OUTPUT_VAL, 0x08);
+        DEV_EN |= DEV_IDE0;
+    }
+    else
+    {
+        DEV_EN &= ~DEV_IDE0;
+        GPIO_CLEAR_BITWISE(GPIOC_OUTPUT_VAL, 0x08);
+    }
+#else
     (void)on;
     /* We do nothing */
+#endif
 }
 
 bool ide_powered(void)
 {
+#if defined(PHILIPS_HDD6330)
+    return ((GPIOC_INPUT_VAL & 0x08) != 0);
+#else
     /* pretend we are always powered - we don't turn it off */
     return true;
+#endif
 }
 
 void power_off(void)
