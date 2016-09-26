@@ -135,9 +135,9 @@ extern void rolo_restart(const unsigned char* source, unsigned char* dest,
 
 /* explicitly put this code in iram, ICODE_ATTR is defined to be null for some
    targets that are low on iram, like the gigabeat F/X */
-void rolo_restart(const unsigned char* source, unsigned char* dest,
+void rolo_do_restart(const unsigned char* source, unsigned char* dest,
                   long length) __attribute__ ((section(".icode")));
-void rolo_restart(const unsigned char* source, unsigned char* dest,
+void rolo_do_restart(const unsigned char* source, unsigned char* dest,
                   long length)
 {
     long i;
@@ -213,41 +213,9 @@ extern unsigned long loadaddress;
  *
  ***************************************************************************/
 #if defined(CPU_COLDFIRE) || defined(CPU_ARM) || defined(CPU_MIPS)
-int rolo_load(const char* filename)
+int rolo_restart(void *buffer, unsigned long size)
 {
     unsigned char* ramstart = (void*)&loadaddress;
-    unsigned char* filebuf;
-    size_t filebuf_size;
-    int errno, length;
-
-    lcd_clear_display();
-    lcd_puts(0, 0, "ROLO...");
-    lcd_puts(0, 1, "Loading");
-    lcd_update();
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_clear_display();
-    lcd_remote_puts(0, 0, "ROLO...");
-    lcd_remote_puts(0, 1, "Loading");
-    lcd_remote_update();
-#endif
-
-    audio_stop();
-
-    /* get the system buffer. release only in case of error, otherwise
-     * we don't return anyway */
-    rolo_handle = core_alloc_maximum("rolo", &filebuf_size, NULL);
-    filebuf = core_get_data(rolo_handle);
-
-    errno = LOAD_FIRMWARE(filebuf, filename, filebuf_size);
-
-    if (errno <= 0)
-    {
-        rolo_error(loader_strerror(errno));
-        return -1;
-    }
-    else
-        length = errno;
-
 #if defined(CPU_PP) && NUM_CORES > 1
     lcd_puts(0, 2, "Waiting for coprocessor...");
     lcd_update();
@@ -293,15 +261,58 @@ int rolo_load(const char* filename)
     set_irq_level(DISABLE_INTERRUPTS);
 #endif
 #endif /* CONFIG_CPU == IMX31L */
-
-    rolo_restart(filebuf, ramstart, length);
-
+    rolo_do_restart(buffer, ramstart, size);
     /* never reached */
+    while(1) {}
+}
+
+int rolo_load(const char* filename)
+{
+    unsigned char* filebuf;
+    size_t filebuf_size;
+    int errno, length;
+
+#warning FIXME Not sure if this the right place to display a message...
+    lcd_clear_display();
+    lcd_puts(0, 0, "ROLO...");
+    lcd_puts(0, 1, "Loading");
+    lcd_update();
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_clear_display();
+    lcd_remote_puts(0, 0, "ROLO...");
+    lcd_remote_puts(0, 1, "Loading");
+    lcd_remote_update();
+#endif
+
+#warning FIXME do we need the audio_stop() here to get enough buffer space?
+    audio_stop();
+
+    /* get the system buffer. release only in case of error, otherwise
+     * we don't return anyway */
+    rolo_handle = core_alloc_maximum("rolo", &filebuf_size, NULL);
+    filebuf = core_get_data(rolo_handle);
+
+    errno = LOAD_FIRMWARE(filebuf, filename, filebuf_size);
+
+    if (errno <= 0)
+    {
+        rolo_error(loader_strerror(errno));
+        return -1;
+    }
+    else
+        length = errno;
+
+    struct shutdown_param param;
+    param.action = SHUTDOWN_ROLO;
+    param.rolo.buffer = filebuf;
+    param.rolo.size = filebuf_size;
+    sys_shutdown(&param);
     return 0;
 }
 #else /* defined(CPU_SH) */
 int rolo_load(const char* filename)
 {
+#error fix this too
     int fd;
     long length;
     long file_length;
@@ -400,7 +411,7 @@ int rolo_load(const char* filename)
     defined(ARCHOS_FMRECORDER)
     PAIOR = 0x0FA0;
 #endif
-    rolo_restart(filebuf, ramstart, length);
+    rolo_do_restart(filebuf, ramstart, length);
 
     return 0; /* this is never reached */
     (void)checksum; (void)file_checksum;

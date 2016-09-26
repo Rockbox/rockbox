@@ -175,7 +175,7 @@ void set_car_adapter_mode(bool setting);
 void reset_poweroff_timer(void);
 void cancel_shutdown(void);
 void shutdown_hw(void);
-void sys_poweroff(void);
+void sys_poweroff(void); /* special case of sys_shutdown */
 /* Returns true if the system should force shutdown for some reason -
  * eg. low battery */
 bool query_force_shutdown(void);
@@ -185,5 +185,29 @@ void accessory_supply_set(bool);
 #ifdef HAVE_LINEOUT_POWEROFF
 void lineout_set(bool);
 #endif
+
+/* shutdown action */
+enum shutdown_action
+{
+    SHUTDOWN_POWEROFF, /* power off the system */
+    SHUTDOWN_REBOOT, /* reboot/reset */
+    SHUTDOWN_ROLO, /* ROLO a buffer */
+};
+/* shutdown parameters */
+struct shutdown_param
+{
+    enum shutdown_action action;
+    struct
+    {
+        /* Buffer to ROLO: this is the raw code, anyway checksum must be done
+         * before calling sys_shutdown. Make sure the buffer will not be
+         * deallocated by any shutdown code! */
+        void *buffer;
+        unsigned long size;
+    }rolo;
+};
+/* Properly shutdown the system and perform an action (power off, reboot, ...)
+ * The data structure will be copied. */
+void sys_shutdown(struct shutdown_param *param);
 
 #endif /* _POWERMGMT_H_ */
