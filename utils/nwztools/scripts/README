@@ -46,7 +46,7 @@ your device to build this firmware upgrade. Once you known it, run
 to list all available targets. For example if your targets is one of the
 NWZ-E460 series, the corresponding target is nwz-e46x.
 Once you have identified the target. Run
-  make dump_rootfs NWZ_TARGET=nwz-exyz
+  make dump_rootfs NWZ_TARGET=nwz-exyz UPG=dump_rootfs.upg
 (replace nwz-exyz with your target)
 This command will produce a firmware upgrade file called
   dump_rootfs.upg
