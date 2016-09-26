@@ -18,11 +18,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "pinctrl.h"
-#include "power.h"
-#include "lradc.h"
-#include "digctl.h"
-#include "clkctrl.h"
+#include "regs/pinctrl.h"
+#include "regs/power.h"
+#include "regs/lradc.h"
+#include "regs/digctl.h"
+#include "regs/clkctrl.h"
 
 #define BOOT_ROM_CONTINUE   0 /* continue boot */
 #define BOOT_ROM_SECTION    1 /* switch to new section *result_id */
@@ -33,6 +33,10 @@
 #define BM_LRADC_CTRL4_LRADCxSELECT(x)  (0xf << (4 * (x)))
 
 typedef unsigned long uint32_t;
+
+/* we include the dualboot rtc code directly */
+#include "dualboot-imx233.h"
+#include "dualboot-imx233.c"
 
 // target specific boot context
 enum context_t
@@ -270,10 +274,36 @@ static inline void do_charge(void)
     }
 }
 
+static void set_updater_bits(void)
+{
+    /* The OF will continue to updater if we clear 18 of PERSISTENT1.
+     * See dualboot-imx233.c in firmware/ for more explanation */
+    HW_RTC_PERSISTENT1_CLR = 1 << 18;
+}
+
 int main(uint32_t arg, uint32_t *result_id)
 {
     if(arg == BOOT_ARG_CHARGE)
         do_charge();
+    /* tell rockbox that we can handle boot mode */
+    imx233_dualboot_set_field(DUALBOOT_CAP_BOOT, 1);
+    /* if we were asked to boot in a special mode, do so */
+    unsigned boot_mode = imx233_dualboot_get_field(DUALBOOT_BOOT);
+    /* clear boot mode to avoid any loop */
+    imx233_dualboot_set_field(DUALBOOT_BOOT, IMX233_BOOT_NORMAL);
+    switch(boot_mode)
+    {
+        case IMX233_BOOT_UPDATER:
+            set_updater_bits();
+            /* fallthrough */
+        case IMX233_BOOT_OF:
+            /* continue booting */
+            return BOOT_ROM_CONTINUE;
+        case IMX233_BOOT_NORMAL:
+        default:
+            break;
+    }
+    /* normal boot */
     switch(boot_decision(get_context()))
     {
         case BOOT_ROCK:
