@@ -31,6 +31,7 @@
 #include "clkctrl-imx233.h"
 #include "powermgmt-imx233.h"
 #include "rtc-imx233.h"
+#include "dualboot-imx233.h"
 #include "dcp-imx233.h"
 #include "pinctrl-imx233.h"
 #include "ocotp-imx233.h"
@@ -535,10 +536,11 @@ bool dbg_hw_info_rtc(void)
         lcd_clear_display();
         struct imx233_rtc_info_t info = imx233_rtc_get_info();
 
-        lcd_putsf(0, 0, "seconds: %lu", info.seconds);
-        lcd_putsf(0, 1, "alarm: %lu", info.alarm);
+        int line = 0;
+        lcd_putsf(0, line++, "seconds: %lu", info.seconds);
+        lcd_putsf(0, line++, "alarm: %lu", info.alarm);
         for(int i = 0; i < 6; i++)
-            lcd_putsf(0, i + 2, "persist%d: 0x%lx", i, info.persistent[i]);
+            lcd_putsf(0, line++, "persist%d: 0x%lx", i, info.persistent[i]);
 
         lcd_update();
         yield();
@@ -1255,6 +1257,60 @@ bool dbg_hw_info_sdmmc(void)
     }
 }
 
+#ifdef HAVE_DUALBOOT_STUB
+bool dbg_hw_info_dualboot(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        int button = my_get_action(HZ / 10);
+        switch(button)
+        {
+            case ACT_NEXT:
+            case ACT_PREV:
+            {
+                /* only if boot mode is supported... */
+                if(!imx233_dualboot_get_field(DUALBOOT_CAP_BOOT))
+                    break;
+                /* change it */
+                unsigned boot = imx233_dualboot_get_field(DUALBOOT_BOOT);
+                if(boot == IMX233_BOOT_NORMAL)
+                    boot = IMX233_BOOT_OF;
+                else if(boot == IMX233_BOOT_OF)
+                    boot = IMX233_BOOT_UPDATER;
+                else
+                    boot = IMX233_BOOT_NORMAL;
+                imx233_dualboot_set_field(DUALBOOT_BOOT, boot);
+                break;
+            }
+            case ACT_OK:
+                lcd_setfont(FONT_UI);
+                return true;
+            case ACT_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        lcd_clear_display();
+        int line = 0;
+        unsigned cap_boot = imx233_dualboot_get_field(DUALBOOT_CAP_BOOT);
+        lcd_putsf(0, line++, "cap_boot: %s", cap_boot ? "yes" : "no");
+        if(cap_boot)
+        {
+            unsigned boot = imx233_dualboot_get_field(DUALBOOT_BOOT);
+            lcd_putsf(0, line++, "boot: %s",
+                boot == IMX233_BOOT_NORMAL ? "normal"
+                : boot == IMX233_BOOT_OF ? "of"
+                : boot == IMX233_BOOT_UPDATER ? "updater" : "?");
+        }
+
+        lcd_update();
+        yield();
+    }
+}
+#endif
+
 static struct
 {
     const char *name;
@@ -1281,6 +1337,9 @@ static struct
     {"timrot", dbg_hw_info_timrot},
     {"button", dbg_hw_info_button},
     {"sdmmc", dbg_hw_info_sdmmc},
+#ifdef HAVE_DUALBOOT_STUB
+    {"dualboot", dbg_hw_info_dualboot},
+#endif
     {"target", dbg_hw_target_info},
 };
 

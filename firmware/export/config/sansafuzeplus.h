@@ -203,6 +203,9 @@
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 
+/* Define this on iMX233 if the boot process uses a dualboot stub */
+#define HAVE_DUALBOOT_STUB
+
 #define BOOTFILE_EXT    "sansa"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"

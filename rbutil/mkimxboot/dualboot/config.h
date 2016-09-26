@@ -19,4 +19,8 @@
  *
  ****************************************************************************/
 
-/** empty, used by register files */
+/** mostly empty, used by register files and dualboot */
+#define COMPILE_DUALBOOT_STUB
+
+/* obviously we have the dualboot stub! */
+#define HAVE_DUALBOOT_STUB
