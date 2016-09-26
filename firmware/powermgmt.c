@@ -51,6 +51,7 @@
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #include <time.h>
 #endif
+#include "rolo.h"
 
 #if (defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(COWON_D2)) \
     && !defined (SIMULATOR)
@@ -136,6 +137,7 @@ static char power_stack[DEFAULT_STACK_SIZE/2 + POWERMGMT_DEBUG_STACK];
 #endif
 static const char power_thread_name[] = "power";
 
+static struct shutdown_param shutdown_parameters;
 
 static int voltage_to_battery_level(int battery_millivolts);
 static void battery_status_update(void);
@@ -795,7 +797,21 @@ void shutdown_hw(void)
        eeprom chips are quite slow and might be still writing the last
        byte. */
     sleep(HZ/4);
-    power_off();
+    switch(shutdown_parameters.action)
+    {
+#if (CONFIG_SHUTDOWN & SHUTDOWN_CFG_RET_TO_BL)
+        case SHUTDOWN_RET_TO_BL:
+            system_return_to_bootloader();
+#endif
+        case SHUTDOWN_ROLO:
+            system_rolo(shutdown_parameters.rolo.buffer, shutdown_parameters.rolo.size);
+        case SHUTDOWN_REBOOT:
+            system_reboot();
+        case SHUTDOWN_POWEROFF:
+        default:
+            power_off();
+    }
+    while(1) {}
 }
 
 void set_poweroff_timeout(int timeout)
@@ -810,10 +826,27 @@ void reset_poweroff_timer(void)
         set_sleep_timer(sleeptimer_duration);
 }
 
-void sys_poweroff(void)
+#if (CONFIG_SHUTDOWN & SHUTDOWN_CFG_SUSPEND)
+static void sys_do_suspend(void)
 {
+#if defined(SONY_NWZ_LINUX)
+    /* On those targets, suspend is taken care of by the underlying OS so we have nothing to do */
+    system_suspend();
+#else
+#error implement this
+#endif
+}
+#endif
+
+static void sys_do_poweroff(void)
+{
+#if (CONFIG_SHUTDOWN & SHUTDOWN_CFG_SUSPEND)
+    /* Suspend is different from other shutdown modes because we resume afterwards! */
+    if(shutdown_parameters.action == SHUTDOWN_SUSPEND)
+        return sys_do_suspend();
+#endif
 #ifndef BOOTLOADER
-    logf("sys_poweroff()");
+    logf("sys_do_poweroff()");
     /* If the main thread fails to shut down the system, we will force a
        power off after an 20 second timeout - 28 seconds if recording */
     if (shutdown_timeout == 0) {
@@ -834,6 +867,18 @@ void sys_poweroff(void)
 
     queue_broadcast(SYS_POWEROFF, 0);
 #endif /* BOOTLOADER */
+}
+
+void sys_shutdown(struct shutdown_param *param)
+{
+    memcpy(&shutdown_parameters, param, sizeof(shutdown_parameters));
+    sys_do_poweroff();
+}
+
+void sys_poweroff(void)
+{
+    shutdown_parameters.action = SHUTDOWN_POWEROFF;
+    sys_do_poweroff();
 }
 
 void cancel_shutdown(void)

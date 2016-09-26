@@ -38,11 +38,6 @@
 
 static const char **kern_mod_list;
 
-void power_off(void)
-{
-    exit(0);
-}
-
 static void compute_kern_mod_list(void)
 {
     /* create empty list */
@@ -194,7 +189,22 @@ void system_init(void)
 
 void system_reboot(void)
 {
-    power_off();
+    nwz_power_restart();
+}
+
+void power_off(void)
+{
+    nwz_power_shutdown();
+}
+
+void system_suspend(void)
+{
+    nwz_power_suspend();
+}
+
+void system_return_to_bootloader(void)
+{
+    exit(0);
 }
 
 #ifdef HAVE_BUTTON_DATA

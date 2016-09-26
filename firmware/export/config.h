@@ -742,6 +742,14 @@ Lyre prototype 1 */
 #endif /* CONFIG_RDS */
 #endif /* HAVE_RDS_CAP */
 
+/* All targets must support poweroff and reboot, they can report additional shutdown options using
+ * the following bitflags */
+#define SHUTDOWN_CFG_SUSPEND    0x1 /* Suspend */
+#define SHUTDOWN_CFG_RET_TO_BL  0x2 /* Return to bootloader */
+#ifndef CONFIG_SHUTDOWN
+#define CONFIG_SHUTDOWN 0
+#endif /* CONFIG_SHUTDOWN */
+
 #ifndef CONFIG_ORIENTATION
 #if LCD_HEIGHT > LCD_WIDTH
 #define CONFIG_ORIENTATION SCREEN_PORTRAIT

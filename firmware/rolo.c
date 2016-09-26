@@ -37,6 +37,7 @@
 #include "core_alloc.h"
 #include "storage.h"
 #include "rolo.h"
+#include "powermgmt.h"
 
 #include "loader_strerror.h"
 #if defined(MI4_FORMAT)
@@ -213,40 +214,9 @@ extern unsigned long loadaddress;
  *
  ***************************************************************************/
 #if defined(CPU_COLDFIRE) || defined(CPU_ARM) || defined(CPU_MIPS)
-int rolo_load(const char* filename)
+int system_rolo(void *buffer, unsigned long size)
 {
     unsigned char* ramstart = (void*)&loadaddress;
-    unsigned char* filebuf;
-    size_t filebuf_size;
-    int err, length;
-
-    lcd_clear_display();
-    lcd_puts(0, 0, "ROLO...");
-    lcd_puts(0, 1, "Loading");
-    lcd_update();
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_clear_display();
-    lcd_remote_puts(0, 0, "ROLO...");
-    lcd_remote_puts(0, 1, "Loading");
-    lcd_remote_update();
-#endif
-
-    audio_stop();
-
-    /* get the system buffer. release only in case of error, otherwise
-     * we don't return anyway */
-    rolo_handle = core_alloc_maximum("rolo", &filebuf_size, NULL);
-    filebuf = core_get_data(rolo_handle);
-
-    err = LOAD_FIRMWARE(filebuf, filename, filebuf_size);
-
-    if (err <= 0)
-    {
-        rolo_error(loader_strerror(err));
-        return -1;
-    }
-    else
-        length = err;
 
 #if defined(CPU_PP) && NUM_CORES > 1
     lcd_puts(0, 2, "Waiting for coprocessor...");
@@ -294,14 +264,58 @@ int rolo_load(const char* filename)
 #endif
 #endif /* CONFIG_CPU == IMX31L */
 
-    rolo_restart(filebuf, ramstart, length);
+    rolo_restart(buffer, ramstart, size);
 
     /* never reached */
+    while(1) {}
+}
+
+int rolo_load(const char* filename)
+{
+    unsigned char* filebuf;
+    size_t filebuf_size;
+    int err, length;
+
+    lcd_clear_display();
+    lcd_puts(0, 0, "ROLO...");
+    lcd_puts(0, 1, "Loading");
+    lcd_update();
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_clear_display();
+    lcd_remote_puts(0, 0, "ROLO...");
+    lcd_remote_puts(0, 1, "Loading");
+    lcd_remote_update();
+#endif
+
+    audio_stop();
+
+    /* get the system buffer and release only in case of error, otherwise
+     * we don't return anyway */
+    rolo_handle = core_alloc_maximum("rolo", &filebuf_size, NULL);
+    filebuf = core_get_data(rolo_handle);
+
+    err = LOAD_FIRMWARE(filebuf, filename, filebuf_size);
+
+    if (err <= 0)
+    {
+        core_free(rolo_handle);
+        rolo_error(loader_strerror(err));
+        return -1;
+    }
+    else
+        length = err;
+
+    struct shutdown_param param;
+    param.action = SHUTDOWN_ROLO;
+    param.rolo.buffer = filebuf;
+    param.rolo.size = filebuf_size;
+    sys_shutdown(&param);
     return 0;
 }
 #else /* defined(CPU_SH) */
 int rolo_load(const char* filename)
 {
+#error fix this
     int fd;
     long length;
     long file_length;

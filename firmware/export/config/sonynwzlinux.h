@@ -114,6 +114,9 @@
 /* Battery */
 #define BATTERY_TYPES_COUNT  1
 
+/* Shutdown options */
+#define CONFIG_SHUTDOWN (SHUTDOWN_CFG_SUSPEND | SHUTDOWN_CFG_RET_TO_BL)
+
 /* special define to be use in various places */
 #define SONY_NWZ_LINUX
 

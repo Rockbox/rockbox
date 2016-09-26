@@ -32,6 +32,13 @@ extern void system_reboot (void);
  * to reboot system. */
 extern void system_exception_wait(void);
 extern void system_init(void);
+#if (CONFIG_SHUTDOWN & SHUTDOWN_CFG_SUSPEND)
+void system_suspend(void);
+#endif /* SHUTDOWN_CFG_SUSPEND */
+#if (CONFIG_SHUTDOWN & SHUTDOWN_CFG_RET_TO_BL)
+void system_return_to_bootloader(void);
+#endif /* SHUTDOWN_CFG_RET_TO_BL */
+void system_rolo(void *buffer, unsigned long size);
 
 extern long cpu_frequency;
 
