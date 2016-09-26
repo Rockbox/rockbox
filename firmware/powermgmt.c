@@ -51,6 +51,7 @@
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #include <time.h>
 #endif
+#include "rolo.h"
 
 #if (defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(COWON_D2)) \
     && !defined (SIMULATOR)
@@ -136,6 +137,7 @@ static char power_stack[DEFAULT_STACK_SIZE/2 + POWERMGMT_DEBUG_STACK];
 #endif
 static const char power_thread_name[] = "power";
 
+static struct shutdown_param shutdown_parameters;
 
 static int voltage_to_battery_level(int battery_millivolts);
 static void battery_status_update(void);
@@ -795,7 +797,17 @@ void shutdown_hw(void)
        eeprom chips are quite slow and might be still writing the last
        byte. */
     sleep(HZ/4);
-    power_off();
+    switch(shutdown_parameters.action)
+    {
+        case SHUTDOWN_ROLO:
+            rolo_restart(shutdown_parameters.rolo.buffer, shutdown_parameters.rolo.size);
+        case SHUTDOWN_REBOOT:
+            system_reboot();
+        case SHUTDOWN_POWEROFF:
+        default:
+            power_off();
+    }
+    while(1) {}
 }
 
 void set_poweroff_timeout(int timeout)
@@ -834,6 +846,12 @@ void sys_poweroff(void)
 
     queue_broadcast(SYS_POWEROFF, 0);
 #endif /* BOOTLOADER */
+}
+
+void sys_shutdown(struct shutdown_param *param)
+{
+    memcpy(&shutdown_parameters, param, sizeof(shutdown_parameters));
+    sys_poweroff();
 }
 
 void cancel_shutdown(void)

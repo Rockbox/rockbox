@@ -21,6 +21,7 @@
 #ifndef __ROLO_H__
 #define __ROLO_H__
 
+int rolo_restart(void *buffer, unsigned long size);
 int rolo_load(const char* file);
 
 #ifdef CPU_PP
