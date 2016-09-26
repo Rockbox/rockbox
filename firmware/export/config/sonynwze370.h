@@ -1,5 +1,5 @@
 /*
- * This config file is for the Sony NWZ-E370 series
+ * This config file is for the Sony NWZ-E370/E380 series
  */
 #define IMX233_SUBTARGET    3780
 #define IMX233_PACKAGE      IMX233_BGA169
@@ -7,7 +7,7 @@
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 88
-#define MODEL_NAME   "Sony NWZ-E370 series"
+#define MODEL_NAME   "Sony NWZ-E370/E380 series"
 
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
