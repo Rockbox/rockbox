@@ -231,20 +231,7 @@ void power_init(void)
 
 void power_off(void)
 {
-    /* wait a bit, useful for the user to stop touching anything */
-    sleep(HZ / 2);
-    /* disable watchdog just in case since we will disable interrupts */
-    imx233_rtc_enable_watchdog(false);
-    /* disable interrupts, it's probably better to avoid any action so close
-     * to shutdown */
-    disable_interrupt(IRQ_FIQ_STATUS);
-#ifdef SANSA_FUZEPLUS
-    /* This pin seems to be important to shutdown the hardware properly */
-    imx233_pinctrl_acquire(0, 9, "power off");
-    imx233_pinctrl_set_function(0, 9, PINCTRL_FUNCTION_GPIO);
-    imx233_pinctrl_enable_gpio(0, 9, true);
-    imx233_pinctrl_set_gpio(0, 9, true);
-#endif
+    imx233_system_prepare_shutdown();
     /* power down */
     HW_POWER_RESET = BF_OR(POWER_RESET, UNLOCK_V(KEY), PWD(1));
     while(1);
