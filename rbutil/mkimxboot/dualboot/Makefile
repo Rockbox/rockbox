@@ -2,8 +2,8 @@ CC=gcc
 LD=ld
 OC=objcopy
 PREFIX?=arm-elf-eabi-
-REGS_PATH=../../../firmware/target/arm/imx233/regs
-CFLAGS=-mcpu=arm926ej-s -std=gnu99 -I. -I$(REGS_PATH) -nostdlib -ffreestanding -fomit-frame-pointer -O
+IMX233_PATH=../../../firmware/target/arm/imx233
+CFLAGS=-mcpu=arm926ej-s -std=gnu99 -I. -I$(IMX233_PATH) -nostdlib -ffreestanding -fomit-frame-pointer -O
 # Edit the following variables when adding a new target.
 # mkimxboot.c also needs to be edited to refer to these
 # To add a new target x you need to:
