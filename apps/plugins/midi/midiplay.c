@@ -484,6 +484,8 @@ static int midimain(const void * filename)
                 /* but run through the tracks without the synth running */
                 rb->pcm_play_stop();
                 seekBackward(5);
+                lastswap = !swap;
+                synthbuf();
                 midi_debug("Rewind to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
                     rb->pcm_play_data(&get_more, NULL, NULL, 0);
@@ -494,6 +496,8 @@ static int midimain(const void * filename)
             {
                 rb->pcm_play_stop();
                 seekForward(5);
+                lastswap = !swap;
+                synthbuf();
                 midi_debug("Skip to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
                     rb->pcm_play_data(&get_more, NULL, NULL, 0);
