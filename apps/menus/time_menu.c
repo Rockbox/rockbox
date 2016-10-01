@@ -43,6 +43,10 @@
 #include "font.h"
 #include "system.h"
 
+#ifdef SAMSUNG_YH820
+#include "splash.h"
+#endif
+
 static int timedate_set(void)
 {
     /* Make a local copy of the time struct */
@@ -279,6 +283,20 @@ int time_screen(void* ignored)
         menu[i].height -= clock_vps[i].height;
         draw_timedate(&clock_vps[i], &screens[i]);
     }
+
+#ifdef SAMSUNG_YH820
+    /* some hardware revisions of the yh820 have a rtc problem: if you try to set
+       the time/date it will leave the player in an absolute unresponsive state
+       which can only be reverted by removing the battery. Setting time/date
+       should be prohibited on this targets. Fortunately we can autodetect these,
+       because they always report "02:02:02" as time.
+    */
+    struct tm *tm = get_time();
+    if (tm->tm_year==102 && tm->tm_hour==2 && tm->tm_min==2 && tm->tm_sec==2) {
+        splash(4*HZ, "Can't set time/date due to hardware issues!");
+        return 0;
+    }
+#endif
 
     ret = do_menu(&time_menu, NULL, menu, false);
     pop_current_activity();
