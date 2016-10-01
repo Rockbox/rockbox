@@ -323,6 +323,7 @@ long bpm IBSS_ATTR;
 int32_t gmbuf[BUF_SIZE*NBUF];
 static unsigned int samples_in_buf;
 
+bool midi_end = false;
 bool quit = false;
 bool swap = false;
 bool lastswap = true;
@@ -341,6 +342,10 @@ static inline void synthbuf(void)
 #else
     outptr = gmbuf;
 #endif
+    if (midi_end) {
+        samples_in_buf = 0;
+        return;
+    }
 
     /* synth samples for as many whole ticks as we can fit in the buffer */
     for (; i >= number_of_samples; i -= number_of_samples)
@@ -353,7 +358,7 @@ static inline void synthbuf(void)
         rb->yield();
 #endif
         if (tick() == 0)
-            quit = true;
+            midi_end = true;    /* no more midi data to play */
     }
 
     /* how many samples did we write to the buffer? */
@@ -379,6 +384,10 @@ static void get_more(const void** start, size_t* size)
 #else
     *start = gmbuf;
 #endif
+    if (samples_in_buf==0) {
+        *start = NULL;
+        quit = true;    /* this was the last buffer to play */
+    }
 }
 
 static int midimain(const void * filename)
