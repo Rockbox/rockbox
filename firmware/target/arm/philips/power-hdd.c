@@ -89,10 +89,8 @@ unsigned int power_input_status(void)
     if (GPIOE_INPUT_VAL & 0x20)
         status |= POWER_INPUT_MAIN_CHARGER;
 
-    /* Do nothing with USB for now
     if (GPIOE_INPUT_VAL & 0x4)
         status |= POWER_INPUT_USB_CHARGER;
-    */
 
     return status;
 }
