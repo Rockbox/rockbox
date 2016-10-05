@@ -30,6 +30,58 @@
 namespace hwstub {
 namespace net {
 
+/** Net helper
+ *
+ * This class provides helpers to implement a socket based context. It abstracts
+ * send/recv to return sensible error codes, print debug messages, and has helpers
+ * to create unix and tcp sockets.
+ *
+ * NOTE: this class is NOT thread-safe */
+class socket_connection
+{
+public:
+    socket_connection();
+    ~socket_connection();
+    /** Return socket file descriptor, or -1 if none */
+    int get_socket_fd();
+    /** Init a socket connection with an existing file descriptor. Note that the
+     * file descriptor will be closed when the class will be destroyed or init
+     * again. If a previous socket was associated with this class before, it will
+     * be closed. */
+    void init(int socket_fd);
+    /** Close the socket connection now */
+    void close();
+    /** Create a TCP connection with a domain name and a port.
+     * In case of error, return -1 */
+    static int create_tcp(const std::string& domain,
+        const std::string& port, std::string *error = nullptr);
+    /** Init a UNIX socket connection with a file system path (see man for details)
+     * In case of error, the previous connection is NOT closed and
+     * the function returns false, otherwise it returns true. */
+    static int create_unix(const std::string& path,
+        std::string *error = nullptr);
+    /** Init a UNIX socket connection with an abstract name (see man for details)
+     * In case of error, the previous connection is NOT closed and
+     * the function returns false, otherwise it returns true. */
+    static int create_unix_abstract(const std::string& path,
+        std::string *error = nullptr);
+
+    /** Useful functions for network byte order conversion */
+    static uint32_t to_net_order(uint32_t u);
+    static uint32_t from_net_order(uint32_t u);
+
+    /** set operation timeout */
+    void set_timeout(std::chrono::milliseconds ms);
+
+    /** Send a message to the server. */
+    error send(void *buffer, size_t& sz, std::ostream& debug = cnull);
+    /** Receive a message from the server, sz is updated with the received size. */
+    error recv(void *buffer, size_t& sz, std::ostream& debug = cnull);
+
+protected:
+    int m_socketfd; /* socket file descriptor */
+};
+
 /** Net context
  *
  * A socket context provides access to another context through a network. This
@@ -57,6 +109,7 @@ public:
     /** Create a UNIX socket context with an abstract name (see man for details) */
     static std::shared_ptr<context> create_unix_abstract(const std::string& path,
         std::string *error = nullptr);
+
     /** Useful functions for network byte order conversion */
     uint32_t to_net_order(uint32_t u);
     uint32_t from_net_order(uint32_t u);
@@ -143,7 +196,7 @@ protected:
     virtual error send(void *buffer, size_t& sz);
     virtual error recv(void *buffer, size_t& sz);
 
-    int m_socketfd; /* socket file descriptor */
+    socket_connection m_conn;
 };
 
 

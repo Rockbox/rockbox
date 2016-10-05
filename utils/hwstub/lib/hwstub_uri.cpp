@@ -22,6 +22,7 @@
 #include "hwstub_usb.hpp"
 #include "hwstub_virtual.hpp"
 #include "hwstub_net.hpp"
+#include "hwstub_gdb.hpp"
 #include <cctype>
 
 namespace hwstub {
@@ -42,6 +43,8 @@ void print_usage(FILE *f, bool client, bool server)
     if(client)
         fprintf(f, "  usb       USB context (using libusb)\n");
     fprintf(f, "  tcp       TCP context\n");
+    if(client)
+        fprintf(f, "  gdb       A GDB context over tcp\n");
     fprintf(f, "  unix      Local unix domain context\n");
     if(client)
         fprintf(f, "  virt      A virtual context (testing and debugging mostly)\n");
@@ -60,6 +63,8 @@ void print_usage(FILE *f, bool client, bool server)
     fprintf(f, "in which case the domain must start with a '#':\n");
     fprintf(f, "  unix:///path/to/socket\n");
     fprintf(f, "  unix://#hwstub\n");
+    fprintf(f, "When creating a GDB context, the domain and port are the usual TCP parameters:\n");
+    fprintf(f, "  gdb://localhost:4141\n");
     if(client)
     {
         fprintf(f, "When creating a virtual context, the domain must contain a specification of the devices.\n");
@@ -246,6 +251,10 @@ std::shared_ptr<context> create_context(const uri& uri, std::string *error)
     else if(uri.scheme() == "tcp")
     {
         return hwstub::net::context::create_tcp(uri.domain(), uri.port(), error);
+    }
+    else if(uri.scheme() == "gdb")
+    {
+        return hwstub::gdb::context::create_tcp(uri.domain(), uri.port(), error);
     }
     else if(uri.scheme() == "unix")
     {

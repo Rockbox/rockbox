@@ -30,39 +30,6 @@
 namespace hwstub {
 namespace net {
 
-/**
- * Context
- */
-context::context()
-    :m_state(state::HELLO), m_error(error::SUCCESS)
-{
-}
-
-context::~context()
-{
-}
-
-std::shared_ptr<context> context::create_socket(int socket_fd)
-{
-    // NOTE: can't use make_shared() because of the protected ctor */
-    return std::shared_ptr<socket_context>(new socket_context(socket_fd));
-}
-
-std::string context::default_unix_path()
-{
-    return "hwstub";
-}
-
-std::string context::default_tcp_domain()
-{
-    return "localhost";
-}
-
-std::string context::default_tcp_port()
-{
-    return "6666";
-}
-
 namespace
 {
     /* len is the total length, including a 0 character if any */
@@ -170,10 +137,163 @@ namespace
     }
 }
 
+/**
+ * Socket connection
+ */
+socket_connection::socket_connection()
+    :m_socketfd(-1)
+{
+}
+
+socket_connection::~socket_connection()
+{
+    close();
+}
+
+int socket_connection::get_socket_fd()
+{
+    return m_socketfd;
+}
+
+void socket_connection::init(int socket_fd)
+{
+    close();
+    m_socketfd = socket_fd;
+}
+
+void socket_connection::close()
+{
+    if(m_socketfd >= 0)
+        ::close(m_socketfd);
+    m_socketfd = -1;
+}
+
+int socket_connection::create_tcp(const std::string& domain,
+    const std::string& port, std::string *error)
+{
+    return create_tcp_low(domain, port, false, error);
+}
+
+int socket_connection::create_unix(const std::string& path,
+    std::string *error)
+{
+    return create_unix_low(false, path.c_str(), path.size() + 1, true, error);
+}
+
+int socket_connection::create_unix_abstract(const std::string& path,
+    std::string *error)
+{
+    std::string fake_path = "#" + path; /* the # will be overriden by 0 */
+    return create_unix_low(true, fake_path.c_str(), fake_path.size(), true, error);
+}
+
+uint32_t socket_connection::to_net_order(uint32_t u)
+{
+    return htonl(u);
+}
+
+uint32_t socket_connection::from_net_order(uint32_t u)
+{
+    return ntohl(u);
+}
+
+void socket_connection::set_timeout(std::chrono::milliseconds ms)
+{
+    struct timeval tv;
+    tv.tv_usec = 1000 * (ms.count() % 1000);
+    tv.tv_sec = ms.count() / 1000;
+     /* set timeout for the client operations */
+    setsockopt(m_socketfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
+    setsockopt(m_socketfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(tv));
+}
+
+error socket_connection::send(void *buffer, size_t& sz, std::ostream& debug)
+{
+    debug << "[net::sock] send(" << sz << "): ";
+    int ret = ::send(m_socketfd, buffer, sz, MSG_NOSIGNAL);
+    if(ret >= 0)
+    {
+        debug << "good(" << ret << ")\n";
+        sz = (size_t)ret;
+        return error::SUCCESS;
+    }
+    /* convert some errors */
+    debug << "fail(" << errno << "," << strerror(errno) << ")\n";
+    switch(errno)
+    {
+#if EAGAIN != EWOULDBLOCK
+        case EAGAIN:
+#endif
+        case EWOULDBLOCK: return error::TIMEOUT;
+        case ECONNRESET: case EPIPE: return error::SERVER_DISCONNECTED;
+        default: return error::NET_ERROR;
+    }
+}
+
+error socket_connection::recv(void *buffer, size_t& sz, std::ostream& debug)
+{
+    debug << "[net::sock] recv(" << sz << "): ";
+    int ret = ::recv(m_socketfd, buffer, sz, MSG_WAITALL);
+    if(ret > 0)
+    {
+        debug << "good(" << ret << ")\n";
+        sz = (size_t)ret;
+        return error::SUCCESS;
+    }
+    if(ret == 0)
+    {
+        debug << "disconnected\n";
+        return error::SERVER_DISCONNECTED;
+    }
+    debug << "fail(" << errno << "," << strerror(errno) << ")\n";
+    switch(errno)
+    {
+#if EAGAIN != EWOULDBLOCK
+        case EAGAIN:
+#endif
+        case EWOULDBLOCK: return error::TIMEOUT;
+        default: return error::NET_ERROR;
+    }
+}
+
+
+/**
+ * Context
+ */
+context::context()
+    :m_state(state::HELLO), m_error(error::SUCCESS)
+{
+}
+
+context::~context()
+{
+}
+
+std::shared_ptr<context> context::create_socket(int socket_fd)
+{
+    // NOTE: can't use make_shared() because of the protected ctor */
+    return std::shared_ptr<socket_context>(new socket_context(socket_fd));
+}
+
+std::string context::default_unix_path()
+{
+    return "hwstub";
+}
+
+std::string context::default_tcp_domain()
+{
+    return "localhost";
+}
+
+std::string context::default_tcp_port()
+{
+    return "6666";
+}
+
 std::shared_ptr<context> context::create_tcp(const std::string& domain,
     const std::string& port, std::string *error)
 {
-    int fd = create_tcp_low(domain, port, false, error);
+    int fd = socket_connection::create_tcp(domain, port, error);
     if(fd >= 0)
         return context::create_socket(fd);
     else
@@ -182,7 +302,7 @@ std::shared_ptr<context> context::create_tcp(const std::string& domain,
 
 std::shared_ptr<context> context::create_unix(const std::string& path, std::string *error)
 {
-    int fd = create_unix_low(false, path.c_str(), path.size() + 1, true, error);
+    int fd = socket_connection::create_unix(path, error);
     if(fd >= 0)
         return context::create_socket(fd);
     else
@@ -191,8 +311,7 @@ std::shared_ptr<context> context::create_unix(const std::string& path, std::stri
 
 std::shared_ptr<context> context::create_unix_abstract(const std::string& path, std::string *error)
 {
-    std::string fake_path = "#" + path; /* the # will be overriden by 0 */
-    int fd = create_unix_low(true, fake_path.c_str(), fake_path.size(), true, error);
+    int fd = socket_connection::create_unix_abstract(path, error);
     if(fd >= 0)
         return context::create_socket(fd);
     else
@@ -263,12 +382,12 @@ bool context::match_device(ctx_dev_t dev, std::shared_ptr<hwstub::device> hwdev)
 
 uint32_t context::to_net_order(uint32_t u)
 {
-    return htonl(u);
+    return socket_connection::to_net_order(u);
 }
 
 uint32_t context::from_net_order(uint32_t u)
 {
-    return ntohl(u);
+    return socket_connection::from_net_order(u);
 }
 
 error context::send_cmd(uint32_t cmd, uint32_t args[HWSTUB_NET_ARGS], uint8_t *send_data,
@@ -480,74 +599,29 @@ void context::stop_context()
  * Socket context
  */
 socket_context::socket_context(int socket_fd)
-    :m_socketfd(socket_fd)
 {
+    m_conn.init(socket_fd);
     set_timeout(std::chrono::milliseconds(1000));
 }
 
 socket_context::~socket_context()
 {
     stop_context();
-    close(m_socketfd);
 }
 
 void socket_context::set_timeout(std::chrono::milliseconds ms)
 {
-    struct timeval tv;
-    tv.tv_usec = 1000 * (ms.count() % 1000);
-    tv.tv_sec = ms.count() / 1000;
-     /* set timeout for the client operations */
-    setsockopt(m_socketfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
-    setsockopt(m_socketfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(tv));
+    m_conn.set_timeout(ms);
 }
 
 error socket_context::send(void *buffer, size_t& sz)
 {
-    debug() << "[net::ctx::sock] send(" << sz << "): ";
-    int ret = ::send(m_socketfd, buffer, sz, MSG_NOSIGNAL);
-    if(ret >= 0)
-    {
-        debug() << "good(" << ret << ")\n";
-        sz = (size_t)ret;
-        return error::SUCCESS;
-    }
-    /* convert some errors */
-    debug() << "fail(" << errno << "," << strerror(errno) << ")\n";
-    switch(errno)
-    {
-#if EAGAIN != EWOULDBLOCK
-        case EAGAIN:
-#endif
-        case EWOULDBLOCK: return error::TIMEOUT;
-        case ECONNRESET: case EPIPE: return error::SERVER_DISCONNECTED;
-        default: return error::NET_ERROR;
-    }
+    return m_conn.send(buffer, sz, debug());
 }
 
 error socket_context::recv(void *buffer, size_t& sz)
 {
-    debug() << "[net::ctx::sock] recv(" << sz << "): ";
-    int ret = ::recv(m_socketfd, buffer, sz, MSG_WAITALL);
-    if(ret > 0)
-    {
-        debug() << "good(" << ret << ")\n";
-        sz = (size_t)ret;
-        return error::SUCCESS;
-    }
-    if(ret == 0)
-    {
-        debug() << "disconnected\n";
-        return error::SERVER_DISCONNECTED;
-    }
-    debug() << "fail(" << errno << "," << strerror(errno) << ")\n";
-    switch(errno)
-    {
-#if EAGAIN != EWOULDBLOCK
-        case EAGAIN:
-#endif
-        case EWOULDBLOCK: return error::TIMEOUT;
-        default: return error::NET_ERROR;
-    }
+    return m_conn.recv(buffer, sz, debug());
 }
 
 /**
