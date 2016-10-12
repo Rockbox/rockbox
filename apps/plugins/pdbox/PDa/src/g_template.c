@@ -630,7 +630,9 @@ static void *gtemplate_new(t_symbol *s, int argc, t_atom *argv)
     (void) s;
 #endif
     if (argc >= 1)
+    {
     	argc--; argv++;
+    }
     return (gtemplate_donew(canvas_makebindsym(sym), argc, argv));
 }
 
