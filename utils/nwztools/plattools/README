@@ -1,0 +1,27 @@
+Platform tools
+--------------
+
+Those tools are designed to run on the devices. They are mostly tests that can
+be run in firmware upgrade mode (using exec_file in utils/nwztools/scripts/). To
+compile those, you will need the sony nwz cross compiler. The canonical way to
+run them is as follows:
+
+1) Build the tools:
+    cd /path/to/utils/nwztools/plattools
+    make
+Note that the default cross compiler prefix is arm-sony-linux-gnueabi- but it
+can be changed using PREFIX:
+PREFIX="sony-nwz-linux-gnueabi-" make
+
+2) Embed the wanted excutable in a firmware upgrade for your device. The README
+in utils/nwztools/scripts contains more documentation on how to select the right
+target. For example if you want to embed test_display for the NWZ-E460 series,
+you should run:
+    cd /path/to/utils/nwztools/scripts
+    make exec_file UPG=test_display_nwze46x.upg NWZ_TARGET=nwz-e46x EXEC=../plattools/test_display.elf
+
+3) Put the upgrade file on the device and trigger a firmware upgrade. Assuming
+your NWZ device is /dev/sdb1 and is mounted at /media/pamaury/WALKMAN, run:
+    cd /path/to/utils/nwztools/scripts
+    make copy_fw_upgrade UPG=test_display_nwze46x.upg NWZ_MOUNT=/media/pamaury/WALKMAN/
+    sudo make do_fw_upgrade NWZ_DEV=/dev/sdb1
