@@ -1347,5 +1347,5 @@ void socket_server::discovery_thread()
     debug() << "[net::srv:sock::discovery] stop\n";
 }
 
-} // namespace uri
 } // namespace net
+} // namespace hwstub
