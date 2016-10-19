@@ -32,6 +32,7 @@
 
 #include "nwz_keys.h"
 #include "nwz_fb.h"
+#include "nwz_adc.h"
 
 /* run a program and exit with nonzero status in case of error
  * argument list must be NULL terminated */
@@ -61,6 +62,7 @@ bool nwz_key_event_is_press(struct input_event *evt);
 bool nwz_key_event_get_hold_status(struct input_event *evt);
 /* get keycode name */
 const char *nwz_key_get_name(int keycode);
+
 /* open framebuffer device */
 int nwz_fb_open(bool lcd);
 /* close framebuffer device */
@@ -69,5 +71,14 @@ void nwz_fb_close(int fb);
 int nwz_fb_get_brightness(int fd, struct nwz_fb_brightness *bl);
 /* set backlight brightness (return -1 on error, 1 on success) */
 int nwz_fb_set_brightness(int fd, struct nwz_fb_brightness *bl);
+
+/* open adc device */
+int nwz_adc_open(void);
+/* close adc device */
+void nwz_adc_close(int fd);
+/* get channel name */
+const char *nwz_adc_get_name(int ch);
+/* read channel value, return -1 on error */
+int nwz_adc_get_val(int fd, int ch);
 
 #endif /* _NWZLIB_H_ */

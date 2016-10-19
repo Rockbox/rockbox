@@ -71,7 +71,7 @@ void nwz_lcdmsgf(bool clear, int x, int y, const char *format, ...)
 
 int nwz_key_open(void)
 {
-    return open("/dev/input/event0", O_RDONLY);
+    return open(NWZ_KEY_DEV, O_RDONLY);
 }
 
 void nwz_key_close(int fd)
@@ -160,7 +160,7 @@ const char *nwz_key_get_name(int keycode)
 
 int nwz_fb_open(bool lcd)
 {
-    return open(lcd ? "/dev/fb/0" : "/dev/fb/1", O_RDWR);
+    return open(lcd ? NWZ_FB_LCD_DEV : NWZ_FB_TV_DEV, O_RDWR);
 }
 
 void nwz_fb_close(int fd)
@@ -182,4 +182,40 @@ int nwz_fb_set_brightness(int fd, struct nwz_fb_brightness *bl)
         return -1;
     else
         return 1;
+}
+
+int nwz_adc_open(void)
+{
+    return open(NWZ_ADC_DEV, O_RDONLY);
+}
+
+void nwz_adc_close(int fd)
+{
+    close(fd);
+}
+
+static const char *nwz_adc_name[] =
+{
+    [NWZ_ADC_VCCBAT] = "VCCBAT",
+    [NWZ_ADC_VCCVBUS] = "VCCVBUS",
+    [NWZ_ADC_ADIN3] = "ADIN3",
+    [NWZ_ADC_ADIN4] = "ADIN4",
+    [NWZ_ADC_ADIN5] = "ADIN5",
+    [NWZ_ADC_ADIN6] = "ADIN6",
+    [NWZ_ADC_ADIN7] = "ADIN7",
+    [NWZ_ADC_ADIN8] = "ADIN8",
+};
+
+const char *nwz_adc_get_name(int ch)
+{
+    return nwz_adc_name[ch];
+}
+
+int nwz_adc_get_val(int fd, int ch)
+{
+    unsigned char val;
+    if(ioctl(fd, NWZ_ADC_GET_VAL(ch), &val) < 0)
+        return -1;
+    else
+        return val;
 }
