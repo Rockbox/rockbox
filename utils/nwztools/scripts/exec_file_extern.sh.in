@@ -1,0 +1,54 @@
+#!/bin/sh
+
+# The updater script on the NWZ has a major bug/feature:
+# it does NOT clear the update flag if the update scrit fails
+# thus causing a update/reboot loop and a bricked device
+# always clear to make sure we don't end up being screwed
+nvpflag fup 0xFFFFFFFF
+
+#
+# This script remounts the user (aka contents) partition read-write-exec and
+# runs the file given and redirects its output and error to a file.
+# To use this file, you need to replace NWZ_EXEC_THIS by the file you want to
+# execute and NWZ_LOG_THIS by the name of the file you want to log to. You may
+# use sed as follows for this purpose:
+# cat exec_file_extern.sh.in | sed 's|NWZ_EXEC_THIS|myfile.elf|' | \
+#                              sed 's|NWZ_LOG_THIS|exec.log|' > my_exec_file.sh
+#
+# NOTE 1: technically, NWZ_EXEC_THIS can be any command, not just a file
+# NOTE 2: this script will export the variable NWZ_CONTENTS that is the path to
+#         the user partition, so that if NWZ_EXEC_THIS is a bash script, it can
+#         easily use it
+#
+
+# go to /tmp
+cd /tmp
+
+# get content partition path
+CONTENTS="/contents"
+CONTENTS_PART=`mount | grep contents | awk '{ print $1 }'`
+
+lcdmsg -c -f /usr/local/bin/font_08x12.bmp -l 0,3 "Contents partition:\n$CONTENTS_PART"
+
+# 2) We need to remount the contents partition in read-write mode be able to
+# write something on it
+lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,6 "Remount $CONTENTS rw and exec"
+if ! mount -o remount,rw,umask=000 $CONTENTS_PART $CONTENTS
+then
+    lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,7 "ERROR: remount failed"
+    sleep 3
+    exit 0
+fi
+
+# run file and redirect all outputs
+lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,7 "Running file..."
+export NWZ_CONTENTS="$CONTENTS"
+$CONTENTS/NWZ_EXEC_THIS >$CONTENTS/NWZ_LOG_THIS 2>&1
+
+# 4) Success screen
+lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "Rebooting in 3 seconds."
+sleep 3
+sync
+
+# finish
+exit 0

@@ -51,7 +51,7 @@ fi
 
 # run it and redirect all outputs to exec.txt
 lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,7 "Running file..."
-/tmp/exec 2>&1 >$CONTENTS/exec.txt
+/tmp/exec >$CONTENTS/exec.txt 2>&1
 
 # 4) Success screen
 lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "Rebooting in 3 seconds."
