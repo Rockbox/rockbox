@@ -157,3 +157,29 @@ const char *nwz_key_get_name(int keycode)
     else
         return nwz_keyname[keycode];
 }
+
+int nwz_fb_open(bool lcd)
+{
+    return open(lcd ? "/dev/fb/0" : "/dev/fb/1", O_RDWR);
+}
+
+void nwz_fb_close(int fd)
+{
+    close(fd);
+}
+
+int nwz_fb_get_brightness(int fd, struct nwz_fb_brightness *bl)
+{
+    if(ioctl(fd, NWZ_FB_GET_BRIGHTNESS, bl) < 0)
+        return -1;
+    else
+        return 1;
+}
+
+int nwz_fb_set_brightness(int fd, struct nwz_fb_brightness *bl)
+{
+    if(ioctl(fd, NWZ_FB_SET_BRIGHTNESS, bl) < 0)
+        return -1;
+    else
+        return 1;
+}
