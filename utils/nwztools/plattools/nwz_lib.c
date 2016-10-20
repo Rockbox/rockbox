@@ -69,9 +69,29 @@ void nwz_lcdmsgf(bool clear, int x, int y, const char *format, ...)
     nwz_lcdmsg(clear, x, y, buffer);
 }
 
+int nwz_input_open(const char *requested_name)
+{
+    /* try all /dev/input/eventX, there can't a lot of them */
+    for(int index = 0; index < 8; index++)
+    {
+        char buffer[32];
+        sprintf(buffer, "/dev/input/event%d", index);
+        int fd = open(buffer, O_RDWR);
+        if(fd < 0)
+            continue; /* try next one */
+        /* query name */
+        char name[256];
+        if(ioctl(fd, EVIOCGNAME(sizeof(name)), name) >= 0 &&
+                strcmp(name, requested_name) == 0)
+            return fd;
+        close(fd);
+    }
+    return -1;
+}
+
 int nwz_key_open(void)
 {
-    return open(NWZ_KEY_DEV, O_RDONLY);
+    return nwz_input_open(NWZ_KEY_NAME);
 }
 
 void nwz_key_close(int fd)
@@ -89,20 +109,7 @@ int nwz_key_get_hold_status(int fd)
 
 int nwz_key_wait_event(int fd, long tmo_us)
 {
-    fd_set rfds;
-    struct timeval tv;
-    struct timeval *tv_ptr = NULL;
-    /* watch the input device */
-    FD_ZERO(&rfds);
-    FD_SET(fd, &rfds);
-    /* setup timeout */
-    if(tmo_us >= 0)
-    {
-        tv.tv_sec = 0;
-        tv.tv_usec = tmo_us;
-        tv_ptr = &tv;
-    }
-    return select(fd + 1, &rfds, NULL, NULL, tv_ptr);
+    return nwz_wait_fds(&fd, 1, tmo_us);
 }
 
 int nwz_key_read_event(int fd, struct input_event *evt)
@@ -218,4 +225,251 @@ int nwz_adc_get_val(int fd, int ch)
         return -1;
     else
         return val;
+}
+
+int nwz_ts_open(void)
+{
+    return nwz_input_open(NWZ_TS_NAME);
+}
+
+void nwz_ts_close(int fd)
+{
+    close(fd);
+}
+
+int nwz_ts_state_init(int fd, struct nwz_ts_state_t *state)
+{
+    memset(state, 0, sizeof(struct nwz_ts_state_t));
+    struct input_absinfo info;
+    if(ioctl(fd, EVIOCGABS(ABS_X), &info) < 0)
+        return -1;
+    state->max_x = info.maximum;
+    if(ioctl(fd, EVIOCGABS(ABS_Y), &info) < 0)
+        return -1;
+    state->max_y = info.maximum;
+    if(ioctl(fd, EVIOCGABS(ABS_PRESSURE), &info) < 0)
+        return -1;
+    state->max_pressure = info.maximum;
+    if(ioctl(fd, EVIOCGABS(ABS_TOOL_WIDTH), &info) < 0)
+        return -1;
+    state->max_tool_width = info.maximum;
+    return 1;
+}
+
+int nwz_ts_state_update(struct nwz_ts_state_t *state, struct input_event *evt)
+{
+    switch(evt->type)
+    {
+        case EV_SYN:
+            return 1;
+        case EV_REL:
+            if(evt->code == REL_RX)
+                state->flick_x = evt->value;
+            else if(evt->code == REL_RY)
+                state->flick_y = evt->value;
+            else
+                return -1;
+            state->flick = true;
+            break;
+        case EV_ABS:
+            if(evt->code == ABS_X)
+                state->x = evt->value;
+            else if(evt->code == ABS_Y)
+                state->y = evt->value;
+            else if(evt->code == ABS_PRESSURE)
+                state->pressure = evt->value;
+            else if(evt->code == ABS_TOOL_WIDTH)
+                state->tool_width = evt->value;
+            else
+                return -1;
+            break;
+        case EV_KEY:
+            if(evt->code == BTN_TOUCH)
+                state->touch = evt->value;
+            else
+                return -1;
+            break;
+        default:
+            return -1;
+    }
+    return 0;
+}
+
+int nwz_ts_state_post_syn(struct nwz_ts_state_t *state)
+{
+    state->flick = false;
+    return 1;
+}
+
+int nwz_ts_read_events(int fd, struct input_event *evts, int nr_evts)
+{
+    int ret = read(fd, evts, nr_evts * sizeof(struct input_event));
+    if(ret < 0)
+        return -1;
+    return ret / sizeof(struct input_event);
+}
+
+long nwz_wait_fds(int *fds, int nr_fds, long tmo_us)
+{
+    fd_set rfds;
+    struct timeval tv;
+    struct timeval *tv_ptr = NULL;
+    /* watch the input device */
+    FD_ZERO(&rfds);
+    int max_fd = 0;
+    for(int i = 0; i < nr_fds; i++)
+    {
+        FD_SET(fds[i], &rfds);
+        if(fds[i] > max_fd)
+            max_fd = fds[i];
+    }
+    /* setup timeout */
+    if(tmo_us >= 0)
+    {
+        tv.tv_sec = 0;
+        tv.tv_usec = tmo_us;
+        tv_ptr = &tv;
+    }
+    int ret = select(max_fd + 1, &rfds, NULL, NULL, tv_ptr);
+    if(ret <= 0)
+        return ret;
+    long bitmap = 0;
+    for(int i = 0; i < nr_fds; i++)
+        if(FD_ISSET(fds[i], &rfds))
+            bitmap |= 1 << i;
+    return bitmap;
+}
+
+int nwz_power_open(void)
+{
+    return open(NWZ_POWER_DEV, O_RDWR);
+}
+
+void nwz_power_close(int fd)
+{
+    close(fd);
+}
+
+int nwz_power_get_status(int fd)
+{
+    int status;
+    if(ioctl(fd, NWZ_POWER_GET_STATUS, &status) < 0)
+        return -1;
+    return status;
+}
+
+static int nwz_power_adval_to_mv(int adval, int ad_base)
+{
+    if(adval == -1)
+        return -1;
+    /* the AD base corresponds to the millivolt value if adval was 255 */
+    return (adval * ad_base) / 255;
+}
+
+int nwz_power_get_vbus_adval(int fd)
+{
+    int status;
+    if(ioctl(fd, NWZ_POWER_GET_VBUS_ADVAL, &status) < 0)
+        return -1;
+    return status;
+}
+
+int nwz_power_get_vbus_voltage(int fd)
+{
+    return nwz_power_adval_to_mv(nwz_power_get_vbus_adval(fd), NWZ_POWER_AD_BASE_VBUS);
+}
+
+int nwz_power_get_vbus_limit(int fd)
+{
+    int status;
+    if(ioctl(fd, NWZ_POWER_GET_VBUS_LIMIT, &status) < 0)
+        return -1;
+    return status;
+}
+
+int nwz_power_get_charge_switch(int fd)
+{
+    int status;
+    if(ioctl(fd, NWZ_POWER_GET_CHARGE_SWITCH, &status) < 0)
+        return -1;
+    return status;
+}
+
+int nwz_power_get_charge_current(int fd)
+{
+    int status;
+    if(ioctl(fd, NWZ_POWER_GET_CHARGE_CURRENT, &status) < 0)
+        return -1;
+    return status;
+}
+
+int nwz_power_get_battery_gauge(int fd)
+{
+    int status;
+    if(ioctl(fd, NWZ_POWER_GET_BAT_GAUGE, &status) < 0)
+        return -1;
+    return status;
+}
+
+int nwz_power_get_battery_adval(int fd)
+{
+    int status;
+    if(ioctl(fd, NWZ_POWER_GET_BAT_ADVAL, &status) < 0)
+        return -1;
+    return status;
+}
+
+int nwz_power_get_battery_voltage(int fd)
+{
+    return nwz_power_adval_to_mv(nwz_power_get_battery_adval(fd), NWZ_POWER_AD_BASE_VBAT);
+}
+
+int nwz_power_get_vbat_adval(int fd)
+{
+    int status;
+    if(ioctl(fd, NWZ_POWER_GET_VBAT_ADVAL, &status) < 0)
+        return -1;
+    return status;
+}
+
+int nwz_power_get_vbat_voltage(int fd)
+{
+    return nwz_power_adval_to_mv(nwz_power_get_vbat_adval(fd), NWZ_POWER_AD_BASE_VBAT);
+}
+
+int nwz_power_get_sample_count(int fd)
+{
+    int status;
+    if(ioctl(fd, NWZ_POWER_GET_SAMPLE_COUNT, &status) < 0)
+        return -1;
+    return status;
+}
+
+int nwz_power_get_vsys_adval(int fd)
+{
+    int status;
+    if(ioctl(fd, NWZ_POWER_GET_VSYS_ADVAL, &status) < 0)
+        return -1;
+    return status;
+}
+
+int nwz_power_get_vsys_voltage(int fd)
+{
+    return nwz_power_adval_to_mv(nwz_power_get_vsys_adval(fd), NWZ_POWER_AD_BASE_VSYS);
+}
+
+int nwz_power_get_acc_charge_mode(int fd)
+{
+    int status;
+    if(ioctl(fd, NWZ_POWER_GET_ACCESSARY_CHARGE_MODE, &status) < 0)
+        return -1;
+    return status;
+}
+
+int nwz_power_is_fully_charged(int fd)
+{
+    int status;
+    if(ioctl(fd, NWZ_POWER_IS_FULLY_CHARGED, &status) < 0)
+        return -1;
+    return status;
 }

@@ -21,7 +21,7 @@
 #ifndef __NWZ_KEYS_H__
 #define __NWZ_KEYS_H__
 
-#define NWZ_KEY_DEV "/dev/input/event0"
+#define NWZ_KEY_NAME    "icx_key"
 
 /* The Sony icx_key driver reports keys via the /dev/input/event0 device and
  * abuses the standard struct input_event. The input_event.code is split into

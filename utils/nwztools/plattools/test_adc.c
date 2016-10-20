@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     int input_fd = nwz_key_open();
     if(input_fd < 0)
     {
-        nwz_lcdmsg(false, 3, 7, "Cannot open input device");
+        nwz_lcdmsg(false, 3, 4, "Cannot open input device");
         sleep(2);
         return 1;
     }

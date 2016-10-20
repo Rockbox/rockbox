@@ -29,10 +29,13 @@
 #include <sys/wait.h>
 #include <linux/input.h>
 #include <fcntl.h>
+#include <string.h>
 
 #include "nwz_keys.h"
 #include "nwz_fb.h"
 #include "nwz_adc.h"
+#include "nwz_ts.h"
+#include "nwz_power.h"
 
 /* run a program and exit with nonzero status in case of error
  * argument list must be NULL terminated */
@@ -80,5 +83,71 @@ void nwz_adc_close(int fd);
 const char *nwz_adc_get_name(int ch);
 /* read channel value, return -1 on error */
 int nwz_adc_get_val(int fd, int ch);
+
+/* open touchscreen device */
+int nwz_ts_open(void);
+/* close touchscreen device */
+void nwz_ts_close(int fd);
+/* structure to track touch state */
+struct nwz_ts_state_t
+{
+    int x, y; /* current position (valid is touch is true) */
+    int max_x, max_y; /* maximum possible values */
+    int pressure, tool_width; /* current pressure and tool width */
+    int max_pressure, max_tool_width; /* maximum possible values */
+    bool touch; /* is the user touching the screen? */
+    bool flick; /* was the action a flick? */
+    int flick_x, flick_y; /* if so, this is the flick direction */
+};
+/* get touchscreen information and init state, return -1 on error, 1 on success */
+int nwz_ts_state_init(int fd, struct nwz_ts_state_t *state);
+/* update state with an event, return -1 on unhandled event, >=0 on handled:
+ * 1 if sync event, 0 otherwise */
+int nwz_ts_state_update(struct nwz_ts_state_t *state, struct input_event *evt);
+/* update state after a sync event to prepare for next round of events */
+int nwz_ts_state_post_syn(struct nwz_ts_state_t *state);
+/* read at most N events from touch screen, and return the number of events */
+int nwz_ts_read_events(int fd, struct input_event *evts, int nr_evts);
+
+/* wait for events on several file descriptors, return a bitmap of active ones
+ * or 0 on timeout, the timeout can be -1 to block */
+long nwz_wait_fds(int *fds, int nr_fds, long timeout_us);
+
+/* open power device */
+int nwz_power_open(void);
+/* close power device */
+void nwz_power_close(int fd);
+/* get power status (return -1 on error, bitmap on success) */
+int nwz_power_get_status(int fd);
+/* get vbus adval (or -1 on error) */
+int nwz_power_get_vbus_adval(int fd);
+/* get vbus voltage in mV (or -1 on error) */
+int nwz_power_get_vbus_voltage(int fd);
+/* get vbus current limit (or -1 on error) */
+int nwz_power_get_vbus_limit(int fd);
+/* get charge switch (or -1 on error) */
+int nwz_power_get_charge_switch(int fd);
+/* get charge current (or -1 on error) */
+int nwz_power_get_charge_current(int fd);
+/* get battery gauge (or -1 on error) */
+int nwz_power_get_battery_gauge(int fd);
+/* get battery adval (or -1 on error) */
+int nwz_power_get_battery_adval(int fd);
+/* get battery voltage in mV (or -1 on error) */
+int nwz_power_get_battery_voltage(int fd);
+/* get vbat adval (or -1 on error) */
+int nwz_power_get_vbat_adval(int fd);
+/* get vbat voltage (or -1 on error) */
+int nwz_power_get_vbat_voltage(int fd);
+/* get sample count (or -1 on error) */
+int nwz_power_get_sample_count(int fd);
+/* get vsys adval (or -1 on error) */
+int nwz_power_get_vsys_adval(int fd);
+/* get vsys voltage in mV (or -1 on error) */
+int nwz_power_get_vsys_voltage(int fd);
+/* get accessory charge mode */
+int nwz_power_get_acc_charge_mode(int fd);
+/* is battery fully charged? (or -1 on error) */
+int nwz_power_is_fully_charged(int fd);
 
 #endif /* _NWZLIB_H_ */
