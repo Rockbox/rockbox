@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 {
     /* clear screen and display welcome message */
     nwz_lcdmsg(true, 0, 0, "test_power");
-    nwz_lcdmsg(false, 0, 2, "PWR OFF: quit");
+    nwz_lcdmsg(false, 0, 2, "BACK: quit");
     /* open input device */
     int input_fd = nwz_key_open();
     if(input_fd < 0)
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
         struct input_event evt;
         if(nwz_key_read_event(input_fd, &evt) != 1)
             continue;
-        if(nwz_key_event_get_keycode(&evt) == NWZ_KEY_OPTION && !nwz_key_event_is_press(&evt))
+        if(nwz_key_event_get_keycode(&evt) == NWZ_KEY_BACK && !nwz_key_event_is_press(&evt))
             break;
     }
     /* finish nicely */

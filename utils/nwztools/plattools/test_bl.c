@@ -24,10 +24,10 @@ int main(int argc, char **argv)
 {
     /* clear screen and display welcome message */
     nwz_lcdmsg(true, 0, 0, "test_bl");
-    nwz_lcdmsg(false, 0, 2, "UP/DOWN: level");
-    nwz_lcdmsg(false, 0, 3, "LEFT/RIGHT: step");
+    nwz_lcdmsg(false, 0, 2, "LEFT/RIGHT: level");
+    nwz_lcdmsg(false, 0, 3, "UP/DOWN: step");
     nwz_lcdmsg(false, 0, 4, "VOL UP/DOWN: period");
-    nwz_lcdmsg(false, 0, 5, "PWR OFF: quit");
+    nwz_lcdmsg(false, 0, 5, "BACK: quit");
     /* open input and framebuffer device */
     int input_fd = nwz_key_open();
     if(input_fd < 0)
@@ -65,25 +65,25 @@ int main(int argc, char **argv)
         /* only act on release */
         if(press)
             continue;
-        if(code == NWZ_KEY_OPTION)
+        if(code == NWZ_KEY_BACK)
             break; /* quit */
         bool change_bl = false;
-        if(code == NWZ_KEY_UP && bl.level < NWZ_FB_BL_MAX_LEVEL)
+        if(code == NWZ_KEY_RIGHT && bl.level < NWZ_FB_BL_MAX_LEVEL)
         {
             change_bl = true;
             bl.level++;
         }
-        else if(code == NWZ_KEY_DOWN && bl.level > NWZ_FB_BL_MIN_LEVEL)
+        else if(code == NWZ_KEY_LEFT && bl.level > NWZ_FB_BL_MIN_LEVEL)
         {
             change_bl = true;
             bl.level--;
         }
-        else if(code == NWZ_KEY_RIGHT && bl.step < NWZ_FB_BL_MAX_STEP)
+        else if(code == NWZ_KEY_UP && bl.step < NWZ_FB_BL_MAX_STEP)
         {
             change_bl = true;
             bl.step++;
         }
-        else if(code == NWZ_KEY_LEFT && bl.step > NWZ_FB_BL_MIN_STEP)
+        else if(code == NWZ_KEY_DOWN && bl.step > NWZ_FB_BL_MIN_STEP)
         {
             change_bl = true;
             bl.step--;

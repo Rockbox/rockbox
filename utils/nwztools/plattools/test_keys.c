@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 {
     /* clear screen and display welcome message */
     nwz_lcdmsg(true, 0, 0, "test_keys");
-    nwz_lcdmsg(false, 0, 2, "hold PWR OFF for 3 seconds to quit");
+    nwz_lcdmsg(false, 0, 2, "hold BACK for 3 seconds to quit");
     /* open input device */
     int input_fd = nwz_key_open();
     if(input_fd < 0)
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
         return 1;
     }
     /* display input state in a loop */
-    int pwr_off_pressed = 0; /* 0 = no pressed, >0 = number of seconds pressed - 1 */
+    int back_pressed = 0; /* 0 = no pressed, >0 = number of seconds pressed - 1 */
     while(1)
     {
         /* display HOLD status */
@@ -43,9 +43,9 @@ int main(int argc, char **argv)
         int ret = nwz_key_wait_event(input_fd, 1000000);
         if(ret != 1)
         {
-            if(pwr_off_pressed > 0)
-                pwr_off_pressed++;
-            if(pwr_off_pressed >= 4)
+            if(back_pressed > 0)
+                back_pressed++;
+            if(back_pressed >= 4)
                 break;
             continue;
         }
@@ -56,10 +56,10 @@ int main(int argc, char **argv)
             nwz_key_get_name(nwz_key_event_get_keycode(&evt)),
             nwz_key_event_is_press(&evt) ? "pressed" : "released",
             nwz_key_event_get_hold_status(&evt));
-        if(nwz_key_event_get_keycode(&evt) == NWZ_KEY_OPTION && nwz_key_event_is_press(&evt))
-            pwr_off_pressed = 1;
+        if(nwz_key_event_get_keycode(&evt) == NWZ_KEY_BACK && nwz_key_event_is_press(&evt))
+            back_pressed = 1;
         else
-            pwr_off_pressed = 0;
+            back_pressed = 0;
     }
     /* close input device */
     close(input_fd);
