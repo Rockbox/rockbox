@@ -23,30 +23,30 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
 #include "fwp.h"
 
 enum keysig_search_method_t
 {
     KEYSIG_SEARCH_NONE = 0,
     KEYSIG_SEARCH_FIRST,
-    KEYSIG_SEARCH_ASCII_STUPID = KEYSIG_SEARCH_FIRST,
-    KEYSIG_SEARCH_ASCII_BRUTE,
+    KEYSIG_SEARCH_ASCII_HEX = KEYSIG_SEARCH_FIRST,
     KEYSIG_SEARCH_LAST
 };
 
 /* notify returns true if the key seems ok */
 typedef bool (*keysig_notify_fn_t)(void *user, uint8_t key[NWZ_KEY_SIZE],
     uint8_t sig[NWZ_SIG_SIZE]);
-/* returns true if a key was accepted by notify */
-typedef bool (*keysig_search_fn_t)(uint8_t *cipher, keysig_notify_fn_t notify, void *user);
 
 struct keysig_search_desc_t
 {
     const char *name;
     const char *comment;
-    keysig_search_fn_t fn;
 };
 
 struct keysig_search_desc_t keysig_search_desc[KEYSIG_SEARCH_LAST];
+
+bool keysig_search(int method, uint8_t *enc_buf, size_t buf_sz,
+    keysig_notify_fn_t notify, void *user, int nr_threads);
 
 #endif /* __keysig_search_h__ */

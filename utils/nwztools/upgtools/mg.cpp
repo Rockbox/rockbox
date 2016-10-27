@@ -28,24 +28,23 @@
 using namespace CryptoPP;
 namespace
 {
-    ECB_Mode< DES >::Decryption g_dec;
-    ECB_Mode< DES >::Encryption g_enc;
-
     inline int dec_des_ecb(void *in, int size, void *out, uint8_t *key)
     {
+        ECB_Mode< DES >::Decryption dec;
         if(size % 8)
             return 42;
-        g_dec.SetKey(key, 8);
-        g_dec.ProcessData((byte*)out, (byte*)in, size);
+        dec.SetKey(key, 8);
+        dec.ProcessData((byte*)out, (byte*)in, size);
         return 0;
     }
 
     inline int enc_des_ecb(void *in, int size, void *out, uint8_t *key)
     {
+        ECB_Mode< DES >::Encryption enc;
         if(size % 8)
             return 42;
-        g_enc.SetKey(key, 8);
-        g_enc.ProcessData((byte*)out, (byte*)in, size);
+        enc.SetKey(key, 8);
+        enc.ProcessData((byte*)out, (byte*)in, size);
         return 0;
     }
 }
