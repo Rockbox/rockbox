@@ -20,6 +20,16 @@
  ****************************************************************************/
 #include "nwz_lib.h"
 
+extern struct nwz_dev_info_t g_nwz_dev_list[];
+
+const char *nwz_get_model_name(unsigned long model_id)
+{
+    for(int i = 0; g_nwz_dev_list[i].name; i++)
+        if(g_nwz_dev_list[i].model_id == model_id)
+            return g_nwz_dev_list[i].name;
+    return NULL;
+}
+
 void nwz_run(const char *file, const char *args[], bool wait)
 {
     pid_t child_pid = fork();

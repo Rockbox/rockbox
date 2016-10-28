@@ -4,7 +4,7 @@ LD=$(PREFIX)gcc
 CFLAGS=-std=gnu99 -Wall -O2
 INCLUDES=-I.
 
-LIB_FILES=nwz_lib.c
+LIB_FILES=nwz_lib.c nwz_lib_devlist.c
 ALL_BUT_LIB=$(patsubst %.c,%.elf,$(filter-out $(LIB_FILES),$(wildcard *.c)))
 
 all: $(ALL_BUT_LIB)

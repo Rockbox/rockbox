@@ -37,6 +37,14 @@
 #include "nwz_ts.h"
 #include "nwz_power.h"
 
+struct nwz_dev_info_t
+{
+    unsigned long model_id;
+    const char *name;
+};
+
+const char *nwz_get_model_name(unsigned long model_id);
+
 /* run a program and exit with nonzero status in case of error
  * argument list must be NULL terminated */
 void nwz_run(const char *file, const char *args[], bool wait);
