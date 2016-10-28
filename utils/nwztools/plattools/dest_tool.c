@@ -1,0 +1,218 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2016 Amaury Pouly
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+#include "nwz_lib.h"
+#include <string.h>
+#include <stdlib.h>
+
+extern char **environ;
+
+const char *white_list[] =
+{
+    "NWZ-E463", "NWZ-E464", "NWZ-E465",
+    "NWZ-A863", "NWZ-A864", "NWZ-A865", "NWZ-A866", "NWZ-A867",
+    NULL,
+};
+
+/* get model id from ICX_MODEL_ID environment variable */
+unsigned long find_model_id(void)
+{
+    const char *mid = getenv("ICX_MODEL_ID");
+    if(mid == NULL)
+        return 0;
+    char *end;
+    unsigned long v = strtoul(mid, &end, 0);
+    if(*end)
+        return 0;
+    else
+        return v;
+}
+
+unsigned long read32(unsigned char *buf)
+{
+    return buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
+}
+
+void write32(unsigned char *buf, unsigned long value)
+{
+    buf[0] = value & 0xff;
+    buf[1] = (value >> 8) & 0xff;
+    buf[2] = (value >> 16) & 0xff;
+    buf[3] = (value >> 24) & 0xff;
+}
+
+struct
+{
+    unsigned long dest;
+    const char *name;
+} g_dest_list[] =
+{
+    { 0, "J" },
+    { 1, "U" },
+    { 0x101, "U2" },
+    { 0x201, "U3" },
+    { 0x301, "CA" },
+    { 2, "CEV" },
+    { 0x102, "CE7" },
+    { 3, "CEW" },
+    { 0x103, "CEW2" },
+    { 4, "CN" },
+    { 5, "KR" },
+    { 6, "E" },
+    { 0x106, "MX" },
+    { 0x206, "E2" },
+    { 0x306, "MX3" },
+    { 7, "TW" },
+};
+
+#define NR_DEST (sizeof(g_dest_list) / sizeof(g_dest_list[0]))
+
+int get_dest_index(unsigned long dest)
+{
+    for(size_t i = 0; i < NR_DEST; i++)
+        if(g_dest_list[i].dest == dest)
+            return i;
+    return -1;
+}
+
+const char *get_dest_name(unsigned long dest)
+{
+    int index = get_dest_index(dest);
+    return index < 0 ? "NG" : g_dest_list[index].name;
+}
+
+int main(int argc, char **argv)
+{
+    /* clear screen and display welcome message */
+    nwz_lcdmsg(true, 0, 0, "destination tool");
+    /* open input device */
+    int input_fd = nwz_key_open();
+    if(input_fd < 0)
+    {
+        nwz_lcdmsg(false, 3, 4, "Cannot open input device");
+        sleep(2);
+        return 1;
+    }
+    unsigned long model_id = find_model_id();
+    if(model_id == 0)
+    {
+        nwz_lcdmsg(false, 3, 4, "Cannot get model ID");
+        sleep(2);
+        return 1;
+    }
+    const char *model_name = nwz_get_model_name(model_id);
+    if(model_name == NULL)
+        model_name = "Unknown";
+    nwz_lcdmsgf(false, 0, 2, "Model ID: %#x", model_id);
+    nwz_lcdmsgf(false, 0, 3, "Model Name: %s", model_name);
+    nwz_lcdmsg(false, 0, 5, "BACK: quit");
+    nwz_lcdmsg(false, 0, 6, "LEFT/RIGHT: change dest");
+    nwz_lcdmsg(false, 0, 7, "PLAY/PAUSE: change sps");
+    bool ok_model = false;
+    for(int i = 0; white_list[i]; i++)
+        if(strcmp(white_list[i], model_name) == 0)
+            ok_model = true;
+    /* display input state in a loop */
+    while(1)
+    {
+        unsigned char nvp_buf[20];
+        bool ok_nvp = false;
+        if(ok_model)
+        {
+            int fd = open("/dev/icx_nvp/011", O_RDONLY);
+            if(fd >= 0)
+            {
+                ssize_t cnt = read(fd, nvp_buf, sizeof(nvp_buf));
+                if(cnt == (ssize_t)sizeof(nvp_buf))
+                    ok_nvp = true;
+                else
+                    nwz_lcdmsg(false, 1, 9, "Cannot read NVP.\n");
+                close(fd);
+            }
+            else
+                nwz_lcdmsg(false, 1, 9, "Cannot open NVP.\n");
+        }
+        else
+        {
+            nwz_lcdmsg(false, 1, 9, "Your model is not supported.\n");
+            nwz_lcdmsg(false, 1, 10, "Please contact a developer.\n");
+        }
+        /* display information */
+        if(ok_nvp)
+        {
+            unsigned long dest = read32(nvp_buf);
+            unsigned long sps = read32(nvp_buf + 4);
+            const char *dest_name = get_dest_name(dest);
+            const char *sps_name = sps ? "ON" : "OFF";
+            nwz_lcdmsgf(false, 1, 9, "DEST: %s (%#x)     ", dest_name, dest);
+            nwz_lcdmsgf(false, 1, 10, "SPS: %s (%d)     ", sps_name, sps);
+        }
+        /* wait for event */
+        int ret = nwz_key_wait_event(input_fd, -1);
+        if(ret != 1)
+            continue;
+        struct input_event evt;
+        if(nwz_key_read_event(input_fd, &evt) != 1)
+            continue;
+        /* only act on release */
+        if(nwz_key_event_is_press(&evt))
+            continue;
+        int keycode = nwz_key_event_get_keycode(&evt);
+        if(keycode == NWZ_KEY_BACK)
+            break;
+        bool write_nvp = false;
+        if(keycode == NWZ_KEY_LEFT || keycode == NWZ_KEY_RIGHT)
+        {
+            int dest_idx = get_dest_index(read32(nvp_buf));
+            /* if destination is unknown, replace by the first one */
+            if(dest_idx == -1)
+                dest_idx = 0;
+            if(keycode == NWZ_KEY_LEFT)
+                dest_idx--;
+            else
+                dest_idx++;
+            dest_idx = (dest_idx + NR_DEST) % NR_DEST;
+            write32(nvp_buf, g_dest_list[dest_idx].dest);
+            write_nvp = true;
+        }
+        else if(keycode == NWZ_KEY_PLAY)
+        {
+            /* change 0 to 1 and anything nonzero to 0 */
+            write32(nvp_buf + 4, read32(nvp_buf + 4) == 0 ? 1 : 0);
+            write_nvp = true;
+        }
+        /* write nvp */
+        if(ok_nvp && write_nvp)
+        {
+            int fd = open("/dev/icx_nvp/011", O_RDWR);
+            if(fd >= 0)
+            {
+                ssize_t cnt = write(fd, nvp_buf, sizeof(nvp_buf));
+                if(cnt != (ssize_t)sizeof(nvp_buf))
+                    nwz_lcdmsg(false, 1, 12, "Cannot write NVP.\n");
+                close(fd);
+            }
+            else
+                nwz_lcdmsg(false, 1, 12, "Cannot open NVP.\n");
+        }
+    }
+    /* finish nicely */
+    return 0;
+}
