@@ -32,6 +32,8 @@ fi
 
 # get update filename
 _UPDATE_FN_=`nvpstr ufn`
+# export model id
+export ICX_MODEL_ID=`/usr/local/bin/nvpflag -x mid`
 
 # extract second file
 fwpchk -f /contents/$_UPDATE_FN_.UPG -c -1 exec
