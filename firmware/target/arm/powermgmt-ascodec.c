@@ -122,6 +122,14 @@ static void enable_charger(void)
     battery_voltage_sync();
 }
 
+void set_battery_final_voltage(int millivolts)
+{
+    unsigned chg_v = BATT_CHG_V;
+    /* implement change here
+     * might also need to tweak other things */
+    ascodec_write_charger(BATT_CHG_I | chg_v);
+}
+
 void powermgmt_init_target(void)
 {
     /* Everything CHARGER, OFF! */
