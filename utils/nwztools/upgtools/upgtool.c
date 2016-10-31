@@ -173,13 +173,16 @@ struct upg_entry_t
 
 struct nwz_model_t g_model_list[] =
 {
-    { "nwz-e45x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, "8a01b624bfbfde4a1662a1772220e3c5", "6173819e", "30b82e5c"},
-    { "nwz-e46x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, "89d813f8f966efdebd9c9e0ea98156d2", "eb4431eb", "4f1d9cac" },
-    { "nwz-a86x", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, "a7c4af6c28b8900a783f307c1ba538c5", "c824e4e2", "7c262bb0" },
+    { "nwz-e450", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, "8a01b624bfbfde4a1662a1772220e3c5", "6173819e", "30b82e5c"},
+    { "nwz-e460", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, "89d813f8f966efdebd9c9e0ea98156d2", "eb4431eb", "4f1d9cac" },
+    { "nwz-a860", HAS_KAS | HAS_KEY | HAS_SIG | CONFIRMED, "a7c4af6c28b8900a783f307c1ba538c5", "c824e4e2", "7c262bb0" },
     /* The following keys were obtained by brute forcing firmware upgrades,
      * someone with a device needs to confirm that they work */
-    { "nw-a82x", HAS_KEY | HAS_SIG, "", "4df06482", "07fa0b6e" },
-    { "nwz-a1x", HAS_KEY | HAS_SIG, "", "ec2888e2", "f62ced8a" },
+    { "nw-a820", HAS_KEY | HAS_SIG, "", "4df06482", "07fa0b6e" },
+    { "nwz-a10", HAS_KEY | HAS_SIG, "", "ec2888e2", "f62ced8a" },
+    { "nwz-a20", HAS_KEY | HAS_SIG, "", "e8e204ee", "577614df" },
+    { "nwz-zx100", HAS_KEY | HAS_SIG, "", "22e44606", "a9f95e90" },
+    { "nwz-e580", HAS_KEY | HAS_SIG, "", "a60806ea", "97e8ce46" },
 };
 
 static int digit_value(char c)
