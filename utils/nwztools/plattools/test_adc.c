@@ -19,8 +19,9 @@
  *
  ****************************************************************************/
 #include "nwz_lib.h"
+#include "nwz_plattools.h"
 
-int main(int argc, char **argv)
+int NWZ_TOOL_MAIN(test_adc)(int argc, char **argv)
 {
     /* clear screen and display welcome message */
     nwz_lcdmsg(true, 0, 0, "test_adc");
@@ -37,6 +38,7 @@ int main(int argc, char **argv)
     int adc_fd = nwz_adc_open();
     if(adc_fd < 0)
     {
+        nwz_key_close(input_fd);
         nwz_lcdmsg(false, 3, 4, "Cannot open adc device");
         sleep(2);
         return 1;
@@ -59,6 +61,7 @@ int main(int argc, char **argv)
             break;
     }
     /* finish nicely */
+    nwz_key_close(input_fd);
+    nwz_adc_close(adc_fd);
     return 0;
 }
- 

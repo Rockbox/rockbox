@@ -19,8 +19,9 @@
  *
  ****************************************************************************/
 #include "nwz_lib.h"
+#include "nwz_plattools.h"
 
-int main(int argc, char **argv)
+int NWZ_TOOL_MAIN(test_bl)(int argc, char **argv)
 {
     /* clear screen and display welcome message */
     nwz_lcdmsg(true, 0, 0, "test_bl");
@@ -39,6 +40,7 @@ int main(int argc, char **argv)
     int fb_fd = nwz_fb_open(true);
     if(fb_fd < 0)
     {
+        nwz_key_close(input_fd);
         nwz_lcdmsg(false, 3, 7, "Cannot open framebuffer device");
         sleep(2);
         return 1;
@@ -103,9 +105,8 @@ int main(int argc, char **argv)
             nwz_fb_set_brightness(fb_fd, &bl);
     }
     /* close input device */
-    close(input_fd);
+    nwz_key_close(input_fd);
+    nwz_fb_close(fb_fd);
     /* finish nicely */
     return 0;
 }
- 
- 

@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include "nwz_lib.h"
+#include "nwz_plattools.h"
 
 static const char *charge_status_name(int chgstat)
 {
@@ -59,7 +60,7 @@ static const char *acc_charge_mode_name(int mode)
     }
 }
 
-int main(int argc, char **argv)
+int NWZ_TOOL_MAIN(test_power)(int argc, char **argv)
 {
     /* clear screen and display welcome message */
     nwz_lcdmsg(true, 0, 0, "test_power");
@@ -76,7 +77,18 @@ int main(int argc, char **argv)
     int power_fd = nwz_power_open();
     if(power_fd < 0)
     {
+        nwz_key_close(input_fd);
         nwz_lcdmsg(false, 3, 4, "Cannot open power device");
+        sleep(2);
+        return 1;
+    }
+    /* open pminfo device */
+    int pminfo_fd = nwz_pminfo_open();
+    if(pminfo_fd < 0)
+    {
+        nwz_key_close(power_fd);
+        nwz_key_close(input_fd);
+        nwz_lcdmsg(false, 3, 4, "Cannot open pminfo device");
         sleep(2);
         return 1;
     }
@@ -119,6 +131,9 @@ int main(int argc, char **argv)
             nwz_power_get_vbat_voltage(power_fd), nwz_power_get_vbat_adval(power_fd));
         nwz_lcdmsgf(false, 0, line++, "acc charge mode: %s (%d)     ",
             acc_charge_mode_name(acc_chg_mode), acc_chg_mode);
+        /* pminfo */
+        line++;
+        nwz_lcdmsgf(false, 0, line++, "pminfo: %#x     ", nwz_pminfo_get_factor(pminfo_fd));
         /* wait for event (1s) */
         int ret = nwz_key_wait_event(input_fd, 1000000);
         if(ret != 1)
@@ -130,5 +145,8 @@ int main(int argc, char **argv)
             break;
     }
     /* finish nicely */
+    nwz_key_close(power_fd);
+    nwz_key_close(input_fd);
+    nwz_pminfo_close(pminfo_fd);
     return 0;
 }

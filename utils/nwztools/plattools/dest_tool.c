@@ -21,10 +21,11 @@
 #include "nwz_lib.h"
 #include <string.h>
 #include <stdlib.h>
+#include "nwz_plattools.h"
 
 extern char **environ;
 
-const char *white_list[] =
+static const char *white_list[] =
 {
     "NWZ-E463", "NWZ-E464", "NWZ-E465",
     "NWZ-A863", "NWZ-A864", "NWZ-A865", "NWZ-A866", "NWZ-A867",
@@ -32,7 +33,7 @@ const char *white_list[] =
 };
 
 /* get model id from ICX_MODEL_ID environment variable */
-unsigned long find_model_id(void)
+static unsigned long find_model_id(void)
 {
     const char *mid = getenv("ICX_MODEL_ID");
     if(mid == NULL)
@@ -45,12 +46,12 @@ unsigned long find_model_id(void)
         return v;
 }
 
-unsigned long read32(unsigned char *buf)
+static unsigned long read32(unsigned char *buf)
 {
     return buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
 }
 
-void write32(unsigned char *buf, unsigned long value)
+static void write32(unsigned char *buf, unsigned long value)
 {
     buf[0] = value & 0xff;
     buf[1] = (value >> 8) & 0xff;
@@ -58,7 +59,7 @@ void write32(unsigned char *buf, unsigned long value)
     buf[3] = (value >> 24) & 0xff;
 }
 
-struct
+static struct
 {
     unsigned long dest;
     const char *name;
@@ -84,7 +85,7 @@ struct
 
 #define NR_DEST (sizeof(g_dest_list) / sizeof(g_dest_list[0]))
 
-int get_dest_index(unsigned long dest)
+static int get_dest_index(unsigned long dest)
 {
     for(size_t i = 0; i < NR_DEST; i++)
         if(g_dest_list[i].dest == dest)
@@ -92,16 +93,16 @@ int get_dest_index(unsigned long dest)
     return -1;
 }
 
-const char *get_dest_name(unsigned long dest)
+static const char *get_dest_name(unsigned long dest)
 {
     int index = get_dest_index(dest);
     return index < 0 ? "NG" : g_dest_list[index].name;
 }
 
-int main(int argc, char **argv)
+int NWZ_TOOL_MAIN(dest_tool)(int argc, char **argv)
 {
     /* clear screen and display welcome message */
-    nwz_lcdmsg(true, 0, 0, "destination tool");
+    nwz_lcdmsg(true, 0, 0, "dest_tool");
     /* open input device */
     int input_fd = nwz_key_open();
     if(input_fd < 0)
@@ -113,6 +114,7 @@ int main(int argc, char **argv)
     unsigned long model_id = find_model_id();
     if(model_id == 0)
     {
+        nwz_key_close(input_fd);
         nwz_lcdmsg(false, 3, 4, "Cannot get model ID");
         sleep(2);
         return 1;
@@ -214,5 +216,6 @@ int main(int argc, char **argv)
         }
     }
     /* finish nicely */
+    nwz_key_close(input_fd);
     return 0;
 }

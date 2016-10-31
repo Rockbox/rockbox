@@ -7,8 +7,11 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2016 Amaury Pouly
+ * Copyright (C) 2011 by Amaury Pouly
  *
+ * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
+ * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -18,14 +21,17 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "nwz_lib.h"
-#include "nwz_plattools.h"
+#ifndef __NWZ_PLATTOOLS_H__
+#define __NWZ_PLATTOOLS_H__
 
-int NWZ_TOOL_MAIN(test_display)(int argc, char **argv)
-{
-    /* clear screen and display welcome message */
-    nwz_lcdmsg(true, 0, 0, "test_display");
-    nwz_lcdmsg(false, 3, 10, "This program will stop in 5 seconds");
-    sleep(5);
-    return 0;
-}
+/** Platform tools can be either built individually, or be included in a
+ * single build (or even dualboot code) for easy testing. Thus, each tool must
+ * use the following macros to support all scenarios. */
+
+#ifdef NWZ_EMBED_TOOLS
+#define NWZ_TOOL_MAIN(tool)  tool##_main
+#else
+#define NWZ_TOOL_MAIN(tool)  main
+#endif
+
+#endif /* __NWZ_PLATTOOLS_H__ */

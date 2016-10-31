@@ -19,8 +19,9 @@
  *
  ****************************************************************************/
 #include "nwz_lib.h"
+#include "nwz_plattools.h"
 
-int main(int argc, char **argv)
+int NWZ_TOOL_MAIN(test_ts)(int argc, char **argv)
 {
     /* clear screen and display welcome message */
     nwz_lcdmsg(true, 0, 0, "test_ts");
@@ -36,6 +37,7 @@ int main(int argc, char **argv)
     int ts_fd = nwz_ts_open();
     if(ts_fd < 0)
     {
+        nwz_key_close(key_fd);
         nwz_lcdmsg(false, 3, 4, "Cannot open touch screen device");
         sleep(2);
         return 1;
@@ -44,6 +46,8 @@ int main(int argc, char **argv)
     struct nwz_ts_state_t ts_state;
     if(nwz_ts_state_init(ts_fd, &ts_state) < 0)
     {
+        nwz_key_close(key_fd);
+        nwz_ts_close(ts_fd);
         nwz_lcdmsg(false, 3, 4, "Cannot init touch screen device");
         sleep(2);
         return 1;

@@ -21,6 +21,8 @@
 #ifndef __NWZ_POWER_H__
 #define __NWZ_POWER_H__
 
+/** power */
+
 #define NWZ_POWER_DEV   "/dev/icx_power"
 
 #define NWZ_POWER_TYPE  'P'
@@ -78,5 +80,36 @@
 #define NWZ_POWER_ACC_CHARGE_NONE   0
 #define NWZ_POWER_ACC_CHARGE_VBAT   1
 #define NWZ_POWER_ACC_CHARGE_VSYS   2
+
+/** pminfo
+ *
+ * This driver seems to collect the state of the device on boot. Thus one
+ * can know if a key was pressed when booting for example.
+ */
+
+#define NWZ_PMINFO_DEV  "/dev/icx_pminfo"
+
+#define NWZ_PMINFO_TYPE 'b'
+
+/* ioctl request */
+
+#define NWZ_PMINFO_GET_FACTOR       _IOR(NWZ_PMINFO_TYPE, 0, unsigned int *)
+#define NWZ_PMINFO_CLR_DETRSTFLG    _IO(NWZ_PMINFO_TYPE, 1)
+
+/* NWZ_PMINFO_GET_FACTOR bitmap
+ * WARNING this information may not apply to all players and some bits do not
+ * exists on some players */
+#define ICX_PMINFO_FACTOR_RTC_WAL  0x20000000 /* RTC Weekly Alarm */
+#define ICX_PMINFO_FACTOR_RTC_DAL  0x10000000 /* RTC Daily Alarm */
+#define ICX_PMINFO_FACTOR_VBUS     0x08000000 /* VBUS in/out */
+#define ICX_PMINFO_FACTOR_DC_POWER 0x04000000 /* AC Adaptor in/out */
+#define ICX_PMINFO_FACTOR_USB_WAKE 0x01000000 /* USB Wake */
+#define ICX_PMINFO_FACTOR_CHARGE   0x00400000 /* Charge */
+#define ICX_PMINFO_FACTOR_CRADLE   0x00080000 /* Cradle in/out */
+#define ICX_PMINFO_FACTOR_AB_EV    0x00008000 /* ab event */
+#define ICX_PMINFO_FACTOR_NC_SW    0x00004000 /* nc switch */
+#define ICX_PMINFO_FACTOR_HOLD_SW  0x00002000 /* hold switch */
+#define ICX_PMINFO_FACTOR_KEY_PAD  0x00001000 /* keypad */
+#define ICX_PMINFO_FACTOR_KEY_CODE 0x00000FFF /* keycode */
 
 #endif /* __NWZ_POWER_H__ */

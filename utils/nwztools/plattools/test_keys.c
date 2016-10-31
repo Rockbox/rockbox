@@ -19,12 +19,13 @@
  *
  ****************************************************************************/
 #include "nwz_lib.h"
+#include "nwz_plattools.h"
 
-int main(int argc, char **argv)
+int NWZ_TOOL_MAIN(test_keys)(int argc, char **argv)
 {
     /* clear screen and display welcome message */
     nwz_lcdmsg(true, 0, 0, "test_keys");
-    nwz_lcdmsg(false, 0, 2, "hold BACK for 3 seconds to quit");
+    nwz_lcdmsg(false, 0, 2, "BACK: hold 3 seconds to quit");
     /* open input device */
     int input_fd = nwz_key_open();
     if(input_fd < 0)
@@ -35,6 +36,10 @@ int main(int argc, char **argv)
     }
     /* display input state in a loop */
     int back_pressed = 0; /* 0 = no pressed, >0 = number of seconds pressed - 1 */
+#define FIRST_LINE  7
+#define LAST_LINE   17
+    int event_line = FIRST_LINE;
+    int prev_evt_line = -1;
     while(1)
     {
         /* display HOLD status */
@@ -52,18 +57,49 @@ int main(int argc, char **argv)
         struct input_event evt;
         if(nwz_key_read_event(input_fd, &evt) != 1)
             continue;
-        nwz_lcdmsgf(false, 2, 6, "%s %s (HOLD=%d)                 ",
+        /* erase last '>' indicator */
+        if(prev_evt_line != -1)
+            nwz_lcdmsg(false, 0, prev_evt_line, "  ");
+        prev_evt_line = event_line;
+        char buffer[32];
+        int len = sprintf(buffer, "> %s %s (HOLD=%d)",
             nwz_key_get_name(nwz_key_event_get_keycode(&evt)),
             nwz_key_event_is_press(&evt) ? "pressed" : "released",
             nwz_key_event_get_hold_status(&evt));
+        /* pad with spaces to erase old stuff */
+        while(len + 1 < sizeof(buffer))
+            buffer[len++] = ' ';
+        buffer[len] = 0;
+        /* print line */
+        nwz_lcdmsg(false, 0, event_line, buffer);
+        /* compute next line */
+        event_line++;
+        if(event_line == LAST_LINE)
+            event_line = FIRST_LINE;
+        /* handle quit */
         if(nwz_key_event_get_keycode(&evt) == NWZ_KEY_BACK && nwz_key_event_is_press(&evt))
             back_pressed = 1;
         else
             back_pressed = 0;
     }
+    /* wait until back is released, to avoid messing with all_tools (if embedded) */
+    nwz_lcdmsg(true, 0, 0, "test_keys");
+    nwz_lcdmsg(false, 0, 2, "BACK: release to quit");
+    while(1)
+    {
+        /* wait for event */
+        int ret = nwz_key_wait_event(input_fd, 1000000);
+        if(ret != 1)
+            continue;
+        struct input_event evt;
+        if(nwz_key_read_event(input_fd, &evt) != 1)
+            continue;
+        /* handle quit */
+        if(nwz_key_event_get_keycode(&evt) == NWZ_KEY_BACK && !nwz_key_event_is_press(&evt))
+            break;
+    }
     /* close input device */
-    close(input_fd);
+    nwz_key_close(input_fd);
     /* finish nicely */
     return 0;
 }
- 

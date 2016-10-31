@@ -483,3 +483,22 @@ int nwz_power_is_fully_charged(int fd)
         return -1;
     return status;
 }
+
+int nwz_pminfo_open(void)
+{
+    return open(NWZ_PMINFO_DEV, O_RDONLY);
+}
+
+void nwz_pminfo_close(int fd)
+{
+    close(fd);
+}
+
+unsigned int nwz_pminfo_get_factor(int fd)
+{
+    unsigned int val;
+    if(ioctl(fd, NWZ_PMINFO_GET_FACTOR, &val) < 0)
+        return 0;
+    else
+        return val;
+}

@@ -158,4 +158,11 @@ int nwz_power_get_acc_charge_mode(int fd);
 /* is battery fully charged? (or -1 on error) */
 int nwz_power_is_fully_charged(int fd);
 
+/* open pminfo device */
+int nwz_pminfo_open(void);
+/* close pminfo device */
+void nwz_pminfo_close(int fd);
+/* get pminfo factor (or 0 on error) */
+unsigned int nwz_pminfo_get_factor(int fd);
+
 #endif /* _NWZLIB_H_ */
