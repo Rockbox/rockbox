@@ -11,6 +11,7 @@ all:
 	@echo "- exec_file: craft an upgrade that embeds and execute a file"
 	@echo "- exec_file_extern: craft an upgrade that execute a file on the user partition"
 	@echo "- list_targets: produce of list of available targets"
+	@echo "- install_dualboot"
 
 ifndef UPG
 want_upg:
@@ -33,7 +34,7 @@ endif
 ifndef NWZ_TARGET
 want_target:
 	$(info Please set NWZ_TARGET to your target. For example:)
-	$(info make dump_rootfs NWZ_TARGET=nwz-e463)
+	$(info make dump_rootfs NWZ_TARGET=nwz-e460)
 	$(info Run 'make list_targets' to get a list of all targets)
 	$(error "")
 else
@@ -71,6 +72,9 @@ UPGPACK=$(upgtool) -c -m $(NWZ_TARGET) $(UPG) $(1)
 
 exec_file: want_target want_exec want_upg
 	$(call UPGPACK, exec_file.sh $(EXEC))
+
+install_dualboot: want_target want_exec want_upg
+	$(call UPGPACK, install_dualboot.sh $(EXEC))
 
 exec_file_extern.tmp: want_exec want_upg want_log
 	cat exec_file_extern.sh.in | sed "s|NWZ_EXEC_THIS|$(EXEC)|" |\

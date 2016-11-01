@@ -30,7 +30,7 @@ const char *nwz_get_model_name(unsigned long model_id)
     return NULL;
 }
 
-void nwz_run(const char *file, const char *args[], bool wait)
+int nwz_run(const char *file, const char *args[], bool wait)
 {
     pid_t child_pid = fork();
     if(child_pid != 0)
@@ -39,12 +39,49 @@ void nwz_run(const char *file, const char *args[], bool wait)
         {
             int status;
             waitpid(child_pid, &status, 0);
+            return status;
         }
+        else
+            return 0;
     }
     else
     {
         execvp(file, (char * const *)args);
         _exit(1);
+    }
+}
+
+char *nwz_run_pipe(const char *file, const char *args[], int *status)
+{
+    int pipe_fds[2];
+    pipe(pipe_fds);
+    pid_t child_pid = fork();
+    if(child_pid == 0)
+    {
+        dup2(pipe_fds[1], 1); /* redirect stdout */
+        dup2(pipe_fds[1], 2); /* redirect stderr */
+        close(pipe_fds[0]); /* close reading */
+        close(pipe_fds[1]); /* close writing */
+        execvp(file, (char * const *)args);
+        _exit(1);
+    }
+    else
+    {
+        close(pipe_fds[1]); /* close writing */
+        char buffer[1024];
+        char *output = malloc(1);
+        ssize_t count;
+        size_t size = 0;
+        while((count = read(pipe_fds[0], buffer, sizeof(buffer))) > 0)
+        {
+            output = realloc(output, size + count + 1);
+            memcpy(output + size, buffer, count);
+            size += count;
+        }
+        close(pipe_fds[0]);
+        output[size] = 0;
+        waitpid(child_pid, status, 0);
+        return output;
     }
 }
 

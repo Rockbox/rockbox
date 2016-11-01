@@ -20,7 +20,7 @@ CONTENTS_PART=`mount | grep contents | awk '{ print $1 }'`
 
 lcdmsg -c -f /usr/local/bin/font_08x12.bmp -l 0,3 "Contents partition:\n$CONTENTS_PART"
 
-# 2) We need to remount the contents partition in read-write mode be able to
+# We need to remount the contents partition in read-write mode be able to
 # write something on it
 lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,6 "Remount $CONTENTS rw"
 if ! mount -o remount,rw $CONTENTS_PART $CONTENTS
@@ -55,7 +55,7 @@ fi
 lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,7 "Running file..."
 /tmp/exec >$CONTENTS/exec.txt 2>&1
 
-# 4) Success screen
+# Success screen
 lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "Rebooting in 3 seconds."
 sleep 3
 sync

@@ -30,6 +30,7 @@
 #include <linux/input.h>
 #include <fcntl.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "nwz_keys.h"
 #include "nwz_fb.h"
@@ -47,7 +48,9 @@ const char *nwz_get_model_name(unsigned long model_id);
 
 /* run a program and exit with nonzero status in case of error
  * argument list must be NULL terminated */
-void nwz_run(const char *file, const char *args[], bool wait);
+int nwz_run(const char *file, const char *args[], bool wait);
+/* run a program and return program output */
+char *nwz_run_pipe(const char *file, const char *args[], int *status);
 
 /* invoke /usr/bin/lcdmsg to display a message using the small font, optionally
  * clearing the screen before */
