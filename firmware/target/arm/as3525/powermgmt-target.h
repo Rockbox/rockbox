@@ -42,8 +42,8 @@
 #define BATT_CHG_I          CHG_I_140MA
 #define CHARGER_TOTAL_TIMER (4*3600*2)  /* about 1.5 * capacity / current */
 
-#elif defined(SANSA_CLIPV2)
 
+#elif defined(SANSA_CLIPV2)
 /* Check if topped-off and monitor voltage while plugged. */
 #define BATT_FULL_VOLTAGE   4200
 #define BATT_VAUTO_RECHARGE 4100

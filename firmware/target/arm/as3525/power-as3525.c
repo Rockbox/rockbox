@@ -73,3 +73,12 @@ bool tuner_powered(void)
     return true;
 }
 #endif
+#ifdef HAVE_ADJ_CHG_VOLTAGE
+/* voltages (millivolt) ,CHG_V Values*/
+const unsigned short volt_charge_to_chgv[7][2] =
+{
+
+{ 3900,CHG_V_3_90V}, {3950,CHG_V_3_95V}, {4000,CHG_V_4_00V},{4050,CHG_V_4_05V}, {4100,CHG_V_4_10V}, {4150,CHG_V_4_15V}, {4200,CHG_V_4_20V}
+
+};
+#endif /*HAVE_ADJ_CHG_VOLTAGE*/
