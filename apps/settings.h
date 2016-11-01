@@ -636,6 +636,9 @@ struct user_settings
 #ifdef HAVE_USB_CHARGING_ENABLE
     int usb_charging;
 #endif
+#ifdef VOLT_FINAL_CHG_MAX
+    int battery_final_volt; /* final charge voltage in millivolts */
+#endif
 
     /* device settings */
 #ifdef HAVE_LCD_CONTRAST
