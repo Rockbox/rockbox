@@ -167,6 +167,19 @@ void set_battery_capacity(int capacity); /* set local battery capacity value */
 int  get_battery_capacity(void); /* get local battery capacity value */
 void set_battery_type(int type); /* set local battery type */
 
+/* Set battery final voltage: if defined, one can tweak the final voltage
+ * from VOLT_FINAL_CHG_MIN to VOLT_FINAL_CHG_MAX in steps of VOLT_FINAL_CHG_INC
+ * millivolts. */
+#ifdef HAVE_BATTERY_FINAL_VOLT
+#if !defined(VOLT_FINAL_CHG_MAX) || !defined(VOLT_FINAL_CHG_MIN) || \
+    !defined(VOLT_FINAL_CHG_INC)
+#error please define VOLT_FINAL_CHG_{MIN,MAX,INC}
+#endif /* sanity check */
+/* Tell charger to change its final charge voltage. This change might not take
+ * effect only on the next cycle */
+void set_battery_final_voltage(int millivolts);
+#endif /* HAVE_BATTERY_FINAL_VOLT */
+
 void set_sleeptimer_duration(int minutes);
 int get_sleep_timer(void);
 void set_keypress_restarts_sleep_timer(bool enable);
