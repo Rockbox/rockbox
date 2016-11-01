@@ -402,6 +402,15 @@ void audiohw_set_sampr_dividers(int fsel);
 #define CHG_V_3_90V     (0x0 << 1)
 #define CHG_OFF         (0x1 << 0)
 
+/* unless overriden by target define, set final charging range from 3.9 to 4.2 */
+#ifndef VOLT_FINAL_CHG_MIN
+#define VOLT_FINAL_CHG_MIN  3900
+#endif
+#ifndef VOLT_FINAL_CHG_MAX
+#define VOLT_FINAL_CHG_MAX  4200
+#endif
+#define VOLT_FINAL_CHG_INC  50
+
 /* AS3514_IRQ_ENRD0 */
 #define CHG_TMPHIGH     (0x1 << 7)
 #define CHG_ENDOFCH     (0x1 << 6)
