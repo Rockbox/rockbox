@@ -51,6 +51,7 @@ enum {
     UNIT_KBIT,    /* kilobits per sec */
     UNIT_PM_TICK, /* peak meter units per tick */
     UNIT_TIME,    /* time duration/interval in seconds, says hours,mins,secs */
+    UNIT_MV,      /* milliVolts */
     UNIT_LAST     /* END MARKER */
 };
 

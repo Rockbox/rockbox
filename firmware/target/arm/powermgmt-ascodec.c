@@ -28,7 +28,8 @@
 #include "powermgmt.h"
 #include "power.h"
 #include "usb.h"
-
+#define LOGF_ENABLE
+#include "logf.h"
 /*===========================================================================
  * These parameters may be defined per target:
  * 
@@ -62,6 +63,10 @@ static int charger_total_timer = 0; /* Timeout in algorithm steps */
  * After charge cycle or non-start = BATT_VAUTO_RECHARGE
  */
 static unsigned int batt_threshold = 0;
+
+static unsigned int batt_chg_voltage = BATT_CHG_V;
+static unsigned int batt_full = BATT_FULL_VOLTAGE;
+static unsigned int batt_recharge = BATT_VAUTO_RECHARGE;
 
 /* ADC should read 0x3ff=5.12V */
 /* full-scale ADC readout (2^10) in millivolt */
@@ -105,8 +110,7 @@ static void disable_charger(void)
 /* Enable charger with specified settings. Start timers, etc. */
 static void enable_charger(void)
 {
-    ascodec_write_charger(BATT_CHG_I | BATT_CHG_V);
-
+    ascodec_write_charger(BATT_CHG_I | batt_chg_voltage);
     sleep(HZ/10); /* Allow charger turn-on time (it could be gradual). */
 
 #if CONFIG_CPU != AS3525v2
@@ -122,6 +126,43 @@ static void enable_charger(void)
     battery_voltage_sync();
 }
 
+#ifdef HAVE_BATTERY_FINAL_VOLT
+
+#if CHG_V_4_20V != BATT_CHG_V
+#error this code assumes a maximum charging voltage of 4.2V
+#endif
+/* voltages (millivolt) to CHG_V table */
+static const struct
+{
+    int mv;
+    int chg_v;
+} volt_charge_to_chgv[] =
+{
+    { 3900, CHG_V_3_90V },
+    { 3950, CHG_V_3_95V },
+    { 4000, CHG_V_4_00V },
+    { 4050, CHG_V_4_05V },
+    { 4100, CHG_V_4_10V },
+    { 4150, CHG_V_4_15V },
+    { 4200, CHG_V_4_20V }
+};
+
+void set_battery_final_voltage(int millivolts)
+{
+    /* setup default values, the defines are calibrated for 4.2V */
+    batt_full = BATT_FULL_VOLTAGE + millivolts - 4200;
+    batt_recharge = BATT_VAUTO_RECHARGE + millivolts - 4200;
+    batt_chg_voltage = CHG_V_4_20V; /* fallback value if tablel lookup fails */
+    for (unsigned i = 0; i < ARRAYLEN(volt_charge_to_chgv); i++)
+        if (volt_charge_to_chgv[i].mv == millivolts)
+            /* adjust voltage */
+            batt_chg_voltage = volt_charge_to_chgv[i].chg_v;
+    /* the effet of the change will only be visible on the next cycle */
+    logf ("set battery final voltage: %d mV, ful: %d mV, recharge: %d mV",
+         millivolts, batt_full, batt_recharge);
+}
+#endif /*HAVE_BATTERY_FINAL_VOLT*/
+
 void powermgmt_init_target(void)
 {
     /* Everything CHARGER, OFF! */
@@ -131,7 +172,7 @@ void powermgmt_init_target(void)
 
 static inline void charger_plugged(void)
 {
-    batt_threshold = BATT_FULL_VOLTAGE; /* Start with topped value. */
+    batt_threshold = batt_full; /* Start with topped value. */
     battery_voltage_sync();
 }
 
@@ -144,13 +185,13 @@ static inline void charger_control(void)
         unsigned int millivolts;
         unsigned int thresh = batt_threshold;
 
-        if (BATT_FULL_VOLTAGE == thresh)
+        if (batt_full == thresh)
         {
             /* Wait for CHG_status to be indicated. */
             if (!ascodec_chg_status())
                 break;
 
-            batt_threshold = BATT_VAUTO_RECHARGE;
+            batt_threshold = batt_recharge;
         }
 
         millivolts = battery_voltage();
