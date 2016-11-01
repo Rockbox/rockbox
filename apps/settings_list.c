@@ -1028,6 +1028,12 @@ const struct settings_list settings[] = {
                    "alkaline,nimh", NULL, 2, ID2P(LANG_BATTERY_TYPE_ALKALINE),
                    ID2P(LANG_BATTERY_TYPE_NIMH)),
 #endif
+#ifdef HAVE_BATTERY_FINAL_VOLT
+        INT_SETTING(0, battery_final_volt, LANG_BATTERY_FINAL_VOLT,
+                VOLT_FINAL_CHG_MAX, "battery final voltage", UNIT_MV,
+                VOLT_FINAL_CHG_MIN, VOLT_FINAL_CHG_MAX,
+                VOLT_FINAL_CHG_INC, NULL, NULL, set_battery_final_voltage),
+#endif
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
     INT_SETTING(0, remote_contrast, LANG_CONTRAST,

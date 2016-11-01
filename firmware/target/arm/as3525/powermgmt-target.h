@@ -100,6 +100,11 @@
 #error "Charger settings not defined!"
 #endif
 
+/* set final charging range from 3.9 to 4.2 */
+#define VOLT_FINAL_CHG_MIN  3900
+#define VOLT_FINAL_CHG_MAX  4200
+#define VOLT_FINAL_CHG_INC  50
+
 /* We want to be able to reset the averaging filter */
 #define HAVE_RESET_BATTERY_FILTER
 

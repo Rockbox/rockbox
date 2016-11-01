@@ -13479,3 +13479,20 @@
     ibassodx90: "Android Debug Bridge"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BATTERY_FINAL_VOLT
+  desc: in Battery menu, change battery charger final voltage
+  user: core
+  <source>
+    *: none
+    battery_final_volt: "Final charge voltage"
+  </source>
+  <dest>
+    *: none
+    battery_final_volt: "Final charge voltage"
+  </dest>
+  <voice>
+    *: none
+    battery_final_volt: "Final charge voltage"
+  </voice>
+</phrase>

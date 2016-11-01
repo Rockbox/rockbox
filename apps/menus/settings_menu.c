@@ -178,6 +178,11 @@ MENUITEM_SETTING(battery_capacity, &global_settings.battery_capacity, NULL);
 #if BATTERY_TYPES_COUNT > 1
 MENUITEM_SETTING(battery_type, &global_settings.battery_type, NULL);
 #endif
+#ifdef HAVE_BATTERY_FINAL_VOLT
+MENUITEM_SETTING(battery_final_volt, &global_settings.battery_final_volt, NULL);
+#endif
+
+
 #ifdef HAVE_USB_CHARGING_ENABLE
 static int usbcharging_callback(int action,const struct menu_item_ex *this_item)
 {
@@ -201,6 +206,9 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
 #endif
 #ifdef HAVE_USB_CHARGING_ENABLE
             &usb_charging,
+#endif
+#ifdef HAVE_BATTERY_FINAL_VOLT
+            &battery_final_volt
 #endif
          );
 /* Disk */
@@ -337,7 +345,7 @@ MENUITEM_SETTING(usb_mode, &global_settings.usb_mode, NULL);
 
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
           0, Icon_System_menu,
-#if (BATTERY_CAPACITY_INC > 0) || (BATTERY_TYPES_COUNT > 1)
+#if (BATTERY_CAPACITY_INC > 0) || (BATTERY_TYPES_COUNT > 1 || defined(HAVE_BATTERY_FINAL_VOLT) )
             &battery_menu,
 #endif
 #if defined(HAVE_DIRCACHE) || defined(HAVE_DISK_STORAGE)

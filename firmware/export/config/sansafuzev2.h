@@ -229,3 +229,6 @@
 
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY
+
+/* Define this if final charge voltage is configurable */
+#define HAVE_BATTERY_FINAL_VOLT
