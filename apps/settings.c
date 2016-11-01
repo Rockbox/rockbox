@@ -907,6 +907,10 @@ void settings_apply(bool read_disk)
     set_battery_capacity(global_settings.battery_capacity);
 #endif
 
+#ifdef VOLT_FINAL_CHG_MAX
+    set_battery_final_voltage(global_settings.battery_final_volt);
+#endif
+
 #if BATTERY_TYPES_COUNT > 1
     set_battery_type(global_settings.battery_type);
 #endif
