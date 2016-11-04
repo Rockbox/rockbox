@@ -23,12 +23,20 @@
 #ifndef __XWORLD_SYS_H__
 #define __XWORLD_SYS_H__
 
+#include "plugin.h"
 #include "intern.h"
 
-#define SYS_NEGATIVE_COLOR
+#if (PLUGIN_BUFFER_SIZE >= 0x80000 && defined(HAVE_LCD_COLOR) && LCD_DEPTH < 24)
+#define SYS_MOTION_BLUR
+/* must be odd */
+#define BLUR_FRAMES 3
+#else
+#error lol
+#endif
+
 #define NUM_COLORS 16
 #define MAX_MUTEXES 16
-#define SETTINGS_FILE "settings.xfg"
+#define SETTINGS_FILE "settings.zfg" /* change when backwards-compatibility is broken */
 #define CODE_X 80
 #define CODE_Y 36
 
@@ -103,6 +111,7 @@ struct System {
         bool sound_enabled;
         int sound_bufsize;
         bool zoom;
+        bool blur;
     } settings;
 };
 

@@ -130,13 +130,32 @@ static bool sys_do_help(void)
     rb->lcd_set_background(LCD_BLACK);
 #endif
     rb->lcd_setfont(FONT_UI);
-    char* help_text[] = {"XWorld", "",
-                         "XWorld", "is", "an", "interpreter", "for", "Another", "World,", "a", "fantastic", "game", "by", "Eric", "Chahi."
-                        };
-    struct style_text style[] = {
-        {0, TEXT_CENTER | TEXT_UNDERLINE},
-        LAST_STYLE_ITEM
+    char *help_text[] = {
+        "XWorld", "",
+        "XWorld", "is", "a", "port", "of", "a", "bytecode", "interpreter", "for", "`Another", "World',", "a", "cinematic", "adventure", "game", "by", "Eric", "Chahi.",
+        "",
+        "",
+        "Level", "Codes:", "",
+        "Level", "1:", "LDKD", "",
+        "Level", "2:", "HTDC", "",
+        "Level", "3:", "CLLD", "",
+        "Level", "4:", "LBKG", "",
+        "Level", "5:", "XDDJ", "",
+        "Level", "6:", "FXLC", "",
+        "Level", "7:", "KRFK", "",
+        "Level", "8:", "KFLB", "",
+        "Level", "9:", "DDRX", "",
+        "Level", "10:", "BFLX", "",
+        "Level", "11:", "BRTD", "",
+        "Level", "12:", "TFBB", "",
+        "Level", "13:", "TXHF", "",
+        "Level", "14:", "CKJL", "",
+        "Level", "15:", "LFCK", "",
     };
+    struct style_text style[] = {
+        { 0, TEXT_CENTER | TEXT_UNDERLINE },
+    };
+
     return display_text(ARRAYLEN(help_text), help_text, style, NULL, true);
 }
 
@@ -149,19 +168,22 @@ static const struct opt_items scaling_settings[3] = {
 };
 
 static const struct opt_items rotation_settings[3] = {
-    { "Disabled"     , -1 },
-    { "Clockwise"    , -1 },
-    { "Anticlockwise", -1 }
+    { "Disabled"        , -1 },
+    { "Clockwise"       , -1 },
+    { "Counterclockwise", -1 }
 };
 
 static void do_video_settings(struct System* sys)
 {
     MENUITEM_STRINGLIST(menu, "Video Settings", NULL,
                         "Negative",
+#ifdef SYS_MOTION_BLUR
+                        "Motion Blur",
+#endif
                         "Scaling",
                         "Rotation",
                         "Show FPS",
-                        "Zoom on code",
+                        "Zoom on Code",
                         "Back");
     int sel = 0;
     while(1)
@@ -171,7 +193,16 @@ static void do_video_settings(struct System* sys)
         case 0:
             rb->set_bool("Negative", &sys->settings.negative_enabled);
             break;
+#ifdef SYS_MOTION_BLUR
         case 1:
+            rb->set_bool("Motion Blur", &sys->settings.blur);
+            break;
+#endif
+#ifndef SYS_MOTION_BLUR
+        case 1:
+#else
+        case 2:
+#endif
             rb->set_option("Scaling", &sys->settings.scaling_quality, INT, scaling_settings,
 #ifdef HAVE_LCD_COLOR
                            3
@@ -186,7 +217,11 @@ static void do_video_settings(struct System* sys)
                 sys->settings.zoom = false;
             }
             break;
+#ifndef SYS_MOTION_BLUR
         case 2:
+#else
+        case 3:
+#endif
             rb->set_option("Rotation", &sys->settings.rotation_option, INT, rotation_settings, 3, NULL);
             if(sys->settings.rotation_option &&
                sys->settings.zoom)
@@ -196,45 +231,42 @@ static void do_video_settings(struct System* sys)
             }
             sys_rotate_keymap(sys);
             break;
+#ifndef SYS_MOTION_BLUR
         case 3:
+#else
+        case 4:
+#endif
             rb->set_bool("Show FPS", &sys->settings.showfps);
             break;
+#ifndef SYS_MOTION_BLUR
         case 4:
-            rb->set_bool("Zoom on code", &sys->settings.zoom);
+#else
+        case 5:
+#endif
+            rb->set_bool("Zoom on Code", &sys->settings.zoom);
             /* zoom only works with scaling and rotation disabled */
-            if(sys->settings.zoom &&
-               ( sys->settings.scaling_quality |
-                 sys->settings.rotation_option))
+            if(sys->settings.zoom && (sys->settings.scaling_quality || sys->settings.rotation_option))
             {
                 rb->splash(HZ*2, "Scaling and rotation automatically disabled.");
                 sys->settings.scaling_quality = 0;
                 sys->settings.rotation_option = 0;
             }
             break;
-        case 5:
-            rb->lcd_clear_display();
+        default:
             sys_save_settings(sys);
             return;
         }
     }
 }
 
-#define MAX_SOUNDBUF_SIZE 512
-const struct opt_items sound_bufsize_options[] = {
-    {"8 samples"  , 8},
-    {"16 samples" , 16},
-    {"32 samples" , 32},
-    {"64 samples" , 64},
-    {"128 samples", 128},
-    {"256 samples", 256},
-    {"512 samples", 512},
-};
+#define MAX_SOUNDBUF_SIZE 256
 
 static void do_sound_settings(struct System* sys)
 {
     MENUITEM_STRINGLIST(menu, "Sound Settings", NULL,
                         "Enabled",
                         "Buffer Level",
+                        "Volume",
                         "Back",
                        );
     int sel = 0;
@@ -246,10 +278,17 @@ static void do_sound_settings(struct System* sys)
             rb->set_bool("Enabled", &sys->settings.sound_enabled);
             break;
         case 1:
-            rb->set_option("Buffer Level", &sys->settings.sound_bufsize, INT,
-                           sound_bufsize_options, ARRAYLEN(sound_bufsize_options), NULL);
+            rb->set_int("Buffer Level", "samples", UNIT_INT, &sys->settings.sound_bufsize, NULL, 16, 16, MAX_SOUNDBUF_SIZE, NULL);
             break;
         case 2:
+        {
+            const struct settings_list* vol =
+                rb->find_setting(&rb->global_settings->volume, NULL);
+            rb->option_screen((struct settings_list*)vol, NULL, false, "Volume");
+            break;
+        }
+        case 3:
+        default:
             sys_save_settings(sys);
             return;
         }
@@ -259,12 +298,13 @@ static void do_sound_settings(struct System* sys)
 static void sys_reset_settings(struct System* sys)
 {
     sys->settings.negative_enabled = false;
-    sys->settings.rotation_option = 0;
-    sys->settings.scaling_quality = 1;
+    sys->settings.rotation_option = 0;   // off
+    sys->settings.scaling_quality = 1;   // fast
     sys->settings.sound_enabled = true;
-    sys->settings.sound_bufsize = 64;
-    sys->settings.showfps = true;
+    sys->settings.sound_bufsize = 32;    /* keep this low */
+    sys->settings.showfps = false;
     sys->settings.zoom = false;
+    sys->settings.blur = false;
     sys_rotate_keymap(sys);
 }
 
@@ -278,18 +318,32 @@ static int mainmenu_cb(int action, const struct menu_item_ex *this_item)
     return action;
 }
 
-static AudioCallback audio_callback;
+static AudioCallback audio_callback = NULL;
+static void get_more(const void** start, size_t* size);
 static void* audio_param;
 static struct System* audio_sys;
 
 /************************************** MAIN MENU ***************************************/
+/* called after game init */
 
 void sys_menu(struct System* sys)
 {
     sys_stopAudio(sys);
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    /* boost for load */
+    rb->cpu_boost(true);
+#endif
+
     rb->splash(0, "Loading...");
     sys->loaded = engine_loadGameState(sys->e, 0);
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(false);
+#endif
+
     rb->lcd_update();
+
     mainmenu_sysptr = sys;
     MENUITEM_STRINGLIST(menu, "XWorld Menu", mainmenu_cb,
                         "Resume Game",          /* 0  */
@@ -352,19 +406,21 @@ void sys_menu(struct System* sys)
             exit(PLUGIN_OK);
             break;
         default:
-            error("sys_menu: fall-through!");
+            break;
         }
     }
-    rb->lcd_clear_display();
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    /* boost for game */
+    rb->cpu_boost(true);
+#endif
+
     sys_startAudio(sys, audio_callback, audio_param);
 }
 
 void sys_init(struct System* sys, const char* title)
 {
     (void) title;
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
-#endif
     backlight_ignore_timeout();
     rb_atexit(exit_handler);
     save_sys = sys;
@@ -565,9 +621,9 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
                 int r, g, b;
                 fb_data pix = rb->lcd_framebuffer[y * LCD_WIDTH + x];
 #if (LCD_DEPTH == 24)
-                r = pix.r;
-                g = pix.g;
-                b = pix.b;
+                r = 0xff - pix.r;
+                g = 0xff - pix.g;
+                b = 0xff - pix.b;
                 rb->lcd_framebuffer[y * LCD_WIDTH + x] = (fb_data) { b, g, r };
 #else
                 r = RGB_UNPACK_RED  (pix);
@@ -581,6 +637,57 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
             }
         }
     }
+
+#ifdef SYS_MOTION_BLUR
+    if(sys->settings.blur)
+    {
+        static fb_data *prev_frames = NULL;
+        static fb_data *orig_fb = NULL;
+        static int prev_baseidx = 0; /* circular buffer */
+        if(!prev_frames)
+        {
+            prev_frames = sys_get_buffer(sys, sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT * BLUR_FRAMES);
+            orig_fb = sys_get_buffer(sys, sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT);
+
+            rb->memset(prev_frames, 0, sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT * BLUR_FRAMES);
+        }
+        if(prev_frames && orig_fb)
+        {
+
+            rb->memcpy(orig_fb, rb->lcd_framebuffer, sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT);
+            /* fancy useless slow motion blur */
+            for(int y = 0; y < LCD_HEIGHT; ++y)
+            {
+                for(int x = 0; x < LCD_WIDTH; ++x)
+                {
+                    int r, g, b;
+                    fb_data pix = rb->lcd_framebuffer[y * LCD_WIDTH + x];
+                    r = RGB_UNPACK_RED  (pix);
+                    g = RGB_UNPACK_GREEN(pix);
+                    b = RGB_UNPACK_BLUE (pix);
+                    r *= BLUR_FRAMES + 1;
+                    g *= BLUR_FRAMES + 1;
+                    b *= BLUR_FRAMES + 1;
+                    for(int i = 0; i < BLUR_FRAMES; ++i)
+                    {
+                        fb_data prev_pix = prev_frames[ (prev_baseidx + i * (LCD_WIDTH * LCD_HEIGHT)) % (LCD_WIDTH * LCD_HEIGHT * BLUR_FRAMES) + y * LCD_WIDTH + x];
+                        r += (BLUR_FRAMES-i) * RGB_UNPACK_RED(prev_pix);
+                        g += (BLUR_FRAMES-i) * RGB_UNPACK_GREEN(prev_pix);
+                        b += (BLUR_FRAMES-i) * RGB_UNPACK_BLUE(prev_pix);
+                    }
+                    r /= (BLUR_FRAMES + 1) / 2 * (1 + BLUR_FRAMES + 1);
+                    g /= (BLUR_FRAMES + 1) / 2 * (1 + BLUR_FRAMES + 1);
+                    b /= (BLUR_FRAMES + 1) / 2 * (1 + BLUR_FRAMES + 1);
+                    rb->lcd_framebuffer[y * LCD_WIDTH + x] = LCD_RGBPACK(r, g, b);
+                }
+            }
+            prev_baseidx -= LCD_WIDTH * LCD_HEIGHT;
+            if(prev_baseidx < 0)
+                prev_baseidx += BLUR_FRAMES * LCD_WIDTH * LCD_HEIGHT;
+            rb->memcpy(prev_frames + prev_baseidx, orig_fb, sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT);
+        }
+    }
+#endif
 
     /*********************** SHOW FPS *************************/
 
@@ -599,6 +706,11 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
 static void do_pause_menu(struct System* sys)
 {
     sys_stopAudio(sys);
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(false);
+#endif
+
     int sel = 0;
     MENUITEM_STRINGLIST(menu, "XWorld Menu", NULL,
                         "Resume Game",         /* 0 */
@@ -663,37 +775,28 @@ static void do_pause_menu(struct System* sys)
             break;
         }
     }
-    rb->lcd_clear_display();
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(true);
+#endif
+
     sys_startAudio(sys, audio_callback, audio_param);
 }
 
 void sys_processEvents(struct System* sys)
 {
-    int btn = rb->button_get(false);
-    btn &= ~BUTTON_REDRAW;
+    int btn = rb->button_status();
+    rb->button_clear_queue();
+
+    static int oldbuttonstate = 0;
+
     debug(DBG_SYS, "button is 0x%08x", btn);
 
     /* exit early if we can */
-    if(btn == BUTTON_NONE)
+    if(btn == oldbuttonstate)
     {
         return;
     }
-
-    /* Ignore some buttons that cause errant input */
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-    if(btn & 0x80000000)
-        return;
-#endif
-#if (CONFIG_KEYPAD == SANSA_E200_PAD)
-    if(btn == (BUTTON_SCROLL_FWD || BUTTON_SCROLL_BACK))
-        return;
-#endif
-#if (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
-    if(btn == (BUTTON_SELECT))
-        return;
-#endif
 
     /* handle special keys first */
     switch(btn)
@@ -709,6 +812,93 @@ void sys_processEvents(struct System* sys)
         break;
     }
 
+    /* Ignore some buttons that cause errant input */
+
+    btn &= ~BUTTON_REDRAW;
+
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+    if(btn & 0x80000000)
+        return;
+#endif
+
+#if (CONFIG_KEYPAD == SANSA_E200_PAD)
+    if(btn == (BUTTON_SCROLL_FWD || BUTTON_SCROLL_BACK))
+        return;
+#endif
+
+#if (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
+    if(btn == (BUTTON_SELECT))
+        return;
+#endif
+
+    /* copied from doom which was copied from rockboy... */
+    unsigned released = ~btn & oldbuttonstate;
+    unsigned pressed = btn & ~oldbuttonstate;
+    oldbuttonstate = btn;
+
+    if(released)
+    {
+        if(released & BTN_FIRE)
+            sys->input.button = false;
+        if(released & sys->keymap.up)
+            sys->input.dirMask &= ~DIR_UP;
+        if(released & sys->keymap.down)
+            sys->input.dirMask &= ~DIR_DOWN;
+        if(released & sys->keymap.left)
+            sys->input.dirMask &= ~DIR_LEFT;
+        if(released & sys->keymap.right)
+            sys->input.dirMask &= ~DIR_RIGHT;
+#ifdef BTN_DOWN_LEFT
+        if(released & sys->keymap.downleft)
+            sys->input.dirMask &= ~(DIR_DOWN | DIR_LEFT);
+#endif
+#ifdef BTN_DOWN_RIGHT
+        if(released & sys->keymap.downright)
+            sys->input.dirMask &= ~(DIR_DOWN | DIR_RIGHT);
+#endif
+#ifdef BTN_UP_LEFT
+        if(released & sys->keymap.upleft)
+            sys->input.dirMask &= ~(DIR_UP | DIR_LEFT);
+#endif
+#ifdef BTN_UP_RIGHT
+        if(released & sys->keymap.upright)
+            sys->input.dirMask &= ~(DIR_UP | DIR_RIGHT);
+#endif
+    }
+
+    if(pressed)
+    {
+        if(pressed & BTN_FIRE)
+            sys->input.button = true;
+        if(pressed & sys->keymap.up)
+            sys->input.dirMask |= DIR_UP;
+        if(pressed & sys->keymap.down)
+            sys->input.dirMask |= DIR_DOWN;
+        if(pressed & sys->keymap.left)
+            sys->input.dirMask |= DIR_LEFT;
+        if(pressed & sys->keymap.right)
+            sys->input.dirMask |= DIR_RIGHT;
+#ifdef BTN_DOWN_LEFT
+        if(pressed & sys->keymap.downleft)
+            sys->input.dirMask |= (DIR_DOWN | DIR_LEFT);
+#endif
+#ifdef BTN_DOWN_RIGHT
+        if(pressed & sys->keymap.downright)
+            sys->input.dirMask |= (DIR_DOWN | DIR_RIGHT);
+#endif
+#ifdef BTN_UP_LEFT
+        if(pressed & sys->keymap.upleft)
+            sys->input.dirMask |= (DIR_UP | DIR_LEFT);
+#endif
+#ifdef BTN_UP_RIGHT
+        if(pressed & sys->keymap.upright)
+            sys->input.dirMask |= (DIR_UP | DIR_RIGHT);
+#endif
+    }
+
+#if 0
     /* handle releases */
     if(btn & BUTTON_REL)
     {
@@ -774,6 +964,7 @@ void sys_processEvents(struct System* sys)
     }
     debug(DBG_SYS, "dirMask is 0x%02x", sys->input.dirMask);
     debug(DBG_SYS, "button is %s", sys->input.button == true ? "true" : "false");
+#endif
 }
 
 void sys_sleep(struct System* sys, uint32_t duration)
@@ -789,26 +980,28 @@ uint32_t sys_getTimeStamp(struct System* sys)
     return (uint32_t) (*rb->current_tick * (1000/HZ));
 }
 
-static int16_t rb_soundbuf [MAX_SOUNDBUF_SIZE] IBSS_ATTR;
-static int8_t temp_soundbuf[MAX_SOUNDBUF_SIZE] IBSS_ATTR;
-static void ICODE_ATTR get_more(const void** start, size_t* size)
+/* game provides us mono samples, we need stereo */
+static int16_t rb_soundbuf[MAX_SOUNDBUF_SIZE * 2];
+static int8_t temp_soundbuf[MAX_SOUNDBUF_SIZE];
+
+static void get_more(const void** start, size_t* size)
 {
-    if(audio_sys->settings.sound_enabled)
+    if(audio_sys->settings.sound_enabled && audio_callback)
     {
         audio_callback(audio_param, temp_soundbuf, audio_sys->settings.sound_bufsize);
-        /* convert xworld format (signed 8-bit) to rockbox format (signed 16-bit) */
+
+        /* convert xworld format (signed 8-bit) to rockbox format (stereo signed 16-bit) */
         for(int i = 0; i < audio_sys->settings.sound_bufsize; ++i)
         {
-            rb_soundbuf[i] = temp_soundbuf[i] * 0x100;
+            rb_soundbuf[2*i] = rb_soundbuf[2*i+1] = temp_soundbuf[i] * 256;
         }
-        *start = rb_soundbuf;
-        *size = audio_sys->settings.sound_bufsize;
     }
     else
     {
-        *start = NULL;
-        *size = 0;
+        rb->memset(rb_soundbuf, 0, audio_sys->settings.sound_bufsize * 2 * sizeof(int16_t));
     }
+    *start = rb_soundbuf;
+    *size = audio_sys->settings.sound_bufsize * 2 * sizeof(int16_t);
 }
 
 void sys_startAudio(struct System* sys, AudioCallback callback, void *param)
@@ -817,6 +1010,7 @@ void sys_startAudio(struct System* sys, AudioCallback callback, void *param)
     audio_callback = callback;
     audio_param = param;
     audio_sys = sys;
+
     rb->pcm_play_data(get_more, NULL, NULL, 0);
 }
 
@@ -872,13 +1066,18 @@ void *sys_createMutex(struct System* sys)
 {
     if(!sys)
         error("sys is NULL!");
+
+    debug(DBG_SYS, "allocating mutex");
+
+    /* this bitfield works as follows: bit set = free, unset = in use */
     for(int i = 0; i < MAX_MUTEXES; ++i)
     {
+        /* check that the corresponding bit is 1 (free) */
         if(sys->mutex_bitfield & (1 << i))
         {
-            rb->mutex_init(&sys->mutex_memory[i]);
-            sys->mutex_bitfield |= (1 << i);
-            return &sys->mutex_memory[i];
+            rb->mutex_init(sys->mutex_memory + i);
+            sys->mutex_bitfield &= ~(1 << i);
+            return sys->mutex_memory + i;
         }
     }
     warning("Out of mutexes!");
@@ -888,20 +1087,18 @@ void *sys_createMutex(struct System* sys)
 void sys_destroyMutex(struct System* sys, void *mutex)
 {
     int mutex_number = ((char*)mutex - (char*)sys->mutex_memory) / sizeof(struct mutex); /* pointer arithmetic! check for bugs! */
-    sys->mutex_bitfield &= ~(1 << mutex_number);
+    sys->mutex_bitfield |= 1 << mutex_number;
 }
 
 void sys_lockMutex(struct System* sys, void *mutex)
 {
     (void) sys;
-    debug(DBG_SYS, "calling mutex_lock");
     rb->mutex_lock((struct mutex*) mutex);
 }
 
 void sys_unlockMutex(struct System* sys, void *mutex)
 {
     (void) sys;
-    debug(DBG_SYS, "calling mutex_unlock");
     rb->mutex_unlock((struct mutex*) mutex);
 }
 
@@ -937,4 +1134,5 @@ void MutexStack(struct MutexStack_t* s, struct System *stub, void *mutex)
 void MutexStack_destroy(struct MutexStack_t* s)
 {
     sys_unlockMutex(s->sys, s->_mutex);
+
 }

@@ -24,7 +24,7 @@
 #include "serializer.h"
 #include "sys.h"
 
-static int8_t ICODE_ATTR addclamp(int a, int b) {
+static int8_t addclamp(int a, int b) {
     int add = a + b;
     if (add < -128) {
         add = -128;
@@ -121,11 +121,11 @@ void mixer_stopAll(struct Mixer* mx) {
 /* Since there is no way to know when SDL will ask for a buffer fill, we need */
 /* to synchronize with a mutex so the channels remain stable during the execution */
 /* of this method. */
-static void ICODE_ATTR mixer_mix(struct Mixer* mx, int8_t *buf, int len) {
+static void mixer_mix(struct Mixer* mx, int8_t *buf, int len) {
     int8_t *pBuf;
 
-    struct MutexStack_t ms;
-    MutexStack(&ms, mx->sys, mx->_mutex);
+    /* disabled because this will be called in IRQ */
+    /*sys_lockMutex(mx->sys, mx->_mutex);*/
 
     /* Clear the buffer since nothing guarantees we are receiving clean memory. */
     rb->memset(buf, 0, len);
@@ -170,11 +170,10 @@ static void ICODE_ATTR mixer_mix(struct Mixer* mx, int8_t *buf, int len) {
 
     }
 
-    MutexStack_destroy(&ms);
+    /*sys_unlockMutex(mx->sys, mx->_mutex);*/
 }
 
-static void ICODE_ATTR mixer_mixCallback(void *param, uint8_t *buf, int len) {
-    debug(DBG_SND, "mixer_mixCallback");
+static void mixer_mixCallback(void *param, uint8_t *buf, int len) {
     mixer_mix((struct Mixer*)param, (int8_t *)buf, len);
 }
 

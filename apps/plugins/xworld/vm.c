@@ -52,7 +52,13 @@ void vm_init(struct VirtualMachine* m) {
 
     rb->memset(m->vmVariables, 0, sizeof(m->vmVariables));
     m->vmVariables[0x54] = 0x81;
-    m->vmVariables[VM_VARIABLE_RANDOM_SEED] = *rb->current_tick;
+    m->vmVariables[VM_VARIABLE_RANDOM_SEED] = *rb->current_tick % 0x10000;
+
+    /* rawgl has these, but they don't seem to do anything */
+    //m->vmVariables[0xBC] = 0x10;
+    //m->vmVariables[0xC6] = 0x80;
+    //m->vmVariables[0xF2] = 4000;
+    //m->vmVariables[0xDC] = 33;
 
     m->_fastMode = false;
     m->player->_markVar = &m->vmVariables[VM_VARIABLE_MUS_MARK];
@@ -81,7 +87,7 @@ void vm_op_add(struct VirtualMachine* m) {
 
 void vm_op_addConst(struct VirtualMachine* m) {
     if (m->res->currentPartId == 0x3E86 && m->_scriptPtr.pc == m->res->segBytecode + 0x6D48) {
-        warning("vm_op_addConst() hack for non-stop looping gun sound bug");
+        //warning("vm_op_addConst() hack for non-stop looping gun sound bug");
         // the script 0x27 slot 0x17 doesn't stop the gun sound from looping, I
         // don't really know why ; for now, let's play the 'stopping sound' like
         // the other scripts do
@@ -152,10 +158,9 @@ void vm_op_jnz(struct VirtualMachine* m) {
 #define BYPASS_PROTECTION
 void vm_op_condJmp(struct VirtualMachine* m) {
 
-    //printf("Jump : %X \n",m->_scriptPtr.pc-m->res->segBytecode);
+    //debug(DBG_VM, "Jump : %X \n",m->_scriptPtr.pc-m->res->segBytecode);
 //FCS Whoever wrote this is patching the bytecode on the fly. This is ballzy !!
-#ifdef BYPASS_PROTECTION
-
+#if 0
     if (m->res->currentPartId == GAME_PART_FIRST && m->_scriptPtr.pc == m->res->segBytecode + 0xCB9) {
 
         // (0x0CB8) condJmp(0x80, VAR(41), VAR(30), 0xCD3)
@@ -168,6 +173,8 @@ void vm_op_condJmp(struct VirtualMachine* m) {
         debug(DBG_VM, "vm_op_condJmp() bypassing protection");
         debug(DBG_VM, "bytecode has been patched");
 
+        //warning("bypassing protection");
+
         //vm_bypassProtection(m);
     }
 
@@ -175,7 +182,8 @@ void vm_op_condJmp(struct VirtualMachine* m) {
 #endif
 
     uint8_t opcode = scriptPtr_fetchByte(&m->_scriptPtr);
-    int16_t b = m->vmVariables[scriptPtr_fetchByte(&m->_scriptPtr)];
+    uint8_t var = scriptPtr_fetchByte(&m->_scriptPtr);
+    int16_t b = m->vmVariables[var];
     uint8_t c = scriptPtr_fetchByte(&m->_scriptPtr);
     int16_t a;
 
@@ -193,6 +201,22 @@ void vm_op_condJmp(struct VirtualMachine* m) {
     switch (opcode & 7) {
     case 0:     // jz
         expr = (b == a);
+
+#ifdef BYPASS_PROTECTION
+        /* always succeed in code wheel verification */
+        if (m->res->currentPartId == GAME_PART_FIRST && var == 0x29 && (opcode & 0x80) != 0) {
+
+            m->vmVariables[0x29] = m->vmVariables[0x1E];
+            m->vmVariables[0x2A] = m->vmVariables[0x1F];
+            m->vmVariables[0x2B] = m->vmVariables[0x20];
+            m->vmVariables[0x2C] = m->vmVariables[0x21];
+            // counters
+            m->vmVariables[0x32] = 6;
+            m->vmVariables[0x64] = 20;
+            expr = true;
+            //warning("Script::op_condJmp() bypassing protection");
+        }
+#endif
         break;
     case 1: // jnz
         expr = (b != a);
@@ -605,8 +629,6 @@ void vm_executeThread(struct VirtualMachine* m) {
         {
             (vm_opcodeTable[opcode])(m);
         }
-
-        rb->yield();
     }
 }
 
