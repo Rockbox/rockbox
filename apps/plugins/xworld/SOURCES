@@ -1,7 +1,6 @@
 bank.c
 engine.c
 file.c
-intern.c
 mixer.c
 parts.c
 resource.c

@@ -61,6 +61,9 @@ void engine_run(struct Engine* e) {
         engine_processInput(e);
 
         vm_hostFrame(&e->vm);
+
+        /* only yield() in the whole game :P */
+        rb->yield();
     }
 
 }
@@ -259,11 +262,11 @@ void engine_init(struct Engine* e) {
     player_init(&e->player);
 
     /* Init virtual machine, legacy way */
-    /* vm_initForPart(&e->vm, GAME_PART_FIRST); // This game part is the protection screen */
+    vm_initForPart(&e->vm, GAME_PART_FIRST); // This game part is the protection screen */
 
     /*  Try to cheat here. You can jump anywhere but the VM crashes afterward. */
     /*  Starting somewhere is probably not enough, the variables and calls return are probably missing. */
-    /* vm_initForPart(&e->vm, GAME_PART2);  Skip protection screen and go directly to intro */
+    /* vm_initForPart(&e->vm, GAME_PART2); Skip protection screen and go directly to intro */
     /* vm_initForPart(&e->vm, GAME_PART3);  CRASH */
     /* vm_initForPart(&e->vm, GAME_PART4);  Start directly in jail but then crash */
     /* vm->initForPart(&e->vm, GAME_PART5);   CRASH */

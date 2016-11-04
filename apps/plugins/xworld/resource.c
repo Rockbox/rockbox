@@ -354,12 +354,14 @@ void res_allocMemBlock(struct Resource* res) {
         rb->audio_stop();
     /* steal the audio buffer */
     size_t sz;
-    /* memory usage is as follows:
-       [VM memory - 600K]
-       [Framebuffers - 128K]
-       [Temporary framebuffer - 192K]
-       [String table buffer]
-    */
+    /* memory usage is first statically allocated, then the remainder is used dynamically:
+     * static:
+     *  [VM memory - 600K]
+     *  [Framebuffers - 128K]
+     *  [Temporary framebuffer - 192K]
+     * dynamic:
+     *  [String table buffer]
+     */
     res->_memPtrStart = rb->plugin_get_audio_buffer(&sz);
     if(sz < MEM_BLOCK_SIZE + (4 * VID_PAGE_SIZE) + 320 * 200 * sizeof(fb_data))
     {

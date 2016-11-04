@@ -126,9 +126,10 @@ uint8_t video_font[FONT_SIZE] = {
     0x00, 0xA0, 0x10, 0x80, 0x10, 0x80, 0x50, 0x00, /* DEL */
 };
 
+/* default bogus strings */
 struct StrEntry video_stringsTableEng[MAX_STRING_TABLE_SIZE] = {
     { 0x001, "B A N A N A  2000" },
-    { 0x002, "Copyright  } 2014 Banana Corporation \nGPLv2\n\nBUNIX Revision 3.14" },
+    { 0x002, "Copyright  } 2016 Franklin Wei\nGPLv2\n\nBUNIX Revision 3.14" },
     { 0x003, "1" },
     { 0x004, "3" },
     { 0x005, "." },
