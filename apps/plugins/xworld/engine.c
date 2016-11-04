@@ -61,6 +61,9 @@ void engine_run(struct Engine* e) {
         engine_processInput(e);
 
         vm_hostFrame(&e->vm);
+
+        /* only yield() in the whole game :P */
+        rb->yield();
     }
 
 }
