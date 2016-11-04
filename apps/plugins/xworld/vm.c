@@ -605,8 +605,6 @@ void vm_executeThread(struct VirtualMachine* m) {
         {
             (vm_opcodeTable[opcode])(m);
         }
-
-        rb->yield();
     }
 }
 
