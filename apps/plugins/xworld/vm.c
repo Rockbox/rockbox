@@ -52,7 +52,8 @@ void vm_init(struct VirtualMachine* m) {
 
     rb->memset(m->vmVariables, 0, sizeof(m->vmVariables));
     m->vmVariables[0x54] = 0x81;
-    m->vmVariables[VM_VARIABLE_RANDOM_SEED] = *rb->current_tick;
+    /* constant seed for code wheel */
+    m->vmVariables[VM_VARIABLE_RANDOM_SEED] = 0;
 
     m->_fastMode = false;
     m->player->_markVar = &m->vmVariables[VM_VARIABLE_MUS_MARK];
@@ -81,7 +82,7 @@ void vm_op_add(struct VirtualMachine* m) {
 
 void vm_op_addConst(struct VirtualMachine* m) {
     if (m->res->currentPartId == 0x3E86 && m->_scriptPtr.pc == m->res->segBytecode + 0x6D48) {
-        warning("vm_op_addConst() hack for non-stop looping gun sound bug");
+        //warning("vm_op_addConst() hack for non-stop looping gun sound bug");
         // the script 0x27 slot 0x17 doesn't stop the gun sound from looping, I
         // don't really know why ; for now, let's play the 'stopping sound' like
         // the other scripts do
@@ -152,7 +153,7 @@ void vm_op_jnz(struct VirtualMachine* m) {
 #define BYPASS_PROTECTION
 void vm_op_condJmp(struct VirtualMachine* m) {
 
-    //printf("Jump : %X \n",m->_scriptPtr.pc-m->res->segBytecode);
+    //debug(DBG_VM, "Jump : %X \n",m->_scriptPtr.pc-m->res->segBytecode);
 //FCS Whoever wrote this is patching the bytecode on the fly. This is ballzy !!
 #ifdef BYPASS_PROTECTION
 
@@ -167,6 +168,8 @@ void vm_op_condJmp(struct VirtualMachine* m) {
         *(m->_scriptPtr.pc + 0x9A) = 0x5A;
         debug(DBG_VM, "vm_op_condJmp() bypassing protection");
         debug(DBG_VM, "bytecode has been patched");
+
+        //warning("bypassing protection");
 
         //vm_bypassProtection(m);
     }
@@ -605,8 +608,6 @@ void vm_executeThread(struct VirtualMachine* m) {
         {
             (vm_opcodeTable[opcode])(m);
         }
-
-        rb->yield();
     }
 }
 
