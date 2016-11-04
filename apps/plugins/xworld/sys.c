@@ -130,13 +130,34 @@ static bool sys_do_help(void)
     rb->lcd_set_background(LCD_BLACK);
 #endif
     rb->lcd_setfont(FONT_UI);
-    char* help_text[] = {"XWorld", "",
-                         "XWorld", "is", "an", "interpreter", "for", "Another", "World,", "a", "fantastic", "game", "by", "Eric", "Chahi."
-                        };
-    struct style_text style[] = {
-        {0, TEXT_CENTER | TEXT_UNDERLINE},
-        LAST_STYLE_ITEM
+    char *help_text[] = {
+        "XWorld", "",
+        "XWorld", "is", "a", "port", "of", "a", "bytecode", "interpreter", "for", "`Another", "World',", "a", "cinematic", "adventure", "game", "by", "Eric", "Chahi.",
+        "",
+        "Level", "Codes:", "",
+        "Level", "1:", "LDKD", "",
+        "Level", "2:", "HTDC", "",
+        "Level", "3:", "CLLD", "",
+        "Level", "4:", "LBKG", "",
+        "Level", "5:", "XDDJ", "",
+        "Level", "6:", "FXLC", "",
+        "Level", "7:", "KRFK", "",
+        "Level", "8:", "KFLB", "",
+        "Level", "9:", "DDRX", "",
+        "Level", "10:", "BFLX", "",
+        "Level", "11:", "BRTD", "",
+        "Level", "12:", "TFBB", "",
+        "Level", "13:", "TXHF", "",
+        "Level", "14:", "CKJL", "",
+        "Level", "15:", "LFCK", "",
     };
+    struct style_text style[] = {
+        { 0, TEXT_CENTER | TEXT_UNDERLINE },
+        { 2, C_RED },
+        { 23, C_RED },
+        { 24, C_RED },
+    };
+
     return display_text(ARRAYLEN(help_text), help_text, style, NULL, true);
 }
 
@@ -149,9 +170,9 @@ static const struct opt_items scaling_settings[3] = {
 };
 
 static const struct opt_items rotation_settings[3] = {
-    { "Disabled"     , -1 },
-    { "Clockwise"    , -1 },
-    { "Anticlockwise", -1 }
+    { "Disabled"        , -1 },
+    { "Clockwise"       , -1 },
+    { "Counterclockwise", -1 }
 };
 
 static void do_video_settings(struct System* sys)
@@ -219,15 +240,16 @@ static void do_video_settings(struct System* sys)
     }
 }
 
-#define MAX_SOUNDBUF_SIZE 512
+#define MAX_SOUNDBUF_SIZE 256
+
+/* NOTE: these are intentionally set very low in order to minimize the
+ * time spent in the IRQ callback. On the ipod6g, going over 512
+ * samples results in a panic. */
 const struct opt_items sound_bufsize_options[] = {
-    {"8 samples"  , 8},
-    {"16 samples" , 16},
-    {"32 samples" , 32},
-    {"64 samples" , 64},
+    {"32 samples", 32},
+    {"64 samples", 64},
     {"128 samples", 128},
     {"256 samples", 256},
-    {"512 samples", 512},
 };
 
 static void do_sound_settings(struct System* sys)
@@ -262,8 +284,8 @@ static void sys_reset_settings(struct System* sys)
     sys->settings.rotation_option = 0;
     sys->settings.scaling_quality = 1;
     sys->settings.sound_enabled = true;
-    sys->settings.sound_bufsize = 64;
-    sys->settings.showfps = true;
+    sys->settings.sound_bufsize = 128; // doom defaults
+    sys->settings.showfps = false;
     sys->settings.zoom = false;
     sys_rotate_keymap(sys);
 }
@@ -278,11 +300,13 @@ static int mainmenu_cb(int action, const struct menu_item_ex *this_item)
     return action;
 }
 
-static AudioCallback audio_callback;
+static AudioCallback audio_callback = NULL;
+static void get_more(const void** start, size_t* size);
 static void* audio_param;
 static struct System* audio_sys;
 
 /************************************** MAIN MENU ***************************************/
+/* called after game init */
 
 void sys_menu(struct System* sys)
 {
@@ -352,7 +376,7 @@ void sys_menu(struct System* sys)
             exit(PLUGIN_OK);
             break;
         default:
-            error("sys_menu: fall-through!");
+            break;
         }
     }
     rb->lcd_clear_display();
@@ -669,7 +693,8 @@ static void do_pause_menu(struct System* sys)
 
 void sys_processEvents(struct System* sys)
 {
-    int btn = rb->button_get(false);
+    int btn = rb->button_status();
+    rb->button_clear_queue();
     btn &= ~BUTTON_REDRAW;
     debug(DBG_SYS, "button is 0x%08x", btn);
 
@@ -789,20 +814,21 @@ uint32_t sys_getTimeStamp(struct System* sys)
     return (uint32_t) (*rb->current_tick * (1000/HZ));
 }
 
-static int16_t rb_soundbuf [MAX_SOUNDBUF_SIZE] IBSS_ATTR;
-static int8_t temp_soundbuf[MAX_SOUNDBUF_SIZE] IBSS_ATTR;
-static void ICODE_ATTR get_more(const void** start, size_t* size)
+/* game provides us mono samples, we need stereo */
+static int16_t rb_soundbuf [MAX_SOUNDBUF_SIZE * 2];
+static int8_t temp_soundbuf[MAX_SOUNDBUF_SIZE];
+static void get_more(const void** start, size_t* size)
 {
-    if(audio_sys->settings.sound_enabled)
+    if(audio_sys->settings.sound_enabled && audio_callback)
     {
         audio_callback(audio_param, temp_soundbuf, audio_sys->settings.sound_bufsize);
         /* convert xworld format (signed 8-bit) to rockbox format (signed 16-bit) */
-        for(int i = 0; i < audio_sys->settings.sound_bufsize; ++i)
+        for(int i = 0; i < audio_sys->settings.sound_bufsize; i += 2)
         {
-            rb_soundbuf[i] = temp_soundbuf[i] * 0x100;
+            rb_soundbuf[i] = rb_soundbuf[i+1] = temp_soundbuf[i] * 0x100;
         }
         *start = rb_soundbuf;
-        *size = audio_sys->settings.sound_bufsize;
+        *size = audio_sys->settings.sound_bufsize * 2;
     }
     else
     {
@@ -872,13 +898,18 @@ void *sys_createMutex(struct System* sys)
 {
     if(!sys)
         error("sys is NULL!");
+
+    debug(DBG_SYS, "allocating mutex");
+
+    /* this bitfield works as follows: bit set = free, unset = in use */
     for(int i = 0; i < MAX_MUTEXES; ++i)
     {
+        /* check that the corresponding bit is 1 (free) */
         if(sys->mutex_bitfield & (1 << i))
         {
-            rb->mutex_init(&sys->mutex_memory[i]);
-            sys->mutex_bitfield |= (1 << i);
-            return &sys->mutex_memory[i];
+            rb->mutex_init(sys->mutex_memory + i);
+            sys->mutex_bitfield &= ~(1 << i);
+            return sys->mutex_memory + i;
         }
     }
     warning("Out of mutexes!");
@@ -888,20 +919,20 @@ void *sys_createMutex(struct System* sys)
 void sys_destroyMutex(struct System* sys, void *mutex)
 {
     int mutex_number = ((char*)mutex - (char*)sys->mutex_memory) / sizeof(struct mutex); /* pointer arithmetic! check for bugs! */
-    sys->mutex_bitfield &= ~(1 << mutex_number);
+    sys->mutex_bitfield |= 1 << mutex_number;
 }
 
 void sys_lockMutex(struct System* sys, void *mutex)
 {
     (void) sys;
-    debug(DBG_SYS, "calling mutex_lock");
+    debug(DBG_SYS, "calling mutex_lock in thread %d", rb->thread_self());
     rb->mutex_lock((struct mutex*) mutex);
 }
 
 void sys_unlockMutex(struct System* sys, void *mutex)
 {
     (void) sys;
-    debug(DBG_SYS, "calling mutex_unlock");
+    debug(DBG_SYS, "calling mutex_unlock in thread %d", rb->thread_self());
     rb->mutex_unlock((struct mutex*) mutex);
 }
 
@@ -937,4 +968,5 @@ void MutexStack(struct MutexStack_t* s, struct System *stub, void *mutex)
 void MutexStack_destroy(struct MutexStack_t* s)
 {
     sys_unlockMutex(s->sys, s->_mutex);
+
 }
