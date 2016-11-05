@@ -25,7 +25,27 @@ int NWZ_TOOL_MAIN(test_display)(int argc, char **argv)
 {
     /* clear screen and display welcome message */
     nwz_lcdmsg(true, 0, 0, "test_display");
-    nwz_lcdmsg(false, 3, 10, "This program will stop in 5 seconds");
-    sleep(5);
+    nwz_lcdmsg(false, 0, 1, "BACK: quit");
+    /* wait for key */
+    int input_fd = nwz_key_open();
+    if(input_fd < 0)
+    {
+        sleep(2);
+        return 1;
+    }
+    while(1)
+    {
+        /* wait for event */
+        int ret = nwz_key_wait_event(input_fd, 1000000);
+        if(ret != 1)
+            continue;
+        struct input_event evt;
+        if(nwz_key_read_event(input_fd, &evt) != 1)
+            continue;
+        /* handle quit */
+        if(nwz_key_event_get_keycode(&evt) == NWZ_KEY_BACK && !nwz_key_event_is_press(&evt))
+            break;
+    }
+    nwz_key_close(input_fd);
     return 0;
 }

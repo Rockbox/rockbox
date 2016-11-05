@@ -6,7 +6,7 @@ INCLUDES=-I.
 
 LIB_FILES=nwz_lib.c nwz_lib_devlist.c
 TOOL_FILES=dest_tool.c test_adc.c test_adc.c test_bl.c test_display.c \
-	test_keys.c test_power.c test_ts.c
+	test_keys.c test_power.c test_ts.c test_fb.c
 ALL_ELF=$(patsubst %.c,%.elf,$(TOOL_FILES)) all_tools.elf dualboot.elf
 
 all: $(ALL_ELF)

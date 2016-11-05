@@ -85,6 +85,9 @@ void nwz_fb_close(int fb);
 int nwz_fb_get_brightness(int fd, struct nwz_fb_brightness *bl);
 /* set backlight brightness (return -1 on error, 1 on success) */
 int nwz_fb_set_brightness(int fd, struct nwz_fb_brightness *bl);
+/* setup framebuffer to its standard mode: LCD output, page 0, no transparency
+ * and no rotation, 2D only updates */
+int nwz_fb_set_standard_mode(int fd);
 
 /* open adc device */
 int nwz_adc_open(void);

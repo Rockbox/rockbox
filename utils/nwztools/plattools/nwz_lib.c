@@ -238,6 +238,27 @@ int nwz_fb_set_brightness(int fd, struct nwz_fb_brightness *bl)
         return 1;
 }
 
+int nwz_fb_set_standard_mode(int fd)
+{
+    /* disable timer (apparently useless with LCD) */
+    struct nwz_fb_update_timer update_timer;
+    update_timer.timerflag = NWZ_FB_TIMER_OFF;
+    update_timer.timeout = NWZ_FB_DEFAULT_TIMEOUT;
+    if(ioctl(fd, NWZ_FB_UPDATE_TIMER, &update_timer) < 0)
+        return -1;
+    /* set page 0 mode to no transparency and no rotation */
+    struct nwz_fb_image_info mode_info;
+    mode_info.tc_enable = 0;
+    mode_info.t_color = 0;
+    mode_info.alpha = 0;
+    mode_info.rot = 0;
+    mode_info.page = 0;
+    mode_info.update = NWZ_FB_ONLY_2D_MODE;
+    if(ioctl(fd, NWZ_FB_UPDATE, &mode_info) < 0)
+        return -2;
+    return 0;
+}
+
 int nwz_adc_open(void)
 {
     return open(NWZ_ADC_DEV, O_RDONLY);

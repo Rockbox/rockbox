@@ -31,7 +31,8 @@
     TOOL(test_display) \
     TOOL(test_keys) \
     TOOL(test_power) \
-    TOOL(test_ts)
+    TOOL(test_ts) \
+    TOOL(test_fb) \
 
 typedef int (*nwz_tool_main_t)(int argc, char **argv);
 
@@ -60,7 +61,7 @@ static void hello(void)
 {
     /* clear screen and display welcome message */
     nwz_lcdmsg(true, 0, 0, "all_tools");
-    nwz_lcdmsg(false, 0, 2, "BACK: quit");
+    nwz_lcdmsg(false, 0, 1, "BACK: quit");
     nwz_lcdmsg(false, 0, 2, "LEFT/RIGHT: change tool");
     nwz_lcdmsg(false, 0, 3, "PLAY: run tool");
 }

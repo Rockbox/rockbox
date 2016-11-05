@@ -29,7 +29,14 @@
  * error, the OF is run. This seems like the safest option since the OF is
  * always there and might do magic things. */
 
-bool boot_rockbox(void)
+enum boot_mode
+{
+    BOOT_ROCKBOX,
+    BOOT_TOOLS,
+    BOOT_OF
+};
+
+enum boot_mode get_boot_mode(void)
 {
     /* get time */
     struct timeval deadline;
@@ -37,7 +44,7 @@ bool boot_rockbox(void)
     {
         nwz_lcdmsg(false, 0, 2, "Cannot get time");
         sleep(2);
-        return false;
+        return BOOT_OF;
     }
     /* open input device */
     int input_fd = nwz_key_open();
@@ -45,11 +52,11 @@ bool boot_rockbox(void)
     {
         nwz_lcdmsg(false, 0, 2, "Cannot open input device");
         sleep(2);
-        return false;
+        return BOOT_OF;
     }
     deadline.tv_sec += 5;
     /* wait for user action */
-    bool boot_rb = false;
+    enum boot_mode mode = BOOT_OF;
     while(true)
     {
         /* get time */
@@ -69,7 +76,8 @@ bool boot_rockbox(void)
         int sec_left = deadline.tv_sec - cur_time.tv_sec;
         sec_left += (deadline.tv_usec - cur_time.tv_usec + 999999) / 1000000; /* round up */
         nwz_lcdmsgf(false, 0, 2, "Booting OF in %d seconds  ", sec_left);
-        nwz_lcdmsg(false, 0, 3, "Press BACK to boot RB");
+        nwz_lcdmsg(false, 0, 3, "Press BACK to run tools");
+        nwz_lcdmsg(false, 0, 3, "Press PLAY to boot RB");
         /* wait for a key (1s) */
         int ret = nwz_key_wait_event(input_fd, 1000000);
         if(ret != 1)
@@ -77,14 +85,21 @@ bool boot_rockbox(void)
         struct input_event evt;
         if(nwz_key_read_event(input_fd, &evt) != 1)
             continue;
-        if(nwz_key_event_get_keycode(&evt) == NWZ_KEY_BACK && !nwz_key_event_is_press(&evt))
+        if(nwz_key_event_is_press(&evt))
+            continue;
+        if(nwz_key_event_get_keycode(&evt) == NWZ_KEY_PLAY)
         {
-            boot_rb = true;
+            mode = BOOT_ROCKBOX;
+            break;
+        }
+        else if(nwz_key_event_get_keycode(&evt) == NWZ_KEY_BACK)
+        {
+            mode = BOOT_TOOLS;
             break;
         }
     }
     nwz_key_close(input_fd);
-    return boot_rb;
+    return mode;
 }
 
 static char *boot_rb_argv[] =
@@ -97,41 +112,40 @@ static char *boot_rb_argv[] =
     NULL
 };
 
-static void wait_key(void)
-{
-    int input_fd = nwz_key_open();
-    /* display input state in a loop */
-    while(1)
-    {
-        /* wait for event (10ms) */
-        int ret = nwz_key_wait_event(input_fd, 10000);
-        if(ret != 1)
-            continue;
-        struct input_event evt;
-        if(nwz_key_read_event(input_fd, &evt) != 1)
-            continue;
-        if(nwz_key_event_get_keycode(&evt) == NWZ_KEY_BACK && !nwz_key_event_is_press(&evt))
-            break;
-    }
-    /* finish nicely */
-    nwz_key_close(input_fd);
-}
-
 int NWZ_TOOL_MAIN(all_tools)(int argc, char **argv);
 
 int main(int argc, char **argv)
 {
-#if 0
+    /* make sure backlight is on and we are running the standard lcd mode */
+    int fb_fd = nwz_fb_open(true);
+    if(fb_fd >= 0)
+    {
+        struct nwz_fb_brightness bl;
+        nwz_fb_get_brightness(fb_fd, &bl);
+        bl.level = NWZ_FB_BL_MAX_LEVEL;
+        nwz_fb_set_brightness(fb_fd, &bl);
+        nwz_fb_set_standard_mode(fb_fd);
+        nwz_fb_close(fb_fd);
+    }
     nwz_lcdmsg(true, 0, 0, "dualboot");
-    if(boot_rockbox())
+    /* run all tools menu */
+    enum boot_mode mode = get_boot_mode();
+    if(mode == BOOT_TOOLS)
+    {
+        /* run tools and then run OF */
+        NWZ_TOOL_MAIN(all_tools)(argc, argv);
+    }
+    else if(mode == BOOT_ROCKBOX)
     {
         /* boot rockox */
         nwz_lcdmsg(true, 0, 3, "Booting rockbox...");
+        /* in the future, we will run rockbox here, for now we just print a
+         * message */
         execvp("/usr/local/bin/lcdmsg", boot_rb_argv);
+        /* fallback to OF in case of failure */
         nwz_lcdmsg(false, 0, 4, "failed.");
         sleep(5);
     }
-    /* if for some reason, running rockbox failed, then try to run the OF */
     /* boot OF */
     nwz_lcdmsg(true, 0, 3, "Booting OF...");
     execvp("/usr/local/bin/SpiderApp.of", argv);
@@ -140,42 +154,4 @@ int main(int argc, char **argv)
     /* if we reach this point, everything failed, so return an error so that
      * sysmgrd knows something is wrong */
     return 1;
-#elif 0
-    const char *args_mount[] = {"mount", NULL};
-    int status;
-    char *output = nwz_run_pipe("mount", args_mount, &status);
-    nwz_lcdmsgf(true, 0, 0, "%d\n%s", status, output);
-    free(output);
-    wait_key();
-    const char *args_ls[] = {"ls", "/var", NULL};
-    output = nwz_run_pipe("ls", args_ls, &status);
-    nwz_lcdmsgf(true, 0, 0, "%d\n%s", status, output);
-    free(output);
-    wait_key();
-    const char *args_glogctl[] = {"glogctl", "flush", NULL};
-    output = nwz_run_pipe("/usr/local/bin/glogctl", args_glogctl, &status);
-    nwz_lcdmsgf(true, 0, 0, "%d\n%s", status, output);
-    free(output);
-    wait_key();
-    system("cp /var/GEMINILOG* /contents/");
-    sync();
-    execvp("/usr/local/bin/SpiderApp.of", argv);
-    return 0;
-#else
-    /* make sure backlight is on */
-    int fb_fd = nwz_fb_open(true);
-    if(fb_fd >= 0)
-    {
-        struct nwz_fb_brightness bl;
-        nwz_fb_get_brightness(fb_fd, &bl);
-        bl.level = NWZ_FB_BL_MAX_LEVEL;
-        nwz_fb_set_brightness(fb_fd, &bl);
-        nwz_fb_close(fb_fd);
-    }
-    /* run all tools menu */
-    NWZ_TOOL_MAIN(all_tools)(argc, argv);
-    /* run OF */
-    execvp("/usr/local/bin/SpiderApp.of", argv);
-    return 0;
-#endif
 }
