@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_41fed205",
+        "filename": "apps/plugins/xworld/sys.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 896,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2016-11-05T10:58:16Z",
+      "side": 1,
+      "message": "What exactly audio_callback() does? It is generally silly to do anything else then buffer management in get_more() since this is called in irq. Usually you pump samples in thread and pop ready samples in get_more() + some buffer management. Besides you should provide \u0027silence clip\u0027 if your buffer is empty instead of returning NULL which will result in pcm underflow which is fatal.",
+      "revId": "453c32d24cabbd5b88c65f92687b1177dd3b51a2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
