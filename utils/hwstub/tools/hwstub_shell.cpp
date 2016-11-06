@@ -1273,7 +1273,7 @@ void load_std_desc(std::vector< soc_desc::soc_t >& socs)
 
 int main(int argc, char **argv)
 {
-    const char *dev_uri = hwstub::uri::default_uri().full_uri().c_str();
+    std::string dev_uri = hwstub::uri::default_uri().full_uri();
     bool verbose = false;
 
     const char *lua_init = "init.lua";
