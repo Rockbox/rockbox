@@ -42,11 +42,11 @@
 #define ALLOW_SOFTLOCK 0
 #endif
 
-#define SEL_ACTION_VOL 2
-#define SEL_ACTION_PLAY 4
-#define SEL_ACTION_STOP 8
-#define SEL_ACTION_SEEK 16
-#define SEL_ACTION_SKIP 32
+#define SEL_ACTION_VOL = 2;
+#define SEL_ACTION_PLAY = 4;
+#define SEL_ACTION_STOP = 8;
+#define SEL_ACTION_SEEK = 16;
+#define SEL_ACTION_SKIP = 32;
 
 enum {
     CONTEXT_STD = 0,
