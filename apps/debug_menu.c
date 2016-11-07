@@ -19,6 +19,8 @@
  *
  ****************************************************************************/
 
+#include "action_select.h" /* Testing */
+
 #include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -2202,11 +2204,11 @@ static bool dbg_screendump(void)
     return false;
 }
 
-static bool dbg_buttonmask(void)
+static bool dbg_actionmask(void)
 {
     char buf[32];//tmp    
     static int btnmask = 0;
-    btnmask = button_select(btnmask,"Select one or more buttons");/* TODO add language define */
+    btnmask = action_select(btnmask,"Select one or more actions");/* TODO add language define */
     snprintf(buf,31,"mask %d",btnmask);
     splash(HZ, buf);  
     return false;
@@ -2658,7 +2660,7 @@ static const struct {
         {"Debug scrollwheel", dbg_scrollwheel },
 #endif
         {"Talk engine stats", dbg_talk },
-        {"Buttonmask test", dbg_buttonmask}, /*Testing*/
+        {"Action mask test", dbg_actionmask}, /*Testing*/
 };
 
 static int menu_action_callback(int btn, struct gui_synclist *lists)
