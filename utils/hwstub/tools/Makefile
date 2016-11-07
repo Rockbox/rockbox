@@ -17,10 +17,13 @@ LIBS=$(HWSTUB_LIB_DIR)/libhwstub.a $(REGTOOLS_LIB_DIR)/libsocdesc.a
 
 all: $(EXEC)
 
-$(HWSTUB_LIB_DIR)/libhwstub.a:
+# force target to always rebuild libraries
+FORCE:
+
+$(HWSTUB_LIB_DIR)/libhwstub.a: FORCE
 	make -C $(HWSTUB_LIB_DIR)
 
-$(REGTOOLS_LIB_DIR)/libsocdesc.a:
+$(REGTOOLS_LIB_DIR)/libsocdesc.a: FORCE
 	make -C $(REGTOOLS_LIB_DIR)
 
 %.o: %.c
