@@ -1,0 +1,78 @@
+24,4,system information
+23,32,u-boot password
+9,4,firmware update flag
+10,4,beep ok flag
+34,16,rtc alarm
+80,4,hold mode
+16,64,model id
+4,16,serial number
+11,32,ship information
+68,4,color variation
+26,5,product code
+29,8,update file name
+32,64,key and signature
+17,4,test mode flag
+18,4,getty mode flag
+70,4,disable iptable flag
+30,64,sound driver parameter
+31,64,noise cancel driver parameter
+77,6,wifi mac address
+75,4,wifi protected setup
+82,16,fm parameter
+83,4,speaker ship info
+84,4,mass storage class mode
+25,4,exception monitor mode
+5,4096,application parameter
+35,2048,bluetooth parameter
+8,8,middleware parameter
+22,4,quick shutdown flag
+69,4,time out to sleep
+78,4,application debug mode flag
+79,4,browser log mode flag
+7,20,secure clock
+3,704,aad key
+12,160,aad icv
+13,520,empr key
+28,64,random data
+76,16,slacker time
+21,4,key mode (debug/release)
+81,8224,slacker id file
+14,16384,EKB 0
+15,16384,EKB 1
+36,1024,EMPR  0
+37,1024,EMPR  1
+38,1024,EMPR  2
+39,1024,EMPR  3
+40,1024,EMPR  4
+41,1024,EMPR  5
+42,1024,EMPR  6
+43,1024,EMPR  7
+44,1024,EMPR  8
+45,1024,EMPR  9
+46,1024,EMPR 10
+47,1024,EMPR 11
+48,1024,EMPR 12
+49,1024,EMPR 13
+50,1024,EMPR 14
+51,1024,EMPR 15
+52,1024,EMPR 16
+53,1024,EMPR 17
+54,1024,EMPR 18
+55,1024,EMPR 19
+56,1024,EMPR 20
+57,1024,EMPR 21
+58,1024,EMPR 22
+59,1024,EMPR 23
+60,1024,EMPR 24
+61,1024,EMPR 25
+62,1024,EMPR 26
+63,1024,EMPR 27
+64,1024,EMPR 28
+65,1024,EMPR 29
+66,1024,EMPR 30
+67,1024,EMPR 31
+1,262144,boot image
+2,262144,hold image
+20,262144,low battery image
+19,262144,update image
+6,262144,update error image

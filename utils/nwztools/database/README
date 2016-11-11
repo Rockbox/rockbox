@@ -1,0 +1,62 @@
+This file explains how the database was created an how to update it.
+
+Model list
+==========
+
+The model list (models.txt) was extract from Sony's mptapp on target. This is
+most probably the only reliable way of getting model IDs. It cannot be done
+automatically but it is easy to locate the list using a tool like IDA. It is
+basically a long list of the following structure:
+  struct model_info_t
+  {
+    const char *name;
+    uin32_t mid;
+  };
+Once identified, it is easy to copy it to a file and grep/sed/awk it to produce
+the textual list. It depends on which tool you use. I decided to keep this list
+because it is an easy format to produce and parse. For consistency, I decided
+to use upper case for the model name and lower case for mid. Keep this when
+you modify the list to keep the diff minimal.
+
+IMPORTANT NOTE: some players have more than one model ID (ie same name) !!
+
+FORMAT (models.txt): list of pairs <mid>,<name> where <name> is upper case
+human name of the player and <mid> is the lower-case hex value of the model ID.
+
+Series list
+===========
+
+The original series list was semi-automatically generated. Unfortunately, Sony
+does not use a 100% regular naming scheme. It is thus simpler to modify it by
+hand for newer models. To keep consistency, the generator script will make sure
+that the series list only refers to device in the model list and that no device
+in the model list is not refered to.
+
+FORMAT (series.txt): list of <codename>,<name>,<mid1>,<mid2>,... where <codename>
+is the (Rockbox-only) codename of the series (that should match what other tools
+use, like upgtools), always in lower case; where <name> is the humand name of the
+series, and <midX> is the list of models in the series (given by model IDs because
+name are not uniques).
+
+Advise on tooling
+=================
+
+The format of the file was carefully chosen to be easy to use and produce. It
+avoids uses spaces are separators because it breaks easily. The "," separator
+is a good match in this case and shouldn't pose a problem. In most tools, changing
+the separator is easy. For example with awk, you can use the
+  -F ","
+option, or define in the preamble with
+  BEGIN { FS = ","; }
+. Other tools have similar constructs.
+
+NVPs
+====
+
+See nvps/README
+
+gen_db.py
+=========
+
+This script generates the database (nwz_db.{c,h}) from the various textual files.
+The output must NOT be touched by hand.

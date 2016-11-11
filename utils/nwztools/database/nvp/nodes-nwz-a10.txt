@@ -1,0 +1,89 @@
+1,4,system information  
+2,32,u-boot password     
+3,4,firmware update flag
+4,4,beep ok flag        
+5,4,hold mode           
+6,16,rtc alarm           
+7,64,model id            
+8,5,product code        
+9,16,serial number       
+10,8,update file name    
+11,64,key and signature   
+12,32,ship information    
+13,4,test mode flag      
+14,4,getty mode flag     
+15,16,fm parameter        
+16,64,sound driver parameter       
+17,64,noise cancel driver parameter
+18,512,bluetooth pskey              
+77,4,wifi protected setup       
+85,4,battery calibration        
+19,2048,bluetooth parameter          
+20,512,btmw factory pair info       
+21,512,btmw factory scdb            
+22,4,btmw log mode flag           
+78,4,application debug mode flag
+79,4,browser log mode flag      
+80,4,time out to sleep          
+81,4,europe vol regulation flag 
+82,4,function information
+83,4,service id
+84,4,marlin key
+86,4,MSC only mode flag
+89,4,SD Card export flag
+23,704,aad/empr key                 
+24,160,aad icv                 
+25,520,empr icv              
+26,4,key mode (debug/release)
+27,64,random data             
+28,8224,slacker id file         
+29,64,starfish id             
+30,33024,marlin device key       
+31,20,secure clock            
+32,16,slacker time            
+33,64,marlin time                  
+34,16384,EKB 0
+35,16384,EKB 1
+36,1024,EMPR  0
+37,1024,EMPR  1
+38,1024,EMPR  2
+39,1024,EMPR  3
+40,1024,EMPR  4
+41,1024,EMPR  5
+42,1024,EMPR  6
+43,1024,EMPR  7
+44,1024,EMPR  8
+45,1024,EMPR  9
+46,1024,EMPR 10
+47,1024,EMPR 11
+48,1024,EMPR 12
+49,1024,EMPR 13
+50,1024,EMPR 14
+51,1024,EMPR 15
+52,1024,EMPR 16
+53,1024,EMPR 17
+54,1024,EMPR 18
+55,1024,EMPR 19
+56,1024,EMPR 20
+57,1024,EMPR 21
+58,1024,EMPR 22
+59,1024,EMPR 23
+60,1024,EMPR 24
+61,1024,EMPR 25
+62,1024,EMPR 26
+63,1024,EMPR 27
+64,1024,EMPR 28
+65,1024,EMPR 29
+66,1024,EMPR 30
+67,1024,EMPR 31
+68,4,color variation     
+69,4,speaker ship info
+70,8,middleware parameter 
+71,4,quick shutdown flag
+72,262144,boot image          
+73,262144,hold image          
+74,262144,low battery image   
+75,262144,update image        
+76,262144,update error image  
+87,262144,precharge image
+88,262144,dead battery image

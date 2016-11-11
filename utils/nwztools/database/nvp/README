@@ -1,0 +1,67 @@
+The NVP map varies a lot from players to players, it is inconceivable to build
+it by hand. The approach taken is to extract it from the kernel of each player.
+Since Sony provides the kernel of all players, it is 'only' a matter of
+downloading all of them. A bit of back story on the NVP: it is non-volatile
+area of the flash that is divided in regions and then "sectors" (unrelated to
+hard drive sectors). Each "sector" stores the data of a "node". The ABI
+between the NVP driver and the userspace is an index: the userspace gives the
+index of a node, and then drives looksup its table to see where it is and what
+is its size. The index map changes over time so Sony introduces standard "names"
+for its entries, those are 3-letters acronym (for example "fup" or "bti" or "shp")
+that have a corresponding index. For some reason, the driver also contains a
+description of the nodes, in english (so "bti" stands for "boot image").
+
+parse_nvp_header.sh
+===================
+
+This script is given a file name, a kernel directory or a kernel tgz and it will
+try to extract the mapping automatically. It produces a list of pairs
+  <node>,<name>
+where <node> is the index of the node (that's the only thing that is usable on
+a running device) and <name> is the standard name of the node. Note that is
+some kind of acronym (like 'fup') and the description needs to be generated
+separatly (see other section).
+
+parse_all_nvp_headers.sh
+========================
+
+This scripts expects a directory to have the following structure:
+  dir/
+    nwz-a10/
+      linux-kernel-*.tgz
+    nwz-e460/
+      linxu-kernel-*.tgz
+    ...
+Each sudirectory must the series name (as used in ../series.txt) and the kernel
+must be a tgz (end in .tgz and not .tar.gz) of the form linux-kernel-*.tgz. Usually
+the variable bit will be the version but some kernels have unknown versions. It
+will then run parse_nvp_header.sh on each of them and store the result in a
+file called <series name>.txt
+
+NOTE: the kernel can be symlinks to other files
+
+nvptool
+=======
+
+The kernel headers do no contain the description of the nvp node names.
+This one can be extract from the icx_nvp[_emmc].ko driver on target using complicated
+elf parsing done by nvptool. Technically nvptoo can find much more information
+like the node -> humanname mapping as well and the actual sector on the disk but
+since we can already extract it easily from the headers, we only extract description
+names from it.
+
+parse_all_nvp_nodes.sh
+======================
+
+This scripts expects a directory to have the following structure:
+  dir/
+    nwz-a10/
+      rootfs.tgz
+    nwz-e460/
+      rootfs.tgz
+    ...
+Each sudirectory must the series name (as used in ../series.txt) and the rootfs
+must be a tar. It will then extract the relevant icx_nvp driver from it and run
+nvptool on it to produce a file called nodes-<series name>.txt
+
+NOTE: the rootfs can be symlinks to other files
