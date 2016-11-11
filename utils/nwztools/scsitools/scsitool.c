@@ -38,6 +38,7 @@
 #include <scsi/sg_pt.h>
 #include "misc.h"
 #include "para_noise.h"
+#include "nwz_db.h"
 
 /* the windows port doesn't have scsi.h and GOOD */
 #ifndef GOOD
@@ -152,7 +153,7 @@ int do_scsi(uint8_t *cdb, int cdb_size, unsigned flags, void *sense, int *sense_
         *sense_size = get_scsi_pt_sense_len(obj);
     if(flags & (DO_WRITE | DO_READ))
         *buf_size -= get_scsi_pt_resid(obj);
-    
+
     destruct_scsi_pt_obj(obj);
     return ret;
 }
@@ -171,20 +172,33 @@ int do_sense_analysis(int status, uint8_t *sense, int sense_size)
     return status;
 }
 
-int do_dnk_cmd(uint32_t cmd, uint8_t sub_cmd, uint16_t arg, void *buffer, int *buffer_size)
+/*
+ * SCSI commands
+ */
+#define CMD_A3          0xa3 /* start a complicated, authenticated, session to do things */
+#define CMD_A4          0xa4 /* start a complicated, authenticated, session to do things */
+#define CMD_EMPR_DPCC   0xd7
+#define CMD_DNK         0xdd
+#define CMD_DPCC        0xfb
+
+/*
+ * DNK: command is in cdb[10], subcommand in cdb[11], cdb[7] must be 0xbc
+ */
+
+int do_dnk_cmd(bool read, uint32_t cmd, uint8_t sub_cmd, uint16_t arg, void *buffer, int *buffer_size)
 {
-    uint8_t cdb[12] = {0xdd, 0, 0, 0, 0, 0, 0, 0xbc, 0, 0, 0, 0};
+    uint8_t cdb[12] = {CMD_DNK, 0, 0, 0, 0, 0, 0, 0xbc, 0, 0, 0, 0};
     cdb[10] = cmd;
     cdb[11] = sub_cmd;
     cdb[8] = (*buffer_size) >> 8;
     cdb[9] = (*buffer_size) & 0xff;
     cdb[4] = (arg >> 8) & 0xff;
     cdb[5] = arg & 0xff;
-    
+
     uint8_t sense[32];
     int sense_size = 32;
-    
-    int ret = do_scsi(cdb, 12, DO_READ, sense, &sense_size, buffer, buffer_size);
+
+    int ret = do_scsi(cdb, 12, read ? DO_READ : DO_WRITE, sense, &sense_size, buffer, buffer_size);
     if(ret < 0)
         return ret;
     ret = do_sense_analysis(ret, sense, sense_size);
@@ -196,10 +210,12 @@ int do_dnk_cmd(uint32_t cmd, uint8_t sub_cmd, uint16_t arg, void *buffer, int *b
 #define DNK_EXACT_LENGTH    (1 << 0)
 #define DNK_STRING          (1 << 1)
 #define DNK_UINT32          (1 << 2)
+#define DNK_HEX             (1 << 3)
 
 struct dnk_prop_t
 {
-    char *name;
+    const char *name;
+    const char *desc;
     uint8_t cmd;
     uint8_t subcmd;
     int size;
@@ -208,15 +224,70 @@ struct dnk_prop_t
 
 struct dnk_prop_t dnk_prop_list[] =
 {
-    { "serial_num", 0x23, 1, 8, DNK_STRING},
-    { "model_id", 0x23, 4, 4, DNK_EXACT_LENGTH | DNK_UINT32},
-    { "product_id", 0x23, 6, 12, DNK_STRING},
-    { "destination", 0x23, 8, 4, DNK_EXACT_LENGTH | DNK_UINT32},
-    { "model_id2", 0x23, 9, 4, DNK_EXACT_LENGTH | DNK_UINT32},
-    { "dev_info", 0x12, 0, 64, DNK_STRING},
+    { "serial_num", "Serial number", 0x23, 1, 8, DNK_STRING},
+    { "storage_size", "Storage size(GB)", 0x23, 4, 4, DNK_EXACT_LENGTH | DNK_UINT32},
+    { "product_id", "Product ID", 0x23, 6, 12, DNK_STRING},
+    { "destination", "Destination", 0x23, 8, 4, DNK_EXACT_LENGTH | DNK_UINT32},
+    { "model_id", "Model ID", 0x23, 9, 4, DNK_EXACT_LENGTH | DNK_UINT32 | DNK_HEX},
+    { "model_name", "Model Name", 0x12, 0, 64, DNK_STRING},
+    /* there are more obscure commands:
+     * - 0x11 returns a 10-byte packet containing a 8-byte "LeftIdl8", scrambled
+     *   with para_noise (the 2-byte padding is random so that output is random
+     *   until unscrambled)
+     * - 0x21 returns a 0x2b2 packet contaning a 0x2b0 "DNK", scrambled similarly
+     * - 0x22 can write the DNK (sending scrambled data again)
+     * - 0x23 has more subproperties:
+     *   - 5 is "eDKS"
+     *   - 7 is "ProductGroup"
+     *   - 10 is nvp properties (see get_dnk_nvp)
+     *   - 11 seems to read something from nvp and encrypt it with AES, not sure what
+     * - 0x24 can write the same properties read by 0x23 */
 };
 
 #define NR_DNK_PROPS   (sizeof(dnk_prop_list) / sizeof(dnk_prop_list[0]))
+
+uint16_t get_big_endian16(void *_buf)
+{
+    uint8_t *buf = _buf;
+    return buf[0] << 16 | buf[1];
+}
+
+uint32_t get_big_endian32(void *_buf)
+{
+    uint8_t *buf = _buf;
+    return buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
+}
+
+void set_big_endian16(void *_buf, uint16_t val)
+{
+    uint8_t *buf = _buf;
+    buf[1] = val & 0xff;
+    buf[0] = (val >> 8) & 0xff;
+}
+
+void set_big_endian32(void *_buf, uint32_t val)
+{
+    uint8_t *buf = _buf;
+    buf[3] = val & 0xff;
+    buf[2] = (val >> 8) & 0xff;
+    buf[1] = (val >> 16) & 0xff;
+    buf[0] = (val >> 24) & 0xff;
+}
+
+uint32_t get_little_endian32(void *_buf)
+{
+    uint8_t *buf = _buf;
+    return buf[3] << 24 | buf[2] << 16 | buf[1] << 8 | buf[0];
+}
+
+void set_little_endian32(void *_buf, uint32_t val)
+{
+    uint8_t *buf = _buf;
+    buf[0] = val & 0xff;
+    buf[1] = (val >> 8) & 0xff;
+    buf[2] = (val >> 16) & 0xff;
+    buf[3] = (val >> 24) & 0xff;
+}
 
 int get_dnk_prop(int argc, char **argv)
 {
@@ -247,6 +318,7 @@ int get_dnk_prop(int argc, char **argv)
     }
     else
     {
+        prop.desc = "Property";
         prop.cmd = strtoul(argv[0], NULL, 0);
         prop.subcmd = strtoul(argv[1], NULL, 0);
         prop.size = strtoul(argv[2], NULL, 0);
@@ -255,7 +327,7 @@ int get_dnk_prop(int argc, char **argv)
 
     char *buffer = buffer_alloc(prop.size + 1);
     int buffer_size = prop.size;
-    int ret = do_dnk_cmd(prop.cmd, prop.subcmd, 0, buffer, &buffer_size);
+    int ret = do_dnk_cmd(true, prop.cmd, prop.subcmd, 0, buffer, &buffer_size);
     if(ret)
         return ret;
     if(buffer_size == 0)
@@ -269,197 +341,185 @@ int get_dnk_prop(int argc, char **argv)
         return 2;
     }
     buffer[buffer_size] = 0;
+    cprintf(GREEN, "%s:", prop.desc);
     if(prop.flags & DNK_STRING)
-        cprintf_field("Property: ", "%s\n", buffer);
+        cprintf(YELLOW, " %s\n", buffer);
     else if(prop.flags & DNK_UINT32)
-        cprintf_field("Property: ", "0x%x\n", *(uint32_t *)buffer);
+    {
+        uint32_t val = get_big_endian32(buffer);
+        if(prop.flags & DNK_HEX)
+            cprintf(YELLOW, " 0x%x\n", val);
+        else
+            cprintf(YELLOW, " %u\n", val);
+    }
     else
     {
-        cprintf(GREEN, "Property:\n");
+        printf(YELLOW, "\n");
         print_hex(buffer, buffer_size);
     }
     return 0;
 }
 
-#define NVP_EXACT_LENGTH    (1 << 0)
-#define NVP_STRING          (1 << 1)
-#define NVP_UINT32          (1 << 2)
-
-struct nvp_prop_t
+int get_model_and_series(int *model_index, int *series_index)
 {
-    const char *name;
-    const char *desc;
-    uint8_t node;
-    int size;
-    unsigned flags;
-};
+    /* we need to get the model ID: code stolen from get_dnk_prop */
+    uint8_t mid_buf[4];
+    int mid_buf_size = sizeof(mid_buf);
+    int ret = do_dnk_cmd(true, 0x23, 9, 0, mid_buf, &mid_buf_size);
+    if(ret)
+    {
+        printf("Cannot get model ID from device: %d\n", ret);
+        return 2;
+    }
+    if(mid_buf_size != sizeof(mid_buf))
+    {
+        printf("Cannot get model ID from device: device didn't send the expected amount of data\n");
+        return 3;
+    }
+    unsigned long model_id = get_big_endian32(&mid_buf);
+    *model_index = -1;
+    for(int i = 0; i < NWZ_MODEL_COUNT; i++)
+        if(nwz_model[i].mid == model_id)
+            *model_index = i;
+    cprintf_field("Model: ", "%s\n", *model_index == -1 ? "Unknown" : nwz_model[*model_index].name);
+    if(*model_index == -1)
+    {
+        printf("Your device is not supported. Please contact developers.\n");
+        return 3;
+    }
+    *series_index = -1;
+    for(int i = 0; i < NWZ_SERIES_COUNT; i++)
+        for(int j = 0; j < nwz_series[i].mid_count; j++)
+            if(nwz_series[i].mid[j] == model_id)
+                *series_index = i;
+    cprintf_field("Series: ", "%s\n", *series_index == -1 ? "Unknown" : nwz_series[*series_index].name);
+    if(*series_index == -1)
+    {
+        printf("Your device is not supported. Please contact developers.\n");
+        return 3;
+    }
+    return 0;
+}
 
-#define NVP_ENTRY(node, name,desc,size,flag) { name, desc, node, size, flag }
-
-struct nvp_prop_t nvp_prop_list[] =
+/* read nvp node, retrun nonzero on error */
+int read_nvp_node(int series_index, enum nwz_nvp_node_t node, void *buffer, int size)
 {
-    NVP_ENTRY(1, "bti", "boot image", 262144, 0),
-    NVP_ENTRY(2, "hdi", "hold image", 262144, 0),
-    NVP_ENTRY(3, "cng", "aad key", 704, 0),
-    NVP_ENTRY(4, "ser", "serial number", 16, NVP_STRING),
-    NVP_ENTRY(5, "app", "application parameter", 4096, 0),
-    NVP_ENTRY(6, "eri", "update error image", 262144, 0),
-    NVP_ENTRY(7, "dcc", "secure clock", 20, 0),
-    NVP_ENTRY(8, "mdl", "middleware parameter", 8, 0),
-    NVP_ENTRY(9, "fup", "firmware update flag", 4, 0),
-    NVP_ENTRY(10, "bok", "beep ok flag", 4, 0),
-    NVP_ENTRY(11, "shp", "ship information", 32, 0),
-    NVP_ENTRY(12, "dba", "aad icv", 160, 0),
-    NVP_ENTRY(13, "dbv", "empr key", 520, 0),
-    NVP_ENTRY(14, "tr0", "EKB 0", 16384, 0),
-    NVP_ENTRY(15, "tr1", "EKB 1", 16384, 0),
-    NVP_ENTRY(16, "mid", "model id", 64, 0),
-    NVP_ENTRY(17, "tst", "test mode flag", 4, 0),
-    NVP_ENTRY(18, "gty", "getty mode flag", 4, 0),
-    NVP_ENTRY(19, "fui", "update image", 262144, 0),
-    NVP_ENTRY(20, "lbi", "low battery image", 262144, 0),
-    NVP_ENTRY(21, "dor", "key mode (debug/release)", 4, 0),
-    NVP_ENTRY(22, "edw", "quick shutdown flag", 4, 0),
-    NVP_ENTRY(23, "ubp", "u-boot password", 32, 0),
-    NVP_ENTRY(24, "syi", "system information", 4, 0),
-    NVP_ENTRY(25, "exm", "exception monitor mode", 4, 0),
-    NVP_ENTRY(26, "pcd", "product code", 5, 0),
-    NVP_ENTRY(27, "btc", "battery calibration", 4, 0),
-    NVP_ENTRY(28, "rnd", "wmt key", 64, 0),
-    NVP_ENTRY(29, "ufn", "update file name", 8, 0),
-    NVP_ENTRY(30, "sdp", "sound driver parameter", 64, 0),
-    NVP_ENTRY(31, "ncp", "noise cancel driver parameter", 64, 0),
-    NVP_ENTRY(32, "kas", "key and signature", 64, 0),
-    NVP_ENTRY(33, "sfi", "starfish id", 64, 0),
-    NVP_ENTRY(34, "rtc", "rtc alarm", 16, 0),
-    NVP_ENTRY(35, "bpr", "bluetooth address", 2048, 0),
-    NVP_ENTRY(36, "e00", "EMPR  0", 1024, 0),
-    NVP_ENTRY(37, "e01", "EMPR  1", 1024, 0),
-    NVP_ENTRY(38, "e02", "EMPR  2", 1024, 0),
-    NVP_ENTRY(39, "e03", "EMPR  3", 1024, 0),
-    NVP_ENTRY(40, "e04", "EMPR  4", 1024, 0),
-    NVP_ENTRY(41, "e05", "EMPR  5", 1024, 0),
-    NVP_ENTRY(42, "e06", "EMPR  6", 1024, 0),
-    NVP_ENTRY(43, "e07", "EMPR  7", 1024, 0),
-    NVP_ENTRY(44, "e08", "EMPR  8", 1024, 0),
-    NVP_ENTRY(45, "e09", "EMPR  9", 1024, 0),
-    NVP_ENTRY(46, "e10", "EMPR 10", 1024, 0),
-    NVP_ENTRY(47, "e11", "EMPR 11", 1024, 0),
-    NVP_ENTRY(48, "e12", "EMPR 12", 1024, 0),
-    NVP_ENTRY(49, "e13", "EMPR 13", 1024, 0),
-    NVP_ENTRY(50, "e14", "EMPR 14", 1024, 0),
-    NVP_ENTRY(51, "e15", "EMPR 15", 1024, 0),
-    NVP_ENTRY(52, "e16", "EMPR 16", 1024, 0),
-    NVP_ENTRY(53, "e17", "EMPR 17", 1024, 0),
-    NVP_ENTRY(54, "e18", "EMPR 18", 1024, 0),
-    NVP_ENTRY(55, "e19", "EMPR 19", 1024, 0),
-    NVP_ENTRY(56, "e20", "EMPR 20", 1024, 0),
-    NVP_ENTRY(57, "e21", "EMPR 21", 1024, 0),
-    NVP_ENTRY(58, "e22", "EMPR 22", 1024, 0),
-    NVP_ENTRY(59, "e23", "EMPR 23", 1024, 0),
-    NVP_ENTRY(60, "e24", "EMPR 24", 1024, 0),
-    NVP_ENTRY(61, "e25", "EMPR 25", 1024, 0),
-    NVP_ENTRY(62, "e26", "EMPR 26", 1024, 0),
-    NVP_ENTRY(63, "e27", "EMPR 27", 1024, 0),
-    NVP_ENTRY(64, "e28", "EMPR 28", 1024, 0),
-    NVP_ENTRY(65, "e29", "EMPR 29", 1024, 0),
-    NVP_ENTRY(66, "e30", "EMPR 30", 1024, 0),
-    NVP_ENTRY(67, "e31", "EMPR 31", 1024, 0),
-    NVP_ENTRY(68, "clv", "color variation", 4, 0),
-    NVP_ENTRY(69, "slp", "time out to sleep", 4, 0),
-    NVP_ENTRY(70, "ipt", "disable iptable flag", 4, 0),
-    NVP_ENTRY(71, "mtm", "marlin time", 64, 0),
-    NVP_ENTRY(72, "mcr", "marlin crl", 16384, 0),
-    NVP_ENTRY(73, "mdk", "marlin device key", 33024, 0),
-    NVP_ENTRY(74, "muk", "marlin user key", 24576, 0),
-    NVP_ENTRY(75, "pts", "wifi protected setup", 4, 0),
-    NVP_ENTRY(76, "skt", "slacker time", 16, 0),
-    NVP_ENTRY(77, "mac", "wifi mac address", 6, 0),
-    NVP_ENTRY(78, "apd", "application debug mode flag", 4, 0),
-    NVP_ENTRY(79, "blf", "browser log mode flag", 4, 0),
-    NVP_ENTRY(80, "hld", "hold mode", 4, 0),
-    NVP_ENTRY(81, "skd", "slacker id file", 8224, 0),
-    NVP_ENTRY(82, "fmp", "fm parameter", 16, 0),
-    NVP_ENTRY(83, "sps", "speaker ship info", 4, 0),
-    NVP_ENTRY(84, "msc", "mass storage class mode", 4, 0),
-    NVP_ENTRY(85, "vrt", "europe vol regulation flag", 4, 0),
-    NVP_ENTRY(86, "psk", "bluetooth pskey", 512, 0),
-    NVP_ENTRY(87, "bml", "btmw log mode flag", 4, 0),
-    NVP_ENTRY(88, "bfd", "btmw factory scdb", 512, 0),
-    NVP_ENTRY(89, "bfp", "btmw factory pair info", 512, 0),
-};
-
-#define NR_NVP_PROPS   (sizeof(nvp_prop_list) / sizeof(nvp_prop_list[0]))
-
-int get_dnk_nvp(int argc, char **argv)
-{
-    if(argc != 1 && argc != 3)
+    int node_index = NWZ_NVP_INVALID;
+    if(nwz_series[series_index].nvp_index)
+        node_index = (*nwz_series[series_index].nvp_index)[node];
+    if(node_index == NWZ_NVP_INVALID)
     {
-        printf("You must specify a known nvp node or a full node specification:\n");
-        printf("Full usage: <node> <size> <flags>\n");
-        printf("Node usage: <node>\n");
-        printf("Nodes:\n");
-        for(unsigned i = 0; i < NR_NVP_PROPS; i++)
-            printf("  %s\t%s\n", nvp_prop_list[i].name, nvp_prop_list[i].desc);
-        return 1;
+        printf("This device doesn't have node '%s'\n", nwz_nvp[node].name);
+        return 5;
     }
-
-    struct nvp_prop_t prop;
-    memset(&prop, 0, sizeof(prop));
-    if(argc == 1)
-    {
-        for(unsigned i = 0; i < NR_NVP_PROPS; i++)
-            if(strcmp(nvp_prop_list[i].name, argv[0]) == 0)
-                prop = nvp_prop_list[i];
-        if(prop.name == NULL)
-        {
-            cprintf(GREY, "Unknown node '%s'\n", argv[0]);
-            return 1;
-        }
-    }
-    else
-    {
-        prop.node = strtoul(argv[0], NULL, 0);
-        prop.size = strtoul(argv[1], NULL, 0);
-        prop.flags = strtoul(argv[2], NULL, 0);
-    }
-
-    int buffer_size = prop.size + 4;
-    uint8_t *buffer = buffer_alloc(buffer_size + 1);
-    int ret = do_dnk_cmd(0x23, 10, prop.node, buffer, &buffer_size);
+    /* the returned data has a 4 byte header:
+     * - byte 0/1 is the para_noise index, written as a 16bit big-endian number
+     * - byte 2/3 is the node index, written as a 16-bit big-endian number
+     *
+     * NOTE: byte 0 is always 0 because the OF always picks small para_noise
+     * indexes but I guess the actual encoding the one above */
+    int xfer_size = size + 4;
+    uint8_t *xfer_buf = buffer_alloc(xfer_size);
+    int ret = do_dnk_cmd(true, 0x23, 10, node_index, xfer_buf, &xfer_size);
     if(ret)
         return ret;
-    if(buffer_size <= 4)
+    if(xfer_size <= 4)
     {
+        free(xfer_buf);
         cprintf(GREY, "Device didn't send any data\n");
-        return 1;
+        return 6;
     }
-    if(buffer[0] != 0 || buffer[2] != 0 || buffer[3] != prop.node)
+    if(get_big_endian16(xfer_buf + 2) != node_index)
     {
+        free(xfer_buf);
         cprintf(GREY, "Device responded with invalid data\n");
         return 1;
     }
-
-    for(int i = 4, idx = buffer[1]; i < buffer_size; i++, idx++)
-        buffer[i] ^= para_noise[idx];
-    buffer[buffer_size] = 0;
-    buffer += 4;
-    buffer_size -= 4;
-    if((prop.flags & DNK_EXACT_LENGTH) && buffer_size != prop.size)
+    if(xfer_size - 4 != (int)size)
     {
+        free(xfer_buf);
         cprintf(GREY, "Device didn't send the expected amount of data\n");
-        return 2;
+        return 7;
     }
-    
-    if(prop.flags & DNK_STRING)
-        cprintf_field("Node: ", "%s\n", buffer);
-    else if(prop.flags & DNK_UINT32)
-        cprintf_field("Node: ", "0x%x\n", *(uint32_t *)buffer);
-    else
+    /* unscramble and copy */
+    for(int i = 4, idx = get_big_endian16(xfer_buf); i < xfer_size; i++, idx++)
+        xfer_buf[i] ^= para_noise[idx % sizeof(para_noise)];
+    memcpy(buffer, xfer_buf + 4, size);
+    free(xfer_buf);
+    return 0;
+}
+
+/* read nvp node, retrun nonzero on error */
+int write_nvp_node(int series_index, enum nwz_nvp_node_t node, void *buffer, int size)
+{
+    int node_index = NWZ_NVP_INVALID;
+    if(nwz_series[series_index].nvp_index)
+        node_index = (*nwz_series[series_index].nvp_index)[node];
+    if(node_index == NWZ_NVP_INVALID)
     {
-        cprintf(GREEN, "Node:\n");
-        print_hex(buffer, buffer_size);
+        printf("This device doesn't have node '%s'\n", nwz_nvp[node].name);
+        return 5;
     }
+    /* the data buffer is prepended with a 4 byte header:
+     * - byte 0/1 is the para_noise index, written as a 16bit big-endian number
+     * - byte 2/3 is the node index, written as a 16-bit big-endian number */
+    int xfer_size = size + 4;
+    uint8_t *xfer_buf = buffer_alloc(xfer_size);
+    /* scramble, always use index 0 for para_noise */
+    set_big_endian16(xfer_buf, 0); /* para_noise index */
+    set_big_endian16(xfer_buf + 2, node_index); /* node index */
+    memcpy(xfer_buf + 4, buffer, size);
+    for(int i = 4, idx = get_big_endian16(xfer_buf); i < xfer_size; i++, idx++)
+        xfer_buf[i] ^= para_noise[idx % sizeof(para_noise)];
+    int ret = do_dnk_cmd(false, 0x24, 10, node_index, xfer_buf, &xfer_size);
+    if(ret)
+        return ret;
+    if(xfer_size - 4 != (int)size)
+    {
+        free(xfer_buf);
+        cprintf(GREY, "Wrong transger size\n");
+        return 7;
+    }
+    free(xfer_buf);
+    return 0;
+}
+
+int get_dnk_nvp(int argc, char **argv)
+{
+    if(argc != 1)
+    {
+        printf("You must specify a known nvp node or a full node specification:\n");
+        printf("Node usage: <node>\n");
+        printf("Nodes:\n");
+        for(unsigned i = 0; i < NWZ_NVP_COUNT; i++)
+            printf("  %s\t%s\n", nwz_nvp[i].name, nwz_nvp[i].desc);
+        return 1;
+    }
+    int series_index, model_index;
+    int ret = get_model_and_series(&model_index, &series_index);
+    if(ret)
+        return ret;
+    /* find entry in NVP */
+    enum nwz_nvp_node_t node = NWZ_NVP_COUNT;
+    for(int i = 0; i < NWZ_NVP_COUNT; i++)
+        if(strcmp(nwz_nvp[i].name, argv[0]) == 0)
+            node = i;
+    if(node== NWZ_NVP_COUNT)
+    {
+        printf("I don't know about node '%s'\n", argv[0]);
+        return 4;
+    }
+    uint8_t *buffer = malloc(nwz_nvp[node].size);
+    ret = read_nvp_node(series_index, node, buffer, nwz_nvp[node].size);
+    if(ret != 0)
+    {
+        free(buffer);
+        return ret;
+    }
+    cprintf(GREEN, "%s:\n", nwz_nvp[node].name);
+    print_hex(buffer, nwz_nvp[node].size);
+
+    free(buffer);
     return 0;
 }
 
@@ -474,6 +534,7 @@ struct dpcc_prop_t
 struct dpcc_prop_t dpcc_prop_list[] =
 {
     { "dev_info", "DEVINFO", 0, 0x80 },
+    /* there are more but they are very obscure */
 };
 
 #define NR_DPCC_PROPS   (sizeof(dpcc_prop_list) / sizeof(dpcc_prop_list[0]))
@@ -606,6 +667,8 @@ int do_fw_upgrade(int argc, char **argv)
 {
     (void) argc;
     (void )argv;
+    /* older devices may have used subcommand 3 instead of 4, but this is not
+     * supported by any device I have seen */
     uint8_t cdb[12] = {0xfc, 0, 0x04, 'd', 'b', 'm', 'n', 0, 0x80, 0, 0, 0};
 
     char *buffer = buffer_alloc(0x81);
@@ -622,6 +685,130 @@ int do_fw_upgrade(int argc, char **argv)
     buffer[buffer_size] = 0;
     cprintf_field("Result:", "\n");
     print_hex(buffer, buffer_size);
+    return 0;
+}
+
+static struct
+{
+    unsigned long dest;
+    const char *name;
+} g_dest_list[] =
+{
+    { 0, "J" },
+    { 1, "U" },
+    { 0x101, "U2" },
+    { 0x201, "U3" },
+    { 0x301, "CA" },
+    { 2, "CEV" },
+    { 0x102, "CE7" },
+    { 3, "CEW" },
+    { 0x103, "CEW2" },
+    { 4, "CN" },
+    { 5, "KR" },
+    { 6, "E" },
+    { 0x106, "MX" },
+    { 0x206, "E2" },
+    { 0x306, "MX3" },
+    { 7, "TW" },
+};
+
+#define DEST_COUNT (sizeof(g_dest_list) / sizeof(g_dest_list[0]))
+
+int do_dest(int argc, char **argv)
+{
+    /* it is possile to write any NVP node using the SCSI interface but only
+     * give the user the possibility to write destination, because that's the
+     * most useful one */
+    if(argc != 1 && argc != 3)
+    {
+        printf("Usage: get\n");
+        printf("Usage: set <dest> <sps>\n");
+        printf("Destination (<dest>) can be either an integer or one of:\n");
+        for(size_t i = 0; i < DEST_COUNT; i++)
+            printf("  %s\n", g_dest_list[i].name);
+        printf("Sound pressure (<sps>) can be be an integer, 'on' or 'off'\n");
+        return 1;
+    }
+    /* get model/series */
+    int model_index, series_index;
+    int ret = get_model_and_series(&model_index, &series_index);
+    /* in all cases, we need to read shp */
+    uint8_t *shp = malloc(nwz_nvp[NWZ_NVP_SHP].size);
+    ret = read_nvp_node(series_index, NWZ_NVP_SHP, shp, nwz_nvp[NWZ_NVP_SHP].size);
+    if(ret != 0)
+    {
+        free(shp);
+        return ret;
+    }
+    /* get */
+    if(strcmp(argv[0], "get") == 0)
+    {
+        if(argc != 1)
+        {
+            printf("Too many arguments for get\n");
+            free(shp);
+            return 2;
+        }
+        const char *dst_name = "Unknown";
+        unsigned long dst = get_little_endian32(shp);
+        for(size_t i = 0; i < DEST_COUNT; i++)
+            if(dst == g_dest_list[i].dest)
+                dst_name = g_dest_list[i].name;
+        printf("Destination: %s (%lx)\n", dst_name, dst);
+        unsigned long sps = get_little_endian32(shp + 4);
+        printf("Sound pressure: %lu (%s)\n", sps, sps == 0 ? "off" : "on");
+        free(shp);
+    }
+    /* set */
+    if(strcmp(argv[0], "set") == 0)
+    {
+        if(argc != 3)
+        {
+            printf("Not enough arguments for set\n");
+            free(shp);
+            return 2;
+        }
+        /* try to parse dest as integer */
+        char *end;
+        unsigned long dst = strtoul(argv[1], &end, 0);
+        if(*end)
+        {
+            /* assume string */
+            int index = -1;
+            for(size_t i = 0; i < DEST_COUNT; i++)
+                if(strcmp(argv[1], g_dest_list[i].name) == 0)
+                    index = i;
+            if(index == -1)
+            {
+                printf("Unknown destination '%s'\n", argv[1]);
+                free(shp);
+                return 3;
+            }
+            dst = g_dest_list[index].dest;
+        }
+        /* try to parse sps as integer */
+        /* try to parse dest as integer */
+        unsigned long sps = strtoul(argv[2], &end, 0);
+        if(*end)
+        {
+            /* assume string */
+            if(strcmp(argv[2], "on") == 0)
+                sps = 1;
+            else if(strcmp(argv[2], "off") == 0)
+                sps = 0;
+            else
+            {
+                printf("Unknown sound pressure setting '%s'\n", argv[2]);
+                free(shp);
+                return 3;
+            }
+        }
+        set_little_endian32(shp, dst);
+        set_little_endian32(shp + 4, sps);
+        int ret = write_nvp_node(series_index, NWZ_NVP_SHP, shp, nwz_nvp[NWZ_NVP_SHP].size);
+        free(shp);
+        return ret;
+    }
     return 0;
 }
 
@@ -642,6 +829,7 @@ struct cmd_t cmd_list[] =
     { "get_user_time", "Get user time", get_user_time },
     { "get_dev_info", "Get device info", get_dev_info },
     { "do_fw_upgrade", "Do a firmware upgrade", do_fw_upgrade },
+    { "dest_tool", "Get/Set destination and sound pressure regulation", do_dest },
 };
 
 #define NR_CMDS (sizeof(cmd_list) / sizeof(cmd_list[0]))
