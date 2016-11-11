@@ -23,29 +23,6 @@
 #include <stdlib.h>
 #include "nwz_plattools.h"
 
-extern char **environ;
-
-static const char *white_list[] =
-{
-    "NWZ-E463", "NWZ-E464", "NWZ-E465",
-    "NWZ-A863", "NWZ-A864", "NWZ-A865", "NWZ-A866", "NWZ-A867",
-    NULL,
-};
-
-/* get model id from ICX_MODEL_ID environment variable */
-static unsigned long find_model_id(void)
-{
-    const char *mid = getenv("ICX_MODEL_ID");
-    if(mid == NULL)
-        return 0;
-    char *end;
-    unsigned long v = strtoul(mid, &end, 0);
-    if(*end)
-        return 0;
-    else
-        return v;
-}
-
 static unsigned long read32(unsigned char *buf)
 {
     return buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
@@ -111,7 +88,7 @@ int NWZ_TOOL_MAIN(dest_tool)(int argc, char **argv)
         sleep(2);
         return 1;
     }
-    unsigned long model_id = find_model_id();
+    unsigned long model_id = nwz_get_model_id();
     if(model_id == 0)
     {
         nwz_key_close(input_fd);
@@ -119,37 +96,39 @@ int NWZ_TOOL_MAIN(dest_tool)(int argc, char **argv)
         sleep(2);
         return 1;
     }
-    const char *model_name = nwz_get_model_name(model_id);
+    const char *model_name = nwz_get_model_name();
     if(model_name == NULL)
         model_name = "Unknown";
+    const char *series_name = "Unknown";
+    bool ok_model = false;
+    if(nwz_get_series() != -1)
+    {
+        series_name = nwz_series[nwz_get_series()].name;
+        ok_model = true;
+    }
     nwz_lcdmsgf(false, 0, 2, "Model ID: %#x", model_id);
-    nwz_lcdmsgf(false, 0, 3, "Model Name: %s", model_name);
+    nwz_lcdmsgf(false, 0, 3, "Model: %s", model_name);
+    nwz_lcdmsgf(false, 0, 4, "Series: %s", series_name);
     nwz_lcdmsg(false, 0, 5, "BACK: quit");
     nwz_lcdmsg(false, 0, 6, "LEFT/RIGHT: change dest");
     nwz_lcdmsg(false, 0, 7, "PLAY/PAUSE: change sps");
-    bool ok_model = false;
-    for(int i = 0; white_list[i]; i++)
-        if(strcmp(white_list[i], model_name) == 0)
-            ok_model = true;
     /* display input state in a loop */
     while(1)
     {
-        unsigned char nvp_buf[20];
+        unsigned char nvp_buf[32];
         bool ok_nvp = false;
         if(ok_model)
         {
-            int fd = open("/dev/icx_nvp/011", O_RDONLY);
-            if(fd >= 0)
+            /* make sure node has the right size... */
+            if(nwz_nvp_read(NWZ_NVP_SHP, NULL) == sizeof(nvp_buf))
             {
-                ssize_t cnt = read(fd, nvp_buf, sizeof(nvp_buf));
-                if(cnt == (ssize_t)sizeof(nvp_buf))
+                if(nwz_nvp_read(NWZ_NVP_SHP, nvp_buf) == sizeof(nvp_buf))
                     ok_nvp = true;
                 else
                     nwz_lcdmsg(false, 1, 9, "Cannot read NVP.\n");
-                close(fd);
             }
             else
-                nwz_lcdmsg(false, 1, 9, "Cannot open NVP.\n");
+                nwz_lcdmsg(false, 1, 9, "NVP node has the wrong size.\n");
         }
         else
         {
@@ -203,16 +182,8 @@ int NWZ_TOOL_MAIN(dest_tool)(int argc, char **argv)
         /* write nvp */
         if(ok_nvp && write_nvp)
         {
-            int fd = open("/dev/icx_nvp/011", O_RDWR);
-            if(fd >= 0)
-            {
-                ssize_t cnt = write(fd, nvp_buf, sizeof(nvp_buf));
-                if(cnt != (ssize_t)sizeof(nvp_buf))
-                    nwz_lcdmsg(false, 1, 12, "Cannot write NVP.\n");
-                close(fd);
-            }
-            else
-                nwz_lcdmsg(false, 1, 12, "Cannot open NVP.\n");
+            if(nwz_nvp_write(NWZ_NVP_SHP, nvp_buf) != 0)
+                nwz_lcdmsg(false, 1, 12, "Cannot write NVP.\n");
         }
     }
     /* finish nicely */

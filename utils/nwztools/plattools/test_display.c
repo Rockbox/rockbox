@@ -24,8 +24,24 @@
 int NWZ_TOOL_MAIN(test_display)(int argc, char **argv)
 {
     /* clear screen and display welcome message */
-    nwz_lcdmsg(true, 0, 0, "test_display");
-    nwz_lcdmsg(false, 0, 1, "BACK: quit");
+    nwz_display_clear(NWZ_COLOR(128, 128, 0));
+    nwz_display_text(0, 0, true, NWZ_COLOR(255, 0, 0), NWZ_COLOR(0, 0, 255), 0,
+        "Hello");
+    nwz_display_text(0, 30, false, NWZ_COLOR(255, 0, 0), NWZ_COLOR(0, 0, 255), 128,
+        "BACK: quit");
+    nwz_display_text(0, 50, false, NWZ_COLOR(255, 0, 0), NWZ_COLOR(0, 0, 255), 255,
+        "BACK: quit");
+    /* display /contents/display.bmp if any */
+    const char *bmp_fname = "/contents/display.bmp";
+    if(access(bmp_fname, R_OK) != -1)
+    {
+        nwz_display_bitmap(10, 70, bmp_fname, 0, 0, 200, 200, NWZ_COLOR_NO_KEY, 255);
+    }
+    else
+    {
+        nwz_display_text(0, 70, false, NWZ_COLOR(255, 0, 0), NWZ_COLOR(0, 0, 0), 0,
+            "Cannot find display.bmp");
+    }
     /* wait for key */
     int input_fd = nwz_key_open();
     if(input_fd < 0)

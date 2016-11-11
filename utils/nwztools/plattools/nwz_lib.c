@@ -19,16 +19,7 @@
  *
  ****************************************************************************/
 #include "nwz_lib.h"
-
-extern struct nwz_dev_info_t g_nwz_dev_list[];
-
-const char *nwz_get_model_name(unsigned long model_id)
-{
-    for(int i = 0; g_nwz_dev_list[i].name; i++)
-        if(g_nwz_dev_list[i].model_id == model_id)
-            return g_nwz_dev_list[i].name;
-    return NULL;
-}
+#include "nwz_db.h"
 
 int nwz_run(const char *file, const char *args[], bool wait)
 {
@@ -91,7 +82,7 @@ void nwz_lcdmsg(bool clear, int x, int y, const char *msg)
     const char *args[16];
     int index = 0;
     char locate[32];
-    args[index++] = path_lcdmsg;
+    args[index++] = "lcdmsg";
     if(clear)
         args[index++] = "-c";
     args[index++] = "-f";
@@ -114,6 +105,96 @@ void nwz_lcdmsgf(bool clear, int x, int y, const char *format, ...)
     vsprintf(buffer, format, args);
     va_end(args);
     nwz_lcdmsg(clear, x, y, buffer);
+}
+
+#define NWZ_COLOR_RGB(col) \
+    NWZ_COLOR_RED(col), NWZ_COLOR_GREEN(col), NWZ_COLOR_BLUE(col)
+
+void nwz_display_clear(nwz_color_t color)
+{
+    const char *path_display = "/usr/local/bin/display";
+    const char *args[16];
+    int index = 0;
+    char col[32];
+    args[index++] = "display";
+    args[index++] = "lcd";
+    args[index++] = "clear";
+    sprintf(col, "%d,%d,%d", NWZ_COLOR_RGB(color));
+    args[index++] = col;
+    args[index++] = NULL;
+    /* wait for lcdmsg to finish to avoid any race conditions in framebuffer
+     * accesses */
+    nwz_run(path_display, args, true);
+}
+
+void nwz_display_text(int x, int y, bool big_font, nwz_color_t foreground_col,
+    nwz_color_t background_col, int alpha, const char *text)
+{
+    const char *path_display = "/usr/local/bin/display";
+    const char *args[16];
+    int index = 0;
+    char fg[32],bg[32], pos[32], transp[16];
+    args[index++] = "display";
+    args[index++] = "lcd";
+    args[index++] = "text";
+    sprintf(pos, "%d,%d", x, y);
+    args[index++] = pos;
+    if(big_font)
+        args[index++] = "/usr/local/bin/font_14x24.bmp";
+    else
+        args[index++] = "/usr/local/bin/font_08x12.bmp";
+    sprintf(fg, "%d,%d,%d", NWZ_COLOR_RGB(foreground_col));
+    args[index++] = fg;
+    sprintf(bg, "%d,%d,%d", NWZ_COLOR_RGB(background_col));
+    args[index++] = bg;
+    sprintf(transp, "%d", alpha);
+    args[index++] = transp;
+    args[index++] = text;
+    args[index++] = NULL;
+    /* wait for lcdmsg to finish to avoid any race conditions in framebuffer
+     * accesses */
+    nwz_run(path_display, args, true);
+}
+
+void nwz_display_textf(int x, int y, bool big_font, nwz_color_t foreground_col,
+    nwz_color_t background_col, int alpha, const char *fmt, ...)
+{
+    char buffer[1024];
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(buffer, fmt, args);
+    va_end(args);
+    nwz_display_text(x, y, big_font, foreground_col, background_col, alpha, buffer);
+}
+
+void nwz_display_bitmap(int x, int y, const char *file, int left, int top,
+    int width, int height, nwz_color_t key_col, int bmp_alpha)
+{
+    const char *path_display = "/usr/local/bin/display";
+    const char *args[16];
+    int index = 0;
+    char pos[32], topleft[32], dim[32], key[32], transp[16];
+    args[index++] = "display";
+    args[index++] = "lcd";
+    args[index++] = "bitmap";
+    sprintf(pos, "%d,%d", x, y);
+    args[index++] = pos;
+    args[index++] = file;
+    sprintf(topleft, "%d,%d", left, top);
+    args[index++] = topleft;
+    sprintf(dim, "%d,%d", width, height);
+    args[index++] = dim;
+    if(key_col == NWZ_COLOR_NO_KEY)
+        sprintf(key, "no");
+    else
+        sprintf(key, "%d,%d,%d", NWZ_COLOR_RGB(key_col));
+    args[index++] = key;
+    sprintf(transp, "%d", bmp_alpha);
+    args[index++] = transp;
+    args[index++] = NULL;
+    /* wait for lcdmsg to finish to avoid any race conditions in framebuffer
+     * accesses */
+    nwz_run(path_display, args, true);
 }
 
 int nwz_input_open(const char *requested_name)
@@ -256,6 +337,20 @@ int nwz_fb_set_standard_mode(int fd)
     mode_info.update = NWZ_FB_ONLY_2D_MODE;
     if(ioctl(fd, NWZ_FB_UPDATE, &mode_info) < 0)
         return -2;
+    return 0;
+}
+
+int nwz_fb_get_resolution(int fd, int *x, int *y, int *bpp)
+{
+    struct fb_var_screeninfo vinfo;
+    if(ioctl(fd, FBIOGET_VSCREENINFO, &vinfo) < 0)
+        return -1;
+    if(x)
+        *x = vinfo.xres;
+    if(y)
+        *y = vinfo.yres;
+    if(bpp)
+        *bpp = vinfo.bits_per_pixel;
     return 0;
 }
 
@@ -559,4 +654,96 @@ unsigned int nwz_pminfo_get_factor(int fd)
         return 0;
     else
         return val;
+}
+
+static unsigned long find_model_id(void)
+{
+    /* try with the environment variable */
+    const char *mid = getenv("ICX_MODEL_ID");
+    if(mid == NULL)
+        return 0;
+    char *end;
+    unsigned long v = strtoul(mid, &end, 0);
+    if(*end)
+        return 0;
+    else
+        return v;
+}
+
+unsigned long nwz_get_model_id(void)
+{
+    static unsigned long model_id = 0xffffffff;
+    if(model_id == 0xffffffff)
+        model_id = find_model_id();
+    return model_id;
+}
+
+const char *nwz_get_model_name()
+{
+    for(int i = 0; i < NWZ_MODEL_COUNT; i++)
+        if(nwz_model[i].mid == nwz_get_model_id())
+            return nwz_model[i].name;
+    return NULL;
+}
+
+static int find_series(void)
+{
+    for(int i = 0; i < NWZ_SERIES_COUNT; i++)
+        for(int j = 0; j < nwz_series[i].mid_count; j++)
+            if(nwz_series[i].mid[j] == nwz_get_model_id())
+                return i;
+    return -1;
+}
+
+int nwz_get_series(void)
+{
+    static int series = -2;
+    if(series == -2)
+        series = find_series();
+    return series;
+}
+
+static nwz_nvp_index_t *get_nvp_index(void)
+{
+    static nwz_nvp_index_t *index = 0;
+    if(index == 0)
+    {
+        int series = nwz_get_series();
+        index = series < 0 ? 0 : nwz_series[series].nvp_index;
+    }
+    return index;
+}
+
+int nwz_nvp_read(enum nwz_nvp_node_t node, void *data)
+{
+    int size = nwz_nvp[node].size;
+    if(data == 0)
+        return size;
+    nwz_nvp_index_t *index = get_nvp_index();
+    if(index == 0 || (*index)[node] == NWZ_NVP_INVALID)
+        return -1;
+    char nvp_path[32];
+    snprintf(nvp_path, sizeof(nvp_path), "/dev/icx_nvp/%03d", (*index)[node]);
+    int fd = open(nvp_path, O_RDONLY);
+    if(fd < 0)
+        return -1;
+    int cnt = read(fd, data, size);
+    close(fd);
+    return cnt == size ? size : -1;
+}
+
+int nwz_nvp_write(enum nwz_nvp_node_t node, void *data)
+{
+    int size = nwz_nvp[node].size;
+    nwz_nvp_index_t *index = get_nvp_index();
+    if(index == 0 || (*index)[node] == NWZ_NVP_INVALID)
+        return -1;
+    char nvp_path[32];
+    snprintf(nvp_path, sizeof(nvp_path), "/dev/icx_nvp/%03d", (*index)[node]);
+    int fd = open(nvp_path, O_WRONLY);
+    if(fd < 0)
+        return -1;
+    int cnt = write(fd, data, size);
+    close(fd);
+    return cnt == size ? 0 : -1;
 }

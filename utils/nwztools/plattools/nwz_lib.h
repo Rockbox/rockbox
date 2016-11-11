@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <linux/input.h>
+#include <linux/fb.h>
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
@@ -37,14 +38,16 @@
 #include "nwz_adc.h"
 #include "nwz_ts.h"
 #include "nwz_power.h"
+#include "nwz_db.h"
 
-struct nwz_dev_info_t
-{
-    unsigned long model_id;
-    const char *name;
-};
-
-const char *nwz_get_model_name(unsigned long model_id);
+/* get model ID, either from ICX_MODEL_ID env var or using nvpflag, return 0
+ * in case of error; note that the result is cached so this function is only
+ * expensive the first time it is called */
+unsigned long nwz_get_model_id(void);
+/* get series (index into nwz_series, or -1 on error) */
+int nwz_get_series(void);
+/* get model name, or null on error */
+const char *nwz_get_model_name(void);
 
 /* run a program and exit with nonzero status in case of error
  * argument list must be NULL terminated */
@@ -52,10 +55,30 @@ int nwz_run(const char *file, const char *args[], bool wait);
 /* run a program and return program output */
 char *nwz_run_pipe(const char *file, const char *args[], int *status);
 
-/* invoke /usr/bin/lcdmsg to display a message using the small font, optionally
+/* invoke /usr/local/bin/lcdmsg to display a message using the small font, optionally
  * clearing the screen before */
 void nwz_lcdmsg(bool clear, int x, int y, const char *msg);
 void nwz_lcdmsgf(bool clear, int x, int y, const char *format, ...);
+/* invoke /usr/local/bin/display to do various things:
+ * - clear screen
+ * - display text
+ * - display bitmap
+ * Currently all operations are performed on the LCD only.
+ * The small text font is 8x12 and the big one is 14x24 */
+typedef int nwz_color_t;
+#define NWZ_COLOR(r, g, b) /* each component between 0 and 255 */ \
+    ((r) <<  16 | (g) << 8 | (b))
+#define NWZ_COLOR_RED(col)      ((col) >> 16)
+#define NWZ_COLOR_GREEN(col)    (((col) >> 8) & 0xff)
+#define NWZ_COLOR_BLUE(col)    ((col) & 0xff)
+#define NWZ_COLOR_NO_KEY    (1 << 24)
+void nwz_display_clear(nwz_color_t color);
+void nwz_display_text(int x, int y, bool big_font, nwz_color_t foreground_col,
+    nwz_color_t background_col, int background_alpha, const char *text);
+void nwz_display_textf(int x, int y, bool big_font, nwz_color_t foreground_col,
+    nwz_color_t background_col, int background_alpha, const char *fmt, ...);
+void nwz_display_bitmap(int x, int y, const char *file, int left, int top,
+    int width, int height, nwz_color_t key, int bmp_alpha);
 
 /* open icx_key input device and return file descriptor */
 int nwz_key_open(void);
@@ -81,6 +104,8 @@ const char *nwz_key_get_name(int keycode);
 int nwz_fb_open(bool lcd);
 /* close framebuffer device */
 void nwz_fb_close(int fb);
+/* get screen resolution, parameters are allowed to be NULL */
+int nwz_fb_get_resolution(int fd, int *x, int *y, int *bpp);
 /* get backlight brightness (return -1 on error, 1 on success) */
 int nwz_fb_get_brightness(int fd, struct nwz_fb_brightness *bl);
 /* set backlight brightness (return -1 on error, 1 on success) */
@@ -170,5 +195,13 @@ int nwz_pminfo_open(void);
 void nwz_pminfo_close(int fd);
 /* get pminfo factor (or 0 on error) */
 unsigned int nwz_pminfo_get_factor(int fd);
+
+/* read a nvp node and return its size, if the data pointer is null, then simply
+ * return the size, return -1 on error */
+int nwz_nvp_read(enum nwz_nvp_node_t node, void *data);
+/* write a nvp node, return 0 on success and -1 on error, the size of the buffer
+ * must be the one returned by nwz_nvp_read */
+int nwz_nvp_write(enum nwz_nvp_node_t node, void *data);
+
 
 #endif /* _NWZLIB_H_ */
