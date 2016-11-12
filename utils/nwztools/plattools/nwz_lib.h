@@ -32,6 +32,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/mman.h>
 
 #include "nwz_keys.h"
 #include "nwz_fb.h"
@@ -72,10 +73,18 @@ typedef int nwz_color_t;
 #define NWZ_COLOR_GREEN(col)    (((col) >> 8) & 0xff)
 #define NWZ_COLOR_BLUE(col)    ((col) & 0xff)
 #define NWZ_COLOR_NO_KEY    (1 << 24)
+
+#define NWZ_FONT_W(big_font) ((big_font) ? 14 : 8)
+#define NWZ_FONT_H(big_font) ((big_font) ? 24 : 14)
+
 void nwz_display_clear(nwz_color_t color);
 void nwz_display_text(int x, int y, bool big_font, nwz_color_t foreground_col,
     nwz_color_t background_col, int background_alpha, const char *text);
+void nwz_display_text_center(int width, int y, bool big_font, nwz_color_t foreground_col,
+    nwz_color_t background_col, int background_alpha, const char *text);
 void nwz_display_textf(int x, int y, bool big_font, nwz_color_t foreground_col,
+    nwz_color_t background_col, int background_alpha, const char *fmt, ...);
+void nwz_display_textf_center(int width, int y, bool big_font, nwz_color_t foreground_col,
     nwz_color_t background_col, int background_alpha, const char *fmt, ...);
 void nwz_display_bitmap(int x, int y, const char *file, int left, int top,
     int width, int height, nwz_color_t key, int bmp_alpha);
@@ -113,6 +122,10 @@ int nwz_fb_set_brightness(int fd, struct nwz_fb_brightness *bl);
 /* setup framebuffer to its standard mode: LCD output, page 0, no transparency
  * and no rotation, 2D only updates */
 int nwz_fb_set_standard_mode(int fd);
+/* change framebuffer page and update screen */
+int nwz_fb_set_page(int fd, int page);
+/* map framebuffer */
+void *nwz_fb_mmap(int fd, int offset, int size);
 
 /* open adc device */
 int nwz_adc_open(void);

@@ -10,7 +10,6 @@ nvpflag fup 0xFFFFFFFF
 # FIXME document this
 #
 
-
 # go to /tmp
 cd /tmp
 
@@ -29,6 +28,9 @@ if [ "$?" != 0 ]; then
     sleep 3
     exit 0
 fi
+
+# redirect all output to a log file
+exec > "$CONTENTS/install_dualboot_log.txt" 2>&1
 
 # import constants
 . /install_script/constant.txt
@@ -66,6 +68,7 @@ fi
 lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,9 "Install rockbox"
 fwpchk -f /contents/$_UPDATE_FN_.UPG -c -1 $SPIDERAPP_PATH
 if [ "$?" != 0 ]; then
+    umount "$ROOTFS_TMP_DIR"
     lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: no file to extract"
     sleep 3
     exit 0
@@ -74,40 +77,45 @@ fi
 # make it executable and change user/group
 chmod 775 $SPIDERAPP_PATH
 if [ "$?" != 0 ]; then
+    umount "$ROOTFS_TMP_DIR"
     lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: cannot make it executable"
     sleep 3
     exit 0
 fi
 chown 500:500 $SPIDERAPP_PATH
 if [ "$?" != 0 ]; then
+    umount "$ROOTFS_TMP_DIR"
     lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: cannot change owner"
     sleep 3
     exit 0
 fi
 
-# # change main application
-# lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,9 "Modify app list"
-# sed -i 's/Rockbox/SpiderApp/' $ROOTFS_TMP_DIR/etc/AppList.conf
-# if [ "$?" != 0 ]; then
-#     lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,14 "ERROR: sed failed"
-#     sleep 3
-#     exit 0
-# fi
-# # and fix ownership
-# chown 500:500 $ROOTFS_TMP_DIR/etc/AppList.conf
-# if [ "$?" != 0 ]; then
-#     lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,14 "ERROR: cannot change group"
-#     sleep 3
-#     exit 0
-# fi
-cat $ROOTFS_TMP_DIR/etc/AppList.conf >$CONTENTS/AppList.conf
-ls -l $ROOTFS_TMP_DIR/usr/local/bin/ >$CONTENTS/ls.txt
-ls -l $ROOTFS_TMP_DIR/etc/ >$CONTENTS/ls2.txt
+# create a symlink from /.rockbox to /contents/.rockbox (see dualboot code
+# for why)
+lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,10 "Create rockbox symlink"
+rm -f "$ROOTFS_TMP_DIR/.rockbox"
+ln -s "$CONTENTS/.rockbox" "$ROOTFS_TMP_DIR/.rockbox"
+if [ "$?" != 0 ]; then
+    umount "$ROOTFS_TMP_DIR"
+    lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: cannot create rockbox symlink"
+    sleep 3
+    exit 0
+fi
+
+# change user/group
+chown -h 500:500 "$ROOTFS_TMP_DIR/.rockbox"
+if [ "$?" != 0 ]; then
+    umount "$ROOTFS_TMP_DIR"
+    lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: cannot change symlink owner"
+    sleep 3
+    exit 0
+fi
 
 # unmount root partition
-lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,10 "Unmount root filesystem"
+lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,11 "Unmount root filesystem"
 sync
 if [ "$?" != 0 ]; then
+    umount "$ROOTFS_TMP_DIR"
     lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: sync failed"
     sleep 3
     exit 0
@@ -125,5 +133,6 @@ lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "Rebooting in 3 seconds."
 sleep 3
 sync
 
+echo "Installation successful"
 # finish
 exit 0

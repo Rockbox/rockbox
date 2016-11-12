@@ -156,6 +156,13 @@ void nwz_display_text(int x, int y, bool big_font, nwz_color_t foreground_col,
     nwz_run(path_display, args, true);
 }
 
+void nwz_display_text_center(int width, int y, bool big_font, nwz_color_t fg,
+    nwz_color_t bg, int alpha, const char *text)
+{
+    int txt_w = NWZ_FONT_W(big_font) * strlen(text);
+    nwz_display_text((width - txt_w) / 2, y, big_font, fg, bg, alpha, text);
+}
+
 void nwz_display_textf(int x, int y, bool big_font, nwz_color_t foreground_col,
     nwz_color_t background_col, int alpha, const char *fmt, ...)
 {
@@ -165,6 +172,17 @@ void nwz_display_textf(int x, int y, bool big_font, nwz_color_t foreground_col,
     vsprintf(buffer, fmt, args);
     va_end(args);
     nwz_display_text(x, y, big_font, foreground_col, background_col, alpha, buffer);
+}
+
+void nwz_display_textf_center(int width, int y, bool big_font, nwz_color_t fg,
+    nwz_color_t bg, int alpha, const char *fmt, ...)
+{
+    char buffer[1024];
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(buffer, fmt, args);
+    va_end(args);
+    nwz_display_text_center(width, y, big_font, fg, bg, alpha, buffer);
 }
 
 void nwz_display_bitmap(int x, int y, const char *file, int left, int top,
@@ -319,6 +337,21 @@ int nwz_fb_set_brightness(int fd, struct nwz_fb_brightness *bl)
         return 1;
 }
 
+int nwz_fb_set_page(int fd, int page)
+{
+    /* set page mode to no transparency and no rotation */
+    struct nwz_fb_image_info mode_info;
+    mode_info.tc_enable = 0;
+    mode_info.t_color = 0;
+    mode_info.alpha = 0;
+    mode_info.rot = 0;
+    mode_info.page = page;
+    mode_info.update = NWZ_FB_ONLY_2D_MODE;
+    if(ioctl(fd, NWZ_FB_UPDATE, &mode_info) < 0)
+        return -2;
+    return 0;
+}
+
 int nwz_fb_set_standard_mode(int fd)
 {
     /* disable timer (apparently useless with LCD) */
@@ -327,17 +360,7 @@ int nwz_fb_set_standard_mode(int fd)
     update_timer.timeout = NWZ_FB_DEFAULT_TIMEOUT;
     if(ioctl(fd, NWZ_FB_UPDATE_TIMER, &update_timer) < 0)
         return -1;
-    /* set page 0 mode to no transparency and no rotation */
-    struct nwz_fb_image_info mode_info;
-    mode_info.tc_enable = 0;
-    mode_info.t_color = 0;
-    mode_info.alpha = 0;
-    mode_info.rot = 0;
-    mode_info.page = 0;
-    mode_info.update = NWZ_FB_ONLY_2D_MODE;
-    if(ioctl(fd, NWZ_FB_UPDATE, &mode_info) < 0)
-        return -2;
-    return 0;
+    return nwz_fb_set_page(fd, 0);
 }
 
 int nwz_fb_get_resolution(int fd, int *x, int *y, int *bpp)
@@ -352,6 +375,11 @@ int nwz_fb_get_resolution(int fd, int *x, int *y, int *bpp)
     if(bpp)
         *bpp = vinfo.bits_per_pixel;
     return 0;
+}
+
+void *nwz_fb_mmap(int fd, int offset, int size)
+{
+    return mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)offset);
 }
 
 int nwz_adc_open(void)
