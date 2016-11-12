@@ -52,6 +52,7 @@ static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #endif
 #ifdef HAVE_BACKLIGHT
 static bool filter_first_keypress;
+static bool non_selective_backlight=true; /* if true every button press turns on BL */
 #ifdef HAVE_REMOTE_LCD
 static bool remote_filter_first_keypress;
 #endif
@@ -330,7 +331,8 @@ static void button_tick(void)
                     }
                     else
 #endif
-                        if (!filter_first_keypress || is_backlight_on(false)
+                        if (!non_selective_backlight ||
+                            !filter_first_keypress || is_backlight_on(false)
 #if BUTTON_REMOTE
                                 || (btn & BUTTON_REMOTE)
 #endif
@@ -349,9 +351,16 @@ static void button_tick(void)
                 else
 #endif
                 {
-                    backlight_on();
+                   
+                    if (non_selective_backlight || is_backlight_on(false)) 
+                        backlight_on();
+                    else                    
+                        backlight_on_wait(HZ/10);
 #ifdef HAVE_BUTTON_LIGHT
-                    buttonlight_on();
+                    if (non_selective_backlight || is_backlight_on(false)) 
+                        buttonlight_on();
+                    else
+                        buttonlight_on_wait(HZ/10);
 #endif
                 }
 
@@ -580,6 +589,10 @@ void button_set_flip(bool flip)
 void set_backlight_filter_keypress(bool value)
 {
     filter_first_keypress = value;
+}
+void button_backlight_enable(bool status)
+{
+    non_selective_backlight=status;
 }
 #ifdef HAVE_REMOTE_LCD
 void set_remote_backlight_filter_keypress(bool value)

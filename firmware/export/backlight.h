@@ -32,6 +32,7 @@
 
 bool is_backlight_on(bool ignore_always_off);
 void backlight_on(void);
+void backlight_on_wait(int wait);
 void backlight_off(void);
 void backlight_set_timeout(int value);
 
@@ -100,6 +101,7 @@ void buttonlight_set_brightness(int val);
 
 #ifdef HAVE_BUTTON_LIGHT
 void buttonlight_on(void);
+void buttonlight_on_wait(int wait);
 void buttonlight_off(void);
 void buttonlight_set_timeout(int value);
 #endif

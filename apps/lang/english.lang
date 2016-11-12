@@ -2679,6 +2679,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "No Backlight On Selected Actions"
+  </source>
+  <dest>
+    *: "No Backlight On Selected Actions"
+  </dest>
+  <voice>
+    *: "No Backlight On Selected Actions"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
   desc: In display settings, time to switch LCD chip into power saving state
   user: core

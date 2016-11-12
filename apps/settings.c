@@ -1064,6 +1064,9 @@ void settings_apply(bool read_disk)
 
 #ifdef HAVE_BACKLIGHT
     set_backlight_filter_keypress(global_settings.bl_filter_first_keypress);
+    set_selective_backlight_actions(global_settings.bl_selective_actions,
+                                    global_settings.bl_selective_actions_mask,
+                                    global_settings.bl_filter_first_keypress);
 #ifdef HAVE_REMOTE_LCD
     set_remote_backlight_filter_keypress(global_settings.remote_bl_filter_first_keypress);
 #endif

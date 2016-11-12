@@ -97,6 +97,10 @@ enum {
 #ifdef BACKLIGHT_DRIVER_CLOSE
     BACKLIGHT_QUIT,
 #endif
+    BACKLIGHT_ON_WAIT,
+#ifdef HAVE_BUTTON_LIGHT
+    BUTTON_LIGHT_ON_WAIT,
+#endif
 };
 
 static void backlight_thread(void);
@@ -112,6 +116,7 @@ int backlight_brightness = DEFAULT_BRIGHTNESS_SETTING;
 #endif
 static int backlight_timer SHAREDBSS_ATTR;
 static int backlight_timeout_normal = 5*HZ;
+static int backlight_on_timer=0;
 #if CONFIG_CHARGING
 static int backlight_timeout_plugged = 5*HZ;
 #endif
@@ -123,7 +128,7 @@ static void backlight_timeout_handler(void);
 #ifdef HAVE_BUTTON_LIGHT
 static int buttonlight_timer;
 static int buttonlight_timeout = 5*HZ;
-
+static int buttonlight_on_timer=0;
 /* Update state of buttonlight according to timeout setting */
 static void buttonlight_update_state(void)
 {
@@ -145,10 +150,14 @@ void buttonlight_on(void)
     queue_remove_from_head(&backlight_queue, BUTTON_LIGHT_ON);
     queue_post(&backlight_queue, BUTTON_LIGHT_ON, 0);
 }
-
+void buttonlight_on_wait(int wait)
+{
+     buttonlight_on_timer=wait;
+}
 void buttonlight_off(void)
 {
     queue_post(&backlight_queue, BUTTON_LIGHT_OFF, 0);
+    buttonlight_on_timer=0;
 }
 
 void buttonlight_set_timeout(int value)
@@ -694,6 +703,14 @@ static void backlight_timeout_handler(void)
             do_backlight_off();
         }
     }
+    if(backlight_on_timer > 0)
+    {
+        backlight_on_timer -= BACKLIGHT_THREAD_TIMEOUT;
+        if(backlight_on_timer <= 0)
+        {
+            backlight_on();
+        }
+    }
 #ifdef HAVE_LCD_SLEEP
     else if(lcd_sleep_timer > 0)
     {
@@ -721,6 +738,14 @@ static void backlight_timeout_handler(void)
         if (buttonlight_timer <= 0)
         {
             buttonlight_hw_off();
+        }
+    }
+    if (buttonlight_on_timer > 0)
+    {
+        buttonlight_on_timer -= BACKLIGHT_THREAD_TIMEOUT;
+        if (buttonlight_on_timer <= 0)
+        {
+            buttonlight_on();
         }
     }
 #endif /* HAVE_BUTTON_LIGHT */
@@ -771,10 +796,14 @@ void backlight_on(void)
     queue_remove_from_head(&backlight_queue, BACKLIGHT_ON);
     queue_post(&backlight_queue, BACKLIGHT_ON, 0);
 }
-
+void backlight_on_wait(int wait)
+{
+    backlight_on_timer=wait;
+}
 void backlight_off(void)
 {
     queue_post(&backlight_queue, BACKLIGHT_OFF, 0);
+    backlight_on_timer=0;
 }
 
 /* returns true when the backlight is on,
