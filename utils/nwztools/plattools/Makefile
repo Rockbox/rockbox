@@ -12,6 +12,12 @@ ALL_ELF=$(patsubst %.c,%.elf,$(TOOL_FILES)) all_tools.elf dualboot.elf
 
 all: $(ALL_ELF)
 
+# image dependency
+data/rockbox_icon.h data/tools_icon.h:
+	make -C data
+
+dualboot.elf: data/rockbox_icon.h data/tools_icon.h
+
 %.elf: %.c $(LIB_FILES)
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ $^
 
