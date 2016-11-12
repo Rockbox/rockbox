@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "action.h"
 #include "config.h"
 #include "lang.h"
 
@@ -41,9 +42,17 @@
 #ifdef HAVE_TOUCHSCREEN
 #include "statusbar-skinned.h"
 #endif
+#ifdef HAVE_BACKLIGHT
+#include "backlight.h"
+static bool selective_backlight(int action);
+static bool selective_act = false;
+static int selective_act_mask = 0;
+static bool filter_first_keypress=false;
 
+#endif
 static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
                                                     work on startup */
+static int last_context = CONTEXT_STD;
 static intptr_t last_data = 0;
 static int last_action = ACTION_NONE;
 static bool repeated = false;
@@ -209,8 +218,8 @@ static int get_action_worker(int context, int timeout,
     int button;
     int i=0;
     int ret = ACTION_UNKNOWN;
-    static int last_context = CONTEXT_STD;
-    
+    /*static int last_context = CONTEXT_STD;//moved to global*/
+
     send_event(GUI_EVENT_ACTIONUPDATE, NULL);
 
     if (timeout == TIMEOUT_NOBLOCK)
@@ -420,6 +429,25 @@ int get_action(int context, int timeout)
     if (button == ACTION_TOUCHSCREEN)
         button = sb_touch_to_button(context);
 #endif
+#ifdef HAVE_BACKLIGHT
+    /* Need to look up actions before we can decide to turn on backlight if
+     * selective backlighting is true filter first keypress events need to be
+     * taken into account as well
+     */
+
+    /* lets do backlight control here instead */
+    button_backlight_enable(!selective_act);
+    if(selective_act)
+    {
+/* for filter_first_keypress was backlight on before we decided to turn it on */
+        bool backlight_is_on=is_backlight_on(false);
+
+        /* erase the action if filter_first_keypress and backlight is off */
+        if(selective_backlight(button) && filter_first_keypress &&
+                                                !backlight_is_on)
+            button=ACTION_NONE;
+    }
+#endif
     return button;
 }
 
@@ -532,4 +560,79 @@ void action_wait_for_release(void)
 {
     wait_for_release = true;
 }
+
+#ifdef HAVE_BACKLIGHT
+/* selective backlighting if the context matches FM or WPS and the passed action
+ * matches the actionmask then the backlight will not be turned on
+ */
+static bool selective_backlight(int action)
+{
+bool backlight = true;
+int context=last_context & ~ALLOW_SOFTLOCK;
+  
+    /*removed if ( action > ACTION_TOUCHSCREEN_IGNORE)*/
+    if ( action > ACTION_REDRAW || 
+        (action == ACTION_UNKNOWN && (last_button & BUTTON_REL)))/*for filter_fkp*/
+    {
+        if(context == ( CONTEXT_FM ) ||
+           context == ( CONTEXT_WPS ))
+        {    
+
+            if ((selective_act_mask & SEL_ACTION_PLAY) &&
+                (action == ACTION_WPS_PLAY || 
+                action == ACTION_FM_PLAY))
+                backlight=false;
+            else if ((selective_act_mask & SEL_ACTION_SEEK) &&
+                    (action == ACTION_WPS_SEEKFWD ||
+                     action == ACTION_WPS_SEEKBACK ||
+                     action == ACTION_WPS_STOPSEEK ||
+                     action == ACTION_STD_PREVREPEAT ||
+                     action == ACTION_STD_NEXTREPEAT))
+                    {
+                        if(!is_backlight_on(false))
+                            backlight_off();
+                        backlight=false;
+                    }            
+            else if ((selective_act_mask & SEL_ACTION_VOL) &&
+                    (action == ACTION_WPS_VOLUP ||
+                    action == ACTION_WPS_VOLDOWN))
+                backlight=false;  
+            else if ((selective_act_mask & SEL_ACTION_SKIP) &&
+                    (action == ACTION_WPS_SKIPNEXT ||
+                    action == ACTION_WPS_SKIPPREV ||
+                    action == ACTION_FM_NEXT_PRESET ||
+                    action == ACTION_FM_PREV_PRESET ||
+                    action == ACTION_STD_PREV ||
+                    action == ACTION_STD_NEXT))
+                backlight=false;
+            else if ((context == CONTEXT_FM ) && /* Sansa Fuze+ fm volume? */
+                    (selective_act_mask & SEL_ACTION_SEEK) && 
+                    (action == ACTION_SETTINGS_INC ||
+                     action == ACTION_SETTINGS_INCREPEAT ||
+                     action == ACTION_SETTINGS_DEC ||
+                     action == ACTION_SETTINGS_DECREPEAT))
+                backlight=false;
+           
+            /* display action code of unfiltered actions
+            else
+            {
+                static char buf[32];
+                snprintf(buf,31,"action %d - %d",action, last_button);
+                splash(HZ/100, buf);
+            }*/
+            
+            
+        }
+        button_backlight_on(backlight,false);
+    }
     
+    return backlight;
+}
+
+void set_selective_backlight_actions(bool selective,int mask,bool filter_fkp)
+{
+    selective_act = selective;
+    selective_act_mask = mask;
+    filter_first_keypress=filter_fkp;
+}
+#endif /* HAVE_BACKLIGHT */
