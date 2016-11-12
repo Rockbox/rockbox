@@ -52,6 +52,7 @@ static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #endif
 #ifdef HAVE_BACKLIGHT
 static bool filter_first_keypress;
+static bool non_selective_backlight=true; /* if true every button press turns on BL */
 #ifdef HAVE_REMOTE_LCD
 static bool remote_filter_first_keypress;
 #endif
@@ -330,7 +331,7 @@ static void button_tick(void)
                     }
                     else
 #endif
-                        if (!filter_first_keypress || is_backlight_on(false)
+                        if (!non_selective_backlight || !filter_first_keypress || is_backlight_on(false)
 #if BUTTON_REMOTE
                                 || (btn & BUTTON_REMOTE)
 #endif
@@ -349,10 +350,7 @@ static void button_tick(void)
                 else
 #endif
                 {
-                    backlight_on();
-#ifdef HAVE_BUTTON_LIGHT
-                    buttonlight_on();
-#endif
+                    button_backlight_on(non_selective_backlight, true);
                 }
 
                 reset_poweroff_timer();
@@ -581,13 +579,37 @@ void set_backlight_filter_keypress(bool value)
 {
     filter_first_keypress = value;
 }
+
+void button_backlight_enable(bool status)
+{
+    non_selective_backlight=status;
+}
+void button_backlight_on(bool status, bool initiate)
+{
+static bool is_initiated = true;
+    if ( (status & initiate) || (is_initiated & status) ||
+         (is_backlight_on(false) & initiate) || (is_initiated & initiate) )    
+    {
+        backlight_on();
+#ifdef HAVE_BUTTON_LIGHT
+        buttonlight_on();
+#endif
+        is_initiated=false;/* request has been handled start over again*/
+    }
+    else
+        is_initiated=initiate; /* we only turn on if there was a 
+                                * button pressed and not on other 
+                                * action messages with selective backlight
+                                */
+}
+
 #ifdef HAVE_REMOTE_LCD
 void set_remote_backlight_filter_keypress(bool value)
 {
     remote_filter_first_keypress = value;
 }
 #endif
-#endif
+#endif /* HAVE_BACKLIGHT */
 
 /*
  * Get button pressed from hardware
