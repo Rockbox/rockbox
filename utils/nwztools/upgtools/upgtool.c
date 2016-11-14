@@ -177,6 +177,7 @@ struct nwz_model_t g_model_list[] =
     { "nwz-e460", HAS_KAS | CONFIRMED, "89d813f8f966efdebd9c9e0ea98156d2", "", "" },
     { "nwz-a860", HAS_KAS | CONFIRMED, "a7c4af6c28b8900a783f307c1ba538c5", "", "" },
     { "nwz-a850", HAS_KAS | CONFIRMED, "a2efb9168616c2e84d78291295c1aa5d", "", "" },
+    { "nwz-e470", HAS_KAS | CONFIRMED, "e4144baaa2707913f17b5634034262c4", "", "" },
     /* The following keys were obtained by brute forcing firmware upgrades,
      * someone with a device needs to confirm that they work */
     { "nw-a820", HAS_KEY | HAS_SIG, "", "4df06482", "07fa0b6e" },
