@@ -1072,7 +1072,12 @@ void settings_apply(bool read_disk)
 #endif
 #ifdef HAS_BUTTON_HOLD
     backlight_set_on_button_hold(global_settings.backlight_on_button_hold);
+#else
+    set_selective_softlock_actions(
+                            global_settings.bl_selective_softlock_actions,
+                            global_settings.bl_selective_softlock_actions_mask);
 #endif
+
 #ifdef HAVE_LCD_SLEEP_SETTING
     lcd_set_sleep_after_backlight_off(global_settings.lcd_sleep_after_backlight_off);
 #endif

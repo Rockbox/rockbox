@@ -44,6 +44,9 @@
 #ifdef HAVE_BACKLIGHT
 void set_selective_backlight_actions(bool selective,int mask,bool filter_fkp);
 #endif
+#ifndef HAS_BUTTON_HOLD
+void set_selective_softlock_actions(bool selective,int mask);
+#endif
 /* Selective backlighting action selection masks */
 #define SEL_ACTION_VOL 2
 #define SEL_ACTION_PLAY 4
