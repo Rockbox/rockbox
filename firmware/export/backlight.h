@@ -31,15 +31,18 @@
 #endif
 
 bool is_backlight_on(bool ignore_always_off);
+bool is_backlight_pending(void);
+void backlight_cancel_pending(void);
 void backlight_on(void);
 void backlight_off(void);
 void backlight_set_timeout(int value);
-
+void backlight_set_on_wait_timeout(int value);
 #ifdef HAVE_BACKLIGHT
 void backlight_init(void) INIT_ATTR;
 void backlight_close(void);
 
 int  backlight_get_current_timeout(void);
+int  backlight_get_current_on_wait_timeout(void);
 
 #if defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
 void backlight_set_fade_in(int value);
@@ -70,9 +73,13 @@ void remote_backlight_hw_off(void);
 void remote_backlight_on(void);
 void remote_backlight_off(void);
 void remote_backlight_set_timeout(int value);
+void remote_backlight_set_on_wait_timeout(int value);
 void remote_backlight_set_timeout_plugged(int value);
 bool is_remote_backlight_on(bool ignore_always_off);
+bool is_remote_backlight_pending(void);
+void remote_backlight_cancel_pending(void);
 int remote_backlight_get_current_timeout(void);
+int remote_backlight_get_current_on_wait_timeout(void);
 
 #ifdef HAS_REMOTE_BUTTON_HOLD
 void remote_backlight_hold_changed(bool rc_hold_button);
@@ -102,11 +109,16 @@ void buttonlight_set_brightness(int val);
 void buttonlight_on(void);
 void buttonlight_off(void);
 void buttonlight_set_timeout(int value);
+void buttonlight_set_on_wait_timeout(int value);
+bool is_buttonlight_pending(void);
+void buttonlight_cancel_pending(void);
+bool is_buttonlight_on(bool ignore_always_off);
 #endif
 
 /* Private API for use in target tree backlight code only */
 #ifdef HAVE_BUTTON_LIGHT
 int  buttonlight_get_current_timeout(void);
+int  buttonlight_get_current_on_wait_timeout(void);
 #endif
 
 #endif /* BACKLIGHT_H */

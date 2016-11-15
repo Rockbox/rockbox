@@ -41,9 +41,19 @@
 #ifdef HAVE_TOUCHSCREEN
 #include "statusbar-skinned.h"
 #endif
+#ifdef HAVE_BACKLIGHT
+#include "backlight.h"
+static bool selective_act = false;
+static int selective_act_mask = 0;
+static bool filter_first_keypress=false;
+#endif
+#if defined(HAVE_BACKLIGHT) || defined(ALLOW_SOFTLOCK)
+static bool is_filtered_context_action(int action, int actmask, int context);
+#endif
 
 static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
                                                     work on startup */
+static int last_context = CONTEXT_STD;
 static intptr_t last_data = 0;
 static int last_action = ACTION_NONE;
 static bool repeated = false;
@@ -209,7 +219,7 @@ static int get_action_worker(int context, int timeout,
     int button;
     int i=0;
     int ret = ACTION_UNKNOWN;
-    static int last_context = CONTEXT_STD;
+    /*static int last_context = CONTEXT_STD;//MovedGlobal*/
     
     send_event(GUI_EVENT_ACTIONUPDATE, NULL);
 
@@ -420,6 +430,30 @@ int get_action(int context, int timeout)
     if (button == ACTION_TOUCHSCREEN)
         button = sb_touch_to_button(context);
 #endif
+#ifdef HAVE_BACKLIGHT
+    /* Need to look up actions before we can decide to turn off backlight if
+     * selective backlighting is true filter first keypress events need to be
+     * taken into account as well
+     */
+
+    if(selective_act && is_backlight_pending() && !is_backlight_on(false))
+    {
+        bool no_backlight = is_filtered_context_action(button, selective_act_mask, 
+                    last_context & ~ALLOW_SOFTLOCK);
+            if(no_backlight)
+            {
+                backlight_cancel_pending();
+#ifdef HAVE_BUTTON_LIGHT
+                buttonlight_cancel_pending();
+#endif
+            }
+            else if(button_queue_count == 0)
+                backlight_on();
+        /* erase the action if filter_first_keypress and backlight is off */
+            if(!no_backlight && filter_first_keypress)
+                button=ACTION_NONE;
+    }
+#endif
     return button;
 }
 
@@ -532,4 +566,86 @@ void action_wait_for_release(void)
 {
     wait_for_release = true;
 }
-    
+
+#if defined(HAVE_BACKLIGHT) || defined(ALLOW_SOFTLOCK)
+/* selective backlighting if the context matches FM or WPS and the passed action
+ * matches the actionmask then the backlight will not be turned on
+ */
+static bool is_filtered_context_action(int action, int actmask, int context)
+{
+bool match = false;
+
+    if((action != ACTION_NONE && action != ACTION_REDRAW && (context == ( CONTEXT_FM ) ||
+       context == ( CONTEXT_WPS ))))
+        {
+
+            if ((actmask & SEL_ACTION_PLAY) &&
+                (action == ACTION_WPS_PLAY || 
+                action == ACTION_FM_PLAY))
+                match = true;
+            else if ((actmask & SEL_ACTION_SEEK) &&
+                    (action == ACTION_WPS_SEEKFWD ||
+                     action == ACTION_WPS_SEEKBACK ||
+                     action == ACTION_WPS_STOPSEEK ||
+                     action == ACTION_STD_PREVREPEAT ||
+                     action == ACTION_STD_NEXTREPEAT))
+                match = true;            
+            else if ((actmask & SEL_ACTION_VOL) &&
+                    (action == ACTION_WPS_VOLUP ||
+                    action == ACTION_WPS_VOLDOWN))
+                match = true;  
+            else if ((actmask & SEL_ACTION_SKIP) &&
+                    (action == ACTION_WPS_SKIPNEXT ||
+                    action == ACTION_WPS_SKIPPREV ||
+                    action == ACTION_FM_NEXT_PRESET ||
+                    action == ACTION_FM_PREV_PRESET ||
+                    action == ACTION_STD_PREV ||
+                    action == ACTION_STD_NEXT))
+                match = true;
+            else if ((context == CONTEXT_FM ) && /* Sansa Fuze+ fm volume? */
+                    (actmask & SEL_ACTION_VOL) && 
+                    (action == ACTION_SETTINGS_INC ||
+                     action == ACTION_SETTINGS_INCREPEAT ||
+                     action == ACTION_SETTINGS_DEC ||
+                     action == ACTION_SETTINGS_DECREPEAT))
+                match = true;
+
+            /* display action code of unfiltered actions
+            else
+            {
+                static char buf[32];
+                snprintf(buf,31,"action %d - %d",action, last_button);
+                splash(HZ/100, buf);
+            }*/
+        }
+    return match;
+}
+#endif /*HAVE_BACKLIGHT || ALLOW_SOFTLOCK*/
+
+#ifdef HAVE_BACKLIGHT
+void set_selective_backlight_actions(bool selective,int mask,bool filter_fkp)
+{
+    if(selective)
+    {
+       backlight_set_on_wait_timeout(1);
+#ifdef HAVE_BUTTON_LIGHT
+       buttonlight_set_on_wait_timeout(1);
+#endif
+
+        set_backlight_filter_keypress(false);/*turnoff ffkp in button.c*/
+    }
+    else
+    {
+        backlight_set_on_wait_timeout(0);
+#ifdef HAVE_BUTTON_LIGHT
+        buttonlight_set_on_wait_timeout(0);
+#endif
+        set_backlight_filter_keypress(filter_fkp);
+    }
+
+    selective_act = selective;
+    selective_act_mask = mask;
+    filter_first_keypress=filter_fkp;
+}
+#endif /* HAVE_BACKLIGHT */
+
