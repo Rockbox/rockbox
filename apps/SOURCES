@@ -95,6 +95,7 @@ gui/pitchscreen.c
 gui/quickscreen.c
 #endif
 gui/folder_select.c
+gui/mask_select.c
 
 gui/wps.c
 gui/scrollbar.c

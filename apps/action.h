@@ -41,6 +41,14 @@
 #else
 #define ALLOW_SOFTLOCK 0
 #endif
+#ifdef HAVE_BACKLIGHT
+void set_selective_backlight_actions(bool selective,int mask,bool filter_fkp);
+#endif
+/* Selective backlighting action selection masks */
+#define SEL_ACTION_VOL 2
+#define SEL_ACTION_PLAY 4
+#define SEL_ACTION_SEEK 8
+#define SEL_ACTION_SKIP 16
 
 enum {
     CONTEXT_STD = 0,

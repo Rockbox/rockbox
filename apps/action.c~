@@ -565,7 +565,7 @@ void action_wait_for_release(void)
     wait_for_release = true;
 }
 
-#if defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD)
+#if defined(HAVE_BACKLIGHT) || defined(ALLOW_SOFTLOCK)
 /* selective backlighting if the context matches FM or WPS and the passed action
  * matches the actionmask then the backlight will not be turned on
  */
