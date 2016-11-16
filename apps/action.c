@@ -47,7 +47,7 @@ static bool selective_act = false;
 static int selective_act_mask = 0;
 static bool filter_first_keypress=false;
 #endif
-#if defined(HAVE_BACKLIGHT) || defined(ALLOW_SOFTLOCK)
+#if defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD)
 static bool is_filtered_context_action(int action, int actmask, int context);
 #endif
 
@@ -71,6 +71,8 @@ static int last_action_tick = 0;
 static bool keys_locked = false;
 static int unlock_combo = BUTTON_NONE;
 static bool screen_has_lock = false;
+static bool selective_softlock = false;
+static int selective_softlock_mask = 0;
 #endif /* HAVE_SOFTWARE_KEYLOCK */
 
 /*
@@ -298,9 +300,11 @@ static int get_action_worker(int context, int timeout,
         return ACTION_NONE; /* "safest" return value */
     }
     last_context = context;
+
 #ifndef HAS_BUTTON_HOLD
     screen_has_lock = ((context & ALLOW_SOFTLOCK) == ALLOW_SOFTLOCK);
-    if (is_keys_locked())
+
+    if (is_keys_locked() && !selective_softlock)
     {
         if (button == unlock_combo)
         {
@@ -391,7 +395,7 @@ static int get_action_worker(int context, int timeout,
     }
     /* DEBUGF("ret = %x\n",ret); */
 #ifndef HAS_BUTTON_HOLD
-    if (screen_has_lock && (ret == ACTION_STD_KEYLOCK))
+    if (screen_has_lock && (ret == ACTION_STD_KEYLOCK) && !selective_softlock)
     {
         unlock_combo = button;
         keys_locked = true;
@@ -426,16 +430,44 @@ static int get_action_worker(int context, int timeout,
 int get_action(int context, int timeout)
 {
     int button = get_action_worker(context,timeout,NULL);
+
 #ifdef HAVE_TOUCHSCREEN
     if (button == ACTION_TOUCHSCREEN)
         button = sb_touch_to_button(context);
+#endif
+#ifndef HAS_BUTTON_HOLD
+    if(selective_softlock && screen_has_lock && (button != ACTION_NONE) && 
+                                                (button != ACTION_REDRAW) && 
+                                                (button != ACTION_UNKNOWN))
+    {
+        if(button == ACTION_STD_KEYLOCK && !is_keys_locked())
+        {
+            keys_locked = true;
+            splash(HZ/2, str(LANG_KEYLOCK_ON));
+            last_button = BUTTON_NONE;
+            button=ACTION_REDRAW;
+        }
+        else if(button == ACTION_STD_KEYLOCK)
+        {
+            keys_locked = false;
+            splash(HZ/2, str(LANG_KEYLOCK_OFF));
+            last_button = BUTTON_NONE;
+            button=ACTION_REDRAW;
+        }
+        else if(is_keys_locked() &&
+                    !is_filtered_context_action(button, selective_softlock_mask,
+                                                last_context & ~ALLOW_SOFTLOCK))
+        {
+            splash(HZ/2, str(LANG_KEYLOCK_ON));
+            button=ACTION_REDRAW;
+        }
+    }
 #endif
 #ifdef HAVE_BACKLIGHT
     /* Need to look up actions before we can decide to turn off backlight if
      * selective backlighting is true filter first keypress events need to be
      * taken into account as well
      */
-
     if(selective_act && is_backlight_pending() 
                      && !is_backlight_on(false) && (button_queue_count() == 0))
     {
@@ -452,6 +484,11 @@ int get_action(int context, int timeout)
                 button=ACTION_NONE;
     }/*if selective_act...*/
 #endif
+
+
+
+
+
     return button;
 }
 
@@ -648,3 +685,12 @@ void set_selective_backlight_actions(bool selective,int mask,bool filter_fkp)
 }
 #endif /* HAVE_BACKLIGHT */
 
+#ifndef HAS_BUTTON_HOLD
+void set_selective_softlock_actions(bool selective,int mask)
+{
+
+    selective_softlock = selective;
+    selective_softlock_mask = mask;
+}
+
+#endif /* HAS_BUTTON_HOLD */

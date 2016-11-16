@@ -13493,3 +13493,17 @@
     *: "No Backlight On Selected Actions"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "No Screen Lock For Selected Actions"
+  </source>
+  <dest>
+    *: "No Screen Lock For Selected Actions"
+  </dest>
+  <voice>
+    *: "No Screen Lock For Selected Actions"
+  </voice>
+</phrase>
