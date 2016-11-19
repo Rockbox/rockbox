@@ -38,8 +38,19 @@
 
 #ifndef HAS_BUTTON_HOLD
 #define ALLOW_SOFTLOCK 0x08000000 /* will be stripped.. never needed except in calls to get_action() */
+void set_selective_softlock_actions(bool selective,int mask);
 #else
 #define ALLOW_SOFTLOCK 0
+#endif
+
+/* Selective action masks */
+#define SEL_ACTION_VOL 2
+#define SEL_ACTION_PLAY 4
+#define SEL_ACTION_SEEK 8
+#define SEL_ACTION_SKIP 16
+
+#if defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD)
+bool is_filtered_context_action(int action, int actmask, int context);
 #endif
 
 enum {

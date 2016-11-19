@@ -1069,6 +1069,15 @@ const struct settings_list settings[] = {
 #endif
 #endif /* HAVE_BACKLIGHT */
 
+#ifndef HAS_BUTTON_HOLD
+   OFFON_SETTING(0, bl_selective_softlock_actions,
+                  LANG_SOFTLOCK_SELECTIVE, false,
+                  "No Screen Lock For Selected Actions", NULL),
+   INT_SETTING(0, bl_selective_softlock_actions_mask, LANG_SOFTLOCK_SELECTIVE,
+                0, "Selective Screen Lock Actions", UNIT_INT,
+                0, 64,2, NULL, NULL, NULL),
+#endif /* !HAS_BUTTON_HOLD */
+
 /** End of old RTC config block **/
 
 #ifdef HAVE_BACKLIGHT
@@ -1078,6 +1087,12 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, remote_caption_backlight, LANG_CAPTION_BACKLIGHT,
                   false, "remote caption backlight", NULL),
 #endif
+   OFFON_SETTING(0, bl_selective_actions,
+                  LANG_BACKLIGHT_SELECTIVE, false,
+                  "No Backlight On Selected Actions", NULL),
+   INT_SETTING(0, bl_selective_actions_mask, LANG_BACKLIGHT_SELECTIVE,
+                0, "Selective Backlight Actions", UNIT_INT,
+                0, 64,2, NULL, NULL, NULL),
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     INT_SETTING(F_NO_WRAP, brightness, LANG_BRIGHTNESS,
                 DEFAULT_BRIGHTNESS_SETTING, "brightness",UNIT_INT,
