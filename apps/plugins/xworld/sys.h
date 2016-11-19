@@ -30,8 +30,6 @@
 #define SYS_MOTION_BLUR
 /* must be odd */
 #define BLUR_FRAMES 3
-#else
-#error lol
 #endif
 
 #define NUM_COLORS 16
