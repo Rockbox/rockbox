@@ -44,6 +44,7 @@
 
 static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
                                                     work on startup */
+static int last_context = CONTEXT_STD;
 static intptr_t last_data = 0;
 static int last_action = ACTION_NONE;
 static bool repeated = false;
@@ -61,7 +62,13 @@ static int last_action_tick = 0;
 static bool keys_locked = false;
 static int unlock_combo = BUTTON_NONE;
 static bool screen_has_lock = false;
+static bool selective_softlock = false;
+static int selective_softlock_mask = 0;
 #endif /* HAVE_SOFTWARE_KEYLOCK */
+
+#ifdef HAVE_BACKLIGHT
+#include "backlight_sel.h"
+#endif
 
 /*
  * do_button_check is the worker function for get_default_action.
@@ -209,8 +216,8 @@ static int get_action_worker(int context, int timeout,
     int button;
     int i=0;
     int ret = ACTION_UNKNOWN;
-    static int last_context = CONTEXT_STD;
-    
+    /*static int last_context = CONTEXT_STD;//MOVED GLOBAL*/
+
     send_event(GUI_EVENT_ACTIONUPDATE, NULL);
 
     if (timeout == TIMEOUT_NOBLOCK)
@@ -290,7 +297,7 @@ static int get_action_worker(int context, int timeout,
     last_context = context;
 #ifndef HAS_BUTTON_HOLD
     screen_has_lock = ((context & ALLOW_SOFTLOCK) == ALLOW_SOFTLOCK);
-    if (is_keys_locked())
+    if (is_keys_locked() && !selective_softlock)
     {
         if (button == unlock_combo)
         {
@@ -381,7 +388,7 @@ static int get_action_worker(int context, int timeout,
     }
     /* DEBUGF("ret = %x\n",ret); */
 #ifndef HAS_BUTTON_HOLD
-    if (screen_has_lock && (ret == ACTION_STD_KEYLOCK))
+    if (screen_has_lock && (ret == ACTION_STD_KEYLOCK) && !selective_softlock)
     {
         unlock_combo = button;
         keys_locked = true;
@@ -419,6 +426,40 @@ int get_action(int context, int timeout)
 #ifdef HAVE_TOUCHSCREEN
     if (button == ACTION_TOUCHSCREEN)
         button = sb_touch_to_button(context);
+#endif
+#ifndef HAS_BUTTON_HOLD
+    if(selective_softlock && screen_has_lock && (button != ACTION_NONE) &&
+                                                (button != ACTION_REDRAW) &&
+                                                (button != ACTION_UNKNOWN))
+    {
+        if(button == ACTION_STD_KEYLOCK && !is_keys_locked())
+        {
+            keys_locked = true;
+            splash(HZ/2, str(LANG_KEYLOCK_ON));
+            last_button = BUTTON_NONE;
+            button=ACTION_REDRAW;
+        }
+        else if(button == ACTION_STD_KEYLOCK)
+        {
+            keys_locked = false;
+            splash(HZ/2, str(LANG_KEYLOCK_OFF));
+            last_button = BUTTON_NONE;
+            button=ACTION_REDRAW;
+        }
+        else if(is_keys_locked() &&
+                    !is_filtered_context_action(button, selective_softlock_mask,
+                                                last_context & ~ALLOW_SOFTLOCK))
+        {
+            splash(HZ/2, str(LANG_KEYLOCK_ON));
+            button=ACTION_REDRAW;
+        }
+    }
+#endif
+#ifdef HAVE_BACKLIGHT
+    if(get_selective_backlight_filter_fkp() &&
+             !is_filtered_context_action(button, get_selective_backlight_mask(),
+                                                last_context & ~ALLOW_SOFTLOCK))
+        button=ACTION_NONE;
 #endif
     return button;
 }
@@ -532,4 +573,64 @@ void action_wait_for_release(void)
 {
     wait_for_release = true;
 }
-    
+
+#if defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD)
+bool is_filtered_context_action(int action, int actmask, int context)
+{
+bool match = false;
+
+    if((action != ACTION_NONE && action != ACTION_REDRAW && (context == ( CONTEXT_FM ) ||
+       context == ( CONTEXT_WPS ))))
+        {
+
+            if ((actmask & SEL_ACTION_PLAY) &&
+                (action == ACTION_WPS_PLAY || 
+                action == ACTION_FM_PLAY))
+                match = true;
+            else if ((actmask & SEL_ACTION_SEEK) &&
+                    (action == ACTION_WPS_SEEKFWD ||
+                     action == ACTION_WPS_SEEKBACK ||
+                     action == ACTION_WPS_STOPSEEK ||
+                     action == ACTION_STD_PREVREPEAT ||
+                     action == ACTION_STD_NEXTREPEAT))
+                match = true;            
+            else if ((actmask & SEL_ACTION_VOL) &&
+                    (action == ACTION_WPS_VOLUP ||
+                    action == ACTION_WPS_VOLDOWN))
+                match = true;  
+            else if ((actmask & SEL_ACTION_SKIP) &&
+                    (action == ACTION_WPS_SKIPNEXT ||
+                    action == ACTION_WPS_SKIPPREV ||
+                    action == ACTION_FM_NEXT_PRESET ||
+                    action == ACTION_FM_PREV_PRESET ||
+                    action == ACTION_STD_PREV ||
+                    action == ACTION_STD_NEXT))
+                match = true;
+            else if ((context == CONTEXT_FM ) && /* Sansa Fuze+ fm volume? */
+                    (actmask & SEL_ACTION_VOL) && 
+                    (action == ACTION_SETTINGS_INC ||
+                     action == ACTION_SETTINGS_INCREPEAT ||
+                     action == ACTION_SETTINGS_DEC ||
+                     action == ACTION_SETTINGS_DECREPEAT))
+                match = true;
+
+            /*display action code of unfiltered actions
+            else
+            {
+                static char buf[32];
+                snprintf(buf,31,"action %d - %d",action, last_button);
+                splash(HZ/100, buf);
+            }*/
+        }
+    return match;
+}
+#endif
+#ifndef HAS_BUTTON_HOLD
+void set_selective_softlock_actions(bool selective,int mask)
+{
+
+    selective_softlock = selective;
+    selective_softlock_mask = mask;
+}
+
+#endif /* HAS_BUTTON_HOLD */

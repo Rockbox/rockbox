@@ -103,6 +103,7 @@ static void backlight_thread(void);
 static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue SHAREDBSS_ATTR;
+static bool ignore_bl_on = false;
 #ifdef BACKLIGHT_DRIVER_CLOSE
 static unsigned int backlight_thread_id = 0;
 #endif
@@ -767,6 +768,23 @@ void backlight_close(void)
 #endif /* BACKLIGHT_DRIVER_CLOSE */
 
 void backlight_on(void)
+{
+    if(!ignore_bl_on)
+    {
+        queue_remove_from_head(&backlight_queue, BACKLIGHT_ON);
+        queue_post(&backlight_queue, BACKLIGHT_ON, 0);
+
+    }
+    else
+        ignore_bl_on = false;
+}
+
+void ignore_next_backlight_on(bool value)
+{
+    ignore_bl_on = value;
+}
+
+void backlight_on_force(void)
 {
     queue_remove_from_head(&backlight_queue, BACKLIGHT_ON);
     queue_post(&backlight_queue, BACKLIGHT_ON, 0);
