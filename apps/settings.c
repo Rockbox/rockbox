@@ -110,6 +110,9 @@ struct system_status global_status;
 #include "usb-ibasso.h"
 #endif
 
+#ifdef HAVE_BACKLIGHT
+#include "backlight_sel.h"
+#endif
 
 long lasttime = 0;
 
@@ -1064,11 +1067,18 @@ void settings_apply(bool read_disk)
 
 #ifdef HAVE_BACKLIGHT
     set_backlight_filter_keypress(global_settings.bl_filter_first_keypress);
+    set_selective_backlight_actions(global_settings.bl_selective_actions,
+                                    global_settings.bl_selective_actions_mask,
+                                    global_settings.bl_filter_first_keypress);
 #ifdef HAVE_REMOTE_LCD
     set_remote_backlight_filter_keypress(global_settings.remote_bl_filter_first_keypress);
 #endif
 #ifdef HAS_BUTTON_HOLD
     backlight_set_on_button_hold(global_settings.backlight_on_button_hold);
+#else
+    set_selective_softlock_actions(
+                            global_settings.bl_selective_softlock_actions,
+                            global_settings.bl_selective_softlock_actions_mask);
 #endif
 #ifdef HAVE_LCD_SLEEP_SETTING
     lcd_set_sleep_after_backlight_off(global_settings.lcd_sleep_after_backlight_off);

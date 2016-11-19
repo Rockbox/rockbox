@@ -52,10 +52,14 @@ static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #endif
 #ifdef HAVE_BACKLIGHT
 static bool filter_first_keypress;
+static bool post_backlight_queue = false;
+struct event_queue selbacklight_queue SHAREDBSS_ATTR;
+
 #ifdef HAVE_REMOTE_LCD
 static bool remote_filter_first_keypress;
 #endif
 #endif /* HAVE_BACKLIGHT */
+
 #ifdef HAVE_HEADPHONE_DETECTION
 static bool phones_present = false;
 #endif
@@ -123,6 +127,23 @@ static bool button_try_post(int button, int data)
      * processed yet - but always post releases */
     const bool force_post = button & BUTTON_REL;
 #endif
+#ifdef HAVE_BACKLIGHT
+    if(post_backlight_queue == true)
+    {
+        bool ret_bl = queue_empty(&selbacklight_queue);
+        if (!ret_bl && force_post)
+        {
+            if (queue_count(&selbacklight_queue) > 4)
+                queue_clear(&selbacklight_queue);/*something is wrong (no reader?)*/
+            else
+            queue_remove_from_head(&selbacklight_queue, button);
+            ret_bl = true;
+        }
+    
+        if (ret_bl)
+            queue_post(&selbacklight_queue, button, data); 
+    }
+#endif /* HAVE_BACKLIGHT */
 
     bool ret = queue_empty(&button_queue);
     if (!ret && force_post)
@@ -447,6 +468,7 @@ void button_init(void)
     /* Init used objects first */
     queue_init(&button_queue, true);
 
+
 #ifdef HAVE_BUTTON_DATA
     int temp;
 #endif
@@ -580,6 +602,56 @@ void button_set_flip(bool flip)
 void set_backlight_filter_keypress(bool value)
 {
     filter_first_keypress = value;
+}
+
+int bl_btn_queue_count( void )
+{
+    if(post_backlight_queue == true)
+        return queue_count(&selbacklight_queue);
+    else
+        return -1;
+}
+
+long bl_btn_get(bool block)
+{
+   if(post_backlight_queue == true)
+    {    
+        struct queue_event ev;
+        int pending_count = queue_count(&selbacklight_queue);
+
+        if ( block || pending_count )
+        {
+            queue_wait(&selbacklight_queue, &ev);
+            return ev.id;
+        }
+        
+    }
+    return BUTTON_NONE;
+    
+}
+
+long bl_btn_get_w_tmo(int ticks)
+{
+    if(post_backlight_queue == true)
+    {    
+        struct queue_event ev;
+    
+        queue_wait_w_tmo(&selbacklight_queue, &ev, ticks);
+        if (ev.id == SYS_TIMEOUT)
+            ev.id = BUTTON_NONE;
+        return ev.id;
+    }
+    return BUTTON_NONE;
+}
+void enable_backlight_queue(void)
+{
+    post_backlight_queue = true;
+    queue_init(&selbacklight_queue, true);
+}
+void disable_backlight_queue(void)
+{
+    post_backlight_queue = false;
+    queue_delete(&selbacklight_queue);
 }
 #ifdef HAVE_REMOTE_LCD
 void set_remote_backlight_filter_keypress(bool value)
