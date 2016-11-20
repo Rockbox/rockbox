@@ -49,9 +49,9 @@ if [ "$?" != 0 ]; then
     exit 0
 fi
 
-# NOTE some platforms use ext3 and some ext4 with a custom mount program
+# NOTE some platforms use ext4 with a custom mount program
 # (/usr/local/bin/icx_mount.ext4), some probably use an mtd too
-mount -t ext2 $COMMON_ROOTFS_PARTITION $ROOTFS_TMP_DIR
+mount -t ext3 $COMMON_ROOTFS_PARTITION $ROOTFS_TMP_DIR
 if [ "$?" != 0 ]; then
     lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: mount failed"
     sleep 3

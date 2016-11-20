@@ -60,11 +60,13 @@ lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,10 "Done."
 
 # 5) Dump the root filesystem
 # Mount the root filesystem read-only and dump it
+# NOTE some platforms use ext4 with a custom mount program
+# (/usr/local/bin/icx_mount.ext4), some probably use an mtd too
 lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,12 "Dumping rootfs..."
 ROOTFS_TMP_DIR=/tmp/rootfs
 mkdir $ROOTFS_TMP_DIR
 . /install_script/constant.txt
-if ! mount -t ext2 -o ro $COMMON_ROOTFS_PARTITION $ROOTFS_TMP_DIR
+if ! mount -t ext3 -o ro $COMMON_ROOTFS_PARTITION $ROOTFS_TMP_DIR
 then
     lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,13 "ERROR: cannot mount rootfs"
 else
