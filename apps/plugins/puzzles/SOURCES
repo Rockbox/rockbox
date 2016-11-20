@@ -1,0 +1,26 @@
+rockbox.c
+rbwrappers.c
+
+combi.c
+divvy.c
+drawing.c
+dsf.c
+findloop.c
+grid.c
+latin.c
+laydomino.c
+loopgen.c
+malloc.c
+maxflow.c
+midend.c
+misc.c
+penrose.c
+printing.c
+random.c
+tdq.c
+tree234.c
+version.c
+
+#ifdef COMBINED
+list.c
+#endif

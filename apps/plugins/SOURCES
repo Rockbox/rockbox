@@ -73,6 +73,10 @@ iriverify.c
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) /* those plugins only run on hardware */
 
 /* Overlays loaders */
+
+/* use this if you want a monolithic 'puzzles' */
+/*sgt-puzzles.c*/
+
 #if PLUGIN_BUFFER_SIZE <= 0x20000 && defined(HAVE_LCD_BITMAP)
 
 #if CONFIG_KEYPAD != ONDIO_PAD && CONFIG_KEYPAD != SANSA_M200_PAD \

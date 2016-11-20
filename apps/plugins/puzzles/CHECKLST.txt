@@ -1,0 +1,70 @@
+Useful checklists
+=================
+
+Things to remember when adding a new puzzle
+-------------------------------------------
+
+Write the source file for the new puzzle (duhh).
+
+Create a .R file for it which:
+ - defines a <puzzle>_EXTRA symbol for it if it requires auxiliary
+   object files (make sure that symbol doesn't contain the icon)
+ - adds it to the `ALL' definition, to ensure it is compiled into
+   the OS X binary
+ - adds it as a GTK build target, with the optional GTK icon
+ - adds it as a Windows build target, with the optional resource
+   file
+ - adds auxiliary solver binaries if any
+ - adds it to $(GAMES) in both the automake and GTK makefiles, for
+   `make install'
+ - adds it to list.c for the OS X binary
+ - adds it to gamedesc.txt, with its Windows executable name, display
+   name, and slightly longer description.
+
+If the puzzle is by a new author, modify the copyright notice in
+LICENCE and in puzzles.but. (Also in index.html, but that's listed
+below under website changes.)
+
+Double-check that the game structure name in the source file has
+been renamed from `nullgame', so that it'll work on OS X. Actually
+compiling it on OS X would be a good way to check this, if
+convenient.
+
+Add a documentation section in puzzles.but.
+
+Make sure there's a Windows help topic name defined in puzzles.but,
+and that it's referenced by the help topic field in the game
+structure in the source file.
+
+Check that REQUIRE_RBUTTON and/or REQUIRE_NUMPAD are set as
+appropriate.
+
+Add the new Unix binary name, and the names of any auxiliary solver
+binaries, to .gitignore.
+
+Write an instructions fragment for the webified puzzle pages, as
+html/<puzzlename>.html .
+
+Make a screenshot:
+ - create an appropriate save file in `icons'
+ - add the puzzle name to icons/Makefile
+ - set up a REDO property in icons/Makefile if the screenshot wants
+   to display a move halfway through an animation
+ - set up a CROP property in icons/Makefile if the icon wants to be
+   a sub-rectangle of the whole screenshot
+
+Don't forget to `git add' the new source file, the new .R file and the
+save file in `icons', the new .html file, and any other new files that
+might have been involved.
+
+Check in!
+
+Put the puzzle on the web:
+ - run puzzlesnap.sh
+ - adjust the copyright in index-mid.html if the puzzle is by a new
+   author
+ - check that the new puzzle has appeared on the staging web page
+ - test both Windows binary links, the docs link, the Javascript
+   version and the Java version
+ - run webupdate
+ - test all those things once more on the live website
