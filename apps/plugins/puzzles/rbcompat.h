@@ -1,0 +1,39 @@
+#include "plugin.h"
+#include "rbassert.h"
+
+#define atof atof_wrapper
+#define atoi rb->atoi
+#define calloc tlsf_calloc
+#define cos cos_wrapper
+#define free tlsf_free
+#define getenv getenv_wrapper
+#define malloc tlsf_malloc
+#define memchr rb->memchr
+#define printf LOGF
+#define puts puts_wrapper
+#define qsort rb->qsort
+#define realloc tlsf_realloc
+#define sin sin_wrapper
+#define sprintf sprintf_wrapper
+#define sscanf sscanf_wrapper
+#define strcat rb->strcat
+#define strchr rb->strchr
+#define strcmp rb->strcmp
+#define strcpy rb->strcpy
+#define strcspn strcspn_wrapper
+#define strlen rb->strlen
+#define strncpy rb->strncpy
+#define strspn strspn_wrapper
+#define vsprintf vsprintf_wrapper
+#define fabs fabs_wrapper
+#define floor floor_wrapper
+#define sqrt sqrt_wrapper
+#define ceil ceil_wrapper
+#define atol atoi
+#define atan2 atan2_wrapper
+#define atan atan_wrapper
+#define acos acos_wrapper
+#define strtol strtol_wrapper
+#define pow pow_wrapper
+#define strtoq strtoq_wrapper
+#define strtouq strtouq_wrapper
