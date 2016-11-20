@@ -63,11 +63,16 @@ void button_clear_queue(void);
 void button_set_flip(bool flip); /* turn 180 degrees */
 #endif
 #ifdef HAVE_BACKLIGHT
+int bl_btn_queue_count(void);
+long bl_btn_get(bool block);
+long bl_btn_get_w_tmo(int ticks);
+void enable_backlight_queue(void);
+void disable_backlight_queue(void);
 void set_backlight_filter_keypress(bool value);
 #ifdef HAVE_REMOTE_LCD
 void set_remote_backlight_filter_keypress(bool value);
 #endif
-#endif
+#endif /* HAVE_BACKLIGHT */
 
 #ifdef HAVE_HEADPHONE_DETECTION
 bool headphones_inserted(void);
