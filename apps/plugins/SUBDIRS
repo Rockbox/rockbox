@@ -16,6 +16,7 @@ clock
 #if defined(HAVE_LCD_COLOR) && \
     (!defined(LCD_STRIDEFORMAT) || (LCD_STRIDEFORMAT != VERTICAL_STRIDE))
 xworld
+puzzles
 #endif
 
 #if    (CONFIG_KEYPAD != ONDIO_PAD) /* not enough buttons */ \
