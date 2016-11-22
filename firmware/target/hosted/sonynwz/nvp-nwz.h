@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2010 Amaury Pouly
+ * Copyright (C) 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +18,24 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __MISC_H__
-#define __MISC_H__
+#ifndef __NVP_NWZ_H__
+#define __NVP_NWZ_H__
 
-#include <stdbool.h>
-#include <stddef.h>
+#include "system.h"
+#include "nwz-db.h"
 
-#define _STR(a) #a
-#define STR(a) _STR(a)
+/* get model ID */
+unsigned long nwz_get_model_id(void);
+/* get model NAME (ie NWZ-E463) */
+const char *nwz_get_model_name(void);
+/* return series (index into nwz_db) */
+int nwz_get_series(void);
 
-#define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
+/* read a nvp node and return its size, if the data pointer is null, then simply
+ * return the size, return -1 on error */
+int nwz_nvp_read(enum nwz_nvp_node_t node, void *data);
+/* write a nvp node, return 0 on success and -1 on error, the size of the buffer
+ * must be the one returned by nwz_nvp_read */
+int nwz_nvp_write(enum nwz_nvp_node_t node, void *data);
 
-typedef const char color_t[];
-
-extern color_t OFF, GREY, RED, GREEN, YELLOW, BLUE;
-void color(color_t c);
-void enable_color(bool enable);
-
-typedef void (*generic_printf_t)(void *u, bool err, color_t c, const char *f, ...);
-
-void generic_std_printf(void *u, bool err, color_t c, const char *f, ...);
-
-#endif /* __MISC_H__ */
+#endif /* __NVP_NWZ_H__ */

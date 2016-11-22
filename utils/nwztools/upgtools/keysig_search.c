@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 
+#define cprintf(col, ...) do {color(col); printf(__VA_ARGS__); }while(0)
+
 /** Generic search code */
 
 /* The generator sends chunks to the workers. The exact type of chunks depends
