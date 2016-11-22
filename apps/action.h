@@ -42,6 +42,13 @@
 #define ALLOW_SOFTLOCK 0
 #endif
 
+/* Selective backlighting action selection masks */
+#define SEL_ACTION_NOEXT 1 /* disable while charging*/
+#define SEL_ACTION_VOL 2
+#define SEL_ACTION_PLAY 4
+#define SEL_ACTION_SEEK 8
+#define SEL_ACTION_SKIP 16
+
 enum {
     CONTEXT_STD = 0,
     /* These CONTEXT_ values were here before me,
@@ -349,6 +356,11 @@ bool action_userabort(int timeout);
 const struct button_mapping* get_context_mapping(int context);
 #ifndef HAS_BUTTON_HOLD
 bool is_keys_locked(void);
+void set_selective_softlock_actions(bool selective, int mask);
+#endif
+
+#ifdef HAVE_BACKLIGHT
+void set_selective_backlight_actions(bool selective, int mask, bool filter_fkp);
 #endif
 
 /* returns the status code variable from action.c for the button just pressed 
