@@ -667,6 +667,8 @@ struct user_settings
                                then according to timeout_values[] */
     bool caption_backlight; /* turn on backlight at end and start of track */
     bool bl_filter_first_keypress;   /* filter first keypress when dark? */
+    int bl_selective_actions; /* backlight disable on some actions */
+    int bl_selective_actions_mask;/* mask of actions that will not enable backlight */
 #if CONFIG_CHARGING
     int backlight_timeout_plugged;
 #endif
@@ -679,6 +681,11 @@ struct user_settings
     int lcd_sleep_after_backlight_off; /* when to put lcd to sleep after backlight
                                           has turned off */
 #endif
+#endif /* HAVE_BACKLIGHT */
+
+#ifndef HAS_BUTTON_HOLD
+    int bt_selective_softlock_actions;
+    int bt_selective_softlock_actions_mask;
 #endif
 #if defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
     int backlight_fade_in;  /* backlight fade in timing: 0..3 */
