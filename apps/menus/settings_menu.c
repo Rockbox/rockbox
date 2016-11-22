@@ -49,11 +49,75 @@
 #include "dircache.h"
 #endif
 #include "folder_select.h"
-
+#ifndef HAS_BUTTON_HOLD
+#include "mask_select.h"
+#endif
 #if defined(DX50) || defined(DX90)
 #include "governor-ibasso.h"
 #include "usb-ibasso.h"
 #endif
+
+#ifndef HAS_BUTTON_HOLD
+static int selectivesoftlock_callback(int action,
+                                      const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+
+    switch (action)
+    {
+        case ACTION_EXIT_MENUITEM:
+            set_selective_softlock_actions(
+                            global_settings.bt_selective_softlock_actions,
+                            global_settings.bt_selective_softlock_actions_mask);
+            break;
+    }
+
+    return action;
+}
+static int selectivesoftlock_set_mask(void* param)
+{
+    (void)param;
+int mask = global_settings.bt_selective_softlock_actions_mask;
+            struct s_mask_items maskitems[]={
+                                         {"Volume"        , SEL_ACTION_VOL },
+                                         {"Play"          , SEL_ACTION_PLAY},
+                                         {"Seek"          , SEL_ACTION_SEEK},
+                                         {"Skip"          , SEL_ACTION_SKIP},
+                                         {"Disable Notify", SEL_ACTION_NONOTIFY}
+                                            };
+
+            mask = mask_select(mask, str(LANG_SOFTLOCK_SELECTIVE)
+                               , maskitems,ARRAYLEN(maskitems));
+            global_settings.bt_selective_softlock_actions_mask = mask;
+            if (mask == 0)
+                global_settings.bt_selective_softlock_actions = 0;
+
+    return true;
+}
+static int toggle_selectivesoftlock(void)
+{
+    global_settings.bt_selective_softlock_actions =
+                 (global_settings.bt_selective_softlock_actions) ? false : true;
+    return 0;
+}
+static char* get_selsoftlock_text(int selected_item, void * data, char *buffer)
+{
+    (void)selected_item;
+    (void)data;
+    (void)buffer;
+    return (global_settings.bt_selective_softlock_actions) ? 
+                                                   str(LANG_ON) : str(LANG_OFF);
+}
+static int selsoftlock_talk_item(int selected_item, void * data)
+{
+    (void)selected_item;
+    (void)data;
+    talk_id(global_settings.bt_selective_softlock_actions ? 
+                                                      LANG_ON : LANG_OFF, true);
+    return 0;
+}
+
+#endif /* !HAS_BUTTON_HOLD */
 
 /***********************************/
 /*    TAGCACHE MENU                */
@@ -330,6 +394,19 @@ MENUITEM_SETTING(touchpad_deadzone, &global_settings.touchpad_deadzone, NULL);
 MENUITEM_SETTING(shortcuts_replaces_quickscreen, &global_settings.shortcuts_replaces_qs, NULL);
 #endif
 
+#ifndef HAS_BUTTON_HOLD
+
+MENUITEM_FUNCTION_DYNTEXT(bt_selective_actions, 0, toggle_selectivesoftlock,
+                          NULL, get_selsoftlock_text, selsoftlock_talk_item,
+                          NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(sel_softlock_mask, 0, ID2P(LANG_SETTINGS),
+                  selectivesoftlock_set_mask, NULL, NULL, Icon_Menu_setting);
+
+MAKE_MENU(sel_softlock, ID2P(LANG_BACKLIGHT_SELECTIVE),
+          selectivesoftlock_callback, Icon_Menu_setting,
+          &bt_selective_actions, &sel_softlock_mask );
+#endif
+
 #if defined(DX50) || defined(DX90)
 MENUITEM_SETTING(governor, &global_settings.governor, NULL);
 MENUITEM_SETTING(usb_mode, &global_settings.usb_mode, NULL);
@@ -379,6 +456,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #ifdef HAVE_TOUCHPAD_DEADZONE
             &touchpad_deadzone,
+#endif
+#ifndef HAS_BUTTON_HOLD
+            &sel_softlock,
 #endif
 #ifdef USB_ENABLE_HID
             &usb_hid,
