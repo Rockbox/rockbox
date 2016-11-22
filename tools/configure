@@ -671,6 +671,21 @@ ypr0cc () {
  prefixtools "arm-ypr0-linux-gnueabi-"
 }
 
+sonynwzcc () {
+ GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
+ # Although the ARM1176JZ-S supports unaligned accesses, those seems to disabled
+ # by the kernel. Since GCC emits unaligned accesses by default on ARMv6, we
+ # need to disable that
+ GCCOPTS="$GCCOPTS -mcpu=arm1176jz-s -mno-unaligned-access"
+ endian="little"
+ app_type="sonynwz"
+ LDOPTS="$LDOPTS -lasound -lpthread -ldl -lrt"
+ SHARED_LDFLAG="-shared" # for use by plugins/codecs/...
+ # Set up compiler
+ gccchoice="4.9.4"
+ prefixtools "arm-sony-linux-gnueabi-"
+}
+
 androidcc () {
     if [ -z "$ANDROID_SDK_PATH" ]; then
         echo "ERROR: You need the Android SDK installed and have the ANDROID_SDK_PATH"
@@ -1425,7 +1440,7 @@ cat <<EOF
  141) YH-920              171) HD300             130) Lyre proto 1
  142) YH-925                                     131) Mini2440
  143) YP-S3
- 144) YP-Z5 ==ROCKCHIP==
+ 144) YP-Z5               ==ROCKCHIP==
                           180) rk27xx generic    ==HiFiMAN==
  ==Application==                                 190) HM-60x
  200) SDL                 ==HiFi E.T.==          191) HM-801
@@ -1433,11 +1448,14 @@ cat <<EOF
  202) Nokia N8xx          211) MA9C              ==Sony==
  203) Nokia N900          212) MA8               220) NWZ-E370/E380 series
  204) Pandora             213) MA8C              221) NWZ-E360 series
- 205) Samsung YP-R0
- 206) Android MIPS        ==IHIFI==              ==iBasso==
- 207) Android x86         230) 760               232) DX50
- 208) Samsung YP-R1       231) 960               233) DX90
+ 205) Samsung YP-R0                              222) NWZ-E460 series
+ 206) Android MIPS        ==IHIFI==
+ 207) Android x86         230) 760
+ 208) Samsung YP-R1       231) 960
 
+ ==iBasso==
+ 232) DX50
+ 233) DX90
 
 EOF
 
@@ -3791,6 +3809,28 @@ fi
     t_manufacturer="imx233"
     t_model="sony-nwz"
     arm926ejscc
+    ;;
+
+   222|sonynwze460)
+    application="yes"
+    target_id=96
+    modelname="sonynwze460"
+    target="SONY_NWZE460"
+    memory=16
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="cp"
+    output="rockbox.sony"
+    bootoutput="bootloader-nwze460.sony" # unused
+    appextra="gui:recorder"
+    plugins=""
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    t_cpu="hosted"
+    t_manufacturer="sonynwz"
+    t_model="nwze460"
+    uname=`uname`
+    sonynwzcc
     ;;
 
    230|ihifi760)

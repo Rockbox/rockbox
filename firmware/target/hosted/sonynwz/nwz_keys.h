@@ -21,8 +21,6 @@
 #ifndef __NWZ_KEYS_H__
 #define __NWZ_KEYS_H__
 
-#define NWZ_KEY_NAME    "icx_key"
-
 /* The Sony icx_key driver reports keys via the /dev/input/event0 device and
  * abuses the standard struct input_event. The input_event.code is split into
  * two parts:
@@ -31,6 +29,9 @@
  * The status of the HOLD can be queried at any time by reading the state of
  * the first LED.
  */
+
+/* device name */
+#define NWZ_KEY_NAME    "icx_key"
 
 /* key code and mask */
 #define NWZ_KEY_MASK        0x1f

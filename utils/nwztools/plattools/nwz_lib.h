@@ -39,7 +39,7 @@
 #include "nwz_adc.h"
 #include "nwz_ts.h"
 #include "nwz_power.h"
-#include "nwz_db.h"
+#include "nwz-db.h"
 
 /* get model ID, either from ICX_MODEL_ID env var or using nvpflag, return 0
  * in case of error; note that the result is cached so this function is only

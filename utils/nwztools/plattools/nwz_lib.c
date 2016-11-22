@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include "nwz_lib.h"
-#include "nwz_db.h"
 
 int nwz_run(const char *file, const char *args[], bool wait)
 {

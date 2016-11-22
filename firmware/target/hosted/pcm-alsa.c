@@ -50,6 +50,7 @@
 #include "system.h"
 #include "debug.h"
 #include "kernel.h"
+#include "panic.h"
 
 #include "pcm.h"
 #include "pcm-internal.h"
@@ -367,23 +368,19 @@ void pcm_play_dma_init(void)
 
     if ((err = snd_pcm_open(&handle, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
     {
-        printf("%s(): Cannot open device %s: %s\n", __func__, device, snd_strerror(err));
-        exit(EXIT_FAILURE);
-        return;
+        panicf("%s(): Cannot open device %s: %s\n", __func__, device, snd_strerror(err));
     }
 
     if ((err = snd_pcm_nonblock(handle, 1)))
-        printf("Could not set non-block mode: %s\n", snd_strerror(err));
+        panicf("Could not set non-block mode: %s\n", snd_strerror(err));
 
     if ((err = set_hwparams(handle, rate)) < 0)
     {
-        printf("Setting of hwparams failed: %s\n", snd_strerror(err));
-        exit(EXIT_FAILURE);
+        panicf("Setting of hwparams failed: %s\n", snd_strerror(err));
     }
     if ((err = set_swparams(handle)) < 0)
     {
-        printf("Setting of swparams failed: %s\n", snd_strerror(err));
-        exit(EXIT_FAILURE);
+        panicf("Setting of swparams failed: %s\n", snd_strerror(err));
     }
 
     pcm_dma_apply_settings();
