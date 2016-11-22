@@ -18,25 +18,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_ADC_H__
-#define __NWZ_ADC_H__
+#ifndef __md5_h__
+#define __md5_h__
 
-#define NWZ_ADC_DEV  "/dev/icx_adc"
+#include <stddef.h>
 
-#define NWZ_ADC_TYPE    'm'
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define NWZ_ADC_MIN_CHAN    0
-#define NWZ_ADC_MAX_CHAN    7
+/* Compute the MD5 digest of a buffer */
+void MD5_CalculateDigest(void *digest, const void *input, size_t length);
 
-#define NWZ_ADC_VCCBAT  0
-#define NWZ_ADC_VCCVBUS 1
-#define NWZ_ADC_ADIN3   2
-#define NWZ_ADC_ADIN4   3
-#define NWZ_ADC_ADIN5   4
-#define NWZ_ADC_ADIN6   5
-#define NWZ_ADC_ADIN7   6
-#define NWZ_ADC_ADIN8   7
+#ifdef __cplusplus
+}
+#endif
 
-#define NWZ_ADC_GET_VAL(chan)   _IOR(NWZ_ADC_TYPE, chan, unsigned char)
-
-#endif /* __NWZ_ADC_H__ */
+#endif /* __md5_h__ */

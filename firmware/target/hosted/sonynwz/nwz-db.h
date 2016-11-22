@@ -42,7 +42,7 @@ enum nwz_nvp_node_t
     NWZ_NVP_DBA, /* aad icv */
     NWZ_NVP_DBG, /*  */
     NWZ_NVP_DBI, /* dead battery image */
-    NWZ_NVP_DBV, /* empr icv | empr key */
+    NWZ_NVP_DBV, /* empr key | empr icv */
     NWZ_NVP_DCC, /* secure clock */
     NWZ_NVP_DOR, /* key mode (debug/release) */
     NWZ_NVP_E00, /* EMPR  0 */
@@ -144,7 +144,7 @@ enum nwz_nvp_node_t
 /* Number of models */
 #define NWZ_MODEL_COUNT     181
 /* Number of series */
-#define NWZ_SERIES_COUNT    36
+#define NWZ_SERIES_COUNT    37
 
 /* NVP node info */
 struct nwz_nvp_info_t

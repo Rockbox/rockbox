@@ -33,11 +33,13 @@ extern "C" {
 #define NWZ_SIG_SIZE    8
 #define NWZ_EXPKEY_SIZE (NWZ_KEY_SIZE * NWZ_KEY_SIZE)
 #define NWZ_DES_BLOCK   8
+#define NWZ_MD5_SIZE    16
 
-int fwp_read(void *in, int size, void *out, uint8_t *key);
-int fwp_write(void *in, int size, void *out, uint8_t *key);
+/* size must be a multiple of 8 */
+void fwp_read(void *in, int size, void *out, uint8_t *key);
+void fwp_write(void *in, int size, void *out, uint8_t *key);
 void fwp_setkey(char key[8]);
-int fwp_crypt(void *buf, int size, int mode);
+void fwp_crypt(void *buf, int size, int mode);
 
 #ifdef __cplusplus
 }

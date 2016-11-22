@@ -1,3 +1,4 @@
+#!/bin/bash
 # usage
 # parse_nodes.sh /path/to/icx_nvp_emmc.ko output_file
 # parse_nodes.sh /path/to/rootfs/dir output_file
