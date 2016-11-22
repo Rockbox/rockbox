@@ -671,15 +671,21 @@ struct user_settings
     int backlight_timeout_plugged;
 #endif
 #ifdef HAVE_BACKLIGHT
+    bool bl_selective_actions; /* backlight disable on some actions */
+    int  bl_selective_actions_mask;/* mask of actions that will not enable backlight */
 #ifdef HAS_BUTTON_HOLD
     int backlight_on_button_hold; /* what to do with backlight when hold
                                      switch is on */
+#else /* !HAS_BUTTON_HOLD */
+    bool bt_selective_softlock_actions;
+    int bt_selective_softlock_actions_mask;
 #endif
 #ifdef HAVE_LCD_SLEEP_SETTING
     int lcd_sleep_after_backlight_off; /* when to put lcd to sleep after backlight
                                           has turned off */
 #endif
-#endif
+#endif /* HAVE_BACKLIGHT */
+
 #if defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
     int backlight_fade_in;  /* backlight fade in timing: 0..3 */
     int backlight_fade_out; /* backlight fade in timing: 0..7 */

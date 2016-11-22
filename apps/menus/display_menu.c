@@ -38,6 +38,9 @@
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
+#ifdef HAVE_BACKLIGHT
+#include "mask_select.h"
+#endif
 #ifdef HAVE_TOUCHSCREEN
 #include "screens.h"
 #endif
@@ -56,13 +59,60 @@ static int filterfirstkeypress_callback(int action,const struct menu_item_ex *th
 #ifdef HAVE_REMOTE_LCD
             set_remote_backlight_filter_keypress(
                                 global_settings.remote_bl_filter_first_keypress);
-#endif
-        
+#endif /* HAVE_REMOTE_LCD */
+
+            set_selective_backlight_actions(
+                                       global_settings.bl_selective_actions,
+                                       global_settings.bl_selective_actions_mask,
+                                       global_settings.bl_filter_first_keypress);
             break;
     }
+
     return action;
 }
+static int selectivebacklight_set_mask(void* param)
+{
+    (void)param;
+     int mask = global_settings.bl_selective_actions_mask;
+            struct s_mask_items maskitems[]={
+                                        {"Volume"            , SEL_ACTION_VOL},
+                                        {"Play"              , SEL_ACTION_PLAY},
+                                        {"Seek"              , SEL_ACTION_SEEK},
+                                        {"Skip"              , SEL_ACTION_SKIP}
+#if CONFIG_CHARGING
+                                       ,{"Disable On Ext Pwr", SEL_ACTION_NOEXT}
 #endif
+                                            };
+
+            mask = mask_select(mask, str(LANG_BACKLIGHT_SELECTIVE)
+                               , maskitems, ARRAYLEN(maskitems));
+            global_settings.bl_selective_actions_mask = mask;
+            if (mask < 2 ||  mask == SEL_ACTION_NOEXT)
+                global_settings.bl_selective_actions = 0;
+
+    return true;
+}
+static int toggle_selectivebacklight(void)
+{
+    global_settings.bl_selective_actions =
+                 (global_settings.bl_selective_actions) ? false : true;
+    return 0;
+}
+static char* get_selbacklight_text(int selected_item, void * data, char *buffer)
+{
+    (void)selected_item;
+    (void)data;
+    (void)buffer;
+    return (global_settings.bl_selective_actions) ? str(LANG_ON) : str(LANG_OFF);
+}
+static int selbacklight_talk_item(int selected_item, void * data)
+{
+    (void)selected_item;
+    (void)data;
+    talk_id(global_settings.bl_selective_actions ? LANG_ON : LANG_OFF, true);
+    return 0;
+}
+#endif /* HAVE_BACKLIGHT */
 #ifdef HAVE_LCD_FLIP
 static int flipdisplay_callback(int action,const struct menu_item_ex *this_item)
 {
@@ -101,9 +151,20 @@ MENUITEM_SETTING(caption_backlight, &global_settings.caption_backlight, NULL);
 MENUITEM_SETTING(backlight_fade_in, &global_settings.backlight_fade_in, NULL);
 MENUITEM_SETTING(backlight_fade_out, &global_settings.backlight_fade_out, NULL);
 #endif
-MENUITEM_SETTING(bl_filter_first_keypress, 
-                    &global_settings.bl_filter_first_keypress, 
+MENUITEM_SETTING(bl_filter_first_keypress,
+                    &global_settings.bl_filter_first_keypress,
                     filterfirstkeypress_callback);
+
+MENUITEM_FUNCTION_DYNTEXT(bl_selective_actions, 0, toggle_selectivebacklight,
+                          NULL, get_selbacklight_text, selbacklight_talk_item,
+                          NULL, NULL, Icon_NOICON);
+MENUITEM_FUNCTION(sel_backlight_mask, 0, ID2P(LANG_SETTINGS),
+                  selectivebacklight_set_mask, NULL, NULL, Icon_Menu_setting);
+
+MAKE_MENU(sel_backlight, ID2P(LANG_BACKLIGHT_SELECTIVE),
+          filterfirstkeypress_callback, Icon_Menu_setting,
+          &bl_selective_actions, &sel_backlight_mask );
+
 #ifdef HAVE_LCD_SLEEP_SETTING
 MENUITEM_SETTING(lcd_sleep_after_backlight_off,
                 &global_settings.lcd_sleep_after_backlight_off, NULL);
@@ -124,6 +185,8 @@ MENUITEM_SETTING(flip_display, &global_settings.flip_display, flipdisplay_callba
 #endif
 #endif /* HAVE_LCD_BITMAP */
 
+
+
 /* now the actual menu */
 MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
             NULL, Icon_Display_menu
@@ -141,6 +204,7 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
             ,&backlight_fade_in, &backlight_fade_out
 #endif
             ,&bl_filter_first_keypress
+            ,&sel_backlight
 # ifdef HAVE_LCD_SLEEP_SETTING
             ,&lcd_sleep_after_backlight_off
 # endif
@@ -190,8 +254,8 @@ MENUITEM_SETTING(remote_contrast,
 MENUITEM_SETTING(remote_invert, 
                     &global_settings.remote_invert, NULL);
    
-#ifdef HAVE_LCD_FLIP                    
-MENUITEM_SETTING(remote_flip_display, 
+#ifdef HAVE_LCD_FLIP
+MENUITEM_SETTING(remote_flip_display,
                     &global_settings.remote_flip_display, flipdisplay_callback);
 #endif
 
@@ -207,7 +271,7 @@ static int ticking_callback(int action,const struct menu_item_ex *this_item)
     }
     return action;
 }
-MENUITEM_SETTING(remote_reduce_ticking, 
+MENUITEM_SETTING(remote_reduce_ticking,
                     &global_settings.remote_reduce_ticking, ticking_callback);
 #endif
 
