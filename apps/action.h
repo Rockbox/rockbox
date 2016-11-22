@@ -41,7 +41,34 @@
 #else
 #define ALLOW_SOFTLOCK 0
 #endif
+#if defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD)
+/* Selective action selection flags */
+#define SEL_ACTION_NONE       0
+#define SEL_ACTION_VOL        0x001U
+#define SEL_ACTION_PLAY       0x002U
+#define SEL_ACTION_SEEK       0x004U
+#define SEL_ACTION_SKIP       0x008U
+#define SEL_ACTION_NOEXT      0x010U/* disable selective backlight while charge*/
+#define SEL_ACTION_NONOTIFY   0x010U/* don't notify user softlock is active */
+#define SEL_ACTION_NOUNKNOWN  0x020U/* disable backlight on unknown buttons */
+#define SEL_ACTION_NOTOUCH    0x020U/* disable touch screen/pad on screen lock */
+#define SEL_ACTION_AUTOLOCK   0x040U/* autolock on backlight off */
+/* Flags below are internal to selective functions */
+#define SEL_ACTION_ALOCK_OK   0x080U/*autolock only active after key lock once*/
+#define SEL_ACTION_FFKEYPRESS 0x080U/* Filter First Keypress active*/
+#define SEL_ACTION_ENABLED    0x100U
+/* Selective Actions flags */
 
+#ifndef HAS_BUTTON_HOLD
+bool is_keys_locked(void);
+void set_selective_softlock_actions(bool selective, unsigned int mask);
+#endif
+
+#ifdef HAVE_BACKLIGHT
+void set_selective_backlight_actions(bool selective, unsigned int mask, 
+                                                              bool filter_fkp);
+#endif
+#endif /* defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD) */
 enum {
     CONTEXT_STD = 0,
     /* These CONTEXT_ values were here before me,
@@ -347,9 +374,6 @@ bool action_userabort(int timeout);
 
 /* no other code should need this apart from action.c */
 const struct button_mapping* get_context_mapping(int context);
-#ifndef HAS_BUTTON_HOLD
-bool is_keys_locked(void);
-#endif
 
 /* returns the status code variable from action.c for the button just pressed 
    If button != NULL it will be set to the actual button code */
