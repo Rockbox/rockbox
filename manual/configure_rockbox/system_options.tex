@@ -167,11 +167,11 @@ this option \setting{On}. If it is not required, then turning this setting
 
 \opt{lineout_poweroff}{
 \subsection{\label{ref:LineoutOnOff}Line Out}
-This option turns the \dap{}'s line-out \setting{On} and \setting{Off}. On some 
-devices an enabled line-out will consume some power even if not used. If it is 
-not required, then turning this setting \setting{Off} will save battery and 
+This option turns the \dap{}'s line-out \setting{On} and \setting{Off}. On some
+devices an enabled line-out will consume some power even if not used. If it is
+not required, then turning this setting \setting{Off} will save battery and
 therefore result in better runtime.
-} 
+}
 
 \opt{HAVE_BUTTON_LIGHTS}{
   \opt{e200,e200v2}{
@@ -241,6 +241,61 @@ therefore result in better runtime.
     \end{description}
 }
 
+
+
+
+\nopt{HAS_BUTTON_HOLD}{
+  \subsection{Advanced Key Lock}
+    This option allows users to select actions that when within WPS or FMS will \emph{not} be
+    blocked by the key lock (software hold switch).
+
+
+        \begin{description}
+        \item[Enabled.]
+        Enables/disables the feature.
+
+        \item[Settings.]
+        Allows to select actions that will \emph{not} be blocked by the key lock.
+                \begin{itemize}
+                \item[Volume.]
+                Volume up/down.
+                \item[Play.]
+                Toggling Play/Pause.
+                \item[Seek.]
+                Seeking in a track.
+                \item[Skip.]
+                Skipping of a track.
+                \opt{HAVE_BACKLIGHT}{
+                \item[Autolock On.]
+                When the backlight turns off, softlock will lock the screen,
+                activates when you press the lock key and if you manually lock
+                again, while active it then disables autolock.
+                \begin{itemize}
+                        \item
+                        (Lock Button Pressed \#1) >Auto Lock On
+                            (device still unlocked till backlight timeout).
+                        \item
+                        (Lock Button Pressed \#2) >Auto Lock Off (device locked).
+                        \item
+                        (Lock Button Pressed \#3) >(device unlocked).
+                \end{itemize}
+                } %\opt{HAVE_BACKLIGHT}
+                \opt{touchpad}{
+                \item[Disable Touch.]
+                 Blocks touch screen buttons like the original.
+                }
+                \item[Disable Notify.]
+                Suppresses the notification 'Buttons Locked'
+                    (still will if power button is pressed).
+                \note{This is a pre-requisite for \setting{selectivebacklight}
+                \reference{ref:selectivebacklight} to work also during key lock.}
+
+                \end{itemize}
+        Selected actions are indicated by a leading +.
+        Note: If all options get de-selected, the entire feature is disabled.
+
+        \end{description}
+} %\nopt{HAS_BUTTON_HOLD}
 
 
 \opt{usb_hid}{
@@ -550,7 +605,7 @@ therefore result in better runtime.
                 \\
             \end{btnmap}
 
-        \item [Browser.] This mode lets you control a web browser (e.g. 
+        \item [Browser.] This mode lets you control a web browser (e.g.
         Firefox). It uses the \dap{}'s keys to navigate through the web page
         and different tabs, navigate through history, and to control zoom.
 
@@ -592,7 +647,7 @@ therefore result in better runtime.
                     \\
                 }
 
-                % Zoom in / out 
+                % Zoom in / out
                 \opt{SANSA_FUZEPLUS_PAD}{Long \ButtonBottomRight}
                 \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD}
                     {Long \ButtonUp / Long \ButtonDown}
@@ -707,13 +762,13 @@ therefore result in better runtime.
                     ,SANSA_CLIP_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD%
                     ,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}
                     {\ButtonUp / \ButtonDown / \ButtonLeft / \ButtonRight}
-                \opt{IRIVER_H10_PAD}{\ButtonScrollUp / \ButtonScrollDown / 
+                \opt{IRIVER_H10_PAD}{\ButtonScrollUp / \ButtonScrollDown /
                     \ButtonLeft / \ButtonRight}
                 \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}
                     {\ButtonMenu / \ButtonPlay / \ButtonLeft / \ButtonRight}
                     &
                 \opt{HAVEREMOTEKEYMAP}{
-                    \opt{MROBE100_RC_PAD}{\ButtonRCPlay / \ButtonRCDisplay / 
+                    \opt{MROBE100_RC_PAD}{\ButtonRCPlay / \ButtonRCDisplay /
                         \ButtonRCRew / \ButtonRCFF}%
                     &}
                 Cursor move up / down / left / right, respectively
