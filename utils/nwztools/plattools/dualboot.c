@@ -250,6 +250,14 @@ void create_sony_logo(void)
 
 int main(int argc, char **argv)
 {
+    /* redirect outputs to a file */
+    int out = open("/contents/dualboot.log", O_RDWR|O_CREAT|O_APPEND, 0600);
+    if(out != -1)
+    {
+        dup2(out, 1);
+        dup2(out, 2);
+        close(out);
+    }
     /* make sure backlight is on and we are running the standard lcd mode */
     int fb_fd = nwz_fb_open(true);
     if(fb_fd >= 0)

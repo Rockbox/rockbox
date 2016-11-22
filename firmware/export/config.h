@@ -277,6 +277,7 @@
 #define LCD_IHIFI         60 /* as used by IHIFI 760/960 */
 #define LCD_CREATIVEZENXFISTYLE 61 /* as used by Creative Zen X-Fi Style */
 #define LCD_SAMSUNGYPR1   62 /* as used by Samsung YP-R1 */
+#define LCD_NWZ_LINUX   63 /* as used in the Linux-based NWZ series */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -581,6 +582,8 @@ Lyre prototype 1 */
 #include "config/ibassodx50.h"
 #elif defined(DX90)
 #include "config/ibassodx90.h"
+#elif defined(SONY_NWZE460)
+#include "config/sonynwze460.h"
 #else
 /* no known platform */
 #endif
@@ -1240,5 +1243,11 @@ Lyre prototype 1 */
 /* null audiohw setting macro for when codec header is included for reasons
    other than audio support */
 #define AUDIOHW_SETTING(name, us, nd, st, minv, maxv, defv, expr...)
+
+/* ensure a non-empty plugin buffer, since a lot of code steals the plugin buffer
+ * for temporary allocations, like the skin engine */
+#if PLUGIN_BUFFER_SIZE == 0
+#error "Don't set PLUGIN_BUFFER_SIZE to 0, this is crash"
+#endif
 
 #endif /* __CONFIG_H__ */

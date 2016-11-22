@@ -95,6 +95,19 @@ target/hosted/samsungypr/radio-ypr.c
 #endif
 #endif
 
+#ifdef SONY_NWZ_LINUX
+target/hosted/kernel-unix.c
+target/hosted/filesystem-unix.c
+target/hosted/lc-unix.c
+drivers/lcd-memframe.c
+target/hosted/pcm-alsa.c
+target/hosted/sonynwz/backlight-nwz.c
+target/hosted/sonynwz/lcd-nwz.c
+target/hosted/sonynwz/button-nwz.c
+target/hosted/sonynwz/system-nwz.c
+target/hosted/sonynwz/powermgmt-nwz.c
+#endif
+
 #if defined(SAMSUNG_YPR0) && !defined(SIMULATOR)
 drivers/adc-as3514.c
 #if (CONFIG_RTC == RTC_AS3514)
@@ -447,6 +460,8 @@ target/hosted/pcm-alsa.c
 #elif defined(SAMSUNG_YPR1) && defined(HAVE_WM8978)
 drivers/audio/wm8978.c
 target/hosted/pcm-alsa.c
+#elif defined(HAVE_NWZ_LINUX_CODEC)
+drivers/audio/nwzlinux-codec.c
 #elif defined(HAVE_SDL_AUDIO)
 drivers/audio/sdl.c
 #if CONFIG_CODEC == SWCODEC
