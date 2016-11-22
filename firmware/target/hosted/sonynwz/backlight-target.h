@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2010 Amaury Pouly
+ * Copyright (C) 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +18,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __MISC_H__
-#define __MISC_H__
+#ifndef BACKLIGHT_TARGET_H
+#define BACKLIGHT_TARGET_H
 
-#include <stdbool.h>
-#include <stddef.h>
+bool backlight_hw_init(void);
+void backlight_hw_on(void);
+void backlight_hw_off(void);
+void backlight_hw_brightness(int brightness);
 
-#define _STR(a) #a
-#define STR(a) _STR(a)
-
-#define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
-
-typedef const char color_t[];
-
-extern color_t OFF, GREY, RED, GREEN, YELLOW, BLUE;
-void color(color_t c);
-void enable_color(bool enable);
-
-typedef void (*generic_printf_t)(void *u, bool err, color_t c, const char *f, ...);
-
-void generic_std_printf(void *u, bool err, color_t c, const char *f, ...);
-
-#endif /* __MISC_H__ */
+#endif /* BACKLIGHT_TARGET_H */

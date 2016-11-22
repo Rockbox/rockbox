@@ -20,7 +20,7 @@
 
 /** /!\ This file was automatically generated, DO NOT MODIFY IT DIRECTLY /!\ */
 
-#include "nwz_db.h"
+#include "nwz-db.h"
 
 struct nwz_model_info_t nwz_model[NWZ_MODEL_COUNT] =
 {

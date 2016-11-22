@@ -34,12 +34,8 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-#include "nwz_keys.h"
-#include "nwz_fb.h"
-#include "nwz_adc.h"
 #include "nwz_ts.h"
-#include "nwz_power.h"
-#include "nwz_db.h"
+#include "nwz-db.h"
 
 /* get model ID, either from ICX_MODEL_ID env var or using nvpflag, return 0
  * in case of error; note that the result is cached so this function is only
@@ -164,50 +160,6 @@ int nwz_ts_read_events(int fd, struct input_event *evts, int nr_evts);
 /* wait for events on several file descriptors, return a bitmap of active ones
  * or 0 on timeout, the timeout can be -1 to block */
 long nwz_wait_fds(int *fds, int nr_fds, long timeout_us);
-
-/* open power device */
-int nwz_power_open(void);
-/* close power device */
-void nwz_power_close(int fd);
-/* get power status (return -1 on error, bitmap on success) */
-int nwz_power_get_status(int fd);
-/* get vbus adval (or -1 on error) */
-int nwz_power_get_vbus_adval(int fd);
-/* get vbus voltage in mV (or -1 on error) */
-int nwz_power_get_vbus_voltage(int fd);
-/* get vbus current limit (or -1 on error) */
-int nwz_power_get_vbus_limit(int fd);
-/* get charge switch (or -1 on error) */
-int nwz_power_get_charge_switch(int fd);
-/* get charge current (or -1 on error) */
-int nwz_power_get_charge_current(int fd);
-/* get battery gauge (or -1 on error) */
-int nwz_power_get_battery_gauge(int fd);
-/* get battery adval (or -1 on error) */
-int nwz_power_get_battery_adval(int fd);
-/* get battery voltage in mV (or -1 on error) */
-int nwz_power_get_battery_voltage(int fd);
-/* get vbat adval (or -1 on error) */
-int nwz_power_get_vbat_adval(int fd);
-/* get vbat voltage (or -1 on error) */
-int nwz_power_get_vbat_voltage(int fd);
-/* get sample count (or -1 on error) */
-int nwz_power_get_sample_count(int fd);
-/* get vsys adval (or -1 on error) */
-int nwz_power_get_vsys_adval(int fd);
-/* get vsys voltage in mV (or -1 on error) */
-int nwz_power_get_vsys_voltage(int fd);
-/* get accessory charge mode */
-int nwz_power_get_acc_charge_mode(int fd);
-/* is battery fully charged? (or -1 on error) */
-int nwz_power_is_fully_charged(int fd);
-
-/* open pminfo device */
-int nwz_pminfo_open(void);
-/* close pminfo device */
-void nwz_pminfo_close(int fd);
-/* get pminfo factor (or 0 on error) */
-unsigned int nwz_pminfo_get_factor(int fd);
 
 /* read a nvp node and return its size, if the data pointer is null, then simply
  * return the size, return -1 on error */

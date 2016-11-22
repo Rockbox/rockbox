@@ -98,7 +98,11 @@ ifeq (,$(findstring bootloader,$(APPSDIR)))
 endif
 
 ifneq (,$(findstring bootloader,$(APPSDIR)))
-  include $(APPSDIR)/bootloader.make
+  ifneq (,$(findstring sonynwz,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/sonynwz/sonynwz.make
+  else
+    include $(APPSDIR)/bootloader.make
+  endif
 else ifneq (,$(findstring bootbox,$(APPSDIR)))
   include $(APPSDIR)/bootbox.make
 else ifneq (,$(findstring checkwps,$(APP_TYPE)))
@@ -130,6 +134,10 @@ else # core
 
   ifneq (,$(findstring ypr1,$(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/samsungypr/ypr1/ypr1.make
+  endif
+
+  ifneq (,$(findstring sonynwz,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/sonynwz/sonynwz.make
   endif
 
   ifneq (,$(findstring android_ndk, $(APP_TYPE)))
