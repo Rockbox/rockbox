@@ -1067,7 +1067,22 @@ const struct settings_list settings[] = {
                   LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS, false,
                   "backlight filters first remote keypress", NULL),
 #endif
+   OFFON_SETTING(0, bl_selective_actions,
+                  LANG_BACKLIGHT_SELECTIVE, false,
+                  "No Backlight On Selected Actions", NULL),
+   INT_SETTING(0, bl_selective_actions_mask, LANG_BACKLIGHT_SELECTIVE,
+                0, "Selective Backlight Actions", UNIT_INT,
+                0, 64,2, NULL, NULL, NULL),
 #endif /* HAVE_BACKLIGHT */
+
+#ifndef HAS_BUTTON_HOLD
+   OFFON_SETTING(0, bt_selective_softlock_actions,
+                  LANG_SOFTLOCK_SELECTIVE, false,
+                  "No Screen Lock For Selected Actions", NULL),
+   INT_SETTING(0, bt_selective_softlock_actions_mask, LANG_SOFTLOCK_SELECTIVE,
+                0, "Selective Screen Lock Actions", UNIT_INT,
+                0, 64,2, NULL, NULL, NULL),
+#endif /* !HAS_BUTTON_HOLD */
 
 /** End of old RTC config block **/
 
