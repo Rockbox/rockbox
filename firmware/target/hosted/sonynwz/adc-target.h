@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2010 Amaury Pouly
+ * Copyright (C) 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +18,30 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __MISC_H__
-#define __MISC_H__
+#ifndef _ADC_NWZ_H_
+#define _ADC_NWZ_H_
 
-#include <stdbool.h>
-#include <stddef.h>
+#include "adc.h"
 
-#define _STR(a) #a
-#define STR(a) _STR(a)
+#define NWZ_ADC_DEV  "/dev/icx_adc"
 
-#define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
+#define NWZ_ADC_TYPE    'm'
 
-typedef const char color_t[];
+#define NWZ_ADC_MIN_CHAN    0
+#define NWZ_ADC_MAX_CHAN    7
 
-extern color_t OFF, GREY, RED, GREEN, YELLOW, BLUE;
-void color(color_t c);
-void enable_color(bool enable);
+#define NWZ_ADC_VCCBAT  0
+#define NWZ_ADC_VCCVBUS 1
+#define NWZ_ADC_ADIN3   2
+#define NWZ_ADC_ADIN4   3
+#define NWZ_ADC_ADIN5   4
+#define NWZ_ADC_ADIN6   5
+#define NWZ_ADC_ADIN7   6
+#define NWZ_ADC_ADIN8   7
 
-typedef void (*generic_printf_t)(void *u, bool err, color_t c, const char *f, ...);
+#define NWZ_ADC_GET_VAL(chan)   _IOR(NWZ_ADC_TYPE, chan, unsigned char)
 
-void generic_std_printf(void *u, bool err, color_t c, const char *f, ...);
+/* Return channel name */
+const char *adc_name(int channel);
 
-#endif /* __MISC_H__ */
+#endif
