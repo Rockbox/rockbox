@@ -178,13 +178,13 @@ struct nwz_model_t g_model_list[] =
     { "nwz-a860", HAS_KAS | CONFIRMED, "a7c4af6c28b8900a783f307c1ba538c5", "", "" },
     { "nwz-a850", HAS_KAS | CONFIRMED, "a2efb9168616c2e84d78291295c1aa5d", "", "" },
     { "nwz-e470", HAS_KAS | CONFIRMED, "e4144baaa2707913f17b5634034262c4", "", "" },
+    { "nwz-e580", HAS_KAS | CONFIRMED, "6e25f79812eca7ceed04819d833e80af", "", "" },
     /* The following keys were obtained by brute forcing firmware upgrades,
      * someone with a device needs to confirm that they work */
     { "nw-a820", HAS_KEY | HAS_SIG, "", "4df06482", "07fa0b6e" },
     { "nwz-a10", HAS_KEY | HAS_SIG, "", "ec2888e2", "f62ced8a" },
     { "nwz-a20", HAS_KEY | HAS_SIG, "", "e8e204ee", "577614df" },
     { "nwz-zx100", HAS_KEY | HAS_SIG, "", "22e44606", "a9f95e90" },
-    { "nwz-e580", HAS_KEY | HAS_SIG, "", "a60806ea", "97e8ce46" },
 };
 
 static int digit_value(char c)

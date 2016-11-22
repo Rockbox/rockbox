@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Copyright (C) 2016 Amaury Pouly
  *
@@ -18,8 +17,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_FB_H__
-#define __NWZ_FB_H__
+
+#ifndef __LCD_TARGET_H__
+#define __LCD_TARGET_H__
+
+extern fb_data *nwz_framebuffer; /* see lcd-nwz.c */
+#define LCD_FRAMEBUF_ADDR(col, row) (nwz_framebuffer + (row)*LCD_WIDTH + (col))
 
 #define NWZ_FB_LCD_DEV  "/dev/fb/0"
 #define NWZ_FB_TV_DEV   "/dev/fb/1"
@@ -136,4 +139,5 @@ struct nwz_fb_update_timer
 #define NWZ_FB_GET_BRIGHTNESS   _IOR(NWZ_FB_TYPE, 0x08, struct nwz_fb_brightness)
 
 
-#endif /* __NWZ_FB_H__ */
+#endif /* __LCD_TARGET_H__ */
+
