@@ -49,11 +49,48 @@
 #include "dircache.h"
 #endif
 #include "folder_select.h"
-
+#ifndef HAS_BUTTON_HOLD
+#include "mask_select.h"
+#endif
 #if defined(DX50) || defined(DX90)
 #include "governor-ibasso.h"
 #include "usb-ibasso.h"
 #endif
+
+#ifndef HAS_BUTTON_HOLD
+static int selectivesoftlock_callback(int action,
+                                        const struct menu_item_ex *this_item)
+{
+    (void)this_item;
+
+    switch (action)
+    {
+        case ACTION_EXIT_MENUITEM:
+        if (global_settings.bt_selective_softlock_actions != false)
+        {
+        int mask=global_settings.bt_selective_softlock_actions_mask;
+        struct s_mask_items maskitems[]={
+                                        {"Volume",SEL_ACTION_VOL},
+                                        {"Play",SEL_ACTION_PLAY},
+                                        {"Seek",SEL_ACTION_SEEK},
+                                        {"Skip",SEL_ACTION_SKIP}};
+        /* TODO add language define */
+        mask = mask_select(mask, str(LANG_SOFTLOCK_SELECTIVE)
+                                ,maskitems,ARRAYLEN(maskitems));
+        global_settings.bt_selective_softlock_actions_mask=mask;
+                                                
+        }
+        else global_settings.bt_selective_softlock_actions_mask=0; /* disabled */
+        
+            set_selective_softlock_actions(
+                            global_settings.bt_selective_softlock_actions,
+                            global_settings.bt_selective_softlock_actions_mask);
+        break;
+    }
+
+    return action;
+}
+#endif /* !HAS_BUTTON_HOLD */
 
 /***********************************/
 /*    TAGCACHE MENU                */
@@ -330,6 +367,12 @@ MENUITEM_SETTING(touchpad_deadzone, &global_settings.touchpad_deadzone, NULL);
 MENUITEM_SETTING(shortcuts_replaces_quickscreen, &global_settings.shortcuts_replaces_qs, NULL);
 #endif
 
+#ifndef HAS_BUTTON_HOLD
+MENUITEM_SETTING(bt_selective_softlock_actions,
+                    &global_settings.bt_selective_softlock_actions,
+                    selectivesoftlock_callback);
+#endif
+
 #if defined(DX50) || defined(DX90)
 MENUITEM_SETTING(governor, &global_settings.governor, NULL);
 MENUITEM_SETTING(usb_mode, &global_settings.usb_mode, NULL);
@@ -379,6 +422,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #ifdef HAVE_TOUCHPAD_DEADZONE
             &touchpad_deadzone,
+#endif
+#ifndef HAS_BUTTON_HOLD
+            &bt_selective_softlock_actions,
 #endif
 #ifdef USB_ENABLE_HID
             &usb_hid,
@@ -683,3 +729,4 @@ MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           );
 /*    SETTINGS MENU                */
 /***********************************/
+
