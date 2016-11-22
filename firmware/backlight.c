@@ -103,6 +103,7 @@ static void backlight_thread(void);
 static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue SHAREDBSS_ATTR;
+static bool ignore_backlight_on = false;
 #ifdef BACKLIGHT_DRIVER_CLOSE
 static unsigned int backlight_thread_id = 0;
 #endif
@@ -123,6 +124,7 @@ static void backlight_timeout_handler(void);
 #ifdef HAVE_BUTTON_LIGHT
 static int buttonlight_timer;
 static int buttonlight_timeout = 5*HZ;
+static bool ignore_buttonlight_on = false;
 
 /* Update state of buttonlight according to timeout setting */
 static void buttonlight_update_state(void)
@@ -140,7 +142,24 @@ static void buttonlight_update_state(void)
 }
 
 /* external interface */
+
 void buttonlight_on(void)
+{
+    if(!ignore_buttonlight_on)
+    {
+        queue_remove_from_head(&backlight_queue, BUTTON_LIGHT_ON);
+        queue_post(&backlight_queue, BUTTON_LIGHT_ON, 0);
+    }
+    else
+        ignore_buttonlight_on = false;
+}
+
+void ignore_next_buttonlight_on(bool value)
+{
+    ignore_buttonlight_on = value;
+}
+
+void buttonlight_on_force(void)
 {
     queue_remove_from_head(&backlight_queue, BUTTON_LIGHT_ON);
     queue_post(&backlight_queue, BUTTON_LIGHT_ON, 0);
@@ -767,6 +786,23 @@ void backlight_close(void)
 #endif /* BACKLIGHT_DRIVER_CLOSE */
 
 void backlight_on(void)
+{
+    if(!ignore_backlight_on)
+    {
+        queue_remove_from_head(&backlight_queue, BACKLIGHT_ON);
+        queue_post(&backlight_queue, BACKLIGHT_ON, 0);
+
+    }
+    else
+        ignore_backlight_on = false;
+}
+
+void ignore_next_backlight_on(bool value)
+{
+    ignore_backlight_on = value;
+}
+
+void backlight_on_force(void)
 {
     queue_remove_from_head(&backlight_queue, BACKLIGHT_ON);
     queue_post(&backlight_queue, BACKLIGHT_ON, 0);

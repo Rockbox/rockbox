@@ -95,6 +95,9 @@ gui/pitchscreen.c
 gui/quickscreen.c
 #endif
 gui/folder_select.c
+#if defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD)
+gui/mask_select.c
+#endif
 
 gui/wps.c
 gui/scrollbar.c
