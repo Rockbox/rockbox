@@ -42,8 +42,33 @@
 #include "statusbar-skinned.h"
 #endif
 
+#ifdef HAVE_BACKLIGHT
+#include "backlight.h"
+#if CONFIG_CHARGING
+#include "power.h"
+#endif
+static bool selective_act = false;
+static int selective_act_mask = 0;
+static bool filter_first_keypress=false;
+static int do_selective_backlight(int action);
+#endif /* HAVE_BACKLIGHT */
+
+#if defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD)
+static int get_filtered_action(int action, int actmask, int context);
+static bool is_filtered_context(int context);
+static bool is_action_filterable(int action);
+static inline bool is_action_completed(void);
+const int act_none = SEL_ACTION_NONE;
+const int act_found = SEL_ACTION_FOUND;
+#define LAST_ACTION_TICKS HZ/4
+#endif
+
+
 static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
                                                     work on startup */
+static int last_context = CONTEXT_STD;
+static bool action_pending = false;
+
 static intptr_t last_data = 0;
 static int last_action = ACTION_NONE;
 static bool repeated = false;
@@ -61,14 +86,17 @@ static int last_action_tick = 0;
 static bool keys_locked = false;
 static int unlock_combo = BUTTON_NONE;
 static bool screen_has_lock = false;
+static bool selective_softlock = false;
+static int selective_softlock_mask = 0;
+static int do_selective_softlock(int action);
 #endif /* HAVE_SOFTWARE_KEYLOCK */
 
 /*
  * do_button_check is the worker function for get_default_action.
  * returns ACTION_UNKNOWN or the requested return value from the list.
  */
-static inline int do_button_check(const struct button_mapping *items,
-                                  int button, int last_button, int *start)
+static inline int do_button_check(const struct button_mapping *items,int button, 
+                                    int last_button, int *start, bool *pending)
 {
     int i = 0;
     int ret = ACTION_UNKNOWN;
@@ -88,6 +116,8 @@ static inline int do_button_check(const struct button_mapping *items,
                 break;
             }
         }
+        else if (items[i].pre_button_code == button)
+            *pending = true; /* determine if this could be another action */
         i++;
     }
     *start = i;
@@ -209,7 +239,7 @@ static int get_action_worker(int context, int timeout,
     int button;
     int i=0;
     int ret = ACTION_UNKNOWN;
-    static int last_context = CONTEXT_STD;
+    /*static int last_context = CONTEXT_STD;//Moved Global*/
     
     send_event(GUI_EVENT_ACTIONUPDATE, NULL);
 
@@ -222,7 +252,7 @@ static int get_action_worker(int context, int timeout,
 
 #if defined(HAVE_GUI_BOOST) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
     static struct timeout gui_unboost;
-    /* Boost the CPU in case of wheel scrolling activity in the defined contexts. 
+    /* Boost the CPU in case of wheel scrolling activity in the defined contexts.
      * Call unboost with a timeout of GUI_BOOST_TIMEOUT. */
     if (button != BUTTON_NONE)
     {
@@ -290,7 +320,7 @@ static int get_action_worker(int context, int timeout,
     last_context = context;
 #ifndef HAS_BUTTON_HOLD
     screen_has_lock = ((context & ALLOW_SOFTLOCK) == ALLOW_SOFTLOCK);
-    if (is_keys_locked())
+    if (is_keys_locked() && !selective_softlock) /*selective softlock disables*/
     {
         if (button == unlock_combo)
         {
@@ -348,6 +378,7 @@ static int get_action_worker(int context, int timeout,
 #endif
 
     /*   logf("%x,%x",last_button,button); */
+    action_pending = false; /* could the button be another actions pre_button */
     while (1)
     {
         /*     logf("context = %x",context); */
@@ -362,8 +393,7 @@ static int get_action_worker(int context, int timeout,
 
         if (items == NULL)
             break;
-
-        ret = do_button_check(items,button,last_button,&i);
+        ret = do_button_check(items, button, last_button, &i, &action_pending);
 
         if (ret == ACTION_UNKNOWN)
         {
@@ -381,8 +411,8 @@ static int get_action_worker(int context, int timeout,
     }
     /* DEBUGF("ret = %x\n",ret); */
 #ifndef HAS_BUTTON_HOLD
-    if (screen_has_lock && (ret == ACTION_STD_KEYLOCK))
-    {
+    if (screen_has_lock && (ret == ACTION_STD_KEYLOCK) && !selective_softlock)
+    {/* sel softlock disable this */
         unlock_combo = button;
         keys_locked = true;
         splash(HZ/2, str(LANG_KEYLOCK_ON));
@@ -411,7 +441,7 @@ static int get_action_worker(int context, int timeout,
 #endif
 
     return ret;
-}
+}/* get_action_worker */
 
 int get_action(int context, int timeout)
 {
@@ -420,6 +450,18 @@ int get_action(int context, int timeout)
     if (button == ACTION_TOUCHSCREEN)
         button = sb_touch_to_button(context);
 #endif
+
+
+#ifndef HAS_BUTTON_HOLD
+    if (selective_softlock && is_action_filterable(button))
+        button = do_selective_softlock(button);
+#endif
+#ifdef HAVE_BACKLIGHT
+    if (selective_act && is_action_filterable(button))
+        button = do_selective_backlight(button);
+#endif
+
+
     return button;
 }
 
@@ -433,7 +475,7 @@ bool action_userabort(int timeout)
 {
     int action = get_action_worker(CONTEXT_STD,timeout,NULL);
     bool ret = (action == ACTION_STD_CANCEL);
-    if(!ret)
+    if (!ret)
     {
         default_event_handler(action);
     }
@@ -532,4 +574,260 @@ void action_wait_for_release(void)
 {
     wait_for_release = true;
 }
-    
+
+#if defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD)
+/*
+* Selective softlock and backlight use this lookup based on mask to decide
+* which actions are filtered, or could be filtered but not currently set.
+* returns act_none if the action isn't found, act_found if the action is found
+* but not set and (SEL_ACTION|found) if the action is set
+*/
+static int get_filtered_action(int action, int actmask, int context)
+{
+    int match = act_none;
+    if (action != ACTION_NONE && action != ACTION_UNKNOWN &&
+                                                   is_filtered_context(context))
+        {           /* prevents useless comparisons */
+
+            if (action == ACTION_WPS_PLAY ||
+                 action == ACTION_FM_PLAY)
+                match = (actmask & SEL_ACTION_PLAY) | act_found;
+            else if (action == ACTION_WPS_SEEKFWD    ||
+                     action == ACTION_WPS_SEEKBACK   ||
+                     action == ACTION_WPS_STOPSEEK   ||
+                     action == ACTION_STD_PREVREPEAT ||
+                     action == ACTION_STD_NEXTREPEAT)
+                match = (actmask & SEL_ACTION_SEEK) | act_found;
+            else if (action == ACTION_WPS_VOLUP ||
+                     action == ACTION_WPS_VOLDOWN)
+                match = (actmask & SEL_ACTION_VOL) | act_found;
+            else if (action == ACTION_WPS_SKIPNEXT  ||
+                    action == ACTION_WPS_SKIPPREV   ||
+                    action == ACTION_FM_NEXT_PRESET ||
+                    action == ACTION_FM_PREV_PRESET ||
+                    action == ACTION_STD_PREV ||
+                    action == ACTION_STD_NEXT)
+                match = (actmask & SEL_ACTION_SKIP) | act_found;
+            else if ((context == CONTEXT_FM ) && /* Sansa Fuze+ fm volume? */
+                    (action == ACTION_SETTINGS_INC       ||
+                     action == ACTION_SETTINGS_INCREPEAT ||
+                     action == ACTION_SETTINGS_DEC       ||
+                     action == ACTION_SETTINGS_DECREPEAT))
+                match = (actmask & SEL_ACTION_VOL) | act_found;
+
+            /*display action code of unfiltered actions
+            else
+            {
+                static char buf[32];
+                snprintf(buf,31,"#action %d - %d",action, last_button);
+                splash(HZ/10, buf);
+            }*/
+        }
+
+    return match;
+}
+/* returns true if the supplied context is to be filtered by selective BL/SL*/
+static bool is_filtered_context(int context)
+{
+return (context == ( CONTEXT_FM ) || context == ( CONTEXT_WPS ));
+}
+/* returns true if action can be passed on to selective backlight/softlock */
+static bool is_action_filterable(int action)
+{
+    return (action != ACTION_REDRAW && !(action & (SYS_EVENT)));
+}
+/*returns true if Button & released, repeated; or won't generate those events*/
+static inline bool is_action_completed(void)
+{
+return (((last_button & (BUTTON_REPEAT | BUTTON_REL)) != 0)
+#ifdef HAVE_SCROLLWHEEL
+        /* Scrollwheel doesn't generate release events  */
+            || (last_button & (BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD))
+#endif
+        );
+}
+#endif /* defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD) */
+
+#ifdef HAVE_BACKLIGHT
+    /* Need to look up actions before we can decide to turn on backlight, if
+     * selective backlighting is true filter first keypress events need to be
+     * taken into account as well, most every action takes two rounds through
+     * get_action_worker, once for the keypress and once for the key release,
+     * actions with pre_button codes take even more, some actions however, only
+     * take once; actions defined with only a button and no release/repeat event
+     * these actions should be acted upon immediately except when we have 
+     * selective backlighting enabled and in this case we only act upon them
+     * immediately if there is no chance they have another even tied to them
+     * determined using action_pending and is_action_completed()
+     */
+static int do_selective_backlight(int action)
+{
+    static int last_filtered = act_none;
+    static int last_filtered_action_tick = 0;
+    int context = last_context & ~ALLOW_SOFTLOCK;
+    bool backlight_is_active = is_backlight_on(false);
+    bool backlight_activate = false;
+
+    int filtered = get_filtered_action(action, selective_act_mask, context);
+
+     if (filtered > act_found)
+        { /*directly after a match a key release event may trigger another*/
+            last_filtered_action_tick = current_tick;
+        }
+    if(is_action_completed() || !action_pending)
+    { /* has button been rel/repeated or is this the only action it could be */
+        if (filtered == act_none && last_filtered == act_found)
+        { /* no action found this time but action was not filtered last time */
+            if (action == ACTION_NONE)
+                action = ACTION_UNKNOWN;
+            backlight_activate = true;
+            last_filtered = act_none;
+        }
+        else
+        { /* reset last filtered , if the action is not filtered and this
+                        isn't just a key release event then turn on backlight*/
+            last_filtered = act_none;
+            if (filtered <= act_found && 
+                last_filtered_action_tick + LAST_ACTION_TICKS < current_tick)
+                backlight_activate = true;
+        }
+    }
+    else if (filtered > act_none)
+        last_filtered = filtered;
+
+#if CONFIG_CHARGING
+    if ((SEL_ACTION_NOEXT & selective_act_mask) && power_input_present())
+        backlight_activate = true; /* disabled on external power*/
+#endif
+
+    if (action != ACTION_NONE &&
+    (backlight_is_active || backlight_activate || !is_filtered_context(context)))
+    {/* turn on backlight if: already on, action is not filtered, or any button 
+                                            pressed in a non-filtered context */
+  
+        backlight_on_force();
+#ifdef HAVE_BUTTON_LIGHT
+        buttonlight_on_force();
+#endif
+        if (filter_first_keypress && !backlight_is_active)
+        {
+            action      = ACTION_NONE;
+            last_button = BUTTON_NONE;
+        }
+    }
+    ignore_next_backlight_on(true);/*must be set everytime we handle backlight*/
+#ifdef HAVE_BUTTON_LIGHT
+    ignore_next_buttonlight_on(true);/* as a precautionary fallback */
+#endif
+    return action;
+}
+
+/* Enable selected actions to leave the screen off */
+void set_selective_backlight_actions(bool selective, int mask, bool filter_fkp)
+{
+    if (selective)
+    {
+        backlight_on_force();
+        ignore_next_backlight_on(true);/* must be set everytime we handle bl */
+#ifdef HAVE_BUTTON_LIGHT
+        buttonlight_on_force();
+        ignore_next_buttonlight_on(true);/* as a precautionary fallback */
+#endif
+
+        set_backlight_filter_keypress(false);/* turnoff ffkp in button.c */
+    }
+    else
+    {
+        backlight_on_force();
+        ignore_next_backlight_on(false);
+#ifdef HAVE_BUTTON_LIGHT
+        buttonlight_on_force();
+        ignore_next_buttonlight_on(false);
+#endif
+        set_backlight_filter_keypress(filter_fkp);
+    }
+    selective_act = selective;
+    selective_act_mask = mask;
+    filter_first_keypress=filter_fkp;
+}
+#endif /* HAVE_BACKLIGHT */
+
+
+#ifndef HAS_BUTTON_HOLD
+/* Handles softlock when selective softlock enabled */
+static int do_selective_softlock(int action)
+{
+    static int last_filtered=act_none;
+    bool notify_user = false;
+    int context = last_context & ~ALLOW_SOFTLOCK;
+    int filtered = get_filtered_action(action, selective_softlock_mask, context);
+
+    if (screen_has_lock)
+    {
+        if (action == ACTION_STD_KEYLOCK && !is_keys_locked())
+        {
+            keys_locked = true;
+            notify_user = true;
+            last_button = BUTTON_NONE;
+            action      = ACTION_REDRAW;
+        }
+        else if (action == ACTION_STD_KEYLOCK)
+        {
+            keys_locked = false;
+            notify_user = true;
+            last_button = BUTTON_NONE;
+            action      = ACTION_REDRAW;
+        }
+        else if (is_keys_locked())
+        {
+
+            if(is_action_completed())
+            {
+                if (filtered <= act_found && last_filtered == act_found)
+                { /* notify user if this action filtered and last was filtered*/
+                    notify_user = true;
+                    action = ACTION_REDRAW;
+                    last_filtered = act_none;
+                }
+                else if (filtered <= act_found && action != ACTION_NONE)
+                {/* wait for completion before notifying user */
+                    action = ACTION_NONE;
+                    last_filtered = filtered;
+                }
+                else
+                    last_filtered = act_none;/* action found let it through*/
+
+            }
+            else if (filtered <= act_found && action != ACTION_NONE)
+            { /* wait for completion before notifying user */
+                action = ACTION_NONE;
+                last_filtered = act_found;
+            }
+            else
+                last_filtered = act_none;/* action found let it through*/
+
+        }
+            if (notify_user)
+            {
+#ifdef HAVE_BACKLIGHT
+                backlight_on_force();
+#endif
+#ifdef HAVE_BUTTON_LIGHT
+                buttonlight_on_force();
+#endif
+                if (keys_locked)
+                    splash(HZ/2, str(LANG_KEYLOCK_ON));
+                else
+                    splash(HZ/2, str(LANG_KEYLOCK_OFF));
+            }
+    }
+    return action;
+}
+
+void set_selective_softlock_actions(bool selective, int mask)
+{
+    selective_softlock = selective;
+    selective_softlock_mask = mask;
+}
+
+#endif /* HAS_BUTTON_HOLD */
