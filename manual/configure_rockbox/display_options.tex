@@ -1,6 +1,6 @@
 % $Id$ %
 \section{\label{ref:Displayoptions}Display}
-  
+
   \begin{description}
 
   \item[LCD Settings.]
@@ -32,14 +32,14 @@
         \item[Backlight Fade In.]
         The amount of time that the backlight will take to fade from off to on
         after a button is pressed. If set to \setting{Off} the backlight will
-        turn on immediately, with no fade in. Can also be set to 
+        turn on immediately, with no fade in. Can also be set to
         \setting{500ms}, \setting{1s} or \setting{2s}.
         \item[Backlight Fade Out.]
         Like Backlight fade in, this controls the amount of time that the
         backlight will take to fade from on to off after a button is pressed. If
         set to \setting{Off} the backlight will turn off immediately, with no
         fade out. Other valid values: \setting{500ms}, \setting{1s},
-        \setting{2s}, \setting{3s}, \setting{4s}, \setting{5s} or 
+        \setting{2s}, \setting{3s}, \setting{4s}, \setting{5s} or
         \setting{10s}.
       }
       \opt{backlight_fade_bool}{
@@ -56,21 +56,51 @@
       With this option enabled the first keypress while the backlight is turned
       off will only turn the backlight on without having any other effect. When
       disabled the first keypress will \emph{also} perform its appropriate action.
-      
+
+      \item[\label{ref:selectivebacklight}Selective Backlight]
+       This option allows some selected actions in While Playing Screen and
+       FM screen to \emph{not} turn on the backlight in order to save power.
+      \begin{description}
+        \item[Enabled.]
+        Enables/disables the feature.
+
+        \item[Settings.]
+        Allows to select actions that will \emph{not} activate backlight.
+                \begin{itemize}
+                \item[Volume.]
+                Volume up/down.
+                \item[Play.]
+                Toggling Play/Pause.
+                \item[Seek.]
+                Seeking in a track.
+                \item[Skip.]
+                Skipping of a track.
+                \item[Disable Unmapped Keys.]
+                Buttons that have no action assigned and accidental button
+                    combinations don't turn on backlight.
+                \item[Disable on External Power.]
+                When plugged goes back to regular behavior.
+                \end{itemize}
+        Selected actions are indicated by a leading +.
+        Note: If all options get de-selected, the entire feature is disabled.
+        \end{description}
+
+
+
       \opt{lcd_sleep}{
         \item[Sleep (After Backlight Off).]
         This setting controls how long rockbox will wait before turning off the
         display after the backlight is turned off. Turning off the display
-        saves battery power but turning on the display takes noticeably longer 
+        saves battery power but turning on the display takes noticeably longer
         than just turning on the backlight.
       }
-      
+
       \opt{backlight_brightness}{
         \item[Brightness.]
         Changes the brightness of your LCD display.
       }
     } % \opt{HAVE_BACKLIGHT}
-    
+
     \opt{lcd_contrast}{
       \item[Contrast.]
       Changes the contrast of your LCD display.
@@ -122,7 +152,7 @@
          This setting lets you invert the whole screen, so now you get a
          black background and light text and graphics.
        \item[Upside Down.]
-         Displays the screen so that the top of the display is nearest 
+         Displays the screen so that the top of the display is nearest
          the buttons. This is sometimes useful when carrying the \dap\ in a
          pocket for easy access to the headphone socket.
        \opt{remote_ticking}{
@@ -138,7 +168,7 @@
     the following parameters:
     \begin{description}
     \item[Scroll Speed.]
-      Sets how many times per second the automatic horizontal scrolling text 
+      Sets how many times per second the automatic horizontal scrolling text
       will move a step.
     \item[Scroll Start Delay.]
       Controls how many milliseconds Rockbox should wait before a new
@@ -184,23 +214,23 @@
       useful on slow displays.
     \nopt{scrollwheel}{
       \item[List Acceleration Start Delay.]
-        This setting enables the acceleration of scroll speed in lists when 
-        holding \ActionStdPrev{} or \ActionStdNext{}. When set to 
-        \setting{Off} the acceleration is disabled. When any other value is set 
+        This setting enables the acceleration of scroll speed in lists when
+        holding \ActionStdPrev{} or \ActionStdNext{}. When set to
+        \setting{Off} the acceleration is disabled. When any other value is set
         the acceleration will start to accelerate after holding
-        \ActionStdPrev{} or \ActionStdNext{} for the chosen time (in 
+        \ActionStdPrev{} or \ActionStdNext{} for the chosen time (in
         seconds).
       \item[List Acceleration Speed.]
-        This setting controls how fast the scroll speed accelerates. The scroll 
-        speed will increase every N seconds. For example, selecting 
-        \setting{Speed up every 3s} will increase the scroll speed every 3 
+        This setting controls how fast the scroll speed accelerates. The scroll
+        speed will increase every N seconds. For example, selecting
+        \setting{Speed up every 3s} will increase the scroll speed every 3
         seconds while \ActionStdPrev{} or \ActionStdNext{} is held.
     }
     \end{description}
 %
   \opt{lcd_bitmap}{
     \item[Peak Meter.]
-      The peak meter can be configured with a number of parameters. 
+      The peak meter can be configured with a number of parameters.
       \begin{description}
       \item[Peak Release.]
         This determines how fast the bar shrinks when the music becomes
@@ -216,7 +246,7 @@
       \item[Clip Hold Time.]
         The number of seconds that the clipping indicator will be visible
         after clipping is detected.
-      \opt{recording}{  
+      \opt{recording}{
         \item[Clip Counter.]
           Show the number of times the clip indicator went active during
           recording in front of the peak meters.

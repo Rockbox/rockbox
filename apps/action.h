@@ -41,37 +41,66 @@
 #else
 #define ALLOW_SOFTLOCK 0
 #endif
+#if defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD)
+/* Selective action selection flags */
+#define SEL_ACTION_NONE       0
+#define SEL_ACTION_VOL        0x001U
+#define SEL_ACTION_PLAY       0x002U
+#define SEL_ACTION_SEEK       0x004U
+#define SEL_ACTION_SKIP       0x008U
+#define SEL_ACTION_NOUNMAPPED 0x010U/* disable backlight on unmapped buttons */
+                                    /* Available 0x020U*/
+                                    /* Available 0x040U*/
+#define SEL_ACTION_NOTOUCH    0x080U/* disable touch screen/pad on screen lock */
+#define SEL_ACTION_AUTOLOCK   0x100U/* autolock on backlight off */
+#define SEL_ACTION_NOEXT      0x200U/* disable selective backlight while charge*/
+#define SEL_ACTION_NONOTIFY   0x200U/* don't notify user softlock is active */
+/* Flags below are internal to selective functions */
+#define SEL_ACTION_ALOCK_OK   0x400U/*autolock only active after key lock once*/
+#define SEL_ACTION_FFKEYPRESS 0x400U/* backlight Filter First Keypress active*/
+#define SEL_ACTION_ENABLED    0x800U
+/* Selective Actions flags */
 
+#ifndef HAS_BUTTON_HOLD
+bool is_keys_locked(void);
+void set_selective_softlock_actions(bool selective, unsigned int mask);
+#endif
+
+#ifdef HAVE_BACKLIGHT
+void set_selective_backlight_actions(bool selective, unsigned int mask,
+                                                              bool filter_fkp);
+#endif
+#endif /* defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD) */
 enum {
     CONTEXT_STD = 0,
     /* These CONTEXT_ values were here before me,
     there values may have significance, so dont touch! */
     CONTEXT_WPS = 1,
-    CONTEXT_TREE = 2, 
+    CONTEXT_TREE = 2,
     CONTEXT_RECORD = 3,
     CONTEXT_MAINMENU = 4, /* uses CONTEXT_TREE and ACTION_TREE_* */
     CONTEXT_ID3DB = 5,
-    /* Add new contexts here, no need to explicitly define a value for them */    
+    /* Add new contexts here, no need to explicitly define a value for them */
     CONTEXT_LIST,
     CONTEXT_SETTINGS, /* regular setting screens (and debug screens) */
-    /* bellow are setting screens which may need to redefine the standard 
+    /* bellow are setting screens which may need to redefine the standard
        setting screen keys, targets should return the CONTEXT_SETTINGS
        keymap unless they are not adequate for the screen
-    NOTE: uses ACTION_STD_[NEXT|PREV] so make sure they are there also   
+    NOTE: uses ACTION_STD_[NEXT|PREV] so make sure they are there also
           and (possibly) ACTION_SETTINGS_[INC|DEC] */
-    CONTEXT_SETTINGS_EQ,            
-    CONTEXT_SETTINGS_COLOURCHOOSER, 
-    CONTEXT_SETTINGS_TIME,          
+    CONTEXT_SETTINGS_EQ,
+    CONTEXT_SETTINGS_COLOURCHOOSER,
+    CONTEXT_SETTINGS_TIME,
     CONTEXT_SETTINGS_RECTRIGGER,
-    
+
     /* The following contexts should use ACTION_STD_[NEXT|PREV]
-        and (possibly) ACTION_SETTINGS_[INC|DEC] 
+        and (possibly) ACTION_SETTINGS_[INC|DEC]
        Also add any extra actions they need                        */
     CONTEXT_BOOKMARKSCREEN, /* uses ACTION_BMS_ defines */
-    CONTEXT_ALARMSCREEN, /* uses ACTION_AS_ defines */   
+    CONTEXT_ALARMSCREEN, /* uses ACTION_AS_ defines */
     CONTEXT_QUICKSCREEN, /* uses ACTION_QS_ defines below */
     CONTEXT_PITCHSCREEN, /* uses ACTION_PS_ defines below */
-    
+
     CONTEXT_YESNOSCREEN, /*NOTE: make sure your target has this and ACTION_YESNO_ACCEPT */
     CONTEXT_RECSCREEN,
     CONTEXT_KEYBOARD,
@@ -86,7 +115,7 @@ enum {
 
 
 enum {
-    
+
     ACTION_NONE = BUTTON_NONE,
     ACTION_UNKNOWN,
     ACTION_REDRAW, /* returned if keys are locked and we splash()'ed */
@@ -95,11 +124,11 @@ enum {
     ACTION_TOUCHSCREEN_IGNORE, /* used for the 'none' action in skins */
 
     /* standard actions, use these first */
-    ACTION_STD_PREV, 
+    ACTION_STD_PREV,
     ACTION_STD_PREVREPEAT,
     ACTION_STD_NEXT,
     ACTION_STD_NEXTREPEAT,
-    
+
     ACTION_STD_OK,
     ACTION_STD_CANCEL,
     ACTION_STD_CONTEXT,
@@ -108,10 +137,10 @@ enum {
     ACTION_STD_KEYLOCK,
     ACTION_STD_REC,
     ACTION_STD_HOTKEY,
-    
+
     ACTION_F3, /* just so everything works again, possibly change me */
     /* code context actions */
-    
+
     /* WPS codes */
     ACTION_WPS_BROWSE,
     ACTION_WPS_PLAY,
@@ -133,7 +162,7 @@ enum {
     ACTION_WPS_CREATE_BOOKMARK,/* optional */
     ACTION_WPS_REC,
 #if 0
-    ACTION_WPSAB_SINGLE, /* This needs to be #defined in 
+    ACTION_WPSAB_SINGLE, /* This needs to be #defined in
                             the config-<target>.h to one of the ACTION_WPS_ actions
                             so it can be used */
 #endif
@@ -141,23 +170,23 @@ enum {
     ACTION_WPS_ABSETB_NEXTDIR, /* you shouldnt want to change dir in ab-mode */
     ACTION_WPS_ABRESET,
     ACTION_WPS_HOTKEY,
-    
-    /* list and tree page up/down */    
+
+    /* list and tree page up/down */
     ACTION_LISTTREE_PGUP,/* optional */
     ACTION_LISTTREE_PGDOWN,/* optional */
 #ifdef HAVE_VOLUME_IN_LIST
     ACTION_LIST_VOLUP,
     ACTION_LIST_VOLDOWN,
 #endif
-    
-    /* tree */ 
+
+    /* tree */
     ACTION_TREE_ROOT_INIT,
     ACTION_TREE_PGLEFT,/* optional */
     ACTION_TREE_PGRIGHT,/* optional */
     ACTION_TREE_STOP,
     ACTION_TREE_WPS,
     ACTION_TREE_HOTKEY,
-    
+
     /* radio */
     ACTION_FM_MENU,
     ACTION_FM_PRESET,
@@ -177,7 +206,7 @@ enum {
     ACTION_REC_NEWFILE,
     ACTION_REC_F2,
     ACTION_REC_F3,
-    
+
     /* main menu */
     /* These are not strictly actions, but must be here
        so they dont conflict with real actions in the menu code */
@@ -186,11 +215,11 @@ enum {
     ACTION_EXIT_AFTER_THIS_MENUITEM, /* if a menu returns this the menu will exit
                                         once the subitem returns */
     ACTION_ENTER_MENUITEM,
-    
+
     /* id3db */
-    
+
     /* list */
-    
+
     /* settings */
     ACTION_SETTINGS_INC,
     ACTION_SETTINGS_INCREPEAT,
@@ -200,16 +229,16 @@ enum {
     ACTION_SETTINGS_DECBIGSTEP,
     ACTION_SETTINGS_RESET,
     ACTION_SETTINGS_SET, /* Used by touchscreen targets */
-    
+
     /* bookmark screen */
     ACTION_BMS_DELETE,
-    
+
     /* quickscreen */
     ACTION_QS_LEFT,
     ACTION_QS_RIGHT,
     ACTION_QS_DOWN,
     ACTION_QS_TOP,
-    
+
     /* pitchscreen */
     /* obviously ignore if you dont have thise screen */
     ACTION_PS_INC_SMALL,
@@ -225,10 +254,10 @@ enum {
     ACTION_PS_EXIT, /* _STD_* isnt going to work here */
     ACTION_PS_SLOWER,
     ACTION_PS_FASTER,
-    
+
     /* yesno screen */
     ACTION_YESNO_ACCEPT,
-    
+
     /* keyboard screen */
     ACTION_KBD_LEFT,
     ACTION_KBD_RIGHT,
@@ -243,7 +272,7 @@ enum {
     ACTION_KBD_DOWN,
     ACTION_KBD_MORSE_INPUT,
     ACTION_KBD_MORSE_SELECT,
-    
+
 #ifdef HAVE_TOUCHSCREEN
     /* the following are helper actions for touchscreen targets,
      * These are for actions which are not doable or required if buttons are
@@ -255,7 +284,7 @@ enum {
     ACTION_TOUCH_VOLUME,
     ACTION_TOUCH_SOFTLOCK,
     ACTION_TOUCH_SETTING,
-#endif    
+#endif
 
     /* USB HID codes */
     ACTION_USB_HID_FIRST, /* Place holder */
@@ -347,11 +376,8 @@ bool action_userabort(int timeout);
 
 /* no other code should need this apart from action.c */
 const struct button_mapping* get_context_mapping(int context);
-#ifndef HAS_BUTTON_HOLD
-bool is_keys_locked(void);
-#endif
 
-/* returns the status code variable from action.c for the button just pressed 
+/* returns the status code variable from action.c for the button just pressed
    If button != NULL it will be set to the actual button code */
 #define ACTION_REMOTE   0x1 /* remote was pressed */
 #define ACTION_REPEAT   0x2 /* action was repeated (NOT button) */
@@ -378,7 +404,7 @@ int action_get_touchscreen_press(short *x, short *y);
  * the press was within the viewport,
  * ACTION_UNKNOWN (and x1, y1 untouched) if the press was outside
  * BUTTON_NONE else
- * 
+ *
  **/
 int action_get_touchscreen_press_in_vp(short *x1, short *y1, struct viewport *vp);
 #endif

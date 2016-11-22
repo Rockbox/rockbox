@@ -103,6 +103,8 @@ static void backlight_thread(void);
 static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue SHAREDBSS_ATTR;
+static bool ignore_backlight_on = false;
+static int backlight_ignored_timer = 0;
 #ifdef BACKLIGHT_DRIVER_CLOSE
 static unsigned int backlight_thread_id = 0;
 #endif
@@ -123,6 +125,8 @@ static void backlight_timeout_handler(void);
 #ifdef HAVE_BUTTON_LIGHT
 static int buttonlight_timer;
 static int buttonlight_timeout = 5*HZ;
+static bool ignore_buttonlight_on = false;
+static int buttonlight_ignored_timer = 0;
 
 /* Update state of buttonlight according to timeout setting */
 static void buttonlight_update_state(void)
@@ -140,10 +144,20 @@ static void buttonlight_update_state(void)
 }
 
 /* external interface */
+
 void buttonlight_on(void)
 {
-    queue_remove_from_head(&backlight_queue, BUTTON_LIGHT_ON);
-    queue_post(&backlight_queue, BUTTON_LIGHT_ON, 0);
+    if(!ignore_buttonlight_on)
+    {
+        queue_remove_from_head(&backlight_queue, BUTTON_LIGHT_ON);
+        queue_post(&backlight_queue, BUTTON_LIGHT_ON, 0);
+    }
+}
+
+void buttonlight_on_ignore(bool value, int timeout)
+{
+    ignore_buttonlight_on = value;
+    buttonlight_ignored_timer = timeout;
 }
 
 void buttonlight_off(void)
@@ -232,7 +246,7 @@ static int backlight_fading_state = NOT_FADING;
 /* s15.16 fixed point variables */
 static int32_t bl_fade_in_step  = ((BL_PWM_INTERVAL*BL_PWM_COUNT)<<16)/300;
 static int32_t bl_fade_out_step = ((BL_PWM_INTERVAL*BL_PWM_COUNT)<<16)/2000;
-static int32_t bl_dim_fraction  = 0;     
+static int32_t bl_dim_fraction  = 0;
 
 static int bl_dim_target  = 0;
 static int bl_dim_current = 0;
@@ -642,7 +656,7 @@ void backlight_thread(void)
                 buttonlight_hw_off();
                 break;
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
-            case BUTTON_LIGHT_BRIGHTNESS_CHANGED:                
+            case BUTTON_LIGHT_BRIGHTNESS_CHANGED:
                 buttonlight_hw_brightness((int)ev.data);
                 break;
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
@@ -723,7 +737,19 @@ static void backlight_timeout_handler(void)
             buttonlight_hw_off();
         }
     }
+    if (buttonlight_ignored_timer > 0)
+    {
+        buttonlight_ignored_timer -= BACKLIGHT_THREAD_TIMEOUT;
+        if (buttonlight_ignored_timer <= 0)
+            ignore_buttonlight_on = false;
+    }
 #endif /* HAVE_BUTTON_LIGHT */
+    if (backlight_ignored_timer > 0)
+    {
+        backlight_ignored_timer -= BACKLIGHT_THREAD_TIMEOUT;
+        if (backlight_ignored_timer <= 0)
+            ignore_backlight_on = false;
+    }
 }
 
 void backlight_init(void)
@@ -768,8 +794,17 @@ void backlight_close(void)
 
 void backlight_on(void)
 {
-    queue_remove_from_head(&backlight_queue, BACKLIGHT_ON);
-    queue_post(&backlight_queue, BACKLIGHT_ON, 0);
+    if(!ignore_backlight_on)
+    {
+        queue_remove_from_head(&backlight_queue, BACKLIGHT_ON);
+        queue_post(&backlight_queue, BACKLIGHT_ON, 0);
+    }
+}
+
+void backlight_on_ignore(bool value, int timeout)
+{
+    ignore_backlight_on = value;
+    backlight_ignored_timer = timeout;
 }
 
 void backlight_off(void)
@@ -829,8 +864,13 @@ void backlight_set_timeout_plugged(int value)
 void backlight_hold_changed(bool hold_button)
 {
     if (!hold_button || (backlight_on_button_hold > 0))
+    {
         /* if unlocked or override in effect */
-        backlight_on();
+
+        /*backlight_on(); REMOVED*/
+        queue_remove_from_head(&backlight_queue, BACKLIGHT_ON);
+        queue_post(&backlight_queue, BACKLIGHT_ON, 0);
+    }
 }
 
 void backlight_set_on_button_hold(int index)
