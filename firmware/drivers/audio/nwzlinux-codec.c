@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2012 Amaury Pouly
+ * Copyright (c) 2016 Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,31 +17,45 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __fwp_h__
-#define __fwp_h__
 
-#include <stdint.h>
+#include "logf.h"
+#include "system.h"
+#include "kernel.h"
+#include "string.h"
+#include "audio.h"
+#include "sound.h"
+#include "audiohw.h"
+#include "cscodec.h"
+#include "nwzlinux_codec.h"
+#include "stdlib.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* This driver handle the Sony linux audio drivers: despite using many differents
+ * codecs, it appears that they all share a common interface and common controls. */
 
-#define NWZ_KAS_SIZE    32
-#define NWZ_KEYSIG_SIZE 16
-#define NWZ_KEY_SIZE    8
-#define NWZ_SIG_SIZE    8
-#define NWZ_EXPKEY_SIZE (NWZ_KEY_SIZE * NWZ_KEY_SIZE)
-#define NWZ_DES_BLOCK   8
-#define NWZ_MD5_SIZE    16
-
-/* size must be a multiple of 8 */
-void fwp_read(void *in, int size, void *out, uint8_t *key);
-void fwp_write(void *in, int size, void *out, uint8_t *key);
-void fwp_setkey(char key[8]);
-void fwp_crypt(void *buf, int size, int mode);
-
-#ifdef __cplusplus
+void audiohw_preinit(void)
+{
+    /* we need to enable the codec */
+    system("amixer cset name='CODEC Power Switch' on");
+    system("amixer > /contents/amixer.txt");
 }
-#endif
 
-#endif /* __fwp_h__ */
+void audiohw_postinit(void)
+{
+}
+
+void audiohw_set_volume(int vol_l, int vol_r)
+{
+    (void) vol_l;
+    (void) vol_r;
+}
+
+void audiohw_close(void)
+{
+    /* disable codec */
+    system("amixer cset name='CODEC Power Switch' off");
+}
+
+void audiohw_set_frequency(int fsel)
+{
+    (void) fsel;
+}

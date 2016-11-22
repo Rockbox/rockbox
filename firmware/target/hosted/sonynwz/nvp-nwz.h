@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2012 Amaury Pouly
+ * Copyright (C) 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,31 +18,24 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __fwp_h__
-#define __fwp_h__
+#ifndef __NVP_NWZ_H__
+#define __NVP_NWZ_H__
 
-#include <stdint.h>
+#include "system.h"
+#include "nwz-db.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* get model ID */
+unsigned long nwz_get_model_id(void);
+/* get model NAME (ie NWZ-E463) */
+const char *nwz_get_model_name(void);
+/* return series (index into nwz_db) */
+int nwz_get_series(void);
 
-#define NWZ_KAS_SIZE    32
-#define NWZ_KEYSIG_SIZE 16
-#define NWZ_KEY_SIZE    8
-#define NWZ_SIG_SIZE    8
-#define NWZ_EXPKEY_SIZE (NWZ_KEY_SIZE * NWZ_KEY_SIZE)
-#define NWZ_DES_BLOCK   8
-#define NWZ_MD5_SIZE    16
+/* read a nvp node and return its size, if the data pointer is null, then simply
+ * return the size, return -1 on error */
+int nwz_nvp_read(enum nwz_nvp_node_t node, void *data);
+/* write a nvp node, return 0 on success and -1 on error, the size of the buffer
+ * must be the one returned by nwz_nvp_read */
+int nwz_nvp_write(enum nwz_nvp_node_t node, void *data);
 
-/* size must be a multiple of 8 */
-void fwp_read(void *in, int size, void *out, uint8_t *key);
-void fwp_write(void *in, int size, void *out, uint8_t *key);
-void fwp_setkey(char key[8]);
-void fwp_crypt(void *buf, int size, int mode);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __fwp_h__ */
+#endif /* __NVP_NWZ_H__ */

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2012 Amaury Pouly
+ * Copyright (C) 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,31 +18,30 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __fwp_h__
-#define __fwp_h__
+#ifndef _ADC_NWZ_H_
+#define _ADC_NWZ_H_
 
-#include <stdint.h>
+#include "adc.h"
 
-#ifdef __cplusplus
-extern "C" {
+#define NWZ_ADC_DEV  "/dev/icx_adc"
+
+#define NWZ_ADC_TYPE    'm'
+
+#define NWZ_ADC_MIN_CHAN    0
+#define NWZ_ADC_MAX_CHAN    7
+
+#define NWZ_ADC_VCCBAT  0
+#define NWZ_ADC_VCCVBUS 1
+#define NWZ_ADC_ADIN3   2
+#define NWZ_ADC_ADIN4   3
+#define NWZ_ADC_ADIN5   4
+#define NWZ_ADC_ADIN6   5
+#define NWZ_ADC_ADIN7   6
+#define NWZ_ADC_ADIN8   7
+
+#define NWZ_ADC_GET_VAL(chan)   _IOR(NWZ_ADC_TYPE, chan, unsigned char)
+
+/* Return channel name */
+const char *adc_name(int channel);
+
 #endif
-
-#define NWZ_KAS_SIZE    32
-#define NWZ_KEYSIG_SIZE 16
-#define NWZ_KEY_SIZE    8
-#define NWZ_SIG_SIZE    8
-#define NWZ_EXPKEY_SIZE (NWZ_KEY_SIZE * NWZ_KEY_SIZE)
-#define NWZ_DES_BLOCK   8
-#define NWZ_MD5_SIZE    16
-
-/* size must be a multiple of 8 */
-void fwp_read(void *in, int size, void *out, uint8_t *key);
-void fwp_write(void *in, int size, void *out, uint8_t *key);
-void fwp_setkey(char key[8]);
-void fwp_crypt(void *buf, int size, int mode);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __fwp_h__ */
