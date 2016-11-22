@@ -276,7 +276,7 @@ build_ctng() {
     $ctng "build"
 
     # install extras
-    if test -e "$dlwhere/$extra"; then
+    if test -n "$extra"; then
         # verify the toolchain has sysroot support
         if test -n `cat $ctng_config | grep CT_USE_SYSROOT\=y`; then
             sysroot=`cat $ctng_config | grep CT_SYSROOT_NAME | sed -e 's,CT_SYSROOT_NAME\=\"\([a-zA-Z0-9]*\)\",\1,'`
@@ -342,6 +342,7 @@ echo "m   - m68k     (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
 echo "a   - arm      (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
 echo "i   - mips     (Jz4740 and ATJ-based players)"
 echo "r   - arm-app  (Samsung ypr0)"
+echo "z   - arm-sony-linux (Linux-based Sony NWZ players)"
 echo "separate multiple targets with spaces"
 echo "(Example: \"s m a\" will build sh, m68k and arm)"
 echo ""
@@ -393,6 +394,9 @@ do
             ;;
         [Rr])
             build_ctng "ypr0" "alsalib.tar.gz" "arm" "linux-gnueabi"
+            ;;
+        [Zz])
+            build_ctng "sony" "" "arm" "linux-gnueabi"
             ;;
         *)
             echo "ROCKBOXDEV: Unsupported architecture option: $arch"
