@@ -462,8 +462,7 @@ static void rb_blitter_load(void *handle, blitter *bl, int x, int y)
 
 static void rb_draw_update(void *handle, int x, int y, int w, int h)
 {
-    LOGF("rb_draw_update(%d, %d, %d, %d)", x, y, w, h);
-    rb->lcd_update_rect(x, y, w, h);
+    /* nothing! */
 }
 
 static void rb_end_draw(void *handle)
@@ -562,9 +561,9 @@ void fatal(char *fmt, ...)
 void get_random_seed(void **randseed, int *randseedsize)
 {
     *randseed = snew(long);
-    long seed = *rb->current_tick;
-    rb->memcpy(*randseed, &seed, sizeof(seed));
-    //*(long*)*randseed = 42; // debug
+    //long seed = *rb->current_tick;
+    //rb->memcpy(*randseed, &seed, sizeof(seed));
+    *(long*)*randseed = 42; // debug
     //rb->splash(HZ, "DEBUG SEED ON");
     *randseedsize = sizeof(long);
 }
@@ -949,6 +948,8 @@ static int pause_menu(void)
 static bool want_redraw = true;
 static bool accept_input = true;
 
+int input_seq[] = { BTN_DOWN, BTN_UP };
+
 /* ignore the excess of LOGFs below... */
 #ifdef LOGF_ENABLE
 #undef LOGF_ENABLE
@@ -963,85 +964,9 @@ static int process_input(int tmo)
     rb->cpu_boost(false); /* about to block for button input */
 #endif
 
-    int button =rb->button_get_w_tmo(tmo);
+    static int pos = 0;
 
-    /* weird stuff */
-    exit_on_usb(button);
-
-    button = rb->button_status();
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
-#endif
-
-    if(button == BTN_PAUSE)
-    {
-        want_redraw = false;
-        /* quick hack to preserve the clipping state */
-        bool orig_clipped = clipped;
-        if(orig_clipped)
-            rb_unclip(NULL);
-
-        int rc = pause_menu();
-
-        if(orig_clipped)
-            rb_clip(NULL, clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height);
-
-        last_keystate = 0;
-        accept_input = true;
-
-        return rc;
-    }
-
-    /* special case for inertia: moves occur after RELEASES */
-    if(!strcmp("Inertia", midend_which_game(me)->name))
-    {
-        LOGF("received button 0x%08x", button);
-
-        unsigned released = ~button & last_keystate;
-        last_keystate = button;
-
-        if(!button)
-        {
-            if(!accept_input)
-            {
-                LOGF("ignoring, all keys released but not accepting input before, can accept input later");
-                accept_input = true;
-                return 0;
-            }
-            else
-                LOGF("accepting this key and subsequent ones");
-        }
-
-        if(!released || !accept_input)
-        {
-            LOGF("released keys detected: 0x%08x", released);
-            LOGF("ignoring, either no keys released or not accepting input");
-            return 0;
-        }
-
-        button |= released;
-        if(last_keystate)
-        {
-            LOGF("ignoring input from now until all released");
-            accept_input = false;
-        }
-        LOGF("accepting event 0x%08x", button);
-    }
-    /* not inertia: events fire on presses */
-    else
-    {
-        /* start accepting input again after a release */
-        if(!button)
-        {
-            accept_input = true;
-            return 0;
-        }
-        /* ignore repeats */
-        if(!accept_input)
-            return 0;
-        accept_input = false;
-    }
+    int button = input_seq[pos++];
 
     switch(button)
     {
@@ -1193,10 +1118,7 @@ static char *init_for_game(const game *gm, int load_fd)
     rb->lcd_set_foreground(LCD_BLACK);
     rb->lcd_set_background(BG_COLOR);
     rb->lcd_clear_display();
-    rb->lcd_update();
 
-    midend_force_redraw(me);
-    draw_title();
     return NULL;
 }
 
@@ -1274,83 +1196,24 @@ enum plugin_status plugin_start(const void *param)
 {
     (void) param;
 
-    rb_atexit(exit_handler);
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
-#endif
+    /* map */
+    init_for_game(gamelist[15], -1);
+    midend_force_redraw(me);
+    draw_title();
+    rb->lcd_update();
+    rb->screen_dump();
+    char fn1[128], fn2[128];
+    rb->snprintf(fn1, 128, "/ss-puzzles-%dx%dx%d.bmp", LCD_WIDTH, LCD_HEIGHT, LCD_DEPTH);
+    rb->snprintf(fn2, 128, "/ss-puzzles-map-%dx%dx%d.bmp", LCD_WIDTH, LCD_HEIGHT, LCD_DEPTH);
+    rb->rename(fn1, fn2);
 
-    bool success = load_game();
-    if(success)
-        goto game_loop;
+    init_for_game(gamelist[2], -1);
+    midend_force_redraw(me);
+    draw_title();
+    rb->lcd_update();
+    rb->screen_dump();
+    rb->snprintf(fn2, 128, "/ss-puzzles-cube-%dx%dx%d.bmp", LCD_WIDTH, LCD_HEIGHT, LCD_DEPTH);
+    rb->rename(fn1, fn2);
 
-    LOGF("acos(.5) = %f", acos(.5));
-    LOGF("sqrt(3)/2 = sin(60) = %f = %f", sqrt(3)/2, sin(PI/3));
-
-    int gm = 0;
-    while(1)
-    {
-        if(rb->set_int("Choose Game", "", UNIT_INT, &gm, NULL, 1, 0, gamecount - 1, formatter))
-            return PLUGIN_OK;
-
-        init_for_game(gamelist[gm], -1);
-
-        last_keystate = 0;
-        accept_input = true;
-
-    game_loop:
-        while(1)
-        {
-            want_redraw = true;
-
-            draw_title();
-
-            int button = process_input(timer_on ? TIMER_INTERVAL : -1);
-
-            if(button < 0)
-            {
-                rb_unclip(NULL);
-                deactivate_timer(NULL);
-
-                if(titlebar)
-                {
-                    sfree(titlebar);
-                    titlebar = NULL;
-                }
-
-                if(button == -1)
-                {
-                    /* new game */
-                    midend_free(me);
-                    break;
-                }
-                else if(button == -2)
-                {
-                    /* quit without saving */
-                    midend_free(me);
-                    sfree(colors);
-                    exit(PLUGIN_OK);
-                }
-                else if(button == -3)
-                {
-                    /* save and quit */
-                    save_game();
-                    midend_free(me);
-                    sfree(colors);
-                    exit(PLUGIN_OK);
-                }
-            }
-
-            if(button)
-                midend_process_key(me, 0, 0, button);
-
-            if(want_redraw)
-                midend_redraw(me);
-
-            if(timer_on)
-                timer_cb();
-
-            rb->yield();
-        }
-        sfree(colors);
-    }
+    return PLUGIN_OK;
 }
