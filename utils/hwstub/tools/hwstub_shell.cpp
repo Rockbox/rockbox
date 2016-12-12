@@ -1239,6 +1239,7 @@ void usage(void)
     printf("options:\n");
     printf("  --help/-?       Display this help\n");
     printf("  --quiet/-q      Quiet non-command messages\n");
+    printf("  -b/--batch      Disable interactive mode after running commands and files\n");
     printf("  --verbose/-v    Verbose output\n");
     printf("  -i <init>       Set lua init file (default is init.lua)\n");
     printf("  -e <cmd>        Execute <cmd> at startup\n");
@@ -1293,6 +1294,7 @@ int main(int argc, char **argv)
 {
     std::string dev_uri = hwstub::uri::default_uri().full_uri();
     bool verbose = false;
+    bool batch = false;
 
     const char *lua_init = "init.lua";
     std::vector< std::pair< exec_type, std::string > > startup_cmds;
@@ -1309,11 +1311,12 @@ int main(int argc, char **argv)
             {"startfile", required_argument, 0, 'f'},
             {"dev", required_argument, 0, 'd'},
             {"verbose", no_argument, 0, 'v'},
+            {"batch", no_argument, 0, 'b'},
             {"debug-rw", no_argument, 0, OPT_DBG_RW},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?qi:e:f:d:v", long_options, NULL);
+        int c = getopt_long(argc, argv, "?qi:e:f:d:vb", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -1343,6 +1346,9 @@ int main(int argc, char **argv)
                 break;
             case OPT_DBG_RW:
                 g_print_mem_rw = true;
+                break;
+            case 'b':
+                batch = true;
                 break;
             default:
                 abort();
@@ -1441,7 +1447,9 @@ int main(int argc, char **argv)
     /* intercept CTRL+C */
     signal(SIGINT, do_signal);
     // start interactive shell
-    luap_enter(g_lua, &g_exit);
+    if(!batch)
+        luap_enter(g_lua, &g_exit);
+    // cleanup
     lua_close(g_lua);
 
     // display log if handled

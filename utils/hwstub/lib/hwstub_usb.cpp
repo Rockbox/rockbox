@@ -153,7 +153,10 @@ error device::open_dev(std::shared_ptr<hwstub::handle>& handle)
     libusb_device_handle *h;
     int err = libusb_open(m_dev, &h);
     if(err != LIBUSB_SUCCESS)
+    {
+        get_context()->debug() << "Cannot open device: " << err << "\n";
         return error::ERROR;
+    }
     /* fetch some descriptors */
     struct libusb_device_descriptor dev_desc;
     struct libusb_config_descriptor *config = nullptr;
@@ -234,7 +237,7 @@ uint16_t device::get_pid()
 handle::handle(std::shared_ptr<hwstub::device> dev, libusb_device_handle *handle)
     :hwstub::handle(dev), m_handle(handle)
 {
-    set_timeout(std::chrono::milliseconds(100));
+    set_timeout(std::chrono::milliseconds(1000));
 }
 
 handle::~handle()
@@ -284,8 +287,13 @@ rb_handle::rb_handle(std::shared_ptr<hwstub::device> dev,
 {
     m_probe_status = error::SUCCESS;
     /* claim interface */
-    if(libusb_claim_interface(m_handle, m_intf) != 0)
+    int err = libusb_claim_interface(m_handle, m_intf);
+    if(err != 0)
+    {
+        get_device()->get_context()->debug() <<
+            "Cannot claim interface: " << err <<"\n";
         m_probe_status = error::PROBE_FAILURE;
+    }
     /* check version */
     if(m_probe_status == error::SUCCESS)
     {
@@ -295,7 +303,13 @@ rb_handle::rb_handle(std::shared_ptr<hwstub::device> dev,
         {
             if(ver_desc.bMajor != HWSTUB_VERSION_MAJOR ||
                     ver_desc.bMinor < HWSTUB_VERSION_MINOR)
+            {
+                get_device()->get_context()->debug() <<
+                    "Version mismatch: host is " << HWSTUB_VERSION_MAJOR <<
+                    "." << HWSTUB_VERSION_MINOR << ", device is " <<
+                    ver_desc.bMajor << "." << ver_desc.bMinor << "\n";
                 m_probe_status = error::PROBE_FAILURE;
+            }
         }
     }
     /* get buffer size */
@@ -305,6 +319,10 @@ rb_handle::rb_handle(std::shared_ptr<hwstub::device> dev,
         m_probe_status = get_layout_desc(layout_desc);
         if(m_probe_status == error::SUCCESS)
             m_buf_size = layout_desc.dBufferSize;
+        /* libusb limits control transfers to 4096 bytes, to which we need to subtract
+         * the size of the possible header. To play safe, limit to 4000 bytes */
+        if(m_buf_size > 4000)
+            m_buf_size = 4000;
     }
 }
 
