@@ -24,6 +24,8 @@
 #include "kernel-imx233.h"
 #include "string.h"
 #include "timrot-imx233.h"
+#include "pinctrl-imx233.h"
+#include "power-imx233.h"
 
 #include "regs/icoll.h"
 
@@ -181,6 +183,13 @@ static void UIRQ(void)
         (unsigned int)(HW_ICOLL_VECTOR - (uint32_t)isr_table) / 4);
 }
 
+__asm("\n\
+.section .text.hwstub\n\
+.global hwstub\n\
+hwstub:\n\
+.incbin \"/home/pamaury/project/rockbox/myrockbox/utils/hwstub/stub/stmp/build/hwstub.bin\"\n");
+extern unsigned char hwstub[];
+
 /* return the priority level */
 void _irq_handler(void)
 {
@@ -190,6 +199,19 @@ void _irq_handler(void)
     /* check for IRQ storm */
     if(irq_count[irq_nr]++ > IRQ_STORM_THRESHOLD)
         panicf("IRQ %d: storm detected", irq_nr);
+    if(imx233_power_read_pswitch())
+    {
+        /* red led */
+        imx233_pinctrl_set_function(2, 2, PINCTRL_FUNCTION_GPIO);
+        imx233_pinctrl_enable_gpio(2, 2, true);
+        imx233_pinctrl_set_gpio(2, 2, true);
+        /* green led */
+        imx233_pinctrl_set_function(2, 4, PINCTRL_FUNCTION_GPIO);
+        imx233_pinctrl_enable_gpio(2, 4, true);
+        imx233_pinctrl_set_gpio(2, 4, false);
+        void (*hwstub_fn)(void) = (void *)hwstub;
+        hwstub_fn();
+    }
     /* do some regular stat */
     if(irq_nr == INT_SRC_TIMER(TIMER_TICK))
         do_irq_stat();
