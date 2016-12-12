@@ -444,7 +444,10 @@ error handle::write(uint32_t addr, const void *buf, size_t& sz, bool atomic)
         size_t xfer = std::min(sz, get_buffer_size());
         err = write_dev(addr, buf, xfer, atomic);
         if(err != error::SUCCESS)
+        {
+            sz = cnt;
             return err;
+        }
         sz -= xfer;
         bufp += xfer;
         addr += xfer;

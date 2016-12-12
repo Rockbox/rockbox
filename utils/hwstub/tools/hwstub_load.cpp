@@ -24,6 +24,7 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <iostream>
 #include "hwstub.hpp"
 #include "hwstub_uri.hpp"
 
@@ -111,6 +112,7 @@ void usage(void)
     printf("  --quiet/-q      Quiet output\n");
     printf("  --type/-t <t>   Override file type\n");
     printf("  --dev/-d <uri>  Device URI (see below)\n");
+    printf("  --verbose/-v    Display debug output\n");
     printf("file types:\n");
     printf("  raw      Load a raw binary blob\n");
     printf("  rockbox  Load a rockbox image produced by scramble\n");
@@ -128,6 +130,7 @@ int main(int argc, char **argv)
     bool quiet = false;
     enum image_type_t type = IT_DETECT;
     const char *uri = "usb:";
+    bool verbose = false;
 
     // parse command line
     while(1)
@@ -138,10 +141,11 @@ int main(int argc, char **argv)
             {"quiet", no_argument, 0, 'q'},
             {"type", required_argument, 0, 't'},
             {"dev", required_argument, 0, 'd'},
+            {"verbose", no_argument, 0, 'v'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?qt:d:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?qt:d:v", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -169,6 +173,9 @@ int main(int argc, char **argv)
                 break;
             case 'd':
                 uri = optarg;
+                break;
+            case 'v':
+                verbose = true;
                 break;
             default:
                 abort();
@@ -236,6 +243,8 @@ int main(int argc, char **argv)
         printf("Cannot create context: %s\n", errstr.c_str());
         return 1;
     }
+    if(verbose)
+        hwctx->set_debug(std::cout);
     std::vector<std::shared_ptr<hwstub::device>> list;
     hwstub::error ret = hwctx->get_device_list(list);
     if(ret != hwstub::error::SUCCESS)
@@ -277,7 +286,7 @@ int main(int argc, char **argv)
         char buffer[128];
         size_t size = sizeof(buffer) - 1;
         hwstub::error err = hwdev->get_log(buffer, size);
-        if(err != hwstub::error::SUCCESS)
+        if(err != error::SUCCESS || size == 0)
             break;
         buffer[size] = 0;
         fprintf(stderr, "%s", buffer);
