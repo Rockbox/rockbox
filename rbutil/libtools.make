@@ -31,25 +31,33 @@ endif
 
 # overwrite for releases
 APPVERSION ?= $(shell $(TOP)/../tools/version.sh $(TOP)/..)
-CFLAGS += -DVERSION=\"$(APPVERSION)\"
+GCCFLAGS += -DVERSION=\"$(APPVERSION)\"
 TARGET_DIR ?= $(abspath .)/
 
 CC := gcc
 CXX := g++
+# use either CC or CXX to link: this makes sure the compiler knows about its
+# internal dependencies. Use CXX if we have at least one c++ file, since we
+# then need to link the c++ standard library (which CXX does for us).
+ifeq ($(strip $(filter %.cpp,$(SOURCES) $(LIBSOURCES))),)
+LD := $(CC)
+else
+LD := $(CXX)
+endif
 CPPDEFINES := $(shell echo foo | $(CROSS)$(CC) -dM -E -)
 
 BINARY = $(OUTPUT)
 # when building a Windows binary add the correct file suffix
 ifeq ($(findstring CYGWIN,$(CPPDEFINES)),CYGWIN)
 BINARY = $(OUTPUT).exe
-CFLAGS+=-mno-cygwin
+GCCFLAGS += -mno-cygwin
 COMPILETARGET = cygwin
 else
 ifeq ($(findstring MINGW,$(CPPDEFINES)),MINGW)
 BINARY = $(OUTPUT).exe
 COMPILETARGET = mingw
 # use POSIX/C99 printf on windows
-CFLAGS += -D__USE_MINGW_ANSI_STDIO=1
+GCCFLAGS += -D__USE_MINGW_ANSI_STDIO=1
 else
 ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
 COMPILETARGET = darwin
@@ -66,7 +74,7 @@ ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
 # When building for 10.4+ we need to use gcc. Otherwise clang is used, so use
 # that to determine if we need to set arch and isysroot.
 ifeq ($(findstring __clang__,$(CPPDEFINES)),__clang__)
-CFLAGS += -mmacosx-version-min=10.5
+GCCFLAGS += -mmacosx-version-min=10.5
 else
 # when building libs for OS X 10.4+ build for both i386 and ppc at the same time.
 # This creates fat objects, and ar can only create the archive but not operate
@@ -75,7 +83,7 @@ ARCHFLAGS += -arch ppc -arch i386
 # building against SDK 10.4 is not compatible with gcc-4.2 (default on newer Xcode)
 # might need adjustment for older Xcode.
 CC = gcc-4.0
-CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
+GCCFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
 endif
 endif
 
@@ -106,7 +114,7 @@ $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS)) $(TARGET_
 	$(info LD $@)
 	$(SILENT)$(call mkdir,$(dir $@))
 # EXTRADEPS need to be built into OBJDIR.
-	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) -o $(BINARY) \
+	$(SILENT)$(CROSS)$(LD) $(ARCHFLAGS) $(LDFLAGS) -o $(BINARY) \
 	    $(OBJS) $(addprefix $(OBJDIR),$(EXTRADEPS)) \
 	    $(addprefix $(OBJDIR),$(EXTRALIBOBJS)) lib$(OUTPUT).a $(addprefix $(OBJDIR),$(EXTRADEPS)) $(LDOPTS)
 
@@ -114,12 +122,12 @@ $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS)) $(TARGET_
 $(OBJDIR)%.c.o:
 	$(info CC $<)
 	$(SILENT)$(call mkdir,$(dir $@))
-	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) -MMD -c -o $@ $<
+	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(GCCFLAGS) $(CFLAGS) -MMD -c -o $@ $<
 
 $(OBJDIR)%.cpp.o:
 	$(info CXX $<)
 	$(SILENT)$(call mkdir,$(dir $@))
-	$(SILENT)$(CROSS)$(CXX) $(ARCHFLAGS) $(CFLAGS) -MMD -c -o $@ $<
+	$(SILENT)$(CROSS)$(CXX) $(ARCHFLAGS) $(GCCFLAGS) $(CXXFLAGS) -MMD -c -o $@ $<
 
 # lib rules
 lib$(OUTPUT).a: $(TARGET_DIR)lib$(OUTPUT).a
@@ -133,7 +141,7 @@ $(OUTPUT).dll: $(TARGET_DIR)$(OUTPUT).dll
 $(TARGET_DIR)$(OUTPUT).dll: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	$(info DLL $(notdir $@))
 	$(SILENT)$(call mkdir,$(dir $@))
-	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) -shared -o $@ $^ \
+	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(GCCFLAGS) -shared -o $@ $^ \
 		    -Wl,--output-def,$(TARGET_DIR)$(OUTPUT).def
 
 # create lib file from objects
