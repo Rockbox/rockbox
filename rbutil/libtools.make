@@ -34,8 +34,8 @@ APPVERSION ?= $(shell $(TOP)/../tools/version.sh $(TOP)/..)
 CFLAGS += -DVERSION=\"$(APPVERSION)\"
 TARGET_DIR ?= $(abspath .)/
 
-NATIVECC ?= gcc
-CC ?= gcc
+CC := gcc
+CXX := g++
 CPPDEFINES := $(shell echo foo | $(CROSS)$(CC) -dM -E -)
 
 BINARY = $(OUTPUT)
@@ -76,7 +76,6 @@ ARCHFLAGS += -arch ppc -arch i386
 # might need adjustment for older Xcode.
 CC = gcc-4.0
 CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
-NATIVECC = gcc-4.0
 endif
 endif
 
@@ -85,13 +84,13 @@ OBJDIR = $(abspath $(BUILD_DIR))/
 
 all: $(BINARY)
 
-OBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR),$(notdir $(SOURCES))))
-LIBOBJS := $(patsubst %.c,%.o,$(addprefix $(OBJDIR),$(notdir $(LIBSOURCES))))
+OBJS := $(addsuffix .o,$(addprefix $(OBJDIR),$(notdir $(SOURCES))))
+LIBOBJS := $(addsuffix .o,$(addprefix $(OBJDIR),$(notdir $(LIBSOURCES))))
 
 # create dependency files. Make sure to use the same prefix as with OBJS!
-$(foreach src,$(SOURCES) $(LIBSOURCES),$(eval $(addprefix $(OBJDIR),$(subst .c,.o,$(notdir $(src)))): $(src)))
-$(foreach src,$(SOURCES) $(LIBSOURCES),$(eval $(addprefix $(OBJDIR),$(subst .c,.d,$(notdir $(src)))): $(src)))
-DEPS = $(addprefix $(OBJDIR),$(subst .c,.d,$(notdir $(SOURCES) $(LIBSOURCES))))
+$(foreach src,$(SOURCES) $(LIBSOURCES),$(eval $(addprefix $(OBJDIR),$(notdir $(src).o)): $(src)))
+$(foreach src,$(SOURCES) $(LIBSOURCES),$(eval $(addprefix $(OBJDIR),$(notdir $(src).d)): $(src)))
+DEPS = $(addprefix $(OBJDIR),$(addsuffix .d,$(notdir $(SOURCES) $(LIBSOURCES))))
 -include $(DEPS)
 
 # additional link dependencies for the standalone executable
@@ -100,11 +99,11 @@ LIBUCL = libucl.a
 $(LIBUCL): $(OBJDIR)$(LIBUCL)
 
 $(OBJDIR)$(LIBUCL):
-	$(SILENT)$(MAKE) -C $(TOP)/../tools/ucl/src TARGET_DIR=$(OBJDIR) $@
+	$(SILENT)$(MAKE) -C $(TOP)/../tools/ucl/src TARGET_DIR=$(OBJDIR) CC=$(CC) $@
 
 # building the standalone executable
 $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS)) $(TARGET_DIR)lib$(OUTPUT).a
-	@echo LD $@
+	$(info LD $@)
 	$(SILENT)$(call mkdir,$(dir $@))
 # EXTRADEPS need to be built into OBJDIR.
 	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) -o $(BINARY) \
@@ -112,10 +111,15 @@ $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS)) $(TARGET_
 	    $(addprefix $(OBJDIR),$(EXTRALIBOBJS)) lib$(OUTPUT).a $(addprefix $(OBJDIR),$(EXTRADEPS)) $(LDOPTS)
 
 # common rules
-$(OBJDIR)%.o:
-	@echo CC $<
+$(OBJDIR)%.c.o:
+	$(info CC $<)
 	$(SILENT)$(call mkdir,$(dir $@))
-	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) -c -o $@ $<
+	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) -MMD -c -o $@ $<
+
+$(OBJDIR)%.cpp.o:
+	$(info CXX $<)
+	$(SILENT)$(call mkdir,$(dir $@))
+	$(SILENT)$(CROSS)$(CXX) $(ARCHFLAGS) $(CFLAGS) -MMD -c -o $@ $<
 
 # lib rules
 lib$(OUTPUT).a: $(TARGET_DIR)lib$(OUTPUT).a
@@ -127,25 +131,21 @@ $(TARGET_DIR)lib$(OUTPUT).a: $(LIBOBJS) \
 dll: $(OUTPUT).dll
 $(OUTPUT).dll: $(TARGET_DIR)$(OUTPUT).dll
 $(TARGET_DIR)$(OUTPUT).dll: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
-	@echo DLL $(notdir $@)
+	$(info DLL $(notdir $@))
 	$(SILENT)$(call mkdir,$(dir $@))
 	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) -shared -o $@ $^ \
 		    -Wl,--output-def,$(TARGET_DIR)$(OUTPUT).def
 
 # create lib file from objects
 $(TARGET_DIR)lib$(OUTPUT).a: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
-	@echo AR $(notdir $@)
+	$(info AR $(notdir $@))
 	$(SILENT)$(call mkdir,$(dir $@))
 	$(SILENT)$(call rm,$@)
-	$(SILENT)$(AR) rcs $@ $^
+	$(SILENT)$(CROSS)$(AR) rcs $@ $^
 
 clean:
 	$(call rm, $(OBJS) $(OUTPUT) $(TARGET_DIR)lib$(OUTPUT)*.a $(OUTPUT).dmg)
 	$(call rm, $(OUTPUT)-* i386 ppc $(OBJDIR))
-
-%.d:
-	$(SILENT)$(call mkdir,$(BUILD_DIR))
-	$(SILENT)$(CC) -MG -MM -MT $(subst .d,.o,$@) $(CFLAGS) -o $(BUILD_DIR)/$(notdir $@) $<
 
 # extra tools
 BIN2C = $(TOP)/tools/bin2c
@@ -154,7 +154,7 @@ $(BIN2C):
 
 # OS X specifics
 $(OUTPUT).dmg: $(OUTPUT)
-	@echo DMG $@
+	$(info DMG $@)
 	$(SILENT)$(call mkdir,$(OUTPUT)-dmg))
 	$(SILENT)cp -p $(OUTPUT) $(OUTPUT)-dmg
 	$(SILENT)hdiutil create -srcfolder $(OUTPUT)-dmg $@
