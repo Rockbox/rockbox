@@ -11,7 +11,7 @@ CFLAGS += -g -Wall
 OUTPUT = chinachippatcher
 
 LIBSOURCES = chinachip.c
-SOURCES = $(LIBSOURCES) main.c
+SOURCES = main.c
 
 include ../libtools.make
 

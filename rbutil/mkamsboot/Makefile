@@ -9,11 +9,11 @@
 CFLAGS += -I../../tools/ucl/include -Wall
 
 OUTPUT = mkamsboot
-LIBUCL = libucl$(RBARCH).a
+LIBUCL = libucl.a
 
 # inputs
 LIBSOURCES := dualboot.c md5.c mkamsboot.c
-SOURCES := $(LIBSOURCES) main.c
+SOURCES := main.c
 # additional link dependencies for the standalone executable
 EXTRADEPS := $(LIBUCL)
 

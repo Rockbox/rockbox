@@ -32,7 +32,7 @@ LDOPTS_OSX = -framework CoreFoundation -framework IOKit
 
 LIBSOURCES = ipodpatcher.c fat32format.c arc4.c \
 	     ipodio-posix.c ipodio-win32-scsi.c ipodio-win32.c
-SOURCES = main.c $(BOOTSRC) $(LIBSOURCES)
+SOURCES = main.c $(BOOTSRC)
 ipodpatcher: SOURCES+= ipodio-posix.c
 
 OUTPUT = ipodpatcher

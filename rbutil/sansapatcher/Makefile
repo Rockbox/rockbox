@@ -12,7 +12,7 @@ OUTPUT = sansapatcher
 
 # inputs
 LIBSOURCES := sansapatcher.c sansaio-posix.c sansaio-win32.c
-SOURCES := $(LIBSOURCES) main.c
+SOURCES := main.c
 # additional link dependencies for the standalone executable
 EXTRADEPS :=
 

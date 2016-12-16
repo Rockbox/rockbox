@@ -16,7 +16,7 @@ OUTPUT = mktccboot
 
 # inputs
 LIBSOURCES := mktccboot.c $(TOOLSDIR)telechips.c
-SOURCES := $(LIBSOURCES) main.c
+SOURCES := main.c
 EXTRADEPS :=
 
 include ../libtools.make

@@ -37,8 +37,6 @@ TARGET_DIR ?= $(abspath .)/
 NATIVECC ?= gcc
 CC ?= gcc
 CPPDEFINES := $(shell echo foo | $(CROSS)$(CC) -dM -E -)
-# use POSIX/C99 printf on windows
-CFLAGS += -D__USE_MINGW_ANSI_STDIO=1
 
 BINARY = $(OUTPUT)
 # when building a Windows binary add the correct file suffix
@@ -50,6 +48,8 @@ else
 ifeq ($(findstring MINGW,$(CPPDEFINES)),MINGW)
 BINARY = $(OUTPUT).exe
 COMPILETARGET = mingw
+# use POSIX/C99 printf on windows
+CFLAGS += -D__USE_MINGW_ANSI_STDIO=1
 else
 ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
 COMPILETARGET = darwin
@@ -79,16 +79,9 @@ CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
 NATIVECC = gcc-4.0
 endif
 endif
-WINDRES = windres
 
 BUILD_DIR ?= $(TARGET_DIR)build$(COMPILETARGET)
-
-ifdef RBARCH
-ARCHFLAGS += -arch $(RBARCH)
-OBJDIR = $(abspath $(BUILD_DIR)/$(RBARCH))/
-else
 OBJDIR = $(abspath $(BUILD_DIR))/
-endif
 
 all: $(BINARY)
 
@@ -103,20 +96,20 @@ DEPS = $(addprefix $(OBJDIR),$(subst .c,.d,$(notdir $(SOURCES) $(LIBSOURCES))))
 
 # additional link dependencies for the standalone executable
 # extra dependencies: libucl
-LIBUCL = libucl$(RBARCH).a
+LIBUCL = libucl.a
 $(LIBUCL): $(OBJDIR)$(LIBUCL)
 
 $(OBJDIR)$(LIBUCL):
 	$(SILENT)$(MAKE) -C $(TOP)/../tools/ucl/src TARGET_DIR=$(OBJDIR) $@
 
 # building the standalone executable
-$(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
+$(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS)) $(TARGET_DIR)lib$(OUTPUT).a
 	@echo LD $@
 	$(SILENT)$(call mkdir,$(dir $@))
 # EXTRADEPS need to be built into OBJDIR.
 	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) -o $(BINARY) \
 	    $(OBJS) $(addprefix $(OBJDIR),$(EXTRADEPS)) \
-	    $(addprefix $(OBJDIR),$(EXTRALIBOBJS)) $(LDOPTS)
+	    $(addprefix $(OBJDIR),$(EXTRALIBOBJS)) lib$(OUTPUT).a $(addprefix $(OBJDIR),$(EXTRADEPS)) $(LDOPTS)
 
 # common rules
 $(OBJDIR)%.o:
@@ -125,10 +118,10 @@ $(OBJDIR)%.o:
 	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(CFLAGS) -c -o $@ $<
 
 # lib rules
-lib$(OUTPUT)$(RBARCH).a: $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a
-lib$(OUTPUT)$(RBARCH): $(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a
+lib$(OUTPUT).a: $(TARGET_DIR)lib$(OUTPUT).a
+lib$(OUTPUT): $(TARGET_DIR)lib$(OUTPUT).a
 
-$(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a: $(LIBOBJS) \
+$(TARGET_DIR)lib$(OUTPUT).a: $(LIBOBJS) \
 				      $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 # rules to build a DLL. Only works for W32 as target (i.e. MinGW toolchain)
 dll: $(OUTPUT).dll
@@ -140,7 +133,7 @@ $(TARGET_DIR)$(OUTPUT).dll: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 		    -Wl,--output-def,$(TARGET_DIR)$(OUTPUT).def
 
 # create lib file from objects
-$(TARGET_DIR)lib$(OUTPUT)$(RBARCH).a: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
+$(TARGET_DIR)lib$(OUTPUT).a: $(LIBOBJS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS))
 	@echo AR $(notdir $@)
 	$(SILENT)$(call mkdir,$(dir $@))
 	$(SILENT)$(call rm,$@)

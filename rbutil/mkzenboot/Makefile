@@ -19,7 +19,7 @@ LIBSOURCES := dualboot.c mkzenboot.c md5.c utils.c \
 	      $(addprefix $(TOOLS_DIR),$(TOOLS_SOURCES))
 
 # inputs for binary only
-SOURCES := $(LIBSOURCES) main.c
+SOURCES := main.c
 # dependencies for binary
 EXTRADEPS :=
 

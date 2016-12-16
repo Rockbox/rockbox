@@ -13,7 +13,7 @@ OUTPUT = mkmpioboot
 
 # inputs
 LIBSOURCES = mkmpioboot.c
-SOURCES = $(LIBSOURCES) main.c
+SOURCES = main.c
 EXTRADEPS = $(LIBUCL)
 
 include ../libtools.make
