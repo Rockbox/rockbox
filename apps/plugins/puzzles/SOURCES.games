@@ -19,7 +19,9 @@ net.c
 netslide.c
 /*palisade.c*/
 pattern.c
+#if PLUGIN_BUFFER_SIZE > 0x20000
 pearl.c
+#endif
 pegs.c
 range.c
 rect.c
