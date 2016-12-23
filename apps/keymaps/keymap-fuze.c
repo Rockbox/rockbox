@@ -28,11 +28,11 @@
 
 /* {Action Code,    Button code,    Prereq button code } */
 
-/* 
+/*
  * The format of the list is as follows
- * { Action Code,   Button code,    Prereq button code } 
+ * { Action Code,   Button code,    Prereq button code }
  * if there's no need to check the previous button's value, use BUTTON_NONE
- * Insert LAST_ITEM_IN_LIST at the end of each mapping 
+ * Insert LAST_ITEM_IN_LIST at the end of each mapping
  */
 static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_PREV,        BUTTON_SCROLL_BACK,                BUTTON_NONE },
@@ -56,35 +56,35 @@ static const struct button_mapping button_context_standard[]  = {
 static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PLAY,              BUTTON_UP|BUTTON_REL,           BUTTON_UP },
     { ACTION_WPS_STOP,              BUTTON_UP|BUTTON_REPEAT,        BUTTON_UP },
-   
+
     { ACTION_WPS_SKIPPREV,          BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
     { ACTION_WPS_SEEKBACK,          BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_WPS_STOPSEEK,          BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT|BUTTON_REPEAT },
-    
+
     { ACTION_WPS_SKIPNEXT,          BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
     { ACTION_WPS_SEEKFWD,           BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_WPS_STOPSEEK,          BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT|BUTTON_REPEAT },
-    
+
     { ACTION_WPS_ABSETB_NEXTDIR,    BUTTON_HOME|BUTTON_RIGHT,       BUTTON_HOME },
     { ACTION_WPS_ABSETA_PREVDIR,    BUTTON_HOME|BUTTON_LEFT,        BUTTON_HOME },
     { ACTION_WPS_ABRESET,           BUTTON_HOME|BUTTON_UP,          BUTTON_HOME },
-    
+
     { ACTION_WPS_VOLUP,             BUTTON_SCROLL_FWD,              BUTTON_NONE },
     { ACTION_WPS_VOLUP,             BUTTON_SCROLL_FWD|BUTTON_REPEAT,BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,           BUTTON_SCROLL_BACK,             BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,           BUTTON_SCROLL_BACK|BUTTON_REPEAT,BUTTON_NONE },
-    
+
     { ACTION_WPS_BROWSE,            BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT },
 
     { ACTION_WPS_CONTEXT,           BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_SELECT },
     { ACTION_WPS_QUICKSCREEN,       BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_DOWN },
 
     { ACTION_WPS_MENU,              BUTTON_DOWN|BUTTON_REL,         BUTTON_DOWN },
-    
+
     { ACTION_WPS_PITCHSCREEN,       BUTTON_SELECT|BUTTON_UP,        BUTTON_SELECT },
     { ACTION_WPS_ID3SCREEN,         BUTTON_SELECT|BUTTON_DOWN,      BUTTON_SELECT },
     { ACTION_WPS_HOTKEY,            BUTTON_HOME|BUTTON_REL,         BUTTON_HOME },
-    
+
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 
@@ -115,7 +115,7 @@ static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,    BUTTON_UP|BUTTON_REL,         BUTTON_UP },
     { ACTION_TREE_STOP,   BUTTON_UP|BUTTON_REPEAT,      BUTTON_UP },
     { ACTION_TREE_HOTKEY, BUTTON_HOME|BUTTON_REL,       BUTTON_HOME },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_tree */
 
@@ -159,7 +159,7 @@ static const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_LEFT,    BUTTON_LEFT|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_QS_RIGHT,   BUTTON_RIGHT|BUTTON_REL,       BUTTON_NONE },
     { ACTION_QS_RIGHT,   BUTTON_RIGHT|BUTTON_REPEAT,    BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_quickscreen */
 
@@ -177,7 +177,7 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
     { ACTION_STD_OK,             BUTTON_SELECT|BUTTON_REL,        BUTTON_NONE },
     { ACTION_STD_CANCEL,         BUTTON_LEFT|BUTTON_REL,          BUTTON_LEFT },
     { ACTION_STD_OK,             BUTTON_RIGHT,                    BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_settings_right_is_inc */
 
@@ -205,7 +205,7 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_EXIT,           BUTTON_UP,                        BUTTON_NONE },
     { ACTION_PS_SLOWER,         BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_PS_FASTER,         BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_pitchscreen */
 
@@ -231,6 +231,7 @@ static const struct button_mapping button_context_recscreen[]  = {
 
 /** FM Radio Screen **/
 static const struct button_mapping button_context_radio[]  = {
+    { ACTION_NONE,           BUTTON_SELECT|BUTTON_REL,          BUTTON_SELECT},
     { ACTION_STD_PREV,       BUTTON_LEFT,                       BUTTON_NONE },
     { ACTION_STD_PREVREPEAT, BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_STD_NEXT,       BUTTON_RIGHT,                      BUTTON_NONE },
@@ -250,12 +251,12 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                     BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE },
-    
+
     { ACTION_KBD_CURSOR_LEFT,  BUTTON_HOME|BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_KBD_CURSOR_LEFT,  BUTTON_HOME|BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_KBD_CURSOR_RIGHT, BUTTON_HOME|BUTTON_RIGHT,               BUTTON_NONE },
     { ACTION_KBD_CURSOR_RIGHT, BUTTON_HOME|BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
-    
+
     { ACTION_KBD_UP,           BUTTON_SCROLL_BACK,               BUTTON_NONE },
     { ACTION_KBD_UP,           BUTTON_SCROLL_BACK|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_KBD_DOWN,         BUTTON_SCROLL_FWD,                BUTTON_NONE },
@@ -386,7 +387,7 @@ const struct button_mapping* get_context_mapping(int context)
     {
         case CONTEXT_STD:
             return button_context_standard;
-            
+
         case CONTEXT_WPS:
             return button_context_wps;
 
@@ -396,7 +397,7 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_MAINMENU:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_listtree_scroll_without_combo;
-            else 
+            else
                 return button_context_listtree_scroll_with_combo;
         case CONTEXT_CUSTOM|CONTEXT_TREE:
             return button_context_tree;
@@ -445,6 +446,6 @@ const struct button_mapping* get_context_mapping(int context)
 #endif
         default:
             return button_context_standard;
-    } 
+    }
     return button_context_standard;
 }
