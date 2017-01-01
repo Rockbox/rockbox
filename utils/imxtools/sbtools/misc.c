@@ -50,7 +50,11 @@ void generate_random_data(void *buf, size_t sz)
 void *xmalloc(size_t s)
 {
     void * r = malloc(s);
-    if(!r) bugp("malloc");
+    if(!r)
+    {
+        printf("Alloc failed\n");
+        abort();
+    }
     return r;
 }
 
