@@ -73,8 +73,7 @@ enum rsrc_error_t
     RSRC_FORMAT_ERROR = -5,
     RSRC_CHECKSUM_ERROR = -6,
     RSRC_NO_VALID_KEY = -7,
-    RSRC_FIRST_CRYPTO_ERROR = -8,
-    RSRC_LAST_CRYPTO_ERROR = RSRC_FIRST_CRYPTO_ERROR - CRYPTO_NUM_ERRORS,
+    RSRC_CRYPTO_ERROR = -8,
 };
 
 enum rsrc_error_t rsrc_write_file(struct rsrc_file_t *rsrc, const char *filename);

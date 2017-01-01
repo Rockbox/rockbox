@@ -232,8 +232,7 @@ enum sb_error_t
     SB_FORMAT_ERROR = -5,
     SB_CHECKSUM_ERROR = -6,
     SB_NO_VALID_KEY = -7,
-    SB_FIRST_CRYPTO_ERROR = -8,
-    SB_LAST_CRYPTO_ERROR = SB_FIRST_CRYPTO_ERROR - CRYPTO_NUM_ERRORS,
+    SB_CRYPTO_ERROR = -8,
 };
 
 #define SB_RAW_MODE     (1 << 0) /* read image in raw mode (aka bootloader-like) */
