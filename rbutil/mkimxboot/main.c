@@ -72,10 +72,9 @@ static void usage(void)
     printf("  -i <file>   Set input file\n");
     printf("  -b <file>   Set boot file\n");
     printf("  -d/--debug  Enable debug output\n");
-    printf("  -t <type>   Set type (dualboot, singleboot, recovery, charge)\n");
+    printf("  -t <type>   Set type (dualboot, singleboot, recovery, origfw, charge)\n");
     printf("  -v <v>      Set variant\n");
     printf("  -x          Dump device informations\n");
-    printf("  -w          Extract the original firmware\n");
     printf("  -p <ver>    Force product and component version\n");
     printf("  -5 <type>   Compute <type> MD5 sum of the input file\n");
     printf("  -m <model>  Specify model (useful for soft MD5 sum)\n");
@@ -108,14 +107,14 @@ static void usage(void)
     exit(1);
 }
 
-static int print_md5(const char *file, enum imx_model_t model, const char *type)
+static int print_md5(const char *file, const char *type)
 {
     uint8_t md5sum[16];
     enum imx_error_t err;
     if(strcmp(type, "full") == 0)
         err = compute_md5sum(file, md5sum);
     else if(strcmp(type, "soft") == 0)
-        err = compute_soft_md5sum(file, model, md5sum);
+        err = compute_soft_md5sum(file, md5sum);
     else
     {
         printf("Invalid md5sum type '%s'\n", type);
@@ -142,7 +141,6 @@ int main(int argc, char *argv[])
     enum imx_output_type_t type = IMX_DUALBOOT;
     enum imx_model_t model = MODEL_UNKNOWN;
     bool debug = false;
-    bool extract_of = false;
     const char *md5type = NULL;
     const char *force_version = NULL;
 
@@ -153,7 +151,7 @@ int main(int argc, char *argv[])
     {
         static struct option long_options[] =
         {
-            {"help", no_argument, 0, '?'},
+            {"help", no_argument, 0, 'h'},
             {"in-file", no_argument, 0, 'i'},
             {"out-file", required_argument, 0, 'o'},
             {"boot-file", required_argument, 0, 'b'},
@@ -166,7 +164,7 @@ int main(int argc, char *argv[])
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?di:o:b:t:v:xwp:m:5:", long_options, NULL);
+        int c = getopt_long(argc, argv, "hdi:o:b:t:v:xp:m:5:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -174,7 +172,7 @@ int main(int argc, char *argv[])
             case 'd':
                 debug = true;
                 break;
-            case '?':
+            case 'h':
                 usage();
                 break;
             case 'o':
@@ -195,6 +193,8 @@ int main(int argc, char *argv[])
                     type = IMX_RECOVERY;
                 else if(strcmp(optarg, "charge") == 0)
                     type = IMX_CHARGE;
+                else if(strcmp(optarg, "origfw") == 0)
+                    type = IMX_ORIG_FW;
                 else
                 {
                     printf("Invalid boot type '%s'\n", optarg);
@@ -222,9 +222,6 @@ int main(int argc, char *argv[])
                 printf("variant mapping:\n");
                 for(int i = 0; i < sizeof(imx_variants) / sizeof(imx_variants[0]); i++)
                     printf("  %s -> variant=%d\n", imx_variants[i].name, imx_variants[i].variant);
-                break;
-            case 'w':
-                extract_of = true;
                 break;
             case 'p':
                 force_version = optarg;
@@ -266,22 +263,17 @@ int main(int argc, char *argv[])
         printf("You must specify an output file\n");
         return 1;
     }
-    if(!bootfile && !extract_of)
+
+    if(!bootfile && type != IMX_ORIG_FW)
     {
         printf("You must specify an boot file\n");
         return 1;
     }
+
     if(optind != argc)
     {
         printf("Extra arguments on command line\n");
         return 1;
-    }
-
-    if(extract_of)
-    {
-        enum imx_error_t err = extract_firmware(infile, variant, outfile);
-        printf("Result: %d\n", err);
-        return 0;
     }
 
     struct imx_option_t opt;

@@ -38,6 +38,8 @@ struct rb_fw_t
     int entry_idx;
 };
 
+/* A firmware upgrade can contains several variants like recovery image, or
+ * images for different models */
 struct imx_fw_variant_desc_t
 {
     /* Offset within file */
@@ -46,6 +48,7 @@ struct imx_fw_variant_desc_t
     size_t size;
 };
 
+/* Map a MD5 sum of the whole file to a model and describe the variants in it */
 struct imx_md5sum_t
 {
     /* Device model */
@@ -58,6 +61,7 @@ struct imx_md5sum_t
     struct imx_fw_variant_desc_t fw_variants[VARIANT_COUNT];
 };
 
+/* Describe how to produce a bootloader image for a specific model */
 struct imx_model_desc_t
 {
     /* Descriptive name of this model */
@@ -72,16 +76,15 @@ struct imx_model_desc_t
     /* Model number used to initialise the checksum in the Rockbox header in
        ".sansa" files - these are the same as MODEL_NUMBER in config-target.h */
     const int rb_model_num;
-    /* Number of keys needed to decrypt/encrypt */
-    int nr_keys;
-    /* Array of keys */
-    struct crypto_key_t *keys;
+    /* Array of NULL-terminated keys */
+    struct crypto_key_t **keys;
     /* Dualboot load address */
     uint32_t dualboot_addr;
     /* Bootloader load address */
     uint32_t bootloader_addr;
 };
 
+/* Friendly names for variants */
 static const char *imx_fw_variant[] =
 {
     [VARIANT_DEFAULT] = "default",
@@ -92,6 +95,7 @@ static const char *imx_fw_variant[] =
     [VARIANT_ZENSTYLE_RECOVERY] = "ZEN Style 100/300 Recovery",
 };
 
+/* List of known MD5 sums for firmware upgrades */
 static const struct imx_md5sum_t imx_sums[] =
 {
     /** Fuze+ */
@@ -196,22 +200,24 @@ static struct crypto_key_t zero_key =
     .u.key = {0}
 };
 
+static struct crypto_key_t *list_zero_key[] = { &zero_key, NULL };
+static struct crypto_key_t *list_all_keys[] = { &zero_key, NULL };
+
 static const struct imx_model_desc_t imx_models[] =
 {
-    [MODEL_FUZEPLUS] = {"Fuze+",  dualboot_fuzeplus, sizeof(dualboot_fuzeplus), "fuz+", 72,
-                          1, &zero_key, 0, 0x40000000 },
-    [MODEL_ZENXFI2] = {"Zen X-Fi2", dualboot_zenxfi2, sizeof(dualboot_zenxfi2), "zxf2", 82,
-                       1, &zero_key, 0, 0x40000000 },
-    [MODEL_ZENXFI3] = {"Zen X-Fi3", dualboot_zenxfi3, sizeof(dualboot_zenxfi3), "zxf3", 83,
-                       1, &zero_key, 0, 0x40000000 },
-    [MODEL_ZENXFISTYLE] = {"Zen X-Fi Style", dualboot_zenxfistyle, sizeof(dualboot_zenxfistyle), "zxfs", 94,
-                       1, &zero_key, 0, 0x40000000 },
-    [MODEL_ZENSTYLE] = {"Zen Style 100/300", NULL, 0, "", -1,
-                       1, &zero_key, 0, 0x40000000 },
-    [MODEL_NWZE370] = {"NWZ-E370", dualboot_nwze370, sizeof(dualboot_nwze370), "e370", 88,
-                       1, &zero_key, 0, 0x40000000 },
-    [MODEL_NWZE360] = {"NWZ-E360", dualboot_nwze360, sizeof(dualboot_nwze360), "e360", 89,
-                       1, &zero_key, 0, 0x40000000 },
+    [MODEL_FUZEPLUS] = {"Fuze+",  dualboot_fuzeplus, sizeof(dualboot_fuzeplus),
+        "fuz+", 72, list_zero_key, 0, 0x40000000 },
+    [MODEL_ZENXFI2] = {"Zen X-Fi2", dualboot_zenxfi2, sizeof(dualboot_zenxfi2),
+        "zxf2", 82, list_zero_key, 0, 0x40000000 },
+    [MODEL_ZENXFI3] = {"Zen X-Fi3", dualboot_zenxfi3, sizeof(dualboot_zenxfi3),
+        "zxf3", 83, list_zero_key, 0, 0x40000000 },
+    [MODEL_ZENXFISTYLE] = {"Zen X-Fi Style", dualboot_zenxfistyle, sizeof(dualboot_zenxfistyle),
+        "zxfs", 94, list_zero_key, 0, 0x40000000 },
+    [MODEL_ZENSTYLE] = {"Zen Style 100/300", NULL, 0, "", -1, list_zero_key, 0, 0x40000000 },
+    [MODEL_NWZE370] = {"NWZ-E370", dualboot_nwze370, sizeof(dualboot_nwze370),
+        "e370", 88, list_zero_key, 0, 0x40000000 },
+    [MODEL_NWZE360] = {"NWZ-E360", dualboot_nwze360, sizeof(dualboot_nwze360),
+        "e360", 89, list_zero_key, 0, 0x40000000 },
 };
 
 #define NR_IMX_SUMS     (sizeof(imx_sums) / sizeof(imx_sums[0]))
@@ -221,6 +227,12 @@ static const struct imx_model_desc_t imx_models[] =
 #define MAGIC_RECOVERY  0xfee1dead
 #define MAGIC_NORMAL    0xcafebabe
 #define MAGIC_CHARGE    0x67726863 /* 'chrg' */
+
+static void add_key_list(struct crypto_key_t **list)
+{
+    while(*list != NULL)
+        add_keys(*list++, 1);
+}
 
 static int rb_fw_get_sb_inst_count(struct rb_fw_t *fw)
 {
@@ -240,8 +252,8 @@ static void rb_fw_fill_sb(struct rb_fw_t *fw, struct sb_inst_t *inst,
     inst[fw->entry_idx].argument = entry_arg;
 }
 
-static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
-    enum imx_output_type_t type, struct sb_file_t *sb_file, struct rb_fw_t boot_fw)
+static enum imx_error_t patch_std_zero_host_play(int jump_before,
+    struct imx_option_t opt, struct sb_file_t *sb_file, struct rb_fw_t boot_fw)
 {
     /* We assume the file has three boot sections: ____, host, play and one
      * resource section rsrc.
@@ -277,7 +289,7 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
         return IMX_DONT_KNOW_HOW_TO_PATCH;
     }
 
-    if(type == IMX_DUALBOOT)
+    if(opt.output == IMX_DUALBOOT)
     {
         /* create a new instruction array with a hole for two instructions */
         struct sb_inst_t *new_insts = xmalloc(sizeof(struct sb_inst_t) * (sec->nr_insts + 2));
@@ -288,15 +300,16 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
         struct sb_inst_t *load = &new_insts[jump_idx];
         memset(load, 0, sizeof(struct sb_inst_t));
         load->inst = SB_INST_LOAD;
-        load->size = imx_models[model].dualboot_size;
-        load->addr = imx_models[model].dualboot_addr;
+        load->size = imx_models[opt.model].dualboot_size;
+        load->addr = imx_models[opt.model].dualboot_addr;
         /* duplicate memory because it will be free'd */
-        load->data = memdup(imx_models[model].dualboot, imx_models[model].dualboot_size);
+        load->data = memdup(imx_models[opt.model].dualboot,
+            imx_models[opt.model].dualboot_size);
         /* second instruction is a call */
         struct sb_inst_t *call = &new_insts[jump_idx + 1];
         memset(call, 0, sizeof(struct sb_inst_t));
         call->inst = SB_INST_CALL;
-        call->addr = imx_models[model].dualboot_addr;
+        call->addr = imx_models[opt.model].dualboot_addr;
         call->argument = MAGIC_ROCK;
         /* free old instruction array */
         free(sec->insts);
@@ -320,9 +333,9 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
 
         return IMX_SUCCESS;
     }
-    else if(type == IMX_SINGLEBOOT || type == IMX_RECOVERY)
+    else if(opt.output == IMX_SINGLEBOOT || opt.output == IMX_RECOVERY)
     {
-        bool recovery = type == IMX_RECOVERY;
+        bool recovery = (opt.output == IMX_RECOVERY);
         /* remove everything after the call and add instructions for firmware */
         struct sb_inst_t *new_insts = xmalloc(sizeof(struct sb_inst_t) * (jump_idx + nr_boot_inst));
         memcpy(new_insts, sec->insts, sizeof(struct sb_inst_t) * jump_idx);
@@ -344,7 +357,7 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
 
         return IMX_SUCCESS;
     }
-    else if(type == IMX_CHARGE)
+    else if(opt.output == IMX_CHARGE)
     {
         /* throw away everything except the dualboot stub with a special argument */
         struct sb_inst_t *new_insts = xmalloc(sizeof(struct sb_inst_t) * 2);
@@ -352,15 +365,16 @@ static enum imx_error_t patch_std_zero_host_play(int jump_before, int model,
         struct sb_inst_t *load = &new_insts[0];
         memset(load, 0, sizeof(struct sb_inst_t));
         load->inst = SB_INST_LOAD;
-        load->size = imx_models[model].dualboot_size;
-        load->addr = imx_models[model].dualboot_addr;
+        load->size = imx_models[opt.model].dualboot_size;
+        load->addr = imx_models[opt.model].dualboot_addr;
         /* duplicate memory because it will be free'd */
-        load->data = memdup(imx_models[model].dualboot, imx_models[model].dualboot_size);
+        load->data = memdup(imx_models[opt.model].dualboot,
+            imx_models[opt.model].dualboot_size);
         /* second instruction is a call */
         struct sb_inst_t *call = &new_insts[1];
         memset(call, 0, sizeof(struct sb_inst_t));
         call->inst = SB_INST_CALL;
-        call->addr = imx_models[model].dualboot_addr;
+        call->addr = imx_models[opt.model].dualboot_addr;
         call->argument = MAGIC_CHARGE;
         /* free old instruction array */
         free(sec->insts);
@@ -428,42 +442,42 @@ static enum imx_error_t parse_version(const char *s, struct sb_version_t *ver)
     return IMX_SUCCESS;
 }
 
-static enum imx_error_t patch_firmware(enum imx_model_t model,
-    enum imx_firmware_variant_t variant, enum imx_output_type_t type,
-    struct sb_file_t *sb_file, struct rb_fw_t boot_fw,
-    const char *force_version)
+static enum imx_error_t patch_firmware(struct imx_option_t opt,
+    struct sb_file_t *sb_file, struct rb_fw_t boot_fw)
 {
-    if(force_version)
+    if(opt.force_version)
     {
-        enum imx_error_t err = parse_version(force_version, &sb_file->product_ver);
-        if(err != IMX_SUCCESS) return err;
-        err = parse_version(force_version, &sb_file->component_ver);
-        if(err != IMX_SUCCESS) return err;
+        enum imx_error_t err = parse_version(opt.force_version, &sb_file->product_ver);
+        if(err != IMX_SUCCESS)
+            return err;
+        err = parse_version(opt.force_version, &sb_file->component_ver);
+        if(err != IMX_SUCCESS)
+            return err;
     }
-    switch(model)
+    switch(opt.model)
     {
         case MODEL_FUZEPLUS:
             /* The Fuze+ uses the standard ____, host, play sections, patch after third
              * call in ____ section */
-            return patch_std_zero_host_play(3, model, type, sb_file, boot_fw);
+            return patch_std_zero_host_play(3, opt, sb_file, boot_fw);
         case MODEL_ZENXFI3:
             /* The ZEN X-Fi3 uses the standard ____, hSst, pSay sections, patch after third
              * call in ____ section. Although sections names use the S variant, they are standard. */
-            return patch_std_zero_host_play(3, model, type, sb_file, boot_fw);
+            return patch_std_zero_host_play(3, opt, sb_file, boot_fw);
         case MODEL_NWZE360:
         case MODEL_NWZE370:
             /* The NWZ-E360/E370 uses the standard ____, host, play sections, patch after first
              * call in ____ section. */
-            return patch_std_zero_host_play(1, model, type, sb_file, boot_fw);
+            return patch_std_zero_host_play(1, opt, sb_file, boot_fw);
         case MODEL_ZENXFI2:
             /* The ZEN X-Fi2 has two types of firmware: recovery and normal.
              * Normal uses the standard ___, host, play sections and recovery only ____ */
-            switch(variant)
+            switch(opt.fw_variant)
             {
                 case VARIANT_ZENXFI2_RECOVERY:
                 case VARIANT_ZENXFI2_NAND:
                 case VARIANT_ZENXFI2_SD:
-                    return patch_std_zero_host_play(1, model, type, sb_file, boot_fw);
+                    return patch_std_zero_host_play(1, opt, sb_file, boot_fw);
                 default:
                     return IMX_DONT_KNOW_HOW_TO_PATCH;
             }
@@ -471,10 +485,17 @@ static enum imx_error_t patch_firmware(enum imx_model_t model,
         case MODEL_ZENXFISTYLE:
             /* The ZEN X-Fi Style uses the standard ____, host, play sections, patch after first
              * call in ____ section. */
-            return patch_std_zero_host_play(1, model, type, sb_file, boot_fw);
+            return patch_std_zero_host_play(1, opt, sb_file, boot_fw);
         default:
             return IMX_DONT_KNOW_HOW_TO_PATCH;
     }
+}
+
+static enum imx_error_t unpatch_firmware(struct imx_option_t opt,
+    struct sb_file_t *sb_file)
+{
+    printf("[ERR] Unimplemented\n");
+    return IMX_ERROR;
 }
 
 static uint32_t get_uint32be(unsigned char *p)
@@ -680,16 +701,10 @@ enum imx_error_t compute_md5sum(const char *file, uint8_t file_md5sum[16])
 }
 
 /* compute soft MD5 of a file */
-enum imx_error_t compute_soft_md5sum(const char *file, enum imx_model_t model,
-    uint8_t soft_md5sum[16])
+enum imx_error_t compute_soft_md5sum(const char *file, uint8_t soft_md5sum[16])
 {
-    if(model == MODEL_UNKNOWN)
-    {
-        printf("[ERR] Cannot compute soft MD5 without knowing the model\n");
-        return IMX_ERROR;
-    }
     clear_keys();
-    add_keys(imx_models[model].keys, imx_models[model].nr_keys);
+    add_key_list(list_all_keys);
     /* read file */
     enum sb_error_t err;
     struct sb_file_t *sb = sb_read_file(file, false, NULL, generic_std_printf, &err);
@@ -703,29 +718,6 @@ enum imx_error_t compute_soft_md5sum(const char *file, enum imx_model_t model,
     /* release file */
     sb_free(sb);
     return err;
-}
-
-static enum imx_error_t load_sb_file(const char *file, int md5_idx,
-    struct imx_option_t opt, struct sb_file_t **sb_file)
-{
-    if(imx_sums[md5_idx].fw_variants[opt.fw_variant].size == 0)
-    {
-        printf("[ERR] Input file does not contain variant '%s'\n", imx_fw_variant[opt.fw_variant]);
-        return IMX_VARIANT_MISMATCH;
-    }
-    enum imx_model_t model = imx_sums[md5_idx].model;
-    enum sb_error_t err;
-    g_debug = opt.debug;
-    clear_keys();
-    add_keys(imx_models[model].keys, imx_models[model].nr_keys);
-    *sb_file = sb_read_file_ex(file, imx_sums[md5_idx].fw_variants[opt.fw_variant].offset,
-                              imx_sums[md5_idx].fw_variants[opt.fw_variant].size, false, NULL, generic_std_printf, &err);
-    if(*sb_file == NULL)
-    {
-        clear_keys();
-        return IMX_FIRST_SB_ERROR + err;
-    }
-    return IMX_SUCCESS;
 }
 
 /* Load a rockbox firwmare from a buffer. Data is copied. Assume firmware is
@@ -873,19 +865,55 @@ static void rb_fw_free(struct rb_fw_t *fw)
     memset(fw, 0, sizeof(struct rb_fw_t));
 }
 
+static bool contains_rockbox_bootloader(struct sb_file_t *sb_file)
+{
+    for(int i = 0; i < sb_file->nr_sections; i++)
+        if(sb_file->sections[i].identifier == MAGIC_ROCK)
+            return true;
+    return false;
+}
+
+/* modify sb_file to produce requested boot image */
+static enum imx_error_t make_boot(struct sb_file_t *sb_file, const char *bootfile,
+    struct imx_option_t opt)
+{
+    /* things went smoothly, we have a SB image but it may not be suitable as an
+     * input image: if it contains a rockbox bootloader, we need to remove it */
+    if(contains_rockbox_bootloader(sb_file))
+    {
+        printf("[INFO] SB file contains a Rockbox bootloader, trying to remove it...\n");
+        enum imx_error_t ret = unpatch_firmware(opt, sb_file);
+        if(ret != IMX_SUCCESS)
+            return ret;
+    }
+    /* load rockbox file */
+    struct rb_fw_t boot_fw;
+    enum imx_error_t ret = rb_fw_load(&boot_fw, bootfile, opt.model);
+    if(ret != IMX_SUCCESS)
+        return ret;
+    /* produce file */
+    ret = patch_firmware(opt, sb_file, boot_fw);
+    rb_fw_free(&boot_fw);
+    return IMX_SUCCESS;
+}
+
 enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     const char *outfile, struct imx_option_t opt)
 {
     /* sanity check */
-    if(opt.fw_variant > VARIANT_COUNT)
+    if(opt.fw_variant >= VARIANT_COUNT || opt.model >= MODEL_COUNT)
         return IMX_ERROR;
-    /* Dump tables */
+    /* dump tables */
     dump_imx_dev_info("[INFO] ");
-    /* compute MD5 sum of the file */
-    uint8_t file_md5sum[16];
-    enum imx_error_t ret = compute_md5sum(infile, file_md5sum);
+    /* load file */
+    void *buf;
+    size_t offset = 0, size = 0;
+    enum imx_error_t ret = read_file(infile, &buf, &size);
     if(ret != IMX_SUCCESS)
         return ret;
+    /* compute MD5 sum of the file */
+    uint8_t file_md5sum[16];
+    compute_md5sum_buf(buf, size, file_md5sum);
     printf("[INFO] MD5 sum of the file: ");
     for(int i = 0; i < 16; i++)
         printf("%02x", file_md5sum[i]);
@@ -893,81 +921,89 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     /* find model */
     int md5_idx;
     ret = find_model_by_md5sum(file_md5sum, &md5_idx);
-    if(ret != IMX_SUCCESS)
-        return ret;
-    enum imx_model_t model = imx_sums[md5_idx].model;
-    printf("[INFO] File is for model %d (%s, version %s)\n", model,
-        imx_models[model].model_name, imx_sums[md5_idx].version);
-    /* load rockbox file */
-    struct rb_fw_t boot_fw;
-    ret = rb_fw_load(&boot_fw, bootfile, model);
-    if(ret != IMX_SUCCESS)
-        return ret;
-    /* load OF file */
-    struct sb_file_t *sb_file;
-    ret = load_sb_file(infile, md5_idx, opt, &sb_file);
-    if(ret != IMX_SUCCESS)
-    {
-        rb_fw_free(&boot_fw);
-        return ret;
-    }
-    /* produce file */
-    ret = patch_firmware(model, opt.fw_variant, opt.output,
-        sb_file, boot_fw, opt.force_version);
+    /* is this a known firmware upgrade ? */
     if(ret == IMX_SUCCESS)
-        ret = sb_write_file(sb_file, outfile, NULL, generic_std_printf);
+    {
+        enum imx_model_t model = imx_sums[md5_idx].model;
+        printf("[INFO] File is for model %d (%s, version %s)\n", model,
+            imx_models[model].model_name, imx_sums[md5_idx].version);
+        /* check the model is the expected one */
+        if(opt.model == MODEL_UNKNOWN)
+            opt.model = model;
+        else if(opt.model != model)
+        {
+            printf("[ERR] Model mismatch, was expecting model %d (%s)\n",
+                opt.model, imx_models[opt.model].model_name);
+            free(buf);
+            return IMX_MODEL_MISMATCH;
+        }
+        /* use database values */
+        offset = imx_sums[md5_idx].fw_variants[opt.fw_variant].offset;
+        size = imx_sums[md5_idx].fw_variants[opt.fw_variant].size;
+        if(size == 0)
+        {
+            printf("[ERR] Input file does not contain variant '%s'\n", imx_fw_variant[opt.fw_variant]);
+            free(buf);
+            return IMX_VARIANT_MISMATCH;
+        }
+        /* special case: if we need to produce the OF, just bypass read/write of
+         * the SB file and output this chunk of the file. This is faster and it
+         * also avoids modifying the OF by reconstructing it */
+        if(opt.output == IMX_ORIG_FW)
+        {
+            printf("[INFO] Extracting original firmware...\n");
+            ret = write_file(outfile, buf + offset, size);
+            free(buf);
+            return ret;
+        }
+    }
+    else
+    {
+        printf("[INFO] File doesn't have a known MD5 sum, assuming it's a SB image...\n");
+        /* image didn't match, so we expect the file to be a raw SB image, either
+        * produced by mkimxboot when uninstalling bootloader or after installing RB,
+        * so load all known keys and go on */
 
+        /* To be more user friendly, give a nice error message if we detect
+         * the file is not a SB file */
+        if(guess_sb_version(infile) == SB_VERSION_UNK)
+        {
+            printf("[ERR] Your firmware doesn't look like a SB file\n");
+            printf("[ERR] This is probably a firmware upgrade\n");
+            printf("[ERR] Unfortunately, this tool doesn't know about it yet\n");
+            printf("[ERR] Please report to the developers to add it\n");
+            free(buf);
+            return IMX_ERROR;
+        }
+    }
+    /* to proceed further, we need to know the model */
+    if(opt.model == MODEL_UNKNOWN)
+    {
+        printf("[ERR] Cannot do processing of soft image without knowing the model\n");
+        free(buf);
+        return IMX_MODEL_MISMATCH;
+    }
+    /* load image */
+    g_debug = opt.debug;
     clear_keys();
-    rb_fw_free(&boot_fw);
+    add_key_list(imx_models[opt.model].keys);
+    enum sb_error_t err;
+    struct sb_file_t *sb_file = sb_read_memory(buf + offset, size, false, NULL, generic_std_printf, &err);
+    if(sb_file == NULL)
+    {
+        printf("[ERR] Cannot open firmware as SB file: %d\n", err);
+        free(buf);
+        return IMX_FIRST_SB_ERROR + err;
+    }
+    /* modify image */
+    ret = make_boot(sb_file, bootfile, opt);
+    if(ret == IMX_SUCCESS)
+    {
+        /* write image */
+        ret = sb_write_file(sb_file, outfile, NULL, generic_std_printf);
+    }
+    /* cleanup */
     sb_free(sb_file);
-    return ret;
-}
-
-enum imx_error_t extract_firmware(const char *infile,
-    enum imx_firmware_variant_t fw_variant, const char *outfile)
-{
-    /* sanity check */
-    if(fw_variant > VARIANT_COUNT)
-        return IMX_ERROR;
-    /* dump tables */
-    dump_imx_dev_info("[INFO] ");
-    /* compute MD5 sum of the file */
-    void *buf;
-    size_t sz;
-    uint8_t file_md5sum[16];
-    int ret = read_file(infile, &buf, &sz);
-    if(ret != IMX_SUCCESS)
-        return ret;
-    ret = compute_md5sum_buf(buf, sz, file_md5sum);
-    if(ret != IMX_SUCCESS)
-    {
-        free(buf);
-        return ret;
-    }
-    printf("[INFO] MD5 sum of the file: ");
-    print_hex(NULL, misc_std_printf, file_md5sum, 16, true);
-    /* find model */
-    int md5_idx;
-    ret = find_model_by_md5sum(file_md5sum, &md5_idx);
-    if(ret != IMX_SUCCESS)
-    {
-        free(buf);
-        return ret;
-    }
-    enum imx_model_t model = imx_sums[md5_idx].model;
-    printf("[INFO] File is for model %d (%s, version %s)\n", model,
-        imx_models[model].model_name, imx_sums[md5_idx].version);
-    /* extract firmware */
-    if(imx_sums[md5_idx].fw_variants[fw_variant].size == 0)
-    {
-        printf("[ERR] Input file does not contain variant '%s'\n", imx_fw_variant[fw_variant]);
-        free(buf);
-        return IMX_VARIANT_MISMATCH;
-    }
-
-    ret = write_file(outfile,
-        buf + imx_sums[md5_idx].fw_variants[fw_variant].offset,
-        imx_sums[md5_idx].fw_variants[fw_variant].size);
     free(buf);
     return ret;
 }
