@@ -29,6 +29,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 enum imx_error_t
 {
     IMX_SUCCESS = 0,
@@ -43,30 +44,31 @@ enum imx_error_t
     IMX_VARIANT_MISMATCH = -9,
     IMX_WRITE_ERROR = -10,
     IMX_FIRST_SB_ERROR = -11,
+    IMX_MODEL_MISMATCH = -12,
 };
 
 enum imx_output_type_t
 {
     IMX_DUALBOOT = 0,
-    IMX_RECOVERY = 1,
-    IMX_SINGLEBOOT = 2,
-    IMX_CHARGE = 3,
+    IMX_RECOVERY,
+    IMX_SINGLEBOOT,
+    IMX_CHARGE,
+    IMX_ORIG_FW,
 };
 
 /* Supported models */
 enum imx_model_t
 {
-    MODEL_UNKNOWN = -1,
-    MODEL_FUZEPLUS = 0,
+    MODEL_UNKNOWN = 0,
+    MODEL_FUZEPLUS,
     MODEL_ZENXFI2,
     MODEL_ZENXFI3,
     MODEL_ZENXFISTYLE,
     MODEL_ZENSTYLE, /* Style 100 and Style 300 */
     MODEL_NWZE370,
     MODEL_NWZE360,
-    /* new models go here */
-
-    NUM_MODELS
+    /* Last */
+    MODEL_COUNT
 };
 
 /* Supported firmware variants */
@@ -88,19 +90,22 @@ enum imx_firmware_variant_t
 struct imx_option_t
 {
     bool debug;
+    enum imx_model_t model;
     enum imx_output_type_t output;
     enum imx_firmware_variant_t fw_variant;
     const char *force_version; // set to NULL to ignore
 };
 
+/* Print internal information to stdout about device database */
 void dump_imx_dev_info(const char *prefix);
+/* Build a SB image from an input firmware and a bootloader, input firmware
+ * can either be a firmware update or another SB file produced by this tool */
 enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
     const char *outfile, struct imx_option_t opt);
-enum imx_error_t extract_firmware(const char *infile,
-    enum imx_firmware_variant_t fw_variant, const char *outfile);
+/* Compute MD5 sum of an entire file */
 enum imx_error_t compute_md5sum(const char *file, uint8_t file_md5sum[16]);
-enum imx_error_t compute_soft_md5sum(const char *file, enum imx_model_t model,
-    uint8_t soft_md5sum[16]);
+/* Compute "soft" MD5 sum of a SB file */
+enum imx_error_t compute_soft_md5sum(const char *file, uint8_t soft_md5sum[16]);
 
 #ifdef __cplusplus
 }
