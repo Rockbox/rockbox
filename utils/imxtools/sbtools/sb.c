@@ -802,7 +802,11 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, vo
     if(memcmp(hdr_sha1, computed_sha1, 20) == 0)
         printf(RED, " Ok\n");
     else
+    {
         printf(RED, " Failed\n");
+        if(!(flags & SB_IGNORE_SHA1))
+            fatal(SB_FORMAT_ERROR, "Bad header checksum\n");
+    }
     printf(GREEN, "  Flags: ");
     printf(YELLOW, "%x\n", sb_header->flags);
     printf(GREEN, "  Total file size : ");
@@ -1045,7 +1049,7 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, vo
             printf(OFF, "%s", indent);
             uint8_t checksum = instruction_checksum(hdr);
             if(checksum != hdr->checksum)
-                printf(GREY, "[Bad checksum']");
+                printf(GREY, "[Bad checksum]");
 
             if(hdr->opcode == SB_INST_NOP)
             {
@@ -1092,6 +1096,14 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, vo
                 if(encrypted)
                     printf(RED, " (Encrypted)");
                 printf(OFF, "\n");
+
+                /* skip it if we cannot decrypt it */
+                if(encrypted && !valid_key)
+                {
+                    printf(GREY, "  Skipping section content (no valid key)\n");
+                    offset += size;
+                    continue;
+                }
 
                 /* save it */
                 byte *sec = xmalloc(size);
@@ -1161,7 +1173,7 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, vo
     else if(flags & SB_IGNORE_SHA1)
     {
         /* some weird images produced by some buggy tools have wrong SHA-1,
-         * this probably gone unnoticed because the bootloader ignores the SH1-1
+         * this probably gone unnoticed because the bootloader ignores the SHA-1
          * anyway */
         printf(RED, " Failed\n");
         cprintf(u, true, GREY, "Warning: SHA-1 mismatch ignored per flags\n");

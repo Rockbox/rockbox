@@ -31,7 +31,7 @@
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #endif
 
-#define bug(...) do { fprintf(stderr,"["__FILE__":"STR(__LINE__)"]ERROR: "__VA_ARGS__); exit(1); } while(0)
+#define bug(...) do { fprintf(stderr,  __VA_ARGS__); exit(1); } while(0)
 #define bugp(...) do { fprintf(stderr, __VA_ARGS__); perror(" "); exit(1); } while(0)
 
 #define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
