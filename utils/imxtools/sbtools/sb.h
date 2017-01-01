@@ -195,7 +195,8 @@ struct sb_section_t
     struct sb_inst_t *insts;
     /* for production use */
     uint32_t file_offset; /* in blocks */
-    uint32_t sec_size; /* in blocks */
+    uint32_t sec_size; /* in blocks, without padding */
+    uint32_t pad_size; /* padding size after the section until next section */
 };
 
 struct sb_file_t
@@ -217,6 +218,7 @@ struct sb_file_t
     struct sb_version_t product_ver;
     struct sb_version_t component_ver;
     /* for production use */
+    int first_boot_sec; /* index in sections[] */
     uint32_t image_size; /* in blocks */
 };
 
