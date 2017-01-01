@@ -333,6 +333,7 @@ void elf_simplify(struct elf_params_t *params)
         {
             cur_sec->size += sections[i].size;
             sections[i].size = 0; // will be ignored by rebuilding (see below)
+            free(sections[i].name);
         }
         else if(sections[i].type == EST_LOAD)
         {
