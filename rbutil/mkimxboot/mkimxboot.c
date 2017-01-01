@@ -191,6 +191,11 @@ static const struct imx_md5sum_t imx_sums[] =
         /* Version 1.00.00 */
         MODEL_NWZE370, "412f8ccd453195c0bebcc1fd8376322f", "1.00.00",
         { [VARIANT_DEFAULT] = {0, 16429056 } }
+    },
+    {
+        /* Version 1.00.200 */
+        MODEL_NWZE370, "75cfa51078261c547717e11a4676f1af", "1.00.200",
+        { [VARIANT_DEFAULT] = {0, 16429056 } }
     }
 };
 
