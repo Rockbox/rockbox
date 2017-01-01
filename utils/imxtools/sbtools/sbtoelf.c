@@ -48,15 +48,6 @@
 /* all blocks are sized as a multiple of 0x1ff */
 #define PAD_TO_BOUNDARY(x) (((x) + 0x1ff) & ~0x1ff)
 
-/* If you find a firmware that breaks the known format ^^ */
-#define assert(a) do { if(!(a)) { fprintf(stderr,"Assertion \"%s\" failed in %s() line %d!\n\nPlease send us your firmware!\n",#a,__func__,__LINE__); exit(1); } } while(0)
-
-#define crypto_cbc(...) \
-    do { int ret = crypto_cbc(__VA_ARGS__); \
-        if(ret != CRYPTO_ERROR_SUCCESS) \
-            bug("crypto_cbc error: %d\n", ret); \
-    }while(0)
-
 /* globals */
 
 static char *g_out_prefix;
@@ -116,7 +107,8 @@ static void extract_sb_section(struct sb_section_t *sec, struct cmd_file_t *cmd_
 
         for(int j = 0; j < sec->nr_insts; j++)
         {
-            assert(sec->insts[j].inst == SB_INST_DATA);
+            if(sec->insts[j].inst != SB_INST_DATA)
+                bug("Internal errror: should be a data section\n");
             fwrite(sec->insts[j].data, sec->insts[j].size, 1, fd);
         }
         fclose(fd);
@@ -185,6 +177,7 @@ static void extract_sb_file(struct sb_file_t *file)
         printf("Write command file to %s\n", filename);
     db_generate_file(cmd_file, filename, NULL, generic_std_printf);
     db_free(cmd_file);
+    free(filename);
 }
 
 static void extract_elf(struct elf_params_t *elf, int count)
@@ -248,13 +241,13 @@ static void usage(void)
 {
     printf("Usage: sbtoelf [options] sb-file\n");
     printf("Options:\n");
-    printf("  -?/--help             Display this message\n");
+    printf("  -h/--help             Display this message\n");
     printf("  -o <prefix>           Enable output and set prefix\n");
     printf("  -d/--debug            Enable debug output*\n");
     printf("  -k <file>             Add key file\n");
     printf("  -z                    Add zero key\n");
     printf("  -r                    Use raw command mode\n");
-    printf("  -a/--add-key <key>    Add single key (hex or usbotp)\n");
+    printf("  -a/--add-key <key>    Add single key\n");
     printf("  -n/--no-color         Disable output colors\n");
     printf("  -l/--loopback <file>  Produce sb file out of extracted description*\n");
     printf("  -f/--force            Force reading even without a key*\n");
@@ -280,7 +273,7 @@ int main(int argc, char **argv)
     {
         static struct option long_options[] =
         {
-            {"help", no_argument, 0, '?'},
+            {"help", no_argument, 0, 'h'},
             {"debug", no_argument, 0, 'd'},
             {"add-key", required_argument, 0, 'a'},
             {"no-color", no_argument, 0, 'n'},
@@ -293,7 +286,7 @@ int main(int argc, char **argv)
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?do:k:zra:nl:f12xsb", long_options, NULL);
+        int c = getopt_long(argc, argv, "hdo:k:zra:nl:f12xsb", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -311,7 +304,7 @@ int main(int argc, char **argv)
             case 'd':
                 g_debug = true;
                 break;
-            case '?':
+            case 'h':
                 usage();
                 break;
             case 'o':
