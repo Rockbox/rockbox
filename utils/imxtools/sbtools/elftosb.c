@@ -324,13 +324,13 @@ static void usage(void)
 {
     printf("Usage: elftosb [options | file]...\n");
     printf("Options:\n");
-    printf("  -?/--help\tDisplay this message\n");
+    printf("  -h/--help\tDisplay this message\n");
     printf("  -o <file>\tSet output file\n");
     printf("  -c <file>\tSet command file\n");
     printf("  -d/--debug\tEnable debug output\n");
     printf("  -k <file>\tAdd key file\n");
     printf("  -z\t\tAdd zero key\n");
-    printf("  --add-key <key>\tAdd single key (hex or usbotp)\n");
+    printf("  --add-key <key>\tAdd single key\n");
     printf("  --real-key <key>\tOverride real key\n");
     printf("  --crypto-iv <iv>\tOverride crypto IV\n");
     exit(1);
@@ -345,11 +345,14 @@ int main(int argc, char **argv)
     real_key.method = CRYPTO_NONE;
     crypto_iv.method = CRYPTO_NONE;
 
+    if(argc == 1)
+        usage();
+
     while(1)
     {
         static struct option long_options[] =
         {
-            {"help", no_argument, 0, '?'},
+            {"help", no_argument, 0, 'h'},
             {"debug", no_argument, 0, 'd'},
             {"add-key", required_argument, 0, 'a'},
             {"real-key", required_argument, 0, 'r'},
@@ -357,7 +360,7 @@ int main(int argc, char **argv)
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?do:c:k:za:", long_options, NULL);
+        int c = getopt_long(argc, argv, "hdo:c:k:za:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -365,7 +368,7 @@ int main(int argc, char **argv)
             case 'd':
                 g_debug = true;
                 break;
-            case '?':
+            case 'h':
                 usage();
                 break;
             case 'o':
