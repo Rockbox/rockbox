@@ -139,8 +139,7 @@ enum sb1_error_t
     SB1_FORMAT_ERROR = -5,
     SB1_CHECKSUM_ERROR = -6,
     SB1_NO_VALID_KEY = -7,
-    SB1_FIRST_CRYPTO_ERROR = -8,
-    SB1_LAST_CRYPTO_ERROR = SB1_FIRST_CRYPTO_ERROR - CRYPTO_NUM_ERRORS,
+    SB1_CRYPTO_ERROR = -8,
 };
 
 enum sb1_error_t sb1_write_file(struct sb1_file_t *sb, const char *filename);
