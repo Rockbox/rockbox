@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2016 Franklin Wei
+ * Copyright (C) 2017 Franklin Wei
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -62,36 +62,34 @@ static long last_keystate = 0;
 
 static void fix_size(void);
 
-static void rb_start_draw(void *handle)
-{
-    (void) handle;
-}
-
 static struct viewport clip_rect;
 static bool clipped = false;
 
 static struct settings_t {
     int slowmo_factor;
-    bool bulk, timerflash;
+    bool bulk, timerflash, clipoff;
 } settings;
 
 /* clipping is implemented through viewports and offsetting
  * coordinates */
 static void rb_clip(void *handle, int x, int y, int w, int h)
 {
-    LOGF("rb_clip(%d %d %d %d)", x, y, w, h);
-    clip_rect.x = x;
-    clip_rect.y = y;
-    clip_rect.width  = w;
-    clip_rect.height = h;
-    clip_rect.font = FONT_UI;
-    clip_rect.drawmode = DRMODE_SOLID;
+    if(!settings.clipoff)
+    {
+        LOGF("rb_clip(%d %d %d %d)", x, y, w, h);
+        clip_rect.x = x;
+        clip_rect.y = y;
+        clip_rect.width  = w;
+        clip_rect.height = h;
+        clip_rect.font = FONT_UI;
+        clip_rect.drawmode = DRMODE_SOLID;
 #if LCD_DEPTH > 1
-    clip_rect.fg_pattern = LCD_DEFAULT_FG;
-    clip_rect.bg_pattern = LCD_DEFAULT_BG;
+        clip_rect.fg_pattern = LCD_DEFAULT_FG;
+        clip_rect.bg_pattern = LCD_DEFAULT_BG;
 #endif
-    rb->lcd_set_viewport(&clip_rect);
-    clipped = true;
+        rb->lcd_set_viewport(&clip_rect);
+        clipped = true;
+    }
 }
 
 static void rb_unclip(void *handle)
@@ -407,6 +405,7 @@ static void rb_blitter_free(void *handle, blitter *bl)
     return;
 }
 
+/* originally from emcc.c */
 static void trim_rect(int *x, int *y, int *w, int *h)
 {
     int x0, x1, y0, y1;
@@ -476,18 +475,51 @@ static void rb_blitter_load(void *handle, blitter *bl, int x, int y)
     rb->lcd_bitmap((fb_data*)bl->bmp.data, x, y, w, h);
 }
 
+static bool need_draw_update = false;
+
+static int ud_l = 0, ud_u = 0, ud_r = LCD_WIDTH, ud_d = LCD_HEIGHT;
+
 static void rb_draw_update(void *handle, int x, int y, int w, int h)
 {
     LOGF("rb_draw_update(%d, %d, %d, %d)", x, y, w, h);
-    if(!settings.bulk)
-        rb->lcd_update_rect(x, y, w, h);
-    else
-        rb->lcd_update();
+
+    /* It seems that the puzzles use a different definition of
+     * "updating" the display than Rockbox does; by calling this
+     * function, it tells us that it has either already drawn to the
+     * updated area (as rockbox assumes), or that it WILL draw to the
+     * said area. Thus we simply remember a rectangle that contains
+     * all the updated regions and update it at the very end. */
+
+    /* adapted from gtk.c */
+    if (!need_draw_update || ud_l > x  ) ud_l = x;
+    if (!need_draw_update || ud_r < x+w) ud_r = x+w;
+    if (!need_draw_update || ud_u > y  ) ud_u = y;
+    if (!need_draw_update || ud_d < y+h) ud_d = y+h;
+
+    need_draw_update = true;
+}
+
+static void rb_start_draw(void *handle)
+{
+    (void) handle;
+
+    /* ... mumble mumble ... not ... reentrant ... mumble mumble ... */
+
+    need_draw_update = false;
+    ud_l = 0;
+    ud_r = LCD_WIDTH;
+    ud_u = 0;
+    ud_d = LCD_HEIGHT;
 }
 
 static void rb_end_draw(void *handle)
 {
+    (void) handle;
+
     LOGF("rb_end_draw");
+
+    if(need_draw_update)
+        rb->lcd_update_rect(ud_l, ud_u, ud_r - ud_l, ud_d - ud_u);
 }
 
 static char *titlebar = NULL;
@@ -893,6 +925,7 @@ static void debug_menu(void)
                         "Randomize colors",
                         "Toggle bulk update",
                         "Toggle flash pixel on timer",
+                        "Toggle clip",
                         "Back");
     bool quit = false;
     int sel = 0;
@@ -920,6 +953,9 @@ static void debug_menu(void)
             settings.timerflash = !settings.timerflash;
             break;
         case 4:
+            settings.clipoff = !settings.clipoff;
+            break;
+        case 5:
         default:
             quit = true;
             break;

@@ -361,7 +361,6 @@ static void enum_grid_squares(const game_params *params, egc_callback callback,
     } else {
         int row, rowlen, other, i, firstix = -1;
         float theight = (float)(sqrt(3) / 2.0);
-        //float theight = 0.8660254037844386467;
 
         for (row = 0; row < params->d1 + params->d2; row++) {
             if (row < params->d2) {

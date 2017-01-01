@@ -42,6 +42,7 @@ PUZZLES_ROCKS := $(addprefix $(PUZZLES_OBJDIR)/sgt-, $(notdir $(PUZZLES_GAMES_SR
 ROCKS += $(PUZZLES_ROCKS)
 endif
 
+# Hack to suppress all warnings:
 PUZZLESFLAGS = $(filter-out -O%,$(PLUGINFLAGS)) -Os		\
 		-Wno-unused-parameter -Wno-sign-compare -Wno-strict-aliasing -w	\
 		-DFOR_REAL

@@ -1,0 +1,21 @@
+This is the readme for the Rockbox port of Simon Tatham's Portable
+Puzzle Collection.
+
+Upstream version used is 7cae89fb4b22c305b3fd98b4e1be065ad527a9f7 from
+December 2016. It should be relatively trivial to update it to a newer
+version, and should probably be done periodically as changes are made.
+
+Most of the upstream files are essentially untouched, apart from some
+minor adjustments to make it compile happily on Rockbox. Some games
+still don't work due to issues with their cursor-only control scheme
+(untangle being the big culprit here) but the ones that don't are
+commented out in SOURCES.games. I'll get around to fixing them
+eventually.
+
+Building is done rather hackily, with a rule for every puzzle to be
+built... almost 40 at the time of writing. Mr. Someone ought to figure
+out how to do that with a wildcard or something.
+
+Kudos to Simon (duh), and Frank, for telling me about it.
+
+Franklin Wei (__builtin)
