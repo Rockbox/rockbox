@@ -1664,7 +1664,7 @@ typedef uint64_t      u_quad_t;
 
 static const u_char *__sccl(char *, const u_char *);
 
-void bcopy(const void *src, void *dst, size_t n)
+static void bcopy_wrapper(const void *src, void *dst, size_t n)
 {
     memmove(dst, src, n);
 }
@@ -1889,7 +1889,7 @@ literal:
                                 }
                                 nread += sum;
                         } else {
-                                bcopy(inp, va_arg(ap, char *), width);
+                                bcopy_wrapper(inp, va_arg(ap, char *), width);
                                 inr -= width;
                                 inp += width;
                                 nread += width;
