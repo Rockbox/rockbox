@@ -82,13 +82,11 @@ uint32_t crc_continue(uint32_t previous_crc, byte *data, int size);
 /* sha1.c */
 struct sha_1_params_t
 {
-    uint32_t hash[5];
-    uint64_t buffer_nr_bits;
-    uint32_t w[80];
+    byte hash[20]; /* final hash */
+    void *object; /* pointer to CryptoPP::SHA1 object */
 };
 
 void sha_1_init(struct sha_1_params_t *params);
-void sha_1_block(struct sha_1_params_t *params, uint32_t cur_hash[5], byte *data);
 void sha_1_update(struct sha_1_params_t *params, byte *buffer, int size);
 void sha_1_finish(struct sha_1_params_t *params);
 void sha_1_output(struct sha_1_params_t *params, byte *out);

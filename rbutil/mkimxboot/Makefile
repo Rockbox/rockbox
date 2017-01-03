@@ -15,7 +15,7 @@ LDFLAGS += -lcrypto++
 OUTPUT = mkimxboot
 
 # inputs for lib
-IMXTOOLS_SOURCES = misc.c sb.c crypto.cpp crc.c sha1.c elf.c
+IMXTOOLS_SOURCES = misc.c sb.c crypto.cpp crc.c elf.c
 LIBSOURCES := dualboot.c mkimxboot.c md5.c \
 	      $(addprefix $(IMXTOOLS_DIR),$(IMXTOOLS_SOURCES))
 # inputs for binary only

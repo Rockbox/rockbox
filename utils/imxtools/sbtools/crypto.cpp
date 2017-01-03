@@ -22,6 +22,7 @@
 #include "misc.h"
 #include <cryptopp/modes.h>
 #include <cryptopp/aes.h>
+#include <cryptopp/sha.h>
 
 using namespace CryptoPP;
 
@@ -123,4 +124,26 @@ int crypto_apply(
         return cbc_mac2(in_data, out_data, nr_blocks, g_key, iv, out_cbc_mac, encrypt);
     else
         return CRYPTO_ERROR_BADSETUP;
+}
+
+void sha_1_init(struct sha_1_params_t *params)
+{
+    params->object = new SHA1;
+}
+
+void sha_1_update(struct sha_1_params_t *params, byte *buffer, int size)
+{
+    reinterpret_cast<SHA1 *>(params->object)->Update(buffer, size);
+}
+
+void sha_1_finish(struct sha_1_params_t *params)
+{
+    SHA1 *obj = reinterpret_cast<SHA1 *>(params->object);
+    obj->Final(params->hash);
+    delete obj;
+}
+
+void sha_1_output(struct sha_1_params_t *params, byte *out)
+{
+    memcpy(out, params->hash, 20);
 }

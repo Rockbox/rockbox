@@ -15,10 +15,10 @@ all: $(BINS)
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-sbtoelf: sbtoelf.o crc.o crypto.o sha1.o xorcrypt.o dbparser.o elf.o misc.o sb.o sb1.o
+sbtoelf: sbtoelf.o crc.o crypto.o xorcrypt.o dbparser.o elf.o misc.o sb.o sb1.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
-elftosb: elftosb.o crc.o crypto.o sha1.o elf.o dbparser.o misc.o sb.o
+elftosb: elftosb.o crc.o crypto.o elf.o dbparser.o misc.o sb.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 elftosb1: elftosb1.o xorcrypt.o elf.o misc.o sb1.o
