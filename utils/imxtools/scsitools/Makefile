@@ -1,6 +1,6 @@
 DEFINES=
-CC=gcc
-LD=gcc
+CC=$(PREFIX)gcc
+LD=$(PREFIX)gcc
 CFLAGS=-g -std=c99 -W -Wall $(DEFINES)
 LDFLAGS=-lsgutils2
 BINS=scsitool
