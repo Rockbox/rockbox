@@ -1,8 +1,9 @@
-DEFINES=
+TOOLS_DIR=../../scsi
+DEFINES+=
 CC=gcc
 LD=gcc
-CFLAGS=-g -std=c99 -W -Wall $(DEFINES)
-LDFLAGS=-lsgutils2
+CFLAGS=-g -std=c99 -Wall $(DEFINES) -I$(TOOLS_DIR)
+LDFLAGS=-L$(TOOLS_DIR) -lrbscsi
 BINS=scsitool
 
 all: $(BINS)
