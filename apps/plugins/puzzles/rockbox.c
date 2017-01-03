@@ -60,6 +60,13 @@ static unsigned *colors = NULL;
 static int ncolors = 0;
 static long last_keystate = 0;
 
+#ifdef FOR_REAL
+/* the "debug menu" is hidden by default in order to avoid the
+ * naturally ensuing complaints from users */
+static bool debug_mode = false;
+static int help_times = 0;
+#endif
+
 static void fix_size(void);
 
 static struct viewport clip_rect;
@@ -899,6 +906,14 @@ static const struct {
 
 static void quick_help(void)
 {
+#ifdef FOR_REAL
+    if(++help_times >= 5)
+    {
+        rb->splash(HZ, "You are now a developer!");
+        debug_mode = true;
+    }
+#endif
+
     for(int i = 0; i < ARRAYLEN(quick_help_text); ++i)
     {
         if(!strcmp(midend_which_game(me)->name, quick_help_text[i].game))
@@ -938,7 +953,7 @@ static void debug_menu(void)
         switch(rb->do_menu(&menu, &sel, NULL, false))
         {
         case 0:
-            rb->set_int("Slowmo factor", "", UNIT_INT, &settings.slowmo_factor, NULL, 1, 1, 10, NULL);
+            rb->set_int("Slowmo factor", "", UNIT_INT, &settings.slowmo_factor, NULL, 1, 1, 15, NULL);
             break;
         case 1:
         {
@@ -993,16 +1008,27 @@ static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
             break;
 #endif
         case 8:
-            if(!midend_num_presets(me))
-                return ACTION_EXIT_MENUITEM;
-            break;
-        case 9:
-#ifdef FOR_REAL
+#ifdef COMBINED
+            /* audio buf is used, so no playback */
+            /* TODO: neglects app builds, but not many people will
+             * care, I bet */
             return ACTION_EXIT_MENUITEM;
 #else
             break;
 #endif
+        case 9:
+            if(!midend_num_presets(me))
+                return ACTION_EXIT_MENUITEM;
+            break;
         case 10:
+#ifdef FOR_REAL
+            if(debug_mode)
+                break;
+            return ACTION_EXIT_MENUITEM;
+#else
+            break;
+#endif
+        case 11:
             if(!midend_which_game(me)->can_configure)
                 return ACTION_EXIT_MENUITEM;
             break;
@@ -1026,6 +1052,7 @@ static int pause_menu(void)
                         "Solve",
                         "Quick Help",
                         "Extensive Help",
+                        "Playback Control",
                         "Game Type",
                         "Debug Menu",
                         "Configure Game",
@@ -1040,6 +1067,10 @@ static int pause_menu(void)
     char title[32] = { 0 };
     rb->snprintf(title, sizeof(title), "%s Menu", midend_which_game(me)->name);
     menu__.desc = title;
+
+#ifdef FOR_REAL
+    help_times = 0;
+#endif
 
     bool quit = false;
     int sel = 0;
@@ -1089,31 +1120,34 @@ static int pause_menu(void)
             full_help();
             break;
         case 8:
+            playback_control(NULL);
+            break;
+        case 9:
             presets_menu();
             midend_new_game(me);
             fix_size();
             quit = true;
             break;
-        case 9:
+        case 10:
             debug_menu();
             break;
-        case 10:
+        case 11:
             config_menu();
             midend_new_game(me);
             fix_size();
             quit = true;
             break;
 #ifdef COMBINED
-        case 11:
+        case 12:
             return -1;
+        case 13:
+            return -2;
+        case 14:
+            return -3;
+#else
         case 12:
             return -2;
         case 13:
-            return -3;
-#else
-        case 11:
-            return -2;
-        case 12:
             return -3;
 #endif
         default:
@@ -1576,6 +1610,10 @@ enum plugin_status plugin_start(const void *param)
     rb->cpu_boost(false);
 #endif
 
+#ifdef FOR_REAL
+    help_times = 0;
+#endif
+
 #ifndef COMBINED
 #define static auto
 #define const
@@ -1625,9 +1663,21 @@ enum plugin_status plugin_start(const void *param)
             break;
         case 5:
             presets_menu();
+            if(!load_success)
+            {
+                clear_and_draw();
+                goto game_loop;
+            }
+            quit = true;
             break;
         case 6:
             config_menu();
+            if(!load_success)
+            {
+                clear_and_draw();
+                goto game_loop;
+            }
+            quit = true;
             break;
         case 8:
             if(load_success)
