@@ -529,7 +529,7 @@ struct user_settings
     int statusbar;    /* STATUSBAR_* enum values */
 #ifdef HAVE_REMOTE_LCD
     int remote_statusbar;
-#endif        
+#endif
 
 #if CONFIG_KEYPAD == RECORDER_PAD
     bool buttonbar;    /* 0=hide, 1=show */
@@ -597,7 +597,12 @@ struct user_settings
     bool constrain_next_folder; /* whether next_folder is constrained to
                                    directories within start_directory */
     int  recursive_dir_insert; /* should directories be inserted recursively */
-    bool fade_on_stop; /* fade on pause/unpause/stop */
+#if CONFIG_CODEC != SWCODEC /* Archos Players */
+    bool fade_on_stop; /* fade on stop */
+#endif
+    bool fade_on_play; /* fade on pause/unpause */
+    int fade_on_pause_delay;
+    int fade_on_play_delay;
     bool playlist_shuffle;
     bool warnon_erase_dynplaylist; /* warn when erasing dynamic playlist */
 
@@ -687,7 +692,7 @@ struct user_settings
     bool backlight_fade_in;
     bool backlight_fade_out;
 #endif
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
     int brightness;
 #endif
 

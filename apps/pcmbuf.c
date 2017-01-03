@@ -119,6 +119,7 @@ static bool pcmbuf_sync_position = false;
 
 /* Fade effect */
 static unsigned int fade_vol = MIX_AMP_UNITY;
+static unsigned int fade_delay = HZ/3;
 static enum
 {
     PCM_NOT_FADING = 0,
@@ -544,7 +545,7 @@ size_t pcmbuf_init(void *bufend)
     }
 
     pcmbuf_finish_crossfade_enable();
-#else 
+#else
     pcmbuf_watermark = PCMBUF_WATERMARK;
 #endif /* HAVE_CROSSFADE */
 
@@ -1225,8 +1226,8 @@ static void pcmbuf_update_volume(void)
 /* Tick that does the fade for the playback channel */
 static void pcmbuf_fade_tick(void)
 {
-    /* ~1/3 second for full range fade */
-    const unsigned int fade_step = MIX_AMP_UNITY / (HZ / 3);
+    /* defaults to ~1/3 second for full range fade */
+    const unsigned int fade_step = MIX_AMP_UNITY / fade_delay;
 
     if (fade_state == PCM_FADING_IN)
         fade_vol += MIN(fade_step, MIX_AMP_UNITY - fade_vol);
@@ -1239,6 +1240,7 @@ static void pcmbuf_fade_tick(void)
     {
         /* Fade is complete */
         tick_remove_task(pcmbuf_fade_tick);
+        fade_delay = HZ/3;
         if (fade_state == PCM_FADING_OUT)
         {
             /* Tell PCM to stop at its earliest convenience */
@@ -1250,7 +1252,7 @@ static void pcmbuf_fade_tick(void)
 }
 
 /* Fade channel in or out in the background */
-void pcmbuf_fade(bool fade, bool in)
+void pcmbuf_fade(bool fade, bool in, int delay)
 {
     /* Must pause any active fade */
     pcm_play_lock();
@@ -1272,6 +1274,11 @@ void pcmbuf_fade(bool fade, bool in)
     else
     {
         /* Set direction and resume fade from current point */
+        if (delay == 0)
+            fade_delay = (HZ/3);
+        else
+        fade_delay = HZ * delay;
+
         fade_state = in ? PCM_FADING_IN : PCM_FADING_OUT;
         tick_add_task(pcmbuf_fade_tick);
     }

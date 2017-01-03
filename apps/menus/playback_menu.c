@@ -90,7 +90,19 @@ static int buffermargin_callback(int action,const struct menu_item_ex *this_item
 MENUITEM_SETTING(buffer_margin, &global_settings.buffer_margin,
                  buffermargin_callback);
 #endif /*HAVE_DISK_STORAGE */
+#if CONFIG_CODEC != SWCODEC
 MENUITEM_SETTING(fade_on_stop, &global_settings.fade_on_stop, NULL);
+#else
+MENUITEM_SETTING(fade_on_play, &global_settings.fade_on_play, NULL);
+MENUITEM_SETTING(fade_on_pause_delay,
+    &global_settings.fade_on_pause_delay, NULL);
+MENUITEM_SETTING(fade_on_play_delay,
+    &global_settings.fade_on_play_delay, NULL);
+
+MAKE_MENU(fade_on_play_menu,ID2P(LANG_FADE_ON_PLAY_PAUSE),0,
+          Icon_NOICON, &fade_on_play, &fade_on_pause_delay, &fade_on_play_delay);
+#endif
+
 MENUITEM_SETTING(party_mode, &global_settings.party_mode, NULL);
 
 #if CONFIG_CODEC == SWCODEC
@@ -208,7 +220,12 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 #ifdef HAVE_DISK_STORAGE
           &buffer_margin,
 #endif
-          &fade_on_stop, &party_mode,
+#if CONFIG_CODEC != SWCODEC /* Archos Players */
+          &fade_on_stop,
+#else
+          &fade_on_play_menu,
+#endif
+          &party_mode,
 
 #if (CONFIG_CODEC == SWCODEC) && defined(HAVE_CROSSFADE)
           &crossfade_settings_menu,

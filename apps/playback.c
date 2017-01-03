@@ -2554,8 +2554,10 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
 #endif
         pcmbuf_update_frequency();
 
+        bool do_fade = global_settings.fade_on_play && filling != STATE_ENDED;
+        pcmbuf_fade(do_fade, true, global_settings.fade_on_play_delay);
         /* Be sure channel is audible */
-        pcmbuf_fade(false, true);
+        /*pcmbuf_fade(false, true, 0);Removed*/
 
         /* Update our state */
         play_status = PLAY_PLAYING;
@@ -2613,10 +2615,12 @@ static void audio_stop_playback(void)
 
     if (play_status == PLAY_STOPPED)
         return;
-
+#if CONFIG_CODEC != SWCODEC /* Archos Players */
     bool do_fade = global_settings.fade_on_stop && filling != STATE_ENDED;
-
-    pcmbuf_fade(do_fade, false);
+#else
+    bool do_fade = global_settings.fade_on_play && filling != STATE_ENDED;
+#endif
+    pcmbuf_fade(do_fade, false, 0);
 
     /* Wait for fade-out */
     audio_wait_fade_complete();
@@ -2668,9 +2672,15 @@ static void audio_on_pause(bool pause)
         audio_on_codec_complete(codec_skip_status);
     }
 
-    bool do_fade = global_settings.fade_on_stop;
+    bool do_fade = global_settings.fade_on_play;
+    int fade_delay = 0;
+    if (pause)
+        fade_delay = global_settings.fade_on_pause_delay;
+    else
+        fade_delay = global_settings.fade_on_play_delay;
 
-    pcmbuf_fade(do_fade, !pause);
+    pcmbuf_fade(do_fade, !pause, fade_delay);
+
 
     if (!ff_rw_mode && !(do_fade && pause))
     {

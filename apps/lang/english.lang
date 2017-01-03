@@ -13479,3 +13479,45 @@
     ibassodx90: "Android Debug Bridge"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_FADE_ON_PAUSE_DELAY
+  desc: options menu to set delay for fade on pause
+  user: core
+  <source>
+    *: "Fade Duration on Pause"
+  </source>
+  <dest>
+    *: "Fade Duration on Pause"
+  </dest>
+  <voice>
+    *: "Fade Duration on Pause"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FADE_ON_PLAY_DELAY
+  desc: options menu to set delay for fade on play
+  user: core
+  <source>
+    *: "Fade Duration on Play"
+  </source>
+  <dest>
+    *: "Fade Duration on Play"
+  </dest>
+  <voice>
+    *: "Fade Duration on Play"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FADE_ON_PLAY_PAUSE
+  desc: options menu to set fade on play or pause
+  user: core
+  <source>
+    *: "Fade on Play/Pause"
+  </source>
+  <dest>
+    *: "Fade on Play/Pause"
+  </dest>
+  <voice>
+    *: "Fade On Play and Pause"
+  </voice>
+</phrase>

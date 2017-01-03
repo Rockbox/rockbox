@@ -70,7 +70,7 @@ int pcmbuf_used_descs(void);
 int pcmbuf_descs(void);
 
 /* Fading and channel volume control */
-void pcmbuf_fade(bool fade, bool in);
+void pcmbuf_fade(bool fade, bool in, int delay);
 bool pcmbuf_fading(void);
 void pcmbuf_soft_mode(bool shhh);
 
