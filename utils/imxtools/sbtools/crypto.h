@@ -32,21 +32,6 @@ extern "C" {
 
 typedef uint8_t byte;
 
-/* aes128.c */
-void xor_(byte *a, byte *b, int n);
-void EncryptAES(byte *msg, byte *key, byte *c);
-void DecryptAES(byte *c, byte *key, byte *m);
-void Pretty(byte* b,int len,const char* label);
-void cbc_mac(
-    byte *in_data, /* Input data */
-    byte *out_data, /* Output data (or NULL) */
-    int nr_blocks, /* Number of blocks to encrypt/decrypt (one block=16 bytes) */
-    byte key[16], /* Key */
-    byte iv[16], /* Initialisation Vector */
-    byte (*out_cbc_mac)[16], /* CBC-MAC of the result (or NULL) */
-    int encrypt /* 1 to encrypt, 0 to decrypt */
-    );
-
 /* crypto.c */
 enum crypto_method_t
 {
@@ -74,6 +59,7 @@ struct crypto_key_t
 
 #define CRYPTO_ERROR_SUCCESS    0
 #define CRYPTO_ERROR_BADSETUP   -1
+#define CRYPTO_ERROR_INVALID_OP -2
 
 /* parameter can be:
  * - CRYPTO_KEY: array of 16-bytes (the key)
