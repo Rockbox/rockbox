@@ -31,50 +31,21 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#ifndef _WIN32
-#include <scsi/scsi.h>
-#endif
-#include <scsi/sg_lib.h>
-#include <scsi/sg_pt.h>
+#include "rbscsi.h"
 #include "misc.h"
 #include "stmp_scsi.h"
 
-/* the windows port doesn't have scsi.h and GOOD */
-#ifndef GOOD
-#define GOOD                 0x00
-#endif
-
 bool g_debug = false;
 bool g_force = false;
-int g_dev_fd = 0;
+stmp_device_t g_dev_fd;
 
-#define let_the_force_flow(x) do { if(!g_force) return x; } while(0)
-#define continue_the_force(x) if(x) let_the_force_flow(x)
-
-#define check_field(v_exp, v_have, str_ok, str_bad) \
-    if((v_exp) != (v_have)) \
-    { cprintf(RED, str_bad); let_the_force_flow(__LINE__); } \
-    else { cprintf(RED, str_ok); }
-
-#define errorf(...) do { cprintf(GREY, __VA_ARGS__); return __LINE__; } while(0)
-
-#if 0
-void *buffer_alloc(int sz)
+struct stmp_device_t
 {
-#ifdef SG_LIB_MINGW
-    unsigned psz = getpagesize();
-#else
-    unsigned psz = sysconf(_SC_PAGESIZE); /* was getpagesize() */
-#endif
-    void *buffer = malloc(sz + psz);
-    return (void *)(((ptrdiff_t)(buffer + psz - 1)) & ~(psz - 1));
-}
-#else
-void *buffer_alloc(int sz)
-{
-    return malloc(sz);
-}
-#endif
+    rb_scsi_device_t dev;
+    unsigned flags;
+    void *user;
+    stmp_printf_t printf;
+};
 
 static uint16_t fix_endian16be(uint16_t w)
 {
@@ -115,77 +86,99 @@ static void print_hex(void *_buffer, int buffer_size)
     }
 }
 
-/* Do read */
-#define DO_READ     (1 << 1)
-/* Do write */
-#define DO_WRITE    (1 << 2)
-
-/* returns <0 on error and status otherwise */
-int do_scsi(uint8_t *cdb, int cdb_size, unsigned flags, void *sense, int *sense_size, void *buffer, int *buf_size)
+static void misc_std_printf(void *user, const char *fmt, ...)
 {
-    char error[256];
-    struct sg_pt_base *obj = construct_scsi_pt_obj();
-    if(obj == NULL)
-    {
-        cprintf(GREY, "construct_scsi_pt_obj failed\n");
-        return 1;
-    }
-    set_scsi_pt_cdb(obj, cdb, cdb_size);
-    if(sense)
-        set_scsi_pt_sense(obj, sense, *sense_size);
-    if(flags & DO_READ)
-        set_scsi_pt_data_in(obj, buffer, *buf_size);
-    if(flags & DO_WRITE)
-        set_scsi_pt_data_out(obj, buffer, *buf_size);
-    int ret = do_scsi_pt(obj, g_dev_fd, 10, 0);
-    switch(get_scsi_pt_result_category(obj))
-    {
-        case SCSI_PT_RESULT_SENSE:
-        case SCSI_PT_RESULT_GOOD:
-            ret = get_scsi_pt_status_response(obj);
-            break;
-        case SCSI_PT_RESULT_STATUS:
-            cprintf(GREY, "Status error: %d (", get_scsi_pt_status_response(obj));
-            sg_print_scsi_status(get_scsi_pt_status_response(obj));
-            printf(")\n");
-            break;
-        case SCSI_PT_RESULT_TRANSPORT_ERR:
-            cprintf(GREY, "Transport error: %s\n", get_scsi_pt_transport_err_str(obj, 256, error));
-            ret = -2;
-            break;
-        case SCSI_PT_RESULT_OS_ERR:
-            cprintf(GREY, "OS error: %s\n", get_scsi_pt_os_err_str(obj, 256, error));
-            ret = -3;
-            break;
-        default:
-            cprintf(GREY, "Unknown error\n");
-            break;
-    }
-
-    if(sense)
-        *sense_size = get_scsi_pt_sense_len(obj);
-    if(flags & (DO_WRITE | DO_READ))
-        *buf_size -= get_scsi_pt_resid(obj);
-    
-    destruct_scsi_pt_obj(obj);
-    return ret;
+    (void) user;
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
 }
 
-int do_sense_analysis(int status, uint8_t *sense, int sense_size)
+#define stmp_printf(dev, ...) \
+    dev->printf(dev->user, __VA_ARGS__)
+
+#define stmp_debugf(dev, ...) \
+    do{ if(dev->flags & STMP_DEBUG) stmp_printf(dev, __VA_ARGS__); }while(0)
+
+stmp_device_t stmp_open(rb_scsi_device_t rdev, unsigned flags, void *user, stmp_printf_t printf)
 {
-    if(status != GOOD && g_debug)
+    if(printf == NULL)
+        printf = misc_std_printf;
+    stmp_device_t sdev = malloc(sizeof(struct stmp_device_t));
+    memset(sdev, 0, sizeof(struct stmp_device_t));
+    sdev->dev = rdev;
+    sdev->flags = flags;
+    sdev->user = user;
+    sdev->printf = printf;
+    return sdev;
+}
+
+void stmp_close(stmp_device_t dev)
+{
+    free(dev);
+}
+
+/* returns <0 on error and status otherwise */
+int stmp_scsi(stmp_device_t dev, uint8_t *cdb, int cdb_size, unsigned flags,
+    void *sense, int *sense_size, void *buffer, int *buf_size)
+{
+    struct rb_scsi_raw_cmd_t cmd;
+    memset(&cmd, 0, sizeof(cmd));
+    cmd.dir = RB_SCSI_NONE;
+    if(flags & STMP_READ)
+        cmd.dir = RB_SCSI_READ;
+    if(flags & STMP_WRITE)
+        cmd.dir = RB_SCSI_WRITE;
+    cmd.cdb = cdb;
+    cmd.cdb_len = cdb_size;
+    cmd.sense = sense;
+    cmd.sense_len = *sense_size;
+    cmd.buf = buffer;
+    cmd.buf_len = *buf_size;
+    cmd.tmo = 1;
+    int ret = rb_scsi_raw_xfer(dev->dev, &cmd);
+    *sense_size = cmd.sense_len;
+    *buf_size = cmd.buf_len;
+    return ret == RB_SCSI_OK || ret == RB_SCSI_SENSE ? cmd.status : -ret;
+}
+
+int stmp_sense_analysis(stmp_device_t dev, int status, uint8_t *sense, int sense_size)
+{
+    if(status != 0 && (dev->flags & STMP_DEBUG))
     {
-        cprintf_field("Status:", " "); fflush(stdout);
-        sg_print_scsi_status(status);
-        cprintf_field("\nSense:", " "); fflush(stdout);
-        sg_print_sense(NULL, sense, sense_size, 0);
+        stmp_printf(dev, "Status: %d\n", status);
+        stmp_printf(dev, "Sense:");
+        for(int i = 0; i < sense_size; i++)
+            stmp_printf(dev, " %02x", sense[i]);
+        stmp_printf(dev, "\n");
     }
-    if(status == GOOD)
-        return 0;
     return status;
 }
 
-int stmp_inquiry(uint8_t *dev_type, char vendor[9], char product[17])
+static int stmp_scsi_read_cmd(stmp_device_t dev, uint8_t cmd, uint8_t subcmd,
+    uint8_t subsubcmd, void *buf, int *len)
+{
+    uint8_t cdb[16];
+    memset(cdb, 0, sizeof(cdb));
+    cdb[0] = SCSI_STMP_READ;
+    cdb[1] = cmd;
+    cdb[2] = subcmd;
+    cdb[3] = subsubcmd;
+
+    uint8_t sense[32];
+    int sense_size = sizeof(sense);
+
+    int ret = stmp_scsi(dev, cdb, sizeof(cdb), STMP_READ, sense, &sense_size, buf, len);
+    if(ret < 0)
+        return ret;
+    ret = stmp_sense_analysis(dev, ret, sense, sense_size);
+    if(ret)
+        return ret;
+    return 0;
+}
+
+int stmp_scsi_inquiry(stmp_device_t dev, uint8_t *dev_type, char vendor[9], char product[17])
 {
     unsigned char buffer[36];
     uint8_t cdb[10];
@@ -197,10 +190,10 @@ int stmp_inquiry(uint8_t *dev_type, char vendor[9], char product[17])
     int sense_size = sizeof(sense);
 
     int buf_sz = sizeof(buffer);
-    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, buffer, &buf_sz);
+    int ret = stmp_scsi(dev, cdb, sizeof(cdb), STMP_READ, sense, &sense_size, buffer, &buf_sz);
     if(ret < 0)
         return ret;
-    ret = do_sense_analysis(ret, sense, sense_size);
+    ret = stmp_sense_analysis(dev, ret, sense, sense_size);
     if(ret)
         return ret;
     if(buf_sz != sizeof(buffer))
@@ -213,109 +206,66 @@ int stmp_inquiry(uint8_t *dev_type, char vendor[9], char product[17])
     return 0;
 }
 
-static int stmp_get_protocol_version(struct scsi_stmp_protocol_version_t *ver)
+int stmp_scsi_get_protocol_version(stmp_device_t dev, void *buf, int *len)
 {
-    uint8_t cdb[16];
-    memset(cdb, 0, sizeof(cdb));
-    cdb[0] = SCSI_STMP_READ;
-    cdb[1] = SCSI_STMP_CMD_GET_PROTOCOL_VERSION;
+    return stmp_scsi_read_cmd(dev, SCSI_STMP_CMD_GET_PROTOCOL_VERSION, 0, 0, buf, len);
+}
 
-    uint8_t sense[32];
-    int sense_size = sizeof(sense);
-
-    int buf_sz = sizeof(struct scsi_stmp_protocol_version_t);
-    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, ver, &buf_sz);
-    if(ret < 0)
-        return ret;
-    ret = do_sense_analysis(ret, sense, sense_size);
-    if(ret)
-        return ret;
-    if(buf_sz != sizeof(struct scsi_stmp_protocol_version_t))
+int stmp_get_protocol_version(stmp_device_t dev, struct scsi_stmp_protocol_version_t *ver)
+{
+    int len = sizeof(*ver);
+    int ret = stmp_scsi_get_protocol_version(dev, ver, &len);
+    if(ret || len != sizeof(*ver))
         return -1;
     return 0;
 }
 
-static int stmp_get_chip_major_rev_id(struct scsi_stmp_chip_major_rev_id_t *ver)
+int stmp_scsi_get_chip_major_rev_id(stmp_device_t dev, void *buf, int *len)
 {
-    uint8_t cdb[16];
-    memset(cdb, 0, sizeof(cdb));
-    cdb[0] = SCSI_STMP_READ;
-    cdb[1] = SCSI_STMP_CMD_GET_CHIP_MAJOR_REV_ID;
+    return stmp_scsi_read_cmd(dev, SCSI_STMP_CMD_GET_CHIP_MAJOR_REV_ID, 0, 0, buf, len);
+}
 
-    uint8_t sense[32];
-    int sense_size = sizeof(sense);
-
-    int buf_sz = sizeof(struct scsi_stmp_chip_major_rev_id_t);
-    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, ver, &buf_sz);
-    if(ret < 0)
-        return ret;
-    ret = do_sense_analysis(ret, sense, sense_size);
-    if(ret)
-        return ret;
-    if(buf_sz != sizeof(struct scsi_stmp_chip_major_rev_id_t))
+int stmp_get_chip_major_rev_id(stmp_device_t dev, uint16_t *ver)
+{
+    int len = sizeof(*ver);
+    int ret = stmp_scsi_get_chip_major_rev_id(dev, ver, &len);
+    if(ret || len != sizeof(*ver))
         return -1;
-    ver->rev = fix_endian16be(ver->rev);
+    *ver = fix_endian16be(*ver);
     return 0;
 }
 
-static int stmp_get_rom_rev_id(struct scsi_stmp_rom_rev_id_t *ver)
+int stmp_scsi_get_rom_rev_id(stmp_device_t dev, void *buf, int *len)
 {
-    uint8_t cdb[16];
-    memset(cdb, 0, sizeof(cdb));
-    cdb[0] = SCSI_STMP_READ;
-    cdb[1] = SCSI_STMP_CMD_GET_ROM_REV_ID;
+    return stmp_scsi_read_cmd(dev, SCSI_STMP_CMD_GET_ROM_REV_ID, 0, 0, buf, len);
+}
 
-    uint8_t sense[32];
-    int sense_size = sizeof(sense);
-
-    int buf_sz = sizeof(struct scsi_stmp_rom_rev_id_t);
-    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, ver, &buf_sz);
-    if(ret < 0)
-        return ret;
-    ret = do_sense_analysis(ret, sense, sense_size);
-    if(ret)
-        return ret;
-    if(buf_sz != sizeof(struct scsi_stmp_rom_rev_id_t))
+int stmp_get_rom_rev_id(stmp_device_t dev, uint16_t *ver)
+{
+    int len = sizeof(*ver);
+    int ret = stmp_scsi_get_rom_rev_id(dev, ver, &len);
+    if(ret || len != sizeof(*ver))
         return -1;
-    ver->rev = fix_endian16be(ver->rev);
+    *ver = fix_endian16be(*ver);
     return 0;
 }
 
-static int stmp_get_logical_media_info(uint8_t info, void *data, int *len)
+int stmp_scsi_get_logical_media_info(stmp_device_t dev, uint8_t info, void *data, int *len)
 {
-    uint8_t cdb[16];
-    memset(cdb, 0, sizeof(cdb));
-    cdb[0] = SCSI_STMP_READ;
-    cdb[1] = SCSI_STMP_CMD_GET_LOGICAL_MEDIA_INFO;
-    cdb[2] = info;
-
-    uint8_t sense[32];
-    int sense_size = sizeof(sense);
-
-    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, data, len);
-    if(ret < 0)
-        return ret;
-    return do_sense_analysis(ret, sense, sense_size);
+    return stmp_scsi_read_cmd(dev, SCSI_STMP_CMD_GET_LOGICAL_MEDIA_INFO, info, 0, data, len);
 }
 
-static int stmp_get_logical_table(struct scsi_stmp_logical_table_t *table, int entry_count)
+int stmp_scsi_get_logical_table(stmp_device_t dev, int entry_count, void *buf, int *len)
 {
-    uint8_t cdb[16];
-    memset(cdb, 0, sizeof(cdb));
-    cdb[0] = SCSI_STMP_READ;
-    cdb[1] = SCSI_STMP_CMD_GET_LOGICAL_TABLE;
-    cdb[2] = entry_count;
+    return stmp_scsi_read_cmd(dev, SCSI_STMP_CMD_GET_LOGICAL_TABLE, entry_count, 0, buf, len);
+}
 
-    uint8_t sense[32];
-    int sense_size = sizeof(sense);
-
-    int buf_sz = sizeof(struct scsi_stmp_logical_table_t) +
+int stmp_get_logical_table(stmp_device_t dev, struct scsi_stmp_logical_table_t *table, int entry_count)
+{
+    int buf_sz =  sizeof(struct scsi_stmp_logical_table_t) +
         entry_count * sizeof(struct scsi_stmp_logical_table_entry_t);
-    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, table, &buf_sz);
-    if(ret < 0)
-        return ret;
-    ret = do_sense_analysis(ret, sense, sense_size);
-    if(ret)
+    int ret = stmp_scsi_get_logical_table(dev, entry_count, table, &buf_sz);
+    if(ret != 0)
         return ret;
     if((buf_sz - sizeof(struct scsi_stmp_logical_table_t)) % sizeof(struct scsi_stmp_logical_table_entry_t))
         return -1;
@@ -326,59 +276,22 @@ static int stmp_get_logical_table(struct scsi_stmp_logical_table_t *table, int e
     return 0;
 }
 
-static int stmp_get_logical_drive_info(uint8_t drive, uint8_t info, void *data, int *len)
+int stmp_scsi_get_logical_drive_info(stmp_device_t dev, uint8_t drive, uint8_t info, void *data, int *len)
 {
-    uint8_t cdb[16];
-    memset(cdb, 0, sizeof(cdb));
-    cdb[0] = SCSI_STMP_READ;
-    cdb[1] = SCSI_STMP_CMD_GET_LOGICAL_DRIVE_INFO;
-    cdb[2] = drive;
-    cdb[3] = info;
-
-    uint8_t sense[32];
-    int sense_size = sizeof(sense);
-
-    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, data, len);
-    if(ret < 0)
-        return ret;
-    return do_sense_analysis(ret, sense, sense_size);
+    return stmp_scsi_read_cmd(dev, SCSI_STMP_CMD_GET_LOGICAL_DRIVE_INFO, drive, info, data, len);
 }
 
-static int stmp_get_device_info(uint8_t info, void *data, int *len)
+int stmp_scsi_get_device_info(stmp_device_t dev, uint8_t info, void *data, int *len)
 {
-    uint8_t cdb[16];
-    memset(cdb, 0, sizeof(cdb));
-    cdb[0] = SCSI_STMP_READ;
-    cdb[1] = SCSI_STMP_CMD_GET_DEVICE_INFO;
-    cdb[2] = info;
-
-    uint8_t sense[32];
-    int sense_size = sizeof(sense);
-
-    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, data, len);
-    if(ret < 0)
-        return ret;
-    return do_sense_analysis(ret, sense, sense_size);
+    return stmp_scsi_read_cmd(dev, SCSI_STMP_CMD_GET_DEVICE_INFO, info, 0, data, len);
 }
 
-static int stmp_get_serial_number(uint8_t info, void *data, int *len)
+int stmp_scsi_get_serial_number(stmp_device_t dev, uint8_t info, void *data, int *len)
 {
-    uint8_t cdb[16];
-    memset(cdb, 0, sizeof(cdb));
-    cdb[0] = SCSI_STMP_READ;
-    cdb[1] = SCSI_STMP_CMD_GET_CHIP_SERIAL_NUMBER;
-    cdb[2] = info;
-
-    uint8_t sense[32];
-    int sense_size = sizeof(sense);
-
-    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, data, len);
-    if(ret < 0)
-        return ret;
-    return do_sense_analysis(ret, sense, sense_size);
+    return stmp_scsi_read_cmd(dev, SCSI_STMP_CMD_GET_CHIP_SERIAL_NUMBER, info, 0, data, len);
 }
 
-static int stmp_read_logical_drive_sectors(uint8_t drive, uint64_t address,
+int stmp_scsi_read_logical_drive_sectors(stmp_device_t dev, uint8_t drive, uint64_t address,
     uint32_t count, void *buffer, int *buffer_size)
 {
     uint8_t cdb[16];
@@ -394,13 +307,13 @@ static int stmp_read_logical_drive_sectors(uint8_t drive, uint64_t address,
     uint8_t sense[32];
     int sense_size = sizeof(sense);
 
-    int ret = do_scsi(cdb, sizeof(cdb), DO_READ, sense, &sense_size, buffer, buffer_size);
+    int ret = stmp_scsi(dev, cdb, sizeof(cdb), STMP_READ, sense, &sense_size, buffer, buffer_size);
     if(ret < 0)
         return ret;
-    return do_sense_analysis(ret, sense, sense_size);
+    return stmp_sense_analysis(dev, ret, sense, sense_size);
 }
 
-static int stmp_write_logical_drive_sectors(uint8_t drive, uint64_t address,
+int stmp_scsi_write_logical_drive_sectors(stmp_device_t dev, uint8_t drive, uint64_t address,
     uint32_t count, void *buffer, int *buffer_size)
 {
     uint8_t cdb[16];
@@ -416,10 +329,10 @@ static int stmp_write_logical_drive_sectors(uint8_t drive, uint64_t address,
     uint8_t sense[32];
     int sense_size = sizeof(sense);
 
-    int ret = do_scsi(cdb, sizeof(cdb), DO_WRITE, sense, &sense_size, buffer, buffer_size);
+    int ret = stmp_scsi(dev, cdb, sizeof(cdb), STMP_WRITE, sense, &sense_size, buffer, buffer_size);
     if(ret < 0)
         return ret;
-    return do_sense_analysis(ret, sense, sense_size);
+    return stmp_sense_analysis(dev, ret, sense, sense_size);
 }
 
 static const char *stmp_get_logical_media_type_string(uint32_t type)
@@ -435,7 +348,7 @@ static const char *stmp_get_logical_media_type_string(uint32_t type)
     }
 }
 
-static const char *stmp_get_logical_media_vendor_string(uint32_t type)
+const char *stmp_get_logical_media_vendor_string(uint32_t type)
 {
     switch(type)
     {
@@ -451,7 +364,7 @@ static const char *stmp_get_logical_media_vendor_string(uint32_t type)
     }
 }
 
-static const char *stmp_get_logical_drive_type_string(uint32_t type)
+const char *stmp_get_logical_drive_type_string(uint32_t type)
 {
     switch(type)
     {
@@ -463,7 +376,7 @@ static const char *stmp_get_logical_drive_type_string(uint32_t type)
     }
 }
 
-static const char *stmp_get_logical_drive_tag_string(uint8_t type)
+const char *stmp_get_logical_drive_tag_string(uint32_t type)
 {
     switch(type)
     {
@@ -482,7 +395,7 @@ static const char *stmp_get_logical_drive_tag_string(uint8_t type)
     }
 }
 
-static const char *stmp_get_logical_media_state_string(uint8_t state)
+const char *stmp_get_logical_media_state_string(uint8_t state)
 {
     switch(state)
     {
@@ -520,22 +433,16 @@ static int do_info(void)
     uint8_t dev_type;
     char vendor[9];
     char product[17];
-    int ret = stmp_inquiry(&dev_type, vendor, product);
-    if(ret)
-    {
-        cprintf(GREY, "Cannot get inquiry data: %d\n", ret);
-    }
-    else
+    int ret = stmp_scsi_inquiry(g_dev_fd, &dev_type, vendor, product);
+    if(ret == 0)
     {
         cprintf_field("  Vendor: ", "%s\n", vendor);
         cprintf_field("  Product: ", "%s\n", product);
     }
 
     struct scsi_stmp_protocol_version_t ver;
-    ret = stmp_get_protocol_version(&ver);
-    if(ret)
-        cprintf(GREY, "Cannot get protocol version: %d\n", ret);
-    else
+    ret = stmp_get_protocol_version(g_dev_fd, &ver);
+    if(ret == 0)
         cprintf_field("  Protocol: ", "%x.%x\n", ver.major, ver.minor);
 
     do
@@ -551,7 +458,7 @@ static int do_info(void)
 
         cprintf(GREEN, "  Device\n");
         int len = 4;
-        ret = stmp_get_device_info(0, &u.u32, &len);
+        ret = stmp_scsi_get_device_info(g_dev_fd, 0, &u.u32, &len);
         if(!ret && len == 4)
         {
             u.u32 = fix_endian32be(u.u32);
@@ -559,7 +466,7 @@ static int do_info(void)
         }
 
         len = 4;
-        ret = stmp_get_device_info(1, &u.u32, &len);
+        ret = stmp_scsi_get_device_info(g_dev_fd, 1, &u.u32, &len);
         if(!ret && len == 4)
         {
             u.u32 = fix_endian32be(u.u32);
@@ -567,19 +474,19 @@ static int do_info(void)
         }
 
         len = 2;
-        ret = stmp_get_serial_number(0, &u.u16, &len);
+        ret = stmp_scsi_get_serial_number(g_dev_fd, 0, &u.u16, &len);
         if(!ret && len == 2)
         {
             u.u16 = fix_endian16be(u.u16);
             len = MIN(u.u16, sizeof(u.buf));
-            ret = stmp_get_serial_number(1, u.buf, &len);
+            ret = stmp_scsi_get_serial_number(g_dev_fd, 1, u.buf, &len);
             cprintf_field("    Serial Number:", " ");
             print_hex(u.buf, len);
             cprintf(OFF, "\n");
         }
 
         len = 2;
-        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_NR_DRIVES, &u.u16, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, SCSI_STMP_MEDIA_INFO_NR_DRIVES, &u.u16, &len);
         if(!ret && len == 2)
         {
             u.u16 = fix_endian16be(u.u16);
@@ -587,7 +494,7 @@ static int do_info(void)
         }
 
         len = 4;
-        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_TYPE, &u.u32, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, SCSI_STMP_MEDIA_INFO_TYPE, &u.u32, &len);
         if(!ret && len == 4)
         {
             u.u32 = fix_endian32be(u.u32);
@@ -596,22 +503,22 @@ static int do_info(void)
         }
 
         len = 1;
-        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_IS_INITIALISED, &u.u8, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, SCSI_STMP_MEDIA_INFO_IS_INITIALISED, &u.u8, &len);
         if(!ret && len == 1)
             cprintf_field("  Is Initialised: ", "%d\n", u.u8);
 
         len = 1;
-        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_STATE, &u.u8, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, SCSI_STMP_MEDIA_INFO_STATE, &u.u8, &len);
         if(!ret && len == 1)
             cprintf_field("  State: ", "%s\n", stmp_get_logical_media_state_string(u.u8));
 
         len = 1;
-        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_IS_WRITE_PROTECTED, &u.u8, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, SCSI_STMP_MEDIA_INFO_IS_WRITE_PROTECTED, &u.u8, &len);
         if(!ret && len == 1)
             cprintf_field("  Is Write Protected: ", "%#x\n", u.u8);
 
         len = 8;
-        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_SIZE, &u.u64, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, SCSI_STMP_MEDIA_INFO_SIZE, &u.u64, &len);
         if(!ret && len == 8)
         {
             u.u64 = fix_endian64be(u.u64);
@@ -621,7 +528,7 @@ static int do_info(void)
 
         int serial_number_size = 0;
         len = 4;
-        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_SERIAL_NUMBER_SIZE, &u.u32, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, SCSI_STMP_MEDIA_INFO_SERIAL_NUMBER_SIZE, &u.u32, &len);
         if(!ret && len == 4)
         {
             u.u32 = fix_endian32be(u.u32);
@@ -630,7 +537,7 @@ static int do_info(void)
         }
 
         len = serial_number_size;
-        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_SERIAL_NUMBER, &u.buf, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, SCSI_STMP_MEDIA_INFO_SERIAL_NUMBER, &u.buf, &len);
         if(!ret && len != 0)
         {
             cprintf(GREEN, "  Serial Number:");
@@ -638,17 +545,17 @@ static int do_info(void)
         }
 
         len = 1;
-        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_IS_SYSTEM_MEDIA, &u.u8, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, SCSI_STMP_MEDIA_INFO_IS_SYSTEM_MEDIA, &u.u8, &len);
         if(!ret && len == 1)
             cprintf_field("  Is System Media: ", "%d\n", u.u8);
 
         len = 1;
-        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_IS_MEDIA_PRESENT, &u.u8, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, SCSI_STMP_MEDIA_INFO_IS_MEDIA_PRESENT, &u.u8, &len);
         if(!ret && len == 1)
             cprintf_field("  Is Media Present: ", "%d\n", u.u8);
 
         len = 4;
-        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_VENDOR, &u.u32, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, SCSI_STMP_MEDIA_INFO_VENDOR, &u.u32, &len);
         if(!ret && len == 4)
         {
             u.u32 = fix_endian32be(u.u32);
@@ -657,7 +564,7 @@ static int do_info(void)
         }
 
         len = 8;
-        ret = stmp_get_logical_media_info(13, &u.u64, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, 13, &u.u64, &len);
         if(!ret && len == 8)
         {
             u.u64 = fix_endian64be(u.u64);
@@ -665,7 +572,7 @@ static int do_info(void)
         }
 
         len = 4;
-        ret = stmp_get_logical_media_info(11, &u.u32, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, 11, &u.u32, &len);
         if(!ret && len == 4)
         {
             u.u32 = fix_endian32be(u.u32);
@@ -673,7 +580,7 @@ static int do_info(void)
         }
 
         len = 4;
-        ret = stmp_get_logical_media_info(14, &u.u32, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, 14, &u.u32, &len);
         if(!ret && len == 4)
         {
             u.u32 = fix_endian32be(u.u32);
@@ -681,27 +588,27 @@ static int do_info(void)
         }
 
         len = 4;
-        ret = stmp_get_logical_media_info(SCSI_STMP_MEDIA_INFO_ALLOC_UNIT_SIZE, &u.u32, &len);
+        ret = stmp_scsi_get_logical_media_info(g_dev_fd, SCSI_STMP_MEDIA_INFO_ALLOC_UNIT_SIZE, &u.u32, &len);
         if(!ret && len == 4)
         {
             u.u32 = fix_endian32be(u.u32);
             cprintf_field("  Allocation Unit Size: ", "%d B\n", u.u32);
         }
     }while(0);
-    
-    struct scsi_stmp_chip_major_rev_id_t chip_rev;
-    ret = stmp_get_chip_major_rev_id(&chip_rev);
+
+    uint16_t chip_rev;
+    ret = stmp_get_chip_major_rev_id(g_dev_fd, &chip_rev);
     if(ret)
         cprintf(GREY, "Cannot get chip major revision id: %d\n", ret);
     else
-        cprintf_field("  Chip Major Rev ID: ", "%x\n", chip_rev.rev);
-    
-    struct scsi_stmp_rom_rev_id_t rom_rev;
-    ret = stmp_get_rom_rev_id(&rom_rev);
+        cprintf_field("  Chip Major Rev ID: ", "%x\n", chip_rev);
+
+    uint16_t rom_rev;
+    ret = stmp_get_rom_rev_id(g_dev_fd, &rom_rev);
     if(ret)
         cprintf(GREY, "Cannot get rom revision id: %d\n", ret);
     else
-        cprintf_field("  ROM Rev ID: ", "%x\n", rom_rev.rev);
+        cprintf_field("  ROM Rev ID: ", "%x\n", rom_rev);
 
     struct
     {
@@ -709,7 +616,7 @@ static int do_info(void)
         struct scsi_stmp_logical_table_entry_t entry[20];
     }__attribute__((packed)) table;
 
-    ret = stmp_get_logical_table(&table.header, sizeof(table.entry) / sizeof(table.entry[0]));
+    ret = stmp_get_logical_table(g_dev_fd, &table.header, sizeof(table.entry) / sizeof(table.entry[0]));
     if(ret)
         cprintf(GREY, "Cannot get logical table: %d\n", ret);
     else
@@ -747,9 +654,9 @@ static int do_info(void)
             }u;
             uint8_t drive = table.entry[i].drive_no;
             cprintf_field("  Drive ", "%02x\n", drive);
-            
+
             int len = 4;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SECTOR_SIZE, &u.u32, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVE_INFO_SECTOR_SIZE, &u.u32, &len);
             if(!ret && len == 4)
             {
                 u.u32 = fix_endian32be(u.u32);
@@ -758,7 +665,7 @@ static int do_info(void)
             }
 
             len = 4;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVe_INFO_ERASE_SIZE, &u.u32, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVe_INFO_ERASE_SIZE, &u.u32, &len);
             if(!ret && len == 4)
             {
                 u.u32 = fix_endian32be(u.u32);
@@ -767,7 +674,7 @@ static int do_info(void)
             }
 
             len = 8;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SIZE, &u.u64, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVE_INFO_SIZE, &u.u64, &len);
             if(!ret && len == 8)
             {
                 u.u64 = fix_endian64be(u.u64);
@@ -777,7 +684,7 @@ static int do_info(void)
             }
 
             len = 4;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SIZE_MEGA, &u.u32, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVE_INFO_SIZE_MEGA, &u.u32, &len);
             if(!ret && len == 4)
             {
                 u.u32 = fix_endian32be(u.u32);
@@ -785,7 +692,7 @@ static int do_info(void)
             }
 
             len = 8;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SECTOR_COUNT, &u.u64, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVE_INFO_SECTOR_COUNT, &u.u64, &len);
             if(!ret && len == 8)
             {
                 u.u64 = fix_endian64be(u.u64);
@@ -793,7 +700,7 @@ static int do_info(void)
             }
 
             len = 4;
-            ret = stmp_get_logical_drive_info(drive,SCSI_STMP_DRIVE_INFO_TYPE, &u.u32, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive,SCSI_STMP_DRIVE_INFO_TYPE, &u.u32, &len);
             if(!ret && len == 4)
             {
                 u.u32 = fix_endian32be(u.u32);
@@ -802,7 +709,7 @@ static int do_info(void)
             }
 
             len = 1;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_TAG, &u.u8, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVE_INFO_TAG, &u.u8, &len);
             if(!ret && len == 1)
             {
                 cprintf_field("    Tag: ", "%#x", u.u8);
@@ -810,7 +717,7 @@ static int do_info(void)
             }
 
             len = 52;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_COMPONENT_VERSION, &u.buf, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVE_INFO_COMPONENT_VERSION, &u.buf, &len);
             if(!ret && len != 0)
             {
                 cprintf(GREEN, "    Component Version:");
@@ -818,7 +725,7 @@ static int do_info(void)
             }
 
             len = 52;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_PROJECT_VERSION, &u.buf, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVE_INFO_PROJECT_VERSION, &u.buf, &len);
             if(!ret && len != 0)
             {
                 cprintf(GREEN, "    Project Version:");
@@ -826,7 +733,7 @@ static int do_info(void)
             }
 
             len = 1;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_IS_WRITE_PROTETED, &u.u8, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVE_INFO_IS_WRITE_PROTETED, &u.u8, &len);
             if(!ret && len == 1)
             {
                 cprintf_field("    Is Writed Protected: ", "%d\n", u.u8);
@@ -834,7 +741,7 @@ static int do_info(void)
 
             len = 2;
             int serial_number_size = 0;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SERIAL_NUMBER_SIZE, &u.u16, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVE_INFO_SERIAL_NUMBER_SIZE, &u.u16, &len);
             if(!ret && len == 2)
             {
                 u.u16 = fix_endian16be(u.u16);
@@ -843,7 +750,7 @@ static int do_info(void)
             }
 
             len = serial_number_size;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SERIAL_NUMBER, &u.buf, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVE_INFO_SERIAL_NUMBER, &u.buf, &len);
             if(!ret && len != 0)
             {
                 cprintf(GREEN, "    Serial Number:");
@@ -851,21 +758,21 @@ static int do_info(void)
             }
 
             len = 1;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_MEDIA_PRESENT, &u.u8, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVE_INFO_MEDIA_PRESENT, &u.u8, &len);
             if(!ret && len == 1)
             {
                 cprintf_field("    Is Media Present: ", "%d\n", u.u8);
             }
 
             len = 1;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_MEDIA_CHANGE, &u.u8, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVE_INFO_MEDIA_CHANGE, &u.u8, &len);
             if(!ret && len == 1)
             {
                 cprintf_field("    Media Change: ", "%d\n", u.u8);
             }
 
             len = 4;
-            ret = stmp_get_logical_drive_info(drive, SCSI_STMP_DRIVE_INFO_SECTOR_ALLOCATION, &u.u32, &len);
+            ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive, SCSI_STMP_DRIVE_INFO_SECTOR_ALLOCATION, &u.u32, &len);
             if(!ret && len == 4)
             {
                 u.u32 = fix_endian32be(u.u32);
@@ -888,7 +795,7 @@ void do_extract(const char *file)
         struct scsi_stmp_logical_table_entry_t entry[20];
     }__attribute__((packed)) table;
 
-    int ret = stmp_get_logical_table(&table.header, sizeof(table.entry) / sizeof(table.entry[0]));
+    int ret = stmp_get_logical_table(g_dev_fd, &table.header, sizeof(table.entry) / sizeof(table.entry[0]));
     if(ret)
     {
         cprintf(GREY, "Cannot get logical table: %d\n", ret);
@@ -917,7 +824,7 @@ void do_extract(const char *file)
     }
     int len = 4;
     uint32_t sector_size;
-    ret = stmp_get_logical_drive_info(drive_no, SCSI_STMP_DRIVE_INFO_SECTOR_SIZE, &sector_size, &len);
+    ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive_no, SCSI_STMP_DRIVE_INFO_SECTOR_SIZE, &sector_size, &len);
     if(ret || len != 4)
     {
         cprintf(GREY, "Cannot get sector size\n");
@@ -931,7 +838,7 @@ void do_extract(const char *file)
     }
     uint8_t *sector = malloc(sector_size);
     len = sector_size;
-    ret = stmp_read_logical_drive_sectors(drive_no, 0, 1, sector, &len);
+    ret = stmp_scsi_read_logical_drive_sectors(g_dev_fd, drive_no, 0, 1, sector, &len);
     if(ret || len != (int)sector_size)
     {
         cprintf(GREY, "Cannot read first sector\n");
@@ -953,7 +860,7 @@ void do_extract(const char *file)
 
     for(int sec = 0; sec * sector_size < fw_size; sec++)
     {
-        ret = stmp_read_logical_drive_sectors(drive_no, sec, 1, sector, &len);
+        ret = stmp_scsi_read_logical_drive_sectors(g_dev_fd, drive_no, sec, 1, sector, &len);
         if(ret || len != (int)sector_size)
         {
             cprintf(GREY, "Cannot read sector %d\n", sec);
@@ -989,7 +896,8 @@ void do_write(const char *file, int want_a_brick)
         struct scsi_stmp_logical_table_entry_t entry[20];
     }__attribute__((packed)) table;
 
-    int ret = stmp_get_logical_table(&table.header, sizeof(table.entry) / sizeof(table.entry[0]));
+    int len = sizeof(table);
+    int ret = stmp_scsi_get_logical_table(g_dev_fd, sizeof(table.entry) / sizeof(table.entry[0]), &table.header, &len);
     if(ret)
     {
         cprintf(GREY, "Cannot get logical table: %d\n", ret);
@@ -1016,9 +924,9 @@ void do_write(const char *file, int want_a_brick)
         cprintf(RED, "* ");
         cprintf_field("Size: ", "%#llx\n", (unsigned long long)drive_sz);
     }
-    int len = 4;
+    len = 4;
     uint32_t sector_size;
-    ret = stmp_get_logical_drive_info(drive_no, SCSI_STMP_DRIVE_INFO_SECTOR_SIZE, &sector_size, &len);
+    ret = stmp_scsi_get_logical_drive_info(g_dev_fd, drive_no, SCSI_STMP_DRIVE_INFO_SECTOR_SIZE, &sector_size, &len);
     if(ret || len != 4)
     {
         cprintf(GREY, "Cannot get sector size\n");
@@ -1034,7 +942,7 @@ void do_write(const char *file, int want_a_brick)
 
     /* sanity check by reading first sector */
     len = sector_size;
-    ret = stmp_read_logical_drive_sectors(drive_no, 0, 1, sector, &len);
+    ret = stmp_scsi_read_logical_drive_sectors(g_dev_fd, drive_no, 0, 1, sector, &len);
     if(ret || len != (int)sector_size)
     {
         cprintf(GREY, "Cannot read first sector\n");
@@ -1091,7 +999,7 @@ void do_write(const char *file, int want_a_brick)
         if(xfer_len < (int)sector_size)
             memset(sector + xfer_len, 0, sector_size - xfer_len);
         len = sector_size;
-        ret = stmp_write_logical_drive_sectors(drive_no, sec, 1, sector, &len);
+        ret = stmp_scsi_write_logical_drive_sectors(g_dev_fd, drive_no, sec, 1, sector, &len);
         if(ret || len != (int)sector_size)
         {
             cprintf(GREY, "Cannot write sector %d\n", sec);
@@ -1120,6 +1028,18 @@ static void usage(void)
 }
 
 static int g_yes_i_want_a_brick = 0;
+
+static void scsi_printf(void *user, const char *fmt, ...)
+{
+    (void)user;
+    if(!g_debug)
+        return;
+    va_list args;
+    va_start(args, fmt);
+    color(GREY);
+    vprintf(fmt, args);
+    va_end(args);
+}
 
 int main(int argc, char **argv)
 {
@@ -1185,11 +1105,18 @@ int main(int argc, char **argv)
     }
 
     int ret = 0;
-    g_dev_fd = scsi_pt_open_device(argv[optind], false, true);
-    if(g_dev_fd < 0)
+    rb_scsi_device_t scsi_dev = rb_scsi_open(argv[optind], g_debug ? RB_SCSI_DEBUG : 0, NULL, scsi_printf);
+    if(scsi_dev == 0)
     {
         cprintf(GREY, "Cannot open device: %m\n");
         ret = 1;
+        goto Lend;
+    }
+    g_dev_fd = stmp_open(scsi_dev, g_debug ? STMP_DEBUG : 0, NULL, scsi_printf);
+    if(g_dev_fd == 0)
+    {
+        cprintf(GREY, "Cannot open stmp device: %m\n");
+        ret = 2;
         goto Lend;
     }
 
@@ -1200,10 +1127,10 @@ int main(int argc, char **argv)
     if(write_fw)
         do_write(write_fw, g_yes_i_want_a_brick);
 
-    scsi_pt_close_device(g_dev_fd);
+    stmp_close(g_dev_fd);
+    rb_scsi_close(scsi_dev);
 Lend:
     color(OFF);
 
     return ret;
 }
-
