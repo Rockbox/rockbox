@@ -22,6 +22,12 @@
 #define __STMP_SCSI__
 
 #include <stdint.h>
+#include <stdbool.h>
+#include "rbscsi.h"
+
+/**
+ * Low-Level SCSI stuff
+ */
 
 #define SCSI_STMP_READ                          0xc0
 #define SCSI_STMP_WRITE                         0xc1
@@ -83,18 +89,21 @@ struct scsi_stmp_logical_table_t
     uint16_t count; /* big-endian */
 } __attribute__((packed));
 
-#define SCSI_STMP_MEDIA_INFO_NR_DRIVES          0
-#define SCSI_STMP_MEDIA_INFO_SIZE               1 /* in bytes */
-#define SCSI_STMP_MEDIA_INFO_ALLOC_UNIT_SIZE    2 /* in bytes */
-#define SCSI_STMP_MEDIA_INFO_IS_INITIALISED     3
-#define SCSI_STMP_MEDIA_INFO_STATE              4
-#define SCSI_STMP_MEDIA_INFO_IS_WRITE_PROTECTED 5
-#define SCSI_STMP_MEDIA_INFO_TYPE               6
-#define SCSI_STMP_MEDIA_INFO_SERIAL_NUMBER_SIZE 7 /* in bytes */
-#define SCSI_STMP_MEDIA_INFO_SERIAL_NUMBER      8
-#define SCSI_STMP_MEDIA_INFO_IS_SYSTEM_MEDIA    9
-#define SCSI_STMP_MEDIA_INFO_IS_MEDIA_PRESENT   10
-#define SCSI_STMP_MEDIA_INFO_VENDOR             12
+#define SCSI_STMP_MEDIA_INFO_NR_DRIVES          0 /** Number of drives (obsolete) */
+#define SCSI_STMP_MEDIA_INFO_SIZE               1 /** Total size (bytes) */
+#define SCSI_STMP_MEDIA_INFO_ALLOC_UNIT_SIZE    2 /** Allocation unit size (bytes) */
+#define SCSI_STMP_MEDIA_INFO_IS_INITIALISED     3 /** Is initialised ? */
+#define SCSI_STMP_MEDIA_INFO_STATE              4 /** Media state */
+#define SCSI_STMP_MEDIA_INFO_IS_WRITE_PROTECTED 5 /** Is write protected ? */
+#define SCSI_STMP_MEDIA_INFO_TYPE               6 /** Physical media type */
+#define SCSI_STMP_MEDIA_INFO_SERIAL_NUMBER_SIZE 7 /** Serial number size (bytes) */
+#define SCSI_STMP_MEDIA_INFO_SERIAL_NUMBER      8 /** Serial number */
+#define SCSI_STMP_MEDIA_INFO_IS_SYSTEM_MEDIA    9 /** Is system media ? */
+#define SCSI_STMP_MEDIA_INFO_IS_MEDIA_PRESENT   10 /** Is media present ? */
+#define SCSI_STMP_MEDIA_INFO_PAGE_SIZE          11 /** Page size (bytes) */
+#define SCSI_STMP_MEDIA_INFO_VENDOR             12 /** Vendor ID */
+#define SCSI_STMP_MEDIA_INFO_NAND_ID            13 /** Full NAND ID */
+#define SCSI_STMP_MEDIA_INFO_NR_DEVICES         14 /** Number of physical devices */
 
 #define SCSI_STMP_MEDIA_STATE_UNKNOWN   0
 #define SCSI_STMP_MEDIA_STATE_ERASED    1
@@ -177,5 +186,15 @@ struct scsi_stmp_logical_drive_info_type_t
 {
     uint8_t type;
 }  __attribute__((packed));
+
+typedef struct stmp_device_t *stmp_device_t;
+
+typedef void (*stmp_printf_t)(void *user, const char *fmt, ...);
+
+/* open flags */
+#define STMP_DEBUG  (1 << 0)
+/* scsi flags */
+#define STMP_READ   (1 << 1)
+#define STMP_WRITE  (1 << 2)
 
 #endif /* __STMP_SCSI__ */
