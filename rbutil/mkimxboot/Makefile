@@ -10,11 +10,12 @@ IMXTOOLS_DIR=../../utils/imxtools/sbtools/
 CFLAGS += -I$(IMXTOOLS_DIR) -Wall
 # std=gnu99 is required by MinGW on Windows (c99 is sufficient for Linux / MXE)
 CFLAGS += -std=gnu99 -g -O3
+LDFLAGS += -lcrypto++
 
 OUTPUT = mkimxboot
 
 # inputs for lib
-IMXTOOLS_SOURCES = misc.c sb.c crypto.cpp crc.c aes128.c sha1.c elf.c
+IMXTOOLS_SOURCES = misc.c sb.c crypto.cpp crc.c sha1.c elf.c
 LIBSOURCES := dualboot.c mkimxboot.c md5.c \
 	      $(addprefix $(IMXTOOLS_DIR),$(IMXTOOLS_SOURCES))
 # inputs for binary only
