@@ -11,7 +11,7 @@ all: $(BINS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-scsitool: scsitool.o misc.o
+scsitool: scsitool.o misc.o stmp_scsi.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 clean:
