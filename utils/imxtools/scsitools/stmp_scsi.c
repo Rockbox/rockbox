@@ -23,7 +23,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 #define _BSD_SOURCE
-#include <endian.h>
 #include "stmp_scsi.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -131,6 +130,7 @@ int stmp_sense_analysis(stmp_device_t dev, int status, uint8_t *sense, int sense
         for(int i = 0; i < sense_size; i++)
             stmp_printf(dev, " %02x", sense[i]);
         stmp_printf(dev, "\n");
+        rb_scsi_decode_sense(dev->dev, sense, sense_size);
     }
     return status;
 }
@@ -613,4 +613,177 @@ int stmp_get_logical_drive_info(stmp_device_t dev, uint8_t drive, struct stmp_lo
             info->has.serial = true;
     }
     return 0;
+}
+
+int stmp_read_firmware(stmp_device_t dev, void *user, stmp_fw_rw_fn_t fn)
+{
+    /* read logicial table */
+    uint8_t *sector = NULL;
+    struct stmp_logical_media_table_t *table = NULL;
+    int ret = stmp_get_logical_media_table(dev, &table);
+    if(ret)
+    {
+        stmp_printf(dev, "Cannot get logical table: %d\n", ret);
+        return -1;
+    }
+    /* locate firmware partition */
+    int entry = 0;
+    while(entry < table->header.count)
+        if(table->entry[entry].type == SCSI_STMP_DRIVE_TYPE_SYSTEM &&
+                table->entry[entry].tag == SCSI_STMP_DRIVE_TAG_SYSTEM_BOOT)
+            break;
+        else
+            entry++;
+    if(entry == table->header.count)
+    {
+        stmp_printf(dev, "Cannot find firmware partition\n");
+        goto Lerr;
+    }
+    uint8_t drive_no = table->entry[entry].drive_no;
+    uint64_t drive_sz = table->entry[entry].size;
+    stmp_debugf(dev, "Firmware drive: %#x\n", drive_no);
+    stmp_debugf(dev, "Firmware max size: %#llx\n", (unsigned long long)drive_sz);
+    /* get drive info */
+    struct stmp_logical_drive_info_t info;
+    ret = stmp_get_logical_drive_info(dev, drive_no, &info);
+    if(ret || !info.has.sector_size)
+    {
+        stmp_printf(dev, "Cannot get sector size\n");
+        goto Lerr;
+    }
+    unsigned sector_size = info.sector_size;
+    stmp_debugf(dev, "Firmware sector size: %lu\n", (unsigned long)sector_size);
+    /* allocate a buffer for one sector */
+    sector = malloc(sector_size);
+    /* read the first sector to check it is correct and get the total size */
+    ret = stmp_read_logical_drive_sectors(dev, drive_no, 0, 1, sector, sector_size);
+    if(ret)
+    {
+        stmp_printf(dev, "Cannot read first sector: %d\n", ret);
+        goto Lerr;
+    }
+    uint32_t sig = *(uint32_t *)(sector + 0x14);
+    if(sig != 0x504d5453)
+    {
+        stmp_printf(dev, "There is something wrong: the first sector doesn't have the STMP signature.\n");
+        goto Lerr;
+    }
+    uint32_t fw_size = *(uint32_t *)(sector + 0x1c) * 16; /* see SB file format */
+    stmp_debugf(dev, "Firmware size: %#x\n", fw_size);
+    /* if fn is NULL, just return the size immediately */
+    if(fn != NULL)
+    {
+        /* read all sectors one by one */
+        for(int sec = 0; sec * sector_size < fw_size; sec++)
+        {
+            ret = stmp_read_logical_drive_sectors(dev, drive_no, sec, 1, sector, sector_size);
+            if(ret)
+            {
+                stmp_printf(dev, "Cannot read sector %d: %d\n", sec, ret);
+                goto Lerr;
+            }
+            int xfer_len = MIN(sector_size, fw_size - sec * sector_size);
+            ret = fn(user, sector, xfer_len);
+            if(ret != xfer_len)
+            {
+                stmp_printf(dev, "User write failed: %d\n", ret);
+                goto Lerr;
+            }
+        }
+    }
+    ret = fw_size;
+Lend:
+    free(table);
+    if(sector)
+        free(sector);
+    return ret;
+Lerr:
+    ret = -1;
+    goto Lend;
+}
+
+int stmp_write_firmware(stmp_device_t dev, void *user, stmp_fw_rw_fn_t fn)
+{
+    /* read logicial table */
+    struct stmp_logical_media_table_t *table = NULL;
+    int ret = stmp_get_logical_media_table(dev, &table);
+    if(ret)
+    {
+        stmp_printf(dev, "Cannot get logical table: %d\n", ret);
+        return -1;
+    }
+    /* locate firmware partition */
+    int entry = 0;
+    while(entry < table->header.count)
+        if(table->entry[entry].type == SCSI_STMP_DRIVE_TYPE_SYSTEM &&
+                table->entry[entry].tag == SCSI_STMP_DRIVE_TAG_SYSTEM_BOOT)
+            break;
+        else
+            entry++;
+    if(entry == table->header.count)
+    {
+        stmp_printf(dev, "Cannot find firmware partition\n");
+        goto Lerr;
+    }
+    uint8_t drive_no = table->entry[entry].drive_no;
+    uint64_t drive_sz = table->entry[entry].size;
+    stmp_debugf(dev, "Firmware drive: %#x\n", drive_no);
+    stmp_debugf(dev, "Firmware max size: %#llx\n", (unsigned long long)drive_sz);
+    /* get drive info */
+    struct stmp_logical_drive_info_t info;
+    ret = stmp_get_logical_drive_info(dev, drive_no, &info);
+    if(ret || !info.has.sector_size)
+    {
+        stmp_printf(dev, "Cannot get sector size\n");
+        goto Lerr;
+    }
+    unsigned sector_size = info.sector_size;
+    stmp_debugf(dev, "Firmware sector size: %lu\n", (unsigned long)sector_size);
+    /* allocate a buffer for one sector */
+    uint8_t *sector = malloc(sector_size);
+    /* read the first sector to check it is correct and get the total size */
+    ret = fn(user, sector, sector_size);
+    /* the whole file could be smaller than one sector, but it must be greater
+     * then the header size */
+    if(ret < 0x20)
+    {
+        stmp_printf(dev, "User read failed: %d\n", ret);
+        goto Lerr;
+    }
+    uint32_t sig = *(uint32_t *)(sector + 0x14);
+    if(sig != 0x504d5453)
+    {
+        stmp_printf(dev, "There is something wrong: the first sector doesn't have the STMP signature.\n");
+        goto Lerr;
+    }
+    uint32_t fw_size = *(uint32_t *)(sector + 0x1c) * 16; /* see SB file format */
+    stmp_debugf(dev, "Firmware size: %#x\n", fw_size);
+    /* write all sectors one by one */
+    for(int sec = 0; sec * sector_size < fw_size; sec++)
+    {
+        int xfer_len = MIN(sector_size, fw_size - sec * sector_size);
+        /* avoid rereading the first sector */
+        if(sec != 0)
+            ret = fn(user, sector, xfer_len);
+        if(ret != xfer_len)
+        {
+            stmp_printf(dev, "User read failed: %d\n", ret);
+            goto Lerr;
+        }
+        if(ret < (int)sector_size)
+            memset(sector + ret, 0, sector_size - ret);
+        ret = stmp_write_logical_drive_sectors(dev, drive_no, sec, 1, sector, sector_size);
+        if(ret)
+        {
+            stmp_printf(dev, "Cannot write sector %d: %d\n", sec, ret);
+            goto Lerr;
+        }
+    }
+    ret = fw_size;
+Lend:
+    free(table);
+    return ret;
+Lerr:
+    ret = -1;
+    goto Lend;
 }
