@@ -46,19 +46,9 @@
 #endif
 
 bool g_debug = false;
-bool g_force = false;
+const char *g_force_series = NULL;
 char *g_out_prefix = NULL;
 int g_dev_fd = 0;
-
-#define let_the_force_flow(x) do { if(!g_force) return x; } while(0)
-#define continue_the_force(x) if(x) let_the_force_flow(x)
-
-#define check_field(v_exp, v_have, str_ok, str_bad) \
-    if((v_exp) != (v_have)) \
-    { cprintf(RED, str_bad); let_the_force_flow(__LINE__); } \
-    else { cprintf(RED, str_ok); }
-
-#define errorf(...) do { cprintf(GREY, __VA_ARGS__); return __LINE__; } while(0)
 
 #if 0
 void *buffer_alloc(int sz)
@@ -362,42 +352,66 @@ int get_dnk_prop(int argc, char **argv)
 
 int get_model_and_series(int *model_index, int *series_index)
 {
-    /* we need to get the model ID: code stolen from get_dnk_prop */
-    uint8_t mid_buf[4];
-    int mid_buf_size = sizeof(mid_buf);
-    int ret = do_dnk_cmd(true, 0x23, 9, 0, mid_buf, &mid_buf_size);
-    if(ret)
+    /* if the user forced the series, simply match by name, special for '?' which
+     * prompts the list */
+    if(g_force_series)
     {
-        printf("Cannot get model ID from device: %d\n", ret);
-        return 2;
+        cprintf(RED, "User forced series, auto-detection disabled\n");
+        *series_index = -1;
+        *model_index = -1;
+        for(int i = 0; i < NWZ_SERIES_COUNT; i++)
+                if(strcmp(nwz_series[i].codename, g_force_series) == 0)
+                    *series_index = i;
+        /* display list on error */
+        if(*series_index == -1)
+        {
+            if(strcmp(g_force_series, "?") != 0)
+                cprintf(GREY, "Unrecognized series '%s'\n", g_force_series);
+            cprintf(OFF, "Series list:\n");
+            for(int i = 0; i < NWZ_SERIES_COUNT; i++)
+                printf("  %-10s %s\n", nwz_series[i].codename, nwz_series[i].name);
+            return -1;
+        }
     }
-    if(mid_buf_size != sizeof(mid_buf))
+    else
     {
-        printf("Cannot get model ID from device: device didn't send the expected amount of data\n");
-        return 3;
+        /* we need to get the model ID: code stolen from get_dnk_prop */
+        uint8_t mid_buf[4];
+        int mid_buf_size = sizeof(mid_buf);
+        int ret = do_dnk_cmd(true, 0x23, 9, 0, mid_buf, &mid_buf_size);
+        if(ret)
+        {
+            cprintf(RED, "Cannot get model ID from device: %d\n", ret);
+            return 2;
+        }
+        if(mid_buf_size != sizeof(mid_buf))
+        {
+            cprintf(RED, "Cannot get model ID from device: device didn't send the expected amount of data\n");
+            return 3;
+        }
+        unsigned long model_id = get_big_endian32(&mid_buf);
+        *model_index = -1;
+        for(int i = 0; i < NWZ_MODEL_COUNT; i++)
+            if(nwz_model[i].mid == model_id)
+                *model_index = i;
+        if(*model_index == -1)
+        {
+            cprintf(RED, "Your device is not supported. Please contact developers.\n");
+            return 3;
+        }
+        *series_index = -1;
+        for(int i = 0; i < NWZ_SERIES_COUNT; i++)
+            for(int j = 0; j < nwz_series[i].mid_count; j++)
+                if(nwz_series[i].mid[j] == model_id)
+                    *series_index = i;
+        if(*series_index == -1)
+        {
+            printf("Your device is not supported. Please contact developers.\n");
+            return 3;
+        }
     }
-    unsigned long model_id = get_big_endian32(&mid_buf);
-    *model_index = -1;
-    for(int i = 0; i < NWZ_MODEL_COUNT; i++)
-        if(nwz_model[i].mid == model_id)
-            *model_index = i;
     cprintf_field("Model: ", "%s\n", *model_index == -1 ? "Unknown" : nwz_model[*model_index].name);
-    if(*model_index == -1)
-    {
-        printf("Your device is not supported. Please contact developers.\n");
-        return 3;
-    }
-    *series_index = -1;
-    for(int i = 0; i < NWZ_SERIES_COUNT; i++)
-        for(int j = 0; j < nwz_series[i].mid_count; j++)
-            if(nwz_series[i].mid[j] == model_id)
-                *series_index = i;
     cprintf_field("Series: ", "%s\n", *series_index == -1 ? "Unknown" : nwz_series[*series_index].name);
-    if(*series_index == -1)
-    {
-        printf("Your device is not supported. Please contact developers.\n");
-        return 3;
-    }
     return 0;
 }
 
@@ -847,11 +861,11 @@ static void usage(void)
 {
     printf("Usage: scsitool [options] <dev> <command> [arguments]\n");
     printf("Options:\n");
-    printf("  -o <prefix>\tSet output prefix\n");
-    printf("  -f/--force\tForce to continue on errors\n");
-    printf("  -?/--help\tDisplay this message\n");
-    printf("  -d/--debug\tDisplay debug messages\n");
-    printf("  -c/--no-color\tDisable color output\n");
+    printf("  -o <prefix>          Set output prefix\n");
+    printf("  -?/--help            Display this message\n");
+    printf("  -d/--debug           Display debug messages\n");
+    printf("  -c/--no-color        Disable color output\n");
+    printf("  -s/--series <name>   Force series (disable auto-detection, use '?' for the list)\n");
     printf("Commands:\n");
     for(unsigned i = 0; i < NR_CMDS; i++)
         printf("  %s\t%s\n", cmd_list[i].name, cmd_list[i].desc);
@@ -867,11 +881,11 @@ int main(int argc, char **argv)
             {"help", no_argument, 0, '?'},
             {"debug", no_argument, 0, 'd'},
             {"no-color", no_argument, 0, 'c'},
-            {"force", no_argument, 0, 'f'},
+            {"series", required_argument, 0, 's'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?dcfo:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?dcfo:s:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -884,14 +898,14 @@ int main(int argc, char **argv)
             case 'd':
                 g_debug = true;
                 break;
-            case 'f':
-                g_force = true;
-                break;
             case '?':
                 usage();
                 break;
             case 'o':
                 g_out_prefix = optarg;
+                break;
+            case 's':
+                g_force_series = optarg;
                 break;
             default:
                 abort();
