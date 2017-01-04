@@ -1,3 +1,4 @@
+#!/bin/bash
 # usage
 # parse_header.sh /path/to/icx_nvp.h
 # parse_header.sh /path/to/linux/source [file]
