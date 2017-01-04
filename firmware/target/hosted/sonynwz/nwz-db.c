@@ -20,7 +20,7 @@
 
 /** /!\ This file was automatically generated, DO NOT MODIFY IT DIRECTLY /!\ */
 
-#include "nwz_db.h"
+#include "nwz-db.h"
 
 struct nwz_model_info_t nwz_model[NWZ_MODEL_COUNT] =
 {
@@ -1021,7 +1021,7 @@ struct nwz_nvp_info_t nwz_nvp[NWZ_NVP_COUNT] =
     [NWZ_NVP_BLF] = { "blf", 4, "browser log mode flag" },
     [NWZ_NVP_BML] = { "bml", 4, "btmw log mode flag" },
     [NWZ_NVP_BOK] = { "bok", 4, "beep ok flag" },
-    [NWZ_NVP_BPR] = { "bpr", 2048, "bluetooth address | bluetooth parameter" },
+    [NWZ_NVP_BPR] = { "bpr", 2048, "bluetooth parameter | bluetooth address" },
     [NWZ_NVP_BTC] = { "btc", 4, "battery calibration" },
     [NWZ_NVP_BTI] = { "bti", 262144, "boot image" },
     [NWZ_NVP_CGP] = { "cgp", 0, "" },
@@ -1031,7 +1031,7 @@ struct nwz_nvp_info_t nwz_nvp[NWZ_NVP_COUNT] =
     [NWZ_NVP_DBA] = { "dba", 160, "aad icv" },
     [NWZ_NVP_DBG] = { "dbg", 0, "" },
     [NWZ_NVP_DBI] = { "dbi", 262144, "dead battery image" },
-    [NWZ_NVP_DBV] = { "dbv", 520, "empr key | empr icv" },
+    [NWZ_NVP_DBV] = { "dbv", 520, "empr icv | empr key" },
     [NWZ_NVP_DCC] = { "dcc", 20, "secure clock" },
     [NWZ_NVP_DOR] = { "dor", 4, "key mode (debug/release)" },
     [NWZ_NVP_E00] = { "e00", 1024, "EMPR  0" },
