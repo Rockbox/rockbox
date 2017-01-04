@@ -3,9 +3,9 @@ CC=gcc
 CXX=g++
 LD=g++
 PROFILE=
-CFLAGS=-g $(PROFILE) -std=c99 -W -Wall $(DEFINES) `pkg-config --cflags openssl` `pkg-config --cflags libcrypto++`
-CXXFLAGS=-g $(PROFILE) -W -Wall $(DEFINES) `pkg-config --cflags openssl` `pkg-config --cflags libcrypto++`
-LDFLAGS=$(PROFILE) `pkg-config --libs openssl` `pkg-config --libs libcrypto++` -lcrypt -lpthread
+CFLAGS=-g $(PROFILE) -std=c99 -W -Wall $(DEFINES) `pkg-config --cflags libcrypto++`
+CXXFLAGS=-g $(PROFILE) -W -Wall $(DEFINES) `pkg-config --cflags libcrypto++`
+LDFLAGS=$(PROFILE) `pkg-config --libs libcrypto++` -lpthread
 BINS=upgtool
 
 all: $(BINS)
@@ -16,7 +16,7 @@ all: $(BINS)
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-upgtool: upgtool.o upg.o misc.o fwp.o mg.o keysig_search.o
+upgtool: upgtool.o upg.o misc.o fwp.o mg.o keysig_search.o md5.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 clean:
