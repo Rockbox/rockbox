@@ -32,7 +32,7 @@ enum nwz_nvp_node_t
     NWZ_NVP_BLF, /* browser log mode flag */
     NWZ_NVP_BML, /* btmw log mode flag */
     NWZ_NVP_BOK, /* beep ok flag */
-    NWZ_NVP_BPR, /* bluetooth address | bluetooth parameter */
+    NWZ_NVP_BPR, /* bluetooth parameter | bluetooth address */
     NWZ_NVP_BTC, /* battery calibration */
     NWZ_NVP_BTI, /* boot image */
     NWZ_NVP_CGP, /*  */
@@ -42,7 +42,7 @@ enum nwz_nvp_node_t
     NWZ_NVP_DBA, /* aad icv */
     NWZ_NVP_DBG, /*  */
     NWZ_NVP_DBI, /* dead battery image */
-    NWZ_NVP_DBV, /* empr key | empr icv */
+    NWZ_NVP_DBV, /* empr icv | empr key */
     NWZ_NVP_DCC, /* secure clock */
     NWZ_NVP_DOR, /* key mode (debug/release) */
     NWZ_NVP_E00, /* EMPR  0 */

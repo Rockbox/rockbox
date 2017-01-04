@@ -66,8 +66,11 @@ lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,12 "Dumping rootfs..."
 ROOTFS_TMP_DIR=/tmp/rootfs
 mkdir $ROOTFS_TMP_DIR
 . /install_script/constant.txt
-if ! mount -t ext3 -o ro $COMMON_ROOTFS_PARTITION $ROOTFS_TMP_DIR
-then
+mount -t ext3 $COMMON_ROOTFS_PARTITION $ROOTFS_TMP_DIR
+if [ "$?" != 0 ]; then
+    mount -t ext2 $COMMON_ROOTFS_PARTITION $ROOTFS_TMP_DIR
+fi
+if [ "$?" != 0 ]; then
     lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,13 "ERROR: cannot mount rootfs"
 else
     tar -cf $DUMP_DIR/rootfs.tar $ROOTFS_TMP_DIR
