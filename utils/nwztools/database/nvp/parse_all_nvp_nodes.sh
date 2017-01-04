@@ -1,4 +1,4 @@
-#
+#!/bin/bash
 # usage: parse_all_nvp_nodes /path/to/directory
 #
 # the expected structure is:

@@ -32,7 +32,7 @@ enum nwz_nvp_node_t
     NWZ_NVP_BLF, /* browser log mode flag */
     NWZ_NVP_BML, /* btmw log mode flag */
     NWZ_NVP_BOK, /* beep ok flag */
-    NWZ_NVP_BPR, /* bluetooth address | bluetooth parameter */
+    NWZ_NVP_BPR, /* bluetooth parameter | bluetooth address */
     NWZ_NVP_BTC, /* battery calibration */
     NWZ_NVP_BTI, /* boot image */
     NWZ_NVP_CGP, /*  */
@@ -144,7 +144,7 @@ enum nwz_nvp_node_t
 /* Number of models */
 #define NWZ_MODEL_COUNT     181
 /* Number of series */
-#define NWZ_SERIES_COUNT    36
+#define NWZ_SERIES_COUNT    37
 
 /* NVP node info */
 struct nwz_nvp_info_t
