@@ -25,6 +25,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <stdbool.h>
+
+#define cprintf(col, ...) do {color(col); printf(__VA_ARGS__); }while(0)
 
 /** Generic search code */
 
@@ -164,6 +167,7 @@ static struct
 }g_keysig_search;
 
 static bool is_hex[256];
+static bool is_alnum[256];
 static bool is_init = false;
 
 static void keysig_search_init()
@@ -172,15 +176,32 @@ static void keysig_search_init()
     is_init = true;
     memset(is_hex, 0, sizeof(is_hex));
     for(int i = '0'; i <= '9'; i++)
+    {
+        is_alnum[i] = true;
         is_hex[i] = true;
+    }
     for(int i = 'a'; i <= 'f'; i++)
         is_hex[i] = true;
+    for(int i = 'A'; i <= 'F'; i++)
+        is_hex[i] = true;
+    for(int i = 'a'; i <= 'z'; i++)
+        is_alnum[i] = true;
+    for(int i = 'A'; i <= 'Z'; i++)
+        is_alnum[i] = true;
 }
 
-static inline bool is_full_ascii(uint8_t *arr)
+static bool hex_validate_sig(uint8_t *arr)
 {
     for(int i = 0; i < 8; i++)
         if(!is_hex[arr[i]])
+            return false;
+    return true;
+}
+
+static bool alnum_validate_sig(uint8_t *arr)
+{
+    for(int i = 0; i < 8; i++)
+        if(!is_alnum[arr[i]])
             return false;
     return true;
 }
@@ -192,11 +213,13 @@ struct upg_header_t
     uint32_t pad; // make sure structure size is a multiple of 8
 } __attribute__((packed));
 
-static bool check_key(uint8_t key[NWZ_KEY_SIZE])
+typedef bool (*sig_validate_fn_t)(uint8_t *key);
+
+static bool check_key(uint8_t key[NWZ_KEY_SIZE], sig_validate_fn_t validate)
 {
     struct upg_header_t hdr;
     mg_decrypt_fw(g_keysig_search.enc_buf, sizeof(hdr.sig), (void *)&hdr, key);
-    if(is_full_ascii(hdr.sig))
+    if(validate(hdr.sig))
     {
         /* the signature looks correct, so decrypt the header futher to be sure */
         mg_decrypt_fw(g_keysig_search.enc_buf, sizeof(hdr), (void *)&hdr, key);
@@ -220,6 +243,7 @@ static bool check_key(uint8_t key[NWZ_KEY_SIZE])
 struct hex_chunk_t
 {
     uint8_t key[NWZ_KEY_SIZE]; /* partially pre-filled key */
+    bool upper_case; /* allow upper case in letters */
     int pos;
     int rem_letters;
     int rem_digits;
@@ -235,7 +259,7 @@ static bool hex_rec(bool producer, struct hex_chunk_t *ch)
     }
     /* filled the key ? */
     if(!producer && ch->pos == NWZ_KEY_SIZE)
-        return check_key(ch->key);
+        return check_key(ch->key, hex_validate_sig);
     /* list next possibilities
      *
      * NOTE (42) Since the cipher is DES, the key is actually 56-bit: the least
@@ -264,6 +288,15 @@ static bool hex_rec(bool producer, struct hex_chunk_t *ch)
             if(hex_rec(producer, ch))
                 return true;
         }
+        if(ch->upper_case)
+        {
+            for(int i = 'A'; i <= 'F'; i += 2)
+            {
+                ch->key[p] = i;
+                if(hex_rec(producer, ch))
+                    return true;
+            }
+        }
         ch->rem_letters++;
     }
     ch->pos--;
@@ -283,13 +316,14 @@ static void *hex_worker(void *arg)
     return NULL;
 }
 
-static bool hex_producer_list(int nr_digits, int nr_letters)
+static bool hex_producer_list(bool upper_case, int nr_digits, int nr_letters)
 {
     struct hex_chunk_t ch;
     cprintf(BLUE, "    Listing keys with %d letters and %d digits\n", nr_letters,
         nr_digits);
     memset(ch.key, ' ', 8);
     ch.pos = 0;
+    ch.upper_case = upper_case;
     ch.rem_letters = nr_letters;
     ch.rem_digits = nr_digits;
     return hex_rec(true, &ch);
@@ -299,16 +333,103 @@ void *hex_producer(void *arg)
 {
     (void) arg;
     // sorted by probability:
-    bool stop = hex_producer_list(5, 3) // 5 digits, 3 letters: 0.281632
-        || hex_producer_list(6, 2) // 6 digits, 2 letters: 0.234693
-        || hex_producer_list(4, 4) // 4 digits, 4 letters: 0.211224
-        || hex_producer_list(7, 1) // 7 digits, 1 letters: 0.111759
-        || hex_producer_list(3, 5) // 3 digits, 5 letters: 0.101388
-        || hex_producer_list(2, 6) // 2 digits, 6 letters: 0.030416
-        || hex_producer_list(8, 0) // 8 digits, 0 letters: 0.023283
-        || hex_producer_list(1, 7) // 1 digits, 7 letters: 0.005214
-        || hex_producer_list(0, 8);// 0 digits, 8 letters: 0.000391
+    bool stop = hex_producer_list(false, 5, 3) // 5 digits, 3 letters: 0.281632
+        || hex_producer_list(false, 6, 2) // 6 digits, 2 letters: 0.234693
+        || hex_producer_list(false, 4, 4) // 4 digits, 4 letters: 0.211224
+        || hex_producer_list(false, 7, 1) // 7 digits, 1 letters: 0.111759
+        || hex_producer_list(false, 3, 5) // 3 digits, 5 letters: 0.101388
+        || hex_producer_list(false, 2, 6) // 2 digits, 6 letters: 0.030416
+        || hex_producer_list(false, 8, 0) // 8 digits, 0 letters: 0.023283
+        || hex_producer_list(false, 1, 7) // 1 digits, 7 letters: 0.005214
+        || hex_producer_list(false, 0, 8);// 0 digits, 8 letters: 0.000391
     if(!stop)
+        producer_stop();
+    return NULL;
+}
+
+void *hex_producer_up(void *arg)
+{
+    (void) arg;
+    // sorted by probability:
+    // TODO sort
+    bool stop = hex_producer_list(true, 5, 3) // 5 digits, 3 letters: 0.281632
+        || hex_producer_list(true, 6, 2) // 6 digits, 2 letters: 0.234693
+        || hex_producer_list(true, 4, 4) // 4 digits, 4 letters: 0.211224
+        || hex_producer_list(true, 7, 1) // 7 digits, 1 letters: 0.111759
+        || hex_producer_list(true, 3, 5) // 3 digits, 5 letters: 0.101388
+        || hex_producer_list(true, 2, 6) // 2 digits, 6 letters: 0.030416
+        || hex_producer_list(true, 8, 0) // 8 digits, 0 letters: 0.023283
+        || hex_producer_list(true, 1, 7) // 1 digits, 7 letters: 0.005214
+        || hex_producer_list(true, 0, 8);// 0 digits, 8 letters: 0.000391
+    if(!stop)
+        producer_stop();
+    return NULL;
+}
+
+/** Alphanumeric search */
+
+struct alnum_chunk_t
+{
+    uint8_t key[NWZ_KEY_SIZE]; /* partially pre-filled key */
+    int pos;
+};
+
+static bool alnum_rec(bool producer, struct alnum_chunk_t *ch)
+{
+    /* we list the first 5 pos in generator, and remaining 3 in workers */
+    if(producer && ch->pos == 4)
+    {
+        printf("yield(%.8s,%d)\n", ch->key, ch->pos);
+        return producer_yield(ch, sizeof(struct alnum_chunk_t));
+    }
+    /* filled the key ? */
+    if(!producer && ch->pos == NWZ_KEY_SIZE)
+        return check_key(ch->key, alnum_validate_sig);
+    /* list next possibilities
+     *
+     * NOTE (42) Since the cipher is DES, the key is actually 56-bit: the least
+     * significant bit of each byte is an (unused) parity bit. We thus only
+     * generate keys where the least significant bit is 0. */
+    int p = ch->pos++;
+    /* NOTE (42) */
+    for(int i = '0'; i <= '9'; i += 2)
+    {
+        ch->key[p] = i;
+        if(alnum_rec(producer, ch))
+            return true;
+    }
+    /* NOTE (42) */
+    for(int i = 'a'; i <= 'z'; i += 2)
+    {
+        ch->key[p] = i;
+        if(alnum_rec(producer, ch))
+            return true;
+    }
+    ch->pos--;
+    return false;
+}
+
+static void *alnum_worker(void *arg)
+{
+    (void) arg;
+    while(true)
+    {
+        struct alnum_chunk_t *ch = consumer_get(NULL);
+        if(ch == NULL)
+            break;
+        alnum_rec(false, ch);
+    }
+    return NULL;
+}
+
+void *alnum_producer(void *arg)
+{
+    (void) arg;
+    struct alnum_chunk_t ch;
+    cprintf(BLUE, "    Listing alphanumeric keys\n");
+    memset(ch.key, ' ', 8);
+    ch.pos = 0;
+    if(!alnum_rec(true, &ch))
         producer_stop();
     return NULL;
 }
@@ -329,10 +450,25 @@ bool keysig_search(int method, uint8_t *enc_buf, size_t buf_sz,
     /* get methods */
     routine_t worker_fn = NULL;
     routine_t producer_fn = NULL;
-    if(method == KEYSIG_SEARCH_ASCII_HEX)
+    if(method == KEYSIG_SEARCH_XDIGITS)
     {
         worker_fn = hex_worker;
         producer_fn = hex_producer;
+    }
+    else if(method == KEYSIG_SEARCH_XDIGITS_UP)
+    {
+        worker_fn = hex_worker;
+        producer_fn = hex_producer_up;
+    }
+    else if(method == KEYSIG_SEARCH_ALNUM)
+    {
+        worker_fn = alnum_worker;
+        producer_fn = alnum_producer;
+    }
+    else
+    {
+        printf("Invalid method\n");
+        return false;
     }
     /* create workers */
     pthread_t *worker = malloc(sizeof(pthread_t) * nr_threads);
@@ -357,9 +493,19 @@ struct keysig_search_desc_t keysig_search_desc[KEYSIG_SEARCH_LAST] =
         .name = "none",
         .comment = "don't use",
     },
-    [KEYSIG_SEARCH_ASCII_HEX] =
+    [KEYSIG_SEARCH_XDIGITS] =
     {
-        .name = "ascii-hex",
-        .comment = "Try to find an hexadecimal ascii string keysig"
+        .name = "xdigits",
+        .comment = "Try to find an hexadecimal string keysig"
+    },
+    [KEYSIG_SEARCH_XDIGITS_UP] =
+    {
+        .name = "xdigits-up",
+        .comment = "Try to find an hexadecimal string keysig, including upper case"
+    },
+    [KEYSIG_SEARCH_ALNUM] =
+    {
+        .name = "alnum",
+        .comment = "Try to find an alphanumeric string keysig"
     },
 };
