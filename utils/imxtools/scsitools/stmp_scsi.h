@@ -355,6 +355,14 @@ int stmp_read_logical_drive_sectors(stmp_device_t dev, uint8_t drive, uint64_t a
     uint32_t count, void *buffer, int buffer_size);
 int stmp_write_logical_drive_sectors(stmp_device_t dev, uint8_t drive, uint64_t address,
     uint32_t count, void *buffer, int buffer_size);
+/* return <0 on error, or firmware size in bytes otherwise,
+ * if not NULL, the read/write function will be called as many times as needed to provide
+ * the entire firmware, it should return number of bytes read/written on success or -1 on error
+ * in all cases, the total size of the firmware is based on the header
+ * if NULL for read, return firmware size */
+typedef int (*stmp_fw_rw_fn_t)(void *user, void *buf, size_t size);
+int stmp_read_firmware(stmp_device_t dev, void *user, stmp_fw_rw_fn_t fn);
+int stmp_write_firmware(stmp_device_t dev, void *user, stmp_fw_rw_fn_t fn);
 /* string helpers */
 const char *stmp_get_logical_media_type_string(uint32_t type);
 const char *stmp_get_logical_media_vendor_string(uint32_t type);
