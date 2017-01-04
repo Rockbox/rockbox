@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Linus Nielsen Feltzing
+ * Copyright (C) 2011 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,23 +19,22 @@
  *
  ****************************************************************************/
 
+#ifndef MKIMXBOOT_H
+#define MKIMXBOOT_H
+
 #include <stdbool.h>
+#include <stdint.h>
+#include <sys/types.h>
 
-/* Set this to true to enable lcd_update() in the printf function */
-extern bool verbose;
-
-/* Error types */
-#define     EATA                    -1
-#define     EDISK                   -2
-#define     EBOOTFILE               -3
-
-/* Functions common to all bootloaders */
-#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
-void reset_screen(void);
-int printf(const char *format, ...);
+#ifdef __cplusplus
+extern "C" {
 #endif
-void error(int errortype, int error, bool shutdown);
-int load_raw_firmware(unsigned char* buf, char* firmware, int buffer_size);
-#ifdef ROCKBOX_HAS_LOGF
-void display_logf(void);
+
+void dump_nwz_dev_info(const char *prefix);
+int mknwzboot(const char *bootfile, const char *outfile, bool debug);
+
+#ifdef __cplusplus
+}
 #endif
+#endif
+

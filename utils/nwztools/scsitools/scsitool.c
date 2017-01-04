@@ -38,7 +38,7 @@
 #include <scsi/sg_pt.h>
 #include "misc.h"
 #include "para_noise.h"
-#include "nwz_db.h"
+#include "nwz-db.h"
 
 /* the windows port doesn't have scsi.h and GOOD */
 #ifndef GOOD
