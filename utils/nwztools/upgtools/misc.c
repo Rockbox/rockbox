@@ -22,24 +22,18 @@
 #include <stdio.h>
 #include <time.h>
 #include <ctype.h>
+#include <stdarg.h>
 #include "misc.h"
 
-char OFF[] = { 0x1b, 0x5b, 0x31, 0x3b, '0', '0', 0x6d, '\0' };
+const char OFF[] = { 0x1b, 0x5b, 0x31, 0x3b, '0', '0', 0x6d, '\0' };
 
-char GREY[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '0', 0x6d, '\0' };
-char RED[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '1', 0x6d, '\0' };
-char GREEN[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '2', 0x6d, '\0' };
-char YELLOW[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '3', 0x6d, '\0' };
-char BLUE[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
+const char GREY[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '0', 0x6d, '\0' };
+const char RED[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '1', 0x6d, '\0' };
+const char GREEN[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '2', 0x6d, '\0' };
+const char YELLOW[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '3', 0x6d, '\0' };
+const char BLUE[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
 
 static bool g_color_enable = true;
-
-void *xmalloc(size_t s)
-{
-    void * r = malloc(s);
-    if(!r) bugp("malloc");
-    return r;
-}
 
 void enable_color(bool enable)
 {
@@ -50,4 +44,15 @@ void color(color_t c)
 {
     if(g_color_enable)
         printf("%s", (char *)c);
+}
+
+void generic_std_printf(void *u, bool err, color_t c, const char *f, ...)
+{
+    (void)u;
+    (void)err;
+    va_list args;
+    va_start(args, f);
+    color(c);
+    vprintf(f, args);
+    va_end(args);
 }

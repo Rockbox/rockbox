@@ -19,6 +19,7 @@
  *
  ****************************************************************************/
 #include <stdio.h>
+#include <stdlib.h>
 #include "fwp.h"
 #include "misc.h"
 #include "mg.h"
@@ -53,9 +54,6 @@ int fwp_crypt(void *buf, int size, int mode)
         size -= NWZ_KEY_SIZE;
     }
     if(size != 0)
-    {
-        cprintf(GREY, "Cannot fwp_crypt non-multiple of 8!\n");
-        return -1;
-    }
+        abort();
     return 0;
 }

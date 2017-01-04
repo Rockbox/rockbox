@@ -27,20 +27,16 @@
 #define _STR(a) #a
 #define STR(a) _STR(a)
 
-#define bug(...) do { fprintf(stderr,"["__FILE__":"STR(__LINE__)"]ERROR: "__VA_ARGS__); exit(1); } while(0)
-#define bugp(...) do { fprintf(stderr, __VA_ARGS__); perror(" "); exit(1); } while(0)
-
 #define ROUND_UP(val, round) ((((val) + (round) - 1) / (round)) * (round))
 
-typedef char color_t[];
+typedef const char color_t[];
 
 extern color_t OFF, GREY, RED, GREEN, YELLOW, BLUE;
-void *xmalloc(size_t s);
 void color(color_t c);
 void enable_color(bool enable);
 
-#define cprintf(col, ...) do {color(col); printf(__VA_ARGS__); }while(0)
+typedef void (*generic_printf_t)(void *u, bool err, color_t c, const char *f, ...);
 
-#define cprintf_field(str1, ...) do{ cprintf(GREEN, str1); cprintf(YELLOW, __VA_ARGS__); }while(0)
+void generic_std_printf(void *u, bool err, color_t c, const char *f, ...);
 
 #endif /* __MISC_H__ */
