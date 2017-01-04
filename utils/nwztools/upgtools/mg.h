@@ -26,10 +26,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-int mg_decrypt_fw(void *in, int size, void *out, uint8_t *key);
-int mg_encrypt_fw(void *in, int size, void *out, uint8_t *key);
-int mg_decrypt_pass(void *in, int size, void *out, uint8_t *key);
-int mg_encrypt_pass(void *in, int size, void *out, uint8_t *key);
+/* size must be a multiple of 8 */
+void mg_decrypt_fw(void *in, int size, void *out, uint8_t *key);
+void mg_encrypt_fw(void *in, int size, void *out, uint8_t *key);
+void mg_decrypt_pass(void *in, int size, void *out, uint8_t *key);
+void mg_encrypt_pass(void *in, int size, void *out, uint8_t *key);
 #ifdef __cplusplus
 }
 #endif

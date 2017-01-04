@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <openssl/md5.h>
+#include "md5.h"
 
 struct nwz_model_t g_model_list[] =
 {
@@ -97,19 +97,14 @@ struct upg_file_t *upg_read_memory(void *buf, size_t size, char key[NWZ_KEY_SIZE
     struct upg_md5_t *md5 = buf;
     cprintf(BLUE, "Preliminary\n");
     cprintf(GREEN, "  MD5: ");
-    for(int i = 0; i < MD5_DIGEST_LENGTH; i++)
+    for(int i = 0; i < NWZ_MD5_SIZE; i++)
         cprintf(YELLOW, "%02x", md5->md5[i]);
     cprintf(OFF, " ");
 
     /* check MD5 */
-    uint8_t actual_md5[MD5_DIGEST_LENGTH];
-    {
-        MD5_CTX c;
-        MD5_Init(&c);
-        MD5_Update(&c, md5 + 1, size - sizeof(struct upg_header_t));
-        MD5_Final(actual_md5, &c);
-    }
-    if(memcmp(actual_md5, md5->md5, MD5_DIGEST_LENGTH) != 0)
+    uint8_t actual_md5[NWZ_MD5_SIZE];
+    MD5_CalculateDigest(actual_md5, (md5 + 1), size - sizeof(struct upg_header_t));
+    if(memcmp(actual_md5, md5->md5, NWZ_MD5_SIZE) != 0)
     {
         cprintf(RED, "Mismatch\n");
         err_printf(GREY, "MD5 Mismatch\n");
@@ -223,12 +218,7 @@ void *upg_write_memory(struct upg_file_t *file, char key[NWZ_KEY_SIZE],
     /* encrypt everything and hash everything */
     fwp_write(hdr, tot_size - sizeof(*md5), hdr, (void *)key);
     /* write final MD5 */
-    {
-        MD5_CTX c;
-        MD5_Init(&c);
-        MD5_Update(&c, (void *)hdr, tot_size - sizeof(*md5));
-        MD5_Final(md5->md5, &c);
-    }
+    MD5_CalculateDigest(md5->md5, (void *)hdr, tot_size - sizeof(*md5));
     *out_size = tot_size;
     return buf;
 }
