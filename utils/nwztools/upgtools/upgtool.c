@@ -319,7 +319,7 @@ static int get_key_and_sig(bool is_extract, void *encrypted_hdr)
         cprintf(GREY, "- select a model with a known KAS\n");
         cprintf(GREY, "- specify an explicit KAS or key+sig\n");
         if(is_extract)
-            cprintf(GREY, "- let me try to find the keysig(slow !)\n");
+            cprintf(GREY, "- let me try to find the keysig by brute force\n");
         return 1;
     }
 
@@ -604,7 +604,7 @@ static void usage(void)
     printf("  -c/--create\t\tCreate a UPG archive\n");
     printf("keysig search method:\n");
     for(int i = KEYSIG_SEARCH_FIRST; i < KEYSIG_SEARCH_LAST; i++)
-        printf("  %s\t%s\n", keysig_search_desc[i].name, keysig_search_desc[i].comment);
+        printf("  %-10s\t%s\n", keysig_search_desc[i].name, keysig_search_desc[i].comment);
     exit(1);
 }
 
