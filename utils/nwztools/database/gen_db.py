@@ -199,9 +199,9 @@ with open("nwz_db.h", "w") as fp:
     # generate list of all nvp nodes
     for name in sorted(g_nvp_names):
         # create comment to explain the meaning, gather several meaning together
-        # if there are more than one
+        # if there are more than one (sorted to keep a stable order when we update)
         explain = ""
-        if name in g_nvp_desc:
+        if name in sorted(g_nvp_desc):
             explain = " | ".join(list(g_nvp_desc[name]))
         # overwrite desc set with a single string for later
         g_nvp_desc[name] = explain
@@ -257,7 +257,7 @@ with open("nwz_db.c", "w") as fp:
         fp.write("    { %s, \"%s\" },\n" % (hex(model["mid"]), model["name"]))
     fp.write("};\n")
     # generate nvps
-    for hash in g_hash_nvp:
+    for hash in sorted(g_hash_nvp):
         nvp = g_hash_nvp[hash]
         fp.write("\nstatic int nvp_index_%s[NWZ_NVP_COUNT] =\n" % hash)
         fp.write("{\n")
