@@ -66,7 +66,20 @@ struct rb_scsi_raw_cmd_t
 };
 
 /* open a device, returns a handle or NULL on error
- * the caller can optionally provide an error printing function */
+ * the caller can optionally provide an error printing function
+ *
+ * Linux:
+ *   Path must be the block device, typically /dev/sdX and the program
+ *   must have the permission to open it in read/write mode.
+ *
+ * Windows:
+ *   If the path starts with '\', it will be use as-is. This allows to use
+ *   paths such as \\.\PhysicalDriveX or \\.\ScsiX
+ *   Alternatively, the code will try to map a logical drive (such as 'C:') to
+ *   the correspoding physical drive.
+ *   In any case, on recent windows, the program needs to be started with
+ *   Administrator privileges.
+ */
 rb_scsi_device_t rb_scsi_open(const char *path, unsigned flags, void *user,
     rb_scsi_printf_t printf);
 /* performs a raw transfer, returns !=0 on error */

@@ -25,6 +25,17 @@
 #include <stdbool.h>
 #include "rbscsi.h"
 
+#if defined(_WIN32) || defined(__WIN32__)
+/* Mingw has a curious behaviour: it packs only the last field, see
+ * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52991 */
+#pragma pack(push)
+#pragma pack(1)
+#define RB_POP_PACK
+#define RB_PACKED
+#else
+#define RB_PACKED   __attribute__((packed))
+#endif
+
 /**
  * Low-Level SCSI stuff
  */
@@ -57,17 +68,17 @@ struct scsi_stmp_protocol_version_t
 {
     uint8_t major;
     uint8_t minor;
-} __attribute__((packed));
+} RB_PACKED;
 
 struct scsi_stmp_rom_rev_id_t
 {
     uint16_t rev; /* big-endian */
-} __attribute__((packed));
+} RB_PACKED;
 
 struct scsi_stmp_chip_major_rev_id_t
 {
     uint16_t rev; /* big-endian */
-} __attribute__((packed));
+} RB_PACKED;
 
 struct scsi_stmp_logical_table_entry_t
 {
@@ -75,7 +86,7 @@ struct scsi_stmp_logical_table_entry_t
     uint8_t type;
     uint8_t tag;
     uint64_t size; /* big-endian */
-} __attribute__((packed));
+} RB_PACKED;
 
 #define SCSI_STMP_DRIVE_TYPE_USER   0
 #define SCSI_STMP_DRIVE_TYPE_SYSTEM 1
@@ -87,7 +98,7 @@ struct scsi_stmp_logical_table_entry_t
 struct scsi_stmp_logical_table_header_t
 {
     uint16_t count; /* big-endian */
-} __attribute__((packed));
+} RB_PACKED;
 
 #define SCSI_STMP_MEDIA_INFO_NR_DRIVES          0 /** Number of drives (obsolete) */
 #define SCSI_STMP_MEDIA_INFO_SIZE               1 /** Total size (bytes) */
@@ -127,12 +138,12 @@ struct scsi_stmp_logical_table_header_t
 struct scsi_stmp_logical_media_info_type_t
 {
     uint8_t type;
-}  __attribute__((packed));
+}  RB_PACKED;
 
 struct scsi_stmp_logical_media_info_manufacturer_t
 {
     uint32_t type; /* big-endian */
-}  __attribute__((packed));
+}  RB_PACKED;
 
 #define SCSI_STMP_DRIVE_INFO_SECTOR_SIZE        0 /** Sector Size (bytes) */
 #define SCSI_STMP_DRIVE_INFO_ERASE_SIZE         1 /** Erase Size (bytes) */
@@ -170,29 +181,29 @@ struct scsi_stmp_logical_media_info_manufacturer_t
 struct scsi_stmp_logical_drive_info_sector_t
 {
     uint32_t size; /* big-endian */
-}  __attribute__((packed));
+}  RB_PACKED;
 
 struct scsi_stmp_logical_drive_info_count_t
 {
     uint64_t count; /* big-endian */
-}  __attribute__((packed));
+}  RB_PACKED;
 
 struct scsi_stmp_logical_drive_info_size_t
 {
     uint64_t size; /* big-endian */
-}  __attribute__((packed));
+}  RB_PACKED;
 
 struct scsi_stmp_logical_drive_info_type_t
 {
     uint8_t type;
-}  __attribute__((packed));
+}  RB_PACKED;
 
 struct scsi_stmp_logical_drive_info_version_t
 {
     uint16_t major;
     uint16_t minor;
     uint16_t revision;
-}  __attribute__((packed));
+}  RB_PACKED;
 
 struct stmp_device_t;
 typedef struct stmp_device_t *stmp_device_t;
@@ -253,7 +264,11 @@ struct stmp_logical_media_table_t
 {
     struct scsi_stmp_logical_table_header_t header;
     struct scsi_stmp_logical_table_entry_t entry[];
-}__attribute__((packed)) table;
+}RB_PACKED table;
+
+#ifdef RB_POP_PACK
+#pragma pack(pop)
+#endif
 
 struct stmp_logical_media_info_t
 {

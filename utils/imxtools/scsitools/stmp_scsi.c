@@ -245,14 +245,22 @@ int stmp_get_logical_media_table(stmp_device_t dev, struct stmp_logical_media_ta
     int len = sizeof(header);
     int ret = stmp_scsi_get_logical_table(dev, 0, &header, &len);
     if(ret || len != sizeof(header))
+    {
+        stmp_debugf(dev, "Device returned the wrong size for logical media header: "
+            "%d bytes but expected %d\n", len, sizeof(header));
         return -1;
+    }
     header.count = stmp_fix_endian16be(header.count);
     int sz = sizeof(header) + header.count * sizeof(struct scsi_stmp_logical_table_entry_t);
     len = sz;
     *table = malloc(sz);
     ret = stmp_scsi_get_logical_table(dev, header.count, &(*table)->header, &len);
     if(ret || len != sz)
+    {
+        stmp_debugf(dev, "Device returned the wrong size for logical media table: "
+            "%d bytes but expected %d (%d entries)\n", len, sz, header.count);
         return -1;
+    }
     (*table)->header.count = stmp_fix_endian16be((*table)->header.count);
     for(unsigned i = 0; i < (*table)->header.count; i++)
         (*table)->entry[i].size = stmp_fix_endian64be((*table)->entry[i].size);
