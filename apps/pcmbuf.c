@@ -1394,8 +1394,13 @@ bool pcmbuf_is_lowdata(void)
 {
     enum channel_status status = mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK);
 
-    if (status != CHANNEL_PLAYING || crossfade_status != CROSSFADE_INACTIVE)
+    if (status != CHANNEL_PLAYING)
         return false;
+
+#ifdef HAVE_CROSSFADE
+    if (crossfade_status != CROSSFADE_INACTIVE)
+        return false;
+#endif
 
     return pcmbuf_data_critical();
 }
