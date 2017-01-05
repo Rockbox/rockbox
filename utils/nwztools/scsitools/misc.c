@@ -32,7 +32,12 @@ char GREEN[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '2', 0x6d, '\0' };
 char YELLOW[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '3', 0x6d, '\0' };
 char BLUE[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
 
+#if defined(_WIN32) || defined(__WIN32__)
+/* disable colors on Windows */
+static bool g_color_enable = false;
+#else
 static bool g_color_enable = true;
+#endif
 
 void *xmalloc(size_t s)
 {

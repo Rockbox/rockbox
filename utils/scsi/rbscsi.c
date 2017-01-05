@@ -151,13 +151,33 @@ void rb_scsi_close(rb_scsi_device_t dev)
 
 /* Windpws */
 #elif defined(RB_SCSI_WINDOWS)
+/* return either path or something allocated with malloc() */
+static const char *map_to_physical_drive(const char *path, unsigned flags, void *user,
+    rb_scsi_printf_t printf)
+{
+    /* don't do anything if path starts with '\' */
+    if(path[0] == '\\')
+        return path;
+    /* Convert to UNC path (C: -> \\.\C:) otherwise it won't work) */
+    char *unc_path = malloc(strlen(path) + 5);
+    sprintf(unc_path, "\\\\.\\%s", path);
+    if(flags & RB_SCSI_DEBUG)
+        printf(user, "rb_scsi: map to UNC path: %s\n", unc_path);
+    return unc_path;
+}
+
 rb_scsi_device_t rb_scsi_open(const char *path, unsigned flags, void *user,
     rb_scsi_printf_t printf)
 {
     if(printf == NULL)
         printf = misc_std_printf;
-    HANDLE h = CreateFileA(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+    /* magic to auto-detect physical drive */
+    const char *open_path = map_to_physical_drive(path, flags, user, printf);
+    HANDLE h = CreateFileA(open_path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
         NULL, OPEN_EXISTING, FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, NULL);
+    /* free path if it was allocated */
+    if(open_path != path)
+        free((char *)open_path);
     if(h == INVALID_HANDLE_VALUE)
     {
         if(flags & RB_SCSI_DEBUG)
