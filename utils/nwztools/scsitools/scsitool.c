@@ -48,6 +48,7 @@
 bool g_debug = false;
 const char *g_force_series = NULL;
 char *g_out_prefix = NULL;
+bool g_relaxed = false;
 int g_dev_fd = 0;
 
 #if 0
@@ -415,8 +416,8 @@ int get_model_and_series(int *model_index, int *series_index)
     return 0;
 }
 
-/* read nvp node, retrun nonzero on error */
-int read_nvp_node(int series_index, enum nwz_nvp_node_t node, void *buffer, int size)
+/* read nvp node, retrun nonzero on error, update size to actual length */
+int read_nvp_node(int series_index, enum nwz_nvp_node_t node, void *buffer, size_t *size)
 {
     int node_index = NWZ_NVP_INVALID;
     if(nwz_series[series_index].nvp_index)
@@ -432,7 +433,7 @@ int read_nvp_node(int series_index, enum nwz_nvp_node_t node, void *buffer, int 
      *
      * NOTE: byte 0 is always 0 because the OF always picks small para_noise
      * indexes but I guess the actual encoding the one above */
-    int xfer_size = size + 4;
+    int xfer_size = *size + 4;
     uint8_t *xfer_buf = buffer_alloc(xfer_size);
     int ret = do_dnk_cmd(true, 0x23, 10, node_index, xfer_buf, &xfer_size);
     if(ret)
@@ -449,16 +450,17 @@ int read_nvp_node(int series_index, enum nwz_nvp_node_t node, void *buffer, int 
         cprintf(GREY, "Device responded with invalid data\n");
         return 1;
     }
-    if(xfer_size - 4 != (int)size)
+    if(!g_relaxed && xfer_size - 4 != (int)*size)
     {
         free(xfer_buf);
         cprintf(GREY, "Device didn't send the expected amount of data\n");
         return 7;
     }
+    *size = xfer_size - 4;
     /* unscramble and copy */
     for(int i = 4, idx = get_big_endian16(xfer_buf); i < xfer_size; i++, idx++)
         xfer_buf[i] ^= para_noise[idx % sizeof(para_noise)];
-    memcpy(buffer, xfer_buf + 4, size);
+    memcpy(buffer, xfer_buf + 4, *size);
     free(xfer_buf);
     return 0;
 }
@@ -506,7 +508,7 @@ int get_dnk_nvp(int argc, char **argv)
         printf("Node usage: <node>\n");
         printf("Nodes:\n");
         for(unsigned i = 0; i < NWZ_NVP_COUNT; i++)
-            printf("  %s\t%s\n", nwz_nvp[i].name, nwz_nvp[i].desc);
+            printf("  %-6s%s\n", nwz_nvp[i].name, nwz_nvp[i].desc);
         return 1;
     }
     int series_index, model_index;
@@ -523,15 +525,19 @@ int get_dnk_nvp(int argc, char **argv)
         printf("I don't know about node '%s'\n", argv[0]);
         return 4;
     }
-    uint8_t *buffer = malloc(nwz_nvp[node].size);
-    ret = read_nvp_node(series_index, node, buffer, nwz_nvp[node].size);
+    size_t size = nwz_nvp[node].size;
+    /* in relaxed mode, always ask for a lot of data to make sure we get everything */
+    if(g_relaxed)
+        size = 4096;
+    uint8_t *buffer = malloc(size);
+    ret = read_nvp_node(series_index, node, buffer, &size);
     if(ret != 0)
     {
         free(buffer);
         return ret;
     }
     cprintf(GREEN, "%s:\n", nwz_nvp[node].name);
-    print_hex(buffer, nwz_nvp[node].size);
+    print_hex(buffer, size);
 
     free(buffer);
     return 0;
@@ -747,8 +753,9 @@ int do_dest(int argc, char **argv)
     int model_index, series_index;
     int ret = get_model_and_series(&model_index, &series_index);
     /* in all cases, we need to read shp */
-    uint8_t *shp = malloc(nwz_nvp[NWZ_NVP_SHP].size);
-    ret = read_nvp_node(series_index, NWZ_NVP_SHP, shp, nwz_nvp[NWZ_NVP_SHP].size);
+    size_t size = nwz_nvp[NWZ_NVP_SHP].size;
+    uint8_t *shp = malloc(size);
+    ret = read_nvp_node(series_index, NWZ_NVP_SHP, shp, &size);
     if(ret != 0)
     {
         free(shp);
@@ -819,7 +826,7 @@ int do_dest(int argc, char **argv)
         }
         set_little_endian32(shp, dst);
         set_little_endian32(shp + 4, sps);
-        int ret = write_nvp_node(series_index, NWZ_NVP_SHP, shp, nwz_nvp[NWZ_NVP_SHP].size);
+        int ret = write_nvp_node(series_index, NWZ_NVP_SHP, shp, size);
         free(shp);
         return ret;
     }
@@ -866,6 +873,7 @@ static void usage(void)
     printf("  -d/--debug           Display debug messages\n");
     printf("  -c/--no-color        Disable color output\n");
     printf("  -s/--series <name>   Force series (disable auto-detection, use '?' for the list)\n");
+    printf("  -r/--relaxed         Relax length checks on nvp properties\n");
     printf("Commands:\n");
     for(unsigned i = 0; i < NR_CMDS; i++)
         printf("  %s\t%s\n", cmd_list[i].name, cmd_list[i].desc);
@@ -885,7 +893,7 @@ int main(int argc, char **argv)
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?dcfo:s:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?dcfo:s:r", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -906,6 +914,9 @@ int main(int argc, char **argv)
                 break;
             case 's':
                 g_force_series = optarg;
+                break;
+            case 'r':
+                g_relaxed = true;
                 break;
             default:
                 abort();
