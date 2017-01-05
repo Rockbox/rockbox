@@ -699,6 +699,10 @@ static void do_configure_item(config_item *cfg)
     {
         bool res = cfg->ival != 0;
         rb->set_bool(cfg->name, &res);
+
+        /* seems to reset backdrop */
+        rb->lcd_set_backdrop(NULL);
+
         cfg->ival = res;
         break;
     }

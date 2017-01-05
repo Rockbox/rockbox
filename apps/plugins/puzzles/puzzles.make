@@ -45,7 +45,7 @@ endif
 # Hack to suppress all warnings:
 PUZZLESFLAGS = $(filter-out -O%,$(PLUGINFLAGS)) -Os		\
 		-Wno-unused-parameter -Wno-sign-compare -Wno-strict-aliasing -w	\
-		-DFOR_REAL
+		-DFOR_REAL -I$(PUZZLES_SRCDIR)
 ifdef PUZZLES_COMBINED
 PUZZLESFLAGS += -DCOMBINED
 endif
@@ -106,9 +106,18 @@ $(PUZZLES_OBJDIR)/sgt-undead.rock: $(PUZZLES_OBJDIR)/undead.o $(PUZZLES_SHARED_O
 $(PUZZLES_OBJDIR)/sgt-unequal.rock: $(PUZZLES_OBJDIR)/unequal.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
 $(PUZZLES_OBJDIR)/sgt-unruly.rock: $(PUZZLES_OBJDIR)/unruly.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
 $(PUZZLES_OBJDIR)/sgt-untangle.rock: $(PUZZLES_OBJDIR)/untangle.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
+
+$(PUZZLES_OBJDIR)/sgt-group.rock: $(PUZZLES_OBJDIR)/unfinished/group.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
+$(PUZZLES_OBJDIR)/sgt-separate.rock: $(PUZZLES_OBJDIR)/unfinished/separate.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
+$(PUZZLES_OBJDIR)/sgt-slide.rock: $(PUZZLES_OBJDIR)/unfinished/slide.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
+$(PUZZLES_OBJDIR)/sgt-sokoban.rock: $(PUZZLES_OBJDIR)/unfinished/sokoban.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
 endif
 
 # special pattern rule for compiling puzzles with extra flags
 $(PUZZLES_OBJDIR)/%.o: $(PUZZLES_SRCDIR)/%.c $(PUZZLES_SRCDIR)/puzzles.make
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PUZZLESFLAGS) -c $< -o $@
+
+$(PUZZLES_OBJDIR)/unfinished/%.o: $(PUZZLES_SRCDIR)/unfinished/%.c $(PUZZLES_SRCDIR)/puzzles.make
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PUZZLESFLAGS) -c $< -o $@

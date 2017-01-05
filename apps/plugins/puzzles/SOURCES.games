@@ -39,3 +39,9 @@ twiddle.c
 /*unequal.c*/
 unruly.c
 /*untangle.c*/
+
+/* disabled for now */
+/*unfinished/group.c*/
+/*unfinished/separate.c*/
+/*unfinished/slide.c*/
+/*unfinished/sokoban.c*/
