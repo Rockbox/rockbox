@@ -31,43 +31,16 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#ifndef _WIN32
-#include <scsi/scsi.h>
-#endif
-#include <scsi/sg_lib.h>
-#include <scsi/sg_pt.h>
+#include "rbscsi.h"
 #include "misc.h"
 #include "para_noise.h"
 #include "nwz_db.h"
-
-/* the windows port doesn't have scsi.h and GOOD */
-#ifndef GOOD
-#define GOOD                 0x00
-#endif
 
 bool g_debug = false;
 const char *g_force_series = NULL;
 char *g_out_prefix = NULL;
 bool g_relaxed = false;
-int g_dev_fd = 0;
-
-#if 0
-void *buffer_alloc(int sz)
-{
-#ifdef SG_LIB_MINGW
-    unsigned psz = getpagesize();
-#else
-    unsigned psz = sysconf(_SC_PAGESIZE); /* was getpagesize() */
-#endif
-    void *buffer = malloc(sz + psz);
-    return (void *)(((ptrdiff_t)(buffer + psz - 1)) & ~(psz - 1));
-}
-#else
-void *buffer_alloc(int sz)
-{
-    return malloc(sz);
-}
-#endif
+rb_scsi_device_t g_dev;
 
 static void print_hex(void *_buffer, int buffer_size)
 {
@@ -101,65 +74,36 @@ static void print_hex(void *_buffer, int buffer_size)
 /* returns <0 on error and status otherwise */
 int do_scsi(uint8_t *cdb, int cdb_size, unsigned flags, void *sense, int *sense_size, void *buffer, int *buf_size)
 {
-    char error[256];
-    struct sg_pt_base *obj = construct_scsi_pt_obj();
-    if(obj == NULL)
-    {
-        cprintf(GREY, "construct_scsi_pt_obj failed\n");
-        return 1;
-    }
-    set_scsi_pt_cdb(obj, cdb, cdb_size);
-    if(sense)
-        set_scsi_pt_sense(obj, sense, *sense_size);
+    struct rb_scsi_raw_cmd_t raw;
+    raw.dir = RB_SCSI_NONE;
     if(flags & DO_READ)
-        set_scsi_pt_data_in(obj, buffer, *buf_size);
+        raw.dir = RB_SCSI_READ;
     if(flags & DO_WRITE)
-        set_scsi_pt_data_out(obj, buffer, *buf_size);
-    int ret = do_scsi_pt(obj, g_dev_fd, 1, 0);
-    switch(get_scsi_pt_result_category(obj))
-    {
-        case SCSI_PT_RESULT_SENSE:
-        case SCSI_PT_RESULT_GOOD:
-            ret = get_scsi_pt_status_response(obj);
-            break;
-        case SCSI_PT_RESULT_STATUS:
-            cprintf(GREY, "Status error: %d (", get_scsi_pt_status_response(obj));
-            sg_print_scsi_status(get_scsi_pt_status_response(obj));
-            printf(")\n");
-            break;
-        case SCSI_PT_RESULT_TRANSPORT_ERR:
-            cprintf(GREY, "Transport error: %s\n", get_scsi_pt_transport_err_str(obj, 256, error));
-            ret = -2;
-            break;
-        case SCSI_PT_RESULT_OS_ERR:
-            cprintf(GREY, "OS error: %s\n", get_scsi_pt_os_err_str(obj, 256, error));
-            ret = -3;
-            break;
-        default:
-            cprintf(GREY, "Unknown error\n");
-            break;
-    }
-
-    if(sense)
-        *sense_size = get_scsi_pt_sense_len(obj);
-    if(flags & (DO_WRITE | DO_READ))
-        *buf_size -= get_scsi_pt_resid(obj);
-
-    destruct_scsi_pt_obj(obj);
-    return ret;
+        raw.dir = RB_SCSI_WRITE;
+    raw.cdb_len = cdb_size;
+    raw.cdb = cdb;
+    raw.buf = buffer;
+    raw.buf_len = *buf_size;
+    raw.sense_len = *sense_size;
+    raw.sense = sense;
+    raw.tmo = 5;
+    int ret = rb_scsi_raw_xfer(g_dev, &raw);
+    *sense_size = raw.sense_len;
+    *buf_size = raw.buf_len;
+    return ret == RB_SCSI_OK || ret == RB_SCSI_SENSE ? raw.status : -ret;
 }
 
 int do_sense_analysis(int status, uint8_t *sense, int sense_size)
 {
-    if(status != GOOD || g_debug)
+    if(status != 0 && g_debug)
     {
-        cprintf_field("Status:", " "); fflush(stdout);
-        sg_print_scsi_status(status);
-        cprintf_field("\nSense:", " "); fflush(stdout);
-        sg_print_sense(NULL, sense, sense_size, 0);
+        cprintf(GREY, "Status: %d\n", status);
+        cprintf(GREY, "Sense:");
+        for(int i = 0; i < sense_size; i++)
+            cprintf(GREY, " %02x", sense[i]);
+        cprintf(GREY, "\n");
+        rb_scsi_decode_sense(g_dev, sense, sense_size);
     }
-    if(status == GOOD)
-        return 0;
     return status;
 }
 
@@ -316,7 +260,7 @@ int get_dnk_prop(int argc, char **argv)
         prop.flags = strtoul(argv[3], NULL, 0);
     }
 
-    char *buffer = buffer_alloc(prop.size + 1);
+    char *buffer = malloc(prop.size + 1);
     int buffer_size = prop.size;
     int ret = do_dnk_cmd(true, prop.cmd, prop.subcmd, 0, buffer, &buffer_size);
     if(ret)
@@ -434,7 +378,7 @@ int read_nvp_node(int series_index, enum nwz_nvp_node_t node, void *buffer, size
      * NOTE: byte 0 is always 0 because the OF always picks small para_noise
      * indexes but I guess the actual encoding the one above */
     int xfer_size = *size + 4;
-    uint8_t *xfer_buf = buffer_alloc(xfer_size);
+    uint8_t *xfer_buf = malloc(xfer_size);
     int ret = do_dnk_cmd(true, 0x23, 10, node_index, xfer_buf, &xfer_size);
     if(ret)
         return ret;
@@ -480,7 +424,7 @@ int write_nvp_node(int series_index, enum nwz_nvp_node_t node, void *buffer, int
      * - byte 0/1 is the para_noise index, written as a 16bit big-endian number
      * - byte 2/3 is the node index, written as a 16-bit big-endian number */
     int xfer_size = size + 4;
-    uint8_t *xfer_buf = buffer_alloc(xfer_size);
+    uint8_t *xfer_buf = malloc(xfer_size);
     /* scramble, always use index 0 for para_noise */
     set_big_endian16(xfer_buf, 0); /* para_noise index */
     set_big_endian16(xfer_buf + 2, node_index); /* node index */
@@ -619,7 +563,7 @@ int get_dpcc_prop(int argc, char **argv)
         prop.size = strtoul(argv[2], NULL, 0);
     }
 
-    char *buffer = buffer_alloc(prop.size);
+    char *buffer = malloc(prop.size);
     int buffer_size = prop.size;
     int ret = do_dpcc_cmd(0, &prop, buffer, &buffer_size);
     if(ret)
@@ -648,7 +592,7 @@ int get_user_time(int argc, char **argv)
     (void) argc;
     (void )argv;
 
-    void *buffer = buffer_alloc(32);
+    void *buffer = malloc(32);
     int buffer_size = 32;
     int ret = do_dpcc_cmd(1, NULL, buffer, &buffer_size);
     if(ret)
@@ -666,7 +610,7 @@ int get_dev_info(int argc, char **argv)
     (void )argv;
     uint8_t cdb[12] = {0xfc, 0, 0x20, 'd', 'b', 'm', 'n', 0, 0x80, 0, 0, 0};
 
-    char *buffer = buffer_alloc(0x81);
+    char *buffer = malloc(0x81);
     int buffer_size = 0x80;
     uint8_t sense[32];
     int sense_size = 32;
@@ -691,7 +635,7 @@ int do_fw_upgrade(int argc, char **argv)
      * supported by any device I have seen */
     uint8_t cdb[12] = {0xfc, 0, 0x04, 'd', 'b', 'm', 'n', 0, 0x80, 0, 0, 0};
 
-    char *buffer = buffer_alloc(0x81);
+    char *buffer = malloc(0x81);
     int buffer_size = 0x80;
     uint8_t sense[32];
     int sense_size = 32;
@@ -930,17 +874,20 @@ int main(int argc, char **argv)
     }
 
     int ret = 0;
-    g_dev_fd = scsi_pt_open_device(argv[optind], false, true);
-    if(g_dev_fd < 0)
+    int flags = 0;
+    if(g_debug)
+        flags |= RB_SCSI_DEBUG;
+    g_dev = rb_scsi_open(argv[optind], flags, NULL, NULL);
+    if(g_dev == 0)
     {
-        cprintf(GREY, "Cannot open device: %m\n");
+        cprintf(GREY, "Cannot open device\n");
         ret = 1;
         goto Lend;
     }
 
     ret = process_cmd(argv[optind + 1], argc - optind - 2, argv + optind + 2);
 
-    scsi_pt_close_device(g_dev_fd);
+    rb_scsi_close(g_dev);
 Lend:
     color(OFF);
 
