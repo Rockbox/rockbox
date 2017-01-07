@@ -78,7 +78,6 @@ int get_volume_name(int volume, char *name);
 #endif
 
 int path_strip_drive(const char *name, const char **nameptr, bool greedy);
-size_t path_trim_whitespace(const char *name, const char **nameptr);
 size_t path_basename(const char *name, const char **nameptr);
 size_t path_dirname(const char *name, const char **nameptr);
 size_t path_strip_trailing_separators(const char *name, const char **nameptr);

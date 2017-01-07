@@ -1712,23 +1712,59 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
 static ssize_t format_track_path(char *dest, char *src, int buf_length,
                                  const char *dir)
 {
-    size_t len;
+    size_t len = 0;
 
-    /* strip whitespace at beginning and end */
-    len = path_trim_whitespace(src, (const char **)&src);
+    /* Look for the end of the string */
+    while (1)
+    {
+        int c = src[len];
+        if (c == '\n' || c == '\r' || c == '\0')
+            break;
+        len++;
+    }
+
+    /* Now work back killing white space */
+    while (len > 0)
+    {
+        int c = src[len - 1];
+        if (c != '\t' && c != ' ')
+            break;
+        len--;
+    }
+
     src[len] = '\0';
 
-    /* replace backslashes with forward slashes */
+    /* Replace backslashes with forward slashes */
     path_correct_separators(src, src);
 
-    /* handle DOS style drive letter and parse non-greedily so that:
-     * 1) "c:/foo" becomes "/foo" and the result is absolute
-     * 2) "c:foo becomes "foo" and the result is relative
-     * This is how Windows seems to handle it except drive letters are of no
-     * meaning here. */
-    path_strip_drive(src, (const char **)&src, false);
+    /* Drive letters have no meaning here; handle DOS style drive letter
+     * and parse greedily so that:
+     *
+     * 1) "c:/foo" is fully qualified, use directory volume only
+     * 2) "c:foo" is relative to current directory on C, use directory path
+     *
+     * Assume any volume on the beginning of the directory path is actually
+     * the volume on which it resides. This may not be the case if the dir
+     * param contains a path such as "/<1>/foo/../../<0>/bar", which refers
+     * to "/<0>/bar" (aka "/bar" at this time). *fingers crossed*
+     *
+     * If any stripped drive spec was absolute, prepend the playlist
+     * directory's volume spec, or root if none. Relative paths remain
+     * relative and the playlist's directory fully qualifies them. Absolute
+     * UNIX-style paths remain unaltered.
+     */
+    if (path_strip_drive(src, (const char **)&src, true) >= 0 &&
+        src[-1] == PATH_SEPCH)
+    {
+    #ifdef HAVE_MULTIVOLUME
+        const char *p;
+        path_strip_volume(dir, &p, false);
+        dir = strmemdupa(dir, p - dir); /* empty if no volspec on dir */
+    #else
+        dir = "";                       /* only volume is root */
+    #endif
+    }
 
-    /* prepends directory only if src is relative */
     len = path_append(dest, *dir ? dir : PATH_ROOTSTR, src, buf_length);
     if (len >= (size_t)buf_length)
         return -1; /* buffer too small */

@@ -197,35 +197,6 @@ int path_strip_drive(const char *name, const char **nameptr, bool greedy)
     return -1;
 }
 
-/* Strips leading and trailing whitespace from a path
- * "  a/b \txyz"  *nameptr->a, len=3: "a/b"
- */
-size_t path_trim_whitespace(const char *name, const char **nameptr)
-{
-    /* NOTE: this won't currently treat DEL (0x7f) as non-printable */
-    const unsigned char *p = name;
-    int c;
-
-    while ((c = *p) <= ' ' && c)
-        ++p;
-
-    const unsigned char *first = p;
-    const unsigned char *last = p;
-
-    while (1)
-    {
-        if (c < ' ')
-        {
-            *nameptr = first;
-            return last - first;
-        }
-
-        while ((c = *++p) > ' ');
-        last = p;
-        while (c == ' ') c = *++p;
-    }
-}
-
 /* Strips directory components from the path
  * ""      *nameptr->NUL,   len=0: ""
  * "/"     *nameptr->/,     len=1: "/"
