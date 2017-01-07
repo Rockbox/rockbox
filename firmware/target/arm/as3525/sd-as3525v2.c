@@ -483,6 +483,7 @@ static int sd_init_card(const int drive)
     long init_timeout;
     bool sd_v2 = false;
 
+    card_info[drive].initialized = 0;
     card_info[drive].rca = 0;
 
     /*  assume 24 MHz clock / 60 = 400 kHz  */
@@ -570,14 +571,6 @@ static int sd_init_card(const int drive)
         MCI_CTYPE |= (1<<drive);
 
 #endif /* ! BOOTLOADER */
-
-    /*  Set low power mode  */
-#if defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS) || defined(SANSA_CLIPZIP)
-    if (amsv2_variant == 1)
-        MCI_CLKENA |= 1<<(1 + 16);
-    else
-#endif
-        MCI_CLKENA |= 1<<(drive + 16);
 
     card_info[drive].initialized = 1;
 
@@ -709,14 +702,6 @@ int sd_init(void)
 
     bitset32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
 
-    CGU_IDE =   (1<<7)          /* AHB interface enable */
-            |   (AS3525_IDE_DIV << 2)
-            |   1;              /* clock source = PLLA */
-
-    CGU_MEMSTICK =  (1<<7)      /* interface enable */
-                 |  (AS3525_MS_DIV << 2)
-                 |  1;          /* clock source = PLLA */
-
     CGU_SDSLOT = (1<<7)         /* interface enable */
                | (AS3525_SDSLOT_DIV << 2)
                | 1;             /* clock source = PLLA */
@@ -775,8 +760,7 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
     const int drive = 0;
 #endif
     bool aligned = !((uintptr_t)buf & (CACHEALIGN_SIZE - 1));
-    int const retry_all_max = 1;
-    int retry_all = 0;
+    int retry_all = 2;
     int const retry_data_max = 3;
     int retry_data;
     unsigned int real_numblocks;
@@ -787,26 +771,25 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
     led(true);
 #endif
 
-    if(count < 0) /* XXX: why is it signed ? */
+    if(count < 1) /* XXX: why is it signed ? */
     {
+        panicf("SD count:%d write:%d drive:%d", count, write, drive);
+/*
         ret = -18;
-        goto sd_transfer_error_no_dma;
+        goto exit;
+*/
     }
 
     /* skip SanDisk OF */
     if (drive == INTERNAL_AS3525)
         start += AMS_OF_SIZE;
 
-    /* no need for complete retry on main, just SD */
-    if (drive == SD_SLOT_AS3525)
-        retry_all = retry_all_max;
-
-sd_transfer_retry_with_reinit:
-    if (card_info[drive].initialized <= 0)
+    while (!card_info[drive].initialized)
     {
+retry_with_reinit:
+        if (--retry_all < 0)
+            goto exit;
         ret = sd_init_card(drive);
-        if (!(card_info[drive].initialized))
-            goto sd_transfer_error_no_dma;
     }
 
     /* Check the real block size after the card has been initialized */
@@ -818,14 +801,14 @@ sd_transfer_retry_with_reinit:
     if ((start+count) > real_numblocks)
     {
         ret = -19;
-        goto sd_transfer_error_no_dma;
+        goto retry_with_reinit;
     }
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_NO_RESP, NULL))
     {
         ret = -20;
-        goto sd_transfer_error_no_dma;
+        goto retry_with_reinit;
     }
 
     dma_retain();
@@ -841,7 +824,7 @@ sd_transfer_retry_with_reinit:
     const int cmd = write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
     retry_data = retry_data_max;
 
-    while (1)
+    while (count > 0)
     {
         void *dma_buf;
         unsigned int transfer = count;
@@ -881,7 +864,7 @@ sd_transfer_retry_with_reinit:
         if(!send_cmd(drive, cmd, arg, MCI_RESP, &response))
         {
             ret = -21;
-            goto sd_transfer_error;
+            break;
         }
 
         semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
@@ -897,14 +880,14 @@ sd_transfer_retry_with_reinit:
         if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP, &response))
         {
             ret = -22;
-            goto sd_transfer_error;
+            break;
         }
 
         ret = sd_wait_for_tran_state(drive);
         if (ret < 0)
         {
             ret -= 25;
-            goto sd_transfer_error;
+            break;
         }
 
         /* According to datasheet DMA channel should be automatically disabled
@@ -912,62 +895,41 @@ sd_transfer_retry_with_reinit:
          * Disable DMA channel manually to prevent problems with DMA. */
         dma_disable_channel(1);
 
-        if(!retry)
-        {
-            if(!write && !aligned)
-                memcpy(buf, uncached_buffer, transfer * SD_BLOCK_SIZE);
-            buf += transfer * SD_BLOCK_SIZE;
-            start += transfer;
-            count -= transfer;
-
-            if (count > 0)
-                continue;
-        }
-        else   /*  reset controller if we had an error  */
+        if (retry) /*  reset controller if we had an error  */
         {
             MCI_CTRL |= (FIFO_RESET|DMA_RESET);
-            while(MCI_CTRL & (FIFO_RESET|DMA_RESET))
-                ;
+            while (MCI_CTRL & (FIFO_RESET|DMA_RESET));
             if (--retry_data >= 0)
                 continue;
 
             ret -= 24;
-            goto sd_transfer_error;
+            break;
         }
 
-        break;
+        if (!write && !aligned)
+            memcpy(buf, uncached_buffer, transfer * SD_BLOCK_SIZE);
+        buf += transfer * SD_BLOCK_SIZE;
+        start += transfer;
+        count -= transfer;
     }
 
     dma_release();
 
+    if (ret != 0) /* if we have error */
+            goto retry_with_reinit;
+
     /* CMD lines are separate, not common, so we need to actively deselect */
     /*  CMD7 w/rca =0 : deselects card & puts it in STBY state */
     if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
-    {
         ret = -23;
-        goto sd_transfer_error;
-    }
 
-    while (1)
-    {
+exit:
 #ifndef BOOTLOADER
-        sd_enable(false);
-        led(false);
+    sd_enable(false);
+    led(false);
 #endif
-        mutex_unlock(&sd_mtx);
-        return ret;
-
-sd_transfer_error:
-        dma_release();
-
-sd_transfer_error_no_dma:
-        card_info[drive].initialized = 0;
-
-        /* .initialized might have been >= 0 but now stale if the ata sd thread
-         * isn't handling an insert because of USB */
-        if (--retry_all >= 0)
-            goto sd_transfer_retry_with_reinit;
-    }
+    mutex_unlock(&sd_mtx);
+    return ret;
 }
 
 int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count,
@@ -993,15 +955,11 @@ void sd_enable(bool on)
     if (on)
     {
         bitset32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
-        CGU_IDE |= (1<<7);                  /* AHB interface enable */
-        CGU_MEMSTICK |= (1<<7);             /* interface enable */
         CGU_SDSLOT |= (1<<7);               /* interface enable */
     }
     else
     {
         CGU_SDSLOT &= ~(1<<7);              /* interface enable */
-        CGU_MEMSTICK &= ~(1<<7);            /* interface enable */
-        CGU_IDE &= ~(1<<7);                 /* AHB interface enable */
         bitclr32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
     }
 }
