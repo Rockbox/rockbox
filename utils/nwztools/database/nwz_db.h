@@ -37,12 +37,12 @@ enum nwz_nvp_node_t
     NWZ_NVP_BTI, /* boot image */
     NWZ_NVP_CGP, /*  */
     NWZ_NVP_CLV, /* color variation */
-    NWZ_NVP_CNG, /* aad/empr key | aad key */
+    NWZ_NVP_CNG, /* aad key | aad/empr key */
     NWZ_NVP_CTR, /*  */
     NWZ_NVP_DBA, /* aad icv */
     NWZ_NVP_DBG, /*  */
     NWZ_NVP_DBI, /* dead battery image */
-    NWZ_NVP_DBV, /* empr key | empr icv */
+    NWZ_NVP_DBV, /* empr icv | empr key */
     NWZ_NVP_DCC, /* secure clock */
     NWZ_NVP_DOR, /* key mode (debug/release) */
     NWZ_NVP_E00, /* EMPR  0 */
@@ -113,7 +113,7 @@ enum nwz_nvp_node_t
     NWZ_NVP_PSK, /* bluetooth pskey */
     NWZ_NVP_PTS, /* wifi protected setup */
     NWZ_NVP_RBT, /*  */
-    NWZ_NVP_RND, /* wmt key | random data */
+    NWZ_NVP_RND, /* random data | wmt key */
     NWZ_NVP_RTC, /* rtc alarm */
     NWZ_NVP_SDC, /* SD Card export flag */
     NWZ_NVP_SDP, /* sound driver parameter */
@@ -142,7 +142,7 @@ enum nwz_nvp_node_t
 /* Invalid NVP index */
 #define NWZ_NVP_INVALID     -1 /* Non-existent entry */
 /* Number of models */
-#define NWZ_MODEL_COUNT     181
+#define NWZ_MODEL_COUNT     183
 /* Number of series */
 #define NWZ_SERIES_COUNT    37
 

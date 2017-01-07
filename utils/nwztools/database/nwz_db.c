@@ -205,6 +205,8 @@ struct nwz_model_info_t nwz_model[NWZ_MODEL_COUNT] =
     { 0x1d000005, "NW-A26" },
     { 0x1d000006, "NW-A27" },
     { 0x1d000007, "NW-A28" },
+    { 0x20000007, "NW-WM1A" },
+    { 0x21000008, "NW-WM1Z" },
 };
 
 static int nvp_index_0ac81d[NWZ_NVP_COUNT] =
@@ -1026,12 +1028,12 @@ struct nwz_nvp_info_t nwz_nvp[NWZ_NVP_COUNT] =
     [NWZ_NVP_BTI] = { "bti", 262144, "boot image" },
     [NWZ_NVP_CGP] = { "cgp", 0, "" },
     [NWZ_NVP_CLV] = { "clv", 4, "color variation" },
-    [NWZ_NVP_CNG] = { "cng", 704, "aad/empr key | aad key" },
+    [NWZ_NVP_CNG] = { "cng", 704, "aad key | aad/empr key" },
     [NWZ_NVP_CTR] = { "ctr", 0, "" },
     [NWZ_NVP_DBA] = { "dba", 160, "aad icv" },
     [NWZ_NVP_DBG] = { "dbg", 0, "" },
     [NWZ_NVP_DBI] = { "dbi", 262144, "dead battery image" },
-    [NWZ_NVP_DBV] = { "dbv", 520, "empr key | empr icv" },
+    [NWZ_NVP_DBV] = { "dbv", 520, "empr icv | empr key" },
     [NWZ_NVP_DCC] = { "dcc", 20, "secure clock" },
     [NWZ_NVP_DOR] = { "dor", 4, "key mode (debug/release)" },
     [NWZ_NVP_E00] = { "e00", 1024, "EMPR  0" },
@@ -1102,7 +1104,7 @@ struct nwz_nvp_info_t nwz_nvp[NWZ_NVP_COUNT] =
     [NWZ_NVP_PSK] = { "psk", 512, "bluetooth pskey" },
     [NWZ_NVP_PTS] = { "pts", 4, "wifi protected setup" },
     [NWZ_NVP_RBT] = { "rbt", 0, "" },
-    [NWZ_NVP_RND] = { "rnd", 64, "wmt key | random data" },
+    [NWZ_NVP_RND] = { "rnd", 64, "random data | wmt key" },
     [NWZ_NVP_RTC] = { "rtc", 16, "rtc alarm" },
     [NWZ_NVP_SDC] = { "sdc", 4, "SD Card export flag" },
     [NWZ_NVP_SDP] = { "sdp", 64, "sound driver parameter" },
@@ -1217,7 +1219,7 @@ static unsigned long models_nwz_s770[] = { 0x16000001, 0x16000002, 0x16000004,
 static unsigned long models_nw_s780[] = { 0x19000001, 0x19000002, 0x19000004,
     0x19000005 };
 
-static unsigned long models_nw_wm1[] = {  };
+static unsigned long models_nw_wm1[] = { 0x20000007, 0x21000008 };
 
 static unsigned long models_nwz_x1000[] = { 0x5000002, 0x5000004, 0x5000005,
     0x5020002, 0x5040002, 0x5020004, 0x5040004, 0x5020005, 0x5040005 };
@@ -1263,7 +1265,7 @@ struct nwz_series_info_t nwz_series[NWZ_SERIES_COUNT] =
     { "nwz-s760", "NWZ-S740 Series", 10, models_nwz_s760, &nvp_index_f505c8 },
     { "nwz-s770", "NWZ-S770 Series", 8, models_nwz_s770, 0 },
     { "nw-s780", "NW-S780 Series", 4, models_nw_s780, &nvp_index_6485c8 },
-    { "nw-wm1", "NW-WM1 Series", 0, models_nw_wm1, &nvp_index_398250 },
+    { "nw-wm1", "NW-WM1 Series", 2, models_nw_wm1, &nvp_index_398250 },
     { "nwz-x1000", "NWZ-X1000 Series", 9, models_nwz_x1000, 0 },
     { "nw-zx100", "NW-ZX100 Series", 6, models_nw_zx100, 0 },
     { "nwz-zx2", "NW-ZX2", 0, models_nwz_zx2, &nvp_index_c8fc85 },
