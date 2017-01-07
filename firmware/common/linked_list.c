@@ -60,26 +60,14 @@ void ll_init(struct ll_head *list)
 void ll_insert_next(struct ll_head *list, struct ll_node *node,
                     struct ll_node *newnode)
 {
-    if (node == NULL)
-    {
-        node = list->head;
+    struct ll_node **nodep = node != NULL ? &node->next : &list->head;
+    struct ll_node *next = *nodep;
 
-        newnode->next = node;
-        list->head = newnode;
+    newnode->next = next;
+    *nodep = newnode;
 
-        if (node == NULL)
-            list->tail = node;
-    }
-    else
-    {
-        struct ll_node *next = node->next;
-
-        newnode->next = next;
-        node->next = newnode;
-
-        if (next == NULL)
-            list->tail = newnode;
-    }
+    if (next == NULL)
+        list->tail = newnode;
 }
 
 /**
@@ -117,27 +105,16 @@ void ll_insert_last(struct ll_head *list, struct ll_node *node)
  */
 void ll_remove_next(struct ll_head *list, struct ll_node *node)
 {
-    if (node == NULL)
+    struct ll_node **nodep = node != NULL ? &node->next : &list->head;
+    struct ll_node *next = *nodep;
+
+    if (next != NULL)
     {
-        node = list->head->next;
+        next = next->next;
+        *nodep = next;
 
-        list->head = node;
-
-        if (node == NULL)
-            list->tail = NULL;
-    }
-    else
-    {
-        struct ll_node *next = node->next;
-
-        if (next != NULL)
-        {
-            next = next->next;
-            node->next = next;
-
-            if (!next)
-                list->tail = node;
-        }
+        if (next == NULL)
+           list->tail = node;
     }
 }
 
