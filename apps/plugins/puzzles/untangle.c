@@ -39,6 +39,7 @@
 #define CIRCLE_RADIUS 6
 #define DRAG_THRESHOLD (CIRCLE_RADIUS * 2)
 #define PREFERRED_TILESIZE 64
+#define CURSOR_GRANULARITY 5
 
 #define FLASH_TIME 0.30F
 #define ANIM_TIME 0.13F
@@ -54,6 +55,7 @@ enum {
     COL_OUTLINE,
     COL_POINT,
     COL_DRAGPOINT,
+    COL_CURSORPOINT,
     COL_NEIGHBOUR,
     COL_FLASH1,
     COL_FLASH2,
@@ -1038,6 +1040,11 @@ static char *game_text_format(const game_state *state)
 
 struct game_ui {
     int dragpoint;		       /* point being dragged; -1 if none */
+
+    int cursorpoint;                   /* point being highlighted, but
+                                        * not dragged by the cursor,
+                                        * again -1 if none */
+
     point newpoint;		       /* where it's been dragged to so far */
     int just_dragged;		       /* reset in game_changed_state */
     int just_moved;		       /* _set_ in game_changed_state */
@@ -1048,6 +1055,7 @@ static game_ui *new_ui(const game_state *state)
 {
     game_ui *ui = snew(game_ui);
     ui->dragpoint = -1;
+    ui->cursorpoint = -1;
     ui->just_moved = ui->just_dragged = FALSE;
     return ui;
 }
@@ -1076,7 +1084,7 @@ static void game_changed_state(game_ui *ui, const game_state *oldstate,
 
 struct game_drawstate {
     long tilesize;
-    int bg, dragpoint;
+    int bg, dragpoint, cursorpoint;
     long *x, *y;
 };
 
@@ -1149,6 +1157,135 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 		ui->newpoint.x, ui->newpoint.y, ui->newpoint.d);
 	ui->just_dragged = TRUE;
 	return dupstr(buf);
+    }
+    else if(IS_CURSOR_MOVE(button))
+    {
+        if(ui->dragpoint < 0)
+        {
+            if(ui->cursorpoint < 0)
+            {
+                ui->cursorpoint = 0;
+                return "";
+            }
+
+            /* We're selecting a point here. */
+            /* Search all the points and find the closest one (2-D) in
+             * the given direction. */
+            int i, best;
+            long bestd;
+
+            /*
+             * Begin drag. We drag the vertex _nearest_ to the pointer,
+             * just in case one is nearly on top of another and we want
+             * to drag the latter. However, we drag nothing at all if
+             * the nearest vertex is outside DRAG_THRESHOLD.
+             */
+            best = -1;
+            bestd = 0;
+
+            for (i = 0; i < n; i++) {
+                if(i == ui->cursorpoint)
+                    continue;
+
+                long px = state->pts[i].x * ds->tilesize / state->pts[i].d;
+                long py = state->pts[i].y * ds->tilesize / state->pts[i].d;
+                long dx = px - state->pts[ui->cursorpoint].x * ds->tilesize / state->pts[ui->cursorpoint].d;
+                long dy = py - state->pts[ui->cursorpoint].y * ds->tilesize / state->pts[ui->cursorpoint].d;
+                long d = dx*dx + dy*dy;
+
+                /* Figure out if this point falls into a 90 degree
+                 * range extending from the current point */
+
+                float angle = atan2(-dy, dx); /* adjust for raster coordinates */
+
+                /* offset to [0..2*PI] */
+                if(angle < 0)
+                    angle += 2*PI;
+
+                int right_direction = FALSE;
+
+                if((button == CURSOR_UP && (1*PI/4 <= angle && angle <= 3*PI/4))   ||
+                   (button == CURSOR_LEFT && (3*PI/4 <= angle && angle <= 5*PI/4)) ||
+                   (button == CURSOR_DOWN && (5*PI/4 <= angle && angle <= 7*PI/4)) ||
+                   (button == CURSOR_RIGHT && (angle >= 7*PI/4 || angle <= 1*PI/4)))
+                    right_direction = TRUE;
+
+                if ((best == -1 || bestd > d) && right_direction) {
+                    best = i;
+                    bestd = d;
+                }
+            }
+
+            if(best >= 0)
+            {
+                ui->cursorpoint = best;
+                return "";
+            }
+        }
+        else if(ui->dragpoint >= 0)
+        {
+            /* dragging */
+            switch(button)
+            {
+            case CURSOR_UP:
+                ui->newpoint.y -= ds->tilesize / CURSOR_GRANULARITY;
+                return "";
+            case CURSOR_DOWN:
+                ui->newpoint.y += ds->tilesize / CURSOR_GRANULARITY;
+                return "";
+            case CURSOR_LEFT:
+                ui->newpoint.x -= ds->tilesize / CURSOR_GRANULARITY;
+                return "";
+            case CURSOR_RIGHT:
+                ui->newpoint.x += ds->tilesize / CURSOR_GRANULARITY;
+                return "";
+            default:
+                break;
+            }
+        }
+    }
+    else if(IS_CURSOR_SELECT(button))
+    {
+        if(ui->dragpoint < 0 && ui->cursorpoint >= 0)
+        {
+            /* begin drag */
+            ui->dragpoint = ui->cursorpoint;
+            ui->cursorpoint = -1;
+            ui->newpoint.x = state->pts[ui->dragpoint].x * ds->tilesize / state->pts[ui->dragpoint].d;
+            ui->newpoint.y = state->pts[ui->dragpoint].y * ds->tilesize / state->pts[ui->dragpoint].d;
+            ui->newpoint.d = ds->tilesize;
+            return "";
+        }
+        else if(ui->dragpoint >= 0)
+        {
+            /* end drag */
+            int p = ui->dragpoint;
+            char buf[80];
+
+            ui->cursorpoint = ui->dragpoint;
+            ui->dragpoint = -1;	       /* terminate drag, no matter what */
+
+            /*
+             * First, see if we're within range. The user can cancel a
+             * drag by dragging the point right off the window.
+             */
+            if (ui->newpoint.x < 0 ||
+                ui->newpoint.x >= (long)state->w*ui->newpoint.d ||
+                ui->newpoint.y < 0 ||
+                ui->newpoint.y >= (long)state->h*ui->newpoint.d)
+                return "";
+
+            /*
+             * We aren't cancelling the drag. Construct a move string
+             * indicating where this point is going to.
+             */
+            sprintf(buf, "P%d:%ld,%ld/%ld", p,
+                    ui->newpoint.x, ui->newpoint.y, ui->newpoint.d);
+            ui->just_dragged = TRUE;
+            return dupstr(buf);
+        }
+        else if(ui->cursorpoint < 0)
+            ui->cursorpoint = 0;
     }
 
     return NULL;
@@ -1241,6 +1378,10 @@ static float *game_colours(frontend *fe, int *ncolours)
     ret[COL_DRAGPOINT * 3 + 1] = 1.0F;
     ret[COL_DRAGPOINT * 3 + 2] = 1.0F;
 
+    ret[COL_CURSORPOINT * 3 + 0] = 0.5F;
+    ret[COL_CURSORPOINT * 3 + 1] = 0.5F;
+    ret[COL_CURSORPOINT * 3 + 2] = 0.5F;
+
     ret[COL_NEIGHBOUR * 3 + 0] = 1.0F;
     ret[COL_NEIGHBOUR * 3 + 1] = 0.0F;
     ret[COL_NEIGHBOUR * 3 + 2] = 0.0F;
@@ -1269,6 +1410,7 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
         ds->x[i] = ds->y[i] = -1;
     ds->bg = -1;
     ds->dragpoint = -1;
+    ds->cursorpoint = -1;
 
     return ds;
 }
@@ -1345,7 +1487,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
         ds->y[i] = y;
     }
 
-    if (ds->bg == bg && ds->dragpoint == ui->dragpoint && !points_moved)
+    if (ds->bg == bg && ds->dragpoint == ui->dragpoint && ds->cursorpoint == ui->cursorpoint && !points_moved)
         return;                        /* nothing to do */
 
     ds->dragpoint = ui->dragpoint;
@@ -1373,15 +1515,18 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
      * When dragging, we should not only vary the colours, but
      * leave the point being dragged until last.
      */
-    for (j = 0; j < 3; j++) {
+    for (j = 0; j < 4; j++) {
 	int thisc = (j == 0 ? COL_POINT :
-		     j == 1 ? COL_NEIGHBOUR : COL_DRAGPOINT);
+		     (j == 1 ? COL_NEIGHBOUR :
+                      j == 2 ? COL_CURSORPOINT : COL_DRAGPOINT));
 	for (i = 0; i < state->params.n; i++) {
             int c;
 
 	    if (ui->dragpoint == i) {
 		c = COL_DRAGPOINT;
-	    } else if (ui->dragpoint >= 0 &&
+	    } else if(ui->cursorpoint == i) {
+                c = COL_CURSORPOINT;
+            } else if (ui->dragpoint >= 0 &&
 		       isedge(state->graph->edges, ui->dragpoint, i)) {
 		c = COL_NEIGHBOUR;
 	    } else {

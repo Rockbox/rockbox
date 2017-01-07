@@ -38,7 +38,7 @@ twiddle.c
 /*undead.c*/
 /*unequal.c*/
 unruly.c
-/*untangle.c*/
+untangle.c
 
 /* disabled for now */
 /*unfinished/group.c*/
