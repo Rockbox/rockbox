@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Linus Nielsen Feltzing
+ * Copyright (C) 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,24 +18,24 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef __NVP_NWZ_H__
+#define __NVP_NWZ_H__
 
-#include <stdbool.h>
+#include "system.h"
+#include "nwz-db.h"
 
-/* Set this to true to enable lcd_update() in the printf function */
-extern bool verbose;
+/* get model ID */
+unsigned long nwz_get_model_id(void);
+/* get model NAME (ie NWZ-E463) */
+const char *nwz_get_model_name(void);
+/* return series (index into nwz_db) */
+int nwz_get_series(void);
 
-/* Error types */
-#define     EATA                    -1
-#define     EDISK                   -2
-#define     EBOOTFILE               -3
+/* read a nvp node and return its size, if the data pointer is null, then simply
+ * return the size, return -1 on error */
+int nwz_nvp_read(enum nwz_nvp_node_t node, void *data);
+/* write a nvp node, return 0 on success and -1 on error, the size of the buffer
+ * must be the one returned by nwz_nvp_read */
+int nwz_nvp_write(enum nwz_nvp_node_t node, void *data);
 
-/* Functions common to all bootloaders */
-#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
-void reset_screen(void);
-int printf(const char *format, ...);
-#endif
-void error(int errortype, int error, bool shutdown);
-int load_raw_firmware(unsigned char* buf, char* firmware, int buffer_size);
-#ifdef ROCKBOX_HAS_LOGF
-void display_logf(void);
-#endif
+#endif /* __NVP_NWZ_H__ */

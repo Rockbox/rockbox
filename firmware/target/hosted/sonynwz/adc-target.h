@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Linus Nielsen Feltzing
+ * Copyright (C) 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,24 +18,30 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _ADC_NWZ_H_
+#define _ADC_NWZ_H_
 
-#include <stdbool.h>
+#include "adc.h"
 
-/* Set this to true to enable lcd_update() in the printf function */
-extern bool verbose;
+#define NWZ_ADC_DEV  "/dev/icx_adc"
 
-/* Error types */
-#define     EATA                    -1
-#define     EDISK                   -2
-#define     EBOOTFILE               -3
+#define NWZ_ADC_TYPE    'm'
 
-/* Functions common to all bootloaders */
-#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
-void reset_screen(void);
-int printf(const char *format, ...);
-#endif
-void error(int errortype, int error, bool shutdown);
-int load_raw_firmware(unsigned char* buf, char* firmware, int buffer_size);
-#ifdef ROCKBOX_HAS_LOGF
-void display_logf(void);
+#define NWZ_ADC_MIN_CHAN    0
+#define NWZ_ADC_MAX_CHAN    7
+
+#define NWZ_ADC_VCCBAT  0
+#define NWZ_ADC_VCCVBUS 1
+#define NWZ_ADC_ADIN3   2
+#define NWZ_ADC_ADIN4   3
+#define NWZ_ADC_ADIN5   4
+#define NWZ_ADC_ADIN6   5
+#define NWZ_ADC_ADIN7   6
+#define NWZ_ADC_ADIN8   7
+
+#define NWZ_ADC_GET_VAL(chan)   _IOR(NWZ_ADC_TYPE, chan, unsigned char)
+
+/* Return channel name */
+const char *adc_name(int channel);
+
 #endif
