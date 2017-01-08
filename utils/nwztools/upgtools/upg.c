@@ -34,6 +34,7 @@ struct nwz_model_t g_model_list[] =
     { "nwz-a850", true, "a2efb9168616c2e84d78291295c1aa5d" },
     { "nwz-e470", true, "e4144baaa2707913f17b5634034262c4" },
     { "nwz-e580", true, "6e25f79812eca7ceed04819d833e80af" },
+    { "nwz-s750", true, "6d4f4d9adec781baf197e6255cedd0f6" },
     /* The following keys were obtained by brute forcing firmware upgrades,
      * someone with a device needs to confirm that they work */
     { "nw-a820", false, "0c9869c268e0eaa6d1ba62daab09cebc" },
