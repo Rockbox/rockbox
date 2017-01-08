@@ -5,7 +5,7 @@ CC=$(PREFIX)gcc
 LD=$(PREFIX)gcc
 NWZ_DB_DIR=../database
 INCLUDES=-I$(NWZ_DB_DIR) -I$(SCSI_DIR)
-CFLAGS=-std=c99 -W -Wall $(DEFINES) $(INCLUDES)
+CFLAGS=-std=c99 -Wall $(DEFINES) $(INCLUDES)
 LDFLAGS=-L$(SCSI_DIR) -lrbscsi
 BINS=scsitool
 

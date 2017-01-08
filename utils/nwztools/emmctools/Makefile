@@ -1,7 +1,7 @@
 DEFINES=
 CC=gcc
 LD=gcc
-CFLAGS=-g -std=c99 -W -Wall $(DEFINES)
+CFLAGS=-g -std=c99 -Wall $(DEFINES)
 LDFLAGS=
 BINS=emmctool
 

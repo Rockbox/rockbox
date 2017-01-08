@@ -3,8 +3,8 @@ CC=gcc
 CXX=g++
 LD=g++
 PROFILE=
-CFLAGS=-g $(PROFILE) -std=c99 -W -Wall $(DEFINES) `pkg-config --cflags libcrypto++`
-CXXFLAGS=-g $(PROFILE) -W -Wall $(DEFINES) `pkg-config --cflags libcrypto++`
+CFLAGS=-g $(PROFILE) -std=c99 -Wall $(DEFINES) `pkg-config --cflags libcrypto++`
+CXXFLAGS=-g $(PROFILE) -Wall $(DEFINES) `pkg-config --cflags libcrypto++`
 LDFLAGS=$(PROFILE) `pkg-config --libs libcrypto++` -lpthread
 BINS=upgtool
 

@@ -3,8 +3,8 @@ CC=gcc
 CXX=g++
 LD=g++
 PROFILE=
-CFLAGS=-g $(PROFILE) -std=c99 -W -Wall $(DEFINES) `xml2-config --cflags`
-CXXFLAGS=-g $(PROFILE) -W -Wall $(DEFINES) `xml2-config --cflags`
+CFLAGS=-g $(PROFILE) -std=c99 -Wall $(DEFINES) `xml2-config --cflags`
+CXXFLAGS=-g $(PROFILE) -Wall $(DEFINES) `xml2-config --cflags`
 LDFLAGS=$(PROFILE) `xml2-config --libs`
 BINS=nvptool
 
