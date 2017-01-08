@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2016 Amaury Pouly
+ * Copyright (C) 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +17,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_ADC_H__
-#define __NWZ_ADC_H__
 
-#define NWZ_ADC_DEV  "/dev/icx_adc"
+#ifndef __NWZLINUX_CODEC_H__
+#define __NWZLINUX_CODEC_H__
 
-#define NWZ_ADC_TYPE    'm'
+#define AUDIOHW_CAPS 0
 
-#define NWZ_ADC_MIN_CHAN    0
-#define NWZ_ADC_MAX_CHAN    7
+/* Volume is in percent */
+AUDIOHW_SETTING(VOLUME,       "dB", 0,  1, 0,  100, 0)
 
-#define NWZ_ADC_VCCBAT  0
-#define NWZ_ADC_VCCVBUS 1
-#define NWZ_ADC_ADIN3   2
-#define NWZ_ADC_ADIN4   3
-#define NWZ_ADC_ADIN5   4
-#define NWZ_ADC_ADIN6   5
-#define NWZ_ADC_ADIN7   6
-#define NWZ_ADC_ADIN8   7
-
-#define NWZ_ADC_GET_VAL(chan)   _IOR(NWZ_ADC_TYPE, chan, unsigned char)
-
-#endif /* __NWZ_ADC_H__ */
+#endif /* __NWZLINUX_CODEC_H__ */
