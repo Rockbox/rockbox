@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2016 Amaury Pouly
+ * Copyright (c) 2016 Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,18 +17,45 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_TS_H__
-#define __NWZ_TS_H__
 
-#define NWZ_TS_NAME "icx_touch_screen"
+#include "logf.h"
+#include "system.h"
+#include "kernel.h"
+#include "string.h"
+#include "audio.h"
+#include "sound.h"
+#include "audiohw.h"
+#include "cscodec.h"
+#include "nwzlinux_codec.h"
+#include "stdlib.h"
 
-/* How touchscreen works:
- *
- * The touchscreen uses mostly the standard linux protocol, reporting ABS_X,
- * ABS_Y, ABS_PRESSURE, TOOL_WIDTH and BTN_TOUCH with SYN to synchronize. The
- * only nonstandard part is the use of REL_RX and REL_RY to report "flick"
- * detection by the hardware. */
+/* This driver handle the Sony linux audio drivers: despite using many differents
+ * codecs, it appears that they all share a common interface and common controls. */
 
-#endif /* __NWZ_TS_H__ */
+void audiohw_preinit(void)
+{
+    /* we need to enable the codec */
+    system("amixer cset name='CODEC Power Switch' on");
+    system("amixer > /contents/amixer.txt");
+}
 
+void audiohw_postinit(void)
+{
+}
 
+void audiohw_set_volume(int vol_l, int vol_r)
+{
+    (void) vol_l;
+    (void) vol_r;
+}
+
+void audiohw_close(void)
+{
+    /* disable codec */
+    system("amixer cset name='CODEC Power Switch' off");
+}
+
+void audiohw_set_frequency(int fsel)
+{
+    (void) fsel;
+}

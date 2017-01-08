@@ -5,13 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2011 by Amaury Pouly
+ * Copyright (C) 2016 by Amaury Pouly
  *
- * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
- * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
- * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -21,17 +17,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_PLATTOOLS_H__
-#define __NWZ_PLATTOOLS_H__
 
-/** Platform tools can be either built individually, or be included in a
- * single build (or even dualboot code) for easy testing. Thus, each tool must
- * use the following macros to support all scenarios. */
+#ifndef __CS42L56_H__
+#define __CS42L56_H__
 
-#ifdef NWZ_EMBED_TOOLS
-#define NWZ_TOOL_MAIN(tool)  tool##_main
-#else
-#define NWZ_TOOL_MAIN(tool)  main
-#endif
+#define AUDIOHW_CAPS 0
 
-#endif /* __NWZ_PLATTOOLS_H__ */
+AUDIOHW_SETTING(VOLUME,       "dB", 0,  1, -60,  12, -25)
+
+#endif /* __CS42L56_H__ */

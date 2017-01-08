@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2016 Amaury Pouly
+ * Copyright (C) 2011 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +18,24 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_ADC_H__
-#define __NWZ_ADC_H__
 
-#define NWZ_ADC_DEV  "/dev/icx_adc"
+#ifndef MKIMXBOOT_H
+#define MKIMXBOOT_H
 
-#define NWZ_ADC_TYPE    'm'
+#include <stdbool.h>
+#include <stdint.h>
+#include <sys/types.h>
 
-#define NWZ_ADC_MIN_CHAN    0
-#define NWZ_ADC_MAX_CHAN    7
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define NWZ_ADC_VCCBAT  0
-#define NWZ_ADC_VCCVBUS 1
-#define NWZ_ADC_ADIN3   2
-#define NWZ_ADC_ADIN4   3
-#define NWZ_ADC_ADIN5   4
-#define NWZ_ADC_ADIN6   5
-#define NWZ_ADC_ADIN7   6
-#define NWZ_ADC_ADIN8   7
+void dump_nwz_dev_info(const char *prefix);
+/* return 0 on success */
+int mknwzboot(const char *bootfile, const char *outfile, bool debug);
 
-#define NWZ_ADC_GET_VAL(chan)   _IOR(NWZ_ADC_TYPE, chan, unsigned char)
+#ifdef __cplusplus
+}
+#endif
+#endif
 
-#endif /* __NWZ_ADC_H__ */
