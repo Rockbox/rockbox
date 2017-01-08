@@ -39,7 +39,6 @@
 bool g_debug = false;
 const char *g_force_series = NULL;
 char *g_out_prefix = NULL;
-bool g_relaxed = false;
 rb_scsi_device_t g_dev;
 
 static void print_hex(void *_buffer, int buffer_size)
@@ -360,17 +359,10 @@ int get_model_and_series(int *model_index, int *series_index)
     return 0;
 }
 
-/* read nvp node, retrun nonzero on error, update size to actual length */
-int read_nvp_node(int series_index, enum nwz_nvp_node_t node, void *buffer, size_t *size)
+/* Read nvp node, retrun nonzero on error, update size to actual length. The
+ * index is the raw node number sent to the device */
+int read_nvp_node(int node_index, void *buffer, size_t *size)
 {
-    int node_index = NWZ_NVP_INVALID;
-    if(nwz_series[series_index].nvp_index)
-        node_index = (*nwz_series[series_index].nvp_index)[node];
-    if(node_index == NWZ_NVP_INVALID)
-    {
-        printf("This device doesn't have node '%s'\n", nwz_nvp[node].name);
-        return 5;
-    }
     /* the returned data has a 4 byte header:
      * - byte 0/1 is the para_noise index, written as a 16bit big-endian number
      * - byte 2/3 is the node index, written as a 16-bit big-endian number
@@ -394,12 +386,6 @@ int read_nvp_node(int series_index, enum nwz_nvp_node_t node, void *buffer, size
         cprintf(GREY, "Device responded with invalid data\n");
         return 1;
     }
-    if(!g_relaxed && xfer_size - 4 != (int)*size)
-    {
-        free(xfer_buf);
-        cprintf(GREY, "Device didn't send the expected amount of data\n");
-        return 7;
-    }
     *size = xfer_size - 4;
     /* unscramble and copy */
     for(int i = 4, idx = get_big_endian16(xfer_buf); i < xfer_size; i++, idx++)
@@ -410,16 +396,8 @@ int read_nvp_node(int series_index, enum nwz_nvp_node_t node, void *buffer, size
 }
 
 /* read nvp node, retrun nonzero on error */
-int write_nvp_node(int series_index, enum nwz_nvp_node_t node, void *buffer, int size)
+int write_nvp_node(int node_index, void *buffer, int size)
 {
-    int node_index = NWZ_NVP_INVALID;
-    if(nwz_series[series_index].nvp_index)
-        node_index = (*nwz_series[series_index].nvp_index)[node];
-    if(node_index == NWZ_NVP_INVALID)
-    {
-        printf("This device doesn't have node '%s'\n", nwz_nvp[node].name);
-        return 5;
-    }
     /* the data buffer is prepended with a 4 byte header:
      * - byte 0/1 is the para_noise index, written as a 16bit big-endian number
      * - byte 2/3 is the node index, written as a 16-bit big-endian number */
@@ -446,41 +424,84 @@ int write_nvp_node(int series_index, enum nwz_nvp_node_t node, void *buffer, int
 
 int get_dnk_nvp(int argc, char **argv)
 {
-    if(argc != 1)
+    if(argc != 1 && argc != 2)
     {
         printf("You must specify a known nvp node or a full node specification:\n");
         printf("Node usage: <node>\n");
+        printf("Node usage: <node> <size>\n");
         printf("Nodes:\n");
         for(unsigned i = 0; i < NWZ_NVP_COUNT; i++)
             printf("  %-6s%s\n", nwz_nvp[i].name, nwz_nvp[i].desc);
+        printf("You can also specify a decimal or hexadecimal value directly\n");
         return 1;
     }
     int series_index, model_index;
     int ret = get_model_and_series(&model_index, &series_index);
     if(ret)
         return ret;
-    /* find entry in NVP */
-    enum nwz_nvp_node_t node = NWZ_NVP_COUNT;
-    for(int i = 0; i < NWZ_NVP_COUNT; i++)
-        if(strcmp(nwz_nvp[i].name, argv[0]) == 0)
-            node = i;
-    if(node== NWZ_NVP_COUNT)
+    size_t size = 0;
+    /* maybe user specified an explicit size */
+    if(argc == 2)
     {
-        printf("I don't know about node '%s'\n", argv[0]);
+        char *end;
+        size = strtoul(argv[1], &end, 0);
+        if(*end)
+        {
+            printf("Invalid user-specified size '%s'\n", argv[1]);
+            return 5;
+        }
+    }
+    /* find entry in NVP */
+    const char *node_name = argv[0];
+    const char *node_desc = NULL;
+    int node_index = NWZ_NVP_INVALID;
+    for(int i = 0; i < NWZ_NVP_COUNT; i++)
+        if(strcmp(nwz_nvp[i].name, node_name) == 0)
+        {
+            if(nwz_series[series_index].nvp_index)
+                node_index = (*nwz_series[series_index].nvp_index)[i];
+            if(node_index == NWZ_NVP_INVALID)
+            {
+                printf("This device doesn't have node '%s'\n", node_name);
+                return 5;
+            }
+            node_desc = nwz_nvp[i].desc;
+            /* if not overriden, try to get size from database */
+            if(size == 0)
+                size = nwz_nvp[i].size;
+        }
+    /* if we can't find it, maybe check if it's a number */
+    if(node_index == NWZ_NVP_INVALID)
+    {
+        char *end;
+        node_index = strtol(node_name, &end, 0);
+        if(*end)
+            node_index = NWZ_NVP_INVALID; /* string is not a number */
+    }
+    if(node_index == NWZ_NVP_INVALID)
+    {
+        printf("I don't know about node '%s'\n", node_name);
         return 4;
     }
-    size_t size = nwz_nvp[node].size;
-    /* in relaxed mode, always ask for a lot of data to make sure we get everything */
-    if(g_relaxed)
+    /* if we don't have a size, take a big size to be sure */
+    if(size == 0)
+    {
         size = 4096;
+        printf("Note: node size unknown, trying to read %u bytes\n", (unsigned)size);
+    }
+    if(g_debug)
+        printf("Asking device for %u bytes\n", (unsigned)size);
+    /* take the size in the database as a hint of the size, but the device could
+     * return less data */
     uint8_t *buffer = malloc(size);
-    ret = read_nvp_node(series_index, node, buffer, &size);
+    ret = read_nvp_node(node_index, buffer, &size);
     if(ret != 0)
     {
         free(buffer);
         return ret;
     }
-    cprintf(GREEN, "%s:\n", nwz_nvp[node].name);
+    cprintf(GREEN, "%s (node %d%s%s):\n", node_name, node_index,
+        node_desc ? "," : "", node_desc ? node_desc : "");
     print_hex(buffer, size);
 
     free(buffer);
@@ -696,10 +717,18 @@ int do_dest(int argc, char **argv)
     /* get model/series */
     int model_index, series_index;
     int ret = get_model_and_series(&model_index, &series_index);
+    int shp_index = NWZ_NVP_INVALID;
+    if(nwz_series[series_index].nvp_index)
+        shp_index = (*nwz_series[series_index].nvp_index)[NWZ_NVP_SHP];
+    if(shp_index == NWZ_NVP_INVALID)
+    {
+        printf("This device doesn't have node 'shp'\n");
+        return 5;
+    }
     /* in all cases, we need to read shp */
     size_t size = nwz_nvp[NWZ_NVP_SHP].size;
     uint8_t *shp = malloc(size);
-    ret = read_nvp_node(series_index, NWZ_NVP_SHP, shp, &size);
+    ret = read_nvp_node(shp_index, shp, &size);
     if(ret != 0)
     {
         free(shp);
@@ -770,7 +799,7 @@ int do_dest(int argc, char **argv)
         }
         set_little_endian32(shp, dst);
         set_little_endian32(shp + 4, sps);
-        int ret = write_nvp_node(series_index, NWZ_NVP_SHP, shp, size);
+        int ret = write_nvp_node(shp_index, shp, size);
         free(shp);
         return ret;
     }
@@ -817,7 +846,6 @@ static void usage(void)
     printf("  -d/--debug           Display debug messages\n");
     printf("  -c/--no-color        Disable color output\n");
     printf("  -s/--series <name>   Force series (disable auto-detection, use '?' for the list)\n");
-    printf("  -r/--relaxed         Relax length checks on nvp properties\n");
     printf("Commands:\n");
     for(unsigned i = 0; i < NR_CMDS; i++)
         printf("  %s\t%s\n", cmd_list[i].name, cmd_list[i].desc);
@@ -837,7 +865,7 @@ int main(int argc, char **argv)
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?dcfo:s:r", long_options, NULL);
+        int c = getopt_long(argc, argv, "?dcfo:s:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -858,9 +886,6 @@ int main(int argc, char **argv)
                 break;
             case 's':
                 g_force_series = optarg;
-                break;
-            case 'r':
-                g_relaxed = true;
                 break;
             default:
                 abort();
