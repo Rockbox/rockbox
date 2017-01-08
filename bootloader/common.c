@@ -60,6 +60,7 @@ bool verbose = false;
 bool verbose = true;
 #endif
 
+#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
 int line = 0;
 #ifdef HAVE_REMOTE_LCD
 int remote_line = 0;
@@ -101,6 +102,7 @@ int printf(const char *format, ...)
 #endif
     return len;
 }
+#endif
 
 void error(int errortype, int error, bool shutdown)
 {

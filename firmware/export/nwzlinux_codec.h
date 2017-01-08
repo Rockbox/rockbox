@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2016 Amaury Pouly
+ * Copyright (C) 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +17,14 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_ADC_H__
-#define __NWZ_ADC_H__
 
-#define NWZ_ADC_DEV  "/dev/icx_adc"
+#ifndef __NWZLINUX_CODEC_H__
+#define __NWZLINUX_CODEC_H__
 
-#define NWZ_ADC_TYPE    'm'
+#define AUDIOHW_CAPS 0
 
-#define NWZ_ADC_MIN_CHAN    0
-#define NWZ_ADC_MAX_CHAN    7
+/* Volume ranges from 0 to 32 (despite the ALSA control claiming 0..100 range).
+ * It is not really in dB, but it's not really in percent either */
+AUDIOHW_SETTING(VOLUME,       "dB", 0,  1, -100,  31, 0)
 
-#define NWZ_ADC_VCCBAT  0
-#define NWZ_ADC_VCCVBUS 1
-#define NWZ_ADC_ADIN3   2
-#define NWZ_ADC_ADIN4   3
-#define NWZ_ADC_ADIN5   4
-#define NWZ_ADC_ADIN6   5
-#define NWZ_ADC_ADIN7   6
-#define NWZ_ADC_ADIN8   7
-
-#define NWZ_ADC_GET_VAL(chan)   _IOR(NWZ_ADC_TYPE, chan, unsigned char)
-
-#endif /* __NWZ_ADC_H__ */
+#endif /* __NWZLINUX_CODEC_H__ */
