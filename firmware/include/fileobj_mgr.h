@@ -41,12 +41,11 @@ void fileobj_fileop_rename(struct filestr_base *stream,
 void fileobj_fileop_remove(struct filestr_base *stream,
                            const struct file_base_info *oldinfop);
 void fileobj_fileop_sync(struct filestr_base *stream);
-void fileobj_fileop_truncate(struct filestr_base *stream);
-extern void ftruncate_internal_callback(struct filestr_base *stream,
-                                        struct filestr_base *s);
 
 file_size_t * fileobj_get_sizep(const struct filestr_base *stream);
 unsigned int fileobj_get_flags(const struct filestr_base *stream);
+struct filestr_base * fileobj_get_next_stream(const struct filestr_base *stream,
+                                              const struct filestr_base *s);
 void fileobj_change_flags(struct filestr_base *stream,
                           unsigned int flags, unsigned int mask);
 void fileobj_mgr_unmount(IF_MV_NONVOID(int volume));

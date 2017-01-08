@@ -292,7 +292,7 @@ struct pathwalk_component
     struct pathwalk_component *nextp;     /* parent if in use else next free */
 };
 
-#define WALK_RC_NOT_FOUND    0   /* successfully not found */
+#define WALK_RC_NOT_FOUND    0   /* successfully not found (aid for file creation) */
 #define WALK_RC_FOUND        1   /* found and opened */
 #define WALK_RC_FOUND_ROOT   2   /* found and opened sys/volume root */
 #define WALK_RC_CONT_AT_ROOT 3   /* continue at root level */
@@ -351,7 +351,10 @@ static int fill_path_compinfo(struct pathwalk *walkp,
         compinfo->length     = compp->length;
         compinfo->attr       = compp->attr;
         compinfo->filesize   = walkp->filesize;
-        compinfo->parentinfo = (compp->nextp ?: compp)->info;
+        if (!(walkp->callflags & FF_SELFINFO))
+            compinfo->parentinfo = (compp->nextp ?: compp)->info;
+        else
+            compinfo->info = compp->info;
     }
 
     return rc;
@@ -393,7 +396,10 @@ static int walk_open_info(struct pathwalk *walkp,
     else
         callflags &= ~FO_DIRECTORY;
 
-    fileop_onopen_internal(stream, &compp->info, callflags);
+    /* make open official if not simply probing for presence */
+    if (!(callflags & FF_PROBE))
+        fileop_onopen_internal(stream, &compp->info, callflags);
+
     return compp->nextp ? WALK_RC_FOUND : WALK_RC_FOUND_ROOT;
 }
 
@@ -511,7 +517,8 @@ walk_path(struct pathwalk *walkp, struct pathwalk_component *compp,
             {
                 /* is ".." */
                 struct pathwalk_component *parentp = compp->nextp;
-                if (!parentp)
+
+                if (!parentp IF_MV( || parentp->attr == ATTR_SYSTEM_ROOT ))
                     return WALK_RC_CONT_AT_ROOT;
 
                 compp->nextp = freep;
@@ -567,6 +574,9 @@ int open_stream_internal(const char *path, unsigned int callflags,
     if (!compinfo)
         callflags &= ~FF_CHECKPREFIX;
 
+    /* This lets it be passed quietly to directory scanning */
+    stream->flags = callflags & FF_MASK;
+
     struct pathwalk walk;
     walk.path      = path;
     walk.callflags = callflags;
@@ -575,7 +585,7 @@ int open_stream_internal(const char *path, unsigned int callflags,
 
     struct pathwalk_component *rootp = pathwalk_comp_alloc(NULL);
     rootp->nextp = NULL;
-    rootp->attr  = ATTR_DIRECTORY;
+    rootp->attr  = ATTR_SYSTEM_ROOT;
 
 #ifdef HAVE_MULTIVOLUME
     int volume = 0, rootrc = WALK_RC_FOUND;
@@ -584,7 +594,7 @@ int open_stream_internal(const char *path, unsigned int callflags,
     while (1)
     {
         const char *pathptr = walk.path;
-
+ 
     #ifdef HAVE_MULTIVOLUME
         /* this seamlessly integrates secondary filesystems into the
            root namespace (e.g. "/<0>/../../<1>/../foo/." :<=> "/foo") */
@@ -596,8 +606,19 @@ int open_stream_internal(const char *path, unsigned int callflags,
             FILE_ERROR(ENXIO, -2);
         }
 
-        /* the root of this subpath is the system root? */
-        rootrc = p == pathptr ? WALK_RC_FOUND_ROOT : WALK_RC_FOUND;
+        if (p == pathptr)
+        {
+            /* the root of this subpath is the system root */
+            rootp->attr = ATTR_SYSTEM_ROOT;
+            rootrc = WALK_RC_FOUND_ROOT;
+        }
+        else
+        {
+            /* this subpath specifies a mount point */
+            rootp->attr = ATTR_MOUNT_POINT;
+            rootrc = WALK_RC_FOUND;
+        }
+
         walk.path = p;
     #endif /* HAVE_MULTIVOLUME */
 
@@ -633,10 +654,8 @@ int open_stream_internal(const char *path, unsigned int callflags,
     default: /* utter, abject failure :`( */
         DEBUGF("Open failed: rc=%d, errno=%d\n", rc, errno);
         filestr_base_destroy(stream);
-        FILE_ERROR(-rc, -2);
+        FILE_ERROR(-rc, -3);
     }
-
-    file_cache_reset(stream->cachep);
 
 file_error:
     return rc;
@@ -757,9 +776,10 @@ int test_stream_exists_internal(const char *path, unsigned int callflags)
 {
     /* only FF_* flags should be in callflags */
     struct filestr_base stream;
-    int rc = open_stream_internal(path, callflags, &stream, NULL);
-    if (rc > 0)
-        close_stream_internal(&stream);
+    int rc = open_stream_internal(path, callflags | FF_PROBE, &stream, NULL);
+
+    if (rc >= 0)
+        filestr_base_destroy(&stream);
 
     return rc;
 }

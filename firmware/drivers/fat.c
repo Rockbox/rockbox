@@ -1927,7 +1927,7 @@ static int free_direntries(struct bpb *fat_bpb, struct fat_file *file)
 
     /* directory entry info is now gone */
     file->dircluster = 0;
-    file->e.entry    = FAT_RW_VAL;
+    file->e.entry    = FAT_DIRSCAN_RW_VAL;
     file->e.entries  = 0;
 
     return 1;
@@ -2521,8 +2521,18 @@ void fat_rewind(struct fat_filestr *filestr)
     filestr->lastcluster  = filestr->fatfilep->firstcluster;
     filestr->lastsector   = 0;
     filestr->clusternum   = 0;
-    filestr->sectornum    = FAT_RW_VAL;
+    filestr->sectornum    = FAT_FILE_RW_VAL;
     filestr->eof          = false;
+}
+
+void fat_seek_to_stream(struct fat_filestr *filestr,
+                        const struct fat_filestr *filestr_seek_to)
+{
+    filestr->lastcluster = filestr_seek_to->lastcluster;
+    filestr->lastsector  = filestr_seek_to->lastsector;
+    filestr->clusternum  = filestr_seek_to->clusternum;
+    filestr->sectornum   = filestr_seek_to->sectornum;
+    filestr->eof         = filestr_seek_to->eof;
 }
 
 int fat_seek(struct fat_filestr *filestr, unsigned long seeksector)
@@ -2536,7 +2546,7 @@ int fat_seek(struct fat_filestr *filestr, unsigned long seeksector)
     long          cluster    = file->firstcluster;
     unsigned long sector     = 0;
     long          clusternum = 0;
-    unsigned long sectornum  = FAT_RW_VAL;
+    unsigned long sectornum  = FAT_FILE_RW_VAL;
 
 #ifdef HAVE_FAT16SUPPORT
     if (fat_bpb->is_fat16 && cluster < 0) /* FAT16 root dir */
@@ -2710,7 +2720,7 @@ int fat_readdir(struct fat_filestr *dirstr, struct fat_dirscan_info *scan,
 
                 dc_lock_cache();
 
-                while (--scan->entry != FAT_RW_VAL) /* at beginning? */
+                while (--scan->entry != FAT_DIRSCAN_RW_VAL) /* at beginning? */
                 {
                     ent = cache_direntry(fat_bpb, dirstr, scan->entry);
 
@@ -2761,7 +2771,7 @@ fat_error:
 void fat_rewinddir(struct fat_dirscan_info *scan)
 {
     /* rewind the directory scan counter to the beginning */
-    scan->entry   = FAT_RW_VAL;
+    scan->entry   = FAT_DIRSCAN_RW_VAL;
     scan->entries = 0;
 }
 

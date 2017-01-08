@@ -81,6 +81,7 @@
 #define ATTR_NEW_FILE       (ATTR_ARCHIVE)
 #define ATTR_NEW_DIRECTORY  (ATTR_DIRECTORY)
 
+#define ATTR_SYSTEM_ROOT    (ATTR_SYSROOT | ATTR_DIRECTORY)
 #define ATTR_MOUNT_POINT    (ATTR_VOLUME | ATTR_DIRECTORY)
 
 /** File sector cache **/
@@ -110,32 +111,34 @@ void file_cache_free(struct filestr_cache *cachep);
 enum fildes_and_obj_flags
 {
     /* used in descriptor and common */
-    FDO_BUSY       = 0x0001, /* descriptor/object is in use */
+    FDO_BUSY       = 0x0001,     /* descriptor/object is in use */
     /* only used in individual stream descriptor */
-    FD_WRITE       = 0x0002, /* descriptor has write mode */
-    FD_WRONLY      = 0x0004, /* descriptor is write mode only */
-    FD_APPEND      = 0x0008, /* descriptor is append mode */
+    FD_WRITE       = 0x0002,     /* descriptor has write mode */
+    FD_WRONLY      = 0x0004,     /* descriptor is write mode only */
+    FD_APPEND      = 0x0008,     /* descriptor is append mode */
+    FD_NONEXIST    = 0x8000,     /* closed but not freed (uncombined) */
     /* only used as common flags */
-    FO_DIRECTORY   = 0x0010, /* fileobj is a directory */
-    FO_TRUNC       = 0x0020, /* fileobj is opened to be truncated */
-    FO_REMOVED     = 0x0040, /* fileobj was deleted while open */
-    FO_SINGLE      = 0x0080, /* fileobj has only one stream open */
+    FO_DIRECTORY   = 0x0010,     /* fileobj is a directory */
+    FO_TRUNC       = 0x0020,     /* fileobj is opened to be truncated */
+    FO_REMOVED     = 0x0040,     /* fileobj was deleted while open */
+    FO_SINGLE      = 0x0080,     /* fileobj has only one stream open */
     FDO_MASK       = 0x00ff,
-    /* bitflags that instruct various 'open' functions how to behave */
-    FF_FILE        = 0x0000, /* expect file; accept file only */
-    FF_DIR         = 0x0100, /* expect dir; accept dir only */
-    FF_ANYTYPE     = 0x0200, /* succeed if either file or dir */
-    FF_TYPEMASK    = 0x0300, /* mask of typeflags */
-    FF_CREAT       = 0x0400, /* create if file doesn't exist */
-    FF_EXCL        = 0x0800, /* fail if creating and file exists */
-    FF_CHECKPREFIX = 0x1000, /* detect if file is prefix of path */
-    FF_NOISO       = 0x2000, /* do not decode ISO filenames to UTF-8 */
-    FF_MASK        = 0x3f00,
-    /* special values used in isolation */
-    FV_NONEXIST    = 0x8000, /* closed but not freed (unmounted) */
-    FV_OPENSYSROOT = 0xc001, /* open sysroot, volume 0 not mounted */
+    FDO_CHG_MASK   = FO_TRUNC,   /* fileobj permitted external change */
+    /* bitflags that instruct various 'open' functions how to behave;
+     * saved in stream flags (only) but not used by manager */
+    FF_FILE        = 0x00000000, /* expect file; accept file only */
+    FF_DIR         = 0x00010000, /* expect dir; accept dir only */
+    FF_ANYTYPE     = 0x00020000, /* succeed if either file or dir */
+    FF_TYPEMASK    = 0x00030000, /* mask of typeflags */
+    FF_CREAT       = 0x00040000, /* create if file doesn't exist */
+    FF_EXCL        = 0x00080000, /* fail if creating and file exists */
+    FF_CHECKPREFIX = 0x00100000, /* detect if file is prefix of path */
+    FF_NOISO       = 0x00200000, /* do not decode ISO filenames to UTF-8 */
+    FF_PROBE       = 0x00400000, /* only test existence; don't open */
+    FF_CACHEONLY   = 0x00800000, /* succeed only if in dircache */
+    FF_SELFINFO    = 0x01000000, /* return info on self as well */
+    FF_MASK        = 0x01ff0000,
 };
-
 
 /** Common data structures used throughout **/
 
@@ -183,8 +186,7 @@ struct dirscan_info
 struct filestr_base
 {
     struct ll_node           node;    /* list item node (first!) */
-    uint16_t                 flags;   /* FD_* bits of this stream */
-    uint16_t                 unused;  /* not used */
+    uint32_t                 flags;   /* F[DF]_* bits of this stream */
     struct filestr_cache     cache;   /* stream-local cache */
     struct filestr_cache     *cachep; /* the cache in use (local or shared) */
     struct file_base_info    *infop;  /* base file information */
@@ -235,17 +237,25 @@ static inline void filestr_unlock(struct filestr_base *stream)
 #define FILESTR_UNLOCK(type, stream) \
     ({ if (FILESTR_##type) filestr_unlock(stream); })
 
-#define ATTR_PREFIX (0x8000) /* out of the way of all ATTR_* bits */
+/* auxilliary attributes - out of the way of regular ATTR_* bits */
+#define ATTR_SYSROOT (0x8000)
+#define ATTR_PREFIX  (0x4000)
 
 /* structure to return detailed information about what you opened */
 struct path_component_info
 {
-    const char   *name;               /* pointer to name within 'path' */
+    const char   *name;               /* pointer to name within 'path' (OUT) */
     size_t       length;              /* length of component within 'path' */
     file_size_t  filesize;            /* size of the opened file (0 if dir) */
     unsigned int attr;                /* attributes of this component */
-    struct file_base_info *prefixp;   /* base info to check as prefix (IN) */
-    struct file_base_info parentinfo; /* parent directory info of file */
+    struct file_base_info *prefixp;   /* base info to check as prefix
+                                         (IN if FF_CHECKPREFIX) */
+    union {
+    struct file_base_info parentinfo; /* parent directory base info of file
+                                         (if not FF_SELFINFO) */
+    struct file_base_info info;       /* base info of file itself
+                                         (if FF_SELFINFO) */
+    };
 };
 
 int open_stream_internal(const char *path, unsigned int callflags,
@@ -261,6 +271,7 @@ int remove_stream_internal(const char *path, struct filestr_base *stream,
 int test_stream_exists_internal(const char *path, unsigned int callflags);
 
 int open_noiso_internal(const char *path, int oflag); /* file.c */
+void force_close_writer_internal(struct filestr_base *stream); /* file.c */
 
 struct dirent;
 int uncached_readdir_dirent(struct filestr_base *stream,
@@ -326,22 +337,26 @@ static inline void file_internal_unlock_WRITER(void)
  *        not in the macro
  */
 
+#define FILE_SET_CODE(_name, _keepcode, _value) \
+    ({  __builtin_constant_p(_value) ?                             \
+            ({ if ((_value) != (_keepcode)) _name = (_value); }) : \
+            ({ _name = (_value); }); })
+
 /* set errno and rc and proceed to the "file_error:" label */
 #define FILE_ERROR(_errno, _rc) \
-    ({  __builtin_constant_p(_errno) ?                       \
-            ({ if ((_errno) != ERRNO) errno = (_errno); }) : \
-            ({ errno = (_errno); });                         \
-        __builtin_constant_p(_rc) ?                          \
-            ({ if ((_rc) != RC) rc = (_rc); }) :             \
-            ({ rc = (_rc); });                               \
+    ({  FILE_SET_CODE(errno, ERRNO, (_errno)); \
+        FILE_SET_CODE(rc, RC, (_rc));          \
         goto file_error; })
 
 /* set errno and return a value at the point of invocation */
 #define FILE_ERROR_RETURN(_errno, _rc...) \
-    ({  __builtin_constant_p(_errno) ?                       \
-            ({ if ((_errno) != ERRNO) errno = (_errno); }) : \
-            ({ errno = (_errno); });                         \
-        return _rc; })
+    ({ FILE_SET_CODE(errno, ERRNO, _errno); \
+       return _rc; })
+
+/* set errno and return code, no branching */
+#define FILE_ERROR_SET(_errno, _rc) \
+    ({ FILE_SET_CODE(errno, ERRNO, (_errno)); \
+       FILE_SET_CODE(rc, RC, (_rc)); })
 
 
 /** Misc. stuff **/

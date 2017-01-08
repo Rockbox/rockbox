@@ -56,7 +56,7 @@ static struct dirstr_desc * get_dirstr(DIR *dirp)
     {
         errnum = EFAULT;
     }
-    else if (dir->stream.flags == FV_NONEXIST)
+    else if (dir->stream.flags & FD_NONEXIST)
     {
         DEBUGF("dir #%d: nonexistant device\n", (int)(dir - open_streams));
         errnum = ENXIO;

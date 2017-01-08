@@ -187,7 +187,8 @@ void fileobj_fileop_open(struct filestr_base *stream,
     ll_insert_last(&fobp->list, &stream->node);
 
     /* initiate the new stream into the enclave */
-    stream->flags = FDO_BUSY | (callflags & (FD_WRITE|FD_WRONLY|FD_APPEND));
+    stream->flags = FDO_BUSY |
+                    (callflags & (FF_MASK|FD_WRITE|FD_WRONLY|FD_APPEND));
     stream->infop = &fobp->bind.info;
     stream->fatstr.fatfilep = &fobp->bind.info.fatfile;
     stream->bindp = &fobp->bind;
@@ -201,14 +202,6 @@ void fileobj_fileop_open(struct filestr_base *stream,
                           (callflags & (FO_DIRECTORY|FO_TRUNC));
         fobp->writers   = 0;
         fobp->size      = 0;
-
-        if (callflags & FD_WRITE)
-        {
-            /* first one is a writer */
-            fobp->writers = 1;
-            file_cache_init(&fobp->cache);
-            filestr_assign_cache(stream, &fobp->cache);
-        }
 
         fileobj_bind_file(&fobp->bind);
     }
@@ -225,32 +218,33 @@ void fileobj_fileop_open(struct filestr_base *stream,
             DEBUGF("%s - FO_DIRECTORY flag does not match: %p %u\n",
                    __func__, stream, callflags);
         }
+    }
 
-        if (fobp->writers)
-        {
-            /* already writers present */
-            fobp->writers++;
-            filestr_assign_cache(stream, &fobp->cache);
-        }
-        else if (callflags & FD_WRITE)
-        {
-            /* first writer */
-            fobp->writers = 1;
-            file_cache_init(&fobp->cache);
-            FOR_EACH_STREAM(FIRST, fobp, s)
-                filestr_assign_cache(s, &fobp->cache);
-        }
-        /* else another reader */
+    if ((callflags & FD_WRITE) && ++fobp->writers == 1)
+    {
+        /* first writer */
+        file_cache_init(&fobp->cache);
+        FOR_EACH_STREAM(FIRST, fobp, s)
+            filestr_assign_cache(s, &fobp->cache);
+    }
+    else if (fobp->writers)
+    {
+        /* already writers present */
+        filestr_assign_cache(stream, &fobp->cache);
+    }
+    else
+    {
+        /* another reader and no writers present */
+        file_cache_reset(stream->cachep);
     }
 }
 
 /* close the stream and free associated resources */
 void fileobj_fileop_close(struct filestr_base *stream)
 {
-    switch (stream->flags)
+    if (!(stream->flags & FDO_BUSY))
     {
-    case 0:              /* not added to manager */
-    case FV_NONEXIST:    /* forced-closed by unmounting */
+        /* not added to manager or forced-closed by unmounting */
         filestr_base_destroy(stream);
         return;
     }
@@ -260,30 +254,30 @@ void fileobj_fileop_close(struct filestr_base *stream)
 
     ll_remove(&fobp->list, &stream->node);
 
-    if ((foflags & FO_SINGLE) || fobp->writers == 0)
+    if (foflags & FO_SINGLE)
     {
-        if (foflags & FO_SINGLE)
+       /* last stream for file; close everything */
+        fileobj_unbind_file(&fobp->bind);
+
+        if (fobp->writers)
+            file_cache_free(&fobp->cache);
+
+        binding_add_to_free_list(fobp); 
+    }
+    else
+    {
+        if ((stream->flags & FD_WRITE) && --fobp->writers == 0)
         {
-            /* last stream for file; close everything */
-            fileobj_unbind_file(&fobp->bind);
+            /* only readers remain; switch back to stream-local caching */
+            FOR_EACH_STREAM(FIRST, fobp, s)
+                filestr_copy_cache(s, &fobp->cache);
 
-            if (fobp->writers)
-                file_cache_free(&fobp->cache);
-
-            binding_add_to_free_list(fobp);
+            file_cache_free(&fobp->cache);
         }
-    }
-    else if ((stream->flags & FD_WRITE) && --fobp->writers == 0)
-    {
-        /* only readers remain; switch back to stream-local caching */
-        FOR_EACH_STREAM(FIRST, fobp, s)
-            filestr_copy_cache(s, &fobp->cache);
 
-        file_cache_free(&fobp->cache);
+        if (fobp->list.head == fobp->list.tail)
+            fobp->flags |= FO_SINGLE; /* only one open stream remaining */
     }
-
-    if (!(foflags & FO_SINGLE) && fobp->list.head == fobp->list.tail)
-        fobp->flags |= FO_SINGLE; /* only one open stream remaining */
 
     filestr_base_destroy(stream);
 }
@@ -320,15 +314,10 @@ void fileobj_fileop_rename(struct filestr_base *stream,
 /* informs manager than directory entries have been updated */
 void fileobj_fileop_sync(struct filestr_base *stream)
 {
-    fileobj_sync_parent((const struct file_base_info *[]){ stream->infop }, 1);
-}
+    if (((struct fileobj_binding *)stream->bindp)->flags & FO_REMOVED)
+        return; /* no dir to sync */
 
-/* inform manager that file has been truncated */
-void fileobj_fileop_truncate(struct filestr_base *stream)
-{
-    /* let caller update internal info */
-    FOR_EACH_STREAM(FIRST, (struct fileobj_binding *)stream->bindp, s)
-        ftruncate_internal_callback(stream, s);
+    fileobj_sync_parent((const struct file_base_info *[]){ stream->infop }, 1);
 }
 
 /* query for the pointer to the size storage for the file object */
@@ -340,6 +329,16 @@ file_size_t * fileobj_get_sizep(const struct filestr_base *stream)
     return &((struct fileobj_binding *)stream->bindp)->size;
 }
 
+/* iterate the list of streams for this stream's file */
+struct filestr_base * fileobj_get_next_stream(const struct filestr_base *stream,
+                                              const struct filestr_base *s)
+{
+    if (!stream->bindp)
+        return NULL;
+
+    return s ? STREAM_NEXT(s) : STREAM_FIRST((struct fileobj_binding *)stream->bindp);
+}
+
 /* query manager bitflags for the file object */
 unsigned int fileobj_get_flags(const struct filestr_base *stream)
 {
@@ -349,20 +348,21 @@ unsigned int fileobj_get_flags(const struct filestr_base *stream)
     return ((struct fileobj_binding *)stream->bindp)->flags;
 }
 
-/* change manager bitflags for the file object */
+/* change manager bitflags for the file object (permitted only) */
 void fileobj_change_flags(struct filestr_base *stream,
                           unsigned int flags, unsigned int mask)
 {
     struct fileobj_binding *fobp = (struct fileobj_binding *)stream->bindp;
-    if (fobp)
-        fobp->flags = (fobp->flags & ~mask) | (flags & mask);
+    if (!fobp)
+        return;
+
+    mask &= FDO_CHG_MASK; 
+    fobp->flags = (fobp->flags & ~mask) | (flags & mask);
 }
 
 /* mark all open streams on a device as "nonexistant" */
 void fileobj_mgr_unmount(IF_MV_NONVOID(int volume))
 {
-    /* right now, there is nothing else to be freed when marking a descriptor
-       as "nonexistant" but a callback could be added if that changes */
     FOR_EACH_VOLUME(volume, v)
     {
         struct fileobj_binding *fobp;
@@ -371,11 +371,17 @@ void fileobj_mgr_unmount(IF_MV_NONVOID(int volume))
             struct filestr_base *s;
             while ((s = STREAM_FIRST(fobp)))
             {
+                /* last ditch effort to preserve FS integrity; we could still
+                   be alive (soft unmount, maybe); we get informed early  */
+                fileop_onunmount_internal(s);
+
+                if (STREAM_FIRST(fobp) == s)
+                    fileop_onclose_internal(s); /* above didn't close it */
+
                 /* keep it "busy" to avoid races; any valid file/directory
                    descriptor returned by an open call should always be
-                   closed by whomever opened it (of course!) */
-                fileop_onclose_internal(s);
-                s->flags = FV_NONEXIST;
+                   closed by whoever opened it (of course!) */
+                s->flags = (s->flags & ~FDO_BUSY) | FD_NONEXIST;
             }
         }
     }

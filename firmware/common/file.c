@@ -54,7 +54,7 @@ static struct filestr_desc * get_filestr(int fildes)
         return file;
 
     DEBUGF("fildes %d: bad file number\n", fildes);
-    errno = (file && file->stream.flags == FV_NONEXIST) ? ENXIO : EBADF;
+    errno = (file && (file->stream.flags & FD_NONEXIST)) ? ENXIO : EBADF;
     return NULL;
 }
 
@@ -187,24 +187,28 @@ file_error:
     return rc;
 }
 
-/* callback for each file stream to make sure all data is in sync with new
-   size */
-void ftruncate_internal_callback(struct filestr_base *stream,
-                                 struct filestr_base *s)
+/* Handle syncing all file's streams to the truncation */ 
+static void handle_truncate(struct filestr_desc * const file, file_size_t size)
 {
-    struct filestr_desc *file = (struct filestr_desc *)s;
-    file_size_t size = *file->sizep;
+    unsigned long filesectors = filesize_sectors(size);
 
-    /* caches with data beyond new extents are invalid */
-    unsigned long sector = file->stream.cachep->sector;
-    if (sector != INVALID_SECNUM && sector >= filesize_sectors(size))
-        filestr_discard_cache(&file->stream);
+    struct filestr_base *s = NULL;
+    while ((s = fileobj_get_next_stream(&file->stream, s)))
+    {
+        /* caches with data beyond new extents are invalid */
+        unsigned long sector = s->cachep->sector;
+        if (sector != INVALID_SECNUM && sector >= filesectors)
+            filestr_discard_cache(s);
 
-    /* keep all positions within bounds */
-    if (file->offset > size)
-        file->offset = size;
+        /* files outside bounds must be rewound */
+        if (fat_query_sectornum(&s->fatstr) > filesectors)
+            fat_seek_to_stream(&s->fatstr, &file->stream.fatstr);
 
-    (void)stream;
+        /* clip file offset too if needed */
+        struct filestr_desc *f = (struct filestr_desc *)s;
+        if (f->offset > size)
+            f->offset = size;
+    }
 }
 
 /* truncate the file to the specified length */
@@ -246,13 +250,17 @@ static int ftruncate_internal(struct filestr_desc *file, file_size_t size,
         rc2 = fat_truncate(&file->stream.fatstr);
         if (rc2 < 0)
             FILE_ERROR(EIO, rc2 * 10 - 3);
+
+        /* never needs to be done this way again since any data beyond the
+           cached size is now gone */
+        fileobj_change_flags(&file->stream, 0, FO_TRUNC);
     }
     /* else just change the cached file size */
 
     if (truncsize < cursize)
     {
         *file->sizep = truncsize;
-        fileop_ontruncate_internal(&file->stream);
+        handle_truncate(file, truncsize);
     }
 
     /* if truncation was partially successful, it effectively destroyed
@@ -299,10 +307,6 @@ static int fsync_internal(struct filestr_desc *file)
         int rc2 = ftruncate_internal(file, size, rc == 0);
         if (rc2 < 0)
             FILE_ERROR(ERRNO, rc2 * 10 - 2);
-
-        /* never needs to be done this way again since any data beyond the
-           cached size is now gone */
-        fileobj_change_flags(&file->stream, 0, FO_TRUNC);
     }
 
 file_error:;
@@ -327,8 +331,7 @@ static int close_internal(struct filestr_desc *file)
     /* call only when holding WRITER lock (updates directory entries) */
     int rc;
 
-    if ((file->stream.flags & FD_WRITE) &&
-        !(fileobj_get_flags(&file->stream) & FO_REMOVED))
+    if ((file->stream.flags & (FD_WRITE|FD_NONEXIST)) == FD_WRITE)
     {
         rc = fsync_internal(file);
         if (rc < 0)
@@ -784,6 +787,12 @@ file_error:;
 int open_noiso_internal(const char *path, int oflag)
 {
     return open_internal_locked(path, oflag, FF_ANYTYPE | FF_NOISO);
+}
+
+void force_close_writer_internal(struct filestr_base *stream)
+{
+    /* only we do writers so we know this is our guy */
+    close_internal((struct filestr_desc *)stream);
 }
 
 

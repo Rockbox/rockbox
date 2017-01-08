@@ -97,13 +97,15 @@ struct fat_direntry
 
 /* cursor structure used for scanning directories; holds the last-returned
    entry information */
+#define FAT_DIRSCAN_RW_VAL (0u - 1u)
+
 struct fat_dirscan_info
 {
     unsigned int entry;         /* short dir entry index in parent */
     unsigned int entries;       /* number of dir entries used */
 };
 
-#define FAT_RW_VAL  (0u - 1)
+#define FAT_FILE_RW_VAL  (0ul - 1ul)
 
 /* basic FAT file information about where to find a file and who houses it */
 struct fat_file
@@ -156,6 +158,8 @@ long fat_readwrite(struct fat_filestr *filestr, unsigned long sectorcount,
                    void *buf, bool write);
 void fat_rewind(struct fat_filestr *filestr);
 int fat_seek(struct fat_filestr *filestr, unsigned long sector);
+void fat_seek_to_stream(struct fat_filestr *filestr,
+                        const struct fat_filestr *filestr_seek_to);
 int fat_truncate(const struct fat_filestr *filestr);
 
 /** Directory stream functions **/

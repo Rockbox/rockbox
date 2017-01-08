@@ -24,6 +24,8 @@
 
 /***
  ** Internal redirects that depend upon whether or not dircache is made
+ **
+ ** Some stuff deals with it, some doesn't right now. This is a nexus point..
  **/
 
 /** File binding **/
@@ -119,11 +121,6 @@ static inline void fileop_onsync_internal(struct filestr_base *stream)
 #endif
 }
 
-static inline void fileop_ontruncate_internal(struct filestr_base *stream)
-{
-    fileobj_fileop_truncate(stream);
-}
-
 static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
 {
 #ifdef HAVE_DIRCACHE
@@ -134,10 +131,20 @@ static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
 
 static inline void volume_onunmount_internal(IF_MV_NONVOID(int volume))
 {
-    fileobj_mgr_unmount(IF_MV(volume));
 #ifdef HAVE_DIRCACHE
+    /* First, to avoid update of something about to be destroyed anyway */
     dircache_unmount(IF_MV(volume));
 #endif
+    fileobj_mgr_unmount(IF_MV(volume));
+}
+
+static inline void fileop_onunmount_internal(struct filestr_base *stream)
+{
+
+    if (stream->flags & FD_WRITE)
+        force_close_writer_internal(stream); /* try to save stuff */
+    else
+        fileop_onclose_internal(stream);     /* just readers, bye */
 }
 
 
