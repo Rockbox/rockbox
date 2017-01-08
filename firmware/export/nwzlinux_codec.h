@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2005 by Linus Nielsen Feltzing
+ * Copyright (C) 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,23 +18,12 @@
  *
  ****************************************************************************/
 
-#include <stdbool.h>
+#ifndef __NWZLINUX_CODEC_H__
+#define __NWZLINUX_CODEC_H__
 
-/* Set this to true to enable lcd_update() in the printf function */
-extern bool verbose;
+#define AUDIOHW_CAPS 0
 
-/* Error types */
-#define     EATA                    -1
-#define     EDISK                   -2
-#define     EBOOTFILE               -3
+/* Volume is in percent */
+AUDIOHW_SETTING(VOLUME,       "dB", 0,  1, -100,  0, -90)
 
-/* Functions common to all bootloaders */
-#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
-void reset_screen(void);
-int printf(const char *format, ...);
-#endif
-void error(int errortype, int error, bool shutdown);
-int load_raw_firmware(unsigned char* buf, char* firmware, int buffer_size);
-#ifdef ROCKBOX_HAS_LOGF
-void display_logf(void);
-#endif
+#endif /* __NWZLINUX_CODEC_H__ */
