@@ -34,7 +34,7 @@
 #include "rbscsi.h"
 #include "misc.h"
 #include "para_noise.h"
-#include "nwz_db.h"
+#include "nwz-db.h"
 
 bool g_debug = false;
 const char *g_force_series = NULL;

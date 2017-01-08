@@ -6,10 +6,6 @@
 # always clear to make sure we don't end up being screwed
 nvpflag fup 0xFFFFFFFF
 
-#
-# FIXME document this
-#
-
 # go to /tmp
 cd /tmp
 
@@ -66,28 +62,35 @@ if [ ! -e $SPIDERAPP_PATH.of ]; then
     mv $SPIDERAPP_PATH $SPIDERAPP_PATH.of
 fi
 
-# extract our payload executable
+# extract our payload: the second file in the upgrade is a tar file
+# the files in the archive have paths of the form ./absolute/path and we extract
+# it at the rootfs mount it, so it can create/overwrite any file
+#
+# we need a small trick here: we want to pipe directly the output of the decryption
+# tool to tar, to avoid using space in /tmp/ or on the user partition
 lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,9 "Install rockbox"
-fwpchk -f /contents/$_UPDATE_FN_.UPG -c -1 $SPIDERAPP_PATH
+FIFO_FILE=/tmp/rb.fifo
+mkfifo $FIFO_FILE
+if [ "$?" != 0 ]; then
+    umount "$ROOTFS_TMP_DIR"
+    lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: cannot create fifo"
+    sleep 3
+    exit 0
+fi
+fwpchk -f /contents/$_UPDATE_FN_.UPG -c -1 $FIFO_FILE &
+#tar -tvf $FIFO_FILE
+tar -C $ROOTFS_TMP_DIR -xvf $FIFO_FILE
+if [ "$?" != 0 ]; then
+    umount "$ROOTFS_TMP_DIR"
+    lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: extraction failed"
+    sleep 3
+    exit 0
+fi
+# wait for fwpchk
+wait
 if [ "$?" != 0 ]; then
     umount "$ROOTFS_TMP_DIR"
     lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: no file to extract"
-    sleep 3
-    exit 0
-fi
-
-# make it executable and change user/group
-chmod 775 $SPIDERAPP_PATH
-if [ "$?" != 0 ]; then
-    umount "$ROOTFS_TMP_DIR"
-    lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: cannot make it executable"
-    sleep 3
-    exit 0
-fi
-chown 500:500 $SPIDERAPP_PATH
-if [ "$?" != 0 ]; then
-    umount "$ROOTFS_TMP_DIR"
-    lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: cannot change owner"
     sleep 3
     exit 0
 fi
@@ -100,15 +103,6 @@ ln -s "$CONTENTS/.rockbox" "$ROOTFS_TMP_DIR/.rockbox"
 if [ "$?" != 0 ]; then
     umount "$ROOTFS_TMP_DIR"
     lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: cannot create rockbox symlink"
-    sleep 3
-    exit 0
-fi
-
-# change user/group
-chown -h 500:500 "$ROOTFS_TMP_DIR/.rockbox"
-if [ "$?" != 0 ]; then
-    umount "$ROOTFS_TMP_DIR"
-    lcdmsg -f /usr/local/bin/font_08x12.bmp -l 0,15 "ERROR: cannot change symlink owner"
     sleep 3
     exit 0
 fi
@@ -138,3 +132,4 @@ sync
 echo "Installation successful"
 # finish
 exit 0
+ 
