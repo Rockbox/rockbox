@@ -7,11 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2011 by Amaury Pouly
+ * Copyright (C) 2016 by Amaury Pouly
  *
- * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
- * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
- * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -21,17 +18,27 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_PLATTOOLS_H__
-#define __NWZ_PLATTOOLS_H__
+#ifndef _BUTTON_TARGET_H_
+#define _BUTTON_TARGET_H_
 
-/** Platform tools can be either built individually, or be included in a
- * single build (or even dualboot code) for easy testing. Thus, each tool must
- * use the following macros to support all scenarios. */
+#include <stdbool.h>
+#include "config.h"
 
-#ifdef NWZ_EMBED_TOOLS
-#define NWZ_TOOL_MAIN(tool)  tool##_main
-#else
-#define NWZ_TOOL_MAIN(tool)  main
-#endif
+/* Main unit's buttons */
+#define BUTTON_POWER                0x00000001
+#define BUTTON_BACK                 0x00000002
+#define BUTTON_PLAY                 0x00000004
+#define BUTTON_LEFT                 0x00000008
+#define BUTTON_UP                   0x00000010
+#define BUTTON_DOWN                 0x00000020
+#define BUTTON_RIGHT                0x00000040
+#define BUTTON_VOL_DOWN             0x00000080
+#define BUTTON_VOL_UP               0x00000100
 
-#endif /* __NWZ_PLATTOOLS_H__ */
+#define BUTTON_MAIN                 0x000001ff
+
+/* Software power-off */
+#define POWEROFF_BUTTON BUTTON_POWER
+#define POWEROFF_COUNT 10
+
+#endif /* _BUTTON_TARGET_H_ */
