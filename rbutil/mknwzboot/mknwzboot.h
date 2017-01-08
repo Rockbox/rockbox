@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2016 Amaury Pouly
+ * Copyright (C) 2011 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,18 +18,24 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_TS_H__
-#define __NWZ_TS_H__
 
-#define NWZ_TS_NAME "icx_touch_screen"
+#ifndef MKIMXBOOT_H
+#define MKIMXBOOT_H
 
-/* How touchscreen works:
- *
- * The touchscreen uses mostly the standard linux protocol, reporting ABS_X,
- * ABS_Y, ABS_PRESSURE, TOOL_WIDTH and BTN_TOUCH with SYN to synchronize. The
- * only nonstandard part is the use of REL_RX and REL_RY to report "flick"
- * detection by the hardware. */
+#include <stdbool.h>
+#include <stdint.h>
+#include <sys/types.h>
 
-#endif /* __NWZ_TS_H__ */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+void dump_nwz_dev_info(const char *prefix);
+/* return 0 on success */
+int mknwzboot(const char *bootfile, const char *outfile, bool debug);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
 
