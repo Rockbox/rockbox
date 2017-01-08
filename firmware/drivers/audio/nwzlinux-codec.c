@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2016 Amaury Pouly
+ * Copyright (c) 2016 Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +17,45 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_ADC_H__
-#define __NWZ_ADC_H__
 
-#define NWZ_ADC_DEV  "/dev/icx_adc"
+#include "logf.h"
+#include "system.h"
+#include "kernel.h"
+#include "string.h"
+#include "audio.h"
+#include "sound.h"
+#include "audiohw.h"
+#include "cscodec.h"
+#include "nwzlinux_codec.h"
+#include "stdlib.h"
 
-#define NWZ_ADC_TYPE    'm'
+/* This driver handle the Sony linux audio drivers: despite using many differents
+ * codecs, it appears that they all share a common interface and common controls. */
 
-#define NWZ_ADC_MIN_CHAN    0
-#define NWZ_ADC_MAX_CHAN    7
+void audiohw_preinit(void)
+{
+    /* we need to enable the codec */
+    system("amixer cset name='CODEC Power Switch' on");
+    system("amixer > /contents/amixer.txt");
+}
 
-#define NWZ_ADC_VCCBAT  0
-#define NWZ_ADC_VCCVBUS 1
-#define NWZ_ADC_ADIN3   2
-#define NWZ_ADC_ADIN4   3
-#define NWZ_ADC_ADIN5   4
-#define NWZ_ADC_ADIN6   5
-#define NWZ_ADC_ADIN7   6
-#define NWZ_ADC_ADIN8   7
+void audiohw_postinit(void)
+{
+}
 
-#define NWZ_ADC_GET_VAL(chan)   _IOR(NWZ_ADC_TYPE, chan, unsigned char)
+void audiohw_set_volume(int vol_l, int vol_r)
+{
+    (void) vol_l;
+    (void) vol_r;
+}
 
-#endif /* __NWZ_ADC_H__ */
+void audiohw_close(void)
+{
+    /* disable codec */
+    system("amixer cset name='CODEC Power Switch' off");
+}
+
+void audiohw_set_frequency(int fsel)
+{
+    (void) fsel;
+}
