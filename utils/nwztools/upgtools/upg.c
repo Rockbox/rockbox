@@ -38,6 +38,9 @@ struct nwz_model_t g_model_list[] =
     { "nw-a820", false, "0c9869c268e0eaa6d1ba62daab09cebc" },
     { "nw-a20", false, "e9d7185e5ac183bf26e9a5b66f983c0b" },
     { "nwz-zx100", false, "2c0bf029804f73e073154388743f84d2" },
+    /* The following models use a different encryption, but we put the KAS here
+     * to not forget them */
+    { "nw-a30", false, "c40d91e7efff3e3aa5c8831dd85526fe4972086283419c8cd8fa3b7dcd39" },
     { 0 }
 };
 
