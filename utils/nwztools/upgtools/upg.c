@@ -27,6 +27,7 @@
 struct nwz_model_t g_model_list[] =
 {
     { "nwz-a10", true, "2572f4a7b8c1a08aeb5142ce9cb834d6" },
+    { "nw-a20", true, "d91a61c7263bafc626e9a5b66f983c0b" },
     { "nwz-e450", true, "8a01b624bfbfde4a1662a1772220e3c5" },
     { "nwz-e460", true, "89d813f8f966efdebd9c9e0ea98156d2" },
     { "nwz-a860", true, "a7c4af6c28b8900a783f307c1ba538c5" },
@@ -36,7 +37,6 @@ struct nwz_model_t g_model_list[] =
     /* The following keys were obtained by brute forcing firmware upgrades,
      * someone with a device needs to confirm that they work */
     { "nw-a820", false, "0c9869c268e0eaa6d1ba62daab09cebc" },
-    { "nw-a20", false, "e9d7185e5ac183bf26e9a5b66f983c0b" },
     { "nwz-zx100", false, "2c0bf029804f73e073154388743f84d2" },
     /* The following models use a different encryption, but we put the KAS here
      * to not forget them */
