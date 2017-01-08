@@ -41,6 +41,7 @@ struct nwz_model_t g_model_list[] =
     /* The following models use a different encryption, but we put the KAS here
      * to not forget them */
     { "nw-a30", false, "c40d91e7efff3e3aa5c8831dd85526fe4972086283419c8cd8fa3b7dcd39" },
+    { "nw-wm1", false, "e8d171a5d92f35eed9658c03fb9f86a169591659851fd7c49525f587a70b" },
     { 0 }
 };
 
