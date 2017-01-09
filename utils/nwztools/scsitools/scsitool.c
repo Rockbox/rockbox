@@ -801,6 +801,10 @@ int do_dest(int argc, char **argv)
         set_little_endian32(shp + 4, sps);
         int ret = write_nvp_node(shp_index, shp, size);
         free(shp);
+        if(ret != 0)
+            printf("An error occured when writing node: %d\n", ret);
+        else
+            printf("Destination successfully changed.\nPlease RESET ALL SETTINGS on your device!\n");
         return ret;
     }
     return 0;
