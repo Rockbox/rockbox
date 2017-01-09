@@ -13,6 +13,7 @@ with open('models.txt') as fp:
         g_models.append({'mid': int(mid, 0), 'name': name})
 # parse series.txt
 g_series = []
+g_series_codename = set()
 with open('series.txt') as fp:
     for line in fp:
         # we unpack and repack 1) to make the format obvious 2) to catch errors
@@ -25,6 +26,7 @@ with open('series.txt') as fp:
             models = []
         models = [int(mid,0) for mid in models]
         g_series.append({'codename': codename, 'name': name, 'models': models})
+        g_series_codename.add(codename)
 # parse all maps in nvp/
 # since most nvps are the same, what we actually do is to compute the md5sum hash
 # of all files, to identify groups and then each entry in the name is in fact the
@@ -38,6 +40,9 @@ for line in subprocess.run(["md5sum"] + map_files, stdout = subprocess.PIPE).std
         continue
     hash, file = line.rstrip().split()
     codename = re.search('nvp/(.*)\.txt', file).group(1)
+    # sanity check
+    if not (codename in g_series_codename):
+        print("Warning: file %s does not have a match series in series.txt" % file)
     hash = hash[:HASH_SIZE]
     # only keep one file
     if not (hash in g_hash_nvp):

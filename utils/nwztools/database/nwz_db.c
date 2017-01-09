@@ -1144,6 +1144,6 @@ struct nwz_series_info_t nwz_series[NWZ_SERIES_COUNT] =
     { "nw-s780", "NW-S780 Series", 4, models_nw_s780, &nvp_index_6485c8 },
     { "nw-wm1", "NW-WM1 Series", 2, models_nw_wm1, &nvp_index_398250 },
     { "nwz-x1000", "NWZ-X1000 Series", 9, models_nwz_x1000, 0 },
-    { "nw-zx100", "NW-ZX100 Series", 6, models_nw_zx100, 0 },
+    { "nw-zx100", "NW-ZX100 Series", 6, models_nw_zx100, &nvp_index_92faee },
     { "nwz-noname", "NONAME", 3, models_nwz_noname, 0 },
 };
