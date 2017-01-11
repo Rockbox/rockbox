@@ -45,6 +45,7 @@
 #include "button.h"
 #include "button-imx233.h"
 #include "sdmmc-imx233.h"
+#include "led-imx233.h"
 #include "storage.h"
 
 #include "regs/usbphy.h"
@@ -792,6 +793,13 @@ bool dbg_hw_info_ocotp(void)
     }
 }
 
+static void get_pwm_freq_duty(int chan, int *freq, int *duty)
+{
+    struct imx233_pwm_info_t info = imx233_pwm_get_info(chan);
+    *freq = imx233_clkctrl_get_freq(CLK_XTAL) * 1000 / info.cdiv / info.period;
+    *duty = (info.inactive - info.active) * 100 / info.period;
+}
+
 bool dbg_hw_info_pwm(void)
 {
     lcd_setfont(FONT_SYSFIXED);
@@ -833,14 +841,14 @@ bool dbg_hw_info_pwm(void)
             }
             else
             {
-                char *prefix = "";
-                int freq = imx233_clkctrl_get_freq(CLK_XTAL) * 1000 / info.cdiv / info.period;
+                int freq, duty;
+                get_pwm_freq_duty(i, &freq, &duty);
+                const char *prefix = "";
                 if(freq > 1000)
                 {
                     prefix = "K";
                     freq /= 1000;
                 }
-                int duty = (info.inactive - info.active) * 100 / info.period;
                 lcd_putsf(0, line++, "%d @%d %sHz, %d%% %c/%c", i, freq, prefix,
                     duty, info.active_state, info.inactive_state);
             }
@@ -1261,6 +1269,125 @@ bool dbg_hw_info_sdmmc(void)
     }
 }
 
+static const char *get_led_col(enum imx233_led_color_t col)
+{
+    switch(col)
+    {
+        case LED_RED: return "red";
+        case LED_GREEN: return "green";
+        case LED_BLUE: return "blue";
+        default: return "unknown";
+    }
+}
+
+bool dbg_hw_info_led(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+    int cur_led = 0, cur_chan = 0;
+    bool nr_leds = imx233_led_get_count();
+    struct imx233_led_t *leds = imx233_led_get_info();
+    bool prev_pending = false;
+    bool next_pending = false;
+    bool editing = false;
+
+    while(1)
+    {
+        int button = my_get_action(HZ / 10);
+        switch(button)
+        {
+            case ACT_NEXT:
+                if(nr_leds > 0 && !editing)
+                {
+                    cur_chan++;
+                    if(cur_chan == leds[cur_led].nr_chan)
+                    {
+                        cur_chan = 0;
+                        cur_led = (cur_led + 1) % nr_leds;
+                    }
+                }
+                else
+                    next_pending = true;
+                break;
+            case ACT_PREV:
+                if(nr_leds > 0 && !editing)
+                {
+                    cur_chan--;
+                    if(cur_chan == -1)
+                    {
+                        cur_led = (cur_led + nr_leds - 1) % nr_leds;
+                        cur_chan = leds[cur_led].nr_chan - 1;
+                    }
+                }
+                else
+                    prev_pending = true;
+                break;
+            case ACT_OK:
+                editing = !editing;
+                break;
+            case ACT_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        lcd_clear_display();
+        int line = 0;
+        if(nr_leds == 0)
+            lcd_putsf(0, line++, "This device has no LED!");
+        for(int led = 0; led < imx233_led_get_count(); led++)
+        {
+            lcd_putsf(0, line++, "LED %d:", led);
+            for(int chan = 0; chan < leds[led].nr_chan; chan++)
+            {
+                /* read current configuration */
+                char buffer[64];
+                bool use_pwm = false;
+                int duty = 0, freq = 1;
+                bool on = false;
+                if(leds[led].chan[chan].has_pwm &&
+                        imx233_pwm_is_enabled(leds[led].chan[chan].pwm_chan))
+                {
+                    get_pwm_freq_duty(leds[led].chan[chan].pwm_chan, &freq, &duty);
+                    /* assume active is high and inactive is low */
+                    snprintf(buffer, sizeof(buffer), "%d Hz, %d%%", freq, duty);
+                    use_pwm = true;
+                }
+                else
+                {
+                    on = imx233_pinctrl_get_gpio(leds[led].chan[chan].gpio_bank,
+                        leds[led].chan[chan].gpio_pin);
+                    snprintf(buffer, sizeof(buffer), "%s", on ? "on" : "off");
+                }
+                if(cur_led == led && cur_chan == chan)
+                    lcd_set_foreground(editing ? LCD_RGBPACK(255, 0, 0) : LCD_RGBPACK(0, 0, 255));
+                lcd_putsf(0, line++, "  %s: %s",
+                    get_led_col(leds[led].chan[chan].color), buffer);
+                lcd_set_foreground(LCD_WHITE);
+                /* do edit */
+                if(cur_led != led || cur_chan != chan || !editing)
+                    continue;
+                if(!next_pending && !prev_pending)
+                    continue;
+                bool inc = next_pending;
+                next_pending = false;
+                prev_pending = false;
+                if(use_pwm)
+                {
+                    duty += inc ? 10 : -10;
+                    if(duty < 0)
+                        duty = 0;
+                    if(duty > 100)
+                        duty = 100;
+                    imx233_led_set_pwm(cur_led, cur_chan, freq, duty);
+                }
+                else
+                    imx233_led_set(cur_led, cur_chan, !on);
+            }
+        }
+        lcd_update();
+        yield();
+    }
+}
+
 #ifdef HAVE_DUALBOOT_STUB
 bool dbg_hw_info_dualboot(void)
 {
@@ -1341,6 +1468,7 @@ static struct
     {"timrot", dbg_hw_info_timrot},
     {"button", dbg_hw_info_button},
     {"sdmmc", dbg_hw_info_sdmmc},
+    {"led", dbg_hw_info_led},
 #ifdef HAVE_DUALBOOT_STUB
     {"dualboot", dbg_hw_info_dualboot},
 #endif
