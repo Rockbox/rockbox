@@ -54,9 +54,18 @@ bool imx233_pwm_is_enabled(int channel)
 void imx233_pwm_enable(int channel, bool enable)
 {
     if(enable)
+    {
+        /* claim pin */
+        imx233_pinctrl_setup_vpin(VPIN_PWM(channel), "pwm", PINCTRL_DRIVE_4mA, false);
         BF_SET(PWM_CTRL, PWMx_ENABLE(channel));
+    }
     else
+    {
         BF_CLR(PWM_CTRL, PWMx_ENABLE(channel));
+        /* stop claiming the pin */
+        imx233_pinctrl_release(VPIN_UNPACK_BANK(VPIN_PWM(channel)),
+            VPIN_UNPACK_PIN(VPIN_PWM(channel)), "pwm");
+    }
 }
 
 void imx233_pwm_setup(int channel, int period, int cdiv, int active,
@@ -66,8 +75,6 @@ void imx233_pwm_setup(int channel, int period, int cdiv, int active,
     bool enable = imx233_pwm_is_enabled(channel);
     if(enable)
         imx233_pwm_enable(channel, false);
-    /* setup pin */
-    imx233_pinctrl_setup_vpin(VPIN_PWM(channel), "pwm", PINCTRL_DRIVE_4mA, false);
     /* watch the order ! active THEN period
      * NOTE: the register value is period-1 */
     BF_WR_ALL(PWM_ACTIVEn(channel), ACTIVE(active), INACTIVE(inactive));
