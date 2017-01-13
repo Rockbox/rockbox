@@ -18,14 +18,15 @@
   #define ICODE_ATTR
 #endif
 
-#if (CONFIG_CPU == MCF5250) || (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+#if (CONFIG_CPU == MCF5250) || (CONFIG_CPU == PP5022) || \
+    (CONFIG_CPU == PP5024) || (CONFIG_CPU == S5L8702)
 #define ICODE_ATTR_FLAC ICODE_ATTR
 #define IBSS_ATTR_FLAC  IBSS_ATTR
 /* Enough IRAM to move additional data to it. */
 #define IBSS_ATTR_FLAC_LARGE_IRAM   IBSS_ATTR
 #define IBSS_ATTR_FLAC_XLARGE_IRAM
 
-#elif defined(CPU_S5L870X)
+#elif (CONFIG_CPU == S5L8700) || (CONFIG_CPU == S5L8701)
 #define ICODE_ATTR_FLAC ICODE_ATTR
 #define IBSS_ATTR_FLAC  IBSS_ATTR
 /* Enough IRAM to move even more additional data to it. */

@@ -95,7 +95,7 @@
 /* Not enough IRAM available to move further data to it. */
 #define IBSS_ATTR_SPC_LARGE_IRAM
 
-#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || (CONFIG_CPU == S5L8702)
 #define IBSS_ATTR_SPC               IBSS_ATTR
 #define ICODE_ATTR_SPC              ICODE_ATTR
 #define ICONST_ATTR_SPC             ICONST_ATTR
@@ -103,7 +103,7 @@
 /* Not enough IRAM available to move further data to it. */
 #define IBSS_ATTR_SPC_LARGE_IRAM
 
-#elif defined(CPU_S5L870X)
+#elif (CONFIG_CPU == S5L8700) || (CONFIG_CPU == S5L8701)
 #define IBSS_ATTR_SPC               IBSS_ATTR
 #define ICODE_ATTR_SPC              ICODE_ATTR
 #define ICONST_ATTR_SPC             ICONST_ATTR

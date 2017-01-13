@@ -199,6 +199,9 @@ enum {
 
 void system_init(void)
 {
+    /* disable IRAM1 (not used because it is slower than DRAM) */
+    clockgate_enable(CLOCKGATE_SM1, false);
+
     clocking_init(clk_modes, 0);
 #ifndef BOOTLOADER
     gpio_preinit();

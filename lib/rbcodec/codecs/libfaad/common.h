@@ -58,14 +58,14 @@ extern struct codec_api* ci;
 #define ICONST_ATTR_FAAD_LARGE_IRAM ICONST_ATTR
 #define IBSS_ATTR_FAAD_XLR
 
-#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024)
+#elif (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || (CONFIG_CPU == S5L8702)
 /* Enough IRAM to move additional data and code to it. */
 #define IBSS_ATTR_FAAD_LARGE_IRAM   IBSS_ATTR
 #define ICODE_ATTR_FAAD_LARGE_IRAM  ICODE_ATTR
 #define ICONST_ATTR_FAAD_LARGE_IRAM ICONST_ATTR
 #define IBSS_ATTR_FAAD_XLR
 
-#elif defined(CPU_S5L870X)
+#elif (CONFIG_CPU == S5L8700) || (CONFIG_CPU == S5L8701)
 /* Very large IRAM. Move even more data to it. */
 #define IBSS_ATTR_FAAD_LARGE_IRAM   IBSS_ATTR
 #define ICODE_ATTR_FAAD_LARGE_IRAM  ICODE_ATTR
