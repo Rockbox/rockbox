@@ -159,9 +159,10 @@ OUTPUT_FORMAT(elf32-littlemips)
 
 #elif CONFIG_CPU==S5L8702
 /* S5L8702 have 256KB of IRAM */
+/* IRAM1 (2nd 128KB block) is not used because it is slower than DRAM */
 #define DRAMORIG 0x08000000
-#define IRAMORIG (0x00000000 + (56*1024))
-#define IRAMSIZE (200*1024)
+#define IRAMORIG (0x00000000 + (48*1024))
+#define IRAMSIZE (80*1024)
 
 #elif CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B
 #undef STUBOFFSET

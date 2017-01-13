@@ -19,7 +19,7 @@ STARTUP(target/arm/s5l8702/crt0.o)
 
 #define DRAMSIZE (DRAM_SIZE - PLUGINSIZE - CODECSIZE - TTB_SIZE)
 #define CODECORIG (ENDAUDIOADDR)
-#define IRAMSIZE (56*1024)  /* 256KB total - 56KB for core, 200KB for codecs */
+#define IRAMSIZE (48*1024)  /* 256KB total - 48KB for core, 200KB for codecs */
 
 /* Where the codec buffer ends, and the plugin buffer starts */
 #define ENDADDR (ENDAUDIOADDR + CODECSIZE)

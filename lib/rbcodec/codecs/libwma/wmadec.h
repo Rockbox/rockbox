@@ -52,13 +52,14 @@
 #define LSP_POW_BITS 7
 
 
-#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || (CONFIG_CPU == MCF5250)
+#if (CONFIG_CPU == PP5022) || (CONFIG_CPU == PP5024) || \
+    (CONFIG_CPU == MCF5250) || (CONFIG_CPU == S5L8702)
 /* PP5022/24 and MCF5250 have 128KB of IRAM. 80KB are allocated for codecs */
 #define IBSS_ATTR_WMA_LARGE_IRAM IBSS_ATTR
 #define IBSS_ATTR_WMA_XL_IRAM
 #define ICONST_ATTR_WMA_XL_IRAM
 
-#elif defined(CPU_S5L870X)
+#elif (CONFIG_CPU == S5L8700) || (CONFIG_CPU == S5L8701)
 /* S5L870x has even more IRAM. Use it. */
 #define IBSS_ATTR_WMA_LARGE_IRAM IBSS_ATTR
 #define IBSS_ATTR_WMA_XL_IRAM    IBSS_ATTR

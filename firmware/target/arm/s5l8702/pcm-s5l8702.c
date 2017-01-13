@@ -207,7 +207,6 @@ void pcm_dma_apply_settings(void)
 
 void pcm_play_dma_init(void)
 {
-    PWRCON(0) &= ~(1 << 4);
     PWRCON(1) &= ~(1 << 7);
 
     dmac_ch_init(&dma_play_ch, &dma_play_ch_cfg);
@@ -406,7 +405,6 @@ void pcm_rec_dma_init(void)
     if (pcm_rec_initialized)
         return;
 
-    PWRCON(0) &= ~(1 << 4);
     PWRCON(1) &= ~(1 << 7);
 
     dmac_ch_init(&dma_rec_ch, &dma_rec_ch_cfg);
