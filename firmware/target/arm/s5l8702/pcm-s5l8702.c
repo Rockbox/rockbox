@@ -407,7 +407,7 @@ void pcm_rec_dma_init(void)
         return;
 
     PWRCON(0) &= ~(1 << 4);
-    PWRCON(0) &= ~(1 << 7);
+    PWRCON(1) &= ~(1 << 7);
 
     dmac_ch_init(&dma_rec_ch, &dma_rec_ch_cfg);
 
