@@ -14,12 +14,40 @@
 int allocs = 0;
 int frees = 0;
 
+bool audiobuf_available =
+#ifndef COMBINED
+    true;
+#else
+    false;
+#endif
+
+static bool grab_audiobuf(void)
+{
+    if(!audiobuf_available)
+        return false;
+
+    if(rb->audio_status())
+        rb->audio_stop();
+
+    size_t sz, junk;
+    void *audiobuf = rb->plugin_get_audio_buffer(&sz);
+    extern char *giant_buffer;
+
+    add_new_area(audiobuf, sz, giant_buffer);
+    audiobuf_available = false;
+    return true;
+}
+
 void *smalloc(size_t size) {
     void *p;
     p = malloc(size);
     LOGF("allocs: %d", ++allocs);
     if (!p)
-	fatal("out of memory");
+    {
+        if(grab_audiobuf())
+            return smalloc(size);
+        fatal("out of memory");
+    }
     return p;
 }
 
@@ -30,7 +58,7 @@ void sfree(void *p) {
     if (p) {
         ++frees;
         LOGF("frees: %d, total outstanding: %d", frees, allocs - frees);
-	free(p);
+        free(p);
     }
 }
 
@@ -46,7 +74,11 @@ void *srealloc(void *p, size_t size) {
 	q = malloc(size);
     }
     if (!q)
-	fatal("out of memory");
+    {
+        if(grab_audiobuf())
+            return srealloc(p, size);
+        fatal("out of memory");
+    }
     return q;
 }
 

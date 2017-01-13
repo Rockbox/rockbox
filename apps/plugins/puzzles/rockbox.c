@@ -71,6 +71,7 @@ static void fix_size(void);
 
 static struct viewport clip_rect;
 static bool clipped = false;
+extern bool audiobuf_available;
 
 static struct settings_t {
     int slowmo_factor;
@@ -1026,7 +1027,10 @@ static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
              * care, I bet */
             return ACTION_EXIT_MENUITEM;
 #else
-            break;
+            if(audiobuf_available)
+                break;
+            else
+                return ACTION_EXIT_MENUITEM;
 #endif
         case 9:
             if(!midend_num_presets(me))
@@ -1355,10 +1359,10 @@ void deactivate_timer(frontend *fe)
 
 #ifdef COMBINED
 /* can't use audio buffer */
-static char giant_buffer[1024*1024*4];
+char giant_buffer[1024*1024*4];
 #else
-/* points to audiobuf */
-static char *giant_buffer = NULL;
+/* points to pluginbuf */
+char *giant_buffer = NULL;
 #endif
 static size_t giant_buffer_len = 0; /* set on start */
 
@@ -1565,6 +1569,18 @@ static int mainmenu_cb(int action, const struct menu_item_ex *this_item)
             return ACTION_EXIT_MENUITEM;
 #else
             break;
+#endif
+        case 4:
+#ifdef COMBINED
+            /* audio buf is used, so no playback */
+            /* TODO: neglects app builds, but not many people will
+             * care, I bet */
+            return ACTION_EXIT_MENUITEM;
+#else
+            if(audiobuf_available)
+                break;
+            else
+                return ACTION_EXIT_MENUITEM;
 #endif
         case 5:
             if(!midend_num_presets(me))
