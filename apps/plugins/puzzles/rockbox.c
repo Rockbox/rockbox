@@ -30,7 +30,6 @@
 #include "lib/playback_control.h"
 #endif
 #include "lib/xlcd.h"
-#include "fixedpoint.h"
 
 /* how many ticks between timer callbacks */
 #define TIMER_INTERVAL (HZ / 50)
@@ -76,7 +75,7 @@ extern bool audiobuf_available;
 
 static struct settings_t {
     int slowmo_factor;
-    bool bulk, timerflash, clipoff, shortcuts, no_aa;
+    bool bulk, timerflash, clipoff;
 } settings;
 
 /* clipping is implemented through viewports and offsetting
@@ -180,129 +179,14 @@ static void rb_draw_rect(void *handle, int x, int y, int w, int h, int color)
     rb->lcd_fillrect(x, y, w, h);
 }
 
-#define SWAP(a, b, t) do { t = a; a = b; b = t; } while(0);
-
-#define fp_fpart(f, bits) ((f) & ((1 << (bits)) - 1))
-#define fp_rfpart(f, bits) ((1 << (bits)) - fp_fpart(f, bits))
-
-#define FRACBITS 16
-
-/* most of our time drawing lines is spent in this function! */
-static inline void plot(unsigned x, unsigned y, unsigned long a,
-                        unsigned long r1, unsigned long g1, unsigned long b1,
-                        unsigned cl, unsigned cr, unsigned cu, unsigned cd)
-{
-    /* This is really quite possibly the least efficient way of doing
-       this. A better way would be in draw_antialiased_line(), but the
-       problem with that is that the algorithms I investigated at
-       least were incorrect at least part of the time and didn't make
-       drawing much faster overall. */
-    if(!(cl <= x && x < cr && cu <= y && y < cd))
-        return;
-
-    fb_data *ptr = rb->lcd_framebuffer + y * LCD_WIDTH + x;
-    fb_data orig = *ptr;
-    unsigned long r2, g2, b2;
-    r2 = RGB_UNPACK_RED(orig);
-    g2 = RGB_UNPACK_GREEN(orig);
-    b2 = RGB_UNPACK_BLUE(orig);
-
-    unsigned long r, g, b;
-    r = ((r1 * a) + (r2 * (256 - a))) >> 8;
-    g = ((g1 * a) + (g2 * (256 - a))) >> 8;
-    b = ((b1 * a) + (b2 * (256 - a))) >> 8;
-
-    *ptr = LCD_RGBPACK(r, g, b);
-}
-
-#undef ABS
-#define ABS(a) ((a)<0?-(a):(a))
-
-/* speed benchmark: 34392 lines/sec vs 112687 non-antialiased
- * lines/sec at full optimization on ipod6g */
-
-/* expects UN-OFFSET coordinates, directly access framebuffer */
-static void draw_antialiased_line(int x0, int y0, int x1, int y1)
-{
-    /* fixed-point Wu's algorithm, modified for integer-only endpoints */
-
-    /* passed to plot() to avoid re-calculation */
-    unsigned short l = 0, r = LCD_WIDTH, u = 0, d = LCD_HEIGHT;
-    if(clipped)
-    {
-        l = clip_rect.x;
-        r = clip_rect.x + clip_rect.width;
-        u = clip_rect.y;
-        d = clip_rect.y + clip_rect.height;
-    }
-
-    bool steep = ABS(y1 - y0) > ABS(x1 - x0);
-    int tmp;
-    if(steep)
-    {
-        SWAP(x0, y0, tmp);
-        SWAP(x1, y1, tmp);
-    }
-    if(x0 > x1)
-    {
-        SWAP(x0, x1, tmp);
-        SWAP(y0, y1, tmp);
-    }
-
-    int dx, dy;
-    dx = x1 - x0;
-    dy = y1 - y0;
-
-    if(!(dx << FRACBITS))
-        return; /* bail out */
-
-    long gradient = fp_div(dy << FRACBITS, dx << FRACBITS, FRACBITS);
-    long intery = (y0 << FRACBITS);
-
-    unsigned color = rb->lcd_get_foreground();
-    unsigned long r1, g1, b1;
-    r1 = RGB_UNPACK_RED(color);
-    g1 = RGB_UNPACK_GREEN(color);
-    b1 = RGB_UNPACK_BLUE(color);
-
-    /* main loop */
-    if(steep)
-    {
-        for(int x = x0; x <= x1; ++x, intery += gradient)
-        {
-            unsigned y = intery >> FRACBITS;
-            unsigned alpha = fp_fpart(intery, FRACBITS) >> (FRACBITS - 8);
-
-            plot(y, x, (1 << 8) - alpha, r1, g1, b1, l, r, u, d);
-            plot(y + 1, x, alpha, r1, g1, b1, l, r, u, d);
-        }
-    }
-    else
-    {
-        for(int x = x0; x <= x1; ++x, intery += gradient)
-        {
-            unsigned y = intery >> FRACBITS;
-            unsigned alpha = fp_fpart(intery, FRACBITS) >> (FRACBITS - 8);
-
-            plot(x, y, (1 << 8) - alpha, r1, g1, b1, l, r, u, d);
-            plot(x, y + 1, alpha, r1, g1, b1, l, r, u, d);
-        }
-    }
-}
-
 static void rb_draw_line(void *handle, int x1, int y1, int x2, int y2,
                          int color)
 {
     LOGF("rb_draw_line(%d, %d, %d, %d, %d)", x1, y1, x2, y2, color);
+    offset_coords(&x1, &y1);
+    offset_coords(&x2, &y2);
     rb_color(color);
-    if(settings.no_aa)
-    {
-        offset_coords(&x1, &y1);
-        offset_coords(&x2, &y2);
-        rb->lcd_drawline(x1, y1, x2, y2);
-    }
-    else
-        draw_antialiased_line(x1, y1, x2, y2);
+    rb->lcd_drawline(x1, y1, x2, y2);
 }
 
 /*
@@ -467,15 +351,12 @@ static void rb_draw_poly(void *handle, int *coords, int npoints,
         y1 = coords[2 * (i - 1) + 1];
         x2 = coords[2 * i];
         y2 = coords[2 * i + 1];
-        if(settings.no_aa)
-        {
-            offset_coords(&x1, &y1);
-            offset_coords(&x2, &y2);
-            rb->lcd_drawline(x1, y1,
-                             x2, y2);
-        }
-        else
-            draw_antialiased_line(x1, y1, x2, y2);
+        offset_coords(&x1, &y1);
+        offset_coords(&x2, &y2);
+        rb->lcd_drawline(x1, y1,
+                         x2, y2);
+        //rb->lcd_update();
+        //rb->sleep(HZ/2);
     }
 
     int x1, y1, x2, y2;
@@ -483,16 +364,11 @@ static void rb_draw_poly(void *handle, int *coords, int npoints,
     y1 = coords[1];
     x2 = coords[2 * (npoints - 1)];
     y2 = coords[2 * (npoints - 1) + 1];
-    if(settings.no_aa)
-    {
-        offset_coords(&x1, &y1);
-        offset_coords(&x2, &y2);
+    offset_coords(&x1, &y1);
+    offset_coords(&x2, &y2);
 
-        rb->lcd_drawline(x1, y1,
-                         x2, y2);
-    }
-    else
-        draw_antialiased_line(x1, y1, x2, y2);
+    rb->lcd_drawline(x1, y1,
+                     x2, y2);
 }
 
 static void rb_draw_circle(void *handle, int cx, int cy, int radius,
@@ -518,35 +394,6 @@ struct blitter {
     struct bitmap bmp;
 };
 
-/* originally from emcc.c */
-static void trim_rect(int *x, int *y, int *w, int *h)
-{
-    int x0, x1, y0, y1;
-
-    /*
-     * Reduce the size of the copied rectangle to stop it going
-     * outside the bounds of the canvas.
-     */
-
-    /* Transform from x,y,w,h form into coordinates of all edges */
-    x0 = *x;
-    y0 = *y;
-    x1 = *x + *w;
-    y1 = *y + *h;
-
-    /* Clip each coordinate at both extremes of the canvas */
-    x0 = (x0 < 0 ? 0 : x0 > LCD_WIDTH - 1 ? LCD_WIDTH - 1: x0);
-    x1 = (x1 < 0 ? 0 : x1 > LCD_WIDTH - 1 ? LCD_WIDTH - 1: x1);
-    y0 = (y0 < 0 ? 0 : y0 > LCD_HEIGHT - 1 ? LCD_HEIGHT - 1: y0);
-    y1 = (y1 < 0 ? 0 : y1 > LCD_HEIGHT - 1 ? LCD_HEIGHT - 1: y1);
-
-    /* Transform back into x,y,w,h to return */
-    *x = x0;
-    *y = y0;
-    *w = x1 - x0;
-    *h = y1 - y0;
-}
-
 static blitter *rb_blitter_new(void *handle, int w, int h)
 {
     LOGF("rb_blitter_new");
@@ -564,6 +411,35 @@ static void rb_blitter_free(void *handle, blitter *bl)
     sfree(bl->bmp.data);
     sfree(bl);
     return;
+}
+
+/* originally from emcc.c */
+static void trim_rect(int *x, int *y, int *w, int *h)
+{
+    int x0, x1, y0, y1;
+
+    /*
+     * Reduce the size of the copied rectangle to stop it going
+     * outside the bounds of the canvas.
+     */
+
+    /* Transform from x,y,w,h form into coordinates of all edges */
+    x0 = *x;
+    y0 = *y;
+    x1 = *x + *w;
+    y1 = *y + *h;
+
+    /* Clip each coordinate at both extremes of the canvas */
+    x0 = (x0 < 0 ? 0 : x0 > LCD_WIDTH ? LCD_WIDTH : x0);
+    x1 = (x1 < 0 ? 0 : x1 > LCD_WIDTH ? LCD_WIDTH : x1);
+    y0 = (y0 < 0 ? 0 : y0 > LCD_HEIGHT ? LCD_HEIGHT : y0);
+    y1 = (y1 < 0 ? 0 : y1 > LCD_HEIGHT ? LCD_HEIGHT : y1);
+
+    /* Transform back into x,y,w,h to return */
+    *x = x0;
+    *y = y0;
+    *w = x1 - x0;
+    *h = y1 - y0;
 }
 
 /* copy a section of the framebuffer */
@@ -747,6 +623,8 @@ void get_random_seed(void **randseed, int *randseedsize)
     *randseed = snew(long);
     long seed = *rb->current_tick;
     rb->memcpy(*randseed, &seed, sizeof(seed));
+    //*(long*)*randseed = 42; // debug
+    //rb->splash(HZ, "DEBUG SEED ON");
     *randseedsize = sizeof(long);
 }
 
@@ -805,11 +683,9 @@ static int list_choose(const char *list_str, const char *title)
     }
 }
 
-#define CONFIGMENU_FREEDSTR 1
-#define CONFIGMENU_SUCCESS 2
-static int do_configure_item(config_item *cfg)
+/* return value is only meaningful when type == C_STRING */
+static bool do_configure_item(config_item *cfg)
 {
-    int rc = 0;
     switch(cfg->type)
     {
     case C_STRING:
@@ -822,46 +698,35 @@ static int do_configure_item(config_item *cfg)
         if(rb->kbd_input(newstr, MAX_STRLEN) < 0)
         {
             sfree(newstr);
-            return rc;
+            return false;
         }
-        if(strcmp(newstr, cfg->sval))
-            rc |= CONFIGMENU_SUCCESS;
         sfree(cfg->sval);
         cfg->sval = newstr;
-        rc |= CONFIGMENU_FREEDSTR;
-        return rc;
+        return true;
     }
     case C_BOOLEAN:
     {
         bool res = cfg->ival != 0;
-        bool orig = res;
         rb->set_bool(cfg->name, &res);
 
         /* seems to reset backdrop */
         rb->lcd_set_backdrop(NULL);
 
         cfg->ival = res;
-        if(cfg->ival != orig)
-            rc |= CONFIGMENU_SUCCESS;
         break;
     }
     case C_CHOICES:
     {
-        int old = cfg->ival;
         int sel = list_choose(cfg->sval, cfg->name);
         if(sel >= 0)
-        {
             cfg->ival = sel;
-        }
-        if(cfg->ival != old)
-            rc |= CONFIGMENU_SUCCESS;
         break;
     }
     default:
         fatal("bad type");
         break;
     }
-    return rc;
+    return false;
 }
 
 const char *config_formatter(int sel, void *data, char *buf, size_t len)
@@ -872,12 +737,10 @@ const char *config_formatter(int sel, void *data, char *buf, size_t len)
     return buf;
 }
 
-static bool config_menu(void)
+static void config_menu(void)
 {
     char *title;
     config_item *config = midend_get_config(me, CFG_SETTINGS, &title);
-
-    bool success = false;
 
     if(!config)
     {
@@ -922,23 +785,19 @@ static bool config_menu(void)
             char *old_str;
             if(old.type == C_STRING)
                 old_str = dupstr(old.sval);
-            int rc = do_configure_item(config + pos);
+            bool freed_str = do_configure_item(config + pos);
             char *err = midend_set_config(me, CFG_SETTINGS, config);
             if(err)
             {
                 rb->splash(HZ, err);
                 memcpy(config + pos, &old, sizeof(old));
-                if(rc & CONFIGMENU_FREEDSTR)
+                if(freed_str)
                     config[pos].sval = old_str;
             }
             else if(old.type == C_STRING)
             {
                 /* success, and we duplicated the old string, so free it */
                 sfree(old_str);
-            }
-            if(!err && (rc & CONFIGMENU_SUCCESS))
-            {
-                success = true;
             }
             break;
         }
@@ -954,7 +813,6 @@ static bool config_menu(void)
 done:
     sfree(title);
     free_cfg(config);
-    return success;
 }
 
 const char *preset_formatter(int sel, void *data, char *buf, size_t len)
@@ -966,12 +824,12 @@ const char *preset_formatter(int sel, void *data, char *buf, size_t len)
     return buf;
 }
 
-static bool presets_menu(void)
+static void presets_menu(void)
 {
     if(!midend_num_presets(me))
     {
         rb->splash(HZ, "No presets!");
-        return false;
+        return;
     }
 
     /* display a list */
@@ -985,8 +843,9 @@ static bool presets_menu(void)
     int current = midend_which_preset(me);
     rb->gui_synclist_select_item(&list, current >= 0 ? current : 0);
 
+    bool done = false;
     rb->gui_synclist_set_title(&list, "Game Type", NOICON);
-    while(1)
+    while (!done)
     {
         rb->gui_synclist_draw(&list);
         int button = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
@@ -1001,11 +860,13 @@ static bool presets_menu(void)
             game_params *params;
             midend_fetch_preset(me, sel, &junk, &params);
             midend_set_params(me, params);
-            return true;
+            done = true;
+            break;
         }
         case ACTION_STD_PREV:
         case ACTION_STD_CANCEL:
-            return false;
+            done = true;
+            break;
         default:
             break;
         }
@@ -1087,37 +948,6 @@ static void init_default_settings(void)
     settings.slowmo_factor = 1;
     settings.bulk = false;
     settings.timerflash = false;
-    settings.clipoff = false;
-    settings.shortcuts = false;
-    settings.no_aa = false;
-}
-
-static void bench_aa(void)
-{
-    rb->sleep(0);
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
-#endif
-    int next = *rb->current_tick + HZ;
-    int i = 0;
-    while(*rb->current_tick < next)
-    {
-        draw_antialiased_line(0, 0, 20, 31);
-        ++i;
-    }
-    rb->splashf(HZ, "%d AA lines/sec", i);
-    next = *rb->current_tick + HZ;
-    int j = 0;
-    while(*rb->current_tick < next)
-    {
-        rb->lcd_drawline(0, 0, 20, 31);
-        ++j;
-    }
-    rb->splashf(HZ, "%d normal lines/sec", j);
-    rb->splashf(HZ, "Efficiency: %d%%", 100 * i / j);
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false);
-#endif
 }
 
 static void debug_menu(void)
@@ -1128,9 +958,6 @@ static void debug_menu(void)
                         "Toggle bulk update",
                         "Toggle flash pixel on timer",
                         "Toggle clip",
-                        "Toggle shortcuts",
-                        "Toggle antialias",
-                        "Benchmark antialias",
                         "Back");
     bool quit = false;
     int sel = 0;
@@ -1161,15 +988,6 @@ static void debug_menu(void)
             settings.clipoff = !settings.clipoff;
             break;
         case 5:
-            settings.shortcuts = !settings.shortcuts;
-            break;
-        case 6:
-            settings.no_aa = !settings.no_aa;
-            break;
-        case 7:
-            bench_aa();
-            break;
-        case 8:
         default:
             quit = true;
             break;
@@ -1235,23 +1053,6 @@ static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
         }
     }
     return action;
-}
-
-static void clear_and_draw(void)
-{
-    rb->lcd_clear_display();
-    rb->lcd_update();
-
-    midend_force_redraw(me);
-    draw_title();
-}
-
-static void reset_drawing(void)
-{
-    rb->lcd_set_viewport(NULL);
-    rb->lcd_set_backdrop(NULL);
-    rb->lcd_set_foreground(LCD_BLACK);
-    rb->lcd_set_background(BG_COLOR);
 }
 
 static int pause_menu(void)
@@ -1338,27 +1139,19 @@ static int pause_menu(void)
             playback_control(NULL);
             break;
         case 9:
-            if(presets_menu())
-            {
-                midend_new_game(me);
-                fix_size();
-                reset_drawing();
-                clear_and_draw();
-                quit = true;
-            }
+            presets_menu();
+            midend_new_game(me);
+            fix_size();
+            quit = true;
             break;
         case 10:
             debug_menu();
             break;
         case 11:
-            if(config_menu())
-            {
-                midend_new_game(me);
-                fix_size();
-                reset_drawing();
-                clear_and_draw();
-                quit = true;
-            }
+            config_menu();
+            midend_new_game(me);
+            fix_size();
+            quit = true;
             break;
 #ifdef COMBINED
         case 12:
@@ -1464,8 +1257,8 @@ static int process_input(int tmo)
         }
         LOGF("accepting event 0x%08x", button);
     }
-    /* default is to ignore repeats except for untangle */
-    else if(strcmp("Untangle", midend_which_game(me)->name))
+    /* not inertia: events fire on presses */
+    else
     {
         /* start accepting input again after a release */
         if(!button)
@@ -1474,7 +1267,6 @@ static int process_input(int tmo)
             return 0;
         }
         /* ignore repeats */
-        /* Untangle gets special treatment */
         if(!accept_input)
             return 0;
         accept_input = false;
@@ -1524,34 +1316,7 @@ static int process_input(int tmo)
     case BTN_FIRE:
         state = CURSOR_SELECT;
         break;
-
-    default:
-        break;
     }
-
-    if(settings.shortcuts)
-    {
-        static bool shortcuts_ok = true;
-        switch(button)
-        {
-        case BTN_LEFT | BTN_FIRE:
-            if(shortcuts_ok)
-                midend_process_key(me, 0, 0, 'u');
-            shortcuts_ok = false;
-            break;
-        case BTN_RIGHT | BTN_FIRE:
-            if(shortcuts_ok)
-                midend_process_key(me, 0, 0, 'r');
-            shortcuts_ok = false;
-            break;
-        case 0:
-            shortcuts_ok = true;
-            break;
-        default:
-            break;
-        }
-    }
-
     LOGF("process_input done");
     LOGF("------------------");
     return state;
@@ -1638,23 +1403,13 @@ static void write_wrapper(void *ptr, void *buf, int len)
     rb->write(fd, buf, len);
 }
 
-static void init_colors(void)
+static void clear_and_draw(void)
 {
-    float *floatcolors = midend_colors(me, &ncolors);
+    rb->lcd_clear_display();
+    rb->lcd_update();
 
-    /* convert them to packed RGB */
-    colors = smalloc(ncolors * sizeof(unsigned));
-    unsigned *ptr = colors;
-    float *floatptr = floatcolors;
-    for(int i = 0; i < ncolors; ++i)
-    {
-        int r = 255 * *(floatptr++);
-        int g = 255 * *(floatptr++);
-        int b = 255 * *(floatptr++);
-        LOGF("color %d is %d %d %d", i, r, g, b);
-        *ptr++ = LCD_RGBPACK(r, g, b);
-    }
-    sfree(floatcolors);
+    midend_force_redraw(me);
+    draw_title();
 }
 
 static char *init_for_game(const game *gm, int load_fd, bool draw)
@@ -1676,9 +1431,26 @@ static char *init_for_game(const game *gm, int load_fd, bool draw)
 
     fix_size();
 
-    init_colors();
+    float *floatcolors = midend_colors(me, &ncolors);
 
-    reset_drawing();
+    /* convert them to packed RGB */
+    colors = smalloc(ncolors * sizeof(unsigned));
+    unsigned *ptr = colors;
+    float *floatptr = floatcolors;
+    for(int i = 0; i < ncolors; ++i)
+    {
+        int r = 255 * *(floatptr++);
+        int g = 255 * *(floatptr++);
+        int b = 255 * *(floatptr++);
+        LOGF("color %d is %d %d %d", i, r, g, b);
+        *ptr++ = LCD_RGBPACK(r, g, b);
+    }
+    sfree(floatcolors);
+
+    rb->lcd_set_viewport(NULL);
+    rb->lcd_set_backdrop(NULL);
+    rb->lcd_set_foreground(LCD_BLACK);
+    rb->lcd_set_background(BG_COLOR);
 
     if(draw)
     {
@@ -1918,26 +1690,22 @@ enum plugin_status plugin_start(const void *param)
             playback_control(NULL);
             break;
         case 5:
-            if(presets_menu())
+            presets_menu();
+            if(!load_success)
             {
-                midend_new_game(me);
-                fix_size();
-                init_colors();
-                reset_drawing();
                 clear_and_draw();
                 goto game_loop;
             }
+            quit = true;
             break;
         case 6:
-            if(config_menu())
+            config_menu();
+            if(!load_success)
             {
-                midend_new_game(me);
-                fix_size();
-                init_colors();
-                reset_drawing();
                 clear_and_draw();
                 goto game_loop;
             }
+            quit = true;
             break;
         case 8:
             if(load_success)
