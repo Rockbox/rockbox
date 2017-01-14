@@ -348,10 +348,10 @@ struct imx233_audioout_info_t imx233_audioout_get_info(void)
     info.spkrmute[0] = info.spkrmute[1] = BF_RD(AUDIOOUT_SPKRVOL, MUTE);
     info.spkr = !BF_RD(AUDIOOUT_PWRDN, SPEAKER);
 #else
-    /* STMP3700/3770 has not speaker amplifier */
+    /* STMP3700/3770 has not speaker amplifier, assume it is on lineout */
     info.spkrvol[0] = info.spkrvol[1] = 0;
-    info.spkrmute[0] = info.spkrmute[1] = true;
-    info.spkr = false;
+    info.spkrmute[0] = info.spkrmute[1] = BF_RD(AUDIOOUT_LINEOUTCTRL, MUTE);
+    info.spkr = !BF_RD(AUDIOOUT_PWRDN, LINEOUT);
 #endif
     info.ss3d = BF_RD(AUDIOOUT_CTRL, SS3D_EFFECT);
     info.ss3d = info.ss3d == 0 ? 0 : 15 * (1 + info.ss3d);
