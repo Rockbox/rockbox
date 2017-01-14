@@ -849,7 +849,7 @@ static void free_name(int nameidx, size_t size)
     while (beg[-1] == 0xfe)
         --beg;
 
-    while (end[1] == 0xfe)
+    while (end[0] == 0xfe)
         ++end;
 
     size = end - beg;
