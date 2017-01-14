@@ -43,8 +43,8 @@ ROCKS += $(PUZZLES_ROCKS)
 endif
 
 # Hack to suppress all warnings:
-PUZZLESFLAGS = $(filter-out -O%,$(PLUGINFLAGS)) -Os		\
-		-Wno-unused-parameter -Wno-sign-compare -Wno-strict-aliasing -w	\
+PUZZLESFLAGS = $(filter-out -O%,$(PLUGINFLAGS)) -O3		\
+		-Wno-unused-parameter -Wno-sign-compare -Wno-strict-aliasing -w \
 		-DFOR_REAL -I$(PUZZLES_SRCDIR)
 ifdef PUZZLES_COMBINED
 PUZZLESFLAGS += -DCOMBINED

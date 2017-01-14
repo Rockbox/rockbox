@@ -1162,17 +1162,16 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     {
         if(ui->dragpoint < 0)
         {
-            if(ui->cursorpoint < 0)
-            {
-                ui->cursorpoint = 0;
-                return "";
-            }
-
             /* We're selecting a point here. */
             /* Search all the points and find the closest one (2-D) in
              * the given direction. */
             int i, best;
             long bestd;
+
+            if(ui->cursorpoint < 0)
+            {
+                ui->cursorpoint = 0;
+            }
 
             /*
              * Begin drag. We drag the vertex _nearest_ to the pointer,
@@ -1196,7 +1195,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 /* Figure out if this point falls into a 90 degree
                  * range extending from the current point */
 
-                float angle = atan2(-dy, dx); /* adjust for raster coordinates */
+                float angle = atan2(-dy, dx); /* negate y to adjust for raster coordinates */
 
                 /* offset to [0..2*PI] */
                 if(angle < 0)
@@ -1494,6 +1493,8 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     ds->bg = bg;
 
     game_compute_size(&state->params, ds->tilesize, &w, &h);
+
+    clip(dr, 0, 0, w, h);
     draw_rect(dr, 0, 0, w, h, bg);
 
     /*
