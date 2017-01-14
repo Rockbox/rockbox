@@ -37,15 +37,10 @@ void backlight_hw_brightness(int level)
     lcd_set_contrast(level);
 #else
     unsigned val = (level + 200) * level / 1000;
-    if(level != 0)
-    {
-        for(unsigned mask = 0x10; mask; mask >>= 1)
-            imx233_uartdbg_send((val & mask) ? 0xff : 0xf8);
-        imx233_uartdbg_send(0);
-        imx233_pinctrl_set_gpio(1, 12, true);
-    }
-    else
-        imx233_pinctrl_set_gpio(1, 12, false);
+    imx233_pinctrl_set_gpio(1, 12, level > 0);
+    for(unsigned mask = 0x10; mask; mask >>= 1)
+        imx233_uartdbg_send((val & mask) ? 0xff : 0xf8);
+    imx233_uartdbg_send(0);
 #endif
 }
 
