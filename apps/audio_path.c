@@ -164,3 +164,16 @@ int audio_get_spdif_sample_rate(void)
 #endif /* HAVE_SPDIF_IN */
 
 #endif /* PLATFORM_NATIVE */
+
+#ifdef HAVE_SPEAKER
+void audio_enable_speaker(int mode)
+{
+#ifdef HAVE_HEADPHONE_DETECTION
+    /* if needed, query jack state */
+    if(mode == 2)
+        mode = !headphones_inserted();
+#endif
+    /* treat any nonzero value as enable */
+    audiohw_enable_speaker(mode);
+}
+#endif

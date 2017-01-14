@@ -522,6 +522,11 @@ static void unplug_change(bool inserted)
             }
         }
     }
+
+#ifdef HAVE_SPEAKER
+    /* update speaker status */
+    audio_enable_speaker(global_settings.speaker_mode);
+#endif
 }
 #endif
 
