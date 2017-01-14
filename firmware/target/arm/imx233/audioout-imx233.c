@@ -279,6 +279,8 @@ void imx233_audioout_enable_spkr(bool en)
     else
     {
         BF_SET(AUDIOOUT_SPEAKERCTRL, MUTE);
+        /* despite what the manual says, we can perfectly set and clear this bit
+         * at will, no need for a reset */
         BF_SET(AUDIOOUT_PWRDN, SPEAKER);
     }
 #elif IMX233_SUBTARGET >= 3700
@@ -311,6 +313,8 @@ void imx233_audioout_enable_spkr(bool en)
         /** Reverse procedure */
         BF_SET(AUDIOOUT_LINEOUTCTRL, MUTE);
         BF_WR(AUDIOOUT_LINEOUTCTRL, CHARGE_CAP(2));
+        /* despite what the manual says, we can perfectly set and clear this bit
+         * at will, no need for a reset */
         BF_SET(AUDIOOUT_PWRDN, LINEOUT);
     }
 #else
