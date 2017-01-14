@@ -27,6 +27,7 @@
 #include "uartdbg-imx233.h"
 #include "pinctrl-imx233.h"
 #include "pwm-imx233.h"
+#include "kernel.h"
 
 void backlight_hw_brightness(int level)
 {
@@ -59,6 +60,7 @@ void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
+    sleep(HZ / 10); /* make sure screen is not white anymore */
 #endif
     /* restore the previous backlight level */
     backlight_hw_brightness(backlight_brightness);
@@ -69,6 +71,7 @@ void backlight_hw_off(void)
     /* there is no real on/off but we can set to 0 brightness */
     backlight_hw_brightness(0);
 #ifdef HAVE_LCD_ENABLE
+    sleep(HZ / 10); /* make sure backlight is real off since screen will be white */
     lcd_enable(false); /* power off visible display */
 #endif
 }
