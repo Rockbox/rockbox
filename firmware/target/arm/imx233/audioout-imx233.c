@@ -269,7 +269,7 @@ void imx233_audioout_enable_spkr(bool en)
     static bool spkr_en = false;
     if(en == spkr_en)
         return;
-    spkr_en = true;
+    spkr_en = en;
 #if IMX233_SUBTARGET >= 3780
     if(en)
     {
