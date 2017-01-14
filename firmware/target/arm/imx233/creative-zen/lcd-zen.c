@@ -250,6 +250,10 @@ void lcd_enable(bool enable)
 
         imx233_dma_reset_channel(APB_LCDIF);
         imx233_dma_start_command(APB_LCDIF, &lcdif_dma[0].dma);
+        /* wait one frame: the LCD features a normally white thus before the first
+         * frame, the screen might be entirely white and that produces an ugly
+         * flash */
+        wait_nr_frames(1);
     }
     else
     {
