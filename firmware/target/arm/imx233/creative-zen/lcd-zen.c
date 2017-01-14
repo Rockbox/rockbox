@@ -174,7 +174,7 @@ static void lcd_init_seq(void)
     spi_write_reg(0x2, 0x300);
     /* NOTE by default stmp3700 has vsync/hsync active low and data launch
      * at negative edge of dotclk, reflect this in the polarity settings */
-    spi_write_reg(0x3, 0xd040);// polarity (OF uses 0xc040, seems incorrect)
+    spi_write_reg(0x3, 0xf040);// OF uses 0xc040, but DS says bit 12 must be set
     spi_write_reg(0x8, 0); // vsync back porch (0=3H)
     spi_write_reg(0x9, 0); // hsync back porch (0=24clk)
     spi_write_reg(0x76, 0x2213);
