@@ -927,7 +927,7 @@ void settings_apply(bool read_disk)
 #endif
 
 #ifdef HAVE_SPEAKER
-    audiohw_enable_speaker(global_settings.speaker_enabled);
+    audio_enable_speaker(global_settings.speaker_mode);
 #endif
 
     if (read_disk)

@@ -1097,7 +1097,7 @@ bool recording_screen(bool no_source)
 
 #ifdef HAVE_SPEAKER
     /* Disable speaker to prevent feedback */
-    audiohw_enable_speaker(false);
+    audio_enable_speaker(0);
 #endif
 
     audio_init_recording();
@@ -1959,7 +1959,7 @@ rec_abort:
 
 #ifdef HAVE_SPEAKER
     /* Re-enable speaker */
-    audiohw_enable_speaker(global_settings.speaker_enabled);
+    audio_enable_speaker(global_settings.speaker_mode);
 #endif
 
     /* make sure the trigger is really turned off */

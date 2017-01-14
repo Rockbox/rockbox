@@ -232,6 +232,15 @@ int audio_get_spdif_sample_rate(void);
 void audio_spdif_set_monitor(int monitor_spdif);
 #endif /* HAVE_SPDIF_IN */
 
+#ifdef HAVE_SPEAKER
+/* enable/disable the speaker: 0=off, 1=on, 2=on if jack unpluged, off otherwise
+ * NOTE this is a one time thing, this function doesn't implement the logic to
+ * check for jack events, it merely changes the speaker state to the expected
+ * state based on the requested mode.
+ */
+void audio_enable_speaker(int mode);
+#endif
+
 /***********************************************************************/
 /* audio event handling */
 enum track_event_flags

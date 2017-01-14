@@ -225,7 +225,7 @@ static int timestretch_callback(int action,const struct menu_item_ex *this_item)
 #endif
 
 #ifdef HAVE_SPEAKER
-    MENUITEM_SETTING(speaker_enabled, &global_settings.speaker_enabled, NULL);
+    MENUITEM_SETTING(speaker_mode, &global_settings.speaker_mode, NULL);
 #endif
 
 #ifdef AUDIOHW_HAVE_EQ
@@ -269,7 +269,7 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
          ,&mdb_harmonics,&mdb_center,&mdb_shape
 #endif
 #ifdef HAVE_SPEAKER
-         ,&speaker_enabled
+         ,&speaker_mode
 #endif
          );
 

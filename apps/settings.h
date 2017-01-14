@@ -746,8 +746,8 @@ struct user_settings
 #endif
 
 #ifdef HAVE_SPEAKER
-    bool speaker_enabled;
-#endif
+    int speaker_mode; /* 0: off, 1: on, 2: auto (only if headphone detection) */
+#endif /* HAVE_SPEAKER */
     bool prevent_skip;
 
 #ifdef HAVE_TOUCHSCREEN

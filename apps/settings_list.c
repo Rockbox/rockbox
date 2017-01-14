@@ -2118,9 +2118,13 @@ const struct settings_list settings[] = {
                   false, "shortcuts instead of quickscreen", NULL),
 #endif
 #ifdef HAVE_SPEAKER
-    OFFON_SETTING(0, speaker_enabled, LANG_ENABLE_SPEAKER, false, "speaker",
-                  audiohw_enable_speaker),
-#endif
+    CHOICE_SETTING(0, speaker_mode, LANG_ENABLE_SPEAKER, 0, "speaker mode",
+# ifdef HAVE_HEADPHONE_DETECTION
+                   "on,off,auto", audio_enable_speaker, 3, ID2P(LANG_OFF), ID2P(LANG_ON), ID2P(LANG_AUTO)),
+#else /* HAVE_HEADPHONE_DETECTION */
+                   "on,off", audio_enable_speaker, 2, ID2P(LANG_OFF), ID2P(LANG_ON)),
+#endif /* HAVE_HEADPHONE_DETECTION */
+#endif /* HAVE_SPEAKER */
 #ifdef HAVE_TOUCHSCREEN
     CHOICE_SETTING(0, touch_mode, LANG_TOUCHSCREEN_MODE, DEFAULT_TOUCHSCREEN_MODE,
                    "touchscreen mode", "point,grid", NULL, 2,
