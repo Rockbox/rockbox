@@ -35,10 +35,10 @@ struct nwz_model_t g_model_list[] =
     { "nwz-e470", true, "e4144baaa2707913f17b5634034262c4" },
     { "nwz-e580", true, "6e25f79812eca7ceed04819d833e80af" },
     { "nwz-s750", true, "6d4f4d9adec781baf197e6255cedd0f6" },
+    { "nw-zx100", true, "cdda8d5e5360fd4373154388743f84d2" },
     /* The following keys were obtained by brute forcing firmware upgrades,
      * someone with a device needs to confirm that they work */
     { "nw-a820", false, "0c9869c268e0eaa6d1ba62daab09cebc" },
-    { "nwz-zx100", false, "2c0bf029804f73e073154388743f84d2" },
     /* The following models use a different encryption, but we put the KAS here
      * to not forget them */
     { "nw-a30", false, "c40d91e7efff3e3aa5c8831dd85526fe4972086283419c8cd8fa3b7dcd39" },
