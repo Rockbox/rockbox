@@ -805,8 +805,11 @@ static int list_choose(const char *list_str, const char *title)
     }
 }
 
-static void do_configure_item(config_item *cfg)
+#define CONFIGMENU_FREEDSTR 1
+#define CONFIGMENU_SUCCESS 2
+static int do_configure_item(config_item *cfg)
 {
+    int rc = 0;
     switch(cfg->type)
     {
     case C_STRING:
@@ -819,34 +822,46 @@ static void do_configure_item(config_item *cfg)
         if(rb->kbd_input(newstr, MAX_STRLEN) < 0)
         {
             sfree(newstr);
-            break;
+            return rc;
         }
+        if(strcmp(newstr, cfg->sval))
+            rc |= CONFIGMENU_SUCCESS;
         sfree(cfg->sval);
         cfg->sval = newstr;
-        break;
+        rc |= CONFIGMENU_FREEDSTR;
+        return rc;
     }
     case C_BOOLEAN:
     {
         bool res = cfg->ival != 0;
+        bool orig = res;
         rb->set_bool(cfg->name, &res);
 
         /* seems to reset backdrop */
         rb->lcd_set_backdrop(NULL);
 
         cfg->ival = res;
+        if(cfg->ival != orig)
+            rc |= CONFIGMENU_SUCCESS;
         break;
     }
     case C_CHOICES:
     {
+        int old = cfg->ival;
         int sel = list_choose(cfg->sval, cfg->name);
         if(sel >= 0)
+        {
             cfg->ival = sel;
+        }
+        if(cfg->ival != old)
+            rc |= CONFIGMENU_SUCCESS;
         break;
     }
     default:
         fatal("bad type");
         break;
     }
+    return rc;
 }
 
 const char *config_formatter(int sel, void *data, char *buf, size_t len)
@@ -904,14 +919,24 @@ static bool config_menu(void)
             config_item old;
             int pos = rb->gui_synclist_get_sel_pos(&list);
             memcpy(&old, config + pos, sizeof(old));
-            do_configure_item(config + pos);
+            char *old_str;
+            if(old.type == C_STRING)
+                old_str = dupstr(old.sval);
+            int rc = do_configure_item(config + pos);
             char *err = midend_set_config(me, CFG_SETTINGS, config);
             if(err)
             {
                 rb->splash(HZ, err);
                 memcpy(config + pos, &old, sizeof(old));
+                if(rc & CONFIGMENU_FREEDSTR)
+                    config[pos].sval = old_str;
             }
-            else
+            else if(old.type == C_STRING)
+            {
+                /* success, and we duplicated the old string, so free it */
+                sfree(old_str);
+            }
+            if(!err && (rc & CONFIGMENU_SUCCESS))
             {
                 success = true;
             }
