@@ -170,8 +170,7 @@ static void lcd_something_seq(void)
 
 static void lcd_init_seq(void)
 {
-    /* NOTE I don't understand why I have to use BGR, logic would say I should not */
-    spi_write_reg(0x1, 0x231d);// no inversion
+    spi_write_reg(0x1, 0x231d);// no BGR inversion (OF uses BGR)
     spi_write_reg(0x2, 0x300);
     /* NOTE by default stmp3700 has vsync/hsync active low and data launch
      * at negative edge of dotclk, reflect this in the polarity settings */
