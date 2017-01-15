@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f960359_ac3c03c0",
+        "filename": "lib/rbcodec/codecs/lib/codeclib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1000524
+      },
+      "writtenOn": "2017-01-15T18:37:13Z",
+      "side": 1,
+      "message": "Is that necessary after the rename of the methods?",
+      "revId": "80154ec5f5eac6c8f24fc4d8e38d9971138ff97f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f960359_cc494f61",
+        "filename": "lib/rbcodec/codecs/lib/codeclib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1000524
+      },
+      "writtenOn": "2017-01-15T18:37:13Z",
+      "side": 1,
+      "message": "shouldn\u0027t for consistency reasons all such methods be renamed to codec_xxx?",
+      "revId": "80154ec5f5eac6c8f24fc4d8e38d9971138ff97f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
