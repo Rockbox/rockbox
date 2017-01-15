@@ -32,7 +32,7 @@ tents.c
 /*towers.c*/
 tracks.c
 twiddle.c
-/*undead.c*/ 
+/*undead.c*/
 /*unequal.c*/
 unruly.c
 untangle.c
