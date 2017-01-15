@@ -21,6 +21,7 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "codeclib.h"
 #include "asap_internal.h"
 
 static byte s_memory[65536];
