@@ -100,7 +100,8 @@ void* codec_realloc(void* ptr, size_t size)
     return(x);
 }
 
-size_t strlen(const char *s)
+#undef strlen
+size_t codec_strlen(const char *s)
 {
     return(ci->strlen(s));
 }
