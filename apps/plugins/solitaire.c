@@ -1547,7 +1547,7 @@ static int load_game( void )
         return -1;
     
     retval = 0; /* Assume good case */
-    if(    ( rb->lseek( fd, -sizeof( int ), SEEK_END ) == -((ssize_t)sizeof( int ))-1 )
+    if(    ( rb->lseek( fd, -(off_t)sizeof( int ), SEEK_END ) == -((ssize_t)sizeof( int ))-1 )
         || ( rb->read( fd, &checksum, sizeof( int ) ) < ((ssize_t)sizeof( int )) )
         || ( rb->lseek( fd, 0, SEEK_SET ) == -1 )
         || save_read( fd, &cur_card, sizeof( int ), &checksum )

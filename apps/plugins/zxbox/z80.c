@@ -48,7 +48,7 @@ static byte *a64kmalloc(int num64ksegs)
     /*exit(1);*/
   }
 
-  return (byte *) (( (long) bigmem & ~((long) 0xFFFF)) + 0x10000);
+  return (byte *) (( (intptr_t) bigmem & ~((intptr_t) 0xFFFF)) + 0x10000);
 }
 
 

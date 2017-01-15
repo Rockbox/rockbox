@@ -216,7 +216,7 @@ static struct tzxblock tzxb[NUMBLOCKID] = {
 };
 
 
-#define PTRDIFF(pe, ps) ((int) (((long) (pe) - (long) (ps)) / sizeof(*pe)))
+#define PTRDIFF(pe, ps) pe - ps
 
 static char tzxheader[] = {'Z','X','T','a','p','e','!',0x1A};
 

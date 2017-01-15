@@ -462,7 +462,7 @@ size_t init_memory_pool(size_t mem_pool_size, void *mem_pool)
         return -1;
     }
 
-    if (((unsigned long) mem_pool & PTR_MASK)) {
+    if (((intptr_t) mem_pool & PTR_MASK)) {
         ERROR_MSG("init_memory_pool (): mem_pool must be aligned to a word\n");
         return -1;
     }
@@ -522,7 +522,7 @@ size_t add_new_area(void *area, size_t area_size, void *mem_pool)
         lb1 = ptr->end;
 
         /* Merging the new area with the next physically contigous one */
-        if ((unsigned long) ib1 == (unsigned long) lb0 + BHDR_OVERHEAD) {
+        if ((ptrdiff_t) ib1 == (ptrdiff_t) lb0 + BHDR_OVERHEAD) {
             if (tlsf->area_head == ptr) {
                 tlsf->area_head = ptr->next;
                 ptr = ptr->next;
@@ -543,7 +543,7 @@ size_t add_new_area(void *area, size_t area_size, void *mem_pool)
 
         /* Merging the new area with the previous physically contigous
            one */
-        if ((unsigned long) lb1->ptr.buffer == (unsigned long) ib0) {
+        if ((intptr_t) lb1->ptr.buffer == (intptr_t) ib0) {
             if (tlsf->area_head == ptr) {
                 tlsf->area_head = ptr->next;
                 ptr = ptr->next;
