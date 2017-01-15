@@ -191,7 +191,7 @@ static int unsynchronize(char* tag, int len, bool *ff_found)
             wp++;
         }
     }
-    return (long)wp - (long)tag;
+    return (intptr_t)wp - (intptr_t)tag;
 }
 
 static int unsynchronize_frame(char* tag, int len)
@@ -562,7 +562,7 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
             (*len)--;
             utf8 = iso_decode(str, utf8, -1, *len);
             *utf8 = 0;
-            *len = (unsigned long)utf8 - (unsigned long)utf8buf;
+            *len = (intptr_t)utf8 - (intptr_t)utf8buf;
             break;
 
         case 0x01: /* Unicode with or without BOM */
@@ -619,7 +619,7 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
         default: /* Plain old string */
             utf8 = iso_decode(str, utf8, -1, *len);
             *utf8 = 0;
-            *len = (unsigned long)utf8 - (unsigned long)utf8buf;
+            *len = (intptr_t)utf8 - (intptr_t)utf8buf;
             break;
     }
     return 0;
