@@ -139,7 +139,7 @@ void lcd_hline(int x1, int x2, int y)
         break;
 
       case OPT_COPY:
-        memcpy(dst, (void *)((long)dst + lcd_backdrop_offset),
+        memcpy(dst, PTR_ADD(dst, lcd_backdrop_offset),
                width * sizeof(fb_data));
         break;
 

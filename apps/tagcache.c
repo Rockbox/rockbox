@@ -930,7 +930,7 @@ inline static bool str_oneof(const char *str, const char *list)
     while (*list)
     {
         sep = strchr(list, '|');
-        l = sep ? (long)sep - (long)list : (int)strlen(list);
+        l = sep ? (intptr_t)sep - (intptr_t)list : (int)strlen(list);
         if ((l==len) && !strncasecmp(str, list, len))
             return true;
         list += sep ? l + 1 : l;
@@ -2362,7 +2362,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
                 /* Avoid processing this entry again. */
                 idx.flag |= FLAG_RESURRECTED;
                 
-                lseek(masterfd, -sizeof(struct index_entry), SEEK_CUR);
+                lseek(masterfd, -(off_t)sizeof(struct index_entry), SEEK_CUR);
                 if (ecwrite_index_entry(masterfd, &idx) != sizeof(struct index_entry))
                 {
                     logf("masterfd writeback fail #1");
@@ -3432,7 +3432,7 @@ static int parse_changelog_line(int line_n, char *buf, void *parameters)
     struct index_entry idx;
     char tag_data[TAG_MAXLEN+32];
     int idx_id;
-    long masterfd = (long)parameters;
+    long masterfd = (long)(intptr_t)parameters;
     const int import_tags[] = { tag_playcount, tag_rating, tag_playtime,
                                 tag_lastplayed, tag_commitid, tag_lastelapsed,
                                 tag_lastoffset };
@@ -3526,7 +3526,7 @@ bool tagcache_import_changelog(void)
     
     filenametag_fd = open_tag_fd(&tch, tag_filename, false);
     
-    fast_readline(clfd, buf, sizeof buf, (long *)masterfd,
+    fast_readline(clfd, buf, sizeof buf, (void *)(intptr_t)masterfd,
                   parse_changelog_line);
     
     close(clfd);
@@ -3665,7 +3665,7 @@ static bool delete_entry(long idx_id)
     }
     
     myidx.flag |= FLAG_DELETED;
-    lseek(masterfd, -sizeof(struct index_entry), SEEK_CUR);
+    lseek(masterfd, -(off_t)sizeof(struct index_entry), SEEK_CUR);
     if (ecwrite_index_entry(masterfd, &myidx) != sizeof(struct index_entry))
     {
         logf("delete_entry(): write_error #1");

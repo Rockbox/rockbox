@@ -251,7 +251,7 @@ int os_opendirfd(const char *osdirname)
     else
     {
         /* Convert OS handle to fd; the fd now owns it */
-        int osfd = _open_osfhandle((long)h, O_RDONLY);
+        int osfd = _open_osfhandle((intptr_t)h, O_RDONLY);
         if (osfd >= 0)
             return osfd;
     }

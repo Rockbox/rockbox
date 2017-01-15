@@ -73,7 +73,7 @@ void metadata_summary (void)
 void *
 align_buffer (void *buffer, size_t * buffer_size)
 {
-    unsigned int wasted = (-(long) buffer) & 3;
+    unsigned int wasted = (-(intptr_t) buffer) & 3;
 
     if (!buffer || !buffer_size)
     {
@@ -88,7 +88,7 @@ align_buffer (void *buffer, size_t * buffer_size)
 
     *buffer_size -= wasted;
 
-    return (void *) (((char *) buffer) + wasted);
+    return PTR_ADD(buffer, wasted);
 }
 
 

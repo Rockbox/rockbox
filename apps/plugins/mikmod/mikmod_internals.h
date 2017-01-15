@@ -703,7 +703,7 @@ extern int Voice_Stopped_internal(SBYTE);
 
 /*========== SIMD mixing helper functions =============*/
 
-#define IS_ALIGNED_16(ptr) (!(((int)(ptr)) & 15))
+#define IS_ALIGNED_16(ptr) (!(((intptr_t)(ptr)) & 15))
 
 /* Altivec helper function */
 #if defined HAVE_ALTIVEC

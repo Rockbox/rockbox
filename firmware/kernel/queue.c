@@ -418,7 +418,7 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
     wr = q->write++ & QUEUE_LENGTH_MASK;
 
     KERNEL_ASSERT((q->write - q->read) <= QUEUE_LENGTH,
-                  "queue_post ovf q=%08lX", (long)q);
+                  "queue_post ovf q=%p", q);
 
     q->events[wr].id   = id;
     q->events[wr].data = data;
@@ -450,7 +450,7 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
     wr = q->write++ & QUEUE_LENGTH_MASK;
 
     KERNEL_ASSERT((q->write - q->read) <= QUEUE_LENGTH,
-                  "queue_send ovf q=%08lX", (long)q);
+                  "queue_send ovf q=%p", q);
 
     q->events[wr].id   = id;
     q->events[wr].data = data;

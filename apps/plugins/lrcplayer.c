@@ -545,7 +545,7 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
             c = rb->utf8seek(cr.str, 1);
             w = 1;
 #else
-            c = ((long)rb->utf8decode(cr.str, &ch) - (long)cr.str);
+            c = ((intptr_t)rb->utf8decode(cr.str, &ch) - (intptr_t)cr.str);
             if (rb->is_diacritic(ch, NULL))
                 w = 0;
             else
@@ -885,7 +885,7 @@ static bool parse_lrc_line(char *line, off_t file_offset)
         lrc_line->time_start = (time/10)*10;
         lrc_line->old_time_start = lrc_line->time_start;
         add_lrc_line(lrc_line, NULL);
-        file_offset += (long)tagend - (long)str;
+        file_offset += (intptr_t)tagend - (intptr_t)str;
         str = tagend;
     }
     if (!first_lrc_line)
@@ -908,7 +908,7 @@ static bool parse_lrc_line(char *line, off_t file_offset)
         if (!tagend) break;
         *tagend = 0;
         time = get_time_value(tagstart+1, false,
-                                file_offset + ((long)tagstart - (long)str));
+                                file_offset + ((intptr_t)tagstart - (intptr_t)str));
         *tagend++ = '>';
         if (time < 0)
         {
@@ -923,7 +923,7 @@ static bool parse_lrc_line(char *line, off_t file_offset)
                 return false;
             nword++;
         }
-        file_offset += (long)tagend - (long)str;
+        file_offset += (intptr_t)tagend - (intptr_t)str;
         tagstart = str = tagend;
         time_start = time;
     }
@@ -1159,7 +1159,7 @@ static int unsynchronize(char* tag, int len, bool *ff_found)
         }
     }
     if(ff_found) *ff_found = _ff_found;
-    return (long)wp - (long)tag;
+    return (intptr_t)wp - (intptr_t)tag;
 }
 
 static int read_unsynched(int fd, void *buf, int len, bool *ff_found)
@@ -1471,7 +1471,7 @@ static void parse_id3v2(int fd)
                 utf_decode = rb->utf16BEdecode;
         }
     }
-    bytesread -= (long)p - (long)tag;
+    bytesread -= (intptr_t)p - (intptr_t)tag;
     tag = p;
 
     while ( bytesread > 0
@@ -1529,7 +1529,7 @@ static void parse_id3v2(int fd)
             lrc_line->old_time_start = -1;
             if(is_crlf) p += chsiz;
         }
-        bytesread -= (long)p - (long)tag;
+        bytesread -= (intptr_t)p - (intptr_t)tag;
         tag = p;
         if(!add_lrc_line(lrc_line, utf8line))
             break;
@@ -2922,7 +2922,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     lrc_buffer = rb->plugin_get_buffer(&lrc_buffer_size);
-    lrc_buffer = (void *)(((long)lrc_buffer+3)&~3); /* 4 bytes aligned */
+    lrc_buffer = ALIGN_UP(lrc_buffer, 4); /* 4 bytes aligned */
     lrc_buffer_size = (lrc_buffer_size - 4)&~3;
 
     reset_current_data();
