@@ -40,7 +40,7 @@ QUICKREF
 /*SUPPRESS 530*/
 
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */
-#define UNALIGNED(X, Y) \
+#define ROCKBOX_UNALIGNED(X, Y) \
   (((long)X & (sizeof (long) - 1)) | ((long)Y & (sizeof (long) - 1)))
 
 #if LONG_MAX == 2147483647L
@@ -77,7 +77,7 @@ _DEFUN (strcpy, (dst0, src0),
   _CONST long *aligned_src;
 
   /* If SRC or DEST is unaligned, then copy bytes.  */
-  if (!UNALIGNED (src, dst))
+  if (!ROCKBOX_UNALIGNED (src, dst))
     {
       aligned_dst = (long*)dst;
       aligned_src = (long*)src;
