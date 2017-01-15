@@ -148,7 +148,7 @@ void lcd_set_backdrop(fb_data* backdrop)
     lcd_backdrop = backdrop;
     if (backdrop)
     {
-        lcd_backdrop_offset = (long)backdrop - (long)lcd_framebuffer;
+        lcd_backdrop_offset = (intptr_t)backdrop - (intptr_t)lcd_framebuffer;
         lcd_fastpixelfuncs = lcd_fastpixelfuncs_backdrop;
     }
     else

@@ -293,7 +293,7 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
     if(b->endbyte < b->storage - 8) {
       ogg_uint32_t *ptr;
       unsigned long bit, bitend;
-      unsigned long adr;
+      intptr_t adr;
       ogg_uint32_t cache = 0;
       int cachesize = 0;
       const unsigned int cachemask = (1<<book->dec_firsttablen)-1;
@@ -303,7 +303,7 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
       const ogg_uint32_t *book_codelist = book->codelist;
       const char         *book_dec_codelengths = book->dec_codelengths;
 
-      adr = (unsigned long)b->ptr;
+      adr = (intptr_t)b->ptr;
       bit = (adr&3)*8+b->endbit;
       ptr = (ogg_uint32_t*)(adr&~3);
       bitend = ((adr&3)+(b->storage-b->endbyte))*8;
@@ -334,7 +334,7 @@ static long decode_packed_block(codebook *book, oggpack_buffer *b,
         cache >>= l;
       }
 
-      adr=(unsigned long)b->ptr;
+      adr=(intptr_t)b->ptr;
       bit-=(adr&3)*8+cachesize;
       b->endbyte+=bit/8;
       b->ptr+=bit/8;

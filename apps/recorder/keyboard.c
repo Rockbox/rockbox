@@ -255,7 +255,7 @@ static void kbd_inschar(struct edit_state *state, unsigned short ch)
 
     len = strlen(state->text);
     utf8 = utf8encode(ch, tmp);
-    j = (long)utf8 - (long)tmp;
+    j = (intptr_t)utf8 - (intptr_t)tmp;
 
     if (len + j < state->buflen)
     {

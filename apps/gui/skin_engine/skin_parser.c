@@ -2493,7 +2493,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         skin_buffer = wps_buffer;
         wps_buffer = (char*)buf;
     }
-    skin_buffer = (void *)(((unsigned long)skin_buffer + 3) & ~3);
+    skin_buffer = ALIGN_UP(skin_buffer, 4); /* align on 4-byte boundary */
     buffersize -= 3;
 #ifdef HAVE_BACKDROP_IMAGE
     backdrop_filename = "-";
