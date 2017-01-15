@@ -207,7 +207,7 @@ static inline void plot(unsigned x, unsigned y, unsigned long a,
     r2 = RGB_UNPACK_RED(orig);
     g2 = RGB_UNPACK_GREEN(orig);
     b2 = RGB_UNPACK_BLUE(orig);
-#lse
+#else
     r2 = orig.r;
     g2 = orig.g;
     b2 = orig.b;

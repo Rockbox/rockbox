@@ -42,8 +42,13 @@ PUZZLES_ROCKS := $(addprefix $(PUZZLES_OBJDIR)/sgt-, $(notdir $(PUZZLES_GAMES_SR
 ROCKS += $(PUZZLES_ROCKS)
 endif
 
-# Hack to suppress all warnings:
-PUZZLESFLAGS = $(filter-out -O%,$(PLUGINFLAGS)) -O3		\
+PUZZLESOPTIMIZE := -O3
+ifeq ($(MODELNAME), sansac200v2)
+PUZZLESOPTIMIZE := -Os
+endif
+
+# we suppress all warnings
+PUZZLESFLAGS = $(filter-out -O%,$(PLUGINFLAGS)) $(PUZZLESOPTIMIZE)		\
 		-Wno-unused-parameter -Wno-sign-compare -Wno-strict-aliasing -w \
 		-DFOR_REAL -I$(PUZZLES_SRCDIR)
 ifdef PUZZLES_COMBINED

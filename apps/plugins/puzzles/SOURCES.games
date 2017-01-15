@@ -19,9 +19,6 @@ net.c
 netslide.c
 /*palisade.c*/
 pattern.c
-#if PLUGIN_BUFFER_SIZE > 0x20000
-pearl.c
-#endif
 pegs.c
 range.c
 rect.c
@@ -35,7 +32,7 @@ tents.c
 /*towers.c*/
 tracks.c
 twiddle.c
-/*undead.c*/
+/*undead.c*/ 
 /*unequal.c*/
 unruly.c
 untangle.c
@@ -45,3 +42,10 @@ untangle.c
 /*unfinished/separate.c*/
 /*unfinished/slide.c*/
 /*unfinished/sokoban.c*/
+
+/* no c200v2 */
+#if PLUGIN_BUFFER_SIZE > 0x14000
+pearl.c
+loopy.c
+solo.c
+#endif
