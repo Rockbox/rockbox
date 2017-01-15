@@ -40,6 +40,7 @@ extern struct codec_api *ci;
 #define free(x) codec_free(x)
 #undef alloca
 #define alloca(x) __builtin_alloca(x)
+#define strlen(s) codec_strlen(s)
 
 void* codec_malloc(size_t size);
 void* codec_calloc(size_t nmemb, size_t size);
@@ -51,7 +52,7 @@ void *memset(void *s, int c, size_t n);
 int memcmp(const void *s1, const void *s2, size_t n);
 void *memmove(void *s1, const void *s2, size_t n);
 
-size_t strlen(const char *s);
+size_t codec_strlen(const char *s);
 char *strcpy(char *dest, const char *src);
 char *strcat(char *dest, const char *src);
 
