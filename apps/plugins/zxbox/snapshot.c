@@ -362,7 +362,7 @@ static void read_compressed_data(SNFILE *fp, byte *start, unsigned size,
     GET_DATA(ch);
     if(p + times > end) {
       put_msg("Warning: Repeat parameter too large in snapshot");
-      times = (int) ((long) end - (long) p);
+      times = (int) ((intptr_t) end - (intptr_t) p);
     }
     for(j = 0; j < times; j++) *p++ = ch;
       }

@@ -94,7 +94,7 @@ void lcd_clear_viewport(void)
         {
             do
             {
-                memcpy(dst, (void *)((long)dst + lcd_backdrop_offset),
+                memcpy(dst, PTR_ADD(dst, lcd_backdrop_offset),
                        len * sizeof(fb_data));
                 dst += step;
             }
@@ -122,7 +122,7 @@ static void ICODE_ATTR clearpixel(fb_data *address)
 
 static void ICODE_ATTR clearimgpixel(fb_data *address)
 {
-    *address = *(fb_data *)((long)address + lcd_backdrop_offset);
+    *address = *PTR_ADD(address, lcd_backdrop_offset);
 }
 
 static void ICODE_ATTR flippixel(fb_data *address)
@@ -244,7 +244,7 @@ void lcd_fillrect(int x, int y, int width, int height)
             break;
 
           case OPT_COPY:
-            memcpy(dst, (void *)((long)dst + lcd_backdrop_offset),
+            memcpy(dst, PTR_ADD(dst, lcd_backdrop_offset),
                    len * sizeof(fb_data));
             break;
 
@@ -395,7 +395,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             do
             {
                 if (!(data & 0x01))
-                    *dst = *(fb_data *)((long)dst + bo);
+                    *dst = *PTR_ADD(dst, bo);
 
                 dst += ROW_INC;
                 UPDATE_SRC;
@@ -435,7 +435,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             do
             {
                 *dst = (data & 0x01) ? fg
-                           : *(fb_data *)((long)dst + bo);
+                           : *PTR_ADD(dst, bo);
                 dst += ROW_INC;
                 UPDATE_SRC;
             }
