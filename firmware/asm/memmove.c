@@ -40,7 +40,7 @@ QUICKREF
 #include <string.h>
 
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */
-#define UNALIGNED(X, Y) \
+#define ROCKBOX_UNALIGNED(X, Y) \
   (((long)X & (sizeof (long) - 1)) | ((long)Y & (sizeof (long) - 1)))
 
 /* How many bytes are copied each iteration of the 4X unrolled loop.  */
@@ -109,7 +109,7 @@ _DEFUN (memmove, (dst_void, src_void, length),
       /* Use optimizing algorithm for a non-destructive copy to closely 
          match memcpy. If the size is small or either SRC or DST is unaligned,
          then punt into the byte copy loop.  This should be rare.  */
-      if (!TOO_SMALL(len) && !UNALIGNED (src, dst))
+      if (!TOO_SMALL(len) && !ROCKBOX_UNALIGNED (src, dst))
         {
           aligned_dst = (long*)dst;
           aligned_src = (long*)src;
