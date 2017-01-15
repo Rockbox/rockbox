@@ -37,7 +37,7 @@ QUICKREF
 #include "_ansi.h"
 
 #define LBLOCKSIZE (sizeof(long))
-#define UNALIGNED(X)   ((long)X & (LBLOCKSIZE - 1))
+#define ROCKBOX_UNALIGNED(X)   ((long)X & (LBLOCKSIZE - 1))
 #define TOO_SMALL(LEN) ((LEN) < LBLOCKSIZE)
 
 _PTR 
@@ -61,7 +61,7 @@ _DEFUN (memset, (m, c, n),
   unsigned long buffer;
   unsigned long *aligned_addr;
 
-  if (!TOO_SMALL (n) && !UNALIGNED (m))
+  if (!TOO_SMALL (n) && !ROCKBOX_UNALIGNED (m))
     {
       /* If we get this far, we know that n is large and m is word-aligned. */
 

@@ -38,7 +38,7 @@ QUICKREF
 #include "_ansi.h" /* for _DEFUN */
 
 /* Nonzero if X is not aligned on a "long" boundary.  */
-#define UNALIGNED(X) ((long)X & (sizeof (long) - 1))
+#define ROCKBOX_UNALIGNED(X) ((long)X & (sizeof (long) - 1))
 
 /* How many bytes are loaded each iteration of the word copy loop.  */
 #define LBLOCKSIZE (sizeof (long))
@@ -82,7 +82,7 @@ _DEFUN (memchr, (s1, i, n),
   unsigned long mask,j;
   unsigned long *aligned_addr;
 
-  if (!UNALIGNED (s))
+  if (!ROCKBOX_UNALIGNED (s))
     {
       mask = 0;
       for (j = 0; j < LBLOCKSIZE; j++)

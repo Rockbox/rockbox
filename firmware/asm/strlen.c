@@ -37,7 +37,7 @@ QUICKREF
 #include <limits.h>
 
 #define LBLOCKSIZE   (sizeof (long))
-#define UNALIGNED(X) ((long)X & (LBLOCKSIZE - 1))
+#define ROCKBOX_UNALIGNED(X) ((long)X & (LBLOCKSIZE - 1))
 
 #if LONG_MAX == 2147483647L
 #define DETECTNULL(X) (((X) - 0x01010101) & ~(X) & 0x80808080)
@@ -73,7 +73,7 @@ _DEFUN (strlen, (str),
   _CONST char *start = str;
   unsigned long *aligned_addr;
 
-  if (!UNALIGNED (str))
+  if (!ROCKBOX_UNALIGNED (str))
     {
       /* If the string is word-aligned, we can check for the presence of 
          a null in each word-sized block.  */

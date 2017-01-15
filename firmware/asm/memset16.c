@@ -22,7 +22,7 @@
 #include "string-extra.h" /* memset16() */
 
 #define LBLOCKSIZE (sizeof(long)/2)
-#define UNALIGNED(X)   ((long)X & (sizeof(long) - 1))
+#define ROCKBOX_UNALIGNED(X)   ((long)X & (sizeof(long) - 1))
 #define TOO_SMALL(LEN) ((LEN) < LBLOCKSIZE)
 
 void memset16(void *dst, int val, size_t len)
@@ -38,7 +38,7 @@ void memset16(void *dst, int val, size_t len)
     unsigned long buffer;
     unsigned long *aligned_addr;
 
-    if (!TOO_SMALL(len) && !UNALIGNED(dst))
+    if (!TOO_SMALL(len) && !ROCKBOX_UNALIGNED(dst))
     {
         aligned_addr = (unsigned long *)dst;
 

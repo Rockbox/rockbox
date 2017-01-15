@@ -40,7 +40,7 @@ QUICKREF
 #include "_ansi.h" /* for _DEFUN */
 
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */
-#define UNALIGNED(X, Y) \
+#define ROCKBOX_UNALIGNED(X, Y) \
   (((long)X & (sizeof (long) - 1)) | ((long)Y & (sizeof (long) - 1)))
 
 /* How many bytes are copied each iteration of the word copy loop.  */
@@ -78,7 +78,7 @@ _DEFUN (memcmp, (m1, m2, n),
   /* If the size is too small, or either pointer is unaligned,
      then we punt to the byte compare loop.  Hopefully this will
      not turn up in inner loops.  */
-  if (!TOO_SMALL(n) && !UNALIGNED(s1,s2))
+  if (!TOO_SMALL(n) && !ROCKBOX_UNALIGNED(s1,s2))
     {
       /* Otherwise, load and compare the blocks of memory one 
          word at a time.  */

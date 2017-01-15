@@ -40,7 +40,7 @@ QUICKREF
 #include "_ansi.h" /* for _DEFUN */
 
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */
-#define UNALIGNED(X, Y) \
+#define ROCKBOX_UNALIGNED(X, Y) \
   (((long)X & (sizeof (long) - 1)) | ((long)Y & (sizeof (long) - 1)))
 
 /* DETECTNULL returns nonzero if (long)X contains a NULL byte. */
@@ -76,7 +76,7 @@ _DEFUN (strcmp, (s1, s2),
   unsigned long *a2;
 
   /* If s1 or s2 are unaligned, then compare bytes. */
-  if (!UNALIGNED (s1, s2))
+  if (!ROCKBOX_UNALIGNED (s1, s2))
     {  
       /* If s1 and s2 are word-aligned, compare them a word at a time. */
       a1 = (unsigned long*)s1;
