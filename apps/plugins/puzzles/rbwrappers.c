@@ -1585,13 +1585,13 @@ sscanf_wrapper(const char *ibuf, const char *fmt, ...)
         int ret;
 
         va_start(ap, fmt);
-        ret = vsscanf(ibuf, fmt, ap);
+        ret = rb_vsscanf(ibuf, fmt, ap);
         va_end(ap);
         return(ret);
 }
 
 int
-vsscanf(const char *inp, char const *fmt0, va_list ap)
+rb_vsscanf(const char *inp, char const *fmt0, va_list ap)
 {
         int inr;
         const u_char *fmt = (const u_char *)fmt0;
