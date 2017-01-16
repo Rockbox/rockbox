@@ -78,7 +78,6 @@ gif,viewers
 pong,games
 ppm,viewers
 properties,viewers
-puzzles,games
 random_folder_advance_config,apps
 remote_control,apps
 resistor,apps
@@ -117,6 +116,7 @@ sgt-palisade,games
 sgt-pattern,games
 sgt-pearl,games
 sgt-pegs,games
+sgt-puzzles,games
 sgt-range,games
 sgt-rect,games
 sgt-samegame,games

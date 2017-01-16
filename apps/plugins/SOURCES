@@ -75,6 +75,7 @@ iriverify.c
 /* Overlays loaders */
 
 /* use this if you want a monolithic 'puzzles' */
+/* remember to set PUZZLES_COMBINED in puzzles.make! */
 /*sgt-puzzles.c*/
 
 #if PLUGIN_BUFFER_SIZE <= 0x20000 && defined(HAVE_LCD_BITMAP)
