@@ -22,24 +22,53 @@ int puts_wrapper(const char *s)
 }
 
 /* fixed-point wrappers */
+static long lastphase = 0, lastsin = 0, lastcos = 0x7fffffff;
+
 double sin_wrapper(double rads)
 {
-    int degs = rads * 180/PI;
-    long fixed = fp14_sin(degs);
-    return fixed / (16384.0);
+    /* we want [0, 2*PI) */
+    while(rads >= 2*PI)
+        rads -= 2*PI;
+    while(rads < 0)
+        rads += 2*PI;
+
+    unsigned long phase = rads/(2*PI) * 4294967296.0;
+
+    /* caching */
+    if(phase == lastphase)
+    {
+        return lastsin/(lastsin < 0 ? 2147483648.0 : 2147483647.0);
+    }
+
+    lastphase = phase;
+    lastsin = fp_sincos(phase, &lastcos);
+    return lastsin/(lastsin < 0 ? 2147483648.0 : 2147483647.0);
 }
 
 double cos_wrapper(double rads)
 {
-    int degs = rads * 180/PI;
-    long fixed = fp14_cos(degs);
-    return fixed / (16384.0);
+    /* we want [0, 2*PI) */
+    while(rads >= 2*PI)
+        rads -= 2*PI;
+    while(rads < 0)
+        rads += 2*PI;
+
+    unsigned long phase = rads/(2*PI) * 4294967296.0;
+
+    /* caching */
+    if(phase == lastphase)
+    {
+        return lastcos/(lastcos < 0 ? 2147483648.0 : 2147483647.0);
+    }
+
+    lastphase = phase;
+    lastsin = fp_sincos(phase, &lastcos);
+    return lastcos/(lastcos < 0 ? 2147483648.0 : 2147483647.0);
 }
 
 int vsprintf_wrapper(char *s, const char *fmt, va_list ap)
 {
     return rb->vsnprintf(s, 9999, fmt, ap);
-
 }
 
 /* Absolute value, simple calculus */
