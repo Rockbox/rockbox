@@ -27,9 +27,9 @@
 #include "config.h"
 #include "fs_attr.h"
 
-#if defined (APPLICATION)
+#if defined (APPLICATION) || defined(CHECKWPS)
 #include "filesystem-app.h"
-#elif defined(SIMULATOR) || defined(__PCTOOL__)
+#elif defined(SIMULATOR) || defined(DBTOOL)
 #include "../../uisimulator/common/filesystem-sim.h"
 #else
 #include "filesystem-native.h"

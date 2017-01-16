@@ -10,7 +10,11 @@ database.c
 ../../firmware/common/unicode.c
 ../../firmware/target/hosted/debug-hosted.c
 ../../firmware/logf.c
+#ifdef WIN32
+../../firmware/target/hosted/filesystem-win32.c
+#else /* !WIN32 */
 ../../firmware/target/hosted/filesystem-unix.c
+#endif /* WIN32 */
 #ifdef APPLICATION
 ../../firmware/target/hosted/filesystem-app.c
 #else /* !APPLICATION */

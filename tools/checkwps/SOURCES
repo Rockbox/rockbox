@@ -6,12 +6,12 @@
 ../../firmware/common/strlcpy.c
 ../../firmware/common/pathfuncs.c
 ../../firmware/asm/mempcpy.c
+#ifdef WIN32
+../../firmware/target/hosted/filesystem-win32.c
+#else /* !WIN32 */
 ../../firmware/target/hosted/filesystem-unix.c
-#ifdef APPLICATION
+#endif /* WIN32 */
 ../../firmware/target/hosted/filesystem-app.c
-#else
-../../uisimulator/common/filesystem-sim.c
-#endif
 #ifdef DEBUG
 ../../firmware/debug.c
 #endif

@@ -39,7 +39,6 @@ bool debug_wps = true;
 int wps_verbose_level = 0;
 char *skin_buffer;
 
-const char *sim_root_dir = ".";
 const struct settings_list *settings;
 const int nb_settings = 0;
 
