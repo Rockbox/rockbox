@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2009 Franklin Wei
+ * Copyright (C) 2017 Franklin Wei
  *
  * Overlay loader stub plugin for puzzles
  *
