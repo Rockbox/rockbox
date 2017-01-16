@@ -67,7 +67,7 @@ static void woof_woof(void)
 static void good_dog(void)
 {
     imx233_rtc_reset_watchdog(WATCHDOG_HW_DELAY * 1000 / HZ); /* ms */
-    imx233_rtc_enable_watchdog(true);
+    imx233_rtc_enable_watchdog(false);
     imx233_timrot_setup_simple(TIMER_WATCHDOG, false, WATCHDOG_SW_DELAY * 1000 / HZ,
         TIMER_SRC_1KHZ, &woof_woof);
     imx233_timrot_set_priority(TIMER_WATCHDOG, ICOLL_PRIO_WATCHDOG);
