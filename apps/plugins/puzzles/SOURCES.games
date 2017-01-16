@@ -46,6 +46,6 @@ untangle.c
 /* no c200v2 */
 #if PLUGIN_BUFFER_SIZE > 0x14000
 pearl.c
-loopy.c
-solo.c
+/*loopy.c*/
+/*solo.c*/
 #endif
