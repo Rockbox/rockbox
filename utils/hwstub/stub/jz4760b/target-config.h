@@ -1,6 +1,7 @@
 #define CONFIG_JZ4760B
 #define TCSM0_ORIG      0xf4000000
 #define TCSM0_SIZE      0x4000
+#define TCSM0_UNCACHED_ADDRESS  0xb32b0000
 #define CPU_MIPS
 #define STACK_SIZE      0x300
 #define DCACHE_SIZE     0x4000 /* 16 kB */
