@@ -90,6 +90,10 @@
 
 #undef HAVE_DIRCACHE
 
+#ifdef HAVE_DIRCACHE
+#include "dircache.h"
+#endif
+
 #ifdef __PCTOOL__
 #define yield() do { } while(0)
 #define sim_sleep(timeout) do { } while(0)
@@ -112,6 +116,9 @@ static long tempbufidx;   /* Current location in buffer. */
 static size_t tempbuf_size; /* Buffer size (TEMPBUF_SIZE). */
 static long tempbuf_left; /* Buffer space left. */
 static long tempbuf_pos;
+#ifndef __PCTOOL__
+static int tempbuf_handle;
+#endif
 
 #define SORTED_TAGS_COUNT 8
 #define TAGCACHE_IS_UNIQUE(tag) (BIT_N(tag) & TAGCACHE_UNIQUE_TAGS)
@@ -289,17 +296,6 @@ static ssize_t ecwrite_index_entry(int fd, struct index_entry *buf)
     return ecwrite(fd, buf, 1, index_entry_ec, tc_stat.econ);
 }
 
-#ifdef HAVE_DIRCACHE
-/**
- * Returns true if specified flag is still present, i.e., dircache
- * has not been reloaded.
- */
-static bool is_dircache_intact(void)
-{
-    return dircache_get_appflag(DIRCACHE_APPFLAG_TAGCACHE);
-}
-#endif
-
 static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
 {
     int fd;
@@ -434,7 +430,7 @@ static long find_entry_ram(const char *filename, int dc)
 
     return -1;
 }
-#endif
+#endif /* defined (HAVE_TC_RAMCACHE) && defined (HAVE_DIRCACHE) */
 
 static long find_entry_disk(const char *filename_raw, bool localfd)
 {
@@ -590,7 +586,7 @@ static bool get_index(int masterfd, int idxid,
         if (ramcache_hdr->indices[idxid].flag & FLAG_DELETED)
             return false;
         
-# ifdef HAVE_DIRCACHE
+#ifdef HAVE_DIRCACHE
         if (!(ramcache_hdr->indices[idxid].flag & FLAG_DIRCACHE)
             || is_dircache_intact())
 #endif
@@ -599,8 +595,6 @@ static bool get_index(int masterfd, int idxid,
             return true;
         }
     }
-#else
-    (void)use_ram;
 #endif
     
     if (masterfd < 0)
@@ -632,6 +626,8 @@ static bool get_index(int masterfd, int idxid,
         return false;
     
     return true;
+
+    (void)use_ram;
 }
 
 #ifndef __PCTOOL__
@@ -724,7 +720,7 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
     {
         struct tagfile_entry *ep;
         
-# ifdef HAVE_DIRCACHE
+#ifdef HAVE_DIRCACHE
         if (tag == tag_filename && (idx->flag & FLAG_DIRCACHE))
         {
             /* for tag_filename, seek is a dircache index */
@@ -745,7 +741,7 @@ static bool retrieve(struct tagcache_search *tcs, struct index_entry *idx,
             }
         }
         else
-# endif
+#endif /* HAVE_DIRCACHE */
         if (tag != tag_filename)
         {
             ep = (struct tagfile_entry *)&ramcache_hdr->tags[tag][seek];
@@ -1511,8 +1507,7 @@ static bool get_next(struct tagcache_search *tcs)
 #ifdef HAVE_TC_RAMCACHE
     if (tcs->ramsearch)
     {
-        
-#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
+#ifdef HAVE_DIRCACHE
         if (tcs->type == tag_filename && (flag & FLAG_DIRCACHE))
         {
             if (is_dircache_intact())
@@ -1537,7 +1532,7 @@ static bool get_next(struct tagcache_search *tcs)
             }
         }
         else
-#endif
+#endif /* HAVE_DIRCACHE */
         if (tcs->type != tag_filename)
         {
             struct tagfile_entry *ep;
@@ -1765,6 +1760,13 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
 #endif
     
     return true;
+}
+#elif defined (HAVE_TC_RAMCACHE)
+/* temporary dummy function until integration is sorted out --jethead71 */
+bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
+{
+    return false;
+    (void)id3; (void)filename;
 }
 #endif
 
@@ -2982,27 +2984,25 @@ static bool commit(void)
 #ifdef HAVE_TC_RAMCACHE
     tc_stat.ramcache = false;
 #endif
-    
+
+    /* Beyond here, jump to commit_error to undo locks and restore dircache */
+    rc = false;
     read_lock++;
     
     /* Try to steal every buffer we can :) */
     if (tempbuf_size == 0)
         local_allocation = true;
 
-#if 0 /* FIXME: How much big? dircache buffer can no longer be taken but
-                may be freed to make room and the cache resumed. --jethead71 */
 #ifdef HAVE_DIRCACHE
     if (tempbuf_size == 0)
     {
-        /* Shut down dircache to free its allocation. */
+        /* Suspend dircache to free its allocation. */
         dircache_free_buffer();
-        if (tempbuf_size > 0)
-        {
-            dircache_buffer_stolen = true;
-        }
+        dircache_buffer_stolen = true;
+
+        allocate_tempbuf();
     }
-#endif
-#endif
+#endif /* HAVE_DIRCACHE */
     
 #ifdef HAVE_TC_RAMCACHE
     if (tempbuf_size == 0 && tc_stat.ramcache_allocated > 0)
@@ -3021,8 +3021,7 @@ static bool commit(void)
         logf("delaying commit until next boot");
         tc_stat.commit_delayed = true;
         close(tmpfd);
-        read_lock--;
-        return false;
+        goto commit_error;
     }
     
     logf("commit %ld entries...", tch.entry_count);
@@ -3053,8 +3052,7 @@ static bool commit(void)
                 tc_stat.commit_delayed = true;
             
             tc_stat.commit_step = 0;
-            read_lock--;
-            return false;
+            goto commit_error;
         }
     }
     
@@ -3063,8 +3061,7 @@ static bool commit(void)
         logf("Failure to commit numeric indices");
         close(tmpfd);
         tc_stat.commit_step = 0;
-        read_lock--;
-        return false;
+        goto commit_error;
     }
     
     close(tmpfd);
@@ -3073,10 +3070,7 @@ static bool commit(void)
     
     /* Update the master index headers. */
     if ( (masterfd = open_master_fd(&tcmh, true)) < 0)
-    {
-        read_lock--;
-        return false;
-    }
+        goto commit_error;
     
     remove(TAGCACHE_FILE_TEMP);
 
@@ -3101,39 +3095,53 @@ static bool commit(void)
         tempbuf_size = 0;
     }
     
-#ifdef HAVE_DIRCACHE
-    /* Rebuild the dircache, if we stole the buffer. */
-    if (dircache_buffer_stolen)
-        dircache_resume();
-#endif
-
 #ifdef HAVE_TC_RAMCACHE
     if (ramcache_buffer_stolen)
+    {
+        ramcache_buffer_stolen = false;
         move_lock--;
+    }
+
     /* Reload tagcache. */
     if (tc_stat.ramcache_allocated > 0)
         tagcache_start_scan();
 #endif
     
-    read_lock--;
-    
-    return true;
-}
+    rc = true;
 
-#ifndef __PCTOOL__
-static int tempbuf_handle;
+commit_error:
+#ifdef HAVE_TC_RAMCACHE
+    if (ramcache_buffer_stolen)
+        move_lock--;
 #endif
+
+    read_lock--;
+
+#ifdef HAVE_DIRCACHE
+    /* Resume the dircache, if we stole the buffer. */
+    if (dircache_buffer_stolen)
+        dircache_resume();
+#endif
+    
+    return rc;
+}
 
 static void allocate_tempbuf(void)
 {
     /* Yeah, malloc would be really nice now :) */
+    size_t size;
+    tempbuf_size = 0;
+
 #ifdef __PCTOOL__
-    tempbuf_size = 32*1024*1024;
-    tempbuf = malloc(tempbuf_size);
+    size = 32*1024*1024;
+    tempbuf = malloc(size);
 #else
-    tempbuf_handle = core_alloc_maximum("tc tempbuf", &tempbuf_size, NULL);
+    tempbuf_handle = core_alloc_maximum("tc tempbuf", &size, NULL);
     tempbuf = core_get_data(tempbuf_handle);
 #endif
+
+    if (tempbuf)
+        tempbuf_size = size;
 }
 
 static void free_tempbuf(void)
@@ -4133,9 +4141,14 @@ static bool load_tagcache(void)
                     goto failure;
                 }
 
-# ifdef HAVE_DIRCACHE
-                if (dircache_is_enabled())
+                if (global_settings.tagcache_autoupdate)
                 {
+                    /* Check if entry has been removed. */
+                #ifdef HAVE_DIRCACHE
+                    /* This will be very slow unless dircache is enabled
+                       or target is flash based. */
+##################
+                    if (dircache_search( /* will get this! -- jethead71 */
                     dc = dircache_get_entry_id(buf);
                     if (dc < 0)
                     {
@@ -4148,24 +4161,17 @@ static bool load_tagcache(void)
 
                     idx->flag |= FLAG_DIRCACHE;
                     idx->tag_seek[tag_filename] = dc;
-                }
-                else
-# endif
-                {
-                    /* This will be very slow unless dircache is enabled
-                       or target is flash based, but do it anyway for
-                       consistency. */
-                    /* Check if entry has been removed. */
-                    if (global_settings.tagcache_autoupdate)
+                #else /* ndef HAVE_DIRCACHE */
+                    /* This will be very slow unless target is flash based;
+                       do it anyway for consistency. */
+                    if (!file_exists(buf))
                     {
-                        if (!file_exists(buf))
-                        {
-                            logf("Entry no longer valid.");
-                            logf("-> %s", buf);
-                            delete_entry(fe->idx_id);
-                            continue;
-                        }
+                        logf("Entry no longer valid.");
+                        logf("-> %s", buf);
+                        delete_entry(fe->idx_id);
+                        continue;
                     }
+                #endif /* HAVE_DIRCACHE */
                 }
                 
                 continue ;

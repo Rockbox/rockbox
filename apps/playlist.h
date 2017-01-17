@@ -82,7 +82,9 @@ struct playlist_info
     bool control_created; /* has control file been created?         */
     int  dirlen;         /* Length of the path to the playlist file */
     volatile unsigned long *indices; /* array of indices            */
-    volatile int *filenames;         /* Array of dircache indices   */
+#ifdef HAVE_DIRCACHE
+    struct dircache_fileref *dcfrefs; /* Dircache entry shortcuts */
+#endif
     int  max_playlist_size; /* Max number of files in playlist. Mirror of
                               global_settings.max_files_in_playlist */
     bool in_ram;         /* playlist stored in ram (dirplay)        */

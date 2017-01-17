@@ -853,7 +853,7 @@ Lyre prototype 1 */
 #define HAVE_DIRCACHE
 #endif
 #ifdef HAVE_TAGCACHE
-//#define HAVE_TC_RAMCACHE
+#define HAVE_TC_RAMCACHE
 #endif
 #endif
 
