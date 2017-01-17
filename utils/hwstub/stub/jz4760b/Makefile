@@ -17,6 +17,13 @@ EXEC=$(BUILD_DIR)/factory.x1
 
 include ../hwstub.make
 
+# make packtools if necessary
+$(PACKTOOLS):
+	make -C $(JZ4760TOOLS)
+
+# add dependency on packtool
+$(BUILD_DIR)/factory.x1: $(PACKTOOLS)
+
 $(BUILD_DIR)/factory.x1: $(EXEC_BIN)
 	$(call PRINTS,PACKTOOLS $(@F))
 	$(SILENT)$(PACKTOOLS) --scramble -o $@ -i $<
