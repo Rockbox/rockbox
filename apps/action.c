@@ -378,7 +378,7 @@ static int get_action_worker(int context, int timeout, bool *is_pre_button,
         if (items == NULL)
             break;
 
-            ret = do_button_check(items, button, last_button, &i, is_pre_button);
+        ret = do_button_check(items, button, last_button, &i, is_pre_button);
 
         if (ret == ACTION_UNKNOWN)
         {
