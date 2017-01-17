@@ -51,7 +51,7 @@ reloc_loop:
 
     /* Tricky part: as explained earlier, tcsm0 is uncached so no need to commit
      * the dcache but we want to invalidate the icache ONLY AT THIS LOCATION.
-     * Indeed, if the invalidate the entire icache in the cache-as-ram case, we
+     * Indeed, if we invalidate the entire icache in the cache-as-ram case, we
      * will miserably crash */
     cache   ICHitInv, 0(t0)   /* invalidate virtual address in icache */
 
@@ -92,7 +92,73 @@ clear_bss_loop:
 stack_setup:
     la      sp, oc_stackend
 
+    /* the tcsm0 is usually accessed by its weird 0xf4000000 address but this
+     * address is not in the range available for EBASE (because EBASE[31:30]
+     * is hardwired to 0b10). Fortunately, the TCSM0 can be accessed by its
+     * physical address (0x132b0000) if we ungate the AHB1 */
+    la      t0, 0xb0000028 /* CPM_CLKGATE1 */
+    lw      t1, 0(t0)
+    li      t2, 0xffffff7e /* AHB1 */
+    and     t1, t2 /* clear AHB1 */
+    sw      t1, 0(t0)
+    /* keep interrupts disabled, use normal exception vectors (to use EBASE) */
+    li      t0, 0
+    mtc0    t0, C0_STATUS
+    /* set EBASE */
+    la      t0, irqbase
+    mtc0    t0, C0_EBASE
     /* jump to C code */
     la      t0, main
     jr      t0
     move    a0, k0
+
+die_blink:
+    /* die blinking */
+    la      a0, 0xb0010400
+    li      a1, 2
+    sw      a1, 0x48(a0) /* clear function (gpio or interrupt) */
+    sw      a1, 0x58(a0) /* clear select (gpio) */
+    sw      a1, 0x64(a0) /* set direction (out) */
+    sw      a1, 0x34(a0) /* set pull (disable) */
+    /* turn backlight on and off */
+    la      a0, 0xb0010414
+    li      a1, 2
+.blink_loop:
+    sw      a1, (a0)
+    la      v0, 10000000
+.wait:
+    bnez    v0, .wait
+    subu    v0, 1
+    sw      a1, 4(a0)
+    la      v0, 10000000
+.wait2:
+    bnez    v0, .wait2
+    subu    v0, 1
+    j       .blink_loop
+    nop
+
+/* restore_data_abort_jmp restores the context and returns from exception */
+    .extern restore_data_abort_jmp
+
+    .global tlb_refill_handler
+    .section .exception.tlb_refill,"ax",%progbits
+tlb_refill_handler:
+    la      k0, die_blink
+    jr      k0
+    nop
+
+    .global cache_error_handler
+    .section .exception.cache_error,"ax",%progbits
+cache_error_handler:
+    la      k0, die_blink
+    jr      k0
+    nop
+
+    .global general_exception_handler
+    .section .exception.general_exception,"ax",%progbits
+general_exception_handler:
+    la      k0, die_blink
+    jr      k0
+    nop
+
+/* no IRQ handler because we don't use interrupts and mask them all */

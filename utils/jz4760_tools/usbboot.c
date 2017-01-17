@@ -25,6 +25,7 @@
 #include <libusb.h>
 #include <getopt.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 #define VR_GET_CPU_INFO         0
 #define VR_SET_DATA_ADDRESS     1

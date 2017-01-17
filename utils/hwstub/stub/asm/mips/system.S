@@ -49,8 +49,36 @@ set_data_abort_jmp:
     sw ra, 40(v0)
     jr ra
     move v0, zero
+
+/* restore context on read/write error, performs the interrupt return */
+.global restore_data_abort_jmp
+restore_data_abort_jmp:
+la k1, data_abort_jmp_ctx_ptr
+    lw s0,  0(k1)
+    lw s1,  4(k1)
+    lw s2,  8(k1)
+    lw s3, 12(k1)
+    lw s4, 16(k1)
+    lw s5, 20(k1)
+    lw s6, 24(k1)
+    lw s7, 28(k1)
+    lw sp, 32(k1)
+    lw s8, 36(k1)
+    lw k1, 40(k1)
+    mtc0 k1, C0_EPC
+#ifdef CONFIG_JZ4760B
+    /* XBurst has a 3 interlock cycle delay, but we don't know if the interlock
+     * works with eret */
+    nop
+#else
+    ehb
+#endif
+    li v0, 1
+    eret
+    nop
 .set reorder
 
+#ifdef CONFIG_FLUSH_CACHES
 .set noreorder
 .text
 .global target_flush_caches
@@ -72,3 +100,4 @@ reloc_icache_loop:
     nop
     jr      ra
     nop
+#endif

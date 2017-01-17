@@ -108,7 +108,7 @@ function XBURST.do_ebase_exc_test(mem_addr)
     exc_addr = mem_addr + 0x180 -- general exception vector
     data_addr = mem_addr + 0x300
     -- lui k0,<low part of data_addr>
-    -- ori     k0,k0,0xbeef
+    -- ori     k0,k0,<high part>
     DEV.write32(exc_addr + 0, 0x3c1a0000 + bit32.rshift(data_addr, 16))
     DEV.write32(exc_addr + 4, 0x375a0000 + bit32.band(data_addr, 0xffff))
     -- lui     k1,0xdead
@@ -179,6 +179,73 @@ function XBURST.test_ebase(mem_addr)
         return
     end
     print("  Exception result: " .. XBURST.do_ebase_exc_test(mem_addr))
+end
+
+function XBURST.test_ext_inst(mem_addr)
+    data_addr = mem_addr + 0x80
+    -----------
+    -- test ext
+    -----------
+    for pos = 0, 31 do
+        for size = 1, 32 - pos do
+            -- lui     v0,<low part of data_addr>
+            -- addiu   v0,v0,<high part>
+            -- lw      v1,0(v0)
+            DEV.write32(mem_addr + 0, 0x3c020000 + bit32.rshift(data_addr, 16))
+            DEV.write32(mem_addr + 4, 0x8c430000 + bit32.band(data_addr, 0xffff))
+            DEV.write32(mem_addr + 8, 0x8c430000)
+            -- ext     v1, v1, pos, size
+            DEV.write32(mem_addr + 12, 0x7c630000 + bit32.rshift(size - 1, 11) + bit32.rshift(pos, 6))
+            -- sw      v1,0(v0)
+            DEV.write32(mem_addr + 16, 0xac430000)
+            -- jr   ra
+            -- nop
+            DEV.write32(mem_addr + 20, 0x03e00008)
+            DEV.write32(mem_addr + 24, 0)
+            -- write some random data
+            data = math.random(0xffffffff)
+            print(string.format("  data: %x", data))
+            DEV.write32(data_addr, data)
+            DEV.call(mem_addr)
+            ext_data = DEV.read32(data_addr)
+            print(string.format("  result: %x vs %x", ext_data, bit32.extract(data, pos, size)))
+            break
+        end
+        break
+    end
+end
+
+function XBURST.test_ei_di_inst(mem_addr)
+    -- save SR and disable interrupts
+    old_sr = XBURST.read_cp0(12, 0)
+    XBURST.write_cp0(12, 0, bit32.replace(old_sr, 0, 0)) -- clear EI
+    print("Testing ei")
+    print("  Test SR")
+    print("    Enable interrupts with CP0")
+    XBURST.write_cp0(12, 0, bit32.replace(old_sr, 1, 0)) -- set EI
+    print(string.format("    SR: 0x%x", XBURST.read_cp0(12, 0)))
+    print("    Disable interrupts with CP0")
+    XBURST.write_cp0(12, 0, bit32.replace(old_sr, 0, 0)) -- clear EI
+    print(string.format("    SR: 0x%x", XBURST.read_cp0(12, 0)))
+
+    print("  Test ei/di")
+    print("    Enable interrupts with ei")
+    -- ei
+    -- jr   ra
+    -- nop
+    DEV.write32(mem_addr + 4, 0x41606020)
+    DEV.write32(mem_addr + 4, 0x03e00008)
+    DEV.write32(mem_addr + 8, 0)
+    DEV.call(mem_addr)
+    print(string.format("    SR: 0x%x", XBURST.read_cp0(12, 0)))
+    print("    Disable interrupts with di")
+    -- di
+    DEV.write32(mem_addr + 4, 0x41606000)
+    DEV.call(mem_addr)
+    print(string.format("    SR: 0x%x", XBURST.read_cp0(12, 0)))
+
+    -- restore SR
+    XBURST.write_cp0(old_sr)
 end
 
 function XBURST.init()
