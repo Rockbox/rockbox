@@ -106,10 +106,11 @@ bool could_be_rockbox(unsigned char *buffer, size_t size)
 
 void usage(void)
 {
-    printf("usage: hwstub::load [options] <addr> <file>\n");
+    printf("usage: hwstub_load [options] <addr> <file>\n");
     printf("options:\n");
     printf("  --help/-?       Display this help\n");
     printf("  --quiet/-q      Quiet output\n");
+    printf("  --verbose/-v    Verbose output\n");
     printf("  --type/-t <t>   Override file type\n");
     printf("  --dev/-d <uri>  Device URI (see below)\n");
     printf("  --verbose/-v    Display debug output\n");
@@ -140,7 +141,7 @@ int main(int argc, char **argv)
     {
         static struct option long_options[] =
         {
-            {"help", no_argument, 0, '?'},
+            {"help", no_argument, 0, 'h'},
             {"quiet", no_argument, 0, 'q'},
             {"type", required_argument, 0, 't'},
             {"dev", required_argument, 0, 'd'},
@@ -150,7 +151,7 @@ int main(int argc, char **argv)
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?qt:d:elv", long_options, NULL);
+        int c = getopt_long(argc, argv, "hqt:d:elv", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -160,7 +161,7 @@ int main(int argc, char **argv)
             case 'q':
                 quiet = true;
                 break;
-            case '?':
+            case 'h':
                 usage();
                 break;
             case 't':

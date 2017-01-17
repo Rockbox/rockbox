@@ -1299,7 +1299,7 @@ void usage(void)
     printf("shell, compiled with hwstub protocol %d.%d\n",
         HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR);
     printf("\n");
-    printf("usage: shell [options] <soc desc files>\n");
+    printf("usage: hwstub_shell [options] <soc desc files>\n");
     printf("options:\n");
     printf("  --help/-?       Display this help\n");
     printf("  --quiet/-q      Quiet non-command messages\n");
