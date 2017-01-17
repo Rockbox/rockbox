@@ -5,6 +5,7 @@ battery_bench.c
 chessclock.c
 credits.c
 cube.c
+cubetimer.c
 dict.c
 jackpot.c
 keybox.c
