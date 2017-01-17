@@ -101,6 +101,10 @@ public:
     void set_timeout(std::chrono::milliseconds ms);
 
 protected:
+    /* return the maximum size of a libusb control transfer, this is a "known"
+     * limitation that is completely undocumented (sigh) and applies at least
+     * to linux and windows hosts */
+    size_t max_libusb_control_xfer_size() const;
     /* interpret libusb error: >=0 means SUCCESS, others are treated as errors,
      * LIBUSB_ERROR_NO_DEVICE is treated as DISCONNECTED */
     error interpret_libusb_error(int err);
