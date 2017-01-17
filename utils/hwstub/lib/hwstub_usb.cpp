@@ -245,6 +245,15 @@ handle::~handle()
     libusb_close(m_handle);
 }
 
+size_t handle::max_libusb_control_xfer_size() const
+{
+    /* on Linux and Windows, libusb limits control transfers to 4k, this is not
+     * documented anywhere except in the source code, see libusb/os/linux_usbfs.h
+     * for MAX_CTRL_BUFFER_LENGTH. Obviously they didn't put it in the system
+     * header files... */
+    return 4096;
+}
+
 error handle::interpret_libusb_error(int err)
 {
     if(err >= 0)
@@ -252,7 +261,10 @@ error handle::interpret_libusb_error(int err)
     if(err == LIBUSB_ERROR_NO_DEVICE)
         return error::DISCONNECTED;
     else
+    {
+        get_device()->get_context()->debug() << "[usb::handle] libusb error: " << err << "\n";
         return error::USB_ERROR;
+    }
 }
 
 error handle::interpret_libusb_error(int err, size_t expected_val)
@@ -332,7 +344,10 @@ rb_handle::~rb_handle()
 
 size_t rb_handle::get_buffer_size()
 {
-    return m_buf_size;
+    /* We return slightly less because the usb protocol involves sending a header
+     * followed by the data, so it reduces the actual buffer size by the size
+     * of the header. To be safe, allow for a 128 bytes header. */
+    return std::min(m_buf_size, max_libusb_control_xfer_size()) - 128;
 }
 
 error rb_handle::status() const
@@ -543,7 +558,9 @@ error jz_handle::probe()
     m_desc_layout.dStackStart = 0; /* As far as I can tell, the ROM uses no stack */
     m_desc_layout.dStackSize = 0;
     m_desc_layout.dBufferStart = 0x080000000;
-    m_desc_layout.dBufferSize = 0x4000;
+    /* max buffer size: leave some space for header so that header + data doesn't
+     * hit the limit */
+    m_desc_layout.dBufferSize = max_libusb_control_xfer_size() - 128;
 
     m_desc_target.bLength = sizeof(m_desc_target);
     m_desc_target.bDescriptorType = HWSTUB_DT_TARGET;
