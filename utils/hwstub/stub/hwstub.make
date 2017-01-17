@@ -19,7 +19,9 @@ DEPS=$(foreach obj,$(OBJ),$(obj).d)
 
 EXEC+=$(EXEC_ELF) $(EXEC_BIN)
 
-SILENT?=@
+ifndef V
+SILENT=@
+endif
 PRINTS=$(SILENT)$(call info,$(1))
 
 all: $(EXEC)
