@@ -427,34 +427,25 @@ static void handle_read(struct usb_ctrlrequest *req)
             return usb_drv_stall(EP_CONTROL, true, true);
         size_t len = MIN(req->wLength, last_read_max_size);
 
-        if(req->bRequest == HWSTUB_READ2_ATOMIC)
+        int ret = set_exception_jmp();
+        if(ret == 0)
         {
-            if(set_data_abort_jmp() == 0)
+            if(req->bRequest == HWSTUB_READ2_ATOMIC)
             {
                 if(!read_atomic(usb_buffer, last_read_addr, len))
                     return usb_drv_stall(EP_CONTROL, true, true);
             }
             else
             {
-                logf("trapped read data abort in [0x%x,0x%x]\n", last_read_addr,
-                    last_read_addr + len);
-                return usb_drv_stall(EP_CONTROL, true, true);
+                    memcpy(usb_buffer, last_read_addr, len);
+                    asm volatile("nop" : : : "memory");
             }
         }
         else
         {
-            if(set_data_abort_jmp() == 0)
-            {
-                memcpy(usb_buffer, last_read_addr, len);
-                asm volatile("nop" : : : "memory");
-            }
-            else
-            {
-                logf("trapped read data abort in [0x%x,0x%x]\n", last_read_addr,
-                    last_read_addr + len);
-                return usb_drv_stall(EP_CONTROL, true, true);
-            }
-
+            logf("trapped exception %d in read [0x%x,0x%x]\n", ret, last_read_addr,
+                last_read_addr + len);
+            return usb_drv_stall(EP_CONTROL, true, true);
         }
 
         usb_drv_send(EP_CONTROL, usb_buffer, len);
@@ -482,9 +473,10 @@ static void handle_write(struct usb_ctrlrequest *req)
     if(size < sz_hdr)
         return usb_drv_stall(EP_CONTROL, true, true);
 
-    if(req->bRequest == HWSTUB_WRITE_ATOMIC)
+    int ret = set_exception_jmp();
+    if(ret == 0)
     {
-        if(set_data_abort_jmp() == 0)
+        if(req->bRequest == HWSTUB_WRITE_ATOMIC)
         {
             if(!write_atomic((void *)write->dAddress,
                              usb_buffer + sz_hdr, size - sz_hdr))
@@ -492,27 +484,55 @@ static void handle_write(struct usb_ctrlrequest *req)
         }
         else
         {
-            logf("trapped write data abort in [0x%x,0x%x]\n", write->dAddress,
-                 write->dAddress + size - sz_hdr);
-            return usb_drv_stall(EP_CONTROL, true, true);
+            memcpy((void *)write->dAddress,
+                   usb_buffer + sz_hdr, size - sz_hdr);
         }
     }
     else
     {
-        if(set_data_abort_jmp() == 0)
-        {
-            memcpy((void *)write->dAddress,
-                   usb_buffer + sz_hdr, size - sz_hdr);
-        }
-        else
-        {
-            logf("trapped write data abort in [0x%x,0x%x]\n", write->dAddress,
-                 write->dAddress + size - sz_hdr);
-            return usb_drv_stall(EP_CONTROL, true, true);
-        }
+        logf("trapped exception %d in write [0x%x,0x%x]\n", ret, write->dAddress,
+                write->dAddress + size - sz_hdr);
+        return usb_drv_stall(EP_CONTROL, true, true);
     }
 
     usb_drv_send(EP_CONTROL, NULL, 0);
+}
+
+static bool do_call(uint32_t addr)
+{
+    /* trap exceptions */
+    int ret = set_exception_jmp();
+    if(ret == 0)
+    {
+#if defined(CPU_ARM)
+        /* in case of call, respond after return */
+        asm volatile("blx %0\n" : : "r"(addr) : "memory");
+        return true;
+#elif defined(CPU_MIPS)
+        asm volatile("jalr %0\nnop\n" : : "r"(addr) : "memory");
+        return true;
+#else
+#warning call is unsupported on this platform
+        return false;
+#endif
+    }
+    else
+    {
+        logf("trapped exception %d in call\n", ret);
+        return false;
+    }
+}
+
+static void do_jump(uint32_t addr)
+{
+#if defined(CPU_ARM)
+    asm volatile("bx %0\n" : : "r" (addr) : "memory");
+#elif defined(CPU_MIPS)
+    asm volatile("jr %0\nnop\n" : : "r" (addr) : "memory");
+#else
+#warning jump is unsupported on this platform
+#define NO_JUMP
+#endif
 }
 
 static void handle_exec(struct usb_ctrlrequest *req)
@@ -537,31 +557,19 @@ static void handle_exec(struct usb_ctrlrequest *req)
 
     if(exec->bmFlags & HWSTUB_EXEC_CALL)
     {
-#if defined(CPU_ARM)
-        /* in case of call, respond after return */
-        asm volatile("blx %0\n" : : "r"(addr) : "memory");
-        usb_drv_send(EP_CONTROL, NULL, 0);
-#elif defined(CPU_MIPS)
-        asm volatile("jalr %0\nnop\n" : : "r"(addr) : "memory");
-        usb_drv_send(EP_CONTROL, NULL, 0);
-#else
-#warning call is unsupported on this platform
-        usb_drv_stall(EP_CONTROL, true, true);
-#endif
+        if(do_call(addr))
+            usb_drv_send(EP_CONTROL, NULL, 0);
+        else
+            usb_drv_stall(EP_CONTROL, true, true);
     }
     else
     {
+#ifndef NO_JUMP
         /* in case of jump, respond immediately and disconnect usb */
-#if defined(CPU_ARM)
         usb_drv_send(EP_CONTROL, NULL, 0);
         usb_drv_exit();
-        asm volatile("bx %0\n" : : "r" (addr) : "memory");
-#elif defined(CPU_MIPS)
-        usb_drv_send(EP_CONTROL, NULL, 0);
-        usb_drv_exit();
-        asm volatile("jr %0\nnop\n" : : "r" (addr) : "memory");
-#else 
-#warning jump is unsupported on this platform
+        do_jump(addr);
+#else
         usb_drv_stall(EP_CONTROL, true, true);
 #endif
     }
