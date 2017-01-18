@@ -52,7 +52,6 @@ SECTIONS
     .itext :
     {
         _iramstart = .; // always 0
-        *(.vectors)
         KEEP(*(.vectors));// otherwise there are no references to it and the linker strip it
         *(.icode*)
         *(.irodata*)
