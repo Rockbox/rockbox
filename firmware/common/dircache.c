@@ -781,56 +781,66 @@ static int alloc_name(size_t size)
     if (dircache.namesfree >= size)
     {
         /* scan for a free gap starting at the hint point - first fit */
-        unsigned char *start = get_name(dircache.nextnamefree), *p = start;
-        unsigned char *namesend = get_name(dircache.names + dircache.sizenames);
-        size_t gapsize = 0;
+        unsigned char * const start = get_name(dircache.nextnamefree);
+        unsigned char * const bufend = get_name(dircache.names + dircache.sizenames);
+        unsigned char *p = start;
+        unsigned char *end = bufend;
 
-        while (gapsize < size)
+        while (1)
         {
-            if ((p = memchr(p, 0xff, namesend - p)))
+            if ((size_t)(bufend - p) >= size && (p = memchr(p, 0xff, end - p)))
             {
                 /* found a sentinel; see if there are enough in a row */
-                gapsize = 1;
-                while (*++p == 0xff && gapsize < size)
-                    gapsize++;
+                unsigned char *q = p + size - 1;
+
+                /* check end byte and every MAX_TINYNAME+1 bytes from the end;
+                   the minimum-length indirectly allocated string that could be
+                   in between must have at least one character at one of those
+                   locations */
+                while (q > p && *q == 0xff)
+                    q -= MAX_TINYNAME+1;
+
+                if (q <= p)
+                {
+                    nameidx = get_nameidx(p);
+                    break;
+                }
+
+                p += size;
             }
             else
             {
-                if (namesend == start)
+                if (end == start)
                     break; /* exhausted */
 
                 /* wrap */
-                namesend = start;
+                end = start;
                 p = get_name(dircache.names);
 
-                if (p == namesend)
+                if (p == end)
                     break; /* initial hint was at names start */
             }
         }
 
-        if (gapsize >= size)
+        if (nameidx)
         {
-            unsigned char *namep = p - gapsize;
-            nameidx = get_nameidx(namep);
-
-            if (*p == 0xff)
+            unsigned char *q = p + size;
+            if (q[0] == 0xff && q[MAX_TINYNAME] != 0xff)
             {
-                /* if only a tiny block remains after buffer, claim it too */
-                size_t tinysize = 1;
-                while (*++p == 0xff && tinysize <= MAX_TINYNAME)
-                    tinysize++;
-
-                if (tinysize <= MAX_TINYNAME)
+                /* if only a tiny block remains after buffer, claim it and
+                   hide it from scans since it's too small for indirect
+                   allocation */
+                do
                 {
-                    /* mark with tiny block sentinel */
-                    memset(p - tinysize, 0xfe, tinysize);
-                    size += tinysize;
+                    *q = 0xfe;
+                    size++;
                 }
+                while (*++q == 0xff);
             }
 
             dircache.namesfree -= size;
             dircache.sizeused += size;
-            set_namesfree_hint(namep + size);
+            set_namesfree_hint(p + size);
         }
     }
 
