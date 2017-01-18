@@ -21,6 +21,7 @@
 #ifndef __HWSTUB_SYSTEM__
 #define __HWSTUB_SYSTEM__
 
+#ifdef ARM_ARCH
 #define IRQ_ENABLED      0x00
 #define IRQ_DISABLED     0x80
 #define IRQ_STATUS       0x80
@@ -56,6 +57,7 @@
 #define enable_fiq() \
     enable_interrupt(FIQ_STATUS)
 
+#ifndef __ASSEMBLER__
 static inline int set_interrupt_status(int status, int mask)
 {
     unsigned long cpsr;
@@ -113,8 +115,21 @@ static inline int disable_interrupt_save(int mask)
         : "i"(mask));
     return cpsr;
 }
+#endif /* __ASSEMBLER__ */
+#endif /* ARM_ARCH */
 
-int set_data_abort_jmp(void);
+/* Save the current context into a local buffer and return 0.
+ * When an exception occurs, typically read/write at invalid address or invalid
+ * instructions (the exact exceptions caught depend on the architecture), it will
+ * restore the context to what it was when the function was called except that
+ * it returns a nonzero value describing the error */
+#define EXCEPTION_NONE  0   /* no exception, returned on the first call */
+#define EXCEPTION_UNSP  1   /* some unspecified exception occured */
+#define EXCEPTION_ADDR  2   /* read/write at an invalid address */
+#define EXCEPTION_INSTR 3   /* invalid instruction */
+
+#ifndef __ASSEMBLER__
+int set_exception_jmp(void);
+#endif /* __ASSEMBLER__ */
 
 #endif /* __HWSTUB_SYSTEM__ */
- 
