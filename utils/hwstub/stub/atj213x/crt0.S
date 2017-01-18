@@ -1,4 +1,5 @@
 #include "mips.h"
+#include "system.h"
 
     .extern main
     .global start
@@ -134,12 +135,12 @@ stack_munge_loop:
     jr.hb t0
     ei
 
-    .extern data_abort_jmp_ctx_ptr
+    .extern exception_jmp_ctx_ptr
     .global tlb_refill_handler
     .section .exception.tlb_refill,"ax",%progbits
 
 tlb_refill_handler:
-    la k1, data_abort_jmp_ctx_ptr
+    la k1, exception_jmp_ctx_ptr
     lw s0,  0(k1)
     lw s1,  4(k1)
     lw s2,  8(k1)
@@ -153,7 +154,7 @@ tlb_refill_handler:
     lw k1, 40(k1)
     mtc0 k1, C0_EPC
     ehb
-    li v0, 1
+    li v0, EXCEPTION_ADDR
     eret
     nop
 
@@ -161,7 +162,7 @@ tlb_refill_handler:
     .section .exception.cache_error,"ax",%progbits
 
 cache_error_handler:
-    la k1, data_abort_jmp_ctx_ptr
+    la k1, exception_jmp_ctx_ptr
     lw s0,  0(k1)
     lw s1,  4(k1)
     lw s2,  8(k1)
@@ -175,7 +176,7 @@ cache_error_handler:
     lw k1, 40(k1)
     mtc0 k1, C0_EPC
     ehb
-    li v0, 1
+    li v0, EXCEPTION_ADDR
     eret
     nop
 
@@ -183,7 +184,7 @@ cache_error_handler:
     .section .exception.general_exception,"ax",%progbits
 
 general_exception_handler:
-    la k1, data_abort_jmp_ctx_ptr
+    la k1, exception_jmp_ctx_ptr
     lw s0,  0(k1)
     lw s1,  4(k1)
     lw s2,  8(k1)
@@ -197,7 +198,7 @@ general_exception_handler:
     lw k1, 40(k1)
     mtc0 k1, C0_EPC
     ehb
-    li v0, 1
+    li v0, EXCEPTION_UNSP
     eret
     nop
 
