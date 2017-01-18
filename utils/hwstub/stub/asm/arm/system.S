@@ -18,32 +18,33 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "system.h"
 
 /* Handling of data abort:
  * the code can register a "longjmp" buffer to restore the context in case of
  * fault */
 .data
-data_abort_jmp_ctx_ptr:
+exception_jmp_ctx_ptr:
 /* buffer contains in order: cpsr,r4-r11,sp,lr,pc */
 .skip   48 /* = 4 * (cpsr +  11 registers) */
 
 .text
-/* Prototype: int set_data_abort_jmp()
- * Return: 1 in case of data abort, 0 otherwise */
-.global set_data_abort_jmp
-set_data_abort_jmp:
+/* Prototype: int set_exception_jmp()
+ * Return: !=0 in case of exception, 0 otherwise */
+.global set_exception_jmp
+set_exception_jmp:
     mrs     r2, cpsr
-    ldr     r1, =data_abort_jmp_ctx_ptr
-    mov     r0, #0
-    stmia   r1, {r2,r4-r11,sp,lr,pc} /* see PC note below */
-    bx      lr
-    mov     r0, #1 /* <-- PC points here in stmia */
-    bx      lr
+    ldr     r1, =exception_jmp_ctx_ptr
+    mov     r0, #EXCEPTION_NONE /* nothing to report */
+    stmia   r1!, {r2,r4-r11,sp,lr} /* see PC note below */
+    mov     r3, pc /* see note below */
+    str     r3, [r1] /* store PC */
+    bx      lr   /* <-- PC points here in mov */
 
 .global data_abort_handler
 data_abort_handler:
     /* restore everything from context */
-    ldr     r1, =data_abort_jmp_ctx_ptr
+    ldr     r1, =exception_jmp_ctx_ptr
     /* NOTE: we need to restore sp_sys and lr_sys, for this we need the
      * LDM  Rn, {}^
      * variant, but we cannot restore PC from it because ^ has a different
@@ -54,4 +55,5 @@ data_abort_handler:
      * because we do not save the abort address and we don't use an abort stack */
     ldmia   r1, {r0,r4-r11,sp,lr}^  /* this variant cannot have writeback (r1!) */
     msr     spsr, r0
-    ldmia   r1, {r0,r4-r11,sp,lr,pc}^ /* reload some registers but we don't care */
+    mov     r0, #EXCEPTION_ADDR
+    ldmia   r1, {r1,r4-r11,sp,lr,pc}^ /* reload some registers but we don't care */
