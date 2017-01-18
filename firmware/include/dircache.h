@@ -69,6 +69,9 @@ typedef uint32_t dc_serial_t;
 /**
  ****************************************************************************/
 
+#define IF_DIRCACHE(...) __VA_ARGS__
+#define IFN_DIRCACHE(...)
+
 #if CONFIG_PLATFORM & PLATFORM_NATIVE
 /* native dircache is lower-level than on a hosted target */
 #define DIRCACHE_NATIVE
@@ -169,6 +172,9 @@ enum dircache_search_flags
 int dircache_search(unsigned int flags, struct dircache_fileref *dcfrefp,
                     const char *path);
 
+int dircache_fileref_cmp(const struct dircache_fileref *dcfrefp1,
+                         const struct dircache_fileref *dcfrefp2);
+
 
 /** Debug screen/info stuff **/
 
@@ -201,6 +207,11 @@ int dircache_save(void);
 #endif /* HAVE_EEPROM_SETTINGS */
 
 void dircache_init(size_t last_size) INIT_ATTR;
+
+#else /* !HAVE_DIRCACHE */
+
+#define IF_DIRCACHE(...)
+#define IFN_DIRCACHE(...) __VA_ARGS__
 
 #endif /* HAVE_DIRCACHE */
 

@@ -354,6 +354,10 @@ static int open_internal_inner2(const char *path,
     int rc;
 
     struct path_component_info compinfo;
+
+    if (callflags & FF_CREAT)
+        callflags |= FF_PARENTINFO;
+
     rc = open_stream_internal(path, callflags, &file->stream, &compinfo);
     if (rc < 0)
     {
@@ -989,7 +993,8 @@ int rename(const char *old, const char *new)
     file_internal_lock_WRITER();
 
     /* open 'old'; it must exist */
-    open1rc = open_stream_internal(old, FF_ANYTYPE, &oldstr, &oldinfo);
+    open1rc = open_stream_internal(old, FF_ANYTYPE | FF_PARENTINFO, &oldstr,
+                                   &oldinfo);
     if (open1rc <= 0)
     {
         DEBUGF("Failed opening old: %d\n", open1rc);
@@ -1014,7 +1019,8 @@ int rename(const char *old, const char *new)
         newinfo.prefixp = oldstr.infop;
     }
 
-    open2rc = open_stream_internal(new, callflags, &newstr, &newinfo);
+    open2rc = open_stream_internal(new, callflags | FF_PARENTINFO, &newstr,
+                                   &newinfo);
     if (open2rc < 0)
     {
         DEBUGF("Failed opening new file: %d\n", open2rc);

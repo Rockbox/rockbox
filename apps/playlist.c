@@ -1324,7 +1324,7 @@ static void playlist_thread(void)
                      && queue_empty(&playlist_queue); index++)
                 {
                     /* Process only pointers that are superficially stale. */
-                    if (dircache_search(DCS_FILEREF, &playlist->dcfrefs[index], NULL) == 0)
+                    if (dircache_search(DCS_FILEREF, &playlist->dcfrefs[index], NULL) > 0)
                         continue ;
                     
                     control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;

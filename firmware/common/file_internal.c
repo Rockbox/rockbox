@@ -351,10 +351,10 @@ static int fill_path_compinfo(struct pathwalk *walkp,
         compinfo->length     = compp->length;
         compinfo->attr       = compp->attr;
         compinfo->filesize   = walkp->filesize;
-        if (!(walkp->callflags & FF_SELFINFO))
-            compinfo->parentinfo = (compp->nextp ?: compp)->info;
-        else
+        if (walkp->callflags & FF_INFO)
             compinfo->info = compp->info;
+        if (walkp->callflags & FF_PARENTINFO)
+            compinfo->parentinfo = (compp->nextp ?: compp)->info;
     }
 
     return rc;
@@ -571,9 +571,9 @@ int open_stream_internal(const char *path, unsigned int callflags,
         FILE_ERROR(path ? ENOENT : EFAULT, -1);
     }
 
-    /* if !compinfo, then the result of this check is not visible anyway */
+    /* if !compinfo then these cannot be returned anyway */
     if (!compinfo)
-        callflags &= ~FF_CHECKPREFIX;
+        callflags &= ~(FF_INFO | FF_PARENTINFO | FF_CHECKPREFIX);
 
     /* This lets it be passed quietly to directory scanning */
     stream->flags = callflags & FF_MASK;

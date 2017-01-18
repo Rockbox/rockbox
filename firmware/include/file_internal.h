@@ -136,8 +136,9 @@ enum fildes_and_obj_flags
     FF_NOISO       = 0x00200000, /* do not decode ISO filenames to UTF-8 */
     FF_PROBE       = 0x00400000, /* only test existence; don't open */
     FF_CACHEONLY   = 0x00800000, /* succeed only if in dircache */
-    FF_SELFINFO    = 0x01000000, /* return info on self as well */
-    FF_MASK        = 0x01ff0000,
+    FF_INFO        = 0x01000000, /* return info on self */
+    FF_PARENTINFO  = 0x02000000, /* return info on parent */
+    FF_MASK        = 0x03ff0000,
 };
 
 /** Common data structures used throughout **/
@@ -244,18 +245,16 @@ static inline void filestr_unlock(struct filestr_base *stream)
 /* structure to return detailed information about what you opened */
 struct path_component_info
 {
-    const char   *name;               /* pointer to name within 'path' (OUT) */
-    size_t       length;              /* length of component within 'path' */
-    file_size_t  filesize;            /* size of the opened file (0 if dir) */
-    unsigned int attr;                /* attributes of this component */
-    struct file_base_info *prefixp;   /* base info to check as prefix
-                                         (IN if FF_CHECKPREFIX) */
-    union {
-    struct file_base_info parentinfo; /* parent directory base info of file
-                                         (if not FF_SELFINFO) */
-    struct file_base_info info;       /* base info of file itself
-                                         (if FF_SELFINFO) */
-    };
+    const char   *name;               /* OUT: pointer to name within 'path' */
+    size_t       length;              /* OUT: length of component within 'path' */
+    file_size_t  filesize;            /* OUT: size of the opened file (0 if dir) */
+    unsigned int attr;                /* OUT: attributes of this component */
+    struct file_base_info info;       /* OUT: base info on file
+                                              (FF_INFO) */
+    struct file_base_info parentinfo; /* OUT: base parent directory info
+                                              (FF_PARENTINFO) */
+    struct file_base_info *prefixp;   /* IN:  base info to check as prefix
+                                              (FF_CHECKPREFIX) */
 };
 
 int open_stream_internal(const char *path, unsigned int callflags,

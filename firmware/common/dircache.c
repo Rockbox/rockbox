@@ -610,6 +610,19 @@ static int get_index(const struct dircache_entry *ce)
 }
 
 /**
+ * return the frontier flags for the index
+ */
+static uint32_t get_frontier(int idx)
+{
+    if (idx == 0)
+        return UINT32_MAX;
+    else if (idx > 0)
+        return get_entry(idx)->frontier;
+    else /* idx < 0 */
+        return get_idx_dcvolp(idx)->frontier;
+}
+
+/**
  *  return the sublist down pointer for the sublist that contains entry 'idx'
  */
 static int * get_downidxp(int idx)
@@ -2515,30 +2528,41 @@ static ssize_t get_path_sub(int idx, struct get_path_sub_data *data)
 }
 
 /**
- * retrieve and validate the file's entry/binding serial number
+ * validate the file's entry/binding serial number
  * the dircache file's serial number must match the indexed entry's or the
  * file reference is stale
  */
-static dc_serial_t get_file_serialnum(const struct dircache_file *dcfilep)
+static int check_file_serialnum(const struct dircache_file *dcfilep)
 {
     int idx = dcfilep->idx;
 
     if (idx == 0 || idx < -NUM_VOLUMES)
-        return 0;
+        return -EBADF;
 
-    dc_serial_t serialnum;
+    dc_serial_t serialnum = dcfilep->serialnum;
+
+    if (serialnum == 0)
+        return -EBADF;
+
+    dc_serial_t s;
 
     if (idx > 0)
     {
         struct dircache_entry *ce = get_entry(idx);
-        serialnum = ce ? ce->serialnum : 0;
+        if (!ce || !(s = ce->serialnum))
+            return -EBADF;
     }
-    else
+    else /* idx < 0 */
     {
-        serialnum = get_idx_dcvolp(idx)->serialnum;
+        struct dircache_volume *dcvolp = get_idx_dcvolp(idx);
+        if (!(s = dcvolp->serialnum))
+            return -EBADF;
     }
 
-    return serialnum == dcfilep->serialnum ? serialnum : 0;
+    if (serialnum != s)
+        return -EBADF;
+
+    return 0;
 }
 
 /**
@@ -2582,12 +2606,17 @@ void dircache_fileref_init(struct dircache_fileref *dcfrefp)
  *   failure - a negative value
  *
  * errors:
+ *   EBADF  - Bad file number
+ *   EFAULT - Bad address
  *   ENOENT - No such file or directory
  */
 ssize_t dircache_get_fileref_path(const struct dircache_fileref *dcfrefp, char *buf,
                                   size_t size)
 {
     ssize_t rc;
+
+    if (!dcfrefp)
+        FILE_ERROR_RETURN(EFAULT, -1);
 
     /* if missing buffer space, still return what's needed a la strlcpy */
     if (!buf)
@@ -2600,10 +2629,11 @@ ssize_t dircache_get_fileref_path(const struct dircache_fileref *dcfrefp, char *
     /* first and foremost, there must be a cache and the serial number must
        check out */
     if (!dircache_runinfo.handle)
-        FILE_ERROR(ENOENT, -1);
+        FILE_ERROR(EBADF, -2);
 
-    if (get_file_serialnum(&dcfrefp->dcfile) == 0)
-        FILE_ERROR(ENOENT, -2);
+    rc = check_file_serialnum(&dcfrefp->dcfile);
+    if (rc < 0)
+        FILE_ERROR(-rc, -3);
 
     struct get_path_sub_data data =
     {
@@ -2614,10 +2644,10 @@ ssize_t dircache_get_fileref_path(const struct dircache_fileref *dcfrefp, char *
 
     rc = get_path_sub(dcfrefp->dcfile.idx, &data);
     if (rc < 0)
-        FILE_ERROR(ENOENT, rc * 10 - 3);
+        FILE_ERROR(ENOENT, rc * 10 - 4);
 
     if (data.serialhash != dcfrefp->serialhash)
-        FILE_ERROR(ENOENT, -4);
+        FILE_ERROR(ENOENT, -5);
 
 file_error:
     dircache_unlock();
@@ -2626,11 +2656,19 @@ file_error:
 
 /**
  * Test a path to various levels of rigor and optionally return dircache file
- * info for the given path
+ * info for the given path.
+ *
+ * If the file reference is used, it is checked first and the path is checked
+ * only if all specified file reference checks fail.
  *
  * returns:
- *   success: 0
+ *   success: 0 = not cached (very weak)
+ *            1 = serial number checks out for the reference (weak)
+ *            2 = serial number and hash check out for the reference (medium)
+ *            3 = path is valid; reference updated if specified (strong)
  *   failure: a negative value
+ *            if file definitely doesn't exist (errno = ENOENT)
+ *            other error
  *
  * errors (including but not limited to):
  *   EFAULT       - Bad address
@@ -2638,78 +2676,121 @@ file_error:
  *   ENAMETOOLONG - File or path name too long
  *   ENOENT       - No such file or directory
  *   ENOTDIR      - Not a directory
- *   ENXIO        - No such device or address
  */
-int dircache_search(unsigned int flags, struct dircache_fileref *dcfrefp, const char *path)
+int dircache_search(unsigned int flags, struct dircache_fileref *dcfrefp,
+                    const char *path)
 {
-    int rc;
-
     if (!(flags & (DCS_FILEREF | DCS_CACHED_PATH)))
         FILE_ERROR_RETURN(EINVAL, -1); /* search nothing? */
 
+    if (!dcfrefp && (flags & (DCS_FILEREF | DCS_UPDATE_FILEREF)))
+        FILE_ERROR_RETURN(EFAULT, -2); /* bad! */
+
+    int rc = 0;
+
     dircache_lock();
 
+    /* -- File reference search -- */
     if (!dircache_runinfo.handle)
-        FILE_ERROR(ENOENT, -2);
+        ;                       /* cache not enabled; not cached */
+    else if (!(flags & DCS_FILEREF))
+        ;                       /* don't use fileref */
+    else if (check_file_serialnum(&dcfrefp->dcfile) < 0)
+        ;                       /* serial number bad */
+    else if (!(flags & _DCS_VERIFY_FLAG))
+        rc = 1;                 /* only check idx and serialnum */
+    else if (get_file_serialhash(&dcfrefp->dcfile) == dcfrefp->serialhash)
+        rc = 2;                 /* reference is most likely still valid */
 
-    if (flags & DCS_FILEREF)
-    {
-        if (!dcfrefp)
-            FILE_ERROR(EFAULT, -3);
-
-        if (get_file_serialnum(&dcfrefp->dcfile) != 0)
-        {
-            if (!(flags & _DCS_VERIFY_FLAG))
-                goto file_success; /* no robust verification wanted */
-
-            if (get_file_serialhash(&dcfrefp->dcfile) == dcfrefp->serialhash)
-                goto file_success; /* reference is most likely still valid */
-        }
-
-        if (!(flags & DCS_CACHED_PATH))
-            FILE_ERROR(ENOENT, -4); /* no path search wanted */
-    }
-
-    if (flags & DCS_CACHED_PATH)
-    {
-        const bool update = flags & DCS_UPDATE_FILEREF;
-        struct path_component_info *compinfop = NULL;
-
-        if (update)
-        {
-            if (!dcfrefp)
-                FILE_ERROR(EFAULT, -5);
-
-            compinfop = alloca(sizeof (*compinfop));  
-        }
-
+    /* -- Path cache and storage search -- */
+    if (rc > 0)
+        ; /* rc > 0 */          /* found by file reference */
+    else if (!(flags & DCS_CACHED_PATH))
+        ; /* rc = 0 */          /* reference bad/unused and no path */
+    else
+    {     /* rc = 0 */          /* check path with cache and/or storage */
+        struct path_component_info compinfo;
         struct filestr_base stream;
-        rc = open_stream_internal(path, FF_ANYTYPE | FF_PROBE | FF_SELFINFO |
-                                  ((flags & _DCS_STORAGE_FLAG) ? 0 : FF_CACHEONLY),
-                                  &stream, compinfop);
-        if (rc <= 0)
+        unsigned int ffcache = (flags & _DCS_STORAGE_FLAG) ? 0 : FF_CACHEONLY;
+        int err = errno;
+        int rc2 = open_stream_internal(path, ffcache | FF_ANYTYPE | FF_PROBE |
+                                       FF_INFO | FF_PARENTINFO, &stream,
+                                       &compinfo);
+        if (rc2 <= 0)
         {
-            if (update)
-                dircache_fileref_init(dcfrefp);
-  
-            FILE_ERROR(rc ? ERRNO : ENOENT, rc * 10 - 6);
-        }
+            if (ffcache == 0)
+            {
+                /* checked storage too: absent for sure */
+                FILE_ERROR(rc2 ? ERRNO : ENOENT, rc2 * 10 - 5);
+            }
 
-        if (update)
+            if (rc2 < 0)
+            {
+                /* no base info available */
+                if (errno != ENOENT)
+                    FILE_ERROR(ERRNO, rc2 * 10 - 6);
+
+                /* only cache; something didn't exist: indecisive */
+                errno = err;
+                FILE_ERROR(ERRNO, RC); /* rc = 0 */
+            }
+
+            struct dircache_file *dcfp = &compinfo.parentinfo.dcfile;
+            if (get_frontier(dcfp->idx) == FRONTIER_SETTLED)
+                FILE_ERROR(ENOENT, -7); /* parent not a frontier; absent */
+            /* else checked only cache; parent is incomplete: indecisive */
+        }
+        else
         {
-            dcfrefp->dcfile     = compinfop->info.dcfile;
-            dcfrefp->serialhash = get_file_serialhash(&compinfop->info.dcfile);
+            struct dircache_file *dcfp = &compinfo.info.dcfile;
+            if (dcfp->serialnum != 0)
+            {
+                /* found by path in the cache afterall */
+                if (flags & DCS_UPDATE_FILEREF)
+                {
+                    dcfrefp->dcfile     = *dcfp;
+                    dcfrefp->serialhash = get_file_serialhash(dcfp);
+                }
+
+                rc = 3;
+            }
         }
     }
-
-file_success:
-    rc = 0;
 
 file_error:
+    if (rc <= 0 && (flags & DCS_UPDATE_FILEREF))
+        dircache_fileref_init(dcfrefp);
+
     dircache_unlock();
     return rc;    
 }
 
+/**
+ * Compare dircache file references (no validity check is made)
+ *
+ * returns: 0 - no match
+ *          1 - indexes match
+ *          2 - serial numbers match
+ *          3 - serial and hashes match
+ */
+int dircache_fileref_cmp(const struct dircache_fileref *dcfrefp1,
+                         const struct dircache_fileref *dcfrefp2)
+{
+    int cmp = 0;
+
+    if (dcfrefp1->dcfile.idx == dcfrefp2->dcfile.idx)
+    {
+        cmp++;
+        if (dcfrefp1->dcfile.serialnum == dcfrefp2->dcfile.serialnum)
+        {
+            cmp++;
+            if (dcfrefp1->serialhash == dcfrefp2->serialhash)
+                cmp++;
+        }
+    }
+
+    return cmp;
+}
 
 /** Debug screen/info stuff **/
 
