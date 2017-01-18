@@ -515,6 +515,42 @@ static void handle_write(struct usb_ctrlrequest *req)
     usb_drv_send(EP_CONTROL, NULL, 0);
 }
 
+static bool do_call(uint32_t addr)
+{
+    /* trap exceptions */
+    if(set_data_abort_jmp() == 0)
+    {
+#if defined(CPU_ARM)
+        /* in case of call, respond after return */
+        asm volatile("blx %0\n" : : "r"(addr) : "memory");
+        return true;
+#elif defined(CPU_MIPS)
+        asm volatile("jalr %0\nnop\n" : : "r"(addr) : "memory");
+        return true;
+#else
+#warning call is unsupported on this platform
+        return false;
+#endif
+    }
+    else
+    {
+        logf("trapped exception in call\n");
+        return false;
+    }
+}
+
+static void do_jump(uint32_t addr)
+{
+#if defined(CPU_ARM)
+    asm volatile("bx %0\n" : : "r" (addr) : "memory");
+#elif defined(CPU_MIPS)
+    asm volatile("jr %0\nnop\n" : : "r" (addr) : "memory");
+#else
+#warning jump is unsupported on this platform
+#define NO_JUMP
+#endif
+}
+
 static void handle_exec(struct usb_ctrlrequest *req)
 {
     int size = usb_drv_recv(EP_CONTROL, usb_buffer, req->wLength);
@@ -537,31 +573,19 @@ static void handle_exec(struct usb_ctrlrequest *req)
 
     if(exec->bmFlags & HWSTUB_EXEC_CALL)
     {
-#if defined(CPU_ARM)
-        /* in case of call, respond after return */
-        asm volatile("blx %0\n" : : "r"(addr) : "memory");
-        usb_drv_send(EP_CONTROL, NULL, 0);
-#elif defined(CPU_MIPS)
-        asm volatile("jalr %0\nnop\n" : : "r"(addr) : "memory");
-        usb_drv_send(EP_CONTROL, NULL, 0);
-#else
-#warning call is unsupported on this platform
-        usb_drv_stall(EP_CONTROL, true, true);
-#endif
+        if(do_call(addr))
+            usb_drv_send(EP_CONTROL, NULL, 0);
+        else
+            usb_drv_stall(EP_CONTROL, true, true);
     }
     else
     {
+#ifndef NO_JUMP
         /* in case of jump, respond immediately and disconnect usb */
-#if defined(CPU_ARM)
         usb_drv_send(EP_CONTROL, NULL, 0);
         usb_drv_exit();
-        asm volatile("bx %0\n" : : "r" (addr) : "memory");
-#elif defined(CPU_MIPS)
-        usb_drv_send(EP_CONTROL, NULL, 0);
-        usb_drv_exit();
-        asm volatile("jr %0\nnop\n" : : "r" (addr) : "memory");
-#else 
-#warning jump is unsupported on this platform
+        do_jump(addr);
+#else
         usb_drv_stall(EP_CONTROL, true, true);
 #endif
     }
