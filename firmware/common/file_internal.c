@@ -396,7 +396,8 @@ static int walk_open_info(struct pathwalk *walkp,
     else
         callflags &= ~FO_DIRECTORY;
 
-    /* make open official if not simply probing for presence */
+    /* make open official if not simply probing for presence - must do it here
+       or compp->info on stack will get destroyed before it was copied */
     if (!(callflags & FF_PROBE))
         fileop_onopen_internal(stream, &compp->info, callflags);
 
@@ -649,6 +650,10 @@ int open_stream_internal(const char *path, unsigned int callflags,
         IF_MV( rc = rootrc; )
     case WALK_RC_NOT_FOUND:
     case WALK_RC_FOUND:
+        /* FF_PROBE leaves nothing for caller to clean up */
+        if (callflags & FF_PROBE)
+            filestr_base_destroy(stream);
+
         break;
 
     default: /* utter, abject failure :`( */
@@ -776,12 +781,7 @@ int test_stream_exists_internal(const char *path, unsigned int callflags)
 {
     /* only FF_* flags should be in callflags */
     struct filestr_base stream;
-    int rc = open_stream_internal(path, callflags | FF_PROBE, &stream, NULL);
-
-    if (rc >= 0)
-        filestr_base_destroy(&stream);
-
-    return rc;
+    return open_stream_internal(path, callflags | FF_PROBE, &stream, NULL);
 }
 
 /* one-time init at startup */
