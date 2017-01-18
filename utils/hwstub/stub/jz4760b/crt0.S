@@ -1,4 +1,5 @@
 #include "mips.h"
+#include "system.h"
 
 .extern main
 .global start
@@ -137,26 +138,30 @@ die_blink:
     j       .blink_loop
     nop
 
-/* restore_data_abort_jmp restores the context and returns from exception */
-    .extern restore_data_abort_jmp
+/* restore_exception_jmp restores the context and returns from exception, it takes
+ * as argument the type of exception */
+    .extern restore_exception_jmp
 
     .global tlb_refill_handler
     .section .exception.tlb_refill,"ax",%progbits
 tlb_refill_handler:
-    la      k0, restore_data_abort_jmp
+    li      a0, EXCEPTION_ADDR
+    la      k0, restore_exception_jmp
     jr      k0
     nop
 
     .global cache_error_handler
     .section .exception.cache_error,"ax",%progbits
 cache_error_handler:
-    la      k0, restore_data_abort_jmp
+    li      a0, EXCEPTION_ADDR
+    la      k0, restore_exception_jmp
     jr      k0
     nop
 
     .global general_exception_handler
     .section .exception.general_exception,"ax",%progbits
 general_exception_handler:
-    la      k0, restore_data_abort_jmp
+    li      a0, EXCEPTION_UNSP
+    la      k0, restore_exception_jmp
     jr      k0
     nop

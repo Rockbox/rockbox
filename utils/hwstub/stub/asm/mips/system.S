@@ -19,23 +19,24 @@
  ****************************************************************************/
 #include "mips.h"
 #include "target-config.h"
+#include "system.h"
 
-/* Handling of data abort:
+/* Handling of exception:
  * the code can register a "longjmp" buffer to restore the context in case of
  * fault */
 .data
-.global data_abort_jmp_ctx_ptr
-data_abort_jmp_ctx_ptr:
+.global exception_jmp_ctx_ptr
+exception_jmp_ctx_ptr:
 /* buffer contains in order: s0-s7, sp, s8, ra */
 .skip   44 /* = 4 * (9 callee saved registers + sp + ra) */
 
 .set noreorder
 .section .icode, "ax", %progbits
-/* Prototype: int set_data_abort_jmp()
+/* Prototype: int set_exception_jmp()
  * Return: 1 in case of data abort, 0 otherwise */
-.global set_data_abort_jmp
-set_data_abort_jmp:
-    la v0,  data_abort_jmp_ctx_ptr
+.global set_exception_jmp
+set_exception_jmp:
+    la v0,  exception_jmp_ctx_ptr
     sw s0,  0(v0)
     sw s1,  4(v0)
     sw s2,  8(v0)
@@ -50,10 +51,12 @@ set_data_abort_jmp:
     jr ra
     move v0, zero
 
-/* restore context on read/write error, performs the interrupt return */
-.global restore_data_abort_jmp
-restore_data_abort_jmp:
-la k1, data_abort_jmp_ctx_ptr
+/* restore context on read/write error, performs the interrupt return
+ * arguments:
+ * a0: exception type (EXCEPTION_*) */
+.global restore_exception_jmp
+restore_exception_jmp:
+    la k1, exception_jmp_ctx_ptr
     lw s0,  0(k1)
     lw s1,  4(k1)
     lw s2,  8(k1)
@@ -73,7 +76,7 @@ la k1, data_abort_jmp_ctx_ptr
 #else
     ehb
 #endif
-    li v0, 1
+    move v0, a0 /* set exception type */
     eret
     nop
 .set reorder
