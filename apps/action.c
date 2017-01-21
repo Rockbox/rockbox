@@ -181,38 +181,6 @@ static inline int get_next_context(const struct button_mapping *items, int i)
             items[i].action_code;
 }
 
-#if defined(HAVE_GUI_BOOST) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
-
-/* Timeout for gui boost in seconds. */
-#define GUI_BOOST_TIMEOUT (HZ)
-
-/* Helper function which is called to boost / unboost CPU. This function
- * avoids to increase boost_count with each call of gui_boost(). */
-static void gui_boost(bool want_to_boost)
-{
-    static bool boosted = false;
-
-    if (want_to_boost && !boosted)
-    {
-        cpu_boost(true);
-        boosted = true;
-    }
-    else if (!want_to_boost && boosted)
-    {
-        cpu_boost(false);
-        boosted = false;
-    }
-}
-
-/* gui_unboost_callback() is called GUI_BOOST_TIMEOUT seconds after the
- * last wheel scrolling event. */
-static int gui_unboost_callback(struct timeout *tmo)
-{
-    (void)tmo;
-    gui_boost(false);
-    return 0;
-}
-#endif
 
 /*
  * int get_action_worker(int context, int timeout, bool *is_pre_button,
@@ -242,23 +210,7 @@ static int get_action_worker(int context, int timeout, bool *is_pre_button,
 
     send_event(GUI_EVENT_ACTIONUPDATE, NULL);
 
-    if (timeout == TIMEOUT_NOBLOCK)
-        button = button_get(false);
-    else if  (timeout == TIMEOUT_BLOCK)
-        button = button_get(true);
-    else
-        button = button_get_w_tmo(timeout);
-
-#if defined(HAVE_GUI_BOOST) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    static struct timeout gui_unboost;
-    /* Boost the CPU in case of wheel scrolling activity in the defined contexts.
-     * Call unboost with a timeout of GUI_BOOST_TIMEOUT. */
-    if (button != BUTTON_NONE)
-    {
-        gui_boost(true);
-        timeout_register(&gui_unboost, gui_unboost_callback, GUI_BOOST_TIMEOUT, 0);
-    }
-#endif
+    button = button_get_w_tmo(timeout);
 
     /* Data from sys events can be pulled with button_get_data
      * multimedia button presses don't go through the action system */

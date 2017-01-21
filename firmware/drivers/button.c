@@ -371,20 +371,74 @@ static void button_tick(void)
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+static bool button_boosted = false;
+static long button_unboost_tick;
+#define BUTTON_UNBOOST_TMO HZ
+
 static void button_boost(bool state)
 {
-    static bool boosted = false;
-    
-    if (state && !boosted)
+    if (state)
     {
-        cpu_boost(true);
-        boosted = true;
+        button_unboost_tick = current_tick + BUTTON_UNBOOST_TMO;
+
+        if (!button_boosted)
+        {
+            button_boosted = true;
+            cpu_boost(true);
+        }
     }
-    else if (!state && boosted)
+    else if (!state && button_boosted)
     {
+        button_boosted = false;
         cpu_boost(false);
-        boosted = false;
     }
+}
+
+static void button_queue_wait(struct queue_event *evp, int timeout)
+{
+    /* Loop once after wait time if boosted in order to unboost and wait the
+       full remaining time */
+    do
+    {
+        int ticks = timeout;
+
+        if (ticks == 0) /* TIMEOUT_NOBLOCK */
+            ;
+        else if (ticks > 0)
+        {
+            if (button_boosted && ticks > BUTTON_UNBOOST_TMO)
+                ticks = BUTTON_UNBOOST_TMO;
+
+            timeout -= ticks;
+        }
+        else            /* TIMEOUT_BLOCK (ticks < 0) */
+        {
+            if (button_boosted)
+                ticks = BUTTON_UNBOOST_TMO;
+        }
+
+        queue_wait_w_tmo(&button_queue, evp, ticks);
+        if (evp->id != SYS_TIMEOUT)
+        {
+            /* GUI boost build gets immediate kick, otherwise at least 3
+               messages had to be there */
+        #ifndef HAVE_GUI_BOOST
+            if (queue_count(&button_queue) >= 2)
+        #endif
+                button_boost(true);
+
+            break; 
+        }
+
+        if (button_boosted && TIME_AFTER(current_tick, button_unboost_tick))
+            button_boost(false);
+    }
+    while (timeout);
+}
+#else /* ndef HAVE_ADJUSTABLE_CPU_FREQ */
+static inline void button_queue_wait(struct queue_event *evp, int timeout)
+{
+    queue_wait_w_timeout(&button_queue, evp, timeout);
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
@@ -396,44 +450,26 @@ int button_queue_count( void )
 long button_get(bool block)
 {
     struct queue_event ev;
-    int pending_count = queue_count(&button_queue);
+    button_queue_wait(&ev, block ? TIMEOUT_BLOCK : TIMEOUT_NOBLOCK);
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    /* Control the CPU boost trying to keep queue empty. */
-    if (pending_count == 0)
-        button_boost(false);
-    else if (pending_count > 2)
-        button_boost(true);
-#endif
-    
-    if ( block || pending_count )
-    {
-        queue_wait(&button_queue, &ev);
-        
-        button_data = ev.data;
-        return ev.id;
-    }
-    
-    return BUTTON_NONE;
-}
-
-long button_get_w_tmo(int ticks)
-{
-    struct queue_event ev;
-    
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    /* Be sure to keep boosted state. */
-    if (!queue_empty(&button_queue))
-        return button_get(true);
-    
-    button_boost(false);
-#endif
-    
-    queue_wait_w_tmo(&button_queue, &ev, ticks);
     if (ev.id == SYS_TIMEOUT)
         ev.id = BUTTON_NONE;
     else
         button_data = ev.data;
+
+    return ev.id;
+}
+
+long button_get_w_tmo(int ticks)
+{
+    struct queue_event ev;    
+    button_queue_wait(&ev, ticks);
+
+    if (ev.id == SYS_TIMEOUT)
+        ev.id = BUTTON_NONE;
+    else
+        button_data = ev.data;
+
     return ev.id;
 }
 
