@@ -35,13 +35,6 @@ long cpu_frequency SHAREDBSS_ATTR = CPU_FREQ;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 static int boost_counter SHAREDBSS_ATTR = 0;
 static bool cpu_idle SHAREDBSS_ATTR = false;
-#if NUM_CORES > 1
-static struct corelock boostctrl_cl SHAREDBSS_ATTR;
-void cpu_boost_init(void)
-{
-    corelock_init(&boostctrl_cl);
-}
-#endif
 
 int get_cpu_boost_counter(void)
 {
@@ -60,7 +53,7 @@ int cpu_boost_log_getcount(void)
 char * cpu_boost_log_getlog_first(void)
 {
     char *first;
-    corelock_lock(&boostctrl_cl);
+    cpu_boost_lock();
 
     first = NULL;
 
@@ -70,7 +63,7 @@ char * cpu_boost_log_getlog_first(void)
         first = cpu_boost_calls[cpu_boost_first];
     }
 
-    corelock_unlock(&boostctrl_cl);
+    cpu_boost_unlock();
     return first;
 }
 
@@ -79,7 +72,7 @@ char * cpu_boost_log_getlog_next(void)
     int message;
     char *next;
 
-    corelock_lock(&boostctrl_cl);
+    cpu_boost_lock();
 
     message = (cpu_boost_track_message+cpu_boost_first)%MAX_BOOST_LOG;
     next = NULL;
@@ -90,13 +83,14 @@ char * cpu_boost_log_getlog_next(void)
         next = cpu_boost_calls[message];
     }
 
-    corelock_unlock(&boostctrl_cl);
+    cpu_boost_unlock();
     return next;
 }
 
 void cpu_boost_(bool on_off, char* location, int line)
 {
-    corelock_lock(&boostctrl_cl);
+    if (!cpu_boost_lock())
+        return;
 
     if (cpu_boost_calls_count == MAX_BOOST_LOG)
     {
@@ -115,7 +109,9 @@ void cpu_boost_(bool on_off, char* location, int line)
 #else
 void cpu_boost(bool on_off)
 {
-    corelock_lock(&boostctrl_cl);
+    if (!cpu_boost_lock())
+        return;
+
 #endif /* CPU_BOOST_LOGGING */
     if(on_off)
     {
@@ -141,12 +137,13 @@ void cpu_boost(bool on_off)
         }
     }
 
-    corelock_unlock(&boostctrl_cl);
+    cpu_boost_unlock();
 }
 
 void cpu_idle_mode(bool on_off)
 {
-    corelock_lock(&boostctrl_cl);
+    if (!cpu_boost_lock())
+        return;
 
     cpu_idle = on_off;
 
@@ -160,7 +157,7 @@ void cpu_idle_mode(bool on_off)
             set_cpu_frequency(CPUFREQ_NORMAL);
     }
 
-    corelock_unlock(&boostctrl_cl);
+    cpu_boost_unlock();
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
