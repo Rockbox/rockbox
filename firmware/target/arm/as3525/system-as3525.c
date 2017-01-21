@@ -33,6 +33,8 @@
 #include "backlight-target.h"
 #include "lcd.h"
 
+static struct mutex cpufreq_mtx;
+
 /*  Charge Pump and Power management Settings  */
 #define AS314_CP_DCDC3_SETTING    \
                ((0<<7) |  /* CP_SW  Auto-Switch Margin 0=200/300 1=150/255 */  \
@@ -144,6 +146,7 @@ static const struct { int source; void (*isr) (void); } vec_int_srcs[] =
     { INT_SRC_USB, INT_USB_FUNC, },
     { INT_SRC_TIMER1, INT_TIMER1 },
     { INT_SRC_TIMER2, INT_TIMER2 },
+    { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
     { INT_SRC_AUDIO, INT_AUDIO },
     /* Lowest priority at the end of the list */
 };
@@ -254,6 +257,8 @@ static inline void check_model_variant(void)
 
 void system_init(void)
 {
+    mutex_init(&cpufreq_mtx);
+
 #if CONFIG_CPU == AS3525v2
     CCU_SRC = 0x57D7BF0;
 #else
@@ -329,7 +334,8 @@ void system_init(void)
 #ifdef HAVE_AS3543
     /* PLL:       disable audio PLL, we use MCLK already */
     ascodec_write_pmu(0x1A, 7, 0x02);
-    /* DCDC_Cntr: set switching speed of CVDD1/2 power supplies to 1 MHz */
+    /* DCDC_Cntr: set switching speed of CVDD1/2 power supplies to 1 MHz,
+       immediate change */
     ascodec_write_pmu(0x17, 7, 0x30);
     /* Out_Cntr2: set drive strength of 24 MHz and 32 kHz clocks to 1 mA */
     ascodec_write_pmu(0x1A, 2, 0xCC);
@@ -412,13 +418,41 @@ void udelay(unsigned usecs)
     );
 }
 
+int get_cpu_voltage(void)
+{
+    int value = ascodec_read_pmu(0x17, 1) & 0x7f;
+
+    /* Calculate in 0.1mV steps */
+    if (value == 0)
+        /* 0 volts */;
+    else if (value <= 0x40)
+        value = 6000 + value * 125;
+    else if (value <= 0x70)
+        value = 14000 + (value - 0x40) * 250;
+    else if (value <= 0x7f)
+        value = 26000 + (value - 0x70) * 500;
+
+    /* Return voltage in millivolts */
+    return (value + 5) / 10;
+}
+
 #ifndef BOOTLOADER
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 
 #if CONFIG_CPU == AS3525
 void set_cpu_frequency(long frequency)
 {
-    if(frequency == CPUFREQ_MAX)
+    /* panicf calls this from possibly any mode; just bail */
+    if (get_processor_mode() != CPU_MODE_THREAD_CONTEXT)
+        return;
+
+    mutex_lock(&cpufreq_mtx);
+
+    if (frequency == cpu_frequency)
+    {
+        /* avoid redundant activity */
+    }
+    else if(frequency == CPUFREQ_MAX)
     {
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
         /* Increasing frequency so boost voltage before change */
@@ -460,11 +494,23 @@ void set_cpu_frequency(long frequency)
 
         cpu_frequency = CPUFREQ_NORMAL;
     }
+
+    mutex_unlock(&cpufreq_mtx);
 }
 #else   /* as3525v2  */
 void set_cpu_frequency(long frequency)
 {
-    if(frequency == CPUFREQ_MAX)
+    /* panicf calls this from possibly any mode; just bail */
+    if (get_processor_mode() != CPU_MODE_THREAD_CONTEXT)
+        return;
+
+    mutex_lock(&cpufreq_mtx);
+
+    if (frequency == cpu_frequency)
+    {
+        /* avoid redundant activity */
+    }
+    else if(frequency == CPUFREQ_MAX)
     {
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
         /* Set CVDD1 power supply */
@@ -487,19 +533,21 @@ void set_cpu_frequency(long frequency)
         cpu_frequency = CPUFREQ_NORMAL;
 
         /* Set CVDD1 power supply */
-#ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
-#if defined(SANSA_CLIPZIP)
-        ascodec_write_pmu(0x17, 1, 0x80 | 19);
-#elif defined(SANSA_CLIPPLUS)
-        if (amsv2_variant)
-            ascodec_write_pmu(0x17, 1, 0x80 | 22);
-        else
-            ascodec_write_pmu(0x17, 1, 0x80 | 26);
-#else
-        ascodec_write_pmu(0x17, 1, 0x80 | 22);
-#endif
-#endif
+ #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
+ #if defined(SANSA_CLIPZIP)
+         ascodec_write_pmu(0x17, 1, 0x80 | 19);
+ #elif defined(SANSA_CLIPPLUS)
+         if (amsv2_variant)
+             ascodec_write_pmu(0x17, 1, 0x80 | 22);
+         else
+             ascodec_write_pmu(0x17, 1, 0x80 | 26);
+ #else
+         ascodec_write_pmu(0x17, 1, 0x80 | 22);
+ #endif
+ #endif
     }
+
+    mutex_unlock(&cpufreq_mtx);
 }
 #endif
 
