@@ -20,7 +20,7 @@
 
 #include <stddef.h>
 
-#define MAX_STDIO_FILES 8
+#define MAX_STDIO_FILES 11
 
 #undef FILE
 #define FILE _FILE_
@@ -42,12 +42,16 @@
 #define ferror _ferror_
 #define feof   _feof_
 #define fprintf _fprintf_
+#define stdout _stdout_
+#define stderr _stderr_
 
 typedef struct {
     int fd;
     int unget_char;
     int error;
 } _FILE_;
+
+extern _FILE_ *_stdout_, *_stderr_;
 
 _FILE_ *_fopen_(const char *path, const char *mode);
 int _fclose_(_FILE_ *stream);
