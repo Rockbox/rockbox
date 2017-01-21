@@ -33,6 +33,8 @@
 #include "backlight-target.h"
 #include "lcd.h"
 
+struct mutex cpufreq_mtx;
+
 /*  Charge Pump and Power management Settings  */
 #define AS314_CP_DCDC3_SETTING    \
                ((0<<7) |  /* CP_SW  Auto-Switch Margin 0=200/300 1=150/255 */  \
@@ -144,6 +146,7 @@ static const struct { int source; void (*isr) (void); } vec_int_srcs[] =
     { INT_SRC_USB, INT_USB_FUNC, },
     { INT_SRC_TIMER1, INT_TIMER1 },
     { INT_SRC_TIMER2, INT_TIMER2 },
+    { INT_SRC_I2C_AUDIO, INT_I2C_AUDIO },
     { INT_SRC_AUDIO, INT_AUDIO },
     /* Lowest priority at the end of the list */
 };
@@ -322,6 +325,12 @@ void system_init(void)
     setup_vic();
 
     dma_init();
+}
+
+/* this is called after kernel and threading are initialized */
+void kernel_device_init(void)
+{
+    mutex_init(&cpufreq_mtx);
 
     ascodec_init();
 
@@ -329,7 +338,8 @@ void system_init(void)
 #ifdef HAVE_AS3543
     /* PLL:       disable audio PLL, we use MCLK already */
     ascodec_write_pmu(0x1A, 7, 0x02);
-    /* DCDC_Cntr: set switching speed of CVDD1/2 power supplies to 1 MHz */
+    /* DCDC_Cntr: set switching speed of CVDD1/2 power supplies to 1 MHz,
+       immediate change */
     ascodec_write_pmu(0x17, 7, 0x30);
     /* Out_Cntr2: set drive strength of 24 MHz and 32 kHz clocks to 1 mA */
     ascodec_write_pmu(0x1A, 2, 0xCC);
@@ -414,11 +424,28 @@ void udelay(unsigned usecs)
 
 #ifndef BOOTLOADER
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+bool set_cpu_frequency__lock(void)
+{
+    if (get_processor_mode() != CPU_MODE_THREAD_CONTEXT)
+        return false;
+
+    mutex_lock(&cpufreq_mtx);
+    return true;
+}
+
+void set_cpu_frequency__unlock(void)
+{
+    mutex_unlock(&cpufreq_mtx);
+}
 
 #if CONFIG_CPU == AS3525
 void set_cpu_frequency(long frequency)
 {
-    if(frequency == CPUFREQ_MAX)
+    if (frequency == cpu_frequency)
+    {
+        /* avoid redundant activity */
+    }
+    else if(frequency == CPUFREQ_MAX)
     {
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
         /* Increasing frequency so boost voltage before change */
@@ -464,7 +491,11 @@ void set_cpu_frequency(long frequency)
 #else   /* as3525v2  */
 void set_cpu_frequency(long frequency)
 {
-    if(frequency == CPUFREQ_MAX)
+    if (frequency == cpu_frequency)
+    {
+        /* avoid redundant activity */
+    }
+    else if(frequency == CPUFREQ_MAX)
     {
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
         /* Set CVDD1 power supply */
