@@ -90,6 +90,7 @@ rockbox_flash,viewers
 rockboy,viewers
 rocklife,demos
 rockpaint,apps
+sdl,demos
 search,viewers
 searchengine,viewers
 settings_dumper,apps
