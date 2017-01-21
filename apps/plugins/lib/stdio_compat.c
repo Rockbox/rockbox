@@ -34,7 +34,7 @@ _FILE_ *_fopen_(const char *path, const char *mode)
     int i;
 
     /* look for free slot */
-    for (i=0; i<MAX_OPEN_FILES; i++, f++)
+    for (i=0; i<MAX_STDIO_FILES; i++, f++)
         if (f->fd == -1)
             break;
 
