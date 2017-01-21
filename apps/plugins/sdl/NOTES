@@ -1,0 +1,5 @@
+- SDL sources are mostly untouched, only some minor tweaks to make it build
+- SDL_image only builds XPM support, edit SDL_config_rockbox.h to change
+- Only video and "keyboard" drivers are implemented, sound and threading are a WIP
+- Video may not work under all pixel formats, please tell me if it doesn't!
+- Ported SDL would conflict with hosted platform's SDL, if present. Worked around by using objcopy --redefine-syms

@@ -74,6 +74,11 @@ iriverify.c
 
 /* Overlays loaders */
 
+#if defined(HAVE_LCD_COLOR) && \
+    (!defined(LCD_STRIDEFORMAT) || (LCD_STRIDEFORMAT != VERTICAL_STRIDE))
+duke3d.c
+#endif
+
 #if PLUGIN_BUFFER_SIZE <= 0x20000 && defined(HAVE_LCD_BITMAP)
 
 #if CONFIG_KEYPAD != ONDIO_PAD && CONFIG_KEYPAD != SANSA_M200_PAD \
