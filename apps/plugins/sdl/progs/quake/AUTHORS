@@ -1,0 +1,12 @@
+#define true 1
+#define false 0
+id Software
+
+Sam Lantinga
+https://www.libsdl.org/projects/quake/
+
+Andy Hefner
+https://github.com/ahefner/sdlquake
+
+Mightyjo
+https://github.com/Mightyjo/sdlquake
