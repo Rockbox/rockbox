@@ -21,11 +21,16 @@
 #ifndef SYSTEM_TARGET_H
 #define SYSTEM_TARGET_H
 
+/* we need some system things initialized after the kernel init */
+#define KDEV_INIT
+
 #include "system-arm.h"
 #include "mmu-arm.h"
 #include "panic.h"
 
 #include "clock-target.h" /* CPUFREQ_* are defined here */
+
+void kernel_device_init(void);
 
 #define STORAGE_WANTS_ALIGN
 
@@ -67,5 +72,21 @@ static inline void mdelay(unsigned msecs)
 
 void usb_insert_int(void);
 void usb_remove_int(void);
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#define CPU_BOOST_LOCK_DEFINED
+
+static inline bool cpu_boost_lock(void)
+{
+    bool set_cpu_frequency__lock(void);
+    return set_cpu_frequency__lock();
+}
+
+static inline void cpu_boost_unlock(void)
+{
+    void set_cpu_frequency__unlock(void);
+    set_cpu_frequency__unlock();
+}
+#endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
 #endif /* SYSTEM_TARGET_H */
