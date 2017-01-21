@@ -204,6 +204,16 @@ enum {
 #include "bitswap.h"
 #include "rbendian.h"
 
+#ifndef ASSERT_CPU_MODE
+/* Very useful to have defined properly for your architecture */
+#define ASSERT_CPU_MODE(mode, rstatus...) \
+    ({ (mode); rstatus; })
+#endif
+
+#ifndef CPU_MODE_THREAD_CONTEXT
+#define CPU_MODE_THREAD_CONTEXT 0
+#endif
+
 #ifndef BIT_N
 #define BIT_N(n) (1U << (n))
 #endif

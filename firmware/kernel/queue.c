@@ -283,6 +283,9 @@ void queue_wait(struct event_queue *q, struct queue_event *ev)
 #endif
 
     oldlevel = disable_irq_save();
+
+    ASSERT_CPU_MODE(CPU_MODE_THREAD_CONTEXT, oldlevel);
+
     corelock_lock(&q->cl);
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
@@ -335,6 +338,10 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 #endif
 
     oldlevel = disable_irq_save();
+
+    if (ticks != TIMEOUT_NOBLOCK)
+        ASSERT_CPU_MODE(CPU_MODE_THREAD_CONTEXT, oldlevel);
+
     corelock_lock(&q->cl);
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
@@ -421,6 +428,9 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
     unsigned int wr;
 
     oldlevel = disable_irq_save();
+
+    ASSERT_CPU_MODE(CPU_MODE_THREAD_CONTEXT, oldlevel);
+
     corelock_lock(&q->cl);
 
     wr = q->write++ & QUEUE_LENGTH_MASK;

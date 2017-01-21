@@ -39,6 +39,8 @@ void mutex_init(struct mutex *m)
 /* Gain ownership of a mutex object or block until it becomes free */
 void mutex_lock(struct mutex *m)
 {
+    ASSERT_CPU_MODE(CPU_MODE_THREAD_CONTEXT);
+
     struct thread_entry *current = __running_self_entry();
 
     if(current == m->blocker.thread)

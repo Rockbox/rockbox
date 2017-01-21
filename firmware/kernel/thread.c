@@ -1234,6 +1234,8 @@ unsigned int create_thread(void (*function)(void),
  */
 void thread_wait(unsigned int thread_id)
 {
+    ASSERT_CPU_MODE(CPU_MODE_THREAD_CONTEXT);
+
     struct thread_entry *current = __running_self_entry();
     struct thread_entry *thread = __thread_id_entry(thread_id);
 

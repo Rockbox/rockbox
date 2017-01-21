@@ -57,6 +57,8 @@ int semaphore_wait(struct semaphore *s, int timeout)
     }
     else if(timeout != 0)
     {
+        ASSERT_CPU_MODE(CPU_MODE_THREAD_CONTEXT, oldlevel);
+
         /* too many waits - block until count is upped... */
         struct thread_entry *current = __running_self_entry();
 

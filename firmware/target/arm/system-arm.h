@@ -76,9 +76,32 @@ void __div0(void);
 #define ints_enabled_checkval(val) \
     (((val) & IRQ_FIQ_STATUS) == 0)
 
+#define CPU_MODE_USER   0x10
+#define CPU_MODE_FIQ    0x11
+#define CPU_MODE_IRQ    0x12
+#define CPU_MODE_SVC    0x13
+#define CPU_MODE_ABT    0x17
+#define CPU_MODE_UNDEF  0x1b
+#define CPU_MODE_SYS    0x1f
+
 /* We run in SYS mode */
+#define CPU_MODE_THREAD_CONTEXT CPU_MODE_SYS
+
 #define is_thread_context() \
-    (get_processor_mode() == 0x1f)
+    (get_processor_mode() == CPU_MODE_THREAD_CONTEXT)
+
+/* Assert that the processor is in the desired execution mode
+ * mode:       Processor mode value to test for
+ * rstatus...: Provide if you already have the value saved, otherwise leave
+ *             blank to get it automatically.
+ */
+#define ASSERT_CPU_MODE(mode, rstatus...) \
+    ({ unsigned long __massert = (mode);                         \
+       unsigned long __mproc = *#rstatus ?                       \
+            ((rstatus +0) & 0x1f) : get_processor_mode();        \
+       if (__mproc != __massert)                                 \
+           panicf("Incorrect CPU mode in %s (0x%02lx!=0x%02lx)", \
+                  __func__, __mproc, __massert); })
 
 /* Core-level interrupt masking */
 

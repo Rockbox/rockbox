@@ -159,6 +159,8 @@ void mrsw_init(struct mrsw_lock *mrsw)
  * access recursively. The current writer is ignored and gets access. */
 void mrsw_read_acquire(struct mrsw_lock *mrsw)
 {
+    ASSERT_CPU_MODE(CPU_MODE_THREAD_CONTEXT);
+
     struct thread_entry *current = __running_self_entry();
 
     if (current == mrsw->splay.blocker.thread IF_PRIO( && mrsw->count < 0 ))
@@ -268,6 +270,8 @@ void mrsw_read_release(struct mrsw_lock *mrsw)
  * safely call recursively. */
 void mrsw_write_acquire(struct mrsw_lock *mrsw)
 {
+    ASSERT_CPU_MODE(CPU_MODE_THREAD_CONTEXT);
+
     struct thread_entry *current = __running_self_entry();
 
     if (current == mrsw->splay.blocker.thread)
