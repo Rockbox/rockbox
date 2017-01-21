@@ -438,7 +438,7 @@ static void button_queue_wait(struct queue_event *evp, int timeout)
 #else /* ndef HAVE_ADJUSTABLE_CPU_FREQ */
 static inline void button_queue_wait(struct queue_event *evp, int timeout)
 {
-    queue_wait_w_timeout(&button_queue, evp, timeout);
+    queue_wait_w_tmo(&button_queue, evp, timeout);
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
