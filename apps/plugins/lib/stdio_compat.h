@@ -20,7 +20,7 @@
 
 #include <stddef.h>
 
-#define MAX_STDIO_FILES 8
+#define MAX_STDIO_FILES 32
 
 #undef FILE
 #define FILE _FILE_
@@ -48,6 +48,8 @@ typedef struct {
     int unget_char;
     int error;
 } _FILE_;
+
+extern _FILE_ *stdio, *stderr;
 
 _FILE_ *_fopen_(const char *path, const char *mode);
 int _fclose_(_FILE_ *stream);
