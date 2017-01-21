@@ -26,6 +26,7 @@ dice,games
 dict,apps
 disktidy,apps
 doom,games
+duke3d,games
 euroconverter,apps
 fft,demos
 fire,demos
@@ -90,6 +91,7 @@ rockbox_flash,viewers
 rockboy,viewers
 rocklife,demos
 rockpaint,apps
+sdl,demos
 search,viewers
 searchengine,viewers
 settings_dumper,apps

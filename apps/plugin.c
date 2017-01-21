@@ -127,6 +127,7 @@ static int WRAPPER(open)(const char *path, int oflag, ...)
 {
     int fildes = FS_PREFIX(open)(path, oflag __OPEN_MODE_ARG);
     plugin_check_open_close__open(fildes);
+    //printf("**** plugin opens %s %d", path, fildes);
     return fildes;
 }
 
@@ -144,6 +145,8 @@ static int WRAPPER(close)(int fildes)
     if (rc >= 0)
         plugin_check_open_close__close(fildes);
 
+    //printf("**** plugin closes %d", fildes);
+    
     return rc;
 }
 
