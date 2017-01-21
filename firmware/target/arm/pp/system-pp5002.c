@@ -24,6 +24,11 @@
 #include "adc-target.h"
 #include "button-target.h"
 
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
+#include "corelock.h"
+static struct corelock cpufreq_cl SHAREDBSS_ATTR;
+#endif
+
 extern void TIMER1(void);
 extern void TIMER2(void);
 
@@ -122,6 +127,18 @@ static void ipod_init_cache(void)
 }
     
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#if NUM_CORES > 1
+void set_cpu_frequency__lock(void)
+{
+    corelock_lock(&cpufreq_cl);
+}
+
+void set_cpu_frequency__unlock(void)
+{
+    corelock_unlock(&cpufreq_cl);
+}
+#endif /* NUM_CORES > 1 */
+
 void set_cpu_frequency(long frequency)
 #else
 static void pp_set_cpu_frequency(long frequency)
@@ -193,7 +210,7 @@ void system_init(void)
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #if NUM_CORES > 1
-        cpu_boost_init();
+        corelock_init(&cpufreq_cl);
 #endif
 #else
         pp_set_cpu_frequency(CPUFREQ_MAX);

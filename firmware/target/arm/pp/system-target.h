@@ -199,4 +199,21 @@ void system_prepare_fw_start(void);
 
 #endif /* BOOTLOADER */
 
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
+#define CPU_BOOST_LOCK_DEFINED
+
+static inline bool cpu_boost_lock(void)
+{
+    void set_cpu_frequency__lock(void);
+    set_cpu_frequency__lock();
+    return true;
+}
+
+static inline void cpu_boost_unlock(void)
+{
+    void set_cpu_frequency__unlock(void);
+    set_cpu_frequency__unlock();
+}
+#endif /* HAVE_ADJUSTABLE_CPU_FREQ && NUM_CORES > 1 */
+
 #endif /* SYSTEM_TARGET_H */

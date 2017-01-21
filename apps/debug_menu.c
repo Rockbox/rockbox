@@ -796,6 +796,12 @@ static bool dbg_cpufreq(void)
         lcd_putsf(0, line++, "Frequency: %ld.%ld MHz", temp, (FREQ-temp*1000000)/100000);
         lcd_putsf(0, line++, "boost_counter: %d", get_cpu_boost_counter());
 
+#ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
+        extern int get_cpu_voltage_setting(void);
+        temp = get_cpu_voltage_setting();
+        lcd_putsf(0, line++, "CPU voltage: %d.%03dV", temp / 1000, temp % 1000);
+#endif
+
         lcd_update();
         button = get_action(CONTEXT_STD,HZ/10);
 

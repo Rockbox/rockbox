@@ -51,10 +51,6 @@ bool detect_original_firmware(void);
 #endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-#if NUM_CORES > 1
-extern struct spinlock boostctrl_spin;
-#endif
-void cpu_boost_init(void);
 #define FREQ cpu_frequency
 void set_cpu_frequency(long frequency);
 #ifdef CPU_BOOST_LOGGING
@@ -213,6 +209,17 @@ enum {
 #ifndef CPU_MODE_THREAD_CONTEXT
 #define CPU_MODE_THREAD_CONTEXT 0
 #endif
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#ifndef CPU_BOOST_LOCK_DEFINED
+#define CPU_BOOST_LOCK_DEFINED
+/* Compatibility defauls */
+static inline bool cpu_boost_lock(void)
+    { return true; }
+static inline void cpu_boost_unlock(void)
+    { }
+#endif /* CPU_BOOST_LOCK */
+#endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
 #ifndef BIT_N
 #define BIT_N(n) (1U << (n))

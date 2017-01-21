@@ -127,7 +127,13 @@ void panicf( const char *fmt, ...)
     lcd_update();
     DEBUGF("%s", panic_buf);
 
-    set_cpu_frequency(0);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    if (cpu_boost_lock())
+    {
+        set_cpu_frequency(0);
+        cpu_boost_unlock();
+    }
+#endif /* HAVE_ADJUSTABLE_CPU_FREQ */
     
 #ifdef HAVE_ATA_POWER_OFF
     ide_power_enable(false);

@@ -308,16 +308,24 @@ void scale_suspend_core(bool suspend)
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#if NUM_CORES > 1
+void set_cpu_frequency__lock(void)
+{
+    corelock_lock(&cpufreq_cl);
+}
+
+void set_cpu_frequency__unlock(void)
+{
+    corelock_unlock(&cpufreq_cl);
+}
+#endif /* NUM_CORES > 1 */
+
 void set_cpu_frequency(long frequency) ICODE_ATTR;
 void set_cpu_frequency(long frequency)
 #else
 static void pp_set_cpu_frequency(long frequency)
 #endif
 {
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
-    corelock_lock(&cpufreq_cl);
-#endif
-
     switch (frequency)
     {
       /* Note1: The PP5022 PLL must be run at >= 96MHz
@@ -424,10 +432,6 @@ static void pp_set_cpu_frequency(long frequency)
         DEV_INIT2    &= ~INIT_PLL;   /* disable PLL power */
         break;
     }
-
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ) && (NUM_CORES > 1)
-    corelock_unlock(&cpufreq_cl);
-#endif
 }
 #endif /* !BOOTLOADER || (SANSA_E200 || SANSA_C200 || PHILIPS_SA9200) */
 
@@ -544,7 +548,6 @@ void system_init(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #if NUM_CORES > 1
         corelock_init(&cpufreq_cl);
-        cpu_boost_init();
 #endif
 #else
         pp_set_cpu_frequency(CPUFREQ_MAX);
