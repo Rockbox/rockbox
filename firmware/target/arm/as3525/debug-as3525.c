@@ -605,3 +605,33 @@ end:
     lcd_setfont(FONT_UI);
     return false;
 }
+
+#ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
+/* Return CPU voltage setting in millivolts */
+int get_cpu_voltage_setting(void)
+{
+    int value;
+
+#if CONFIG_CPU == AS3525
+    value = ascodec_read(AS3514_CVDD_DCDC3) & 0x3;
+    value = 1200 - value * 50;
+#else /* as3525v2 */
+    value = ascodec_read_pmu(0x17, 1) & 0x7f;
+
+    /* Calculate in 0.1mV steps */
+    if (value == 0)
+        /* 0 volts */;
+    else if (value <= 0x40)
+        value = 6000 + value * 125;
+    else if (value <= 0x70)
+        value = 14000 + (value - 0x40) * 250;
+    else if (value <= 0x7f)
+        value = 26000 + (value - 0x70) * 500;
+
+    /* Return voltage setting in millivolts */
+    value = (value + 5) / 10;
+#endif /* CONFIG_CPU */
+
+    return value;
+}
+#endif /* HAVE_ADJUSTABLE_CPU_VOLTAGE */
