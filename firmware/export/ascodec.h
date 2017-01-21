@@ -43,6 +43,8 @@ int ascodec_read(unsigned int index);
 
 void ascodec_readbytes(unsigned int index, unsigned int len, unsigned char *data);
 
+void ascodec_wait_adc_finished(void);
+
 #if CONFIG_CHARGING
 bool ascodec_endofch(void);
 bool ascodec_chg_status(void);
