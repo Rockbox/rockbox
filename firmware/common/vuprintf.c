@@ -22,10 +22,11 @@
 #include <sys/types.h>
 #include <limits.h>
 #include <string.h>
+#include <stddef.h>
 #include "system.h"
 #include "vuprintf.h"
 
-#if 0
+#if 1
 /* turn everything on */
 #define FMT_LENMOD      (0xffffffff)
 #define FMT_RADIX       (0xffffffff)

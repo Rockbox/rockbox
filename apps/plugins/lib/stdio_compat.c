@@ -20,11 +20,15 @@
 
 #include "plugin.h"
 #include "stdio_compat.h"
+#include "errno.h"
 
 static _FILE_ __file__[MAX_STDIO_FILES] = {
     {-1,-1,0},{-1,-1,0},{-1,-1,0},{-1,-1,0},
-    {-1,-1,0},{-1,-1,0},{-1,-1,0},{-1,-1,0}
+    {-1,-1,0},{-1,-1,0},{-1,-1,0},{-1,-1,0},
+    {-1,-1,0},{-1,-1,0},{-1,-1,0}
 };
+
+_FILE_ *_stdout_ = NULL, *_stderr_ = NULL;
 
 _FILE_ *_fopen_(const char *path, const char *mode)
 {
@@ -34,13 +38,16 @@ _FILE_ *_fopen_(const char *path, const char *mode)
     int i;
 
     /* look for free slot */
-    for (i=0; i<MAX_OPEN_FILES; i++, f++)
+    for (i=0; i<MAX_STDIO_FILES; i++, f++)
         if (f->fd == -1)
             break;
 
     /* no empty slots */
     if (i == MAX_STDIO_FILES)
+    {
+        rb->splash(HZ, "no open slots");
         return NULL;
+    }
 
     if (*mode != 'r')
     {
@@ -72,10 +79,14 @@ _FILE_ *_fopen_(const char *path, const char *mode)
     }
 
 
-    fd = rb->open(path, flags);
+    fd = rb->open(path, flags, 0666);
 
-    if (fd == -1)
+    if (fd < 0)
+    {
+        //extern int errno;
+        //rb->splashf(HZ*2, "open of %s failed (%d)", path, errno);
         return NULL;
+    }
 
     /* initialize */
     f->fd = fd;
@@ -97,23 +108,40 @@ size_t _fread_(void *ptr, size_t size, size_t nmemb, _FILE_ *stream)
 
     if (ret < (ssize_t)(size*nmemb))
         stream->error = -1;
-
-    return ret;
+    return ret / size;
 }
 
 size_t _fwrite_(const void *ptr, size_t size, size_t nmemb, _FILE_ *stream)
 {
-    ssize_t ret = rb->write(stream->fd, ptr, size*nmemb);
+    if(stream)
+    {
+        ssize_t ret = rb->write(stream->fd, ptr, size*nmemb);
 
-    if (ret < (ssize_t)(size*nmemb))
-        stream->error = -1;
+        if (ret < (ssize_t)(size*nmemb))
+            stream->error = -1;
 
-    return ret;
+        return ret / size;
+    }
+#if 1
+    else
+    {
+        char buf[10];
+        rb->snprintf(buf, 10, "%%%ds", size*nmemb);
+        rb->splashf(HZ, buf, ptr);
+        return size * nmemb;
+    }
+#endif
 }
 
 int _fseek_(_FILE_ *stream, long offset, int whence)
 {
-    return rb->lseek(stream->fd, offset, whence);
+    if(rb->lseek(stream->fd, offset, whence) >= 0)
+        return 0;
+    else
+    {
+        rb->splashf(HZ, "lseek() failed: %d fd:%d", errno, stream->fd);
+        return -1;
+    }
 }
 
 long _ftell_(_FILE_ *stream)
