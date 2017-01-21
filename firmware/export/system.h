@@ -207,7 +207,7 @@ enum {
 #ifndef ASSERT_CPU_MODE
 /* Very useful to have defined properly for your architecture */
 #define ASSERT_CPU_MODE(mode, rstatus...) \
-    ({ (mode); rstatus; })
+    ({ (void)(mode); rstatus; })
 #endif
 
 #ifndef CPU_MODE_THREAD_CONTEXT
