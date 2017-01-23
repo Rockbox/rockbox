@@ -570,20 +570,45 @@ namespace
 
 struct soc_sorter
 {
-    /* returns the first (lowest) address of an instance */
+    /* returns the lowest address of an instance, or 0 if none
+     * and 0xffffffff if cannot evaluate */
     soc_addr_t first_addr(const instance_t& inst) const
     {
         if(inst.type == instance_t::SINGLE)
             return inst.addr;
+        /* sanity check */
+        if(inst.type != instance_t::RANGE)
+        {
+            printf("Warning: unknown instance type %d\n", inst.type);
+            return 0;
+        }
         if(inst.range.type == range_t::STRIDE)
-            return inst.range.base;
-        soc_word_t res;
+            return inst.range.base; /* assume positive stride */
+        if(inst.range.type == range_t::LIST)
+        {
+            soc_addr_t min = 0;
+            for(size_t i = 0; i < inst.range.list.size(); i++)
+                if(inst.range.list[i] < min)
+                    min = inst.range.list[i];
+            return min;
+        }
+        /* sanity check */
+        if(inst.range.type != range_t::FORMULA)
+        {
+            printf("Warning: unknown range type %d\n", inst.range.type);
+            return 0;
+        }
+        soc_addr_t min = 0;
         std::map< std::string, soc_word_t > vars;
-        vars[inst.range.variable] = inst.range.first;
-        error_context_t ctx;
-        if(!evaluate_formula(inst.range.formula, vars, res, "", ctx))
-            return 0xffffffff;
-        return res;
+        for(size_t i = 0; i < inst.range.count; i++)
+        {
+            soc_word_t res;
+            vars[inst.range.variable] = inst.range.first;
+            error_context_t ctx;
+            if(evaluate_formula(inst.range.formula, vars, res, "", ctx) && res < min)
+                min = res;
+        }
+        return min;
     }
 
     /* sort instances by first address */
@@ -601,18 +626,30 @@ struct soc_sorter
             return b.instance.size() > 0;
         if(b.instance.size() == 0)
             return false;
-        return first_addr(a.instance[0]) < first_addr(b.instance[0]);
+        soc_addr_t addr_a = first_addr(a.instance[0]);
+        soc_addr_t addr_b = first_addr(b.instance[0]);
+        /* It may happen that two nodes have the same first instance address,
+         * for example if one logically splits a block into two blocks with
+         * the same base. In this case, sort by name */
+        if(addr_a == addr_b)
+            return a.name < b.name;
+        return addr_a < addr_b;
     }
 
     /* sort fields by decreasing position */
     bool operator()(const field_t& a, const field_t& b) const
     {
+        /* in the unlikely case where two fields have the same position, use name */
+        if(a.pos == b.pos)
+            return a.name < b.name;
         return a.pos > b.pos;
     }
 
-    /* sort enum values by value */
+    /* sort enum values by value, then by name */
     bool operator()(const enum_t& a, const enum_t& b) const
     {
+        if(a.value == b.value)
+            return a.name < b.name;
         return a.value < b.value;
     }
 };
@@ -639,7 +676,7 @@ void normalize(node_t& node)
     std::sort(node.instance.begin(), node.instance.end(), soc_sorter());
 }
 
-}
+} /* namespace */
 
 void normalize(soc_t& soc)
 {
