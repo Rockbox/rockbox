@@ -1349,7 +1349,8 @@ void load_std_desc(std::vector< soc_desc::soc_t >& socs)
             printf("Cannot load description file '%s'\n", file.c_str());
             socs.pop_back();
         }
-        print_context(file, ctx);
+        if(!g_quiet)
+            print_context(file, ctx);
     }
     closedir(dir);
 }
@@ -1430,7 +1431,8 @@ int main(int argc, char **argv)
             printf("Cannot load description file '%s'\n", argv[i]);
             socs.pop_back();
         }
-        print_context(argv[i], ctx);
+        if(!g_quiet)
+            print_context(argv[i], ctx);
     }
     /* load standard desc files */
     load_std_desc(socs);
