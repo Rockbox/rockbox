@@ -135,6 +135,7 @@ namespace
         int err = getaddrinfo(domain.c_str(), port.c_str(), &hints, &result);
         if(err != 0)
         {
+            freeaddrinfo(result);
             if(error)
                 *error = std::string("getaddrinfo failed: ") + gai_strerror(err);
             return -1;
@@ -163,6 +164,7 @@ namespace
             else
                 break; /* success */
         }
+        freeaddrinfo(result);
         /* no address was tried */
         if(socket_fd < 0 && error)
             *error = "getaddrinfo() returned no usable result (socket()/connect()/bind() failed)";
