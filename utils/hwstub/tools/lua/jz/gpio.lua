@@ -23,8 +23,8 @@ function JZ.gpio.pinmask(bank, mask)
     end
 
     t.gpio = function()
-        HW.GPIO.FUN[bank].CLR.write(mask)
-        HW.GPIO.SEL[bank].CLR.write(mask)
+        HW.GPIO.FUNCTION[bank].CLR.write(mask)
+        HW.GPIO.SELECT[bank].CLR.write(mask)
     end
 
     t.dir = function(out)
@@ -56,17 +56,17 @@ function JZ.gpio.pinmask(bank, mask)
     end
 
     t.std_function = function(fun_nr)
-        HW.GPIO.FUN[bank].SET.write(mask)
+        HW.GPIO.FUNCTION[bank].SET.write(mask)
         if fun_nr >= 2 then
-            HW.GPIO.TRG[bank].SET.write(mask)
+            HW.GPIO.TRIGGER[bank].SET.write(mask)
             fun_nr = fun_nr - 2
         else
-            HW.GPIO.TRG[bank].CLR.write(mask)
+            HW.GPIO.TRIGGER[bank].CLR.write(mask)
         end
         if fun_nr >= 2 then
-            HW.GPIO.SEL[bank].SET.write(mask)
+            HW.GPIO.SELECT[bank].SET.write(mask)
         else
-            HW.GPIO.SEL[bank].CLR.write(mask)
+            HW.GPIO.SELECT[bank].CLR.write(mask)
         end
     end
     return t

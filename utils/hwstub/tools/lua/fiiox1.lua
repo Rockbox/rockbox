@@ -92,7 +92,7 @@ function FIIOX1.init_lcd()
     -- setup Fiio X1 specific pins
     FIIOX1.setup_fiio_lcd_pins()
     -- reset lcd
-    JZ.lcd_reset()
+    FIIOX1.lcd_reset()
 end
 
 -- call with nil to get automatic name
@@ -139,6 +139,7 @@ function FIIOX1.dump_spl(file)
 end
 
 function FIIOX1.init()
+    FIIOX1.hw_detect()
     FIIOX1.init_backligt()
     FIIOX1.test_backlight()
     FIIOX1.init_lcd()
