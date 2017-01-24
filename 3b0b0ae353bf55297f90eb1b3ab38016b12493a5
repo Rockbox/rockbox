@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5f72d720_6526a6ba",
+        "filename": "firmware/target/arm/as3525/ascodec-as3525.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2017-01-24T14:32:51Z",
+      "side": 1,
+      "message": "Hmmm, yeah, that\u0027s not right. The bit could get set between read and clear and missed. It would actually be useful here if the atomic bit functions returned the old value. Now they\u0027re just void.",
+      "parentUuid": "5f72d720_0527b2b8",
+      "range": {
+        "startLine": 548,
+        "startChar": 0,
+        "endLine": 549,
+        "endChar": 71
+      },
+      "revId": "3b0b0ae353bf55297f90eb1b3ab38016b12493a5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f72d720_252cae98",
         "filename": "firmware/target/arm/as3525/ascodec-as3525.c",
         "patchSetId": 7
@@ -36,6 +60,30 @@
       "writtenOn": "2017-01-24T12:54:45Z",
       "side": 1,
       "message": "We don\u0027t need this as rockbox already in non-usb mode by default.",
+      "range": {
+        "startLine": 644,
+        "startChar": 0,
+        "endLine": 645,
+        "endChar": 25
+      },
+      "revId": "3b0b0ae353bf55297f90eb1b3ab38016b12493a5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f72d720_853ac2ca",
+        "filename": "firmware/target/arm/as3525/ascodec-as3525.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2017-01-24T14:32:51Z",
+      "side": 1,
+      "message": "That looks safe to take out. usb_status_event does nothing if USB monitoring hasn\u0027t started. I was actually planning to make usb_detect read that bit instead of keeping two status flags but that\u0027s an optimization for later.",
+      "parentUuid": "5f72d720_252cae98",
       "range": {
         "startLine": 644,
         "startChar": 0,
