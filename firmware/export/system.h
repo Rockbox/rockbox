@@ -163,14 +163,15 @@ static inline __attribute__((always_inline))
 uint32_t isolate_first_bit(uint32_t val)
     { return val & -val; }
 
-/* Functions to set and clear register or variable bits atomically */
-void bitmod16(volatile uint16_t *addr, uint16_t bits, uint16_t mask);
-void bitset16(volatile uint16_t *addr, uint16_t mask);
-void bitclr16(volatile uint16_t *addr, uint16_t mask);
+/* Functions to set and clear register or variable bits atomically;
+ * return value is the previous value of *addr */
+uint16_t bitmod16(volatile uint16_t *addr, uint16_t bits, uint16_t mask);
+uint16_t bitset16(volatile uint16_t *addr, uint16_t mask);
+uint16_t bitclr16(volatile uint16_t *addr, uint16_t mask);
 
-void bitmod32(volatile uint32_t *addr, uint32_t bits, uint32_t mask);
-void bitset32(volatile uint32_t *addr, uint32_t mask);
-void bitclr32(volatile uint32_t *addr, uint32_t mask);
+uint32_t bitmod32(volatile uint32_t *addr, uint32_t bits, uint32_t mask);
+uint32_t bitset32(volatile uint32_t *addr, uint32_t mask);
+uint32_t bitclr32(volatile uint32_t *addr, uint32_t mask);
 
 /* gcc 3.4 changed the format of the constraints */
 #if (__GNUC__ >= 3) && (__GNUC_MINOR__ > 3) || (__GNUC__ >= 4)
