@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f75db04_86964a94",
+        "filename": "firmware/target/arm/as3525/ascodec-as3525.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2017-01-24T00:42:06Z",
+      "side": 1,
+      "message": "we can just set ascodec_enrd0_shadow \u003d data[0] as later we check it with mask in any case",
+      "range": {
+        "startLine": 536,
+        "startChar": 0,
+        "endLine": 549,
+        "endChar": 5
+      },
+      "revId": "562684dd1f801280f6279b27f983561d3eb8292b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
