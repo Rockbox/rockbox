@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f72d720_0527b2b8",
+        "filename": "firmware/target/arm/as3525/ascodec-as3525.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2017-01-24T12:54:45Z",
+      "side": 1,
+      "message": "Should be atomic operation. We should add \"VIC_INT_EN_CLEAR \u003d INTERRUPT_AUDIO;\" before and \"VIC_INT_ENABLE \u003d INTERRUPT_AUDIO;\" after.",
+      "range": {
+        "startLine": 548,
+        "startChar": 0,
+        "endLine": 549,
+        "endChar": 71
+      },
+      "revId": "3b0b0ae353bf55297f90eb1b3ab38016b12493a5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f72d720_252cae98",
+        "filename": "firmware/target/arm/as3525/ascodec-as3525.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2017-01-24T12:54:45Z",
+      "side": 1,
+      "message": "We don\u0027t need this as rockbox already in non-usb mode by default.",
+      "range": {
+        "startLine": 644,
+        "startChar": 0,
+        "endLine": 645,
+        "endChar": 25
+      },
+      "revId": "3b0b0ae353bf55297f90eb1b3ab38016b12493a5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
