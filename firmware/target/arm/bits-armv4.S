@@ -20,7 +20,7 @@
 ****************************************************************************/
 
 /***************************************************************************
- * void bitmod32(volatile uint32_t *addr, uint32_t bits, uint32_t mask)
+ * uint32_t bitmod32(volatile uint32_t *addr, uint32_t bits, uint32_t mask)
  */
     .section    .text.bitmod32, "ax", %progbits
     .align      2
@@ -30,54 +30,59 @@ bitmod32:
     mrs    r12, cpsr
     orr    r3, r12, #0xc0
     msr    cpsr_c, r3
-    ldr    r3, [r0]
+    mov    r3, r0
+    ldr    r0, [r3]
     and    r1, r1, r2               @ Only allow mod of bits in 'mask'
-    bic    r3, r3, r2               @ Clear mask bits
-    orr    r3, r3, r1               @ Set according to 'bits'
-    str    r3, [r0]
+    bic    r2, r0, r2               @ Clear mask bits
+    orr    r1, r2, r1               @ Set according to 'bits'
+    str    r1, [r3]
     msr    cpsr_c, r12
     bx     lr
     .size  bitmod32, .-bitmod32
 
+
 /***************************************************************************
- * void bitset32(volatile uint32_t *addr, uint32_t mask)
+ * uint32_t bitset32(volatile uint32_t *addr, uint32_t mask)
  */
     .section    .text.bitset32, "ax", %progbits
     .align      2
     .global     bitset32
     .type       bitset32, %function
 bitset32:
+    mov    r2, r0
     mrs    r12, cpsr
-    orr    r2, r12, #0xc0
-    msr    cpsr_c, r2
-    ldr    r2, [r0]
-    orr    r2, r2, r1
-    str    r2, [r0]
+    orr    r3, r12, #0xc0
+    msr    cpsr_c, r3
+    ldr    r0, [r2]
+    orr    r1, r0, r1
+    str    r1, [r2]
     msr    cpsr_c, r12
     bx     lr
     .size  bitset32, .-bitset32
 
 
 /***************************************************************************
- * void bitclr32(volatile uint32_t *addr, uint32_t mask)
+ * uint32_t bitclr32(volatile uint32_t *addr, uint32_t mask)
  */
      .section    .text.bitclr32, "ax", %progbits
      .align      2
      .global     bitclr32
      .type       bitclr32, %function
 bitclr32:
+    mov    r2, r0
     mrs    r12, cpsr
-    orr    r2, r12, #0xc0
-    msr    cpsr_c, r2
-    ldr    r2, [r0]
-    bic    r2, r2, r1
-    str    r2, [r0]
+    orr    r3, r12, #0xc0
+    msr    cpsr_c, r3
+    ldr    r0, [r2]
+    bic    r1, r0, r1
+    str    r1, [r2]
     msr    cpsr_c, r12
     bx     lr
     .size  bitclr32, .-bitclr32
 
+
 /***************************************************************************
- * void bitmod16(volatile uint16_t *addr, uint16_t bits, uint16_t mask)
+ * uint16_t bitmod16(volatile uint16_t *addr, uint16_t bits, uint16_t mask)
  */
     .section    .text.bitmod16, "ax", %progbits
     .align      2
@@ -87,49 +92,52 @@ bitmod16:
     mrs    r12, cpsr
     orr    r3, r12, #0xc0
     msr    cpsr_c, r3
-    ldrh   r3, [r0]
+    mov    r3, r0
+    ldrh   r0, [r3]
     and    r1, r1, r2               @ Only allow mod of bits in 'mask'
-    bic    r3, r3, r2               @ Clear mask bits
-    orr    r3, r3, r1               @ Set according to 'bits'
-    strh   r3, [r0]
+    bic    r2, r0, r2               @ Clear mask bits
+    orr    r1, r2, r1               @ Set according to 'bits'
+    strh   r1, [r3]
     msr    cpsr_c, r12
     bx     lr
     .size  bitmod16, .-bitmod16
 
+
 /***************************************************************************
- * void bitset16(volatile uint16_t *addr, uint16_t mask)
+ * uint16_t bitset16(volatile uint16_t *addr, uint16_t mask)
  */
     .section    .text.bitset16, "ax", %progbits
     .align      2
     .global     bitset16
     .type       bitset16, %function
 bitset16:
+    mov    r2, r0
     mrs    r12, cpsr
-    orr    r2, r12, #0xc0
-    msr    cpsr_c, r2
-    ldrh   r2, [r0]
-    orr    r2, r2, r1
-    strh   r2, [r0]
+    orr    r3, r12, #0xc0
+    msr    cpsr_c, r3
+    ldrh   r0, [r2]
+    orr    r1, r0, r1
+    strh   r1, [r2]
     msr    cpsr_c, r12
     bx     lr
     .size  bitset16, .-bitset16
 
 
 /***************************************************************************
- * void bitclr16(volatile uint16_t *addr, uint16_t mask)
+ * uint16_t bitclr16(volatile uint16_t *addr, uint16_t mask)
  */
      .section    .text.bitclr16, "ax", %progbits
      .align      2
      .global     bitclr16
      .type       bitclr16, %function
 bitclr16:
+    mov    r2, r0
     mrs    r12, cpsr
-    orr    r2, r12, #0xc0
-    msr    cpsr_c, r2
-    ldrh   r2, [r0]
-    bic    r2, r2, r1
-    strh   r2, [r0]
+    orr    r3, r12, #0xc0
+    msr    cpsr_c, r3
+    ldrh   r0, [r2]
+    bic    r1, r0, r1
+    strh   r1, [r2]
     msr    cpsr_c, r12
     bx     lr
     .size  bitclr16, .-bitclr16
-
