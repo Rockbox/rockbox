@@ -71,7 +71,7 @@ struct imx233_button_map_t imx233_button_map[] =
 
 struct imx233_button_map_t imx233_button_map[] =
 {
-    [I_VDDIO] = IMX233_BUTTON_(VDDIO, VDDIO(3500), "vddio"), /* we need VDDIO for relative */
+    [I_VDDIO] = IMX233_BUTTON_(VDDIO, VDDIO(3460), "vddio"), /* we need VDDIO for relative */
     IMX233_BUTTON_(HOLD, LRADC_REL(CHAN, 0, I_VDDIO), "hold"),
     IMX233_BUTTON(MENU, LRADC_REL(CHAN, 200, I_VDDIO), "menu"),
     IMX233_BUTTON(SHORTCUT, LRADC_REL(CHAN, 445, I_VDDIO), "shortcut"),
