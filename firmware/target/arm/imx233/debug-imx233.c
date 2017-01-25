@@ -1372,7 +1372,7 @@ bool dbg_hw_info_led(void)
                 prev_pending = false;
                 if(use_pwm)
                 {
-                    duty += inc ? 10 : -10;
+                    duty += inc ? 2 : -2;
                     if(duty < 0)
                         duty = 0;
                     if(duty > 100)
