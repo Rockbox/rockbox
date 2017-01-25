@@ -22,7 +22,6 @@
 #define POWERMGMT_TARGET_H
 
 #include "config.h"
-#include "powermgmt-imx233.h"
 
 /* Sony NWZ-E360/NWZ-E370 settings:
  * - current ramp slope: 

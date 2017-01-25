@@ -19,8 +19,9 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "powermgmt-target.h"
+#include "powermgmt.h"
 #include "power-imx233.h"
+#include "led-imx233.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
@@ -45,3 +46,30 @@ const unsigned short percent_to_volt_charge[11] =
     /* Sansa Fuze+ Li Ion 600mAH figured from charge curve */
     3480, 3790, 3845, 3880, 3900, 3935, 4005, 4070, 4150, 4250, 4335
 };
+
+void charging_algorithm_init_hook(void)
+{
+#ifdef CREATIVE_ZEN
+    /* The ZEN only has a blue LED, power it at 20% to get ~50% lightness */
+    imx233_led_set_pwm(0, 0, 1000 /* Hz */, 20 /* % */);
+#endif
+}
+
+void charging_algorithm_step_hook(void)
+{
+#if (defined(CREATIVE_ZENMOZAIC) || defined(CREATIVE_ZENXFI))
+    /* The ZEN Mozaic and X-Fi have a red-green led: use it to show battery
+     * level: green is 100%, red is 0%. */
+    int idx = (batt_percent() + 5) / 10;
+    /* The table was obtained by applying gamma correction (x->x^3) in the range
+     * 0.3 to 0.7, to obtain a change in hue but not in overall brightness */
+    static int led_tbl[11] = {3, 4, 5, 7, 10, 13, 16, 20, 24, 29, 34};
+    /* On those targets, channel 0 is red and 1 is green. See note below */
+    imx233_led_set_pwm(0, 0, freq, led_tbl[10 - idx]);
+    imx233_led_set_pwm(0, 1, freq, led_tbl[idx]);
+#endif
+}
+
+void charging_algorithm_close_hook(void)
+{
+}
