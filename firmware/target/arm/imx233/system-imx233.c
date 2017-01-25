@@ -286,8 +286,8 @@ struct cpufreq_profile_t
 /* Some devices don't handle very well memory frequency changes, so avoid them
  * by running at highest speed at all time */
 #if defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI)
-#define EMIFREQ_NORMAL  IMX233_EMIFREQ_130_MHz
-#define EMIFREQ_MAX     IMX233_EMIFREQ_130_MHz
+#define EMIFREQ_NORMAL  IMX233_EMIFREQ_64_MHz
+#define EMIFREQ_MAX     IMX233_EMIFREQ_64_MHz
 #else /* weird targets */
 #define EMIFREQ_NORMAL  IMX233_EMIFREQ_64_MHz
 #define EMIFREQ_MAX     IMX233_EMIFREQ_130_MHz
