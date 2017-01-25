@@ -180,7 +180,7 @@ bool imx233_button_read_hold(void)
     return imx233_button_read_btn(hold_idx);
 }
 
-bool __attribute__((weak)) button_hold(void)
+bool button_hold(void)
 {
     bool hold_button = imx233_button_read_hold();
 #ifndef BOOTLOADER
@@ -202,7 +202,7 @@ bool imx233_button_read_jack(void)
     return imx233_button_read_btn(jack_idx);
 }
 
-bool __attribute__((weak)) headphones_inserted(void)
+bool headphones_inserted(void)
 {
     return imx233_button_read_jack();
 }

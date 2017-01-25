@@ -24,9 +24,7 @@
 #include "audio.h"
 #include "audio-target.h"
 
-/* target can override those functions to provide hooks to the audio code
- * alternativelly, the default implementation provide support for GPIO
- * controlled gates using the following defines
+/* target can control those functions by using the following defines
  * NOTE by default gates are enabled by setting GPIO to 1 (except if inverted)
  *
  * IMX233_AUDIO_HP_GATE_BANK (gpio bank)
@@ -37,7 +35,7 @@
  * IMX233_AUDIO_SPKR_GATE_PIN (gpio pin)
  * IMX233_AUDIO_SPKR_GATE_INVERTED (define if inverted)
  *
- * target can override those to control microphone parameters
+ * target can set those to control microphone parameters
  * NOTE by default, mic select is 1, mic bias is 0 and mic resistor is 2KOhm
  * IMX233_AUDIO_MIC_SELECT (mic bias pin: 0=lradc0, 1=lradc1)
  * IMX233_AUDIO_MIC_BIAS (mic bias, 0=1.21V, 1=1.46, ..., 7=2.96V (0.25mV inc)

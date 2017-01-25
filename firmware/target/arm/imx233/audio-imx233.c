@@ -22,7 +22,7 @@
 #include "audio-imx233.h"
 #include "pinctrl-imx233.h"
 
-void __attribute__((weak)) imx233_audio_preinit(void)
+void imx233_audio_preinit(void)
 {
 #ifdef IMX233_AUDIO_HP_GATE_BANK
     imx233_pinctrl_acquire(IMX233_AUDIO_HP_GATE_BANK, IMX233_AUDIO_HP_GATE_PIN, "hp_gate");
@@ -38,12 +38,12 @@ void __attribute__((weak)) imx233_audio_preinit(void)
 #endif
 }
 
-void __attribute__((weak)) imx233_audio_postinit(void)
+void imx233_audio_postinit(void)
 {
     imx233_audio_enable_hp(true);
 }
 // enable/disable the HP audio gate (typically using a GPIO)
-void __attribute__((weak)) imx233_audio_enable_hp(bool en)
+void imx233_audio_enable_hp(bool en)
 {
 #ifdef IMX233_AUDIO_HP_GATE_BANK
 # ifdef IMX233_AUDIO_HP_GATE_INVERTED
@@ -55,7 +55,7 @@ void __attribute__((weak)) imx233_audio_enable_hp(bool en)
 #endif
 }
 // enable/disable the speaker audio gate (typically using a GPIO)
-void __attribute__((weak)) imx233_audio_enable_spkr(bool en)
+void imx233_audio_enable_spkr(bool en)
 {
 #ifdef IMX233_AUDIO_SPKR_GATE_BANK
 # ifdef IMX233_AUDIO_SPKR_GATE_INVERTED
@@ -112,14 +112,14 @@ static void select_audio_path(void)
     }
 }
 
-void __attribute__((weak)) audio_input_mux(int source, unsigned flags)
+void audio_input_mux(int source, unsigned flags)
 {
     input_source = source;
     input_flags = flags;
     select_audio_path();
 }
 
-void __attribute__((weak)) audio_set_output_source(int source)
+void audio_set_output_source(int source)
 {
     output_source = source;
     select_audio_path();
