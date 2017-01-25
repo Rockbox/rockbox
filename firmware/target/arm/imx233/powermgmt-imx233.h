@@ -24,6 +24,17 @@
 #include "config.h"
 #include "powermgmt.h"
 
+/** Target that wants to define hook into charging algorithm must define
+ * IMX233_POWERMGMT_HOOK
+ * and define the following functions */
+#ifdef IMX233_POWERMGMT_HOOK
+#define HAVE_HOOKS
+void charging_algorithm_init_hook(void);
+void charging_algorithm_step_hook(void);
+void charging_algorithm_close_hook(void);
+#endif
+#define HAVE_ME
+
 void imx233_powermgmt_init(void);
 
 struct imx233_powermgmt_info_t

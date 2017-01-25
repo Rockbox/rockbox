@@ -22,7 +22,6 @@
 #define POWERMGMT_TARGET_H
 
 #include "config.h"
-#include "powermgmt-imx233.h"
 
 /* Creative ZEN X-Fi3 OF settings:
  * - current ramp slope: 10 mA/s

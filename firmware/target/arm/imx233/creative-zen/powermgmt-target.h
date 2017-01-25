@@ -22,7 +22,6 @@
 #define POWERMGMT_TARGET_H
 
 #include "config.h"
-#include "powermgmt-imx233.h"
 
 /* ZEN X-Fi OF settings:
  * - current ramp slope: 
@@ -51,5 +50,8 @@
 #define IMX233_CHARGING_TIMEOUT (4 * 3600 * HZ)
 #define IMX233_DIE_TEMP_HIGH    71
 #define IMX233_DIE_TEMP_LOW     56
+
+/* we want hooks for leds */
+#define IMX233_POWERMGMT_HOOK
 
 #endif /*  POWERMGMT_TARGET_H */

@@ -1280,6 +1280,48 @@ static const char *get_led_col(enum imx233_led_color_t col)
     }
 }
 
+#if 0
+
+
+void set_percent(int batt_percent)
+{
+    int freq = 1000; /* Hz */
+    /* on those targets, channel 0 is red and 1 is green */
+    imx233_led_set_pwm(0, 0, freq, (100 - batt_percent));
+    imx233_led_set_pwm(0, 1, freq, batt_percent/3);
+}
+
+bool dbg_hw_info_led(void)
+{
+    lcd_setfont(FONT_SYSFIXED);
+    int percent = 0;
+
+    while(1)
+    {
+        int button = my_get_action(HZ);
+        switch(button)
+        {
+            case ACT_NEXT:
+                percent = MIN(percent + 10, 100);
+                break;
+            case ACT_PREV:
+                percent = MAX(percent - 10, 0);
+                break;
+            case ACT_OK:
+            case ACT_CANCEL:
+                lcd_setfont(FONT_UI);
+                return false;
+        }
+
+        set_percent(percent);
+        lcd_clear_display();
+        lcd_putsf(0, 0, "percent: %d", percent);
+        lcd_update();
+        yield();
+    }
+}
+
+#else
 bool dbg_hw_info_led(void)
 {
     lcd_setfont(FONT_SYSFIXED);
@@ -1387,6 +1429,7 @@ bool dbg_hw_info_led(void)
         yield();
     }
 }
+#endif
 
 #ifdef HAVE_DUALBOOT_STUB
 bool dbg_hw_info_dualboot(void)

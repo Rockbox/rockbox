@@ -91,6 +91,9 @@ void powermgmt_init_target(void)
 #if IMX233_SUBTARGET >= 3780
     tick_add_task(&ramp_up_4p2_rail);
 #endif
+#ifdef IMX233_POWERMGMT_HOOK
+    charging_algorithm_init_hook();
+#endif
 }
 
 void charging_algorithm_step(void)
@@ -192,10 +195,16 @@ void charging_algorithm_step(void)
         charge_state = CHARGE_STATE_DISABLED;
     }
 #endif
+#ifdef IMX233_POWERMGMT_HOOK
+    charging_algorithm_step_hook();
+#endif
 }
 
 void charging_algorithm_close(void)
 {
+#ifdef IMX233_POWERMGMT_HOOK
+    charging_algorithm_close_hook();
+#endif
 #if IMX233_SUBTARGET >= 3780
     tick_remove_task(&ramp_up_4p2_rail);
 #endif
