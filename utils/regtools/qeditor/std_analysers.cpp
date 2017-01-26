@@ -87,7 +87,8 @@ bool ClockAnalyser::SupportSoc(const QString& soc_name)
     return soc_name == "imx233"
         || soc_name == "rk27xx"
         || soc_name == "atj213x"
-        || soc_name == "jz4760b";
+        || soc_name == "jz4760b"
+        || soc_name == "stmp3700";
 }
 
 QString ClockAnalyser::GetFreq(unsigned freq)
@@ -138,6 +139,7 @@ void ClockAnalyser::FillTree()
 {
     m_tree_widget->clear();
     if(m_soc.get()->name == "imx233") FillTreeIMX233();
+    if(m_soc.get()->name == "stmp3700") FillTreeIMX233();
     else if(m_soc.get()->name == "rk27xx") FillTreeRK27XX();
     else if(m_soc.get()->name == "atj213x") FillTreeATJ213X();
     else if(m_soc.get()->name == "jz4760b") FillTreeJZ4760B();
@@ -634,6 +636,7 @@ void ClockAnalyser::FillTreeRK27XX()
 
 void ClockAnalyser::FillTreeIMX233()
 {
+    /* work for stmp3700 and imx233 */
     soc_word_t value, value2, value3;
 
     QTreeWidgetItem *ring_osc = 0;
@@ -766,18 +769,18 @@ void ClockAnalyser::FillTreeIMX233()
             ReadFieldOld("CLKCTRL", "SSP", "CLKGATE", value3))
         clk_ssp = AddClock(value ? ref_xtal : ref_io, "clk_ssp", value3 ? DISABLED : FROM_PARENT, 1, value2);
     else
-        clk_ssp = AddClock(ref_xtal, "clk_p", INVALID);
+        clk_ssp = AddClock(ref_xtal, "clk_ssp", INVALID);
 
-    if(ReadFieldOld("SSP1", "TIMING", "CLOCK_DIVIDE", value) &&
-            ReadFieldOld("SSP1", "TIMING", "CLOCK_RATE", value2) &&
-            ReadFieldOld("SSP1", "CTRL0", "CLKGATE", value3))
+    if(ReadFieldOld("SSP[1]", "TIMING", "CLOCK_DIVIDE", value) &&
+            ReadFieldOld("SSP[1]", "TIMING", "CLOCK_RATE", value2) &&
+            ReadFieldOld("SSP[1]", "CTRL0", "CLKGATE", value3))
         AddClock(clk_ssp, "clk_ssp1", value3 ? DISABLED : FROM_PARENT, 1, value * (1 + value2));
     else
         AddClock(clk_ssp, "clk_ssp1", INVALID);
 
-    if(ReadFieldOld("SSP2", "TIMING", "CLOCK_DIVIDE", value) &&
-            ReadFieldOld("SSP2", "TIMING", "CLOCK_RATE", value2) &&
-            ReadFieldOld("SSP2", "CTRL0", "CLKGATE", value3))
+    if(ReadFieldOld("SSP[2]", "TIMING", "CLOCK_DIVIDE", value) &&
+            ReadFieldOld("SSP[2]", "TIMING", "CLOCK_RATE", value2) &&
+            ReadFieldOld("SSP[2]", "CTRL0", "CLKGATE", value3))
         AddClock(clk_ssp, "clk_ssp2", value3 ? DISABLED : FROM_PARENT, 1, value * (1 + value2));
     else
         AddClock(clk_ssp, "clk_ssp2", INVALID);
@@ -893,7 +896,7 @@ QWidget *EmiAnalyser::GetWidget()
 
 bool EmiAnalyser::SupportSoc(const QString& soc_name)
 {
-    return soc_name == "imx233";
+    return soc_name == "imx233" || soc_name == "stmp3700";
 }
 
 void EmiAnalyser::OnChangeDisplayMode(int index)
