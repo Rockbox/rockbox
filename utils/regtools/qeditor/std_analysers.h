@@ -126,6 +126,7 @@ private:
     DisplayMode m_display_mode;
     unsigned m_emi_freq;
     QLineEdit *m_emi_freq_label;
+    QLineEdit *m_emi_size_label;
 };
 
 /**
