@@ -47,6 +47,8 @@
 #include "partitions-imx233.h"
 #include "backlight-target.h"
 #include "adc.h"
+#include "fcntl.h"
+#include "file.h"
 
 #include "usb.h"
 
@@ -129,6 +131,18 @@ static void usb_mode(int connect_timeout)
 }
 #endif /* HAVE_BOOTLOADER_USB_MODE */
 
+#if IMX233_SUBTARGET == 3700
+struct
+{
+    uint32_t address;
+    uint32_t value;
+}stmp3700_reglist[] =
+{
+    #include "stmp3700_reglist.h"
+};
+#define STMP3700_REGLIST_COUNT  (sizeof(stmp3700_reglist) / sizeof(stmp3700_reglist[0]))
+#endif
+
 void main(uint32_t arg, uint32_t addr) NORETURN_ATTR;
 void main(uint32_t arg, uint32_t addr)
 {
@@ -136,6 +150,11 @@ void main(uint32_t arg, uint32_t addr)
     int buffer_size;
     void(*kernel_entry)(void);
     int ret;
+
+#if IMX233_SUBTARGET == 3700
+    for(int i = 0; i < STMP3700_REGLIST_COUNT; i++)
+        stmp3700_reglist[i].value = *(volatile uint32_t *)stmp3700_reglist[i].address;
+#endif
 
     system_init();
     kernel_init();
@@ -202,6 +221,23 @@ void main(uint32_t arg, uint32_t addr)
 #endif
 
     printf("Loading firmware");
+
+    /* write registers */
+#if IMX233_SUBTARGET == 3700
+    int fd = open("/stmp3700_reg.txt", O_WRONLY|O_TRUNC|O_CREAT, 0666);
+    if(fd >= 0)
+    {
+        fdprintf(fd, "soc = stmp3700\n");
+        for(int i = 0; i < STMP3700_REGLIST_COUNT; i++)
+            fdprintf(fd, "0x%08x = 0x%08x\n", stmp3700_reglist[i].address, stmp3700_reglist[i].value);
+        close(fd);
+    }
+    else
+    {
+        printf("Cannot write register dump: %d", fd);
+        sleep(HZ * 2);
+    }
+#endif
 
     loadbuffer = (unsigned char*)loadaddress;
     buffer_size = (int)(loadaddressend - loadaddress);
