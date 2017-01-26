@@ -25,22 +25,6 @@
 #include <stdint.h>
 #include "time.h"
 
-#define MINUTE_SECONDS      60
-#define HOUR_SECONDS        3600
-#define DAY_SECONDS         86400
-#define WEEK_SECONDS        604800
-#define YEAR_SECONDS        31536000
-#define LEAP_YEAR_SECONDS   31622400
-
-/* Days in each month */
-static uint8_t days_in_month[] =
-    {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
-static inline bool is_leapyear(int year)
-{
-    return (((year%4)==0) && (((year%100)!=0) || ((year%400)==0)));
-}
-
 struct tm *gmtime(const time_t *timep)
 {
     static struct tm time;
@@ -49,65 +33,72 @@ struct tm *gmtime(const time_t *timep)
 
 struct tm *gmtime_r(const time_t *timep, struct tm *tm)
 {
-    time_t seconds = *timep;
-    int year, i, mday, hour, min;
-
-    /* weekday */
-    tm->tm_wday = (seconds / DAY_SECONDS + 4) % 7;
-
-    /* Year */
-    year = 1970;
-    while (seconds >= LEAP_YEAR_SECONDS)
+    /* Epoch start: Thursday, 1 January 1970 */
+    static const unsigned short mon_yday[13] =
     {
-        if (is_leapyear(year)){
-            seconds -= LEAP_YEAR_SECONDS;
-        } else {
-            seconds -= YEAR_SECONDS;
-        }
+        /* Since 1 Jan, how many days have passed this year by the 1st of
+           each month or, if you like, year day of 1st of month (non-leap)
+      +31  +28  +31  +30  +31  +30  +31  +31  +30  +31  +30  +31  +31 */
+        0,  31,  59,  90, 120, 151, 181, 212, 243, 273, 304, 334, 365
+    };
 
-        year++;
-    }
+    int x0, x1, x2, x3; /* scratch variables */
 
-    if (is_leapyear(year)) {
-        days_in_month[1] = 29;
-    } else {
-        days_in_month[1] = 28;
-        if(seconds>YEAR_SECONDS){
-            year++;
-            seconds -= YEAR_SECONDS;
-        }
-    }
-    tm->tm_year = year - 1900;
+    time_t s = *timep;
+    int d = s / 86400;
 
-    /* Month */
-    for (i = 0; i < 12; i++)
+    x0 = s - (time_t)d * 86400; /* second # of day (0..86399) */
+    x1 = x0 / 3600;
+    tm->tm_hour = x1;
+
+    x0 -= x1 * 3600;            /* second # of hour (0..3599) */
+    x1 = x0 / 60;
+    tm->tm_min = x1;
+
+    x0 -= x1 * 60;              /* second # of minute (0..59) */
+    tm->tm_sec = x0;
+
+    /* calculate year from day number */
+    x0 = (d / 365 + 1) / 4;
+    x1 = (x0 + 17) / 25;
+    x2 = (x1 + 3) / 4;
+
+    int y = (d - x0 + x1 - x2) / 365;
+
+    tm->tm_year = y + 70;                   /* 70.. */
+
+    /* calculate year day from year number and day number */
+    x0 = (y + 1) / 4;
+    x1 = (x0 + 17) / 25;
+    x2 = (x1 + 3) / 4;
+
+    int yday = d - x0 + x1 - x2 - y * 365;
+
+    tm->tm_yday = x3 = yday;                /* 0..364/365 */
+
+    /* check if leap year; adjust February->March transition if so rather
+       than keeping a leap year version of mon_yday[]; comparisons are made
+       with remainders without adjusting for the offests before division made
+       above */
+    if (y - x0 * 4 == 2 && (x0 - x1 * 25 != 7 || x1 - x2 * 4 == 0))
     {
-        if (seconds < days_in_month[i]*DAY_SECONDS){
-            tm->tm_mon = i;
-            break;
-        }
-
-        seconds -= days_in_month[i]*DAY_SECONDS;
+        /* retard month lookup to make year day 59 into 29 Feb, both to make
+           year day 60 into 01 March, lagging one day for remainder of year */
+        if (x3 >= mon_yday[2] && --x3 >= mon_yday[2])
+            yday--;
     }
 
-    /* Month Day */
-    mday = seconds/DAY_SECONDS;
-    seconds -= mday*DAY_SECONDS;
-    tm->tm_mday = mday + 1; /* 1 ... 31 */
+    /* stab approximately at current month based on year day; advance if
+       it fell short (never initially more than 1 short). */
+    x0 = x3 / 32;
+    if (mon_yday[x0 + 1] <= x3)
+        x0++;
 
-    /* Hour */
-    hour = seconds/HOUR_SECONDS;
-    seconds -= hour*HOUR_SECONDS;
-    tm->tm_hour = hour;
+    tm->tm_mon  = x0;                      /* 0..11 */
+    tm->tm_mday = yday - mon_yday[x0] + 1; /* 1..31 */
+    tm->tm_wday = (d + 4) % 7;             /* 0..6 */
 
-    /* Minute */
-    min = seconds/MINUTE_SECONDS;
-    seconds -= min*MINUTE_SECONDS;
-    tm->tm_min = min;
-
-    /* Second */
-    tm->tm_sec = seconds;
+    tm->tm_isdst = -1; /* not implemented right now */
 
     return tm;
 }
-
