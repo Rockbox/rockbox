@@ -24,7 +24,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "pcf50605.h"
-#include <stdbool.h>
+#include "timefuncs.h"
 
 /* Values which each disable one alarm time register */
 static const char alarm_disable[] = {
@@ -49,10 +49,12 @@ int rtc_read_datetime(struct tm *tm)
     tm->tm_sec  = buf[0];
     tm->tm_min  = buf[1];
     tm->tm_hour = buf[2];
-    tm->tm_wday = buf[3];
     tm->tm_mday = buf[4];
     tm->tm_mon  = buf[5] - 1;
     tm->tm_year = buf[6] + 100;
+    tm->tm_yday = 0; /* Not implemented for now */
+
+    set_day_of_week(tm);
 
     return rc;
 }

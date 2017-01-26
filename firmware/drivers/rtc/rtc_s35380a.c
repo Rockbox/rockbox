@@ -23,6 +23,7 @@
 #include "config.h"
 #include "rtc.h" 
 #include "i2c-coldfire.h"
+#include "timefuncs.h"
 
 /*  Driver for the Seiko S35380A real-time clock chip with i2c interface
 
@@ -188,10 +189,12 @@ int rtc_read_datetime(struct tm *tm)
     tm->tm_sec  = buf[TIME_SECOND];
     tm->tm_min  = buf[TIME_MINUTE];
     tm->tm_hour = buf[TIME_HOUR];
-    tm->tm_wday = buf[TIME_WEEKDAY];
     tm->tm_mday = buf[TIME_DAY];
     tm->tm_mon  = buf[TIME_MONTH] - 1;
     tm->tm_year = buf[TIME_YEAR] + 100;
+    tm->tm_yday = 0; /* Not implemented for now */
+
+    set_day_of_week(tm);
 
     return ret;
 }

@@ -23,6 +23,7 @@
 #include "rtc.h"
 #include "kernel.h"
 #include "system.h"
+#include "timefuncs.h"
 
 void rtc_init(void)
 {
@@ -35,10 +36,12 @@ int rtc_read_datetime(struct tm *tm)
     tm->tm_sec = BCD2DEC(BCDSEC);
     tm->tm_min = BCD2DEC(BCDMIN);
     tm->tm_hour = BCD2DEC(BCDHOUR);
-    tm->tm_wday = BCD2DEC(BCDDAY) - 1; /* timefuncs wants 0..6 for wday */
     tm->tm_mday = BCD2DEC(BCDDATE);
     tm->tm_mon = BCD2DEC(BCDMON) - 1;
     tm->tm_year = BCD2DEC(BCDYEAR) + 100;
+    tm->tm_yday = 0; /* Not implemented for now */
+
+    set_day_of_week(tm);
 
     return 1;
 }

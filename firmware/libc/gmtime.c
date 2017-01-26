@@ -108,6 +108,9 @@ struct tm *gmtime_r(const time_t *timep, struct tm *tm)
     /* Second */
     tm->tm_sec = seconds;
 
+    tm->tm_yday = 0; /* Not implemented for now */
+    tm->tm_isdst = -1; /* Not implemented for now */
+
     return tm;
 }
 

@@ -22,6 +22,7 @@
 #include "logf.h"
 #include "sw_i2c.h"
 #include "i2c-pp.h"
+#include "timefuncs.h"
 
 /* The RTC chip is unknown, the information about it was gathered by 
  * reverse engineering the bootloader.
@@ -140,10 +141,12 @@ int rtc_read_datetime(struct tm *tm)
     tm->tm_sec = buf[6];
     tm->tm_min = buf[5];
     tm->tm_hour = buf[4];
-    tm->tm_wday = buf[3];
     tm->tm_mday = buf[2];
     tm->tm_mon = buf[1] - 1;
     tm->tm_year = buf[0] + 100;
+    tm->tm_yday = 0; /* Not implemented for now */
+
+    set_day_of_week(tm);
 
     return rc;
 }

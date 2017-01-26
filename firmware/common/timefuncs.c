@@ -71,9 +71,6 @@ struct tm *get_time(void)
         /* Once per second, 1/10th of a second off */
         timeout = HZ * (current_tick / HZ + 1) + HZ / 5;
         rtc_read_datetime(&tm);
-        set_day_of_week(&tm);
-
-        tm.tm_yday = 0; /* Not implemented for now */
         tm.tm_isdst = -1; /* Not implemented for now */
     }
 #else /* No RTC */

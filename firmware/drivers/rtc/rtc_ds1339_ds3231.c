@@ -21,6 +21,7 @@
 #include "rtc.h" 
 #include "logf.h"
 #include "sw_i2c.h"
+#include "timefuncs.h"
 
 #define RTC_ADDR   0xD0
 
@@ -122,10 +123,12 @@ int rtc_read_datetime(struct tm *tm)
     tm->tm_sec  = BCD2DEC(buf[0] & 0x7f);
     tm->tm_min  = BCD2DEC(buf[1] & 0x7f);
     tm->tm_hour = BCD2DEC(buf[2] & 0x3f);
-    tm->tm_wday = BCD2DEC(buf[3] & 0x7) - 1; /* timefuncs wants 0..6 for wday */
     tm->tm_mday = BCD2DEC(buf[4] & 0x3f);
     tm->tm_mon  = BCD2DEC(buf[5] & 0x1f) - 1;
     tm->tm_year = BCD2DEC(buf[6]) + 100;
+    tm->tm_yday = 0; /* Not implemented for now */
+
+    set_day_of_week(tm);
 
     return rc;
 }

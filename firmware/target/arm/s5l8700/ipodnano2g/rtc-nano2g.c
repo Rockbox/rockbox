@@ -23,6 +23,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "pmu-target.h"
+#include "timefuncs.h"
 
 void rtc_init(void)
 {
@@ -41,10 +42,12 @@ int rtc_read_datetime(struct tm *tm)
     tm->tm_sec = buf[0];
     tm->tm_min = buf[1];
     tm->tm_hour = buf[2];
-    tm->tm_wday = buf[3];
     tm->tm_mday = buf[4];
     tm->tm_mon = buf[5] - 1;
     tm->tm_year = buf[6] + 100;
+    tm->tm_yday = 0; /* Not implemented for now */
+
+    set_day_of_week(tm);
 
     return 0;
 }
