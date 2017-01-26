@@ -870,6 +870,13 @@ EmiAnalyser::EmiAnalyser(const soc_desc::soc_ref_t& soc, IoBackend *backend)
     m_emi_freq_label = new QLineEdit;
     m_emi_freq_label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     m_emi_freq_label->setReadOnly(true);
+    m_emi_size_label = new QLineEdit;
+    m_emi_size_label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    m_emi_size_label->setReadOnly(true);
+    line_layout->addStretch();
+    line_layout->addWidget(new QLabel("Size:"));
+    line_layout->addWidget(m_emi_size_label);
+    line_layout->addWidget(new QLabel("MiB"));
     line_layout->addStretch();
     line_layout->addWidget(new QLabel("Frequency:"));
     line_layout->addWidget(m_emi_freq_label);
@@ -1007,6 +1014,21 @@ void EmiAnalyser::FillTable()
     }
 
     m_emi_freq_label->setText(QString().sprintf("%.3f", m_emi_freq / 1000000.0));
+
+    soc_word_t rows, columns, cs_map;
+    if(ReadFieldOld("DRAM", "CTL14", "CS_MAP", cs_map) &&
+            ReadFieldOld("DRAM", "CTL10", "ADDR_PINS", rows) &&
+            ReadFieldOld("DRAM", "CTL11", "COLUMN_SIZE", columns))
+    {
+        rows = 13 - rows;
+        columns = 12 - columns;
+        soc_word_t banks = 4;
+        soc_word_t chips = __builtin_popcount(cs_map);
+        unsigned long size = 2 * (1 << (rows + columns)) * chips * banks;
+        m_emi_size_label->setText(QString().sprintf("%lu", (unsigned long)size / 1024 / 1024));
+    }
+    else
+        m_emi_size_label->setText("<invalid>");
 
     NewGroup("Control Parameters");
     if(ReadFieldOld("EMI", "CTRL", "PORT_PRIORITY_ORDER", value))
