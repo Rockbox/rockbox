@@ -1035,7 +1035,7 @@ namespace
 std::vector< node_t > *get_children(node_ref_t node)
 {
     if(node.is_root())
-        return &node.soc().get()->node;
+        return node.soc().valid() ? &node.soc().get()->node : 0;
     node_t *n = node.get();
     return n == 0 ? 0 : &n->node;
 }
