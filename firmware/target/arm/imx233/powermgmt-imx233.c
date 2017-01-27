@@ -68,9 +68,121 @@ void imx233_powermgmt_init(void)
 #endif
 }
 
+#if IMX233_SUBTARGET < 3700
+/* The STMP3600 is completely different from the STMP3700+, we don't support it
+ * at the moment */
+static void charging_init(void)
+{
+}
+
+static void charging_close(void)
+{
+}
+
+static void charging_step(void)
+{
+    /* Unimplemented on STMP3600 */
+}
+#elif IMX233_SUBTARGET < 3780
+/* The STMP3700 features a DCDC that takes battery input and produces
+ * VDDD, VDDA and VDDIO. It also has a chain of three linear regulators:
+ * VDD5V -> VDDIO -> VDDA -> VDDD that can be independently controlled.
+ * Currently, we setup things as follows:
+ * - on battery: use DCDC for maximal efficiency
+ * - on 5V: use linear regulators to only draw from 5V and enable charger
+ * Important note: we don't control the initial state, we can be ROLOed in any
+ * state and the OF bootloader/stub can use a very different setup */
+static void charging_init(void)
+{
+    /* the bootloader may be using some unusual setup so make sure the
+     * linear regulation current limit is not set */
+    BF_CLR(POWER_5VCTRL, ILIMIT_EQ_ZERO);
+    BF_CLR(POWER_5VCTRL, ENABLE_ILIMIT);
+    /* since we will power from regulators, disable stepping as per manual;
+     * this appears to be very important, otherwise the chip will randomly
+     * crash when switching from DCDC to linear regulators */
+    BF_WR(POWER_VDDIOCTRL, DISABLE_STEPPING(1));
+    BF_WR(POWER_VDDDCTRL, DISABLE_STEPPING(1));
+    BF_WR(POWER_VDDACTRL, DISABLE_STEPPING(1));
+}
+
+static void charging_close(void)
+{
+}
+
+static void charging_step(void)
+{
+    bool is_5v_present = usb_detect() == USB_INSERTED;
+
+    /* initial state & 5v -> battery transition */
+    if(!is_5v_present && charge_state != DISCHARGING)
+    {
+        logf("pwrmgmt: * -> discharging");
+        charge_state = DISCHARGING;
+        /* 5V has been lost: disable charger and make sure linear regulators are
+         * disabled so we use DCDC */
+        BF_WR(POWER_VDDDCTRL, ENABLE_LINREG(0));
+        BF_WR(POWER_VDDACTRL, ENABLE_LINREG(0));
+        BF_SET(POWER_CHARGE, PWD_BATTCHRG);
+    }
+    /* battery -> 5v transition */
+    else if(is_5v_present && charge_state == DISCHARGING)
+    {
+        logf("pwrmgmt: discharging -> charging");
+        /* disable DCDC and setup DCDC transfer for when we loose 5V */
+        BF_CLR(POWER_5VCTRL, ENABLE_DCDC);
+        BF_SET(POWER_5VCTRL, DCDC_XFER);
+        /* enable battery charging */
+        BF_CLR(POWER_CHARGE, PWD_BATTCHRG);
+        charge_state = CHARGING;
+        timeout_charging = current_tick + IMX233_CHARGING_TIMEOUT;
+    }
+    /* charging -> error transition */
+    else if(charge_state == CHARGING && TIME_AFTER(current_tick, timeout_charging))
+    {
+        /* we have charged for a too long time, declare charger broken */
+        logf("pwrmgmt: charging timeout exceeded!");
+        logf("pwrmgmt: charging -> error");
+        /* stop charging, note that we disabled the DCDC so we are now running
+         * from linear regulators and thus we leave the battery untouched */
+        BF_SET(POWER_CHARGE, PWD_BATTCHRG);
+        /* goto error state */
+        charge_state = CHARGE_STATE_ERROR;
+    }
+    /* charging -> topoff transition */
+    else if(charge_state == CHARGING && !BF_RD(POWER_STS, CHRGSTS))
+    {
+        logf("pwrmgmt: topping off");
+        logf("pwrmgmt: charging -> topoff");
+        charge_state = TOPOFF;
+        timeout_topping_off = current_tick + IMX233_TOPOFF_TIMEOUT;
+    }
+    /* topoff -> disabled transition */
+    else if(charge_state == TOPOFF && TIME_AFTER(current_tick, timeout_topping_off))
+    {
+        logf("pwrmgmt: charging finished");
+        logf("pwrmgmt: topoff -> disabled");
+        /* stop charging, note that we disabled the DCDC so we are now running
+         * from linear regulators and thus we leave the battery untouched */
+        BF_SET(POWER_CHARGE, PWD_BATTCHRG);
+        charge_state = CHARGE_STATE_DISABLED;
+    }
+}
+#else /* IMX233_SUBTARGET >= 3780 */
+/* The i.MX233 has a different architecture from STMP3700: it
+ * features a DCDC that takes input either from battery from from a 4.2V rail
+ * powered by a VDD5V -> 4P2 linear regulator. It also has a chain of three linear
+ * regulators: VDD5V -> VDDIO -> VDDA -> VDDD that can be independently controlled,
+ * and an extra linear regulator VDDIO -> VDDMEM that is always on.
+ * Currently, we setup things as follows:
+ * - on battery: we use the DCDC that we run from battery
+ * - on 5V: we use the DCDC that we run from 4P2 and enable charger
+ * Important note: we don't control the initial state, we can be ROLOed in any
+ * state and the OF bootloader/stub can use a very different setup. In particular,
+ * it is possible that the system is running from linear regulators */
+
 #define MAX_4P2_ILIMIT  0x3f
 
-#if IMX233_SUBTARGET >= 3780
 /* The code below assumes HZ = 100 so that it runs every 10ms */
 #if HZ != 100
 #warning The ramp_up_4p2_rail() tick task assumes HZ = 100, this may break charging
@@ -82,20 +194,27 @@ static void ramp_up_4p2_rail(void)
     if(charge_state == TRICKLE && BF_RD(POWER_5VCTRL, CHARGE_4P2_ILIMIT) < MAX_4P2_ILIMIT)
         HW_POWER_5VCTRL += BF_POWER_5VCTRL_CHARGE_4P2_ILIMIT(1);
 }
-#endif /* IMX233_SUBTARGET >= 3780 */
 
-void powermgmt_init_target(void)
+static void charging_init(void)
 {
-    charge_state = DISCHARGING;
-    /* stmp < 3780 does not have a 4.2 rail */
-#if IMX233_SUBTARGET >= 3780
+    /* we need tick task to ramp up the 4P2 rail */
     tick_add_task(&ramp_up_4p2_rail);
-#endif
+    /* since we will run the DCDC all the time, make sure that it draws from 4.2
+     * when available, that way when 5V is available, we never draw from battery */
+    BF_WR(POWER_DCDC4P2, CMPTRIP(0)); /* 85% */
+    BF_WR(POWER_DCDC4P2, DROPOUT_CTRL(0xe)); /* select greater, 200 mV drop */
+    /* keep DCDC running when on 5V insertion */
+    BF_CLR(POWER_5VCTRL, DCDC_XFER);
+    BF_SET(POWER_5VCTRL, ENABLE_DCDC);
 }
 
-void charging_algorithm_step(void)
+static void charging_close(void)
 {
-#if IMX233_SUBTARGET >= 3700
+    tick_remove_task(&ramp_up_4p2_rail);
+}
+
+static void charging_step(void)
+{
     bool is_5v_present = usb_detect() == USB_INSERTED;
 
     /* initial state & 5v -> battery transition */
@@ -106,52 +225,47 @@ void charging_algorithm_step(void)
         charge_state = DISCHARGING;
         /* 5V has been lost: disable 4p2 power rail */
         BF_SET(POWER_CHARGE, PWD_BATTCHRG);
-#if IMX233_SUBTARGET >= 3780
         BF_WR(POWER_DCDC4P2, ENABLE_DCDC(0));
         BF_WR(POWER_DCDC4P2, ENABLE_4P2(0));
         BF_WR(POWER_5VCTRL, CHARGE_4P2_ILIMIT(0));
         BF_SET(POWER_5VCTRL, PWD_CHARGE_4P2);
-#endif
+        /* at this point we can safely disable linear regulators in case those
+         * were enabled */
+        BF_WR(POWER_VDDDCTRL, ENABLE_LINREG(0));
+        BF_WR(POWER_VDDACTRL, ENABLE_LINREG(0));
     }
     /* battery -> 5v transition */
     else if(is_5v_present && charge_state == DISCHARGING)
     {
         logf("pwrmgmt: discharging -> trickle");
         logf("pwrmgmt: begin charging 4p2");
-#if IMX233_SUBTARGET >= 3780
         /* 5V has been detected: prepare 4.2V power rail for activation
          * WARNING we can reach this situation when starting after Freescale bootloader
-         * or after RoLo in a state where the DCDC is running. In this case,
+         * or after RoLo in a state where the DCDC is already running. In this case,
          * we must *NOT* disable it or this will shutdown the device. This procedure
          * is safe: it will never disable the DCDC and will not reduce the charge
          * limit on the 4P2 rail. */
         BF_WR(POWER_DCDC4P2, ENABLE_4P2(1));
         BF_SET(POWER_CHARGE, ENABLE_LOAD);
-        BF_WR(POWER_5VCTRL, CHARGE_4P2_ILIMIT(0)); /* start by drawing 0mA */
-        BF_CLR(POWER_5VCTRL, PWD_CHARGE_4P2);// FIXME: manual error ?
+        BF_CLR(POWER_5VCTRL, PWD_CHARGE_4P2);
         BF_WR(POWER_DCDC4P2, ENABLE_DCDC(1));
         /* the tick task will take care of slowly ramping up the current in the rail
          * every 10ms (since it runs at HZ and HZ=100) */
-#endif
         charge_state = TRICKLE;
     }
     /* trickle -> charging transition */
     else if(charge_state == TRICKLE)
     {
-#if IMX233_SUBTARGET >= 3780
         /* If 4.2V current limit has not reached 780mA, don't do anything, the
-         * DPC is still running */
+         * tick task is still running */
         /* If we've reached the maximum, take action */
         if(BF_RD(POWER_5VCTRL, CHARGE_4P2_ILIMIT) == MAX_4P2_ILIMIT)
-#endif
         {
             logf("pwrmgmt: enable dcdc and charger");
             logf("pwrmgmt: trickle -> charging");
-#if IMX233_SUBTARGET >= 3780
             /* adjust arbitration between 4.2 and battery */
             BF_WR(POWER_DCDC4P2, CMPTRIP(0)); /* 85% */
             BF_WR(POWER_DCDC4P2, DROPOUT_CTRL(0xe)); /* select greater, 200 mV drop */
-#endif
             /* switch to DCDC */
             BF_CLR(POWER_5VCTRL, DCDC_XFER);
             BF_SET(POWER_5VCTRL, ENABLE_DCDC);
@@ -191,14 +305,23 @@ void charging_algorithm_step(void)
         BF_SET(POWER_CHARGE, PWD_BATTCHRG);
         charge_state = CHARGE_STATE_DISABLED;
     }
-#endif
+}
+#endif /* IMX233_SUBTARGET */
+
+void powermgmt_init_target(void)
+{
+    charge_state = DISCHARGING;
+    charging_init();
+}
+
+void charging_algorithm_step(void)
+{
+    charging_step();
 }
 
 void charging_algorithm_close(void)
 {
-#if IMX233_SUBTARGET >= 3780
-    tick_remove_task(&ramp_up_4p2_rail);
-#endif
+    charging_close();
 }
 
 struct imx233_powermgmt_info_t imx233_powermgmt_get_info(void)
