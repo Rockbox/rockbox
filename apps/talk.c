@@ -47,16 +47,22 @@
 #include "plugin.h" /* plugin_get_buffer() */
 #include "debug.h"
 #include "panic.h"
-
+#include "misc.h"
+#define IDX_HR    0U
+#define IDX_MIN   1U
+#define IDX_SEC   2U
+#define IDX_MS    3U
+#define IDX_COUNT 4U
+#define THIS_TIME_UNIT 1
 /* Memory layout varies between targets because the
    Archos (MASCODEC) devices cannot mix voice and audio playback
- 
+
              MASCODEC  | MASCODEC  | SWCODEC
              (playing) | (stopped) |
     voicebuf-----------+-----------+------------
               audio    | voice     | voice
                        |-----------|------------
-                       | thumbnail | thumbnail 
+                       | thumbnail | thumbnail
                        |           |------------
                        |           | filebuf
                        |           |------------
@@ -132,7 +138,7 @@ static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
 #if CONFIG_CODEC == SWCODEC
 /* protects queue_read, queue_write and thumbnail_buf_used */
-static struct mutex queue_mutex SHAREDBSS_ATTR; 
+static struct mutex queue_mutex SHAREDBSS_ATTR;
 #define talk_queue_lock() ({ mutex_lock(&queue_mutex); })
 #define talk_queue_unlock() ({ mutex_unlock(&queue_mutex); })
 #else
@@ -289,13 +295,13 @@ static int open_voicefile(void)
     char* p_lang = DEFAULT_VOICE_LANG; /* default */
 
     if ( global_settings.lang_file[0] &&
-         global_settings.lang_file[0] != 0xff ) 
+         global_settings.lang_file[0] != 0xff )
     {   /* try to open the voice file of the selected language */
         p_lang = (char *)global_settings.lang_file;
     }
 
     snprintf(buf, sizeof(buf), LANG_DIR "/%s.voice", p_lang);
-    
+
     return open(buf, O_RDONLY);
 }
 
@@ -724,7 +730,7 @@ static void mp3_callback(const void** start, size_t* size)
         curr_hd[1] = commit_buffer[2];
         curr_hd[2] = commit_buffer[3];
     }
-    
+
     talk_queue_unlock();
 }
 
@@ -760,7 +766,7 @@ void talk_force_shutup(void)
         {
             if (*search++ != 0xFF) /* quick search for frame sync byte */
                 continue; /* (this does the majority of the job) */
-            
+
             /* look at the (bitswapped) rest of header candidate */
             if (search[0] == curr_hd[0] /* do the quicker checks first */
              && search[2] == curr_hd[2]
@@ -770,7 +776,7 @@ void talk_force_shutup(void)
                 break; /* From looking at it, this is our header. */
             }
         }
-    
+
         if (search-pos)
         {   /* play old data until the frame end, to keep the MAS in sync */
             sent = search-pos;
@@ -815,7 +821,7 @@ static void queue_clip(struct queue_entry *clip, bool enqueue)
     /* Something is being enqueued, force_enqueue_next override is no
        longer in effect. */
     force_enqueue_next = false;
-    
+
     if (!clip->length)
         return; /* safety check */
 #if CONFIG_CPU == SH7034
@@ -924,7 +930,7 @@ void talk_init(void)
         }
         avg_size = total_size / non_empty;
         max_clips = MIN((int)(MAX_CLIP_BUFFER_SIZE/avg_size) + 1, non_empty);
-        /* account for possible thumb clips */        
+        /* account for possible thumb clips */
         total_size += THUMBNAIL_RESERVE;
         max_clips += 16;
         voicefile_size = total_size;
@@ -1063,7 +1069,7 @@ static int _talk_file(const char* filename,
 
 #if CONFIG_CODEC != SWCODEC
     if(mp3info(&info, filename)) /* use this to find real start */
-    {   
+    {
         return 0; /* failed to open, or invalid */
     }
 #endif
@@ -1205,19 +1211,19 @@ int talk_number(long n, bool enqueue)
 
     if (!enqueue)
         talk_shutup(); /* cut off all the pending stuff */
-    
+
     if (n==0)
     {   /* special case */
         talk_id(VOICE_ZERO, true);
         return 0;
     }
-    
+
     if (n<0)
     {
         talk_id(VOICE_MINUS, true);
         n = -n;
     }
-    
+
     while (n)
     {
         int segment = n / mil; /* extract in groups of 3 digits */
@@ -1246,7 +1252,7 @@ int talk_number(long n, bool enqueue)
             /* direct indexing */
             if (ones)
                 talk_id(VOICE_ZERO + ones, true);
- 
+
             /* add billion, million, thousand */
             if (mil)
                 talk_id(VOICE_THOUSAND + level, true);
@@ -1304,21 +1310,21 @@ int talk_value(long n, int unit, bool enqueue)
 int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
 {
     int unit_id;
-    static const int unit_voiced[] = 
+    static const int unit_voiced[] =
     {   /* lookup table for the voice ID of the units */
         [0 ... UNIT_LAST-1] = -1, /* regular ID, int, signed */
         [UNIT_MS]
             = VOICE_MILLISECONDS, /* here come the "real" units */
         [UNIT_SEC]
-            = VOICE_SECONDS, 
+            = VOICE_SECONDS,
         [UNIT_MIN]
-            = VOICE_MINUTES, 
+            = VOICE_MINUTES,
         [UNIT_HOUR]
-            = VOICE_HOURS, 
+            = VOICE_HOURS,
         [UNIT_KHZ]
-            = VOICE_KHZ, 
+            = VOICE_KHZ,
         [UNIT_DB]
-            = VOICE_DB, 
+            = VOICE_DB,
         [UNIT_PERCENT]
             = VOICE_PERCENT,
         [UNIT_MAH]
@@ -1394,11 +1400,83 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
     return 0;
 }
 
+/* Say time duration/interval. Input is time unit specifys base unit,
+   say hours,minutes,seconds, milliseconds. or any combination thereof */
+int talk_time_intervals(int time, int unit_idx, bool enqueue)
+{
+    unsigned int  units_in[IDX_COUNT] = {0};
+    unsigned int  abs_val = abs(time);
+    long calc_val = 0;
+    if (!enqueue)
+        talk_shutup(); /* cut off all the pending stuff */
+    switch (unit_idx)
+    {
+            case UNIT_HOUR:
+                units_in[IDX_HR] = THIS_TIME_UNIT;
+                break;
+            case UNIT_MIN:
+                units_in[IDX_HR] = (abs_val >= MS_IN_HR / MS_IN_MIN)?
+                                                    MS_IN_HR / MS_IN_MIN : 0;
+                units_in[IDX_MIN] = THIS_TIME_UNIT;
+                break;
+            case UNIT_SEC:
+                units_in[IDX_HR] = (abs_val >= MS_IN_HR / MS_IN_SEC)?
+                                                    MS_IN_HR / MS_IN_SEC : 0;
+                units_in[IDX_MIN] = (abs_val >= MS_IN_MIN / MS_IN_SEC)?
+                                                    MS_IN_MIN / MS_IN_SEC : 0;
+                units_in[IDX_SEC] = THIS_TIME_UNIT;
+                break;
+            case UNIT_MS:
+                units_in[IDX_HR] = (abs_val >= MS_IN_HR)? MS_IN_HR : 0;
+                units_in[IDX_MIN] =(abs_val >=  MS_IN_MIN)? MS_IN_MIN : 0;
+                units_in[IDX_SEC] = (abs_val >= MS_IN_SEC)? MS_IN_SEC : 0;
+                units_in[IDX_MS] = THIS_TIME_UNIT;
+                break;
+            default:
+                break;
+    }
+
+    if (time < 0)
+        talk_id(VOICE_MINUS, true);
+    if (abs_val == 0)
+    {
+        talk_value_decimal(0, unit_idx, 0, true);
+    }
+    else
+    {
+        if (units_in[IDX_HR] != 0)
+        {
+            calc_val = (long)(abs_val / units_in[IDX_HR]);
+            if (calc_val > 0)
+                talk_value_decimal(calc_val, UNIT_HOUR, 0, true);
+        }
+        if (units_in[IDX_MIN] != 0)
+        {
+            calc_val = (long)(abs_val / units_in[IDX_MIN] % 60);
+            if (calc_val > 0)
+                talk_value_decimal(calc_val, UNIT_MIN, 0, true);
+        }
+        if (units_in[IDX_SEC] != 0)
+        {
+            calc_val = (long)(abs_val / units_in[IDX_SEC] % 60);
+            if (calc_val > 0)
+                talk_value_decimal(calc_val, UNIT_SEC, 0, true);
+        }
+        if (units_in[IDX_MS] != 0)
+        {
+            calc_val = (long)(abs_val % 1000);
+            if (calc_val > 0)
+                talk_value_decimal(calc_val, UNIT_MS, 0, true);
+        }
+    }
+    return -1;
+}
+
 /* spell a string */
 int talk_spell(const char* spell, bool enqueue)
 {
     char c; /* currently processed char */
-    
+
     if (talk_temp_disable_count > 0)
         return -1;  /* talking has been disabled */
     if (!check_audio_status())
@@ -1406,7 +1484,7 @@ int talk_spell(const char* spell, bool enqueue)
 
     if (!enqueue)
         talk_shutup(); /* cut off all the pending stuff */
-    
+
     while ((c = *spell++) != '\0')
     {
         /* if this grows into too many cases, I should use a table */
@@ -1421,7 +1499,7 @@ int talk_spell(const char* spell, bool enqueue)
         else if (c == '+')
             talk_id(VOICE_PLUS, true);
         else if (c == '.')
-            talk_id(VOICE_DOT, true); 
+            talk_id(VOICE_DOT, true);
         else if (c == ' ')
             talk_id(VOICE_PAUSE, true);
         else if (c == '/')
@@ -1435,7 +1513,7 @@ void talk_disable(bool disable)
 {
     if (disable)
         talk_temp_disable_count++;
-    else 
+    else
         talk_temp_disable_count--;
 }
 
