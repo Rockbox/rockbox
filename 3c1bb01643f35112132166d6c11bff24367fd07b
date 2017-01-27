@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff962b61_a20c3e3b",
+        "filename": "firmware/target/arm/as3525/ascodec-as3525.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2017-01-27T11:29:00Z",
+      "side": 1,
+      "message": "We should add #if CONFIG_RTC as it can be optional. On AMSv1 we have very little space for the bootloader, so disabling RTC a bit helping.",
+      "revId": "3c1bb01643f35112132166d6c11bff24367fd07b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff962b61_82125a58",
+        "filename": "firmware/target/arm/as3525/ascodec-as3525.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 679,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2017-01-27T11:29:00Z",
+      "side": 1,
+      "message": "#if CONFIG_RTC\n       IRQ_RTC |\n#endif",
+      "range": {
+        "startLine": 679,
+        "startChar": 35,
+        "endLine": 679,
+        "endChar": 43
+      },
+      "revId": "3c1bb01643f35112132166d6c11bff24367fd07b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff962b61_620f562e",
+        "filename": "firmware/target/arm/as3525/ascodec-as3525.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 683,
+      "author": {
+        "id": 1000427
+      },
+      "writtenOn": "2017-01-27T11:29:00Z",
+      "side": 1,
+      "message": "#if CONFIG_RTC\n       IRQ_RTC |\n#endif",
+      "range": {
+        "startLine": 683,
+        "startChar": 36,
+        "endLine": 683,
+        "endChar": 43
+      },
+      "revId": "3c1bb01643f35112132166d6c11bff24367fd07b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
