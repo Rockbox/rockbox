@@ -1042,7 +1042,7 @@ void YRegDisplayItemEditor::paintEvent(QPaintEvent *event)
     Q_UNUSED(event);
     QPainter painter(this);
     /* reuse delegate code to paint */
-    QStyleOptionViewItemV4 opt = m_display->viewOptions();
+    QStyleOptionViewItem opt = m_display->viewOptions();
     opt.state |= QStyle::State_HasFocus | QStyle::State_Selected | QStyle::State_Active;
     opt.displayAlignment = Qt::AlignHCenter | Qt::AlignVCenter;
     opt.rect = rect();
@@ -1060,9 +1060,9 @@ YRegDisplayItemDelegate::YRegDisplayItemDelegate(QObject *parent)
 {
 }
 
-void YRegDisplayItemDelegate::MyPaint(QPainter *painter, const QStyleOptionViewItemV4& option) const
+void YRegDisplayItemDelegate::MyPaint(QPainter *painter, const QStyleOptionViewItem& option) const
 {
-    QStyleOptionViewItemV4 opt = option;
+    QStyleOptionViewItem opt = option;
     painter->save();
     // draw everything rotated, requires careful manipulation of the
     // rects involved
@@ -1077,7 +1077,7 @@ void YRegDisplayItemDelegate::MyPaint(QPainter *painter, const QStyleOptionViewI
 void YRegDisplayItemDelegate::paint(QPainter *painter,
     const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-    QStyleOptionViewItemV4 opt = option;
+    QStyleOptionViewItem opt = option;
     // default alignment is centered unless specified
     opt.displayAlignment = Qt::AlignHCenter | Qt::AlignVCenter;
     initStyleOption(&opt, index);

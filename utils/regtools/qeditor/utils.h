@@ -443,7 +443,7 @@ public:
     YRegDisplayItemDelegate(QObject *parent = 0);
     virtual void paint(QPainter *painter, const QStyleOptionViewItem& option,
         const QModelIndex& index) const;
-    virtual void MyPaint(QPainter *painter, const QStyleOptionViewItemV4& option) const;
+    virtual void MyPaint(QPainter *painter, const QStyleOptionViewItem& option) const;
     virtual QSize sizeHint(const QStyleOptionViewItem& option,
         const QModelIndex& index) const;
     /* don't bother using the item factory and such, we only use this delegate
