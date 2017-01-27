@@ -474,14 +474,6 @@ void imx233_power_get_regulator_linreg(enum imx233_regulator_t reg,
         *linreg_offset = 0;
 }
 
-// offset is -1,0 or 1
-/*
-void imx233_power_set_regulator_linreg(enum imx233_regulator_t reg,
-    bool enabled, int linreg_offset)
-{
-}
-*/
-
 #if IMX233_SUBTARGET < 3700
 int imx233_power_sense_die_temperature(int *min, int *max)
 {

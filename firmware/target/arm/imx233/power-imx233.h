@@ -57,10 +57,6 @@ void imx233_power_set_regulator(enum imx233_regulator_t reg, unsigned target_mv,
 void imx233_power_get_regulator_linreg(enum imx233_regulator_t reg,
     bool *enabled, int *linreg_offset);
 
-// offset is -1,0 or 1
-void imx233_power_set_regulator_linreg(enum imx233_regulator_t reg,
-    bool enabled, int linreg_offset);
-
 #if IMX233_SUBTARGET >= 3700
 static inline void imx233_power_set_dcdc_freq(bool pll, unsigned freq)
 {
