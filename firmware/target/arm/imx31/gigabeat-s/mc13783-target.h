@@ -27,6 +27,7 @@
 enum mc13783_event_ids
 {
     MC13783_ADCDONE_EVENT = 0, /* ADC conversion complete */
+    MC13783_1HZ_EVENT,         /* RTC tick */
     MC13783_ONOFD1_EVENT,      /* Power button */
 #ifdef HAVE_HEADPHONE_DETECTION
     MC13783_ONOFD2_EVENT,      /* Headphone jack */

@@ -46,6 +46,8 @@ struct spi_node mc13783_spi =
     0,                             /* SPI clock - no wait states */
 };
 
+void rtc_1hz(void);
+
 
 /* Gigabeat S definitions for static MC13783 event registration */
 
@@ -56,6 +58,12 @@ const struct mc13783_event mc13783_events[MC13783_NUM_EVENTS] =
         .int_id   = MC13783_INT_ID_ADCDONE,
         .sense    = 0,
         .callback = adc_done,
+    },
+    [MC13783_1HZ_EVENT] = /* RTC tick */
+    {
+        .int_id   = MC13783_INT_ID_1HZ,
+        .sense    = 0,
+        .callback = rtc_1hz,
     },
     [MC13783_ONOFD1_EVENT] = /* Power button */
     {

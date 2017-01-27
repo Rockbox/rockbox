@@ -77,5 +77,10 @@
 #define UNUSED_ATTR
 #endif
 
+#if defined(__GNUC__)
+#define WEAK_ATTR  __attribute__((weak))
+#else
+#define WEAK_ATTR
+#endif
 
 #endif /* _GCC_EXTENSIONS_H_ */
