@@ -69,6 +69,7 @@ static const unsigned char rtc_registers[RTC_NUM_REGS_RD] =
 
 /* was it an alarm that triggered power on ? */
 static bool alarm_start = false;
+static bool rtc_is_dirty = true; /* force a read right away */
 
 static const unsigned short month_table[13] =
 {
@@ -96,6 +97,11 @@ static bool read_time_and_day(uint32_t regs[RTC_NUM_REGS_RD])
     return true;
 }
 
+void MC13783_EVENT_CB_1HZ(void)
+{
+    rtc_is_dirty = true;
+}
+
 /** Public APIs **/
 void rtc_init(void)
 {
@@ -105,6 +111,20 @@ void rtc_init(void)
         alarm_start = true;
         mc13783_write(MC13783_INTERRUPT_STATUS1, MC13783_TODAI);
     }
+
+    mc13783_enable_event(MC13783_INT_ID_1HZ, true);
+}
+
+bool rtc_dirty(void)
+{
+    int oldlevel = disable_irq_save();
+
+    bool ret = rtc_is_dirty;
+    rtc_is_dirty = false;
+
+    restore_irq(oldlevel);
+
+    return ret;
 }
 
 int rtc_read_datetime(struct tm *tm)

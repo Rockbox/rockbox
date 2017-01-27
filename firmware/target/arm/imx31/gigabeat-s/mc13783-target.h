@@ -46,6 +46,10 @@ static struct spi_node mc13783_spi =
 MC13783_EVENT_VECTOR_TBL_START()
     /* ADC conversion complete */
     MC13783_EVENT_VECTOR(ADCDONE, 0)
+#if CONFIG_RTC
+    /* RTC tick */
+    MC13783_EVENT_VECTOR(1HZ, 0)
+#endif /* CONFIG_RTC */
     /* Power button */
     MC13783_EVENT_VECTOR(ONOFD1, MC13783_ONOFD1S)
     /* Main charger detection */
