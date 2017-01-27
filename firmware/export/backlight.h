@@ -57,8 +57,7 @@ void backlight_set_on_button_hold(int index);
 #endif
 
 #if defined(HAVE_LCD_SLEEP) && defined(HAVE_LCD_SLEEP_SETTING)
-/* was index to table now ticks */
-void lcd_set_sleep_after_backlight_off(int timeout_sec);
+void lcd_set_sleep_after_backlight_off(int index);
 #endif
 
 #else /* !HAVE_BACKLIGHT */

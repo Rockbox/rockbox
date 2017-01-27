@@ -78,6 +78,31 @@
 #include "appevents.h"
 
 #ifdef HAVE_RECORDING
+/* This array holds the record timer interval lengths, in seconds */
+static const unsigned long rec_timer_seconds[] =
+{
+    0,        /* 0 means OFF */
+    5*60,     /* 00:05 */
+    10*60,    /* 00:10 */
+    15*60,    /* 00:15 */
+    30*60,    /* 00:30 */
+    60*60,    /* 01:00 */
+    74*60,    /* 01:14 */
+    80*60,    /* 01:20 */
+    2*60*60,  /* 02:00 */
+    4*60*60,  /* 04:00 */
+    6*60*60,  /* 06:00 */
+    8*60*60,  /* 08:00 */
+    10L*60*60, /* 10:00 */
+    12L*60*60, /* 12:00 */
+    18L*60*60, /* 18:00 */
+    24L*60*60  /* 24:00 */
+};
+
+static unsigned int rec_timesplit_seconds(void)
+{
+    return rec_timer_seconds[global_settings.rec_timesplit];
+}
 
 /* This array holds the record size interval lengths, in bytes */
 static const unsigned long rec_size_bytes[] =
@@ -1685,7 +1710,7 @@ bool recording_screen(bool no_source)
             update_countdown = 5;
             last_seconds = seconds;
 
-            dseconds = (unsigned) global_settings.rec_timesplit;/* seconds */
+            dseconds = rec_timesplit_seconds();
             dsize = rec_sizesplit_bytes();
             num_recorded_bytes = audio_num_recorded_bytes();
 

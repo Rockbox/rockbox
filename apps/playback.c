@@ -3660,12 +3660,20 @@ void audio_set_cuesheet(bool enable)
 }
 
 #ifdef HAVE_DISK_STORAGE
-/* Set the audio antiskip buffer margin by SECONDS */
+/* Set the audio antiskip buffer margin by index */
 void audio_set_buffer_margin(int setting)
 {
-    logf("buffer margin: %u", (unsigned) setting);
-    LOGFQUEUE("audio > audio Q_AUDIO_UPDATE_WATERMARK: %u",(unsigned) setting);
-    audio_queue_post(Q_AUDIO_UPDATE_WATERMARK, (unsigned) setting); /*SECONDS*/
+    static const unsigned short lookup[] =
+        { 5, 15, 30, 60, 120, 180, 300, 600 };
+
+    if ((unsigned)setting >= ARRAYLEN(lookup))
+        setting = 0;
+
+    logf("buffer margin: %u", (unsigned)lookup[setting]);
+
+    LOGFQUEUE("audio > audio Q_AUDIO_UPDATE_WATERMARK: %u",
+              (unsigned)lookup[setting]);
+    audio_queue_post(Q_AUDIO_UPDATE_WATERMARK, lookup[setting]);
 }
 #endif /* HAVE_DISK_STORAGE */
 

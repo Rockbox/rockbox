@@ -26,7 +26,6 @@
 #include "option_select.h"
 #include "kernel.h"
 #include "lang.h"
-#include "language.h"
 #include "talk.h"
 #include "settings_list.h"
 #include "sound.h"
@@ -37,12 +36,6 @@
 #include "menu.h"
 #include "quickscreen.h"
 
-#define IDX_HR    0U
-#define IDX_MIN   1U
-#define IDX_SEC   2U
-#define IDX_MS    3U
-#define IDX_COUNT 4U
-#define THIS_TIME_UNIT 1
 
 static int selection_to_val(const struct settings_list *setting, int selection);
 int option_value_as_int(const struct settings_list *setting)
@@ -55,10 +48,10 @@ int option_value_as_int(const struct settings_list *setting)
         temp = *(int*)setting->setting;
     return temp;
 }
-static const char *unit_strings[] =
-{
+static const char *unit_strings[] = 
+{   
     [UNIT_INT] = "",    [UNIT_MS]  = "ms",
-    [UNIT_SEC] = "s",   [UNIT_MIN] = "min",
+    [UNIT_SEC] = "s",   [UNIT_MIN] = "min", 
     [UNIT_HOUR]= "hr",  [UNIT_KHZ] = "kHz",
     [UNIT_DB]  = "dB",  [UNIT_PERCENT] = "%",
     [UNIT_MAH] = "mAh", [UNIT_PIXEL] = "px",
@@ -70,130 +63,7 @@ static const char *unit_strings[] =
 /* these two vars are needed so arbitrary values can be added to the
    TABLE_SETTING settings if the F_ALLOW_ARBITRARY_VALS flag is set */
 static int table_setting_oldval = 0, table_setting_array_position = 0;
-
-/* return an auto ranged time string, unit_idx specifies
-    lowest or base index of the value flag F_TIME_SETTING calls this*/
-const char *option_get_timestring(char *buffer, int buf_len,int value, int unit_idx)
-{
-    unsigned int  offsets[IDX_COUNT] ={0}, units_in[IDX_COUNT] = {0};
-    unsigned int  abs_val = abs(value);
-    unsigned int  fmt_idx = 0, base_idx = 0;
-    const char    *unit;
-    static const char *restrict time_fmt_str[] =
-    {
-     /*STD Formatting Strings*/
-     " ""%1$02u""%2$n"":%3$02u""%4$n"":%5$02u""%6$n"".%7$03u""%8$n",
-     /*-hh:mm:ss.mss*/
-     " ""%3$02u""%4$n"":%5$02u""%6$n"".%7$03u""%8$n""%9$c""%1$02u""%2$n",
-     /*-mm:ss.mss\0hh*/
-     " ""%5$02u""%6$n"".%7$03u""%8$n""%9$c""%1$02u""%2$n"":%3$02u""%4$n",
-     /*ss.mss\0hhmm*/
-     " ""%7$03u""%8$n""%9$c""%1$02u""%2$n""%3$02u""%4$n""%5$02u""%6$n",
-     /*mss\0hhmmss*/
-     /*RTL Formatting Strings*/
-     " ""%10$s"" %1$02u""%2$n""%9$c""%7$03u""%8$n%5$02u""%6$n""%3$02u""%4$n",
-     /*-unit hh\0mssssmm*/
-     " ""%10$s"" %3$02u""%4$n"":%1$02u""%2$n""%9$c""%7$03u""%8$n""%5$02u""%6$n",
-     /*-unit mm:hh\0mssss*/
-     " ""%10$s"" %5$02u""%6$n"":%3$02u""%4$n"":%1$02u""%2$n""%9$c""%7$03u""%8$n",
-     /*-unit ss:mm:hh\0mss*/
-     " ""%10$s"" %7$03u""%8$n"".%5$02u""%6$n"":%3$02u""%4$n"":%1$02u""%2$n""%9$c",
-     /*-unit mss.ss:mm:hh*/
-    };
-
-    switch (unit_idx)
-    {
-            case UNIT_HOUR:
-                base_idx = IDX_HR;
-                units_in[IDX_HR] = THIS_TIME_UNIT;
-                break;
-            case UNIT_MIN:
-                base_idx = IDX_MIN;
-                units_in[IDX_HR] = MS_IN_HR / MS_IN_MIN;
-                units_in[IDX_MIN] = THIS_TIME_UNIT;
-                break;
-            case UNIT_SEC:
-                base_idx = IDX_SEC;
-                units_in[IDX_HR] = MS_IN_HR / MS_IN_SEC;
-                units_in[IDX_MIN] = MS_IN_MIN / MS_IN_SEC;
-                units_in[IDX_SEC] = THIS_TIME_UNIT;
-                break;
-            case UNIT_MS:
-                base_idx = IDX_MS;
-                units_in[IDX_HR] = MS_IN_HR;
-                units_in[IDX_MIN] = MS_IN_MIN;
-                units_in[IDX_SEC] = MS_IN_SEC;
-                units_in[IDX_MS] = THIS_TIME_UNIT;
-                break;
-            default:
-                base_idx = IDX_HR;
-                break;
-    }
-    if (abs_val == 0)
-    {
-        unit = unit_strings[unit_idx];
-        fmt_idx = lang_is_rtl()? base_idx + IDX_COUNT : base_idx;
-    }
-    else if (abs_val < units_in[IDX_SEC])
-    {
-        unit = unit_strings[UNIT_MS];
-        fmt_idx = lang_is_rtl()? base_idx + IDX_COUNT : IDX_MS;
-    }
-    else if (abs_val < units_in[IDX_MIN])
-    {
-        unit = unit_strings[UNIT_SEC];
-        fmt_idx = lang_is_rtl()? base_idx + IDX_COUNT : IDX_SEC;
-    }
-    else if (abs_val < units_in[IDX_HR])
-    {
-        unit = unit_strings[UNIT_MIN];
-        fmt_idx = lang_is_rtl()? base_idx + IDX_COUNT : IDX_MIN;
-    }
-    else
-    {
-        unit = unit_strings[UNIT_HOUR];
-        fmt_idx = lang_is_rtl()? base_idx + IDX_COUNT : IDX_HR;
-    }
-
-    snprintf(buffer, buf_len,time_fmt_str[fmt_idx],
-             units_in[IDX_HR] != 0? abs_val / units_in[IDX_HR] : 0,
-             &offsets[IDX_HR],
-             units_in[IDX_MIN] != 0 ? abs_val / units_in[IDX_MIN] % 60 : 0,
-             &offsets[IDX_MIN],
-             units_in[IDX_SEC] != 0? abs_val / units_in[IDX_SEC] % 60 : 0,
-             &offsets[IDX_SEC],
-             units_in[IDX_MS] != 0 ? (abs_val % 1000) : 0,
-             &offsets[IDX_MS],
-             '\0',
-             unit);
-    /*add negative sign*/
-    if (value < 0)
-        buffer[0] = '-';
-
-    /* IN rtl languages place terminator in
-       proper place to block unneeded fields
-      else place terminator at lowest index
-      and cat units to string */
-    if(UNLIKELY(lang_is_rtl()))
-    {
-        if (abs_val < units_in[IDX_SEC])
-            buffer[offsets[IDX_MS]] = '\0';
-        else if (abs_val < units_in[IDX_MIN])
-            buffer[offsets[IDX_SEC]] = '\0';
-        else if (abs_val < units_in[IDX_HR])
-            buffer[offsets[IDX_MIN]] = '\0';
-    }
-    else
-    {
-        buffer[offsets[base_idx]] = '\0';
-        strlcat(buffer, " ", buf_len);
-        strlcat(buffer, unit, buf_len);
-    }
-
-    return buffer;
-}
-
-const char *option_get_valuestring(const struct settings_list *setting,
+const char *option_get_valuestring(const struct settings_list *setting, 
                                    char *buffer, int buf_len,
                                    intptr_t temp_var)
 {
@@ -212,34 +82,6 @@ const char *option_get_valuestring(const struct settings_list *setting,
                  (char*)temp_var, info->suffix);
     }
 #endif
-    else if (((setting->flags & F_TIME_SETTING) == F_TIME_SETTING) &&
-        (((setting->flags & F_INT_SETTING) == F_INT_SETTING) ||
-        ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING)))
-
-    {
-        const struct int_setting *int_info = setting->int_setting;
-        const struct table_setting *tbl_info = setting->table_setting;
-        const char* (*formatter)(char*, size_t, int, const char*);
-        const char *unit;
-
-        if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
-        {
-            formatter = int_info->formatter;
-            unit = unit_strings[int_info->unit];
-            str = option_get_timestring(buffer, buf_len,
-                                        temp_var, int_info->unit);
-        }
-        else
-        {
-            formatter = tbl_info->formatter;
-            unit = unit_strings[tbl_info->unit];
-            str = option_get_timestring(buffer, buf_len,
-                                        temp_var, tbl_info->unit);
-        }
-
-        if (formatter)
-            str = formatter(buffer, buf_len, (int)temp_var, unit);
-    }
     else if (((setting->flags & F_INT_SETTING) == F_INT_SETTING) ||
              ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING))
     {
@@ -369,7 +211,7 @@ void option_talk_value(const struct settings_list *setting, int value, bool enqu
         }
     }
 }
-
+    
 static int option_talk(int selected_item, void * data)
 {
     struct settings_list *setting = (struct settings_list *)data;
@@ -487,7 +329,7 @@ static int selection_to_val(const struct settings_list *setting, int selection)
     else if ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING)
     {
         const struct table_setting *info = setting->table_setting;
-        if (setting->flags&F_ALLOW_ARBITRARY_VALS &&
+        if (setting->flags&F_ALLOW_ARBITRARY_VALS && 
             table_setting_array_position != -1    &&
             (selection >= table_setting_array_position))
         {
@@ -528,7 +370,7 @@ static int selection_to_val(const struct settings_list *setting, int selection)
     return max- (selection * step);
 }
 
-static const char * value_setting_get_name_cb(int selected_item,
+static const char * value_setting_get_name_cb(int selected_item, 
                                               void * data,
                                               char *buffer,
                                               size_t buffer_len)
@@ -657,16 +499,16 @@ bool option_screen(const struct settings_list *setting,
         title = (char*)setting->cfg_vals;
     else
         title = P2STR(option_title);
-
+    
     gui_synclist_set_title(&lists, title, Icon_Questionmark);
     gui_synclist_set_icon_callback(&lists, NULL);
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(&lists, option_talk);
-
+    
     val_to_selection(setting, oldvalue, &nb_items, &selected, &function);
     gui_synclist_set_nb_items(&lists, nb_items);
     gui_synclist_select_item(&lists, selected);
-
+    
     gui_synclist_limit_scroll(&lists, true);
     gui_synclist_draw(&lists);
     /* talk the item */
@@ -716,7 +558,7 @@ bool option_screen(const struct settings_list *setting,
             {
                 if (var_type == F_T_INT || var_type == F_T_UINT)
                     *(int*)setting->setting = *variable;
-                else
+                else 
                     *(bool*)setting->setting = (*variable==1);
             }
             settings_save();

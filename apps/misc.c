@@ -1047,15 +1047,6 @@ char* skip_whitespace(char* const str)
     return s;
 }
 
-unsigned int ms_to_ticks(unsigned int ms)
-{
-    return ms/MS_IN_TICK;
-}
-
-unsigned int ticks_to_ms(unsigned int ticks)
-{
-    return ticks * MS_IN_TICK;
-}
 /* Format time into buf.
  *
  * buf      - buffer to format to.

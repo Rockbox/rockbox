@@ -41,7 +41,7 @@
 #include "backlight.h"
 #endif
 #include "action.h"
-#include "misc.h" /*ms to ticks*/
+
 #if CONFIG_CODEC == SWCODEC
 #include "pcm.h"
 #include "pcm_mixer.h"
@@ -97,9 +97,9 @@ static unsigned short pm_db_min = 0;      /* minimum of range in 1/100 dB */
 static unsigned short pm_db_max = 9000;   /* maximum of range in 1/100 dB */
 static unsigned short pm_db_range = 9000; /* range width in 1/100 dB */
 /* Timing behaviour */
-static int pm_peak_hold = HZ / 5; /* peak hold timeout ticks */
+static int pm_peak_hold = 1;          /* peak hold timeout index */
 static int pm_peak_release = 8;       /* peak release in units per read */
-static int pm_clip_hold = HZ *60; /* clip hold timeout ticks */
+static int pm_clip_hold = 16;         /* clip hold timeout index */
 static bool pm_clip_eternal = false;  /* true if clip timeout is disabled */
 
 #ifdef HAVE_RECORDING
@@ -172,6 +172,22 @@ static int history_pos = 0;
 static void peak_meter_draw(struct screen *display, struct meter_scales *meter_scales,
                             int x, int y, int width, int height);
 
+/* time out values for max */
+static const short peak_time_out[] = {
+    0 * HZ, HZ / 5, 30, HZ / 2, HZ, 2 * HZ, 
+    3 * HZ, 4 * HZ, 5 * HZ, 6 * HZ, 7 * HZ, 8 * HZ,
+    9 * HZ, 10 * HZ, 15 * HZ, 20 * HZ, 30 * HZ, 60 * HZ
+};
+
+/* time out values for clip */
+static const long clip_time_out[] = {
+    0 * HZ, 1  * HZ, 2 * HZ, 3 * HZ, 4 * HZ, 5 * HZ, 
+    6 * HZ, 7 * HZ, 8 * HZ, 9 * HZ, 10 * HZ, 15 * HZ,
+    20 * HZ, 25 * HZ, 30 * HZ, 45 * HZ, 60 * HZ, 90 * HZ,
+    120 * HZ, 180 * HZ, 300 * HZ, 600L * HZ, 1200L * HZ,
+    2700L * HZ, 5400L * HZ
+};
+
 /* precalculated peak values that represent magical
    dBfs values. Used to draw the scale */
 static const short db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
@@ -193,7 +209,7 @@ static int db_scale_count = DB_SCALE_SRC_VALUES_SIZE;
 
 /**
  * Calculates dB Value for the peak meter, uses peak value as input
- * @param int sample - The input value
+ * @param int sample - The input value 
  *                    Make sure that 0 <= value < SAMPLE_RANGE
  *
  * @return int - The 2 digit fixed point result of the euation
@@ -211,7 +227,7 @@ static int db_scale_count = DB_SCALE_SRC_VALUES_SIZE;
  *               range of -12dB to 0dB (78.0 to 90.0dB).
  */
 
-static int calc_db (int isample)
+static int calc_db (int isample) 
 {
     /* return n+m*(isample-istart)/100 */
     int n;
@@ -321,10 +337,10 @@ static int db_to_sample_bin_search(int min, int max, int db)
  * Converts a value representing dBfs to a linear
  * scaled volume info as it is used by the MAS.
  * An incredibly inefficiant function which is
- * the vague inverse of calc_db. This really
+ * the vague inverse of calc_db. This really 
  * should be replaced by something better soon.
- *
- * @param int db - A dBfs * 100 value with
+ * 
+ * @param int db - A dBfs * 100 value with 
  *                 -9000 < value <= 0
  * @return int - The return value is in the range of
  *               0 <= return value < MAX_PEAK
@@ -350,10 +366,10 @@ int peak_meter_db2sample(int db)
     else {
         retval = db_to_sample_bin_search(0, MAX_PEAK, max_peak_db + db);
 
-        /* as this is a dirty function anyway, we want to adjust the
+        /* as this is a dirty function anyway, we want to adjust the 
            full scale hit manually to avoid users complaining that when
-           they adjust maximum for 0 dBfs and display it in percent it
-           shows 99%. That is due to precision loss and this is the
+           they adjust maximum for 0 dBfs and display it in percent it 
+           shows 99%. That is due to precision loss and this is the 
            optical fix */
     }
 
@@ -367,7 +383,7 @@ int peak_meter_db2sample(int db)
  * for dBfs: -9000 < newmin <= 0
  * for linear: 0 <= newmin <= 100
  */
-static void peak_meter_set_min(int newmin)
+static void peak_meter_set_min(int newmin) 
 {
     if (pm_use_dbfs) {
         peak_meter_range_min = peak_meter_db2sample(newmin);
@@ -393,13 +409,13 @@ static void peak_meter_set_min(int newmin)
 }
 
 /**
- * Returns the minimum value of the range the meter
+ * Returns the minimum value of the range the meter 
  * displays. If the scale is set to dBfs it returns
  * dBfs values * 100 or linear percent values.
  * @return: using dBfs : -9000 < value <= 0
  *          using linear scale: 0 <= value <= 100
  */
-int peak_meter_get_min(void)
+int peak_meter_get_min(void) 
 {
     int retval = 0;
     if (pm_use_dbfs) {
@@ -417,7 +433,7 @@ int peak_meter_get_min(void)
  * for dBfs: -9000 < newmax <= 0
  * for linear: 0 <= newmax <= 100
  */
-static void peak_meter_set_max(int newmax)
+static void peak_meter_set_max(int newmax) 
 {
     if (pm_use_dbfs) {
         peak_meter_range_max = peak_meter_db2sample(newmax);
@@ -442,13 +458,13 @@ static void peak_meter_set_max(int newmax)
 }
 
 /**
- * Returns the minimum value of the range the meter
+ * Returns the minimum value of the range the meter 
  * displays. If the scale is set to dBfs it returns
  * dBfs values * 100 or linear percent values
  * @return: using dBfs : -9000 < value <= 0
  *          using linear scale: 0 <= value <= 100
  */
-int peak_meter_get_max(void)
+int peak_meter_get_max(void) 
 {
     int retval = 0;
     if (pm_use_dbfs) {
@@ -472,7 +488,7 @@ bool peak_meter_get_use_dbfs(void)
 /**
  * Specifies whether the values displayed are scaled
  * as dBfs or as linear percent values.
- * @param use - set to true for dBfs,
+ * @param use - set to true for dBfs, 
  *              set to false for linear scaling in percent
  */
 void peak_meter_set_use_dbfs(bool use)
@@ -486,12 +502,12 @@ void peak_meter_set_use_dbfs(bool use)
  * Initialize the range of the meter. Only values
  * that are in the range of [range_min ... range_max]
  * are displayed.
- * @param bool dbfs - set to true for dBfs,
- *                    set to false for linear scaling in percent
- * @param int range_min - Specifies the lower value of the range.
+ * @param bool dbfs - set to true for dBfs, 
+ *                    set to false for linear scaling in percent 
+ * @param int range_min - Specifies the lower value of the range. 
  *                        Pass a value dBfs * 100 when dbfs is set to true.
  *                        Pass a percent value when dbfs is set to false.
- * @param int range_max - Specifies the upper value of the range.
+ * @param int range_max - Specifies the upper value of the range. 
  *                        Pass a value dBfs * 100 when dbfs is set to true.
  *                        Pass a percent value when dbfs is set to false.
  */
@@ -506,18 +522,18 @@ void peak_meter_init_range( bool dbfs, int range_min, int range_max)
  * Initialize the peak meter with all relevant values concerning times.
  * @param int release - Set the maximum amount of pixels the meter is allowed
  *                      to decrease with each redraw
- * @param int hold - Select the time preset for the time the peak indicator
- *                   is reset after a peak occurred. The preset values are
+ * @param int hold - Select the time preset for the time the peak indicator 
+ *                   is reset after a peak occurred. The preset values are 
  *                   stored in peak_time_out.
- * @param int clip_hold - Select the time preset for the time the peak
- *                        indicator is reset after a peak occurred. The preset
+ * @param int clip_hold - Select the time preset for the time the peak 
+ *                        indicator is reset after a peak occurred. The preset 
  *                        values are stored in clip_time_out.
  */
-void peak_meter_init_times(int release_ticks, int hold_ms, int clip_hold_sec)
+void peak_meter_init_times(int release, int hold, int clip_hold) 
 {
-    pm_peak_hold = ms_to_ticks(hold_ms);
-    pm_peak_release = release_ticks;
-    pm_clip_hold = HZ * clip_hold_sec;
+    pm_peak_hold = hold;
+    pm_peak_release = release;
+    pm_clip_hold = clip_hold;
 }
 
 #ifdef HAVE_RECORDING
@@ -538,7 +554,7 @@ int pm_get_clipcount(void)
 }
 
 /**
- * Set clipping counter to zero (typically at start of recording or playback)
+ * Set clipping counter to zero (typically at start of recording or playback) 
  */
 void pm_reset_clipcount(void)
 {
@@ -547,7 +563,7 @@ void pm_reset_clipcount(void)
 #endif
 
 /**
- * Set the source of the peak meter to playback or to
+ * Set the source of the peak meter to playback or to 
  * record.
  * @param: bool playback - If true playback peak meter is used.
  *         If false recording peak meter is used.
@@ -575,7 +591,7 @@ void peak_meter_playback(bool playback)
 }
 
 #ifdef HAVE_RECORDING
-static void set_trig_status(int new_state)
+static void set_trig_status(int new_state) 
 {
     if (trig_status != new_state) {
         trig_status = new_state;
@@ -588,9 +604,9 @@ static void set_trig_status(int new_state)
 #endif
 
 /**
- * Reads peak values from the MAS, and detects clips. The
+ * Reads peak values from the MAS, and detects clips. The 
  * values are stored in pm_max_left pm_max_right for later
- * evauluation. Consecutive calls to peak_meter_peek detect
+ * evauluation. Consecutive calls to peak_meter_peek detect 
  * that ocurred. This function could be used by a thread for
  * busy reading the MAS.
  */
@@ -641,8 +657,8 @@ void peak_meter_peek(void)
         (left == MAX_PEAK - 1)) {
 #endif
         pm_clip_left = true;
-        pm_clip_timeout_l =
-            current_tick + pm_clip_hold;
+        pm_clip_timeout_l = 
+            current_tick + clip_time_out[pm_clip_hold];
     }
 
 #if CONFIG_CODEC == SWCODEC
@@ -652,8 +668,8 @@ void peak_meter_peek(void)
         (right == MAX_PEAK - 1)) {
 #endif
         pm_clip_right = true;
-        pm_clip_timeout_r =
-            current_tick + pm_clip_hold;
+        pm_clip_timeout_r = 
+            current_tick + clip_time_out[pm_clip_hold];
     }
 
 #ifdef HAVE_RECORDING
@@ -685,7 +701,7 @@ void peak_meter_peek(void)
         case TRIG_READY:
             /* no more changes, if trigger was activated as release trigger */
             /* threshold exceeded? */
-            if ((left > trig_strt_threshold)
+            if ((left > trig_strt_threshold) 
                 || (right > trig_strt_threshold)) {
                     /* reset trigger duration */
                     trig_hightime = current_tick;
@@ -735,7 +751,7 @@ void peak_meter_peek(void)
         case TRIG_GO:
         case TRIG_CONTINUE:
             /* threshold exceeded? */
-            if ((left > trig_stp_threshold)
+            if ((left > trig_stp_threshold) 
                 || (right > trig_stp_threshold)) {
                 /* restart hold time countdown */
                 trig_lowtime = current_tick;
@@ -753,7 +769,7 @@ void peak_meter_peek(void)
             /* gap time expired? */
             if (current_tick - trig_lowtime > trig_rstrt_gap){
                 /* start threshold exceeded? */
-                if ((left > trig_strt_threshold)
+                if ((left > trig_strt_threshold) 
                     || (right > trig_strt_threshold)) {
 
                     set_trig_status(TRIG_RETRIG);
@@ -763,7 +779,7 @@ void peak_meter_peek(void)
                 else
 
                 /* stop threshold exceeded */
-                if ((left > trig_stp_threshold)
+                if ((left > trig_stp_threshold) 
                     || (right > trig_stp_threshold)) {
                     if (current_tick - trig_hightime > trig_stp_hold){
                         trig_lowtime = current_tick;
@@ -911,7 +927,7 @@ void peak_meter_get_peakhold(int *peak_left, int *peak_right)
  * @param int unused - This parameter was added to
  * make the function compatible with set_int
  */
-void peak_meter_set_clip_hold(int time)
+void peak_meter_set_clip_hold(int time) 
 {
     pm_clip_left = false;
     pm_clip_right = false;
@@ -951,7 +967,7 @@ unsigned short peak_meter_scale_value(unsigned short val, int meterwidth)
     else
     {
         /* scale the samples */
-        retval  = ((retval - peak_meter_range_min) * meterwidth)
+        retval  = ((retval - peak_meter_range_min) * meterwidth) 
                   / pm_range;
     }
     return retval;
@@ -968,7 +984,7 @@ void peak_meter_current_vals(int *left, int *right)
     static int left_level = 0, right_level = 0;
     if (level_check){
         /* only read the volume info from MAS if peek since last read*/
-        left_level  = peak_meter_read_l();
+        left_level  = peak_meter_read_l(); 
         right_level = peak_meter_read_r();
         level_check = false;
     }
@@ -978,9 +994,9 @@ void peak_meter_current_vals(int *left, int *right)
 
 /**
  * Draws a peak meter in the specified size at the specified position.
- * @param int x - The x coordinate.
+ * @param int x - The x coordinate. 
  *                Make sure that 0 <= x and x + width < display->getwidth()
- * @param int y - The y coordinate.
+ * @param int y - The y coordinate. 
  *                Make sure that 0 <= y and y + height < display->getheight()
  * @param int width - The width of the peak meter. Note that for display
  *                    of clips a 3 pixel wide area is used ->
@@ -988,7 +1004,7 @@ void peak_meter_current_vals(int *left, int *right)
  * @param int height - The height of the peak meter. height > 3
  */
 static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
-                         int x, int y, int width, int height)
+                         int x, int y, int width, int height) 
 {
     int left_level = 0, right_level = 0;
     int left = 0, right = 0;
@@ -1012,11 +1028,11 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
 
         peak_meter_current_vals(&left_level, &right_level);
 
-        /* scale the samples dBfs */
+        /* scale the samples dBfs */    
         left  = peak_meter_scale_value(left_level, meterwidth);
         right = peak_meter_scale_value(right_level, meterwidth);
 
-         /*if the scale has changed -> recalculate the scale
+         /*if the scale has changed -> recalculate the scale 
            (The scale becomes invalid when the range changed.) */
         if (!scales->db_scale_valid){
 
@@ -1030,7 +1046,7 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
                             peak_meter_scale_value(
                                 db_scale_src_values[i],
                                 meterwidth - 1);
-                }
+                } 
             }
 
             /* when scaling linear we simly make 10% steps */
@@ -1069,12 +1085,12 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
         }
 
         if (!pm_clip_eternal) {
-            if (pm_clip_left &&
+            if (pm_clip_left && 
                 TIME_AFTER(current_tick, pm_clip_timeout_l)){
                 pm_clip_left = false;
             }
 
-            if (pm_clip_right &&
+            if (pm_clip_right && 
                 TIME_AFTER(current_tick, pm_clip_timeout_r)){
                 pm_clip_right = false;
             }
@@ -1084,13 +1100,13 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
         if (left > scales->pm_peak_left) {
             scales->pm_peak_left = left - 1;
             scales->pm_peak_timeout_l =
-                current_tick + pm_peak_hold;
+                current_tick + peak_time_out[pm_peak_hold];
         }
 
         if (right > scales->pm_peak_right) {
             scales->pm_peak_right = right - 1;
-            scales->pm_peak_timeout_r =
-                current_tick + pm_peak_hold;
+            scales->pm_peak_timeout_r = 
+                current_tick + peak_time_out[pm_peak_hold];
         }
     }
 
@@ -1122,7 +1138,7 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
 
     /* draw dots for scale marks */
     for (i = 0; i < db_scale_count; i++) {
-        /* The x-coordinates of interesting scale mark points
+        /* The x-coordinates of interesting scale mark points 
            have been calculated before */
         display->drawpixel(x + scales->db_scale_lcd_coord[i],
                            y + height / 2 - 1);
@@ -1132,9 +1148,9 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
 
 #ifdef HAVE_BACKLIGHT
     /* cliplight */
-    if ((pm_clip_left || pm_clip_right) &&
+    if ((pm_clip_left || pm_clip_right) && 
         global_settings.cliplight &&
-#if CONFIG_CODEC == SWCODEC
+#if CONFIG_CODEC == SWCODEC        
         !pm_playback)
 #else
         !(audio_status() & (AUDIO_STATUS_PLAY | AUDIO_STATUS_ERROR)))
@@ -1189,7 +1205,7 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
         ticks_per_redraw[tmp] ++;
     }
 
-    /* display a bar to show how many ticks have passed since
+    /* display a bar to show how many ticks have passed since 
        the last redraw */
     display->fillrect(x, y + height / 2, current_tick - pm_tick, 2);
     pm_tick = current_tick;
@@ -1260,7 +1276,7 @@ void peak_meter_define_trigger(
  * Enables or disables the trigger.
  * @param on - If true the trigger is turned on.
  */
-void peak_meter_trigger(bool on)
+void peak_meter_trigger(bool on) 
 {
     /* don't use set_trigger here as that would fire an undesired event */
     trig_status = on ? TRIG_READY : TRIG_OFF;
@@ -1271,7 +1287,7 @@ void peak_meter_trigger(bool on)
  * @param listener - The function that is called with each change of
  *                   trig_status. May be set to NULL if no callback is desired.
  */
-void peak_meter_set_trigger_listener(void (*listener)(int status))
+void peak_meter_set_trigger_listener(void (*listener)(int status)) 
 {
     trigger_listener = listener;
 }
@@ -1288,7 +1304,7 @@ void peak_meter_set_trigger_listener(void (*listener)(int status))
  * peak_meter_release_trigger. To turn the trigger off call
  * peak_meter_trigger_off.
  */
-int peak_meter_trigger_status(void)
+int peak_meter_trigger_status(void) 
 {
    return trig_status; /* & TRIG_PIT_MASK;*/
 }
@@ -1408,7 +1424,7 @@ int peak_meter_draw_get_btn(int action_context, int x[], int y[],
         if (TIME_AFTER(current_tick, next_refresh)) {
             for(i = 0; i < nb_screens; i++)
             {
-                screens[i].set_viewport(&vps[i]);
+                screens[i].set_viewport(&vps[i]);                                
                 peak_meter_screen(&screens[i], x[i], y[i], height[i]);
                 screens[i].update_viewport_rect(x[i], y[i],
                                                 screens[i].getwidth() - x[i],
@@ -1435,7 +1451,7 @@ static void peak_meter_clear_histogram(void)
     }
 }
 
-bool peak_meter_histogram(void)
+bool peak_meter_histogram(void) 
 {
     int i;
     int btn = BUTTON_NONE;
@@ -1548,3 +1564,4 @@ void histogram_draw(int x1, int x2, int y1, int y2, int width, int height)
 #endif
 }
 #endif /* HAVE_HISTOGRAM */
+

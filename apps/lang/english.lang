@@ -2700,15 +2700,15 @@
   desc: in lcd settings
   user: core
   <source>
-    *: "Never"
+    *: none
     lcd_sleep: "Never"
   </source>
   <dest>
-    *: "Never"
+    *: none
     lcd_sleep: "Never"
   </dest>
   <voice>
-    *: "Never"
+    *: none
     lcd_sleep: "Never"
   </voice>
 </phrase>

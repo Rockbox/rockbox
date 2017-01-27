@@ -25,7 +25,7 @@
 #define MAX_PEAK 0x8000
 
 /*#define PM_DEBUG */
-#ifdef PM_DEBUG
+#ifdef PM_DEBUG 
 extern bool peak_meter_histogram(void);
 #endif
 
@@ -44,8 +44,7 @@ extern int  peak_meter_draw_get_btn(int action_context, int x[], int y[],
 extern void peak_meter_set_clip_hold(int time);
 extern void peak_meter_peek(void);
 extern void peak_meter_init_range( bool dbfs, int range_min, int range_max);
-//extern void peak_meter_init_times(int release, int hold, int clip_hold);
-extern void peak_meter_init_times(int release_ticks, int hold_ms, int clip_hold_sec);
+extern void peak_meter_init_times(int release, int hold, int clip_hold);
 #ifdef HAVE_AGC
 extern void peak_meter_get_peakhold(int *peak_left, int *peak_right);
 #endif
@@ -85,7 +84,7 @@ extern void peak_meter_set_trigger_listener(void (*listener)(int status));
 
 #define TRIG_HEIGHT 8
 
-extern void peak_meter_draw_trig(int x[], int y[], int trig_width[],
+extern void peak_meter_draw_trig(int x[], int y[], int trig_width[], 
                                       int nb_screens);
 
 #define DB_SCALE_SRC_VALUES_SIZE 12
@@ -108,3 +107,4 @@ struct meter_scales{
 
 extern void peak_meter_screen(struct screen *display, int x, int y, int height);
 #endif /* __PEAKMETER_H__ */
+
