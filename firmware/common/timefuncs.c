@@ -58,18 +58,33 @@ bool valid_time(const struct tm *tm)
     else
         return true;
 }
+
+/* Don't read the RTC more than once per second
+ * returns true if the rtc needs to be read
+ * targets may override with their own implementation
+ */
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+WEAK_ATTR
+#endif
+bool rtc_dirty(void)
+{
+    static long timeout = 0;
+
+    /* Don't read the RTC more than once per second */
+    if (!TIME_AFTER(current_tick, timeout))
+        return false;
+
+    /* Once per second, 1/10th of a second off */
+    timeout = HZ * (current_tick / HZ + 1) + HZ / 5;
+    return true;
+}
 #endif /* CONFIG_RTC */
 
 struct tm *get_time(void)
 {
 #if CONFIG_RTC
-    static long timeout = 0;
-
-    /* Don't read the RTC more than once per second */
-    if (TIME_AFTER(current_tick, timeout))
+    if (rtc_dirty())
     {
-        /* Once per second, 1/10th of a second off */
-        timeout = HZ * (current_tick / HZ + 1) + HZ / 5;
         rtc_read_datetime(&tm);
         tm.tm_isdst = -1; /* Not implemented for now */
     }
