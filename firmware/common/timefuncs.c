@@ -24,13 +24,21 @@
 
 #include "kernel.h"
 #include "rtc.h"
+#ifdef HAVE_RTC_IRQ
+#include "rtc-target.h"
+#endif
 #include "timefuncs.h"
 #include "debug.h"
 
 static struct tm tm;
 
 #if !CONFIG_RTC
-static void fill_default_tm(struct tm *tm)
+static inline bool rtc_dirty(void)
+{
+    return true;
+}
+
+static inline int rtc_read_datetime(struct tm *tm)
 {
     tm->tm_sec = 0;
     tm->tm_min = 0;
@@ -38,9 +46,9 @@ static void fill_default_tm(struct tm *tm)
     tm->tm_mday = 1;
     tm->tm_mon = 0;
     tm->tm_year = 70;
-    tm->tm_wday = 1;
-    tm->tm_yday = 0; /* Not implemented for now */
-    tm->tm_isdst = -1; /* Not implemented for now */
+    tm->tm_wday = 4;
+    tm->tm_yday = 0;
+    return 1;
 }
 #endif /* !CONFIG_RTC */
 
@@ -58,24 +66,37 @@ bool valid_time(const struct tm *tm)
     else
         return true;
 }
-#endif /* CONFIG_RTC */
 
-struct tm *get_time(void)
+/* Don't read the RTC more than once per second
+ * returns true if the rtc needs to be read
+ * targets may override with their own implementation
+ */
+#ifndef HAVE_RTC_IRQ
+static inline bool rtc_dirty(void)
 {
-#if CONFIG_RTC
     static long timeout = 0;
 
     /* Don't read the RTC more than once per second */
     if (TIME_AFTER(current_tick, timeout))
     {
-        /* Once per second, 1/10th of a second off */
-        timeout = HZ * (current_tick / HZ + 1) + HZ / 5;
+        /* Once per second, 1/5th of a second off */
+        timeout = current_tick / HZ * HZ + 6*HZ / 5;
+        return true;
+    }
+
+    return false;
+}
+#endif /* HAVE_RTC_IRQ */
+#endif /* CONFIG_RTC */
+
+struct tm *get_time(void)
+{
+    if (rtc_dirty())
+    {
         rtc_read_datetime(&tm);
         tm.tm_isdst = -1; /* Not implemented for now */
     }
-#else /* No RTC */
-    fill_default_tm(&tm);
-#endif /* RTC */
+
     return &tm;
 }
 
