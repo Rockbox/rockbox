@@ -131,6 +131,16 @@ static unsigned long ascodec_enrd0_shadow = 0;
 
 static void ascodec_wait_cb(struct ascodec_request *req);
 
+/* RTC interrupt and status
+ * Caution: To avoid an extra variable, IRQ_RTC is used as a flag for
+ * ascodec_enrd0_shadow, which conflicts with RVDD_WASLOW, but we're not using
+ * that right now */
+#if CONFIG_RTC
+#define IFRTC_IRQ_RTC   IRQ_RTC
+#else /* !CONFIG_RTC */
+#define IFRTC_IRQ_RTC   0
+#endif /* CONFIG_RTC */
+
 /** --debugging help-- **/
 
 #ifdef DEBUG
@@ -148,7 +158,6 @@ static struct int_audio_counters {
 #endif /* DEBUG */
 
 #define COUNT_INT(x) IFDEBUG((int_audio_counters.int_##x)++)
-
 
 /** --stock request and callback functionality -- **/
 
@@ -510,13 +519,12 @@ static void ascodec_int_audio_cb(struct ascodec_request *req)
         }
     }
 
+#if CONFIG_RTC
     if (data[2] & IRQ_RTC) { /* rtc irq */
-        /*
-         * Can be configured for once per second or once per minute,
-         * default is once per second
-         */
+        ascodec_enrd0_shadow |= IRQ_RTC;
         COUNT_INT(rtc);
     }
+#endif /* CONFIG_RTC */
 
     if (data[2] & IRQ_ADC) { /* adc finished */
         COUNT_INT(adc);
@@ -580,6 +588,14 @@ int ascodec_read_charger(void)
 }
 #endif /* CONFIG_CHARGING */
 
+#if CONFIG_RTC
+/* read sticky rtc dirty status */
+bool ascodec_rtc_dirty(void)
+{
+    return bitclr32(&ascodec_enrd0_shadow, IRQ_RTC) & IRQ_RTC;
+}
+#endif /* CONFIG_RTC */
+
 /*
  * NOTE:
  * After the conversion to interrupts, ascodec_(lock|unlock) are only used by
@@ -635,8 +651,9 @@ void ascodec_init(void)
     VIC_INT_ENABLE = INTERRUPT_I2C_AUDIO;
     VIC_INT_ENABLE = INTERRUPT_AUDIO;
 
-    /* detect if USB was connected at startup since there is no transition */
-    ascodec_enrd0_shadow = ascodec_read(AS3514_IRQ_ENRD0);
+    /* detect if USB was connected at startup since there is no transition;
+       force an initial read of the clock (if CONFIG_RTC) */
+    ascodec_enrd0_shadow = ascodec_read(AS3514_IRQ_ENRD0) | IFRTC_IRQ_RTC;
     if(ascodec_enrd0_shadow & USB_STATUS)
         usb_insert_int();
 
@@ -651,10 +668,10 @@ void ascodec_init(void)
     /* XIRQ = IRQ, active low reset signal, 6mA push-pull output */
     ascodec_write_pmu(0x1a, 3, (1<<2)|3); /* 1A-3 = Out_Cntr3 register */
     /* Generate irq on (rtc,) adc change */
-    ascodec_write(AS3514_IRQ_ENRD2, /*IRQ_RTC |*/ IRQ_ADC);
+    ascodec_write(AS3514_IRQ_ENRD2, IFRTC_IRQ_RTC | IRQ_ADC);
 #else
     /* Generate irq for push-pull, active high, irq on rtc+adc change */
     ascodec_write(AS3514_IRQ_ENRD2, IRQ_PUSHPULL | IRQ_HIGHACTIVE |
-                                    /*IRQ_RTC |*/ IRQ_ADC);
+                                    IFRTC_IRQ_RTC | IRQ_ADC);
 #endif
 }
