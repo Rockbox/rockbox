@@ -131,6 +131,10 @@ static unsigned long ascodec_enrd0_shadow = 0;
 
 static void ascodec_wait_cb(struct ascodec_request *req);
 
+#if CONFIG_RTC
+bool rtc_dirty(void) __attribute__((alias("ascodec_rtc_dirty")));
+#endif
+
 /** --debugging help-- **/
 
 #ifdef DEBUG
@@ -511,10 +515,9 @@ static void ascodec_int_audio_cb(struct ascodec_request *req)
     }
 
     if (data[2] & IRQ_RTC) { /* rtc irq */
-        /*
-         * Can be configured for once per second or once per minute,
-         * default is once per second
-         */
+        /* Caution: conflicts with RVDD was low but we're not using that
+           right now */
+        ascodec_enrd0_shadow |= IRQ_RTC;
         COUNT_INT(rtc);
     }
 
@@ -587,6 +590,21 @@ int ascodec_read_charger(void)
 }
 #endif /* CONFIG_CHARGING */
 
+#if CONFIG_RTC
+/* read sticky rtc dirty status */
+bool ascodec_rtc_dirty(void)
+{
+    int oldlevel = disable_irq_save();
+
+    bool ret = ascodec_enrd0_shadow & IRQ_RTC;
+    ascodec_enrd0_shadow &= ~IRQ_RTC;
+
+    restore_irq(oldlevel);
+
+    return ret;
+}
+#endif /* CONFIG_RTC */
+
 /*
  * NOTE:
  * After the conversion to interrupts, ascodec_(lock|unlock) are only used by
@@ -658,10 +676,10 @@ void ascodec_init(void)
     /* XIRQ = IRQ, active low reset signal, 6mA push-pull output */
     ascodec_write_pmu(0x1a, 3, (1<<2)|3); /* 1A-3 = Out_Cntr3 register */
     /* Generate irq on (rtc,) adc change */
-    ascodec_write(AS3514_IRQ_ENRD2, /*IRQ_RTC |*/ IRQ_ADC);
+    ascodec_write(AS3514_IRQ_ENRD2, IRQ_RTC | IRQ_ADC);
 #else
     /* Generate irq for push-pull, active high, irq on rtc+adc change */
     ascodec_write(AS3514_IRQ_ENRD2, IRQ_PUSHPULL | IRQ_HIGHACTIVE |
-                                    /*IRQ_RTC |*/ IRQ_ADC);
+                                    IRQ_RTC | IRQ_ADC);
 #endif
 }
