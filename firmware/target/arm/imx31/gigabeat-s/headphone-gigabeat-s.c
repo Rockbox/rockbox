@@ -25,7 +25,6 @@
 #include "kernel.h"
 #include "thread.h"
 #include "mc13783.h"
-#include "mc13783-target.h"
 #include "adc.h"
 #include "button.h"
 
@@ -146,7 +145,7 @@ static void NORETURN_ATTR headphone_thread(void)
 }
 
 /* HP plugged/unplugged event - called from PMIC ISR */
-void headphone_detect_event(void)
+void MC13783_EVENT_CB_ONOFD2(void)
 {
     /* Trigger the thread immediately. */
     semaphore_release(&headphone_wakeup);
@@ -170,5 +169,5 @@ void INIT_ATTR headphone_init(void)
                                         IF_COP(, CPU));
 
     /* Enable PMIC event */
-    mc13783_enable_event(MC13783_ONOFD2_EVENT, true);
+    mc13783_enable_event(MC13783_INT_ID_ONOFD2, true);
 }

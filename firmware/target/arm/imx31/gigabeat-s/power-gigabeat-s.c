@@ -66,9 +66,9 @@ static void update_main_charger(bool present)
 }
 
 /* Detect changes in presence of the AC adaptor. Called from PMIC ISR. */
-void charger_main_detect_event(void)
+void MC13783_EVENT_CB_SE1(void)
 {
-    update_main_charger(mc13783_event_sense(MC13783_SE1_EVENT));
+    update_main_charger(mc13783_event_sense());
 }
 
 /* Detect changes in USB bus power. Called from usb connect event ISR. */
@@ -159,5 +159,5 @@ void power_init(void)
                             & MC13783_SE1S);
 
     /* Enable detect event */
-    mc13783_enable_event(MC13783_SE1_EVENT, true);
+    mc13783_enable_event(MC13783_INT_ID_SE1, true);
 }

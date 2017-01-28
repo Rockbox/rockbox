@@ -86,12 +86,6 @@
 
 #define AB_REPEAT_ENABLE
 
-/* Define this if you have a SI4700 fm radio tuner */
-#define CONFIG_TUNER SI4700
-
-#define HAVE_RDS_CAP
-#define RDS_ISR_PROCESSING
-
 /* Define this if you have the WM8978 audio codec */
 #define HAVE_WM8978
 
@@ -124,6 +118,10 @@
 #define HAVE_LCD_ENABLE
 
 #ifndef BOOTLOADER
+/* Define this if you have a SI4700 fm radio tuner */
+#define CONFIG_TUNER SI4700
+#define HAVE_RDS_CAP
+#define RDS_ISR_PROCESSING
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP

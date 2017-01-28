@@ -111,7 +111,7 @@ bool adc_enable_channel(int channel, bool enable)
 }
 
 /* ADC conversion complete event - called from PMIC ISR */
-void adc_done(void)
+void MC13783_EVENT_CB_ADCDONE(void)
 {
     semaphore_release(&adc_done_signal);
 }
@@ -132,5 +132,5 @@ void adc_init(void)
 
     /* Enable ADCDONE event */
     mc13783_write(MC13783_INTERRUPT_STATUS0, MC13783_ADCDONEI);
-    mc13783_enable_event(MC13783_ADCDONE_EVENT, true);
+    mc13783_enable_event(MC13783_INT_ID_ADCDONE, true);
 }

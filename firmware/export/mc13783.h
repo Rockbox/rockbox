@@ -1256,9 +1256,6 @@ enum mc13783_regs_enum
 #define MC13783_TC3PERIOD_POS           (21)
 #define MC13783_TC3TRIODE               (0x1 << 23)
 
-/* For event enum values which are target-defined */
-#include "mc13783-target.h"
-
 void mc13783_init(void);
 void mc13783_close(void);
 uint32_t mc13783_set(unsigned address, uint32_t bits);
@@ -1296,7 +1293,7 @@ enum mc13783_int_ids
     MC13783_INT_ID_CHGSHORT   =  9,
     MC13783_INT_ID_CCCV       = 10,
     MC13783_INT_ID_CHGCURR    = 11,
-    MC13783_INT_ID_BPONI      = 12,
+    MC13783_INT_ID_BPON       = 12,
     MC13783_INT_ID_LOBATL     = 13,
     MC13783_INT_ID_LOBATH     = 14,
     MC13783_INT_ID_UDP        = 15,
@@ -1306,41 +1303,70 @@ enum mc13783_int_ids
     MC13783_INT_ID_CKDET      = 22,
     MC13783_INT_ID_UDM        = 23,
      /* *STATUS1/MASK1/SENSE1 */
-    MC13783_INT_ID_1HZ        =  0 + 0x20,
-    MC13783_INT_ID_TODA       =  1 + 0x20,
-    MC13783_INT_ID_ONOFD1     =  3 + 0x20,  /* ON1B */
-    MC13783_INT_ID_ONOFD2     =  4 + 0x20,  /* ON2B */
-    MC13783_INT_ID_ONOFD3     =  5 + 0x20,  /* ON3B */
-    MC13783_INT_ID_SYSRST     =  6 + 0x20,
-    MC13783_INT_ID_RTCRST     =  7 + 0x20,
-    MC13783_INT_ID_PCI        =  8 + 0x20,
-    MC13783_INT_ID_WARM       =  9 + 0x20,
-    MC13783_INT_ID_MEMHLD     = 10 + 0x20,
-    MC13783_INT_ID_PWRRDY     = 11 + 0x20,
-    MC13783_INT_ID_THWARNL    = 12 + 0x20,
-    MC13783_INT_ID_THWARNH    = 13 + 0x20,
-    MC13783_INT_ID_CLK        = 14 + 0x20,
-    MC13783_INT_ID_SEMAF      = 15 + 0x20,
-    MC13783_INT_ID_MC2B       = 17 + 0x20,
-    MC13783_INT_ID_HSDET      = 18 + 0x20,
-    MC13783_INT_ID_HSL        = 19 + 0x20,
-    MC13783_INT_ID_ALSPTH     = 20 + 0x20,
-    MC13783_INT_ID_AHSSHORT   = 21 + 0x20,
+    MC13783_INT_ID_1HZ        =  0 + 32,
+    MC13783_INT_ID_TODA       =  1 + 32,
+    MC13783_INT_ID_ONOFD1     =  3 + 32,  /* ON1B */
+    MC13783_INT_ID_ONOFD2     =  4 + 32,  /* ON2B */
+    MC13783_INT_ID_ONOFD3     =  5 + 32,  /* ON3B */
+    MC13783_INT_ID_SYSRST     =  6 + 32,
+    MC13783_INT_ID_RTCRST     =  7 + 32,
+    MC13783_INT_ID_PCI        =  8 + 32,
+    MC13783_INT_ID_WARM       =  9 + 32,
+    MC13783_INT_ID_MEMHLD     = 10 + 32,
+    MC13783_INT_ID_PWRRDY     = 11 + 32,
+    MC13783_INT_ID_THWARNL    = 12 + 32,
+    MC13783_INT_ID_THWARNH    = 13 + 32,
+    MC13783_INT_ID_CLK        = 14 + 32,
+    MC13783_INT_ID_SEMAF      = 15 + 32,
+    MC13783_INT_ID_MC2B       = 17 + 32,
+    MC13783_INT_ID_HSDET      = 18 + 32,
+    MC13783_INT_ID_HSL        = 19 + 32,
+    MC13783_INT_ID_ALSPTH     = 20 + 32,
+    MC13783_INT_ID_AHSSHORT   = 21 + 32,
 };
 
-#define MC13783_INT_ID_SET_DIV    (0x20)
-#define MC13783_INT_ID_NUM_MASK   (0x1f)
+#ifdef DEFINE_MC13783_VECTOR_TABLE
 
 struct mc13783_event
 {
-    enum mc13783_int_ids int_id : 8;
-    uint32_t sense : 24;
-    void (*callback)(void);
+    uint32_t id    : 8;     /* MC13783_INT_ID_x */
+    uint32_t sense : 24;    /* MC13783_xS */
+    void (*callback)(void); /* MC13783_EVENT_CB_x */
 };
 
-void mc13783_enable_event(enum mc13783_event_ids id, bool enable);
+/* Declares vector table. Order-implied priority */
+#define MC13783_EVENT_VECTOR_TBL_START() \
+    static FORCE_INLINE uintptr_t __mc13783_event_vector_tbl(int __what) \
+    {                                                                    \
+        static const struct mc13783_event __tbl[] = {
 
-/* Read the sense bit if one exists - valid only within event handlers */
-uint32_t mc13783_event_sense(enum mc13783_event_ids id);
+#define MC13783_EVENT_VECTOR(__name, __sense) \
+            { .id       = MC13783_INT_ID_##__name,                 \
+              .sense    = (__sense),                               \
+              .callback = ({ void MC13783_EVENT_CB_##__name(void); \
+                             MC13783_EVENT_CB_##__name; }) },
+
+#define MC13783_EVENT_VECTOR_TBL_END() \
+        };                                              \
+        switch (__what)                                 \
+        {                                               \
+            default: return (uintptr_t)__tbl;           \
+            case  1: return (uintptr_t)ARRAYLEN(__tbl); \
+        }                                               \
+    }
+
+#define mc13783_event_vector_tbl \
+     ((const struct mc13783_event *)__mc13783_event_vector_tbl(0))
+
+#define mc13783_event_vector_tbl_len \
+     ((unsigned int)__mc13783_event_vector_tbl(1))
+
+#endif /* DEFINE_MC13783_VECTOR_TABLE */
+
+void mc13783_enable_event(enum mc13783_int_ids id, bool enable);
+
+/* Read the sense bit(s) if configured - valid only within the respective
+   event handler */
+uint32_t mc13783_event_sense(void);
 
 #endif /* _MC13783_H_ */

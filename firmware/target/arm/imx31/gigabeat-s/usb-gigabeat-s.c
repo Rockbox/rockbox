@@ -70,10 +70,10 @@ static void update_usb_status(bool sense)
 }
 
 /* Detect presence of USB bus - called from PMIC ISR */
-void usb_connect_event(void)
+void MC13783_EVENT_CB_USB(void)
 {
     /* Read the associated sense value */
-    update_usb_status(mc13783_event_sense(MC13783_USB_EVENT));
+    update_usb_status(mc13783_event_sense());
 }
 
 int usb_detect(void)
@@ -90,7 +90,7 @@ void usb_init_device(void)
     update_usb_status(usb_plugged());
 
     /* Enable PMIC event */
-    mc13783_enable_event(MC13783_USB_EVENT, true);
+    mc13783_enable_event(MC13783_INT_ID_USB, true);
 }
 
 void usb_enable(bool on)

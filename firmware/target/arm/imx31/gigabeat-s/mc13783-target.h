@@ -23,17 +23,41 @@
 #ifndef MC13783_TARGET_H
 #define MC13783_TARGET_H
 
-/* Declare event indexes in priority order in a packed array */
-enum mc13783_event_ids
+#include "mc13783.h"
+
+#ifdef DEFINE_MC13783_VECTOR_TABLE
+
+/* Gigabeat S mc13783 serial interface node. */
+static struct spi_node mc13783_spi =
 {
-    MC13783_ADCDONE_EVENT = 0, /* ADC conversion complete */
-    MC13783_ONOFD1_EVENT,      /* Power button */
-#ifdef HAVE_HEADPHONE_DETECTION
-    MC13783_ONOFD2_EVENT,      /* Headphone jack */
-#endif
-    MC13783_SE1_EVENT,         /* Main charger detection */
-    MC13783_USB_EVENT,         /* USB insertion */
-    MC13783_NUM_EVENTS,
+    /* Based upon original firmware settings */
+    CSPI2_NUM,                     /* CSPI module 2 */
+    CSPI_CONREG_CHIP_SELECT_SS0 |  /* Chip select 0 */
+    CSPI_CONREG_DRCTL_DONT_CARE |  /* Don't care about CSPI_RDY */
+    CSPI_CONREG_DATA_RATE_DIV_32 | /* Clock = IPG_CLK/32 = 2,062,500Hz. */
+    CSPI_BITCOUNT(32-1) |          /* All 32 bits are to be transferred */
+    CSPI_CONREG_SSPOL |            /* SS active high */
+    CSPI_CONREG_SSCTL |            /* Negate SS between SPI bursts */
+    CSPI_CONREG_MODE,              /* Master mode */
+    0,                             /* SPI clock - no wait states */
 };
+
+/* Gigabeat S definitions for static MC13783 event registration */
+MC13783_EVENT_VECTOR_TBL_START()
+    /* ADC conversion complete */
+    MC13783_EVENT_VECTOR(ADCDONE, 0)
+    /* Power button */
+    MC13783_EVENT_VECTOR(ONOFD1, MC13783_ONOFD1S)
+    /* Main charger detection */
+    MC13783_EVENT_VECTOR(SE1, MC13783_SE1S)
+    /* USB insertion/USB charger detection */
+    MC13783_EVENT_VECTOR(USB, MC13783_USB4V4S)
+#ifdef HAVE_HEADPHONE_DETECTION
+    /* Headphone jack */
+    MC13783_EVENT_VECTOR(ONOFD2, 0)
+#endif /* HAVE_HEADPHONE_DETECTION */
+MC13783_EVENT_VECTOR_TBL_END()
+
+#endif /* DEFINE_MC13783_VECTOR_TABLE */
 
 #endif /* MC13783_TARGET_H */

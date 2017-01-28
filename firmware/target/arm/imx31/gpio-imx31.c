@@ -23,7 +23,8 @@
 #include "config.h"
 #include "system.h"
 #include "avic-imx31.h"
-#include "gpio-imx31.h"
+#define DEFINE_GPIO_VECTOR_TABLE
+#include "gpio-target.h"
 
 /* UIE vector found in avic-imx31.c */
 extern void UIE_VECTOR(void);
@@ -31,101 +32,91 @@ extern void UIE_VECTOR(void);
 /* Event lists are allocated for the specific target */
 #if (GPIO_EVENT_MASK & USE_GPIO1_EVENTS)
 static __attribute__((interrupt("IRQ"))) void GPIO1_HANDLER(void);
-extern const struct gpio_event gpio1_events[GPIO1_NUM_EVENTS];
 #endif
 
 #if (GPIO_EVENT_MASK & USE_GPIO2_EVENTS)
 static __attribute__((interrupt("IRQ"))) void GPIO2_HANDLER(void);
-extern const struct gpio_event gpio2_events[GPIO2_NUM_EVENTS];
 #endif
 
 #if (GPIO_EVENT_MASK & USE_GPIO3_EVENTS)
 static __attribute__((interrupt("IRQ"))) void GPIO3_HANDLER(void);
-extern const struct gpio_event gpio3_events[GPIO3_NUM_EVENTS];
 #endif
 
-#define DR      (0x00 / sizeof (unsigned long)) /* 00h        */
-#define GDIR    (0x04 / sizeof (unsigned long)) /* 04h        */
-#define PSR     (0x08 / sizeof (unsigned long)) /* 08h        */
-#define ICR     (0x0C / sizeof (unsigned long)) /* 0Ch ICR1,2 */
-#define IMR     (0x14 / sizeof (unsigned long)) /* 14h        */
-#define ISR     (0x18 / sizeof (unsigned long))
-
-static const struct gpio_module_desc
+static struct gpio_module_desc
 {
     volatile unsigned long * const base;    /* Module base address */
     void (* const handler)(void);           /* Interrupt function */
-    const struct gpio_event * const events; /* Event handler list */
+    const struct gpio_event *events;        /* Event handler list */
+    unsigned long enabled;                  /* Enabled event mask */
     const uint8_t ints;                     /* AVIC int number */
     const uint8_t int_priority;             /* AVIC int priority */
-    const uint8_t count;                    /* Number of events */
-} gpio_descs[GPIO_NUM_GPIO] =
+    uint8_t       count;                    /* Number of events */
+} * const gpio_descs[] =
 {
 #if (GPIO_EVENT_MASK & USE_GPIO1_EVENTS)
-    {
+    [GPIO1_NUM] = &(struct gpio_module_desc) {
         .base         = (unsigned long *)GPIO1_BASE_ADDR,
         .ints         = INT_GPIO1,
         .handler      = GPIO1_HANDLER,
-        .events       = gpio1_events,
-        .count        = GPIO1_NUM_EVENTS,
         .int_priority = GPIO1_INT_PRIO
     },
 #endif
 #if (GPIO_EVENT_MASK & USE_GPIO2_EVENTS)
-    {
+    [GPIO2_NUM] = &(struct gpio_module_desc) {
         .base         = (unsigned long *)GPIO2_BASE_ADDR,
         .ints         = INT_GPIO2,
         .handler      = GPIO2_HANDLER,
-        .events       = gpio2_events,
-        .count        = GPIO2_NUM_EVENTS,
         .int_priority = GPIO2_INT_PRIO
     },
 #endif
 #if (GPIO_EVENT_MASK & USE_GPIO3_EVENTS)
-    {
+    [GPIO3_NUM] = &(struct gpio_module_desc) {
         .base         = (unsigned long *)GPIO3_BASE_ADDR,
         .ints         = INT_GPIO3,
         .handler      = GPIO3_HANDLER,
-        .events       = gpio3_events,
-        .count        = GPIO3_NUM_EVENTS,
         .int_priority = GPIO3_INT_PRIO,
     },
 #endif
 };
 
+#define GPIO_MODULE_CNT ARRAYLEN(gpio_descs)
+
+static const struct gpio_event * event_from_id(
+    const struct gpio_module_desc *desc, enum gpio_id id)
+{
+    const struct gpio_event *events = desc->events;
+    for (unsigned int i = 0; i < desc->count; i++)
+    {
+        if (events[i].id == id)
+            return &events[i];
+    }
+
+    return NULL;
+}
+
 static void gpio_call_events(enum gpio_module_number gpio)
 {
-    const struct gpio_module_desc * const desc = &gpio_descs[gpio];
+    const struct gpio_module_desc * const desc = gpio_descs[gpio];
     volatile unsigned long * const base = desc->base;
-    const struct gpio_event * event, *event_last;
 
-    event = desc->events;
-    event_last = event + desc->count;
+    /* Send only events that are not masked */
+    unsigned long pnd = base[GPIO_ISR] & base[GPIO_IMR];
 
-    /* Intersect pending and unmasked bits */
-    unsigned long pnd = base[ISR] & base[IMR];
+    if (pnd & ~desc->enabled)
+        UIE_VECTOR(); /* One or more aren't handled properly */
 
-    /* Call each event handler in order */
-    /* .count is surely expected to be > 0 */
-    do
+    const struct gpio_event *event = desc->events;
+
+    while (pnd)
     {
-        unsigned long mask = event->mask;
-
+        unsigned long mask = 1ul << (event->id % 32);
         if (pnd & mask)
         {
             event->callback();
             pnd &= ~mask;
         }
 
-        if (pnd == 0)
-            break; /* Teminate early if nothing more to service */
-    }
-    while (++event < event_last);
-
-    if (pnd != 0)
-    {
-        /* One or more weren't handled */
-        UIE_VECTOR();
+        event++;
     }
 }
 
@@ -152,69 +143,90 @@ static __attribute__((interrupt("IRQ"))) void GPIO3_HANDLER(void)
 
 void INIT_ATTR gpio_init(void)
 {
-    /* Mask-out GPIO interrupts - enable what's wanted later */
-    int i;
-    for (i = 0; i < GPIO_NUM_GPIO; i++)
-        gpio_descs[i].base[IMR] = 0;
+    for (unsigned int mod = 0; mod < GPIO_MODULE_CNT; mod++)
+    {
+        struct gpio_module_desc * const desc = gpio_descs[mod];
+        if (!desc)
+            continue;
+
+        /* Parse the event table per module. First contiguous run seen for a
+         * module is used. */
+        const struct gpio_event *event = gpio_event_vector_tbl;
+        for (unsigned int i = 0; i < gpio_event_vector_tbl_len; i++, event++)
+        {
+            if (event->id / 32 == mod)
+            {
+                desc->events = event;
+                while (++desc->count < 32 && (++event)->id / 32 == mod);
+                break;
+            }
+        }
+
+        /* Mask-out GPIO interrupts - enable what's wanted later */
+        desc->base[GPIO_IMR] = 0;
+    }
 }
 
-bool gpio_enable_event(enum gpio_event_ids id)
+bool gpio_enable_event(enum gpio_id id, bool enable)
 {
-    const struct gpio_module_desc * const desc = &gpio_descs[id >> 5];
-    const struct gpio_event * const event = &desc->events[id & 31];
+    unsigned int mod = id / 32;
+
+    struct gpio_module_desc * const desc = gpio_descs[mod];
+
+    if (mod >= GPIO_MODULE_CNT || desc == NULL)
+        return false;
+
+    const struct gpio_event * const event = event_from_id(desc, id);
+    if (!event)
+        return false;
+
     volatile unsigned long * const base = desc->base;
-    volatile unsigned long *icr;
-    unsigned long mask, line;
-    unsigned long imr;
-    int shift;
+    unsigned long num = id % 32;
+    unsigned long mask = 1ul << num;
 
-    int oldlevel = disable_irq_save();
+    unsigned long cpsr = disable_irq_save();
 
-    imr =  base[IMR];
+    unsigned long imr = base[GPIO_IMR];
 
-    if (imr == 0)
+    if (enable)
     {
-        /* First enabled interrupt for this GPIO */
-        avic_enable_int(desc->ints, INT_TYPE_IRQ, desc->int_priority,
-                        desc->handler);
+        if (desc->enabled == 0)
+        {
+            /* First enabled interrupt for this GPIO */
+            avic_enable_int(desc->ints, INT_TYPE_IRQ, desc->int_priority,
+                            desc->handler);
+        }
+
+        /* Set the line sense */
+        if (event->sense == GPIO_SENSE_EDGE_SEL)
+        {
+            /* Interrupt configuration register is ignored */
+            base[GPIO_EDGE_SEL] |= mask;
+        }
+        else
+        {
+            volatile unsigned long *icrp = &base[GPIO_ICR + num / 16];
+            unsigned int shift = 2*(num % 16);
+            bitmod32(icrp, event->sense << shift, 0x3 << shift);
+            base[GPIO_EDGE_SEL] &= ~mask;
+        }
+
+        /* Unmask the line */
+        desc->enabled |= mask;
+        imr |= mask;
+    }
+    else
+    {
+        imr &= ~mask;
+        desc->enabled &= ~mask;
+
+        if (desc->enabled == 0)
+            avic_disable_int(desc->ints); /* No events remain enabled */
     }
 
-    /* Set the line sense */
-    line = find_first_set_bit(event->mask);
-    icr = &base[ICR + (line >> 4)];
-    shift = 2*(line & 15);
-    mask = GPIO_SENSE_CONFIG_MASK << shift;
+    base[GPIO_IMR] = imr;
 
-    *icr = (*icr & ~mask) | ((event->sense << shift) & mask);
-
-    /* Unmask the line */
-    base[IMR] = imr | event->mask;
-
-    restore_irq(oldlevel);
+    restore_irq(cpsr);
 
     return true;
-}
-
-void gpio_disable_event(enum gpio_event_ids id)
-{
-    const struct gpio_module_desc * const desc = &gpio_descs[id >> 5];
-    const struct gpio_event * const event = &desc->events[id & 31];
-    volatile unsigned long * const base = desc->base;
-    unsigned long imr;
-
-    int oldlevel = disable_irq_save();
-
-    /* Remove bit from mask */
-    imr = base[IMR] & ~event->mask;
-
-    /* Mask the line */
-    base[IMR] = imr;
-
-    if (imr == 0)
-    {
-        /* No events remain enabled */
-        avic_disable_int(desc->ints);
-    }
-
-    restore_irq(oldlevel);
 }

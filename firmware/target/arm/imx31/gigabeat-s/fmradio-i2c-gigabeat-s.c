@@ -26,7 +26,7 @@
 #include "thread.h"
 #include "mc13783.h"
 #include "iomuxc-imx31.h"
-#include "gpio-imx31.h"
+#include "gpio-target.h"
 #include "i2c-imx31.h"
 #include "fmradio_i2c.h"
 #include "rds.h"
@@ -139,20 +139,25 @@ static struct si4700_i2c_transfer_desc
     .xfer = { .node = &si4700_i2c_node }
 };
 
+static bool int_restore;
+
 static void si4700_rds_read_raw_callback(struct i2c_transfer_desc *xfer)
 {
     struct si4700_i2c_transfer_desc *xf =
         (struct si4700_i2c_transfer_desc *)xfer;
 
-    if (xfer->rxcount != 0)
-        return; /* Read didn't finish */
+    if (xfer->rxcount == 0)
+    {
+        uint16_t rds_data[4];
+        si4700_rds_read_raw_async_complete(xf->regbuf, rds_data);
 
-    uint16_t rds_data[4];
+        if (rds_process(rds_data))
+            si4700_rds_set_event();
+    }
+    /* else read didn't finish */
 
-    si4700_rds_read_raw_async_complete(xf->regbuf, rds_data);
-
-    if (rds_process(rds_data))
-        si4700_rds_set_event();
+    if (int_restore)
+        gpio_int_enable(SI4700_EVENT_ID);
 }
 
 /* Callback from si4700_rds_read_raw to execute the read */
@@ -169,10 +174,13 @@ void si4700_read_raw_async(int count)
 }
 
 /* RDS GPIO interrupt handler - start RDS data read */
-void si4700_stc_rds_event(void)
+void INT_SI4700_RDS(void)
 {
-    /* read and clear the interrupt */
-    SI4700_GPIO_STC_RDS_ISR = (1ul << SI4700_GPIO_STC_RDS_LINE);
+    /* mask and clear the interrupt */
+    gpio_int_disable(SI4700_EVENT_ID);
+    gpio_int_clear(SI4700_EVENT_ID);
+
+    /* read the RDS data */
     si4700_rds_read_raw_async(); 
 }
 
@@ -180,13 +188,10 @@ void si4700_stc_rds_event(void)
    powering down */
 void si4700_rds_powerup(bool on)
 {
-    gpio_disable_event(SI4700_STC_RDS_EVENT_ID);
-
-    if (on)
-    {
-        SI4700_GPIO_STC_RDS_ISR = (1ul << SI4700_GPIO_STC_RDS_LINE);
-        gpio_enable_event(SI4700_STC_RDS_EVENT_ID);
-    }
+    int_restore = on;
+    gpio_int_disable(SI4700_EVENT_ID);
+    gpio_int_clear(SI4700_EVENT_ID);
+    gpio_enable_event(SI4700_EVENT_ID, on);
 }
 
 /* One-time RDS init at startup */

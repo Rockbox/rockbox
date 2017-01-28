@@ -46,7 +46,6 @@
 #define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
 #define ADC_READ_ERROR 0xFFFF
 
-void adc_done(void);
 /* Enable conversion of specified channel (if switchoff is possible) */
 bool adc_enable_channel(int channel, bool enable);
 

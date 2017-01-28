@@ -21,7 +21,6 @@
 #ifndef POWER_IMX31_H
 #define POWER_IMX31_H
 
-void charger_main_detect_event(void);
 void charger_usb_detect_event(int status);
 
 #endif /* POWER_IMX31_H */

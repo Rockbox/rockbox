@@ -23,34 +23,33 @@
 #ifndef GPIO_TARGET_H
 #define GPIO_TARGET_H
 
-/* MC13783 GPIO pin info for this target */
-#define MC13783_GPIO_IMR    GPIO1_IMR
-#define MC13783_GPIO_NUM    GPIO1_NUM   
-#define MC13783_GPIO_ISR    GPIO1_ISR
-#define MC13783_GPIO_LINE   31
+/* Gigabeat S definitions for static GPIO event registration */
+#include "gpio-imx31.h"
 
-/* SI4700 GPIO STC/RDS pin info for this target */
-#define SI4700_GPIO_STC_RDS_IMR     GPIO1_IMR
-#define SI4700_GPIO_STC_RDS_NUM     GPIO1_NUM
-#define SI4700_GPIO_STC_RDS_ISR     GPIO1_ISR
-#define SI4700_GPIO_STC_RDS_LINE    27
+#ifdef DEFINE_GPIO_VECTOR_TABLE
+
+GPIO_VECTOR_TBL_START()
+    /* mc13783 keeps the PRIINT high (no low pulse) if other unmasked
+     * interrupts become active when clearing them or if a source being
+     * cleared becomes active at that time. Edge-detection will not get
+     * a rising edge in that case so use high-level sense. */
+    GPIO_EVENT_VECTOR(GPIO1_31, GPIO_SENSE_HIGH_LEVEL)
+#if CONFIG_TUNER
+    /* Generates a 5ms low pulse on the line - detect the falling edge */
+    GPIO_EVENT_VECTOR(GPIO1_27, GPIO_SENSE_FALLING)
+#endif /* CONFIG_TUNER */
+GPIO_VECTOR_TBL_END()
 
 #define GPIO1_INT_PRIO      INT_PRIO_DEFAULT
 
-/* Declare event indexes in priority order in a packed array */
-enum gpio_event_ids
-{
-    /* GPIO1 event IDs */
-    MC13783_EVENT_ID = GPIO1_EVENT_FIRST,
-    SI4700_STC_RDS_EVENT_ID,
-    GPIO1_NUM_EVENTS = 2,
-    /* GPIO2 event IDs */
-    /* none defined */
-    /* GPIO3 event IDs */
-    /* none defined */
-};
+#endif /* DEFINE_GPIO_VECTOR_TABLE */
 
-void mc13783_event(void);
-void si4700_stc_rds_event(void);
+#define INT_MC13783         GPIO1_31_EVENT_CB
+#define MC13783_EVENT_ID    GPIO1_31_ID
+
+#if CONFIG_TUNER
+#define INT_SI4700_RDS      GPIO1_27_EVENT_CB
+#define SI4700_EVENT_ID     GPIO1_27_ID
+#endif /* CONFIG_TUNER */
 
 #endif /* GPIO_TARGET_H */

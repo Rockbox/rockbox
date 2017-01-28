@@ -157,9 +157,9 @@ static void power_button_update(bool pressed)
 }
 
 /* Power button event - called from PMIC ISR */
-void button_power_event(void)
+void MC13783_EVENT_CB_ONOFD1(void)
 {
-    power_button_update(!mc13783_event_sense(MC13783_ONOFD1_EVENT));
+    power_button_update(!mc13783_event_sense());
 }
 
 void button_init_device(void)
@@ -197,7 +197,7 @@ void button_init_device(void)
 
     power_button_update(!(mc13783_read(MC13783_INTERRUPT_SENSE1)
                             & MC13783_ONOFD1S));
-    mc13783_enable_event(MC13783_ONOFD1_EVENT, true);
+    mc13783_enable_event(MC13783_INT_ID_ONOFD1, true);
 
 #ifdef HAVE_HEADPHONE_DETECTION
     headphone_init();
@@ -213,7 +213,7 @@ void button_close_device(void)
     /* Assumes HP detection is not available */
     initialized = false;
 
-    mc13783_enable_event(MC13783_ONOFD1_EVENT, false);
+    mc13783_enable_event(MC13783_INT_ID_ONOFD1, false);
     ext_btn = BUTTON_NONE;
 }
 #endif /* BUTTON_DRIVER_CLOSE */

@@ -1139,10 +1139,8 @@ target/arm/imx31/uart-imx31.c
 target/arm/imx31/gigabeat-s/adc-gigabeat-s.c
 target/arm/imx31/gigabeat-s/backlight-gigabeat-s.c
 target/arm/imx31/gigabeat-s/button-gigabeat-s.c
-target/arm/imx31/gigabeat-s/gpio-gigabeat-s.c
 target/arm/imx31/gigabeat-s/kernel-gigabeat-s.c
 target/arm/imx31/gigabeat-s/i2s-gigabeat-s.c
-target/arm/imx31/gigabeat-s/mc13783-gigabeat-s.c
 target/arm/imx31/gigabeat-s/power-gigabeat-s.c
 target/arm/imx31/gigabeat-s/powermgmt-gigabeat-s.c
 target/arm/imx31/gigabeat-s/system-gigabeat-s.c
