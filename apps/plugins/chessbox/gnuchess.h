@@ -4,7 +4,7 @@
 
 #define neutral 2
 #define white 0
-#define black 1 
+#define black 1
 #define no_piece 0
 #define pawn 1
 #define knight 2
@@ -18,7 +18,7 @@
 #define valueR 550
 #define valueQ 1100
 #define valueK 1200
-
+#define MAX_GAME_CNT 256 /*added 1-29-2017*/
 /* ---- chess engine global types ---- */
 struct GameRec {
     unsigned short gmove;
@@ -39,9 +39,10 @@ extern bool withbook;
 extern long Level;
 extern short TCflag,TCmoves,TCminutes;
 extern short timeout;
-extern short GameCnt,Game50,castld[2],kingmoved[2],OperatorTime;
+extern unsigned char GameCnt; /* uchar rolls over at 255 1-29-2017*/
+extern short Game50,castld[2],kingmoved[2],OperatorTime;
 extern struct TimeControlRec TimeControl;
-extern struct GameRec GameList[240];
+extern struct GameRec GameList[MAX_GAME_CNT];
 
 /* ---- The beginning of a GNUChess v2 APIfication ---- */
 void SetTimeControl(void);
