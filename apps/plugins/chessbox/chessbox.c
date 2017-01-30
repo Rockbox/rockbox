@@ -7,7 +7,7 @@
 *                     \/            \/     \/    \/            \/
 * $Id$
 *
-* Copyright (C) 2006 Miguel A. Arévalo 
+* Copyright (C) 2006 Miguel A. Arévalo
 * Color graphics from eboard
 * GNUChess v2 chess engine Copyright (c) 1988  John Stanback
 *
@@ -20,7 +20,7 @@
 * KIND, either express or implied.
 *
 ****************************************************************************/
- 
+
 #include "plugin.h"
 
 #if (MEMORYSIZE > 8) /* Lowmem doesn't have playback in chessbox */
@@ -60,7 +60,7 @@ extern const fb_data chessbox_pieces[];
 
 /* save files */
 #define SAVE_FILE  PLUGIN_GAMES_DATA_DIR "/chessbox.save"
-
+#define SAVE_FILEDBG  PLUGIN_GAMES_DATA_DIR "/chessbox_dbg.save"
 /* commands enum */
 #define COMMAND_NOP        0
 #define COMMAND_MOVE       1
@@ -80,7 +80,7 @@ short plugin_mode;
 
 /* level+1's string */
 const char *level_string[] = { "Level 1: 60 moves / 5 min" ,
-                        "Level 2: 60 moves / 15 min" , 
+                        "Level 2: 60 moves / 15 min" ,
                         "Level 3: 60 moves / 30 min" ,
                         "Level 4: 40 moves / 30 min" ,
                         "Level 5: 40 moves / 60 min" ,
@@ -120,7 +120,7 @@ static void cb_drawboard (void) {
     short r , c , x , y ;
     short l , piece , p_color ;
     int b_color=1;
-    
+
     rb->lcd_clear_display();
 
     for (r = 0; r < 8; r++) {
@@ -132,8 +132,8 @@ static void cb_drawboard (void) {
             if ( piece == no_piece ) {
                 rb->lcd_bitmap_part ( chessbox_pieces , 0 ,
                                       TILE_HEIGHT * b_color ,
-                                      STRIDE(   SCREEN_MAIN, 
-                                                BMPWIDTH_chessbox_pieces, 
+                                      STRIDE(   SCREEN_MAIN,
+                                                BMPWIDTH_chessbox_pieces,
                                                 BMPHEIGHT_chessbox_pieces) ,
                                       XOFS + x*TILE_WIDTH ,
                                       YOFS + ( 7 - y )*TILE_HEIGHT ,
@@ -146,8 +146,8 @@ static void cb_drawboard (void) {
                                           4 * TILE_HEIGHT * ( piece - 1 ) +
                                           2 * TILE_HEIGHT * p_color +
                                           TILE_HEIGHT * b_color ,
-                                      STRIDE(   SCREEN_MAIN, 
-                                                BMPWIDTH_chessbox_pieces, 
+                                      STRIDE(   SCREEN_MAIN,
+                                                BMPWIDTH_chessbox_pieces,
                                                 BMPHEIGHT_chessbox_pieces) ,
                                       XOFS + x*TILE_WIDTH ,
                                       YOFS + (7 - y)*TILE_HEIGHT ,
@@ -158,7 +158,7 @@ static void cb_drawboard (void) {
         }
         b_color = (b_color == 1) ? 0 : 1 ;
     }
-    
+
     /* draw board limits */
 #if (LCD_WIDTH > TILE_WIDTH*8) && (LCD_HEIGHT > TILE_HEIGHT*8)
     rb->lcd_drawrect(XOFS - 1, YOFS - 1, TILE_WIDTH*8 + 2, TILE_HEIGHT*8 + 2);
@@ -186,7 +186,7 @@ static void cb_switch ( short x , short y ) {
 /* ---- callback for capturing interaction while thinking ---- */
 static void cb_wt_callback ( void ) {
     int button = BUTTON_NONE;
-    
+
     wt_command = COMMAND_NOP;
     button = rb->button_get(false);
     switch (button) {
@@ -264,13 +264,111 @@ static void cb_levelup ( void ) {
         cb_setlevel ( Level+1 );
     rb->splash ( HZ/2 , level_string[Level-1] );
 };
+static void cb_saveposition_dbg ( void )
+{
+    int fd;
+    short sq,i,c;
+    unsigned short temp;
+    char buf[32]="\0";
+    int ch_ct = 0;
 
+    rb->splash ( 0 , "Saving debug" );
+    fd = rb->open(SAVE_FILEDBG, O_WRONLY|O_CREAT, 0666);
+    ch_ct = rb->snprintf(buf,31,"computer = %d, %d bytes\n",computer+1,
+                                                        sizeof(computer));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"opponent = %d, %d bytes\n",opponent,
+                                                        sizeof(opponent));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"Game50 = %d, %d bytes\n",Game50,
+                                                      sizeof(Game50));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"CastldWht = %d, %d bytes\n",castld[white],
+                                                      sizeof(castld[white]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"CastldBlk = %d, %d bytes\n",castld[black],
+                                                      sizeof(castld[black]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"KngMovedWht = %d, %d bytes\n",kingmoved[white],
+                                                      sizeof(kingmoved[white]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"KngMovedBlk = %d, %d bytes\n",kingmoved[black],
+                                                      sizeof(kingmoved[black]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"WithBook = %d, %d bytes\n",withbook,
+                                                      sizeof(withbook));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"Lvl = %ld, %d bytes\n",Level,
+                                                      sizeof(Level));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"TCflag = %d, %d bytes\n",TCflag,
+                                                      sizeof(TCflag));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"OpTime = %d, %d bytes\n",OperatorTime,
+                                                      sizeof(OperatorTime));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"TmCtlClkWht = %ld, %d bytes\n",
+                    TimeControl.clock[white], sizeof(TimeControl.clock[white]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"TmCtlClkBlk = %ld, %d bytes\n",
+                    TimeControl.clock[black],  sizeof(TimeControl.clock[black]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"TmCtlMovesWht = %d, %d bytes\n",
+                   TimeControl.moves[white],  sizeof(TimeControl.moves[white]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"TmCtlMovesBlk = %d, %d bytes\n",
+                   TimeControl.moves[black],  sizeof(TimeControl.moves[black]));
+    rb->write(fd, buf, ch_ct);
+    for (sq = 0; sq < 64; sq++) {
+        if (color[sq] == neutral) c = 0; else c = color[sq]+1;
+        temp = 256*board[sq] + c ;
+        ch_ct = rb->snprintf(buf,31,"sq %02d = %d, %d bytes\n",sq, temp,
+                                                      sizeof(temp));
+        rb->write(fd, buf, ch_ct);
+    }
+    for (i = 0; i <= GameCnt; i++) {
+        ch_ct = rb->snprintf(buf,31,"GameCt %d, %d bytes\n",i,
+                                                      sizeof(GameCnt));
+        rb->write(fd, buf, ch_ct);
+        if (GameList[i].color == neutral)
+        {
+            c = 0;
+            ch_ct = rb->snprintf(buf,31,"color = %d, %d bytes\n",c,
+                                                            sizeof(c));
+            rb->write(fd, buf, ch_ct);
+        }
+        else
+            c = GameList[i].color + 1;
+        ch_ct = rb->snprintf(buf,31,"gmove = %d, %d bytes\n",GameList[i].gmove,
+                                                      sizeof(GameList[i].gmove));
+        rb->write(fd, buf, ch_ct);
+        ch_ct = rb->snprintf(buf,31,"score = %d, %d bytes\n",GameList[i].score,
+                                                      sizeof(GameList[i].score));
+        rb->write(fd, buf, ch_ct);
+        ch_ct = rb->snprintf(buf,31,"depth = %d, %d bytes\n",GameList[i].depth,
+                                                      sizeof(GameList[i].depth));
+        rb->write(fd, buf, ch_ct);
+        ch_ct = rb->snprintf(buf,31,"nodes = %ld, %d bytes\n",GameList[i].nodes,
+                                                      sizeof(GameList[i].nodes));
+        rb->write(fd, buf, ch_ct);
+        ch_ct = rb->snprintf(buf,31,"time = %d, %d bytes\n",GameList[i].time,
+                                                      sizeof(GameList[i].time));
+        rb->write(fd, buf, ch_ct);
+        ch_ct = rb->snprintf(buf,31,"piece = %d, %d bytes\n",GameList[i].piece,
+                                                     sizeof(GameList[i].piece));
+        rb->write(fd, buf, ch_ct);
+        ch_ct = rb->snprintf(buf,31,"color = %d, %d bytes\n",c,sizeof(c));
+        rb->write(fd, buf, ch_ct);
+    }
+    rb->close(fd);
+
+}
 /* ---- Save current position ---- */
 static void cb_saveposition ( void ) {
     int fd;
     short sq,i,c;
     unsigned short temp;
-    
+    cb_saveposition_dbg();
     rb->splash ( 0 , "Saving position" );
 
     fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
@@ -323,7 +421,7 @@ static void cb_restoreposition ( void ) {
     int fd;
     short sq;
     unsigned short m;
-    
+
     if ( (fd = rb->open(SAVE_FILE, O_RDONLY)) >= 0 ) {
         rb->splash ( 0 , "Loading position" );
         rb->read(fd, &(computer), sizeof(computer));
@@ -356,7 +454,7 @@ static void cb_restoreposition ( void ) {
             else
                 --color[sq];
         }
-        GameCnt = -1;
+        GameCnt = 255;/*Unsigned char rollover to 0*/
         while (rb->read(fd, &(GameList[++GameCnt].gmove),
                         sizeof(GameList[GameCnt].gmove)) > 0) {
             rb->read(fd, &(GameList[GameCnt].score),
@@ -393,10 +491,10 @@ static int cb_menu_viewer(void)
     int selection;
     int result = 0;
     bool menu_quit = false;
-    
+
     MENUITEM_STRINGLIST(menu,"Chessbox Menu",NULL,"Restart Game",
-                        "Select Other Game", "Quit");                  
-    
+                        "Select Other Game", "Quit");
+
     while(!menu_quit)
     {
         switch(rb->do_menu(&menu, &selection, NULL, false))
@@ -422,7 +520,7 @@ static int cb_menu_viewer(void)
 static struct cb_command cb_get_viewer_command (void) {
     int button;
     struct cb_command result = { 0, {0,0,0,0,0}, 0 };
-    
+
     /* main loop */
     while ( true ) {
         button = rb->button_get(true);
@@ -476,7 +574,7 @@ static void cb_start_viewer(char* filename){
 
             /* init board */
             GNUChess_Initialize();
-    
+
             /* draw the board */
             cb_drawboard();
 
@@ -494,7 +592,7 @@ static void cb_start_viewer(char* filename){
                             rb->splash ( HZ*2 , "At the begining of the game" );
                             break;
                         }
-                        board[locn[curr_ply->row_from][curr_ply->column_from]] 
+                        board[locn[curr_ply->row_from][curr_ply->column_from]]
                             = board[locn[curr_ply->row_to][curr_ply->column_to]];
                         color[locn[curr_ply->row_from][curr_ply->column_from]]
                             = color[locn[curr_ply->row_to][curr_ply->column_to]];
@@ -601,14 +699,14 @@ static int cb_menu(void)
     int selection;
     int result = 0;
     bool menu_quit = false;
-    
+
     MENUITEM_STRINGLIST(menu,"Chessbox Menu",NULL,"New Game","Resume Game",
                         "Save Game", "Restore Game",
 #ifdef HAVE_PLAYBACK_CONTROL
                         "Playback Control",
 #endif
-                                            "Quit");                  
-    
+                                            "Quit");
+
     while(!menu_quit)
     {
         switch(rb->do_menu(&menu, &selection, NULL, false))
@@ -654,7 +752,7 @@ static struct cb_command cb_getcommand (void) {
     int marked = false , from_marked = false ;
     short marked_x = 0 , marked_y = 0 ;
     struct cb_command result = { 0, {0,0,0,0,0}, 0 };
-    
+
     cb_switch ( x , y );
     /* main loop */
     while ( true ) {
@@ -815,11 +913,11 @@ static void cb_play_game(void) {
 
     /* init PGN history data structures */
     game = pgn_init_game();
-    
+
     /* restore saved position, if saved */
     cb_restoreposition();
     /* TODO: save/restore the PGN history of unfinished games */
-    
+
     /* draw the board */
     /* I don't like configscreens, start game inmediatly */
     cb_drawboard();
@@ -937,7 +1035,7 @@ static void cb_play_game(void) {
                 break;
         }
     }
-    
+
     cb_saveposition();
     /* TODO: save/restore the PGN history of unfinished games */
     rb->lcd_setfont(FONT_UI);
@@ -948,7 +1046,7 @@ static void cb_play_game(void) {
 * plugin entry point.
 ******************************************************************************/
 enum plugin_status plugin_start(const void* parameter) {
-    
+
     /* plugin init */
 
 #if LCD_DEPTH > 1
@@ -957,7 +1055,7 @@ enum plugin_status plugin_start(const void* parameter) {
 
     /* end of plugin init */
 
-    /* if the plugin was invoked as a viewer, parse the file and show the game list 
+    /* if the plugin was invoked as a viewer, parse the file and show the game list
      * else, start playing a game
      */
     if (parameter != NULL) {
