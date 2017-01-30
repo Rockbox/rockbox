@@ -40,7 +40,6 @@ int radio_present = 0;
 static int tuner_frequency = 0;
 static int tuner_signal_power = 0;
 static bool radio_tuned = false;
-static bool rds_event = false;
 
 static char rds_radioname[9];
 static char rds_radioinfo[65];
@@ -421,31 +420,6 @@ int ipod_rmt_tuner_get(int setting)
         case RADIO_STEREO:
             val = true;
             break;
-            
-        case RADIO_EVENT:
-            if (rds_event)
-            {
-                val = 1;
-                rds_event = false;
-            }
-            break;
     }
     return val;
-}
-
-char* ipod_get_rds_info(int setting)
-{
-    char *text = NULL;
-    
-    switch(setting)
-    {
-        case RADIO_RDS_NAME:
-            text = rds_radioname;
-            break;
-
-        case RADIO_RDS_TEXT:
-            text = rds_radioinfo;
-            break;
-    }
-    return text;
 }
