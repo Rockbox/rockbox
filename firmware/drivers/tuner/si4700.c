@@ -213,9 +213,6 @@
 static bool tuner_present = false;
 static uint16_t cache[16];
 static struct mutex fmr_mutex SHAREDBSS_ATTR;
-#ifdef HAVE_RDS_CAP
-static int rds_event = 0;
-#endif
 
 /* reads <len> registers from radio at offset 0x0A into cache */
 static void si4700_read(int len)
@@ -373,6 +370,7 @@ void si4700_init(void)
         si4700_sleep(1);
 
 #ifdef HAVE_RDS_CAP
+        rds_init();
         si4700_rds_init();
 #endif
     }
@@ -528,21 +526,6 @@ int si4700_get(int setting)
         case RADIO_RSSI_MAX:
             val = RSSI_MAX;
             break;
-            
-#ifdef HAVE_RDS_CAP
-        case RADIO_EVENT:
-        {
-        #ifdef RDS_ISR_PROCESSING
-            int oldlevel = disable_irq_save();
-        #endif
-            val = rds_event;
-            rds_event = 0;
-        #ifdef RDS_ISR_PROCESSING
-            restore_irq(oldlevel);
-        #endif
-            break;
-            }
-#endif
     }
 
     mutex_unlock(&fmr_mutex);
@@ -567,77 +550,45 @@ void si4700_dbg_info(struct si4700_dbg_info *nfo)
 
 #ifdef HAVE_RDS_CAP
 
-#ifdef RDS_ISR_PROCESSING
-/* Read raw RDS info for processing - in ISR */
+#if (CONFIG_RDS & RDS_CFG_ISR)
+static unsigned char isr_regbuf[(RDSD - STATUSRSSI + 1) * 2];
 
-/* Assumes regbuf is 32 bytes */
-void si4700_rds_read_raw_async(void)
+/* Called by RDS interrupt on target */
+void si4700_rds_interrupt(void)
 {
-    si4700_read_raw_async((RDSD - STATUSRSSI + 1) * 2);
+    si4700_rds_read_raw_async(isr_regbuf, sizeof (isr_regbuf));
 }
 
-void si4700_rds_read_raw_async_complete(unsigned char *regbuf,
-                                        uint16_t data[4])
+/* Handle RDS event from ISR */
+void si4700_rds_process(void)
 {
-    const int index = (RDSA - STATUSRSSI) * 2;
+    uint16_t rds_data[4];
+    int index = (RDSA - STATUSRSSI) * 2;
 
     for (int i = 0; i < 4; i++) {
-        data[i] = regbuf[index] << 8 | regbuf[index + 1];
-        regbuf += 2;
+        rds_data[i] = isr_regbuf[index] << 8 | isr_regbuf[index + 1];
+        index += 2;
     }
+
+    rds_process(rds_data);
 }
 
-/* Set the event flag */
-void si4700_rds_set_event(void)
-{
-    rds_event = 1;
-}
+#else /* !(CONFIG_RDS & RDS_CFG_ISR) */
 
-#else /* ndef RDS_ISR_PROCESSING */
-/* Read raw RDS info for processing */
-bool si4700_rds_read_raw(uint16_t data[4])
+/* Handle RDS event from thread */
+void si4700_rds_process(void)
 {
-    bool retval = false;
-
     mutex_lock(&fmr_mutex);
 
     if (tuner_powered())
     {
         si4700_read_reg(RDSD);
-        memcpy(data, &cache[RDSA], 4 * sizeof (uint16_t));
-        retval = true;
+        rds_process(&cache[RDSA]);
     }
 
     mutex_unlock(&fmr_mutex);
-
-    return retval;   
 }
+#endif /* (CONFIG_RDS & RDS_CFG_ISR) */
 
-/* Set the event flag */
-void si4700_rds_set_event(void)
-{
-    mutex_lock(&fmr_mutex);
-    rds_event = 1;
-    mutex_unlock(&fmr_mutex);
-}
-#endif /* RDS_ISR_PROCESSING */
-
-char * si4700_get_rds_info(int setting)
-{
-    char *text = NULL;
-    
-    switch(setting)
-    {
-        case RADIO_RDS_NAME:
-            text = rds_get_ps();
-            break;
-
-        case RADIO_RDS_TEXT:
-            text = rds_get_rt();
-            break;
-    }
-
-    return text;
-}
 #endif /* HAVE_RDS_CAP */
 

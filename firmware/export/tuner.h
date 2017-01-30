@@ -25,6 +25,10 @@
 #include "config.h"
 #include "hwcompat.h"
 
+#ifdef HAVE_RDS_CAP
+#include <sys/types.h>
+#endif
+
 /** Settings to the tuner layer **/
 enum
 {
@@ -45,8 +49,6 @@ enum
     RADIO_PRESENT = 0,
     RADIO_TUNED,
     RADIO_STEREO,
-    /* RADIO_EVENT is an event that requests a screen update */
-    RADIO_EVENT,
     RADIO_RSSI,
     RADIO_RSSI_MIN,
     RADIO_RSSI_MAX,
@@ -57,15 +59,20 @@ enum
 
 #ifdef HAVE_RDS_CAP
 /** Readback from the tuner RDS layer **/
-enum
+/* returns needed size if buffer size is inadequate */
+size_t tuner_get_rds_info(int setting, void *dst, size_t dstsize);
+
+enum RADIO_RDS_INFO
 {
-    RADIO_RDS_NAME,
-    RADIO_RDS_TEXT,
+    RADIO_RDS_NAME,         /* dst: array of char, dstsize: buffer size */
+    RADIO_RDS_TEXT,         /* dst: array of char, dstsize: buffer size */
+    RADIO_RDS_PROGRAM_INFO, /* dst: uint16_t *, dstsize: >= sizeof(uint16_t) */
+    RADIO_RDS_CURRENT_TIME, /* dst: time_t *, dstsize: >= sizeof(time_t) */
 
     /* Put new general-purpose readback values above this line */
     __RADIO_GET_RDS_INFO_STANDARD_LAST
 };
-#endif
+#endif /* HAVE_RDS_CAP */
 
 /** Tuner regions **/
 

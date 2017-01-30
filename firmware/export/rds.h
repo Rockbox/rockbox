@@ -18,18 +18,45 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef RDS_H
+#define RDS_H
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "time.h"
 
 void rds_init(void);
-
 void rds_reset(void);
-bool rds_process(uint16_t data[4]);
+void rds_sync(void);
 
-uint16_t rds_get_pi(void);
-char* rds_get_ps(void);
-char* rds_get_rt(void);
-time_t rds_get_ct(void);
+#if (CONFIG_RDS & RDS_CFG_PROCESS)
+/* RDS raw data processing */
+void rds_process(const uint16_t data[4]);
+#endif /* (CONFIG_RDS & RDS_CFG_PROCESS) */
 
+enum rds_info_id
+{
+    RDS_INFO_NULL = 0,
+    RDS_INFO_CODEABLE,  /* code table, right now only G0 */
+    RDS_INFO_PI,        /* programme identifier */
+    RDS_INFO_PS,        /* programme service name */
+    RDS_INFO_RT,        /* radio text */
+    RDS_INFO_CT,        /* clock time */
+};
 
+enum rds_code_table
+{
+    RDS_CT_G0,          /* default code table G0 */
+    RDS_CT_G1,          /* alternate code table G1 */
+    RDS_CT_G2,          /* alternate code table G2 */
+};
+
+#if (CONFIG_RDS & RDS_CFG_PUSH)
+/* pushes preprocesed RDS information */
+void rds_push_info(enum rds_info_id info_id, uintptr_t data, size_t size);
+#endif /* (CONFIG_RDS & RDS_CFG_PUSH) */
+
+/* read fully-processed RDS data */
+size_t rds_pull_info(enum rds_info_id info_id, uintptr_t data, size_t size);
+
+#endif /* RDS_H */

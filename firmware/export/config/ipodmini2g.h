@@ -164,6 +164,7 @@
 /* Define Apple remote tuner */
 #define CONFIG_TUNER IPOD_REMOTE_TUNER
 #define HAVE_RDS_CAP
+#define CONFIG_RDS RDS_CFG_PUSH
 
 /* Define this if you have a PortalPlayer PP5022 */
 #define CONFIG_CPU PP5022

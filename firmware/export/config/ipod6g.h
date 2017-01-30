@@ -167,6 +167,7 @@
 /* Define Apple remote tuner */
 //#define CONFIG_TUNER IPOD_REMOTE_TUNER
 //#define HAVE_RDS_CAP
+//#define CONFIG_RDS RDS_CFG_PUSH
 
 /* The exact type of CPU */
 #define CONFIG_CPU S5L8702

@@ -121,7 +121,7 @@
 /* Define this if you have a SI4700 fm radio tuner */
 #define CONFIG_TUNER SI4700
 #define HAVE_RDS_CAP
-#define RDS_ISR_PROCESSING
+#define CONFIG_RDS (RDS_CFG_ISR | RDS_CFG_PROCESS)
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP

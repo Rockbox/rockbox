@@ -35,7 +35,6 @@
 #include "generic_i2c.h"
 #include "fmradio_i2c.h"
 #include "thread.h"
-#include "rds.h"
 
 #if     defined(SANSA_CLIP) || defined(SANSA_C200V2)
 #define I2C_SCL_GPIO(x) GPIOB_PIN(x)
@@ -203,13 +202,9 @@ void tuner_isr(void)
 /* Captures RDS data and processes it */
 static void NORETURN_ATTR rds_thread(void)
 {
-    uint16_t rds_data[4];
-
     while (true) {
         semaphore_wait(&rds_sema, TIMEOUT_BLOCK);
-        if (si4700_rds_read_raw(rds_data) && rds_process(rds_data)) {
-            si4700_rds_set_event();
-        }
+        si4700_rds_process();
     }
 }
 
@@ -233,7 +228,6 @@ void si4700_rds_powerup(bool on)
 void si4700_rds_init(void)
 {
     semaphore_init(&rds_sema, 1, 0);
-    rds_init();
     create_thread(rds_thread, rds_stack, sizeof(rds_stack), 0, "rds"
                   IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
 }

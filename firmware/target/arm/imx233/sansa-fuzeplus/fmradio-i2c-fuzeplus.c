@@ -23,7 +23,6 @@
 #include "system.h"
 #include "kernel.h"
 #include "pinctrl-imx233.h"
-#include "rds.h"
 #include "si4700.h"
 
 /**
@@ -52,13 +51,11 @@ static void stc_rds_callback(int bank, int pin, intptr_t user)
 /* Captures RDS data and processes it */
 static void NORETURN_ATTR rds_thread(void)
 {
-    uint16_t rds_data[4];
-
     while(true)
     {
         semaphore_wait(&rds_sema, TIMEOUT_BLOCK);
-        if(si4700_rds_read_raw(rds_data) && rds_process(rds_data))
-            si4700_rds_set_event();
+        si4700_rds_process();
+
         /* renable callback */
         imx233_pinctrl_setup_irq(2, 27, true, true, false, &stc_rds_callback, 0);
     }
@@ -86,7 +83,6 @@ void si4700_rds_powerup(bool on)
 void si4700_rds_init(void)
 {
     semaphore_init(&rds_sema, 1, 0);
-    rds_init();
     create_thread(rds_thread, rds_stack, sizeof(rds_stack), 0, "rds"
         IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
 }
