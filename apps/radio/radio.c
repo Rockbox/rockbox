@@ -696,10 +696,6 @@ void radio_screen(void)
 
             default:
                 default_event_handler(button);
-#ifdef HAVE_RDS_CAP
-                if (tuner_get(RADIO_EVENT))
-                    update_type = SKIN_REFRESH_ALL;
-#endif
                 if (!tuner_get(RADIO_PRESENT))
                 {
 #if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)

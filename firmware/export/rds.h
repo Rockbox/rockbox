@@ -18,18 +18,22 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef RDS_H
+#define RDS_H
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "time.h"
 
 void rds_init(void);
-
 void rds_reset(void);
-bool rds_process(uint16_t data[4]);
+
+void rds_sync(void);
+void rds_process(const uint16_t data[4]);
 
 uint16_t rds_get_pi(void);
-char* rds_get_ps(void);
-char* rds_get_rt(void);
+size_t rds_get_ps(char *dst, size_t dstsize);
+size_t rds_get_rt(char *dst, size_t dstsize);
 time_t rds_get_ct(void);
 
-
+#endif /* RDS_H */
