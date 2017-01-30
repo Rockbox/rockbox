@@ -260,7 +260,6 @@ bool __dbg_dvfs_dptc(void)
     unsigned long ltw[4];
     bool ltwassert[4];
 
-    lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
     dvfs_mask = dvfs_level_mask();
@@ -274,6 +273,8 @@ bool __dbg_dvfs_dptc(void)
         int line = 0;
 
         int button = button_get_w_tmo(HZ/10);
+
+        lcd_clear_display();
 
         if (dvfs_wp < 0)
             strcpy(buf, "Auto");
