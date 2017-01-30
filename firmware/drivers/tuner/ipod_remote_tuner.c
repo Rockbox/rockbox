@@ -30,6 +30,7 @@
 #include "adc.h"
 #include "settings.h"
 #include "power.h"
+#include "rds.h"
 
 static unsigned char tuner_param = 0x00, old_tuner_param = 0xFF;
 /* temp var for tests to avoid looping execution in submenus settings*/
@@ -40,7 +41,6 @@ int radio_present = 0;
 static int tuner_frequency = 0;
 static int tuner_signal_power = 0;
 static bool radio_tuned = false;
-static bool rds_event = false;
 
 static char rds_radioname[9];
 static char rds_radioinfo[65];
@@ -90,6 +90,7 @@ static void rmt_tuner_sleep(int state)
 {
     if (state == 0)
     {
+        rds_init();
         tuner_param = 0x00;
         old_tuner_param = 0xFF;
         mono_mode = -1;
@@ -273,13 +274,12 @@ void rmt_tuner_rds_data(unsigned int len, const unsigned char *buf)
 {
     if (buf[2] == 0x1E)
     {
-        strlcpy(rds_radioname,buf+4,8);
+        rds_push_info(RDS_INFO_PS, (uintptr_t)(buf+4), 8);
     }
     else if(buf[2] == 0x04)
     {
-        strlcpy(rds_radioinfo,buf+4,len-4);
+        rds_push_info(RDS_INFO_RT, (uintptr_t)(buf+4), len-4);
     }
-    rds_event = true;
 }
     
 /* tuner abstraction layer: set something to the tuner */
@@ -421,31 +421,6 @@ int ipod_rmt_tuner_get(int setting)
         case RADIO_STEREO:
             val = true;
             break;
-            
-        case RADIO_EVENT:
-            if (rds_event)
-            {
-                val = 1;
-                rds_event = false;
-            }
-            break;
     }
     return val;
-}
-
-char* ipod_get_rds_info(int setting)
-{
-    char *text = NULL;
-    
-    switch(setting)
-    {
-        case RADIO_RDS_NAME:
-            text = rds_radioname;
-            break;
-
-        case RADIO_RDS_TEXT:
-            text = rds_radioinfo;
-            break;
-    }
-    return text;
 }

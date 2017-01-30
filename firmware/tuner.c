@@ -24,6 +24,9 @@
 #include "kernel.h"
 #include "tuner.h"
 #include "fmradio.h"
+#ifdef HAVE_RDS_CAP
+#include "rds.h"
+#endif /* HAVE_RDS_CAP */
 
 /* General region information */
 const struct fm_region_data fm_region_data[TUNER_NUM_REGIONS] =
@@ -102,4 +105,24 @@ void tuner_init(void)
     #endif
     }
 }
+
+#ifdef HAVE_RDS_CAP
+size_t tuner_get_rds_info(int setting, void *dst, size_t dstsize)
+{
+    /* TODO: integrate this into tuner_get/set */
+    static const unsigned char info_id_tbl[] =
+    {
+        [RADIO_RDS_NAME]         = RDS_INFO_PS,
+        [RADIO_RDS_TEXT]         = RDS_INFO_RT,
+        [RADIO_RDS_PROGRAM_INFO] = RDS_INFO_PI,
+        [RADIO_RDS_CURRENT_TIME] = RDS_INFO_CT,
+    };
+
+    if ((unsigned int)setting >= ARRAYLEN(info_id_tbl))
+        return 0;
+
+    return rds_pull_info(info_id_tbl[setting], (uintptr_t)dst, dstsize);
+}
+#endif /* HAVE_RDS_CAP */
+
 #endif /* SIMULATOR */

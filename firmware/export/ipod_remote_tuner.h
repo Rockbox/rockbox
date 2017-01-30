@@ -33,13 +33,10 @@ extern void rmt_tuner_rds_data(unsigned int len, const unsigned char *buf);
 
 int ipod_rmt_tuner_set(int setting, int value);
 int ipod_rmt_tuner_get(int setting);
-char* ipod_get_rds_info(int setting);
-
 
 #ifndef CONFIG_TUNER_MULTI
 #define tuner_set ipod_rmt_tuner_set
 #define tuner_get ipod_rmt_tuner_get
-#define tuner_get_rds_info ipod_get_rds_info
 #endif
 
 #endif /* _IPOD_REMOTE_TUNER_H_ */

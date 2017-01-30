@@ -712,6 +712,16 @@ Lyre prototype 1 */
 #define BATTERY_CAPACITY_INC 0
 #endif
 
+#ifdef HAVE_RDS_CAP
+/* combinable bitflags */
+#define RDS_CFG_ISR     0x1 /* uses ISR to process packets */
+#define RDS_CFG_PROCESS 0x2 /* uses raw packet processing */
+#define RDS_CFG_PUSH    0x4 /* pushes processed information */
+#ifndef CONFIG_RDS
+#define CONFIG_RDS  RDS_CFG_PROCESS /* thread processing+raw processing */
+#endif /* CONFIG_RDS */
+#endif /* HAVE_RDS_CAP */
+
 #ifndef CONFIG_ORIENTATION
 #if LCD_HEIGHT > LCD_WIDTH
 #define CONFIG_ORIENTATION SCREEN_PORTRAIT
