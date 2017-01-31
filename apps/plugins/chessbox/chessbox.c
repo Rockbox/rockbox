@@ -26,8 +26,7 @@
 #if (MEMORYSIZE > 8) /* Lowmem doesn't have playback in chessbox */
 #define HAVE_PLAYBACK_CONTROL
 #endif
-
-
+/*#define CHESSBOX_SAVE_FILE_DBG  PLUGIN_GAMES_DATA_DIR "/chessbox_dbg.save"*/
 #ifdef HAVE_PLAYBACK_CONTROL
 #include "lib/playback_control.h"
 #endif
@@ -265,12 +264,117 @@ static void cb_levelup ( void ) {
     rb->splash ( HZ/2 , level_string[Level-1] );
 };
 
+#ifdef CHESSBOX_SAVE_FILE_DBG
+/* Save a debug file with names, variables, and sizes */
+static void cb_saveposition_dbg ( void )
+{
+    int fd;
+    short sq,i,c;
+    unsigned short temp;
+    char buf[32]="\0";
+    int ch_ct = 0;
+
+    rb->splash ( 0 , "Saving debug" );
+    fd = rb->open(CHESSBOX_SAVE_FILE_DBG, O_WRONLY|O_CREAT, 0666);
+    ch_ct = rb->snprintf(buf,31,"computer = %d, %d bytes\n",computer+1,
+                                                        sizeof(computer));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"opponent = %d, %d bytes\n",opponent+1,
+                                                        sizeof(opponent));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"Game50 = %d, %d bytes\n",Game50,
+                                                      sizeof(Game50));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"CastldWht = %d, %d bytes\n",castld[white],
+                                                      sizeof(castld[white]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"CastldBlk = %d, %d bytes\n",castld[black],
+                                                      sizeof(castld[black]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"KngMovedWht = %d, %d bytes\n",kingmoved[white],
+                                                      sizeof(kingmoved[white]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"KngMovedBlk = %d, %d bytes\n",kingmoved[black],
+                                                      sizeof(kingmoved[black]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"WithBook = %d, %d bytes\n",withbook,
+                                                      sizeof(withbook));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"Lvl = %ld, %d bytes\n",Level,
+                                                      sizeof(Level));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"TCflag = %d, %d bytes\n",TCflag,
+                                                      sizeof(TCflag));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"OpTime = %d, %d bytes\n",OperatorTime,
+                                                      sizeof(OperatorTime));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"TmCtlClkWht = %ld, %d bytes\n",
+                    TimeControl.clock[white], sizeof(TimeControl.clock[white]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"TmCtlClkBlk = %ld, %d bytes\n",
+                    TimeControl.clock[black],  sizeof(TimeControl.clock[black]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"TmCtlMovesWht = %d, %d bytes\n",
+                   TimeControl.moves[white],  sizeof(TimeControl.moves[white]));
+    rb->write(fd, buf, ch_ct);
+    ch_ct = rb->snprintf(buf,31,"TmCtlMovesBlk = %d, %d bytes\n",
+                   TimeControl.moves[black],  sizeof(TimeControl.moves[black]));
+    rb->write(fd, buf, ch_ct);
+    for (sq = 0; sq < 64; sq++) {
+        if (color[sq] == neutral) c = 0; else c = color[sq]+1;
+        temp = 256*board[sq] + c ;
+        ch_ct = rb->snprintf(buf,31,"sq %02d = %d, %d bytes\n",sq, temp,
+                                                      sizeof(temp));
+        rb->write(fd, buf, ch_ct);
+    }
+    for (i = 0; i <= GameCnt; i++) {
+        ch_ct = rb->snprintf(buf,31,"GameCt %d, %d bytes\n",i,
+                                                      sizeof(GameCnt));
+        rb->write(fd, buf, ch_ct);
+        if (GameList[i].color == neutral)
+        {
+            c = 0;
+            ch_ct = rb->snprintf(buf,31,"color = %d, %d bytes\n",c,
+                                                            sizeof(c));
+            rb->write(fd, buf, ch_ct);
+        }
+        else
+            c = GameList[i].color + 1;
+        ch_ct = rb->snprintf(buf,31,"gmove = %d, %d bytes\n",GameList[i].gmove,
+                                                      sizeof(GameList[i].gmove));
+        rb->write(fd, buf, ch_ct);
+        ch_ct = rb->snprintf(buf,31,"score = %d, %d bytes\n",GameList[i].score,
+                                                      sizeof(GameList[i].score));
+        rb->write(fd, buf, ch_ct);
+        ch_ct = rb->snprintf(buf,31,"depth = %d, %d bytes\n",GameList[i].depth,
+                                                      sizeof(GameList[i].depth));
+        rb->write(fd, buf, ch_ct);
+        ch_ct = rb->snprintf(buf,31,"nodes = %ld, %d bytes\n",GameList[i].nodes,
+                                                      sizeof(GameList[i].nodes));
+        rb->write(fd, buf, ch_ct);
+        ch_ct = rb->snprintf(buf,31,"time = %d, %d bytes\n",GameList[i].time,
+                                                      sizeof(GameList[i].time));
+        rb->write(fd, buf, ch_ct);
+        ch_ct = rb->snprintf(buf,31,"piece = %d, %d bytes\n",GameList[i].piece,
+                                                     sizeof(GameList[i].piece));
+        rb->write(fd, buf, ch_ct);
+        ch_ct = rb->snprintf(buf,31,"color = %d, %d bytes\n",c,sizeof(c));
+        rb->write(fd, buf, ch_ct);
+    }
+    rb->close(fd);
+
+}
+#endif
+
 /* ---- Save current position ---- */
 static void cb_saveposition ( void ) {
     int fd;
     short sq,i,c;
     unsigned short temp;
-
+#ifdef CHESSBOX_SAVE_FILE_DBG
+    cb_saveposition_dbg();
+#endif
     rb->splash ( 0 , "Saving position" );
 
     fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
@@ -356,7 +460,7 @@ static void cb_restoreposition ( void ) {
             else
                 --color[sq];
         }
-        GameCnt = -1;
+        GameCnt = MAX_GAME_CNT - 1; /*uchar rollsover to 0 after 255*/
         while (rb->read(fd, &(GameList[++GameCnt].gmove),
                         sizeof(GameList[GameCnt].gmove)) > 0) {
             rb->read(fd, &(GameList[GameCnt].score),

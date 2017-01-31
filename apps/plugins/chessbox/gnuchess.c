@@ -103,8 +103,9 @@ short INCscore;
 short HasPawn[2],HasKnight[2],HasBishop[2],HasRook[2],HasQueen[2];
 short ChkFlag[maxdepth],CptrFlag[maxdepth],PawnThreat[maxdepth];
 short Pscore[maxdepth],Tscore[maxdepth],Threat[maxdepth];
-struct GameRec GameList[240];
-short GameCnt,Game50,epsquare,lpost,rcptr,contempt;
+struct GameRec GameList[MAX_GAME_CNT];
+unsigned char GameCnt; /*Bug fix now rolls over instead of overflow*/
+short Game50,epsquare,lpost,rcptr,contempt;
 short MaxSearchDepth,Xscore;
 struct TimeControlRec TimeControl;
 short TCflag,TCmoves,TCminutes,OperatorTime;
@@ -1132,7 +1133,7 @@ static short i,alpha,beta,score,tempb,tempc,tempsf,tempst,xside,rpt;
       if (--TimeControl.moves[side] == 0) SetTimeControl();
     }
   if ((root->flags & draw) && bothsides) quit = true;
-  if (GameCnt > 238) quit = true;
+  if (GameCnt > MAX_GAME_CNT - 2) quit = true;
   player = xside;
   Sdepth = 0;
   return(0);
@@ -2319,7 +2320,7 @@ void NewGame()  {
   xwndw = 90;
   MaxSearchDepth = 29;
   contempt = 0;
-  GameCnt = -1; Game50 = 0;
+  GameCnt = MAX_GAME_CNT - 1; Game50 = 0;
   Zwmtl = Zbmtl = 0;
   Developed[white] = Developed[black] = false;
   castld[white] = castld[black] = false;
