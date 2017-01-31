@@ -1,7 +1,7 @@
 
 #ifndef _GNUCHESS_H_
 #define _GNUCHESS_H_
-
+#define MAX_GAME_CNT 256
 #define neutral 2
 #define white 0
 #define black 1
@@ -39,9 +39,10 @@ extern bool withbook;
 extern long Level;
 extern short TCflag,TCmoves,TCminutes;
 extern short timeout;
-extern short GameCnt,Game50,castld[2],kingmoved[2],OperatorTime;
+extern unsigned char GameCnt; /* Bug fix rolls over at 255 instead of overflow */
+extern short Game50,castld[2],kingmoved[2],OperatorTime;
 extern struct TimeControlRec TimeControl;
-extern struct GameRec GameList[240];
+extern struct GameRec GameList[MAX_GAME_CNT];
 
 /* ---- The beginning of a GNUChess v2 APIfication ---- */
 void SetTimeControl(void);
