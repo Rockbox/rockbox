@@ -159,9 +159,10 @@ static char pgn_from_piece(unsigned short piece, unsigned short color){
     return pgn_piece;
 }
 
-static void pgn_to_coords(struct pgn_ply_node* ply){
+static bool pgn_to_coords(struct pgn_ply_node* ply){
+    bool success = true;
     unsigned short str_length = rb->strlen(ply->pgn_text);
-    char str[10];
+    char str[9];
     rb->strcpy(str,ply->pgn_text);
     ply->column_from = 0xFF;
     ply->row_from = 0xFF;
@@ -172,6 +173,7 @@ static void pgn_to_coords(struct pgn_ply_node* ply){
     ply->enpassant = false;
     ply->castle = false;
     ply->promotion = false;
+
     unsigned short i, j, piece;
     bool found = false;
 
@@ -342,16 +344,25 @@ static void pgn_to_coords(struct pgn_ply_node* ply){
     /* leave a very complete log of the parsing of the game while it gets stable */
     for (i=0;i<8;i++){
         for (j=0;j<8;j++) {
+
             rb->fdprintf(loghandler,"%c",pgn_from_piece(board[locn[7-i][j]],color[locn[7-i][j]]));
         }
         rb->fdprintf(loghandler,"\n");
     }
-
+    /* check bounds of row and columns should be 0-7 bad .pgn returns 0xFF */
+    if ((ply->row_to | ply->column_to | ply->row_from | ply->column_from) < 8)
+    {
     /* update the board */
-    board[locn[ply->row_to][ply->column_to]] = board[locn[ply->row_from][ply->column_from]];
-    color[locn[ply->row_to][ply->column_to]] = color[locn[ply->row_from][ply->column_from]];
-    board[locn[ply->row_from][ply->column_from]] = no_piece;
-    color[locn[ply->row_from][ply->column_from]] = neutral;
+        board[locn[ply->row_to][ply->column_to]] =
+                                   board[locn[ply->row_from][ply->column_from]];
+        color[locn[ply->row_to][ply->column_to]] =
+                                    color[locn[ply->row_from][ply->column_from]];
+        board[locn[ply->row_from][ply->column_from]] = no_piece;
+        color[locn[ply->row_from][ply->column_from]] = neutral;
+    }
+    else
+        success = false; /*ERROR*/
+    return success;
 }
 
 static void coords_to_pgn(struct pgn_ply_node* ply){
@@ -657,9 +668,10 @@ void pgn_parse_game(const char* filename,
                     struct pgn_game_node* selected_game){
     struct pgn_ply_node size_ply, *first_ply = NULL;
     struct pgn_ply_node *temp_ply = NULL, *curr_node = NULL;
+    bool success = true;
     int fhandler, i;
     char line_buffer[128];
-    char token_buffer[10];
+    char token_buffer[9];
     unsigned short pos;
     unsigned short curr_player = white;
 
@@ -685,24 +697,35 @@ void pgn_parse_game(const char* filename,
                 || (token_buffer[0] >= 'a' && token_buffer[0] <= 'z')
                 || (token_buffer[0] == '0' && token_buffer[2] != '1')){
                 temp_ply = (struct pgn_ply_node *)pl_malloc(sizeof size_ply);
-                temp_ply->player = curr_player;
-                curr_player = (curr_player==white)?black:white;
-                rb->strcpy(temp_ply->pgn_text, token_buffer);
-                pgn_to_coords(temp_ply);
-                temp_ply->prev_node = NULL;
-                temp_ply->next_node = NULL;
-                if (first_ply == NULL) {
-                    first_ply = curr_node = temp_ply;
-                } else {
-                    curr_node->next_node = temp_ply;
-                    temp_ply->prev_node = curr_node;
-                    curr_node = temp_ply;
-                }
-                rb->fdprintf(loghandler,
-                    "player: %u; pgn: %s; from: %u,%u; to: %u,%u; taken: %u.\n",
+                /* Null pointer can be returned from pl_malloc check for this */
+                if (temp_ply)
+                {
+                    temp_ply->player = curr_player;
+                    curr_player = (curr_player==white)?black:white;
+                    rb->strcpy(temp_ply->pgn_text, token_buffer);
+                    success = pgn_to_coords(temp_ply);
+                    temp_ply->prev_node = NULL;
+                    temp_ply->next_node = NULL;
+                    if (first_ply == NULL && success) {
+                        first_ply = curr_node = temp_ply;
+                    } else if (success){
+                        curr_node->next_node = temp_ply;
+                        temp_ply->prev_node = curr_node;
+                        curr_node = temp_ply;
+                    } else{
+                       /* bad .pgn break loop and notify user */
+                       first_ply = NULL;
+                        break;
+                    }
+
+                    rb->fdprintf(loghandler,
+                        "player: %u; pgn: %s; from: %u,%u; to: %u,%u; taken: %u.\n",
                              temp_ply->player, temp_ply->pgn_text, temp_ply->row_from,
                              temp_ply->column_from, temp_ply->row_to,
                              temp_ply->column_to, temp_ply->taken_piece);
+                }
+                else
+                    first_ply = NULL;
             }
         }
     }
@@ -719,6 +742,7 @@ void pgn_parse_game(const char* filename,
         curr_node->next_node = temp_ply;
     }
     selected_game->first_ply = first_ply;
+
     rb->close(fhandler);
 }
 
