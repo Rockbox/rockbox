@@ -24,6 +24,10 @@
 #include "file.h"
 #include "rb-loader.h"
 #include "loader_strerror.h"
+#ifdef HAVE_MULTIVOLUME
+#include "mv.h"
+#include "pathfuncs.h"
+#endif
 
 /* Load firmware image in a format created by add method of tools/scramble
  * on success we return size loaded image
@@ -33,7 +37,7 @@
 int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
 {
     char filename[MAX_PATH];
-    int fd;
+    int fd = -1;
     int rc;
     int len;
     int ret = 0;
@@ -41,21 +45,45 @@ int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
     unsigned long sum;
     int i;
 
-    /* only filename passed */
     if (firmware[0] != '/')
     {
-        /* First check in BOOTDIR */
-        snprintf(filename, sizeof(filename), BOOTDIR "/%s",firmware);
-
-        fd = open(filename, O_RDONLY);
-        if(fd < 0)
+        /*If multivolume check volume highest index to lowest for firmware file*/
+#ifdef HAVE_MULTIVOLUME
+        char buf_vol_name[VOL_MAX_LEN+1] = "\0";
+        for (int i = NUM_VOLUMES; i > 0 && fd < 0; i--)
         {
-            /* Check in root dir */
-            snprintf(filename, sizeof(filename),"/%s",firmware);
+            get_volume_name(i-1, buf_vol_name);
+            /* First check in BOOTDIR */
+            snprintf(filename, sizeof(filename), "/%s" BOOTDIR "/%s",
+                                                 buf_vol_name,
+                                                 firmware);
             fd = open(filename, O_RDONLY);
-
             if (fd < 0)
-                return EFILE_NOT_FOUND;
+            {
+                /* Check in root dir */
+                snprintf(filename, sizeof(filename), "/%s/%s",
+                                                     buf_vol_name,
+                                                     firmware);
+                fd = open(filename, O_RDONLY);
+            }
+            /*if fd is valid break from loop to continue loading */
+        }
+#endif
+        /* Fallback to standard */
+        if (fd < 0)
+        {
+            snprintf(filename, sizeof(filename), BOOTDIR "/%s",firmware);
+
+            fd = open(filename, O_RDONLY);
+            if(fd < 0)
+            {
+                /* Check in root dir */
+                snprintf(filename, sizeof(filename),"/%s",firmware);
+                fd = open(filename, O_RDONLY);
+
+                if (fd < 0)
+                    return EFILE_NOT_FOUND;
+            }
         }
     }
     else
@@ -112,4 +140,3 @@ end:
     close(fd);
     return ret;
 }
-
