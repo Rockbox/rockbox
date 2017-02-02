@@ -419,4 +419,9 @@ static inline void blocker_splay_init(struct blocker_splay *blsplay)
     corelock_init(&blsplay->cl);
 }
 
+static inline long get_tmo_tick(struct thread_entry *thread)
+{
+    return thread->tmo_tick;
+}
+
 #endif /* THREAD_INTERNAL_H */

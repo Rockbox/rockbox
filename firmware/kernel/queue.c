@@ -339,9 +339,6 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
     oldlevel = disable_irq_save();
 
-    if (ticks != TIMEOUT_NOBLOCK)
-        ASSERT_CPU_MODE(CPU_MODE_THREAD_CONTEXT, oldlevel);
-
     corelock_lock(&q->cl);
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
@@ -351,12 +348,17 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
 
     rd = q->read;
     wr = q->write;
-    if (rd == wr && ticks != 0)
+
+    if(rd != wr || ticks == 0)
+        ; /* no block */
+    else while(1)
     {
+        ASSERT_CPU_MODE(CPU_MODE_THREAD_CONTEXT, oldlevel);
+
         struct thread_entry *current = __running_self_entry();
         block_thread(current, ticks, &q->queue, NULL);
-        corelock_unlock(&q->cl);    
 
+        corelock_unlock(&q->cl);
         switch_thread();
 
         disable_irq();
@@ -365,29 +367,41 @@ void queue_wait_w_tmo(struct event_queue *q, struct queue_event *ev, int ticks)
         rd = q->read;
         wr = q->write;
 
-        wait_queue_try_remove(current);
+        if(rd != wr)
+            break;
+
+        if(ticks < 0)
+            continue; /* empty again, infinite block */
+
+        /* timeout is legit if thread is still queued and awake */
+        if(LIKELY(wait_queue_try_remove(current)))
+            break;
+
+        /* we mustn't return earlier than expected wait time */
+        ticks = get_tmo_tick(current) - current_tick;
+        if(ticks <= 0)
+            break;
     }
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-    if(ev)
+    if(UNLIKELY(!ev))
+        ; /* just waiting for something */
+    else
 #endif
+    if(rd != wr)
     {
-        /* no worry about a removed message here - status is checked inside
-           locks - perhaps verify if timeout or false alarm */
-        if (rd != wr)
-        {
-            q->read = rd + 1;
-            rd &= QUEUE_LENGTH_MASK;
-            *ev = q->events[rd];
-            /* Get data for a waiting thread if one */
-            queue_do_fetch_sender(q->send, rd);
-        }
-        else
-        {
-            ev->id = SYS_TIMEOUT;
-        }
+        q->read = rd + 1;
+        rd &= QUEUE_LENGTH_MASK;
+        *ev = q->events[rd];
+
+        /* Get data for a waiting thread if one */
+        queue_do_fetch_sender(q->send, rd);
     }
-    /* else just waiting on non-empty */
+    else
+    {
+        ev->id   = SYS_TIMEOUT;
+        ev->data = 0;
+    }
 
     corelock_unlock(&q->cl);
     restore_irq(oldlevel);
