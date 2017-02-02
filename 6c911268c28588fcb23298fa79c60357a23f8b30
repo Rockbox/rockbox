@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fb443fb_bc07c118",
+        "filename": "firmware/drivers/audio/nwzlinux-codec.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2017-02-02T14:27:38Z",
+      "side": 1,
+      "message": "function name implies HEAP",
+      "revId": "6c911268c28588fcb23298fa79c60357a23f8b30",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fb443fb_9c0c053c",
+        "filename": "firmware/drivers/audio/nwzlinux-codec.c",
+        "patchSetId": 18
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1000020
+      },
+      "writtenOn": "2017-02-02T14:27:38Z",
+      "side": 1,
+      "message": "debug thing?",
+      "revId": "6c911268c28588fcb23298fa79c60357a23f8b30",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
