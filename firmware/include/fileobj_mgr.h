@@ -29,6 +29,11 @@ void file_binding_remove(struct file_base_binding *bindp);
 void file_binding_remove_next(struct file_base_binding *prevp,
                               struct file_base_binding *bindp);
 
+bool fileobj_mount(const struct file_base_info *srcinfop,
+                   unsigned int callflags,
+                   struct file_base_binding **bindpp);
+void fileobj_unmount(struct file_base_binding *bindp);
+
 void fileobj_fileop_open(struct filestr_base *stream,
                          const struct file_base_info *srcinfop,
                          unsigned int callflags);
