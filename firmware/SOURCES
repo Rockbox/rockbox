@@ -204,6 +204,7 @@ common/dircache.c
 common/pathfuncs.c
 common/format.c
 common/linked_list.c
+common/rb_namespace.c
 common/strcasecmp.c
 common/strcasestr.c
 common/strnatcmp.c
