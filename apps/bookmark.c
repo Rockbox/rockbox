@@ -1090,9 +1090,7 @@ static bool generate_bookmark_file_name(const char *in)
     {
 #ifdef HAVE_MULTIVOLUME
         /* The "root" of an extra volume need special handling too. */
-        const char *filename;
-        path_strip_volume(in, &filename, true);
-        bool volume_root = *filename == '\0';
+        bool volume_root = path_strip_volume(in, NULL, true) == ROOT_VOLUME;
 #endif
         strcpy(global_bookmark_file_name, in);
         if(global_bookmark_file_name[len-1] == '/')
