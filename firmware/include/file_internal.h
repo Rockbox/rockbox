@@ -44,11 +44,15 @@
 /* internal functions open streams as well; make sure they don't fail if all
    user descs are busy; this needs to be at least the greatest quantity needed
    at once by all internal functions */
+#define MOUNT_AUX_FILEOBJS 1
+
 #ifdef HAVE_DIRCACHE
-#define AUX_FILEOBJS 3
+#define DIRCACHE_AUX_FILEOBJS 1
 #else
-#define AUX_FILEOBJS 2
+#define DIRCACHE_AUX_FILEOBJS 0
 #endif
+
+#define AUX_FILEOBJS (2+DIRCACHE_AUX_FILEOBJS+MOUNT_AUX_FILEOBJS)
 
 /* number of components statically allocated to handle the vast majority
    of path depths; should maybe be tuned for >= 90th percentile but for now,
@@ -113,16 +117,18 @@ enum fildes_and_obj_flags
     /* used in descriptor and common */
     FDO_BUSY       = 0x0001,     /* descriptor/object is in use */
     /* only used in individual stream descriptor */
-    FD_WRITE       = 0x0002,     /* descriptor has write mode */
-    FD_WRONLY      = 0x0004,     /* descriptor is write mode only */
-    FD_APPEND      = 0x0008,     /* descriptor is append mode */
+    FD_VALID       = 0x0002,     /* descriptor is valid but not registered */
+    FD_WRITE       = 0x0004,     /* descriptor has write mode */
+    FD_WRONLY      = 0x0008,     /* descriptor is write mode only */
+    FD_APPEND      = 0x0010,     /* descriptor is append mode */
     FD_NONEXIST    = 0x8000,     /* closed but not freed (uncombined) */
     /* only used as common flags */
-    FO_DIRECTORY   = 0x0010,     /* fileobj is a directory */
-    FO_TRUNC       = 0x0020,     /* fileobj is opened to be truncated */
-    FO_REMOVED     = 0x0040,     /* fileobj was deleted while open */
-    FO_SINGLE      = 0x0080,     /* fileobj has only one stream open */
-    FDO_MASK       = 0x00ff,
+    FO_DIRECTORY   = 0x0020,     /* fileobj is a directory */
+    FO_TRUNC       = 0x0040,     /* fileobj is opened to be truncated */
+    FO_REMOVED     = 0x0080,     /* fileobj was deleted while open */
+    FO_SINGLE      = 0x0100,     /* fileobj has only one stream open */
+    FO_MOUNTTARGET = 0x0200,     /* fileobj kept open as a mount target */
+    FDO_MASK       = 0x03ff,
     FDO_CHG_MASK   = FO_TRUNC,   /* fileobj permitted external change */
     /* bitflags that instruct various 'open' functions how to behave;
      * saved in stream flags (only) but not used by manager */
@@ -138,7 +144,9 @@ enum fildes_and_obj_flags
     FF_CACHEONLY   = 0x00800000, /* succeed only if in dircache */
     FF_INFO        = 0x01000000, /* return info on self */
     FF_PARENTINFO  = 0x02000000, /* return info on parent */
-    FF_MASK        = 0x03ff0000,
+    FF_DEVPATH     = 0x04000000, /* path is a device path, not root-based */
+    FF_NOFS        = 0x08000000, /* no filesystem mounted here */
+    FF_MASK        = 0x0fff0000,
 };
 
 /** Common data structures used throughout **/
@@ -148,11 +156,10 @@ struct file_base_info
 {
     union {
 #ifdef HAVE_MULTIVOLUME
-    int                  volume;  /* file's volume (overlaps fatfile.volume) */
+    int                  volume;  /* file's volume (overlaps required
+                                     volume info in fctrl) */
 #endif
-#if CONFIG_PLATFORM & PLATFORM_NATIVE
-    struct fat_file      fatfile; /* FS driver file info */
-#endif
+    struct file_ctrl_block fctrl; /* FS driver file info */
     };
 #ifdef HAVE_DIRCACHE
     struct dircache_file dcfile;  /* dircache file info */
@@ -183,6 +190,13 @@ struct dirscan_info
 #endif
 };
 
+struct file_ioctrl_block
+{
+    union {
+    struct fat_file fatfile;
+    };
+};
+
 /* describes the file as an open stream */
 struct filestr_base
 {
@@ -191,7 +205,7 @@ struct filestr_base
     struct filestr_cache     cache;   /* stream-local cache */
     struct filestr_cache     *cachep; /* the cache in use (local or shared) */
     struct file_base_info    *infop;  /* base file information */
-    struct fat_filestr       fatstr;  /* FS driver information */
+    struct file_ioctrl_block ioctrl;  /* FS driver information */
     struct file_base_binding *bindp;  /* common binding for file/dir */
     struct mutex             *mtx;    /* serialization for this stream */
 };

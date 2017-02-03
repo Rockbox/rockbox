@@ -132,7 +132,7 @@ static int WRAPPER(open)(const char *path, int oflag, ...)
 
 static int WRAPPER(creat)(const char *path, mode_t mode)
 {
-    int fildes = FS_PREFIX(creat)(path __CREAT_MODE_ARG);
+    int fildes = FS_PREFIX(creat)(path __OPEN_MODE_PARM);
     plugin_check_open_close__open(fildes);
     return fildes;
     (void)mode;

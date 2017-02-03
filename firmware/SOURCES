@@ -174,13 +174,16 @@ common/crc32-mi4.c
 #ifdef RKW_FORMAT
 common/crc32-rkw.c
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#ifndef APPLICATION
 common/dir.c
-common/disk_cache.c
-common/file.c
-common/file_internal.c
 common/disk.c
+common/file.c
+#endif /* APPLICATION */
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+common/disk_cache.c
+common/file_internal.c
 common/fileobj_mgr.c
+common/filesystem-native.c
 #endif /* PLATFORM_NATIVE */
 #ifdef HAVE_DIRCACHE
 common/dircache.c
@@ -188,6 +191,7 @@ common/dircache.c
 common/pathfuncs.c
 common/format.c
 common/linked_list.c
+common/rb_namespace.c
 common/strcasecmp.c
 common/strcasestr.c
 common/strnatcmp.c

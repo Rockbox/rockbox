@@ -51,9 +51,65 @@ enum {
 #endif
 };
 
+static int usb_state = USB_EXTRACTED;
+
 #ifdef HAVE_MULTIDRIVE
-extern void sim_ext_extracted(int drive);
+static bool is_ext_inserted = false;
+extern void sim_ext_status(int drive, bool inserted);
 #endif
+
+static int vol_drive[NUM_VOLUMES] = { [0 ... NUM_VOLUMES-1] = -1 };
+
+static int get_free_volume(void)
+{
+    for (int i = 0; i < NUM_VOLUMES; i++)
+    {
+        if (vol_drive[i] == -1) /* unassigned? */
+            return i;
+    }
+
+    return -1; /* none found */
+}
+
+static void usb_set_host_present(bool present)
+{
+    usb_host_present = preset;
+    if (!usb_host_present)
+    {
+        /* in usb.c, this is only done for exclusive storage
+         * do it here anyway but don't depend on the acks */
+        disk_mount_all();
+        queue_broadcast(SYS_USB_DISCONNECTED, 0);
+        return;
+    }
+
+    if(TIME_AFTER(current_tick, last_broadcast_tick + HZ*5))
+    {
+        num_acks_to_expect = 0;
+        last_broadcast_tick = current_tick;
+    }
+
+    num_acks_to_expect += queue_broadcast(SYS_USB_CONNECTED, 0) - 1;
+    DEBUGF("USB inserted. Waiting for %d acks...\n",
+           num_acks_to_expect);
+}
+
+bool usb_handle_connected_ack(void)
+{
+    if(num_acks_to_expect > 0 && --num_acks_to_expect == 0)
+    {
+        DEBUGF("All threads have acknowledged the connect.\n");
+        disk_unmount_all();
+        return true;
+    }
+    else
+    {
+        DEBUGF("usb: got ack, %d to go...\n",
+               num_acks_to_expect);
+    }
+
+    return false;
+}
 
 void sim_thread(void)
 {
@@ -86,37 +142,37 @@ void sim_thread(void)
                    case, reset the count or else USB would be locked out until
                    rebooting because it most likely won't ever come. Simply
                    resetting to the most recent broadcast count is racy. */
-                if(TIME_AFTER(current_tick, last_broadcast_tick + HZ*5))
-                {
-                    num_acks_to_expect = 0;
-                    last_broadcast_tick = current_tick;
-                }
+                if (usb_state != USB_EXTRACTED)
+                    break;
 
-                num_acks_to_expect += queue_broadcast(SYS_USB_CONNECTED, 0) - 1;
-                DEBUGF("USB inserted. Waiting for %d acks...\n",
-                       num_acks_to_expect);
+                usb_state = USB_POWERED;
+                usb_set_host_present(true);
                 break;
             case SYS_USB_CONNECTED_ACK:
-                if(num_acks_to_expect > 0 && --num_acks_to_expect == 0)
-                {
-                    DEBUGF("All threads have acknowledged the connect.\n");
-                }
-                else
-                {
-                    DEBUGF("usb: got ack, %d to go...\n",
-                           num_acks_to_expect);
-                }
+                if (usb_handle_connected_ack())
+                    usb_state = USB_INSERTED;
                 break;
             case SIM_USB_EXTRACTED:
-                /* in usb.c, this is only done for exclusive storage
-                 * do it here anyway but don't depend on the acks */
-                queue_broadcast(SYS_USB_DISCONNECTED, 0);
+                if (usb_state == USB_EXTRACTED)
+                    break;
+
+                usb_state = USB_EXTRACTED;
+                usb_set_host_present(false);
                 break;
 #ifdef HAVE_MULTIDRIVE
             case SIM_EXT_INSERTED:
             case SIM_EXT_EXTRACTED:
-                sim_ext_extracted(ev.data);
-                queue_broadcast(ev.id == SIM_EXT_INSERTED ?
+                if (is_ext_inserted == (ev.id == SIM_EXT_INSERTED))
+                    break;
+
+                is_ext_inserted = !is_ext_inserted;
+
+                if (is_ext_inserted)
+                    disk_mount(ev.id);
+                else
+                    disk_unmount(ev.id);
+
+                queue_broadcast(is_ext_inserted ?
                                 SYS_HOTSWAP_INSERTED : SYS_HOTSWAP_EXTRACTED, 0);
                 sleep(HZ/20);
                 queue_broadcast(SYS_FS_CHANGED, 0);
@@ -142,19 +198,17 @@ void sim_trigger_screendump(void)
     queue_post(&sim_queue, SIM_SCREENDUMP, 0);
 }
 
-static bool is_usb_inserted;
 void sim_trigger_usb(bool inserted)
 {
     if (inserted)
         queue_post(&sim_queue, SIM_USB_INSERTED, 0);
     else
         queue_post(&sim_queue, SIM_USB_EXTRACTED, 0);
-    is_usb_inserted = inserted;
 }
 
 int usb_detect(void)
 {
-    return is_usb_inserted ? USB_INSERTED : USB_EXTRACTED;
+    return usb_state == USB_EXTRACTED ? USB_EXTRACTED : USB_INSERTED;
 }
 
 void usb_init(void)
@@ -183,13 +237,61 @@ void usb_wait_for_disconnect(struct event_queue *q)
     }
 }
 
-#ifdef HAVE_MULTIDRIVE
-static bool is_ext_inserted;
+int disk_mount(int drive)
+{
+    if (!CHECK_DRV(drive))
+        return 0;
 
+    int volume = get_free_volume();
+    volume_drive[drive] = volume;
+    volume_onmount_internal(IF_MV(volume));
+
+    return 1;
+}
+
+int disk_unmount(int drive)
+{
+    if (!CHECK_DRV(drive))
+        return 0;
+
+    int unmounted = 0;
+
+    for (int i = 0; i < NUM_VOLUMES; i++)
+    {
+        if (vol_drive[i] == drive)
+        {   /* force releasing resources */
+            vol_drive[i] = -1;
+            volume_onunmount_internal(IF_MV(i));
+            unounted++;
+        }
+    }
+
+    return unmounted;
+}
+
+int disk_mount_all(void)
+{
+    int mounted = 0;
+
+    disk_writer_lock();
+
+    volume_onunmount_internal(IF_MV(-1));
+
+    for (int i = 0; i < NUM_VOLUMES; i++)
+        vol_drive[i] = -1; /* mark all as unassigned */
+
+    for (int i = 0; i < NUM_DRIVES; i++)
+    {
+        
+}
+
+int disk_unmount_all(void)
+{
+}
+
+#ifdef HAVE_MULTIDRIVE
 void sim_trigger_external(bool inserted)
 {
-    is_ext_inserted = inserted;
-
     int drive = 1; /* Can do others! */
     if (inserted)
         queue_post(&sim_queue, SIM_EXT_INSERTED, drive);

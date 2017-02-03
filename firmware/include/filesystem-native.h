@@ -37,11 +37,32 @@
 
 #ifdef RB_FILESYSTEM_OS
 #define FILEFUNCTIONS_DEFINED
-#endif
+
+/* structure used for open file descriptors */
+struct filestr_desc
+{
+    struct filestr_base stream; /* basic stream info (first!) */
+    file_size_t         offset; /* current offset for stream */
+    file_size_t         *sizep; /* shortcut to file size in fileobj */
+};
+
+ssize_t file_readwrite(struct filestr_desc *file, void *buf, size_t nbyte,
+                       bool write);
+off_t file_lseek(struct filestr_desc *file, off_t offset, int whence);
+int file_ftruncate(struct filestr_desc *file, file_size_t size,
+                   bool write_now);
+int file_fsync(struct filestr_desc *file);
+
+static inline file_size_t file_filesize(struct filestr_desc *file)
+    { return *file->sizep; }
+
+#endif /* RB_FILESYSTEM_OS */
 
 #ifndef FILEFUNCTIONS_DECLARED
 #define __OPEN_MODE_ARG
-#define __CREAT_MODE_ARG
+#define __OPEN_MODE_ARG_DECL
+#define __OPEN_MODE_PARM
+#define __OPEN_MODE_PARM_DECL
 
 int     open(const char *name, int oflag);
 int     creat(const char *name);

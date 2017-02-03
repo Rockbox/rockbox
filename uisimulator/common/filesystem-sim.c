@@ -47,87 +47,167 @@ extern const char *sim_root_dir;
 #define O_BINARY 0
 #endif
 
-struct filestr_desc
+struct sim_file
 {
-    int  osfd;              /* The host OS file descriptor */
-    bool mounted;           /* Is host volume still mounted? */
 #ifdef HAVE_MULTIVOLUME
-    int  volume;            /* The virtual volume number */
+    int volume;     /* file's "volume" (first!) */
 #endif
-} openfiles[MAX_OPEN_FILES] =
-{
-    [0 ... MAX_OPEN_FILES-1] = { .osfd = -1 }
+    const char *basename;
+    const char *ospath;
+    OS_STAT_T  st;
 };
 
-static struct filestr_desc * alloc_filestr(int *fildesp)
+struct file_ctrl_block
 {
-    for (unsigned int i = 0; i < MAX_OPEN_FILES; i++)
-    {
-        struct filestr_desc *filestr = &openfiles[i];
-        if (filestr->osfd < 0)
-        {
-            *fildesp = i;
-            return filestr;
-        }
-    }
-
-    return NULL;
-}
-
-static struct filestr_desc * get_filestr(int fildes)
-{
-    struct filestr_desc *filestr = &openfiles[fildes];
-
-    if ((unsigned int)fildes >= MAX_OPEN_FILES || filestr->osfd < 0)
-        filestr = NULL;
-    else if (filestr->mounted)
-        return filestr;
-
-    errno = filestr ? ENXIO : EBADF;
-    DEBUGF("fildes %d: %s\n", fildes, strerror(errno));
-    return NULL;
-}
-
-struct dirstr_desc
-{
-    int               osfd;          /* Host OS directory file descriptor */
-    bool              osfd_opened;   /* Host fd is another open file */
-    OS_DIR_T          *osdirp;       /* Host OS directory stream */
-#ifdef USE_OSDIRNAME
-    char              *osdirname;    /* Host OS directory path */
-#endif
-    struct sim_dirent entry;         /* Rockbox directory entry */
+    union {
 #ifdef HAVE_MULTIVOLUME
-    int               volume;        /* Virtual volume number */
-    int               volumecounter; /* Counter for root volume entries */
+    int volume;
 #endif
-    bool              mounted;       /* Is the virtual volume still mounted? */
-} opendirs[MAX_OPEN_DIRS];
+    struct sim_file simfile;
+    };
+};
 
-static struct dirstr_desc * alloc_dirstr(void)
+struct file_ioctrl_block
 {
-    for (unsigned int i = 0; i < MAX_OPEN_DIRS; i++)
+    struct sim_file *simfilep;
+    int             osfd;
+    bool            dirfd_opened;
+    OS_DIR_T        osdirp;
+};
+
+/* File control */
+int fctrl_open_at(struct file_ctrl_block *fctrl_dir,
+                  const struct ioctrl_direntry_base *entry,
+                  struct file_ctrl_block *fctrl)
+{
+    struct simfile *ssss
+    int rc = os_open(fctrl->simfile.path, x, x);
+
+    char ospath[SIM_TMPBUF_MAX_PATH];
+    int pprc = sim_get_os_path(ospath, path, sizeof (ospath));
+    if (pprc < 0)
+        return -2;
+
+    int osfd = os_open(ospath, oflag | O_BINARY __OPEN_MODE_ARG);
+    if (osfd < 0)
+        return -3;
+
+    OS_STAT_T s;
+    if (os_stat(ospath, &s) < 0)
     {
-        struct dirstr_desc *dirstr = &opendirs[i];
-        if (dirstr->osdirp == NULL)
-            return dirstr;
+        os_close(osfd);
+        return -4;
     }
 
-    return NULL;
+    unsigned int callflags = S_ISDIR(s.st_mode) ? FO_DIRECTORY : 0;
+    struct file_base_info info;
+    filestr->stream.ioctrl.osfd = osfd;
+
+#ifdef HAVE_MULTIVOLUME
+    info.fctrl.simfile.volume = MAX(pprc - 1, 0);
+#endif
+    fileop_onopen_internal(&filestr->stream, &info, callflags);
+    return fildes;
+
 }
 
-static struct dirstr_desc * get_dirstr(DIR *dirp)
+int fctrl_close(struct file_ctrl_block *fctrl)
 {
-    struct dirstr_desc *dirstr = (struct dirstr_desc *)dirp;
+    free(fctrl->simfile.basename);
+    free(fctrl->simfile.ospath);
+    return 0;
+}
 
-    if (!PTR_IN_ARRAY(opendirs, dirstr, MAX_OPEN_DIRS) || !dirstr->osdirp)
-        dirstr = NULL;
-    else if (dirstr->mounted)
-        return dirstr;
+int fctrl_rename_at(struct file_ctrl_block *fctrl_dir,
+                    struct file_ctrl_block *fctrl,
+                    const unsigned char *newname)
+{
+}
 
-    errno = dirstr ? ENXIO : EBADF;
-    DEBUGF("dir #%d: %s\n", (int)(dirstr - opendirs), strerror(errno));
-    return NULL;
+int fctrl_samefile(const struct file_ctrl_block *fctrl1,
+                   const struct file_ctrl_block *fctrl2)
+{
+    return (fctrl1->st.st_dev == ctrl2->st.st_dev &&
+            fctrl1->st.st_ino == ctrl2->st.st_ino) ? 1 : 0;
+}
+
+int fctrl_io_rewind(struct file_ioctrl_block *ioctrl)
+{
+    off_t rc = os_lseek(ioctrl->osfd, 0, SEEK_SET);
+    if (rc < 0)
+        return -1;
+
+    return 0;
+}
+
+int fctrl_remove(struct file_ctrl_block *fctrl, unsigned int flags)
+{
+    if (!flags)
+        return -1;
+
+    return os_remove(fctrl->ospath);
+}
+
+/* File I/O control */
+int fctrl_io_assign_file(struct file_ioctrl_block *ioctrl,
+                         struct file_ctrl_block *fctrl)
+{
+    ioctrl->simfilep = &fctrl->simfile;
+    return 0;
+}
+
+int fctrl_io_open()
+{
+}
+
+int fctrl_io_close(struct file_ioctrl_block *ioctrl)
+{
+    if (ioctrl->osdirp)
+    {
+        /* is a directory stream */
+        if (ioctrl->dirfd_opened)
+            os_close(ioctrl->osfd);
+
+        return os_closedir(ioctrl->osdirp);
+    }
+    else
+    {
+        return os_close(ioctrl->osfd);
+    }
+}
+
+/* file.c backend */
+ssize_t file_readwrite(struct filestr_desc *file, void *buf, size_t nbyte,
+                       bool dowrite)
+{
+    return dowrite ? os_write(file->stream.ioctrl.osfd, buf, nbyte);
+                     os_read(file->stream.ioctrl.osfd, buf, nbyte);
+}
+
+off_t file_lseek(struct filestr_desc *file, off_t offset, int whence)
+{
+    return os_lseek(file->stream.ioctrl.osfd, offset, whence);
+}
+
+int file_ftruncate(struct filestr_desc *file, file_size_t size,
+                   bool write_now)
+{
+    int osfd = file->stream.ioctrl.osfd;
+
+    file_size_t realsize = os_filesize(osfd);
+    if (size < 0)
+        return -1;
+
+    if (size >= realsize)
+        return 0;
+
+    return os_ftruncate(osfd, size);
+    (void)write_now;
+}
+
+int file_fsync(struct filestr_desc *file)
+{
+    return os_fsync(file->stream.ioctrl.osfd);
 }
 
 static int close_dirstr(struct dirstr_desc *dirstr)
@@ -151,73 +231,7 @@ static int close_dirstr(struct dirstr_desc *dirstr)
     return rc;
 }
 
-#ifdef HAVE_MULTIVOLUME
-static int readdir_volume_inner(struct dirstr_desc *dirstr,
-                                struct sim_dirent *entry)
-{
-    /* Volumes (secondary file systems) get inserted into the system root
-     * directory. If the path specified volume 0, enumeration will not
-     * include other volumes, but just its own files and directories.
-     *
-     * Fake special directories, which don't really exist, that will get
-     * redirected upon opendir()
-     */
-    while (++dirstr->volumecounter < NUM_VOLUMES)
-    {
-        /* on the system root */
-        if (!volume_present(dirstr->volumecounter))
-            continue;
-
-        get_volume_name(dirstr->volumecounter, entry->d_name);
-        return 1;
-    }
-
-    /* do normal directory entry fetching */
-    return 0;
-}
-#endif /* HAVE_MULTIVOLUME */
-
-static inline int readdir_volume(struct dirstr_desc *dirstr,
-                                 struct sim_dirent *entry)
-{
-#ifdef HAVE_MULTIVOLUME
-    if (dirstr->volumecounter < NUM_VOLUMES)
-        return readdir_volume_inner(dirstr, entry);
-#endif /* HAVE_MULTIVOLUME */
-
-    /* do normal directory entry fetching */
-    return 0;
-    (void)dirstr; (void)entry;
-}
-
-
 /** Internal functions **/
-
-#ifdef HAVE_MULTIDRIVE
-/**
- * Handle drive extraction by pretending the files' volumes no longer exist
- * and invalidating their I/O for the remainder of their lifetimes as would
- * happen on a native target
- */
-void sim_ext_extracted(int drive)
-{
-    for (unsigned int i = 0; i < MAX_OPEN_FILES; i++)
-    {
-        struct filestr_desc *filestr = &openfiles[i];
-        if (filestr->osfd >= 0 && volume_drive(filestr->volume) == drive)
-            filestr->mounted = false;
-    }
-
-    for (unsigned int i = 0; i < MAX_OPEN_DIRS; i++)
-    {
-        struct dirstr_desc *dirstr = &opendirs[i];
-        if (dirstr->osdirp && volume_drive(dirstr->volume) == drive)
-            dirstr->mounted = false;
-    }
-
-    (void)drive;
-}
-#endif /* HAVE_MULTIDRIVE */
 
 /**
  * Provides target-like path parsing behavior with single and multiple volumes
@@ -309,6 +323,8 @@ int sim_get_os_path(char *buffer, const char *path, size_t bufsize)
 
             const char *next;
             volume = path_strip_volume(p, &next, true);
+            if (volume == ROOT_VOLUME)
+                volume = 0; /* FIXME: root no longer implies volume 0 */
 
             if (next > p)
             {
@@ -412,118 +428,6 @@ int sim_get_os_path(char *buffer, const char *path, size_t bufsize)
 
 
 /** File functions **/
-
-int sim_open(const char *path, int oflag, ...)
-{
-    int fildes;
-    struct filestr_desc *filestr = alloc_filestr(&fildes);
-    if (!filestr)
-    {
-        errno = EMFILE;
-        return -1;
-    }
-
-    char ospath[SIM_TMPBUF_MAX_PATH];
-    int pprc = sim_get_os_path(ospath, path, sizeof (ospath));
-    if (pprc < 0)
-        return -2;
-
-    filestr->osfd = os_open(ospath, oflag | O_BINARY __OPEN_MODE_ARG);
-    if (filestr->osfd < 0)
-        return -3;
-
-#ifdef HAVE_MULTIVOLUME
-    filestr->volume  = MAX(pprc - 1, 0);
-#endif
-    filestr->mounted = true;
-    return fildes;
-}
-
-int sim_creat(const char *path, mode_t mode)
-{
-    return sim_open(path, O_WRONLY|O_CREAT|O_TRUNC, mode);
-}
-
-int sim_close(int fildes)
-{
-    struct filestr_desc *filestr = &openfiles[fildes];
-    if ((unsigned int)fildes >= MAX_OPEN_FILES || filestr->osfd < 0)
-    {
-        errno = EBADF;
-        return -1;
-    }
-
-    int osfd = filestr->osfd;
-    filestr->osfd = -1;
-    return os_close(osfd);
-}
-
-int sim_ftruncate(int fildes, off_t length)
-{
-    struct filestr_desc *filestr = get_filestr(fildes);
-    if (!filestr)
-        return -1;
-
-    off_t size = os_filesize(filestr->osfd);
-    if (size < 0)
-        return -1;
-
-    if (length >= size)
-        return 0;
-
-    int rc = os_ftruncate(filestr->osfd, length);
-
-#ifdef HAVE_DIRCACHE
-    if (rc >= 0)
-        dircache_ftruncate(xxxxxx);
-#endif
-
-    return rc;
-}
-
-int sim_fsync(int fildes)
-{
-    struct filestr_desc *filestr = get_filestr(fildes);
-    if (!filestr)
-        return -1;
-
-    int rc = os_fsync(filestr->osfd);
-
-#ifdef HAVE_DIRCACHE
-    if (rc >= 0)
-        dircache_fsync(xxxxxx);
-#endif
-
-    return rc;
-}
-
-off_t sim_lseek(int fildes, off_t offset, int whence)
-{
-    struct filestr_desc *filestr = get_filestr(fildes);
-    if (!filestr)
-        return -1;
-
-    return os_lseek(filestr->osfd, offset, whence);
-}
-
-ssize_t sim_read(int fildes, void *buf, size_t nbyte)
-{
-    struct filestr_desc *filestr = get_filestr(fildes);
-    if (!filestr)
-        return -1;
-
-    return os_read(filestr->osfd, buf, nbyte);
-}
-
-ssize_t sim_write(int fildes, const void *buf, size_t nbyte)
-{
-    struct filestr_desc *filestr = get_filestr(fildes);
-    if (!filestr)
-        return -1;
-
-    return os_write(filestr->osfd, buf, nbyte);
-}
-
 int sim_remove(const char *path)
 {
     char ospath[SIM_TMPBUF_MAX_PATH];
@@ -531,11 +435,11 @@ int sim_remove(const char *path)
         return -1;
 
     int rc = os_remove(ospath);
-
-#ifdef HAVE_DIRCACHE
     if (rc >= 0)
-        dircache_remove(xxxxxx);
-#endif
+    {
+        struct file_base_info info;
+        fileop_onremove_internal(&stream, &info);
+    }
 
     return rc;
 }
@@ -560,9 +464,11 @@ int sim_rename(const char *old, const char *new)
     }
 
     int rc = os_rename(osold, osnew);
-
+###############
 #ifdef HAVE_DIRCACHE
     if (rc >= 0)
+    {
+        fileop_onremove_internal
         dircache_rename(xxxxxx);
 #endif
 
@@ -575,7 +481,7 @@ off_t sim_filesize(int fildes)
     if (!filestr)
         return -1;
 
-    return os_filesize(filestr->osfd);
+    return os_filesize(filestr->stream.ioctrl.osfd);
 }
 
 int sim_fsamefile(int fildes1, int fildes2)
@@ -591,7 +497,8 @@ int sim_fsamefile(int fildes1, int fildes2)
     if (filestr1 == filestr2)
         return 1;
 
-    return os_fsamefile(filestr1->osfd, filestr2->osfd);
+    return os_fsamefile(filestr1->stream.ioctrl.osfd,
+                        filestr2->stream.ioctrl.osfd);
 }
 
 int sim_relate(const char *path1, const char *path2)

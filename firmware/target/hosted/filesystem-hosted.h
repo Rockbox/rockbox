@@ -50,8 +50,14 @@ bool os_file_exists(const char *ospath);
         }                                    \
         mode; })
 
-#define __CREAT_MODE_ARG \
+#define __OPEN_MODE_ARG_DECL \
+    , ...
+
+#define __OPEN_MODE_PARM \
     , mode
+
+#define __OPEN_MODE_PARM_DECL \
+    , mode_t mode
 
 #endif /* OSFUNCTIONS_DECLARED */
 
