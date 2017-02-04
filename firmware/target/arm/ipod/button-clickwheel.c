@@ -435,7 +435,7 @@ int button_read_device(void)
             /* lock -> disable wheel sensor */
             DEV_EN &= ~DEV_OPTO;
 #elif CONFIG_CPU==S5L8701
-            pmu_ldo_power_off(1); /* disable clickwheel power supply */
+            /*pmu_ldo_power_off(1);*/ /* disable clickwheel power supply */
             WHEEL00 = 0;
             WHEEL10 = 0;
             PWRCONEXT |= 1;
@@ -452,7 +452,7 @@ int button_read_device(void)
             DEV_EN |= DEV_OPTO;
             opto_i2c_init();
 #elif CONFIG_CPU==S5L8701
-            pmu_ldo_power_on(1); /* enable clickwheel power supply */
+            /*pmu_ldo_power_on(1);*/ /* enable clickwheel power supply */
             s5l_clickwheel_init();
 #elif CONFIG_CPU==S5L8702
             s5l_clickwheel_init();
