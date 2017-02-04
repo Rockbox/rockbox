@@ -228,4 +228,4 @@
 #define DEFAULT_REC_RIGHT_GAIN  23
 
 /* Define this if a programmable hotkey is mapped */
-//#define HAVE_HOTKEY
+#define HAVE_HOTKEY
