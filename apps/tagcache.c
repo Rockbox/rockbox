@@ -4302,6 +4302,8 @@ static bool check_deleted_files(void)
             logf("-> %s / %ld", buf, tfe.tag_length);
             delete_entry(tfe.idx_id);
         }
+
+        do_timed_yield();
     }
     
     close(fd);
