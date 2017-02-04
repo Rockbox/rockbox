@@ -132,6 +132,7 @@
 #endif
 
 #include "talk.h"
+#include "bootdata.h"
 
 static const char* threads_getname(int selected_item, void *data,
                                    char *buffer, size_t buffer_len)
@@ -2541,6 +2542,24 @@ static bool dbg_skin_engine(void)
 }
 #endif
 
+static bool dbg_boot_data(void)
+{
+    struct simplelist_info info;
+    info.scroll_all = true;
+    simplelist_info_init(&info, "Boot data", 1, NULL);
+    simplelist_set_line_count(0);
+    simplelist_addline("Magic: %.8s", boot_data.magic);
+    simplelist_addline("Length: %lu", boot_data.length);
+    simplelist_addline("CRC: %lx", boot_data.crc);
+    for (unsigned i = 0; i < boot_data.length; i += 4)
+    {
+        simplelist_addline("%02x: %02x %02x %02x %02x", i, boot_data.payload[i],
+            boot_data.payload[i+1], boot_data.payload[i+2], boot_data.payload[i+3]);
+    }
+
+    info.hide_selection = true;
+    return simplelist_show_list(&info);
+}
 
 /****** The menu *********/
 static const struct {
@@ -2654,6 +2673,7 @@ static const struct {
         {"Debug scrollwheel", dbg_scrollwheel },
 #endif
         {"Talk engine stats", dbg_talk },
+        {"Boot data", dbg_boot_data },
 };
 
 static int menu_action_callback(int btn, struct gui_synclist *lists)
