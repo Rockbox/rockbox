@@ -45,6 +45,9 @@ SECTIONS
         *(.text*)
         *(.data*)
         *(.rodata*)
+        /* remember address of magic section */
+        _magicoffset = . - _dramcopystart;
+        KEEP(*(.magic*))
     } > DRAM
 
     _dramtextend = .;
@@ -81,6 +84,18 @@ SECTIONS
     /* crt0 needs a temporary stack which does not overlap with init and itext
      * and is in physical memory: put it *after* init and itext. A small one suffices */
     crt0_tmpstack_phys = _dramcopyend + 0x200 - CACHED_DRAM_ADDR + UNCACHED_DRAM_ADDR;
+
+    /* this section will appear last in the binary and only contains the offset
+     * to the magic section. It is only useful for the bootloader to locate it
+     * and as soon as rockbox starts, this will get overwritten by data or bss.
+     * For this reason, we put in a basically non-existent memory (EOF) but still
+     * load it in DRAM so that it appears in the binary at the end */
+    .endofbinary :
+    {
+        /* write a magic value and then the offset to the magic section */
+        QUAD(0x30636967616d6272) /* 'rbmagic0' in little-endian */
+        LONG(_magicoffset)
+    } >DRAM
 
     .dramcopyend (NOLOAD) :
     {

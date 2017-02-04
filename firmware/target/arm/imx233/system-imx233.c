@@ -55,6 +55,8 @@
 
 void UIE(unsigned int pc, unsigned int num);
 
+char __attribute__((section(".magic"))) magic_string[] = "this is magic";
+
 static void woof_woof(void)
 {
     /* stop hardware watchdog, we catched the error */
