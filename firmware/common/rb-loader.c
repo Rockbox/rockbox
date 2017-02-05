@@ -25,6 +25,54 @@
 #include "rb-loader.h"
 #include "loader_strerror.h"
 
+#include "bootdata.h"
+#include "crc32.h"
+
+/* Write boot data into location marked by magic header
+ * buffer is already loaded with the firmware image
+ * we just need to find the location and write
+ * data into the payload along with the crc
+ * for later verification and use.
+ * Returns payload len on success,
+ * On error returns EKEY_NOT_FOUND
+*/
+int write_bootdata(unsigned char* buf, int len,unsigned int boot_volume)
+{
+    struct boot_data_t bl_boot_data;
+    struct boot_data_t *fw_boot_data = NULL;
+    unsigned int magic[2] = {BOOT_DATA_MAGIC0, BOOT_DATA_MAGIC1};
+    int search_len = MIN(len, BOOT_DATA_SEARCH_SIZE);
+    int payload_len = EKEY_NOT_FOUND;
+
+    /* 0 fill bootloader struct then add our data */
+    memset(&bl_boot_data.payload, 0, BOOT_DATA_PAYLOAD_SIZE);
+    bl_boot_data.boot_volume = boot_volume;
+
+    /* search for boot data header prior to search_len */
+    for(unsigned int i = 0; i <= (search_len - sizeof(struct boot_data_t)); i++)
+    {
+        if ( memcmp ( &buf[i], &magic[0], sizeof(magic) ) == 0)
+        {
+            fw_boot_data = (struct boot_data_t*) &buf[i];
+            /* 0 payload region in firmware */
+            memset(fw_boot_data->payload, 0, fw_boot_data->length);
+            /* determine maximum bytes we can write to firmware
+               BOOT_DATA_PAYLOAD_SIZE is the size the bootloader expects */
+            payload_len = MIN(BOOT_DATA_PAYLOAD_SIZE, fw_boot_data->length);
+            /* write payload size back to firmware struct */
+            fw_boot_data->length = payload_len;
+            /* copy data to firmware bootdata struct */
+            memcpy(fw_boot_data->payload, &bl_boot_data.payload, payload_len);
+            /* calculate and write the crc for the payload */
+            fw_boot_data->crc = crc_32(fw_boot_data->payload,
+                                       payload_len,
+                                       0xffffffff);
+            break;
+        }
+    }
+    return payload_len;
+}
+
 /* Load firmware image in a format created by add method of tools/scramble
  * on success we return size loaded image
  * on error we return negative value which can be deciphered by means
@@ -40,6 +88,7 @@ int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
     unsigned long chksum;
     unsigned long sum;
     int i;
+    int boot_volume = 0; /*0 is the default boot volume*/
 
     /* only filename passed */
     if (firmware[0] != '/')
@@ -105,11 +154,10 @@ int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
         ret = EBAD_CHKSUM;
         goto end;
     }
-
+    write_bootdata(buf, len, boot_volume);
     ret = len;
 
 end:
     close(fd);
     return ret;
 }
-
