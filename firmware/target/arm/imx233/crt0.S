@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "config.h"
 #include "cpu.h"
+#include "bootdata.h"
 
 .section .vectors,"ax",%progbits
 .code 32
@@ -164,6 +165,9 @@ remap:
     bl      main
 1:
     b       1b
+
+/* boot data structure */
+put_boot_data_here
 
 /* Cache-align interrupt stacks */
     .balign    32
