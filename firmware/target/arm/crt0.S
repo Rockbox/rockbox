@@ -20,6 +20,7 @@
  ****************************************************************************/
 #include "config.h"
 #include "cpu.h"
+#include "bootdata.h"
 
     .section .init.text,"ax",%progbits
 
@@ -136,6 +137,9 @@ newstart:
 
     ldr     ip, =main       @ make sure we are using the virtual address
     bx      ip
+
+/* boot data structure */
+put_boot_data_here
 
 /* Cache-align interrupt stacks */
 .balign    32
