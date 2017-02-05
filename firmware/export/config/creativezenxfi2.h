@@ -8,6 +8,8 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 82
 #define MODEL_NAME   "Creative Zen X-Fi2"
+/* Define if boot data from bootloader has been enabled for the target */
+#define HAVE_BOOTDATA
 
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
