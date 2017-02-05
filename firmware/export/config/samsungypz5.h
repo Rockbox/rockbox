@@ -8,6 +8,8 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER            84
 #define MODEL_NAME              "Samsung YP-Z5"
+/* Define if boot data from bootloader has been enabled for the target */
+#define HAVE_BOOTDATA
 
 #define HW_SAMPR_CAPS           SAMPR_CAP_ALL
 

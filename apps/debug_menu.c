@@ -129,6 +129,10 @@
 
 #include "talk.h"
 
+#if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
+#include "bootdata.h"
+#endif
+
 static const char* threads_getname(int selected_item, void *data,
                                    char *buffer, size_t buffer_len)
 {
@@ -2539,7 +2543,30 @@ static bool dbg_skin_engine(void)
 }
 #endif
 
+#if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
+static bool dbg_boot_data(void)
+{
+    unsigned int crc = 0;
+    struct simplelist_info info;
+    info.scroll_all = true;
+    simplelist_info_init(&info, "Boot data", 1, NULL);
+    simplelist_set_line_count(0);
+    simplelist_addline("Magic: %.8s", boot_data.magic);
+    simplelist_addline("Length: %lu", boot_data.length);
+    simplelist_addline("CRC: %lx", boot_data.crc);
+    crc = crc_32(boot_data.payload, boot_data.length, 0xffffffff);
+    (crc == boot_data.crc) ? simplelist_addline("CRC: OK!") :
+                             simplelist_addline("CRC: BAD");
+    for (unsigned i = 0; i < boot_data.length; i += 4)
+    {
+        simplelist_addline("%02x: %02x %02x %02x %02x", i, boot_data.payload[i],
+            boot_data.payload[i+1], boot_data.payload[i+2], boot_data.payload[i+3]);
+    }
 
+    info.hide_selection = true;
+    return simplelist_show_list(&info);
+}
+#endif
 /****** The menu *********/
 static const struct {
     unsigned char *desc; /* string or ID */
@@ -2652,6 +2679,9 @@ static const struct {
         {"Debug scrollwheel", dbg_scrollwheel },
 #endif
         {"Talk engine stats", dbg_talk },
+#if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
+        {"Boot data", dbg_boot_data },
+#endif
 };
 
 static int menu_action_callback(int btn, struct gui_synclist *lists)

@@ -21,6 +21,10 @@
 #include "config.h"
 #include "cpu.h"
 
+#if defined(HAVE_BOOTDATA) && !defined(BOOTLOADER)
+#include "bootdata.h"
+#endif
+
 .section .vectors,"ax",%progbits
 .code 32
     /* most handlers are in DRAM which is too far away for a relative jump */
@@ -164,6 +168,11 @@ remap:
     bl      main
 1:
     b       1b
+
+#if defined(HAVE_BOOTDATA) && !defined(BOOTLOADER)
+/* boot data structure */
+put_boot_data_here
+#endif
 
 /* Cache-align interrupt stacks */
     .balign    32
