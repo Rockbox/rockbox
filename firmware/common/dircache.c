@@ -1422,6 +1422,7 @@ static void sab_process_volume(struct dircache_volume *dcvolp)
 
     info.dcfile.idx       = idx;
     info.dcfile.serialnum = dcvolp->serialnum;
+    binding_resolve(&info);
     sab_process_dir(&info, true);
 }
 
