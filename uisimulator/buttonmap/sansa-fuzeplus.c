@@ -23,6 +23,44 @@
 #include <SDL.h>
 #include "button.h"
 #include "buttonmap.h"
+#include "system.h"
+
+/* we emulate a 3x3 grid, this gives the button mapping */
+int button_mapping[3][3] =
+{
+    {BUTTON_BACK, BUTTON_LEFT, BUTTON_BOTTOMLEFT},
+    {BUTTON_UP, BUTTON_SELECT, BUTTON_DOWN},
+    {BUTTON_PLAYPAUSE, BUTTON_RIGHT, BUTTON_BOTTOMRIGHT},
+};
+
+static int deadzone = 0;
+
+/* Ignore deadzone function. If outside of the pad, project to border. */
+static int find_button_no_deadzone(int x, int y)
+{
+    /* compute grid coordinate */
+    int gx = MAX(MIN(x * 3 / TOUCHPAD_WIDTH, 2), 0);
+    int gy = MAX(MIN(y * 3 / TOUCHPAD_HEIGHT, 2), 0);
+
+    return button_mapping[gx][gy];
+}
+
+int touchpad_to_button(int x, int y)
+{
+    /* find button ignoring deadzones */
+    int btn = find_button_no_deadzone(x, y);
+    /* To check if we are in a deadzone, we try to shift the coordinates
+     * and see if we get the same button. Not that we do not want to apply
+     * the deadzone in the borders ! The code works even in the borders because
+     * the find_button_no_deadzone() project out-of-bound coordinates to the
+     * borders */
+    if(find_button_no_deadzone(x + deadzone, y) != btn ||
+            find_button_no_deadzone(x - deadzone, y) != btn ||
+            find_button_no_deadzone(x, y + deadzone) != btn ||
+            find_button_no_deadzone(x, y - deadzone) != btn)
+        return 0;
+    return btn;
+}
 
 int key_to_button(int keyboard_button)
 {
@@ -78,6 +116,7 @@ int key_to_button(int keyboard_button)
 }
 
 struct button_map bm[] = {
+    /*
     { SDLK_KP7,        69, 401, 39, "Back" },
     { SDLK_KP8,       161, 404, 34, "Up" },
     { SDLK_KP9,       258, 400, 43, "Play/Pause" },
@@ -87,6 +126,7 @@ struct button_map bm[] = {
     { SDLK_KP1,        82, 535, 34, "Bottom-Left" },
     { SDLK_KP2,       162, 532, 33, "Down" },
     { SDLK_KP3,       234, 535, 42, "Bottom-Right" },
+    */
     { SDLK_KP_PLUS,     1, 128, 29, "Vol+" },
     { SDLK_KP_MINUS,    5, 187, 30, "Vol-" },
     { SDLK_HOME,      170,   6, 50, "Power" },

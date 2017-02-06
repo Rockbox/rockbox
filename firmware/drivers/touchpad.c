@@ -25,6 +25,7 @@
 #include "button-target.h"
 
 static bool touch_enabled = true;
+static enum touchpad_mode current_mode = TOUCHPAD_BUTTON;
 
 void touchpad_enable(bool en)
 {
@@ -35,9 +36,29 @@ void touchpad_enable(bool en)
     }
 }
 
-int touchpad_filter(int button)
+bool touchpad_is_enabled(void)
+{
+    return touch_enabled;
+}
+
+int touchpad_report_touch(int x, int y, int *data)
 {
     if(!touch_enabled)
-        button &= ~BUTTON_TOUCHPAD;
-    return button;
+        return 0;
+    /* in button mode, map to a button */
+    if(current_mode == TOUCHPAD_BUTTON)
+        return touchpad_to_button(x, y);
+    /* otherwise report touch in data and using the special BUTTON_TOUCHPAD */
+    *data = x << 16 | y;
+    return BUTTON_TOUCHPAD;
+}
+
+void touchpad_set_mode(enum touchpad_mode mode)
+{
+    current_mode = mode;
+}
+
+enum touchpad_mode touchpad_get_mode(void)
+{
+    return current_mode;
 }

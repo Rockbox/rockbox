@@ -38,8 +38,13 @@
 #include "powermgmt.h"
 #include "storage.h"
 
-#ifdef HAVE_TOUCHSCREEN
-#include "touchscreen.h"
+#if defined(HAVE_TOUCHSCREEN) || defined(HAVE_TOUCHPAD)
+# ifdef HAVE_TOUCHSCREEN
+#  include "touchscreen.h"
+# endif
+# ifdef HAVE_TOUCHPAD
+#  include "touchpad.h"
+# endif
 static int mouse_coords = 0;
 #endif
 /* how long until repeat kicks in */
@@ -110,6 +115,28 @@ static void touchscreen_event(int x, int y)
 }
 #endif
 
+#ifdef HAVE_TOUCHPAD
+static void touchpad_event(int x, int y)
+{
+    if(!background)
+        return;
+    if(background) {
+        x -= UI_TOUCHPAD_POSX;
+        y -= UI_TOUCHPAD_POSY;
+    }
+
+    if(x >= 0 && y >= 0 && x < UI_TOUCHPAD_WIDTH && y < UI_TOUCHPAD_HEIGHT) {
+        /* transform coordinates from pixels to whatever range is in the headers */
+        x = (x * TOUCHPAD_WIDTH) / UI_TOUCHPAD_WIDTH;
+        y = (y * TOUCHPAD_HEIGHT) / UI_TOUCHPAD_HEIGHT;
+        mouse_coords = (x << 16) | y;
+        button_event(BUTTON_TOUCHPAD, true);
+        if (debug_wps)
+            printf("Mouse at 1: (%d, %d)\n", x, y);
+    }
+}
+#endif
+
 static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
 {
 #define SQUARE(x) ((x)*(x))
@@ -146,6 +173,10 @@ static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
                 else
                     button_event(BUTTON_TOUCHSCREEN, false);
 #endif
+#ifdef HAVE_TOUCHPAD
+                else
+                    button_event(BUTTON_TOUCHPAD, false);
+#endif
             break;
         }
     } else {    /* button down */
@@ -175,6 +206,9 @@ static void mouse_event(SDL_MouseButtonEvent *event, bool button_up)
 #endif
 #ifdef HAVE_TOUCHSCREEN
             touchscreen_event(event->x, event->y);
+#endif
+#ifdef HAVE_TOUCHPAD
+            touchpad_event(event->x, event->y);
 #endif
             break;
         }
@@ -258,13 +292,18 @@ static bool event_handler(SDL_Event *event)
 #endif
         button_event(ev_key, event->type == SDL_KEYDOWN);
         break;
-#ifdef HAVE_TOUCHSCREEN
+#if defined(HAVE_TOUCHSCREEN) || defined(HAVE_TOUCHPAD)
     case SDL_MOUSEMOTION:
         if (event->motion.state & SDL_BUTTON(1))
         {
             int x = event->motion.x / display_zoom;
             int y = event->motion.y / display_zoom;
+# ifdef HAVE_TOUCHSCREEN
             touchscreen_event(x, y);
+# endif
+# ifdef HAVE_TOUCHPAD
+            touchpad_event(x, y);
+# endif
         }
         break;
 #endif
@@ -400,17 +439,18 @@ static void button_event(int key, bool pressed)
         }
 #endif
     default:
-#ifdef HAVE_TOUCHSCREEN
+#if defined(HAVE_TOUCHSCREEN) || defined(HAVE_TOUCHPAD)
 # ifndef HAS_BUTTON_HOLD
+#  if defined(HAVE_TOUCHSCREEN)
         if(touchscreen_is_enabled())
+#  else
+        if(touchpad_is_enabled())
+#  endif
 # endif
             new_btn = key_to_touch(key, mouse_coords);
         if (!new_btn)
 #endif
             new_btn = key_to_button(key);
-#ifdef HAVE_TOUCHPAD
-        new_btn = touchpad_filter(new_btn);
-#endif
         break;
     }
     /* Call to make up for scrollwheel target implementation.  This is
@@ -447,7 +487,7 @@ static void button_event(int key, bool pressed)
 #if defined(HAVE_BUTTON_DATA)
 int button_read_device(int* data)
 {
-#if defined(HAVE_TOUCHSCREEN)
+#if defined(HAVE_TOUCHSCREEN) || defined(HAVE_TOUCHPAD)
     *data = mouse_coords;
 #else
     (void) *data;   /* suppress compiler warnings */

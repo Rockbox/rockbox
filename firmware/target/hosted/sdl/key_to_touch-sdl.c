@@ -26,6 +26,7 @@
 #include "buttonmap.h"
 #include "touchscreen.h"
 
+#ifdef HAVE_TOUCHSCREEN
 int key_to_touch(int keyboard_button, unsigned int mouse_coords)
 {
     int new_btn = BUTTON_NONE;
@@ -107,3 +108,14 @@ int key_to_touch(int keyboard_button, unsigned int mouse_coords)
     }
     return new_btn;
 }
+#endif
+
+#ifdef HAVE_TOUCHPAD
+int key_to_touch(int keyboard_button, unsigned int mouse_coords)
+{
+    if(keyboard_button != BUTTON_TOUCHPAD)
+        return 0;
+    int data;
+    return touchpad_report_touch(mouse_coords >> 16, mouse_coords & 0xffff, &data);
+}
+#endif

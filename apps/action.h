@@ -122,6 +122,7 @@ enum {
     ACTION_TOUCHSCREEN,
     ACTION_TOUCHSCREEN_MODE, /* toggle the touchscreen mode */
     ACTION_TOUCHSCREEN_IGNORE, /* used for the 'none' action in skins */
+    ACTION_TOUCHPAD,
 
     /* standard actions, use these first */
     ACTION_STD_PREV,

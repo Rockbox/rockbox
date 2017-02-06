@@ -242,15 +242,14 @@ int button_mapping[3][3] =
 
 /* timeout before lowering touchpad power from lack of activity */
 #define ACTIVITY_TMO        (5 * HZ)
-#define TOUCHPAD_WIDTH      3010
-#define TOUCHPAD_HEIGHT     1975
 #define DEADZONE_MULTIPLIER 2 /* deadzone multiplier */
 
 /* power level when touchpad is active: experiments show that "low power" reduce
  * power consumption and hardly makes a difference in quality. */
 #define ACTIVE_POWER_LEVEL  RMI_SLEEP_MODE_LOW_POWER
 
-static int touchpad_btns = 0; /* button bitmap for the touchpad */
+static bool touchpad_touch = false; /* there is a touch */
+static int touchpad_x, touchpad_y; /* touch coordinates */
 static unsigned last_activity = 0; /* tick of the last touchpad activity */
 static bool t_enable = true; /* is touchpad enabled? */
 static int deadzone; /* deadzone size */
@@ -266,7 +265,7 @@ static int find_button_no_deadzone(int x, int y)
     return button_mapping[gx][gy];
 }
 
-static int find_button(int x, int y)
+int touchpad_to_button(int x, int y)
 {
     /* find button ignoring deadzones */
     int btn = find_button_no_deadzone(x, y);
@@ -288,9 +287,12 @@ void touchpad_set_deadzone(int touchpad_deadzone)
     deadzone = touchpad_deadzone * DEADZONE_MULTIPLIER;
 }
 
-static int touchpad_read_device(void)
+static int touchpad_read_device(int *data)
 {
-    return touchpad_btns;
+    if(touchpad_touch)
+        return touchpad_report_touch(touchpad_x, touchpad_y, data);
+    else
+        return 0;
 }
 
 /* i2c transfer only used for irq processing
@@ -354,9 +356,13 @@ static void rmi_data_irq_cb(struct rmi_xfer_t *xfer)
     int absolute_y = rmi_irq_data.s.absolute.y_msb << 8 | rmi_irq_data.s.absolute.y_lsb;
     int nr_fingers = rmi_irq_data.s.absolute.misc & 7;
     if(nr_fingers == 1)
-        touchpad_btns = find_button(absolute_x, absolute_y);
+    {
+        touchpad_x = absolute_x;
+        touchpad_y = absolute_y;
+        touchpad_touch = true;
+    }
     else
-        touchpad_btns = 0;
+        touchpad_touch = false;
 }
 
 /* touchpad attention line interrupt */
@@ -528,7 +534,8 @@ bool button_debug_screen(void)
         unsigned char sleep_mode = rmi_read_single(RMI_DEVICE_CONTROL) & RMI_SLEEP_MODE_BM;
         lcd_set_viewport(NULL);
         lcd_clear_display();
-        int btns = button_read_device();
+        int data;
+        int btns = button_read_device(&data);
         lcd_putsf(0, 0, "button bitmap: %x", btns);
         lcd_putsf(0, 1, "RMI: id=%s info=%s", product_id, product_info_str);
         lcd_putsf(0, 2, "xmax=%d ymax=%d res=%d", x_max, y_max, sensor_resol);
@@ -670,8 +677,9 @@ bool button_debug_screen(void)
 }
 
 #else /* BOOTLOADER */
-int touchpad_read_device(void)
+int touchpad_read_device(int *data)
 {
+    (void)data;
     return 0;
 }
 #endif
@@ -688,7 +696,7 @@ void button_init_device(void)
     imx233_button_init();
 }
 
-int button_read_device(void)
+int button_read_device(int *data)
 {
-    return imx233_button_read(touchpad_filter(touchpad_read_device()));
+    return imx233_button_read(touchpad_read_device(data));
 }

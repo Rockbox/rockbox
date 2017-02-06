@@ -300,7 +300,10 @@
 #define UI_HEIGHT                   609 /* height of GUI window */
 #define UI_LCD_POSX                 43 /* x position of lcd */
 #define UI_LCD_POSY                 62 /* y position of lcd */
-
+#define UI_TOUCHPAD_POSX            43 /* x position of touchpad */
+#define UI_TOUCHPAD_POSY            386 /* y position of touchpad */
+#define UI_TOUCHPAD_WIDTH           240 /* width of touchpad */
+#define UI_TOUCHPAD_HEIGHT          200 /* height of touchpad */
 
 #elif defined(SANSA_FUZE) || defined(SANSA_FUZEV2)
 #ifdef SANSA_FUZE

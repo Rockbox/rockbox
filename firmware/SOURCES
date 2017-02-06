@@ -65,7 +65,7 @@ target/hosted/sdl/filesystem-sdl.c
 #endif
 target/hosted/sdl/load_code-sdl.c
 target/hosted/sdl/timer-sdl.c
-#ifdef HAVE_TOUCHSCREEN
+#if defined(HAVE_TOUCHSCREEN) || defined(HAVE_TOUCHPAD)
 target/hosted/sdl/key_to_touch-sdl.c
 #endif
 #ifdef APPLICATION

@@ -132,6 +132,7 @@
 #endif
 
 #include "talk.h"
+#include "touchpad.h"
 
 static const char* threads_getname(int selected_item, void *data,
                                    char *buffer, size_t buffer_len)
@@ -2541,6 +2542,91 @@ static bool dbg_skin_engine(void)
 }
 #endif
 
+#ifdef HAVE_TOUCHPAD
+static bool dbg_touchpad(void)
+{
+    int x_max = TOUCHPAD_WIDTH;
+    int y_max = TOUCHPAD_HEIGHT;
+    /* size of the top region we need to diplay stuff */
+    int info_h;
+
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_getstringsize("x", NULL, &info_h);
+    info_h *= 2; /* we want at least 2 lines */
+
+    /* Device to screen: we display an area on the screen that represents the
+     * touchpad. As much as possible, we try to keep the ratio of the device */
+    int zone_w = TOUCHPAD_WIDTH_PIXELS;
+    int zone_h = TOUCHPAD_HEIGHT_PIXELS;
+    /* rescale (keeping ratio) if it doesn't fit */
+    if(zone_w > LCD_WIDTH)
+    {
+        zone_h = (zone_h * LCD_WIDTH) / zone_w;
+        zone_w = LCD_WIDTH;
+    }
+    /* same vertically but keep some space at the top to display info */
+    if(zone_h > LCD_HEIGHT - info_h)
+    {
+        zone_w = (zone_w * (LCD_HEIGHT - info_h)) / zone_h;
+        zone_h = LCD_HEIGHT - info_h;
+    }
+
+    #define DX2SX(x) (((x) * zone_w) / x_max)
+    #define DY2SY(y) (((y) * zone_h) / y_max)
+    struct viewport report_vp;
+    memset(&report_vp, 0, sizeof(report_vp));
+    report_vp.x = (LCD_WIDTH - zone_w) / 2; /* center horizontally */
+    report_vp.y = LCD_HEIGHT - zone_h; /* put at the bottom */
+    report_vp.width = zone_w;
+    report_vp.height = zone_h;
+
+    enum touchpad_mode old_mode = touchpad_get_mode();
+    touchpad_set_mode(TOUCHPAD_POINT);
+    cpu_boost(true);
+    while(1)
+    {
+        lcd_set_viewport(NULL);
+        lcd_clear_display();
+        /* we try to get a button event to drain the button queue... */
+        button_get_w_tmo(HZ / 100);
+        /* but we read the actual device */
+        int btn = button_status();
+        /* quit on any button (since we are in point mode, only non-touch
+         * buttons are reported) */
+        if((btn & BUTTON_MAIN))
+            break;
+        int data = button_get_data();
+        int y = data & 0xffff;
+        int x = data >> 16;
+        bool touch = !!(btn & BUTTON_TOUCHPAD);
+        if(touch)
+        {
+            btn = touchpad_to_button(x, y);
+            lcd_putsf(0, 0, "touch: %4d,%4d (btn=%x)", x, y, btn);
+        }
+        else
+            lcd_putsf(0, 0, "touch: no");
+
+        /* display virtual touchpad with deadzones */
+        lcd_set_viewport(&report_vp);
+        /* draw a red rect around the touchpad */
+        lcd_set_drawinfo(DRMODE_SOLID, LCD_RGBPACK(0xff, 0, 0), LCD_BLACK);
+        lcd_drawrect(0, 0, zone_w, zone_h);
+        /* put a point at the reported position of the finger */
+        if(touch)
+        {
+            lcd_set_drawinfo(DRMODE_SOLID, LCD_RGBPACK(0, 0xff, 0), LCD_BLACK);
+            lcd_fillrect(DX2SX(x) - 1, DY2SY(y) - 1, 3, 3);
+        }
+        lcd_update();
+    }
+    cpu_boost(false);
+    lcd_set_viewport(NULL);
+    lcd_setfont(FONT_UI);
+    touchpad_set_mode(old_mode);
+    return true;
+}
+#endif
 
 /****** The menu *********/
 static const struct {
@@ -2654,6 +2740,9 @@ static const struct {
         {"Debug scrollwheel", dbg_scrollwheel },
 #endif
         {"Talk engine stats", dbg_talk },
+#ifdef HAVE_TOUCHPAD
+        {"Touchpad", dbg_touchpad },
+#endif
 };
 
 static int menu_action_callback(int btn, struct gui_synclist *lists)

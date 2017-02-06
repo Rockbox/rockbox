@@ -79,6 +79,13 @@
 #define MIN_TOUCHPAD_SENSITIVITY_SETTING        -25
 #define MAX_TOUCHPAD_SENSITIVITY_SETTING        25
 #define DEFAULT_TOUCHPAD_SENSITIVITY_SETTING    13
+#define HAVE_BUTTON_DATA
+/* touchpad ranges, reported by hardware */
+#define TOUCHPAD_WIDTH  3010
+#define TOUCHPAD_HEIGHT 1975
+/* correspond size in pixels (take whole width and keep ratio) */
+#define TOUCHPAD_WIDTH_PIXELS   240
+#define TOUCHPAD_HEIGHT_PIXELS  158
 
 /* Define this to enable dead zone on touchpad */
 #ifndef SIMULATOR
