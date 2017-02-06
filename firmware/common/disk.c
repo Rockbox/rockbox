@@ -199,8 +199,6 @@ int disk_mount(int drive)
                    sizeof(fat_partition_types)) == NULL)
             continue;  /* not an accepted partition type */
 
-        bool success = false;
-
     #ifdef MAX_LOG_SECTOR_SIZE
         for (int j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
         {
@@ -210,9 +208,9 @@ int disk_mount(int drive)
                 pinfo[i].size *= j;
                 mounted++;
                 vol_drive[volume] = drive; /* remember the drive for this volume */
-                volume = get_free_volume(); /* prepare next entry */
                 disk_sector_multiplier[drive] = j;
-                success = true;
+                volume_onmount_internal(IF_MV(volume));
+                volume = get_free_volume(); /* prepare next entry */
                 break;
             }
         }
@@ -221,13 +219,10 @@ int disk_mount(int drive)
         {
             mounted++;
             vol_drive[volume] = drive; /* remember the drive for this volume */
+            volume_onmount_internal(IF_MV(volume));
             volume = get_free_volume(); /* prepare next entry */
-            success = true;
         }
     #endif /* MAX_LOG_SECTOR_SIZE */
-
-        if (success)
-            volume_onmount_internal(IF_MV(volume));
     }
 
     if (mounted == 0 && volume != -1) /* none of the 4 entries worked? */
