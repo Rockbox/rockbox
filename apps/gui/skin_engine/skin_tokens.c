@@ -1030,7 +1030,25 @@ const char *get_token_value(struct gui_wps *gwps,
             break;
 
         case SKIN_TOKEN_VOLUME:
-            snprintf(buf, buf_size, "%d", global_settings.volume);
+            {
+                char sign = ' ';
+                int val = sound_val2phys(SOUND_VOLUME, global_settings.volume);
+                if (sound_numdecimals(SOUND_VOLUME))
+                {
+                    int integer, dec;
+                    if(val < 0)
+                    {
+                        sign = '-';
+                        val = abs(val);
+                    }
+                    integer = val / 10;
+                    dec = val % 10;
+                    snprintf(buf, buf_size, "%c%d.%d", sign, integer, dec);
+                }
+                else
+                    snprintf(buf, buf_size, "%d", val);
+            }
+
             if (intval)
             {
                 int minvol = sound_min(SOUND_VOLUME);
