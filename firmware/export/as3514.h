@@ -32,9 +32,9 @@
 
 /*different volume ranges for different AMS chips*/
 #ifdef HAVE_AS3543
-AUDIOHW_SETTING(VOLUME,     "dB",   0,   1, -82,   6, -25)
+AUDIOHW_SETTING(VOLUME,     "dB",   1,   15, -820,   60, -250)
 #else /* !HAVE_AS3543 */
-AUDIOHW_SETTING(VOLUME,     "dB",   0,   1, -74,   6, -25)
+AUDIOHW_SETTING(VOLUME,     "dB",   1,   15, -740,   60, -250)
 #endif /* HAVE_AS3543 */
 
 #ifdef HAVE_RECORDING
