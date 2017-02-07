@@ -202,9 +202,16 @@ int path_strip_drive(const char *name, const char **nameptr, bool greedy)
  * "/"     *nameptr->/,     len=1: "/"
  * "//"    *nameptr->2nd /, len=1: "/"
  * "/a"    *nameptr->a,     len=1: "a"
+ * "a/"    *nameptr->a,     len=1: "a"
  * "/a/bc" *nameptr->b,     len=2: "bc"
  * "d"     *nameptr->d,     len=1: "d"
  * "ef/gh" *nameptr->g,     len=2: "gh"
+ *
+ * Notes: * Doesn't do suffix removal at this time.
+ *        * In the same string, path_dirname() returns a pointer with the
+ *          same or lower address as path_basename().
+ *        * Pasting a separator between the returns of path_dirname() and
+ *          path_basename() will result in a path equivalent to the input.
  */
 size_t path_basename(const char *name, const char **nameptr)
 {
@@ -232,9 +239,17 @@ size_t path_basename(const char *name, const char **nameptr)
  * "/"     *nameptr->/,     len=1: "/"
  * "//"    *nameptr->2nd /, len=1: "/"
  * "/a"    *nameptr->/,     len=1: "/"
+ * "a/"    *nameptr->a,     len=0: ""
  * "/a/bc" *nameptr->/,     len=2: "/a"
  * "d"     *nameptr->d,     len=0: ""
  * "ef/gh" *nameptr->e,     len=2: "ef"
+ *
+ * Notes: * Interpret len=0 as ".".
+ *        * In the same string, path_dirname() returns a pointer with the
+ *          same or lower address as path_basename().
+ *        * Pasting a separator between the returns of path_dirname() and
+ *          path_basename() will result in a path equivalent to the input.
+ *
  */
 size_t path_dirname(const char *name, const char **nameptr)
 {
