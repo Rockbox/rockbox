@@ -806,6 +806,9 @@ Lyre prototype 1 */
 
 /* Storage related config handling */
 
+/*rb can be redirected to external drive using rockbox_main.MODEL_NAME_SHORT*/
+#define BOOT_REDIR "rockbox_main"
+
 #if (CONFIG_STORAGE & (CONFIG_STORAGE - 1)) != 0
 /* Multiple storage drivers */
 #define CONFIG_STORAGE_MULTI

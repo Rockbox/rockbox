@@ -8,6 +8,7 @@
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 72
 #define MODEL_NAME   "Sandisk Sansa Fuze+"
+#define MODEL_NAME_SHORT "fuze+"
 
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
