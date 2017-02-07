@@ -520,7 +520,7 @@ void set_cpu_frequency(long frequency)
         /* Set CVDD1 power supply */
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
 #if defined(SANSA_CLIPZIP)
-        ascodec_write_pmu(0x17, 1, 0x80 | 19);
+        ascodec_write_pmu(0x17, 1, 0x80 | 20);
 #elif defined(SANSA_CLIPPLUS)
         if (amsv2_variant)
             ascodec_write_pmu(0x17, 1, 0x80 | 22);
