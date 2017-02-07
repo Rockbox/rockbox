@@ -133,7 +133,9 @@
 
 #include "talk.h"
 
+#if !defined(SIMULATOR)
 #include "bootdata.h"
+#endif
 
 static const char* threads_getname(int selected_item, void *data,
                                    char *buffer, size_t buffer_len)
@@ -2542,7 +2544,7 @@ static bool dbg_skin_engine(void)
     return simplelist_show_list(&info);
 }
 #endif
-
+#if !defined(SIMULATOR)
 static bool dbg_boot_data(void)
 {
     unsigned int crc = 0;
@@ -2565,7 +2567,7 @@ static bool dbg_boot_data(void)
     info.hide_selection = true;
     return simplelist_show_list(&info);
 }
-
+#endif
 /****** The menu *********/
 static const struct {
     unsigned char *desc; /* string or ID */
@@ -2678,7 +2680,9 @@ static const struct {
         {"Debug scrollwheel", dbg_scrollwheel },
 #endif
         {"Talk engine stats", dbg_talk },
+#if !defined(SIMULATOR)
         {"Boot data", dbg_boot_data },
+#endif
 };
 
 static int menu_action_callback(int btn, struct gui_synclist *lists)
