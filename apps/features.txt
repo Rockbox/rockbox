@@ -284,3 +284,7 @@ hardware_click
 #if defined(HAVE_PLAY_FREQ)
 play_frequency
 #endif
+
+#if defined(HAVE_BOOTDATA)
+boot_data
+#endif
