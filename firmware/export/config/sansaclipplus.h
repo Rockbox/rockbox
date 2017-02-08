@@ -7,6 +7,8 @@
 #define MODEL_NAME   "Sandisk Sansa Clip+"
 #define FIRMWARE_OFFSET_FILE_DATA 8
 #define FIRMWARE_OFFSET_FILE_CRC 0
+/* Define if boot data from bootloader has been enabled for the target */
+#define HAVE_BOOTDATA
 
 #define HAVE_MULTIDRIVE
 #define NUM_DRIVES 2
