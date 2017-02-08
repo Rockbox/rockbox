@@ -7,6 +7,8 @@
 #define MODEL_NAME   "Sandisk Sansa Clipv2"
 #define FIRMWARE_OFFSET_FILE_DATA 8
 #define FIRMWARE_OFFSET_FILE_CRC 0
+/* Define if boot data from bootloader has been enabled for the target */
+#define HAVE_BOOTDATA
 
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 

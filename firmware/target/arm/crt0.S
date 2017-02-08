@@ -21,6 +21,10 @@
 #include "config.h"
 #include "cpu.h"
 
+#if defined(HAVE_BOOTDATA) && !defined(BOOTLOADER)
+#include "bootdata.h"
+#endif
+
     .section .init.text,"ax",%progbits
 
     .global    start
@@ -136,6 +140,11 @@ newstart:
 
     ldr     ip, =main       @ make sure we are using the virtual address
     bx      ip
+
+#if defined(HAVE_BOOTDATA) && !defined(BOOTLOADER)
+/* boot data structure */
+put_boot_data_here
+#endif
 
 /* Cache-align interrupt stacks */
 .balign    32
