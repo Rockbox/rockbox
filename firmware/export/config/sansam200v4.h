@@ -6,6 +6,8 @@
 #define MODEL_NUMBER 42
 
 #define MODEL_NAME   "Sandisk Sansa m200 v4 series"
+/* Define if boot data from bootloader has been enabled for the target */
+#define HAVE_BOOTDATA
 
 /* Enable FAT16 support */
 #define HAVE_FAT16SUPPORT
