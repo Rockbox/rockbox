@@ -9,6 +9,8 @@
 #define FIRMWARE_OFFSET_FILE_CRC 0
 /* Define if boot data from bootloader has been enabled for the target */
 #define HAVE_BOOTDATA
+/* define boot redirect file name allows booting from external drives */
+#define BOOT_REDIR "rockbox_main.clip+"
 
 #define HAVE_MULTIDRIVE
 #define NUM_DRIVES 2
