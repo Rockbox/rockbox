@@ -44,7 +44,7 @@ endif
 
 PUZZLESOPTIMIZE := -O2
 ifeq ($(MODELNAME), sansac200v2)
-PUZZLESOPTIMIZE := -Os
+PUZZLESOPTIMIZE := -Os # tiny plugin buffer
 endif
 
 # we suppress all warnings
@@ -72,11 +72,11 @@ $(PUZZLES_OBJDIR)/puzzles.ovl: $(PUZZLES_OBJ) $(PUZZLES_OUTLDS) $(TLSFLIB)
 	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
 else
 $(PUZZLES_OBJDIR)/sgt-%.rock: $(PUZZLES_OBJDIR)/%.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
-	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(BUILDDIR)/$*.elf \
+	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(PUZZLES_OBJDIR)/$*.elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
-		-lgcc $(PLUGINLDFLAGS)
-	$(SILENT)$(call objcopy,$(BUILDDIR)/$*.elf,$@)
+		-lgcc $(filter-out -Wl%.map, $(PLUGINLDFLAGS)) -Wl,-Map,$(PUZZLES_OBJDIR)/$*.map
+	$(SILENT)$(call objcopy,$(PUZZLES_OBJDIR)/$*.elf,$@)
 endif
 
 # special pattern rule for compiling puzzles with extra flags
