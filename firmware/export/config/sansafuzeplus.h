@@ -10,6 +10,8 @@
 #define MODEL_NAME   "Sandisk Sansa Fuze+"
 /* Define if boot data from bootloader has been enabled for the target */
 #define HAVE_BOOTDATA
+/* define boot redirect file name allows booting from external drives */
+#define BOOT_REDIR "rockbox_main.fuze+"
 
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
