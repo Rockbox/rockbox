@@ -22,7 +22,6 @@
 #include "config.h"
 #include "system.h"
 #include "file.h"
-#include "rb-loader.h"
 #include "loader_strerror.h"
 
 #if defined(HAVE_BOOTDATA)
@@ -73,46 +72,64 @@ static int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume)
     return payload_len;
 }
 #endif /* HAVE_BOOTDATA */
-/* Load firmware image in a format created by add method of tools/scramble
- * on success we return size loaded image
- * on error we return negative value which can be deciphered by means
+
+#ifdef HAVE_MULTIBOOT
+/* places path in supplied buffer for firmware in volumes/drives other
+ * than player root
+ * on error returns Negative number or 0
+ * on success returns bytes from snprintf
+ * note: if supplied buffer is too small return will be
+ * the number of bytes that would have been written
+ */
+int get_redirect_dir(char* buf, int buffer_size,
+                            const char* firmware, int volume)
+{
+    int fd;
+    int f_offset;
+    char add_path[MAX_PATH];
+    /* Check in root of volume for rockbox_main.playername redirect */
+    snprintf(add_path, sizeof(add_path), "/<%d>/"BOOT_REDIR, volume);
+    fd = open(add_path, O_RDONLY);
+    if (fd < 0)
+        return EFILE_NOT_FOUND;
+    /*clear add_path for re-use*/
+    memset(add_path, 0, sizeof(add_path));
+    f_offset = read(fd, add_path,sizeof(add_path));
+    close(fd);
+    /* walk string from end */
+    for(int i = f_offset - 1;i > 0; i--)
+    {
+        if (add_path[i] < 0x20) /* strip control chars < SPACE */
+           add_path[i] = '\0';
+    }
+    /* path is /<vol#>/add_path/BOOTDIR/firmwarename
+       if add_path is empty /<vol#>//BOOTDIR/firmwarename */
+    return snprintf(buf, buffer_size, "/<%d>/%s/"BOOTDIR"/%s", volume,
+                                                               add_path,
+                                                               firmware);
+}
+#endif /* HAVE_MULTIBOOT */
+
+/* loads a firmware file from supplied filename
+ * file opened, checks firmware size and checksum
+ * if no error, firmware loaded to supplied buffer
+ * file closed
+ * Returns size of loaded image on success
+ * On error returns Negative value deciphered by means
  * of strerror() function
  */
-int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
+static int load_firmware_filename(unsigned char* buf,
+                                  const char* filename,
+                                  int buffer_size)
 {
-    char filename[MAX_PATH];
-    int fd;
-    int rc;
     int len;
-    int ret = 0;
-    unsigned long chksum;
-    unsigned long sum;
+    unsigned long chksum, sum;
     int i;
+    int ret;
+    int fd = open(filename, O_RDONLY);
 
-    /* only filename passed */
-    if (firmware[0] != '/')
-    {
-        /* First check in BOOTDIR */
-        snprintf(filename, sizeof(filename), BOOTDIR "/%s",firmware);
-
-        fd = open(filename, O_RDONLY);
-        if(fd < 0)
-        {
-            /* Check in root dir */
-            snprintf(filename, sizeof(filename),"/%s",firmware);
-            fd = open(filename, O_RDONLY);
-
-            if (fd < 0)
-                return EFILE_NOT_FOUND;
-        }
-    }
-    else
-    {
-        /* full path passed */
-        fd = open(firmware, O_RDONLY);
-        if (fd < 0)
-            return EFILE_NOT_FOUND;
-    }
+    if (fd < 0)
+        return EFILE_NOT_FOUND;
 
     len = filesize(fd) - 8;
 
@@ -124,18 +141,16 @@ int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
 
     lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
 
-    rc = read(fd, &chksum, 4);
-    chksum = betoh32(chksum); /* Rockbox checksums are big-endian */
-    if(rc < 4)
+    if (read(fd, &chksum, 4) < 4)
     {
         ret = EREAD_CHKSUM_FAILED;
         goto end;
     }
+    chksum = betoh32(chksum); /* Rockbox checksums are big-endian */
 
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
-    rc = read(fd, buf, len);
-    if(rc < len)
+    if (read(fd, buf, len) < len)
     {
         ret = EREAD_IMAGE_FAILED;
         goto end;
@@ -148,19 +163,70 @@ int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
         sum += buf[i];
     }
 
-    if(sum != chksum)
+    if (sum != chksum)
     {
         ret = EBAD_CHKSUM;
         goto end;
     }
-#ifdef HAVE_BOOTDATA
-    /* 0 is the default boot volume */
-    write_bootdata(buf, ret, 0);
-#endif
     ret = len;
-
 
 end:
     close(fd);
+    return ret;
+}
+
+/* Load firmware image in a format created by add method of tools/scramble
+ * on success we return size loaded image
+ * on error we return negative value which can be deciphered by means
+ * of strerror() function
+ */
+int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
+{
+
+    int ret = EFILE_NOT_FOUND;
+    char filename[MAX_PATH];
+    /* only filename passed */
+    if (firmware[0] != '/')
+    {
+/*If multivolume check volume highest index to lowest for firmware file*/
+#ifdef HAVE_MULTIBOOT
+        /* look for rockbox_main.<playername> */
+        /* 0 is the default boot volume, not checked here */
+        for (unsigned int i = NUM_VOLUMES - 1; i > 0 && ret < 0; i--)
+        {
+            if (get_redirect_dir(filename, sizeof(filename), firmware, i) > 0)
+            {
+                ret = load_firmware_filename(buf, filename, buffer_size);
+            /* if firmware has no boot_data don't load from external drives */
+                if (write_bootdata(buf, ret, i) <= 0)
+                    ret = EKEY_NOT_FOUND;
+            }
+            /* if ret is valid break from loop to continue loading */
+        }
+#endif
+
+        if (ret < 0)
+        {
+            /* First check in BOOTDIR */
+            snprintf(filename, sizeof(filename), BOOTDIR "/%s",firmware);
+
+            ret = load_firmware_filename(buf, filename, buffer_size);
+
+            if (ret < 0)
+            {
+                /* Check in root dir */
+                snprintf(filename, sizeof(filename),"/%s",firmware);
+                ret = load_firmware_filename(buf, filename, buffer_size);
+            }
+#ifdef HAVE_BOOTDATA
+                /* 0 is the default boot volume */
+                write_bootdata(buf, ret, 0);
+#endif
+        }
+    }
+    else /* full path passed */
+        ret = load_firmware_filename(buf, firmware, buffer_size);
+
+
     return ret;
 }
