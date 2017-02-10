@@ -864,6 +864,11 @@ Lyre prototype 1 */
 #error HAVE_MULTIDRIVE needs to have an explicit NUM_DRIVES
 #endif
 
+/* note to remove multi-partition booting this could be changed to MULTIDRIVE */
+#if defined(HAVE_BOOTDATA) && defined(BOOT_REDIR) && defined(HAVE_MULTIVOLUME)
+#define HAVE_MULTIBOOT
+#endif
+
 #ifndef NUM_DRIVES
 #define NUM_DRIVES 1
 #endif
