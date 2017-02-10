@@ -82,9 +82,7 @@
 #include "pathfuncs.h"
 #include "structec.h"
 #include "debug.h"
-#ifdef HAVE_DIRCACHE
 #include "dircache.h"
-#endif
 
 #ifndef __PCTOOL__
 #include "lang.h"
@@ -768,7 +766,7 @@ static bool open_files(struct tagcache_search *tcs, int tag)
     return true;
 }
 
-static bool retrieve(struct tagcache_search *tcs, int idx_id,
+static bool retrieve(struct tagcache_search *tcs, IF_DIRCACHE(int idx_id,)
                      struct index_entry *idx, int tag, char *buf, long size)
 {
     struct tagfile_entry tfe;
@@ -1087,8 +1085,8 @@ static bool check_clauses(struct tagcache_search *tcs,
                 if (clause->tag == tag_filename
                     || clause->tag == tag_virt_basename)
                 {
-                    retrieve(tcs, tcs->idx_id, idx, tag_filename, buf,
-                             sizeof buf);
+                    retrieve(tcs, IF_DIRCACHE(tcs->idx_id,) idx, tag_filename,
+                             buf, sizeof buf);
                 }
                 else
                 {
@@ -1661,7 +1659,7 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
     if (!get_index(tcs->masterfd, idxid, &idx, true))
         return false;
     
-    return retrieve(tcs, idxid, &idx, tag, buf, size);
+    return retrieve(tcs, IF_DIRCACHE(idxid,) &idx, tag, buf, size);
 }
 
 static bool update_master_header(void)
