@@ -201,7 +201,12 @@ static int move_callback(int handle, void* current, void* new)
     if (lock_count > 0)
         return BUFLIB_CB_CANNOT_MOVE;
 
-    UPDATE(menu, diff);
+    if (menu)
+        UPDATE(menu, diff);
+
+    if (csi)
+        UPDATE(csi, diff);
+
     /* loop over menus */
     for(int i = 0; i < menu_count; i++)
     {
