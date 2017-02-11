@@ -24,3 +24,9 @@ int load_firmware(unsigned char* buf, const char* firmware, int buffer_size);
 /* returns path for firmware in volumes/drives other than player root */
 int get_redirect_dir(char* buf, int buffer_size, const char* firmware, int volume);
 #endif
+
+#ifdef BOOTLOADER
+/* O_CREAT is removed from bootloader */
+#undef O_CREAT
+#undef FF_CREAT
+#endif

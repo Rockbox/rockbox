@@ -187,7 +187,7 @@ file_error:
     return rc;
 }
 
-/* Handle syncing all file's streams to the truncation */ 
+/* Handle syncing all file's streams to the truncation */
 static void handle_truncate(struct filestr_desc * const file, file_size_t size)
 {
     unsigned long filesectors = filesize_sectors(size);
@@ -382,6 +382,7 @@ static int open_internal_inner2(const char *path,
             compinfo.filesize = MAX_DIRECTORY_SIZE; /* allow file ops */
         }
     }
+#if !defined(BOOTLOADER) || defined(DEBUG)
     else if (callflags & FF_CREAT)
     {
         if (compinfo.attr & ATTR_DIRECTORY)
@@ -393,14 +394,23 @@ static int open_internal_inner2(const char *path,
         /* not found; try to create it */
 
         callflags &= ~FO_TRUNC;
-        rc = create_stream_internal(&compinfo.parentinfo, compinfo.name, 
+        rc = create_stream_internal(&compinfo.parentinfo, compinfo.name,
                                     compinfo.length, ATTR_NEW_FILE, callflags,
                                     &file->stream);
+#ifdef BOOTLOADER
+        DEBUGF("File.c create_stream_internal() disabled in bootloader\n");
+#endif
+
         if (rc < 0)
             FILE_ERROR(ERRNO, rc * 10 - 6);
 
         created = true;
     }
+#else
+    else if (callflags & FF_CREAT)
+        panicf("File.c O_CREAT disabled in bootloader\n");
+
+#endif
     else
     {
         DEBUGF("File not found\n");

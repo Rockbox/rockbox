@@ -25,6 +25,9 @@
  ****************************************************************************/
 #include "diacritic.h"
 #include "system.h"
+#include "debug.h"
+/*#define LOGF_ENABLE*/
+#include "logf.h"
 
 #define DIAC_NUM_RANGES      (ARRAYLEN(diac_ranges))
 
@@ -193,6 +196,7 @@ static const struct diac_range diac_ranges[] =
 static unsigned short mru_len = 0;
 static unsigned short diacritic_mru[MRU_MAX_LEN];
 
+#ifndef BOOTLOADER
 bool is_diacritic(const unsigned short char_code, bool *is_rtl)
 {
     unsigned short mru, i;
@@ -239,3 +243,14 @@ Found:
 
     return (char_code < diac->base + diac->num_diacritics);
 }
+#else
+/* BOOTLOADER Dummy Function*/
+bool is_diacritic(const unsigned short char_code, bool *is_rtl)
+{
+    (void) diacritic_mru;
+    (void) mru_len;
+        DEBUGF("diacritic.c is_diacritic() disabled in bootloader\n");
+    *is_rtl = 0;
+    return (char_code >= 0x300 && char_code < 0x370)? true : false;
+}
+#endif /* nedf BOOTLOADER*/

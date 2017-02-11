@@ -23,6 +23,7 @@
 #include "system.h"
 #include "file.h"
 #include "loader_strerror.h"
+#include "rb-loader.h"
 
 #if defined(HAVE_BOOTDATA)
 #include "bootdata.h"
