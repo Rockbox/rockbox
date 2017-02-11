@@ -1430,7 +1430,7 @@ static void fat_open_internal(IF_MV(int volume,) long startcluster,
     file->e.entry      = 0;
     file->e.entries    = 0;
 }
-
+#ifndef BOOTLOADER
 #if CONFIG_RTC
 static void fat_time(uint16_t *date, uint16_t *time, int16_t *tenth)
 {
@@ -1536,6 +1536,20 @@ static void fat_time(uint16_t *date, uint16_t *time, int16_t *tenth)
 }
 #endif /* CONFIG_RTC */
 
+#else
+/* BOOTLOADER dummy function */
+void fat_time(uint16_t *date, uint16_t *time, int16_t *tenth)
+{
+    if (time)
+        *time = ((11 < 6) | 11) >> 1; /* set to 00:11:11 */
+
+    if (tenth)
+        *tenth = 100;
+    if (date)
+        *date = (40 << 9) | (1 << 5) | 1;/*1/1/2020*/
+    DEBUGF("Fat.c fat_time() disabled in bootloader\n");
+}
+#endif/*ndef BOOTLOADER*/
 static int write_longname(struct bpb *fat_bpb, struct fat_filestr *parentstr,
                           struct fat_file *file, const unsigned char *name,
                           unsigned long ucslen, const unsigned char *shortname,
@@ -2252,7 +2266,6 @@ fat_error:
     cache_commit(fat_bpb);
     return rc;
 }
-
 
 /** File stream functions **/
 
