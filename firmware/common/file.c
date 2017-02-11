@@ -187,7 +187,7 @@ file_error:
     return rc;
 }
 
-/* Handle syncing all file's streams to the truncation */ 
+/* Handle syncing all file's streams to the truncation */
 static void handle_truncate(struct filestr_desc * const file, file_size_t size)
 {
     unsigned long filesectors = filesize_sectors(size);
@@ -391,11 +391,18 @@ static int open_internal_inner2(const char *path,
         }
 
         /* not found; try to create it */
-
+#if !defined(BOOTLOADER) || defined(DEBUG)
         callflags &= ~FO_TRUNC;
-        rc = create_stream_internal(&compinfo.parentinfo, compinfo.name, 
+        rc = create_stream_internal(&compinfo.parentinfo, compinfo.name,
                                     compinfo.length, ATTR_NEW_FILE, callflags,
                                     &file->stream);
+#ifdef BOOTLOADER
+#ifndef DEBUG
+        panicf("File.c Create disabled in bootloader\n");
+#endif
+        DEBUGF("File.c create_stream_internal() disabled in bootloader\n");
+#endif
+#endif
         if (rc < 0)
             FILE_ERROR(ERRNO, rc * 10 - 6);
 
