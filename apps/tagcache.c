@@ -438,8 +438,8 @@ static bool do_timed_yield(void)
     static long wakeup_tick = 0;
     if (TIME_AFTER(current_tick, wakeup_tick))
     {
-        wakeup_tick = current_tick + (HZ/4);
         yield();
+        wakeup_tick = current_tick + (HZ/50);
         return true;
     }
     return false;
@@ -471,27 +471,17 @@ static long find_entry_ram(const char *filename)
     {
         for (int i = last_pos; i < end_pos; i++)
         {
-            if (tcramcache.hdr->indices[i].flag & FLAG_DIRCACHE)
-            {
-                int cmp = dircache_fileref_cmp(&tcrc_dcfrefs[i], &dcfref);
-                if (cmp > 0)
-                {
-                    if (cmp < 3)
-                    {
-                        if (dircache_search(DCS_CACHED_PATH | DCS_UPDATE_FILEREF,
-                                            &dcfref, filename) <= 0)
-                            return -1;
-
-                        if (dircache_fileref_cmp(&tcrc_dcfrefs[i], &dcfref) < 3)
-                            return -1;
-                    }
-
-                    last_pos = MAX(0, i - 3);
-                    return i;
-                }
-            }
-
             do_timed_yield();
+
+            if (!(tcramcache.hdr->indices[i].flag & FLAG_DIRCACHE))
+                continue;
+
+            int cmp = dircache_fileref_cmp(&tcrc_dcfrefs[i], &dcfref);
+            if (cmp < 3)
+                continue;
+
+            last_pos = MAX(0, i - 3);
+            return i;
         }
 
         if (last_pos == 0)
@@ -4084,7 +4074,7 @@ static bool load_tagcache(void)
 
         p = TC_ALIGN_PTR(p, &rc);
         bytesleft -= rc;
-        if (bytesleft <= 0)
+        if (bytesleft < (ssize_t)sizeof(struct tagcache_header))
         {
             logf("Too big tagcache #10.5");
             goto failure;
@@ -4112,15 +4102,9 @@ static bool load_tagcache(void)
 
             p = TC_ALIGN_PTR(p, &rc);
             bytesleft -= rc;
-            if (bytesleft <= 0)
+            if (bytesleft < (ssize_t)sizeof(struct tagfile_entry))
             {
                 logf("Too big tagcache #10.75");
-                goto failure;
-            }
-
-            if (bytesleft < (ssize_t)sizeof (struct tagfile_entry))
-            {
-                logf("Too big tagcache #10.875");
                 goto failure;
             }
             
@@ -4141,6 +4125,12 @@ static bool load_tagcache(void)
             if (tag == tag_filename)
             {
                 int idx_id = fe->idx_id; /* gonna clobber tagfile entry */
+                if (idx_id < 0 || idx_id >= tcmh.tch.entry_count)
+                {
+                    logf("corrupt tagfile entry (tag: %d)", tag);
+                    goto failure;
+                }
+
                 struct index_entry *idx = &tcramcache.hdr->indices[idx_id];
 
             #ifdef HAVE_DIRCACHE
@@ -4479,7 +4469,7 @@ static bool check_dir(const char *dirname, int add_files)
 
         struct dirinfo info = dir_get_info(dir, entry);
         size_t len = strlen(curpath);
-        path_append(&curpath[len], PA_SEP_HARD, entry->d_name,
+        path_append(&curpath[len-1], PA_SEP_HARD, entry->d_name,
                     sizeof (curpath) - len);
 
         processed_dir_count++;
