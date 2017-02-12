@@ -23,6 +23,11 @@
 #include "config.h"
 #include "debug.h"
 #include "tuner.h"
+#ifdef HAVE_RDS_CAP
+#include <strlcpy.h>
+#include "system.h"
+#include "rds.h"
+#endif
 
 #if CONFIG_TUNER
 
@@ -124,21 +129,46 @@ bool tuner_power(bool status)
 }
 
 #ifdef HAVE_RDS_CAP
-char* tuner_get_rds_info(int setting)
+size_t tuner_get_rds_info(int setting, void *dst, size_t dstsize)
 {
-    char *text = NULL;
-    
-    switch(setting)
+    /* TODO: integrate this into tuner_get/set */
+    static const unsigned char info_id_tbl[] =
     {
-        case RADIO_RDS_NAME:
-            text = "Rockbox Radio";
-            break;
+        [RADIO_RDS_NAME]         = RDS_INFO_PS,
+        [RADIO_RDS_TEXT]         = RDS_INFO_RT,
+        [RADIO_RDS_PROGRAM_INFO] = RDS_INFO_PI,
+        [RADIO_RDS_CURRENT_TIME] = RDS_INFO_CT,
+    };
 
-        case RADIO_RDS_TEXT:
-            text = "http://www.rockbox.org" ;
-            break;
+    if ((unsigned int)setting >= ARRAYLEN(info_id_tbl))
+        return 0;
+
+    switch (info_id_tbl[setting])
+    {
+    case RDS_INFO_PI:
+        if (dstsize >= sizeof (uint16_t)) {
+            *(uint16_t *)dst = 0;
+        }
+        dstsize = sizeof (uint16_t);
+        break;
+    case RDS_INFO_PS:
+        dstsize = strlcpy(dst, "Rockbox Radio", dstsize);
+        break;
+    case RDS_INFO_RT:
+        dstsize = strlcpy(dst, "http://www.rockbox.org", dstsize);
+        break;
+    case RDS_INFO_CT:
+        if (dstsize >= sizeof (time_t)) {
+            *(time_t *)dst = 0;
+        }
+        dstsize = sizeof (time_t);
+        break;
+
+    default:
+        dstsize = 0;
     }
-    return text;
+
+    return dstsize;
 }
-#endif
-#endif
+#endif /* HAVE_RDS_CAP */
+#endif /* CONFIG_TUNER */

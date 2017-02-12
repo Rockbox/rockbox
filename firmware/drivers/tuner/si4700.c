@@ -28,7 +28,9 @@
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h"
 #include "fmradio_i2c.h" /* physical interface driver */
+#ifdef HAVE_RDS_CAP
 #include "rds.h"
+#endif
 
 #if defined(SANSA_CLIP) || defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2) \
     || defined(SANSA_FUZEPLUS)
