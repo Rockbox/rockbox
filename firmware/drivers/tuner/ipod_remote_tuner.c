@@ -42,9 +42,6 @@ static int tuner_frequency = 0;
 static int tuner_signal_power = 0;
 static bool radio_tuned = false;
 
-static char rds_radioname[9];
-static char rds_radioinfo[65];
-
 static void rmt_tuner_signal_power(unsigned char value)
 {
     tuner_signal_power = (int)(value);
@@ -68,9 +65,8 @@ static void rmt_tuner_set_freq(int curr_freq)
     {
         radio_tuned = false;
         tuner_signal_power = 0;
-        /* clear rds name and info */
-        memset(rds_radioname,' ',sizeof(rds_radioname));
-        memset(rds_radioinfo,' ',sizeof(rds_radioinfo));
+        /* clear rds data */
+        rds_reset();
         /* ex: 00 01 63 14 = 90.9MHz */
         unsigned char data[] = {0x07, 0x0B, 0x00, 0x01, 0x63, 0x14};
         
