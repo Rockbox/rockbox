@@ -169,7 +169,8 @@ bool engine_loadStringTable(struct Engine* e)
          * this gives verbose warnings while loadFontFile doesn't because the font looks similar
          * enough to pass for the "original", but the strings don't
          */
-        warning("Unable to find string table, falling back to alternate strings");
+        /* FW 2017-2-12: eliminated obnoxious warning */
+        /*warning("Unable to find string table, falling back to alternate strings");*/
         goto fail;
     }
 
