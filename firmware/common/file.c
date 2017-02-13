@@ -31,6 +31,10 @@
 #include "dircache_redirect.h"
 #include "string-extra.h"
 
+#ifndef O_CREAT
+#warning O_CREAT is DISABLED
+#define O_CREAT O_RDONLY
+#endif
 /**
  * These functions provide a roughly POSIX-compatible file I/O API.
  */
@@ -187,7 +191,7 @@ file_error:
     return rc;
 }
 
-/* Handle syncing all file's streams to the truncation */ 
+/* Handle syncing all file's streams to the truncation */
 static void handle_truncate(struct filestr_desc * const file, file_size_t size)
 {
     unsigned long filesectors = filesize_sectors(size);
@@ -398,7 +402,7 @@ static int open_internal_inner2(const char *path,
         /* not found; try to create it */
 
         callflags &= ~FO_TRUNC;
-        rc = create_stream_internal(&compinfo.parentinfo, compinfo.name, 
+        rc = create_stream_internal(&compinfo.parentinfo, compinfo.name,
                                     compinfo.length, ATTR_NEW_FILE, callflags,
                                     &file->stream);
         if (rc < 0)

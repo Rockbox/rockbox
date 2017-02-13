@@ -7,6 +7,8 @@
 #define MODEL_NAME   "Sandisk Sansa Clip"
 #define FIRMWARE_OFFSET_FILE_DATA 8
 #define FIRMWARE_OFFSET_FILE_CRC 0
+/* define this for bootloader that will not create files */
+#define BOOTLOADER_NO_O_CREAT
 
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
