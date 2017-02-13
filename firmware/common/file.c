@@ -349,13 +349,14 @@ file_error:;
 /* actually do the open gruntwork */
 static int open_internal_inner2(const char *path,
                                 struct filestr_desc *file,
-                                unsigned int callflags)
+                                unsigned int callflags,
+                                int oflag)
 {
     int rc;
 
     struct path_component_info compinfo;
 
-    if (callflags & FF_CREAT)
+    if (oflag & O_CREAT)
         callflags |= FF_PARENTINFO;
 
     rc = open_stream_internal(path, callflags, &file->stream, &compinfo);
@@ -369,7 +370,7 @@ static int open_internal_inner2(const char *path,
 
     if (rc > 0)
     {
-        if (callflags & FF_EXCL)
+        if (oflag & O_EXCL)
         {
             DEBUGF("File exists\n");
             FILE_ERROR(EEXIST, -2);
@@ -386,7 +387,7 @@ static int open_internal_inner2(const char *path,
             compinfo.filesize = MAX_DIRECTORY_SIZE; /* allow file ops */
         }
     }
-    else if (callflags & FF_CREAT)
+    else if (oflag & O_CREAT)
     {
         if (compinfo.attr & ATTR_DIRECTORY)
         {
@@ -483,15 +484,10 @@ static int open_internal_inner1(const char *path, int oflag,
     /* O_CREAT and O_APPEND are fine without write mode
      * for the former, an empty file is created but no data may be written
      * for the latter, no append will be allowed anyway */
-    if (oflag & O_CREAT)
-    {
-        callflags |= FF_CREAT;
+    if (!(oflag & O_CREAT))
+        oflag &= ~O_EXCL; /* result is undefined: we choose "ignore" */
 
-        if (oflag & O_EXCL)
-            callflags |= FF_EXCL;
-    }
-
-    rc = open_internal_inner2(path, file, callflags);
+    rc = open_internal_inner2(path, file, callflags, oflag);
     if (rc < 0)
         FILE_ERROR(ERRNO, rc * 10 - 3);
 
