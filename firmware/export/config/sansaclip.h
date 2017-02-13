@@ -8,6 +8,11 @@
 #define FIRMWARE_OFFSET_FILE_DATA 8
 #define FIRMWARE_OFFSET_FILE_CRC 0
 
+/* define this for bootloader that will not create files */
+#ifdef BOOTLOADER
+#define DISABLE_O_CREAT
+#endif
+
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
 /* define this if you have recording possibility */
