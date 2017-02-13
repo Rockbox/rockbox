@@ -61,7 +61,7 @@ enum {
 
 /* make a "talkable" ID from number + unit
    unit is upper 4 bits, number the remaining (in regular 2's complement) */
-#define TALK_ID(n,u) (((long)(u))<<UNIT_SHIFT | ((n) & ~(-1L<<UNIT_SHIFT)))
+#define TALK_ID(n,u) (((long)(u))<<UNIT_SHIFT | ((n) & ~(-1L<<DECIMAL_SHIFT)))
 
 /* make a "talkable" ID from a decimal number + unit, the decimal number
    is represented like x*10^d where d is the number of decimal digits */
