@@ -130,15 +130,13 @@ enum fildes_and_obj_flags
     FF_DIR         = 0x00010000, /* expect dir; accept dir only */
     FF_ANYTYPE     = 0x00020000, /* succeed if either file or dir */
     FF_TYPEMASK    = 0x00030000, /* mask of typeflags */
-    FF_CREAT       = 0x00040000, /* create if file doesn't exist */
-    FF_EXCL        = 0x00080000, /* fail if creating and file exists */
-    FF_CHECKPREFIX = 0x00100000, /* detect if file is prefix of path */
-    FF_NOISO       = 0x00200000, /* do not decode ISO filenames to UTF-8 */
-    FF_PROBE       = 0x00400000, /* only test existence; don't open */
-    FF_CACHEONLY   = 0x00800000, /* succeed only if in dircache */
-    FF_INFO        = 0x01000000, /* return info on self */
-    FF_PARENTINFO  = 0x02000000, /* return info on parent */
-    FF_MASK        = 0x03ff0000,
+    FF_CHECKPREFIX = 0x00040000, /* detect if file is prefix of path */
+    FF_NOISO       = 0x00080000, /* do not decode ISO filenames to UTF-8 */
+    FF_PROBE       = 0x00100000, /* only test existence; don't open */
+    FF_CACHEONLY   = 0x00200000, /* succeed only if in dircache */
+    FF_INFO        = 0x00400000, /* return info on self */
+    FF_PARENTINFO  = 0x00800000, /* return info on parent */
+    FF_MASK        = 0x00ff0000,
 };
 
 /** Common data structures used throughout **/
