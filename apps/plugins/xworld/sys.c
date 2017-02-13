@@ -117,6 +117,7 @@ void exit_handler(void)
 {
     sys_save_settings(save_sys);
     sys_stopAudio(save_sys);
+    rb->timer_unregister();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
@@ -1114,7 +1115,8 @@ void *sys_get_buffer(struct System* sys, size_t sz)
     {
         void* ret = sys->membuf;
         rb->memset(ret, 0, sz);
-        sys->membuf += sz;
+        sys->membuf = (char*)(sys->membuf) + sz;
+        sys->bytes_left -= sz;
         return ret;
     }
     else
@@ -1128,11 +1130,12 @@ void MutexStack(struct MutexStack_t* s, struct System *stub, void *mutex)
 {
     s->sys = stub;
     s->_mutex = mutex;
-    sys_lockMutex(s->sys, s->_mutex);
+    /* FW 2017-2-12: disabled; no blocking ops in IRQ context! */
+    /*sys_lockMutex(s->sys, s->_mutex);*/
 }
 
 void MutexStack_destroy(struct MutexStack_t* s)
 {
-    sys_unlockMutex(s->sys, s->_mutex);
-
+    (void) s;
+    /*sys_unlockMutex(s->sys, s->_mutex);*/
 }
