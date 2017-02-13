@@ -25,12 +25,15 @@
  ****************************************************************************/
 #include "diacritic.h"
 #include "system.h"
-
+#include "debug.h"
 #define DIAC_NUM_RANGES      (ARRAYLEN(diac_ranges))
 
 /* Each diac_range_ struct defines a Unicode range that begins with
  * N diacritic characters, and continues with non-diacritic characters up to the
- * base of the next item in the array */
+ * base of the next item in the array
+ *
+ * Fuctionality is reduced to only Combining Diacritics and is_RTL in BOOTLOADER
+*/
 struct diac_range
 {
     unsigned base           : 16;
@@ -193,6 +196,7 @@ static const struct diac_range diac_ranges[] =
 static unsigned short mru_len = 0;
 static unsigned short diacritic_mru[MRU_MAX_LEN];
 
+#ifndef BOOTLOADER
 bool is_diacritic(const unsigned short char_code, bool *is_rtl)
 {
     unsigned short mru, i;
@@ -239,3 +243,22 @@ Found:
 
     return (char_code < diac->base + diac->num_diacritics);
 }
+#else /* BOOTLOADER */
+/* BOOTLOADER Dummy Function */
+#warning is_diacritic functionality reduced in bootloader
+bool is_diacritic(const unsigned short char_code, bool *is_rtl)
+{
+    (void) diacritic_mru;
+    (void) mru_len;
+    DEBUGF("diacritic.c is_diacritic() reduced in bootloader\n");
+
+    /* RTL languages */
+    if (is_rtl)
+        *is_rtl = ((char_code > 0x058f && char_code < 0x07c0) ||
+                   (char_code == 0xfe70)) ? true : false;
+
+    /* Only true for Combining Diacritical Marks */
+    return ((char_code > 0x2ff && char_code < 0x370) ||
+            (char_code > 0x20CF && char_code < 0x2100)) ? true : false;
+}
+#endif /* ndef BOOTLOADER*/
