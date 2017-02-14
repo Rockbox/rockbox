@@ -26,7 +26,6 @@
 #include <time.h>
 #include "config.h"
 #include "system.h"
-#include "mv.h" /* for volume definitions */
 
 /********
  **** DO NOT use these functions directly unless otherwise noted. Required
@@ -51,131 +50,209 @@
 /**
  ****************************************************************************/
 
-#define INVALID_SECNUM     (0xfffffffeul) /* sequential, not FAT */
-#define FAT_MAX_FILE_SIZE  (0xfffffffful) /* 2^32-1 bytes */
-#define MAX_DIRENTRIES     65536
-#define MAX_DIRECTORY_SIZE (MAX_DIRENTRIES*32) /* 2MB max size */
+/* Note: This struct doesn't hold the raw values after mounting if
+ * bpb_bytspersec isn't 512. All sector counts are normalized to 512 byte
+ * physical sectors. */
+#ifdef HAVE_FAT16SUPPORT
+#define IF_FAT16(...) __VA_ARGS__
+#else
+#define IF_FAT16(...)
+#endif
 
-/* these aren't I/O error conditions, so define specially; failure rc's
- * shouldn't return the last digit as "0", therefore this is unambiguous */
-#define FAT_RC_ENOSPC (-10)
-#define FAT_SEEK_EOF  (-20)
-
-/* Number of bytes reserved for a file name (including the trailing \0).
-   Since names are stored in the entry as UTF-8, we won't be ble to
-   store all names allowed by FAT. In FAT, a name can have max 255
-   characters (not bytes!). Since the UTF-8 encoding of a char may take
-   up to 4 bytes, there will be names that we won't be able to store
-   completely. For such names, the short DOS name is used. */
-#define FAT_DIRENTRY_NAME_MAX 255
-struct fat_direntry
+struct fsinfo
 {
-    union {
-    uint8_t  name[255+1+4];     /* UTF-8 name plus \0 plus parse slop */
-    uint16_t ucssegs[5+20][13]; /* UTF-16 segment buffer - layout saves... */
-    };                          /* ...130 bytes (important if stacked) */
-    uint16_t ucsterm;           /* allow one NULL-term after ucssegs */
-    uint8_t  shortname[13];     /* DOS filename (OEM charset) */
-    uint8_t  attr;              /* file attributes */
-    uint8_t  crttimetenth;      /* millisecond creation time stamp (0-199) */
-    uint16_t crttime;           /* creation time */
-    uint16_t crtdate;           /* creation date */
-    uint16_t lstaccdate;        /* last access date */
-    uint16_t wrttime;           /* last write time */
-    uint16_t wrtdate;           /* last write date */
-    uint32_t filesize;          /* file size in bytes */
-    int32_t  firstcluster;      /* first FAT cluster of file, 0 if empty */
+    signed long freecount; /* last known free cluster count */
+    signed long nextfree;  /* first cluster to start looking for free
+                              clusters, or -1 for no hint */
+    bool        dirty;     /* true if it needs writeback */
 };
 
-/* cursor structure used for scanning directories; holds the last-returned
-   entry information */
-#define FAT_DIRSCAN_RW_VAL (0u - 1u)
+/* variables for internal use */
+#define __struct_bpb_DRV_FAT \
+    struct {                                                          \
+    unsigned long secperclus;       /* sectors in each cluster */     \
+    unsigned long clussize;         /* total size of a cluster */     \
+    unsigned long fatsz;            /* number of FAT sectors */       \
+    unsigned int  numfats;          /* number of FAT structures */    \
+    unsigned long fatrgnstart;      /* first sector of FAT 0 */       \
+    unsigned long firstdatasector;  /* sector of first data block */  \
+    unsigned long firstallowed;     /* first writeable sector */      \
+    unsigned long totsec;           /* sectors used by this volume */ \
+    unsigned long dataclusters;     /* total data clusters in vol */  \
+    signed   long rootclus;         /* negative if not FAT32 */       \
+    union {                                                           \
+    unsigned long fsinfosec;        /* fsinfo sector - FAT32 only */  \
+    unsigned long rootdirsectornum; /* root sector   - FAT16 only */  \
+    };                                                                \
+    struct fsinfo fsinfo;           /* 16/32: kept, 32: persisted */  \
+    IF_FAT16(                                                         \
+    const struct  fat_ops *ops; /* functions specific to FAT type */  \
+    ) /* IF_FAT16 */                                                  \
+    }
 
-struct fat_dirscan_info
-{
-    unsigned int entry;         /* short dir entry index in parent */
-    unsigned int entries;       /* number of dir entries used */
-};
+#define FAT_DIRSCAN_RW_VAL (0u - 1u) /* before entry 0 */
 
-#define FAT_FILE_RW_VAL  (0ul - 1ul)
+#define __struct_DRV_FAT(...) __VA_ARGS__
+
+#define __struct_dirscan_DRV_FAT \
+    struct {                                                          \
+    unsigned int direntry;      /* current dir index cursor */        \
+    }
+
+#define __struct_idx_info_DRV_FAT \
+    struct {                                                          \
+    unsigned int direntry;      /* short entry in parent */           \
+    unsigned int numentries;    /* number of entries used */          \
+    }
+
+#define __struct_stat_DRV_FAT \
+    struct {                                                          \
+    uint8_t  attr;              /* file attributes */                 \
+    uint8_t  crttimetenth;      /* ms creation time stamp (0-199) */  \
+    uint16_t crttime;           /* creation time */                   \
+    uint16_t crtdate;           /* creation date */                   \
+    uint16_t lstaccdate;        /* last access date */                \
+    uint16_t wrttime;           /* last write time */                 \
+    uint16_t wrtdate;           /* last write date */                 \
+    uint32_t filesize;          /* file size in bytes */              \
+    int32_t  firstcluster;      /* file's first cluster, 0=empty */   \
+    }
+
+#define __struct_fileentry_DRV_FAT \
+    struct {                                                          \
+    uint16_t ucssegs[20][13];   /* UTF-16 segment buffer */           \
+    uint16_t ucsterm;           /* NULL-term after ucssegs */         \
+    uint8_t  shortname[13];     /* DOS filename (OEM charset) */      \
+    __struct_stat_DRV_FAT;      /* numeric file entry stats */        \
+    __struct_idx_info_DRV_FAT;  /* directory index info */            \
+    }
 
 /* basic FAT file information about where to find a file and who houses it */
-struct fat_file
-{
-#ifdef HAVE_MULTIVOLUME
-    int    volume;              /* file resides on which volume (first!) */
-#endif
-    long   firstcluster;        /* first cluster in file */
-    long   dircluster;          /* first cluster of parent directory */
-    struct fat_dirscan_info e;  /* entry information */
-};
+#define __struct_fileinfo_DRV_FAT \
+    struct {                                                          \
+    signed   long firstcluster; /* first cluster in file */           \
+    signed   long dircluster;   /* first cluster of parent */         \
+    __struct_idx_info_DRV_FAT;  /* directory index info */            \
+    }
 
 /* this stores what was last accessed when read or writing a file's data */
-struct fat_filestr
-{
-    struct fat_file *fatfilep;  /* common file information */
-    long          lastcluster;  /* cluster of last access */
-    unsigned long lastsector;   /* sector of last access */
-    long          clusternum;   /* cluster number of last access */
-    unsigned long sectornum;    /* sector number within current cluster */
-    bool          eof;          /* end-of-file reached */
-};
+#define __struct_filestr_DRV_FAT \
+    struct {                                                          \
+    signed   long lastcluster; /* cluster of last access */           \
+    unsigned long lastsector;  /* sector of last access */            \
+    signed   long clusternum;  /* cluster number of last access */    \
+    unsigned long sectornum;   /* sector index in current cluster */  \
+    bool          eof;         /* end-of-file reached */              \
+    struct iobuf_handle fatiob; /* side handle for FAT sectors */     \
+    }
 
-/** File entity functions **/
-int fat_create_file(struct fat_file *parent, const char *name,
-                    uint8_t attr, struct fat_file *file,
-                    struct fat_direntry *fatent);
-bool fat_dir_is_parent(const struct fat_file *dir, const struct fat_file *file);
-bool fat_file_is_same(const struct fat_file *file1, const struct fat_file *file2);
-int fat_fstat(struct fat_file *file, struct fat_direntry *entry);
-int fat_open(const struct fat_file *parent, long startcluster,
-             struct fat_file *file);
-int fat_open_rootdir(IF_MV(int volume,) struct fat_file *dir);
-enum fat_remove_op           /* what should fat_remove(), remove? */
-{
-    FAT_RM_DIRENTRIES = 0x1, /* remove only directory entries */
-    FAT_RM_DATA       = 0x2, /* remove only file data */
-    FAT_RM_ALL        = 0x3, /* remove all of above */
-};
-int fat_remove(struct fat_file *file, enum fat_remove_op what);
-int fat_rename(struct fat_file *parent, struct fat_file *file,
-               const unsigned char *newname);
+struct bpb;
+struct fileentry;
+struct fileinfo;
+struct filestr;
 
-/** File stream functions **/
-int fat_closewrite(struct fat_filestr *filestr, uint32_t size,
-                   struct fat_direntry *fatentp);
-void fat_filestr_init(struct fat_filestr *filestr, struct fat_file *file);
-unsigned long fat_query_sectornum(const struct fat_filestr *filestr);
-long fat_readwrite(struct fat_filestr *filestr, unsigned long sectorcount,
-                   void *buf, bool write);
-void fat_rewind(struct fat_filestr *filestr);
-int fat_seek(struct fat_filestr *filestr, unsigned long sector);
-void fat_seek_to_stream(struct fat_filestr *filestr,
-                        const struct fat_filestr *filestr_seek_to);
-int fat_truncate(const struct fat_filestr *filestr);
+#ifdef __FILESYS_STRUCTS_DRV
+/* complete the structure definitions in flattened, reduced form */
+FS_DRV_STRUCT_COMPLETE(bpb, FAT);
 
-/** Directory stream functions **/
-struct filestr_cache;
-int fat_readdir(struct fat_filestr *dirstr, struct fat_dirscan_info *scan,
-                struct filestr_cache *cachep, struct fat_direntry *entry);
-void fat_rewinddir(struct fat_dirscan_info *scan);
+/* the following use struct iobuf_handle */
+#include "disk_cache.h"
 
-/** Mounting and unmounting functions **/
-bool fat_ismounted(IF_MV_NONVOID(int volume));
-int fat_mount(IF_MV(int volume,) IF_MD(int drive,) unsigned long startsector);
-int fat_unmount(IF_MV_NONVOID(int volume));
+FS_DRV_STRUCT_COMPLETE(fileentry, FAT);
+FS_DRV_STRUCT_COMPLETE(fileinfo, FAT);
+FS_DRV_STRUCT_COMPLETE(filestr, FAT);
+FS_DRV_STRUCT_COMPLETE(dirscan, FAT);
+#endif /* __FILESYS_STRUCTS_DRV */
 
-/** Debug screen stuff **/
+/** File Ops **/
+
+/* file */
+enum cmpfi_result fat_fileop_compare_fileinfo(const struct fileinfo *info1,
+                                              const struct fileinfo *info2);
+
+int fat_fileop_open_volume(struct bpb *bpb,
+                           struct fileinfo *info);
+
+int fat_fileop_create(struct fileinfo *dirinfo,
+                      unsigned int callflags,
+                      struct fileentry *entry);
+
+int fat_fileop_open(struct fileinfo *dirinfo,
+                    struct fileentry *entry,
+                    struct fileinfo *info);
+
+int fat_fileop_close(struct fileinfo *info);
+
+int fat_fileop_remove(struct fileinfo *info);
+
+int fat_fileop_sync(struct fileinfo *info,
+                    struct fileentry *entry);
+
+int fat_fileop_rename(struct fileinfo *dirinfo,
+                      struct fileinfo *info,
+                      struct fileentry *entry);
+
+int fat_fileop_open_filestr(struct fileinfo *info,
+                            struct filestr *str);
+
+static inline int fat_fileop_close_filestr(struct filestr *str)
+    { return 0; (void)str; }
+
+int fat_fileop_ftruncate(struct filestr *str,
+                         file_size_t truncsize);
+
+off_t fat_fileop_lseek(struct filestr *str,
+                       off_t offset,
+                       int whence);
+
+ssize_t fat_fileop_readwrite(struct filestr *str,
+                             void *buf,
+                             size_t nbyte,
+                             bool write);
+
+/* directory */
+int fat_fileop_compare_name(struct fileinfo *dirinfo,
+                            const char *name1,
+                            const char *name2,
+                            size_t maxlen);
+
+int fat_fileop_get_fileentry(struct fileinfo *dirinfo,
+                             const char *name,
+                             size_t length,
+                             struct fileentry *entry);
+
+int fat_fileop_readdir(struct filestr *dirstr,
+                       struct dirscan *scan,
+                       struct fileentry *entry);
+
+int fat_fileop_rewinddir(struct filestr *dirstr,
+                         struct dirscan *scan);
+
+int fat_fileop_convert_entry(union direntry_cvt_t dst,
+                             union direntry_cvt_t src,
+                             unsigned int cvtflags);
+
+/** Disk Ops **/
+int fat_diskop_mount(struct bpb *bpb);
+int fat_diskop_unmount(struct bpb *bpb);
+
+/** Volume Ops **/
+size_t fat_volop_cluster_size(struct bpb *bpb);
+
 #ifdef MAX_LOG_SECTOR_SIZE
-int fat_get_bytes_per_sector(IF_MV_NONVOID(int volume));
-#endif /* MAX_LOG_SECTOR_SIZE */
-unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume));
-void fat_recalc_free(IF_MV_NONVOID(int volume));
-bool fat_size(IF_MV(int volume,) unsigned long *size, unsigned long *free);
+size_t fat_volop_get_bytes_per_sector(struct bpb *bpb);
+#endif
+
+void fat_volop_recalc_free(struct bpb *bpb);
+
+void fat_volop_size(struct bpb *bpb,
+                    unsigned long *size,
+                    unsigned long *free);
+
+void fat_volop_flush(struct bpb *bpb);
 
 /** Misc. **/
-time_t fattime_mktime(uint16_t fatdate, uint16_t fattime);
-void fat_empty_fat_direntry(struct fat_direntry *entry);
-void fat_init(void);
+time_t fattime_mktime(uint16_t fatdate,
+                      uint16_t fattime);
 
 #endif /* FAT_H */
