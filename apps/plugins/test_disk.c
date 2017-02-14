@@ -21,7 +21,11 @@
 
 #include "plugin.h"
 #include "lib/helper.h"
-
+#include "lib/pluginlib_actions.h"
+#include "lib/playergfx.h"
+#include "lib/xlcd.h"
+#include "lib/mylcd.h"
+#include <errno.h>
 
 
 #define TESTBASEDIR HOME_DIR "/__TEST__"
@@ -41,9 +45,40 @@ static size_t audiobuflen;
 static unsigned short frnd_buffer;
 static int line = 0;
 static int max_line = 0;
+static int line_height = 0;
 static int log_fd;
 static char logfilename[MAX_PATH];
 static const char testbasedir[] = TESTBASEDIR;
+
+#define LOG_PUTS   0x0
+#define LOG_SCROLL 0x1
+#define LOG_PUTLOG 0x2
+
+static bool should_abort(void)
+{
+    const struct button_mapping *plugin_contexts[] =
+    {
+        pla_main_ctx,
+#ifdef HAVE_REMOTE_LCD
+        pla_remote_ctx,
+#endif
+    };
+
+    while (1)
+    {
+        int action = pluginlib_getaction(0, plugin_contexts,
+                                         ARRAYLEN(plugin_contexts));
+        switch (action)
+        {
+            case ACTION_NONE:
+                return false;
+
+            case PLA_EXIT:
+            case PLA_CANCEL:
+               return true;
+        }
+    }
+}
 
 static void mem_fill_frnd(unsigned char *addr, int len)
 {
@@ -75,10 +110,8 @@ static bool mem_cmp_frnd(unsigned char *addr, int len)
 
 static bool log_init(void)
 {
-    int h;
-
-    rb->lcd_getstringsize("A", NULL, &h);
-    max_line = LCD_HEIGHT / h;
+    rb->lcd_getstringsize("A", NULL, &line_height);
+    max_line = LCD_HEIGHT / line_height;
     line = 0;
     rb->lcd_clear_display();
     rb->lcd_update();
@@ -89,14 +122,39 @@ static bool log_init(void)
     return log_fd >= 0;
 }
 
-static void log_text(char *text, bool advance)
+static void log_text(const char *text, unsigned flags)
 {
+    if (flags & LOG_SCROLL)
+    {
+        if (line >= max_line)
+        {
+#ifdef HAVE_LCD_BITMAP
+            mylcd_scroll_up(line_height);
+            line--;
+#else
+            line = 0;
+#endif
+        }
+    }
+
+#ifdef HAVE_LCD_BITMAP
+    int mode = rb->lcd_get_drawmode();
+    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    rb->lcd_fillrect(0, line*line_height, LCD_WIDTH, line_height);
+    rb->lcd_set_drawmode(mode);
+#endif
+
     rb->lcd_puts(0, line, text);
     rb->lcd_update();
-    if (advance)
+
+    if (flags & LOG_SCROLL)
     {
-        if (++line >= max_line)
-            line = 0;
+        if (line < max_line)
+            line++;
+    }
+
+    if (flags & LOG_PUTLOG)
+    {
         rb->fdprintf(log_fd, "%s\n", text);
     }
 }
@@ -111,22 +169,24 @@ static bool test_fs(void)
     unsigned char text_buf[32];
     int total, current, align;
     int fd, ret;
+    bool errabt = true;
 
     log_init();
-    log_text("test_disk WRITE&VERIFY", true);
+    log_text("test_disk WRITE&VERIFY", LOG_SCROLL|LOG_PUTLOG);
+    log_text(rb->rbversion, LOG_SCROLL|LOG_PUTLOG);
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     rb->snprintf(text_buf, sizeof(text_buf), "CPU clock: %ld Hz",
                  *rb->cpu_frequency);
     log_text(text_buf, true);
 #endif
-    log_text("----------------------", true);
+    log_text("----------------------", LOG_SCROLL|LOG_PUTLOG);
     rb->snprintf(text_buf, sizeof text_buf, "Data size: %dKB", (TEST_SIZE>>10));
-    log_text(text_buf, true);
+    log_text(text_buf, LOG_SCROLL|LOG_PUTLOG);
 
     fd = rb->creat(TEST_FILE, 0666);
     if (fd < 0)
     {
-        rb->splashf(HZ, "creat() failed: %d", fd);
+        rb->splashf(HZ, "creat() failed (%d)", errno);
         goto error;
     }
 
@@ -139,24 +199,27 @@ static bool test_fs(void)
         current = MIN(current, total);
         rb->snprintf(text_buf, sizeof text_buf, "Wrt %dKB, %dKB left",
                      current >> 10, total >> 10);
-        log_text(text_buf, false);
+        log_text(text_buf, LOG_PUTS);
 
         mem_fill_frnd(audiobuf + align, current);
         ret = rb->write(fd, audiobuf + align, current);
         if (current != ret)
         {
-            rb->splashf(0, "write() failed: %d/%d", ret, current);
+            rb->splashf(0, "write() failed: %d/%d (%d)", ret, current, errno);
             rb->close(fd);
             goto error;
         }
         total -= current;
+
+        if (should_abort())
+            goto error;
     }
     rb->close(fd);
 
     fd = rb->open(TEST_FILE, O_RDONLY);
     if (fd < 0)
     {
-        rb->splashf(0, "open() failed: %d", ret);
+        rb->splashf(0, "open() failed (%d)", errno);
         goto error;
     }
 
@@ -169,29 +232,34 @@ static bool test_fs(void)
         current = MIN(current, total);
         rb->snprintf(text_buf, sizeof text_buf, "Cmp %dKB, %dKB left",
                      current >> 10, total >> 10);
-        log_text(text_buf, false);
+        log_text(text_buf, LOG_PUTS);
 
         ret = rb->read(fd, audiobuf + align, current);
         if (current != ret)
         {
-            rb->splashf(0, "read() failed: %d/%d", ret, current);
+            rb->splashf(0, "read() failed: %d/%d (%d)", ret, current, errno);
             rb->close(fd);
             goto error;
         }
         if (!mem_cmp_frnd(audiobuf + align, current))
         {
-            log_text(text_buf, true);
-            log_text("Compare error.", true);
+            log_text(text_buf, LOG_SCROLL|LOG_PUTLOG);
+            log_text("Compare error.", LOG_SCROLL|LOG_PUTLOG);
             rb->close(fd);
             goto error;
         }
         total -= current;
-    }
-    rb->close(fd);
-    log_text(text_buf, true);
-    log_text("Test passed.", true);
 
+        if (should_abort())
+            goto error;
+    }
+    log_text(text_buf, LOG_SCROLL|LOG_PUTLOG);
+    log_text("Test passed.", LOG_SCROLL|LOG_PUTLOG);
+    errabt = false;
 error:
+    rb->close(fd);
+    if (errabt)
+        log_text("Error/Abort", LOG_SCROLL|LOG_PUTLOG);
     log_close();
     rb->remove(TEST_FILE);
     rb->button_clear_queue();
@@ -210,13 +278,15 @@ static bool file_speed(int chunksize, bool align)
     if ((unsigned)chunksize >= audiobuflen)
         return false;
 
-    log_text("--------------------", true);
+    errno = 0;
+
+    log_text("--------------------", LOG_SCROLL|LOG_PUTLOG);
 
     /* File creation write speed */
     fd = rb->creat(TEST_FILE, 0666);
     if (fd < 0)
     {
-        rb->splashf(HZ, "creat() failed: %d", fd);
+        rb->splashf(HZ, "creat() failed (%d)", errno);
         goto error;
     }
     time = *rb->current_tick;
@@ -225,7 +295,8 @@ static bool file_speed(int chunksize, bool align)
         ret = rb->write(fd, audiobuf + (align ? 0 : 1), chunksize);
         if (chunksize != ret)
         {
-            rb->splashf(HZ, "write() failed: %d/%d", ret, chunksize);
+            rb->splashf(HZ, "write() failed: %d/%d (%d)", ret, chunksize,
+                        errno);
             rb->close(fd);
             goto error;
         }
@@ -235,13 +306,16 @@ static bool file_speed(int chunksize, bool align)
     rb->close(fd);
     rb->snprintf(text_buf, sizeof text_buf, "Create (%d,%c): %ld KB/s",
                  chunksize, align ? 'A' : 'U', (25 * (filesize>>8) / time) );
-    log_text(text_buf, true);
+    log_text(text_buf, LOG_SCROLL|LOG_PUTLOG);
+
+    if (should_abort())
+        goto error;
 
     /* Existing file write speed */
     fd = rb->open(TEST_FILE, O_WRONLY);
     if (fd < 0)
     {
-        rb->splashf(0, "open() failed: %d", fd);
+        rb->splashf(0, "open() failed (%d)", errno);
         goto error;
     }
     time = *rb->current_tick;
@@ -250,7 +324,8 @@ static bool file_speed(int chunksize, bool align)
         ret = rb->write(fd, audiobuf + (align ? 0 : 1), chunksize);
         if (chunksize != ret)
         {
-            rb->splashf(0, "write() failed: %d/%d", ret, chunksize);
+            rb->splashf(0, "write() failed: %d/%d (%d)", ret, chunksize,
+                        errno);
             rb->close(fd);
             goto error;
         }
@@ -259,13 +334,16 @@ static bool file_speed(int chunksize, bool align)
     rb->close(fd);
     rb->snprintf(text_buf, sizeof text_buf, "Write  (%d,%c): %ld KB/s",
                  chunksize, align ? 'A' : 'U', (25 * (filesize>>8) / time) );
-    log_text(text_buf, true);
+    log_text(text_buf, LOG_SCROLL|LOG_PUTLOG);
+
+    if (should_abort())
+        goto error;
     
     /* File read speed */
     fd = rb->open(TEST_FILE, O_RDONLY);
     if (fd < 0)
     {
-        rb->splashf(0, "open() failed: %d", fd);
+        rb->splashf(0, "open() failed (%d)", errno);
         goto error;
     }
     time = *rb->current_tick;
@@ -274,7 +352,8 @@ static bool file_speed(int chunksize, bool align)
         ret = rb->read(fd, audiobuf + (align ? 0 : 1), chunksize);
         if (chunksize != ret)
         {
-            rb->splashf(0, "read() failed: %d/%d", ret, chunksize);
+            rb->splashf(0, "read() failed: %d/%d (%d)", ret, chunksize,
+                        errno);
             rb->close(fd);
             goto error;
         }
@@ -283,7 +362,11 @@ static bool file_speed(int chunksize, bool align)
     rb->close(fd);
     rb->snprintf(text_buf, sizeof text_buf, "Read   (%d,%c): %ld KB/s",
                  chunksize, align ? 'A' : 'U', (25 * (filesize>>8) / time) );
-    log_text(text_buf, true);
+    log_text(text_buf, LOG_SCROLL|LOG_PUTLOG);
+
+    if (should_abort())
+        goto error;
+
     rb->remove(TEST_FILE);
     return true;
 
@@ -303,13 +386,14 @@ static bool test_speed(void)
 
     rb->memset(audiobuf, 'T', audiobuflen);
     log_init();
-    log_text("test_disk SPEED TEST", true);
+    log_text("test_disk SPEED TEST", LOG_SCROLL|LOG_PUTLOG);
+    log_text(rb->rbversion, LOG_SCROLL|LOG_PUTLOG);
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     rb->snprintf(text_buf, sizeof(text_buf), "CPU clock: %ld Hz",
                  *rb->cpu_frequency);
-    log_text(text_buf, true);
+    log_text(text_buf, LOG_SCROLL|LOG_PUTLOG);
 #endif
-    log_text("--------------------", true);
+    log_text("--------------------", LOG_SCROLL|LOG_PUTLOG);
 
     /* File creation speed */
     time = *rb->current_tick + TEST_TIME*HZ;
@@ -320,7 +404,7 @@ static bool test_speed(void)
         if (fd < 0)
         {
             last_file = i;
-            rb->splashf(HZ, "creat() failed: %d", fd);
+            rb->splashf(HZ, "creat() failed (%d)", errno);
             goto error;
         }
         rb->close(fd);
@@ -328,8 +412,11 @@ static bool test_speed(void)
     last_file = i;
     rb->snprintf(text_buf, sizeof(text_buf), "Create:  %d files/s",
                  last_file / TEST_TIME);
-    log_text(text_buf, true);
-    
+    log_text(text_buf, LOG_SCROLL|LOG_PUTLOG);
+
+    if (should_abort())
+        goto error;
+
     /* File open speed */
     time = *rb->current_tick + TEST_TIME*HZ;
     for (n = 0, i = 0; TIME_BEFORE(*rb->current_tick, time); n++, i++)
@@ -340,13 +427,16 @@ static bool test_speed(void)
         fd = rb->open(text_buf, O_RDONLY);
         if (fd < 0)
         {
-            rb->splashf(HZ, "open() failed: %d", fd);
+            rb->splashf(HZ, "open() failed (%d)", errno);
             goto error;
         }
         rb->close(fd);
     }
     rb->snprintf(text_buf, sizeof(text_buf), "Open:    %d files/s", n / TEST_TIME);
-    log_text(text_buf, true);
+    log_text(text_buf, LOG_SCROLL|LOG_PUTLOG);
+
+    if (should_abort())
+        goto error;
 
     /* Directory scan speed */
     time = *rb->current_tick + TEST_TIME*HZ;
@@ -359,7 +449,7 @@ static bool test_speed(void)
             dir = rb->opendir(testbasedir);
             if (dir == NULL)
             {
-                rb->splash(HZ, "opendir() failed.");
+                rb->splashf(HZ, "opendir() failed (%d)", errno);
                 goto error;
             }
         }
@@ -367,7 +457,10 @@ static bool test_speed(void)
     }
     rb->closedir(dir);
     rb->snprintf(text_buf, sizeof(text_buf), "Dirscan: %d files/s", n / TEST_TIME);
-    log_text(text_buf, true);
+    log_text(text_buf, LOG_SCROLL|LOG_PUTLOG);
+
+    if (should_abort())
+        goto error;
 
     dir = NULL;
     entry = NULL;
@@ -382,7 +475,7 @@ static bool test_speed(void)
             dir = rb->opendir(testbasedir);
             if (dir == NULL)
             {
-                rb->splash(HZ, "opendir() failed.");
+                rb->splashf(HZ, "opendir() failed (%d)", errno);
                 goto error;
             }
         }
@@ -392,7 +485,10 @@ static bool test_speed(void)
     }
     rb->closedir(dir);
     rb->snprintf(text_buf, sizeof(text_buf), "Dirscan w info: %d files/s", n / TEST_TIME);
-    log_text(text_buf, true);
+    log_text(text_buf, LOG_SCROLL|LOG_PUTLOG);
+
+    if (should_abort())
+        goto error;
 
     /* File delete speed */
     time = *rb->current_tick;
@@ -403,7 +499,10 @@ static bool test_speed(void)
     }
     rb->snprintf(text_buf, sizeof(text_buf), "Delete:  %ld files/s",
                  last_file * HZ / (*rb->current_tick - time));
-    log_text(text_buf, true);
+    log_text(text_buf, LOG_SCROLL|LOG_PUTLOG);
+
+    if (should_abort())
+        goto error;
     
     if (file_speed(512, true)
         && file_speed(512, false)
@@ -412,7 +511,7 @@ static bool test_speed(void)
         && file_speed(1048576, true))
         file_speed(1048576, false);
 
-    log_text("DONE", false);
+    log_text("DONE", LOG_SCROLL);
     log_close();
     rb->button_clear_queue();
     rb->button_get(true);
@@ -424,7 +523,7 @@ static bool test_speed(void)
         rb->snprintf(text_buf, sizeof(text_buf), TESTBASEDIR "/%08x.tmp", i);
         rb->remove(text_buf);
     }
-    log_text("DONE", false);
+    log_text("DONE", LOG_SCROLL);
     log_close();
     rb->button_clear_queue();
     rb->button_get(true);

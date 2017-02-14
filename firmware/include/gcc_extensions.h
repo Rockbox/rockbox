@@ -77,5 +77,11 @@
 #define UNUSED_ATTR
 #endif
 
+#if defined(__GNUC__) && (__GNUC__ >= 5 || \
+                    (__GNUC__ >= 4 && __GNUC_MINOR__ >= 3))
+#define HOT_ATTR    __attribute__((hot))
+#else
+#define HOT_ATTR
+#endif
 
 #endif /* _GCC_EXTENSIONS_H_ */

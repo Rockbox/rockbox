@@ -97,10 +97,13 @@
     ((unsigned int)IF_MD_DRV(drive) < NUM_DRIVES)
 
 /* Volume-centric functions (in disk.c) */
+struct bpb;
+struct bpb * get_vol_bpb(int volume);
+
 void volume_recalc_free(IF_MV_NONVOID(int volume));
 unsigned int volume_get_cluster_size(IF_MV_NONVOID(int volume));
 void volume_size(IF_MV(int volume,) unsigned long *size, unsigned long *free);
-bool volume_ismounted(IF_MV_NONVOID(int volume));
+void volume_flush(IF_MV_NONVOID(int volume)); /* -1 = all */
 #ifdef HAVE_HOTSWAP
 bool volume_removable(int volume);
 bool volume_present(int volume);

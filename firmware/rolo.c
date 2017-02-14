@@ -35,6 +35,7 @@
 #include "adc.h"
 #include "string.h"
 #include "core_alloc.h"
+#include "file_internal.h"
 #include "storage.h"
 #include "rolo.h"
 
@@ -258,11 +259,10 @@ int rolo_load(const char* filename)
     lcd_update();
 #endif
 
-#ifdef HAVE_STORAGE_FLUSH
-    lcd_puts(0, 1, "Flushing storage buffers");
+    lcd_puts(0, 1, "Flushing");
     lcd_update();
-    storage_flush();
-#endif
+    filesystem_close();
+    volume_flush(IF_MV(-1));
 
     lcd_puts(0, 1, "Executing");
     lcd_update();
@@ -377,11 +377,10 @@ int rolo_load(const char* filename)
         return -1;
     }
 
-#ifdef HAVE_STORAGE_FLUSH
     lcd_puts(0, 1, "Flushing      ");
     lcd_update();
-    storage_flush();
-#endif
+    filesystem_close();
+    volume_flush(IF_MV(-1));
 
     lcd_puts(0, 1, "Executing     ");
     lcd_update();
