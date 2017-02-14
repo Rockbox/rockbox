@@ -24,7 +24,7 @@
 #include "kernel.h"
 #include "storage.h"
 #include "debug.h"
-#include "disk_cache.h"
+#include "file_internal.h"
 #include "fileobj_mgr.h"
 #include "dir.h"
 #include "dircache_redirect.h"
@@ -76,14 +76,23 @@ static const unsigned char fat_partition_types[] =
 
 /* space for 4 partitions on 2 drives */
 static struct partinfo part[NUM_DRIVES*4];
-/* mounted to which drive (-1 if none) */
-static int vol_drive[NUM_VOLUMES];
+
+struct bpb * get_vol_bpb(int volume)
+{
+    /* mounted partition info */
+    static struct bpb bpbs[NUM_VOLUMES];
+
+    if ((unsigned int)volume >= ARRAYLEN(bpbs))
+        return NULL;
+
+    return &bpbs[volume];
+}
 
 static int get_free_volume(void)
 {
     for (int i = 0; i < NUM_VOLUMES; i++)
     {
-        if (vol_drive[i] == -1) /* unassigned? */
+        if (!get_vol_bpb(i)->mounted) /* unassigned? */
             return i;
     }
 
@@ -106,12 +115,12 @@ int disk_get_sector_multiplier(IF_MD_NONVOID(int drive))
 }
 #endif /* MAX_LOG_SECTOR_SIZE */
 
-bool disk_init(IF_MD_NONVOID(int drive))
+static bool disk_init(IF_MD_NONVOID(int drive))
 {
     if (!CHECK_DRV(drive))
         return false; /* out of space in table */
 
-    unsigned char *sector = dc_get_buffer();
+    unsigned char *sector = iocache_get_buffer();
     if (!sector)
         return false;
 
@@ -127,8 +136,6 @@ bool disk_init(IF_MD_NONVOID(int drive))
            destroy the first entry of drive 0. That one is needed to calculate
            config sector position. */
         struct partinfo *pinfo = &part[IF_MD_DRV(drive)*4];
-
-        disk_writer_lock();
 
         /* parse partitions */
         for (int i = 0; i < 4; i++)
@@ -148,8 +155,6 @@ bool disk_init(IF_MD_NONVOID(int drive))
             }
         }
 
-        disk_writer_unlock();
-
         init = true;
     }
     else
@@ -157,7 +162,7 @@ bool disk_init(IF_MD_NONVOID(int drive))
         DEBUGF("Bad boot sector signature\n");
     }
 
-    dc_release_buffer(sector);
+    iocache_release_buffer(sector);
     return init;
 }
 
@@ -195,6 +200,13 @@ int disk_mount(int drive)
          volume != -1 && i < 4 && mounted < NUM_VOLUMES_PER_DRIVE;
          i++)
     {
+        struct bpb *bpb = get_vol_bpb(volume);
+        /* init these prior to calling functions below */
+        bpb->drive = drive;
+        bpb->volume = volume;
+        bpb->startsector = pinfo[i].start;
+        ll_init(&bpb->openfiles);
+
         if (memchr(fat_partition_types, pinfo[i].type,
                    sizeof(fat_partition_types)) == NULL)
             continue;  /* not an accepted partition type */
@@ -202,12 +214,13 @@ int disk_mount(int drive)
     #ifdef MAX_LOG_SECTOR_SIZE
         for (int j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
         {
-            if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start * j))
+            bpb->startsector *= j;
+            if (!__DISKOP(mount)(bpb))
             {
+                bpb->mounted = 1;
+                mounted++;
                 pinfo[i].start *= j;
                 pinfo[i].size *= j;
-                mounted++;
-                vol_drive[volume] = drive; /* remember the drive for this volume */
                 disk_sector_multiplier[drive] = j;
                 volume_onmount_internal(IF_MV(volume));
                 volume = get_free_volume(); /* prepare next entry */
@@ -215,10 +228,10 @@ int disk_mount(int drive)
             }
         }
     #else /* ndef MAX_LOG_SECTOR_SIZE */
-        if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start))
+        if (!__DISKOP(mount)(bpb))
         {
+            bpb->mounted = 1;
             mounted++;
-            vol_drive[volume] = drive; /* remember the drive for this volume */
             volume_onmount_internal(IF_MV(volume));
             volume = get_free_volume(); /* prepare next entry */
         }
@@ -228,15 +241,19 @@ int disk_mount(int drive)
     if (mounted == 0 && volume != -1) /* none of the 4 entries worked? */
     {   /* try "superfloppy" mode */
         DEBUGF("No partition found, trying to mount sector 0.\n");
-
-        if (!fat_mount(IF_MV(volume,) IF_MD(drive,) 0))
+        struct bpb *bpb = get_vol_bpb(volume);
+        bpb->drive = drive;
+        bpb->volume = volume;
+        bpb->startsector = 0;
+        ll_init(&bpb->openfiles);
+        if (!__DISKOP(mount)(bpb))
         {
+            bpb->mounted = 1;
+            mounted = 1;
         #ifdef MAX_LOG_SECTOR_SIZE
             disk_sector_multiplier[drive] =
-                fat_get_bytes_per_sector(IF_MV(volume)) / SECTOR_SIZE;
+                __VOLOP(get_bytes_per_sector)(bpb) / SECTOR_SIZE;
         #endif
-            mounted = 1;
-            vol_drive[volume] = drive; /* remember the drive for this volume */
             volume_onmount_internal(IF_MV(volume));
         }
     }
@@ -253,10 +270,6 @@ int disk_mount_all(void)
 
     /* reset all mounted partitions */
     volume_onunmount_internal(IF_MV(-1));
-    fat_init();
-
-    for (int i = 0; i < NUM_VOLUMES; i++)
-        vol_drive[i] = -1; /* mark all as unassigned */
 
     for (int i = 0; i < NUM_DRIVES; i++)
     {
@@ -272,22 +285,20 @@ int disk_mount_all(void)
 
 int disk_unmount(int drive)
 {
-    if (!CHECK_DRV(drive))
-        return 0;
-
     int unmounted = 0;
 
     disk_writer_lock();
 
     for (int i = 0; i < NUM_VOLUMES; i++)
     {
-        if (vol_drive[i] == drive)
+        struct bpb *bpb = get_vol_bpb(i);
+        if (bpb->mounted && bpb->drive == drive)
         {   /* force releasing resources */
-            vol_drive[i] = -1; /* mark unused */
 
             volume_onunmount_internal(IF_MV(i));
-            fat_unmount(IF_MV(i));
+            __DISKOP(unmount)(bpb);
 
+            bpb->mounted = 0; /* mark unused */
             unmounted++;
         }
     }
@@ -322,11 +333,11 @@ bool disk_present(IF_MD_NONVOID(int drive))
 
     if (CHECK_DRV(drive))
     {
-        void *sector = dc_get_buffer();
+        void *sector = iocache_get_buffer();
         if (sector)
         {
             rc = storage_read_sectors(IF_MD(drive,) 0, 1, sector);
-            dc_release_buffer(sector);
+            iocache_release_buffer(sector);
         }
     }
 
@@ -338,52 +349,76 @@ bool disk_present(IF_MD_NONVOID(int drive))
 
 void volume_recalc_free(IF_MV_NONVOID(int volume))
 {
-    if (!CHECK_VOL(volume))
-        return;
-
-    /* FIXME: this is crummy but the only way to ensure a correct freecount
-       if other threads are writing and changing the fsinfo; it is possible
-       to get multiple threads calling here and also writing and get correct
-       freespace counts, however a bit complicated to do; if thou desireth I
-       shall implement the concurrent version -- jethead71 */
     disk_writer_lock();
-    fat_recalc_free(IF_MV(volume));
+
+    struct bpb *bpb = get_vol_bpb(IF_MV_VOL(volume));
+    if (bpb && bpb->mounted)
+        __VOLOP(recalc_free)(bpb);
+
     disk_writer_unlock();
 }
 
 unsigned int volume_get_cluster_size(IF_MV_NONVOID(int volume))
 {
-    if (!CHECK_VOL(volume))
-        return 0;
+    unsigned int clustersize = 0;
 
     disk_reader_lock();
-    unsigned int clustersize = fat_get_cluster_size(IF_MV(volume));
+
+    struct bpb *bpb = get_vol_bpb(IF_MV_VOL(volume));
+    if (bpb && bpb->mounted)
+        clustersize = __VOLOP(cluster_size)(bpb);
+
     disk_reader_unlock();
+
     return clustersize;
 }
 
 void volume_size(IF_MV(int volume,) unsigned long *sizep, unsigned long *freep)
 {
+    if (freep) *sizep = 0;
+    if (freep) *freep = 0;
+
     disk_reader_lock();
 
-    if (!CHECK_VOL(volume) || !fat_size(IF_MV(volume,) sizep, freep))
-    {
-        if (freep) *sizep = 0;
-        if (freep) *freep = 0;
-    }
+    struct bpb *bpb = get_vol_bpb(IF_MV_VOL(volume));
+    if (bpb && bpb->mounted)
+        __VOLOP(size)(bpb, sizep, freep);
 
     disk_reader_unlock();
 }
 
-#if defined (HAVE_HOTSWAP) || defined (HAVE_MULTIDRIVE) \
-    || defined (HAVE_DIRCACHE)
+void volume_flush(IF_MV(int volume))
+{
+    disk_writer_lock();
+
+    FOR_EACH_VOLUME(volume, v)
+    {
+        struct bpb *bpb = get_vol_bpb(v);
+        if (!bpb_ismounted_internal(bpb))
+            continue;
+
+        __VOLOP(flush)(bpb);
+        __vol_clean(bpb);
+    }
+
+#ifdef HAVE_STORAGE_FLUSH
+    /* Commit pending writes if needed. Things like flash translation layers
+       may need this to commit scattered pages to their final locations. So
+       far only used for iPod Nano 2G. */
+    storage_flush();
+#endif
+
+    disk_writer_unlock();
+}
+
+#if defined (HAVE_HOTSWAP) || defined (HAVE_MULTIDRIVE)
 enum volume_info_type
 {
 #ifdef HAVE_HOTSWAP
     VP_REMOVABLE,
     VP_PRESENT,
 #endif
-#if defined (HAVE_MULTIDRIVE) || defined (HAVE_DIRCACHE)
+#if defined (HAVE_MULTIDRIVE)
     VP_DRIVE,
 #endif
 };
@@ -394,9 +429,10 @@ static int volume_properties(int volume, enum volume_info_type infotype)
 
     disk_reader_lock();
 
-    if (CHECK_VOL(volume))
+    struct bpb *bpb = get_vol_bpb(volume);
+    if (bpb && bpb->mounted)
     {
-        int vd = vol_drive[volume];
+        int vd = bpb->drive;
         switch (infotype)
         {
     #ifdef HAVE_HOTSWAP
@@ -407,7 +443,7 @@ static int volume_properties(int volume, enum volume_info_type infotype)
             res = storage_present(vd) ? 1 : 0;
             break;
     #endif
-    #if defined(HAVE_MULTIDRIVE) || defined(HAVE_DIRCACHE)
+    #if defined(HAVE_MULTIDRIVE)
         case VP_DRIVE:
             res = vd;
             break;
@@ -438,11 +474,4 @@ int volume_drive(int volume)
 }
 #endif /* HAVE_MULTIDRIVE */
 
-#ifdef HAVE_DIRCACHE
-bool volume_ismounted(IF_MV_NONVOID(int volume))
-{
-    return volume_properties(IF_MV_VOL(volume), VP_DRIVE) >= 0;
-}
-#endif /* HAVE_DIRCACHE */
-
-#endif /* HAVE_HOTSWAP || HAVE_MULTIDRIVE || HAVE_DIRCACHE */
+#endif /* HAVE_HOTSWAP || HAVE_MULTIDRIVE */

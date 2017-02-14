@@ -36,6 +36,8 @@ static unsigned int storage_drivers[NUM_DRIVES];
 static unsigned int num_drives;
 #endif /* CONFIG_STORAGE_MULTI */
 
+unsigned int ___vol_active IBSS_ATTR;
+
 /* defaults: override elsewhere target-wise if they must be different */
 #if (CONFIG_STORAGE & STORAGE_ATA)
  #ifndef ATA_THREAD_STACK_SIZE
@@ -154,6 +156,27 @@ static FORCE_INLINE int storage_event_send(unsigned int route, long id,
 }
 #endif /* ndef CONFIG_STORAGE_MULTI */
 
+static void flush_idling_volumes(void)
+{
+    static unsigned int active = 0;
+    unsigned int mask = ___vol_active;
+    ___vol_active = 0;
+
+    active |= mask;
+    unsigned trig = active ^ mask;
+    active &= ~trig;
+
+    if (mask)
+        storage_spin(); /* cache hits can cause storage to go idle */
+
+    while (trig)
+    {
+        int volume = __builtin_ctz(trig);
+        volume_flush(IF_MV(volume));
+        trig &= ~(1 << volume);
+    }
+}
+
 static void NORETURN_ATTR storage_thread(void)
 {
     unsigned int bdcast = CONFIG_STORAGE;
@@ -174,10 +197,16 @@ static void NORETURN_ATTR storage_thread(void)
             trig = bdcast & ~trig;
             if (trig) {
                 if (!usb_mode) {
+                    /* anything could get dirt here since idle notifys aren't
+                       local to the storage driver going to sleep */
                     call_storage_idle_notifys(false);
+                    volume_flush(IF_MV(-1));
                 }
                 storage_event_send(trig, Q_STORAGE_SLEEPNOW, 0);
+                break;
             }
+
+            flush_idling_volumes();
             break;
 
 #if (CONFIG_STORAGE & STORAGE_ATA)
@@ -421,15 +450,6 @@ int storage_write_sectors(IF_MD(int drive,) unsigned long start, int count,
 }
 
 #ifdef CONFIG_STORAGE_MULTI
-
-#define DRIVER_MASK     0xff000000
-#define DRIVER_OFFSET   24
-#define DRIVE_MASK      0x00ff0000
-#define DRIVE_OFFSET    16
-#define PARTITION_MASK  0x0000ff00
-
-static unsigned int storage_drivers[NUM_DRIVES];
-static unsigned int num_drives;
 
 int storage_num_drives(void)
 {

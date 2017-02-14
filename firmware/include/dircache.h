@@ -105,43 +105,42 @@ void dircache_unmount(IF_MV_NONVOID(int volume));
 
 /** File API service functions **/
 
-/* avoid forcing #include of file_internal.h, fat.h and dir.h */
-struct filestr_base;
-struct file_base_info;
-struct file_base_binding;
+/* avoid forcing #include of many internal files */
+struct fileentry;
+struct filestr;
+struct fileinfo;
+struct dirscan;
 struct dirent;
-struct dirscan_info;
-struct dirinfo_native;
 
-int dircache_readdir_dirent(struct filestr_base *stream,
-                            struct dirscan_info *scanp,
-                            struct dirent *entry);
-void dircache_rewinddir_dirent(struct dirscan_info *scanp);
-
-#ifdef DIRCACHE_NATIVE
-struct fat_direntry;
-int dircache_readdir_internal(struct filestr_base *stream,
-                              struct file_base_info *infop,
-                              struct fat_direntry *fatent);
-void dircache_rewinddir_internal(struct file_base_info *info);
-#endif /* DIRCACHE_NATIVE */
-
+int dircache_readdir(struct filestr *dirstr,
+                     struct dirscan *scanp,
+                     struct dirent *entry);
+void dircache_rewinddir(struct filestr *dirstr,
+                        struct dirscan *scanp);
+int dircache_get_fileentry(struct fileinfo *dirinfop,
+                           const char *name,
+                           size_t length,
+                           unsigned int callflags,
+                           struct fileentry *entry);
 
 /** Dircache live updating **/
 
-void dircache_get_rootinfo(struct file_base_info *infop);
-void dircache_bind_file(struct file_base_binding *bindp);
-void dircache_unbind_file(struct file_base_binding *bindp);
-void dircache_fileop_create(struct file_base_info *dirinfop,
-                            struct file_base_binding *bindp,
-                            const char *basename,
-                            const struct dirinfo_native *dinp);
-void dircache_fileop_rename(struct file_base_info *dirinfop,
-                            struct file_base_binding *bindp,
-                            const char *basename);
-void dircache_fileop_remove(struct file_base_binding *bindp);
-void dircache_fileop_sync(struct file_base_binding *infop,
-                          const struct dirinfo_native *dinp);
+void dircache_get_rootinfo(struct bpb *bpb,
+                           struct fileinfo *infop);
+#define dircache_get_entryinfo(entry, infop) \
+    ({ const struct fileentry *__entry = (entry);  \
+       struct fileinfo *__infop = (infop);   \
+       dircache_dcfile_copy(&__infop->drv.dc, &__entry->drv.dc); })
+void dircache_bind_file(struct fileinfo *infop);
+void dircache_unbind_file(struct fileinfo *infop);
+void dircache_fileop_create(struct fileinfo *dirinfop,
+                            struct fileentry *entry);
+void dircache_fileop_rename(struct fileinfo *dirinfop,
+                            struct fileinfo *infop,
+                            struct fileentry *entry);
+void dircache_fileop_remove(struct fileinfo *infop);
+void dircache_fileop_sync(struct fileinfo *infop,
+                          struct fileentry *entry);
 
 
 /** Dircache paths, files and shortcuts **/
@@ -197,9 +196,22 @@ void dircache_get_info(struct dircache_info *info);
 void dircache_dump(void);
 #endif /* DIRCACHE_DUMPSTER */
 
-
 /** Misc. stuff **/
-void dircache_dcfile_init(struct dircache_file *dcfilep);
+
+/* set the dircache file to initial values */
+static inline void dircache_dcfile_init(struct dircache_file *dcfilep)
+{
+    dcfilep->idx       = 0;
+    dcfilep->serialnum = 0;
+}
+
+/* copy fields of a dircache file */
+static inline void dircache_dcfile_copy(struct dircache_file *dst,
+                                        const struct dircache_file *src)
+{
+    dst->idx       = src->idx;
+    dst->serialnum = src->serialnum;
+}
 
 #ifdef HAVE_EEPROM_SETTINGS
 int dircache_load(void);
