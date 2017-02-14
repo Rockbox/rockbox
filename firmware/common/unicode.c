@@ -240,8 +240,7 @@ static int alloc_and_load_cp_table(int cp, void *buf)
         return -1;
     }
 
-    /* must be opened without a chance of reentering from FS code */
-    int fd = open_noiso_internal(path, O_RDONLY);
+    int fd = open(path, O_RDONLY);
     if (fd < 0)
         return -1;
 

@@ -147,6 +147,12 @@ int get_cpu_boost_counter(void);
     (type *)((void *)(__mptr) - offsetof(type, member)); })
 #endif
 
+/* Get the containing itme of *ptr in type if ptr is not NULL,
+   else NULL */
+#define container_of_ifnn(ptr, type, member) ({ \
+    typeof (ptr) __mptr = (ptr);                \
+    __mptr ? container_of(__mptr, type, member) : NULL; })
+
 /* returns index of first set bit or 32 if no bits are set */
 #if defined(CPU_ARM) && ARM_ARCH >= 5 && !defined(__thumb__)
 static inline int find_first_set_bit(uint32_t val)
