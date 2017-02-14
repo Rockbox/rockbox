@@ -67,42 +67,39 @@
    overflow */
 #define file_size_t uint32_t
 
+#define FILE_SIZE_T_MAX   (0xffffffffu)
+
 #ifdef __USE_FILE_OFFSET64
 /* if we want, we can deal with files up to 2^32-1 bytes-- the full FAT16/32
    range */
-#define FILE_SIZE_MAX   (0xffffffffu)
+#define FILE_OFF_T_MAX   (0xffffffffu)
 #else
 /* file contents and size will be preserved by the APIs so long as ftruncate()
    isn't used; bytes passed 2^31-1 will not accessible nor will writes succeed
    that would extend the file beyond the max for a 32-bit off_t */
-#define FILE_SIZE_MAX   (0x7fffffffu)
+#define FILE_OFF_T_MAX   (0x7fffffffu)
 #endif
 
-/* if file is "large(ish)", then get rid of the contents now rather than
-   lazily when the file is synced or closed in order to free-up space */
-#define O_TRUNC_THRESH 65536
+#define IOC_KB_BUFS(x) ((x)*1024 / IOCACHE_BUFSIZE)
 
-/* This needs enough for all file handles to have a buffer in the worst case
- * plus at least one reserved exclusively for the cache client and a couple
- * for other file system code. The buffers are put to use by the cache if not
- * taken for another purpose (meaning nothing is wasted sitting fallow).
- *
- * One map per volume is maintained in order to avoid collisions between
- * volumes that would slow cache probing. IOC_MAP_NUM_ENTRIES is the number
- * for each map per volume. The buffers themselves are shared.
- */
-#if MEMORYSIZE < 8
-#define DC_NUM_ENTRIES      32
-#define DC_MAP_NUM_ENTRIES  128
-#elif MEMORYSIZE <= 32
-#define DC_NUM_ENTRIES      48
-#define DC_MAP_NUM_ENTRIES  128
-#else /* MEMORYSIZE > 32 */
-#define DC_NUM_ENTRIES      64
-#define DC_MAP_NUM_ENTRIES  256
+/* Memory size isn't really the correct way to size it; processor speed and storage
+ * type appear more relevant. Much is yet to be determined. */
+#ifdef BOOTLOADER
+/* bootloader doesn't do much so keep only 16 buffers */
+#define IOC_NUM_ENTRIES     IOC_KB_BUFS(8)
+#elif MEMORYSIZE <= 2
+#define IOC_NUM_ENTRIES     IOC_KB_BUFS(56)
+#elif MEMORYSIZE <= 8
+#define IOC_NUM_ENTRIES     IOC_KB_BUFS(76)
+#else /* MEMORYSIZE > 8 */
+#ifdef HAVE_DISK_STORAGE
+#define IOC_NUM_ENTRIES     IOC_KB_BUFS(128)
+#else  /* !HAVE_DISK_STORAGE */
+#define IOC_NUM_ENTRIES     IOC_KB_BUFS(76)
+#endif /* HAVE_DISK_STORAGE */
 #endif /* MEMORYSIZE */
 
 /* this _could_ be larger than a sector if that would ever be useful */
-#define DC_CACHE_BUFSIZE    SECTOR_SIZE
+#define IOCACHE_BUFSIZE    SECTOR_SIZE
 
 #endif /* FS_DEFINES_H */
