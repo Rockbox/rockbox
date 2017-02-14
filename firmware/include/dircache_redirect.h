@@ -20,7 +20,7 @@
  ****************************************************************************/
 #ifndef _DIRCACHE_REDIRECT_H_
 
-#include "dir.h"
+#include "dircache.h"
 
 /***
  ** Internal redirects that depend upon whether or not dircache is made
@@ -30,95 +30,127 @@
 
 /** File binding **/
 
-static inline void get_rootinfo_internal(struct file_base_info *infop)
+static inline void fileobj_bind_file(struct fileinfo *infop)
 {
 #ifdef HAVE_DIRCACHE
-    dircache_get_rootinfo(infop);
+    dircache_bind_file(infop);
 #else
+    file_binding_insert_last(infop);
+#endif
+}
+
+static inline void fileobj_unbind_file(struct fileinfo *infop)
+{
+#ifdef HAVE_DIRCACHE
+    dircache_unbind_file(infop);
+#else
+    file_binding_remove(infop);
+#endif
+}
+
+/** File ops that combine with dircache **/
+static inline enum cmpfi_result
+    compare_fileinfo_internal(const struct fileinfo *info1,
+                              const struct fileinfo *info2)
+{
+    return __FILEOP(compare_fileinfo)(info1, info2);
+}
+
+static inline int get_fileentry_internal(struct fileinfo *dirinfo,
+                                         const char *name,
+                                         size_t length,
+                                         unsigned int callflags,
+                                         struct fileentry *entry)
+{
+#ifdef HAVE_DIRCACHE
+    return dircache_get_fileentry(dirinfo, name, length, callflags, entry);
+#else
+    return __FILEOP(get_fileentry)(dirinfo, name, length, entry);
+    (void)callflags;
+#endif
+}
+
+static inline int fileop_open_volume_fileinfo(struct bpb *bpb,
+                                              struct fileinfo *infop)
+{
+    int rc = __FILEOP(open_volume)(bpb, infop);
+#ifdef HAVE_DIRCACHE
+    if (rc >= 0)
+        dircache_get_rootinfo(bpb, infop);
+#endif
+    return rc;
+}
+
+static inline int fileop_open_fileinfo(struct fileinfo *dirinfop,
+                                       struct fileentry *entry,
+                                       struct fileinfo *infop)
+{
+    int rc = __FILEOP(open)(dirinfop, entry, infop);
+#ifdef HAVE_DIRCACHE
+    if (rc >= 0)
+        dircache_get_entryinfo(entry, infop);
+#endif
+    return rc;
+}
+
+/** Fileop event handlers **/
+static inline void fileop_onopen(struct fileinfo *srcinfop,
+                                 unsigned int callflags,
+                                 struct fileinfo **infopp)
+{
+    fileobj_fileop_open(srcinfop, callflags, infopp);
+}
+
+static inline void fileop_oncreate(struct fileinfo *dirinfop,
+                                   struct fileentry *entry)
+{
+#ifdef HAVE_DIRCACHE
+    dircache_fileop_create(dirinfop, entry);
+#endif
+    (void)dirinfop; (void)entry;
+}
+
+static inline void fileop_onclose(struct fileinfo *infop)
+{
+    fileobj_fileop_close(infop);
+}
+
+static inline void fileop_onopen_filestr(unsigned int callflags,
+                                         struct filestr *str)
+{
+    fileobj_fileop_open_filestr(callflags, str);
+}
+
+static inline void fileop_onclose_filestr(struct filestr *str)
+{
+    fileobj_fileop_close_filestr(str);
+}
+
+static inline void fileop_onsync_filestr(struct fileinfo *infop,
+                                         struct fileentry *entry)
+{
+#ifdef HAVE_DIRCACHE
+    dircache_fileop_sync(infop, entry);
+#endif
+    (void)infop; (void)entry;
+}
+
+static inline void fileop_onremove(struct fileinfo *infop)
+{
+#ifdef HAVE_DIRCACHE
+    dircache_fileop_remove(infop);
+#endif
     (void)infop;
-#endif
 }
 
-static inline void fileobj_bind_file(struct file_base_binding *bindp)
+static inline void fileop_onrename(struct fileinfo *dirinfop,
+                                   struct fileinfo *infop,
+                                   struct fileentry *entry)
 {
 #ifdef HAVE_DIRCACHE
-    dircache_bind_file(bindp);
-#else
-    file_binding_insert_last(bindp);
+    dircache_fileop_rename(dirinfop, infop, entry);
 #endif
-}
-
-static inline void fileobj_unbind_file(struct file_base_binding *bindp)
-{
-#ifdef HAVE_DIRCACHE
-    dircache_unbind_file(bindp);
-#else
-    file_binding_remove(bindp);
-#endif
-}
-
-
-/** File event handlers **/
-
-static inline void fileop_onopen_internal(struct filestr_base *stream,
-                                          struct file_base_info *srcinfop,
-                                          unsigned int callflags)
-{
-    fileobj_fileop_open(stream, srcinfop, callflags);
-}
-
-static inline void fileop_onclose_internal(struct filestr_base *stream)
-{
-    fileobj_fileop_close(stream);
-}
-
-static inline void fileop_oncreate_internal(struct filestr_base *stream,
-                                            struct file_base_info *srcinfop,
-                                            unsigned int callflags,
-                                            struct file_base_info *dirinfop,
-                                            const char *basename)
-{
-#ifdef HAVE_DIRCACHE
-    dircache_dcfile_init(&srcinfop->dcfile);
-#endif
-    fileobj_fileop_create(stream, srcinfop, callflags);
-#ifdef HAVE_DIRCACHE
-    struct dirinfo_native din;
-    fill_dirinfo_native(&din);
-    dircache_fileop_create(dirinfop, stream->bindp, basename, &din);
-#endif
-    (void)dirinfop; (void)basename;
-}
-
-static inline void fileop_onremove_internal(struct filestr_base *stream,
-                                            struct file_base_info *oldinfop)
-{
-    fileobj_fileop_remove(stream, oldinfop);
-#ifdef HAVE_DIRCACHE
-    dircache_fileop_remove(stream->bindp);
-#endif
-}
-
-static inline void fileop_onrename_internal(struct filestr_base *stream,
-                                            struct file_base_info *oldinfop,
-                                            struct file_base_info *dirinfop,
-                                            const char *basename)
-{
-    fileobj_fileop_rename(stream, oldinfop);
-#ifdef HAVE_DIRCACHE
-    dircache_fileop_rename(dirinfop, stream->bindp, basename);
-#endif
-    (void)dirinfop; (void)basename;
-}
-
-static inline void fileop_onsync_internal(struct filestr_base *stream)
-{
-    fileobj_fileop_sync(stream);
-#ifdef HAVE_DIRCACHE
-    struct dirinfo_native din;
-    fill_dirinfo_native(&din);
-    dircache_fileop_sync(stream->bindp, &din);
-#endif
+    (void)dirinfop; (void)infop; (void)entry;
 }
 
 static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
@@ -138,67 +170,27 @@ static inline void volume_onunmount_internal(IF_MV_NONVOID(int volume))
     fileobj_mgr_unmount(IF_MV(volume));
 }
 
-static inline void fileop_onunmount_internal(struct filestr_base *stream)
-{
-
-    if (stream->flags & FD_WRITE)
-        force_close_writer_internal(stream); /* try to save stuff */
-    else
-        fileop_onclose_internal(stream);     /* just readers, bye */
-}
-
 
 /** Directory reading **/
 
-static inline int readdir_dirent(struct filestr_base *stream,
-                                 struct dirscan_info *scanp,
-                                 struct dirent *entry)
+static inline int readdir_internal(struct filestr *dirstr,
+                                   struct dirscan *scanp,
+                                   struct dirent *entry)
 {
 #ifdef HAVE_DIRCACHE
-    return dircache_readdir_dirent(stream, scanp, entry);
+    return dircache_readdir(dirstr, scanp, entry);
 #else
-    return uncached_readdir_dirent(stream, scanp, entry);
+    return uncached_readdir_internal(dirstr, scanp, entry);
 #endif
 }
 
-static inline void rewinddir_dirent(struct dirscan_info *scanp)
+static inline void rewinddir_internal(struct filestr *dirstr,
+                                      struct dirscan *scanp)
 {
 #ifdef HAVE_DIRCACHE
-    dircache_rewinddir_dirent(scanp);
+    dircache_rewinddir(dirstr, scanp);
 #else
-    uncached_rewinddir_dirent(scanp);
-#endif
-}
-
-static inline int readdir_internal(struct filestr_base *stream,
-                                   struct file_base_info *infop,
-                                   struct fat_direntry *fatent)
-{
-#ifdef HAVE_DIRCACHE
-    return dircache_readdir_internal(stream, infop, fatent);
-#else
-    return uncached_readdir_internal(stream, infop, fatent);
-#endif
-}
-
-static inline void rewinddir_internal(struct file_base_info *infop)
-{
-#ifdef HAVE_DIRCACHE
-    dircache_rewinddir_internal(infop);
-#else
-    uncached_rewinddir_internal(infop);
-#endif
-}
-
-
-/** Misc. stuff **/
-
-static inline struct fat_direntry *get_dir_fatent_dircache(void)
-{
-#ifdef HAVE_DIRCACHE
-    return get_dir_fatent();
-#else
-    return NULL;
+    __FILEOP(rewinddir)(dirstr, scanp);
 #endif
 }
 
