@@ -24,50 +24,87 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include "mv.h"
+#include "fs_attr.h"
+#include "fs_defines.h"
 #include "linked_list.h"
 #include "mutex.h"
 #include "mrsw_lock.h"
-#include "fs_attr.h"
-#include "fs_defines.h"
-#include "fat.h"
 #ifdef HAVE_DIRCACHE
 #include "dircache.h"
 #endif
 
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#include "disk_cache.h"
+#else
+struct iobuf_handle {};
+#endif
+
 #define MAX_OPEN_HANDLES (MAX_OPEN_FILES+MAX_OPEN_DIRS)
 
-/* default attributes when creating new files and directories */
-#define ATTR_NEW_FILE       (ATTR_ARCHIVE)
-#define ATTR_NEW_DIRECTORY  (ATTR_DIRECTORY)
-
+/* auxilliary attributes - out of the way of regular ATTR_* bits */
+#define ATTR_SYSROOT        (0x8000)
 #define ATTR_SYSTEM_ROOT    (ATTR_SYSROOT | ATTR_DIRECTORY)
 #define ATTR_MOUNT_POINT    (ATTR_VOLUME | ATTR_DIRECTORY)
 
-/** File sector cache **/
+#define FSI_S_RDDIR_OK      1 /* found and returned an entry */
+#define FSI_S_RDDIR_EOD     0 /* no more entries */
 
-enum filestr_cache_flags
+#define FSI_S_RDDIR_HAVEENT(_rc) \
+    ((_rc) > FSI_S_RDDIR_EOD)
+
+#define FSI_S_OPEN_OK       1 /* stream opened or probe was successful */
+#define FSI_S_OPEN_NOENT    0 /* component info was provided; name doesn't
+                                 exist in parent but parent does */
+
+/* returns the last deep traceable internal error number (non-reentrant) */
+#define __internal_errno \
+    (*({ extern int __internal_errno_g; &__internal_errno_g; }))
+
+enum cmpfi_result
 {
-    FSC_DIRTY = 0x1,        /* buffer is dirty (needs writeback) */
-    FSC_NEW   = 0x2,        /* buffer is new (never yet written) */
+    CMPFI_LT   = -1, /* info1 compares less than info2 */
+    CMPFI_EQ   =  0, /* file info is the same file */
+    CMPFI_GT   = +1, /* info1 compares greater than info2 */
+    CMPFI_BADF = -2, /* one or more infos cannot make a valid compare */
+    CMPFI_XDIR = -3, /* files are in different directories */
+    CMPFI_XDEV = -4, /* files are on different devices */
 };
 
-struct filestr_cache
-{
-    uint8_t       *buffer;  /* buffer to hold sector */
-    unsigned long sector;   /* file sector that is in buffer */
-    unsigned int  flags;    /* FSC_* bits */
-};
+#define FSI_CMPFI_INVALID   INT_MIN
 
-void file_cache_init(struct filestr_cache *cachep);
-void file_cache_reset(struct filestr_cache *cachep);
-void file_cache_alloc(struct filestr_cache *cachep);
-void file_cache_free(struct filestr_cache *cachep);
+#define FSI_S_OPENED(_rc) \
+    ((_rc) == FSI_S_OPEN_OK)
+
+/* hook these to the FAT driver for now */
+#define __DISKOP(fn) \
+    fat_diskop_##fn
+#define __VOLOP(fn) \
+    fat_volop_##fn
+#define __FILEOP(fn) \
+    fat_fileop_##fn
+
+union direntry_cvt_t
+{
+    struct fileentry *fileentry;
+    struct dirent    *dirent;
+    struct dirinfo   *dirinfo;
+} __attribute__((__transparent_union__));
+
+enum
+{
+    CVTENT_SRC_FILEENTRY = 0x0,
+    CVTENT_SRC_DIRENT    = 0x1,
+    CVTENT_SRC_MASK      = 0x3,
+    CVTENT_DST_DIRENT    = 0x0,
+    CVTENT_DST_DIRINFO   = 0x4,
+    CVTENT_DST_MASK      = 0xc,
+};
 
 
 /** Common bitflags used throughout **/
 
 /* bitflags used by open files and descriptors */
-enum fildes_and_obj_flags
+enum
 {
     /* used in descriptor and common */
     FDO_BUSY       = 0x0001,     /* descriptor/object is in use */
@@ -75,180 +112,347 @@ enum fildes_and_obj_flags
     FD_WRITE       = 0x0002,     /* descriptor has write mode */
     FD_WRONLY      = 0x0004,     /* descriptor is write mode only */
     FD_APPEND      = 0x0008,     /* descriptor is append mode */
-    FD_NONEXIST    = 0x8000,     /* closed but not freed (uncombined) */
+    FD_OPEN_MASK   = FD_WRITE|FD_WRONLY|FD_APPEND,
+    FD_NONEXIST    = 0x8000,     /* forced closed (not with FDO_BUSY) */
     /* only used as common flags */
     FO_DIRECTORY   = 0x0010,     /* fileobj is a directory */
-    FO_TRUNC       = 0x0020,     /* fileobj is opened to be truncated */
-    FO_REMOVED     = 0x0040,     /* fileobj was deleted while open */
-    FO_SINGLE      = 0x0080,     /* fileobj has only one stream open */
-    FDO_MASK       = 0x00ff,
-    FDO_CHG_MASK   = FO_TRUNC,   /* fileobj permitted external change */
+    FO_SYNC        = 0x0020,     /* file sync is needed */
+    FO_OPEN_MASK   = FO_DIRECTORY,
+    FDO_MASK       = 0x803f,
     /* bitflags that instruct various 'open' functions how to behave;
      * saved in stream flags (only) but not used by manager */
-    FF_FILE        = 0x00000000, /* expect file; accept file only */
-    FF_DIR         = 0x00010000, /* expect dir; accept dir only */
-    FF_ANYTYPE     = 0x00020000, /* succeed if either file or dir */
+    FF_ANYTYPE     = 0x00000000, /* succeed if either file or dir (default) */
+    FF_FILE        = 0x00010000, /* expect file; accept file only */
+    FF_DIR         = 0x00020000, /* expect dir; accept dir only */
     FF_TYPEMASK    = 0x00030000, /* mask of typeflags */
-    FF_CHECKPREFIX = 0x00040000, /* detect if file is prefix of path */
+    FF_PREFIX      = 0x00040000, /* detect(ed) prefix of path */
     FF_NOISO       = 0x00080000, /* do not decode ISO filenames to UTF-8 */
-    FF_PROBE       = 0x00100000, /* only test existence; don't open */
-    FF_CACHEONLY   = 0x00200000, /* succeed only if in dircache */
-    FF_INFO        = 0x00400000, /* return info on self */
-    FF_PARENTINFO  = 0x00800000, /* return info on parent */
+    FF_CACHEONLY   = 0x00100000, /* succeed only if in dircache */
+    FF_INFO        = 0x00200000, /* return info on self */
+    FF_PARENTINFO  = 0x00400000, /* return info on parent */
+    FF_SYSROOT     = 0x00800000, /* object is the system root */
     FF_MASK        = 0x00ff0000,
+    FF_INFO_MASK   = FF_SYSROOT,
+    FF_STR_MASK    = 0,
 };
 
 /** Common data structures used throughout **/
 
-/* basic file information about its location */
-struct file_base_info
+/* These get defined in the driver so they see the pointers as their own,
+ * e.g.:
+ *
+ * FS_DRV_STRUCT_COMPLETE(fileinfo, FAT)
+ *
+ * This way of doing things also prevents every driver file from having to
+ * include complete definitions from every other. Only one kind is in use at
+ * a time for a given volume or file, so the allocation areas can be shared.
+ */
+struct bpb;
+struct fileentry;
+struct fileinfo;
+struct filestr;
+struct dirscan;
+
+/* Shared fields (this would be cleaner with -fms-extensions) */
+#define __struct_bpb_HDR \
+    struct {                                                              \
+    unsigned char       mounted;     /* 1: mounted, 0: not mounted */     \
+    unsigned char       drive;       /* on which physical device  */      \
+    unsigned char       volume;      /* on which volume ? */              \
+    unsigned long       startsector; /* beginning of partition on disk */ \
+    struct ll_head      openfiles;   /* open files on this volume */      \
+    struct iocache_bpb  ioc;         /* cache info kept by volume */      \
+    }
+
+#define __struct_fileentry_HDR \
+    struct {                                                              \
+    char                *name;                                            \
+    size_t              namelen;                                          \
+    }
+
+#define __struct_fileinfo_HDR \
+    struct {                                                              \
+    struct ll_node      node;        /* list item node (first!) */        \
+    uint32_t            flags;       /* F[D]O_* bits of this file */      \
+    struct bpb          *bpb;        /* partition information */          \
+    file_size_t         size;        /* file size in bytes */             \
+    }
+
+#define __struct_filestr_HDR \
+    struct {                                                              \
+    struct ll_node      node;        /* list item node (first!) */        \
+    uint32_t            flags;       /* F[DF]_* bits of this stream */    \
+    file_size_t         offset;      /* file pointer */                   \
+    struct fileinfo     *infop;      /* base file information */          \
+    struct mutex        *mtx;        /* serialization for this stream */  \
+    struct iobuf_handle iob;         /* current IO cache buffer handle */ \
+    }
+
+#define __struct_dirscan_HDR         /* *placeholder* */
+
+/* 1) define the macros */
+#if defined (__FILESYS_STRUCTS_HDR)
+
+/* basic definitions with only the headers */
+#undef __FILESYS_STRUCTS_DRV
+#undef __FILESYS_STRUCTS_FULL
+
+#define FS_HDR_STRUCT_COMPLETE(__tag__) \
+    struct __tag__ {          \
+    __struct_##__tag__##_HDR; \
+    }
+
+#elif defined (__FILESYS_STRUCTS_DRV)
+
+/* flattened structs for driver code */
+#undef __FILESYS_STRUCTS_FULL
+
+/* FS driver sees this as a flat structure of its own fields */
+#define FS_DRV_STRUCT_COMPLETE(__tag__, __drvname__) \
+    struct __tag__ {                        \
+    __struct_##__tag__##_HDR;               \
+    __struct_##__tag__##_DRV_##__drvname__; \
+    }
+
+/* Actual non-generic definitions done in target's code, not here */
+
+#else /* 1) */
+
+/* full-sized structures */
+#define __FILESYS_STRUCTS_FULL
+
+#define FS_FULL_STRUCT_COMPLETE(__tag__) \
+    struct __tag__ {          \
+    __struct_##__tag__##_HDR; \
+    struct __tag__##_drv drv; \
+    }
+
+/* add drivers structs here */
+#define __FS_STRUCT_DRV_LIST(__tag__) \
+    union {                                               \
+    __struct_DRV_FAT( __struct_##__tag__##_DRV_FAT fat; ) \
+    __struct_DRV_PLT( __struct_##__tag__##_DRV_PLT plt; ) \
+    }
+#endif /* 1) */
+
+/* 2) include headers that use them but who's definitions are needed below */
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#include "fat.h"
+#endif
+
+/* 2.25) */
+#if defined (__FILESYS_STRUCTS_HDR)
+/* bpb is needed early for step 2.5) */
+FS_HDR_STRUCT_COMPLETE(bpb);
+#elif defined (__FILESYS_STRUCTS_DRV)
+/* Nothing */
+#else /* __FILESYS_STRUCT_FULL */
+#ifndef __struct_DRV_FAT
+#define __struct_DRV_FAT(...)
+#endif
+#ifndef __struct_DRV_PLT
+#define __struct_DRV_PLT(...)
+#endif /* 2) */
+struct bpb_drv
 {
-    union {
-#ifdef HAVE_MULTIVOLUME
-    int                  volume;  /* file's volume (overlaps fatfile.volume) */
-#endif
-#if CONFIG_PLATFORM & PLATFORM_NATIVE
-    struct fat_file      fatfile; /* FS driver file info */
-#endif
-    };
+    __FS_STRUCT_DRV_LIST(bpb);
+};
+
+FS_FULL_STRUCT_COMPLETE(bpb);
+#endif /* struct definition selection */
+
+/* 3) Actually define the types */
+#if defined (__FILESYS_STRUCTS_HDR)
+FS_HDR_STRUCT_COMPLETE(fileinfo);
+FS_HDR_STRUCT_COMPLETE(filestr);
+FS_HDR_STRUCT_COMPLETE(dirscan);
+FS_HDR_STRUCT_COMPLETE(fileentry);
+#elif defined (__FILESYS_STRUCTS_DRV)
+/* Nothing - will be done in driver header */
+#else /* __FILESYS_STRUCT_FULL */
+/* These are the true, final forms */
+struct fileinfo_drv
+{
+    __FS_STRUCT_DRV_LIST(fileinfo);
 #ifdef HAVE_DIRCACHE
-    struct dircache_file dcfile;  /* dircache file info */
+    struct dircache_file dc;
 #endif
 };
 
-#define BASEINFO_VOL(infop) \
-    IF_MV_VOL((infop)->volume)
-
-/* open files binding item */
-struct file_base_binding
+struct filestr_drv
 {
-    struct ll_node        node;   /* list item node (first!) */
-    struct file_base_info info;   /* basic file info */
+    __FS_STRUCT_DRV_LIST(filestr);
 };
 
-#define BASEBINDING_VOL(bindp) \
-    BASEINFO_VOL(&(bindp)->info)
-
-/* directory scanning position info */
-struct dirscan_info
+struct dirscan_drv
 {
-#if CONFIG_PLATFORM & PLATFORM_NATIVE
-    struct fat_dirscan_info fatscan; /* FS driver scan info */
-#endif
+    __FS_STRUCT_DRV_LIST(dirscan);
 #ifdef HAVE_DIRCACHE
-    struct dircache_file    dcscan;  /* dircache scan info */
+    struct dircache_file dc;
 #endif
 };
 
-/* describes the file as an open stream */
-struct filestr_base
+struct fileentry_drv
 {
-    struct ll_node           node;    /* list item node (first!) */
-    uint32_t                 flags;   /* F[DF]_* bits of this stream */
-    struct filestr_cache     cache;   /* stream-local cache */
-    struct filestr_cache     *cachep; /* the cache in use (local or shared) */
-    struct file_base_info    *infop;  /* base file information */
-    struct fat_filestr       fatstr;  /* FS driver information */
-    struct file_base_binding *bindp;  /* common binding for file/dir */
-    struct mutex             *mtx;    /* serialization for this stream */
+    __FS_STRUCT_DRV_LIST(fileentry);
+#ifdef HAVE_DIRCACHE
+    struct dircache_file dc;
+#endif
 };
 
-void filestr_base_init(struct filestr_base *stream);
-void filestr_base_destroy(struct filestr_base *stream);
-void filestr_alloc_cache(struct filestr_base *stream);
-void filestr_free_cache(struct filestr_base *stream);
-void filestr_assign_cache(struct filestr_base *stream,
-                          struct filestr_cache *cachep);
-void filestr_copy_cache(struct filestr_base *stream,
-                        struct filestr_cache *cachep);
-void filestr_discard_cache(struct filestr_base *stream);
+FS_FULL_STRUCT_COMPLETE(fileinfo);
+FS_FULL_STRUCT_COMPLETE(filestr);
+FS_FULL_STRUCT_COMPLETE(dirscan);
+FS_FULL_STRUCT_COMPLETE(fileentry);
+#endif /* 3) */
 
-/* allocates a cache buffer if needed and returns the cache pointer */
-static inline struct filestr_cache *
-filestr_get_cache(struct filestr_base *stream)
+static inline void fileinfo_hdr_init(struct bpb *bpb,
+                                     size_t size,
+                                     struct fileinfo *infop)
 {
-    struct filestr_cache *cachep = stream->cachep;
-
-    if (!cachep->buffer)
-        filestr_alloc_cache(stream);
-
-    return cachep;
+    infop->flags = 0;
+    infop->bpb   = bpb;
+    infop->size  = size;
 }
 
-static inline void filestr_lock(struct filestr_base *stream)
+static inline void fileinfo_hdr_destroy(struct fileinfo *infop)
 {
-    mutex_lock(stream->mtx);
+    infop->flags = 0;
+    infop->bpb   = NULL;
 }
 
-static inline void filestr_unlock(struct filestr_base *stream)
+static inline void filestr_hdr_init(struct fileinfo *infop,
+                                    struct filestr *str)
 {
-    mutex_unlock(stream->mtx);
+    str->flags  = 0;
+    str->offset = 0;
+    str->infop  = infop;
+    iobuf_init(&str->iob);
+}
+
+static inline void filestr_hdr_destroy(struct filestr *str)
+{
+    str->flags = 0;
+    str->infop = NULL;
+}
+
+static inline void filestr_lock(struct filestr *str)
+{
+    mutex_lock(str->mtx);
+}
+
+static inline void filestr_unlock(struct filestr *str)
+{
+    mutex_unlock(str->mtx);
 }
 
 /* stream lock doesn't have to be used if getting RW lock writer access */
 #define FILESTR_WRITER 0
 #define FILESTR_READER 1
 
-#define FILESTR_LOCK(type, stream) \
-    ({ if (FILESTR_##type) filestr_lock(stream); })
+#define FILESTR_LOCK(type, str) \
+    ({ if (FILESTR_##type) filestr_lock(str); })
 
-#define FILESTR_UNLOCK(type, stream) \
-    ({ if (FILESTR_##type) filestr_unlock(stream); })
+#define FILESTR_UNLOCK(type, str) \
+    ({ if (FILESTR_##type) filestr_unlock(str); })
 
-/* auxilliary attributes - out of the way of regular ATTR_* bits */
-#define ATTR_SYSROOT (0x8000)
-#define ATTR_PREFIX  (0x4000)
+#define FILEINFO_NEXT(fip) \
+    ({ struct fileinfo *__fip = (fip); \
+       (struct fileinfo *)__fip->node.next; })
+
+#define FILEINFO_VOL(fip) \
+    ({ IF_MV( struct fileinfo *__fip = (fip); ) \
+       IF_MV_VOL(__fip->bpb->volume); })
+
+#define FILESTR_VOL(fsp) \
+    ({ IF_MV( struct filestr *__fsp = (fsp); ) \
+       FILEINFO_VOL(__fsp->infop); })
+
+
+#ifdef __FILESYS_STRUCTS_FULL
+/* These require full-size struct definitions so we hide them for those not
+   using them */
+
+/* copy the filesystem file object information in a struct fileinfo */
+static inline void fileinfo_copy_fsinfo(struct fileinfo *infop,
+                                        const struct fileinfo *srcinfop)
+{
+    /* infop->flags left alone */
+    infop->bpb  = srcinfop->bpb;
+    infop->size = srcinfop->size;
+    infop->drv  = srcinfop->drv;
+}
+
+static inline void fileinfo_copy_fsinfo_f(struct fileinfo *infop,
+                                          unsigned int flags,
+                                          const struct fileinfo *srcinfop)
+{
+    infop->flags = flags;
+    infop->bpb   = srcinfop->bpb;
+    infop->size  = srcinfop->size;
+    infop->drv   = srcinfop->drv;
+}
 
 /* structure to return detailed information about what you opened */
 struct path_component_info
 {
-    const char   *name;               /* OUT: pointer to name within 'path' */
-    size_t       length;              /* OUT: length of component within 'path' */
-    file_size_t  filesize;            /* OUT: size of the opened file (0 if dir) */
-    unsigned int attr;                /* OUT: attributes of this component */
-    struct file_base_info info;       /* OUT: base info on file
-                                              (FF_INFO) */
-    struct file_base_info parentinfo; /* OUT: base parent directory info
-                                              (FF_PARENTINFO) */
-    struct file_base_info *prefixp;   /* IN:  base info to check as prefix
-                                              (FF_CHECKPREFIX) */
+    const char   *name;             /* OUT: pointer to name within 'path' */
+    size_t       namelen;           /* OUT: length of component within 'path' */
+    file_size_t  filesize;          /* OUT: size of the opened file (0 if dir) */
+    unsigned int attr;              /* OUT: attributes of this component */
+    uint32_t     flags;             /* OUT: flags of this component */
+    struct fileinfo info;           /* OUT: base info on file
+                                            (FF_INFO) */
+    struct fileinfo parentinfo;     /* OUT: base parent directory info
+                                            (FF_PARENTINFO) */
+    struct fileinfo const *prefixp; /* IN:  base info to check as prefix
+                                            (FF_PREFIX) */
 };
 
-int open_stream_internal(const char *path, unsigned int callflags,
-                         struct filestr_base *stream,
-                         struct path_component_info *compinfo);
-int close_stream_internal(struct filestr_base *stream);
-int create_stream_internal(struct file_base_info *parentinfop,
-                           const char *basename, size_t length,
-                           unsigned int attr, unsigned int callflags,
-                           struct filestr_base *stream);
-int remove_stream_internal(const char *path, struct filestr_base *stream,
-                           unsigned int callflags);
-int test_stream_exists_internal(const char *path, unsigned int callflags);
+/* file functions */
+int open_file_internal(const char *path,
+                       unsigned int callflags,
+                       struct path_component_info *compinfo,
+                       struct fileinfo **infopp);
 
-int open_noiso_internal(const char *path, int oflag); /* file.c */
-void force_close_writer_internal(struct filestr_base *stream); /* file.c */
+int create_file_internal(struct fileinfo *parentinfop,
+                         const char *basename,
+                         size_t namelen,
+                         unsigned int callflags,
+                         struct fileinfo **infopp);
 
-struct dirent;
-int uncached_readdir_dirent(struct filestr_base *stream,
-                            struct dirscan_info *scanp,
-                            struct dirent *entry);
-void uncached_rewinddir_dirent(struct dirscan_info *scanp);
+int close_file_internal(struct fileinfo *infop);
 
-int uncached_readdir_internal(struct filestr_base *stream,
-                              struct file_base_info *infop,
-                              struct fat_direntry *fatent);
-void uncached_rewinddir_internal(struct file_base_info *infop);
+int remove_file_internal(const char *path,
+                         unsigned int callflags,
+                         struct fileinfo *infop);
 
-int test_dir_empty_internal(struct filestr_base *stream);
+int sync_file_internal(struct fileinfo *infop);
 
-struct dirinfo_internal
+/* stream functions */
+int open_filestr_internal(struct fileinfo *infop,
+                          unsigned int callflags,
+                          struct filestr *str);
+
+int close_filestr_internal(struct filestr *str);
+
+/* directory functions */
+int uncached_readdir_internal(struct filestr *dirstr,
+                              struct dirscan *scanp,
+                              struct dirent *entry);
+
+int test_dir_empty_internal(struct fileinfo *dirinfo);
+
+/* compare two names in the context of the parent */
+static inline int compare_name_internal(struct fileinfo *dirinfo,
+                                        const char *name1,
+                                        const char *name2,
+                                        size_t length)
 {
-    unsigned int attr;
-    file_size_t  size;
-    uint16_t     wrtdate;
-    uint16_t     wrttime;
-};
+    return __FILEOP(compare_name)(dirinfo, name1, name2, length);
+}
+
+#endif /* __FILESYS_STRUCTS_FULL */
 
 /** Synchronization used throughout **/
 
@@ -283,37 +487,24 @@ static inline void file_internal_unlock_WRITER(void)
 #define ERRNO 0 /* maintain errno value */
 #define RC    0 /* maintain rc value */
 
-/* NOTES: if _errno is a non-constant expression, it must set an error
- *        number and not return the ERRNO constant which will merely set
- *        errno to zero, not preserve the current value; if you must set
- *        errno to zero, set it explicitly, not in the macro
- *
- *        if _rc is constant-expression evaluation to 'RC', then rc will
- *        NOT be altered; i.e. if you must set rc to zero, set it explicitly,
- *        not in the macro
- */
+/* sets rc to _rc and jumps to the file_error: label */
+#define FILE_ERROR_RC(_rc) \
+    ({ if ((_rc) != RC) rc = (_rc); \
+       goto file_error; })
 
-#define FILE_SET_CODE(_name, _keepcode, _value) \
-    ({  __builtin_constant_p(_value) ?                             \
-            ({ if ((_value) != (_keepcode)) _name = (_value); }) : \
-            ({ _name = (_value); }); })
+/* sets errno to -_nerrno and rc to _rc if _nerrno < 0, else no change */
+#define SET_ERRNO_RC(_nerrno, _rc...) \
+    ({ if ((_nerrno) < 0) {          \
+           errno = -(_nerrno);       \
+           if (*#_rc) rc = (_rc +0); \
+       } })
 
-/* set errno and rc and proceed to the "file_error:" label */
-#define FILE_ERROR(_errno, _rc) \
-    ({  FILE_SET_CODE(errno, ERRNO, (_errno)); \
-        FILE_SET_CODE(rc, RC, (_rc));          \
-        goto file_error; })
-
-/* set errno and return a value at the point of invocation */
-#define FILE_ERROR_RETURN(_errno, _rc...) \
-    ({ FILE_SET_CODE(errno, ERRNO, _errno); \
+/* sets errno to -_nerrno if _nerrno < 0; always returns the value _rc */
+#define SET_ERRNO_RC_RETURN(_nerrno, _rc...) \
+    ({ if ((_nerrno) < 0) {    \
+           errno = -(_nerrno); \
+       }                       \
        return _rc; })
-
-/* set errno and return code, no branching */
-#define FILE_ERROR_SET(_errno, _rc) \
-    ({ FILE_SET_CODE(errno, ERRNO, (_errno)); \
-       FILE_SET_CODE(rc, RC, (_rc)); })
-
 
 /** Misc. stuff **/
 
@@ -323,20 +514,46 @@ static inline void file_internal_unlock_WRITER(void)
              _end = (IF_MV_VOL(volume) >= 0 ? i : NUM_VOLUMES-1);  \
          i <= _end; i++)
 
-/* return a pointer to the static struct fat_direntry */
-static inline struct fat_direntry *get_dir_fatent(void)
-{
-    extern struct fat_direntry dir_fatent;
-    return &dir_fatent;
-}
+#define bpb_ismounted_internal(__bpb) \
+    ({ struct bpb *___bpb = (__bpb); \
+       ___bpb && ___bpb->mounted; })
 
-void iso_decode_d_name(char *d_name);
+#define volume_ismounted_internal(volume) \
+    bpb_ismounted_internal(get_vol_bpb(volume))
 
-#ifdef HAVE_DIRCACHE
-void empty_dirent(struct dirent *entry);
-void fill_dirinfo_native(struct dirinfo_native *din);
-#endif /* HAVE_DIRCACHE */
+#define STATIC_FILEENTRY \
+    ({ extern struct fileentry __fileentry_g; \
+       &__fileentry_g; })
 
+/* some reusable helper routines in file.c */
+int file_fileop_open_filestr(const char *path,
+                             int oflag,
+                             unsigned int callflags,
+                             struct filestr **strp);
+
+int file_fileop_close_filestr(struct filestr *str);
+
+off_t file_fileop_lseek(struct filestr *str,
+                        off_t offset,
+                        int whence,
+                        file_size_t limit);
+
+void file_fileop_filesystem_close(void);
+
+#define __vol_active(_bpb) \
+    ({ struct bpb *__bpb = (_bpb);       \
+       extern unsigned int ___vol_active; \
+       ___vol_active |= 1u << __bpb->volume; })
+
+#define __vol_clean(_bpb) \
+    ({ struct bpb *__bpb = (_bpb);     \
+       extern unsigned int ___vol_active; \
+       ___vol_active &= ~(1u << __bpb->volume); })
+
+/* one-time init at boot */
 void filesystem_init(void) INIT_ATTR;
+
+/* flush and close at shutdown/rolo */
+void filesystem_close(void);
 
 #endif /* _FILE_INTERNAL_H_ */
