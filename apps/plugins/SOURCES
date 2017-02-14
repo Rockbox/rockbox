@@ -35,6 +35,8 @@ shopper.c
 resistor.c
 otp.c
 
+test_disk.c
+
 #ifdef USB_ENABLE_HID
 remote_control.c
 #endif
