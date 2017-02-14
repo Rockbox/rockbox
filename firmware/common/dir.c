@@ -24,30 +24,31 @@
 #include <errno.h>
 #include <string.h>
 #include "debug.h"
-#include "dir.h"
 #include "pathfuncs.h"
+#include "file_internal.h"
 #include "fileobj_mgr.h"
 #include "dircache_redirect.h"
+#include "dir.h"
 
 /* structure used for open directory streams */
 static struct dirstr_desc
 {
-    struct filestr_base stream; /* basic stream info (first!) */
-    struct dirscan_info scan;   /* directory scan cursor */
-    struct dirent       entry;  /* current parsed entry information */
+    struct filestr *strp; /* basic stream info (first!) */
+    struct dirscan scan;  /* directory scan cursor */
+    struct dirent  entry; /* current parsed entry information */
 #ifdef HAVE_MULTIVOLUME
-    int                 volumecounter; /* counter for root volume entries */
+    int    volumecounter; /* counter for root volume entries */
 #endif
-} open_streams[MAX_OPEN_DIRS];
+} open_dirs[MAX_OPEN_DIRS];
 
 /* check and return a struct dirstr_desc* from a DIR* */
 static struct dirstr_desc * get_dirstr(DIR *dirp)
 {
     struct dirstr_desc *dir = (struct dirstr_desc *)dirp;
 
-    if (!PTR_IN_ARRAY(open_streams, dir, MAX_OPEN_DIRS))
+    if (!PTR_IN_ARRAY(open_dirs, dir, MAX_OPEN_DIRS))
         dir = NULL;
-    else if (dir->stream.flags & FDO_BUSY)
+    else if (LIKELY(dir->strp && (dir->strp->flags & FDO_BUSY)))
         return dir;
 
     int errnum;
@@ -56,7 +57,7 @@ static struct dirstr_desc * get_dirstr(DIR *dirp)
     {
         errnum = EFAULT;
     }
-    else if (dir->stream.flags & FD_NONEXIST)
+    else if (dir->strp->flags & FD_NONEXIST)
     {
         DEBUGF("dir #%d: nonexistant device\n", (int)(dir - open_streams));
         errnum = ENXIO;
@@ -76,7 +77,7 @@ static struct dirstr_desc * get_dirstr(DIR *dirp)
         file_internal_lock_##type();                 \
         struct dirstr_desc *_dir = get_dirstr(dirp); \
         if (_dir)                                    \
-            FILESTR_LOCK(type, &_dir->stream);       \
+            FILESTR_LOCK(type, _dir->strp);          \
         else                                         \
             file_internal_unlock_##type();           \
         _dir;                                        \
@@ -84,9 +85,9 @@ static struct dirstr_desc * get_dirstr(DIR *dirp)
 
 /* release the lock on the dirstr_desc* */
 #define RELEASE_DIRSTR(type, dir) \
-    ({                                        \
-        FILESTR_UNLOCK(type, &(dir)->stream); \
-        file_internal_unlock_##type();        \
+    ({                                     \
+        FILESTR_UNLOCK(type, (dir)->strp); \
+        file_internal_unlock_##type();     \
     })
 
 
@@ -95,8 +96,8 @@ static struct dirstr_desc * alloc_dirstr(void)
 {
     for (unsigned int dd = 0; dd < MAX_OPEN_DIRS; dd++)
     {
-        struct dirstr_desc *dir = &open_streams[dd];
-        if (!dir->stream.flags)
+        struct dirstr_desc *dir = &open_dirs[dd];
+        if (!dir->strp)
             return dir;
     }
 
@@ -117,7 +118,7 @@ static int readdir_volume_inner(struct dirstr_desc *dir, struct dirent *entry)
     while (++dir->volumecounter < NUM_VOLUMES)
     {
         /* on the system root */
-        if (!fat_ismounted(dir->volumecounter))
+        if (!volume_ismounted_internal(dir->volumecounter))
             continue;
 
         get_volume_name(dir->volumecounter, entry->d_name);
@@ -125,11 +126,11 @@ static int readdir_volume_inner(struct dirstr_desc *dir, struct dirent *entry)
         dir->entry.info.size    = 0;
         dir->entry.info.wrtdate = 0;
         dir->entry.info.wrttime = 0;
-        return 1;
+        return FSI_S_RDDIR_OK;
     }
 
     /* do normal directory entry fetching */
-    return 0;
+    return FSI_S_RDDIR_EOD;
 }
 #endif /* HAVE_MULTIVOLUME */
 
@@ -143,7 +144,7 @@ static inline int readdir_volume(struct dirstr_desc *dir,
 #endif /* HAVE_MULTIVOLUME */
 
     /* do normal directory entry fetching */
-    return 0;
+    return FSI_S_RDDIR_EOD;
     (void)dir; (void)entry;
 }
 
@@ -153,63 +154,66 @@ static inline int readdir_volume(struct dirstr_desc *dir,
 /* open a directory */
 DIR * opendir(const char *dirname)
 {
-    DEBUGF("opendir(dirname=\"%s\"\n", dirname);
+    DEBUGF("%s:dirname='%s'\n", __func__, dirname);
 
     DIR *dirp = NULL;
+    int rc;
 
     file_internal_lock_WRITER();
 
-    int rc;
-
     struct dirstr_desc * const dir = alloc_dirstr();
     if (!dir)
-        FILE_ERROR(EMFILE, RC);
+        FILE_ERROR_RC(-EMFILE);
 
-    rc = open_stream_internal(dirname, FF_DIR, &dir->stream, NULL);
+    rc = file_fileop_open_filestr(dirname, O_RDONLY, FF_DIR, &dir->strp);
     if (rc < 0)
     {
-        DEBUGF("Open failed: %d\n", rc);
-        FILE_ERROR(ERRNO, RC);
+        /* dir->strp will be null */
+        DEBUGF("%s failed:%d\n", __func__, rc);
+        FILE_ERROR_RC(RC);
     }
 
 #ifdef HAVE_MULTIVOLUME
     /* volume counter is relevant only to the system root */
-    dir->volumecounter = rc > 1 ? 0 : INT_MAX;
+    unsigned int flags = dir->strp->infop->flags;
+    dir->volumecounter = (flags & FF_SYSROOT) ? 0 : INT_MAX;
 #endif /* HAVE_MULTIVOLUME */
 
-    fat_rewind(&dir->stream.fatstr);
-    rewinddir_dirent(&dir->scan);
+    rewinddir_internal(dir->strp, &dir->scan);
 
     dirp = (DIR *)dir;
 file_error:
     file_internal_unlock_WRITER();
+
+    SET_ERRNO_RC(rc);
     return dirp;
 }
 
 /* close a directory stream */
 int closedir(DIR *dirp)
 {
+    DEBUGF("%s:dirp=%p\n", __func__, dirp);
+
     int rc;
 
     file_internal_lock_WRITER();
 
-    /* needs to work even if marked "nonexistant" */
     struct dirstr_desc * const dir = (struct dirstr_desc *)dirp;
-    if (!PTR_IN_ARRAY(open_streams, dir, MAX_OPEN_DIRS))
-        FILE_ERROR(EFAULT, -1);
+    if (!PTR_IN_ARRAY(open_dirs, dir, MAX_OPEN_DIRS))
+        FILE_ERROR_RC(-EFAULT);
 
-    if (!dir->stream.flags)
+    rc = file_fileop_close_filestr(dir->strp);
+    if (rc < 0)
     {
-        DEBUGF("dir #%d: dir not open\n", (int)(dir - open_streams));
-        FILE_ERROR(EBADF, -2);
+        DEBUGF("%s failed:%d\n", __func__, rc);
+        FILE_ERROR_RC(RC);
     }
 
-    rc = close_stream_internal(&dir->stream);
-    if (rc < 0)
-        FILE_ERROR(ERRNO, rc * 10 - 3);
-
+    dir->strp = NULL;
 file_error:
     file_internal_unlock_WRITER();
+
+    SET_ERRNO_RC(rc, -1);
     return rc;
 }
 
@@ -218,27 +222,29 @@ struct dirent * readdir(DIR *dirp)
 {
     struct dirstr_desc * const dir = GET_DIRSTR(READER, dirp);
     if (!dir)
-        FILE_ERROR_RETURN(ERRNO, NULL);
+        return NULL;
 
+    int rc;
     struct dirent *res = NULL;
 
-    int rc = readdir_volume(dir, &dir->entry);
-    if (rc == 0)
+    rc = readdir_volume(dir, &dir->entry);
+    if (rc == FSI_S_RDDIR_EOD)
     {
-        rc = readdir_dirent(&dir->stream, &dir->scan, &dir->entry);
+        rc = readdir_internal(dir->strp, &dir->scan, &dir->entry);
         if (rc < 0)
-            FILE_ERROR(EIO, RC);
+        {
+            DEBUGF("%s failed:%d\n", __func__, rc);
+            FILE_ERROR_RC(-EIO);
+        }
     }
 
-    if (rc > 0)
+    if (FSI_S_RDDIR_HAVEENT(rc))
         res = &dir->entry;
 
 file_error:
     RELEASE_DIRSTR(READER, dir);
 
-    if (rc > 1)
-        iso_decode_d_name(res->d_name);
-
+    SET_ERRNO_RC(rc);
     return res;
 }
 
@@ -246,49 +252,52 @@ file_error:
 /* read a directory (reentrant) */
 int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
 {
+    struct dirstr_desc * const dir = GET_DIRSTR(READER, dirp);
+    if (!dir)
+        return -1;
+
+    int rc;
+
     if (!result)
-        FILE_ERROR_RETURN(EFAULT, -2);
+        FILE_ERROR_RC_RETURN(-EFAULT, -1);
 
     *result = NULL;
 
     if (!entry)
-        FILE_ERROR_RETURN(EFAULT, -3);
+        FILE_ERROR_RC_RETURN(-EFAULT, -1);
 
-    struct dirstr_desc * const dir = GET_DIRSTR(READER, dirp);
-    if (!dir)
-        FILE_ERROR_RETURN(ERRNO, -1);
-
-    int rc = readdir_volume(dir, entry);
-    if (rc == 0)
+    rc = readdir_volume(dir, entry);
+    if (rc == FSI_S_RDDIR_EOD)
     {
-        rc = readdir_dirent(&dir->stream, &dir->scan, entry);
+        rc = readdir_internal(dir->strp, &dir->scan, entry);
         if (rc < 0)
-            FILE_ERROR(EIO, rc * 10 - 4);
+        {
+            DEBUGF("%s failed:%d\n", __func__, rc);
+            FILE_ERROR_RC(-EIO);
+        }
     }
 
+    if (FSI_S_RDDIR_HAVEENT(rc))
+        *result = entry;
+
+    rc = 0;
 file_error:
     RELEASE_DIRSTR(READER, dir);
 
-    if (rc > 0)
-    {
-        if (rc > 1)
-            iso_decode_d_name(entry->d_name);
-
-        *result = entry;
-        rc = 0;
-    }
-
+    SET_ERRNO_RC(rc, -1);
     return rc;
 }
 
 /* reset the position of a directory stream to the beginning of a directory */
 void rewinddir(DIR *dirp)
 {
+    DEBUGF("%s:dirp=%p\n", __func__, dirp);
+
     struct dirstr_desc * const dir = GET_DIRSTR(READER, dirp);
     if (!dir)
-        FILE_ERROR_RETURN(ERRNO);
+        return;
 
-    rewinddir_dirent(&dir->scan);
+    rewinddir_internal(dir->strp, &dir->scan);
 
 #ifdef HAVE_MULTIVOLUME
     if (dir->volumecounter != INT_MAX)
@@ -303,44 +312,42 @@ void rewinddir(DIR *dirp)
 /* make a directory */
 int mkdir(const char *path)
 {
-    DEBUGF("mkdir(path=\"%s\")\n", path);
+    DEBUGF("%s:path='%s'\n", __func__, path);
 
     int rc;
 
     file_internal_lock_WRITER();
 
-    struct filestr_base stream;
-    struct path_component_info compinfo;
-    rc = open_stream_internal(path, FF_DIR | FF_PARENTINFO, &stream,
-                              &compinfo);
+    struct path_component_info ci;
+    rc = open_file_internal(path, FF_PARENTINFO, &ci, NULL);
     if (rc < 0)
     {
-        DEBUGF("Can't open parent dir or path is not a directory\n");
-        FILE_ERROR(ERRNO, rc * 10 - 1);
+        DEBUGF("Can't open parent dir\n");
+        FILE_ERROR_RC(RC);
     }
-    else if (rc > 0)
+    else if (FSI_S_OPENED(rc))
     {
         DEBUGF("File exists\n");
-        FILE_ERROR(EEXIST, -2);
+        FILE_ERROR_RC(-EEXIST);
     }
 
-    rc = create_stream_internal(&compinfo.parentinfo, compinfo.name,
-                                compinfo.length, ATTR_NEW_DIRECTORY,
-                                FO_DIRECTORY, &stream);
+    rc = create_file_internal(&ci.parentinfo, ci.name, ci.namelen,
+                              FO_DIRECTORY, NULL);
     if (rc < 0)
-        FILE_ERROR(ERRNO, rc * 10 - 3);
+        FILE_ERROR_RC(RC);
 
     rc = 0;
 file_error:
-    close_stream_internal(&stream);
     file_internal_unlock_WRITER();
+
+    SET_ERRNO_RC(rc, -1);
     return rc;
 }
 
 /* remove a directory */
 int rmdir(const char *name)
 {
-    DEBUGF("rmdir(name=\"%s\")\n", name);
+    DEBUGF("%s:name='%s'\n", __func__, name);
 
     if (name)
     {
@@ -349,14 +356,24 @@ int rmdir(const char *name)
         size_t len = path_basename(name, &basename);
         if (basename[0] == '.' && len == 1)
         {
-            DEBUGF("Invalid path; last component is \".\"\n");
-            FILE_ERROR_RETURN(EINVAL, -9);
+            DEBUGF("Invalid path; last component is '.'\n");
+            SET_ERRNO_RC_RETURN(-EINVAL, -1);
         }
     }
 
+    int rc;
+
     file_internal_lock_WRITER();
-    int rc = remove_stream_internal(name, NULL, FF_DIR);
+
+    rc = remove_file_internal(name, FF_DIR, NULL);
+    if (rc < 0)
+       FILE_ERROR_RC(RC);
+
+    rc = 0;
+file_error:
     file_internal_unlock_WRITER();
+
+    SET_ERRNO_RC(rc, -1);
     return rc;
 }
 
@@ -366,49 +383,57 @@ int rmdir(const char *name)
 /* return if two directory streams refer to the same directory */
 int samedir(DIR *dirp1, DIR *dirp2)
 {
+    DEBUGF("%s:dirp1=%p:dirp2=%p\n", __func__, dirp1, dirp2);
+    int rc = -1;
+
     struct dirstr_desc * const dir1 = GET_DIRSTR(WRITER, dirp1);
-    if (!dir1)
-        FILE_ERROR_RETURN(ERRNO, -1);
+    if (dir1)
+    {
+        struct dirstr_desc * const dir2 = get_dirstr(dirp2);
+        if (dir2)
+            rc = dir1->strp->infop == dir2->strp->infop ? 1 : 0;
 
-    int rc = -2;
+        RELEASE_DIRSTR(WRITER, dir1);
+    }
 
-    struct dirstr_desc * const dir2 = get_dirstr(dirp2);
-    if (dir2)
-        rc = dir1->stream.bindp == dir2->stream.bindp ? 1 : 0;
-
-    RELEASE_DIRSTR(WRITER, dir1);
     return rc;
 }
 
 /* test directory existence (returns 'false' if a file) */
 bool dir_exists(const char *dirname)
 {
+    DEBUGF("%s:dirname='%s'\n", __func__, dirname);
+
+    int rc;
+
     file_internal_lock_WRITER();
-    bool rc = test_stream_exists_internal(dirname, FF_DIR) > 0;
+    rc = open_file_internal(dirname, FF_DIR, NULL, NULL);
     file_internal_unlock_WRITER();
-    return rc;
+
+    SET_ERRNO_RC(rc);
+    return FSI_S_OPENED(rc);
 }
 
 /* get the portable info from the native entry */
 struct dirinfo dir_get_info(DIR *dirp, struct dirent *entry)
 {
     int rc;
+
     if (!dirp || !entry)
-        FILE_ERROR(EFAULT, RC);
+        FILE_ERROR_RC(-EFAULT);
 
     if (entry->d_name[0] == '\0')
-        FILE_ERROR(ENOENT, RC);
+        FILE_ERROR_RC(-ENOENT);
 
-    if ((file_size_t)entry->info.size > FILE_SIZE_MAX)
-        FILE_ERROR(EOVERFLOW, RC);
+    struct dirinfo dirinfo;
+    rc = __FILEOP(convert_entry)(&dirinfo, entry,
+                                 CVTENT_SRC_DIRENT | CVTENT_DST_DIRINFO);
+    if (rc < 0)
+        FILE_ERROR_RC(RC);
 
-    return (struct dirinfo)
-    {
-        .attribute = entry->info.attr,
-        .size      = entry->info.size,
-        .mtime     = fattime_mktime(entry->info.wrtdate, entry->info.wrttime),
-    };
-
+    return dirinfo;
 file_error:
+    DEBUGF("%s failed:%d\n", __func__, rc);
+    SET_ERRNO_RC(rc);
     return (struct dirinfo){ .attribute = 0 };
 }
