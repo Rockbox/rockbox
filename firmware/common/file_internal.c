@@ -24,278 +24,90 @@
 #include "debug.h"
 #include "panic.h"
 #include "pathfuncs.h"
-#include "disk_cache.h"
+#include "file_internal.h"
 #include "fileobj_mgr.h"
-#include "dir.h"
 #include "dircache_redirect.h"
-#include "dircache.h"
 #include "string-extra.h"
-#include "rbunicode.h"
+#include "dir.h"
+#include <kernel.h>
 
 /** Internal common filesystem service functions  **/
+
+struct mrsw_lock file_internal_mrsw SHAREDBSS_ATTR;
 
 /* for internal functions' scanning use to save quite a bit of stack space -
    access must be serialized by the writer lock */
 #if defined(CPU_SH) || defined(IAUDIO_M5) \
     || CONFIG_CPU == IMX233
 /* otherwise, out of IRAM */
-struct fat_direntry dir_fatent;
+static struct dirent __dirent_g;
+struct fileentry __fileentry_g;
 #else
-struct fat_direntry dir_fatent IBSS_ATTR;
+static struct dirent __dirent_g IBSS_ATTR;
+struct fileentry __fileentry_g IBSS_ATTR;
 #endif
 
-struct mrsw_lock file_internal_mrsw SHAREDBSS_ATTR;
+#define STATIC_DIRENT (&__dirent_g)
 
+int __internal_errno_g;
 
-/** File stream sector caching **/
-
-/* initialize a new cache structure */
-void file_cache_init(struct filestr_cache *cachep)
-{
-    cachep->buffer = NULL;
-    cachep->sector = INVALID_SECNUM;
-    cachep->flags  = 0;
-}
-
-/* discard and mark the cache buffer as unused */
-void file_cache_reset(struct filestr_cache *cachep)
-{
-    cachep->sector = INVALID_SECNUM;
-    cachep->flags  = 0;
-}
-
-/* allocate resources attached to the cache */
-void file_cache_alloc(struct filestr_cache *cachep)
-{
-    /* if this fails, it is a bug; check for leaks and that the cache has
-       enough buffers for the worst case */
-    if (!cachep->buffer && !(cachep->buffer = dc_get_buffer()))
-        panicf("file_cache_alloc - OOM");
-}
-
-/* free resources attached to the cache */
-void file_cache_free(struct filestr_cache *cachep)
-{
-    if (cachep && cachep->buffer)
-    {
-        dc_release_buffer(cachep->buffer);
-        cachep->buffer = NULL;
-    }
-
-    file_cache_reset(cachep);
-}
-
-
-/** Stream base APIs **/
-
-static inline void filestr_clear(struct filestr_base *stream)
-{
-    stream->flags = 0;
-    stream->bindp = NULL;
-#if 0
-    stream->mtx   = NULL;
-#endif
-}
-
-/* actually late-allocate the assigned cache */
-void filestr_alloc_cache(struct filestr_base *stream)
-{
-    file_cache_alloc(stream->cachep);
-}
-
-/* free the stream's cache buffer if it's its own */
-void filestr_free_cache(struct filestr_base *stream)
-{
-    if (stream->cachep == &stream->cache)
-        file_cache_free(stream->cachep);
-}
-
-/* assign a cache to the stream */
-void filestr_assign_cache(struct filestr_base *stream,
-                          struct filestr_cache *cachep)
-{
-    if (cachep)
-    {
-        filestr_free_cache(stream);
-        stream->cachep = cachep;
-    }
-    else /* assign own cache */
-    {
-        file_cache_reset(&stream->cache);
-        stream->cachep = &stream->cache;
-    }
-}
-
-/* duplicate a cache into a stream's local cache */
-void filestr_copy_cache(struct filestr_base *stream,
-                        struct filestr_cache *cachep)
-{
-    stream->cachep = &stream->cache;
-    stream->cache.sector = cachep->sector;
-    stream->cache.flags  = cachep->flags;
-
-    if (cachep->buffer)
-    {
-        file_cache_alloc(&stream->cache);
-        memcpy(stream->cache.buffer, cachep->buffer, DC_CACHE_BUFSIZE);
-    }
-    else
-    {
-        file_cache_free(&stream->cache);
-    }
-}
-
-/* discard cache contents and invalidate it */
-void filestr_discard_cache(struct filestr_base *stream)
-{
-    file_cache_reset(stream->cachep);
-}
-
-/* Initialize the base descriptor */
-void filestr_base_init(struct filestr_base *stream)
-{
-    filestr_clear(stream);
-    file_cache_init(&stream->cache);
-    stream->cachep = &stream->cache;
-}
-
-/* free base descriptor resources */
-void filestr_base_destroy(struct filestr_base *stream)
-{
-    filestr_clear(stream);
-    filestr_free_cache(stream);
-}
-
+static unsigned int fd_callflags = ~0u;
 
 /** Internal directory service functions **/
 
-/* read the next directory entry and return its FS info */
-int uncached_readdir_internal(struct filestr_base *stream,
-                              struct file_base_info *infop,
-                              struct fat_direntry *fatent)
-{
-    return fat_readdir(&stream->fatstr, &infop->fatfile.e,
-                       filestr_get_cache(stream), fatent);
-}
-
-/* rewind the FS directory to the beginning */
-void uncached_rewinddir_internal(struct file_base_info *infop)
-{
-    fat_rewinddir(&infop->fatfile.e);
-}
-
 /* check if the directory is empty (ie. only "." and/or ".." entries
    exist at most) */
-int test_dir_empty_internal(struct filestr_base *stream)
+int test_dir_empty_internal(struct fileinfo *dirinfo)
 {
-    int rc;
+    struct fileentry *entry = STATIC_FILEENTRY;
+    int rc = get_fileentry_internal(dirinfo, NULL, 0, 0, entry);
 
-    struct file_base_info info;
-    fat_rewind(&stream->fatstr);
-    rewinddir_internal(&info);
-
-    while ((rc = readdir_internal(stream, &info, &dir_fatent)) > 0)
-    {
-        /* no OEM decoding is recessary for this simple check */
-        if (!is_dotdir_name(dir_fatent.name))
-        {
-            DEBUGF("Directory not empty\n");
-            FILE_ERROR_RETURN(ENOTEMPTY, -1);
-        }
-    }
-
-    if (rc < 0)
-    {
-        DEBUGF("I/O error checking directory: %d\n", rc);
-        FILE_ERROR_RETURN(EIO, rc * 10 - 2);
-    }
-
-    return 0;
-}
-
-/* iso decode the name to UTF-8 */
-void iso_decode_d_name(char *d_name)
-{
-    if (is_dotdir_name(d_name))
-        return;
-
-    char shortname[13];
-    size_t len = strlcpy(shortname, d_name, sizeof (shortname));
-    /* This MUST be the default codepage thus not something that could be
-       loaded on call */
-    iso_decode(shortname, d_name, -1, len + 1);
-}
-
-#ifdef HAVE_DIRCACHE
-/* nullify all the fields of the struct dirent */
-void empty_dirent(struct dirent *entry)
-{
-    entry->d_name[0] = '\0';
-    entry->info.attr    = 0;
-    entry->info.size    = 0;
-    entry->info.wrtdate = 0;
-    entry->info.wrttime = 0;
-}
-
-/* fill the native dirinfo from the static dir_fatent */
-void fill_dirinfo_native(struct dirinfo_native *dinp)
-{
-    struct fat_direntry *fatent = get_dir_fatent();
-    dinp->attr    = fatent->attr;
-    dinp->size    = fatent->filesize;
-    dinp->wrtdate = fatent->wrtdate;
-    dinp->wrttime = fatent->wrttime;
-}
-#endif /* HAVE_DIRCACHE */
-
-int uncached_readdir_dirent(struct filestr_base *stream,
-                            struct dirscan_info *scanp,
-                            struct dirent *entry)
-{
-    struct fat_direntry fatent;
-    int rc = fat_readdir(&stream->fatstr, &scanp->fatscan,
-                         filestr_get_cache(stream), &fatent);
-
-    /* FAT driver clears the struct fat_dirent if nothing is returned */
-    strcpy(entry->d_name, fatent.name);
-    entry->info.attr    = fatent.attr;
-    entry->info.size    = fatent.filesize;
-    entry->info.wrtdate = fatent.wrtdate;
-    entry->info.wrttime = fatent.wrttime;
+    if (FSI_S_RDDIR_HAVEENT(rc))
+        rc = -ENOTEMPTY;
 
     return rc;
 }
 
-/* rewind the FS directory pointer */
-void uncached_rewinddir_dirent(struct dirscan_info *scanp)
+int uncached_readdir_internal(struct filestr *dirstr,
+                              struct dirscan *scanp,
+                              struct dirent *entry)
 {
-    fat_rewinddir(&scanp->fatscan);
-}
+    struct fileentry fileentry;
+    fileentry.name = entry->d_name;
+    int rc = __FILEOP(readdir)(dirstr, scanp, &fileentry);
+    if (FSI_S_RDDIR_HAVEENT(rc))
+    {
+        int rc2 = __FILEOP(convert_entry)(entry, &fileentry,
+                                          CVTENT_SRC_FILEENTRY |
+                                          CVTENT_DST_DIRENT);
+        if (rc2 < 0)
+            rc = rc2;
+    }
 
+    return rc;
+}
 
 /** open_stream_internal() helpers and types **/
 
 struct pathwalk
 {
-    const char                 *path;     /* current location in input path */
-    unsigned int               callflags; /* callflags parameter */
-    struct path_component_info *compinfo; /* compinfo parameter */
-    file_size_t                filesize;  /* size of the file */
+    const char                 *path;      /* current location in input path */
+    unsigned int               callflags;  /* callflags parameter */
+    struct path_component_info *compinfop; /* compinfo parameter */
+    struct fileinfo            **infopp;   /* infopp parameter */
+    unsigned int               pfxcnt;     /* prefix depth counter */
 };
 
 struct pathwalk_component
 {
-    struct file_base_info     info;       /* basic file information */
-    const char                *name;      /* component name location in path */
-    uint16_t                  length;     /* length of name of component */
-    uint16_t                  attr;       /* attributes of this component */
-    struct pathwalk_component *nextp;     /* parent if in use else next free */
+    struct fileinfo           info;        /* basic file information */
+    const char                *name;       /* component name location in path */
+    uint16_t                  namelen;     /* length of name of component */
+    uint16_t                  attr;        /* attributes of this component */
+    struct pathwalk_component *nextp;      /* parent if in use else next free */
 };
 
-#define WALK_RC_NOT_FOUND    0   /* successfully not found (aid for file creation) */
-#define WALK_RC_FOUND        1   /* found and opened */
-#define WALK_RC_FOUND_ROOT   2   /* found and opened sys/volume root */
-#define WALK_RC_CONT_AT_ROOT 3   /* continue at root level */
+#define WALK_RC_CONT_AT_ROOT (-__ELASTERROR)  /* continue at root level */
 
 /* return another struct pathwalk_component from the pool, or NULL if the
    pool is completely used */
@@ -328,33 +140,37 @@ static int fill_path_compinfo(struct pathwalk *walkp,
                               struct pathwalk_component *compp,
                               int rc)
 {
+    /* still fail if writing is disabled and file doesn't exist */
     if (rc == -ENOENT)
     {
         /* this component wasn't found; see if more of them exist or path
            has trailing separators; if it does, this component should be
            interpreted as a directory even if it doesn't exist and it's the
-           final one; also, this has to be the last part or it's an error*/
-        const char *p = GOBBLE_PATH_SEPCH(walkp->path);
-        if (!*p)
-        {
-            if (p > walkp->path)
-                compp->attr |= ATTR_DIRECTORY;
+           final one; also, this has to be the last part or it's an error */
+        compp->attr = *walkp->path ? ATTR_DIRECTORY : 0;
+        compp->info.size = 0;
 
-            rc = WALK_RC_NOT_FOUND; /* successfully not found */
-        }
+        if (!*GOBBLE_PATH_SEPCH(walkp->path))
+            rc = FSI_S_OPEN_NOENT; /* successfully not found */
     }
 
     if (rc >= 0)
     {
-        struct path_component_info *compinfo = walkp->compinfo;
-        compinfo->name       = compp->name;
-        compinfo->length     = compp->length;
-        compinfo->attr       = compp->attr;
-        compinfo->filesize   = walkp->filesize;
+        struct path_component_info *compinfop = walkp->compinfop;
+        compinfop->name      = compp->name;
+        compinfop->namelen   = compp->namelen;
+        compinfop->attr      = compp->attr;
+        compinfop->filesize  = compp->info.size;
+        compinfop->flags     = walkp->pfxcnt ? FF_PREFIX : 0;
+
         if (walkp->callflags & FF_INFO)
-            compinfo->info = compp->info;
+            fileinfo_copy_fsinfo(&compinfop->info, &compp->info);
+
         if (walkp->callflags & FF_PARENTINFO)
-            compinfo->parentinfo = (compp->nextp ?: compp)->info;
+        {
+            fileinfo_copy_fsinfo(&compinfop->parentinfo,
+                                 &(compp->nextp ?: compp)->info);
+        }
     }
 
     return rc;
@@ -363,14 +179,13 @@ static int fill_path_compinfo(struct pathwalk *walkp,
 /* open the final stream itself, if found */
 static int walk_open_info(struct pathwalk *walkp,
                           struct pathwalk_component *compp,
-                          int rc,
-                          struct filestr_base *stream)
+                          int rc)
 {
     /* this may make adjustments to things; do it first */
-    if (walkp->compinfo)
+    if (walkp->compinfop)
         rc = fill_path_compinfo(walkp, compp, rc);
 
-    if (rc < 0 || rc == WALK_RC_NOT_FOUND)
+    if (rc < 0 || rc == FSI_S_OPEN_NOENT)
         return rc;
 
     unsigned int callflags = walkp->callflags;
@@ -390,106 +205,91 @@ static int walk_open_info(struct pathwalk *walkp,
     /* FF_ANYTYPE: basically, ignore FF_FILE/FF_DIR */
     }
 
+    if (!walkp->infopp)
+        return FSI_S_OPEN_OK;
+
     /* FO_DIRECTORY must match type */
     if (isdir)
         callflags |= FO_DIRECTORY;
     else
         callflags &= ~FO_DIRECTORY;
 
+    if (compp->attr == ATTR_SYSTEM_ROOT)
+        callflags |= FF_SYSROOT;
+    else
+        callflags &= ~FF_SYSROOT;
+
     /* make open official if not simply probing for presence - must do it here
        or compp->info on stack will get destroyed before it was copied */
-    if (!(callflags & FF_PROBE))
-        fileop_onopen_internal(stream, &compp->info, callflags);
-
-    return compp->nextp ? WALK_RC_FOUND : WALK_RC_FOUND_ROOT;
+    fileop_onopen(&compp->info, callflags, walkp->infopp);
+    return FSI_S_OPEN_OK;
 }
 
 /* check the component against the prefix test info */
-static void walk_check_prefix(struct pathwalk *walkp,
-                              struct pathwalk_component *compp)
+static inline void walk_check_prefix(const struct fileinfo *parentinfop,
+                                     const struct fileinfo *pfxinfop,
+                                     struct pathwalk *walkp)
 {
-    if (compp->attr & ATTR_PREFIX)
-        return;
-
-    if (!fat_file_is_same(&compp->info.fatfile,
-                          &walkp->compinfo->prefixp->fatfile))
-        return;
-
-    compp->attr |= ATTR_PREFIX;
+    /* children inherit the prefix coloring from the parent */
+    if (walkp->pfxcnt ||
+        compare_fileinfo_internal(parentinfop, pfxinfop) == CMPFI_EQ)
+    {
+        walkp->pfxcnt++;
+    }
 }
 
 /* opens the component named by 'comp' in the directory 'parent' */
 static NO_INLINE int open_path_component(struct pathwalk *walkp,
-                                         struct pathwalk_component *compp,
-                                         struct filestr_base *stream)
+                                         struct pathwalk_component *compp)
 {
     int rc;
 
     /* create a null-terminated copy of the component name */
-    char *compname = strmemdupa(compp->name, compp->length);
-
     unsigned int callflags = walkp->callflags;
     struct pathwalk_component *parentp = compp->nextp;
+    struct fileentry *entry = STATIC_FILEENTRY;
 
-    /* children inherit the prefix coloring from the parent */
-    compp->attr = parentp->attr & ATTR_PREFIX;
+    if (callflags & FF_PREFIX)
+        walk_check_prefix(&parentp->info, walkp->compinfop->prefixp, walkp);
 
-    /* most of the next would be abstracted elsewhere if doing other
-       filesystems */
-
-    /* scan parent for name; stream is converted to this parent */
-    file_cache_reset(stream->cachep);
-    stream->infop = &parentp->info;
-    fat_filestr_init(&stream->fatstr, &parentp->info.fatfile);
-    rewinddir_internal(&compp->info);
-
-    while ((rc = readdir_internal(stream, &compp->info, &dir_fatent)) > 0)
+    rc = get_fileentry_internal(&parentp->info, compp->name, compp->namelen,
+                                callflags, entry);
+    if (rc == FSI_S_RDDIR_EOD)
     {
-        if (rc > 1 && !(callflags & FF_NOISO))
-            iso_decode_d_name(dir_fatent.name);
-
-        if (!strcasecmp(compname, dir_fatent.name))
-            break;
-    }
-
-    if (rc == 0)
-    {
-        DEBUGF("File/directory not found\n");
+        DEBUGF("%s:File/directory not found\n", __func__);
         return -ENOENT;
     }
     else if (rc < 0)
     {
-        DEBUGF("I/O error reading directory %d\n", rc);
-        return -EIO;
+        DEBUGF("%s:I/O error reading directory:%d\n", __func__, rc);
+        return rc;
     }
 
-    rc = fat_open(stream->fatstr.fatfilep, dir_fatent.firstcluster,
-                  &compp->info.fatfile);
+    rc = fileop_open_fileinfo(&parentp->info, entry, &compp->info);
     if (rc < 0)
     {
-        DEBUGF("I/O error opening file/directory %s (%d)\n",
-               compname, rc);
+        DEBUGF("%s:I/O error opening file/directory:%d\n", __func__, rc);
+        return rc;
+    }
+
+    rc = __FILEOP(convert_entry)(STATIC_DIRENT, entry,
+                                 CVTENT_SRC_FILEENTRY | CVTENT_DST_DIRENT);
+    if (rc < 0)
+    {
+        DEBUGF("%s:I/O error converting directory entry:%d\n", __func__, rc);
         return -EIO;
     }
 
-    walkp->filesize = dir_fatent.filesize;
-    compp->attr    |= dir_fatent.attr;
+    compp->attr = STATIC_DIRENT->info.attr;
 
-    if (callflags & FF_CHECKPREFIX)
-        walk_check_prefix(walkp, compp);
-
-    return WALK_RC_FOUND;
+    return FSI_S_OPEN_OK;
 }
 
 /* parse a path component, open it and process the next */
 static NO_INLINE int
-walk_path(struct pathwalk *walkp, struct pathwalk_component *compp,
-          struct filestr_base *stream)
+walk_path(struct pathwalk *walkp, struct pathwalk_component *compp)
 {
-    int rc = WALK_RC_FOUND;
-
-    if (walkp->callflags & FF_CHECKPREFIX)
-        walk_check_prefix(walkp, compp);
+    int rc = FSI_S_OPEN_OK;
 
     /* alloca is used in a loop, but we reuse any blocks previously allocated
        if we went up then back down; if the path takes us back to the root, then
@@ -501,12 +301,18 @@ walk_path(struct pathwalk *walkp, struct pathwalk_component *compp,
 
     while ((len = parse_path_component(&walkp->path, &name)))
     {
+        if (len > MAX_COMPNAME)
+        {
+            rc = -ENAMETOOLONG;
+            break;
+        }
+
         /* whatever is to be a parent must be a directory */
         if (!(compp->attr & ATTR_DIRECTORY))
-            return -ENOTDIR;
-
-        if (len > MAX_COMPNAME)
-            return -ENAMETOOLONG;
+        {
+            rc = -ENOTDIR;
+            break;
+        }
 
         /* check for "." and ".." */
         if (name[0] == '.')
@@ -518,6 +324,9 @@ walk_path(struct pathwalk *walkp, struct pathwalk_component *compp,
             {
                 /* is ".." */
                 struct pathwalk_component *parentp = compp->nextp;
+
+                if (walkp->pfxcnt)
+                    walkp->pfxcnt--;
 
                 if (!parentp IF_MV( || parentp->attr == ATTR_SYSTEM_ROOT ))
                     return WALK_RC_CONT_AT_ROOT;
@@ -538,27 +347,29 @@ walk_path(struct pathwalk *walkp, struct pathwalk_component *compp,
         newp->nextp = compp;
         compp = newp;
 
-        compp->name = name;
-        compp->length = len;
+        compp->name    = name;
+        compp->namelen = len;
 
-        rc = open_path_component(walkp, compp, stream);
+        rc = open_path_component(walkp, compp);
         if (rc < 0)
             break; /* return info below */
     }
 
-    return walk_open_info(walkp, compp, rc, stream);
+    return walk_open_info(walkp, compp, rc);
 }
 
 /* open a stream given a path to the resource */
-int open_stream_internal(const char *path, unsigned int callflags,
-                         struct filestr_base *stream,
-                         struct path_component_info *compinfo)
+int open_file_internal(const char *path,
+                       unsigned int callflags,
+                       struct path_component_info *compinfop,
+                       struct fileinfo **infopp)
 {
     DEBUGF("%s(path=\"%s\",flg=%X,str=%p,compinfo=%p)\n", __func__,
-           path, callflags, stream, compinfo);
+           path, callflags, str, compinfo);
     int rc;
 
-    filestr_base_init(stream);
+    if (infopp)
+        *infopp = NULL;
 
     if (!path_is_absolute(path))
     {
@@ -568,29 +379,23 @@ int open_stream_internal(const char *path, unsigned int callflags,
            difficult to add) */
         DEBUGF("\"%s\" is not an absolute path\n"
                "Only absolute paths currently supported.\n", path);
-        FILE_ERROR(path ? ENOENT : EFAULT, -1);
+        FILE_ERROR_RC(path ? -ENOENT : -EFAULT);
     }
 
     /* if !compinfo then these cannot be returned anyway */
-    if (!compinfo)
-        callflags &= ~(FF_INFO | FF_PARENTINFO | FF_CHECKPREFIX);
-
-    /* This lets it be passed quietly to directory scanning */
-    stream->flags = callflags & FF_MASK;
+    if (!compinfop)
+        callflags &= ~(FF_INFO | FF_PARENTINFO | FF_PREFIX);
 
     struct pathwalk walk;
     walk.path      = path;
     walk.callflags = callflags;
-    walk.compinfo  = compinfo;
-    walk.filesize  = 0;
+    walk.compinfop = compinfop;
+    walk.infopp    = infopp;
+    walk.pfxcnt    = 0;
 
     struct pathwalk_component *rootp = pathwalk_comp_alloc(NULL);
     rootp->nextp = NULL;
     rootp->attr  = ATTR_SYSTEM_ROOT;
-
-#ifdef HAVE_MULTIVOLUME
-    int volume = 0, rootrc = WALK_RC_FOUND;
-#endif /* HAVE_MULTIVOLUME */
 
     while (1)
     {
@@ -600,194 +405,256 @@ int open_stream_internal(const char *path, unsigned int callflags,
         /* this seamlessly integrates secondary filesystems into the
            root namespace (e.g. "/<0>/../../<1>/../foo/." :<=> "/foo") */
         const char *p;
-        volume = path_strip_volume(pathptr, &p, false);
+        int volume = path_strip_volume(pathptr, &p, false);
         if (!CHECK_VOL(volume))
         {
             DEBUGF("No such device or address: %d\n", volume);
-            FILE_ERROR(ENXIO, -2);
+            FILE_ERROR_RC(-ENXIO);
         }
 
-        if (p == pathptr)
-        {
-            /* the root of this subpath is the system root */
-            rootp->attr = ATTR_SYSTEM_ROOT;
-            rootrc = WALK_RC_FOUND_ROOT;
-        }
-        else
-        {
-            /* this subpath specifies a mount point */
-            rootp->attr = ATTR_MOUNT_POINT;
-            rootrc = WALK_RC_FOUND;
-        }
-
+        rootp->attr = p == pathptr ? ATTR_SYSTEM_ROOT : ATTR_MOUNT_POINT;
         walk.path = p;
     #endif /* HAVE_MULTIVOLUME */
 
         /* set name to start at last leading separator; names of volume
            specifiers will be returned as "/<fooN>" */
-        rootp->name   = GOBBLE_PATH_SEPCH(pathptr) - 1;
-        rootp->length =
-            IF_MV( rootrc == WALK_RC_FOUND ? p - rootp->name : ) 1;
+        rootp->name    = GOBBLE_PATH_SEPCH(pathptr) - 1;
+        rootp->namelen = IF_MV( p != pathptr ? p - rootp->name : ) 1;
 
-        rc = fat_open_rootdir(IF_MV(volume,) &rootp->info.fatfile);
+        struct bpb *bpb = get_vol_bpb(IF_MV_VOL(volume));
+        rc = fileop_open_volume_fileinfo(bpb, &rootp->info);
         if (rc < 0)
         {
             /* not mounted */
             DEBUGF("No such device or address: %d\n", IF_MV_VOL(volume));
-            rc = -ENXIO;
-            break;
+            FILE_ERROR_RC(rc);
         }
 
-        get_rootinfo_internal(&rootp->info);
-        rc = walk_path(&walk, rootp, stream);
+        rc = walk_path(&walk, rootp);
         if (rc != WALK_RC_CONT_AT_ROOT)
             break;
-    }
-
-    switch (rc)
-    {
-    case WALK_RC_FOUND_ROOT:
-        IF_MV( rc = rootrc; )
-    case WALK_RC_NOT_FOUND:
-    case WALK_RC_FOUND:
-        /* FF_PROBE leaves nothing for caller to clean up */
-        if (callflags & FF_PROBE)
-            filestr_base_destroy(stream);
-
-        break;
-
-    default: /* utter, abject failure :`( */
-        DEBUGF("Open failed: rc=%d, errno=%d\n", rc, errno);
-        filestr_base_destroy(stream);
-        FILE_ERROR(-rc, -3);
     }
 
 file_error:
     return rc;
 }
 
-/* close the stream referenced by 'stream' */
-int close_stream_internal(struct filestr_base *stream)
+/* create a new file in the parent directory */
+int create_file_internal(struct fileinfo *dirinfop, const char *basename,
+                         size_t namelen, unsigned int callflags,
+                         struct fileinfo **infopp)
 {
-    int rc;
-    unsigned int foflags = fileobj_get_flags(stream);
+    /* assumes open_file_internal was called first and failed to find the
+       basename in the parent directory */
+    DEBUGF("%s:dirip=%p:name='%.*s':attr=%X:cf=%X:infopp=%p\n",
+           __func__, dirinfop, (int)namelen, basename, attr,
+           callflags, infopp);
 
-    if ((foflags & (FO_SINGLE|FO_REMOVED)) == (FO_SINGLE|FO_REMOVED))
+    if (infopp)
+        *infopp = NULL;
+
+    if (namelen > MAX_COMPNAME)
     {
-        /* nothing is referencing it so now remove the file's data */
-        rc = fat_remove(&stream->infop->fatfile, FAT_RM_DATA);
+        DEBUGF("Name too long\n");
+        return -ENAMETOOLONG;
+    }
+
+    struct fileentry *entry = STATIC_FILEENTRY;
+
+    strmemcpy(entry->name, basename, namelen);
+    entry->namelen = namelen;
+
+    /* create the file or directory entity */
+    int rc = __FILEOP(create)(dirinfop, callflags, entry);
+    if (rc < 0)
+    {
+        DEBUGF("Create failed:%d\n", rc);
+        FILE_ERROR_RC(RC);
+    }
+
+    fileop_oncreate(dirinfop, entry);
+
+    if (infopp)
+    {
+        /* caller wants to open it */
+        struct fileinfo info;
+        rc = fileop_open_fileinfo(dirinfop, entry, &info);
         if (rc < 0)
         {
-            DEBUGF("I/O error removing file data: %d\n", rc);
-            FILE_ERROR(EIO, rc * 10 - 1);
+            DEBUGF("Open failed:%d\n", rc);
+            FILE_ERROR_RC(RC);
         }
+
+        /* can't remove the above creation if this failed
+           because it needs the file info to do it */
+        fileop_onopen(&info, callflags, infopp);
+    }
+
+    rc = FSI_S_OPEN_OK;
+file_error:
+    return rc;
+}
+
+int close_file_internal(struct fileinfo *infop)
+{
+    DEBUGF("%s:ip=%p\n", __func__, infop);
+
+    /* close things no matter what; state of fd is unspecified upon error */
+    int rc = 0;
+
+    if (fileobj_get_refcount(infop) == 1)
+    {
+        /* last reference to file is being closed */
+        if (infop->flags & FO_SYNC)
+            rc = sync_file_internal(infop);
+
+        int rc2 = __FILEOP(close)(infop);
+        if (rc >= 0 && rc2 < 0)
+            rc = rc2;
+    }
+
+    fileop_onclose(infop);
+    return rc;
+}
+
+/* removes files and directories - back-end to remove() and rmdir() */
+int remove_file_internal(const char *path, unsigned int callflags,
+                         struct fileinfo *infop)
+{
+    DEBUGF("%s:path='%s':cf=%X:ip=%p", __func__, path, callflags, infop);
+
+    /* Only FF_* flags should be in callflags */
+    int rc = 0, locrc = -1;
+
+    if (!infop)
+    {
+        /* open it locally */
+        locrc = open_file_internal(path, callflags, NULL, &infop);
+        if (!FSI_S_OPENED(locrc))
+        {
+            DEBUGF("Failed opening path:%d\n", rc);
+            FILE_ERROR_RC(locrc);
+        }
+    }
+    /* else ignore the 'path' argument */
+
+    if (infop->flags & FO_DIRECTORY)
+    {
+        /* directory to be removed must be empty */
+        rc = test_dir_empty_internal(infop);
+        if (rc < 0)
+        {
+            if (rc == -ENOTEMPTY)
+                DEBUGF("Directory not empty\n");
+
+            FILE_ERROR_RC(RC);
+        }
+    }
+
+    /* remove the file's entry only */
+    rc = __FILEOP(remove)(infop);
+    if (rc < 0)
+    {
+        DEBUGF("Remove entry error:%d\n", rc);
+        FILE_ERROR_RC(RC);
+    }
+
+    fileop_onremove(infop);
+
+file_error:
+    if (FSI_S_OPENED(locrc))
+    {
+        /* close and remove data */
+        int rc2 = close_file_internal(infop);
+        if (rc2 < 0 && rc >= 0)
+        {
+            rc = rc2;
+            DEBUGF("Success but failed closing stream: %d\n", rc);
+        }
+    }
+    /* else data will be removed when caller closes it */
+
+    return rc;
+}
+
+/* flush all changes to storage */
+int sync_file_internal(struct fileinfo *infop)
+{
+    int rc;
+
+    struct fileentry *entry = STATIC_FILEENTRY;
+
+    rc = __FILEOP(sync)(infop, entry);
+    if (rc < 0)
+        FILE_ERROR_RC(RC);
+
+    infop->flags &= ~FO_SYNC;
+    fileop_onsync_filestr(infop, entry);
+
+    rc = 0;
+file_error:
+    return rc;
+}
+
+/* opens the stream using the info provided by open/create_file_internal */
+int open_filestr_internal(struct fileinfo *infop, unsigned int callflags,
+                          struct filestr *str)
+{
+    int rc;
+
+    rc = __FILEOP(open_filestr)(infop, str);
+    if (rc < 0)
+        FILE_ERROR_RC(rc);
+
+    fileop_onopen_filestr(callflags & fd_callflags, str);
+
+    rc = FSI_S_OPEN_OK;
+file_error:
+    return rc;
+}
+
+/* close the stream referenced by 'str' */
+int close_filestr_internal(struct filestr *str)
+{
+    int rc;
+
+    if (!(str->flags & FD_NONEXIST))
+    {
+        if (str->flags & FD_WRITE)
+            str->infop->flags |= FO_SYNC;
+
+        rc = __FILEOP(close_filestr)(str);
+        if (rc < 0)
+            FILE_ERROR_RC(RC);
     }
 
     rc = 0;
 file_error:
     /* close no matter what */
-    fileop_onclose_internal(stream);
+    fileop_onclose_filestr(str);
     return rc;
 }
 
-/* create a new stream in the parent directory */
-int create_stream_internal(struct file_base_info *parentinfop,
-                           const char *basename, size_t length,
-                           unsigned int attr, unsigned int callflags,
-                           struct filestr_base *stream)
-{
-    /* assumes an attempt was made beforehand to open *stream with
-       open_stream_internal() which returned zero (successfully not found),
-       so does not initialize it here */
-    const char * const name = strmemdupa(basename, length);
-    DEBUGF("Creating \"%s\"\n", name);
 
-    struct file_base_info info;
-    int rc = fat_create_file(&parentinfop->fatfile, name, attr,
-                             &info.fatfile, get_dir_fatent_dircache());
-    if (rc < 0)
-    {
-        DEBUGF("Create failed: %d\n", rc);
-        FILE_ERROR(rc == FAT_RC_ENOSPC ? ENOSPC : EIO, rc * 10 - 1);
-    }
-
-    /* dir_fatent is implicit arg */
-    fileop_oncreate_internal(stream, &info, callflags, parentinfop, name);
-    rc = 0;
-file_error:
-    return rc;
-}
-
-/* removes files and directories - back-end to remove() and rmdir() */
-int remove_stream_internal(const char *path, struct filestr_base *stream,
-                           unsigned int callflags)
-{
-    /* Only FF_* flags should be in callflags */
-    int rc;
-
-    struct filestr_base opened_stream;
-    if (!stream)
-        stream = &opened_stream;
-
-    if (stream == &opened_stream)
-    {
-        /* no stream provided so open local one */
-        rc = open_stream_internal(path, callflags, stream, NULL);
-        if (rc < 0)
-        {
-            DEBUGF("Failed opening path: %d\n", rc);
-            FILE_ERROR(ERRNO, rc * 10 - 1);
-        }
-    }
-    /* else ignore the 'path' argument */
-
-    if (callflags & FF_DIR)
-    {
-        /* directory to be removed must be empty */
-        rc = test_dir_empty_internal(stream);
-        if (rc < 0)
-            FILE_ERROR(ERRNO, rc * 10 - 2);
-    }
-
-    /* save old info since fat_remove() will destroy the dir info */
-    struct file_base_info oldinfo = *stream->infop;
-    rc = fat_remove(&stream->infop->fatfile, FAT_RM_DIRENTRIES);
-    if (rc < 0)
-    {
-        DEBUGF("I/O error removing dir entries: %d\n", rc);
-        FILE_ERROR(EIO, rc * 10 - 3);
-    }
-
-    fileop_onremove_internal(stream, &oldinfo);
-
-    rc = 0;
-file_error:
-    if (stream == &opened_stream)
-    {
-        /* will do removal of data below if this is the only reference */
-        int rc2 = close_stream_internal(stream);
-        if (rc2 < 0 && rc >= 0)
-        {
-            rc = rc2 * 10 - 4;
-            DEBUGF("Success but failed closing stream: %d\n", rc);
-        }
-    }
-
-    return rc;
-}
-
-/* test file/directory existence with constraints */
-int test_stream_exists_internal(const char *path, unsigned int callflags)
-{
-    /* only FF_* flags should be in callflags */
-    struct filestr_base stream;
-    return open_stream_internal(path, callflags | FF_PROBE, &stream, NULL);
-}
+/** Filesystem **/
 
 /* one-time init at startup */
 void filesystem_init(void)
 {
+    STATIC_FILEENTRY->name = STATIC_DIRENT->d_name;
     mrsw_init(&file_internal_mrsw);
-    dc_init();
+    iocache_init();
     fileobj_mgr_init();
+}
+
+/* flush outstanding writes for all volumes and prevent further writing */
+void filesystem_close(void)
+{
+    file_internal_lock_WRITER();
+    file_fileop_filesystem_close();
+    fd_callflags = ~FD_WRITE;
+    file_internal_unlock_WRITER();
+
+    /* files descriptors may still be opened with read or write access if the
+       underlying files exist but writes or creates will fail */
 }

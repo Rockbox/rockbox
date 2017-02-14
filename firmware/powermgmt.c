@@ -29,6 +29,7 @@
 #endif
 #include "string.h"
 #include "storage.h"
+#include "file_internal.h"
 #include "power.h"
 #include "audio.h"
 #include "mp3_playback.h"
@@ -37,6 +38,7 @@
 #include "backlight.h"
 #include "lcd.h"
 #include "rtc.h"
+#include "disk.h"
 #if CONFIG_TUNER
 #include "fmradio.h"
 #endif
@@ -753,18 +755,14 @@ void shutdown_hw(void)
 {
     charging_algorithm_close();
     audio_stop();
+    filesystem_close();
 
     if (battery_level_safe()) { /* do not save on critical battery */
 #ifdef HAVE_LCD_BITMAP
         font_unload_all();
 #endif
-
-/* Commit pending writes if needed. Even though we don't do write caching,
-   things like flash translation layers may need this to commit scattered
-   pages to there final locations. So far only used for iPod Nano 2G. */
-#ifdef HAVE_STORAGE_FLUSH
-        storage_flush();
-#endif
+        /* mark storage coherent */
+        volume_flush(IF_MV(-1));
 
         if (storage_disk_is_active())
             storage_spindown(1);
