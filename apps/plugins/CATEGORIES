@@ -75,6 +75,7 @@ pitch_detector,apps
 plasma,demos
 png,viewers
 gif,viewers
+physicsfractals,demos
 pong,games
 ppm,viewers
 properties,viewers
