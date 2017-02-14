@@ -28,6 +28,7 @@
 #include "debug.h"
 #include "system.h"
 #include "logf.h"
+#include "file_internal.h"
 #include "fileobj_mgr.h"
 #include "pathfuncs.h"
 #include "dircache.h"
@@ -100,8 +101,9 @@
 struct sab_component;
 struct sab
 {
-    struct filestr_base   stream;    /* scan directory stream */
-    struct file_base_info info;      /* scanned entry info */
+    struct filestr        str;       /* scan directory stream */
+    struct dirscan        scan;      /* dir scan position */
+    struct fileinfo       info;      /* scanned entry info */
     bool volatile         quit;      /* halt all scanning */
     struct sab_component  *stackend; /* end of stack pointer */
     struct sab_component  *top;      /* current top of stack */
@@ -181,7 +183,7 @@ struct dircache_entry
     unsigned char namebuf[MAX_TINYNAME]; /* direct storage (.tinyname == 1) */
     };
     uint32_t    direntry     : 16; /* entry # in parent - max 0xffff */
-    uint32_t    direntries   :  5; /* # of entries used - max 21 */
+    uint32_t    numentries   :  5; /* # of entries used - max 21 */
     uint32_t    tinyname     :  1; /* if == 1, name fits in .namebuf */
     uint32_t    frontier     :  2; /* (FRONTIER_* bitflags) */
     uint32_t    attr         :  8; /* entry file attributes */
@@ -259,17 +261,14 @@ static struct dircache_runinfo
     /* per-volume data */
     struct dircache_runinfo_volume
     {
-        struct file_base_binding *resolved0; /* first resolved binding in list */
-        struct file_base_binding *queued0;   /* first queued binding in list */
-        struct sab               *sabp;      /* if building, struct sab in use */
+        struct fileinfo *resolved0; /* first resolved binding in list */
+        struct fileinfo *queued0;   /* first queued binding in list */
+        struct sab      *sabp;      /* if building, struct sab in use */
     } dcrivol[NUM_VOLUMES];
 } dircache_runinfo;
 
-#define BINDING_NEXT(bindp) \
-    ((struct file_base_binding *)(bindp)->node.next)
-
 #define FOR_EACH_BINDING(start, p) \
-    for (struct file_base_binding *p = (start); p; p = BINDING_NEXT(p))
+    for (struct fileinfo *p = (start); p; p = FILEINFO_NEXT(p))
 
 #define FOR_EACH_CACHE_ENTRY(ce) \
     for (struct dircache_entry *ce = &dircache_runinfo.pentry[1],  \
@@ -282,13 +281,12 @@ static struct dircache_runinfo
 /* "overloaded" macros to get volume structures */
 #define DCVOL_i(i)               (&dircache.dcvol[i])
 #define DCVOL_volume(volume)     (&dircache.dcvol[volume])
-#define DCVOL_infop(infop)       (&dircache.dcvol[BASEINFO_VOL(infop)])
-#define DCVOL_dirinfop(dirinfop) (&dircache.dcvol[BASEINFO_VOL(dirinfop)])
+#define DCVOL_infop(infop)       (&dircache.dcvol[FILEINFO_VOL(infop)])
+#define DCVOL_dirinfop(dirinfop) (&dircache.dcvol[FILEINFO_VOL(dirinfop)])
 #define DCVOL(x)                 DCVOL_##x(x)
 
 #define DCRIVOL_i(i)             (&dircache_runinfo.dcrivol[i])
-#define DCRIVOL_infop(infop)     (&dircache_runinfo.dcrivol[BASEINFO_VOL(infop)])
-#define DCRIVOL_bindp(bindp)     (&dircache_runinfo.dcrivol[BASEBINDING_VOL(bindp)])
+#define DCRIVOL_infop(infop)     (&dircache_runinfo.dcrivol[FILEINFO_VOL(infop)])
 #define DCRIVOL(x)               DCRIVOL_##x(x)
 
 /* reserve over 75% full? */
@@ -354,74 +352,86 @@ static inline void buffer_unlock(void)
     dircache_runinfo.buflocked--;
 }
 
+/**
+ * yield the processor if it's been too long
+ */
+static inline void scheduled_yield__(long *next)
+{
+    long tick = current_tick;
+    if (LIKELY(TIME_BEFORE(tick, *next)))
+        return;
+
+    *next = tick + HZ/50;
+    yield();
+}
+
+#define scheduled_yield() \
+    ({ static long next; scheduled_yield__(&next); })
 
 /** Open file bindings management **/
 
 /* compare the basic file information and return 'true' if they are logically
    equivalent or the same item, else return 'false' if not */
-static inline bool binding_compare(const struct file_base_info *infop1,
-                                   const struct file_base_info *infop2)
+static inline bool binding_compare(const struct fileinfo *infop1,
+                                   const struct fileinfo *infop2)
 {
-#ifdef DIRCACHE_NATIVE
-    return fat_file_is_same(&infop1->fatfile, &infop2->fatfile);
-#else
-    #error hey watch it!
-#endif
+    return __FILEOP(compare_fileinfo)(infop1, infop2) == CMPFI_EQ;
 }
 
 /**
  * bind a file to the cache; "queued" or "resolved" depending upon whether or
  * not it has entry information
  */
-static void binding_open(struct file_base_binding *bindp)
+static void binding_open(struct fileinfo *infop)
 {
-    struct dircache_runinfo_volume *dcrivolp = DCRIVOL(bindp);
-    if (bindp->info.dcfile.serialnum)
+    struct dircache_runinfo_volume *dcrivolp = DCRIVOL(infop);
+
+    if (infop->drv.dc.serialnum)
     {
         /* already resolved */
-        dcrivolp->resolved0 = bindp;
-        file_binding_insert_first(bindp);
+        dcrivolp->resolved0 = infop;
+        file_binding_insert_first(infop);
     }
     else
     {
         if (dcrivolp->queued0 == NULL)
-            dcrivolp->queued0 = bindp;
+            dcrivolp->queued0 = infop;
 
-        file_binding_insert_last(bindp);
+        file_binding_insert_last(infop);
     }
 }
 
 /**
  * remove a binding from the cache
  */
-static void binding_close(struct file_base_binding *bindp)
+static void binding_close(struct fileinfo *infop)
 {
-    struct dircache_runinfo_volume *dcrivolp = DCRIVOL(bindp);
+    struct dircache_runinfo_volume *dcrivolp = DCRIVOL(infop);
 
-    if (bindp == dcrivolp->queued0)
-        dcrivolp->queued0 = BINDING_NEXT(bindp);
-    else if (bindp == dcrivolp->resolved0)
+    if (infop == dcrivolp->queued0)
+        dcrivolp->queued0 = FILEINFO_NEXT(infop);
+    else if (infop == dcrivolp->resolved0)
     {
-        struct file_base_binding *nextp = BINDING_NEXT(bindp);
+        struct fileinfo *nextp = FILEINFO_NEXT(infop);
         dcrivolp->resolved0 = (nextp == dcrivolp->queued0) ? NULL : nextp;
     }
 
-    file_binding_remove(bindp);
+    file_binding_remove(infop);
     /* no need to reset it */
 }
 
 /**
  * resolve a queued binding with the information from the given source file
  */
-static void binding_resolve(const struct file_base_info *infop)
+static void binding_resolve(struct fileinfo *infop)
 {
     struct dircache_runinfo_volume *dcrivolp = DCRIVOL(infop);
 
     /* quickly check the queued list to see if it's there */
-    struct file_base_binding *prevp = NULL;
+    struct fileinfo *prevp = NULL;
     FOR_EACH_BINDING(dcrivolp->queued0, p)
     {
-        if (!binding_compare(infop, &p->info))
+        if (!binding_compare(infop, p))
         {
             prevp = p;
             continue;
@@ -429,7 +439,7 @@ static void binding_resolve(const struct file_base_info *infop)
 
         if (p == dcrivolp->queued0)
         {
-            dcrivolp->queued0 = BINDING_NEXT(p);
+            dcrivolp->queued0 = FILEINFO_NEXT(p);
             if (dcrivolp->resolved0 == NULL)
                 dcrivolp->resolved0 = p;
         }
@@ -440,9 +450,9 @@ static void binding_resolve(const struct file_base_info *infop)
             dcrivolp->resolved0 = p;
         }
 
-        /* srcinfop may be the actual one */
-        if (&p->info != infop)
-            p->info.dcfile = infop->dcfile;
+        /* infop may be the actual one */
+        if (p != infop)
+            dircache_dcfile_copy(&p->drv.dc, &infop->drv.dc);
 
         break;
     }
@@ -451,24 +461,24 @@ static void binding_resolve(const struct file_base_info *infop)
 /**
  * dissolve a resolved binding on its volume
  */
-static void binding_dissolve(struct file_base_binding *prevp,
-                             struct file_base_binding *bindp)
+static void binding_dissolve(struct fileinfo *prevp,
+                             struct fileinfo *infop)
 {
-    struct dircache_runinfo_volume *dcrivolp = DCRIVOL(bindp);
+    struct dircache_runinfo_volume *dcrivolp = DCRIVOL(infop);
 
-    if (bindp == dcrivolp->resolved0)
+    if (infop == dcrivolp->resolved0)
     {
-        struct file_base_binding *nextp = BINDING_NEXT(bindp);
+        struct fileinfo *nextp = FILEINFO_NEXT(infop);
         dcrivolp->resolved0 = (nextp == dcrivolp->queued0) ? NULL : nextp;
     }
 
     if (dcrivolp->queued0 == NULL)
-        dcrivolp->queued0 = bindp;
+        dcrivolp->queued0 = infop;
 
-    file_binding_remove_next(prevp, bindp);
-    file_binding_insert_last(bindp);
+    file_binding_remove_next(prevp, infop);
+    file_binding_insert_last(infop);
 
-    dircache_dcfile_init(&bindp->info.dcfile);
+    dircache_dcfile_init(&infop->drv.dc);
 }
 
 /**
@@ -484,7 +494,7 @@ static void binding_dissolve_volume(struct dircache_runinfo_volume *dcrivolp)
         if (p == dcrivolp->queued0)
             break;
 
-        dircache_dcfile_init(&p->info.dcfile);
+        dircache_dcfile_init(&p->drv.dc);
     }
 
     dcrivolp->queued0 = dcrivolp->resolved0;
@@ -700,15 +710,15 @@ static void sab_sync_scan(struct sab *sabp, int *prevp, int *nextp)
             if (prevp == p->downp)
             {
                 /* was first item; rewind it */
-                dircache_rewinddir_internal(&sabp->info);
+                dircache_rewinddir(&sabp->str, &sabp->scan);
             }
             else
             {
                 struct dircache_entry *ceprev =
                     container_of(prevp, struct dircache_entry, next);
             #ifdef DIRCACHE_NATIVE
-                sabp->info.fatfile.e.entry   = ceprev->direntry;
-                sabp->info.fatfile.e.entries = ceprev->direntries;
+                sabp->info.drv.fat.direntry   = ceprev->direntry;
+                sabp->info.drv.fat.numentries = ceprev->numentries;
             #endif
             }
         }
@@ -890,7 +900,8 @@ static void free_name(int nameidx, size_t size)
  * allocate and assign a name to the entry
  */
 static int entry_assign_name(struct dircache_entry *ce,
-                             const unsigned char *name, size_t size)
+                             const unsigned char *name,
+                             size_t size)
 {
     unsigned char *copyto;
 
@@ -939,10 +950,10 @@ static void entry_unassign_name(struct dircache_entry *ce)
  * assign a new name to the entry
  */
 static int entry_reassign_name(struct dircache_entry *ce,
-                               const unsigned char *newname)
+                               const unsigned char *newname,
+                               size_t newlen)
 {
     size_t oldlen = ce->tinyname ? 0 : CE_NAMESIZE(ce->namelen);
-    size_t newlen = strlen(newname);
 
     if (oldlen == newlen || (oldlen == 0 && newlen <= MAX_TINYNAME))
     {
@@ -1012,13 +1023,13 @@ static void free_orphan_entry(struct dircache_runinfo_volume *dcrivolp,
         /* was an established entry; find any associated resolved binding and
            dissolve it;  bindings are kept strictly synchronized with changes
            to the storage so a simple serial number comparison is sufficient */
-        struct file_base_binding *prevp = NULL;
+        struct fileinfo *prevp = NULL;
         FOR_EACH_BINDING(dcrivolp->resolved0, p)
         {
             if (p == dcrivolp->queued0)
                 break;
 
-            if (ce->serialnum == p->info.dcfile.serialnum)
+            if (ce->serialnum == p->drv.dc.serialnum)
             {
                 binding_dissolve(prevp, p);
                 break;
@@ -1042,14 +1053,14 @@ static void free_orphan_entry(struct dircache_runinfo_volume *dcrivolp,
 /**
  * allocates a new entry of with the name specified by 'basename'
  */
-static int create_entry(const char *basename,
+static int create_entry(const char *basename, size_t namelen,
                         struct dircache_entry **res)
 {
     int idx = alloc_entry(res);
 
     if (idx > 0)
     {
-        int rc = entry_assign_name(*res, basename, strlen(basename));
+        int rc = entry_assign_name(*res, basename, namelen);
         if (rc < 0)
         {
             free_orphan_entry(NULL, *res, idx);
@@ -1104,9 +1115,9 @@ static void free_subentries(struct dircache_runinfo_volume *dcrivolp, int *downp
 /**
  * free the specified file entry and its children
  */
-static void free_file_entry(struct file_base_info *infop)
+static void free_file_entry(struct fileinfo *infop)
 {
-    int idx = infop->dcfile.idx;
+    int idx = infop->drv.dc.idx;
     if (idx <= 0)
         return; /* can't remove a root/invalid */
 
@@ -1126,7 +1137,7 @@ static void free_file_entry(struct file_base_info *infop)
 /**
  * insert the new entry into the parent, sorted into position
  */
-static void insert_file_entry(struct file_base_info *dirinfop,
+static void insert_file_entry(struct fileinfo *dirinfop,
                               struct dircache_entry *ce)
 {
     /* DIRCACHE_NATIVE: the entires are sorted into the spot it would be on
@@ -1141,7 +1152,7 @@ static void insert_file_entry(struct file_base_info *dirinfop,
      * add a duplicate since it will be comparing any entries it finds in front
      * of it.
      */
-    int diridx = dirinfop->dcfile.idx;
+    int diridx = dirinfop->drv.dc.idx;
     int *nextp = get_downidxp(diridx);
 
     while (8675309)
@@ -1170,12 +1181,39 @@ static void insert_file_entry(struct file_base_info *dirinfop,
 /**
  * unlink the entry from its parent and return its pointer to the caller
  */
-static struct dircache_entry * remove_file_entry(struct file_base_info *infop)
+static struct dircache_entry * remove_file_entry(struct fileinfo *infop)
 {
     struct dircache_runinfo_volume *dcrivolp = DCRIVOL(infop);
-    struct dircache_entry *ce = get_entry(infop->dcfile.idx);
-    remove_entry(dcrivolp, ce, get_previdxp(infop->dcfile.idx));
+    struct dircache_entry *ce = get_entry(infop->drv.dc.idx);
+    remove_entry(dcrivolp, ce, get_previdxp(infop->drv.dc.idx));
     return ce;
+}
+
+/**
+ * Update the file stats we keep
+ */
+static void entry_update_stats(const struct fileentry *entry,
+                               struct dircache_entry *ce)
+{
+#ifdef DIRCACHE_NATIVE
+    ce->firstcluster = entry->drv.fat.firstcluster;
+    ce->direntry     = entry->drv.fat.direntry;
+    ce->numentries   = entry->drv.fat.numentries;
+    ce->wrtdate      = entry->drv.fat.wrtdate;
+    ce->wrttime      = entry->drv.fat.wrttime;
+    ce->attr         = entry->drv.fat.attr;
+    if (!(ce->attr & ATTR_DIRECTORY))
+        ce->filesize = entry->drv.fat.filesize;
+#else
+    ce->mtime        = entry->drv.plt.mtime;
+    ce->attr         = 0;
+    if (S_ISDIR(entry->drv.plt.mode))
+        ce->attr |= ATTR_DIRECTORY;
+    if (S_ISLNK(entry->drv.plt.mode))
+        ce->attr |= ATTR_LINK;
+    if (!(ce->attr & ATTR_DIRECTORY))
+        ce->filesize = entry->drv.plt.size;
+#endif
 }
 
 /**
@@ -1252,11 +1290,13 @@ static void process_events(void)
  */
 static void sab_process_sub(struct sab *sabp)
 {
-    struct fat_direntry *const fatentp = get_dir_fatent();
-    struct filestr_base *const streamp = &sabp->stream;
-    struct file_base_info *const infop = &sabp->info;
+    struct fileentry *entryp = STATIC_FILEENTRY;
+    struct dirscan *scanp = &sabp->scan;
+    struct filestr *strp = &sabp->str;
+    struct fileinfo *infop = &sabp->info;
+    struct fileinfo *strinfop;
 
-    int idx = infop->dcfile.idx;
+    int idx = infop->drv.dc.idx;
     int *downp = get_downidxp(idx);
     if (!downp)
         return;
@@ -1269,12 +1309,19 @@ static void sab_process_sub(struct sab *sabp)
         compp->prevp = downp;
 
         /* open directory stream */
-        filestr_base_init(streamp);
-        fileobj_fileop_open(streamp, infop, FO_DIRECTORY);
-        fat_rewind(&streamp->fatstr);
-        uncached_rewinddir_internal(infop);
+        fileobj_fileop_open(infop, FO_DIRECTORY, &strinfop);
 
-        const long dircluster = streamp->infop->fatfile.firstcluster;
+        if (__FILEOP(open_filestr)(strinfop, strp) < 0)
+        {
+            sabp->quit = true;
+            goto filestr_err;
+        }
+
+        fileobj_fileop_open_filestr(FO_DIRECTORY, strp);
+
+        __FILEOP(rewinddir)(strp, scanp);
+
+        const long dircluster = strinfop->drv.fat.firstcluster;
 
         /* first pass: read directory */
         while (1)
@@ -1291,7 +1338,7 @@ static void sab_process_sub(struct sab *sabp)
             }
             /* else an immediate-contents directory scan */
 
-            int rc = uncached_readdir_internal(streamp, infop, fatentp);
+            int rc = __FILEOP(readdir)(strp, scanp, entryp);
             if (rc <= 0)
             {
                 if (rc < 0)
@@ -1313,14 +1360,14 @@ static void sab_process_sub(struct sab *sabp)
                    the entry just scanned, do nothing further and continue
                    with the next */
                 ce = get_entry(prev);
-                if (ce->direntry == infop->fatfile.e.entry)
+                if (ce->direntry == entryp->drv.fat.direntry)
                 {
                     compp->prevp = &ce->next;
                     continue; /* already there */
                 }
             }
 
-            int idx = create_entry(fatentp->name, &ce);
+            int idx = create_entry(entryp->name, entryp->namelen, &ce);
             if (idx <= 0)
             {
                 if (idx == -ENAMETOOLONG)
@@ -1340,28 +1387,36 @@ static void sab_process_sub(struct sab *sabp)
             *compp->prevp = idx;
             compp->prevp = &ce->next;
 
-            if (!(fatentp->attr & ATTR_DIRECTORY))
-                ce->filesize = fatentp->filesize;
-            else if (!is_dotdir_name(fatentp->name))
+            if (!(entryp->drv.fat.attr & ATTR_DIRECTORY))
+                ce->filesize = entryp->drv.fat.filesize;
+            else if (!is_dotdir_name(entryp->name))
                 ce->frontier = FRONTIER_NEW; /* this needs scanning */
 
             /* copy remaining FS info */
-            ce->direntry     = infop->fatfile.e.entry;
-            ce->direntries   = infop->fatfile.e.entries;
-            ce->attr         = fatentp->attr;
-            ce->firstcluster = fatentp->firstcluster;
-            ce->wrtdate      = fatentp->wrtdate;
-            ce->wrttime      = fatentp->wrttime;
+            ce->direntry     = entryp->drv.fat.direntry;
+            ce->numentries   = entryp->drv.fat.numentries;
+            ce->attr         = entryp->drv.fat.attr;
+            ce->firstcluster = entryp->drv.fat.firstcluster;
+            ce->wrtdate      = entryp->drv.fat.wrtdate;
+            ce->wrttime      = entryp->drv.fat.wrttime;
 
             /* resolve queued user bindings */
-            infop->fatfile.firstcluster = fatentp->firstcluster;
-            infop->fatfile.dircluster   = dircluster;
-            infop->dcfile.idx           = idx;
-            infop->dcfile.serialnum     = ce->serialnum;
+            /* infop->bpb was set when scan began */
+            infop->drv.fat.firstcluster = ce->firstcluster;
+            infop->drv.fat.dircluster   = dircluster;
+            infop->drv.fat.direntry     = ce->direntry;
+            infop->drv.fat.numentries   = ce->numentries;
+            infop->drv.dc.idx           = idx;
+            infop->drv.dc.serialnum     = ce->serialnum;
             binding_resolve(infop);
         } /* end while */
 
-        close_stream_internal(streamp);
+        if (__FILEOP(close_filestr)(strp) < 0)
+            sabp->quit = true;
+
+        fileobj_fileop_close_filestr(strp);
+    filestr_err:
+        fileobj_fileop_close(strinfop);
 
         if (sabp->quit)
             return;
@@ -1397,20 +1452,20 @@ static void sab_process_sub(struct sab *sabp)
         downp = &ce->down;
 
         /* set up info for next open
-         * IF_MV: "volume" was set when scan began */
-        infop->fatfile.firstcluster = ce->firstcluster;
-        infop->fatfile.dircluster   = dircluster;
-        infop->fatfile.e.entry      = ce->direntry;
-        infop->fatfile.e.entries    = ce->direntries;
-        infop->dcfile.idx           = idx;
-        infop->dcfile.serialnum     = ce->serialnum;
+         * infop->bpb was set when scan began */
+        infop->drv.fat.firstcluster = ce->firstcluster;
+        infop->drv.fat.dircluster   = dircluster;
+        infop->drv.fat.direntry     = ce->direntry;
+        infop->drv.fat.numentries   = ce->numentries;
+        infop->drv.dc.idx           = idx;
+        infop->drv.dc.serialnum     = ce->serialnum;
     } /* end while */
 }
 
 /**
  * scan and build the contents of a directory or volume root
  */
-static void sab_process_dir(struct file_base_info *infop, bool issab)
+static void sab_process_dir(struct fileinfo *infop, bool issab)
 {
     /* infop should have been fully opened meaning that all its parent
        directory information is filled in and intact; the binding information
@@ -1432,7 +1487,7 @@ static void sab_process_dir(struct file_base_info *infop, bool issab)
     if (issab)
         DCRIVOL(infop)->sabp = sabp;
 
-    establish_frontier(infop->dcfile.idx, FRONTIER_NEW | FRONTIER_RENEW);
+    establish_frontier(infop->drv.dc.idx, FRONTIER_NEW | FRONTIER_RENEW);
     sab_process_sub(sabp);
 
     if (issab)
@@ -1452,8 +1507,8 @@ static void sab_process_volume(struct dircache_volume *dcvolp)
     logf("dircache - building volume %d", volume);
 
     /* gather everything sab_process_dir() needs in order to begin a scan */
-    struct file_base_info info;
-    rc = fat_open_rootdir(IF_MV(volume,) &info.fatfile);
+    struct fileinfo info;
+    rc = __FILEOP(open_volume)(get_vol_bpb(IF_MV_VOL(volume)), &info);
     if (rc < 0)
     {
         /* probably not mounted */
@@ -1462,8 +1517,8 @@ static void sab_process_volume(struct dircache_volume *dcvolp)
         return;
     }
 
-    info.dcfile.idx       = idx;
-    info.dcfile.serialnum = dcvolp->serialnum;
+    info.drv.dc.idx       = idx;
+    info.drv.dc.serialnum = dcvolp->serialnum;
     binding_resolve(&info);
     sab_process_dir(&info, true);
 }
@@ -1471,31 +1526,33 @@ static void sab_process_volume(struct dircache_volume *dcvolp)
 /**
  * this function is the back end to the public API's like readdir()
  */
-int dircache_readdir_dirent(struct filestr_base *stream,
-                            struct dirscan_info *scanp,
-                            struct dirent *entry)
+int dircache_readdir(struct filestr *dirstr,
+                     struct dirscan *scanp,
+                     struct dirent *entry)
 {
-    struct file_base_info *dirinfop = stream->infop;
+    struct fileinfo *dirinfop = dirstr->infop;
 
-    if (!dirinfop->dcfile.serialnum)
+    if (!dirinfop->drv.dc.serialnum)
         goto read_uncached; /* no parent cached => no entries cached */
 
     struct dircache_volume *dcvolp = DCVOL(dirinfop);
 
-    int diridx = dirinfop->dcfile.idx;
+    int diridx = dirinfop->drv.dc.idx;
     unsigned int frontier = diridx <= 0 ? dcvolp->frontier :
                                           get_entry(diridx)->frontier;
 
     /* if not settled, just readthrough; no binding information is needed for
-       this; if it becomes settled, we'll get scan->dcfile caught up and do
+       this; if it becomes settled, we'll get scan->drv.dc caught up and do
        subsequent reads with the cache */
     if (frontier != FRONTIER_SETTLED)
         goto read_uncached;
 
-    int idx = scanp->dcscan.idx;
+    scheduled_yield();
+
+    int idx = scanp->drv.dc.idx;
     struct dircache_entry *ce;
 
-    unsigned int direntry = scanp->fatscan.entry;
+    unsigned int direntry = scanp->drv.fat.direntry;
     while (1)
     {
         if (idx == 0 || direntry == FAT_DIRSCAN_RW_VAL) /* rewound? */
@@ -1509,7 +1566,7 @@ int dircache_readdir_dirent(struct filestr_base *stream,
            at the beginning and fast-forward to the correct point as indicated
            by the FS scanner */
         ce = get_entry(idx);
-        if (ce && ce->serialnum == scanp->dcscan.serialnum)
+        if (ce && ce->serialnum == scanp->drv.dc.serialnum)
         {
             idx = ce->next;
             break;
@@ -1522,11 +1579,7 @@ int dircache_readdir_dirent(struct filestr_base *stream,
     {
         ce = get_entry(idx);
         if (!ce)
-        {
-            empty_dirent(entry);
-            scanp->fatscan.entries = 0;
-            return 0; /* end of dir */
-        }
+            return FSI_S_RDDIR_EOD; /* end of dir */
 
         if (ce->direntry > direntry || direntry == FAT_DIRSCAN_RW_VAL)
             break; /* cache reader is caught up to FS scan */
@@ -1542,245 +1595,145 @@ int dircache_readdir_dirent(struct filestr_base *stream,
     entry->info.wrttime = ce->wrttime;
 
     /* FS scan information */
-    scanp->fatscan.entry    = ce->direntry;
-    scanp->fatscan.entries  = ce->direntries;
+    scanp->drv.fat.direntry = ce->direntry;
 
     /* dircache scan information */
-    scanp->dcscan.idx       = idx;
-    scanp->dcscan.serialnum = ce->serialnum;
+    scanp->drv.dc.idx       = idx;
+    scanp->drv.dc.serialnum = ce->serialnum;
 
-    /* return whether this needs decoding */
-    int rc = ce->direntries == 1 ? 2 : 1;
-
-    yield();
-    return rc;
+    return FSI_S_RDDIR_OK;
 
 read_uncached:
-    dircache_dcfile_init(&scanp->dcscan);
-    return uncached_readdir_dirent(stream, scanp, entry);
+    dircache_dcfile_init(&scanp->drv.dc);
+    return uncached_readdir_internal(dirstr, scanp, entry);
 }
 
 /**
  * rewind the directory scan cursor
  */
-void dircache_rewinddir_dirent(struct dirscan_info *scanp)
+void dircache_rewinddir(struct filestr *dirstr, struct dirscan *scanp)
 {
-    uncached_rewinddir_dirent(scanp);
-    dircache_dcfile_init(&scanp->dcscan);
+    __FILEOP(rewinddir)(dirstr, scanp);
+    dircache_dcfile_init(&scanp->drv.dc);
 }
 
 /**
- * this function is the back end to file API internal scanning, which requires
- * much more detail about the directory entries; this is allowed to make
- * assumptions about cache state because the cache will not be altered during
- * the scan process; an additional important property of internal scanning is
- * that any available binding information is not ignored even when a scan
- * directory is frontier zoned.
+ * search the cache for a name in the directory
  */
-int dircache_readdir_internal(struct filestr_base *stream,
-                              struct file_base_info *infop,
-                              struct fat_direntry *fatent)
+int dircache_get_fileentry(struct fileinfo *dirinfop,
+                           const char *name,
+                           size_t namelen,
+                           unsigned int callflags,
+                           struct fileentry *entry)
 {
     /* call with writer exclusion */
-    struct file_base_info *dirinfop = stream->infop;
+    scheduled_yield();
+
     struct dircache_volume *dcvolp = DCVOL(dirinfop);
 
     /* assume binding "not found" */
-    infop->dcfile.serialnum = 0;
+    dircache_dcfile_init(&entry->drv.dc);
 
-    /* is parent cached? if not, readthrough because nothing is here yet */
-    if (!dirinfop->dcfile.serialnum)
+    /* is parent cached? if not, quit because nothing is here yet */
+    if (!dirinfop->drv.dc.serialnum)
+        goto read_uncached;
+
+    int diridx = dirinfop->drv.dc.idx;
+    int idx = 0;
+    unsigned int frontier = FRONTIER_ZONED;
+    struct dircache_entry *ce;
+
+    if (diridx < 0)
     {
-        if (stream->flags & FF_CACHEONLY)
-            goto read_eod;
-
-        return uncached_readdir_internal(stream, infop, fatent);
+        idx = dcvolp->root_down;
+        frontier = dcvolp->frontier;
+    }
+    else if ((ce = get_entry(diridx)))
+    {
+        idx = ce->down;
+        frontier = ce->frontier;
     }
 
-    int diridx = dirinfop->dcfile.idx;
-    unsigned int frontier = diridx < 0 ?
-        dcvolp->frontier : get_entry(diridx)->frontier;
+    char tinybuf[MAX_TINYNAME+1];
 
-    int idx = infop->dcfile.idx;
-    if (idx == 0) /* rewound? */
-        idx = diridx <= 0 ? dcvolp->root_down : get_entry(diridx)->down;
-    else
-        idx = get_entry(idx)->next;
-
-    struct dircache_entry *ce = get_entry(idx);
-
-    if (frontier != FRONTIER_SETTLED && !(stream->flags & FF_CACHEONLY))
+    for (ce = get_entry(idx); ce; idx = ce->next, ce = get_entry(idx))
     {
-        /* the directory being read is reported to be incompletely cached;
-           readthrough and if the entry exists, return it with its binding
-           information; otherwise return the uncached read result while
-           maintaining the last index */
-        int rc = uncached_readdir_internal(stream, infop, fatent);
-        if (rc <= 0 || !ce || ce->direntry > infop->fatfile.e.entry)
-            return rc;
+        bool tinyname = ce->tinyname;
+        const char *s;
+        size_t len;
 
-        /* entry matches next one to read */
-    }
-    else if (!ce)
+        if (namelen > MAX_TINYNAME)
+        {
+            if (tinyname)
+                continue;
+
+            len = CE_NAMESIZE(ce->namelen);
+            if (len != namelen)
+                continue;
+
+            s = get_name(ce->name);
+        }
+        else if (name)
+        {
+            if (!tinyname)
+                continue;
+
+            if (name != tinybuf)
+                name = strmemcpy(tinybuf, name, namelen);
+
+            len = MAX_TINYNAME;
+            s = ce->namebuf;
+        }
+        else
+        {
+            /* something other than dotdirs? */
+            if (tinyname && is_dotdir_name(ce->namebuf))
+                continue;
+
+            return FSI_S_RDDIR_OK; /* is _not_ empty, frontier or not */
+        }
+
+        if (!compare_name_internal(dirinfop, s, name, len))
+            break;
+    } /* end for */
+
+    if (!ce)
     {
-        /* end of dir */
-        goto read_eod;
+        /* if not a frontier, it doesn't exist */
+        if (frontier == FRONTIER_SETTLED)
+            return FSI_S_RDDIR_EOD;
+
+        goto read_uncached;
     }
 
     /* FS entry information that we maintain */
-    entry_name_copy(fatent->name, ce);
-    fatent->shortname[0]     = '\0';
-    fatent->attr             = ce->attr;
+    /* leave name fields alone, we're just scanning */
+    entry->drv.fat.attr         = ce->attr;
     /* file code file scanning does not need time information */
-    fatent->filesize         = (ce->attr & ATTR_DIRECTORY) ? 0 : ce->filesize;
-    fatent->firstcluster     = ce->firstcluster;
+    entry->drv.fat.filesize     = (ce->attr & ATTR_DIRECTORY) ?
+                                        0 : ce->filesize;
+    entry->drv.fat.firstcluster = ce->firstcluster;
 
     /* FS entry directory information */
-    infop->fatfile.e.entry   = ce->direntry;
-    infop->fatfile.e.entries = ce->direntries;
+    entry->drv.fat.direntry     = ce->direntry;
+    entry->drv.fat.numentries   = ce->numentries;
 
     /* dircache file binding information */
-    infop->dcfile.idx        = idx;
-    infop->dcfile.serialnum  = ce->serialnum;
+    entry->drv.dc.idx           = idx;
+    entry->drv.dc.serialnum     = ce->serialnum;
 
-    /* return whether this needs decoding */
-    int rc = ce->direntries == 1 ? 2 : 1;
+    return FSI_S_RDDIR_OK;
 
-    if (frontier == FRONTIER_SETTLED)
-    {
-        static long next_yield;
-        if (TIME_AFTER(current_tick, next_yield))
-        {
-            yield();
-            next_yield = current_tick + HZ/50;
-        }
-    }
+read_uncached:
+    if (callflags & FF_CACHEONLY)
+        return FSI_S_RDDIR_EOD;
 
-    return rc;
-
-read_eod:
-    fat_empty_fat_direntry(fatent);
-    infop->fatfile.e.entries = 0;
-    return 0;    
-}
-
-/**
- * rewind the scan position for an internal scan
- */
-void dircache_rewinddir_internal(struct file_base_info *infop)
-{
-    uncached_rewinddir_internal(infop);
-    dircache_dcfile_init(&infop->dcfile);
+    return __FILEOP(get_fileentry)(dirinfop, name, namelen, entry);
 }
 
 #else /* !DIRCACHE_NATIVE (for all others) */
 
-#####################
-/* we require access to the host functions */
-#undef opendir
-#undef readdir
-#undef closedir
-#undef rewinddir
-
-static char sab_path[MAX_PATH];
-
-static int sab_process_dir(struct dircache_entry *ce)
-{
-    struct dirent_uncached *entry;
-    struct dircache_entry *first_ce = ce;
-    DIR *dir = opendir(sab_path);
-    if(dir == NULL)
-    {
-        logf("Failed to opendir_uncached(%s)", sab_path);
-        return -1;
-    }
-
-    while (1)
-    {
-        if (!(entry = readdir(dir)))
-            break;
-
-        if (IS_DOTDIR_NAME(entry->d_name))
-        {
-            /* add "." and ".." */
-            ce->info.attribute = ATTR_DIRECTORY;
-            ce->info.size = 0;
-            ce->down = entry->d_name[1] == '\0' ? first_ce : first_ce->up;
-            strcpy(ce->dot_d_name, entry->d_name);
-            continue;
-        }
-
-        size_t size = strlen(entry->d_name) + 1;
-        ce->d_name = (d_names_start -= size);
-        ce->info = entry->info;
-
-        strcpy(ce->d_name, entry->d_name);
-        dircache_size += size;
-
-        if(entry->info.attribute & ATTR_DIRECTORY)
-        {
-            dircache_gen_down(ce, ce);
-            if(ce->down == NULL)
-            {
-                closedir_uncached(dir);
-                return -1;
-            }
-            /* save current paths size */
-            int pathpos = strlen(sab_path);
-            /* append entry */
-            strlcpy(&sab_path[pathpos], "/", sizeof(sab_path) - pathpos);
-            strlcpy(&sab_path[pathpos+1], entry->d_name, sizeof(sab_path) - pathpos - 1);
-
-            int rc = sab_process_dir(ce->down);
-            /* restore path */
-            sab_path[pathpos] = '\0';
-
-            if(rc < 0)
-            {
-                closedir_uncached(dir);
-                return rc;
-            }
-        }
-
-        ce = dircache_gen_entry(ce);
-        if (ce == NULL)
-            return -5;
-
-        yield();
-    }
-
-    closedir_uncached(dir);
-    return 1;
-}
-
-static int sab_process_volume(IF_MV(int volume,) struct dircache_entry *ce)
-{
-    memset(ce, 0, sizeof(struct dircache_entry));
-    strlcpy(sab_path, "/", sizeof sab_path);
-    return sab_process_dir(ce);
-}
-
-int dircache_readdir_r(struct dircache_dirscan *dir, struct dirent *result)
-{
-    if (dircache_state != DIRCACHE_READY)
-        return readdir_r(dir->###########3, result, &result);
-
-    bool first = dir->dcinfo.scanidx == REWIND_INDEX;
-    struct dircache_entry *ce = get_entry(first ? dir->dcinfo.index :
-                                                  dir->dcinfo.scanidx);
-
-    ce = first ? ce->down : ce->next;
-
-    if (ce == NULL)
-        return 0;
-
-    dir->scanidx = ce - dircache_root;
-
-    strlcpy(result->d_name, ce->d_name, sizeof (result->d_name));
-    result->info = ce->dirinfo;
-
-    return 1;
-}
+/* Nothing here yet */
 
 #endif /* DIRCACHE_* */
 
@@ -1861,8 +1814,7 @@ static void build_volumes(void)
 
     for (int i = 0; i < NUM_VOLUMES; i++)
     {
-        /* this does reader locking but we already own that */
-        if (!volume_ismounted(IF_MV(i)))
+        if (!volume_ismounted_internal(i))
             continue;
 
         struct dircache_volume *dcvolp = DCVOL(i);
@@ -2294,21 +2246,21 @@ void dircache_free_buffer(void)
  * obtain binding information for the file's root volume; this is the starting
  * point for internal path parsing and binding
  */
-void dircache_get_rootinfo(struct file_base_info *infop)
+void dircache_get_rootinfo(struct bpb *bpb, struct fileinfo *infop)
 {
-    int volume = BASEINFO_VOL(infop);
+    int volume = bpb->volume;
     struct dircache_volume *dcvolp = DCVOL(volume);
 
     if (dcvolp->serialnum)
     {
         /* root has a binding */
-        infop->dcfile.idx       = -volume - 1;
-        infop->dcfile.serialnum = dcvolp->serialnum;
+        infop->drv.dc.idx       = -volume - 1;
+        infop->drv.dc.serialnum = dcvolp->serialnum;
     }
     else
     {
         /* root is idle */
-        dircache_dcfile_init(&infop->dcfile);
+        dircache_dcfile_init(&infop->drv.dc);
     }
 }
 
@@ -2316,94 +2268,90 @@ void dircache_get_rootinfo(struct file_base_info *infop)
  * called by file code when the first reference to a file or directory is
  * opened
  */
-void dircache_bind_file(struct file_base_binding *bindp)
+void dircache_bind_file(struct fileinfo *infop)
 {
     /* requires write exclusion */
-    logf("dc open: %u", (unsigned int)bindp->info.dcfile.serialnum);
-    binding_open(bindp);
+    logf("dc open:" DC_SERIAL_FMT, infop->drv.dc.serialnum);
+    binding_open(infop);
 }
 
 /**
  * called by file code when the last reference to a file or directory is
  * closed
  */
-void dircache_unbind_file(struct file_base_binding *bindp)
+void dircache_unbind_file(struct fileinfo *infop)
 {
     /* requires write exclusion */
-    logf("dc close: %u", (unsigned int)bindp->info.dcfile.serialnum);
-    binding_close(bindp);
+    logf("dc close:" DC_SERIAL_FMT, infop->drv.dc.serialnum);
+    binding_close(infop);
 }
 
 /**
  * called by file code when a file is newly created
  */
-void dircache_fileop_create(struct file_base_info *dirinfop,
-                            struct file_base_binding *bindp,
-                            const char *basename,
-                            const struct dirinfo_native *dinp)
+void dircache_fileop_create(struct fileinfo *dirinfop,
+                            struct fileentry *entry)
 {
     /* requires write exclusion */
-    logf("dc create: %u \"%s\"",
-         (unsigned int)bindp->info.dcfile.serialnum, basename);
+    logf("dc create:" DC_SERIAL_FMT ":'%s'",
+         entry->drv.dc.serialnum, entry->name);
 
-    if (!dirinfop->dcfile.serialnum)
+    if (!dirinfop->drv.dc.serialnum)
     {
         /* no parent binding => no child binding */
+        dircache_dcfile_init(&entry->drv.dc);
         return;
     }
 
     struct dircache_entry *ce;
-    int idx = create_entry(basename, &ce);
+    int idx = create_entry(entry->name, entry->namelen, &ce);
+
     if (idx <= 0)
     {
         /* failed allocation; parent cache contents are not complete */
-        establish_frontier(dirinfop->dcfile.idx, FRONTIER_ZONED);
+        dircache_dcfile_init(&entry->drv.dc);
+        establish_frontier(dirinfop->drv.dc.idx, FRONTIER_ZONED);
         return;
     }
 
-    struct file_base_info *infop = &bindp->info;
-
-#ifdef DIRCACHE_NATIVE
-    ce->firstcluster = infop->fatfile.firstcluster;
-    ce->direntry     = infop->fatfile.e.entry;
-    ce->direntries   = infop->fatfile.e.entries;
-    ce->wrtdate      = dinp->wrtdate;
-    ce->wrttime      = dinp->wrttime;
-#else
-    ce->mtime        = dinp->mtime;
-#endif
-    ce->attr         = dinp->attr;
-    if (!(dinp->attr & ATTR_DIRECTORY))
-        ce->filesize = dinp->size;
-
+    entry_update_stats(entry, ce);
     insert_file_entry(dirinfop, ce);
 
-    /* file binding will have been queued when it was opened; just resolve */
-    infop->dcfile.idx       = idx;
-    infop->dcfile.serialnum = ce->serialnum;
-    binding_resolve(infop);
+    entry->drv.dc.idx       = idx;
+    entry->drv.dc.serialnum = ce->serialnum;
 
-    if ((dinp->attr & ATTR_DIRECTORY) && !is_dotdir_name(basename))
+    if (!(ce->attr & ATTR_DIRECTORY))
+        return;
+
+    /* scan-in the contents of the new directory at this level only */
+    struct fileinfo info;
+    int rc = __FILEOP(open)(dirinfop, entry, &info);
+    if (rc < 0)
     {
-        /* scan-in the contents of the new directory at this level only */
-        buffer_lock();
-        sab_process_dir(infop, false);
-        buffer_unlock();
+        establish_frontier(idx, FRONTIER_ZONED);
+        return;
     }
+
+    info.drv.dc.idx       = idx;
+    info.drv.dc.serialnum = ce->serialnum;
+
+    buffer_lock();
+    sab_process_dir(&info, false);
+    buffer_unlock();
 }
 
 /**
  * called by file code when a file or directory is removed
  */
-void dircache_fileop_remove(struct file_base_binding *bindp)
+void dircache_fileop_remove(struct fileinfo *infop)
 {
     /* requires write exclusion */
-    logf("dc remove: %u\n", (unsigned int)bindp->info.dcfile.serialnum);
+    logf("dc remove:" DC_SERIAL_FMT, nfop->drv.dc.serialnum);
 
-    if (!bindp->info.dcfile.serialnum)
+    if (!infop->drv.dc.serialnum)
         return; /* no binding yet */
 
-    free_file_entry(&bindp->info);
+    free_file_entry(infop);
 
     /* if binding was resolved; it should now be queued via above call */
 }
@@ -2411,93 +2359,82 @@ void dircache_fileop_remove(struct file_base_binding *bindp)
 /**
  * called by file code when a file is renamed
  */
-void dircache_fileop_rename(struct file_base_info *dirinfop,
-                            struct file_base_binding *bindp,
-                            const char *basename)
+void dircache_fileop_rename(struct fileinfo *dirinfop,
+                            struct fileinfo *infop,
+                            struct fileentry *entry)
 {
     /* requires write exclusion */
-    logf("dc rename: %u \"%s\"",
-         (unsigned int)bindp->info.dcfile.serialnum, basename);
+    logf("dc rename:" DC_SERIAL_FMT ":'%s'", infop->drv.dc.serialnum,
+         entry->name);
 
-    if (!dirinfop->dcfile.serialnum)
+    if (!dirinfop->drv.dc.serialnum)
     {
         /* new parent directory not cached; there is nowhere to put it so
            nuke it */
-        if (bindp->info.dcfile.serialnum)
-            free_file_entry(&bindp->info);
+        if (infop->drv.dc.serialnum)
+            free_file_entry(infop);
         /* else no entry anyway */
 
         return;
     }
 
-    if (!bindp->info.dcfile.serialnum)
+    if (!infop->drv.dc.serialnum)
     {
         /* binding not resolved on the old file but it's going into a resolved
            parent which means the parent would be missing an entry in the cache;
            downgrade the parent */
-        establish_frontier(dirinfop->dcfile.idx, FRONTIER_ZONED);
+        establish_frontier(dirinfop->drv.dc.idx, FRONTIER_ZONED);
         return;
     }
 
     /* unlink the entry but keep it; it needs to be re-sorted since the
        underlying FS probably changed the order */
-    struct dircache_entry *ce = remove_file_entry(&bindp->info);
+    struct dircache_entry *ce = remove_file_entry(infop);
 
-#ifdef DIRCACHE_NATIVE
     /* update other name-related information before inserting */
-    ce->direntry   = bindp->info.fatfile.e.entry;
-    ce->direntries = bindp->info.fatfile.e.entries;
-#endif
+    entry_update_stats(entry, ce);
 
     /* place it into its new home */
     insert_file_entry(dirinfop, ce);
 
     /* lastly, update the entry name itself */
-    if (entry_reassign_name(ce, basename) == 0)
+    if (entry_reassign_name(ce, entry->name, entry->namelen) == 0)
     {
         /* it's not really the same one now so re-stamp it */
         dc_serial_t serialnum = next_serialnum();
         ce->serialnum = serialnum;
-        bindp->info.dcfile.serialnum = serialnum;
+        infop->drv.dc.serialnum = serialnum;
     }
     else
     {
         /* it cannot be kept around without a valid name */
-        free_file_entry(&bindp->info);
-        establish_frontier(dirinfop->dcfile.idx, FRONTIER_ZONED);
+        free_file_entry(infop);
+        establish_frontier(dirinfop->drv.dc.idx, FRONTIER_ZONED);
     }
 }
 
 /**
  * called by file code to synchronize file entry information
  */
-void dircache_fileop_sync(struct file_base_binding *bindp,
-                          const struct dirinfo_native *dinp)
+void dircache_fileop_sync(struct fileinfo *infop,
+                          struct fileentry *entry)
 {
     /* requires write exclusion */
-    struct file_base_info *infop = &bindp->info;
-    logf("dc sync: %u\n", (unsigned int)infop->dcfile.serialnum);
+    logf("dc sync:" DC_SERIAL_FMT, infop->drv.dc.serialnum);
 
-    if (!infop->dcfile.serialnum)
+    dircache_dcfile_copy(&entry->drv.dc, &infop->drv.dc);
+
+    if (!infop->drv.dc.serialnum)
         return; /* binding unresolved */
 
-    struct dircache_entry *ce = get_entry(infop->dcfile.idx);
+    struct dircache_entry *ce = get_entry(infop->drv.dc.idx);
     if (!ce)
     {
-        logf("  bad index %d", infop->dcfile.idx);
+        logf("  bad index %d", infop->drv.dc.idx);
         return; /* a root (should never be called for this) */
     }
 
-#ifdef DIRCACHE_NATIVE
-    ce->firstcluster = infop->fatfile.firstcluster;
-    ce->wrtdate      = dinp->wrtdate;
-    ce->wrttime      = dinp->wrttime;
-#else
-    ce->mtime        = dinp->mtime;
-#endif
-    ce->attr         = dinp->attr;
-    if (!(dinp->attr & ATTR_DIRECTORY))
-        ce->filesize = dinp->size;
+    entry_update_stats(entry, ce);
 }
 
 
@@ -2530,7 +2467,7 @@ static ssize_t get_path_sub(int idx, struct get_path_sub_data *data)
         /* go all the way up then move back down from the root */
         len = get_path_sub(ce->up, data) - 1;
         if (len < 0)
-            return -2;
+            return -1;
 
         cename = alloca(DC_MAX_NAME + 1);
         entry_name_copy(cename, ce);
@@ -2634,7 +2571,7 @@ void dircache_fileref_init(struct dircache_fileref *dcfrefp)
  *   success - the length of the string, not including the trailing null or the
  *             buffer length required if the buffer is too small (return is >=
  *             size)
- *   failure - a negative value
+ *   failure - -1, sets errno
  *
  * errors:
  *   EBADF  - Bad file number
@@ -2647,7 +2584,7 @@ ssize_t dircache_get_fileref_path(const struct dircache_fileref *dcfrefp, char *
     ssize_t rc;
 
     if (!dcfrefp)
-        FILE_ERROR_RETURN(EFAULT, -1);
+        SET_ERRNO_RC_RETURN(-EFAULT, -1);
 
     /* if missing buffer space, still return what's needed a la strlcpy */
     if (!buf)
@@ -2660,11 +2597,11 @@ ssize_t dircache_get_fileref_path(const struct dircache_fileref *dcfrefp, char *
     /* first and foremost, there must be a cache and the serial number must
        check out */
     if (!dircache_runinfo.handle)
-        FILE_ERROR(EBADF, -2);
+        FILE_ERROR_RC(-EBADF);
 
     rc = check_file_serialnum(&dcfrefp->dcfile);
     if (rc < 0)
-        FILE_ERROR(-rc, -3);
+        FILE_ERROR_RC(RC);
 
     struct get_path_sub_data data =
     {
@@ -2675,13 +2612,15 @@ ssize_t dircache_get_fileref_path(const struct dircache_fileref *dcfrefp, char *
 
     rc = get_path_sub(dcfrefp->dcfile.idx, &data);
     if (rc < 0)
-        FILE_ERROR(ENOENT, rc * 10 - 4);
+        FILE_ERROR_RC(-ENOENT);
 
     if (data.serialhash != dcfrefp->serialhash)
-        FILE_ERROR(ENOENT, -5);
+        FILE_ERROR_RC(-ENOENT);
 
 file_error:
     dircache_unlock();
+
+    SET_ERRNO_RC(rc, -1);
     return rc;
 }
 
@@ -2697,7 +2636,7 @@ file_error:
  *            1 = serial number checks out for the reference (weak)
  *            2 = serial number and hash check out for the reference (medium)
  *            3 = path is valid; reference updated if specified (strong)
- *   failure: a negative value
+ *   failure: -1
  *            if file definitely doesn't exist (errno = ENOENT)
  *            other error
  *
@@ -2712,10 +2651,10 @@ int dircache_search(unsigned int flags, struct dircache_fileref *dcfrefp,
                     const char *path)
 {
     if (!(flags & (DCS_FILEREF | DCS_CACHED_PATH)))
-        FILE_ERROR_RETURN(EINVAL, -1); /* search nothing? */
+        SET_ERRNO_RC_RETURN(-EINVAL, -1); /* search nothing? */
 
     if (!dcfrefp && (flags & (DCS_FILEREF | DCS_UPDATE_FILEREF)))
-        FILE_ERROR_RETURN(EFAULT, -2); /* bad! */
+        SET_ERRNO_RC_RETURN(-EFAULT, -1); /* bad! */
 
     int rc = 0;
 
@@ -2741,39 +2680,32 @@ int dircache_search(unsigned int flags, struct dircache_fileref *dcfrefp,
     else
     {     /* rc = 0 */          /* check path with cache and/or storage */
         struct path_component_info compinfo;
-        struct filestr_base stream;
         unsigned int ffcache = (flags & _DCS_STORAGE_FLAG) ? 0 : FF_CACHEONLY;
-        int err = errno;
-        int rc2 = open_stream_internal(path, ffcache | FF_ANYTYPE | FF_PROBE |
-                                       FF_INFO | FF_PARENTINFO, &stream,
-                                       &compinfo);
+        int rc2 = open_file_internal(path, ffcache | FF_INFO | FF_PARENTINFO,
+                                     &compinfo, NULL);
         if (rc2 <= 0)
         {
             if (ffcache == 0)
             {
                 /* checked storage too: absent for sure */
-                FILE_ERROR(rc2 ? ERRNO : ENOENT, rc2 * 10 - 5);
+                FILE_ERROR_RC(rc2 ?: -ENOENT);
             }
 
             if (rc2 < 0)
             {
+                /* only cache; something didn't exist: indecisive (rc = 0) */
                 /* no base info available */
-                if (errno != ENOENT)
-                    FILE_ERROR(ERRNO, rc2 * 10 - 6);
-
-                /* only cache; something didn't exist: indecisive */
-                errno = err;
-                FILE_ERROR(ERRNO, RC); /* rc = 0 */
+                FILE_ERROR_RC(rc2 == -ENOENT ? 0 : rc2);
             }
 
-            struct dircache_file *dcfp = &compinfo.parentinfo.dcfile;
+            struct dircache_file *dcfp = &compinfo.parentinfo.drv.dc;
             if (get_frontier(dcfp->idx) == FRONTIER_SETTLED)
-                FILE_ERROR(ENOENT, -7); /* parent not a frontier; absent */
+                FILE_ERROR_RC(-ENOENT); /* parent not a frontier; absent */
             /* else checked only cache; parent is incomplete: indecisive */
         }
         else
         {
-            struct dircache_file *dcfp = &compinfo.info.dcfile;
+            struct dircache_file *dcfp = &compinfo.info.drv.dc;
             if (dcfp->serialnum != 0)
             {
                 /* found by path in the cache afterall */
@@ -2793,6 +2725,8 @@ file_error:
         dircache_fileref_init(dcfrefp);
 
     dircache_unlock();
+
+    SET_ERRNO_RC(rc, -1);
     return rc;    
 }
 
@@ -3002,16 +2936,6 @@ void dircache_dump(void)
 
 
 /** Misc. stuff **/
-
-/**
- * set the dircache file to initial values
- */
-void dircache_dcfile_init(struct dircache_file *dcfilep)
-{
-    dcfilep->idx       = 0;
-    dcfilep->serialnum = 0;
-}
-
 #ifdef HAVE_EEPROM_SETTINGS
 
 #ifdef HAVE_HOTSWAP
