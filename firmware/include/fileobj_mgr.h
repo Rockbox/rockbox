@@ -21,33 +21,23 @@
 #ifndef _FILEOBJ_MGR_H_
 #define _FILEOBJ_MGR_H_
 
-#include "file_internal.h"
+void file_binding_insert_first(struct fileinfo *infop);
+void file_binding_insert_last(struct fileinfo *infop);
+void file_binding_remove(struct fileinfo *infop);
+void file_binding_remove_next(struct fileinfo *prevp,
+                              struct fileinfo *infop);
 
-void file_binding_insert_first(struct file_base_binding *bindp);
-void file_binding_insert_last(struct file_base_binding *bindp);
-void file_binding_remove(struct file_base_binding *bindp);
-void file_binding_remove_next(struct file_base_binding *prevp,
-                              struct file_base_binding *bindp);
+void fileobj_fileop_open(struct fileinfo *srcinfop,
+                         unsigned int callflags,
+                         struct fileinfo **infopp);
+void fileobj_fileop_close(struct fileinfo *infop);
 
-void fileobj_fileop_open(struct filestr_base *stream,
-                         const struct file_base_info *srcinfop,
-                         unsigned int callflags);
-void fileobj_fileop_close(struct filestr_base *stream);
-void fileobj_fileop_create(struct filestr_base *stream,
-                           const struct file_base_info *srcinfop,
-                           unsigned int callflags);
-void fileobj_fileop_rename(struct filestr_base *stream,
-                           const struct file_base_info *oldinfop);
-void fileobj_fileop_remove(struct filestr_base *stream,
-                           const struct file_base_info *oldinfop);
-void fileobj_fileop_sync(struct filestr_base *stream);
+unsigned int fileobj_get_refcount(struct fileinfo *infop);
 
-file_size_t * fileobj_get_sizep(const struct filestr_base *stream);
-unsigned int fileobj_get_flags(const struct filestr_base *stream);
-struct filestr_base * fileobj_get_next_stream(const struct filestr_base *stream,
-                                              const struct filestr_base *s);
-void fileobj_change_flags(struct filestr_base *stream,
-                          unsigned int flags, unsigned int mask);
+void fileobj_fileop_open_filestr(unsigned int callflags,
+                                 struct filestr *str);
+void fileobj_fileop_close_filestr(struct filestr *str);
+
 void fileobj_mgr_unmount(IF_MV_NONVOID(int volume));
 
 void fileobj_mgr_init(void) INIT_ATTR;
