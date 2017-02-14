@@ -36,7 +36,6 @@ struct partinfo
 #define PARTITION_TYPE_FAT16                0x06
 #define PARTITION_TYPE_OS2_HIDDEN_C_DRIVE   0x84
 
-bool disk_init(IF_MD_NONVOID(int drive));
 bool disk_partinfo(int partition, struct partinfo *info);
 
 int disk_mount_all(void); /* returns the # of successful mounts */

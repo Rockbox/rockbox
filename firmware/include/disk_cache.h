@@ -21,40 +21,73 @@
 #ifndef DISK_CACHE_H
 #define DISK_CACHE_H
 
-#include "mutex.h"
+#include "storage.h"
+#include "searchtree.h"
 #include "mv.h"
 
-static inline void dc_lock_cache(void)
+struct bpb;
+
+struct iobuf_handle
 {
-    extern struct mutex disk_cache_mutex;
-    mutex_lock(&disk_cache_mutex);
+    void *h; /* buffer reference for fast path lookup and release */
+};
+
+static inline void iobuf_init(struct iobuf_handle *iobp)
+{
+    iobp->h = NULL; /* just set as invalid */
 }
 
-static inline void dc_unlock_cache(void)
+typedef int (*iocache_wb_cb_t)(struct bpb *bpb,
+                               unsigned long start,
+                               int count,
+                               const void *buf);
+
+struct iocache_bpb
 {
-    extern struct mutex disk_cache_mutex;
-    mutex_unlock(&disk_cache_mutex);
-}
+    struct searchtree index;   /* buffer index for searching */
+    struct ll_head    wbq;     /* buffers awaiting writeback */
+    iocache_wb_cb_t   wbcb;
+};
 
-void * dc_cache_probe(IF_MV(int volume,) unsigned long secnum,
-                      unsigned int *flags);
-void dc_dirty_buf(void *buf);
-void dc_discard_buf(void *buf);
-void dc_commit_all(IF_MV_NONVOID(int volume));
-void dc_discard_all(IF_MV_NONVOID(int volume));
+void * iobuf_cache(struct bpb *bpb,
+                   unsigned long num,
+                   struct iobuf_handle *iobp,
+                   unsigned int priority,
+                   bool fill);
 
-void dc_init(void) INIT_ATTR;
+void iobuf_release(struct iobuf_handle *iobp);
 
-/* in addition to filling, writeback is implemented by the client */
-extern void dc_writeback_callback(IF_MV(int volume, ) unsigned long sector,
-                                  void *buf);
+void iobuf_release_dirty(struct iobuf_handle *iobp);
+
+void iobuf_release_dirty_cb(struct iobuf_handle *iobp);
+
+long iocache_readwrite(struct bpb *bpb,
+                       unsigned long start,
+                       int count,
+                       void *buf,
+                       bool write);
+
+#define iocache_writeback(bpb, start, count, buf) \
+    storage_write_sectors(IF_MD((bpb)->drive,) (start), (count), (buf))
+
+void iocache_mount_volume(struct bpb *bpb, iocache_wb_cb_t wbcb);
+
+void iocache_flush_volume(struct bpb *bpb);
+
+void iocache_discard_volume(struct bpb *bpb);
 
 
 /** These synchronize and can be called by anyone **/
 
 /* expropriate a buffer from the cache of DC_CACHE_BUFSIZE bytes */
-void * dc_get_buffer(void);
+void * iocache_get_buffer(void);
+
 /* return buffer to the cache by buffer */
-void dc_release_buffer(void *buf);
+void iocache_release_buffer(void *buf);
+
+/** Boot init **/
+
+/* one-time init at startup */
+void iocache_init(void) INIT_ATTR;
 
 #endif /* DISK_CACHE_H */
