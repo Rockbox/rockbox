@@ -1260,3 +1260,16 @@ enum current_activity get_current_activity(void)
 }
 
 #endif
+
+#ifdef HAVE_SPEAKER
+void set_speaker_mode(int speaker_mode)
+{
+    global_settings.speaker_mode = speaker_mode;
+    /* update speaker status */
+    audio_enable_speaker(global_settings.speaker_mode);
+}
+int get_speaker_mode(void)
+{
+    return global_settings.speaker_mode;
+}
+#endif
