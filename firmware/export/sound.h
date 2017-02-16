@@ -32,6 +32,7 @@ int sound_steps(int setting);
 int sound_min(int setting);
 int sound_max(int setting);
 int sound_default(int setting);
+int sound_current(int setting);
 sound_set_type* sound_get_fn(int setting);
 
 void sound_set_volume(int value);
