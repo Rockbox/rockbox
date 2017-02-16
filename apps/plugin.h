@@ -370,7 +370,7 @@ struct plugin_api {
                               int width, int height);
 #endif
     void (*viewport_set_defaults)(struct viewport *vp,
-                                  const enum screen_type screen);                                  
+                                  const enum screen_type screen);                                   
 #ifdef HAVE_LCD_BITMAP
     void (*viewportmanager_theme_enable)(enum screen_type screen, bool enable,
                                          struct viewport *viewport);
@@ -956,6 +956,8 @@ struct plugin_api {
     char* (*root_menu_write_to_cfg)(void* setting, char*buf, int buf_len);
     void (*root_menu_load_from_cfg)(void* setting, char *value);
     int (*settings_save)(void);
+    /* sound */
+    int (*sound_current)(int setting);
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
