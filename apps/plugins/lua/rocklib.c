@@ -38,7 +38,7 @@
  * from Lua in its stack in direct order (the first argument is pushed first). To return values to Lua,
  * a C function just pushes them onto the stack, in direct order (the first result is pushed first),
  * and returns the number of results. Any other value in the stack below the results will be properly
- * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results.
+ * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results. 
  *
  * When porting new functions, don't forget to check rocklib_aux.pl whether it automatically creates
  * wrappers for the function and if so, add the function names to @forbidden_functions. This is to
@@ -377,115 +377,6 @@ RB_WRAP(current_tick)
     return 1;
 }
 
-/* current sound settings */
-#ifdef AUDIOHW_HAVE_BASS
-RB_WRAP(sound_current_bass)
-{
-    lua_pushinteger(L, (*rb).global_settings->bass);
-    return 1;
-}
-#endif
-#ifdef AUDIOHW_HAVE_TREBLE
-RB_WRAP(sound_current_treble)
-{
-    lua_pushinteger(L, (*rb).global_settings->treble);
-    return 1;
-}
-#endif
-RB_WRAP(sound_current_balance)
-{
-    lua_pushinteger(L, (*rb).global_settings->balance);
-    return 1;
-}
-#ifndef PLATFORM_HAS_VOLUME_CHANGE
-RB_WRAP(sound_current_volume)
-{
-    lua_pushinteger(L, (*rb).global_settings->volume);
-    return 1;
-}
-#endif
-RB_WRAP(sound_current_channels)
-{
-    lua_pushinteger(L, (*rb).global_settings->channel_config);
-    return 1;
-}
-RB_WRAP(sound_current_stereo_width)
-{
-    lua_pushinteger(L, (*rb).global_settings->stereo_width);
-    return 1;
-}
-
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-RB_WRAP(sound_current_loudness)
-{
-    lua_pushinteger(L, (*rb).global_settings->loudness);
-    return 1;
-}
-RB_WRAP(sound_current_avc)
-{
-    lua_pushinteger(L, (*rb).global_settings->avc);
-    return 1;
-}
-RB_WRAP(sound_current_mdb_strength)
-{
-    lua_pushinteger(L, (*rb).global_settings->mdb_strength);
-    return 1;
-}
-RB_WRAP(sound_current_mdb_harmonics)
-{
-    lua_pushinteger(L, (*rb).global_settings->mdb_harmonics);
-    return 1;
-}
-RB_WRAP(sound_current_mdb_center)
-{
-    lua_pushinteger(L, (*rb).global_settings->mdb_center);
-    return 1;
-}
-RB_WRAP(sound_current_mdb_shape)
-{
-    lua_pushinteger(L, (*rb).global_settings->mdb_shape);
-    return 1;
-}
-RB_WRAP(sound_current_mdb_enable)
-{
-    lua_pushinteger(L, (*rb).global_settings->mdb_enable);
-    return 1;
-}
-RB_WRAP(sound_current_superbass)
-{
-    lua_pushinteger(L, (*rb).global_settings->superbass);
-    return 1;
-}
-#endif
-#ifdef AUDIOHW_HAVE_BASS_CUTOFF
-RB_WRAP(sound_current_bass_cutoff)
-{
-    lua_pushinteger(L, (*rb).global_settings->bass_cutoff);
-    return 1;
-}
-#endif
-#ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
-RB_WRAP(sound_current_treble_cutoff)
-{
-    lua_pushinteger(L, (*rb).global_settings->treble_cutoff);
-    return 1;
-}
-#endif
-#ifdef AUDIOHW_HAVE_DEPTH_3D
-RB_WRAP(sound_current_depth_3d)
-{
-    lua_pushinteger(L, (*rb).global_settings->depth_3d);
-    return 1;
-}
-#endif
-#ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
-RB_WRAP(sound_current_filter_rolloff)
-{
-    lua_pushinteger(L, (*rb).global_settings->roll_off);
-    return 1;
-}
-#endif
-/* end current sound settings */
 #ifdef HAVE_TOUCHSCREEN
 RB_WRAP(action_get_touchscreen_press)
 {
@@ -852,49 +743,6 @@ static const luaL_Reg rocklib[] =
 #endif
     R(get_plugin_action),
 
-#ifdef AUDIOHW_HAVE_BASS
-    R(sound_current_bass),
-#endif
-
-#ifdef AUDIOHW_HAVE_TREBLE
-    R(sound_current_treble),
-#endif
-
-#ifndef PLATFORM_HAS_VOLUME_CHANGE
-    R(sound_current_volume),
-#endif
-
-    R(sound_current_balance),
-    R(sound_current_channels),
-    R(sound_current_stereo_width),
-
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    R(sound_current_loudness),
-    R(sound_current_avc),
-    R(sound_current_mdb_strength),
-    R(sound_current_mdb_harmonics),
-    R(sound_current_mdb_center),
-    R(sound_current_mdb_shape),
-    R(sound_current_mdb_enable),
-    R(sound_current_superbass),
-#endif
-
-#ifdef AUDIOHW_HAVE_BASS_CUTOFF
-    R(sound_current_bass_cutoff),
-#endif
-
-#ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
-    R(sound_current_treble_cutoff),
-#endif
-
-#ifdef AUDIOHW_HAVE_DEPTH_3D
-    R(sound_current_depth_3d),
-#endif
-
-#ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
-    R(sound_current_filter_rolloff),
-#endif
-
     {"new_image", rli_new},
 
     {NULL, NULL}
@@ -949,6 +797,8 @@ LUALIB_API int luaopen_rock(lua_State *L)
     RB_STRING_CONSTANT(PLUGIN_DATA_DIR);
     RB_STRING_CONSTANT(VIEWERS_DATA_DIR);
 
+    RB_CONSTANT(PLUGIN_API_VERSION);
+    RB_CONSTANT(PLUGIN_MIN_API_VERSION);
     rli_init(L);
 
     return 1;
