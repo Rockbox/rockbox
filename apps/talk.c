@@ -935,7 +935,7 @@ void talk_init(void)
      * and so we can re-use it if it's already allocated in any event */
 
     filehandle = open_voicefile();
-    if (filehandle > 0)
+    if (filehandle > -1)
     {
         if (!load_voicefile_index(filehandle))
         {
