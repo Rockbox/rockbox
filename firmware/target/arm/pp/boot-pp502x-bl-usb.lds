@@ -70,7 +70,6 @@ SECTIONS
     {
         _iedata = .;
         *(.qharray)
-        *(.ibss*)
         . = ALIGN(0x4);
         _iend = .;
     } > IRAM
@@ -106,6 +105,7 @@ SECTIONS
     {
         _edata = .;
         *(.bss*)
+        *(.ibss*); /* The bss section is too large for IRAM - we just move it to DRAM */
         *(COMMON)
     } > DRAM
 
