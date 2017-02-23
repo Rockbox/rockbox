@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2016 Amaury Pouly
+ * Copyright (C) 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +18,30 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_ADC_H__
-#define __NWZ_ADC_H__
+#ifndef _BUTTON_TARGET_H_
+#define _BUTTON_TARGET_H_
 
-#define NWZ_ADC_DEV  "/dev/icx_adc"
+#include <stdbool.h>
+#include "config.h"
 
-#define NWZ_ADC_TYPE    'm'
+/* Main unit's buttons */
+#define BUTTON_POWER                0x00000001
+#define BUTTON_BACK                 0x00000002
+#define BUTTON_PLAY                 0x00000004
+#define BUTTON_LEFT                 0x00000008
+#define BUTTON_UP                   0x00000010
+#define BUTTON_DOWN                 0x00000020
+#define BUTTON_RIGHT                0x00000040
+#define BUTTON_VOL_DOWN             0x00000080
+#define BUTTON_VOL_UP               0x00000100
 
-#define NWZ_ADC_MIN_CHAN    0
-#define NWZ_ADC_MAX_CHAN    7
+#define BUTTON_MAIN                 0x000001ff
 
-#define NWZ_ADC_VCCBAT  0
-#define NWZ_ADC_VCCVBUS 1
-#define NWZ_ADC_ADIN3   2
-#define NWZ_ADC_ADIN4   3
-#define NWZ_ADC_ADIN5   4
-#define NWZ_ADC_ADIN6   5
-#define NWZ_ADC_ADIN7   6
-#define NWZ_ADC_ADIN8   7
+/* Software power-off */
+#define POWEROFF_BUTTON BUTTON_POWER
+#define POWEROFF_COUNT 10
 
-#define NWZ_ADC_GET_VAL(chan)   _IOR(NWZ_ADC_TYPE, chan, unsigned char)
+/* force driver to reload button state (useful after suspend) */
+void nwz_button_reload_after_suspend(void);
 
-#endif /* __NWZ_ADC_H__ */
+#endif /* _BUTTON_TARGET_H_ */
