@@ -50,6 +50,7 @@
 #include "system.h"
 #include "debug.h"
 #include "kernel.h"
+#include "panic.h"
 
 #include "pcm.h"
 #include "pcm-internal.h"
@@ -66,14 +67,21 @@
  * with multple applications running */
 static char device[] = "plughw:0,0";                    /* playback device */
 static const snd_pcm_access_t access_ = SND_PCM_ACCESS_RW_INTERLEAVED; /* access mode */
+#ifdef SONY_NWZ_LINUX
+/* Sony NWZ must use 32-bit per sample */
+static const snd_pcm_format_t format = SND_PCM_FORMAT_S32_LE;    /* sample format */
+typedef long sample_t;
+#else
 static const snd_pcm_format_t format = SND_PCM_FORMAT_S16;    /* sample format */
+typedef short sample_t;
+#endif
 static const int channels = 2;                                /* count of channels */
 static unsigned int rate = 44100;                       /* stream rate */
 
 static snd_pcm_t *handle;
 static snd_pcm_sframes_t buffer_size = MIX_FRAME_SAMPLES * 32; /* ~16k */
 static snd_pcm_sframes_t period_size = MIX_FRAME_SAMPLES * 4;  /*  ~4k */
-static short *frames;
+static sample_t *frames;
 
 static const void  *pcm_data = 0;
 static size_t       pcm_size = 0;
@@ -153,7 +161,7 @@ static int set_hwparams(snd_pcm_t *handle, unsigned sample_rate)
         goto error;
     }
     if (!frames)
-        frames = malloc(period_size * channels * sizeof(short));
+        frames = malloc(period_size * channels * sizeof(sample_t));
 
     /* write the parameters to device */
     err = snd_pcm_hw_params(handle, params);
@@ -229,12 +237,28 @@ static bool fill_frames(void)
                 return false;
             }
         }
-        copy_n = MIN((ssize_t)pcm_size, frames_left*4);
-        memcpy(&frames[2*(period_size-frames_left)], pcm_data, copy_n);
 
-        pcm_data += copy_n;
-        pcm_size -= copy_n;
-        frames_left -= copy_n/4;
+        if (pcm_size % 4)
+            panicf("Wrong pcm_size");
+        /* the compiler will optimize this test away */
+        copy_n = MIN((ssize_t)pcm_size/4, frames_left);
+        if (format == SND_PCM_FORMAT_S32_LE)
+        {
+            /* We have to convert 16-bit to 32-bit, the need to multiply the
+             * sample by some value so the sound is not too low */
+            const short *pcm_ptr = pcm_data;
+            sample_t *sample_ptr = &frames[2*(period_size-frames_left)];
+            for (int i = 0; i < copy_n*2; i++)
+                *sample_ptr++ = *pcm_ptr++ * 256; /* FIXME: we could adjust this value to increase the sound range */
+        }
+        else
+        {
+            /* Rockbox and PCM have same format: memcopy */
+            memcpy(&frames[2*(period_size-frames_left)], pcm_data, copy_n);
+        }
+        pcm_data += copy_n*4;
+        pcm_size -= copy_n*4;
+        frames_left -= copy_n;
 
         if (new_buffer)
         {
@@ -285,7 +309,7 @@ static int async_rw(snd_pcm_t *handle)
 {
     int err;
     snd_pcm_sframes_t sample_size;
-    short *samples;
+    sample_t *samples;
 
 #ifdef USE_ASYNC_CALLBACK
     /* assign alternative stack for the signal handlers */
@@ -323,7 +347,7 @@ static int async_rw(snd_pcm_t *handle)
 
     /* fill buffer with silence to initiate playback without noisy click */
     sample_size = buffer_size;
-    samples = malloc(sample_size * channels * sizeof(short));
+    samples = malloc(sample_size * channels * sizeof(sample_t));
 
     snd_pcm_format_set_silence(format, samples, sample_size);
     err = snd_pcm_writei(handle, samples, sample_size);
@@ -367,23 +391,19 @@ void pcm_play_dma_init(void)
 
     if ((err = snd_pcm_open(&handle, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
     {
-        printf("%s(): Cannot open device %s: %s\n", __func__, device, snd_strerror(err));
-        exit(EXIT_FAILURE);
-        return;
+        panicf("%s(): Cannot open device %s: %s\n", __func__, device, snd_strerror(err));
     }
 
     if ((err = snd_pcm_nonblock(handle, 1)))
-        printf("Could not set non-block mode: %s\n", snd_strerror(err));
+        panicf("Could not set non-block mode: %s\n", snd_strerror(err));
 
     if ((err = set_hwparams(handle, rate)) < 0)
     {
-        printf("Setting of hwparams failed: %s\n", snd_strerror(err));
-        exit(EXIT_FAILURE);
+        panicf("Setting of hwparams failed: %s\n", snd_strerror(err));
     }
     if ((err = set_swparams(handle)) < 0)
     {
-        printf("Setting of swparams failed: %s\n", snd_strerror(err));
-        exit(EXIT_FAILURE);
+        panicf("Setting of swparams failed: %s\n", snd_strerror(err));
     }
 
     pcm_dma_apply_settings();

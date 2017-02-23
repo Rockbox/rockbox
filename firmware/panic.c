@@ -115,7 +115,7 @@ void panicf( const char *fmt, ...)
     }
 
 #if defined(CPU_ARM)
-    backtrace(pc, sp, &y);
+    rb_backtrace(pc, sp, &y);
 #endif
 #ifdef ROCKBOX_HAS_LOGF
     logf_panic_dump(&y);
