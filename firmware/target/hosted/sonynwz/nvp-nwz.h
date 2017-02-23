@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2016 Amaury Pouly
+ * Copyright (C) 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +18,24 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_ADC_H__
-#define __NWZ_ADC_H__
+#ifndef __NVP_NWZ_H__
+#define __NVP_NWZ_H__
 
-#define NWZ_ADC_DEV  "/dev/icx_adc"
+#include "system.h"
+#include "nwz-db.h"
 
-#define NWZ_ADC_TYPE    'm'
+/* get model ID */
+unsigned long nwz_get_model_id(void);
+/* get model NAME (ie NWZ-E463) */
+const char *nwz_get_model_name(void);
+/* return series (index into nwz_db) */
+int nwz_get_series(void);
 
-#define NWZ_ADC_MIN_CHAN    0
-#define NWZ_ADC_MAX_CHAN    7
+/* read a nvp node and return its size, if the data pointer is null, then simply
+ * return the size, return -1 on error */
+int nwz_nvp_read(enum nwz_nvp_node_t node, void *data);
+/* write a nvp node, return 0 on success and -1 on error, the size of the buffer
+ * must be the one returned by nwz_nvp_read */
+int nwz_nvp_write(enum nwz_nvp_node_t node, void *data);
 
-#define NWZ_ADC_VCCBAT  0
-#define NWZ_ADC_VCCVBUS 1
-#define NWZ_ADC_ADIN3   2
-#define NWZ_ADC_ADIN4   3
-#define NWZ_ADC_ADIN5   4
-#define NWZ_ADC_ADIN6   5
-#define NWZ_ADC_ADIN7   6
-#define NWZ_ADC_ADIN8   7
-
-#define NWZ_ADC_GET_VAL(chan)   _IOR(NWZ_ADC_TYPE, chan, unsigned char)
-
-#endif /* __NWZ_ADC_H__ */
+#endif /* __NVP_NWZ_H__ */
