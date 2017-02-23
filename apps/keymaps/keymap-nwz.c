@@ -210,6 +210,7 @@ static const struct button_mapping button_context_colorchooser[]  = {
 }; /* button_context_colorchooser */
 
 static const struct button_mapping button_context_eq[]  = {
+    { ACTION_STD_CANCEL,                BUTTON_BACK,                       BUTTON_NONE },
     { ACTION_STD_OK,                    BUTTON_PLAY|BUTTON_REL,            BUTTON_PLAY },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),

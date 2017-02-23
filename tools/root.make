@@ -73,7 +73,10 @@ ifeq (,$(findstring checkwps,$(APP_TYPE)))
       include $(FIRMDIR)/firmware.make
       include $(ROOTDIR)/apps/bitmaps/bitmaps.make
       ifeq (arch_arm,$(ARCH))
-          include $(ROOTDIR)/lib/unwarminder/unwarminder.make
+          # some targets don't use the unwarminder because they have the glibc backtrace
+          ifeq (,$(filter sonynwz,$(APP_TYPE)))
+            include $(ROOTDIR)/lib/unwarminder/unwarminder.make
+          endif
       endif
       ifeq (,$(findstring bootloader,$(APPSDIR)))
         include $(ROOTDIR)/lib/skin_parser/skin_parser.make
@@ -98,7 +101,11 @@ ifeq (,$(findstring bootloader,$(APPSDIR)))
 endif
 
 ifneq (,$(findstring bootloader,$(APPSDIR)))
-  include $(APPSDIR)/bootloader.make
+  ifneq (,$(findstring sonynwz,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/sonynwz/sonynwz.make
+  else
+    include $(APPSDIR)/bootloader.make
+  endif
 else ifneq (,$(findstring bootbox,$(APPSDIR)))
   include $(APPSDIR)/bootbox.make
 else ifneq (,$(findstring checkwps,$(APP_TYPE)))
@@ -130,6 +137,10 @@ else # core
 
   ifneq (,$(findstring ypr1,$(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/samsungypr/ypr1/ypr1.make
+  endif
+
+  ifneq (,$(findstring sonynwz,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/sonynwz/sonynwz.make
   endif
 
   ifneq (,$(findstring android_ndk, $(APP_TYPE)))
