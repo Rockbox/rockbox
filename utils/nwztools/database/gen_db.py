@@ -200,7 +200,7 @@ extern struct nwz_series_info_t nwz_series[NWZ_SERIES_COUNT];
 #endif /* __NWZ_DB_H__ */
 """
 
-with open("nwz_db.h", "w") as fp:
+with open("nwz-db.h", "w") as fp:
     fp.write(header_begin)
     # generate list of all nvp nodes
     for name in sorted(g_nvp_names):
@@ -241,7 +241,7 @@ impl_begin = \
 
 /** /!\ This file was automatically generated, DO NOT MODIFY IT DIRECTLY /!\ */
 
-#include "nwz_db.h"
+#include "nwz-db.h"
 
 struct nwz_model_info_t nwz_model[NWZ_MODEL_COUNT] =
 {
@@ -256,7 +256,7 @@ def by_name(nvp_entry):
 def codename_to_c(codename):
     return re.sub('[^a-zA-Z0-9]', '_', codename, 0)
 
-with open("nwz_db.c", "w") as fp:
+with open("nwz-db.c", "w") as fp:
     fp.write(impl_begin)
     # generate model list (sort by mid)
     for model in sorted(g_models, key = by_mid):

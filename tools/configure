@@ -706,12 +706,15 @@ pandoracc () {
  GCCOPTS="$GCCOPTS -ffast-math -fsingle-precision-constant"
 }
 
-ypr0cc () {
-
+arm1176jzlinuxcc () {
  GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
+ # Although the ARM1176JZ-S supports unaligned accesses, those seems to disabled
+ # by the kernel. Since GCC emits unaligned accesses by default on ARMv6, we
+ # need to disable that
+ GCCOPTS="$GCCOPTS -mcpu=arm1176jz-s -mno-unaligned-access -mfloat-abi=softfp"
  GCCOPTIMIZE=''
  LDOPTS="-lasound -lpthread -lm -ldl -lrt $LDOPTS"
- GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
+ GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs" # warn about undefined symbols in shared libraries
  SHARED_LDFLAG="-shared"
  SHARED_CFLAGS=''
  endian="little"
@@ -721,8 +724,18 @@ ypr0cc () {
  GCCOPTS="$GCCOPTS  -D_GNU_SOURCE=1 -U_FORTIFY_SOURCE -D_REENTRANT"
 
  # Set up compiler
- gccchoice="4.4.6"
- prefixtools "arm-ypr0-linux-gnueabi-"
+ gccchoice="4.9.4"
+ prefixtools "arm-rockbox-linux-gnueabi-"
+}
+
+ypr0cc () {
+ arm1176jzlinuxcc
+ app_type="ypr0"
+}
+
+sonynwzcc () {
+ arm1176jzlinuxcc
+ app_type="sonynwz"
 }
 
 androidcc () {
@@ -1493,11 +1506,14 @@ cat <<EOF
  202) Nokia N8xx          211) MA9C              ==Sony==
  203) Nokia N900          212) MA8               220) NWZ-E370/E380 series
  204) Pandora             213) MA8C              221) NWZ-E360 series
- 205) Samsung YP-R0
- 206) Android MIPS        ==IHIFI==              ==iBasso==
- 207) Android x86         230) 760               232) DX50
- 208) Samsung YP-R1       231) 960               233) DX90
-
+ 205) Samsung YP-R0                              222) NWZ-E450 series
+ 206) Android MIPS        ==IHIFI==              223) NWZ-E460 series
+ 207) Android x86         230) 760               224) NWZ-E470 series
+ 208) Samsung YP-R1       231) 960               225) NWZ-E580 series
+                                                 226) NWZ-A10 series
+ ==iBasso==
+ 232) DX50
+ 233) DX90
 
 EOF
 
@@ -3851,6 +3867,121 @@ fi
     t_manufacturer="imx233"
     t_model="sony-nwz"
     arm926ejscc
+    ;;
+
+   222|sonynwze450)
+    application="yes"
+    target_id=96
+    modelname="sonynwze450"
+    target="SONY_NWZE450"
+    memory=16
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="cp"
+    output="rockbox.sony"
+    boottool="$rootdir/tools/scramble -add=e450"
+    bootoutput="bootloader-nwze450.sony"
+    appextra="gui:recorder"
+    plugins=""
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    t_cpu="hosted"
+    t_manufacturer="sonynwz"
+    t_model="nwze450"
+    uname=`uname`
+    sonynwzcc
+    ;;
+
+   223|sonynwze460)
+    application="yes"
+    target_id=97
+    modelname="sonynwze460"
+    target="SONY_NWZE460"
+    memory=16
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="cp"
+    output="rockbox.sony"
+    boottool="$rootdir/tools/scramble -add=e460"
+    bootoutput="bootloader-nwze460.sony"
+    appextra="gui:recorder"
+    plugins="yes"
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    t_cpu="hosted"
+    t_manufacturer="sonynwz"
+    t_model="nwze460"
+    uname=`uname`
+    sonynwzcc
+    ;;
+
+   224|sonynwze470)
+    application="yes"
+    target_id=100
+    modelname="sonynwze470"
+    target="SONY_NWZE470"
+    memory=16
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="cp"
+    output="rockbox.sony"
+    boottool="$rootdir/tools/scramble -add=e470"
+    bootoutput="bootloader-nwze470.sony"
+    appextra="gui:recorder"
+    plugins=""
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    t_cpu="hosted"
+    t_manufacturer="sonynwz"
+    t_model="nwze470"
+    uname=`uname`
+    sonynwzcc
+    ;;
+
+   225|sonynwze580)
+    application="yes"
+    target_id=98
+    modelname="sonynwze580"
+    target="SONY_NWZE580"
+    memory=16
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="cp"
+    output="rockbox.sony"
+    boottool="$rootdir/tools/scramble -add=e580"
+    bootoutput="bootloader-nwze580.sony"
+    appextra="gui:recorder"
+    plugins=""
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    t_cpu="hosted"
+    t_manufacturer="sonynwz"
+    t_model="nwze580"
+    uname=`uname`
+    sonynwzcc
+    ;;
+
+   226|sonynwza10)
+    application="yes"
+    target_id=101
+    modelname="sonynwza10"
+    target="SONY_NWZA10"
+    memory=16
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="cp"
+    output="rockbox.sony"
+    boottool="$rootdir/tools/scramble -add=a10"
+    bootoutput="bootloader-nwza10.sony"
+    appextra="gui:recorder"
+    plugins=""
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    t_cpu="hosted"
+    t_manufacturer="sonynwz"
+    t_model="nwza10"
+    uname=`uname`
+    sonynwzcc
     ;;
 
    230|ihifi760)
