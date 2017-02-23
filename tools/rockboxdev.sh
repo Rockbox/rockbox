@@ -195,13 +195,17 @@ gettool() {
                     longterm_ver="${version%.*}"
                     top_dir="v2.6"
                     ;;
-
+                3.*)
+                    longterm_ver=""
+                    top_dir="v3.x"
+                    ;;
                 *)
                     echo "ROCKBOXDEV: I don't know how to handle this kernel version: $version"
                     exit
                 ;;
             esac
             base_url="http://www.kernel.org/pub/linux/kernel/$top_dir"
+            # we try several URLs, the 2.6 versions are a mess and need that
             url="$base_url $base_url/longterm/v$longterm_ver $base_url/longterm"
             ext="tar.gz"
             ;;
@@ -696,6 +700,7 @@ if [ -z "$RBDEV_TARGET" ]; then
     echo "i   - mips     (Jz4740 and ATJ-based players)"
     echo "r   - arm-app  (Samsung ypr0)"
     echo "x   - arm-linux  (Generic Linux ARM: Samsung ypr0, Linux-based Sony NWZ)"
+    echo "y   - mips-linux  (Generic Linux MIPS: AGPTek Rocker)"
     echo "separate multiple targets with spaces"
     echo "(Example: \"s m a\" will build sh, m68k and arm)"
     echo ""
@@ -781,6 +786,36 @@ do
             glibcopts="--enable-kernel=2.6.23 --enable-oldest-abi=2.4"
             build_linux_toolchain "arm-rockbox-linux-gnueabi" "2.26.1" "" "4.9.4" \
                 "$gccopts" "2.6.32.68" "2.19" "$glibcopts"
+            # build alsa-lib
+            # we need to set the prefix to how it is on device (/usr) and then
+            # tweak install dir at make install step
+            alsalib_ver="1.0.19"
+            gettool "alsa-lib" "$alsalib_ver"
+            extract "alsa-lib-$alsalib_ver"
+            prefix="/usr" buildtool "alsa-lib" "$alsalib_ver" \
+                "--host=$target --disable-python" "" "install DESTDIR=$prefix/$target/sysroot"
+            ;;
+        [yy])
+            # IMPORTANT NOTE
+            # This toolchain must support several targets and thus must support
+            # the oldest possible configuration.
+            #
+            # AGPTek Rocker:
+            #   XBurst release 1 (something inbetween mips32r1 and mips32r2)
+            #   gcc: 4.9.4 is the latest 4.9.x stable branch, also the only one that
+            #        compiles with GCC >6
+            #   kernel: 3.10.14
+            #   glibc: 2.16
+            #
+            # To maximize compatibility, we use kernel 3.2.85 which is the lastest
+            # longterm 3.2 kernel and is supported by the latest glibc, and we
+            # require support for up to glibc 2.4
+            # We use a recent 2.26.1 binutils to avoid any build problems and
+            # avoid patches/bugs.
+            glibcopts="--enable-kernel=3.2 --enable-oldest-abi=2.4"
+            # FIXME: maybe add -mhard-float
+            build_linux_toolchain "mips-rockbox-linux-gnu" "2.26.1" "" "4.9.4" \
+                "$gccopts" "3.2.85" "2.25" "$glibcopts"
             # build alsa-lib
             # we need to set the prefix to how it is on device (/usr) and then
             # tweak install dir at make install step
