@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Linus Nielsen Feltzing
+ * Copyright (C) 2017 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,25 +17,20 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- ****************************************************************************/
+ ****************************************************************************/ 
+#ifndef __ROCKBOX_BACKTRACE_H__
+#define __ROCKBOX_BACKTRACE_H__
 
-#include <stdbool.h>
-
-/* Set this to true to enable lcd_update() in the printf function */
-extern bool verbose;
-
-/* Error types */
-#define     EATA                    -1
-#define     EDISK                   -2
-#define     EBOOTFILE               -3
-
-/* Functions common to all bootloaders */
-#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
-void reset_screen(void);
-int printf(const char *format, ...);
+#include "config.h"
+#ifdef BACKTRACE_UNWARMINDER
+#include "backtrace-unwarminder.h"
 #endif
-void error(int errortype, int error, bool shutdown);
-int load_raw_firmware(unsigned char* buf, char* firmware, int buffer_size);
-#ifdef ROCKBOX_HAS_LOGF
-void display_logf(void);
-#endif
+
+/* Print a backtrace using lcd_* functions, starting at the given line and updating
+ * the line number. On targets that support it (typically native targets), the
+ * backtrace will start at the given value of PC and using the stack frame given
+ * by PC. On hosted targets, it will typically ignore those values and backtrace
+ * from the caller */
+void rb_backtrace(int pcAddr, int spAddr, unsigned *line);
+
+#endif /* __ROCKBOX_BACKTRACE_H__ */
