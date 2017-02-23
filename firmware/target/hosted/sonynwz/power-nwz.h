@@ -18,8 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_POWER_H__
-#define __NWZ_POWER_H__
+#ifndef __POWER_NWZ_H__
+#define __POWER_NWZ_H__
+
+#include "power.h"
 
 /** power */
 
@@ -112,4 +114,42 @@
 #define ICX_PMINFO_FACTOR_KEY_PAD  0x00001000 /* keypad */
 #define ICX_PMINFO_FACTOR_KEY_CODE 0x00000FFF /* keycode */
 
-#endif /* __NWZ_POWER_H__ */
+void power_init(void);
+/* get power status (return -1 on error, bitmap on success) */
+int nwz_power_get_status(void);
+/* get vbus adval (or -1 on error) */
+int nwz_power_get_vbus_adval(void);
+/* get vbus voltage in mV (or -1 on error) */
+int nwz_power_get_vbus_voltage(void);
+/* get vbus current limit (or -1 on error) */
+int nwz_power_get_vbus_limit(void);
+/* get charge switch (or -1 on error) */
+int nwz_power_get_charge_switch(void);
+/* get charge current (or -1 on error) */
+int nwz_power_get_charge_current(void);
+/* get battery gauge (or -1 on error) */
+int nwz_power_get_battery_gauge(void);
+/* get battery adval (or -1 on error) */
+int nwz_power_get_battery_adval(void);
+/* get battery voltage in mV (or -1 on error) */
+int nwz_power_get_battery_voltage(void);
+/* get vbat adval (or -1 on error) */
+int nwz_power_get_vbat_adval(void);
+/* get vbat voltage (or -1 on error) */
+int nwz_power_get_vbat_voltage(void);
+/* get sample count (or -1 on error) */
+int nwz_power_get_sample_count(void);
+/* get vsys adval (or -1 on error) */
+int nwz_power_get_vsys_adval(void);
+/* get vsys voltage in mV (or -1 on error) */
+int nwz_power_get_vsys_voltage(void);
+/* get accessory charge mode */
+int nwz_power_get_acc_charge_mode(void);
+/* is battery fully charged? (or -1 on error) */
+int nwz_power_is_fully_charged(void);
+/* change power state (-1 on error, 0 otherwise)*/
+int nwz_power_suspend(void);
+int nwz_power_shutdown(void);
+int nwz_power_restart(void);
+
+#endif /* __POWER_NWZ_H__ */
