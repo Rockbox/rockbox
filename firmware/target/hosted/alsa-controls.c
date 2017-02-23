@@ -3,7 +3,7 @@
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
  *                     \/            \/     \/    \/            \/ 
  *
  * Copyright (C) 2016 Amaury Pouly
@@ -179,4 +179,7 @@ void alsa_controls_set_ints(const char *name, int count, long *val)
 {
     return alsa_controls_set(name, SND_CTL_ELEM_TYPE_INTEGER, count, val);
 }
+<<<<<<< 132297db71d4887c5c9e163872febe80b9fa02bb
 
+=======
+>>>>>>> Initial commit for the Sony NWZ linux port

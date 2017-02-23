@@ -278,6 +278,7 @@
 #define LCD_IHIFI         60 /* as used by IHIFI 760/960 */
 #define LCD_CREATIVEZENXFISTYLE 61 /* as used by Creative Zen X-Fi Style */
 #define LCD_SAMSUNGYPR1   62 /* as used by Samsung YP-R1 */
+#define LCD_NWZ_LINUX   63 /* as used in the Linux-based NWZ series */
 #define LCD_INGENIC_LINUX 64
 
 /* LCD_PIXELFORMAT */
@@ -584,8 +585,21 @@ Lyre prototype 1 */
 #include "config/ibassodx50.h"
 #elif defined(DX90)
 #include "config/ibassodx90.h"
+<<<<<<< 132297db71d4887c5c9e163872febe80b9fa02bb
 #elif defined(AGPTEK_ROCKER)
 #include "config/agptekrocker.h"
+=======
+#elif defined(SONY_NWZE460)
+#include "config/sonynwze460.h"
+#elif defined(SONY_NWZE450)
+#include "config/sonynwze450.h"
+#elif defined(SONY_NWZE580)
+#include "config/sonynwze580.h"
+#elif defined(SONY_NWZA10)
+#include "config/sonynwza10.h"
+#elif defined(SONY_NWZE470)
+#include "config/sonynwze470.h"
+>>>>>>> Initial commit for the Sony NWZ linux port
 #else
 /* no known platform */
 #endif

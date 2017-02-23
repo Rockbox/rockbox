@@ -41,10 +41,13 @@
 #endif /* def __PCTOOL__ */
 
 #if !defined(APPLICATION) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || \
-    defined(DX50) || defined(DX90) || defined(AGPTEK_ROCKER)
+    defined(DX50) || defined(DX90) || defined(SONY_NWZ_LINUX) || \
+    defined(AGPTEK_ROCKER)
 
 #if defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
 #define HOME_DIR "/mnt/media0"
+#elif defined(SONY_NWZ_LINUX)
+#define HOME_DIR "/contents"
 #elif defined(DX50) || defined(DX90)
 /* Where to put save files like recordings, playlists, screen dumps ...*/
 #define HOME_DIR "/mnt/sdcard"
@@ -86,7 +89,8 @@
 #define PLUGIN_DEMOS_DIR    PLUGIN_DIR "/demos"
 #define VIEWERS_DIR         PLUGIN_DIR "/viewers"
 
-#if defined(APPLICATION) && !(defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || defined(DX50) || defined(DX90))
+#if defined(APPLICATION) && !(defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || \
+    defined(DX50) || defined(DX90) || defined(SONY_NWZ_LINUX))
 #define PLUGIN_DATA_DIR          ROCKBOX_DIR "/rocks.data"
 #define PLUGIN_GAMES_DATA_DIR    PLUGIN_DATA_DIR
 #define PLUGIN_APPS_DATA_DIR     PLUGIN_DATA_DIR

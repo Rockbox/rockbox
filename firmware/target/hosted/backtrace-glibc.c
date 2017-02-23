@@ -58,4 +58,3 @@ void rb_backtrace(int pc, int sp, unsigned *line)
 
     free(strings);
 }
-
