@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Linus Nielsen Feltzing
+ * Copyright (C) 2016 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,24 +18,30 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _BUTTON_TARGET_H_
+#define _BUTTON_TARGET_H_
 
 #include <stdbool.h>
+#include "config.h"
 
-/* Set this to true to enable lcd_update() in the printf function */
-extern bool verbose;
+/* Main unit's buttons */
+#define BUTTON_POWER                0x00000001
+#define BUTTON_BACK                 0x00000002
+#define BUTTON_PLAY                 0x00000004
+#define BUTTON_LEFT                 0x00000008
+#define BUTTON_UP                   0x00000010
+#define BUTTON_DOWN                 0x00000020
+#define BUTTON_RIGHT                0x00000040
+#define BUTTON_VOL_DOWN             0x00000080
+#define BUTTON_VOL_UP               0x00000100
 
-/* Error types */
-#define     EATA                    -1
-#define     EDISK                   -2
-#define     EBOOTFILE               -3
+#define BUTTON_MAIN                 0x000001ff
 
-/* Functions common to all bootloaders */
-#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
-void reset_screen(void);
-int printf(const char *format, ...);
-#endif
-void error(int errortype, int error, bool shutdown);
-int load_raw_firmware(unsigned char* buf, char* firmware, int buffer_size);
-#ifdef ROCKBOX_HAS_LOGF
-void display_logf(void);
-#endif
+/* Software power-off */
+#define POWEROFF_BUTTON BUTTON_POWER
+#define POWEROFF_COUNT 10
+
+/* force driver to reload button state (useful after suspend) */
+void nwz_button_reload_after_suspend(void);
+
+#endif /* _BUTTON_TARGET_H_ */

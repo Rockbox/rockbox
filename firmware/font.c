@@ -85,7 +85,7 @@
 /* compiled-in font */
 extern struct font sysfont;
 
-#ifndef BOOTLOADER
+#if !defined(BOOTLOADER) || defined(SONY_NWZ_LINUX)
 
 struct buflib_alloc_data {
     struct font font;    /* must be the first member! */
