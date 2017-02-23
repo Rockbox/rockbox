@@ -30,8 +30,10 @@ extern bool verbose;
 #define     EBOOTFILE               -3
 
 /* Functions common to all bootloaders */
+#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
 void reset_screen(void);
 int printf(const char *format, ...);
+#endif
 void error(int errortype, int error, bool shutdown);
 int load_raw_firmware(unsigned char* buf, char* firmware, int buffer_size);
 #ifdef ROCKBOX_HAS_LOGF
