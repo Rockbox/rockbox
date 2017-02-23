@@ -5,7 +5,6 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Copyright (C) 2016 Amaury Pouly
  *
@@ -18,8 +17,12 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __NWZ_FB_H__
-#define __NWZ_FB_H__
+
+#ifndef __LCD_TARGET_H__
+#define __LCD_TARGET_H__
+
+extern fb_data *nwz_framebuffer; /* see lcd-nwz.c */
+#define LCD_FRAMEBUF_ADDR(col, row) (nwz_framebuffer + (row)*LCD_WIDTH + (col))
 
 #define NWZ_FB_LCD_DEV  "/dev/fb/0"
 #define NWZ_FB_TV_DEV   "/dev/fb/1"
@@ -62,6 +65,7 @@ struct nwz_fb_brightness
  *
  * FIXME I don't know what the timer is, it seems irrelevant for the LCD but
  * the OF uses it for TV, maybe this controls the refresh rate of the TV output?
+ * Also it only exists on early version (up to generation x60 roughly)
  *
  * On a side note, this information only applies to a subset of LCD types (the
  * LCD type can be gathered from icx_sysinfo):
@@ -126,8 +130,7 @@ struct nwz_fb_update_timer
 
 /* NOTE: I renamed those from Sony's header, because their original names were
  * pure crap */
-/* FIXME: Sony uses _IOR for NWZ_FB_WAIT_REFRESH but it should be _IORW */
-#define NWZ_FB_WAIT_REFRESH     _IORW(NWZ_FB_TYPE, 0x00, struct nwz_fb_status)
+#define NWZ_FB_WAIT_REFRESH     _IOR(NWZ_FB_TYPE, 0x00, struct nwz_fb_status)
 #define NWZ_FB_UPDATE           _IOW(NWZ_FB_TYPE, 0x01, struct nwz_fb_image_info)
 #define NWZ_FB_SET_MODE         _IOW(NWZ_FB_TYPE, 0x02, struct nwz_fb_image_info)
 #define NWZ_FB_GET_MODE         _IOR(NWZ_FB_TYPE, 0x03, struct nwz_fb_image_info)
@@ -136,4 +139,5 @@ struct nwz_fb_update_timer
 #define NWZ_FB_GET_BRIGHTNESS   _IOR(NWZ_FB_TYPE, 0x08, struct nwz_fb_brightness)
 
 
-#endif /* __NWZ_FB_H__ */
+#endif /* __LCD_TARGET_H__ */
+
