@@ -226,6 +226,15 @@ static int move_callback(int handle, void *current, void *new)
 
 static int alloc_and_load_cp_table(int cp, void *buf)
 {
+#ifdef DISABLE_UNICODE_LOAD_CODEPAGES
+
+#warning loading codepages disabled
+    (void) cp;
+    (void) buf;
+    (void) move_callback;
+    return 0;
+
+#else
     static struct buflib_callbacks ops =
         { .move_callback = move_callback };
 
@@ -267,6 +276,7 @@ static int alloc_and_load_cp_table(int cp, void *buf)
 
     close(fd);
     return -1;
+#endif
 }
 
 /* Encode a UCS value as UTF-8 and return a pointer after this UTF-8 char. */

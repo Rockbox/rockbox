@@ -8,6 +8,10 @@
 #define FIRMWARE_OFFSET_FILE_DATA 8
 #define FIRMWARE_OFFSET_FILE_CRC 0
 
+#ifdef BOOTLOADER
+#define DISABLE_UNICODE_LOAD_CODEPAGES
+#endif
+
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 
 /* define this if you have recording possibility */
