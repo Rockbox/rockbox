@@ -36,6 +36,7 @@
 #include "rbpaths.h"
 #include "pathfuncs.h"
 #include "core_alloc.h"
+#include "panic.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -226,6 +227,20 @@ static int move_callback(int handle, void *current, void *new)
 
 static int alloc_and_load_cp_table(int cp, void *buf)
 {
+#ifdef DISABLE_UNICODE_LOAD_CODEPAGES
+
+#warning loading codepages disabled
+    (void) buf;
+    (void) move_callback;
+    const char *filename = cp_info[cp].filename;
+    if (filename != NULL)
+    {
+        DEBUGF("ERROR: loading codepages disabled %s", filename);
+        panicf("ERROR: loading codepages disabled %s", filename);
+    }
+    return 0;
+
+#else
     static struct buflib_callbacks ops =
         { .move_callback = move_callback };
 
@@ -267,6 +282,7 @@ static int alloc_and_load_cp_table(int cp, void *buf)
 
     close(fd);
     return -1;
+#endif
 }
 
 /* Encode a UCS value as UTF-8 and return a pointer after this UTF-8 char. */
