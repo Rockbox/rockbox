@@ -490,6 +490,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                             break;
                         case 0: /* reset setting */
                             reset_setting(setting, setting->setting);
+                            settings_save();
+                            settings_apply(false);
                             break;
 #ifdef HAVE_QUICKSCREEN
                         case 1: /* set as top QS item */
