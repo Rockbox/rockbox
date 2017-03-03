@@ -56,7 +56,7 @@
 
 #if (YUV2RGB_VERSION == VERSION_SVN)
     .section .icode, "ax", %progbits
-    
+
 
 /****************************************************************************
  * extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
@@ -76,8 +76,8 @@
  *
  * Converts two lines from YUV to RGB565 and writes to LCD at once. First loop
  * loads Cb/Cr, calculates the chroma offset and saves them to buffer. Within
- * the second loop these chroma offset are reloaded from buffer. Within each 
- * loop two pixels are calculated and written to LCD. 
+ * the second loop these chroma offset are reloaded from buffer. Within each
+ * loop two pixels are calculated and written to LCD.
  */
     .align      2
     .global     lcd_write_yuv420_lines
@@ -86,7 +86,7 @@ lcd_write_yuv420_lines:
                                       /* r0 = src = yuv_src */
                                       /* r1 = dst = out */
                                       /* r2 = width */
-                                      /* r3 = stride */                
+                                      /* r3 = stride */
     stmfd       sp!, { r4-r10, lr }   /* save non-scratch */
     ldmia       r0, { r9, r10, r12 }  /* r9 = yuv_src[0] = Y'_p */
                                       /* r10 = yuv_src[1] = Cb_p */
@@ -113,9 +113,9 @@ lcd_write_yuv420_lines:
     sub         r1, r1, #128          /* r1 = Cr-128 */
 
     add         r2, r1, r1, asl #1    /* r2 = Cr*51 + Cb*24 */
-    add         r2, r2, r2, asl #4   
-    add         r2, r2, r0, asl #3   
-    add         r2, r2, r0, asl #4   
+    add         r2, r2, r2, asl #4
+    add         r2, r2, r0, asl #3
+    add         r2, r2, r0, asl #4
 
     add         r4, r1, r1, asl #2    /* r1 = Cr*101 */
     add         r4, r4, r1, asl #5
@@ -124,9 +124,9 @@ lcd_write_yuv420_lines:
     add         r1, r1, #256          /* r1 = rv = (r1 + 256) >> 9 */
     mov         r1, r1, asr #9
     rsb         r2, r2, #128          /* r2 = guv = (-r2 + 128) >> 8 */
-    mov         r2, r2, asr #8       
+    mov         r2, r2, asr #8
     add         r0, r0, #2            /* r0 = bu = (Cb*128 + 256) >> 9 */
-    mov         r0, r0, asr #2       
+    mov         r0, r0, asr #2
     stmia       r8!, {r0-r2}          /* store r0, r1 and r2 to chroma buffer */
 
     /* 1st loop, first pixel */
@@ -141,17 +141,17 @@ lcd_write_yuv420_lines:
 
     orr         r5, r6, r4            /* check if clamping is needed... */
     orr         r5, r5, r3, asr #1    /* ...at all */
-    cmp         r5, #31                 
+    cmp         r5, #31
     bls         15f                   /* -> no clamp */
     cmp         r6, #31               /* clamp r */
-    mvnhi       r6, r6, asr #31         
-    andhi       r6, r6, #31             
+    mvnhi       r6, r6, asr #31
+    andhi       r6, r6, #31
     cmp         r3, #63               /* clamp g */
     mvnhi       r3, r3, asr #31
     andhi       r3, r3, #63
     cmp         r4, #31               /* clamp b */
-    mvnhi       r4, r4, asr #31         
-    andhi       r4, r4, #31          
+    mvnhi       r4, r4, asr #31
+    andhi       r4, r4, #31
 15:                                   /* no clamp */
 
     /* calculate pixel_1 and save to r4 for later pixel packing */
@@ -166,21 +166,21 @@ lcd_write_yuv420_lines:
 
     add         r6, r1, r5, asr #8    /* r6 = r = (Y >> 9) + rv */
     add         r3, r2, r5, asr #7    /* r3 = g = (Y >> 8) + guv */
-    add         r5, r0, r5, asr #8    /* r5 = b = (Y >> 9) + bu */   
+    add         r5, r0, r5, asr #8    /* r5 = b = (Y >> 9) + bu */
 
     orr         r0, r6, r5            /* check if clamping is needed... */
     orr         r0, r0, r3, asr #1    /* ...at all */
-    cmp         r0, #31                 
+    cmp         r0, #31
     bls         15f                   /* -> no clamp */
     cmp         r6, #31               /* clamp r */
-    mvnhi       r6, r6, asr #31         
-    andhi       r6, r6, #31             
+    mvnhi       r6, r6, asr #31
+    andhi       r6, r6, #31
     cmp         r3, #63               /* clamp g */
     mvnhi       r3, r3, asr #31
     andhi       r3, r3, #63
     cmp         r5, #31               /* clamp b */
-    mvnhi       r5, r5, asr #31         
-    andhi       r5, r5, #31          
+    mvnhi       r5, r5, asr #31
+    andhi       r5, r5, #31
 15:                                   /* no clamp */
 
     /* calculate pixel_2 and pack with pixel_1 before writing */
@@ -196,7 +196,7 @@ lcd_write_yuv420_lines:
     /* Reload several registers for pointer rewinding for next loop */
     add         r8, sp, #12           /* chroma buffer */
     ldmia       sp, {r7, r9}          /* r7  = loop count */
-                                      /* r9 = &ysrc[stride] */   
+                                      /* r9 = &ysrc[stride] */
 
     /* 2nd loop start */
 20:                                   /* loop start */
@@ -215,17 +215,17 @@ lcd_write_yuv420_lines:
 
     orr         r5, r6, r4            /* check if clamping is needed... */
     orr         r5, r5, r3, asr #1    /* ...at all */
-    cmp         r5, #31                 
+    cmp         r5, #31
     bls         15f                   /* -> no clamp */
     cmp         r6, #31               /* clamp r */
-    mvnhi       r6, r6, asr #31         
-    andhi       r6, r6, #31             
+    mvnhi       r6, r6, asr #31
+    andhi       r6, r6, #31
     cmp         r3, #63               /* clamp g */
     mvnhi       r3, r3, asr #31
     andhi       r3, r3, #63
     cmp         r4, #31               /* clamp b */
-    mvnhi       r4, r4, asr #31         
-    andhi       r4, r4, #31          
+    mvnhi       r4, r4, asr #31
+    andhi       r4, r4, #31
 15:                                   /* no clamp */
     /* calculate pixel_1 and save to r4 for later pixel packing */
     orr         r4, r4, r3, lsl #5    /* pixel_1 = r<<11 | g<<5 | b */
@@ -243,17 +243,17 @@ lcd_write_yuv420_lines:
 
     orr         r0, r6, r5            /* check if clamping is needed... */
     orr         r0, r0, r3, asr #1    /* ...at all */
-    cmp         r0, #31                 
+    cmp         r0, #31
     bls         15f                   /* -> no clamp */
     cmp         r6, #31               /* clamp r */
-    mvnhi       r6, r6, asr #31         
-    andhi       r6, r6, #31             
+    mvnhi       r6, r6, asr #31
+    andhi       r6, r6, #31
     cmp         r3, #63               /* clamp g */
     mvnhi       r3, r3, asr #31
     andhi       r3, r3, #63
     cmp         r5, #31               /* clamp b */
-    mvnhi       r5, r5, asr #31         
-    andhi       r5, r5, #31          
+    mvnhi       r5, r5, asr #31
+    andhi       r5, r5, #31
 15:                                   /* no clamp */
 
     /* calculate pixel_2 and pack with pixel_1 before writing */

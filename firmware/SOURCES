@@ -1596,10 +1596,10 @@ target/arm/s5l8700/ipodnano2g/piezo-nano2g.c
 
 #ifdef IPOD_6G
 target/arm/ipod/button-clickwheel.c
-target/arm/s5l8702/ipod6g/storage_ata-ipod6g.c
-target/arm/s5l8702/ipod6g/backlight-ipod6g.c
-target/arm/s5l8702/ipod6g/powermgmt-ipod6g.c
-target/arm/s5l8702/ipod6g/power-ipod6g.c
+target/arm/s5l8702/ipod6g/storage_ata-6g.c
+target/arm/s5l8702/ipod6g/backlight-6g.c
+target/arm/s5l8702/ipod6g/powermgmt-6g.c
+target/arm/s5l8702/ipod6g/power-6g.c
 target/arm/s5l8702/kernel-s5l8702.c
 target/arm/s5l8702/system-s5l8702.c
 target/arm/s5l8702/timer-s5l8702.c
@@ -1607,28 +1607,28 @@ target/arm/s5l8702/gpio-s5l8702.c
 target/arm/s5l8702/pl080.c
 target/arm/s5l8702/dma-s5l8702.c
 target/arm/s5l8702/clocking-s5l8702.c
-target/arm/s5l8702/ipod6g/lcd-ipod6g.c
-target/arm/s5l8702/ipod6g/lcd-asm-ipod6g.S
-target/arm/s5l8702/ipod6g/piezo-ipod6g.c
+target/arm/s5l8702/ipod6g/lcd-6g.c
+target/arm/s5l8702/ipod6g/lcd-asm-6g.S
+target/arm/s5l8702/ipod6g/piezo-6g.c
 #if 0 //TODO
 target/arm/s5l8702/postmortemstub.S
 #endif
-target/arm/s5l8702/ipod6g/pmu-ipod6g.c
-target/arm/s5l8702/ipod6g/rtc-ipod6g.c
-target/arm/s5l8702/ipod6g/adc-ipod6g.c
+target/arm/s5l8702/ipod6g/pmu-6g.c
+target/arm/s5l8702/ipod6g/rtc-6g.c
+target/arm/s5l8702/ipod6g/adc-6g.c
 #if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
 target/arm/s5l8702/usb-s5l8702.c
 #endif
 #ifdef HAVE_SERIAL
 target/arm/uc870x.c
 target/arm/s5l8702/uart-s5l8702.c
-target/arm/s5l8702/ipod6g/serial-ipod6g.c
+target/arm/s5l8702/ipod6g/serial-6g.c
 #endif
 #ifndef BOOTLOADER
 target/arm/s5l8702/debug-s5l8702.c
 target/arm/s5l8702/pcm-s5l8702.c
-target/arm/s5l8702/ipod6g/audio-ipod6g.c
-target/arm/s5l8702/ipod6g/cscodec-ipod6g.c
+target/arm/s5l8702/ipod6g/audio-6g.c
+target/arm/s5l8702/ipod6g/cscodec-6g.c
 #else
 target/arm/s5l8702/spi-s5l8702.c
 target/arm/s5l8702/crypto-s5l8702.c
