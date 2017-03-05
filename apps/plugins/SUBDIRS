@@ -72,6 +72,8 @@ doom
 /* For all the swcodec targets */
 #if CONFIG_CODEC == SWCODEC
 
+morse
+
 #if MEMORYSIZE > 2 /* we need a lot of RAM for instruments */
 midi
 mikmod
