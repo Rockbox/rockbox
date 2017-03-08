@@ -425,14 +425,17 @@ static void binding_resolve(const struct file_base_info *infop)
         }
 
         if (p == dcrivolp->queued0)
+        {
             dcrivolp->queued0 = BINDING_NEXT(p);
+            if (dcrivolp->resolved0 == NULL)
+                dcrivolp->resolved0 = p;
+        }
         else
         {
             file_binding_remove_next(prevp, p);
             file_binding_insert_first(p);
+            dcrivolp->resolved0 = p;
         }
-
-        dcrivolp->resolved0 = p;
 
         /* srcinfop may be the actual one */
         if (&p->info != infop)
@@ -1375,6 +1378,8 @@ static void sab_process_sub(struct sab *sabp)
         infop->fatfile.dircluster   = dircluster;
         infop->fatfile.e.entry      = ce->direntry;
         infop->fatfile.e.entries    = ce->direntries;
+        infop->dcfile.idx           = idx;
+        infop->dcfile.serialnum     = ce->serialnum;
     } /* end while */
 }
 
