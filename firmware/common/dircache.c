@@ -1884,10 +1884,12 @@ static void build_volumes(void)
         dircache.reserve_used = reserve_used;
 
     if (DIRCACHE_STUFFED(reserve_used))
-        dircache.last_size = 0; /* reset */
-    else if (dircache.size > dircache.last_size ||
-        dircache.last_size - dircache.size > DIRCACHE_RESERVE)
-        dircache.last_size = dircache.size;
+        dircache.last_size = 0;             /* reset */
+    else if (dircache.size > dircache.last_size)
+        dircache.last_size = dircache.size; /* grow */
+    else if (!dircache_runinfo.suspended &&
+             dircache.last_size - dircache.size > DIRCACHE_RESERVE)
+        dircache.last_size = dircache.size; /* shrink if not suspended */
 
     logf("Done, %ld KiB used", dircache.size / 1024);
 
