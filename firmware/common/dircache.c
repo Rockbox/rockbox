@@ -1886,8 +1886,11 @@ static void build_volumes(void)
     if (DIRCACHE_STUFFED(reserve_used))
         dircache.last_size = 0; /* reset */
     else if (dircache.size > dircache.last_size ||
-        dircache.last_size - dircache.size > DIRCACHE_RESERVE)
+             (!dircache_runinfo.suspended &&
+              dircache.last_size - dircache.size > DIRCACHE_RESERVE))
+    {
         dircache.last_size = dircache.size;
+    }
 
     logf("Done, %ld KiB used", dircache.size / 1024);
 
