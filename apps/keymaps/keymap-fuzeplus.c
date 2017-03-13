@@ -71,19 +71,19 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_STOPSEEK,              BUTTON_LEFT|BUTTON_REL,            BUTTON_LEFT|BUTTON_REPEAT },
     { ACTION_WPS_STOPSEEK,              BUTTON_RIGHT|BUTTON_REL,           BUTTON_RIGHT|BUTTON_REPEAT },
 
-    { ACTION_WPS_VOLUP,                 BUTTON_VOL_UP,                     BUTTON_NONE },
-    { ACTION_WPS_VOLUP,                 BUTTON_VOL_UP|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_WPS_VOLUP,                 BUTTON_VOL_UP|BUTTON_REL,          BUTTON_VOL_UP },
+    { ACTION_WPS_SKIPNEXT,              BUTTON_VOL_UP|BUTTON_REL,          BUTTON_VOL_UP|BUTTON_REPEAT },
     { ACTION_WPS_VOLUP,                 BUTTON_UP,                         BUTTON_NONE },
     { ACTION_WPS_VOLUP,                 BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE },
 
-    { ACTION_WPS_VOLDOWN,               BUTTON_VOL_DOWN,                   BUTTON_NONE },
-    { ACTION_WPS_VOLDOWN,               BUTTON_VOL_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_WPS_VOLDOWN,               BUTTON_VOL_DOWN|BUTTON_REL,        BUTTON_VOL_DOWN },
+    { ACTION_WPS_SKIPPREV,              BUTTON_VOL_DOWN|BUTTON_REL,        BUTTON_VOL_DOWN|BUTTON_REPEAT },
     { ACTION_WPS_VOLDOWN,               BUTTON_DOWN,                       BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,               BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
  
     { ACTION_WPS_MENU,                  BUTTON_BACK,                       BUTTON_NONE },
-    { ACTION_WPS_BROWSE,                BUTTON_SELECT|BUTTON_REL,          BUTTON_SELECT },
-    { ACTION_WPS_PITCHSCREEN,           BUTTON_BOTTOMLEFT|BUTTON_REPEAT,   BUTTON_BOTTOMLEFT },
+    { ACTION_WPS_VIEW_PLAYLIST,         BUTTON_SELECT|BUTTON_REL,          BUTTON_SELECT },
+    { ACTION_WPS_ID3SCREEN,             BUTTON_BOTTOMLEFT|BUTTON_REPEAT,   BUTTON_BOTTOMLEFT },
     { ACTION_WPS_QUICKSCREEN,           BUTTON_BOTTOMLEFT|BUTTON_REL,      BUTTON_BOTTOMLEFT },
     { ACTION_WPS_ID3SCREEN,             BUTTON_BOTTOMRIGHT|BUTTON_REPEAT,  BUTTON_BOTTOMRIGHT },
 
@@ -150,11 +150,15 @@ static const struct button_mapping button_context_tree[]  = {
 
 static const struct button_mapping button_context_list[]  = {
 #ifdef HAVE_VOLUME_IN_LIST
-    { ACTION_LIST_VOLUP,                BUTTON_VOL_UP,                     BUTTON_NONE },
-    { ACTION_LIST_VOLUP,                BUTTON_VOL_UP|BUTTON_REPEAT,       BUTTON_NONE },
-    { ACTION_LIST_VOLDOWN,              BUTTON_VOL_DOWN,                   BUTTON_NONE },
-    { ACTION_LIST_VOLDOWN,              BUTTON_VOL_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_LIST_VOLUP,                BUTTON_VOL_UP|BUTTON_REL,          BUTTON_VOL_UP },
+    { ACTION_LIST_VOLDOWN,              BUTTON_VOL_DOWN|BUTTON_REL,        BUTTON_VOL_DOWN },
 #endif
+
+#ifdef HAVE_MUSIC_CONTROL_IN_LIST
+    { ACTION_LIST_SKIPNEXT,             BUTTON_VOL_UP|BUTTON_REL,          BUTTON_VOL_UP|BUTTON_REPEAT },
+    { ACTION_LIST_SKIPPREV,             BUTTON_VOL_DOWN|BUTTON_REL,        BUTTON_VOL_DOWN|BUTTON_REPEAT },
+#endif
+
     { ACTION_LISTTREE_PGUP,             BUTTON_BOTTOMLEFT,                 BUTTON_NONE },
     { ACTION_LISTTREE_PGUP,             BUTTON_BOTTOMLEFT|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_LISTTREE_PGDOWN,           BUTTON_BOTTOMRIGHT,                BUTTON_NONE },

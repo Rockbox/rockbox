@@ -179,6 +179,11 @@ enum {
     ACTION_LIST_VOLDOWN,
 #endif
 
+#ifdef HAVE_MUSIC_CONTROL_IN_LIST
+    ACTION_LIST_SKIPPREV,
+    ACTION_LIST_SKIPNEXT,
+#endif
+
     /* tree */
     ACTION_TREE_ROOT_INIT,
     ACTION_TREE_PGLEFT,/* optional */
