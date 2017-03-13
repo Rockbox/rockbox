@@ -56,7 +56,7 @@
         root + 'Music' + 'Artist' + 'Album' + 'Disc N' + filename */
 #define STATIC_PATHCOMP_NUM 6
 
-#define MAX_NAME    255
+#define MAX_COMPNAME    260
 
 /* unsigned value that will also hold the off_t range we need without
    overflow */

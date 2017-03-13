@@ -505,7 +505,7 @@ walk_path(struct pathwalk *walkp, struct pathwalk_component *compp,
         if (!(compp->attr & ATTR_DIRECTORY))
             return -ENOTDIR;
 
-        if (len >= MAX_NAME)
+        if (len > MAX_COMPNAME)
             return -ENAMETOOLONG;
 
         /* check for "." and ".." */

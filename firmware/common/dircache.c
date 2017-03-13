@@ -149,15 +149,18 @@ enum
     DCM_LAST  = DCM_PROCEED,
 };
 
-#define MAX_TINYNAME   sizeof (uint32_t)
-#define DC_MAX_NAME    MIN(MAX_NAME, UINT8_MAX)
+#define MAX_TINYNAME      sizeof (uint32_t)
+#define NAMELEN_ADJ       (MAX_TINYNAME+1)
+#define DC_MAX_NAME       (UINT8_MAX+NAMELEN_ADJ)
+#define CE_NAMESIZE(len)  ((len)+NAMELEN_ADJ)
+#define NAMESIZE_CE(size) ((size)-NAMELEN_ADJ)
 
 /* Throw some warnings if about the limits if things may not work */
-#if MAX_NAME > UINT8_MAX
+#if MAX_COMPNAME > UINT8_MAX+5
 #warning Need more than 8 bits in name length bitfield
 #endif
 
-#if DIRCACHE_LIMIT > ((1 << 24)-255)
+#if DIRCACHE_LIMIT > ((1 << 24)-1+5)
 #warning Names may not be addressable with 24 bits
 #endif
 
@@ -173,7 +176,7 @@ struct dircache_entry
     union {
     struct {
     uint32_t    name         : 24; /* indirect storage (.tinyname == 0) */
-    uint32_t    length       :  8; /* length of name indexed by 'name' */
+    uint32_t    namelen      :  8; /* length of name - (MAX_TINYNAME+1) */
     };
     unsigned char namebuf[MAX_TINYNAME]; /* direct storage (.tinyname == 1) */
     };
@@ -743,7 +746,7 @@ static void entry_name_copy(char *dst, const struct dircache_entry *ce)
 {
     if (LIKELY(!ce->tinyname))
     {
-        strmemcpy(dst, get_name(ce->name), ce->length);
+        strmemcpy(dst, get_name(ce->name), CE_NAMESIZE(ce->namelen));
         return;
     }
 
@@ -876,8 +879,8 @@ static void free_name(int nameidx, size_t size)
 /**
  * allocate and assign a name to the entry
  */
-static bool entry_assign_name(struct dircache_entry *ce,
-                              const unsigned char *name, size_t size)
+static int entry_assign_name(struct dircache_entry *ce,
+                             const unsigned char *name, size_t size)
 {
     unsigned char *copyto;
 
@@ -893,21 +896,21 @@ static bool entry_assign_name(struct dircache_entry *ce,
     else
     {
         if (size > DC_MAX_NAME)
-            size = DC_MAX_NAME;
+            return -ENAMETOOLONG;
 
         int nameidx = alloc_name(size);
         if (!nameidx)
-            return false;
+            return -ENOSPC;
 
         copyto = get_name(nameidx);
 
         ce->tinyname = 0;
         ce->name     = nameidx;
-        ce->length   = size;
+        ce->namelen  = NAMESIZE_CE(size);
     }
 
     memcpy(copyto, name, size);
-    return true;
+    return 0;
 }
 
 /**
@@ -915,17 +918,20 @@ static bool entry_assign_name(struct dircache_entry *ce,
  */
 static void entry_unassign_name(struct dircache_entry *ce)
 {
-    if (!ce->tinyname)
-        free_name(ce->name, ce->length);
+    if (ce->tinyname)
+        return;
+
+    free_name(ce->name, CE_NAMESIZE(ce->namelen));
+    ce->tinyname = 1;
 }
 
 /**
  * assign a new name to the entry
  */
-static bool entry_reassign_name(struct dircache_entry *ce,
-                                const unsigned char *newname)
+static int entry_reassign_name(struct dircache_entry *ce,
+                               const unsigned char *newname)
 {
-    size_t oldlen = ce->tinyname ? 0 : ce->length;
+    size_t oldlen = ce->tinyname ? 0 : CE_NAMESIZE(ce->namelen);
     size_t newlen = strlen(newname);
 
     if (oldlen == newlen || (oldlen == 0 && newlen <= MAX_TINYNAME))
@@ -934,7 +940,7 @@ static bool entry_reassign_name(struct dircache_entry *ce,
                           newname, newlen);
         if (newlen < MAX_TINYNAME)
             *p = '\0';
-        return true;
+        return 0;
     }
 
     /* needs a new name allocation; if the new name fits in the freed block,
@@ -968,7 +974,7 @@ static int alloc_entry(struct dircache_entry **res)
     {
         dircache.last_size = 0;
         *res = NULL;
-        return 0;
+        return -ENOSPC;
     }
 
     dircache.sizeused += ENTRYSIZE;
@@ -976,7 +982,7 @@ static int alloc_entry(struct dircache_entry **res)
     ce->next      = 0;
     ce->up        = 0;
     ce->down      = 0;
-    ce->length    = 0;
+    ce->tinyname  = 1;
     ce->frontier  = FRONTIER_SETTLED;
     ce->serialnum = next_serialnum();
 
@@ -1030,18 +1036,19 @@ static int create_entry(const char *basename,
                         struct dircache_entry **res)
 {
     int idx = alloc_entry(res);
-    if (!idx)
+
+    if (idx > 0)
     {
-        logf("size limit reached (entry)");
-        return 0; /* full */
+        int rc = entry_assign_name(*res, basename, strlen(basename));
+        if (rc < 0)
+        {
+            free_orphan_entry(NULL, *res, idx);
+            idx = rc;
+        }
     }
 
-    if (!entry_assign_name(*res, basename, strlen(basename)))
-    {
-        free_orphan_entry(NULL, *res, idx);
-        logf("size limit reached (name)");
-        return 0; /* really full! */
-    }
+    if (idx == -ENOSPC)
+        logf("size limit reached");
 
     return idx;
 }
@@ -1304,8 +1311,15 @@ static void sab_process_sub(struct sab *sabp)
             }
 
             int idx = create_entry(fatentp->name, &ce);
-            if (!idx)
+            if (idx <= 0)
             {
+                if (idx == -ENAMETOOLONG)
+                {
+                    /* not fatal; just don't include it */
+                    establish_frontier(compp->idx, FRONTIER_ZONED);
+                    continue;
+                }
+
                 sabp->quit = true;
                 break;
             }
@@ -2328,7 +2342,7 @@ void dircache_fileop_create(struct file_base_info *dirinfop,
 
     struct dircache_entry *ce;
     int idx = create_entry(basename, &ce);
-    if (idx == 0)
+    if (idx <= 0)
     {
         /* failed allocation; parent cache contents are not complete */
         establish_frontier(dirinfop->dcfile.idx, FRONTIER_ZONED);
@@ -2427,7 +2441,7 @@ void dircache_fileop_rename(struct file_base_info *dirinfop,
     insert_file_entry(dirinfop, ce);
 
     /* lastly, update the entry name itself */
-    if (entry_reassign_name(ce, basename))
+    if (entry_reassign_name(ce, basename) == 0)
     {
         /* it's not really the same one now so re-stamp it */
         dc_serial_t serialnum = next_serialnum();
@@ -2506,7 +2520,7 @@ static ssize_t get_path_sub(int idx, struct get_path_sub_data *data)
         if (len < 0)
             return -2;
 
-        cename = alloca(MAX_NAME + 1);
+        cename = alloca(DC_MAX_NAME + 1);
         entry_name_copy(cename, ce);
     }
     else /* idx < 0 */
