@@ -703,6 +703,16 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
             setvol();
             return true;
 #endif
+
+#ifdef HAVE_MUSIC_CONTROL_IN_LIST
+        case ACTION_LIST_SKIPNEXT:
+            audio_next();
+            return true;
+        case ACTION_LIST_SKIPPREV:
+            audio_prev();
+            return true;
+#endif
+
         case ACTION_STD_PREV:
         case ACTION_STD_PREVREPEAT:
             gui_list_select_at_offset(lists, -next_item_modifier);

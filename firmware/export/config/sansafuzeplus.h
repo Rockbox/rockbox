@@ -53,6 +53,9 @@
 /* define this if the target has volume keys which can be used in the lists */
 #define HAVE_VOLUME_IN_LIST
 
+/* define this if the volume keys can be used to control playback in the list */
+#define HAVE_MUSIC_CONTROL_IN_LIST
+
 /* define this if you have LCD enable function */
 #define HAVE_LCD_ENABLE
 
