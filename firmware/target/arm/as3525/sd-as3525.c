@@ -23,7 +23,7 @@
 /* Driver for the ARM PL180 SD/MMC controller inside AS3525 SoC */
 
 #include "config.h" /* for HAVE_MULTIDRIVE & AMS_OF_SIZE */
-#include "fat.h"
+#include "fs_defines.h"
 #include "thread.h"
 #include "led.h"
 #include "sdmmc.h"

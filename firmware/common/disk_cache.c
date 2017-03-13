@@ -23,7 +23,7 @@
 #include "system.h"
 #include "linked_list.h"
 #include "disk_cache.h"
-#include "fat.h" /* for SECTOR_SIZE */
+#include "fs_defines.h"
 #include "bitarray.h"
 
 /* Cache: LRU cache with separately-chained hashtable

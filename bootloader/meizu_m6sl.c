@@ -30,7 +30,6 @@
 #include "kernel.h"
 #include "thread.h"
 #include "storage.h"
-#include "fat.h"
 #include "disk.h"
 #include "font.h"
 #include "adc.h"

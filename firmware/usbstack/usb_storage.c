@@ -27,7 +27,7 @@
 #include "logf.h"
 #include "storage.h"
 #include "disk.h"
-#include "fat.h"
+#include "fs_defines.h"
 /* Needed to get at the audio buffer */
 #include "audio.h"
 #include "usb_storage.h"
@@ -39,10 +39,6 @@
 
 #ifdef USB_USE_RAMDISK
 #define RAMDISK_SIZE 2048
-#endif
-
-#ifndef SECTOR_SIZE
-#define SECTOR_SIZE 512
 #endif
 
 /* These defaults allow the operation */

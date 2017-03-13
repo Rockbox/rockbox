@@ -30,7 +30,6 @@
 #include "system.h"
 #include "debug.h"
 #include "storage.h"
-#include "fat.h"
 #include "disk.h"
 #include "panic.h"
 #include "lcd.h"

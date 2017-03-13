@@ -35,8 +35,8 @@
 #include "usb.h"
 #include "sd.h"
 #include "storage.h"
+#include "fs_defines.h"
 
-#define SECTOR_SIZE     512
 #define BLOCKS_PER_BANK 0x7a7800
 
 /* Comparing documentations of various MMC/SD controllers revealed, */

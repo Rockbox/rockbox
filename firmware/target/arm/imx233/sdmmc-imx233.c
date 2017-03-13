@@ -27,7 +27,6 @@
 #include "pinctrl-imx233.h"
 #include "partitions-imx233.h"
 #include "button-target.h"
-#include "fat.h"
 #include "disk.h"
 #include "usb.h"
 #include "debug.h"

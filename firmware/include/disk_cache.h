@@ -21,29 +21,6 @@
 #ifndef DISK_CACHE_H
 #define DISK_CACHE_H
 
-/* This needs enough for all file handles to have a buffer in the worst case
- * plus at least one reserved exclusively for the cache client and a couple
- * for other file system code. The buffers are put to use by the cache if not
- * taken for another purpose (meaning nothing is wasted sitting fallow).
- *
- * One map per volume is maintained in order to avoid collisions between
- * volumes that would slow cache probing. DC_MAP_NUM_ENTRIES is the number
- * for each map per volume. The buffers themselves are shared.
- */
-#if MEMORYSIZE < 8
-#define DC_NUM_ENTRIES      32
-#define DC_MAP_NUM_ENTRIES  128
-#elif MEMORYSIZE <= 32
-#define DC_NUM_ENTRIES      48
-#define DC_MAP_NUM_ENTRIES  128
-#else /* MEMORYSIZE > 32 */
-#define DC_NUM_ENTRIES      64
-#define DC_MAP_NUM_ENTRIES  256
-#endif /* MEMORYSIZE */
-
-/* this _could_ be larger than a sector if that would ever be useful */
-#define DC_CACHE_BUFSIZE    SECTOR_SIZE
-
 #include "mutex.h"
 #include "mv.h"
 

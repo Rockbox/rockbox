@@ -43,7 +43,6 @@
 #endif
 #include "sdmmc.h"
 #include "disk.h"
-#include "fat.h"
 #include "system-target.h"
 
 /* The configuration method is not very flexible. */
@@ -72,7 +71,6 @@
 #define UNALIGNED_NUM_SECTORS   10
 #define MAX_TRANSFER_ERRORS     10
 
-#define SECTOR_SIZE        512
 #define BLOCKS_PER_BANK    0x7A7800
 
 /* command flags for send_cmd */

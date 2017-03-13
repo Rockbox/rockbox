@@ -34,9 +34,8 @@
 #include "ata_idle_notify.h"
 #include "ata-driver.h"
 #include "ata-defines.h"
+#include "fs_defines.h"
 #include "storage.h"
-
-#define SECTOR_SIZE     512
 
 #define SELECT_DEVICE1  0x10
 #define SELECT_LBA      0x40

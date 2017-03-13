@@ -63,7 +63,7 @@
 #include "usb.h"
 #include "rtc.h"
 #include "storage.h"
-#include "fat.h"
+#include "fs_defines.h"
 #include "eeprom_24cxx.h"
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
 #include "sdmmc.h"

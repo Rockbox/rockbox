@@ -29,7 +29,6 @@
 #include "lcd.h"
 #include "../kernel-internal.h"
 #include "storage.h"
-#include "fat.h"
 #include "file_internal.h"
 #include "disk.h"
 #include "font.h"

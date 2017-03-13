@@ -32,7 +32,6 @@
 #include "thread.h"
 #include "storage.h"
 #include "file_internal.h"
-#include "fat.h"
 #include "disk.h"
 #include "font.h"
 #include "panic.h"

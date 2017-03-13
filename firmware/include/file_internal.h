@@ -28,54 +28,13 @@
 #include "mutex.h"
 #include "mrsw_lock.h"
 #include "fs_attr.h"
+#include "fs_defines.h"
 #include "fat.h"
 #ifdef HAVE_DIRCACHE
 #include "dircache.h"
 #endif
 
-/** Tuneable parameters **/
-
-/* limits for number of open descriptors - if you increase these values, make
-   certain that the disk cache has enough available buffers */
-#define MAX_OPEN_FILES 11
-#define MAX_OPEN_DIRS  12
 #define MAX_OPEN_HANDLES (MAX_OPEN_FILES+MAX_OPEN_DIRS)
-
-/* internal functions open streams as well; make sure they don't fail if all
-   user descs are busy; this needs to be at least the greatest quantity needed
-   at once by all internal functions */
-#ifdef HAVE_DIRCACHE
-#define AUX_FILEOBJS 3
-#else
-#define AUX_FILEOBJS 2
-#endif
-
-/* number of components statically allocated to handle the vast majority
-   of path depths; should maybe be tuned for >= 90th percentile but for now,
-   imma just guessing based on something like:
-        root + 'Music' + 'Artist' + 'Album' + 'Disc N' + filename */
-#define STATIC_PATHCOMP_NUM 6
-
-#define MAX_COMPNAME    260
-
-/* unsigned value that will also hold the off_t range we need without
-   overflow */
-#define file_size_t uint32_t
-
-#ifdef __USE_FILE_OFFSET64
-/* if we want, we can deal with files up to 2^32-1 bytes-- the full FAT16/32
-   range */
-#define FILE_SIZE_MAX   (0xffffffffu)
-#else
-/* file contents and size will be preserved by the APIs so long as ftruncate()
-   isn't used; bytes passed 2^31-1 will not accessible nor will writes succeed
-   that would extend the file beyond the max for a 32-bit off_t */
-#define FILE_SIZE_MAX   (0x7fffffffu)
-#endif
-
-/* if file is "large(ish)", then get rid of the contents now rather than
-   lazily when the file is synced or closed in order to free-up space */
-#define O_TRUNC_THRESH 65536
 
 /* default attributes when creating new files and directories */
 #define ATTR_NEW_FILE       (ATTR_ARCHIVE)

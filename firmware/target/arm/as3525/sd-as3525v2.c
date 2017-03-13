@@ -21,7 +21,7 @@
  ****************************************************************************/
 
 #include "config.h" /* for HAVE_MULTIVOLUME */
-#include "fat.h"
+#include "fs_defines.h"
 #include "thread.h"
 #include "gcc_extensions.h"
 #include "led.h"

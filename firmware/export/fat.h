@@ -48,14 +48,6 @@
 #define FAT_MAX_TRANSFER_SIZE 256
 #endif
 
-/* still experimental? */
-/* increasing this will increase the total memory used by the cache; the
-   cache, as noted in disk_cache.h, has other minimum requirements that may
-   prevent reducing its number of entries in order to compensate */
-#ifndef SECTOR_SIZE
-#define SECTOR_SIZE 512
-#endif
-
 /**
  ****************************************************************************/
 

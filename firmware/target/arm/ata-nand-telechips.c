@@ -28,8 +28,7 @@
 #include "panic.h"
 #include "nand_id.h"
 #include "storage.h"
-
-#define SECTOR_SIZE 512
+#include "fs_defines.h"
 
 /* ECC on read is implemented on the assumption that MLC-style 4-bit correction
    is always used regardless of NAND chip type. This assumption is true for at
