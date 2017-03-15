@@ -21,11 +21,9 @@
  
 //#define SD_DEBUG
 
-#include "sd.h"
 #include "system.h"
 #include <string.h>
 #include "gcc_extensions.h"
-#include "thread.h"
 #include "panic.h"
 
 #ifdef SD_DEBUG
@@ -33,8 +31,8 @@
 #endif
 #ifdef HAVE_HOTSWAP
 #include "sdmmc.h"
-#include "disk.h"
 #endif
+#include "storage.h"
 #include "dma-target.h"     
 #include "system-target.h"
 #include "led-mini2440.h"
@@ -90,6 +88,12 @@ struct sd_card_status
 /* for compatibility */
 static long last_disk_activity = -1;
 
+#ifdef CONFIG_STORAGE_MULTI
+static int sd_first_drive = 0;
+#else
+#define sd_first_drive 0
+#endif
+
 static bool initialized = false;
 static bool sd_enabled = false;
 static long next_yield = 0;
@@ -109,11 +113,7 @@ static struct sd_card_status sd_status[NUM_CARDS] =
 #endif
 #endif
 
-/* Shoot for around 75% usage */
-static long             sd_stack [(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
-static const char               sd_thread_name[] = "sd";
 static struct mutex             sd_mtx SHAREDBSS_ATTR;
-static struct event_queue       sd_queue;
 static struct semaphore         transfer_completion_signal;
 static volatile unsigned int    transfer_error[NUM_DRIVES];
 /* align on cache line size */
@@ -511,17 +511,13 @@ static inline bool card_detect_target(void)
 
 static int sd1_oneshot_callback(struct timeout *tmo)
 {
-    (void)tmo;
-
     /* This is called only if the state was stable for 300ms - check state
      * and post appropriate event. */
-    if (card_detect_target())
-    {
-        queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
-    }
-    else
-        queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
+    queue_broadcast(card_detect_target() ? SYS_HOTSWAP_INSERTED :
+                                           SYS_HOTSWAP_EXTRACTED,
+                    sd_first_drive + CARD_NUM_SLOT);
     return 0;
+    (void)tmo;
 }
 
 void EINT8_23(void)
@@ -570,46 +566,6 @@ bool sd_removable(IF_MD_NONVOID(int card_no))
 
 #endif /* HAVE_HOTSWAP */
 /*****************************************************************************/
-
-static void sd_thread(void) NORETURN_ATTR;
-static void sd_thread(void)
-{
-    struct queue_event ev;
-
-    /* TODO */
-    while (1)
-    {
-        queue_wait_w_tmo(&sd_queue, &ev, HZ);
-        switch ( ev.id )
-        {
-#ifdef HAVE_HOTSWAP
-        case SYS_HOTSWAP_INSERTED:
-        case SYS_HOTSWAP_EXTRACTED:;
-            int success = 1;
-
-            disk_unmount(0);     /* release "by force" */
-
-            mutex_lock(&sd_mtx); /* lock-out card activity */
-
-            /* Force card init for new card, re-init for re-inserted one or
-             * clear if the last attempt to init failed with an error. */
-            card_info[0].initialized = 0;
-
-            /* Access is now safe */
-            mutex_unlock(&sd_mtx);
-
-            if (ev.id == SYS_HOTSWAP_INSERTED)
-                success = disk_mount(0); /* 0 if fail */
-
-            /* notify the system about the changed filesystems
-             */
-            if (success)
-                queue_broadcast(SYS_FS_CHANGED, 0);
-            break;
-#endif /* HAVE_HOTSWAP */
-        }        
-    }
-}
 
 static int sd_wait_for_state(const int card_no, unsigned int state)
 {
@@ -907,9 +863,6 @@ int sd_init(void)
     semaphore_init(&transfer_completion_signal, 1, 0);
     /* init mutex */
     mutex_init(&sd_mtx);
-    queue_init(&sd_queue, true);
-    create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,
-            sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
 
     uncached_buffer = UNCACHED_ADDR(&aligned_buffer[0]);
 
@@ -950,16 +903,9 @@ tCardInfo *card_get_info_target(int card_no)
 int sd_num_drives(int first_drive)
 {
     dbgprintf ("sd_num_drv");
-#if 0
     /* Store which logical drive number(s) we have been assigned */
     sd_first_drive = first_drive;
-#endif
-    
     return NUM_CARDS;
-}
-
-void sd_sleepnow(void)
-{
 }
 
 bool sd_disk_is_active(void)
@@ -980,3 +926,27 @@ int sd_spinup_time(void)
 #endif /* CONFIG_STORAGE_MULTI */
 /*****************************************************************************/
 
+int sd_event(long id, intptr_t data)
+{
+    int rc = 0;
+
+    switch (id)
+    {
+#ifdef HAVE_HOTSWAP
+    case SYS_HOTSWAP_INSERTED:
+    case SYS_HOTSWAP_EXTRACTED:
+        mutex_lock(&sd_mtx);
+        /* Force card init for new card, re-init for re-inserted one or
+         * clear if the last attempt to init failed with an error. */
+        card_info[data].initialized = 0;
+        mutex_unlock(&sd_mtx);
+        break;
+#endif /* HAVE_HOTSWAP */
+    default:
+        rc = storage_event_default_handler(id, data, last_disk_activity,
+                                           STORAGE_SD);
+        break;
+    }
+
+    return rc;
+}

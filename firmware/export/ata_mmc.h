@@ -21,6 +21,8 @@
 #ifndef __ATA_MMC_H__
 #define __ATA_MMC_H__
 
+#include <stdbool.h>
+
 void mmc_enable_int_flash_clock(bool on);
 bool mmc_detect(void);
 bool mmc_touched(void);

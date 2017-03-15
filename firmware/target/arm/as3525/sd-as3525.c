@@ -24,7 +24,6 @@
 
 #include "config.h" /* for HAVE_MULTIDRIVE & AMS_OF_SIZE */
 #include "fs_defines.h"
-#include "thread.h"
 #include "led.h"
 #include "sdmmc.h"
 #include "system.h"
@@ -39,19 +38,14 @@
 #include "dma-target.h" /* DMA request lines */
 #include "clock-target.h"
 #include "panic.h"
+#include "storage.h"
+
 #ifdef HAVE_BUTTON_LIGHT
 #include "backlight-target.h"
 #endif
-#include "stdbool.h"
-#include "ata_idle_notify.h"
-#include "sd.h"
-#include "usb.h"
+
 /*#define LOGF_ENABLE*/
 #include "logf.h"
-
-#ifdef HAVE_HOTSWAP
-#include "disk.h"
-#endif
 
 //#define VERIFY_WRITE 1
 
@@ -119,16 +113,19 @@ static tCardInfo card_info[NUM_DRIVES];
 #define SD_MAX_READ_TIMEOUT     ((AS3525_PCLK_FREQ) / 1000 * 100) /* 100 ms */
 #define SD_MAX_WRITE_TIMEOUT    ((AS3525_PCLK_FREQ) / 1000 * 250) /* 250 ms */
 
+#ifdef CONFIG_STORAGE_MULTI
+static int sd_first_drive = 0;
+#else
+#define    sd_first_drive 0
+#endif
+
 /* for compatibility */
 static long last_disk_activity = -1;
 
 #define MIN_YIELD_PERIOD 5  /* ticks */
 static long next_yield = 0;
 
-static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x200)/sizeof(long)];
-static const char         sd_thread_name[] = "ata/sd";
-static struct mutex       sd_mtx;
-static struct event_queue sd_queue;
+static struct mutex sd_mtx;
 bool sd_enabled = false;
 
 #if defined(HAVE_MULTIDRIVE)
@@ -147,6 +144,59 @@ static unsigned char *uncached_buffer = AS3525_UNCACHED_ADDR(&aligned_buffer[0])
 
 static inline void mci_delay(void) { udelay(1000) ; }
 
+static void enable_controller(bool on)
+{
+
+#if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
+    extern int buttonlight_is_on;
+#endif
+
+#if defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE)
+    static bool cpu_boosted = false;
+#endif
+
+    if (sd_enabled == on)
+        return; /* nothing to do */
+
+    sd_enabled = on;
+
+    if(on)
+    {
+#if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
+        /* buttonlight AMSes need a bit of special handling for the buttonlight
+         * here due to the dual mapping of GPIOD and XPD */
+        bitmod32(&CCU_IO, 1<<2, 3<<2);  /* XPD is SD-MCI interface (b3:2 = 01) */
+        if (buttonlight_is_on)
+            GPIOD_DIR &= ~(1<<7);
+        else
+           buttonlight_hw_off();
+#endif
+
+#if defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE)
+        if(card_detect_target())  /* If SD card present Boost cpu for voltage */
+        {
+            cpu_boosted = true;
+            cpu_boost(true);
+        }
+#endif  /* defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE) */
+    }
+    else
+    {
+#if defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE)
+        if(cpu_boosted)
+        {
+            cpu_boost(false);
+            cpu_boosted = false;
+        }
+#endif  /* defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE) */
+
+#if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
+        bitmod32(&CCU_IO, 0<<2, 3<<2);  /* XPD is general purpose IO (b3:2 = 00) */
+        if (buttonlight_is_on)
+           buttonlight_hw_on();
+#endif
+    }
+}
 
 static inline bool card_detect_target(void)
 {
@@ -161,18 +211,13 @@ static inline bool card_detect_target(void)
 #ifdef HAVE_HOTSWAP
 static int sd1_oneshot_callback(struct timeout *tmo)
 {
-    (void)tmo;
-
     /* This is called only if the state was stable for 300ms - check state
      * and post appropriate event. */
-    if (card_detect_target())
-    {
-        queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
-    }
-    else
-        queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
-
+    queue_broadcast(card_detect_target() ? SYS_HOTSWAP_INSERTED :
+                                           SYS_HOTSWAP_EXTRACTED,
+                    sd_first_drive + SD_SLOT_AS3525);
     return 0;
+    (void)tmo;
 }
 
 void sd_gpioa_isr(void)
@@ -435,87 +480,6 @@ static int sd_init_card(const int drive)
     return 0;
 }
 
-static void sd_thread(void) NORETURN_ATTR;
-static void sd_thread(void)
-{
-    struct queue_event ev;
-    bool idle_notified = false;
-
-    while (1)
-    {
-        queue_wait_w_tmo(&sd_queue, &ev, HZ);
-
-        switch ( ev.id )
-        {
-#ifdef HAVE_HOTSWAP
-        case SYS_HOTSWAP_INSERTED:
-        case SYS_HOTSWAP_EXTRACTED:;
-            int success = 1;
-
-            disk_unmount(SD_SLOT_AS3525); /* release "by force" */
-
-            mutex_lock(&sd_mtx); /* lock-out card activity */
-
-            /* Force card init for new card, re-init for re-inserted one or
-             * clear if the last attempt to init failed with an error. */
-            card_info[SD_SLOT_AS3525].initialized = 0;
-
-            if (ev.id == SYS_HOTSWAP_INSERTED)
-            {
-                success = 0;
-                sd_enable(true);
-                init_pl180_controller(SD_SLOT_AS3525);
-                int rc = sd_init_card(SD_SLOT_AS3525);
-                sd_enable(false);
-                if (rc >= 0)
-                    success = 2;
-                else /* initialisation failed */
-                    panicf("microSD init failed : %d", rc);
-            }
-
-            mutex_unlock(&sd_mtx);
-
-            if (success > 1)
-                success = disk_mount(SD_SLOT_AS3525); /* 0 if fail */
-
-            /*
-             * Mount succeeded, or this was an EXTRACTED event,
-             * in both cases notify the system about the changed filesystems
-             */
-            if (success)
-                queue_broadcast(SYS_FS_CHANGED, 0);
-
-            break;
-#endif /* HAVE_HOTSWAP */
-
-        case SYS_TIMEOUT:
-            if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
-            {
-                idle_notified = false;
-            }
-            else
-            {
-                /* never let a timer wrap confuse us */
-                next_yield = current_tick;
-
-                if (!idle_notified)
-                {
-                    call_storage_idle_notifys(false);
-                    idle_notified = true;
-                }
-            }
-            break;
-
-        case SYS_USB_CONNECTED:
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
-            /* Wait until the USB cable is extracted again */
-            usb_wait_for_disconnect(&sd_queue);
-
-            break;
-        }
-    }
-}
-
 static void init_pl180_controller(const int drive)
 {
     MCI_COMMAND(drive) = MCI_DATA_CTRL(drive) = 0;
@@ -576,12 +540,8 @@ int sd_init(void)
     /* init mutex */
     mutex_init(&sd_mtx);
 
-    queue_init(&sd_queue, true);
-    create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,
-            sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
-
-    sd_enabled = true;
-    sd_enable(false);
+    sd_enabled = true; /* force action on next call */
+    enable_controller(false);
 
     return 0;
 }
@@ -698,7 +658,7 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
     unsigned long response;
     bool aligned = !((uintptr_t)buf & (CACHEALIGN_SIZE - 1));
 
-    sd_enable(true);
+    enable_controller(true);
     led(true);
 
     if (card_info[drive].initialized <= 0)
@@ -873,7 +833,7 @@ sd_transfer_error:
 sd_transfer_error_nodma:
 
     led(false);
-    sd_enable(false);
+    enable_controller(false);
 
     if (ret)    /* error */
         card_info[drive].initialized = 0;
@@ -947,55 +907,9 @@ long sd_last_disk_activity(void)
 
 void sd_enable(bool on)
 {
-#if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
-    extern int buttonlight_is_on;
-#endif
-
-#if defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE)
-    static bool cpu_boosted = false;
-#endif
-
-    if (sd_enabled == on)
-        return; /* nothing to do */
-
-    sd_enabled = on;
-
-    if(on)
-    {
-#if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
-        /* buttonlight AMSes need a bit of special handling for the buttonlight
-         * here due to the dual mapping of GPIOD and XPD */
-        bitmod32(&CCU_IO, 1<<2, 3<<2);  /* XPD is SD-MCI interface (b3:2 = 01) */
-        if (buttonlight_is_on)
-            GPIOD_DIR &= ~(1<<7);
-        else
-           buttonlight_hw_off();
-#endif
-
-#if defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE)
-        if(card_detect_target())  /* If SD card present Boost cpu for voltage */
-        {
-            cpu_boosted = true;
-            cpu_boost(true);
-        }
-#endif  /* defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE) */
-    }
-    else
-    {
-#if defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE)
-        if(cpu_boosted)
-        {
-            cpu_boost(false);
-            cpu_boosted = false;
-        }
-#endif  /* defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE) */
-
-#if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
-        bitmod32(&CCU_IO, 0<<2, 3<<2);  /* XPD is general purpose IO (b3:2 = 00) */
-        if (buttonlight_is_on)
-           buttonlight_hw_on();
-#endif
-    }
+    mutex_lock(&sd_mtx);
+    enable_controller(on);
+    mutex_unlock(&sd_mtx);
 }
 
 tCardInfo *card_get_info_target(int card_no)
@@ -1006,9 +920,45 @@ tCardInfo *card_get_info_target(int card_no)
 #ifdef CONFIG_STORAGE_MULTI
 int sd_num_drives(int first_drive)
 {
-    /* We don't care which logical drive number(s) we have been assigned */
-    (void)first_drive;
-
+    sd_first_drive = first_drive;
     return NUM_DRIVES;
 }
 #endif /* CONFIG_STORAGE_MULTI */
+
+int sd_event(long id, intptr_t data)
+{
+    int rc = 0;
+
+    switch (id)
+    {
+#ifdef HAVE_HOTSWAP
+    case SYS_HOTSWAP_INSERTED:
+    case SYS_HOTSWAP_EXTRACTED:
+        mutex_lock(&sd_mtx); /* lock-out card activity */
+
+        /* Force card init for new card, re-init for re-inserted one or
+         * clear if the last attempt to init failed with an error. */
+        card_info[data].initialized = 0;
+
+        if (id == SYS_HOTSWAP_INSERTED)
+        {
+            enable_controller(true);
+            init_pl180_controller(data);
+            rc = sd_init_card(data);
+            enable_controller(false);
+        }
+
+        mutex_unlock(&sd_mtx);
+        break;
+#endif /* HAVE_HOTSWAP */
+    case Q_STORAGE_TICK:
+        /* never let a timer wrap confuse us */
+        next_yield = current_tick;
+    default:
+        rc = storage_event_default_handler(id, data, last_disk_activity,
+                                           STORAGE_SD);
+        break;
+    }
+
+    return rc;
+}

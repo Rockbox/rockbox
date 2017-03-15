@@ -18,26 +18,28 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdbool.h>
-#include "mmc.h"
+#include "config.h"
 #include "ata_mmc.h"
 #include "sdmmc.h"
-#include "ata_idle_notify.h"
 #include "kernel.h"
-#include "thread.h"
 #include "led.h"
 #include "sh7034.h"
 #include "system.h"
 #include "debug.h"
 #include "panic.h"
-#include "usb.h"
 #include "power.h"
 #include "string.h"
 #include "hwcompat.h"
 #include "adc.h"
 #include "bitswap.h"
-#include "disk.h" /* for mount/unmount */
 #include "storage.h"
+
+
+#ifdef HAVE_MULTIDRIVE
+#define MMC_NUM_DRIVES 2
+#else
+#define MMC_NUM_DRIVES 1
+#endif
 
 #define BLOCK_SIZE  512   /* fixed */
 
@@ -90,15 +92,14 @@ static long last_disk_activity = -1;
 
 /* private variables */
 
+#ifdef CONFIG_STORAGE_MULTI
+static int mmc_first_drive = 0;
+#else
+#define mmc_first_drive 0
+#endif
+
 static struct mutex mmc_mutex SHAREDBSS_ATTR;
 
-#ifdef HAVE_HOTSWAP
-static long mmc_stack[((DEFAULT_STACK_SIZE*2) + 0x800)/sizeof(long)];
-#else
-static long mmc_stack[(DEFAULT_STACK_SIZE*2)/sizeof(long)];
-#endif
-static const char mmc_thread_name[] = "mmc";
-static struct event_queue mmc_queue SHAREDBSS_ATTR;
 static bool initialized = false;
 static bool new_mmc_circuit;
 
@@ -157,6 +158,21 @@ static int send_block_send(unsigned char start_token, long timeout,
 static void mmc_tick(void);
 
 /* implementation */
+
+static void enable_controller(bool on)
+{
+    PBCR1 &= ~0x0CF0;      /* PB13, PB11 and PB10 become GPIO,
+                            * if not modified below */
+    if (on)
+        PBCR1 |= 0x08A0;   /* as SCK1, TxD1, RxD1 */
+
+    and_b(~0x80, &PADRL);  /* assert flash reset */
+    sleep(HZ/100);
+    or_b(0x80, &PADRL);    /* de-assert flash reset */
+    sleep(HZ/100);
+    card_info[0].initialized = false;
+    card_info[1].initialized = false;
+}
 
 void mmc_enable_int_flash_clock(bool on)
 {
@@ -763,51 +779,6 @@ bool mmc_disk_is_active(void)
     return mutex_test(&mmc_mutex);
 }
 
-static void mmc_thread(void)
-{
-    struct queue_event ev;
-    bool idle_notified = false;
-
-    while (1) {
-        queue_wait_w_tmo(&mmc_queue, &ev, HZ);
-        switch ( ev.id ) 
-        {
-            case SYS_USB_CONNECTED:
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                /* Wait until the USB cable is extracted again */
-                usb_wait_for_disconnect(&mmc_queue);
-                break;
-
-#ifdef HAVE_HOTSWAP
-            case SYS_HOTSWAP_INSERTED:
-                disk_mount(1); /* mount MMC */
-                queue_broadcast(SYS_FS_CHANGED, 0);
-                break;
-
-            case SYS_HOTSWAP_EXTRACTED:
-                disk_unmount(1); /* release "by force" */
-                queue_broadcast(SYS_FS_CHANGED, 0);
-                break;
-#endif
-                
-            default:
-                if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
-                {
-                    idle_notified = false;
-                }
-                else
-                {
-                    if (!idle_notified)
-                    {
-                        call_storage_idle_notifys(false);
-                        idle_notified = true;
-                    }
-                }
-                break;
-        }
-    }
-}
-
 bool mmc_detect(void)
 {
     return (adc_read(ADC_MMC_SWITCH) < 0x200);
@@ -868,11 +839,11 @@ static void mmc_tick(void)
         {
             if (current_status)
             {
-                queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
+                queue_broadcast(SYS_HOTSWAP_INSERTED, mmc_first_drive + 1);
             }
             else
             {
-                queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
+                queue_broadcast(SYS_HOTSWAP_EXTRACTED, mmc_first_drive + 1);
                 mmc_status = MMC_UNTOUCHED;
                 card_info[1].initialized = false;
             }
@@ -882,17 +853,9 @@ static void mmc_tick(void)
 
 void mmc_enable(bool on)
 {
-    PBCR1 &= ~0x0CF0;      /* PB13, PB11 and PB10 become GPIO,
-                            * if not modified below */
-    if (on)
-        PBCR1 |= 0x08A0;   /* as SCK1, TxD1, RxD1 */
-
-    and_b(~0x80, &PADRL);  /* assert flash reset */
-    sleep(HZ/100);
-    or_b(0x80, &PADRL);    /* de-assert flash reset */
-    sleep(HZ/100);
-    card_info[0].initialized = false;
-    card_info[1].initialized = false;
+    mutex_lock(&mmc_mutex);
+    enable_controller(on);
+    mutex_unlock(&mmc_mutex);
 }
 
 int mmc_init(void)
@@ -900,10 +863,8 @@ int mmc_init(void)
     int rc = 0;
 
     if (!initialized) 
-    {
         mutex_init(&mmc_mutex);
-        queue_init(&mmc_queue, true);
-    }
+
     mutex_lock(&mmc_mutex);
     led(false);
 
@@ -933,15 +894,10 @@ int mmc_init(void)
         IPRE  &=  0x0FFF;  /* disable SCI1 interrupts for the CPU */
 
         new_mmc_circuit = ((HW_MASK & MMC_CLOCK_POLARITY) != 0);
-
-        create_thread(mmc_thread, mmc_stack,
-                      sizeof(mmc_stack), 0, mmc_thread_name
-                      IF_PRIO(, PRIORITY_SYSTEM)
-                      IF_COP(, CPU));
         tick_add_task(mmc_tick);
         initialized = true;
     }
-    mmc_enable(true);
+    enable_controller(true);
 
     mutex_unlock(&mmc_mutex);
     return rc;
@@ -998,11 +954,6 @@ bool mmc_present(IF_MD_NONVOID(int drive))
 }
 #endif
 
-
-void mmc_sleep(void)
-{
-}
-
 void mmc_spin(void)
 {
 }
@@ -1015,13 +966,13 @@ void mmc_spindown(int seconds)
 #ifdef CONFIG_STORAGE_MULTI
 int mmc_num_drives(int first_drive)
 {
-    /* We don't care which logical drive number(s) we have been assigned */
-    (void)first_drive;
-    
-#ifdef HAVE_MULTIDRIVE
-    return 2;
-#else
-    return 1;
-#endif
+    mmc_first_drive = first_drive;
+    return MMC_NUM_DRIVES;
 }
-#endif
+#endif /* CONFIG_STORAGE_MULTI */
+
+int mmc_event(long id, intptr_t data)
+{
+    return storage_event_default_handler(id, data, last_disk_activity,
+                                         STORAGE_MMC);
+}

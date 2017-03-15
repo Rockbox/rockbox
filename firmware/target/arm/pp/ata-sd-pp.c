@@ -24,16 +24,10 @@
 #ifdef HAVE_HOTSWAP
 #include "sd-pp-target.h"
 #endif
-#include "ata_idle_notify.h"
 #include "system.h"
 #include <string.h>
-#include "thread.h"
 #include "led.h"
-#include "disk.h"
 #include "cpu.h"
-#include "panic.h"
-#include "usb.h"
-#include "sd.h"
 #include "storage.h"
 #include "fs_defines.h"
 
@@ -151,12 +145,6 @@
 /* for compatibility */
 static long last_disk_activity = -1;
 
-/** static, private data **/ 
-static bool initialized = false;
-static unsigned int sd_thread_id = 0;
-
-#define Q_CLOSE    1
-
 static long next_yield = 0;
 #define MIN_YIELD_PERIOD 1000
 
@@ -177,29 +165,27 @@ static struct sd_card_status sd_status[NUM_DRIVES] =
 #endif
 };
 
-/* Shoot for around 75% usage */
-static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
-static const char         sd_thread_name[] = "ata/sd";
-static struct mutex       sd_mtx SHAREDBSS_ATTR;
-static struct event_queue sd_queue SHAREDBSS_ATTR;
+static struct mutex sd_mtx SHAREDBSS_ATTR;
 
 #ifdef HAVE_HOTSWAP
 static int sd_first_drive = 0;
 #endif
 
-/* Posted when card plugged status has changed */
-#define SD_HOTSWAP    1
-/* Actions taken by sd_thread when card status has changed */
-enum sd_thread_actions
-{
-    SDA_NONE      = 0x0,
-    SDA_UNMOUNTED = 0x1,
-    SDA_MOUNTED   = 0x2
-};
-
 /* Private Functions */
 
 static unsigned int check_time[NUM_EC];
+
+static inline void enable_controller(bool on)
+{
+    if(on)
+    {
+        DEV_EN |= DEV_ATA; /* Enable controller */
+    }
+    else
+    {
+        DEV_EN &= ~DEV_ATA; /* Disable controller */
+    }
+}
 
 static inline bool sd_check_timeout(long timeout, int id)
 {
@@ -876,7 +862,7 @@ int sd_read_sectors(IF_MD(int drive,) unsigned long start, int incount,
     /* TODO: Add DMA support. */
 
     mutex_lock(&sd_mtx);
-    sd_enable(true);
+    enable_controller(true);
     led(true);
 
 sd_read_retry:
@@ -964,7 +950,7 @@ sd_read_retry:
     while (1)
     {
         led(false);
-        sd_enable(false);
+        enable_controller(false);
         mutex_unlock(&sd_mtx);
 
         return ret;
@@ -994,7 +980,7 @@ int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count,
     unsigned int bank;
 
     mutex_lock(&sd_mtx);
-    sd_enable(true);
+    enable_controller(true);
     led(true);
 
 sd_write_retry:
@@ -1092,7 +1078,7 @@ sd_write_retry:
     while (1)
     {
         led(false);
-        sd_enable(false);
+        enable_controller(false);
         mutex_unlock(&sd_mtx);
 
         return ret;
@@ -1108,182 +1094,79 @@ sd_write_error:
     }
 }
 
-#ifndef SD_DRIVER_CLOSE
-static void sd_thread(void) NORETURN_ATTR;
-#endif
-static void sd_thread(void)
-{
-    struct queue_event ev;
-    bool idle_notified = false;
-    
-    while (1)
-    {
-        queue_wait_w_tmo(&sd_queue, &ev, HZ);
-
-        switch ( ev.id ) 
-        {
-#ifdef HAVE_HOTSWAP
-        case SYS_HOTSWAP_INSERTED:
-        case SYS_HOTSWAP_EXTRACTED:;
-            int success = 1;
-
-            disk_unmount(sd_first_drive+1); /* release "by force" */
-
-            mutex_lock(&sd_mtx); /* lock-out card activity */
-
-            /* Force card init for new card, re-init for re-inserted one or
-             * clear if the last attempt to init failed with an error. */
-            card_info[1].initialized = 0;
-            sd_status[1].retry = 0; 
-
-            /* Access is now safe */
-            mutex_unlock(&sd_mtx);
-
-            if (ev.id == SYS_HOTSWAP_INSERTED)
-                success = disk_mount(sd_first_drive+1); /* 0 if fail */
-
-            if (success)
-                queue_broadcast(SYS_FS_CHANGED, 0);
-            break;
-#endif /* HAVE_HOTSWAP */
-        case SYS_TIMEOUT:
-            if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
-            {
-                idle_notified = false;
-            }
-            else
-            {
-                /* never let a timer wrap confuse us */
-                next_yield = USEC_TIMER;
-
-                if (!idle_notified)
-                {
-                    call_storage_idle_notifys(false);
-                    idle_notified = true;
-                }
-            }
-            break;
-        case SYS_USB_CONNECTED:
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
-            /* Wait until the USB cable is extracted again */
-            usb_wait_for_disconnect(&sd_queue);
-            break;
-
-#ifdef SD_DRIVER_CLOSE
-        case Q_CLOSE:
-            return;
-#endif
-        }
-    }
-}
-
-#ifdef SD_DRIVER_CLOSE
-void sd_close(void)
-{
-    unsigned int thread_id = sd_thread_id;
-    
-    if (thread_id == 0)
-        return;
-
-    sd_thread_id = 0;
-
-    queue_post(&sd_queue, Q_CLOSE, 0);
-    thread_wait(thread_id);
-}
-#endif /* SD_DRIVER_CLOSE */
-
 void sd_enable(bool on)
 {
-    if(on)
-    {
-        DEV_EN |= DEV_ATA; /* Enable controller */
-    }
-    else
-    {
-        DEV_EN &= ~DEV_ATA; /* Disable controller */
-    }
+    mutex_lock(&sd_mtx);
+    enable_controller(on);
+    mutex_unlock(&sd_mtx);
 }
-
 
 int sd_init(void)
 {
     int ret = 0;
 
-    if (!initialized)
-        mutex_init(&sd_mtx);
-
-    mutex_lock(&sd_mtx);
+    mutex_init(&sd_mtx);
 
     led(false);
 
-    if (!initialized)
-    {
-        initialized = true;
-
-        /* init controller */
+    /* init controller */
 #if defined(PHILIPS_SA9200)
-        GPIOA_ENABLE = 0x00;
-        GPIO_SET_BITWISE(GPIOD_ENABLE, 0x01);
+    GPIOA_ENABLE = 0x00;
+    GPIO_SET_BITWISE(GPIOD_ENABLE, 0x01);
 #else
-        outl(inl(0x70000088) & ~(0x4), 0x70000088);
-        outl(inl(0x7000008c) & ~(0x4), 0x7000008c);
-        GPO32_ENABLE |= 0x4;
+    outl(inl(0x70000088) & ~(0x4), 0x70000088);
+    outl(inl(0x7000008c) & ~(0x4), 0x7000008c);
+    GPO32_ENABLE |= 0x4;
 
-        GPIO_SET_BITWISE(GPIOG_ENABLE, (0x3 << 5));
-        GPIO_SET_BITWISE(GPIOG_OUTPUT_EN, (0x3 << 5));
-        GPIO_SET_BITWISE(GPIOG_OUTPUT_VAL, (0x3 << 5));
+    GPIO_SET_BITWISE(GPIOG_ENABLE, (0x3 << 5));
+    GPIO_SET_BITWISE(GPIOG_OUTPUT_EN, (0x3 << 5));
+    GPIO_SET_BITWISE(GPIOG_OUTPUT_VAL, (0x3 << 5));
 #endif
 
 #ifdef HAVE_HOTSWAP
-        /* enable card detection port - mask interrupt first */
+    /* enable card detection port - mask interrupt first */
 #ifdef SANSA_E200
-        GPIO_CLEAR_BITWISE(GPIOA_INT_EN, 0x80);
+    GPIO_CLEAR_BITWISE(GPIOA_INT_EN, 0x80);
 
-        GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_EN, 0x80);
-        GPIO_SET_BITWISE(GPIOA_ENABLE, 0x80);
+    GPIO_CLEAR_BITWISE(GPIOA_OUTPUT_EN, 0x80);
+    GPIO_SET_BITWISE(GPIOA_ENABLE, 0x80);
 #elif defined SANSA_C200
-        GPIO_CLEAR_BITWISE(GPIOL_INT_EN, 0x08);
+    GPIO_CLEAR_BITWISE(GPIOL_INT_EN, 0x08);
 
-        GPIO_CLEAR_BITWISE(GPIOL_OUTPUT_EN, 0x08);
-        GPIO_SET_BITWISE(GPIOL_ENABLE, 0x08);
+    GPIO_CLEAR_BITWISE(GPIOL_OUTPUT_EN, 0x08);
+    GPIO_SET_BITWISE(GPIOL_ENABLE, 0x08);
 #endif
 #endif
-        sd_select_device(0);
+    sd_select_device(0);
 
-        if (currcard->initialized < 0)
-            ret = currcard->initialized;
+    if (currcard->initialized < 0)
+        ret = currcard->initialized;
 
-        queue_init(&sd_queue, true);
-        sd_thread_id = create_thread(sd_thread, sd_stack, sizeof(sd_stack),
-            0, sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE)
-            IF_COP(, CPU));
-
-        /* enable interupt for the mSD card */
-        sleep(HZ/10);
+    /* enable interupt for the mSD card */
+    sleep(HZ/10);
 #ifdef HAVE_HOTSWAP
 #ifdef SANSA_E200
-        CPU_INT_EN = HI_MASK;
-        CPU_HI_INT_EN = GPIO0_MASK;
+    CPU_INT_EN = HI_MASK;
+    CPU_HI_INT_EN = GPIO0_MASK;
 
-        GPIOA_INT_LEV = (0x80 << 8) | (~GPIOA_INPUT_VAL & 0x80);
+    GPIOA_INT_LEV = (0x80 << 8) | (~GPIOA_INPUT_VAL & 0x80);
 
-        GPIOA_INT_CLR = 0x80;
+    GPIOA_INT_CLR = 0x80;
 
-        /* enable the card detect interrupt */
-        GPIO_SET_BITWISE(GPIOA_INT_EN, 0x80);
+    /* enable the card detect interrupt */
+    GPIO_SET_BITWISE(GPIOA_INT_EN, 0x80);
 #elif defined SANSA_C200
-        CPU_INT_EN = HI_MASK;
-        CPU_HI_INT_EN = GPIO2_MASK;
+    CPU_INT_EN = HI_MASK;
+    CPU_HI_INT_EN = GPIO2_MASK;
 
-        GPIOL_INT_LEV = (0x08 << 8) | (~GPIOL_INPUT_VAL & 0x08);
+    GPIOL_INT_LEV = (0x08 << 8) | (~GPIOL_INPUT_VAL & 0x08);
 
-        GPIOL_INT_CLR = 0x08;
-    
-        /* enable the card detect interrupt */
-        GPIO_SET_BITWISE(GPIOL_INT_EN, 0x08);
+    GPIOL_INT_CLR = 0x08;
+
+    /* enable the card detect interrupt */
+    GPIO_SET_BITWISE(GPIOL_INT_EN, 0x08);
 #endif
-#endif
-    }
+#endif /* HAVE_HOTSWAP */
 
     mutex_unlock(&sd_mtx);
 
@@ -1294,19 +1177,17 @@ tCardInfo *card_get_info_target(int card_no)
 {
     return &card_info[card_no];
 }
+
 #ifdef HAVE_HOTSWAP
 static int sd1_oneshot_callback(struct timeout *tmo)
 {
-    (void)tmo;
-
     /* This is called only if the state was stable for 300ms - check state
      * and post appropriate event. */
-    if (card_detect_target())
-        queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
-    else
-        queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
-
+    queue_broadcast(card_detect_target() ? SYS_HOTSWAP_INSERTED :
+                                           SYS_HOTSWAP_EXTRACTED,
+                    sd_first_drive+1);
     return 0;
+    (void)tmo;
 }
 
 /* called on insertion/removal interrupt */
@@ -1377,3 +1258,36 @@ int sd_num_drives(int first_drive)
 #endif
 }
 #endif
+
+int sd_event(long id, intptr_t data)
+{
+    int rc = 0;
+
+    switch (id)
+    {
+#ifdef HAVE_HOTSWAP
+    case SYS_HOTSWAP_INSERTED:
+    case SYS_HOTSWAP_EXTRACTED:
+        mutex_lock(&sd_mtx); /* lock-out card activity */
+
+        /* Force card init for new card, re-init for re-inserted one or
+         * clear if the last attempt to init failed with an error. */
+        card_info[data].initialized = 0;
+        sd_status[data].retry = 0;
+
+        /* Access is now safe */
+        mutex_unlock(&sd_mtx);
+        break;
+#endif /* HAVE_HOTSWAP */
+
+    case Q_STORAGE_TICK:
+        /* never let a timer wrap confuse us */
+        next_yield = USEC_TIMER;
+    default:
+        rc = storage_event_default_handler(id, data, last_disk_activity,
+                                           STORAGE_SD);
+        break;
+    }
+
+    return rc;
+}

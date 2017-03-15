@@ -159,3 +159,8 @@ bool ramdisk_present(IF_MD(int drive))
 }
 #endif
 
+int ramdisk_event(long id, intptr_t data)
+{
+    return storage_event_default_handler(id, data, last_disk_activity,
+                                         STORAGE_RAMDISK);
+}

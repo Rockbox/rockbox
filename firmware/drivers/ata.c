@@ -20,18 +20,13 @@
  ****************************************************************************/
 #include <stdbool.h>
 #include <inttypes.h>
-#include "ata.h"
-#include "kernel.h"
-#include "thread.h"
 #include "led.h"
 #include "cpu.h"
 #include "system.h"
 #include "debug.h"
 #include "panic.h"
-#include "usb.h"
 #include "power.h"
 #include "string.h"
-#include "ata_idle_notify.h"
 #include "ata-driver.h"
 #include "ata-defines.h"
 #include "fs_defines.h"
@@ -64,23 +59,27 @@
 #define CMD_WRITE_DMA_EXT          0x35
 #endif
 
-/* Should all be < 0x100 (which are reserved for control messages) */
-#define Q_SLEEP    0
-#define Q_CLOSE    1
-
 #define READWRITE_TIMEOUT 5*HZ
 
 #ifdef HAVE_ATA_POWER_OFF
 #define ATA_POWER_OFF_TIMEOUT 2*HZ
 #endif
 
-#ifdef ATA_DRIVER_CLOSE
-static unsigned int ata_thread_id = 0;
+#if defined(HAVE_USBSTACK)
+#define ATA_ACTIVE_IN_USB 1
+#else
+#define ATA_ACTIVE_IN_USB 0
 #endif
 
-#if defined(HAVE_USBSTACK)
-#define ALLOW_USB_SPINDOWN
-#endif
+enum {
+    ATA_BOOT = -1,
+    ATA_OFF,
+    ATA_SLEEPING,
+    ATA_SPINUP,
+    ATA_ON,
+};
+
+static int ata_state = ATA_BOOT;
 
 static struct mutex ata_mtx SHAREDBSS_ATTR;
 static int ata_device; /* device 0 (master) or 1 (slave) */
@@ -90,22 +89,16 @@ static int spinup_time = 0;
 static bool ata_led_enabled = true;
 static bool ata_led_on = false;
 #endif
-static bool spinup = false;
-static bool sleeping = true;
-#ifdef HAVE_ATA_POWER_OFF
-static bool poweroff = false;
-#endif
+
 static long sleep_timeout = 5*HZ;
 #ifdef HAVE_LBA48
 static bool lba48 = false; /* set for 48 bit addressing */
 #endif
-static long ata_stack[(DEFAULT_STACK_SIZE*3)/sizeof(long)];
-static const char ata_thread_name[] = "ata";
-static struct event_queue ata_queue SHAREDBSS_ATTR;
-static bool initialized = false;
 
-static long last_user_activity = -1;
 static long last_disk_activity = -1;
+#ifdef HAVE_ATA_POWER_OFF
+static long power_off_tick;
+#endif
 
 static unsigned long total_sectors;
 static int multisectors; /* number of supported multisectors */
@@ -135,6 +128,38 @@ static int perform_soft_reset(void);
 static int set_multiple_mode(int sectors);
 static int set_features(void);
 
+static inline void keep_ata_active(void)
+{
+    last_disk_activity = current_tick;
+}
+
+static inline void schedule_ata_sleep(long from_now)
+{
+    last_disk_activity = current_tick - sleep_timeout + from_now;
+}
+
+static inline bool ata_sleep_timed_out(void)
+{
+    return sleep_timeout &&
+           TIME_AFTER(current_tick, last_disk_activity + sleep_timeout);
+}
+
+static inline void schedule_ata_power_off(void)
+{
+#ifdef HAVE_ATA_POWER_OFF
+    power_off_tick = current_tick + ATA_POWER_OFF_TIMEOUT;
+#endif
+}
+
+static inline bool ata_power_off_timed_out(void)
+{
+#ifdef HAVE_ATA_POWER_OFF
+    return TIME_AFTER(current_tick, power_off_tick);
+#else
+    return false;
+#endif
+}
+
 #ifndef ATA_TARGET_POLLING
 static ICODE_ATTR int wait_for_bsy(void)
 {
@@ -144,7 +169,7 @@ static ICODE_ATTR int wait_for_bsy(void)
     {
         if (!(ATA_IN8(ATA_STATUS) & STATUS_BSY))
             return 1;
-        last_disk_activity = current_tick;
+        keep_ata_active();
         yield();
     } while (TIME_BEFORE(current_tick, timeout));
 
@@ -164,7 +189,7 @@ static ICODE_ATTR int wait_for_rdy(void)
     {
         if (ATA_IN8(ATA_ALT_STATUS) & STATUS_RDY)
             return 1;
-        last_disk_activity = current_tick;
+        keep_ata_active();
         yield();
     } while (TIME_BEFORE(current_tick, timeout));
 
@@ -174,6 +199,44 @@ static ICODE_ATTR int wait_for_rdy(void)
 #define wait_for_bsy    ata_wait_for_bsy
 #define wait_for_rdy    ata_wait_for_rdy
 #endif
+
+static int ata_perform_wakeup(int state)
+{
+    if (state > ATA_OFF) {
+        if (perform_soft_reset()) {
+            return -1;
+        }
+    }
+#ifdef HAVE_ATA_POWER_OFF
+    else {
+        if (ata_power_on()) {
+            return -2;
+        }
+    }
+#endif
+
+    return 0;
+}
+
+static int ata_perform_sleep(void)
+{
+    ATA_OUT8(ATA_SELECT, ata_device);
+
+    if(!wait_for_rdy()) {
+        DEBUGF("ata_perform_sleep() - not RDY\n");
+        return -1;
+    }
+
+    ATA_OUT8(ATA_COMMAND, CMD_SLEEP);
+
+    if (!wait_for_rdy())
+    {
+        DEBUGF("ata_perform_sleep() - CMD failed\n");
+        return -2;
+    }
+
+    return 0;
+}
 
 static ICODE_ATTR int wait_for_start_of_transfer(void)
 {
@@ -278,13 +341,9 @@ static int ata_transfer_sectors(unsigned long start,
     long timeout;
     int count;
     void* buf;
-    long spinup_start;
+    long spinup_start = spinup_start;
 #ifdef HAVE_ATA_DMA
     bool usedma = false;
-#endif
-
-#ifndef MAX_PHYS_SECTOR_SIZE
-    mutex_lock(&ata_mtx);
 #endif
 
     if (start + incount > total_sectors) {
@@ -292,28 +351,17 @@ static int ata_transfer_sectors(unsigned long start,
         goto error;
     }
 
-    last_disk_activity = current_tick;
-    spinup_start = current_tick;
+    keep_ata_active();
 
     ata_led(true);
 
-    if ( sleeping ) {
-        sleeping = false; /* set this now since it'll be on */
-        spinup = true;
-#ifdef HAVE_ATA_POWER_OFF
-        if (poweroff) {
-            if (ata_power_on()) {
-                ret = -2;
-                goto error;
-            }
-        }
-        else
-#endif
-        {
-            if (perform_soft_reset()) {
-                ret = -2;
-                goto error;
-            }
+    if (ata_state < ATA_ON) {
+        spinup_start = current_tick;
+        int state = ata_state;
+        ata_state = ATA_SPINUP;
+        if (ata_perform_wakeup(state)) {
+            ret = -2;
+            goto error;
         }
     }
 
@@ -331,7 +379,7 @@ static int ata_transfer_sectors(unsigned long start,
     count = incount;
     while (TIME_BEFORE(current_tick, timeout)) {
         ret = 0;
-        last_disk_activity = current_tick;
+        keep_ata_active();
 
 #ifdef HAVE_ATA_DMA
         /* If DMA is supported and parameters are ok for DMA, use it */
@@ -395,12 +443,9 @@ static int ata_transfer_sectors(unsigned long start,
                 goto retry;
             }
 
-            if (spinup) {
+            if (ata_state == ATA_SPINUP) {
+                ata_state = ATA_ON;
                 spinup_time = current_tick - spinup_start;
-                spinup = false;
-#ifdef HAVE_ATA_POWER_OFF
-                poweroff = false;
-#endif
             }
         }
         else
@@ -426,12 +471,9 @@ static int ata_transfer_sectors(unsigned long start,
                     goto retry;
                 }
 
-                if (spinup) {
+                if (ata_state == ATA_SPINUP) {
+                    ata_state = ATA_ON;
                     spinup_time = current_tick - spinup_start;
-                    spinup = false;
-#ifdef HAVE_ATA_POWER_OFF
-                    poweroff = false;
-#endif
                 }
 
                 /* read the status register exactly once per loop */
@@ -470,7 +512,7 @@ static int ata_transfer_sectors(unsigned long start,
                 buf += sectors * SECTOR_SIZE; /* Advance one chunk of sectors */
                 count -= sectors;
 
-                last_disk_activity = current_tick;
+                keep_ata_active();
             }
         }
 
@@ -490,9 +532,11 @@ static int ata_transfer_sectors(unsigned long start,
 
   error:
     ata_led(false);
-#ifndef MAX_PHYS_SECTOR_SIZE
-    mutex_unlock(&ata_mtx);
-#endif
+
+    if (ret < 0 && ata_state == ATA_SPINUP) {
+        /* bailed out before updating */
+        ata_state = ATA_ON;
+    }
 
     return ret;
 }
@@ -507,11 +551,12 @@ int ata_read_sectors(IF_MD(int drive,)
     (void)drive; /* unused for now */
 #endif
 
-    return ata_transfer_sectors(start, incount, inbuf, false);
+    mutex_lock(&ata_mtx);
+    int rc = ata_transfer_sectors(start, incount, inbuf, false);
+    mutex_unlock(&ata_mtx);
+    return rc;
 }
-#endif
 
-#ifndef MAX_PHYS_SECTOR_SIZE
 int ata_write_sectors(IF_MD(int drive,)
                       unsigned long start,
                       int count,
@@ -521,9 +566,12 @@ int ata_write_sectors(IF_MD(int drive,)
     (void)drive; /* unused for now */
 #endif
 
-    return ata_transfer_sectors(start, count, (void*)buf, true);
+    mutex_lock(&ata_mtx);
+    int rc = ata_transfer_sectors(start, count, (void*)buf, true);
+    mutex_unlock(&ata_mtx);
+    return rc;
 }
-#endif
+#endif /* ndef MAX_PHYS_SECTOR_SIZE */
 
 #ifdef MAX_PHYS_SECTOR_SIZE
 static int cache_sector(unsigned long sector)
@@ -748,178 +796,26 @@ void ata_spindown(int seconds)
 
 bool ata_disk_is_active(void)
 {
-    return !sleeping;
-}
-
-static int ata_perform_sleep(void)
-{
-    /* guard against calls made with checks of these variables outside
-       the mutex that may not be on the ata thread; status may have changed. */
-    if (spinup || sleeping) {
-        return 0;
-    }
-
-    ATA_OUT8(ATA_SELECT, ata_device);
-
-    if(!wait_for_rdy()) {
-        DEBUGF("ata_perform_sleep() - not RDY\n");
-        return -1;
-    }
-
-    ATA_OUT8(ATA_COMMAND, CMD_SLEEP);
-
-    if (!wait_for_rdy())
-    {
-        DEBUGF("ata_perform_sleep() - CMD failed\n");
-        return -2;
-    }
-
-    sleeping = true;
-    return 0; 
-}
-
-void ata_sleep(void)
-{
-    queue_post(&ata_queue, Q_SLEEP, 0);
+    return ata_state >= ATA_SPINUP;
 }
 
 void ata_sleepnow(void)
 {
-    if (!spinup && !sleeping && initialized)
-    {
-        call_storage_idle_notifys(false);
+    if (ata_state >= ATA_SPINUP) {
         mutex_lock(&ata_mtx);
-        ata_perform_sleep();
+        if (ata_state == ATA_ON) {
+            if (!ata_perform_sleep()) {
+                ata_state = ATA_SLEEPING;
+                schedule_ata_power_off();
+            }
+        }
         mutex_unlock(&ata_mtx);
     }
 }
 
 void ata_spin(void)
 {
-    last_user_activity = current_tick;
-}
-
-static void ata_thread(void)
-{
-#ifdef HAVE_ATA_POWER_OFF
-    static long last_sleep = 0;
-#endif
-    struct queue_event ev;
-#ifdef ALLOW_USB_SPINDOWN
-    static bool usb_mode = false;
-#endif
-    
-    while (1) {
-        queue_wait_w_tmo(&ata_queue, &ev, HZ/2);
-
-        switch ( ev.id ) {
-            case SYS_TIMEOUT:
-                if (!spinup && !sleeping)
-                {
-                    if (TIME_AFTER( current_tick, 
-                                    last_disk_activity + (HZ*2) ) )
-                    {
-#ifdef ALLOW_USB_SPINDOWN
-                        if(!usb_mode)
-#endif
-                        {
-                            call_storage_idle_notifys(false);
-                        }
-                    }
-
-                    if ( sleep_timeout &&
-                         TIME_AFTER( current_tick, 
-                                    last_user_activity + sleep_timeout ) &&
-                         TIME_AFTER( current_tick, 
-                                    last_disk_activity + sleep_timeout ) )
-                    {
-#ifdef ALLOW_USB_SPINDOWN
-                        if(!usb_mode)
-#endif
-                        {
-                            call_storage_idle_notifys(true);
-                        }
-                        mutex_lock(&ata_mtx);
-                        ata_perform_sleep();
-#ifdef HAVE_ATA_POWER_OFF
-                        last_sleep = current_tick;
-#endif
-                        mutex_unlock(&ata_mtx);
-                    }
-                }
-
-#ifdef HAVE_ATA_POWER_OFF
-                if ( !spinup && sleeping && !poweroff &&
-                     TIME_AFTER( current_tick, last_sleep + ATA_POWER_OFF_TIMEOUT ))
-                {
-                    mutex_lock(&ata_mtx);
-                    ide_power_enable(false);
-                    poweroff = true;
-                    mutex_unlock(&ata_mtx);
-                }
-#endif
-                break;
-
-#ifndef USB_NONE
-            case SYS_USB_CONNECTED:
-                /* Tell the USB thread that we are safe */
-                DEBUGF("ata_thread got SYS_USB_CONNECTED\n");
-#ifdef ALLOW_USB_SPINDOWN
-                usb_mode = true;
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                /* There is no need to force ATA power on */
-#else
-                mutex_lock(&ata_mtx);
-                if (sleeping) {
-                    ata_led(true);
-                    sleeping = false; /* set this now since it'll be on */
-
-#ifdef HAVE_ATA_POWER_OFF
-                    if (poweroff) {
-                        ata_power_on();
-                        poweroff = false;
-                    }
-                    else
-#endif
-                    {
-                        perform_soft_reset();
-                    }
-
-                    ata_led(false);
-                }
-                mutex_unlock(&ata_mtx);
-
-                /* Wait until the USB cable is extracted again */
-                usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                usb_wait_for_disconnect(&ata_queue);
-#endif
-                break;
-                
-#ifdef ALLOW_USB_SPINDOWN
-            case SYS_USB_DISCONNECTED:
-                /* Tell the USB thread that we are ready again */
-                DEBUGF("ata_thread got SYS_USB_DISCONNECTED\n");
-                usb_mode = false;
-                break;
-#endif
-#endif /* USB_NONE */
-
-            case Q_SLEEP:
-#ifdef ALLOW_USB_SPINDOWN
-                if(!usb_mode)
-#endif
-                {
-                    call_storage_idle_notifys(false);
-                }
-                last_disk_activity = current_tick - sleep_timeout + (HZ/2);
-                break;
-
-#ifdef ATA_DRIVER_CLOSE
-            case Q_CLOSE:
-                return;
-#endif
-        }
-    }
+    keep_ata_active();
 }
 
 /* Hardware reset protocol as specified in chapter 9.1, ATA spec draft v5 */
@@ -1025,11 +921,13 @@ static int perform_soft_reset(void)
 
 int ata_soft_reset(void)
 {
-    int ret;
+    int ret = -6;
     
     mutex_lock(&ata_mtx);
 
-    ret = perform_soft_reset();
+    if (ata_state > ATA_OFF) {
+        ret = perform_soft_reset();
+    }
 
     mutex_unlock(&ata_mtx);
     return ret;
@@ -1068,7 +966,7 @@ static int ata_power_on(void)
 
     return 0;
 }
-#endif
+#endif /* HAVE_ATA_POWER_OFF */
 
 static int STORAGE_INIT_ATTR master_slave_detect(void)
 {
@@ -1250,9 +1148,8 @@ int STORAGE_INIT_ATTR ata_init(void)
     int rc = 0;
     bool coldstart;
 
-    if ( !initialized ) {
+    if (ata_state == ATA_BOOT) {
         mutex_init(&ata_mtx);
-        queue_init(&ata_queue, true);
     }
 
     mutex_lock(&ata_mtx);
@@ -1261,16 +1158,13 @@ int STORAGE_INIT_ATTR ata_init(void)
     coldstart = ata_is_coldstart();
     ata_led(false);
     ata_device_init();
-    sleeping = false;
     ata_enable(true);
 #ifdef MAX_PHYS_SECTOR_SIZE
     memset(&sector_cache, 0, sizeof(sector_cache));
 #endif
 
-    if ( !initialized ) {
-        /* First call won't have multiple thread contention - this
-         * may return at any point without having to unlock */
-        mutex_unlock(&ata_mtx);
+    if (ata_state == ATA_BOOT) {
+        ata_state = ATA_OFF;
 
         if (!ide_powered()) /* somebody has switched it off */
         {
@@ -1290,14 +1184,17 @@ int STORAGE_INIT_ATTR ata_init(void)
         {   /* failed? -> second try, always with hard reset */
             DEBUGF("ata: init failed, retrying...\n");
             rc  = init_and_check(true);
-            if (rc)
-                return rc;
+            if (rc) {
+                goto error;
+            }
         }
 
         rc = identify();
 
-        if (rc)
-            return -40 + rc;
+        if (rc) {
+            rc = -40 + rc;
+            goto error;
+        }
 
         multisectors = identify_info[47] & 0xff;
         if (multisectors == 0) /* Invalid multisector info, try with 16 */
@@ -1317,15 +1214,20 @@ int STORAGE_INIT_ATTR ata_init(void)
             total_sectors = identify_info[100] | (identify_info[101] << 16);
             lba48 = true; /* use BigLBA */
         }
-#endif
+#endif /* HAVE_LBA48 */
+
         rc = freeze_lock();
 
-        if (rc)
-            return -50 + rc;
+        if (rc) {
+            rc = -50 + rc;
+            goto error;
+        }
 
         rc = set_features();
-        if (rc)
-            return -60 + rc;
+        if (rc) {
+            rc = -60 + rc;
+            goto error;
+        }
 
 #ifdef MAX_PHYS_SECTOR_SIZE
         /* Find out the physical sector size */
@@ -1351,43 +1253,19 @@ int STORAGE_INIT_ATTR ata_init(void)
         if (phys_sector_mult > (MAX_PHYS_SECTOR_SIZE/SECTOR_SIZE))
             panicf("Unsupported physical sector size: %d",
                    phys_sector_mult * SECTOR_SIZE);
-#endif
+#endif /* MAX_PHYS_SECTOR_SIZE */
 
-        mutex_lock(&ata_mtx); /* Balance unlock below */
-
-        last_disk_activity = current_tick;
-#ifdef ATA_DRIVER_CLOSE
-        ata_thread_id =
-#endif
-        create_thread(ata_thread, ata_stack,
-                      sizeof(ata_stack), 0, ata_thread_name
-                      IF_PRIO(, PRIORITY_USER_INTERFACE)
-                      IF_COP(, CPU));
-        initialized = true;
-
+        ata_state = ATA_ON;
+        keep_ata_active();
     }
     rc = set_multiple_mode(multisectors);
     if (rc)
         rc = -70 + rc;
 
+error:
     mutex_unlock(&ata_mtx);
     return rc;
 }
-
-#ifdef ATA_DRIVER_CLOSE
-void ata_close(void)
-{
-    unsigned int thread_id = ata_thread_id;
-    
-    if (thread_id == 0)
-        return;
-
-    ata_thread_id = 0;
-
-    queue_post(&ata_queue, Q_CLOSE, 0);
-    thread_wait(thread_id);
-}
-#endif /* ATA_DRIVER_CLOSE */
 
 #if (CONFIG_LED == LED_REAL)
 void ata_set_led_enabled(bool enabled) 
@@ -1453,9 +1331,7 @@ int ata_get_dma_mode(void)
 
 /* Needed to allow updating while waiting for DMA to complete */
 void ata_keep_active(void)
-{
-    last_disk_activity = current_tick;
-}
+    __attribute__((alias("ata_spin")));
 #endif
 
 #ifdef CONFIG_STORAGE_MULTI
@@ -1467,3 +1343,58 @@ int ata_num_drives(int first_drive)
     return 1;
 }
 #endif
+
+int ata_event(long id, intptr_t data)
+{
+    int rc = 0;
+
+    /* GCC does a lousy job culling unreachable cases in the default handler
+       if statements are in a switch statement, so we'll do it this way. Only
+       the first case is frequently hit anyway. */
+    if (LIKELY(id == Q_STORAGE_TICK)) {
+        /* won't see ATA_BOOT in here */
+        int state = ata_state;
+        if (state != ATA_ON || !ata_sleep_timed_out()) {
+            if (state == ATA_SLEEPING && ata_power_off_timed_out()) {
+                mutex_lock(&ata_mtx);
+                if (ata_state == ATA_SLEEPING) {
+                    ide_power_enable(false);
+                    ata_state = ATA_OFF;
+                }
+                mutex_unlock(&ata_mtx);
+            }
+            STG_EVENT_ASSERT_ACTIVE(STORAGE_ATA);
+        }
+    }
+    else if (id == Q_STORAGE_SLEEPNOW) {
+        ata_sleepnow();
+    }
+    else if (id == Q_STORAGE_SLEEP) {
+        schedule_ata_sleep(HZ/5);
+    }
+#ifndef USB_NONE
+    else if (id == SYS_USB_CONNECTED) {
+        if (ATA_ACTIVE_IN_USB) {
+            /* There is no need to force ATA power on */
+            STG_EVENT_ASSERT_ACTIVE(STORAGE_ATA);
+        }
+        else {
+            mutex_lock(&ata_mtx);
+            if (ata_state < ATA_ON) {
+                ata_led(true);
+                if (!(rc = ata_perform_wakeup(ata_state))) {
+                    ata_state = ATA_ON;
+                }
+                ata_led(false);
+            }
+            mutex_unlock(&ata_mtx);
+        }
+    }
+#endif /* ndef USB_NONE */
+    else {
+        rc = storage_event_default_handler(id, data, last_disk_activity,
+                                           STORAGE_ATA);
+    }
+
+    return rc;
+}
