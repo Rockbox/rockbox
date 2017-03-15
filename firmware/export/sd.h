@@ -27,7 +27,7 @@
 #include "mv.h" /* for HAVE_MULTIDRIVE or not */
 
 #ifdef HAVE_BOOTLOADER_USB_MODE
-#define SD_DRIVER_CLOSE
+#define STORAGE_CLOSE
 #endif
 
 #define SD_BLOCK_SIZE 512 /* XXX : support other sizes ? */
