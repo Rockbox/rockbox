@@ -147,9 +147,8 @@ static void cleanup(void)
 /* returns height of drawn area */
 static int reset_drawing(long proportion) /* 16.16 fixed point, goes from 0 --> 1 over time */
 {
-    int h = -1, w;
-    if(h < 0)
-        rb->lcd_getstringsize("X", &w, &h);
+    int w, h;
+    rb->lcd_getstringsize("X", &w, &h);
 
     /* clear word area */
     rb->lcd_set_foreground(BACKGROUND_COLOR);
