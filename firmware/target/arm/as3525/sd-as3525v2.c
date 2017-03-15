@@ -22,7 +22,6 @@
 
 #include "config.h" /* for HAVE_MULTIVOLUME */
 #include "fs_defines.h"
-#include "thread.h"
 #include "gcc_extensions.h"
 #include "led.h"
 #include "sdmmc.h"
@@ -36,19 +35,7 @@
 #include "pl081.h"  /* DMA controller */
 #include "dma-target.h" /* DMA request lines */
 #include "clock-target.h"
-#include "panic.h"
-#include "stdbool.h"
-#include "ata_idle_notify.h"
-#include "sd.h"
-#include "usb.h"
-
-#ifdef HAVE_HOTSWAP
-#include "disk.h"
-#endif
-
-#include "lcd.h"
-#include <stdarg.h>
-#include "sysfont.h"
+#include "storage.h"
 
 #define     INTERNAL_AS3525  0   /* embedded SD card */
 #define     SD_SLOT_AS3525   1   /* SD slot if present */
@@ -327,13 +314,15 @@ static unsigned char *uncached_buffer = AS3525_UNCACHED_ADDR(&aligned_buffer[0])
 
 static tCardInfo card_info[NUM_DRIVES];
 
+#ifdef CONFIG_STORAGE_MULTI
+static int sd_first_drive = 0;
+#else
+#define    sd_first_drive 0
+#endif
+
 /* for compatibility */
 static long last_disk_activity = -1;
-
-static long sd_stack [(DEFAULT_STACK_SIZE*2 + 0x200)/sizeof(long)];
-static const char         sd_thread_name[] = "ata/sd";
 static struct mutex       sd_mtx SHAREDBSS_ATTR;
-static struct event_queue sd_queue;
 #ifndef BOOTLOADER
 bool sd_enabled = false;
 #endif
@@ -370,6 +359,22 @@ void INT_NAND(void)
 
     MCI_CTRL |= INT_ENABLE;
 }
+
+#ifndef BOOTLOADER
+static void enable_controller(bool on)
+{
+    if (on)
+    {
+        bitset32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
+        CGU_SDSLOT |= (1<<7);               /* interface enable */
+    }
+    else
+    {
+        CGU_SDSLOT &= ~(1<<7);              /* interface enable */
+        bitclr32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
+    }
+}
+#endif /* BOOTLOADER */
 
 static inline bool card_detect_target(void)
 {
@@ -577,75 +582,6 @@ static int sd_init_card(const int drive)
     return 0;
 }
 
-static void sd_thread(void) NORETURN_ATTR;
-static void sd_thread(void)
-{
-    struct queue_event ev;
-    bool idle_notified = false;
-
-    while (1)
-    {
-        queue_wait_w_tmo(&sd_queue, &ev, HZ);
-
-        switch ( ev.id )
-        {
-#ifdef HAVE_HOTSWAP
-        case SYS_HOTSWAP_INSERTED:
-        case SYS_HOTSWAP_EXTRACTED:;
-            int success = 1;
-
-            disk_unmount(SD_SLOT_AS3525); /* release "by force" */
-
-            mutex_lock(&sd_mtx); /* lock-out card activity */
-
-            /* Force card init for new card, re-init for re-inserted one or
-             * clear if the last attempt to init failed with an error. */
-            card_info[SD_SLOT_AS3525].initialized = 0;
-
-            if (ev.id == SYS_HOTSWAP_INSERTED)
-            {
-                sd_enable(true);
-                success = sd_init_card(SD_SLOT_AS3525) == 0 ? 2 : 0;
-                sd_enable(false);
-            }
-
-            mutex_unlock(&sd_mtx);
-
-            if (success > 1)
-                success = disk_mount(SD_SLOT_AS3525); /* 0 if fail */
-
-            /*
-             * Mount succeeded, or this was an EXTRACTED event,
-             * in both cases notify the system about the changed filesystems
-             */
-            if (success)
-                queue_broadcast(SYS_FS_CHANGED, 0);
-
-            break;
-#endif /* HAVE_HOTSWAP */
-
-        case SYS_TIMEOUT:
-            if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
-            {
-                idle_notified = false;
-            }
-            else if (!idle_notified)
-            {
-                call_storage_idle_notifys(false);
-                idle_notified = true;
-            }
-            break;
-
-        case SYS_USB_CONNECTED:
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
-            /* Wait until the USB cable is extracted again */
-            usb_wait_for_disconnect(&sd_queue);
-
-            break;
-        }
-    }
-}
-
 static void init_controller(void)
 {
     int hcon_numcards = ((MCI_HCON>>1) & 0x1F) + 1;
@@ -706,6 +642,7 @@ int sd_init(void)
                | (AS3525_SDSLOT_DIV << 2)
                | 1;             /* clock source = PLLA */
 
+    mutex_init(&sd_mtx);
     semaphore_init(&transfer_completion_signal, 1, 0);
     semaphore_init(&command_completion_signal, 1, 0);
 
@@ -737,16 +674,9 @@ int sd_init(void)
     if(ret < 0)
         return ret;
 
-    /* init mutex */
-    mutex_init(&sd_mtx);
-
-    queue_init(&sd_queue, true);
-    create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,
-            sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
-
 #ifndef BOOTLOADER
     sd_enabled = true;
-    sd_enable(false);
+    enable_controller(false);
 #endif
     return 0;
 }
@@ -767,7 +697,7 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
 
     mutex_lock(&sd_mtx);
 #ifndef BOOTLOADER
-    sd_enable(true);
+    enable_controller(true);
     led(true);
 #endif
 
@@ -925,7 +855,7 @@ retry_with_reinit:
 
 exit:
 #ifndef BOOTLOADER
-    sd_enable(false);
+    enable_controller(false);
     led(false);
 #endif
     mutex_unlock(&sd_mtx);
@@ -952,16 +882,9 @@ long sd_last_disk_activity(void)
 
 void sd_enable(bool on)
 {
-    if (on)
-    {
-        bitset32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
-        CGU_SDSLOT |= (1<<7);               /* interface enable */
-    }
-    else
-    {
-        CGU_SDSLOT &= ~(1<<7);              /* interface enable */
-        bitclr32(&CGU_PERI, CGU_MCI_CLOCK_ENABLE);
-    }
+    mutex_lock(&sd_mtx);
+    enable_controller(on);
+    mutex_unlock(&sd_mtx);
 }
 #endif /* BOOTLOADER */
 
@@ -983,18 +906,13 @@ bool sd_present(IF_MD_NONVOID(int drive))
 
 static int sd1_oneshot_callback(struct timeout *tmo)
 {
-    (void)tmo;
-
     /* This is called only if the state was stable for 300ms - check state
      * and post appropriate event. */
-    if (card_detect_target())
-    {
-        queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
-    }
-    else
-        queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
-
+    queue_broadcast(card_detect_target() ? SYS_HOTSWAP_INSERTED :
+                                           SYS_HOTSWAP_EXTRACTED,
+                    sd_first_drive + SD_SLOT_AS3525);
     return 0;
+    (void)tmo;
 }
 
 void sd_gpioa_isr(void)
@@ -1012,9 +930,41 @@ void sd_gpioa_isr(void)
 #ifdef CONFIG_STORAGE_MULTI
 int sd_num_drives(int first_drive)
 {
-    /* We don't care which logical drive number(s) we have been assigned */
-    (void)first_drive;
-
+    sd_first_drive = first_drive;
     return NUM_DRIVES;
 }
 #endif /* CONFIG_STORAGE_MULTI */
+
+int sd_event(long id, intptr_t data)
+{
+    int rc = 0;
+
+    switch (id)
+    {
+#ifdef HAVE_HOTSWAP
+    case SYS_HOTSWAP_INSERTED:
+    case SYS_HOTSWAP_EXTRACTED:
+        mutex_lock(&sd_mtx); /* lock-out card activity */
+
+        /* Force card init for new card, re-init for re-inserted one or
+         * clear if the last attempt to init failed with an error. */
+        card_info[data].initialized = 0;
+
+        if (id == SYS_HOTSWAP_INSERTED)
+        {
+            enable_controller(true);
+            rc = sd_init_card(data);
+            enable_controller(false);
+        }
+
+        mutex_unlock(&sd_mtx);
+        break;
+#endif /* HAVE_HOTSWAP */
+    default:
+        rc = storage_event_default_handler(id, data, last_disk_activity,
+                                           STORAGE_SD);
+        break;
+    }
+
+    return rc;
+}
