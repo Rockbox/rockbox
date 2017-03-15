@@ -20,6 +20,9 @@
  ****************************************************************************/
 #include "storage.h"
 #include "kernel.h"
+#include "ata_idle_notify.h"
+#include "usb.h"
+#include "disk.h"
 
 #ifdef CONFIG_STORAGE_MULTI
 
@@ -31,7 +34,308 @@
 
 static unsigned int storage_drivers[NUM_DRIVES];
 static unsigned int num_drives;
+#endif /* CONFIG_STORAGE_MULTI */
+
+/* defaults: override elsewhere target-wise if they must be different */
+#if (CONFIG_STORAGE & STORAGE_ATA)
+ #ifndef ATA_THREAD_STACK_SIZE
+  #define ATA_THREAD_STACK_SIZE     (DEFAULT_STACK_SIZE*2)
+ #endif
 #endif
+#if (CONFIG_STORAGE & STORAGE_MMC)
+ #ifndef MMC_THREAD_STACK_SIZE
+  #define MMC_THREAD_STACK_SIZE     (DEFAULT_STACK_SIZE*2)
+ #endif
+#endif
+#if (CONFIG_STORAGE & STORAGE_SD)
+ #ifndef SD_THREAD_STACK_SIZE
+  #define SD_THREAD_STACK_SIZE      (DEFAULT_STACK_SIZE*2)
+ #endif
+#endif
+#if (CONFIG_STORAGE & STORAGE_NAND)
+ #ifndef NAND_THREAD_STACK_SIZE
+  #define NAND_THREAD_STACK_SIZE    (DEFAULT_STACK_SIZE*2)
+ #endif
+#endif
+#if (CONFIG_STORAGE & STORAGE_RAMDISK)
+ #ifndef RAMDISK_THREAD_STACK_SIZE
+  #define RAMDISK_THREAD_STACK_SIZE (0) /* not used on its own */
+ #endif
+#endif
+
+static struct event_queue storage_queue SHAREDBSS_ATTR;
+static unsigned int storage_thread_id = 0;
+
+static union {
+#if (CONFIG_STORAGE & STORAGE_ATA)
+    long stk_ata[ATA_THREAD_STACK_SIZE / sizeof (long)];
+#endif
+#if (CONFIG_STORAGE & STORAGE_MMC)
+    long stk_mmc[MMC_THREAD_STACK_SIZE / sizeof (long)];
+#endif
+#if (CONFIG_STORAGE & STORAGE_SD)
+    long stk_sd[SD_THREAD_STACK_SIZE / sizeof (long)];
+#endif
+#if (CONFIG_STORAGE & STORAGE_NAND)
+    long stk_nand[NAND_THREAD_STACK_SIZE / sizeof (long)];
+#endif
+#if (CONFIG_STORAGE & STORAGE_RAMDISK)
+    long stk_ramdisk[RAMDISK_THREAD_STACK_SIZE / sizeof (long)];
+#endif
+} storage_thread_stack;
+
+static const char storage_thread_name[] =
+#if (CONFIG_STORAGE & STORAGE_ATA)
+    "/ata"
+#endif
+#if (CONFIG_STORAGE & STORAGE_MMC)
+    "/mmc"
+#endif
+#if (CONFIG_STORAGE & STORAGE_SD)
+    "/sd"
+#endif
+#if (CONFIG_STORAGE & STORAGE_NAND)
+    "/nand"
+#endif
+#if (CONFIG_STORAGE & STORAGE_RAMDISK)
+    "/ramdisk"
+#endif
+    ;
+
+/* event is targeted to a specific drive */
+#define DRIVE_EVT  (1 << STORAGE_NUM_TYPES)
+
+#ifdef CONFIG_STORAGE_MULTI
+static int storage_event_send(unsigned int route, long id, intptr_t data)
+{
+    /* most events go to everyone */
+    if (UNLIKELY(route == DRIVE_EVT)) {
+        route = (storage_drivers[data] & DRIVER_MASK) >> DRIVER_OFFSET;
+        data  = (storage_drivers[data] & DRIVE_MASK) >> DRIVE_OFFSET;
+    }
+
+    int rc = 0;
+
+#if (CONFIG_STORAGE & STORAGE_ATA)
+    if (route & STORAGE_ATA) {
+        rc = ata_event(id, data);
+    }
+#endif
+#if (CONFIG_STORAGE & STORAGE_MMC)
+    if (route & STORAGE_MMC) {
+        rc = mmc_event(id, data);
+    }
+#endif
+#if (CONFIG_STORAGE & STORAGE_SD)
+    if (route & STORAGE_SD) {
+        rc = sd_event(id, data);
+    }
+#endif
+#if (CONFIG_STORAGE & STORAGE_NAND)
+    if (route & STORAGE_NAND) {
+        rc = nand_event(id, data);
+    }
+#endif
+#if (CONFIG_STORAGE & STORAGE_RAMDISK)
+    if (route & STORAGE_RAMDISK) {
+        rc = ramdisk_event(id, data);
+    }
+#endif
+
+    return rc;
+}
+#endif /* CONFIG_STORAGE_MULTI */
+
+#ifndef CONFIG_STORAGE_MULTI
+static FORCE_INLINE int storage_event_send(unsigned int route, long id,
+                                           intptr_t data)
+{
+    return route ? STORAGE_FUNCTION(event)(id, data) : 0;
+}
+#endif /* ndef CONFIG_STORAGE_MULTI */
+
+static void NORETURN_ATTR storage_thread(void)
+{
+    unsigned int bdcast = CONFIG_STORAGE;
+    bool usb_mode = false;
+    struct queue_event ev;
+
+    while (1)
+    {
+        queue_wait_w_tmo(&storage_queue, &ev, HZ/2);
+
+        switch (ev.id)
+        {
+        case SYS_TIMEOUT:;
+            /* drivers hold their bit low when they want to
+               sleep and keep it high otherwise */
+            unsigned int trig = 0;
+            storage_event_send(bdcast, Q_STORAGE_TICK, (intptr_t)&trig);
+            trig = bdcast & ~trig;
+            if (trig) {
+                if (!usb_mode) {
+                    call_storage_idle_notifys(false);
+                }
+                storage_event_send(trig, Q_STORAGE_SLEEPNOW, 0);
+            }
+            break;
+
+#if (CONFIG_STORAGE & STORAGE_ATA)
+        case Q_STORAGE_SLEEP:
+            storage_event_send(bdcast, ev.id, 0);
+            break;
+#endif
+
+#ifdef STORAGE_CLOSE
+        case Q_STORAGE_CLOSE:
+            storage_event_send(CONFIG_STORAGE, ev.id, 0);
+            thread_exit();
+#endif /* STORAGE_CLOSE */
+
+#ifdef HAVE_HOTSWAP
+        case SYS_HOTSWAP_INSERTED:
+        case SYS_HOTSWAP_EXTRACTED:
+            if (!usb_mode) {
+                int drive = IF_MD_DRV(ev.data);
+                if (!CHECK_DRV(drive)) {
+                    break;
+                }
+
+                int umnt = disk_unmount(drive);
+                int mnt = 0;
+                int rci = storage_event_send(DRIVE_EVT, ev.id, drive);
+
+                if (ev.id == SYS_HOTSWAP_INSERTED && !rci) {
+                    mnt = disk_mount(drive);
+                }
+
+                if (umnt > 0 || mnt > 0) {
+                    /* something was unmounted and/or mounted */
+                    queue_broadcast(SYS_FS_CHANGED, drive);
+                }
+            }
+            break;
+#endif /* HAVE_HOTSWAP */
+
+#ifndef USB_NONE
+        case SYS_USB_CONNECTED:
+        case SYS_USB_DISCONNECTED:
+            bdcast = 0;
+            storage_event_send(CONFIG_STORAGE, ev.id, (intptr_t)&bdcast);
+            usb_mode = ev.id == SYS_USB_CONNECTED;
+            if (usb_mode) {
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            }
+            else {
+                bdcast = CONFIG_STORAGE;
+            }
+            break;
+#endif /* ndef USB_NONE */
+        }
+    }
+}
+
+void storage_sleep(void)
+{
+#if (CONFIG_STORAGE & STORAGE_ATA)
+    if (storage_thread_id) {
+        queue_post(&storage_queue, Q_STORAGE_SLEEP, 0);
+    }
+#endif
+}
+
+#ifdef STORAGE_CLOSE
+void storage_close(void)
+{
+    if (storage_thread_id) {
+        queue_post(&storage_queue, Q_STORAGE_CLOSE, 0);
+        thread_wait(storage_thread_id);
+    }
+}
+#endif /* STORAGE_CLOSE */
+
+static inline void storage_thread_init(void)
+{
+    if (storage_thread_id) {
+        return;
+    }
+
+    queue_init(&storage_queue, true);
+    storage_thread_id = create_thread(storage_thread, &storage_thread_stack,
+                                      sizeof (storage_thread_stack),
+                                      0, &storage_thread_name[1]
+                                      IF_PRIO(, PRIORITY_USER_INTERFACE)
+                                      IF_COP(, CPU));
+}
+
+int storage_init(void)
+{
+#ifdef CONFIG_STORAGE_MULTI
+    int rc=0;
+    int i;
+    num_drives=0;
+    
+#if (CONFIG_STORAGE & STORAGE_ATA)
+    if ((rc=ata_init())) return rc;
+    
+    int ata_drives = ata_num_drives(num_drives);
+    for (i=0; i<ata_drives; i++)
+    {
+        storage_drivers[num_drives++] = 
+            (STORAGE_ATA<<DRIVER_OFFSET) | (i << DRIVE_OFFSET);
+    }
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_MMC)
+    if ((rc=mmc_init())) return rc;
+    
+    int mmc_drives = mmc_num_drives(num_drives);
+    for (i=0; i<mmc_drives ;i++)
+    {
+        storage_drivers[num_drives++] =
+            (STORAGE_MMC<<DRIVER_OFFSET) | (i << DRIVE_OFFSET);
+    }
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_SD)
+    if ((rc=sd_init())) return rc;
+    
+    int sd_drives = sd_num_drives(num_drives);
+    for (i=0; i<sd_drives; i++)
+    {
+        storage_drivers[num_drives++] =
+            (STORAGE_SD<<DRIVER_OFFSET) | (i << DRIVE_OFFSET);
+    }
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_NAND)
+    if ((rc=nand_init())) return rc;
+    
+    int nand_drives = nand_num_drives(num_drives);
+    for (i=0; i<nand_drives; i++)
+    {
+        storage_drivers[num_drives++] =
+            (STORAGE_NAND<<DRIVER_OFFSET) | (i << DRIVE_OFFSET);
+    }
+#endif
+
+#if (CONFIG_STORAGE & STORAGE_RAMDISK)
+    if ((rc=ramdisk_init())) return rc;
+    
+    int ramdisk_drives = ramdisk_num_drives(num_drives);
+    for (i=0; i<ramdisk_drives; i++)
+    {
+        storage_drivers[num_drives++] =
+            (STORAGE_RAMDISK<<DRIVER_OFFSET) | (i << DRIVE_OFFSET);
+    }
+#endif
+#else /* ndef CONFIG_STORAGE_MULTI */
+    STORAGE_FUNCTION(init)();
+#endif /* CONFIG_STORAGE_MULTI */
+
+    storage_thread_init();
+    return 0;
+}
 
 int storage_read_sectors(IF_MD(int drive,) unsigned long start, int count,
                          void* buf)
@@ -141,71 +445,6 @@ int storage_driver_type(int drive)
     return bit ? find_first_set_bit(bit) : -1;
 }
 
-int storage_init(void)
-{
-    int rc=0;
-    int i;
-    num_drives=0;
-    
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    if ((rc=ata_init())) return rc;
-    
-    int ata_drives = ata_num_drives(num_drives);
-    for (i=0; i<ata_drives; i++)
-    {
-        storage_drivers[num_drives++] = 
-            (STORAGE_ATA<<DRIVER_OFFSET) | (i << DRIVE_OFFSET);
-    }
-#endif
-
-#if (CONFIG_STORAGE & STORAGE_MMC)
-    if ((rc=mmc_init())) return rc;
-    
-    int mmc_drives = mmc_num_drives(num_drives);
-    for (i=0; i<mmc_drives ;i++)
-    {
-        storage_drivers[num_drives++] =
-            (STORAGE_MMC<<DRIVER_OFFSET) | (i << DRIVE_OFFSET);
-    }
-#endif
-
-#if (CONFIG_STORAGE & STORAGE_SD)
-    if ((rc=sd_init())) return rc;
-    
-    int sd_drives = sd_num_drives(num_drives);
-    for (i=0; i<sd_drives; i++)
-    {
-        storage_drivers[num_drives++] =
-            (STORAGE_SD<<DRIVER_OFFSET) | (i << DRIVE_OFFSET);
-    }
-#endif
-
-#if (CONFIG_STORAGE & STORAGE_NAND)
-    if ((rc=nand_init())) return rc;
-    
-    int nand_drives = nand_num_drives(num_drives);
-    for (i=0; i<nand_drives; i++)
-    {
-        storage_drivers[num_drives++] =
-            (STORAGE_NAND<<DRIVER_OFFSET) | (i << DRIVE_OFFSET);
-    }
-#endif
-
-#if (CONFIG_STORAGE & STORAGE_RAMDISK)
-    if ((rc=ramdisk_init())) return rc;
-    
-    int ramdisk_drives = ramdisk_num_drives(num_drives);
-    for (i=0; i<ramdisk_drives; i++)
-    {
-        storage_drivers[num_drives++] =
-            (STORAGE_RAMDISK<<DRIVER_OFFSET) | (i << DRIVE_OFFSET);
-    }
-#endif
-
-    return 0;
-}
-
-
 void storage_enable(bool on)
 {
 #if (CONFIG_STORAGE & STORAGE_ATA)
@@ -226,29 +465,6 @@ void storage_enable(bool on)
 
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     ramdisk_enable(on);
-#endif
-}
-
-void storage_sleep(void)
-{
-#if (CONFIG_STORAGE & STORAGE_ATA)
-    ata_sleep();
-#endif
-
-#if (CONFIG_STORAGE & STORAGE_MMC)
-    mmc_sleep();
-#endif
-
-#if (CONFIG_STORAGE & STORAGE_SD)
-    sd_sleep();
-#endif
-
-#if (CONFIG_STORAGE & STORAGE_NAND)
-    nand_sleep();
-#endif
-
-#if (CONFIG_STORAGE & STORAGE_RAMDISK)
-    ramdisk_sleep();
 #endif
 }
 
@@ -603,6 +819,5 @@ bool storage_present(int drive)
         return false;
     }
 }
-#endif
-
+#endif /* HAVE_HOTSWAP */
 #endif /*CONFIG_STORAGE_MULTI*/
