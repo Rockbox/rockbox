@@ -31,8 +31,7 @@
 #include <mmu-arm.h>
 #include <string.h>
 #include "led.h"
-#include "ata_idle_notify.h"
-
+#include "storage.h"
 
 #define NAND_CMD_READ       0x00
 #define NAND_CMD_PROGCNFRM  0x10
@@ -91,7 +90,6 @@ static int nand_powered = 0;
 static int nand_interleaved = 0;
 static int nand_cached = 0;
 static long nand_last_activity_value = -1;
-static long nand_stack[DEFAULT_STACK_SIZE];
 
 static struct mutex nand_mtx;
 static struct semaphore nand_complete;
@@ -359,20 +357,22 @@ void nand_power_up(void)
 
 void nand_power_down(void)
 {
-    if (!nand_powered) return;
     mutex_lock(&nand_mtx);
-    pmu_ldo_power_off(4);
-    PCON2 = 0x11111111;
-    PDAT2 = 0;
-    PCON3 = 0x11111111;
-    PDAT3 = 0;
-    PCON4 = 0x11111111;
-    PDAT4 = 0;
-    PCON5 = (PCON5 & ~0xF) | 1;
-    PUNK5 = 1;
-    PWRCONEXT |= 0x40;
-    PWRCON |= 0x100000;
-    nand_powered = 0;
+    if (nand_powered)
+    {
+        pmu_ldo_power_off(4);
+        PCON2 = 0x11111111;
+        PDAT2 = 0;
+        PCON3 = 0x11111111;
+        PDAT3 = 0;
+        PCON4 = 0x11111111;
+        PDAT4 = 0;
+        PCON5 = (PCON5 & ~0xF) | 1;
+        PUNK5 = 1;
+        PWRCONEXT |= 0x40;
+        PWRCON |= 0x100000;
+        nand_powered = 0;
+    }
     mutex_unlock(&nand_mtx);
 }
 
@@ -714,20 +714,6 @@ const struct nand_device_info_type* nand_get_device_type(uint32_t bank)
     return &nand_deviceinfotable[nand_type[bank]];
 }
 
-static void nand_thread(void)
-{
-    while (1)
-    {
-        if (TIME_AFTER(current_tick, nand_last_activity_value + HZ / 5)
-         && nand_powered)
-        {
-            call_storage_idle_notifys(false);
-            nand_power_down();
-        }
-        sleep(HZ / 10);
-    }
-}
-
 int nand_device_init(void)
 {
     mutex_init(&nand_mtx);
@@ -776,10 +762,30 @@ int nand_device_init(void)
     nand_cached = ((nand_deviceinfotable[nand_type[0]].id >> 23) & 1);
 
     nand_last_activity_value = current_tick;
-    create_thread(nand_thread, nand_stack,
-                  sizeof(nand_stack), 0, "nand"
-                  IF_PRIO(, PRIORITY_USER_INTERFACE)
-                  IF_COP(, CPU));
-
     return 0;
+}
+
+int nand_event(long id, intptr_t data)
+{
+    int rc = 0;
+
+    if (LIKELY(id == Q_STORAGE_TICK))
+    {
+        if (!nand_powered ||
+            TIME_BEFORE(current_tick, nand_last_activity_value + HZ / 5))
+        {
+            STG_EVENT_ASSERT_ACTIVE(STORAGE_NAND);
+        }
+    }
+    else if (id == Q_STORAGE_SLEEPNOW)
+    {
+        nand_power_down();
+    }
+    else
+    {
+        rc = storage_event_default_handler(id, data, nand_last_activity_value,
+                                           STORAGE_NAND);
+    }
+
+    return rc;
 }

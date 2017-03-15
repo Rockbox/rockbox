@@ -175,4 +175,8 @@ int ata_get_dma_mode(void);
 int ata_read_smart(struct ata_smart_values*);
 #endif
 
+#ifdef BOOTLOADER
+#define STORAGE_CLOSE
+#endif
+
 #endif /* __ATA_H__ */

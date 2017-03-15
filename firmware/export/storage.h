@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include "config.h" /* for HAVE_MULTIDRIVE or not */
 #include "mv.h"
+#include <kernel.h>
 
 #if (CONFIG_STORAGE & STORAGE_HOSTFS) || defined(SIMULATOR)
 #define HAVE_HOSTFS
@@ -46,6 +47,57 @@
 #include "ramdisk.h"
 #endif
 
+enum
+{
+    Q_STORAGE_TICK = 1,
+    Q_STORAGE_SLEEP,
+    Q_STORAGE_SLEEPNOW,
+#ifdef STORAGE_CLOSE
+    Q_STORAGE_CLOSE,
+#endif
+};
+
+#define STG_EVENT_ASSERT_ACTIVE(type) \
+    ({ intptr_t __data = (data);          \
+       *((unsigned int *)(__data)) |= (type); })
+
+static FORCE_INLINE int storage_event_default_handler(long id,
+                                                      intptr_t data,
+                                                      long last_activity,
+                                                      unsigned int type)
+{
+    /* fake sleep in order to trigger storage idle sequence */
+    static long slept_at = -1;
+
+    if (id ==  Q_STORAGE_TICK) {
+        if (last_activity == slept_at ||
+            TIME_BEFORE(current_tick, last_activity + 3*HZ)) {
+            STG_EVENT_ASSERT_ACTIVE(type);
+        }
+    }
+    else if (id == Q_STORAGE_SLEEPNOW) {
+        slept_at = last_activity;
+    }
+
+    return 0;
+}
+
+#if (CONFIG_STORAGE & STORAGE_SD)
+int sd_event(long id, intptr_t data);
+#endif
+#if (CONFIG_STORAGE & STORAGE_MMC)
+int mmc_event(long id, intptr_t data);
+#endif
+#if (CONFIG_STORAGE & STORAGE_ATA)
+int ata_event(long id, intptr_t data);
+#endif
+#if (CONFIG_STORAGE & STORAGE_NAND)
+int nand_event(long id, intptr_t data);
+#endif
+#if (CONFIG_STORAGE & STORAGE_RAMDISK)
+int ramdisk_event(long id, intptr_t data);
+#endif
+
 struct storage_info
 {
     unsigned int sector_size;
@@ -55,13 +107,24 @@ struct storage_info
     char *revision;
 };
 
+int storage_init(void) STORAGE_INIT_ATTR;
+void storage_close(void);
+
 #ifdef HAVE_HOSTFS
 #include "hostfs.h"
 /* stubs for the plugin api */
 static inline void stub_storage_sleep(void) {}
 static inline void stub_storage_spin(void) {}
 static inline void stub_storage_spindown(int timeout) { (void)timeout; }
+static inline int stub_storage_event(long id, intptr_t data)
+    { return 0; (void)id; (void)data; }
+#else /* ndef HAVE_HOSTFS */
+#if (CONFIG_STORAGE & STORAGE_ATA)
+void storage_sleep(void);
+#else
+static inline void storage_sleep(void) {}
 #endif
+#endif /* HAVE_HOSTFS */
 
 #if !defined(CONFIG_STORAGE_MULTI) || defined(HAVE_HOSTFS)
 /* storage_spindown, storage_sleep and storage_spin are passed as
@@ -70,6 +133,7 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
     #define storage_num_drives() NUM_DRIVES
     #if defined(HAVE_HOSTFS)
         #define STORAGE_FUNCTION(NAME) (stub_## NAME)
+        #define storage_event stub_storage_event
         #define storage_spindown stub_storage_spindown
         #define storage_sleep stub_storage_sleep
         #define storage_spin stub_storage_spin
@@ -97,15 +161,12 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
     #elif (CONFIG_STORAGE & STORAGE_ATA)
         #define STORAGE_FUNCTION(NAME) (ata_## NAME)
         #define storage_spindown ata_spindown
-        #define storage_sleep ata_sleep
         #define storage_spin ata_spin
 
         #define storage_enable(on) ata_enable(on)
         #define storage_sleepnow() ata_sleepnow()
         #define storage_disk_is_active() ata_disk_is_active()
         #define storage_soft_reset() ata_soft_reset()
-        #define storage_init() ata_init()
-        #define storage_close() ata_close()
         #ifdef HAVE_STORAGE_FLUSH
             #define storage_flush() (void)0
         #endif
@@ -124,15 +185,12 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
     #elif (CONFIG_STORAGE & STORAGE_SD)
         #define STORAGE_FUNCTION(NAME) (sd_## NAME)
         #define storage_spindown sd_spindown
-        #define storage_sleep sd_sleep
         #define storage_spin sd_spin
 
         #define storage_enable(on) sd_enable(on)
         #define storage_sleepnow() sd_sleepnow()
         #define storage_disk_is_active() 0
         #define storage_soft_reset() (void)0
-        #define storage_init() sd_init()
-        #define storage_close() sd_close()
         #ifdef HAVE_STORAGE_FLUSH
             #define storage_flush() (void)0
         #endif
@@ -151,14 +209,12 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
      #elif (CONFIG_STORAGE & STORAGE_MMC)
         #define STORAGE_FUNCTION(NAME) (mmc_## NAME)
         #define storage_spindown mmc_spindown
-        #define storage_sleep mmc_sleep
         #define storage_spin mmc_spin
 
         #define storage_enable(on) mmc_enable(on)
         #define storage_sleepnow() mmc_sleepnow()
         #define storage_disk_is_active() mmc_disk_is_active()
         #define storage_soft_reset() (void)0
-        #define storage_init() mmc_init()
         #ifdef HAVE_STORAGE_FLUSH
             #define storage_flush() (void)0
         #endif
@@ -177,14 +233,12 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
     #elif (CONFIG_STORAGE & STORAGE_NAND)
         #define STORAGE_FUNCTION(NAME) (nand_## NAME)
         #define storage_spindown nand_spindown
-        #define storage_sleep nand_sleep
         #define storage_spin nand_spin
 
         #define storage_enable(on) (void)0
         #define storage_sleepnow() nand_sleepnow()
         #define storage_disk_is_active() 0
         #define storage_soft_reset() (void)0
-        #define storage_init() nand_init()
         #ifdef HAVE_STORAGE_FLUSH
             #define storage_flush() nand_flush()
         #endif
@@ -203,14 +257,12 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
     #elif (CONFIG_STORAGE & STORAGE_RAMDISK)
         #define STORAGE_FUNCTION(NAME) (ramdisk_## NAME)
         #define storage_spindown ramdisk_spindown
-        #define storage_sleep ramdisk_sleep
         #define storage_spin ramdisk_spin
 
         #define storage_enable(on) (void)0
         #define storage_sleepnow() ramdisk_sleepnow()
         #define storage_disk_is_active() 0
         #define storage_soft_reset() (void)0
-        #define storage_init() ramdisk_init()
         #ifdef HAVE_STORAGE_FLUSH
             #define storage_flush() (void)0
         #endif
@@ -234,11 +286,9 @@ static inline void stub_storage_spindown(int timeout) { (void)timeout; }
 /* Multi-driver use normal functions */
 
 void storage_enable(bool on);
-void storage_sleep(void);
 void storage_sleepnow(void);
 bool storage_disk_is_active(void);
 int storage_soft_reset(void);
-int storage_init(void) STORAGE_INIT_ATTR;
 int storage_flush(void);
 void storage_spin(void);
 void storage_spindown(int seconds);

@@ -22,32 +22,23 @@
 #include "config.h"
 #include "gcc_extensions.h"
 #include "jz4740.h"
-#include "ata.h"
-#include "ata_idle_notify.h"
 #include "ata-sd-target.h"
-#include "disk.h"
 #include "led.h"
 #include "sdmmc.h"
 #include "logf.h"
-#include "sd.h"
-#include "system.h"
-#include "kernel.h"
 #include "storage.h"
 #include "string.h"
-#include "usb.h"
 
 static long               last_disk_activity = -1;
 #if defined(CONFIG_STORAGE_MULTI) || defined(HAVE_HOTSWAP)
 static int                sd_drive_nr = 0;
+#else
+#define                   sd_drive_nr 0
 #endif
 static tCardInfo          card;
 
-static long               sd_stack[(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
-static const char         sd_thread_name[] = "ata/sd";
-static struct event_queue sd_queue;
 static struct mutex       sd_mtx;
 static struct semaphore   sd_wakeup;
-static void               sd_thread(void) NORETURN_ATTR;
 
 static int                use_4bit;
 static int                num_6;
@@ -1229,11 +1220,6 @@ int sd_init(void)
     {
         semaphore_init(&sd_wakeup, 1, 0);
         mutex_init(&sd_mtx);
-        queue_init(&sd_queue, true);
-        create_thread(sd_thread, sd_stack, sizeof(sd_stack), 0,
-                      sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE)
-                      IF_COP(, CPU));
-
         inited = true;
     }
 
@@ -1265,7 +1251,7 @@ static inline void sd_stop_transfer(void)
     mutex_unlock(&sd_mtx);
 }
 
-int sd_read_sectors(IF_MV(int drive,) unsigned long start, int count, void* buf)
+int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf)
 {
 #ifdef HAVE_MULTIVOLUME
     (void)drive;
@@ -1404,7 +1390,7 @@ int sd_soft_reset(void)
 }
 
 #ifdef HAVE_HOTSWAP
-bool sd_removable(IF_MV_NONVOID(int drive))
+bool sd_removable(IF_MD_NONVOID(int drive))
 {
 #ifdef HAVE_MULTIVOLUME
     (void)drive;
@@ -1414,19 +1400,16 @@ bool sd_removable(IF_MV_NONVOID(int drive))
 
 static int sd_oneshot_callback(struct timeout *tmo)
 {
-    (void)tmo;
     int state = card_detect_target();
 
     /* This is called only if the state was stable for 300ms - check state
      * and post appropriate event. */
-    if (state)
-        queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
-    else
-        queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
+    queue_broadcast(state ? SYS_HOTSWAP_INSERTED : SYS_HOTSWAP_EXTRACTED,
+                    sd_drive_nr);
 
     sd_gpio_setup_irq(state);
-
     return 0;
+    (void)tmo;
 }
 
 /* called on insertion/removal interrupt */
@@ -1453,58 +1436,27 @@ int sd_num_drives(int first_drive)
 }
 #endif
 
-static void sd_thread(void)
+int sd_event(long id, intptr_t data)
 {
-    struct queue_event ev;
-    bool idle_notified = false;
+    int rc = 0;
 
-    while (1)
+    switch (id)
     {
-        queue_wait_w_tmo(&sd_queue, &ev, HZ);
-
-        switch (ev.id)
-        {
 #ifdef HAVE_HOTSWAP
-        case SYS_HOTSWAP_INSERTED:
-        case SYS_HOTSWAP_EXTRACTED:;
-            int success = 1;
-
-            disk_unmount(sd_drive_nr); /* release "by force" */
-
-            mutex_lock(&sd_mtx); /* lock-out card activity */
-
-            /* Force card init for new card, re-init for re-inserted one or
-             * clear if the last attempt to init failed with an error. */
-            card.initialized = 0;
-
-            mutex_unlock(&sd_mtx);
-
-            if(ev.id == SYS_HOTSWAP_INSERTED)
-                success = disk_mount(sd_drive_nr); /* 0 if fail */
-
-            if(success)
-                queue_broadcast(SYS_FS_CHANGED, 0);
-
-            break;
+    case SYS_HOTSWAP_INSERTED:
+    case SYS_HOTSWAP_EXTRACTED:
+        mutex_lock(&sd_mtx); /* lock-out card activity */
+        /* Force card init for new card, re-init for re-inserted one or
+         * clear if the last attempt to init failed with an error. */
+        card.initialized = 0;
+        mutex_unlock(&sd_mtx);
+        break;
 #endif /* HAVE_HOTSWAP */
-
-        case SYS_TIMEOUT:
-            if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
-                idle_notified = false;
-            else
-            {
-                if (!idle_notified)
-                {
-                    call_storage_idle_notifys(false);
-                    idle_notified = true;
-                }
-            }
-            break;
-        case SYS_USB_CONNECTED:
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
-            /* Wait until the USB cable is extracted again */
-            usb_wait_for_disconnect(&sd_queue);
-            break;
-        }
+    default:
+        rc = storage_event_default_handler(id, data, last_disk_activity,
+                                           STORAGE_SD);
+        break;
     }
+
+    return rc;
 }

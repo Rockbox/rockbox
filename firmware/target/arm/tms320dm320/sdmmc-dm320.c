@@ -19,13 +19,10 @@
  *
  ****************************************************************************/
  
-#include "sd.h"
 #include "system.h"
 #include <string.h>
 #include "gcc_extensions.h"
-#include "thread.h"
 #include "panic.h"
-#include "kernel.h"
 #include "dma-target.h"
 #include "ata_idle_notify.h"
 
@@ -42,8 +39,8 @@
 #endif
 #endif
 #include "sdmmc.h"
-#include "disk.h"
 #include "system-target.h"
+#include "storage.h"
 
 /* The configuration method is not very flexible. */
 #define CARD_NUM_SLOT   1
@@ -105,7 +102,6 @@ struct sd_card_status
 static long last_disk_activity = -1;
 
 static bool initialized = false;
-static unsigned int sd_thread_id = 0;
 
 static bool sd_enabled = false;
 static long next_yield = 0;
@@ -122,10 +118,7 @@ static struct sd_card_status sd_status[NUM_CARDS] =
 };
 
 /* Shoot for around 75% usage */
-static long             sd_stack [(DEFAULT_STACK_SIZE*2 + 0x1c0)/sizeof(long)];
-static const char               sd_thread_name[] = "sd";
 static struct mutex             sd_mtx SHAREDBSS_ATTR;
-static struct event_queue       sd_queue;
 static volatile unsigned int    transfer_error[NUM_DRIVES];
 /* align on cache line size */
 static unsigned char    aligned_buffer[UNALIGNED_NUM_SECTORS * SD_BLOCK_SIZE] 
@@ -154,20 +147,16 @@ static void sd_card_mux(int card_no)
 #endif
 }
 
+static inline void enable_controller(bool on)
+{
+    sd_enabled = on;
+}
 
 void sd_enable(bool on)
 {
-    if (sd_enabled == on)
-        return; /* nothing to do */
-
-    if (on)
-    {
-        sd_enabled = true;
-    }
-    else
-    {
-        sd_enabled = false;
-    }
+    mutex_lock(&sd_mtx);
+    enable_controller(on);
+    mutex_unlock(&sd_mtx);
 }
 
 /* sets clock rate just like OF does */
@@ -514,17 +503,13 @@ static inline bool card_detect_target(void)
 
 static int sd1_oneshot_callback(struct timeout *tmo)
 {
-    (void)tmo;
-
     /* This is called only if the state was stable for 300ms - check state
      * and post appropriate event. */
-    if (card_detect_target())
-    {
-        queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
-    }
-    else
-        queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
+    queue_broadcast(card_detect_target() ? SYS_HOTSWAP_INSERTED :
+                                           SYS_HOTSWAP_EXTRACTED,
+                    CARD_NUM_SLOT);
     return 0;
+    (void)tmo;
 }
 
 #ifdef SANSA_CONNECT
@@ -577,57 +562,6 @@ bool sd_removable(IF_MD_NONVOID(int card_no))
 
 #endif /* HAVE_HOTSWAP */
 
-static void sd_thread(void) NORETURN_ATTR;
-static void sd_thread(void)
-{
-    struct queue_event ev;
-    bool idle_notified = false;
-
-    while (1)
-    {
-        queue_wait_w_tmo(&sd_queue, &ev, HZ);
-        switch ( ev.id )
-        {
-#ifdef HAVE_HOTSWAP
-        case SYS_HOTSWAP_INSERTED:
-        case SYS_HOTSWAP_EXTRACTED:;
-            int success = 1;
-
-            disk_unmount(0);     /* release "by force" */
-
-            mutex_lock(&sd_mtx); /* lock-out card activity */
-
-            /* Force card init for new card, re-init for re-inserted one or
-             * clear if the last attempt to init failed with an error. */
-            card_info[0].initialized = 0;
-
-            mutex_unlock(&sd_mtx);
-
-            if (ev.id == SYS_HOTSWAP_INSERTED)
-                success = disk_mount(0); /* 0 if fail */
-
-            /* notify the system about the changed filesystems */
-            if (success)
-                queue_broadcast(SYS_FS_CHANGED, 0);
-
-            break;
-#endif /* HAVE_HOTSWAP */
-
-        case SYS_TIMEOUT:
-            if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
-            {
-                idle_notified = false;
-            }
-            else if (!idle_notified)
-            {
-                call_storage_idle_notifys(false);
-                idle_notified = true;
-            }
-            break;
-        }        
-    }
-}
-
 static int sd_wait_for_state(unsigned int state)
 {
     unsigned long response = 0;
@@ -671,7 +605,7 @@ static int sd_transfer_sectors(int card_no, unsigned long start,
 
     dbgprintf("transfer %d %d %d", card_no, start, count);
     mutex_lock(&sd_mtx);
-    sd_enable(true);
+    enable_controller(true);
 
 sd_transfer_retry:
     if (card_no == CARD_NUM_SLOT && !card_detect_target())
@@ -812,7 +746,7 @@ sd_transfer_retry:
 
     while (1)
     {
-        sd_enable(false);
+        enable_controller(false);
         mutex_unlock(&sd_mtx);
 
         return ret;
@@ -860,14 +794,17 @@ int sd_init(void)
 {
     int ret = EC_OK;
 
-#ifndef BOOTLOADER
-    sd_enabled = true;
-    sd_enable(false);
-#endif
-    mutex_init(&sd_mtx);
+    if (!initialized)
+    {
+        mutex_init(&sd_mtx);
+        initialized = true;
+    }
 
     mutex_lock(&sd_mtx);
-    initialized = true;
+
+#ifndef BOOTLOADER
+    enable_controller(false);
+#endif
 
     /* based on linux/drivers/mmc/dm320mmc.c
        Copyright (C) 2006 ZSI, All Rights Reserved.
@@ -919,12 +856,6 @@ int sd_init(void)
 
     /* Disable Memory Card CLK - it is enabled on demand by TMS320DM320 */
     bitclr16(&IO_MMC_MEM_CLK_CONTROL, (1 << 8));
-
-    queue_init(&sd_queue, true);
-    sd_thread_id = create_thread(sd_thread, sd_stack, sizeof(sd_stack),
-        0, sd_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE)
-        IF_COP(, CPU));
-
     mutex_unlock(&sd_mtx);
 
     return ret;
@@ -940,7 +871,27 @@ tCardInfo *card_get_info_target(int card_no)
     return &card_info[card_no];
 }
 
-void sd_sleepnow(void)
+int sd_event(long id, intptr_t data)
 {
-}
+    int rc = 0;
 
+    switch (id)
+    {
+#ifdef HAVE_HOTSWAP
+    case SYS_HOTSWAP_INSERTED:
+    case SYS_HOTSWAP_EXTRACTED:
+        mutex_lock(&sd_mtx); /* lock-out card activity */
+        /* Force card init for new card, re-init for re-inserted one or
+         * clear if the last attempt to init failed with an error. */
+        card_info[data].initialized = 0;
+        mutex_unlock(&sd_mtx);
+        break;
+#endif /* HAVE_HOTSWAP */
+    default:
+        rc = storage_event_default_handler(id, data, last_disk_activity,
+                                           STORAGE_SD);
+        break;
+    }
+
+    return rc;
+}

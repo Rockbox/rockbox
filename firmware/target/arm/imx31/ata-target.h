@@ -23,10 +23,6 @@
 
 #include "config.h"
 
-#ifdef BOOTLOADER
-#define ATA_DRIVER_CLOSE
-#endif
-
 /* Plain C read & write loops */
 /* They likely won't be used anyway since DMA potentially works for any
  * sector number and alignment. */
