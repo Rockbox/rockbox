@@ -48,7 +48,7 @@ static void *pl_malloc(size_t size)
     }
     else
     {
-        bufptr += size;
+        bufptr = (char*)(bufptr) + size;
         bufleft -= size;
         return ptr;
     }
