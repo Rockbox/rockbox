@@ -23,10 +23,6 @@
 
 #include "config.h"
 
-#ifdef BOOTLOADER
-#define ATA_DRIVER_CLOSE
-#endif
-
 #ifdef HAVE_ATA_DMA
 /* FIXME does this chips does MWDMA ? */
 #define ATA_MAX_MWDMA   2

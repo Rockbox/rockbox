@@ -19,8 +19,6 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "thread.h"
-#include "disk.h"
 #include "storage.h"
 #include "timer.h"
 #include "kernel.h"
@@ -31,8 +29,6 @@
 #include "mmcdefs-target.h"
 #include "s5l8702.h"
 #include "led.h"
-#include "ata_idle_notify.h"
-#include "disk_cache.h"
 
 
 #ifndef ATA_RETRIES
@@ -58,7 +54,6 @@ static struct semaphore ata_wakeup;
 static uint32_t ata_dma_flags;
 static long ata_last_activity_value = -1;
 static long ata_sleep_timeout = 20 * HZ;
-static uint32_t ata_stack[(DEFAULT_STACK_SIZE + 0x400) / 4];
 static bool ata_powered;
 static const int ata_retries = ATA_RETRIES;
 static const bool ata_error_srst = true;
@@ -889,21 +884,6 @@ static int ata_rw_sectors(uint64_t sector, uint32_t count, void* buffer, bool wr
     return 0;
 }
 
-static void ata_thread(void)
-{
-    while (true)
-    {
-        mutex_lock(&ata_mutex);
-        if (TIME_AFTER(current_tick, ata_last_activity_value + ata_sleep_timeout) && ata_powered)
-        {
-            call_storage_idle_notifys(false);
-            ata_power_down();
-        }
-        mutex_unlock(&ata_mutex);
-        sleep(HZ / 2);
-    }
-}
-
 /* API Functions */
 int ata_soft_reset(void)
 {
@@ -982,21 +962,11 @@ void ata_spindown(int seconds)
     ata_sleep_timeout = seconds * HZ;
 }
 
-void ata_sleep(void)
-{
-    ata_last_activity_value = current_tick - ata_sleep_timeout + HZ / 5;
-}
-
 void ata_sleepnow(void)
 {
     mutex_lock(&ata_mutex);
     ata_power_down();
     mutex_unlock(&ata_mutex);
-}
-
-void ata_close(void)
-{
-    ata_sleepnow();
 }
 
 void ata_spin(void)
@@ -1034,10 +1004,6 @@ int ata_init(void)
     mutex_unlock(&ata_mutex);
     if (IS_ERR(rc)) return rc;
 
-    create_thread(ata_thread, ata_stack,
-                    sizeof(ata_stack), 0, "ATA idle monitor"
-                    IF_PRIO(, PRIORITY_USER_INTERFACE)
-                    IF_COP(, CPU));
     return 0;
 }
 
@@ -1129,3 +1095,38 @@ void INT_MMC(void)
     SDCI_IRQ = irq;
 }
 
+int ata_event(long id, intptr_t data)
+{
+    int rc = 0;
+
+    /* GCC does a lousy job culling unreachable cases in the default handler
+       if statements are in a switch statement, so we'll do it this way. Only
+       the first case is frequently hit anyway. */
+    if (LIKELY(id == Q_STORAGE_TICK))
+    {
+        if (!ata_powered ||
+            TIME_BEFORE(current_tick, ata_last_activity_value + ata_sleep_timeout))
+        {
+            STG_EVENT_ASSERT_ACTIVE(STORAGE_ATA);
+        }
+    }
+    else if (id == Q_STORAGE_SLEEPNOW)
+    {
+        ata_sleepnow();
+    }
+    else if (id == Q_STORAGE_SLEEP)
+    {
+        ata_last_activity_value = current_tick - ata_sleep_timeout + HZ / 5;
+    }
+    else if (id == SYS_USB_CONNECTED)
+    {
+        STG_EVENT_ASSERT_ACTIVE(STORAGE_ATA);
+    }
+    else
+    {
+        rc = storage_event_default_handler(id, data, ata_last_activity_value,
+                                           STORAGE_ATA);
+    }
+
+    return rc;
+}

@@ -217,9 +217,6 @@ static struct sdmmc_status_t sdmmc_status[SDMMC_NUM_DRIVES];
 #define SDMMC_STATUS(drive) sdmmc_status[drive]
 
 /* sd only */
-static long sdmmc_stack[(DEFAULT_STACK_SIZE*2 + 0x200)/sizeof(long)];
-static const char sdmmc_thread_name[] = "sdmmc";
-static struct event_queue sdmmc_queue;
 #if CONFIG_STORAGE & STORAGE_SD
 static int sd_first_drive;
 static unsigned _sd_num_drives;
@@ -260,10 +257,38 @@ static void sdmmc_detect_callback(int ssp)
 {
     /* This is called only if the state was stable for 300ms - check state
      * and post appropriate event. */
-    if(imx233_ssp_sdmmc_detect(ssp))
-        queue_broadcast(SYS_HOTSWAP_INSERTED, 0);
-    else
-        queue_broadcast(SYS_HOTSWAP_EXTRACTED, 0);
+    long evid = imx233_ssp_sdmmc_detect(ssp) ?
+                    SYS_HOTSWAP_INSERTED : SYS_HOTSWAP_EXTRACTED;
+
+    /* Have to reverse lookup the ssp */
+    for (unsigned drive = 0; drive < SDMMC_NUM_DRIVES; drive++)
+    {
+        if (SDMMC_SSP(drive) != ssp)
+            continue;
+
+        int first_drive, *map;
+        switch (SDMMC_MODE(drive))
+        {
+#if (CONFIG_STORAGE & STORAGE_MMC)
+        case MMC_MODE:
+            first_drive = mmc_first_drive;
+            map = mmc_map;
+            break;
+#endif
+#if (CONFIG_STORAGE & STORAGE_SD)
+        case SD_MODE:
+            first_drive = sd_first_drive;
+            map = sd_map;
+            break;
+#endif
+        default:
+            continue;
+        }
+
+        /* message requires logical drive number as data */
+        queue_broadcast(evid, first_drive + map[drive]);
+    }
+
     imx233_ssp_sdmmc_setup_detect(ssp, true, sdmmc_detect_callback, false,
         imx233_ssp_sdmmc_is_detect_inverted(ssp));
 }
@@ -483,7 +508,48 @@ static int init_sd_card(int drive)
 
     return 0;
 }
-#endif
+
+int sd_event(long id, intptr_t data)
+{
+    int rc = 0;
+
+    switch (id)
+    {
+#ifdef HAVE_HOTSWAP
+    case SYS_HOTSWAP_INSERTED:
+    case SYS_HOTSWAP_EXTRACTED:;
+        const int drive = sd_map[data];
+
+        /* Skip non-removable drivers */
+        if(!sdmmc_removable(drive))
+        {
+            rc = -1;
+            break;
+        }
+
+        mutex_lock(&mutex[drive]); /* lock-out card activity */
+
+        /* Force card init for new card, re-init for re-inserted one or
+         * clear if the last attempt to init failed with an error. */
+        SDMMC_INFO(drive).initialized = 0;
+
+        if(id == SYS_HOTSWAP_INSERTED)
+            rc = init_drive(drive);
+
+        /* unlock card */
+        mutex_unlock(&mutex[drive]);
+        /* Access is now safe */
+        break;
+#endif /* HAVE_HOTSWAP */
+    default:
+        rc = storage_event_default_handler(id, data, sd_last_disk_activity(),
+                                           STORAGE_SD);
+        break;
+    }
+
+    return rc;
+}
+#endif /* CONFIG_STORAGE & STORAGE_SD */
 
 #if CONFIG_STORAGE & STORAGE_MMC
 static int init_mmc_drive(int drive)
@@ -573,7 +639,13 @@ static int init_mmc_drive(int drive)
 
     return 0;
 }
-#endif
+
+int mmc_event(long id, intptr_t data)
+{
+    return storage_event_default_handler(id, data, mmc_last_disk_activity(),
+                                         STORAGE_MMC);
+}
+#endif /* CONFIG_STORAGE & STORAGE_MMC */
 
 /* low-level function, don't call directly! */
 static int __xfer_sectors(int drive, unsigned long start, int count, void *buf, bool read)
@@ -770,98 +842,6 @@ static int init_drive(int drive)
     return 0;
 }
 
-static void sdmmc_thread(void) NORETURN_ATTR;
-static void sdmmc_thread(void)
-{
-    struct queue_event ev;
-    bool idle_notified = false;
-    int timeout = 0;
-
-    while (1)
-    {
-        queue_wait_w_tmo(&sdmmc_queue, &ev, HZ);
-
-        switch(ev.id)
-        {
-#if CONFIG_STORAGE & STORAGE_SD
-        case SYS_HOTSWAP_INSERTED:
-        case SYS_HOTSWAP_EXTRACTED:
-        {
-            int microsd_init = ev.id == SYS_HOTSWAP_INSERTED ? 0 : 1;
-
-            /* We now have exclusive control of fat cache and sd.
-             * Release "by force", ensure file
-             * descriptors aren't leaked and any busy
-             * ones are invalid if mounting. */
-            for(unsigned sd_drive = 0; sd_drive < _sd_num_drives; sd_drive++)
-            {
-                int drive = sd_map[sd_drive];
-                /* Skip non-removable drivers */
-                if(!sdmmc_removable(drive))
-                    continue;
-
-                disk_unmount(sd_first_drive + sd_drive);
-
-                mutex_lock(&mutex[drive]); /* lock-out card activity */
-
-                /* Force card init for new card, re-init for re-inserted one or
-                 * clear if the last attempt to init failed with an error. */
-                SDMMC_INFO(sd_map[sd_drive]).initialized = 0;
-
-                int rc = -1;
-                if(ev.id == SYS_HOTSWAP_INSERTED)
-                {
-                    rc = init_drive(drive);
-                    if(rc < 0) /* initialisation failed */
-                        panicf("%s init failed : %d", SDMMC_CONF(sd_map[sd_drive]).name, rc);
-                }
-
-                /* unlock card */
-                mutex_unlock(&mutex[drive]);
-
-                if (rc >= 0)
-                    microsd_init += disk_mount(sd_first_drive + sd_drive); /* 0 if fail */
-            }
-            /* Access is now safe */
-           /*
-            * One or more mounts succeeded, or this was an EXTRACTED event,
-            * in both cases notify the system about the changed filesystems
-            */
-            if(microsd_init)
-                queue_broadcast(SYS_FS_CHANGED, 0);
-
-            break;
-        }
-#endif
-        case SYS_TIMEOUT:
-#if CONFIG_STORAGE & STORAGE_SD
-            timeout = MAX(timeout, sd_last_disk_activity()+(3*HZ));
-#endif
-#if CONFIG_STORAGE & STORAGE_MMC
-            timeout = MAX(timeout, mmc_last_disk_activity()+(3*HZ));
-#endif
-            if(TIME_BEFORE(current_tick, timeout))
-            {
-                idle_notified = false;
-            }
-            else
-            {
-                if(!idle_notified)
-                {
-                    call_storage_idle_notifys(false);
-                    idle_notified = true;
-                }
-            }
-            break;
-        case SYS_USB_CONNECTED:
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
-            /* Wait until the USB cable is extracted again */
-            usb_wait_for_disconnect(&sdmmc_queue);
-            break;
-        }
-    }
-}
-
 static int sdmmc_init(void)
 {
     static int is_initialized = false;
@@ -870,10 +850,6 @@ static int sdmmc_init(void)
     is_initialized = true;
     for(unsigned drive = 0; drive < SDMMC_NUM_DRIVES; drive++)
         mutex_init(&mutex[drive]);
-
-    queue_init(&sdmmc_queue, true);
-    create_thread(sdmmc_thread, sdmmc_stack, sizeof(sdmmc_stack), 0,
-            sdmmc_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
 
     for(unsigned drive = 0; drive < SDMMC_NUM_DRIVES; drive++)
     {
@@ -1022,10 +998,6 @@ long mmc_last_disk_activity(void)
 void mmc_enable(bool on)
 {
     (void) on;
-}
-
-void mmc_sleep(void)
-{
 }
 
 void mmc_sleepnow(void)
