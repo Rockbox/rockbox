@@ -180,7 +180,6 @@ snake.c
 snake2.c
 solitaire.c
 sokoban.c
-speedread.c
 star.c
 starfield.c
 vu_meter.c
@@ -216,6 +215,7 @@ nim.c
 #if LCD_DEPTH > 1                  /* non-mono bitmap targets */
 
 matrix.c
+speedread.c
 
 #if (LCD_WIDTH > 138)
 invadrox.c
