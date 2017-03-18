@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df20872f_b90c9f3b",
+        "filename": "apps/plugins/sdl/sdl.make",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2017-03-18T02:14:08Z",
+      "side": 1,
+      "message": "You also need \"OTHER_INC +\u003d -I$(SDLSRCDIR)/include\". Otherwise make dep will create dependencies which expect to find the SDL headers in the build directory.",
+      "revId": "48880193c089f7553b8d917ce33acf65505eed31",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df20872f_99075b19",
+        "filename": "apps/plugins/sdl/sdl.make",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1000058
+      },
+      "writtenOn": "2017-03-18T02:14:08Z",
+      "side": 1,
+      "message": "redefines.txt is not included in patch set 4 or earlier sets.",
+      "revId": "48880193c089f7553b8d917ce33acf65505eed31",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
