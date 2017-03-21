@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f1a8f01_b70ca83b",
+        "filename": "firmware/common/dircache.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1888,
+      "author": {
+        "id": 1000041
+      },
+      "writtenOn": "2017-03-21T06:28:09Z",
+      "side": 1,
+      "message": "The issue here is that while it won\u0027t set last_size to 0, thus avoiding a sync build, dircache.size can be very small because of the interruption (the code checks whether the cache grew at all or whether it shrank by more than the reserve amount) and the next build will stop with a very incomplete cache which won\u0027t be made correct until another reboot or forced rebuild (which you\u0027ll have to wait for anyway).\n\nI was thinking about never shrinking or zeroing if the build thread was interrupted since then it can\u0027t determine accurately whether the final size is really smaller. Clearly just relying on wherever dircache.size ended up as isn\u0027t so good unless the scan finished normally. Growing it is okay if it got bigger before it was interrupted.",
+      "revId": "2d3247d4fc20bd6bf17a24e12121953aaa1135e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
