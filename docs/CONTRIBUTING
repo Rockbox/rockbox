@@ -49,7 +49,7 @@ Braces for function declarations are put in a new line under the name, as in:
 
   int foo(char *name)
   {
-     return FOO_NAME:
+      return FOO_NAME:
   }
 
 Always indent your code with four spaces. Don't use TAB characters, as that
@@ -66,7 +66,7 @@ Use UTF-8 character set, but try to refrain from using any non-ascii
 letters as they will only appear weird in some camps no matter what.
 
 Contributing code
--------
+-----------------
 We have a public code review system based on git, which is also how you can
 check out the latest version of the Rockbox sources.
 See http://www.rockbox.org/wiki/UsingGit for details on how to setup your
