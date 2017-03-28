@@ -1,31 +1,35 @@
-/***************************************************************************
- *             __________               __   ___.
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
- *                     \/            \/     \/    \/            \/
- * $Id$
- *
- * Copyright (C) 2016 Amaury Pouly
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
- * KIND, either express or implied.
- *
- ****************************************************************************/
-#ifndef __md5_h__
-#define __md5_h__
+/*********************************************************************
+* Filename:   md5.h
+* Author:     Brad Conte (brad AT bradconte.com)
+* Copyright:
+* Disclaimer: This code is presented "as is" without any guarantees.
+* Details:    Defines the API for the corresponding MD5 implementation.
+*********************************************************************/
 
+#ifndef MD5_H
+#define MD5_H
+
+/*************************** HEADER FILES ***************************/
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/****************************** MACROS ******************************/
+#define MD5_BLOCK_SIZE 16               // MD5 outputs a 16 byte digest
+
+/**************************** DATA TYPES ****************************/
+typedef unsigned char BYTE;             // 8-bit byte
+typedef unsigned int  WORD;             // 32-bit word, change to "long" for 16-bit machines
+
+typedef struct {
+   BYTE data[64];
+   WORD datalen;
+   unsigned long long bitlen;
+   WORD state[4];
+} MD5_CTX;
+
+/*********************** FUNCTION DECLARATIONS **********************/
+void md5_init(MD5_CTX *ctx);
+void md5_update(MD5_CTX *ctx, const BYTE data[], size_t len);
+void md5_final(MD5_CTX *ctx, BYTE hash[]);
 
 /* Compute the MD5 digest of a buffer */
 void MD5_CalculateDigest(void *digest, const void *input, size_t length);
@@ -34,4 +38,4 @@ void MD5_CalculateDigest(void *digest, const void *input, size_t length);
 }
 #endif
 
-#endif /* __md5_h__ */
+#endif   // MD5_H
