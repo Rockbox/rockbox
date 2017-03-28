@@ -465,6 +465,11 @@ int main(int argc, char **argv)
         printf("You cannot specify both create and extract\n");
         return 1;
     }
+    if(extract && !g_out_prefix)
+    {
+        printf("You need to  specify output prefix (-o) to extract\n");
+        return 1;
+    }
 
     int ret = 0;
     if(create)
