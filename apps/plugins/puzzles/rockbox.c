@@ -24,11 +24,11 @@
 #include "plugin.h"
 
 #include "help.h"
-#include "keymaps.h"
 #include "lz4tiny.h"
 
 #include "src/puzzles.h"
 
+#include "lib/keymaps.h"
 #include "lib/playback_control.h"
 #include "lib/simple_viewer.h"
 #include "lib/xlcd.h"

@@ -33,11 +33,11 @@
 #include "lib/pluginlib_actions.h"
 #include "lib/pluginlib_bmp.h"
 #include "lib/pluginlib_exit.h"
+#include "lib/keymaps.h"
 
 #include "sys.h"
 #include "parts.h"
 #include "engine.h"
-#include "keymaps.h"
 
 static struct System* save_sys;
 
