@@ -24,8 +24,8 @@
 #include "plugin.h"
 
 #include "puzzles.h"
-#include "keymaps.h"
 
+#include "lib/keymaps.h"
 #ifndef COMBINED
 #include "lib/playback_control.h"
 #endif
