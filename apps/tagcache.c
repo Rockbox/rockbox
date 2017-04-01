@@ -209,10 +209,10 @@ static struct master_header current_tcmh;
 
 #ifdef HAVE_TC_RAMCACHE
 
-#define TC_ALIGN_PTR(p, gap_out_p) \
+#define TC_ALIGN_PTR(p, type, gap_out_p) \
     ({ typeof (p) __p = (p);                                  \
-       typeof (p) __palgn = ALIGN_UP(__p, sizeof (intptr_t)); \
-       *(gap_out_p) = __palgn - __p;                          \
+       typeof (p) __palgn = ALIGN_UP(__p, __alignof__(type)); \
+       *(gap_out_p) = (char *)__palgn - (char *)__p;          \
        __palgn; })
 
 #define IF_TCRCDC(...) IF_DIRCACHE(__VA_ARGS__)
@@ -3872,14 +3872,15 @@ static struct buflib_callbacks ops = {
 
 static bool allocate_tagcache(void)
 {
+    tc_stat.ramcache_allocated = 0;
+    tcramcache.handle = 0;
+    tcramcache.hdr = NULL;
+
     /* Load the header. */
     struct master_header tcmh;
     int fd = open_master_fd(&tcmh, false);
     if (fd < 0)
-    {
-        tcramcache.hdr = NULL;
         return false;
-    }
     
     close(fd);
     
@@ -3887,8 +3888,6 @@ static bool allocate_tagcache(void)
      * Now calculate the required cache size plus 
      * some extra space for alignment fixes. 
      */
-    tc_stat.ramcache_allocated = 0;
-
     size_t alloc_size = tcmh.tch.datasize + 256 + TAGCACHE_RESERVE +
         sizeof(struct ramcache_header) + TAG_COUNT*sizeof(void *);
 #ifdef HAVE_DIRCACHE
@@ -3899,14 +3898,13 @@ static bool allocate_tagcache(void)
     if (handle <= 0)
         return false;
 
-    void *data = core_get_data(handle);
-
-    tcramcache.hdr = data;
+    tcramcache.handle = handle;
+    tcramcache.hdr = core_get_data(handle);
     tc_stat.ramcache_allocated = alloc_size;
 
     memset(tcramcache.hdr, 0, sizeof(struct ramcache_header));
     memcpy(&current_tcmh, &tcmh, sizeof current_tcmh);
-    logf("tagcache: %lu bytes allocated.", tc_stat.ramcache_allocated);
+    logf("tagcache: %d bytes allocated.", tc_stat.ramcache_allocated);
 
     return true;
 }
@@ -3917,6 +3915,7 @@ static bool tagcache_dumpload(void)
     struct statefile_header shdr;
     int fd, rc, handle;
 
+    tcramcache.handle = 0;
     tcramcache.hdr = NULL;
     
     fd = open(TAGCACHE_STATEFILE, O_RDONLY);
@@ -3946,6 +3945,7 @@ static bool tagcache_dumpload(void)
     }
 
     tcrc_buffer_lock();
+    tcramcache.handle = handle;
     tcramcache.hdr = core_get_data(handle);
     rc = read(fd, tcramcache.hdr, shdr.tc_stat.ramcache_allocated);
     tcrc_buffer_unlock();
@@ -4019,6 +4019,8 @@ static bool load_tagcache(void)
 #endif /* HAVE_DIRCACHE */
 
     logf("loading tagcache to ram...");
+
+    tcrc_buffer_lock(); /* lock for the rest of the scan, simpler to handle */
     
     fd = open(TAGCACHE_FILE_MASTER, O_RDONLY);
     if (fd < 0)
@@ -4026,8 +4028,6 @@ static bool load_tagcache(void)
         logf("tagcache open failed");
         goto failure;
     }
-
-    tcrc_buffer_lock(); /* lock for the rest of the scan, simpler to handle */
 
     struct master_header tcmh;
     if (ecread(fd, &tcmh, 1, master_header_ec, tc_stat.econ)
@@ -4072,7 +4072,7 @@ static bool load_tagcache(void)
         if (TAGCACHE_IS_NUMERIC(tag))
             continue;
 
-        p = TC_ALIGN_PTR(p, &rc);
+        p = TC_ALIGN_PTR(p, struct tagcache_header, &rc);
         bytesleft -= rc;
         if (bytesleft < (ssize_t)sizeof(struct tagcache_header))
         {
@@ -4100,7 +4100,7 @@ static bool load_tagcache(void)
             if (do_timed_yield() && check_event_queue())
                 goto failure;
 
-            p = TC_ALIGN_PTR(p, &rc);
+            p = TC_ALIGN_PTR(p, struct tagfile_entry, &rc);
             bytesleft -= rc;
             if (bytesleft < (ssize_t)sizeof(struct tagfile_entry))
             {
@@ -4119,20 +4119,31 @@ static bool load_tagcache(void)
                 goto failure;
             }
 
+            int idx_id = fe->idx_id; /* dircache reference clobbers *fe */
+            struct index_entry *idx = &tcramcache.hdr->indices[idx_id];
+
+            if (idx_id != -1 || tag == tag_filename) /* filename NOT optional */
+            {
+                if (idx_id < 0 || idx_id >= tcmh.tch.entry_count)
+                {
+                    logf("corrupt tagfile entry:tag=%d:idxid=%d", tag, idx_id);
+                    goto failure;
+                }
+
+                if (idx->tag_seek[tag] != pos)
+                {
+                    logf("corrupt data structures!:");
+                    logf("  tag_seek[%d]=%ld:pos=%ld", tag,
+                         idx->tag_seek[tag], pos);
+                    goto failure;
+                }
+            }
+
             /* We have a special handling for the filename tags; neither the
                paths nor the entry headers are stored; only the tagcache header
                and dircache references are. */
             if (tag == tag_filename)
             {
-                int idx_id = fe->idx_id; /* gonna clobber tagfile entry */
-                if (idx_id < 0 || idx_id >= tcmh.tch.entry_count)
-                {
-                    logf("corrupt tagfile entry (tag: %d)", tag);
-                    goto failure;
-                }
-
-                struct index_entry *idx = &tcramcache.hdr->indices[idx_id];
-
             #ifdef HAVE_DIRCACHE
                 if (idx->flag & FLAG_DIRCACHE)
                 {
@@ -4144,12 +4155,6 @@ static bool load_tagcache(void)
                 p += sizeof (struct dircache_fileref);
                 bytesleft -= sizeof (struct dircache_fileref);
             #endif /* HAVE_DIRCACHE */
-
-                if (idx->tag_seek[tag] != pos)
-                {
-                    logf("corrupt data structures!");
-                    goto failure;
-                }
 
                 char filename[TAG_MAXLEN+32];
                 if (fe->tag_length >= (long)sizeof(filename)-1)
@@ -4163,11 +4168,14 @@ static bool load_tagcache(void)
 
                 if ((idx->flag & FLAG_DELETED) IFN_DIRCACHE( || !auto_update ))
                 {
+                    /* seek over tag data instead of reading */
                     if (lseek(fd, fe->tag_length, SEEK_CUR) < 0)
                     {
                         logf("read error #11.5");
                         goto failure;
                     }
+
+                    continue;
                 }
 
                 if (read(fd, filename, fe->tag_length) != fe->tag_length)
@@ -4191,7 +4199,7 @@ static bool load_tagcache(void)
                 else if (auto_update)
             #else /* ndef HAVE_DIRCACHE */
                 /* Check if path is no longer valid */
-                if (auto_update && !file_exists(filename))
+                if (!file_exists(filename))
             #endif /* HAVE_DIRCACHE */
                 {
                     logf("Entry no longer valid.");
@@ -4218,7 +4226,7 @@ static bool load_tagcache(void)
             if (rc != fe->tag_length)
             {
                 logf("read error #13");
-                logf("rc=0x%04x", rc); // 0x431
+                logf("rc=0x%04x", (unsigned int)rc); // 0x431
                 logf("len=0x%04lx", fe->tag_length); // 0x4000
                 logf("pos=0x%04lx", lseek(fd, 0, SEEK_CUR)); // 0x433
                 logf("tag=0x%02x", tag); // 0x00
@@ -4661,6 +4669,9 @@ static void load_ramcache(void)
          * so disable it entirely to prevent further issues. */
         tc_stat.ready = false;
         tcramcache.hdr = NULL;
+        int handle = tcramcache.handle;
+        tcramcache.handle = 0;
+        core_free(handle);
     }
     
     cpu_boost(false);
