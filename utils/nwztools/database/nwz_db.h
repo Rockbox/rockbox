@@ -41,8 +41,11 @@ enum nwz_nvp_node_t
     NWZ_NVP_DBA, /* aad icv */
     NWZ_NVP_DBG, /*  */
     NWZ_NVP_DBI, /* dead battery image */
+    NWZ_NVP_DBS, /*  */
     NWZ_NVP_DBV, /* empr icv | empr key */
     NWZ_NVP_DCC, /* secure clock */
+    NWZ_NVP_DG0, /*  */
+    NWZ_NVP_DG1, /*  */
     NWZ_NVP_DOR, /* key mode (debug/release) */
     NWZ_NVP_E00, /* EMPR  0 */
     NWZ_NVP_E01, /* EMPR  1 */
@@ -77,6 +80,10 @@ enum nwz_nvp_node_t
     NWZ_NVP_E30, /* EMPR 30 */
     NWZ_NVP_E31, /* EMPR 31 */
     NWZ_NVP_EDW, /* quick shutdown flag */
+    NWZ_NVP_EP0, /*  */
+    NWZ_NVP_EP1, /*  */
+    NWZ_NVP_EP2, /*  */
+    NWZ_NVP_EP3, /*  */
     NWZ_NVP_ERI, /* update error image */
     NWZ_NVP_EXM, /* exception monitor mode */
     NWZ_NVP_FMP, /* fm parameter */
@@ -108,6 +115,7 @@ enum nwz_nvp_node_t
     NWZ_NVP_NVR, /*  */
     NWZ_NVP_PCD, /* product code */
     NWZ_NVP_PCI, /* precharge image */
+    NWZ_NVP_PNC, /*  */
     NWZ_NVP_PRK, /*  */
     NWZ_NVP_PSK, /* bluetooth pskey */
     NWZ_NVP_PTS, /* wifi protected setup */
@@ -134,6 +142,7 @@ enum nwz_nvp_node_t
     NWZ_NVP_UFN, /* update file name */
     NWZ_NVP_UMS, /*  */
     NWZ_NVP_UPS, /*  */
+    NWZ_NVP_VAR, /*  */
     NWZ_NVP_VRT, /* europe vol regulation flag */
     NWZ_NVP_COUNT /* Number of nvp nodes */
 };
