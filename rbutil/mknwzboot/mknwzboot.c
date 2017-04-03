@@ -49,6 +49,7 @@ static const struct nwz_model_desc_t nwz_models[] =
     { "Sony NWZ-E470 Series", "e470", 103, "nwz-e470" },
     { "Sony NWZ-E580 Series", "e580", 102, "nwz-e580" },
     { "Sony NWZ-A10 Series", "a10", 104, "nwz-a10" },
+    { "Sony NWZ-X1000 Series", "x100", 105, "nwz-x1000" },
 };
 
 #define NR_NWZ_MODELS     (sizeof(nwz_models) / sizeof(nwz_models[0]))

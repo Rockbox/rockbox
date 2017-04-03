@@ -592,6 +592,8 @@ Lyre prototype 1 */
 #include "config/sonynwza10.h"
 #elif defined(SONY_NWZE470)
 #include "config/sonynwze470.h"
+#elif defined(SONY_NWZX1000)
+#include "config/sonynwzx1000.h"
 #else
 /* no known platform */
 #endif
