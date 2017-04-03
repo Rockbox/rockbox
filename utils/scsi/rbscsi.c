@@ -43,11 +43,10 @@ typedef HANDLE rb_scsi_handle_t;
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <scsi/sg.h>
-#include <scsi/sg_lib.h>
-#include <scsi/sg_io_linux.h>
 #define RB_SCSI_LINUX
 typedef int rb_scsi_handle_t;
 #else
@@ -64,6 +63,9 @@ struct rb_scsi_device_t
 
 /* Linux */
 #ifdef RB_SCSI_LINUX
+/* the values for hdr.driver_status are not defined in public headers */
+#define DRIVER_SENSE        0x08
+
 rb_scsi_device_t rb_scsi_open(const char *path, unsigned flags, void *user,
     rb_scsi_printf_t printf)
 {
