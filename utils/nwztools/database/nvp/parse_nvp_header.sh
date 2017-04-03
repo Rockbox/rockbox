@@ -66,13 +66,16 @@ else
     >&2 echo "Analyzing $FILE"
 fi
 
+# old format: #define ICX1087_NVP_NODE_APP "/dev/icx1087_nvp/0"
+# new format: #define ICX_NVP_NODE_APP ICX_NVP_NODE_BASE "0"
+
 cat "$FILE" | awk ' \
 BEGIN { \
-    expr = "#define[[:space:]]+ICX_NVP_NODE_([[:alnum:]]+)[[:space:]]+ICX_NVP_NODE_BASE[[:space:]]*\"([[:digit:]]+)\""; \
+    expr = "#define[[:space:]]+ICX[[:digit:]]*_NVP_NODE_([[:alnum:]]+)[[:space:]]+(ICX_NVP_NODE_BASE[[:space:]]*\"|\"/dev.*_nvp/)([[:digit:]]+)\"";
 } \
 { \
     if($0 ~ expr) \
     { \
-        print(tolower(gensub(expr, "\\1,\\2", "g", $0)));
+        print(tolower(gensub(expr, "\\1,\\3", "g", $0)));
     } \
 }'

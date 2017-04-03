@@ -4,6 +4,9 @@
 # parse_nodes.sh /path/to/rootfs/dir output_file
 # parse_nodes.sh /path/to/rootfs.tgz output_file
 #
+if [ -z "$NVP_LOG" ]; then
+    NVP_LOG=/dev/null
+fi
 if [ "$#" -lt 2 ]; then
     >&2 echo "usage: parse_header.sh /path/to/icx_nvp.ko|/path/to/rootfs/dir|/path/to/rootfs.tgz output_file"
     exit 1
@@ -56,4 +59,4 @@ else
     >&2 echo "Analyzing $FILE"
 fi
 
-./nvptool -x "$FILE" -o "$OUTPUT" >/dev/null
+./nvptool -x "$FILE" -o "$OUTPUT" >"$NVP_LOG"

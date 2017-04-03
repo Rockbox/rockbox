@@ -3,6 +3,7 @@ import glob
 import os
 import re
 import subprocess
+import hashlib
 
 # parse models.txt
 g_models = []
@@ -35,14 +36,14 @@ g_hash_nvp = dict() # hash -> nvp
 g_nvp_hash = dict() # codename -> hash
 HASH_SIZE=6
 map_files = glob.glob('nvp/nw*.txt')
-for line in subprocess.run(["md5sum"] + map_files, stdout = subprocess.PIPE).stdout.decode("utf-8").split("\n"):
-    if len(line.rstrip()) == 0:
-        continue
-    hash, file = line.rstrip().split()
-    codename = re.search('nvp/(.*)\.txt', file).group(1)
+for f in map_files:
+    h = hashlib.md5()
+    h.update(open(f, "rb").read())
+    hash = h.hexdigest()
+    codename = re.search('(nw.*)\.txt', f).group(1)
     # sanity check
     if not (codename in g_series_codename):
-        print("Warning: file %s does not have a match series in series.txt" % file)
+        print("Warning: file %s does not have a match series in series.txt" % f)
     hash = hash[:HASH_SIZE]
     # only keep one file
     if not (hash in g_hash_nvp):
