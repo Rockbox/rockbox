@@ -2376,9 +2376,16 @@ static void audio_on_codec_complete(int status)
            Skipping: There was already a skip in progress, remember it and
                      allow no further progress until the PCM from the previous
                      song has finished
+
+           This function will be reentered upon completing the existing
+           transition in order to do the one that was just tried (below)
          */
         codec_skip_pending = true;
         codec_skip_status = status;
+
+        /* PCM buffer must know; audio could still be filling and hasn't
+           yet reached the play watermark */
+        pcmbuf_start_track_change(TRACK_CHANGE_AUTO_PILEUP);
         return;
     }
 

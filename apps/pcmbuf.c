@@ -204,6 +204,13 @@ extern void audio_pcmbuf_sync_position(void);
 
 /**************************************/
 
+/* start PCM if callback says it's alright */
+static void start_audio_playback(void)
+{
+     if (audio_pcmbuf_may_play())
+        pcmbuf_play_start();
+}
+
 /* Return number of commited bytes in buffer (committed chunks count as
    a full chunk even if only partially filled) */
 static size_t pcmbuf_unplayed_bytes(void)
@@ -492,8 +499,8 @@ void * pcmbuf_request_buffer(int *count)
         trigger_cpu_boost();
 
         /* If pre-buffered to the watermark, start playback */
-        if (!pcmbuf_data_critical() && audio_pcmbuf_may_play())
-            pcmbuf_play_start();
+        if (!pcmbuf_data_critical())
+            start_audio_playback();
     }
 
     void *buf;
@@ -672,14 +679,21 @@ void pcmbuf_monitor_track_change(bool monitor)
 
 void pcmbuf_start_track_change(enum pcm_track_change_type type)
 {
+    /* Commit all outstanding data before starting next track - tracks don't
+       comingle inside a single buffer chunk */
+    commit_if_needed(COMMIT_ALL_DATA);
+
+    if (type == TRACK_CHANGE_AUTO_PILEUP)
+    {
+        /* Fill might not have been above watermark */
+        start_audio_playback();
+        return;
+    }
+
 #ifdef HAVE_CROSSFADE
     bool crossfade = false;
 #endif
     bool auto_skip = type != TRACK_CHANGE_MANUAL;
-
-    /* Commit all outstanding data before starting next track - tracks don't
-       comingle inside a single buffer chunk */
-    commit_if_needed(COMMIT_ALL_DATA);
 
     /* Update position key so that:
        1) Positions are keyed to the track to which they belong for sync
@@ -695,9 +709,8 @@ void pcmbuf_start_track_change(enum pcm_track_change_type type)
     {
         crossfade_cancel();
 
-        /* If end of all data, force playback */
-        if (audio_pcmbuf_may_play())
-            pcmbuf_play_start();
+        /* Fill might not have been above watermark */
+        start_audio_playback();
     }
 #ifdef HAVE_CROSSFADE
     /* Determine whether this track change needs to crossfaded and how */
