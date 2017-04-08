@@ -188,7 +188,8 @@ static inline uintptr_t ringbuf_add(uintptr_t p, size_t v)
 }
 
 /* Buffer pointer (p) minus value (v), wrapped if necessary */
-static inline uintptr_t ringbuf_sub(uintptr_t p, size_t v)
+/* Interprets p == v as empty */
+static inline uintptr_t ringbuf_sub_empty(uintptr_t p, size_t v)
 {
     uintptr_t res = p;
     if (p < v)
@@ -197,8 +198,21 @@ static inline uintptr_t ringbuf_sub(uintptr_t p, size_t v)
     return res - v;
 }
 
+/* Buffer pointer (p) minus value (v), wrapped if necessary */
+/* Interprets p == v as full */
+static inline uintptr_t ringbuf_sub_full(uintptr_t p, size_t v)
+{
+    uintptr_t res = p;
+    if (p <= v)
+        res += buffer_len; /* wrap */
+
+    return res - v;
+}
+
 /* How far value (v) plus buffer pointer (p1) will cross buffer pointer (p2) */
-static inline ssize_t ringbuf_add_cross(uintptr_t p1, size_t v, uintptr_t p2)
+/* Interprets p1 == p2 as empty */
+static inline ssize_t ringbuf_add_cross_empty(uintptr_t p1, size_t v,
+                                              uintptr_t p2)
 {
     ssize_t res = p1 + v - p2;
     if (p1 >= p2) /* wrap if necessary */
@@ -207,8 +221,30 @@ static inline ssize_t ringbuf_add_cross(uintptr_t p1, size_t v, uintptr_t p2)
     return res;
 }
 
+/* How far value (v) plus buffer pointer (p1) will cross buffer pointer (p2) */
+/* Interprets p1 == p2 as full */
+static inline ssize_t ringbuf_add_cross_full(uintptr_t p1, size_t v,
+                                             uintptr_t p2)
+{
+    ssize_t res = p1 + v - p2;
+    if (p1 > p2) /* wrap if necessary */
+        res -= buffer_len;
+
+    return res;
+}
+
 /* Real buffer watermark */
 #define BUF_WATERMARK MIN(conf_watermark, high_watermark)
+
+static size_t bytes_used(void)
+{
+    struct memory_handle *first = first_handle;
+    if (!first) {
+        return 0;
+    }
+
+    return ringbuf_sub_full(cur_handle->widx, ringbuf_offset(first));
+}
 
 /*
 LINKED LIST MANAGEMENT
@@ -288,7 +324,7 @@ add_handle(unsigned int flags, size_t data_size, size_t *data_out)
         /* the current handle hasn't finished buffering. We can only add
            a new one if there is already enough free space to finish
            the buffering. */
-        if (ringbuf_add_cross(widx, cur_total, ridx) >= 0) {
+        if (ringbuf_add_cross_full(widx, cur_total, ridx) > 0) {
             /* Not enough space to finish allocation */
             return NULL;
         } else {
@@ -297,8 +333,8 @@ add_handle(unsigned int flags, size_t data_size, size_t *data_out)
         }
     }
 
-    /* Align to pointer size up */
-    size_t adjust = ALIGN_UP(widx, sizeof(intptr_t)) - widx;
+    /* Align to align size up */
+    size_t adjust = ALIGN_UP(widx, alignof(struct memory_handle)) - widx;
     size_t index = ringbuf_add(widx, adjust);
     size_t len = data_size + sizeof(struct memory_handle);
 
@@ -311,12 +347,15 @@ add_handle(unsigned int flags, size_t data_size, size_t *data_out)
     }
 
     /* How far we shifted index to align things, must be < buffer_len */
-    size_t shift = ringbuf_sub(index, widx);
+    size_t shift = ringbuf_sub_empty(index, widx);
 
     /* How much space are we short in the actual ring buffer? */
-    ssize_t overlap = ringbuf_add_cross(widx, shift + len, ridx);
-    if (overlap >= 0 &&
-        ((flags & H_ALLOCALL) || (size_t)overlap >= data_size)) {
+    ssize_t overlap = first_handle ?
+        ringbuf_add_cross_full(widx, shift + len, ridx) :
+        ringbuf_add_cross_empty(widx, shift + len, ridx);
+
+    if (overlap > 0 &&
+        ((flags & H_ALLOCALL) || (size_t)overlap > data_size)) {
         /* Not enough space for required allocations */
         return NULL;
     }
@@ -430,9 +469,9 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
 
     size_t size_to_move = sizeof(struct memory_handle) + data_size;
 
-    /* Align to pointer size down */
+    /* Align to align size down */
     size_t final_delta = *delta;
-    final_delta = ALIGN_DOWN(final_delta, sizeof(intptr_t));
+    final_delta = ALIGN_DOWN(final_delta, alignof(struct memory_handle));
     if (final_delta < sizeof(struct memory_handle)) {
         /* It's not legal to move less than the size of the struct */
         return false;
@@ -440,8 +479,8 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
 
     uintptr_t oldpos = ringbuf_offset(src);
     uintptr_t newpos = ringbuf_add(oldpos, final_delta);
-    intptr_t overlap = ringbuf_add_cross(newpos, size_to_move, buffer_len);
-    intptr_t overlap_old = ringbuf_add_cross(oldpos, size_to_move, buffer_len);
+    intptr_t overlap = ringbuf_add_cross_full(newpos, size_to_move, buffer_len);
+    intptr_t overlap_old = ringbuf_add_cross_full(oldpos, size_to_move, buffer_len);
 
     if (overlap > 0) {
         /* Some part of the struct + data would wrap, maybe ok */
@@ -459,8 +498,8 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
             correction = overlap - data_size;
         }
         if (correction) {
-            /* Align correction to pointer size up */
-            correction = ALIGN_UP(correction, sizeof(intptr_t));
+            /* Align correction to align size up */
+            correction = ALIGN_UP(correction, alignof(struct memory_handle));
             if (final_delta < correction + sizeof(struct memory_handle)) {
                 /* Delta cannot end up less than the size of the struct */
                 return false;
@@ -648,19 +687,19 @@ static bool buffer_handle(int handle_id, size_t to_buffer)
     {
         /* max amount to copy */
         size_t widx = h->widx;
-
         ssize_t copy_n = h->filesize - h->end;
         copy_n = MIN(copy_n, BUFFERING_DEFAULT_FILECHUNK);
         copy_n = MIN(copy_n, (off_t)(buffer_len - widx));
 
-        uintptr_t offset = ringbuf_offset(h->next ?: first_handle);
-        ssize_t overlap = ringbuf_add_cross(widx, copy_n, offset);
+        mutex_lock(&llist_mutex);
 
         /* read only up to available space and stop if it would overwrite
-           the next handle; stop one byte early for last handle to avoid
-           empty/full alias */
-        if (!h->next)
-            overlap++;
+           the next handle; stop one byte early to avoid empty/full alias
+           (or else do more complicated arithmetic to differentiate) */
+        size_t next = ringbuf_offset(h->next ?: first_handle);
+        ssize_t overlap = ringbuf_add_cross_full(widx, copy_n, next);
+
+        mutex_unlock(&llist_mutex);
 
         if (overlap > 0) {
             stop = true;
@@ -745,7 +784,7 @@ static void shrink_handle(struct memory_handle *h)
         /* data is pinned by default - if we start moving packet audio,
            the semantics will determine whether or not data is movable
            but the handle will remain movable in either case */
-        size_t delta = ringbuf_sub(h->ridx, h->data);
+        size_t delta = ringbuf_sub_empty(h->ridx, h->data);
 
         /* The value of delta might change for alignment reasons */
         if (!move_handle(&h, &delta, 0))
@@ -760,7 +799,7 @@ static void shrink_handle(struct memory_handle *h)
 
         size_t data_size = h->filesize - h->start;
         uintptr_t handle_distance =
-            ringbuf_sub(ringbuf_offset(h->next), h->data);
+            ringbuf_sub_empty(ringbuf_offset(h->next), h->data);
         size_t delta = handle_distance - data_size;
 
         /* The value of delta might change for alignment reasons */
@@ -800,9 +839,12 @@ static void shrink_handle(struct memory_handle *h)
 static bool fill_buffer(void)
 {
     logf("fill_buffer()");
-    struct memory_handle *m = first_handle;
+    mutex_lock(&llist_mutex);
 
+    struct memory_handle *m = first_handle;
     shrink_handle(m);
+
+    mutex_unlock(&llist_mutex);
 
     while (queue_empty(&buffering_queue) && m) {
         if (m->end < m->filesize && !buffer_handle(m->id, 0)) {
@@ -843,7 +885,7 @@ static int load_image(int fd, const char *path,
 #if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
     bmp->maskdata = NULL;
 #endif
-    int free = (int)MIN(buffer_len - buf_used(), buffer_len - bufidx)
+    int free = (int)MIN(buffer_len - bytes_used(), buffer_len - bufidx)
                         - sizeof(struct bitmap);
 
 #ifdef HAVE_JPEG
@@ -1158,6 +1200,8 @@ static void rebuffer_handle(int handle_id, off_t newpos)
             newpos = h->filesize; /* file truncation happened above */
     }
 
+    mutex_lock(&llist_mutex);
+
     size_t next = ringbuf_offset(h->next ?: first_handle);
 
 #ifdef STORAGE_WANTS_ALIGN
@@ -1170,7 +1214,7 @@ static void rebuffer_handle(int handle_id, off_t newpos)
     size_t alignment_pad = STORAGE_OVERLAP((uintptr_t)newpos -
                                            (uintptr_t)ringbuf_ptr(new_index));
 
-    if (ringbuf_add_cross(new_index, alignment_pad, next) >= 0)
+    if (ringbuf_add_cross_full(new_index, alignment_pad, next) > 0)
         alignment_pad = 0; /* Forego storage alignment this time */
 
     new_index = ringbuf_add(new_index, alignment_pad);
@@ -1187,7 +1231,12 @@ static void rebuffer_handle(int handle_id, off_t newpos)
         lseek(h->fd, newpos, SEEK_SET);
 
     off_t filerem = h->filesize - newpos;
-    if (h->next && ringbuf_add_cross(new_index, filerem, next) > 0) {
+    bool send = h->next &&
+                ringbuf_add_cross_full(new_index, filerem, next) > 0;
+
+    mutex_unlock(&llist_mutex);
+
+    if (send) {
         /* There isn't enough space to rebuffer all of the track from its new
            offset, so we ask the user to free some */
         DEBUGF("%s(): space is needed\n", __func__);
@@ -1416,7 +1465,7 @@ ssize_t bufgettail(int handle_id, size_t size, void **data)
         return ERR_HANDLE_NOT_FOUND;
 
     if (h->end >= h->filesize) {
-        size_t tidx = ringbuf_sub(h->widx, size);
+        size_t tidx = ringbuf_sub_empty(h->widx, size);
 
         if (tidx + size > buffer_len) {
             size_t copy_n = tidx + size - buffer_len;
@@ -1447,7 +1496,7 @@ ssize_t bufcuttail(int handle_id, size_t size)
         if (available < size)
             size = available;
 
-        h->widx = ringbuf_sub(h->widx, size);
+        h->widx = ringbuf_sub_empty(h->widx, size);
         h->filesize -= size;
         h->end -= size;
     } else {
@@ -1548,11 +1597,10 @@ size_t buf_length(void)
 /* Return the amount of buffer space used */
 size_t buf_used(void)
 {
-    struct memory_handle *first = first_handle;
-    if (!first)
-        return 0;
-
-    return ringbuf_sub(cur_handle->widx, ringbuf_offset(first));
+    mutex_lock(&llist_mutex);
+    size_t used = bytes_used();
+    mutex_unlock(&llist_mutex);
+    return used;
 }
 
 void buf_set_watermark(size_t bytes)
@@ -1579,7 +1627,9 @@ static void shrink_buffer_inner(struct memory_handle *h)
 static void shrink_buffer(void)
 {
     logf("shrink_buffer()");
+    mutex_lock(&llist_mutex);
     shrink_buffer_inner(first_handle);
+    mutex_unlock(&llist_mutex);
 }
 
 static void NORETURN_ATTR buffering_thread(void)

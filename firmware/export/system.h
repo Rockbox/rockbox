@@ -135,6 +135,10 @@ int get_cpu_boost_counter(void);
 #define PTR_ADD(ptr, x) ((typeof(ptr))((char*)(ptr) + (x)))
 #define PTR_SUB(ptr, x) ((typeof(ptr))((char*)(ptr) - (x)))
 
+#ifndef alignof
+#define alignof __alignof__
+#endif
+
 /* Get the byte offset of a type's member */
 #ifndef offsetof
 #define offsetof(type, member)  __builtin_offsetof(type, member)
