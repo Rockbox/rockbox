@@ -37,6 +37,7 @@
 #include "playback.h"
 #endif
 #include "buffering.h"
+#include "linked_list.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 /* #define LOGF_ENABLE */
@@ -78,7 +79,9 @@ enum handle_flags
 };
 
 struct memory_handle {
-    int     id;             /* A unique ID for the handle */
+    struct lld_node hnode;  /* Handle list node (first!) */
+    struct lld_node mrunode;/* MRU list node */
+    int     id;             /* A unique ID for the handle (after list!) */
     enum data_type type;    /* Type of data buffered with this handle */
     uint8_t flags;          /* Handle property flags */
     int8_t  pinned;         /* Count of pinnings */
@@ -92,7 +95,6 @@ struct memory_handle {
     off_t   start;          /* Offset at which we started reading the file */
     off_t   pos;            /* Read position in file */
     off_t volatile end;     /* Offset at which we stopped reading the file */
-    struct memory_handle *next;
 };
 
 struct buf_message_data
@@ -110,21 +112,29 @@ static size_t buffer_len;
 static size_t conf_watermark = 0; /* Level to trigger filebuf fill */
 static size_t high_watermark = 0; /* High watermark for rebuffer */
 
-/* current memory handle in the linked list. NULL when the list is empty. */
-static struct memory_handle *cur_handle;
-/* first memory handle in the linked list. NULL when the list is empty. */
-static struct memory_handle *first_handle;
-
-static int num_handles;  /* number of handles in the list */
-
+static struct lld_head handle_list; /* buffer-order handle list */
+static struct lld_head mru_cache;   /* MRU-ordered list of handles */
+static int num_handles;             /* number of handles in the lists */
 static int base_handle_id;
 
 /* Main lock for adding / removing handles */
 static struct mutex llist_mutex SHAREDBSS_ATTR;
 
-/* Handle cache (makes find_handle faster).
-   This is global so that move_handle and rm_handle can invalidate it. */
-static struct memory_handle *cached_handle = NULL;
+#define HLIST_HANDLE(node) \
+    ({ struct lld_node *__node = (node); \
+       (struct memory_handle *)__node; })
+
+#define HLIST_FIRST \
+    HLIST_HANDLE(handle_list.head)
+
+#define HLIST_LAST \
+    HLIST_HANDLE(handle_list.tail)
+
+#define HLIST_NEXT(h) \
+    HLIST_HANDLE((h)->hnode.next)
+
+#define MRU_HANDLE(m) \
+    container_of((m), struct memory_handle, mrunode)
 
 static struct data_counters
 {
@@ -238,33 +248,38 @@ static inline ssize_t ringbuf_add_cross_full(uintptr_t p1, size_t v,
 
 static size_t bytes_used(void)
 {
-    struct memory_handle *first = first_handle;
+    struct memory_handle *first = HLIST_FIRST;
     if (!first) {
         return 0;
     }
 
-    return ringbuf_sub_full(cur_handle->widx, ringbuf_offset(first));
+    return ringbuf_sub_full(HLIST_LAST->widx, ringbuf_offset(first));
 }
 
 /*
 LINKED LIST MANAGEMENT
 ======================
 
-add_handle  : Add a handle to the list
-rm_handle   : Remove a handle from the list
-find_handle : Get a handle pointer from an ID
-move_handle : Move a handle in the buffer (with or without its data)
+add_handle    : Create a new handle
+link_handle   : Add a handle to the list
+unlink_handle : Remove a handle from the list
+find_handle   : Get a handle pointer from an ID
+move_handle   : Move a handle in the buffer (with or without its data)
 
 These functions only handle the linked list structure. They don't touch the
 contents of the struct memory_handle headers.
 
-The first and current (== last) handle are kept track of.
-A new handle is added at to the end and becomes the current one.
+Doubly-linked list, not circular.
+New handles are added at the tail.
 
 num_handles = N
-first_handle -> h0 -> h1 -> h2 -> ... hN-1 -> NULL
-                                      ^
-cur_handle   -------------------------+
+       NULL <- h0 <-> h1 <-> h2 -> ... <- hN-1 -> NULL
+head=> --------^                          ^
+tail=> -----------------------------------+
+
+MRU cache is similar except new handles are added at the head and the most-
+recently-accessed handle is always moved to the head (if not already there).
+
 */
 
 static int next_handle_id(void)
@@ -281,18 +296,38 @@ static int next_handle_id(void)
     return next_hid;
 }
 
-/* adds the handle to the linked list */
-static void link_cur_handle(struct memory_handle *h)
+/* Adds the handle to the linked list */
+static void link_handle(struct memory_handle *h)
 {
-    h->next = NULL;
-
-    if (first_handle)
-        cur_handle->next = h;
-    else
-        first_handle = h; /* the first one */
-
-    cur_handle = h;
+    lld_insert_last(&handle_list, &h->hnode);
+    lld_insert_first(&mru_cache, &h->mrunode);
     num_handles++;
+}
+
+/* Delete a given memory handle from the linked list */
+static void unlink_handle(struct memory_handle *h)
+{
+    lld_remove(&handle_list, &h->hnode);
+    lld_remove(&mru_cache, &h->mrunode);
+    num_handles--;
+}
+
+/* Adjusts handle list pointers _before_ it's actually moved */
+static void adjust_handle_node(struct lld_head *list,
+                               struct lld_node *srcnode,
+                               struct lld_node *destnode)
+{
+    if (srcnode->prev) {
+        srcnode->prev->next = destnode;
+    } else {
+        list->head = destnode;
+    }
+
+    if (srcnode->next) {
+        srcnode->next->prev = destnode;
+    } else {
+        list->tail = destnode;
+    }
 }
 
 /* Add a new handle to the linked list and return it. It will have become the
@@ -313,11 +348,13 @@ add_handle(unsigned int flags, size_t data_size, size_t *data_out)
     size_t ridx = 0, widx = 0;
     off_t cur_total = 0;
 
-    if (first_handle) {
+    struct memory_handle *first = HLIST_FIRST;
+    if (first) {
         /* Buffer is not empty */
-        ridx = ringbuf_offset(first_handle);
-        widx = cur_handle->data;
-        cur_total = cur_handle->filesize - cur_handle->start;
+        struct memory_handle *last = HLIST_LAST;
+        ridx = ringbuf_offset(first);
+        widx = last->data;
+        cur_total = last->filesize - last->start;
     }
 
     if (cur_total > 0) {
@@ -350,7 +387,7 @@ add_handle(unsigned int flags, size_t data_size, size_t *data_out)
     size_t shift = ringbuf_sub_empty(index, widx);
 
     /* How much space are we short in the actual ring buffer? */
-    ssize_t overlap = first_handle ?
+    ssize_t overlap = first ?
         ringbuf_add_cross_full(widx, shift + len, ridx) :
         ringbuf_add_cross_empty(widx, shift + len, ridx);
 
@@ -374,80 +411,28 @@ add_handle(unsigned int flags, size_t data_size, size_t *data_out)
     return h;
 }
 
-/* Delete a given memory handle from the linked list
-   and return true for success. Nothing is actually erased from memory. */
-static bool rm_handle(const struct memory_handle *h)
-{
-    if (h == NULL)
-        return true;
-
-    struct memory_handle *m = first_handle;
-    struct memory_handle *c = cur_handle;
-
-    if (h == m) {
-        m = m->next;
-        first_handle = m;
-        if (!m) {
-            /* h was the first and last handle: the buffer is now empty */
-            cur_handle = NULL;
-        }
-    } else {
-        /* Find the previous handle */
-        while (m && m->next != h) {
-            m = m->next;
-        }
-        if (m && m->next == h) {
-            m->next = h->next;
-            if (h == c)
-                cur_handle = m;
-        } else {
-            /* If we don't find ourselves, this is a seriously incoherent
-               state with a corrupted list and severe action is needed! */
-            panicf("rm_handle fail: %d", h->id);
-            return false;
-        }
-    }
-
-    /* Invalidate the cache to prevent it from keeping the old location of h */
-    if (h == cached_handle)
-        cached_handle = NULL;
-
-    num_handles--;
-    return true;
-}
-
 /* Return a pointer to the memory handle of given ID.
    NULL if the handle wasn't found */
-static struct memory_handle *find_handle(int handle_id)
+static struct memory_handle * find_handle(int handle_id)
 {
-    if (handle_id < 0 || !first_handle)
-        return NULL;
+    struct memory_handle *h = NULL;
+    struct lld_node *mru = mru_cache.head;
+    struct lld_node *m = mru;
 
-    /* Simple caching because most of the time the requested handle
-       will either be the same as the last, or the one after the last */
-    struct memory_handle *cached = cached_handle;
-    if (cached) {
-        if (cached->id == handle_id) {
-            return cached;
-        } else {
-            cached = cached->next;
-            if (cached && cached->id == handle_id) {
-                cached_handle = cached;
-                return cached;
-            }
-        }
-    }
-
-    struct memory_handle *m = first_handle;
-    while (m && m->id != handle_id) {
+    while (m && MRU_HANDLE(m)->id != handle_id) {
         m = m->next;
     }
 
-    /* This condition can only be reached with !m or m->id == handle_id */
-    if (m)
-        cached_handle = m;
+    if (m) {
+        if (m != mru) {
+            lld_remove(&mru_cache, m);
+            lld_insert_first(&mru_cache, m);
+        }
 
-    return m;
+        h = MRU_HANDLE(m);
+    }
+
+    return h;
 }
 
 /* Move a memory handle and data_size of its data delta bytes along the buffer.
@@ -462,7 +447,7 @@ static struct memory_handle *find_handle(int handle_id)
 static bool move_handle(struct memory_handle **h, size_t *delta,
                         size_t data_size)
 {
-    const struct memory_handle *src;
+    struct memory_handle *src;
 
     if (h == NULL || (src = *h) == NULL)
         return false;
@@ -512,27 +497,9 @@ static bool move_handle(struct memory_handle **h, size_t *delta,
 
     struct memory_handle *dest = ringbuf_ptr(newpos);
 
-    if (src == first_handle) {
-        first_handle = dest;
-    } else {
-        struct memory_handle *m = first_handle;
-        while (m && m->next != src) {
-            m = m->next;
-        }
-        if (m && m->next == src) {
-            m->next = dest;
-        } else {
-            return false;
-        }
-    }
-
-    /* Update the cache to prevent it from keeping the old location of h */
-    if (src == cached_handle)
-        cached_handle = dest;
-
-    /* the cur_handle pointer might need updating */
-    if (src == cur_handle)
-        cur_handle = dest;
+    /* Adjust list pointers */
+    adjust_handle_node(&handle_list, &src->hnode, &dest->hnode);
+    adjust_handle_node(&mru_cache, &src->mrunode, &dest->mrunode);
 
     /* x = handle(s) following this one...
      * ...if last handle, unmoveable if metadata, only shrinkable if audio.
@@ -614,7 +581,7 @@ static int update_data_counters(struct data_counters *dc)
     struct memory_handle *m = find_handle(base_handle_id);
     bool is_useful = m == NULL;
 
-    for (m = first_handle; m; m = m->next)
+    for (m = HLIST_FIRST; m; m = HLIST_NEXT(m))
     {
         off_t pos = m->pos;
         off_t end = m->end;
@@ -696,7 +663,7 @@ static bool buffer_handle(int handle_id, size_t to_buffer)
         /* read only up to available space and stop if it would overwrite
            the next handle; stop one byte early to avoid empty/full alias
            (or else do more complicated arithmetic to differentiate) */
-        size_t next = ringbuf_offset(h->next ?: first_handle);
+        size_t next = ringbuf_offset(HLIST_NEXT(h) ?: HLIST_FIRST);
         ssize_t overlap = ringbuf_add_cross_full(widx, copy_n, next);
 
         mutex_unlock(&llist_mutex);
@@ -755,21 +722,17 @@ static bool buffer_handle(int handle_id, size_t to_buffer)
 /* Q_CLOSE_HANDLE */
 static bool close_handle(int handle_id)
 {
-    bool retval = true;
-
     mutex_lock(&llist_mutex);
     struct memory_handle *h = find_handle(handle_id);
 
     /* If the handle is not found, it is closed */
     if (h) {
         close_fd(&h->fd);
-        /* rm_handle returns true unless the handle somehow persists after
-           exit */
-        retval = rm_handle(h);
+        unlink_handle(h);
     }
 
     mutex_unlock(&llist_mutex);
-    return retval;
+    return true;
 }
 
 /* Free buffer space by moving the handle struct right before the useful
@@ -794,12 +757,12 @@ static void shrink_handle(struct memory_handle *h)
         h->start += delta;
     } else {
         /* metadata handle: we can move all of it */
-        if (h->pinned || !h->next)
+        if (h->pinned || !HLIST_NEXT(h))
             return; /* Pinned, last handle */
 
         size_t data_size = h->filesize - h->start;
         uintptr_t handle_distance =
-            ringbuf_sub_empty(ringbuf_offset(h->next), h->data);
+            ringbuf_sub_empty(ringbuf_offset(HLIST_NEXT(h)), h->data);
         size_t delta = handle_distance - data_size;
 
         /* The value of delta might change for alignment reasons */
@@ -841,7 +804,7 @@ static bool fill_buffer(void)
     logf("fill_buffer()");
     mutex_lock(&llist_mutex);
 
-    struct memory_handle *m = first_handle;
+    struct memory_handle *m = HLIST_FIRST;
     shrink_handle(m);
 
     mutex_unlock(&llist_mutex);
@@ -851,7 +814,7 @@ static bool fill_buffer(void)
             m = NULL;
             break;
         }
-        m = m->next;
+        m = HLIST_NEXT(m);
     }
 
     if (m) {
@@ -965,7 +928,7 @@ int bufopen(const char *file, size_t offset, enum data_type type,
             h->pos      = 0;
             h->end      = 0;
 
-            link_cur_handle(h);
+            link_handle(h);
 
             /* Inform the buffering thread that we added a handle */
             LOGFQUEUE("buffering > Q_HANDLE_ADDED %d", handle_id);
@@ -1067,7 +1030,7 @@ int bufopen(const char *file, size_t offset, enum data_type type,
         h->widx     = data;
         h->filesize = size;
         h->end      = adjusted_offset;
-        link_cur_handle(h);
+        link_handle(h);
     }
 
     mutex_unlock(&llist_mutex);
@@ -1136,7 +1099,7 @@ int bufalloc(const void *src, size_t size, enum data_type type)
         h->pos       = 0;
         h->end       = size;
 
-        link_cur_handle(h);
+        link_handle(h);
     }
 
     mutex_unlock(&llist_mutex);
@@ -1202,7 +1165,7 @@ static void rebuffer_handle(int handle_id, off_t newpos)
 
     mutex_lock(&llist_mutex);
 
-    size_t next = ringbuf_offset(h->next ?: first_handle);
+    size_t next = ringbuf_offset(HLIST_NEXT(h) ?: HLIST_FIRST);
 
 #ifdef STORAGE_WANTS_ALIGN
     /* Strip alignment padding then redo */
@@ -1231,7 +1194,7 @@ static void rebuffer_handle(int handle_id, off_t newpos)
         lseek(h->fd, newpos, SEEK_SET);
 
     off_t filerem = h->filesize - newpos;
-    bool send = h->next &&
+    bool send = HLIST_NEXT(h) &&
                 ringbuf_add_cross_full(new_index, filerem, next) > 0;
 
     mutex_unlock(&llist_mutex);
@@ -1619,7 +1582,7 @@ static void shrink_buffer_inner(struct memory_handle *h)
     if (h == NULL)
         return;
 
-    shrink_buffer_inner(h->next);
+    shrink_buffer_inner(HLIST_NEXT(h));
 
     shrink_handle(h);
 }
@@ -1628,7 +1591,7 @@ static void shrink_buffer(void)
 {
     logf("shrink_buffer()");
     mutex_lock(&llist_mutex);
-    shrink_buffer_inner(first_handle);
+    shrink_buffer_inner(HLIST_FIRST);
     mutex_unlock(&llist_mutex);
 }
 
@@ -1785,16 +1748,18 @@ bool buffering_reset(char *buf, size_t buflen)
     send_event(BUFFER_EVENT_BUFFER_RESET, NULL);
 
     /* If handles weren't closed above, just do it */
-    while (num_handles != 0)
-        bufclose(first_handle->id);
+    struct memory_handle *h;
+    while ((h = HLIST_FIRST)) {
+        bufclose(h->id);
+    }
 
     buffer = buf;
     buffer_len = buflen;
     guard_buffer = buf + buflen;
 
-    first_handle = NULL;
-    cur_handle = NULL;
-    cached_handle = NULL;
+    lld_init(&handle_list);
+    lld_init(&mru_cache);
+
     num_handles = 0;
     base_handle_id = -1;
 
