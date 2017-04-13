@@ -10,7 +10,7 @@ IMXTOOLS_DIR=../../utils/imxtools/sbtools/
 CFLAGS += -I$(IMXTOOLS_DIR) -Wall
 # std=gnu99 is required by MinGW on Windows (c99 is sufficient for Linux / MXE)
 CFLAGS += -std=gnu99 -g -O3
-LDFLAGS += -lcrypto++
+LDOPTS += -lcryptopp
 
 OUTPUT = mkimxboot
 
