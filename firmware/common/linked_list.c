@@ -198,16 +198,14 @@ void lld_remove(struct lld_head *list, struct lld_node *node)
     struct lld_node *next = node->next;
     struct lld_node *prev = node->prev;
 
-    if (node == list->head)
+    if (prev == NULL)
         list->head = next;
-
-    if (node == list->tail)
-        list->tail = prev;
-
-    if (prev != NULL)
+    else
         prev->next = next;
 
-    if (next != NULL)
+    if (next == NULL)
+        list->tail = prev;
+    else
         next->prev = prev;
 }
 
