@@ -10,7 +10,19 @@ IMXTOOLS_DIR=../../utils/imxtools/sbtools/
 CFLAGS += -I$(IMXTOOLS_DIR) -Wall
 # std=gnu99 is required by MinGW on Windows (c99 is sufficient for Linux / MXE)
 CFLAGS += -std=gnu99 -g -O3
-LDFLAGS += -lcrypto++
+
+PKGCONFIG = $(CROSS)pkg-config --silence-errors
+LIBCRYPTO = $(shell $(PKGCONFIG) --libs libcryptopp)
+ifeq ($(LIBCRYPTO),)
+LIBCRYPTO = $(shell $(PKGCONFIG) --libs libcrypto++)
+ifeq ($(LIBCRYPTO),)
+LIBCRYPTO = $(shell $(PKGCONFIG) --libs cryptopp)
+ifeq ($(LIBCRYPTO),)
+LIBCRYPTO = $(shell $(PKGCONFIG) --libs crypto++)
+endif
+endif
+endif
+LDOPTS += $(LIBCRYPTO)
 
 OUTPUT = mkimxboot
 
