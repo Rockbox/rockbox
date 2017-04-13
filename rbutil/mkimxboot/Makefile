@@ -10,7 +10,13 @@ IMXTOOLS_DIR=../../utils/imxtools/sbtools/
 CFLAGS += -I$(IMXTOOLS_DIR) -Wall
 # std=gnu99 is required by MinGW on Windows (c99 is sufficient for Linux / MXE)
 CFLAGS += -std=gnu99 -g -O3
-LDFLAGS += -lcrypto++
+
+# Distros could use different names for the crypto library. We try a list
+# of candidate names, only one of them should be the valid one.
+PKGCONFIG := $(CROSS)pkg-config
+LIBCRYPTO_NAMES = libcryptopp libcrypto++ cryptopp crypto++
+$(foreach l,$(LIBCRYPTO_NAMES),\
+	$(eval LDOPTS += $(shell $(PKGCONFIG) --silence-errors --libs $(l))))
 
 OUTPUT = mkimxboot
 
