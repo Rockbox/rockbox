@@ -204,6 +204,9 @@ unix:!macx:static {
     LIBS += -Wl,-Bstatic -lusb -Wl,-Bdynamic
 }
 
+# required for libimxboot.a
+LIBS += -lcrypto++
+
 # if -config intel is specified use 10.5 SDK and don't build for PPC
 contains(QT_MAJOR_VERSION, 5) {
     macx {
