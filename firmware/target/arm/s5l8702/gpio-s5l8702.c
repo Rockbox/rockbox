@@ -62,6 +62,7 @@ void INIT_ATTR gpio_init(void)
      *   1    0        120/160slim  dock line-in + jack mic
      */
     GPIOCMD = 0xe0700;
+    udelay(10000);
     rec_hw_ver = (PDAT(14) & (1 << 7)) ? 0 : 1;
     GPIOCMD = 0xe070e;  /* restore default configuration */
 

@@ -23,10 +23,55 @@
 #include "audio.h"
 #include "sound.h"
 #include "pmu-target.h"
+#include "i2c-s5l8702.h"
 
 extern int rec_hw_ver;
 
+/* Mikey is the internal controller for jack microphone and/or
+ * remote accessories.
+ * TODO:
+ *  - move to mikey-6g.c
+ *  - detect jack accessory
+ *  - support for remote buttons
+ */
+unsigned char mikey_read(int address)
+{
+    unsigned char val;
+    i2c_read(0, 0x72, address, 1, &val);
+    return val;
+}
+
+int mikey_write(int address, unsigned char val)
+{
+    return i2c_write(0, 0x72, address, 1, &val);
+}
+
+void mikey_reset(void)
+{
+    mikey_write(0, 5);
+    mikey_write(1, 0x80);
+}
+
 #if INPUT_SRC_CAPS != 0
+#ifdef HAVE_RECORDING
+void audio_enable_mic(bool enable)
+{
+    if (rec_hw_ver == 0)
+        return;
+
+    if (enable)
+    {
+        mikey_write(0, 7);  /* raise voltage to polarize microphone */
+        GPIOCMD = 0xe070f;  /* enable preamp */
+    }
+    else
+    {
+        mikey_reset();      /* microphone line voltage = 0 */
+        GPIOCMD = 0xe070e;  /* disable preamp */
+    }
+}
+#endif
+
 void audio_set_output_source(int source)
 {
     if ((unsigned)source >= AUDIO_NUM_SOURCES)
@@ -53,8 +98,7 @@ void audio_input_mux(int source, unsigned flags)
                 /* Vcodec = 1800mV (900mV + value*100mV) */
                 pmu_ldo_set_voltage(3, 0x9);
 
-                if (rec_hw_ver == 1)
-                    GPIOCMD = 0xe070e;
+                audio_enable_mic(false);
             }
 #endif
         break;
@@ -63,13 +107,12 @@ void audio_input_mux(int source, unsigned flags)
         case AUDIO_SRC_MIC:             /* recording only */
             if (source != last_source)
             {
-                if (rec_hw_ver == 1)
-                    GPIOCMD = 0xe070f;
+                audio_enable_mic(true);
 
                 /* Vcodec = 2400mV (900mV + value*100mV) */
                 pmu_ldo_set_voltage(3, 0xf);
 
-                audiohw_set_monitor(false);
+                audiohw_set_monitor(true);
                 audiohw_enable_recording(true);  /* source mic */
             }
         break;
@@ -79,13 +122,12 @@ void audio_input_mux(int source, unsigned flags)
         case AUDIO_SRC_LINEIN:          /* recording only */
             if (source != last_source)
             {
-                if (rec_hw_ver == 1)
-                    GPIOCMD = 0xe070e;
+                audio_enable_mic(false);
 
                 /* Vcodec = 2400mV (900mV + value*100mV) */
                 pmu_ldo_set_voltage(3, 0xf);
 
-                audiohw_set_monitor(false);
+                audiohw_set_monitor(true);
                 audiohw_enable_recording(false); /* source line */
             }
         break;
