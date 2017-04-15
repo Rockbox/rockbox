@@ -205,7 +205,7 @@ unix:!macx:static {
 }
 
 # required for libimxboot.a
-LIBS += -lcrypto++
+LIBS += $$system(pkg-config --silence-errors --libs libcrypto++)
 
 # if -config intel is specified use 10.5 SDK and don't build for PPC
 contains(QT_MAJOR_VERSION, 5) {
