@@ -3,8 +3,8 @@
 #include <SDL.h>
 #include <SDL_video.h>
 
-#define WIDTH (LCD_WIDTH / 3)
-#define HEIGHT (LCD_HEIGHT / 3)
+#define WIDTH LCD_WIDTH
+#define HEIGHT LCD_HEIGHT
 
 //#define MAX(a, b) ((a>b)?(a):(b))
 //#define MIN(a, b) ((a<b)?(a):(b))
@@ -353,6 +353,8 @@ vector ray_to_pixel(int x, int y, int w, int h, const struct camera_t *cam, scal
     return d;
 }
 
+bool progressive = false;
+
 void render_lines(bool native, fb_data *fb, int w, int h,
                   const struct scene_t *scene,
                   const struct camera_t *cam,
@@ -398,6 +400,8 @@ void render_lines(bool native, fb_data *fb, int w, int h,
         }
         if(!native)
             rb->splashf(0, "Worker %d: %d%% (%d/%d)\n", worker, 100 * (y+1) / h, y+1, h);
+        if(progressive)
+            rb->lcd_update_rect(0, y, LCD_WIDTH, 1);
     }
 }
 
@@ -542,7 +546,7 @@ int raytrace_main(int argc, char *argv[])
     amask = 0;
 #endif
 
-    float scale = 1.0;
+    float scale = .2;
 
     while(1)
     {
@@ -613,7 +617,7 @@ int raytrace_main(int argc, char *argv[])
                 if(bounces < MIN_BOUNCES)
                     bounces = MIN_BOUNCES;
             }
-            if(scale > .25)
+            if(scale > .1)
                 scale /= 1.2;
         }
 
@@ -654,15 +658,9 @@ int raytrace_main(int argc, char *argv[])
                     break;
                 case SDLK_SPACE:
                 {
-                    unsigned char *ppm = malloc(LCD_WIDTH * LCD_HEIGHT * 3);
-                    render_scene(false, rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, &scene, &cam, 2, 5);
-                    FILE *f = fopen("/test.ppm", "w");
-                    fprintf(f, "P6\n%d %d\n%d\n", LCD_WIDTH, LCD_HEIGHT, 255);
-                    rb->splash(0, "Writing...");
-                    fwrite(ppm, LCD_WIDTH * LCD_HEIGHT, 3, f);
-                    rb->splash(0, "Finalizing...");
-                    fclose(f);
-                    free(ppm);
+                    progressive = true;
+                    render_scene(true, rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, &scene, &cam, 2, 1000);
+                    progressive = false;
                     break;
                 }
                 case SDLK_LEFT:
