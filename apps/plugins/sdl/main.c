@@ -25,6 +25,7 @@ extern int testwin_main(int argc, char *argv[]);
 //#endif
 extern int abe_main(int argc, char *argv[]);
 extern int ballerburg_main(int argc, char **argv);
+extern int raytrace_main(int argc, char *argv[]);
 
 struct prog_t {
     const char *name;
@@ -37,6 +38,7 @@ struct prog_t {
     {  "Ball Field",               ballfield_main,     false  },
     {  "Parallax v.3",             parallax3_main,     false  },
     {  "Parallax v.4",             parallax4_main,     false  },
+    {  "Raytrace",                 raytrace_main,      false  },
     {  "Test Bitmap",              testbitmap_main,    false  },
     {  "Test Cursor",              testcursor_main,    false  },
     {  "Test Thread",              testhread_main,     true   },

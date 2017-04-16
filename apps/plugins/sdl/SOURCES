@@ -33,6 +33,9 @@ tests/ballerburg/sdlgfx.c
 tests/ballerburg/sdlgui.c
 tests/ballerburg/settings.c
 
+tests/raytrace/main.c
+tests/raytrace/vector.c
+
 //#if 0
 tests/ballfield.c
 tests/parallax3.c

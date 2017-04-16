@@ -106,6 +106,13 @@
 #define getenv SDL_getenv
 #define strchr SDL_strchr
 #define strpbrk strpbrk_wrapper
+#define sqrt sqrt_wrapper
+#define tan tan_wrapper
+#define fabs fabs_wrapper
+
+#define assert(x) (0)
+
+#define M_PI 4.0
 
 #define LOAD_XPM
 
@@ -120,5 +127,8 @@ int mkdir_wrapepr(const char *path);
 int printf_wrapper(const char*, ...);
 int sprintf_wrapper(char*, const char*, ...);
 void rbsdl_atexit(void (*)(void));
+float sqrt_wrapper(float);
+float tan_wrapper(float);
+float fabs_wrapper(float);
 
 #endif /* _SDL_config_rockbox_h */
