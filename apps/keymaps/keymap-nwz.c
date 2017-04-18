@@ -71,12 +71,18 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_VOLUP,                 BUTTON_VOL_UP|BUTTON_REPEAT,       BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,               BUTTON_VOL_DOWN,                   BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,               BUTTON_VOL_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
-#endif
+
+    { ACTION_WPS_PITCHSCREEN,           BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE },
+    { ACTION_WPS_VIEW_PLAYLIST,         BUTTON_DOWN,                       BUTTON_NONE },
+
+#else
 
     { ACTION_WPS_VOLUP,                 BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE },
     { ACTION_WPS_VOLUP,                 BUTTON_UP,                         BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,               BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,               BUTTON_DOWN,                       BUTTON_NONE },
+
+#endif
 
     { ACTION_WPS_MENU,                  BUTTON_BACK|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_WPS_BROWSE,                BUTTON_BACK|BUTTON_REL,            BUTTON_BACK },
