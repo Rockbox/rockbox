@@ -126,9 +126,10 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
 void audiohw_close(void) {}
 
 #ifdef CONFIG_SAMPR_TYPES
-unsigned int pcm_sampr_to_hw_sampr(unsigned int samplerate,
-                                   unsigned int type)
-    { return samplerate; (void)type; }
+unsigned long pcm_sampr_convert(unsigned long samplerate,
+                                enum pcm_sampr_type type_from,
+                                enum pcm_sampr_type type_to)
+    { return samplerate; (void)type_from; (void)type_to; }
 #endif /* CONFIG_SAMPR_TYPES */
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 int mas_codec_readreg(int reg)

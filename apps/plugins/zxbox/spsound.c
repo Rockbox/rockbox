@@ -33,6 +33,7 @@
 
 int bufframes = 1;
 
+extern pcm_handle_t pcm_handle;
 int sound_avail = 0;
 int sound_on = 1;
 
@@ -105,21 +106,24 @@ static void open_snd(void)
 {
     sndstate = SPS_OPENED;
     sound_avail=1;
-   rb->pcm_play_stop();
+    if(rb->pcm_open(&pcm_handle, PCM_STREAM_PLAYBACK))
+        return;
+
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPR_44);
+    rb->pcm_set_frequency(pcm_handle, SAMPR_44);
 }
 
 static void close_snd(int normal)
 {
     (void)normal;
     sound_avail = 0;
-    rb->pcm_play_stop();    
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    rb->pcm_set_frequency(pcm_handle, HW_SAMPR_RESET);
+    rb->pcm_close(pcm_handle);
+    pcm_handle = 0;
 }
 
 
@@ -189,11 +193,15 @@ void autoclose_sound(void)
   }
 #endif
 }
-static void get_more(const void** start, unsigned long* frames)
+static int get_more(int status, const void** start, unsigned long* frames)
 {
+    if (status < 0)
+        return status;
+
     doneplay = 1;
     (void)start;
     (void)frames;
+    return 0;
 }
 
 /* sp_sound_buf is Unsigned 8 bit, Rate 8000 Hz, Mono */
@@ -218,7 +226,8 @@ static void write_buf(void){
                     = my_buf[j+10] = my_buf[j+11] \
                     = (((byte)sp_sound_buf[i])<<8) >> settings.volume;
 
-    rb->pcm_play_data(get_more, NULL, my_buf ,TMNUM*3*2);
+    rb->pcm_play_data(pcm_handle, get_more, my_buf ,TMNUM*3*2,
+                      PCM_FORMAT(PCM_FORMAT_S16_2, 2));
 
 #if 0
     /* can use to save and later analyze what we produce */

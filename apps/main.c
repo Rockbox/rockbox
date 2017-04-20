@@ -88,6 +88,7 @@
 #endif
 
 #if (CONFIG_CODEC == SWCODEC)
+#include "pcm-internal.h"
 #include "audio_thread.h"
 #include "playback.h"
 #include "tdspeed.h"

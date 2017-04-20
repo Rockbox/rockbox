@@ -46,9 +46,9 @@ static const int index_table[] ICONST_ATTR = {
 static struct adpcm_data cur_data;
 static int blocksperchunk;
 
-static struct pcm_format *fmt;
+static struct libpcm_pcm_format *fmt;
 
-static bool set_format(struct pcm_format *format)
+static bool set_format(struct libpcm_pcm_format *format)
 {
     uint32_t max_chunk_count;
 

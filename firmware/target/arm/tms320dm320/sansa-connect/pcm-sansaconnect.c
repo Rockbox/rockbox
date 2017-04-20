@@ -100,16 +100,35 @@ void pcm_dma_apply_settings(void)
 /* Note that size is actually limited to the size of a short right now due to
  *  the implementation on the DSP side (and the way that we access it)
  */
-void pcm_play_dma_start(const void *addr, unsigned long frames)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
 {
     unsigned long sdem_addr=(unsigned long)addr - CONFIG_SDRAM_START;
-    /* Initialize codec. */
+    size_t size = frames*4;
+
+    /* set the new DMA values */
     DSP_(_sdem_addrl) = sdem_addr & 0xffff;
     DSP_(_sdem_addrh) = sdem_addr >> 16;
-    DSP_(_sdem_dsp_size) = frames*4;
-    DSP_(_dma0_stopped)=0;
-    
-    dsp_wake();
+    DSP_(_sdem_dsp_size) = size;
+
+    /* Flush any pending cache writes */
+    commit_dcache_range(start, size);
+
+    if (DSP_(_dma0_stopped) == 1)
+    {
+        /* Initialize codec. */
+        DSP_(_dma0_stopped)=0;
+        dsp_wake();
+    }
+    else
+    {
+        /* Wakes it in DSPHINT() */
+        DEBUGF("pcm_sdram at %08p, sdem_addr %08p", addr, sdem_addr);
+    }
+}
+
+void pcm_play_dma_prepare(void)
+{
+    pcm_play_dma_stop();
 }
 
 void pcm_play_dma_stop(void)
@@ -119,12 +138,12 @@ void pcm_play_dma_stop(void)
     dsp_wake();
 }
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
 
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
 
 }
@@ -172,25 +191,8 @@ void DSPHINT(void)
         break;
         
     case MSG_REFILL:
-        /* Buffer empty.  Try to get more. */
-        if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &frames))
-        {
-            unsigned long sdem_addr=(unsigned long)start - CONFIG_SDRAM_START;
-            size_t size = frames*4;
-            /* Flush any pending cache writes */
-            commit_dcache_range(start, size);
-
-            /* set the new DMA values */
-            DSP_(_sdem_addrl) = sdem_addr & 0xffff;
-            DSP_(_sdem_addrh) = sdem_addr >> 16;
-            DSP_(_sdem_dsp_size) = size;
-            
-            DEBUGF("pcm_sdram at 0x%08lx, sdem_addr 0x%08lx",
-                (unsigned long)start, (unsigned long)sdem_addr);
-
-            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-        }
-        
+        /* Buffer empty. Inform and more may be sent. */
+        pcm_play_dma_complete_callback(0);        
         break;
     default:
         DEBUGF("DSP: unknown msg 0x%04x", dsp_message.msg);

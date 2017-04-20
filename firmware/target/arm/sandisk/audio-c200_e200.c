@@ -187,24 +187,43 @@ void audiohw_set_sampr_dividers(int fsel)
 }
 
 #ifdef CONFIG_SAMPR_TYPES
-unsigned int pcm_sampr_to_hw_sampr(unsigned int samplerate,
-                                   unsigned int type)
+unsigned long pcm_sampr_convert(unsigned long samplerate,
+                                enum pcm_sampr_type type_from,
+                                enum pcm_sampr_type type_to)
 {
 #ifdef HAVE_RECORDING
-    if (samplerate != HW_SAMPR_RESET && type == SAMPR_TYPE_REC)
+    if (type_from == SAMPR_TYPE_PLAY)
+        type_from = SAMPR_TYPE_HW;
+
+    if (type_to == SAMPR_TYPE_PLAY)
+        type_to = SAMPR_TYPE_HW;
+
+    if (samplerate != HW_SAMPR_RESET && type_from != type_to)
     {
         /* Check if the samplerate is in the list of recordable rates.
          * Fail to default if not */
-        int index = round_value_to_list32(samplerate, rec_freq_sampr,
-                                          REC_NUM_FREQ, false);
-        if (samplerate != rec_freq_sampr[index])
-            samplerate = REC_SAMPR_DEFAULT;
+        if (type_from == SAMPR_TYPE_REC) /* REC to HW */
+        {
+            int index = round_value_to_list32(samplerate, rec_freq_sampr,
+                                              REC_NUM_FREQ, false);
+            if (samplerate != rec_freq_sampr[index])
+                samplerate = REC_SAMPR_DEFAULT;
 
-        samplerate *= 2; /* Recording rates are 1/2 the codec clock */
+            samplerate *= 2; /* Recording rates are half the DAC clock */
+        }
+        else                             /* HW to REC */
+        {
+            int index = round_value_to_list32(samplrate, hw_freq_sampr,
+                                              HW_NUM_FREQ, false);
+            if (samplerate != hw_freq_sampr[index])
+                samplerate = HW_SAMPR_DEFAULT;
+
+            samplerate /= 2; /* Playback rates are twice the ADC clock */
+        }
     }
 #endif /* HAVE_RECORDING */
 
     return samplerate;
-    (void)type;
+    (void)type_from; (void)type_to;
 }
 #endif /* CONFIG_SAMPR_TYPES */

@@ -87,10 +87,6 @@ struct system_status global_status;
 #include "enc_config.h"
 #endif
 #include "pcm_sampr.h"
-#ifdef HAVE_PLAY_FREQ
-#include "pcm_mixer.h"
-#include "dsp_core.h"
-#endif
 #endif /* CONFIG_CODEC == SWCODEC */
 
 #define NVRAM_BLOCK_SIZE 44
@@ -735,41 +731,6 @@ void settings_apply_pm_range(void)
 }
 #endif /* HAVE_LCD_BITMAP */
 
-#ifdef HAVE_PLAY_FREQ
-void settings_apply_play_freq(int value, bool playback)
-{
-    static const unsigned long play_sampr[] = { SAMPR_44, SAMPR_48 };
-    static int prev_setting = 0;
-
-    if ((unsigned)value >= ARRAYLEN(play_sampr))
-        value = 0;
-
-    bool changed = value != prev_setting;
-    prev_setting = value;
-
-    unsigned long elapsed = 0;
-    unsigned long offset = 0;
-    bool playing = changed && !playback &&
-                   audio_status() == AUDIO_STATUS_PLAY;
-
-    if (playing)
-    {
-        struct mp3entry *id3 = audio_current_track();
-        elapsed = id3->elapsed;
-        offset = id3->offset;
-    }
-
-    if (changed && !playback)
-        audio_hard_stop();
-
-    /* Other sub-areas of playback pick it up from the mixer */
-    mixer_set_frequency(play_sampr[value]);
-
-    if (playing)
-        audio_play(elapsed, offset);
-}
-#endif /* HAVE_PLAY_FREQ */
-
 void sound_settings_apply(void)
 {
 #ifdef AUDIOHW_HAVE_BASS
@@ -1023,10 +984,11 @@ void settings_apply(bool read_disk)
     lcd_scroll_delay(global_settings.scroll_delay);
 
 
-#ifdef HAVE_PLAY_FREQ
-    settings_apply_play_freq(global_settings.play_frequency, false);
-#endif
 #if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_PLAY_FREQ
+    /* before crossfade */
+    audio_set_playback_frequency(global_settings.play_frequency);
+#endif
 #ifdef HAVE_CROSSFADE
     audio_set_crossfade(global_settings.crossfade);
 #endif

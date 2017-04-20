@@ -45,11 +45,11 @@ static int blockbits = 0;
 static int lastbytebits = 0;
 static bool after_seek = false;
 
-static struct pcm_format *fmt;
+static struct libpcm_pcm_format *fmt;
 
 #define GET_SAMPLE_COUNT(s) ((((s) << 3) / fmt->channels - 22) / fmt->bitspersample + 1)
 
-static bool set_format(struct pcm_format *format)
+static bool set_format(struct libpcm_pcm_format *format)
 {
     fmt = format;
 

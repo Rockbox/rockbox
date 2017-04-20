@@ -134,7 +134,7 @@ static unsigned int search_chunk(const unsigned char *name, int nlen, off_t *pos
     return 0;
 }
 
-static bool parse_audio_track(struct pcm_format *fmt, unsigned int chunksize, off_t *pos)
+static bool parse_audio_track(struct libpcm_pcm_format *fmt, unsigned int chunksize, off_t *pos)
 {
     const unsigned char *buf;
     size_t size;
@@ -185,7 +185,7 @@ static bool parse_audio_track(struct pcm_format *fmt, unsigned int chunksize, of
     return true;
 }
 
-static bool parse_score_track(struct pcm_format *fmt, off_t *pos)
+static bool parse_score_track(struct libpcm_pcm_format *fmt, off_t *pos)
 {
     const unsigned char *buf;
     unsigned int chunksize;
@@ -277,13 +277,13 @@ static bool parse_score_track(struct pcm_format *fmt, off_t *pos)
     return true;
 }
 
-static bool parse_header(struct pcm_format *fmt, off_t *pos)
+static bool parse_header(struct libpcm_pcm_format *fmt, off_t *pos)
 {
     const unsigned char *buf;
     unsigned int chunksize;
     size_t size;
 
-    ci->memset(fmt, 0, sizeof(struct pcm_format));
+    ci->memset(fmt, 0, sizeof(struct libpcm_pcm_format));
 
     /* check File Chunk and Contents Info Chunk */
     buf = ci->request_buffer(&size, 16);
@@ -319,7 +319,7 @@ static bool parse_header(struct pcm_format *fmt, off_t *pos)
     return true;
 }
 
-static struct pcm_format format;
+static struct libpcm_pcm_format format;
 static uint32_t bytesdone;
 
 static uint8_t *read_buffer(size_t *realsize)

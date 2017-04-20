@@ -30,7 +30,6 @@
 #include <errno.h>
 #define PREFIX(_x_) sim_ ## _x_
 #else
-extern int errno;
 #define EINVAL          22      /* Invalid argument */
 #define ERANGE          34      /* Math result not representable */
 #define PREFIX

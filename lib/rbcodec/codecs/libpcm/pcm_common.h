@@ -47,7 +47,7 @@ else if ((data) < (min)) data = min;
  */
 #define MSADPCM_NUM_COEFF 7
 
-struct pcm_format {
+struct libpcm_pcm_format {
     /*
      * RIFF: wFormatTag (in 'fmt ' chunk)
      * AIFF: compressionType (in 'COMM' chunk)
@@ -138,7 +138,7 @@ struct pcm_codec {
      *     true:  RIFF/AIFF header check OK
      *     false: RIFF/AIFF header check NG
      */
-    bool (*set_format)(struct pcm_format *format);
+    bool (*set_format)(struct libpcm_pcm_format *format);
 
     /*
      * get seek position

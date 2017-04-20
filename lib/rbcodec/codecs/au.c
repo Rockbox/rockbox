@@ -88,7 +88,7 @@ static unsigned int get_be32(uint8_t *buf)
     return (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
 }
 
-static int convert_au_format(unsigned int encoding, struct pcm_format *fmt)
+static int convert_au_format(unsigned int encoding, struct libpcm_pcm_format *fmt)
 {
     fmt->formattag = AU_FORMAT_UNSUPPORT;
     if (encoding < 8)
@@ -119,7 +119,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 /* this is called for each file to process */
 enum codec_status codec_run(void)
 {
-    struct pcm_format format;
+    struct libpcm_pcm_format format;
     uint32_t bytesdone, decodedsamples;
     size_t n;
     int bufcount;
@@ -142,7 +142,7 @@ enum codec_status codec_run(void)
     param = ci->id3->elapsed;
     bytesdone = ci->id3->offset;
 
-    ci->memset(&format, 0, sizeof(struct pcm_format));
+    ci->memset(&format, 0, sizeof(struct libpcm_pcm_format));
     format.is_signed = true;
     format.is_little_endian = false;
 

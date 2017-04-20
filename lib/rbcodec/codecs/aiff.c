@@ -75,7 +75,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 /* this is called for each file to process */
 enum codec_status codec_run(void)
 {
-    struct pcm_format format;
+    struct libpcm_pcm_format format;
     uint32_t bytesdone, decodedsamples;
     /* rockbox: comment 'set but unused' variables
     uint32_t num_sample_frames = 0;
@@ -127,7 +127,7 @@ enum codec_status codec_run(void)
     buf += 12;
     n -= 12;
 
-    ci->memset(&format, 0, sizeof(struct pcm_format));
+    ci->memset(&format, 0, sizeof(struct libpcm_pcm_format));
     format.is_signed = true;
     format.is_little_endian = false;
 

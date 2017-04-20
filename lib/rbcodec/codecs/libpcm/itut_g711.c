@@ -106,9 +106,9 @@ static const int16_t ulaw2linear16[256] ICONST_ATTR = {
         24,      16,       8,       0
 };
 
-static struct pcm_format *fmt;
+static struct libpcm_pcm_format *fmt;
 
-static bool set_format(struct pcm_format *format)
+static bool set_format(struct libpcm_pcm_format *format)
 {
     fmt = format;
 

@@ -30,7 +30,7 @@ CODEC_HEADER
 
 static int32_t samples[PCM_SAMPLE_SIZE] IBSS_ATTR;
 
-static struct pcm_format format;
+static struct libpcm_pcm_format format;
 static uint32_t bytesdone;
 
 static uint8_t *read_buffer(size_t *realsize)
@@ -78,7 +78,7 @@ enum codec_status codec_run(void)
     bytesdone = ci->id3->offset;
     ci->seek_buffer(0);
 
-    ci->memset(&format, 0, sizeof(struct pcm_format));
+    ci->memset(&format, 0, sizeof(struct libpcm_pcm_format));
 
     /* set format */
     format.channels      = 1;

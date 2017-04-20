@@ -104,10 +104,6 @@ grey_show(false);
 grey_release();
 #endif 
 
-#if CONFIG_CODEC == SWCODEC && !defined SIMULATOR
-    rb->pcm_play_stop();
-#endif
-
 return PLUGIN_OK;
 }
 

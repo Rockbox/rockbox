@@ -54,85 +54,47 @@ static struct channel_descriptor dma_play_cd =
  * registers. Disabling SDMA interrupt would disable DMA callbacks systemwide
  * and that is not something that is desireable.
  *
- * Lock explanation [++.locked]:
- * Trivial, just increment .locked.
+ * Lock explanation [DMA_INT_LOCKED:1]:
+ * Trivial, just set DMA_INT_LOCKED:1
  *
- * Unlock explanation [if (--.locked == 0 && .state != 0)]:
- * If int occurred and saw .locked as nonzero, we'll get a pending
- * and it will have taken no action other than to set the flag to the
- * value of .state. If it saw zero for .locked, it will have proceeded
- * normally into the pcm callbacks. If cb set the pending flag, it has
- * to be called to kickstart the callback mechanism and DMA. If the unlock
- * came after a stop, we won't be in the block and DMA will be off. If
- * we're still doing transfers, cb will see 0 for .locked and if pending,
- * it won't be called by DMA again. */
-struct dma_data
-{
-    int locked;
-    int callback_pending; /* DMA interrupt happened while locked */
-    int state;
-};
+ * Unlock explanation [DMA_INT_LOCKED:0 && DMA_INT_ON:1]:
+ * If int occurred and saw DMA_INT_LOCKED:1, callback will set DMA_CB_PENDING:1
+ * and it will have taken no action other than to set that flag. If it saw
+ * DMA_INT_LOCKED:0, it will have proceeded normally into the pcm callbacks.
+ * If cb set DMA_CB_PENDING:1, it has to be called when releasing the lockout
+ * in order to kickstart the callback mechanism and DMA if DMA_INT_ON:1. If an
+ * automatic stop was due, it will also complete normally when kickstarting.
+ * Another interrupt can't happen unless the channel was explicitly restarted.
+ */
+#define DMA_INT_LOCKED 0x1ul
+#define DMA_INT_ON     0x2ul
+#define DMA_CB_PENDING 0x4ul
 
-static struct dma_data dma_play_data =
-{
-    /* Initialize to an unlocked, stopped state */
-    .locked = 0,
-    .callback_pending = 0,
-    .state = 0
-};
-
-static void play_start_dma(const void *addr, unsigned long frames)
-{
-    size_t size = frames*4;
-    commit_dcache_range(addr, size);
-
-    dma_play_bd.buf_addr = (void *)addr_virt_to_phys((unsigned long)addr);
-    dma_play_bd.mode.count = size;
-    dma_play_bd.mode.command = TRANSFER_16BIT;
-    dma_play_bd.mode.status = BD_DONE | BD_WRAP | BD_INTR;
-
-    sdma_channel_run(DMA_PLAY_CH_NUM);
-}
+static unsigned long dma_play_state;
 
 static void play_dma_callback(void)
 {
-    if (dma_play_data.locked != 0)
+    if (dma_play_state & DMA_INT_LOCKED)
     {
-        /* Callback is locked out */
-        dma_play_data.callback_pending = dma_play_data.state;
-        return;
+        dma_play_state |= DMA_CB_PENDING;
+        return; /* Callback is locked out */
     }
 
-    /* Inform of status and get new buffer */
-    enum pcm_dma_status status = (dma_play_bd.mode.status & BD_RROR) ?
-                  PCM_DMAST_ERR_DMA : PCM_DMAST_OK;
-    const void *addr;
-    unsigned long frames;
-
-    if (pcm_play_dma_complete_callback(status, &addr, &frames))
-    {
-        play_start_dma(addr, frames);
-        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-    }
+    pcm_play_dma_complete_callback((dma_play_bd.mode.status & BD_RROR) ? -EIO : 0);
 }
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    ++dma_play_data.locked;
+    bitset32(&dma_play_state, DMA_INT_LOCKED);
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-    if (--dma_play_data.locked == 0 && dma_play_data.state != 0)
-    {
-        unsigned long oldstatus = disable_irq_save();
-        int pending = dma_play_data.callback_pending;
-        dma_play_data.callback_pending = 0;
-        restore_irq(oldstatus);
+    unsigned long state =
+        bitclr32(&dma_play_state, DMA_INT_LOCKED|DMA_CB_PENDING);
 
-        if (pending != 0)
-            play_dma_callback();
-    }
+    if ((state & (DMA_INT_ON|DMA_CB_PENDING)) == (DMA_INT_ON|DMA_CB_PENDING))
+        play_dma_callback();
 }
 
 void pcm_dma_apply_settings(void)
@@ -155,41 +117,37 @@ void pcm_play_dma_postinit(void)
     audiohw_postinit();
 }
 
-static void play_start_pcm(void)
+static NO_INLINE void tx_start(void)
 {
-    /* Stop transmission (if in progress) */
-    SSI_SCR2 &= ~SSI_SCR_TE;
-
+    SSI_SCR2 &= ~SSI_SCR_TE;     /* Stop transmission (if going) */
     SSI_SCR2 |= SSI_SCR_SSIEN;   /* Enable SSI */
     SSI_STCR2 |= SSI_STCR_TFEN0; /* Enable TX FIFO */
 
-    dma_play_data.state = 1; /* Check callback on unlock */
+    bitset32(&dma_play_state, DMA_INT_ON); /* Check callback on unlock */
 
     /* Do prefill to prevent swapped channels (see TLSbo61214 in MCIMX31CE).
      * No actual solution was offered but this appears to work. */
-    SSI_STX0_2 = 0;
-    SSI_STX0_2 = 0;
-    SSI_STX0_2 = 0;
-    SSI_STX0_2 = 0;
+    while ((SSI_SFCSR2 & SSI_SFCSR_TFCNT0) < (8 << SSI_SFCSR_TFCNT0_POS))
+        SSI_STX0_2 = 0;
 
     SSI_SIER2 |= SSI_SIER_TDMAE; /* Enable DMA req. */
     SSI_SCR2 |= SSI_SCR_TE;      /* Start transmitting */
 }
 
-static void play_stop_pcm(void)
+static NO_INLINE void tx_stop(void)
 {
     SSI_SIER2 &= ~SSI_SIER_TDMAE; /* Disable DMA req. */
 
     /* Set state before pending to prevent race with interrupt */
-    dma_play_data.state = 0;
+    bool int_on = bitclr32(&dma_play_state, DMA_INT_ON) & DMA_INT_ON;
 
-    /* Wait for FIFO to empty */
-    while (SSI_SFCSR_TFCNT0 & SSI_SFCSR2);
+    if (int_on)
+        while (SSI_SFCSR2 & SSI_SFCSR_TFCNT0); /* Wait for FIFO to empty */
 
-    SSI_STCR2 &= ~SSI_STCR_TFEN0; /* Disable TX */
+    SSI_STCR2 &= ~SSI_STCR_TFEN0;              /* Disable TX */
     SSI_SCR2 &= ~(SSI_SCR_TE | SSI_SCR_SSIEN); /* Disable transmission, SSI */
 
-    if (pcm_playing)
+    if (int_on)
     {
         /* Stopping: clear buffer info to ensure 0-size readbacks when
          * stopped */
@@ -198,32 +156,35 @@ static void play_stop_pcm(void)
         sdma_write_word(PLAY_MSA_ADDR, 0);
     }
 
-    /* Clear any pending callback */
-    dma_play_data.callback_pending = 0;
+    bitclr32(&dma_play_state, DMA_CB_PENDING); /* Clear any pending callback */
 }
 
-void pcm_play_dma_start(const void *addr, unsigned long frames)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
 {
-    sdma_channel_stop(DMA_PLAY_CH_NUM);
+    size_t size = frames*4;
+    commit_dcache_range(addr, size);
 
-    /* Disable transmission */
-    SSI_STCR2 &= ~SSI_STCR_TFEN0;
-    SSI_SCR2 &= ~(SSI_SCR_TE | SSI_SCR_SSIEN);
+    dma_play_bd.buf_addr = (void *)addr_virt_to_phys((unsigned long)addr);
+    dma_play_bd.mode.count = size;
+    dma_play_bd.mode.command = TRANSFER_16BIT;
+    dma_play_bd.mode.status = BD_DONE | BD_WRAP | BD_INTR;
 
-    if (!sdma_channel_reset(DMA_PLAY_CH_NUM))
-        return;
+    if (!(dma_play_state & DMA_INT_ON))
+        tx_start();
 
-    /* Begin I2S transmission */
-    play_start_pcm();
+    sdma_channel_run(DMA_PLAY_CH_NUM);
+}
 
-    /* Begin DMA transfer */
-    play_start_dma(addr, frames);
+void pcm_play_dma_prepare(void)
+{
+    pcm_play_dma_stop();
+    sdma_channel_reset(DMA_PLAY_CH_NUM);
 }
 
 void pcm_play_dma_stop(void)
 {
     sdma_channel_stop(DMA_PLAY_CH_NUM);
-    play_stop_pcm();
+    tx_stop();
 }
 
 void pcm_play_dma_pause(bool pause)
@@ -231,17 +192,17 @@ void pcm_play_dma_pause(bool pause)
     if (pause)
     {
         sdma_channel_pause(DMA_PLAY_CH_NUM);
-        play_stop_pcm();
+        tx_stop();
     }
     else
     {
-        play_start_pcm();
+        tx_start();
         sdma_channel_run(DMA_PLAY_CH_NUM);
     }
 }
 
 /* Return the number of frames remaining - full L-R sample pairs only */
-unsigned long pcm_get_frames_waiting(void)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
     /* read burst dma source address register in channel context */
     unsigned long msa = sdma_read_word(PLAY_MSA_ADDR);
@@ -281,6 +242,8 @@ const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 }
 
 #ifdef HAVE_RECORDING
+static unsigned long dma_rec_state;
+
 static struct buffer_descriptor dma_rec_bd NOCACHEBSS_ATTR;
 
 static void rec_dma_callback(void);
@@ -295,15 +258,75 @@ static struct channel_descriptor dma_rec_cd =
     .event_id1 = SDMA_REQ_SSI1_RX1,
 };
 
-static struct dma_data dma_rec_data =
+static void rec_dma_callback(void)
 {
-    /* Initialize to an unlocked, stopped state */
-    .locked = 0,
-    .callback_pending = 0,
-    .state = 0
-};
+    if (dma_rec_state & DMA_INT_LOCKED)
+    {
+        dma_rec_state |= DMA_CB_PENDING;
+        return; /* Callback is locked out */
+    }
 
-static void rec_start_dma(void *addr, unsigned long frames)
+    pcm_rec_dma_complete_callback((dma_rec_bd.mode.status & BD_RROR) ? -EIO : 0);
+}
+
+static NO_INLINE void rx_start(void)
+{
+    SSI_SRCR1 |= SSI_SRCR_RFEN0;  /* Enable RX FIFO */
+
+    while (SSI_SFCSR1 & SSI_SFCSR_RFCNT0) /* Ensure clear FIFO */
+        SSI_SRX0_1;
+
+    SSI_SCR1 |= SSI_SCR_RE;       /* Enable receive */
+    SSI_SIER1 |= SSI_SIER_RDMAE;  /* Enable DMA req. */
+
+    bitset32(&dma_rec_state, DMA_INT_ON); /* Check callback on unlock */
+}
+
+static NO_INLINE void rx_stop(void)
+{
+    SSI_SIER1 &= ~SSI_SIER_RDMAE; /* Disable DMA req. */
+
+    /* Set state before pending to prevent race with interrupt */
+    bool int_on = bitclr32(&dma_rec_state, DMA_INT_ON) & DMA_INT_ON;
+
+    SSI_SCR1 &= ~SSI_SCR_RE;      /* Disable RX */
+    SSI_SRCR1 &= ~SSI_SRCR_RFEN0; /* Disable RX FIFO */
+
+    /* SSI1 provides the clocking signals for the codec and is always ON */
+
+    if (int_on)
+    {
+        /* Stopping: clear buffer info to ensure 0-size readbacks when
+         * stopped */
+        dma_rec_bd.buf_addr = NULL;
+        dma_rec_bd.mode.count = 0;
+        sdma_write_word(REC_MDA_ADDR, 0);
+    }
+
+    bitclr32(&dma_rec_state, DMA_CB_PENDING); /* Clear any pending callback */
+}
+
+void pcm_rec_dma_lock(void)
+{
+    bitset32(&dma_rec_state, DMA_INT_LOCKED);
+}
+
+void pcm_rec_dma_unlock(void)
+{
+    unsigned long state =
+        bitclr32(&dma_rec_state, DMA_INT_LOCKED|DMA_CB_PENDING);
+
+    if ((state & (DMA_INT_ON|DMA_CB_PENDING)) == (DMA_INT_ON|DMA_CB_PENDING))
+        rec_dma_callback();
+}
+
+void pcm_rec_dma_stop(void)
+{
+    sdma_channel_stop(DMA_REC_CH_NUM);
+    rx_stop();
+}
+
+void pcm_rec_dma_capture_frames(void *addr, unsigned long frames)
 {
     size_t size = frames*4;
     discard_dcache_range(addr, size);
@@ -315,98 +338,16 @@ static void rec_start_dma(void *addr, unsigned long frames)
     dma_rec_bd.mode.command = TRANSFER_16BIT;
     dma_rec_bd.mode.status = BD_DONE | BD_WRAP | BD_INTR;
 
+    if (!(dma_rec_state & DMA_INT_ON))
+        rx_start();
+
     sdma_channel_run(DMA_REC_CH_NUM);
 }
 
-static void rec_dma_callback(void)
-{
-    if (dma_rec_data.locked != 0)
-    {
-        dma_rec_data.callback_pending = dma_rec_data.state;
-        return; /* Callback is locked out */
-    }
-
-    /* Inform middle layer */
-    enum pcm_dma_status status = (dma_rec_bd.mode.status & BD_RROR) ?
-                                  PCM_DMAST_ERR_DMA : PCM_DMAST_OK;
-    void *addr;
-    unsigned long frames;
-
-    if (pcm_rec_dma_complete_callback(status, &addr, &frames))
-    {
-        rec_start_dma(addr, frames);
-        pcm_rec_dma_status_callback(PCM_DMAST_STARTED);
-    }
-}
-
-void pcm_rec_lock(void)
-{
-    ++dma_rec_data.locked;
-}
-
-void pcm_rec_unlock(void)
-{
-    if (--dma_rec_data.locked == 0 && dma_rec_data.state != 0)
-    {
-        unsigned long oldstatus = disable_irq_save();
-        int pending = dma_rec_data.callback_pending;
-        dma_rec_data.callback_pending = 0;
-        restore_irq(oldstatus);
-
-        if (pending != 0)
-            rec_dma_callback();
-    }
-}
-
-void pcm_rec_dma_stop(void)
-{
-    SSI_SIER1 &= ~SSI_SIER_RDMAE; /* Disable DMA req. */
-
-    /* Set state before pending to prevent race with interrupt */
-    dma_rec_data.state = 0;
-
-    /* Stop receiving data */
-    sdma_channel_stop(DMA_REC_CH_NUM);
-
-    bitclr32(&SSI_SIER1, SSI_SIER_RDMAE);
-
-    SSI_SCR1 &= ~SSI_SCR_RE;      /* Disable RX */
-    SSI_SRCR1 &= ~SSI_SRCR_RFEN0; /* Disable RX FIFO */
-
-    if (pcm_recording)
-    {
-        /* Stopping: clear buffer info to ensure 0-size readbacks when
-         * stopped */
-        dma_rec_bd.buf_addr = NULL;
-        dma_rec_bd.mode.count = 0;
-        sdma_write_word(REC_MDA_ADDR, 0);
-    }
-
-    /* Clear any pending callback */
-    dma_rec_data.callback_pending = 0;
-}
-
-void pcm_rec_dma_start(void *addr, unsigned long frames)
+void pcm_rec_dma_prepare(void)
 {
     pcm_rec_dma_stop();
-
-    if (!sdma_channel_reset(DMA_REC_CH_NUM))
-        return;
-
-    SSI_SRCR1 |= SSI_SRCR_RFEN0; /* Enable RX FIFO */
-
-    /* Ensure clear FIFO */
-    while (SSI_SFCSR1 & SSI_SFCSR_RFCNT0)
-        SSI_SRX0_1;
-
-    /* Enable receive */
-    SSI_SCR1 |= SSI_SCR_RE;
-    SSI_SIER1 |= SSI_SIER_RDMAE; /* Enable DMA req. */
-
-    /* Begin DMA transfer */
-    rec_start_dma(addr, frames);
-
-    dma_rec_data.state = 1; /* Check callback on unlock */
+    sdma_channel_reset(DMA_REC_CH_NUM);
 }
 
 void pcm_rec_dma_close(void)

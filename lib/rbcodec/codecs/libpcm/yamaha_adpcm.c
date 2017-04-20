@@ -76,9 +76,9 @@ static bool has_block_header = false;
 static struct adpcm_data cur_data;
 static int blocksperchunk;
 
-static struct pcm_format *fmt;
+static struct libpcm_pcm_format *fmt;
 
-static bool set_format(struct pcm_format *format)
+static bool set_format(struct libpcm_pcm_format *format)
 {
     fmt = format;
 

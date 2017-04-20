@@ -19,9 +19,6 @@
  *
  ****************************************************************************/
 #include "config.h"
-#if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
-#include <stdlib.h> /* sim uses rand for peakmeter simulation */
-#endif
 #include "thread.h"
 #include "kernel.h"
 #include "settings.h"
@@ -44,32 +41,22 @@
 
 #if CONFIG_CODEC == SWCODEC
 #include "pcm.h"
-#include "pcm_mixer.h"
 
 #ifdef HAVE_RECORDING
 #include "pcm_record.h"
 #endif
+#endif /* SWCODEC */
 
-static bool pm_playback = true; /* selects between playback and recording peaks */
+#ifdef HAVE_RECORDING
+static bool pm_record = false; /* selects playback or recording behavior */
 #endif
 
 static struct meter_scales scales[NB_SCREENS];
 
-#if !defined(SIMULATOR) && CONFIG_CODEC != SWCODEC
-/* Data source */
-static int pm_src_left = MAS_REG_DQPEAK_L;
-static int pm_src_right = MAS_REG_DQPEAK_R;
-#endif
-
 /* Current values and cumulation */
-#if CONFIG_CODEC == SWCODEC
-static struct pcm_peaks peaks;
-#define pm_cur_left  (peaks.peak[0])
-#define pm_cur_right (peaks.peak[1])
-#else
-static int pm_cur_left;        /* current values (last peak_meter_peek) */
-static int pm_cur_right;
-#endif /* SWCODEC */
+static struct audio_peaks peaks;
+#define pm_cur_left  ((int)peaks.peak[0])
+#define pm_cur_right ((int)peaks.peak[1])
 static int pm_max_left;        /* maximum values between peak meter draws */
 static int pm_max_right;
 #if defined(HAVE_AGC) || defined(HAVE_HISTOGRAM)
@@ -576,18 +563,8 @@ void pm_reset_clipcount(void)
  */
 void peak_meter_playback(bool playback)
 {
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
-    (void)playback;
-#elif CONFIG_CODEC == SWCODEC
-    pm_playback = playback;
-#else
-    if (playback) {
-        pm_src_left = MAS_REG_DQPEAK_L;
-        pm_src_right = MAS_REG_DQPEAK_R;
-    } else {
-        pm_src_left = MAS_REG_QPEAK_L;
-        pm_src_right = MAS_REG_QPEAK_R;
-    }
+#ifdef HAVE_RECORDING
+    pm_record = !playback;
 #endif
     /* reset the scales just in case recording and playback
        use different viewport sizes. Normally we should be checking viewport
@@ -619,28 +596,15 @@ static void set_trig_status(int new_state)
 void peak_meter_peek(void)
 {
     int left, right;
+    /* read current values */
 #ifdef HAVE_RECORDING
     bool was_clipping = pm_clip_left || pm_clip_right;
 #endif
-   /* read current values */
-#if CONFIG_CODEC == SWCODEC
-    if (pm_playback)
-        mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK, &peaks);
-#ifdef HAVE_RECORDING
-    else
-        pcm_calculate_rec_peaks(&peaks);
-#endif
+
+    audio_get_peaks(&peaks, 15);
+
     left  = pm_cur_left;
     right = pm_cur_right;
-#else /* !SWCODEC */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-    pm_cur_left  = left  = mas_codec_readreg(pm_src_left);
-    pm_cur_right = right = mas_codec_readreg(pm_src_right);
-#else
-    pm_cur_left  = left  = 8000;
-    pm_cur_right = right = 9000;
-#endif
-#endif /* SWCODEC */
 
     /* check for clips
        An clip is assumed when two consecutive readouts
@@ -1150,11 +1114,7 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
     /* cliplight */
     if ((pm_clip_left || pm_clip_right) && 
         global_settings.cliplight &&
-#if CONFIG_CODEC == SWCODEC        
-        !pm_playback)
-#else
-        !(audio_status() & (AUDIO_STATUS_PLAY | AUDIO_STATUS_ERROR)))
-#endif
+        pm_record)
     {
         /* if clipping, cliplight setting on and in recording screen */
         if (global_settings.cliplight <= 2)

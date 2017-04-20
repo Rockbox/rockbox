@@ -24,10 +24,6 @@
 #define _ROCKCONF_H_ /* Protect against unwanted include */
 #include "lua.h"
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-int errno = 0;
-#endif
-
 char *strerror(int errnum)
 {
     (void) errnum;

@@ -94,7 +94,7 @@ static const struct pcm_codec *get_wave_codec(uint32_t formattag)
     return 0;
 }
 
-static struct pcm_format format;
+static struct libpcm_pcm_format format;
 static uint32_t bytesdone;
 
 /* Read an unaligned 64-bit little endian unsigned integer from buffer. */
@@ -211,7 +211,7 @@ enum codec_status codec_run(void)
     ci->advance_buffer(40);
 
     firstblockposn = 40;
-    ci->memset(&format, 0, sizeof(struct pcm_format));
+    ci->memset(&format, 0, sizeof(struct libpcm_pcm_format));
     format.is_signed = true;
     format.is_little_endian = true;
 

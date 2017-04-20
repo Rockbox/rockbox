@@ -21,6 +21,8 @@
 /* HZ, TIME_AFTER, current_tick */
 #include "kernel.h"
 
+#include "pcm.h"
+
 /* Structure to record some info during processing call */
 struct dsp_loop_context
 {

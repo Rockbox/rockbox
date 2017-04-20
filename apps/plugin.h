@@ -77,7 +77,6 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "misc.h"
 #include "pathfuncs.h"
 #if (CONFIG_CODEC == SWCODEC)
-#include "pcm_mixer.h"
 #include "dsp-util.h"
 #include "dsp_core.h"
 #include "dsp_proc_settings.h"
@@ -656,31 +655,33 @@ struct plugin_api {
 #if CONFIG_CODEC == SWCODEC
     const unsigned long *audio_master_sampr_list;
     const unsigned long *hw_freq_sampr;
-    void (*pcm_apply_settings)(void);
-    void (*pcm_play_data)(pcm_play_callback_type get_more,
-                          pcm_status_callback_type status_cb,
-                          const void *start, unsigned long frames);
-    void (*pcm_play_stop)(void);
-    void (*pcm_set_frequency)(unsigned int frequency);
-    bool (*pcm_is_playing)(void);
-    bool (*pcm_is_paused)(void);
-    void (*pcm_play_pause)(bool play);
-    unsigned long (*pcm_get_frames_waiting)(void);
-    void (*pcm_calculate_peaks)(struct pcm_peaks *peaks);
-    const void* (*pcm_get_peak_buffer)(unsigned long *frames_rem);
-    void (*pcm_play_lock)(void);
-    void (*pcm_play_unlock)(void);
+    int (*pcm_apply_settings)(pcm_handle_t pcm);
+    unsigned long (*pcm_set_frequency)(pcm_handle_t pcm,
+                                       unsigned long samplerate);
+    unsigned long (*pcm_get_frequency)(pcm_handle_t pcm);
+    int (*pcm_open)(pcm_handle_t *pcm_out,
+                    unsigned int flags);
+    int (*pcm_close)(pcm_handle_t pcm);
+    int (*pcm_lock_callback)(pcm_handle_t pcm);
+    int (*pcm_unlock_callback)(pcm_handle_t pcm);
+    int (*pcm_play_data)(pcm_handle_t pcm,
+                         pcm_play_callback_type callback,
+                         const void *addr,
+                         unsigned long frames,
+                         const struct pcm_format *format);
+    int (*pcm_pause)(pcm_handle_t pcm, bool pause);
+    int (*pcm_stop)(pcm_handle_t pcm);
+    int (*pcm_get_state)(pcm_handle_t pcm);
+    unsigned long (*pcm_get_frames_waiting)(pcm_handle_t pcm);
     void (*beep_play)(unsigned int frequency, unsigned int duration,
                       unsigned int amplitude);
 #ifdef HAVE_RECORDING
     const unsigned long *rec_freq_sampr;
-    void (*pcm_init_recording)(void);
-    void (*pcm_close_recording)(void);
-    void (*pcm_record_data)(pcm_rec_callback_type more_ready,
-                            pcm_status_callback_type status_cb,
-                            void *start, unsigned long frames);
-    void (*pcm_stop_recording)(void);
-    void (*pcm_calculate_rec_peaks)(struct pcm_peaks *peaks);
+    int (*pcm_record_data)(pcm_handle_t pcm,
+                           pcm_record_callback_type callback,
+                           void *addr,
+                           unsigned long frames,
+                           const struct pcm_format *format);
     void (*audio_set_recording_gain)(int left, int right, int type);
 #endif /* HAVE_RECORDING */
 #if INPUT_SRC_CAPS != 0
@@ -698,24 +699,6 @@ struct plugin_api {
     struct dsp_config * (*dsp_get_config)(enum dsp_ids id);
     void (*dsp_process)(struct dsp_config *dsp, struct dsp_buffer *src,
                         struct dsp_buffer *dst);
-
-    enum channel_status (*mixer_channel_status)(enum pcm_mixer_channel channel);
-    const void * (*mixer_channel_get_buffer)(enum pcm_mixer_channel channel,
-                                             unsigned long *frames_rem);
-    void (*mixer_channel_calculate_peaks)(enum pcm_mixer_channel channel,
-                                          struct pcm_peaks *peaks);
-    void (*mixer_channel_play_data)(enum pcm_mixer_channel channel,
-                                    pcm_play_callback_type get_more,
-                                    const void *start, unsigned long frames);
-    void (*mixer_channel_play_pause)(enum pcm_mixer_channel channel, bool play);
-    void (*mixer_channel_stop)(enum pcm_mixer_channel channel);
-    void (*mixer_channel_set_amplitude)(enum pcm_mixer_channel channel,
-                                        unsigned int amplitude);
-    unsigned long (*mixer_channel_get_frames_waiting)(enum pcm_mixer_channel channel);
-    void (*mixer_channel_set_buffer_hook)(enum pcm_mixer_channel channel,
-                                          chan_buffer_hook_fn_type fn);
-    void (*mixer_set_frequency)(unsigned int samplerate);
-    unsigned int (*mixer_get_frequency)(void);
     void (*system_sound_play)(enum system_sound sound);
     void (*keyclick_click)(bool rawbutton, int action);
 #endif /* CONFIG_CODEC == SWCODC */
@@ -749,6 +732,14 @@ struct plugin_api {
     struct mp3entry* (*audio_current_track)(void);
     void (*audio_flush_and_reload_tracks)(void);
     int (*audio_get_file_pos)(void);
+    void (*audio_get_peaks)(struct audio_peaks *peaks,
+                            unsigned int fracbits);
+#if CONFIG_CODEC == SWCODEC
+    unsigned long (*audio_get_playback_samplerate)(void);
+    const void * (* audio_get_unplayed_data)(unsigned long *frames_rem);
+    int (*audio_add_pcm_hook)(audio_pcm_hook_fn fn);
+    int (*audio_remove_pcm_hook)(audio_pcm_hook_fn fn);
+#endif /* SWCODEC */
 #if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     unsigned long (*mpeg_get_last_header)(void);
 #endif

@@ -31,8 +31,7 @@ static struct emac_context
 static FORCE_INLINE void save_emac_context(void)
 {
     /* Save only if not already saved */
-    if (emac_context.saved == 0)
-    {
+    if (emac_context.saved == 0) {
         emac_context.saved = 1;
         asm volatile (
             "move.l   %%macsr, %%d0             \n"
@@ -51,8 +50,7 @@ static FORCE_INLINE void save_emac_context(void)
 static FORCE_INLINE void restore_emac_context(void)
 {
     /* Restore only if saved */
-    if (UNLIKELY(emac_context.saved != 0))
-    {
+    if (UNLIKELY(emac_context.saved != 0)) {
         asm volatile (
            "movem.l (%0), %%d0-%%d1/%%a0-%%a1  \n"
            "move.l  %%a1, %%acc1               \n"
@@ -66,58 +64,20 @@ static FORCE_INLINE void restore_emac_context(void)
     }
 }
 
-#define mixer_buffer_callback_exit() restore_emac_context()
+#define mixer_buffer_cleanup() restore_emac_context()
 
-/* Mix channels' samples and apply gain factors */
-static FORCE_INLINE void mix_samples(void *out,
-                                     const void *src0,
-                                     int32_t src0_amp,
-                                     const void *src1,
-                                     int32_t src1_amp,
-                                     unsigned long count)
+static void write_samples_2ch_s16(void *out,
+                                  const struct pcm_handle *pcm,
+                                  unsigned long count)
 {
-    uint32_t s0, s1, s2, s3;
-    save_emac_context();
+    int32_t amp = pcm->amplitude;
+    int16_t const *src = pcm->start;
+    int32_t t0, t1, t2, t3;
 
-    asm volatile (
-        "move.l     (%1)+, %5                 \n"
-    "1:                                       \n"
-        "movea.w    %5, %4                    \n"
-        "asr.l      %10, %5                   \n"
-        "mac.l      %4, %8,            %%acc0 \n"
-        "mac.l      %5, %8, (%2)+, %5, %%acc1 \n"
-        "movea.w    %5, %4                    \n"
-        "asr.l      %10, %5                   \n"
-        "mac.l      %4, %9,            %%acc0 \n"
-        "mac.l      %5, %9, (%1)+, %5, %%acc1 \n"
-        "movclr.l   %%acc0, %6                \n"
-        "movclr.l   %%acc1, %7                \n"
-        "swap.w     %6                        \n"
-        "move.w     %6, %7                    \n"
-        "move.l     %7, (%0)+                 \n"
-        "subq.l     #1, %3                    \n"
-        "bhi.b      1b                        \n"
-        : "+a"(out), "+a"(src0), "+a"(src1), "+d"(count),
-          "=&a"(s0), "=&d"(s1), "=&d"(s2), "=&d"(s3)
-        : "r"(src0_amp), "r"(src1_amp), "d"(16)
-    );
-}
-
-/* Write channel's samples and apply gain factor */
-static FORCE_INLINE void write_samples(void *out,
-                                       const void *src,
-                                       int32_t amp,
-                                       unsigned long count)
-{
-    if (LIKELY(amp == MIX_AMP_UNITY))
-    {
-        /* Channel is unity amplitude */
+    if (LIKELY(amp == MIX_AMP_UNITY)) {
         memcpy(out, src, count*4);
     }
-    else
-    {
-        /* Channel needs amplitude cut */
-        uint32_t s0, s1, s2, s3;
+    else {
         save_emac_context();
 
         asm volatile (
@@ -125,18 +85,53 @@ static FORCE_INLINE void write_samples(void *out,
         "1:                                       \n"
             "movea.w    %4, %3                    \n"
             "asr.l      %8, %4                    \n"
-            "mac.l      %3, %7,            %%acc0 \n"
-            "mac.l      %4, %7, (%1)+, %4, %%acc1 \n"
+            "mac.l      %4, %7,            %%acc0 \n"
+            "mac.l      %3, %7, (%1)+, %4, %%acc1 \n"
             "movclr.l   %%acc0, %5                \n"
             "movclr.l   %%acc1, %6                \n"
-            "swap.w     %5                        \n"
-            "move.w     %5, %6                    \n"
-            "move.l     %6, (%0)+                 \n"
+            "swap.w     %6                        \n"
+            "move.w     %6, %5                    \n"
+            "move.l     %5, (%0)+                 \n"
             "subq.l     #1, %2                    \n"
             "bhi.b      1b                        \n"
             : "+a"(out), "+a"(src), "+d"(count),
-              "=&a"(s0), "=&d"(s1), "=&d"(s2), "=&d"(s3)
-            : "r"(amp), "d"(16)
-        );
+              "=&a"(t0), "=&d"(t1), "=&d"(t2), "=&d"(t3)
+            : "r"(amp), "d"(16));
     }
+}
+
+
+static void mix_samples_1ch_s16(void *out,
+                                const struct pcm_handle *pcm,
+                                unsigned long count)
+{
+    int32_t amp = pcm->amplitude;
+    int16_t const *src = pcm->addr;
+    int32_t t0, t1, t2, t3, t4;
+
+    save_emac_context();
+
+    asm volatile (
+        "move.l     (%0), %5                  \n"
+        "move.l     (%1)+, %4                 \n"
+    "1:                                       \n"
+        "movea.w    %5, %3                    \n"
+        "asr.l      %9, %5                    \n"
+        "move.l     %5, %%acc0                \n"
+        "move.l     %3, %%acc1                \n"
+        "movea.w    %4, %3                    \n"
+        "asr.l      %9, %4                    \n"
+        "mac.l      %4, %8, 4(%0), %5, %%acc0 \n"
+        "mac.l      %3, %8, (%1)+, %4, %%acc1 \n"
+        "movclr.l   %%acc0, %6                \n"
+        "movclr.l   %%acc1, %7                \n"
+        "swap.w     %7                        \n"
+        "move.w     %7, %6                    \n"
+        "move.l     %6, (%0)+                 \n"
+        "subq.l     #1, %2                    \n"
+        "bhi.b      1b                        \n"
+        : "+a"(out), "+a"(src), "+d"(count),
+          "=&a"(t0), "=&d"(t1), "=&d"(t2), "=&d"(t3), "=&d"(t4)
+        : "r"(amp), "d"(16)
+    );
 }
