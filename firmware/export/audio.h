@@ -30,9 +30,12 @@
 #if CONFIG_CODEC == SWCODEC
 #include "pcm_sampr.h"
 #include "pcm.h"
+#define AUDIO_MAX_CHANNELS PCM_NATIVE_CHANNELS
 #ifdef HAVE_RECORDING
 #include "enc_base.h"
 #endif /* HAVE_RECORDING */
+#else /* CONFIG_CODEC != SWCODEC */
+#define AUDIO_MAX_CHANNELS 2
 #endif /* CONFIG_CODEC == SWCODEC */
 
 #define AUDIO_STATUS_PLAY       0x0001
@@ -213,6 +216,14 @@ unsigned long audio_prerecorded_time(void);
 
 #endif /* HAVE_RECORDING */
 
+struct audio_peaks
+{
+#if CONFIG_CODEC == SWCODEC
+    struct pcm_peaks pcm_peaks; /* must directly precede 'peak' array */
+#endif
+    uint32_t peak[AUDIO_MAX_CHANNELS];
+};
+
 #if CONFIG_CODEC == SWCODEC
 /* SWCODEC misc. audio functions */
 #if INPUT_SRC_CAPS != 0
@@ -223,6 +234,11 @@ void audio_set_input_source(int source, unsigned flags);
 void audio_input_mux(int source, unsigned flags);
 void audio_set_output_source(int source);
 #endif /* INPUT_SRC_CAPS */
+
+int audio_get_pcm_state();
+void audio_get_peaks(struct audio_peaks *peaks, unsigned int fracbits);
+int audio_add_remove_pcm_hook(audio_pcm_hook_fn fn, bool add);
+
 #endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef HAVE_SPDIF_IN

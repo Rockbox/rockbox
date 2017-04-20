@@ -200,9 +200,9 @@ static struct starfield starfield;
 
 static int plugin_main(void)
 {
-    int button, avg_peak, t_disp=0;
+    int button, t_disp=0;
     int font_h, font_w;
-    bool pulse __attribute__ ((unused)) = true; /* 'unused' resolves warnings */
+    bool pulse = true;
     rb->lcd_getstringsize("A", &font_w, &font_h);
     starfield_init(&starfield);
     starfield_add_stars(&starfield, INIT_STARS);
@@ -220,50 +220,22 @@ static int plugin_main(void)
         rb->sleep(1);
         rb->lcd_clear_display();
 
-#if ((CONFIG_CODEC == SWCODEC)  || !defined(SIMULATOR) && \
-    ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)))
-
         /* This will make the stars pulse to the music */
         if(pulse){
+            /* Get the peaks, range [0, 8] */
+            static struct audio_peaks peaks;
+            rb->audio_get_peaks(&peaks, 3);
 
-            /* Get the peaks. ( Borrowed from vu_meter ) */
-#if (CONFIG_CODEC == SWCODEC)
-            static struct pcm_peaks peaks;
-            rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
-                                              &peaks);
-            #define left_peak peaks.peak[0]
-            #define right_peak peaks.peak[1]
-#else
-            int left_peak = rb->mas_codec_readreg(0xC);
-            int right_peak = rb->mas_codec_readreg(0xD);
-#endif
-            /* Devide peak data by 4098 to bring the max
-               value down from ~32k to 8 */
-            left_peak  =    left_peak/0x1000;
-            right_peak =    right_peak/0x1000;
+            /* Set the speed to the peak meter - average of channels */
+            starfield.z_move = (peaks.peak[0] + peaks.peak[1]) / 2;
 
-            /* Make sure they dont stop */
-            if(left_peak<0x1)
-                left_peak     = 0x1;
-            if(right_peak<0x1)
-                right_peak    = 0x1;
-
-            /* And make sure they dont go over 8 */
-            if(left_peak>0x8)
-                left_peak     = 0x8;
-            if(right_peak>0x8)
-                right_peak    = 0x8;
-
-            /* We need the average of both chanels */
-            avg_peak     = ( left_peak + right_peak )/2;
-
-            /* Set the speed to the peak meter */
-            starfield.z_move = avg_peak;
-
+            /* Make sure it doesn't stop or go over 8 */
+            if(starfield.z_move<0x1)
+                starfield.z_move = 0x1;
+            else if(starfield.z_move>0x8)
+                starfield.z_move = 0x8;
         } /* if pulse */
-#else
-        (void) avg_peak;
-#endif
+
         starfield_move_and_draw(&starfield);
 
 #ifdef HAVE_LCD_COLOR

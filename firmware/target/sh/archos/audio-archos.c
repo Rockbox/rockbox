@@ -535,6 +535,19 @@ bool mp3_is_playing(void)
     return playing;
 }
 
+void mp3_get_peaks(uint32_t *left, uint32_t *right)
+{
+    *left = rb->mas_codec_readreg(MAS_REG_DQPEAK_L);
+    *right = rb->mas_codec_readreg(MAS_REG_DQPEAK_R);
+}
+
+#ifdef HAVE_RECORDING
+void mp3_get_rec_peaks(uint32_t *left, uint32_t *right)
+{
+    *left = rb->mas_codec_readreg(MAS_REG_QPEAK_L)
+    *right = rb->mas_codec_readreg(MAS_REG_QPEAK_R);
+}
+#endif /* HAVE_RECORDING */
 
 /* returns the next byte position which would be transferred */
 unsigned char* mp3_get_pos(void)

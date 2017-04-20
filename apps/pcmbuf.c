@@ -25,7 +25,6 @@
 #include "debug.h"
 #include <kernel.h>
 #include "pcm.h"
-#include "pcm_mixer.h"
 #include "pcmbuf.h"
 #include "dsp-util.h"
 #include "playback.h"
@@ -41,13 +40,13 @@
 #include "audio.h"
 #include "voice_thread.h"
 
-/* 2 channels * 2 bytes/sample, interleaved */
-#define PCMBUF_SAMPLE_SIZE   (2 * 2)
+/* 2 channels * PCM_NATIVE_SIZE bytes/sample, interleaved */
+#define PCMBUF_FRAME_SIZE   PCM_DMT_T_FRAME_SIZE
 
 /* This is the target fill size of chunks on the pcm buffer
    Can be any number of samples but power of two sizes make for faster and
-   smaller math - must be < 65536 bytes */
-#define PCMBUF_CHUNK_SIZE    8192u
+   smaller math - must be < 65536 bytes - worst is 32-bit samples or 16kB */
+#define PCMBUF_CHUNK_SIZE    (2048*PCMBUF_FRAME_SIZE)
 
 /* Small guard buf to give decent space near end */
 #define PCMBUF_GUARD_SIZE    (PCMBUF_CHUNK_SIZE / 8)
@@ -71,7 +70,7 @@
 #define DATA_LEVEL(quarter_secs) (pcmbuf_sampr * (quarter_secs))
 
 /* Number of bytes played per second */
-#define BYTERATE            (pcmbuf_sampr * PCMBUF_SAMPLE_SIZE)
+#define BYTERATE            (pcmbuf_sampr * PCMBUF_FRAME_SIZE)
 
 #if MEMORYSIZE > 2
 /* Keep watermark high for large memory target - at least (2s) */
@@ -122,9 +121,15 @@ static size_t pcmbuf_watermark = 0;
 static bool low_latency_mode = false;
 
 static bool pcmbuf_sync_position = false;
+static bool pcmbuf_position_callback_on = true;
+
+/* PCM handle in use by playback and recording engines */
+extern pcm_handle_t audio_pcm_handle;
+static pcm_handle_t pcm_handle = 0;
+static audio_pcm_hook_fn pcmbuf_pcm_hook = NULL;
 
 /* Fade effect */
-static unsigned int fade_vol = MIX_AMP_UNITY;
+static unsigned int fade_vol = PCM_AMP_UNITY;
 static enum
 {
     PCM_NOT_FADING = 0,
@@ -201,13 +206,12 @@ extern void audio_pcmbuf_track_change(bool pcmbuf);
 extern bool audio_pcmbuf_may_play(void);
 extern void audio_pcmbuf_sync_position(void);
 
-
 /**************************************/
 
 /* start PCM if callback says it's alright */
 static void start_audio_playback(void)
 {
-     if (audio_pcmbuf_may_play())
+    if (audio_pcmbuf_may_play())
         pcmbuf_play_start();
 }
 
@@ -446,7 +450,7 @@ static void commit_write_buffer(size_t size)
 /* Request space in the buffer for writing output samples */
 void * pcmbuf_request_buffer(unsigned long *frames)
 {
-    size_t size = *frames * PCMBUF_SAMPLE_SIZE;
+    size_t size = *frames * PCMBUF_FRAME_SIZE;
 
 #ifdef HAVE_CROSSFADE
     /* We're going to crossfade to a new track, which is now on its way */
@@ -462,7 +466,7 @@ void * pcmbuf_request_buffer(unsigned long *frames)
     if (size > PCMBUF_MAX_BUFFER)
         size = PCMBUF_MAX_BUFFER; /* constrain request */
 
-    enum channel_status status = mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK);
+    int state = pcm_get_state(pcm_handle);
     size_t remaining = pcmbuf_unplayed_bytes();
 
     /* Need to have length bytes to prevent wrapping overwriting - leave one
@@ -476,7 +480,7 @@ void * pcmbuf_request_buffer(unsigned long *frames)
         return NULL;
 
     /* Maintain the buffer level above the watermark */
-    if (status != CHANNEL_STOPPED)
+    if (state > PCM_STATE_STOPPED)
     {
         if (low_latency_mode)
         {
@@ -521,7 +525,7 @@ void * pcmbuf_request_buffer(unsigned long *frames)
         buf = get_write_buffer(&size);
     }
 
-    *frames = size / PCMBUF_SAMPLE_SIZE;
+    *frames = size / PCMBUF_FRAME_SIZE;
     return buf;
 }
 
@@ -529,7 +533,7 @@ void * pcmbuf_request_buffer(unsigned long *frames)
 void pcmbuf_write_complete(unsigned long frames, unsigned long elapsed,
                            off_t offset)
 {
-    size_t size = frames * PCMBUF_SAMPLE_SIZE;
+    size_t size = frames * PCMBUF_FRAME_SIZE;
 
 #ifdef HAVE_CROSSFADE
     if (crossfade_status != CROSSFADE_INACTIVE)
@@ -668,14 +672,14 @@ static void pcmbuf_cancel_track_change(bool position)
    immediately if the buffer is empty */
 void pcmbuf_monitor_track_change(bool monitor)
 {
-    pcm_play_lock();
+    pcm_lock_callback(pcm_handle);
 
     if (monitor)
         pcmbuf_monitor_track_change_ex(chunk_widx);
     else
         pcmbuf_cancel_track_change(false);
 
-    pcm_play_unlock();
+    pcm_unlock_callback(pcm_handle);
 }
 
 void pcmbuf_start_track_change(enum pcm_track_change_type type)
@@ -786,8 +790,12 @@ void pcmbuf_start_track_change(enum pcm_track_change_type type)
 /** Playback */
 
 /* PCM driver callback */
-static void pcmbuf_pcm_callback(const void **start, unsigned long *frames)
+static int pcmbuf_pcm_callback(int status, const void **start,
+                               unsigned long *frames)
 {
+    if (status < 0)
+        return status;
+
     /*- Process the chunk that just finished -*/
     size_t index = chunk_ridx;
     struct chunkdesc *desc = current_desc;
@@ -811,15 +819,21 @@ static void pcmbuf_pcm_callback(const void **start, unsigned long *frames)
         current_desc = desc = index_chunkdesc(index);
 
         *start = index_buffer(index);
-        *frames = desc->size / PCMBUF_SAMPLE_SIZE;
+        *frames = desc->size / PCMBUF_FRAME_SIZE;
 
-        if (desc->pos_key != 0)
+        if (pcmbuf_position_callback_on && desc->pos_key != 0)
         {
             /* Positioning chunk - notify playback */
             audio_pcmbuf_position_callback(desc->elapsed, desc->offset,
                                            desc->pos_key);
         }
+
+        /* call the hook, if one */
+        if (pcmbuf_pcm_hook)
+            pcmbuf_pcm_hook(state, *start, *frames);
     }
+
+    return 0;
 }
 
 /* Force playback */
@@ -827,12 +841,16 @@ void pcmbuf_play_start(void)
 {
     logf("pcmbuf_play_start");
 
-    if (mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) == CHANNEL_STOPPED &&
+    if (!pcm_handle && pcm_open(&pcm_handle, PCM_STREAM_PLAYBACK))
+        return;
+
+    audio_pcm_handle = pcm_handle;
+
+    if (pcm_get_state(pcm_handle) == PCM_STATE_STOPPED &&
         chunk_widx != chunk_ridx)
     {
         current_desc = NULL;
-        mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, pcmbuf_pcm_callback,
-                                NULL, 0);
+        pcm_play_data(pcm_handle, pcmbuf_pcm_callback, NULL, 0, NULL);
     }
 }
 
@@ -842,7 +860,12 @@ void pcmbuf_play_stop(void)
     logf("pcmbuf_play_stop");
 
     /* Reset channel */
-    mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
+    if (pcm_handle)
+    {
+        pcm_close(pcm_handle);
+        pcm_handle = 0;
+        audio_pcm_handle = 0;
+    }
 
     /* Reset buffer */
     init_buffer_state();
@@ -862,10 +885,14 @@ void pcmbuf_pause(bool pause)
 {
     logf("pcmbuf_pause: %s", pause?"pause":"play");
 
-    if (mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) != CHANNEL_STOPPED)
-        mixer_channel_play_pause(PCM_MIXER_CHAN_PLAYBACK, !pause);
+    if (pcm_get_state(pcm_handle) > PCM_STATE_STOPPED)
+    {
+        pcm_pause(pcm_handle, pause);
+    }
     else if (!pause)
+    {
         pcmbuf_play_start();
+    }
 }
 
 
@@ -879,7 +906,7 @@ static void mixfader_init(struct mixfader *faderp, int32_t start_factor,
 {
     /* Linear fade */
     faderp->endfac = end_factor;
-    faderp->nsamp2 = size / PCMBUF_SAMPLE_SIZE * 2;
+    faderp->nsamp2 = size / PCMBUF_FRAME_SIZE * 2;
     faderp->alloc  = alloc;
 
     if (faderp->nsamp2 == 0)
@@ -922,7 +949,7 @@ static inline void mixfader_step(struct mixfader *faderp)
 
 static FORCE_INLINE int32_t mixfade_sample(const struct mixfader *faderp, int32_t s)
 {
-    return (faderp->factor * s + MIXFADE_UNITY/2) >> MIXFADE_UNITY_BITS;
+    return scale_sample_t(s, faderp->factor, MIXFADE_UNITY_BITS);
 }
 
 /* Cancel crossfade operation */
@@ -1004,7 +1031,7 @@ static void crossfade_mix_fade(struct mixfader *faderp, size_t size,
     if (index == INVALID_BUF_INDEX)
         return;
 
-    int16_t *inbuf = input_buf;
+    pcm_dma_t *inbuf = input_buf;
 
     bool alloced = inbuf && faderp->alloc &&
                    index_chunk_offs(index, 0) == chunk_widx;
@@ -1012,7 +1039,7 @@ static void crossfade_mix_fade(struct mixfader *faderp, size_t size,
     while (size)
     {
         struct chunkdesc *desc = index_chunkdesc(index);
-        int16_t *outbuf = index_buffer(index);
+        pcm_dma_t *outbuf = index_buffer(index);
 
         switch (offset)
         {
@@ -1030,7 +1057,7 @@ static void crossfade_mix_fade(struct mixfader *faderp, size_t size,
 
         size_t amount = (alloced ? PCMBUF_CHUNK_SIZE : desc->size)
                             - (index % PCMBUF_CHUNK_SIZE);
-        int16_t *chunkend = SKIPBYTES(outbuf, amount);
+        pcm_dma_t *chunkend = SKIPBYTES(outbuf, amount);
 
         if (size < amount)
             amount = size;
@@ -1040,7 +1067,7 @@ static void crossfade_mix_fade(struct mixfader *faderp, size_t size,
         if (alloced)
         {
             /* Fade the input buffer into the new destination chunk */
-            for (size_t s = amount; s != 0; s -= PCMBUF_SAMPLE_SIZE)
+            for (size_t s = amount; s != 0; s -= PCMBUF_FRAME_SIZE)
             {
                 *outbuf++ = mixfade_sample(faderp, *inbuf++);
                 *outbuf++ = mixfade_sample(faderp, *inbuf++);
@@ -1052,21 +1079,19 @@ static void crossfade_mix_fade(struct mixfader *faderp, size_t size,
         else if (inbuf)
         {
             /* Fade the input buffer and mix into the destination chunk */
-            for (size_t s = amount; s != 0; s -= PCMBUF_SAMPLE_SIZE)
+            for (size_t s = amount; s != 0; s -= PCMBUF_FRAME_SIZE)
             {
-                int32_t left  = outbuf[0];
-                int32_t right = outbuf[1];
-                left  += mixfade_sample(faderp, *inbuf++);
-                right += mixfade_sample(faderp, *inbuf++);
-                *outbuf++ = clip_sample_16(left);
-                *outbuf++ = clip_sample_16(right);
+                int32_t left  = mixfade_sample(faderp, *inbuf++);
+                int32_t right = mixfade_sample(faderp, *inbuf++);
+                *outbuf++ = mix_clip_sample_t(outbuf[0], left)
+                *outbuf++ = mix_clip_sample_t(outbuf[1], right);
                 mixfader_step(faderp);
             }
         }
         else
         {
             /* Fade the chunk in place */
-            for (size_t s = amount; s != 0; s -= PCMBUF_SAMPLE_SIZE)
+            for (size_t s = amount; s != 0; s -= PCMBUF_FRAME_SIZE)
             {
                 int32_t left  = outbuf[0];
                 int32_t right = outbuf[1];
@@ -1107,7 +1132,7 @@ static void crossfade_start(void)
 {
     logf("crossfade_start");
 
-    pcm_play_lock();
+    pcm_lock_callback(pcm_handle);
 
     if (crossfade_status == CROSSFADE_CONTINUE)
     {
@@ -1118,7 +1143,7 @@ static void crossfade_start(void)
         if (crossfade_auto_skip)
             pcmbuf_monitor_track_change_ex(crossfade_widx);
 
-        pcm_play_unlock();
+        pcm_unlock_callback(pcm_handle);
         return;
     }
 
@@ -1131,7 +1156,7 @@ static void crossfade_start(void)
     {
         logf("crossfade rejected");
         crossfade_cancel();
-        pcm_play_unlock();
+        pcm_unlock_callback(pcm_handle);
         return;
     }
 
@@ -1161,7 +1186,7 @@ static void crossfade_start(void)
         size_t index = crossfade_find_buftail(crossfade_auto_skip, unplayed,
                                               fade_out_need, &buffer_rem);
 
-        pcm_play_unlock();
+        pcm_unlock_callback(pcm_handle);
 
         if (buffer_rem < fade_out_need)
         {
@@ -1197,7 +1222,7 @@ static void crossfade_start(void)
         crossfade_mix_fade(&outfader, pcmbuf_size, NULL, &index, 0,
                            MIXFADE_NULLIFY_POS);
 
-        pcm_play_lock();
+        pcm_lock_callback(pcm_handle);
     }
 
     /* Initialize fade-in counters */
@@ -1215,7 +1240,7 @@ static void crossfade_start(void)
     if (crossfade_auto_skip)
         pcmbuf_monitor_track_change_ex(crossfade_widx);
 
-    pcm_play_unlock();
+    pcm_unlock_callback(pcm_handle);
 
     logf("crossfade_start done!");
 }
@@ -1305,23 +1330,23 @@ static void pcmbuf_update_volume(void)
     if (soft_mode)
         vol >>= 2;
 
-    mixer_channel_set_amplitude(PCM_MIXER_CHAN_PLAYBACK, vol);
+    pcm_set_amplitude(pcm_handle, vol);
 }
 
 /* Tick that does the fade for the playback channel */
 static void pcmbuf_fade_tick(void)
 {
     /* ~1/3 second for full range fade */
-    const unsigned int fade_step = MIX_AMP_UNITY / (HZ / 3);
+    const unsigned int fade_step = PCM_AMP_UNITY / (HZ / 3);
 
     if (fade_state == PCM_FADING_IN)
-        fade_vol += MIN(fade_step, MIX_AMP_UNITY - fade_vol);
+        fade_vol += MIN(fade_step, PCM_AMP_UNITY - fade_vol);
     else if (fade_state == PCM_FADING_OUT)
-        fade_vol -= MIN(fade_step, fade_vol - MIX_AMP_MUTE);
+        fade_vol -= MIN(fade_step, fade_vol - PCM_AMP_MUTE);
 
     pcmbuf_update_volume();
 
-    if (fade_vol == MIX_AMP_MUTE || fade_vol == MIX_AMP_UNITY)
+    if (fade_vol == PCM_AMP_MUTE || fade_vol == PCM_AMP_UNITY)
     {
         /* Fade is complete */
         tick_remove_task(pcmbuf_fade_tick);
@@ -1338,21 +1363,21 @@ static void pcmbuf_fade_tick(void)
 /* Fade channel in or out in the background */
 void pcmbuf_fade(bool fade, bool in)
 {
-    /* Must pause any active fade */
-    pcm_play_lock();
+    /* Must pause any active fade (to protect concurrent data) */
+    pcm_lock_callback(pcm_handle);
 
     if (fade_state != PCM_NOT_FADING)
         tick_remove_task(pcmbuf_fade_tick);
 
     fade_out_complete = false;
 
-    pcm_play_unlock();
+    pcm_unlock_callback(pcm_handle);
 
     if (!fade)
     {
         /* Simply set the level */
         fade_state = PCM_NOT_FADING;
-        fade_vol = in ? MIX_AMP_UNITY : MIX_AMP_MUTE;
+        fade_vol = in ? PCM_AMP_UNITY : PCM_AMP_MUTE;
         pcmbuf_update_volume();
     }
     else
@@ -1369,11 +1394,11 @@ bool pcmbuf_fading(void)
     return fade_state != PCM_NOT_FADING;
 }
 
-/* Quiet-down the channel if 'shhh' is true or else play at normal level */
+/* Quiet-down the playback (~ -12dB) if 'shhh' is true or else play at
+   full volume */
 void pcmbuf_soft_mode(bool shhh)
 {
-    /* Have to block the tick or improper order could leave volume in soft
-       mode if fading reads the old value first but updates after us. */
+    /* Must pause any active fade (to protect concurrent data) */
     int res = fade_state != PCM_NOT_FADING ?
                 tick_remove_task(pcmbuf_fade_tick) : -1;
 
@@ -1400,15 +1425,20 @@ void pcmbuf_sync_position_update(void)
     pcmbuf_sync_position = true;
 }
 
-
+void pcmbuf_suspend_position_updates(bool suspend)
+{
+    pcm_lock_callback(pcm_handle);
+    pcmbuf_position_callback_on = !suspend;
+    pcm_unlock_callback(pcm_handle);
+}
 
 /** Misc */
 
 bool pcmbuf_is_lowdata(void)
 {
-    enum channel_status status = mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK);
+    int state = pcm_get_state(pcm_handle);
 
-    if (status != CHANNEL_PLAYING)
+    if (state != PCM_STATE_RUNNING)
         return false;
 
 #ifdef HAVE_CROSSFADE
@@ -1432,4 +1462,35 @@ void pcmbuf_update_frequency(void)
 unsigned int pcmbuf_get_frequency(void)
 {
     return pcmbuf_sampr;
+}
+
+int pcmbuf_hook_add_remove(audio_pcm_hook_fn fn, bool add)
+{
+    int rc = -1;
+
+    if (callback)
+    {
+        audio_pcm_hook_fn currfn = pcmbuf_pcm_hook;
+
+        if (fn == currfn)
+        {
+            if (!add)
+                fn = NULL;
+
+            rc = 0;
+        }
+        else if (!currfn && add)
+        {
+            rc = 0;
+        }
+
+        if (rc == 0)
+        {
+            pcm_lock_callback(pcm_handle);
+            pcmbuf_pcm_hook = fn;
+            pcm_unlock_callback(pcm_handle);
+        }
+    }
+
+    return rc;
 }

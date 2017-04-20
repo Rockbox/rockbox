@@ -228,7 +228,7 @@ static void codec_pcmbuf_insert_callback(
         dst.frames_rem = 0;
         dst.frames = MAX(src.frames_rem, 1024); /* Arbitrary min request */
 
-        if ((dst.p16out = pcmbuf_request_buffer(&dst.frames)) == NULL)
+        if ((dst.pout = pcmbuf_request_buffer(&dst.frames)) == NULL)
         {
             cancel_cpu_boost();
 

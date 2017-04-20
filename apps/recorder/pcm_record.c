@@ -1,6 +1,6 @@
 /***************************************************************************
  *             __________               __   ___.
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___h
  *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
@@ -129,6 +129,11 @@
 extern struct codec_api ci;            /* in codec_thread.c */
 extern struct event_queue audio_queue; /* in audio_thread.c */
 extern unsigned int audio_thread_id;   /* in audio_thread.c */
+
+static int pcmrec_buf_handle;
+/* PCM handle in use by playback and recording engines */
+extern pcm_handle_t audio_pcm_handle;
+static pcm_handle_t pcm_handle;
 
 /** General recording state **/
 
@@ -485,11 +490,23 @@ static void clear_warning_status(uint32_t w)
 }
 
 /* Callback for when more data is ready - called by DMA ISR */
-static void pcm_rec_have_more(void **start, unsigned long *frames)
+static int pcm_rec_have_more(int status, void **start, unsigned long *frames)
 {
     size_t next_idx = pcm_widx;
 
-    if (!pcm_pause)
+    if (status < 0)
+    {
+        /* Some error condition - may be recoverable */     
+        if (!PCM_ERR_RECOVERABLE(status))
+        {
+            set_error_bits(PCMREC_E_DMA);
+            return status;
+        }
+
+        /* Try again next transmission - buffer is invalid */
+        set_warning_bits(PCMREC_W_DMA);
+    }
+    else if (!pcm_pause)
     {
         /* One empty chunk must remain after widx is advanced */
         if (pcmbuf_used() <= PCM_BUF_SIZE - 2*PCM_CHUNK_SIZE)
@@ -502,33 +519,24 @@ static void pcm_rec_have_more(void **start, unsigned long *frames)
     *frames = PCM_CHUNK_FRAMES;
 
     pcm_widx = next_idx;
+
+    return 0;
 }
 
-static enum pcm_dma_status pcm_rec_status_callback(enum pcm_dma_status status)
+/* Start capture */
+static bool start_recording(void)
 {
-    if (status < PCM_DMAST_OK)
-    {
-        /* Some error condition */
-        if (status == PCM_DMAST_ERR_DMA)
-        {
-            set_error_bits(PCMREC_E_DMA);
-            return status;
-        }
-        else
-        {
-            /* Try again next transmission - buffer is invalid */
-            set_warning_bits(PCMREC_W_DMA);
-        }
-    }
-
-    return PCM_DMAST_OK;
+    return pcm_record_data(pcm_handle,
+                           pcmrec_pcm_callback,
+                           pcmbuf_ptr(pcm_widx),
+                           PCM_CHUNK_FRAMES,
+                           PCM_FORMAT(PCM_FORMAT_S16, 2)) == 0;
 }
 
-/* Start DMA transfer */
-static void pcm_start_recording(void)
+/* Stop capture */
+static void stop_recording(void)
 {
-    pcm_record_data(pcm_rec_have_more, pcm_rec_status_callback,
-                    pcmbuf_ptr(pcm_widx), PCM_CHUNK_FRAMES);
+    pcm_stop(pcm_handle);
 }
 
 /* Initialize the various recording buffers */
@@ -784,7 +792,7 @@ static void check_spdif_samplerate(void)
         return;
 
     codec_stop();
-    pcm_stop_recording();
+    stop_recording();
     reset_fifos(true);
     reset_rec_stats();
     update_samplerate_config(sampr);
@@ -793,7 +801,11 @@ static void check_spdif_samplerate(void)
     if (!configure_encoder_stream() || rec_errors)
         return;
 
-    pcm_start_recording();
+    if (!start_recording())
+    {
+        raise_error_status(PCMREC_E_CAPTURE);
+        return;
+    }
 
     if (record_status == RECORD_PRERECORDING)
     {
@@ -1406,25 +1418,31 @@ static void tally_prerecord_data(void)
 
 /** Event handlers for recording thread **/
 
-static int pcmrec_handle;
 /* Q_AUDIO_INIT_RECORDING */
 static void on_init_recording(void)
 {
+    if (pcm_open(&pcm_handle, PCM_STREAM_RECORDING))
+        return;
+
+    audio_pcm_handle = pcm_handle;
+
     send_event(RECORDING_EVENT_START, NULL);
     /* dummy ops with no callbacks, needed because by
      * default buflib buffers can be moved around which must be avoided
      * FIXME: This buffer should play nicer and be shrinkable/movable */
     static struct buflib_callbacks dummy_ops;
     talk_buffer_set_policy(TALK_BUFFER_LOOSE);
-    pcmrec_handle = core_alloc_maximum("pcmrec", &rec_buffer_size, &dummy_ops);
+
+    pcmrec_buf_handle = core_alloc_maximum("pcmrec", &rec_buffer_size,
+                                           &dummy_ops);
     if (pcmrec_handle <= 0)
     /* someone is abusing core_alloc_maximum(). Fix this evil guy instead of
      * trying to handle OOM without hope */
         panicf("%s(): OOM\n", __func__);
-    rec_buffer = core_get_data(pcmrec_handle);
+
+    rec_buffer = core_get_data(pcmrec_buf_handle);
     init_rec_buffers();
     init_state();
-    pcm_init_recording();
 }
 
 /* Q_AUDIO_CLOSE_RECORDING */
@@ -1433,7 +1451,6 @@ static void on_close_recording(void)
     /* Simply shut down the recording system. Whatever wasn't saved is
        lost. */
     codec_unload();
-    pcm_close_recording();
     close_rec_file();
     init_state();
 
@@ -1441,12 +1458,16 @@ static void on_close_recording(void)
     pcm_rec_error_clear();
 
     /* Reset PCM to defaults */
+    pcm_close(pcm_handle);
+    audio_pcm_handle = 0;
+
     pcm_set_frequency(HW_SAMPR_RESET | SAMPR_TYPE_REC);
     audio_set_output_source(AUDIO_SRC_PLAYBACK);
     pcm_apply_settings();
 
-    if (pcmrec_handle > 0)
+    if (pcmrec_buf_handle > 0)
         pcmrec_handle = core_free(pcmrec_handle);
+
     talk_buffer_set_policy(TALK_BUFFER_DEFAULT);
 
     send_event(RECORDING_EVENT_STOP, NULL);
@@ -1469,7 +1490,7 @@ static void on_recording_options(struct audio_recording_options *options)
     }
 
     /* Stop everything else that might be running */
-    pcm_stop_recording();
+    stop_recording();
 
     int afmt = rec_format_afmt[options->enc_config.rec_format];
     bool enc_load = true;
@@ -1556,7 +1577,10 @@ static void on_recording_options(struct audio_recording_options *options)
             pcm_pause = false;
         }
 
-        pcm_start_recording();
+        if (!start_recording())
+        {
+            raise_error_status(PCMREC_E_CAPTURE);
+        }
     }
     else
     {

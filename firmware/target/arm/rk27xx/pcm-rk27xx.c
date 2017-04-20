@@ -29,28 +29,18 @@
 #include "sound.h"
 #include "pcm-internal.h"
 
-static int locked = 0;
+static unsigned long dma_play_state = 0;
 
 /* Mask the DMA interrupt */
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    if (++locked == 1)
-    {
-        int old = disable_irq_save();
-        INTC_IMR &= ~IRQ_ARM_HDMA; /* mask HDMA interrupt */ 
-        restore_irq(old);
-    }
+    bitclr32(&INTC_IMR, IRQ_ARM_HDMA); /* mask HDMA interrupt */ 
 }
 
 /* Unmask the DMA interrupt if enabled */
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-    if(--locked == 0)
-    {
-        int old = disable_irq_save();
-        INTC_IMR |= IRQ_ARM_HDMA; /* unmask HDMA interrupt */
-        restore_irq(old);
-    }
+    bitset32(&INTC_IMR, dma_play_state); /* unmask HDMA interrupt */
 }
 
 void pcm_play_dma_stop(void)
@@ -58,7 +48,7 @@ void pcm_play_dma_stop(void)
     HDMA_CON0 = 0x00;
     HDMA_ISR = 0x00;
 
-    locked = 1;
+    dma_play_state = 0;
 }
 
 static void hdma_i2s_transfer(const void *addr, unsigned long frames)
@@ -105,13 +95,17 @@ static void hdma_i2s_transfer(const void *addr, unsigned long frames)
                   (1<<0));   /* hardware trigger DMA mode */
 }
 
-void pcm_play_dma_start(const void *addr, unsigned long frames)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
+{
+    /* kick in DMA transfer */
+    hdma_i2s_transfer(addr, frames);
+    dma_play_state = IRQ_ARM_HDMA;
+}
+
+void pcm_play_dma_prepare(void)
 {
     /* Stop any DMA in progress */
     pcm_play_dma_stop();
-
-    /* kick in DMA transfer */
-    hdma_i2s_transfer(addr, frames);
 }
 
 /* pause DMA transfer by disabling clock to DMA module */
@@ -120,12 +114,12 @@ void pcm_play_dma_pause(bool pause)
     if(pause)
     {
         SCU_CLKCFG |= CLKCFG_HDMA;
-        locked = 1;
+        dma_play_state = 0;
     }
     else
     {
         SCU_CLKCFG &= ~CLKCFG_HDMA;
-        locked = 0;
+        dma_play_state = IRQ_ARM_HDMA;
     }
 }
 
@@ -274,14 +268,7 @@ unsigned long pcm_get_frames_waiting(void)
 /* audio DMA ISR called when chunk from callers buffer has been transfered */
 void INT_HDMA(void)
 {
-    const void *start;
-    unsigned long frames;
-
-    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &frames))
-    {
-        hdma_i2s_transfer(start, frames);
-        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-    }
+    pcm_play_dma_complete_callback(0);
 }
 
 const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)

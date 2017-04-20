@@ -44,22 +44,42 @@ void sample_output_dithered(struct sample_io_data *this,
 
 /** Sample output **/
 
-#if !defined(CPU_COLDFIRE) && !defined(CPU_ARM)
+#if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM)) \
+    || NATIVE_DEPTH > WORD_DEPTH
 /* write mono internal format to output format */
 void sample_output_mono(struct sample_io_data *this,
                         struct dsp_buffer *src, struct dsp_buffer *dst)
 {
     unsigned long count = this->frames_out;
     const int32_t *s0 = src->p32[0];
-    int16_t *d = dst->p16out;
+    pcm_dma_t *d = dst->pout;
     int scale = src->format.output_scale;
+
+#if (CONFIG_PCM_FORMAT_CAPS & PCM_FORMAT_CAP_4_BYTE_CAPS)
+    if (scale <= 0)
+    {
+        int depth = src->format.frac_bits + 1;
+        scale = -scale;
+
+        do
+        {
+            int32_t lr = clip_sample(*s0++, depth) << scale;
+            pcm_dma_t_write_incr(&d, lr, 1);
+            pcm_dma_t_write_incr(&d, lr, 1);
+        }
+        while (--count > 0);
+
+        return;
+    }
+#endif /* CONFIG_PCM_FORMAT_CAPS */
+
     int32_t dc_bias = 1L << (scale - 1);
 
     do
     {
-        int32_t lr = clip_sample_16((*s0++ + dc_bias) >> scale);
-        *d++ = lr;
-        *d++ = lr;
+        int32_t lr = mix_clip_sample_t(*s0++, dc_bias, scale);
+        pcm_dma_t_write_incr(&d, lr, 1);
+        pcm_dma_t_write_incr(&d, lr, 1);
     }
     while (--count);
 }
@@ -71,14 +91,36 @@ void sample_output_stereo(struct sample_io_data *this,
     unsigned long count = this->frames_out;
     const int32_t *s0 = src->p32[0];
     const int32_t *s1 = src->p32[1];
-    int16_t *d = dst->p16out;
+    pcm_dma_t *d = dst->pout;
     int scale = src->format.output_scale;
+
+#if (CONFIG_PCM_FORMAT_CAPS & PCM_FORMAT_CAP_4_BYTE_CAPS)
+    if (scale <= 0)
+    {
+        int depth = src->format.frac_bits + 1;
+        scale = -scale;
+
+        do
+        {
+            int32_t l = clip_sample(*s0++, depth) << scale;
+            int32_t r = clip_sample(*s1++, depth) << scale;
+            pcm_dma_t_write_incr(&d, l, 1);
+            pcm_dma_t_write_incr(&d, r, 1);
+        }
+        while (--count > 0);
+
+        return;
+    }
+#endif /* CONFIG_PCM_FORMAT_CAPS */
+
     int32_t dc_bias = 1L << (scale - 1);
 
     do
     {
-        *d++ = clip_sample_16((*s0++ + dc_bias) >> scale);
-        *d++ = clip_sample_16((*s1++ + dc_bias) >> scale);
+        int32_t l = mix_clip_sample_t(*s0++, dc_bias, scale);
+        int32_t r = mix_clip_sample_t(*s1++, dc_bias, scale);
+        pcm_dma_t_write_incr(&d, l, 1);
+        pcm_dma_t_write_incr(&d, r, 1);
     }
     while (--count);
 }
@@ -115,12 +157,12 @@ void sample_output_dithered(struct sample_io_data *this,
         struct dither_state *dither = &dither_data.state[ch];
 
         const int32_t *s = src->p32[ch];
-        int16_t *d = &dst->p16out[ch];
+        pcm_dma_t *d = &dst->pout[ch];
 
-        for (unsigned long i = 0; i < count; i++, s++, d += 2)
+        for (int i = 0; i < count; i++)
         {
             /* Noise shape and bias (for correct rounding later) */
-            int32_t sample = *s;
+            int32_t sample = *s++;
 
             sample += dither->error[0] - dither->error[1] + dither->error[2];
             dither->error[2] = dither->error[1];
@@ -140,7 +182,8 @@ void sample_output_dithered(struct sample_io_data *this,
             dither->error[0] = sample - (output << scale);
 
             /* Clip and store */
-            *d = clip_sample_16(output);
+            output = clip_sample_t(output);
+            pcm_dma_t_write_incr(&d, output, 2);
         }
     }
 
@@ -149,12 +192,12 @@ void sample_output_dithered(struct sample_io_data *this,
 
     /* Have to duplicate left samples into the right channel since
        output is interleaved stereo */
-    int16_t *d = dst->p16out;
+    pcm_dma_t *d = dst->pout;
 
     do
     {
-        int16_t s = *d++;
-        *d++ = s;
+        pcm_dma_t s = pcm_dma_t_read_incr(&d);
+        pcm_dma_t_write_incr(&d, s);
     }
     while (--count);
 }
@@ -171,8 +214,18 @@ void dsp_sample_output_format_change(struct sample_io_data *this,
           sample_output_dithered },
     };
 
-    bool dither = dsp_get_id((void *)this) == CODEC_IDX_AUDIO &&
-                  dither_data.enabled;
+    bool dither = true;
+
+#if NATIVE_DEPTH > WORD_DEPTH
+    /* No dithering unless downscaling */
+    dither = format->output_scale > 0;
+#endif
+
+    if (dither) {
+        dither = dsp_get_id((void *)this) == CODEC_IDX_AUDIO &&
+                 dither_data.enabled;
+    }
+
     int channels = format->num_channels;
 
     DSP_PRINT_FORMAT(DSP Output, *format);

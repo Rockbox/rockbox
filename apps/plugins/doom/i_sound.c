@@ -62,6 +62,8 @@
 #endif
 #define SAMPLESIZE  2      // 16bit
 
+static pcm_handle_t pcm_handle = 0;
+
 // The global mixing buffer.
 //  Basically, samples from all active internal channels
 //  are modifed and added, and stored in the buffer
@@ -457,27 +459,34 @@ void I_UpdateSound( void )
 //  only output be done asynchronous?
 //
 
-void get_more(const void** start, unsigned long* frames)
+int get_more(int status, const void** start, unsigned long* frames)
 {
+   if (status < 0)
+        return status;
+
    I_UpdateSound(); // Force sound update
 
    *start = mixbuffer;
    *frames = SAMPLECOUNT;
+
+   return 0;
 }
 
 
 void I_SubmitSound(void)
 {
-   if (!enable_sound)
+   if (!enable_sound || !pcm_handle)
       return;
 
-   rb->pcm_play_data(&get_more, NULL, NULL, 0);
+   rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                     SAMPLE_FORMAT(SAMPLE_FORMAT_S16_2, 2));
 }
 
 void I_ShutdownSound(void)
 {
-   rb->pcm_play_stop();
+   rb->pcm_close(pcm_handle);
    rb->pcm_set_frequency(HW_SAMPR_DEFAULT); // 44100
+   pcm_handle = 0;
 }
 
 void I_InitSound()
@@ -486,7 +495,8 @@ void I_InitSound()
 
    // Initialize external data (all sounds) at start, keep static.
    printf( "I_InitSound: ");
-   rb->pcm_play_stop();
+
+   rb->pcm_open(&pcm_handle, PCM_STREAM_PLAYBACK);
 
 #if INPUT_SRC_CAPS != 0
    /* Select playback */

@@ -26,7 +26,6 @@
 #include "s5l8700.h"
 #include "panic.h"
 #include "audiohw.h"
-#include "pcm.h"
 #include "pcm-internal.h"
 #include "pcm_sampr.h"
 #include "dma-target.h"
@@ -40,7 +39,6 @@
     - recording is not implemented
 */
 
-static volatile int locked = 0;
 static const int zerosample = 0;
 static unsigned char dblbuf[1024] IBSS_ATTR;
 static const void* queuedbuf;
@@ -83,25 +81,20 @@ static const struct div_entry {
 };
 
 /* Mask the DMA interrupt */
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    if (locked++ == 0) {
-        INTMSK &= ~(1 << 10);
-    }
+    bitclr32(&INTMSK, (1 << 10));
 }
 
 /* Unmask the DMA interrupt if enabled */
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-    if (--locked == 0) {
-        INTMSK |= (1 << 10);
-    }
+    bitset32(&INTMSK, (1 << 10));
 }
 
 void INT_DMA(void) ICODE_ATTR;
 void INT_DMA(void)
 {
-    bool new_buffer = false;
     DMACOM0 = 7;
     while (!(DMACON0 & (1 << 18)))
     {
@@ -112,48 +105,42 @@ void INT_DMA(void)
             DMATCNT0 = queuedsize / 2 - 1;
             queuedsize = 0;
         }
-        else
+        else if (!nextsize)
         {
-            if (!nextsize)
-            {
-                unsigned long frames;
-                new_buffer = pcm_play_dma_complete_callback(
-                                PCM_DMAST_OK, &nextbuf, &frames);
-                if (!new_buffer)
-                    break;
-
-                nextsize = frames*4;
-            }
-            queuedsize = MIN(sizeof(dblbuf), nextsize / 2);
-            nextsize -= queuedsize;
-            queuedbuf = nextbuf + nextsize;
-            DMABASE0 = (unsigned int)nextbuf;
-            DMATCNT0 = nextsize / 2 - 1;
-            nextsize = 0;
-        }
-        commit_dcache();
-        DMACOM0 = 4;
-        DMACOM0 = 7;
-
-        if (new_buffer)
-        {
-            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-            new_buffer = false;
+            pcm_play_dma_complete_callback(0);
+            if (!queuedsize)
+                break;
         }
     }
-
 }
 
-void pcm_play_dma_start(const void* addr, unsigned long frames)
+void pcm_play_dma_send_frames(const void* addr, unsigned long frames)
 {
-    /* DMA channel on */
+################################
     nextbuf = addr;
     nextsize = frames*4;
+
+    queuedsize = MIN(sizeof(dblbuf), nextsize / 2);
+    nextsize -= queuedsize;
+    queuedbuf = nextbuf + nextsize;
+    DMABASE0 = (unsigned int)nextbuf;
+    DMATCNT0 = nextsize / 2 - 1;
+    nextsize = 0;
+
+    commit_dcache();
+    DMACOM0 = 4;
+    DMACOM0 = 7;
+
+    /* DMA channel on */
     queuedsize = 0;
     DMABASE0 = (unsigned int)(&zerosample);
     DMATCNT0 = 0;
     DMACOM0 = 4;
 
+}
+
+void pcm_play_dma_prepare(void)
+{
     /* IIS Tx clock on */
     I2SCLKCON = (1 << 0);   /* 1 = power on */
     
@@ -162,6 +149,8 @@ void pcm_play_dma_start(const void* addr, unsigned long frames)
                (1 << 2) |   /* 1 = I2S interface enable */
                (1 << 1) |   /* 1 = DMA request enable */
                (0 << 0);    /* 0 = LRCK on */
+
+    queuedsize = 0;
 }
 
 void pcm_play_dma_stop(void)
@@ -292,11 +281,11 @@ const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
  ** Recording DMA transfer
  **/
 #ifdef HAVE_RECORDING
-void pcm_rec_lock(void)
+void pcm_rec_dma_lock(void)
 {
 }
 
-void pcm_rec_unlock(void)
+void pcm_rec_dma_unlock(void)
 {
 }
 
@@ -304,10 +293,14 @@ void pcm_rec_dma_stop(void)
 {
 }
 
-void pcm_rec_dma_start(void *addr, unsigned long frames)
+void pcm_rec_dma_capture_frames(void *addr, unsigned long frames)
 {
     (void)addr;
     (void)frames;
+}
+
+void pcm_rec_dma_prepare(void)
+{
 }
 
 void pcm_rec_dma_close(void)

@@ -26,87 +26,150 @@
 #else
 
 #include "dsp-util.h" /* for clip_sample_16 */
-/* Mix channels' samples and apply gain factors */
-static FORCE_INLINE void mix_samples(int16_t *out,
-                                     const int16_t *src0,
-                                     int32_t src0_amp,
-                                     const int16_t *src1,
-                                     int32_t src1_amp,
+
+static void mix_samples_mono(void *out,
+                             const struct mixer_channel *chan,
+                             unsigned long count)
+{
+    pcm_dma_t *dst = out;
+    int32_t amp = chan->amp;
+
+    if (amp == PCM_AMP_UNITY)
+    {
+        do
+        {
+            int32_t l = pcm_dma_t_read(dst, 0);
+            int32_t r = pcm_dma_t_read(dst, 1);
+            int32_t s = *src++;
+            l = mix_clip_sample_t(l, s);
+            r = mix_clip_sample_t(r, s);
+            pcm_dma_t_write_incr(&dst, l, 1);
+            pcm_dma_t_write_incr(&dst, r, 1);
+        }
+        while (--count);
+    }
+    else
+    {
+    }
+}
+
+static FORCE_INLINE void mix_samples(void *out,
+                                     const struct mixer_channel *chan,
                                      unsigned long count)
 {
-    if (src0_amp == MIX_AMP_UNITY && src1_amp == MIX_AMP_UNITY)
+    pcm_dma_t *dst = out;
+    int16_t const *src = chan->start;
+    int32_t amp = chan->amp;
+
+    if (amp == PCM_AMP_UNITY)
     {
-        /* Both are unity amplitude */
+
         do
         {
-            int32_t l = *src0++ + *src1++;
-            int32_t h = *src0++ + *src1++;
-            *out++ = clip_sample_16(l);
-            *out++ = clip_sample_16(h);
-        }
-        while (--count);
-    }
-    else if (src0_amp != MIX_AMP_UNITY && src1_amp != MIX_AMP_UNITY)
-    {
-        /* Neither are unity amplitude */
-        do
-        {
-            int32_t l = (*src0++ * src0_amp >> 16) + (*src1++ * src1_amp >> 16);
-            int32_t h = (*src0++ * src0_amp >> 16) + (*src1++ * src1_amp >> 16);
-            *out++ = clip_sample_16(l);
-            *out++ = clip_sample_16(h);
+            int32_t l = pcm_dma_t_read(dst, 0);
+            int32_t r = pcm_dma_t_read(dst, 1);
+            l = mix_clip_sample_t(l, *src++);
+            r = mix_clip_sample_t(r, *src++);
+            pcm_dma_t_write_incr(&dst, l, 1);
+            pcm_dma_t_write_incr(&dst, r, 1);
         }
         while (--count);
     }
     else
     {
-        /* One is unity amplitude */
-        if (src0_amp != MIX_AMP_UNITY)
-        {
-            /* Keep unity in src0, amp0 */
-            const int16_t *src_tmp = src0;
-            src0 = src1;
-            src1 = src_tmp;
-            src1_amp = src0_amp;
-            src0_amp = MIX_AMP_UNITY;
-        }
-
         do
         {
-            int32_t l = *src0++ + (*src1++ * src1_amp >> 16);
-            int32_t h = *src0++ + (*src1++ * src1_amp >> 16);
-            *out++ = clip_sample_16(l);
-            *out++ = clip_sample_16(h);
+            int32_t l = pcm_dma_t_read(dst, 0);
+            int32_t r = pcm_dma_t_read(dst, 1);
+            l += (*src++ * amp + (1L << (PCM_AMP_FRACBITS-1))) >> PCM_AMP_FRACBITS;
+            r += (*src++ * amp + (1L << (PCM_AMP_FRACBITS-1))) >> PCM_AMP_FRACBITS;
+            pcm_dma_t_write_incr(&dst, l, 1);
+            pcm_dma_t_write_incr(&dst, r, 1);
         }
         while (--count);
     }
 }
 
-/* Write channel's samples and apply gain factor */
-static FORCE_INLINE void write_samples(int16_t *out,
-                                       const int16_t *src,
-                                       int32_t amp,
-                                       unsigned long count)
+static void write_samples(void *out,
+                          const struct pcm_handle *pcm,
+                          unsigned long count)
 {
-    if (LIKELY(amp == MIX_AMP_UNITY))
+    int32_t amp = chan->amp;
+    pcm_dma_t *dst = out;
+
+#if PCM_NATIVE_DEPTH > 16
+    if (UNLIKELY(chan->depth < PCM_NATIVE_DEPTH))
     {
-        /* Channel is unity amplitude */
-        memcpy(out, src, count*2*sizeof (int16_t));
+        /* Other depth: conversion required */
+        int16_t const *src = chan->desc.start;
+        int scale = PCM_NATIVE_DEPTH - chan->depth;
+
+        if (LIKELY(amp == MIX_AMP_UNITY))
+        {
+            /* Channel is unity amplitude */
+            do
+            {
+                *dst++ = *src++ << scale;
+                *dst++ = *src++ << scale;
+            }
+            while (--count);
+        }
+        else
+        {
+            /* Channel needs amplitude cut */
+            do
+            {
+                int32_t l = *src++;
+                int32_t r = *src++;
+                l = (l * amp + (1L << (MIX_AMP_FRACBITS-1))) >> PCM_AMP_FRACBITS;
+                r = (r * amp + (1L << (MIX_AMP_FRACBITS-1))) >> PCM_AMP_FRACBITS;
+                *dst++ = l << scale;
+                *dst++ = r << scale;
+            }
+            while (--count);
+        }
     }
     else
+#endif /* PCM_NATIVE_DEPTH > 16 */
     {
-        /* Channel needs amplitude cut */
-        do
+        /* Native depth */
+        if (LIKELY(amp == MIX_AMP_UNITY))
         {
-            int32_t l = *src++ * amp >> 16;
-            int32_t h = *src++ * amp >> 16;
-            *out++ = l;
-            *out++ = h;
+            /* Channel is unity amplitude */
+            memcpy(dst, chan->desc.start, pcm_dma_t_frames_size(count));
         }
-        while (--count);
+        else
+        {
+            /* Channel needs amplitude cut */
+            do
+            {
+                int32_t l = pcm_dma_t_read_incr(&src, 1);
+                int32_t r = pcm_dma_t_read_incr(&src, 1);
+                l = scale_sample_t(l, amp, PCM_AMP_FRACBITS);
+                r = scale_sample_t(r, amp, PCM_AMP_FRACBITS);
+                pcm_dma_t_write_incr(&out, l, 1);
+                pcm_dma_t_write_incr(&out, r, 1);
+            }
+            while (--count);
+        }
     }
+
+    (void)depth;
 }
 
+static int set_sample_format(const struct pcm_mixer_chan *chan,
+                             xxxxxxxxxxxxxxxxx format)
+{
+    int rc = 0;
+
+    switch (format)
+    {
+    default:
+        rc = -EINVAL;
+    }
+
+    return rc;
+}
 
 #endif /* CPU_* */
 

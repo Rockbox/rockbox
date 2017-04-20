@@ -24,428 +24,170 @@
 #include "kernel.h"
 #include "pcm.h"
 #include "pcm-internal.h"
-#include "pcm_mixer.h"
 
-/* Channels use standard-style PCM callback interface but a latency of one
-   frame by double-buffering is introduced in order to facilitate mixing and
-   keep the hardware fed. There must be sufficient time to perform operations
-   before the last samples are sent to the codec and so things are done in
-   parallel (as much as possible) with sending-out data. */
+/* Packed pointer array of all not-stopped streames (+ NULL) */
+static struct pcm_handle * active_streams[PCM_MAX_STREAMS+1] IBSS_ATTR;
 
-static unsigned int mixer_sampr = HW_SAMPR_DEFAULT;
-
-/* Define this to nonzero to add a marker pulse at each buffer start */
-#define BUFFER_BOUNDARY_MARKERS 0
-
-/* Descriptor for each channel */
-struct mixer_channel
-{
-    const void *start;               /* Buffer pointer */
-    unsigned long frames;            /* Frames remaining */
-    unsigned long prev_frames;       /* Frames consumed data in prev. cycle */
-    pcm_play_callback_type get_more; /* Registered callback */
-    enum channel_status status;      /* Playback status */
-    uint32_t amplitude;              /* Amp. factor: 0x0000 = mute, 0x10000 = unity */
-    chan_buffer_hook_fn_type buffer_hook; /* Callback for new buffer */
-};
-
-/* Because of the double-buffering, playback is always from here, otherwise a
-   mechanism for the channel callbacks not to free buffers too early would be
-   needed (if we _really_ want it and it's worth it, we _can_ do that ;-) ) */
-static uint32_t downmix_buf[2][MIX_FRAME_PERIOD] DOWNMIX_BUF_IBSS MEM_ALIGN_ATTR;
-static unsigned int downmix_index = 0;   /* Which downmix_buf? */
-
-/* Descriptors for all available channels */
-static struct mixer_channel channels[PCM_MIXER_NUM_CHANNELS] IBSS_ATTR;
-
-/* Packed pointer array of all playing (active) channels in "channels" array */
-static struct mixer_channel * active_channels[PCM_MIXER_NUM_CHANNELS+1] IBSS_ATTR;
-
-/* Number of silence frames to play after all data has played */
-#define MAX_IDLE_PERIODS    (mixer_sampr*3 / MIX_FRAME_PERIOD)
-static unsigned int idle_counter = 0;
+/* Number of silence periods to play after all data has played (3 seconds) */
+#define MAX_IDLE_PERIODS ((int)(pcm_curr_sampr*3 / PCM_DBL_BUF_FRAMES))
+static int idle_counter = -1; /* -1u if stopped, 0 .. MAX otherwise */
 
 /** Mixing routines, CPU optmized **/
 #include "asm/pcm-mixer.c"
 
-/** Private generic routines **/
-
-/* Mark channel active to mix its data */
-static void mixer_activate_channel(struct mixer_channel *chan)
+/* Make stream active to allow it to mix */
+static inline void activate_stream(struct pcm_handle *pcm)
 {
-    void **elem = find_array_ptr((void **)active_channels, chan);
+    void **elem = find_array_ptr((void **)active_streams, chan);
 
-    if (!*elem)
-    {
+    if (!*elem) {
         idle_counter = 0;
-        *elem = chan;
+        *elem = pcm;
     }
 }
 
-/* Stop channel from mixing */
-static void mixer_deactivate_channel(struct mixer_channel *chan)
+/* Stop stream from mixing */
+static inline void deactivate_stream(struct pcm_handle *pcm)
 {
-    remove_array_ptr((void **)active_channels, chan);
+    remove_array_ptr((void **)active_streams, pcm);
 }
 
-/* Deactivate channel and change it to stopped state */
-static void channel_stopped(struct mixer_channel *chan)
+/* Deactivate stream and change it to stopped state */
+static inline void stream_stopped(struct pcm_handle *pcm)
 {
-    mixer_deactivate_channel(chan);
-    chan->frames = 0;
-    chan->start = NULL;
-    chan->status = CHANNEL_STOPPED;
+    deactivate_stream(pcm);
+    pcm_stream_stopped(pcm);
 }
 
-/* Main PCM callback - sends the current prepared frame to play */
-static void mixer_pcm_callback(const void **addr, unsigned long *frames)
+/* Stop all streams and inform of error status if any */
+static void stop_all_streams(int status)
 {
-    *addr = downmix_buf[downmix_index];
-    *frames = MIX_FRAME_PERIOD;
+    struct pcm_handle *pcm;
+
+    while ((pcm = *active_streams)) {
+        if (status != 0 && pcm->callback) {
+            pcm->callback(status, &(const void *){ NULL }, &(unsigned long){ 0 });
+        }
+
+        stream_stopped(pcm);
+    }
 }
 
-static inline void chan_call_buffer_hook(struct mixer_channel *chan)
+/* Buffering callback - calls sub-callbacks and mixes the data for the
+   next buffer to be sent */
+unsigned long MIXER_CALLBACK_ICODE
+pcm_mixer_fill_buffer(int status, void *outbuf, unsigned long frames)
 {
-    if (UNLIKELY(chan->buffer_hook))
-        chan->buffer_hook(chan->start, chan->frames);
-}
+    if (!PCM_ERR_RECOVERABLE(status)) {
+        stop_all_streams(status);
+        return 0;
+    }
 
-/* Buffering callback - calls sub-callbacks and mixes the data for next
-   buffer to be sent from mixer_pcm_callback() */
-static enum pcm_dma_status MIXER_CALLBACK_ICODE
-mixer_buffer_callback(enum pcm_dma_status status)
-{
-    if (status != PCM_DMAST_STARTED)
-        return status;
+    pcm_dma_t *mixptr = outbuf;
+    unsigned long framesrem = frames;
+    unsigned long mixframes = frames;
+    struct pcm_handle **pcm_p, *chan;
 
-    downmix_index ^= 1; /* Next buffer */
+    /* "Loop" back here if one round wasn't enough to fill a buffer */
+fill_buffer:
+    pcm_p = active_streams;
+    pcm = *pcm_p;
 
-    void *mixptr = downmix_buf[downmix_index];
-    unsigned long frames_rem = MIX_FRAME_PERIOD;
-    unsigned long mixframes = frames_rem;
-    struct mixer_channel **chan_p;
-
-    /* "Loop" back here if one round wasn't enough to fill a frame */
-fill_frame:
-    chan_p = active_channels;
-
-    while (*chan_p)
-    {
+    while (pcm) {
         /* Find the active channel with the least data remaining and call any
            callbacks for channels that ran out - stopping whichever report
            "no more" */
-        struct mixer_channel *chan = *chan_p;
-        chan->start += chan->prev_frames * PCM_FRAME_SIZE;
-        chan->frames -= chan->prev_frames;
+        pcm->frames -= pcm->prev_frames;
 
-        if (!chan->frames)
-        {
-            if (chan->get_more)
-            {
-                chan->get_more(&chan->start, &chan->frames);
-                ALIGN_AUDIOBUF(chan->start, chan->frames);
+        if (pcm->frames) {
+            pcm->addr += pcm->prev_frames*pcm->frame_size;
+        }
+        else {
+            int st = status;
+
+            if (pcm->callback) {
+                pcm->addr = NULL;
+                st = pcm->callback(status, &pcm->addr, &pcm->frames);
             }
 
-            if (!(chan->start && chan->frames))
-            {
-                /* Channel is stopping */
-                channel_stopped(chan);
+            if (st != 0 || !(pcm->addr && pcm->frames)) {
+                stream_stopped(pcm);
+                pcm = *pcm_p;
                 continue;
             }
-
-            chan_call_buffer_hook(chan);
         }
 
-        /* Channel will play for at least part of this frame */
+        /* Channel with the fewest frames remaining sets the count */
+        if (pcm->frames < mixframes) {
+            mixframes = pcm->frames;
+        }
 
-        /* Channel with least amount of data remaining determines the downmix
-           size */
-        if (chan->frames < mixframes)
-            mixframes = chan->frames;
-
-        chan_p++;
+;       pcm = *++pcm_p;
     }
 
     /* Add all still-active channels to the downmix */
-    chan_p = active_channels;
+    pcm_p = active_streams;
+    pcm = *pcm_p;
 
-    if (LIKELY(*chan_p))
-    {
-        struct mixer_channel *chan = *chan_p++;
+    if (LIKELY(pcm)) {
+        /* write the first stream */
+        write_frames(mixptr, pcm, mixframes);
+        pcm->prev_frames = mixframes;
 
-        if (LIKELY(!*chan_p))
-        {
-            write_samples(mixptr, chan->start, chan->amplitude, mixframes);
-        }
-        else
-        {
-            const void *src0, *src1;
-            unsigned int amp0, amp1;
-
-            /* Mix first two channels with each other as the downmix */
-            src0 = chan->start;
-            amp0 = chan->amplitude;
-            chan->prev_frames = mixframes;
-
-            chan = *chan_p++;
-            src1 = chan->start;
-            amp1 = chan->amplitude;
-
-            while (1)
-            {
-                mix_samples(mixptr, src0, amp0, src1, amp1, mixframes);
-
-                if (!*chan_p)
-                    break;
-
-                /* More channels to mix - mix each with existing downmix */
-                chan->prev_frames = mixframes;
-                chan = *chan_p++;
-                src0 = mixptr;
-                amp0 = MIX_AMP_UNITY;
-                src1 = chan->start;
-                amp1 = chan->amplitude;
-            }
+        /* mix any additional streams */
+        while ((pcm = *++pcm_p)) {
+            mix_frames(mixptr, pcm, mixframes);
+            pcm->prev_frames = mixframes;
         }
 
-        chan->prev_frames = mixframes;
-        frames_rem -= mixframes;
+        framesrem -= mixframes;
 
-        if (frames_rem)
-        {
+        if (framesrem) {
             /* There is still space remaining in this frame */
-            mixptr += mixframes * PCM_FRAME_SIZE;
-            mixframes = frames_rem;
-            goto fill_frame;
+            mixptr += pcm_dma_t_frames_size(mixframes);
+            mixframes = framesrem;
+            goto fill_buffer;
         }
     }
-    else if (idle_counter++ < MAX_IDLE_PERIODS)
-    {
-        /* Pad incomplete frames with silence */
-        memset(mixptr, 0, frames_rem*PCM_FRAME_SIZE);
+    else if (++idle_counter <= MAX_IDLE_PERIODS) {
+        /* Pad incomplete periods with silence/fill idle silence period */
+        memset(mixptr, 0, pcm_dma_t_frames_size(framesrem));
     }
-    /* else silence period ran out - go to sleep */
+    else {
+        /* Silence period ran out - go to sleep */
+        idle_counter = -1;
+        frames = 0;
+    }
 
-#if BUFFER_BOUNDARY_MARKERS != 0
-    if (next_size)
-        *downmix_buf[downmix_index] = downmix_index ? 0x7fff7fff : 0x80008000;
-#endif
+#ifdef HAVE_SW_VOLUME_CONTROL
+    if (frames) {
+        /* Apply final volume setting (before cleanup code) */
+        pcm_sw_volume_apply(outbuf, frames);
+    }
+#endif /* HAVE_SW_VOLUME_CONTROL */
 
     /* Certain SoC's have to do cleanup */
-    mixer_buffer_callback_exit();
+    mixer_buffer_cleanup();
 
-    return PCM_DMAST_OK;
+    return frames;
 }
 
-/* Start PCM driver if it's not currently playing */
-static void mixer_start_pcm(void)
+/* Puts the stream on the active list */
+void pcm_mixer_activate_stream(struct pcm_handle *pcm)
 {
-    if (pcm_is_playing())
-        return;
-
-#if defined(HAVE_RECORDING)
-    if (pcm_is_recording())
-        return;
-#endif
-
-    /* Requires a shared global sample rate for all channels */
-    pcm_set_frequency(mixer_sampr);
-
-    /* Prepare initial frames and set up the double buffer */
-    mixer_buffer_callback(PCM_DMAST_STARTED);
-
-    /* Save the previous call's output */
-    void *start = downmix_buf[downmix_index];
-
-    mixer_buffer_callback(PCM_DMAST_STARTED);
-
-    pcm_play_data(mixer_pcm_callback, mixer_buffer_callback,
-                  start, MIX_FRAME_PERIOD);
+    activate_stream(pcm);
 }
 
-/** Public interfaces **/
-
-/* Start playback on a channel */
-void mixer_channel_play_data(enum pcm_mixer_channel channel,
-                             pcm_play_callback_type get_more,
-                             const void *start,
-                             unsigned long frames)
+/* Removes the stream from the active list */
+void pcm_mixer_deactivate_stream(struct pcm_handle *pcm)
 {
-    struct mixer_channel *chan = &channels[channel];
-
-    ALIGN_AUDIOBUF(start, frames);
-
-    if (!(start && frames) && get_more)
-    {
-        /* Initial buffer not passed - call the callback now */
-        pcm_play_lock();
-        mixer_deactivate_channel(chan); /* Protect chan struct if active;
-                                           may also be same callback which
-                                           must not be reentered */
-        pcm_play_unlock(); /* Allow playback while doing callback */
-
-        frames = 0;
-        get_more(&start, &frames);
-        ALIGN_AUDIOBUF(start, frames);
-    }
-
-    pcm_play_lock();
-
-    if (start && frames)
-    {
-        /* We have data - start the channel */
-        chan->status = CHANNEL_PLAYING;
-        chan->start = start;
-        chan->frames = frames;
-        chan->prev_frames = 0;
-        chan->get_more = get_more;
-
-        mixer_activate_channel(chan);
-        chan_call_buffer_hook(chan);
-        mixer_start_pcm();
-    }
-    else
-    {
-        /* Never had anything - stop it now */
-        channel_stopped(chan);
-    }
-
-    pcm_play_unlock();
+    deactivate_stream(pcm);
 }
 
-/* Pause or resume a channel (when started) */
-void mixer_channel_play_pause(enum pcm_mixer_channel channel, bool play)
+/* Cancels all active streams */
+void pcm_mixer_reset(void)
 {
-    struct mixer_channel *chan = &channels[channel];
-
-    pcm_play_lock();
-
-    if (play == (chan->status == CHANNEL_PAUSED) &&
-        chan->status != CHANNEL_STOPPED)
-    {
-        if (play)
-        {
-            chan->status = CHANNEL_PLAYING;
-            mixer_activate_channel(chan);
-            mixer_start_pcm();
-        }
-        else
-        {
-            mixer_deactivate_channel(chan);
-            chan->status = CHANNEL_PAUSED;
-        }
-    }
-
-    pcm_play_unlock();
-}
-
-/* Stop playback on a channel */
-void mixer_channel_stop(enum pcm_mixer_channel channel)
-{
-    struct mixer_channel *chan = &channels[channel];
-
-    pcm_play_lock();
-    channel_stopped(chan);
-    pcm_play_unlock();
-}
-
-/* Set channel's amplitude factor */
-void mixer_channel_set_amplitude(enum pcm_mixer_channel channel,
-                                 unsigned int amplitude)
-{
-    channels[channel].amplitude = MIN(amplitude, MIX_AMP_UNITY);
-}
-
-/* Return channel's playback status */
-enum channel_status mixer_channel_status(enum pcm_mixer_channel channel)
-{
-    return channels[channel].status;
-}
-
-/* Returns amount data remaining in channel before next callback */
-unsigned long mixer_channel_get_frames_waiting(enum pcm_mixer_channel channel)
-{
-    return channels[channel].frames;
-}
-
-/* Return pointer to channel's playing audio data and the size remaining */
-const void * mixer_channel_get_buffer(enum pcm_mixer_channel channel,
-                                      unsigned long *frames_rem)
-{
-    struct mixer_channel *chan = &channels[channel];
-    const void *buf = *(const void * volatile *)&chan->start;
-    unsigned long rem = *(unsigned long volatile *)&chan->frames;
-    const void *buf2 = *(const void * volatile *)&chan->start;
-
-    /* Still same buffer? */
-    if (buf == buf2)
-    {
-        *frames_rem = rem;
-        return buf;
-    }
-
-    /* can't be sure buf and size are related */
-    *frames_rem = 0;
-    return NULL;
-}
-
-/* Calculate peak values for channel */
-void mixer_channel_calculate_peaks(enum pcm_mixer_channel channel,
-                                   struct pcm_peaks *peaks)
-{
-    peaks->addr = mixer_channel_get_buffer(channel, &peaks->frames);
-    pcm_do_peak_calculation(peaks, channels[channel].status == CHANNEL_PLAYING);
-}
-
-/* Adjust channel pointer by a given offset to support movable buffers */
-void mixer_adjust_channel_address(enum pcm_mixer_channel channel,
-                                  off_t offset)
-{
-    pcm_play_lock();
-    /* Makes no difference if it's stopped */
-    channels[channel].start += offset;
-    pcm_play_unlock();
-}
-
-/* Set a hook that is called upon getting a new source buffer for a channel
-   NOTE: Called for each buffer, not each mixer chunk */
-void mixer_channel_set_buffer_hook(enum pcm_mixer_channel channel,
-                                   chan_buffer_hook_fn_type fn)
-{
-    struct mixer_channel *chan = &channels[channel];
-
-    pcm_play_lock();
-    chan->buffer_hook = fn;
-    pcm_play_unlock();
-}
-
-/* Stop ALL channels and PCM and reset state */
-void mixer_reset(void)
-{
-    pcm_play_stop();
-
-    while (*active_channels)
-        channel_stopped(*active_channels);
-
-    idle_counter = 0;
-}
-
-/* Set output samplerate */
-void mixer_set_frequency(unsigned int samplerate)
-{
-    pcm_set_frequency(samplerate);
-    samplerate = pcm_get_frequency();
-
-    if (samplerate == mixer_sampr)
-        return;
-
-    /* All data is now invalid */
-    mixer_reset();
-    mixer_sampr = samplerate;
-}
-
-/* Get output samplerate */
-unsigned int mixer_get_frequency(void)
-{
-    return mixer_sampr;
+    stop_all_streams(0);
+    idle_counter = -1;
+    /* we're locked out and caller will shut off the DMA */
 }

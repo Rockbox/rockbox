@@ -19,88 +19,173 @@
  *
  ****************************************************************************/
 
-#define MIXER_OPTIMIZED_WRITE_SAMPLES
-#define MIXER_OPTIMIZED_MIX_SAMPLES
-
-/* Mix channels' samples and apply gain factors */
-static FORCE_INLINE void mix_samples(void *out,
-                                     const void *src0,
-                                     int32_t src0_amp,
-                                     const void *src1,
-                                     int32_t src1_amp,
-                                     unsigned long count)
+static void write_samples_unity_1ch_s16(void *out,
+                                        const struct pcm_handle *pcm,
+                                        unsigned long count)
 {
-    int32_t s0, s1, tmp;
-    asm volatile (
-    "1:                             \n"
-        "ldr    %4, [%1], #4        \n"
-        "ldr    %5, [%2], #4        \n"
-        "smulwb %6, %7, %4          \n"
-        "smulwt %4, %7, %4          \n"
-        "smlawb %6, %8, %5, %6      \n"
-        "smlawt %4, %8, %5, %4      \n"
-        "mov    %5, %6, asr #15     \n"
-        "teq    %5, %5, asr #31     \n"
-        "eorne  %6, %9, %6, asr #31 \n"
-        "mov    %5, %4, asr #15     \n"
-        "teq    %5, %5, asr #31     \n"
-        "eorne  %4, %9, %4, asr #31 \n"
-        "subs   %3, %3, #1          \n"
-        "and    %6, %6, %9, lsr #16 \n"
-        "orr    %6, %6, %4, lsl #16 \n"
-        "str    %6, [%0], #4        \n"
-        "bhi    1b                  \n"
-        : "+r"(out), "+r"(src0), "+r"(src1), "+r"(count),
-          "=&r"(s0), "=&r"(s1), "=&r"(tmp)
-        : "r"(src0_amp), "r"(src1_amp), "r"(0xffff7fff));
+    memcpy(out, src, count * 2 * pcm->num_channels);
 }
 
-/* Write channel's samples and apply gain factor */
-static FORCE_INLINE void write_samples(void *out,
-                                       const void *src,
-                                       int32_t amp,
+static void write_samples_unity_2ch_s16(void *out,
+                                        const struct pcm_handle *pcm,
+                                        unsigned long count)
+{
+    memcpy(out, src, count * 2 * 2);
+}
+
+static void write_samples_gain_1ch_s16(void *out,
+                                       const struct pcm_handle *pcm,
                                        unsigned long count)
 {
-    if (LIKELY(amp == MIX_AMP_UNITY))
-    {
-        /* Channel is unity amplitude */
-        asm volatile (
-            "ands   r1, %2, #0x7   \n"
-            "beq    2f             \n"
-        "1:                        \n"
-            "ldr    r0, [%1], #4   \n"
-            "subs   r1, r1, #1     \n"
-            "str    r0, [%0], #4   \n"
-            "bne    1b             \n"
-            "bics   %2, %2, #0x7   \n"
-            "beq    3f             \n"
-        "2:                        \n"
-            "ldmia  %1!, { r0-r7 } \n"
-            "subs   %2, %2, #8     \n"
-            "stmia  %0!, { r0-r7 } \n"
-            "bhi    2b             \n"
-        "3:                        \n"
-            : "+r"(out), "+r"(src), "+r"(count)
-            :
-            : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7");
+    int16_t const *src = pcm->addr;
+    int32_t t0;
+
+    asm volatile (
+    "1:                             \n"
+        "ldrsh  %3, [%1], #2        \n"
+        "subs   %2, %2, #1          \n"
+        "smulwb %3, %4, %3          \n"
+        "mov    %3, %3, lsl #16     \n"
+        "orr    %3, %3, %3, lsr #16 \n"
+        "str    %3, [%0], #4        \n"
+        "bhi    1b                  \n"
+        : "+r"(out), "+r"(src), "+r"(count),
+          "=&r"(t0),
+        : "r"(pcm->amplitude));
+}
+
+static void write_samples_gain_2ch_s16(void *out,
+                                       const struct pcm_handle *pcm,
+                                       unsigned long count)
+{
+    int16_t const *src = pcm->addr;
+    int32_t t0, t1;
+
+    asm volatile (
+    "1:                             \n"
+        "ldrsh  %3, [%1], #2        \n"
+        "ldrsh  %4, [%1], #2        \n"
+        "subs   %2, %2, #1          \n"
+        "smulwb %3, %5, %3          \n"
+        "smulwb %4, %5, %4          \n"
+        "mov    %3, %3, lsl #16     \n"
+        "mov    %4, %4, lsl #16     \n"
+        "orr    %3, %4, %3, lsr #16 \n"
+        "str    %3, [%0], #4        \n"
+        "bhi    1b                  \n"
+        : "+r"(out), "+r"(src), "+r"(count),
+          "=&r"(t0), "=&r"(t1)
+        : "r"(pcm->amplitude));
+}
+
+static void mix_samples_1ch_s16(void *out,
+                                const struct pcm_handle *pcm,
+                                unsigned long count)
+{
+    int32_t amp = pcm->amplitude
+    int16_t const *src = pcm->addr;
+    int32_t t0, t1, t2;
+
+    asm volatile (
+    "1:                             \n"
+        "ldrsh  %5, [%1], #2        \n"
+        "ldrsh  %3, [%0, #0]        \n"
+        "ldrsh  %4, [%0, #2]        \n"
+        "smulwb %5, %6, %5          \n"
+        "add    %3, %3, %5          \n"
+        "add    %4, %4, %5          \n"
+        "mov    %5, %3, asr #15     \n"
+        "teq    %5, %3, asr #31     \n"
+        "eorne  %3, %7, %3, asr #31 \n"
+        "mov    %5, %4, asr #15     \n"
+        "teq    %5, %4, asr #31     \n"
+        "eorne  %4, %7, %4, asr #31 \n"
+        "subs   %2, %2, #1          \n"
+        "and    %5, %3, %7, lsr #16 \n"
+        "orr    %3, %5, %4, lsl #16 \n"
+        "str    %3, [%0], #4        \n"
+        "bhi    1b                  \n"
+        : "+r"(out), "+r"(src), "+r"(count),
+          "=&r"(t0), "=&r"(t1), "=&r"(t2)
+        : "r"(amp), "r"(0xffff7fff));
+}
+
+static void mix_samples_2ch_s16(void *out,
+                                const struct pcm_handle *pcm,
+                                unsigned long count)
+{
+    int32_t amp = pcm->amplitude
+    int16_t const *src = pcm->addr;
+    int32_t t0, t1, t2, t3;
+
+    asm volatile (
+    "1:                             \n"
+        "ldrsh  %3, [%0, #0]        \n"
+        "ldrsh  %4, [%0, #2]        \n"
+        "ldrsh  %5, [%1], #2        \n"
+        "ldrsh  %6, [%1], #2        \n"
+        "smlawb %3, %7, %5, %3      \n"
+        "smlawb %4, %7, %6, %4      \n"
+        "mov    %5, %3, asr #15     \n"
+        "teq    %5, %3, asr #31     \n"
+        "eorne  %3, %8, %3, asr #31 \n"
+        "mov    %5, %4, asr #15     \n"
+        "teq    %5, %4, asr #31     \n"
+        "eorne  %4, %8, %4, asr #31 \n"
+        "subs   %2, %2, #1          \n"
+        "and    %5, %3, %8, lsr #16 \n"
+        "orr    %3, %5, %4, lsl #16 \n"
+        "str    %3, [%0], #4        \n"
+        "bhi    1b                  \n"
+        : "+r"(out), "+r"(src), "+r"(count),
+          "=&r"(t0), "=&r"(t1), "=&r"(t2), "=&r"(t3)
+        : "r"(amp), "r"(0xffff7fff));
+}
+
+static pcm_mixer_samples_fn write_samples = NULL;
+static pcm_mixer_samples_fn mix_samples = NULL;
+
+int pcm_mixer_format_config(struct pcm_handle *pcm,
+                            const struct pcm_format *format)
+{
+    if (format->amplitude == PCM_AMP_UNITY) {
+        mix_samples = 
     }
-    else
+
+    /* [format][channels][gain == unity] */
+    static const struct mix_write_samples_desc fns[1][2] =
     {
-        /* Channel needs amplitude cut */
-        uint32_t l, h;
-        asm volatile (
-        "1:                             \n"
-            "ldr    %3, [%1], #4        \n"
-            "subs   %2, %2, #1          \n"
-            "smulwt %4, %5, %3          \n"
-            "smulwb %3, %5, %3          \n"
-            "mov    %4, %4, lsl #16     \n"
-            "mov    %3, %3, lsl #16     \n"
-            "orr    %4, %4, %3, lsr #16 \n"
-            "str    %4, [%0], #4        \n"
-            "bhi    1b                  \n"
-            : "+r"(out), "+r"(src), "+r"(count),
-              "=&r"(l), "=&r"(h)
-            : "r"(amp));
+        [0] = /* PCM_FORMAT_S16_2 */
+        {
+            [0] = /* mono */
+            {
+                [0] = { .write = write_samples_gain_1ch_s16,
+                        .mix   = mix_samples_1ch_s16, },
+                [1] = { .write = write_samples_unity_s16,
+                        .mix   = mix_samples_1ch_s16, }, 
+            },
+            [1] = /* stereo */
+            {
+                [0] = { .write = write_samples_gain_2ch_s16,
+                        .mix   = mix_samples_2ch_s16, },
+                [1] = { .write = write_samples_unity_s16,
+                        .mix   = mix_samples_2ch_s16, }, 
+            },
+        },
+    };
+
+    unsigned int code = format->format_code - PCM_FORMAT_S16_2;
+    unsigned int chnum = format->num_channels - 1;
+
+    if (code > 0 || chnum > 1) {
+        return -1;
     }
+
+    const struct mix_write_samples_desc *desc =
+        fns[code][chnum][pcm->gain == PCM_AMP_UNITY];
+
+    write_samples = desc->write;
+    mix_samples   = desc->mix;
+
+    return 0;
 }

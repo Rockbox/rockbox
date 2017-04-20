@@ -396,8 +396,8 @@ static FORCE_INLINE void dsp_proc_call(struct dsp_proc_slot *s,
  * dst:
  *     frames_rem = number of frames placed in buffer so far; set to
  *                  zero on first call
- *     p16out     = current fill pointer in destination buffer; set to
- *                  buffer start on first call
+ *     pout      = current fill pointer in destination buffer; set to
+ *                 buffer start on first call
  *     frames     = remaining buffer space in samples; set to maximum
  *                  desired output count on first call
  *     format     = ignored
