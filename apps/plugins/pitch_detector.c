@@ -238,8 +238,8 @@ static const struct picture note_bitmaps =
     BMPHEIGHT_pitch_notes/NUM_NOTE_IMAGES
 };
 
-
-static unsigned int sample_rate;
+static pcm_handle_t pcm_handle;
+static unsigned long sample_rate;
 static int audio_head = 0; /* which of the two buffers to use? */
 static volatile int audio_tail = 0; /* which of the two buffers to record? */
 /* It's stereo, so make the buffer twice as big */
@@ -952,7 +952,7 @@ static uint32_t ICODE_ATTR buffer_magnitude(int16_t *input)
 }
 
 /* Stop the recording when the buffer is full */
-static void recording_callback(void **start, unsigned long *frames)
+static int recording_callback(int status, void **start, unsigned long *frames)
 {
     int tail = audio_tail ^ 1;
 
@@ -963,17 +963,53 @@ static void recording_callback(void **start, unsigned long *frames)
     /* Always record full buffer, even if not required */
     *start = audio_data[tail];
     *frames = BUFFER_SIZE / 2;
+
+    return status;
 }
 #endif /* SIMULATOR */
+
+/* Init the audio recording */
+static void open_audio_recording(void)
+{
+    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
+    rb->audio_set_input_source(INPUT_TYPE, SRCF_RECORDING);
+
+    /* set to maximum gain */
+    rb->audio_set_recording_gain(settings.record_gain,
+                                 settings.record_gain,
+                                 AUDIO_GAIN_MIC);
+
+    pcm_handle = rb->pcm_open(PCM_STREAM_RECORDING);
+
+    /* Highest C on piano is approx 4.186 kHz, so we need just over
+     * 8.372 kHz to pass it. */
+    sample_rate = rb->pcm_set_frequency(pcm_handle, 9000);
+}
+
+/* Close the audio recording and reset state */
+static void close_audio_recording(void)
+{
+    rb->pcm_set_frequency(pcm_handle, HW_SAMPR_RESET);
+    rb->pcm_close(pcm_handle);
+}
 
 /* Start recording */
 static void record_data(void)
 {
 #ifndef SIMULATOR
     /* Always record full buffer, even if not required */
-    rb->pcm_record_data(recording_callback, NULL,
+    rb->pcm_record_data(pcm_handle,
+                        recording_callback,
                         audio_data[audio_tail],
-                        BUFFER_SIZE / 2);
+                        BUFFER_SIZE / 2,
+                        PCM_FORMAT(PCM_FORMAT_S16_2, 2));
+#endif
+}
+
+static void record_stop(void)
+{
+#ifndef SIMULATOR
+    rb->pcm_stop(pcm_handle);
 #endif
 }
 
@@ -1013,7 +1049,7 @@ static void record_and_get_pitch(void)
                     break;
 
                 case PLA_CANCEL:
-                    rb->pcm_stop_recording();
+                    record_stop();
                     quit = main_menu();
                     if(!quit)
                     {
@@ -1076,8 +1112,8 @@ static void record_and_get_pitch(void)
 #endif
         }
     }
-    rb->pcm_close_recording();
-    rb->pcm_set_frequency(HW_SAMPR_RESET | SAMPR_TYPE_REC);
+
+    close_audio_recording();
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     rb->cancel_cpu_boost();
 #endif
@@ -1097,22 +1133,8 @@ static void init_everything(void)
     /* Stop all playback */
     rb->plugin_get_audio_buffer(NULL);
 
-    /* --------- Init the audio recording ----------------- */
-    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
-    rb->audio_set_input_source(INPUT_TYPE, SRCF_RECORDING);
-
-    /* set to maximum gain */
-    rb->audio_set_recording_gain(settings.record_gain,
-                                 settings.record_gain,
-                                 AUDIO_GAIN_MIC);
-
-    /* Highest C on piano is approx 4.186 kHz, so we need just over
-     * 8.372 kHz to pass it. */
-    sample_rate = rb->round_value_to_list32(9000, rb->rec_freq_sampr,
-                                            REC_NUM_FREQ, false);
-    sample_rate = rb->rec_freq_sampr[sample_rate];
-    rb->pcm_set_frequency(sample_rate | SAMPR_TYPE_REC);
-    rb->pcm_init_recording();
+    /* Init the audio recording */
+    open_audio_recording();
 
     /* avoid divsion by zero */
     if(settings.lowest_freq == 0)

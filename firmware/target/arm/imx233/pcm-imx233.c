@@ -21,7 +21,6 @@
 
 #include "config.h"
 #include "audiohw.h"
-#include "pcm.h"
 #include "dma-imx233.h"
 #include "pcm-internal.h"
 #include "audioout-imx233.h"
@@ -40,7 +39,6 @@ __ENSURE_STRUCT_CACHE_FRIENDLY(struct pcm_dma_command_t)
  * take a while. We work around this by splitting big transfers into small burst
  * to make sure we can stop quickly. */
 
-static int dac_locked = 0;
 static struct pcm_dma_command_t dac_dma;
 static bool dac_freezed = false;
 
@@ -83,22 +81,18 @@ static void play(void)
 
 void INT_DAC_DMA(void)
 {
-    /* if stop is pending, ackonowledge stop
-     * otherwise try to get some more and stop if there is none */
+    /* if stop is pending, ackonowledge stop */
     if(dac_state == DAC_STOP_PENDING)
     {
         dac_state = DAC_STOPPED;
     }
     else if(dac_state == DAC_PLAYING)
     {
-        /* continue if buffer is not done, otherwise try to get some new data */
-        if(dac_frames || pcm_play_dma_complete_callback(PCM_DMAST_OK, &dac_buf, &dac_frames))
-        {
+        /* continue if buffer is not done */
+        if (dac_frames)
             play();
-            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-        }
         else
-            dac_state = DAC_STOPPED;
+            pcm_play_dma_complete_callback(0);
     }
 
     imx233_dma_clear_channel_interrupt(APB_AUDIO_DAC);
@@ -106,21 +100,19 @@ void INT_DAC_DMA(void)
 
 void INT_DAC_ERROR(void)
 {
+    pcm_play_dma_complete_callback(-EIO);
     dac_state = DAC_STOPPED;
-    pcm_play_dma_status_callback(PCM_DMAST_ERR_DMA);
     imx233_dma_clear_channel_interrupt(APB_AUDIO_DAC);
 }
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    if(dac_locked++ == 0)
-        imx233_dma_enable_channel_interrupt(APB_AUDIO_DAC, false);
+    imx233_dma_enable_channel_interrupt(APB_AUDIO_DAC, false);
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-    if(--dac_locked == 0)
-        imx233_dma_enable_channel_interrupt(APB_AUDIO_DAC, true);
+    imx233_dma_enable_channel_interrupt(APB_AUDIO_DAC, true);
 }
 
 void pcm_play_dma_stop(void)
@@ -130,19 +122,23 @@ void pcm_play_dma_stop(void)
      * wait for the end of transfer */
     dac_buf = NULL;
     dac_frames = 0;
-    dac_state = DAC_STOP_PENDING;
+
+    if(dac_state != DAC_STOPPED)
+        dac_state = DAC_STOP_PENDING;
 }
 
-void pcm_play_dma_start(const void *addr, unsigned long frames)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
 {
     /* update pending buffer */
     dac_buf = addr;
     dac_frames = frames;
-    /* if we are stopped restart playback, otherwise IRQ will pick up */
-    if(dac_state == DAC_STOPPED)
-        play();
-    else
-        dac_state = DAC_PLAYING;
+    dac_state = DAC_PLAYING;
+    play();
+}
+
+void pcm_play_dma_prepare(void)
+{
+    /* nothing to do */
 }
 
 void pcm_play_dma_pause(bool pause)
@@ -151,30 +147,26 @@ void pcm_play_dma_pause(bool pause)
     dac_freezed = pause;
 }
 
-void pcm_play_dma_init(void)
+void pcm_dma_init(const struct pcm_hw_settings *settings)
 {
-    audiohw_preinit();
-}
-
-void pcm_play_dma_postinit(void)
-{
-    audiohw_postinit();
+    audiohw_init();
     imx233_icoll_enable_interrupt(INT_SRC_DAC_DMA, true);
     imx233_icoll_enable_interrupt(INT_SRC_DAC_ERROR, true);
     imx233_icoll_set_priority(INT_SRC_DAC_DMA, ICOLL_PRIO_AUDIO);
     imx233_dma_enable_channel_interrupt(APB_AUDIO_DAC, true);
+    (void)settings;
 }
 
-void pcm_dma_apply_settings(void)
+void pcm_dma_apply_settings(const struct pcm_hw_settings *settings)
 {
-    pcm_play_lock();
+    pcm_play_dma_lock();
     /* update frequency */
-    audiohw_set_frequency(pcm_fsel);
+    audiohw_set_frequency(settings->fsel);
     /* compute maximum transfer size: aim at ~1/100s stop time maximum, make sure
      * the resulting value is a multiple of cache line. At sample rate F we
      * transfer two samples (2 x 2 bytes) F times per second = 4F b/s */
     dma_max_frames = CACHEALIGN_UP(4 * pcm_sampr / 100) / 4;
-    pcm_play_unlock();
+    pcm_play_dma_unlock();
 }
 
 unsigned long pcm_get_frames_waiting(void)
@@ -226,7 +218,6 @@ const void *pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
  * long it could take a while. We work around this by splitting big transfers
  * into small burst to make sure we can stop quickly. */
 #ifdef HAVE_RECORDING
-static int adc_locked = 0;
 static struct pcm_dma_command_t adc_dma;
 
 static void *adc_buf;            /* current buffer (physical address) */
@@ -240,17 +231,14 @@ enum
     ADC_STOPPED,
 }adc_state = ADC_STOPPED;
 
-void pcm_rec_lock(void)
+void pcm_rec_dma_lock(void)
 {
-    if(adc_locked++ == 0)
-        imx233_dma_enable_channel_interrupt(APB_AUDIO_ADC, false);
+    imx233_dma_enable_channel_interrupt(APB_AUDIO_ADC, false);
 }
 
-
-void pcm_rec_unlock(void)
+void pcm_rec_dma_unlock(void)
 {
-    if(--adc_locked == 0)
-        imx233_dma_enable_channel_interrupt(APB_AUDIO_ADC, true);
+    imx233_dma_enable_channel_interrupt(APB_AUDIO_ADC, true);
 }
 
 void pcm_rec_dma_init(void)
@@ -293,19 +281,10 @@ void INT_ADC_DMA(void)
     else if(adc_state == ADC_RECORDING)
     {
         /* continue if buffer is not done, otherwise try to get some new data */
-        if(!adc_frames)
-        {
-            if(pcm_rec_dma_complete_callback(PCM_DMAST_OK, &adc_addr, &adc_frames))
-                adc_buf = PHYSICAL_ADDR(adc_addr);
-            else
-                adc_state = ADC_STOPPED;
-        }
-
-        if(adc_state == ADC_RECORDING)
-        {
+        if(adc_frames)
             rec();
-            pcm_rec_dma_status_callback(PCM_DMAST_STARTED);
-        }
+        else
+            pcm_rec_dma_complete_callback(0);
     }
 
     imx233_dma_clear_channel_interrupt(APB_AUDIO_ADC);
@@ -313,22 +292,24 @@ void INT_ADC_DMA(void)
 
 void INT_ADC_ERROR(void)
 {
+    pcm_rec_dma_complete_callback(-EIO);
     adc_state = ADC_STOPPED;
-    pcm_rec_dma_status_callback(PCM_DMAST_ERR_DMA);
     imx233_dma_clear_channel_interrupt(APB_AUDIO_ADC);
 }
 
-void pcm_rec_dma_start(void *addr, unsigned long frames)
+void pcm_rec_dma_capture_frames(void *addr, unsigned long frames)
 {
     /* update pending buffer */
     adc_buf = PHYSICAL_ADDR(addr);
     adc_addr = addr;
     adc_frames = frames;
-    /* if we are stopped restart recording, otherwise IRQ will pick up */
-    if(adc_state == ADC_STOPPED)
-        rec();
-    else
-        adc_state = ADC_RECORDING;
+    adc_state = ADC_RECORDING;
+    rec();
+}
+
+void pcm_rec_dma_prepare(void)
+{
+    /* nothing to do */
 }
 
 void pcm_rec_dma_stop(void)
@@ -339,7 +320,9 @@ void pcm_rec_dma_stop(void)
     adc_buf = NULL;
     adc_addr = NULL;
     adc_frames = 0;
-    adc_state = ADC_STOP_PENDING;
+
+    if(adc_state != ADC_STOPPED)
+        adc_state = ADC_STOP_PENDING;
 }
 
 const void *pcm_rec_dma_get_peak_buffer(unsigned long *frames_avail)

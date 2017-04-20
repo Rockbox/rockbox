@@ -116,7 +116,7 @@ struct
     .vol_r = 0,
     .dac_l = 0,
     .dac_r = 0,
-    .ahw_mute = false,
+    .ahw_mute = true,
     .prescaler = 0,
     .eq_on = true,
     .band_gain = { 0, 0, 0, 0, 0 },
@@ -170,7 +170,7 @@ static int vol_tenthdb2hw(int db)
         return db / 10 - -90;
 }
 
-void audiohw_preinit(void)
+void audiohw_codec_init(void)
 {
     /* 1. Turn on external power supplies. Wait for supply voltage to settle. */
 
@@ -205,10 +205,7 @@ void audiohw_preinit(void)
 
     /* 6. Set L/ROUTEN = 1 in register R2. */
     wmc_write(WMC_POWER_MANAGEMENT2, WMC_LOUT1EN | WMC_ROUT1EN);
-}
 
-void audiohw_postinit(void)
-{
     sleep(5*HZ/4);
 
     /* 7. Enable other mixers as required */
@@ -345,7 +342,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
     }
 }
 
-static void audiohw_mute(bool mute)
+void audiohw_mute(bool mute)
 {
     wmc_vol.ahw_mute = mute;
 

@@ -26,7 +26,6 @@
 #include "s5l8702.h"
 #include "panic.h"
 #include "audiohw.h"
-#include "pcm.h"
 #include "pcm-internal.h"
 #include "pcm_sampr.h"
 #include "mmu-arm.h"
@@ -81,23 +80,21 @@ static struct dmac_ch_cfg dma_play_ch_cfg = {
 #define CHUNK_MAX_BYTES     (LLI_MAX_BYTES * 1)
 #define WATERMARK_BYTES     (PCM_WATERMARK * 4)
 
-static volatile int locked = 0;
 static unsigned char dblbuf[2][WATERMARK_BYTES] CACHEALIGN_ATTR;
 static int active_dblbuf;
+static int pcm_running = false;
 size_t pcm_remaining;
 
 /* Mask the DMA interrupt */
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    if (locked++ == 0)
-        dmac_ch_lock_int(&dma_play_ch);
+    dmac_ch_lock_int(&dma_play_ch);
 }
 
 /* Unmask the DMA interrupt if enabled */
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-    if (--locked == 0)
-        dmac_ch_unlock_int(&dma_play_ch);
+    dmac_ch_unlock_int(&dma_play_ch);
 }
 
 static inline void play_queue_dma(void *addr, size_t size, void *cb_data)
@@ -107,24 +104,8 @@ static inline void play_queue_dma(void *addr, size_t size, void *cb_data)
                 (void*)S5L8702_DADDR_PERI_IIS0_TX, size, cb_data);
 }
 
-static void dma_play_callback(void *cb_data)
+static void dma_play_transfer(const void *dataptr)
 {
-    if (!cb_data)
-        return; /* dblbuf callback entered, nothing to do */
-
-    const void *dataptr = cb_data;
-
-    if (!pcm_remaining)
-    {
-        unsigned long frames;
-
-        if (!pcm_play_dma_complete_callback(
-                     PCM_DMAST_OK, &dataptr, &frames))
-            return;
-
-        pcm_remaining = frames*4;
-    }
-
     uint32_t lastsize = MIN(WATERMARK_BYTES, pcm_remaining >> 1);
     pcm_remaining -= lastsize;
     uint32_t chunksize = MIN(CHUNK_MAX_BYTES, pcm_remaining);
@@ -144,23 +125,44 @@ static void dma_play_callback(void *cb_data)
     memcpy(dblbuf[active_dblbuf], dataptr + chunksize, lastsize);
     play_queue_dma(dblbuf[active_dblbuf], lastsize, NULL);
     active_dblbuf ^= 1;
-
-    pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 }
 
-void pcm_play_dma_start(const void* addr, unsigned long frames)
+static void dma_play_callback(void *cb_data)
 {
-    pcm_play_dma_stop();
+    if (!cb_data)
+        return; /* dblbuf callback entered, nothing to do */
 
-    pcm_remaining = frames*4;
-    I2STXCOM = 0xe;
-    dma_play_callback((void*)addr);
+    if (pcm_remaining)
+        dma_play_transfer(cb_data); /* continue with current */
+    else
+        pcm_play_dma_complete_callback(0);   /* possibly start new buffer */
+}
+
+void pcm_play_dma_send_frames(const void* addr, unsigned long frames)
+{
+    pcm_remaining = frames * 4;
+
+    if (!pcm_running)
+    {
+        /* start from stopped state */
+        pcm_running = true;
+        I2STXCOM = 0xe;
+    }
+
+    dma_play_transfer(addr);
+}
+
+void pcm_play_dma_prepare(void)
+{
+    if (pcm_running)
+        pcm_play_dma_stop();
 }
 
 void pcm_play_dma_stop(void)
 {
     dmac_ch_stop(&dma_play_ch);
     I2STXCOM = 0xa;
+    pcm_running = false;
 }
 
 /* pause playback by disabling LRCK */
@@ -174,11 +176,11 @@ void pcm_play_dma_pause(bool pause)
 #define MCLK_FREQ     12000000
 
 /* set the configured PCM frequency */
-void pcm_dma_apply_settings(void)
+void pcm_dma_apply_settings(const struct pcm_hw_settings *settings)
 {
     static uint16_t last_clkcon3l = 0;
     uint16_t clkcon3l;
-    int fsel;
+    int fsel = settings->fsel;
 
     /* For unknown reasons, s5l8702 I2S controller does not synchronize
      * with CS42L55 at 32000 Hz. To fix it, the CODEC is configured with
@@ -186,12 +188,11 @@ void pcm_dma_apply_settings(void)
      * obtaining 32 KHz in LRCK controller input and 8 MHz in SCLK input.
      * OF uses this trick.
      */
-    if (pcm_fsel == HW_FREQ_32) {
+    if (fsel == HW_FREQ_32) {
         fsel = HW_FREQ_48;
         clkcon3l = 0x3028;  /* PLL2 / 3 / 9 -> 8 MHz */
     }
     else {
-        fsel = pcm_fsel;
         clkcon3l = 0;  /* OSC0 -> 12 MHz */
     }
 
@@ -211,7 +212,7 @@ void pcm_dma_apply_settings(void)
     audiohw_set_frequency(fsel);
 }
 
-void pcm_play_dma_init(void)
+void pcm_dma_init(const struct pcm_hw_settings *settings)
 {
     PWRCON(0) &= ~(1 << 4);
     PWRCON(1) &= ~(1 << 7);
@@ -221,13 +222,8 @@ void pcm_play_dma_init(void)
     I2STXCON = 0xb100019;
     I2SCLKCON = 1;
 
-    audiohw_preinit();
+    audiohw_codec_init();
     pcm_dma_apply_settings();
-}
-
-void pcm_play_dma_postinit(void)
-{
-    audiohw_postinit();
 }
 
 unsigned long pcm_get_frames_waiting(void)
@@ -249,7 +245,6 @@ const void* pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
  ** Recording DMA transfer
  **/
 #ifdef HAVE_RECORDING
-static volatile int rec_locked = 0;
 static void *rec_dma_addr;
 static size_t rec_dma_size;
 static bool pcm_rec_initialized = false;
@@ -343,29 +338,40 @@ static void dma_rec_callback(void *cb_data)
     }
     else /* TASK_RECBUF */
     {
-        /* Inform middle layer */
-        unsigned long frames;
-        if (pcm_rec_dma_complete_callback(
-                    PCM_DMAST_OK, &rec_dma_addr, &frames))
-        {
-            rec_dma_size = frames*4;
-            SIZE_PANIC(rec_dma_size);
-            rec_dmac_ch_queue(rec_dma_addr + AHEADBUF_SZ,
-                        rec_dma_size - AHEADBUF_SZ, TASK_RECBUF);
-            pcm_rec_dma_status_callback(PCM_DMAST_STARTED);
-        }
+        pcm_rec_dma_complete_callback(0); /* possibly start new buffer */
     }
 }
 
-void pcm_rec_lock(void)
+void pcm_rec_dma_capture_frames(void *addr, unsigned long frames)
 {
-    if ((rec_locked++ == 0) && pcm_rec_initialized)
+    size_t size = frames * 4;
+
+    SIZE_PANIC(size);
+
+    rec_dma_addr = addr;
+    rec_dma_size = size;
+
+    if (completed_task == -2)
+    {
+        /* launch first DMA transfer to capture into ahead buffer,
+           link the second task to capture into record buffer */
+        rec_dmac_ch_queue(ahead_buf, AHEADBUF_SZ, TASK_AHEADBUF);
+        I2SRXCOM = 0x6; /* start Rx I2S */
+        completed_task = -1;
+    }
+
+    rec_dmac_ch_queue(addr + AHEADBUF_SZ, size - AHEADBUF_SZ, TASK_RECBUF);
+}
+
+void pcm_rec_dma_lock(void)
+{
+    if (pcm_rec_initialized)
         dmac_ch_lock_int(&dma_rec_ch);
 }
 
-void pcm_rec_unlock(void)
+void pcm_rec_dma_unlock(void)
 {
-    if ((--rec_locked == 0) && pcm_rec_initialized)
+    if (pcm_rec_initialized)
         dmac_ch_unlock_int(&dma_rec_ch);
 }
 
@@ -380,24 +386,10 @@ void pcm_rec_dma_stop(void)
     completed_task = -1;
 }
 
-void pcm_rec_dma_start(void *addr, unsigned long frames)
+void pcm_rec_dma_prepare(void)
 {
-    size_t size = frames * 4;
-
-    SIZE_PANIC(size);
-
     pcm_rec_dma_stop();
-
-    rec_dma_addr = addr;
-    rec_dma_size = size;
-    completed_task = -1;
-
-    /* launch first DMA transfer to capture into ahead buffer,
-       link the second task to capture into record buffer */
-    rec_dmac_ch_queue(ahead_buf, AHEADBUF_SZ, TASK_AHEADBUF);
-    rec_dmac_ch_queue(addr + AHEADBUF_SZ, size - AHEADBUF_SZ, TASK_RECBUF);
-
-    I2SRXCOM = 0x6; /* start Rx I2S */
+    completed_task = -2;
 }
 
 void pcm_rec_dma_close(void)
@@ -416,8 +408,7 @@ void pcm_rec_dma_init(void)
     dmac_ch_init(&dma_rec_ch, &dma_rec_ch_cfg);
 
     /* synchronize lock status */
-    if (rec_locked)
-        dmac_ch_lock_int(&dma_rec_ch);
+    dmac_ch_lock_int(&dma_rec_ch);
 
     I2SRXCON = 0x1000;
     I2SCLKCON = 1;

@@ -238,8 +238,7 @@ void dsp_sample_input_format_change(struct sample_io_data *this,
 
     this->format_dirty = 0;
     this->sample_buf.format = *format;
-    this->input_samples = fns[this->stereo_mode]
-                             [this->sample_depth > NATIVE_DEPTH ? 1 : 0];
+    this->input_samples = fns[this->stereo_mode][this->sample_depth > WORD_DEPTH];
 }
 
 /* increment the format version counter */
@@ -312,7 +311,7 @@ bool dsp_sample_io_configure(struct sample_io_data *this,
         this->format.output_scale = WORD_FRACBITS + 1 - NATIVE_DEPTH;
         this->format.frequency = this->output_sampr;
         this->format.codec_frequency = this->output_sampr;
-        this->sample_depth = NATIVE_DEPTH;
+        this->sample_depth = WORD_DEPTH;
         this->stereo_mode = STEREO_NONINTERLEAVED;
         break;
 
@@ -325,11 +324,9 @@ bool dsp_sample_io_configure(struct sample_io_data *this,
 
     case DSP_SET_SAMPLE_DEPTH:
         format_change_set(this);
-        this->format.frac_bits =
-            value <= NATIVE_DEPTH ? WORD_FRACBITS : value;
-        this->format.output_scale =
-            this->format.frac_bits + 1 - NATIVE_DEPTH;
-        this->sample_depth = value;
+        this->sample_depth = value <= WORD_DEPTH ? WORD_DEPTH : value + 1;
+        this->format.frac_bits = value <= WORD_DEPTH ? WORD_FRACBITS : value;
+        this->format.output_scale = this->format.frac_bits + 1 - NATIVE_DEPTH;
         break;
 
     case DSP_SET_STEREO_MODE:

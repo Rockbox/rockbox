@@ -65,7 +65,7 @@ static void dac_enable(const int val)
     pca9555_write_output(val<<4, 1<<4);
 }
 
-void audiohw_postinit(void)
+void audiohw_codec_init(void)
 {
     pop_ctrl(0);
     sleep(HZ/4);

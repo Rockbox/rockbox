@@ -30,9 +30,12 @@
 #if CONFIG_CODEC == SWCODEC
 #include "pcm_sampr.h"
 #include "pcm.h"
+#define AUDIO_MAX_CHANNELS PCM_DMA_T_CHANNELS
 #ifdef HAVE_RECORDING
 #include "enc_base.h"
 #endif /* HAVE_RECORDING */
+#else /* CONFIG_CODEC != SWCODEC */
+#define AUDIO_MAX_CHANNELS 2
 #endif /* CONFIG_CODEC == SWCODEC */
 
 #define AUDIO_STATUS_PLAY       0x0001
@@ -49,6 +52,8 @@
 
 
 void audio_init(void) INIT_ATTR;
+bool audio_is_initialized(void);
+void audio_wait_for_ready(void);
 void audio_play(unsigned long elapsed, unsigned long offset);
 void audio_stop(void);
 /* Stops audio from serving playback and frees resources*/
@@ -213,6 +218,16 @@ unsigned long audio_prerecorded_time(void);
 
 #endif /* HAVE_RECORDING */
 
+struct audio_peaks
+{
+#if CONFIG_CODEC == SWCODEC
+    struct pcm_peaks pcm_peaks; /* must directly precede 'peak' array */
+#endif
+    uint32_t peak[AUDIO_MAX_CHANNELS];
+};
+
+void audio_get_peaks(struct audio_peaks *peaks, unsigned int fracbits);
+
 #if CONFIG_CODEC == SWCODEC
 /* SWCODEC misc. audio functions */
 #if INPUT_SRC_CAPS != 0
@@ -223,6 +238,26 @@ void audio_set_input_source(int source, unsigned flags);
 void audio_input_mux(int source, unsigned flags);
 void audio_set_output_source(int source);
 #endif /* INPUT_SRC_CAPS */
+
+#define audio_sample_t                  pcm_dma_t
+#define AUDIO_FRAME_CHANNELS            PCM_DMA_T_CHANNELS
+#define AUDIO_SAMPLE_SIZE               PCM_DMA_T_SIZE
+#define AUDIO_FRAME_SIZE                PCM_DMA_T_FRAME_SIZE
+#define AUDIO_SAMPLE_DEPTH              PCM_DMA_T_DEPTH
+
+#define audio_sample_read_preidx        pcm_dma_t_read_preidx
+#define audio_sample_read_postidx       pcm_dma_t_read_postidx
+#define audio_sample_write_preidx       pcm_dma_t_write_preidx
+#define audio_sample_write_postidx      pcm_dma_t_write_postidx
+#define audio_scale_sample_to           pcm_dma_t_scale_to
+#define audio_sample_amplify            pcm_dma_t_amplify
+#define audio_sample_mix_clip           pcm_dma_t_mix_clip
+#define audio_sample_ptr_advance        pcm_dma_t_advance
+
+#define audio_frames2size               pcm_dma_t_frames2size
+#define audio_size2frames               pcm_dma_t_size2frames
+
+typedef void (* audio_pcm_hook_fn)(const void *start, unsigned long frames);
 #endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef HAVE_SPDIF_IN

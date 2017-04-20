@@ -110,7 +110,7 @@ static int vol_tenthdb2hw(int db)
     }
 }
 
-static void audiohw_mute(bool mute)
+void audiohw_mute(bool mute)
 {
     if (mute) {
         /* Set DACMU = 1 to soft-mute the audio DACs. */
@@ -127,7 +127,7 @@ static void codec_set_active(int active)
     wmc_write(ACTIVECTRL, active ? ACTIVECTRL_ACTIVE : 0);
 }
 
-void audiohw_preinit(void)
+void audiohw_codec_init(void)
 {
     /* POWER UP SEQUENCE */
     /* 1) Switch on power supplies. By default the WM codec is in Standby Mode,
@@ -152,13 +152,8 @@ void audiohw_preinit(void)
      *    (active) in register 0Ch, enabling the DAC signal path, free
      *     of any significant power-up noise. */
     wmc_clear(PDCTRL, PDCTRL_OUTPD);
-}
 
-void audiohw_postinit(void)
-{
     sleep(HZ);
-
-    audiohw_mute(false);
 
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
     /* We need to enable bit 4 of GPIOL for output for sound on H10 */
