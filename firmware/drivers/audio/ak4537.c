@@ -75,8 +75,9 @@ static int vol_tenthdb2hw(int db)
         return ((-db)/5);
 }
 
-/*static void audiohw_mute(bool mute)
+void audiohw_mute(bool mute)
 {
+#if 0
     if (mute)
     {
         akc_set(AK4537_DAC, SMUTE);
@@ -87,9 +88,11 @@ static int vol_tenthdb2hw(int db)
         udelay(200000);
         akc_clear(AK4537_DAC, SMUTE);
     }
-}*/
+#endif
+    (void)mute;
+}
 
-void audiohw_preinit(void)
+void audiohw_codec_init(void)
 {
     int i;
     for (i = 0; i < AKC_NUM_REGS; i++)
@@ -153,11 +156,6 @@ void audiohw_preinit(void)
     /* power up the common voltage of headphone amp */
     akc_set(AK4537_PM2, PMHPL | PMHPR);
     udelay(100000);
-}
-
-void audiohw_postinit(void)
-{
-    /* nothing */
 }
 
 void audiohw_close(void)

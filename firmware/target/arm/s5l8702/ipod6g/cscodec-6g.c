@@ -30,7 +30,7 @@
 void audiohw_init(void)
 {
 #ifdef HAVE_CS42L55
-    audiohw_preinit();
+    audiohw_codec_init();
 #endif
 }
 

@@ -53,7 +53,6 @@
 #endif
 #endif
 
-#include "pcm.h"
 #include "pcm-internal.h"
 #include "pcm_sampr.h"
 
@@ -93,9 +92,9 @@ GMainLoop *pcm_loop = NULL;
 static const void* pcm_data = NULL;
 static unsigned long pcm_data_frames = 0;
 
-static int audio_locked = 0;
 static pthread_mutex_t audio_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int inside_feed_data = 0;
+static bool audio_running = false;
 
 /*
  * mutex lock/unlock wrappers neatness' sake
@@ -110,26 +109,27 @@ static inline void unlock_audio(void)
     pthread_mutex_unlock(&audio_lock_mutex);
 }
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    if (++audio_locked == 1)
-        lock_audio();
+    lock_audio();
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-    if (--audio_locked == 0)
-        unlock_audio();
+    unlock_audio();
 }
 
 void pcm_dma_apply_settings(void)
 {
 }
 
-void pcm_play_dma_start(const void *addr, unsigned long frames)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
 {
     pcm_data = addr;
     pcm_data_frames = frames;
+
+    if (audio_running)
+        return;
 
     if (playback_granted)
     {
@@ -146,6 +146,14 @@ void pcm_play_dma_start(const void *addr, unsigned long frames)
                                                 playback_state_req_callback,
                                                 NULL);
     }
+
+    audio_running = true;
+}
+
+void pcm_play_dma_prepare(void)
+{
+    if (audio_running)
+        pcm_play_dma_stop();
 }
 
 void pcm_play_dma_stop(void)
@@ -189,7 +197,9 @@ static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
        from inside gstreamer's stream thread as it will deadlock */
     inside_feed_data = 1;
 
-    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data, &pcm_data_frames))
+    pcm_play_dma_complete_callback(0);
+
+    if (pcm_data && pcm_data_frames)
     {
         GstBuffer *buffer = gst_buffer_new ();
         GstFlowReturn ret;
@@ -202,8 +212,6 @@ static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
 
         if (ret != 0)
             DEBUGF("push-buffer error result: %d\n", ret);
-
-        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
     } else
     {
         DEBUGF("feed_data: No Data.\n");
@@ -439,11 +447,11 @@ void pcm_set_mixer_volume(int volume)
 
 
 #ifdef HAVE_RECORDING
-void pcm_rec_lock(void)
+void pcm_rec_dma_lock(void)
 {
 }
 
-void pcm_rec_unlock(void)
+void pcm_rec_dma_unlock(void)
 {
 }
 
@@ -455,10 +463,14 @@ void pcm_rec_dma_close(void)
 {
 }
 
-void pcm_rec_dma_start(void *start, unsigned long frames)
+void pcm_rec_dma_capture_frames(void *start, unsigned long frames)
 {
     (void)start;
     (void)frames;
+}
+
+void pcm_rec_dma_prepare(void)
+{
 }
 
 void pcm_rec_dma_stop(void)

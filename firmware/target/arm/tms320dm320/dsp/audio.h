@@ -23,6 +23,5 @@
 #define AUDIO_H
 
 void audiohw_init(void);
-void audiohw_postinit(void);
 
 #endif

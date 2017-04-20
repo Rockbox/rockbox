@@ -124,6 +124,8 @@
 
 #define FRACTSIZE 10
 
+static pcm_handle_t pcm_handle;
+
 #ifndef SIMULATOR
 
 #if (HW_SAMPR_CAPS & SAMPR_CAP_22)
@@ -285,16 +287,28 @@ enum plugin_status plugin_start(const void* parameter)
         ROCKBOX_DIR "/patchset/drums.cfg") == -1)
     {
         printf("\nINIT ERROR\n");
-        return -1;
+        return PLUGIN_ERROR;
     }
-//#ifndef SIMULATOR
-    rb->pcm_play_stop();
+
+    if (!rb->plugin_get_audio_buffer(NULL))
+    {
+        printf("\nPLAYBACK STOP ERROR\n");
+        return PLUGIN_ERROR;
+    }
+
+    pcm_handle = rb->pcm_open(PCM_STREAM_PLAYBACK);
+    if (!pcm_handle)
+    {
+        printf("\nNO PCM\n");
+        return PLUGIN_ERROR;
+    }
+
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPLE_RATE); // 44100 22050 11025
+    rb->pcm_set_frequency(pcm_handle, SAMPLE_RATE); // 44100 22050 11025
 
 
     retval = beatboxmain();
@@ -303,8 +317,8 @@ enum plugin_status plugin_start(const void* parameter)
     rb->profstop();
 #endif
 
-    rb->pcm_play_stop();
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    rb->pcm_set_frequency(pcm_handle, HW_SAMPR_RESET);
+    rb->pcm_close(pcm_handle);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(false);
@@ -515,8 +529,11 @@ void redrawScreen(unsigned char force)
     rb->lcd_update();
 }
 
-void get_more(const void** start, unsigned long* frames)
+int get_more(int status, const void** start, unsigned long* frames)
 {
+    if (status < 0)
+        return status;
+
 #ifndef SYNC
     if(lastswap!=swap)
     {
@@ -533,6 +550,8 @@ void get_more(const void** start, unsigned long* frames)
 #ifndef SYNC
     swap ^= 1;
 #endif
+
+    return 0;
 }
 
 int beatboxmain()
@@ -542,7 +561,8 @@ int beatboxmain()
 
     numberOfSamples=44100/10;
     synthbuf();
-    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+    rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                      SAMPLE_FORMAT(SAMPLE_FORMAT_S16, 2));
 
     rb->lcd_set_background(0x000000);
     rb->lcd_clear_display();

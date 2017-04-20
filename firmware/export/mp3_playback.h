@@ -33,11 +33,7 @@ typedef void (*mp3_play_callback_t)(const void **start, size_t* size);
 #endif
 
 /* functions formerly in mpeg.c */
-void mp3_init(int volume, int bass, int treble, int balance, int loudness,
-              int avc, int channel_config, int stereo_width,
-              int mdb_strength, int mdb_harmonics,
-              int mdb_center, int mdb_shape, bool mdb_enable,
-              bool superbass);
+void mp3_init(void);
 
 /* exported just for mpeg.c, to keep the recording there */
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)

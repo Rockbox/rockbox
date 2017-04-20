@@ -51,13 +51,13 @@ static void cscodec_setbits(int reg, unsigned char off, unsigned char on)
     cscodec_write(reg, data);
 }
 
-static void audiohw_mute(bool mute)
+void audiohw_mute(bool mute)
 {
     if (mute) cscodec_setbits(PLAYCTL, 0, PLAYCTL_MSTAMUTE | PLAYCTL_MSTBMUTE);
     else cscodec_setbits(PLAYCTL, PLAYCTL_MSTAMUTE | PLAYCTL_MSTBMUTE, 0);
 }
 
-void audiohw_preinit(void)
+void audiohw_codec_init(void)
 {
     cscodec_power(true);
     cscodec_clock(true);
@@ -103,16 +103,13 @@ void audiohw_preinit(void)
     cscodec_write(LINEBCTL, LINEBCTL_LINEBMUTE);
     cscodec_write(PWRCTL1, PWRCTL1_PDN_CHRG | PWRCTL1_PDN_ADCA
                          | PWRCTL1_PDN_ADCB);
-}
 
-void audiohw_postinit(void)
-{
+
     cscodec_write(HPACTL, 0);
     cscodec_write(HPBCTL, 0);
     cscodec_write(LINEACTL, 0);
     cscodec_write(LINEBCTL, 0);
     cscodec_write(CLSHCTL, CLSHCTL_ADPTPWR_SIGNAL);
-    audiohw_mute(false);
 }
 
 void audiohw_set_volume(int vol_l, int vol_r)

@@ -77,8 +77,8 @@ struct dsp_buffer
     union
     {
         const void *pin[2];      /* 04h: Channel pointers (In) */
-        int32_t *p32[2];         /* 04h: Channel pointers (Int) */
-        int16_t *p16out;         /* 04h: DSP output buffer (Out) */
+        int32_t    *p32[2];      /* 04h: Channel pointers (Int) */
+        void       *pout;        /* 04h: DSP output buffer (Out) */
     };
     union
     {
@@ -110,11 +110,12 @@ static inline void dsp_advance_buffer_input(struct dsp_buffer *buf,
 /* Add samples to output buffer and update remaining space (Out).
    Provided to dsp_process() */
 static inline void dsp_advance_buffer_output(struct dsp_buffer *buf,
-                                             unsigned long by_count)
+                                             unsigned long by_count,
+                                             unsigned int numchannels)
 {
     buf->frames -= by_count;
     buf->frames_rem += by_count;
-    buf->p16out += 2 * by_count; /* Interleaved stereo */
+    audio_sample_ptr_advance(&buf->pout, by_count, numchannels); 
 }
 
 /* Remove samples from internal input buffer (In, Int).

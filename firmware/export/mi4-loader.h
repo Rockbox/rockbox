@@ -48,4 +48,4 @@ struct tea_key {
 #define NUM_KEYS (sizeof(tea_keytable)/sizeof(tea_keytable[0]))
 
 int load_mi4(unsigned char* buf, const char* firmware, unsigned int buffer_size);
-const char *mi4_strerror(int8_t errno);
+const char *mi4_strerror(int8_t err);

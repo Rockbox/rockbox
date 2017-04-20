@@ -104,10 +104,6 @@ void audiohw_unmute(void)
     pcm1792_write_reg(PCM1792_REG(18), REG18_INIT_VALUE);
 }
 
-void audiohw_preinit(void)
-{
-}
-
 void audiohw_set_frequency(int fsel)
 {
     (void)fsel;

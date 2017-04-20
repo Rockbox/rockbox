@@ -404,14 +404,13 @@ void audiohw_init(void);
 /**
  * Do initial audio codec setup. Usually called from audiohw_init.
  */
-void audiohw_preinit(void);
+void audiohw_codec_init(void);
 
 /**
- * Do some stuff (codec related) after audiohw_init that needs to be
- * delayed such as enabling outputs to prevent popping. This lets
- * other inits in the system complete in the meantime.
- */
-void audiohw_postinit(void);
+  * Mute or enable sound.
+  * @param mute true or false.
+  */
+void audiohw_mute(bool mute);
 
 /**
  * Close audio codec.

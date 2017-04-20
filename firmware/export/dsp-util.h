@@ -23,32 +23,106 @@
 
 #include "gcc_extensions.h"
 
-/** Clip sample to signed 16 bit range **/
-
 #ifdef CPU_ARM
 #if ARM_ARCH >= 6
-static FORCE_INLINE int32_t clip_sample_16(int32_t sample)
+
+static FORCE_INLINE int32_t clip_sample(int32_t sample,
+                                        unsigned int depth)
 {
-    int32_t out;
-	asm ("ssat %0, #16, %1"
-        : "=r" (out) : "r"(sample));
-    return out;
+    if (depth < 32) {
+        int32_t out;
+        asm ("ssat  %0, %2, %1"
+            : "=r" (out) : "r"(sample), "i"(depth));
+        return out;
+    }
+    else {
+        return sample; /* can't be out of range */
+    }
 }
-#define CLIP_SAMPLE_16_DEFINED
+
+static FORCE_INLINE int32_t mix_clip_sample(int32_t sample1,
+                                            int32_t sample2,
+                                            unsigned int depth)
+{
+    if (depth < 32) {
+        /* add then saturate */
+        return clip_sample(sample1 + sample2, depth);
+    }
+    else {
+        /* add and saturate in one */
+        int32_t out;
+        asm ("qadd  %0, %1, %2"
+        : "=r" (out) : "r"(sample1), "r"(sample2));
+        return out;
+    }
+}
+
+#define CLIP_SAMPLE_DEFINED
+
 #endif /* ARM_ARCH */
 #endif /* CPU_ARM */
 
-#ifndef CLIP_SAMPLE_16_DEFINED
+#ifndef CLIP_SAMPLE_DEFINED
+
 /* Generic implementation */
-static FORCE_INLINE int32_t clip_sample_16(int32_t sample)
+static FORCE_INLINE int32_t clip_sample(int32_t sample,
+                                        unsigned int depth)
 {
-    if ((int16_t)sample != sample)
-        sample = 0x7fff ^ (sample >> 31);
+    if (depth < 32) {
+        if (((sample << (32 - depth)) >> (32 - depth)) != sample) {
+            sample = (0x7fffffff >> (32 - depth)) ^ (sample >> 31);
+        }
+    }
+    /* else can't be out of range */
+
     return sample;
 }
-#endif /* CLIP_SAMPLE_16_DEFINED */
 
-#undef CLIP_SAMPLE_16_DEFINED
+static FORCE_INLINE int32_t mix_clip_sample(int32_t sample1,
+                                            int32_t sample2,
+                                            unsigned int depth)
+{
+    if (depth < 32) {
+        return clip_sample(sample1 + sample2, depth);
+    }
+    else {
+        int64_t out = (int64_t)sample1 + sample2;
+        if ((int32_t)out != out) {
+            out = 0x7fffffff ^ (out >> 63);
+        }
+        return out;
+    }
+}
+
+#endif /* CLIP_SAMPLE_DEFINED */
+
+static FORCE_INLINE int32_t amplify_sample(int32_t sample,
+                                           int32_t factor,
+                                           unsigned int depth,
+                                           unsigned int fracbits)
+{
+    if (depth + fracbits <= 32) {
+        return (factor * sample + ((1L << fracbits) - 1)) >> fracbits;
+    }
+    else {
+        return ((int64_t)factor * sample + ((1L << fracbits) - 1)) >> fracbits;
+    }
+}
+
+#define clip_sample_16(sample) \
+    clip_sample((sample), 16)
+
+#define mix_clip_sample_16(sample1, sample2) \
+    mix_clip_sample((sample1), (sample2), 16)
+
+#define pcm_dma_t_clip(sample) \
+    clip_sample((sample), PCM_DMA_T_DEPTH)
+
+#define pcm_dma_t_mix_clip(sample1, sample2) \
+    mix_clip_sample((sample1), (sample2), PCM_DMA_T_DEPTH)
+
+#define pcm_dma_t_amplify(sample, factor, fracbits) \
+    amplify_sample((sample), (factor), PCM_DMA_T_DEPTH, (fracbits))
 
 /* Absolute difference of signed 32-bit numbers which must be dealt with
  * in the unsigned 32-bit range */
@@ -56,5 +130,7 @@ static FORCE_INLINE uint32_t ad_s32(int32_t a, int32_t b)
 {
     return (a >= b) ? (a - b) : (b - a);
 }
+
+#undef CLIP_SAMPLE_DEFINED
 
 #endif /* DSP_UTIL_H */

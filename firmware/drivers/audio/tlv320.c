@@ -88,7 +88,7 @@ static void tlv320_write_reg(unsigned reg, unsigned value)
     tlv320_regs[reg] = value;
 }
 
-static void audiohw_mute(bool mute)
+void audiohw_mute(bool mute)
 {
     unsigned value_dap = tlv320_regs[REG_DAP];
     unsigned value_l, value_r;
@@ -140,18 +140,11 @@ void audiohw_init(void)
 #endif
     tlv320_write_reg(REG_DIA, DIA_ACT);
     audiohw_set_frequency(-1); /* default */
-}
 
-/**
- * Switch outputs ON
- */
-void audiohw_postinit(void)
-{
     /* All ON except ADC, MIC and LINE */
     sleep(HZ);
     tlv320_write_reg(REG_PC, PC_ADC | PC_MIC | PC_LINE);
     sleep(HZ/4);
-    audiohw_mute(false);
 }
 
 /**
