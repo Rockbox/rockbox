@@ -63,11 +63,15 @@ void pcm_dma_apply_settings(void)
     audiohw_set_frequency(pcm_fsel);
 }
 
-void pcm_play_dma_start(const void *addr, unsigned long frames)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
 {
     (void)addr;
     (void)frames;
     DEBUGF("pcm_play_dma_start(%p, %lu)", addr, frames);
+}
+
+void pcm_play_dma_prepare(void)
+{
 }
 
 void pcm_play_dma_stop(void)
@@ -75,12 +79,12 @@ void pcm_play_dma_stop(void)
 
 }
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
 
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
 
 }

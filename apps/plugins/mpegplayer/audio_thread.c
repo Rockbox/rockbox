@@ -654,7 +654,7 @@ static void audio_thread(void)
             ssize_t size = dst.frames * 2 * sizeof(int16_t);
 
             /* Wait for required amount of free buffer space */
-            while ((dst.p16out = pcm_output_get_buffer(&size)) == NULL)
+            while ((dst.pout = pcm_output_get_buffer(&size)) == NULL)
             {
                 /* Wait one frame */
                 int timeout = dst.frames*HZ / td.samplerate;

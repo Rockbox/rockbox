@@ -2991,6 +2991,39 @@ int audio_status(void)
     return ret;
 }
 
+static inline void scale_peaks(struct audio_peaks *peaks,
+                               unsigned int fracbits)
+{
+    if (fracbits < 15)
+    {
+         peaks->peak[0] >>= 15 - fracbits;
+         peaks->peak[1] >>= 15 - fracbits;
+    }
+    else /* fracbits > 15 */
+    {
+         peaks->peak[0] <<= fracbits - 15;
+         peaks->peak[1] <<= fracbits - 15;
+    }
+}
+
+void audio_get_peaks(struct audio_peaks *peaks, unsigned int fracbits)
+{
+    mp3_get_peaks(&peaks->peak[0], &peaks->peak[1]);
+
+    if (fracbits != 15)
+        scale_peaks(peaks, fracbits);
+}
+
+#ifdef HAVE_RECORDING
+void audio_get_record_peaks(struct audio_peaks *peaks, unsigned int fracbits)
+{
+    mp3_get_rec_peaks(&peaks->peak[0], &peaks->peak[1]);
+
+    if (fracbits != 15)
+        scale_peaks(peaks, fracbits);
+}
+#endif /* HAVE_RECORDING */
+
 /* Unused function
 unsigned int audio_error(void)
 {

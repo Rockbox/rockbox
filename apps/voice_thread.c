@@ -90,12 +90,15 @@ static const char voice_thread_name[] = "voice";
 /* Voice thread synchronization objects */
 static struct event_queue voice_queue SHAREDBSS_ATTR;
 static struct queue_sender_list voice_queue_sender_list SHAREDBSS_ATTR;
+
+static int voice_buf_hid = 0;
+static pcm_handle_t pcm_handle = 0;
 static int quiet_counter SHAREDDATA_ATTR = 0;
 static bool voice_playing = false;
 
 #define VOICE_PCM_BUF_PERIOD   ((PLAY_SAMPR_MAX*VOICE_DECODE_FRAMES + \
                                 VOICE_SAMPLE_RATE) / VOICE_SAMPLE_RATE)
-#define VOICE_PCM_BUF_CHANNELS 2
+#define VOICE_PCM_BUF_CHANNELS PCM_DMA_T_CHANNELS
 
 /* Voice processing states */
 enum voice_state
@@ -159,11 +162,9 @@ static struct voice_buf
     struct voice_pcm_buf
     {
         unsigned long frames;
-        int16_t pcm[VOICE_PCM_BUF_PERIOD*VOICE_PCM_BUF_CHANNELS];
+        pcm_dma_t pcm[VOICE_PCM_BUF_PERIOD*VOICE_PCM_BUF_CHANNELS];
     } bufs[VOICE_BUFS];
 } *voice_buf = NULL;
-
-static int voice_buf_hid = 0;
 
 static int move_callback(int handle, void *current, void *new)
 {
@@ -173,13 +174,13 @@ static int move_callback(int handle, void *current, void *new)
 
     if (td != NULL)
     {
-        td->src.p32[0] = SKIPBYTES(td->src.p32[0], diff);
-        td->src.p32[1] = SKIPBYTES(td->src.p32[1], diff);
+        td->src.p32[0] = PTR_ADD(td->src.p32[0], diff);
+        td->src.p32[1] = PTR_ADD(td->src.p32[1], diff);
 
         if (td->dst != NULL) /* Only when calling dsp_process */
-            td->dst->p16out = SKIPBYTES(td->dst->p16out, diff);
+            td->dst->pout = PTR_ADD(td->dst->pout, diff);
 
-        mixer_adjust_channel_address(PCM_MIXER_CHAN_VOICE, diff);
+        pcm_adjust_address(pcm_handle, diff);
     }
 
     voice_buf = new;
@@ -192,9 +193,9 @@ static void sync_callback(int handle, bool sync_on)
 {
     /* A move must not allow PCM to access the channel */
     if (sync_on)
-        pcm_play_lock();
+        pcm_lock_callback(pcm_handle);
     else
-        pcm_play_unlock();
+        pcm_unlock_callback(pcm_handle);
 
     (void)handle;
 }
@@ -212,8 +213,13 @@ static unsigned int voice_unplayed_bufs(void)
 }
 
 /* Mixer channel callback */
-static void voice_pcm_callback(const void **start, unsigned long *frames)
+static int voice_pcm_callback(int status,
+                              const void **start,
+                              unsigned long *frames)
 {
+    if (status < 0)
+        return status;
+
     unsigned int bufs_out = ++voice_buf->bufs_out;
 
     if (voice_unplayed_bufs() == 0)
@@ -222,6 +228,8 @@ static void voice_pcm_callback(const void **start, unsigned long *frames)
     struct voice_pcm_buf *buf = &voice_buf->bufs[bufs_out % VOICE_BUFS];
     *start = buf->pcm;
     *frames = buf->frames;
+
+    return 0;
 }
 
 /* Start playback of voice channel if not already playing */
@@ -232,14 +240,13 @@ static void voice_start_playback(void)
         return;
 
     struct voice_pcm_buf *buf = &voice_buf->bufs[voice_buf->bufs_out % VOICE_BUFS];
-    mixer_channel_play_data(PCM_MIXER_CHAN_VOICE, voice_pcm_callback,
-                            buf->pcm, buf->frames);
+    pcm_play_data(pcm_handle, voice_pcm_callback, buf->pcm, buf->frames, NULL);
 }
 
 /* Stop the voice channel */
 static void voice_stop_playback(void)
 {
-    mixer_channel_stop(PCM_MIXER_CHAN_VOICE);
+    pcm_stop(pcm_handle);
     voice_buf->bufs_in = voice_buf->bufs_out = 0;
 }
 
@@ -335,8 +342,6 @@ static void voice_data_init(struct voice_thread_data *td)
     dsp_configure(td->dsp, DSP_SET_FREQUENCY, VOICE_SAMPLE_RATE);
     dsp_configure(td->dsp, DSP_SET_SAMPLE_DEPTH, VOICE_SAMPLE_DEPTH);
     dsp_configure(td->dsp, DSP_SET_STEREO_MODE, STEREO_MONO);
-
-    mixer_channel_set_amplitude(PCM_MIXER_CHAN_VOICE, MIX_AMP_UNITY);
     voice_buf->td = td;
     td->dst = NULL;
 }
@@ -351,10 +356,17 @@ static enum voice_state voice_message(struct voice_thread_data *td)
     {
     case Q_VOICE_PLAY:
         LOGFQUEUE("voice < Q_VOICE_PLAY");
+
         if (quiet_counter == 0)
         {
             /* Boost CPU now */
             trigger_cpu_boost();
+
+            if (!pcm_handle && pcm_open(&pcm_handle, PCM_STREAM_PLAYBACK))
+            {
+                cancel_cpu_boost();
+                break; /* can't play anything */
+            }
         }
         else
         {
@@ -409,8 +421,10 @@ static enum voice_state voice_message(struct voice_thread_data *td)
         /* Fall-through */
     case Q_VOICE_STOP:
         LOGFQUEUE("voice < Q_VOICE_STOP");
-        cancel_cpu_boost();
         voice_stop_playback();
+        pcm_close(pcm_handle);
+        pcm_handle = 0;
+        cancel_cpu_boost();
         break;
 
     /* No default: no other message ids are sent */

@@ -9,6 +9,7 @@ struct pcm pcm IBSS_ATTR;
 #define SAMPLE_SIZE (2*sizeof(int16_t))
 
 #if CONFIG_CODEC == SWCODEC
+static pcm_handle_t pcm_handle;
 
 static volatile int doneplay=1;
 
@@ -17,18 +18,26 @@ static int16_t *hwbuf;
 
 static bool newly_started;
 
-static void get_more(const void** start, unsigned long* frames)
+static int get_more(int status, const void** start, unsigned long* frames)
 {
+    if (status < 0)
+        return status;
+
     memcpy(hwbuf, buf[doneplay], BUF_COUNT*SAMPLE_SIZE);
     *start = hwbuf;
     *frames = BUF_COUNT;
     doneplay=1;
+
+    return 0;
 }
 
 void rockboy_pcm_init(void)
 {
     if(plugbuf)
         return;
+
+    if (!pcm_handle)
+        rb->pcm_open(&pcm_handle, PCM_STREAM_PLAYBACK);
 
     newly_started = true;
 
@@ -51,8 +60,6 @@ void rockboy_pcm_init(void)
         memset(buf, 0,  pcm.len * N_BUFS * SAMPLE_SIZE);
     }
 
-    rb->pcm_play_stop();
-
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
@@ -65,9 +72,10 @@ void rockboy_pcm_init(void)
 void rockboy_pcm_close(void)
 {
     memset(&pcm, 0, sizeof pcm);    
-    newly_started = true;   
-    rb->pcm_play_stop();    
+    newly_started = true;
+    rb->pcm_close(pcm_handle);
     rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    pcm_handle = 0;
 }
 
 int rockboy_pcm_submit(void)
@@ -77,7 +85,8 @@ int rockboy_pcm_submit(void)
 
     if(newly_started)
     {
-        rb->pcm_play_data(&get_more, NULL, NULL,0);
+        rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                          PCM_FORMAT(PCM_FORMAT_S16_2, 2));
         newly_started = false;
     }
 

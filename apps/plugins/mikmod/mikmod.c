@@ -43,6 +43,7 @@ static int curfile = 0, direction = DIR_NEXT, entries = 0;
 /* list of the mod files */
 static char **file_pt;
 
+static pcm_handle_t pcm_handle;
 
 /* The MP3 audio buffer which we will use as heap memory */
 static unsigned char* audio_buffer;
@@ -268,7 +269,7 @@ static inline void synthbuf(void)
     VC_WriteBytes(outptr, BUF_COUNT*SAMPLE_SIZE);
 }
 
-static void get_more(const void** start, unsigned long* frames)
+static int get_more(int status, const void** start, unsigned long* frames)
 {
 #ifndef SYNC
     if (lastswap != swap)
@@ -285,6 +286,8 @@ static void get_more(const void** start, unsigned long* frames)
 #ifndef SYNC
     swap ^= 1;
 #endif
+
+    return status;
 }
 
 static void showinfo(void)
@@ -658,7 +661,8 @@ static int playfile(char* filename)
     {
         display = DISPLAY_INFO;
         Player_Start(module);
-        rb->pcm_play_data(&get_more, NULL, NULL, 0);
+        rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                          PCM_FORMAT(PCM_FORMAT_S16_2, 2));
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -798,11 +802,12 @@ static int playfile(char* filename)
         case ACTION_WPS_PLAY:
             if(!Player_Paused())
             {
-                rb->pcm_play_stop();
+                rb->pcm_stop(pcm_handle);
             }
             else
             {
-                rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                                  PCM_FORMAT(PCM_FORMAT_S16_2, 2));
             }
             Player_TogglePause();
             break;
@@ -877,7 +882,17 @@ enum plugin_status plugin_start(const void* parameter)
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
-    rb->pcm_play_stop();
+    audio_buffer = rb->plugin_get_audio_buffer(&audio_buffer_free);
+    if (!audio_buffer)
+    {
+        return PLUGIN_ERROR;
+    }
+
+    if (rb->pcm_open(&pcm_handle, PCM_STREAM_PLAYBACK))
+    {
+        return PLUGIN_ERROR;
+    }
+
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
@@ -885,7 +900,6 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     rb->pcm_set_frequency(SAMPLE_RATE);
 
-    audio_buffer = rb->plugin_get_audio_buffer((size_t *)&audio_buffer_free);
     
     rb->strcpy(np_file, parameter);
     get_mod_list();
@@ -910,6 +924,7 @@ enum plugin_status plugin_start(const void* parameter)
     if (MikMod_Init(""))
     {
         rb->splashf(HZ, "%s", MikMod_strerror(MikMod_errno));
+        rb->pcm_close(pcm_handle);
         return PLUGIN_ERROR;
     }
 
@@ -920,7 +935,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     MikMod_Exit();
 
-    rb->pcm_play_stop();
+    rb->pcm_close(pcm_handle);
     rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 
     if (retval == PLUGIN_OK)

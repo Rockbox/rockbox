@@ -26,8 +26,10 @@
 #include "logf.h"
 #include "usb.h"
 #include "pcm.h"
+#include "pcm-internal.h"
 #include "sound.h"
 #include "audio_thread.h"
+#include "pcmbuf.h"
 #ifdef AUDIO_HAVE_RECORDING
 #include "pcm_record.h"
 #endif
@@ -62,6 +64,8 @@ static long audio_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
 static const char audio_thread_name[] = "audio";
 unsigned int audio_thread_id = 0;
 
+pcm_handle_t audio_pcm_handle = 0;
+
 static void NORETURN_ATTR audio_thread(void)
 {
     struct queue_event ev;
@@ -77,6 +81,7 @@ static void NORETURN_ATTR audio_thread(void)
         case Q_AUDIO_PLAY:
             LOGFQUEUE("audio < Q_AUDIO_PLAY");
             audio_playback_handler(&ev);
+            audio_pcm_handle = NULL;
             continue;
 
         /* Playback has to handle these, even if not playing */
@@ -92,6 +97,7 @@ static void NORETURN_ATTR audio_thread(void)
         case Q_AUDIO_INIT_RECORDING:
             LOGFQUEUE("audio < Q_AUDIO_INIT_RECORDING");
             audio_recording_handler(&ev);
+            audio_pcm_handle = NULL;
             continue;
 #endif
 
@@ -134,6 +140,38 @@ void audio_error_clear(void)
 #ifdef AUDIO_HAVE_RECORDING
     pcm_rec_error_clear();
 #endif
+}
+
+int audio_get_pcm_state(void)
+{
+    return pcm_get_state(audio_pcm_handle);
+}
+
+void audio_get_peaks(struct audio_peaks *peaks, unsigned int fracbits)
+{
+    int depth = pcm_get_peaks(audio_pcm_handle, &peaks->pcm_peaks);
+
+    int shift = fracbits - depth + 1;
+    if (!shift)
+        return;
+
+    for (unsigned int i = 0; i < ARRAYLEN(peaks->peak); i++)
+    {
+        if (shift < 0)
+            peaks->peak[i] >>= -shift;
+        else
+            peaks->peak[i] <<= shift;
+    }
+}
+
+const void * audio_get_playing_frames(unsigned int *frames_rem)
+{
+    return pcm_get_playing_frames(audio_pcm_handle, frames_rem);
+}
+
+int audio_add_remove_pcm_hook(audio_pcm_hook_fn fn, bool add)
+{
+    return pcmbuf_hook_add_remove(fn, add);
 }
 
 /** -- Startup -- **/

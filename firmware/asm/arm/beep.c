@@ -26,13 +26,12 @@ static FORCE_INLINE void beep_generate(int16_t *out, unsigned long count,
     uint32_t s, t;
 
     asm volatile (
-        "mvn   %4, #0x00008000     \n"
-        "bic   %4, %4, #0x80000000 \n"
+        "mvn   %4, #0x8000         \n"
     "1:                            \n"
-        "eors  %3, %4, %1, asr #31 \n"
-        "orrmi %3, %3, %3, lsr #15 \n"
+        "eor   %3, %4, %1, asr #31 \n"
+        "orr   %3, %3, #0x0001     \n"
         "subs  %2, %2, #1          \n"
-        "str   %3, [%0], #4        \n"
+        "strh  %3, [%0], #2        \n"
         "add   %1, %1, %5          \n"
         "bhi   1b                  \n"
         : "+r"(out), "+r"(*phase), "+r"(count),

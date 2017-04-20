@@ -26,7 +26,8 @@
 #include "s_stuff.h"
 
 /* Declare functions that go to IRAM. */
-void pdbox_get_more(const void** start, unsigned long* frames) ICODE_ATTR;
+void pdbox_get_more(int status, const void** start,
+                    unsigned long* frames) ICODE_ATTR;
 int rockbox_send_dacs(void) ICODE_ATTR;
 
 /* Extern variables. */
@@ -41,6 +42,8 @@ static unsigned int outbuf_head;
 static unsigned int outbuf_tail;
 static unsigned int outbuf_fill;
 
+static pcm_handle_t pcm_handle;
+
 /* Playing status. */
 static bool playing;
 
@@ -54,7 +57,11 @@ void rockbox_open_audio(int rate)
     playing = false;
 
     /* Stop playing to reconfigure audio settings. */
-    rb->pcm_play_stop();
+
+    if (!pcm_handle)
+        rb->pcm_open(&pcm_handle, PCM_STREAM_PLAYBACK);
+    else
+        rb->pcm_stop(pcm_handle);
 
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
@@ -79,19 +86,22 @@ void rockbox_open_audio(int rate)
 void rockbox_close_audio(void)
 {
     /* Stop playback. */
-    rb->pcm_play_stop();
+    rb->pcm_close(pcm_handle);
+    pcm_handle = 0;
 
     /* Reset playing status. */
     playing = false;
 
     /* Restore default sampling rate. */
     rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
-    rb->pcm_apply_settings();
 }
 
 /* Rockbox audio callback. */
-void pdbox_get_more(const void** start, unsigned long* frames)
+int pdbox_get_more(int status, const void** start, unsigned long* frames)
 {
+    if (status < 0)
+        return status;
+
     if(outbuf_fill > 0)
     {
         /* Store output data address and size. */
@@ -117,6 +127,8 @@ void pdbox_get_more(const void** start, unsigned long* frames)
 
         /* Nothing to play. */
     }
+
+    return 0;
 }
 
 /* Audio I/O. */
@@ -183,7 +195,8 @@ int rockbox_send_dacs(void)
     if(!playing && outbuf_fill > 0)
     {
         /* Start playing. */
-        rb->pcm_play_data(pdbox_get_more, NULL, NULL, 0);
+        rb->pcm_play_data(pcm_handle, pdbox_get_more, NULL, 0,
+                          PCM_FORMAT(PCM_FORMAT_S16_2, 2));
 
         /* Set status flag. */
         playing = true;

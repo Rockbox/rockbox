@@ -28,15 +28,7 @@
 #include "pcm-internal.h"
 
 /* PCM interrupt routine lockout */
-static struct
-{
-    int locked;
-    unsigned long state;
-} dma_play_lock =
-{
-    .locked = 0,
-    .state  = 0,
-};
+static unsigned long dma_play_state = 0;
 
 #define FIFO_COUNT ((IISFCON >> 6) & 0x3F)
 
@@ -48,17 +40,15 @@ static struct
 void fiq_handler(void) __attribute__((interrupt ("FIQ")));
 
 /* Mask the DMA interrupt */
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    if (++dma_play_lock.locked == 1)
-        bitset32(&INTMSK, DMA2_MASK);
+    bitset32(&INTMSK, DMA2_MASK);
 }
 
 /* Unmask the DMA interrupt if enabled */
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-    if (--dma_play_lock.locked == 0)
-        bitclr32(&INTMSK, dma_play_lock.state);
+    bitclr32(&INTMSK, dma_play_state);
 }
 
 void pcm_play_dma_init(void)
@@ -110,11 +100,8 @@ static void play_start_pcm(void)
     /* clear pending DMA interrupt */
     SRCPND = DMA2_MASK;
 
-    /* Flush any pending writes */
-    commit_dcache_range((char*)DISRC2-0x30000000, (DCON2 & 0xFFFFF) * 2);
-
     /* unmask DMA interrupt when unlocking */
-    dma_play_lock.state = DMA2_MASK;
+    dma_play_state = DMA2_MASK;
 
     /* turn on the request */
     IISCON |= (1<<5);
@@ -139,14 +126,14 @@ static void play_stop_pcm(void)
     DMASKTRIG2 = 0x4;
 
     /* are we playing? wait for the chunk to finish */
-    if (dma_play_lock.state != 0)
+    if (dma_play_state != 0)
     {
         /* wait for the FIFO to empty and DMA to stop */
         while ((IISCON & (1<<7)) || (DMASKTRIG2 & 0x2));
     }
 
     /* Keep interrupt masked when unlocking */
-    dma_play_lock.state = 0;
+    dma_play_state = 0;
 
     /* turn off the request */
     IISCON &= ~(1<<5);
@@ -158,7 +145,25 @@ static void play_stop_pcm(void)
     IISCON &= ~(1<<0);
 }
 
-void pcm_play_dma_start(const void *addr, unsigned long frames)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
+{
+    /* Flush any pending cache writes */
+    commit_dcache_range(start, frames*4);
+
+    /* set DMA source and options */
+    DISRC2 = (unsigned int)addr | 0x30000000;
+    /* How many transfers to make - we transfer half-word at a time = 2 bytes */
+    /* DMA control: CURR_TC int, single service mode, I2SSDO int, HW trig */
+    /*     no auto-reload, half-word (16bit) */
+    DCON2 = DMA_CONTROL_SETUP | (frames*2);
+
+    if (dma_play_state != 0)
+        DMASKTRIG2 = 0x2; /* Re-Activate the channel */
+    else
+        play_start_pcm(); /* Start the channel */
+}
+
+void pcm_play_dma_prepare(void)
 {
     /* Enable the IIS clock */
     bitset32(&CLKCON, 1<<17);
@@ -175,15 +180,8 @@ void pcm_play_dma_start(const void *addr, unsigned long frames)
     /* IIS is on the APB bus, INT when TC reaches 0, fixed dest addr */
     DIDSTC2 = 0x03;
 
-    /* set DMA source and options */
-    DISRC2 = (unsigned int)addr + 0x30000000;
-    /* How many transfers to make - we transfer half-word at a time = 2 bytes */
-    /* DMA control: CURR_TC int, single service mode, I2SSDO int, HW trig */
-    /*     no auto-reload, half-word (16bit) */
-    DCON2 = DMA_CONTROL_SETUP | (frames*2);
-    DISRCC2 = 0x00;  /* memory is on AHB bus, increment addresses */
-
-    play_start_pcm();
+    /* memory is on AHB bus, increment addresses */
+    DISRCC2 = 0x00;
 }
 
 /* Promptly stop DMA transfers and stop IIS */
@@ -215,27 +213,11 @@ void pcm_play_dma_pause(bool pause)
 
 void fiq_handler(void)
 {
-    static const void *start;
-    static unsigned long frames;
-
-    /* clear any pending interrupt */
+    /* clear pending DMA interrupt */
     SRCPND = DMA2_MASK;
 
-    /* Buffer empty.  Try to get more. */
-    if (!pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &frames))
-        return;
-
-    /* Flush any pending cache writes */
-    commit_dcache_range(start, frames*4);
-
-    /* set the new DMA values */
-    DCON2 = DMA_CONTROL_SETUP | (frames*2);
-    DISRC2 = (unsigned int)start + 0x30000000;
-
-    /* Re-Activate the channel */
-    DMASKTRIG2 = 0x2;
-
-    pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+    /* Buffer empty. Callee may send more. */
+    pcm_play_dma_complete_callback(0);
 }
 
 unsigned long pcm_get_frames_waiting(void)
