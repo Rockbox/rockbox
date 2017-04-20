@@ -74,7 +74,6 @@ struct codec_load_info
     int afmt;   /* codec specification (AFMT_*) */
 };
 
-
 /** --- Main state control --- **/
 
 static int codec_type = AFMT_UNKNOWN; /* Codec type (C,A-) */
@@ -228,7 +227,7 @@ static void codec_pcmbuf_insert_callback(
         dst.frames_rem = 0;
         dst.frames = MAX(src.frames_rem, 1024); /* Arbitrary min request */
 
-        if ((dst.p16out = pcmbuf_request_buffer(&dst.frames)) == NULL)
+        if ((dst.pout = pcmbuf_request_buffer(&dst.frames)) == NULL)
         {
             cancel_cpu_boost();
 
@@ -500,7 +499,12 @@ static void run_codec(void)
     codec_queue_ack(Q_CODEC_RUN);
 
     trigger_cpu_boost();
-    dsp_configure(ci.dsp, DSP_SET_OUT_FREQUENCY, pcmbuf_get_frequency());
+    dsp_configure(ci.dsp, DSP_SET_OUT_FREQUENCY,
+                  audio_get_playback_samplerate());
+    dsp_configure(ci.dsp, DSP_SET_OUT_PCM_FORMAT,
+                  PCM_DMA_T_FORMAT_CODE);
+    dsp_configure(ci.dsp, DSP_SET_OUT_PCM_CHANNELS,
+                  PCM_DMA_T_CHANNELS);
 
     if (!encoder)
     {

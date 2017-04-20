@@ -21,6 +21,9 @@
 /* HZ, TIME_AFTER, current_tick */
 #include "kernel.h"
 
+#include "pcm.h"
+#include "audio.h"
+
 /* Structure to record some info during processing call */
 struct dsp_loop_context
 {
@@ -75,8 +78,8 @@ static inline void dsp_process_end(struct dsp_loop_context *ctx)
 
 #endif
 
-#define DSP_OUT_MIN_HZ      PLAY_SAMPR_HW_MIN
-#define DSP_OUT_MAX_HZ      PLAY_SAMPR_MAX
+#define DSP_OUT_MIN_HZ      HW_SAMPR_MIN
+#define DSP_OUT_MAX_HZ      HW_SAMPR_MAX
 #define DSP_OUT_DEFAULT_HZ  PLAY_SAMPR_DEFAULT
 
 #endif

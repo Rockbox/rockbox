@@ -25,9 +25,11 @@
  * no more than 15.
  */
 #define WORD_SHIFT      12
-#define WORD_FRACBITS   27
-#define NATIVE_DEPTH    16
+#define WORD_FRACBITS   27  /* ie. signed 28-bit integer */
+#define WORD_DEPTH      16
 
+#define DSP_OUT_DEFAULT_PCM_SHIFT   (DSP_OUT_DEFAULT_PCM_BITS - \
+                                     (WORD_FRACBITS + 1))
 struct sample_io_data;
 
 /* DSP initial buffer input function call prototype */
@@ -43,17 +45,22 @@ typedef void (*sample_output_fn_type)(struct sample_io_data *this,
 struct sample_io_data
 {
     unsigned long frames_out;     /* 00h: Output frame count */
+    int8_t  out_pcm_shift;        /* 04h: Output factor exponent */
+    uint8_t out_pcm_chnum;        /* 05h: Number of channels in output */
+    uint8_t out_pcm_bits;         /* Output sample depth in bits */
+    uint8_t out_pcm_size;         /* Number of bytes in output sample */
+    uint8_t out_pcm_format;       /* Current output format code */
+    uint8_t format_dirty;         /* Format change set, avoids superfluous
+                                     increments before carrying it out */
+    uint8_t output_version;       /* Format version of src buffer at output */
+    uint8_t in_pcm_stmode;        /* Codec-specified channel format */
+    uint8_t in_pcm_bits;          /* Bit depth of codec input */
     struct sample_format format;  /* Format for next dsp_process call */
-    int sample_depth;             /* Codec-specified sample depth */           
-    int stereo_mode;              /* Codec-specified channel format */
     sample_input_fn_type input_samples; /* Initial input function */
     struct dsp_buffer sample_buf; /* Buffer descriptor for converted samples */
     int32_t *sample_buf_p[2];     /* Internal format buffer pointers */
     sample_output_fn_type output_samples; /* Final output function */
-    unsigned int output_sampr;    /* Master output samplerate */
-    uint8_t format_dirty;         /* Format change set, avoids superfluous
-                                     increments before carrying it out */
-    uint8_t output_version;       /* Format version of src buffer at output */
+    unsigned long output_sampr;   /* Master output samplerate */
 };
 
 void dsp_sample_input_format_change(struct sample_io_data *this,
@@ -66,5 +73,20 @@ void dsp_sample_output_format_change(struct sample_io_data *this,
 bool dsp_sample_io_configure(struct sample_io_data *this,
                              unsigned int setting,
                              intptr_t *value_p);
+
+/* Add samples to output buffer and update remaining space (Out).
+   Provided to dsp_process() */
+static inline void dsp_advance_buffer_output(struct dsp_buffer *buf,
+                                             unsigned long by_count,
+                                             unsigned int numchannels,
+                                             size_t sampsize)
+{
+    buf->frames -= by_count;
+    buf->frames_rem += by_count;
+#ifndef CONFIG_DSP_OUT_MULTISIZE
+    sampsize = DSP_OUT_DEFAULT_PCM_SIZE;
+#endif
+    buf->pout = PTR_ADD(buf->pout, by_count*numchannels*sampsize);
+}
 
 #endif /* DSP_SAMPLE_IO_H */

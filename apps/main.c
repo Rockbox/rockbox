@@ -88,6 +88,7 @@
 #endif
 
 #if (CONFIG_CODEC == SWCODEC)
+#include "pcm-internal.h"
 #include "audio_thread.h"
 #include "playback.h"
 #include "tdspeed.h"
@@ -176,6 +177,9 @@ int main(void)
     tree_gui_init();
     /* Keep the order of this 3
      * Must be done before any code uses the multi-screen API */
+
+    /* synchronize with audio - audio applies the initial sound settings */
+    audio_wait_for_ready();
 #ifdef HAVE_USBSTACK
     /* All threads should be created and public queues registered by now */
     usb_start_monitoring();
@@ -361,10 +365,7 @@ static void init(void)
     viewportmanager_init();
 
     storage_init();
-#if CONFIG_CODEC == SWCODEC
-    pcm_init();
-    dsp_init();
-#endif
+    audio_init();
     settings_reset();
     settings_load(SETTINGS_ALL);
     settings_apply(true);
@@ -380,27 +381,8 @@ static void init(void)
     playlist_init();
     shortcuts_init();
 
-#if CONFIG_CODEC != SWCODEC
-    mp3_init( global_settings.volume,
-              global_settings.bass,
-              global_settings.treble,
-              global_settings.balance,
-              global_settings.loudness,
-              global_settings.avc,
-              global_settings.channel_config,
-              global_settings.stereo_width,
-              global_settings.mdb_strength,
-              global_settings.mdb_harmonics,
-              global_settings.mdb_center,
-              global_settings.mdb_shape,
-              global_settings.mdb_enable,
-              global_settings.superbass);
-#endif /* CONFIG_CODEC != SWCODEC */
-
     if (global_settings.audioscrobbler)
         scrobbler_init();
-
-    audio_init();
 
     settings_apply_skins();
 }
@@ -617,10 +599,9 @@ static void init(void)
         }
     }
 
-#if CONFIG_CODEC == SWCODEC
-    pcm_init();
-    dsp_init();
-#endif
+    CHART(">audio_init");
+    audio_init();
+    CHART("<audio_init");
 
 #if defined(SETTINGS_RESET) || (CONFIG_KEYPAD == IPOD_4G_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H10_PAD)
@@ -686,29 +667,6 @@ static void init(void)
         scrobbler_init();
 
     shortcuts_init();
-
-#if CONFIG_CODEC != SWCODEC
-    /* No buffer allocation (see buffer.c) may take place after the call to
-       audio_init() since the mpeg thread takes the rest of the buffer space */
-    mp3_init( global_settings.volume,
-              global_settings.bass,
-              global_settings.treble,
-              global_settings.balance,
-              global_settings.loudness,
-              global_settings.avc,
-              global_settings.channel_config,
-              global_settings.stereo_width,
-              global_settings.mdb_strength,
-              global_settings.mdb_harmonics,
-              global_settings.mdb_center,
-              global_settings.mdb_shape,
-              global_settings.mdb_enable,
-              global_settings.superbass);
-#endif /* CONFIG_CODEC != SWCODEC */
-
-    CHART(">audio_init");
-    audio_init();
-    CHART("<audio_init");
 
     /* runtime database has to be initialized after audio_init() */
     cpu_boost(false);

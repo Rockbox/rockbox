@@ -47,6 +47,7 @@
 
 #include "zxbox_keyb.h"
 
+pcm_handle_t pcm_handle;
 int endofsingle IBSS_ATTR;
 
 int sp_nosync IBSS_ATTR = 0;
@@ -291,7 +292,7 @@ static void options_menu(void){
                 if (new_setting != settings.sound )
                     settings.sound=new_setting;
 #if CONFIG_CODEC == SWCODEC && !defined SIMULATOR
-                rb->pcm_play_stop();
+                rb->pcm_stop(pcm_handle);
 #endif
                 break;
             case 5:
@@ -319,7 +320,7 @@ static void options_menu(void){
 static bool zxbox_menu(void)
 {
 #if CONFIG_CODEC == SWCODEC && !defined SIMULATOR
-    rb->pcm_play_stop();
+    rb->pcm_stop(pcm_handle);
 #endif
     int selected=0;
     int result;

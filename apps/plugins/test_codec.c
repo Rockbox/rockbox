@@ -224,7 +224,7 @@ static int process_dsp(const void *ch1, const void *ch2, unsigned long frames)
 
     struct dsp_buffer dst;
     dst.frames_rem = 0;
-    dst.p16out = (int16_t *)dspbuffer;
+    dst.pout = dspbuffer;
     dst.frames = dspbuffer_count;
 
     while (1)

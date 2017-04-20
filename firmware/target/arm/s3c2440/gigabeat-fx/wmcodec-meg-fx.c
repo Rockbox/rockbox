@@ -45,7 +45,7 @@ void audiohw_init(void)
     GPCCON |= (1 << 10);
     GPCDAT |= (1 << 5);
 
-    audiohw_preinit();
+    audiohw_codec_init();
 
 #ifdef HAVE_HARDWARE_BEEP
     /* pin pullup ON */

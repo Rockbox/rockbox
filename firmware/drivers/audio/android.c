@@ -34,6 +34,10 @@ void audiohw_set_balance(int balance)
     (void)balance;
 }
 
+void audiohw_mute(bool mute)
+{
+}
+
 void audiohw_close(void)
 {
     extern void pcm_shutdown(void);

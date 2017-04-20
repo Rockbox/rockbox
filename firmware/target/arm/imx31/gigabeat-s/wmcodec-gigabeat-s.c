@@ -115,7 +115,7 @@ void audiohw_init(void)
 
     i2c_enable_node(&wm8978_i2c_node, true);
 
-    audiohw_preinit();
+    audiohw_codec_init();
 
     bitset32(&GPIO3_DR, (1 << 21)); /* Turn on analogue LDO */
 }

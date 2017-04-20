@@ -82,7 +82,7 @@ static void get_volume_params(int db, int *dac, int *amp)
     }
 }
 
-static void audiohw_mute(bool mute)
+void audiohw_mute(bool mute)
 {
     if (mute) {
         wmcodec_write(DACCTRL, DACCTRL_SOFTMUTE);
@@ -91,7 +91,7 @@ static void audiohw_mute(bool mute)
     }
 }
 
-void audiohw_preinit(void)
+void audiohw_codec_init(void)
 {
     /* Set low bias mode */
     wmcodec_write(BIASCTRL, BIASCTRL_BIASCUT);
@@ -125,15 +125,11 @@ void audiohw_preinit(void)
     wmcodec_write(ROUTMIX, ROUTMIX_DACR2RMIX);
     /* Disable VMID independent current bias */
     wmcodec_write(OUT4TOADC, 0);
-}
 
-void audiohw_postinit(void)
-{
     wmcodec_write(PWRMGMT1, PWRMGMT1_PLLEN | PWRMGMT1_BIASEN
                           | PWRMGMT1_BUFIOEN | PWRMGMT1_VMIDSEL_500K);
                           /* lower the VMID power consumption */
     wmcodec_write(BIASCTRL, 0);
-    audiohw_mute(false);
 }
 
 void audiohw_set_volume(int vol_l, int vol_r)

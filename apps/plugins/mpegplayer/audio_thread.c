@@ -482,6 +482,8 @@ static void audio_thread(void)
 
     td.dsp = rb->dsp_get_config(CODEC_IDX_AUDIO);
     rb->dsp_configure(td.dsp, DSP_SET_OUT_FREQUENCY, CLOCK_RATE);
+    rb->dsp_configure(td.dsp, DSP_SET_OUT_PCM_FORMAT, PCM_DMA_T_FORMAT_CODE);
+    rb->dsp_configure(td.dsp, DSP_SET_OUT_PCM_CHANNELS, PCM_DMA_T_CHANNELS);
 #ifdef HAVE_PITCHCONTROL
     rb->sound_set_pitch(PITCH_SPEED_100);
     rb->dsp_set_timestretch(PITCH_SPEED_100);
@@ -654,7 +656,7 @@ static void audio_thread(void)
             ssize_t size = dst.frames * 2 * sizeof(int16_t);
 
             /* Wait for required amount of free buffer space */
-            while ((dst.p16out = pcm_output_get_buffer(&size)) == NULL)
+            while ((dst.pout = pcm_output_get_buffer(&size)) == NULL)
             {
                 /* Wait one frame */
                 int timeout = dst.frames*HZ / td.samplerate;

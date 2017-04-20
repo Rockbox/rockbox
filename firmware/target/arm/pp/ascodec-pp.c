@@ -63,7 +63,7 @@ void audiohw_init(void)
 
     i2s_reset();
 
-    audiohw_preinit();
+    audiohw_codec_init();
 }
 
 void ascodec_write(unsigned int reg, unsigned int value)

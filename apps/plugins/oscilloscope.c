@@ -861,22 +861,10 @@ static int  last_right;
 
 static void get_peaks(int *left, int *right)
 {
-#if CONFIG_CODEC == SWCODEC
-    static struct pcm_peaks peaks;
-    rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
-                                      &peaks);
+    static struct audio_peaks peaks;
+    rb->audio_get_peaks(&peaks, 15);
     *left = peaks.peak[0];
     *right = peaks.peak[1];
-#elif defined (SIMULATOR)
-    *left = rand() % 0x8000;
-    *right = rand() % 0x8000;
-#elif (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    *left = rb->mas_codec_readreg(0xC);
-    *right = rb->mas_codec_readreg(0xD);
-#else
-    *left = 0;
-    *right = 0;
-#endif
 }
 
 static long get_next_delay(void)
@@ -1255,32 +1243,20 @@ static long anim_peaks_vertical(void)
 /** Waveform View **/
 
 #ifdef OSCILLOSCOPE_GRAPHMODE
-static int16_t waveform_buffer[2*ALIGN_UP(PLAY_SAMPR_MAX, 2048)+2*2048]
+static audio_sample_t waveform_buffer[2*ALIGN_UP(PLAY_SAMPR_MAX, 2048)+2*2048]
     MEM_ALIGN_ATTR;
 static size_t waveform_buffer_threshold = 0;
 static size_t volatile waveform_buffer_have = 0;
 static size_t waveform_buffer_break = 0;
-static unsigned long mixer_sampr = PLAY_SAMPR_DEFAULT;
-#define PCM_SAMPLESIZE (2*sizeof(int16_t))
-#define PCM_BYTERATE(sampr) ((sampr)*PCM_SAMPLESIZE)
-
+static unsigned long pcm_sampr = 0;
+#define PCM_BYTERATE(sampr) audio_frames2size(sampr)
 #define WAVEFORM_SCALE_PCM(full_scale, sample) \
-        ((((full_scale) * (sample)) + (1 << 14)) >> 15)
+        ((((full_scale) * audio_scale_sample_to(sample, 16)) + (1 << 14)) >> 15)
 
-static void waveform_buffer_set_threshold(size_t threshold)
+static FORCE_INLINE int32_t waveform_buffer_read(int preidx)
 {
-    if (threshold > sizeof (waveform_buffer))
-        threshold = sizeof (waveform_buffer);
-
-    if (threshold == waveform_buffer_threshold)
-        return;
-
-    /* Avoid changing it in the middle of buffer callback */
-    rb->pcm_play_lock();
-
-    waveform_buffer_threshold = threshold;
-
-    rb->pcm_play_unlock();
+    const void *p = waveform_buffer;
+    return audio_sample_read_preidx(&p, preidx, false);
 }
 
 static inline bool waveform_buffer_have_enough(void)
@@ -1317,11 +1293,11 @@ static void waveform_buffer_done(void)
 }
     
 /* where the samples are obtained and buffered */
-static void waveform_buffer_callback(const void *start, unsigned long frames)
+static void waveform_pcm_hook(const void *start, unsigned long frames)
 {
     size_t threshold = waveform_buffer_threshold;
     size_t have = waveform_buffer_have;
-    size_t size = frames * 4;
+    size_t size = audio_frames2size(frames);
 
     if (have >= threshold)
     {
@@ -1377,10 +1353,28 @@ static void waveform_buffer_callback(const void *start, unsigned long frames)
 
 static void waveform_buffer_reset(void)
 {
-    /* only called when callback is off */
     waveform_buffer_have = 0;
     waveform_buffer_threshold = 0;
     waveform_buffer_break = 0;
+}
+
+static void waveform_buffer_set_threshold(unsigned long frames)
+{
+    size_t threshold = audio_frames2size(frames);
+
+    if (threshold > sizeof (waveform_buffer))
+        threshold = sizeof (waveform_buffer);
+
+    if (threshold == waveform_buffer_threshold)
+        return;
+
+    /* Avoid changing it in the middle of buffer callback */
+    int rc = rb->audio_remove_pcm_hook(waveform_pcm_hook);
+
+    waveform_buffer_threshold = threshold;
+
+    if (rc == 0)
+        rb->audio_add_pcm_hook(waveform_pcm_hook);
 }
 
 static void anim_waveform_plot_filled_h(int x, int x_prev,
@@ -1437,7 +1431,7 @@ static long anim_waveform_horizontal(void)
 
     long cur_tick = *rb->current_tick;
 
-    if (rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) != CHANNEL_PLAYING)
+    if (rb->audio_status() != AUDIO_STATUS_PLAY)
     {
         osd_lcd_update_prepare();
         rb->lcd_hline(0, LCD_WIDTH-1, 1*LCD_HEIGHT/4);
@@ -1447,9 +1441,9 @@ static long anim_waveform_horizontal(void)
         return cur_tick + HZ/5;
     }
 
-    int count = (mixer_sampr*osc_delay + 100*HZ - 1) / (100*HZ);
+    int count = (pcm_sampr*osc_delay + 100*HZ - 1) / (100*HZ);
 
-    waveform_buffer_set_threshold(count*PCM_SAMPLESIZE);
+    waveform_buffer_set_threshold(count);
 
     if (!waveform_buffer_have_enough())
         return cur_tick + HZ/100;
@@ -1485,14 +1479,14 @@ static long anim_waveform_horizontal(void)
     if (osc.draw == DRAW_PIXEL)
         goto plot_start_noprev; /* Doesn't need previous points */
 
-    lmax = lmin = waveform_buffer[0];
-    rmax = rmin = waveform_buffer[1];
+    lmax = lmin = waveform_buffer_read(0);
+    rmax = rmin = waveform_buffer_read(1);
 
     /* Find min-max envelope for interval */
     for (int i = 2; i < idx; i += 2)
     {
-        int sl = waveform_buffer[i + 0];
-        int sr = waveform_buffer[i + 1];
+        int sl = waveform_buffer_read(i + 0);
+        int sr = waveform_buffer_read(i + 1);
 
         if (sl < lmin)
             lmin = sl;
@@ -1539,14 +1533,14 @@ static long anim_waveform_horizontal(void)
         rmin_prev = rmin, rmax_prev = rmax;
 
     plot_start_noprev:
-        lmax = lmin = waveform_buffer[idx_prev + 0];
-        rmax = rmin = waveform_buffer[idx_prev + 1];
+        lmax = lmin = waveform_buffer_read(idx_prev + 0);
+        rmax = rmin = waveform_buffer_read(idx_prev + 1);
 
         /* Find min-max envelope for interval */
         for (int i = idx_prev + 2; i < idx; i += 2)
         {
-            int sl = waveform_buffer[i + 0];
-            int sr = waveform_buffer[i + 1];
+            int sl = waveform_buffer_read(i + 0);
+            int sr = waveform_buffer_read(i + 1);
 
             if (sl < lmin)
                 lmin = sl;
@@ -1574,7 +1568,7 @@ static long anim_waveform_horizontal(void)
 
     long delay = get_next_delay();
     return cur_tick + delay - waveform_buffer_have * HZ /
-                PCM_BYTERATE(mixer_sampr);
+                PCM_BYTERATE(pcm_sampr);
 }
 
 static void anim_waveform_plot_filled_v(int y, int y_prev,
@@ -1631,7 +1625,7 @@ static long anim_waveform_vertical(void)
 
     long cur_tick = *rb->current_tick;
 
-    if (rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) != CHANNEL_PLAYING)
+    if (rb->audio_status() != AUDIO_STATUS_PLAY)
     {
         osd_lcd_update_prepare();
         rb->lcd_vline(1*LCD_WIDTH/4, 0, LCD_HEIGHT-1);
@@ -1641,9 +1635,9 @@ static long anim_waveform_vertical(void)
         return cur_tick + HZ/5;
     }
 
-    int count = (mixer_sampr*osc_delay + 100*HZ - 1) / (100*HZ);
+    int count = (pcm_sampr*osc_delay + 100*HZ - 1) / (100*HZ);
 
-    waveform_buffer_set_threshold(count*PCM_SAMPLESIZE);
+    waveform_buffer_set_threshold(count);
 
     if (!waveform_buffer_have_enough())
         return cur_tick + HZ/100;
@@ -1679,14 +1673,14 @@ static long anim_waveform_vertical(void)
     if (osc.draw == DRAW_PIXEL)
         goto plot_start_noprev; /* Doesn't need previous points */
 
-    lmax = lmin = waveform_buffer[0];
-    rmax = rmin = waveform_buffer[1];
+    lmax = lmin = waveform_buffer_read(0);
+    rmax = rmin = waveform_buffer_read(1);
 
     /* Find min-max envelope for interval */
     for (int i = 2; i < idx; i += 2)
     {
-        int sl = waveform_buffer[i + 0];
-        int sr = waveform_buffer[i + 1];
+        int sl = waveform_buffer_read(i + 0);
+        int sr = waveform_buffer_read(i + 1);
 
         if (sl < lmin)
             lmin = sl;
@@ -1733,14 +1727,14 @@ static long anim_waveform_vertical(void)
         rmin_prev = rmin, rmax_prev = rmax;
 
     plot_start_noprev:
-        lmax = lmin = waveform_buffer[idx_prev + 0];
-        rmax = rmin = waveform_buffer[idx_prev + 1];
+        lmax = lmin = waveform_buffer_read(idx_prev + 0);
+        rmax = rmin = waveform_buffer_read(idx_prev + 1);
 
         /* Find min-max envelope for interval */
         for (int i = idx_prev + 2; i < idx; i += 2)
         {
-            int sl = waveform_buffer[i + 0];
-            int sr = waveform_buffer[i + 1];
+            int sl = waveform_buffer_read(i + 0);
+            int sr = waveform_buffer_read(i + 1);
 
             if (sl < lmin)
                 lmin = sl;
@@ -1768,13 +1762,13 @@ static long anim_waveform_vertical(void)
 
     long delay = get_next_delay();
     return cur_tick + delay - waveform_buffer_have * HZ
-                / PCM_BYTERATE(mixer_sampr);
+                / PCM_BYTERATE(pcm_sampr);
 }
 
 static void anim_waveform_exit(void)
 {
     /* Remove any buffer hook */
-    rb->mixer_channel_set_buffer_hook(PCM_MIXER_CHAN_PLAYBACK, NULL);
+    rb->audio_remove_pcm_hook(waveform_pcm_hook);
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     /* Remove our boost */
     rb->cancel_cpu_boost();
@@ -1842,16 +1836,14 @@ static void graphmode_setup(void)
 #ifdef OSCILLOSCOPE_GRAPHMODE
     if (osc.graphmode == GRAPH_WAVEFORM)
     {
-        rb->mixer_channel_set_buffer_hook(PCM_MIXER_CHAN_PLAYBACK,
-                                          waveform_buffer_callback);
+        rb->audio_add_pcm_hook(waveform_pcm_hook);
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
         rb->trigger_cpu_boost(); /* Just looks better */
 #endif
     }
     else
     {
-        rb->mixer_channel_set_buffer_hook(PCM_MIXER_CHAN_PLAYBACK,
-                                          NULL);
+        rb->audio_remove_pcm_hook(waveform_pcm_hook);
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
         rb->cancel_cpu_boost();
 #endif
@@ -1931,8 +1923,8 @@ static void osc_setup(void)
     osd_lcd_update();
 #endif
 
-#ifdef OSCILLOSCOPE_GRAPHMODE
-    mixer_sampr = rb->mixer_get_frequency();
+#if defined(OSCILLOSCOPE_GRAPHMODE)
+    pcm_sampr = rb->audio_get_playback_samplerate();
 #endif
 
     /* Turn off backlight timeout */

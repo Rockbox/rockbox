@@ -51,10 +51,7 @@ void audiohw_init(void)
     
     PCR0 = 0x000E - 8; /* PCR  : FSX, FSR active low, external FS/CLK source */
 #endif
-}
 
-void audiohw_postinit(void)
-{
     /* Trigger first XEVT0 */
     SPCR20 |= 1;
 }

@@ -39,7 +39,6 @@
 #endif
 #endif
 
-#include "pcm.h"
 #include "pcm-internal.h"
 #include "pcm_sampr.h"
 
@@ -72,19 +71,17 @@ static struct pcm_udata
 
 static SDL_AudioSpec obtained;
 static SDL_AudioCVT cvt;
-static int audio_locked = 0;
+static bool audio_running = false;
 static SDL_mutex *audio_lock;
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    if (++audio_locked == 1)
-        SDL_LockMutex(audio_lock);
+    SDL_LockMutex(audio_lock);
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-    if (--audio_locked == 0)
-        SDL_UnlockMutex(audio_lock);
+    SDL_UnlockMutex(audio_lock);
 }
 
 static void pcm_dma_apply_settings_nolock(void)
@@ -99,24 +96,23 @@ static void pcm_dma_apply_settings_nolock(void)
 
 void pcm_dma_apply_settings(void)
 {
-    pcm_play_lock();
+    SDL_LockMutex(audio_lock);
     pcm_dma_apply_settings_nolock();
-    pcm_play_unlock();
+    SDL_UnlockMutex(audio_lock);
 }
 
-void pcm_play_dma_start(const void *addr, unsigned long frames)
+void pcm_play_dma_prepare(void)
 {
+    pcm_play_dma_stop();
     pcm_dma_apply_settings_nolock();
-
-    pcm_data = addr;
-    pcm_data_frames = frames;
-
-    SDL_PauseAudio(0);
 }
 
 void pcm_play_dma_stop(void)
 {
     SDL_PauseAudio(1);
+    audio_running = false;
+    pcm_data = NULL;
+    pcm_data_frames = 0;
 #ifdef DEBUG
     if (udata.debug != NULL) {
         fclose(udata.debug);
@@ -134,7 +130,7 @@ void pcm_play_dma_pause(bool pause)
         SDL_PauseAudio(0);
 }
 
-unsigned long pcm_get_frames_waiting(void)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
     return pcm_data_frames;
 }
@@ -228,6 +224,18 @@ static void write_to_soundcard(struct pcm_udata *udata)
     }
 }
 
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
+{
+    pcm_data = addr;
+    pcm_data_frames = frames;
+
+    if (audio_running)
+        return;
+
+    SDL_PauseAudio(0);
+    audio_running = true;
+}
+
 static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
 {
     logf("sdl_audio_callback: len %d, pcm %u\n", len, pcm_data_frames);
@@ -237,21 +245,19 @@ static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
 
     SDL_LockMutex(audio_lock);
 
-    /* Write what we have in the PCM buffer */
-    if (pcm_data_frames)
-        goto start;
-
     /* Audio card wants more? Get some more then. */
     while (len > 0) {
-        new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data,
-                                                    &pcm_data_frames);
+        if (!pcm_data_frames)
+        {
+            pcm_play_dma_complete_callback(0);
 
-        if (!new_buffer) {
-            DEBUGF("sdl_audio_callback: No Data.\n");
-            break;
+    ,       new_buffer = pcm_data && pcm_data_frames;
+            if (!new_buffer) {
+                DEBUGF("sdl_audio_callback: No Data.\n");
+                break;
+            }
         }
 
-    start:
         udata->num_in  = pcm_data_frames;
         udata->num_out = len / out_frame_size;
 
@@ -262,8 +268,6 @@ static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
         if (new_buffer)
         {
             new_buffer = false;
-            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-
             if ((Uint32)len > udata->num_out)
             {
                 /* provide stable frame rate */
@@ -275,7 +279,7 @@ static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
                     SDL_Delay(delay);
                     SDL_LockMutex(audio_lock);
 
-                    if (!pcm_is_playing())
+                    if (!audio_running)
                         break;
                 }
             }
@@ -302,11 +306,11 @@ const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 }
 
 #ifdef HAVE_RECORDING
-void pcm_rec_lock(void)
+void pcm_rec_dma_lock(void)
 {
 }
 
-void pcm_rec_unlock(void)
+void pcm_rec_dma_unlock(void)
 {
 }
 
@@ -318,10 +322,14 @@ void pcm_rec_dma_close(void)
 {
 }
 
-void pcm_rec_dma_start(void *start, unsigned long frames)
+void pcm_rec_dma_capture_frames(void *addr, unsigned long frames)
 {
-    (void)start;
+    (void)addr;
     (void)frames;
+}
+
+void pcm_rec_dma_prepare(void)
+{
 }
 
 void pcm_rec_dma_stop(void)

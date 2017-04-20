@@ -26,7 +26,6 @@
 #include "system.h"
 #include "kernel.h"
 #include "debug.h"
-#include "pcm.h"
 #include "pcm-internal.h"
 
 extern JNIEnv *env_ptr;
@@ -34,7 +33,7 @@ extern JNIEnv *env_ptr;
 /* infos about our pcm chunks */
 static const void *pcm_data_start;
 static unsigned long pcm_data_frames;
-static int     audio_locked = 0;
+static bool    audio_running = false;
 static pthread_mutex_t audio_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /* cache frequently called methods */
@@ -72,17 +71,12 @@ JNIEXPORT jint JNICALL
 Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
                                         jbyteArray temp_array, jint max_size)
 {
-    bool new_buffer = false;
-
     lock_audio();
 
     jint left = max_size;
 
     if (!pcm_data_frames) /* get some initial data */
-    {
-        new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK,
-                            &pcm_data_start, &pcm_data_frames);
-    }
+        pcm_play_dma_complete_callback(0);
 
     while(left > 0 && pcm_data_frames)
     {
@@ -96,11 +90,6 @@ Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
         (*env)->SetByteArrayRegion(env, temp_array, 0,
                                         transfer_size, (jbyte*)pcm_data_start);
 
-        if (new_buffer)
-        {
-            new_buffer = false;
-            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-        }
         /* SetByteArrayRegion copies, which enables us to unlock audio. This
          * is good because the below write() call almost certainly block.
          * This allows the mixer to be clocked at a regular interval which vastly
@@ -111,7 +100,7 @@ Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
         lock_audio();
 
         /* check if still playing. might have changed during the write() call */
-        if (!pcm_is_playing())
+        if (!audio_running)
             break;
 
         if (ret < 0)
@@ -120,44 +109,53 @@ Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
             return ret;
         }
 
-        if (!pcm_data_frames) /* need new data */
+        if (pcm_data_frames)
         {
-            new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK,
-                                &pcm_data_start, &pcm_data_frames);
-        }
-        else /* increment data pointer and feed more */
+            /* increment data pointer and feed more */
             pcm_data_start += transfer_size;
+        }
+        else
+        {
+            /* all data has been sent */
+            pcm_play_dma_complete_callback(0);
+        }
     }
-
-    if (new_buffer)
-        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 
     unlock_audio();
     return max_size - left;
 }
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    if (++audio_locked == 1)
-        lock_audio();
+    lock_audio();
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-    if (--audio_locked == 0)
-        unlock_audio();
+    unlock_audio();
 }
 
-void pcm_dma_apply_settings(void)
+void pcm_dma_apply_settings(const struct pcm_hw_settings *settings)
 {
+    (void)settings;
 }
 
-void pcm_play_dma_start(const void *addr, unsigned long frames)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
 {
     pcm_data_start = addr;
     pcm_data_frames = frames;
-    
+
+    if (audio_running)
+        return;
+
     pcm_play_dma_pause(false);
+    audio_running = true;
+}
+
+void pcm_play_dma_prepare(void)
+{
+    if (audio_running)
+        pcm_play_dma_stop();
 }
 
 void pcm_play_dma_stop(void)
@@ -169,6 +167,7 @@ void pcm_play_dma_stop(void)
     (*env)->CallVoidMethod(env,
                            RockboxPCM_instance,
                            stop_method);
+    audio_running = false;
 }
 
 void pcm_play_dma_pause(bool pause)
@@ -179,7 +178,7 @@ void pcm_play_dma_pause(bool pause)
                                (int)pause);
 }
 
-unsigned long pcm_get_frames_waiting(void)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
     return pcm_data_frames;
 }
@@ -195,7 +194,7 @@ const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
     return (void *)((addr + 3) & ~3);
 }
 
-void pcm_play_dma_init(void)
+void pcm_dma_init(const struct pcm_hw_settings *settings)
 {
     /* in order to have background music playing after leaving the activity,
      * we need to allocate the PCM object from the Rockbox thread (the Activity
@@ -216,10 +215,8 @@ void pcm_play_dma_init(void)
     set_volume_method = e->GetMethodID(env_ptr, RockboxPCM_class, "set_volume", "(I)V");
     stop_method       = e->GetMethodID(env_ptr, RockboxPCM_class, "stop", "()V");
     write_method      = e->GetMethodID(env_ptr, RockboxPCM_class, "write", "([BII)I");
-}
 
-void pcm_play_dma_postinit(void)
-{
+    (void)settings;
 }
 
 void pcm_set_mixer_volume(int volume)

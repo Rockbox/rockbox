@@ -139,8 +139,20 @@ static void get_volume_params(int db, int *dac, int *amp)
     }
 }
 
+void audiohw_mute(bool mute)
+{
+    if (mute)
+    {
+        /* Set DACMU = 1 to soft-mute the audio DACs. */
+        wmcodec_write(DACCTRL, 0x4c);
+    } else {
+        /* Set DACMU = 0 to soft-un-mute the audio DACs. */
+        wmcodec_write(DACCTRL, 0xc);
+    }
+}
+
 /* Silently enable / disable audio output */
-void audiohw_preinit(void)
+void audiohw_codec_init(void)
 {
     wmcodec_write(RESET,    0x1ff);    /* Reset */
 
@@ -177,25 +189,8 @@ void audiohw_preinit(void)
     wmcodec_write(RDACVOL, 0x1ff);
 
     wmcodec_write(OUT4ADC, 0x0);    /* POBCTRL = 0 */
-}
 
-static void audiohw_mute(bool mute)
-{
-    if (mute)
-    {
-        /* Set DACMU = 1 to soft-mute the audio DACs. */
-        wmcodec_write(DACCTRL, 0x4c);
-    } else {
-        /* Set DACMU = 0 to soft-un-mute the audio DACs. */
-        wmcodec_write(DACCTRL, 0xc);
-    }
-}
-
-void audiohw_postinit(void)
-{
     sleep(HZ/2);
-
-    audiohw_mute(0);
 }
 
 void audiohw_set_volume(int vol_l, int vol_r)
