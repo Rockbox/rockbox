@@ -369,7 +369,7 @@ static inline void synthbuf(void)
 #endif
 }
 
-static void get_more(const void** start, unsigned long* frames)
+static void get_more(int status, const void** start, unsigned long* frames)
 {
 #ifndef SYNC
     if(lastswap != swap)
@@ -390,6 +390,8 @@ static void get_more(const void** start, unsigned long* frames)
         *start = NULL;
         quit = true;    /* this was the last buffer to play */
     }
+
+    return status;
 }
 
 static int midimain(const void * filename)
@@ -463,7 +465,8 @@ static int midimain(const void * filename)
     samples_this_second = 0;
 
     synthbuf();
-    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+    rb->pcm_play_data(get_more, NULL, 0,
+                      PCM_FORMAT(PCM_FORMAT_S16, 2));
 
     while (!quit)
     {
@@ -520,7 +523,8 @@ static int midimain(const void * filename)
                 synthbuf();
                 midi_debug("Rewind to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                    rb->pcm_play_data(get_more, NULL, 0,
+                                      PCM_FORMAT(PCM_FORMAT_S16, 2));
                 break;
             }
 
@@ -532,7 +536,8 @@ static int midimain(const void * filename)
                 synthbuf();
                 midi_debug("Skip to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                    rb->pcm_play_data(get_more, NULL, 0,
+                                      PCM_FORMAT(PCM_FORMAT_S16, 2));
                 break;
             }
 
@@ -547,7 +552,8 @@ static int midimain(const void * filename)
                 {
                     midi_debug("Playing from %d:%02d\n", playing_time/60, playing_time%60);
                     is_playing = true;
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                    rb->pcm_play_data(get_more, NULL, 0,
+                                      PCM_FORMAT(PCM_FORMAT_S16, 2));
                 }
                 break;
             }

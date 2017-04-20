@@ -457,12 +457,14 @@ void I_UpdateSound( void )
 //  only output be done asynchronous?
 //
 
-void get_more(const void** start, unsigned long* frames)
+void get_more(int status, const void** start, unsigned long* frames)
 {
    I_UpdateSound(); // Force sound update
 
    *start = mixbuffer;
    *frames = SAMPLECOUNT;
+
+   return status;
 }
 
 
@@ -471,7 +473,8 @@ void I_SubmitSound(void)
    if (!enable_sound)
       return;
 
-   rb->pcm_play_data(&get_more, NULL, NULL, 0);
+   rb->pcm_play_data(&get_more, NULL, 0,
+                     SAMPLE_FORMAT(SAMPLE_FORMAT_S16, 2));
 }
 
 void I_ShutdownSound(void)

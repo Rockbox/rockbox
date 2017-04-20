@@ -320,7 +320,7 @@ static int mainmenu_cb(int action, const struct menu_item_ex *this_item)
 }
 
 static AudioCallback audio_callback = NULL;
-static void get_more(const void** start, unsigned long* frames);
+static int get_more(int status, const void** start, unsigned long* frames);
 static void* audio_param;
 static struct System* audio_sys;
 
@@ -982,27 +982,30 @@ uint32_t sys_getTimeStamp(struct System* sys)
 }
 
 /* game provides us mono samples, we need stereo */
-static int16_t rb_soundbuf[MAX_SOUNDBUF_SIZE * 2] ALIGNED_ATTR(4);
+static int16_t rb_soundbuf[MAX_SOUNDBUF_SIZE];
 static int8_t temp_soundbuf[MAX_SOUNDBUF_SIZE];
 
-static void get_more(const void** start, unsigned long* frames)
+static int get_more(int status, const void** start, unsigned long* frames)
 {
     if(audio_sys->settings.sound_enabled && audio_callback)
     {
         audio_callback(audio_param, temp_soundbuf, audio_sys->settings.sound_bufsize);
 
-        /* convert xworld format (signed 8-bit) to rockbox format (stereo signed 16-bit) */
+        /* convert xworld format (signed 8-bit) to rockbox format (signed 16-bit) */
         for(int i = 0; i < audio_sys->settings.sound_bufsize; ++i)
         {
-            rb_soundbuf[2*i] = rb_soundbuf[2*i+1] = temp_soundbuf[i] * 256;
+            rb_soundbuf[i] = temp_soundbuf[i] * 256;
         }
     }
     else
     {
-        rb->memset(rb_soundbuf, 0, audio_sys->settings.sound_bufsize * 2 * sizeof(int16_t));
+        rb->memset(rb_soundbuf, 0, audio_sys->settings.sound_bufsize * sizeof(int16_t));
     }
+
     *start = rb_soundbuf;
     *frames = audio_sys->settings.sound_bufsize;
+
+    return status;
 }
 
 void sys_startAudio(struct System* sys, AudioCallback callback, void *param)
@@ -1012,7 +1015,8 @@ void sys_startAudio(struct System* sys, AudioCallback callback, void *param)
     audio_param = param;
     audio_sys = sys;
 
-    rb->pcm_play_data(get_more, NULL, NULL, 0);
+    rb->pcm_play_data(get_more, NULL, 0,
+                      PCM_FORMAT(PCM_FORMAT_S16, 1));
 }
 
 void sys_stopAudio(struct System* sys)

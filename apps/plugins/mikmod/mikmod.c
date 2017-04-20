@@ -268,7 +268,7 @@ static inline void synthbuf(void)
     VC_WriteBytes(outptr, BUF_COUNT*SAMPLE_SIZE);
 }
 
-static void get_more(const void** start, unsigned long* frames)
+static int get_more(int status, const void** start, unsigned long* frames)
 {
 #ifndef SYNC
     if (lastswap != swap)
@@ -285,6 +285,8 @@ static void get_more(const void** start, unsigned long* frames)
 #ifndef SYNC
     swap ^= 1;
 #endif
+
+    return status;
 }
 
 static void showinfo(void)
@@ -658,7 +660,8 @@ static int playfile(char* filename)
     {
         display = DISPLAY_INFO;
         Player_Start(module);
-        rb->pcm_play_data(&get_more, NULL, NULL, 0);
+        rb->pcm_play_data(get_more, NULL, 0,
+                          PCM_FORMAT(PCM_FORMAT_S16, 2));
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -802,7 +805,8 @@ static int playfile(char* filename)
             }
             else
             {
-                rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                rb->pcm_play_data(get_more, NULL, 0,
+                                  PCM_FORMAT(PCM_FORMAT_S16, 2));
             }
             Player_TogglePause();
             break;

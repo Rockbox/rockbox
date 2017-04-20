@@ -26,7 +26,8 @@
  */
 #define WORD_SHIFT      12
 #define WORD_FRACBITS   27
-#define NATIVE_DEPTH    16
+#define WORD_DEPTH      16
+#define NATIVE_DEPTH    PCM_NATIVE_DEPTH
 
 struct sample_io_data;
 

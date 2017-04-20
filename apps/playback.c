@@ -1132,7 +1132,7 @@ static void playing_id3_sync(struct track_info *user_info,
     struct mp3entry *id3 = bufgetid3(user_info->id3_hid);
     struct mp3entry *playing_id3 = id3_get(PLAYING_ID3);
 
-    pcm_play_lock();
+    pcmbuf_suspend_position_updates(true);
 
     unsigned long e = playing_id3->elapsed;
     unsigned long o = playing_id3->offset;
@@ -1151,7 +1151,7 @@ static void playing_id3_sync(struct track_info *user_info,
         offset = 0;
     }
 
-    pcm_play_unlock();
+    pcmbuf_suspend_position_updates(false);
 
     if (id3)
     {
@@ -3651,7 +3651,6 @@ long audio_filebufused(void)
 {
     return buf_used();
 }
-
 
 /** -- Settings -- **/
 

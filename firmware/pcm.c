@@ -28,8 +28,8 @@
 #include "audio.h"
 #include "sound.h"
 #include "general.h"
+#include "pcm.h"
 #include "pcm-internal.h"
-#include "pcm_mixer.h"
 
 /**
  * Aspects implemented in the target-specific portion:
@@ -38,11 +38,10 @@
  *   Public -
  *      pcm_postinit
  *      pcm_get_frames_waiting
- *      pcm_play_lock
- *      pcm_play_unlock
  *   Semi-private -
+ *      pcm_play_dma_lock
+ *      pcm_play_dma_unlock
  *      pcm_play_dma_complete_callback
- *      pcm_play_dma_status_callback
  *      pcm_play_dma_init
  *      pcm_play_dma_postinit
  *      pcm_play_dma_start
@@ -50,265 +49,275 @@
  *      pcm_play_dma_pause
  *      pcm_play_dma_get_peak_buffer
  *   Data Read/Written within TSP -
- *      pcm_sampr (R)
- *      pcm_fsel (R)
- *      pcm_curr_sampr (R)
- *      pcm_playing (R)
- *      pcm_paused (R)
+ *      pcm_sampr (RO)
+ *      pcm_fsel (RO)
+ *      pcm_curr_sampr (RO)
  *
  * ==Playback/Recording==
  *   Semi-private -
  *      pcm_dma_apply_settings
  *
  * ==Recording==
- *   Public -
- *      pcm_rec_lock
- *      pcm_rec_unlock
  *   Semi-private -
+ *      pcm_rec_dma_lock
+ *      pcm_rec_dma_unlock
  *      pcm_rec_dma_complete_callback
- *      pcm_rec_dma_status_callback
  *      pcm_rec_dma_init
  *      pcm_rec_dma_close
  *      pcm_rec_dma_start
  *      pcm_rec_dma_stop
  *      pcm_rec_dma_get_peak_buffer
- *   Data Read/Written within TSP -
- *      pcm_recording (R)
  *
  * States are set _after_ the target's pcm driver is called so that it may
  * know from whence the state is changed. One exception is init.
  *
  */
 
-/* 'true' when all stages of pcm initialization have completed */
-static bool pcm_is_ready = false;
+#define IS_CAPTURE_STREAM(flags) \
+    (PCM_FLAGS_STREAM_TYPE(flags) == PCM_STREAM_RECORDING)
 
-/* The registered callback function to ask for more mp3 data */
-volatile pcm_play_callback_type
-    pcm_callback_for_more SHAREDBSS_ATTR = NULL;
-/* The registered callback function to inform of DMA status */
-volatile pcm_status_callback_type
-    pcm_play_status_callback SHAREDBSS_ATTR = NULL;
-/* PCM playback state */
-volatile bool pcm_playing SHAREDBSS_ATTR = false;
-/* PCM paused state. paused implies playing */
-volatile bool pcm_paused SHAREDBSS_ATTR = false;
-/* samplerate of currently playing audio - undefined if stopped */
-unsigned long pcm_curr_sampr SHAREDBSS_ATTR = 0;
-/* samplerate waiting to be set */
-unsigned long pcm_sampr SHAREDBSS_ATTR = HW_SAMPR_DEFAULT;
-/* samplerate frequency selection index */
-int pcm_fsel SHAREDBSS_ATTR = HW_FREQ_DEFAULT;
-
-static void pcm_play_data_start_int(const void *addr, unsigned long frames);
-static void pcm_play_pause_int(bool play);
-void pcm_play_stop_int(void);
-
-#if !defined(HAVE_SW_VOLUME_CONTROL) || defined(PCM_SW_VOLUME_UNBUFFERED)
-/** Standard hw volume/unbuffered control functions - otherwise, see
- ** pcm_sw_volume.c **/
-static inline void pcm_play_dma_start_int(const void *addr, unsigned long frames)
+/* dimension info on a single sample of one channel, indexed by format code */
+static const struct
 {
-#ifdef HAVE_SW_VOLUME_CONTROL
-    /* Smoothed transition might not have happened so sync now */
-    pcm_sync_pcm_factors();
+    uint8_t size;
+    uint8_t depth;
+} pcm_sample_dims[] =
+{
+    [PCM_FORMAT_S16_2] = { .size = 2, .depth = 16 },
+#if (CONFIG_PCM_FORMAT_CAPS & PCM_FORMAT_CAP_S24_4)
+    [PCM_FORMAT_S24_4] = { .size = 4, .depth = 24 },
 #endif
-    pcm_play_dma_start(addr, frames);
-}
+#if (CONFIG_PCM_FORMAT_CAPS & PCM_FORMAT_CAP_S32_4)
+    [PCM_FORMAT_S32_4] = { .size = 4, .depth = 32 },
+#endif
+#if (CONFIG_PCM_FORMAT_CAPS & PCM_FORMAT_CAP_S24_3)
+    [PCM_FORMAT_S24_3] = { .size = 3, .depth = 24 },
+#endif
+};
 
-static inline void pcm_play_dma_pause_int(bool pause)
-{
-    if (pause || pcm_get_frames_waiting())
-    {
-        pcm_play_dma_pause(pause);
-    }
-    else
-    {
-        logf(" no data");
-        pcm_play_data_start_int(NULL, 0);
-    }
-}
+/* 'true' when all stages of pcm initialization have completed */
+static volatile bool pcm_is_ready = false;
 
-static inline void pcm_play_dma_stop_int(void)
-{
-    pcm_play_dma_stop();
-}
+static unsigned int pcm_play_locked = 0;
+#ifdef HAVE_RECORDING
+static unsigned int pcm_rec_locked = 0;
+static struct pcm_stream_desc *cur_rec_desc = NULL; /* only one for now */
+#endif
 
-static inline const void *
-    pcm_play_dma_get_peak_buffer_int(unsigned long *frames_rem)
-{
-    return pcm_play_dma_get_peak_buffer(frames_rem);
-}
+static struct pcm_stream_desc pcm_descs[PCM_MAX_HANDLES] IBSS_ATTR;
+static uint32_t free_desc_mask IBSS_ATTR;
 
-bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
-                                    const void **addr,
-                                    unsigned long *frames)
-{
-    /* Check status callback first if error */
-    if (status < PCM_DMAST_OK)
-        status = pcm_play_dma_status_callback(status);
-
-    if (status >= PCM_DMAST_OK && pcm_get_more_int(addr, frames))
-        return true;
-
-    /* Error, callback missing or no more DMA to do */
-    pcm_play_stop_int();
-    return false;
-}
-#endif /* !HAVE_SW_VOLUME_CONTROL || PCM_SW_VOLUME_UNBUFFERED */
-
-static void pcm_play_data_start_int(const void *addr, unsigned long frames)
-{
-    ALIGN_AUDIOBUF(addr, frames);
-
-    if ((addr && frames) || pcm_get_more_int(&addr, &frames))
-    {
-        pcm_apply_settings();
-        logf(" pcm_play_dma_start_int");
-        pcm_play_dma_start_int(addr, frames);
-        pcm_playing = true;
-        pcm_paused = false;
-    }
-    else
-    {
-        /* Force a stop */
-        logf(" pcm_play_stop_int");
-        pcm_play_stop_int();
-    }
-}
-
-static void pcm_play_pause_int(bool play)
-{
-    if (play)
-        pcm_apply_settings();
-
-    logf(" pcm_play_dma_pause_int");
-    pcm_play_dma_pause_int(!play);
-    pcm_paused = !play && pcm_playing;
-}
-
-void pcm_play_stop_int(void)
-{
-    pcm_play_dma_stop_int();
-    pcm_callback_for_more = NULL;
-    pcm_play_status_callback = NULL;
-    pcm_paused = false;
-    pcm_playing = false;
-}
-
+/* Wait for full init to complete */
 static void pcm_wait_for_init(void)
 {
-    while (!pcm_is_ready)
+    while (!pcm_is_ready) {
         sleep(0);
+    }
+}
+
+/* Assign the next handle */
+static void desc_next_handle(struct pcm_stream_desc *desc)
+{
+    unsigned long version = desc->id / PCM_MAX_HANDLES;
+    unsigned long index = desc->id - version*PCM_MAX_HANDLES;
+
+    if (++version == 0) {
+        version = 1;
+    }
+
+    desc->id = version*PCM_MAX_HANDLES + index; 
+}
+
+/* Allocate a PCM handle from the pool */
+static struct pcm_stream_desc * pcm_alloc_desc(void)
+{
+    if (!free_desc_mask) {
+        return NULL;
+    }
+
+    unsigned long index = find_first_set_bit(free_desc_mask);
+    free_desc_mask &= ~(1ul << index);
+
+    return &pcm_descs[index];
+}
+
+/* Check that the handle is valid and is open */
+static struct pcm_stream_desc * pcm_handle_desc(pcm_handle_t pcm)
+{
+    struct pcm_stream_desc *desc = &pcm_descs[pcm % PCM_MAX_HANDLES];
+    if (desc->id == pcm) {
+        return desc;
+    }
+
+    logf("PCM:invalid handle");
+    return NULL;
+}
+
+/* Return a PCM handle to the pool */
+static void pcm_free_desc(struct pcm_stream_desc *desc)
+{
+    uint32_t bit = 1ul << (desc->id % PCM_MAX_HANDLES);
+    desc_next_handle(desc);
+    free_desc_mask |= bit;
+}
+
+static void lock_stream_callback(struct pcm_stream_desc *desc)
+{
+#ifdef HAVE_RECORDING
+    if (IS_CAPTURE_STREAM(desc->flags)) {
+        if (++pcm_rec_locked == 1) {
+            pcm_rec_dma_lock();
+        }
+    }
+    else
+#endif
+    {
+        if (++pcm_play_locked == 1) {
+            pcm_play_dma_lock();
+        }
+    }
+
+    (void)desc;
+}
+
+static int unlock_stream_callback(struct pcm_stream_desc *desc)
+{
+#ifdef HAVE_RECORDING
+    if (IS_CAPTURE_STREAM(desc->flags)) {
+        if (!pcm_rec_locked) {
+            return -1;
+        }
+
+        if (--pcm_rec_locked == 0) {
+            pcm_rec_dma_unlock();
+        }
+    }
+    else
+#endif
+    {
+        if (!pcm_play_locked) {
+            return -1;
+        }
+
+        if (--pcm_play_locked == 0) {
+            pcm_play_dma_unlock();
+        }
+    }
+
+    return 0;
+    (void)desc;
+}
+
+/* Stream has stopped playing */
+void pcm_stream_stopped(struct pcm_stream_desc *desc)
+{
+    desc->addr     = NULL;
+    desc->frames   = 0;
+    desc->state    = PCM_STATE_STOPPED;
+    desc->callback = NULL;
+}
+
+/* Globally lock out PCM interrupt */
+void pcm_play_lock_device_callback(void)
+{
+    if (++pcm_play_locked == 1) {
+        pcm_play_dma_lock();
+    }
+}
+
+/* Globally reenable PCM interrupt */
+void pcm_play_unlock_device_callback(void)
+{
+    if (--pcm_play_locked == 0) {
+        pcm_play_dma_unlock();
+    }
 }
 
 /**
- * Perform peak calculation on a buffer of packed 16-bit samples.
+ * Perform peak calculation on a buffer of samples
  *
  * Used for recording and playback.
  */
-static void pcm_peak_peeker(struct pcm_peaks *peaks)
+static void pcm_peak_peeker(struct pcm_stream_desc *desc, struct pcm_peaks *peaks)
 {
-    uint32_t peak_l = 0, peak_r = 0;
+    const pcm_dma_t *pend = peaks->end_addr;
 
-    const int16_t *p = peaks->addr;
-    const int16_t *pend = peaks->end_addr;
-
-    do
-    {
-        int32_t s;
-
-        s = p[0];
-
-        if (s < 0)
-            s = -s;
-
-        if ((uint32_t)s > peak_l)
-            peak_l = s;
-
-        s = p[1];
-
-        if (s < 0)
-            s = -s;
-
-        if ((uint32_t)s > peak_r)
-            peak_r = s;
-
-        p += 4 * 2; /* Every 4th sample, interleaved */
+    for (unsigned int ch = desc->chnum; ch--;) {
+        peaks->peak[ch] = 0;
     }
-    while (p < pend);
 
-    peaks->peak[0] = peak_l;
-    peaks->peak[1] = peak_r;
-}
-
-void pcm_do_peak_calculation(struct pcm_peaks *peaks, bool active)
-{
-    long tick = current_tick;
-
-    /* Peak no farther ahead than expected period to avoid overcalculation */
-    long period = tick - peaks->tick;
-
-    /* Keep reasonable limits on period */
-    if (period < 1)
-        period = 1;
-    else if (period > HZ/5)
-        period = HZ/5;
-
-    peaks->period = (3*peaks->period + period) / 4;
-    peaks->tick = tick;
-
-    if (active)
+    switch (desc->sample_size)
     {
-        unsigned long lookahead = peaks->period*pcm_curr_sampr / HZ;
-        peaks->frames = MIN(lookahead, peaks->frames);
+#if (CONFIG_PCM_FORMAT_CAPS & PCM_FORMAT_CAP_4_BYTE_CAPS)
+    case 4:
+    {
+        const int32_t *p = peaks->addr;
 
-        if (peaks->addr && peaks->frames)
-        {
-            peaks->end_addr = peaks->addr + peaks->frames*PCM_FRAME_SIZE;
-            pcm_peak_peeker(peaks);
+        while (p < end) {
+            for (unsigned int ch = desc->chnum; ch--;) {
+                uint32_t s_abs = UABS(uint32_t, *p++);
+
+                if (s_abs > peaks->peak[ch]) {
+                    peaks->peak[ch] = s_abs;
+                }
+            }
+
+            p += 3*desc->chnum; /* every 4th sample only */
         }
-        /* else keep previous peak values */
-    }
-    else
+
+        break;
+        } /* 4 */
+#endif /* CONFIG_CAPS */
+#if CONFIG_PCM_FORMAT_CAPS == PCM_FORMAT_CAP_S16_2
+    default:
+#else
+    case 2:
+#endif
     {
-        /* peaks are zero */
-        memset(peaks->peak, 0, sizeof (peaks->peak));
-        peaks->end_addr = NULL;
+        const int16_t *p = peaks->addr;
+
+        while (p < end) {
+            for (unsigned int ch = desc->chnum; ch--;) {
+                uint32_t s_abs = UABS(uint32_t, *p++);
+
+                if (s_abs > peaks->peak[ch]) {
+                    peaks->peak[ch] = s_abs;
+                }
+            }
+
+            p += 3*desc->chnum; /* every 4th sample only */
+        }
+
+        break;
+        } /* 2/default */
+    } /* switch */
+}
+
+static inline void pcm_zero_peaks(unsigned int chnum,
+                                  struct pcm_peaks *peaks)
+{
+    while (chnum--) {
+        peaks->peak[chnum] = 0;
     }
+
+    peaks->end_addr = NULL;
 }
 
-void pcm_calculate_peaks(struct pcm_peaks *peaks)
-{
-    peaks->addr = pcm_play_dma_get_peak_buffer_int(&peaks->frames);
-    pcm_do_peak_calculation(peaks, pcm_playing && !pcm_paused);
-}
-
-const void * pcm_get_peak_buffer(unsigned long *frames_rem)
-{
-    return pcm_play_dma_get_peak_buffer_int(frames_rem);
-}
-
-bool pcm_is_playing(void)
-{
-    return pcm_playing;
-}
-
-bool pcm_is_paused(void)
-{
-    return pcm_paused;
-}
-
-/****************************************************************************
- * Functions that do not require targeted implementation but only a targeted
- * interface
- */
+/** PCM global init, state and settings **/
 
 /* This should only be called at startup before any audio playback or
    recording is attempted */
 void pcm_init(void)
 {
     logf("pcm_init");
+
+    /* set initial next handles for each descriptor */
+    for (unsigned long i = 0; i < PCM_MAX_HANDLES; i++) {
+        struct pcm_stream_desc *desc = &pcm_descs[i];
+        desc->id = 1*PCM_MAX_HANDLES + i;
+    }
+
+    free_desc_mask = MASK_N(uint32_t, PCM_MAX_HANDLES, 0);
 
     pcm_set_frequency(HW_SAMPR_DEFAULT);
 
@@ -333,60 +342,40 @@ bool pcm_is_initialized(void)
     return pcm_is_ready;
 }
 
-void pcm_play_data(pcm_play_callback_type get_more,
-                   pcm_status_callback_type status_cb,
-                   const void *start, unsigned long frames)
+/* Stop everything and reset state */
+void pcm_reset(void)
 {
-    logf("pcm_play_data");
-
-    pcm_play_lock();
-
-    pcm_callback_for_more = get_more;
-    pcm_play_status_callback = status_cb;
-
-    logf(" pcm_play_data_start_int");
-    pcm_play_data_start_int(start, frames);
-
-    pcm_play_unlock();
-}
-
-void pcm_play_pause(bool play)
-{
-    logf("pcm_play_pause: %s", play ? "play" : "pause");
-
-    pcm_play_lock();
-
-    if (play == pcm_paused && pcm_playing)
-    {
-        logf(" pcm_play_pause_int");
-        pcm_play_pause_int(play);
+    if (++pcm_play_locked == 1) {
+        pcm_play_dma_lock();
     }
 
-    pcm_play_unlock();
-}
+    pcm_play_stop_dma();
+    pcm_mixer_reset();
 
-void pcm_play_stop(void)
-{
-    logf("pcm_play_stop");
-
-    pcm_play_lock();
-
-    if (pcm_playing)
-    {
-        logf(" pcm_play_stop_int");
-        pcm_play_stop_int();
+    if (--pcm_play_locked == 0) {
+        pcm_play_dma_unlock();
     }
 
-    pcm_play_unlock();
-}
+#ifdef HAVE_RECORDING
+    if (++pcm_rec_locked == 1) {
+        pcm_rec_dma_lock();
+    }
 
-/**/
+    if (cur_rec_desc) {
+        pcm_rec_stop_capture(cur_rec_desc);
+    }
+
+    if (--pcm_rec_locked == 0) {
+        pcm_rec_dma_unlock();
+    }
+#endif
+}
 
 /* set frequency next frequency used by the audio hardware -
  * what pcm_apply_settings will set */
-void pcm_set_frequency(unsigned int samplerate)
+unsigned long pcm_set_frequency(unsigned long samplerate)
 {
-    logf("pcm_set_frequency");
+    logf("pcm_set_frequency:sr=%lu", samplerate);
 
     int index;
 
@@ -407,14 +396,16 @@ void pcm_set_frequency(unsigned int samplerate)
     if (samplerate != hw_freq_sampr[index])
         index = HW_FREQ_DEFAULT; /* Invalid = default */
 
-    pcm_sampr = hw_freq_sampr[index];
-    pcm_fsel = index;
+    __pcm_sampr = hw_freq_sampr[index];
+    __pcm_fsel = index;
+
+    return __pcm_sampr;
 }
 
 /* return last-set frequency */
-unsigned int pcm_get_frequency(void)
+unsigned long pcm_get_frequency(void)
 {
-    return pcm_sampr;
+    return __pcm_sampr;
 }
 
 /* apply pcm settings to the hardware */
@@ -424,52 +415,310 @@ void pcm_apply_settings(void)
 
     pcm_wait_for_init();
 
-    if (pcm_sampr != pcm_curr_sampr)
+    if (__pcm_sampr != __pcm_curr_sampr)
     {
         logf(" pcm_dma_apply_settings");
         pcm_dma_apply_settings();
-        pcm_curr_sampr = pcm_sampr;
+        __pcm_curr_sampr = __pcm_sampr;
     }
 }
 
-#ifdef HAVE_RECORDING
-/** Low level pcm recording apis **/
 
-/* the registered callback function for when more data is available */
-static volatile pcm_rec_callback_type
-    pcm_callback_more_ready SHAREDBSS_ATTR = NULL;
-volatile pcm_status_callback_type
-    pcm_rec_status_callback SHAREDBSS_ATTR = NULL;
-/* DMA transfer in is currently active */
-volatile bool pcm_recording SHAREDBSS_ATTR = false;
-volatile unsigned long pcm_rec_buf_seq_num = 0;
+/** PCM Playback **/
+static pcm_dma_t pcm_dbl_buf[2][PCM_DBL_BUF_FRAMES*PCM_DMA_T_CHANNELS]
+        PCM_DBL_BUF_IBSS MEM_ALIGN_ATTR;
+static unsigned long pcm_dbl_buf_frames[2] IBSS_ATTR;
+static int pcm_dbl_buf_index = -1;   /* Which pcm_dbl_buf? (-1 == not playing) */
 
-/* Called internally by functions to reset the state */
-static void pcm_recording_stopped(void)
+/* samplerate of currently playing audio - undefined if stopped */
+unsigned long __pcm_curr_sampr SHAREDBSS_ATTR = 0;
+/* samplerate waiting to be set */
+unsigned long __pcm_sampr SHAREDBSS_ATTR = HW_SAMPR_DEFAULT;
+/* samplerate frequency selection index */
+int __pcm_fsel SHAREDBSS_ATTR = HW_FREQ_DEFAULT;
+
+static int setup_play_format(struct pcm_stream_desc *desc,
+                             const struct pcm_format *format)
 {
-    pcm_recording = false;
-    pcm_callback_more_ready = NULL;
-    pcm_rec_status_callback = NULL;
+    desc->format = *(format ?: PCM_FORMAT_NATIVE());
+
+    int rc = pcm_mixer_format_config(desc)
+    if (rc == 0) {
+        desc->sample_size  = pcm_sample_dims[format->code].size;
+        desc->frame_size   = desc->sample_size * format->chnum;
+        desc->sample_depth = pcm_sample_dims[format->code].depth;
+    }
+    else {
+        logf("PCM:bad format:code=%u:chnum=%u", format->code, format->chnum);
+    }
+
+    return rc;
+}
+
+static void pcm_play_dma_start_int(const void *addr, unsigned long frames)
+{
+    logf(" pcm_play_dma_start_int");
+#ifdef HAVE_SW_VOLUME_CONTROL
+    /* Smoothed transition might not have happened so sync now */
+    pcm_sw_volume_sync_factors();
+#endif
+    pcm_apply_settings();
+    pcm_play_dma_prepare();
+    pcm_play_dma_send_frames(addr, frames);
+}
+
+/* Stop the playback DMA transfer */
+static inline void pcm_play_stop_dma(void)
+{
+    pcm_play_dma_stop();
+    pcm_dbl_buf_index = -1;
+}
+
+/* Start the playback DMA transfer if not already going */
+static void pcm_play_start_dma(struct pcm_stream_desc *desc)
+{
+    pcm_mixer_activate_stream(desc);
+
+    if (pcm_dbl_buf_idx >= 0) {
+        return;
+    }
+
+    /* PCM driver not running */
+    memset(pcm_dbl_buf, 0, sizeof (pcm_dbl_buf));
+    pcm_dbl_buf_idx = 0;
+
+    /* Two shortened silence frames to start cycle (1 frames latency total).
+       First mixed frame will be done in parallel with 2nd buffer so that
+       should be as long as possible */
+    pcm_dbl_buf_frames[0] = 32; /* enough to top off any hw fifo */
+    pcm_dbl_buf_frames[1] = PCM_DBL_BUF_FRAMES - 32;
+    pcm_play_dma_start_int(pcm_dbl_buf[0], pcm_dbl_buf_frames[0]);
+}
+
+static const void * pcm_play_get_remaining_frames(struct pcm_stream_desc *desc,
+                                                  unsigned long *frames_rem)
+{
+    const void *addr = *(const void * volatile *)&desc->addr;
+    unsigned long rem = *(unsigned long volatile *)&desc->frames;
+    const void *addr2 = *(const void * volatile *)&desc->addr;
+
+    /* Still same buffer? */
+    if (addr != addr2) {
+        rem = 0;
+        addr = NULL;
+    }
+
+    *frames_rem = rem;
+    return addr;
+}
+
+static void pcm_play_get_peaks(struct pcm_stream_desc *desc,
+                               struct pcm_peaks *peaks)
+{
+    long tick = current_tick;
+    /* Peak no farther ahead than expected period to avoid overcalculation */
+    long period = tick - peaks->tick;
+
+    peaks->addr = pcm_play_get_remaining_frames(pcm, &peaks->frames);
+
+    /* Keep reasonable limits on period */
+    if (period < 1) {
+        period = 1;
+    }
+    else if (period > HZ/5) {
+        period = HZ/5;
+    }
+
+    peaks->period = (3*peaks->period + period) / 4;
+    peaks->tick = tick;
+
+    if (pcm->state == PCM_STATE_RUNNING) {
+        unsigned long lookahead = peaks->period*__pcm_curr_sampr / HZ;
+        peaks->frames = MIN(lookahead, peaks->frames);
+
+        if (peaks->addr && peaks->frames) {
+            peaks->end_addr = peaks->addr + peaks->frames*desc->frame_size;
+            pcm_peak_peeker(pcm, peaks);
+        }
+        /* else keep previous peak values */
+
+        return;
+    }
+
+    pcm_zero_peaks(pcm->chnum, peaks);
+}
+
+/* Called back by driver when last buffer has finished or an error occurs */
+void pcm_play_dma_complete_callback(int status)
+{
+    int index0 = pcm_dbl_buf_index;
+    int index1 = 1 - index0;
+
+    pcm_dbl_buf_index = index1;
+
+    unsigned long frames = pcm_play_dbl_buf_frames[index0];
+    pcm_play_dbl_buf_frames[index0] = 0;
+
+    if (status == 0 && frames) {
+        pcm_play_dma_send_frames(pcm_play_dbl_buf[index0], frames);
+
+        pcm_play_dbl_buf_frames[index1] =
+            pcm_mixer_fill_buffer(pcm_play_dbl_buf[index1], PCM_DBL_BUF_FRAMES);
+        return;
+    }
+
+    /* Error or no more DMA to do */
+    pcm_play_stop_dma();
+}
+
+void pcm_play_data(pcm_handle_t pcm,
+                   pcm_play_callback_type callback,
+                   const void *start,
+                   unsigned long frames,
+                   const struct sample_format *format)
+{
+    logf("pcm_play_data");
+
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        return -1;
+    }
+
+    lock_stream_callback(desc);
+
+    int rc = 0;
+    unsigned int flags = desc->flags;
+
+#ifdef HAVE_RECORDING
+    if (IS_CAPTURE_STREAM(flags)) {
+        logf("  is capture stream");
+        rc = -1;
+    }
+    else
+#endif /* HAVE_RECORDING */
+    {
+         rc = setup_play_format(desc, format);
+    }
+
+    if (rc == 0) {
+        /* if there's a callback, mixer will call it to get first buffer
+           else it will just mix from the supplied buffer */
+        if (!(addr && frames)) {
+            addr = NULL;
+            frames = 0;
+        }
+
+        desc->start       = start;
+        desc->frames      = frames;
+        desc->prev_frames = 0;
+        desc->callback    = callback;
+        desc->state       = PCM_STATE_RUNNING;
+
+        pcm_play_start_dma(desc);
+    }
+
+    unlock_stream_callback(desc);
+
+    return 0;
+}
+
+int pcm_play_pause(pcm_handle_t pcm, bool play)
+{
+    logf("pcm_play_pause:play=%d", (int)play);
+
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        return -1;
+    }
+
+    lock_stream_callback(desc);
+
+    if (desc->state != PCM_STATE_STOPPED &&
+        play != (desc->state == PCM_STATE_RUNNING)) {
+
+        if (play) {
+            desc->state = PCM_STATE_RUNNING;
+            pcm_play_start_dma(desc);
+        }
+        else {
+            pcm_mixer_deactivate_stream(desc);
+            desc->state = PCM_STATE_PAUSED;
+        }
+
+        pcm_play_pause_stream(desc, play);
+    }
+
+    unlock_stream_callback(desc);
+
+    return 0;
+}
+
+int pcm_play_stop(pcm_handle_t pcm)
+{
+    logf("pcm_play_stop");
+
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        return -1;
+    }
+
+    lock_stream_callback(desc);
+
+    if (desc->state != PCM_STATE_STOPPED) {
+        pcm_mixer_deactivate_stream(desc);
+        desc->state = PCM_STATE_STOPPED;
+    }
+
+    unlock_stream_callback(desc);
+
+    return 0;
+}
+
+
+/** PCM Capture **/
+#ifdef HAVE_RECORDING
+
+/* Stops the hardware capture */
+static void pcm_rec_stop_capture(struct pcm_stream_desc *desc)
+{
+    pcm_rec_dma_stop();
+    pcm_stream_stopped(desc);
+}
+
+/* Initializes the handle in accordance with the desired PCM format */
+static int setup_record_format(struct pcm_stream_desc *desc,
+                               const struct pcm_format *format)
+{
+    /* TODO: work out mono, format compatibility and other stuff */
+    if (format->code != PCM_FORMAT_S16_2 || format->chnum != 2) {
+        logf("PCM:bad format:code=%u:chnum=%u", format->code, format->chnum);
+        return -1;
+    }
+    else {
+        desc->format = *(format ?: PCM_FORMAT(PCM_FORMAT_S16_2, 2));
+        desc->sample_size  = pcm_sample_dims[PCM_FORMAT_S16_2].size;
+        desc->frame_size   = desc->sample_size * 2;
+        desc->sample_depth = pcm_sample_dims[PCM_FORMAT_S16_2].depth;
+        return 0;
+    }
 }
 
 /**
  * Return recording peaks - From the end of the last peak up to
  *                          current write position.
  */
-void pcm_calculate_rec_peaks(struct pcm_peaks *peaks)
+static void pcm_recording_get_peaks(struct pcm_stream_desc *desc,
+                                    struct pcm_peaks *peaks)
 {
-    if (pcm_recording)
-    {
+    if (desc->state == PCM_STATE_RUNNING) {
         peaks->addr = pcm_rec_dma_get_peak_buffer(&peaks->frames);
 
-        if (peaks->addr && peaks->frames)
-        {
-            unsigned long seq = pcm_rec_buf_seq_num;
+        if (peaks->addr && peaks->frames) {
+            unsigned long seq = desc->seqnum_rec;
             const void *end_addr = peaks->end_addr;
-            const void *end = peaks->addr + peaks->frames*PCM_FRAME_SIZE;
+            const void *end = peaks->addr + peaks->frames*desc->frame_size;
 
-            if (peaks->seq == seq && end_addr >= peaks->addr && end_addr <= end)
-            {
+            if (peaks->seq == seq && end_addr >= peaks->addr && end_addr <= end) {
                 /* carry on from previous endpoint */
                 peaks->addr = end_addr;
             }
@@ -477,140 +726,342 @@ void pcm_calculate_rec_peaks(struct pcm_peaks *peaks)
             peaks->end_addr = end;
             peaks->seq = seq;
 
-            if (peaks->addr < end)
-                pcm_peak_peeker(peaks);
+            if (peaks->addr < end) {
+                pcm_peak_peeker(desc, peaks);
+            }
         }
 
         /* else keep previous peak values */
+        return;
     }
-    else
-    {
-        memset(peaks->peak, 0, sizeof (peaks->peak));
-        peaks->end_addr = NULL;
+
+    pcm_zero_peaks(desc->chnum, peaks);
+}
+
+/* Called back by driver when last buffer is ready or an error occurs */
+void pcm_rec_dma_complete_callback(int status)
+{
+    struct pcm_stream_desc *desc = cur_rec_desc;
+    pcm_rec_callback_type callback = desc->callback_rec;
+
+    desc->addr_rec = NULL;
+    desc->frames = 0;
+
+    if (callback) {
+        status = callback(status, &desc->addr_rec, &desc->frames);
+        ALIGN_AUDIOBUF(desc->addr_rec, desc->frames, 2*2);
+    }
+
+    if (status == 0 && desc->addr_rec && desc->frames) {
+        desc->seqnum_rec++;
+        pcm_rec_dma_capture_frames(desc->addr_rec, desc->frames);
+    }
+    else {
+        /* Error, callback missing or no more DMA to do */
+        pcm_rec_stop_capture(desc);
     }
 }
 
-bool pcm_is_recording(void)
+static int pcm_recording_init(struct pcm_stream_desc *desc)
 {
-    return pcm_recording;
+    logf("pcm_recording_init");
+
+    int rc = -1;
+
+    lock_stream_callback(desc);
+
+    if (!cur_rec_desc) {
+        logf(" pcm_rec_dma_init");
+        pcm_rec_dma_init();
+        cur_rec_desc = desc;
+        rc = 0;
+    }
+
+    unlock_stream_callback(desc);
+
+    return rc;
 }
 
-/****************************************************************************
- * Functions that do not require targeted implementation but only a targeted
- * interface
- */
-
-void pcm_init_recording(void)
+static void pcm_recording_close(struct pcm_stream_desc *desc)
 {
-    logf("pcm_init_recording");
+    logf("pcm_recording_close");
 
-    pcm_wait_for_init();
+    lock_stream_callback(desc);
 
-    /* Stop the beasty before attempting recording */
-    mixer_reset();
-
-    /* Recording init is locked unlike general pcm init since this is not
-     * just a one-time event at startup and it should and must be safe by
-     * now. */
-    pcm_rec_lock();
-
-    logf(" pcm_rec_dma_init");
-    pcm_recording_stopped();
-    pcm_rec_dma_init();
-
-    pcm_rec_unlock();
-}
-
-void pcm_close_recording(void)
-{
-    logf("pcm_close_recording");
-
-    pcm_rec_lock();
-
-    if (pcm_recording)
-    {
-        logf(" pcm_rec_dma_stop");
-        pcm_rec_dma_stop();
-        pcm_recording_stopped();
+    if (desc->state != PCM_STATE_STOPPED) {
+        logf(" pcm_rec_stop_capture");
+        pcm_rec_stop_capture(desc);
     }
 
     logf(" pcm_rec_dma_close");
     pcm_rec_dma_close();
+    cur_rec_desc = NULL;
 
-    pcm_rec_unlock();
+    unlock_stream_callback(desc);
 }
 
-void pcm_record_data(pcm_rec_callback_type more_ready,
-                     pcm_status_callback_type status_cb,
-                     void *addr, unsigned long frames)
+int pcm_record_data(pcm_handle_t pcm,
+                    pcm_record_callback_type callback,
+                    void *addr,
+                    unsigned long frames,
+                    const struct pcm_format *format)
 {
     logf("pcm_record_data");
 
-    ALIGN_AUDIOBUF(addr, frames);
-
-    if (!(addr && frames))
-    {
-        logf(" no buffer");
-        return;
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        return -1;
     }
 
-    pcm_rec_lock();
+    lock_stream_callback(desc);
 
-    pcm_callback_more_ready = more_ready;
-    pcm_rec_status_callback = status_cb;
-
-    logf(" pcm_rec_dma_start");
-    pcm_apply_settings();
-    pcm_rec_dma_start(addr, frames);
-    pcm_recording = true;
-    pcm_rec_buf_seq_num++;
-
-    pcm_rec_unlock();
-} /* pcm_record_data */
-
-void pcm_stop_recording(void)
-{
-    logf("pcm_stop_recording");
-
-    pcm_rec_lock();
-
-    if (pcm_recording)
-    {
-        logf(" pcm_rec_dma_stop");
-        pcm_rec_dma_stop();
-        pcm_recording_stopped();
+    if (desc->state != PCM_STATE_STOPPED) {
+        logf("  pcm_rec_stop_capture");
+        pcm_rec_stop_capture(desc);
     }
 
-    pcm_rec_unlock();
-} /* pcm_stop_recording */
+    int rc = setup_record_format(desc, format);
 
-bool pcm_rec_dma_complete_callback(enum pcm_dma_status status,
-                                   void **addr, unsigned long *frames)
-{
-     /* Check status callback first if error */
-    if (status < PCM_DMAST_OK)
-        status = pcm_rec_dma_status_callback(status);
+    if (rc == 0) {
+        ALIGN_AUDIOBUF(addr, frames, 2*2);
 
-    pcm_rec_callback_type have_more = pcm_callback_more_ready;
+        if (addr && frames) {
+            desc->addr_rec     = addr;
+            desc->frames       = frames;
+            desc->callback_rec = callback;
+            desc->seqnum_rec++;
 
-    if (have_more && status >= PCM_DMAST_OK)
-    {
-        /* Call registered callback to obtain next buffer */
-        have_more(addr, frames);
-        ALIGN_AUDIOBUF(*addr, *frames);
-
-        if (*addr && *frames)
-        {
-            pcm_rec_buf_seq_num++;
-            return true;
+            pcm_apply_settings();
+            pcm_rec_dma_capture_frames_prepare();
+            pcm_rec_dma_capture_frames(addr, frames);
+            desc->state = PCM_STATE_RUNNING;
+        }
+        else {
+            logf(" no buffer");
         }
     }
 
-    /* Error, callback missing or no more DMA to do */
-    pcm_rec_dma_stop();
-    pcm_recording_stopped();
+    unlock_stream_callback(desc);
 
-    return false;
+    return 0;
+}
+
+int pcm_record_stop(pcm_handle_t pcm)
+{
+    logf("pcm_record_stop");
+
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        return -1;
+    }
+
+    lock_stream_callback(desc);
+
+    if (desc->state != PCM_STATE_STOPPED) {
+        logf(" pcm_rec_stop_capture");
+        pcm_rec_stop_capture(desc);
+    }
+
+    unlock_stream_callback(desc);
+
+    return 0;
 }
 
 #endif /* HAVE_RECORDING */
+
+int pcm_open(pcm_handle_t *pcm_out, unsigned int flags)
+{
+    if (!pcm_out) {
+        return -1;
+    }
+
+    *pcm_out = 0;
+
+    pcm_wait_for_init();
+
+    int rc = -1;
+    struct pcm_stream_desc *desc = pcm_alloc_desc();
+
+    if (desc) {
+        desc->flags       = flags;
+        desc->start       = NULL;
+        desc->frames      = 0;
+        desc->amplitude   = PCM_AMP_UNITY;
+        desc->prev_frames = 0;
+        desc->callback    = NULL;
+        desc->state       = PCM_STATE_STOPPED;
+
+        if (IS_CAPTURE_STREAM(flags)) {
+        #ifdef HAVE_RECORDING
+            rc = pcm_recording_init(desc);
+        #endif
+        }
+        else {
+            rc = 0;
+        }
+
+        if (rc >= 0) {
+            *pcm_out = desc->id;
+            rc = 0;
+        }
+        else {
+            pcm_free_desc(desc);
+        }
+    }
+
+    return rc;
+}
+
+int pcm_close(pcm_handle_t pcm)
+{
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        return -1;
+    }
+
+#ifdef HAVE_RECORDING
+    if (IS_CAPTURE_STREAM(desc->flags)) {
+        pcm_recording_close(desc);
+    }
+    else
+#endif /* HAVE_RECORDING */
+    {
+        pcm_play_stop(pcm);
+    }
+
+    pcm_free_handle(desc);
+
+    return 0;
+}
+
+/* Lock out the stream's callback */
+int pcm_lock_callback(pcm_handle_t pcm)
+{
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        return -1;
+    }
+
+    lock_stream_callback(desc);
+
+    return 0;
+}
+
+/* Release the stream's callback lockout */
+int pcm_unlock_callback(pcm_handle_t pcm)
+{
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        return -1;
+    }
+
+    return unlock_stream_callback(desc);
+}
+
+/* Get the current stream state */
+int pcm_get_state(pcm_handle_t pcm)
+{
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        return -1;
+    }
+
+    return desc->state;
+}
+
+/* Set stream's amplitude factor */
+int pcm_set_amplitude(pcm_handle_t pcm, int32_t amplitude)
+{
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        return -1;
+    }
+
+    int32_t oldamp = desc->amplitude;
+
+    if (amplitude < PCM_AMP_MIN) {
+        amplitude = PCM_AMP_MIN;
+    }
+    else if (amplitude > PCM_AMP_MAX) {
+        amplitude = PCM_AMP_MAX;
+    }
+
+    desc->amplitude = amplitude;
+
+    if ((oldamp == PCM_AMP_UNITY) != (amplitude == PCM_AMP_UNITY)) {
+        pcm_mixer_format_config(desc);
+    }
+
+    return 0;
+}
+
+/* Returns amount data remaining in channel before next callback */
+unsigned long pcm_get_frames_waiting(pcm_handle_t pcm)
+{
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        return -1;
+    }
+
+    return desc->frames;
+}
+
+/* Return pointer to channel's playing audio data and the frames remaining */
+const void * pcm_get_playing_buffer(pcm_handle_t pcm,
+                                    unsigned long *frames_rem)
+{
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        *frames_rem = 0;
+        return NULL;
+    }
+
+    return pcm_play_get_remaining_frames(desc, frames_rem);
+}
+
+/* Calculate peak values for stream */
+int pcm_get_peaks(pcm_handle_t pcm, struct pcm_peaks *peaks)
+{
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        return -1;
+    }
+
+#ifdef HAVE_RECORDING
+    if (IS_CAPTURE_STREAM(desc->flags)) {
+        pcm_recording_get_peaks(desc, peaks);
+    }
+    else
+#endif /* HAVE_RECORDING */
+    {
+        pcm_play_get_peaks(desc, peaks);
+    }
+
+    return desc->sample_depth;
+}
+
+/* Adjust channel pointer by a given offset to support movable buffers */
+int pcm_adjust_address(pcm_handle_t pcm, off_t offset)
+{
+    struct pcm_stream_desc *desc = pcm_handle_desc(pcm);
+    if (!desc) {
+        return -1;
+    }
+
+    lock_stream_callback(desc);
+
+#ifdef HAVE_RECORDING
+    if (IS_CAPTURE_STREAM(desc->flags)) {
+        /* recording buffers can't be movable at this time since they're being
+           written directly by the driver */
+        unlock_stream_callback(desc);
+        return -1;
+    }
+#endif /* HAVE_RECORDING */
+
+    /* Makes no difference if it's stopped */
+    desc->addr += offset;
+    unlock_stream_callback(desc);
+
+    return 0;
+}

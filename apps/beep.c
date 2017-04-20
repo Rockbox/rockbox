@@ -22,13 +22,13 @@
 #include "system.h"
 #include "settings.h"
 #include "pcm.h"
-#include "pcm_mixer.h"
 #include "misc.h"
 #include "fixedpoint.h"
 
 /** Beep generation, CPU optimized **/
 #include "asm/beep.c"
 
+static struct pcm_channel *beep_chan; /* Opened PCM channel */
 static uint32_t beep_phase;      /* Phase of square wave generator */
 static uint32_t beep_step;       /* Step of square wave generator on each sample */
 static unsigned long beep_rem;   /* Number of frames remaining to generate */
@@ -37,13 +37,16 @@ static unsigned long beep_rem;   /* Number of frames remaining to generate */
 
 /* Reserve enough static space for keyclick to fit in worst case */
 #define BEEP_BUF_FRAMES  BEEP_FRAMES(PLAY_SAMPR_MAX, KEYCLICK_DURATION)
-static int16_t beep_buf[BEEP_BUF_FRAMES*2] IBSS_ATTR ALIGNED_ATTR(4);
+static int16_t beep_buf[BEEP_BUF_FRAMES];
 
 /* Callback to generate the beep frames - also don't want inlining of
    call below in beep_play */
-static NO_INLINE void
-beep_get_more(const void **start, unsigned long *frames)
+static NO_INLINE int
+beep_get_more(int status, const void **start, unsigned long *frames)
 {
+    if (status < 0)
+        return status;
+
     unsigned long rem = beep_rem;
 
     if (rem)
@@ -54,6 +57,8 @@ beep_get_more(const void **start, unsigned long *frames)
         *frames = rem;
         beep_generate(beep_buf, rem, &beep_phase, beep_step);
     }
+
+    return 0;
 }
 
 /* Generates a constant square wave sound with a given frequency in Hertz for
@@ -61,16 +66,16 @@ beep_get_more(const void **start, unsigned long *frames)
 void beep_play(unsigned int frequency, unsigned int duration,
                unsigned int amplitude)
 {
-    mixer_channel_stop(PCM_MIXER_CHAN_BEEP);
+    pcm_play_stop(beep_chan);
 
     if (frequency == 0 || duration == 0 || amplitude == 0)
         return;
 
-    if (amplitude > INT16_MAX)
-        amplitude = INT16_MAX;
+    if (!beep_chan && pcm_open(&beep_chan, PCM_STREAM_PLAYBACK))
+        return;
 
     /* Setup the parameters for the square wave generator */
-    uint32_t fout = mixer_get_frequency();
+    uint32_t fout = pcm_get_frequency();
     beep_phase = 0;
     beep_step = fp_div(frequency, fout, 32);
     beep_rem = BEEP_FRAMES(fout, duration);
@@ -80,12 +85,13 @@ void beep_play(unsigned int frequency, unsigned int duration,
     unsigned long count;
 
     /* Generate first frame here */
-    beep_get_more(&start, &count);
+    beep_get_more(0, &start, &count);
 
-    mixer_channel_set_amplitude(PCM_MIXER_CHAN_BEEP,
-                                amplitude*MIX_AMP_UNITY / INT16_MAX);
+    if (amplitude > INT16_MAX)
+        amplitude = INT16_MAX;
 
-    mixer_channel_play_data(PCM_MIXER_CHAN_BEEP,
-                            beep_rem ? beep_get_more : NULL,
-                            start, count);
+    pcm_set_amplitude(beep_chan, amplitude*MIX_AMP_UNITY / INT16_MAX);
+
+    pcm_play_data(beep_chan, beep_rem ? beep_get_more : NULL,
+                  start, count, PCM_FORMAT(PCM_FORMAT_S16_2, 1));
 }

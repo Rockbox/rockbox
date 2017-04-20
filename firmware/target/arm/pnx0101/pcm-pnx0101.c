@@ -31,18 +31,22 @@ short __attribute__((section(".dmabuf"))) dma_buf_right[DMA_BUF_SAMPLES];
 const int16_t* p IBSS_ATTR;
 unsigned long p_frames IBSS_ATTR;
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
 }
 
-void pcm_play_dma_start(const void *addr, unsigned long frames)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
 {
     p = addr;
     p_frames = frames;
+}
+
+void pcm_play_dma_prepare(void)
+{
 }
 
 void pcm_play_dma_stop(void)
@@ -64,8 +68,6 @@ static inline void fill_dma_buf(int offset)
 
     if (pcm_playing && !pcm_paused)
     {
-        bool new_buffer =false;
-
         do
         {
             unsigned long count;
@@ -106,17 +108,10 @@ static inline void fill_dma_buf(int offset)
             }
             p = tmp_p;
 
-            if (new_buffer)
-            {
-                new_buffer = false;
-                pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-            }
-
             if (l >= lend)
                 return;
 
-            new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK,
-                                                        &p, &p_frames);
+            pcm_play_dma_complete(0);
         }
         while (p_frames);
     }

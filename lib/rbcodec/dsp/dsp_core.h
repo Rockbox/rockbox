@@ -77,8 +77,8 @@ struct dsp_buffer
     union
     {
         const void *pin[2];      /* 04h: Channel pointers (In) */
-        int32_t *p32[2];         /* 04h: Channel pointers (Int) */
-        int16_t *p16out;         /* 04h: DSP output buffer (Out) */
+        int32_t    *p32[2];      /* 04h: Channel pointers (Int) */
+        void       *pout;        /* 04h: DSP output buffer (Out) */
     };
     union
     {
@@ -114,7 +114,8 @@ static inline void dsp_advance_buffer_output(struct dsp_buffer *buf,
 {
     buf->frames -= by_count;
     buf->frames_rem += by_count;
-    buf->p16out += 2 * by_count; /* Interleaved stereo */
+     /* Always interleaved for now */
+    buf->pout = PTR_ADD(buf->pout, by_count*PCM_SAMPLE_T_FRAME_SIZE);
 }
 
 /* Remove samples from internal input buffer (In, Int).

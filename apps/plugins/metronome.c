@@ -989,36 +989,19 @@ static void play_tock(void)
 
 #else /*  CONFIG_CODEC == SWCODEC */
 
-#define MET_IS_PLAYING rb->pcm_is_playing()
+#define MET_IS_PLAYING (!!(rb->pcm_get_status() & PCM_STATUS_PLAYING))
 #define MET_PLAY_STOP rb->audio_stop()
-
-static int16_t pcm_buf[MAX(TICK_LEN, TOCK_LEN)*2] ALIGNED_ATTR(4);
-static int inbuffer = 0;
 
 static void play_tick(void)
 {
-    if (inbuffer != 1)
-    {
-        for (size_t i = 0; i < TICK_LEN; i++)
-            pcm_buf[i*2] = pcm_buf[i*2+1] = tick_sound[i];
-
-        inbuffer = 1;
-    }
-
-    rb->pcm_play_data(NULL, NULL, pcm_buf, TICK_LEN);
+    rb->pcm_play_data(NULL, tick_sound, TICK_LEN,
+                      PCM_FORMAT(PCM_FORMAT_S16, 1));
 }
 
 static void play_tock(void)
 {
-    if (inbuffer != 2)
-    {
-        for (size_t i = 0; i < TOCK_LEN; i++)
-            pcm_buf[i*2] = pcm_buf[i*2+1] = tock_sound[i];
-
-        inbuffer = 2;
-    }
-
-    rb->pcm_play_data(NULL, NULL, pcm_buf, TOCK_LEN);
+    rb->pcm_play_data(NULL, tock_sound, TOCK_LEN,
+                      PCM_FORMAT(PCM_FORMAT_S16, 1));
 }
 
 #endif /* CONFIG_CODEC != SWCODEC */

@@ -275,37 +275,25 @@ static bool pacbox_menu(void)
 
 /* Sound is emulated in ISR context, so not much is done per sound frame */
 #define NBSAMPLES    128
-static int16_t sound_buf[NBSAMPLES*2] ALIGNED_ATTR(4);
 #if CONFIG_CPU == MCF5249
 /* Not enough to put this in IRAM */
-static int16_t raw_buf[NBSAMPLES];
+#define SOUND_BUF_IBSS
 #else
-static int16_t raw_buf[NBSAMPLES] IBSS_ATTR;
+#define SOUND_BUF_IBSS IBSS_ATTR
 #endif
+
+static int16_t sound_buf[NBSAMPLES] SOUND_BUF_IBSS;
 
 /*
     Audio callback
  */
-static void get_more(const void **start, unsigned long *frames)
+static int get_more(int status, const void **start, unsigned long *frames)
 {
-    int16_t *raw, *out;
-
     /* Emulate the audio for the current register settings */
-    playSound(raw_buf, NBSAMPLES);
-
-    raw = raw_buf;
-    out = sound_buf;
-
-    /* Convert to stereo */
-    for (unsigned long i = NBSAMPLES; i; i--)
-    {
-        int16_t sample = *raw++;
-        *out++ = sample;
-        *out++ = sample;
-    }
-
+    playSound(sound_buf, NBSAMPLES);
     *start = sound_buf;
-    *frames = NBSAMPLES; 
+    *frames = NBSAMPLES;
+    return status;
 }
 
 /*
@@ -337,7 +325,8 @@ static void start_sound(void)
     wsg3_set_sampling_rate(rb->hw_freq_sampr[sr_index]);
 
     rb->pcm_set_frequency(rb->hw_freq_sampr[sr_index]);
-    rb->pcm_play_data(get_more, NULL, NULL, 0);
+    rb->pcm_play_data(get_more, NULL, 0,
+                      PCM_FORMAT(PCM_FORMAT_S16, 1));
 
     sound_playing = true;
 }

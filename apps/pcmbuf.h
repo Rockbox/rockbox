@@ -76,6 +76,7 @@ void pcmbuf_soft_mode(bool shhh);
 /* Time and position */
 unsigned int pcmbuf_get_position_key(void);
 void pcmbuf_sync_position_update(void);
+void pcmbuf_suspend_position_updates(bool suspend);
 
 /* Misc */
 bool pcmbuf_is_lowdata(void);
@@ -83,4 +84,7 @@ void pcmbuf_set_low_latency(bool state);
 void pcmbuf_update_frequency(void);
 unsigned int pcmbuf_get_frequency(void);
 
+void pcmbuf_get_peaks(struct audio_peaks *peaks, unsigned int fracbits);
+const void * pcmbuf_get_playing_frames(unsigned long *frames_rem);
+int pcmbuf_hook_add_remove(audio_pcm_hook_fn hook, bool add);
 #endif /* PCMBUF_H */

@@ -515,7 +515,7 @@ void redrawScreen(unsigned char force)
     rb->lcd_update();
 }
 
-void get_more(const void** start, unsigned long* frames)
+int get_more(int status, const void** start, unsigned long* frames)
 {
 #ifndef SYNC
     if(lastswap!=swap)
@@ -533,6 +533,8 @@ void get_more(const void** start, unsigned long* frames)
 #ifndef SYNC
     swap ^= 1;
 #endif
+
+    return status;
 }
 
 int beatboxmain()
@@ -542,7 +544,8 @@ int beatboxmain()
 
     numberOfSamples=44100/10;
     synthbuf();
-    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+    rb->pcm_play_data(&get_more, NULL, 0,
+                      SAMPLE_FORMAT(SAMPLE_FORMAT_S16, 2));
 
     rb->lcd_set_background(0x000000);
     rb->lcd_clear_display();

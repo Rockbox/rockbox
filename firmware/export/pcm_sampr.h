@@ -373,8 +373,8 @@ extern const unsigned long rec_freq_sampr[REC_NUM_FREQ];
 #endif
 
 #ifndef PCM_SAMPR_CONFIG_ONLY
-unsigned int pcm_sampr_to_hw_sampr(unsigned int samplerate,
-                                   unsigned int type);
+unsigned long pcm_sampr_to_hw_sampr(unsigned long samplerate,
+                                    unsigned int type);
 #endif
 
 #else /* ndef CONFIG_SAMPR_TYPES */

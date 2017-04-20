@@ -17,12 +17,13 @@ static int16_t *hwbuf;
 
 static bool newly_started;
 
-static void get_more(const void** start, unsigned long* frames)
+static int get_more(int status, const void** start, unsigned long* frames)
 {
     memcpy(hwbuf, buf[doneplay], BUF_COUNT*SAMPLE_SIZE);
     *start = hwbuf;
     *frames = BUF_COUNT;
     doneplay=1;
+    return status;
 }
 
 void rockboy_pcm_init(void)
@@ -77,7 +78,8 @@ int rockboy_pcm_submit(void)
 
     if(newly_started)
     {
-        rb->pcm_play_data(&get_more, NULL, NULL,0);
+        rb->pcm_play_data(get_more, NULL, 0,
+                          PCM_FORMAT(PCM_FORMAT_S16, 2));
         newly_started = false;
     }
 
