@@ -88,6 +88,7 @@ static void NORETURN_ATTR rds_thread(void)
     /* start up frozen */
     int timeout = TIMEOUT_BLOCK;
     struct queue_event ev;
+    bool rds_rdy = false;
 
     while (true) {
         queue_wait_w_tmo(&rds_queue, &ev, timeout);
@@ -96,10 +97,14 @@ static void NORETURN_ATTR rds_thread(void)
                 /* power up: timeout after 1 tick, else block indefinitely */
                 timeout = ev.data ? 1 : TIMEOUT_BLOCK;
                 break;
-            case SYS_TIMEOUT:
+            case SYS_TIMEOUT:;
                 /* Captures RDS data and processes it */
-                if ((si4709_read_reg(STATUSRSSI) & STATUSRSSI_RDSR) >> 8) {
-                    si4700_rds_process();
+                bool rdsr = si4709_read_reg(STATUSRSSI) & STATUSRSSI_RDSR;
+                if (rdsr != rds_rdy) {
+                    rds_rdy = rdsr;
+                    if (rdsr) {
+                        si4700_rds_process();
+                    }
                 }
                 break;
         }
