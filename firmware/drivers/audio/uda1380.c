@@ -167,7 +167,7 @@ void audiohw_set_treble(int value)
                               | TREBLEL(value) | TREBLER(value));
 }
 
-static void audiohw_mute(bool mute)
+void audiohw_mute(bool mute)
 {
     unsigned int value = uda1380_regs[REG_MUTE];
 
@@ -279,10 +279,7 @@ void audiohw_init(void)
         /* this shoud never (!) happen. */
         logf("uda1380: audiohw_init failed");
     }
-}
 
-void audiohw_postinit(void)
-{
     /* Sleep a while so the power can stabilize (especially a long
        delay is needed for the line out connector). */
     sleep(HZ);
@@ -290,9 +287,8 @@ void audiohw_postinit(void)
     /* Power on FSDAC and HP amp. */
     uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_DAC | PON_HP);
 
-    /* UDA1380: Unmute the master channel
+    /* UDA1380: May unmute the master channel
        (DAC should be at zero point now). */
-    audiohw_mute(false);
 }
 
 void audiohw_set_prescaler(int val)

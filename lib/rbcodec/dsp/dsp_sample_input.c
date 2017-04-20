@@ -48,11 +48,10 @@
  * Input operates similarly to how an out-of-place processing stage should
  * behave.
  */
-
-extern void dsp_sample_output_init(struct sample_io_data *this);
-extern void dsp_sample_output_flush(struct sample_io_data *this);
-extern void dsp_sample_output_format_change(struct sample_io_data *this,
-                                            struct sample_format *format);
+bool dsp_sample_output_configure(struct sample_io_data *this,
+                                 unsigned int setting,
+                                 intptr_t value,
+                                 intptr_t *outval);
 
 #define SAMPLE_BUF_PERIOD 128 /* Per channel, per DSP */
 /* CODEC_IDX_AUDIO = left and right, CODEC_IDX_VOICE = mono */
@@ -238,8 +237,8 @@ void dsp_sample_input_format_change(struct sample_io_data *this,
 
     this->format_dirty = 0;
     this->sample_buf.format = *format;
-    this->input_samples = fns[this->stereo_mode]
-                             [this->sample_depth > NATIVE_DEPTH ? 1 : 0];
+    this->input_samples = fns[this->in_pcm_stmode]
+                             [this->in_pcm_bits > WORD_DEPTH];
 }
 
 /* increment the format version counter */
@@ -287,9 +286,8 @@ static void INIT_ATTR dsp_sample_input_init(struct sample_io_data *this,
 static void INIT_ATTR dsp_sample_io_init(struct sample_io_data *this,
                                          enum dsp_ids dsp_id)
 {
-    this->output_sampr = DSP_OUT_DEFAULT_HZ;
     dsp_sample_input_init(this, dsp_id);
-    dsp_sample_output_init(this);
+    dsp_sample_output_configure(this, DSP_INIT, dsp_id, NULL);
 }
 
 bool dsp_sample_io_configure(struct sample_io_data *this,
@@ -309,11 +307,10 @@ bool dsp_sample_io_configure(struct sample_io_data *this,
         format_change_set(this);
         this->format.num_channels = 2;
         this->format.frac_bits = WORD_FRACBITS;
-        this->format.output_scale = WORD_FRACBITS + 1 - NATIVE_DEPTH;
         this->format.frequency = this->output_sampr;
         this->format.codec_frequency = this->output_sampr;
-        this->sample_depth = NATIVE_DEPTH;
-        this->stereo_mode = STEREO_NONINTERLEAVED;
+        this->in_pcm_stmode = STEREO_NONINTERLEAVED;
+        this->in_pcm_bits = WORD_DEPTH;
         break;
 
     case DSP_SET_FREQUENCY:
@@ -325,22 +322,19 @@ bool dsp_sample_io_configure(struct sample_io_data *this,
 
     case DSP_SET_SAMPLE_DEPTH:
         format_change_set(this);
-        this->format.frac_bits =
-            value <= NATIVE_DEPTH ? WORD_FRACBITS : value;
-        this->format.output_scale =
-            this->format.frac_bits + 1 - NATIVE_DEPTH;
-        this->sample_depth = value;
+        this->format.frac_bits = value <= WORD_DEPTH ? WORD_FRACBITS : value;
+        this->in_pcm_bits = value <= WORD_DEPTH ? WORD_DEPTH : value + 1;
         break;
 
     case DSP_SET_STEREO_MODE:
         format_change_set(this);
         this->format.num_channels = value == STEREO_MONO ? 1 : 2;
-        this->stereo_mode = value;
+        this->in_pcm_stmode = value;
         break;
 
     case DSP_FLUSH:
         dsp_sample_input_flush(this);
-        dsp_sample_output_flush(this);
+        dsp_sample_output_configure(this, DSP_FLUSH, 0, NULL);
         break;
 
     case DSP_SET_PITCH:
@@ -350,20 +344,8 @@ bool dsp_sample_io_configure(struct sample_io_data *this,
             fp_mul(value, this->format.codec_frequency, 16);
         break;
 
-    case DSP_SET_OUT_FREQUENCY:
-        value = value > 0 ? value : DSP_OUT_DEFAULT_HZ;
-        value = MIN(DSP_OUT_MAX_HZ, MAX(DSP_OUT_MIN_HZ, value));
-        *value_p = value;
-
-        if ((unsigned int)value == this->output_sampr)
-            return true; /* No change; don't broadcast */
-
-        this->output_sampr = value;
-        break;
-
-    case DSP_GET_OUT_FREQUENCY:
-        *value_p = this->output_sampr;
-        return true; /* Only I/O handles it */
+    default:
+        return dsp_sample_output_configure(this, setting, value, value_p);
     }
 
     return false;

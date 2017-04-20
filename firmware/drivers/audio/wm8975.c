@@ -88,7 +88,7 @@ static int vol_tenthdb2hw(int db)
     }
 }
 
-static void audiohw_mute(bool mute)
+void audiohw_mute(bool mute)
 {
     if (mute) {
         /* Set DACMU = 1 to soft-mute the audio DACs. */
@@ -106,7 +106,7 @@ static void audiohw_mute(bool mute)
    We might want to change this for all targets,
    but it has only been tested on iPod Nano 2G so far. */
 #ifdef IPOD_NANO2G
-void audiohw_preinit(void)
+void audiohw_codec_init(void)
 {
     wm8975_write(RESET, RESET_RESET);
 
@@ -118,17 +118,14 @@ void audiohw_preinit(void)
 
     wm8975_write(PWRMGMT1, wm8975_regs[PWRMGMT1]);
     wm8975_write(PWRMGMT2, wm8975_regs[PWRMGMT2]);
-}
 
-void audiohw_postinit(void)
-{
     wm8975_regs[PWRMGMT1] &= ~PWRMGMT1_VMIDSEL_MASK;
     wm8975_regs[PWRMGMT1] |= PWRMGMT1_VMIDSEL_50K;
     wm8975_write(PWRMGMT1, wm8975_regs[PWRMGMT1]);
-    audiohw_mute(false);
 }
+
 #else /* !IPOD_NANO2G */
-void audiohw_preinit(void)
+void audiohw_codec_init(void)
 {
     /* POWER UP SEQUENCE */
     wm8975_write(RESET, RESET_RESET);
@@ -162,11 +159,6 @@ void audiohw_preinit(void)
     
     wm8975_write(MOUTMIX1, 0);
     wm8975_write(MOUTMIX2, 0);
-}
-
-void audiohw_postinit(void)
-{
-    audiohw_mute(false);
 }
 #endif
 

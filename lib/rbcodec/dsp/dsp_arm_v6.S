@@ -31,15 +31,23 @@ sample_output_mono:
     @ input: r0 = this, r1 = src, r2 = dst
     stmfd   sp!, { r4, lr }            @
                                        @
-    ldr     r0, [r0]                   @ r0 = this->frames_out
-    ldr     r3, [r2, #4]               @ r3 = dst->p16out
+    ldm     r0, { r0, r12 }            @ r0 = this->frames_out
+                                       @ r12 = this->out_pcm_shift.this->out_pcm_chnum
+    ldr     r3, [r2, #4]               @ r3 = dst->pout
     ldr     r2, [r1, #4]               @ r2 = src->p32[0]
-    ldrb    r1, [r1, #19]              @ r1 = src->format.output_scale
                                        @
+    uxtb    r14, r12, ror #8           @ r14 = this->out_pcm_chnum
+    sxtb    r12, r12                   @ r12 = this->out_pcm_shift
+                                       @
+    rsb     r1, r12, #0                @ is 2^n; this downscales
+    sub     r12, r1, #1                @
     mov     r4, #1                     @ r4 = 1 << (scale - 1)
-    mov     r4, r4, lsl r1             @
+    mov     r4, r4, lsl r12            @
+                                       @
+    cmp     r14, #1                    @ mono output?
+    beq     3f                         @
+                                       @
     subs    r0, r0, #1                 @ odd: end at 0; even: end at wrap
-    mov     r4, r4, lsr #1             @
     beq     2f                         @ Zero? Only one sample!
                                        @
 1:                                     @
@@ -67,6 +75,35 @@ sample_output_mono:
     str     r12, [r3]                  @ store So
                                        @
     ldmfd   sp!, { r4, pc }            @
+                                       @
+3:                                     @
+    subs    r0, r0, #1                 @ odd: end at 0; even: end at wrap
+    beq     5f                         @ Zero? Only one sample!
+                                       @
+4:                                     @
+    ldmia   r2!, { r12, r14 }          @ load Mi0, Mi1
+    qadd    r12, r12, r4               @ round, scale, saturate and
+    qadd    r14, r14, r4               @ pack Mi0 to Mo0, Mi1 to Mo1
+    mov     r12, r12, asr r1           @
+    mov     r14, r14, asr r1           @
+    ssat    r12, #16, r12              @
+    ssat    r14, #16, r14              @
+    subs    r0, r0, #2                 @
+    pkhbt   r12, r12, r14, asl #16     @
+    str     r12, [r3], #4              @ store Mo0, Mo1
+    bhi     4b                         @
+                                       @
+    ldmlofd sp!, { r4, pc }            @ if count was even, we're done
+                                       @
+5:                                     @
+    ldr     r12, [r2]                  @ round, scale, saturate
+    qadd    r12, r12, r4               @ Mi to Mo
+    mov     r12, r12, asr r1           @
+    ssat    r12, #16, r12              @
+    strh    r12, [r3]                  @ store Mo
+                                       @
+    ldmfd   sp!, { r4, pc }            @
+
     .size   sample_output_mono, .-sample_output_mono
 
 /****************************************************************************
@@ -81,15 +118,17 @@ sample_output_stereo:
     @ input: r0 = this, r1 = src, r2 = dst
     stmfd   sp!, { r4-r7, lr }         @
                                        @
+    ldrsb   r12, [r0, #4]              @ r12 = this->out_pcm_shift
     ldr     r0, [r0]                   @ r0 = this->frames_out
-    ldr     r3, [r2, #4]               @ r3 = dst->p16out
+    ldr     r3, [r2, #4]               @ r3 = dst->pout
     ldmib   r1, { r2, r4 }             @ r2 = src->p32[0], r4 = src->p32[1]
-    ldrb    r1, [r1, #19]              @ r1 = src->format.output_scale
                                        @
+    rsb     r1, r12, #0                @ is 2^n; this downscales
+    sub     r12, r1, #1                @
     mov     r5, #1                     @ r5 = 1 << (scale - 1)
-    mov     r5, r5, lsl r1             @
+    mov     r5, r5, lsl r12            @
+                                       @
     subs    r0, r0, #1                 @ odd: end at 0; even: end at wrap
-    mov     r5, r5, lsr #1             @
     beq     2f                         @ Zero? Only one sample!
                                        @
 1:                                     @

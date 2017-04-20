@@ -169,10 +169,6 @@ void audiohw_init(void)
     audiohw_set_volume (-250);    /* -25 dB */
 }
 
-void audiohw_postinit(void)
-{
-}
-
 void audiohw_close(void)
 {
     /* DAC, ADC off */
@@ -195,16 +191,18 @@ void audiohw_set_treble(int value)
     udacodec_write (UDA_REG_DATA0, UDA_DATA_CTRL1 | uda_regs [UDA_REG_ID_CTRL1] );
 }
 
-/*static void audiohw_mute(bool mute)
+void audiohw_mute(bool mute)
 {
+#if 0
     if (mute)
         uda_regs [UDA_REG_ID_CTRL2] |= UDA_MUTE_ON;
     else    
         uda_regs [UDA_REG_ID_CTRL2] &= ~UDA_MUTE_ON;
     
     udacodec_write (UDA_REG_DATA0, UDA_DATA_CTRL2 | uda_regs [UDA_REG_ID_CTRL2] );
+#endif
+    (void)mute;
 }
-*/
 
 #ifdef AUDIOHW_HAVE_PRESCALER
 void audiohw_set_prescaler(int val)

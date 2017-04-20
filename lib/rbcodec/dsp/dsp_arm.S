@@ -642,20 +642,26 @@ sample_output_mono:
     @ input: r0 = this, r1 = src, r2 = dst
     stmfd   sp!, { r4-r6, lr }
 
+    ldrsb   r12, [r0, #4]              @ r12 = this->out_pcm_shift
+    ldrb    r5, [r0, #5]               @ r5 = this->out_pcm_chnum
     ldr     r0, [r0]                   @ r0 = this->frames_out
-    ldr     r3, [r2, #4]               @ r2 = dst->p16out
-    ldr     r2, [r1, #4]               @ r1 = src->p32[0]
-    ldrb    r1, [r1, #19]              @ r2 = src->format.output_scale
+    ldr     r3, [r2, #4]               @ r3 = dst->pout
+    ldr     r2, [r1, #4]               @ r2 = src->p32[0]
 
-    mov     r4, #1
-    mov     r4, r4, lsl r1             @ r4 = 1 << (scale-1)
-    mov     r4, r4, lsr #1
+    rsb     r1, r12, #0                @ r1 = right shift
+    sub     r12, r1, #1                @
+    mov     r4, #1                     @
+    mov     r4, r4, lsl r12            @ r4 = 1 << (scale-1)
+
     mvn     r14, #0x8000               @ r14 = 0xffff7fff, needed for
                                        @ clipping and masking
-    subs    r0, r0, #1                 @
-    beq     .som_singlesample          @ Zero? Only one sample!
+    cmp     r5, #1                     @ mono output?
+    beq     som1loop;
 
-.somloop:
+    subs    r0, r0, #1                 @
+    beq     .som2_singlesample         @ Zero? Only one sample!
+
+.som2loop:
     ldmia   r2!, { r5, r6 }
     add     r5, r5, r4                 @ r6 = (r6 + 1<<(scale-1)) >> scale
     mov     r5, r5, asr r1
@@ -667,29 +673,60 @@ sample_output_mono:
     mov     r12, r6, asr #15
     teq     r12, r12, asr #31
     eorne   r6, r14, r6, asr #31       @ Clip (-32768...+32767)
-
     and     r5, r5, r14, lsr #16
     and     r6, r6, r14, lsr #16
     orr     r5, r5, r5, lsl #16        @ pack first 2 halfwords into 1 word
     orr     r6, r6, r6, lsl #16        @ pack last 2 halfwords into 1 word
     stmia   r3!, { r5, r6 }
-
     subs    r0, r0, #2
-    bhi     .somloop
+    bhi     .som2loop
 
     ldmpc   cond=lo, regs=r4-r6        @ even 'count'? return
 
-.som_singlesample:
+.som2_singlesample:
     ldr     r5, [r2]                   @ do odd sample
     add     r5, r5, r4
     mov     r5, r5, asr r1
     mov     r12, r5, asr #15
     teq     r12, r12, asr #31
-    eorne   r5, r14, r5, asr #31
-
+    eorne   r5, r14, r5, asr #31       @ Clip (-32768...+32767)
     and     r5, r5, r14, lsr #16       @ pack 2 halfwords into 1 word
     orr     r5, r5, r5, lsl #16
     str     r5, [r3]
+
+    ldmpc   regs=r4-r6
+
+.som1start:
+    subs    r0, r0, #1                 @
+    beq     .som1_singlesample         @ Zero? Only one sample!
+
+.som1loop:
+    ldmia   r2!, { r5, r6 }
+    add     r5, r5, r4                 @ r6 = (r6 + 1<<(scale-1)) >> scale
+    mov     r5, r5, asr r1
+    mov     r12, r5, asr #15
+    teq     r12, r12, asr #31
+    eorne   r5, r14, r5, asr #31       @ Clip (-32768...+32767)
+    add     r6, r6, r4
+    mov     r6, r6, asr r1             @ r7 = (r7 + 1<<(scale-1)) >> scale
+    mov     r12, r6, asr #15
+    teq     r12, r12, asr #31
+    eorne   r6, r14, r6, asr #31       @ Clip (-32768...+32767)
+    strh    r5, [r3], #2
+    strh    r6, [r3], #2
+    subs    r0, r0, #2
+    bhi     .som1loop
+
+    ldmpc   cond=lo, regs=r4-r6        @ even 'count'? return
+
+.som1_singlesample:
+    ldr     r5, [r2]                   @ do odd sample
+    add     r5, r5, r4
+    mov     r5, r5, asr r1
+    mov     r12, r5, asr #15
+    teq     r12, r12, asr #31
+    eorne   r5, r14, r5, asr #31      @ Clip (-32768...+32767)
+    strh    r5, [r3]
 
     ldmpc   regs=r4-r6
     .size   sample_output_mono, .-sample_output_mono
@@ -706,14 +743,15 @@ sample_output_stereo:
     @ input: r0 = this, r1 = src, r2 = dst
     stmfd   sp!, { r4-r9, lr }
 
+    ldrsb   r12, [r0, #4]              @ r12 = this->out_pcm_shift
     ldr     r0, [r0]                   @ r0 = this->frames_out
-    ldr     r3, [r2, #4]               @ r3 = dsp->p16out
+    ldr     r3, [r2, #4]               @ r3 = dsp->pout
     ldmib   r1, { r2, r5 }             @ r2 = src->p32[0], r5 = src->p32[1]
-    ldrb    r1, [r1, #19]              @ r1 = src->format.output_scale
 
-    mov     r4, #1
-    mov     r4, r4, lsl r1             @ r4 = 1 << (scale-1)
-    mov     r4, r4, lsr #1             @
+    rsb     r1, r12, #0                @ is 2^n; this downscales
+    sub     r12, r1, #1                @
+    mov     r4, #1                     @
+    mov     r4, r4, lsl r12            @ r4 = 1 << (scale-1)
 
     mvn     r14, #0x8000               @ r14 = 0xffff7fff, needed for
                                        @ clipping and masking

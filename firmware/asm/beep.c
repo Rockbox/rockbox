@@ -32,11 +32,7 @@ static FORCE_INLINE void beep_generate(int16_t *out, unsigned long count,
 
     do
     {
-        int16_t amp = ph > UINT32_MAX / 2 ? -INT16_MAX : INT16_MAX;
-
-        *out++ = amp;
-        *out++ = amp;
-
+        *out++ = ph > UINT32_MAX / 2 ? -INT16_MAX : INT16_MAX;
         ph += step;
     }
     while (--count);
@@ -44,5 +40,4 @@ static FORCE_INLINE void beep_generate(int16_t *out, unsigned long count,
     *phase = ph;
 }
 
-#define BEEP_GENERIC
 #endif /* CPU_* */

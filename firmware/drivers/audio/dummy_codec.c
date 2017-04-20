@@ -26,11 +26,14 @@
 #include "system.h"
 #include "pcm_sw_volume.h"
 
-void audiohw_preinit(void) { }
-
-void audiohw_postinit(void) { }
+void audiohw_codec_init(void) { }
 
 void audiohw_close(void) { }
+
+void audiohw_mute(bool mute)
+{
+    (void)mute;
+}
 
 void audiohw_set_frequency(int fsel)
 {

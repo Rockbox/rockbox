@@ -258,7 +258,7 @@ static int playback_callback(int action,const struct menu_item_ex *this_item)
 #ifdef HAVE_PLAY_FREQ
             if (this_item == &play_frequency)
             {
-                settings_apply_play_freq(global_settings.play_frequency, false);
+                audio_set_playback_frequency(global_settings.play_frequency);
                 break;
             }
 #endif /* HAVE_PLAY_FREQ */

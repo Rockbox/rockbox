@@ -103,7 +103,7 @@ void audiohw_init(void)
     /* reset the I2S controller into known state */
     i2s_reset();
 
-    audiohw_preinit();
+    audiohw_codec_init();
 }
 
 void wmcodec_write(int reg, int data)

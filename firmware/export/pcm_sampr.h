@@ -364,27 +364,20 @@ extern const unsigned long rec_freq_sampr[REC_NUM_FREQ];
 
 #endif /* HAVE_RECORDING */
 
-#ifdef CONFIG_SAMPR_TYPES
-
-#define SAMPR_TYPE_MASK (0xff << 24)
-#define SAMPR_TYPE_PLAY (0x00 << 24)
+#if defined(CONFIG_SAMPR_TYPES) && !defined(PCM_SAMPR_CONFIG_ONLY)
+enum pcm_sampr_type
+{
+    SAMPR_TYPE_PLAY,
 #ifdef HAVE_RECORDING
-#define SAMPR_TYPE_REC  (0x01 << 24)
+    SAMPR_TYPE_REC,
 #endif
+    SAMPR_TYPE_HW,
+};
 
-#ifndef PCM_SAMPR_CONFIG_ONLY
-unsigned int pcm_sampr_to_hw_sampr(unsigned int samplerate,
-                                   unsigned int type);
-#endif
+unsigned long pcm_sampr_convert(unsigned long samplerate,
+                                enum pcm_sampr_type type_from,
+                                enum pcm_sampr_type type_to);
 
-#else /* ndef CONFIG_SAMPR_TYPES */
-
-/* Types are ignored and == 0 */
-#define SAMPR_TYPE_PLAY 0
-#ifdef HAVE_RECORDING
-#define SAMPR_TYPE_REC  0
-#endif
-
-#endif /* CONFIG_SAMPR_TYPES */
+#endif /* defined(CONFIG_SAMPR_TYPES) && !defined(PCM_SAMPR_CONFIG_ONLY) */
 
 #endif /* PCM_SAMPR_H */

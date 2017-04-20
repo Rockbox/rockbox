@@ -64,6 +64,8 @@ static const unsigned int timerfreq_div = 500; /* 2 ms resolution */
    issues) */
 static const unsigned int blinklimit = 135;
 
+static pcm_handle_t pcm_handle;
+
 enum metronome_errors
 {
     MERR_NOTHING = 0
@@ -949,15 +951,10 @@ static bool sound_trigger = false;
 #ifdef SIMULATOR
 
 /* No audio in HWCODEC simulator build. */
-#define MET_IS_PLAYING 0
-#define MET_PLAY_STOP do {} while(0)
 static void play_tick(void){ printf("tick\n"); }
 static void play_tock(void){ printf("tock\n"); }
 
 #else
-
-#define MET_IS_PLAYING rb->mp3_is_playing()
-#define MET_PLAY_STOP rb->mp3_play_stop()
 
 static void callback(const void** start, size_t* size)
 {
@@ -989,36 +986,16 @@ static void play_tock(void)
 
 #else /*  CONFIG_CODEC == SWCODEC */
 
-#define MET_IS_PLAYING rb->pcm_is_playing()
-#define MET_PLAY_STOP rb->audio_stop()
-
-static int16_t pcm_buf[MAX(TICK_LEN, TOCK_LEN)*2] ALIGNED_ATTR(4);
-static int inbuffer = 0;
-
 static void play_tick(void)
 {
-    if (inbuffer != 1)
-    {
-        for (size_t i = 0; i < TICK_LEN; i++)
-            pcm_buf[i*2] = pcm_buf[i*2+1] = tick_sound[i];
-
-        inbuffer = 1;
-    }
-
-    rb->pcm_play_data(NULL, NULL, pcm_buf, TICK_LEN);
+    rb->pcm_play_data(pcm_handle, NULL, tick_sound, TICK_LEN,
+                      PCM_FORMAT(PCM_FORMAT_S16_2, 1));
 }
 
 static void play_tock(void)
 {
-    if (inbuffer != 2)
-    {
-        for (size_t i = 0; i < TOCK_LEN; i++)
-            pcm_buf[i*2] = pcm_buf[i*2+1] = tock_sound[i];
-
-        inbuffer = 2;
-    }
-
-    rb->pcm_play_data(NULL, NULL, pcm_buf, TOCK_LEN);
+    rb->pcm_play_data(pcm_handle, NULL, tock_sound, TOCK_LEN,
+                      PCM_FORMAT(PCM_FORMAT_S16_2, 1));
 }
 
 #endif /* CONFIG_CODEC != SWCODEC */
@@ -1455,11 +1432,14 @@ static void cleanup(void)
     if(fd >= 0) rb->close(fd);
 
     metronome_pause();
-    MET_PLAY_STOP; /* stop audio ISR */
+#if CONFIG_CODEC != SWCODEC
+    rb->mp3_play_stop(); /* stop audio ISR */
+#endif
     tweak_volume(0);
     rb->led(0);
 #if CONFIG_CODEC == SWCODEC
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    rb->pcm_set_frequency(pcm_handle, HW_SAMPR_RESET);
+    rb->pcm_close(pcm_handle);
 #endif
 }
 
@@ -1796,20 +1776,27 @@ enum plugin_status plugin_start(const void* file)
 
     mem_init();
 
-    if(MET_IS_PLAYING) MET_PLAY_STOP; /* stop audio IS */
-
 #if (CONFIG_CODEC != SWCODEC)
+    if(rb->mp3_is_playing())
+        rb->mp3_play_stop(); /* stop audio IS */
 #ifndef SIMULATOR
     rb->bitswap(tick_sound, sizeof(tick_sound));
     rb->bitswap(tock_sound, sizeof(tock_sound));
 #endif
 #else
+    if(!rb->plugin_get_audio_buffer(NULL)) /* stop playback */
+        return PLUGIN_ERROR;
+
+    pcm_handle = rb->pcm_open(PCM_STREAM_PLAYBACK);
+    if (!pcm_handle)
+        return PLUGIN_ERROR;
+
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPR_44);
+    rb->pcm_set_frequency(pcm_handle, SAMPR_44);
 #endif /* CONFIG_CODEC != SWCODEC */
 
     if(file)

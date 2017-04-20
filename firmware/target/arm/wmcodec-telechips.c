@@ -44,7 +44,7 @@
 void audiohw_init(void)
 {
 #if defined(HAVE_WM8731) || defined(HAVE_WM8751) || defined(HAVE_WM8985)
-    audiohw_preinit();
+    audiohw_codec_init();
 #endif
 }
 

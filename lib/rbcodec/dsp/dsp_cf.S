@@ -712,14 +712,13 @@ sample_output_stereo:
     movem.l     %d1-%d7/%a2-%a6, (%sp)    | be the far more common condition
     move.l      #0x80, %macsr             | put emac unit in signed int mode
     movem.l     52(%sp), %a0-%a2          | %a0 = this, %a1 = src, %a2 = dst
+    move.b      4(%a0), %d1               | %d1 = this->out_pcm_shift
     move.l      (%a0), %a0                | %a0 = this->frames_out
-    move.l      4(%a2), %a4               | %a4 = dst->p16out
+    move.l      4(%a2), %a4               | %a4 = dst->pout
     lea.l       (%a4, %a0.l*4), %a0       | %a0 = count -> end address
     movem.l     4(%a1), %a2-%a3           | %a2 = src->p32[0], %a3 = src->p32[1]
-    clr.l       %d1                       | %a1 = multiplier: (1 << (16 - scale))
-    move.b      19(%a1), %d1              | %d1 = src->format.output_scale
-    sub.l       #16, %d1                  |
-    neg.l       %d1                       |
+    ext.b       %d1                       | %a1 = multiplier: (1 << (16 - -scale))
+    add.l       #16, %d1                  |
     moveq.l     #1, %d0                   |
     asl.l       %d1, %d0                  |
     move.l      %d0, %a1                  |
@@ -825,14 +824,13 @@ sample_output_mono:
     movem.l     %d1-%d5/%a2-%a4, (%sp)    | be the far more common condition
     move.l      #0x80, %macsr             | put emac unit in signed int mode
     movem.l     36(%sp), %a0-%a2          | %a0 = this, %a1 = src, %a2 = dst
+    move.b      4(%a0), %d1               | %d1 = this->out_pcm_shift
     move.l      (%a0), %a0                | %a0 = this->frames_out
-    move.l      4(%a2), %a3               | %a3 = dst->p16out
+    move.l      4(%a2), %a3               | %a3 = dst->pout
     movem.l     4(%a1), %a2               | %a2 = src->p32[0]
     lea.l       (%a3, %a0.l*4), %a0       | %a0 = count -> end address
-    clr.l       %d1                       | %d5 = multiplier: (1 << (16 - scale))
-    move.b      19(%a1), %d1              | %d1 = src->format.output_scale
-    sub.l       #16, %d1                  |
-    neg.l       %d1                       |
+    ext.b       %d1                       | %d5 = multiplier: (1 << (16 - -scale))
+    add.l       #16, %d1                  |
     moveq.l     #1, %d5                   |
     asl.l       %d1, %d5                  |
     move.l      #0x8000, %a4              | %a4 = rounding term
@@ -907,3 +905,107 @@ sample_output_mono:
     lea.l       32(%sp), %sp              | cleanup
     rts                                   |
     .size      sample_output_mono, .-sample_output_mono
+
+/****************************************************************************
+ * void sample_output_mono_m(struct sample_io_data *this,
+ *                          struct dsp_buffer *src,
+ *                          struct dsp_buffer *dst)
+ *
+ * Same treatment as sample_output_mono but for one channel in and out
+ */
+    .section   .text
+    .align      2
+    .global    sample_output_mono_m
+sample_output_mono_m:
+    | input: 4(sp) = count, 8(sp) = src, 12(sp) = dst
+    lea.l       -36(%sp), %sp             | save registers
+    move.l      %macsr, %d1               | do it now as at many lines will
+    movem.l     %d1-%d6/%a2-%a4, (%sp)    | be the far more common condition
+    move.l      #0x80, %macsr             | put emac unit in signed int mode
+    movem.l     36(%sp), %a0-%a2          | %a0 = this, %a1 = src, %a2 = dst
+    move.b      4(%a0), %d1               | %d1 = this->out_pcm_shift
+    move.l      (%a0), %a0                | %a0 = this->frames_out
+    move.l      4(%a2), %a3               | %a3 = dst->pout
+    movem.l     4(%a1), %a2               | %a2 = src->p32[0]
+    lea.l       (%a3, %a0.l*2), %a0       | %a0 = count -> end address
+    ext.b       %d1                       | %d6 = multiplier: (1 << (16 - -scale))
+    add.l       #16, %d1                  |
+    moveq.l     #1, %d6                   |
+    asl.l       %d1, %d6                  |
+    move.l      #0x8000, %a4              | %a4 = rounding term
+    moveq.l     #30, %d0                  | %d0 = second line bound
+    add.l       %a3, %d0                  |
+    and.l       #0xfffffff0, %d0          |
+    cmp.l       %a0, %d0                  | at least a full line?
+    bhi.w       40f | word loop 1 start   | no? do as trailing words
+    sub.l       #16, %d0                  | %d0 = first line bound
+    cmp.l       %a3, %d0                  | any leading words?
+    bls.b       20f | line loop start     | no? start line loop
+10: | word loop 0                         |
+    move.l      (%a2)+, %d1               |
+    move.l      %a4, %acc0                |
+    mac.l       %d1, %d6, %acc0           | shift to high word
+    movclr.l    %acc0, %d1                |
+    swap.w      %d1                       |
+    move.w      %d1, (%a3)+               |
+    cmp.l       %a3, %d0                  |
+    bhi.b       10b | long loop 0         |
+20: | line loop start                     |
+    lea.l       -14(%a0), %a1             | %a1 = at or just before last line bound
+30: | line loop                           |
+    move.l      (%a2)+, %d0               | get next 8 samples and scale
+    move.l      %a4, %acc0                |
+    move.l      %acc0, %acc1              |
+    move.l      %acc1, %acc2              |
+    move.l      %acc2, %acc3              |
+    mac.l       %d0, %d6, (%a2)+, %d1, %acc0 |
+    mac.l       %d1, %d6, (%a2)+, %d2, %acc1 |
+    mac.l       %d0, %d6, (%a2)+, %d3, %acc2 |
+    mac.l       %d3, %d6  (%a2)+, %d4, %acc3 |
+    lea.l       16(%a3), %a3              | increment dest here, mitigate stalls
+    movclr.l    %acc0, %d0                |
+    movclr.l    %acc1, %d2                |
+    movclr.l    %acc2, %d1                |
+    movclr.l    %acc3, %d3                |
+    swap.w      %d2                       |
+    move.w      %d2, %d0                  |
+    swap.w      %d3                       |
+    move.w      %d3, %d1                  |
+    move.l      %a4, %acc0                |
+    move.l      %acc0, %acc1              |
+    move.l      %acc1, %acc2              |
+    move.l      %acc2, %acc3              |
+    mac.l       %d4, %d6, (%a2)+, %d5, %acc0 |
+    mac.l       %d5, %d6, (%a2)+, %d2, %acc1 |
+    mac.l       %d2, %d6, (%a2)+, %d3, %acc2 |
+    mac.l       %d3, %d6             , %acc3 |
+    movclr.l    %acc0, %d2                |
+    movclr.l    %acc1, %d4                |
+    movclr.l    %acc2, %d3                |
+    movclr.l    %acc3, %d5                |
+    swap.w      %d4                       |
+    move.w      %d4, %d2                  |
+    swap.w      %d5                       |
+    move.w      %d5, %d3                  |
+    movem.l     %d0-%d3, -16(%a3)         | write 8 mono samples
+    cmp.l       %a3, %a1                  |
+    bhi.b       30b | line loop           |
+40: | word loop 1 start                   |
+    cmp.l       %a3, %a0                  | any words left?
+    bls.b       60f | output end          | no? stop
+50: | loop loop 1                         |
+    move.l      (%a2)+, %d1               | handle trailing words
+    move.l      %a4, %acc0                |
+    mac.l       %d1, %d6, %acc0           | the same way as leading ones
+    movclr.l    %acc0, %d1                |
+    swap.w      %d1
+    move.w      %d1, (%a3)+               |
+    cmp.l       %a3, %a0                  |
+    bhi.b       50b | long loop 1         |
+60: | output end                          |
+    movem.l     (%sp), %d1-%d6/%a2-%a4    | restore registers
+    move.l      %d1, %macsr               |
+    lea.l       36(%sp), %sp              | cleanup
+    rts                                   |
+    .size      sample_output_mono_m, .-sample_output_mono_m
+
