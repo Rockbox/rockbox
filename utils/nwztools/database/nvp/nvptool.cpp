@@ -616,7 +616,7 @@ int do_extract(const char *output, int argc, char **argv)
             continue;
         }
         /* relocate the zoneinfo pointer */
-        void *Zone = elf_reloc_addr32_ptr(zoneinfo_ptr);;
+        void *Zone = elf_reloc_addr32_ptr(zoneinfo_ptr);
         if(Zone == nullptr)
         {
             printf("  %s\n", name);
