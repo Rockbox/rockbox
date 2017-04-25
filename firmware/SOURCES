@@ -86,9 +86,11 @@ target/hosted/filesystem-app.c
 #if defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
 target/hosted/kernel-unix.c
 target/hosted/filesystem-unix.c
+#ifndef SIMULATOR
 target/hosted/lc-unix.c
 drivers/lcd-memframe.c
 target/hosted/samsungypr/lcd-ypr.c
+#endif
 target/hosted/samsungypr/gpio-ypr.c
 #if CONFIG_TUNER
 target/hosted/samsungypr/radio-ypr.c
