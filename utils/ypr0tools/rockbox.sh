@@ -17,7 +17,7 @@
 if [ -e "/dev/r1Button" ]
 then
     # running on YP-R1 model (volume up button)
-    BTN=$(echo -e -n "\x02")
+    BTN=$(echo -e -n "\x03")
     VAL=$(dd if=/dev/r1Button bs=4 count=1)
 else
     # running on YP-R0 model (menu button)
