@@ -21,58 +21,116 @@
  *
  ****************************************************************************/
 
+/* system includes */
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <linux/i2c-dev.h>
 #include "stdint.h"
 #include "string.h"
+
+/* application includes */
 #include "kernel.h"
-
 #include "radio-ypr.h"
-#include "si4700.h"
 #include "power.h"
+#include "gpio-target.h"
+#include "gpio-ypr.h"
+#include "panic.h"
+#include "i2c-target.h"
 
+/* 7bits I2C address for Si4709
+ * (apparently not selectable by pins or revisions) */
+#define SI4709_I2C_SLAVE_ADDR   0x10
+
+/** i2c file handle */
 static int radio_dev = -1;
 
-void radiodev_open(void) {
-    radio_dev = open("/dev/si470x", O_RDWR);
+/* toggle radio RST pin */
+static void power_toggle(bool set)
+{
+    /* setup the GPIO port, as in OF */
+    gpio_set_iomux(GPIO_FM_BUS_EN, CONFIG_ALT3);
+    gpio_set_pad(GPIO_FM_BUS_EN, PAD_CTL_SRE_FAST | PAD_CTL_DRV_HIGH);
+    gpio_direction_output(GPIO_FM_BUS_EN);
+    gpio_set(GPIO_FM_BUS_EN, set);
 }
 
-void radiodev_close(void) {
-    close(radio_dev);
+void radiodev_open(void)
+{
+    int retval = -1;    /* ioctl return value */
+
+    /* open the I2C bus where the chip is attached to */
+    radio_dev = open(I2C_BUS_FM_RADIO, O_RDWR);
+
+    if (radio_dev == -1)
+    {
+        panicf("%s: failed to open /dev/i2c-1 device - %d", __FUNCTION__, retval);
+    }
+    else
+    {
+        /* device is open, go on */
+
+        /* set the slave address for the handle.
+         * Some other modules might have set the same slave address
+         * e.g. another module. Let's do a I2C_SLAVE_FORCE which does
+         * not care about looking for other init'ed i2c slaves */
+        retval = ioctl(radio_dev, I2C_SLAVE_FORCE, SI4709_I2C_SLAVE_ADDR);
+
+        if (retval == -1)
+        {
+            /* the ioctl call should never fail, if radio_dev is valid */
+            panicf("%s: failed to set slave address - %d", __FUNCTION__, retval);
+        }
+        else
+        {
+            /* initialization completed */
+        }
+    }
+
+    /* i2c subsystem ready, now toggle power to the chip */
+    power_toggle(true);
+    /* 100ms reset delay */
+    sleep(HZ/10);
+
 }
 
-/* High-level registers access */
-void si4709_write_reg(int addr, uint16_t value) {
-    sSi4709_t r = { .addr = addr, .value = value };
-    ioctl(radio_dev, IOCTL_SI4709_WRITE_BYTE, &r);
+void radiodev_close(void)
+{
+    /* power the chip down */
+    power_toggle(false);
+
+    /* close the i2c subsystem */
+    if (radio_dev != -1)
+    {
+        (void)close(radio_dev);
+    }
+    else
+    {
+        /* not opened */
+    }
+
+    /* set back to safe error value */
+    radio_dev = -1;
 }
 
-uint16_t si4709_read_reg(int addr) {
-    sSi4709_t r = { .addr = addr, .value = 0 };
-    ioctl(radio_dev, IOCTL_SI4709_READ_BYTE, &r);
-    return r.value;
-}
-
-/* Low-level i2c channel access */
+/* Low-level i2c channel access: write */
 int fmradio_i2c_write(unsigned char address, unsigned char* buf, int count)
 {
     (void)address;
-    sSi4709_i2c_t r = { .size = count, .buf = buf };
-    return ioctl(radio_dev, IOCTL_SI4709_I2C_WRITE, &r);
+    return write(radio_dev, buf, count);
 }
 
+/* Low-level i2c channel access: read */
 int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 {
     (void)address;
-    sSi4709_i2c_t r = { .size = count, .buf = buf };
-    return ioctl(radio_dev, IOCTL_SI4709_I2C_READ, &r);
+    return read(radio_dev, buf, count);
 }
 
 #ifdef HAVE_RDS_CAP
 
 /* Register we are going to poll */
-#define STATUSRSSI  0xA
+#define STATUSRSSI          (0xA)
 #define STATUSRSSI_RDSR     (0x1 << 15)
 
 /* Low-level RDS Support */
@@ -89,6 +147,7 @@ static void NORETURN_ATTR rds_thread(void)
     int timeout = TIMEOUT_BLOCK;
     struct queue_event ev;
     bool rds_rdy = false;
+    struct si4700_dbg_info radio_regs;
 
     while (true) {
         queue_wait_w_tmo(&rds_queue, &ev, timeout);
@@ -97,9 +156,10 @@ static void NORETURN_ATTR rds_thread(void)
                 /* power up: timeout after 1 tick, else block indefinitely */
                 timeout = ev.data ? 1 : TIMEOUT_BLOCK;
                 break;
-            case SYS_TIMEOUT:;
+            case SYS_TIMEOUT:
                 /* Captures RDS data and processes it */
-                bool rdsr = si4709_read_reg(STATUSRSSI) & STATUSRSSI_RDSR;
+                si4700_dbg_info(&radio_regs);
+                bool rdsr = radio_regs.regs[STATUSRSSI] & STATUSRSSI_RDSR;
                 if (rdsr != rds_rdy) {
                     rds_rdy = rdsr;
                     if (rdsr) {
