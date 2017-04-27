@@ -134,7 +134,14 @@ struct _fb_pixel {
 typedef struct _fb_pixel fb_data;
 #define FB_DATA_SZ 3
 #else /* LCD_DEPTH > 24 */
+#if (LCD_PIXELFORMAT == XRGB8888)
+struct _fb_pixel {
+    unsigned char b, g, r, x;
+};
+typedef struct _fb_pixel fb_data;
+#else
 typedef unsigned long fb_data;
+#endif
 #define FB_DATA_SZ 4
 #endif /* LCD_DEPTH */
 
@@ -348,7 +355,7 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #define RGB_UNPACK_BLUE_LCD(x)   _RGB_UNPACK_BLUE_LCD(x)
 #endif /* RGB565* */
 
-#elif LCD_PIXELFORMAT == RGB888
+#elif (LCD_PIXELFORMAT == RGB888) || (LCD_PIXELFORMAT == XRGB8888)
 #define LCD_MAX_RED    255
 #define LCD_MAX_GREEN  255
 #define LCD_MAX_BLUE   255
