@@ -670,7 +670,7 @@ int read_bmp_fd(int fd,
     /* Check if this fits the buffer */
     if (totalsize > maxsize) {
         DEBUGF("read_bmp_fd: Bitmap too large for buffer: "
-               "%d bytes.\n", totalsize);
+               "%d bytes (%d max).\n", totalsize, maxsize);
         return -6;
     }
 

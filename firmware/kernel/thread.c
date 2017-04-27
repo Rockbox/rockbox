@@ -37,6 +37,9 @@
 #endif
 #include "core_alloc.h"
 
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
+#include <errno.h>
+#endif
 /* Define THREAD_EXTRA_CHECKS as 1 to enable additional state checks */
 #ifdef DEBUG
 #define THREAD_EXTRA_CHECKS 1 /* Always 1 for DEBUG */

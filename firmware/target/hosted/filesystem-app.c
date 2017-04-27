@@ -48,7 +48,8 @@ static const char rbhome[] = HOME_DIR;
 #endif
 
 #if !(defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || defined(DX50) || \
-    defined(SONY_NWZ_LINUX) || defined(DX90)) && !defined(__PCTOOL__)
+    defined(SONY_NWZ_LINUX) || defined(DX90) || defined(AGPTEK_ROCKER)) && \
+    !defined(__PCTOOL__)
 /* Special dirs are user-accessible (and user-writable) dirs which take priority
  * over the ones where Rockbox is installed to. Classic example would be
  * $HOME/.config/rockbox.org vs /usr/share/rockbox */

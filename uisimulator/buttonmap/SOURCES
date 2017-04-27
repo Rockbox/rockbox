@@ -83,5 +83,7 @@ samsung-ypr0.c
 creative-zen.c
 #elif CONFIG_KEYPAD == SONY_NWZA860_PAD
 sony-nwza860.c
+#elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
+agptek-rocker.c
 #endif
 #endif /* SIMULATOR */

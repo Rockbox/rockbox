@@ -103,6 +103,8 @@ endif
 ifneq (,$(findstring bootloader,$(APPSDIR)))
   ifneq (,$(findstring sonynwz,$(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/sonynwz/sonynwz.make
+  else ifneq (,$(findstring rocker,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/agptek/rocker.make
   else
     include $(APPSDIR)/bootloader.make
   endif
@@ -141,6 +143,10 @@ else # core
 
   ifneq (,$(findstring sonynwz,$(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/sonynwz/sonynwz.make
+  endif
+
+  ifneq (,$(findstring rocker,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/agptek/rocker.make
   endif
 
   ifneq (,$(findstring android_ndk, $(APP_TYPE)))

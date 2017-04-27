@@ -315,4 +315,6 @@ keymaps/keymap-ihifi.c
 keymaps/keymap-ypr1.c
 #elif CONFIG_KEYPAD == DX50_PAD
 keymaps/keymap-dx50.c
+#elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
+keymaps/keymap-agptekrocker.c
 #endif

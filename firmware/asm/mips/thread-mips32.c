@@ -26,23 +26,22 @@
  *---------------------------------------------------------------------------
  */
 
-void start_thread(void); /* Provide C access to ASM label */
-static void USED_ATTR _start_thread(void)
+static void USED_ATTR start_thread(void *addr)
 {
-    /* t1 = context */
     asm volatile (
-      "start_thread:          \n"
         ".set noreorder       \n"
         ".set noat            \n"
-        "lw     $8,    4($9)  \n" /* Fetch thread function pointer ($8 = t0, $9 = t1) */
-        "lw     $29,  36($9)  \n" /* Set initial sp(=$29) */
-        "jalr   $8            \n" /* Start the thread */
-        "sw     $0,   44($9)  \n" /* Clear start address */
+        "lw     $t9,    4(%0)  \n" /* Fetch thread function pointer ($25 = t9) */
+        "lw     $sp,   40(%0)  \n" /* Set initial sp(=$29) */
+        "jalr   $t9            \n" /* Start the thread */
+        "sw     $zero, 48(%0)  \n" /* Clear start address */
         ".set at              \n"
         ".set reorder         \n"
+        : : "r" (addr) : "t9"
     );
     thread_exit();
 }
+
 
 /* Place context pointer in s0 slot, function pointer in s1 slot, and
  * start_thread pointer in context_start */
@@ -60,17 +59,18 @@ static inline void store_context(void* addr)
     asm volatile (
         ".set noreorder        \n"
         ".set noat             \n"
-        "sw    $16,  0(%0)     \n" /* s0 */
-        "sw    $17,  4(%0)     \n" /* s1 */
-        "sw    $18,  8(%0)     \n" /* s2 */
-        "sw    $19, 12(%0)     \n" /* s3 */
-        "sw    $20, 16(%0)     \n" /* s4 */
-        "sw    $21, 20(%0)     \n" /* s5 */
-        "sw    $22, 24(%0)     \n" /* s6 */
-        "sw    $23, 28(%0)     \n" /* s7 */
-        "sw    $30, 32(%0)     \n" /* fp */
-        "sw    $29, 36(%0)     \n" /* sp */
-        "sw    $31, 40(%0)     \n" /* ra */
+        "sw    $s0,  0(%0)     \n" /* s0 */
+        "sw    $s1,  4(%0)     \n" /* s1 */
+        "sw    $s2,  8(%0)     \n" /* s2 */
+        "sw    $s3, 12(%0)     \n" /* s3 */
+        "sw    $s4, 16(%0)     \n" /* s4 */
+        "sw    $s5, 20(%0)     \n" /* s5 */
+        "sw    $s6, 24(%0)     \n" /* s6 */
+        "sw    $s7, 28(%0)     \n" /* s7 */
+        "sw    $gp, 32(%0)     \n" /* gp */
+        "sw    $fp, 36(%0)     \n" /* fp */
+        "sw    $sp, 40(%0)     \n" /* sp */
+        "sw    $ra, 44(%0)     \n" /* ra */
         ".set at               \n"
         ".set reorder          \n"
         : : "r" (addr)
@@ -86,26 +86,27 @@ static inline void load_context(const void* addr)
     asm volatile (
         ".set noat             \n"
         ".set noreorder        \n"
-        "lw    $8, 44(%0)      \n" /* Get start address ($8 = t0) */
-        "beqz  $8, running     \n" /* NULL -> already running */
+        "lw    $t9, 48(%0)     \n" /* Get start address ($8 = t0) */
+        "beqz  $t9, running    \n" /* NULL -> already running */
         "nop                   \n"
-        "jr    $8              \n"
-        "move  $9, %0          \n" /* t1 = context */
+        "jr    $t9             \n"
+        "move  $a0, %0          \n" /* a0 = context branch delay slot anyway */
     "running:                  \n"
-        "lw    $16,  0(%0)     \n" /* s0 */
-        "lw    $17,  4(%0)     \n" /* s1 */
-        "lw    $18,  8(%0)     \n" /* s2 */
-        "lw    $19, 12(%0)     \n" /* s3 */
-        "lw    $20, 16(%0)     \n" /* s4 */
-        "lw    $21, 20(%0)     \n" /* s5 */
-        "lw    $22, 24(%0)     \n" /* s6 */
-        "lw    $23, 28(%0)     \n" /* s7 */
-        "lw    $30, 32(%0)     \n" /* fp */
-        "lw    $29, 36(%0)     \n" /* sp */
-        "lw    $31, 40(%0)     \n" /* ra */
+        "lw    $s0,  0(%0)     \n" /* s0 */
+        "lw    $s1,  4(%0)     \n" /* s1 */
+        "lw    $s2,  8(%0)     \n" /* s2 */
+        "lw    $s3, 12(%0)     \n" /* s3 */
+        "lw    $s4, 16(%0)     \n" /* s4 */
+        "lw    $s5, 20(%0)     \n" /* s5 */
+        "lw    $s6, 24(%0)     \n" /* s6 */
+        "lw    $s7, 28(%0)     \n" /* s7 */
+        "lw    $gp, 32(%0)     \n" /* gp */
+        "lw    $fp, 36(%0)     \n" /* fp */
+        "lw    $sp, 40(%0)     \n" /* sp */
+        "lw    $ra, 44(%0)     \n" /* ra */
         ".set at               \n"
         ".set reorder          \n"
-        : : "r" (addr) : "t0", "t1"
+        : : "r" (addr) : "t9"
     );
 }
 

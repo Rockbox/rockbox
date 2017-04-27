@@ -13,7 +13,7 @@ rockboxlogo.112x30x1.bmp
 rockboxlogo.96x30x16.bmp
 #elif (LCD_WIDTH == 128) && (LCD_DEPTH == 2)
 rockboxlogo.128x42x2.bmp
-#elif (LCD_WIDTH == 128) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 128) && (LCD_DEPTH >= 16)
 rockboxlogo.128x40x16.bmp
 #elif (LCD_WIDTH == 132) && (LCD_DEPTH >= 16)
 rockboxlogo.132x40x16.bmp
@@ -40,9 +40,15 @@ rockboxlogo.640x198x16.bmp
 #endif
 
 /* The Sony NWZ linux bootloader needs icons to display a menu */
-#if defined(BOOTLOADER) && defined(SONY_NWZ_LINUX)
+#if defined(BOOTLOADER) 
+#if defined(SONY_NWZ_LINUX)
 rockboxicon.130x130x16.bmp
 toolsicon.130x130x16.bmp
+#elif defined(AGPTEK_ROCKER)
+hibyicon.70x70x16.bmp
+rockboxicon.70x70x16.bmp
+toolsicon.70x70x16.bmp
+#endif
 #endif
 
 #ifndef BOOTLOADER  /* We don't need these for the bootloader */

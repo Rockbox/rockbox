@@ -73,6 +73,8 @@ show_logo.c
 mpio_hd200_hd300.c
 #elif defined(SONY_NWZ_LINUX)
 nwz_linux.c
+#elif defined(AGPTEK_ROCKER)
+rocker_linux.c
 #elif defined(RK27_GENERIC) || defined(HM60X) || defined(HM801) \
       || defined(MA9) || defined(MA9C) || defined(MA8) || defined(MA8C) \
       || defined(IHIFI760) || defined(IHIFI960)

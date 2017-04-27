@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2002 by Ulf Ralberg
+ * Copyright (C) 2017 by Marcin Bukat
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,29 +17,43 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <sys/types.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdio.h>
 
-/* index offset register
- *  0     0     $16 s0
- *  1     4     $17 s1
- *  2     8     $18 s2
- *  3    12     $19 s3
- *  4    16     $20 s4
- *  5    20     $21 s5
- *  6    24     $22 s6
- *  7    28     $23 s7
- *  8    32     $28 gp
- *  9    36     $30 s8 (s8)
- * 10    40     $29 sp
- * 11    44     $31 ra
- * 12    48     start
- */
-struct regs
+#include "system.h"
+#include "power-agptek.h"
+#include "power.h"
+#include "panic.h"
+#include "sysfs.h"
+
+const char * const sysfs_bat_voltage =
+    "/sys/class/power_supply/battery/voltage_now";
+
+const char * const sysfs_bat_status =
+    "/sys/class/power_supply/battery/status";
+
+unsigned int agptek_power_get_status(void)
 {
-    uint32_t r[10]; /* 0-32 - Registers s0-s7, gp, fp */
-    uint32_t sp;    /*   36 - Stack pointer */
-    uint32_t ra;    /*   40 - Return address */
-    uint32_t start; /*   44 - Thread start address, or NULL when started */
-};
+    char buf[12] = {0};
+    sysfs_get_string(sysfs_bat_status, buf, sizeof(buf));
 
-#define DEFAULT_STACK_SIZE 0x400 /* Bytes */
+    if (strncmp(buf, "Charging", 8) == 0)
+    {
+        return POWER_INPUT_USB_CHARGER;
+    }
+    else
+    {
+        return POWER_INPUT_NONE;
+    }
+}
 
+unsigned int agptek_power_get_battery_voltage(void)
+{
+    int battery_voltage;
+    sysfs_get_int(sysfs_bat_voltage, &battery_voltage);
+
+    return battery_voltage/1000;
+}

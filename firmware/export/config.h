@@ -166,6 +166,7 @@
 #define SAMSUNG_YH92X_PAD  62
 #define DX50_PAD           63
 #define SONY_NWZA860_PAD   64 /* The NWZ-A860 is too different (touchscreen) */
+#define AGPTEK_ROCKER_PAD 65
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -279,6 +280,7 @@
 #define LCD_CREATIVEZENXFISTYLE 61 /* as used by Creative Zen X-Fi Style */
 #define LCD_SAMSUNGYPR1   62 /* as used by Samsung YP-R1 */
 #define LCD_NWZ_LINUX   63 /* as used in the Linux-based NWZ series */
+#define LCD_INGENIC_LINUX 64
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -288,6 +290,7 @@
 #define RGB565 565
 #define RGB565SWAPPED 3553
 #define RGB888 888
+#define XRGB8888 8888
 
 /* LCD_STRIDEFORMAT */
 #define VERTICAL_STRIDE     1
@@ -601,6 +604,8 @@ Lyre prototype 1 */
 #include "config/sonynwzs750.h"
 #elif defined(SONY_NWZE350)
 #include "config/sonynwze350.h"
+#elif defined(AGPTEK_ROCKER)
+#include "config/agptekrocker.h"
 #else
 /* no known platform */
 #endif

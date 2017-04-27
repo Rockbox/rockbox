@@ -5,9 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
- * Copyright (C) 2002 by Ulf Ralberg
+ * Copyright (C) 2017 by Marcin Bukat
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,29 +17,27 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _BUTTON_TARGET_H_
+#define _BUTTON_TARGET_H_
 
-/* index offset register
- *  0     0     $16 s0
- *  1     4     $17 s1
- *  2     8     $18 s2
- *  3    12     $19 s3
- *  4    16     $20 s4
- *  5    20     $21 s5
- *  6    24     $22 s6
- *  7    28     $23 s7
- *  8    32     $28 gp
- *  9    36     $30 s8 (s8)
- * 10    40     $29 sp
- * 11    44     $31 ra
- * 12    48     start
- */
-struct regs
-{
-    uint32_t r[10]; /* 0-32 - Registers s0-s7, gp, fp */
-    uint32_t sp;    /*   36 - Stack pointer */
-    uint32_t ra;    /*   40 - Return address */
-    uint32_t start; /*   44 - Thread start address, or NULL when started */
-};
+#include <stdbool.h>
+#include "config.h"
 
-#define DEFAULT_STACK_SIZE 0x400 /* Bytes */
+/* Main unit's buttons */
+#define BUTTON_LEFT                 0x00000001
+#define BUTTON_RIGHT                0x00000002
+#define BUTTON_UP                   0x00000004
+#define BUTTON_DOWN                 0x00000008
+#define BUTTON_SELECT               0x00000010
+#define BUTTON_VOLDOWN              0x00000020
+#define BUTTON_VOLUP                0x00000040
+#define BUTTON_POWER                0x00000080
+
+#define BUTTON_MAIN                 0x000000ff
+
+/* Software power-off */
+#define POWEROFF_BUTTON BUTTON_POWER
+#define POWEROFF_COUNT 10
+
+#endif /* _BUTTON_TARGET_H_ */
 
