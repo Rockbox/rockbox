@@ -508,6 +508,12 @@
 #define UI_LCD_POSX                 46
 #define UI_LCD_POSY                 40
 
+#elif defined(AGPTEK_ROCKER)
+#define UI_TITLE                    "Agptek Rocker"
+#define UI_WIDTH                    186
+#define UI_HEIGHT                   380
+#define UI_LCD_POSX                 29
+#define UI_LCD_POSY                 25
 #elif defined(SIMULATOR)
 #error no UI defines
 #endif

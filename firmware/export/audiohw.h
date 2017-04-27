@@ -214,6 +214,8 @@ struct sound_settings_info
 #include "codec-dx50.h"
 #elif defined(DX90)
 #include "codec-dx90.h"
+#elif defined(HAVE_ROCKER_CODEC)
+#include "rocker_codec.h"
 #endif
 
 /* convert caps into defines */

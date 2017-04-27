@@ -234,8 +234,8 @@ void screen_dump(void)
 #endif
             }
             while (dst < dst_end);
-#elif LCD_DEPTH == 24
-            dst_end = dst + LCD_WIDTH*3;
+#elif LCD_DEPTH >= 24
+            dst_end = dst + LCD_WIDTH*sizeof(fb_data);
             src = FBADDR(0, y);
             do
             {

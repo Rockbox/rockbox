@@ -132,6 +132,10 @@ else # core
     include $(ROOTDIR)/firmware/target/hosted/samsungypr/ypr1/ypr1.make
   endif
 
+  ifneq (,$(findstring rocker,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/agptek/rocker.make
+  endif
+
   ifneq (,$(findstring android_ndk, $(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/ibasso/android_ndk.make
   else

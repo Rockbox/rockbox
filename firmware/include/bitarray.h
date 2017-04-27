@@ -44,6 +44,7 @@
 /** Iterators **/
 #include "config.h"
 #include <stdint.h>
+#include <limits.h>
 
 #if (defined(CPU_ARM) && ARM_ARCH >= 5) || UINT32_MAX < UINT_MAX
 #define __BITARRAY_CTZ(wval)    __builtin_ctz(wval)
