@@ -1,5 +1,11 @@
+#ifndef __RBCOMPAT_H__
+#define __RBCOMPAT_H__
+
 #include "plugin.h"
 #include "rbassert.h"
+#include "lib/pluginlib_exit.h"
+
+#include <tlsf.h>
 
 int sprintf_wrapper(char *str, const char *fmt, ...);
 char *getenv_wrapper(const char *c);
@@ -60,3 +66,9 @@ double acos_wrapper(double x);
 #define strtoq strtoq_wrapper
 #define strtouq strtouq_wrapper
 #define vsprintf vsprintf_wrapper
+
+#define abs(x) ((x)<0?-(x):(x))
+
+/* work around compilation error */
+typedef void FILE;
+#endif

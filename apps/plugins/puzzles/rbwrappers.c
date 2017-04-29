@@ -1346,9 +1346,12 @@ double scalbn_wrapper (double x, int n)
         if (k > 0)                              /* normal result */
             {__HI(x) = (hx&0x800fffff)|(k<<20); return x;}
         if (k <= -54)
+        {
             if (n > 50000)      /* in case integer overflow in n+k */
                 return huge*copysign_wrapper(huge,x);   /*overflow*/
-            else return tiny*copysign_wrapper(tiny,x);  /*underflow*/
+            else
+                return tiny*copysign_wrapper(tiny,x);  /*underflow*/
+        }
         k += 54;                                /* subnormal result */
         __HI(x) = (hx&0x800fffff)|(k<<20);
         return x*twom54;
@@ -1605,18 +1608,6 @@ static const u_char *__sccl(char *, const u_char *);
 static void bcopy_wrapper(const void *src, void *dst, size_t n)
 {
     memmove(dst, src, n);
-}
-
-int
-sscanf_wrapper(const char *ibuf, const char *fmt, ...)
-{
-        va_list ap;
-        int ret;
-
-        va_start(ap, fmt);
-        ret = rb_vsscanf(ibuf, fmt, ap);
-        va_end(ap);
-        return(ret);
 }
 
 int
@@ -2063,6 +2054,18 @@ input_failure:
         return (nconversions != 0 ? nassigned : -1);
 match_failure:
         return (nassigned);
+}
+
+int
+sscanf_wrapper(const char *ibuf, const char *fmt, ...)
+{
+        va_list ap;
+        int ret;
+
+        va_start(ap, fmt);
+        ret = rb_vsscanf(ibuf, fmt, ap);
+        va_end(ap);
+        return(ret);
 }
 
 /*

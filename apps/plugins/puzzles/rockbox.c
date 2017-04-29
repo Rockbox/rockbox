@@ -23,8 +23,8 @@
 
 #include "plugin.h"
 
-#include "puzzles.h"
-#include "keymaps.h"
+#include "src/puzzles.h"
+#include "src/keymaps.h"
 
 #ifndef COMBINED
 #include "lib/playback_control.h"
@@ -315,6 +315,7 @@ static void rb_draw_line(void *handle, int x1, int y1, int x2, int y2,
         draw_antialiased_line(x1, y1, x2, y2);
 }
 
+#if 0
 /*
  * draw filled polygon
  * originally by Sebastian Leonhardt (ulmutul)
@@ -409,6 +410,7 @@ static void v_fillarea(int count, int *pxy)
         fill_poly_line(i, count, pxy);
     }
 }
+#endif
 
 static void rb_draw_poly(void *handle, int *coords, int npoints,
                          int fillcolor, int outlinecolor)
@@ -916,7 +918,7 @@ static bool config_menu(void)
             config_item old;
             int pos = rb->gui_synclist_get_sel_pos(&list);
             memcpy(&old, config + pos, sizeof(old));
-            char *old_str;
+            char *old_str = NULL;
             if(old.type == C_STRING)
                 old_str = dupstr(old.sval);
             bool freed_str = do_configure_item(config + pos);
@@ -928,13 +930,13 @@ static bool config_menu(void)
                 if(freed_str)
                     config[pos].sval = old_str;
             }
-            else if(old.type == C_STRING)
-            {
-                /* success, and we duplicated the old string, so free it */
-                sfree(old_str);
-            }
             else
             {
+                if(old.type == C_STRING)
+                {
+                    /* success, and we duplicated the old string, so free it */
+                    sfree(old_str);
+                }
                 success = true;
             }
             break;
@@ -956,33 +958,29 @@ done:
 
 const char *preset_formatter(int sel, void *data, char *buf, size_t len)
 {
-    char *name;
-    game_params *junk;
-    midend_fetch_preset(me, sel, &name, &junk);
-    rb->strlcpy(buf, name, len);
+    struct preset_menu *menu = data;
+    rb->snprintf(buf, len, "%s", menu->entries[sel].title);
     return buf;
 }
 
-static bool presets_menu(void)
+/* main worker function */
+static bool do_preset_menu(struct preset_menu *menu, char *title)
 {
-    if(!midend_num_presets(me))
-    {
-        rb->splash(HZ, "No presets!");
+    if(!menu->n_entries)
         return false;
-    }
 
     /* display a list */
     struct gui_synclist list;
 
-    rb->gui_synclist_init(&list, &preset_formatter, NULL, false, 1, NULL);
+    rb->gui_synclist_init(&list, &preset_formatter, menu, false, 1, NULL);
     rb->gui_synclist_set_icon_callback(&list, NULL);
-    rb->gui_synclist_set_nb_items(&list, midend_num_presets(me));
+    rb->gui_synclist_set_nb_items(&list, menu->n_entries);
     rb->gui_synclist_limit_scroll(&list, false);
 
-    int current = midend_which_preset(me);
-    rb->gui_synclist_select_item(&list, current >= 0 ? current : 0);
+    rb->gui_synclist_select_item(&list, 0); /* we don't start with the current one selected */
 
-    rb->gui_synclist_set_title(&list, "Game Type", NOICON);
+    char def[] = "Game Type";
+    rb->gui_synclist_set_title(&list, title ? title : def, NOICON);
     while(1)
     {
         rb->gui_synclist_draw(&list);
@@ -994,11 +992,19 @@ static bool presets_menu(void)
         case ACTION_STD_OK:
         {
             int sel = rb->gui_synclist_get_sel_pos(&list);
-            char *junk;
-            game_params *params;
-            midend_fetch_preset(me, sel, &junk, &params);
-            midend_set_params(me, params);
-            return true;
+            struct preset_menu_entry *entry = menu->entries + sel;
+            if(entry->params)
+            {
+                midend_set_params(me, entry->params);
+                return true;
+            }
+            else
+            {
+                /* recurse */
+                if(do_preset_menu(entry->submenu, entry->title))
+                    return true;
+            }
+            break;
         }
         case ACTION_STD_PREV:
         case ACTION_STD_CANCEL:
@@ -1007,6 +1013,11 @@ static bool presets_menu(void)
             break;
         }
     }
+}
+
+static bool presets_menu(void)
+{
+    return do_preset_menu(midend_get_presets(me, NULL), NULL);
 }
 
 static const struct {
@@ -1212,7 +1223,7 @@ static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
                 return ACTION_EXIT_MENUITEM;
 #endif
         case 9:
-            if(!midend_num_presets(me))
+            if(!midend_get_presets(me, NULL)->n_entries)
                 return ACTION_EXIT_MENUITEM;
             break;
         case 10:
@@ -1808,7 +1819,7 @@ static int mainmenu_cb(int action, const struct menu_item_ex *this_item)
                 return ACTION_EXIT_MENUITEM;
 #endif
         case 5:
-            if(!midend_num_presets(me))
+            if(!midend_get_presets(me, NULL)->n_entries)
                 return ACTION_EXIT_MENUITEM;
             break;
         case 6:
