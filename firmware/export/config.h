@@ -597,6 +597,8 @@ Lyre prototype 1 */
 #include "config/sonynwze580.h"
 #elif defined(SONY_NWZA10)
 #include "config/sonynwza10.h"
+#elif defined(SONY_NWA20)
+#include "config/sonynwa20.h"
 #elif defined(SONY_NWZE470)
 #include "config/sonynwze470.h"
 >>>>>>> Initial commit for the Sony NWZ linux port
