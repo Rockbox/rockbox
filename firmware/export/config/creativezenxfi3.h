@@ -39,8 +39,9 @@
 /* define this to enable JPEG decoding */
 #define HAVE_JPEG
 
-/* Define this if a programmable hotkey is mapped */
+/* Define this if a programmable hotkey is mapped
 #define HAVE_HOTKEY
+*/
 
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
@@ -120,7 +121,7 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
-#define AB_REPEAT_ENABLE
+//#define AB_REPEAT_ENABLE
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
