@@ -1511,7 +1511,7 @@ cat <<EOF
  207) Android x86         230) 760               224) NWZ-E470 series
  208) Samsung YP-R1       231) 960               225) NWZ-E580 series
                                                  226) NWZ-A10 series
- ==iBasso==
+ ==iBasso==                                      227) NW-A20 series
  232) DX50
  233) DX90
 
@@ -3980,6 +3980,29 @@ fi
     t_cpu="hosted"
     t_manufacturer="sonynwz"
     t_model="nwza10"
+    uname=`uname`
+    sonynwzcc
+    ;;
+
+   227|sonynwa20)
+    application="yes"
+    target_id=102
+    modelname="sonynwa20"
+    target="SONY_NWA20"
+    memory=16
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="cp"
+    output="rockbox.sony"
+    boottool="$rootdir/tools/scramble -add=a20"
+    bootoutput="bootloader-nwa20.sony"
+    appextra="gui:recorder"
+    plugins=""
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    t_cpu="hosted"
+    t_manufacturer="sonynwz"
+    t_model="nwa20"
     uname=`uname`
     sonynwzcc
     ;;
