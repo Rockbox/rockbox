@@ -19,3 +19,10 @@ out how to do that with a wildcard or something.
 Kudos to Simon (duh), and Frank, for telling me about it.
 
 Franklin Wei (__builtin)
+
+April 2017: Changes made to move upstream sources to a separate
+subdirectory, where they are completely unmodified from the
+original. Updating the upstream version is now as simple as copying a
+fresh set of sources to src/. Several hacks were used to accomplish
+this: a global include specified on the command line, and a directory
+of dummy header files.

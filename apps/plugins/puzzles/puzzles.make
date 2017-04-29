@@ -48,9 +48,11 @@ PUZZLESOPTIMIZE := -Os # tiny plugin buffer
 endif
 
 # we suppress all warnings
-PUZZLESFLAGS = $(filter-out -O%,$(PLUGINFLAGS)) $(PUZZLESOPTIMIZE)		\
-		-Wno-unused-parameter -Wno-sign-compare -Wno-strict-aliasing -w \
-		-DFOR_REAL -I$(PUZZLES_SRCDIR)
+PUZZLESFLAGS =  -I$(PUZZLES_SRCDIR)/dummy 					\
+		$(filter-out -O%,$(PLUGINFLAGS)) $(PUZZLESOPTIMIZE)		\
+		-Wno-unused-parameter -Wno-sign-compare -Wno-strict-aliasing \
+		-DFOR_REAL -I$(PUZZLES_SRCDIR)/src				\
+		-include $(PUZZLES_SRCDIR)/rbcompat.h
 ifdef PUZZLES_COMBINED
 PUZZLESFLAGS += -DCOMBINED
 endif
@@ -71,11 +73,11 @@ $(PUZZLES_OBJDIR)/puzzles.ovl: $(PUZZLES_OBJ) $(PUZZLES_OUTLDS) $(TLSFLIB)
 		-lgcc $(PUZZLES_OVLFLAGS)
 	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
 else
-$(PUZZLES_OBJDIR)/sgt-%.rock: $(PUZZLES_OBJDIR)/%.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
+$(PUZZLES_OBJDIR)/sgt-%.rock: $(PUZZLES_OBJDIR)/src/%.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(PUZZLES_OBJDIR)/$*.elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
-		-lgcc $(filter-out -Wl%.map, $(PLUGINLDFLAGS)) -Wl,-Map,$(PUZZLES_OBJDIR)/$*.map
+		-lgcc $(filter-out -Wl%.map, $(PLUGINLDFLAGS)) -Wl,-Map,$(PUZZLES_OBJDIR)/src/$*.map
 	$(SILENT)$(call objcopy,$(PUZZLES_OBJDIR)/$*.elf,$@)
 endif
 
@@ -85,5 +87,9 @@ $(PUZZLES_OBJDIR)/%.o: $(PUZZLES_SRCDIR)/%.c $(PUZZLES_SRCDIR)/puzzles.make
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PUZZLESFLAGS) -c $< -o $@
 
 $(PUZZLES_OBJDIR)/unfinished/%.o: $(PUZZLES_SRCDIR)/unfinished/%.c $(PUZZLES_SRCDIR)/puzzles.make
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PUZZLESFLAGS) -c $< -o $@
+
+$(PUZZLES_OBJDIR)/src/%.o: $(PUZZLES_SRCDIR)/src/%.c $(PUZZLES_SRCDIR)/puzzles.make
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PUZZLESFLAGS) -c $< -o $@
