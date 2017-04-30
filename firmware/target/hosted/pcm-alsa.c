@@ -286,25 +286,6 @@ static void open_hw_device(snd_pcm_stream_t requested, snd_pcm_stream_t *current
         /* close the device first */
         close_hw_device();
 
-        /* special handling for YP-R1 (temporary solution) */
-
-//        if (requested == SND_PCM_STREAM_PLAYBACK)
-//        {
-//        system("/bin/sh -c /usr/bin/amixer cset numid=7,iface=MIXER,name='Master Power witch' 2");
-//        system("/bin/sh -c /usr/bin/amixer cset numid=6,iface=MIXER,name='Master Handfree Switch' 0");
-//        system("/bin/sh -c /usr/bin/amixer cset numid=5,iface=MIXER,name='Master Mute' 0");
-//        system("/bin/sh -c /usr/bin/amixer cset numid=9,iface=MIXER,name='Master samplerate' 44100");
-//        system("/bin/sh -c /usr/bin/amixer cset numid=2,iface=MIXER,name='Master Volume' 28");
-//        system("/bin/sh -c /usr/bin/amixer cset numid=1,iface=MIXER,name='PCM PlayBack Switch' 2");
-//        system("/bin/sh -c /usr/bin/amixer cset numid=8,iface=MIXER,name='FM Mute' 0");
-//        system("/bin/sh -c /usr/bin/amixer cset numid=4,iface=MIXER,name='Capture FM Switch' 0");
-//        system("/bin/sh -c /usr/bin/amixer cset numid=3,iface=MIXER,name='Capture Mic Switch' 0");
-//        }
-//        else
-//        {
-//            system("/usr/bin/amixer cset numid=3,iface=MIXER,name='Capture Mic Switch' 1");
-//        }
-
         if ((err = snd_pcm_open(&handle, device, requested, 0)) < 0)
         {
             panicf("%s(): Cannot open device %s: %s", __func__, device, snd_strerror(err));

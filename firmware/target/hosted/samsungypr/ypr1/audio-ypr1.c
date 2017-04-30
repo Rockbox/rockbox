@@ -21,6 +21,7 @@
 #include "system.h"
 #include "audiohw.h"
 #include "audio.h"
+#include "gpio-ypr.h"
 
 void audiohw_enable_tone_controls(bool enable);
 void audiohw_enable_depth_3d(bool enable);
@@ -46,6 +47,12 @@ void audio_set_output_source(int source)
         audiohw_enable_depth_3d(false);
         break;
     }
+
+    /* the kernel does some nasty things and among these,
+     * changing the mute pin at alsa backend device closing:
+     * therefore, keep it active */
+    gpio_set(GPIO_MUTE, true);
+
 }
 
 void audio_input_mux(int source, unsigned int flags)
