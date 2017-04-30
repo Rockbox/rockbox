@@ -145,8 +145,7 @@ $releasenotes="/wiki/ReleaseNotes314";
     },
     'ipodnano2g' => {
         name => 'iPod Nano 2nd gen',
-        status => 2,
-        release => '3.10',
+        status => 1,
     },
     'ipodvideo' => {
         name => 'iPod Video',
@@ -154,7 +153,7 @@ $releasenotes="/wiki/ReleaseNotes314";
     },
     'ipod6g' => {
         name => 'iPod 6th gen (Classic)',
-        status => 1,
+        status => 2,
     },
     'iriverh10' => {
         name => 'iriver H10 20GB',
