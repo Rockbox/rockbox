@@ -48,11 +48,11 @@ PUZZLESOPTIMIZE := -Os # tiny plugin buffer
 endif
 
 # we suppress all warnings
-PUZZLESFLAGS =  -I$(PUZZLES_SRCDIR)/dummy 					\
+PUZZLESFLAGS =  -I$(PUZZLES_SRCDIR)/dummy					\
 		$(filter-out -O%,$(PLUGINFLAGS)) $(PUZZLESOPTIMIZE)		\
 		-Wno-unused-parameter -Wno-sign-compare -Wno-strict-aliasing -w	\
-		-DFOR_REAL -I$(PUZZLES_SRCDIR)/src -I$(PUZZLES_SRCDIR)		\
-		-include $(PUZZLES_SRCDIR)/rbcompat.h
+		-DFOR_REAL -I$(PUZZLES_SRCDIR)/src -I$(PUZZLES_SRCDIR) -include	\
+		$(PUZZLES_SRCDIR)/rbcompat.h
 ifdef PUZZLES_COMBINED
 PUZZLESFLAGS += -DCOMBINED
 endif
@@ -82,14 +82,14 @@ $(PUZZLES_OBJDIR)/sgt-%.rock: $(PUZZLES_OBJDIR)/src/%.o $(PUZZLES_SHARED_OBJ) $(
 endif
 
 # special pattern rule for compiling puzzles with extra flags
-$(PUZZLES_OBJDIR)/%.o: $(PUZZLES_SRCDIR)/%.c $(PUZZLES_SRCDIR)/puzzles.make
+$(PUZZLES_OBJDIR)/%.o: $(PUZZLES_SRCDIR)/%.c $(PUZZLES_SRCDIR)/puzzles.make $(PUZZLES_SRCDIR)/rbcompat.h # needed for proper dependency checks
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PUZZLESFLAGS) -c $< -o $@
 
-$(PUZZLES_OBJDIR)/unfinished/%.o: $(PUZZLES_SRCDIR)/unfinished/%.c $(PUZZLES_SRCDIR)/puzzles.make
+$(PUZZLES_OBJDIR)/src/%.o: $(PUZZLES_SRCDIR)/src/%.c $(PUZZLES_SRCDIR)/puzzles.make $(PUZZLES_SRCDIR)/rbcompat.h
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PUZZLESFLAGS) -c $< -o $@
 
-$(PUZZLES_OBJDIR)/src/%.o: $(PUZZLES_SRCDIR)/src/%.c $(PUZZLES_SRCDIR)/puzzles.make
+$(PUZZLES_OBJDIR)/src/unfinished/%.o: $(PUZZLES_SRCDIR)/src/unfinished/%.c $(PUZZLES_SRCDIR)/puzzles.make $(PUZZLES_SRCDIR)/rbcompat.h
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PUZZLESFLAGS) -c $< -o $@
