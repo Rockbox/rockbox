@@ -522,6 +522,59 @@ void audiohw_set_recsrc(int source, bool recording)
         wmc_clear(WMC_RIGHT_ADC_BOOST_CTRL, WMC_PGABOOSTR);
         break;
 
+    case AUDIO_SRC_MIC:
+
+        if (recording)
+        {
+            /* Disable bypass */
+            wmc_clear(WMC_LEFT_MIXER_CTRL, WMC_BYPL2LMIX);
+            wmc_clear(WMC_RIGHT_MIXER_CTRL, WMC_BYPR2RMIX);
+            /* Enable ADCs, IP BOOSTMIX and PGA, route L/R2 through PGA */
+            wmc_set(WMC_POWER_MANAGEMENT2, WMC_ADCENL | WMC_ADCENR |
+                    WMC_BOOSTENL | WMC_BOOSTENR | WMC_INPPGAENL |
+                    WMC_INPPGAENR);
+            wmc_set(WMC_ADC_CONTROL, WMC_ADCOSR | WMC_HPFEN);
+            /* PGA at 0dB with +20dB boost */
+            wmc_write_masked(WMC_LEFT_INP_PGA_GAIN_CTRL, 0x10, WMC_AVOL);
+            wmc_write_masked(WMC_RIGHT_INP_PGA_GAIN_CTRL, 0x10, WMC_AVOL);
+
+            wmc_clear(WMC_LEFT_INP_PGA_GAIN_CTRL, WMC_MUTE);
+
+            // this below should not be needed at all..
+            wmc_clear(WMC_RIGHT_INP_PGA_GAIN_CTRL, WMC_MUTE);
+
+            wmc_set(WMC_LEFT_ADC_BOOST_CTRL, WMC_PGABOOSTL);
+            wmc_set(WMC_RIGHT_ADC_BOOST_CTRL, WMC_PGABOOSTR);
+            /* Connect L/R2 inputs to PGA */
+            wmc_write_masked(WMC_INPUT_CTRL, WMC_L2_2INPPGA | WMC_R2_2INPPGA |
+                                             WMC_LIN2INPPGA | WMC_RIN2INPPGA,
+                                             WMC_L2_2INPPGA | WMC_R2_2INPPGA |
+                                             WMC_LIP2INPPGA | WMC_RIP2INPPGA |
+                                             WMC_LIN2INPPGA | WMC_RIN2INPPGA);
+
+            wmc_set(WMC_LEFT_MIXER_CTRL, WMC_BYPL2LMIX);
+            wmc_write_masked(WMC_LEFT_MIXER_CTRL, 0x07 << WMC_BYPLMIXVOL_POS,
+                    WMC_BYPLMIXVOL);
+//            wmc_set(WMC_RIGHT_MIXER_CTRL, WMC_AUXR2RMIX);
+            /* Set L/R AUX input gain to 0dB */
+//            wmc_write_masked(WMC_LEFT_MIXER_CTRL, 0x05 << WMC_AUXLMIXVOL_POS,
+//                     WMC_AUXLMIXVOL);
+//            wmc_write_masked(WMC_RIGHT_MIXER_CTRL, 0x05 << WMC_AUXRMIXVOL_POS,
+//                     WMC_AUXRMIXVOL);
+            wmc_set(WMC_LEFT_MIXER_CTRL, WMC_DACL2LMIX);
+            wmc_set(WMC_RIGHT_MIXER_CTRL, WMC_DACR2RMIX);
+            wmc_set(WMC_POWER_MANAGEMENT1, WMC_OUT3MIXEN);
+            wmc_set(WMC_POWER_MANAGEMENT3, WMC_RMIXEN);
+            wmc_set(WMC_POWER_MANAGEMENT3, WMC_LMIXEN);
+
+            wmc_write_masked(WMC_LEFT_ADC_DIGITAL_VOL, 0xFF, WMC_DVOL);
+            wmc_write_masked(WMC_RIGHT_ADC_DIGITAL_VOL, 0xFF, WMC_DVOL);
+
+
+        }
+
+        break;
+
     case AUDIO_SRC_FMRADIO:
         if (recording)
         {
@@ -544,6 +597,23 @@ void audiohw_set_recsrc(int source, bool recording)
                                              WMC_L2_2INPPGA | WMC_R2_2INPPGA |
                                              WMC_LIP2INPPGA | WMC_RIP2INPPGA |
                                              WMC_LIN2INPPGA | WMC_RIN2INPPGA);
+#ifdef SAMSUNG_YPR1
+            /* On Samsung YP-R1 we have to do some extra steps to select the AUX
+             * analog input source i.e. where the audio lines of the FM tuner are.
+             */
+            wmc_set(WMC_LEFT_MIXER_CTRL, WMC_AUXL2LMIX);
+            wmc_set(WMC_RIGHT_MIXER_CTRL, WMC_AUXR2RMIX);
+            /* Set L/R AUX input gain to 0dB */
+            wmc_write_masked(WMC_LEFT_MIXER_CTRL, 0x05 << WMC_AUXLMIXVOL_POS,
+                     WMC_AUXLMIXVOL);
+            wmc_write_masked(WMC_RIGHT_MIXER_CTRL, 0x05 << WMC_AUXRMIXVOL_POS,
+                     WMC_AUXRMIXVOL);
+            wmc_set(WMC_LEFT_MIXER_CTRL, WMC_DACL2LMIX);
+            wmc_set(WMC_RIGHT_MIXER_CTRL, WMC_DACR2RMIX);
+            wmc_set(WMC_POWER_MANAGEMENT1, WMC_OUT3MIXEN);
+            wmc_set(WMC_POWER_MANAGEMENT3, WMC_RMIXEN);
+            wmc_set(WMC_POWER_MANAGEMENT3, WMC_LMIXEN);
+#endif
         }
         else
         {
@@ -587,6 +657,10 @@ void audiohw_set_recvol(int left, int right, int type)
 {
     switch (type)
     {
+    case AUDIO_GAIN_MIC:
+        wmc_write_masked(WMC_LEFT_ADC_DIGITAL_VOL, 0xFF, WMC_DVOL);
+        wmc_write_masked(WMC_RIGHT_ADC_DIGITAL_VOL, 0xFF, WMC_DVOL);
+        return;
     case AUDIO_GAIN_LINEIN:
         wmc_write_masked(WMC_LEFT_ADC_DIGITAL_VOL, left + 239, WMC_DVOL);
         wmc_write_masked(WMC_RIGHT_ADC_DIGITAL_VOL, right + 239, WMC_DVOL);

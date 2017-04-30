@@ -23,7 +23,7 @@
 #ifndef _WM8978_H
 #define _WM8978_H
 
-#if 0
+#ifdef HAVE_MIC_IN
 #define AUDIOHW_CAPS (EQ_CAP | PRESCALER_CAP | DEPTH_3D_CAP | \
                       LIN_GAIN_CAP | MIC_GAIN_CAP)
 #else
@@ -65,9 +65,9 @@ AUDIOHW_SETTING(DEPTH_3D,          "%", 0,   1,   0,  15,   0, (100*val + 8) / 1
      * gain. */
 AUDIOHW_SETTING(LEFT_GAIN,        "dB", 1,   1,-238,  16,   0, val * 5)
 AUDIOHW_SETTING(RIGHT_GAIN,       "dB", 1,   1,-238,  16,   0, val * 5)
-#if 0 /* whenever it's needed - none on GBS */
+#ifdef HAVE_MIC_IN
 AUDIOHW_SETTING(MIC_GAIN,         "dB", 1,   1,-238,  16,   0, val * 5)
-#endif /* 0 */
+#endif
 #endif /* HAVE_RECORDING */
 
 void audiohw_set_recsrc(int source, bool recording);
