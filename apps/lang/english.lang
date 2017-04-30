@@ -13540,13 +13540,13 @@
   desc: Backlight behaviour setting
   user: core
   <source>
-    *: "Selective Backlight"
+    *: "Backlight Exemptions"
   </source>
   <dest>
-    *: "Selective Backlight"
+    *: "Backlight Exemptions"
   </dest>
   <voice>
-    *: "Selective Backlight"
+    *: "Backlight Exemptions"
   </voice>
 </phrase>
 <phrase>
