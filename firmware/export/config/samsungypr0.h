@@ -109,6 +109,16 @@
 #define HAVE_TUNER_PWR_CTRL
 #define HAVE_RDS_CAP
 
+
+/* define this if you have recording possibility */
+#define HAVE_RECORDING
+
+/* define the bitmask of hardware sample rates */
+#define HW_SAMPR_CAPS   (SAMPR_CAP_44)
+
+/* define the bitmask of recording sample rates */
+#define REC_SAMPR_CAPS  (SAMPR_CAP_44)
+
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN
 #define INPUT_SRC_CAPS SRC_CAP_FMRADIO

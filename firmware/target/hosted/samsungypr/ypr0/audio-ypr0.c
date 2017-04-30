@@ -44,26 +44,28 @@ void audio_input_mux(int source, unsigned flags)
 
     switch (source)
     {
-        default:                        /* playback - no recording */
-            source = AUDIO_SRC_PLAYBACK;
-        case AUDIO_SRC_PLAYBACK:
-            audio_channels = 2;
-            if (source != last_source)
-            {
-                audiohw_set_monitor(false);
-
-            }
-            break;
-
         case AUDIO_SRC_FMRADIO:         /* recording and playback */
             audio_channels = 2;
             if (source == last_source)
                 break;
 
+            /* enable FM radio recording (false) */
+            audiohw_enable_recording(false);
+            /* monitor FM radio line input 1 (i.e. route to headphones) */
             audiohw_set_monitor(true);
+            break;
+
+        default:                            /* playback - no recording */
+        case AUDIO_SRC_PLAYBACK:
+            source = AUDIO_SRC_PLAYBACK;    /* avoid fall-through warning */
+            audio_channels = 2;
+            if (source != last_source)
+            {
+                /* disable monitoring, DAC will be used */
+                audiohw_set_monitor(false);
+            }
             break;
     } /* end switch */
 
     last_source = source;
 } /* audio_input_mux */
-
