@@ -50,8 +50,8 @@ endif
 # we suppress all warnings
 PUZZLESFLAGS =  -I$(PUZZLES_SRCDIR)/dummy 					\
 		$(filter-out -O%,$(PLUGINFLAGS)) $(PUZZLESOPTIMIZE)		\
-		-Wno-unused-parameter -Wno-sign-compare -Wno-strict-aliasing \
-		-DFOR_REAL -I$(PUZZLES_SRCDIR)/src				\
+		-Wno-unused-parameter -Wno-sign-compare -Wno-strict-aliasing -w	\
+		-DFOR_REAL -I$(PUZZLES_SRCDIR)/src -I$(PUZZLES_SRCDIR)		\
 		-include $(PUZZLES_SRCDIR)/rbcompat.h
 ifdef PUZZLES_COMBINED
 PUZZLESFLAGS += -DCOMBINED
