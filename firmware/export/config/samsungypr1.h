@@ -99,6 +99,9 @@
 /* We have WM1808, which so far is compatible with the following */
 #define HAVE_WM8978
 
+/* We can record FM-radio and microphone */
+#define HAVE_RECORDING
+
 /* For the moment the only supported frequency is 44kHz,
  * even if the codec supports more (see wmcodec-ypr1.c)
  */
@@ -114,7 +117,8 @@
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN
-#define INPUT_SRC_CAPS SRC_CAP_FMRADIO
+#define HAVE_MIC_IN
+#define INPUT_SRC_CAPS    (SRC_CAP_MIC | SRC_CAP_FMRADIO)
 
 /* We have a GPIO pin that detects it */
 #define HAVE_HEADPHONE_DETECTION

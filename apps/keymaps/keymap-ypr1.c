@@ -166,6 +166,8 @@ const struct button_mapping* target_get_context_mapping(int context)
             return button_context_pitchscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
+        case CONTEXT_RECSCREEN:
+            return button_context_settings;
     }
     return button_context_standard;
 }
