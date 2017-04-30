@@ -34,6 +34,7 @@
 # - Johannes Linke
 # - Kai Posadowsky
 # - Udo Schläpfer
+# - Johannes Rauh
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -13413,5 +13414,173 @@
   <voice>
     *: none
     swcodec: "f(x1)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ENABLED
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Enabled"
+  </source>
+  <dest>
+    *: "Aktiviert?"
+  </dest>
+  <voice>
+    *: "Aktiviert"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_PLAY
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Play"
+  </dest>
+  <voice>
+    *: "Play"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Seek"
+  </source>
+  <dest>
+    *: "Seek"
+  </dest>
+  <voice>
+    *: "Seek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Skip"
+  </source>
+  <dest>
+    *: "Skip"
+  </dest>
+  <voice>
+    *: "Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Backlight Exemptions"
+  </source>
+  <dest>
+    *: "Ausnahmen für Beleuchtung"
+  </dest>
+  <voice>
+    *: "Ausnahmen für Beleuchtung"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Deaktivieren bei ext. Stromversorgung"
+  </dest>
+  <voice>
+    *: "Deaktivieren bei externer Stromversorgung"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Tasten ohne Funktion ignorieren"
+  </dest>
+  <voice>
+    *: "Tasten ohne Funktion ignorieren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Erweiterte Tastensperre"
+  </dest>
+  <voice>
+    *: "Erweiterte Tastensperre"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Automatische Tastensperre ein"
+  </dest>
+  <voice>
+    *: "Automatische Tastensperre ein"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Automatische Tastensperre aus"
+  </dest>
+  <voice>
+    *: "Automatische Tastensperre aus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Notify"
+  </source>
+  <dest>
+    *: "Hinweis deaktivieren"
+  </dest>
+  <voice>
+    *: "Hinweis deaktivieren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Touchscreen deaktivieren"
+  </dest>
+  <voice>
+    *: "Touchscreen deaktivieren"
   </voice>
 </phrase>
