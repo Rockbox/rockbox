@@ -145,7 +145,7 @@ $releasenotes="/wiki/ReleaseNotes314";
     },
     'ipodnano2g' => {
         name => 'iPod Nano 2nd gen',
-        status => 1,
+        status => 3,
     },
     'ipodvideo' => {
         name => 'iPod Video',
