@@ -81,8 +81,10 @@ $(PUZZLES_OBJDIR)/sgt-%.rock: $(PUZZLES_OBJDIR)/src/%.o $(PUZZLES_SHARED_OBJ) $(
 	$(SILENT)$(call objcopy,$(PUZZLES_OBJDIR)/$*.elf,$@)
 endif
 
+$(PUZZLES_SRCDIR)/rbcompat.h: $(APPSDIR)/plugin.h $(BUILDDIR)/sysfont.h $(PUZZLES_SRCDIR)/rbassert.h
+
 # special pattern rule for compiling puzzles with extra flags
-$(PUZZLES_OBJDIR)/%.o: $(PUZZLES_SRCDIR)/%.c $(PUZZLES_SRCDIR)/puzzles.make $(PUZZLES_SRCDIR)/rbcompat.h # needed for proper dependency checks
+$(PUZZLES_OBJDIR)/%.o: $(PUZZLES_SRCDIR)/%.c $(PUZZLES_SRCDIR)/puzzles.make $(PUZZLES_SRCDIR)/rbcompat.h
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PUZZLESFLAGS) -c $< -o $@
 
