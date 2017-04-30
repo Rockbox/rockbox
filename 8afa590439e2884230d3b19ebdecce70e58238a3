@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ff23b18_1e0f8d2e",
+        "filename": "utils/nwztools/upgtools/upg.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000536
+      },
+      "writtenOn": "2017-04-30T01:23:54Z",
+      "side": 1,
+      "message": "Please revert this whitespace change.",
+      "revId": "8afa590439e2884230d3b19ebdecce70e58238a3",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
