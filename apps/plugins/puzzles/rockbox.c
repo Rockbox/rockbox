@@ -23,8 +23,8 @@
 
 #include "plugin.h"
 
+#include "keymaps.h"
 #include "src/puzzles.h"
-#include "src/keymaps.h"
 
 #ifndef COMBINED
 #include "lib/playback_control.h"
