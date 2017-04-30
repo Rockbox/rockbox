@@ -654,7 +654,27 @@ ypr0cc () {
 
  # Set up compiler
  gccchoice="4.4.6"
- prefixtools "arm-ypr0-linux-gnueabi-"
+# prefixtools "arm-ypr0-linux-gnueabi-"
+ prefixtools "/home/lorenzo/palmte2-dev/buildroot-2015.02/output/host/usr/bin/arm-buildroot-linux-gnueabi-"
+}
+
+palmtungstene2cc () {
+
+ GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
+ GCCOPTIMIZE=''
+ LDOPTS="-lasound -lpthread -lm -ldl -lrt $LDOPTS"
+ GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
+ SHARED_LDFLAG="-shared"
+ SHARED_CFLAGS=''
+ endian="little"
+ app_type="ypr0"
+
+ # Include path
+ GCCOPTS="$GCCOPTS  -D_GNU_SOURCE=1 -U_FORTIFY_SOURCE -D_REENTRANT"
+
+ # Set up compiler
+ gccchoice="4.8.4"
+ prefixtools "/home/lorenzo/palmte2-dev/buildroot-2015.02/output/host/usr/bin/arm-buildroot-linux-gnueabi-"
 }
 
 androidcc () {
@@ -1413,7 +1433,7 @@ cat <<EOF
  206) Android MIPS        ==IHIFI==              ==iBasso==
  207) Android x86         230) 760               232) DX50
  208) Samsung YP-R1       231) 960               233) DX90
-
+ 209) Palm Tungsten E2
 
 EOF
 
@@ -3539,13 +3559,13 @@ fi
     target_id=78
     modelname="samsungypr0"
     target="SAMSUNG_YPR0"
-    memory=32
+    memory=4
     uname=`uname`
     ypr0cc
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 9"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox"
     bootoutput="rockbox"
     appextra="recorder:gui:radio"
@@ -3635,6 +3655,29 @@ fi
     t_cpu="hosted"
     t_manufacturer="samsungypr"
     t_model="ypr1"
+    ;;
+
+   209|palmtungstene2)
+    application="yes"
+    target_id=96
+    modelname="palmtungstene2"
+    target="PALM_TUNGSTENE2"
+    memory=6
+    uname=`uname`
+    palmtungstene2cc
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox"
+    bootoutput="rockbox"
+    appextra="recorder:gui:hosted"
+    plugins="yes"
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="palm"
+    t_model="tungstene2"
     ;;
 
    210|hifietma9)

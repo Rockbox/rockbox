@@ -307,4 +307,6 @@ keymaps/keymap-ihifi.c
 keymaps/keymap-ypr1.c
 #elif CONFIG_KEYPAD == DX50_PAD
 keymaps/keymap-dx50.c
+#elif CONFIG_KEYPAD == PALM_TUNGSTENE2_PAD
+keymaps/keymap-tungstene2.c
 #endif

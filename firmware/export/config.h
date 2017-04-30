@@ -165,6 +165,7 @@
 #define SAMSUNG_YPR1_PAD  61
 #define SAMSUNG_YH920_PAD  62
 #define DX50_PAD           63
+#define PALM_TUNGSTENE2_PAD 64
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -277,6 +278,7 @@
 #define LCD_IHIFI         60 /* as used by IHIFI 760/960 */
 #define LCD_CREATIVEZENXFISTYLE 61 /* as used by Creative Zen X-Fi Style */
 #define LCD_SAMSUNGYPR1   62 /* as used by Samsung YP-R1 */
+#define LCD_PALMTUNGSTENE2   63 /* as used by Palm Tungsten E2 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -580,6 +582,8 @@ Lyre prototype 1 */
 #include "config/ibassodx50.h"
 #elif defined(DX90)
 #include "config/ibassodx90.h"
+#elif defined(PALM_TUNGSTENE2)
+#include "config/palmtungstene2.h"
 #else
 /* no known platform */
 #endif

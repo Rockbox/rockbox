@@ -118,6 +118,8 @@ struct sound_settings_info
 #include "codec-dx50.h"
 #elif defined(DX90)
 #include "codec-dx90.h"
+#elif defined(PALM_TUNGSTENE2)
+#include "codec-tungstene2.h"
 #endif
 
 /* convert caps into defines */

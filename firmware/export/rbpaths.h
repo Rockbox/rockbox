@@ -40,13 +40,15 @@
 #define ROCKBOX_DIR_LEN (sizeof(ROCKBOX_DIR)-1)
 #endif /* def __PCTOOL__ */
 
-#if !defined(APPLICATION) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || defined(DX50) || defined(DX90)
+#if !defined(APPLICATION) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || defined(DX50) || defined(DX90) || defined(PALM_TUNGSTENE2)
 
 #if defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
 #define HOME_DIR "/mnt/media0"
 #elif defined(DX50) || defined(DX90)
 /* Where to put save files like recordings, playlists, screen dumps ...*/
 #define HOME_DIR "/mnt/sdcard"
+#elif defined(PALM_TUNGSTENE2)
+#define HOME_DIR "/"
 #else
 #define HOME_DIR "/"
 #endif

@@ -1,0 +1,211 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ *
+ * Copyright (C) 2015 Lorenzo Miori
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+#include "config.h"
+#include "button.h"
+#include "kernel.h"
+#include "system.h"
+#include "button-target.h"
+#include "stdio.h"
+#include "unistd.h"
+
+#include <fcntl.h>
+#include <signal.h>
+#include <linux/input.h>
+#include <stropts.h>
+#include <poll.h>
+
+#include <pthread.h>
+
+#define KEYBOARD_BUFFER_SIZE    64
+
+struct pollfd keyboard_dev;
+struct input_event ev[KEYBOARD_BUFFER_SIZE];
+int size = sizeof(ev);
+int key = BUTTON_NONE;
+
+
+/* this function is run by the second thread */
+void *event_thread(void *key)
+{
+    
+    int ret;
+    int i;
+
+    while (1)
+    {
+//        key = BUTTON_NONE;
+		ret = read(keyboard_dev.fd, ev, sizeof(struct input_event) * KEYBOARD_BUFFER_SIZE);
+
+		if (ret < (int) sizeof(struct input_event)) 
+                {
+                    continue;
+		}
+
+		for (i = 0; i < ret / (int)sizeof(struct input_event); i++)
+                {
+    
+                                            printf("event: %d, %d, %d\n", ev[i].code, ev[i].type, ev[i].value);
+                            //ev.value == 1 && 
+                    if (ev[i].value == 1 && ev[i].type == 1)
+                    {
+                        /* Check for all the keys */
+                        if (ev[i].code == KEY_F1) {
+                            *(int*)key = BUTTON_USER;
+                        }
+                        if (ev[i].code == KEY_ENTER) {
+                            *(int*)key = BUTTON_SELECT;
+                        }
+                        if (ev[i].code == KEY_UP) {
+                            *(int*)key = BUTTON_UP;
+                        }
+                        if (ev[i].code == KEY_DOWN) {
+                            *(int*)key = BUTTON_DOWN;
+                        }
+                        if (ev[i].code == KEY_LEFT) {
+                            *(int*)key = BUTTON_LEFT;
+                        }
+                        if (ev[i].code == KEY_RIGHT) {
+                            *(int*)key = BUTTON_RIGHT;
+                        }
+                        if (ev[i].code == KEY_F3) {
+                            *(int*)key = BUTTON_MENU;
+                        }
+                        if (ev[i].code == KEY_F2) {
+                            *(int*)key = BUTTON_BACK;
+                        }
+                        if (ev[i].code == KEY_F4) {
+                            *(int*)key = BUTTON_POWER;
+                        }
+            }
+
+            // keyup
+            if (ev[i].value == 0 && ev[i].type == 1)
+            {
+                *(int*)key = BUTTON_NONE;
+            }
+
+        }
+    }
+
+/* the function must return something - NULL will do */
+return NULL;
+
+}
+
+/* this variable is our reference to the second thread */
+pthread_t inc_x_thread;
+
+int k = BUTTON_NONE;
+
+int button_read_device(void)
+{
+   
+    int ret = 0;
+    int i = 0;
+    
+    /* This I/O call is *not* blocking. Refer to button_init(). */
+    ret = read(keyboard_dev.fd, ev, sizeof(struct input_event) * KEYBOARD_BUFFER_SIZE);
+
+    if (ret >= (int) sizeof(struct input_event))
+    {
+
+        for (i = 0; i < ret / (int)sizeof(struct input_event); i++)
+                {
+    
+                                            printf("event: %d, %d, %d\n", ev[i].code, ev[i].type, ev[i].value);
+                            //ev.value == 1 && 
+                    if (ev[i].value == 1 && ev[i].type == 1)
+                    {
+                        /* Check for all the keys */
+                        if (ev[i].code == KEY_F1) {
+                            k = BUTTON_USER;
+                        }
+                        if (ev[i].code == KEY_ENTER) {
+                            k = BUTTON_SELECT;
+                        }
+                        if (ev[i].code == KEY_UP) {
+                            k = BUTTON_UP;
+                        }
+                        if (ev[i].code == KEY_DOWN) {
+                            k = BUTTON_DOWN;
+                        }
+                        if (ev[i].code == KEY_LEFT) {
+                            k = BUTTON_LEFT;
+                        }
+                        if (ev[i].code == KEY_RIGHT) {
+                            k = BUTTON_RIGHT;
+                        }
+                        if (ev[i].code == KEY_F3) {
+                            k = BUTTON_MENU;
+                        }
+                        if (ev[i].code == KEY_F2) {
+                            k = BUTTON_BACK;
+                        }
+                        if (ev[i].code == KEY_F4) {
+                            k = BUTTON_POWER;
+                        }
+            }
+
+            // keyup
+            if (ev[i].value == 0 && ev[i].type == 1)
+            {
+                k = BUTTON_NONE;
+            }
+
+        }
+    }
+    
+    return k;
+    
+    //return key;
+}
+
+bool headphones_inserted(void)
+{
+    /* GPIO low - 0 - means headphones inserted */
+    return 0;
+//    return !gpio_get(GPIO_HEADPHONE_SENSE);
+}
+
+void button_init_device(void)
+{
+    keyboard_dev.fd = open("/dev/input/event1", O_RDONLY);
+    keyboard_dev.events = POLLIN;
+
+    /* create a second thread which executes inc_x(&x) */
+    //if(pthread_create(&inc_x_thread, NULL, event_thread, &key))
+    //{
+
+    //fprintf(stderr, "Error creating thread\n");
+
+    //}
+
+    int flags = fcntl(keyboard_dev.fd, F_GETFL, 0);
+    fcntl(keyboard_dev.fd, F_SETFL, flags | O_NONBLOCK);
+
+}
+
+#ifdef BUTTON_DRIVER_CLOSE
+void button_close_device(void)
+{
+
+}
+#endif /* BUTTON_DRIVER_CLOSE */
