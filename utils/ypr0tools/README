@@ -7,6 +7,11 @@ $ sudo ./patch-firmware.sh files . # needs sudo
 $ ./fwcrypt R0.ROM <optional: source path>
 
 After that, R0.ROM is patched and can load Rockbox.
+Additionally a binary patch file named cramfs-fsl.rom.original is created and
+this file is used by Rockbox Utility to patch the firmware under the supported
+platforms which would be otherwise very tricky to handle.
+PLEASE NOTE: for this latter patch file to be successfully created, you SHALL
+execute ALL the steps above, otherwise the patch file will be empty !
 
 rockbox.sh is a script to put into rockbox.zip. It's a small loader script
 that sets stuff up.

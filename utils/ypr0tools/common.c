@@ -45,6 +45,9 @@ uint8_t g_yp_key[] =
 char* firmware_components[] = {"MBoot", "Linux", "RootFS", "Sysdata"};
 char* firmware_filenames[] = {"MBoot.bin", "zImage", "cramfs-fsl.rom", "SYSDATA.bin"};
 
+/* patched firmware md5sums */
+const struct t_ypr_patched_md5sum SAMSUNG_YPR0_INFO = { "8e93065fe1e0842d7cac55d7c63f407c" };
+
 void cyclic_xor(void *data, int datasize, void *xor, int xorsize)
 {
     for(int i = 0; i < datasize; i++)
