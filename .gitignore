@@ -94,6 +94,8 @@
 /tools/mkzenboot
 /tools/iaudio_bl_flash.c
 /tools/iaudio_bl_flash.h
+/tools/.vagrant
+/tools/*-console.log
 
 # /tools/database/
 /tools/database/database
