@@ -84,6 +84,9 @@ if [ ! -e $CRAMFS ]; then
     exit 1
 fi
 
+echo "Saving the original cramfs as $CRAMFS.original"
+cp $CRAMFS $CRAMFS.original
+
 echo "Extracting cramfs image"
 
 [ ! -e $ROOTFS ] || rm -R $ROOTFS
@@ -118,3 +121,23 @@ mknod $ROOTFS/dev/ttyGS0 c 127 0
 
 echo "Packing new cramfs image"
 cramfs-1.1/mkcramfs $ROOTFS $CRAMFS
+
+if [ -e "bsdiff/bsdiff" ]
+then
+
+    # Create the patch file (binary diff)
+    echo "Creating RAW binary patch file for $CRAMFS (against $CRAMFS.original) to $CRAMFS.patch"
+    bsdiff/bsdiff $CRAMFS.original $CRAMFS $CRAMFS.patch
+
+    echo "Compressing the RAW binary patch file to $CRAMFS.patch.compressed"
+
+    # Qt QByteArray::qUncompress requires a 4 bytes header consisting of
+    # the big-endian value indicating the original size of the data.
+    # Therefore, the following python snippet compress the data and appends the requisite header at the beginning
+    python -c "import zlib,sys,struct; fdata = sys.stdin.read() ; fdataheader = struct.pack('>I', len(fdata)) ; print fdataheader + \
+           zlib.compress(fdata)" < $CRAMFS.patch > $CRAMFS.patch.compressed
+
+    # Prepare suitable .c and .h files
+    echo "Converting the compressed Qt-compatible patch to source code"
+    ./bin2c $CRAMFS.patch.compressed samsung_yp$MODEL
+fi
