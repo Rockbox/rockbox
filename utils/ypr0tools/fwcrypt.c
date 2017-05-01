@@ -26,26 +26,8 @@
 #include <stdint.h>
 #include "common.h"
 
-static char* input_dir = NULL;
 static FILE* output_file = NULL;
 static struct firmware_data fw;
-
-static void cleanup(void)
-{
-    for (int i = 0; i < YPR0_COMPONENTS_COUNT; i++)
-    {
-        free(fw.component_data[i]);
-    }
-}
-
-static void die(int error)
-{
-    if (output_file != NULL)
-        fclose(output_file);
-    free(input_dir);
-    cleanup();
-    exit(error);
-}
 
 static void pad4byte(char byte, FILE* handle) {
     int padding = 4 - ftell(handle) % 4;
@@ -56,41 +38,27 @@ static void pad4byte(char byte, FILE* handle) {
     }
 }
 
-int main(int argc, char **argv)
+int ypr_encrypt(char* rom_file, char *input_path)
 {
     FILE* component_handle = NULL;
     FILE* rev_info_file = NULL;
     int error = 0;
     char* tmp_path = malloc(MAX_PATH);
+    int retval = SAMSUNG_ARG_ERROR;
 
     memset(&fw, 0, sizeof(fw));
 
-    if (argc < 2)
-    {
-        printf(
-            "Crypts Samsung YP-R0/YP-R1 ROM file format\n"
-            "Usage: fwcrypt <output ROM file path\n"
-        );
-        return 1;
-    }
-
-    input_dir = malloc(MAX_PATH);
-    input_dir[0] = '\0';
-    if (argc > 2)
-    {
-        strcpy(input_dir, argv[2]);
-    }
-
     /* open the output file for write */
-    output_file = fopen(argv[1], "wb");
+    output_file = fopen(rom_file, "wb");
     if (output_file == NULL)
     {
         fprintf(stderr, "Cannot open file for writing: %m\n");
-        die(SAMSUNG_WRITE_ERROR);
+        retval = SAMSUNG_WRITE_ERROR;
+        goto cleanup;
     }
 
     /* write generic header */
-    join_path(tmp_path, input_dir, "RevisionInfo.txt");
+    join_path(tmp_path, input_path, "RevisionInfo.txt");
     rev_info_file = fopen(tmp_path, "rb");
     if (rev_info_file != NULL)
     {
@@ -115,17 +83,19 @@ int main(int argc, char **argv)
     if(error != 0)
     {
         fprintf(stderr, "Cannot write generic header\n");
-        die(SAMSUNG_WRITE_ERROR);
+        retval = SAMSUNG_WRITE_ERROR;
+        goto cleanup;
     }
 
     for (int i = 0; i < YPR0_COMPONENTS_COUNT; i++)
     {
-        join_path(tmp_path, input_dir, firmware_filenames[i]);
+        join_path(tmp_path, input_path, firmware_filenames[i]);
         component_handle = fopen(tmp_path, "rb");
         if (component_handle == NULL)
         {
             fprintf(stderr, "Error while reading firmware component.\n");
-            die(SAMSUNG_READ_ERROR);
+            retval = SAMSUNG_READ_ERROR;
+            goto cleanup;
         }
         fw.component_size[i] = get_filesize(component_handle);
         fw.component_data[i] = malloc(fw.component_size[i] * sizeof(char));
@@ -141,7 +111,8 @@ int main(int argc, char **argv)
             fw.component_size[i], fw.component_checksum[i]) < 0)
         {
             fprintf(stderr, "Error writing to output file.\n");
-            die(SAMSUNG_WRITE_ERROR);
+            retval = SAMSUNG_WRITE_ERROR;
+            goto cleanup;
         }
     }
 
@@ -170,7 +141,8 @@ int main(int argc, char **argv)
         {
             fprintf(stderr, "%s: error writing data to file. Written %ld bytes\n",
                    firmware_components[i], written);
-            die(SAMSUNG_WRITE_ERROR);
+            retval = SAMSUNG_WRITE_ERROR;
+            goto cleanup;
         }
         /* padding */
         if (i < (YPR0_COMPONENTS_COUNT-1))
@@ -178,5 +150,41 @@ int main(int argc, char **argv)
     }
 
     /* free the big amount of memory and close handles */
-    die(SAMSUNG_SUCCESS);
+    retval = SAMSUNG_SUCCESS;
+    goto cleanup;
+
+cleanup:
+    /* cleanup resources */
+
+    for (int i = 0; i < YPR0_COMPONENTS_COUNT; i++)
+    {
+        if (fw.component_data[i] != NULL)
+            free(fw.component_data[i]);
+    }
+
+    if (output_file != NULL)
+        fclose(output_file);
+
+    return retval;
 }
+
+#ifdef FWCRYPT_EXECUTABLE
+int main(int argc, char **argv)
+{
+    if (argc < 2)
+    {
+        printf("Crypts Samsung YP-R0/YP-R1 ROM file format\n"
+               "Usage: fwcrypt <output ROM file path\n");
+        return SAMSUNG_ARG_ERROR;
+    }
+
+    if (argc > 2)
+    {
+        return ypr_encrypt(argv[1], argv[2]);
+    }
+    else
+    {
+        return ypr_encrypt(argv[1], "");
+    }
+}
+#endif

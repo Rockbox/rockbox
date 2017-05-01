@@ -69,6 +69,11 @@ SOURCES += \
  base/rockboxinfo.cpp \
  ../../tools/mkboot.c \
  ../../tools/iriver.c \
+ ../../utils/ypr0tools/common.c \
+ ../../utils/ypr0tools/fwdecrypt.c \
+ ../../utils/ypr0tools/fwcrypt.c \
+ ../../utils/ypr0tools/samsung_ypr0.c \
+ ../../utils/ypr0tools/bsdiff/bspatch.c \
  base/ziputil.cpp \
  gui/comboboxviewdelegate.cpp \
  gui/selectiveinstallwidget.cpp \
@@ -81,6 +86,7 @@ SOURCES += \
  mspack/system-mspack.c \
  base/mspackutil.cpp \
  base/archiveutil.cpp \
+    $$PWD/base/bootloaderinstallypr.cpp
 
 
 HEADERS += \
@@ -145,6 +151,9 @@ HEADERS += \
  base/rockboxinfo.h \
  ../../tools/mkboot.h \
  ../../tools/iriver.h \
+ ../../utils/ypr0tools/common.h \
+ ../../utils/ypr0tools/samsung_ypr0.h \
+ ../../utils/ypr0tools/bsdiff/bspatch.h \
  base/ziputil.h \
  lame/lame.h \
  gui/comboboxviewdelegate.h \
@@ -169,6 +178,7 @@ HEADERS += \
  mspack/szdd.h \
  base/mspackutil.h \
  base/archiveutil.h \
+    $$PWD/base/bootloaderinstallypr.h
 
 
 FORMS += \
