@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * Copyright (C) 2013 Lorenzo Miori
+ * Copyright (C) 2013-2017 Lorenzo Miori
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,58 +27,27 @@
 #include <stdbool.h>
 #include "common.h"
 
-static char* output_dir = NULL;
-static FILE* input_file = NULL;
-static struct firmware_data fw;
-
-static void cleanup(void)
+/* This is the main decrypt function */
+int ypr_decrypt(char *input_file_path, char *output_dir)
 {
-    for (int i = 0; i < YPR0_COMPONENTS_COUNT; i++)
-    {
-        free(fw.component_data[i]);
-    }
-}
-
-static void die(int error)
-{
-    if (input_file != NULL)
-        fclose(input_file);
-    free(output_dir);
-    cleanup();
-    exit(error);
-}
-
-int main(int argc, char **argv)
-{
+    FILE* input_file = NULL;
     FILE* component_handle = NULL;
     FILE* rev_info_file = NULL;
-    char* tmp_path = malloc(MAX_PATH);
+    struct firmware_data fw;
+    char tmp_path[MAX_PATH];
     int error = 0;
     bool md5sum_error = false;
+    int retval = SAMSUNG_ARG_ERROR;
 
     memset(&fw, 0, sizeof(fw));
 
-    if (argc < 2)
-    {
-        printf("Decrypts Samsung YP-R0/YP-R1 ROM file format\n"
-               "Usage: fwdecrypt <ROM file path\n"
-        );
-        return 1;
-    }
-
-    output_dir = malloc(MAX_PATH);
-    output_dir[0] = '\0';
-    if (argc > 2)
-    {
-        strcpy(output_dir, argv[2]);
-    }
-
     /* open the output file for write */
-    input_file = fopen(argv[1], "rb");
+    input_file = fopen(input_file_path, "rb");
     if (input_file == NULL)
     {
         fprintf(stderr, "Cannot open file for reading: %m\n");
-        die(SAMSUNG_READ_ERROR);
+        retval =  SAMSUNG_READ_ERROR;
+        goto cleanup;
     }
 
     /* read some generic information */
@@ -98,7 +67,8 @@ int main(int argc, char **argv)
     if (error != 0)
     {
         fprintf(stderr, "Cannot write generic header\n");
-        die(SAMSUNG_WRITE_ERROR);
+        retval = SAMSUNG_WRITE_ERROR;
+        goto cleanup;
     }
 
     /* read metadata */
@@ -154,7 +124,8 @@ int main(int argc, char **argv)
         if (component_handle == NULL)
         {
             fprintf(stderr, "Error opening file for writing. Is the directory valid and writeable?\n");
-            die(SAMSUNG_WRITE_ERROR);
+            retval =  SAMSUNG_WRITE_ERROR;
+            goto cleanup;
         }
 
         fwrite(fw.component_data[i], 1, fw.component_size[i], component_handle);
@@ -162,7 +133,51 @@ int main(int argc, char **argv)
 
     }
 
-    if (md5sum_error)
-        die(SAMSUNG_MD5_ERROR);
-    die(SAMSUNG_SUCCESS);
+    /* check the final result */
+    if (md5sum_error == true)
+    {
+        retval = SAMSUNG_MD5_ERROR;
+    }
+    else
+    {
+        retval = SAMSUNG_SUCCESS;
+    }
+
+cleanup:
+    /* Cleanup created resources */
+
+    if (input_file != NULL)
+    {
+        fclose(input_file);
+    }
+
+    for (int i = 0; i < YPR0_COMPONENTS_COUNT; i++)
+    {
+        if (fw.component_data[i] != NULL)
+            free(fw.component_data[i]);
+    }
+
+    return retval;
+
 }
+
+#ifdef FWCRYPT_EXECUTABLE
+int main(int argc, char **argv)
+{
+    if (argc < 2)
+    {
+        printf("Decrypts Samsung YP-R0/YP-R1 ROM file format\n"
+               "Usage: fwdecrypt <ROM file path\n");
+        return SAMSUNG_ARG_ERROR;
+    }
+
+    if (argc > 2)
+    {
+        return ypr_decrypt(argv[1], argv[2]);
+    }
+    else
+    {
+        return ypr_decrypt(argv[1], "");
+    }
+}
+#endif
