@@ -28,6 +28,10 @@
 #include <getopt.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined(WIN32)
 #  define DIR_SEPARATOR '\\'
 #else
@@ -76,11 +80,20 @@ enum samsung_error_t
     SAMSUNG_FORMAT_ERROR = -2,
     SAMSUNG_MD5_ERROR = -3,
     SAMSUNG_WRITE_ERROR = -4,
+    SAMSUNG_ARG_ERROR = -5
 };
 
-void cyclic_xor(void *data, int datasize, void *xor, int xorsize);
+//void cyclic_xor(void* data, int datasize, void* xor, int xorsize);
 size_t get_filesize(FILE* handle);
 void join_path(char* destination, char* first, char* second);
 void md5sum(char* component_checksum, char* data, unsigned long size);
+
+/* decrypt/encrypt functionality */
+int ypr_decrypt(char *input_file_path, char *output_dir);
+int ypr_encrypt(char* rom_file, char *input_path);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _COMMON_H_ */
