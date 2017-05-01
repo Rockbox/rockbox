@@ -84,6 +84,9 @@ if [ ! -e $CRAMFS ]; then
     exit 1
 fi
 
+echo "Saving the original cramfs as $CRAMFS.original"
+cp $CRAMFS $CRAMFS.original
+
 echo "Extracting cramfs image"
 
 [ ! -e $ROOTFS ] || rm -R $ROOTFS
@@ -118,3 +121,13 @@ mknod $ROOTFS/dev/ttyGS0 c 127 0
 
 echo "Packing new cramfs image"
 cramfs-1.1/mkcramfs $ROOTFS $CRAMFS
+
+if [ -e "bsdiff/bsdiff" ]
+then
+    echo "Creating RAW binary patch file for $CRAMFS (against $CRAMFS.original) to $CRAMFS.patch"
+    bsdiff/bsdiff $CRAMFS.original $CRAMFS $CRAMFS.patch
+    echo "Gzipping the RAW binary patch file to $CRAMFS.patch.gzip"
+    cat $CRAMFS.patch | gzip --stdout > $CRAMFS.patch.gzip
+    echo "Converting the gzipped patch to source code"
+    ./bin2c $CRAMFS.patch.gzip samsung_yp$MODEL
+fi
