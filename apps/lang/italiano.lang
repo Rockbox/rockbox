@@ -254,6 +254,7 @@
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
+    creativezen*: "Select = Yes"
   </source>
   <dest>
     *: "PLAY = Sì"
@@ -263,6 +264,7 @@
     mrobe500: "PLAY, POWER o alto-destra = Sì"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Sì"
+    creativezen*: "SELECT = Sì"
   </dest>
   <voice>
     *: ""
@@ -12273,15 +12275,15 @@ desc: deprecated
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Controlli Tono"
+    gigabeats,samsungypr1: "Controllo dei toni"
   </dest>
   <voice>
     *: none
-    gigabeats: "Controlli Tono"
+    gigabeats,samsungypr1: "Controllo dei toni"
   </voice>
 </phrase>
 <phrase>
@@ -12290,15 +12292,15 @@ desc: deprecated
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Impostazioni Avanzate Controlli Tono"
+    gigabeats,samsungypr1: "Impostazioni Avanzate Controllo tono"
   </dest>
   <voice>
     *: none
-    gigabeats: "Impostazioni Avanzate Controlli Tono"
+    gigabeats,samsungypr1: "Impostazioni Avanzate Controllo tono"
   </voice>
 </phrase>
 <phrase>
@@ -12307,15 +12309,15 @@ desc: deprecated
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Guadagno Banda %d"
+    gigabeats,samsungypr1: "Guadagno banda %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Guadagno Banda"
+    gigabeats,samsungypr1: "Guadagno banda"
   </voice>
 </phrase>
 <phrase>
@@ -12324,15 +12326,15 @@ desc: deprecated
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Frequenza Banda %d"
+    gigabeats,samsungypr1: "Frequenza banda %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Frequenza Banda"
+    gigabeats,samsungypr1: "Frequenza banda"
   </voice>
 </phrase>
 <phrase>
@@ -12341,15 +12343,15 @@ desc: deprecated
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Ampiezza Banda %d"
+    gigabeats,samsungypr1: "Ampiezza banda %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Ampiezza Banda"
+    gigabeats,samsungypr1: "Ampiezza banda"
   </voice>
 </phrase>
 <phrase>
@@ -12358,15 +12360,15 @@ desc: deprecated
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: ""
   </dest>
   <voice>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: ""
   </voice>
 </phrase>
 <phrase>
@@ -12375,15 +12377,15 @@ desc: deprecated
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: ""
   </dest>
   <voice>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: ""
   </voice>
 </phrase>
 <phrase>
@@ -13081,5 +13083,485 @@ desc: deprecated
   </dest>
   <voice>
     *: "Morbido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_METHOD2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "SIDE ONLY"
+  </source>
+  <dest>
+    *: none
+    swcodec: "SIDE ONLY"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "SIDE ONLY"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Disabilita tasti non mappati"
+  </dest>
+  <voice>
+    *: "Disabilita tasti non mappati"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> System -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Mass Storage"
+    ibassodx90: "Mass Storage"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Memoria di massa"
+    ibassodx90: "Memoria di massa"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Memoria di massa"
+    ibassodx90: "Memoria di massa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Separatore di linea"
+  </dest>
+  <voice>
+    *: "Separatore di linea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ENABLED
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Enabled"
+  </source>
+  <dest>
+    *: "Abilitata"
+  </dest>
+  <voice>
+    *: "Abilitata"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Disable Touch"
+  </dest>
+  <voice>
+    *: "Disable Touch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Skip"
+  </source>
+  <dest>
+    *: "Skip"
+  </dest>
+  <voice>
+    *: "Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PBE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Autolock Off"
+  </dest>
+  <voice>
+    *: "Autolock Off"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Notify"
+  </source>
+  <dest>
+    *: "Disable Notify"
+  </dest>
+  <voice>
+    *: "Disable Notify"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_CHARGE
+  desc: in Settings -> General -> System -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Charge Only"
+    ibassodx90: "Charge Only"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Solo ricarica batteria"
+    ibassodx90: "Solo ricarica batteria"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Solo ricarica batteria"
+    ibassodx90: "Solo ricarica batteria"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Limite massimo del volume"
+  </dest>
+  <voice>
+    *: "Limite massimo del volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x2)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x2)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x2)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE
+  desc: in Settings -> General -> System -> USB Mode
+  user: core
+  <source>
+    *: none
+    ibassodx50: "USB Mode"
+    ibassodx90: "USB Mode"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Modalità USB"
+    ibassodx90: "Modalità USB"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Modalità USB"
+    ibassodx90: "Modalità USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Selective Backlight"
+  </source>
+  <dest>
+    *: "Retroilluminazione adattabile"
+  </dest>
+  <voice>
+    *: "Retroilluminazione adattabile"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Autolock On"
+  </dest>
+  <voice>
+    *: "Autolock On"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_ADB
+  desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Advanced Key Lock"
+  </dest>
+  <voice>
+    *: "Advanced Key Lock"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
+  desc: in Settings -> General -> System -> Freq Scaling Governor
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Seek"
+  </source>
+  <dest>
+    *: "Seek"
+  </dest>
+  <voice>
+    *: "Seek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x1)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x1)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x1)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_PLAY
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Play"
+  </dest>
+  <voice>
+    *: "Play"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Attack Time"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Attack Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Colore separatore di linea"
+  </dest>
+  <voice>
+    *: "Colore separatore di linea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Haas Surround"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Haas Surround"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Haas Surround"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Disable on External Power"
+  </dest>
+  <voice>
+    *: "Disable on External Power"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_MIX
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Dry / Wet Mix"
   </voice>
 </phrase>
