@@ -24,7 +24,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -35,9 +34,23 @@
 #define O_BINARY 0
 #endif
 
+#ifdef WIN32
+#include <windows.h>
+#define sleep_ms(ms) Sleep(ms)
+#else
+#include <time.h>
+static void sleep_ms(unsigned int ms)
+{
+   struct timespec req;
+   req.tv_sec = ms / 1000;
+   req.tv_nsec = (ms % 1000) * 1000000;
+   nanosleep(&req, NULL);
+}
+#endif
+
 #define DEFAULT_LOOP_PERIOD 1  /* seconds */
 
-#define ERROR(format, ...) \
+#define _ERR(format, ...) \
     do { \
         snprintf(errstr, errstrsize, "[ERR] "format, __VA_ARGS__); \
         goto error; \
@@ -48,10 +61,10 @@ static int write_file(char *outfile, unsigned char* buf,
 {
     int fd = open(outfile, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0666);
     if (fd < 0)
-        ERROR("Could not open %s for writing", outfile);
+        _ERR("Could not open %s for writing", outfile);
 
     if (write(fd, buf, bufsize) != bufsize)
-        ERROR("Could not write file %s", outfile);
+        _ERR("Could not write file %s", outfile);
 
     return 1;
 
@@ -68,32 +81,24 @@ static unsigned char *read_file(char *infile, int *bufsize,
 
     fd = open(infile, O_RDONLY|O_BINARY);
     if (fd < 0)
-        ERROR("Could not open %s for reading", infile);
+        _ERR("Could not open %s for reading", infile);
 
     if (fstat(fd, &s) < 0)
-        ERROR("Checking size of input file %s", infile);
+        _ERR("Checking size of input file %s", infile);
 
     *bufsize = s.st_size;
 
     buf = malloc(*bufsize);
     if (buf == NULL)
-        ERROR("Could not allocate memory for %s", infile);
+        _ERR("Could not allocate memory for %s", infile);
 
     if (read(fd, buf, *bufsize) != *bufsize)
-        ERROR("Could not read file %s", infile);
+        _ERR("Could not read file %s", infile);
 
     return buf;
 
 error:
     return NULL;
-}
-
-static void sleep_ms(unsigned int ms)
-{
-   struct timespec req;
-   req.tv_sec = ms / 1000;
-   req.tv_nsec = (ms % 1000) * 1000000;
-   nanosleep(&req, NULL);
 }
 
 static void usage(void)
@@ -169,7 +174,11 @@ int main(int argc, char* argv[])
     int dfusize;
 
     fprintf(stderr,
+#if defined(WIN32) && defined(USE_LIBUSBAPI)
+    "mks5lboot Version " VERSION " (libusb)\n"
+#else
     "mks5lboot Version " VERSION "\n"
+#endif
     "This is free software; see the source for copying conditions.  There is NO\n"
     "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
     "\n");

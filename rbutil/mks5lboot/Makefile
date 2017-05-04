@@ -4,6 +4,7 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
+CC := gcc
 CFLAGS += -Wall -Wextra
 
 OUTPUT = mks5lboot
@@ -15,17 +16,24 @@ SOURCES := $(LIBSOURCES) main.c
 # dependencies for binary
 EXTRADEPS :=
 
-ifeq ($(findstring MINGW,$(shell uname)),MINGW)
+CPPDEFINES := $(shell echo foo | $(CROSS)$(CC) -dM -E -)
+
+ifeq ($(findstring WIN32,$(CPPDEFINES)),WIN32)
 LDOPTS += -lsetupapi
-# optional libusb support on Windows
-ifdef DISABLE_LIBUSBAPI
-CFLAGS += -DNO_LIBUSBAPI
-else
+# optional libusb support (needed for WinUSB and libusbK drivers)
+ifeq ($(findstring MINGW,$(CPPDEFINES)),MINGW)
+ifeq ($(USE_LIBUSBAPI),1)
+CFLAGS += -DUSE_LIBUSBAPI
 LDOPTS += -Wl,-Bstatic -lusb-1.0
 endif
+endif
 else
-# Linux, OS X
+ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
+LDOPTS += -L/usr/local/lib -framework IOKit -framework CoreFoundation
+else # Linux
+CFLAGS += -DUSE_LIBUSBAPI
 LDOPTS += -lusb-1.0
+endif
 endif
 
 include ../libtools.make
