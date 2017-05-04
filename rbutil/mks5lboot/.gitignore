@@ -1,2 +1,5 @@
 buildposix/
+buildmingw/
+builddarwin/
 mks5lboot
+mks5lboot.exe

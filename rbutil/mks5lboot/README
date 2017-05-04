@@ -5,7 +5,7 @@ A tool to install/uninstall a dual bootloader into a s5l8702 based
 device:
 
   - iPod Classic 6G
-  - iPod Nano 3G (TODO)
+  - iPod Nano 3G (WIP)
 
 
 Usage
@@ -97,32 +97,40 @@ Prerequisites:
              [INFO] DFU device state: 2
            . When the device is found but there is no driver installed:
              [ERR] Could not open USB device: LIBUSB_ERROR_NOT_SUPPORTED
-           . Then the device is found but driver is not valid (probably a
+           . When the device is found but driver is not valid (probably a
              libusb-win32 driver is installed):
              [ERR] Could not set USB configuration: LIBUSB_ERROR_NOT_FOUND
     . If there is no valid DFU driver installed, try one of these:
         a) Use Zadig (http://zadig.akeo.ie/) to build and install a WinUSB
            (libusb.info) or libusbK driver for your device. Note that
            libusb-win32 (libusb0) drivers are not valid for mks5lboot.
-        b) Use Apple Mobile Device USB driver (included with iTunes).
+        b) Use Apple Mobile Device USB driver (included with iTunes). To
+           install this driver without iTunes see https://www.freemyipod.org
+           /wiki/EmCORE_Installation/iPodClassic/InstalliTunesDrivers
 
 Command line install:
 
   - If you are using iTunes on Windows, close iTunes and kill (or pause)
     iTunesHelper.exe before entering DFU mode.
 
+  - If you are using iTunes on Mac, quit iTunes and kill (or pause) the
+    iTunesHelper process before entering DFU mode.
+    You can use "ps x | grep iTunesHelper" to locate the process <PID>,
+    use "kill -STOP <PID>" to suspend the process and "kill -CONT <PID>"
+    to resume it once the bootloader is installed.
+
   - Put you device on DFU mode by pressing and holding SELECT+MENU buttons
     for about 12 seconds.
 
     You can notice when the device enters DFU mode running the next command
     to scan the USB bus every second (press Ctrl-C to abort the scan):
-      mks5lboot --dfuscan --loop
+      ./mks5lboot --dfuscan --loop
 
   - To install or update a bootloader, build the DFU installer and send it
     to the device:
-      mks5lboot --bl-inst /path/to/bootloader-ipod6g.ipod
+      ./mks5lboot --bl-inst path/to/bootloader-ipod6g.ipod
 
-    When the DFU imagen is loaded and executed, the device emits an 'alive'
+    When the DFU image is loaded and executed, the device emits an 'alive'
     tone (2000Hz/100ms). When the bootloader is successfully installed then
     a dual tone beep sounds (1000Hz/100ms+2000Hz/150ms) and the device
     reboots. If something went bad then 330Hz/500ms tone is emited and the
@@ -132,10 +140,15 @@ Command line install:
 
   - To remove a previously installed bootloader, build the DFU uninstaler
     and send it to the device:
-      mks5lboot --bl-uninst ipod6g
+      ./mks5lboot --bl-uninst ipod6g
 
-  If USB access is denied, try to run the mks5lboot tool using a privileged
-  user (i.e. Administrator or root).
+  Notes:
+
+  - If USB access is denied, try to run the mks5lboot tool using a privileged
+    user (i.e. Administrator or root).
+
+  - On Windows, use 'mks5lboot' or 'mks5lboot.exe' instead of './mks5lboot'.
+
 
 
 Dual-Boot
@@ -192,14 +205,20 @@ To build the DFU single-boot installer and send it to the device:
   mks5lboot --bl-inst --single /path/to/bootloader-ipod6g.ipod
 
 
-Compilation
------------
+Build
+-----
 
-Needs libusb > 1.0 installed, tested on:
+To build type 'make'.
 
-Linux: gcc-4.9.2 + libusb-1.0.19
-Windows XP: mingw32-gcc-4.8.1 + libusbx-1.0.15
-OS X 10.11: clang-7.3.0 + libusb-1.0.20
+Linux needs libusb >= 1.0, use your package manager to install libusb.
+
+For Windows, to build with libusb support type 'make USE_LIBUSBAPI=1'.
+
+Tested on:
+  Linux: gcc-4.9.2 + libusb-1.0.19
+  Windows XP: mingw32-gcc-4.8.1 + libusbx-1.0.15
+  OS X 10.11: clang-7.3.0 + libusb-1.0.20
+  MXE: i686-w64-mingw32.static-gcc 5.4.0 + libusb-1.0.21
 
 
 Hacking
