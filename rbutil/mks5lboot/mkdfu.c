@@ -117,7 +117,7 @@ static void put_uint32le(unsigned char* p, uint32_t x)
     p[3] = (x >> 24) & 0xff;
 }
 
-#define ERROR(format, ...) \
+#define _ERR(format, ...) \
     do { \
         snprintf(errstr, errstrsize, "[ERR] "format, __VA_ARGS__); \
         goto error; \
@@ -135,16 +135,16 @@ static unsigned char *load_file(char *filename, int *bufsize,
 
     fd = open(filename, O_RDONLY|O_BINARY);
     if (fd < 0)
-        ERROR("Could not open %s for reading", filename);
+        _ERR("Could not open %s for reading", filename);
 
     if (fstat(fd, &s) < 0)
-        ERROR("Checking filesize of input file %s", filename);
+        _ERR("Checking filesize of input file %s", filename);
     *bufsize = s.st_size;
 
     if (is_rbbl) {
         /* Read Rockbox header */
         if (read(fd, header, sizeof(header)) != sizeof(header))
-            ERROR("Could not read file %s", filename);
+            _ERR("Could not read file %s", filename);
         *bufsize -= sizeof(header);
 
         for (i = 0; i < NUM_MODELS; i++)
@@ -152,7 +152,7 @@ static unsigned char *load_file(char *filename, int *bufsize,
                 break;
 
         if (i == NUM_MODELS)
-            ERROR("Model name \"%4.4s\" unknown. "
+            _ERR("Model name \"%4.4s\" unknown. "
                     "Is this really a rockbox bootloader?", header + 4);
 
         *model = &ipod_identity[i];
@@ -160,10 +160,10 @@ static unsigned char *load_file(char *filename, int *bufsize,
 
     buf = malloc(*bufsize);
     if (buf == NULL)
-        ERROR("Could not allocate memory for %s", filename);
+        _ERR("Could not allocate memory for %s", filename);
 
     if (read(fd, buf, *bufsize) != *bufsize)
-        ERROR("Could not read file %s", filename);
+        _ERR("Could not read file %s", filename);
 
     if (is_rbbl) {
         /* Check checksum */
@@ -173,7 +173,7 @@ static unsigned char *load_file(char *filename, int *bufsize,
              sum += buf[i];
         }
         if (sum != get_uint32be(header))
-            ERROR("Checksum mismatch in %s", filename);
+            _ERR("Checksum mismatch in %s", filename);
     }
 
     close(fd);
@@ -223,7 +223,7 @@ unsigned char *mkdfu(int dfu_type, char *dfu_arg, int* dfu_size,
                 }
             }
             if (!model)
-                ERROR("Platform name \"%s\" unknown", dfu_arg);
+                _ERR("Platform name \"%s\" unknown", dfu_arg);
 
             *dfu_size = BIN_OFFSET + model->dualboot_uninstall_size;
             dfu_desc = "BL uninstaller";
@@ -255,11 +255,11 @@ unsigned char *mkdfu(int dfu_type, char *dfu_arg, int* dfu_size,
     }
 
     if (*dfu_size > DFU_MAXSIZE)
-        ERROR("DFU image (%d bytes) too big", *dfu_size);
+        _ERR("DFU image (%d bytes) too big", *dfu_size);
 
     dfu_buf = calloc(*dfu_size, 1);
     if (!dfu_buf)
-        ERROR("Could not allocate %d bytes for DFU image", *dfu_size);
+        _ERR("Could not allocate %d bytes for DFU image", *dfu_size);
 
     cert_off = get_uint32le(s5l8702hdr.u.enc34.cert_off);
     cert_sz  = get_uint32le(s5l8702hdr.u.enc34.cert_sz);
