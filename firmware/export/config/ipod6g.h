@@ -246,8 +246,8 @@
 //#define USB_ENABLE_SERIAL
 #define HAVE_USBSTACK
 #define HAVE_USB_HID_MOUSE
-#define USB_VENDOR_ID 0x05AC
-#define USB_PRODUCT_ID 0x1261
+#define USB_VENDOR_ID 0x1d50
+#define USB_PRODUCT_ID 0x531d
 #define USB_DEVBSS_ATTR __attribute__((aligned(32)))
 #define HAVE_BOOTLOADER_USB_MODE
 #ifdef BOOTLOADER

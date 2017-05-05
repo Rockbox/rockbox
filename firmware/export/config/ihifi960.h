@@ -149,8 +149,8 @@
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
 
-#define USB_VENDOR_ID 0x071b
-#define USB_PRODUCT_ID 0x3202
+#define USB_VENDOR_ID 0x1d50
+#define USB_PRODUCT_ID 0x53e7
 #define HAVE_BOOTLOADER_USB_MODE
 
 /* Define this if your LCD can set contrast */

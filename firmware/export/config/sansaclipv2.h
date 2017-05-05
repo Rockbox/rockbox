@@ -185,8 +185,8 @@
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
-#define USB_VENDOR_ID 0x0781
-#define USB_PRODUCT_ID 0x7435
+#define USB_VENDOR_ID 0x1d50
+#define USB_PRODUCT_ID 0x533c
 #define HAVE_BOOTLOADER_USB_MODE
 
 /* Virtual LED (icon) */

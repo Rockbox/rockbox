@@ -218,8 +218,8 @@
 #define HAVE_USBSTACK
 /* usb stack and driver settings */
 #define USB_PORTSCX_PHY_TYPE PORTSCX_PTS_ULPI
-#define USB_VENDOR_ID 0x0930
-#define USB_PRODUCT_ID 0x0010
+#define USB_VENDOR_ID 0x1d50
+#define USB_PRODUCT_ID 0x5329
 #define HAVE_USB_HID_MOUSE
 #ifdef BOOTLOADER
 /* enable bootloader USB mode - ONLY define when also BOOTLOADER */
