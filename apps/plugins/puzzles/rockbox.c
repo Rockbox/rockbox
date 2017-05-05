@@ -964,7 +964,8 @@ const char *preset_formatter(int sel, void *data, char *buf, size_t len)
 }
 
 /* main worker function */
-static bool do_preset_menu(struct preset_menu *menu, char *title)
+/* returns the index of the selected item on success, -1 on failure */
+static int do_preset_menu(struct preset_menu *menu, char *title, int selected)
 {
     if(!menu->n_entries)
         return false;
@@ -977,9 +978,9 @@ static bool do_preset_menu(struct preset_menu *menu, char *title)
     rb->gui_synclist_set_nb_items(&list, menu->n_entries);
     rb->gui_synclist_limit_scroll(&list, false);
 
-    rb->gui_synclist_select_item(&list, 0); /* we don't start with the current one selected */
+    rb->gui_synclist_select_item(&list, selected);
 
-    char def[] = "Game Type";
+    static char def[] = "Game Type";
     rb->gui_synclist_set_title(&list, title ? title : def, NOICON);
     while(1)
     {
@@ -996,19 +997,19 @@ static bool do_preset_menu(struct preset_menu *menu, char *title)
             if(entry->params)
             {
                 midend_set_params(me, entry->params);
-                return true;
+                return sel;
             }
             else
             {
                 /* recurse */
-                if(do_preset_menu(entry->submenu, entry->title))
-                    return true;
+                if(do_preset_menu(entry->submenu, entry->title, 0)) /* select first one */
+                    return sel;
             }
             break;
         }
         case ACTION_STD_PREV:
         case ACTION_STD_CANCEL:
-            return false;
+            return -1;
         default:
             break;
         }
@@ -1017,7 +1018,20 @@ static bool do_preset_menu(struct preset_menu *menu, char *title)
 
 static bool presets_menu(void)
 {
-    return do_preset_menu(midend_get_presets(me, NULL), NULL);
+    /* figure out the index of the current preset
+     * if it's in a submenu, give up and default to the first item */
+    struct preset_menu *top = midend_get_presets(me, NULL);
+    int sel = 0;
+    for(int i = 0; i < top->n_entries; ++i)
+    {
+        if(top->entries[i].id == midend_which_preset(me))
+        {
+            sel = i;
+            break;
+        }
+    }
+
+    return do_preset_menu(midend_get_presets(me, NULL), NULL, sel) >= 0;
 }
 
 static const struct {
