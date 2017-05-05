@@ -180,8 +180,8 @@
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
 //#define USB_HANDLED_BY_OF
-#define USB_VENDOR_ID 0x041e
-#define USB_PRODUCT_ID 0x4133
+#define USB_VENDOR_ID 0x1d50
+#define USB_PRODUCT_ID 0x5319
 #define HAVE_USB_HID_MOUSE
 #define HAVE_BOOTLOADER_USB_MODE
 

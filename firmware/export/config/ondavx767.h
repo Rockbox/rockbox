@@ -163,8 +163,8 @@
 
 #define CONFIG_USBOTG   USBOTG_JZ4740
 #define HAVE_USBSTACK
-#define USB_VENDOR_ID   0x07C4
-#define USB_PRODUCT_ID  0xA4A5
+#define USB_VENDOR_ID 0x1d50
+#define USB_PRODUCT_ID 0x5326
 
 /* Define this if a programmable hotkey is mapped */
 //#define HAVE_HOTKEY

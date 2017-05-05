@@ -169,8 +169,8 @@
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
-#define USB_VENDOR_ID 0x0471
-#define USB_PRODUCT_ID 0x014f
+#define USB_VENDOR_ID 0x1d50
+#define USB_PRODUCT_ID 0x5303
 #define HAVE_USB_HID_MOUSE
 #ifdef BOOTLOADER
 /* enable bootloader USB mode - ONLY define when also BOOTLOADER */

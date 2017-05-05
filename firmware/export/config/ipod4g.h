@@ -203,8 +203,8 @@
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
-#define USB_VENDOR_ID 0x05ac
-#define USB_PRODUCT_ID 0x1203
+#define USB_VENDOR_ID 0x1d50
+#define USB_PRODUCT_ID 0x5333
 #define HAVE_USB_HID_MOUSE
 
 /* Define this if you have adjustable CPU frequency */
