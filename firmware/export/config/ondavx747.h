@@ -210,8 +210,8 @@ No access to the NAND yet..
 /* Connect by events, not by tick polling */
 #define USB_STATUS_BY_EVENT
 
-#define USB_VENDOR_ID     0x07C4
-#define USB_PRODUCT_ID    0xA4A5
+#define USB_VENDOR_ID 0x1d50
+#define USB_PRODUCT_ID 0x5378
 
 /* Define this if a programmable hotkey is mapped */
 //#define HAVE_HOTKEY

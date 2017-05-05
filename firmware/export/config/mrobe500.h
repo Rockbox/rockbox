@@ -218,8 +218,8 @@
 //#define USBPOWER_BTN_IGNORE BUTTON_TOUCH
 /* usb stack and driver settings */
 #define USB_NUM_ENDPOINTS   7
-#define USB_VENDOR_ID       0x07b4
-#define USB_PRODUCT_ID      0x0281
+#define USB_VENDOR_ID 0x1d50
+#define USB_PRODUCT_ID 0x5346
 #define HAVE_USB_HID_MOUSE
 
 /* Define this if hardware supports alternate blitting */

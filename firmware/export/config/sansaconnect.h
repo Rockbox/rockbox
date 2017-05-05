@@ -184,8 +184,8 @@
 
 #if 0
 #define HAVE_USBSTACK
-#define USB_VENDOR_ID 0x0781
-#define USB_PRODUCT_ID 0x7480
+#define USB_VENDOR_ID 0x1d50
+#define USB_PRODUCT_ID 0x5342
 #endif
 
 #define INCLUDE_TIMEOUT_API

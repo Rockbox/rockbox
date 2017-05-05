@@ -9,8 +9,8 @@
 
 #if 0
 #define HAVE_USBSTACK
-#define USB_VENDOR_ID 0x0e21
-#define USB_PRODUCT_ID 0x0800
+#define USB_VENDOR_ID 0x1d50
+#define USB_PRODUCT_ID 0x5321
 #endif
 
 
