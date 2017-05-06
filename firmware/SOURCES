@@ -1485,7 +1485,6 @@ target/arm/imx233/samsung-ypz5/lcd-ypz5.c
 target/arm/imx233/samsung-ypz5/button-ypz5.c
 target/arm/imx233/samsung-ypz5/debug-ypz5.c
 target/arm/imx233/samsung-ypz5/powermgmt-ypz5.c
-target/arm/imx233/button-lradc-imx233.c
 #ifndef BOOTLOADER
 target/arm/imx233/fmradio-imx233.c
 #endif
