@@ -53,9 +53,32 @@
 #include <windows.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <ddk/ntddscsi.h>
 
 #include "ipodio.h"
+
+/* from ddk/ntddscsi.h */
+#define SCSI_IOCTL_DATA_OUT               0
+#define SCSI_IOCTL_DATA_IN                1
+#define SCSI_IOCTL_DATA_UNSPECIFIED       2
+
+#define IOCTL_SCSI_PASS_THROUGH \
+    CTL_CODE(FILE_DEVICE_CONTROLLER, 0x0401, METHOD_BUFFERED, FILE_READ_ACCESS | FILE_WRITE_ACCESS)
+
+typedef struct _SCSI_PASS_THROUGH {
+    USHORT  Length;
+    UCHAR  ScsiStatus;
+    UCHAR  PathId;
+    UCHAR  TargetId;
+    UCHAR  Lun;
+    UCHAR  CdbLength;
+    UCHAR  SenseInfoLength;
+    UCHAR  DataIn;
+    ULONG  DataTransferLength;
+    ULONG  TimeOutValue;
+    ULONG_PTR DataBufferOffset;
+    ULONG  SenseInfoOffset;
+    UCHAR  Cdb[16];
+} SCSI_PASS_THROUGH, *PSCSI_PASS_THROUGH;
 
 typedef struct _SCSI_PASS_THROUGH_WITH_BUFFERS {
     SCSI_PASS_THROUGH Spt;
