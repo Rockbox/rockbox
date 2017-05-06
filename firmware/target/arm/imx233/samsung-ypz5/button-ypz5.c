@@ -26,6 +26,7 @@
 #include "power-imx233.h"
 #include "button-lradc-imx233.h"
 #include "button-target.h"
+#include "button-imx233.h"
 
 #ifndef BOOTLOADER
 #include "touchscreen.h"
@@ -35,15 +36,21 @@
 #include "action.h"
 #endif
 
-struct imx233_button_lradc_mapping_t imx233_button_lradc_mapping[] =
+#define CHAN    0   /* ADC channel for the buttons */
+#define I_VDDIO 0   /* Mock button to define the relative voltage to compute voltage from ADC steps */
+
+struct imx233_button_map_t imx233_button_map[] =
 {
-    {455, BUTTON_VOL_UP},
-    {900, BUTTON_VOL_DOWN},
-    {1410, BUTTON_BACK},
-    {1868, BUTTON_FF},
-    {2311, BUTTON_REW},
-    {2700, 0},
-    {3300, IMX233_BUTTON_LRADC_END},
+    [I_VDDIO] = IMX233_BUTTON_(VDDIO, VDDIO(3760), "vddio"), /* we need VDDIO for relative */
+    IMX233_BUTTON_(HOLD, GPIO(0, 13), "hold"),
+    IMX233_BUTTON(POWER, PSWITCH(1), "power"),
+    IMX233_BUTTON(SELECT, PSWITCH(3), "select"),
+    IMX233_BUTTON(VOL_UP, LRADC_REL(CHAN, 485, I_VDDIO), "vol up"),
+    IMX233_BUTTON(VOL_DOWN, LRADC_REL(CHAN, 975, I_VDDIO), "vol down"),
+    IMX233_BUTTON(BACK, LRADC_REL(CHAN, 1521, I_VDDIO), "back"),
+    IMX233_BUTTON(FF, LRADC_REL(CHAN, 2000, I_VDDIO), "ff"),
+    IMX233_BUTTON(REW, LRADC_REL(CHAN, 2480, I_VDDIO), "rew"),
+    IMX233_BUTTON_(END, END(), "")
 };
 
 #ifndef BOOTLOADER
@@ -93,18 +100,14 @@ void touchpad_pin_setup(void)
 
 void button_init_device(void)
 {
-    imx233_button_lradc_init();
+    /* init button subsystem */
+    imx233_button_init();
 #ifndef BOOTLOADER
     touchpad_pin_setup();
     /* Now that is powered up, proceed with touchpad initialization */
     imx233_touchscreen_init();
     imx233_touchscreen_enable(true);
 #endif /* BOOTLOADER */
-}
-
-bool button_hold(void)
-{
-    return imx233_button_lradc_hold();
 }
 
 /* X, Y, RadiusX, RadiusY */
@@ -123,13 +126,8 @@ int button_read_device(void)
 {
     int res = 0;
 
-    switch(imx233_power_read_pswitch())
-    {
-        case 1: res |= BUTTON_POWER; break;
-        case 3: res |= BUTTON_SELECT; break;
-    }
-
 #ifndef BOOTLOADER
+    /* handle the touchpad events */
     touching = imx233_touchscreen_get_touch(&last_x, &last_y);
     if(touching)
     {
@@ -151,7 +149,8 @@ int button_read_device(void)
         }
     }
 #endif /* BOOTLOADER */
-    return imx233_button_lradc_read(res);
+    /* handle the generic events */
+    return imx233_button_read(res);
 }
 
 #ifndef BOOTLOADER
