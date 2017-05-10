@@ -1099,11 +1099,6 @@ static void quick_help(void)
     }
 }
 
-static void full_help(void)
-{
-    /* TODO */
-}
-
 static void init_default_settings(void)
 {
     settings.slowmo_factor = 1;
@@ -1219,11 +1214,7 @@ static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
                 return ACTION_EXIT_MENUITEM;
             break;
         case 7:
-#ifdef FOR_REAL
-            return ACTION_EXIT_MENUITEM;
-#else
             break;
-#endif
         case 8:
 #ifdef COMBINED
             /* audio buf is used, so no playback */
@@ -1354,7 +1345,7 @@ static int pause_menu(void)
             quick_help();
             break;
         case 7:
-            full_help();
+            full_help(midend_which_game(me)->name);
             break;
         case 8:
             playback_control(NULL);
@@ -1815,11 +1806,7 @@ static int mainmenu_cb(int action, const struct menu_item_ex *this_item)
                 return ACTION_EXIT_MENUITEM;
             break;
         case 3:
-#ifdef FOR_REAL
-            return ACTION_EXIT_MENUITEM;
-#else
             break;
-#endif
         case 4:
 #ifdef COMBINED
             /* audio buf is used, so no playback */
@@ -1934,7 +1921,7 @@ enum plugin_status plugin_start(const void *param)
             quick_help();
             break;
         case 3:
-            full_help();
+            full_help(midend_which_game(me)->name);
             break;
         case 4:
             playback_control(NULL);
