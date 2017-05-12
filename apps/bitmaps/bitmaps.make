@@ -25,7 +25,7 @@ ifneq ($(strip $(BMP2RB_REMOTENATIVE)),)
 BMP += $(call preprocess, $(BITMAPDIR)/remote_native/SOURCES)
 endif
 
-BMPOBJ = $(BMP:$(ROOTDIR)/%.bmp=$(BUILDDIR)/%.o)
+BMPOBJ = $(call full_path_subst,$(ROOTDIR)/%.bmp,$(BUILDDIR)/%.o,$(BMP))
 
 BMPHFILES = $(BMPINCDIR)/usblogo.h $(BMPINCDIR)/remote_usblogo.h \
 	$(BMPINCDIR)/default_icons.h $(BMPINCDIR)/remote_default_icons.h \

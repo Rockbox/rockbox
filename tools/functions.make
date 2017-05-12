@@ -73,3 +73,18 @@ ifeq ($(call info),old)
 export info=echo "$$(1)";
 endif
 
+# path substituion can be surprisingly tricky, indeed the following almost
+# always work but not quite:
+#   BMPOBJ = $(BMP:$(ROOTDIR)/%.bmp=$(BUILDDIR)/%.o)
+# indeed if
+#   ROOTDIR=/rockbox
+#   BUILDDIR=/rockbox/build-bla
+# then:
+#   /rockbox/apps/bitmaps/rockboxlogo-bla.bmp -> /rockbox/apps/bitmaps/rockbox/build-blalogo.o
+# this function ensure that this type of problems does not occur
+#
+# usage: $(call full_path_subst,patterm,replacement,text)
+#
+# example: $(call full_path_subst,$(ROOTDIR)/%.bmp,$(BUILDDIR)/%.o,$(BMP))
+NO_MATCH=this_string_will_never_match_anything
+full_path_subst=$(patsubst $(NO_MATCH)/%,%, $(patsubst $(NO_MATCH)/$(1), $(2), $(addprefix $(NO_MATCH)/, $(3))))
