@@ -1,0 +1,483 @@
+#!/bin/sh 
+#
+# This is a main init script for Z
+# 
+# (C) 2005 Samsung Electronics
+#
+# $Log: rc,v $
+# Revision 1.21  2006/11/16 06:01:05  hcyun
+# Call sync before umounting..
+#
+# Revision 1.20  2006/10/19 06:36:12  hcyun
+# - handle /mnt/app partition corruption case.
+#   it can happen due to 1) hard reset during db update or 2) badly programmed
+#   nand flash using old compas rom writer (prio to 609-28A)
+#
+# Revision 1.19  2006/07/27 05:39:31  hcyun
+# remove z5-fw.ver also.
+#
+# Revision 1.18  2006/07/20 10:52:01  hcyun
+# remove Oasis-big.cramfs also when install failed.
+#
+# Revision 1.17  2006/07/20 09:49:07  hcyun
+# prevent firmware downgrade in any case.
+#
+# Revision 1.16  2006/07/18 09:12:57  hcyun
+# do not rely on /proc/z5-hw (gpio based).
+# use driver proc (/proc/lld/type) instead.
+#
+# Revision 1.15  2006/07/06 09:16:45  hcyun
+# module, downgrade check
+#
+# Revision 1.13  2006/06/21 04:53:06  biglow
+# add checking rootine for RTC Error
+#
+# Revision 1.12  2006/05/30 07:59:41  hcyun
+# add dosfsck to correct filesystem corruption due to power off during metadata update
+#
+# Revision 1.11  2006/04/19 07:26:43  hcyun
+# - set hidden on System/System.ver
+#
+# Revision 1.10  2006/03/23 14:05:54  hcyun
+# - support seperate MLC/SLC kernel image.
+# - support upgrade from phase1 + SLC
+# - add fixup script execution for future upgrade handling
+# - handle 7.5MB /ufdrawc limit due to 4GB with pre 2.0 partition table bug
+#   now Oasis image must be named as "Oasis-big.cramfs"
+# - firmware version update without modifying country code of /mnt/app/System.ver
+#
+# Revision 1.9  2006/03/06 10:43:44  biglow
+# - add detecting s/w version
+#
+# Revision 1.8  2006/02/22 12:43:45  hcyun
+# reset db after the reformatting due to FAT corruption.
+#
+# Revision 1.7  2006/02/13 10:02:54  hcyun
+# handle mount error
+#
+# - hcyun
+#
+# Revision 1.6  2006/01/16 13:22:48  hcyun
+# retry to write cramfs
+#
+# Revision 1.5  2006/01/15 08:20:54  hcyun
+# handle install fail case
+#
+# Revision 1.4  2005/12/29 11:43:28  hcyun
+# leave System.ver untouched in /mnt/usb
+#
+# Revision 1.3  2005/12/26 06:41:34  hcyun
+# safe System.ver update.
+#
+# Revision 1.2  2005/12/22 12:37:09  hcyun
+# add hostname
+#
+# Revision 1.1  2005/12/22 05:50:18  hcyun
+# Moved from images directory.
+#
+
+err_msg()
+{
+    echo "ERROR $*"
+    exit 1 
+}
+
+err_install() 
+{
+    echo "ERROR $*"
+
+    killall -9 install-scr.sh
+
+    rm -f z5-fw.ver
+    rm -f z5-fw.dat fw.tar.gz 
+    rm -f Oasis.cramfs Oasis-big.cramfs Oasis.tar.gz Media.tar.gz System.ver 
+    rm -f zImage Image Image-SLC Image-MLC rootfs.cramfs nandboot.sb 
+    sync
+
+    # TODO. display firmware upgrade failure. 
+
+    /z-proj/bin/recovery  /share/install-fail.fb
+
+    echo ">> Reset the system" 
+    reboot
+    echo "main 0" > /proc/powerctl 
+}
+
+handle_corruption_ufda()
+{
+    mount /mnt/app || return  # this will format" 
+
+    echo "Removing DB and settings for safety reason" 
+    rm -rf /mnt/app/usr 
+    rm -f /mnt/app/fsck* 
+
+    echo "Logging fsck error"
+    date >> /mnt/app/log.fsck
+
+    echo "Backup System.ver if exist" 
+    cp /mnt/app/System.ver /mnt/tmp/System.ver
+
+    if mount -t cramfs /dev/ufdrawc /Oasis; then
+	if [ -f "/Oasis/OasisData.tar.gz" ]; then 
+	    echo "copy OasisData"
+	    cat /Oasis/OasisData.tar.gz | ( cd /mnt/app ; tar zxvf -  )
+	fi
+	umount /Oasis
+    fi
+
+    if grep "VER" /mnt/tmp/System.ver; then 
+	echo "Ok. use stored System.ver" 
+	cp /mnt/tmp/System.ver /mnt/app/
+    else 
+	echo "stored System.ver is corrupted.. use the OasisData.tar.gz" 
+	rm -f /mnt/tmp/System.ver
+    fi 
+    sync
+
+    umount /mnt/app
+}
+
+handle_noformat_ufda()
+{
+    echo "mount failed"
+    echo "Unmounting previous mounts" 
+    umount /mnt/app 
+
+    echo "Now re-format the /dev/ufda" 
+    ffdisk /dev/ufda -a
+
+    fformat -f12 -c 16 /dev/ufda1 || \
+    	fformat -f12 -c 32 /dev/ufda1 || \
+	    fformat -f16 -c 8 /dev/ufda1 || err_msg "Can't format /dev/ufda1" 
+
+    mount /mnt/app 
+
+    if mount -t cramfs /dev/ufdrawc /Oasis; then 
+	if [ -f "/Oasis/OasisData.tar.gz" ]; then 
+	    echo "copy OasisData"
+	    cat /Oasis/OasisData.tar.gz | ( cd /mnt/app ; tar zxvf - )
+	fi
+	umount /Oasis 
+    fi
+}
+
+handle_noformat_ufdb()
+{
+    echo "mount failed"
+    echo "Unmounting previous mounts" 
+    umount /mnt/usb 
+
+    echo "Now re-format the /dev/ufdb" 
+    ffdisk /dev/ufdb -a
+
+    fformat -f32 -c 32 /dev/ufdb1 || \
+	fformat -f16 -c 32 /dev/ufdb1 || err_msg "Can't format /dev/ufdb1" 
+
+    mount /mnt/usb 
+
+    if mount -t cramfs /dev/ufdrawc /Oasis; then 
+	echo "Copy wallpapers" 
+	(cd /Oasis/usr/Oasis/DataTemplate; tar cf - . ) | ( cd /mnt/usb; tar xvf - )
+	(cd /Oasis/usr/Oasis; bin/resetdb.sh )
+	umount /Oasis 
+    fi
+}
+
+# procedure start downloading 
+handle_nofw()
+{
+    echo "[handle_nofw]: Unable to find a firmware"
+
+    umount /mnt/app
+    umount /mnt/usb 
+
+    # /dev/ufda2 must be formatted. 
+    # TODO : error handling if /dev/ufda1 is not formatted" 
+
+    echo ">> Now ready to connect UMS"
+    echo "usbcontrol 1" > /proc/gadget_udc
+    insmod g_file_storage file=/dev/ufdb
+
+    echo ">> download firmware to the UMS" 
+    echo "after downlod is finished.. !!reboot the target!!"
+    echo "it will install new firmware automatically"
+
+    echo 
+    echo ">> Start recovery" 
+    /z-proj/bin/recovery  /share/recovery.fb
+
+    echo ">> Unloading UMS driver" 
+    rmmod g_file_storage 
+    sync 
+
+    echo ">> Reset the system" 
+    echo "main 0" > /proc/powerctl 
+}
+
+handle_cramfs()
+{
+    image=$1
+    dev=$2
+
+    echo "Error on installing cramfs $image on $dev. Try again"
+    dd if=$image of=$dev bs=2048  || err_msg "Fail again -_-"
+    sync
+}
+
+
+# this is fix for 4GB SLC, phase 1. 
+fixup_oasis()
+{
+    echo "[fixup_oasis]: Found an uninstalled Oasis cramfs image"
+
+    cd /mnt/usb 
+
+    echo "Install UI application (bigger than 7.5MB)"
+    dd if=Oasis-big.cramfs of=/dev/ufdrawc bs=2048 || handle_cramfs Oasis-big.cramfs /dev/ufdrawc 
+    rm -f Oasis-big.cramfs
+    sync
+}
+
+# temporary procedure to install correct kernel in case of installed 
+# rc script do not distinguish MLC/SLC installation. 
+# when this is kicked in, we can assume new rc script is running.
+# !! IMPORTANT !! require reboot
+fixup_kernel()
+{
+    echo "[fixup_kernel]: Found an uninstalled kernel image" 
+
+    cd /mnt/usb 
+
+    # TODO : display temporary kernel update notice 
+    echo "refresh 0" > /proc/lfbctrl
+    cat /share/install.fb > /dev/fb0
+
+    if [ ! -f "/proc/z5-hw" ]; then 
+	# this must be a phase1 firmware with SLC attached. 
+	echo "phase1 firmware with SLC" 
+	dd if=Image-SLC of=/dev/ufdrawa bs=2048 || handle_cramfs Image-SLC /dev/ufdrawa 
+    else
+	echo "[ERROR] Not a phase1 with SLC?" 
+	cat /share/install-fail.fb > /dev/fb0 
+    fi
+
+    echo "Removing fixup kernel images"
+    rm -f Image-SLC Image-MLC
+
+    sync
+
+    echo "Reboot the system" 
+    reboot 
+}
+
+# temporary procedure for initial product without fw version update capability 
+update_fwver()
+{
+    echo "[update_fwver]: Found firmware update"
+
+    # TODO : 
+    update_version `cat /mnt/usb/z5-fw.ver` /mnt/app/System.ver 
+    [ ! -d "/mnt/usb/System" ] && mkdir -p /mnt/usb/System 
+    cp /mnt/app/System.ver /mnt/usb/System/System.ver
+    chmod 1555 /mnt/usb/System
+    chmod 1555 /mnt/usb/System/System.ver 
+    rm -f /mnt/usb/z5-fw.ver 
+    rm -f /mnt/usb/System.ver 
+    sync 
+}
+
+
+# procedure to install new firmware image.. 
+install_newfw()
+{
+    echo "[install_newfw]: Found a new firmware " 
+
+    cd /mnt/usb 
+
+    echo "refresh 0" > /proc/lfbctrl
+    /z-proj/bin/install-scr.sh &  # spinning update screen. 
+
+    echo ">> Start firmware installation" 
+
+    echo "Decrypting firmware"
+    z5decrypt z5-fw.dat fw.tar.gz z5-fw.ver || err_install "Decryption failed"
+
+    echo "Decompressing firmware" 
+    tar zxvf fw.tar.gz || err_install "Corrupted firmware" 
+
+    echo "Removing decrypted firmware Image" 
+    rm -f fw.tar.gz
+
+
+    if check_downgrade `cat z5-fw.ver` /mnt/app/System.ver ; then 
+        err_install "installed kernel is newer than this one"
+    fi 
+    if [ -f "z5_fixup.sh" ]; then 
+	echo "Found a fixup script... run it first"
+	sh z5-fixup.sh 
+	rm -f z5-fixup.sh 
+	sync
+    fi 
+
+    if [ ! -f "/mnt/app/System.ver" ]; then 
+	echo "Initial System.ver installation to /mnt/app" 
+	mv System.ver /mnt/app 
+	sync
+    fi 
+
+    if [ -f "Media.tar.gz" ]; then 
+	echo "Installing Media Files" 
+	cat Media.tar.gz | (cd /mnt/usb; tar zxvf - )
+	rm -f Media.tar.gz 
+	sync
+    fi 
+
+    if [ -f "Oasis.cramfs" ]; then 
+	echo "Install UI application" 
+	dd if=Oasis.cramfs of=/dev/ufdrawc bs=2048 || handle_cramfs Oasis.cramfs /dev/ufdrawc 
+	rm -f Oasis.cramfs
+	sync
+    fi 
+
+    if [ -f "Oasis-big.cramfs" ]; then 
+	echo "Install UI application (bigger than 7.5MB)" 
+	dd if=Oasis-big.cramfs of=/dev/ufdrawc bs=2048 || handle_cramfs Oasis-big.cramfs /dev/ufdrawc 
+	rm -f Oasis-big.cramfs
+	sync
+    fi 
+
+    if [ -f "Oasis.tar.gz" ]; then 
+	echo "Installing OasisData (or Devel version of Oasis)" 
+	if [ -d "/mnt/app/usr/Oasis" ]; then 
+	    echo "Removing previously installed Oasis" 
+	    rm -rf /mnt/app/usr/Oasis 
+	    rm -f /mnt/app/start.sh
+	fi 
+	cat Oasis.tar.gz | (cd /mnt/app; tar zxvf - )
+	rm -f Oasis.tar.gz 
+	sync
+    fi 
+
+    if [ -f "zImage" ]; then 
+        echo "Installing zImage" 
+	dd if=zImage of=/dev/ufdrawa bs=2048 || handle_cramfs zImage /dev/ufdrawa 
+	rm -f zImage 
+	sync
+    fi 
+
+    if [ -f "Image" ]; then 
+        echo "Installing Image" 
+	dd if=Image of=/dev/ufdrawa bs=2048 || handle_cramfs Image /dev/ufdrawa 
+	rm -f Image 
+	sync
+    fi 
+
+    if [ -f "Image-SLC" -o -f "Image-MLC" ]; then
+	if grep "SLC" /proc/lld/type ; then 
+	    echo "SLC flash is connected" 
+	    dd if=Image-SLC of=/dev/ufdrawa bs=2048 || handle_cramfs Image-SLC /dev/ufdrawa 
+	elif grep "MLC" /proc/lld/type ; then 
+	    echo "MLC flash is connected" 
+	    dd if=Image-MLC of=/dev/ufdrawa bs=2048 || handle_cramfs Image-MLC /dev/ufdrawa 
+	else 
+	    echo "[ERROR] Incorrect z5-hw info.."
+	fi
+	echo "Removing fixup kernel images" 
+	rm -f Image-SLC Image-MLC
+	sync
+    fi
+
+    if [ -f "nandboot.sb" ]; then 
+	echo "Installing bootloader"
+	nsect=`ls -l nandboot.sb | awk '{ print $5 }'` 
+	echo "bootloader num sectors : $nsect"
+	dd if=nandboot.sb of=/dev/misc/sram 
+	echo "$nsect" > /proc/lld/nandsb
+	rm -f nandboot.sb 
+	sync 
+    fi
+
+    if [ -f "rootfs.cramfs" ]; then 
+	echo "Install cramfs" 
+	dd if=rootfs.cramfs of=/dev/ufdrawb bs=2048 || handle_cramfs rootfs.cramfs /dev/ufdrawb
+	rm -f rootfs.cramfs
+    fi 
+
+    echo "Removing encrypted firmware Image" 
+    rm -f z5-fw.dat
+    sync
+
+    echo ">>> Firmware Installation was successful" 
+    
+    echo ">>> Reset the system"
+    /sbin/reboot
+    echo "reboot is not working.. force power off" 
+    echo "main 0" > /proc/powerctl # should not reach here
+}
+
+export PATH=$PATH:/z-proj/bin
+
+mount -t proc none /proc
+mount -t tmpfs none /mnt/tmp
+
+# loading necessary modules  
+ 
+echo "Loading FS modules" 
+if grep "SLC" /proc/lld/type; then
+    insmod -q rfs-slc > /dev/null 
+elif grep "MLC" /proc/lld/type; then
+    insmod -q rfs-mlc > /dev/null
+else
+    echo "ERROR: no nand info. kernel is not yet installed" 
+fi
+ 
+echo "Loading USB modules" 
+insmod -q stmp36xx_lib > /dev/null
+insmod -q STMP36xx_udc > /dev/null 
+
+/z-proj/bin/dosfsck -a /dev/ufda1 \
+    && echo "fsck was successful" \
+    || handle_corruption_ufda
+
+mount /mnt/app \
+    && echo "mount /dev/ufda1 is successful" \
+    || handle_noformat_ufda
+
+mount /mnt/usb \
+    && echo "mount /dev/ufdb1 is successful" \
+    || handle_noformat_ufdb
+
+
+[ -f "/mnt/usb/z5-fw.dat" ] && install_newfw
+
+# Ugly fix for initial product (SLC with pre 2.0 firmware ) - require reboot 
+[ -f "/mnt/usb/Image-SLC" ] && fixup_kernel
+
+# Ugly for for initial product (4GB SLC with pre 2.0 firmware) 
+[ -f "/mnt/usb/Oasis-big.cramfs" ] && fixup_oasis
+
+[ -f "/mnt/usb/z5-fw.ver" ] && update_fwver 
+
+# read S/W version information
+cat /mnt/app/System.ver > /proc/z5-ver
+
+# RFS Oasis (only for development) 
+if [ -f "/mnt/app/start.sh" ]; then 
+    echo "[DEVEL] RFS /dev/ufda1 contain oasis distribution"
+    echo "[DEVEL] Starting main UI" 
+    /mnt/app/start.sh 
+    /z-proj/bin/checkrtc.sh
+    exit
+fi 
+
+# CRAMFS Oasis (for production)
+mount -t cramfs /dev/ufdrawc /Oasis \
+    || handle_nofw
+[ -f "/Oasis/start.sh" ] \
+    || handle_nofw
+
+echo "Start main UI" 
+/Oasis/start.sh
+/z-proj/bin/checkrtc.sh
+
+hostname "Z5 Rockbox"
