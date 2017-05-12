@@ -157,7 +157,7 @@ endif # CORE_GCSECTIONS
 OBJ := $(SRC:.c=.o)
 OBJ := $(OBJ:.S=.o)
 OBJ += $(BMP:.bmp=.o)
-OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(OBJ))
+OBJ := $(call full_path_subst,$(ROOTDIR)/%,$(BUILDDIR)/%,$(OBJ))
 
 build: $(TOOLS) $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS) $(ARCHOSROM) $(RBINFO)
 
