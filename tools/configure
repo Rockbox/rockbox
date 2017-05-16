@@ -1485,7 +1485,7 @@ cat <<EOF
  141) YH-920              171) HD300             130) Lyre proto 1
  142) YH-925                                     131) Mini2440
  143) YP-S3
- 144) YP-Z5 ==ROCKCHIP==
+ 144) YP-Z5               ==ROCKCHIP==
                           180) rk27xx generic    ==HiFiMAN==
  ==Application==                                 190) HM-60x
  200) SDL                 ==HiFi E.T.==          191) HM-801
