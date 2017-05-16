@@ -57,6 +57,10 @@ enum touch_state_t
 
 static enum touch_state_t touch_state;
 static int touch_chan = -1;
+#if IMX233_SUBTARGET < 3700
+/* See imx233_touchscreen_init() */
+static int touch_chan_xp = -1, touch_chan_yp = -1;
+#endif
 static int touch_delay = -1;
 static int touch_x, touch_y;
 /* once a touch is confirmed, the parameters are copied to these value for
@@ -98,11 +102,15 @@ static void pulldown_setup(bool xminus_enable, bool yminus_enable,
 
 static void kick_measure(bool pull_x, bool pull_y, bool detect, int src)
 {
-    if(touch_chan >= 0)
-        imx233_lradc_release_channel(touch_chan);
-    touch_chan = imx233_lradc_acquire_channel(src, TIMEOUT_NOBLOCK);
-    if(touch_chan < 0)
-        panicf("touchscreen: cannot get adc channel");
+#if IMX233_SUBTARGET < 3700
+    /* Select proper channel on STMP3600 */
+    if(src == LRADC_SRC_XPLUS)
+        touch_chan = touch_chan_xp;
+    else if(src == LRADC_SRC_XPLUS)
+        touch_chan = touch_chan_xp;
+    else
+        panicf("Unknown channel source %d in touchscreen", src);
+#endif
     /* enable interrupt */
     imx233_lradc_set_channel_irq_callback(touch_chan, &touch_channel_irq);
     imx233_icoll_enable_interrupt(INT_SRC_LRADC_CHx(touch_chan), true);
@@ -192,7 +200,23 @@ void imx233_touchscreen_init(void)
 {
     touch_delay = imx233_lradc_acquire_delay(TIMEOUT_NOBLOCK);
     if(touch_delay < 0)
-        panicf("Cannot acquire channel and delays for touchscreen measurement");
+        panicf("Cannot acquire delay for touchscreen measurement");
+#if IMX233_SUBTARGET >= 3700
+    /* On STMP3700+, any channel can measure any source so one channel is enough
+     * for all operations */
+    touch_chan = imx233_lradc_acquire_channel(LRADC_SRC_XPLUS, TIMEOUT_NOBLOCK);
+    if(touch_chan < 0)
+        panicf("touchscreen: cannot get adc channel");
+#else
+    /* On STMP3600, channel mapping is fixed for touch screen so we need to reserve
+     * two channels */
+    touch_chan_xp = imx233_lradc_acquire_channel(LRADC_SRC_XPLUS, TIMEOUT_NOBLOCK);
+    if(touch_chan_xp < 0)
+        panicf("touchscreen: cannot get adc X+ channel");
+    touch_chan_yp = imx233_lradc_acquire_channel(LRADC_SRC_YPLUS, TIMEOUT_NOBLOCK);
+    if(touch_chan_yp < 0)
+        panicf("touchscreen: cannot get adc Y+ channel");
+#endif
     imx233_touchscreen_enable(false);
 }
 
