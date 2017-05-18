@@ -86,10 +86,10 @@ static void rb_clip(void *handle, int x, int y, int w, int h)
     if(!settings.clipoff)
     {
         LOGF("rb_clip(%d %d %d %d)", x, y, w, h);
-        clip_rect.x = x;
-        clip_rect.y = y;
-        clip_rect.width  = w;
-        clip_rect.height = h;
+        clip_rect.x = MAX(0, x);
+        clip_rect.y = MAX(0, y);
+        clip_rect.width  = MIN(LCD_WIDTH, w);
+        clip_rect.height = MIN(LCD_HEIGHT, h);
         clip_rect.font = FONT_UI;
         clip_rect.drawmode = DRMODE_SOLID;
 #if LCD_DEPTH > 1
@@ -663,7 +663,7 @@ static void rb_end_draw(void *handle)
     LOGF("rb_end_draw");
 
     if(need_draw_update)
-        rb->lcd_update_rect(ud_l, ud_u, ud_r - ud_l, ud_d - ud_u);
+        rb->lcd_update_rect(MAX(0, ud_l), MAX(0, ud_u), MIN(LCD_WIDTH, ud_r - ud_l), MIN(LCD_HEIGHT, ud_d - ud_u));
 }
 
 static char *titlebar = NULL;
