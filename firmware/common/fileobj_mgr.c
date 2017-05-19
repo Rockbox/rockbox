@@ -416,7 +416,7 @@ void fileobj_change_flags(struct filestr_base *stream,
     if (!fobp)
         return;
 
-    mask &= FDO_CHG_MASK; 
+    mask &= FDO_CHG_MASK;
     fobp->flags = (fobp->flags & ~mask) | (flags & mask);
 }
 
