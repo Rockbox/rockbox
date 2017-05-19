@@ -19,3 +19,9 @@
  ****************************************************************************/
 
 int load_firmware(unsigned char* buf, const char* firmware, int buffer_size);
+
+#ifdef HAVE_MULTIBOOT
+/* returns path for firmware in volumes/drives other than player root */
+int get_redirect_dir(char* buf, int buffer_size, int volume,
+                     const char* rootdir, const char* firmware);
+#endif
