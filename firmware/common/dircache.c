@@ -1632,7 +1632,7 @@ int dircache_readdir_internal(struct filestr_base *stream,
 read_eod:
     fat_empty_fat_direntry(fatent);
     infop->fatfile.e.entries = 0;
-    return 0;    
+    return 0;
 }
 
 /**
@@ -2510,13 +2510,10 @@ static ssize_t get_path_sub(int idx, struct get_path_sub_data *data)
         cename = "";
 
     #ifdef HAVE_MULTIVOLUME
+        /* prepend the volume specifier */
         int volume = IF_MV_VOL(-idx - 1);
-        if (volume > 0)
-        {
-            /* prepend the volume specifier for volumes > 0 */
-            cename = alloca(VOL_MAX_LEN+1);
-            get_volume_name(volume, cename);
-        }
+        cename = alloca(VOL_MAX_LEN+1);
+        get_volume_name(volume, cename);
     #endif /* HAVE_MULTIVOLUME */
 
         data->serialhash = dc_hash_serialnum(get_idx_dcvolp(idx)->serialnum,
@@ -2762,7 +2759,7 @@ file_error:
         dircache_fileref_init(dcfrefp);
 
     dircache_unlock();
-    return rc;    
+    return rc;
 }
 
 /**
@@ -2916,7 +2913,7 @@ void dircache_dump(void)
                      "0x%08X,0,"
                      "\"\",\"\"\n",
                      -volume-1, dcvolp->serialnum,
-                         dc_hash_serialnum(dcvolp->serialnum, DC_SERHASH_START), 
+                         dc_hash_serialnum(dcvolp->serialnum, DC_SERHASH_START),
                      PATH_SEPCH, IF_MV(name,) dcvolp->frontier,
                      ATTR_DIRECTORY | ATTR_VOLUME);
         }

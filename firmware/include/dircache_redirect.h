@@ -20,7 +20,16 @@
  ****************************************************************************/
 #ifndef _DIRCACHE_REDIRECT_H_
 
+#include "rbpaths.h"
+#include "pathfuncs.h"
 #include "dir.h"
+#include "dircache.h"
+
+#if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR)
+#include "rb-loader.h"
+#include "bootdata.h"
+#include "crc32.h"
+#endif
 
 /***
  ** Internal redirects that depend upon whether or not dircache is made
@@ -123,10 +132,61 @@ static inline void fileop_onsync_internal(struct filestr_base *stream)
 
 static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
 {
+#ifdef HAVE_MULTIVOLUME
+    char path[VOL_MAX_LEN+2];
+    make_volume_root(volume, path);
+#else
+    const char *path = PATH_ROOTSTR;
+#endif
+#if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR)
+    static char rootpath[VOL_MAX_LEN+2] = RB_ROOT_CONTENTS_DIR;
+    static bool redirected = false;
+    int boot_volume = 0;
+    unsigned int crc = 0;
+
+        root_mount_path(path, NSITEM_MOUNTED);
+        crc = crc_32(boot_data.payload, boot_data.length, 0xffffffff);
+        if (crc == boot_data.crc)
+        {
+            boot_volume = boot_data.boot_volume; /* boot volume contained in uint8_t payload */
+            root_mount_path(path, volume == boot_volume ? NSITEM_HIDDEN :
+                                                          NSITEM_MOUNTED);
+            if (volume == boot_volume && !redirected)
+            {
+                if (get_redirect_dir(rootpath, sizeof(rootpath),
+                                                    boot_volume, "", "") > 0)
+                {
+                    rootpath[path_strip_trailing_separators(rootpath,NULL)] = '\0';
+                }
+                else /* Error occurred, card removed? Set root to default */
+                {
+                    root_mount_path(RB_ROOT_CONTENTS_DIR, NSITEM_CONTENTS);
+                    boot_volume = path_strip_volume(RB_ROOT_CONTENTS_DIR,
+                                                                    NULL, false);
+                }
+            }
+        } /*CRC OK*/
+        else
+            root_mount_path(path, RB_ROOT_VOL_HIDDEN(volume) ? NSITEM_HIDDEN : 0);
+
+        if (volume == boot_volume)
+        {
+            redirected = true;
+            root_mount_path(rootpath, NSITEM_CONTENTS);
+        }
+
+#else
+
+    root_mount_path(path, RB_ROOT_VOL_HIDDEN(volume) ? NSITEM_HIDDEN : 0);
+#ifdef HAVE_MULTIVOLUME
+    if (volume == path_strip_volume(RB_ROOT_CONTENTS_DIR, NULL, false))
+#endif
+        root_mount_path(RB_ROOT_CONTENTS_DIR, NSITEM_CONTENTS);
+#endif /* HAVE_MULTIBOOT */
+
 #ifdef HAVE_DIRCACHE
     dircache_mount();
 #endif
-    IF_MV( (void)volume; )
 }
 
 static inline void volume_onunmount_internal(IF_MV_NONVOID(int volume))
@@ -135,6 +195,7 @@ static inline void volume_onunmount_internal(IF_MV_NONVOID(int volume))
     /* First, to avoid update of something about to be destroyed anyway */
     dircache_unmount(IF_MV(volume));
 #endif
+    root_unmount_volume(IF_MV(volume));
     fileobj_mgr_unmount(IF_MV(volume));
 }
 
