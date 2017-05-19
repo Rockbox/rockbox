@@ -36,6 +36,47 @@
 
 #define MAX_OPEN_HANDLES (MAX_OPEN_FILES+MAX_OPEN_DIRS)
 
+/* internal functions open streams as well; make sure they don't fail if all
+   user descs are busy; this needs to be at least the greatest quantity needed
+   at once by all internal functions */
+#define MOUNT_AUX_FILEOBJS 1
+
+#ifdef HAVE_DIRCACHE
+#define DIRCACHE_AUX_FILEOBJS 1
+#else
+#define DIRCACHE_AUX_FILEOBJS 0
+#endif
+
+#define AUX_FILEOBJS (2+DIRCACHE_AUX_FILEOBJS+MOUNT_AUX_FILEOBJS)
+
+/* number of components statically allocated to handle the vast majority
+   of path depths; should maybe be tuned for >= 90th percentile but for now,
+   imma just guessing based on something like:
+        root + 'Music' + 'Artist' + 'Album' + 'Disc N' + filename */
+#define STATIC_PATHCOMP_NUM 6
+
+#define MAX_NAME    255
+
+/* unsigned value that will also hold the off_t range we need without
+   overflow */
+#define file_size_t uint32_t
+
+#ifdef __USE_FILE_OFFSET64
+/* if we want, we can deal with files up to 2^32-1 bytes-- the full FAT16/32
+   range */
+#define FILE_SIZE_MAX   (0xffffffffu)
+#else
+/* file contents and size will be preserved by the APIs so long as ftruncate()
+   isn't used; bytes passed 2^31-1 will not accessible nor will writes succeed
+   that would extend the file beyond the max for a 32-bit off_t */
+#define FILE_SIZE_MAX   (0x7fffffffu)
+#endif
+
+/* if file is "large(ish)", then get rid of the contents now rather than
+   lazily when the file is synced or closed in order to free-up space */
+#define O_TRUNC_THRESH 65536
+
+//>>>>>>> d79580907618c43cfd0feaa9456af2b2ab98b734
 /* default attributes when creating new files and directories */
 #define ATTR_NEW_FILE       (ATTR_ARCHIVE)
 #define ATTR_NEW_DIRECTORY  (ATTR_DIRECTORY)
@@ -72,16 +113,18 @@ enum fildes_and_obj_flags
     /* used in descriptor and common */
     FDO_BUSY       = 0x0001,     /* descriptor/object is in use */
     /* only used in individual stream descriptor */
-    FD_WRITE       = 0x0002,     /* descriptor has write mode */
-    FD_WRONLY      = 0x0004,     /* descriptor is write mode only */
-    FD_APPEND      = 0x0008,     /* descriptor is append mode */
+    FD_VALID       = 0x0002,     /* descriptor is valid but not registered */
+    FD_WRITE       = 0x0004,     /* descriptor has write mode */
+    FD_WRONLY      = 0x0008,     /* descriptor is write mode only */
+    FD_APPEND      = 0x0010,     /* descriptor is append mode */
     FD_NONEXIST    = 0x8000,     /* closed but not freed (uncombined) */
     /* only used as common flags */
-    FO_DIRECTORY   = 0x0010,     /* fileobj is a directory */
-    FO_TRUNC       = 0x0020,     /* fileobj is opened to be truncated */
-    FO_REMOVED     = 0x0040,     /* fileobj was deleted while open */
-    FO_SINGLE      = 0x0080,     /* fileobj has only one stream open */
-    FDO_MASK       = 0x00ff,
+    FO_DIRECTORY   = 0x0020,     /* fileobj is a directory */
+    FO_TRUNC       = 0x0040,     /* fileobj is opened to be truncated */
+    FO_REMOVED     = 0x0080,     /* fileobj was deleted while open */
+    FO_SINGLE      = 0x0100,     /* fileobj has only one stream open */
+    FO_MOUNTTARGET = 0x0200,     /* fileobj kept open as a mount target */
+    FDO_MASK       = 0x03ff,
     FDO_CHG_MASK   = FO_TRUNC,   /* fileobj permitted external change */
     /* bitflags that instruct various 'open' functions how to behave;
      * saved in stream flags (only) but not used by manager */
@@ -89,13 +132,17 @@ enum fildes_and_obj_flags
     FF_DIR         = 0x00010000, /* expect dir; accept dir only */
     FF_ANYTYPE     = 0x00020000, /* succeed if either file or dir */
     FF_TYPEMASK    = 0x00030000, /* mask of typeflags */
-    FF_CHECKPREFIX = 0x00040000, /* detect if file is prefix of path */
-    FF_NOISO       = 0x00080000, /* do not decode ISO filenames to UTF-8 */
-    FF_PROBE       = 0x00100000, /* only test existence; don't open */
-    FF_CACHEONLY   = 0x00200000, /* succeed only if in dircache */
-    FF_INFO        = 0x00400000, /* return info on self */
-    FF_PARENTINFO  = 0x00800000, /* return info on parent */
-    FF_MASK        = 0x00ff0000,
+    FF_CREAT       = 0x00040000, /* create if file doesn't exist */
+    FF_EXCL        = 0x00080000, /* fail if creating and file exists */
+    FF_CHECKPREFIX = 0x00100000, /* detect if file is prefix of path */
+    FF_NOISO       = 0x00200000, /* do not decode ISO filenames to UTF-8 */
+    FF_PROBE       = 0x00400000, /* only test existence; don't open */
+    FF_CACHEONLY   = 0x00800000, /* succeed only if in dircache */
+    FF_INFO        = 0x01000000, /* return info on self */
+    FF_PARENTINFO  = 0x02000000, /* return info on parent */
+    FF_DEVPATH     = 0x04000000, /* path is a device path, not root-based */
+    FF_NOFS        = 0x08000000, /* no filesystem mounted here */
+    FF_MASK        = 0x0fff0000,
 };
 
 /** Common data structures used throughout **/

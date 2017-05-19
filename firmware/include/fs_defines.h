@@ -51,11 +51,11 @@
 /* internal functions open streams as well; make sure they don't fail if all
    user descs are busy; this needs to be at least the greatest quantity needed
    at once by all internal functions */
-#ifdef HAVE_DIRCACHE
-#define AUX_FILEOBJS 3
-#else
-#define AUX_FILEOBJS 2
-#endif
+//#ifdef HAVE_DIRCACHE
+//#define AUX_FILEOBJS 3
+//#else
+//#define AUX_FILEOBJS 2
+//#endif
 
 /* number of components statically allocated to handle the vast majority
    of path depths; should maybe be tuned for >= 90th percentile but for now,
