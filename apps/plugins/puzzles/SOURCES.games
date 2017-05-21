@@ -1,3 +1,5 @@
+/* commented-out games cannot be played due to controls and/or bugs */
+
 src/blackbox.c
 src/bridges.c
 src/cube.c
