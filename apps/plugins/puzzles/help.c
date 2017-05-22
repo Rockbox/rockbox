@@ -4,6 +4,11 @@
 void full_help(const char *name)
 {
     int ch_num = -1;
+
+    /* dirty hack */
+    if(!strcmp(name, "Train Tracks"))
+        name = "Tracks";
+
     /* search the help text for a chapter with this name */
     for(int ch = 0; ch < help_numchapters; ++ch)
     {
