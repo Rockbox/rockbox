@@ -167,7 +167,7 @@ static void rb_draw_text(void *handle, int x, int y, int fonttype,
         x -= w;
 
     rb_color(color);
-    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+    rb->lcd_set_drawmode(DRMODE_FG);
     rb->lcd_putsxy(x, y, text);
     rb->lcd_set_drawmode(DRMODE_SOLID);
 }
