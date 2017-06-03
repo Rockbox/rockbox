@@ -23,6 +23,7 @@
 
 #include "plugin.h"
 
+#include "help.h"
 #include "keymaps.h"
 #include "src/puzzles.h"
 
@@ -34,6 +35,9 @@
 
 /* how many ticks between timer callbacks */
 #define TIMER_INTERVAL (HZ / 50)
+
+#define DEBUG_MENU
+
 #define BG_R .9f /* very light gray */
 #define BG_G .9f
 #define BG_B .9f
@@ -61,7 +65,7 @@ static unsigned *colors = NULL;
 static int ncolors = 0;
 static long last_keystate = 0;
 
-#ifdef FOR_REAL
+#if defined(FOR_REAL) && defined(DEBUG_MENU)
 /* the "debug menu" is hidden by default in order to avoid the
  * naturally ensuing complaints from users */
 static bool debug_mode = false;
@@ -743,7 +747,7 @@ void fatal(char *fmt, ...)
 {
     va_list ap;
 
-    rb->splash(HZ, "FATAL ERROR");
+    rb->splash(HZ, "FATAL");
 
     va_start(ap, fmt);
     char buf[80];
@@ -1034,53 +1038,9 @@ static bool presets_menu(void)
     return do_preset_menu(midend_get_presets(me, NULL), NULL, sel) >= 0;
 }
 
-static const struct {
-    const char *game, *help;
-} quick_help_text[] = {
-    { "Black Box", "Find the hidden balls in the box by bouncing laser beams off them." },
-    { "Bridges", "Connect all the islands with a network of bridges." },
-    { "Cube", "Pick up all the blue squares by rolling the cube over them." },
-    { "Dominosa", "Tile the rectangle with a full set of dominoes." },
-    { "Fifteen", "Slide the tiles around to arrange them into order." },
-    { "Filling", "Mark every square with the area of its containing region." },
-    { "Flip", "Flip groups of squares to light them all up at once." },
-    { "Flood", "Turn the grid the same colour in as few flood fills as possible." },
-    { "Galaxies", "Divide the grid into rotationally symmetric regions each centred on a dot." },
-    { "Guess", "Guess the hidden combination of colours." },
-    { "Inertia", "Collect all the gems without running into any of the mines." },
-    { "Keen", "Complete the latin square in accordance with the arithmetic clues." },
-    { "Light Up", "Place bulbs to light up all the squares." },
-    { "Loopy", "Draw a single closed loop, given clues about number of adjacent edges." },
-    { "Magnets", "Place magnets to satisfy the clues and avoid like poles touching." },
-    { "Map", "Colour the map so that adjacent regions are never the same colour." },
-    { "Mines", "Find all the mines without treading on any of them." },
-    { "Net", "Rotate each tile to reassemble the network." },
-    { "Netslide", "Slide a row at a time to reassemble the network." },
-    { "Palisade", "Divide the grid into equal-sized areas in accordance with the clues." },
-    { "Pattern", "Fill in the pattern in the grid, given only the lengths of runs of black squares." },
-    { "Pearl", "Draw a single closed loop, given clues about corner and straight squares." },
-    { "Pegs", "Jump pegs over each other to remove all but one." },
-    { "Range", "Place black squares to limit the visible distance from each numbered cell." },
-    { "Rectangles", "Divide the grid into rectangles with areas equal to the numbers." },
-    { "Same Game", "Clear the grid by removing touching groups of the same colour squares." },
-    { "Signpost", "Connect the squares into a path following the arrows." },
-    { "Singles", "Black out the right set of duplicate numbers." },
-    { "Sixteen", "Slide a row at a time to arrange the tiles into order." },
-    { "Slant", "Draw a maze of slanting lines that matches the clues." },
-    { "Solo", "Fill in the grid so that each row, column and square block contains one of every digit." },
-    { "Tents", "Place a tent next to each tree." },
-    { "Towers", "Complete the latin square of towers in accordance with the clues." },
-    { "Tracks", "Fill in the railway track according to the clues." },
-    { "Twiddle", "Rotate the tiles around themselves to arrange them into order." },
-    { "Undead", "Place ghosts, vampires and zombies so that the right numbers of them can be seen in mirrors." },
-    { "Unequal", "Complete the latin square in accordance with the > signs." },
-    { "Unruly", "Fill in the black and white grid to avoid runs of three." },
-    { "Untangle", "Reposition the points so that the lines do not cross." },
-};
-
 static void quick_help(void)
 {
-#ifdef FOR_REAL
+#if defined(FOR_REAL) && defined(DEBUG_MENU)
     if(++help_times >= 5)
     {
         rb->splash(HZ, "You are now a developer!");
@@ -1088,25 +1048,10 @@ static void quick_help(void)
     }
 #endif
 
-    for(int i = 0; i < ARRAYLEN(quick_help_text); ++i)
-    {
-        if(!strcmp(midend_which_game(me)->name, quick_help_text[i].game))
-        {
-            rb->splash(0, quick_help_text[i].help);
-            rb->button_get(true);
-            return;
-        }
-    }
+    rb->splash(0, quick_help_text);
+    rb->button_get(true);
+    return;
 }
-
-#if PLUGIN_BUFFER_SIZE <= 0x14000
-/* no full help available due to memory constraints, so we provide a
- * dummy function here */
-void full_help(const char *str)
-{
-    (void) str;
-}
-#endif
 
 static void init_default_settings(void)
 {
@@ -1118,6 +1063,7 @@ static void init_default_settings(void)
     settings.no_aa = false;
 }
 
+#ifdef DEBUG_MENU
 static void bench_aa(void)
 {
     rb->sleep(0);
@@ -1202,6 +1148,7 @@ static void debug_menu(void)
         }
     }
 }
+#endif
 
 static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
 {
@@ -1223,11 +1170,7 @@ static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
                 return ACTION_EXIT_MENUITEM;
             break;
         case 7:
-#if PLUGIN_BUFFER_SIZE <= 0x14000
-            return ACTION_EXIT_MENUITEM;
-#else
             break;
-#endif
         case 8:
 #ifdef COMBINED
             /* audio buf is used, so no playback */
@@ -1245,7 +1188,7 @@ static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
                 return ACTION_EXIT_MENUITEM;
             break;
         case 10:
-#ifdef FOR_REAL
+#if defined(FOR_REAL) && defined(DEBUG_MENU)
             if(debug_mode)
                 break;
             return ACTION_EXIT_MENUITEM;
@@ -1309,7 +1252,7 @@ static int pause_menu(void)
     rb->snprintf(title, sizeof(title), "%s Menu", midend_which_game(me)->name);
     menu__.desc = title;
 
-#ifdef FOR_REAL
+#if defined(FOR_REAL) && defined(DEBUG_MENU)
     help_times = 0;
 #endif
 
@@ -1374,7 +1317,9 @@ static int pause_menu(void)
             }
             break;
         case 10:
+#ifdef DEBUG_MENU
             debug_menu();
+#endif
             break;
         case 11:
             if(config_menu())
@@ -1819,11 +1764,7 @@ static int mainmenu_cb(int action, const struct menu_item_ex *this_item)
                 return ACTION_EXIT_MENUITEM;
             break;
         case 3:
-#if PLUGIN_BUFFER_SIZE <= 0x14000
-            return ACTION_EXIT_MENUITEM;
-#else
             break;
-#endif
         case 4:
 #ifdef COMBINED
             /* audio buf is used, so no playback */
@@ -1892,7 +1833,7 @@ enum plugin_status plugin_start(const void *param)
     rb->cpu_boost(false);
 #endif
 
-#ifdef FOR_REAL
+#if defined(FOR_REAL) && defined(DEBUG_MENU)
     help_times = 0;
 #endif
 

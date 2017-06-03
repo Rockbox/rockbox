@@ -1,7 +1,7 @@
-/* defined in helpcontent.c */
+/* defined in help/ */
 
-extern int help_chapteroffsets[], help_maxlen, help_numchapters;
 extern const char help_text[];
+extern const char quick_help_text[];
 
 /* in help.c */
 void full_help(const char *name);

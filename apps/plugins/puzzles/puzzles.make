@@ -16,7 +16,10 @@ PUZZLES_SHARED_OBJ = $(call c2obj, $(PUZZLES_SHARED_SRC))
 PUZZLES_GAMES_SRC = $(call preprocess, $(PUZZLES_SRCDIR)/SOURCES.games)
 PUZZLES_GAMES_OBJ = $(call c2obj, $(PUZZLES_GAMES_SRC))
 
-PUZZLES_SRC = $(PUZZLES_GAMES_SRC) $(PUZZLES_SHARED_SRC)
+PUZZLES_HELP_SRC = $(wildcard $(PUZZLES_SRCDIR)/help/*)
+PUZZLES_HELP_OBJ = $(call c2obj, $(PUZZLES_HELP_OBJ))
+
+PUZZLES_SRC = $(PUZZLES_GAMES_SRC) $(PUZZLES_SHARED_SRC) $(PUZZLES_HELP_SRC)
 PUZZLES_OBJ = $(call c2obj, $(PUZZLES_SRC))
 
 PUZZLES_ROCKS = $(addprefix $(PUZZLES_OBJDIR)/sgt-, $(notdir $(PUZZLES_GAMES_SRC:.c=.rock)))
@@ -37,7 +40,7 @@ PUZZLESFLAGS =  -I$(PUZZLES_SRCDIR)/dummy					\
 		-DFOR_REAL -I$(PUZZLES_SRCDIR)/src -I$(PUZZLES_SRCDIR) -include	\
 		$(PUZZLES_SRCDIR)/rbcompat.h
 
-$(PUZZLES_OBJDIR)/sgt-%.rock: $(PUZZLES_OBJDIR)/src/%.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
+$(PUZZLES_OBJDIR)/sgt-%.rock: $(PUZZLES_OBJDIR)/src/%.o $(PUZZLES_OBJDIR)/help/%.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(PUZZLES_OBJDIR)/$*.elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \

@@ -2,10 +2,7 @@ rockbox.c
 rbwrappers.c
 rbmalloc.c
 
-#ifndef SANSA_C200V2
 help.c
-helpcontent.c
-#endif
 
 src/combi.c
 src/divvy.c
