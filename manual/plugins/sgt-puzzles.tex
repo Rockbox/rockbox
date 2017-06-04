@@ -1,0 +1,29 @@
+\subsection{Sgt-Puzzles}
+\screenshot{plugins/images/ss-puzzles-cube}{``Cube'', a rolling solid puzzle}{fig:Cube}
+\screenshot{plugins/images/ss-puzzles-map}{``Map'', a 4-coloring game}{fig:Map}
+
+The games that begin with the ``sgt-'' prefix are ports of certain
+puzzles from Simon Tatham's Portable Puzzle Collection, an open source
+collection of single-player puzzle games.
+
+\subsubsection{Puzzle Documentation}
+For documentation on the games included, please see the ``Extensive
+Help'' menu option from inside the plugin to read puzzle-specific
+instructions or visit their official website at
+\url{https://www.chiark.greenend.org.uk/~sgtatham/puzzles/}.
+
+\subsubsection{Dynamic Font Sizing}
+By default, each game will only use one of two fonts in drawing: the
+hard-coded system font for fixed-width text, and the theme's UI font
+for variable-width text. For improved puzzle rendering, each puzzle is
+capable of using a special font pack when it is installed. This font
+pack is available from
+\url{http://download.rockbox.org/useful/sgt-fonts.zip}. To install,
+simply extract the contents of this file to the
+\fname{/.rockbox/fonts/} directory on your device. Once this has been
+done, each game will dynamically load and use properly-sized fonts
+whenever needed.
+
+\note{On hard disk-based devices, this may cause a slight delay as the
+  disk spins up to load the fonts when a puzzle is first started, and
+  after using the ``Extensive Help'' feature.}
