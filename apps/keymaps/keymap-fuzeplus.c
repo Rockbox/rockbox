@@ -50,11 +50,6 @@ static const struct button_mapping button_context_standard[]  = {
 
     { ACTION_STD_KEYLOCK,               BUTTON_POWER,                      BUTTON_NONE },
 
-/*    { ACTION_STD_QUICKSCREEN,           BUTTON_REC|BUTTON_SELECT,          BUTTON_REC },
-    { ACTION_STD_REC,                   BUTTON_REC|BUTTON_REPEAT,          BUTTON_REC },
-    { ACTION_STD_HOTKEY,                BUTTON_REC|BUTTON_SELECT,          BUTTON_REC },
-   on some gesture later? */
-
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
@@ -88,13 +83,6 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_ID3SCREEN,             BUTTON_BOTTOMRIGHT|BUTTON_REPEAT,  BUTTON_BOTTOMRIGHT },
 
     { ACTION_WPS_HOTKEY,                BUTTON_BOTTOMRIGHT|BUTTON_REL,     BUTTON_BOTTOMRIGHT },
-
-/*  Playlist should be hard linked on BOTTOMRIGHT and hotkey move to some gesture in the future
-    { ACTION_WPS_VIEW_PLAYLIST,         BUTTON_BACK|BUTTON_DOWN,           BUTTON_NONE },
-    { ACTION_WPS_ABSETB_NEXTDIR,        BUTTON_BACK|BUTTON_RIGHT,          BUTTON_BACK },
-    { ACTION_WPS_ABSETA_PREVDIR,        BUTTON_BACK|BUTTON_LEFT,           BUTTON_BACK },
-    { ACTION_WPS_ABRESET,               BUTTON_BACK|BUTTON_SELECT,         BUTTON_BACK },
-     on some gesture later? */
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_wps */
@@ -159,9 +147,6 @@ static const struct button_mapping button_context_list[]  = {
     { ACTION_LISTTREE_PGUP,             BUTTON_BOTTOMLEFT|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_LISTTREE_PGDOWN,           BUTTON_BOTTOMRIGHT,                BUTTON_NONE },
     { ACTION_LISTTREE_PGDOWN,           BUTTON_BOTTOMRIGHT|BUTTON_REPEAT,  BUTTON_NONE },
-/*#ifdef HAVE_HOTKEY on some gesture later?
-    { ACTION_TREE_HOTKEY,               BUTTON_BACK|BUTTON_REL,            BUTTON_BACK|BUTTON_REPEAT },
-#endif*/
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
@@ -200,6 +185,8 @@ static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_SETTINGS_DEC,             BUTTON_LEFT,                        BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,       BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE },
     { ACTION_STD_CANCEL,               BUTTON_BACK,                        BUTTON_NONE },
+    /* NOTE: long select will only work when recording is stopped */
+    { ACTION_STD_MENU,                 BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
@@ -448,7 +435,7 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_colorchooser;
         case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_settings_right_is_inc;
-	case CONTEXT_CUSTOM|CONTEXT_SETTINGS:
+        case CONTEXT_CUSTOM|CONTEXT_SETTINGS:
             return button_context_settings_right_is_inc;
 #ifdef USB_ENABLE_HID
         case CONTEXT_USB_HID:

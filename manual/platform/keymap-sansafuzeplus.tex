@@ -21,12 +21,10 @@
 
 \newcommand{\ActionStdContext}{Long \ButtonSelect{} or Long \ButtonRight}
 
-\newcommand{\ActionStdCancel}{\ButtonBack{} or \ButtonLeft}
+\newcommand{\ActionStdCancel}{\ButtonLeft}
 \newcommand{\ActionStdOk}{\ButtonSelect{} or \ButtonRight}
 
-\newcommand{\ActionStdRec}{\fixme{tbd}}
-\newcommand{\ActionStdQuickScreen}{\fixme{tbd}}
-\newcommand{\ActionStdMenu}{\fixme{tbd}}
+\newcommand{\ActionStdMenu}{\ButtonBack{}}
 \newcommand{\ActionQuickScreenExit}{Any corner keys or \ButtonSelect}
 
 %Button actions, wps context
@@ -51,19 +49,12 @@
 
 \newcommand{\ActionWpsHotkey}{\ButtonBottomRight}
 
-\newcommand{\ActionWpsPlaylist}{\fixme{tbd}}
-\newcommand{\ActionWpsAbSetBNextDir}{\fixme{tbd}}
-\newcommand{\ActionWpsAbSetAPrevDir}{\fixme{tbd}}
-\newcommand{\ActionWpsAbReset}{\fixme{tbd}}
-
 %Button actions, tree context
 \newcommand{\ActionTreeWps}{\ButtonPlay}
 \newcommand{\ActionTreeStop}{Long \ButtonPlay}
 
 \newcommand{\ActionTreeEnter}{\ButtonSelect{} or \ButtonRight}
-\newcommand{\ActionTreeParentDirectory}{\ButtonBack{} or \ButtonLeft}
-\newcommand{\ActionTreeHotkey}{\fixme{tbd}}
-\newcommand{\ActionTreeQuickScreen}{\fixme{tbd}}
+\newcommand{\ActionTreeParentDirectory}{\ButtonLeft}
 
 %Button actions, YesNo context
 \newcommand{\ActionYesNoAccept}{\ButtonSelect}
@@ -114,11 +105,11 @@
 \newcommand{\ActionRecPause}{\ButtonPlay}
 \newcommand{\ActionRecExit}{\ButtonBack}
 \newcommand{\ActionRecNewfile}{\ButtonBottomRight}
-\newcommand{\ActionRecMenu}{\fixme{tbd}}
 \newcommand{\ActionRecSettingsInc}{\ButtonRight}
 \newcommand{\ActionRecSettingsDec}{\ButtonLeft}
 \newcommand{\ActionRecPrev}{\ButtonUp}
 \newcommand{\ActionRecNext}{\ButtonDown}
+\newcommand{\ActionRecMenu}{Long \ButtonSelect{} or Long \ButtonBack{}}
 
 %Button actions, FM radio context
 \newcommand{\ActionFMMenu}{Long \ButtonSelect}
@@ -130,8 +121,8 @@
 \newcommand{\ActionFMExit}{\ButtonBack}
 \newcommand{\ActionFMPrevPreset}{\ButtonBottomLeft}
 \newcommand{\ActionFMNextPreset}{\ButtonBottomRight}
-\newcommand{\ActionFMSettingsInc}{\ActionSettingInc}
-\newcommand{\ActionFMSettingsDec}{\ActionSettingDec}
+\newcommand{\ActionFMSettingsInc}{\ActionSettingInc or \ButtonVolUp}
+\newcommand{\ActionFMSettingsDec}{\ActionSettingDec or \ButtonVolDown}
 \newcommand{\ActionFMPrev}{\ButtonLeft}
 \newcommand{\ActionFMNext}{\ButtonRight}
 
