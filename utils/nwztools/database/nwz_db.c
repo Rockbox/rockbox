@@ -1318,7 +1318,7 @@ struct nwz_series_info_t nwz_series[NWZ_SERIES_COUNT] =
     { "nwz-e550", "NWZ-E550 Series", 4, models_nwz_e550, 0 },
     { "nwz-e570", "NWZ-E570 Series", 4, models_nwz_e570, 0 },
     { "nwz-e580", "NWZ-E580 Series", 4, models_nwz_e580, &nvp_index_6485c8 },
-    { "nw-s10", "NW-S10 Series", 5, models_nw_s10, 0 },
+    { "nw-s10", "NW-S10 Series", 5, models_nw_s10, &nvp_index_6485c8 },
     { "nwz-s510", "NWZ-S510 Series", 2, models_nwz_s510, 0 },
     { "nwz-s610", "NWZ-S610 Series", 5, models_nwz_s610, 0 },
     { "nwz-s630", "NWZ-S630 Series", 6, models_nwz_s630, 0 },
