@@ -1,6 +1,1 @@
-midifile.c
-midiutil.c
-sequencer.c
-guspat.c
-synth.c
 midiplay.c

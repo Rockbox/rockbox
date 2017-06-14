@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 Karl Kurbjun based on midi2wav by Stepan Moskovchenko
+ * Copyright (C) 2017 William Wilgus, 2016 Moshe Piekarski
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,584 +19,823 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#include "guspat.h"
-#include "midiutil.h"
-#include "synth.h"
-#include "sequencer.h"
-#include "midifile.h"
+#include "lib/pluginlib_actions.h"
+#include <stdio.h>
 
+static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
-/* variable button definitions */
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define MIDI_QUIT       BUTTON_OFF
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_RC_QUIT    BUTTON_RC_STOP
-#define MIDI_PLAYPAUSE  BUTTON_ON
+/* Checks execution time between first call for output and first call for input */
+//#define BF_EXEC_TIME_PROFILE
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define MIDI_QUIT       (BUTTON_SELECT | BUTTON_MENU)
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_SCROLL_FWD
-#define MIDI_VOL_DOWN   BUTTON_SCROLL_BACK
-#define MIDI_PLAYPAUSE  BUTTON_PLAY
+/* PROGRAM BUFFERS */
+#define STACK_SIZE      128
+#define DATA_SIZE       1024
+//30000
+#define PROG_BUFFER     32768
+//32768
+//16384
+//8192
+//4096
+#define TEXT_BUFFER      180
+#define INPUT_BUFFER     5
+/* Brain Fuck Commands
+>    increment the data pointer (to point to the next cell to the right).
+<    decrement the data pointer (to point to the next cell to the left).
++    increment (increase by one) the byte at the data pointer.
+-    decrement (decrease by one) the byte at the data pointer.
+.    output the byte at the data pointer.
+,    accept one byte of input, storing its value in the byte at the data pointer.
+[    if the byte at the data pointer is zero, then instead of moving the
+    ins pointer forward to the next command, jump it forward to the
+    command after the matching ] command.
+]    if the byte at the data pointer is nonzero, then instead of moving the
+    ins pointer forward to the next command,    jump it back to the command after the matching [ command.
+*/
 
+#define BF_INC_DP       '>'
+#define BF_DEC_DP       '<'
+#define BF_INC_VAL      '+'
+#define BF_DEC_VAL      '-'
+#define BF_OUTPUT       '.'
+#define BF_INPUT        ','
+#define BF_JFZ          '['
+#define BF_JBNZ         ']'
 
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_A
+/* OPTIMIZED BF OPERATIONS*/
+/* optimized programs turn long lists of operations into a single
+    operation with an amount to increment/decrement by */
+#define OP_INC_DP       '\x0E' //'I'//
+#define OP_DEC_DP       '\x0F' //'D'//
+#define OP_INC_VAL      '\x11' //'A'//
+#define OP_DEC_VAL      '\x12' //'S'//
+#define OP_ZERO_VAL     '\x18' //'Z'//
+#define OP_ONE_VAL      '\x13' //'O'//
+/* loop offsets are stored directly to file for faster jumps */
+#define OP_LOOP_ZERO    '{'
+#define OP_LOOP_NZERO    '}'
 
+/*ERRORS*/
+#define SUCCESS        0x000
+#define USER_EXIT      0x001
+#define ERROR          0x002
+#define STACK_OVFL     0x004
+#define STACK_UNFL     0x008
+#define DATA_OVFL      0x010
+#define DATA_UNFL      0x020
+#define ENDOFFILE      0x040
+#define INS_OVFL       0x080
+#define FILE_ERR       0x100
 
-#elif (CONFIG_KEYPAD == GIGABEAT_S_PAD)
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_PLAY
+/*STACK MANIPULATION stores return address of loops*/
+#define STACK_EMPTY()   (stkptr <= 0)
+#define STACK_FULL()    (stkptr >= STACK_SIZE)
+#define STACK_PUSH(a)   (stack[stkptr++] = a)
+#define STACK_POP()     (stack[--stkptr])
+#define STACK_PEEK()     (stack[stkptr-1])
+#define STACK_DISCARD()     (stkptr--)
 
-
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_SCROLL_FWD
-#define MIDI_VOL_DOWN   BUTTON_SCROLL_BACK
-#define MIDI_PLAYPAUSE  BUTTON_UP
-
-#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-#define MIDI_QUIT       (BUTTON_HOME|BUTTON_REPEAT)
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_SCROLL_FWD
-#define MIDI_VOL_DOWN   BUTTON_SCROLL_BACK
-#define MIDI_PLAYPAUSE  BUTTON_UP
-
-
-#elif (CONFIG_KEYPAD == SANSA_C200_PAD) || \
-(CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
-(CONFIG_KEYPAD == SANSA_M200_PAD)
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_VOL_UP
-#define MIDI_VOL_DOWN   BUTTON_VOL_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_UP
-
-
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_PLAY
-
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_SCROLL_UP
-#define MIDI_VOL_DOWN   BUTTON_SCROLL_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_PLAY
-
-
-#elif CONFIG_KEYPAD == MROBE500_PAD
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_RC_PLAY
-#define MIDI_VOL_DOWN   BUTTON_RC_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_RC_HEART
-
-
-#elif (CONFIG_KEYPAD == MROBE100_PAD)
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_DISPLAY
-
-
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define MIDI_QUIT       BUTTON_RC_REC
-#define MIDI_FFWD       BUTTON_RC_FF
-#define MIDI_REWIND     BUTTON_RC_REW
-#define MIDI_VOL_UP     BUTTON_RC_VOL_UP
-#define MIDI_VOL_DOWN   BUTTON_RC_VOL_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_RC_PLAY
-
-
-#elif CONFIG_KEYPAD == COWON_D2_PAD
-#define MIDI_QUIT       BUTTON_POWER
-
-#elif CONFIG_KEYPAD == IAUDIO67_PAD
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_STOP
-#define MIDI_VOL_DOWN   BUTTON_PLAY
-#define MIDI_PLAYPAUSE  BUTTON_MENU
-
-#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-#define MIDI_QUIT       BUTTON_BACK
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD
-#define MIDI_QUIT       (BUTTON_PLAY|BUTTON_REPEAT)
-#define MIDI_FFWD       BUTTON_MENU
-#define MIDI_REWIND     BUTTON_BACK
-#define MIDI_VOL_UP     BUTTON_VOL_UP
-#define MIDI_VOL_DOWN   BUTTON_VOL_DOWN
-#define MIDI_PLAYPAUSE  (BUTTON_PLAY|BUTTON_REL)
-
-#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_MENU
-
-#elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_MENU
-
-#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_NEXT
-#define MIDI_REWIND     BUTTON_PREV
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_MENU
-
-#elif CONFIG_KEYPAD == ONDAVX747_PAD
-#define MIDI_QUIT       BUTTON_POWER
-#elif CONFIG_KEYPAD == ONDAVX777_PAD
-#define MIDI_QUIT       BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
-      (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD)
-#define MIDI_QUIT       (BUTTON_PLAY|BUTTON_REPEAT)
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
-#define MIDI_QUIT       BUTTON_REC
-#define MIDI_FFWD       BUTTON_NEXT
-#define MIDI_REWIND     BUTTON_PREV
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define MIDI_QUIT       (BUTTON_REC | BUTTON_PLAY)
-#define MIDI_FFWD       BUTTON_FF
-#define MIDI_REWIND     BUTTON_REW
-#define MIDI_VOL_UP     BUTTON_VOL_UP
-#define MIDI_VOL_DOWN   BUTTON_VOL_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define MIDI_QUIT       (BUTTON_MENU | BUTTON_REPEAT)
-#define MIDI_FFWD       BUTTON_FF
-#define MIDI_REWIND     BUTTON_REW
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_PLAYPAUSE
-
-#elif CONFIG_KEYPAD == SANSA_CONNECT_PAD
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_SELECT
-
-#elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
-#define MIDI_QUIT       BUTTON_BACK
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_USER
-
-#elif (CONFIG_KEYPAD == HM60X_PAD) || \
-    (CONFIG_KEYPAD == HM801_PAD)
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_SELECT
-
-#elif (CONFIG_KEYPAD == SONY_NWZ_PAD)
-#define MIDI_QUIT       BUTTON_BACK
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == CREATIVE_ZEN_PAD)
-#define MIDI_QUIT       BUTTON_BACK
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_UP
-#define MIDI_VOL_DOWN   BUTTON_DOWN
-#define MIDI_PLAYPAUSE  BUTTON_PLAYPAUSE
-
-#elif CONFIG_KEYPAD == DX50_PAD
-#define MIDI_QUIT       BUTTON_POWER
-#define MIDI_FFWD       BUTTON_RIGHT
-#define MIDI_REWIND     BUTTON_LEFT
-#define MIDI_VOL_UP     BUTTON_VOL_UP
-#define MIDI_VOL_DOWN   BUTTON_VOL_DOWN
-
-#else
-#error No keymap defined!
+const char prompt_continue[] = "Press Select to continue.";
+const char op_header[] = "#BFOptimized\nDO NOT ALTER DEPENDS ON FILE OFFSETS\n\0";
+static int8_t data[DATA_SIZE] = {0};
+static uint32_t stack[STACK_SIZE] = {0};
+static unsigned char program[PROG_BUFFER] = {0};
+#ifdef BF_EXEC_TIME_PROFILE
+uint32_t e_time = 0; //for profiling
 #endif
-
-#ifdef HAVE_TOUCHSCREEN
-#ifndef MIDI_QUIT
-#define MIDI_QUIT       BUTTON_TOPLEFT
-#endif
-#ifndef MIDI_FFWD
-#define MIDI_FFWD       BUTTON_MIDRIGHT
-#endif
-#ifndef MIDI_REWIND
-#define MIDI_REWIND     BUTTON_MIDLEFT
-#endif
-#ifndef MIDI_VOL_UP
-#define MIDI_VOL_UP     BUTTON_TOPMIDDLE
-#endif
-#ifndef MIDI_VOL_DOWN
-#define MIDI_VOL_DOWN   BUTTON_BOTTOMMIDDLE
-#endif
-#ifndef MIDI_PLAYPAUSE
-#define MIDI_PLAYPAUSE  BUTTON_CENTER
-#endif
-#endif
-
-#undef SYNC
-
-#ifdef SIMULATOR
-#define SYNC
-#endif
-
-struct MIDIfile * mf IBSS_ATTR;
-
-int number_of_samples IBSS_ATTR; /* the number of samples in the current tick */
-int playing_time IBSS_ATTR;  /* How many seconds into the file have we been playing? */
-int samples_this_second IBSS_ATTR;    /* How many samples produced during this second so far? */
-long bpm IBSS_ATTR;
-
-int32_t gmbuf[BUF_SIZE*NBUF];
-static unsigned int samples_in_buf;
-
-bool midi_end = false;
-bool quit = false;
-bool swap = false;
-bool lastswap = true;
-
-static inline void synthbuf(void)
+static int button_prompt(bool prompt, int prompt_button, const char* prompt_text)
 {
-    int32_t *outptr;
-    int i = BUF_SIZE;
-
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(true);
-#endif
-#ifndef SYNC
-    if (lastswap == swap)
-        return;
-    lastswap = swap;
-
-    outptr = (swap ? gmbuf : gmbuf+BUF_SIZE);
-#else
-    outptr = gmbuf;
-#endif
-    if (midi_end) {
-        samples_in_buf = 0;
-        return;
-    }
-
-    /* synth samples for as many whole ticks as we can fit in the buffer */
-    for (; i >= number_of_samples; i -= number_of_samples)
+    int fh;
+    int button = BUTTON_NONE;
+    button = pluginlib_getaction(TIMEOUT_NOBLOCK,
+                                 plugin_contexts,
+                                 ARRAYLEN(plugin_contexts));
+    if (prompt)
     {
-        synthSamples((int32_t*)outptr, number_of_samples);
-        outptr += number_of_samples;
-#ifndef SYNC
-        /* synthbuf is called in interrupt context is SYNC is defined so it cannot yield
-           that bug causing the sim to crach when not using SYNC should really be fixed */
-        rb->yield();
-#endif
-        if (tick() == 0)
-            midi_end = true;    /* no more midi data to play */
-    }
+        rb->lcd_getstringsize("W", NULL, &fh);
+        rb->lcd_putsxy(3,LCD_HEIGHT-fh, prompt_text);
+        rb->lcd_update();
+        rb->sleep(HZ/2);
 
-    /* how many samples did we write to the buffer? */
-    samples_in_buf = BUF_SIZE-i;
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(false);
-#endif
-}
-
-static void get_more(const void** start, size_t* size)
-{
-#ifndef SYNC
-    if(lastswap != swap)
-    {
-        midi_debug("Buffer miss!"); /* Comment out the midi_debug to make missses less noticable. */
-    }
-
-#else
-    synthbuf();  /* For some reason midiplayer crashes when an update is forced */
-#endif
-
-    *size = samples_in_buf*sizeof(int32_t);
-#ifndef SYNC
-    *start = swap ? gmbuf : gmbuf + BUF_SIZE;
-    swap = !swap;
-#else
-    *start = gmbuf;
-#endif
-    if (samples_in_buf==0) {
-        *start = NULL;
-        quit = true;    /* this was the last buffer to play */
-    }
-}
-
-static int midimain(const void * filename)
-{
-    int a, notes_used, vol;
-    bool is_playing = true;  /* false = paused */
-
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(true);
-#endif
-    midi_debug("Loading file");
-    mf = loadFile(filename);
-
-    if (mf == NULL)
-    {
-        midi_debug("Error loading file.");
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-        rb->cpu_boost(false);
-#endif
-        return -1;
-    }
-
-    if (initSynth(mf, ROCKBOX_DIR "/patchset/patchset.cfg",
-        ROCKBOX_DIR "/patchset/drums.cfg") == -1)
-    {
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-        rb->cpu_boost(false);
-#endif
-        return -1;
-    }
-
-    rb->pcm_play_stop();
-#if INPUT_SRC_CAPS != 0
-    /* Select playback */
-    rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
-    rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
-#endif
-    rb->pcm_set_frequency(SAMPLE_RATE); /* 44100 22050 11025 */
-
-    /*
-        * tick() will do one MIDI clock tick. Then, there's a loop here that
-        * will generate the right number of samples per MIDI tick. The whole
-        * MIDI playback is timed in terms of this value.. there are no forced
-        * delays or anything. It just produces enough samples for each tick, and
-        * the playback of these samples is what makes the timings right.
-        *
-        * This seems to work quite well. On a laptop, anyway.
-        */
-
-    midi_debug("Okay, starting sequencing");
-
-    bpm = mf->div*1000000/tempo;
-    number_of_samples = SAMPLE_RATE/bpm;
-
-    /* Skip over any junk in the beginning of the file, so start playing */
-    /* after the first note event */
-    do
-    {
-        notes_used = 0;
-        for (a = 0; a < MAX_VOICES; a++)
-            if (voices[a].isUsed)
-                notes_used++;
-        tick();
-    } while (notes_used == 0);
-
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(false);
-#endif
-
-    playing_time = 0;
-    samples_this_second = 0;
-
-    synthbuf();
-    rb->pcm_play_data(&get_more, NULL, NULL, 0);
-
-    while (!quit)
-    {
-    #ifndef SYNC
-        synthbuf();
-    #endif
-        rb->yield();
-
-        /* Prevent idle poweroff */
-        rb->reset_poweroff_timer();
-
-        /* Code taken from Oscilloscope plugin */
-        switch (rb->button_get(false))
+        while (1)
         {
-            case MIDI_VOL_UP:
-            case MIDI_VOL_UP | BUTTON_REPEAT:
-            {
-                vol = rb->global_settings->volume;
-                if (vol < rb->sound_max(SOUND_VOLUME))
-                {
-                    vol++;
-                    rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_settings->volume = vol;
-                }
-                break;
-            }
+            button = pluginlib_getaction(HZ,
+                                         plugin_contexts,
+                                         ARRAYLEN(plugin_contexts));
+            if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                return PLA_EXIT;
 
-            case MIDI_VOL_DOWN:
-            case MIDI_VOL_DOWN | BUTTON_REPEAT:
-            {
-                vol = rb->global_settings->volume;
-                if (vol > rb->sound_min(SOUND_VOLUME))
-                {
-                    vol--;
-                    rb->sound_set(SOUND_VOLUME, vol);
-                    rb->global_settings->volume = vol;
-                }
-                break;
-            }
-
-            case MIDI_REWIND:
-            {
-                /* Rewinding is tricky. Basically start the file over */
-                /* but run through the tracks without the synth running */
-                rb->pcm_play_stop();
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-                rb->cpu_boost(true);
-#endif
-                seekBackward(5);
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-                rb->cpu_boost(false);
-#endif
-                lastswap = !swap;
-                synthbuf();
-                midi_debug("Rewind to %d:%02d\n", playing_time/60, playing_time%60);
-                if (is_playing)
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
-                break;
-            }
-
-            case MIDI_FFWD:
-            {
-                rb->pcm_play_stop();
-                seekForward(5);
-                lastswap = !swap;
-                synthbuf();
-                midi_debug("Skip to %d:%02d\n", playing_time/60, playing_time%60);
-                if (is_playing)
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
-                break;
-            }
-
-            case MIDI_PLAYPAUSE:
-            {
-                if (is_playing)
-                {
-                    midi_debug("Paused at %d:%02d\n", playing_time/60, playing_time%60);
-                    is_playing = false;
-                    rb->pcm_play_stop();
-                } else
-                {
-                    midi_debug("Playing from %d:%02d\n", playing_time/60, playing_time%60);
-                    is_playing = true;
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
-                }
-                break;
-            }
-
-#ifdef MIDI_RC_QUIT
-            case MIDI_RC_QUIT:
-#endif
-            case MIDI_QUIT:
-                quit = true;
+            if (button == PLA_EXIT || button == prompt_button ||
+                button != (prompt_button == -1 ? 0 : button))
+            break;
         }
     }
-    return 0;
+    return button;
 }
 
-enum plugin_status plugin_start(const void* parameter)
+int output(bool new, const char *fmt, ...)
 {
-    int retval;
+    /* output modified from midi */
+    static int  p_xtpt = 1;
+    static int  p_ytpt = 1;
+    static int  h = 0;
 
-    if (parameter == NULL)
+    static bool prompt_next = false;
+    static char p_buf[TEXT_BUFFER];
+    static int  pos = 0;
+
+    int         i = 0, p = 0;
+    char        last_chr = '\0';
+    int         chr_count = 0;
+    int         new_xtpt = 0;
+    int         fh;
+    static int  fw = 1;
+    va_list ap;
+
+    if (new)
     {
-        rb->splash(HZ*2, " Play .MID file ");
-        return PLUGIN_OK;
+    /* sets cursor to beginning of screen, if fmt[0] == '\0' clears buffer */
+        p_ytpt = 1;
+        p_xtpt = 1;
+        new = false;
+        if (fmt[0] == '\0')
+        {
+            pos = 0;
+            prompt_next = false;
+            return 3;
+        }
     }
-    rb->lcd_setfont(FONT_SYSFIXED);
+    va_start(ap, fmt);
+    chr_count = rb->vsnprintf(&p_buf[pos],sizeof(p_buf)-pos, fmt, ap);
+    va_end(ap);
 
-    midi_debug("%s", parameter);
-    /*   rb->splash(HZ, true, parameter); */
+    if (chr_count == 1 && (fmt[1] == 'c' || fmt[1] == 'C'))
+    {
+        new_xtpt = p_xtpt + rb->font_getstringsize(p_buf, NULL, NULL, FONT_UI);
+        last_chr = p_buf[pos];
+        if ((last_chr == ' ' || last_chr <= '\e') && (new_xtpt) > (LCD_WIDTH - fw * 3))
+        {   /*print now*/
+            p_buf[pos] = '\n';
+            last_chr = '\n';
+        }
+        else if ((new_xtpt) >= (LCD_WIDTH) && pos+1 < TEXT_BUFFER)
+            p_buf[++pos] = '\n';
+        else if ((pos++ < TEXT_BUFFER) && last_chr > '\e')
+            return 2; /*Continue building buffer*/
+    }
 
-#ifdef RB_PROFILE
-    rb->profile_thread();
+    pos = 0;
+    if (prompt_next)
+    {
+        if (button_prompt(true, PLA_SELECT, prompt_continue) == PLA_EXIT)
+            return 0;
+        p_xtpt=1;
+        p_ytpt=1;
+        //h = 0;
+        rb->lcd_clear_display();
+        prompt_next = false;
+    }
+
+    rb->lcd_getstringsize("W", &fw, &fh);
+
+    /* Device LCDs display newlines funny. */
+    for(i = 0; p_buf[i]!='\0'; i++)
+        if (p_buf[i] == '\n')
+        {
+            p_buf[i] = '\0';
+            rb->lcd_putsxy(p_xtpt,p_ytpt, (unsigned char *)&p_buf[p]);
+            if (h ==0)
+                rb->font_getstringsize(&p_buf[p], NULL, &h, FONT_UI);
+            rb->lcd_update();
+            p_ytpt+=h;//+2;
+            p_xtpt = 1;
+            p = i+1;
+        }
+    if (p_buf[p] != '\0')
+    {
+        rb->lcd_putsxy(p_xtpt,p_ytpt, (unsigned char *)&p_buf[p]);
+        p_xtpt+= rb->font_getstringsize(&p_buf[p], NULL, &h, FONT_UI);
+        rb->lcd_update();
+        if (p_xtpt>LCD_WIDTH-fw)
+        {
+            p_ytpt+=h;//+2;
+            p_xtpt=1;
+        }
+    }
+    if (p_ytpt >= LCD_HEIGHT-(fh * 2))
+        prompt_next = true;
+    else
+        h = 0;
+    return 1;
+}
+
+int input(void)
+{
+    static char in[INPUT_BUFFER] = {'\n'}; // LF
+    static unsigned char pos = 0;
+    int ret = 1;
+    in[0] = '\0';
+    int out = '\n'; //LF
+    in[INPUT_BUFFER -1] = '\0';
+
+    while(ret != 0 && pos == 0)
+    {
+        ret = rb->kbd_input(in, INPUT_BUFFER -1);
+        rb->lcd_clear_display();
+        rb->lcd_update();
+    }
+
+    if ((in[0] >= '0') && (in[0] <= '9') && pos == 0)
+        out = rb->atoi(in);
+    else
+    {
+        out = in[pos++];
+        for (int i = 0; i < INPUT_BUFFER -1 ; i++)
+            if (in[i] == '\0')
+                in[i] = '\n'; //LF
+
+        if (out == '\n' || out == '\0' || pos >= 4)
+        {
+            for (pos = 0; pos < INPUT_BUFFER - 2 ; pos++)
+                in[pos] = '\n'; //LF
+            in[0] = '\0';
+            pos = 0;
+        }
+    }
+    return out;
+}
+int32_t save_bf(char * file_name, int32_t insptr, int32_t dataptr, uint16_t stkptr)
+{
+    int32_t bytes_write = 0;
+    int fd_sv = rb->open(file_name, O_RDWR | O_TRUNC | O_CREAT, 0777);
+    if (!fd_sv)
+    {
+        rb->splash(HZ * 5, "Error Saving");
+        return 0;
+    }
+    bytes_write += rb->write(fd_sv, &insptr, sizeof(insptr));
+    bytes_write += rb->write(fd_sv, &dataptr, sizeof(dataptr));
+    bytes_write += rb->write(fd_sv, &stkptr, sizeof(stkptr));
+    bytes_write += rb->write(fd_sv, data, DATA_SIZE);
+    bytes_write += rb->write(fd_sv, stack, STACK_SIZE);
+    rb->close(fd_sv);
+
+    return bytes_write;
+}
+int32_t restore_bf(char * file_name, int32_t* insptr, int32_t* dataptr, uint16_t* stkptr)
+{
+    rb->splash(HZ * 5, "Restoring");
+    uint32_t bytes_read = 0;
+    uint32_t bytes_expected = (DATA_SIZE + STACK_SIZE +
+                                sizeof(int32_t) + sizeof(int32_t) + sizeof(uint16_t));
+    int fd_sv = rb->open(file_name, O_RDONLY);
+    if (!fd_sv)
+    {
+        rb->splash(HZ * 5, "Error restoring");
+        return 0;
+    }
+    bytes_read += rb->read(fd_sv, insptr, sizeof(int32_t));
+    bytes_read += rb->read(fd_sv, dataptr, sizeof(int32_t));
+    bytes_read += rb->read(fd_sv, stkptr, sizeof(uint16_t));
+    bytes_read += rb->read(fd_sv, data, DATA_SIZE);
+    bytes_read += rb->read(fd_sv, stack, STACK_SIZE);
+    rb->close(fd_sv);
+    if (bytes_read != bytes_expected)
+    {
+        rb->splashf (HZ * 5, "Error restoring %lu %lu ",
+                             (unsigned long) bytes_read,
+                             (unsigned long) bytes_expected);
+        *insptr = 0;
+        *dataptr = 0;
+        *stkptr = 0;
+        /*data and stack need to be set to 0 as well..*/
+        return 0;
+    }
+    return bytes_read;
+}
+
+static inline int buf_load_bf(int fd, int32_t insptr, char* buf, unsigned int buf_sz)
+{
+    static int ret_err = SUCCESS;
+    rb->lseek(fd, insptr, SEEK_SET);
+    if (rb->read(fd, buf, buf_sz) <= 0)
+        ret_err = ENDOFFILE;
+    return ret_err;
+}
+static inline void fast_op_load(int32_t insptr, uint32_t * fast_op)
+{
+    rb->memcpy(fast_op, &program[insptr], sizeof(*fast_op));
+}
+
+int execute_bf(int fd)
+{
+    int ret_err = SUCCESS;
+    off_t    file_sz = rb->filesize(fd);
+    bool     prompt = true;
+    int      bf_nop = 0;
+    int32_t  insptr = 0;
+    int32_t  buf_pos = 0;
+    int32_t  dataptr = 0;
+    uint16_t stkptr = 0;
+    int32_t  bytes_read = 0;
+    uint32_t fast_op = 0;
+    if (rb->file_exists("/test.bfs"))
+    {
+        const struct text_message prompt =
+            { (const char*[]) {"Restore?", "/test.bfs"}, 2};
+        enum yesno_res response = rb->gui_syncyesno_run(&prompt, NULL, NULL);
+        if(response != YESNO_NO)
+            restore_bf("/test.bfs", &insptr, &dataptr, &stkptr);
+    }
+
+    buf_pos = insptr;
+    ret_err |= buf_load_bf(fd, insptr, program, PROG_BUFFER);
+    output(true, "\0"); //New Screen
+    rb->lcd_clear_display();
+
+    while (ret_err == SUCCESS)
+    {
+        if (button_prompt(false, 0,"") == PLA_EXIT)
+            ret_err |= USER_EXIT;
+
+        switch (program[insptr-buf_pos]) {
+            case BF_INC_DP:
+                if (!bf_nop && ++dataptr >= DATA_SIZE)
+                        ret_err |= DATA_OVFL;
+                break;
+
+            case OP_INC_DP:
+               /* load several bytes into fast_op use that to add or subtract */
+                    fast_op_load(insptr - buf_pos +1, &fast_op);
+                    dataptr += fast_op;
+                    if (dataptr >= DATA_SIZE)
+                        ret_err |= DATA_OVFL;
+                insptr += sizeof(fast_op);
+                break;
+
+            case BF_DEC_DP:
+                if (!bf_nop && --dataptr < 0)
+                        ret_err |= DATA_UNFL;
+                break;
+
+            case OP_DEC_DP:
+                fast_op_load(insptr - buf_pos +1, &fast_op);
+                dataptr -= fast_op;
+                if (dataptr < 0)
+                    ret_err |= DATA_UNFL;
+
+                insptr += sizeof(fast_op);
+                break;
+
+            case BF_INC_VAL:
+                if (!bf_nop)
+                    data[dataptr]++;
+                break;
+
+            case OP_INC_VAL:
+                fast_op_load(insptr - buf_pos +1, &fast_op);
+                data[dataptr] += fast_op;
+                insptr += sizeof(fast_op);
+                break;
+
+            case BF_DEC_VAL:
+                if (!bf_nop)
+                    data[dataptr]--;
+                break;
+
+            case OP_DEC_VAL:
+                fast_op_load(insptr - buf_pos +1, &fast_op);
+                data[dataptr] -= fast_op;
+                insptr += sizeof(fast_op);
+                break;
+
+            case OP_ZERO_VAL:
+                data[dataptr] = 0;
+                break;
+
+            case OP_ONE_VAL:
+                data[dataptr] = 1;
+                break;
+
+            case BF_OUTPUT:
+                if (!bf_nop)
+                {
+#ifdef BF_EXEC_TIME_PROFILE
+                    if (e_time == 0)
+                        e_time = *rb->current_tick;//for profiling
 #endif
+                    if (!output    (!prompt, "%c",data[dataptr]))
+                        ret_err |= USER_EXIT;
+                    prompt = true;
+                }
+                    break;
 
-    retval = midimain(parameter);
-
-#ifdef RB_PROFILE
-    rb->profstop();
+            case BF_INPUT:
+                if (!bf_nop)
+                {
+#ifdef BF_EXEC_TIME_PROFILE
+                    if (e_time > 0)
+                    {// for profiling execution speed
+                        e_time = (*rb->current_tick-e_time);
+                        rb->splashf(HZ, "%u", (unsigned int) e_time);
+                    }
+                    e_time = 0;
 #endif
+                    output(false, "%c",'\n'); //dump buffer
+                    if (button_prompt(prompt, PLA_SELECT, prompt_continue) == PLA_EXIT)
+                    {
+                        ret_err |= USER_EXIT;
+                        break;
+                    }
+                    output(true, "\0"); //New Screen
+                    data[dataptr] = input();
 
-    rb->pcm_play_stop();
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+                    prompt = false;
 
-    rb->splash(HZ, "FINISHED PLAYING");
+                }
+                break;
+            case OP_LOOP_ZERO:
+                /* In fast_op loops the offset is recorded just after*/
+                if (data[dataptr] == 0)
+                {
+                    fast_op_load(insptr - buf_pos +1, &fast_op);
+                    insptr = fast_op;
+                    break;
+                }
+                insptr += sizeof(fast_op);
+                break;
+            case OP_LOOP_NZERO:
+                if (data[dataptr] != 0)
+                {
+                    fast_op_load(insptr - buf_pos +1, &fast_op);
+                    insptr = fast_op;
+                    if (insptr-buf_pos < 0)
+                    {
+                        ret_err |= buf_load_bf(fd, insptr, program, PROG_BUFFER);
+                        buf_pos = insptr;
+                    }
+                    continue;
+                }
+                insptr += sizeof(fast_op);
 
-    if (retval == -1)
+                break;
+
+            case BF_JFZ:
+                if (bf_nop)
+                    bf_nop++;
+                else if ((data[dataptr]==0))
+                    bf_nop = 1;
+                else// if (bf_nop == 0)
+                {
+                    if (STACK_FULL())
+                        ret_err |= STACK_OVFL;
+                    else
+                        STACK_PUSH(insptr);
+                }
+                break;
+
+            case BF_JBNZ:
+                if (bf_nop == 0)
+                {
+                    if (STACK_EMPTY())
+                        ret_err |= STACK_UNFL;
+                    else if (data[dataptr])
+                    {
+                        /*insptr_jmp = STACK_PEEK() + 1;
+                        if (insptr-insptr_jmp == 1 &&
+                            program[insptr-buf_pos-1] == BF_DEC_VAL) //[-]
+                        {
+                            data[dataptr] = 0; //short circuit for 0 data
+                            STACK_DISCARD(); //discard address
+                            break;
+                        }
+                        insptr = insptr_jmp;
+                        */
+                        insptr = STACK_PEEK() + 1; /* jump one past [ */
+                        if (insptr-buf_pos < 0)
+                        {
+                            ret_err |= buf_load_bf(fd, insptr, program, PROG_BUFFER);
+                            buf_pos = insptr;
+                        }
+                        continue;
+                    }
+                    else
+                        STACK_DISCARD(); //discard address
+                }
+                else //if (bf_nop)
+                    bf_nop--;
+                break;
+
+            case 0xFF://EOF:
+                ret_err |= ENDOFFILE;
+
+            default:
+                break;
+        }
+        //insptr++;
+        if (++insptr - buf_pos >= PROG_BUFFER - (signed) sizeof(fast_op) - 2)
+        {
+            ret_err |= buf_load_bf(fd, insptr, program, PROG_BUFFER);
+            buf_pos = insptr;
+        }
+        if (insptr >= file_sz)
+            ret_err |= INS_OVFL;
+    }
+    if ((ret_err || !STACK_EMPTY() || insptr != file_sz) &&
+       (ret_err & USER_EXIT) != USER_EXIT)
+    {
+       rb->splashf(HZ * 5, "ip: %li dp: %li ins:(%i) %c ; bytes: %lu",
+                           (signed long) insptr-1, (signed long) dataptr,
+                           program[insptr-buf_pos-1], program[insptr-buf_pos-1],
+                           (unsigned long) bytes_read);
+        if (ret_err == SUCCESS)
+        ret_err = ERROR;
+    }
+    else if ((ret_err & USER_EXIT) == USER_EXIT)
+    {
+        const struct text_message prompt =
+            { (const char*[]) {"Save?", "/test.bfs"}, 2};
+        enum yesno_res response = rb->gui_syncyesno_run(&prompt, NULL, NULL);
+        if(response != YESNO_NO)
+            save_bf("/test.bfs", insptr-1, dataptr, stkptr);
+    }
+
+    return ret_err;
+}
+
+int optimize_bf(const void* file, int fd)
+{
+    const char data_z = OP_ZERO_VAL;
+    const char data_o = OP_ONE_VAL;
+    char file_name[64]={'\0'};
+    char ins_op = 0;
+    unsigned char ins = 0, ins_new = 1;
+    int32_t  insptr = 0;
+    uint16_t stkptr = 0;
+    uint16_t bkt_open_ct = 0, bkt_close_ct = 0;
+
+    int ret_err = SUCCESS;
+    int fd_op;
+    union ins_data_u
+    {
+        uint32_t fast_op;
+        uint8_t  cbuf[sizeof(uint16_t)];
+    }ins_data;
+    uint32_t bytes_write = 0;
+    int bytes_read = 0;
+    rb->snprintf(file_name, sizeof(file_name), "%sop%c" , (const char *) file, '\0');
+    fd_op = rb->open(file_name, O_RDWR | O_TRUNC | O_CREAT, 0777);
+
+    bytes_write = rb->write(fd_op, op_header, sizeof(op_header));
+    bytes_read = rb->read(fd, &ins, 1);
+
+    output(true, "Optimizing Source %c",'\n'); //New screen + dump buffer NOW
+    output(false, "%s %c",file_name, '\n'); //dump buffer NOW
+    while (ret_err == SUCCESS && bytes_read > 0)
+    {
+        if (button_prompt(false, 0,"") == PLA_EXIT)
+            ret_err |= USER_EXIT;
+
+        if (ins_new == 0)
+            bytes_read = rb->read(fd, &ins, 1);
+        else
+            ins_new = 0;
+        switch (ins)
+        {
+            case BF_INC_DP:
+                ins_op = OP_INC_DP;
+                break;
+            case BF_DEC_DP:
+                ins_op = OP_DEC_DP;
+                break;
+            case BF_INC_VAL:
+                ins_op = OP_INC_VAL;
+                break;
+            case BF_DEC_VAL:
+                ins_op = OP_DEC_VAL;
+                break;
+            case BF_JFZ://[ /* misses optimization of data_z on CRLF boundries.*/
+                bytes_read = rb->read(fd, &ins_new, 1);
+                if (bytes_read > 0 && ins_new == BF_DEC_VAL) //-
+                {
+                    bytes_read += rb->read(fd, &ins_new, 1);
+                    if (bytes_read > 1 && ins_new == BF_JBNZ) //]
+                    {
+                        bytes_read = rb->read(fd, &ins_new, 1);
+                        if (bytes_read > 0 && ins_new == BF_INC_VAL)//+
+                        {
+                            bytes_write += rb->write(fd_op, &data_o, 1);
+                            ins_new = 0;
+                            continue;
+                        }
+                        bytes_write += rb->write(fd_op, &data_z, 1);
+                        ins = ins_new;
+                        continue;
+                    }
+                }
+                rb->lseek(fd, -bytes_read, SEEK_CUR);
+                /* if the other optimizations didn't happen we will get to
+                   this point, here we push the offset of the '[' onto a stack
+                  and pop it at the fast_op variable after the closing brace ']'
+                  we add one to it so when it is used it actually points at the
+                  very next ins after the fast_op variable. THE '[' bracket
+                  gets a value of one less than the actual ins since we
+                  add one and check the buffer position in the loop
+                  >>>>{0015->}0009++
+                */
+                ins_op = OP_LOOP_ZERO;
+                bkt_open_ct++;
+                if (STACK_FULL())
+                    ret_err |= STACK_OVFL;
+                else
+                    STACK_PUSH(bytes_write + sizeof(ins_data.fast_op) + 1);
+                case BF_JBNZ:
+                ins_data.fast_op = -1;
+                if (ins_op != OP_LOOP_ZERO)
+                {
+                    ins_op = OP_LOOP_NZERO;
+                    bkt_close_ct++;
+                    if (STACK_EMPTY())
+                        ret_err |= STACK_UNFL;
+                    else
+                        ins_data.fast_op = STACK_POP();
+                }
+
+                bytes_write += rb->write(fd_op, &ins_op, 1);
+                bytes_write += rb->write(fd_op,
+                                         ins_data.cbuf, sizeof(ins_data.fast_op));
+                ins_new = 0;
+                ins_op = 0;
+                continue;
+            case BF_OUTPUT:
+            case BF_INPUT:
+                ins_new = 0;
+                bytes_write += rb->write(fd_op, &ins, 1);
+                continue;
+            case 0xFF://EOF:
+                ret_err = ENDOFFILE;
+                continue;
+            default:
+                continue;
+        }
+        ins_data.fast_op = 0;
+        if (bytes_read > 0 && ins != 0xFF)//EOF)
+		{
+            bytes_read = rb->read(fd, &ins_new, 1);
+		    while (bytes_read > 0 && ins_new != 0xFF//EOF
+                                  && ins == ins_new)
+            {
+                ins_data.fast_op++;
+                bytes_read = rb->read(fd, &ins_new, 1);
+            }
+            if (ins_data.fast_op == 0)
+			    ins_op = ins;
+            ins = ins_new;
+		}
+        if(ins_data.fast_op > 0)
+        {
+            ins_data.fast_op++;
+            bytes_write += rb->write(fd_op, &ins_op, 1);
+            bytes_write += rb->write(fd_op,
+                                     ins_data.cbuf, sizeof(ins_data.fast_op));
+        }
+        else
+            bytes_write += rb->write(fd_op, &ins_op, 1);
+    }
+    //rb->splash(HZ, file_name);
+    rb->close(fd);
+    //rb->splashf(HZ * 10, "%i", ret_err);
+    if (ret_err == SUCCESS) /*fill jump offsets for loops*/
+    {
+        output(false, "Calculating loop offsets. %c",'\n');
+        output(false, "[ %lu, ] %lu %c", (unsigned long) bkt_open_ct,
+                                         (unsigned long) bkt_close_ct,'\n');
+        insptr = 0;
+        rb->lseek(fd_op, 0, SEEK_SET);
+        ins_new = 1;
+        bytes_read = rb->read(fd_op, &ins, 1);
+        while (ret_err == SUCCESS && bytes_read > 0)
+        {
+            if (button_prompt(false, 0,"") == PLA_EXIT)
+                ret_err |= USER_EXIT;
+
+            if (ins_new == 0)
+            {
+                bytes_read = rb->read(fd_op, &ins, 1);
+                insptr++;
+            }
+            ins_new = 0;
+            //rb->splashf(HZ, "%c, %i", ins, insptr);
+            switch(ins)
+            {
+                case OP_LOOP_NZERO:
+                    insptr += sizeof(ins_data.fast_op);
+                    bytes_read = rb->read(fd_op,
+                                          &ins_data.cbuf, sizeof(ins_data.fast_op));
+                    if (bytes_read == sizeof(ins_data.fast_op))
+                    {
+                        rb->lseek(fd_op,
+                                  ins_data.fast_op - sizeof(ins_data.fast_op),
+                                  SEEK_SET);
+
+                        ins_data.fast_op = insptr;
+                        rb->write(fd_op, ins_data.cbuf, sizeof(ins_data.fast_op));
+                        rb->lseek(fd_op, insptr + 1, SEEK_SET);//ret to prev position
+                    }
+                    break;
+                /*Skip these, have to jump past them since their fast_op variable
+                  might contain 123 or 125('[]')*/
+                case OP_LOOP_ZERO:
+                case OP_INC_DP:
+                case OP_DEC_DP:
+                case OP_INC_VAL:
+                case OP_DEC_VAL:
+                    insptr += sizeof(ins_data.fast_op);
+                    rb->lseek(fd_op, insptr+1, SEEK_SET);
+                    break;
+
+                case 0xFF://EOF:
+                    rb->splashf(HZ * 10, "EOF %lu", (unsigned long) insptr - 1);
+                    ret_err |= ENDOFFILE;
+                    continue;
+                default:
+                    continue;
+            }
+        }
+
+    }
+    rb->close(fd_op);
+    if (ret_err == SUCCESS)
+    {
+        fd_op = rb->open(file_name, O_RDONLY);
+        rb->lseek(fd_op, 0, SEEK_SET);
+        rb->lcd_clear_display();
+        ret_err = execute_bf(fd_op);
+        rb->close(fd_op);
+    }
+return ret_err;
+}
+
+enum plugin_status plugin_start(const void* file)
+{
+    int status;
+    int fd;
+    char f_ret = '\0';
+    bool optimized = true;
+    if (!file)
         return PLUGIN_ERROR;
+
+    fd = rb->open(file, O_RDONLY);
+    if (!fd)
+        return PLUGIN_ERROR;
+    for( int i = 0; i<8 ; i++)
+    {
+        rb->read(fd, &f_ret, 1);
+        if (f_ret != op_header[i])
+        {
+            optimized =false;
+            break;
+        }
+    }
+    rb->lseek(fd, 0, SEEK_SET);
+
+    rb->lcd_clear_display();
+    if(!optimized)
+    {
+        const struct text_message prompt =
+            { (const char*[]) {"Optimize Source?", "This will take a moment"}, 2};
+        enum yesno_res response = rb->gui_syncyesno_run(&prompt, NULL, NULL);
+        if(response == YESNO_NO)
+            optimized = true;
+        else
+            optimized = false;
+}
+
+
+    if (!optimized)
+        status = optimize_bf(file, fd);
+    else
+    {
+        status = execute_bf(fd);
+        rb->close(fd);
+    }
+    rb->lcd_clear_display();
+
+    if (status & ERROR)
+        output(false, "\nError executing");
+    if (status & STACK_UNFL )
+        output(false, "\nError stack underflow");
+    else if (status & STACK_OVFL )
+        output(false, "\nError stack overflow");
+    if (status & DATA_UNFL )
+        output(false, "\nError data underflow");
+    else if (status & DATA_OVFL )
+        output(false, "\nError data overflow");
+    if (status & ENDOFFILE )
+        output(false, "\nError end of file");
+    if (status & INS_OVFL )
+        output(false, "\nError ins overflow");
+
+    button_prompt(true, PLA_SELECT, "Any key to Exit                         ");
+
     return PLUGIN_OK;
 }
-
