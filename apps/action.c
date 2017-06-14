@@ -679,6 +679,16 @@ void set_selective_backlight_actions(bool selective, unsigned int mask,
         if(filter_fkp)
             backlight_mask |= SEL_ACTION_FFKEYPRESS;
     }
+#ifndef HAS_BUTTON_HOLD
+    /* Autolock needs time to check if backlight is enabled*/
+    else if (mask_has_flag(softlock_mask, SEL_ACTION_AUTOLOCK))
+    {
+        set_backlight_filter_keypress(false);/* turnoff ffkp in button.c */
+        backlight_mask = SEL_ACTION_ENABLED; /* enable sel bl but no exceptions*/
+        if(filter_fkp)
+            backlight_mask |= SEL_ACTION_FFKEYPRESS;
+    }
+#endif
     else
     {
         set_backlight_filter_keypress(filter_fkp);
@@ -822,6 +832,12 @@ void set_selective_softlock_actions(bool selective, unsigned int mask)
     keys_locked = false;
     if(selective)
         softlock_mask = mask | SEL_ACTION_ENABLED;
+#ifdef HAVE_BACKLIGHT
+        if(mask_has_flag(softlock_mask, SEL_ACTION_AUTOLOCK) &&
+           !mask_has_flag(backlight_mask, SEL_ACTION_ENABLED))
+            set_selective_backlight_actions(true, SEL_ACTION_ENABLED,
+                                        global_settings.bl_filter_first_keypress);
+#endif
     else
         softlock_mask = SEL_ACTION_NONE;
 }
