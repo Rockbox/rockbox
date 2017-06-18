@@ -260,7 +260,7 @@ void lcd_update_rect(int x, int y, int w, int h)
     lcd_write_reg(0x52, x);
     lcd_write_reg(0x53, x + w - 1);
     lcd_write_reg(0x20, LCD_HEIGHT - y - 1);
-    lcd_write_reg(0x21, x);
+    lcd_write_reg(0x21, y);
     lcd_write_reg(0x22, 0);
     imx233_lcdif_wait_ready();
     imx233_lcdif_set_word_length(16);
