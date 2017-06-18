@@ -263,7 +263,10 @@ int get_dnk_prop(int argc, char **argv)
     int buffer_size = prop.size;
     int ret = do_dnk_cmd(true, prop.cmd, prop.subcmd, 0, buffer, &buffer_size);
     if(ret)
+    {
+        cprintf(GREY, "An error occured during request\n");
         return ret;
+    }
     if(buffer_size == 0)
     {
         cprintf(GREY, "Device didn't send any data\n");
@@ -497,6 +500,7 @@ int get_dnk_nvp(int argc, char **argv)
     ret = read_nvp_node(node_index, buffer, &size);
     if(ret != 0)
     {
+        cprintf(GREY, "An error occured during request\n");
         free(buffer);
         return ret;
     }
@@ -588,10 +592,13 @@ int get_dpcc_prop(int argc, char **argv)
     int buffer_size = prop.size;
     int ret = do_dpcc_cmd(0, &prop, buffer, &buffer_size);
     if(ret)
+    {
+        cprintf(GREY, "An error occured during request\n");
         return ret;
+    }
     if(buffer_size < prop.size)
         buffer[buffer_size] = 0;
-    cprintf_field("Property: ", "%s\n", buffer);
+    cprintf_field("Raw data: ", "%s\n", buffer);
     return 0;
 }
 
@@ -617,7 +624,10 @@ int get_user_time(int argc, char **argv)
     int buffer_size = 32;
     int ret = do_dpcc_cmd(1, NULL, buffer, &buffer_size);
     if(ret)
+    {
+        cprintf(GREY, "An error occured during request\n");
         return ret;
+    }
     struct user_timer_t *time = buffer;
     cprintf_field("User Time: ", "%02x/%02x/%02x%02x %02x:%02x:%02x\n",
         time->day, time->month, time->year[0], time->year[1], time->hour,
@@ -666,7 +676,10 @@ int do_fw_upgrade(int argc, char **argv)
         return ret;
     ret = do_sense_analysis(ret, sense, sense_size);
     if(ret)
+    {
+        cprintf(GREY, "An error occured during request\n");
         return ret;
+    }
     buffer[buffer_size] = 0;
     cprintf_field("Result:", "\n");
     print_hex(buffer, buffer_size);
