@@ -512,6 +512,22 @@ int get_dnk_nvp(int argc, char **argv)
     return 0;
 }
 
+int get_dnk_nvp_multi(int argc, char **argv)
+{
+    if(argc == 0)
+    {
+        printf("You must specify one or more node names\n");
+        printf("usage: <node1> <node2> <node3> ..\n");
+        printf("Nodes:\n");
+        for(unsigned i = 0; i < NWZ_NVP_COUNT; i++)
+            printf("  %-6s%s\n", nwz_nvp[i].name, nwz_nvp[i].desc);
+        return 1;
+    }
+    for(int i = 0; i < argc; i++)
+        get_dnk_nvp(1, &argv[i]);
+    return 0;
+}
+
 struct dpcc_devinfo_t
 {
     uint8_t vendor_identification[8];
@@ -898,6 +914,7 @@ struct cmd_t cmd_list[] =
 {
     { "get_dnk_prop", "Get DNK property", get_dnk_prop },
     { "get_dnk_nvp", "Get DNK NVP content", get_dnk_nvp },
+    { "get_dnk_nvp_multi", "Get several DNK NVP content", get_dnk_nvp_multi },
     { "get_dpcc_prop", "Get DPCC property", get_dpcc_prop },
     { "get_user_time", "Get user time", get_user_time },
     { "get_dev_info", "Get device info", get_dev_info },
