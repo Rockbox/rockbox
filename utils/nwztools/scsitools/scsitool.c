@@ -512,17 +512,48 @@ int get_dnk_nvp(int argc, char **argv)
     return 0;
 }
 
+struct dpcc_devinfo_t
+{
+    uint8_t vendor_identification[8];
+    uint8_t product_identification[16];
+    uint8_t product_revision[4];
+    uint8_t product_sub_revision[4];
+    uint8_t storage_size[4];
+    uint8_t serial_number[16];
+    uint8_t vendor_specific[32];
+} __attribute__((packed));
+
+void dpcc_print_devinfo(void *buffer, int buf_size)
+{
+    if(buf_size < sizeof(struct dpcc_devinfo_t))
+    {
+        cprintf(GREY, "Cannot parse DEVINFO: buffer too small\n");
+        return;
+    }
+    struct dpcc_devinfo_t *devinfo = buffer;
+    cprintf_field("Vendor identification: ", "%.8s\n", devinfo->vendor_identification);
+    cprintf_field("Product identification: ", "%.16s\n", devinfo->product_identification);
+    cprintf_field("Product revision: ", "%.4s\n", devinfo->product_revision);
+    cprintf_field("Product sub revision: ", "%.4s\n", devinfo->product_sub_revision);
+    cprintf_field("Storage size: ", "%.4s\n", devinfo->storage_size);
+    cprintf_field("Serial number: ", "%.32s\n", devinfo->serial_number);
+    cprintf_field("Vendor specific: ", "%.32s\n", devinfo->vendor_specific);
+}
+
+typedef void (*dpcc_print_func_t)(void *buffer, int buf_size);
+
 struct dpcc_prop_t
 {
     char *user_name;
     char name[7];
-    uint8_t cdb1;
+    uint8_t cdb1; // flags: bit 0 means size flag (means size in paragraph)
     int size;
+    dpcc_print_func_t print_func;
 };
 
 struct dpcc_prop_t dpcc_prop_list[] =
 {
-    { "dev_info", "DEVINFO", 0, 0x80 },
+    { "dev_info", "DEVINFO", 0, 0x80, dpcc_print_devinfo },
     /* there are more but they are very obscure */
 };
 
@@ -534,7 +565,7 @@ int do_dpcc_cmd(uint32_t cmd, struct dpcc_prop_t *prop, void *buffer, int *buffe
     cdb[2] = cmd;
     if(cmd == 0)
     {
-        strncpy((char *)(cdb + 3), prop->name, 7); // warning: erase cdb[10] !
+        memcpy((char *)(cdb + 3), prop->name, 7);
         cdb[1] = prop->cdb1;
         if(prop->cdb1 & 1)
             cdb[10] = (*buffer_size + 15) / 16;
@@ -575,7 +606,7 @@ int get_dpcc_prop(int argc, char **argv)
         for(unsigned i = 0; i < NR_DPCC_PROPS; i++)
             if(strcmp(dpcc_prop_list[i].user_name, argv[0]) == 0)
                 prop = dpcc_prop_list[i];
-        if(prop.user_name[0] == 0)
+        if(prop.user_name == 0)
         {
             cprintf(GREY, "Unknown property '%s'\n", argv[0]);
             return 1;
@@ -641,7 +672,7 @@ int get_dev_info(int argc, char **argv)
     (void )argv;
     uint8_t cdb[12] = {0xfc, 0, 0x20, 'd', 'b', 'm', 'n', 0, 0x80, 0, 0, 0};
 
-    char *buffer = malloc(0x81);
+    char *buffer = malloc(0x80);
     int buffer_size = 0x80;
     uint8_t sense[32];
     int sense_size = 32;
@@ -651,9 +682,40 @@ int get_dev_info(int argc, char **argv)
         return ret;
     ret = do_sense_analysis(ret, sense, sense_size);
     if(ret)
+    {
+        cprintf(GREY, "An error occured during request\n");
         return ret;
+    }
     buffer[buffer_size] = 0;
-    cprintf_field("Device Info:", "\n");
+    cprintf_field("Raw device info:", "\n");
+    print_hex(buffer, buffer_size);
+    // the 16 first bytes are 'DEVINFO', 0x80, followed by zeroes
+    dpcc_print_devinfo(buffer + 16, buffer_size - 16);
+    return 0;
+}
+
+int get_dhp(int argc, char **argv)
+{
+    (void) argc;
+    (void )argv;
+    uint8_t cdb[12] = {0xfc, 0, 'D', 'd', 'h', 'p', 0, 0, 0, 0, 0, 0};
+
+    char *buffer = malloc(0x80);
+    int buffer_size = 0x80;
+    uint8_t sense[32];
+    int sense_size = 32;
+
+    int ret = do_scsi(cdb, 12, DO_READ, sense, &sense_size, buffer, &buffer_size);
+    if(ret < 0)
+        return ret;
+    ret = do_sense_analysis(ret, sense, sense_size);
+    if(ret)
+    {
+        cprintf(GREY, "An error occured during request\n");
+        return ret;
+    }
+    buffer[buffer_size] = 0;
+    cprintf_field("Destination/Headphones:", "\n");
     print_hex(buffer, buffer_size);
     return 0;
 }
@@ -839,6 +901,7 @@ struct cmd_t cmd_list[] =
     { "get_dpcc_prop", "Get DPCC property", get_dpcc_prop },
     { "get_user_time", "Get user time", get_user_time },
     { "get_dev_info", "Get device info", get_dev_info },
+    { "get_dhp", "Get destination headphones", get_dhp },
     { "do_fw_upgrade", "Do a firmware upgrade", do_fw_upgrade },
     { "dest_tool", "Get/Set destination and sound pressure regulation", do_dest },
 };
