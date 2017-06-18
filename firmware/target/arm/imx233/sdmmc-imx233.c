@@ -167,7 +167,7 @@ const struct sdmmc_config_t sdmmc_config[] =
         .ssp = 2,
         .mode = SD_MODE
     },
-#elif defined(SONY_NWZE370) || defined(SONY_NWZE360)
+#elif defined(SONY_NWZE370) || defined(SONY_NWZE360) || defined(SONY_NWZS540)
     /* The Sony NWZ-E370 uses #B1P29 for power */
     {
         .name = "internal/SD",

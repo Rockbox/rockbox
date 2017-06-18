@@ -1244,7 +1244,7 @@ target/arm/imx233/creative-zenxfi3/debug-zenxfi3.c
 target/arm/imx233/creative-zenxfi3/powermgmt-zenxfi3.c
 #endif
 
-#if defined(SONY_NWZE360) || defined(SONY_NWZE370)
+#if defined(SONY_NWZE360) || defined(SONY_NWZE370) || defined(SONY_NWZS540)
 #ifndef BOOTLOADER
 target/arm/imx233/fmradio-imx233.c
 #endif
@@ -1257,6 +1257,9 @@ target/arm/imx233/sony-nwz/powermgmt-nwze360.c
 # elif defined(SONY_NWZE370)
 target/arm/imx233/sony-nwz/lcd-nwze370.c
 target/arm/imx233/sony-nwz/powermgmt-nwze370.c
+# elif defined(SONY_NWZS540)
+target/arm/imx233/sony-nwz/lcd-nwzs540.c
+target/arm/imx233/sony-nwz/powermgmt-nwzs540.c
 # endif
 #endif
 

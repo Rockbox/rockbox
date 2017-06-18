@@ -196,7 +196,13 @@ static const struct imx_md5sum_t imx_sums[] =
         /* Version 1.00.200 */
         MODEL_NWZE370, "75cfa51078261c547717e11a4676f1af", "1.00.200",
         { [VARIANT_DEFAULT] = {0, 16429056 } }
-    }
+    },
+    /** Sony NWZ-S540 */
+    {
+        /* Version 1.01.02 */
+        MODEL_NWZS540, "7e3cfd1b8c9c549468950756f5e28eca", "1.01.02",
+        { [VARIANT_DEFAULT] = {0, 20058112 } }
+    },
 };
 
 static struct crypto_key_t zero_key =
@@ -223,6 +229,8 @@ static const struct imx_model_desc_t imx_models[] =
         "e370", 88, list_zero_key, 0, 0x40000000 },
     [MODEL_NWZE360] = {"NWZ-E360", dualboot_nwze360, sizeof(dualboot_nwze360),
         "e360", 89, list_zero_key, 0, 0x40000000 },
+    [MODEL_NWZS540] = {"NWZ-S540", dualboot_nwzs540, sizeof(dualboot_nwzs540),
+        "s540", 96, list_zero_key, 0, 0x40000000 },
 };
 
 #define NR_IMX_SUMS     (sizeof(imx_sums) / sizeof(imx_sums[0]))
@@ -467,6 +475,7 @@ static enum imx_error_t patch_firmware(struct imx_option_t opt,
             return patch_std_zero_host_play(3, opt, sb_file, boot_fw);
         case MODEL_NWZE360:
         case MODEL_NWZE370:
+        case MODEL_NWZS540:
             /* The NWZ-E360/E370 uses the standard ____, host, play sections, patch after first
              * call in ____ section. */
             return patch_std_zero_host_play(1, opt, sb_file, boot_fw);

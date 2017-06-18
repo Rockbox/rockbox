@@ -155,7 +155,7 @@ static int boot_decision(int context)
     /* if volume down is hold, boot to OF */
     return !read_gpio(2, 7) ? BOOT_OF : BOOT_ROCK;
 }
-#elif defined(SONY_NWZE360) || defined(SONY_NWZE370)
+#elif defined(SONY_NWZE360) || defined(SONY_NWZE370) || defined(SONY_NWZS540)
 static int local_decision(void)
 {
     /* read keys and pswitch */

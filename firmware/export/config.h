@@ -277,6 +277,7 @@
 #define LCD_IHIFI         60 /* as used by IHIFI 760/960 */
 #define LCD_CREATIVEZENXFISTYLE 61 /* as used by Creative Zen X-Fi Style */
 #define LCD_SAMSUNGYPR1   62 /* as used by Samsung YP-R1 */
+#define LCD_NWZS540   63 /* as used by Sony NWZ-S540 series */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -567,6 +568,8 @@ Lyre prototype 1 */
 #include "config/sonynwze370.h"
 #elif defined(SONY_NWZE360)
 #include "config/sonynwze360.h"
+#elif defined(SONY_NWZS540)
+#include "config/sonynwzs540.h"
 #elif defined(SAMSUNG_YPZ5)
 #include "config/samsungypz5.h"
 #elif defined(IHIFI760)

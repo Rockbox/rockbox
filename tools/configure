@@ -1493,11 +1493,14 @@ cat <<EOF
  202) Nokia N8xx          211) MA9C              ==Sony==
  203) Nokia N900          212) MA8               220) NWZ-E370/E380 series
  204) Pandora             213) MA8C              221) NWZ-E360 series
- 205) Samsung YP-R0
- 206) Android MIPS        ==IHIFI==              ==iBasso==
- 207) Android x86         230) 760               232) DX50
- 208) Samsung YP-R1       231) 960               233) DX90
+ 205) Samsung YP-R0                              222) NWZ-S540 series
+ 206) Android MIPS        ==IHIFI==
+ 207) Android x86         230) 760
+ 208) Samsung YP-R1       231) 960
 
+ ==iBasso==
+ 232) DX50
+ 233) DX90
 
 EOF
 
@@ -3843,6 +3846,26 @@ fi
     tool="$rootdir/tools/scramble -add=e360"
     output="rockbox.sony"
     bootoutput="bootloader-nwze360.sony"
+    appextra="gui:recorder:radio"
+    plugins="yes"
+    swcodec="yes"
+    toolset=$scramblebitmaptools
+    t_cpu="arm"
+    t_manufacturer="imx233"
+    t_model="sony-nwz"
+    arm926ejscc
+    ;;
+
+   222|sonynwzs540)
+    target_id=96
+    modelname="sonynwzs540"
+    target="SONY_NWZS540"
+    memory=32
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="$rootdir/tools/scramble -add=s540"
+    output="rockbox.sony"
+    bootoutput="bootloader-nwzs540.sony"
     appextra="gui:recorder:radio"
     plugins="yes"
     swcodec="yes"
