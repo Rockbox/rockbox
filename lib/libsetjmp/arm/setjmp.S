@@ -6,19 +6,20 @@
 #define CONCAT(a, b)  CONCAT2(a, b)
 #define CONCAT2(a, b) a##b
 
+#define __USER_LABEL_PREFIX__
 #ifndef __USER_LABEL_PREFIX__
 #error  __USER_LABEL_PREFIX__ not defined
 #endif
 
 #define SYM(x) CONCAT (__USER_LABEL_PREFIX__, x)
 
-#ifdef __ELF__
+//#ifdef __ELF__
 #define TYPE(x) .type SYM(x),function
 #define SIZE(x) .size SYM(x), . - SYM(x)
-#else
-#define TYPE(x)
-#define SIZE(x)
-#endif
+//#else
+//#define TYPE(x)
+//#define SIZE(x)
+//#endif
 
 /* Arm/Thumb interworking support:
 

@@ -1,3 +1,4 @@
+../../../firmware/clang_fix_eabi.c
 gcc-support.c
 pluginlib_actions.c
 helper.c

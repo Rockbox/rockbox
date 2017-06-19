@@ -1,9 +1,12 @@
 CC=arm-elf-eabi-gcc
+CC=~/project/llvm/build/bin/clang
 LD=arm-elf-eabi-gcc
-AS=arm-elf-eabi-gcc
+#AS=arm-elf-eabi-gcc
+AS=$(CC)
 OC=arm-elf-eabi-objcopy
 SBTOOLS=../../sbtools/
-CFLAGS=-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe -std=gnu99 -mcpu=arm926ej-s -fomit-frame-pointer -Wno-pointer-sign -Wno-override-init -ffunction-sections
+CLANG_OPTS=-target arm-elf-none-eabi -ccc-gcc-name arm-elf-eabi-gcc
+CFLAGS=-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe -std=gnu99 -mcpu=arm926ej-s -fomit-frame-pointer -Wno-pointer-sign -ffunction-sections $(CLANG_OPTS)
 CFLAGS_3700=$(CFLAGS) -DHAVE_STMP3700
 ASFLAGS=$(CFLAGS) -D__ASSEMBLER__
 ASFLAGS_3700=$(CFLAGS_3700) -D__ASSEMBLER__

@@ -29,7 +29,7 @@
 
 #if defined(CPU_COLDFIRE) || defined (CPU_ARM)
 int32_t fir_buf[FIR_BUF_CNT] IBSS_ATTR_SPC
-    __attribute__((aligned(FIR_BUF_ALIGN*1)));
+    __attribute__((aligned(FIR_BUF_ALIGN)));
 #endif
 #if SPC_BRRCACHE
 /* a little extra for samples that go past end */

@@ -7,6 +7,8 @@ mdct_lookup.c
 fft-ffmpeg.c
 mdct.c
 
+../../../../firmware/clang_fix_eabi.c
+
 #elif (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(__APPLE__)
 osx.dummy.c
 #endif

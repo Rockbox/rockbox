@@ -1,6 +1,6 @@
 #undef unix /* causes problems with some files */
 #undef linux
-
+clang_fix_eabi.c
 ata_idle_notify.c
 events.c
 backlight.c

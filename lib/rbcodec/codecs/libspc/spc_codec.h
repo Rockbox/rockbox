@@ -304,7 +304,8 @@ struct voice_t
 extern int16_t BRRcache [BRR_CACHE_SIZE];
 #endif
 
-enum { FIR_BUF_HALF = 8 };
+//enum { FIR_BUF_HALF = 8 };
+#define FIR_BUF_HALF 8
 
 #if defined(CPU_COLDFIRE)
 /* global because of the large aligment requirement for hardware masking -
@@ -327,6 +328,12 @@ enum
     FIR_BUF_MASK  = ~((FIR_BUF_ALIGN / 2) | (sizeof ( int32_t ) - 1))
 };
 #else
+#define FIR_BUF_CNT (FIR_BUF_HALF * 2 * 2)
+#define FIR_BUF_SIZE (FIR_BUF_CNT * sizeof ( int32_t ))
+#define FIR_BUF_ALIGN (FIR_BUF_SIZE)
+#define FIR_BUF_MASK  (~((FIR_BUF_ALIGN / 2) | (sizeof ( int32_t ) * 2 - 1)))
+
+#if 0
 enum
 {
     FIR_BUF_CNT   = FIR_BUF_HALF * 2 * 2,
@@ -334,6 +341,7 @@ enum
     FIR_BUF_ALIGN = FIR_BUF_SIZE,
     FIR_BUF_MASK  = ~((FIR_BUF_ALIGN / 2) | (sizeof ( int32_t ) * 2 - 1))
 };
+#endif
 #endif /* ARM_ARCH */
 #endif /* CPU_* */
 

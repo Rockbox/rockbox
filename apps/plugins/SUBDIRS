@@ -31,7 +31,7 @@ fft
 #endif
 
 chessbox
-fractals
+//fractals
 imageviewer
 sudoku
 reversi
