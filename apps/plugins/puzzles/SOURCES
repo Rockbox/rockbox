@@ -2,8 +2,6 @@ rockbox.c
 rbwrappers.c
 rbmalloc.c
 
-help.c
-
 src/combi.c
 src/divvy.c
 src/drawing.c

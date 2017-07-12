@@ -30,7 +30,9 @@
 #ifndef COMBINED
 #include "lib/playback_control.h"
 #endif
+#include "lib/simple_viewer.h"
 #include "lib/xlcd.h"
+
 #include "fixedpoint.h"
 
 /* how many ticks between timer callbacks */
@@ -131,6 +133,118 @@ static void rb_color(int n)
     rb->lcd_set_foreground(colors[n]);
 }
 
+/* font bundle size range */
+#define BUNDLE_MIN 7
+#define BUNDLE_MAX 36
+#define BUNDLE_COUNT (BUNDLE_MAX - BUNDLE_MIN + 1)
+
+static struct bundled_font {
+    int status; /* -3 = never tried loading, or unloaded, -2 = failed to load, >= -1: loaded successfully */
+    int last_use;
+} loaded_fonts[2*BUNDLE_COUNT]; /* monospace are first, then proportional */
+
+static int n_fonts, access_counter = -1;
+
+static void unload_fonts(void)
+{
+    for(int i = 0; i < 2 * BUNDLE_COUNT; ++i)
+        if(loaded_fonts[i].status > 0) /* don't unload FONT_UI */
+        {
+            rb->font_unload(loaded_fonts[i].status);
+            loaded_fonts[i].status = -3;
+        }
+    access_counter = -1;
+    rb->lcd_setfont(FONT_UI);
+}
+
+static void rb_setfont(int type, int size)
+{
+    if(access_counter < 0)
+    {
+        for(int i = 0; i < 2 * BUNDLE_COUNT; ++i)
+                loaded_fonts[i].status = -3;
+        access_counter = 0;
+        n_fonts = 0;
+    }
+
+    /* out of range */
+    if(BUNDLE_MAX < size)
+        size = BUNDLE_MAX;
+
+    int font_idx = (type == FONT_FIXED ? 0 : BUNDLE_COUNT) + size - BUNDLE_MIN;
+    switch(loaded_fonts[font_idx].status)
+    {
+    case -3:
+    {
+        /* never loaded */
+        char buf[MAX_PATH];
+        if(size < 10) /* Deja Vu only goes down to 10px, below that it's a giant blob */
+        {
+            if(size < 7)
+                size = 7; /* we're not going to force anyone to read 05-Tiny :P */
+            /* we also don't care about monospace/proportional at this point */
+            switch(size)
+            {
+            case 7:
+                rb->snprintf(buf, sizeof(buf), FONT_DIR "/07-Fixed.fnt");
+                break;
+            case 8:
+                rb->snprintf(buf, sizeof(buf), FONT_DIR "/08-Rockfont.fnt");
+                break;
+            case 9:
+                rb->snprintf(buf, sizeof(buf), FONT_DIR "/09-Fixed.fnt");
+                break;
+            default:
+                assert(false);
+            }
+        }
+        else
+            rb->snprintf(buf, sizeof(buf), FONT_DIR "/%02d-%s.fnt", size, type == FONT_FIXED ? "DejaVuSansMono" : "DejaVuSans");
+
+        if(n_fonts >= MAXUSERFONTS - 3) /* safety margin, FIXME */
+        {
+            /* unload an old font */
+            int oldest_use = -1, oldest_idx = -1;
+            for(int i = 0; i < 2 * BUNDLE_COUNT; ++i)
+            {
+                if((loaded_fonts[i].status >= 0 && loaded_fonts[i].last_use < oldest_use) || oldest_use < 0)
+                {
+                    oldest_use = loaded_fonts[i].last_use;
+                    oldest_idx = i;
+                }
+            }
+            assert(oldest_idx >= 0);
+            rb->font_unload(loaded_fonts[oldest_idx].status);
+            loaded_fonts[oldest_idx].status = -3;
+            n_fonts--;
+        }
+
+        loaded_fonts[font_idx].status = rb->font_load(buf);
+        if(loaded_fonts[font_idx].status < 0)
+            goto fallback;
+        loaded_fonts[font_idx].last_use = access_counter++;
+        n_fonts++;
+        rb->lcd_setfont(loaded_fonts[font_idx].status);
+        break;
+    }
+    case -2:
+    case -1:
+        goto fallback;
+    default:
+        loaded_fonts[font_idx].last_use = access_counter++;
+        rb->lcd_setfont(loaded_fonts[font_idx].status);
+        break;
+    }
+
+    return;
+
+fallback:
+
+    rb->lcd_setfont(type == FONT_FIXED ? FONT_SYSFIXED : FONT_UI);
+
+    return;
+}
+
 static void rb_draw_text(void *handle, int x, int y, int fonttype,
                          int fontsize, int align, int color, char *text)
 {
@@ -139,19 +253,7 @@ static void rb_draw_text(void *handle, int x, int y, int fonttype,
 
     offset_coords(&x, &y);
 
-    /* TODO: variable font size */
-    switch(fonttype)
-    {
-    case FONT_FIXED:
-        rb->lcd_setfont(FONT_SYSFIXED);
-        break;
-    case FONT_VARIABLE:
-        rb->lcd_setfont(FONT_UI);
-        break;
-    default:
-        fatal("bad font");
-        break;
-    }
+    rb_setfont(fonttype, fontsize);
 
     int w, h;
     rb->lcd_getstringsize(text, &w, &h);
@@ -1053,6 +1155,27 @@ static void quick_help(void)
     return;
 }
 
+static void full_help(const char *name)
+{
+    unsigned old_bg = rb->lcd_get_background();
+
+    bool orig_clipped = clipped;
+    if(orig_clipped)
+        rb_unclip(NULL);
+
+    rb->lcd_set_foreground(LCD_WHITE);
+    rb->lcd_set_background(LCD_BLACK);
+    unload_fonts();
+    rb->lcd_setfont(FONT_UI);
+
+    view_text(name, help_text);
+
+    rb->lcd_set_background(old_bg);
+
+    if(orig_clipped)
+        rb_clip(NULL, clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height);
+}
+
 static void init_default_settings(void)
 {
     settings.slowmo_factor = 1;
@@ -1663,6 +1786,7 @@ static char *init_for_game(const game *gm, int load_fd, bool draw)
 
 static void exit_handler(void)
 {
+    unload_fonts();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
