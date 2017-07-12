@@ -1616,7 +1616,10 @@ static int process_input(int tmo)
         break;
 
     case BTN_FIRE:
-        state = CURSOR_SELECT;
+        if(!strcmp("Fifteen", midend_which_game(me)->name))
+            state = 'h'; /* hint */
+        else
+            state = CURSOR_SELECT;
         break;
 
     default:
