@@ -12,6 +12,8 @@ int sprintf_wrapper(char *str, const char *fmt, ...)
 
 char *getenv_wrapper(const char *c)
 {
+    if(!strcmp(c, "SIGNPOST_GEARS"))
+        return "y";
     return NULL;
 }
 
