@@ -901,7 +901,7 @@ const char *config_choices_formatter(int sel, void *data, char *buf, size_t len)
     return buf;
 }
 
-static int list_choose(const char *list_str, const char *title)
+static int list_choose(const char *list_str, const char *title, int sel)
 {
     char delim = *list_str;
 
@@ -920,7 +920,7 @@ static int list_choose(const char *list_str, const char *title)
     rb->gui_synclist_set_nb_items(&list, n);
     rb->gui_synclist_limit_scroll(&list, false);
 
-    rb->gui_synclist_select_item(&list, 0);
+    rb->gui_synclist_select_item(&list, sel);
 
     rb->gui_synclist_set_title(&list, (char*)title, NOICON);
     while (1)
@@ -1089,7 +1089,7 @@ static bool do_configure_item(config_item *cfgs, int idx)
     }
     case C_CHOICES:
     {
-        int sel = list_choose(cfg->sval, cfg->name);
+        int sel = list_choose(cfg->sval, cfg->name, cfg->ival);
         if(sel >= 0)
             cfg->ival = sel;
         break;
@@ -1153,26 +1153,35 @@ static bool config_menu(void)
         {
         case ACTION_STD_OK:
         {
-            config_item old;
             int pos = rb->gui_synclist_get_sel_pos(&list);
+
+            /* store the initial state */
+            config_item old;
             memcpy(&old, config + pos, sizeof(old));
+
             char *old_str = NULL;
             if(old.type == C_STRING)
                 old_str = dupstr(old.sval);
-            bool freed_str = do_configure_item(config + pos);
+
+            bool freed_str = do_configure_item(config, pos);
             char *err = midend_set_config(me, CFG_SETTINGS, config);
+
             if(err)
             {
                 rb->splash(HZ, err);
+
+                /* restore old state */
                 memcpy(config + pos, &old, sizeof(old));
-                if(freed_str)
+
+                if(old.type == C_STRING && freed_str)
                     config[pos].sval = old_str;
             }
             else
             {
                 if(old.type == C_STRING)
                 {
-                    /* success, and we duplicated the old string, so free it */
+                    /* success, and we duplicated the old string when
+                     * we didn't need to, so free it now */
                     sfree(old_str);
                 }
                 success = true;
