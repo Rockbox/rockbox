@@ -277,14 +277,10 @@ static void rb_draw_text(void *handle, int x, int y, int fonttype,
     int w, h;
     rb->lcd_getstringsize(text, &w, &h);
 
-    static int cap_h = -1;
-    if(cap_h < 0)
-        rb->lcd_getstringsize("X", NULL, &cap_h);
-
     if(align & ALIGN_VNORMAL)
         y -= h;
     else if(align & ALIGN_VCENTRE)
-        y -= cap_h / 2;
+        y -= h / 2;
 
     if(align & ALIGN_HCENTRE)
         x -= w / 2;
