@@ -50,6 +50,7 @@ memset:
 /*
  * we know that the pointer in r0 is aligned to a word boundary.
  */
+        and     r1, r1, #255            @ clear sign bits
         orr     r1, r1, r1, lsl #8
         orr     r1, r1, r1, lsl #16
         mov     r3, r1
