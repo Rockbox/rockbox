@@ -1641,6 +1641,15 @@ static int process_input(int tmo)
     /* weird stuff */
     exit_on_usb(button);
 
+    /* these games require a second input on long-press */
+    if(accept_input && (button == (BTN_FIRE | BUTTON_REPEAT)) &&
+       (strcmp("Mines", midend_which_game(me)->name)   != 0 ||
+        strcmp("Magnets", midend_which_game(me)->name) != 0))
+    {
+        accept_input = false;
+        return ' ';
+    }
+
     button = rb->button_status();
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -1666,12 +1675,17 @@ static int process_input(int tmo)
         return rc;
     }
 
-    /* special case for inertia: moves occur after RELEASES */
-    if(!strcmp("Inertia", midend_which_game(me)->name))
+    /* these three games require, for one reason or another, that
+     * events fire upon buttons being released rather than when they
+     * are pressed */
+    if(strcmp("Inertia", midend_which_game(me)->name) == 0 ||
+       strcmp("Mines", midend_which_game(me)->name)   == 0 ||
+       strcmp("Magnets", midend_which_game(me)->name) == 0 )
     {
         LOGF("received button 0x%08x", button);
 
         unsigned released = ~button & last_keystate;
+
         last_keystate = button;
 
         if(!button)
@@ -1691,16 +1705,17 @@ static int process_input(int tmo)
             return 0;
         }
 
-        button |= released;
-        if(last_keystate)
+        if(button)
         {
             LOGF("ignoring input from now until all released");
             accept_input = false;
         }
+
+        button |= released;
         LOGF("accepting event 0x%08x", button);
     }
     /* default is to ignore repeats except for untangle */
-    else if(strcmp("Untangle", midend_which_game(me)->name))
+    else if(strcmp("Untangle", midend_which_game(me)->name) != 0)
     {
         /* start accepting input again after a release */
         if(!button)
