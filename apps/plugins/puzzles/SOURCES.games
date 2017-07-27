@@ -16,7 +16,7 @@ src/lightup.c
 /*src/loopy.c*/
 src/magnets.c
 src/map.c
-/*src/mines.c*/
+src/mines.c
 src/net.c
 src/netslide.c
 /*src/palisade.c*/
