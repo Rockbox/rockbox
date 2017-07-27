@@ -47,6 +47,8 @@
 
 #define ERROR_COLOR LCD_RGBPACK(255, 0, 0)
 
+#define MAX_FONTS (MAXUSERFONTS - 2)
+
 #ifdef COMBINED
 #define SAVE_FILE PLUGIN_GAMES_DATA_DIR "/puzzles.sav"
 #else
@@ -54,6 +56,7 @@ static char save_file_path[MAX_PATH];
 #define SAVE_FILE ((const char*)save_file_path)
 #endif
 
+#define FONT_TABLE PLUGIN_GAMES_DATA_DIR "/.sgt-puzzles.fnttab"
 
 #define MURICA
 
@@ -147,6 +150,8 @@ static struct bundled_font {
 
 static int n_fonts, access_counter = -1;
 
+/* called on exit and before entering help viewer (workaround for a
+   possible bug in simple_viewer) */
 static void unload_fonts(void)
 {
     for(int i = 0; i < 2 * BUNDLE_COUNT; ++i)
@@ -159,19 +164,53 @@ static void unload_fonts(void)
     rb->lcd_setfont(FONT_UI);
 }
 
+static void init_fonttab(void)
+{
+    for(int i = 0; i < 2 * BUNDLE_COUNT; ++i)
+        loaded_fonts[i].status = -3;
+    access_counter = 0;
+    n_fonts = 0;
+}
+
+static void font_path(char *buf, int type, int size)
+{
+    if(size < 10) /* Deja Vu only goes down to 10px, below that it's a giant blob */
+    {
+        if(size < 7)
+            size = 7; /* we're not going to force anyone to read 05-Tiny :P */
+        /* we also don't care about monospace/proportional at this point */
+        switch(size)
+        {
+        case 7:
+            rb->snprintf(buf, MAX_PATH, FONT_DIR "/07-Fixed.fnt");
+            break;
+        case 8:
+            rb->snprintf(buf, MAX_PATH, FONT_DIR "/08-Rockfont.fnt");
+            break;
+        case 9:
+            rb->snprintf(buf, MAX_PATH, FONT_DIR "/09-Fixed.fnt");
+            break;
+        default:
+            assert(false);
+        }
+    }
+    else
+        rb->snprintf(buf, MAX_PATH, FONT_DIR "/%02d-%s.fnt", size, type == FONT_FIXED ? "DejaVuSansMono" : "DejaVuSans");
+}
+
 static void rb_setfont(int type, int size)
 {
-    if(access_counter < 0)
-    {
-        for(int i = 0; i < 2 * BUNDLE_COUNT; ++i)
-                loaded_fonts[i].status = -3;
-        access_counter = 0;
-        n_fonts = 0;
-    }
-
-    /* out of range */
+    /* out of range (besides, no puzzle should ever need this large
+       of a font, anyways) */
     if(BUNDLE_MAX < size)
         size = BUNDLE_MAX;
+    if(size < 10)
+    {
+        if(size < 7) /* no teeny-tiny fonts */
+            size = 7;
+        /* assume monospace for these */
+        type = FONT_FIXED;
+    }
 
     int font_idx = (type == FONT_FIXED ? 0 : BUNDLE_COUNT) + size - BUNDLE_MIN;
     switch(loaded_fonts[font_idx].status)
@@ -180,30 +219,8 @@ static void rb_setfont(int type, int size)
     {
         /* never loaded */
         char buf[MAX_PATH];
-        if(size < 10) /* Deja Vu only goes down to 10px, below that it's a giant blob */
-        {
-            if(size < 7)
-                size = 7; /* we're not going to force anyone to read 05-Tiny :P */
-            /* we also don't care about monospace/proportional at this point */
-            switch(size)
-            {
-            case 7:
-                rb->snprintf(buf, sizeof(buf), FONT_DIR "/07-Fixed.fnt");
-                break;
-            case 8:
-                rb->snprintf(buf, sizeof(buf), FONT_DIR "/08-Rockfont.fnt");
-                break;
-            case 9:
-                rb->snprintf(buf, sizeof(buf), FONT_DIR "/09-Fixed.fnt");
-                break;
-            default:
-                assert(false);
-            }
-        }
-        else
-            rb->snprintf(buf, sizeof(buf), FONT_DIR "/%02d-%s.fnt", size, type == FONT_FIXED ? "DejaVuSansMono" : "DejaVuSans");
-
-        if(n_fonts >= MAXUSERFONTS - 3) /* safety margin, FIXME */
+        font_path(buf, type, size);
+        if(n_fonts >= MAX_FONTS) /* safety margin, FIXME */
         {
             /* unload an old font */
             int oldest_use = -1, oldest_idx = -1;
@@ -1911,6 +1928,139 @@ static void exit_handler(void)
 #endif
 }
 
+#define MAX_LINE 128
+
+/* try loading the fonts indicated in the on-disk font table */
+static void load_fonts(void)
+{
+    int fd = rb->open(FONT_TABLE, O_RDONLY);
+    if(fd < 0)
+        return;
+
+    uint64_t fontmask = 0;
+    while(1)
+    {
+        char linebuf[MAX_LINE], *ptr = linebuf;
+        int len = rb->read_line(fd, linebuf, sizeof(linebuf));
+        if(len <= 0)
+            break;
+
+        char *tok, *save;
+        tok = rb->strtok_r(ptr, ":", &save);
+        ptr = NULL;
+
+        if(!strcmp(tok, midend_which_game(me)->name))
+        {
+            uint32_t left, right;
+            tok = rb->strtok_r(ptr, ":", &save);
+            left = atoi(tok);
+            tok = rb->strtok_r(ptr, ":", &save);
+            right = atoi(tok);
+            fontmask = ((uint64_t)left << 31) | right;
+            break;
+        }
+    }
+
+    /* nothing to do */
+    if(!fontmask)
+    {
+        rb->close(fd);
+        return;
+    }
+
+    /* loop through each bit of the mask and try loading the
+       corresponding font */
+    for(int i = 0; i < 2 * BUNDLE_COUNT; ++i)
+    {
+        if(fontmask & ((uint64_t)1 << i))
+        {
+            int size = (i > BUNDLE_COUNT  ? i - BUNDLE_COUNT : i) + BUNDLE_MIN;
+            int type = i > BUNDLE_COUNT ? FONT_VARIABLE : FONT_FIXED;
+            rb_setfont(type, size);
+        }
+    }
+
+    rb->close(fd);
+}
+
+/* remember which fonts were loaded */
+static void save_fonts(void)
+{
+#if 2*BUNDLE_COUNT > 62
+#error too many fonts for 62-bit mask
+#endif
+
+    /* first assemble the bitmask */
+    uint64_t fontmask = 0;
+    for(int i = 0; i < 2 * BUNDLE_COUNT; ++i)
+    {
+        /* try loading if we attempted to load */
+        if(loaded_fonts[i].status >= -2)
+        {
+            fontmask |= (uint64_t)1 << i;
+        }
+    }
+
+    if(fontmask)
+    {
+        /* font table format is as follows:
+         * [GAME NAME]:[32-halves of bit mask in decimal][newline]
+         */
+        int fd = rb->open(FONT_TABLE, O_RDONLY);
+        int outfd = rb->open(FONT_TABLE ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        if(outfd < 0)
+            return;
+        
+        uint64_t oldmask = 0;
+
+        if(fd >= 0)
+        {
+            while(1)
+            {
+                char linebuf[MAX_LINE], *ptr = linebuf;
+                char origbuf[MAX_LINE];
+                int len = rb->read_line(fd, linebuf, sizeof(linebuf));
+                if(len <= 0)
+                    break;
+                rb->memcpy(origbuf, linebuf, len);
+
+                char *tok, *save;
+                tok = rb->strtok_r(ptr, ":", &save);
+                ptr = NULL;
+
+                /* copy line if not matching */
+                if(strcmp(tok, midend_which_game(me)->name) != 0)
+                {
+                    rb->write(outfd, origbuf, len);
+                    rb->fdprintf(outfd, "\n");
+                }
+                else
+                {
+                    /* matching, remember the old mask */
+                    assert(oldmask == 0);
+                    uint32_t left, right;
+                    tok = rb->strtok_r(ptr, ":", &save);
+                    left = atoi(tok);
+                    tok = rb->strtok_r(ptr, ":", &save);
+                    right = atoi(tok);
+                    oldmask = ((uint64_t)left << 31) | right;
+                }
+            }
+            rb->close(fd);
+        }
+        uint64_t final = fontmask;
+        if(n_fonts < MAX_FONTS)
+            final |= oldmask;
+        uint32_t left = final >> 31;
+        uint32_t right = final & 0x7fffffff;
+        if(fd < 0)
+            rb->fdprintf(outfd, "# Please do not edit this file!\n");
+        rb->fdprintf(outfd, "%s:%u:%u\n", midend_which_game(me)->name, left, right);
+        rb->close(outfd);
+        rb->rename(FONT_TABLE ".tmp", FONT_TABLE);
+    }
+}
+
 /* expects a totally free me* pointer */
 static bool load_game(void)
 {
@@ -1921,8 +2071,6 @@ static bool load_game(void)
         return false;
 
     rb->splash(0, "Loading...");
-
-    LOGF("opening %s", SAVE_FILE);
 
     char *game;
     char *ret = identify_game(&game, read_wrapper, (void*)fd);
@@ -1955,7 +2103,6 @@ static bool load_game(void)
                     return false;
                 }
                 rb->close(fd);
-                /* success, we delete the save */
                 rb->remove(SAVE_FILE);
                 return true;
             }
@@ -1973,14 +2120,23 @@ static bool load_game(void)
                 rb->splash(HZ, ret);
                 sfree(ret);
                 rb->close(fd);
+                rb->remove(SAVE_FILE);
                 return false;
             }
             rb->close(fd);
-            /* success, we delete the save */
             rb->remove(SAVE_FILE);
+
+            load_fonts();
+
+            /* success */
             return true;
         }
         rb->splashf(HZ, "Cannot load save game for %s!", game);
+
+        /* clean up, even on failure */
+        rb->close(fd);
+        rb->remove(SAVE_FILE);
+
         return false;
 #endif
     }
@@ -1989,9 +2145,14 @@ static bool load_game(void)
 static void save_game(void)
 {
     rb->splash(0, "Saving...");
+
+    /* save game */
     int fd = rb->open(SAVE_FILE, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     midend_serialize(me, write_wrapper, (void*) fd);
     rb->close(fd);
+
+    save_fonts();
+
     rb->lcd_update();
 }
 
@@ -2063,6 +2224,8 @@ enum plugin_status plugin_start(const void *param)
         rb->splash(HZ, "WARNING: floating-point functions are being weird... report me!");
 
     init_default_settings();
+
+    init_fonttab();
 
     load_success = load_game();
 
