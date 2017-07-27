@@ -82,7 +82,7 @@ extern bool audiobuf_available;
 
 static struct settings_t {
     int slowmo_factor;
-    bool bulk, timerflash, clipoff, shortcuts, no_aa;
+    bool timerflash, clipoff, shortcuts, no_aa, polyanim;
 } settings;
 
 /* clipping is implemented through viewports and offsetting
@@ -544,7 +544,11 @@ static void rb_draw_poly(void *handle, int *coords, int npoints,
             xlcd_filltriangle(x1, y1,
                               x2, y2,
                               x3, y3);
-
+            if(settings.polyanim)
+            {
+                rb->lcd_update();
+                rb->sleep(HZ/5);
+            }
 #if 0
             /* debug code */
             rb->lcd_set_foreground(LCD_RGBPACK(255,0,0));
@@ -1179,11 +1183,11 @@ static void full_help(const char *name)
 static void init_default_settings(void)
 {
     settings.slowmo_factor = 1;
-    settings.bulk = false;
     settings.timerflash = false;
     settings.clipoff = false;
     settings.shortcuts = false;
     settings.no_aa = false;
+    settings.polyanim = false;
 }
 
 #ifdef DEBUG_MENU
@@ -1220,12 +1224,12 @@ static void debug_menu(void)
     MENUITEM_STRINGLIST(menu, "Debug Menu", NULL,
                         "Slowmo factor",
                         "Randomize colors",
-                        "Toggle bulk update",
                         "Toggle flash pixel on timer",
                         "Toggle clip",
                         "Toggle shortcuts",
                         "Toggle antialias",
                         "Benchmark antialias",
+                        "Toggle show poly steps",
                         "Back");
     bool quit = false;
     int sel = 0;
@@ -1247,22 +1251,22 @@ static void debug_menu(void)
             break;
         }
         case 2:
-            settings.bulk = !settings.bulk;
-            break;
-        case 3:
             settings.timerflash = !settings.timerflash;
             break;
-        case 4:
+        case 3:
             settings.clipoff = !settings.clipoff;
             break;
-        case 5:
+        case 4:
             settings.shortcuts = !settings.shortcuts;
             break;
-        case 6:
+        case 5:
             settings.no_aa = !settings.no_aa;
             break;
-        case 7:
+        case 6:
             bench_aa();
+            break;
+        case 7:
+            settings.polyanim = !settings.polyanim;
             break;
         case 8:
         default:
