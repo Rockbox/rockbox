@@ -43,6 +43,9 @@
 #define BG_R .9f /* very light gray */
 #define BG_G .9f
 #define BG_B .9f
+#define BG_COLOR LCD_RGBPACK((int)(255*BG_R), (int)(255*BG_G), (int)(255*BG_B))
+
+#define ERROR_COLOR LCD_RGBPACK(255, 0, 0)
 
 #ifdef COMBINED
 #define SAVE_FILE PLUGIN_GAMES_DATA_DIR "/puzzles.sav"
@@ -51,7 +54,6 @@ static char save_file_path[MAX_PATH];
 #define SAVE_FILE ((const char*)save_file_path)
 #endif
 
-#define BG_COLOR LCD_RGBPACK((int)(255*BG_R), (int)(255*BG_G), (int)(255*BG_B))
 
 #define MURICA
 
@@ -927,18 +929,131 @@ static int list_choose(const char *list_str, const char *title)
     }
 }
 
-/* return value is only meaningful when type == C_STRING */
-static bool do_configure_item(config_item *cfg)
+static bool is_integer(const char *str)
 {
+    while(*str)
+    {
+        char c = *str++;
+        if(!isdigit(c) && c != '-')
+            return false;
+    }
+    return true;
+}
+
+/* max length of C_STRING config vals */
+#define MAX_STRLEN 128
+
+static void int_chooser(config_item *cfgs, int idx, int val)
+{
+    config_item *cfg = cfgs + idx;
+    int old_val = val;
+
+    rb->snprintf(cfg->sval, MAX_STRLEN, "%d", val);
+
+    rb->lcd_clear_display();
+
+    while(1)
+    {
+        rb->lcd_set_foreground(LCD_WHITE);
+        rb->lcd_puts(0, 0, cfg->name);
+        rb->lcd_putsf(0, 1, "< %d >", val);
+        rb->lcd_update();
+        rb->lcd_set_foreground(ERROR_COLOR);
+
+        int d = 0;
+        int button = rb->button_get(true);
+        switch(button)
+        {
+        case BTN_RIGHT:
+        case BTN_RIGHT | BUTTON_REPEAT:
+            d = 1;
+            break;
+        case BTN_LEFT:
+        case BTN_LEFT | BUTTON_REPEAT:
+            d = -1;
+            break;
+        case BTN_FIRE:
+            /* config is already set */
+            rb->lcd_scroll_stop();
+            return;
+        case BTN_PAUSE:
+            if(val != old_val)
+                rb->splash(HZ, "Canceled.");
+            val = old_val;
+            rb->snprintf(cfg->sval, MAX_STRLEN, "%d", val);
+            rb->lcd_scroll_stop();
+            return;
+        }
+        if(d)
+        {
+            /* we try to increment the value up to this much (mainly
+             * a workaround for Unruly): */
+#define CHOOSER_MAX_INCR 2
+
+            char *ret;
+            for(int i = 0; i < CHOOSER_MAX_INCR; ++i)
+            {
+                val += d;
+                rb->snprintf(cfg->sval, MAX_STRLEN, "%d", val);
+                ret = midend_set_config(me, CFG_SETTINGS, cfgs);
+                if(!ret)
+                {
+                    /* clear any error message */
+                    rb->lcd_clear_display();
+                    rb->lcd_scroll_stop();
+                    break;
+                }
+
+            }
+
+            /* failure */
+            if(ret)
+            {
+                /* bright, annoying red */
+                rb->lcd_set_foreground(ERROR_COLOR);
+                rb->lcd_puts_scroll(0, 2, ret);
+
+                /* reset value */
+                val -= d * CHOOSER_MAX_INCR;
+                rb->snprintf(cfg->sval, MAX_STRLEN, "%d", val);
+                assert(!midend_set_config(me, CFG_SETTINGS, cfgs));
+            }
+        }
+    }
+}
+
+/* return value is only meaningful when type == C_STRING, where it
+ * indicates whether cfg->sval has been freed or otherwise altered */
+static bool do_configure_item(config_item *cfgs, int idx)
+{
+    config_item *cfg = cfgs + idx;
     switch(cfg->type)
     {
     case C_STRING:
     {
-#define MAX_STRLEN 128
         char *newstr = smalloc(MAX_STRLEN);
-        rb->strlcpy(newstr, cfg->sval, MAX_STRLEN);
+
         rb->lcd_set_foreground(LCD_WHITE);
         rb->lcd_set_background(LCD_BLACK);
+
+        if(is_integer(cfg->sval))
+        {
+            int val = atoi(cfg->sval);
+
+            /* we now free the original string and give int_chooser()
+             * a clean buffer to work with */
+            sfree(cfg->sval);
+            cfg->sval = newstr;
+
+            int_chooser(cfgs, idx, val);
+
+            rb->lcd_set_foreground(LCD_WHITE);
+            rb->lcd_set_background(LCD_BLACK);
+
+            return true;
+        }
+
+        rb->strlcpy(newstr, cfg->sval, MAX_STRLEN);
         if(rb->kbd_input(newstr, MAX_STRLEN) < 0)
         {
             sfree(newstr);
