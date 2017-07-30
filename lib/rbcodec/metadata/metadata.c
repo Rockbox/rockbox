@@ -25,7 +25,6 @@
 #include "platform.h"
 #include "debug.h"
 #include "logf.h"
-#include "cuesheet.h"
 #include "metadata.h"
 
 #include "metadata_parsers.h"
