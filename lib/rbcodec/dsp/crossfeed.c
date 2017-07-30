@@ -302,7 +302,7 @@ static intptr_t crossfeed_new_format(struct dsp_proc_entry *this,
                                      struct dsp_config *dsp,
                                      struct sample_format *format)
 {
-    DSP_PRINT_FORMAT(DSP_PROC_CROSSFEED, format);
+    DSP_PRINT_FORMAT(DSP_PROC_CROSSFEED, *format);
 
     bool was_active = dsp_proc_active(dsp, DSP_PROC_CROSSFEED);
     bool active = format->num_channels >= 2;

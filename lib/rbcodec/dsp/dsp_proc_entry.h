@@ -158,7 +158,7 @@ void dsp_proc_set_in_place(struct dsp_config *dsp, enum dsp_proc_ids id,
 #define DSP_PRINT_FORMAT(id, format) \
     DEBUGF("DSP format- " #id "\n"                      \
            "  ver:%u ch:%u fb:%u os:%u hz:%u chz:%u\n", \
-           (unsigned int)(format).version               \
+           (unsigned int)(format).version,              \
            (unsigned int)(format).num_channels,         \
            (unsigned int)(format).frac_bits,            \
            (unsigned int)(format).output_scale,         \
