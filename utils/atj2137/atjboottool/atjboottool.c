@@ -763,8 +763,8 @@ static int process_block_B(uint8_t block[512])
     return 0;
 }
 
-static int do_fwu_v3(int size, uint8_t *buf, uint8_t *blockA, uint8_t *blockB,
-    uint8_t *unk, uint8_t *unk2, uint8_t *blo)
+static int get_key_fwu_v3(int size, uint8_t *buf, uint8_t *blockA, uint8_t *blockB,
+    uint8_t *keybuf, uint8_t *blo)
 {
     (void) size;
     uint8_t smallblock[512];
@@ -777,7 +777,7 @@ static int do_fwu_v3(int size, uint8_t *buf, uint8_t *blockA, uint8_t *blockB,
     uint8_t bb = buf[0x1fe] & 0xf;
     
     cprintf_field("  Block A: ", "%d\n", ba + 2);
-    cprintf("  Block B: ", "%d\n", ba + bb + 5);
+    cprintf_field("  Block B: ", "%d\n", ba + bb + 5);
     
     *blockA = buf[494] & 0xf;
     *blockB = buf[510] & 0xf;
@@ -814,10 +814,10 @@ static int do_fwu_v3(int size, uint8_t *buf, uint8_t *blockA, uint8_t *blockB,
     cprintf(GREEN, "  Crypto 4: ");
     check_field(ret, 0, "Pass\n", "Fail\n");
 
-    memcpy(unk2, &smallbuf[17], 32);
+    memcpy(keybuf, &smallbuf[17], 32);
     int offset = g_decode_A_info.nr_words + 91;
     
-    decode_block_with_swap(unk2, 0, &buf[offset], 512 - offset, g_perm_B);
+    decode_block_with_swap(keybuf, 0, &buf[offset], 512 - offset, g_perm_B);
 
     int pos = *(uint16_t *)&buf[offset];
     cprintf_field("  Word: ", "%d ", pos);
@@ -854,12 +854,6 @@ static int do_fwu_v3(int size, uint8_t *buf, uint8_t *blockA, uint8_t *blockB,
     cprintf(GREEN, "  Compare: ");
     check_field(ret, 0, "Pass\n", "Fail\n");
 
-    uint8_t zero[16];
-    memset(zero, 0, sizeof(zero));
-    ret = memcmp(unk, zero, sizeof(zero));
-    cprintf(GREEN, "  Sanity: ");
-    check_field(ret, 0, "Pass\n", "Fail\n");
-
     /*
     ret = memcmp(midbuf + 25, zero, sizeof(zero));
     cprintf(GREEN, "  Sanity: ");
@@ -869,15 +863,81 @@ static int do_fwu_v3(int size, uint8_t *buf, uint8_t *blockA, uint8_t *blockB,
     return 0;
 }
 
-static int do_sthg_fwu_v3(uint8_t *buf, int *size, uint8_t *unk, uint8_t *block)
+/* stolen from https://github.com/nfd/atj2127decrypt, I have no idea from where
+ * he got this sequence of code. This code is really weird, I copy verbatim
+ * his authors comment below. */
+uint32_t atj2127_key[] =
+{
+    0x42146ea2, 0x892c8e85, 0x9f9f6d27, 0x545fedc3,
+    0x09e5c0ca, 0x2dfa7e61, 0x4e5322e6, 0xb19185b9
+};
+
+/* decrypt a 512-byte sector */
+static void atj2127_decrypt_sector(void *inbuf, size_t size,
+    uint32_t session_key[8], int rounds_to_perform)
+{
+    uint32_t key[8];
+    for(int i = 0; i < 8; i++)
+        key[i] = atj2127_key[i] ^ session_key[i];
+    uint32_t *buf = inbuf;
+    if(size % 32)
+        cprintf(GREY, "Size is not a multiple of 32!!!\n");
+    while(rounds_to_perform > 0)
+    {
+        uint32_t rollover = buf[7] ^ session_key[7];
+
+        buf[0] ^= key[1];
+        buf[1] ^= key[2];
+        buf[2] ^= key[3];
+        buf[3] ^= key[4];
+        buf[4] ^= key[5];
+        buf[5] ^= key[6];
+        buf[6] ^= key[7];
+        buf[7] ^= key[1] ^ key[4];
+
+        key[1] = key[2];
+        key[2] = key[3];
+        key[3] = key[4];
+        key[4] = key[5];
+        key[5] = key[6];
+        key[6] = key[7];
+        key[7] = rollover;
+
+        buf += 8;
+        rounds_to_perform -= 1;
+    }
+}
+
+static void atj2127_decrypt(uint8_t *dst, const uint8_t *src, size_t size,
+    uint8_t keybuf[32], int rounds_to_perform)
+{
+    cprintf(BLUE, "ATJ2127:\n");
+    cprintf_field("  Rounds: ", "%d\n", rounds_to_perform);
+    while(size > 0)
+    {
+        int sec_sz = MIN(size, 512);
+        memcpy(dst, src, sec_sz);
+        atj2127_decrypt_sector(dst, sec_sz, (uint32_t *)keybuf, rounds_to_perform);
+        src += sec_sz;
+        dst += sec_sz;
+        size -= sec_sz;
+    }
+}
+
+static bool check_afi(uint8_t *buf, int size);
+
+static int decrypt_fwu_v3(uint8_t *buf, int *size, uint8_t block[512], bool force_atj2127)
 {
     uint8_t blockA;
     uint8_t blockB;
-    uint8_t unk2[32];
-    memset(unk2, 0, sizeof(unk2));
-    int ret = do_fwu_v3(*size, buf, &blockA, &blockB, unk, unk2, block);
+    uint8_t keybuf[32];
+    memset(keybuf, 0, sizeof(keybuf));
+    int ret = get_key_fwu_v3(*size, buf, &blockA, &blockB, keybuf, block);
     continue_the_force(ret);
 
+    int file_size = *size;
+    /* the input buffer is reorganized based on two offsets (blockA and blockB),
+     * skip 2048 bytes of data used for crypto init */
     *size -= 2048;
     uint8_t *tmpbuf = malloc(*size);
     memset(tmpbuf, 0, *size);
@@ -887,9 +947,54 @@ static int do_sthg_fwu_v3(uint8_t *buf, int *size, uint8_t *unk, uint8_t *block)
     memcpy(tmpbuf + offsetA, buf + offsetA + 1536, offsetB);
     memcpy(tmpbuf + offsetA + offsetB,
         buf + offsetA + 1536 + offsetB + 512, *size - offsetA - offsetB);
-    compute_perm(unk2, 32, g_perm_B);
-    decode_perm(tmpbuf, *size, g_perm_B);
-    memcpy(buf, tmpbuf, *size);
+    /* stolen from https://github.com/nfd/atj2127decrypt, I have no idea from where
+     * he got this sequence of code. This code is really weird, I copy verbatim
+     * his authors comment below.
+     *
+     * This is really weird. This is passed to the decrypt-sector function and
+     * determines how much of each 512-byte sector to decrypt, where for every
+     * 32MB of size above the first 32MB, one 32 byte chunk of each sector
+     * (starting from the end) will remain unencrypted, up to a maximum of 480
+     * bytes of plaintext. Was this a speed-related thing? It just seems
+     * completely bizarre. */
+
+    /* NOTE: the original code uses the file length to determine how much
+     * to encrypt and not the size reported in the header. Since
+     * the file size can be different from the size reported in the header
+     * (the infamous 512 bytes described above), this might be wrong. */
+    int rounds_to_perform = 16 - (file_size >> 0x19);
+    if(rounds_to_perform <= 0)
+        rounds_to_perform = 1;
+    /* the ATJ213x and ATJ2127 do not use the same encryption at this point, and I
+     * don't see any obvious way to tell which encryption is used (since they
+     * use the same version above). The only difference is that ATJ2127 images
+     * I have seen have an extra 512 bytes at the end file (ie the actual file
+     * is 512 bytes larger than indicated by the header) but I don't know if this
+     * is the case for all files. Thus, unless the user force encryption mode,
+     * try both and see if one looks like an AFI file. To guess which one to use,
+     * decrypt the first sector and see if it looks like an AFI file */
+    bool is_atj2127 = false;
+    if(force_atj2127)
+        is_atj2127 = true;
+    else
+    {
+        uint8_t hdr_buf[512];
+        atj2127_decrypt(hdr_buf, tmpbuf, sizeof(hdr_buf), keybuf, rounds_to_perform);
+        is_atj2127 = check_afi(hdr_buf, sizeof(hdr_buf));
+        if(is_atj2127)
+            cprintf(BLUE, "File looks like an ATJ2127 firmware\n");
+        else
+            cprintf(BLUE, "File does not looks like an ATJ2127 firmware\n");
+    }
+
+    if(is_atj2127)
+        atj2127_decrypt(buf, tmpbuf, *size, keybuf, rounds_to_perform);
+    else
+    {
+        compute_perm(keybuf, 32, g_perm_B);
+        decode_perm(tmpbuf, *size, g_perm_B);
+        memcpy(buf, tmpbuf, *size);
+    }
 
     return 0;
 }
@@ -925,7 +1030,7 @@ static void build_out_prefix(char *add, char *replace, bool slash)
     }
 }
 
-static int do_fwu(uint8_t *buf, int size)
+static int do_fwu(uint8_t *buf, int size, bool force_atj2127)
 {
     struct fwu_hdr_t *hdr = (void *)buf;
 
@@ -988,11 +1093,9 @@ static int do_fwu(uint8_t *buf, int size)
 
     if(g_version[ver].version == 3)
     {
-        uint8_t unk[32];
-        memset(unk, 0, sizeof(unk));
         uint8_t block[512];
         memset(block, 0, sizeof(block));
-        int ret = do_sthg_fwu_v3(buf, &size, unk, block);
+        int ret = decrypt_fwu_v3(buf, &size, block, force_atj2127);
         continue_the_force(ret);
 
         cprintf(GREY, "Descrambling to %s... ", g_out_prefix);
@@ -1198,7 +1301,7 @@ static int do_afi(uint8_t *buf, int size)
     return 0;
 }
 
-static bool check_afi(uint8_t *buf, int size)
+bool check_afi(uint8_t *buf, int size)
 {
     struct afi_hdr_t *hdr = (void *)buf;
 
@@ -1257,9 +1360,26 @@ struct fw_hdr_t
     struct fw_entry_t entry[FW_ENTRIES];
 } __attribute__((packed));
 
-const uint8_t g_fw_signature[FW_SIG_SIZE] =
+/* the s1fwx source code has a layout but it does not make any sense for firmwares
+ * found in ATJ2127 for example. In doubt just don't do anything */
+struct fw_hdr_f0_t
+{
+    uint8_t sig[FW_SIG_SIZE];
+    uint8_t res[12];
+    uint32_t checksum;
+    uint8_t res2[492];
+
+    struct fw_entry_t entry[FW_ENTRIES];
+} __attribute__((packed));
+
+const uint8_t g_fw_signature_f2[FW_SIG_SIZE] =
 {
     0x55, 0xaa, 0xf2, 0x0f
+};
+
+const uint8_t g_fw_signature_f0[FW_SIG_SIZE] =
+{
+    0x55, 0xaa, 0xf0, 0x0f
 };
 
 static void build_filename_fw(char buf[16], struct fw_entry_t *ent)
@@ -1286,42 +1406,60 @@ static int do_fw(uint8_t *buf, int size)
     cprintf(GREEN, "  Signature:");
     for(int i = 0; i < FW_SIG_SIZE; i++)
         cprintf(YELLOW, " %02x", hdr->sig[i]);
-    if(memcmp(hdr->sig, g_fw_signature, FW_SIG_SIZE) == 0)
-        cprintf(RED, " Ok\n");
+    int variant = 0;
+    if(memcmp(hdr->sig, g_fw_signature_f2, FW_SIG_SIZE) == 0)
+    {
+        variant = 0xf2;
+        cprintf(RED, " Ok (f2 variant)\n");
+    }
+    else if(memcmp(hdr->sig, g_fw_signature_f0, FW_SIG_SIZE) == 0)
+    {
+        variant = 0xf0;
+        cprintf(RED, " Ok (f0 variant)\n");
+    }
     else
     {
         cprintf(RED, " Mismatch\n");
         let_the_force_flow(__LINE__);
     }
 
-    cprintf_field("  USB VID: ", "0x%x\n", hdr->usb_vid);
-    cprintf_field("  USB PID: ", "0x%x\n", hdr->usb_pid);
-    cprintf_field("  Date: ", "%x/%x/%x%x\n", hdr->day, hdr->month, hdr->year[0], hdr->year[1]);
-    cprintf_field("  Checksum: ", "%x\n", hdr->checksum);
-    cprintf_field("  Productor: ", "%.16s\n", hdr->productor);
-    cprintf_field("  String 2: ", "%.16s\n", hdr->str2);
-    cprintf_field("  String 3: ", "%.32s\n", hdr->str3);
-    cprintf_field("  Device Name: ", "%.32s\n", hdr->dev_name);
-    cprintf(GREEN, "  Unknown:\n");
-    for(int i = 0; i < 8; i++)
+    /* both variants have the same header size, only the fields differ */
+    if(variant == 0xf2)
     {
-        cprintf(YELLOW, "    ");
-        for(int j = 0; j < 16; j++)
-            cprintf(YELLOW, "%02x ", hdr->res2[i * 16 + j]);
-        cprintf(YELLOW, "\n");
-    }
-    cprintf_field("  USB Name 1: ", "%.8s\n", hdr->usb_name1);
-    cprintf_field("  USB Name 2: ", "%.8s\n", hdr->usb_name2);
-    cprintf_field("  MTP Name 1: ", "%.32s\n", hdr->mtp_name1);
-    cprintf_field("  MTP Name 2: ", "%.32s\n", hdr->mtp_name2);
-    cprintf_field("  MTP Version: ", "%.32s\n", hdr->mtp_ver);
+        cprintf_field("  USB VID: ", "0x%x\n", hdr->usb_vid);
+        cprintf_field("  USB PID: ", "0x%x\n", hdr->usb_pid);
+        cprintf_field("  Date: ", "%x/%x/%02x%02x\n", hdr->day, hdr->month, hdr->year[0], hdr->year[1]);
+        cprintf_field("  Checksum: ", "%x\n", hdr->checksum);
+        cprintf_field("  Productor: ", "%.16s\n", hdr->productor);
+        cprintf_field("  String 2: ", "%.16s\n", hdr->str2);
+        cprintf_field("  String 3: ", "%.32s\n", hdr->str3);
+        cprintf_field("  Device Name: ", "%.32s\n", hdr->dev_name);
+        cprintf(GREEN, "  Unknown:\n");
+        for(int i = 0; i < 8; i++)
+        {
+            cprintf(YELLOW, "    ");
+            for(int j = 0; j < 16; j++)
+                cprintf(YELLOW, "%02x ", hdr->res2[i * 16 + j]);
+            cprintf(YELLOW, "\n");
+        }
+        cprintf_field("  USB Name 1: ", "%.8s\n", hdr->usb_name1);
+        cprintf_field("  USB Name 2: ", "%.8s\n", hdr->usb_name2);
+        cprintf_field("  MTP Name 1: ", "%.32s\n", hdr->mtp_name1);
+        cprintf_field("  MTP Name 2: ", "%.32s\n", hdr->mtp_name2);
+        cprintf_field("  MTP Version: ", "%.32s\n", hdr->mtp_ver);
 
-    cprintf_field("  MTP VID: ", "0x%x\n", hdr->mtp_vid);
-    cprintf_field("  MTP PID: ", "0x%x\n", hdr->mtp_pid);
-    cprintf_field("  FW Version: ", "%.64s\n", hdr->fw_ver);
+        cprintf_field("  MTP VID: ", "0x%x\n", hdr->mtp_vid);
+        cprintf_field("  MTP PID: ", "0x%x\n", hdr->mtp_pid);
+        cprintf_field("  FW Version: ", "%.64s\n", hdr->fw_ver);
+    }
+    else
+    {
+        struct fw_hdr_f0_t *hdr_f0 = (void *)hdr;
+        cprintf(GREEN, "  Header not dumped because format is unclear.\n");
+    }
 
     build_out_prefix(".unpack", "", true);
-    
+
     cprintf(BLUE, "Entries\n");
     for(int i = 0; i < AFI_ENTRIES; i++)
     {
@@ -1365,7 +1503,11 @@ static bool check_fw(uint8_t *buf, int size)
 
     if(size < (int)sizeof(struct fw_hdr_t))
         return false;
-    return memcmp(hdr->sig, g_fw_signature, FW_SIG_SIZE) == 0;
+    if(memcmp(hdr->sig, g_fw_signature_f2, FW_SIG_SIZE) == 0)
+        return true;
+    if(memcmp(hdr->sig, g_fw_signature_f0, FW_SIG_SIZE) == 0)
+        return true;
+    return false;
 }
 
 static void usage(void)
@@ -1380,6 +1522,7 @@ static void usage(void)
     printf("  --fwu\tUnpack a FWU firmware file\n");
     printf("  --afi\tUnpack a AFI archive file\n");
     printf("  --fw\tUnpack a FW archive file\n");
+    printf("  --atj2127\tForce ATJ2127 decryption mode\n");
     printf("The default is to try to guess the format.\n");
     printf("If several formats are specified, all are tried.\n");
     printf("If no output prefix is specified, a default one is picked.\n");
@@ -1391,7 +1534,8 @@ int main(int argc, char **argv)
     bool try_fwu = false;
     bool try_afi = false;
     bool try_fw = false;
-    
+    bool force_atj2127 = false;
+
     while(1)
     {
         static struct option long_options[] =
@@ -1403,6 +1547,7 @@ int main(int argc, char **argv)
             {"fwu", no_argument, 0, 'u'},
             {"afi", no_argument, 0, 'a'},
             {"fw", no_argument, 0, 'w'},
+            {"atj2127", no_argument, 0, '2'},
             {0, 0, 0, 0}
         };
 
@@ -1436,6 +1581,9 @@ int main(int argc, char **argv)
                 break;
             case 'w':
                 try_fw = true;
+                break;
+            case '2':
+                force_atj2127 = true;
                 break;
             default:
                 abort();
@@ -1471,12 +1619,12 @@ int main(int argc, char **argv)
         perror("Cannot read file");
         return 1;
     }
-    
+
     fclose(fin);
 
     int ret = -99;
     if(try_fwu || check_fwu(buf, size))
-        ret = do_fwu(buf, size);
+        ret = do_fwu(buf, size, force_atj2127);
     else if(try_afi || check_afi(buf, size))
         ret = do_afi(buf, size);
     else if(try_fw || check_fw(buf, size))
@@ -1486,7 +1634,7 @@ int main(int argc, char **argv)
         cprintf(GREY, "No valid format found\n");
         ret = 1;
     }
-    
+
     if(ret != 0)
     {
         cprintf(GREY, "Error: %d", ret);
