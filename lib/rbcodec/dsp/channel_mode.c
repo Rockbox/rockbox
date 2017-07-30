@@ -204,7 +204,7 @@ static intptr_t channel_mode_new_format(struct dsp_proc_entry *this,
                                         struct dsp_config *dsp,
                                         struct sample_format *format)
 {
-    DSP_PRINT_FORMAT(DSP_PROC_CHANNEL_MODE, format);
+    DSP_PRINT_FORMAT(DSP_PROC_CHANNEL_MODE, *format);
 
     bool active = format->num_channels >= 2;
     dsp_proc_activate(dsp, DSP_PROC_CHANNEL_MODE, active);
