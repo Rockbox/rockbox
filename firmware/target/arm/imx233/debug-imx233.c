@@ -233,9 +233,7 @@ bool dbg_hw_info_power(void)
 #define DISP_REGULATOR(name) \
         imx233_power_get_regulator(REGULATOR_##name, &trg, &bo); \
         imx233_power_get_regulator_linreg(REGULATOR_##name, &en, &linreg); \
-        if(en) snprintf(buf, sizeof(buf), "%d", linreg); \
-        else snprintf(buf, sizeof(buf), " "); \
-        lcd_putsf(0, line++, "%6s %4d %4d %s", #name, trg, bo, buf); \
+        lcd_putsf(0, line++, "%6s %4d %4d %d", #name, trg, bo, linreg); \
 
         DISP_REGULATOR(VDDD);
 #if IMX233_SUBTARGET >= 3700
@@ -248,11 +246,13 @@ bool dbg_hw_info_power(void)
         lcd_putsf(0, line++, "dcdc: pll: %d freq: %d", info.dcdc_sel_pllclk, info.dcdc_freqsel);
         lcd_putsf(0, line++, "chrg: %d mA / %d mA", info.charge_current, info.stop_current);
         lcd_putsf(0, line++, "chrging: %d  batadj: %d", info.charging, info.batt_adj);
+#if IMX233_SUBTARGET >= 3780
         lcd_putsf(0, line++, "4.2: en: %d  dcdc: %d", info._4p2_enable, info._4p2_dcdc);
         lcd_putsf(0, line++, "4.2: cmptrip: %d", info._4p2_cmptrip);
         lcd_putsf(0, line++, "4.2: dropout: %d", info._4p2_dropout);
         lcd_putsf(0, line++, "5v: pwd_4.2_charge: %d", info._5v_pwd_charge_4p2);
         lcd_putsf(0, line++, "5v: chrglim: %d mA", info._5v_charge_4p2_limit);
+#endif
         lcd_putsf(0, line++, "5v: dcdc: %d  xfer: %d", info._5v_enable_dcdc, info._5v_dcdc_xfer);
         lcd_putsf(0, line++, "5v: thr: %d mV", info._5v_vbusvalid_thr);
         lcd_putsf(0, line++, "5v: use: %d cmps: %d", info._5v_vbusvalid_detect, info._5v_vbus_cmps);

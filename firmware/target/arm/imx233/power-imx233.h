@@ -92,12 +92,14 @@ struct imx233_power_info_t
     int stop_current;
     bool charging;
     bool batt_adj;
+#if IMX233_SUBTARGET >= 3780
     bool _4p2_enable;
     bool _4p2_dcdc;
     int _4p2_cmptrip;
     int _4p2_dropout;
     bool _5v_pwd_charge_4p2;
     int _5v_charge_4p2_limit;
+#endif
     bool _5v_dcdc_xfer;
     bool _5v_enable_dcdc;
     int _5v_vbusvalid_thr;
