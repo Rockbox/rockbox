@@ -326,8 +326,8 @@ static struct
 #define ADD_REGULATOR_LINREG(name) \
         .linreg_bm = BM_POWER_##name##CTRL_ENABLE_LINREG
 #define ADD_REGULATOR_LINREG_OFFSET(name) \
-        .linreg_offset_bm = BP_POWER_##name##CTRL_LINREG_OFFSET, \
-        .linreg_offset_bp = BM_POWER_##name##CTRL_LINREG_OFFSET
+        .linreg_offset_bm = BM_POWER_##name##CTRL_LINREG_OFFSET, \
+        .linreg_offset_bp = BP_POWER_##name##CTRL_LINREG_OFFSET
 
 #if IMX233_SUBTARGET >= 3700
     [REGULATOR_VDDD] =
