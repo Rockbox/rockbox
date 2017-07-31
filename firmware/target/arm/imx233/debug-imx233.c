@@ -227,7 +227,6 @@ bool dbg_hw_info_power(void)
         unsigned trg, bo;
         bool en;
         int linreg;
-        char buf[16];
 
         lcd_putsf(0, line++, "name  value bo linreg");
 #define DISP_REGULATOR(name) \
