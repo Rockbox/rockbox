@@ -36,11 +36,8 @@ static inline void delay_loop(void)
 
 #define DELAY delay_loop()
 
-static struct mutex i2c_mtx;
-
 void i2c_init(void)
 {
-    mutex_init(&i2c_mtx);
 }
 
 void i2c_start(void)
@@ -152,7 +149,6 @@ int i2c_getack(void)
 int i2c_write(int device, const unsigned char* buf, int count )
 {
     int i = 0;
-    mutex_lock(&i2c_mtx);
     
     i2c_start();
     i2c_outb(device & 0xfe);
@@ -163,7 +159,6 @@ int i2c_write(int device, const unsigned char* buf, int count )
     }
     
     i2c_stop();
-    mutex_unlock(&i2c_mtx);
     return 0;
 }
 
@@ -172,7 +167,6 @@ int i2c_write(int device, const unsigned char* buf, int count )
 int i2c_readmem(int device, int address, unsigned char* buf, int count )
 {
     int i = 0;
-    mutex_lock(&i2c_mtx);
     
     i2c_start();
     i2c_outb(device & 0xfe);
@@ -193,6 +187,5 @@ int i2c_readmem(int device, int address, unsigned char* buf, int count )
 
 exit:
     i2c_stop();
-    mutex_unlock(&i2c_mtx);
     return 0;
 }
