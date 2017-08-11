@@ -730,8 +730,6 @@ int sd_init(void)
     if (!initialized)
         mutex_init(&sd_mtx);
 
-    mutex_lock(&sd_mtx);
-
     led(false);
 
     if (!initialized)
@@ -768,8 +766,6 @@ int sd_init(void)
         IEN |= EXT0_IRQ_MASK; /* enable the interrupt */
 #endif
     }
-
-    mutex_unlock(&sd_mtx);
 
     return ret;
 }
