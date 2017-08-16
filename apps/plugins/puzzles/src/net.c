@@ -257,7 +257,10 @@ static char *encode_params(const game_params *params, int full)
     if (params->wrapping)
         ret[len++] = 'w';
     if (full && params->barrier_probability)
-        len += sprintf(ret+len, "b%g", params->barrier_probability);
+    {
+        len += sprintf(ret+len, "b");
+        len += ftoa(ret + len, 400, params->barrier_probability);
+    }
     if (full && !params->unique)
         ret[len++] = 'a';
     assert(len < lenof(ret));
@@ -292,7 +295,7 @@ static config_item *game_configure(const game_params *params)
 
     ret[3].name = "Barrier probability";
     ret[3].type = C_STRING;
-    sprintf(buf, "%g", params->barrier_probability);
+    ftoa(buf, 80, params->barrier_probability);
     ret[3].sval = dupstr(buf);
     ret[3].ival = 0;
 

@@ -1701,7 +1701,7 @@ void midend_serialise(midend *me,
      */
     if (me->ourgame->is_timed) {
         char buf[80];
-        sprintf(buf, "%g", me->elapsed);
+        ftoa(buf, 80, me->elapsed);
         wr("TIME", buf);
     }
 

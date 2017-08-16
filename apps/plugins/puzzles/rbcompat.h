@@ -15,6 +15,7 @@ double cos_wrapper(double rads);
 int vsprintf_wrapper(char *s, const char *fmt, va_list ap);
 float fabs_wrapper(float n);
 float floor_wrapper(float n);
+int ftoa(char *buf, int len, float f);
 
 float atan_wrapper(float x);
 float atan2_wrapper(float y, float x);

@@ -163,7 +163,10 @@ static char *encode_params(const game_params *params, int full)
 
     sprintf(data, "%dx%d", params->w, params->h);
     if (full && params->expandfactor)
-        sprintf(data + strlen(data), "e%g", params->expandfactor);
+    {
+        sprintf(data + strlen(data), "e");
+        ftoa(data + strlen(data), 256, params->expandfactor);
+    }
     if (full && !params->unique)
         strcat(data, "a");
 
@@ -191,7 +194,7 @@ static config_item *game_configure(const game_params *params)
 
     ret[2].name = "Expansion factor";
     ret[2].type = C_STRING;
-    sprintf(buf, "%g", params->expandfactor);
+    ftoa(buf, 80, params->expandfactor);
     ret[2].sval = dupstr(buf);
     ret[2].ival = 0;
 
