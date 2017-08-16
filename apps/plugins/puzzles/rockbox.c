@@ -34,6 +34,7 @@
 #include "lib/xlcd.h"
 
 #include "fixedpoint.h"
+#include "lz4tiny.h"
 
 /* how many ticks between timer callbacks */
 #define TIMER_INTERVAL (HZ / 50)
@@ -1311,7 +1312,12 @@ static void full_help(const char *name)
     unload_fonts();
     rb->lcd_setfont(FONT_UI);
 
-    view_text(name, help_text);
+    char *buf = smalloc(help_text_len);
+    LZ4_decompress_tiny(help_text, buf, help_text_len);
+
+    view_text(name, buf);
+
+    sfree(buf);
 
     rb->lcd_set_background(old_bg);
 
