@@ -121,7 +121,6 @@ int spi_block_transfer(enum SPI_target target,
     /* Disable the clock */
     bitclr16(&IO_CLK_MOD2, CLK_MOD2_SIF0);
     
-    mutex_unlock(&spi_mtx);
     return 0;
 }
 
