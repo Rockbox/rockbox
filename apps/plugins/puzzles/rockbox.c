@@ -1688,7 +1688,8 @@ static int process_input(int tmo)
      * are pressed */
     if(strcmp("Inertia", midend_which_game(me)->name) == 0 ||
        strcmp("Mines", midend_which_game(me)->name)   == 0 ||
-       strcmp("Magnets", midend_which_game(me)->name) == 0 )
+       strcmp("Magnets", midend_which_game(me)->name) == 0 ||
+       strcmp("Map", midend_which_game(me)->name)     == 0)
     {
         LOGF("received button 0x%08x", button);
 
