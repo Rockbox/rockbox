@@ -26,3 +26,6 @@ original. Updating the upstream version is now as simple as copying a
 fresh set of sources to src/. Several hacks were used to accomplish
 this: a global include specified on the command line, and a directory
 of dummy header files.
+
+August 2017: Every game that can be played with only the cursor keys
+is now functional.

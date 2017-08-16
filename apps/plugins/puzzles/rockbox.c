@@ -562,11 +562,14 @@ static void rb_draw_poly(void *handle, int *coords, int npoints,
             xlcd_filltriangle(x1, y1,
                               x2, y2,
                               x3, y3);
+
+#ifdef DEBUG_MENU
             if(settings.polyanim)
             {
                 rb->lcd_update();
-                rb->sleep(HZ/5);
+                rb->sleep(HZ/4);
             }
+#endif
 #if 0
             /* debug code */
             rb->lcd_set_foreground(LCD_RGBPACK(255,0,0));
@@ -616,6 +619,14 @@ static void rb_draw_poly(void *handle, int *coords, int npoints,
         }
         else
             draw_antialiased_line(x1, y1, x2, y2);
+
+#ifdef DEBUG_MENU
+        if(settings.polyanim)
+        {
+            rb->lcd_update();
+            rb->sleep(HZ/4);
+        }
+#endif
     }
 
     int x1, y1, x2, y2;
@@ -1116,6 +1127,8 @@ static bool config_menu(void)
 {
     char *title;
     config_item *config = midend_get_config(me, CFG_SETTINGS, &title);
+
+    rb->lcd_setfont(FONT_UI);
 
     bool success = false;
 
