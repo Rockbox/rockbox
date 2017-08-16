@@ -1,6 +1,7 @@
 rockbox.c
 rbwrappers.c
 rbmalloc.c
+lz4tiny.c
 
 src/combi.c
 src/divvy.c

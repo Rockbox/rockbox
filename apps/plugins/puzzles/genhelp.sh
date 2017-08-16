@@ -3,6 +3,8 @@
 #
 # expects halibut to be installed in $PATH:
 # http://www.chiark.greenend.org.uk/~sgtatham/halibut
+#
+# also requires host CC and lz4 library to be available
 
 halibut --text src/puzzles.but
 
@@ -47,6 +49,15 @@ cat puzzles.txt | awk 'BEGIN { file = "none"; }
      print ";" > file;
  }
 '
+
+# now compress
+for f in help/*
+do
+    echo "Compressing: "$f
+    gcc compress.c $f -llz4 -o compress -O0
+    ./compress > $f.tmp
+    mv $f.tmp $f
+done
 
 # generate quick help from gamedesc.txt
 cat src/gamedesc.txt | awk -F ":" '{print "const char quick_help_text[] = \""$5"\";" >> "help/"$1".c" }'
