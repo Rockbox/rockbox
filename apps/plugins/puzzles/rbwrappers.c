@@ -23,6 +23,12 @@ int puts_wrapper(const char *s)
     return 0;
 }
 
+int ftoa(char *buf, int len, float f)
+{
+    /* biggest hack ever */
+    return rb->snprintf(buf, len, "%d.%06d", (int)f, (int)((f - (int)f)*1e6));
+}
+
 /* fixed-point wrappers */
 static long lastphase = 0, lastsin = 0, lastcos = 0x7fffffff;
 
