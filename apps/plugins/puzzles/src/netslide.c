@@ -320,6 +320,8 @@ static char *validate_params(const game_params *params, int full)
 	return "Barrier probability may not be negative";
     if (params->barrier_probability > 1)
 	return "Barrier probability may not be greater than 1";
+    if (params->movetarget < 0)
+        return "Number of shuffling moves may not be negative";
     return NULL;
 }
 

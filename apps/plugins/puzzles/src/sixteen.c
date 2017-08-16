@@ -178,7 +178,8 @@ static char *validate_params(const game_params *params, int full)
 {
     if (params->w < 2 || params->h < 2)
 	return "Width and height must both be at least two";
-
+    if (params->movetarget < 0)
+        return "Number of shuffling moves may not be negative";
     return NULL;
 }
 
