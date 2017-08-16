@@ -57,7 +57,6 @@ int main()
     printf("/* auto-generated on " __DATE__ " by genhelp.sh */\n");
     printf("/* orig %d comp %d ratio %g level %d saved %d */\n", inlen, minsz, (double)minsz / inlen, minlev, inlen - minsz);
     printf("/* DO NOT EDIT! */\n\n");
-    printf("#include \"help.h\"\n");
     printf("const char help_text[] = {\n");
 
     dump_bytes(outbuf, len);
