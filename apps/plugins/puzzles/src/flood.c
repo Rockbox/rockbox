@@ -213,8 +213,10 @@ static game_params *custom_params(const config_item *cfg)
 
 static char *validate_params(const game_params *params, int full)
 {
-    if (params->w < 2 && params->h < 2)
+    if (params->w * params->h < 2)
         return "Grid must contain at least two squares";
+    if (params->w < 1 || params->h < 1)
+        return "Width and height must both be at least one";
     if (params->colours < 3 || params->colours > 10)
         return "Must have between 3 and 10 colours";
     if (params->leniency < 0)
