@@ -25,16 +25,15 @@
 
 #include "help.h"
 #include "keymaps.h"
+#include "lz4tiny.h"
+
 #include "src/puzzles.h"
 
-#ifndef COMBINED
 #include "lib/playback_control.h"
-#endif
 #include "lib/simple_viewer.h"
 #include "lib/xlcd.h"
 
 #include "fixedpoint.h"
-#include "lz4tiny.h"
 
 /* how many ticks between timer callbacks */
 #define TIMER_INTERVAL (HZ / 50)
@@ -53,10 +52,6 @@
 #define ERROR_COLOR LCD_RGBPACK(255, 0, 0)
 
 #define MAX_FONTS (MAXUSERFONTS - 2)
-
-#ifdef COMBINED
-#define SAVE_FILE PLUGIN_GAMES_DATA_DIR "/puzzles.sav"
-#endif
 
 #define FONT_TABLE PLUGIN_GAMES_DATA_DIR "/.sgt-puzzles.fnttab"
 
@@ -1457,17 +1452,10 @@ static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
         case 7:
             break;
         case 8:
-#ifdef COMBINED
-            /* audio buf is used, so no playback */
-            /* TODO: neglects app builds, but not many people will
-             * care, I bet */
-            return ACTION_EXIT_MENUITEM;
-#else
             if(audiobuf_available)
                 break;
             else
                 return ACTION_EXIT_MENUITEM;
-#endif
         case 9:
             if(!midend_get_presets(me, NULL)->n_entries)
                 return ACTION_EXIT_MENUITEM;
@@ -1525,9 +1513,6 @@ static int pause_menu(void)
                         "Game Type",
                         "Debug Menu",
                         "Configure Game",
-#ifdef COMBINED
-                        "Select Another Game",
-#endif
                         "Quit without Saving",
                         "Quit");
 #undef static
@@ -1616,19 +1601,10 @@ static int pause_menu(void)
                 quit = true;
             }
             break;
-#ifdef COMBINED
-        case 12:
-            return -1;
-        case 13:
-            return -2;
-        case 14:
-            return -3;
-#else
         case 12:
             return -2;
         case 13:
             return -3;
-#endif
         default:
             break;
         }
@@ -1643,10 +1619,6 @@ static int pause_menu(void)
 static bool want_redraw = true;
 static bool accept_input = true;
 
-/* ignore the excess of LOGFs below... */
-#ifdef LOGF_ENABLE
-#undef LOGF_ENABLE
-#endif
 static int process_input(int tmo)
 {
     LOGF("process_input start");
@@ -1696,9 +1668,9 @@ static int process_input(int tmo)
         return rc;
     }
 
-    /* these three games require, for one reason or another, that
-     * events fire upon buttons being released rather than when they
-     * are pressed */
+    /* these games require, for one reason or another, that events
+     * fire upon buttons being released rather than when they are
+     * pressed */
     if(strcmp("Inertia", midend_which_game(me)->name) == 0 ||
        strcmp("Mines", midend_which_game(me)->name)   == 0 ||
        strcmp("Magnets", midend_which_game(me)->name) == 0 ||
@@ -1867,22 +1839,9 @@ void deactivate_timer(frontend *fe)
     timer_on = false;
 }
 
-#ifdef COMBINED
-/* can't use audio buffer */
-char giant_buffer[1024*1024*4];
-#else
 /* points to pluginbuf */
 char *giant_buffer = NULL;
-#endif
 static size_t giant_buffer_len = 0; /* set on start */
-
-#ifdef COMBINED
-const char *formatter(char *buf, size_t n, int i, const char *unit)
-{
-    rb->snprintf(buf, n, "%s", gamelist[i]->name);
-    return buf;
-}
-#endif
 
 static void fix_size(void)
 {
@@ -2139,30 +2098,6 @@ static bool load_game(void)
         /* seek to beginning */
         rb->lseek(fd, 0, SEEK_SET);
 
-#ifdef COMBINED
-        /* search for the game and initialize the midend */
-        for(int i = 0; i < gamecount; ++i)
-        {
-            if(!strcmp(game, gamelist[i]->name))
-            {
-                sfree(ret);
-                ret = init_for_game(gamelist[i], fd, true);
-                if(ret)
-                {
-                    rb->splash(HZ, ret);
-                    sfree(ret);
-                    rb->close(fd);
-                    return false;
-                }
-                rb->close(fd);
-                rb->remove(fname);
-                return true;
-            }
-        }
-        rb->splashf(HZ, "Incompatible game %s reported as compatible!?!? REEEPORT MEEEE!!!!", game);
-        rb->close(fd);
-        return false;
-#else
         if(!strcmp(game, thegame.name))
         {
             sfree(ret);
@@ -2192,7 +2127,6 @@ static bool load_game(void)
         rb->remove(fname);
 
         return false;
-#endif
     }
 }
 
@@ -2232,17 +2166,10 @@ static int mainmenu_cb(int action, const struct menu_item_ex *this_item)
         case 3:
             break;
         case 4:
-#ifdef COMBINED
-            /* audio buf is used, so no playback */
-            /* TODO: neglects app builds, but not many people will
-             * care, I bet */
-            return ACTION_EXIT_MENUITEM;
-#else
             if(audiobuf_available)
                 break;
             else
                 return ACTION_EXIT_MENUITEM;
-#endif
         case 5:
             if(!midend_get_presets(me, NULL)->n_entries)
                 return ACTION_EXIT_MENUITEM;
@@ -2267,19 +2194,13 @@ enum plugin_status plugin_start(const void *param)
     rb->cpu_boost(true);
 #endif
 
-#ifdef COMBINED
-    giant_buffer_len = sizeof(giant_buffer);
-#else
     giant_buffer = rb->plugin_get_buffer(&giant_buffer_len);
-#endif
-
-#ifndef COMBINED
-#endif
 
     rb_atexit(exit_handler);
 
     init_tlsf();
 
+    /* sanity check */
     if(fabs(sqrt(3)/2 - sin(PI/3)) > .01)
     {
         return PLUGIN_ERROR;
@@ -2291,13 +2212,11 @@ enum plugin_status plugin_start(const void *param)
 
     load_success = load_game();
 
-#ifndef COMBINED
     if(!load_success)
     {
         /* our main menu expects a ready-to-use midend */
         init_for_game(&thegame, -1, false);
     }
-#endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     /* about to go to menu or button block */
@@ -2308,7 +2227,6 @@ enum plugin_status plugin_start(const void *param)
     help_times = 0;
 #endif
 
-#ifndef COMBINED
 #define static auto
 #define const
     MENUITEM_STRINGLIST(menu, NULL, mainmenu_cb,
@@ -2389,24 +2307,10 @@ enum plugin_status plugin_start(const void *param)
             break;
         }
     }
-#else
-    if(load_success)
-        goto game_loop;
-#endif
 
-#ifdef COMBINED
-    int gm = 0;
-#endif
     while(1)
     {
-#ifdef COMBINED
-        if(rb->set_int("Choose Game", "", UNIT_INT, &gm, NULL, 1, 0, gamecount - 1, formatter))
-            return PLUGIN_OK;
-
-        init_for_game(gamelist[gm], -1, true);
-#else
         init_for_game(&thegame, -1, true);
-#endif
 
         last_keystate = 0;
         accept_input = true;
