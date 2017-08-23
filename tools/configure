@@ -265,6 +265,11 @@ simcc () {
  # Some linux setups like to warn about unused results. They are correct,
  # but cleaning this up is a lot of work.
  GCCOPTS="$GCCOPTS -Wno-unused-result"
+ # GCC 7.x spits out a lot of warnings about macros containing
+ # defined() and fall-throughs in switch statements. Fixing all these
+ # is a waste of time.
+ GCCOPTS="$GCCOPTS -Wno-expansion-to-defined -Wimplicit-fallthrough=0"
+
  GCCOPTIMIZE=''
  LDOPTS="$LDOPTS -lm" # button-sdl.c uses sqrt()
  sigaltstack=""
