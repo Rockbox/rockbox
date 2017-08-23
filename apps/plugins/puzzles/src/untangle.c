@@ -1122,6 +1122,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
 	if (bestd <= DRAG_THRESHOLD * DRAG_THRESHOLD) {
 	    ui->dragpoint = best;
+	    ui->cursorpoint = -1;
 	    ui->newpoint.x = x;
 	    ui->newpoint.y = y;
 	    ui->newpoint.d = ds->tilesize;
@@ -1183,25 +1184,28 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             bestd = 0;
 
             for (i = 0; i < n; i++) {
+                long px, py, dx, dy, d;
+                float angle;
+                int right_direction;
                 if(i == ui->cursorpoint)
                     continue;
 
-                long px = state->pts[i].x * ds->tilesize / state->pts[i].d;
-                long py = state->pts[i].y * ds->tilesize / state->pts[i].d;
-                long dx = px - state->pts[ui->cursorpoint].x * ds->tilesize / state->pts[ui->cursorpoint].d;
-                long dy = py - state->pts[ui->cursorpoint].y * ds->tilesize / state->pts[ui->cursorpoint].d;
-                long d = dx*dx + dy*dy;
+                px = state->pts[i].x * ds->tilesize / state->pts[i].d;
+                py = state->pts[i].y * ds->tilesize / state->pts[i].d;
+                dx = px - state->pts[ui->cursorpoint].x * ds->tilesize / state->pts[ui->cursorpoint].d;
+                dy = py - state->pts[ui->cursorpoint].y * ds->tilesize / state->pts[ui->cursorpoint].d;
+                d = dx*dx + dy*dy;
 
                 /* Figure out if this point falls into a 90 degree
                  * range extending from the current point */
 
-                float angle = atan2(-dy, dx); /* negate y to adjust for raster coordinates */
+                angle = atan2(-dy, dx); /* negate y to adjust for raster coordinates */
 
                 /* offset to [0..2*PI] */
                 if(angle < 0)
                     angle += 2*PI;
 
-                int right_direction = FALSE;
+                right_direction = FALSE;
 
                 if((button == CURSOR_UP && (1*PI/4 <= angle && angle <= 3*PI/4))   ||
                    (button == CURSOR_LEFT && (3*PI/4 <= angle && angle <= 5*PI/4)) ||
@@ -1284,7 +1288,10 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             return dupstr(buf);
         }
         else if(ui->cursorpoint < 0)
+        {
             ui->cursorpoint = 0;
+            return "";
+        }
     }
 
     return NULL;

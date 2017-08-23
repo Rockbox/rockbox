@@ -2779,7 +2779,7 @@ static void draw_square(drawing *dr, game_drawstate *ds,
 
 	    draw_circle(dr, COORD(x) + (xo+1)*TILESIZE/5,
 			COORD(y) + (yo+1)*TILESIZE/5,
-			TILESIZE/7, COL_0 + c, COL_0 + c);
+			TILESIZE/4, COL_0 + c, COL_0 + c);
 	}
 
     /*

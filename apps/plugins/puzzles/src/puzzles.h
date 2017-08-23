@@ -381,6 +381,10 @@ void draw_text_outline(drawing *dr, int x, int y, int fonttype,
  * less than buffer size. */
 void copy_left_justified(char *buf, size_t sz, const char *str);
 
+/* An ugly, but working float-to-string implementation for platforms
+ * that don't have one */
+int ftoa(char *buf, float f);
+
 /*
  * dsf.c
  */
