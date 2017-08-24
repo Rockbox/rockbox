@@ -167,5 +167,9 @@ void push_current_activity(enum current_activity screen);
 void pop_current_activity(void);
 enum current_activity get_current_activity(void);
 
+#ifdef HAVE_SPEAKER
+void set_speaker_mode(int speaker_mode, bool save_setting);
+int get_speaker_mode(void);
+#endif
 
 #endif /* MISC_H */
