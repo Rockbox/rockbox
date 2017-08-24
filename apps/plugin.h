@@ -160,7 +160,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 234
+#define PLUGIN_API_VERSION 235
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -974,6 +974,9 @@ struct plugin_api {
     char* (*root_menu_write_to_cfg)(void* setting, char*buf, int buf_len);
     void (*root_menu_load_from_cfg)(void* setting, char *value);
     int (*settings_save)(void);
+    /* powermgmt */
+    void (*set_sleeptimer_duration)(int minutes);
+    int (*get_sleep_timer)(void);
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
