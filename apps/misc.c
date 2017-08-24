@@ -1260,3 +1260,19 @@ enum current_activity get_current_activity(void)
 }
 
 #endif
+
+#ifdef HAVE_SPEAKER
+void set_speaker_mode(int speaker_mode, bool save_setting)
+{
+    if (save_setting)
+        global_settings.speaker_mode = speaker_mode;
+    /* update speaker status */
+    audio_enable_speaker(speaker_mode);
+}
+int get_speaker_mode(void)
+{
+    /* Do Note if you didn't save the setting you will not get
+       the actual status only the last saved status of the speaker */
+    return global_settings.speaker_mode;
+}
+#endif

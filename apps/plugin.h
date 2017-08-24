@@ -974,7 +974,13 @@ struct plugin_api {
     char* (*root_menu_write_to_cfg)(void* setting, char*buf, int buf_len);
     void (*root_menu_load_from_cfg)(void* setting, char *value);
     int (*settings_save)(void);
-
+    /* misc */
+#ifdef HAVE_SPEAKER
+    void (*set_speaker_mode)(int speaker_mode, bool save_setting);
+    int (*get_speaker_mode)(void);
+    /* Do Note if you didn't save the setting you will not get
+       the actual status only the last saved status of the speaker */
+#endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 };
