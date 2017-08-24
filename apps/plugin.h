@@ -956,6 +956,9 @@ struct plugin_api {
     char* (*root_menu_write_to_cfg)(void* setting, char*buf, int buf_len);
     void (*root_menu_load_from_cfg)(void* setting, char *value);
     int (*settings_save)(void);
+    /* powermgmt */
+    void (*set_sleeptimer_duration)(int minutes);
+    int (*get_sleep_timer)(void);
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
