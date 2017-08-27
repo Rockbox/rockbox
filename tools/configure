@@ -4258,6 +4258,11 @@ else
    GCCOPTS="$GCCOPTS -Wno-shift-negative-value -Wno-unused-const-variable -Wno-nonnull-compare -Wno-tautological-compare"
  fi
 
+ if test "$gccnum" -ge "700"; then
+   # gcc 7 spews a bunch of warnings by default
+   GCCOPTS="$GCCOPTS -Wno-expansion-to-defined -Wimplicit-fallthrough=0"
+ fi
+
  case $prefix in
    ""|"$CROSS_COMPILE")
      # simulator
