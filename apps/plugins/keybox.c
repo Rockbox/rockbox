@@ -314,7 +314,7 @@ static void splash_pw(int selected_item)
         if (entry->next)
             entry = entry->next;
     }
-    if (entry->name != '\0')
+    if (entry->name[0] != '\0')
         rb->splashf(0, "%s  %s", entry->name, entry->password);
     else
         rb->splashf(0, "%s", entry->password);
