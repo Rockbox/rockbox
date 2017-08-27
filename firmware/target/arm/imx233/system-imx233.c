@@ -257,7 +257,9 @@ void imx233_reset_block(volatile uint32_t *block_reg)
 void udelay(unsigned us)
 {
     uint32_t ref = HW_DIGCTL_MICROSECONDS;
-    while(!imx233_us_elapsed(ref, us));
+    /* increase number of us by 1 to make sure we wait *at least* the requested
+     * time */
+    while(!imx233_us_elapsed(ref, us + 1));
 }
 
 void imx233_digctl_set_arm_cache_timings(unsigned timings)
