@@ -129,8 +129,9 @@ static struct current_step_bit_t g_4p2_charge_limit_bits[] =
  * Since we didn't encounter this problem, we never lock VBUSVALID
  *
  * WARNING
- * Using VBUSVALID irq on STMP3700 seems broken, once the irq is fired,
- * it cannot be acked. Currently fallback to the VDD5V>VDDIO method.
+ * Using VBUSVALID IRQ is broken on STMP3700 (see errata). The IRQ cannot be
+ * cleared. Currently fallback to the VDD5V>VDDIO method even though it's less
+ * reliable (we could use polling too).
  */
 #if IMX233_SUBTARGET >= 3780
 #define USE_VBUSVALID
