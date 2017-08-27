@@ -292,7 +292,7 @@ void lcd_init_device(void)
     /** lcd is 320x240, data bus is 8-bit, depth is 24-bit so we need 3clk/pix
      * by running PIX clock at 24MHz we can sustain ~100 fps */
     imx233_clkctrl_enable(CLK_PIX, false);
-    imx233_clkctrl_set_div(CLK_PIX, 2);
+    imx233_clkctrl_set_div(CLK_PIX, 1);
     imx233_clkctrl_set_bypass(CLK_PIX, true); /* use XTAL */
     imx233_clkctrl_enable(CLK_PIX, true);
     imx233_lcdif_init();
