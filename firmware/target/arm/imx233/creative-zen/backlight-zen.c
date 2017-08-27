@@ -27,6 +27,7 @@
 #include "uartdbg-imx233.h"
 #include "pinctrl-imx233.h"
 #include "pwm-imx233.h"
+#include "kernel.h"
 
 void backlight_hw_brightness(int level)
 {
@@ -37,15 +38,9 @@ void backlight_hw_brightness(int level)
     lcd_set_contrast(level);
 #else
     unsigned val = (level + 200) * level / 1000;
-    if(level != 0)
-    {
-        for(unsigned mask = 0x10; mask; mask >>= 1)
-            imx233_uartdbg_send((val & mask) ? 0xff : 0xf8);
-        imx233_uartdbg_send(0);
-        imx233_pinctrl_set_gpio(1, 12, true);
-    }
-    else
-        imx233_pinctrl_set_gpio(1, 12, false);
+    for(unsigned mask = 0x10; mask; mask >>= 1)
+        imx233_uartdbg_send((val & mask) ? 0xff : 0xf8);
+    imx233_uartdbg_send(0);
 #endif
 }
 
@@ -64,7 +59,9 @@ void backlight_hw_on(void)
 {
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(true); /* power on lcd + visible display */
+    sleep(HZ / 10); /* make sure screen is not white anymore */
 #endif
+    imx233_pinctrl_set_gpio(1, 12, true);
     /* restore the previous backlight level */
     backlight_hw_brightness(backlight_brightness);
 }
@@ -73,6 +70,7 @@ void backlight_hw_off(void)
 {
     /* there is no real on/off but we can set to 0 brightness */
     backlight_hw_brightness(0);
+    imx233_pinctrl_set_gpio(1, 12, false);
 #ifdef HAVE_LCD_ENABLE
     lcd_enable(false); /* power off visible display */
 #endif
