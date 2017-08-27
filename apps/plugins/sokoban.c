@@ -1513,7 +1513,6 @@ static int sokoban_menu(void)
     int selection = 0;
     bool menu_quit;
     int start_selected = 0;
-    int prev_level = current_info.level.index;
 
     MENUITEM_STRINGLIST(menu, "Sokoban Menu", NULL,
                         "Resume", "Select Level", "Audio Playback", "Keys",
