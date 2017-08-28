@@ -33,6 +33,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <ostream>
+#include <functional>
 
 namespace hwstub {
 
@@ -80,7 +81,7 @@ std::string error_string(error err);
  *
  * A context provides a way to regularly poll for derive changes. There are two
  * ways to manually force an update:
- * - on call to get_device_list(), the list is already refetched
+ * - on call to get_device_list(), the list is always refetched
  * - on call to update_list() to force list update
  * Note that automatic polling is disabled by default.
  */
@@ -212,7 +213,7 @@ public:
     std::shared_ptr<context> get_context();
 
 protected:
-    /** Some subsystems allow for hardware to be open several times and so do not.
+    /** Some subsystems allow for hardware to be open several times and some do not.
      * For example, libusb only allows one handle per device. To workaround this issue,
      * open() will do some magic to allow for several open() even when the hardware
      * supports only one. If the device does not support multiple

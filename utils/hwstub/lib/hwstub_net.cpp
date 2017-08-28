@@ -282,7 +282,7 @@ error context::send_cmd(uint32_t cmd, uint32_t args[HWSTUB_NET_ARGS], uint8_t *s
 
     if(m_state == state::DEAD)
         return m_error;
-    /* do a delayed init, unless with are doing a HELLO */
+    /* do a delayed init, unless we are doing a HELLO */
     if(m_state == state::HELLO && cmd != HWSERVER_HELLO)
         delayed_init();
     /* build header */
@@ -452,7 +452,7 @@ void context::delayed_init()
 
 void context::stop_context()
 {
-    /* make sure with have the lock, this function might be call asynchronously */
+    /* make sure with have the lock, this function might be called asynchronously */
     std::unique_lock<std::recursive_mutex> lock(m_mutex);
     /* if dead, don't do anything */
     if(m_state == state::DEAD)
@@ -942,7 +942,7 @@ void server::client_thread(client_state *state)
         }
     }
     debug() << "[net::srv::client] stop: " << state->client << "\n";
-    /* clean client state to avoiding keeping references to objets */
+    /* clean client state to avoid keeping references to objets */
     state->dev_map.clear();
     state->handle_map.clear();
     /* kill client */
