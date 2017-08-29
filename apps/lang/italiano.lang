@@ -12364,11 +12364,11 @@ desc: deprecated
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: ""
+    gigabeats,samsungypr1: "Narrow"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: ""
+    gigabeats,samsungypr1: "Narrow"
   </voice>
 </phrase>
 <phrase>
@@ -12381,11 +12381,11 @@ desc: deprecated
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: ""
+    gigabeats,samsungypr1: "Wide"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: ""
+    gigabeats,samsungypr1: "Wide"
   </voice>
 </phrase>
 <phrase>
