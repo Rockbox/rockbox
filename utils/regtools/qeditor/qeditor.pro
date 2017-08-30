@@ -7,7 +7,16 @@ SOURCES += main.cpp mainwindow.cpp regtab.cpp backend.cpp analyser.cpp \
 LIBS += -L../lib/ -lsocdesc -lxml2
 INCLUDEPATH += ../include/ ../../hwstub/include
 DEPENDPATH += ../
-CONFIG += c++11
+
+greaterThan(QT_MAJOR_VERSION, 4) {
+    # qt5 knows c++11
+    CONFIG += c++11
+}
+else {
+    message("Qt4 is deprecated, you should use Qt5")
+    # qt4 does not, use gcc specific code
+    QMAKE_CXXFLAGS += -std=c++11
+}
 
 libsocdesc.commands = cd ../lib && make
 QMAKE_EXTRA_TARGETS += libsocdesc
