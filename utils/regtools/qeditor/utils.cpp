@@ -1991,7 +1991,7 @@ MessageWidget::MessageWidget(QWidget *parent)
     m_text->setWordWrap(true);
     m_close = new QToolButton(this);
     m_close->setText("close");
-    m_close->setIcon(style()->standardIcon(QStyle::SP_DialogCloseButton));
+    m_close->setIcon(style()->standardIcon(QStyle::QStyle::SP_DialogCloseButton));
     m_close->setAutoRaise(true);
 
     QHBoxLayout *layout = new QHBoxLayout(this);
@@ -2074,26 +2074,47 @@ YIconManager *YIconManager::m_singleton = nullptr;
 YIconManager::YIconManager()
 {
     m_icon_name[ListAdd] = "list-add";
+    m_icon_fallback[ListAdd] = QStyle::SP_CustomBase; /* drawn by RenderListAdd */
     m_icon_name[ListRemove] = "list-remove";
+    m_icon_fallback[ListRemove] = QStyle::SP_CustomBase; /* drawn by RenderListAdd */
     m_icon_name[DocumentNew] = "document-new";
+    m_icon_fallback[DocumentNew] = QStyle::SP_FileDialogNewFolder;
     m_icon_name[DocumentEdit] = "document-edit";
+    m_icon_fallback[DocumentEdit] = QStyle::SP_FileDialogContentsView;
     m_icon_name[DocumentOpen] = "document-open";
+    m_icon_fallback[DocumentOpen] = QStyle::SP_DialogOpenButton;
     m_icon_name[DocumentSave] = "document-save";
+    m_icon_fallback[DocumentSave] = QStyle::SP_DialogSaveButton;
     m_icon_name[DocumentSaveAs] = "document-save-as";
+    m_icon_fallback[DocumentSaveAs] = QStyle::SP_DialogSaveButton;
     m_icon_name[Preferences] = "preferences-system";
+    m_icon_fallback[Preferences] = QStyle::SP_FileDialogInfoView;
     m_icon_name[FolderNew] = "folder-new";
+    m_icon_fallback[FolderNew] = QStyle::SP_FileDialogNewFolder;
     m_icon_name[Computer] = "computer";
+    m_icon_fallback[Computer] = QStyle::SP_ComputerIcon;
     m_icon_name[Cpu] = "cpu";
+    m_icon_fallback[Cpu] = QStyle::SP_DriveHDIcon;
     m_icon_name[DialogError] = "dialog-error";
+    m_icon_fallback[DialogError] = QStyle::SP_MessageBoxCritical;
     m_icon_name[ViewRefresh] = "view-refresh";
+    m_icon_fallback[ViewRefresh] = QStyle::SP_BrowserReload;
     m_icon_name[SytemRun] = "system-run";
+    m_icon_fallback[SytemRun] = QStyle::SP_MediaPlay;
     m_icon_name[ApplicationExit] = "application-exit";
+    m_icon_fallback[ApplicationExit] = QStyle::SP_TitleBarCloseButton;
     m_icon_name[HelpAbout] = "help-about";
+    m_icon_fallback[HelpAbout] = QStyle::SP_MessageBoxInformation;
     m_icon_name[FormatTextBold] = "format-text-bold";
+    m_icon_fallback[FormatTextBold] = QStyle::SP_CustomBase; /* drawn by RenderLetter */
     m_icon_name[FormatTextItalic] = "format-text-italic";
+    m_icon_fallback[FormatTextItalic] = QStyle::SP_CustomBase; /* drawn by RenderLetter */
     m_icon_name[FormatTextUnderline] = "format-text-underline";
+    m_icon_fallback[FormatTextUnderline] = QStyle::SP_CustomBase; /* drawn by RenderLetter */
     m_icon_name[TextGeneric] = "text-x-generic";
+    m_icon_fallback[TextGeneric] = QStyle::SP_FileDialogDetailedView;
     m_icon_name[MultimediaPlayer] = "multimedia-player";
+    m_icon_fallback[MultimediaPlayer] = QStyle::SP_ComputerIcon;
 }
 
 YIconManager::~YIconManager()
@@ -2111,27 +2132,25 @@ QIcon YIconManager::GetIcon(IconType type)
 {
     if(type < 0 || type >= MaxIcon)
         return QIcon();
-    if(QIcon::hasThemeIcon(m_icon_name[type]))
-        return QIcon::fromTheme(m_icon_name[type]);
-    /* render icon if needed */
+    /* cache icons */
     if(m_icon[type].isNull())
-        Render(type);
+        m_icon[type] = QIcon::fromTheme(m_icon_name[type], GetFallbackIcon(type));
     return m_icon[type];
 }
 
 namespace
 {
-    void RenderListAdd(QIcon& icon)
+    QIcon RenderListAdd()
     {
         QPixmap pix(64, 64);
         pix.fill(Qt::transparent);
         QPainter paint(&pix);
         paint.fillRect(30, 12, 4, 40, QColor(255, 0, 0));
         paint.fillRect(12, 30, 40, 4, QColor(255, 0, 0));
-        icon = QIcon(pix);
+        return QIcon(pix);
     }
 
-    void RenderListRemove(QIcon& icon)
+    QIcon RenderListRemove()
     {
         QPixmap pix(64, 64);
         pix.fill(Qt::transparent);
@@ -2139,26 +2158,46 @@ namespace
         paint.setPen(QColor(255, 0, 0));
         paint.drawLine(12, 12, 52, 52);
         paint.drawLine(12, 52, 52, 16);
-        icon = QIcon(pix);
+        return QIcon(pix);
     }
 
-    void RenderUnknown(QIcon& icon)
+    QIcon RenderUnknown()
     {
         QPixmap pix(64, 64);
         pix.fill();
         QPainter paint(&pix);
         paint.fillRect(0, 0, 64, 64, QColor(255, 0, 0));
-        icon = QIcon(pix);
+        return QIcon(pix);
+    }
+
+    QIcon RenderText(const QString& str, bool bold, bool italic, bool underline)
+    {
+        QPixmap pix(64, 64);
+        pix.fill();
+        QPainter paint(&pix);
+        QFont font = QApplication::font("QButton");
+        font.setBold(bold);
+        font.setItalic(italic);
+        font.setUnderline(underline);
+        font.setPixelSize(64);
+        paint.setFont(font);
+        paint.drawText(0, 0, 64, 64, Qt::AlignCenter, str);
+        return QIcon(pix);
     }
 }
 
-void YIconManager::Render(IconType type)
+QIcon YIconManager::GetFallbackIcon(IconType type)
 {
+    if(m_icon_fallback[type] != QStyle::SP_CustomBase)
+        return QApplication::style()->standardIcon(m_icon_fallback[type]);
     switch(type)
     {
-        case ListAdd: RenderListAdd(m_icon[type]); break;
-        case ListRemove: RenderListRemove(m_icon[type]); break;
-        default: RenderUnknown(m_icon[type]); break;
+        case ListAdd: return RenderListAdd(); break;
+        case ListRemove: return RenderListRemove(); break;
+        case FormatTextBold: return RenderText("B", true, false, false);
+        case FormatTextItalic: return RenderText("I", false, true, false);
+        case FormatTextUnderline: return RenderText("U", false, false, true);
+        default: return RenderUnknown(); break;
     }
 }
 
