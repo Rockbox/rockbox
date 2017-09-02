@@ -712,7 +712,7 @@ handle_prop_value (enum prop_type_t type)
                 ++buffer;
             }
 
-            if (buffer != '\0')
+            if (*buffer != '\0')
             {
                 ++buffer;
 
