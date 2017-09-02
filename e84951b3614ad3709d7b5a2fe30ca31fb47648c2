@@ -16,6 +16,24 @@
       "revId": "e84951b3614ad3709d7b5a2fe30ca31fb47648c2",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f3cfba2_ce070318",
+        "filename": "apps/lang/italiano.lang",
+        "patchSetId": 1
+      },
+      "lineNbr": 12359,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2017-09-02T02:32:19Z",
+      "side": 1,
+      "message": "The same typo is in every other language file, too. Perhaps on a separate commit.",
+      "parentUuid": "9f57efe8_af02b908",
+      "revId": "e84951b3614ad3709d7b5a2fe30ca31fb47648c2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
