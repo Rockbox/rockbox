@@ -71,9 +71,9 @@ typedef struct {
 } BF_Data;
 
 struct huffcodetab {
-  const uint8_t        len;   /* max. index                  */
-  const uint8_t const *table; /* pointer to array[len][len]  */
-  const uint8_t const *hlen;  /* pointer to array[len][len]  */
+  const uint8_t len;    /* max. index                  */
+  const uint8_t *table; /* pointer to array[len][len]  */
+  const uint8_t *hlen;  /* pointer to array[len][len]  */
 };
 
 struct huffcodebig {
@@ -98,7 +98,7 @@ static short     enc_data    [SAMPL2]            IBSS_ATTR; /*  1152 Bytes */
 static BF_Data   CodedData                       IBSS_ATTR; /*  1056 Bytes */
 
 static const uint16_t sfBand[6][23]              ICONST_ATTR;
-static const uint16_t const *scalefac            IBSS_ATTR;
+static const uint16_t *scalefac                  IBSS_ATTR;
 
 static const int16_t   ca    [8]                 ICONST_ATTR; /*    16 Bytes */
 static const uint16_t  cs    [8]                 ICONST_ATTR; /*    16 Bytes */
