@@ -261,12 +261,13 @@ simcc () {
  winbuild=""
  GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
 
+ GCCOPTS="$GCCOPTS -m32"
  GCCOPTS="$GCCOPTS -fno-builtin -g"
  # Some linux setups like to warn about unused results. They are correct,
  # but cleaning this up is a lot of work.
  GCCOPTS="$GCCOPTS -Wno-unused-result"
  GCCOPTIMIZE=''
- LDOPTS="$LDOPTS -lm" # button-sdl.c uses sqrt()
+ LDOPTS="$LDOPTS -lm -m32" # button-sdl.c uses sqrt()
  sigaltstack=""
  fibers=""
  endian="" # endianess of the dap doesnt matter here
