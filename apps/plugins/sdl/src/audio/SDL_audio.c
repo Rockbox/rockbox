@@ -113,6 +113,9 @@ static AudioBootStrap *bootstrap[] = {
 #if SDL_AUDIO_DRIVER_EPOCAUDIO
 	&EPOCAudio_bootstrap,
 #endif
+#if SDL_AUDIO_DRIVER_ROCKBOX
+        &ROCKBOXAUD_bootstrap,
+#endif
 	NULL
 };
 SDL_AudioDevice *current_audio = NULL;
@@ -221,6 +224,7 @@ int SDLCALL SDL_RunAudio(void *audiop)
 		} else {
 			audio->WaitAudio(audio);
 		}
+                rb->yield();
 	}
 
 	/* Wait for the audio to drain.. */

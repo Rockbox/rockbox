@@ -26,14 +26,17 @@ extern int testwin_main(int argc, char *argv[]);
 extern int abe_main(int argc, char *argv[]);
 extern int ballerburg_main(int argc, char **argv);
 extern int raytrace_main(int argc, char *argv[]);
+extern int wolf3d_main(int argc, char *argv[]);
+extern int testsound_main(int argc, char *argv[]);
 
 struct prog_t {
     const char *name;
     int (*main)(int argc, char *argv[]);
     bool printf_enabled;
 } programs[] = {
-    {  "Abe's Amazing Adventure",  abe_main,           true  },
-    {  "Ballerburg",               ballerburg_main,    false },
+#if 0
+    {  "Abe's Amazing Adventure",  abe_main,           true   },
+    {  "Ballerburg",               ballerburg_main,    false  },
     {  "Screensaver",              SDLBlock_main,      false  },
     {  "Ball Field",               ballfield_main,     false  },
     {  "Parallax v.3",             parallax3_main,     false  },
@@ -44,7 +47,10 @@ struct prog_t {
     {  "Test Thread",              testhread_main,     true   },
     {  "Test Platform",            testplatform_main,  true   },
     {  "Test Sprite",              testsprite_main,    false  },
-    {  "Test Window",              testwin_main,       false  }
+    {  "Test Window",              testwin_main,       false  },
+#endif
+    {  "Wolf3D!!!!!",              wolf3d_main,        false  },
+    {  "Test sound",               testsound_main,     true   },
 };
 #endif
 
@@ -101,17 +107,6 @@ enum plugin_status plugin_start(const void *param)
         return PLUGIN_ERROR;
     }
 
-#if 0
-    /* weird crashes */
-    void *audiobuf = rb->plugin_get_audio_buffer(&sz);
-    if(audiobuf)
-    {
-        rb->splashf(HZ, "point 1 (sz=%d, addr=0x%08x)", sz, audiobuf);
-        add_new_area(audiobuf, sz, pluginbuf);
-        rb->splash(HZ, "point 2");
-    }
-#endif
-
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
@@ -121,9 +116,13 @@ enum plugin_status plugin_start(const void *param)
 #undef rb_atexit
     rb_atexit(cleanup);
 
-    char *arg[] = {"blah"};
+    /* these settings provide a nice balance of efficiency, quality, and latency */
+    char *arg[] = {"blah", "--audiobuffer", "2048"};
     int rc = main_fn(ARRAYLEN(arg), arg);
     if(rc != 0)
         rb->splash(HZ * 2, SDL_GetError());
+
+    rb->sleep(HZ * 2);
+
     return rc;
 }

@@ -35,6 +35,9 @@
 struct SDL_PrivateVideoData {
     int w, h;
     void *buffer;
+    void *scale_buffer_input;
+    void *scale_buffer_output;
+    long scale_x, scale_y;
 };
 
 #endif /* _SDL_nullvideo_h */
