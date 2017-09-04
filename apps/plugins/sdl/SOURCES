@@ -3,6 +3,7 @@ main.c
 wrappers.c
 
 /* our programs */
+#if 0
 tests/abe/Directories.c
 tests/abe/Editor.c
 tests/abe/Font.c
@@ -35,8 +36,39 @@ tests/ballerburg/settings.c
 
 tests/raytrace/main.c
 tests/raytrace/vector.c
+#endif
 
-//#if 0
+tests/wolf3d/fmopl.c
+tests/wolf3d/id_ca.c
+tests/wolf3d/id_in.c
+tests/wolf3d/id_pm.c
+tests/wolf3d/id_sd.c
+tests/wolf3d/id_us_1.c
+tests/wolf3d/id_vh.c
+tests/wolf3d/id_vl.c
+tests/wolf3d/signon.c
+tests/wolf3d/wl_act1.c
+tests/wolf3d/wl_act2.c
+tests/wolf3d/wl_agent.c
+tests/wolf3d/wl_atmos.c
+tests/wolf3d/wl_cloudsky.c
+tests/wolf3d/wl_debug.c
+tests/wolf3d/wl_dir3dspr.c
+tests/wolf3d/wl_draw.c
+tests/wolf3d/wl_floorceiling.c
+tests/wolf3d/wl_game.c
+tests/wolf3d/wl_inter.c
+tests/wolf3d/wl_main.c
+tests/wolf3d/wl_menu.c
+tests/wolf3d/wl_parallax.c
+tests/wolf3d/wl_play.c
+tests/wolf3d/wl_shade.c
+tests/wolf3d/wl_state.c
+tests/wolf3d/wl_text.c
+
+tests/testsound.c
+
+#if 0
 tests/ballfield.c
 tests/parallax3.c
 tests/parallax4.c
@@ -47,7 +79,7 @@ tests/testhread.c
 tests/testplatform.c
 tests/testsprite.c
 tests/testwin.c
-//#endif
+#endif
 
 /* SDL lib */
 src/SDL.c
@@ -61,8 +93,9 @@ src/audio/SDL_mixer_MMX.c
 src/audio/SDL_mixer_MMX_VC.c
 src/audio/SDL_mixer_m68k.c
 src/audio/SDL_wave.c
-src/audio/disk/SDL_diskaudio.c
-src/audio/dummy/SDL_dummyaudio.c
+//src/audio/disk/SDL_diskaudio.c
+//src/audio/dummy/SDL_dummyaudio.c
+src/audio/rockbox/SDL_rockboxaudio.c
 src/cdrom/SDL_cdrom.c
 src/cdrom/dummy/SDL_syscdrom.c
 src/cpuinfo/SDL_cpuinfo.c
@@ -84,7 +117,7 @@ src/stdlib/SDL_qsort.c
 src/stdlib/SDL_stdlib.c
 src/stdlib/SDL_string.c
 src/thread/SDL_thread.c
-#if 0
+#if 1
 src/thread/rockbox/SDL_syscond.c
 src/thread/rockbox/SDL_sysmutex.c
 src/thread/rockbox/SDL_syssem.c
@@ -134,3 +167,27 @@ SDL_image/IMG_xcf.c
 SDL_image/IMG_xpm.c
 SDL_image/IMG_xv.c
 SDL_image/IMG_xxx.c
+
+/* Mix */
+SDL_mixer/dynamic_flac.c
+SDL_mixer/dynamic_fluidsynth.c
+SDL_mixer/dynamic_mod.c
+SDL_mixer/dynamic_mp3.c
+SDL_mixer/dynamic_ogg.c
+SDL_mixer/effect_position.c
+SDL_mixer/effects_internal.c
+SDL_mixer/effect_stereoreverse.c
+SDL_mixer/fluidsynth.c
+SDL_mixer/load_aiff.c
+SDL_mixer/load_flac.c
+SDL_mixer/load_ogg.c
+SDL_mixer/load_voc.c
+SDL_mixer/mixer.c
+SDL_mixer/music.c
+SDL_mixer/music_cmd.c
+SDL_mixer/music_flac.c
+SDL_mixer/music_mad.c
+SDL_mixer/music_mod.c
+SDL_mixer/music_modplug.c
+SDL_mixer/music_ogg.c
+SDL_mixer/wavestream.c
