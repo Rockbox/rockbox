@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Wolf4SDL" />
+		<Option pch_mode="2" />
+		<Option compiler="devkitgp2x" />
+		<Build>
+			<Target title="default">
+				<Option output="Wolf4SDL" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option compiler="devkitgp2x" />
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-DGP2X" />
+		</Compiler>
+		<Linker>
+			<Add library="SDL" />
+			<Add library="SDL_mixer" />
+			<Add library="iconv" />
+		</Linker>
+		<Unit filename="GP2X/gp2x.cpp" />
+		<Unit filename="GP2X/gp2x.h" />
+		<Unit filename="audiosod.h" />
+		<Unit filename="audiowl6.h" />
+		<Unit filename="f_spear.h" />
+		<Unit filename="fmopl.cpp" />
+		<Unit filename="fmopl.h" />
+		<Unit filename="foreign.h" />
+		<Unit filename="gfxv_apo.h" />
+		<Unit filename="gfxv_sod.h" />
+		<Unit filename="gfxv_wl6.h" />
+		<Unit filename="id_ca.cpp" />
+		<Unit filename="id_ca.h" />
+		<Unit filename="id_in.cpp" />
+		<Unit filename="id_in.h" />
+		<Unit filename="id_pm.cpp" />
+		<Unit filename="id_sd.cpp" />
+		<Unit filename="id_sd.h" />
+		<Unit filename="id_us.h" />
+		<Unit filename="id_us_1.cpp" />
+		<Unit filename="id_vh.cpp" />
+		<Unit filename="id_vh.h" />
+		<Unit filename="id_vl.cpp" />
+		<Unit filename="id_vl.h" />
+		<Unit filename="sdl_winmain.cpp" />
+		<Unit filename="signon.cpp" />
+		<Unit filename="version.h" />
+		<Unit filename="wl_act1.cpp" />
+		<Unit filename="wl_act2.cpp" />
+		<Unit filename="wl_agent.cpp" />
+		<Unit filename="wl_debug.cpp" />
+		<Unit filename="wl_def.h" />
+		<Unit filename="wl_draw.cpp" />
+		<Unit filename="wl_game.cpp" />
+		<Unit filename="wl_inter.cpp" />
+		<Unit filename="wl_main.cpp" />
+		<Unit filename="wl_menu.cpp" />
+		<Unit filename="wl_menu.h" />
+		<Unit filename="wl_play.cpp" />
+		<Unit filename="wl_state.cpp" />
+		<Unit filename="wl_text.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

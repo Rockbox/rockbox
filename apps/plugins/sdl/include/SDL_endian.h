@@ -70,6 +70,12 @@ extern "C" {
  *  header should only be included in files that actually use them.
  */
 /*@{*/
+
+#define Uint16 uint16_t
+#define Uint32 uint32_t
+#define Uint64 uint64_t
+#undef SDL_static_cast
+#define SDL_static_cast(type, val) ((type)((val)))
 #if defined(__GNUC__) && defined(__i386__) && \
    !(__GNUC__ == 2 && __GNUC_MINOR__ <= 95 /* broken gcc version */)
 static __inline__ Uint16 SDL_Swap16(Uint16 x)
@@ -182,6 +188,10 @@ static __inline__ Uint64 SDL_Swap64(Uint64 x)
 #define SDL_Swap64(X)	(X)
 #endif /* SDL_HAS_64BIT_TYPE */
 /*@}*/
+
+#undef Uint16
+#undef Uint32
+#undef Uint64
 
 /**
  *  @name SDL_SwapLE and SDL_SwapBE Functions
