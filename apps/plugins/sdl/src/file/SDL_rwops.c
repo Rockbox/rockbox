@@ -492,6 +492,14 @@ SDL_RWops *SDL_RWFromFile(const char *file, const char *mode)
 		return NULL;
 	}
 
+#ifdef ROCKBOX
+        if(file[0] != '/')
+        {
+            SDL_SetError("Rockbox paths must be absolute");
+            return NULL;
+        }
+#endif
+        
 #if defined(__WIN32__) && !defined(__SYMBIAN32__)
 	rwops = SDL_AllocRW();
 	if (!rwops)

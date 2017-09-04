@@ -42,7 +42,7 @@
 
 /* environment variables and defaults. */
 #define DISKENVR_OUTFILE         "SDL_DISKAUDIOFILE"
-#define DISKDEFAULT_OUTFILE      "sdlaudio.raw"
+#define DISKDEFAULT_OUTFILE      "/sdlaudio.raw"
 #define DISKENVR_WRITEDELAY      "SDL_DISKAUDIODELAY"
 #define DISKDEFAULT_WRITEDELAY   150
 
@@ -62,11 +62,11 @@ static const char *DISKAUD_GetOutputFilename(void)
 /* Audio driver bootstrap functions */
 static int DISKAUD_Available(void)
 {
-	const char *envr = SDL_getenv("SDL_AUDIODRIVER");
-	if (envr && (SDL_strcmp(envr, DISKAUD_DRIVER_NAME) == 0)) {
+    //const char *envr = SDL_getenv("SDL_AUDIODRIVER");
+//	if (envr && (SDL_strcmp(envr, DISKAUD_DRIVER_NAME) == 0)) {
 		return(1);
-	}
-	return(0);
+//	}
+//	return(0);
 }
 
 static void DISKAUD_DeleteDevice(SDL_AudioDevice *device)
