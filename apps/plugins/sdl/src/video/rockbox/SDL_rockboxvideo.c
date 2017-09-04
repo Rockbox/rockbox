@@ -44,7 +44,7 @@
 #define RBSDL_UP_RIGHT SDLK_KP9
 #define RBSDL_DOWN_LEFT SDLK_KP1
 #define RBSDL_DOWN_RIGHT SDLK_KP3
-#define RBSDL_FIRE SDLK_SPACE
+#define RBSDL_FIRE SDLK_LCTRL
 #define RBSDL_QUIT SDLK_ESCAPE
 
 
@@ -107,14 +107,39 @@ void ROCKBOX_PumpEvents(_THIS)
     /* poll buttons */
     static long last_keystate = 0;
     unsigned button = rb->button_status();
+
+    rb->button_clear_queue();
+
     unsigned released = ~button & last_keystate;
     unsigned pressed = button & ~last_keystate;
     last_keystate = button;
 
+#ifndef HAS_BUTTON_HOLD
+    /* button combo for menu */
     if(button == BTN_PAUSE)
     {
         rb_press(RBSDL_QUIT, BTN_PAUSE);
+        rb_release(RBSDL_QUIT, BTN_PAUSE);
     }
+#else
+    /* copied from doom */
+    static unsigned int holdbutton = 0;
+    static bool hswitch = 0;
+    if (rb->button_hold()&~holdbutton)
+    {
+        if(hswitch==0)
+        {
+            hswitch=1;
+            rb_press(RBSDL_QUIT, BTN_PAUSE);
+        }
+        else
+        {
+            hswitch=0;
+            rb_release(RBSDL_QUIT, BTN_PAUSE);
+        }
+    }
+    holdbutton=rb->button_hold();
+#endif
 
     if(released)
     {
