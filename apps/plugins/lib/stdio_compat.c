@@ -44,7 +44,10 @@ _FILE_ *_fopen_(const char *path, const char *mode)
 
     /* no empty slots */
     if (i == MAX_STDIO_FILES)
+    {
+        rb->splash(HZ, "no open slots");
         return NULL;
+    }
 
     if (*mode != 'r')
     {
@@ -80,7 +83,8 @@ _FILE_ *_fopen_(const char *path, const char *mode)
 
     if (fd < 0)
     {
-        //rb->splashf(HZ*2, "open of %s failed", path);
+        //extern int errno;
+        //rb->splashf(HZ*2, "open of %s failed (%d)", path, errno);
         return NULL;
     }
 
@@ -104,7 +108,7 @@ size_t _fread_(void *ptr, size_t size, size_t nmemb, _FILE_ *stream)
 
     if (ret < (ssize_t)(size*nmemb))
         stream->error = -1;
-    return ret;
+    return ret / size;
 }
 
 size_t _fwrite_(const void *ptr, size_t size, size_t nmemb, _FILE_ *stream)
@@ -116,7 +120,7 @@ size_t _fwrite_(const void *ptr, size_t size, size_t nmemb, _FILE_ *stream)
         if (ret < (ssize_t)(size*nmemb))
             stream->error = -1;
 
-        return ret;
+        return ret / size;
     }
 #if 1
     else
