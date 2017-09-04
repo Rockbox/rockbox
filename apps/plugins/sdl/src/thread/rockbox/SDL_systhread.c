@@ -33,46 +33,35 @@
 
 #include "plugin.h"
 
-static struct semaphore sem;
-static bool sem_init = false;
-static void *global_args;
+static void *global_args = NULL;
 
 static void rbsdl_runthread(void)
 {
-    SDL_RunThread(global_args);
-    rb->semaphore_release(&sem);
+    void *args = global_args;
+    global_args = NULL;
+    SDL_RunThread(args);
 }
+
+#define MAX_THREAD 4
+static char names[MAX_THREAD][16];
+static char stacks[MAX_THREAD][DEFAULT_STACK_SIZE];
 
 int SDL_SYS_CreateThread(SDL_Thread *thread, void *args)
 {
-    /* memory leak!!! */
-    rb->splash(HZ, "> CreateThread");
-    const size_t sz = DEFAULT_STACK_SIZE;
-    void *stack = malloc(sz);
-
-    if(!sem_init)
-    {
-        rb->splash(HZ, "semaphore init");
-        rb->semaphore_init(&sem, 1, 1);
-        sem_init = true;
-    }
-
-    rb->semaphore_wait(&sem, TIMEOUT_BLOCK);
-
-    char *name = malloc(16);
     static int threadnum = 0;
-    rb->snprintf(name, 16, "sdl_%d", threadnum++);
+    snprintf(names[threadnum], 16, "sdl_%d", threadnum);
 
-    rb->splash(HZ, "create");
+    while(global_args) rb->yield(); /* busy wait */
 
     global_args = args;
 
-    thread->handle = rb->create_thread(rbsdl_runthread, stack, sz,
-                                       0, name /* collisions allowed? */
-                                       IF_PRIO(, PRIORITY_USER_INTERFACE)
+    thread->handle = rb->create_thread(rbsdl_runthread, stacks[threadnum], DEFAULT_STACK_SIZE,
+                                       0, names[threadnum] /* collisions allowed? */
+                                       IF_PRIO(, PRIORITY_REALTIME)
                                        IF_COP(, CPU));
 
-    rb->splash(HZ, "< CreateThread");
+    threadnum++;
+
     return 0;
 }
 

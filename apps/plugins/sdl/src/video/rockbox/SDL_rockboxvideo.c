@@ -31,6 +31,7 @@
 #include "SDL_rockboxvideo.h"
 
 #include "plugin.h"
+#include "fixedpoint.h"
 
 #include "keymaps.h"
 
@@ -44,9 +45,10 @@
 #define RBSDL_UP_RIGHT SDLK_KP9
 #define RBSDL_DOWN_LEFT SDLK_KP1
 #define RBSDL_DOWN_RIGHT SDLK_KP3
-#define RBSDL_FIRE SDLK_SPACE
+#define RBSDL_FIRE SDLK_LCTRL
 #define RBSDL_QUIT SDLK_ESCAPE
-
+#define RBSDL_STRAFELEFT SDLK_a
+#define RBSDL_STRAFERIGHT SDLK_d
 
 /* Initialization/Query functions */
 static int ROCKBOX_VideoInit(_THIS, SDL_PixelFormat *vformat);
@@ -81,6 +83,7 @@ void ROCKBOX_InitOSKeymap(_THIS) {}
 
 static void rb_release(int sdl_sym, Uint8 scancode)
 {
+    LOGF("release key %d", sdl_sym);
     SDL_keysym sym;
     sym.sym = sdl_sym;
     sym.scancode = scancode;
@@ -90,6 +93,7 @@ static void rb_release(int sdl_sym, Uint8 scancode)
 
 static void rb_press(int sdl_sym, Uint8 scancode)
 {
+    LOGF("pressing key %d", sdl_sym);
     SDL_keysym sym;
     sym.sym = sdl_sym;
     sym.scancode = scancode;
@@ -102,19 +106,79 @@ typedef struct WMCursor {} WMCursor;
 int ROCKBOX_ShowWMCursor(_THIS, WMcursor *cursor) { return 0; }
 void ROCKBOX_WarpWMCursor(_THIS, Uint16 x, Uint16 y) {}
 void ROCKBOX_MoveWMCursor(_THIS, int x, int y) {}
+
 void ROCKBOX_PumpEvents(_THIS)
 {
     /* poll buttons */
     static long last_keystate = 0;
-    unsigned button = rb->button_status();
+
+    unsigned button;
+
+    /* wolf3d code */
+#if defined(BUTTON_SCROLL_FWD) && defined(BUTTON_SCROLL_BACK)
+    /* check clickwheel with button_get() */
+    /* strafe right */
+    button = rb->button_get(false);
+    static int a_release = -1, d_release = -1;
+
+    switch(button)
+    {
+    case BUTTON_SCROLL_FWD | BUTTON_REPEAT:
+    case BUTTON_SCROLL_FWD:
+        rb_press(RBSDL_STRAFERIGHT, BUTTON_SCROLL_FWD);
+        d_release = *rb->current_tick + HZ / 25;
+        break;
+    case BUTTON_SCROLL_BACK | BUTTON_REPEAT:
+    case BUTTON_SCROLL_BACK:
+        rb_press(RBSDL_STRAFELEFT, BUTTON_SCROLL_BACK);
+        a_release = *rb->current_tick + HZ / 25;
+        break;
+    default:
+        if(a_release > 0 && TIME_AFTER(*rb->current_tick, a_release))
+        {
+            rb_release(RBSDL_STRAFELEFT, BUTTON_SCROLL_BACK);
+            a_release = -1;
+        }
+        if(d_release > 0 && TIME_AFTER(*rb->current_tick, d_release))
+        {
+            rb_release(RBSDL_STRAFERIGHT, BUTTON_SCROLL_FWD);
+            d_release = -1;
+        }
+        break;
+    }
+#endif
+
+    button = rb->button_status();
+
+    rb->button_clear_queue();
+
     unsigned released = ~button & last_keystate;
     unsigned pressed = button & ~last_keystate;
     last_keystate = button;
 
+#ifndef HAS_BUTTON_HOLD
+    /* button combo for menu */
     if(button == BTN_PAUSE)
     {
         rb_press(RBSDL_QUIT, BTN_PAUSE);
+        rb_release(RBSDL_QUIT, BTN_PAUSE);
     }
+#else
+    /* copied from doom */
+    static bool holdbutton = false;
+    if (rb->button_hold() != holdbutton)
+    {
+        if(holdbutton==0)
+        {
+            rb_press(RBSDL_QUIT, BTN_PAUSE);
+        }
+        else
+        {
+            rb_release(RBSDL_QUIT, BTN_PAUSE);
+        }
+    }
+    holdbutton=rb->button_hold();
+#endif
 
     if(released)
     {
@@ -271,14 +335,18 @@ int ROCKBOX_VideoInit(_THIS, SDL_PixelFormat *vformat)
 
 SDL_Rect **ROCKBOX_ListModes(_THIS, SDL_PixelFormat *format, Uint32 flags)
 {
+#if 0
     static SDL_Rect rect;
     static SDL_Rect *rects[2] = { &rect, NULL };
-    if(format->BitsPerPixel != LCD_DEPTH)
-        return NULL;
     rect.x = rect.y = 0;
     rect.w = LCD_WIDTH;
     rect.h = LCD_HEIGHT;
     return rects;
+#endif
+    if(format->BitsPerPixel != LCD_DEPTH)
+        return NULL;
+    /* we will scale anything, as long as the format is correct */
+    return (SDL_Rect**)-1;
 }
 
 SDL_Surface *ROCKBOX_SetVideoMode(_THIS, SDL_Surface *current,
@@ -292,9 +360,25 @@ SDL_Surface *ROCKBOX_SetVideoMode(_THIS, SDL_Surface *current,
         return NULL;
 
     this->hidden->buffer = SDL_malloc(width * height * (bpp / 8));
+
     if ( ! this->hidden->buffer ) {
         SDL_SetError("Couldn't allocate buffer for requested mode");
         return(NULL);
+    }
+
+    /* scaling buffer, must be big enough to hold the biggest
+     * possible input we can be given */
+    if(width != LCD_WIDTH || height != LCD_HEIGHT)
+    {
+        this->hidden->scale_buffer_input = SDL_malloc(width * height * (bpp / 8));
+        this->hidden->scale_buffer_output = SDL_malloc(LCD_WIDTH * LCD_HEIGHT * (bpp / 8));
+        if ( ! this->hidden->scale_buffer_input || !this->hidden->scale_buffer_output) {
+            SDL_SetError("Couldn't allocate scale buffer for requested mode");
+            return(NULL);
+        }
+
+        this->hidden->scale_x = fp_div(LCD_WIDTH << 16, width << 16, 16);
+        this->hidden->scale_y = fp_div(LCD_HEIGHT << 16, height << 16, 16);
     }
 
 /*      printf("Setting mode %dx%d\n", width, height); */
@@ -341,7 +425,7 @@ static void ROCKBOX_UnlockHWSurface(_THIS, SDL_Surface *surface)
     return;
 }
 
-static fb_data tmp_fb[LCD_WIDTH * LCD_HEIGHT];
+//static fb_data tmp_fb[LCD_WIDTH * LCD_HEIGHT];
 
 static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
 {
@@ -349,6 +433,7 @@ static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
     {
         for(int i = 0; i < numrects; ++i)
         {
+            /* no scaling */
             if(this->hidden->w == LCD_WIDTH && this->hidden->h == LCD_HEIGHT)
             {
                 rb->lcd_bitmap_part(this->screen->pixels,
@@ -366,6 +451,47 @@ static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
                     }
                 }
 #endif
+            }
+            /* we must scale */
+            else
+            {
+                fb_data *ptr = this->hidden->scale_buffer_input;
+                /* first copy the rectangle line-by-line into our
+                 * scaling buffer */
+                for(int y = rects[i].y; y < rects[i].y + rects[i].h; ++y)
+                {
+                    for(int x = rects[i].x; x < rects[i].x + rects[i].w; ++x)
+                    {
+                        *ptr++ = ((fb_data*)this->screen->pixels)[y * this->screen->w + x];
+                    }
+                }
+
+                /* Our scaling input buffer now has the target
+                 * rectangle in it. Now we must scale it down (into
+                 * the output buffer) */
+
+                struct bitmap in_bmp;
+                in_bmp.width = rects[i].w;
+                in_bmp.height = rects[i].h;
+                in_bmp.data = this->hidden->scale_buffer_input;
+
+                int out_w, out_h;
+                int out_x, out_y;
+                struct bitmap out_bmp;
+                out_w = out_bmp.width = fp_mul(rects[i].w << 16, this->hidden->scale_x, 16) >> 16;
+                out_h = out_bmp.height = fp_mul(rects[i].h << 16, this->hidden->scale_y, 16) >> 16;
+                out_bmp.data = this->hidden->scale_buffer_output;
+
+                smooth_resize_bitmap(&in_bmp, &out_bmp);
+
+                out_x = fp_mul(rects[i].x << 16, this->hidden->scale_x, 16) >> 16;
+                out_y = fp_mul(rects[i].y << 16, this->hidden->scale_y, 16) >> 16;
+
+                /* now finally blit the output buffer to the actual
+                 * framebuffer */
+                rb->lcd_bitmap(this->hidden->scale_buffer_output,
+                               out_x, out_y,
+                               out_w, out_h);
             }
         }
         rb->lcd_update();
