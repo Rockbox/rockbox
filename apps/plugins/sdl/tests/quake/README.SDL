@@ -1,0 +1,38 @@
+#define true 1
+#define false 0
+#define true 1
+#define false 0
+
+This is a quick hack of Quake ported to the Simple DirectMedia Layer library.
+http://www.devolution.com/~slouken/SDL/
+
+To build under Linux, simply run ./configure; make
+
+This game requires the original Quake datafiles.  You can get the shareware
+data files from http://www.idsoftware.com/.
+
+Of interest in the original X sources is the following:
+	// Duff's Device
+	count = width;
+	n = (count + 7) / 8;
+	dest = ((PIXEL16 *)src) + x+width - 1;
+	src += x+width - 1;
+
+	switch (count % 8) {
+	case 0:	do {	*dest-- = st2d_8to16table[*src--];
+	case 7:		*dest-- = st2d_8to16table[*src--];
+	case 6:		*dest-- = st2d_8to16table[*src--];
+	case 5:		*dest-- = st2d_8to16table[*src--];
+	case 4:		*dest-- = st2d_8to16table[*src--];
+	case 3:		*dest-- = st2d_8to16table[*src--];
+	case 2:		*dest-- = st2d_8to16table[*src--];
+	case 1:		*dest-- = st2d_8to16table[*src--];
+		} while (--n > 0);
+	}
+This idea may make it into the SDL blitters if it turns out to be faster
+than my current code. :)
+
+Thanks to Zoid, Dave Taylor, John Carmack, and everyone else involved in the
+open source release of id games. :)
+
+- Sam Lantinga (slouken@devolution.com) 12/25/1999

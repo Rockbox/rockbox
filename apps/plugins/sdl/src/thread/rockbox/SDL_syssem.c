@@ -87,7 +87,7 @@ SDL_sem *SDL_CreateSemaphore(Uint32 initial_value)
         return NULL;
     }
 
-    rb->semaphore_init(&sem->s, 99999, initial_value);
+    rb->semaphore_init(&sem->s, 99, initial_value);
 
     return sem;
 }
@@ -135,6 +135,8 @@ int SDL_SemWaitTimeout(SDL_sem *sem, Uint32 timeout)
         return 0;
     else
         return SDL_MUTEX_TIMEDOUT;
+
+    return SDL_MUTEX_TIMEDOUT;
 }
 
 int SDL_SemWait(SDL_sem *sem)
@@ -145,7 +147,7 @@ int SDL_SemWait(SDL_sem *sem)
 Uint32 SDL_SemValue(SDL_sem *sem)
 {
     Uint32 value;
-	
+
     value = 0;
     if ( sem ) {
         value = sem->s.count;
@@ -161,7 +163,7 @@ int SDL_SemPost(SDL_sem *sem)
     }
 
     rb->semaphore_release(&sem->s);
-    
+
     return 0;
 }
 
