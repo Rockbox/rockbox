@@ -44,7 +44,7 @@
 #define RBSDL_UP_RIGHT SDLK_KP9
 #define RBSDL_DOWN_LEFT SDLK_KP1
 #define RBSDL_DOWN_RIGHT SDLK_KP3
-#define RBSDL_FIRE SDLK_SPACE
+#define RBSDL_FIRE SDLK_LCTRL
 #define RBSDL_QUIT SDLK_ESCAPE
 
 
@@ -107,6 +107,9 @@ void ROCKBOX_PumpEvents(_THIS)
     /* poll buttons */
     static long last_keystate = 0;
     unsigned button = rb->button_status();
+
+    rb->button_clear_queue();
+
     unsigned released = ~button & last_keystate;
     unsigned pressed = button & ~last_keystate;
     last_keystate = button;
