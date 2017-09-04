@@ -38,7 +38,16 @@
 #define COMBINED_SDL
 
 /* Enable the dummy audio driver (src/audio/dummy/\*.c) */
-#define SDL_AUDIO_DRIVER_DUMMY  1
+//#define SDL_AUDIO_DRIVER_DISK  1
+
+#ifdef SIMULATOR
+#define RB_SAMPR SAMPR_44
+#else
+#define RB_SAMPR SAMPR_16
+#endif
+
+/* woot */
+#define SDL_AUDIO_DRIVER_ROCKBOX 1
 
 /* Enable the stub cdrom driver (src/cdrom/dummy/\*.c) */
 #define SDL_CDROM_DISABLED      1
@@ -50,10 +59,10 @@
 #define SDL_LOADSO_DISABLED     1
 
 /* Enable the stub thread support (src/thread/generic/\*.c) */
-#define SDL_THREADS_DISABLED    1
+//#define SDL_THREADS_DISABLED    1
 
 /* WIP */
-//#define SDL_THREAD_ROCKBOX     1
+#define SDL_THREAD_ROCKBOX     1
 
 #define SDL_TIMER_ROCKBOX 1
 
@@ -78,6 +87,7 @@
 #define atexit rb_atexit
 #define atoi rb->atoi
 #define calloc tlsf_calloc
+#define SDL_calloc calloc
 #define cos cos_wrapper
 #define fmod fmod_wrapper
 #define free tlsf_free
@@ -109,6 +119,14 @@
 #define sqrt sqrt_wrapper
 #define tan tan_wrapper
 #define fabs fabs_wrapper
+#define lseek rb->lseek
+#define vsnprintf rb->vsnprintf
+#define vsprintf vsprintf_wrapper
+#define unlink remove
+#define pow pow_wrapper
+#define floor floor_wrapper
+#define log rb_log
+#define atan atan_wrapper
 
 #define assert(x) (0)
 
@@ -130,5 +148,13 @@ void rbsdl_atexit(void (*)(void));
 float sqrt_wrapper(float);
 float tan_wrapper(float);
 float fabs_wrapper(float);
+float atan_wrapper(float x);
+float pow_wrapper(float x, float y);
+float rb_log(float x);
+float floor_wrapper(float n);
+
+/* HACK */
+//#define Mix_Chunk void
+//#define MIX_CHANNELS 1
 
 #endif /* _SDL_config_rockbox_h */
