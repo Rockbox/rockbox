@@ -60,7 +60,7 @@
 # include <string.h>
 #endif
 #ifdef HAVE_STRINGS_H
-# include <strings.h>
+//# include <strings.h>
 #endif
 #if defined(HAVE_INTTYPES_H)
 # include <inttypes.h>
