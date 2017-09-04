@@ -3,6 +3,7 @@ main.c
 wrappers.c
 
 /* our programs */
+#if 0
 tests/abe/Directories.c
 tests/abe/Editor.c
 tests/abe/Font.c
@@ -35,8 +36,83 @@ tests/ballerburg/settings.c
 
 tests/raytrace/main.c
 tests/raytrace/vector.c
+#endif
 
-//#if 0
+#if 1
+tests/wolf3d/fmopl.c
+tests/wolf3d/id_ca.c
+tests/wolf3d/id_in.c
+tests/wolf3d/id_pm.c
+tests/wolf3d/id_sd.c
+tests/wolf3d/id_us_1.c
+tests/wolf3d/id_vh.c
+tests/wolf3d/id_vl.c
+tests/wolf3d/signon.c
+tests/wolf3d/wl_act1.c
+tests/wolf3d/wl_act2.c
+tests/wolf3d/wl_agent.c
+tests/wolf3d/wl_atmos.c
+tests/wolf3d/wl_cloudsky.c
+tests/wolf3d/wl_debug.c
+tests/wolf3d/wl_dir3dspr.c
+tests/wolf3d/wl_draw.c
+tests/wolf3d/wl_floorceiling.c
+tests/wolf3d/wl_game.c
+tests/wolf3d/wl_inter.c
+tests/wolf3d/wl_main.c
+tests/wolf3d/wl_menu.c
+tests/wolf3d/wl_parallax.c
+tests/wolf3d/wl_play.c
+tests/wolf3d/wl_shade.c
+tests/wolf3d/wl_state.c
+tests/wolf3d/wl_text.c
+#endif
+
+tests/duke3d/Engine/src/cache.c
+tests/duke3d/Engine/src/display.c
+tests/duke3d/Engine/src/draw.c
+tests/duke3d/Engine/src/dummy_multi.c
+tests/duke3d/Engine/src/engine.c
+tests/duke3d/Engine/src/filesystem.c
+tests/duke3d/Engine/src/fixedPoint_math.c
+tests/duke3d/Engine/src/icon.c
+tests/duke3d/Engine/src/mmulti.c
+tests/duke3d/Engine/src/network.c
+tests/duke3d/Engine/src/tiles.c
+tests/duke3d/Game/src/audiolib/fx_man.c
+tests/duke3d/Game/src/audiolib/dsl.c
+tests/duke3d/Game/src/audiolib/ll_man.c
+tests/duke3d/Game/src/audiolib/multivoc.c
+tests/duke3d/Game/src/audiolib/mv_mix.c
+tests/duke3d/Game/src/audiolib/mvreverb.c
+tests/duke3d/Game/src/audiolib/nodpmi.c
+tests/duke3d/Game/src/audiolib/pitch.c
+tests/duke3d/Game/src/audiolib/user.c
+tests/duke3d/Game/src/audiolib/usrhooks.c
+tests/duke3d/Game/src/actors.c
+tests/duke3d/Game/src/animlib.c
+tests/duke3d/Game/src/config.c
+tests/duke3d/Game/src/console.c
+tests/duke3d/Game/src/control.c
+tests/duke3d/Game/src/cvar_defs.c
+tests/duke3d/Game/src/cvars.c
+tests/duke3d/Game/src/dummy_audiolib.c
+tests/duke3d/Game/src/game.c
+tests/duke3d/Game/src/gamedef.c
+tests/duke3d/Game/src/global.c
+tests/duke3d/Game/src/keyboard.c
+tests/duke3d/Game/src/menues.c
+tests/duke3d/Game/src/midi/sdl_midi.c
+tests/duke3d/Game/src/player.c
+tests/duke3d/Game/src/premap.c
+tests/duke3d/Game/src/rts.c
+tests/duke3d/Game/src/scriplib.c
+tests/duke3d/Game/src/sector.c
+tests/duke3d/Game/src/sounds.c
+
+tests/testsound.c
+
+#if 0
 tests/ballfield.c
 tests/parallax3.c
 tests/parallax4.c
@@ -47,7 +123,7 @@ tests/testhread.c
 tests/testplatform.c
 tests/testsprite.c
 tests/testwin.c
-//#endif
+#endif
 
 /* SDL lib */
 src/SDL.c
@@ -61,8 +137,9 @@ src/audio/SDL_mixer_MMX.c
 src/audio/SDL_mixer_MMX_VC.c
 src/audio/SDL_mixer_m68k.c
 src/audio/SDL_wave.c
-src/audio/disk/SDL_diskaudio.c
-src/audio/dummy/SDL_dummyaudio.c
+//src/audio/disk/SDL_diskaudio.c
+//src/audio/dummy/SDL_dummyaudio.c
+src/audio/rockbox/SDL_rockboxaudio.c
 src/cdrom/SDL_cdrom.c
 src/cdrom/dummy/SDL_syscdrom.c
 src/cpuinfo/SDL_cpuinfo.c
@@ -84,7 +161,7 @@ src/stdlib/SDL_qsort.c
 src/stdlib/SDL_stdlib.c
 src/stdlib/SDL_string.c
 src/thread/SDL_thread.c
-#if 0
+#if 1
 src/thread/rockbox/SDL_syscond.c
 src/thread/rockbox/SDL_sysmutex.c
 src/thread/rockbox/SDL_syssem.c
@@ -134,3 +211,44 @@ SDL_image/IMG_xcf.c
 SDL_image/IMG_xpm.c
 SDL_image/IMG_xv.c
 SDL_image/IMG_xxx.c
+
+/* Mix */
+SDL_mixer/dynamic_flac.c
+SDL_mixer/dynamic_fluidsynth.c
+SDL_mixer/dynamic_mod.c
+SDL_mixer/dynamic_mp3.c
+SDL_mixer/dynamic_ogg.c
+SDL_mixer/effect_position.c
+SDL_mixer/effects_internal.c
+SDL_mixer/effect_stereoreverse.c
+SDL_mixer/fluidsynth.c
+SDL_mixer/load_aiff.c
+SDL_mixer/load_flac.c
+SDL_mixer/load_ogg.c
+SDL_mixer/load_voc.c
+SDL_mixer/mixer.c
+SDL_mixer/music.c
+SDL_mixer/music_cmd.c
+SDL_mixer/music_flac.c
+SDL_mixer/music_mad.c
+SDL_mixer/music_mod.c
+SDL_mixer/music_modplug.c
+SDL_mixer/music_ogg.c
+SDL_mixer/wavestream.c
+
+/* doesn't work */
+#if 0
+SDL_mixer/timidity/common.c
+SDL_mixer/timidity/ctrlmode.c
+SDL_mixer/timidity/filter.c
+SDL_mixer/timidity/instrum.c
+SDL_mixer/timidity/mix.c
+SDL_mixer/timidity/output.c
+SDL_mixer/timidity/playmidi.c
+SDL_mixer/timidity/readmidi.c
+SDL_mixer/timidity/resample.c
+SDL_mixer/timidity/sdl_a.c
+SDL_mixer/timidity/sdl_c.c
+SDL_mixer/timidity/tables.c
+SDL_mixer/timidity/timidity.c
+#endif
