@@ -74,7 +74,7 @@ int SDL_SemPost(SDL_sem *sem)
 
 struct SDL_semaphore
 {
-    struct semaphore s;
+    int s;
 };
 
 SDL_sem *SDL_CreateSemaphore(Uint32 initial_value)
@@ -87,8 +87,8 @@ SDL_sem *SDL_CreateSemaphore(Uint32 initial_value)
         return NULL;
     }
 
-    rb->semaphore_init(&sem->s, 99999, initial_value);
-
+    sem->s = initial_value;
+    
     return sem;
 }
 
@@ -113,8 +113,10 @@ int SDL_SemTryWait(SDL_sem *sem)
 
     retval = SDL_MUTEX_TIMEDOUT;
 
-    if(rb->semaphore_wait(&sem->s, 0) == OBJ_WAIT_SUCCEEDED)
+    if(sem->s <= 0)
         retval = 0;
+    else
+        sem->s--;
 
     return retval;
 }
@@ -131,10 +133,18 @@ int SDL_SemWaitTimeout(SDL_sem *sem, Uint32 timeout)
         return SDL_SemTryWait(sem);
     }
 
-    if(rb->semaphore_wait(&sem->s, timeout / (1000 / HZ)) == OBJ_WAIT_SUCCEEDED)
-        return 0;
-    else
-        return SDL_MUTEX_TIMEDOUT;
+    long stop = *rb->current_tick + timeout / (1000 / HZ);
+    while(!TIME_AFTER(*rb->current_tick, stop))
+    {
+        if(sem->s > 0)
+        {
+            sem->s--;
+            return 0;
+        }
+        rb->yield();
+    }
+
+    return SDL_MUTEX_TIMEDOUT;
 }
 
 int SDL_SemWait(SDL_sem *sem)
@@ -145,10 +155,10 @@ int SDL_SemWait(SDL_sem *sem)
 Uint32 SDL_SemValue(SDL_sem *sem)
 {
     Uint32 value;
-	
+
     value = 0;
     if ( sem ) {
-        value = sem->s.count;
+        value = sem->s;
     }
     return value;
 }
@@ -160,8 +170,8 @@ int SDL_SemPost(SDL_sem *sem)
         return -1;
     }
 
-    rb->semaphore_release(&sem->s);
-    
+    sem->s++;
+
     return 0;
 }
 

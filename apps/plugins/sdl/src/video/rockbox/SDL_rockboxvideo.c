@@ -44,9 +44,10 @@
 #define RBSDL_UP_RIGHT SDLK_KP9
 #define RBSDL_DOWN_LEFT SDLK_KP1
 #define RBSDL_DOWN_RIGHT SDLK_KP3
-#define RBSDL_FIRE SDLK_SPACE
+#define RBSDL_FIRE SDLK_LCTRL
 #define RBSDL_QUIT SDLK_ESCAPE
-
+#define RBSDL_STRAFELEFT SDLK_a
+#define RBSDL_STRAFERIGHT SDLK_d
 
 /* Initialization/Query functions */
 static int ROCKBOX_VideoInit(_THIS, SDL_PixelFormat *vformat);
@@ -81,6 +82,7 @@ void ROCKBOX_InitOSKeymap(_THIS) {}
 
 static void rb_release(int sdl_sym, Uint8 scancode)
 {
+    LOGF("release key %d", sdl_sym);
     SDL_keysym sym;
     sym.sym = sdl_sym;
     sym.scancode = scancode;
@@ -90,6 +92,7 @@ static void rb_release(int sdl_sym, Uint8 scancode)
 
 static void rb_press(int sdl_sym, Uint8 scancode)
 {
+    LOGF("pressing key %d", sdl_sym);
     SDL_keysym sym;
     sym.sym = sdl_sym;
     sym.scancode = scancode;
@@ -102,19 +105,77 @@ typedef struct WMCursor {} WMCursor;
 int ROCKBOX_ShowWMCursor(_THIS, WMcursor *cursor) { return 0; }
 void ROCKBOX_WarpWMCursor(_THIS, Uint16 x, Uint16 y) {}
 void ROCKBOX_MoveWMCursor(_THIS, int x, int y) {}
+
 void ROCKBOX_PumpEvents(_THIS)
 {
     /* poll buttons */
     static long last_keystate = 0;
-    unsigned button = rb->button_status();
+
+    /* wolf3d code */
+#if defined(BUTTON_SCROLL_FWD) && defined(BUTTON_SCROLL_BACK)
+    /* check clickwheel with button_get() */
+    /* strafe right */
+    unsigned button = rb->button_get(false);
+    static int a_release = -1, d_release = -1;
+
+    switch(button)
+    {
+    case BUTTON_SCROLL_FWD | BUTTON_REPEAT:
+    case BUTTON_SCROLL_FWD:
+        rb_press(RBSDL_STRAFERIGHT, BUTTON_SCROLL_FWD);
+        d_release = *rb->current_tick + HZ / 25;
+        break;
+    case BUTTON_SCROLL_BACK | BUTTON_REPEAT:
+    case BUTTON_SCROLL_BACK:
+        rb_press(RBSDL_STRAFELEFT, BUTTON_SCROLL_BACK);
+        a_release = *rb->current_tick + HZ / 25;
+        break;
+    default:
+        if(a_release > 0 && TIME_AFTER(*rb->current_tick, a_release))
+        {
+            rb_release(RBSDL_STRAFELEFT, BUTTON_SCROLL_BACK);
+            a_release = -1;
+        }
+        if(d_release > 0 && TIME_AFTER(*rb->current_tick, d_release))
+        {
+            rb_release(RBSDL_STRAFERIGHT, BUTTON_SCROLL_FWD);
+            d_release = -1;
+        }
+        break;
+    }
+#endif
+
+    button = rb->button_status();
+
+    rb->button_clear_queue();
+
     unsigned released = ~button & last_keystate;
     unsigned pressed = button & ~last_keystate;
     last_keystate = button;
 
+#ifndef HAS_BUTTON_HOLD
+    /* button combo for menu */
     if(button == BTN_PAUSE)
     {
         rb_press(RBSDL_QUIT, BTN_PAUSE);
+        rb_release(RBSDL_QUIT, BTN_PAUSE);
     }
+#else
+    /* copied from doom */
+    static bool holdbutton = false;
+    if (rb->button_hold() != holdbutton)
+    {
+        if(holdbutton==0)
+        {
+            rb_press(RBSDL_QUIT, BTN_PAUSE);
+        }
+        else
+        {
+            rb_release(RBSDL_QUIT, BTN_PAUSE);
+        }
+    }
+    holdbutton=rb->button_hold();
+#endif
 
     if(released)
     {
@@ -341,7 +402,7 @@ static void ROCKBOX_UnlockHWSurface(_THIS, SDL_Surface *surface)
     return;
 }
 
-static fb_data tmp_fb[LCD_WIDTH * LCD_HEIGHT];
+//static fb_data tmp_fb[LCD_WIDTH * LCD_HEIGHT];
 
 static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
 {
