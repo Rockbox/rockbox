@@ -109,6 +109,14 @@
 #define sqrt sqrt_wrapper
 #define tan tan_wrapper
 #define fabs fabs_wrapper
+#define lseek rb->lseek
+#define vsnprintf rb->vsnprintf
+#define vsprintf vsprintf_wrapper
+#define unlink remove
+#define pow pow_wrapper
+#define floor floor_wrapper
+#define log rb_log
+#define atan atan_wrapper
 
 #define assert(x) (0)
 
@@ -130,5 +138,13 @@ void rbsdl_atexit(void (*)(void));
 float sqrt_wrapper(float);
 float tan_wrapper(float);
 float fabs_wrapper(float);
+float atan_wrapper(float x);
+float pow_wrapper(float x, float y);
+float rb_log(float x);
+float floor_wrapper(float n);
+
+/* HACK */
+#define Mix_Chunk void
+#define MIX_CHANNELS 1
 
 #endif /* _SDL_config_rockbox_h */

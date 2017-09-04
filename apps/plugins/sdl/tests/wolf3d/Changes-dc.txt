@@ -1,0 +1,17 @@
+1.7 <February 01, 2009>
+- Saved game description saved to VMS header
+- Adjustments made to LCD
+- VMU loading code improved
+- Miscellaneous code clean ups
+- Work started on new disc check code
+
+1.6 <October 04, 2008>
+- Getting the DC port up-to-date
+
+1.5 <May 25, 2008>
+- Mouse support
+- Weapon switch support
+- Controllers with C & Z button support
+- Command line parameters via 'params.txt' support
+- SOD mission pack support via menu
+- Commercial CD-ROM swap support
