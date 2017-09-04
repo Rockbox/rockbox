@@ -1,0 +1,79 @@
+TARGET = 1ST_READ.BIN
+
+include $(KOS_BASE)/Makefile.rules
+
+#KOS_ROMDISK_DIR = romdisk
+
+#OBJS += romdisk.o
+OBJS += dc/dc_cd.o
+OBJS += dc/dc_main.o
+OBJS += dc/dc_maple.o
+OBJS += dc/dc_video.o
+OBJS += dc/dc_vmu.o
+OBJS += fmopl.o
+OBJS += id_ca.o
+OBJS += id_in.o
+OBJS += id_pm.o
+OBJS += id_sd.o
+OBJS += id_us_1.o
+OBJS += id_vh.o
+OBJS += id_vl.o
+OBJS += signon.o
+OBJS += wl_act1.o
+OBJS += wl_act2.o
+OBJS += wl_agent.o
+OBJS += wl_atmos.o
+OBJS += wl_cloudsky.o
+OBJS += wl_debug.o
+OBJS += wl_draw.o
+OBJS += wl_floorceiling.o
+OBJS += wl_game.o
+OBJS += wl_inter.o
+OBJS += wl_main.o
+OBJS += wl_menu.o
+OBJS += wl_parallax.o
+OBJS += wl_play.o
+OBJS += wl_state.o
+OBJS += wl_text.o
+
+KOS_CFLAGS += -I${KOS_BASE}/../kos-ports/include/SDL
+
+all: rm-elf $(TARGET)
+
+clean:
+	-rm -f Wolf4SDL.bin Wolf4SDL.elf $(OBJS)
+
+rm-elf:
+	-rm -f $(TARGET) Wolf4SDL.bin Wolf4SDL.elf
+
+Wolf4SDL.elf: $(OBJS)
+	$(KOS_CC) $(KOS_CFLAGS) $(KOS_LDFLAGS) -o Wolf4SDL.elf $(KOS_START) \
+		$(OBJS) -lSDL_mixer -lSDL -lm -lz $(OBJEXTRA) $(KOS_LIBS)
+
+Wolf4SDL.bin: Wolf4SDL.elf
+	kos-objcopy -O binary -R .stack Wolf4SDL.elf Wolf4SDL.bin
+
+1ST_READ.BIN: Wolf4SDL.bin
+	$(SCRAMBLE) Wolf4SDL.bin make-cd/1ST_READ.BIN
+
+##############################################################################
+#dc-tool IP commands for BBA\LAN owners.
+#
+#It enables uploading binaries directly to your Dreamcast from your PC and
+#also allows for remote debugging.
+#
+#You'll have to change the IP to your BBA\LAN's IP and also the MAC address,
+#if your dc-tool IP needs ARP.
+##############################################################################
+
+#arp:
+#	arp.exe -s 192.168.1.137 00-d0-f1-02-8a-f9
+
+run: Wolf4SDL.elf
+	$(DCTOOL_IP) -t 192.168.1.137 -i data.iso -x Wolf4SDL.elf
+
+debug: Wolf4SDL.elf
+	$(DCTOOL_IP) -g -t 192.168.1.137 -i data.iso -x Wolf4SDL.elf & sh-elf-insight.exe Wolf4SDL.elf
+
+reset:
+	$(DCTOOL_IP) -r -t 192.168.1.137
