@@ -362,6 +362,30 @@ $releasenotes="/wiki/ReleaseNotes314";
         name => 'Sony NWZ-E370/E380',
         status => 3,
     },
+    'sonynwze450' => {
+        name => 'Sony NWZ-E450',
+        status => 2,
+    },
+    'sonynwze460' => {
+        name => 'Sony NWZ-E460',
+        status => 2,
+    },
+    'sonynwze470' => {
+        name => 'Sony NWZ-E470',
+        status => 2,
+    },
+    'sonynwze580' => {
+        name => 'Sony NWZ-E580',
+        status => 2,
+    },
+    'sonynwza10' => {
+        name => 'Sony NWZ-A10',
+        status => 2,
+    },
+    'sonynwa20' => {
+        name => 'Sony NW-A20',
+        status => 2,
+    },
     'creativezenxfi' => {
         name => 'Creative Zen X-Fi',
         status => 3
