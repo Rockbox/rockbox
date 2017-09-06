@@ -35,6 +35,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
+#include <system.h>
 
 /* device types */
 #define DEV_KEY     0   /* icx_keys driver */
@@ -70,64 +71,64 @@ static bool touch_detect;
 /* get touchscreen information and init state */
 int ts_init_state(int fd)
 {
-    memset(state, 0, sizeof(struct nwz_ts_state_t));
+    memset(&ts_state, 0, sizeof(ts_state));
     struct input_absinfo info;
     if(ioctl(fd, EVIOCGABS(ABS_X), &info) < 0)
         return -1;
-    state->max_x = info.maximum;
+    ts_state.max_x = info.maximum;
     if(ioctl(fd, EVIOCGABS(ABS_Y), &info) < 0)
         return -1;
-    state->max_y = info.maximum;
+    ts_state.max_y = info.maximum;
     if(ioctl(fd, EVIOCGABS(ABS_PRESSURE), &info) < 0)
         return -1;
-    state->max_pressure = info.maximum;
+    ts_state.max_pressure = info.maximum;
     if(ioctl(fd, EVIOCGABS(ABS_TOOL_WIDTH), &info) < 0)
         return -1;
-    state->max_tool_width = info.maximum;
+    ts_state.max_tool_width = info.maximum;
     touch_detect = false;
     return 0;
 }
 
-void handle_touch(struct input_event *evt)
+void handle_touch(struct input_event evt)
 {
-    switch(evt->type)
+    switch(evt.type)
     {
         case EV_SYN:
             /* on SYN, we copy the state to the rockbox state */
-            touch_x = ts_state->x;
-            touch_y = ts_state->y;
+            touch_x = ts_state.x;
+            touch_y = ts_state.y;
             /* map coordinate to screen */
-            x = x * LCD_WIDTH / ts_state->max_x;
-            y = y * LCD_HEIGHT / ts_state->max_y;
+            touch_x = touch_x * LCD_WIDTH / ts_state.max_x;
+            touch_y = touch_y * LCD_HEIGHT / ts_state.max_y;
             /* don't trust driver reported ranges */
-            x = MAX(0, MIN(x, LCD_WIDTH - 1));
-            y = MAX(0, MIN(y, LCD_HEIGHT - 1));
-            touch_detect = ts_state->touch;
+            touch_x = MAX(0, MIN(touch_x, LCD_WIDTH - 1));
+            touch_y = MAX(0, MIN(touch_y, LCD_HEIGHT - 1));
+            touch_detect = ts_state.touch;
             /* reset flick */
-            state->flick = false;
+            ts_state.flick = false;
             break;
         case EV_REL:
-            if(evt->code == REL_RX)
-                state->flick_x = evt->value;
-            else if(evt->code == REL_RY)
-                state->flick_y = evt->value;
+            if(evt.code == REL_RX)
+                ts_state.flick_x = evt.value;
+            else if(evt.code == REL_RY)
+                ts_state.flick_y = evt.value;
             else
                 break;
-            state->flick = true;
+            ts_state.flick = true;
             break;
         case EV_ABS:
-            if(evt->code == ABS_X)
-                state->x = evt->value;
-            else if(evt->code == ABS_Y)
-                state->y = evt->value;
-            else if(evt->code == ABS_PRESSURE)
-                state->pressure = evt->value;
-            else if(evt->code == ABS_TOOL_WIDTH)
-                state->tool_width = evt->value;
+            if(evt.code == ABS_X)
+                ts_state.x = evt.value;
+            else if(evt.code == ABS_Y)
+                ts_state.y = evt.value;
+            else if(evt.code == ABS_PRESSURE)
+                ts_state.pressure = evt.value;
+            else if(evt.code == ABS_TOOL_WIDTH)
+                ts_state.tool_width = evt.value;
             break;
         case EV_KEY:
-            if(evt->code == BTN_TOUCH)
-                state->touch = evt->value;
+            if(evt.code == BTN_TOUCH)
+                ts_state.touch = evt.value;
             break;
         default:
             break;
@@ -296,7 +297,8 @@ int button_read_device(
         }
     }
 #ifdef HAVE_TOUCHSCREEN
-    button_bitmap |= touchscreen_to_pixels(touch_x, touch_y, data);
+    if(touch_detect)
+        button_bitmap |= touchscreen_to_pixels(touch_x, touch_y, data);
 #endif
     return hold_status ? 0 : button_bitmap;
 }

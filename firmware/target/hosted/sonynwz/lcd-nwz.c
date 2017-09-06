@@ -47,7 +47,7 @@ void identify_fb(const char *id)
         nwz_fb_type = FB_EMXX;
     else
         nwz_fb_type = FB_OTHER;
-    printf("lcd: fb id = '%s -> type = %d\n", id, nwz_fb_type);
+    printf("lcd: fb id = '%s' -> type = %d\n", id, nwz_fb_type);
 }
 
 /* select which page (0 or 1) to display, disable DSP, transparency and rotation */

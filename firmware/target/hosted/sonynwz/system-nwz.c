@@ -167,15 +167,21 @@ void system_reboot(void)
     power_off();
 }
 
+#ifdef HAVE_BUTTON_DATA
+#define IF_DATA(data) data
+#else
+#define IF_DATA(data)
+#endif
 void system_exception_wait(void)
 {
     backlight_hw_on();
     backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
     /* wait until button press and release */
-    while(button_read_device() != 0) {}
-    while(button_read_device() == 0) {}
-    while(button_read_device() != 0) {}
-    while(button_read_device() == 0) {}
+    IF_DATA(int data);
+    while(button_read_device(IF_DATA(&data)) != 0) {}
+    while(button_read_device(IF_DATA(&data)) == 0) {}
+    while(button_read_device(IF_DATA(&data)) != 0) {}
+    while(button_read_device(IF_DATA(&data)) == 0) {}
 }
 
 int hostfs_init(void)
