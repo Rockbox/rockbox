@@ -123,7 +123,6 @@ typedef struct
   ---------------------------------------------------------------------------
 */
 
-static const char null_key_v1[]  = "CTL:N0MAD|PDE0.SIGN.";
 static const char null_key_v2[]  = "CTL:N0MAD|PDE0.DPMP.";
 static const char null_key_v3[]  = "CTL:Z3N07|PDE0.DPMP.";
 static const char null_key_v4[]  = "CTL:N0MAD|PDE0.DPFP.";

@@ -359,7 +359,6 @@ bool dbg_hw_info_audio(void)
 
         lcd_clear_display();
         int line = 0;
-        unsigned int val;
 
         lcd_putsf(0, line++, "vol: %d dB", vol);
 
