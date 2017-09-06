@@ -35,7 +35,11 @@ ANDROID_PLATFORM=$(ANDROID_SDK_PATH)/platforms/android-$(ANDROID_PLATFORM_VERSIO
 BUILD_TOOLS_VERSION=$(notdir $(firstword $(wildcard $(ANDROID_SDK_PATH)/build-tools/$(ANDROID_PLATFORM_VERSION).*)))
 AAPT=$(ANDROID_SDK_PATH)/build-tools/$(BUILD_TOOLS_VERSION)/aapt
 DX=$(ANDROID_SDK_PATH)/build-tools/$(BUILD_TOOLS_VERSION)/dx
-ZIPALIGN=$(ANDROID_SDK_PATH)/tools/zipalign
+ifneq ("$(wildcard $(ANDROID_SDK_PATH)/tools/zipalign)","")
+    ZIPALIGN=$(ANDROID_SDK_PATH)/tools/zipalign
+else
+    ZIPALIGN=$(ANDROID_SDK_PATH)/build-tools/$(BUILD_TOOLS_VERSION)/zipalign
+endif
 KEYSTORE=$(HOME)/.android/debug.keystore
 ADB=$(ANDROID_SDK_PATH)/platform-tools/adb
 BUILDAPK=$(ANDROID_DIR)/buildapk.sh
