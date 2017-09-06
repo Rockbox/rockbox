@@ -184,7 +184,12 @@ static int calc_freq(int clk)
                     return 0;
             }
         case CLK_I2C:
-            return calc_freq(CLK_PCLK)/AS3525_I2C_PRESCALER;
+#if CONFIG_CPU == AS3525
+            if (cpu_frequency == CPUFREQ_MAX)
+                return calc_freq(CLK_PCLK)/AS3525_I2C_PRESCALER_BOOSTED;
+            else
+#endif
+                return calc_freq(CLK_PCLK)/AS3525_I2C_PRESCALER;
         case CLK_I2SI:
             switch((CGU_AUDIO>>12) & 3) {
                 case 0:
@@ -220,7 +225,7 @@ static int calc_freq(int clk)
         case CLK_SD_MCLK_MSD:
             if(!(MCI_SD & (1<<8)))
                 return 0;
-            else if(MCI_SD & (1<<10))
+            else if(MCI_SD & (1<<10)) /* bypass */
                 return calc_freq(CLK_PCLK);
             else
             return calc_freq(CLK_PCLK)/(((MCI_SD & 0xff)+1)*2);
@@ -293,21 +298,21 @@ bool dbg_hw_info(void)
         lcd_puts(0, line++, "[Clock Frequencies:]");
         lcd_puts(0, line++, "     SET       ACTUAL");
 #if CONFIG_CPU == AS3525
-        lcd_putsf(0, line++, "922T:%s     %3dMHz",
+        lcd_putsf(0, line++, "922T:%s        %6dKHz",
                                         (!(read_cp15()>>30)) ? "FAST " :
                                         (read_cp15()>>31) ? "ASYNC" : "SYNC ",
 #else
-        lcd_putsf(0, line++, "926ejs:        %3dMHz",
+        lcd_putsf(0, line++, "926ejs:        %6dKHz",
 #endif
-                                         calc_freq(CLK_PROC)/1000000);
-        lcd_putsf(0, line++, "PLLA:%3dMHz    %3dMHz", AS3525_PLLA_FREQ/1000000,
-                                                   calc_freq(CLK_PLLA)/1000000);
-        lcd_putsf(0, line++, "PLLB:          %3dMHz", calc_freq(CLK_PLLB)/1000000);
-        lcd_putsf(0, line++, "FCLK:          %3dMHz", calc_freq(CLK_FCLK)/1000000);
-        lcd_putsf(0, line++, "DRAM:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
-                                                 calc_freq(CLK_EXTMEM)/1000000);
-        lcd_putsf(0, line++, "PCLK:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
-                                                   calc_freq(CLK_PCLK)/1000000);
+                                         calc_freq(CLK_PROC)/1000);
+        lcd_putsf(0, line++, "PLLA:%6dKHz    %6dKHz", AS3525_PLLA_FREQ/1000,
+                                                   calc_freq(CLK_PLLA)/1000);
+        lcd_putsf(0, line++, "PLLB:             %6dKHz", calc_freq(CLK_PLLB)/1000);
+        lcd_putsf(0, line++, "FCLK:             %6dKHz", calc_freq(CLK_FCLK)/1000);
+        lcd_putsf(0, line++, "DRAM:%6dKHz    %6dKHz", AS3525_PCLK_FREQ/1000,
+                                                 calc_freq(CLK_EXTMEM)/1000);
+        lcd_putsf(0, line++, "PCLK:%6dKHz    %6dKHz", AS3525_PCLK_FREQ/1000,
+                                                   calc_freq(CLK_PCLK)/1000);
 
 #if LCD_HEIGHT < 176  /* clip  */
         lcd_update();
@@ -323,16 +328,16 @@ bool dbg_hw_info(void)
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
 
-        lcd_putsf(0, line++, "IDE :%3dMHz    %3dMHz", AS3525_IDE_FREQ/1000000,
-                                                    calc_freq(CLK_IDE)/1000000);
-        lcd_putsf(0, line++, "DBOP:%3dMHz    %3dMHz", AS3525_DBOP_FREQ/1000000,
-                                                   calc_freq(CLK_DBOP)/1000000);
-        lcd_putsf(0, line++, "I2C :%3dkHz    %3dkHz", AS3525_I2C_FREQ/1000,
+        lcd_putsf(0, line++, "IDE :%6dKHz    %6dKHz", AS3525_IDE_FREQ/1000,
+                                                    calc_freq(CLK_IDE)/1000);
+        lcd_putsf(0, line++, "DBOP:%6dKHz    %6dKHz", AS3525_DBOP_FREQ/1000,
+                                                   calc_freq(CLK_DBOP)/1000);
+        lcd_putsf(0, line++, "I2C :%6dkHz    %6dkHz", AS3525_I2C_FREQ/1000,
                                                        calc_freq(CLK_I2C)/1000);
-        lcd_putsf(0, line++, "I2SI: %s      %3dMHz", (CGU_AUDIO & (1<<23)) ?
-                                   "on " : "off" , calc_freq(CLK_I2SI)/1000000);
-        lcd_putsf(0, line++, "I2SO: %s      %3dMHz", (CGU_AUDIO & (1<<11)) ?
-                                    "on " : "off", calc_freq(CLK_I2SO)/1000000);
+        lcd_putsf(0, line++, "I2SI: %s         %6dKHz", (CGU_AUDIO & (1<<23)) ?
+                                   "on " : "off" , calc_freq(CLK_I2SI)/1000);
+        lcd_putsf(0, line++, "I2SO: %s         %6dKHz", (CGU_AUDIO & (1<<11)) ?
+                                    "on " : "off", calc_freq(CLK_I2SO)/1000);
 #if CONFIG_CPU == AS3525
         /* If disabled, enable SD cards so we can read the registers */
         if(sd_enabled == false)
@@ -345,18 +350,18 @@ bool dbg_hw_info(void)
             sd_enable(false);
         }
 
-        lcd_putsf(0, line++, "SD  :%3dMHz    %3dMHz",
-            ((AS3525_IDE_FREQ/ 1000000) /
+        lcd_putsf(0, line++, "SD  :%6dKHz    %6dKHz",
+            ((AS3525_IDE_FREQ/ 1000) /
             ((last_nand & MCI_CLOCK_BYPASS)? 1:(((last_nand & 0xff)+1) * 2))),
-            calc_freq(CLK_SD_MCLK_NAND)/1000000);
+            calc_freq(CLK_SD_MCLK_NAND)/1000);
 #ifdef HAVE_MULTIDRIVE
-        lcd_putsf(0, line++, "uSD :%3dMHz    %3dMHz",
-            ((AS3525_PCLK_FREQ/ 1000000) /
+        lcd_putsf(0, line++, "uSD :%6dKHz    %6dKHz",
+            ((calc_freq(CLK_PCLK)/ 1000) /
             ((last_sd & MCI_CLOCK_BYPASS) ? 1: (((last_sd & 0xff) + 1) * 2))),
-            calc_freq(CLK_SD_MCLK_MSD)/1000000);
+            calc_freq(CLK_SD_MCLK_MSD)/1000);
 #endif
 #endif  /* CONFIG_CPU == AS3525 */
-        lcd_putsf(0, line++, "USB :          %3dMHz", calc_freq(CLK_USB)/1000000);
+        lcd_putsf(0, line++, "USB :             %6dKHz", calc_freq(CLK_USB)/1000);
 
 #if LCD_HEIGHT < 176  /* clip  */
         lcd_update();

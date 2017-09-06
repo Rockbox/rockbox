@@ -43,7 +43,7 @@ unsigned short dbop_read_input(void)
     /* make sure that the DBOP FIFO is empty */
     while ((DBOP_STAT & (1<<10)) == 0);
 
-    int delay = 10;
+    int delay = 20;
     while (delay--) asm volatile ("nop\n");
 
     /* write DBOP_DOUT to pre-charge DBOP data lines with a defined level */
