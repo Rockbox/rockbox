@@ -49,6 +49,12 @@ struct mutex cpufreq_mtx;
 #define CVDD_1_10          2
 #define CVDD_1_05          3
 
+/* FIXME */
+#define I2C2_CPSR0      *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x1C))
+#define I2C2_CPSR1      *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x20))
+extern void sd_set_boosted_divider(void);
+extern void sd_set_unboosted_divider(void);
+
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
 
@@ -352,7 +358,11 @@ void kernel_device_init(void)
     /* CVDD2:     set CVDD2 power supply (digital for DAC/SD/etc) to 2.75V */
     ascodec_write_pmu(0x17, 2, 0x80 | 115);
 #else /* HAVE_AS3543 */
+#if CONFIG_CPU == AS3525
+    ascodec_write(AS3514_CVDD_DCDC3, AS314_CP_DCDC3_SETTING|CVDD_1_10);
+#else
     ascodec_write(AS3514_CVDD_DCDC3, AS314_CP_DCDC3_SETTING);
+#endif
 #endif /* HAVE_AS3543 */
 
 #ifndef BOOTLOADER
@@ -362,6 +372,8 @@ void kernel_device_init(void)
     VIC_INT_ENABLE = (INTERRUPT_GPIOA);
     /* pin selection for irq happens in the drivers */
 #endif
+
+
 
 #if CONFIG_TUNER
     fmradio_i2c_init();
@@ -447,7 +459,9 @@ void set_cpu_frequency(long frequency)
     }
     else if(frequency == CPUFREQ_MAX)
     {
-#ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE) && (CPUFREQ_MAX > 200000000)
+        /* This doesn't work anymore. It was written before ascodec
+           was switched to use interrupts */
         /* Increasing frequency so boost voltage before change */
         ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_20));
 
@@ -467,10 +481,35 @@ void set_cpu_frequency(long frequency)
             "mcr p15, 0, r0, c1, c0  \n"
             : : : "r0" );
 
+#ifdef HAVE_MULTIDRIVE
+        /*  Set uSD frequency */
+        sd_set_boosted_divider();
+#endif
+        /*  Set I2C frequency */
+        I2C2_CPSR0 = AS3525_I2C_PRESCALER_BOOSTED & 0xFF;          /* 8 lsb */
+        I2C2_CPSR1 = (AS3525_I2C_PRESCALER_BOOSTED >> 8) & 0x3;    /* 2 msb */
+        /*  Set PCLK frequency */
+        CGU_PERI = ((CGU_PERI & ~0x7F)  |       /* reset divider & clksel bits */
+                 (AS3525_PCLK_DIV0_BOOSTED << 2) |
+                 (AS3525_PCLK_DIV1_BOOSTED << 6) |
+                  AS3525_PCLK_SEL);
         cpu_frequency = CPUFREQ_MAX;
     }
     else
     {
+        /*  Set I2C frequency */
+        I2C2_CPSR0 = AS3525_I2C_PRESCALER & 0xFF;          /* 8 lsb */
+        I2C2_CPSR1 = (AS3525_I2C_PRESCALER >> 8) & 0x3;    /* 2 msb */
+        /*  Set PCLK frequency */
+        CGU_PERI = ((CGU_PERI & ~0x7F)  |       /* reset divider & clksel bits */
+                 (AS3525_PCLK_DIV0 << 2) |
+                 (AS3525_PCLK_DIV1 << 6) |
+                  AS3525_PCLK_SEL);
+
+#ifdef HAVE_MULTIDRIVE
+        /*  Set uSD frequency */
+        sd_set_unboosted_divider();
+#endif
         asm volatile(
             "mrc p15, 0, r0, c1, c0  \n"
             "bic r0, r0, #3<<30      \n"     /* fastbus clocking */
@@ -480,7 +519,7 @@ void set_cpu_frequency(long frequency)
         /* FCLK is unused so put it to the lowest freq we can */
         CGU_PROC = ((0xf << 4) | (0x3 << 2) | AS3525_CLK_MAIN);
 
-#ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE) && (CPUFREQ_MAX > 200000000)
         /* Decreasing frequency so reduce voltage after change */
         ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_10));
 #endif  /*  HAVE_ADJUSTABLE_CPU_VOLTAGE */

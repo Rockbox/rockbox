@@ -116,9 +116,8 @@ static void init_pl180_controller(const int drive);
 static tCardInfo card_info[NUM_DRIVES];
 
 /* maximum timeouts recommanded in the SD Specification v2.00 */
-#define SD_MAX_READ_TIMEOUT     ((AS3525_PCLK_FREQ) / 1000 * 100) /* 100 ms */
-#define SD_MAX_WRITE_TIMEOUT    ((AS3525_PCLK_FREQ) / 1000 * 250) /* 250 ms */
-
+#define SD_MAX_READ_TIMEOUT     ((AS3525_PCLK_FREQ*(cpu_frequency==CPUFREQ_MAX?2:1)) / 1000 * 100) /* 100 ms */
+#define SD_MAX_WRITE_TIMEOUT    ((AS3525_PCLK_FREQ*(cpu_frequency==CPUFREQ_MAX?2:1)) / 1000 * 250) /* 250 ms */
 /* for compatibility */
 static long last_disk_activity = -1;
 
@@ -139,6 +138,8 @@ static bool hs_card = false;
 static struct semaphore transfer_completion_signal;
 static volatile unsigned int transfer_error[NUM_DRIVES];
 #define PL180_MAX_TRANSFER_ERRORS 10
+
+extern long cpu_frequency;
 
 #define UNALIGNED_NUM_SECTORS 10
 static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SD_BLOCK_SIZE] __attribute__((aligned(32)));   /* align on cache line size */
@@ -276,6 +277,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
         }
         else if(status & MCI_CMD_SENT)  /* CMD sent, no response required */
             return true;
+        udelay(1);
     }
 
     return false;
@@ -285,7 +287,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
 #define MCI_HALFSPEED     (MCI_CLOCK_ENABLE)                        /* MCLK/2 */
 #define MCI_QUARTERSPEED  (MCI_CLOCK_ENABLE | 1)                    /* MCLK/4 */
 #define MCI_IDENTSPEED    (MCI_CLOCK_ENABLE | AS3525_SD_IDENT_DIV)  /* IDENT  */
-
+#define MCI_IDENTSPEED_BOOSTED    (MCI_CLOCK_ENABLE | AS3525_SD_IDENT_DIV_BOOSTED)
 static int sd_init_card(const int drive)
 {
     unsigned long response;
@@ -295,7 +297,10 @@ static int sd_init_card(const int drive)
     card_info[drive].rca = 0;
 
     /* MCLCK on and set to 400kHz ident frequency  */
-    MCI_CLOCK(drive) = MCI_IDENTSPEED;
+    if (cpu_frequency == CPUFREQ_MAX)
+        MCI_CLOCK(drive) = MCI_IDENTSPEED_BOOSTED;
+    else
+        MCI_CLOCK(drive) = MCI_IDENTSPEED;
 
     /* 100 - 400kHz clock required for Identification Mode  */
     /*  Start of Card Identification Mode ************************************/
@@ -377,8 +382,12 @@ static int sd_init_card(const int drive)
         MCI_CLOCK(drive) = MCI_HALFSPEED;  /* MCICLK = IDE_CLK/2 = 25 MHz  */
 #if defined(HAVE_MULTIDRIVE)
     else
-        /* MCICLK = PCLK/2 = 31MHz(HS) or PCLK/4 = 15.5 Mhz (STD)*/
-        MCI_CLOCK(drive) = (hs_card ? MCI_HALFSPEED : MCI_QUARTERSPEED);
+    {   /* PCLK = 23.25Mhz (46.5MHz boosted) MCI = 23.25Mhz(hs) or 11.625 */
+        if (cpu_frequency == CPUFREQ_MAX )
+            MCI_CLOCK(drive) = (hs_card ? MCI_FULLSPEED : MCI_HALFSPEED);
+        else
+            MCI_CLOCK(drive) = MCI_FULLSPEED;
+    }
 #endif
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
@@ -515,6 +524,19 @@ static void sd_thread(void)
         }
     }
 }
+
+#ifdef HAVE_MULTIDRIVE
+void sd_set_boosted_divider(void)
+{
+    MCI_CLOCK(SD_SLOT_AS3525) = (hs_card ?
+    MCI_FULLSPEED : MCI_HALFSPEED);
+}
+
+void sd_set_unboosted_divider(void)
+{
+    MCI_CLOCK(SD_SLOT_AS3525) = MCI_FULLSPEED;    
+}
+#endif
 
 static void init_pl180_controller(const int drive)
 {
