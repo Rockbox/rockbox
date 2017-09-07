@@ -701,3 +701,34 @@ __aeabi_idivmod:
     .byte 0x92, 0x90, 0x8f, 0x8e, 0x8d, 0x8c, 0x8a, 0x89
     .byte 0x88, 0x87, 0x86, 0x85, 0x84, 0x83, 0x82, 0x81
 #endif
+
+/*
+ * int __popcountsi2(unsigned int x)
+ * int __popcountdi2(unsigned long x)
+ */
+    .section    .text.__popcountsi2, "ax", %progbits
+    .global     __popcountsi2
+    .type       __popcountsi2, %function
+    .global     __popcountdi2
+    .type       __popcountdi2, %function
+    .set        __popcountdi2, __popcountsi2
+__popcountsi2:
+    mov r1, #0x33           @ r1 = 0x33333333
+    orr r1, r1, r1, lsl #8  @ ...
+    orr r1, r1, r1, lsl #16 @ ...
+    eor r2, r1, r1, lsl #1  @ r2 = 0x55555555
+    and r2, r2, r0, lsr #1  @ r2 = (x >> 1) & 0x55555555
+    sub r0, r0, r2          @ x = x - ((x >> 1) & 0x55555555)
+    and r2, r1, r0          @ r2 = x & 0x33333333
+    and r1, r1, r0, lsr #2  @ r1 = (x >> 2) & 0x33333333
+    add r0, r2, r1          @ x = (x & 0x33333333) + ((x >> 2) & 0x33333333)
+    mov r1, #0x0f           @ r1 = 0x0f0f0f0f
+    orr r1, r1, r1, lsl #8  @ ...
+    orr r1, r1, r1, lsl #16 @ ...
+    add r0, r0, lsr #4      @ x = x + (x >> 4)
+    and r0, r0, r1          @ x = (x + (x >> 4)) & 0x0f0f0f0f
+    add r0, r0, lsr #16     @ x = x + (x >> 16)
+    add r0, r0, lsr #8      @ x = x + (x >> 8)
+    and r0, r0, #0x3f       @ x &= 0x3f
+    bx  lr                  @ return x
+   .size    __popcountsi2, .-__popcountsi2
