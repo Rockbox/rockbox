@@ -359,6 +359,7 @@ static int update_dir(void)
     else 
 #endif
     {
+        tc.sort_dir = global_settings.sort_dir;
         /* if the tc.currdir has been changed, reload it ...*/
         if (strncmp(tc.currdir, lastdir, sizeof(lastdir)) || reload_dir)
         {
