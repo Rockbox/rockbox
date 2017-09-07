@@ -69,6 +69,7 @@ static int context;
 static const char *selected_file = NULL;
 static int selected_file_attr = 0;
 static int onplay_result = ONPLAY_OK;
+extern struct menu_item_ex file_menu; /* settings_menu.c  */
 
 /* redefine MAKE_MENU so the MENU_EXITAFTERTHISMENU flag can be added easily */
 #define MAKE_ONPLAYMENU( name, str, callback, icon, ... )               \
@@ -1397,7 +1398,7 @@ MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #ifdef HAVE_RECORDING
            &set_recdir_item,
 #endif
-           &set_startdir_item, &add_to_faves_item,
+           &set_startdir_item, &add_to_faves_item, &file_menu,
          );
 static int onplaymenu_callback(int action,const struct menu_item_ex *this_item)
 {
