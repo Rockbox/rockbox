@@ -60,7 +60,7 @@ void tx_writec(unsigned char c)
 }
 
 
-static int uart_push(void *user_data, unsigned char ch)
+static int uart_push(void *user_data, int ch)
 {
     (void)user_data;
 
