@@ -203,6 +203,7 @@ common/fileobj_mgr.c
 common/dircache.c
 #endif /* HAVE_DIRCACHE */
 common/pathfuncs.c
+common/fdprintf.c
 common/format.c
 common/linked_list.c
 common/strcasecmp.c

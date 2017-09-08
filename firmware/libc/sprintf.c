@@ -21,9 +21,6 @@
 
 /*
  * Minimal printf and snprintf formatting functions
- *
- * These support %c %s %d and %x
- * Field width and zero-padding flag only
  */
 
 #include <stdio.h>
@@ -42,16 +39,16 @@ struct for_snprintf {
     size_t max;   /* max amount to store */
 };
 
-static int sprfunc(void *ptr, unsigned char letter)
+static int sprfunc(void *ptr, int letter)
 {
     struct for_snprintf *pr = (struct for_snprintf *)ptr;
     if(pr->bytes < pr->max) {
         *pr->ptr = letter;
         pr->ptr++;
         pr->bytes++;
-        return true;
+        return 1;
     }
-    return false; /* filled buffer */
+    return 0; /* filled buffer */
 }
 
 
@@ -65,7 +62,7 @@ int snprintf(char *buf, size_t size, const char *fmt, ...)
     pr.max = size;
 
     va_start(ap, fmt);
-    format(sprfunc, &pr, fmt, ap);
+    vuprintf(sprfunc, &pr, fmt, ap);
     va_end(ap);
 
     /* make sure it ends with a trailing zero */
@@ -82,7 +79,7 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
     pr.bytes = 0;
     pr.max = size;
 
-    format(sprfunc, &pr, fmt, ap);
+    vuprintf(sprfunc, &pr, fmt, ap);
 
     /* make sure it ends with a trailing zero */
     pr.ptr[(pr.bytes < pr.max) ? 0 : -1] = '\0';

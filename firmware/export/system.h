@@ -97,6 +97,10 @@ int get_cpu_boost_counter(void);
 #define MAX(a, b) (((a)>(b))?(a):(b))
 #endif
 
+#ifndef ABS
+#define ABS(a) ({ typeof (a) ___a = (a); (___a) >= 0 ? (___a) : -(___a); })
+#endif
+
 /* return number of elements in array a */
 #define ARRAYLEN(a) (sizeof(a)/sizeof((a)[0]))
 
