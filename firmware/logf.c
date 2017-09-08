@@ -38,7 +38,7 @@
 #endif
 #include "logf.h"
 #include "serial.h"
-#include "format.h"
+#include "vuprintf.h"
 
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
@@ -193,7 +193,7 @@ static void check_logfindex(void)
     }
 }
 
-static int logf_push(void *userp, unsigned char c)
+static int logf_push(void *userp, int c)
 {
     (void)userp;
 
@@ -210,7 +210,7 @@ static int logf_push(void *userp, unsigned char c)
     }
 #endif
 
-    return true;
+    return 1;
 }
 
 void _logf(const char *fmt, ...)
@@ -310,7 +310,7 @@ void logf_panic_dump(int *y)
 #endif
 
 #ifdef ROCKBOX_HAS_LOGDISKF
-static int logdiskf_push(void *userp, unsigned char c)
+static int logdiskf_push(void *userp, int c)
 {
     (void)userp;
 
@@ -319,11 +319,11 @@ static int logdiskf_push(void *userp, unsigned char c)
     {
         strcpy(&logdiskfbuffer[logdiskfindex-8], "LOGFULL");
         logdiskfindex=MAX_LOGDISKF_SIZE;
-        return false;
+        return 0;
     }
     logdiskfbuffer[logdiskfindex++] = c;
 
-    return true;
+    return 1;
 }
 
 static void flush_buffer(void);

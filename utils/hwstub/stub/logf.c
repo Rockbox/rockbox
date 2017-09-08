@@ -34,14 +34,14 @@ void enable_logf(bool en)
     logfen = en;
 }
 
-static int logf_push(void *userp, unsigned char c)
+static int logf_push(void *userp, int c)
 {
     (void)userp;
     
     logfbuffer[logfwrite++] = c;
     if(logfwrite == MAX_LOGF_SIZE)
         logfwrite = 0;
-    return true;
+    return 1;
 }
 
 void logf(const char *fmt, ...)
