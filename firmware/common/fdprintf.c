@@ -18,20 +18,23 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "file.h"
+#include "vuprintf.h"
 
-#ifndef __FORMAT_H__
-#define __FORMAT_H__
+static int fprfunc(void *pr, int letter)
+{
+    /* TODO: add a buffer to reduce write() calls */
+    return write((intptr_t)pr, &(char){ letter }, 1) == 1 ? 1 : -1;
+}
 
-void format(
-    /* call 'push()' for each output letter */
-    int (*push)(void *userp, unsigned char data),
-    void *userp,
-    const char *fmt,
-    va_list ap);
+int fdprintf(int fd, const char *fmt, ...)
+{
+    int bytes;
+    va_list ap;
 
-/* callback function is called for every output character (byte) with userp and
- * should return 0 when ch is a char other than '\0' that should stop printing */
-void vuprintf(int (*push)(void *userp, unsigned char data),
-              void *userp, const char *fmt, va_list ap);
+    va_start(ap, fmt);
+    bytes = vuprintf(fprfunc, (void *)(intptr_t)fd, fmt, ap);
+    va_end(ap);
 
-#endif /* __FORMAT_H__ */
+    return bytes;
+}
