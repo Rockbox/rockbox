@@ -19,19 +19,27 @@
  *
  ****************************************************************************/
 
-#ifndef __FORMAT_H__
-#define __FORMAT_H__
+#ifndef __VUPRINTF_H__
+#define __VUPRINTF_H__
 
-void format(
-    /* call 'push()' for each output letter */
-    int (*push)(void *userp, unsigned char data),
-    void *userp,
-    const char *fmt,
-    va_list ap);
+#include <stdarg.h>
 
-/* callback function is called for every output character (byte) with userp and
- * should return 0 when ch is a char other than '\0' that should stop printing */
-void vuprintf(int (*push)(void *userp, unsigned char data),
-              void *userp, const char *fmt, va_list ap);
+/* callback function is called for every output character (byte) in the
+ * output with userp
+ *
+ * it must return > 0 to continue (increments counter)
+ * it may return 0 to stop (increments counter)
+ * it may return < 0 to stop (does not increment counter)
+ * a zero in the format string stops (does not increment counter)
+ *
+ * caller is reponsible for stopping formatting in order to keep the return
+ * value from overflowing (assuming they have a reason to care)
+ */
+typedef int (* vuprintf_push_cb)(void *userp, int c);
 
-#endif /* __FORMAT_H__ */
+/*
+ * returns the number of times push() was called and returned >= 0
+ */
+int vuprintf(vuprintf_push_cb push, void *userp, const char *fmt, va_list ap);
+
+#endif /* __VUPRINTF_H__ */
