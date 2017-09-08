@@ -18,14 +18,40 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdarg.h>
+#include <string.h>
+#include "file.h"
+#include "format.h"
 
-#ifndef __FORMAT_H__
-#define __FORMAT_H__
+struct for_fprintf {
+    int fd;    /* where to store it */
+    int bytes; /* amount stored */
+};
 
-typedef int (* format_push_cb_t)(void *userp, int c);
+static int fprfunc(void *pr, int letter)
+{
+    struct for_fprintf *fpr  = (struct for_fprintf *)pr;
+    int rc = write(fpr->fd, &(unsigned char){ letter }, 1);
 
-/* callback function is called for every output character (byte) with userp and
- * should return 0 when ch is a char other than '\0' that should stop printing */
-void vuprintf(format_push_cb_t push, void *userp, const char *fmt, va_list ap);
+    if(rc > 0) {
+        fpr->bytes++; /* count them */
+        return 1;  /* we are ok */
+    }
 
-#endif /* __FORMAT_H__ */
+    return 0; /* failure */
+}
+
+int fdprintf(int fd, const char *fmt, ...)
+{
+    va_list ap;
+    struct for_fprintf fpr;
+
+    fpr.fd=fd;
+    fpr.bytes=0;
+
+    va_start(ap, fmt);
+    vuprintf(fprfunc, &fpr, fmt, ap);
+    va_end(ap);
+
+    return fpr.bytes; /* return 0 on error */
+}

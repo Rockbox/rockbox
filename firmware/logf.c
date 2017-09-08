@@ -193,7 +193,7 @@ static void check_logfindex(void)
     }
 }
 
-static int logf_push(void *userp, unsigned char c)
+static int logf_push(void *userp, int c)
 {
     (void)userp;
 
@@ -310,7 +310,7 @@ void logf_panic_dump(int *y)
 #endif
 
 #ifdef ROCKBOX_HAS_LOGDISKF
-static int logdiskf_push(void *userp, unsigned char c)
+static int logdiskf_push(void *userp, int c)
 {
     (void)userp;
 
