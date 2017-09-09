@@ -231,6 +231,7 @@ static const struct button_mapping button_context_recscreen[]  = {
 
 /** FM Radio Screen **/
 static const struct button_mapping button_context_radio[]  = {
+    { ACTION_NONE,           BUTTON_SELECT|BUTTON_REL,          BUTTON_SELECT},
     { ACTION_STD_PREV,       BUTTON_LEFT,                       BUTTON_NONE },
     { ACTION_STD_PREVREPEAT, BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_STD_NEXT,       BUTTON_RIGHT,                      BUTTON_NONE },
