@@ -537,6 +537,10 @@ private:
     bool generate_register(std::ostream& os, const pseudo_node_inst_t& reg);
     bool generate_macro_header(error_context_t& ectx);
 protected:
+    /// return true to generate support macros
+    /// if false then all macros are disabled except MT_REG_ADDR, MT_REG_VAR,
+    /// and MT_FIELD_*. Also the macro header is not created
+    virtual bool has_support_macros() const = 0;
     /// return true to generate selector files
     virtual bool has_selectors() const = 0;
     /// [selector only] return the directory name for the soc
@@ -942,16 +946,30 @@ bool common_generator::generate_register(std::ostream& os, const pseudo_node_ins
             type_xfix(MT_REG_NAME, false);
         std::string macro_index = type_xfix(MT_REG_INDEX, true) + var_basename +
             type_xfix(MT_REG_INDEX, false);
-        /* print VAR macro */
-        ctx.add(macro_var + param_str, macro_name(MN_VARIABLE) + "(" + var_basename + param_str + ")");
+        /* print VAR macro:
+         * if we have support macros then we generate something like HW(basename)
+         * where HW is some support macros to support complex operations. Otherwise
+         * we just generate something like (*(volatile unsigned uintN_t)basename_addr) */
+        if(!has_support_macros())
+        {
+            std::ostringstream oss;
+            oss << "(*(volatile uint" << regr.get()->width << "_t *)" << macro_addr + param_str << ")";
+            ctx.add(macro_var + param_str, oss.str());
+        }
+        else
+            ctx.add(macro_var + param_str, macro_name(MN_VARIABLE) + "(" + var_basename + param_str + ")");
         /* print ADDR macro */
         ctx.add(macro_addr + param_str, var_addr[i]);
-        /* print TYPE macro */
-        ctx.add(macro_type + param_str, register_type_name(var_access[i], regr.get()->width));
-        /* print PREFIX macro */
-        ctx.add(macro_prefix + param_str, basename);
-        /* print INDEX macro */
-        ctx.add(macro_index + param_str, param_str);
+        /* disable macros if needed */
+        if(has_support_macros())
+        {
+            /* print TYPE macro */
+            ctx.add(macro_type + param_str, register_type_name(var_access[i], regr.get()->width));
+            /* print PREFIX macro */
+            ctx.add(macro_prefix + param_str, basename);
+            /* print INDEX macro */
+            ctx.add(macro_index + param_str, param_str);
+        }
     }
     /* print fields */
     std::vector< field_ref_t > fields = regr.fields();
@@ -993,6 +1011,9 @@ bool common_generator::generate_register(std::ostream& os, const pseudo_node_ins
 
 bool common_generator::generate_macro_header(error_context_t& ectx)
 {
+    /* only generate if we need support macros */
+    if(!has_support_macros())
+        return true;
     std::ofstream fout((m_outdir + "/" + macro_header()).c_str());
     if(!fout)
     {
@@ -1533,8 +1554,9 @@ bool common_generator::generate(error_context_t& ectx)
         print_guard(fout, guard, true);
 
         /* if we generate selectors, we include the macro header in them, otherwise
-         * we include the macro header right here */
-        if(!has_selectors())
+         * we include the macro header right here. If we don't need support macros,
+         * we also don't include it. */
+        if(!has_selectors() && has_support_macros())
         {
             fout << "\n";
             fout << "#include \"" << macro_header() << "\"\n";
@@ -1614,6 +1636,11 @@ bool common_generator::generate(error_context_t& ectx)
 
 class jz_generator : public common_generator
 {
+    bool has_support_macros() const
+    {
+        return true;
+    }
+
     bool has_selectors() const
     {
         return m_soc.size() >= 2;
@@ -1774,6 +1801,11 @@ class jz_generator : public common_generator
 
 class imx_generator : public common_generator
 {
+    bool has_support_macros() const
+    {
+        return true;
+    }
+
     bool has_selectors() const
     {
         return m_soc.size() >= 2;
@@ -1930,6 +1962,135 @@ class imx_generator : public common_generator
 };
 
 /**
+ * Generator: atj
+ */
+
+class atj_generator : public common_generator
+{
+    bool has_support_macros() const
+    {
+        // no support macros
+        return false;
+    }
+
+    bool has_selectors() const
+    {
+        return false;
+    }
+
+    std::string selector_soc_dir(const soc_ref_t& ref) const
+    {
+        return ref.get()->name;
+    }
+
+    std::string selector_include_header() const
+    {
+        // unused
+        return "<error>";
+    }
+
+    std::string selector_soc_macro(const soc_ref_t& ref) const
+    {
+        // unused
+        return "<error>";
+    }
+
+    std::string register_header(const node_inst_t& inst) const
+    {
+        /* one register header per top-level block */
+        if(inst.is_root())
+            return "<error>";
+        if(inst.parent().is_root())
+            return tolower(inst.node().name()) + ".h";
+        else
+            return register_header(inst.parent());
+    }
+
+    std::string macro_name(macro_name_t macro) const
+    {
+        // no macros are generated
+        return "<macro_name>";
+    }
+
+    std::string macro_header() const
+    {
+        // unused
+        return "<error>";
+    }
+
+    bool register_flag(const node_inst_t& inst, register_flag_t flag) const
+    {
+        /* make everything parametrized */
+        switch(flag)
+        {
+            case RF_GENERATE_ALL_INST: return false;
+            case RF_GENERATE_PARAM_INST: return true;
+            default: return false;
+        }
+    }
+
+    std::string type_xfix(macro_type_t type, bool prefix) const
+    {
+        switch(type)
+        {
+            case MT_REG_ADDR: return prefix ? "" : "_ADDR";
+            case MT_REG_VAR: return prefix ? "" : "";
+            case MT_FIELD_BP: return prefix ? "BP_" : "";
+            case MT_FIELD_BM: return prefix ? "BM_" : "";
+            case MT_FIELD_BV: return prefix ? "BV_" : "";
+            case MT_FIELD_BF: return prefix ? "BF_" : "";
+            case MT_FIELD_BFM: return prefix ? "BFM_" : "";
+            case MT_FIELD_BFV: return prefix ? "BF_" : "_V";
+            case MT_FIELD_BFMV: return prefix ? "BFM_" : "_V";
+            default: return "<xfix>";
+        }
+    }
+
+    std::string variant_xfix(const std::string& variant, bool prefix) const
+    {
+        return "<variant>";
+    }
+
+    std::string inst_prefix(const node_inst_t& inst) const
+    {
+        /* separate blocks with _: block_reg */
+        return "_";
+    }
+
+    std::string field_prefix() const
+    {
+        /* separate fields with _: block_reg_field */
+        return "_";
+    }
+
+    std::string enum_prefix() const
+    {
+        /* separate enums with __: block_reg_field__enum */
+        return "__";
+    }
+
+    std::string enum_name(const enum_ref_t& enum_) const
+    {
+        return enum_.get()->name;
+    }
+
+    access_type_t register_access(const std::string& variant, access_t access) const
+    {
+        return AT_RW;
+    }
+
+    bool has_sct() const
+    {
+        return false;
+    }
+
+    std::string sct_variant(macro_name_t name) const
+    {
+        return "<variant>";
+    }
+};
+
+/**
  * Driver
  */
 
@@ -1939,6 +2100,8 @@ abstract_generator *get_generator(const std::string& name)
         return new jz_generator();
     else if(name == "imx")
         return new imx_generator();
+    else if(name == "atj")
+        return new atj_generator();
     else
         return 0;
 }
