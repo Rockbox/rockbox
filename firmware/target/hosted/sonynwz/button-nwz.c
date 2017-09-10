@@ -18,7 +18,7 @@
  *
  ****************************************************************************/
 #include "button.h"
-#define LOGF_ENABLE
+//#define LOGF_ENABLE
 #include "logf.h"
 #include "panic.h"
 #include "backlight.h"
@@ -192,6 +192,19 @@ static void open_input_device(const char *path)
     poll_nfds++;
 }
 
+#if defined(SONY_NWZA860)
+/* keycode -> rockbox button mapping */
+static int button_map[NWZ_KEY_MASK + 1] =
+{
+    [0 ... NWZ_KEY_MASK] = 0,
+    [NWZ_KEY_PLAY] = BUTTON_PLAY,
+    [NWZ_KEY_RIGHT] = BUTTON_FF,
+    [NWZ_KEY_LEFT] = BUTTON_REW,
+    [NWZ_KEY_VOL_DOWN] = BUTTON_VOL_DOWN,
+    [NWZ_KEY_VOL_UP] = BUTTON_VOL_UP,
+    [NWZ_KEY_BACK] = BUTTON_BACK,
+};
+#else /* SONY_NWZA860 */
 /* keycode -> rockbox button mapping */
 static int button_map[NWZ_KEY_MASK + 1] =
 {
@@ -214,6 +227,7 @@ static int button_map[NWZ_KEY_MASK + 1] =
     [NWZ_KEY_AD1_6] = 0,
     [NWZ_KEY_AD1_7] = 0,
 };
+#endif /* SONY_NWZA860 */
 
 static void handle_key(struct input_event evt)
 {
@@ -296,11 +310,16 @@ int button_read_device(
 #endif
         }
     }
+    int btns = button_bitmap;
 #ifdef HAVE_TOUCHSCREEN
+    /* WARNING we must call touchscreen_to_pixels even if there is no touch,
+     * otherwsise *data is not filled with the last position and it breaks
+     * everything */
+    int touch_bitmap = touchscreen_to_pixels(touch_x, touch_y, data);
     if(touch_detect)
-        button_bitmap |= touchscreen_to_pixels(touch_x, touch_y, data);
+        btns |= touch_bitmap;
 #endif
-    return hold_status ? 0 : button_bitmap;
+    return hold_status ? 0 : btns;
 }
 
 void nwz_button_reload_after_suspend(void)

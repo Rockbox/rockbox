@@ -165,6 +165,7 @@
 #define SAMSUNG_YPR1_PAD  61
 #define SAMSUNG_YH92X_PAD  62
 #define DX50_PAD           63
+#define SONY_NWZA860_PAD   64 /* The NWZ-A860 is too different (touchscreen) */
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -594,6 +595,8 @@ Lyre prototype 1 */
 #include "config/sonynwa20.h"
 #elif defined(SONY_NWZE470)
 #include "config/sonynwze470.h"
+#elif defined(SONY_NWZA860)
+#include "config/sonynwza860.h"
 #else
 /* no known platform */
 #endif

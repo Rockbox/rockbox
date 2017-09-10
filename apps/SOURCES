@@ -305,6 +305,8 @@ keymaps/keymap-zen.c
 keymaps/keymap-ma.c
 #elif CONFIG_KEYPAD == SONY_NWZ_PAD
 keymaps/keymap-nwz.c
+#elif CONFIG_KEYPAD == SONY_NWZA860_PAD
+keymaps/keymap-nwza860.c
 #elif CONFIG_KEYPAD == SAMSUNG_YPZ5_PAD
 keymaps/keymap-ypz5.c
 #elif CONFIG_KEYPAD == IHIFI_PAD
