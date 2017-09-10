@@ -63,6 +63,15 @@
 #error toolsicon has the wrong resolution
 #endif
 
+/* the A860 does not have left/right/up/down but it has rew/ff so pretend we
+ * always have rew/ff */
+#ifndef BUTTON_REW
+#define BUTTON_REW  BUTTON_LEFT
+#endif
+#ifndef BUTTON_FF
+#define BUTTON_FF   BUTTON_RIGHT
+#endif
+
 /* buffer for Sony image, filled from NVP */
 unsigned short sonyicon[ICON_WIDTH * ICON_HEIGHT];
 const struct bitmap bm_sonyicon =
@@ -257,9 +266,9 @@ enum boot_mode get_boot_mode(void)
         if(btn == BUTTON_PLAY)
             break;
         /* left/right/up/down: change mode */
-        if(btn == BUTTON_LEFT || btn == BUTTON_DOWN)
+        if(btn == BUTTON_LEFT || btn == BUTTON_DOWN || btn == BUTTON_REW)
             mode = (mode + BOOT_COUNT - 1) % BOOT_COUNT;
-        if(btn == BUTTON_RIGHT || btn == BUTTON_UP)
+        if(btn == BUTTON_RIGHT || btn == BUTTON_UP || btn == BUTTON_FF)
             mode = (mode + 1) % BOOT_COUNT;
     }
 
@@ -340,9 +349,9 @@ int choice_screen(const char *title, bool center, int nr_choices, const char *ch
             return btn == BUTTON_PLAY ? choice : -1;
         }
         /* left/right/up/down: change mode */
-        if(btn == BUTTON_LEFT || btn == BUTTON_UP)
+        if(btn == BUTTON_LEFT || btn == BUTTON_UP || btn == BUTTON_REW)
             choice = (choice + nr_choices - 1) % nr_choices;
-        if(btn == BUTTON_RIGHT || btn == BUTTON_DOWN)
+        if(btn == BUTTON_RIGHT || btn == BUTTON_DOWN || btn == BUTTON_FF)
             choice = (choice + 1) % nr_choices;
     }
 }

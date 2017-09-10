@@ -192,6 +192,19 @@ static void open_input_device(const char *path)
     poll_nfds++;
 }
 
+#if defined(SONY_NWZA860)
+/* keycode -> rockbox button mapping */
+static int button_map[NWZ_KEY_MASK + 1] =
+{
+    [0 ... NWZ_KEY_MASK] = 0,
+    [NWZ_KEY_PLAY] = BUTTON_PLAY,
+    [NWZ_KEY_RIGHT] = BUTTON_FF,
+    [NWZ_KEY_LEFT] = BUTTON_REW,
+    [NWZ_KEY_VOL_DOWN] = BUTTON_VOL_DOWN,
+    [NWZ_KEY_VOL_UP] = BUTTON_VOL_UP,
+    [NWZ_KEY_BACK] = BUTTON_BACK,
+};
+#else /* SONY_NWZA860 */
 /* keycode -> rockbox button mapping */
 static int button_map[NWZ_KEY_MASK + 1] =
 {
@@ -214,6 +227,7 @@ static int button_map[NWZ_KEY_MASK + 1] =
     [NWZ_KEY_AD1_6] = 0,
     [NWZ_KEY_AD1_7] = 0,
 };
+#endif /* SONY_NWZA860 */
 
 static void handle_key(struct input_event evt)
 {
