@@ -165,7 +165,8 @@
 #define SAMSUNG_YPR1_PAD  61
 #define SAMSUNG_YH92X_PAD  62
 #define DX50_PAD           63
-#define AGPTEK_ROCKER_PAD 64
+#define SONY_NWZA860_PAD   64 /* The NWZ-A860 is too different (touchscreen) */
+#define AGPTEK_ROCKER_PAD  65
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -601,7 +602,12 @@ Lyre prototype 1 */
 #include "config/sonynwa20.h"
 #elif defined(SONY_NWZE470)
 #include "config/sonynwze470.h"
+<<<<<<< d5b52e49df54d6f8b377576f079216ed81a00036
 >>>>>>> Initial commit for the Sony NWZ linux port
+=======
+#elif defined(SONY_NWZA860)
+#include "config/sonynwza860.h"
+>>>>>>> Add support for the NWZ-A860
 #else
 /* no known platform */
 #endif
