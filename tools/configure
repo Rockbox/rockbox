@@ -1512,7 +1512,7 @@ cat <<EOF
  208) Samsung YP-R1       231) 960               225) NWZ-E580 series
                                                  226) NWZ-A10 series
  ==iBasso==                                      227) NW-A20 series
- 232) DX50
+ 232) DX50                                       228) NWZ-A860 series
  233) DX90
 
 EOF
@@ -4003,6 +4003,29 @@ fi
     t_cpu="hosted"
     t_manufacturer="sonynwz"
     t_model="nwa20"
+    uname=`uname`
+    sonynwzcc
+    ;;
+
+   228|sonynwza860)
+    application="yes"
+    target_id=103
+    modelname="sonynwza860"
+    target="SONY_NWZA860"
+    memory=16
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="cp"
+    output="rockbox.sony"
+    boottool="$rootdir/tools/scramble -add=a860"
+    bootoutput="bootloader-nwza860.sony"
+    appextra="gui:recorder"
+    plugins=""
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    t_cpu="hosted"
+    t_manufacturer="sonynwz"
+    t_model="nwza860"
     uname=`uname`
     sonynwzcc
     ;;

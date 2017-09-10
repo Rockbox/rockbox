@@ -24,6 +24,40 @@
 #include <stdbool.h>
 #include "config.h"
 
+/* The NWZ-A860 is completely different, it has a touchscreen and some but not
+ * all keys of the other others */
+#if defined(SONY_NWZA860)
+
+/* Main unit's buttons */
+#define BUTTON_BACK                 0x00000001 /* HOME */
+#define BUTTON_PLAY                 0x00000002
+#define BUTTON_REW                  0x00000004
+#define BUTTON_FF                   0x00000008
+#define BUTTON_VOL_DOWN             0x00000010
+#define BUTTON_VOL_UP               0x00000020
+/* For compatibility */
+#define BUTTON_LEFT                 BUTTON_MIDLEFT
+#define BUTTON_RIGHT                BUTTON_MIDRIGHT
+#define BUTTON_UP                   BUTTON_TOPMIDDLE
+#define BUTTON_DOWN                 BUTTON_BOTTOMMIDDLE
+
+/* Touch Screen Area Buttons */
+#define BUTTON_TOPLEFT              0x00000040
+#define BUTTON_TOPMIDDLE            0x00000080
+#define BUTTON_TOPRIGHT             0x00000100
+#define BUTTON_MIDLEFT              0x00000200
+#define BUTTON_CENTER               0x00000400
+#define BUTTON_MIDRIGHT             0x00000800
+#define BUTTON_BOTTOMLEFT           0x00001000
+#define BUTTON_BOTTOMMIDDLE         0x00002000
+#define BUTTON_BOTTOMRIGHT          0x00004000
+
+#define BUTTON_MAIN 0x7fff
+
+#define POWEROFF_BUTTON             BUTTON_BACK
+
+#else /* SONY_NWZA860 */
+
 /* Main unit's buttons */
 #define BUTTON_POWER                0x00000001
 #define BUTTON_BACK                 0x00000002
@@ -37,8 +71,11 @@
 
 #define BUTTON_MAIN                 0x000001ff
 
+#define POWEROFF_BUTTON             BUTTON_POWER
+
+#endif /* SONY_NWZA860 */
+
 /* Software power-off */
-#define POWEROFF_BUTTON BUTTON_POWER
 #define POWEROFF_COUNT 10
 
 /* force driver to reload button state (useful after suspend) */
