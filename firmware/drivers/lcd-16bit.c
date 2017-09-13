@@ -380,23 +380,23 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
 #else  /* optimized C version */
     do
     {
-        const fb_data *src_row = src;
-        fb_data *dst_row = dst;
-        fb_data *row_end = dst_row + width;
+        int w = width;
         do
         {
-            unsigned data = *src_row++;
-            if (data != TRANSPARENT_COLOR)
-            {
-                if (data == REPLACEWITHFG_COLOR)
-                    data = fg;
-                *dst_row = data;
-            }
+            if (*src == REPLACEWITHFG_COLOR)
+                *dst  = fg;
+
+            else if (*src != TRANSPARENT_COLOR)
+                *dst = *src;
+
+            src++;
+            dst++;
         }
-        while (++dst_row < row_end);
-        src += stride;
-        dst += LCD_WIDTH;
+        while (--w);
+
+        src += stride - width;
+        dst += LCD_WIDTH - width;
     }
-    while (--height > 0);
+    while (--height);
 #endif
 }
