@@ -74,11 +74,11 @@ void lcd_hline(int x1, int x2, int y)
 
     /******************** In viewport clipping **********************/
     /* nothing to draw? */
-    if (((unsigned)y >= (unsigned)current_vp->height) || 
+    if (((unsigned)y >= (unsigned)current_vp->height) ||
         (x1 >= current_vp->width) ||
         (x2 < 0))
         return;
-        
+
     if (x1 < 0)
         x1 = 0;
     if (x2 >= current_vp->width)
@@ -88,14 +88,14 @@ void lcd_hline(int x1, int x2, int y)
     x1 += current_vp->x;
     x2 += current_vp->x;
     y += current_vp->y;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
     if (((unsigned)y >= (unsigned) LCD_HEIGHT) || (x1 >= LCD_WIDTH)
         || (x2 < 0))
-        return;  
-    
+        return;
+
     /* clipping */
     if (x1 < 0)
         x1 = 0;
@@ -178,19 +178,19 @@ void lcd_vline(int x, int y1, int y2)
         y1 = 0;
     if (y2 >= current_vp->height)
         y2 = current_vp->height-1;
-        
+
     /* adjust for viewport */
     x += current_vp->x;
     y1 += current_vp->y;
     y2 += current_vp->y;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if (( (unsigned) x >= (unsigned)LCD_WIDTH) || (y1 >= LCD_HEIGHT) 
+    if (( (unsigned) x >= (unsigned)LCD_WIDTH) || (y1 >= LCD_HEIGHT)
         || (y2 < 0))
         return;
-    
+
     /* clipping */
     if (y1 < 0)
         y1 = 0;
@@ -221,7 +221,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
     if ((width <= 0) || (height <= 0) || (x >= current_vp->width) ||
         (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     if (x < 0)
     {
         width += x;
@@ -234,23 +234,23 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
         src_y -= y;
         y = 0;
     }
-    
+
     if (x + width > current_vp->width)
         width = current_vp->width - x;
     if (y + height > current_vp->height)
-        height = current_vp->height - y;    
-    
+        height = current_vp->height - y;
+
     /* adjust for viewport */
     x += current_vp->x;
     y += current_vp->y;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT) 
+    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
         return;
-    
+
     /* clip image in viewport in screen */
     if (x < 0)
     {
@@ -269,7 +269,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
 #endif
-    
+
     src += stride * src_y + src_x; /* move starting point */
     dst = FBADDR(x, y);
 
@@ -295,7 +295,7 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
     if ((width <= 0) || (height <= 0) || (x >= current_vp->width) ||
         (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     if (x < 0)
     {
         width += x;
@@ -308,23 +308,23 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
         src_y -= y;
         y = 0;
     }
-    
+
     if (x + width > current_vp->width)
         width = current_vp->width - x;
     if (y + height > current_vp->height)
-        height = current_vp->height - y;    
-    
+        height = current_vp->height - y;
+
     /* adjust for viewport */
     x += current_vp->x;
     y += current_vp->y;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT) 
+    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
         return;
-    
+
     /* clip image in viewport in screen */
     if (x < 0)
     {
@@ -347,7 +347,7 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
     src += stride * src_y + src_x; /* move starting point */
     dst = FBADDR(x, y);
 
-#ifdef CPU_ARM
+#if 0 //#ifdef CPU_ARM
     {
         int w, px;
         asm volatile (
@@ -380,23 +380,23 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
 #else  /* optimized C version */
     do
     {
-        const fb_data *src_row = src;
-        fb_data *dst_row = dst;
-        fb_data *row_end = dst_row + width;
+        fb_data *row_end = dst + width;
         do
         {
-            unsigned data = *src_row++;
+            unsigned data = *src++;
+            if (data == REPLACEWITHFG_COLOR)
+                data = fg;
+            /* comparing twice prevents worthless branch ins. */
             if (data != TRANSPARENT_COLOR)
-            {
-                if (data == REPLACEWITHFG_COLOR)
-                    data = fg;
-                *dst_row = data;
-            }
+                *dst = data;
         }
-        while (++dst_row < row_end);
-        src += stride;
-        dst += LCD_WIDTH;
+        while (++dst < row_end);
+
+        src += stride - width;
+        dst += LCD_WIDTH; /* Counterintuitive but, splitting into two */
+        dst -= width;    /*  ops allows better compiler optimization */
     }
     while (--height > 0);
+
 #endif
 }
