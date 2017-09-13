@@ -347,7 +347,7 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
     src += stride * src_y + src_x; /* move starting point */
     dst = FBADDR(x, y);
 
-#ifdef CPU_ARM
+#if 0 //#ifdef CPU_ARM
     {
         int w, px;
         asm volatile (
@@ -380,23 +380,23 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
 #else  /* optimized C version */
     do
     {
-        const fb_data *src_row = src;
-        fb_data *dst_row = dst;
-        fb_data *row_end = dst_row + width;
+        fb_data *row_end = dst + width;
         do
         {
-            unsigned data = *src_row++;
+            unsigned data = *src++;
+            if (data == REPLACEWITHFG_COLOR)
+                data = fg;
+            /* comparing twice prevents worthless branch ins. */
             if (data != TRANSPARENT_COLOR)
-            {
-                if (data == REPLACEWITHFG_COLOR)
-                    data = fg;
-                *dst_row = data;
-            }
+                *dst = data;
         }
-        while (++dst_row < row_end);
-        src += stride;
-        dst += LCD_WIDTH;
+        while (++dst < row_end);
+
+        src += stride - width;
+        dst += LCD_WIDTH; /* Counterintuitive but, splitting into two */
+        dst -= width;    /*  ops allows better compiler optimization */
     }
     while (--height > 0);
+
 #endif
 }
