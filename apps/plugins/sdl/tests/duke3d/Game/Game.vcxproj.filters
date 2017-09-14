@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{06253b92-93a2-4d56-8563-5a03a31eadc1}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{b2eb2339-7496-4d78-9bc0-83683f1179a3}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Midi">
+      <UniqueIdentifier>{3f2653b9-f76d-4555-84a0-475ace3f6c8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Audiolib">
+      <UniqueIdentifier>{9c2a484b-af3c-47f8-b997-35621c3c6a41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Console Source">
+      <UniqueIdentifier>{a1461a19-8d35-48aa-a91c-0a2b6c229f40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Console Headers">
+      <UniqueIdentifier>{1e8402f7-1c36-454c-a9a9-926a77f481b5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\actors.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\animlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\config.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\control.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gamedef.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\global.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\keyboard.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\menues.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\player.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\premap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rts.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scriplib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sector.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sounds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audiolib\dsl.c">
+      <Filter>Audiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audiolib\fx_man.c">
+      <Filter>Audiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audiolib\ll_man.c">
+      <Filter>Audiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audiolib\multivoc.c">
+      <Filter>Audiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audiolib\mv_mix.c">
+      <Filter>Audiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audiolib\mvreverb.c">
+      <Filter>Audiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audiolib\nodpmi.c">
+      <Filter>Audiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audiolib\pitch.c">
+      <Filter>Audiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audiolib\user.c">
+      <Filter>Audiolib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\console.c">
+      <Filter>Console Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cvar_defs.c">
+      <Filter>Console Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cvars.c">
+      <Filter>Console Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\midi\sdl_midi.c">
+      <Filter>Midi</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\_rts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\animlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\control.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\develop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\duke3d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dukewin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\file_lib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\funct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\function.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gamedefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\keyboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mouse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\names.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scriplib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\soundefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sounds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util_lib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audiolib\assert.h">
+      <Filter>Audiolib</Filter>
+    </ClInclude>
+    <ClInclude Include="src\_functio.h">
+      <Filter>Console Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\console.h">
+      <Filter>Console Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cvar_defs.h">
+      <Filter>Console Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cvars.h">
+      <Filter>Console Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="chocolateDukeResources.rc" />
+  </ItemGroup>
+</Project>

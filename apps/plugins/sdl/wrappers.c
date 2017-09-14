@@ -12,6 +12,168 @@ static long lastsin = 0, lastcos = 0x7fffffff;
 
 #define PI 3.1415926535897932384626433832795
 
+void fatal(char *fmt, ...)
+{
+    va_list ap;
+
+    rb->splash(HZ, "FATAL");
+
+    va_start(ap, fmt);
+    char buf[80];
+    vsnprintf(buf, 80, fmt, ap);
+    rb->splash(HZ * 2, buf);
+    va_end(ap);
+
+    exit(1);
+}
+
+char *strtok_wrapper(char *str, const char *delim)
+{
+    static char *save = NULL;
+    return rb->strtok_r(str, delim, &save);
+}
+
+/* Implementation of strtod() and atof(),
+   taken from SanOS (http://www.jbox.dk/sanos/). */
+static int rb_errno = 0;
+
+static double rb_strtod(const char *str, char **endptr)
+{
+  double number;
+  int exponent;
+  int negative;
+  char *p = (char *) str;
+  double p10;
+  int n;
+  int num_digits;
+  int num_decimals;
+
+    /* Reset Rockbox errno -- W.B. */
+#ifdef ROCKBOX
+    rb_errno = 0;
+#endif
+
+  // Skip leading whitespace
+  while (isspace(*p)) p++;
+
+  // Handle optional sign
+  negative = 0;
+  switch (*p)
+  {
+    case '-': negative = 1; // Fall through to increment position
+    case '+': p++;
+  }
+
+  number = 0.;
+  exponent = 0;
+  num_digits = 0;
+  num_decimals = 0;
+
+  // Process string of digits
+  while (isdigit(*p))
+  {
+    number = number * 10. + (*p - '0');
+    p++;
+    num_digits++;
+  }
+
+  // Process decimal part
+  if (*p == '.')
+  {
+    p++;
+
+    while (isdigit(*p))
+    {
+      number = number * 10. + (*p - '0');
+      p++;
+      num_digits++;
+      num_decimals++;
+    }
+
+    exponent -= num_decimals;
+  }
+
+  if (num_digits == 0)
+  {
+#ifdef ROCKBOX
+    rb_errno = 1;
+#else
+    errno = ERANGE;
+#endif
+    return 0.0;
+  }
+
+  // Correct for sign
+  if (negative) number = -number;
+
+  // Process an exponent string
+  if (*p == 'e' || *p == 'E')
+  {
+    // Handle optional sign
+    negative = 0;
+    switch(*++p)
+    {
+      case '-': negative = 1;   // Fall through to increment pos
+      case '+': p++;
+    }
+
+    // Process string of digits
+    n = 0;
+    while (isdigit(*p))
+    {
+      n = n * 10 + (*p - '0');
+      p++;
+    }
+
+    if (negative)
+      exponent -= n;
+    else
+      exponent += n;
+  }
+
+#ifndef ROCKBOX
+  if (exponent < DBL_MIN_EXP  || exponent > DBL_MAX_EXP)
+  {
+    errno = ERANGE;
+    return HUGE_VAL;
+  }
+#endif
+
+  // Scale the result
+  p10 = 10.;
+  n = exponent;
+  if (n < 0) n = -n;
+  while (n)
+  {
+    if (n & 1)
+    {
+      if (exponent < 0)
+        number /= p10;
+      else
+        number *= p10;
+    }
+    n >>= 1;
+    p10 *= p10;
+  }
+
+#ifndef ROCKBOX
+  if (number == HUGE_VAL) errno = ERANGE;
+#endif
+  if (endptr) *endptr = p;
+
+  return number;
+}
+
+double atof_wrapper(const char *str)
+{
+    return rb_strtod(str, NULL);
+}
+
+int clock(void)
+{
+    return *rb->current_tick;
+}
+
 double sin_wrapper(double rads)
 {
     /* we want [0, 2*PI) */
@@ -64,7 +226,7 @@ float tan_wrapper(float f)
 int printf_wrapper(const char *fmt, ...)
 {
     static int p_xtpt;
-    char p_buf[50];
+    char p_buf[256];
     rb->yield();
     va_list ap;
 
@@ -76,6 +238,7 @@ int printf_wrapper(const char *fmt, ...)
     rb->lcd_putsxy(1,p_xtpt, (unsigned char *)p_buf);
     if (printf_enabled)
         rb->lcd_update();
+    LOGF("%s", p_buf);
 
     p_xtpt+=8;
     if(p_xtpt>LCD_HEIGHT-8)
@@ -88,6 +251,13 @@ int printf_wrapper(const char *fmt, ...)
         }
     }
     return 1;
+}
+
+int vprintf(const char *fmt, va_list ap)
+{
+    char buf[256];
+    vsnprintf(buf, 256, fmt, ap);
+    return printf("%s", buf);
 }
 
 int sprintf_wrapper(char *str, const char *fmt, ...)
