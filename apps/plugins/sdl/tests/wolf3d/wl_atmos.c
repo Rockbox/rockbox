@@ -86,7 +86,7 @@ void DrawStarSky(byte *vbuf, uint32_t vbufPitch)
         i = 0;
         if(xx < 0) i = -xx;
         if(xx > viewwidth - 11) stopx = viewwidth - xx;
-        if(yy < 0) startj = -yy;
+        if(yy < 0) starty = -yy;
         if(yy > viewheight - 11) stopy = viewheight - yy;
         for(; i < stopx; i++)
             for(int j = starty; j < stopy; j++)
