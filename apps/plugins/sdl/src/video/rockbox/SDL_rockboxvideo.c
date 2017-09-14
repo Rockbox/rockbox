@@ -45,7 +45,7 @@
 #define RBSDL_UP_RIGHT SDLK_KP9
 #define RBSDL_DOWN_LEFT SDLK_KP1
 #define RBSDL_DOWN_RIGHT SDLK_KP3
-#define RBSDL_FIRE SDLK_LCTRL
+#define RBSDL_FIRE SDLK_RETURN
 #define RBSDL_QUIT SDLK_ESCAPE
 #define RBSDL_STRAFELEFT SDLK_a
 #define RBSDL_STRAFERIGHT SDLK_d
@@ -75,6 +75,9 @@ static int ROCKBOX_Available(void)
 
 static void ROCKBOX_DeleteDevice(SDL_VideoDevice *device)
 {
+    SDL_free(device->hidden->buffer);
+    SDL_free(device->hidden->scale_buffer_input);
+    SDL_free(device->hidden->scale_buffer_output);
     SDL_free(device->hidden);
     SDL_free(device);
 }
@@ -370,6 +373,9 @@ SDL_Surface *ROCKBOX_SetVideoMode(_THIS, SDL_Surface *current,
      * possible input we can be given */
     if(width != LCD_WIDTH || height != LCD_HEIGHT)
     {
+        if(this->hidden->scale_buffer_input) SDL_free(this->hidden->scale_buffer_input);
+        if(this->hidden->scale_buffer_output) SDL_free(this->hidden->scale_buffer_output);
+
         this->hidden->scale_buffer_input = SDL_malloc(width * height * (bpp / 8));
         this->hidden->scale_buffer_output = SDL_malloc(LCD_WIDTH * LCD_HEIGHT * (bpp / 8));
         if ( ! this->hidden->scale_buffer_input || !this->hidden->scale_buffer_output) {
@@ -425,6 +431,20 @@ static void ROCKBOX_UnlockHWSurface(_THIS, SDL_Surface *surface)
     return;
 }
 
+#if LCD_PIXELFORMAT == RGB565SWAPPED
+static void flip_pixels(int x, int y, int w, int h)
+{
+    for(int y = rects[i].y; y < rects[i].y + rects[i].h; ++y)
+    {
+        for(int x = rects[i].x; x < rects[i].x + rects[i].w; ++x)
+        {
+            /* swap pixels directly in the framebuffer */
+            rb->lcd_framebuffer[y * LCD_WIDTH + x] = swap16(rb->lcd_framebuffer[y * LCD_WIDTH + x]);
+        }
+    }
+}
+#endif
+
 //static fb_data tmp_fb[LCD_WIDTH * LCD_HEIGHT];
 
 static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
@@ -442,14 +462,7 @@ static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
                                     rects[i].x, rects[i].y,
                                     rects[i].w, rects[i].h);
 #if LCD_PIXELFORMAT == RGB565SWAPPED
-                for(int y = rects[i].y; y < rects[i].y + rects[i].h; ++y)
-                {
-                    for(int x = rects[i].x; x < rects[i].x + rects[i].w; ++x)
-                    {
-                        /* swap pixels directly in the framebuffer */
-                        rb->lcd_framebuffer[y * LCD_WIDTH + x] = swap16(rb->lcd_framebuffer[y * LCD_WIDTH + x]);
-                    }
-                }
+                flip_pixels(rects[i].x, rects[i].y, rects[i].w, rects[i].h);
 #endif
             }
             /* we must scale */
@@ -482,7 +495,7 @@ static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
                 out_h = out_bmp.height = fp_mul(rects[i].h << 16, this->hidden->scale_y, 16) >> 16;
                 out_bmp.data = this->hidden->scale_buffer_output;
 
-                smooth_resize_bitmap(&in_bmp, &out_bmp);
+                simple_resize_bitmap(&in_bmp, &out_bmp);
 
                 out_x = fp_mul(rects[i].x << 16, this->hidden->scale_x, 16) >> 16;
                 out_y = fp_mul(rects[i].y << 16, this->hidden->scale_y, 16) >> 16;
@@ -492,6 +505,9 @@ static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
                 rb->lcd_bitmap(this->hidden->scale_buffer_output,
                                out_x, out_y,
                                out_w, out_h);
+#if LCD_PIXELFORMAT == RGB565SWAPPED
+                flip_pixels(rects[i].x, rects[i].y, rects[i].w, rects[i].h);
+#endif
             }
         }
         rb->lcd_update();

@@ -28,16 +28,38 @@
 
 #include "plugin.h"
 
-static long start = 0;
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR) && !defined(RB_PROFILE)
+#define USE_TIMER
+#endif
+
+/* based off doom */
+#ifdef USE_TIMER
+static volatile unsigned int ticks = 0;
+
+static void sdltime(void)
+{
+    ticks++;
+}
+#else
+static unsigned long start;
+#endif
 
 void SDL_StartTicks(void)
 {
+#ifdef USE_TIMER
+    rb->timer_register(1, NULL, TIMER_FREQ/1000, sdltime IF_COP(, CPU));
+#else
     start = *rb->current_tick;
+#endif
 }
 
 Uint32 SDL_GetTicks (void)
 {
+#ifdef USE_TIMER
+    return ticks;
+#else
     return (*rb->current_tick - start) * (1000 / HZ);
+#endif
 }
 
 void SDL_Delay (Uint32 ms)

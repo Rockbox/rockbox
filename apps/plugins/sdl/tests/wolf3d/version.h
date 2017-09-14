@@ -33,7 +33,7 @@
 
 #endif
 
-//#define USE_FEATUREFLAGS    // Enables the level feature flags (see bottom of wl_def.h)
+#define USE_FEATUREFLAGS    // Enables the level feature flags (see bottom of wl_def.h)
 //#define USE_SHADING         // Enables shading support (see wl_shade.cpp)
 //#define USE_DIR3DSPR        // Enables directional 3d sprites (see wl_dir3dspr.cpp)
 //#define USE_FLOORCEILINGTEX // Enables floor and ceiling textures stored in the third mapplane (see wl_floorceiling.cpp)
@@ -48,7 +48,7 @@
 #define DEBUGKEYS             // Comment this out to compile without the Tab debug keys
 #define ARTSEXTERN
 #define DEMOSEXTERN
-#define PLAYDEMOLIKEORIGINAL  // When playing or recording demos, several bug fixes do not take
+//#define PLAYDEMOLIKEORIGINAL  // When playing or recording demos, several bug fixes do not take
                               // effect to let the original demos work as in the original Wolf3D v1.4
                               // (actually better, as the second demo rarely worked)
 
