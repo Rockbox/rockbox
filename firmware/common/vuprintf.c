@@ -26,7 +26,7 @@
 #include "vuprintf.h"
 
 #define FMT_H_SUPPORT  0    /* signed/unsigned short formatting */
-#define FMT_HH_SUPPORT 0    /* signed/unsigned char formatting */
+#define FMT_HH_SUPPORT 1    /* signed/unsigned char formatting */
 #define FMT_L_SUPPORT  1    /* signed/unsigned long formatting */
 #define FMT_LL_SUPPORT 0    /* signed/unsigned long long formatting */
 #define FMT_Z_SUPPORT  1    /* size_t/ssize_t formatting */

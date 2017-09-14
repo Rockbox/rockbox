@@ -83,59 +83,97 @@
 
 #undef strdup
 
+#define CLOCKS_PER_SEC HZ
+
+/*
+  copied from firmware/assert.h
+*/
+
+#undef assert
+
+#ifdef NDEBUG           /* required by ANSI standard */
+#define assert(p)       ((void)0)
+#else
+
+#define assert(e)       ((e) ? (void)0 : fatal("assertion failed %s:%d", __FILE__, __LINE__))
+
+#endif /* NDEBUG */
+
+#define SDL_calloc calloc
+#define atan atan_wrapper
 #define atan2 atan2_wrapper
 #define atexit rb_atexit
 #define atoi rb->atoi
 #define calloc tlsf_calloc
-#define SDL_calloc calloc
+#define clock clock_wrapper
 #define cos cos_wrapper
+#define fabs fabs_wrapper
+#define floor floor_wrapper
 #define fmod fmod_wrapper
 #define free tlsf_free
+#define getenv SDL_getenv
+#define getchar() rb->sleep(2*HZ)
+#define log rb_log
+#define lseek rb->lseek
 #define malloc tlsf_malloc
 #define mkdir rb->mkdir
+#define opendir rb->opendir
+#define pow pow_wrapper
 #define printf printf_wrapper
+#define putenv(x) /* nothing */
 #define puts printf
+#define qsort rb->qsort
 #define rand rb->rand
 #define rb_atexit rbsdl_atexit
+/* HACK */
+#define exp(x) pow(2.71828182845, (x))
+#define readdir rb->readdir
 #define realloc tlsf_realloc
 #define remove rb->remove
 #define sin sin_wrapper
+#define snprintf rb->snprintf
 #define sprintf sprintf_wrapper
+#define sqrt sqrt_wrapper
+#define srand rb->srand
 #define sscanf SDL_sscanf
+#define strcasecmp rb->strcasecmp
 #define strcat strcat_wrapper
+#define strchr SDL_strchr
 #define strcmp rb->strcmp
 #define strcpy strcpy_wrapper
 #define strdup strdup_wrapper
 #define strlen rb->strlen
 #define strncmp rb->strncmp
+#define strpbrk strpbrk_wrapper
 #define strrchr rb->strrchr
 #define strstr SDL_strstr
 #define strtol SDL_strtol
-#define qsort rb->qsort
-#define snprintf rb->snprintf
-#define getenv SDL_getenv
-#define strchr SDL_strchr
-#define strpbrk strpbrk_wrapper
-#define sqrt sqrt_wrapper
 #define tan tan_wrapper
-#define fabs fabs_wrapper
-#define lseek rb->lseek
-#define vsnprintf rb->vsnprintf
-#define vsprintf vsprintf_wrapper
 #define unlink remove
-#define pow pow_wrapper
-#define floor floor_wrapper
-#define log rb_log
-#define atan atan_wrapper
+#define vsnprintf rb->vsnprintf
+#define closedir rb->closedir
+#define mkdir rb->mkdir
+#define strncasecmp rb->strncasecmp
+#define atol atoi
+#define atof atof_wrapper
+#define vsprintf vsprintf_wrapper
+#define strtok strtok_wrapper
+#define time(x) (*rb->current_tick/HZ)
+#define strncat rb->strlcat /* hack */
+#define vprintf vprintf_wrapper
+#define strerror(x) "error"
 
-#define assert(x) (0)
-
-#define M_PI 4.0
+#define M_PI 3.141592
+#define EOF 0xff
 
 #define LOAD_XPM
+//#define MID_MUSIC
+//#define USE_TIMIDITY_MIDI
 
 #define FILENAME_MAX MAX_PATH
 
+int vprintf(const char *fmt, va_list ap);
+char *strtok_wrapper(char *str, const char *delim);
 char *strcpy_wrapper(char *dest, const char *src);
 double cos_wrapper(double);
 double sin_wrapper(double);

@@ -1780,12 +1780,12 @@ statetype s_spark3              = {false,SPR_SPARK3,6,(statefunc)T_Projectile,NU
 statetype s_spark4              = {false,SPR_SPARK4,6,(statefunc)T_Projectile,NULL,&s_spark1};
 
 
-void A_Slurpie (objtype *)
+void A_Slurpie (objtype * o)
 {
     SD_PlaySound(SLURPIESND);
 }
 
-void A_Breathing (objtype *)
+void A_Breathing (objtype * o)
 {
     SD_PlaySound(ANGELTIREDSND);
 }
@@ -1820,7 +1820,7 @@ void SpawnAngel (int tilex, int tiley)
 =================
 */
 
-void A_Victory (objtype *)
+void A_Victory (objtype * ob)
 {
     playstate = ex_victorious;
 }

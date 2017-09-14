@@ -296,7 +296,10 @@ static void setup_thread(struct regs *context)
     void (*fn)(void) = context->start;
     context->uc = alloc_thread_buf();
     while (!make_context(context->uc, fn, (char*)context->stack, context->stack_size))
+    {
         DEBUGF("Thread creation failed. Retrying");
+        exit(0);
+    }
 }
 
 
