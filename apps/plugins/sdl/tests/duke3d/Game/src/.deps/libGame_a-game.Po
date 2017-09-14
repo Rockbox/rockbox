@@ -1,0 +1,288 @@
+libGame_a-game.o: game.c /usr/include/stdc-predef.h types.h \
+ /usr/include/inttypes.h /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/bits/wordsize.h /usr/include/bits/long-double.h \
+ /usr/include/gnu/stubs.h /usr/include/gnu/stubs-64.h \
+ /usr/lib/gcc/x86_64-pc-linux-gnu/7.1.1/include/stdint.h \
+ /usr/include/stdint.h /usr/include/bits/libc-header-start.h \
+ /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+ /usr/include/bits/wchar.h develop.h scriplib.h file_lib.h gamedefs.h \
+ keyboard.h util_lib.h function.h control.h sounds.h audiolib/fx_man.h \
+ audiolib/sndcards.h config.h audiolib/sndcards.h duke3d.h \
+ /usr/include/stdio.h \
+ /usr/lib/gcc/x86_64-pc-linux-gnu/7.1.1/include/stddef.h \
+ /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
+ /usr/lib/gcc/x86_64-pc-linux-gnu/7.1.1/include/stdarg.h \
+ /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio.h /usr/include/string.h /usr/include/xlocale.h \
+ /usr/include/bits/string.h /usr/include/bits/string2.h \
+ /usr/include/stdlib.h /usr/include/bits/waitflags.h \
+ /usr/include/bits/waitstatus.h /usr/include/sys/types.h \
+ /usr/include/bits/types/clock_t.h /usr/include/bits/types/clockid_t.h \
+ /usr/include/bits/types/time_t.h /usr/include/bits/types/timer_t.h \
+ /usr/include/endian.h /usr/include/bits/endian.h \
+ /usr/include/bits/byteswap.h /usr/include/bits/byteswap-16.h \
+ /usr/include/bits/uintn-identity.h /usr/include/sys/select.h \
+ /usr/include/bits/select.h /usr/include/bits/sigset.h \
+ /usr/include/bits/types/struct_timeval.h \
+ /usr/include/bits/types/struct_timespec.h /usr/include/sys/sysmacros.h \
+ /usr/include/bits/sysmacros.h /usr/include/bits/pthreadtypes.h \
+ /usr/include/alloca.h /usr/include/bits/stdlib-bsearch.h \
+ /usr/include/bits/stdlib-float.h ../../Engine/src/platform.h \
+ ../../Engine/src/unix_compat.h /usr/include/assert.h \
+ /usr/include/sys/stat.h /usr/include/bits/stat.h /usr/include/sys/uio.h \
+ /usr/include/bits/uio.h /usr/include/unistd.h \
+ /usr/include/bits/posix_opt.h /usr/include/bits/environments.h \
+ /usr/include/bits/confname.h /usr/include/getopt.h /usr/include/fcntl.h \
+ /usr/include/bits/fcntl.h /usr/include/bits/fcntl-linux.h \
+ /usr/include/linux/falloc.h /usr/include/dirent.h \
+ /usr/include/bits/dirent.h /usr/include/bits/posix1_lim.h \
+ /usr/include/bits/local_lim.h /usr/include/linux/limits.h \
+ /usr/include/malloc.h /usr/include/time.h /usr/include/bits/time.h \
+ /usr/include/bits/timex.h /usr/include/bits/types/struct_tm.h \
+ /usr/include/bits/types/struct_itimerspec.h /usr/include/ctype.h \
+ ../../Engine/src/build.h dukeunix.h ../../Game/src/types.h _rts.h rts.h \
+ soundefs.h audiolib/music.h audiolib/../duke3d.h names.h \
+ ../../Engine/src/engine.h ../../Engine/src/cache.h \
+ ../../Engine/src/filesystem.h ../../Engine/src/platform.h \
+ ../../Engine/src/display.h ../../Engine/src/fixedPoint_math.h \
+ ../../Engine/src/tiles.h ../../Engine/src/build.h \
+ ../../Engine/src/network.h ../../Engine/src/fixedPoint_math.h \
+ audiolib/usrhooks.h funct.h console.h cvars.h cvar_defs.h global.h
+
+/usr/include/stdc-predef.h:
+
+types.h:
+
+/usr/include/inttypes.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/bits/long-double.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/7.1.1/include/stdint.h:
+
+/usr/include/stdint.h:
+
+/usr/include/bits/libc-header-start.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/bits/wchar.h:
+
+develop.h:
+
+scriplib.h:
+
+file_lib.h:
+
+gamedefs.h:
+
+keyboard.h:
+
+util_lib.h:
+
+function.h:
+
+control.h:
+
+sounds.h:
+
+audiolib/fx_man.h:
+
+audiolib/sndcards.h:
+
+config.h:
+
+audiolib/sndcards.h:
+
+duke3d.h:
+
+/usr/include/stdio.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/7.1.1/include/stddef.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/7.1.1/include/stdarg.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/include/string.h:
+
+/usr/include/xlocale.h:
+
+/usr/include/bits/string.h:
+
+/usr/include/bits/string2.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/bits/waitflags.h:
+
+/usr/include/bits/waitstatus.h:
+
+/usr/include/sys/types.h:
+
+/usr/include/bits/types/clock_t.h:
+
+/usr/include/bits/types/clockid_t.h:
+
+/usr/include/bits/types/time_t.h:
+
+/usr/include/bits/types/timer_t.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/bits/byteswap.h:
+
+/usr/include/bits/byteswap-16.h:
+
+/usr/include/bits/uintn-identity.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/bits/types/struct_timeval.h:
+
+/usr/include/bits/types/struct_timespec.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/bits/sysmacros.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+/usr/include/alloca.h:
+
+/usr/include/bits/stdlib-bsearch.h:
+
+/usr/include/bits/stdlib-float.h:
+
+../../Engine/src/platform.h:
+
+../../Engine/src/unix_compat.h:
+
+/usr/include/assert.h:
+
+/usr/include/sys/stat.h:
+
+/usr/include/bits/stat.h:
+
+/usr/include/sys/uio.h:
+
+/usr/include/bits/uio.h:
+
+/usr/include/unistd.h:
+
+/usr/include/bits/posix_opt.h:
+
+/usr/include/bits/environments.h:
+
+/usr/include/bits/confname.h:
+
+/usr/include/getopt.h:
+
+/usr/include/fcntl.h:
+
+/usr/include/bits/fcntl.h:
+
+/usr/include/bits/fcntl-linux.h:
+
+/usr/include/linux/falloc.h:
+
+/usr/include/dirent.h:
+
+/usr/include/bits/dirent.h:
+
+/usr/include/bits/posix1_lim.h:
+
+/usr/include/bits/local_lim.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/malloc.h:
+
+/usr/include/time.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/bits/timex.h:
+
+/usr/include/bits/types/struct_tm.h:
+
+/usr/include/bits/types/struct_itimerspec.h:
+
+/usr/include/ctype.h:
+
+../../Engine/src/build.h:
+
+dukeunix.h:
+
+../../Game/src/types.h:
+
+_rts.h:
+
+rts.h:
+
+soundefs.h:
+
+audiolib/music.h:
+
+audiolib/../duke3d.h:
+
+names.h:
+
+../../Engine/src/engine.h:
+
+../../Engine/src/cache.h:
+
+../../Engine/src/filesystem.h:
+
+../../Engine/src/platform.h:
+
+../../Engine/src/display.h:
+
+../../Engine/src/fixedPoint_math.h:
+
+../../Engine/src/tiles.h:
+
+../../Engine/src/build.h:
+
+../../Engine/src/network.h:
+
+../../Engine/src/fixedPoint_math.h:
+
+audiolib/usrhooks.h:
+
+funct.h:
+
+console.h:
+
+cvars.h:
+
+cvar_defs.h:
+
+global.h:

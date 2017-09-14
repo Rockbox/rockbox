@@ -40,7 +40,7 @@ void InitSky();
 void DrawClouds(byte *vbuf, unsigned vbufPitch, int min_wallheight);
 
 #ifndef USE_FEATUREFLAGS
-int GetCloudSkyDefID();
+//int GetCloudSkyDefID();
 #endif
 
 #endif

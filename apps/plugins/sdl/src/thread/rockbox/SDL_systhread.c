@@ -44,7 +44,7 @@ static void rbsdl_runthread(void)
 
 #define MAX_THREAD 4
 static char names[MAX_THREAD][16];
-static char stacks[MAX_THREAD][DEFAULT_STACK_SIZE];
+static long stacks[MAX_THREAD][DEFAULT_STACK_SIZE / sizeof(long)];
 
 int SDL_SYS_CreateThread(SDL_Thread *thread, void *args)
 {

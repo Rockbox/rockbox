@@ -1,0 +1,12 @@
+#include <windows.h>
+#include <commctrl.h>
+#include <richedit.h>
+
+
+
+
+
+//
+// Icon resources
+//
+IDI_ICON1          ICON           ".\\duke_icon.ico"
