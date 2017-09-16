@@ -221,7 +221,6 @@ error:
     return err;
 }
 
-#ifdef SONY_NWZ_LINUX
 /* Digital volume explanation:
  * with very good approximation (<0.1dB) the convertion from dB to multiplicative
  * factor, for dB>=0, is 2^(dB/3). We can then notice that if we write dB=3*k+r
@@ -253,7 +252,6 @@ void pcm_alsa_set_digital_volume(int vol_db)
         dig_vol_mult = 1 << vol_shift | 1 << (vol_shift - 1);
     printf("%d dB -> factor = %d\n", vol_db - 48, dig_vol_mult);
 }
-#endif
 
 /* copy pcm samples to a spare buffer, suitable for snd_pcm_writei() */
 static bool fill_frames(void)
