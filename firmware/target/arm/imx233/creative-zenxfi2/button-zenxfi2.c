@@ -82,7 +82,7 @@ void button_init_device(void)
     imx233_button_init();
 }
 
-static int touch_to_pixels(int *val_x, int *val_y)
+static void fix_pixels(int *val_x, int *val_y)
 {
     short x,y;
 
@@ -101,9 +101,7 @@ static int touch_to_pixels(int *val_x, int *val_y)
     y = MAX(0, MIN(y, LCD_HEIGHT - 1));
 
     *val_x = x;
-    *val_y = y;
-
-    return (x<<16)|y;
+    *val_y = y;;
 }
 
 void touchscreen_enable_device(bool en)
@@ -114,11 +112,10 @@ void touchscreen_enable_device(bool en)
 static int touchscreen_read_device(int *data)
 {
     int x, y;
-    if(!imx233_touchscreen_get_touch(&x, &y))
-        return 0;
-    if(data)
-        *data = touch_to_pixels(&x, &y);
-    return touchscreen_to_pixels(x, y, data);
+    bool touch = imx233_touchscreen_get_touch(&x, &y);
+    fix_pixels(&x, &y);
+    int btns = touchscreen_to_pixels(x, y, data);
+    return touch ? btns : 0;
 }
 
 int button_read_device(int *data)
