@@ -508,12 +508,20 @@
 #define UI_LCD_POSX                 46
 #define UI_LCD_POSY                 40
 
+#elif defined(SONY_NWZA860)
+#define UI_TITLE                    "Sony NWZ-A860 Series"
+#define UI_WIDTH                    390 /* width of GUI window */
+#define UI_HEIGHT                   690/* height of GUI window */
+#define UI_LCD_POSX                 78
+#define UI_LCD_POSY                 92
+
 #elif defined(AGPTEK_ROCKER)
 #define UI_TITLE                    "Agptek Rocker"
 #define UI_WIDTH                    186
 #define UI_HEIGHT                   380
 #define UI_LCD_POSX                 29
 #define UI_LCD_POSY                 25
+
 #elif defined(SIMULATOR)
 #error no UI defines
 #endif
