@@ -60,6 +60,9 @@ extern int hostfs_driver_type(int drive);
 #   define hostfs_driver_type(drive) (STORAGE_NAND_NUM)
 #  elif (CONFIG_STORAGE & STORAGE_RAMDISK)
 #   define hostfs_driver_type(drive) (STORAGE_RAMDISK_NUM)
+/* we may have hostfs without application when building sims for applications! */
+#  elif (CONFIG_STORAGE & STORAGE_HOSTFS)
+#   define hostfs_driver_type(drive) (STORAGE_HOSTFS_NUM)
 #  else
 #   error Unknown storage driver
 #  endif /* CONFIG_STORAGE */

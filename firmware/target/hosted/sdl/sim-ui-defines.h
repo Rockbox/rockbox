@@ -508,6 +508,13 @@
 #define UI_LCD_POSX                 46
 #define UI_LCD_POSY                 40
 
+#elif defined(SONY_NWZA860)
+#define UI_TITLE                    "Sony NWZ-A860 Series"
+#define UI_WIDTH                    390 /* width of GUI window */
+#define UI_HEIGHT                   690/* height of GUI window */
+#define UI_LCD_POSX                 78
+#define UI_LCD_POSY                 92
+
 #elif defined(SIMULATOR)
 #error no UI defines
 #endif

@@ -2594,7 +2594,7 @@ static const struct {
 #endif
         { "Skin Engine RAM usage", dbg_skin_engine },
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SONY_NWZ_LINUX)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || (defined(SONY_NWZ_LINUX) && !defined(SIMULATOR))
         { "View HW info", dbg_hw_info },
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
