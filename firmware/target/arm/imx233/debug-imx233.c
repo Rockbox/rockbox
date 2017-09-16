@@ -1091,6 +1091,7 @@ bool dbg_hw_info_button(void)
     int vddio_val = orig_vddio_val;
     int vddio_brownout = orig_vddio_brownout;
 #endif
+    touchscreen_set_mode(TOUCHSCREEN_POINT);
 
     while(1)
     {
@@ -1114,12 +1115,14 @@ bool dbg_hw_info_button(void)
                 imx233_power_set_regulator(REGULATOR_VDDIO, orig_vddio_val, orig_vddio_brownout);
 #endif
                 lcd_setfont(FONT_UI);
+                touchscreen_set_mode(TOUCHSCREEN_BUTTON);
                 return true;
             case ACT_CANCEL:
 #if IMX233_SUBTARGET >= 3700
                 imx233_power_set_regulator(REGULATOR_VDDIO, orig_vddio_val, orig_vddio_brownout);
 #endif
                 lcd_setfont(FONT_UI);
+                touchscreen_set_mode(TOUCHSCREEN_BUTTON);
                 return false;
         }
 
@@ -1480,6 +1483,8 @@ bool dbg_hw_info(void)
     int len = ARRAYLEN(debug_screens);
     int top_visible = 0;
     int highlight = 0;
+    enum touchscreen_mode old_mode = touchscreen_get_mode();
+    touchscreen_set_mode(TOUCHSCREEN_BUTTON);
     while(1)
     {
         int button = my_get_action(HZ / 10);
@@ -1498,6 +1503,7 @@ bool dbg_hw_info(void)
                 lcd_setfont(FONT_UI);
                 break;
             case ACT_CANCEL:
+                touchscreen_set_mode(old_mode);
                 return false;
         }
         // adjust top visible if needed
@@ -1528,6 +1534,7 @@ bool dbg_hw_info(void)
         lcd_update();
         yield();
     }
+    touchscreen_set_mode(old_mode);
     return false;
 }
 
