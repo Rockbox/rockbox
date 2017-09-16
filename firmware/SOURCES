@@ -95,12 +95,11 @@ target/hosted/samsungypr/radio-ypr.c
 #endif
 #endif
 
-#ifdef SONY_NWZ_LINUX
+#if defined(SONY_NWZ_LINUX) && !defined(SIMULATOR)
 target/hosted/backtrace-glibc.c
 target/hosted/kernel-unix.c
 target/hosted/filesystem-unix.c
 target/hosted/lc-unix.c
-target/hosted/pcm-alsa.c
 target/hosted/sonynwz/lcd-nwz.c
 target/hosted/sonynwz/button-nwz.c
 target/hosted/sonynwz/system-nwz.c
@@ -467,6 +466,7 @@ target/hosted/pcm-alsa.c
 #elif defined(HAVE_NWZ_LINUX_CODEC)
 drivers/audio/nwzlinux-codec.c
 target/hosted/alsa-controls.c
+target/hosted/pcm-alsa.c
 #elif defined(HAVE_SDL_AUDIO)
 drivers/audio/sdl.c
 #if CONFIG_CODEC == SWCODEC

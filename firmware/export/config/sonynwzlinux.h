@@ -2,7 +2,9 @@
  * This config file is for the Sony NWZ Linux based targets
  */
 
+#ifndef SIMULATOR
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
+#endif
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
@@ -64,9 +66,16 @@
 #define CONFIG_KEYPAD SONY_NWZ_PAD
 #define HAS_BUTTON_HOLD
 
+/** Non-simulator section **/
+#ifndef SIMULATOR
 /* We have usb power and can detect usb but it is handled by Linux */
 #define HAVE_USB_POWER
 #define USB_NONE
+
+/* Audio codec */
+#define HAVE_NWZ_LINUX_CODEC
+
+#endif /* SIMULATOR */
 
 #define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
 
@@ -91,9 +100,6 @@
 
 /* Battery */
 #define BATTERY_TYPES_COUNT  1
-
-/* Audio codec */
-#define HAVE_NWZ_LINUX_CODEC
 
 /* special define to be use in various places */
 #define SONY_NWZ_LINUX
