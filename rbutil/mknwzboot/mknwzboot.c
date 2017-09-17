@@ -27,6 +27,7 @@
 #include "upg.h"
 
 #include "install_script.h"
+#include "uninstall_script.h"
 
 struct nwz_model_desc_t
 {
@@ -145,6 +146,24 @@ static int find_model(uint8_t *boot, size_t boot_size)
     return model;
 }
 
+static int find_model2(const char *model_str)
+{
+    /* since it can be confusing for the user, we accept both rbmodel and codename */
+    /* find model by comparing magic scramble value */
+    int model = 0;
+    for(; model < NR_NWZ_MODELS; model++)
+        if(strcmp(nwz_models[model].rb_model_name, model_str) == 0 ||
+                strcmp(nwz_models[model].codename, model_str) == 0)
+            break;
+    if(model == NR_NWZ_MODELS)
+    {
+        printf("[ERR] Unknown model: %s\n", model_str);
+        return -1;
+    }
+    printf("[INFO] Bootloader file for %s\n", nwz_models[model].model_name);
+    return model;
+}
+
 static bool get_model_keysig(int model, char key[NWZ_KEY_SIZE], char sig[NWZ_SIG_SIZE])
 {
     const char *codename = nwz_models[model].codename;
@@ -213,6 +232,47 @@ int mknwzboot(const char *bootfile, const char *outfile, bool debug)
      * to copy data because upg_free() will free it */
     upg_append(upg, memdup(boot + 8, boot_size - 8), boot_size - 8);
     free(boot);
+    /* write file to buffer */
+    size_t upg_size;
+    void *upg_buf = upg_write_memory(upg, key, sig, &upg_size, &debug, nwz_printf);
+    upg_free(upg);
+    if(upg_buf == NULL)
+    {
+        printf("[ERR] Cannot create UPG file\n");
+        return 4;
+    }
+    if(!write_file(outfile, upg_buf, upg_size))
+    {
+        free(upg_buf);
+        printf("[ERR] Cannpt write UPG file\n");
+        return 5;
+    }
+    free(upg_buf);
+    return 0;
+}
+
+int mknwzboot_uninst(const char *model_string, const char *outfile, bool debug)
+{
+    /* check that it is a valid scrambled file */
+    int model = find_model2(model_string);
+    if(model < 0)
+    {
+        printf("[ERR] Invalid model\n");
+        return 2;
+    }
+    /* find keys */
+    char key[NWZ_KEY_SIZE];
+    char sig[NWZ_SIG_SIZE];
+    if(!get_model_keysig(model, key, sig))
+    {
+        printf("[ERR][INTERNAL] Cannot get keys for model\n");
+        return 3;
+    }
+    /* create the upg file */
+    struct upg_file_t *upg = upg_new();
+    /* first file is the uninstall script: we have to copy data because upg_free()
+     * will free it */
+    upg_append(upg, memdup(uninstall_script, LEN_uninstall_script), LEN_uninstall_script);
     /* write file to buffer */
     size_t upg_size;
     void *upg_buf = upg_write_memory(upg, key, sig, &upg_size, &debug, nwz_printf);

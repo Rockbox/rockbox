@@ -33,6 +33,7 @@ extern "C" {
 void dump_nwz_dev_info(const char *prefix);
 /* return 0 on success */
 int mknwzboot(const char *bootfile, const char *outfile, bool debug);
+int mknwzboot_uninst(const char *model, const char *outfile, bool debug);
 
 #ifdef __cplusplus
 }

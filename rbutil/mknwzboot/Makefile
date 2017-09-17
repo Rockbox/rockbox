@@ -18,7 +18,7 @@ OUTPUT = mknwzboot
 
 # inputs for lib
 UPGTOOLS_SOURCES = misc.c upg.c fwp.c mg.cpp md5.cpp
-LIBSOURCES := mknwzboot.c install_script.c \
+LIBSOURCES := mknwzboot.c install_script.c uninstall_script.c \
 	      $(addprefix $(UPGTOOLS_DIR),$(UPGTOOLS_SOURCES))
 # inputs for binary only
 SOURCES := $(LIBSOURCES) main.c
@@ -30,6 +30,9 @@ include ../libtools.make
 install_script.c install_script.h: install_script.sh $(BIN2C)
 	$(BIN2C) install_script.sh install_script
 
+uninstall_script.c uninstall_script.h: uninstall_script.sh $(BIN2C)
+	$(BIN2C) uninstall_script.sh uninstall_script
+
 # explicit dependencies on install_script.{c,h} and mknwzboot.h
-$(OBJDIR)mknwzboot.o: install_script.h install_script.c mknwzboot.h
-$(OBJDIR)main.o: install_script.h install_script.c main.c mknwzboot.h
+$(OBJDIR)mknwzboot.o: install_script.h install_script.c uninstall_script.h uninstall_script.c mknwzboot.h
+$(OBJDIR)main.o: main.c mknwzboot.h
