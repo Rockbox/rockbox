@@ -130,7 +130,7 @@ void usage(void)
            "\t                   747p, x777, nn2g, m244, cli+, fuz2, hd20, hd30,\n"
            "\t                   ip6g, rk27, clzp, zxf2, zxf3, fuz+, e370, e360,\n"
            "\t                   zxfi, zmoz, zen, zenv, ypz5, zxfs, e450, e460,\n"
-           "\t                   e470,e580,a10,a20,a860,s750)\n");
+           "\t                   e470,e580,a10,a20,a860,s750,e350)\n");
     printf("\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -399,6 +399,8 @@ int main (int argc, char** argv)
             modelnum = 107;
         else if (!strcmp(&argv[1][5], "s750")) /* Sony NWZ-S750 series */
             modelnum = 108;
+        else if (!strcmp(&argv[1][5], "e350")) /* Sony NWZ-E350 series */
+            modelnum = 109;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

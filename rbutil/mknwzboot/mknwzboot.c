@@ -45,6 +45,7 @@ struct nwz_model_desc_t
 
 static const struct nwz_model_desc_t nwz_models[] =
 {
+    { "Sony NWZ-E350 Series", "e350", 109, "nwz-e350" },
     { "Sony NWZ-E450 Series", "e450", 100, "nwz-e450" },
     { "Sony NWZ-E460 Series", "e460", 101, "nwz-e460" },
     { "Sony NWZ-E470 Series", "e470", 103, "nwz-e470" },
