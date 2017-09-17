@@ -34,6 +34,8 @@ static void usage(void)
     printf("  -b <file>   Set boot file\n");
     printf("  -d/--debug  Enable debug output\n");
     printf("  -x          Dump device informations\n");
+    printf("  -u          Create uninstall update\n");
+    printf("  -m <model>  Specify model\n");
     exit(1);
 }
 
@@ -42,6 +44,8 @@ int main(int argc, char *argv[])
     char *outfile = NULL;
     char *bootfile = NULL;
     bool debug = false;
+    bool install = true;
+    const char *model = NULL;
 
     if(argc == 1)
         usage();
@@ -55,10 +59,12 @@ int main(int argc, char *argv[])
             {"boot-file", required_argument, 0, 'b'},
             {"debug", no_argument, 0, 'd'},
             {"dev-info", no_argument, 0, 'x'},
+            {"uninstall", no_argument, 0, 'u'},
+            {"model", required_argument, 0, 'm'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "ho:b:dx", long_options, NULL);
+        int c = getopt_long(argc, argv, "ho:b:dxum:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -77,6 +83,12 @@ int main(int argc, char *argv[])
                 break;
             case 'x':
                 dump_nwz_dev_info("");
+                return 0;
+            case 'u':
+                install = false;
+                break;
+            case 'm':
+                model = optarg;
                 break;
             default:
                 abort();
@@ -88,9 +100,14 @@ int main(int argc, char *argv[])
         printf("You must specify an output file\n");
         return 1;
     }
-    if(!bootfile)
+    if(install && !bootfile)
     {
-        printf("You must specify a boot file\n");
+        printf("You must specify a boot file for installation\n");
+        return 1;
+    }
+    if(!install && !model)
+    {
+        printf("You must provide a model for uninstallation\n");
         return 1;
     }
     if(optind != argc)
@@ -99,7 +116,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    int err = mknwzboot(bootfile, outfile, debug);
+    int err;
+    if(install)
+        err = mknwzboot(bootfile, outfile, debug);
+    else
+        err = mknwzboot_uninst(model, outfile, debug);
     printf("Result: %d\n", err);
     return err;
 }

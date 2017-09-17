@@ -42,11 +42,10 @@ if [ "$?" != 0 ]; then
 fi
 
 # redirect all output to a log file
-exec > "$CONTENTS/install_dualboot_log.txt" 2>&1
+exec > "$CONTENTS/uninstall_dualboot_log.txt" 2>&1
 
 # import constants
 . /install_script/constant.txt
-_UPDATE_FN_=`nvpstr ufn`
 ROOTFS_TMP_DIR=/tmp/rootfs
 SPIDERAPP_PATH=$ROOTFS_TMP_DIR/usr/local/bin/SpiderApp
 
@@ -79,53 +78,19 @@ if [ "$?" != 0 ]; then
     exit 0
 fi
 
-# rename the previous main application unless there is already a copy
-lcdprint 0,8 "Backup OF"
+# the installer renames the OF to $SPIDERAPP_PATH.of so if it does not exists
+# print an error
+lcdprint 0,8 "Restore OF"
 if [ ! -e $SPIDERAPP_PATH.of ]; then
-    mv $SPIDERAPP_PATH $SPIDERAPP_PATH.of
-fi
-
-# extract our payload: the second file in the upgrade is a tar file
-# the files in the archive have paths of the form ./absolute/path and we extract
-# it at the rootfs mount it, so it can create/overwrite any file
-#
-# we need a small trick here: we want to pipe directly the output of the decryption
-# tool to tar, to avoid using space in /tmp/ or on the user partition
-lcdprint 0,9 "Install rockbox"
-FIFO_FILE=/tmp/rb.fifo
-mkfifo $FIFO_FILE
-if [ "$?" != 0 ]; then
-    umount "$ROOTFS_TMP_DIR"
-    lcdprint 0,15 "ERROR: cannot create fifo"
+    lcdprint 0,15 "ERROR: cannot find OF"
+    lcdprint 0,16 "ERROR: is Rockbox installed?"
     sleep 3
     exit 0
 fi
-fwpchk -f /contents/$_UPDATE_FN_.UPG -c -1 $FIFO_FILE &
-#tar -tvf $FIFO_FILE
-tar -C $ROOTFS_TMP_DIR -xvf $FIFO_FILE
+# restore the OF
+mv $SPIDERAPP_PATH.of $SPIDERAPP_PATH
 if [ "$?" != 0 ]; then
-    umount "$ROOTFS_TMP_DIR"
-    lcdprint 0,15 "ERROR: extraction failed"
-    sleep 3
-    exit 0
-fi
-# wait for fwpchk
-wait
-if [ "$?" != 0 ]; then
-    umount "$ROOTFS_TMP_DIR"
-    lcdprint 0,15 "ERROR: no file to extract"
-    sleep 3
-    exit 0
-fi
-
-# create a symlink from /.rockbox to /contents/.rockbox (see dualboot code
-# for why)
-lcdprint 0,10 "Create rockbox symlink"
-rm -f "$ROOTFS_TMP_DIR/.rockbox"
-ln -s "$CONTENTS/.rockbox" "$ROOTFS_TMP_DIR/.rockbox"
-if [ "$?" != 0 ]; then
-    umount "$ROOTFS_TMP_DIR"
-    lcdprint 0,15 "ERROR: cannot create rockbox symlink"
+    lcdprint 0,15 "ERROR: restore failed"
     sleep 3
     exit 0
 fi
@@ -152,6 +117,6 @@ lcdprint 0,15 "Rebooting in 3 seconds."
 sleep 3
 sync
 
-echo "Installation successful"
+echo "Uninstallation successful"
 # finish
 exit 0
