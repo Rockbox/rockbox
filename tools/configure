@@ -1524,17 +1524,17 @@ cat <<EOF
  200) SDL                 ==HiFi E.T.==          191) HM-801
  201) Android             210) MA9
  202) Nokia N8xx          211) MA9C              ==Sony==
- 203) Nokia N900          212) MA8               220) NWZ-E370/E380 series
- 204) Pandora             213) MA8C              221) NWZ-E360 series
- 205) Samsung YP-R0                              222) NWZ-E450 series
- 206) Android MIPS        ==IHIFI==              223) NWZ-E460 series
- 207) Android x86         230) 760               224) NWZ-E470 series
- 208) Samsung YP-R1       231) 960               225) NWZ-E580 series
-                                                 226) NWZ-A10 series
- ==iBasso==               ==Agptek==             227) NW-A20 series
- 232) DX50                240) Rocker            228) NWZ-A860 series
- 233) DX90                                       229) NWZ-S750 series
-
+ 203) Nokia N900          212) MA8               219) NWZ-E350 series
+ 204) Pandora             213) MA8C              220) NWZ-E370/E380 series
+ 205) Samsung YP-R0                              221) NWZ-E360 series
+ 206) Android MIPS        ==IHIFI==              222) NWZ-E450 series
+ 207) Android x86         230) 760               223) NWZ-E460 series
+ 208) Samsung YP-R1       231) 960               224) NWZ-E470 series
+                                                 225) NWZ-E580 series
+ ==iBasso==               ==Agptek==             226) NWZ-A10 series
+ 232) DX50                240) Rocker            227) NW-A20 series
+ 233) DX90                                       228) NWZ-A860 series
+                                                 229) NWZ-S750 series
 EOF
 
   buildfor=`input`;
@@ -3847,6 +3847,29 @@ fi
     t_cpu="arm"
     t_manufacturer="rk27xx"
     t_model="ma"
+    ;;
+
+   219|sonynwze350)
+    application="yes"
+    target_id=105
+    modelname="sonynwze350"
+    target="SONY_NWZE350"
+    memory=16
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="cp"
+    output="rockbox.sony"
+    boottool="$rootdir/tools/scramble -add=e350"
+    bootoutput="bootloader-nwze350.sony"
+    appextra="gui:recorder"
+    plugins=""
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    t_cpu="hosted"
+    t_manufacturer="sonynwz"
+    t_model="nwze350"
+    uname=`uname`
+    sonynwzcc
     ;;
 
    220|sonynwze370)
