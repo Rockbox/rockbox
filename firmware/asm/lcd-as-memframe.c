@@ -33,12 +33,10 @@ extern void lcd_write_yuv420_lines(fb_data *dst,
     /* Draw a partial YUV colour bitmap - similiar behavior to lcd_blit_yuv
        in the core */
     const unsigned char *ysrc, *usrc, *vsrc;
-    int height = 2, linecounter;
     fb_data *row_end;
 
     /* width and height must be >= 2 and an even number */
     width &= ~1;
-    linecounter = height >> 1;
 
 #if LCD_WIDTH >= LCD_HEIGHT
     row_end = dst + width;
