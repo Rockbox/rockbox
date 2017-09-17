@@ -390,6 +390,10 @@ $releasenotes="/wiki/ReleaseNotes314";
         name => 'Sony NWZ-A860',
         status => 2,
     },
+    'sonynwzs750' => {
+        name => 'Sony NWZ-S750',
+        status => 2,
+    },
     'creativezenxfi' => {
         name => 'Creative Zen X-Fi',
         status => 3
