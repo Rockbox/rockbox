@@ -354,6 +354,10 @@ $releasenotes="/wiki/ReleaseNotes314";
         name => 'Creative Zen X-Fi3',
         status => 3,
     },
+    'sonynwze350' => {
+        name => 'Sony NWZ-E350',
+        status => 2,
+    },
     'sonynwze360' => {
         name => 'Sony NWZ-E360',
         status => 3,
