@@ -122,7 +122,10 @@ enum codec_status codec_run(void)
     OggVorbis_File vf;
     ogg_int32_t **pcm;
 
-    int error = CODEC_ERROR;
+    /* mark variable volatile because it can be modified between setjmp() and
+     * longjmp() so the compiler needs to know it should not put it in a register,
+     * see "man longjmp" for details. */
+    volatile int error = CODEC_ERROR;
     long n;
     int current_section;
     int previous_section;
