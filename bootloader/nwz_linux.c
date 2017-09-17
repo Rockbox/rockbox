@@ -44,6 +44,7 @@
 #include <dirent.h>
 #include <sys/wait.h>
 #include <stdarg.h>
+#include "version.h"
 
 /* all images must have the following size */
 #define ICON_WIDTH  130
@@ -470,6 +471,11 @@ int main(int argc, char **argv)
         dup2(fd, fileno(stderr));
         close(fd);
     }
+    /* print version */
+    printf("Rockbox boot loader\n");
+    printf("Version: %s\n", rbversion);
+    printf("%s\n", MODEL_NAME);
+
     system_init();
     core_allocator_init();
     kernel_init();
