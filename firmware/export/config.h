@@ -586,10 +586,6 @@ Lyre prototype 1 */
 #include "config/ibassodx50.h"
 #elif defined(DX90)
 #include "config/ibassodx90.h"
-<<<<<<< 132297db71d4887c5c9e163872febe80b9fa02bb
-#elif defined(AGPTEK_ROCKER)
-#include "config/agptekrocker.h"
-=======
 #elif defined(SONY_NWZE460)
 #include "config/sonynwze460.h"
 #elif defined(SONY_NWZE450)
@@ -602,12 +598,12 @@ Lyre prototype 1 */
 #include "config/sonynwa20.h"
 #elif defined(SONY_NWZE470)
 #include "config/sonynwze470.h"
-<<<<<<< d5b52e49df54d6f8b377576f079216ed81a00036
->>>>>>> Initial commit for the Sony NWZ linux port
-=======
 #elif defined(SONY_NWZA860)
 #include "config/sonynwza860.h"
->>>>>>> Add support for the NWZ-A860
+#elif defined(SONY_NWZS750)
+#include "config/sonynwzs750.h"
+#elif defined(AGPTEK_ROCKER)
+#include "config/agptekrocker.h"
 #else
 /* no known platform */
 #endif

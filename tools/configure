@@ -1533,7 +1533,7 @@ cat <<EOF
                                                  226) NWZ-A10 series
  ==iBasso==               ==Agptek==             227) NW-A20 series
  232) DX50                240) Rocker            228) NWZ-A860 series
- 233) DX90
+ 233) DX90                                       229) NWZ-S750 series
 
 EOF
 
@@ -4046,6 +4046,29 @@ fi
     t_cpu="hosted"
     t_manufacturer="sonynwz"
     t_model="nwza860"
+    uname=`uname`
+    sonynwzcc
+    ;;
+
+   229|sonynwzs750)
+    application="yes"
+    target_id=104
+    modelname="sonynwzs750"
+    target="SONY_NWZS750"
+    memory=16
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    tool="cp"
+    output="rockbox.sony"
+    boottool="$rootdir/tools/scramble -add=s750"
+    bootoutput="bootloader-nwzs750.sony"
+    appextra="gui:recorder"
+    plugins=""
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    t_cpu="hosted"
+    t_manufacturer="sonynwz"
+    t_model="nwzs750"
     uname=`uname`
     sonynwzcc
     ;;
