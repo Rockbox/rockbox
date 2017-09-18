@@ -62,6 +62,7 @@
 #include "yesno.h"
 #include "viewport.h"
 #include "list.h"
+#include "fixedpoint.h"
 
 #include "debug.h"
 
@@ -1060,21 +1061,13 @@ char* skip_whitespace(char* const str)
  */
 void format_time(char* buf, int buf_size, long t)
 {
-    int const time = abs(t / 1000);
-    int const hours = time / 3600;
-    int const minutes = time / 60 - hours * 60;
-    int const seconds = time % 60;
-    const char * const sign = &"-"[t < 0 ? 0 : 1];
-
-    if ( hours == 0 )
-    {
-        snprintf(buf, buf_size, "%s%d:%02d", sign, minutes, seconds);
-    }
-    else
-    {
-        snprintf(buf, buf_size, "%s%d:%02d:%02d", sign, hours, minutes,
-                 seconds);
-    }
+    unsigned long time = labs(t / 1000);
+    unsigned long hours = time / 3600;
+    unsigned long minutes = time / 60 - hours * 60;
+    unsigned long seconds = time % 60;
+    int hashours = hours > 0;
+    snprintf(buf, buf_size, "%.*s%.0lu%.*s%.*lu:%.2lu",
+             t < 0, "-", hours, hashours, ":", hashours+1, minutes, seconds);
 }
 
 /**
@@ -1260,3 +1253,18 @@ enum current_activity get_current_activity(void)
 }
 
 #endif
+
+/* format a sound value like: -1.05 dB */
+int format_sound_value(char *buf, size_t size, int snd, int val)
+{
+    int numdec = sound_numdecimals(snd);
+    const char *unit = sound_unit(snd);
+    int physval = sound_val2phys(snd, val);
+
+    unsigned int factor = ipow(10, numdec);
+    unsigned int av = abs(physval);
+    unsigned int i = av / factor;
+    unsigned int d = av - i*factor;
+    return snprintf(buf, size, "%c%u%.*s%.*u %s", " -"[physval < 0],
+                    i, numdec, ".", numdec, d, unit);
+}
