@@ -548,39 +548,9 @@ static void auto_gain_control(int *peak_l, int *peak_r, int *balance)
 }
 #endif /* HAVE_AGC */
 
-static const char* const fmtstr[] =
-{
-    "%c%d %s",            /* no decimals */
-    "%c%d.%d %s ",        /* 1 decimal */
-    "%c%d.%02d %s "       /* 2 decimals */
-};
-
-static const char factor[] = {1, 10, 100};
-
 static char *fmt_gain(int snd, int val, char *str, int len)
 {
-    int i, d, numdec;
-    const char *unit;
-    char sign = ' ';
-
-    val = sound_val2phys(snd, val);
-    if(val < 0)
-    {
-        sign = '-';
-        val = -val;
-    }
-    numdec = sound_numdecimals(snd);
-    unit = sound_unit(snd);
-
-    if(numdec)
-    {
-        i = val / factor[numdec];
-        d = val % factor[numdec];
-        snprintf(str, len, fmtstr[numdec], sign, i, d, unit);
-    }
-    else
-        snprintf(str, len, fmtstr[numdec], sign, val, unit);
-
+    format_sound_value(str, len, snd, val);
     return str;
 }
 

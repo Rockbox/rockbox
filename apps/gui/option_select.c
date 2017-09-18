@@ -106,23 +106,9 @@ const char *option_get_valuestring(const struct settings_list *setting,
     }
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
-        char sign = ' ';
-        const char *unit = sound_unit(setting->sound_setting->setting);
-        int val = sound_val2phys(setting->sound_setting->setting, (int)temp_var);
-        if (sound_numdecimals(setting->sound_setting->setting))
-        {
-            int integer, dec;
-            if(val < 0)
-            {
-                sign = '-';
-                val = abs(val);
-            }
-            integer = val / 10;
-            dec = val % 10;
-            snprintf(buffer, buf_len, "%c%d.%d %s", sign, integer, dec, unit);
-        }
-        else
-            snprintf(buffer, buf_len, "%d %s", val, unit);
+        format_sound_value(buffer, buf_len,
+                           setting->sound_setting->setting,
+                           temp_var);
     }
     else if ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING)
     {

@@ -397,8 +397,7 @@ void WI_unloadData(void);
 void WI_levelNameLump(int epis, int map, char* buf, int bsize)
 {
    if (gamemode == commercial) {
-      snprintf(buf, bsize,"CWILV%s%d",(map/10>0?"":"0"), map);  //ANOTHER ROCKHACK "CWILV%2.2d"
-      //snprintf(buf,bsize, "CWILV%2.2d", map);
+      snprintf(buf,bsize, "CWILV%2.2d", map);
    } else {
       snprintf(buf,bsize, "WILV%d%d", epis, map);
    }
@@ -1829,8 +1828,7 @@ void WI_loadData(void)
                if (wbs->epsd != 1 || j != 8)
                {
                   // animations
-                  snprintf(name, sizeof(name),"WIA%d%s%d%s%d", wbs->epsd, (j/10>0?"":"0"), j,(i/10>0?"":"0"), i);  //ANOTHER ROCKHACK
-                  //snprintf(name, sizeof(name),"WIA%d%.2d%.2d", wbs->epsd, j, i);
+                  snprintf(name, sizeof(name),"WIA%d%.2d%.2d", wbs->epsd, j, i);
                   a->p[i] = W_CacheLumpName(name);
                }
                else
@@ -1872,8 +1870,7 @@ void WI_unloadData(void)
                // MONDO HACK!
                if (wbs->epsd != 1 || j != 8) {
                   // animations
-                  snprintf(name, sizeof(name),"WIA%d%s%d%s%d", wbs->epsd, (j/10>0?"":"0"), j,(i/10>0?"":"0"), i);  //ANOTHER ROCKHACK
-                  //snprintf(name,sizeof(name), "WIA%d%.2d%.2d", wbs->epsd, j, i);
+                  snprintf(name,sizeof(name), "WIA%d%.2d%.2d", wbs->epsd, j, i);
                   W_UnlockLumpName(name);
                }
             }

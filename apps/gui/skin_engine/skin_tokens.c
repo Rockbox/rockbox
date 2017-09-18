@@ -70,6 +70,7 @@
 #if CONFIG_TUNER
 #include "radio.h"
 #include "tuner.h"
+#include "fixedpoint.h"
 #endif
 #include "list.h"
 
@@ -432,23 +433,11 @@ const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
 /* Returns buf                                       */
 static char *format_freq_MHz(int freq, int freq_step, char *buf, int buf_size)
 {
-    int scale, div;
-    char *fmt;
-    if (freq_step < 100000)
-    {
-        /* Format with two digits after decimal point */
-        scale = 10000;
-        fmt = "%d.%02d";
-    }
-    else
-    {
-        /* Format with one digit after decimal point */
-        scale = 100000;
-        fmt = "%d.%d";
-    }
-    div = 1000000 / scale;
+    int decimals = (freq_step < 100000) + 1;
+    int scale = ipow(10, 6 - decimals);
+    int div = 1000000 / scale;
     freq = freq / scale;
-    snprintf(buf, buf_size, fmt, freq/div, freq%div);
+    snprintf(buf, buf_size, "%d.%.*d", freq/div, decimals, freq%div);
     return buf;
 }
 
