@@ -528,7 +528,6 @@ int main(int argc, char **argv)
         }
         else
         {
-            /* FIXME doesn't seem to work */
             printf("suspend\n");
             nwz_power_suspend();
         }
