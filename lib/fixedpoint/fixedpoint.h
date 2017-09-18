@@ -89,6 +89,8 @@ long fp16_log(int x);
 long fp16_exp(int x);
 
 unsigned long isqrt(unsigned long x);
+long ipow(long b, long n);
+
 
 /* fast unsigned multiplication (16x16bit->32bit or 32x32bit->32bit,
  * whichever is faster for the architecture) */
