@@ -62,6 +62,7 @@
 #include "yesno.h"
 #include "viewport.h"
 #include "list.h"
+#include "fixedpoint.h"
 
 #include "debug.h"
 
@@ -1260,3 +1261,18 @@ enum current_activity get_current_activity(void)
 }
 
 #endif
+
+/* format a sound value like: -1.05 dB */
+int format_sound_value(char *buf, size_t size, int snd, int val)
+{
+    int numdec = sound_numdecimals(snd);
+    const char *unit = sound_unit(snd);
+    int physval = sound_val2phys(snd, val);
+
+    int factor = ipow(10, numdec);
+    int av = abs(physval);
+    int i = av / factor;
+    int d = av - i*factor;
+    return snprintf(buf, size, "%c%d%s%.*d %s", " -"[physval < 0],
+                    i, &"."[!numdec], numdec, d, unit);
+}
