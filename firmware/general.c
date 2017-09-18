@@ -107,7 +107,6 @@ char *create_numbered_filename(char *buffer, const char *path,
     int pathlen;
     int prefixlen = strlen(prefix);
     int suffixlen = strlen(suffix);
-    char fmtstring[12];
 
     if (buffer != path)
         strlcpy(buffer, path, MAX_PATH);
@@ -152,9 +151,8 @@ char *create_numbered_filename(char *buffer, const char *path,
 
     max_num++;
 
-    snprintf(fmtstring, sizeof(fmtstring), "/%%s%%0%dd%%s", numberlen);
-    snprintf(buffer + pathlen, MAX_PATH - pathlen, fmtstring, prefix,
-             max_num, suffix);
+    snprintf(buffer + pathlen, MAX_PATH - pathlen, "/%s%0*d%s", prefix,
+             numberlen, max_num, suffix);
 
 #ifdef IF_CNFN_NUM
     if (num)
