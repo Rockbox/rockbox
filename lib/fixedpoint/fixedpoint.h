@@ -85,6 +85,8 @@ long fp14_sin(int val);
 long fp16_log(int x);
 long fp16_exp(int x);
 
+long ipow(long x, long y);
+
 /* fast unsigned multiplication (16x16bit->32bit or 32x32bit->32bit,
  * whichever is faster for the architecture) */
 #ifdef CPU_ARM

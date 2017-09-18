@@ -1053,9 +1053,10 @@ static bool view_battery(void)
 
                 st = power_input_status() &
                      (POWER_INPUT_CHARGER | POWER_INPUT_BATTERY);
-                lcd_putsf(0, line++, "%s%s",
-                         (st & POWER_INPUT_MAIN_CHARGER) ? " Main" : "",
-                         (st & POWER_INPUT_USB_CHARGER) ? " USB" : "");
+
+                lcd_putsf(0, line++, "%.*s%.*s",
+                         !!(st & POWER_INPUT_MAIN_CHARGER)*5, " Main",
+                         !!(st & POWER_INPUT_USB_CHARGER)*4, " USB");
 
                 y = ARRAYLEN(chrgstate_strings) - 1;
 
@@ -1084,22 +1085,18 @@ static bool view_battery(void)
                          y / 1000, y % 1000);
 
                 y = battery_adc_charge_current();
-                if (y < 0) x = '-', y = -y;
-                else       x = ' ';
-                lcd_putsf(0, line++, "CHRGISN:%c%d mA", x, y);
+                lcd_putsf(0, line++, "CHRGISN:% d mA", y);
 
                 y = cccv_regulator_dissipation();
                 lcd_putsf(0, line++, "P CCCV : %d mW", y);
 
                 y = battery_charge_current();
-                if (y < 0) x = '-', y = -y;
-                else       x = ' ';
-                lcd_putsf(0, line++, "I Charge:%c%d mA", x, y);
+                lcd_putsf(0, line++, "I Charge:% d mA", y);
 
                 y = battery_adc_temp();
 
                 if (y != INT_MIN) {
-                    lcd_putsf(0, line++, "T Battery: %dC (%dF)", y,
+                    lcd_putsf(0, line++, "T Battery: %d\u00b0C (%d\u00b0F)", y,
                                (9*y + 160) / 5);
                 } else {
                     /* Conversion disabled */
@@ -1371,6 +1368,8 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 #elif  (CONFIG_STORAGE & STORAGE_ATA)
 static int disk_callback(int btn, struct gui_synclist *lists)
 {
+    static const char atanums[] = { " 0 1 2 3 4 5 6" };
+
     (void)lists;
     int i;
     char buf[128];
@@ -1414,12 +1413,10 @@ static int disk_callback(int btn, struct gui_synclist *lists)
              "Read-ahead: %s", i ? "enabled" : "unsupported");
     timing_info_present = identify_info[53] & (1<<1);
     if(timing_info_present) {
-        char pio3[2], pio4[2];pio3[1] = 0;
-        pio4[1] = 0;
-        pio3[0] = (identify_info[64] & (1<<0)) ? '3' : 0;
-        pio4[0] = (identify_info[64] & (1<<1)) ? '4' : 0;
         simplelist_addline(
-                 "PIO modes: 0 1 2 %s %s", pio3, pio4);
+                 "PIO modes: 0 1 2%.*s%.*s",
+                 (identify_info[64] & (1<<0)) << 1, &atanums[3*2],
+                 (identify_info[64] & (1<<1))     , &atanums[4*2]);
     }
     else {
         simplelist_addline(
@@ -1442,13 +1439,11 @@ static int disk_callback(int btn, struct gui_synclist *lists)
             "Physical sector size: %d", sector_size);
 #ifdef HAVE_ATA_DMA
     if (identify_info[63] & (1<<0)) {
-        char mdma0[2], mdma1[2], mdma2[2];
-        mdma0[1] = mdma1[1] = mdma2[1] = 0;
-        mdma0[0] = (identify_info[63] & (1<<0)) ? '0' : 0;
-        mdma1[0] = (identify_info[63] & (1<<1)) ? '1' : 0;
-        mdma2[0] = (identify_info[63] & (1<<2)) ? '2' : 0;
         simplelist_addline(
-                 "MDMA modes: %s %s %s", mdma0, mdma1, mdma2);
+                 "MDMA modes:%.*s%.*s%.*s",
+                  (identify_info[63] & (1<<0)) << 1, &atanums[0*2],
+                  (identify_info[63] & (1<<1))     , &atanums[1*2],
+                  (identify_info[63] & (1<<2)) >> 1, &atanums[2*2]);
         simplelist_addline(
                  "MDMA Cycle times %dns/%dns",
                  identify_info[65],
@@ -1459,18 +1454,15 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                 "No MDMA mode info");
     }
     if (identify_info[53] & (1<<2)) {
-        char udma0[2], udma1[2], udma2[2], udma3[2], udma4[2], udma5[2], udma6[2];
-        udma0[1] = udma1[1] = udma2[1] = udma3[1] = udma4[1] = udma5[1] = udma6[1] = 0;
-        udma0[0] = (identify_info[88] & (1<<0)) ? '0' : 0;
-        udma1[0] = (identify_info[88] & (1<<1)) ? '1' : 0;
-        udma2[0] = (identify_info[88] & (1<<2)) ? '2' : 0;
-        udma3[0] = (identify_info[88] & (1<<3)) ? '3' : 0;
-        udma4[0] = (identify_info[88] & (1<<4)) ? '4' : 0;
-        udma5[0] = (identify_info[88] & (1<<5)) ? '5' : 0;
-        udma6[0] = (identify_info[88] & (1<<6)) ? '6' : 0;
         simplelist_addline(
-                 "UDMA modes: %s %s %s %s %s %s %s", udma0, udma1, udma2,
-                                                     udma3, udma4, udma5, udma6);
+                 "UDMA modes:%.*s%.*s%.*s%.*s%.*s%.*s%.*s",
+                 (identify_info[88] & (1<<0)) << 1, &atanums[0*2],
+                 (identify_info[88] & (1<<1))     , &atanums[1*2],
+                 (identify_info[88] & (1<<2)) >> 1, &atanums[2*2],
+                 (identify_info[88] & (1<<3)) >> 2, &atanums[3*2],
+                 (identify_info[88] & (1<<4)) >> 3, &atanums[4*2],
+                 (identify_info[88] & (1<<5)) >> 4, &atanums[5*2],
+                 (identify_info[88] & (1<<6)) >> 5, &atanums[6*2]);
     }
     else {
         simplelist_addline(
@@ -1691,7 +1683,7 @@ static int ata_smart_callback(int btn, struct gui_synclist *lists)
         }
         else
         {
-            simplelist_addline("ATA SMART error: 0x%x", rc);
+            simplelist_addline("ATA SMART error: %#x", rc);
         }
         read_done = true;
     }
@@ -2165,7 +2157,7 @@ static int radio_callback(int btn, struct gui_synclist *lists)
 
         tuner_get_rds_info(RADIO_RDS_NAME, buf, sizeof (buf));
         tuner_get_rds_info(RADIO_RDS_PROGRAM_INFO, &pi, sizeof (pi));
-        simplelist_addline("PI:%04X PS:'%8s'", pi, buf);
+        simplelist_addline("PI:%04X PS:'%-8s'", pi, buf);
         tuner_get_rds_info(RADIO_RDS_TEXT, buf, sizeof (buf));
         simplelist_addline("RT:%s", buf);
         tuner_get_rds_info(RADIO_RDS_CURRENT_TIME, &seconds, sizeof (seconds));

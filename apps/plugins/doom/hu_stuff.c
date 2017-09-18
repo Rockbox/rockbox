@@ -311,14 +311,14 @@ void HU_Init(void)
       {
          snprintf(buffer, sizeof(buffer), "DIG%d",j-48);
          R_SetPatchNum(hu_font2 +i, buffer);
-         snprintf(buffer, sizeof(buffer), "STCFN%s%d", (j/10>0?"0":"00"), j); //NOTE ROCKHACK: "STCFN%.3d"
+         snprintf(buffer, sizeof(buffer), "STCFN%.3d", j);
          R_SetPatchNum(&hu_font[i], buffer);
       }
       else if ('A'<=j && j<='Z')
       {
          snprintf(buffer, sizeof(buffer), "DIG%c",j);
          R_SetPatchNum(hu_font2 +i, buffer);
-         snprintf(buffer, sizeof(buffer), "STCFN%s%d", (j/10>0?"0":"00"), j); //NOTE ROCKHACK: "STCFN%.3d"
+         snprintf(buffer, sizeof(buffer), "STCFN%.3d", j);
          R_SetPatchNum(&hu_font[i], buffer);
       }
       else if (j=='-')
@@ -348,14 +348,14 @@ void HU_Init(void)
       }
       else if (j<97)
       {
-         snprintf(buffer, sizeof(buffer), "STCFN%s%d", (j/10>0?"0":"00"), j); //NOTE ROCKHACK: "STCFN%.3d"
+         snprintf(buffer, sizeof(buffer), "STCFN%.3d", j);
          R_SetPatchNum(hu_font2 +i, buffer);
          R_SetPatchNum(&hu_font[i], buffer);
          //jff 2/23/98 make all font chars defined, useful or not
       }
       else if (j>122)
       {
-         snprintf(buffer, sizeof(buffer), "STBR%d", j); //NOTE: "STBR%.3d"
+         snprintf(buffer, sizeof(buffer), "STBR%.3d", j);
          R_SetPatchNum(hu_font2 +i, buffer);
          R_SetPatchNum(&hu_font[i], buffer);
       }
