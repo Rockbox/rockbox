@@ -1695,7 +1695,7 @@ static int ata_smart_callback(int btn, struct gui_synclist *lists)
         }
         else
         {
-            simplelist_addline("ATA SMART error: 0x%x", rc);
+            simplelist_addline("ATA SMART error: %#x", rc);
         }
         read_done = true;
     }
@@ -2169,7 +2169,7 @@ static int radio_callback(int btn, struct gui_synclist *lists)
 
         tuner_get_rds_info(RADIO_RDS_NAME, buf, sizeof (buf));
         tuner_get_rds_info(RADIO_RDS_PROGRAM_INFO, &pi, sizeof (pi));
-        simplelist_addline("PI:%04X PS:'%8s'", pi, buf);
+        simplelist_addline("PI:%04X PS:'%-8s'", pi, buf);
         tuner_get_rds_info(RADIO_RDS_TEXT, buf, sizeof (buf));
         simplelist_addline("RT:%s", buf);
         tuner_get_rds_info(RADIO_RDS_CURRENT_TIME, &seconds, sizeof (seconds));
