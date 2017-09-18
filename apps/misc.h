@@ -167,5 +167,7 @@ void push_current_activity(enum current_activity screen);
 void pop_current_activity(void);
 enum current_activity get_current_activity(void);
 
+/* format a sound value like: -1.05 dB */
+int format_sound_value(char *buf, size_t len, int snd, int val);
 
 #endif /* MISC_H */

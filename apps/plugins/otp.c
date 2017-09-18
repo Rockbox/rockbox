@@ -516,25 +516,23 @@ static void add_acct(void)
 
 static void show_code(int acct)
 {
-    /* rockbox's printf doesn't support a variable field width afaik */
-    char format_buf[64];
     if(!accounts[acct].is_totp)
     {
-        rb->snprintf(format_buf, sizeof(format_buf), "%%0%dd", accounts[acct].digits);
-        rb->splashf(0, format_buf, HOTP(accounts[acct].secret,
-                                        accounts[acct].sec_len,
-                                        accounts[acct].hotp_counter,
-                                        accounts[acct].digits));
+        rb->splashf(0, "%0*d", accounts[acct].digits,
+                               HOTP(accounts[acct].secret,
+                                    accounts[acct].sec_len,
+                                    accounts[acct].hotp_counter,
+                                    accounts[acct].digits));
         ++accounts[acct].hotp_counter;
     }
 #if CONFIG_RTC
     else
     {
-        rb->snprintf(format_buf, sizeof(format_buf), "%%0%dd (%%ld second(s) left)", accounts[acct].digits);
-        rb->splashf(0, format_buf, TOTP(accounts[acct].secret,
-                                        accounts[acct].sec_len,
-                                        accounts[acct].totp_period,
-                                        accounts[acct].digits),
+        rb->splashf(0, "%0*d (%ld seconds(s) left)", accounts[acct].digits,
+                                                     TOTP(accounts[acct].secret,
+                                                          accounts[acct].sec_len,
+                                                          accounts[acct].totp_period,
+                                                          accounts[acct].digits),
                     accounts[acct].totp_period - get_utc() % accounts[acct].totp_period);
     }
 #else
