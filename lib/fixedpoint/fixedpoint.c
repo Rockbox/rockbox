@@ -211,6 +211,35 @@ long fp_sqrt(long x, unsigned int fracbits)
     return g;
 }
 
+/* raise an integer to an integer power */
+long ipow(long x, long y)
+{
+    /* y[k] = bit k of y, 0 or 1; k=0...n; n=|_ lg(y) _|
+     *
+     * x^y =  x^(y[0]*2^0 + y[1]*2^1 + ... + y[n]*2^n)
+     *     =  x^(y[0]*2^0) * x^(y[1]*2^1) * ... * x^(y[n]*2^n)
+     */
+    long a = 1;
+
+    if (y < 0 && x != -1)
+    {
+        a = 0; /* would be < 1 or +inf if x == 0 */
+    }
+    else
+    {
+        while (y)
+        {
+            if (y & 1)
+                a *= x;
+
+            y /= 2;
+            x *= x;
+        }
+    }
+
+    return a;
+}
+
 /**
  * Fixed point sinus using a lookup table
  * don't forget to divide the result by 16384 to get the actual sinus value
