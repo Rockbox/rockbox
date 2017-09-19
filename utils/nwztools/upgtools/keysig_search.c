@@ -266,11 +266,12 @@ static bool hex_rec(bool producer, struct hex_chunk_t *ch)
      * significant bit of each byte is an (unused) parity bit. We thus only
      * generate keys where the least significant bit is 0. */
     int p = ch->pos++;
+    int step = (p % 2) ? 2 : 1; // skip significant bit at positions 1, 3, 5 and 7
     if(ch->rem_digits > 0)
     {
         ch->rem_digits--;
         /* NOTE (42) */
-        for(int i = '0'; i <= '9'; i += 2)
+        for(int i = '0'; i <= '9'; i += step)
         {
             ch->key[p] = i;
             if(hex_rec(producer, ch))
@@ -282,7 +283,7 @@ static bool hex_rec(bool producer, struct hex_chunk_t *ch)
     {
         ch->rem_letters--;
         /* NOTE (42) */
-        for(int i = 'a'; i <= 'f'; i += 2)
+        for(int i = 'a'; i <= 'f'; i += step)
         {
             ch->key[p] = i;
             if(hex_rec(producer, ch))
@@ -290,7 +291,7 @@ static bool hex_rec(bool producer, struct hex_chunk_t *ch)
         }
         if(ch->upper_case)
         {
-            for(int i = 'A'; i <= 'F'; i += 2)
+            for(int i = 'A'; i <= 'F'; i += step)
             {
                 ch->key[p] = i;
                 if(hex_rec(producer, ch))
@@ -379,7 +380,7 @@ static bool alnum_rec(bool producer, struct alnum_chunk_t *ch)
     /* we list the first 5 pos in generator, and remaining 3 in workers */
     if(producer && ch->pos == 4)
     {
-        printf("yield(%.8s,%d)\n", ch->key, ch->pos);
+        //printf("yield(%.8s,%d)\n", ch->key, ch->pos);
         return producer_yield(ch, sizeof(struct alnum_chunk_t));
     }
     /* filled the key ? */
@@ -392,14 +393,15 @@ static bool alnum_rec(bool producer, struct alnum_chunk_t *ch)
      * generate keys where the least significant bit is 0. */
     int p = ch->pos++;
     /* NOTE (42) */
-    for(int i = '0'; i <= '9'; i += 2)
+    int step = (p % 2) ? 2 : 1; // skip significant bit at positions 1, 3, 5 and 7
+    for(int i = '0'; i <= '9'; i += step)
     {
         ch->key[p] = i;
         if(alnum_rec(producer, ch))
             return true;
     }
     /* NOTE (42) */
-    for(int i = 'a'; i <= 'z'; i += 2)
+    for(int i = 'a'; i <= 'z'; i += step)
     {
         ch->key[p] = i;
         if(alnum_rec(producer, ch))
