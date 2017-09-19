@@ -758,9 +758,13 @@ int do_fw_upgrade(int argc, char **argv)
         cprintf(GREY, "An error occured during request\n");
         return ret;
     }
-    buffer[buffer_size] = 0;
-    cprintf_field("Result:", "\n");
-    print_hex(buffer, buffer_size);
+    /* the device is not supposed to send back anything but if it does, print it */
+    if(buffer_size > 0)
+    {
+        buffer[buffer_size] = 0;
+        cprintf_field("Result:", "\n");
+        print_hex(buffer, buffer_size);
+    }
     return 0;
 }
 
