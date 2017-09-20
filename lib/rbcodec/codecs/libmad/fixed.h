@@ -292,7 +292,7 @@ mad_fixed_t mad_f_mul_inline(mad_fixed_t x, mad_fixed_t y)
 
 # elif defined(FPM_MIPS)
 
-#if GCCNUM >= 404
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)
 typedef unsigned int u64_di_t __attribute__ ((mode (DI))); 
 # define MAD_F_MLX(hi, lo, x, y) \
 do { \
