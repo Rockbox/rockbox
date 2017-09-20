@@ -197,8 +197,6 @@
 
 #define SECTOR_SIZE 4096
 
-#define STORAGE_NEEDS_ALIGN
-
 #define HAVE_ATA_SMART
 
 /* define this if the device has larger sectors when accessed via USB */
