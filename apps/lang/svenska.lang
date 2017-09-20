@@ -258,6 +258,7 @@
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
+    creativezen*: "Select = Yes"
   </source>
   <dest>
     *: "SPELA = Ja"
@@ -267,6 +268,7 @@
     mrobe500: "SPELA, PÅ/AV, eller överst-höger = Ja"
     archosplayer: "SPELA/STOPP"
     vibe500: "OK = Ja"
+    creativezen*: "Välj = Ja"
   </dest>
   <voice>
     *: ""
@@ -12273,15 +12275,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Tonkontroller"
+    gigabeats,samsungypr1: "Tonkontroller"
   </dest>
   <voice>
     *: none
-    gigabeats: "Tonkontroller"
+    gigabeats,samsungypr1: "Tonkontroller"
   </voice>
 </phrase>
 <phrase>
@@ -12290,15 +12292,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Avancerade tonkontroller"
+    gigabeats,samsungypr1: "Avancerade tonkontrollinställningar"
   </dest>
   <voice>
     *: none
-    gigabeats: "Avancerade tonkontroller"
+    gigabeats,samsungypr1: "Avancerade tonkontrollinställningar"
   </voice>
 </phrase>
 <phrase>
@@ -12307,15 +12309,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Förstärkning på band %d"
+    gigabeats,samsungypr1: "Band %d förstärknig"
   </dest>
   <voice>
     *: none
-    gigabeats: "Förstärkning på band"
+    gigabeats,samsungypr1: "Band förstärknig"
   </voice>
 </phrase>
 <phrase>
@@ -12324,15 +12326,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Frekvens på band %d"
+    gigabeats,samsungypr1: "Band %d frekvens"
   </dest>
   <voice>
     *: none
-    gigabeats: "Frekvens på band"
+    gigabeats,samsungypr1: "Band frekvens"
   </voice>
 </phrase>
 <phrase>
@@ -12341,15 +12343,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Bredd på band %d"
+    gigabeats,samsungypr1: "Band %d bredd"
   </dest>
   <voice>
     *: none
-    gigabeats: "Bredd på band"
+    gigabeats,samsungypr1: "Bandbredd"
   </voice>
 </phrase>
 <phrase>
@@ -12358,15 +12360,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Smal"
+    gigabeats,samsungypr1: "Snäv"
   </dest>
   <voice>
     *: none
-    gigabeats: "Smal"
+    gigabeats,samsungypr1: "Snäv"
   </voice>
 </phrase>
 <phrase>
@@ -12375,15 +12377,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Bred"
+    gigabeats,samsungypr1: "Bredd"
   </dest>
   <voice>
     *: none
-    gigabeats: "Bred"
+    gigabeats,samsungypr1: "Bredd"
   </voice>
 </phrase>
 <phrase>
@@ -12392,15 +12394,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D-förbättring"
+    depth_3d: "3-D förbättring"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D-förbättring"
+    depth_3d: "3-D förbättring"
   </voice>
 </phrase>
 <phrase>
@@ -13039,5 +13041,527 @@
   </dest>
   <voice>
     *: "Välj kataloger att söka igenom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_CHARGE
+  desc: in Settings -> General -> System -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Charge Only"
+    ibassodx90: "Charge Only"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Endast laddning"
+    ibassodx90: "Endast laddning"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Endast laddning"
+    ibassodx90: "Endast laddning"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Selective Backlight"
+  </source>
+  <dest>
+    *: "Selektiv bakgrundsbelysning"
+  </dest>
+  <voice>
+    *: "Selektiv bakgrundsbelysning"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "DAC's filter roll-off"
+  </dest>
+  <voice>
+    *: "DAC's filter roll-off"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ENABLED
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Enabled"
+  </source>
+  <dest>
+    *: "Aktiverad"
+  </dest>
+  <voice>
+    *: "Aktiverad"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Attack-tid"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Attack-tid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE
+  desc: in Settings -> General -> System -> USB Mode
+  user: core
+  <source>
+    *: none
+    ibassodx50: "USB Mode"
+    ibassodx90: "USB Mode"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "USB-läge"
+    ibassodx90: "USB-läge"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "USB-läge"
+    ibassodx90: "USB-läge"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Auto-lås Av"
+  </dest>
+  <voice>
+    *: "Auto-lås Av"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_PLAY
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Spela"
+  </dest>
+  <voice>
+    *: "Spela"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
+  desc: in Settings -> General -> System -> Freq Scaling Governor
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Inaktivera Okartlagda nycklar"
+  </dest>
+  <voice>
+    *: "Inaktivera Okartlagda nycklar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Inaktivera på extern ström"
+  </dest>
+  <voice>
+    *: "Inaktivera på extern ström"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Avancerat nyckellås"
+  </dest>
+  <voice>
+    *: "Avancerat nyckellås"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_ADB
+  desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PBE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Perceptuell basförbättring"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Perceptuell basförbättring"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x1)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x1)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x1)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x2)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x2)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x2)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Långsam"
+  </dest>
+  <voice>
+    *: "Långsam"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_MIX
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Inaktivera Beröra"
+  </dest>
+  <voice>
+    *: "Inaktivera Beröra"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Seek"
+  </source>
+  <dest>
+    *: "Söka"
+  </dest>
+  <voice>
+    *: "Söka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Radavskiljare"
+  </dest>
+  <voice>
+    *: "Radavskiljare"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Haas Surround"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Haas Surround"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Haas Surround"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Skip"
+  </source>
+  <dest>
+    *: "Hoppa över"
+  </dest>
+  <voice>
+    *: "Hoppa över"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_METHOD2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "SIDE ONLY"
+  </source>
+  <dest>
+    *: none
+    swcodec: "SIDE ONLY"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "SIDE ONLY"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Maximal volymgräns"
+  </dest>
+  <voice>
+    *: "Maximal volymgräns"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Auto-lås On"
+  </dest>
+  <voice>
+    *: "Auto-lås On"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Notify"
+  </source>
+  <dest>
+    *: "Inaktivera Meddela"
+  </dest>
+  <voice>
+    *: "Inaktivera Meddela"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> System -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Mass Storage"
+    ibassodx90: "Mass Storage"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Masslagring"
+    ibassodx90: "Masslagring"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Masslagring"
+    ibassodx90: "Masslagring"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Färg för radavskiljare"
+  </dest>
+  <voice>
+    *: "Färg för radavskiljare"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "Skarp"
+  </dest>
+  <voice>
+    *: "Skarp"
   </voice>
 </phrase>

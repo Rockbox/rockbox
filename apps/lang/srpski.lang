@@ -252,6 +252,7 @@
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
+    creativezen*: "Select = Yes"
   </source>
   <dest>
     *: "PLAY = Да"
@@ -261,6 +262,7 @@
     mrobe500: "PLAY, POWER, или горе-десно = Да"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Да"
+    creativezen*: "Select = Да"
   </dest>
   <voice>
     *: ""
@@ -13170,5 +13172,392 @@
   </dest>
   <voice>
     *: "Боја сепаратора линија"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
+  desc: in Settings -> General -> System -> Freq Scaling Governor
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Управљач скалирањем фрекв"
+    ibassodx90: "Управљач скалирањем фрекв"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Управљач скалирањем фрекв"
+    ibassodx90: "Управљач скалирањем фрекв"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_METHOD2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "SIDE ONLY"
+  </source>
+  <dest>
+    *: none
+    swcodec: "САМО SIDE"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "САМО SIDE"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Онемогући док је на спољном напајању"
+  </dest>
+  <voice>
+    *: "Онемогући док је на спољном напајању"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_PLAY
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Репродукуј"
+  </dest>
+  <voice>
+    *: "Репродукуј"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Notify"
+  </source>
+  <dest>
+    *: "Онемогући обавештење"
+  </dest>
+  <voice>
+    *: "Онемогући обавештење"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Аутозакључавање Укљ."
+  </dest>
+  <voice>
+    *: "Аутозакључавање Укљ."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x2)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x2)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x2)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE
+  desc: in Settings -> General -> System -> USB Mode
+  user: core
+  <source>
+    *: none
+    ibassodx50: "USB Mode"
+    ibassodx90: "USB Mode"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "USB Мод"
+    ibassodx90: "USB Мод"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "USB Мод"
+    ibassodx90: "USB Мод"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Онемогући немапиране тастере"
+  </dest>
+  <voice>
+    *: "Онемогући немапиране тастере"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_ADB
+  desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x1)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x1)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x1)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Онемогући додир"
+  </dest>
+  <voice>
+    *: "Онемогући додир"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Skip"
+  </source>
+  <dest>
+    *: "Прескочи"
+  </dest>
+  <voice>
+    *: "Прескочи"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Haas Surround"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Haas Surround"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Haas Surround"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Seek"
+  </source>
+  <dest>
+    *: "Премотај"
+  </dest>
+  <voice>
+    *: "Премотај"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Редукција слушног замора"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Редукција слушног замора"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ENABLED
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Enabled"
+  </source>
+  <dest>
+    *: "Омогућено"
+  </dest>
+  <voice>
+    *: "Омогућено"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> System -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Mass Storage"
+    ibassodx90: "Mass Storage"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Масовно Складиште"
+    ibassodx90: "Масовно Складиште"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Масовно Складиште"
+    ibassodx90: "Масовно Складиште"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_MIX
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Однос Чист / Процесиран"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Однос Чист / Процесиран"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Напредно закључавање тастера"
+  </dest>
+  <voice>
+    *: "Напредно закључавање тастера"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PBE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Перцептуално побољшавање басова"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Перцептуално побољшавање басова"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Selective Backlight"
+  </source>
+  <dest>
+    *: "Селективно позадинско светло"
+  </dest>
+  <voice>
+    *: "Селективно позадинско светло"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Аутозакључавање Искљ."
+  </dest>
+  <voice>
+    *: "Аутозакључавање Искљ."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_CHARGE
+  desc: in Settings -> General -> System -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Charge Only"
+    ibassodx90: "Charge Only"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Само пуњење"
+    ibassodx90: "Само пуњење"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Само пуњење"
+    ibassodx90: "Само пуњење"
   </voice>
 </phrase>

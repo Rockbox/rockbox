@@ -7914,8 +7914,6 @@ desc: deprecated
     *: "Tempo"
   </voice>
 </phrase>
-/* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
- * the selector should probably be usb_charging_enable_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
   desc: in Battery menu
@@ -12394,15 +12392,15 @@ desc: deprecated
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Miglioramento 3D"
+    depth_3d: "Miglioramento 3-D"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "Miglioramento 3D"
+    depth_3d: "Miglioramento 3-D"
   </voice>
 </phrase>
 <phrase>

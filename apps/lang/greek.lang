@@ -250,17 +250,23 @@
   user: core
   <source>
     *: "PLAY = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
+    creativezen*: "Select = Yes"
   </source>
   <dest>
     *: "PLAY = Επικύρωση"
+    cowond2*: ""
     iriverh100,iriverh120,iriverh300: "NAVI = Επικύρωση"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Επικύρωση"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Επικύρωση"
+    mrobe500: "PLAY, POWER, or top-right = Επικύρωση"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Επικύρωση"
+    creativezen*: "Select = Επικύρωση"
   </dest>
   <voice>
     *: ""
@@ -417,7 +423,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLISTS
-  desc: in the main menu and file view setting
+  desc: in the file view setting
   user: core
   <source>
     *: "Playlists"
@@ -1796,7 +1802,7 @@
   user: core
   <source>
     *: none
-    swcodec: "Beep Volume"
+    swcodec: "Track Skip Beep"
   </source>
   <dest>
     *: none
@@ -1967,19 +1973,16 @@
 </phrase>
 <phrase>
   id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
+  desc: deprecated
   user: core
   <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
+    *: ""
   </source>
   <dest>
-    *: none
-    headphone_detection: "Διάρκεια κύλισης πίσω" 
+    *: ""
   </dest>
   <voice>
-    *: none
-    headphone_detection: "Διάρκεια κύλισης πίσω"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2218,17 +2221,21 @@
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
     ipod*: "Building database... %d found (PREV to return)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
+    archosplayer: "Building DB %d found"
   </source>
   <dest>
     *: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (OFF για επιστροφή)"
     iriverh100,iriverh120,iriverh300: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (STOP για επιστροφή)"
     ipod*: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (PREV για επιστροφή)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (LEFT για επιστροφή)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (PREV για επιστροφή)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (PREV για επιστροφή)"
+    gogearsa9200: "Δημιουργία βάσεως δεδομένων... βρέθηκαν %d (REW για επιστροφή)"
+    archosplayer: "Δημιουργία ΒΔ βρέθηκαν %d"
   </dest>
   <voice>
-    *: "Kαταχωρήσεις βρέθηκαν για τη βάση δεδομένων"
+    *: "Καταχωρήσεις βρέθηκαν για τη βάση δεδομένων"
   </voice>
 </phrase>
 <phrase>
@@ -2408,7 +2415,7 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Browse Fonts"
+    lcd_bitmap: "Font"
   </source>
   <dest>
     *: none
@@ -2424,13 +2431,13 @@
   desc: in settings_menu()
   user: core
   <source>
-    *: "Browse .wps files"
+    *: "While Playing Screen"
   </source>
   <dest>
     *: "Περιήγηση αρχείων .wps"
   </dest>
   <voice>
-    *: "Περιήγηση αρχείων γουάιλ πλέινγκ σκρίν"
+    *: "Περιήγηση αρχείων οθόνης κατά την αναπαραγωγή"
   </voice>
 </phrase>
 <phrase>
@@ -2439,7 +2446,7 @@
   user: core
   <source>
     *: none
-    remote: "Browse .rwps files"
+    remote: "Remote While Playing Screen"
   </source>
   <dest>
     *: none
@@ -2447,7 +2454,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Περιήγηση αρχείων γουάιλ πλέινγκ σκρίν χειριστηρίου"
+    remote: "Περιήγηση αρχείων οθόνης χειριστηρίου κατά την αναπαραγωγή"
   </voice>
 </phrase>
 <phrase>
@@ -3926,8 +3933,9 @@
   <source>
     *: none
     rtc: "ON = Set"
+    mrobe500: "HEART = Set"
     iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100: "SELECT = Set"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
     vibe500: "OK = Set"
     mpiohd300: "ENTER = Set"
@@ -3935,8 +3943,9 @@
   <dest>
     *: none
     rtc: "ON = Ρύθμιση"
+    mrobe500: "HEART = Ρύθμιση"
     iriverh100,iriverh120,iriverh300: "NAVI = Ρύθμιση"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100: "SELECT = Ρύθμιση"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Ρύθμιση"
     gogearsa9200,samsungyh*: "PLAY = Ρύθμιση"
     vibe500: "OK = Ρύθμιση"
     mpiohd300: "ENTER = Ρύθμιση"
@@ -3952,28 +3961,32 @@
   <source>
     *: none
     rtc: "OFF = Revert"
+    mrobe500: "POWER = Revert"
     iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,gogearsa9200,mpiohd300: "MENU = Revert"
+    ipod*,sansac200*,mpiohd300: "MENU = Revert"
     iaudiox5,iaudiom5: "RECORD = Revert"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
     sansafuzeplus: "BACK = Revert"
     mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
+    gogearsa9200: "LEFT = Revert"
     vibe500: "CANCEL = Revert"
     samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: none
     rtc: "OFF = Ακύρωση"
+    mrobe500: "POWER = Ακύρωση"
     iriverh100,iriverh120,iriverh300: "STOP = Ακύρωση"
-    ipod*,sansac200*,gogearsa9200,mpiohd300: "MENU = Ακύρωση"
+    ipod*,sansac200*,mpiohd300: "MENU = Ακύρωση"
     iaudiox5,iaudiom5: "RECORD = Ακύρωση"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Ακύρωση"
     gigabeatfx: "POWER = Ακύρωση"
     sansafuzeplus: "BACK = Ακύρωση"
     mrobe100: "DISPLAY = Ακύρωση"
     gigabeats: "BACK = Ακύρωση"
+    gogearsa9200: "LEFT = Ακύρωση"
     vibe500: "C = Ακύρωση"
     samsungyh*: "REW = Ακύρωση"
   </dest>
@@ -4781,13 +4794,13 @@
   desc: "talkbox" mode for directories + files
   user: core
   <source>
-    *: ".talk mp3 clip"
+    *: ".talk Clip"
   </source>
   <dest>
-    *: ".talk αρχείο mp3"
+    *: ".talk Αρχείο"
   </dest>
   <voice>
-    *: "τόκ αρχείο mp3"
+    *: "talk Αρχείο"
   </voice>
 </phrase>
 <phrase>
@@ -4907,13 +4920,13 @@
   desc: in the main menu
   user: core
   <source>
-    *: "Browse Themes"
+    *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Περιήγηση θεμάτων"
+    *: "Περιήγηση αρχείων θεμάτων"
   </dest>
   <voice>
-    *: "Περιήγηση θεμάτων"
+    *: "Περιήγηση αρχείων θεμάτων"
   </voice>
 </phrase>
 <phrase>
@@ -6438,7 +6451,7 @@
 </phrase>
 <phrase>
   id: LANG_CATALOG
-  desc: in onplay menu
+  desc: in main menu and onplay menu
   user: core
   <source>
     *: "Playlist Catalogue"
@@ -11151,5 +11164,2401 @@
   </dest>
   <voice>
     *: "Μέγεθος αρχείου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Ratio"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Αναλογία"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Αναλογία"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Ορισμός ως καταλόγου λιστών αναπαραγωγής"
+  </dest>
+  <voice>
+    *: "Ορισμός ως καταλόγου λιστών αναπαραγωγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Επαναφορά πριν τη συνέχιση"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Επαναφορά πριν τη συνέχιση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_CANCEL_CURRENT
+  desc: shown instead of sleep timer when it's running
+  user: core
+  <source>
+    *: "Cancel Sleep Timer"
+  </source>
+  <dest>
+    *: "Ακύρωση χρονοδιακόπτη ύπνου"
+  </dest>
+  <voice>
+    *: "Ακύρωση χρονοδιακόπτη ύπνου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "Κατάσταση νέκρωσης της οθόνης αφής"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "Κατάσταση νέκρωσης της οθόνης αφής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x1)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x1)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x1)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_CUSTOM
+  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
+  user: core
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "Προσαρμοσμένο"
+  </dest>
+  <voice>
+    *: "Προσαρμοσμένο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_MODE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Mode"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Λειτουργία οθόνης αφής"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Λειτουργία οθόνης αφής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MORSE_INPUT
+  desc: in Settings -> System
+  user: core
+  <source>
+    *: none
+    morse_input: "Use Morse Code Input"
+  </source>
+  <dest>
+    *: none
+    morse_input: "Χρήση της εισόδου κώδικα Morse"
+  </dest>
+  <voice>
+    *: none
+    morse_input: "Χρήση της εισόδου κώδικα Morse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_OTHER
+  desc: Catch-all FM region. Select if none of the others work
+  user: core
+  <source>
+    *: none
+    radio: "Other"
+  </source>
+  <dest>
+    *: none
+    radio: "Άλλο"
+  </dest>
+  <voice>
+    *: none
+    radio: "Άλλο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Remote Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Οθόνη χειριστηρίου"
+  </dest>
+  <voice>
+    *: none
+    remote: "Οθόνη χειριστηρίου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OF
+  desc: Shown in WPS: X of Y (tracks)
+  user: core
+  <source>
+    *: "of"
+  </source>
+  <dest>
+    *: "Από"
+  </dest>
+  <voice>
+    *: "Από"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "Τρέχουσα λίστα αναπαραγωγής"
+  </dest>
+  <voice>
+    *: "Τρέχουσα λίστα αναπαραγωγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_10
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "10:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "10:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "10 σε 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_OK
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "OK"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "OK"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "OK"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_PICTUREFLOW
+  desc: Onplay pictureflow
+  user: core
+  <source>
+    *: "PictureFlow"
+  </source>
+  <dest>
+    *: "PictureFlow"
+  </dest>
+  <voice>
+    *: "open picture flow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_WIDE
+  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
+  user: core
+  <source>
+    *: none
+    gigabeats,samsungypr1: "Wide"
+  </source>
+  <dest>
+    *: none
+    gigabeats,samsungypr1: "Wide"
+  </dest>
+  <voice>
+    *: none
+    gigabeats,samsungypr1: "Wide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "Αυτόματη επαναφορά"
+  </dest>
+  <voice>
+    *: "Αυτόματη επαναφορά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CUSTOM
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Custom"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Προσαρμοσμένο"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Προσαρμοσμένο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_RATE
+  desc: "rate" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Rate"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Ταχύτητα"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Ταχύτητα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_OUTRO
+  desc: skipping to the 5 seconds before the end of a track
+  user: core
+  <source>
+    *: "Skip to Outro"
+  </source>
+  <dest>
+    *: "Μεταπήδηση στο τέλος"
+  </dest>
+  <voice>
+    *: "Μεταπήδηση στο τέλος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
+  desc: in sound_menu, advanced settings for hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
+  </source>
+  <dest>
+    *: none
+    gigabeats,samsungypr1: "Ρυθμίσης ελέγχου τονικότητας για προχωρημένους"
+  </dest>
+  <voice>
+    *: none
+    gigabeats,samsungypr1: "Ρυθμίσης ελέγχου τονικότητας για προχωρημένους"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "Επανεκίνηση χρονοδιακόπτη ύπνου με το πάτημα πλήκτρου"
+  </dest>
+  <voice>
+    *: "Επανεκίνηση χρονοδιακόπτη ύπνου με το πάτημα πλήκτρου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOUSE_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Mouse"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Ποντίκι"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Ποντίκι"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "Queue Last Shuffled"
+  </dest>
+  <voice>
+    *: "Queue Last Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MULTIMEDIA_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Multimedia"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Πολυμέσα"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Πολυμέσα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PBE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Ενίσχυση μπάσων"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Ενίσχυση μπάσων"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RIGHT
+  desc: Generic use of 'right'
+  user: core
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Δεξιά"
+  </dest>
+  <voice>
+    *: "Δεξιά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEPTH_3D
+  desc: in sound_menu, amount of 3D enhancement effect
+  user: core
+  <source>
+    *: none
+    depth_3d: "3-D Enhancement"
+  </source>
+  <dest>
+    *: none
+    depth_3d: "Βελτίωση ήχου 3-D "
+  </dest>
+  <voice>
+    *: none
+    depth_3d: "Βελτίωση ήχου 3-D"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_SBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Εμφάνιση γραμμής κατάστασης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_METHOD2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "SIDE ONLY"
+  </source>
+  <dest>
+    *: none
+    swcodec: "SIDE ONLY"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "SIDE ONLY"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_CHARGE
+  desc: in Settings -> General -> System -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Charge Only"
+    ibassodx90: "Charge Only"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Μόνο φόρτιση"
+    ibassodx90: "Μόνο φόρτιση"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Μόνο φόρτιση"
+    ibassodx90: "Μόνο φόρτιση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Απενεργοποίηση αφής"
+  </dest>
+  <voice>
+    *: "Απενεργοποίηση αφής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_START_CURRENT
+  desc: shown when a sleep timer isn't running
+  user: core
+  <source>
+    *: "Start Sleep Timer"
+  </source>
+  <dest>
+    *: "Έναρξη χρονοδιακόπτη ύπνου"
+  </dest>
+  <voice>
+    *: "Έναρξη χρονοδιακόπτη ύπνου"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RSBS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    remote: ""
+  </source>
+  <dest>
+    *: none
+    remote: ""
+  </dest>
+  <voice>
+    *: none
+    remote: "Εμφάνιση γραμμής κατάστασης στο χειριστήριο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auto"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Αυτόματο"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Αυτόματο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE_YES
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Απενεργοποίηση σε εξωτερική τροφοδωσία"
+  </dest>
+  <voice>
+    *: "Απενεργοποίηση σε εξωτερική τροφοδωσία"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEMITONE
+  desc:
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Semitone"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Semitone"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Semitone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Knee"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Knee"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Απενεργοποίηση άχρηστων πλήκτρων"
+  </dest>
+  <voice>
+    *: "Απενεργοποίηση άχρηστων πλήκτρων"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Selective Backlight"
+  </source>
+  <dest>
+    *: "Selective Backlight"
+  </dest>
+  <voice>
+    *: "Selective Backlight"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_6
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "6:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "6:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "6 σε 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_PLAYLISTCAT_DIR
+  desc:
+  user: core
+  <source>
+    *: "Reset Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "Επαναφορά του καταλόγου λιστών αναπαραγωγής"
+  </dest>
+  <voice>
+    *: "Επαναφορά του καταλόγου λιστών αναπαραγωγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_UNTAGGED
+  desc: "<untagged>" entry in tag browser
+  user: core
+  <source>
+    *: "<Untagged>"
+  </source>
+  <dest>
+    *: "<Χωρίς ετικέτα>"
+  </dest>
+  <voice>
+    *: "Χωρίς ετικέτα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio: "Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio: "Οθόνη ραδιοφώνου"
+  </dest>
+  <voice>
+    *: none
+    radio: "Οθόνη ραδιοφώνου"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RFMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio_remote: ""
+  </source>
+  <dest>
+    *: none
+    radio_remote: ""
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Εμφάνιση οθόνης ραδιοφώνου στο χειριστήριο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_HARDWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Speaker Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Ήχος κουμπιών στο μεγάφωνο"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Ήχος κουμπιών στο μεγάφωνο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: none
+    swcodec: "Timestretch"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Timestretch"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Timestretch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_HID
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB HID"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "USB HID"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Συσκευή ελέγχου USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LEFT
+  desc: Generic use of 'left'
+  user: core
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Αριστερά"
+  </dest>
+  <voice>
+    *: "Αριστερά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_GAIN
+  desc: in sound_menu, hardware equalizer tone controls filter gain
+  user: core
+  <source>
+    *: none
+    gigabeats,samsungypr1: "Band %d Gain"
+  </source>
+  <dest>
+    *: none
+    gigabeats,samsungypr1: "Band %d Gain"
+  </dest>
+  <voice>
+    *: none
+    gigabeats,samsungypr1: "Band Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_THRESHOLD
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Threshold"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Threshold"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Threshold"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_DELETE
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Del"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Διαγραφή"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Διαγραφή"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_POINT
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Absolute Point"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Absolute Point"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Absolute Point"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_CHANGES
+  desc: When you try to exit screens to confirm save
+  user: core
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Αποθήκευση αλλαγών;"
+  </dest>
+  <voice>
+    *: "Αποθήκευση αλλαγών;"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_TOP
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Top"
+  </source>
+  <dest>
+    *: "Κορυφή"
+  </dest>
+  <voice>
+    *: "Κορυφή"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "Συντομεύσεις"
+  </dest>
+  <voice>
+    *: "Συντομεύσεις"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_LIMIT
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Maximum Volume Limit"
+  </source>
+  <dest>
+    *: "Όριο μέγιστης έντασης"
+  </dest>
+  <voice>
+    *: "Όριο μέγιστης έντασης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "2:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "2:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "2 σε 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Πλήκτρο"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Πλήκτρο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Calibrate"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Calibrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIN_RAM_USAGE
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_FOLDER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select one or more directories"
+  </source>
+  <dest>
+    *: "Επιλογή ενός ή περισσότερων φακέλων"
+  </dest>
+  <voice>
+    *: "Επιλογή ενός ή περισσότερων φακέλων"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_FREQUENCY
+  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
+  user: core
+  <source>
+    *: none
+    gigabeats,samsungypr1: "Band %d Frequency"
+  </source>
+  <dest>
+    *: none
+    gigabeats,samsungypr1: "Ρύθμιση %d συχνότητα"
+  </dest>
+  <voice>
+    *: none
+    gigabeats,samsungypr1: "Συχνότητα ρύθμισης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Haas Surround"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Haas Surround"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Haas Surround"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_HARD_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Hard Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Hard Knee"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Hard Knee"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "Έναρξη περιηγητή αρχείων σε"
+  </dest>
+  <voice>
+    *: "Έναρξη περιηγητή αρχείων στον κύριο κατάλογο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE
+  desc: in Settings -> General -> System -> USB Mode
+  user: core
+  <source>
+    *: none
+    ibassodx50: "USB Mode"
+    ibassodx90: "USB Mode"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Λειτουργία USB"
+    ibassodx90: "Λειτουργία USB"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Λειτουργία USB"
+    ibassodx90: "Λειτουργία USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ROLL_OFF
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's filter roll-off"
+  </source>
+  <dest>
+    *: "DAC's filter roll-off"
+  </dest>
+  <voice>
+    *: "DAC's filter roll-off"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Compressor"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Συμπιεστής"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Συμπιεστής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUSBAR_BOTTOM
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: "Bottom"
+  </source>
+  <dest>
+    *: "Κάτω μέρος"
+  </dest>
+  <voice>
+    *: "Κάτω μέρος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE
+  desc: alternative to yes/no for tristate settings
+  user: core
+  <source>
+    *: "Force"
+  </source>
+  <dest>
+    *: "Εξαναγκασμός"
+  </dest>
+  <voice>
+    *: "Εξαναγκασμός"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ENABLED
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Enabled"
+  </source>
+  <dest>
+    *: "Ενεργοποιημένο"
+  </dest>
+  <voice>
+    *: "Ενεργοποιημένο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_TRACK
+  desc: Shown in WPS
+  user: core
+  <source>
+    *: "Next Track:"
+  </source>
+  <dest>
+    *: "Επόμενο κομμάτι"
+  </dest>
+  <voice>
+    *: "Επόμενο κομμάτι"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYCLICK_SOFTWARE
+  desc: in keyclick settings menu
+  user: core
+  <source>
+    *: none
+    hardware_click: "Headphone Keyclick"
+  </source>
+  <dest>
+    *: none
+    hardware_click: "Ήχος πλήκτρων στα ακουστικά"
+  </dest>
+  <voice>
+    *: none
+    hardware_click: "Ήχος πλήκτρων στα ακουστικά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_STATUSBAR
+  desc: in Settings -> General -> Display -> statusbar
+  user: core
+  <source>
+    *: none
+    remote: "Remote Statusbar"
+  </source>
+  <dest>
+    *: none
+    remote: "Γραμμή κατάστασης χειριστηρίου"
+  </dest>
+  <voice>
+    *: none
+    remote: "Γραμμή κατάστασης χειριστηρίου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Πλάτος γραμμής κίλησης"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Πλάτος γραμμής κίλησης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PRESENTATION_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Presentation"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Παρουσίαση"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Παρουσίαση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RELEASE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Release Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Χρόνος κυκλοφορίας"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Χρόνος κυκλοφορίας"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "Προεπιλεγμένη Διάρκεια χρονοδιακόπτη ύπνου"
+  </dest>
+  <voice>
+    *: "Προεπιλεγμένη Διάρκεια χρονοδιακόπτη ύπνου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Κλείδωμα πλήκτρων για προχωρημένους"
+  </dest>
+  <voice>
+    *: "Κλείδωμα πλήκτρων για προχωρημένους"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "Επιλογή φακέλων για τη σάρωση"
+  </dest>
+  <voice>
+    *: "Επιλογή φακέλων για τη σάρωση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVENT_SKIPPING
+  desc: in Settings -> Playback Settings
+  user: core
+  <source>
+    *: "Prevent Track Skipping"
+  </source>
+  <dest>
+    *: "Απαγώρευση παράκαμψης κομματιού"
+  </dest>
+  <voice>
+    *: "Απαγώρευση παράκαμψης κομματιού"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_GAIN
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Makeup Gain"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Makeup Gain"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Makeup Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONSTRAIN_NEXT_FOLDER
+  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
+  user: core
+  <source>
+    *: "Constrain Auto-Change"
+  </source>
+  <dest>
+    *: "Constrain Auto-Change"
+  </dest>
+  <voice>
+    *: "Constrain Auto-Change"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Απενεργοποίηση αυτόματου κλειδώματος"
+  </dest>
+  <voice>
+    *: "Απενεργοποίηση αυτόματου κλειδώματος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_PLAY
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Αναπαραγωγή"
+  </dest>
+  <voice>
+    *: "Αναπαραγωγή"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_4
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "4:1"
+  </source>
+  <dest>
+    *: none
+    swcodec: "4:1"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "4 σε 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Base Skin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Εμφάνιση βάσης"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Εμφάνιση βάσης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HISTOGRAM_INTERVAL
+  desc: in record settings menu
+  user: core
+  <source>
+    *: none
+    histogram: "Histogram interval"
+  </source>
+  <dest>
+    *: none
+    histogram: "Histogram interval"
+  </dest>
+  <voice>
+    *: none
+    histogram: "Histogram interval"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_SOFT_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Soft Knee"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Soft Knee"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Soft Knee"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "Έναρξη χρονοδιακόπτη ύπνου στην εκίνηση"
+  </dest>
+  <voice>
+    *: "Έναρξη χρονοδιακόπτη ύπνου στην εκίνηση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RSSI
+  desc: Signal strength of a received FM station
+  user: core
+  <source>
+    *: none
+    radio: "Signal strength:"
+  </source>
+  <dest>
+    *: none
+    radio: "Ισχής σήματος"
+  </dest>
+  <voice>
+    *: none
+    radio: "Ισχής σήματος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_ATTACK
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Attack Time"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Attack Time"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Attack Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Πλήκτρο περιηγητή αρχείων"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Πλήκτρο περιηγητή αρχείων"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KBD_CANCEL
+  desc: in keyboard
+  user: core
+  <source>
+    *: none
+    touchscreen: "Cancel"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Ακύρωση"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Ακύρωση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "Επαναφορά στην παύση"
+  </dest>
+  <voice>
+    *: "Επαναφορά στην παύση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Ρυθμίσεις οθόνης αφής"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Ρυθμίσεις οθόνης αφής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_GRID
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "3x3 Grid"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Πλέγμα 3x3"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Πλέγμα 3x3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "Επαναφορά σε αυτόματη αλλαγή κομματιού"
+  </dest>
+  <voice>
+    *: "Επαναφορά σε αυτόματη αλλαγή κομματιού"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPEED
+  desc: timestretch speed
+  user: core
+  <source>
+    *: none
+    swcodec: "Speed"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Ταχύτητα"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Ταχύτητα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Πλήκτρο WPS"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Πλήκτρο WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_MIX
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> System -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Mass Storage"
+    ibassodx90: "Mass Storage"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Εσωτερική μνήμη"
+    ibassodx90: "Εσωτερική μνήμη"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Εσωτερική μνήμη"
+    ibassodx90: "Εσωτερική μνήμη"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_SKIP_FIRST_DRIVE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    multidrive_usb: "USB Hide Internal Drive"
+  </source>
+  <dest>
+    *: none
+    multidrive_usb: "Απόκριψη εσωτερικής μνήμης USB"
+  </dest>
+  <voice>
+    *: none
+    multidrive_usb: "Απόκριψη εσωτερικής μνήμης USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
+  desc: prompt for user to decide whether to update bookmarks
+  user: core
+  <source>
+    *: "Update on Stop"
+  </source>
+  <dest>
+    *: "Ενημέρωση στην παύση"
+  </dest>
+  <voice>
+    *: "Ενημέρωση στην παύση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_SCREEN
+  desc: in the main menu
+  user: core
+  <source>
+    *: none
+    remote: "Main Screen"
+  </source>
+  <dest>
+    *: none
+    remote: "Κύρια οθόνη"
+  </dest>
+  <voice>
+    *: none
+    remote: "Κύρια οθόνη"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
+    *: none
+    crossfade: "Automatic Track Change Only"
+  </source>
+  <dest>
+    *: none
+    crossfade: "Μόνο αυτόματη εναλλαγή κομματιού"
+  </dest>
+  <voice>
+    *: none
+    crossfade: "Μόνο αυτόματη εναλλαγή κομματιού"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOMATIC
+  desc: generic automatic
+  user: core
+  <source>
+    *: "Automatic"
+  </source>
+  <dest>
+    *: "Αυτόματο"
+  </dest>
+  <voice>
+    *: "Αυτόματο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Notify"
+  </source>
+  <dest>
+    *: "Απενεργοποίηση ειδοποίησης"
+  </dest>
+  <voice>
+    *: "Απενεργοποίηση ειδοποίησης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "Εκίνηση/Τερματισμός"
+  </dest>
+  <voice>
+    *: "Εκίνηση/Τερματισμός"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINEOUT_ONOFF
+  desc: in system settings menu
+  user: core
+  <source>
+    *: none
+    lineout_poweroff: "Line Out"
+  </source>
+  <dest>
+    *: none
+    lineout_poweroff: "Γραμμή εξώδου"
+  </dest>
+  <voice>
+    *: none
+    lineout_poweroff: "Γραμμή εξώδου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "Διαχωριστής γραμμής"
+  </dest>
+  <voice>
+    *: "Διαχωριστής γραμμής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x2)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x2)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x2)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Seek"
+  </source>
+  <dest>
+    *: "Μεταπήδηση"
+  </dest>
+  <voice>
+    *: "Μεταπήδηση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_KEYPAD_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "USB Keypad Mode"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Λειτουργία πληκτρολογίου USB"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Λειτουργία πληκτρολογίου USB"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "Glyphs To Cache"
+  </dest>
+  <voice>
+    *: "Glyphs To Cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSER_MODE
+  desc: in settings_menu
+  user: core
+  <source>
+    *: none
+    usb_hid: "Browser"
+  </source>
+  <dest>
+    *: none
+    usb_hid: "Περιηγητής"
+  </dest>
+  <voice>
+    *: none
+    usb_hid: "Περιηγητής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH_NARROW
+  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats,samsungypr1: "Narrow"
+  </source>
+  <dest>
+    *: none
+    gigabeats,samsungypr1: "Narrow"
+  </dest>
+  <voice>
+    *: none
+    gigabeats,samsungypr1: "Narrow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Χρήση του μενού συντομεύσεων αντί για την οθόνη συντομεύσεων"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Χρήση του μενού συντομεύσεων αντί για την οθόνη συντομεύσεων"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Skip"
+  </source>
+  <dest>
+    *: "Παράκαμψη"
+  </dest>
+  <voice>
+    *: "Παράκαμψη"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Q"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Q"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO_LIMIT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Όριο"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Όριο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_MEIER
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Simple (Meier)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Simple (Meier)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Simple"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Reset Calibration"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Reset Calibration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "Μόνο σε προσαρμοσμένους φακέλους"
+  </dest>
+  <voice>
+    *: "Μόνο σε προσαρμοσμένους φακέλους"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FMS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    radio: ""
+  </source>
+  <dest>
+    *: none
+    radio: ""
+  </dest>
+  <voice>
+    *: none
+    radio: "Εμφάνιση οθόνης ραδιοφώνου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION_HEADER
+  desc: in radio screen
+  user: core
+  <source>
+    *: none
+    radio: "Station:"
+  </source>
+  <dest>
+    *: none
+    radio: "Σταθμός"
+  </dest>
+  <voice>
+    *: none
+    radio: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT
+  desc: Shown in WPS (short form of Next Track)
+  user: core
+  <source>
+    *: "Next:"
+  </source>
+  <dest>
+    *: "Επόμενο"
+  </dest>
+  <voice>
+    *: "Επόμενο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_WESTERN_EUROPEAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Western European (CP1252)"
+  </source>
+  <dest>
+    *: "Western European (CP1252)"
+  </dest>
+  <voice>
+    *: "Western European"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_WIDTH
+  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
+  user: core
+  <source>
+    *: none
+    gigabeats,samsungypr1: "Band %d Width"
+  </source>
+  <dest>
+    *: none
+    gigabeats,samsungypr1: "Πλάτος %d ρύθμισης"
+  </dest>
+  <voice>
+    *: none
+    gigabeats,samsungypr1: "Πλάτος ρύθμισης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_BASE_SKIN
+  desc: browse for the base skin in theme settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Remote Base Skin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "Έναρξη περιηγητή αρχείων εδώ"
+  </dest>
+  <voice>
+    *: "Έναρξη περιηγητή αρχείων εδώ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
+  desc: in Settings -> General -> System -> Freq Scaling Governor
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_ENABLE
+  desc: deprecated
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Ενεργοποίηση αυτόματου κλειδώματος"
+  </dest>
+  <voice>
+    *: "Ενεργοποίηση αυτόματου κλειδώματος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_QS_ITEM
+  desc: used for the submenu name for the quickscreen items
+  user: core
+  <source>
+    *: none
+    quickscreen: "Set as Top Quickscreen Item"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "Ορισμός ως πρώτου αντικειμένου στην οθόνη συντομεύσεων"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "Ορισμός ως πρώτου αντικειμένου στην οθόνη συντομεύσεων"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Sharp"
+  </source>
+  <dest>
+    *: "Sharp"
+  </dest>
+  <voice>
+    *: "Sharp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_POSITION
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Scroll Bar Position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Θέση γραμμής κίλησης"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Θέση γραμμής κίλησης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "Χρώμα διαχωριστή γραμμής"
+  </dest>
+  <voice>
+    *: "Χρώμα διαχωριστή γραμμής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "Εισαγωγή τελευταίου ανακατεμένου"
+  </dest>
+  <voice>
+    *: "Εισαγωγή τελευταίου ανακατεμένου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RADIOSCREEN
+  desc: in the theme menu
+  user: core
+  <source>
+    *: none
+    radio_remote: "Remote Radio Screen"
+  </source>
+  <dest>
+    *: none
+    radio_remote: "Οθόνη ραδιοφώνου στο χειριστήριο"
+  </dest>
+  <voice>
+    *: none
+    radio_remote: "Οθόνη ραδιοφώνου στο χειριστήριο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Slow"
+  </source>
+  <dest>
+    *: "Σιγανό"
+  </dest>
+  <voice>
+    *: "Σιγανό"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_ADB
+  desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRETCH_LIMIT
+  desc: "limit" in pitch screen
+  user: core
+  <source>
+    *: none
+    pitchscreen: "Limit"
+  </source>
+  <dest>
+    *: none
+    pitchscreen: "Όριο"
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Όριο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HW_EQ_TONE_CONTROLS
+  desc: in sound_menu, hardware equalizer tone controls
+  user: core
+  <source>
+    *: none
+    gigabeats,samsungypr1: "Tone Controls"
+  </source>
+  <dest>
+    *: none
+    gigabeats,samsungypr1: "Έλεγχος τονικότητας"
+  </dest>
+  <voice>
+    *: none
+    gigabeats,samsungypr1: "Έλεγχος τονικότητας"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ITALY
+  desc: fm region Italy
+  user: core
+  <source>
+    *: none
+    radio: "Italy"
+  </source>
+  <dest>
+    *: none
+    radio: "Ιταλία"
+  </dest>
+  <voice>
+    *: none
+    radio: "Ιταλία"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_COMPOSER
+  desc: in tag viewer
+  user: core
+  <source>
+    *: "Composer"
+  </source>
+  <dest>
+    *: "Συνθέτης"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
