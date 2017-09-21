@@ -706,7 +706,26 @@ pandoracc () {
  GCCOPTS="$GCCOPTS -ffast-math -fsingle-precision-constant"
 }
 
-arm1176jzlinuxcc () {
+ypr0cc () {
+
+ GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
+ GCCOPTIMIZE=''
+ LDOPTS="-lasound -lpthread -lm -ldl -lrt $LDOPTS"
+ GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
+ SHARED_LDFLAG="-shared"
+ SHARED_CFLAGS=''
+ endian="little"
+ app_type="ypr0"
+
+ # Include path
+ GCCOPTS="$GCCOPTS  -D_GNU_SOURCE=1 -U_FORTIFY_SOURCE -D_REENTRANT"
+
+ # Set up compiler
+ gccchoice="4.4.6"
+ prefixtools "arm-ypr0-linux-gnueabi-"
+}
+
+sonynwzcc () {
  GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
  # Although the ARM1176JZ-S supports unaligned accesses, those seems to disabled
  # by the kernel. Since GCC emits unaligned accesses by default on ARMv6, we
@@ -726,15 +745,6 @@ arm1176jzlinuxcc () {
  # Set up compiler
  gccchoice="4.9.4"
  prefixtools "arm-rockbox-linux-gnueabi-"
-}
-
-ypr0cc () {
- arm1176jzlinuxcc
- app_type="ypr0"
-}
-
-sonynwzcc () {
- arm1176jzlinuxcc
  app_type="sonynwz"
 }
 
