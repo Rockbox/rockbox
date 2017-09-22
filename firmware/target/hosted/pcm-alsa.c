@@ -287,7 +287,7 @@ static bool fill_frames(void)
         else
         {
             /* Rockbox and PCM have same format: memcopy */
-            memcpy(&frames[2*(period_size-frames_left)], pcm_data, copy_n);
+            memcpy(&frames[2*(period_size-frames_left)], pcm_data, copy_n * 4);
         }
         pcm_data += copy_n*4;
         pcm_size -= copy_n*4;
