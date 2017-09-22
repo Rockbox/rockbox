@@ -32,6 +32,7 @@ $(BUILDDIR)/lang/lang_core.o: $(BUILDDIR)/lang/lang.h $(BUILDDIR)/lang/lang_core
 	$(call PRINTS,CC lang_core.c)$(CC) $(CFLAGS) -c $(BUILDDIR)/lang/lang_core.c -o $@
 
 $(BUILDDIR)/lang/lang.h $(BUILDDIR)/lang/lang_core.c: $(APPSDIR)/lang/$(LANGUAGE).lang $(BUILDDIR)/apps/features
+	$(call PRINTS,GEN lang.h)
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
 		perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(MODELNAME)$$feat $<
 
