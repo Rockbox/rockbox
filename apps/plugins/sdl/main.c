@@ -28,12 +28,19 @@ extern int ballerburg_main(int argc, char **argv);
 extern int raytrace_main(int argc, char *argv[]);
 extern int wolf3d_main(int argc, char *argv[]);
 extern int testsound_main(int argc, char *argv[]);
-int duke3d_main(int argc,char  **argv);
+extern int duke3d_main(int argc,char  **argv);
+extern int quake_main (int c, char **v);
+
+char *wolf3d_argv[] = { "wolf3d", "--audiobuffer", "2048"  };
+char *duke3d_argv[] = { "duke3d" };
+char *quake_argv[] = { "quake", "-basedir", "/.rockbox/quake" };
 
 struct prog_t {
     const char *name;
     int (*main)(int argc, char *argv[]);
     bool printf_enabled;
+    int argc;
+    char **argv;
 } programs[] = {
 #if 0
     {  "Abe's Amazing Adventure",  abe_main,           true   },
@@ -49,10 +56,11 @@ struct prog_t {
     {  "Test Platform",            testplatform_main,  true   },
     {  "Test Sprite",              testsprite_main,    false  },
     {  "Test Window",              testwin_main,       false  },
+    {  "Wolf3D!!!!!",              wolf3d_main,        false, ARRAYLEN(wolf3d_argv), wolf3d_argv },
+    {  "Duke3D",                   duke3d_main,        true, ARRAYLEN(duke3d_argv), duke3d_argv },
 #endif
-    {  "Wolf3D!!!!!",              wolf3d_main,        false  },
-    {  "Duke3D",                   duke3d_main,        true   },
-    {  "Test sound",               testsound_main,     true   },
+    {  "Quake",                    quake_main,         true, ARRAYLEN(quake_argv), quake_argv },
+    {  "Test sound",               testsound_main,     true, 0, NULL },
 };
 #endif
 
@@ -105,15 +113,19 @@ void install_segv(void)
 }
 #endif
 
-/* 1024k (assuming 32-bit long) */
-static long main_stack[128 * 1024 / 4];
+static long main_stack[1024 * 1024 / 4];
 int (*main_fn)(int argc, char *argv[]);
+int prog_idx;
 static void main_thread(void)
 {
     /* these settings provide a nice balance of efficiency, quality, and latency */
+    main_fn = programs[prog_idx].main;
 
-    char *arg[] = {"/blah", "--audiobuffer", "2048", NULL};
-    int rc = main_fn(ARRAYLEN(arg) - 1, arg);
+    char *fallback[] = { "/blah", NULL };
+    char **argv = programs[prog_idx].argv ? programs[prog_idx].argv : fallback;
+    int argc = programs[prog_idx].argv ? programs[prog_idx].argc : 1;
+
+    int rc = main_fn(argc, argv);
     if(rc != 0)
         rb->splash(HZ * 2, SDL_GetError());
 
@@ -151,6 +163,7 @@ enum plugin_status plugin_start(const void *param)
     rb->splash(0, "plugin start 1");
 
     rb->set_int("Choose SDL Program", "", UNIT_INT, &prog, NULL, 1, 0, ARRAYLEN(programs) - 1, formatter);
+    prog_idx = prog;
     rb->splash(0, "plugin start 2");
 
     main_fn = programs[prog].main;

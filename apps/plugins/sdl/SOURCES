@@ -38,7 +38,7 @@ tests/raytrace/main.c
 tests/raytrace/vector.c
 #endif
 
-#if 1
+#if 0
 tests/wolf3d/fmopl.c
 tests/wolf3d/id_ca.c
 tests/wolf3d/id_in.c
@@ -66,7 +66,6 @@ tests/wolf3d/wl_play.c
 tests/wolf3d/wl_shade.c
 tests/wolf3d/wl_state.c
 tests/wolf3d/wl_text.c
-#endif
 
 tests/duke3d/Engine/src/cache.c
 tests/duke3d/Engine/src/display.c
@@ -109,6 +108,77 @@ tests/duke3d/Game/src/rts.c
 tests/duke3d/Game/src/scriplib.c
 tests/duke3d/Game/src/sector.c
 tests/duke3d/Game/src/sounds.c
+#endif
+
+tests/quake/d_vars.c
+tests/quake/nonintel.c
+tests/quake/cd_null.c
+tests/quake/chase.c
+tests/quake/cl_demo.c
+tests/quake/cl_input.c
+tests/quake/cl_main.c
+tests/quake/cl_parse.c
+tests/quake/cl_tent.c
+tests/quake/cmd.c
+tests/quake/common.c
+tests/quake/console.c
+tests/quake/crc.c
+tests/quake/cvar.c
+tests/quake/d_edge.c
+tests/quake/d_fill.c
+tests/quake/d_init.c
+tests/quake/d_modech.c
+tests/quake/d_part.c
+tests/quake/d_polyse.c
+tests/quake/d_scan.c
+tests/quake/d_sky.c
+tests/quake/d_sprite.c
+tests/quake/d_surf.c
+tests/quake/d_zpoint.c
+tests/quake/draw.c
+tests/quake/host.c
+tests/quake/host_cmd.c
+tests/quake/keys.c
+tests/quake/mathlib.c
+tests/quake/menu.c
+tests/quake/model.c
+tests/quake/net_loop.c
+tests/quake/net_vcr.c
+tests/quake/net_none.c
+tests/quake/net_main.c
+tests/quake/pr_cmds.c
+tests/quake/pr_edict.c
+tests/quake/pr_exec.c
+tests/quake/r_aclip.c
+tests/quake/r_alias.c
+tests/quake/r_bsp.c
+tests/quake/r_draw.c
+tests/quake/r_edge.c
+tests/quake/r_efrag.c
+tests/quake/r_light.c
+tests/quake/r_main.c
+tests/quake/r_misc.c
+tests/quake/r_part.c
+tests/quake/r_sky.c
+tests/quake/r_sprite.c
+tests/quake/r_surf.c
+tests/quake/r_vars.c
+tests/quake/sbar.c
+tests/quake/screen.c
+tests/quake/snd_dma.c
+tests/quake/snd_mem.c
+tests/quake/snd_mix.c
+tests/quake/snd_sdl.c
+tests/quake/sv_main.c
+tests/quake/sv_move.c
+tests/quake/sv_phys.c
+tests/quake/sv_user.c
+tests/quake/sys_sdl.c
+tests/quake/vid_sdl.c
+tests/quake/view.c
+tests/quake/wad.c
+tests/quake/world.c
+tests/quake/zone.c
 
 tests/testsound.c
 

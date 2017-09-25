@@ -1222,12 +1222,20 @@ float pow_wrapper(float x, float y)
     return rb_exp(rb_log(x) * y);
 }
 
-float floor_wrapper(float n)
+double floor_wrapper(double n)
 {
-    if(n < 0.0f)
-        return ((int)n - 1);
+    if(n < 0.0)
+    {
+        int y = (int)n;
+        return ((float)y == n) ? y : y - 1;
+    }
     else
         return (int)n;
+}
+
+double ceil_wrapper(double n)
+{
+    return floor_wrapper(n) + 1.0;
 }
 
 /* Natural logarithm.

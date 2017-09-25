@@ -140,7 +140,7 @@
 #define CODEC_SIZE 0x100000
 
 /* The number of bytes reserved for loadable plugins */
-#define PLUGIN_BUFFER_SIZE 0x800000
+#define PLUGIN_BUFFER_SIZE 3 * 1024 * 1024
 
 /* 6g has a standard battery of 550mAh, except for the thick 6g (2007 160gb) which has a standard battery of 850mAh */
 #define BATTERY_CAPACITY_DEFAULT 550 /* default battery capacity */
