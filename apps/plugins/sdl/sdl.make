@@ -22,7 +22,7 @@ OTHER_INC += -I$(SDLSRCDIR)/include
 # include comes first because of possible system SDL headers taking
 # precedence
 SDLFLAGS = -I$(SDLSRCDIR)/include $(filter-out -O%,$(PLUGINFLAGS))	\
--O2 -Wno-unused-parameter -Xpreprocessor -Wno-undef
+-O2 -Wno-unused-parameter -Xpreprocessor -Wno-undef -Wcast-align -fno-short-enums
 
 $(SDLBUILDDIR)/sdl.rock: $(SDL_OBJ) $(TLSFLIB)
 

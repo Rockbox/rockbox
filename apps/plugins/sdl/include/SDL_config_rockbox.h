@@ -30,6 +30,7 @@
 #include "plugin.h"
 #include "lib/pluginlib_exit.h"
 
+#include <setjmp.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -68,6 +69,12 @@
 
 #define SDL_VIDEO_DRIVER_ROCKBOX  1
 
+#ifndef ROCKBOX_BIG_ENDIAN
+#define SDL_BYTEORDER SDL_LIL_ENDIAN
+#else
+#define SDL_BYTEORDER SDL_BIG_ENDIAN
+#endif
+
 #define SDL_HAS_64BIT_TYPE 1
 #define LACKS_UNISTD_H    1
 #define LACKS_STDLIB_H    1
@@ -103,16 +110,20 @@
 #define atan atan_wrapper
 #define atan2 atan2_wrapper
 #define atexit rb_atexit
+#define atof atof_wrapper
 #define atoi rb->atoi
+#define atol atoi
 #define calloc tlsf_calloc
 #define clock clock_wrapper
+#define closedir rb->closedir
 #define cos cos_wrapper
+#define exp(x) pow(2.71828182845, (x)) /* HACK */
 #define fabs fabs_wrapper
 #define floor floor_wrapper
 #define fmod fmod_wrapper
 #define free tlsf_free
-#define getenv SDL_getenv
 #define getchar() rb->sleep(2*HZ)
+#define getenv SDL_getenv
 #define log rb_log
 #define lseek rb->lseek
 #define malloc tlsf_malloc
@@ -125,8 +136,6 @@
 #define qsort rb->qsort
 #define rand rb->rand
 #define rb_atexit rbsdl_atexit
-/* HACK */
-#define exp(x) pow(2.71828182845, (x))
 #define readdir rb->readdir
 #define realloc tlsf_realloc
 #define remove rb->remove
@@ -138,30 +147,27 @@
 #define sscanf SDL_sscanf
 #define strcasecmp rb->strcasecmp
 #define strcat strcat_wrapper
-#define strchr SDL_strchr
+#define strchr rb->strchr
 #define strcmp rb->strcmp
 #define strcpy strcpy_wrapper
 #define strdup strdup_wrapper
+#define strerror(x) "error"
 #define strlen rb->strlen
+#define strncasecmp rb->strncasecmp
+#define strncat rb->strlcat /* hack */
 #define strncmp rb->strncmp
 #define strpbrk strpbrk_wrapper
 #define strrchr rb->strrchr
 #define strstr SDL_strstr
+#define strtok strtok_wrapper
 #define strtol SDL_strtol
 #define tan tan_wrapper
-#define unlink remove
-#define vsnprintf rb->vsnprintf
-#define closedir rb->closedir
-#define mkdir rb->mkdir
-#define strncasecmp rb->strncasecmp
-#define atol atoi
-#define atof atof_wrapper
-#define vsprintf vsprintf_wrapper
-#define strtok strtok_wrapper
 #define time(x) (*rb->current_tick/HZ)
-#define strncat rb->strlcat /* hack */
+#define unlink remove
 #define vprintf vprintf_wrapper
-#define strerror(x) "error"
+#define vsnprintf rb->vsnprintf
+#define vsprintf vsprintf_wrapper
+#define ceil ceil_wrapper
 
 #define M_PI 3.141592
 #define EOF 0xff
@@ -172,24 +178,25 @@
 
 #define FILENAME_MAX MAX_PATH
 
-int vprintf(const char *fmt, va_list ap);
-char *strtok_wrapper(char *str, const char *delim);
 char *strcpy_wrapper(char *dest, const char *src);
+char *strtok_wrapper(char *str, const char *delim);
+double ceil_wrapper(double x);
 double cos_wrapper(double);
+double floor_wrapper(double n);
 double sin_wrapper(double);
 float atan2_wrapper(float, float);
+float atan_wrapper(float x);
+float fabs_wrapper(float);
 float fmod(float x, float y);
+float pow_wrapper(float x, float y);
+float rb_log(float x);
+float sqrt_wrapper(float);
+float tan_wrapper(float);
 int mkdir_wrapepr(const char *path);
 int printf_wrapper(const char*, ...);
 int sprintf_wrapper(char*, const char*, ...);
+int vprintf(const char *fmt, va_list ap);
 void rbsdl_atexit(void (*)(void));
-float sqrt_wrapper(float);
-float tan_wrapper(float);
-float fabs_wrapper(float);
-float atan_wrapper(float x);
-float pow_wrapper(float x, float y);
-float rb_log(float x);
-float floor_wrapper(float n);
 
 /* HACK */
 //#define Mix_Chunk void
