@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2006 Jonathan Gordon
+ * Copyright (C) 2017 William Wilgus
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,21 +26,22 @@
 #include "config.h"
 #include "lang.h"
 
+#if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
+#include "language.h"
+#endif
+
 #include "appevents.h"
 #include "button.h"
 #include "action.h"
 #include "kernel.h"
-#include "debug.h"
+
 #include "splash.h"
 #include "settings.h"
-#include "pcmbuf.h"
 #include "misc.h"
-#if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
-#include "language.h"
-#endif
-#include "viewport.h"
+
 #ifdef HAVE_TOUCHSCREEN
 #include "statusbar-skinned.h"
+#include "viewport.h"
 #endif
 
 #ifdef HAVE_BACKLIGHT
@@ -49,382 +51,938 @@
 #endif
 #endif /* HAVE_BACKLIGHT */
 
-#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
-static int last_button = BUTTON_NONE|BUTTON_REL; /* allow the ipod wheel to
-                                                    work on startup */
-static intptr_t last_data = 0;
-static int last_action = ACTION_NONE;
-static bool repeated = false;
-static bool wait_for_release = false;
+#define REPEAT_WINDOW_TICKS HZ/4
+#define ACTION_FILTER_TICKS HZ/2 /* timeout between filtered actions SL/BL */
+
+/* holds the action state between calls to get_action \ get_action_custom) */
+static action_last_t action_last =
+{
+    .action           = ACTION_NONE,
+    .button           = BUTTON_NONE | BUTTON_REL, /* allow the ipod wheel to
+                                                     work on startup */
+    .context          = CONTEXT_STD,
+    .data             = 0,
+    .repeated         = false,
+    .tick             = 0,
+    .wait_for_release = false,
 
 #ifdef HAVE_TOUCHSCREEN
-static bool short_press = false;
+    .ts_data        = 0,
+    .ts_short_press = false,
 #endif
 
-#define REPEAT_WINDOW_TICKS HZ/4
-static int last_action_tick = 0;
+#ifdef HAVE_BACKLIGHT
+    .backlight_mask = SEL_ACTION_NONE,
+    .bl_filter_tick = 0,
+#endif
+
+#ifndef HAS_BUTTON_HOLD
+    .keys_locked     = false,
+    .screen_has_lock = false,
+    .sl_filter_tick  = 0,
+    .softlock_mask   = SEL_ACTION_NONE,
+    .unlock_combo    = BUTTON_NONE,
+#endif
+}; /* action_last_t action_last */
+
+/******************************************************************************
+** INTERNAL ACTION FUNCTIONS **************************************************
+*******************************************************************************
+*/
+
+/******************************************
+* has_flag compares value to a (SINGLE) flag
+* returns true if set, false otherwise
+*/
+static inline bool has_flag(unsigned int value, unsigned int flag)
+{
+    return ((value & flag) == flag);
+}
 
 #if defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD)
-static inline bool is_action_normal(int action);
-static inline bool mask_has_flag(unsigned int mask, unsigned int flag);
-static inline bool is_action_completed(int button);
-#define LAST_FILTER_TICKS HZ/2 /* timeout between filtered actions */
-#endif /* defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD) */
+/* HELPER FUNCTIONS selective softlock and backlight */
 
-#ifdef HAVE_BACKLIGHT
-static unsigned int backlight_mask = SEL_ACTION_NONE;
-static int do_backlight(int action, int context, bool is_pre_btn);
-static void handle_backlight(bool backlight, bool ignore_next);
-#endif /* HAVE_BACKLIGHT */
-
-/* software keylock stuff */
-#ifndef HAS_BUTTON_HOLD
-static bool keys_locked = false;
-static bool screen_has_lock = false;
-static unsigned int softlock_mask = SEL_ACTION_NONE;
-static inline int do_softlock_unlock_combo(int button, int context);
-static int do_softlock(int button, int action, int context, bool is_pre_btn);
-#endif /* HAVE_SOFTWARE_KEYLOCK */
-/*
- * do_button_check is the worker function for get_default_action.
- * returns ACTION_UNKNOWN or the requested return value from the list.
- * BE AWARE is_pre_button can miss pre buttons if a match is found first.
- */
-static inline int do_button_check(const struct button_mapping *items,int button,
-                                    int last_button, int *start, bool *prebtn)
+/****************************************************************
+* is_action_filtered, selective softlock and backlight use this
+* to lookup which actions are filtered, matches are only true if
+* action is found and supplied SEL_ACTION mask has the flag.
+* returns false if the action isn't found or isn't enabled,
+* true if the action is found and is enabled
+*/
+static bool is_action_filtered(int action, unsigned int mask, int context)
 {
-    int i = 0;
-    int ret = ACTION_UNKNOWN;
+    bool match = false;
 
-    while (items[i].button_code != BUTTON_NONE)
+    switch (action)
     {
-        if (items[i].button_code == button)
-        {
-            /*
-                CAVEAT: This will allways return the action without pre_button_code if it has a
-                lower index in the list.
-            */
-            if ((items[i].pre_button_code == BUTTON_NONE)
-                || (items[i].pre_button_code == last_button))
-            {
-                ret = items[i].action_code;
-                break;
-            }
-        }
-        else if (items[i].pre_button_code & button)
-            *prebtn = true; /* determine if this could be another action */
-        i++;
+        case ACTION_NONE:
+            break;
+/*Actions that are not mapped will not turn on the backlight option NOUNMAPPED*/
+        case ACTION_UNKNOWN:
+            match = has_flag(mask, SEL_ACTION_NOUNMAPPED);
+            break;
+        case ACTION_WPS_PLAY:
+        case ACTION_FM_PLAY:
+            match = has_flag(mask, SEL_ACTION_PLAY);
+            break;
+        case ACTION_STD_PREVREPEAT:
+        case ACTION_STD_NEXTREPEAT:
+        case ACTION_WPS_SEEKBACK:
+        case ACTION_WPS_SEEKFWD:
+        case ACTION_WPS_STOPSEEK:
+            match = has_flag(mask, SEL_ACTION_SEEK);
+            break;
+        case ACTION_STD_PREV:
+        case ACTION_STD_NEXT:
+        case ACTION_WPS_SKIPNEXT:
+        case ACTION_WPS_SKIPPREV:
+        case ACTION_FM_NEXT_PRESET:
+        case ACTION_FM_PREV_PRESET:
+            match = has_flag(mask, SEL_ACTION_SKIP);
+            break;
+        case ACTION_WPS_VOLUP:
+        case ACTION_WPS_VOLDOWN:
+            match = has_flag(mask, SEL_ACTION_VOL);
+            break;
+        case ACTION_SETTINGS_INC:/*FMS*/
+        case ACTION_SETTINGS_INCREPEAT:/*FMS*/
+        case ACTION_SETTINGS_DEC:/*FMS*/
+        case ACTION_SETTINGS_DECREPEAT:/*FMS*/
+            match = (context == CONTEXT_FM) && has_flag(mask, SEL_ACTION_VOL);
+            break;
+        default:
+            /* display action code of unfiltered actions */
+            logf ("unfiltered actions: context: %d action: %d, last btn: %d, \
+                  mask: %d", context, action, action_last.button, mask);
+            break;
+    }/*switch*/
+
+    return match;
+}
+
+/*******************************************************************************
+* is_action_discarded:
+* Most every action takes two rounds through get_action_worker,
+* once for the keypress and once for the key release,
+* actions with pre_button codes take even more, some actions however, only
+* take once; actions defined with only a button and no release/repeat event,
+* these actions should be acted upon immediately except when we have
+* selective backlighting/softlock enabled and in this case we only act upon
+* them immediately if there is no chance they have another event tied to them
+* determined using !is_prebutton or if action is completed
+* returns true if event was discarded and false if it was kept
+*/
+static bool is_action_discarded(action_cur_t *cur, bool filtered, long *tick)
+{
+    bool ret = true;
+    bool completed = (cur->button & (BUTTON_REPEAT | BUTTON_REL)) != 0;
+
+#ifdef HAVE_SCROLLWHEEL
+    /* Scrollwheel doesn't generate release events  */
+    completed |= (cur->button & (BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD)) != 0;
+#endif
+
+    /*directly after a match a key release event may trigger another*/
+    if (filtered && cur->action != ACTION_UNKNOWN)
+    {
+        *tick = current_tick + ACTION_FILTER_TICKS;
     }
-    *start = i;
+    /* has button been released/repeat or is this the only action it could be */
+    if (completed || !cur->is_prebutton)
+    {
+        /* if the action is not filtered and this isn't just a
+        * key release event then return false
+        * keeping action, and reset tick
+        */
+        if (!filtered && *tick < current_tick)
+        {
+            *tick = 0;
+             ret  = false;
+        }
+    }
+
     return ret;
 }
 
-#if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
-/*
- * button is horizontally inverted to support RTL language if the given language
- * and context combination require that
- */
-static int button_flip_horizontally(int context, int button)
+/*******************************************************
+* action_handle_backlight is used to both delay
+* and activate the backlight if HAVE_BACKLIGHT
+* and SEL_ACTION_ENABLED; backlight state is
+* set true/false and ignore_next sets the backlight
+* driver to ignore backlight_on commands from
+* other modules for a finite duration;
+* Ignore is set each time the action system
+* handles the backlight as a precaution since, if
+* the action system was not triggered the device would
+* appear unresponsive to the user.
+* If a backlight_on event hasn't been handled in the
+* ignore duration it will timeout and the next call
+* to backlight_on will trigger as normal
+*/
+static void action_handle_backlight(bool backlight, bool ignore_next)
 {
-    int newbutton;
+#if !defined(HAVE_BACKLIGHT)
+    (void) backlight;
+    (void) ignore_next;
+    return;
+#else /* HAVE_BACKLIGHT */
+    if (backlight)
+    {
+        backlight_on_ignore(false, 0);
+        backlight_on();
+    }
 
+    backlight_on_ignore(ignore_next, 5*HZ);/*must be set everytime we handle bl*/
+
+#ifdef HAVE_BUTTON_LIGHT
+    if (backlight)
+    {
+        buttonlight_on_ignore(false, 0);
+        buttonlight_on();
+    }
+
+    buttonlight_on_ignore(ignore_next, 5*HZ);/* as a precautionary fallback */
+#endif /* HAVE_BUTTON_LIGHT */
+
+#endif/* HAVE_BACKLIGHT */
+}
+
+#endif /*defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD) HELPER FUNCTIONS*/
+
+/******************************************************************
+* action_poll_button filters button presses for get_action_worker;
+* if button_get_w_tmo returns...
+* BUTTON_NONE, SYS_EVENTS, MULTIMEDIA BUTTONS, ACTION_REDRAW
+* they are allowed to pass immediately through to handler.
+* if waiting for button release ACTION_NONE is returned until
+* button is released/repeated.
+*/
+static inline bool action_poll_button(action_last_t *last, action_cur_t *cur)
+{
+    bool ret = true;
+    int *button = &cur->button;
+
+    *button = button_get_w_tmo(cur->timeout);
+   /* **************************************************************************
+    * if action_wait_for_release() was called without a button being pressed
+    * then actually waiting for release would do the wrong thing, i.e.
+    * the next key press is entirely ignored. So, if here comes a normal
+    * button press (neither release nor repeat) the press is a fresh one and
+    * no point in waiting for release
+    *
+    * This logic doesn't work for touchscreen which can send normal
+    * button events repeatedly before the first repeat (as in BUTTON_REPEAT).
+    * These cannot be distinguished from the very first touch
+    * but there's nothing we can do about it here
+    */
+    if (*button == BUTTON_NONE || (*button & (BUTTON_REPEAT|BUTTON_REL)) == 0)
+    {
+        last->wait_for_release = false;
+    }
+   /* ********************************************************
+    * Can return button immediately, sys_event & multimedia
+    * button presses don't use the action system, Data from
+    * sys events can be pulled with button_get_data.
+    * BUTTON_REDRAW should result in a screen refresh
+    */
+    if (*button == BUTTON_NONE || (*button & (SYS_EVENT|BUTTON_MULTIMEDIA)) != 0)
+    {
+        return true;
+    }
+    else if (*button == BUTTON_REDRAW)
+    {   /* screen refresh */
+        *button = ACTION_REDRAW;
+        return true;
+    }
+   /* *************************************************
+    * If waiting for release, Don't send any buttons
+    * through until we see the release event
+    */
+    if (last->wait_for_release)
+    {
+        if (has_flag(*button, BUTTON_REL))
+        { /* remember the button for button eating on context change */
+            last->wait_for_release = false;
+            last->button = *button;
+        }
+
+        *button = ACTION_NONE;
+    }
+#ifdef HAVE_SCROLLWHEEL
+   /* *********************************************
+    * Scrollwheel doesn't generate release events
+    * further processing needed
+    */
+    else if ((last->button & (BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD)) != 0)
+    {
+        ret = false;
+    }
+#endif
+   /* *************************************************************
+    * On Context Changed eat all buttons until the previous button
+    * was |BUTTON_REL (also eat the |BUTTON_REL button)
+    */
+    else if ((cur->context != last->context) && ((last->button & BUTTON_REL) == 0))
+    {
+        if (has_flag(*button, BUTTON_REL))
+        {
+            last->button = *button;
+            last->action = ACTION_NONE;
+        }
+
+        *button = ACTION_NONE; /* "safest" return value */
+    }
+   /* ****************************
+    * regular button press,
+    * further processing needed
+    */
+    else
+    {
+        ret = false;
+    }
+
+    /* current context might contain ALLOW_SOFTLOCK save prior to stripping it */
+    if (!ret)
+    {
+        last->context = cur->context;
+    }
+
+    return ret;
+}
+
+/*********************************************
+* update_screen_has_lock sets screen_has_lock
+* if passed context contains ALLOW_SOFTLOCK
+* and removes ALLOW_SOFTLOCK from the passed
+* context flag
+*/
+static inline void update_screen_has_lock(action_last_t *last, action_cur_t *cur)
+{
+#if defined(HAS_BUTTON_HOLD)
+    (void) last;
+    (void) cur;
+    return;
+#else
+    last->screen_has_lock = has_flag(cur->context, ALLOW_SOFTLOCK);
+    cur->context &= ~ALLOW_SOFTLOCK;
+#endif
+}
+
+/***********************************************
+* get_action_touchscreen allows touchscreen
+* presses to have short_press and repeat events
+*/
+static inline bool get_action_touchscreen(action_last_t *last, action_cur_t *cur)
+{
+
+#if !defined(HAVE_TOUCHSCREEN)
+    (void) last;
+    (void) cur;
+    return false;
+#else
+    if (has_flag(cur->button, BUTTON_TOUCHSCREEN))
+    {
+        last->repeated = false;
+        last->ts_short_press = false;
+        if (has_flag(last->button, BUTTON_TOUCHSCREEN))
+        {
+            if (has_flag(cur->button, BUTTON_REL) &&
+                !has_flag(last->button, BUTTON_REPEAT))
+            {
+                last->ts_short_press = true;
+            }
+            else if (has_flag(cur->button, BUTTON_REPEAT))
+            {
+                last->repeated = true;
+            }
+        }
+
+        last->button = cur->button;
+        cur->action = ACTION_TOUCHSCREEN;
+        return true;
+    }
+
+    return false;
+#endif
+}
+
+/******************************************************************************
+* button_flip_horizontally, passed button is horizontally inverted to support
+* RTL language if the given language and context combination require it
+* Affected contexts: CONTEXT_STD, CONTEXT_TREE, CONTEXT_LIST, CONTEXT_MAINMENU
+* Affected buttons with rtl language:
+* BUTTON_LEFT, BUTTON_RIGHT,
+* Affected buttons with rtl language and !simulator:
+* BUTTON_SCROLL_BACK, BUTTON_SCROLL_FWD, BUTTON_MINUS, BUTTON_PLUS
+*/
+static inline void button_flip_horizontally(int context, int *button)
+{
+
+#if !defined(HAVE_LCD_BITMAP) || defined(BOOTLOADER)
+    (void) context;
+    (void) *button;
+    return;
+#else
+    int newbutton = *button;
     if (!(lang_is_rtl() && ((context == CONTEXT_STD) ||
         (context == CONTEXT_TREE) || (context == CONTEXT_LIST) ||
         (context == CONTEXT_MAINMENU))))
     {
-        return button;
+        return;
     }
 
-    newbutton = button &
-        ~(BUTTON_LEFT | BUTTON_RIGHT
-#if defined(BUTTON_SCROLL_BACK) && defined(BUTTON_SCROLL_FWD) && \
-    !defined(SIMULATOR)
-        | BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD
-#endif
-#if defined(BUTTON_MINUS) && defined(BUTTON_PLUS) && \
-    !defined(SIMULATOR)
-        | BUTTON_MINUS | BUTTON_PLUS
-#endif
-        );
-
-    if (button & BUTTON_LEFT)
+    newbutton &= ~(BUTTON_LEFT | BUTTON_RIGHT);
+    if (has_flag(*button, BUTTON_LEFT))
+    {
         newbutton |= BUTTON_RIGHT;
-    if (button & BUTTON_RIGHT)
+    }
+
+    if (has_flag(*button, BUTTON_RIGHT))
+    {
         newbutton |= BUTTON_LEFT;
-#if defined(BUTTON_SCROLL_BACK) && defined(BUTTON_SCROLL_FWD) && \
-    !defined(SIMULATOR)
-    if (button & BUTTON_SCROLL_BACK)
+    }
+#ifndef SIMULATOR
+#ifdef HAVE_SCROLLWHEEL
+    newbutton &= ~(BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD);
+    if (has_flag(*button, BUTTON_SCROLL_BACK))
+    {
         newbutton |= BUTTON_SCROLL_FWD;
-    if (button & BUTTON_SCROLL_FWD)
+    }
+
+    if (has_flag(*button, BUTTON_SCROLL_FWD))
+    {
         newbutton |= BUTTON_SCROLL_BACK;
+    }
 #endif
-#if defined(BUTTON_MINUS) && defined(BUTTON_PLUS) && \
-    !defined(SIMULATOR)
-    if (button & BUTTON_MINUS)
+
+#if defined(BUTTON_MINUS) && defined(BUTTON_PLUS)
+    newbutton &= ~(BUTTON_MINUS | BUTTON_PLUS)
+    if (has_flag(*button, BUTTON_MINUS))
+    {
         newbutton |= BUTTON_PLUS;
-    if (button & BUTTON_PLUS)
+    }
+
+    if (has_flag(*button, BUTTON_PLUS))
+    {
         newbutton |= BUTTON_MINUS;
+    }
 #endif
+#endif /* !SIMULATOR */
 
-    return newbutton;
+    *button = newbutton;
+#endif /* !HAVE_LCD_BITMAP | BOOTLOADER */
+} /* button_flip_horizontally */
+
+/**********************************************************************
+* action_code_worker is the worker function for action_code_lookup.
+* returns ACTION_UNKNOWN or the requested return value from the list.
+* BE AWARE IF YOUR DESIRED ACTION IS IN A LOWER 'CHAINED' CONTEXT::
+* *** is_prebutton can miss pre_buttons
+* ** An action without pre_button_code (pre_button_code = BUTTON_NONE)
+* *  will be returned from the higher context
+*/
+static inline int action_code_worker(action_last_t *last,
+                                     action_cur_t  *cur,
+                                              int  *end  )
+{
+    int ret = ACTION_UNKNOWN;
+    int i = 0;
+    unsigned int found = 0;
+    while (cur->items[i].button_code != BUTTON_NONE)
+    {
+        if (cur->items[i].button_code == cur->button)
+        {
+            /********************************************************
+            * { Action Code,   Button code,    Prereq button code }
+            * CAVEAT: This will allways return the action without
+            * pre_button_code (pre_button_code = BUTTON_NONE)
+            * if it is found before 'falling through'
+            * to a lower 'chained' context.
+            *
+            * Example: button = UP|REL, last_button = UP;
+            *  while looking in CONTEXT_WPS there is an action defined
+            *  {ACTION_FOO, BUTTON_UP|BUTTON_REL, BUTTON_NONE}
+            *  then ACTION_FOO in CONTEXT_WPS will be returned
+            *  EVEN THOUGH you are expecting a fully matched
+            *  ACTION_BAR from CONTEXT_STD
+            *  {ACTION_BAR, BUTTON_UP|BUTTON_REL, BUTTON_UP}
+            */
+            if (cur->items[i].pre_button_code == last->button)
+            {   /* Always allow an exact match */
+                found++;
+                *end = i;
+            }
+            else if (!found && cur->items[i].pre_button_code == BUTTON_NONE)
+            {   /* Only allow Loose match if exact match wasn't found */
+                found++;
+                *end = i;
+            }
+        }
+        else if (has_flag(cur->items[i].pre_button_code, cur->button))
+        { /* This could be another action depending on next button press */
+            cur->is_prebutton = true;
+            if (found > 1) /* There is already an exact match */
+            {
+                break;
+            }
+        }
+        i++;
+    }
+
+    if (!found)
+    {
+        *end = i;
+    }
+    else
+    {
+        ret = cur->items[*end].action_code;
+    }
+
+    return ret;
 }
-#endif
 
+/***************************************************************************
+* get_next_context returns the next CONTEXT to be searched for action_code
+* by action_code_lookup(); if needed it first continues incrementing till
+* the end of current context map is reached; If there is another
+* 'chained' context below the current context this new context is returned
+* if there is not a 'chained' context to return, CONTEXT_STD is returned;
+*/
 static inline int get_next_context(const struct button_mapping *items, int i)
 {
     while (items[i].button_code != BUTTON_NONE)
+    {
         i++;
+    }
+
     return (items[i].action_code == ACTION_NONE ) ?
-            CONTEXT_STD :
-            items[i].action_code;
+            CONTEXT_STD : items[i].action_code;
 }
 
-
-/*
- * int get_action_worker(int context, int timeout, bool *is_pre_button,
-                         struct button_mapping *user_mappings)
-   This function searches the button list for the given context for the just
-   pressed button.
-   If there is a match it returns the value from the list.
-   If there is no match..
-        the last item in the list "points" to the next context in a chain
-        so the "chain" is followed until the button is found.
-        putting ACTION_NONE will get CONTEXT_STD which is always the last list checked.
-   BE AWARE is_pre_button can miss pre buttons if a match is found first.
-    it is more for actions that are not yet completed in the desired context
-     but are defined in a lower 'chained' context.
-   Timeout can be TIMEOUT_NOBLOCK to return immediatly
-                  TIMEOUT_BLOCK   to wait for a button press
-   Any number >0   to wait that many ticks for a press
- */
-static int get_action_worker(int context, int timeout, bool *is_pre_button,
-                             const struct button_mapping* (*get_context_map)(int) )
+/************************************************************************
+* action_code_lookup passes current button, last button and is_prebutton
+* to action_code_worker() which uses the current button map to
+* lookup action_code.
+* BE AWARE IF YOUR DESIRED ACTION IS IN A LOWER 'CHAINED' CONTEXT::
+* *** is_prebutton can miss pre_buttons
+* ** An action without pre_button_code (pre_button_code = BUTTON_NONE)
+* *  will be returned from the higher context see action_code_worker()
+*  for a more in-depth explanation
+* places action into current_action
+*/
+static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
 {
-    const struct button_mapping *items = NULL;
-    int button;
-    int i=0;
-    int ret = ACTION_UNKNOWN;
-    static int last_context = CONTEXT_STD;
+    int  action  = ACTION_NONE;
+    int  context = cur->context;
+    int  i = 0;
 
-    send_event(GUI_EVENT_ACTIONUPDATE, NULL);
+    cur->is_prebutton = false;
 
-    button = button_get_w_tmo(timeout);
-
-    /* Data from sys events can be pulled with button_get_data
-     * multimedia button presses don't go through the action system */
-    if (button == BUTTON_NONE || button & (SYS_EVENT|BUTTON_MULTIMEDIA))
+    for(;;)
     {
-        /* no button pressed so no point in waiting for release */
-        if (button == BUTTON_NONE)
-            wait_for_release = false;
-        return button;
-    }
-
-    /* the special redraw button should result in a screen refresh */
-    if (button == BUTTON_REDRAW)
-        return ACTION_REDRAW;
-
-    /* if action_wait_for_release() was called without a button being pressed
-     * then actually waiting for release would do the wrong thing, i.e.
-     * the next key press is entirely ignored. So, if here comes a normal
-     * button press (neither release nor repeat) the press is a fresh one and
-     * no point in waiting for release
-     *
-     * This logic doesn't work for touchscreen which can send normal
-     * button events repeatedly before the first repeat (as in BUTTON_REPEAT).
-     * These cannot be distinguished from the very first touch
-     * but there's nothing we can do about it here */
-    if ((button & (BUTTON_REPEAT|BUTTON_REL)) == 0)
-        wait_for_release = false;
-
-    /* Don't send any buttons through untill we see the release event */
-    if (wait_for_release)
-    {
-        if (button&BUTTON_REL)
+        /* logf("context = %x",context); */
+#if (BUTTON_REMOTE != 0)
+        if (has_flag(cur->button, BUTTON_REMOTE))
         {
-            /* remember the button for the below button eating on context
-             * change */
-            last_button = button;
-            wait_for_release = false;
+            *context |= CONTEXT_REMOTE;
         }
-        return ACTION_NONE;
-    }
-
-    if ((context != last_context) && ((last_button & BUTTON_REL) == 0)
-#ifdef HAVE_SCROLLWHEEL
-        /* Scrollwheel doesn't generate release events  */
-        && !(last_button & (BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD))
 #endif
-        )
-    {
-        if (button & BUTTON_REL)
+
+        cur->items = cur->get_context_map(context);
+
+        if (cur->items != NULL)
         {
-            last_button = button;
-            last_action = ACTION_NONE;
+            action = action_code_worker(last, cur, &i);
+
+            if (action == ACTION_UNKNOWN)
+            {
+                context = get_next_context(cur->items, i);
+
+                if (context != (int)CONTEXT_STOPSEARCHING)
+                {
+                    i = 0;
+                    continue;
+                }
+            }
         }
-        /* eat all buttons until the previous button was |BUTTON_REL
-           (also eat the |BUTTON_REL button) */
-        return ACTION_NONE; /* "safest" return value */
+        /* No more items, action was found, or STOPSEARCHING was specified */
+        break;
     }
-    last_context = context;
+    cur->action = action;
+}
 
 #ifndef HAS_BUTTON_HOLD
-    screen_has_lock = ((context & ALLOW_SOFTLOCK) == ALLOW_SOFTLOCK);
-    context &= ~ALLOW_SOFTLOCK;
-    if (is_keys_locked())
-    {
-        ret = do_softlock_unlock_combo(button, context);
-        if (!is_keys_locked())
-            return ret;
-    }
+/*************************************
+* do_key_lock (dis)/enables softlock
+* based on lock flag, last button and
+* buttons still in queue are purged
+* if HAVE_TOUCHSCREEN then depending
+* on user selection it will be locked
+* or unlocked as well
+*/
+static inline void do_key_lock(bool lock)
+{
+    action_last.keys_locked = lock;
+    action_last.button = BUTTON_NONE;
+    button_clear_queue();
 #if defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
-    else if (!mask_has_flag(softlock_mask, SEL_ACTION_NOTOUCH))
+ /* disable touch device on keylock if std behavior or selected disable touch */
+    if (!has_flag(action_last.softlock_mask, SEL_ACTION_ENABLED) ||
+         has_flag(action_last.softlock_mask, SEL_ACTION_NOTOUCH))
     {
-        /* make sure touchpad get reactivated if we quit the screen */
-        button_enable_touch(true);
+        button_enable_touch(!lock);
     }
 #endif
+}
+
+/**********************************************
+* do_auto_softlock when user selects autolock
+* unlock_combo stored for later unlock
+* activates autolock on backlight timeout
+* toggles autolock on / off by
+* ACTION_STD_KEYLOCK presses;
+*/
+static inline int do_auto_softlock(action_last_t *last, action_cur_t *cur)
+{
+
+#if !defined(HAVE_BACKLIGHT)
+    (void) last;
+    return cur->action;
+#else
+    int  action     = cur->action;
+    bool is_timeout = false;
+    int  timeout;
+    if (has_flag(last->softlock_mask, SEL_ACTION_ALOCK_OK))
+    {
+        timeout = backlight_get_current_timeout();
+        is_timeout = (timeout > 0 && (current_tick > action_last.tick + timeout));
+    }
+
+    if (is_timeout)
+    {
+        do_key_lock(true);
+    }
+    else if (action == ACTION_STD_KEYLOCK)
+    {
+        last->unlock_combo = cur->button;/* set unlock combo to allow unlock */
+        last->softlock_mask ^= SEL_ACTION_ALOCK_OK;
+        action_handle_backlight(true, false);
+            /* If we don't wait for a moment for the backlight queue
+             *  to process, the user will never see the message */
+        if (!is_backlight_on(false))
+        {
+            sleep(HZ/2);
+        }
+
+        if (has_flag(last->softlock_mask, SEL_ACTION_ALOCK_OK))
+        {
+            splash(HZ/2, ID2P(LANG_ACTION_AUTOLOCK_ON));
+            action = ACTION_REDRAW;
+        }
+        else
+        {
+            splash(HZ/2, ID2P(LANG_ACTION_AUTOLOCK_OFF));
+        }
+    }
+
+    return action;
+#endif /* HAVE_BACKLIGHT */
+}
 
 #endif /* HAS_BUTTON_HOLD */
 
-#ifdef HAVE_TOUCHSCREEN
-    if (button & BUTTON_TOUCHSCREEN)
+/*****************************************************
+* do_softlock Handles softlock once action is known
+* selective softlock allows user selected actions to
+* bypass a currently locked state, special lock state
+* autolock is handled here as well if HAVE_BACKLIGHT
+*/
+static inline void do_softlock(action_last_t *last, action_cur_t *cur)
+{
+#if defined(HAS_BUTTON_HOLD)
+    (void) last;
+    (void) cur;
+    return;
+#else
+    int  action = cur->action;
+
+    if (!last->screen_has_lock)
+    { /* no need to check softlock return immediately */
+        return;
+    }
+
+    bool filtered = true;
+    bool notify_user = false;
+    bool sl_activate = true; /* standard softlock behavior */
+
+    if ((!last->keys_locked) && has_flag(last->softlock_mask, SEL_ACTION_AUTOLOCK))
     {
-        repeated = false;
-        short_press = false;
-        if (last_button & BUTTON_TOUCHSCREEN)
-        {
-            if ((button & BUTTON_REL) &&
-                ((last_button & BUTTON_REPEAT)==0))
-            {
-                short_press = true;
-            }
-            else if (button & BUTTON_REPEAT)
-                repeated = true;
-        }
-        last_button = button;
-        return ACTION_TOUCHSCREEN;
+        action = do_auto_softlock(last, cur);
+    }
+    /* Lock/Unlock toggled by ACTION_STD_KEYLOCK presses*/
+    if ((action == ACTION_STD_KEYLOCK)
+         || (last->keys_locked && last->unlock_combo == cur->button))
+    {
+        last->unlock_combo = cur->button;
+        do_key_lock(!last->keys_locked);
+        notify_user = true;
+    }
+#if (BUTTON_REMOTE != 0)/* Allow remote actions through */
+    else if (has_flag(cur->button, BUTTON_REMOTE))
+    {
+        return;
     }
 #endif
 
-#if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
-    button = button_flip_horizontally(context, button);
+    else if (last->keys_locked && action != ACTION_REDRAW)
+    {
+        if (has_flag(last->softlock_mask, SEL_ACTION_ENABLED))
+        {
+            filtered = is_action_filtered(action, last->softlock_mask, cur->context);
+
+            sl_activate = !is_action_discarded(cur, filtered, &last->sl_filter_tick);
+        }
+
+        if (sl_activate)
+        { /*All non-std softlock options are set to 0 if advanced sl is disabled*/
+            if (!has_flag(last->softlock_mask, SEL_ACTION_NONOTIFY))
+            {   /* always true on standard softlock behavior*/
+                notify_user = has_flag(cur->button, BUTTON_REL);
+                action = ACTION_REDRAW;
+            }
+            else
+                action = ACTION_NONE;
+        }
+        else if (!filtered)
+        { /* catch blocked actions on fast repeated presses */
+            action = ACTION_NONE;
+        }
+     }/* keys_locked */
+
+#ifdef BUTTON_POWER /*always notify if power button pressed while keys locked*/
+    notify_user |= (has_flag(cur->button, BUTTON_POWER|BUTTON_REL)
+                    && last->keys_locked);
 #endif
 
-    /*   logf("%x,%x",last_button,button); */
-    *is_pre_button = false; /* could the button be another actions pre_button */
-    while (1)
+    if (notify_user)
     {
-        /*     logf("context = %x",context); */
-#if (BUTTON_REMOTE != 0)
-        if (button & BUTTON_REMOTE)
-            context |= CONTEXT_REMOTE;
+        action_handle_backlight(true, false);
+
+#ifdef HAVE_BACKLIGHT
+       /* If we don't wait for a moment for the backlight queue to process,
+        * the user will never see the message
+        */
+        if (!is_backlight_on(false))
+        {
+            sleep(HZ/2);
+        }
 #endif
-        if ((context & CONTEXT_PLUGIN) && get_context_map)
-            items = get_context_map(context);
+        if (last->keys_locked)
+        {
+            splash(HZ/2, ID2P(LANG_KEYLOCK_ON));
+        }
         else
-            items = get_context_mapping(context);
-
-        if (items == NULL)
-            break;
-
-        ret = do_button_check(items, button, last_button, &i, is_pre_button);
-
-        if (ret == ACTION_UNKNOWN)
         {
-            context = get_next_context(items,i);
-
-            if (context != (int)CONTEXT_STOPSEARCHING)
-            {
-                i = 0;
-                continue;
-            }
+            splash(HZ/2, ID2P(LANG_KEYLOCK_OFF));
         }
-        /* Action was found or STOPSEARCHING was specified */
-        break;
-    }
-    /* DEBUGF("ret = %x\n",ret); */
-#ifndef HAS_BUTTON_HOLD
-    if(screen_has_lock && is_action_normal(ret))
-        ret = do_softlock(button, ret, last_context & ~ALLOW_SOFTLOCK, is_pre_button);
-#endif
-    if ((current_tick - last_action_tick < REPEAT_WINDOW_TICKS)
-         && (ret == last_action))
-        repeated = true;
-    else
-        repeated = false;
 
-    last_button = button;
-    last_action = ret;
-    last_data   = button_get_data();
-    last_action_tick = current_tick;
+        action       = ACTION_REDRAW;
+        last->button = BUTTON_NONE;
+        button_clear_queue();
+    }
+
+    cur->action = action;
+#endif/*!HAS_BUTTON_HOLD*/
+}
+
+/**********************************************************************
+* update_action_last copies the current action values into action_last
+* saving the current state & allowing get_action_worker() to return
+* while waiting for the next button press; Since some actions take
+* multiple buttons, this allows those actions to be looked up and
+* returned in a non-blocking way;
+* Returns action, checks\sets repeated, plays keyclick (if applicable)
+*/
+static inline int update_action_last(action_last_t *last, action_cur_t *cur)
+{
+    int  action = cur->action;
+
+    logf ("action system: context: %d last context: %d, action: %d, \
+           last action: %d, button %d, last btn: %d, last repeated: %d, \
+           last_data: %d", cur->context, last->context, cur->action,
+           last->action, cur->button, last->button, last->repeated, last->data);
+
+    if (action == last->action)
+    {
+        last->repeated = (current_tick < last->tick + REPEAT_WINDOW_TICKS);
+    }
+    else
+    {
+        last->repeated = false;
+    }
+
+    last->action = action;
+    last->button = cur->button;
+    last->data   = button_get_data();
+    last->tick   = current_tick;
 
 #if CONFIG_CODEC == SWCODEC
     /* Produce keyclick */
-    keyclick_click(false, ret);
+    keyclick_click(false, action);
 #endif
 
-    return ret;
-}/* get_action_worker */
-
-int get_action(int context, int timeout)
-{
-    bool is_pre_button = false;
-    int  button = get_action_worker(context, timeout, &is_pre_button, NULL);
-
-#ifdef HAVE_TOUCHSCREEN
-    if (button == ACTION_TOUCHSCREEN)
-        button = sb_touch_to_button(context);
-#endif
-
-#ifdef HAVE_BACKLIGHT
-    if (mask_has_flag(backlight_mask, SEL_ACTION_ENABLED) &&
-                                                        is_action_normal(button))
-        button = do_backlight(button, context & ~ALLOW_SOFTLOCK, is_pre_button);
-#endif
-
-    return button;
+    return action;
 }
 
-int get_custom_action(int context,int timeout,
-                      const struct button_mapping* (*get_context_map)(int))
+/********************************************************
+* init_act_cur initializes passed struct action_cur_t
+* with context, timeout,and get_context_map.
+* other values set to default
+* if get_context_map is NULL standard
+* context mapping will be used
+*/
+static void init_act_cur(action_cur_t *cur,
+                         int  context, int  timeout,
+                         const struct button_mapping* (*get_context_map)(int))
 {
-    bool is_pre_button = false;
-    return get_action_worker(context,timeout, &is_pre_button, get_context_map);
-}
+    cur->action              = ACTION_UNKNOWN;
+    cur->button              = BUTTON_NONE;
+    cur->context             = context;
+    cur->is_prebutton        = false;
+    cur->items               = NULL;
+    cur->timeout             = timeout;
 
-bool action_userabort(int timeout)
-{
-    bool is_pre_button = false;
-    int action = get_action_worker(CONTEXT_STD,timeout, &is_pre_button, NULL);
-    bool ret = (action == ACTION_STD_CANCEL);
-    if (!ret)
+    if (get_context_map == NULL)/* standard mapping */
     {
-        default_event_handler(action);
+        cur->get_context_map = get_context_mapping;
     }
-    return ret;
+    else /* user defined button mapping*/
+    {
+        cur->get_context_map = get_context_map;
+    }
 }
 
-intptr_t get_action_data(void)
+/*******************************************************
+* do_backlight allows exemptions to the backlight on
+* user selected actions; Actions need to be looked up
+* before the decision to turn on backlight is made,
+* if selective backlighting is enabled then
+* filter first keypress events may need
+* to be taken into account as well
+* IF SEL_ACTION_ENABLED then:
+* Returns action or is FFKeypress is enabled,
+* ACTION_NONE on first keypress
+* delays backlight_on until action is known
+* handles backlight_on if needed
+*/
+static inline int do_backlight(action_last_t *last, action_cur_t *cur, int action)
 {
-    return last_data;
+
+#if !defined(HAVE_BACKLIGHT)
+    (void) last;
+    (void) cur;
+    return action;
+#else
+    if (!has_flag(last->backlight_mask, SEL_ACTION_ENABLED)
+        || (action & (SYS_EVENT|BUTTON_MULTIMEDIA)) != 0
+        || action == ACTION_REDRAW)
+    {
+        return action;
+    }
+
+    bool filtered;
+    bool bl_activate = false;
+    bool bl_is_off = !is_backlight_on(false);
+
+#if CONFIG_CHARGING /* disable if on external power */
+    bl_is_off &= !(has_flag(last->backlight_mask, SEL_ACTION_NOEXT)
+                     && power_input_present());
+#endif
+    /* skip if backlight on | incorrect context | SEL_ACTION_NOEXT + ext pwr */
+    if ((cur->context == CONTEXT_FM || cur->context == CONTEXT_WPS) && bl_is_off)
+    {
+        filtered = is_action_filtered(action, last->backlight_mask, cur->context);
+        bl_activate = !is_action_discarded(cur, filtered, &last->bl_filter_tick);
+    }
+    else /* standard backlight behaviour */
+    {
+        bl_activate = true;
+    }
+
+    if (action != ACTION_NONE && bl_activate)
+    {
+        action_handle_backlight(true, true);
+        /* Handle first keypress enables backlight only */
+        if (has_flag(last->backlight_mask, SEL_ACTION_FFKEYPRESS) && bl_is_off)
+        {
+            action       = ACTION_NONE;
+            last->button = BUTTON_NONE;
+        }
+    }
+    else
+    {
+        action_handle_backlight(false, true);/* set ignore next true */
+    }
+
+    return action;
+#endif /* !HAVE_BACKLIGHT */
 }
 
-int get_action_statuscode(int *button)
+/********************************************************************
+* get_action_worker() searches the button list of the passed context
+* for the just pressed button. If there is a match it returns the
+* value from the list. If there is no match, the last item in the
+* list "points" to the next context in a chain so the "chain" is
+* followed until the button is found. ACTION_NONE int the button
+* list will get CONTEXT_STD which is always the last list checked.
+*
+* BE AWARE IF YOUR DESIRED ACTION IS IN A LOWER 'CHAINED' CONTEXT::
+* *** is_prebutton can miss pre_buttons
+* ** An action without pre_button_code (pre_button_code = BUTTON_NONE)
+* *  will be returned from the higher context see action_code_worker()
+*  for a more in-depth explanation
+*
+*   Timeout can be: TIMEOUT_NOBLOCK to return immediatly
+*                   TIMEOUT_BLOCK   to wait for a button press
+*                   Any number >0   to wait that many ticks for a press
+*/
+static int get_action_worker(action_last_t *last, action_cur_t *cur)
 {
-    int ret = 0;
-    if (button)
-        *button = last_button;
+    send_event(GUI_EVENT_ACTIONUPDATE, NULL);
 
-    if (last_button & BUTTON_REMOTE)
-        ret |= ACTION_REMOTE;
-    if (repeated)
-        ret |= ACTION_REPEAT;
-    return ret;
+    /*if button = none/special; returns immediately*/
+    if (action_poll_button(last, cur))
+    {
+        return cur->button;
+    }
+
+    update_screen_has_lock(last, cur);
+
+    if (get_action_touchscreen(last, cur))
+    {
+        return cur->action;
+    }
+
+    button_flip_horizontally(cur->context, &cur->button);
+
+    action_code_lookup(last, cur);
+
+    do_softlock(last, cur);
+
+    return update_action_last(last, cur);
 }
+/*
+*******************************************************************************
+* END INTERNAL ACTION FUNCTIONS ***********************************************
+*******************************************************************************/
 
+/******************************************************************************
+* EXPORTED ACTION FUNCTIONS ***************************************************
+*******************************************************************************
+*/
 #ifdef HAVE_TOUCHSCREEN
 /* return BUTTON_NONE               on error
  *        BUTTON_REPEAT             if repeated press
@@ -434,30 +992,44 @@ int get_action_statuscode(int *button)
  */
 int action_get_touchscreen_press(short *x, short *y)
 {
-    static int last_data = 0;
+
     int data;
-    if ((last_button & BUTTON_TOUCHSCREEN) == 0)
-        return BUTTON_NONE;
-    data = button_get_data();
-    if (last_button & BUTTON_REL)
+    int ret = BUTTON_TOUCHSCREEN;
+
+    if (!has_flag(action_last.button, BUTTON_TOUCHSCREEN))
     {
-        *x = (last_data&0xffff0000)>>16;
-        *y = (last_data&0xffff);
+        return BUTTON_NONE;
+    }
+
+    data = button_get_data();
+    if (has_flag(action_last.button, BUTTON_REL))
+    {
+        *x = (action_last.ts_data&0xffff0000)>>16;
+        *y = (action_last.ts_data&0xffff);
     }
     else
     {
         *x = (data&0xffff0000)>>16;
         *y = (data&0xffff);
     }
-    last_data = data;
-    if (repeated)
-        return BUTTON_REPEAT;
-    if (short_press)
-        return BUTTON_REL;
+
+    action_last.ts_data = data;
+
+    if (action_last.repeated)
+    {
+        ret = BUTTON_REPEAT;
+    }
+    else if (action_last.ts_short_press)
+    {
+        ret = BUTTON_REL;
+    }
     /* This is to return a BUTTON_REL after a BUTTON_REPEAT. */
-    if (last_button & BUTTON_REL)
-        return BUTTON_REPEAT|BUTTON_REL;
-    return BUTTON_TOUCHSCREEN;
+    else if (has_flag(action_last.button, BUTTON_REL))
+    {
+        ret = BUTTON_REPEAT|BUTTON_REL;
+    }
+
+    return ret;
 }
 
 int action_get_touchscreen_press_in_vp(short *x1, short *y1, struct viewport *vp)
@@ -473,216 +1045,106 @@ int action_get_touchscreen_press_in_vp(short *x1, short *y1, struct viewport *vp
         *y1 = y - vp->y;
         return ret;
     }
-    if (ret & BUTTON_TOUCHSCREEN)
+
+    if (has_flag(ret, BUTTON_TOUCHSCREEN))
+    {
         return ACTION_UNKNOWN;
+    }
+
     return BUTTON_NONE;
 }
 #endif
 
-/* Don't let get_action*() return any ACTION_* values until the current buttons
- * have been released. SYS_* and BUTTON_NONE will go through.
- * Any actions relying on _RELEASE won't get seen.
- *
- * Note this doesn't currently work for touchscreen targets if called
- * when the screen isn't currently touched, because they can send normal
- * (non-BUTTON_REPEAT) events repeatedly, if the touch coordinates change.
- * This cannot be distinguished from normal buttons events.
- */
-void action_wait_for_release(void)
+bool action_userabort(int timeout)
 {
-    wait_for_release = true;
-}
-
-#if defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD)
-/* HELPER FUNCTIONS
-* Selective softlock and backlight use this lookup based on mask to decide
-* which actions are filtered, or could be filtered but not currently set.
-* returns false if the action isn't found, true if the action is found
-*/
-static bool is_action_filtered(int action, unsigned int mask, int context)
-{
-    bool match = false;
-
-    switch (action)
+    int  action = get_custom_action(CONTEXT_STD, timeout, NULL);
+    bool ret    = (action == ACTION_STD_CANCEL);
+    if (!ret)
     {
-        case ACTION_NONE:
-            break;
-/*Actions that are not mapped will not turn on the backlight option NOUNMAPPED*/
-        case ACTION_UNKNOWN:
-            match = mask_has_flag(mask, SEL_ACTION_NOUNMAPPED);
-            break;
-        case ACTION_WPS_PLAY:
-        case ACTION_FM_PLAY:
-            match = mask_has_flag(mask, SEL_ACTION_PLAY);
-            break;
-        case ACTION_STD_PREVREPEAT:
-        case ACTION_STD_NEXTREPEAT:
-        case ACTION_WPS_SEEKBACK:
-        case ACTION_WPS_SEEKFWD:
-        case ACTION_WPS_STOPSEEK:
-            match = mask_has_flag(mask, SEL_ACTION_SEEK);
-            break;
-        case ACTION_STD_PREV:
-        case ACTION_STD_NEXT:
-        case ACTION_WPS_SKIPNEXT:
-        case ACTION_WPS_SKIPPREV:
-        case ACTION_FM_NEXT_PRESET:
-        case ACTION_FM_PREV_PRESET:
-            match = mask_has_flag(mask, SEL_ACTION_SKIP);
-            break;
-        case ACTION_WPS_VOLUP:
-        case ACTION_WPS_VOLDOWN:
-            match = mask_has_flag(mask, SEL_ACTION_VOL);
-            break;
-        case ACTION_SETTINGS_INC:/*FMS*/
-        case ACTION_SETTINGS_INCREPEAT:/*FMS*/
-        case ACTION_SETTINGS_DEC:/*FMS*/
-        case ACTION_SETTINGS_DECREPEAT:/*FMS*/
-            match = (context == CONTEXT_FM) && mask_has_flag(mask, SEL_ACTION_VOL);
-            break;
-        default:
-            /* display action code of unfiltered actions */
-            logf ("unfiltered actions: context: %d action: %d, last btn: %d, \
-                  mask: %d", context, action, last_button, mask);
-            break;
-    }/*switch*/
+        default_event_handler(action);
+    }
 
-    return match;
-}
-/* compares mask to a flag return true if set false otherwise*/
-static inline bool mask_has_flag(unsigned int mask, unsigned int flag)
-{
-    return ((mask & flag) != 0);
-}
-/* returns true if the supplied context is to be filtered by selective BL/SL*/
-static inline bool is_context_filtered(int context)
-{
-    return (context == CONTEXT_FM || context == CONTEXT_WPS);
-}
-/* returns true if action can be passed on to selective backlight/softlock */
-static inline bool is_action_normal(int action)
-{
-    return (action != ACTION_REDRAW && (action & SYS_EVENT) == 0);
-}
-/*returns true if Button & released, repeated; or won't generate those events*/
-static inline bool is_action_completed(int button)
-{
-    return ((button & (BUTTON_REPEAT | BUTTON_REL)) != 0
-#ifdef HAVE_SCROLLWHEEL
-        /* Scrollwheel doesn't generate release events  */
-            || (button & (BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD)) != 0
-#endif
-        );
-}
-
-/* most every action takes two rounds through get_action_worker,
- * once for the keypress and once for the key release,
- * actions with pre_button codes take even more, some actions however, only
- * take once; actions defined with only a button and no release/repeat event,
- * these actions should be acted upon immediately except when we have
- * selective backlighting/softlock enabled and in this case we only act upon
- * them immediately if there is no chance they have another event tied to them
- * determined using is_pre_button and is_action_completed()
- *returns true if event was not filtered and false if it was
-*/
-static bool is_action_unfiltered(int action,int button, bool is_pre_button,
-                               bool filtered, int *tick)
-{
-    bool ret = false;
-        /*directly after a match a key release event may trigger another*/
-        if (filtered && action != ACTION_UNKNOWN)
-            *tick = current_tick + LAST_FILTER_TICKS;
-        /* has button been rel/rep or is this the only action it could be */
-        if (is_action_completed(button) || !is_pre_button)
-        {
-            /* reset last action , if the action is not filtered and
-               this isn't just a key release event then return true */
-            if (!filtered && *tick < current_tick)
-            {
-                *tick = 0;
-                ret = true;
-            }
-         }/*is_action_completed() || !is_pre_button*/
     return ret;
 }
-#endif /*defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD) HELPER FUNCTIONS*/
 
-#ifdef HAVE_BACKLIGHT
-static void handle_backlight(bool backlight, bool ignore_next)
+void action_wait_for_release(void)
 {
-    if (backlight)
-    {
-        backlight_on_ignore(false, 0);
-        backlight_on();
-#ifdef HAVE_BUTTON_LIGHT
-        buttonlight_on_ignore(false, 0);
-        buttonlight_on();
-    }
-    buttonlight_on_ignore(ignore_next, 5*HZ);/* as a precautionary fallback */
-#else
-    }
-#endif
-    backlight_on_ignore(ignore_next, 5*HZ);/*must be set everytime we handle bl*/
+    action_last.wait_for_release = true;
 }
 
-    /* Need to look up actions before we can decide to turn on backlight, if
-     * selective backlighting is true filter first keypress events need to be
-     * taken into account as well
-     */
-static int do_backlight(int action, int context, bool is_pre_btn)
+int get_action(int context, int timeout)
 {
-    static int last_filtered_tick = 0;
+    action_cur_t current;
+    init_act_cur(&current, context, timeout, NULL);
 
-    bool bl_is_active = is_backlight_on(false);
-    bool bl_activate = false;
-    bool filtered;
+    int action = get_action_worker(&action_last, &current);
 
-#if CONFIG_CHARGING /* disable if on external power */
-    if (!bl_is_active && is_context_filtered(context) &&
-    !(mask_has_flag(backlight_mask, SEL_ACTION_NOEXT) && power_input_present()))
-#else /* skip if backlight is on or incorrect context */
-    if (!bl_is_active && is_context_filtered(context))
-#endif
+#ifdef HAVE_TOUCHSCREEN
+    if (action == ACTION_TOUCHSCREEN)
     {
-        filtered = is_action_filtered(action, backlight_mask, context);
-        bl_activate = is_action_unfiltered(action, last_button, is_pre_btn,
-                                               filtered, &last_filtered_tick);
-    }/*is_context_filtered(context)*/
-    else
-        bl_activate = true;
-
-    if (action != ACTION_NONE && bl_activate)
-    {
-        handle_backlight(true, true);
-
-        if (mask_has_flag(backlight_mask, SEL_ACTION_FFKEYPRESS) && !bl_is_active)
-        {
-            action      = ACTION_NONE;
-            last_button = BUTTON_NONE;
-        }
+        action = sb_touch_to_button(context);
     }
-    else
-        handle_backlight(false, true);/* set ignore next true */
+#endif
+
+    action = do_backlight(&action_last, &current, action);
 
     return action;
 }
 
+int get_custom_action(int context,int timeout,
+                      const struct button_mapping* (*get_context_map)(int))
+{
+    action_cur_t current;
+    init_act_cur(&current, context, timeout, get_context_map);
+
+    return get_action_worker(&action_last, &current);
+}
+
+intptr_t get_action_data(void)
+{
+    return action_last.data;
+}
+
+int get_action_statuscode(int *button)
+{
+    int ret = 0;
+    if (button)
+    {
+        *button = action_last.button;
+    }
+
+    if (has_flag(action_last.button, BUTTON_REMOTE))
+    {
+        ret |= ACTION_REMOTE;
+    }
+
+    if (action_last.repeated)
+    {
+        ret |= ACTION_REPEAT;
+    }
+
+    return ret;
+}
+
+#ifdef HAVE_BACKLIGHT
 /* Enable selected actions to leave the backlight off */
 void set_selective_backlight_actions(bool selective, unsigned int mask,
                                                               bool filter_fkp)
 {
-    handle_backlight(true, selective);
+    action_handle_backlight(true, selective);
     if (selective) /* we will handle filter_first_keypress here so turn it off*/
     {
         set_backlight_filter_keypress(false);/* turnoff ffkp in button.c */
-        backlight_mask = mask | SEL_ACTION_ENABLED;
-        if(filter_fkp)
-            backlight_mask |= SEL_ACTION_FFKEYPRESS;
+        action_last.backlight_mask = mask | SEL_ACTION_ENABLED;
+        if (filter_fkp)
+        {
+            action_last.backlight_mask |= SEL_ACTION_FFKEYPRESS;
+        }
     }
     else
     {
         set_backlight_filter_keypress(filter_fkp);
-        backlight_mask = SEL_ACTION_NONE;
+        action_last.backlight_mask = SEL_ACTION_NONE;
     }
 }
 #endif /* HAVE_BACKLIGHT */
@@ -690,140 +1152,24 @@ void set_selective_backlight_actions(bool selective, unsigned int mask,
 #ifndef HAS_BUTTON_HOLD
 bool is_keys_locked(void)
 {
-    return (screen_has_lock && keys_locked);
+    return (action_last.screen_has_lock && action_last.keys_locked);
 }
 
-static inline void do_key_lock(bool lock)
-{
-    keys_locked = lock;
-    last_button = BUTTON_NONE;
-    button_clear_queue();
-#if defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
- /* disable touch device on keylock if std behavior or selected disable touch */
-     if (!mask_has_flag(softlock_mask, SEL_ACTION_ENABLED) ||
-          mask_has_flag(softlock_mask, SEL_ACTION_NOTOUCH))
-            button_enable_touch(!lock);
-#endif
-}
-
-/* user selected autolock based on backlight timeout; toggles autolock on / off
-    by ACTION_STD_KEYLOCK presses, Activates autolock if set on backlight timeout
-*/
-#ifdef HAVE_BACKLIGHT
-static inline int do_auto_softlock(int button, int action, int *unlock_combo)
-{
-    if(mask_has_flag(softlock_mask, SEL_ACTION_ALOCK_OK) && !is_backlight_on(false))
-        do_key_lock(true);
-
-    else if (action == ACTION_STD_KEYLOCK)
-    {
-        *unlock_combo = button;/* set unlock combo to allow unlock */
-        softlock_mask ^= SEL_ACTION_ALOCK_OK;
-        handle_backlight(true, false);
-            /* If we don't wait for a moment for the backlight queue
-             *  to process, the user will never see the message */
-        if (!is_backlight_on(false))
-            sleep(HZ/2);
-
-        if (mask_has_flag(softlock_mask, SEL_ACTION_ALOCK_OK))
-        {
-            splash(HZ/2, ID2P(LANG_ACTION_AUTOLOCK_ON));
-            action = ACTION_REDRAW;
-        }
-        else
-            splash(HZ/2, ID2P(LANG_ACTION_AUTOLOCK_OFF));
-    }
-    return action;
-}
-#endif
-
-/* Allows unlock softlock when action is not yet known but unlock_combo set*/
-static inline int do_softlock_unlock_combo(int button, int context)
-{
-return do_softlock(button, ACTION_NONE, context, false);
-}
-
-/* Handles softlock once action is known */
-static int do_softlock(int button, int action, int context, bool is_pre_btn)
-{
-    static int last_filtered_tick = 0;
-    static int unlock_combo = BUTTON_NONE; /*Moved from GLOBAL*/
-    bool filtered = true;
-    bool notify_user = false;
-    bool sl_activate = true; /* standard softlock behavior */
-
-#ifdef HAVE_BACKLIGHT
-    if (!keys_locked && mask_has_flag(softlock_mask, SEL_ACTION_AUTOLOCK))
-        action = do_auto_softlock(button, action, &unlock_combo);
-#endif
-    /* Lock/Unlock toggled by ACTION_STD_KEYLOCK presses*/
-    if ((action == ACTION_STD_KEYLOCK) || (keys_locked && unlock_combo == button))
-    {
-        unlock_combo = button;
-        do_key_lock(!keys_locked);
-        notify_user = true;
-    }
-#if (BUTTON_REMOTE != 0)/* Allow remote actions through */
-    else if (mask_has_flag(button, BUTTON_REMOTE))
-            notify_user = false;
-#endif
-    else if (keys_locked && action != ACTION_NONE && action != ACTION_REDRAW)
-    {
-        if (mask_has_flag(softlock_mask, SEL_ACTION_ENABLED))
-        {
-            filtered = is_action_filtered(action, softlock_mask, context);
-
-            sl_activate = is_action_unfiltered(action, button, is_pre_btn,
-                                                   filtered, &last_filtered_tick);
-        }
-        /*All non-std softlock options are set to 0 if advanced sl is disabled*/
-        if (sl_activate)
-        {
-            if (!mask_has_flag(softlock_mask, SEL_ACTION_NONOTIFY))
-            {   /* always true on standard softlock behavior*/
-                notify_user = mask_has_flag(button, BUTTON_REL);
-                action = ACTION_REDRAW;
-            }
-            else
-                action = ACTION_NONE;
-        }
-        else if (!filtered)/*catch blocked actions on fast repeated presses*/
-                action = ACTION_NONE;
-     } /* keys_locked */
-
-#ifdef BUTTON_POWER /*always notify if power button pressed while keys locked*/
-    notify_user |= (mask_has_flag(button, BUTTON_POWER) && keys_locked);
-#endif
-
-    if (notify_user)
-    {
-#ifdef HAVE_BACKLIGHT
-        handle_backlight(true, false);
-            /* If we don't wait for a moment for the backlight queue
-             *  to process, the user will never see the message */
-        if (!is_backlight_on(false))
-            sleep(HZ/2);
-#endif
-        if (keys_locked)
-            splash(HZ/2, ID2P(LANG_KEYLOCK_ON));
-        else
-            splash(HZ/2, ID2P(LANG_KEYLOCK_OFF));
-
-        last_button = BUTTON_NONE;
-        action      = ACTION_REDRAW;
-        button_clear_queue();
-    }
-
-    return action;
-}
-
+/* Enable selected actions to bypass a locked state */
 void set_selective_softlock_actions(bool selective, unsigned int mask)
 {
-    keys_locked = false;
-    if(selective)
-        softlock_mask = mask | SEL_ACTION_ENABLED;
+    action_last.keys_locked = false;
+    if (selective)
+    {
+        action_last.softlock_mask = mask | SEL_ACTION_ENABLED;
+    }
     else
-        softlock_mask = SEL_ACTION_NONE;
+    {
+        action_last.softlock_mask = SEL_ACTION_NONE;
+    }
 }
-
-#endif /* HAS_BUTTON_HOLD */
+#endif /* !HAS_BUTTON_HOLD */
+/*
+*******************************************************************************
+* END EXPORTED ACTION FUNCTIONS ***********************************************
+*******************************************************************************/
