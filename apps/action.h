@@ -36,11 +36,12 @@
 #define LAST_ITEM_IN_LIST { CONTEXT_STOPSEARCHING, BUTTON_NONE, BUTTON_NONE }
 #define LAST_ITEM_IN_LIST__NEXTLIST(a) { a, BUTTON_NONE, BUTTON_NONE }
 
-#ifndef HAS_BUTTON_HOLD
+#if !defined(HAS_BUTTON_HOLD)
 #define ALLOW_SOFTLOCK 0x08000000 /* will be stripped.. never needed except in calls to get_action() */
 #else
 #define ALLOW_SOFTLOCK 0
 #endif
+
 #if defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD)
 /* Selective action selection flags */
 #define SEL_ACTION_NONE       0
@@ -61,16 +62,23 @@
 #define SEL_ACTION_ENABLED    0x800U
 /* Selective Actions flags */
 
-#ifndef HAS_BUTTON_HOLD
+#if !defined(HAS_BUTTON_HOLD)
+/* returns true if keys_locked and screen_has_lock */
 bool is_keys_locked(void);
+/* Enable selected actions to bypass a locked state
+* mask is combination of Selective action selection flags */
 void set_selective_softlock_actions(bool selective, unsigned int mask);
 #endif
 
-#ifdef HAVE_BACKLIGHT
+#if defined(HAVE_BACKLIGHT)
+/* Enable selected actions to leave the backlight off
+* mask is combination of Selective action selection flags */
 void set_selective_backlight_actions(bool selective, unsigned int mask,
-                                                              bool filter_fkp);
+                                                             bool filter_fkp);
 #endif
+
 #endif /* defined(HAVE_BACKLIGHT) || !defined(HAS_BUTTON_HOLD) */
+
 enum {
     CONTEXT_STD = 0,
     /* These CONTEXT_ values were here before me,
@@ -358,11 +366,56 @@ enum {
     LAST_ACTION_PLACEHOLDER, /* custom actions should be this + something */
 };
 
+ /* act_cur holds action state during get_action() call */
+typedef struct
+{
+    int                            action;
+    int                            button;
+    int                            context;
+    int                            timeout;
+    const struct button_mapping   *items;
+    const struct button_mapping* (*get_context_map)(int);
+    bool                           is_prebutton;
+} action_cur_t;
+
+/* act_last holds action state between get_action() calls */
+typedef struct
+{
+    int      action;
+    long     tick;
+    int      button;
+    int      context;
+    intptr_t data;
+
+#if defined(HAVE_BACKLIGHT)
+    unsigned int backlight_mask;
+    long         bl_filter_tick;
+#endif
+
+#if !defined(HAS_BUTTON_HOLD)
+    long         sl_filter_tick;
+    unsigned int softlock_mask;
+    int          unlock_combo;
+    bool         keys_locked;
+    bool         screen_has_lock;
+
+#endif
+
+    bool          repeated;
+    bool          wait_for_release;
+
+#ifdef HAVE_TOUCHSCREEN
+    bool     ts_short_press;
+    int      ts_data;
+#endif
+} action_last_t;
+
 struct button_mapping {
     int action_code;
     int button_code;
     int pre_button_code;
 };
+
 /* use if you want to supply your own button mappings, PLUGINS ONLY */
 /* get_context_map is a function which returns a button_mapping* depedning on the given context */
 /* custom button_mappings may "chain" to inbuilt CONTEXT's */
@@ -409,10 +462,22 @@ int action_get_touchscreen_press(short *x, short *y);
 int action_get_touchscreen_press_in_vp(short *x1, short *y1, struct viewport *vp);
 #endif
 
-/* Don't let get_action*() return any ACTION_* values until the current buttons
- * have been released. SYS_* and BUTTON_NONE will go through.
- * Any actions relying on _RELEASE won't get seen.
- */
+/*******************************************************
+* action_wait_for_release will not allow
+* get_action(|_custom)() to return
+* any ACTION_* values until the current buttons
+* have been released.
+* SYS_* and BUTTON_NONE will pass through.
+* but, any actions relying on _RELEASE won't be seen.
+*
+* Note this doesn't currently work for
+* touchscreen targets if called when the
+* screen isn't currently touched because,
+* if the touch coordinates change they can send
+* normal (non-BUTTON_REPEAT) events repeatedly,
+* this cannot be distinguished
+* from normal button events.
+*/
 void action_wait_for_release(void);
 
 #endif /* __ACTION_H__ */
