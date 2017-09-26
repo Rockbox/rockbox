@@ -1213,6 +1213,8 @@ static void wps_state_init(void)
     state->paused = false;
     if(audio_status() & AUDIO_STATUS_PLAY)
     {
+        if(global_settings.pause_first_track_load && state->id3 == NULL)
+            audio_pause(); /*If there was no current track pause playback*/
         state->id3 = audio_current_track();
         state->nid3 = audio_next_track();
     }
