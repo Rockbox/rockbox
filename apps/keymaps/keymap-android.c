@@ -61,7 +61,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_VOLUP,         BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,       BUTTON_VOL_DOWN,                BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,       BUTTON_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 

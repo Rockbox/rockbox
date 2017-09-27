@@ -25,23 +25,23 @@
 #include "action.h"
 #include "button.h"
 
-/* 
+/*
  * The format of the list is as follows
- * { Action Code,   Button code,    Prereq button code } 
+ * { Action Code,   Button code,    Prereq button code }
  * if there's no need to check the previous button's value, use BUTTON_NONE
- * Insert LAST_ITEM_IN_LIST at the end of each mapping 
+ * Insert LAST_ITEM_IN_LIST at the end of each mapping
  */
 static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_PREV,          BUTTON_UP,                  BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,    BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_STD_NEXT,          BUTTON_DOWN,                BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
-    
+
     { ACTION_STD_CANCEL,        BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_PLAY,                BUTTON_NONE },
     { ACTION_STD_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,BUTTON_SELECT },
 
-    { ACTION_STD_QUICKSCREEN,   BUTTON_MODE|BUTTON_REPEAT,  BUTTON_MODE }, 
+    { ACTION_STD_QUICKSCREEN,   BUTTON_MODE|BUTTON_REPEAT,  BUTTON_MODE },
     { ACTION_STD_MENU,          BUTTON_MODE|BUTTON_REL,     BUTTON_MODE },
     { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,   BUTTON_SELECT },
     { ACTION_STD_OK,            BUTTON_RIGHT,               BUTTON_NONE },
@@ -81,7 +81,7 @@ static const struct button_mapping button_context_settings[]  = {
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_NONE,                  BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_NONE,                  BUTTON_RIGHT,                   BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
 
@@ -94,7 +94,7 @@ static const struct button_mapping button_context_settings_r_is_inc[]  = {
     { ACTION_STD_PREVREPEAT,        BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_STD_NEXT,              BUTTON_DOWN,                BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,        BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settingsgraphical */
 
@@ -117,7 +117,7 @@ static const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_LEFT,       BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
 
@@ -134,13 +134,13 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_EXIT,           BUTTON_PLAY,                BUTTON_NONE },
     { ACTION_PS_SLOWER,         BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_PS_FASTER,         BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
 
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                           BUTTON_NONE },
-    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },   
+    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                          BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,            BUTTON_NONE },
     { ACTION_KBD_SELECT,       BUTTON_SELECT|BUTTON_REL,              BUTTON_SELECT },
@@ -180,6 +180,6 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_pitchscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
-    } 
+    }
     return button_context_standard;
 }

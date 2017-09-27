@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 /* Button Code Definitions for the Mini2440 target
- * based on Toshiba Gigabeat F keymap 
+ * based on Toshiba Gigabeat F keymap
  */
 #include <stdio.h>
 #include <string.h>
@@ -118,7 +118,7 @@ static const struct button_mapping button_context_list[]  = {
     { ACTION_LIST_VOLDOWN,       BUTTON_VOL_DOWN,                    BUTTON_NONE },
     { ACTION_LIST_VOLDOWN,       BUTTON_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
 #endif
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
 

@@ -105,7 +105,7 @@ static const struct button_mapping button_context_list[]  = {
     { ACTION_LISTTREE_PGUP,     BUTTON_PLAY|BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_LISTTREE_PGDOWN,   BUTTON_PLAY|BUTTON_DOWN,                BUTTON_NONE },
     { ACTION_LISTTREE_PGDOWN,   BUTTON_PLAY|BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
 

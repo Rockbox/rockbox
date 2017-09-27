@@ -42,7 +42,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_PREVREPEAT,  BUTTON_SCROLL_BACK|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_STD_NEXT,        BUTTON_SCROLL_FWD,                 BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,  BUTTON_SCROLL_FWD|BUTTON_REPEAT,   BUTTON_NONE },
-    
+
     { ACTION_STD_PREV,        BUTTON_UP,                 BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,  BUTTON_UP|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_STD_NEXT,        BUTTON_DOWN,               BUTTON_NONE },
@@ -62,7 +62,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_BROWSE,        BUTTON_BACK,                 BUTTON_NONE },
     { ACTION_WPS_MENU,          BUTTON_MENU|BUTTON_REL,      BUTTON_MENU },
     { ACTION_WPS_CONTEXT,       BUTTON_MENU|BUTTON_REPEAT,   BUTTON_MENU },
-    
+
     { ACTION_WPS_VOLUP,     BUTTON_SCROLL_FWD,                   BUTTON_NONE },
     { ACTION_WPS_VOLUP,     BUTTON_SCROLL_FWD|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,   BUTTON_SCROLL_BACK,                  BUTTON_NONE },

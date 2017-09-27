@@ -234,7 +234,7 @@ const struct button_mapping* target_get_context_mapping(int context)
         case CONTEXT_SETTINGS:
             return button_context_settings;
         case CONTEXT_WPS:
-            return button_context_wps; 
+            return button_context_wps;
         case CONTEXT_YESNOSCREEN:
             return button_context_yesno;
         case CONTEXT_SETTINGS_TIME:
@@ -284,6 +284,6 @@ const struct button_mapping* target_get_context_mapping(int context)
 #endif
         default:
             return button_context_standard;
-    } 
+    }
     return button_context_standard;
 }

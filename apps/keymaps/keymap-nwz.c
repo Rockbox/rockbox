@@ -156,7 +156,7 @@ static const struct button_mapping button_context_radio[]  = {
 
 #ifdef HAVE_RECORDING
 static const struct button_mapping button_context_recscreen[]  = {
- 
+
     { ACTION_REC_PAUSE,                BUTTON_PLAY,                        BUTTON_NONE },
     { ACTION_SETTINGS_INC,             BUTTON_RIGHT,                       BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,       BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
@@ -346,7 +346,7 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_SETTINGS:
             return button_context_settings;
         case CONTEXT_WPS:
-            return button_context_wps; 
+            return button_context_wps;
         case CONTEXT_YESNOSCREEN:
             return button_context_yesno;
         case CONTEXT_SETTINGS_TIME:
@@ -396,6 +396,6 @@ const struct button_mapping* get_context_mapping(int context)
 #endif
         default:
             return button_context_standard;
-    } 
+    }
     return button_context_standard;
 }

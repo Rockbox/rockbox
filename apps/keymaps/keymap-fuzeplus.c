@@ -80,7 +80,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_VOLDOWN,               BUTTON_VOL_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,               BUTTON_DOWN,                       BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,               BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
- 
+
     { ACTION_WPS_MENU,                  BUTTON_BACK,                       BUTTON_NONE },
     { ACTION_WPS_BROWSE,                BUTTON_SELECT|BUTTON_REL,          BUTTON_SELECT },
     { ACTION_WPS_PITCHSCREEN,           BUTTON_BOTTOMLEFT|BUTTON_REPEAT,   BUTTON_BOTTOMLEFT },
@@ -390,7 +390,7 @@ static const struct button_mapping button_context_usb_hid_mode_mouse[] = {
 
     { ACTION_USB_HID_MOUSE_BUTTON_LEFT,       BUTTON_SELECT,                        BUTTON_NONE },
     { ACTION_USB_HID_MOUSE_BUTTON_LEFT_REL,   BUTTON_SELECT|BUTTON_REL,             BUTTON_NONE },
- 
+
     { ACTION_USB_HID_MOUSE_BUTTON_RIGHT,      BUTTON_PLAYPAUSE,                     BUTTON_NONE },
     { ACTION_USB_HID_MOUSE_BUTTON_RIGHT_REL,  BUTTON_PLAYPAUSE|BUTTON_REL,          BUTTON_PLAYPAUSE },
 
@@ -398,7 +398,7 @@ static const struct button_mapping button_context_usb_hid_mode_mouse[] = {
     { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_UP,   BUTTON_BACK|BUTTON_REPEAT,            BUTTON_NONE },
     { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_DOWN, BUTTON_BOTTOMLEFT,                    BUTTON_NONE },
     { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_DOWN, BUTTON_BOTTOMLEFT|BUTTON_REPEAT,      BUTTON_NONE },
- 
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
 }; /* button_context_usb_hid_mode_mouse */
 #endif
@@ -416,7 +416,7 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_SETTINGS:
             return button_context_settings;
         case CONTEXT_WPS:
-            return button_context_wps; 
+            return button_context_wps;
         case CONTEXT_YESNOSCREEN:
             return button_context_yesno;
         case CONTEXT_SETTINGS_TIME:
@@ -466,6 +466,6 @@ const struct button_mapping* get_context_mapping(int context)
 #endif
         default:
             return button_context_standard;
-    } 
+    }
     return button_context_standard;
 }

@@ -84,9 +84,9 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_ID3SCREEN,     BUTTON_SELECT|BUTTON_DOWN,      BUTTON_SELECT },
 
 #ifdef HAVE_HOTKEY /* down|repeat doesn't work in the file browser */
-    { ACTION_WPS_HOTKEY,        BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE }, 
+    { ACTION_WPS_HOTKEY,        BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
 #else
-    { ACTION_WPS_VIEW_PLAYLIST, BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE }, 
+    { ACTION_WPS_VIEW_PLAYLIST, BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
 #endif
 
 #ifndef HAS_BUTTON_HOLD /* Clip+ */
@@ -100,7 +100,7 @@ static const struct button_mapping button_context_settings[] = {
     { ACTION_STD_OK,            BUTTON_HOME|BUTTON_REL,     BUTTON_HOME },
     { ACTION_STD_CANCEL,        BUTTON_POWER,               BUTTON_NONE },
     { ACTION_SETTINGS_RESET,    BUTTON_SELECT,              BUTTON_NONE },
-    
+
     { ACTION_SETTINGS_INC,      BUTTON_UP,                  BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_SETTINGS_DEC,      BUTTON_DOWN,                BUTTON_NONE },
@@ -209,7 +209,7 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_INC_SMALL,      BUTTON_UP,                      BUTTON_NONE },
     { ACTION_PS_INC_BIG,        BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_PS_DEC_SMALL,      BUTTON_DOWN,                    BUTTON_NONE },
-    { ACTION_PS_DEC_BIG,        BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },   
+    { ACTION_PS_DEC_BIG,        BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,         BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,                   BUTTON_NONE },

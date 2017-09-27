@@ -117,7 +117,7 @@ static const struct button_mapping button_context_list[]  = {
     { ACTION_LIST_VOLDOWN,      BUTTON_VOL_DOWN,                BUTTON_NONE },
     { ACTION_LIST_VOLDOWN,      BUTTON_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
 #endif
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
 
@@ -162,10 +162,10 @@ static const struct button_mapping button_context_settings[]  = {
 
     { ACTION_SETTINGS_DEC,      BUTTON_DOWN,                    BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
-   
+
     { ACTION_STD_PREV,          BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
-    
+
     { ACTION_STD_NEXT,          BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
 
@@ -175,7 +175,7 @@ static const struct button_mapping button_context_settings[]  = {
 static const struct button_mapping button_context_settings_right_is_inc[]  = {
     { ACTION_SETTINGS_INC,      BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
-    
+
     { ACTION_SETTINGS_DEC,      BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
 
@@ -204,7 +204,7 @@ static const struct button_mapping button_context_quickscreen[]  = {
 
     { ACTION_QS_DOWN,           BUTTON_DOWN|BUTTON_REL,         BUTTON_NONE },
     { ACTION_QS_DOWN,           BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
-    
+
     { ACTION_QS_LEFT,           BUTTON_LEFT|BUTTON_REL,         BUTTON_NONE },
     { ACTION_QS_LEFT,           BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
 
@@ -225,10 +225,10 @@ static const struct button_mapping button_context_pitchscreen[]  = {
 
     { ACTION_PS_DEC_SMALL,      BUTTON_DOWN,                    BUTTON_NONE },
     { ACTION_PS_DEC_BIG,        BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
-    
+
     { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,         BUTTON_NONE },
-    
+
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,        BUTTON_NONE },
 

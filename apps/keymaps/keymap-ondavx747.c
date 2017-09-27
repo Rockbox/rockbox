@@ -46,10 +46,10 @@ static const struct button_mapping button_context_standard[]  = {
 
     { ACTION_STD_OK,          BUTTON_MENU|BUTTON_REL,        BUTTON_MENU },
     { ACTION_STD_CANCEL,      BUTTON_POWER,                  BUTTON_NONE },
-    
+
     { ACTION_STD_QUICKSCREEN, BUTTON_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_STD_CONTEXT,     BUTTON_MENU|BUTTON_REPEAT,     BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
@@ -62,9 +62,9 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_VOLUP,         BUTTON_VOL_UP|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_WPS_MENU,          BUTTON_MENU|BUTTON_REL,          BUTTON_MENU },
     { ACTION_WPS_CONTEXT,       BUTTON_MENU|BUTTON_REPEAT,       BUTTON_MENU },
-    
+
     { ACTION_WPS_MENU,          BUTTON_POWER,                    BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 
@@ -164,7 +164,7 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_CURSOR_RIGHT, BUTTON_VOL_UP|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_KBD_DONE,         BUTTON_MENU|BUTTON_REPEAT,       BUTTON_NONE },
     { ACTION_KBD_ABORT,        BUTTON_POWER,                    BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_keyboard */
 

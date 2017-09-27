@@ -51,7 +51,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_PREVREPEAT,    BUTTON_UP|BUTTON_REPEAT,               BUTTON_NONE },
     { ACTION_STD_NEXT,          BUTTON_DOWN|BUTTON_REL,                BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,             BUTTON_NONE },
-    
+
     { ACTION_STD_PREV,          BUTTON_FF|BUTTON_REL,                  BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,    BUTTON_FF|BUTTON_REPEAT,               BUTTON_NONE },
     { ACTION_STD_NEXT,          BUTTON_REW|BUTTON_REL,                BUTTON_NONE },
@@ -230,7 +230,7 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_PLAY,        BUTTON_POWER | BUTTON_REL,         BUTTON_NONE },
     { ACTION_FM_STOP,        BUTTON_POWER | BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_FM_EXIT,        BUTTON_BACK,                       BUTTON_NONE },
-    
+
     //{ ACTION_SETTINGS_INC,      BUTTON_VOL_UP,                  BUTTON_NONE },
     //{ ACTION_SETTINGS_INCREPEAT,BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE },
     //{ ACTION_SETTINGS_DEC,      BUTTON_VOL_DOWN,                BUTTON_NONE },
@@ -242,7 +242,7 @@ static const struct button_mapping button_context_radio[]  = {
 
 #ifdef HAVE_RECORDING
 static const struct button_mapping button_context_recscreen[]  = {
- 
+
     { ACTION_REC_PAUSE,                BUTTON_SELECT,                      BUTTON_NONE },
     { ACTION_SETTINGS_INC,             BUTTON_RIGHT,                       BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,       BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
@@ -335,7 +335,7 @@ static const struct button_mapping button_context_usb_hid_mode_mouse[] = {
     { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_UP,   BUTTON_FF|BUTTON_REPEAT,              BUTTON_NONE },
     { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_DOWN, BUTTON_REW,                           BUTTON_NONE },
     { ACTION_USB_HID_MOUSE_WHEEL_SCROLL_DOWN, BUTTON_REW|BUTTON_REPEAT,             BUTTON_NONE },
- 
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_USB_HID)
 }; /* button_context_usb_hid_mode_mouse */
 #endif

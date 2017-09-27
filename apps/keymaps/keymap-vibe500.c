@@ -31,11 +31,11 @@
 #include "button.h"
 #include "settings.h"
 
-/* 
+/*
  * The format of the list is as follows
- * { Action Code,   Button code,    Prereq button code } 
+ * { Action Code,   Button code,    Prereq button code }
  * if there's no need to check the previous button's value, use BUTTON_NONE
- * Insert LAST_ITEM_IN_LIST at the end of each mapping 
+ * Insert LAST_ITEM_IN_LIST at the end of each mapping
  */
 static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_PREV,          BUTTON_UP,                          BUTTON_NONE },

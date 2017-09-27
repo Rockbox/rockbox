@@ -64,10 +64,10 @@ static const struct button_mapping button_context_wps[]  = {
 
     { ACTION_WPS_SEEKBACK,  BUTTON_RC_REW|BUTTON_REPEAT,BUTTON_NONE },
     { ACTION_WPS_SEEKFWD,   BUTTON_RC_FF|BUTTON_REPEAT, BUTTON_NONE },
-    
-    { ACTION_WPS_STOPSEEK,  BUTTON_RC_REW|BUTTON_REL,   
+
+    { ACTION_WPS_STOPSEEK,  BUTTON_RC_REW|BUTTON_REL,
                                                 BUTTON_RC_REW|BUTTON_REPEAT},
-                                                
+
     { ACTION_WPS_STOPSEEK,  BUTTON_RC_FF|BUTTON_REL,
                                                 BUTTON_RC_FF|BUTTON_REPEAT},
 
@@ -243,4 +243,3 @@ const struct button_mapping* target_get_context_mapping(int context)
     }
     return button_context_standard;
 }
-

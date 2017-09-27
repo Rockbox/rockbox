@@ -122,7 +122,7 @@ static void swap_items(int a, int b)
 {
     char temp[MAX_ITEM_NAME];
     bool enabled;
-    
+
     rb->strcpy(temp, menu_items[a].string);
     enabled = menu_items[a].enabled;
     rb->strcpy(menu_items[a].string,
@@ -139,7 +139,7 @@ enum plugin_status plugin_start(const void* parameter)
     struct gui_synclist list;
     bool done = false;
     int action, cur_sel;
-    
+
     menu_table = rb->root_menu_get_options(&menu_item_count);
     load_from_cfg();
 

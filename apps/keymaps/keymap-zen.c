@@ -456,4 +456,3 @@ const struct button_mapping* get_context_mapping(int context)
     }
     return button_context_standard;
 }
- 
