@@ -25,58 +25,79 @@
 #include "action.h"
 #include "button.h"
 
-/* 
- * The format of the list is as follows
- * { Action Code,   Button code,    Prereq button code } 
+/* The format of the list is as follows
+ * { Action Code,   Button code,    Prereq button code }
  * if there's no need to check the previous button's value, use BUTTON_NONE
- * Insert LAST_ITEM_IN_LIST at the end of each mapping 
- */
-static const struct button_mapping button_context_standard[]  = {
-    { ACTION_STD_PREV,       BUTTON_REW,                 BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT, BUTTON_REW|BUTTON_REPEAT,   BUTTON_NONE },
+ *
+ * CAVEAT: This will allways return the action without
+ * pre_button_code (pre_button_code = BUTTON_NONE)
+ * if it is found before 'falling through'
+ * to a lower 'chained' context.
+ *
+ * Example: button = UP|REL, last_button = UP;
+ *  while looking in CONTEXT_WPS there is an action defined
+ *  {ACTION_FOO, BUTTON_UP|BUTTON_REL, BUTTON_NONE}
+ *  then ACTION_FOO in CONTEXT_WPS will be returned
+ *  EVEN THOUGH you are expecting a fully matched
+ *  ACTION_BAR from CONTEXT_STD
+ *  {ACTION_BAR, BUTTON_UP|BUTTON_REL, BUTTON_UP}
+ *
+ * Insert LAST_ITEM_IN_LIST at the end of each mapping
+*/
+
+static const struct button_mapping button_context_standard[] = {
+
+    { ACTION_STD_CANCEL,     BUTTON_VOL,                 BUTTON_NONE },
+    { ACTION_STD_CONTEXT,    BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_PLAY },
+    { ACTION_STD_MENU,       BUTTON_M,                   BUTTON_NONE },
     { ACTION_STD_NEXT,       BUTTON_FF,                  BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT, BUTTON_FF|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_STD_CONTEXT,    BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_PLAY },
-    { ACTION_STD_CANCEL,     BUTTON_VOL,                 BUTTON_NONE },
     { ACTION_STD_OK,         BUTTON_PLAY|BUTTON_REL,     BUTTON_PLAY },
-    { ACTION_STD_MENU,       BUTTON_M,                   BUTTON_NONE },
+    { ACTION_STD_PREV,       BUTTON_REW,                 BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT, BUTTON_REW|BUTTON_REPEAT,   BUTTON_NONE },
+
 
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
-static const struct button_mapping button_context_wps[]  = {
-    { ACTION_WPS_PLAY,       BUTTON_PLAY|BUTTON_REL,     BUTTON_PLAY },
-    { ACTION_WPS_SKIPNEXT,   BUTTON_FF|BUTTON_REL,       BUTTON_FF   },
-    { ACTION_WPS_SKIPPREV,   BUTTON_REW|BUTTON_REL,      BUTTON_REW  },
-    { ACTION_WPS_SEEKBACK,   BUTTON_REW|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_WPS_SEEKFWD,    BUTTON_FF|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_WPS_STOPSEEK,   BUTTON_REW|BUTTON_REL,      BUTTON_REW|BUTTON_REPEAT },
-    { ACTION_WPS_STOPSEEK,   BUTTON_FF|BUTTON_REL,       BUTTON_FF|BUTTON_REPEAT },
-    { ACTION_WPS_STOP,       BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_PLAY },
-    { ACTION_WPS_VOLDOWN,    BUTTON_REW|BUTTON_VOL,      BUTTON_NONE  },
-    { ACTION_WPS_VOLDOWN,    BUTTON_REW|BUTTON_VOL|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_WPS_VOLUP,      BUTTON_FF|BUTTON_VOL,       BUTTON_NONE  },
-    { ACTION_WPS_VOLUP,      BUTTON_FF|BUTTON_VOL|BUTTON_REPEAT,    BUTTON_NONE },
+static const struct button_mapping button_context_wps[] = {
 
-    { ACTION_WPS_BROWSE,     BUTTON_VOL|BUTTON_REL,      BUTTON_VOL },
-    { ACTION_WPS_MENU,       BUTTON_M|BUTTON_REL,        BUTTON_M   },
-    { ACTION_WPS_CONTEXT,    BUTTON_M|BUTTON_REPEAT,     BUTTON_M   },
-    { ACTION_STD_KEYLOCK,    BUTTON_M|BUTTON_VOL,        BUTTON_NONE },
+    { ACTION_STD_KEYLOCK,  BUTTON_M|BUTTON_VOL,                 BUTTON_NONE },
+    { ACTION_WPS_BROWSE,   BUTTON_VOL|BUTTON_REL,               BUTTON_VOL },
+    { ACTION_WPS_CONTEXT,  BUTTON_M|BUTTON_REPEAT,              BUTTON_M   },
+    { ACTION_WPS_MENU,     BUTTON_M|BUTTON_REL,                 BUTTON_M   },
+    { ACTION_WPS_PLAY,     BUTTON_PLAY|BUTTON_REL,              BUTTON_PLAY },
+    { ACTION_WPS_SEEKBACK, BUTTON_REW|BUTTON_REPEAT,            BUTTON_NONE },
+    { ACTION_WPS_SEEKFWD,  BUTTON_FF|BUTTON_REPEAT,             BUTTON_NONE },
+    { ACTION_WPS_SKIPNEXT, BUTTON_FF|BUTTON_REL,                BUTTON_FF   },
+    { ACTION_WPS_SKIPPREV, BUTTON_REW|BUTTON_REL,               BUTTON_REW  },
+    { ACTION_WPS_STOP,     BUTTON_PLAY|BUTTON_REPEAT,           BUTTON_PLAY },
+
+    { ACTION_WPS_STOPSEEK, BUTTON_FF|BUTTON_REL,                BUTTON_FF|BUTTON_REPEAT },
+    { ACTION_WPS_STOPSEEK, BUTTON_REW|BUTTON_REL,               BUTTON_REW|BUTTON_REPEAT },
+
+    { ACTION_WPS_VOLDOWN,  BUTTON_REW|BUTTON_VOL,               BUTTON_NONE  },
+    { ACTION_WPS_VOLDOWN,  BUTTON_REW|BUTTON_VOL|BUTTON_REPEAT, BUTTON_NONE },
+
+    { ACTION_WPS_VOLUP,    BUTTON_FF|BUTTON_VOL,                BUTTON_NONE  },
+    { ACTION_WPS_VOLUP,    BUTTON_FF|BUTTON_VOL|BUTTON_REPEAT,  BUTTON_NONE },
+
 
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 
 #ifdef CONFIG_TUNER
-static const struct button_mapping button_context_radio[]  = {
-    { ACTION_FM_MENU,                  BUTTON_M|BUTTON_REPEAT,             BUTTON_NONE },
-    { ACTION_FM_PLAY,                  BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY },
-    { ACTION_FM_STOP,                  BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE },
-    { ACTION_SETTINGS_INC,             BUTTON_VOL|BUTTON_FF,               BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT,       BUTTON_VOL|BUTTON_FF|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,             BUTTON_VOL|BUTTON_REW,              BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT,       BUTTON_VOL|BUTTON_REW|BUTTON_REPEAT,BUTTON_NONE },
+static const struct button_mapping button_context_radio[] = {
 
-    { ACTION_FM_EXIT,                  BUTTON_M|BUTTON_REL,                BUTTON_M },
+    { ACTION_FM_EXIT,            BUTTON_M|BUTTON_REL,                 BUTTON_M },
+    { ACTION_FM_MENU,            BUTTON_M|BUTTON_REPEAT,              BUTTON_NONE },
+    { ACTION_FM_PLAY,            BUTTON_PLAY|BUTTON_REL,              BUTTON_PLAY },
+    { ACTION_FM_STOP,            BUTTON_PLAY|BUTTON_REPEAT,           BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_VOL|BUTTON_REW,               BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_VOL|BUTTON_REW|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_SETTINGS_INC,       BUTTON_VOL|BUTTON_FF,                BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_VOL|BUTTON_FF|BUTTON_REPEAT,  BUTTON_NONE },
+
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_radio */
@@ -87,22 +108,19 @@ const struct button_mapping* get_context_mapping(int context)
 {
     switch (context)
     {
-        case CONTEXT_STD:
-            return button_context_standard;
-        case CONTEXT_WPS:
-            return button_context_wps;
+        case CONTEXT_STD:                     { return button_context_standard; }
+        case CONTEXT_WPS:                     { return button_context_wps; }
 #ifdef CONFIG_TUNER
-        case CONTEXT_FM:
-             return button_context_radio;
+        case CONTEXT_FM:                      { return button_context_radio; }
 #endif
-        case CONTEXT_TREE:
-        case CONTEXT_LIST:
-        case CONTEXT_MAINMENU:
-            
         case CONTEXT_SETTINGS:
         case CONTEXT_SETTINGS|CONTEXT_REMOTE:
-        default:
-            return button_context_standard;
-    } 
+        case CONTEXT_TREE:
+
+        case CONTEXT_LIST:
+        case CONTEXT_MAINMENU:
+
+        default:                              { return button_context_standard; }
+    }
     return button_context_standard;
 }
