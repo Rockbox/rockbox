@@ -60,20 +60,25 @@ static inline void store_context(void* addr)
     asm volatile (
         ".set noreorder        \n"
         ".set noat             \n"
-        "sw    $16,  0(%0)     \n" /* s0 */
-        "sw    $17,  4(%0)     \n" /* s1 */
-        "sw    $18,  8(%0)     \n" /* s2 */
-        "sw    $19, 12(%0)     \n" /* s3 */
-        "sw    $20, 16(%0)     \n" /* s4 */
-        "sw    $21, 20(%0)     \n" /* s5 */
-        "sw    $22, 24(%0)     \n" /* s6 */
-        "sw    $23, 28(%0)     \n" /* s7 */
-        "sw    $30, 32(%0)     \n" /* fp */
-        "sw    $29, 36(%0)     \n" /* sp */
-        "sw    $31, 40(%0)     \n" /* ra */
+        "move  $8, %0          \n" /* Store addr in clobbered t0 othrewise
+                                    * compiler could select %0 to be s0-s7
+                                    * during inlining which would break
+                                    * things horribly.
+                                    */
+        "sw    $16,  0($8)     \n" /* s0 */
+        "sw    $17,  4($8)     \n" /* s1 */
+        "sw    $18,  8($8)     \n" /* s2 */
+        "sw    $19, 12($8)     \n" /* s3 */
+        "sw    $20, 16($8)     \n" /* s4 */
+        "sw    $21, 20($8)     \n" /* s5 */
+        "sw    $22, 24($8)     \n" /* s6 */
+        "sw    $23, 28($8)     \n" /* s7 */
+        "sw    $30, 32($8)     \n" /* fp */
+        "sw    $29, 36($8)     \n" /* sp */
+        "sw    $31, 40($8)     \n" /* ra */
         ".set at               \n"
         ".set reorder          \n"
-        : : "r" (addr)
+        : : "r" (addr) : "t0"
     );
 }
 
@@ -92,17 +97,22 @@ static inline void load_context(const void* addr)
         "jr    $8              \n"
         "move  $9, %0          \n" /* t1 = context */
     "running:                  \n"
-        "lw    $16,  0(%0)     \n" /* s0 */
-        "lw    $17,  4(%0)     \n" /* s1 */
-        "lw    $18,  8(%0)     \n" /* s2 */
-        "lw    $19, 12(%0)     \n" /* s3 */
-        "lw    $20, 16(%0)     \n" /* s4 */
-        "lw    $21, 20(%0)     \n" /* s5 */
-        "lw    $22, 24(%0)     \n" /* s6 */
-        "lw    $23, 28(%0)     \n" /* s7 */
-        "lw    $30, 32(%0)     \n" /* fp */
-        "lw    $29, 36(%0)     \n" /* sp */
-        "lw    $31, 40(%0)     \n" /* ra */
+        "move  $8, %0          \n" /* Store addr in clobbered t0 otherwise
+                                    * compiler could select %0 to be s0-s7
+                                    * during inlining which would break
+                                    * things horribly.
+                                    */
+        "lw    $16,  0($8)     \n" /* s0 */
+        "lw    $17,  4($8)     \n" /* s1 */
+        "lw    $18,  8($8)     \n" /* s2 */
+        "lw    $19, 12($8)     \n" /* s3 */
+        "lw    $20, 16($8)     \n" /* s4 */
+        "lw    $21, 20($8)     \n" /* s5 */
+        "lw    $22, 24($8)     \n" /* s6 */
+        "lw    $23, 28($8)     \n" /* s7 */
+        "lw    $30, 32($8)     \n" /* fp */
+        "lw    $29, 36($8)     \n" /* sp */
+        "lw    $31, 40($8)     \n" /* ra */
         ".set at               \n"
         ".set reorder          \n"
         : : "r" (addr) : "t0", "t1"
