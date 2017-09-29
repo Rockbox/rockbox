@@ -524,6 +524,18 @@ static inline const char * format_p(const void *p,
 }
 #endif /* FMT_RADIX_p */
 
+#undef ABS
+#define ABS(x) ((x)<0?-(x):(x))
+
+static const char * format_f(double f,
+                             struct fmt_buf *fmt_buf,
+                             int radixchar,
+                             bool *numericp)
+{
+    fmt_buf->length = snprintf(fmt_buf->buf, 24, "%d.%06d", (int)f, ABS((int)((f - (int)f)*1e6)));
+    return fmt_buf->buf;
+}
+
 /* parse fixed width or precision field */
 static const char * parse_number_spec(const char *fmt,
                                       int ch,
@@ -740,6 +752,12 @@ int vuprintf(vuprintf_push_cb push, /* call 'push()' for each output letter */
                            &numeric);
             break;
         #endif
+
+        case 'f':
+        case 'g':
+            buf = format_f(va_arg(ap, double), &fmt_buf, ch,
+                           &numeric);
+            break;
 
             /** signed integer **/
         case 'd':
