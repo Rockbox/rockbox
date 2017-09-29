@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2010 Amaury Pouly
+ * Copyright (C) 2017 Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,25 +18,23 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __MISC_H__
-#define __MISC_H__
+#ifndef __FWU_H__
+#define __FWU_H__
 
-#include <stdbool.h>
-#include <stdio.h>
+#include <stdint.h>
 
-#define cprintf(col, ...) do {color(col); printf(__VA_ARGS__); }while(0)
+enum fwu_mode_t
+{
+    FWU_AUTO, /* Will try to guess which mode to use */
+    FWU_ATJ213X, /* Will use ATJ213x style mode */
+    FWU_ATJ2127, /* Will use ATJ2127 variation */
+};
 
-#define cprintf_field(str1, ...) do{ cprintf(GREEN, str1); cprintf(YELLOW, __VA_ARGS__); }while(0)
+/* Decrypt a FWU file inplace, the size variable is updated to reflect the size of the decrypted
+ * firmware. Return 0 on success. The mode parameter selects how the function guesses between
+ * various variants of FWU. */
+int fwu_decrypt(uint8_t *buf, size_t *size, enum fwu_mode_t mode);
+/* Check if a file looks like a FWU file */
+bool fwu_check(uint8_t *buf, size_t size);
 
-#ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
-
-typedef char color_t[];
-
-extern color_t OFF, GREY, RED, GREEN, YELLOW, BLUE;
-void *xmalloc(size_t s);
-void color(color_t c);
-void enable_color(bool enable);
-
-#endif /* __MISC_H__ */
+#endif /* __FWU_H__ */

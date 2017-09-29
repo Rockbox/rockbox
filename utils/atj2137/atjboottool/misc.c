@@ -37,7 +37,12 @@ static bool g_color_enable = true;
 void *xmalloc(size_t s)
 {
     void * r = malloc(s);
-    if(!r) bugp("malloc");
+    if(!r)
+    {
+        color(GREY);
+        printf("Allocation failed.\n");
+        abort();
+    }
     return r;
 }
 
