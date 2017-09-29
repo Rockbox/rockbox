@@ -34,6 +34,7 @@
 #define FMT_N_SUPPORT  0    /* bytes output so far ('int *' argument) */
 #define FMT_O_SUPPORT  0    /* octal radix formatting */
 #define FMT_P_SUPPORT  1    /* pointer formatting */
+#define FMT_F_SUPPORT  1    /* floating-point formatting */
 
 /* avoid defining redundant functions if two or more types can use the same
  * something not getting a macro means it gets assigned its own value and
@@ -415,6 +416,25 @@ static const char * format_p(const void *p,
 }
 #endif /* FMT_P_SUPPORT */
 
+#if FMT_F_SUPPORT
+/* %f %F */
+
+#undef ABS
+#define ABS(x) ((x)<0?-(x):(x))
+
+static const char * format_f(double f,
+                             struct fmt_buf *fmt_buf,
+                             int radixchar,
+                             bool *numericp)
+{
+    fmt_buf->length = snprintf(fmt_buf->buf, 24, "%d.%06d", (int)f, ABS((int)((f - (int)f)*1e6)));
+    return fmt_buf->buf;
+}
+
+#undef ABS
+
+#endif /* FMT_P_SUPPORT */
+
 /* parse fixed width or precision field */
 static const char * parse_number_spec(const char *fmt,
                                       int ch,
@@ -632,6 +652,13 @@ int vuprintf(vuprintf_push_cb push, /* call 'push()' for each output letter */
             buf = format_p(va_arg(ap, void *), &fmt_buf, ch, &numeric);
             break;
         #endif /* FMT_P_SUPPORT */
+
+        #if FMT_F_SUPPORT
+        case 'f':
+        case 'g':
+            buf = format_f(va_arg(ap, double), &fmt_buf, ch, &numeric);
+            break;
+        #endif
 
             /** signed integer **/
         case 'd':
