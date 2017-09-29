@@ -149,10 +149,10 @@ static int decode_block_A(uint8_t block[1020])
     }
     for(int i = 20; i < 32; i++)
         key[i] = key[i - 20];
-    
+
     for(int i = 0; i < 992; i++)
         block[i] ^= key[i % 32] ^ g_check_block_A_table[i];
-    
+
     return check_block(block - 1, block + 1000, 1001);
 }
 
@@ -277,7 +277,7 @@ static int process_block_A(uint8_t block[1024])
     g_crypto_info_byte = block[offset - 1];
     g_decode_buffer = malloc(g_decode_A_info.size);
     g_decode_buffer2 = malloc(g_decode_A_info.size);
-    
+
     memset(g_decode_buffer, 0, g_decode_A_info.size);
     memset(g_decode_buffer2, 0, g_decode_A_info.size);
 
@@ -288,7 +288,7 @@ static int process_block_A(uint8_t block[1024])
 
     cprintf_field("  Word: ", "%d ", *(uint16_t *)&g_subblock_A[286]);
     check_field(*(uint16_t *)&g_subblock_A[286], 1, "Ok\n", "Mismatch\n");
-    
+
     return 0;
 }
 
@@ -625,7 +625,7 @@ static int crypto3(uint32_t *a1, ptr_bundle_t *ptrs_alt, ptr_bundle_t *ptrs)
 static int crypto4(uint8_t *a1, ptr_bundle_t *ptrs, uint32_t *a3)
 {
     ptr_bundle_t ptrs_others;
-    
+
     ptrs_others.ptrA = malloc(g_decode_A_info.size);
     ptrs_others.ptrB = malloc(g_decode_A_info.size);
     clear_memory(ptrs_others.ptrA, g_decode_A_info.nr_dwords);

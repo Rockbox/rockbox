@@ -10,7 +10,7 @@ all: $(BINS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-atjboottool: atjboottool.o fwu.o misc.o atj_tables.o
+atjboottool: atjboottool.o fwu.o fw.o afi.o misc.o atj_tables.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 clean:

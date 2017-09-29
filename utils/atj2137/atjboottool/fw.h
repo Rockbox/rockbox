@@ -18,18 +18,17 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __AFI_H__
-#define __AFI_H__
+#ifndef __FW_H__
+#define __FW_H__
 
 #include <stdint.h>
 
-uint32_t afi_checksum(void *ptr, size_t size);
 /* Unpack an AFI file: the callback function will be called once for each file in the archive with
  * its name and content. If the callback returns a nonzero value, the function will stop and return
  * that value. Returns 0 on success */
-typedef int (*afi_extract_callback_t)(const char *name, uint8_t *buf, size_t size);
-int afi_unpack(uint8_t *buf, size_t size, afi_extract_callback_t cb);
+typedef int (*fw_extract_callback_t)(const char *name, uint8_t *buf, size_t size);
+int fw_unpack(uint8_t *buf, size_t size, fw_extract_callback_t cb);
 /* Check if a file looks like an AFI file */
-bool afi_check(uint8_t *buf, size_t size);
+bool fw_check(uint8_t *buf, size_t size);
 
-#endif /* __AFI_H__ */ 
+#endif /* __FW_H__ */ 
