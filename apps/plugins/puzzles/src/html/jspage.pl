@@ -3,6 +3,17 @@
 use strict;
 use warnings;
 
+my $jspath = "";
+while ($ARGV[0] =~ /^-/) {
+    my $opt = shift @ARGV;
+    last if $opt eq "--";
+    if ($opt =~ /^--jspath=(.+)$/) {
+        $jspath = $1;
+    } else {
+        die "jspage.pl: unrecognised option '$opt'\n";
+    }
+}
+
 open my $footerfile, "<", shift @ARGV or die "footer: open: $!\n";
 my $footer = "";
 $footer .= $_ while <$footerfile>;
@@ -62,7 +73,7 @@ EOF
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ASCII" />
 <title>${puzzlename}, ${unfinishedtitlefragment}from Simon Tatham's Portable Puzzle Collection</title>
-<script type="text/javascript" src="${filename}.js"></script>
+<script type="text/javascript" src="${jspath}${filename}.js"></script>
 <style class="text/css">
 /* Margins and centring on the top-level div for the game menu */
 #gamemenu { margin-top: 0; margin-bottom: 0.5em; text-align: center }
@@ -101,6 +112,15 @@ EOF
 #gamemenu ul li.disabled {
     /* Grey out menu items with the "disabled" class */
     color: rgba(0,0,0,0.5);
+}
+
+#gamemenu ul li.separator {
+    color: transparent;
+    border: 0;
+}
+
+#gamemenu ul li.afterseparator {
+    border-left: 1px solid rgba(0,0,0,0.3);
 }
 
 #gamemenu ul li:first-of-type {
@@ -196,14 +216,19 @@ ${unfinishedpara}
 
 <hr>
 <div id="puzzle" style="display: none">
-<div id="gamemenu"><ul><li id="new">New game</li
+<div id="gamemenu"><ul><li>Game...<ul
+><li id="specific">Enter game ID</li
+><li id="random">Enter random seed</li
+><li id="save">Download save file</li
+><li id="load">Upload save file</li
+></ul></li
+><li>Type...<ul id="gametype"></ul></li
+><li class="separator"></li
+><li id="new" class="afterseparator">New game</li
 ><li id="restart">Restart game</li
 ><li id="undo">Undo move</li
 ><li id="redo">Redo move</li
 ><li id="solve">Solve game</li
-><li id="specific">Enter game ID</li
-><li id="random">Enter random seed</li
-><li>Select game type<ul id="gametype" class="left"></ul></li
 ></ul></div>
 <div align=center>
   <div id="resizable" style="position:relative; left:0; top:0">

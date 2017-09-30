@@ -1545,7 +1545,7 @@ static frontend *frontend_new(HINSTANCE inst)
     fe->statusbar = NULL;
     fe->bitmap = NULL;
 
-    SetWindowLong(fe->hwnd, GWL_USERDATA, (LONG)fe);
+    SetWindowLongPtr(fe->hwnd, GWLP_USERDATA, (LONG_PTR)fe);
 
     return fe;
 }
@@ -1992,7 +1992,7 @@ static void make_dialog_full_screen(HWND hwnd)
 static int CALLBACK AboutDlgProc(HWND hwnd, UINT msg,
 				 WPARAM wParam, LPARAM lParam)
 {
-    frontend *fe = (frontend *)GetWindowLong(hwnd, GWL_USERDATA);
+    frontend *fe = (frontend *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
     switch (msg) {
       case WM_INITDIALOG:
@@ -2249,7 +2249,7 @@ static void create_config_controls(frontend * fe)
 static int CALLBACK ConfigDlgProc(HWND hwnd, UINT msg,
 				  WPARAM wParam, LPARAM lParam)
 {
-    frontend *fe = (frontend *)GetWindowLong(hwnd, GWL_USERDATA);
+    frontend *fe = (frontend *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
     config_item *i;
     struct cfg_aux *j;
 
@@ -2260,7 +2260,7 @@ static int CALLBACK ConfigDlgProc(HWND hwnd, UINT msg,
             char *title;
 
 	    fe = (frontend *) lParam;
-	    SetWindowLong(hwnd, GWL_USERDATA, lParam);
+	    SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
 	    fe->cfgbox = hwnd;
 
             fe->cfg = frontend_get_config(fe, fe->cfg_which, &title);
@@ -2479,8 +2479,8 @@ static void about(frontend *fe)
 
     SendMessage(fe->cfgbox, WM_SETFONT, (WPARAM)fe->cfgfont, FALSE);
 
-    SetWindowLong(fe->cfgbox, GWL_USERDATA, (LONG)fe);
-    SetWindowLong(fe->cfgbox, DWL_DLGPROC, (LONG)AboutDlgProc);
+    SetWindowLongPtr(fe->cfgbox, GWLP_USERDATA, (LONG_PTR)fe);
+    SetWindowLongPtr(fe->cfgbox, DWLP_DLGPROC, (LONG_PTR)AboutDlgProc);
 
     id = 1000;
     y = height/2;
@@ -2660,8 +2660,8 @@ static int get_config(frontend *fe, int which)
 
     SendMessage(fe->cfgbox, WM_SETFONT, (WPARAM)fe->cfgfont, FALSE);
 
-    SetWindowLong(fe->cfgbox, GWL_USERDATA, (LONG)fe);
-    SetWindowLong(fe->cfgbox, DWL_DLGPROC, (LONG)ConfigDlgProc);
+    SetWindowLongPtr(fe->cfgbox, GWLP_USERDATA, (LONG_PTR)fe);
+    SetWindowLongPtr(fe->cfgbox, DWLP_DLGPROC, (LONG_PTR)ConfigDlgProc);
 
     /*
      * Count the controls so we can allocate cfgaux.
@@ -2975,7 +2975,7 @@ static int is_alt_pressed(void)
 static LRESULT CALLBACK WndProc(HWND hwnd, UINT message,
 				WPARAM wParam, LPARAM lParam)
 {
-    frontend *fe = (frontend *)GetWindowLong(hwnd, GWL_USERDATA);
+    frontend *fe = (frontend *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
     int cmd;
 
     switch (message) {
@@ -2993,18 +2993,18 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message,
 	cmd = wParam & ~0xF;	       /* low 4 bits reserved to Windows */
 	switch (cmd) {
 	  case IDM_NEW:
-	    if (!midend_process_key(fe->me, 0, 0, 'n'))
+	    if (!midend_process_key(fe->me, 0, 0, UI_NEWGAME))
 		PostQuitMessage(0);
 	    break;
 	  case IDM_RESTART:
 	    midend_restart_game(fe->me);
 	    break;
 	  case IDM_UNDO:
-	    if (!midend_process_key(fe->me, 0, 0, 'u'))
+	    if (!midend_process_key(fe->me, 0, 0, UI_UNDO))
 		PostQuitMessage(0);
 	    break;
 	  case IDM_REDO:
-	    if (!midend_process_key(fe->me, 0, 0, '\x12'))
+	    if (!midend_process_key(fe->me, 0, 0, UI_REDO))
 		PostQuitMessage(0);
 	    break;
 	  case IDM_COPY:
@@ -3026,7 +3026,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message,
 	    }
 	    break;
 	  case IDM_QUIT:
-	    if (!midend_process_key(fe->me, 0, 0, 'q'))
+	    if (!midend_process_key(fe->me, 0, 0, UI_QUIT))
 		PostQuitMessage(0);
 	    break;
 	  case IDM_CONFIG:
@@ -3405,8 +3405,18 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message,
 	}
 	break;
       case WM_CHAR:
-	if (!midend_process_key(fe->me, 0, 0, (unsigned char)wParam))
-	    PostQuitMessage(0);
+        {
+            int key = (unsigned char)wParam;
+            if (key == '\x1A') {
+                BYTE keystate[256];
+                if (GetKeyboardState(keystate) &&
+                    (keystate[VK_SHIFT] & 0x80) &&
+                    (keystate[VK_CONTROL] & 0x80))
+                    key = UI_REDO;
+            }
+            if (!midend_process_key(fe->me, 0, 0, key))
+                PostQuitMessage(0);
+        }
 	return 0;
       case WM_TIMER:
 	if (fe->timer) {
