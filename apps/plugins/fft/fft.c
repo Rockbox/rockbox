@@ -624,16 +624,16 @@ static unsigned calc_magnitudes(enum fft_amp_scale scale)
                 }
                 else
                 {
-                    d = isqrt(d); /* linear scaling, nothing
-                                     bad should happen */
+                    d = fp_sqrt(d, 0); /* linear scaling, nothing
+                                          bad should happen */
                     d = fp16_log(d << 16); /* the log function
                                               expects s15.16 values */
                 }
             }
             else
             {
-                d = isqrt(d); /* linear scaling, nothing
-                                 bad should happen */
+                d = fp_sqrt(d, 0); /* linear scaling, nothing
+                                      bad should happen */
             }
         }
 

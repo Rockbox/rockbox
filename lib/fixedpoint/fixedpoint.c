@@ -29,6 +29,8 @@
 #define BIT_N(n) (1U << (n))
 #endif
 
+#define PREC_BITS 32
+
 /** TAKEN FROM ORIGINAL fixedpoint.h */
 /* Inverse gain of circular cordic rotation in s0.31 format. */
 static const long cordic_circular_gain = 0xb2458939; /* 0.607252929 */
@@ -142,65 +144,72 @@ long fp_sincos(unsigned long phase, long *cos)
     return y;
 }
 
-/**
- * Fixed point square root via Newton-Raphson.
- * @param x square root argument.
- * @param fracbits specifies number of fractional bits in argument.
- * @return Square root of argument in same fixed point format as input.
+/* Accurate sqrt with only elementary operations.
+ * Snagged from:
+ *   http://www.devmaster.net/articles/fixed-point-optimizations/
  *
- * This routine has been modified to run longer for greater precision,
- * but cuts calculation short if the answer is reached sooner. 
+ * Extension to fractions and initial estimate improvement by jethead71
  */
 long fp_sqrt(long x, unsigned int fracbits)
 {
-    unsigned long xfp, b;
-    int n = 8; /* iteration limit (should terminate earlier) */
-
-    if (x <= 0)
+    if (x <= 0) {
         return 0; /* no sqrt(neg), or just sqrt(0) = 0 */
-
-    /* Increase working precision by one bit */
-    xfp = x << 1;
-    fracbits++;
-
-    /* Get the midpoint between fracbits index and the highest bit index */
-    b = ((sizeof(xfp)*8-1) - __builtin_clzl(xfp) + fracbits) >> 1;
-    b = BIT_N(b);
-
-    do
-    {
-        unsigned long c = b;
-        b = (fp_div(xfp, b, fracbits) + b) >> 1;
-        if (c == b) break;
     }
-    while (n-- > 0);
 
-    return b >> 1;
-}
+    uint32_t xfp = x;
+    uint32_t g = 0;
 
-/* Accurate int sqrt with only elementary operations.
- * Snagged from:
- *   http://www.devmaster.net/articles/fixed-point-optimizations/ */
-unsigned long isqrt(unsigned long x)
-{
-    /* Adding CLZ could optimize this further */
-    unsigned long g = 0;
-    int bshift = 15;
-    unsigned long b = 1ul << bshift;
-    
-    do
-    {
-        unsigned long temp = (g + g + b) << bshift;
+    int intwidth = PREC_BITS - fracbits;
+    int bshift = __builtin_clz(xfp);
 
-        if (x > temp)
-        {
-            g += b;
-            x -= temp;
+#if 0
+    if (ULONG_BITS > PREC_BITS && bshift >= PREC_BITS) {
+        bshift -= ULONG_BITS - PREC_BITS;
+    }
+#endif
+
+    if (bshift >= intwidth) {
+        bshift = -1;
+    }
+    else {
+        bshift = (intwidth - bshift - 1) / 2;
+    }
+
+    uint32_t b = 1ul << (bshift + fracbits);
+
+    /* integer part */
+    while (xfp && bshift >= 0) {
+        uint32_t t = ((g << 1) | b) << bshift--;
+
+        if (xfp >= t) {
+            g |= b;
+            xfp -= t;
         }
 
         b >>= 1;
     }
-    while (bshift--);
+
+    /* fractional part */
+    if (xfp && b) {
+        do {
+            uint32_t t = (g << 1) | b;
+            uint32_t xfc = xfp & (1ul << (PREC_BITS-1));
+            xfp <<= 1;
+
+            if (xfc || xfp >= t) {
+                g |= b;
+                xfp -= t;
+            }
+
+            b >>= 1;
+        } while (xfp && b);
+
+        /* round up if the next bit would be a '1' */
+        if (xfp && ((xfp & (1ul << (PREC_BITS-1))) ||
+                    (xfp << 1) >= ((g << 1) | 1))) {
+            g++;
+        }
+    }
 
     return g;
 }
