@@ -62,6 +62,9 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
+/* There is no hardware tone control */
+#define HAVE_SW_TONE_CONTROLS
+
 /* KeyPad configuration for plugins */
 #define CONFIG_KEYPAD SONY_NWZ_PAD
 #define HAS_BUTTON_HOLD
