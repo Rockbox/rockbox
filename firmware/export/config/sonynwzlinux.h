@@ -65,6 +65,12 @@
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
 
+/* The A15 and A25 support more sampling rates, in fact they support crazy high bit-rates such
+ * as 176.4 and 192 kHz but Rockbox does not support those */
+#if defined(SONY_NWZA10) || defined(SONY_NWA20)
+#define HW_SAMPR_CAPS   (SAMPR_CAP_44 | SAMPR_CAP_48 | SAMPR_CAP_88 | SAMPR_CAP_96)
+#endif
+
 /* KeyPad configuration for plugins */
 #define CONFIG_KEYPAD SONY_NWZ_PAD
 #define HAS_BUTTON_HOLD
