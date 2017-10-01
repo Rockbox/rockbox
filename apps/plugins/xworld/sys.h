@@ -64,12 +64,14 @@ struct keymapping_t {
     int down;
     int left;
     int right;
-#if (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
+
+    /* These aren't conditional, even if they aren't used (this is to
+     * prevent headers and source from having varying defintions of
+     * this structure, leading to memory corruption */
     int upleft;
     int upright;
     int downleft;
     int downright;
-#endif
 };
 
 typedef void (*AudioCallback)(void *param, uint8_t *stream, int len);
