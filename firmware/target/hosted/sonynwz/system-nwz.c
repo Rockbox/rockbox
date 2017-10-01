@@ -90,6 +90,28 @@ static void print_kern_mod_list(void)
 uintptr_t *stackbegin;
 uintptr_t *stackend;
 
+static void dump_proc_map(void)
+{
+    const char *file = "/proc/self/maps";
+    printf("Dumping %s...\n", file);
+    FILE *f = fopen(file, "r");
+    if(f == NULL)
+    {
+        perror("Cannot open file");
+        return;
+    }
+    while(true)
+    {
+        char *line = NULL;
+        size_t n;
+        if(getline(&line, &n, f) < 0)
+            break;
+        printf("> %s", line);
+        free(line);
+    }
+    fclose(f);
+}
+
 static void nwz_sig_handler(int sig, siginfo_t *siginfo, void *context)
 {
     /* safe guard variable - we call backtrace() only on first
@@ -97,6 +119,10 @@ static void nwz_sig_handler(int sig, siginfo_t *siginfo, void *context)
      * memory regions which cause abort
      */
     static bool triggered = false;
+
+    /* dump process maps to log file to ease debugging
+     * will also print crash info to the log */
+    dump_proc_map();
 
     lcd_set_backdrop(NULL);
     lcd_set_drawmode(DRMODE_SOLID);
@@ -113,10 +139,14 @@ static void nwz_sig_handler(int sig, siginfo_t *siginfo, void *context)
     unsigned long pc = uc->uc_mcontext.arm_pc;
     unsigned long sp = uc->uc_mcontext.arm_sp;
 
+    printf("%s at %08x\n", strsignal(sig), (unsigned int)pc);
     lcd_putsf(0, line++, "%s at %08x", strsignal(sig), pc);
 
     if(sig == SIGILL || sig == SIGFPE || sig == SIGSEGV || sig == SIGBUS || sig == SIGTRAP)
+    {
+        printf("address 0x%08x\n", (unsigned int)siginfo->si_addr);
         lcd_putsf(0, line++, "address 0x%08x", siginfo->si_addr);
+    }
 
     if(!triggered)
     {
