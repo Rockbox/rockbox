@@ -479,6 +479,10 @@ static void pcm_dma_apply_settings_nolock(void)
 {
     snd_pcm_drop(handle);
     set_hwparams(handle, pcm_sampr);
+#if defined(HAVE_NWZ_LINUX_CODEC)
+    /* Sony NWZ linux driver uses a nonstandard mecanism to set the sampling rate */
+    audiohw_set_frequency(pcm_sampr);
+#endif
 }
 
 void pcm_dma_apply_settings(void)

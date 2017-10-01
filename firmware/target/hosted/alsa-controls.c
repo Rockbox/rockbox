@@ -72,6 +72,15 @@ bool alsa_controls_find(snd_ctl_elem_id_t *id, const char *name)
     return false;
 }
 
+bool alsa_has_control(const char *name)
+{
+    snd_ctl_elem_id_t *id;
+    /* allocate things on stack */
+    snd_ctl_elem_id_alloca(&id);
+    /* find control */
+    return alsa_controls_find(id, name);
+}
+
 /* find a control element enum index by name, return -1 if not found */
 int alsa_controls_find_enum(const char *name, const char *enum_name)
 {
