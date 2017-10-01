@@ -45,9 +45,6 @@
  *  Take square root of a fixed point number:
  *      fp_sqrt(x, fracbits)
  *
- *  Take the square root of an integer:
- *      isqrt(x)
- *
  *  Calculate sin or cos of an angle (very fast, from a table):
  *      fp14_sin(angle)
  *      fp14_cos(angle)
@@ -87,8 +84,6 @@ long fp14_cos(int val);
 long fp14_sin(int val);
 long fp16_log(int x);
 long fp16_exp(int x);
-
-unsigned long isqrt(unsigned long x);
 
 /* fast unsigned multiplication (16x16bit->32bit or 32x32bit->32bit,
  * whichever is faster for the architecture) */
