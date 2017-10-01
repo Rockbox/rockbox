@@ -84,6 +84,15 @@ numid=4,iface=MIXER,name='Output Switch'
   ; Item #2 'LineFixed'
   ; Item #3 'Speaker'
   : values=0
+numid=6,iface=MIXER,name='Sampling Rate'
+  ; type=ENUMERATED,access=rw------,values=1,items=6
+  ; Item #0 '44100'
+  ; Item #1 '48000'
+  ; Item #2 '88200'
+  ; Item #3 '96000'
+  ; Item #4 '176400'
+  ; Item #5 '192000'
+  : values=0
 */
 
 /* List of various codecs used by Sony */
@@ -111,6 +120,8 @@ static int fd_noican;
 static int fd_hw;
 /* Codec */
 static enum nwz_codec_t nwz_codec;
+/* does the code support setting the sample rate? */
+static bool has_sample_rate;
 
 static enum nwz_codec_t find_codec(void)
 {
@@ -284,6 +295,8 @@ void audiohw_preinit(void)
     alsa_controls_set_enum("Output Switch", "Headphone");
     /* unmute */
     alsa_controls_set_bool("CODEC Mute Switch", false);
+    /* sample rate */
+    has_sample_rate = alsa_has_control("Sampling Rate");
 
     /* init noican */
     noican_init();
@@ -381,5 +394,11 @@ void audiohw_close(void)
 
 void audiohw_set_frequency(int fsel)
 {
-    (void) fsel;
+    if(has_sample_rate)
+    {
+        /* it's slightly annoying that Sony put the value in an enum with strings... */
+        char freq_str[16];
+        sprintf(freq_str, "%d", fsel);
+        alsa_controls_set_enum("Sampling Rate", freq_str);
+    }
 }
