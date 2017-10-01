@@ -63,7 +63,7 @@ static void sys_rotate_keymap(struct System* sys)
         sys->keymap.down = BTN_DOWN;
         sys->keymap.left = BTN_LEFT;
         sys->keymap.right = BTN_RIGHT;
-#if (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
+#ifdef BTN_HAVE_DIAGONAL
         sys->keymap.upleft = BTN_UP_LEFT;
         sys->keymap.upright = BTN_UP_RIGHT;
         sys->keymap.downleft = BTN_DOWN_RIGHT;
@@ -75,7 +75,7 @@ static void sys_rotate_keymap(struct System* sys)
         sys->keymap.down = BTN_LEFT;
         sys->keymap.left = BTN_UP;
         sys->keymap.right = BTN_DOWN;
-#if (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
+#ifdef BTN_HAVE_DIAGONAL
         sys->keymap.upleft = BTN_UP_RIGHT;
         sys->keymap.upright = BTN_DOWN_RIGHT;
         sys->keymap.downleft = BTN_UP_LEFT;
@@ -87,7 +87,7 @@ static void sys_rotate_keymap(struct System* sys)
         sys->keymap.down = BTN_RIGHT;
         sys->keymap.left = BTN_DOWN;
         sys->keymap.right = BTN_UP;
-#if (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
+#ifdef BTN_HAVE_DIAGONAL
         sys->keymap.upleft = BTN_DOWN_LEFT;
         sys->keymap.upright = BTN_UP_LEFT;
         sys->keymap.downleft = BTN_DOWN_RIGHT;

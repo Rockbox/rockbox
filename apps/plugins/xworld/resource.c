@@ -371,7 +371,7 @@ void res_allocMemBlock(struct Resource* res) {
     res->sys->membuf = res->_memPtrStart + ( MEM_BLOCK_SIZE + (4 * VID_PAGE_SIZE) + 320 * 200 * sizeof(fb_data));
     res->sys->bytes_left = sz - (MEM_BLOCK_SIZE + (4 * VID_PAGE_SIZE) + 320 * 200 * sizeof(fb_data));
 
-    debug(DBG_RES, "audiobuf is %d bytes in size", sz);
+    debug(DBG_RES, "audiobuf is %d bytes in size (%d bytes left)", sz, res->sys->bytes_left);
 
     res->_scriptBakPtr = res->_scriptCurPtr = res->_memPtrStart;
     res->_vidBakPtr = res->_vidCurPtr = res->_memPtrStart + MEM_BLOCK_SIZE - 0x800 * 16; //0x800 = 2048, so we have 32KB free for vidBack and vidCur
