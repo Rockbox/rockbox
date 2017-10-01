@@ -34,6 +34,8 @@ void alsa_controls_close(void);
 /* find a control element ID by name, return false of not found, the id needs
  * to be allocated */
 bool alsa_controls_find(snd_ctl_elem_id_t *id, const char *name);
+/* check wether a control exists */
+bool alsa_has_control(const char *name);
 /* find a control element enum index by name, return -1 if not found */
 int alsa_controls_find_enum(const char *name, const char *enum_name);
 /* set a control, potentially supports several values */
