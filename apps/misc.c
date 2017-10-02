@@ -28,6 +28,9 @@
 #include "misc.h"
 #include "system.h"
 #include "lcd.h"
+#include "language.h" /* time_format_auto */
+#include "talk.h" /* unit_strings_core */
+
 #ifdef HAVE_DIRCACHE
 #include "dircache.h"
 #endif
@@ -115,6 +118,19 @@ const unsigned char * const byte_units[] =
 };
 
 const unsigned char * const * const kbyte_units = &byte_units[1];
+
+const unsigned char * const unit_strings_core[] =
+{
+    [UNIT_INT] = "",    [UNIT_MS]  = "ms",
+    [UNIT_SEC] = "s",   [UNIT_MIN] = "min",
+    [UNIT_HOUR]= "hr",  [UNIT_KHZ] = "kHz",
+    [UNIT_DB]  = "dB",  [UNIT_PERCENT] = "%",
+    [UNIT_MAH] = "mAh", [UNIT_PIXEL] = "px",
+    [UNIT_PER_SEC] = "per sec",
+    [UNIT_HERTZ] = "Hz",
+    [UNIT_MB]  = "MB",  [UNIT_KBIT]  = "kb/s",
+    [UNIT_PM_TICK] = "units/10ms",
+};
 
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
@@ -1050,6 +1066,237 @@ char* skip_whitespace(char* const str)
         s++;
 
     return s;
+}
+
+/*  time_split_units()
+    split time values depending on base unit
+    unit_idx: UNIT_HOUR, UNIT_MIN, UNIT_SEC, UNIT_MS
+    abs_value: absolute time value
+    units_in: array of unsigned ints with UNIT_IDX_TIME_COUNT fields
+*/
+unsigned int time_split_units(int unit_idx, unsigned long abs_val, 
+                              unsigned int (*units_in)[UNIT_IDX_TIME_COUNT])
+{
+    unsigned int base_idx;
+    int hours;
+    int minutes;
+    int seconds;
+    int millisec;
+    switch (unit_idx & UNIT_IDX_MASK) /* format the values depending on base unit */
+    { /*Mask off upper bits*/
+
+
+            case UNIT_MS:
+                base_idx = UNIT_IDX_MS;
+                millisec = abs_val;
+                abs_val  = abs_val  /  1000U;
+                millisec = millisec - (1000U * abs_val);
+                hours    = abs_val  /  3600U;
+                abs_val  = abs_val  - (3600U * hours);
+                minutes  = abs_val /   60U;
+                seconds  = abs_val  - (60U * minutes);
+                break;
+            case UNIT_SEC:
+                base_idx = UNIT_IDX_SEC;
+                hours    = abs_val  /  3600U;
+                abs_val  = abs_val  - (3600U * hours);
+                minutes  = abs_val /   60U;
+                seconds  = abs_val  - (60U * minutes);
+                millisec = 0;
+                break;
+            case UNIT_MIN:
+                base_idx = UNIT_IDX_MIN;
+                hours    = abs_val /  60U;
+                abs_val  = abs_val - (60U * hours);
+                minutes  = abs_val;
+                seconds  = 0;
+                millisec = 0;
+                break;
+            case UNIT_HOUR:
+            default:
+                base_idx = UNIT_IDX_HR;
+                hours    = abs_val;
+                abs_val  = 0;
+                minutes  = 0;
+                seconds  = 0;
+                millisec = 0;
+                break;
+    }
+    (*units_in)[UNIT_IDX_HR]  = hours;
+    (*units_in)[UNIT_IDX_MIN] = minutes;
+    (*units_in)[UNIT_IDX_SEC] = seconds;
+    (*units_in)[UNIT_IDX_MS]  = millisec;
+    return base_idx;
+}
+
+/* format_time_auto - return an auto ranged time string,
+
+   unit_idx: specifies lowest or base index of the value,
+
+   VALUE should be passed in the same form as unit_idx
+   if unit_idx is HOURS then the value passed should be in HOURS!
+   if unit_idx is MS then the value passed should be in MILLISECONDS!
+   same for SEC & MIN
+
+   add | UNIT_LOCK_ to keep place holder of units that would normally be
+   discarded.. For instance, UNIT_LOCK_HR would keep the hours place, ex: string
+   00:10:10 (0 HRS 10 MINS 10 SECONDS) normally it would return as 10:10
+
+   supress_unit may be set to true and in this case the
+   hr, min, sec, ms identifiers will be left off the resulting string but
+   since right to left languages are handled it is advisable to leave units
+   as an indication of the text direction
+
+   idx_pos[2]: (if !NULL) [0] specifies an index of interest,
+   the offset in the string for that index will be returned
+   in field [0] offset, field [1] will be the length
+   Ex: in a string 12:34:56.78 if you pass the idx_pos UNIT_IDX_MIN then you
+   will be given the offset(3) of 34 and a length of 2
+*/
+const char *format_time_auto(char *buffer, int buf_len, const long value,
+                                  int unit_idx, bool supress_unit,
+                                  unsigned int (*idx_pos)[2])
+{
+    const unsigned int off_hr  = 10;
+    const unsigned int off_7   = 7;
+    const unsigned int off_4   = 4;
+    unsigned long      abs_val = abs(value);
+    bool               is_rtl  = lang_is_rtl();
+    const char        *unit;
+    char               timebuf[24];/* -2147483648:00:00.00\0 */
+
+    int                len;
+    int                left_offset;
+    unsigned int       base_idx;
+    unsigned int       max_idx;
+    unsigned int       offsets[UNIT_IDX_TIME_COUNT];
+    unsigned int       fwidth[UNIT_IDX_TIME_COUNT]   = {0,2,2,3}; /* hr is var len */
+    unsigned int       units_in[UNIT_IDX_TIME_COUNT] = {0};
+
+    if (idx_pos != NULL)
+    {
+        if ((*idx_pos)[0]> UNIT_IDX_TIME_COUNT - 1)
+            (*idx_pos)[0] = UNIT_IDX_TIME_COUNT - 1;
+
+        if ((*idx_pos)[0] == UNIT_IDX_HR)
+            (unit_idx |= UNIT_LOCK_HR);
+
+        else if ((*idx_pos)[0] == UNIT_IDX_MIN)
+            (unit_idx |= UNIT_LOCK_MIN);
+
+        else if ((*idx_pos)[0] == UNIT_IDX_SEC)
+            (unit_idx |= UNIT_LOCK_SEC);
+    }
+
+    base_idx = time_split_units(unit_idx, abs_val, &units_in);
+
+    if (units_in[UNIT_IDX_HR] || (unit_idx & UNIT_LOCK_HR))
+    {
+        unit = unit_strings_core[UNIT_HOUR];
+        max_idx = UNIT_IDX_HR;
+    }
+    else if (units_in[UNIT_IDX_MIN] || (unit_idx & UNIT_LOCK_MIN))
+    {
+        unit = unit_strings_core[UNIT_MIN];
+        max_idx = UNIT_IDX_MIN;
+    }
+    else if (units_in[UNIT_IDX_SEC] || (unit_idx & UNIT_LOCK_SEC))
+    {
+        unit = unit_strings_core[UNIT_SEC];
+        max_idx = UNIT_IDX_SEC;
+    }
+    else if (units_in[UNIT_IDX_MS])
+    {
+        unit = unit_strings_core[UNIT_MS];
+        max_idx = UNIT_IDX_MS;
+    }
+    else /* value is 0*/
+    {
+        unit = unit_strings_core[unit_idx & UNIT_IDX_MASK]; /*Mask off upper bits*/
+        max_idx = base_idx;
+    }
+
+    if (!is_rtl)
+    {
+        len = snprintf(timebuf, sizeof(timebuf), "%d:%02d:%02d.%03d",
+                 units_in[UNIT_IDX_HR],
+                 units_in[UNIT_IDX_MIN],
+                 units_in[UNIT_IDX_SEC],
+                 units_in[UNIT_IDX_MS]);
+
+        /*?:59:59.999*/
+        offsets[UNIT_IDX_HR]  = 0;
+        /* we can use the default width (1) of hour to figure out
+         * how long the HOUR field ended up being since it is variable length */
+        fwidth[UNIT_IDX_HR]   = len - off_hr;
+        offsets[UNIT_IDX_MIN] = fwidth[UNIT_IDX_HR] + 1;
+        offsets[UNIT_IDX_SEC] = fwidth[UNIT_IDX_HR] + off_4;
+        offsets[UNIT_IDX_MS]  = fwidth[UNIT_IDX_HR] + off_7;
+
+        /* place terminator to get rid of units less than minimum needed*/
+        timebuf[offsets[base_idx] + fwidth[base_idx]] = '\0';
+
+        /* discard units greater than maximum needed */
+        left_offset  = -(offsets[max_idx]);
+        /* add negative sign if needed */
+        left_offset += strlcpy(buffer, &"-"[value < 0 ? 0 : 1] , buf_len);
+        /* discard units greater than maximum needed */
+
+        strlcat(buffer, &timebuf[offsets[max_idx]], buf_len);
+
+        if(!supress_unit)
+        {
+            strlcat(buffer, " ", buf_len);
+            strlcat(buffer, unit, buf_len);
+        }
+
+    }
+    else
+    {
+        /*RTL Languages*/
+        len = snprintf(timebuf, sizeof(timebuf), "%03d.%02d:%02d:%d",
+                 units_in[UNIT_IDX_MS],
+                 units_in[UNIT_IDX_SEC],
+                 units_in[UNIT_IDX_MIN],
+                 units_in[UNIT_IDX_HR]);
+
+        /* 999.59:59:0 we can pre calculate the offsets since they don't change */
+        offsets[UNIT_IDX_HR]  = off_hr;
+        offsets[UNIT_IDX_MIN] = off_7;
+        offsets[UNIT_IDX_SEC] = off_4;
+        offsets[UNIT_IDX_MS]  = 0;
+
+        /* we can use the default width (1) of hour to figure out
+         * how long the HOUR field ended up being since it is variable length */
+        fwidth[UNIT_IDX_HR] = len - offsets[UNIT_IDX_HR];
+
+        /* place terminator to get rid of units greater than maximum needed*/
+        timebuf[offsets[max_idx] + fwidth[max_idx]] = '\0';
+
+        /* discard units less than minimum needed */
+        left_offset = -offsets[base_idx];
+
+        if(!supress_unit)
+        {
+            strlcpy(buffer, unit, buf_len);
+            left_offset += strlcat(buffer, " ", buf_len);
+            /* discard units less than minimum needed */
+            strlcat(buffer, &timebuf[offsets[base_idx]], buf_len);
+        }
+        else /* discard units less than minimum needed */
+            strlcpy(buffer, &timebuf[offsets[base_idx]], buf_len);
+
+        if (value < 0) /* add negative sign if needed*/
+            strlcat(buffer, value < 0?"-":"\0" , buf_len);
+    }
+
+
+    if (idx_pos != NULL)
+    {
+        (*idx_pos)[1]= fwidth[*(idx_pos)[0]];
+        (*idx_pos)[0]= left_offset + offsets[(*idx_pos)[0]];
+    }
+    return buffer;
 }
 
 /* Format time into buf.
