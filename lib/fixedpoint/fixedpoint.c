@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <inttypes.h>
+#include <limits.h>
 
 #define ULONG_BITS (sizeof (unsigned long)*CHAR_BIT)
 
