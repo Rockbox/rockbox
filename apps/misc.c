@@ -1068,12 +1068,23 @@ void format_time(char* buf, int buf_size, long t)
 
     if ( hours == 0 )
     {
-        snprintf(buf, buf_size, "%s%d:%02d", sign, minutes, seconds);
+        if (lang_is_rtl())
+            snprintf(buf, buf_size, "%s%d:%02d", sign, minutes, seconds);
+        else
+            snprintf(buf, buf_size, "%02d:%d%s", seconds, minutes, sign);
     }
     else
     {
-        snprintf(buf, buf_size, "%s%d:%02d:%02d", sign, hours, minutes,
-                 seconds);
+        if (lang_is_rtl())
+        {
+            snprintf(buf, buf_size, "%s%d:%02d:%02d", 
+                     sign, hours, minutes,seconds);
+        }
+        else
+        {
+            snprintf(buf, buf_size, "%02d:%02d:%d%s", 
+                     seconds, minutes, hours, sign);
+        }
     }
 }
 
