@@ -28,6 +28,7 @@
 #include "misc.h"
 #include "system.h"
 #include "lcd.h"
+#include "language.h" /*lang_is_rtl()*/
 #ifdef HAVE_DIRCACHE
 #include "dircache.h"
 #endif
@@ -1060,20 +1061,32 @@ char* skip_whitespace(char* const str)
  */
 void format_time(char* buf, int buf_size, long t)
 {
-    int const time = abs(t / 1000);
-    int const hours = time / 3600;
-    int const minutes = time / 60 - hours * 60;
-    int const seconds = time % 60;
+    int       time    = abs(t) / 1000UL;
+    int const hours   = time  /  3600U;
+              time    = time  - (3600U * hours);
+    int const minutes = time /   60U;
+    int const seconds = time  - (60U * minutes);
     const char * const sign = &"-"[t < 0 ? 0 : 1];
 
     if ( hours == 0 )
     {
-        snprintf(buf, buf_size, "%s%d:%02d", sign, minutes, seconds);
+        if (lang_is_rtl())
+            snprintf(buf, buf_size, "%02d:%d%s", seconds, minutes, sign);
+        else
+            snprintf(buf, buf_size, "%s%d:%02d", sign, minutes, seconds);
     }
     else
     {
-        snprintf(buf, buf_size, "%s%d:%02d:%02d", sign, hours, minutes,
-                 seconds);
+        if (lang_is_rtl())
+        {
+            snprintf(buf, buf_size, "%02d:%02d:%d%s",
+                     seconds, minutes, hours, sign);
+        }
+        else
+        {
+            snprintf(buf, buf_size, "%s%d:%02d:%02d",
+                     sign, hours, minutes,seconds);
+        }
     }
 }
 
