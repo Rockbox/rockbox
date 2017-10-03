@@ -28,6 +28,8 @@
 #include "misc.h"
 #include "system.h"
 #include "lcd.h"
+#include "language.h" /* is_lang_rtl() */
+#include "talk.h" /* unit_strings_core[] */
 #ifdef HAVE_DIRCACHE
 #include "dircache.h"
 #endif
@@ -115,6 +117,18 @@ const unsigned char * const byte_units[] =
 };
 
 const unsigned char * const * const kbyte_units = &byte_units[1];
+const unsigned char * const unit_strings_core[] =
+{
+    [UNIT_INT] = "",    [UNIT_MS]  = "ms",
+    [UNIT_SEC] = "s",   [UNIT_MIN] = "min",
+    [UNIT_HOUR]= "hr",  [UNIT_KHZ] = "kHz",
+    [UNIT_DB]  = "dB",  [UNIT_PERCENT] = "%",
+    [UNIT_MAH] = "mAh", [UNIT_PIXEL] = "px",
+    [UNIT_PER_SEC] = "per sec",
+    [UNIT_HERTZ] = "Hz",
+    [UNIT_MB]  = "MB",  [UNIT_KBIT]  = "kb/s",
+    [UNIT_PM_TICK] = "units/10ms",
+};
 
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
@@ -1050,6 +1064,243 @@ char* skip_whitespace(char* const str)
         s++;
 
     return s;
+}
+
+unsigned long ms_to_ticks(unsigned long ms)
+{
+    return ms/MS_IN_TICK;
+}
+
+unsigned long ticks_to_ms(unsigned long ticks)
+{
+    return ticks * MS_IN_TICK;
+}
+
+/*  time_split_units()
+    split time values depending on base unit
+    unit_idx: UNIT_HOUR, UNIT_MIN, UNIT_SEC, UNIT_MS
+    abs_value: absolute time value
+    units_in: array of unsigned ints with UNIT_IDX_TIME_COUNT fields
+*/
+unsigned int time_split_units(int unit_idx, unsigned long abs_val,
+                              unsigned int (*units_in)[UNIT_IDX_TIME_COUNT])
+{
+    unsigned int base_idx;
+    int hours, minutes, seconds, millisec;
+    switch (unit_idx & UNIT_IDX_MASK) /*Mask off upper bits*/
+    {
+            case UNIT_MS:
+                base_idx = UNIT_IDX_MS;
+                millisec = abs_val;
+                abs_val  = abs_val  /  1000U;
+                millisec = millisec - (1000U * abs_val);
+                hours    = abs_val  /  3600U;
+                abs_val  = abs_val  - (3600U * hours);
+                minutes  = abs_val /   60U;
+                seconds  = abs_val  - (60U * minutes);
+                break;
+            case UNIT_SEC:
+                base_idx = UNIT_IDX_SEC;
+                hours    = abs_val  /  3600U;
+                abs_val  = abs_val  - (3600U * hours);
+                minutes  = abs_val /   60U;
+                seconds  = abs_val  - (60U * minutes);
+                millisec = 0;
+                break;
+            case UNIT_MIN:
+                base_idx = UNIT_IDX_MIN;
+                hours    = abs_val /  60U;
+                abs_val  = abs_val - (60U * hours);
+                minutes  = abs_val;
+                seconds  = 0;
+                millisec = 0;
+                break;
+            case UNIT_HOUR:
+            default:
+                base_idx = UNIT_IDX_HR;
+                hours    = abs_val;
+                abs_val  = 0;
+                minutes  = 0;
+                seconds  = 0;
+                millisec = 0;
+                break;
+    }
+    (*units_in)[UNIT_IDX_HR]  = hours;
+    (*units_in)[UNIT_IDX_MIN] = minutes;
+    (*units_in)[UNIT_IDX_SEC] = seconds;
+    (*units_in)[UNIT_IDX_MS]  = millisec;
+    return base_idx;
+}
+
+/* format_time_auto - return an auto ranged time string;
+   buffer:  needs to be at least 64 characters
+
+   unit_idx: specifies lowest or base index of the value
+   add | UNIT_LOCK_ to prevent autorange below this index
+   add | UNIT_TRIM_ZERO to supress leading zero on the largest unit
+
+   value: should be passed in the same form as unit_idx
+
+   supress_unit: if true unit string is NOT printed
+
+   idx_pos[2]: (if !NULL) [0] specifies an index of interest,
+   the offset and width for that index will be returned.
+   In field [0] offset, field [1] length
+   Ex: given 12:34:56.78 if you pass the idx_pos UNIT_IDX_MIN
+   idx_pos returns -> {3,2}.. offset(3) and length(2) = '34'
+*/
+const char *format_time_auto(char *buffer, int buf_len, const long value,
+                                  int unit_idx, bool supress_unit,
+                                  unsigned int (*idx_pos)[2])
+{
+    unsigned long      abs_val     = abs(value);
+    bool               is_rtl      = lang_is_rtl();
+    int                timebuf_len = 30; /* -2147483648:00:00.00\0 */
+    char              *timebuf;/*timebuf[24]; shared with buffer instead*/
+    const char        *unit;
+    int                len;
+    int                left_offset;
+    unsigned int       base_idx, max_idx;
+
+    unsigned int       units_in[UNIT_IDX_TIME_COUNT] = {0};
+    unsigned int       offsets[UNIT_IDX_TIME_COUNT] =
+                       {
+                            [UNIT_IDX_HR]  = 10,/* ?:59:59.999 Std offsets */
+                            [UNIT_IDX_MIN] = 7, /*0?:+1:+4.+7 need calculated */
+                            [UNIT_IDX_SEC] = 4,/* 999.59:59:0  RTL offsets */
+                            [UNIT_IDX_MS]  = 0,/* 0  .4 :7 :10 won't change */
+                       }; /* {10,7,4,0}; Offsets*/
+    unsigned int       fwidth[UNIT_IDX_TIME_COUNT] =
+                       {
+                            [UNIT_IDX_HR]  = 0, /* hr is variable length */
+                            [UNIT_IDX_MIN] = 2,
+                            [UNIT_IDX_SEC] = 2,
+                            [UNIT_IDX_MS]  = 3,
+                       }; /* {0,2,2,3}; Field Widths*/
+
+    buf_len = buf_len - (timebuf_len + 2);
+    timebuf = &buffer[buf_len + 1]; /* use part of the supplied buffer */
+    if (buf_len < 32)
+        return buffer;
+
+    if (idx_pos != NULL)
+    {
+        if ((*idx_pos)[0]> UNIT_IDX_TIME_COUNT - 1)
+            (*idx_pos)[0] = UNIT_IDX_TIME_COUNT - 1;
+
+        if ((*idx_pos)[0] == UNIT_IDX_HR)
+            (unit_idx |= UNIT_LOCK_HR);
+        else if ((*idx_pos)[0] == UNIT_IDX_MIN)
+            (unit_idx |= UNIT_LOCK_MIN);
+        else if ((*idx_pos)[0] == UNIT_IDX_SEC)
+            (unit_idx |= UNIT_LOCK_SEC);
+    }
+
+    base_idx = time_split_units(unit_idx, abs_val, &units_in);
+
+    if (units_in[UNIT_IDX_HR] || (unit_idx & UNIT_LOCK_HR))
+    {
+        unit = unit_strings_core[UNIT_HOUR];
+        max_idx = UNIT_IDX_HR;
+    }
+    else if (units_in[UNIT_IDX_MIN] || (unit_idx & UNIT_LOCK_MIN))
+    {
+        unit = unit_strings_core[UNIT_MIN];
+        max_idx = UNIT_IDX_MIN;
+    }
+    else if (units_in[UNIT_IDX_SEC] || (unit_idx & UNIT_LOCK_SEC))
+    {
+        unit = unit_strings_core[UNIT_SEC];
+        max_idx = UNIT_IDX_SEC;
+    }
+    else if (units_in[UNIT_IDX_MS])
+    {
+        unit = unit_strings_core[UNIT_MS];
+        max_idx = UNIT_IDX_MS;
+    }
+    else /* value is 0*/
+    {
+        unit = unit_strings_core[unit_idx & UNIT_IDX_MASK]; /*Mask off upper bits*/
+        max_idx = base_idx;
+    }
+
+    if (!is_rtl)
+    {
+        len = snprintf(timebuf, timebuf_len, "%02d:%02d:%02d.%03d",
+                 units_in[UNIT_IDX_HR],
+                 units_in[UNIT_IDX_MIN],
+                 units_in[UNIT_IDX_SEC],
+                 units_in[UNIT_IDX_MS]);
+
+        fwidth[UNIT_IDX_HR]   = len - offsets[UNIT_IDX_HR];
+
+        offsets[UNIT_IDX_MS]  = fwidth[UNIT_IDX_HR] + offsets[UNIT_IDX_MIN];
+        offsets[UNIT_IDX_SEC] = fwidth[UNIT_IDX_HR] + offsets[UNIT_IDX_SEC];
+        offsets[UNIT_IDX_MIN] = fwidth[UNIT_IDX_HR] + 1;
+        offsets[UNIT_IDX_HR]  = 0;
+
+        timebuf[offsets[base_idx] + fwidth[base_idx]] = '\0';
+
+        left_offset  = -(offsets[max_idx]);
+        left_offset += strlcpy(buffer, value < 0 ? "-" : "\0", buf_len);
+
+        /* trim leading zero on the max_idx */
+        if ((unit_idx & UNIT_TRIM_ZERO) == UNIT_TRIM_ZERO &&
+            units_in[max_idx] && timebuf[offsets[max_idx]] == '0')
+        {
+            offsets[max_idx]++;
+        }
+
+        strlcat(buffer, &timebuf[offsets[max_idx]], buf_len);
+
+        if (!supress_unit)
+        {
+            strlcat(buffer, " ", buf_len);
+            strlcat(buffer, unit, buf_len);
+        }
+
+    }
+    else /*RTL Languages*/
+    {
+        len = snprintf(timebuf, timebuf_len, "%03d.%02d:%02d:%02d",
+                 units_in[UNIT_IDX_MS],
+                 units_in[UNIT_IDX_SEC],
+                 units_in[UNIT_IDX_MIN],
+                 units_in[UNIT_IDX_HR]);
+
+        fwidth[UNIT_IDX_HR] = len - offsets[UNIT_IDX_HR];
+
+        left_offset = -offsets[base_idx];
+
+        /* trim leading zero on the max_idx */
+        if ((unit_idx & UNIT_TRIM_ZERO) == UNIT_TRIM_ZERO &&
+            units_in[max_idx] && timebuf[offsets[max_idx]] == '0')
+        {
+            timebuf[offsets[max_idx]] = timebuf[offsets[max_idx]+1];
+            fwidth[max_idx]--;
+        }
+
+        timebuf[offsets[max_idx] + fwidth[max_idx]] = '\0';
+
+        if (!supress_unit)
+        {
+            strlcpy(buffer, unit, buf_len);
+            left_offset += strlcat(buffer, " ", buf_len);
+            strlcat(buffer, &timebuf[offsets[base_idx]], buf_len);
+        }
+        else
+            strlcpy(buffer, &timebuf[offsets[base_idx]], buf_len);
+
+        if (value < 0)
+            strlcat(buffer, "-", buf_len);
+    }
+
+    if (idx_pos != NULL)
+    {
+        (*idx_pos)[1]= fwidth[*(idx_pos)[0]];
+        (*idx_pos)[0]= left_offset + offsets[(*idx_pos)[0]];
+    }
+    return buffer;
 }
 
 /* Format time into buf.
