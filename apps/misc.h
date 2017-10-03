@@ -37,6 +37,63 @@ extern const unsigned char * const * const kbyte_units;
 char *output_dyn_value(char *buf, int buf_size, int value,
                       const unsigned char * const *units, bool bin_scale);
 
+extern const unsigned char * const unit_strings_core[];
+/* format_time_auto */
+#define UNIT_IDX_HR         0x0U
+#define UNIT_IDX_MIN        0x1U
+#define UNIT_IDX_SEC        0x2U
+#define UNIT_IDX_MS         0x3U
+#define UNIT_IDX_TIME_COUNT 0x4U
+#define UNIT_IDX_MASK       0x01FFU /*Return only Unit_IDX*/
+#define UNIT_TRIM_ZERO      0x0200U /*Don't show leading zero on max_idx*/
+#define UNIT_LOCK_MASK      0x7D00U /*Return only Unit_LOCK*/
+#define UNIT_LOCK_HR        0x0400U /*Don't Auto Range below this field*/
+#define UNIT_LOCK_MIN       0x0800U /*Don't Auto Range below this field*/
+#define UNIT_LOCK_SEC       0x1000U /*Don't Auto Range below this field*/
+
+/* convert ticks to MS and back*/
+#define MS_IN_TICK (1000UL/HZ)
+unsigned long ms_to_ticks(unsigned long ms);
+unsigned long ticks_to_ms(unsigned long ticks);
+
+/*  time_split_units()
+    split time values depending on base unit
+    unit_idx: UNIT_HOUR, UNIT_MIN, UNIT_SEC, UNIT_MS
+    abs_value: absolute time value
+    units_in: array of unsigned ints with IDX_TIME_COUNT fields
+*/
+unsigned int time_split_units(int unit_idx, unsigned long abs_val,
+                        unsigned int (*units_in)[UNIT_IDX_TIME_COUNT]);
+
+/* format_time_auto - return an auto ranged time string,
+
+   unit_idx: specifies lowest or base index of the value,
+
+   VALUE should be passed in the same form as unit_idx
+   if unit_idx is HOURS then the value passed should be in HOURS!
+   if unit_idx is MS then the value passed should be in MILLISECONDS!
+   same for SEC & MIN
+
+   add | UNIT_LOCK_ to keep place holder of units that would normally be
+   discarded.. For instance, UNIT_LOCK_HR would keep the hours place, ex: string
+   00:10:10 (0 HRS 10 MINS 10 SECONDS) normally it would return as 10:10
+
+   supress_unit may be set to true and in this case the
+   hr, min, sec, ms identifiers will be left off the resulting string but
+   since right to left languages are handled it is advisable to leave units
+   as an indication of the text direction
+
+   idx_pos[2]: (if !NULL) [0] specifies an index of interest,
+   the offset in the string for that index will be returned
+   in field [0] offset, field [1] will be the length
+   Ex: in a string 12:34:56.78 if you pass the idx_pos UNIT_IDX_MIN then you
+   will be given the offset(3) of 34 and a length of 2
+*/
+
+const char *format_time_auto(char *buffer, int buf_len, const long value,
+                                  int unit_idx, bool supress_unit,
+                                  unsigned int (*idx_pos)[2]);
+
 /* Format time into buf.
  *
  * buf      - buffer to format to.
