@@ -2808,7 +2808,8 @@ int playlist_update_resume_info(const struct mp3entry* id3)
             global_status.resume_elapsed != id3->elapsed ||
             global_status.resume_offset != id3->offset)
         {
-            unsigned int crc = crc_32(id3->path, strlen(id3->path), -1);
+            unsigned int crc = playlist_get_filename_crc32(playlist,
+                                                           playlist->index);
             global_status.resume_index  = playlist->index;
             global_status.resume_crc32 = crc;
             global_status.resume_elapsed = id3->elapsed;
