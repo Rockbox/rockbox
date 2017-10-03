@@ -1068,6 +1068,77 @@ char* skip_whitespace(char* const str)
     return s;
 }
 
+unsigned long ms_to_ticks(unsigned long ms)
+{
+    return ms/MS_IN_TICK;
+}
+
+unsigned long ticks_to_ms(unsigned long ticks)
+{
+    return ticks * MS_IN_TICK;
+}
+
+/*  time_split_units()
+    split time values depending on base unit
+    unit_idx: UNIT_HOUR, UNIT_MIN, UNIT_SEC, UNIT_MS
+    abs_value: absolute time value
+    units_in: array of unsigned ints with UNIT_IDX_TIME_COUNT fields
+*/
+unsigned int time_split_units(int unit_idx, unsigned long abs_val, 
+                              unsigned int (*units_in)[UNIT_IDX_TIME_COUNT])
+{
+    unsigned int base_idx;
+    int hours;
+    int minutes;
+    int seconds;
+    int millisec;
+    switch (unit_idx & UNIT_IDX_MASK) /* format the values depending on base unit */
+    { /*Mask off upper bits*/
+
+
+            case UNIT_MS:
+                base_idx = UNIT_IDX_MS;
+                millisec = abs_val;
+                abs_val  = abs_val  /  1000U;
+                millisec = millisec - (1000U * abs_val);
+                hours    = abs_val  /  3600U;
+                abs_val  = abs_val  - (3600U * hours);
+                minutes  = abs_val /   60U;
+                seconds  = abs_val  - (60U * minutes);
+                break;
+            case UNIT_SEC:
+                base_idx = UNIT_IDX_SEC;
+                hours    = abs_val  /  3600U;
+                abs_val  = abs_val  - (3600U * hours);
+                minutes  = abs_val /   60U;
+                seconds  = abs_val  - (60U * minutes);
+                millisec = 0;
+                break;
+            case UNIT_MIN:
+                base_idx = UNIT_IDX_MIN;
+                hours    = abs_val /  60U;
+                abs_val  = abs_val - (60U * hours);
+                minutes  = abs_val;
+                seconds  = 0;
+                millisec = 0;
+                break;
+            case UNIT_HOUR:
+            default:
+                base_idx = UNIT_IDX_HR;
+                hours    = abs_val;
+                abs_val  = 0;
+                minutes  = 0;
+                seconds  = 0;
+                millisec = 0;
+                break;
+    }
+    (*units_in)[UNIT_IDX_HR]  = hours;
+    (*units_in)[UNIT_IDX_MIN] = minutes;
+    (*units_in)[UNIT_IDX_SEC] = seconds;
+    (*units_in)[UNIT_IDX_MS]  = millisec;
+    return base_idx;
+}
+
 /* format_time_auto - return an auto ranged time string,
 
    unit_idx: specifies lowest or base index of the value,
@@ -1092,33 +1163,30 @@ char* skip_whitespace(char* const str)
    Ex: in a string 12:34:56.78 if you pass the idx_pos UNIT_IDX_MIN then you
    will be given the offset(3) of 34 and a length of 2
 */
-const char *format_time_auto(char *buffer, int buf_len, const int value,
+const char *format_time_auto(char *buffer, int buf_len, const long value,
                                   int unit_idx, bool supress_unit,
                                   unsigned int (*idx_pos)[2])
 {
-    const unsigned int off_hr = 10;
-    const unsigned int off_7  = 7;
-    const unsigned int off_4  = 4;
-
-    unsigned int       base_idx;
-    unsigned int       max_idx;
-    unsigned int       offsets[IDX_TIME_COUNT];
-    unsigned int       fwidth[IDX_TIME_COUNT]   = {0,2,2,3}; /* hr is variable */
-    unsigned int       units_in[IDX_TIME_COUNT] = {0};
-    unsigned int       abs_val                  = abs(value);
-
-    bool               is_rtl                   = lang_is_rtl();
-
+    const unsigned int off_hr  = 10;
+    const unsigned int off_7   = 7;
+    const unsigned int off_4   = 4;
+    unsigned long      abs_val = abs(value);
+    bool               is_rtl  = lang_is_rtl();
     const char        *unit;
     char               timebuf[24];/* -2147483648:00:00.00\0 */
 
     int                len;
     int                left_offset;
+    unsigned int       base_idx;
+    unsigned int       max_idx;
+    unsigned int       offsets[UNIT_IDX_TIME_COUNT];
+    unsigned int       fwidth[UNIT_IDX_TIME_COUNT]   = {0,2,2,3}; /* hr is var len */
+    unsigned int       units_in[UNIT_IDX_TIME_COUNT] = {0};
 
     if (idx_pos != NULL)
     {
-        if ((*idx_pos)[0]> IDX_TIME_COUNT - 1)
-            (*idx_pos)[0] = IDX_TIME_COUNT - 1;
+        if ((*idx_pos)[0]> UNIT_IDX_TIME_COUNT - 1)
+            (*idx_pos)[0] = UNIT_IDX_TIME_COUNT - 1;
 
         if ((*idx_pos)[0] == UNIT_IDX_HR)
             (unit_idx |= UNIT_LOCK_HR);
@@ -1130,34 +1198,7 @@ const char *format_time_auto(char *buffer, int buf_len, const int value,
             (unit_idx |= UNIT_LOCK_SEC);
     }
 
-    switch (unit_idx & UNIT_IDX_MASK) /* format the values depending on base unit */
-    { /*Mask off upper bits*/
-            case UNIT_HOUR:
-                base_idx = UNIT_IDX_HR;
-                units_in[UNIT_IDX_HR] = abs_val;
-                break;
-            case UNIT_MIN:
-                base_idx = UNIT_IDX_MIN;
-                units_in[UNIT_IDX_HR]  = abs_val / (60);
-                units_in[UNIT_IDX_MIN] = abs_val % 60;
-                break;
-            case UNIT_SEC:
-                base_idx = UNIT_IDX_SEC;
-                units_in[UNIT_IDX_HR]   = abs_val / (3600);
-                units_in[UNIT_IDX_MIN]  = (abs_val / (60)) % 60;
-                units_in[UNIT_IDX_SEC]  = abs_val % 60;
-                break;
-            case UNIT_MS:
-                base_idx = UNIT_IDX_MS;
-                units_in[UNIT_IDX_HR]  = abs_val / (3600 * 1000);
-                units_in[UNIT_IDX_MIN] = (abs_val / (60 * 1000)) % 60;
-                units_in[UNIT_IDX_SEC] = (abs_val / (1000)) % 60;
-                units_in[UNIT_IDX_MS]  = (abs_val % 1000);
-                break;
-            default:
-                base_idx = UNIT_IDX_HR;
-                break;
-    }
+    base_idx = time_split_units(unit_idx, abs_val, &units_in);
 
     if (units_in[UNIT_IDX_HR] || (unit_idx & UNIT_LOCK_HR))
     {
@@ -1205,12 +1246,6 @@ const char *format_time_auto(char *buffer, int buf_len, const int value,
         /* place terminator to get rid of units less than minimum needed*/
         timebuf[offsets[base_idx] + fwidth[base_idx]] = '\0';
 
-        if ((unit_idx & (UNIT_SEC | UNIT_SHORT_MIN)) && supress_unit)
-        {   /* special to match original format_time behaviour */
-            if (value < 600)
-                {offsets[UNIT_IDX_MIN]++; }
-        }
-
         /* discard units greater than maximum needed */
         left_offset  = -(offsets[max_idx]);
         /* add negative sign if needed */
@@ -1240,16 +1275,6 @@ const char *format_time_auto(char *buffer, int buf_len, const int value,
         offsets[UNIT_IDX_MIN] = off_7;
         offsets[UNIT_IDX_SEC] = off_4;
         offsets[UNIT_IDX_MS]  = 0;
-
-        if ((unit_idx & (UNIT_SEC | UNIT_SHORT_MIN)) && supress_unit)
-        {
-            /* special to match original format_time behaviour */
-            if (value < 600)
-            {
-                timebuf[offsets[UNIT_IDX_MIN]] = timebuf[offsets[UNIT_IDX_MIN]+1];
-                timebuf[offsets[UNIT_IDX_MIN]+1] = '\0';
-            }
-        }
 
         /* we can use the default width (1) of hour to figure out
          * how long the HOUR field ended up being since it is variable length */
@@ -1300,25 +1325,15 @@ void format_time(char* buf, int buf_size, long t)
 
     if ( hours == 0 )
     {
-        if (lang_is_rtl())
-            snprintf(buf, buf_size, "%s%d:%02d", sign, minutes, seconds);
-        else
-            snprintf(buf, buf_size, "%02d:%d%s", seconds, minutes, sign);
+        snprintf(buf, buf_size, "%s%d:%02d", sign, minutes, seconds);
     }
     else
     {
-        if (lang_is_rtl())
-        {
-            snprintf(buf, buf_size, "%s%d:%02d:%02d", 
-                     sign, hours, minutes,seconds);
-        }
-        else
-        {
-            snprintf(buf, buf_size, "%02d:%02d:%d%s", 
-                     seconds, minutes, hours, sign);
-        }
+        snprintf(buf, buf_size, "%s%d:%02d:%02d", sign, hours, minutes,
+                 seconds);
     }
 }
+
 /**
  * Splits str at each occurence of split_char and puts the substrings into vector,
  * but at most vector_lenght items. Empty substrings are ignored.

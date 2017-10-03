@@ -47,7 +47,7 @@
 #include "plugin.h" /* plugin_get_buffer() */
 #include "debug.h"
 #include "panic.h"
-
+#include "misc.h" /* talk_time_intervals() */
 /* Memory layout varies between targets because the
    Archos (MASCODEC) devices cannot mix voice and audio playback
  
@@ -1392,6 +1392,46 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
     talk_id(unit_id, true); /* say the unit, if any */
 
     return 0;
+}
+
+/* Say time duration/interval. Input is time unit specifys base unit,
+   say hours,minutes,seconds, milliseconds. or any combination thereof */
+int talk_time_intervals(int time, int unit_idx, bool enqueue)
+{
+    unsigned int units_in[UNIT_IDX_TIME_COUNT] = {0};
+    unsigned int abs_val = abs(time);
+
+    if (!enqueue)
+        talk_shutup(); /* cut off all the pending stuff */
+
+   time_split_units(unit_idx, abs_val, &units_in);
+
+    if (time < 0)
+        talk_id(VOICE_MINUS, true);
+    if (abs_val == 0)
+    {
+        talk_value_decimal(0, unit_idx, 0, true);
+    }
+    else
+    {
+        if (units_in[UNIT_IDX_HR] != 0)
+        {
+            talk_value_decimal(units_in[UNIT_IDX_HR], UNIT_HOUR, 0, true);
+        }
+        if (units_in[UNIT_IDX_MIN] != 0)
+        {
+            talk_value_decimal(units_in[UNIT_IDX_MIN], UNIT_MIN, 0, true);
+        }
+        if (units_in[UNIT_IDX_SEC] != 0)
+        {
+            talk_value_decimal(units_in[UNIT_IDX_SEC], UNIT_SEC, 0, true);
+        }
+        if (units_in[UNIT_IDX_MS] != 0)
+        {
+            talk_value_decimal(units_in[UNIT_IDX_MS], UNIT_MS, 0, true);
+        }
+    }
+    return -1;
 }
 
 /* spell a string */

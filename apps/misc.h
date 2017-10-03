@@ -39,17 +39,30 @@ char *output_dyn_value(char *buf, int buf_size, int value,
 
 extern const unsigned char * const unit_strings_core[];
 /* format_time_auto */
-#define UNIT_IDX_HR    0x0U
-#define UNIT_IDX_MIN   0x1U
-#define UNIT_IDX_SEC   0x2U
-#define UNIT_IDX_MS    0x3U
-#define IDX_TIME_COUNT 0x4U
-#define UNIT_IDX_MASK  0x1FFU/*Return only Unit_IDX*/
-#define UNIT_LOCK_MASK 0x7E00/*Return only Unit_LOCK*/
-#define UNIT_LOCK_HR   0x200U /*Don't Auto Range below this field*/
-#define UNIT_LOCK_MIN  0x400U /*Don't Auto Range below this field*/
-#define UNIT_LOCK_SEC  0x800U /*Don't Auto Range below this field*/
-#define UNIT_SHORT_MIN 0x1000 /*legacy behaviour for minute field*/
+#define UNIT_IDX_HR         0x0U
+#define UNIT_IDX_MIN        0x1U
+#define UNIT_IDX_SEC        0x2U
+#define UNIT_IDX_MS         0x3U
+#define UNIT_IDX_TIME_COUNT 0x4U
+#define UNIT_IDX_MASK       0x1FFU/*Return only Unit_IDX*/
+#define UNIT_LOCK_MASK      0x7E00/*Return only Unit_LOCK*/
+#define UNIT_LOCK_HR        0x200U /*Don't Auto Range below this field*/
+#define UNIT_LOCK_MIN       0x400U /*Don't Auto Range below this field*/
+#define UNIT_LOCK_SEC       0x800U /*Don't Auto Range below this field*/
+
+/* convert ticks to MS and back*/
+#define MS_IN_TICK (1000UL/HZ)
+unsigned long ms_to_ticks(unsigned long ms);
+unsigned long ticks_to_ms(unsigned long ticks);
+
+/*  time_split_units()
+    split time values depending on base unit
+    unit_idx: UNIT_HOUR, UNIT_MIN, UNIT_SEC, UNIT_MS
+    abs_value: absolute time value
+    units_in: array of unsigned ints with IDX_TIME_COUNT fields
+*/
+unsigned int time_split_units(int unit_idx, unsigned long abs_val, 
+                        unsigned int (*units_in)[UNIT_IDX_TIME_COUNT]);
 
 /* format_time_auto - return an auto ranged time string,
 
@@ -76,7 +89,7 @@ extern const unsigned char * const unit_strings_core[];
    will be given the offset(3) of 34 and a length of 2
 */
 
-const char *format_time_auto(char *buffer, int buf_len, const int value,
+const char *format_time_auto(char *buffer, int buf_len, const long value,
                                   int unit_idx, bool supress_unit,
                                   unsigned int (*idx_pos)[2]);
 

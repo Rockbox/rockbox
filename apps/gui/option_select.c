@@ -52,6 +52,14 @@ int option_value_as_int(const struct settings_list *setting)
 /* these two vars are needed so arbitrary values can be added to the
    TABLE_SETTING settings if the F_ALLOW_ARBITRARY_VALS flag is set */
 static int table_setting_oldval = 0, table_setting_array_position = 0;
+
+/* return an auto ranged time string, unit_idx specifies
+    lowest or base index of the value flag F_TIME_SETTING calls this*/
+const char *option_get_timestring(char *buffer, int buf_len,int value, int unit_idx)
+{
+    return format_time_auto(buffer, buf_len, value, unit_idx, false,NULL);
+}
+
 const char *option_get_valuestring(const struct settings_list *setting, 
                                    char *buffer, int buf_len,
                                    intptr_t temp_var)
@@ -82,15 +90,21 @@ const char *option_get_valuestring(const struct settings_list *setting,
         {
             formatter = int_info->formatter;
             unit = unit_strings_core[int_info->unit];
+                if ((setting->flags & F_TIME_SETTING) == F_TIME_SETTING)
+                    str = option_get_timestring(buffer, buf_len,
+                                                (int)temp_var, int_info->unit);
         }
         else
         {
             formatter = tbl_info->formatter;
             unit = unit_strings_core[tbl_info->unit];
+                if ((setting->flags & F_TIME_SETTING) == F_TIME_SETTING)
+                    str = option_get_timestring(buffer, buf_len,
+                                                (int)temp_var, tbl_info->unit);
         }
         if (formatter)
             str = formatter(buffer, buf_len, (int)temp_var, unit);
-        else
+        else if ((setting->flags & F_TIME_SETTING) != F_TIME_SETTING)
             snprintf(buffer, buf_len, "%d %s", (int)temp_var, unit?unit:"");
     }
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
