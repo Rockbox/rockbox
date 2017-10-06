@@ -4,6 +4,17 @@ import os
 import re
 import subprocess
 import hashlib
+import sys
+
+# arguments
+if len(sys.argv) != 2:
+    print("Usage: %s output_directory" % sys.argv[0])
+    exit(1)
+output_directory = sys.argv[1]
+# check path is valid
+if not os.path.isdir(output_directory):
+    print("Error: '%s' is not a valid directory" % output_directory)
+    exit(1)
 
 # parse models.txt
 g_models = []
@@ -200,7 +211,7 @@ extern struct nwz_series_info_t nwz_series[NWZ_SERIES_COUNT];
 #endif /* __NWZ_DB_H__ */
 """
 
-with open("nwz-db.h", "w") as fp:
+with open(os.path.join(output_directory, "nwz-db.h"), "w") as fp:
     fp.write(header_begin)
     # generate list of all nvp nodes
     for name in sorted(g_nvp_names):
@@ -256,7 +267,7 @@ def by_name(nvp_entry):
 def codename_to_c(codename):
     return re.sub('[^a-zA-Z0-9]', '_', codename, 0)
 
-with open("nwz-db.c", "w") as fp:
+with open(os.path.join(output_directory, "nwz-db.c"), "w") as fp:
     fp.write(impl_begin)
     # generate model list (sort by mid)
     for model in sorted(g_models, key = by_mid):
