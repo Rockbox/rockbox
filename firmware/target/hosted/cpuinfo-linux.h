@@ -39,9 +39,12 @@ struct time_state {
 };
 
 int cpuusage_linux(struct cpuusage* u);
-int frequency_linux(int cpu, bool scaling);
+/* Return the frequency of a CPU. Note that whenever CPU frequency scaling is supported by the
+ * driver, this frequency may not be accurate and may vaguely reflect the cpu mode. Use
+ * current_scaling_frequency() to get the actual frequency if scaling is supported.
+ * Return -1 on error. */
+int frequency_linux(int cpu);
 
-#if defined(DX50) || defined(DX90)
 /*
     Get the current cpufreq scaling governor.
     cpu [in]: The number of the cpu to query.
@@ -60,7 +63,6 @@ bool current_scaling_governor(int cpu, char* governor, int governor_size);
 int min_scaling_frequency(int cpu);
 int current_scaling_frequency(int cpu);
 int max_scaling_frequency(int cpu);
-#endif
 
 int cpustatetimes_linux(int cpu, struct time_state* data, int max_elements);
 int cpucount_linux(void);
