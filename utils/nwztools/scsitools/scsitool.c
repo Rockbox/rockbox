@@ -308,13 +308,13 @@ int get_model_id(unsigned long *model_id)
     if(ret)
     {
         cprintf(RED, "Cannot get model ID from device: %d\n", ret);
-        cprintf(RED, "You device is most likely not compatible with this tool.\n");
+        cprintf(RED, "Your device is most likely not compatible with this tool.\n");
         return 2;
     }
     if(mid_buf_size != sizeof(mid_buf))
     {
         cprintf(RED, "Cannot get model ID from device: device didn't send the expected amount of data\n");
-        cprintf(RED, "You device is most likely not compatible with this tool.\n");
+        cprintf(RED, "Your device is most likely not compatible with this tool.\n");
         return 3;
     }
     *model_id = get_big_endian32(&mid_buf);
