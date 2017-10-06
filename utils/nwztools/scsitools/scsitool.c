@@ -41,6 +41,8 @@ const char *g_force_series = NULL;
 char *g_out_prefix = NULL;
 rb_scsi_device_t g_dev;
 
+void help_us(bool unsupported, unsigned long model_id);
+
 static void print_hex(void *_buffer, int buffer_size)
 {
     uint8_t *buffer = _buffer;
@@ -297,6 +299,28 @@ int get_dnk_prop(int argc, char **argv)
     return 0;
 }
 
+/* get the model DID: code stolen from get_dnk_prop */
+int get_model_id(unsigned long *model_id)
+{
+    uint8_t mid_buf[4];
+    int mid_buf_size = sizeof(mid_buf);
+    int ret = do_dnk_cmd(true, 0x23, 9, 0, mid_buf, &mid_buf_size);
+    if(ret)
+    {
+        cprintf(RED, "Cannot get model ID from device: %d\n", ret);
+        cprintf(RED, "You device is most likely not compatible with this tool.\n");
+        return 2;
+    }
+    if(mid_buf_size != sizeof(mid_buf))
+    {
+        cprintf(RED, "Cannot get model ID from device: device didn't send the expected amount of data\n");
+        cprintf(RED, "You device is most likely not compatible with this tool.\n");
+        return 3;
+    }
+    *model_id = get_big_endian32(&mid_buf);
+    return 0;
+}
+
 int get_model_and_series(int *model_index, int *series_index)
 {
     /* if the user forced the series, simply match by name, special for '?' which
@@ -322,28 +346,17 @@ int get_model_and_series(int *model_index, int *series_index)
     }
     else
     {
-        /* we need to get the model ID: code stolen from get_dnk_prop */
-        uint8_t mid_buf[4];
-        int mid_buf_size = sizeof(mid_buf);
-        int ret = do_dnk_cmd(true, 0x23, 9, 0, mid_buf, &mid_buf_size);
-        if(ret)
-        {
-            cprintf(RED, "Cannot get model ID from device: %d\n", ret);
-            return 2;
-        }
-        if(mid_buf_size != sizeof(mid_buf))
-        {
-            cprintf(RED, "Cannot get model ID from device: device didn't send the expected amount of data\n");
-            return 3;
-        }
-        unsigned long model_id = get_big_endian32(&mid_buf);
+        /* we need to get the model ID */
+        unsigned long model_id;
+        if(get_model_id(&model_id))
+            return 1;
         *model_index = -1;
         for(int i = 0; i < NWZ_MODEL_COUNT; i++)
             if(nwz_model[i].mid == model_id)
                 *model_index = i;
         if(*model_index == -1)
         {
-            cprintf(RED, "Your device is not supported. Please contact developers.\n");
+            help_us(true, model_id);
             return 3;
         }
         *series_index = -1;
@@ -353,7 +366,7 @@ int get_model_and_series(int *model_index, int *series_index)
                     *series_index = i;
         if(*series_index == -1)
         {
-            printf("Your device is not supported. Please contact developers.\n");
+            help_us(true, model_id);
             return 3;
         }
     }
@@ -812,6 +825,8 @@ int do_dest(int argc, char **argv)
     /* get model/series */
     int model_index, series_index;
     int ret = get_model_and_series(&model_index, &series_index);
+    if(ret)
+        return ret;
     int shp_index = NWZ_NVP_INVALID;
     if(nwz_series[series_index].nvp_index)
         shp_index = (*nwz_series[series_index].nvp_index)[NWZ_NVP_SHP];
@@ -843,9 +858,9 @@ int do_dest(int argc, char **argv)
         for(size_t i = 0; i < DEST_COUNT; i++)
             if(dst == g_dest_list[i].dest)
                 dst_name = g_dest_list[i].name;
-        printf("Destination: %s (%lx)\n", dst_name, dst);
+        cprintf_field("Destination: ", "%s (%lx)\n", dst_name, dst);
         unsigned long sps = get_little_endian32(shp + 4);
-        printf("Sound pressure: %lu (%s)\n", sps, sps == 0 ? "off" : "on");
+        cprintf_field("Sound pressure: ", "%lu (%s)\n", sps, sps == 0 ? "off" : "on");
         free(shp);
     }
     /* set */
@@ -905,6 +920,15 @@ int do_dest(int argc, char **argv)
     return 0;
 }
 
+int do_help_us(int argc, char **argv)
+{
+    unsigned long model_id;
+    if(get_model_id(&model_id))
+        return 1;
+    help_us(false, model_id);
+    return 0;
+}
+
 typedef int (*cmd_fn_t)(int argc, char **argv);
 
 struct cmd_t
@@ -925,6 +949,7 @@ struct cmd_t cmd_list[] =
     { "get_dhp", "Get destination headphones", get_dhp },
     { "do_fw_upgrade", "Do a firmware upgrade", do_fw_upgrade },
     { "dest_tool", "Get/Set destination and sound pressure regulation", do_dest },
+    { "help_us", "Provide useful information for developers to help us", do_help_us },
 };
 
 #define NR_CMDS (sizeof(cmd_list) / sizeof(cmd_list[0]))
@@ -951,6 +976,17 @@ static void usage(void)
     for(unsigned i = 0; i < NR_CMDS; i++)
         printf("  %s\t%s\n", cmd_list[i].name, cmd_list[i].desc);
     exit(1);
+}
+
+void help_us(bool unsupported, unsigned long model_id)
+{
+    if(unsupported)
+        cprintf(RED, "Your device is not supported yet.\n");
+    cprintf(RED, "Please contact developers and send them the information below.\n");
+    cprintf(RED, "See https://www.rockbox.org/wiki/SonyNWDestTool#ReportDevice\n");
+    cprintf(BLUE, "-------------------[ Paste information below ]-------------------\n");
+    cprintf_field("Model ID: ", "%#lx\n", model_id);
+    get_dev_info(0, NULL);
 }
 
 int main(int argc, char **argv)
