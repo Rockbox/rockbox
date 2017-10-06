@@ -35,11 +35,9 @@
 #include "cpuinfo-linux.h"
 #include "gcc_extensions.h"
 
-#if defined(DX50) || defined(DX90)
 #include <limits.h>
 #include <string.h>
 #include "debug.h"
-#endif
 
 #undef open /* want the *real* open here, not sim_open or the like */
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID) || defined(DX50) || defined(DX90)
@@ -50,6 +48,14 @@
 #define NUM_SAMPLES 64
 #define NUM_SAMPLES_MASK (NUM_SAMPLES-1)
 #define SAMPLE_RATE  4
+
+/* Some targets like the Sony NWZ have a broken cpu driver that reports frequencies in MHz instead
+ * of kHz */
+#if defined(SONY_NWZ_LINUX)
+#define FREQ_MULTIPLIER     1000
+#else
+#define FREQ_MULTIPLIER     1
+#endif
 
 struct cputime_sample {
     struct tms sample;
@@ -143,24 +149,21 @@ int cpucount_linux(void)
     return get_nprocs();
 }
 
-int frequency_linux(int cpu, bool scaling)
+int frequency_linux(int cpu)
 {
     char path[64];
     char temp[10];
     int cpu_dev, ret = -1;
-    snprintf(path, sizeof(path),
-        "/sys/devices/system/cpu/cpu%d/cpufreq/%s_cur_freq",
-        cpu, scaling ? "scaling" : "cpuinfo");
+    snprintf(path, sizeof(path), "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_cur_freq", cpu);
     cpu_dev = open(path, O_RDONLY);
     if (cpu_dev < 0)
         return -1;
     if (read(cpu_dev, temp, sizeof(temp)) >= 0)
-        ret = atoi(temp);
+        ret = atoi(temp) * FREQ_MULTIPLIER;
     close(cpu_dev);
     return ret;
 }
 
-#if defined(DX50) || defined(DX90)
 bool current_scaling_governor(int cpu, char* governor, int governor_size)
 {
     if((cpu < 0) || (governor == NULL) || (governor_size <= 0))
@@ -168,7 +171,7 @@ bool current_scaling_governor(int cpu, char* governor, int governor_size)
         return false;
     }
 
-    char path[PATH_MAX];
+    char path[64];
     snprintf(path,
              sizeof(path),
              "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_governor",
@@ -212,13 +215,13 @@ static int read_cpu_frequency(int cpu, enum cpu_frequency_options freqOpt)
         return -1;
     }
 
-    char path[PATH_MAX];
+    char path[64];
     switch(freqOpt)
     {
         case SCALING_MIN_FREQ:
         {
             snprintf(path,
-                     PATH_MAX,
+                     sizeof(path),
                      "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_min_freq",
                      cpu);
             break;
@@ -227,7 +230,7 @@ static int read_cpu_frequency(int cpu, enum cpu_frequency_options freqOpt)
         case SCALING_CUR_FREQ:
         {
             snprintf(path,
-                     PATH_MAX,
+                     sizeof(path),
                      "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq",
                      cpu);
             break;
@@ -236,7 +239,7 @@ static int read_cpu_frequency(int cpu, enum cpu_frequency_options freqOpt)
         case SCALING_MAX_FREQ:
         {
             snprintf(path,
-                     PATH_MAX,
+                     sizeof(path),
                      "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq",
                      cpu);
             break;
@@ -264,7 +267,7 @@ static int read_cpu_frequency(int cpu, enum cpu_frequency_options freqOpt)
     }
 
     fclose(f);
-    return(freq);
+    return freq * FREQ_MULTIPLIER;
 }
 
 
@@ -284,7 +287,6 @@ int max_scaling_frequency(int cpu)
 {
     return(read_cpu_frequency(cpu, SCALING_MAX_FREQ));
 }
-#endif
 
 int cpustatetimes_linux(int cpu, struct time_state* data, int max_elements)
 {

@@ -240,9 +240,13 @@ static const char* get_cpuinfo(int selected_item, void *data,
         {
             int cpu = (selected_item - 5) / (state_count + 1);
             int cpu_line = (selected_item - 5) % (state_count + 1);
-#if defined(DX50) || defined(DX90)
+
+            /* scaling info */
             int min_freq = min_scaling_frequency(cpu);
             int cur_freq = current_scaling_frequency(cpu);
+            /* fallback if scaling frequency is not available */
+            if(cur_freq <= 0)
+                cur_freq = frequency_linux(cpu);
             int max_freq = max_scaling_frequency(cpu);
             char governor[20];
             bool have_governor = current_scaling_governor(cpu, governor, sizeof(governor));
@@ -256,16 +260,6 @@ static const char* get_cpuinfo(int selected_item, void *data,
                         cur_freq > 0 ? cur_freq/1000 : -1,
                         max_freq > 0 ? max_freq/1000 : -1);
             }
-#else
-            int freq1 = frequency_linux(cpu, false);
-            int freq2 = frequency_linux(cpu, true);
-            if (cpu_line == 0)
-            {
-                sprintf(buffer, " CPU%d: Cur/Scal freq: %d/%d MHz", cpu,
-                                freq1 > 0 ? freq1/1000 : -1,
-                                freq2 > 0 ? freq2/1000 : -1);
-            }
-#endif
             else
             {
                 cpustatetimes_linux(cpu, states, ARRAYLEN(states));
