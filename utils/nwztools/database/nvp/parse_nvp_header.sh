@@ -38,7 +38,8 @@ fi
 if [ "`echo "$LIST" | grep "icx_nvp_emmc.h" | wc -l`" = "1" ]; then
     LIST=`echo "$LIST" | grep "icx_nvp_emmc.h"`
 else
-    LIST=`echo "$LIST" | grep 'icx[[:digit:]]*_nvp[[:alpha:]_]*.h'`
+# otherwise find any file named icx_nvp*.h but filter out icx_nvp_wrapper.h
+    LIST=`echo "$LIST" | grep 'icx[[:digit:]]*_nvp[[:alpha:]_]*.h' | sed '/icx_nvp_wrapper/d'`
 fi
 LIST_CNT=`echo "$LIST" | wc -l`
 if [ "$LIST_CNT" = "0" ]; then

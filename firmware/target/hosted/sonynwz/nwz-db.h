@@ -35,6 +35,7 @@ enum nwz_nvp_node_t
     NWZ_NVP_BPR, /* bluetooth address | bluetooth parameter */
     NWZ_NVP_BTC, /* battery calibration */
     NWZ_NVP_BTI, /* boot image */
+    NWZ_NVP_CLG, /*  */
     NWZ_NVP_CLV, /* color variation */
     NWZ_NVP_CNG, /* aad key | aad/empr key */
     NWZ_NVP_CTR, /*  */
@@ -119,6 +120,7 @@ enum nwz_nvp_node_t
     NWZ_NVP_PRK, /*  */
     NWZ_NVP_PSK, /* bluetooth pskey */
     NWZ_NVP_PTS, /* wifi protected setup */
+    NWZ_NVP_PWD, /*  */
     NWZ_NVP_RBT, /*  */
     NWZ_NVP_RND, /* random data | wmt key */
     NWZ_NVP_RTC, /* rtc alarm */
@@ -152,7 +154,7 @@ enum nwz_nvp_node_t
 /* Number of models */
 #define NWZ_MODEL_COUNT     186
 /* Number of series */
-#define NWZ_SERIES_COUNT    36
+#define NWZ_SERIES_COUNT    38
 
 /* NVP node info */
 struct nwz_nvp_info_t
