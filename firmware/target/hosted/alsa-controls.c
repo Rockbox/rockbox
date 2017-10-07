@@ -108,8 +108,8 @@ int alsa_controls_find_enum(const char *name, const char *enum_name)
     return -1;
 }
 
-/* set a control, potentially supports several values */
-void alsa_controls_set(const char *name, snd_ctl_elem_type_t type,
+/* set/get a control, potentially supports several values */
+void alsa_controls_get_set(bool get, const char *name, snd_ctl_elem_type_t type,
     unsigned nr_values, long *val)
 {
     snd_ctl_elem_id_t *id;
@@ -132,21 +132,54 @@ void alsa_controls_set(const char *name, snd_ctl_elem_type_t type,
     if(snd_ctl_elem_info_get_count(info) != nr_values)
         panicf("Control '%s' has wrong count (got %u, expected %u)",
             name, snd_ctl_elem_info_get_count(info), nr_values);
-    /* set value */
     snd_ctl_elem_value_set_id(value, id);
-    for(unsigned i = 0; i < nr_values; i++)
+    /* set value */
+    if(get)
     {
-        /* ALSA is braindead: there are "typed" setters but they all take long anyway */
-        if(type == SND_CTL_ELEM_TYPE_BOOLEAN)
-            snd_ctl_elem_value_set_boolean(value, i, val[i]);
-        else if(type == SND_CTL_ELEM_TYPE_INTEGER)
-            snd_ctl_elem_value_set_integer(value, i, val[i]);
-        else if(type == SND_CTL_ELEM_TYPE_ENUMERATED)
-            snd_ctl_elem_value_set_enumerated(value, i, val[i]);
+        /* read value */
+        if(snd_ctl_elem_read(alsa_ctl, value) < 0)
+            panicf("Cannot read control '%s'", name);
+        for(unsigned i = 0; i < nr_values; i++)
+        {
+            /* ALSA is braindead: there are "typed" setters but they all take long anyway */
+            if(type == SND_CTL_ELEM_TYPE_BOOLEAN)
+                val[i] = snd_ctl_elem_value_get_boolean(value, i);
+            else if(type == SND_CTL_ELEM_TYPE_INTEGER)
+                val[i] = snd_ctl_elem_value_get_integer(value, i);
+            else if(type == SND_CTL_ELEM_TYPE_ENUMERATED)
+                val[i] = snd_ctl_elem_value_get_enumerated(value, i);
+        }
     }
-    /* write value */
-    if(snd_ctl_elem_write(alsa_ctl, value) < 0)
-        panicf("Cannot write control '%s'", name);
+    else
+    {
+        for(unsigned i = 0; i < nr_values; i++)
+        {
+            /* ALSA is braindead: there are "typed" setters but they all take long anyway */
+            if(type == SND_CTL_ELEM_TYPE_BOOLEAN)
+                snd_ctl_elem_value_set_boolean(value, i, val[i]);
+            else if(type == SND_CTL_ELEM_TYPE_INTEGER)
+                snd_ctl_elem_value_set_integer(value, i, val[i]);
+            else if(type == SND_CTL_ELEM_TYPE_ENUMERATED)
+                snd_ctl_elem_value_set_enumerated(value, i, val[i]);
+        }
+        /* write value */
+        if(snd_ctl_elem_write(alsa_ctl, value) < 0)
+            panicf("Cannot write control '%s'", name);
+    }
+}
+
+/* set a control, potentially supports several values */
+void alsa_controls_set(const char *name, snd_ctl_elem_type_t type,
+    unsigned nr_values, long *val)
+{
+    return alsa_controls_get_set(false, name, type, nr_values, val);
+}
+
+/* get a control, potentially supports several values */
+void alsa_controls_get(const char *name, snd_ctl_elem_type_t type,
+    unsigned nr_values, long *val)
+{
+    return alsa_controls_get_set(true, name, type, nr_values, val);
 }
 
 /* get control information */
@@ -187,4 +220,12 @@ void alsa_controls_set_enum(const char *name, const char *enum_name)
 void alsa_controls_set_ints(const char *name, int count, long *val)
 {
     return alsa_controls_set(name, SND_CTL_ELEM_TYPE_INTEGER, count, val);
+}
+
+/* helper function: get a control with a single boolean value */
+bool alsa_controls_get_bool(const char *name)
+{
+    long lval = 0;
+    alsa_controls_get(name, SND_CTL_ELEM_TYPE_BOOLEAN, 1, &lval);
+    return lval != 0;
 }
