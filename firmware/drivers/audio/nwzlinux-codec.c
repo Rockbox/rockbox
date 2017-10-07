@@ -277,6 +277,29 @@ static void hw_close(void)
     close(fd_hw);
 }
 
+/* Acoustic and Cue/Rev control how the volume curve, but it is not clear
+ * what the intention of these modes are and the OF does not seem to use
+ * them by default */
+bool audiohw_acoustic_enabled(void)
+{
+    return alsa_controls_get_bool("CODEC Acoustic Switch");
+}
+
+void audiohw_enable_acoustic(bool en)
+{
+    alsa_controls_set_bool("CODEC Acoustic Switch", en);
+}
+
+bool audiohw_cuerev_enabled(void)
+{
+    return alsa_controls_get_bool("CODEC Cue/Rev Switch");
+}
+
+void audiohw_enable_cuerev(bool en)
+{
+    alsa_controls_set_bool("CODEC Cue/Rev Switch", en);
+}
+
 void audiohw_preinit(void)
 {
     alsa_controls_init();
@@ -287,8 +310,8 @@ void audiohw_preinit(void)
     /* Acoustic and Cue/Rev control how the volume curve, but it is not clear
      * what the intention of these modes are and the OF does not seem to use
      * them by default */
-    alsa_controls_set_bool("CODEC Acoustic Switch", false);
-    alsa_controls_set_bool("CODEC Cue/Rev Switch", false);
+    audiohw_enable_acoustic(false);
+    audiohw_enable_cuerev(false);
     /* not sure exactly what it means */
     alsa_controls_set_enum("Playback Src Switch", "Music");
     /* use headphone output */

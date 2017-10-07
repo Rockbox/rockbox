@@ -36,6 +36,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include "nwzlinux_codec.h"
 
 /* NOTE: some targets with touchscreen don't have the usual keypad, on those
  * we use a mixture of rewind/forward/volume+/- to emulate it */
@@ -44,6 +45,8 @@
 #define ACT_OK      2
 #define ACT_PREV    3
 #define ACT_NEXT    4
+#define ACT_DEC     5
+#define ACT_INC     6
 #define ACT_REPEAT  0x1000
 
 int xlate_button(int btn)
@@ -58,13 +61,21 @@ int xlate_button(int btn)
         case BUTTON_PLAY:
             return ACT_OK;
         case BUTTON_UP:
-        case BUTTON_LEFT:
-        case BUTTON_VOL_UP:
+#ifdef BUTTON_FF
+        case BUTTON_FF:
+#endif
             return ACT_PREV;
-        case BUTTON_DOWN:
         case BUTTON_RIGHT:
-        case BUTTON_VOL_DOWN:
+        case BUTTON_VOL_UP:
+            return ACT_INC;
+        case BUTTON_DOWN:
+#ifdef BUTTON_FF
+        case BUTTON_REW:
+#endif
             return ACT_NEXT;
+        case BUTTON_LEFT:
+        case BUTTON_VOL_DOWN:
+            return ACT_DEC;
         default:
             return ACT_NONE;
     }
@@ -96,8 +107,6 @@ bool dbg_hw_info_adc(void)
         int button = my_get_action(HZ / 25);
         switch(button)
         {
-            case ACT_NEXT:
-            case ACT_PREV:
             case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
@@ -166,8 +175,6 @@ bool dbg_hw_info_power(void)
         int button = my_get_action(HZ / 25);
         switch(button)
         {
-            case ACT_NEXT:
-            case ACT_PREV:
             case ACT_OK:
                 lcd_setfont(FONT_UI);
                 return true;
@@ -335,6 +342,7 @@ bool dbg_hw_info_audio(void)
 {
     lcd_setfont(FONT_SYSFIXED);
     int vol = 0;
+    enum { VOL, ACOUSTIC, CUEREV, NR_SETTINGS } setting = VOL;
 
     while(1)
     {
@@ -342,12 +350,10 @@ bool dbg_hw_info_audio(void)
         switch(btn)
         {
             case ACT_PREV:
-                vol--;
-                pcm_alsa_set_digital_volume(vol);
+                setting = (setting + NR_SETTINGS - 1) % NR_SETTINGS;
                 break;
             case ACT_NEXT:
-                vol++;
-                pcm_alsa_set_digital_volume(vol);
+                setting = (setting + 1) % NR_SETTINGS;
                 break;
             case ACT_OK:
                 lcd_setfont(FONT_UI);
@@ -356,11 +362,38 @@ bool dbg_hw_info_audio(void)
                 lcd_setfont(FONT_UI);
                 return false;
         }
+        if(btn == ACT_INC || btn == ACT_DEC)
+        {
+            bool inc = (btn == ACT_INC);
+            switch(setting)
+            {
+                case VOL:
+                    vol += inc ? 1 : -1;
+                    pcm_alsa_set_digital_volume(vol);
+                    break;
+                case ACOUSTIC:
+                    audiohw_enable_acoustic(!audiohw_acoustic_enabled());
+                    break;
+                case CUEREV:
+                    audiohw_enable_cuerev(!audiohw_cuerev_enabled());
+                    break;
+                default:
+                    break;
+            }
+        }
 
         lcd_clear_display();
         int line = 0;
+#define SEL_COL(item) lcd_set_foreground(item == setting ? LCD_RGBPACK(255, 0, 0) : LCD_WHITE);
 
+        SEL_COL(VOL)
         lcd_putsf(0, line++, "vol: %d dB", vol);
+        SEL_COL(ACOUSTIC)
+        lcd_putsf(0, line++, "acoustic: %s", audiohw_acoustic_enabled() ? "on" : "off");
+        SEL_COL(CUEREV)
+        lcd_putsf(0, line++, "cue/rev: %s", audiohw_cuerev_enabled() ? "on" : "off");
+        lcd_set_foreground(LCD_WHITE);
+#undef SEL_COL
 
         lcd_update();
         yield();
