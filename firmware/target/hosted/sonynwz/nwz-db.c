@@ -210,6 +210,7 @@ struct nwz_model_info_t nwz_model[NWZ_MODEL_COUNT] =
     { 0x22000004, "NW-A35" },
     { 0x22000005, "NW-A36" },
     { 0x22000006, "NW-A37" },
+    { 0x23000006, "NW-ZX300" },
 };
 
 static int nvp_index_0ac81d[NWZ_NVP_COUNT] =
