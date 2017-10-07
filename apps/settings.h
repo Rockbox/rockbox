@@ -309,6 +309,11 @@ struct user_settings
     bool superbass;     /* true/false */
 #endif
 
+#ifdef HAVE_NWZ_LINUX_CODEC
+    bool nwz_acoustic; /* Sony's "Acoustic" mode */
+    bool nwz_cuerev; /* Sony's "Cue/Rev" mode */
+#endif
+
 #ifdef AUDIOHW_HAVE_BASS_CUTOFF
     int bass_cutoff;
 #endif

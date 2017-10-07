@@ -228,6 +228,11 @@ static int timestretch_callback(int action,const struct menu_item_ex *this_item)
     MENUITEM_SETTING(speaker_mode, &global_settings.speaker_mode, NULL);
 #endif
 
+#ifdef HAVE_NWZ_LINUX_CODEC
+    MENUITEM_SETTING(nwz_acoustic, &global_settings.nwz_acoustic, NULL);
+    MENUITEM_SETTING(nwz_cuerev, &global_settings.nwz_cuerev, NULL);
+#endif
+
 #ifdef AUDIOHW_HAVE_EQ
 #endif /* AUDIOHW_HAVE_EQ */
 
@@ -270,6 +275,9 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #endif
 #ifdef HAVE_SPEAKER
          ,&speaker_mode
+#endif
+#ifdef HAVE_NWZ_LINUX_CODEC
+         ,&nwz_acoustic,&nwz_cuerev
 #endif
          );
 

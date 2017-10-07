@@ -930,6 +930,11 @@ void settings_apply(bool read_disk)
     audio_enable_speaker(global_settings.speaker_mode);
 #endif
 
+#ifdef HAVE_NWZ_LINUX_CODEC
+    audiohw_enable_acoustic(global_settings.nwz_acoustic);
+    audiohw_enable_cuerev(global_settings.nwz_cuerev);
+#endif
+
     if (read_disk)
     {
         char buf[MAX_PATH];

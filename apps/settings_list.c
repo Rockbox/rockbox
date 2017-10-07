@@ -2246,6 +2246,10 @@ const struct settings_list settings[] = {
                    ID2P(LANG_IBASSO_USB_MODE_CHARGE),
                    ID2P(LANG_IBASSO_USB_MODE_ADB)),
 #endif
+#ifdef HAVE_NWZ_LINUX_CODEC
+    OFFON_SETTING(0, nwz_acoustic, LANG_NWZ_ACOUSTIC, false, "Acoustic mode", audiohw_enable_acoustic),
+    OFFON_SETTING(0, nwz_cuerev, LANG_NWZ_CUEREV, false, "Cue/Rev mode", audiohw_enable_cuerev),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

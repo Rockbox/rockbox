@@ -13647,3 +13647,31 @@
     *: "Disable Touch"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_NWZ_ACOUSTIC
+  desc: Enable Sony's "acoustic" mode
+  user: core
+  <source>
+    *: "Sony Acoustic mode"
+  </source>
+  <dest>
+    *: "Sony Acoustic mode"
+  </dest>
+  <voice>
+    *: "Sony Acoustic mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NWZ_CUEREV
+  desc: Enable Sony's "cuerev" mode
+  user: core
+  <source>
+    *: "Sony Cue/Rev mode"
+  </source>
+  <dest>
+    *: "Sony Cue/Rev mode"
+  </dest>
+  <voice>
+    *: "Sony Cue/Rev mode"
+  </voice>
+</phrase>
