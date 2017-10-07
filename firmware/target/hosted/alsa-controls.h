@@ -31,6 +31,9 @@ void alsa_controls_init(void);
 /* close alsa controls */
 void alsa_controls_close(void);
 
+/* NOTE: all the following functions panic on error. This behaviour could be changed with the
+ * functions returning proper values but that would make errors happen silently */
+
 /* find a control element ID by name, return false of not found, the id needs
  * to be allocated */
 bool alsa_controls_find(snd_ctl_elem_id_t *id, const char *name);
@@ -49,5 +52,10 @@ void alsa_controls_set_bool(const char *name, bool val);
 void alsa_controls_set_enum(const char *name, const char *enum_name);
 /* helper function: set a control with one or more integers */
 void alsa_controls_set_ints(const char *name, int count, long *val);
+/* get a control value, potentially supports several values */
+void alsa_controls_get(const char *name, snd_ctl_elem_type_t type,
+    unsigned nr_values, long *val);
+/* helper function: set a control with a single boolean value */
+bool alsa_controls_get_bool(const char *name);
 
 #endif /* __ALSA_CONTROLS_RB_H__ */
