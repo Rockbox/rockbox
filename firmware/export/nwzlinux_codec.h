@@ -26,4 +26,11 @@
 /* Ranges from -100dB to 4dB */
 AUDIOHW_SETTING(VOLUME,       "dB", 0,  1, -100,  4, -10)
 
+/* enable/disable Sony's "acoustic" mode */
+bool audiohw_acoustic_enabled(void);
+void audiohw_enable_acoustic(bool en);
+/* enable/disable Sony's "cuerev" mode */
+bool audiohw_cuerev_enabled(void);
+void audiohw_enable_cuerev(bool en);
+
 #endif /* __NWZLINUX_CODEC_H__ */
