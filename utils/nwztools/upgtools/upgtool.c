@@ -435,7 +435,7 @@ int main(int argc, char **argv)
             cprintf(GREEN, "  %s:", g_model_list[i].model);
 
             cprintf(RED, " kas=");
-            cprintf(YELLOW, "%."STR(NWZ_KAS_SIZE)"s", g_model_list[i].kas);
+            cprintf(YELLOW, "%s", g_model_list[i].kas);
             if(g_model_list[i].confirmed)
                 cprintf(RED, " confirmed");
             else
