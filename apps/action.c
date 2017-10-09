@@ -110,6 +110,10 @@ static inline int do_button_check(const struct button_mapping *items,int button,
                 || (items[i].pre_button_code == last_button))
             {
                 ret = items[i].action_code;
+#if defined(EXPOSE_OF_RECOVERY)
+                ret = ACTION_STD_CANCEL; /* DONT ALLOW BUTTONS */
+#endif               
+
                 break;
             }
         }

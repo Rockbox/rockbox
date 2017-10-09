@@ -783,6 +783,15 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
     /* skip SanDisk OF */
     if (drive == INTERNAL_AS3525)
         start += AMS_OF_SIZE;
+#if defined(EXPOSE_OF_RECOVERY)
+    if (drive == INTERNAL_AS3525)
+    {    
+        if (usb_detect() == USB_INSERTED)
+        {
+            start -= (AMS_OF_SIZE);
+        }
+    }
+#endif 
 
     while (!card_info[drive].initialized)
     {

@@ -1,7 +1,7 @@
 /*
  * This config file is for the Sandisk Sansa Clip Zip
  */
-
+#define EXPOSE_OF_RECOVERY
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 79
 #define MODEL_NAME   "Sandisk Sansa Zip"
