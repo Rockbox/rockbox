@@ -41,6 +41,15 @@
 #define RAMDISK_SIZE 2048
 #endif
 
+#ifdef EXPOSE_OF_RECOVERY
+#include "splash.h"
+#include <stdio.h>
+char recoverymsg[MAX_PATH]="NO ERRORS"; 
+#define USBRECOVERY_ERR snprintf
+#else
+#define USBRECOVERY_ERR(...) do { } while(0)
+#endif
+
 /* These defaults allow the operation */
 #ifndef USBSTOR_READ_SECTORS_FILTER
 #define USBSTOR_READ_SECTORS_FILTER() ({ 0; })
@@ -429,6 +438,11 @@ int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_size)
 static int usb_handle;
 void usb_storage_init_connection(void)
 {
+
+#ifdef EXPOSE_OF_RECOVERY
+    splashf(HZ/100, "USB: WARNING RECOVERY MODE!");
+#endif
+
     logf("ums: set config");
     /* prime rx endpoint. We only need room for commands */
     state = WAITING_FOR_COMMAND;
@@ -481,6 +495,11 @@ void usb_storage_init_connection(void)
 
 void usb_storage_disconnect(void)
 {
+
+#ifdef EXPOSE_OF_RECOVERY
+    splashf(HZ*15, "USB: %s", recoverymsg);
+#endif
+
     if (usb_handle > 0)
         usb_handle = core_free(usb_handle);
 }
@@ -505,6 +524,8 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                 if((unsigned int)length!=(SECTOR_SIZE* cur_cmd.count)
                   && (unsigned int)length!=WRITE_BUFFER_SIZE) {
                     logf("unexpected length :%d",length);
+                    USBRECOVERY_ERR(recoverymsg, sizeof(recoverymsg), 
+                                      "unexpected length :%d",length);
                     break;
                 }
 
@@ -537,6 +558,12 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                 }
 
                 if(result != 0) {
+
+                    USBRECOVERY_ERR(recoverymsg, sizeof(recoverymsg), 
+                                         "ERROR Write %d, sector: %u, ct: %u", 
+                                         cur_cmd.last_result, cur_cmd.sector, 
+                                                              cur_cmd.count);
+
                     send_csw(UMS_STATUS_FAIL);
                     cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
                     cur_sense_data.asc=ASC_WRITE_ERROR;
@@ -556,6 +583,10 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             }
             else {
                 logf("Transfer failed %X",status);
+
+                USBRECOVERY_ERR(recoverymsg, sizeof(recoverymsg), 
+                                      "Transfer failed %X",status);
+
                 send_csw(UMS_STATUS_FAIL);
                 /* TODO fill in cur_sense_data */
                 cur_sense_data.sense_key=0;
@@ -609,6 +640,10 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             }
             else {
                 logf("Transfer failed %X",status);
+
+                USBRECOVERY_ERR(recoverymsg, sizeof(recoverymsg), 
+                                      "Transfer failed %X",status);
+
                 send_csw(UMS_STATUS_FAIL);
                 /* TODO fill in cur_sense_data */
                 cur_sense_data.sense_key=0;
@@ -631,6 +666,12 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                 if(cur_cmd.count==0) {
                     //logf("data sent, now send csw");
                     if(cur_cmd.last_result!=0) {
+
+                        USBRECOVERY_ERR(recoverymsg, sizeof(recoverymsg), 
+                                             "ERROR Read %d, sector: %u, ct: %u", 
+                                             cur_cmd.last_result, cur_cmd.sector, 
+                                                                  cur_cmd.count);
+
                         /* The last read failed. */
                         send_csw(UMS_STATUS_FAIL);
                         cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
@@ -647,6 +688,10 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             }
             else {
                 logf("Transfer failed %X",status);
+
+                USBRECOVERY_ERR(recoverymsg, sizeof(recoverymsg), 
+                                      "Transfer failed %X",status);
+
                 send_csw(UMS_STATUS_FAIL);
                 /* TODO fill in cur_sense_data */
                 cur_sense_data.sense_key=0;
