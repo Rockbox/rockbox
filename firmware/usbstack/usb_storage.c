@@ -41,6 +41,13 @@
 #define RAMDISK_SIZE 2048
 #endif
 
+#ifdef EXPOSE_OF_RECOVERY
+#include "splash.h"
+#define USBRECOVERY_MSG splashf
+#else
+#define USBRECOVERY_MSG(...) do { } while(0)
+#endif
+
 /* These defaults allow the operation */
 #ifndef USBSTOR_READ_SECTORS_FILTER
 #define USBSTOR_READ_SECTORS_FILTER() ({ 0; })
@@ -505,6 +512,7 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                 if((unsigned int)length!=(SECTOR_SIZE* cur_cmd.count)
                   && (unsigned int)length!=WRITE_BUFFER_SIZE) {
                     logf("unexpected length :%d",length);
+                    USBRECOVERY_MSG(HZ/100, "unexpected length :%d",length);
                     break;
                 }
 
@@ -537,6 +545,11 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                 }
 
                 if(result != 0) {
+
+                    USBRECOVERY_MSG(HZ/100, "ERROR Write %d, sector: %u, ct: %u", 
+                                         cur_cmd.last_result, cur_cmd.sector, 
+                                                              cur_cmd.count);
+
                     send_csw(UMS_STATUS_FAIL);
                     cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
                     cur_sense_data.asc=ASC_WRITE_ERROR;
@@ -556,6 +569,9 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             }
             else {
                 logf("Transfer failed %X",status);
+
+                USBRECOVERY_MSG(HZ/100, "Transfer failed %X",status);
+
                 send_csw(UMS_STATUS_FAIL);
                 /* TODO fill in cur_sense_data */
                 cur_sense_data.sense_key=0;
@@ -609,6 +625,9 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             }
             else {
                 logf("Transfer failed %X",status);
+
+                USBRECOVERY_MSG(HZ/100, "Transfer failed %X",status);
+
                 send_csw(UMS_STATUS_FAIL);
                 /* TODO fill in cur_sense_data */
                 cur_sense_data.sense_key=0;
@@ -631,6 +650,11 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
                 if(cur_cmd.count==0) {
                     //logf("data sent, now send csw");
                     if(cur_cmd.last_result!=0) {
+
+                        USBRECOVERY_MSG(HZ/100, "ERROR Read %d, sector: %u, ct: %u", 
+                                             cur_cmd.last_result, cur_cmd.sector, 
+                                                                  cur_cmd.count);
+
                         /* The last read failed. */
                         send_csw(UMS_STATUS_FAIL);
                         cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
@@ -647,6 +671,9 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             }
             else {
                 logf("Transfer failed %X",status);
+
+                USBRECOVERY_MSG(HZ/100, "Transfer failed %X",status);
+
                 send_csw(UMS_STATUS_FAIL);
                 /* TODO fill in cur_sense_data */
                 cur_sense_data.sense_key=0;
