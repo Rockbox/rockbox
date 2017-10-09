@@ -349,8 +349,19 @@ void kernel_device_init(void)
     ascodec_write_pmu(0x18, 1, 0x35);
     /* AVDD17:    set AVDD17 power supply to 2.5V */
     ascodec_write_pmu(0x18, 7, 0x31);
+
+#ifdef EXPOSE_OF_RECOVERY
+    /* CVDD2:     set CVDD2 power supply (digital for DAC/SD/etc) to 3.30V */
+    ascodec_write_pmu(0x17, 2, 0x80 | 126);//0xE == .7v
+/* According to datasheet VSEL goes from 0x1 to 0xF in 50mv steps
+ * Not Sure why we are using 8 bits here but followed the same convention
+ * Just In Case there is something not apparent.
+ * VSEL = [0x71-07F] VDD = 2.6v + (VSEL - 0x70) X .05 
+ */
+#else
     /* CVDD2:     set CVDD2 power supply (digital for DAC/SD/etc) to 2.75V */
-    ascodec_write_pmu(0x17, 2, 0x80 | 115);
+    ascodec_write_pmu(0x17, 2, 0x80 | 115);//0x3 == .15v
+#endif
 #else /* HAVE_AS3543 */
     ascodec_write(AS3514_CVDD_DCDC3, AS314_CP_DCDC3_SETTING);
 #endif /* HAVE_AS3543 */
