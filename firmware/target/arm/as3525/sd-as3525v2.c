@@ -54,7 +54,7 @@
 #define     SD_SLOT_AS3525   1   /* SD slot if present */
 
 /* Clipv2 Clip+ and Fuzev2 OF all occupy the same size */
-#define AMS_OF_SIZE 0xf000
+#define AMS_OF_SIZE 0xf000 //UNBOUNDED SD SECTORS DANGEROUS!!//0xf000
 
 /* command flags */
 #define MCI_NO_RESP     (0<<0)
@@ -342,6 +342,8 @@ static struct semaphore transfer_completion_signal;
 static struct semaphore command_completion_signal;
 static volatile bool retry;
 static volatile int cmd_error;
+
+static bool usb_connected = false;
 
 #if defined(HAVE_MULTIDRIVE)
 #define EXT_SD_BITS (1<<2)
@@ -637,10 +639,11 @@ static void sd_thread(void)
             break;
 
         case SYS_USB_CONNECTED:
+            usb_connected = true;
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
             /* Wait until the USB cable is extracted again */
             usb_wait_for_disconnect(&sd_queue);
-
+            usb_connected = false;
             break;
         }
     }
@@ -783,7 +786,15 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
     /* skip SanDisk OF */
     if (drive == INTERNAL_AS3525)
         start += AMS_OF_SIZE;
-
+    if (drive == INTERNAL_AS3525)
+    {    
+#if defined(EXPOSE_OF_RECOVERY)       
+        if (usb_connected == true)
+        {
+            start -= (AMS_OF_SIZE);
+        }
+#endif        
+    }    
     while (!card_info[drive].initialized)
     {
 retry_with_reinit:
