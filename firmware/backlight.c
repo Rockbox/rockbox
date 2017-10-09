@@ -479,6 +479,7 @@ static void backlight_setup_fade_down(void)
 
 static inline void do_backlight_off(void)
 {
+#if !defined(EXPOSE_OF_RECOVERY)
     backlight_timer = 0;
 #if BACKLIGHT_FADE_IN_THREAD
     backlight_setup_fade_down();
@@ -490,6 +491,9 @@ static inline void do_backlight_off(void)
     backlight_lcd_sleep_countdown(true);
 #endif
 #endif
+#else
+    return; //No BL off in RECOVERY
+#endif /* !EXPOSE_OF_RECOVERY */
 }
 
 /* Update state of backlight according to timeout setting */
