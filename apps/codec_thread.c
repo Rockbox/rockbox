@@ -473,6 +473,8 @@ static void load_codec(const struct codec_load_info *ev_data)
             status = codec_load_file(codec_fn, &ci);
     }
 
+    cancel_cpu_boost();
+
     /* Types must agree */
     if (status >= 0 && encoder == !!codec_get_enc_callback())
     {
@@ -500,6 +502,7 @@ static void run_codec(void)
     codec_queue_ack(Q_CODEC_RUN);
 
     trigger_cpu_boost();
+
     dsp_configure(ci.dsp, DSP_SET_OUT_FREQUENCY, pcmbuf_get_frequency());
 
     if (!encoder)
@@ -527,6 +530,8 @@ static void run_codec(void)
            status */
         audio_codec_complete(status);
     }
+
+    cancel_cpu_boost();
 }
 
 /* Handle Q_CODEC_SEEK */
@@ -539,7 +544,7 @@ static void seek_codec(unsigned long time)
         codec_seek_complete_callback();
         return;
     }
-
+    
     /* Post it up one level */
     queue_post(&codec_queue, Q_CODEC_SEEK, time);
     codec_queue_ack(Q_CODEC_SEEK);
@@ -576,7 +581,6 @@ static void NORETURN_ATTR codec_thread(void)
 
     while (1)
     {
-        cancel_cpu_boost();
 
         queue_wait(&codec_queue, &ev);
 
@@ -599,6 +603,7 @@ static void NORETURN_ATTR codec_thread(void)
         case Q_CODEC_SEEK:
             LOGFQUEUE("codec < Q_CODEC_SEEK: %lu", (unsigned long)ev.data);
             seek_codec(ev.data);
+            cancel_cpu_boost();
             break;
 
         case Q_CODEC_UNLOAD:
