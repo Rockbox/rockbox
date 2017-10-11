@@ -1603,8 +1603,8 @@ static void NORETURN_ATTR buffering_thread(void)
     while (true)
     {
         if (num_handles > 0) {
-            if (!filling) {
-                cancel_cpu_boost();
+            if (filling) {
+                trigger_cpu_boost();
             }
             queue_wait_w_tmo(&buffering_queue, &ev, filling ? 1 : HZ/2);
         } else {
@@ -1702,6 +1702,7 @@ static void NORETURN_ATTR buffering_thread(void)
                     filling = fill_buffer();
                 }
             }
+            cancel_cpu_boost();
         }
     }
 }
