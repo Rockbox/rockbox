@@ -1603,7 +1603,11 @@ static void NORETURN_ATTR buffering_thread(void)
     while (true)
     {
         if (num_handles > 0) {
-            if (!filling) {
+            logf("tick: %ld, buffering_thread fill: %d, count: %d", current_tick,
+                                         (int) filling, data_counters.remaining);
+            if (filling) {
+                trigger_cpu_boost();
+            } else if (ev.id == SYS_TIMEOUT) {
                 cancel_cpu_boost();
             }
             queue_wait_w_tmo(&buffering_queue, &ev, filling ? 1 : HZ/2);
