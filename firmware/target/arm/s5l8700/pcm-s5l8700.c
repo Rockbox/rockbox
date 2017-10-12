@@ -26,7 +26,6 @@
 #include "s5l8700.h"
 #include "panic.h"
 #include "audiohw.h"
-#include "pcm.h"
 #include "pcm-internal.h"
 #include "pcm_sampr.h"
 #include "dma-target.h"
@@ -35,12 +34,10 @@
 /*  Driver for the IIS/PCM part of the s5l8700 using DMA
 
     Notes:
-    - pcm_play_dma_pause is untested, not sure if implemented the right way
     - pcm_play_dma_stop is untested, not sure if implemented the right way
     - recording is not implemented
 */
 
-static volatile int locked = 0;
 static const int zerosample = 0;
 static unsigned char dblbuf[1024] IBSS_ATTR;
 static const void* queuedbuf;
@@ -83,25 +80,20 @@ static const struct div_entry {
 };
 
 /* Mask the DMA interrupt */
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    if (locked++ == 0) {
-        INTMSK &= ~(1 << 10);
-    }
+    bitclr32(&INTMSK, (1 << 10));
 }
 
 /* Unmask the DMA interrupt if enabled */
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-    if (--locked == 0) {
-        INTMSK |= (1 << 10);
-    }
+    bitset32(&INTMSK, (1 << 10));
 }
 
 void INT_DMA(void) ICODE_ATTR;
 void INT_DMA(void)
 {
-    bool new_buffer = false;
     DMACOM0 = 7;
     while (!(DMACON0 & (1 << 18)))
     {
@@ -112,45 +104,42 @@ void INT_DMA(void)
             DMATCNT0 = queuedsize / 2 - 1;
             queuedsize = 0;
         }
-        else
+        else if (!nextsize)
         {
-            if (!nextsize)
-            {
-                new_buffer = pcm_play_dma_complete_callback(
-                                PCM_DMAST_OK, &nextbuf, &nextsize);
-                if (!new_buffer)
-                    break;
-            }
-            queuedsize = MIN(sizeof(dblbuf), nextsize / 2);
-            nextsize -= queuedsize;
-            queuedbuf = nextbuf + nextsize;
-            DMABASE0 = (unsigned int)nextbuf;
-            DMATCNT0 = nextsize / 2 - 1;
-            nextsize = 0;
-        }
-        commit_dcache();
-        DMACOM0 = 4;
-        DMACOM0 = 7;
-
-        if (new_buffer)
-        {
-            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-            new_buffer = false;
+            pcm_play_dma_complete_callback(0);
+            if (!queuedsize)
+                break;
         }
     }
-
 }
 
-void pcm_play_dma_start(const void* addr, size_t size)
+void pcm_play_dma_send_frames(const void* addr, unsigned long frames)
 {
-    /* DMA channel on */
+################################
     nextbuf = addr;
-    nextsize = size;
+    nextsize = frames*4;
+
+    queuedsize = MIN(sizeof(dblbuf), nextsize / 2);
+    nextsize -= queuedsize;
+    queuedbuf = nextbuf + nextsize;
+    DMABASE0 = (unsigned int)nextbuf;
+    DMATCNT0 = nextsize / 2 - 1;
+    nextsize = 0;
+
+    commit_dcache();
+    DMACOM0 = 4;
+    DMACOM0 = 7;
+
+    /* DMA channel on */
     queuedsize = 0;
     DMABASE0 = (unsigned int)(&zerosample);
     DMATCNT0 = 0;
     DMACOM0 = 4;
 
+}
+
+void pcm_play_dma_prepare(void)
+{
     /* IIS Tx clock on */
     I2SCLKCON = (1 << 0);   /* 1 = power on */
     
@@ -159,6 +148,8 @@ void pcm_play_dma_start(const void* addr, size_t size)
                (1 << 2) |   /* 1 = I2S interface enable */
                (1 << 1) |   /* 1 = DMA request enable */
                (0 << 0);    /* 0 = LRCK on */
+
+    queuedsize = 0;
 }
 
 void pcm_play_dma_stop(void)
@@ -171,17 +162,6 @@ void pcm_play_dma_stop(void)
                (0 << 2) |   /* 1 = I2S interface enable */
                (1 << 1) |   /* 1 = DMA request enable */
                (0 << 0);    /* 0 = LRCK on */
-}
-
-/* pause playback by disabling the I2S interface */
-void pcm_play_dma_pause(bool pause)
-{
-    if (pause) {
-        I2STXCOM |= (1 << 0);   /* LRCK off */
-    }
-    else {
-        I2STXCOM &= ~(1 << 0);  /* LRCK on */
-    }
 }
 
 static void pcm_dma_set_freq(enum hw_freq_indexes idx)
@@ -206,7 +186,7 @@ static void pcm_dma_set_freq(enum hw_freq_indexes idx)
              (div.cdiv - 1);    /* MCLK_DIV_VAL */
 }
 
-void pcm_play_dma_init(void)
+void pcm_dma_init(const struct pcm_hw_settings *settings)
 {
     /* configure IIS pins */
 #ifdef IPOD_NANO2G
@@ -260,50 +240,29 @@ void pcm_play_dma_init(void)
                (1 << 0);    /* channel index */
 #endif
 
-    audiohw_preinit();
-}
-
-void pcm_play_dma_postinit(void)
-{
-    audiohw_postinit();
+    audiohw_codec_init();
 }
 
 /* set the configured PCM frequency */
-void pcm_dma_apply_settings(void)
+void pcm_dma_apply_settings(const struct pcm_settings *settings)
 {
-    pcm_dma_set_freq(pcm_fsel);    
+    pcm_dma_set_freq(settings->fsel);    
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
-    return (nextsize + DMACTCNT0 + 2) << 1;
+    return (nextsize + DMACTCNT0 + 2) >> 1;
 }
-
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    *count = DMACTCNT0 >> 1;
-    return (void *)(((DMACADDR0 + 2) & ~3) | 0x40000000);
-}
-
-#ifdef HAVE_PCM_DMA_ADDRESS
-void * pcm_dma_addr(void *addr)
-{
-    if (addr != NULL)
-        addr = (void*)((uintptr_t)addr | 0x40000000);
-    return addr;
-}
-#endif
-
 
 /****************************************************************************
  ** Recording DMA transfer
  **/
 #ifdef HAVE_RECORDING
-void pcm_rec_lock(void)
+void pcm_rec_dma_lock(void)
 {
 }
 
-void pcm_rec_unlock(void)
+void pcm_rec_dma_unlock(void)
 {
 }
 
@@ -311,10 +270,14 @@ void pcm_rec_dma_stop(void)
 {
 }
 
-void pcm_rec_dma_start(void *addr, size_t size)
+void pcm_rec_dma_capture_frames(void *addr, unsigned long frames)
 {
     (void)addr;
-    (void)size;
+    (void)frames;
+}
+
+void pcm_rec_dma_prepare(void)
+{
 }
 
 void pcm_rec_dma_close(void)
@@ -327,9 +290,9 @@ void pcm_rec_dma_init(void)
 }
 
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
-    return NULL;
+    return 0;
 }
 
 #endif /* HAVE_RECORDING */

@@ -43,7 +43,8 @@ struct pacman_settings {
 
 static struct pacman_settings settings;
 static struct pacman_settings old_settings;
-static bool sound_playing = false;
+static pcm_handle_t pcm_handle;
+#define PACBOX_PCM_FORMAT PCM_FORMAT_T_PARM(PCM_FORMAT_S16_1CH_2I)
 
 #define SETTINGS_VERSION 1
 #define SETTINGS_MIN_VERSION 1
@@ -275,39 +276,25 @@ static bool pacbox_menu(void)
 
 /* Sound is emulated in ISR context, so not much is done per sound frame */
 #define NBSAMPLES    128
-static uint32_t sound_buf[NBSAMPLES];
 #if CONFIG_CPU == MCF5249
 /* Not enough to put this in IRAM */
-static int16_t raw_buf[NBSAMPLES];
+#define SOUND_BUF_IBSS
 #else
-static int16_t raw_buf[NBSAMPLES] IBSS_ATTR;
+#define SOUND_BUF_IBSS IBSS_ATTR
 #endif
+
+static int16_t sound_buf[NBSAMPLES] SOUND_BUF_IBSS;
 
 /*
     Audio callback
  */
-static void get_more(const void **start, size_t *size)
+static int get_more(int status, const void **start, unsigned long *frames)
 {
-    int32_t *out, *outend;
-    int16_t *raw;
-
     /* Emulate the audio for the current register settings */
-    playSound(raw_buf, NBSAMPLES);
-
-    out = sound_buf;
-    outend = out + NBSAMPLES;
-    raw = raw_buf;
-
-    /* Convert to stereo */
-    do
-    {
-        uint32_t sample = (uint16_t)*raw++;
-        *out++ = sample | (sample << 16);
-    }
-    while (out < outend);
-
+    playSound(sound_buf, NBSAMPLES);
     *start = sound_buf;
-    *size = NBSAMPLES*sizeof(sound_buf[0]); 
+    *frames = NBSAMPLES;
+    return status;
 }
 
 /*
@@ -317,13 +304,17 @@ static void start_sound(void)
 {
     int sr_index;
 
-    if (sound_playing)
+    if (pcm_handle)
         return;
 
 #ifndef PLUGIN_USE_IRAM    
     /* Ensure control of PCM - stopping music isn't obligatory */
     rb->plugin_get_audio_buffer(NULL);
 #endif
+
+    pcm_handle = rb->pcm_open(PCM_STREAM_PLAYBACK);
+    if (!pcm_handle)
+        return;
 
     /* Get the closest rate >= to what is preferred */
     sr_index = rb->round_value_to_list32(PREFERRED_SAMPLING_RATE,
@@ -338,10 +329,9 @@ static void start_sound(void)
 
     wsg3_set_sampling_rate(rb->hw_freq_sampr[sr_index]);
 
-    rb->pcm_set_frequency(rb->hw_freq_sampr[sr_index]);
-    rb->pcm_play_data(get_more, NULL, NULL, 0);
-
-    sound_playing = true;
+    rb->pcm_set_frequency(pcm_handle, rb->hw_freq_sampr[sr_index]);
+    rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                      PACBOX_PCM_FORMAT);
 }
 
 /*
@@ -349,13 +339,13 @@ static void start_sound(void)
 */
 static void stop_sound(void)
 {
-    if (!sound_playing)
+    if (!pcm_handle)
         return;
 
-    rb->pcm_play_stop();
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    rb->pcm_set_frequency(pcm_handle, HW_SAMPR_RESET);
 
-    sound_playing = false;
+    rb->pcm_close(pcm_handle);
+    pcm_handle = 0;
 }
 
 /*

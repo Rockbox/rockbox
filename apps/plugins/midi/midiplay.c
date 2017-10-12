@@ -320,18 +320,21 @@ int playing_time IBSS_ATTR;  /* How many seconds into the file have we been play
 int samples_this_second IBSS_ATTR;    /* How many samples produced during this second so far? */
 long bpm IBSS_ATTR;
 
-int32_t gmbuf[BUF_SIZE*NBUF];
+static pcm_handle_t pcm_handle;
+#define MIDIPLAY_PCM_FORMAT PCM_FORMAT_T_PARM(PCM_FORMAT_S16_2CH_2I)
+
+static int16_t gmbuf[NBUF][BUF_COUNT*2] ALIGNED_ATTR(4);
 static unsigned int samples_in_buf;
 
 bool midi_end = false;
 bool quit = false;
-bool swap = false;
-bool lastswap = true;
+static int swap = 0;
+static int lastswap = 1;
 
 static inline void synthbuf(void)
 {
-    int32_t *outptr;
-    int i = BUF_SIZE;
+    int16_t *outptr;
+    int i = BUF_COUNT;
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(true);
@@ -340,11 +343,9 @@ static inline void synthbuf(void)
     if (lastswap == swap)
         return;
     lastswap = swap;
-
-    outptr = (swap ? gmbuf : gmbuf+BUF_SIZE);
-#else
-    outptr = gmbuf;
 #endif
+    outptr = gmbuf[swap];
+
     if (midi_end) {
         samples_in_buf = 0;
         return;
@@ -354,7 +355,7 @@ static inline void synthbuf(void)
     for (; i >= number_of_samples; i -= number_of_samples)
     {
         synthSamples((int32_t*)outptr, number_of_samples);
-        outptr += number_of_samples;
+        outptr += number_of_samples*2;
 #ifndef SYNC
         /* synthbuf is called in interrupt context is SYNC is defined so it cannot yield
            that bug causing the sim to crach when not using SYNC should really be fixed */
@@ -365,13 +366,13 @@ static inline void synthbuf(void)
     }
 
     /* how many samples did we write to the buffer? */
-    samples_in_buf = BUF_SIZE-i;
+    samples_in_buf = BUF_COUNT-i;
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(false);
 #endif
 }
 
-static void get_more(const void** start, size_t* size)
+static int get_more(int status, const void** start, unsigned long* frames)
 {
 #ifndef SYNC
     if(lastswap != swap)
@@ -383,17 +384,17 @@ static void get_more(const void** start, size_t* size)
     synthbuf();  /* For some reason midiplayer crashes when an update is forced */
 #endif
 
-    *size = samples_in_buf*sizeof(int32_t);
+    *frames = samples_in_buf;
+    *start = gmbuf[swap];
 #ifndef SYNC
-    *start = swap ? gmbuf : gmbuf + BUF_SIZE;
-    swap = !swap;
-#else
-    *start = gmbuf;
+    swap ^= 1;
 #endif
     if (samples_in_buf==0) {
         *start = NULL;
         quit = true;    /* this was the last buffer to play */
     }
+
+    return status;
 }
 
 static int midimain(const void * filename)
@@ -425,13 +426,21 @@ static int midimain(const void * filename)
         return -1;
     }
 
-    rb->pcm_play_stop();
+    pcm_handle = rb->pcm_open(PCM_STREAM_PLAYBACK);
+    if (!pcm_handle)
+    {
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+        rb->cpu_boost(false);
+#endif
+        return -1;
+    }
+
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPLE_RATE); /* 44100 22050 11025 */
+    rb->pcm_set_frequency(pcm_handle, SAMPLE_RATE); /* 44100 22050 11025 */
 
     /*
         * tick() will do one MIDI clock tick. Then, there's a loop here that
@@ -467,7 +476,8 @@ static int midimain(const void * filename)
     samples_this_second = 0;
 
     synthbuf();
-    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+    rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                      MIDIPLAY_PCM_FORMAT);
 
     while (!quit)
     {
@@ -512,7 +522,7 @@ static int midimain(const void * filename)
             {
                 /* Rewinding is tricky. Basically start the file over */
                 /* but run through the tracks without the synth running */
-                rb->pcm_play_stop();
+                rb->pcm_stop(pcm_handle);
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
                 rb->cpu_boost(true);
 #endif
@@ -520,23 +530,25 @@ static int midimain(const void * filename)
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
                 rb->cpu_boost(false);
 #endif
-                lastswap = !swap;
+                lastswap = swap  ^ 1;
                 synthbuf();
                 midi_debug("Rewind to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                    rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                                      MIDIPLAY_PCM_FORMAT);
                 break;
             }
 
             case MIDI_FFWD:
             {
-                rb->pcm_play_stop();
+                rb->pcm_stop(pcm_handle);
                 seekForward(5);
-                lastswap = !swap;
+                lastswap = swap ^ 1;
                 synthbuf();
                 midi_debug("Skip to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                    rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                                      MIDIPLAY_PCM_FORMAT);
                 break;
             }
 
@@ -546,12 +558,13 @@ static int midimain(const void * filename)
                 {
                     midi_debug("Paused at %d:%02d\n", playing_time/60, playing_time%60);
                     is_playing = false;
-                    rb->pcm_play_stop();
+                    rb->pcm_stop(pcm_handle);
                 } else
                 {
                     midi_debug("Playing from %d:%02d\n", playing_time/60, playing_time%60);
                     is_playing = true;
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                    rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                                      MIDIPLAY_PCM_FORMAT);
                 }
                 break;
             }
@@ -586,12 +599,12 @@ enum plugin_status plugin_start(const void* parameter)
 
     retval = midimain(parameter);
 
+    rb->pcm_set_frequency(pcm_handle, HW_SAMPR_RESET);
+    rb->pcm_close(pcm_handle);
+
 #ifdef RB_PROFILE
     rb->profstop();
 #endif
-
-    rb->pcm_play_stop();
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 
     rb->splash(HZ, "FINISHED PLAYING");
 

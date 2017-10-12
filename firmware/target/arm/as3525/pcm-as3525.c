@@ -31,159 +31,131 @@
 #include "mmu-arm.h"
 #include "pcm-internal.h"
 
-#define MAX_TRANSFER (4*((1<<11)-1)) /* maximum data we can transfer via DMA
-                                      * i.e. 32 bits at once (size of I2SO_DATA)
-                                      * and the number of 32bits words has to
-                                      * fit in 11 bits of DMA register */
+#define MAX_TRANSFER ((1<<11)-1)   /* maximum data we can transfer via DMA
+                                    * i.e. 32 bits at once (size of I2SO_DATA)
+                                    * and the number of 32bits words has to
+                                    * fit in 11 bits of DMA register */
 
-static const void *dma_start_addr;    /* Pointer to callback buffer */
-static size_t dma_start_size;   /* Size of callback buffer */
-static const void *dma_sub_addr;      /* Pointer to sub buffer */
-static size_t dma_rem_size;     /* Remaining size - in 4*32 bits */
-static size_t play_sub_size;    /* size of current subtransfer */
+static const void *dma_start_addr;     /* Pointer to callback buffer */
+static unsigned long dma_start_frames; /* Count of callback buffer */
+static const uint32_t *dma_sub_addr;   /* Pointer to sub buffer */
+static unsigned long dma_rem_frames;   /* Remaining frames */
+static unsigned long play_sub_frames;  /* frame count of current subtransfer */
 static void dma_callback(void);
-static int locked = 0;
-static bool volatile is_playing = false;
-static bool play_callback_pending = false;
+static unsigned long dma_play_state = 0;
 
-#ifdef HAVE_RECORDING
-/* Stopping playback gates clock if not recording */
-static bool volatile is_recording = false;
-#endif
+#define DMA_INT_LOCKED  0x1ul
+#define DMA_INT_ON      0x2ul
+#define DMA_CB_PENDING  0x4ul
+#define DMA_PLAYING     0x8ul
 
 /* Mask the DMA interrupt */
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    ++locked;
+    bitset32(&dma_play_state, DMA_INT_LOCKED);
 }
 
 /* Unmask the DMA interrupt if enabled */
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-    if(--locked == 0 && is_playing)
-    {
-        int old = disable_irq_save();
-        if(play_callback_pending)
-        {
-            play_callback_pending = false;
-            dma_callback();
-        }
-        restore_irq(old);
-    }
+    unsigned long state = bitclr32(&dma_play_state,
+                                   DMA_INT_LOCKED|DMA_CB_PENDING);
+
+    if ((state & (DMA_INT_ON|DMA_CB_PENDING)) == (DMA_INT_ON|DMA_CB_PENDING))
+        dma_callback();
 }
 
 static void play_start_pcm(void)
 {
     const void *addr = dma_sub_addr;
-    size_t size = dma_rem_size;
-    if(size > MAX_TRANSFER)
-        size = MAX_TRANSFER;
+    unsigned long frames = dma_rem_frames;
 
-    play_sub_size = size;
+    if (frames > MAX_TRANSFER)
+        frames = MAX_TRANSFER;
+
+    play_sub_frames = frames;
 
     dma_enable_channel(0, (void*)addr, (void*)I2SOUT_DATA, DMA_PERI_I2SOUT,
-                DMAC_FLOWCTRL_DMAC_MEM_TO_PERI, true, false, size >> 2,
+                DMAC_FLOWCTRL_DMAC_MEM_TO_PERI, true, false, frames,
                 DMA_S16, dma_callback);
 }
 
 static void dma_callback(void)
 {
-    dma_sub_addr += play_sub_size;
-    dma_rem_size -= play_sub_size;
-    play_sub_size = 0; /* Might get called again if locked */
+    dma_sub_addr += play_sub_frames;
+    dma_rem_frames -= play_sub_frames;
+    play_sub_frames = 0; /* Might get called again if locked */
 
-    if(locked)
+    if (dma_play_state & DMA_INT_LOCKED)
     {
-        play_callback_pending = is_playing;
+        if (dma_play_state & DMA_PLAYING)
+            dma_play_state |= DMA_CB_PENDING;
+
         return;
     }
 
-    if(!dma_rem_size)
-    {
-        if(!pcm_play_dma_complete_callback(PCM_DMAST_OK, &dma_start_addr,
-                                           &dma_start_size))
-            return;
-
-        dma_sub_addr = dma_start_addr;
-        dma_rem_size = dma_start_size;
-
-        /* force writeback */
-        commit_dcache_range(dma_start_addr, dma_start_size);
+    if (dma_rem_frames)
         play_start_pcm();
-        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-    }
     else
-    {
-        play_start_pcm();
-    }
+        pcm_play_dma_complete_callback(0);
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
 {
-    is_playing = true;
-
     dma_start_addr = addr;
-    dma_start_size = size;
-    dma_sub_addr = dma_start_addr;
-    dma_rem_size = size;
-
-    dma_retain();
-
-    /* force writeback */
-    commit_dcache_range(dma_start_addr, dma_start_size);
-
+    dma_start_frames = frames;
+    dma_sub_addr = addr;
+    dma_rem_frames = frames;
+    commit_dcache_range(addr, frames*4);
     play_start_pcm();
+
+    if (dma_play_state & DMA_INT_ON)
+        return;
+
+    bitset32(&dma_play_state, DMA_INT_ON);
+}
+
+void pcm_play_dma_prepare(void)
+{
+    bitset32(&dma_play_state, DMA_PLAYING);
+    dma_retain();
 }
 
 void pcm_play_dma_stop(void)
 {
-    is_playing = false;
+    bitclr32(&dma_play_state, DMA_INT_ON|DMA_PLAYING);
 
     dma_disable_channel(0);
 
-    /* Ensure byte counts read back 0 */
+    /* Ensure frame counts read back 0 */
     DMAC_CH_SRC_ADDR(0) = 0;
     dma_start_addr = NULL;
-    dma_start_size = 0;
-    dma_rem_size = 0;
+    dma_start_frames = 0;
+    dma_rem_frames = 0;
 
     dma_release();
 
-    play_callback_pending = false;
+    bitclr32(&dma_play_state, DMA_CB_PENDING);
 }
 
-void pcm_play_dma_pause(bool pause)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
-    is_playing = !pause;
+    int oldstatus = disable_irq_save();
+    unsigned long addr = DMAC_CH_SRC_ADDR(0);
+    unsigned long startaddr = (unsigned long)dma_start_addr;
+    unsigned long startframes = dma_start_frames;
+    restore_interrupt(oldstatus);
 
-    if(pause)
-    {
-        dma_pause_channel(0);
-
-        /* if producer's buffer finished, upper layer starts anew */
-        if (dma_rem_size == 0)
-            play_callback_pending = false;
-    }
-    else
-    {
-        if (play_sub_size != 0)
-            dma_resume_channel(0);
-        /* else unlock calls the callback if sub buffers remain */
-    }
+    return startframes - (addr - startaddr) / 4;
 }
 
-void pcm_play_dma_init(void)
+void pcm_dma_init(const struct pcm_hw_settings *settings)
 {
     bitset32(&CGU_PERI, CGU_I2SOUT_APB_CLOCK_ENABLE);
     I2SOUT_CONTROL = (1<<6) | (1<<3);  /* enable dma, stereo */
 
-    audiohw_preinit();
-    pcm_dma_apply_settings();
-}
-
-void pcm_play_dma_postinit(void)
-{
-    audiohw_postinit();
+    audiohw_init();
+    pcm_dma_apply_settings(settings);
 }
 
 /* divider is 9 bits but the highest one (for 8kHz) fit in 8 bits */
@@ -202,87 +174,49 @@ static const unsigned char divider[SAMPR_NUM_FREQ] = {
     [HW_FREQ_8 ] = ((AS3525_MCLK_FREQ/128 + SAMPR_8 /2) / SAMPR_8 ) - 1,
 };
 
-static inline unsigned char mclk_divider(void)
+void pcm_dma_apply_settings(const struct pcm_hw_settings *settings)
 {
-    return divider[pcm_fsel];
-}
+    int fsel = settings->fsel;
 
-void pcm_dma_apply_settings(void)
-{
     bitmod32(&CGU_AUDIO,
              (0<<24) |               /* I2SI_MCLK2PAD_EN = disabled */
              (0<<23) |               /* I2SI_MCLK_EN = disabled */
              (0<<14) |               /* I2SI_MCLK_DIV_SEL = unused */
              (0<<12) |               /* I2SI_MCLK_SEL = clk_main */
              (1<<11) |               /* I2SO_MCLK_EN */
-             (mclk_divider() << 2) | /* I2SO_MCLK_DIV_SEL */
+             (divider[fsel] << 2) |  /* I2SO_MCLK_DIV_SEL */
              (AS3525_MCLK_SEL << 0), /* I2SO_MCLK_SEL */
              0x01ffffff);
 }
-
-size_t pcm_get_bytes_waiting(void)
-{
-    int oldstatus = disable_irq_save();
-    size_t addr = DMAC_CH_SRC_ADDR(0);
-    size_t start_addr = (size_t)dma_start_addr;
-    size_t start_size = dma_start_size;
-    restore_interrupt(oldstatus);
-
-    return start_size - addr + start_addr;
-}
-
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    int oldstatus = disable_irq_save();
-    size_t addr = DMAC_CH_SRC_ADDR(0);
-    size_t start_addr = (size_t)dma_start_addr;
-    size_t start_size = dma_start_size;
-    restore_interrupt(oldstatus);
-
-    *count = (start_size - addr + start_addr) >> 2;
-    return (void*)AS3525_UNCACHED_ADDR(addr);
-}
-
-#ifdef HAVE_PCM_DMA_ADDRESS
-void * pcm_dma_addr(void *addr)
-{
-    if (addr != NULL)
-        addr = AS3525_UNCACHED_ADDR(addr);
-    return addr;
-}
-#endif
-
 
 /****************************************************************************
  ** Recording DMA transfer
  **/
 #ifdef HAVE_RECORDING
 
-static int rec_locked = 0;
-static uint32_t *rec_dma_addr;
-static size_t rec_dma_size;
+/* Stopping playback gates clock if not recording */
+static bool rec_inton = false;
+static uint32_t *rec_dma_addr, *rec_dma_buf;
+static unsigned long rec_dma_frames;
 static int keep_sample = 0; /* In nonzero, keep the sample; else, discard it */
 
-void pcm_rec_lock(void)
+void pcm_rec_dma_lock(void)
 {
     int oldlevel = disable_irq_save();
 
-    if (++rec_locked == 1)
-    {
-        bitset32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE);
-        VIC_INT_EN_CLEAR = INTERRUPT_I2SIN;
-        I2SIN_MASK = 0; /* disables all interrupts */
-    }
+    bitset32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE);
+    VIC_INT_EN_CLEAR = INTERRUPT_I2SIN;
+    I2SIN_MASK = 0; /* disables all interrupts */
 
     restore_irq(oldlevel);
 }
 
 
-void pcm_rec_unlock(void)
+void pcm_rec_dma_unlock(void)
 {
     int oldlevel = disable_irq_save();
 
-    if (--rec_locked == 0 && is_recording)
+    if (rec_inton)
     {
         VIC_INT_ENABLE = INTERRUPT_I2SIN;
         I2SIN_MASK = (1<<2); /* I2SIN_MASK_POAF */
@@ -298,7 +232,7 @@ void INT_I2SIN(void)
     if (audio_channels == 1)
     {
         /* RX is left-channel-only mono */
-        while (rec_dma_size > 0)
+        while (rec_dma_frames)
         {
             if (I2SIN_RAW_STATUS & (1<<5))
                 return; /* empty */
@@ -314,7 +248,8 @@ void INT_I2SIN(void)
                    14-bit => 16-bit samples */
                 value = (uint16_t)(value << 2) | (value << 18);
 
-                if (audio_output_source != AUDIO_SRC_PLAYBACK && !is_playing)
+                if (audio_output_source != AUDIO_SRC_PLAYBACK &&
+                    !(dma_play_state & DMA_PLAYING))
                 {
                     /* In this case, loopback is manual so that both output
                        channels have audio */
@@ -331,7 +266,7 @@ void INT_I2SIN(void)
                 }
 
                 *rec_dma_addr++ = value;
-                rec_dma_size -= 4;
+                rec_dma_frames--;
             }
         }
     }
@@ -339,7 +274,7 @@ void INT_I2SIN(void)
 #endif /* CONFIG_CPU == AS3525 */
     {
         /* RX is stereo */
-        while (rec_dma_size > 0)
+        while (rec_dma_frames)
         {
             if (I2SIN_RAW_STATUS & (1<<5))
                 return; /* empty */
@@ -355,41 +290,40 @@ void INT_I2SIN(void)
 
                 /* 14-bit => 16-bit samples */
                 *rec_dma_addr++ = (value << 2) & ~0x00030000;
-                rec_dma_size -= 4;
+                rec_dma_frames--;
             }
         }
     }
 
     /* Inform middle layer */
-    if (pcm_rec_dma_complete_callback(PCM_DMAST_OK, (void **)&rec_dma_addr,
-                                      &rec_dma_size))
-    {
-        pcm_rec_dma_status_callback(PCM_DMAST_STARTED);
-    }
+    pcm_rec_dma_complete_callback(0);
 }
 
 
 void pcm_rec_dma_stop(void)
 {
-    is_recording = false;
-
     VIC_INT_EN_CLEAR = INTERRUPT_I2SIN;
     I2SIN_MASK = 0; /* disables all interrupts */
-
-    rec_dma_addr = NULL;
-    rec_dma_size = 0;
-
     bitclr32(&CGU_PERI, CGU_I2SIN_APB_CLOCK_ENABLE);
+
+    rec_dma_buf = NULL;
+    rec_dma_addr = NULL;
+    rec_dma_frames = 0;
+    rec_inton = false;
 }
 
 
-void pcm_rec_dma_start(void *addr, size_t size)
+void pcm_rec_dma_capture_frames(void *addr, unsigned long frames)
 {
-    is_recording = true;
-
+    rec_dma_buf = addr;
     rec_dma_addr = addr;
-    rec_dma_size = size;
+    rec_dma_frames = frames;
+    rec_inton = true;
+}
 
+
+void pcm_rec_dma_prepare(void)
+{
     keep_sample = 0;
 
     /* ensure empty FIFO */
@@ -419,9 +353,14 @@ void pcm_rec_dma_init(void)
 }
 
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+unsigned long pcm_rec_dma_get_frames_captured(void)
 {
-    return rec_dma_addr;
+    int oldstatus = disable_irq_save();
+    unsigned long addr = (unsigned long)rec_dma_addr;
+    unsigned long buf = (unsigned long)rec_dma_buf;
+    restore_irq(oldstatus);
+
+    return (addr - buf) / 4;
 }
 
 #endif /* HAVE_RECORDING */

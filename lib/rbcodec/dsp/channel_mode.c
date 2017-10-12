@@ -75,7 +75,7 @@ void channel_mode_proc_mono(struct dsp_proc_entry *this,
     struct dsp_buffer *buf = *buf_p;
     int32_t *sl = buf->p32[0];
     int32_t *sr = buf->p32[1];
-    int count = buf->remcount;
+    unsigned long count = buf->frames_rem;
 
     do
     {
@@ -83,7 +83,7 @@ void channel_mode_proc_mono(struct dsp_proc_entry *this,
         *sl++ = lr;
         *sr++ = lr;
     }
-    while (--count > 0);
+    while (--count);
 
     (void)this;
 }
@@ -96,7 +96,7 @@ void channel_mode_proc_custom(struct dsp_proc_entry *this,
 
     int32_t *sl = buf->p32[0];
     int32_t *sr = buf->p32[1];
-    int count = buf->remcount;
+    unsigned long count = buf->frames_rem;
 
     const int32_t gain  = data->sw_gain;
     const int32_t cross = data->sw_cross;
@@ -108,7 +108,7 @@ void channel_mode_proc_custom(struct dsp_proc_entry *this,
         *sl++ = FRACMUL(l, gain) + FRACMUL(r, cross);
         *sr++ = FRACMUL(r, gain) + FRACMUL(l, cross);
     }
-    while (--count > 0);
+    while (--count);
 }
 
 void channel_mode_proc_karaoke(struct dsp_proc_entry *this,
@@ -117,7 +117,7 @@ void channel_mode_proc_karaoke(struct dsp_proc_entry *this,
     struct dsp_buffer *buf = *buf_p;
     int32_t *sl = buf->p32[0];
     int32_t *sr = buf->p32[1];
-    int count = buf->remcount;
+    unsigned long count = buf->frames_rem;
 
     do
     {
@@ -125,7 +125,7 @@ void channel_mode_proc_karaoke(struct dsp_proc_entry *this,
         *sl++ = ch;
         *sr++ = -ch;
     }
-    while (--count > 0);
+    while (--count);
 
     (void)this;
 }
@@ -136,7 +136,7 @@ void channel_mode_proc_mono_left(struct dsp_proc_entry *this,
 {
     /* Just copy over the other channel */
     struct dsp_buffer *buf = *buf_p;
-    memcpy(buf->p32[1], buf->p32[0], buf->remcount * sizeof (int32_t));
+    memcpy(buf->p32[1], buf->p32[0], buf->frames_rem * sizeof (int32_t));
     (void)this;
 }
 
@@ -145,7 +145,7 @@ void channel_mode_proc_mono_right(struct dsp_proc_entry *this,
 {
     /* Just copy over the other channel */
     struct dsp_buffer *buf = *buf_p;
-    memcpy(buf->p32[0], buf->p32[1], buf->remcount * sizeof (int32_t));
+    memcpy(buf->p32[0], buf->p32[1], buf->frames_rem * sizeof (int32_t));
     (void)this;
 }
 
@@ -206,7 +206,7 @@ static intptr_t channel_mode_new_format(struct dsp_proc_entry *this,
 {
     DSP_PRINT_FORMAT(DSP_PROC_CHANNEL_MODE, *format);
 
-    bool active = format->num_channels >= 2;
+    bool active = format->num_channels == 2;
     dsp_proc_activate(dsp, DSP_PROC_CHANNEL_MODE, active);
 
     if (active)

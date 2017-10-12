@@ -733,6 +733,9 @@ void settings_apply_pm_range(void)
 
 void sound_settings_apply(void)
 {
+    if (!audio_is_initialized())
+        return; /* if boot, this is done separately */
+
 #ifdef AUDIOHW_HAVE_BASS
     sound_set(SOUND_BASS, global_settings.bass);
 #endif

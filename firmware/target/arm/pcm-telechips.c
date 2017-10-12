@@ -26,7 +26,6 @@
 #include "audio.h"
 #include "sound.h"
 #include "i2s.h"
-#include "pcm.h"
 #include "pcm-internal.h"
 
 struct dma_data
@@ -35,16 +34,12 @@ struct dma_data
    optimised fiq handler, so don't change it. */
     union
     {
-        uint16_t *p;
+        int16_t *p;
         const void *p_r;
         void *p_w;
     };
-    size_t size;
-#if NUM_CORES > 1
-    unsigned core;
-#endif
-    int locked;
-    int state;
+    unsigned long frames;
+    unsigned long state;
 };
 
 /****************************************************************************
@@ -54,23 +49,11 @@ struct dma_data dma_play_data SHAREDBSS_ATTR =
 {
     /* Initialize to a locked, stopped state */
     { .p = NULL },
-    .size = 0,
-#if NUM_CORES > 1
-    .core = 0x00,
-#endif
-    .locked = 0,
+    .frames = 0,
     .state = 0
 };
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    unsigned long addr = (unsigned long)dma_play_data.p;
-    size_t cnt = dma_play_data.size;
-    *count = cnt >> 2;
-    return (void *)((addr + 2) & ~3);
-}
-
-void pcm_play_dma_init(void)
+void pcm_dma_init(const struct pcm_hw_settings *settings)
 {
     DAVC = 0x0;         /* Digital Volume = max */
 #ifdef COWON_D2
@@ -110,102 +93,85 @@ void pcm_play_dma_init(void)
 #endif
 }
 
-void pcm_play_dma_postinit(void)
+void pcm_dma_apply_settings(const struct pcm_hw_settings *settings)
 {
-    audiohw_postinit();
+    (void)settings;
 }
 
-void pcm_dma_apply_settings(void)
+static void play_start_pcm(bool start)
 {
-}
-
-static void play_start_pcm(void)
-{
-    DAMR &= ~(1<<14);   /* disable tx */
-    dma_play_data.state = 1;
-
-    if (dma_play_data.size >= 16)
+    if (start)
     {
-        DADO_L(0) = *dma_play_data.p++;
-        DADO_R(0) = *dma_play_data.p++;
-        DADO_L(1) = *dma_play_data.p++;
-        DADO_R(1) = *dma_play_data.p++;
-        DADO_L(2) = *dma_play_data.p++;
-        DADO_R(2) = *dma_play_data.p++;
-        DADO_L(3) = *dma_play_data.p++;
-        DADO_R(3) = *dma_play_data.p++;
-        dma_play_data.size -= 16;
+        DAMR &= ~(1<<14);   /* disable tx */
     }
 
-    DAMR |= (1<<14);   /* enable tx */
+    if (dma_play_data.frames < 4)
+    {
+        dma_play_data.frames = 0;
+        return;
+    }
+
+    DADO_L(0) = *dma_play_data.p++;
+    DADO_R(0) = *dma_play_data.p++;
+    DADO_L(1) = *dma_play_data.p++;
+    DADO_R(1) = *dma_play_data.p++;
+    DADO_L(2) = *dma_play_data.p++;
+    DADO_R(2) = *dma_play_data.p++;
+    DADO_L(3) = *dma_play_data.p++;
+    DADO_R(3) = *dma_play_data.p++;
+
+    dma_play_data.frames -= 4;
+
+    if (start)
+    {
+        DAMR |= (1<<14);   /* enable tx */
+        dma_play_data.state = DAI_TX_IRQ_MASK;
+    }
 }
 
-static void play_stop_pcm(void)
+static void play_stop_pcm(bool reset)
 {
     DAMR &= ~(1<<14);   /* disable tx */
     dma_play_data.state = 0;
+
+    if (reset)
+    {
+        dma_play_data.addr = NULL;
+        dma_play_data.frames = 0;
+    }
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
 {
-    dma_play_data.p_r  = addr;
-    dma_play_data.size = size;
+    dma_play_data.p_r = addr;
+    dma_play_data.frames = frames;
+    play_start_pcm(!dma_play_data.state);
+}
 
-#if NUM_CORES > 1
-    /* This will become more important later - and different ! */
-    dma_play_data.core = processor_id(); /* save initiating core */
-#endif
-
-    IEN |= DAI_TX_IRQ_MASK;
-
-    play_start_pcm();
+void pcm_play_dma_prepare(void)
+{
+    pcm_play_dma_stop();
 }
 
 void pcm_play_dma_stop(void)
 {
-    play_stop_pcm();
-    dma_play_data.size = 0;
-#if NUM_CORES > 1
-    dma_play_data.core = 0; /* no core in control */
-#endif
+    play_stop_pcm(true);
 }
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    int status = disable_fiq_save();
-
-    if (++dma_play_data.locked == 1)
-    {
-        IEN &= ~DAI_TX_IRQ_MASK;
-    }
-
-    restore_fiq(status);
+    bitclr32(&IEN, DAI_TX_IRQ_MASK);
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-   int status = disable_fiq_save();
-
-    if (--dma_play_data.locked == 0 && dma_play_data.state != 0)
-    {
-        IEN |= DAI_TX_IRQ_MASK;
-    }
-
-   restore_fiq(status);
+    bitset32(&IEN, dma_play_data.state);
 }
 
-void pcm_play_dma_pause(bool pause)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
-    if (pause) {
-        play_stop_pcm();
-    } else {
-        play_start_pcm();
-    }
-}
-
-size_t pcm_get_bytes_waiting(void)
-{
-    return dma_play_data.size & ~3;
+    unsigned long frames = dma_play_data.frames;
+    return frames < 4 ? 0 : frames;
 }
 
 #ifdef HAVE_RECORDING
@@ -218,10 +184,14 @@ void pcm_rec_dma_close(void)
 {
 }
 
-void pcm_rec_dma_start(void *addr, size_t size)
+void pcm_rec_dma_capture_frames(void *addr, unsigned long frames)
 {
     (void) addr;
-    (void) size;
+    (void) frames;
+}
+
+void pcm_rec_dma_prepare(void)
+{
 }
 
 void pcm_rec_dma_stop(void)
@@ -236,9 +206,9 @@ void pcm_rec_unlock(void)
 {
 }
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+unsigned long pcm_rec_dma_get_frames_captured(void)
 {
-    return NULL;
+    return 0;
 }
 #endif
 
@@ -253,22 +223,18 @@ void fiq_handler(void)
      * r0-r3 and r12 is a working register.
      */
     asm volatile (
-        "sub     lr, lr, #4          \n"
-        "stmfd   sp!, { r0-r3, lr }  \n" /* stack scratch regs and lr */
-        "mov     r14, #0             \n" /* Was the callback called? */
 #if defined(CPU_TCC780X)
         "mov     r8, #0xc000         \n" /* DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK */
-        "ldr     r9, =0xf3001004     \n" /* CREQ */
+        "mov     r9, #0xf3000000     \n" /* CREQ = 0xf3001004 */
+        "orr     r9, r9, #0x00000f00 \n"
 #elif defined(CPU_TCC77X)
         "mov     r8, #0x0030         \n" /* DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK */
-        "ldr     r9, =0x80000104     \n" /* CREQ */
+        "mov     r9, #0x80000000     \n" /* CREQ = 0x80000104 */
 #endif
-        "str     r8, [r9]            \n" /* clear DAI IRQs */
-        "ldmia   r11, { r8-r9 }      \n" /* r8 = p, r9 = size */
-        "cmp     r9, #0x10           \n" /* is size <16? */
-        "blo     .more_data          \n" /* if so, ask pcmbuf for more data */
-
-    ".fill_fifo:                     \n"
+        "str     r8, [r9, #0x104]    \n" /* clear DAI IRQs */
+        "ldmia   r11, { r8-r9 }      \n" /* r8 = p, r9 = frames */
+        "subs    r9, r9, #4          \n" /* >= 4 frames? */
+        "blo     1f                  \n"
         "ldr     r12, [r8], #4       \n" /* load two samples */
         "str     r12, [r10, #0x0]    \n" /* write top sample to DADO_L0 */
         "mov     r12, r12, lsr #16   \n" /* put right sample at the bottom */
@@ -285,50 +251,32 @@ void fiq_handler(void)
         "str     r12, [r10, #0x18]   \n" /* write top sample to DADO_L3 */
         "mov     r12, r12, lsr #16   \n" /* put right sample at the bottom */
         "str     r12, [r10, #0x1c]   \n" /* write low sample to DADO_R3*/
-        "sub     r9, r9, #0x10       \n" /* 4 words written */
-        "stmia   r11, { r8-r9 }      \n" /* save p and size */
-
-        "cmp     r14, #0             \n" /* Callback called? */
-        "ldmeqfd sp!, { r0-r3, pc }^ \n" /* no? -> exit */
-
-        "ldr     r1, =pcm_play_status_callback \n"
-        "ldr     r1, [r1]            \n"
-        "cmp     r1, #0              \n"
-        "movne   r0, %1              \n"
-        "blxne   r1                  \n"
-        "ldmfd   sp!, { r0-r3, pc }^ \n" /* exit */
-
-    ".more_data:                     \n"
-        "mov     r14, #1             \n" /* Remember we got more data in this FIQ */
-        "mov     r0, %0              \n" /* r0 = status */
-        "mov     r1, r11             \n" /* r1 = &dma_play_data.p_r */
-        "add     r2, r11, #4         \n" /* r2 = &dma_play_data.size */
-        "mov     lr, pc              \n"
-        "ldr     pc, =pcm_play_dma_complete_callback \n"
-        "cmp     r0, #0              \n" /* any more to play? */
-        "ldmneia r11, { r8-r9 }      \n" /* load new p and size */
-        "cmpne   r9, #0x0f           \n" /* did we actually get enough data? */
-        "bhi     .fill_fifo          \n" /* not stop and enough? refill */
-        "ldmfd   sp!, { r0-r3, pc }^ \n" /* exit */
-        ".ltorg                      \n"
-        : : "i"(PCM_DMAST_OK), "i"(PCM_DMAST_STARTED)
+        "stmia   r11, { r8-r9 }      \n" /* save p and frames */
+        "subs    pc, lr, #4          \n" /* -> exit */
+    "1:                              \n"
+        "movlo   r9, #0              \n" /* zero-out size if needed */
+        "strlo   r9, [r11, #4]       \n"
+        "sub     lr, lr, #4          \n" /* stack scratch regs and lr */
+        "stmfd   sp!, { r0-r3, lr }  \n"
+        "ldr     r1, .complete       \n" /* pcm_play_dma_complete_callback(0) */
+        "mov     r0, #0              \n"
+        "blx     r1                  \n"
+        "ldmfd   sp!, { r0-r3, pc }^ \n"
+    ".complete:                      \n"
+        ".word pcm_play_dma_complete_callback \n"
     );
 }
 #else /* C version for reference */
 void fiq_handler(void) ICODE_ATTR;
 void fiq_handler(void)
 {
-    register bool new_buffer = false;
+    /* Clear FIQ status */
+    CREQ = DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK;
 
-    if (dma_play_data.size < 16)
+    if (dma_play_data.frames >= 4)
     {
-        /* p is empty, get some more data */
-        new_buffer = pcm_play_dma_complete_callback(&dma_play_data.p_r,
-                                                    &dma_play_data.size);
-    }
+        dma_play_data.frames -= 4;
 
-    if (dma_play_data.size >= 16)
-    {
         DADO_L(0) = *dma_play_data.p++;
         DADO_R(0) = *dma_play_data.p++;
         DADO_L(1) = *dma_play_data.p++;
@@ -337,15 +285,12 @@ void fiq_handler(void)
         DADO_R(2) = *dma_play_data.p++;
         DADO_L(3) = *dma_play_data.p++;
         DADO_R(3) = *dma_play_data.p++;
-
-        dma_play_data.size -= 16;
     }
-
-    /* Clear FIQ status */
-    CREQ = DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK;
-
-    if (new_buffer)
-        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+    else
+    {
+        dma_play_data.frames = 0;
+        pcm_play_dma_complete_callback(0);
+    }
 }
 #endif
 

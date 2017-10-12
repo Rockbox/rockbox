@@ -123,10 +123,25 @@ static int vol_tenthdb2hw(int db)
     }
 }
 
+void audiohw_mute(bool mute)
+{
+    if (mute) {
+        as3514_set(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200)
+        as3514_set(AS3514_LINE_OUT_L, LINE_OUT_L_LO_SES_DM_MUTE);
+#endif /* SANSA_E200V2 || SANSA_FUZE || SANSA_C200 */
+    } else {
+        as3514_clear(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
+#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200)
+        as3514_clear(AS3514_LINE_OUT_L, LINE_OUT_L_LO_SES_DM_MUTE);
+#endif /* SANSA_E200V2 || SANSA_FUZE || SANSA_C200 */
+    }
+}
+
 /*
  * Initialise the PP I2C and I2S.
  */
-void audiohw_preinit(void)
+void audiohw_codec_init(void)
 {
     /* read all reg values */
     ascodec_readbytes(0x0, AS3514_NUM_AUDIO_REGS, as3514_regs);
@@ -225,25 +240,7 @@ void audiohw_preinit(void)
     /* DAC direct - gain, mixer and limitter bypassed */
     as3514_write(AS3514_HPH_OUT_R, HPH_OUT_R_HEADPHONES | HPH_OUT_R_HP_OUT_DAC);
 #endif
-}
 
-static void audiohw_mute(bool mute)
-{
-    if (mute) {
-        as3514_set(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200)
-        as3514_set(AS3514_LINE_OUT_L, LINE_OUT_L_LO_SES_DM_MUTE);
-#endif /* SANSA_E200V2 || SANSA_FUZE || SANSA_C200 */
-    } else {
-        as3514_clear(AS3514_HPH_OUT_L, HPH_OUT_L_HP_MUTE);
-#if defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200)
-        as3514_clear(AS3514_LINE_OUT_L, LINE_OUT_L_LO_SES_DM_MUTE);
-#endif /* SANSA_E200V2 || SANSA_FUZE || SANSA_C200 */
-    }
-}
-
-void audiohw_postinit(void)
-{
     /* wait until outputs have stabilized */
     sleep(HZ/4);
 
@@ -257,8 +254,6 @@ void audiohw_postinit(void)
     as3514_write_masked(AS3514_LINE_OUT_R, 0x1b, AS3514_VOL_MASK);
     as3514_write_masked(AS3514_LINE_OUT_L, 0x1b, AS3514_VOL_MASK);
 #endif /* SANSA_E200V2 || SANSA_FUZE || SANSA_C200 */
-
-    audiohw_mute(false);
 }
 
 void audiohw_set_volume(int vol_l, int vol_r)

@@ -41,13 +41,15 @@ enum dsp_settings
     DSP_SET_PITCH,
     DSP_SET_OUT_FREQUENCY,
     DSP_GET_OUT_FREQUENCY,
+    DSP_SET_OUT_PCM_FORMAT,
+    /* below are internal messages; new codec messages go on preceding line */
     DSP_PROC_INIT,
     DSP_PROC_CLOSE,
     DSP_PROC_NEW_FORMAT,
     DSP_PROC_SETTING, /* stage-specific should be this + id */
 };
 
-enum dsp_stereo_modes
+enum dsp_input_channel_modes
 {
     STEREO_INTERLEAVED,
     STEREO_NONINTERLEAVED,
@@ -64,7 +66,7 @@ struct sample_format
                                      are newly enabled) */
     uint8_t num_channels;    /* 01h: number of channels of data */
     uint8_t frac_bits;       /* 02h: number of fractional bits */
-    uint8_t output_scale;    /* 03h: output scaling shift */
+    uint8_t reserved0;       /* 03h: not used for now */
     int32_t frequency;       /* 04h: pitch-adjusted sample rate */
     int32_t codec_frequency; /* 08h: codec-specifed sample rate */
                              /* 0ch */
@@ -73,24 +75,24 @@ struct sample_format
 /* Used by ASM routines - keep field order or else fix the functions */
 struct dsp_buffer
 {
-    int32_t remcount;       /* 00h: Samples in buffer (In, Int, Out) */
+    unsigned long frames_rem;    /* 00h: Frames in buffer (In, Int, Out) */
     union
     {
-        const void *pin[2]; /* 04h: Channel pointers (In) */
-        int32_t *p32[2];    /* 04h: Channel pointers (Int) */
-        int16_t *p16out;    /* 04h: DSP output buffer (Out) */
+        const void *pin[2];      /* 04h: Channel pointers (In) */
+        int32_t    *p32[2];      /* 04h: Channel pointers (Int) */
+        void       *pout;        /* 04h: DSP output buffer (Out) */
     };
     union
     {
-        uint32_t proc_mask; /* 0Ch: In-place effects already appled to buffer
-                                    in order to avoid double-processing. Set
-                                    to zero on new buffer before passing to
-                                    DSP. */
-        int bufcount;       /* 0Ch: Buffer length/dest buffer remaining
-                                    Basically, pay no attention unless it's
-                                    *your* new buffer and is used internally
-                                    or is specifically the final output
-                                    buffer. */
+        uint32_t proc_mask;      /* 0Ch: In-place effects already appled to buffer
+                                         in order to avoid double-processing. Set
+                                         to zero on new buffer before passing to
+                                         DSP. */
+        unsigned long frames;    /* 0Ch: Buffer length/dest buffer remaining
+                                         Basically, pay no attention unless it's
+                                         *your* new buffer and is used internally
+                                         or is specifically the final output
+                                         buffer. */
     };
     struct sample_format format; /* 10h: Buffer format data */
                                  /* 1ch */
@@ -99,30 +101,20 @@ struct dsp_buffer
 /* Remove samples from input buffer (In). Sample size is specified.
    Provided to dsp_process(). */
 static inline void dsp_advance_buffer_input(struct dsp_buffer *buf,
-                                            int by_count,
+                                            unsigned long by_count,
                                             size_t size_each)
 {
-    buf->remcount -= by_count;
+    buf->frames_rem -= by_count;
     buf->pin[0] += by_count * size_each;
     buf->pin[1] += by_count * size_each;
-}
-
-/* Add samples to output buffer and update remaining space (Out).
-   Provided to dsp_process() */
-static inline void dsp_advance_buffer_output(struct dsp_buffer *buf,
-                                             int by_count)
-{
-    buf->bufcount -= by_count;
-    buf->remcount += by_count;
-    buf->p16out += 2 * by_count; /* Interleaved stereo */
 }
 
 /* Remove samples from internal input buffer (In, Int).
    Provided to dsp_process() or by another processing stage. */
 static inline void dsp_advance_buffer32(struct dsp_buffer *buf,
-                                        int by_count)
+                                        unsigned long by_count)
 {
-    buf->remcount -= by_count;
+    buf->frames_rem -= by_count;
     buf->p32[0] += by_count;
     buf->p32[1] += by_count;
 }

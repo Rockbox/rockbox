@@ -19,88 +19,234 @@
  *
  ****************************************************************************/
 
-#define MIXER_OPTIMIZED_WRITE_SAMPLES
-#define MIXER_OPTIMIZED_MIX_SAMPLES
+/* functions compatible with ARMv5TE+ */
 
-/* Mix channels' samples and apply gain factors */
-static FORCE_INLINE void mix_samples(void *out,
-                                     const void *src0,
-                                     int32_t src0_amp,
-                                     const void *src1,
-                                     int32_t src1_amp,
-                                     size_t size)
+#ifndef write_samples_gain_1ch_s16i_s16i
+#define write_samples_gain_1ch_s16i_s16i write_samples_gain_1ch_s16i_s16i_arm5
+
+static void __attribute__((naked))
+write_samples_gain_1ch_s16i_s16i_arm5(struct pcm_stream_desc *desc,
+                                      void *out,
+                                      unsigned long count)
 {
-    int32_t s0, s1, tmp;
+    asm volatile(
+        "str     r4, [sp, #-4]!           \n"
+        "ldr     r3, [r0, %1]             \n" /* r3 = desc->amplitude_tx */
+        "ldr     r0, [r0, %0]             \n" /* r0 = desc->addr_tx */
+        "subs    r2, r2, #1               \n"
+        "beq     2f                       \n" /* 1 frame? */
+    "1:  ldrh    r4, [r0], #2             \n" /* ....SM0 */
+        "ldrh    r12, [r0], #2            \n" /* ....SM1 */
+        "subs    r2, r2, #2               \n"
+        "smulwb  r4, r3, r4               \n" /* A*SM0 */
+        "smulwb  r12, r3, r12             \n" /* A*SM1 */
+        "mov     r4, r4, lsl #16          \n" /* A*SM0.A*SM0 */
+        "orr     r4, r4, r4, lsr #16      \n"
+        "mov     r12, r12, lsl #16        \n" /* A*SM1.A*SM1 */
+        "orr     r12, r12, r12, lsr #16   \n"
+        "stmia   r1!, { r4, r12 }         \n"
+        "bhi     1b                       \n"
+        "ldrlo   r4, [sp], #4             \n" /* event count? return */
+        "bxlo    lr                       \n"
+    "2:  ldrh    r4, [r0]                 \n" /* ,,,M0 */
+        "smulwb  r4, r3, r4               \n" /* A*SM0 */
+        "mov     r4, r4, lsl #16          \n" /* A*SM0.A*SM0 */
+        "orr     r4, r4, r4, lsr #16      \n"
+        "str     r4, [r1]                 \n"
+        "ldr     r4, [sp], #4             \n"
+        "bx      lr                       \n"
+        :
+        : "i"(PCM_STR_DESC_ADDR_TX_OFFS), "i"(PCM_STR_DESC_AMP_TX_OFFS));
+
+    (void)out; (void)desc; (void)count;
+}
+#endif /* write_samples_gain_1ch_s16i_s16i */
+
+#ifndef write_samples_gain_2ch_s16i_s16i
+#define write_samples_gain_2ch_s16i_s16i write_samples_gain_2ch_s16i_s16i_arm5
+
+static void __attribute__((naked))
+write_samples_gain_2ch_s16i_s16i_arm5(struct pcm_stream_desc *desc,
+                                      void *out,
+                                      unsigned long count)
+{
+    asm volatile(
+        "stmfd   sp!, { r4-r6 }           \n"
+        "ldr     r3, [r0, %1]             \n" /* r3 = pcm->amplitude_tx */
+        "ldr     r0, [r0, %0]             \n" /* r1 = pcm->addr_tx */
+        "subs    r2, r2, #1               \n"
+        "beq     2f                       \n" /* 1 frame? */
+    "1:  ldrh    r4, [r0], #2             \n" /* ....SL0 */
+        "ldrh    r5, [r0], #2             \n" /* ....SR0 */
+        "ldrh    r6, [r0], #2             \n" /* ....SL1 */
+        "ldrh    r12, [r0], #2            \n" /* ....SR */
+        "subs    r2, r2, #2               \n"
+        "smulwb  r4, r3, r4               \n" /* A*SL0 */
+        "smulwb  r5, r3, r5               \n" /* A*SR0 */
+        "smulwb  r6, r3, r6               \n" /* A*SL1 */
+        "smulwb  r12, r3, r12             \n" /* A*SR1 */
+        "mov     r4, r4, lsl #16          \n" /* A*SR0.A*SL0 */
+        "mov     r5, r5, lsl #16          \n"
+        "orr     r5, r5, r4, lsr #16      \n"
+        "mov     r6, r6, lsl #16          \n" /* A*SR1.A*SL1 */
+        "mov     r12, r12, lsl #16        \n"
+        "orr     r6, r12, r6, lsr #16     \n"
+        "stmia   r1!, { r5-r6 }           \n"
+        "bhi     1b                       \n"
+        "ldmlofd sp!, { r4-r6 }           \n" /* event count? return */
+        "bxlo    lr                       \n"
+    "2:  ldrh    r4, [r0, #0]             \n" /* ....SL0 */
+        "ldrh    r5, [r0, #2]             \n" /* ....SR0 */
+        "smulwb  r4, r3, r4               \n" /* A*SL0 */
+        "smulwb  r5, r3, r5               \n" /* A*SR0 */
+        "mov     r4, r4, lsl #16          \n" /* A*SR0.A*SL0 */
+        "mov     r5, r5, lsl #16          \n"
+        "orr     r5, r5, r4, lsr #16      \n"
+        "str     r5, [r1]                 \n"
+        "ldmfd   sp!, { r4-r6 }           \n"
+        "bx      lr                       \n"
+        :
+        : "i"(PCM_STR_DESC_ADDR_TX_OFFS), "i"(PCM_STR_DESC_AMP_TX_OFFS));
+
+    (void)out; (void)desc; (void)count;
+}
+#endif /* write_samples_gain_2ch_s16i_s16i */
+
+#if !defined(mix_samples_unity_1ch_s16i_s16i) || \
+    !defined(mix_samples_gain_1ch_s16i_s16i)
+
+#ifndef mix_samples_unity_1ch_s16i_s16i
+#define mix_samples_unity_1ch_s16i_s16i mix_samples_1ch_s16i_s16i_arm5
+#endif
+
+#ifndef mix_samples_gain_1ch_s16i_s16i
+#define mix_samples_gain_1ch_s16i_s16i  mix_samples_1ch_s16i_s16i_arm5
+#endif
+
+static void __attribute__((naked))
+mix_samples_1ch_s16i_s16i_arm5(struct pcm_stream_desc *desc,
+                               void *out,
+                               unsigned long count)
+{
     asm volatile (
-    "1:                             \n"
-        "ldr    %4, [%1], #4        \n"
-        "ldr    %5, [%2], #4        \n"
-        "smulwb %6, %7, %4          \n"
-        "smulwt %4, %7, %4          \n"
-        "smlawb %6, %8, %5, %6      \n"
-        "smlawt %4, %8, %5, %4      \n"
-        "mov    %5, %6, asr #15     \n"
-        "teq    %5, %5, asr #31     \n"
-        "eorne  %6, %9, %6, asr #31 \n"
-        "mov    %5, %4, asr #15     \n"
-        "teq    %5, %5, asr #31     \n"
-        "eorne  %4, %9, %4, asr #31 \n"
-        "subs   %3, %3, #4          \n"
-        "and    %6, %6, %9, lsr #16 \n"
-        "orr    %6, %6, %4, lsl #16 \n"
-        "str    %6, [%0], #4        \n"
-        "bhi    1b                  \n"
-        : "+r"(out), "+r"(src0), "+r"(src1), "+r"(size),
-          "=&r"(s0), "=&r"(s1), "=&r"(tmp)
-        : "r"(src0_amp), "r"(src1_amp), "r"(0xffff7fff));
-}
+        "stmfd   sp!, { r4-r8 }           \n"
+        "ldr     r3, [r0, %1]             \n" /* r3 = desc->amplitude_tx */
+        "ldr     r0, [r0, %0]             \n" /* r0 = desc->addr_tx */
+        "subs    r2, r2, #1               \n"
+        "mvn     r12, #0x00000000         \n"
+        "beq     2f                       \n" /* 1 frame? */
+    "1:  ldrh    r4, [r0], #2             \n" /* ....SM0 */
+        "ldrh    r5, [r0], #2             \n" /* ....SM1 */
+        "ldmia   r1, { r7-r8  }           \n" /* DR0.DL0|DR1.DL1 */
+        "subs    r2, r2, #2               \n"
+        "smulwb  r4, r3, r4               \n" /* A*SM0 */
+        "smulwb  r5, r3, r5               \n" /* A*SM1 */
+        "mov     r6, r7, lsl #16          \n" /* DL0<<16 */
+        "mov     r4, r4, lsl #16          \n" /* M0<<16*/
+        "qadd    r6, r4, r6               \n" /* SAT[(DL0<<16)+(A*SM0<<16)] */
+        "qadd    r4, r4, r7               \n" /* SAT[(DR0<<16)+(A*SM0<<16)] */
+        "mov     r7, r8, lsl #16          \n" /* DL1<<16 */
+        "mov     r5, r5, lsl #16          \n" /* M1<<16*/
+        "qadd    r7, r5, r7               \n" /* SAT[(DL1<<16)+(A*SM1<<16)] */
+        "qadd    r5, r5, r8               \n" /* SAT[(DR1<<16)+(A*SM1<<16)] */
+        "bic     r4, r4, r12, lsr #16     \n" /* DL0+A*SM0.DR0+A*SM0 */
+        "orr     r6, r4, r6, lsr #16      \n"
+        "bic     r5, r5, r12, lsr #16     \n" /* DR1+A*SM1.DL1+A*SM1 */
+        "orr     r7, r5, r7, lsr #16      \n"
+        "stmia   r1!, { r6-r7 }           \n"
+        "bhi     1b                       \n"
+        "ldmlofd sp!, { r4-r8 }           \n" /* event count? return */
+        "bxlo    lr                       \n"
+    "2:  ldrh    r4, [r0]                 \n" /* M0 */
+        "ldr     r7, [r1]                 \n" /* DR0.DL0 */
+        "smulwb  r4, r3, r4               \n" /* A*SM0 */
+        "mov     r6, r7, lsl #16          \n" /* DL0<<16 */
+        "mov     r4, r4, lsl #16          \n" /* A*SM0<<16 */
+        "qadd    r6, r4, r6               \n" /* SAT[(DL0<<16)+(A*SM0<<16)] */
+        "qadd    r4, r7, r4               \n" /* SAT[(DR0<<16)+(A*SM0<<16)] */
+        "bic     r4, r4, r12, lsr #16     \n" /* DR0+A*SM0.DL0+A*SM0 */
+        "orr     r6, r4, r6, lsr #16      \n"
+        "str     r6, [r1]                 \n"
+        "ldmfd   sp!, { r4-r8 }           \n"
+        "bx      lr                       \n"
+        :
+        : "i"(PCM_STR_DESC_ADDR_TX_OFFS), "i"(PCM_STR_DESC_AMP_TX_OFFS));
 
-/* Write channel's samples and apply gain factor */
-static FORCE_INLINE void write_samples(void *out,
-                                       const void *src,
-                                       int32_t amp,
-                                       size_t size)
-{
-    if (LIKELY(amp == MIX_AMP_UNITY))
-    {
-        /* Channel is unity amplitude */
-        asm volatile (
-            "ands   r1, %2, #0x1f  \n"
-            "beq    2f             \n"
-        "1:                        \n"
-            "ldr    r0, [%1], #4   \n"
-            "subs   r1, r1, #4     \n"
-            "str    r0, [%0], #4   \n"
-            "bne    1b             \n"
-            "bics   %2, %2, #0x1f  \n"
-            "beq    3f             \n"
-        "2:                        \n"
-            "ldmia  %1!, { r0-r7 } \n"
-            "subs   %2, %2, #32    \n"
-            "stmia  %0!, { r0-r7 } \n"
-            "bhi    2b             \n"
-        "3:                        \n"
-            : "+r"(out), "+r"(src), "+r"(size)
-            :
-            : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7");
-    }
-    else
-    {
-        /* Channel needs amplitude cut */
-        uint32_t l, h;
-        asm volatile (
-        "1:                             \n"
-            "ldr    %3, [%1], #4        \n"
-            "subs   %2, %2, #4          \n"
-            "smulwt %4, %5, %3          \n"
-            "smulwb %3, %5, %3          \n"
-            "mov    %4, %4, lsl #16     \n"
-            "mov    %3, %3, lsl #16     \n"
-            "orr    %4, %4, %3, lsr #16 \n"
-            "str    %4, [%0], #4        \n"
-            "bhi    1b                  \n"
-            : "+r"(out), "+r"(src), "+r"(size),
-              "=&r"(l), "=&r"(h)
-            : "r"(amp));
-    }     
+    (void)out; (void)desc; (void)count;
 }
+#endif /* mix_samples_gain/unity_1ch_s16i_s16i */
+
+#if !defined(mix_samples_unity_2ch_s16i_s16i) || \
+    !defined(mix_samples_gain_2ch_s16i_s16i)
+
+#ifndef mix_samples_unity_2ch_s16i_s16i
+#define mix_samples_unity_2ch_s16i_s16i mix_samples_2ch_s16i_s16i_arm5
+#endif
+
+#ifndef mix_samples_gain_2ch_s16i_s16i
+#define mix_samples_gain_2ch_s16i_s16i  mix_samples_2ch_s16i_s16i_arm5
+#endif
+
+static void __attribute__((naked))
+mix_samples_2ch_s16i_s16i_arm5(struct pcm_stream_desc *desc,
+                               void *out,
+                               unsigned long count)
+{
+    asm volatile (
+        "stmfd   sp!, { r4-r10 }          \n"
+        "ldr     r3, [r0, %1]             \n" /* r3 = desc->amplitude_tx */
+        "ldr     r0, [r0, %0]             \n" /* r0 = desc->addr_tx */
+        "subs    r2, r2, #1               \n"
+        "mvn     r12, #0x00000000         \n"
+        "beq     2f                       \n" /* 1 frame? */
+    "1:  ldrh    r4, [r0], #2             \n" /* ....SL0 */
+        "ldrh    r5, [r0], #2             \n" /* ....SR0 */
+        "ldrh    r6, [r0], #2             \n" /* ....SL1 */
+        "ldrh    r7, [r0], #2             \n" /* ....SR1 */
+        "ldmia   r1, { r9-r10 }           \n" /* DR0.DL0|DR1.DL1 */
+        "subs    r2, r2, #2               \n"
+        "smulwb  r4, r3, r4               \n" /* A*SL0 */
+        "smulwb  r5, r3, r5               \n" /* A*SR0 */
+        "smulwb  r6, r3, r6               \n" /* A*SL1 */
+        "smulwb  r7, r3, r7               \n" /* A*SR1 */
+        "mov     r8, r9, lsl #16          \n" /* DL0<<16 */
+        "mov     r4, r4, lsl #16          \n" /* A*SL0<<16 */
+        "mov     r5, r5, lsl #16          \n" /* A*SR0<<16 */
+        "mov     r6, r6, lsl #16          \n" /* A*SL1<<16 */
+        "mov     r7, r7, lsl #16          \n" /* A*SR1<<16 */
+        "qadd    r4, r4, r8               \n" /* SAT[(DL0<<16)+(A*SL0<<16)] */
+        "qadd    r5, r5, r9               \n" /* SAT[(DR0<<16)+(A*SR0<<16)] */
+        "mov     r9, r10, lsl #16         \n" /* DL1<<16 */
+        "qadd    r6, r6, r9               \n" /* SAT[(DL1<<16)+(A*SL1<<16)] */
+        "qadd    r7, r7, r10              \n" /* SAT[(DR1<<16)+(A*SR1<<16)] */
+        "bic     r5, r5, r12, lsr #16     \n" /* DR0+A*SR0.DL0+A*SL0 */
+        "orr     r8, r5, r4, lsr #16      \n"
+        "bic     r7, r7, r12, lsr #16     \n" /* DR1+A*SR1.DL1+A*SL1 */
+        "orr     r9, r7, r6, lsr #16      \n"
+        "stmia   r1!, { r8-r9 }           \n"
+        "bhi     1b                       \n"
+        "ldmlofd sp!, { r4-r10 }          \n" /* event count? return */
+        "bxlo    lr                       \n"
+    "2:  ldrh    r4, [r0, #0]             \n" /* ....SL0 */
+        "ldrh    r5, [r0, #2]             \n" /* ....SR0 */
+        "ldr     r7, [r1]                 \n" /* DR0.DL0 */
+        "smulwb  r4, r3, r4               \n" /* A*SL0 */
+        "smulwb  r5, r3, r5               \n" /* A*SR0 */
+        "mov     r6, r7, lsl #16          \n" /* DL0<<16 */
+        "mov     r4, r4, lsl #16          \n" /* A*SL0<<16 */
+        "mov     r5, r5, lsl #16          \n" /* A*SL1<<16 */
+        "qadd    r4, r4, r6               \n" /* SAT[(DL0<<16)+(A*SL0<<16)] */
+        "qadd    r5, r5, r7               \n" /* SAT[(DR0<<16)+(A*SR0<<16)] */
+        "bic     r5, r5, r12, lsr #16     \n" /* DR0+A*SR0.DL0+A*SL0 */
+        "orr     r8, r5, r4, lsr #16      \n"
+        "str     r8, [r1]                 \n"
+        "ldmfd   sp!, { r4-r10 }          \n"
+        "bx      lr                       \n"
+        :
+        : "i"(PCM_STR_DESC_ADDR_TX_OFFS), "i"(PCM_STR_DESC_AMP_TX_OFFS));
+
+    (void)out; (void)desc; (void)count;
+}
+#endif /* mix_samples_gain/unity_1ch_s16i_s16i */
+
+#include "pcm-mixer-armv4.c"

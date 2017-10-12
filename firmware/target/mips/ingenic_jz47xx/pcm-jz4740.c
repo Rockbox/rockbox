@@ -24,7 +24,6 @@
 #include "logf.h"
 #include "audio.h"
 #include "sound.h"
-#include "pcm.h"
 #include "pcm-internal.h"
 #include "jz4740.h"
 
@@ -33,9 +32,14 @@
  ** Playback DMA transfer
  **/
 
-void pcm_play_dma_postinit(void)
+void pcm_dma_init(const struct pcm_hw_settings *settings)
 {
-    audiohw_postinit();
+    /* TODO */
+
+    system_enable_irq(DMA_IRQ(DMA_AIC_TX_CHANNEL));
+
+    /* Initialize default register values. */
+    audiohw_init();
 
     /* playback sample: 16 bits burst: 16 bytes */
     __i2s_set_iss_sample_size(16);
@@ -47,44 +51,25 @@ void pcm_play_dma_postinit(void)
     __aic_flush_fifo();
 }
 
-void pcm_play_dma_init(void)
+void pcm_dma_apply_settings(const struct pcm_hw_settings *settings)
 {
     /* TODO */
-
-    system_enable_irq(DMA_IRQ(DMA_AIC_TX_CHANNEL));
-
-    /* Initialize default register values. */
-    audiohw_init();
+    audiohw_set_frequency(settings->samplerate);
 }
 
-void pcm_dma_apply_settings(void)
-{
-    /* TODO */
-    audiohw_set_frequency(pcm_sampr);
-}
-
-static const void* playback_address;
-static inline void set_dma(const void *addr, size_t size)
+static const void *playback_address;
+static inline void set_dma(const void *addr, unsigned long frames)
 {
     int burst_size;
-    logf("%x %d %x", (unsigned int)addr, size, REG_AIC_SR);
+    logf("%p %lu %x", addr, frames, REG_AIC_SR);
 
-    if(size % 16)
+    if(frames % 4)
     {
-        if(size % 4)
-        {
-            size /= 2;
-            burst_size = DMAC_DCMD_DS_16BIT;
-        }
-        else
-        {
-            size /= 4;
-            burst_size = DMAC_DCMD_DS_32BIT;
-        }
+        burst_size = DMAC_DCMD_DS_32BIT;
     }
     else
     {
-        size /= 16;
+        frames /= 4;
         burst_size = DMAC_DCMD_DS_16BYTE;
     }
 
@@ -92,24 +77,11 @@ static inline void set_dma(const void *addr, size_t size)
     REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) = DMAC_DCCSR_NDES;
     REG_DMAC_DSAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)addr);
     REG_DMAC_DTAR(DMA_AIC_TX_CHANNEL)  = PHYSADDR((unsigned long)AIC_DR);
-    REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)  = size;
+    REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL)  = frames;
     REG_DMAC_DRSR(DMA_AIC_TX_CHANNEL)  = DMAC_DRSR_RS_AICOUT;
     REG_DMAC_DCMD(DMA_AIC_TX_CHANNEL)  = (DMAC_DCMD_SAI | DMAC_DCMD_SWDH_32 | burst_size | DMAC_DCMD_DWDH_16 | DMAC_DCMD_TIE);
 
     playback_address = addr;
-}
-
-static inline void play_dma_callback(void)
-{
-    const void *start;
-    size_t size;
-
-    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
-    {
-        set_dma(start, size);
-        REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
-        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-    }
 }
 
 void DMA_CALLBACK(DMA_AIC_TX_CHANNEL)(void) __attribute__ ((section(".icode")));
@@ -130,20 +102,21 @@ void DMA_CALLBACK(DMA_AIC_TX_CHANNEL)(void)
     if (REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_TT)
     {
         REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) &= ~DMAC_DCCSR_TT;
-        play_dma_callback();
+        pcm_play_dma_complete_callback(0);
     }
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
+{
+    set_dma(addr, frames);
+    REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
+}
+
+void pcm_play_dma_prepare(void)
 {
     dma_enable();
-
-    set_dma(addr, size);
-
     __aic_enable_transmit_dma();
     __aic_enable_replay();
-
-    REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
 }
 
 void pcm_play_dma_stop(void)
@@ -157,95 +130,50 @@ void pcm_play_dma_stop(void)
     __aic_disable_transmit_dma();
     __aic_disable_replay();
 
+    playback_address = NULL;
+
     restore_irq(flags);
 }
 
-static unsigned int play_lock = 0;
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
     int flags = disable_irq_save();
-
-    if (++play_lock == 1)
-        __dmac_channel_disable_irq(DMA_AIC_TX_CHANNEL);
-
+    __dmac_channel_disable_irq(DMA_AIC_TX_CHANNEL);
     restore_irq(flags);
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
     int flags = disable_irq_save();
-
-    if (--play_lock == 0)
-        __dmac_channel_enable_irq(DMA_AIC_TX_CHANNEL);
-
+    __dmac_channel_enable_irq(DMA_AIC_TX_CHANNEL);
     restore_irq(flags);
 }
 
-void pcm_play_dma_pause(bool pause)
+static unsigned long get_dma_count(void)
 {
-    int flags = disable_irq_save();
+    if (!(REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_EN))
+        return 0;
 
-    if(pause)
-        REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) &= ~DMAC_DCCSR_EN;
-    else
-        REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
-
-    restore_irq(flags);
-}
-
-static int get_dma_count(void)
-{
-    int count = REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL);
+    unsigned long count = REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL);
     switch(REG_DMAC_DCMD(DMA_AIC_TX_CHANNEL) & DMAC_DCMD_DS_MASK)
     {
-        case DMAC_DCMD_DS_16BIT:
-            count *= 2;
-            break;
         case DMAC_DCMD_DS_32BIT:
-            count *= 4;
             break;
         case DMAC_DCMD_DS_16BYTE:
-            count *= 16;
+            count *= 4;
             break;
     }
 
     return count;
 }
 
-size_t pcm_get_bytes_waiting(void)
-{
-    int bytes, flags = disable_irq_save();
-
-    if(REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_EN)
-        bytes = get_dma_count() & ~3;
-    else
-        bytes = 0;
-
-    restore_irq(flags);
-
-    return bytes;
-}
-
-const void * pcm_play_dma_get_peak_buffer(int *count)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
     int flags = disable_irq_save();
-
-    const void* addr;
-    if(REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_EN)
-    {
-        int bytes = get_dma_count();
-        *count = bytes >> 2;
-        addr = (const void*)((int)(playback_address + bytes + 2) & ~3);
-    }
-    else
-    {
-        *count = 0;
-        addr = NULL;
-    }
-
+    unsigned long frames = get_dma_count();
     restore_irq(flags);
 
-    return addr;
+    return frames;
 }
 
 void audiohw_close(void)
@@ -263,10 +191,14 @@ void pcm_rec_dma_close(void)
 {
 }
 
-void pcm_rec_dma_start(void *addr, size_t size)
+void pcm_rec_dma_capture_frames(void *addr, unsigned long frames)
 {
     (void) addr;
-    (void) size;
+    (void) frames;
+}
+
+void pcm_rec_dma_prepare(void)
+{
 }
 
 void pcm_rec_dma_stop(void)
@@ -281,8 +213,8 @@ void pcm_rec_unlock(void)
 {
 }
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+unsigned long pcm_rec_dma_get_frames_captured(void)
 {
-    return NULL;
+    return 0;
 }
 #endif

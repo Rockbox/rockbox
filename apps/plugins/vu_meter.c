@@ -741,17 +741,10 @@ static void draw_digital_minimeters(void) {
 }
 
 static void analog_meter(void) {
-
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    int left_peak = rb->mas_codec_readreg(0xC);
-    int right_peak = rb->mas_codec_readreg(0xD);
-#elif (CONFIG_CODEC == SWCODEC)
-    static struct pcm_peaks peaks;
-    rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
-                                      &peaks);
-    #define left_peak peaks.left
-    #define right_peak peaks.right
-#endif
+    #define left_peak ((int)peaks.peak[0])
+    #define right_peak ((int)peaks.peak[1])
+    static struct audio_peaks peaks;
+    rb->audio_get_peaks(&peaks, 16);
 
     if(vumeter_settings.analog_use_db_scale) {
         left_needle_top_x = analog_db_scale[left_peak * half_width / MAX_PEAK];
@@ -802,16 +795,10 @@ static void analog_meter(void) {
 }
 
 static void digital_meter(void) {
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    int left_peak = rb->mas_codec_readreg(0xC);
-    int right_peak = rb->mas_codec_readreg(0xD);
-#elif (CONFIG_CODEC == SWCODEC)
-    static struct pcm_peaks peaks;
-    rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
-                                      &peaks);
-    #define left_peak peaks.left
-    #define right_peak peaks.right
-#endif
+    #define left_peak ((int)peaks.peak[0])
+    #define right_peak ((int)peaks.peak[1])
+    static struct audio_peaks peaks;
+    rb->audio_get_peaks(&peaks, 16);
 
     if(vumeter_settings.digital_use_db_scale) {
         num_left_leds = digital_db_scale[left_peak * 44 / MAX_PEAK];

@@ -364,7 +364,7 @@ static FORCE_INLINE void dsp_proc_call(struct dsp_proc_slot *s,
 
     if (s->mask)
     {
-        if ((s->mask & (buf->proc_mask | NACT_BIT)) || buf->remcount <= 0)
+        if ((s->mask & (buf->proc_mask | NACT_BIT)) || !buf->frames_rem)
             return;
 
         buf->proc_mask |= s->mask;
@@ -380,27 +380,27 @@ static FORCE_INLINE void dsp_proc_call(struct dsp_proc_slot *s,
  * dsp:            the DSP instance in use
  *
  * src:
- *     remcount  = number of input samples remaining; set to desired
- *                 number of samples to be processed
- *     pin[0]    = left channel if non-interleaved, audio data if
- *                 interleaved or mono
- *     pin[1]    = right channel if non-interleaved, ignored if
- *                 interleaved or mono
- *     proc_mask = set to zero on first call, updated by this function
- *                 to keep track of which in-place stages have been
- *                 run on the buffers to avoid multiple applications of
- *                 them
- *     format    = for internal buffers, gives the relevant format
- *                 details
+ *     frames_rem = number of input frames remaining; set to desired
+ *                  number of PCM frames to be processed
+ *     pin[0]     = left channel if non-interleaved, audio data if
+ *                  interleaved or mono
+ *     pin[1]     = right channel if non-interleaved, ignored if
+ *                  interleaved or mono
+ *     proc_mask  = set to zero on first call, updated by this function
+ *                  to keep track of which in-place stages have been
+ *                  run on the buffers to avoid multiple applications of
+ *                  them
+ *     format     = for internal buffers, gives the relevant format
+ *                  details
  *
  * dst:
- *     remcount  = number of samples placed in buffer so far; set to
- *                 zero on first call
- *     p16out    = current fill pointer in destination buffer; set to
- *                 buffer start on first call
- *     bufcount  = remaining buffer space in samples; set to maximum
- *                 desired output count on first call
- *     format    = ignored
+ *     frames_rem = number of frames placed in buffer so far; set to
+ *                  zero on first call
+ *     pout       = current fill pointer in destination buffer; set to
+ *                  buffer start on first call
+ *     frames     = remaining buffer space in frames; set to maximum
+ *                  desired output count on first call
+ *     format     = ignored
  *
  * Processing stops when src is exhausted or dst is filled, whichever
  * happens first. Samples can still be output when src buffer is empty
@@ -420,7 +420,7 @@ static FORCE_INLINE void dsp_proc_call(struct dsp_proc_slot *s,
 void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
                  struct dsp_buffer *dst)
 {
-    if (dst->bufcount <= 0)
+    if (!dst->frames)
     {
         /* No place to put anything thus nothing may be safely consumed */
         return;
@@ -449,20 +449,21 @@ void dsp_process(struct dsp_config *dsp, struct dsp_buffer *src,
             dsp_proc_call(s, dsp, &buf);
 
         /* Don't overread/write src/destination */
-        int outcount = MIN(dst->bufcount, buf->remcount);
+        unsigned long count = MIN(dst->frames, buf->frames_rem);
 
-        if (outcount <= 0)
+        if (!count)
             break; /* Output full or purged internal buffers */
 
         if (UNLIKELY(buf->format.version != dsp->io_data.output_version))
             dsp_sample_output_format_change(&dsp->io_data, &buf->format);
 
-        dsp->io_data.outcount = outcount;
+        dsp->io_data.frames_out = count;
         dsp->io_data.output_samples(&dsp->io_data, buf, dst);
 
         /* Advance buffers by what output consumed and produced */
-        dsp_advance_buffer32(buf, outcount);
-        dsp_advance_buffer_output(dst, outcount);
+        dsp_advance_buffer32(buf, count);
+        dsp_advance_buffer_output(dst, count, dsp->io_data.out_pcm_chnum,
+                                  dsp->io_data.out_pcm_size);
 
         DSP_PROCESS_LOOP();
     } /* while */

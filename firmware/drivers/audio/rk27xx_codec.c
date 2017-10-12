@@ -42,7 +42,7 @@ static int codec_read(uint8_t reg, uint8_t *val)
 
 static uint8_t cr1_sel = DACSEL;
 
-static void audiohw_mute(bool mute)
+void audiohw_mute(bool mute)
 {
     if (mute)
         codec_write(CR1, SB_MICBIAS|DAC_MUTE|cr1_sel);
@@ -68,7 +68,7 @@ static int vol_tenthdb2hw(int tdb)
         return -((tdb - 45)/5); /* 0.5 dB steps */
 }
 
-void audiohw_preinit(void)
+void audiohw_codec_init(void)
 {
     /* PD7 output low */
     GPIO_PDDR &= ~(1<<7);
@@ -82,10 +82,7 @@ void audiohw_preinit(void)
     codec_write(CCR2, (FREQ44100 << 4)|FREQ44100);
     codec_write(CRR, RATIO_8|KFAST_32|THRESHOLD_128);
     codec_write(TR1, NOSC);
-}
 
-void audiohw_postinit(void)
-{
     /* power up DAC */
     codec_write(PMR1, SB_OUT|SB_MIX|SB_ADC|SB_IN1|SB_IN2|SB_MIC|SB_IND);
 
@@ -101,8 +98,6 @@ void audiohw_postinit(void)
     sleep(HZ/10);
     GPIO_PDDR |= (1<<7); /* PD7 high */
     sleep(HZ/10);
-
-    audiohw_mute(false);
 }
 
 void audiohw_close(void)

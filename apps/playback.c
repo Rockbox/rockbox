@@ -106,8 +106,11 @@
 /** Miscellaneous **/
 extern unsigned int audio_thread_id;   /* from audio_thread.c */
 extern struct event_queue audio_queue; /* from audio_thread.c */
-extern bool audio_is_initialized;      /* from audio_thread.c */
 extern struct codec_api ci;            /* from codecs.c */
+
+#ifdef HAVE_PLAY_FREQ
+static unsigned long playback_sampr = PLAY_SAMPR_DEFAULT;
+#endif
 
 /** Possible arrangements of the main buffer **/
 static enum audio_buffer_state
@@ -124,7 +127,7 @@ static enum play_status
     PLAY_STOPPED = 0,
     PLAY_PLAYING = AUDIO_STATUS_PLAY,
     PLAY_PAUSED  = AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE,
-} play_status = PLAY_STOPPED;
+} play_status SHAREDBSS_ATTR = PLAY_STOPPED;
 
 /* Sizeable things that only need exist during playback and not when stopped */
 static struct audio_scratch_memory
@@ -1136,7 +1139,7 @@ static void playing_id3_sync(struct track_info *user_info,
     struct mp3entry *id3 = bufgetid3(user_info->id3_hid);
     struct mp3entry *playing_id3 = id3_get(PLAYING_ID3);
 
-    pcm_play_lock();
+    pcmbuf_suspend_position_updates(true);
 
     unsigned long e = playing_id3->elapsed;
     unsigned long o = playing_id3->offset;
@@ -1155,7 +1158,7 @@ static void playing_id3_sync(struct track_info *user_info,
         offset = 0;
     }
 
-    pcm_play_unlock();
+    pcmbuf_suspend_position_updates(false);
 
     if (id3)
     {
@@ -2561,8 +2564,6 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
 #ifndef PLATFORM_HAS_VOLUME_CHANGE
         sound_set_volume(global_settings.volume);
 #endif
-        pcmbuf_update_frequency();
-
         /* Be sure channel is audible */
         pcmbuf_fade(false, true);
 
@@ -3341,7 +3342,6 @@ bool audio_pcmbuf_may_play(void)
     return play_status == PLAY_PLAYING && !ff_rw_mode;
 }
 
-
 /** -- External interfaces -- **/
 
 /* Get a copy of the id3 data for the for current track + offset + skip delta */
@@ -3660,7 +3660,6 @@ long audio_filebufused(void)
     return buf_used();
 }
 
-
 /** -- Settings -- **/
 
 /* Enable or disable cuesheet support and allocate/don't allocate the
@@ -3718,17 +3717,25 @@ void audio_set_playback_frequency(int setting)
     if ((unsigned)setting >= ARRAYLEN(play_sampr))
         setting = 0;
 
-    unsigned long playback_sampr = mixer_get_frequency();
     unsigned long sampr = play_sampr[setting];
 
     if (sampr != playback_sampr)
     {
-        mixer_set_frequency(sampr);
+        playback_sampr = sampr;
         LOGFQUEUE("audio >| audio Q_AUDIO_REMAKE_AUDIO_BUFFER");
         audio_queue_send(Q_AUDIO_REMAKE_AUDIO_BUFFER, 0);
     }
 }
 #endif /* HAVE_PLAY_FREQ */
+
+unsigned long audio_get_playback_samplerate(void)
+{
+#ifdef HAVE_PLAY_FREQ
+    return playback_sampr;
+#else
+    return PLAY_SAMPR_DEFAULT;
+#endif
+}
 
 unsigned int playback_status(void)
 {
@@ -3744,13 +3751,5 @@ void INIT_ATTR playback_init(void)
     mutex_init(&id3_mutex);
     track_list_init();
     buffering_init();
-    pcmbuf_update_frequency();
     add_event(PLAYBACK_EVENT_VOICE_PLAYING, playback_voice_event);
-#ifdef HAVE_CROSSFADE
-    /* Set crossfade setting for next buffer init which should be about... */
-    pcmbuf_request_crossfade_enable(global_settings.crossfade);
-#endif
-#ifdef HAVE_DISK_STORAGE
-    audio_set_buffer_margin(global_settings.buffer_margin);
-#endif
 }

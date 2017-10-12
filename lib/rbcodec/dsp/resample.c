@@ -38,10 +38,10 @@
 #define DEBUGF(...)
 #endif
 
-#define RESAMPLE_BUF_COUNT 192 /* Per channel, per DSP */
+#define RESAMPLE_BUF_PERIOD 192 /* Per channel, per DSP */
 
 /* CODEC_IDX_AUDIO = left and right, CODEC_IDX_VOICE = mono */
-static int32_t resample_out_bufs[3][RESAMPLE_BUF_COUNT] IBSS_ATTR;
+static int32_t resample_out_bufs[3][RESAMPLE_BUF_PERIOD] IBSS_ATTR;
 
 /* Data for each resampler on each DSP */
 static struct resample_data
@@ -58,8 +58,9 @@ static struct resample_data
 } resample_data[DSP_COUNT] IBSS_ATTR;
 
 /* Actual worker function. Implemented here or in target assembly code. */
-int resample_hermite(struct resample_data *data, struct dsp_buffer *src,
-                     struct dsp_buffer *dst);
+unsigned long resample_hermite(struct resample_data *data,
+                               struct dsp_buffer *src,
+                               struct dsp_buffer *dst);
 
 static void resample_flush_data(struct resample_data *data)
 {
@@ -70,7 +71,7 @@ static void resample_flush_data(struct resample_data *data)
 static void resample_flush(struct dsp_proc_entry *this)
 {
     struct resample_data *data = (void *)this->data;
-    data->resample_buf.remcount = 0;
+    data->resample_buf.frames_rem = 0;
     resample_flush_data(data);
 }
 
@@ -97,11 +98,12 @@ static bool resample_new_delta(struct resample_data *data,
 }
 
 #if !defined(CPU_COLDFIRE) && !defined(CPU_ARM)
-int resample_hermite(struct resample_data *data, struct dsp_buffer *src,
-                     struct dsp_buffer *dst)
+unsigned long resample_hermite(struct resample_data *data,
+                               struct dsp_buffer *src,
+                               struct dsp_buffer *dst)
 {
-    int ch = src->format.num_channels - 1;
-    uint32_t count = MIN(src->remcount, 0x8000);
+    unsigned int ch = src->format.num_channels - 1;
+    unsigned long count = MIN(src->frames_rem, 0x8000);
     uint32_t delta = data->delta;
     uint32_t phase, pos;
     int32_t *d;
@@ -111,7 +113,7 @@ int resample_hermite(struct resample_data *data, struct dsp_buffer *src,
         const int32_t *s = src->p32[ch];
 
         d = dst->p32[ch];
-        int32_t *dmax = d + dst->bufcount;
+        int32_t *dmax = d + dst->frames;
 
         /* Restore state */
         phase = data->phase;
@@ -178,17 +180,17 @@ int resample_hermite(struct resample_data *data, struct dsp_buffer *src,
         data->history[ch][1] = pos < 2 ? data->history[ch][pos+1] : s[pos-2];
         data->history[ch][2] = pos < 1 ? data->history[ch][pos+2] : s[pos-1];
     }
-    while (--ch >= 0);
+    while (ch--);
 
     /* Wrap phase accumulator back to start of next frame. */
     data->phase = phase - (pos << 16);
 
-    dst->remcount = d - dst->p32[0];
+    dst->frames_rem = d - dst->p32[0];
     return pos;
 }
 #endif /* CPU */
 
-/* Resample count stereo samples or stop when the destination is full.
+/* Resample frames_rem frames or stop when the destination is full.
  * Updates the src buffer and changes to its own output buffer to refer to
  * the resampled data. */
 static void resample_process(struct dsp_proc_entry *this,
@@ -200,21 +202,21 @@ static void resample_process(struct dsp_proc_entry *this,
 
     *buf_p = dst;
 
-    if (dst->remcount > 0)
+    if (dst->frames_rem)
         return; /* data still remains */
 
-    dst->remcount = 0;
+    dst->frames_rem = 0;
     dst->p32[0] = data->resample_out_p[0];
     dst->p32[1] = data->resample_out_p[1];
 
-    if (src->remcount > 0)
+    if (src->frames_rem)
     {
-        dst->bufcount = RESAMPLE_BUF_COUNT;
+        dst->frames = RESAMPLE_BUF_PERIOD;
 
-        int consumed = resample_hermite(data, src, dst);
+        unsigned long consumed = resample_hermite(data, src, dst);
 
         /* Advance src by consumed amount */
-        if (consumed > 0)
+        if (consumed)
             dsp_advance_buffer32(src, consumed);
     }
     /* else purged resample_buf */
@@ -231,7 +233,7 @@ static intptr_t resample_new_format(struct dsp_proc_entry *this,
     struct resample_data *data = (void *)this->data;
     struct dsp_buffer *dst = &data->resample_buf;
 
-    if (dst->remcount > 0)
+    if (dst->frames_rem)
         return PROC_NEW_FORMAT_TRANSITION;
 
     DSP_PRINT_FORMAT(DSP_PROC_RESAMPLE, *format);

@@ -64,9 +64,10 @@
 #define PCMREC_E_ENCODER_STREAM         0x80100000
 /* I/O error has occurred */
 #define PCMREC_E_IO                     0x80200000
-
+/* Failed to start capture */
+#define PCMREC_E_CAPTURE                0x80400000
 /* all error flags */
-#define PCMREC_E_ALL                    0x803f0000
+#define PCMREC_E_ALL                    0x807f0000
 
 /* Functions called by audio_thread.c */
 void pcm_rec_error_clear(void);

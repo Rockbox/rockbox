@@ -95,4 +95,23 @@ static inline void tdspeed_free_buffers(int32_t **buffers, int nbuf)
     }
 }
 
+/** Output format support configuration **/
+#define CONFIG_DSP_OUT_2BYTE_INT
+
+typedef unsigned long dsp_pcm_format_t;
+
+#define DSP_PCM_FORMAT_INIT(f)          (f)
+
+#define DSP_OUT_DEFAULT_PCM_FORMAT      (0)
+
+#define DSP_PCM_FORMAT_GET_CHNUM        (2)
+#define DSP_PCM_FORMAT_GET_BITS         (16)
+#define DSP_PCM_FORMAT_GET_SIZE         (sizeof (int16_t))
+
+/* not currently supported; return default support */
+#define DSP_PCM_FORMAT_GET_USGN(f)      (false)
+#define DSP_PCM_FORMAT_GET_FLT(f)       (false)  
+#define DSP_PCM_FORMAT_GET_NI(f)        (false)   
+#define DSP_PCM_FORMAT_GET_END(f)       (0)  
+
 #endif

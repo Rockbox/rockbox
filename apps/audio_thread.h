@@ -93,7 +93,7 @@ enum
 /* (*) If you change these, you must check audio_clear_track_notifications
        in playback.c for correctness */
 
-void audio_init(void);
+void audio_init(void) INIT_ATTR;
 void playback_init(void);
 unsigned int playback_status(void);
 

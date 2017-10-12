@@ -43,16 +43,7 @@ static int vol_tenthdb2hw(int db)
     }
 }
 
-void audiohw_init(void)
-{
-    short val = tsc2100_readreg(TSAC4_PAGE, TSAC4_ADDRESS);
-    /* disable DAC PGA soft-stepping */
-    val |= TSAC4_DASTDP;
-    
-    tsc2100_writereg(TSAC4_PAGE, TSAC4_ADDRESS, val);
-}
-
-static void audiohw_mute(bool mute)
+void audiohw_mute(bool mute)
 {
     short vol = tsc2100_readreg(TSDACGAIN_PAGE, TSDACGAIN_ADDRESS);
     /* left  mute bit == 1<<15
@@ -69,9 +60,13 @@ static void audiohw_mute(bool mute)
     tsc2100_writereg(TSDACGAIN_PAGE, TSDACGAIN_ADDRESS, vol);
 }
 
-void audiohw_postinit(void)
+void audiohw_init(void)
 {
-    audiohw_mute(false);
+    short val = tsc2100_readreg(TSAC4_PAGE, TSAC4_ADDRESS);
+    /* disable DAC PGA soft-stepping */
+    val |= TSAC4_DASTDP;
+    
+    tsc2100_writereg(TSAC4_PAGE, TSAC4_ADDRESS, val);
 }
 
 void audiohw_set_volume(int vol_l, int vol_r)
