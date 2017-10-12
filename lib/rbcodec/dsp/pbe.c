@@ -40,7 +40,6 @@
 static int pbe_strength = 0;
 static int pbe_precut = 0;
 static int32_t tcoef1, tcoef2, tcoef3;
-static int32_t *b0[2], *b2[2], *b3[2];
 static int b0_r[2],b2_r[2],b3_r[2],b0_w[2],b2_w[2],b3_w[2];
 int32_t temp_buffer;
 static struct dsp_filter pbe_filter[5];
@@ -61,18 +60,6 @@ static void pbe_buffer_free(void)
 
     core_free(handle);
     handle = -1;
-}
-
-static void pbe_buffer_get_data(void)
-{
-    if (handle < 0)
-        return;
-    b0[0] = core_get_data(handle);
-    b0[1] = b0[0] + B0_SIZE;
-    b2[0] = b0[1] + B0_SIZE;
-    b2[1] = b2[0] + B2_SIZE;
-    b3[0] = b2[1] + B2_SIZE;
-    b3[1] = b3[0] + B3_SIZE;
 }
 
 static void dsp_pbe_flush(void)
@@ -153,7 +140,14 @@ static void pbe_process(struct dsp_proc_entry *this,
     int b0_level = (B0_DLY * pbe_strength) / 100;
     int32_t x;
 
-    pbe_buffer_get_data();
+    int32_t *b0[2], *b2[2], *b3[2];
+
+    b0[0] = core_get_data(handle);
+    b0[1] = b0[0] + B0_SIZE;
+    b2[0] = b0[1] + B0_SIZE;
+    b2[1] = b2[0] + B2_SIZE;
+    b3[0] = b2[1] + B2_SIZE;
+    b3[1] = b3[0] + B3_SIZE;
 
     for(int ch = 0; ch < num_channels; ch++)
     {
