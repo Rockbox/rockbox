@@ -45,7 +45,7 @@ pga_process:
     move.l      (%a2)+, %d2             | %d2 = *s++,
     mac.l       %a0, %d2, (%a2)+, %d2, %acc0 | %acc0 = S(n)*gain, load S(n+1)
     subq.l      #1, %d0                 | --count > 0 ? : effectively n++
-    ble.b       30f | loop done         | no? finish up
+    bls.b       30f | loop done         | no? finish up
 20: | loop                              |
     move.l      %accext01, %d4          | fetch S(n-1)[7:0]
     movclr.l    %acc0, %d3              | fetch S(n-1)[40:8] in %d5[31:0]
@@ -53,8 +53,8 @@ pga_process:
     mac.l       %a0, %d2, (%a2)+, %d2, %acc0 | %acc0 = S(n)*gain, load S(n+1)
     move.b      %d4, %d3                |
     move.l      %d3, (%a3)+             |
-    subq.l      #1, %d0                 | --count > 0 ? : effectively n++
-    bgt.b       20b | loop              | yes? do more samples
+    subq.l      #1, %d0                 | --count ? : effectively n++
+    bhi.b       20b | loop              | yes? do more samples
 30: | loop done                         |
     move.l      %accext01, %d4          | fetch S(n-1)[7:0]
     movclr.l    %acc0, %d3              | fetch S(n-1)[40:8] in %d5[31:0]
@@ -62,7 +62,7 @@ pga_process:
     move.b      %d4, %d3                |
     move.l      %d3, (%a3)              |
     subq.l      #1, %d1                 | next channel
-    bgt.b       10b | channel loop      |
+    bhi.b       10b | channel loop      |
     movem.l     (%sp), %d2-%d4/%a2-%a3  | restore registers
     lea.l       20(%sp), %sp            | cleanup stack
     rts                                 |
@@ -81,7 +81,8 @@ crossfeed_process:
     movem.l     %d2-%d7/%a2-%a6, (%sp)  | save all regs
     movem.l     48(%sp), %a1/%a4        | %a1 = this, %a4 = buf_p
     move.l      (%a4), %a4              | %a4 = buf = *buf_p
-    movem.l     (%a4), %d0/%a4-%a5      | %d0 = buf->remcount, %a4 = buf->p32[0],
+    movem.l     (%a4), %d0/%a4-%a5      | %d0 = buf->frames_rem
+                                        | %a4 = buf->p32[0]
                                         | %a5 = buf->p32[1]
     move.l      (%a1), %a6              | %d7 = state = &crossfeed_state
     movem.l     (%a6), %d1-%d6/%a0-%a3  | %d1 = gain, %d2-%d4 = coefs,
@@ -121,8 +122,8 @@ crossfeed_process:
 1:                                      | ...fwd taken branches more costly
     move.l      (%sp), %a2         | 2b | wrap it up
 
-    subq.l      #1, %d0                 | --count > 0 ?
-    bgt.b       .cfp_loop               | yes? do more
+    subq.l      #1, %d0                 | --count ?
+    bhi.b       .cfp_loop               | yes? do more
 
     movclr.l    %acc0, %d7              | write last outputs
     move.l      %d7, (%a4)              | .
@@ -151,7 +152,7 @@ crossfeed_meier_process:
     move.l      (%a1), %a1              | %a1 = buf = *buf_p
     movem.l     4(%a0), %d1-%d5         | %d1 = vcl, %d2 = vcr, %d3 = vdiff,
                                         | %d4 = coef1, %d5 = coef2
-    movem.l     (%a1), %d0/%a1-%a2      | %d0 = count = buf->remcount
+    movem.l     (%a1), %d0/%a1-%a2      | %d0 = count = buf->frames_rem
                                         | %a1 = p32[0], %a2 = p32[1]
     | Register usage in loop:
     | %d0 = count, %d1 = vcl, %d2 = vcr, %d3 = vdiff/lout,
@@ -172,7 +173,7 @@ crossfeed_meier_process:
     movclr.l    %acc1, %d6              | %d5 = fetch -res2 in s0.31
     add.l       %d6, %d2                | vcr += -res2
     subq.l      #1, %d0                 | count--
-    bgt         .cfmp_loop              | more samples?
+    bhi.b       .cfmp_loop              | more samples?
                                         |
     movem.l     %d1-%d3, 4(%a0)         | save vcl, vcr, vdiff
     movem.l     (%sp), %d2-%d6/%a2      | restore non-volatiles
@@ -181,8 +182,9 @@ crossfeed_meier_process:
     .size   crossfeed_meier_process, .-crossfeed_meier_process
 
 /****************************************************************************
- * int resample_hermite(struct resample_data *data, struct dsp_buffer *src,
- *                      struct dsp_buffer *dst)
+ * unsigned long resample_hermite(struct resample_data *data,
+ *                                struct dsp_buffer *src,
+ *                                struct dsp_buffer *dst)
  */
     .section    .text
     .align      2
@@ -202,11 +204,11 @@ resample_hermite:
     movem.l     %d5/%a5, (%sp)          | store ch, h
     movem.l     (%a0), %d1-%d2          | %d1 = delta = data->delta,
                                         | %d2 = phase = data->phase
-    move.l      (%a1), %d3              | %d3 = srcrem = src->remcount
-    move.l      12(%a2), %d4            | %d4 = dstrem = dst->bufcount
+    move.l      (%a1), %d3              | %d3 = srcrem = src->frames_rem
+    move.l      12(%a2), %d4            | %d4 = dstrem = dst->frames
 
     cmp.l       #0x8000, %d3            | %d4 = MIN(srcrem, 0x8000)
-    ble.b       1f                      |
+    bls.b       1f                      |
     move.l      #0x8000, %d3            |
 1:                                      |
 
@@ -217,14 +219,14 @@ resample_hermite:
     lsr.l       %d7, %d0                |
 
     cmp.l       %d3, %d0                | pos = MIN(pos, srcrem)
-    ble.b       1f                      |
+    bls.b       1f                      |
     move.l      %d3, %d0                |
 1:
 
     lea.l       (%a1, %d0.l*4), %a1     | %a1 = &s[pos]
 
     cmp.l       #3, %d0                 |
-    bge.b       1f                      |
+    bhs.b       1f                      |
     move.l      %d0, %a0                |
     lea.l       (%a0, %a0.l*2), %a0     |
     jmp         2(%pc, %a0.l*4)    | 4b |
@@ -245,7 +247,7 @@ resample_hermite:
 2:
 
     cmp.l       %d3, %d0                | pos past end?
-    bge.w       .hrs_channel_done       |
+    bhs.w       .hrs_channel_done       |
 
     cmp.l       #0x10000, %d1           | delta >= 1.0?
     bhs.w       .hrs_dsstart            | yes? downsampling
@@ -312,8 +314,8 @@ resample_hermite:
     movclr.l    %acc1, %d5              |
     mac.l       %d2, %d5, %acc0         |
 
-    subq.l      #1, %d4                 | dstrem <= 0?
-    ble.b       .hrs_usfull             | yes? stop
+    subq.l      #1, %d4                 | dstrem?
+    bls.b       .hrs_usfull             | no? stop
 
     movclr.l    %acc0, %d5              | *d++ = d5 = result
     move.l      %d5, (%a2)+             |
@@ -355,7 +357,7 @@ resample_hermite:
     /** Downsampling **/
     |
     | Register usage in loop:
-    | r0 = pos, d1 = delta, d2 = phase, d3 = srcrem, d4 = dstrem
+    | d0 = pos, d1 = delta, d2 = phase, d3 = srcrem, d4 = dstrem
     | d5 = scratch, d6 = scratch, d7 = 16 (shift value)
     | a0 = scratch, a1 = &s[pos], a2 = d,
     | a3 = x3, a4 = x2, a5 = x1, a6 = x0
@@ -363,7 +365,6 @@ resample_hermite:
 .hrs_dsloop:
     movclr.l    %acc0, %d5              | *d++ = acc
     move.l      %d5, (%a2)+             |
-
     sub.l       %d0, %a0                | %a0 = -shift = last_pos - pos
     move.l      %a0, %d5                |
     asl.l       #2, %d5                 | -shift -> -bytes
@@ -390,10 +391,10 @@ resample_hermite:
     move.l      %a6, %a5          | 2b  | x1 = x0
 1:
 
-    subq.l      #1, %d4           | 2b  | dstrem <= 0?
-    ble.b       .hrs_channel_done | 2b  | yes? stop
+    subq.l      #1, %d4           | 2b  | dstrem?
+    bls.b       .hrs_channel_done | 2b  | no? stop
     cmp.l       %d3, %d0                |
-    bge.b       .hrs_channel_done       |
+    bhs.b       .hrs_channel_done       |
 
 .hrs_dsstart:
     move.l      (%a1), %a6              | %a6 = s[pos]
@@ -437,7 +438,7 @@ resample_hermite:
     mac.l       %d5, %d6, %acc0         |
 
     cmp.l       %d3, %d0                | %d0 = MIN(pos, srcrem)
-    ble.w       .hrs_dsloop             |
+    bls.w       .hrs_dsloop             |
     move.l      %d3, %d0                |
     bra.w       .hrs_dsloop             |
 
@@ -447,10 +448,10 @@ resample_hermite:
     lea.l       12(%a0), %a5            | h++
     movem.l     56(%sp), %a0-%a2        | load data, src, dst
     subq.l      #1, %d5                 | ch > 0?
-    bgt.w       .hrs_channel_loop       | yes? process next channel
+    bhi.w       .hrs_channel_loop       | yes? process next channel
 
-    move.l      12(%a2), %d1            | %d1 = dst->bufcount
-    sub.l       %d4, %d1                | written = dst->bufcount - dstrem
+    move.l      12(%a2), %d1            | %d1 = dst->frames
+    sub.l       %d4, %d1                | written = dst->frames - dstrem
     move.l      %d1, (%a2)              | dst->remcount = written
     move.l      %d0, %d1                | wrap phase to position in next frame
     lsl.l       %d7, %d1                | data->phase = phase - (pos << 16)
@@ -487,7 +488,7 @@ channel_mode_proc_mono:
     mac.l       %d1, %d3, (%a0)+, %d1, %acc0 |
     mac.l       %d2, %d3, (%a1)+, %d2, %acc0 |
     subq.l      #1, %d0                 |
-    ble.s       20f | loop done         |
+    bls.b       20f | loop done         |
 10: | loop                              |
     movclr.l    %acc0, %d4              | L = R = l/2 + r/2
     mac.l       %d1, %d3, (%a0)+, %d1, %acc0 |
@@ -495,7 +496,7 @@ channel_mode_proc_mono:
     move.l      %d4, (%a2)+             | output to original buffer
     move.l      %d4, (%a3)+             |
     subq.l      #1, %d0                 |
-    bgt.s       10b | loop              |
+    bhi.b       10b | loop              |
 20: | loop done                         |
     movclr.l    %acc0, %d4              | output last sample
     move.l      %d4, (%a2)              |
@@ -533,7 +534,7 @@ channel_mode_proc_custom:
     mac.l       %d2, %d4             , %acc0 |
     mac.l       %d2, %d3, (%a1)+, %d2, %acc1 |
     subq.l      #1, %d0                 |
-    ble.b       20f | loop done         |
+    bls.b       20f | loop done         |
 10: | loop                              |
     movclr.l    %acc0, %d5              |
     movclr.l    %acc1, %d6              |
@@ -544,7 +545,7 @@ channel_mode_proc_custom:
     move.l      %d5, (%a2)+             |
     move.l      %d6, (%a3)+             |
     subq.l      #1, %d0                 |
-    bgt.s       10b | loop              |
+    bhi.b       10b | loop              |
 20: | loop done                         |
     movclr.l    %acc0, %d5              | output last sample
     movclr.l    %acc1, %d6              |
@@ -580,7 +581,7 @@ channel_mode_proc_karaoke:
     mac.l       %d1, %d3, (%a0)+, %d1, %acc0 | L = l/2 - r/2
     msac.l      %d2, %d3, (%a1)+, %d2, %acc0 |
     subq.l      #1, %d0                 |
-    ble.b       20f | loop done         |
+    bls.b       20f | loop done         |
 10: | loop                              |
     movclr.l    %acc0, %d4              |
     mac.l       %d1, %d3, (%a0)+, %d1, %acc0 | L = l/2 - r/2
@@ -589,7 +590,7 @@ channel_mode_proc_karaoke:
     neg.l       %d4                     | R = -L = -(l/2 - r/2) = r/2 - l/2
     move.l      %d4, (%a3)+             |
     subq.l      #1, %d0                 |
-    bgt.s       10b | loop              |
+    bhi.b       10b | loop              |
 20: | loop done                         |
     movclr.l    %acc0, %d4              | output last sample
     move.l      %d4, (%a2)              |
@@ -601,7 +602,9 @@ channel_mode_proc_karaoke:
     .size       channel_mode_proc_karaoke, .-channel_mode_proc_karaoke
 
 /****************************************************************************
- * void filter_process(struct dsp_filter *f, int32_t *buf[], int count,
+ * void filter_process(struct dsp_filter *f,
+ *                     int32_t *buf[],
+ *                     unsigned long count,
  *                     unsigned int channels)
  *
  * define HIGH_PRECISION as '1' to make filtering calculate lower bits after
@@ -662,12 +665,12 @@ filter_process:
 #endif
     move.l      %d2, (%a6)+             | save result
     subq.l      #1, %d5                 | are we done with this channel?
-    bgt         20b | loop
+    bhi.b       20b | loop
 
     movem.l     %d0-%d3, (%a5)          | save history back to struct
     lea.l       16(%a5), %a5            | point to next channel's history
     subq.l      #1, 60(%sp)             | have we processed both channels?
-    bhi         10b | channel loop
+    bhi.b       10b | channel loop
 
 #if HIGH_PRECISION
     movem.l     (%sp), %d2-%d7/%a2-%a6
@@ -709,14 +712,13 @@ sample_output_stereo:
     movem.l     %d1-%d7/%a2-%a6, (%sp)    | be the far more common condition
     move.l      #0x80, %macsr             | put emac unit in signed int mode
     movem.l     52(%sp), %a0-%a2          | %a0 = this, %a1 = src, %a2 = dst
-    move.l      (%a0), %a0                | %a0 = this->outcount
-    move.l      4(%a2), %a4               | %a4 = dst->p16out
+    move.b      4(%a0), %d1               | %d1 = this->out_pcm_shift
+    move.l      (%a0), %a0                | %a0 = this->frames_out
+    move.l      4(%a2), %a4               | %a4 = dst->pout
     lea.l       (%a4, %a0.l*4), %a0       | %a0 = count -> end address
     movem.l     4(%a1), %a2-%a3           | %a2 = src->p32[0], %a3 = src->p32[1]
-    clr.l       %d1                       | %a1 = multiplier: (1 << (16 - scale))
-    move.b      19(%a1), %d1              | %d1 = src->format.output_scale
-    sub.l       #16, %d1                  |
-    neg.l       %d1                       |
+    ext.b       %d1                       | %a1 = multiplier: (1 << (16 - -scale))
+    add.l       #16, %d1                  |
     moveq.l     #1, %d0                   |
     asl.l       %d1, %d0                  |
     move.l      %d0, %a1                  |
@@ -822,14 +824,13 @@ sample_output_mono:
     movem.l     %d1-%d5/%a2-%a4, (%sp)    | be the far more common condition
     move.l      #0x80, %macsr             | put emac unit in signed int mode
     movem.l     36(%sp), %a0-%a2          | %a0 = this, %a1 = src, %a2 = dst
-    move.l      (%a0), %a0                | %a0 = this->outcount
-    move.l      4(%a2), %a3               | %a3 = dst->p16out
+    move.b      4(%a0), %d1               | %d1 = this->out_pcm_shift
+    move.l      (%a0), %a0                | %a0 = this->frames_out
+    move.l      4(%a2), %a3               | %a3 = dst->pout
     movem.l     4(%a1), %a2               | %a2 = src->p32[0]
     lea.l       (%a3, %a0.l*4), %a0       | %a0 = count -> end address
-    clr.l       %d1                       | %d5 = multiplier: (1 << (16 - scale))
-    move.b      19(%a1), %d1              | %d1 = src->format.output_scale
-    sub.l       #16, %d1                  |
-    neg.l       %d1                       |
+    ext.b       %d1                       | %d5 = multiplier: (1 << (16 - -scale))
+    add.l       #16, %d1                  |
     moveq.l     #1, %d5                   |
     asl.l       %d1, %d5                  |
     move.l      #0x8000, %a4              | %a4 = rounding term
@@ -904,3 +905,107 @@ sample_output_mono:
     lea.l       32(%sp), %sp              | cleanup
     rts                                   |
     .size      sample_output_mono, .-sample_output_mono
+
+/****************************************************************************
+ * void sample_output_mono_m(struct sample_io_data *this,
+ *                          struct dsp_buffer *src,
+ *                          struct dsp_buffer *dst)
+ *
+ * Same treatment as sample_output_mono but for one channel in and out
+ */
+    .section   .text
+    .align      2
+    .global    sample_output_mono_m
+sample_output_mono_m:
+    | input: 4(sp) = count, 8(sp) = src, 12(sp) = dst
+    lea.l       -36(%sp), %sp             | save registers
+    move.l      %macsr, %d1               | do it now as at many lines will
+    movem.l     %d1-%d6/%a2-%a4, (%sp)    | be the far more common condition
+    move.l      #0x80, %macsr             | put emac unit in signed int mode
+    movem.l     36(%sp), %a0-%a2          | %a0 = this, %a1 = src, %a2 = dst
+    move.b      4(%a0), %d1               | %d1 = this->out_pcm_shift
+    move.l      (%a0), %a0                | %a0 = this->frames_out
+    move.l      4(%a2), %a3               | %a3 = dst->pout
+    movem.l     4(%a1), %a2               | %a2 = src->p32[0]
+    lea.l       (%a3, %a0.l*2), %a0       | %a0 = count -> end address
+    ext.b       %d1                       | %d6 = multiplier: (1 << (16 - -scale))
+    add.l       #16, %d1                  |
+    moveq.l     #1, %d6                   |
+    asl.l       %d1, %d6                  |
+    move.l      #0x8000, %a4              | %a4 = rounding term
+    moveq.l     #30, %d0                  | %d0 = second line bound
+    add.l       %a3, %d0                  |
+    and.l       #0xfffffff0, %d0          |
+    cmp.l       %a0, %d0                  | at least a full line?
+    bhi.w       40f | word loop 1 start   | no? do as trailing words
+    sub.l       #16, %d0                  | %d0 = first line bound
+    cmp.l       %a3, %d0                  | any leading words?
+    bls.b       20f | line loop start     | no? start line loop
+10: | word loop 0                         |
+    move.l      (%a2)+, %d1               |
+    move.l      %a4, %acc0                |
+    mac.l       %d1, %d6, %acc0           | shift to high word
+    movclr.l    %acc0, %d1                |
+    swap.w      %d1                       |
+    move.w      %d1, (%a3)+               |
+    cmp.l       %a3, %d0                  |
+    bhi.b       10b | long loop 0         |
+20: | line loop start                     |
+    lea.l       -14(%a0), %a1             | %a1 = at or just before last line bound
+30: | line loop                           |
+    move.l      (%a2)+, %d0               | get next 8 samples and scale
+    move.l      %a4, %acc0                |
+    move.l      %acc0, %acc1              |
+    move.l      %acc1, %acc2              |
+    move.l      %acc2, %acc3              |
+    mac.l       %d0, %d6, (%a2)+, %d1, %acc0 |
+    mac.l       %d1, %d6, (%a2)+, %d2, %acc1 |
+    mac.l       %d0, %d6, (%a2)+, %d3, %acc2 |
+    mac.l       %d3, %d6  (%a2)+, %d4, %acc3 |
+    lea.l       16(%a3), %a3              | increment dest here, mitigate stalls
+    movclr.l    %acc0, %d0                |
+    movclr.l    %acc1, %d2                |
+    movclr.l    %acc2, %d1                |
+    movclr.l    %acc3, %d3                |
+    swap.w      %d2                       |
+    move.w      %d2, %d0                  |
+    swap.w      %d3                       |
+    move.w      %d3, %d1                  |
+    move.l      %a4, %acc0                |
+    move.l      %acc0, %acc1              |
+    move.l      %acc1, %acc2              |
+    move.l      %acc2, %acc3              |
+    mac.l       %d4, %d6, (%a2)+, %d5, %acc0 |
+    mac.l       %d5, %d6, (%a2)+, %d2, %acc1 |
+    mac.l       %d2, %d6, (%a2)+, %d3, %acc2 |
+    mac.l       %d3, %d6             , %acc3 |
+    movclr.l    %acc0, %d2                |
+    movclr.l    %acc1, %d4                |
+    movclr.l    %acc2, %d3                |
+    movclr.l    %acc3, %d5                |
+    swap.w      %d4                       |
+    move.w      %d4, %d2                  |
+    swap.w      %d5                       |
+    move.w      %d5, %d3                  |
+    movem.l     %d0-%d3, -16(%a3)         | write 8 mono samples
+    cmp.l       %a3, %a1                  |
+    bhi.b       30b | line loop           |
+40: | word loop 1 start                   |
+    cmp.l       %a3, %a0                  | any words left?
+    bls.b       60f | output end          | no? stop
+50: | loop loop 1                         |
+    move.l      (%a2)+, %d1               | handle trailing words
+    move.l      %a4, %acc0                |
+    mac.l       %d1, %d6, %acc0           | the same way as leading ones
+    movclr.l    %acc0, %d1                |
+    swap.w      %d1
+    move.w      %d1, (%a3)+               |
+    cmp.l       %a3, %a0                  |
+    bhi.b       50b | long loop 1         |
+60: | output end                          |
+    movem.l     (%sp), %d1-%d6/%a2-%a4    | restore registers
+    move.l      %d1, %macsr               |
+    lea.l       36(%sp), %sp              | cleanup
+    rts                                   |
+    .size      sample_output_mono_m, .-sample_output_mono_m
+

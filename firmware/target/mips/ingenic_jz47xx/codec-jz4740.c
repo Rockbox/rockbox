@@ -255,19 +255,12 @@ static void audiohw_mute(bool mute)
         REG_ICDC_CDCCR1 &= ~ICDC_CDCCR1_HPMUTE;
 }
 
-void audiohw_preinit(void)
-{
-}
-
-void audiohw_postinit(void)
-{
-    audiohw_mute(false);
-    //HP_turn_on();
-}
-
 void audiohw_init(void)
 {
     i2s_codec_init();
+
+    audiohw_mute(false);
+    //HP_turn_on();
 }
 
 void audiohw_set_volume(int vol_l, int vol_r)

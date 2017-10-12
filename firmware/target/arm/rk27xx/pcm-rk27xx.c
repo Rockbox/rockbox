@@ -29,28 +29,18 @@
 #include "sound.h"
 #include "pcm-internal.h"
 
-static int locked = 0;
+static unsigned long dma_play_state = 0;
 
 /* Mask the DMA interrupt */
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    if (++locked == 1)
-    {
-        int old = disable_irq_save();
-        INTC_IMR &= ~IRQ_ARM_HDMA; /* mask HDMA interrupt */ 
-        restore_irq(old);
-    }
+    bitclr32(&INTC_IMR, IRQ_ARM_HDMA); /* mask HDMA interrupt */ 
 }
 
 /* Unmask the DMA interrupt if enabled */
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-    if(--locked == 0)
-    {
-        int old = disable_irq_save();
-        INTC_IMR |= IRQ_ARM_HDMA; /* unmask HDMA interrupt */
-        restore_irq(old);
-    }
+    bitset32(&INTC_IMR, dma_play_state); /* unmask HDMA interrupt */
 }
 
 void pcm_play_dma_stop(void)
@@ -58,18 +48,18 @@ void pcm_play_dma_stop(void)
     HDMA_CON0 = 0x00;
     HDMA_ISR = 0x00;
 
-    locked = 1;
+    dma_play_state = 0;
 }
 
-static void hdma_i2s_transfer(const void *addr, size_t size)
+static void hdma_i2s_transfer(const void *addr, unsigned long frames)
 {
     SCU_CLKCFG &= ~CLKCFG_HDMA; /* enable HDMA clock */
 
-    commit_discard_dcache_range(addr, size);
+    commit_discard_dcache_range(addr, frames*4);
 
     HDMA_ISRC0 = (uint32_t)addr;               /* source address */
     HDMA_IDST0 = (uint32_t)&I2S_TXR;           /* i2s tx fifo */
-    HDMA_ICNT0 = (uint16_t)((size>>2) - 1);    /* number of dma transactions
+    HDMA_ICNT0 = (uint16_t)(frames - 1);       /* number of dma transactions
                                                 * of transfer size bytes
                                                 * (zero based)
                                                 */
@@ -105,28 +95,17 @@ static void hdma_i2s_transfer(const void *addr, size_t size)
                   (1<<0));   /* hardware trigger DMA mode */
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
+{
+    /* kick in DMA transfer */
+    hdma_i2s_transfer(addr, frames);
+    dma_play_state = IRQ_ARM_HDMA;
+}
+
+void pcm_play_dma_prepare(void)
 {
     /* Stop any DMA in progress */
     pcm_play_dma_stop();
-
-    /* kick in DMA transfer */
-    hdma_i2s_transfer(addr, size);
-}
-
-/* pause DMA transfer by disabling clock to DMA module */
-void pcm_play_dma_pause(bool pause)
-{
-    if(pause)
-    {
-        SCU_CLKCFG |= CLKCFG_HDMA;
-        locked = 1;
-    }
-    else
-    {
-        SCU_CLKCFG &= ~CLKCFG_HDMA;
-        locked = 0;
-    }
 }
 
 static void i2s_init(void)
@@ -240,60 +219,37 @@ static void set_codec_freq(unsigned int freq)
 }
 #endif
 
-void pcm_play_dma_init(void)
+void pcm_dma_init(const struct pcm_hw_settings *settings)
 {
     /* unmask HDMA interrupt in INTC */
     INTC_IMR |= IRQ_ARM_HDMA;
     INTC_IECR |= IRQ_ARM_HDMA;
 
-    audiohw_preinit();
+    audiohw_init();
     
     i2s_init();
+    (void)settings;
 }
 
-void pcm_play_dma_postinit(void)
-{
-    audiohw_postinit();
-}
-
-void pcm_dma_apply_settings(void)
+void pcm_dma_apply_settings(const struct pcm_hw_settings *settings)
 {
 #ifdef CODEC_SLAVE
-    set_codec_freq(pcm_fsel);
+    set_codec_freq(settings->fsel);
 #endif
 
-    audiohw_set_frequency(pcm_fsel);
+    audiohw_set_frequency(settings->fsel);
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
     /* current terminate count is in transfer size units (4bytes here) */
-    return (HDMA_CCNT0 & 0xffff)<<2;
+    return HDMA_CCNT0 & 0xffff;
 }
 
 /* audio DMA ISR called when chunk from callers buffer has been transfered */
 void INT_HDMA(void)
 {
-    const void *start;
-    size_t size;
-
-    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
-    {
-        hdma_i2s_transfer(start, size);
-        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-    }
-}
-
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    uint32_t addr;
-    
-    int old = disable_irq_save();
-    addr = HDMA_CSRC0;
-    *count = ((HDMA_CCNT0 & 0xffff)<<2);
-    restore_interrupt(old);
-
-    return (void*)addr;
+    pcm_play_dma_complete_callback(0);
 }
 
 /****************************************************************************

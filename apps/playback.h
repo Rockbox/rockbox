@@ -79,9 +79,19 @@ void audio_set_cuesheet(bool enable);
 #ifdef HAVE_CROSSFADE
 void audio_set_crossfade(int enable);
 #endif
+#ifdef HAVE_PLAY_FREQ
+void audio_set_playback_frequency(int setting);
+#endif
+
+unsigned long audio_get_playback_samplerate(void);
 
 size_t audio_get_filebuflen(void);
 
 unsigned int playback_status(void);
+
+const void * audio_get_unplayed_data(unsigned long *frames_rem);
+
+int audio_add_pcm_hook(audio_pcm_hook_fn hook);
+int audio_remove_pcm_hook(audio_pcm_hook_fn hook);
 
 #endif /* _PLAYBACK_H */

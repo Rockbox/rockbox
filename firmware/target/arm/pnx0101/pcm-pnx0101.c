@@ -29,29 +29,28 @@ short __attribute__((section(".dmabuf"))) dma_buf_left[DMA_BUF_SAMPLES];
 short __attribute__((section(".dmabuf"))) dma_buf_right[DMA_BUF_SAMPLES];
 
 const int16_t* p IBSS_ATTR;
-size_t p_size IBSS_ATTR;
+unsigned long p_frames IBSS_ATTR;
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
 {
     p = addr;
-    p_size = size;
+    p_frames = frames;
+}
+
+void pcm_play_dma_prepare(void)
+{
 }
 
 void pcm_play_dma_stop(void)
 {
-}
-
-void pcm_play_dma_pause(bool pause)
-{
-    (void)pause;
 }
 
 static inline void fill_dma_buf(int offset)
@@ -64,15 +63,13 @@ static inline void fill_dma_buf(int offset)
 
     if (pcm_playing && !pcm_paused)
     {
-        bool new_buffer =false;
-
         do
         {
-            int count;
+            unsigned long count;
             const int16_t *tmp_p;
-            count = MIN(p_size / 4, (size_t)(lend - l));
+            count = MIN(p_frames, (unsigned long)(lend - l));
             tmp_p = p;
-            p_size -= count * 4;
+            p_frames -= count * 4;
 
             if ((int)l & 3)
             {
@@ -106,19 +103,12 @@ static inline void fill_dma_buf(int offset)
             }
             p = tmp_p;
 
-            if (new_buffer)
-            {
-                new_buffer = false;
-                pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-            }
-
             if (l >= lend)
                 return;
 
-            new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK,
-                                                        &p, &p_size);
+            pcm_play_dma_complete(0);
         }
-        while (p_size);
+        while (p_frames);
     }
 
     if (l < lend)
@@ -146,7 +136,7 @@ unsigned long physical_address(void *p)
     return (MMUBLOCK((adr >> 21) & 0xf) << 21) | (adr & ((1 << 21) - 1));
 }
 
-void pcm_init(void)
+void pcm_dma_init(const struct pcm_hw_settings *settings)
 {
     int i;
 
@@ -186,28 +176,18 @@ void pcm_init(void)
     DMAINTEN &= ~3;
     DMAR10(0) |= 1;
     DMAR10(1) |= 1;
+
+    (void)settings;
 }
 
-void pcm_play_dma_postinit(void)
+void pcm_dma_apply_settings(const struct pcm_hw_settings *settings)
 {
-    audiohw_postinit();
+    (void)settings;
 }
 
-void pcm_dma_apply_settings(void)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
-}
-
-size_t pcm_get_bytes_waiting(void)
-{
-    return p_size & ~3;
-}
-
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    unsigned long addr = (unsigned long)p;
-    size_t cnt = p_size;
-    *count = cnt >> 2;
-    return (void *)((addr + 2) & ~3);
+    return p_frames;
 }
 
 void audiohw_set_volume(int value)

@@ -26,8 +26,11 @@
 #include "logf.h"
 #include "usb.h"
 #include "pcm.h"
+#include "pcm-internal.h"
 #include "sound.h"
 #include "audio_thread.h"
+#include "pcmbuf.h"
+#include "dsp_core.h"
 #ifdef AUDIO_HAVE_RECORDING
 #include "pcm_record.h"
 #endif
@@ -51,7 +54,7 @@
 #define LOGFQUEUE(...)
 #endif
 
-bool audio_is_initialized = false;
+static bool audio_is_ready = false;
 
 /* Event queues */
 struct event_queue audio_queue SHAREDBSS_ATTR;
@@ -62,12 +65,17 @@ static long audio_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
 static const char audio_thread_name[] = "audio";
 unsigned int audio_thread_id = 0;
 
+pcm_handle_t audio_pcm_handle = 0;
+
 static void NORETURN_ATTR audio_thread(void)
 {
     struct queue_event ev;
     ev.id = Q_NULL; /* something not in switch below */
 
-    pcm_postinit();
+    pcm_init();
+    audio_is_ready = true;
+    sound_settings_apply();
+    audiohw_mute(false);
 
     while (1)
     {
@@ -118,6 +126,16 @@ intptr_t audio_queue_send(long id, intptr_t data)
     return queue_send(&audio_queue, id, data);
 }
 
+bool audio_is_initialized(void)
+{
+    return audio_is_ready;
+}
+
+void audio_wait_for_ready(void)
+{
+    audio_queue_send(Q_NULL, 0);
+}
+
 /* Return the playback and recording status */
 int audio_status(void)
 {
@@ -136,25 +154,41 @@ void audio_error_clear(void)
 #endif
 }
 
+void audio_get_peaks(struct audio_peaks *peaks, unsigned int bits)
+{
+    int peak_bits = pcm_get_peaks(audio_pcm_handle, &peaks->pcm_peaks);
+
+    if (bits == (unsigned int)peak_bits)
+        return;
+
+    for (unsigned int i = 0; i < ARRAYLEN(peaks->peak); i++)
+        peaks->peak[i] = audio_scale_sample_to(peaks->peak[i], bits);
+}
+
+const void * audio_get_unplayed_data(unsigned long *frames_rem)
+{
+    return pcm_get_unplayed_data(audio_pcm_handle, frames_rem);
+}
+
+int audio_add_pcm_hook(audio_pcm_hook_fn hook)
+{
+    return pcmbuf_add_pcm_hook(hook);
+}
+
+int audio_remove_pcm_hook(audio_pcm_hook_fn hook)
+{
+    return pcmbuf_remove_pcm_hook(hook);
+}
+
 /** -- Startup -- **/
 
 /* Initialize the audio system - called from init() in main.c */
-void INIT_ATTR audio_init(void)
+void audio_init(void)
 {
-    /* Can never do this twice */
-    if (audio_is_initialized)
-    {
-        logf("audio: already initialized");
-        return;
-    }
-
-    logf("audio: initializing");
-
     /* Initialize queues before giving control elsewhere in case it likes
        to send messages. Thread creation will be delayed however so nothing
        starts running until ready if something yields such as talk_init. */
     queue_init(&audio_queue, true);
-    codec_thread_init();
 
     /* This thread does buffer, so match its priority */
     audio_thread_id = create_thread(audio_thread, audio_stack,
@@ -165,13 +199,10 @@ void INIT_ATTR audio_init(void)
     queue_enable_queue_send(&audio_queue, &audio_queue_sender_list,
                             audio_thread_id);
 
+    dsp_init();
+    codec_thread_init();
     playback_init();
 #ifdef AUDIO_HAVE_RECORDING
     recording_init();
 #endif
-
-   /* Probably safe to say */
-    audio_is_initialized = true;
-
-    sound_settings_apply();
 }

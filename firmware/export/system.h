@@ -97,6 +97,12 @@ int get_cpu_boost_counter(void);
 #define MAX(a, b) (((a)>(b))?(a):(b))
 #endif
 
+#ifndef UABS
+#define UABS(utype, a) \
+    ({ typeof (a) ___a = (a); \
+       ___a < 0 ? (utype)(-(___a + 1)) + (utype)1 : (utype)___a; })
+#endif
+
 /* return number of elements in array a */
 #define ARRAYLEN(a) (sizeof(a)/sizeof((a)[0]))
 
@@ -231,9 +237,11 @@ static inline void cpu_boost_unlock(void)
 #endif
 
 #ifndef MASK_N
-/* Make a mask of n contiguous bits, shifted left by 'shift' */
+/* Make a mask of n contiguous bits, shifted left by 'shift'
+ * Constraints: 1 <= n <= non-padding bit count of type
+ */
 #define MASK_N(type, n, shift) \
-    ((type)((((type)1 << (n)) - (type)1) << (shift)))
+    ((~(type)0 ^ ((~(type)0 << ((n) - 1)) << 1)) << (shift))
 #endif
 
 /* Declare this as HIGHEST_IRQ_LEVEL if they don't differ */

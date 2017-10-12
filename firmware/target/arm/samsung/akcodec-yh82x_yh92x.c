@@ -78,7 +78,7 @@ void audiohw_init(void)
     GPIOF_OUTPUT_VAL |=  0x80;
     GPIOF_OUTPUT_EN  |=  0x80;
 
-    audiohw_preinit();
+    audiohw_codec_init();
 
     GPIOL_ENABLE     |=  0x20;
     GPIOL_OUTPUT_VAL |=  0x20;

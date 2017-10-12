@@ -124,6 +124,9 @@
 
 #define FRACTSIZE 10
 
+static pcm_handle_t pcm_handle;
+#define BEATBOX_PCM_FORMAT PCM_FORMAT_T_PARM(PCM_FORMAT_S16_2CH_2I)
+
 #ifndef SIMULATOR
 
 #if (HW_SAMPR_CAPS & SAMPR_CAP_22)
@@ -142,8 +145,8 @@
 
 #endif
 
-
-#define BUF_SIZE 256
+#define SAMPLE_SIZE (2*sizeof(int16_t))
+#define BUF_COUNT 256
 #define NBUF   2
 
 #undef SYNC
@@ -213,7 +216,7 @@ const unsigned char * drumNames[]={
     "Open Surdo     "
 };
 
-long gmbuf[BUF_SIZE*NBUF];
+static int16_t gmbuf[NBUF][BUF_COUNT*2] ALIGNED_ATTR(4);
 
 int quit=0;
 
@@ -285,16 +288,28 @@ enum plugin_status plugin_start(const void* parameter)
         ROCKBOX_DIR "/patchset/drums.cfg") == -1)
     {
         printf("\nINIT ERROR\n");
-        return -1;
+        return PLUGIN_ERROR;
     }
-//#ifndef SIMULATOR
-    rb->pcm_play_stop();
+
+    if (!rb->plugin_get_audio_buffer(NULL))
+    {
+        printf("\nPLAYBACK STOP ERROR\n");
+        return PLUGIN_ERROR;
+    }
+
+    pcm_handle = rb->pcm_open(PCM_STREAM_PLAYBACK);
+    if (!pcm_handle)
+    {
+        printf("\nNO PCM\n");
+        return PLUGIN_ERROR;
+    }
+
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPLE_RATE); // 44100 22050 11025
+    rb->pcm_set_frequency(pcm_handle, SAMPLE_RATE); // 44100 22050 11025
 
 
     retval = beatboxmain();
@@ -303,8 +318,8 @@ enum plugin_status plugin_start(const void* parameter)
     rb->profstop();
 #endif
 
-    rb->pcm_play_stop();
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    rb->pcm_set_frequency(pcm_handle, HW_SAMPR_RESET);
+    rb->pcm_close(pcm_handle);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(false);
@@ -316,12 +331,12 @@ enum plugin_status plugin_start(const void* parameter)
     return PLUGIN_OK;
 }
 
-bool swap=0;
-bool lastswap=1;
+static int swap=0;
+static int lastswap=1;
 
 inline void synthbuf(void)
 {
-   long *outptr;
+   int16_t *outptr;
    register int i;
    static int currentSample=0;
    int synthtemp[2];
@@ -329,18 +344,17 @@ inline void synthbuf(void)
 #ifndef SYNC
    if(lastswap==swap) return;
    lastswap=swap;
-
-   outptr=(swap ? gmbuf : gmbuf+BUF_SIZE);
-#else
-   outptr=gmbuf;
 #endif
+   outptr=gmbuf[swap];
 
-   for(i=0; i<BUF_SIZE/2; i++)
+   for(i=0; i<BUF_COUNT; i++)
    {
       synthSample(&synthtemp[0], &synthtemp[1]);
       currentSample++;
-      *outptr=((synthtemp[0]&0xFFFF) << 16) | (synthtemp[1]&0xFFFF);
-      outptr++;
+
+      *outptr++ = synthtemp[0] & 0xFFFF;
+      *outptr++ = synthtemp[1] & 0xFFFF;
+
       if(currentSample==numberOfSamples)
       {
             if(playState == STATE_PLAYING)
@@ -516,8 +530,11 @@ void redrawScreen(unsigned char force)
     rb->lcd_update();
 }
 
-void get_more(const void** start, size_t* size)
+int get_more(int status, const void** start, unsigned long* frames)
 {
+    if (status < 0)
+        return status;
+
 #ifndef SYNC
     if(lastswap!=swap)
     {
@@ -528,13 +545,14 @@ void get_more(const void** start, size_t* size)
     synthbuf();  // For some reason midiplayer crashes when an update is forced
 #endif
 
-    *size = BUF_SIZE*sizeof(short);
+    *frames = BUF_COUNT;
+    *start = gmbuf[swap];
+
 #ifndef SYNC
-    *start = swap ? gmbuf : gmbuf + BUF_SIZE;
-    swap=!swap;
-#else
-    *start = gmbuf;
+    swap ^= 1;
 #endif
+
+    return 0;
 }
 
 int beatboxmain()
@@ -544,7 +562,8 @@ int beatboxmain()
 
     numberOfSamples=44100/10;
     synthbuf();
-    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+    rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                      BEATBOX_PCM_FORMAT);
 
     rb->lcd_set_background(0x000000);
     rb->lcd_clear_display();

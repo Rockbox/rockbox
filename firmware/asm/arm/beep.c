@@ -20,20 +20,21 @@
  ****************************************************************************/
 
 /* Actually output samples into beep_buf */
-static FORCE_INLINE void beep_generate(uint32_t *out, int count,
-                                       int32_t *phase, uint32_t step,
-                                       uint32_t amplitude)
+static FORCE_INLINE void beep_generate(int16_t *out, unsigned long count,
+                                       uint32_t *phase, uint32_t step)
 {
-    uint32_t s;
+    uint32_t s, t;
 
     asm volatile (
+        "mvn   %4, #0x8000         \n"
     "1:                            \n"
-        "eor   %3, %5, %1, asr #31 \n"
+        "eor   %3, %4, %1, asr #31 \n"
+        "orr   %3, %3, #0x0001     \n"
         "subs  %2, %2, #1          \n"
-        "str   %3, [%0], #4        \n"
-        "add   %1, %1, %4          \n"
-        "bgt   1b                  \n"
+        "strh  %3, [%0], #2        \n"
+        "add   %1, %1, %5          \n"
+        "bhi   1b                  \n"
         : "+r"(out), "+r"(*phase), "+r"(count),
-          "=&r"(s)
-        : "r"(step), "r"(amplitude));
+          "=&r"(s), "=&r"(t)
+        : "r"(step));
 }

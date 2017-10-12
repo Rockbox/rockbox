@@ -26,7 +26,8 @@
 #include "s_stuff.h"
 
 /* Declare functions that go to IRAM. */
-void pdbox_get_more(const void** start, size_t* size) ICODE_ATTR;
+int pdbox_get_more(int status, const void** start,
+                   unsigned long* frames) ICODE_ATTR;
 int rockbox_send_dacs(void) ICODE_ATTR;
 
 /* Extern variables. */
@@ -41,6 +42,9 @@ static unsigned int outbuf_head;
 static unsigned int outbuf_tail;
 static unsigned int outbuf_fill;
 
+static pcm_handle_t pcm_handle;
+#define PDBOX_SYS_PCM_FORMAT PCM_FORMAT_T_PARM(PCM_FORMAT_S16_2CH_2I)
+
 /* Playing status. */
 static bool playing;
 
@@ -54,7 +58,11 @@ void rockbox_open_audio(int rate)
     playing = false;
 
     /* Stop playing to reconfigure audio settings. */
-    rb->pcm_play_stop();
+
+    if (!pcm_handle)
+        pcm_handle = rb->pcm_open(PCM_STREAM_PLAYBACK);
+    else
+        rb->pcm_stop(pcm_handle);
 
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
@@ -63,8 +71,7 @@ void rockbox_open_audio(int rate)
 #endif
 
     /* Set sample rate of the audio buffer. */
-    rb->pcm_set_frequency(rate);
-    rb->pcm_apply_settings();
+    rb->pcm_set_frequency(pcm_handle, rate);
 
     /* Initialize output buffer. */
     for(i = 0; i < OUTBUFSIZE; i++)
@@ -78,25 +85,28 @@ void rockbox_open_audio(int rate)
 /* Close audio. */
 void rockbox_close_audio(void)
 {
+    /* Restore default sampling rate. */
+    rb->pcm_set_frequency(pcm_handle, HW_SAMPR_RESET);
+
     /* Stop playback. */
-    rb->pcm_play_stop();
+    rb->pcm_close(pcm_handle);
+    pcm_handle = 0;
 
     /* Reset playing status. */
     playing = false;
-
-    /* Restore default sampling rate. */
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
-    rb->pcm_apply_settings();
 }
 
 /* Rockbox audio callback. */
-void pdbox_get_more(const void** start, size_t* size)
+int pdbox_get_more(int status, const void** start, unsigned long* frames)
 {
+    if (status < 0)
+        return status;
+
     if(outbuf_fill > 0)
     {
         /* Store output data address and size. */
         *start = outbuf[outbuf_tail].data;
-        *size = sizeof(outbuf[outbuf_tail].data);
+        *frames = ARRAYLEN(outbuf[outbuf_tail].data) / 2;
 
         /* Free this part of output buffer. */
         outbuf[outbuf_tail].fill = 0;
@@ -117,6 +127,8 @@ void pdbox_get_more(const void** start, size_t* size)
 
         /* Nothing to play. */
     }
+
+    return 0;
 }
 
 /* Audio I/O. */
@@ -183,7 +195,8 @@ int rockbox_send_dacs(void)
     if(!playing && outbuf_fill > 0)
     {
         /* Start playing. */
-        rb->pcm_play_data(pdbox_get_more, NULL, NULL, 0);
+        rb->pcm_play_data(pcm_handle, pdbox_get_more, NULL, 0,
+                          PDBOX_SYS_PCM_FORMAT);
 
         /* Set status flag. */
         playing = true;

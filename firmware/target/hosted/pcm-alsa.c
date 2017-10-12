@@ -52,9 +52,7 @@
 #include "kernel.h"
 #include "panic.h"
 
-#include "pcm.h"
 #include "pcm-internal.h"
-#include "pcm_mixer.h"
 #include "pcm_sampr.h"
 #include "audiohw.h"
 #include "pcm-alsa.h"
@@ -84,15 +82,14 @@ static snd_pcm_sframes_t buffer_size = MIX_FRAME_SAMPLES * 32; /* ~16k */
 static snd_pcm_sframes_t period_size = MIX_FRAME_SAMPLES * 4;  /*  ~4k */
 static sample_t *frames;
 
-static const void  *pcm_data = 0;
-static size_t       pcm_size = 0;
+static const void  *pcm_data = NULL;
+static unsigned long pcm_frames = 0;
+static unsigned long pcm_sampr = 0;
 
 #ifdef USE_ASYNC_CALLBACK
 static snd_async_handler_t *ahandler;
 static pthread_mutex_t pcm_mtx;
 static char signal_stack[SIGSTKSZ];
-#else
-static int recursion;
 #endif
 
 static int set_hwparams(snd_pcm_t *handle, unsigned sample_rate)
@@ -253,28 +250,30 @@ void pcm_alsa_set_digital_volume(int vol_db)
     printf("%d dB -> factor = %d\n", vol_db - 48, dig_vol_mult);
 }
 
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
+{
+    pcm_data = addr;
+    pcm_frames = frames;
+}
+
 /* copy pcm samples to a spare buffer, suitable for snd_pcm_writei() */
 static bool fill_frames(void)
 {
     ssize_t copy_n, frames_left = period_size;
-    bool new_buffer = false;
 
     while (frames_left > 0)
     {
-        if (!pcm_size)
+        if (!pcm_frames)
         {
-            new_buffer = true;
-            if (!pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data,
-                                                &pcm_size))
-            {
+            if (pcm_data)
+                pcm_play_dma_complete_callback(0);
+
+            if (!(pcm_data && pcm_frames))
                 return false;
-            }
         }
 
-        if (pcm_size % 4)
-            panicf("Wrong pcm_size");
         /* the compiler will optimize this test away */
-        copy_n = MIN((ssize_t)pcm_size/4, frames_left);
+        copy_n = MIN(pcm_frames, frames_left);
         if (format == SND_PCM_FORMAT_S32_LE)
         {
             /* We have to convert 16-bit to 32-bit, the need to multiply the
@@ -289,16 +288,12 @@ static bool fill_frames(void)
             /* Rockbox and PCM have same format: memcopy */
             memcpy(&frames[2*(period_size-frames_left)], pcm_data, copy_n * 4);
         }
-        pcm_data += copy_n*4;
-        pcm_size -= copy_n*4;
-        frames_left -= copy_n;
 
-        if (new_buffer)
-        {
-            new_buffer = false;
-            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-        }
+        pcm_data += copy_n*PCM_FRAME_SIZE;
+        pcm_frames -= copy_n;
+        frames_left -= copy_n;
     }
+
     return true;
 }
 
@@ -417,10 +412,10 @@ void cleanup(void)
 }
 
 
-void pcm_play_dma_init(void)
+void pcm_dma_init(const struct pcm_hw_settings *settings)
 {
     int err;
-    audiohw_preinit();
+    audiohw_codec_init();
 
     if ((err = snd_pcm_open(&handle, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
     {
@@ -439,7 +434,7 @@ void pcm_play_dma_init(void)
         panicf("Setting of swparams failed: %s\n", snd_strerror(err));
     }
 
-    pcm_dma_apply_settings();
+    pcm_dma_apply_settings(settings);
 
 #ifdef USE_ASYNC_CALLBACK
     pthread_mutexattr_t attr;
@@ -455,23 +450,21 @@ void pcm_play_dma_init(void)
 }
 
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
 #ifdef USE_ASYNC_CALLBACK
     pthread_mutex_lock(&pcm_mtx);
 #else
-    if (recursion++ == 0)
-        tick_remove_task(pcm_tick);
+    tick_remove_task(pcm_tick);
 #endif
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
 #ifdef USE_ASYNC_CALLBACK
     pthread_mutex_unlock(&pcm_mtx);
 #else
-    if (--recursion == 0)
-        tick_add_task(pcm_tick);
+    tick_add_task(pcm_tick);
 #endif
 }
 
@@ -485,31 +478,39 @@ static void pcm_dma_apply_settings_nolock(void)
 #endif
 }
 
-void pcm_dma_apply_settings(void)
+void pcm_dma_apply_settings(const struct pcm_hw_settings *settings)
 {
-    pcm_play_lock();
+#ifdef USE_ASYNC_CALLBACK
+    pthread_mutex_lock(&pcm_mtx);
+#else
+    int rc = tick_remove_task(pcm_tick);
+#endif
+    pcm_sampr = settings->samplerate;
     pcm_dma_apply_settings_nolock();
     pcm_play_unlock();
+#ifdef USE_ASYNC_CALLBACK
+    pthread_mutex_unlock(&pcm_mtx);
+#else
+    if (rc == 0)
+    {
+        /* Tick was active; restore it */
+        tick_add_task(pcm_tick);
+    }
+#endif
 }
-
-
-void pcm_play_dma_pause(bool pause)
-{
-    snd_pcm_pause(handle, pause);
-}
-
 
 void pcm_play_dma_stop(void)
 {
+    pcm_data = NULL;
+    pcm_frames = 0;
     snd_pcm_drain(handle);
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_prepare(void)
 {
+    pcm_data = NULL;
+    pcm_frames = 0;
     pcm_dma_apply_settings_nolock();
-
-    pcm_data = addr;
-    pcm_size = size;
 
     while (1)
     {
@@ -543,7 +544,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
             }
             case SND_PCM_STATE_PAUSED:
             {   /* paused, simply resume */
-                pcm_play_dma_pause(0);
+                snd_pcm_pause(handle, 0);
                 return;
             }
             case SND_PCM_STATE_DRAINING:
@@ -556,34 +557,21 @@ void pcm_play_dma_start(const void *addr, size_t size)
     }
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
-    return pcm_size;
+    return pcm_frames;
 }
-
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    uintptr_t addr = (uintptr_t)pcm_data;
-    *count = pcm_size / 4;
-    return (void *)((addr + 3) & ~3);
-}
-
-void pcm_play_dma_postinit(void)
-{
-    audiohw_postinit();
-}
-
 
 void pcm_set_mixer_volume(int volume)
 {
     (void)volume;
 }
 #ifdef HAVE_RECORDING
-void pcm_rec_lock(void)
+void pcm_rec_dma_lock(void)
 {
 }
 
-void pcm_rec_unlock(void)
+void pcm_rec_dma_unlock(void)
 {
 }
 
@@ -595,19 +583,23 @@ void pcm_rec_dma_close(void)
 {
 }
 
-void pcm_rec_dma_start(void *start, size_t size)
+void pcm_rec_dma_capture_frames(void *start, unsigned long frames)
 {
     (void)start;
-    (void)size;
+    (void)frames;
+}
+
+void pcm_rec_dma_capture_frames_prepare(void)
+{
 }
 
 void pcm_rec_dma_stop(void)
 {
 }
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+unsigned long pcm_rec_dma_get_frames_captured(void)
 {
-    return NULL;
+    return 0;
 }
 
 void audiohw_set_recvol(int left, int right, int type)

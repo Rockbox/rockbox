@@ -29,7 +29,7 @@
 #include "dsp-target.h"
 #include "pcm-internal.h"
 
-void pcm_play_dma_init(void)
+void pcm_dma_init(const struct pcm_hw_settings *settings)
 {
     IO_CLK_O1DIV = 3;
     /* Set GIO25 to CLKOUT1A */
@@ -42,32 +42,24 @@ void pcm_play_dma_init(void)
 
     /* init DSP */
 //    dsp_init();
+
+    (void)settings;
 }
 
-void pcm_play_dma_postinit(void)
+void pcm_dma_apply_settings(const struct pcm_hw_settings *settings)
 {
-    audiohw_postinit();
-
-    /* wake DSP */
-//    dsp_wake();
+    audiohw_set_frequency(settings->fsel);
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    (void) count;
-    return 0;
-}
-
-void pcm_dma_apply_settings(void)
-{
-    audiohw_set_frequency(pcm_fsel);
-}
-
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
 {
     (void)addr;
-    (void)size;
-    DEBUGF("pcm_play_dma_start(0x%x, %d)", addr, size);
+    (void)frames;
+    DEBUGF("pcm_play_dma_start(%p, %lu)", addr, frames);
+}
+
+void pcm_play_dma_prepare(void)
+{
 }
 
 void pcm_play_dma_stop(void)
@@ -75,22 +67,17 @@ void pcm_play_dma_stop(void)
 
 }
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
 
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
 
 }
 
-void pcm_play_dma_pause(bool pause)
-{
-    (void) pause;
-}
-
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
     return 0;
 }

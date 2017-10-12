@@ -29,7 +29,6 @@
 #include "config.h"
 #include "debug.h"
 #include "panic.h"
-#include "pcm.h"
 #include "pcm-internal.h"
 
 #include "sound/asound.h"
@@ -43,8 +42,8 @@
 static struct pcm* _alsa_handle = NULL;
 
 
-/* Bytes left in the Rockbox PCM frame buffer. */
-static size_t _pcm_buffer_size = 0;
+/* Frames left in the Rockbox PCM frame buffer. */
+static unsigned long _pcm_buffer_frames = 0;
 
 
 /* Rockbox PCM frame buffer. */
@@ -77,6 +76,10 @@ static void* pcm_thread_run(void* nothing)
 
     while(true)
     {
+        /* FIXME: This doesn't actually cause the PCM lock to lock out
+         *        the callback if this thread is executing right after
+         *        releasing the mutex below when the PCM lock is acquired
+         *        by another thread - jethead71 */
         pthread_mutex_lock(&_dma_suspended_mtx);
         while((_dma_stopped == 1) || (_dma_locked == 1))
         {
@@ -86,10 +89,11 @@ static void* pcm_thread_run(void* nothing)
         }
         pthread_mutex_unlock(&_dma_suspended_mtx);
 
-        if(_pcm_buffer_size == 0)
+        if(_pcm_buffer_frames == 0)
         {
-            /* Retrive a new PCM buffer from Rockbox. */
-            if(! pcm_play_dma_complete_callback(PCM_DMAST_OK, &_pcm_buffer, &_pcm_buffer_size))
+            pcm_play_dma_complete_callback(0);
+
+            if(!(_pcm_buffer && _pcm_buffer_frames))
             {
                 DEBUGF("DEBUG %s: No new buffer.", __func__);
 
@@ -97,10 +101,9 @@ static void* pcm_thread_run(void* nothing)
                 continue;
             }
         }
-        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 
         /* This relies on Rockbox PCM frame buffer size == ALSA PCM frame buffer size. */
-        if(pcm_write(_alsa_handle, _pcm_buffer, _pcm_buffer_size) != 0)
+        if(pcm_write(_alsa_handle, _pcm_buffer, _pcm_buffer_frames*4) != 0)
         {
             DEBUGF("ERROR %s: pcm_write failed: %s.", __func__, pcm_get_error(_alsa_handle));
 
@@ -108,7 +111,7 @@ static void* pcm_thread_run(void* nothing)
             continue;
         }
 
-        _pcm_buffer_size = 0;
+        _pcm_buffer_frames = 0;
 
         /*DEBUGF("DEBUG %s: Thread running.", __func__);*/
     }
@@ -307,7 +310,7 @@ void pcm_play_dma_init(void)
                                = 4 * 256 * 2 * 2
                                = 4096
                                = Rockbox PCM buffer size
-        pcm_thread_run relies on this size match. See pcm_mixer.h.
+        pcm_thread_run relies on this size match. See pcm-internal.h.
     */
     _config.channels          = 2;
     _config.rate              = 44100;
@@ -337,7 +340,21 @@ void pcm_play_dma_init(void)
 }
 
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
+{
+    _pcm_buffer        = addr;
+    _pcm_buffer_frames = frames;
+
+    if (!_dma_stopped)
+        return;
+
+    pthread_mutex_lock(&_dma_suspended_mtx);
+    _dma_stopped = 0;
+    pthread_cond_signal(&_dma_suspended_cond);
+    pthread_mutex_unlock(&_dma_suspended_mtx);
+}
+
+void pcm_play_dma_prepare(void)
 {
     TRACE;
 
@@ -355,30 +372,9 @@ void pcm_play_dma_start(const void *addr, size_t size)
         panicf("ERROR %s: Could not unmute.", __func__);
     }
 
-    _pcm_buffer      = addr;
-    _pcm_buffer_size = size;
-
-    pthread_mutex_lock(&_dma_suspended_mtx);
-    _dma_stopped = 0;
-    pthread_cond_signal(&_dma_suspended_cond);
-    pthread_mutex_unlock(&_dma_suspended_mtx);
+    if (!_dma_stopped)
+        pcm_play_dma_stop();
 }
-
-
-/* TODO: Why is this in the API if it gets never called? */
-void pcm_play_dma_pause(bool pause)
-{
-    TRACE;
-
-    pthread_mutex_lock(&_dma_suspended_mtx);
-    _dma_stopped = pause ? 1 : 0;
-    if(_dma_stopped == 0)
-    {
-        pthread_cond_signal(&_dma_suspended_cond);
-    }
-    pthread_mutex_unlock(&_dma_suspended_mtx);
-}
-
 
 void pcm_play_dma_stop(void)
 {
@@ -390,53 +386,35 @@ void pcm_play_dma_stop(void)
     pthread_mutex_unlock(&_dma_suspended_mtx);
 }
 
-
-/* Unessecary play locks before pcm_play_dma_postinit. */
-static int _play_lock_recursion_count = -10000;
-
-
 void pcm_play_dma_postinit(void)
 {
     TRACE;
-
-    _play_lock_recursion_count = 0;
 }
 
-
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
     TRACE;
 
-    ++_play_lock_recursion_count;
-
-    if(_play_lock_recursion_count == 1)
-    {
-        pthread_mutex_lock(&_dma_suspended_mtx);
-        _dma_locked = 1;
-        pthread_mutex_unlock(&_dma_suspended_mtx);
-    }
+    pthread_mutex_lock(&_dma_suspended_mtx);
+    _dma_locked = 1;
+    pthread_mutex_unlock(&_dma_suspended_mtx);
 }
 
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
     TRACE;
 
-    --_play_lock_recursion_count;
-
-    if(_play_lock_recursion_count == 0)
-    {
-        pthread_mutex_lock(&_dma_suspended_mtx);
-        _dma_locked = 0;
-        pthread_cond_signal(&_dma_suspended_cond);
-        pthread_mutex_unlock(&_dma_suspended_mtx);
-    }
+    pthread_mutex_lock(&_dma_suspended_mtx);
+    _dma_locked = 0;
+    pthread_cond_signal(&_dma_suspended_cond);
+    pthread_mutex_unlock(&_dma_suspended_mtx);
 }
 
 
 void pcm_dma_apply_settings(void)
 {
-    unsigned int rate = pcm_get_frequency();
+    unsigned int rate = pcm_cur_sampr;
 
     DEBUGF("DEBUG %s: Current sample rate: %u, next sampe rate: %u.", __func__, _config.rate, rate);
 
@@ -456,22 +434,11 @@ void pcm_dma_apply_settings(void)
 }
 
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
     TRACE;
 
-    return _pcm_buffer_size;
-}
-
-
-/* TODO: WTF */
-const void* pcm_play_dma_get_peak_buffer(int* count)
-{
-    TRACE;
-
-    uintptr_t addr = (uintptr_t) _pcm_buffer;
-    *count = _pcm_buffer_size / 4;
-    return (void*) ((addr + 3) & ~3);
+    return _pcm_buffer_frames;
 }
 
 

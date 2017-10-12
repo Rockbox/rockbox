@@ -18,9 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+######################
 
-#define MIXER_OPTIMIZED_MIX_SAMPLES
-#define MIXER_OPTIMIZED_WRITE_SAMPLES
 static struct emac_context
 {
     unsigned long saved;
@@ -31,8 +30,7 @@ static struct emac_context
 static FORCE_INLINE void save_emac_context(void)
 {
     /* Save only if not already saved */
-    if (emac_context.saved == 0)
-    {
+    if (emac_context.saved == 0) {
         emac_context.saved = 1;
         asm volatile (
             "move.l   %%macsr, %%d0             \n"
@@ -51,8 +49,7 @@ static FORCE_INLINE void save_emac_context(void)
 static FORCE_INLINE void restore_emac_context(void)
 {
     /* Restore only if saved */
-    if (UNLIKELY(emac_context.saved != 0))
-    {
+    if (UNLIKELY(emac_context.saved != 0)) {
         asm volatile (
            "movem.l (%0), %%d0-%%d1/%%a0-%%a1  \n"
            "move.l  %%a1, %%acc1               \n"
@@ -66,77 +63,394 @@ static FORCE_INLINE void restore_emac_context(void)
     }
 }
 
-#define mixer_buffer_callback_exit() restore_emac_context()
+#define mixer_buffer_cleanup() restore_emac_context()
 
-/* Mix channels' samples and apply gain factors */
-static FORCE_INLINE void mix_samples(void *out,
-                                     const void *src0,
-                                     int32_t src0_amp,
-                                     const void *src1,
-                                     int32_t src1_amp,
-                                     size_t size)
+static void
+write_samples_unity_1ch_s16i_s16i(const struct pcm_stream_desc *desc,
+                                  void *out,
+                                  unsigned long count)
 {
-    uint32_t s0, s1, s2, s3;
-    save_emac_context();
+    /* SM0.SM1|SM2.SM3|SM4.SM5|SM6.SM7 */
+    /* SM0....|SM1.SM2|SM3.SM4|SM5.SM6|SM7.SM8? */
+    int16_t const *src = desc->addr_tx;
 
     asm volatile (
-        "move.l     (%1)+, %5                 \n"
-    "1:                                       \n"
-        "movea.w    %5, %4                    \n"
-        "asr.l      %10, %5                   \n"
-        "mac.l      %4, %8,            %%acc0 \n"
-        "mac.l      %5, %8, (%2)+, %5, %%acc1 \n"
-        "movea.w    %5, %4                    \n"
-        "asr.l      %10, %5                   \n"
-        "mac.l      %4, %9,            %%acc0 \n"
-        "mac.l      %5, %9, (%1)+, %5, %%acc1 \n"
-        "movclr.l   %%acc0, %6                \n"
-        "movclr.l   %%acc1, %7                \n"
-        "swap.w     %6                        \n"
-        "move.w     %6, %7                    \n"
-        "move.l     %7, (%0)+                 \n"
-        "subq.l     #4, %3                    \n"
+        "move.l     %3(%0), %0                 \n"
+        "move.l     %1, %%d0                   \n"
+        "lea.l      (%0, %2.l*2), %2           \n" /* count => src end */
+        "btst.l     #1, %%d0                   \n"
+        "beq.b      1f \n"
+        "move.w     (%1)+, %%d1                  \n"
+        "move.l     %%d1, %%d5                 \n"
+        "swap.w     %%d1                       \n"
+        "move.w     %%d5, %%d1                 \n"
+        "move.w     %%d1, (%0)+                \n"
+        "cmp.l      %1, %2 \n"
+        "bls.b      9f \n"
+    "1:                                        \n"
+        "add.l      #14, %0                   \n"
+        "and.l      #0xfffffff0, %%d0          \n"
+        "move.l     %%d0, %%a0                  \n"
+
+    "x:  movem.l    %1, %%d0/%%d2/%%d4/%%d6       \n"
+        "lea.l      16(%1), %1                \n"
+        "move.l     %%d0, %%d5                  \n"
+        "swap.w     %%d5                       \n"
+        "move.l     %%d5, %d1                  \n"
+        "move.w     %%d0, %d1                  \n"
+        "move.w     %%d5  %d0                  \n"
+
+        "move.l     %%d2, %d5                  \n"
+        "swap.w     %%d5                       \n"
+        "move.l     %%d5, %d3                  \n"
+        "move.w     %%d2, %d3                  \n"
+        "move.w     %%d5, %d2                  \n"
+
+        "movem.l    %%d0-%%d3, %0               \n"
+        "lea.l      16(%0), %0                \n"
+
+        "move.l     %%d4, %%d0                  \n"
+        "swap.w     %%d4                       \n"
+        "move.l     %%d4, %%d1                  \n"
+        "move.w     %%d0, %%d1                  \n"
+        "move.w     %%d4, %%d0                  \n"
+
+        "move.l     %%d6, %%d2                  \n"
+        "swap.w     %%d6                       \n"
+        "move.l     %%d6, %%d3                  \n"
+        "move.w     %%d2, %%d3                  \n"
+        "move.w     %%d6, %%d2                  \n"
+
+        "movem.l    %%d0-%%d3, %0               \n"
+        "lea.l      16(%0), %0                \n"
+
+        "subq.l     #1, %2                    \n"
         "bhi.b      1b                        \n"
-        : "+a"(out), "+a"(src0), "+a"(src1), "+d"(size),
-          "=&a"(s0), "=&d"(s1), "=&d"(s2), "=&d"(s3)
-        : "r"(src0_amp), "r"(src1_amp), "d"(16)
-    );
+    "9:                                       \n"
+        :
+        : "+a"(desc), "+a"(out), "+a"(count)
+        : "i"(PCM_STR_DESC_ADDR_OFFS));
 }
 
-/* Write channel's samples and apply gain factor */
-static FORCE_INLINE void write_samples(void *out,
-                                       const void *src,
-                                       int32_t amp,
-                                       size_t size)
+static void
+write_samples_unity_2ch_s16i_s16i(const struct pcm_stream_desc *desc,
+                                  void *out,
+                                  unsigned long count)
 {
-    if (LIKELY(amp == MIX_AMP_UNITY))
-    {
-        /* Channel is unity amplitude */
-        memcpy(out, src, size);
-    }
-    else
-    {
-        /* Channel needs amplitude cut */
-        uint32_t s0, s1, s2, s3;
-        save_emac_context();
-
-        asm volatile (
-            "move.l     (%1)+, %4                 \n"
-        "1:                                       \n"
-            "movea.w    %4, %3                    \n"
-            "asr.l      %8, %4                    \n"
-            "mac.l      %3, %7,            %%acc0 \n"
-            "mac.l      %4, %7, (%1)+, %4, %%acc1 \n"
-            "movclr.l   %%acc0, %5                \n"
-            "movclr.l   %%acc1, %6                \n"
-            "swap.w     %5                        \n"
-            "move.w     %5, %6                    \n"
-            "move.l     %6, (%0)+                 \n"
-            "subq.l     #4, %2                    \n"
-            "bhi.b      1b                        \n"
-            : "+a"(out), "+a"(src), "+d"(size),
-              "=&a"(s0), "=&d"(s1), "=&d"(s2), "=&d"(s3)
-            : "r"(amp), "d"(16)
-        );
-    }     
+    memcpy(out, desc->addr_tx, count*2*sizeof (int16_t));
 }
+
+static void
+write_samples_gain_1ch_s16i_s16i(const struct pcm_stream_desc *desc,
+                                 void *out,
+                                 unsigned long count)
+{
+    save_emac_context();
+
+    const void *src = desc->addr_tx;
+    unsigned long t0, t1, t2, t3;
+
+    /* M0.M1|M2.M3|M4.M5
+         4                */
+    /* ...M0|M1.M2|M3.M4
+         3     4          */
+    asm volatile (
+        "move.l     %1, %6                    \n"
+        "btst.l     #1, %6                    \n"
+        "bne.b      1f                        \n"
+        "move.l     (%1)+, %4                 \n" /* longword aligned */
+        "movea.w    %4, %3                    \n"
+        "asr.l      %8, %4                    \n"
+        "mac.l      %4, %7,          , %%acc0 \n"
+        "subq.l     #1, %2                    \n"
+        "bhi.b      2f                        \n"
+        "bra.b      4f                        \n"
+    "1:  movea.w    (%1)+, %3                 \n" /* word aligned */
+        "mac.l      %3, %7, (%1)+, %4, %%acc0 \n"
+        "subq.l     #1, %2                    \n"
+        "bhi.b      3f                        \n"
+        "bra.b      4f                        \n"
+    "2:  movclr.l   %%acc0, %5                \n"
+        "mac.l      %3, %7, (%1)+, %4, %%acc0 \n"
+        "move.l     %5, %6                    \n"
+        "swap.w     %6                        \n"
+        "move.w     %6, %5                    \n"
+        "move.l     %5, (%0)+                 \n"
+        "subq.l     #1, %2                    \n"
+        "bls.b      4f                        \n"
+    "3:  movclr.l   %%acc0, %5                \n"
+        "movea.w    %4, %3                    \n"
+        "asr.l      %8, %4                    \n"
+        "mac.l      %4, %7,          , %%acc0 \n"
+        "move.l     %5, %6                    \n"
+        "swap.w     %6                        \n"
+        "move.w     %6, %5                    \n"
+        "move.l     %5, (%0)+                 \n"
+        "subq.l     #1, %2                    \n"
+        "bhi.b      2b                        \n"
+    "4:  movclr.l   %%acc0, %5                \n"
+        "move.l     %5, %6                    \n"
+        "swap.w     %6                        \n"
+        "move.w     %6, %5                    \n"
+        "move.l     %5, (%0)                  \n"
+        : "+a"(out), "+a"(src), "+d"(count),
+          "=&a"(t0), "=&d"(t1), "=&d"(t2), "=&d"(t3)
+        : "r"(pcm->amplitude_tx), "d"(16));
+}
+
+static void
+write_samples_gain_2ch_s16i_s16i(const struct pcm_stream_desc *desc,
+                                 void *out,
+                                 unsigned long count)
+{
+    save_emac_context();
+
+    const void *src = desc->addr_tx;
+    int32_t t0, t1, t2, t3;
+
+    /* L0.R0|L1.R1|L2.R2
+         4                */
+    /* ...L0|R0.L1|R1.L2
+         3     4         */
+    asm volatile (
+        "move.l     %1, %6                    \n"
+        "btst.l     #1, %6                    \n"
+        "bne.b      2f                        \n"
+        "move.l     (%1)+, %4                 \n" /* longword aligned */
+        "movea.w    %4, %3                    \n"
+        "asr.l      %8, %4                    \n"
+        "mac.l      %4, %7,          , %%acc0 \n"
+        "mac.l      %3, %7, (%1)+, %4, %%acc1 \n"
+        "subq.l     #1, %2                    \n"
+        "bls.b      4f                        \n"
+    "1:  movclr.l   %%acc0, %5                \n"
+        "movclr.l   %%acc1, %6                \n"
+        "movea.w    %4, %3                    \n"
+        "asr.l      %8, %4                    \n"
+        "mac.l      %4, %7,          , %%acc0 \n"
+        "mac.l      %3, %7, (%1)+, %4, %%acc1 \n"
+        "swap.w     %6                        \n"
+        "move.w     %6, %5                    \n"
+        "move.l     %5, (%0)+                 \n"
+        "subq.l     #1, %2                    \n"
+        "bls.b      4f                        \n"
+        "movclr.l   %%acc0, %5                \n"
+        "movclr.l   %%acc1, %6                \n"
+        "movea.w    %4, %3                    \n"
+        "asr.l      %8, %4                    \n"
+        "mac.l      %4, %7,          , %%acc0 \n"
+        "mac.l      %3, %7, (%1)+, %4, %%acc1 \n"
+        "swap.w     %6                        \n"
+        "move.w     %6, %5                    \n"
+        "move.l     %5, (%0)+                 \n"
+        "subq.l     #1, %2                    \n"
+        "bhi.b      1b                        \n"
+        "bra.b      4f                        \n"
+    "2:  movea.w    (%1)+, %3                 \n" /* word aligned */
+        "mac.l      %3, %7, (%1)+, %4, %%acc0 \n"
+        "movea.w    %4, %3                    \n"
+        "asr.l      %8, %4                    \n"
+        "mac.l      %4, %7,          , %%acc1 \n"
+        "subq.l     #1, %2                    \n"
+        "bls.b      4f                        \n"
+    "3:  movclr.l   %%acc0, %5                \n"
+        "movclr.l   %%acc1, %6                \n"
+        "mac.l      %3, %7, (%1)+, %4, %%acc0 \n"
+        "movea.w    %4, %3                    \n"
+        "asr.l      %8, %4                    \n"
+        "mac.l      %4, %7,          , %%acc1 \n"
+        "swap.w     %6                        \n"
+        "move.w     %6, %5                    \n"
+        "move.l     %5, (%0)+                 \n"
+        "subq.l     #1, %2                    \n"
+        "bls.b      4f                        \n"
+        "movclr.l   %%acc0, %5                \n"
+        "movclr.l   %%acc1, %6                \n"
+        "mac.l      %3, %7, (%1)+, %4, %%acc0 \n"
+        "movea.w    %4, %3                    \n"
+        "asr.l      %8, %4                    \n"
+        "mac.l      %4, %7,          , %%acc1 \n"
+        "swap.w     %6                        \n"
+        "move.w     %6, %5                    \n"
+        "move.l     %5, (%0)+                 \n"
+        "subq.l     #1, %2                    \n"
+        "bhi.b      3b                        \n"
+    "4:  movclr.l   %%acc0, %5                \n"
+        "movclr.l   %%acc1, %6                \n"
+        "swap.w     %6                        \n"
+        "move.w     %6, %5                    \n"
+        "move.l     %5, (%0)                  \n"
+        : "+a"(out), "+a"(src), "+d"(count),
+          "=&a"(t0), "=&d"(t1), "=&d"(t2), "=&d"(t3)
+        : "r"(pcm->amplitude_tx), "d"(16));
+}
+
+static void
+mix_samples_1ch_s16i_s16i(const struct pcm_stream_desc *desc,
+                          void *out,
+                          unsigned long count)
+{
+    save_emac_context();
+
+    int16_t const *src = pcm->addr;
+    int32_t t0, t1, t2, t3, t4, t5;
+
+    /* DL0.DR0|DL1.DR1|DL2.DR2
+          6
+       SM0.SM1|SM2.SM4|SM4.SM5..
+          4
+       ....SM0|SM1.SM2|SM3.SM4..
+          3       4
+     */
+    asm volatile (
+        "move.l     %1, %7                    \n"
+        "move.l     (%0), %6                  \n"
+        "btst.l     #1, %7                    \n"
+        "bne.b      1f                        \n"
+        "move.l     (%1)+, %4                 \n" /* longword-aligned */
+        "bra.b      3f                        \n"
+    "1:  movea.w    (%1)+, %3                 \n" /* word-aligned */
+        "movea.w    %6, %5                    \n"
+        "asr.l      %10, %6                   \n"
+        "bra.b      4f                        \n"
+    "2:  movclr.l   %%acc0, %7                \n"
+        "movclr.l   %%acc1, %8                \n"
+        "swap.w     %8                        \n"
+        "move.w     %8, %7                    \n"
+        "move.l     %7, (%0)+                 \n"
+    "3:  movea.w    %4, %3                    \n"
+        "asr.l      %10, %4                   \n"
+        "movea.w    %6, %5                    \n"
+        "asr.l      %10, %6                   \n"
+        "move.l     %6, %%acc0                \n"
+        "move.l     %5, %%acc1                \n"
+        "mac.l      %4, %9,          , %%acc0 \n"
+        "mac.l      %4, %9, 4(%0), %6, %%acc1 \n"
+        "subq.l     #1, %2                    \n"
+        "bls.b      5f                        \n"
+        "movea.w    %6, %5                    \n"
+        "asr.l      %10, %6                   \n"
+        "movclr.l   %%acc0, %7                \n"
+        "movclr.l   %%acc1, %8                \n"
+        "swap.w     %8                        \n"
+        "move.w     %8, %7                    \n"
+        "move.l     %7, (%0)+                 \n"
+    "4:  move.l     %6, %%acc0                \n"
+        "move.l     %5, %%acc1                \n"
+        "mac.l      %3, %9, (%1)+, %4, %%acc0 \n"
+        "mac.l      %3, %9, 4(%0), %6, %%acc1 \n"
+        "subq.l     #1, %2                    \n"
+        "bhi.b      2b                        \n"
+    "5:  moveclr.l  %%acc0, %7                \n"
+        "moveclr.l  %%acc1, %8                \n"
+        "swap.w     %8                        \n"
+        "move.w     %8, %7                    \n"
+        "move.l     %7, (%0)                  \n"
+        : "+a"(out), "+a"(src), "+d"(count),
+          "=&a"(t0), "=&d"(t1), "=&a"(t2), "=&d"(t3), "=&d"(t4), "=&d"(t5)
+        : "r"(desc->amplitude_tx), "d"(16));
+}
+
+static void
+mix_samples_2ch_s16i_s16i(const struct pcm_stream_desc *desc,
+                          void *out,
+                          unsigned long count)
+{
+    save_emac_context();
+
+    const void *src = desc->addr_tx;
+    int32_t t0, t1, t2, t3, t4, t5;
+
+    /* DL0.DR0|DL1.DR1|DL2.DR2
+          6
+       SL0.SR0|SL1.SR1|SL2.SR2..
+          4
+       ....SL0|SR0.SL1|SR1.SL2..
+          3       4
+     */
+    asm volatile (
+        "move.l     %1, %7                    \n"
+        "move.l     (%0), %6                  \n"
+        "btst.l     #1, %7                    \n"
+        "bne.b      3f                        \n"
+        "move.l     (%1)+, %4                 \n"
+        "bra.b      2f                        \n"
+    "1:  movclr.l   %%acc0, %7                \n" /* longword-aligned */
+        "movclr.l   %%acc1, %8                \n"
+        "swap.w     %8                        \n"
+        "move.w     %8, %7                    \n"
+        "move.l     %7, (%0)+                 \n"
+    "2:  movea.w    %4, %3                    \n"
+        "asr.l      %10, %4                   \n"
+        "movea.w    %6, %5                    \n"
+        "asr.l      %10, %6                   \n"
+        "move.l     %6, %%acc0                \n"
+        "move.l     %5, %%acc1                \n"
+        "mac.l      %4, %9, (%1)+, %4, %%acc0 \n"
+        "mac.l      %3, %9, 4(%0), %6, %%acc1 \n"
+        "subq.l     #1, %2                    \n"
+        "bls.b      6f                        \n"
+        "movea.w    %4, %3                    \n"
+        "asr.l      %10, %4                   \n"
+        "movea.w    %6, %5                    \n"
+        "asr.l      %10, %6                   \n"
+        "movclr.l   %%acc0, %7                \n"
+        "movclr.l   %%acc1, %8                \n"
+        "swap.w     %8                        \n"
+        "move.w     %8, %7                    \n"
+        "move.l     %7, (%0)+                 \n"
+        "move.l     %6, %%acc0                \n"
+        "move.l     %5, %%acc1                \n"
+        "mac.l      %4, %9, (%1)+, %4, %%acc0 \n"
+        "mac.l      %3, %9, 4(%0), %6, %%acc1 \n"
+        "subq.l     #1, %2                    \n"
+        "bhi.b      1b                        \n"
+        "bra.b      6f                        \n"
+    "3:  movea.w    (%1)+, %3                 \n" /* word-aligned */
+        "bra.b      5f                        \n"
+    "4:  movclr.l   %%acc0, %7                \n"
+        "movclr.l   %%acc1, %8                \n"
+        "swap.w     %8                        \n"
+        "move.w     %8, %7                    \n"
+        "move.l     %7, (%0)+                 \n"
+    "5:  movea.w    %6, %5                    \n"
+        "asr.l      %10, %6                   \n"
+        "move.l     %6, %%acc0                \n"
+        "move.l     %5, %%acc1                \n"
+        "mac.l      %3, %9, (%1)+, %4, %%acc0 \n"
+        "movea.w    %4, %3                    \n"
+        "asr.l      %10, %4                   \n"
+        "mac.l      %4, %9, 4(%0), %6, %%acc1 \n"
+        "subq.l     #1, %2                    \n"
+        "bls.b      6f                        \n"
+        "movea.w    %6, %5                    \n"
+        "asr.l      %10, %6                   \n"
+        "movclr.l   %%acc0, %7                \n"
+        "movclr.l   %%acc1, %8                \n"
+        "swap.w     %8                        \n"
+        "move.w     %8, %7                    \n"
+        "move.l     %7, (%0)+                 \n"
+        "move.l     %6, %%acc0                \n"
+        "move.l     %5, %%acc1                \n"
+        "mac.l      %3, %9, (%1)+, %4, %%acc0 \n"
+        "movea.w    %4, %3                    \n"
+        "asr.l      %10, %4                   \n"
+        "mac.l      %4, %9, 4(%0), %6, %%acc1 \n"
+        "subq.l     #1, %2                    \n"
+        "bhi.b      4b                        \n"
+    "6:  movclr.l   %%acc0, %7                \n"
+        "movclr.l   %%acc1, %8                \n"
+        "swap.w     %8                        \n"
+        "move.w     %8, %7                    \n"
+        "move.l     %7, (%0)+                 \n"
+
+        : "+a"(out), "+a"(src), "+d"(count),
+          "=&a"(t0), "=&d"(t1), "=&a"(t2), "=&d"(t3), "=&d"(t4), "=&d"(t5)
+        : "r"(desc->amplitude_tx), "d"(16));
+}
+
+/* these are the same for unity and gain applied */
+#define mix_samples_unity_1ch_s16i_s16i     mix_samples_1ch_s16i_s16i
+#define mix_samples_gain_1ch_s16i_s16i      mix_samples_1ch_s16i_s16i
+#define mix_samples_unity_2ch_s16i_s16i     mix_samples_2ch_s16i_s16i
+#define mix_samples_gain_2ch_s16i_s16i      mix_samples_2ch_s16i_s16i

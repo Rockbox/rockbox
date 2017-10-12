@@ -35,34 +35,7 @@
  */
 static const void *start;
 
-void pcm_play_dma_postinit(void)
-{
-    /* Configure clock divider */
-    tsc2100_writereg(CONTROL_PAGE2, TSPP1_ADDRESS, 0x1120);
-    tsc2100_writereg(CONTROL_PAGE2, TSAC3_ADDRESS, 0x0800);
-    tsc2100_writereg(CONTROL_PAGE2, TSCPC_ADDRESS, 0x3B00);
-    tsc2100_writereg(CONTROL_PAGE2, TSAC1_ADDRESS, 0x0300);
-    tsc2100_writereg(CONTROL_PAGE2, TSCSC_ADDRESS, 0xC580);
-    audiohw_postinit();
-}
-
-/* Return the current location in the SDRAM to SARAM transfer along with the
- *  number of bytes read in the current buffer (count).  There is latency with
- *  this method equivalent to ~ the size of the SARAM buffer since there is
- *  another buffer between your ears and this calculation, but this works for
- *  key clicks and an approximate peak meter.
- */
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    int cnt = DSP_(_sdem_level);
-
-    unsigned long addr = (unsigned long) start + cnt;
-    
-    *count = (cnt & 0xFFFFF) >> 1;
-    return (void *)((addr + 2) & ~3);
-}
-
-void pcm_play_dma_init(void)
+void pcm_dma_init(const struct pcm_hw_settings *settings)
 {
     IO_INTC_IRQ0 = INTR_IRQ0_IMGBUF;
     bitset16(&IO_INTC_EINT0, INTR_EINT0_IMGBUF);
@@ -82,6 +55,13 @@ void pcm_play_dma_init(void)
 
     DSP_(_dma0_stopped)=1;
     dsp_wake();
+
+    /* Configure clock divider */
+    tsc2100_writereg(CONTROL_PAGE2, TSPP1_ADDRESS, 0x1120);
+    tsc2100_writereg(CONTROL_PAGE2, TSAC3_ADDRESS, 0x0800);
+    tsc2100_writereg(CONTROL_PAGE2, TSCPC_ADDRESS, 0x3B00);
+    tsc2100_writereg(CONTROL_PAGE2, TSAC1_ADDRESS, 0x0300);
+    tsc2100_writereg(CONTROL_PAGE2, TSCSC_ADDRESS, 0xC580);
 }
 
 void pcm_dma_apply_settings(void)
@@ -92,51 +72,57 @@ void pcm_dma_apply_settings(void)
 /* Note that size is actually limited to the size of a short right now due to
  *  the implementation on the DSP side (and the way that we access it)
  */
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
 {
     unsigned long sdem_addr=(unsigned long)addr - CONFIG_SDRAM_START;
-    /* Initialize codec. */
+    size_t size = frames*4;
+
+    /* set the new DMA values */
     DSP_(_sdem_addrl) = sdem_addr & 0xffff;
     DSP_(_sdem_addrh) = sdem_addr >> 16;
     DSP_(_sdem_dsp_size) = size;
-    DSP_(_dma0_stopped)=0;
-    
-    dsp_wake();
+
+    /* Flush any pending cache writes */
+    commit_dcache_range(start, size);
+
+    if (DSP_(_dma0_stopped) == 1)
+    {
+        /* Initialize codec. */
+        DSP_(_dma0_stopped)=0;
+        dsp_wake();
+    }
+    else
+    {
+        /* Wakes it in DSPHINT() */
+        DEBUGF("pcm_sdram at %08p, sdem_addr %08p", addr, sdem_addr);
+    }
+}
+
+void pcm_play_dma_prepare(void)
+{
+    pcm_play_dma_stop():
 }
 
 void pcm_play_dma_stop(void)
 {
     DSP_(_dma0_stopped)=1;
+    start = NULL;
     dsp_wake();
 }
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
 
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
 
 }
 
-void pcm_play_dma_pause(bool pause)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
-    if (pause)
-    {
-        DSP_(_dma0_stopped)=2;
-        dsp_wake();
-    }
-    else
-    {
-        DSP_(_dma0_stopped)=0;
-        dsp_wake();
-    }
-}
-
-size_t pcm_get_bytes_waiting(void)
-{
-    return DSP_(_sdem_dsp_size)-DSP_(_sdem_level);
+    return (DSP_(_sdem_dsp_size)-DSP_(_sdem_level)) / 4;
 }
 
 /* Only used when debugging */
@@ -146,7 +132,7 @@ void DSPHINT(void) __attribute__ ((section(".icode")));
 void DSPHINT(void)
 {
     unsigned int i;
-    size_t size;
+    unsigned long frames;
 
     IO_INTC_FIQ0 = INTR_IRQ0_IMGBUF;
     
@@ -163,24 +149,8 @@ void DSPHINT(void)
         break;
         
     case MSG_REFILL:
-        /* Buffer empty.  Try to get more. */
-        if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
-        {
-            unsigned long sdem_addr=(unsigned long)start - CONFIG_SDRAM_START;
-            /* Flush any pending cache writes */
-            commit_dcache_range(start, size);
-
-            /* set the new DMA values */
-            DSP_(_sdem_addrl) = sdem_addr & 0xffff;
-            DSP_(_sdem_addrh) = sdem_addr >> 16;
-            DSP_(_sdem_dsp_size) = size;
-            
-            DEBUGF("pcm_sdram at 0x%08lx, sdem_addr 0x%08lx",
-                (unsigned long)start, (unsigned long)sdem_addr);
-
-            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
-        }
-        
+        /* Buffer empty. Inform and more may be sent. */
+        pcm_play_dma_complete_callback(0);
         break;
     default:
         DEBUGF("DSP: unknown msg 0x%04x", dsp_message.msg);

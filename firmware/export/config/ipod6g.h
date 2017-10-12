@@ -127,8 +127,6 @@
 /* Define the type of audio codec */
 #define HAVE_CS42L55
 
-#define HAVE_PCM_DMA_ADDRESS
-
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
