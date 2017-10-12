@@ -328,7 +328,7 @@ void imx233_set_cpu_frequency(long frequency)
         prof++;
     if(prof->cpu_freq == 0)
         return;
-    /* disable auto-slow (enable back afterwards) */
+    /* disable auto-slow */
     imx233_clkctrl_enable_auto_slow(false);
 
     /* WARNING watch out the order ! */
@@ -354,8 +354,7 @@ void imx233_set_cpu_frequency(long frequency)
         /* Change VDDD regulator */
         imx233_power_set_regulator(REGULATOR_VDDD, prof->vddd, prof->vddd_bo);
     }
-    /* enable auto slow again */
-    imx233_clkctrl_enable_auto_slow(true);
+    /* do not renable auto-slow, it seems to kill performance */
     /* update frequency */
     cpu_frequency = frequency;
 #else
