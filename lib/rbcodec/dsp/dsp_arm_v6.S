@@ -31,14 +31,14 @@ sample_output_mono:
     @ input: r0 = this, r1 = src, r2 = dst
     stmfd   sp!, { r4, lr }            @
                                        @
-    ldr     r0, [r0]                   @ r0 = this->outcount
+    ldr     r0, [r0]                   @ r0 = this->frames_out
     ldr     r3, [r2, #4]               @ r3 = dst->p16out
     ldr     r2, [r1, #4]               @ r2 = src->p32[0]
     ldrb    r1, [r1, #19]              @ r1 = src->format.output_scale
                                        @
     mov     r4, #1                     @ r4 = 1 << (scale - 1)
     mov     r4, r4, lsl r1             @
-    subs    r0, r0, #1                 @ odd: end at 0; even: end at -1
+    subs    r0, r0, #1                 @ odd: end at 0; even: end at wrap
     mov     r4, r4, lsr #1             @
     beq     2f                         @ Zero? Only one sample!
                                        @
@@ -54,9 +54,9 @@ sample_output_mono:
     pkhbt   r14, r14, r14, asl #16     @
     subs    r0, r0, #2                 @
     stmia   r3!, { r12, r14 }          @ store So0, So1
-    bgt     1b                         @
+    bhi     1b                         @
                                        @
-    ldmltfd sp!, { r4, pc }            @ if count was even, we're done
+    ldmlofd sp!, { r4, pc }            @ if count was even, we're done
                                        @
 2:                                     @
     ldr     r12, [r2]                  @ round, scale, saturate
@@ -81,14 +81,14 @@ sample_output_stereo:
     @ input: r0 = this, r1 = src, r2 = dst
     stmfd   sp!, { r4-r7, lr }         @
                                        @
-    ldr     r0, [r0]                   @ r0 = this->outcount
+    ldr     r0, [r0]                   @ r0 = this->frames_out
     ldr     r3, [r2, #4]               @ r3 = dst->p16out
     ldmib   r1, { r2, r4 }             @ r2 = src->p32[0], r4 = src->p32[1]
     ldrb    r1, [r1, #19]              @ r1 = src->format.output_scale
                                        @
     mov     r5, #1                     @ r5 = 1 << (scale - 1)
     mov     r5, r5, lsl r1             @
-    subs    r0, r0, #1                 @ odd: end at 0; even: end at -1
+    subs    r0, r0, #1                 @ odd: end at 0; even: end at wrap
     mov     r5, r5, lsr #1             @
     beq     2f                         @ Zero? Only one sample!
                                        @
@@ -111,9 +111,9 @@ sample_output_stereo:
     pkhbt   r7, r7, r14, asl #16       @
     subs    r0, r0, #2                 @
     stmia   r3!, { r6, r7 }            @ store So0, So1
-    bgt     1b                         @
+    bhi     1b                         @
                                        @
-    ldmltfd sp!, { r4-r7, pc }         @ if count was even, we're done
+    ldmlofd sp!, { r4-r7, pc }         @ if count was even, we're done
                                        @
 2:                                     @
     ldr     r6, [r2]                   @ r6 = Li

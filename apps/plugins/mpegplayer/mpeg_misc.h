@@ -24,10 +24,6 @@
 #define MPEG_MISC_H
 
 /* Miscellaneous helpers */
-#ifndef ALIGNED_ATTR
-#define ALIGNED_ATTR(x) __attribute__((aligned(x)))
-#endif
-
 #include "disk_buf.h"
 
 /* Generic states for when things are too simple to care about naming them */

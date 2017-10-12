@@ -42,7 +42,7 @@ typedef void (*sample_output_fn_type)(struct sample_io_data *this,
 /* This becomes part of the DSP aggregate */
 struct sample_io_data
 {
-    int outcount;                 /* 00h: Output count */
+    unsigned long frames_out;     /* 00h: Output frame count */
     struct sample_format format;  /* Format for next dsp_process call */
     int sample_depth;             /* Codec-specified sample depth */           
     int stereo_mode;              /* Codec-specified channel format */

@@ -52,9 +52,9 @@ void pcm_play_dma_postinit(void)
 //    dsp_wake();
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
+const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 {
-    (void) count;
+    *frames_rem = 0;
     return 0;
 }
 
@@ -63,11 +63,11 @@ void pcm_dma_apply_settings(void)
     audiohw_set_frequency(pcm_fsel);
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_start(const void *addr, unsigned long frames)
 {
     (void)addr;
-    (void)size;
-    DEBUGF("pcm_play_dma_start(0x%x, %d)", addr, size);
+    (void)frames;
+    DEBUGF("pcm_play_dma_start(%p, %lu)", addr, frames);
 }
 
 void pcm_play_dma_stop(void)
@@ -90,7 +90,7 @@ void pcm_play_dma_pause(bool pause)
     (void) pause;
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_get_frames_waiting(void)
 {
     return 0;
 }

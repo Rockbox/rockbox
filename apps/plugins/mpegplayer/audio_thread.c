@@ -634,10 +634,10 @@ static void audio_thread(void)
                                 STEREO_MONO : STEREO_NONINTERLEAVED);
         }
 
-        td.src.remcount  = synth.pcm.length;
-        td.src.pin[0]    = synth.pcm.samples[0];
-        td.src.pin[1]    = synth.pcm.samples[1];
-        td.src.proc_mask = 0;
+        td.src.frames_rem = synth.pcm.length;
+        td.src.pin[0]     = synth.pcm.samples[0];
+        td.src.pin[1]     = synth.pcm.samples[1];
+        td.src.proc_mask  = 0;
 
         td.state  = TSTATE_RENDER_WAIT;
 
@@ -648,35 +648,35 @@ static void audio_thread(void)
         while (1)
         {
             struct dsp_buffer dst;
-            dst.remcount = 0;
-            dst.bufcount = MAX(td.src.remcount, 1024);
+            dst.frames_rem = 0;
+            dst.frames = MAX(td.src.frames_rem, 1024);
 
-            ssize_t size = dst.bufcount * 2 * sizeof(int16_t);
+            ssize_t size = dst.frames * 2 * sizeof(int16_t);
 
             /* Wait for required amount of free buffer space */
             while ((dst.p16out = pcm_output_get_buffer(&size)) == NULL)
             {
                 /* Wait one frame */
-                int timeout = dst.bufcount*HZ / td.samplerate;
+                int timeout = dst.frames*HZ / td.samplerate;
                 str_get_msg_w_tmo(&audio_str, &td.ev, MAX(timeout, 1));
                 if (td.ev.id != SYS_TIMEOUT)
                     goto message_process;
             }
 
-            dst.bufcount = size / (2 * sizeof (int16_t));
+            dst.frames = size / (2 * sizeof (int16_t));
             rb->dsp_process(td.dsp, &td.src, &dst);
 
-            if (dst.remcount > 0)
+            if (dst.frames_rem > 0)
             {
                 /* Make this data available to DMA */
-                pcm_output_commit_data(dst.remcount * 2 * sizeof(int16_t),
+                pcm_output_commit_data(dst.frames_rem * 2 * sizeof(int16_t),
                                        audio_queue.curr->time);
 
                 /* As long as we're on this timestamp, the time is just
                    incremented by the number of samples */
-                audio_queue.curr->time += dst.remcount;
+                audio_queue.curr->time += dst.frames_rem;
             }
-            else if (td.src.remcount <= 0)
+            else if (!td.src.frames_rem)
             {
                 break;
             }

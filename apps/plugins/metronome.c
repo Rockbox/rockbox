@@ -641,6 +641,9 @@ static signed short tock_sound[] =
 ,-3,2,-1,0,1,-1,0,0,1,-1,1
 ,-2,3
 };
+
+#define TICK_LEN    ARRAYLEN(tick_sound)
+#define TOCK_LEN    ARRAYLEN(tock_sound)
 #endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -989,29 +992,33 @@ static void play_tock(void)
 #define MET_IS_PLAYING rb->pcm_is_playing()
 #define MET_PLAY_STOP rb->audio_stop()
 
-/* Really necessary? Cannot just play mono?
-   Also: This is wasted memory! */
-static short tick_buf[sizeof(tick_sound)*2];
-static short tock_buf[sizeof(tock_sound)*2];
-
-/* Convert the mono samples to interleaved stereo */
-static void prepare_buffers(void)
-{
-    size_t i;
-    for(i = 0;i < sizeof(tick_sound)/sizeof(short);i++)
-      tick_buf[i*2] = tick_buf[i*2+1] = tick_sound[i];
-    for(i = 0;i < sizeof(tock_sound)/sizeof(short);i++)
-      tock_buf[i*2] = tock_buf[i*2+1] = tock_sound[i];
-}
+static int16_t pcm_buf[MAX(TICK_LEN, TOCK_LEN)*2] ALIGNED_ATTR(4);
+static int inbuffer = 0;
 
 static void play_tick(void)
 {
-    rb->pcm_play_data(NULL, NULL, tick_buf, sizeof(tick_buf));
+    if (inbuffer != 1)
+    {
+        for (size_t i = 0; i < TICK_LEN; i++)
+            pcm_buf[i*2] = pcm_buf[i*2+1] = tick_sound[i];
+
+        inbuffer = 1;
+    }
+
+    rb->pcm_play_data(NULL, NULL, pcm_buf, TICK_LEN);
 }
 
 static void play_tock(void)
 {
-    rb->pcm_play_data(NULL, NULL, tock_buf, sizeof(tock_buf));
+    if (inbuffer != 2)
+    {
+        for (size_t i = 0; i < TOCK_LEN; i++)
+            pcm_buf[i*2] = pcm_buf[i*2+1] = tock_sound[i];
+
+        inbuffer = 2;
+    }
+
+    rb->pcm_play_data(NULL, NULL, pcm_buf, TOCK_LEN);
 }
 
 #endif /* CONFIG_CODEC != SWCODEC */
@@ -1797,7 +1804,6 @@ enum plugin_status plugin_start(const void* file)
     rb->bitswap(tock_sound, sizeof(tock_sound));
 #endif
 #else
-    prepare_buffers();
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
