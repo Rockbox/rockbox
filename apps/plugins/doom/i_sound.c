@@ -457,12 +457,12 @@ void I_UpdateSound( void )
 //  only output be done asynchronous?
 //
 
-void get_more(const void** start, size_t* size)
+void get_more(const void** start, unsigned long* frames)
 {
    I_UpdateSound(); // Force sound update
 
    *start = mixbuffer;
-   *size = SAMPLECOUNT*2*sizeof(short);
+   *frames = SAMPLECOUNT;
 }
 
 

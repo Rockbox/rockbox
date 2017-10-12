@@ -409,26 +409,19 @@ void sound_mix(void)
             r *= snd.level2*60;
         }
 
-        if(l > 32767)
-            l = 32767;
-        if(l < -32768)
-            l = -32768;
-            
-        if(r > 32767)
-            r = 32767;
-        if(r < -32768)
-            r = -32768;
-
         if (pcm.buf)
         {
             if (pcm.pos >= pcm.len)
                 rockboy_pcm_submit();
             if (pcm.stereo)
             {
-                pcm.buf[pcm.pos++] = l;
-                pcm.buf[pcm.pos++] = r;
+                pcm.buf[pcm.pos++] = clip_sample_16(l);
+                pcm.buf[pcm.pos++] = clip_sample_16(r);
             }
-            else pcm.buf[pcm.pos++] = ((l+r)>>1);
+            else
+            {
+                pcm.buf[pcm.pos++] = clip_sample_16((l + r) / 2);
+            }
         }
     }
     R_NR52 = (R_NR52&0xf0) | S1.on | (S2.on<<1) | (S3.on<<2) | (S4.on<<3);

@@ -116,10 +116,13 @@ void INT_DMA(void)
         {
             if (!nextsize)
             {
+                unsigned long frames;
                 new_buffer = pcm_play_dma_complete_callback(
-                                PCM_DMAST_OK, &nextbuf, &nextsize);
+                                PCM_DMAST_OK, &nextbuf, &frames);
                 if (!new_buffer)
                     break;
+
+                nextsize = frames*4;
             }
             queuedsize = MIN(sizeof(dblbuf), nextsize / 2);
             nextsize -= queuedsize;
@@ -141,11 +144,11 @@ void INT_DMA(void)
 
 }
 
-void pcm_play_dma_start(const void* addr, size_t size)
+void pcm_play_dma_start(const void* addr, unsigned long frames)
 {
     /* DMA channel on */
     nextbuf = addr;
-    nextsize = size;
+    nextsize = frames*4;
     queuedsize = 0;
     DMABASE0 = (unsigned int)(&zerosample);
     DMATCNT0 = 0;
@@ -274,26 +277,16 @@ void pcm_dma_apply_settings(void)
     pcm_dma_set_freq(pcm_fsel);    
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_get_frames_waiting(void)
 {
-    return (nextsize + DMACTCNT0 + 2) << 1;
+    return (nextsize + DMACTCNT0 + 2) >> 1;
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
+const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 {
-    *count = DMACTCNT0 >> 1;
+    *frames_rem = DMACTCNT0 >> 1;
     return (void *)(((DMACADDR0 + 2) & ~3) | 0x40000000);
 }
-
-#ifdef HAVE_PCM_DMA_ADDRESS
-void * pcm_dma_addr(void *addr)
-{
-    if (addr != NULL)
-        addr = (void*)((uintptr_t)addr | 0x40000000);
-    return addr;
-}
-#endif
-
 
 /****************************************************************************
  ** Recording DMA transfer
@@ -311,10 +304,10 @@ void pcm_rec_dma_stop(void)
 {
 }
 
-void pcm_rec_dma_start(void *addr, size_t size)
+void pcm_rec_dma_start(void *addr, unsigned long frames)
 {
     (void)addr;
-    (void)size;
+    (void)frames;
 }
 
 void pcm_rec_dma_close(void)
@@ -327,8 +320,9 @@ void pcm_rec_dma_init(void)
 }
 
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+const void * pcm_rec_dma_get_peak_buffer(unsigned long *frames_avail)
 {
+    *frames_avail = 0;
     return NULL;
 }
 

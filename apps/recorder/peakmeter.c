@@ -62,8 +62,14 @@ static int pm_src_right = MAS_REG_DQPEAK_R;
 #endif
 
 /* Current values and cumulation */
+#if CONFIG_CODEC == SWCODEC
+static struct pcm_peaks peaks;
+#define pm_cur_left  (peaks.peak[0])
+#define pm_cur_right (peaks.peak[1])
+#else
 static int pm_cur_left;        /* current values (last peak_meter_peek) */
 static int pm_cur_right;
+#endif /* SWCODEC */
 static int pm_max_left;        /* maximum values between peak meter draws */
 static int pm_max_right;
 #if defined(HAVE_AGC) || defined(HAVE_HISTOGRAM)
@@ -619,20 +625,14 @@ void peak_meter_peek(void)
    /* read current values */
 #if CONFIG_CODEC == SWCODEC
     if (pm_playback)
-    {
-        static struct pcm_peaks chan_peaks; /* *MUST* be static */
-        mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
-                                      &chan_peaks);
-        pm_cur_left = chan_peaks.left;
-        pm_cur_right = chan_peaks.right;
-    }
+        mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK, &peaks);
 #ifdef HAVE_RECORDING
     else
-        pcm_calculate_rec_peaks(&pm_cur_left, &pm_cur_right);
+        pcm_calculate_rec_peaks(&peaks);
 #endif
     left  = pm_cur_left;
     right = pm_cur_right;
-#else
+#else /* !SWCODEC */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     pm_cur_left  = left  = mas_codec_readreg(pm_src_left);
     pm_cur_right = right = mas_codec_readreg(pm_src_right);
@@ -640,7 +640,7 @@ void peak_meter_peek(void)
     pm_cur_left  = left  = 8000;
     pm_cur_right = right = 9000;
 #endif
-#endif
+#endif /* SWCODEC */
 
     /* check for clips
        An clip is assumed when two consecutive readouts

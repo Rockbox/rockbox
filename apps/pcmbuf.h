@@ -24,8 +24,9 @@
 #include <sys/types.h>
 
 /* Commit PCM data */
-void *pcmbuf_request_buffer(int *count);
-void pcmbuf_write_complete(int count, unsigned long elapsed, off_t offset);
+void * pcmbuf_request_buffer(unsigned long *frames);
+void pcmbuf_write_complete(unsigned long frames, unsigned long elapsed,
+                           off_t offset);
 
 /* Init */
 size_t pcmbuf_init(void *bufend);

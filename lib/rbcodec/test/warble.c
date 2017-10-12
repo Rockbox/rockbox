@@ -216,29 +216,29 @@ static uint64_t make_float64(int32_t sample, int shift)
     return *(uint64_t*)&val;
 }
 
-static void write_pcm(int16_t *pcm, int count)
+static void write_pcm(int16_t *pcm, unsigned long frames)
 {
     if (!write_header_written)
         write_wav_header();
-    int i;
-    for (i = 0; i < 2 * count; i++)
+    unsigned long i;
+    for (i = 0; i < 2 * frames; i++)
         pcm[i] = htole16(pcm[i]);
-    write(output_fd, pcm, 4 * count);
+    write(output_fd, pcm, 4 * frames);
 }
 
-static void write_pcm_raw(int32_t *pcm, int count)
+static void write_pcm_raw(int32_t *pcm, unsigned long frames)
 {
     if (write_raw) {
-        write(output_fd, pcm, count * sizeof(*pcm));
+        write(output_fd, pcm, frames * sizeof(*pcm));
     } else {
         if (!write_header_written)
             write_wav_header();
-        int i;
-        uint64_t buf[count];
+        unsigned long i;
+        uint64_t buf[frames];
 
-        for (i = 0; i < count; i++)
+        for (i = 0; i < frames; i++)
             buf[i] = htole64(make_float64(pcm[i], format.depth));
-        write(output_fd, buf, count * sizeof(*buf));
+        write(output_fd, buf, frames * sizeof(*buf));
     }
 }
 
@@ -356,12 +356,12 @@ static void playback_quit(void)
     SDL_Quit();
 }
 
-static void playback_pcm(int16_t *pcm, int count)
+static void playback_pcm(int16_t *pcm, unsigned long frames)
 {
     const char *stream = (const char *)pcm;
-    count *= 4;
+    size_t size = frames * 4;
 
-    while (count > 0) {
+    while (size) {
         if (playback_decode_pos >= PLAYBACK_BUFFER_SIZE) {
             if (!playback_running)
                 playback_start();
@@ -371,10 +371,10 @@ static void playback_pcm(int16_t *pcm, int count)
             playback_decode_pos = 0;
         }
         char *decode_buffer = playback_buffer[playback_decode_ind];
-        int copy_len = MIN(count, PLAYBACK_BUFFER_SIZE - playback_decode_pos);
+        size_t copy_len = MIN(size, PLAYBACK_BUFFER_SIZE - playback_decode_pos);
         memcpy(decode_buffer + playback_decode_pos, stream, copy_len);
         stream += copy_len;
-        count -= copy_len;
+        size -= copy_len;
         playback_decode_pos += copy_len;
     }
 }
@@ -436,44 +436,45 @@ static void *ci_codec_get_buffer(size_t *size)
     return ptr;
 }
 
-static void ci_pcmbuf_insert(const void *ch1, const void *ch2, int count)
+static void ci_pcmbuf_insert(const void *ch1, const void *ch2,
+                             unsigned long frames)
 {
-    num_output_samples += count;
+    num_output_samples += frames;
 
     if (use_dsp) {
         struct dsp_buffer src;
-        src.remcount = count;
+        src.frames_rem = frames;
         src.pin[0] = ch1;
         src.pin[1] = ch2;
         src.proc_mask = 0;
         while (1) {
-            int out_count = MAX(count, 512);
-            int16_t buf[2 * out_count];
+            unsigned long out_frames = MAX(frames, 512);
+            int16_t buf[2 * out_frames];
             struct dsp_buffer dst;
 
-            dst.remcount = 0;
+            dst.frames_rem = 0;
             dst.p16out = buf;
-            dst.bufcount = out_count;
+            dst.frames = out_frames;
 
             dsp_process(ci.dsp, &src, &dst);
 
-            if (dst.remcount > 0) {
+            if (dst.frames_rem) {
                 if (mode == MODE_WRITE)
-                    write_pcm(buf, dst.remcount);
+                    write_pcm(buf, dst.frames_rem);
                 else if (mode == MODE_PLAY)
-                    playback_pcm(buf, dst.remcount);
-            } else if (src.remcount <= 0) {
+                    playback_pcm(buf, dst.frames_rem);
+            } else if (!src.frames_rem) {
                 break;
             }
         }
     } else {
         /* Convert to 32-bit interleaved. */
-        count *= format.channels;
-        int i;
-        int32_t buf[count];
+        frames *= format.channels;
+        unsigned long i;
+        int32_t buf[frames];
         if (format.depth > 16) {
             if (format.stereo_mode == STEREO_NONINTERLEAVED) {
-                for (i = 0; i < count; i += 2) {
+                for (i = 0; i < frames; i += 2) {
                     buf[i+0] = ((int32_t*)ch1)[i/2];
                     buf[i+1] = ((int32_t*)ch2)[i/2];
                 }
@@ -482,19 +483,19 @@ static void ci_pcmbuf_insert(const void *ch1, const void *ch2, int count)
             }
         } else {
             if (format.stereo_mode == STEREO_NONINTERLEAVED) {
-                for (i = 0; i < count; i += 2) {
+                for (i = 0; i < frames; i += 2) {
                     buf[i+0] = ((int16_t*)ch1)[i/2];
                     buf[i+1] = ((int16_t*)ch2)[i/2];
                 }
             } else {
-                for (i = 0; i < count; i++) {
+                for (i = 0; i < frames; i++) {
                     buf[i] = ((int16_t*)ch1)[i];
                 }
             }
         }
 
         if (mode == MODE_WRITE)
-            write_pcm_raw(buf, count);
+            write_pcm_raw(buf, frames);
     }
 
     perform_config();

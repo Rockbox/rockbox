@@ -53,7 +53,7 @@ static size_t audio_buffer_free;
 bool quit;
 int playingtime IBSS_ATTR;
 MODULE *module IBSS_ATTR;
-char gmbuf[BUF_SIZE*NBUF];
+static int16_t gmbuf[2][BUF_COUNT*2] ALIGNED_ATTR(4);
 
 
 int textlines;
@@ -249,8 +249,10 @@ static int change_filename(int direct)
 * Playback
 */
 
-bool swap = false;
-bool lastswap = true;
+static int swap = 0;
+#ifndef SYNC
+static int lastswap = 1;
+#endif
 
 static inline void synthbuf(void)
 {
@@ -259,16 +261,14 @@ static inline void synthbuf(void)
 #ifndef SYNC
     if (lastswap == swap) return;
     lastswap = swap;
-
-    outptr = (swap ? gmbuf : gmbuf + BUF_SIZE);
-#else
-    outptr = gmbuf;
 #endif
 
-    VC_WriteBytes(outptr, BUF_SIZE);
+    outptr = (char *)gmbuf[swap];
+
+    VC_WriteBytes(outptr, BUF_COUNT*SAMPLE_SIZE);
 }
 
-static void get_more(const void** start, size_t* size)
+static void get_more(const void** start, unsigned long* frames)
 {
 #ifndef SYNC
     if (lastswap != swap)
@@ -280,12 +280,10 @@ static void get_more(const void** start, size_t* size)
     synthbuf();
 #endif
 
-    *size = BUF_SIZE;
+    *frames = BUF_COUNT;
+    *start = gmbuf[swap];
 #ifndef SYNC
-    *start = swap ? gmbuf : gmbuf + BUF_SIZE;
-    swap = !swap;
-#else
-    *start = gmbuf;
+    swap ^= 1;
 #endif
 }
 
