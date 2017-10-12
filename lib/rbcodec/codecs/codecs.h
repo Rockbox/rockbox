@@ -121,7 +121,8 @@ struct codec_api {
     void* (*codec_get_buffer)(size_t *size);
     /* Insert PCM data into audio buffer for playback. Playback will start
        automatically. */
-    void (*pcmbuf_insert)(const void *ch1, const void *ch2, int count);
+    void (*pcmbuf_insert)(const void *ch1, const void *ch2,
+                          unsigned long frames);
     /* Set song position in WPS (value in ms). */
     void (*set_elapsed)(unsigned long value);
 
@@ -203,13 +204,13 @@ struct codec_api {
 #endif
 
 #ifdef HAVE_RECORDING
-    int (*enc_pcmbuf_read)(void *buf, int count);
-    int (*enc_pcmbuf_advance)(int count);
+    unsigned long (*enc_pcmbuf_read)(void *buf, unsigned long frames);
+    unsigned long (*enc_pcmbuf_advance)(unsigned long frames);
     struct enc_chunk_data * (*enc_encbuf_get_buffer)(size_t need);
     void (*enc_encbuf_finish_buffer)(void);
-    ssize_t (*enc_stream_read)(void *buf, size_t count);
+    ssize_t (*enc_stream_read)(void *buf, size_t nbyte);
     off_t (*enc_stream_lseek)(off_t offset, int whence);
-    ssize_t (*enc_stream_write)(const void *buf, size_t count);
+    ssize_t (*enc_stream_write)(const void *buf, size_t nbyte);
     int (*round_value_to_list32)(unsigned long value,
                                  const unsigned long list[],
                                  int count,

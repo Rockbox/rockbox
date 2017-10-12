@@ -62,8 +62,13 @@ static int pm_src_right = MAS_REG_DQPEAK_R;
 #endif
 
 /* Current values and cumulation */
+#if CONFIG_CODEC == SWCODEC
+static uint32_t pm_cur_left;
+static uint32_t pm_cur_right;
+#else
 static int pm_cur_left;        /* current values (last peak_meter_peek) */
 static int pm_cur_right;
+#endif /* SWCODEC */
 static int pm_max_left;        /* maximum values between peak meter draws */
 static int pm_max_right;
 #if defined(HAVE_AGC) || defined(HAVE_HISTOGRAM)

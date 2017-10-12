@@ -91,7 +91,7 @@ static int bus_watch_id = 0;
 GMainLoop *pcm_loop = NULL;
 
 static const void* pcm_data = NULL;
-static size_t pcm_data_size = 0;
+static unsigned long pcm_data_frames = 0;
 
 static int audio_locked = 0;
 static pthread_mutex_t audio_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -126,10 +126,10 @@ void pcm_dma_apply_settings(void)
 {
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_start(const void *addr, unsigned long frames)
 {
     pcm_data = addr;
-    pcm_data_size = size;
+    pcm_data_frames = frames;
 
     if (playback_granted)
     {
@@ -173,9 +173,9 @@ void pcm_play_dma_pause(bool pause)
     }
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_get_frames_waiting(void)
 {
-    return pcm_data_size;
+    return pcm_data_frames;
 }
 
 static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
@@ -189,13 +189,13 @@ static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
        from inside gstreamer's stream thread as it will deadlock */
     inside_feed_data = 1;
 
-    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data, &pcm_data_size))
+    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data, &pcm_data_frames))
     {
         GstBuffer *buffer = gst_buffer_new ();
         GstFlowReturn ret;
 
         GST_BUFFER_DATA (buffer) = (__u8 *)pcm_data;
-        GST_BUFFER_SIZE (buffer) = pcm_data_size;
+        GST_BUFFER_SIZE (buffer) = pcm_data_frames*4;
 
         g_signal_emit_by_name (appsrc, "push-buffer", buffer, &ret);
         gst_buffer_unref (buffer);
@@ -215,10 +215,14 @@ static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
     unlock_audio();
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
+const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 {
-    uintptr_t addr = (uintptr_t)pcm_data;
-    *count = pcm_data_size / 4;
+    lock_audio();
+    uintptr_t addr = pcm_data;
+    unsigned long rem = pcm_data_frames;
+    unlock_audio();
+
+    *frames_rem = rem;
     return (void *)((addr + 2) & ~3);
 }
 
@@ -451,18 +455,19 @@ void pcm_rec_dma_close(void)
 {
 }
 
-void pcm_rec_dma_start(void *start, size_t size)
+void pcm_rec_dma_start(void *start, unsigned long frames)
 {
     (void)start;
-    (void)size;
+    (void)frames;
 }
 
 void pcm_rec_dma_stop(void)
 {
 }
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+const void * pcm_rec_dma_get_peak_buffer(unsigned long *frames_avail)
 {
+    *frames_avail = 0;
     return NULL;
 }
 

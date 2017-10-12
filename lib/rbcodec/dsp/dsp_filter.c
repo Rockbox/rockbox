@@ -278,8 +278,8 @@ void filter_flush(struct dsp_filter *f)
  * implementations.
  */
 #if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM))
-void filter_process(struct dsp_filter *f, int32_t * const buf[], int count,
-                    unsigned int channels)
+void filter_process(struct dsp_filter *f, int32_t * const buf[],
+                    unsigned long count, unsigned int channels)
 {
     /* Direct form 1 filtering code.
        y[n] = b0*x[i] + b1*x[i - 1] + b2*x[i - 2] + a1*y[i - 1] + a2*y[i - 2],
@@ -288,7 +288,7 @@ void filter_process(struct dsp_filter *f, int32_t * const buf[], int count,
     unsigned int shift = f->shift;
 
     for (unsigned int c = 0; c < channels; c++) {
-        for (int i = 0; i < count; i++) {
+        for (unsigned long i = 0; i < count; i++) {
             long long acc = (long long) buf[c][i] * f->coefs[0];
             acc += (long long) f->history[c][0] * f->coefs[1];
             acc += (long long) f->history[c][1] * f->coefs[2];

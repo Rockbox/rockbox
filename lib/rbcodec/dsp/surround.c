@@ -172,13 +172,12 @@ static void surround_process(struct dsp_proc_entry *this,
 {
 
     struct dsp_buffer *buf = *buf_p;
-    int count = buf->remcount;
+    unsigned long count = buf->frames_rem;
 
     int dly_shift3 = dly_size/8;
     int dly_shift2 = dly_size/4;
     int dly_shift1 = dly_size/2;
     int dly = dly_size;
-    int i;
     int32_t x;
 
     /*only need to buffer right channel */
@@ -190,7 +189,7 @@ static void surround_process(struct dsp_proc_entry *this,
     hh = bb + BB_DLY;
     cl = hh + HH_DLY;
 
-    for (i = 0; i < count; i++)
+    for (unsigned long i = 0; i < count; i++)
     {
         int32_t mid = buf->p32[0][i] / 2 + buf->p32[1][i] / 2;
         int32_t side = buf->p32[0][i] - buf->p32[1][i];
@@ -285,7 +284,7 @@ static intptr_t surround_new_format(struct dsp_proc_entry *this,
 
     /* Stereo mode only */
     bool was_active = dsp_proc_active(dsp, DSP_PROC_SURROUND);
-    bool now_active = format->num_channels > 1;
+    bool now_active = format->num_channels == 2;
     dsp_proc_activate(dsp, DSP_PROC_SURROUND, now_active);
 
     if (now_active)

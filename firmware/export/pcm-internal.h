@@ -43,36 +43,41 @@
 
 #ifdef PCM_SW_VOLUME_UNBUFFERED
 /* Copies buffer with volume scaling applied */
-void pcm_sw_volume_copy_buffer(void *dst, const void *src, size_t size);
+void pcm_sw_volume_copy_buffer(void *dst, const void *src,
+                               unsigned long frames);
 #define pcm_copy_buffer pcm_sw_volume_copy_buffer
 #else /* !PCM_SW_VOLUME_UNBUFFERED */
 #ifdef HAVE_SDL_AUDIO
 #define pcm_copy_buffer memcpy
 #endif
-#ifndef PCM_PLAY_DBL_BUF_SAMPLES
-#define PCM_PLAY_DBL_BUF_SAMPLES 1024 /* Max 4KByte chunks */
+#ifndef PCM_PLAY_DBL_BUF_FRAMES
+#define PCM_PLAY_DBL_BUF_FRAMES 1024 /* Max 4KByte chunks */
 #endif
 #ifndef PCM_DBL_BUF_BSS
-#define PCM_DBL_BUF_BSS               /* In DRAM, uncached may be better */
+#define PCM_DBL_BUF_BSS              /* In DRAM, uncached may be better */
 #endif
 #endif /* PCM_SW_VOLUME_UNBUFFERED */
 
 void pcm_sync_pcm_factors(void);
 #endif /* HAVE_SW_VOLUME_CONTROL */
 
-#define PCM_SAMPLE_SIZE     (2 * sizeof (int16_t))
+#define PCM_FRAME_SIZE    (2 * sizeof (int16_t))
 /* Cheapo buffer align macro to align to the 16-16 PCM size */
-#define ALIGN_AUDIOBUF(start, size) \
-    ({ (start) = (void *)(((uintptr_t)(start) + 3) & ~3); \
-       (size) &= ~3; })
+#define ALIGN_AUDIOBUF(start, frames) \
+    ({  uintptr_t __start = (uintptr_t)(start);      \
+        typeof (frames) __frames = (frames);         \
+        if ((__start & 3) && __frames) {             \
+             (start) = (void *)((__start + 3) & ~3); \
+             (frames) = __frames - 1;                \
+        } })
 
 void pcm_do_peak_calculation(struct pcm_peaks *peaks, bool active,
-                             const void *addr, int count);
+                             const void *addr, unsigned long frames);
 
 /** The following are for internal use between pcm.c and target-
     specific portion **/
 /* Call registered callback to obtain next buffer */
-static inline bool pcm_get_more_int(const void **addr, size_t *size)
+static inline bool pcm_get_more_int(const void **addr, unsigned long *frames)
 {
     extern volatile pcm_play_callback_type pcm_callback_for_more;
     pcm_play_callback_type get_more = pcm_callback_for_more;
@@ -81,11 +86,11 @@ static inline bool pcm_get_more_int(const void **addr, size_t *size)
         return false;
 
     *addr = NULL;
-    *size = 0;
-    get_more(addr, size);
-    ALIGN_AUDIOBUF(*addr, *size);
+    *frames = 0;
+    get_more(addr, frames);
+    ALIGN_AUDIOBUF(*addr, *frames);
 
-    return *addr && *size;
+    return *addr && *frames;
 }
 
 static FORCE_INLINE enum pcm_dma_status pcm_call_status_cb(
@@ -118,25 +123,21 @@ pcm_play_dma_status_callback(enum pcm_dma_status status)
 }
 
 #if defined(HAVE_SW_VOLUME_CONTROL) && !defined(PCM_SW_VOLUME_UNBUFFERED)
-void pcm_play_dma_start_int(const void *addr, size_t size);
+void pcm_play_dma_start_int(const void *addr, unsigned long frames);
 void pcm_play_dma_pause_int(bool pause);
 void pcm_play_dma_stop_int(void);
 void pcm_play_stop_int(void);
-const void *pcm_play_dma_get_peak_buffer_int(int *count);
+const void *pcm_play_dma_get_peak_buffer_int(unsigned long *frames_rem);
 #endif /* HAVE_SW_VOLUME_CONTROL && !PCM_SW_VOLUME_UNBUFFERED */
 
 /* Called by the bottom layer ISR when more data is needed. Returns true
  * if a new buffer is available, false otherwise. */
 bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
-                                    const void **addr, size_t *size);
+                                    const void **addr, unsigned long *frames);
 
 extern unsigned long pcm_curr_sampr;
 extern unsigned long pcm_sampr;
 extern int pcm_fsel;
-
-#ifdef HAVE_PCM_DMA_ADDRESS
-void * pcm_dma_addr(void *addr);
-#endif
 
 extern volatile bool pcm_playing;
 extern volatile bool pcm_paused;
@@ -145,10 +146,10 @@ void pcm_play_dma_lock(void);
 void pcm_play_dma_unlock(void);
 void pcm_play_dma_init(void) INIT_ATTR;
 void pcm_play_dma_postinit(void);
-void pcm_play_dma_start(const void *addr, size_t size);
+void pcm_play_dma_start(const void *addr, unsigned long frames);
 void pcm_play_dma_stop(void);
 void pcm_play_dma_pause(bool pause);
-const void * pcm_play_dma_get_peak_buffer(int *count);
+const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem);
 
 void pcm_dma_apply_settings(void);
 
@@ -160,9 +161,9 @@ extern volatile bool pcm_recording;
 /* APIs implemented in the target-specific portion */
 void pcm_rec_dma_init(void);
 void pcm_rec_dma_close(void);
-void pcm_rec_dma_start(void *addr, size_t size);
+void pcm_rec_dma_start(void *addr, unsigned long frames);
 void pcm_rec_dma_stop(void);
-const void * pcm_rec_dma_get_peak_buffer(void);
+const void * pcm_rec_dma_get_peak_buffer(unsigned long *frames_avail);
 
 static FORCE_INLINE enum pcm_dma_status
 pcm_rec_dma_status_callback(enum pcm_dma_status status)
@@ -176,13 +177,7 @@ pcm_rec_dma_status_callback(enum pcm_dma_status status)
 /* Called by the bottom layer ISR when more data is needed. Returns true
  * if a new buffer is available, false otherwise. */
 bool pcm_rec_dma_complete_callback(enum pcm_dma_status status,
-                                   void **addr, size_t *size);
-
-#ifdef HAVE_PCM_REC_DMA_ADDRESS
-#define pcm_rec_dma_addr(addr) pcm_dma_addr(addr)
-#else
-#define pcm_rec_dma_addr(addr) addr
-#endif
+                                   void **addr, unsigned long *frames);
 
 #endif /* HAVE_RECORDING */
 

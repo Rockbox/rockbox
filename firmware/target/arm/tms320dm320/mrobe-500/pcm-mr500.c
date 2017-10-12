@@ -52,14 +52,15 @@ void pcm_play_dma_postinit(void)
  *  another buffer between your ears and this calculation, but this works for
  *  key clicks and an approximate peak meter.
  */
-const void * pcm_play_dma_get_peak_buffer(int *count)
+const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 {
-    int cnt = DSP_(_sdem_level);
-
-    unsigned long addr = (unsigned long) start + cnt;
+    int oldlevel = disable_irq_save();
+    unsigned long addr = (unsigned long)*(volatile const void **)&start;
+    unsigned long size = DSP_(_sdem_level);
+    restore_irq(oldlevel);
     
-    *count = (cnt & 0xFFFFF) >> 1;
-    return (void *)((addr + 2) & ~3);
+    *frames_rem = (size & 0xFFFFF) / 4;
+    return (void *)((addr + size + 2) & ~3);
 }
 
 void pcm_play_dma_init(void)
@@ -92,13 +93,13 @@ void pcm_dma_apply_settings(void)
 /* Note that size is actually limited to the size of a short right now due to
  *  the implementation on the DSP side (and the way that we access it)
  */
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_start(const void *addr, unsigned long frames)
 {
     unsigned long sdem_addr=(unsigned long)addr - CONFIG_SDRAM_START;
     /* Initialize codec. */
     DSP_(_sdem_addrl) = sdem_addr & 0xffff;
     DSP_(_sdem_addrh) = sdem_addr >> 16;
-    DSP_(_sdem_dsp_size) = size;
+    DSP_(_sdem_dsp_size) = frames*4;
     DSP_(_dma0_stopped)=0;
     
     dsp_wake();
@@ -107,6 +108,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
 void pcm_play_dma_stop(void)
 {
     DSP_(_dma0_stopped)=1;
+    start = NULL;
     dsp_wake();
 }
 
@@ -134,9 +136,9 @@ void pcm_play_dma_pause(bool pause)
     }
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_get_frames_waiting(void)
 {
-    return DSP_(_sdem_dsp_size)-DSP_(_sdem_level);
+    return (DSP_(_sdem_dsp_size)-DSP_(_sdem_level)) / 4;
 }
 
 /* Only used when debugging */
@@ -146,7 +148,7 @@ void DSPHINT(void) __attribute__ ((section(".icode")));
 void DSPHINT(void)
 {
     unsigned int i;
-    size_t size;
+    unsigned long frames;
 
     IO_INTC_FIQ0 = INTR_IRQ0_IMGBUF;
     
@@ -164,9 +166,10 @@ void DSPHINT(void)
         
     case MSG_REFILL:
         /* Buffer empty.  Try to get more. */
-        if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
+        if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &frames))
         {
             unsigned long sdem_addr=(unsigned long)start - CONFIG_SDRAM_START;
+            size_t size = frames*4;
             /* Flush any pending cache writes */
             commit_dcache_range(start, size);
 

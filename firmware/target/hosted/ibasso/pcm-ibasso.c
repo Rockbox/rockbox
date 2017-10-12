@@ -43,8 +43,8 @@
 static struct pcm* _alsa_handle = NULL;
 
 
-/* Bytes left in the Rockbox PCM frame buffer. */
-static size_t _pcm_buffer_size = 0;
+/* Frames left in the Rockbox PCM frame buffer. */
+static unsigned long _pcm_buffer_frames = 0;
 
 
 /* Rockbox PCM frame buffer. */
@@ -77,6 +77,10 @@ static void* pcm_thread_run(void* nothing)
 
     while(true)
     {
+        /* FIXME: This doesn't actually cause the PCM lock to lock out
+         *        the callback if this thread is executing right after
+         *        releasing the mutex below when the PCM lock is acquired
+         *        by another thread - jethead71 */
         pthread_mutex_lock(&_dma_suspended_mtx);
         while((_dma_stopped == 1) || (_dma_locked == 1))
         {
@@ -86,10 +90,11 @@ static void* pcm_thread_run(void* nothing)
         }
         pthread_mutex_unlock(&_dma_suspended_mtx);
 
-        if(_pcm_buffer_size == 0)
+        if(_pcm_buffer_frames == 0)
         {
             /* Retrive a new PCM buffer from Rockbox. */
-            if(! pcm_play_dma_complete_callback(PCM_DMAST_OK, &_pcm_buffer, &_pcm_buffer_size))
+            if(! pcm_play_dma_complete_callback(PCM_DMAST_OK, &_pcm_buffer,
+                                                &_pcm_buffer_frames))
             {
                 DEBUGF("DEBUG %s: No new buffer.", __func__);
 
@@ -100,7 +105,7 @@ static void* pcm_thread_run(void* nothing)
         pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 
         /* This relies on Rockbox PCM frame buffer size == ALSA PCM frame buffer size. */
-        if(pcm_write(_alsa_handle, _pcm_buffer, _pcm_buffer_size) != 0)
+        if(pcm_write(_alsa_handle, _pcm_buffer, _pcm_buffer_frames*4) != 0)
         {
             DEBUGF("ERROR %s: pcm_write failed: %s.", __func__, pcm_get_error(_alsa_handle));
 
@@ -108,7 +113,7 @@ static void* pcm_thread_run(void* nothing)
             continue;
         }
 
-        _pcm_buffer_size = 0;
+        _pcm_buffer_count = 0;
 
         /*DEBUGF("DEBUG %s: Thread running.", __func__);*/
     }
@@ -337,7 +342,7 @@ void pcm_play_dma_init(void)
 }
 
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_start(const void *addr, unsigned long frames)
 {
     TRACE;
 
@@ -355,8 +360,8 @@ void pcm_play_dma_start(const void *addr, size_t size)
         panicf("ERROR %s: Could not unmute.", __func__);
     }
 
-    _pcm_buffer      = addr;
-    _pcm_buffer_size = size;
+    _pcm_buffer        = addr;
+    _pcm_buffer_frames = frames;
 
     pthread_mutex_lock(&_dma_suspended_mtx);
     _dma_stopped = 0;
@@ -365,7 +370,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
 }
 
 
-/* TODO: Why is this in the API if it gets never called? */
 void pcm_play_dma_pause(bool pause)
 {
     TRACE;
@@ -456,21 +460,23 @@ void pcm_dma_apply_settings(void)
 }
 
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_get_frames_waiting(void)
 {
     TRACE;
 
-    return _pcm_buffer_size;
+    return _pcm_buffer_frames;
 }
 
 
 /* TODO: WTF */
-const void* pcm_play_dma_get_peak_buffer(int* count)
+const void* pcm_play_dma_get_peak_buffer(unsigned long* frames_rem)
 {
     TRACE;
 
-    uintptr_t addr = (uintptr_t) _pcm_buffer;
-    *count = _pcm_buffer_size / 4;
+    uintptr_t addr = (uintptr_t)*(volatile const void **)&_pcm_buffer;
+    unsigned long frames = _pcm_buffer_frames;
+
+    *frames_rem = frames;
     return (void*) ((addr + 3) & ~3);
 }
 

@@ -1047,7 +1047,7 @@ static inline bool fft_init_fft_lib(void)
 
 static inline bool fft_get_fft(void)
 {
-    int count;
+    unsigned long count;
     const int16_t *value =
         rb->mixer_channel_get_buffer(PCM_MIXER_CHAN_PLAYBACK, &count);
     /* This block can introduce discontinuities in our data. Meaning, the
@@ -1073,7 +1073,7 @@ static inline bool fft_get_fft(void)
         kiss_fft_scalar left = *value++;
         kiss_fft_scalar right = *value++;
         input[fft_idx].r = (left + right) >> 1; /* to mono */
-    } while (fft_idx++, --count > 0);
+    } while (fft_idx++, --count);
 
     apply_window_func(fft.window_func);
 
