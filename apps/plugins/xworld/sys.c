@@ -320,7 +320,7 @@ static int mainmenu_cb(int action, const struct menu_item_ex *this_item)
 }
 
 static AudioCallback audio_callback = NULL;
-static void get_more(const void** start, size_t* size);
+static void get_more(const void** start, unsigned long* frames);
 static void* audio_param;
 static struct System* audio_sys;
 
@@ -982,10 +982,10 @@ uint32_t sys_getTimeStamp(struct System* sys)
 }
 
 /* game provides us mono samples, we need stereo */
-static int16_t rb_soundbuf[MAX_SOUNDBUF_SIZE * 2];
+static int16_t rb_soundbuf[MAX_SOUNDBUF_SIZE * 2] ALIGNED_ATTR(4);
 static int8_t temp_soundbuf[MAX_SOUNDBUF_SIZE];
 
-static void get_more(const void** start, size_t* size)
+static void get_more(const void** start, unsigned long* frames)
 {
     if(audio_sys->settings.sound_enabled && audio_callback)
     {
@@ -1002,7 +1002,7 @@ static void get_more(const void** start, size_t* size)
         rb->memset(rb_soundbuf, 0, audio_sys->settings.sound_bufsize * 2 * sizeof(int16_t));
     }
     *start = rb_soundbuf;
-    *size = audio_sys->settings.sound_bufsize * 2 * sizeof(int16_t);
+    *frames = audio_sys->settings.sound_bufsize;
 }
 
 void sys_startAudio(struct System* sys, AudioCallback callback, void *param)

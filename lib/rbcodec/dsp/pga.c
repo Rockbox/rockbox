@@ -109,9 +109,9 @@ void pga_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p)
     for (unsigned int ch = 0; ch < channels; ch++)
     {
         int32_t *d = buf->p32[ch];
-        int count = buf->remcount;
+        unsigned long count = buf->frames_rem;
 
-        for (int i = 0; i < count; i++)
+        for (unsigned long i = 0; i < count; i++)
             d[i] = FRACMUL_SHL(d[i], gain, 8);
     }
 

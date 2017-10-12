@@ -865,8 +865,8 @@ static void get_peaks(int *left, int *right)
     static struct pcm_peaks peaks;
     rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                       &peaks);
-    *left = peaks.left;
-    *right = peaks.right;
+    *left = peaks.peak[0];
+    *right = peaks.peak[1];
 #elif defined (SIMULATOR)
     *left = rand() % 0x8000;
     *right = rand() % 0x8000;
@@ -1317,10 +1317,11 @@ static void waveform_buffer_done(void)
 }
     
 /* where the samples are obtained and buffered */
-static void waveform_buffer_callback(const void *start, size_t size)
+static void waveform_buffer_callback(const void *start, unsigned long frames)
 {
     size_t threshold = waveform_buffer_threshold;
     size_t have = waveform_buffer_have;
+    size_t size = frames * 4;
 
     if (have >= threshold)
     {

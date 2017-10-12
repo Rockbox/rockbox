@@ -69,7 +69,7 @@
 
 /**
  * PCM_NUM_CHUNKS:    Number of PCM chunks
- * PCM_CHUNK_SAMP:    Number of samples in a PCM chunk
+ * PCM_CHUNK_FRAMES:  Number of frames in a PCM chunk
  * PCM_BOOST_SECONDS: PCM level at which to boost CPU
  * PANIC_SECONDS:     Flood watermark time until full
  * FLUSH_SECONDS:     Flush watermark time until full
@@ -82,9 +82,9 @@
  * multiplied by the numerator first.
  */
 #if MEMORYSIZE <= 2
-#define PCM_NUM_CHUNKS         56
-#define PCM_CHUNK_SAMP       1024
-#define PCM_BOOST_SECONDS       1/2
+#define PCM_NUM_CHUNKS      56
+#define PCM_CHUNK_FRAMES  1024
+#define PCM_BOOST_SECONDS    1/2
 #define PANIC_SECONDS           1/2
 #define FLUSH_SECONDS           1
 #define FLUSH_MON_INTERVAL      1/6
@@ -99,13 +99,13 @@
 
 /* Default values if not overridden above */
 #ifndef PCM_NUM_CHUNKS
-#define PCM_NUM_CHUNKS        256
+#define PCM_NUM_CHUNKS     256
 #endif
-#ifndef PCM_CHUNK_SAMP
-#define PCM_CHUNK_SAMP       2048
+#ifndef PCM_CHUNK_FRAMES
+#define PCM_CHUNK_FRAMES  2048
 #endif
 #ifndef PCM_BOOST_SECONDS
-#define PCM_BOOST_SECONDS       1
+#define PCM_BOOST_SECONDS    1
 #endif
 #ifndef FLUSH_MON_INTERVAL
 #define FLUSH_MON_INTERVAL      1/4
@@ -203,9 +203,9 @@ static unsigned int  pre_record_seconds; /* Pre-record time in seconds     */
 ****************************************************************************/
 
 /** Buffer parameters where incoming PCM data is placed **/
-#define PCM_DEPTH_BYTES (sizeof (int16_t))
-#define PCM_SAMP_SIZE   (2*PCM_DEPTH_BYTES)
-#define PCM_CHUNK_SIZE  (PCM_CHUNK_SAMP*PCM_SAMP_SIZE)
+#define PCM_SAMPLE_SIZE (sizeof (int16_t))
+#define PCM_FRAME_SIZE  (2*PCM_SAMPLE_SIZE)
+#define PCM_CHUNK_SIZE  (PCM_CHUNK_FRAMES*PCM_FRAME_SIZE)
 #define PCM_BUF_SIZE    (PCM_NUM_CHUNKS*PCM_CHUNK_SIZE)
 
 /* Convert byte sizes into buffer slot counts */
@@ -244,7 +244,8 @@ static struct enc_chunk_file *fname_buf;/* Buffer with next file to create */
 static unsigned long  enc_sample_rate;  /* Samplerate used by encoder      */
 static bool           pcm_buffer_empty; /* All PCM chunks processed?       */
 
-static typeof (memcpy) *pcm_copyfn;     /* PCM memcpy or copy_buffer_mono  */
+static void (* pcm_copyfn)(void *, const void *, unsigned long);
+                                        /* PCM copy or copy_buffer_mono  */
 static enc_callback_t enc_cb;           /* Encoder's recording callback    */
 
 /** File flushing **/
@@ -484,7 +485,7 @@ static void clear_warning_status(uint32_t w)
 }
 
 /* Callback for when more data is ready - called by DMA ISR */
-static void pcm_rec_have_more(void **start, size_t *size)
+static void pcm_rec_have_more(void **start, unsigned long *frames)
 {
     size_t next_idx = pcm_widx;
 
@@ -498,7 +499,7 @@ static void pcm_rec_have_more(void **start, size_t *size)
     }
 
     *start = pcmbuf_ptr(next_idx);
-    *size = PCM_CHUNK_SIZE;
+    *frames = PCM_CHUNK_FRAMES;
 
     pcm_widx = next_idx;
 }
@@ -515,7 +516,7 @@ static enum pcm_dma_status pcm_rec_status_callback(enum pcm_dma_status status)
         }
         else
         {
-            /* Try again next transmission - frame is invalid */
+            /* Try again next transmission - buffer is invalid */
             set_warning_bits(PCMREC_W_DMA);
         }
     }
@@ -527,7 +528,7 @@ static enum pcm_dma_status pcm_rec_status_callback(enum pcm_dma_status status)
 static void pcm_start_recording(void)
 {
     pcm_record_data(pcm_rec_have_more, pcm_rec_status_callback,
-                    pcmbuf_ptr(pcm_widx), PCM_CHUNK_SIZE);
+                    pcmbuf_ptr(pcm_widx), PCM_CHUNK_FRAMES);
 }
 
 /* Initialize the various recording buffers */
@@ -647,7 +648,7 @@ static unsigned long get_encbuf_datarate(void)
     }
     else
     {
-        return CHUNK_SIZE_COUNT(sample_rate*num_channels*PCM_DEPTH_BYTES);
+        return CHUNK_SIZE_COUNT(sample_rate*num_channels*PCM_SAMPLE_SIZE);
     }
 }
 
@@ -869,9 +870,15 @@ static bool open_rec_file(bool create)
     return true;
 }
 
+static void ICODE_ATTR
+copy_buffer_stereo(void *dst, const void *src, unsigned long count)
+{
+    memcpy(dst, src, PCM_FRAME_SIZE * count);
+}
+
 /* Copy with mono conversion - output 1/2 size of input */
-static void * ICODE_ATTR
-copy_buffer_mono_lr(void *dst, const void *src, size_t src_size)
+static void ICODE_ATTR
+copy_buffer_mono_lr(void *dst, const void *src, unsigned long count)
 {
     int16_t *d = dst;
     int16_t const *s = src;
@@ -879,14 +886,12 @@ copy_buffer_mono_lr(void *dst, const void *src, size_t src_size)
     /* mono = (L + R) / 2 */
     do
         *d++ = ((int32_t){ *s++ } + *s++ + 1) >> 1;
-    while (src_size -= PCM_SAMP_SIZE);
-
-    return dst;
+    while (--count);
 }
 
 /* Copy with mono conversion - output 1/2 size of input */
-static void * ICODE_ATTR
-copy_buffer_mono_l(void *dst, const void *src, size_t src_size)
+static void ICODE_ATTR
+copy_buffer_mono_l(void *dst, const void *src, unsigned long count)
 {
     int16_t *d = dst;
     int16_t const *s = (int16_t *)src - 2;
@@ -894,14 +899,12 @@ copy_buffer_mono_l(void *dst, const void *src, size_t src_size)
     /* mono = L */
     do
         *d++ = *(s += 2);
-    while (src_size -= PCM_SAMP_SIZE);
-
-    return dst;
+    while (--count);
 }
 
 /* Copy with mono conversion - output 1/2 size of input */
-static void * ICODE_ATTR
-copy_buffer_mono_r(void *dst, const void *src, size_t src_size)
+static void ICODE_ATTR
+copy_buffer_mono_r(void *dst, const void *src, unsigned long count)
 {
     int16_t *d = dst;
     int16_t const *s = (int16_t *)src - 1;
@@ -909,9 +912,7 @@ copy_buffer_mono_r(void *dst, const void *src, size_t src_size)
     /* mono = R */
     do
         *d++ = *(s += 2);
-    while (src_size -= PCM_SAMP_SIZE);
-
-    return dst;
+    while (--count);
 }
 
 
@@ -1503,11 +1504,11 @@ static void on_recording_options(struct audio_recording_options *options)
     queue_reply(&audio_queue, 0);  /* Let caller go */
 
     /* Pick appropriate PCM copy routine */
-    pcm_copyfn = memcpy;
+    pcm_copyfn = copy_buffer_stereo;
 
     if (num_channels == 1)
     {
-        static typeof (memcpy) * const copy_buffer_mono[] =
+        static typeof (pcm_copyfn) const copy_buffer_mono[] =
         {
             copy_buffer_mono_lr,
             copy_buffer_mono_l,
@@ -1805,14 +1806,14 @@ recording_done:
  *
  * NOTE: Request must be less than the PCM buffer length in samples in order
  *       to progress.
- *       (ie. count <= PCM_NUM_CHUNKS*PCM_CHUNK_SAMP)
+ *       (ie. frames <= PCM_NUM_CHUNKS*PCM_CHUNK_FRAMES)
  */
-static int enc_pcmbuf_read(void *buffer, int count)
+static unsigned long enc_pcmbuf_read(void *buffer, unsigned long frames)
 {
     size_t avail = pcmbuf_used();
-    size_t size = count*PCM_SAMP_SIZE;
+    size_t size = frames * PCM_FRAME_SIZE;
 
-    if (count > 0 && avail >= size)
+    if (frames && avail >= size)
     {
         size_t endidx = pcm_ridx + size;
 
@@ -1824,12 +1825,13 @@ static int enc_pcmbuf_read(void *buffer, int count)
             if (num_channels == 1)
                 offset /= 2; /* src offset -> dst offset */
 
-            pcm_copyfn(buffer + offset, pcmbuf_ptr(0), wrap);
+            pcm_copyfn(buffer + offset, pcmbuf_ptr(0),
+                       wrap / PCM_FRAME_SIZE);
         }
 
-        pcm_copyfn(buffer, pcmbuf_ptr(pcm_ridx), size);
+        pcm_copyfn(buffer, pcmbuf_ptr(pcm_ridx), size / PCM_FRAME_SIZE);
 
-        if (avail >= sample_rate*PCM_SAMP_SIZE*PCM_BOOST_SECONDS ||
+        if (avail >= sample_rate*PCM_FRAME_SIZE*PCM_BOOST_SECONDS ||
             avail >= PCM_BUF_SIZE*1/2)
         {
             /* Filling up - boost threshold data available or more or 1/2 full
@@ -1839,7 +1841,7 @@ static int enc_pcmbuf_read(void *buffer, int count)
 
         pcm_buffer_empty = false;
 
-        return count;
+        return frames;
     }
 
     /* Not enough data available - encoder should idle */
@@ -1853,24 +1855,24 @@ static int enc_pcmbuf_read(void *buffer, int count)
     return 0;
 }
 
-/* Advance PCM buffer by count samples */
-static int enc_pcmbuf_advance(int count)
+/* Advance PCM buffer by a number of frames */
+static unsigned long enc_pcmbuf_advance(unsigned long frames)
 {
-    if (count <= 0)
+    if (!frames)
         return 0;
 
     size_t avail = pcmbuf_used();
-    size_t size = count*PCM_SAMP_SIZE;
+    size_t size = frames * PCM_FRAME_SIZE;
 
     if (avail < size)
     {
         size = avail;
-        count = size / PCM_SAMP_SIZE;
+        frames = size / PCM_FRAME_SIZE;
     }
 
     pcm_ridx = pcmbuf_add(pcm_ridx, size);
 
-    return count;
+    return frames;
 }
 
 /* Return encoder chunk at current write position, wrapping to 0 if
@@ -1953,10 +1955,10 @@ static void enc_encbuf_finish_buffer(void)
     if (data_size == 0)
         return; /* Claims nothing was written */
 
-    size_t count = CHUNK_DATA_COUNT(data_size);
+    size_t size = CHUNK_DATA_COUNT(data_size);
     size_t avail = encbuf_free();
 
-    if (avail <= count || enc_widx + count > enc_buflen)
+    if (avail <= size || enc_widx + size > enc_buflen)
     {
         /* Claims it wrote too much? */
         raise_warning_status(PCMREC_W_ENC_BUFFER_OVF);
@@ -1971,20 +1973,20 @@ static void enc_encbuf_finish_buffer(void)
         return;
     }
 
-    encbuf_widx_advance(enc_widx, count);
+    encbuf_widx_advance(enc_widx, size);
 
-    encbuf_rec_count += count;
+    encbuf_rec_count += size;
     num_rec_bytes += data_size;
     num_rec_samples += data->pcm_count;
 }
 
 /* Read from the output stream */
-static ssize_t enc_stream_read(void *buf, size_t count)
+static ssize_t enc_stream_read(void *buf, size_t nbyte)
 {
     if (!stream_flush_buf())
         return -1;
 
-    return read(rec_fd, buf, count);
+    return read(rec_fd, buf, nbyte);
 }
 
 /* Seek the output steam */
@@ -1997,28 +1999,28 @@ static off_t enc_stream_lseek(off_t offset, int whence)
 }
 
 /* Write to the output stream */
-static ssize_t enc_stream_write(const void *buf, size_t count)
+static ssize_t enc_stream_write(const void *buf, size_t nbyte)
 {
-    if (UNLIKELY(count >= STREAM_BUF_SIZE))
+    if (UNLIKELY(nbyte >= STREAM_BUF_SIZE))
     {
         /* Too big to buffer */
         if (stream_flush_buf())
-            return write(rec_fd, buf, count);
+            return write(rec_fd, buf, nbyte);
     }
 
-    if (!count)
+    if (!nbyte)
         return 0;
 
-    if (stream_buf_used + count > STREAM_BUF_SIZE)
+    if (stream_buf_used + nbyte > STREAM_BUF_SIZE)
     {
-        if (!stream_flush_buf() && stream_buf_used + count > STREAM_BUF_SIZE)
-            count = STREAM_BUF_SIZE - stream_buf_used;
+        if (!stream_flush_buf() && stream_buf_used + nbyte > STREAM_BUF_SIZE)
+            nbyte = STREAM_BUF_SIZE - stream_buf_used;
     }
 
-    memcpy(stream_buffer + stream_buf_used, buf, count);
-    stream_buf_used += count;
+    memcpy(stream_buffer + stream_buf_used, buf, nbyte);
+    stream_buf_used += nbyte;
 
-    return count;
+    return nbyte;
 }
 
 /* One-time init at startup */

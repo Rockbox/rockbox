@@ -134,8 +134,8 @@ static void pbe_process(struct dsp_proc_entry *this,
                         struct dsp_buffer **buf_p)
 {
     struct dsp_buffer *buf = *buf_p;
-    int count = buf->remcount;
-    int num_channels = buf->format.num_channels;
+    unsigned long count = buf->frames_rem;
+    unsigned int num_channels = buf->format.num_channels;
     int b2_level = (B2_DLY * pbe_strength) / 100;
     int b0_level = (B0_DLY * pbe_strength) / 100;
     int32_t x;
@@ -149,9 +149,9 @@ static void pbe_process(struct dsp_proc_entry *this,
     b3[0] = b2[1] + B2_SIZE;
     b3[1] = b3[0] + B3_SIZE;
 
-    for(int ch = 0; ch < num_channels; ch++)
+    for (unsigned int ch = 0; ch < num_channels; ch++)
     {
-        for (int i = 0; i < count; i++)
+        for (unsigned long i = 0; i < count; i++)
         {
             /* 160hz - 500hz no delay */
             temp_buffer = FRACMUL(buf->p32[ch][i], tcoef1) -
@@ -180,7 +180,7 @@ static void pbe_process(struct dsp_proc_entry *this,
 
     /* apply Biophonic EQ   */
     for (int i = 0; i < 5; i++)
-        filter_process(&pbe_filter[i], buf->p32, buf->remcount,
+        filter_process(&pbe_filter[i], buf->p32, buf->frames_rem,
                        buf->format.num_channels);
 
     (void)this;

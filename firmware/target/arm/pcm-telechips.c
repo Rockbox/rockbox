@@ -35,14 +35,11 @@ struct dma_data
    optimised fiq handler, so don't change it. */
     union
     {
-        uint16_t *p;
+        int16_t *p;
         const void *p_r;
         void *p_w;
     };
-    size_t size;
-#if NUM_CORES > 1
-    unsigned core;
-#endif
+    unsigned long frames;
     int locked;
     int state;
 };
@@ -55,18 +52,18 @@ struct dma_data dma_play_data SHAREDBSS_ATTR =
     /* Initialize to a locked, stopped state */
     { .p = NULL },
     .size = 0,
-#if NUM_CORES > 1
-    .core = 0x00,
-#endif
     .locked = 0,
     .state = 0
 };
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
+const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 {
-    unsigned long addr = (unsigned long)dma_play_data.p;
-    size_t cnt = dma_play_data.size;
-    *count = cnt >> 2;
+    int oldstatus = disable_irq_save();
+    unsigned long addr = (unsigned long)dma_play_data.p_r;
+    unsigned long frames = dma_play_data.frames;
+    restore_irq(oldstatus);
+
+    *frames_rem = frames;
     return (void *)((addr + 2) & ~3);
 }
 
@@ -124,7 +121,7 @@ static void play_start_pcm(void)
     DAMR &= ~(1<<14);   /* disable tx */
     dma_play_data.state = 1;
 
-    if (dma_play_data.size >= 16)
+    if (dma_play_data.frames >= 4)
     {
         DADO_L(0) = *dma_play_data.p++;
         DADO_R(0) = *dma_play_data.p++;
@@ -134,7 +131,7 @@ static void play_start_pcm(void)
         DADO_R(2) = *dma_play_data.p++;
         DADO_L(3) = *dma_play_data.p++;
         DADO_R(3) = *dma_play_data.p++;
-        dma_play_data.size -= 16;
+        dma_play_data.frames -= 4;
     }
 
     DAMR |= (1<<14);   /* enable tx */
@@ -144,17 +141,14 @@ static void play_stop_pcm(void)
 {
     DAMR &= ~(1<<14);   /* disable tx */
     dma_play_data.state = 0;
+    dma_play_data.addr = NULL;
+    dma_play_data.frames = 0;
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_start(const void *addr, unsigned long frames)
 {
-    dma_play_data.p_r  = addr;
-    dma_play_data.size = size;
-
-#if NUM_CORES > 1
-    /* This will become more important later - and different ! */
-    dma_play_data.core = processor_id(); /* save initiating core */
-#endif
+    dma_play_data.p_r = addr;
+    dma_play_data.frames = frames;
 
     IEN |= DAI_TX_IRQ_MASK;
 
@@ -164,10 +158,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
 void pcm_play_dma_stop(void)
 {
     play_stop_pcm();
-    dma_play_data.size = 0;
-#if NUM_CORES > 1
-    dma_play_data.core = 0; /* no core in control */
-#endif
 }
 
 void pcm_play_lock(void)
@@ -203,9 +193,9 @@ void pcm_play_dma_pause(bool pause)
     }
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_get_frames_waiting(void)
 {
-    return dma_play_data.size & ~3;
+    return dma_play_data.frames;
 }
 
 #ifdef HAVE_RECORDING
@@ -218,10 +208,10 @@ void pcm_rec_dma_close(void)
 {
 }
 
-void pcm_rec_dma_start(void *addr, size_t size)
+void pcm_rec_dma_start(void *addr, unsigned long frames)
 {
     (void) addr;
-    (void) size;
+    (void) frames;
 }
 
 void pcm_rec_dma_stop(void)
@@ -236,8 +226,9 @@ void pcm_rec_unlock(void)
 {
 }
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+const void * pcm_rec_dma_get_peak_buffer(unsigned long *frames_avail)
 {
+    *frames_avail = 0;
     return NULL;
 }
 #endif
@@ -264,8 +255,8 @@ void fiq_handler(void)
         "ldr     r9, =0x80000104     \n" /* CREQ */
 #endif
         "str     r8, [r9]            \n" /* clear DAI IRQs */
-        "ldmia   r11, { r8-r9 }      \n" /* r8 = p, r9 = size */
-        "cmp     r9, #0x10           \n" /* is size <16? */
+        "ldmia   r11, { r8-r9 }      \n" /* r8 = p, r9 = frames */
+        "cmp     r9, #4              \n" /* is frames < 4? */
         "blo     .more_data          \n" /* if so, ask pcmbuf for more data */
 
     ".fill_fifo:                     \n"
@@ -285,8 +276,8 @@ void fiq_handler(void)
         "str     r12, [r10, #0x18]   \n" /* write top sample to DADO_L3 */
         "mov     r12, r12, lsr #16   \n" /* put right sample at the bottom */
         "str     r12, [r10, #0x1c]   \n" /* write low sample to DADO_R3*/
-        "sub     r9, r9, #0x10       \n" /* 4 words written */
-        "stmia   r11, { r8-r9 }      \n" /* save p and size */
+        "sub     r9, r9, #4          \n" /* 4 frames written */
+        "stmia   r11, { r8-r9 }      \n" /* save p and frames */
 
         "cmp     r14, #0             \n" /* Callback called? */
         "ldmeqfd sp!, { r0-r3, pc }^ \n" /* no? -> exit */
@@ -302,13 +293,13 @@ void fiq_handler(void)
         "mov     r14, #1             \n" /* Remember we got more data in this FIQ */
         "mov     r0, %0              \n" /* r0 = status */
         "mov     r1, r11             \n" /* r1 = &dma_play_data.p_r */
-        "add     r2, r11, #4         \n" /* r2 = &dma_play_data.size */
+        "add     r2, r11, #4         \n" /* r2 = &dma_play_data.frames */
         "mov     lr, pc              \n"
         "ldr     pc, =pcm_play_dma_complete_callback \n"
         "cmp     r0, #0              \n" /* any more to play? */
         "ldmneia r11, { r8-r9 }      \n" /* load new p and size */
-        "cmpne   r9, #0x0f           \n" /* did we actually get enough data? */
-        "bhi     .fill_fifo          \n" /* not stop and enough? refill */
+        "cmpne   r9, #4              \n" /* did we actually get enough data? */
+        "bhs     .fill_fifo          \n" /* not stop and enough? refill */
         "ldmfd   sp!, { r0-r3, pc }^ \n" /* exit */
         ".ltorg                      \n"
         : : "i"(PCM_DMAST_OK), "i"(PCM_DMAST_STARTED)
@@ -320,14 +311,14 @@ void fiq_handler(void)
 {
     register bool new_buffer = false;
 
-    if (dma_play_data.size < 16)
+    if (dma_play_data.frames < 4)
     {
         /* p is empty, get some more data */
         new_buffer = pcm_play_dma_complete_callback(&dma_play_data.p_r,
-                                                    &dma_play_data.size);
+                                                    &dma_play_data.frames);
     }
 
-    if (dma_play_data.size >= 16)
+    if (dma_play_data.frames >= 4)
     {
         DADO_L(0) = *dma_play_data.p++;
         DADO_R(0) = *dma_play_data.p++;
@@ -338,7 +329,7 @@ void fiq_handler(void)
         DADO_L(3) = *dma_play_data.p++;
         DADO_R(3) = *dma_play_data.p++;
 
-        dma_play_data.size -= 16;
+        dma_play_data.frames -= 4;
     }
 
     /* Clear FIQ status */

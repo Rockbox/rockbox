@@ -32,7 +32,7 @@ static FORCE_INLINE void mix_samples(int16_t *out,
                                      int32_t src0_amp,
                                      const int16_t *src1,
                                      int32_t src1_amp,
-                                     size_t size)
+                                     unsigned long count)
 {
     if (src0_amp == MIX_AMP_UNITY && src1_amp == MIX_AMP_UNITY)
     {
@@ -44,7 +44,7 @@ static FORCE_INLINE void mix_samples(int16_t *out,
             *out++ = clip_sample_16(l);
             *out++ = clip_sample_16(h);
         }
-        while ((size -= 2*sizeof(int16_t)) > 0);
+        while (--count);
     }
     else if (src0_amp != MIX_AMP_UNITY && src1_amp != MIX_AMP_UNITY)
     {
@@ -56,7 +56,7 @@ static FORCE_INLINE void mix_samples(int16_t *out,
             *out++ = clip_sample_16(l);
             *out++ = clip_sample_16(h);
         }
-        while ((size -= 2*sizeof(int16_t)) > 0);
+        while (--count);
     }
     else
     {
@@ -78,7 +78,7 @@ static FORCE_INLINE void mix_samples(int16_t *out,
             *out++ = clip_sample_16(l);
             *out++ = clip_sample_16(h);
         }
-        while ((size -= 2*sizeof(int16_t)) > 0);
+        while (--count);
     }
 }
 
@@ -86,12 +86,12 @@ static FORCE_INLINE void mix_samples(int16_t *out,
 static FORCE_INLINE void write_samples(int16_t *out,
                                        const int16_t *src,
                                        int32_t amp,
-                                       size_t size)
+                                       unsigned long count)
 {
     if (LIKELY(amp == MIX_AMP_UNITY))
     {
         /* Channel is unity amplitude */
-        memcpy(out, src, size);
+        memcpy(out, src, count*2*sizeof (int16_t));
     }
     else
     {
@@ -103,8 +103,8 @@ static FORCE_INLINE void write_samples(int16_t *out,
             *out++ = l;
             *out++ = h;
         }
-        while ((size -= 2*sizeof(int16_t)) > 0);
-    }     
+        while (--count);
+    }
 }
 
 

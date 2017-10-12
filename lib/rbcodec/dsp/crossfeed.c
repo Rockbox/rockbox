@@ -187,9 +187,9 @@ void crossfeed_process(struct dsp_proc_entry *this, struct dsp_buffer **buf_p)
     int32_t *di = state->index;
     int32_t *di_max = state->index_max;
 
-    int count = buf->remcount;
+    unsigned long count = buf->frames_rem;
 
-    for (int i = 0; i < count; i++)
+    for (unsigned long i = 0; i < count; i++)
     {
         int32_t left = buf->p32[0][i];
         int32_t right = buf->p32[1][i];
@@ -243,9 +243,9 @@ void crossfeed_meier_process(struct dsp_proc_entry *this,
     int32_t coef1 = state->coef1;
     int32_t coef2 = state->coef2;
 
-    int count = buf->remcount;
+    unsigned long count = buf->frames_rem;
 
-    for (int i = 0; i < count; i++)
+    for (unsigned long i = 0; i < count; i++)
     {
         /* Calculate new output */
         int32_t lout = buf->p32[0][i] + vcl;
@@ -305,7 +305,7 @@ static intptr_t crossfeed_new_format(struct dsp_proc_entry *this,
     DSP_PRINT_FORMAT(DSP_PROC_CROSSFEED, *format);
 
     bool was_active = dsp_proc_active(dsp, DSP_PROC_CROSSFEED);
-    bool active = format->num_channels >= 2;
+    bool active = format->num_channels == 2;
     dsp_proc_activate(dsp, DSP_PROC_CROSSFEED, active);
 
     if (active)
