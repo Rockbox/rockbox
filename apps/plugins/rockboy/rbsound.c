@@ -5,22 +5,23 @@
 struct pcm pcm IBSS_ATTR;
 
 #define N_BUFS 2
-#define BUF_SIZE 2048
+#define BUF_COUNT 1024
+#define SAMPLE_SIZE (2*sizeof(int16_t))
 
 #if CONFIG_CODEC == SWCODEC
 
-bool doneplay=1;
-bool bufnum=0;
+static volatile int doneplay=1;
 
-static unsigned short *buf=0, *hwbuf=0;
+static int16_t (*buf)[BUF_COUNT*2];
+static int16_t *hwbuf;
 
 static bool newly_started;
 
-static void get_more(const void** start, size_t* size)
+static void get_more(const void** start, unsigned long* frames)
 {
-    memcpy(hwbuf, &buf[pcm.len*doneplay], BUF_SIZE*sizeof(short));
+    memcpy(hwbuf, buf[doneplay], BUF_COUNT*SAMPLE_SIZE);
     *start = hwbuf;
-    *size = BUF_SIZE*sizeof(short);
+    *frames = BUF_COUNT;
     doneplay=1;
 }
 
@@ -39,15 +40,15 @@ void rockboy_pcm_init(void)
 
     pcm.stereo = 1;
 
-    pcm.len = BUF_SIZE;
+    pcm.len = BUF_COUNT;
     if(!buf)
     {
-        buf = my_malloc(pcm.len * N_BUFS *sizeof(short));
-        hwbuf = my_malloc(pcm.len *sizeof(short));
+        buf = my_malloc(pcm.len * N_BUFS * SAMPLE_SIZE);
+        hwbuf = my_malloc(pcm.len * SAMPLE_SIZE);
 
-        pcm.buf = buf;
+        pcm.buf = buf[0];
         pcm.pos = 0;
-        memset(buf, 0,  pcm.len * N_BUFS*sizeof(short));
+        memset(buf, 0,  pcm.len * N_BUFS * SAMPLE_SIZE);
     }
 
     rb->pcm_play_stop();

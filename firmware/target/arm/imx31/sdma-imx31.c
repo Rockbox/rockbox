@@ -714,3 +714,20 @@ void sdma_read_words(unsigned long *buf, unsigned long start, int count)
     SDMA_HSTART = 1ul;
     sdma_channel_wait_nonblocking(0);
 }
+
+/* Read one word from SDMA core memory */
+unsigned long sdma_read_word(unsigned long at)
+{
+    unsigned long buf[CACHEALIGN_SIZE*2 / sizeof (unsigned long)];
+    unsigned long *p = CACHEALIGN_UP(*(unsigned long **)&buf);
+    discard_dcache_range(p, CACHEALIGN_SIZE);
+    sdma_read_words(p, at, 1);
+    return *p;
+}
+
+/* Write one word to SDMA core memory */
+void sdma_write_word(unsigned long at, unsigned long val)
+{
+    commit_dcache_range(&val, sizeof (val));
+    sdma_write_words(&val, at, 1);
+}

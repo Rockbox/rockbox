@@ -189,11 +189,11 @@ void autoclose_sound(void)
   }
 #endif
 }
-static void get_more(const void** start, size_t* size)
+static void get_more(const void** start, unsigned long* frames)
 {
     doneplay = 1;
     (void)start;
-    (void)size;
+    (void)frames;
 }
 
 /* sp_sound_buf is Unsigned 8 bit, Rate 8000 Hz, Mono */
@@ -218,7 +218,7 @@ static void write_buf(void){
                     = my_buf[j+10] = my_buf[j+11] \
                     = (((byte)sp_sound_buf[i])<<8) >> settings.volume;
 
-    rb->pcm_play_data(&get_more,NULL,(unsigned char*)(my_buf),TMNUM*4*3*2);
+    rb->pcm_play_data(get_more, NULL, my_buf ,TMNUM*3*2);
 
 #if 0
     /* can use to save and later analyze what we produce */

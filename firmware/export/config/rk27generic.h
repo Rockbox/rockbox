@@ -112,8 +112,6 @@
 #define CONFIG_TUNER TEA5767
 #define CONFIG_TUNER_XTAL  32768
 
-/* #define HAVE_PCM_DMA_ADDRESS */
-
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS

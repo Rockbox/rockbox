@@ -166,7 +166,7 @@ static void eq_process(struct dsp_proc_entry *this,
                        struct dsp_buffer **buf_p)
 {
     struct dsp_buffer *buf = *buf_p;
-    int count = buf->remcount;
+    unsigned long count = buf->frames_rem;
     unsigned int channels = buf->format.num_channels;
 
     FOR_EACH_ENB_BAND(b)

@@ -54,45 +54,46 @@ extern void dsp_sample_output_flush(struct sample_io_data *this);
 extern void dsp_sample_output_format_change(struct sample_io_data *this,
                                             struct sample_format *format);
 
-#define SAMPLE_BUF_COUNT 128 /* Per channel, per DSP */
+#define SAMPLE_BUF_PERIOD 128 /* Per channel, per DSP */
 /* CODEC_IDX_AUDIO = left and right, CODEC_IDX_VOICE = mono */
-static int32_t sample_bufs[3][SAMPLE_BUF_COUNT] IBSS_ATTR;
+static int32_t sample_bufs[3][SAMPLE_BUF_PERIOD] IBSS_ATTR;
 
 /* inline helper to setup buffers when conversion is required */
-static FORCE_INLINE int sample_input_setup(struct sample_io_data *this,
-                                           struct dsp_buffer **buf_p,
-                                           int channels,
-                                           struct dsp_buffer **src,
-                                           struct dsp_buffer **dst)
+static FORCE_INLINE unsigned long
+    sample_input_setup(struct sample_io_data *this,
+                       struct dsp_buffer **buf_p,
+                       unsigned int channels,
+                       struct dsp_buffer **src,
+                       struct dsp_buffer **dst)
 {
     struct dsp_buffer *s = *buf_p;
     struct dsp_buffer *d = *dst = &this->sample_buf;
 
     *buf_p = d;
 
-    if (d->remcount > 0)
+    if (d->frames_rem)
         return 0; /* data still remains */
 
     *src = s;
 
-    int count = MIN(s->remcount, SAMPLE_BUF_COUNT);
+    unsigned long count = MIN(s->frames_rem, SAMPLE_BUF_PERIOD);
 
-    d->remcount  = count;
-    d->p32[0]    = this->sample_buf_p[0];
-    d->p32[1]    = this->sample_buf_p[channels - 1];
-    d->proc_mask = s->proc_mask;
+    d->frames_rem = count;
+    d->p32[0]     = this->sample_buf_p[0];
+    d->p32[1]     = this->sample_buf_p[channels - 1];
+    d->proc_mask  = s->proc_mask;
 
     return count;
 }
 
-/* convert count 16-bit mono to 32-bit mono */
+/* convert 16-bit mono to 32-bit mono */
 static void sample_input_mono16(struct sample_io_data *this,
                                 struct dsp_buffer **buf_p)
 {
     struct dsp_buffer *src, *dst;
-    int count = sample_input_setup(this, buf_p, 1, &src, &dst);
+    unsigned long count = sample_input_setup(this, buf_p, 1, &src, &dst);
 
-    if (count <= 0)
+    if (!count)
         return;
 
     const int16_t *s = src->pin[0];
@@ -105,17 +106,17 @@ static void sample_input_mono16(struct sample_io_data *this,
     {
         *d++ = *s++ << scale;
     }
-    while (--count > 0);
+    while (--count);
 }
 
-/* convert count 16-bit interleaved stereo to 32-bit noninterleaved */
+/* convert 16-bit interleaved stereo to 32-bit noninterleaved */
 static void sample_input_i_stereo16(struct sample_io_data *this,
                                     struct dsp_buffer **buf_p)
 {
     struct dsp_buffer *src, *dst;
-    int count = sample_input_setup(this, buf_p, 2, &src, &dst);
+    unsigned long count = sample_input_setup(this, buf_p, 2, &src, &dst);
 
-    if (count <= 0)
+    if (!count)
         return;
 
     const int16_t *s = src->pin[0];
@@ -130,17 +131,17 @@ static void sample_input_i_stereo16(struct sample_io_data *this,
         *dl++ = *s++ << scale;
         *dr++ = *s++ << scale;
     }
-    while (--count > 0);
+    while (--count);
 }
 
-/* convert count 16-bit noninterleaved stereo to 32-bit noninterleaved */
+/* convert 16-bit noninterleaved stereo to 32-bit noninterleaved */
 static void sample_input_ni_stereo16(struct sample_io_data *this,
                                      struct dsp_buffer **buf_p)
 {
     struct dsp_buffer *src, *dst;
-    int count = sample_input_setup(this, buf_p, 2, &src, &dst);
+    unsigned long count = sample_input_setup(this, buf_p, 2, &src, &dst);
 
-    if (count <= 0)
+    if (!count)
         return;
 
     const int16_t *sl = src->pin[0];
@@ -156,16 +157,16 @@ static void sample_input_ni_stereo16(struct sample_io_data *this,
         *dl++ = *sl++ << scale;
         *dr++ = *sr++ << scale;
     }
-    while (--count > 0);
+    while (--count);
 }
 
-/* convert count 32-bit mono to 32-bit mono */
+/* convert 32-bit mono to 32-bit mono */
 static void sample_input_mono32(struct sample_io_data *this,
                                 struct dsp_buffer **buf_p)
 {
     struct dsp_buffer *dst = &this->sample_buf;
 
-    if (dst->remcount > 0)
+    if (dst->frames_rem)
     {
         *buf_p = dst;
         return; /* data still remains */
@@ -177,14 +178,14 @@ static void sample_input_mono32(struct sample_io_data *this,
 }
 
 
-/* convert count 32-bit interleaved stereo to 32-bit noninterleaved stereo */
+/* convert 32-bit interleaved stereo to 32-bit noninterleaved stereo */
 static void sample_input_i_stereo32(struct sample_io_data *this,
                                     struct dsp_buffer **buf_p)
 {
     struct dsp_buffer *src, *dst;
-    int count = sample_input_setup(this, buf_p, 2, &src, &dst);
+    unsigned long count = sample_input_setup(this, buf_p, 2, &src, &dst);
 
-    if (count <= 0)
+    if (!count)
         return;
 
     const int32_t *s = src->pin[0];
@@ -198,7 +199,7 @@ static void sample_input_i_stereo32(struct sample_io_data *this,
         *dl++ = *s++;
         *dr++ = *s++;
     }
-    while (--count > 0);
+    while (--count);
 }
 
 /* convert 32 bit-noninterleaved stereo to 32-bit noninterleaved stereo */
@@ -207,7 +208,7 @@ static void sample_input_ni_stereo32(struct sample_io_data *this,
 {
     struct dsp_buffer *dst = &this->sample_buf;
 
-    if (dst->remcount > 0)
+    if (dst->frames_rem)
         *buf_p = dst; /* data still remains */
     /* else no buffer switch */
 }
@@ -230,7 +231,7 @@ void dsp_sample_input_format_change(struct sample_io_data *this,
               sample_input_mono32 },
     };
 
-    if (this->sample_buf.remcount > 0)
+    if (this->sample_buf.frames_rem)
         return;
 
     DSP_PRINT_FORMAT(DSP Input, this->format);
@@ -254,7 +255,7 @@ static void format_change_set(struct sample_io_data *this)
 /* discard the sample buffer */
 static void dsp_sample_input_flush(struct sample_io_data *this)
 {
-    this->sample_buf.remcount = 0;
+    this->sample_buf.frames_rem = 0;
 }
 
 static void INIT_ATTR dsp_sample_input_init(struct sample_io_data *this,
