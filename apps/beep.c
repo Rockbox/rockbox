@@ -22,45 +22,43 @@
 #include "system.h"
 #include "settings.h"
 #include "pcm.h"
-#include "pcm_mixer.h"
 #include "misc.h"
 #include "fixedpoint.h"
 
 /** Beep generation, CPU optimized **/
 #include "asm/beep.c"
 
-static uint32_t beep_phase;     /* Phase of square wave generator */
-static uint32_t beep_step;      /* Step of square wave generator on each sample */
-#ifdef BEEP_GENERIC
-static int16_t  beep_amplitude; /* Amplitude of square wave generator */
-#else
-/* Optimized routines do XOR with phase sign bit in both channels at once */
-static uint32_t beep_amplitude; /* Amplitude of square wave generator */
-#endif
-static int beep_count;          /* Number of samples remaining to generate */
+static pcm_handle_t pcm_handle;  /* Opened PCM stream (always open) */
+static uint32_t beep_phase;      /* Phase of square wave generator */
+static uint32_t beep_step;       /* Step of square wave generator on each sample */
+static unsigned long beep_rem;   /* Number of frames remaining to generate */
 
-#define BEEP_COUNT(fs, duration) ((fs) / 1000 * (duration))
+#define BEEP_FRAMES(fs, duration) ((fs) / 1000 * (duration))
 
 /* Reserve enough static space for keyclick to fit in worst case */
-#define BEEP_BUF_COUNT  BEEP_COUNT(PLAY_SAMPR_MAX, KEYCLICK_DURATION)
-static int16_t beep_buf[BEEP_BUF_COUNT*2] IBSS_ATTR __attribute__((aligned(4)));
+#define BEEP_BUF_FRAMES  BEEP_FRAMES(PLAY_SAMPR_MAX, KEYCLICK_DURATION)
+static int16_t beep_buf[BEEP_BUF_FRAMES];
 
 /* Callback to generate the beep frames - also don't want inlining of
    call below in beep_play */
-static void __attribute__((noinline))
-beep_get_more(const void **start, size_t *size)
+static NO_INLINE int
+beep_get_more(int status, const void **start, unsigned long *frames)
 {
-    int count = beep_count;
+    if (!PCM_STATUS_CONTINUABLE(status))
+        return status;
 
-    if (count > 0)
+    unsigned long rem = beep_rem;
+
+    if (rem)
     {
-        count = MIN(count, BEEP_BUF_COUNT);
-        beep_count -= count;
+        rem = MIN(rem, BEEP_BUF_FRAMES);
+        beep_rem -= rem;
         *start = beep_buf;
-        *size = count * 2 * sizeof (int16_t);
-        beep_generate((void *)beep_buf, count, &beep_phase,
-                      beep_step, beep_amplitude);
+        *frames = rem;
+        beep_generate(beep_buf, rem, &beep_phase, beep_step);
     }
+
+    return 0;
 }
 
 /* Generates a constant square wave sound with a given frequency in Hertz for
@@ -68,36 +66,32 @@ beep_get_more(const void **start, size_t *size)
 void beep_play(unsigned int frequency, unsigned int duration,
                unsigned int amplitude)
 {
-    mixer_channel_stop(PCM_MIXER_CHAN_BEEP);
+    if (pcm_handle)
+        pcm_stop(pcm_handle);
+    else if (!(pcm_handle = pcm_open(PCM_STREAM_PLAYBACK)))
+        return;
 
     if (frequency == 0 || duration == 0 || amplitude == 0)
         return;
 
-    if (amplitude > INT16_MAX)
-        amplitude = INT16_MAX;
-
     /* Setup the parameters for the square wave generator */
-    uint32_t fout = mixer_get_frequency();
+    uint32_t fout = pcm_get_frequency(pcm_handle);
     beep_phase = 0;
     beep_step = fp_div(frequency, fout, 32);
-    beep_count = BEEP_COUNT(fout, duration);
-
-#ifdef BEEP_GENERIC
-    beep_amplitude = amplitude;
-#else
-    /* Optimized routines do XOR with phase sign bit in both channels at once */
-    beep_amplitude = amplitude | (amplitude << 16); /* Word:|AMP16|AMP16| */
-#endif
+    beep_rem = BEEP_FRAMES(fout, duration);
 
     /* If it fits - avoid cb overhead */
     const void *start;
-    size_t size;
+    unsigned long count;
 
     /* Generate first frame here */
-    beep_get_more(&start, &size);
+    beep_get_more(0, &start, &count);
 
-    mixer_channel_set_amplitude(PCM_MIXER_CHAN_BEEP, MIX_AMP_UNITY);
-    mixer_channel_play_data(PCM_MIXER_CHAN_BEEP,
-                            beep_count ? beep_get_more : NULL,
-                            start, size);
+    if (amplitude > INT16_MAX)
+        amplitude = INT16_MAX;
+
+    pcm_set_amplitude(pcm_handle, amplitude*PCM_AMP_UNITY / INT16_MAX);
+
+    pcm_play_data(pcm_handle, beep_rem ? beep_get_more : NULL,
+                  start, count, PCM_FORMAT_T_PARM(PCM_FORMAT_S16_1CH_2I));
 }

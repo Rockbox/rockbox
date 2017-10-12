@@ -311,7 +311,7 @@ void audiohw_set_playback_src(enum nwz_src_t src)
     }
 }
 
-void audiohw_preinit(void)
+void audiohw_codec_init(void)
 {
     alsa_controls_init();
     /* turn on codec */
@@ -353,10 +353,6 @@ void audiohw_preinit(void)
     hw_open();
     nwz_codec = find_codec();
     printf("Codec: %s\n", nwz_get_codec_name());
-}
-
-void audiohw_postinit(void)
-{
 }
 
 /* volume must be driver unit */
@@ -417,6 +413,11 @@ void audiohw_set_volume(int vol_l, int vol_r)
     nwz_set_driver_vol(drv_vol);
     printf(" set digital volume %d dB\n", vol / 10);
     pcm_alsa_set_digital_volume(vol / 10);
+}
+
+void audiohw_mute(bool mute)
+{
+    (void)mute;
 }
 
 void audiohw_close(void)

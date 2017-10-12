@@ -53,7 +53,6 @@
 #endif
 #endif
 
-#include "pcm.h"
 #include "pcm-internal.h"
 #include "pcm_sampr.h"
 
@@ -91,11 +90,11 @@ static int bus_watch_id = 0;
 GMainLoop *pcm_loop = NULL;
 
 static const void* pcm_data = NULL;
-static size_t pcm_data_size = 0;
+static unsigned long pcm_data_frames = 0;
 
-static int audio_locked = 0;
 static pthread_mutex_t audio_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int inside_feed_data = 0;
+static bool audio_running = false;
 
 /*
  * mutex lock/unlock wrappers neatness' sake
@@ -110,26 +109,27 @@ static inline void unlock_audio(void)
     pthread_mutex_unlock(&audio_lock_mutex);
 }
 
-void pcm_play_lock(void)
+void pcm_play_dma_lock(void)
 {
-    if (++audio_locked == 1)
-        lock_audio();
+    lock_audio();
 }
 
-void pcm_play_unlock(void)
+void pcm_play_dma_unlock(void)
 {
-    if (--audio_locked == 0)
-        unlock_audio();
+    unlock_audio();
 }
 
 void pcm_dma_apply_settings(void)
 {
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_send_frames(const void *addr, unsigned long frames)
 {
     pcm_data = addr;
-    pcm_data_size = size;
+    pcm_data_frames = frames;
+
+    if (audio_running)
+        return;
 
     if (playback_granted)
     {
@@ -146,6 +146,14 @@ void pcm_play_dma_start(const void *addr, size_t size)
                                                 playback_state_req_callback,
                                                 NULL);
     }
+
+    audio_running = true;
+}
+
+void pcm_play_dma_prepare(void)
+{
+    if (audio_running)
+        pcm_play_dma_stop();
 }
 
 void pcm_play_dma_stop(void)
@@ -156,26 +164,9 @@ void pcm_play_dma_stop(void)
         gst_element_set_state (GST_ELEMENT(gst_pipeline), GST_STATE_NULL);
 }
 
-void pcm_play_dma_pause(bool pause)
+unsigned long pcm_play_dma_get_frames_waiting(void)
 {
-    if (inside_feed_data)
-    {
-        if (pause)
-            g_signal_emit_by_name (gst_appsrc, "end-of-stream", NULL);
-        else
-            DEBUGF("ERROR: Called dma_pause(0) while inside feed_data\n");
-    } else
-    {
-        if (pause)
-            gst_element_set_state (GST_ELEMENT(gst_pipeline), GST_STATE_NULL);
-        else
-            gst_element_set_state (GST_ELEMENT(gst_pipeline), GST_STATE_PLAYING);
-    }
-}
-
-size_t pcm_get_bytes_waiting(void)
-{
-    return pcm_data_size;
+    return pcm_data_frames;
 }
 
 static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
@@ -189,21 +180,21 @@ static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
        from inside gstreamer's stream thread as it will deadlock */
     inside_feed_data = 1;
 
-    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data, &pcm_data_size))
+    pcm_play_dma_complete_callback(0);
+
+    if (pcm_data && pcm_data_frames)
     {
         GstBuffer *buffer = gst_buffer_new ();
         GstFlowReturn ret;
 
         GST_BUFFER_DATA (buffer) = (__u8 *)pcm_data;
-        GST_BUFFER_SIZE (buffer) = pcm_data_size;
+        GST_BUFFER_SIZE (buffer) = pcm_data_frames*4;
 
         g_signal_emit_by_name (appsrc, "push-buffer", buffer, &ret);
         gst_buffer_unref (buffer);
 
         if (ret != 0)
             DEBUGF("push-buffer error result: %d\n", ret);
-
-        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
     } else
     {
         DEBUGF("feed_data: No Data.\n");
@@ -214,14 +205,6 @@ static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
 
     unlock_audio();
 }
-
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    uintptr_t addr = (uintptr_t)pcm_data;
-    *count = pcm_data_size / 4;
-    return (void *)((addr + 2) & ~3);
-}
-
 
 static gboolean
 gst_bus_message (GstBus * bus, GstMessage * message, void *unused)
@@ -435,11 +418,11 @@ void pcm_set_mixer_volume(int volume)
 
 
 #ifdef HAVE_RECORDING
-void pcm_rec_lock(void)
+void pcm_rec_dma_lock(void)
 {
 }
 
-void pcm_rec_unlock(void)
+void pcm_rec_dma_unlock(void)
 {
 }
 
@@ -451,19 +434,23 @@ void pcm_rec_dma_close(void)
 {
 }
 
-void pcm_rec_dma_start(void *start, size_t size)
+void pcm_rec_dma_capture_frames(void *start, unsigned long frames)
 {
     (void)start;
-    (void)size;
+    (void)frames;
+}
+
+void pcm_rec_dma_prepare(void)
+{
 }
 
 void pcm_rec_dma_stop(void)
 {
 }
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+unsigned long pcm_rec_dma_get_frames_captured(void)
 {
-    return NULL;
+    return 0;
 }
 
 void audiohw_set_recvol(int left, int right, int type)

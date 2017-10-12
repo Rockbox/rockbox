@@ -26,18 +26,20 @@
 #include "audioin-imx233.h"
 #include "audio-imx233.h"
 
-void audiohw_preinit(void)
+void audiohw_codec_init(void)
 {
     imx233_audioout_preinit();
     imx233_audioin_preinit();
     imx233_audio_preinit();
-}
 
-void audiohw_postinit(void)
-{
     imx233_audioout_postinit();
     imx233_audioin_postinit();
     imx233_audio_postinit();
+}
+
+void audiohw_mute(bool mute)
+{
+    (void)mute;
 }
 
 void audiohw_close(void)

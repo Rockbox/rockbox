@@ -59,8 +59,6 @@ static mp3_play_callback_t callback_for_more;
 #define MAX_ID3_TAGS (1<<4) /* Must be power of 2 */
 #define MAX_ID3_TAGS_MASK (MAX_ID3_TAGS - 1)
 
-bool audio_is_initialized = false;
-
 /* FIX: this code pretty much assumes a MAS */
 
 /* dirty calls to mpeg.c */
@@ -316,22 +314,10 @@ static void init_playback(void)
 }
 #endif /* #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 
-void mp3_init(int volume, int bass, int treble, int balance, int loudness,
-              int avc, int channel_config, int stereo_width,
-              int mdb_strength, int mdb_harmonics,
-              int mdb_center, int mdb_shape, bool mdb_enable,
-              bool superbass)
+void mp3_init(void)
 {
 #if CONFIG_CODEC == MAS3507D
     unsigned long val;
-    (void)loudness;
-    (void)avc;
-    (void)mdb_strength;
-    (void)mdb_harmonics;
-    (void)mdb_center;
-    (void)mdb_shape;
-    (void)mdb_enable;
-    (void)superbass;
 #endif
 
     setup_sci0();
@@ -416,27 +402,6 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     ICR &= ~0x0010; /* IRQ3 level sensitive */
     PACR1 = (PACR1 & 0x3fff) | 0x4000; /* PA15 is IRQ3 */
-#endif
-
-    /* Must be done before calling sound_set() */
-    audio_is_initialized = true;
-
-    sound_set(SOUND_BASS, bass);
-    sound_set(SOUND_TREBLE, treble);
-    sound_set(SOUND_BALANCE, balance);
-    sound_set(SOUND_VOLUME, volume);
-    sound_set(SOUND_CHANNELS, channel_config);
-    sound_set(SOUND_STEREO_WIDTH, stereo_width);
-    
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    sound_set(SOUND_LOUDNESS, loudness);
-    sound_set(SOUND_AVC, avc);
-    sound_set(SOUND_MDB_STRENGTH, mdb_strength);
-    sound_set(SOUND_MDB_HARMONICS, mdb_harmonics);
-    sound_set(SOUND_MDB_CENTER, mdb_center);
-    sound_set(SOUND_MDB_SHAPE, mdb_shape);
-    sound_set(SOUND_MDB_ENABLE, mdb_enable);
-    sound_set(SOUND_SUPERBASS, superbass);
 #endif
 
     playing = false;
@@ -535,6 +500,19 @@ bool mp3_is_playing(void)
     return playing;
 }
 
+void mp3_get_peaks(uint32_t *left, uint32_t *right)
+{
+    *left = rb->mas_codec_readreg(MAS_REG_DQPEAK_L);
+    *right = rb->mas_codec_readreg(MAS_REG_DQPEAK_R);
+}
+
+#ifdef HAVE_RECORDING
+void mp3_get_rec_peaks(uint32_t *left, uint32_t *right)
+{
+    *left = rb->mas_codec_readreg(MAS_REG_QPEAK_L)
+    *right = rb->mas_codec_readreg(MAS_REG_QPEAK_R);
+}
+#endif /* HAVE_RECORDING */
 
 /* returns the next byte position which would be transferred */
 unsigned char* mp3_get_pos(void)

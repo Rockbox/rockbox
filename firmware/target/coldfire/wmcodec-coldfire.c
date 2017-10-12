@@ -39,7 +39,7 @@
 
 void audiohw_init(void)
 {
-    audiohw_preinit();
+    audiohw_codec_init();
 }
 
 void wmcodec_write(int reg, int data)

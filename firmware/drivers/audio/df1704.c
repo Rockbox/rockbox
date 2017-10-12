@@ -99,10 +99,6 @@ void audiohw_unmute(void)
                      DF1704_MUTE_OFF);
 }
 
-void audiohw_preinit(void)
-{
-}
-
 void audiohw_set_frequency(int fsel)
 {
     (void)fsel;

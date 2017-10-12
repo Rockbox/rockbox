@@ -159,7 +159,7 @@ void audiohw_set_treble_cutoff(int val)
 }
 #endif
 
-static void audiohw_mute(bool mute)
+void audiohw_mute(bool mute)
 {
     /* Mute:   Set DACMU = 1 to soft-mute the audio DACs. */
     /* Unmute: Set DACMU = 0 to soft-un-mute the audio DACs. */
@@ -170,7 +170,7 @@ static void audiohw_mute(bool mute)
 }
 
 /* Reset and power up the WM8751 */
-void audiohw_preinit(void)
+void audiohw_codec_init(void)
 {
 #if defined(MROBE_100)
     /* controls headphone ouput */
@@ -214,11 +214,7 @@ void audiohw_preinit(void)
     /* Set default samplerate */
 
     audiohw_set_frequency(HW_FREQ_DEFAULT);
-}
 
-/* Enable DACs and audio output after a short delay */
-void audiohw_postinit(void)
-{
     /* From app notes: allow Vref to stabilize to reduce clicks */
     sleep(HZ);
 
@@ -274,8 +270,6 @@ void audiohw_postinit(void)
     /* lower power consumption */
     wmcodec_set_masked(PWRMGMT1, PWRMGMT1_VMIDSEL_50K,
                        PWRMGMT1_VMIDSEL_MASK);
-
-    audiohw_mute(false);
 
 #if defined(MROBE_100)
     /* enable headphone output */

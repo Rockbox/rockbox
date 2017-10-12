@@ -2991,6 +2991,39 @@ int audio_status(void)
     return ret;
 }
 
+static inline void scale_peaks(struct audio_peaks *peaks,
+                               unsigned int bits)
+{
+    if (bits < 16)
+    {
+         peaks->peak[0] >>= 16 - bits;
+         peaks->peak[1] >>= 16 - bits;
+    }
+    else /* bits > bits */
+    {
+         peaks->peak[0] <<= bits - 16;
+         peaks->peak[1] <<= bits - 16;
+    }
+}
+
+void audio_get_peaks(struct audio_peaks *peaks, unsigned int bits)
+{
+    mp3_get_peaks(&peaks->peak[0], &peaks->peak[1]);
+
+    if (bits != 16)
+        scale_peaks(peaks, bits);
+}
+
+#ifdef HAVE_RECORDING
+void audio_get_record_peaks(struct audio_peaks *peaks, unsigned int bits)
+{
+    mp3_get_rec_peaks(&peaks->peak[0], &peaks->peak[1]);
+
+    if (bits != 16)
+        scale_peaks(peaks, bits);
+}
+#endif /* HAVE_RECORDING */
+
 /* Unused function
 unsigned int audio_error(void)
 {
@@ -3025,9 +3058,10 @@ static void mpeg_thread(void)
 
 void audio_init(void)
 {
-    mpeg_errno = 0;
+    mp3_init();
+    audio_is_ready = true;
 
-    audio_reset_buffer();
+    mpeg_errno = 0;
 
 #ifndef SIMULATOR
     queue_init(&mpeg_queue, true);
@@ -3052,7 +3086,15 @@ void audio_init(void)
     dbg_cnt2us(0);
 #endif /* !SIMULATOR */
 #endif /* DEBUG */
-    audio_is_initialized = true;
 }
 
+void audio_is_initialized(void)
+{
+    return audio_is_ready;
+}
+
+void audio_wait_for_ready(void)
+{
+    sound_settings_apply();
+}
 #endif /* CONFIG_CODEC != SWCODEC */

@@ -34,9 +34,10 @@ channel_mode_proc_mono:
     ldr     r1, [r1]                   @ r1 = buf = *buf_p;
     stmfd   sp!, { r4, lr }            @
                                        @
-    ldmia   r1, { r0-r2 }              @ r0 = buf->remcount, r1 = buf->p32[0],
+    ldmia   r1, { r0-r2 }              @ r0 = buf->frames_rem
+                                       @ r1 = buf->p32[0]
                                        @ r2 = buf->p32[1]
-    subs    r0, r0, #1                 @ odd: end at 0; even: end at -1
+    subs    r0, r0, #1                 @ odd: end at 0; even: end at wrap
     beq     .mono_singlesample         @ Zero? Only one sample!
                                        @
 .monoloop:                             @
@@ -49,9 +50,9 @@ channel_mode_proc_mono:
     subs    r0, r0, #2                 @
     stmia   r1!, { r12, r14 }          @ store Mo0, Mo1
     stmia   r2!, { r12, r14 }          @ store Mo0, Mo1
-    bgt     .monoloop                  @
+    bhi     .monoloop                  @
                                        @
-    ldmpc   cond=lt, regs=r4           @ if count was even, we're done
+    ldmpc   cond=lo, regs=r4           @ if count was even, we're done
                                        @
 .mono_singlesample:                    @
     ldr     r3, [r1]                   @ r3 = Ls
@@ -80,7 +81,8 @@ channel_mode_proc_custom:
 
     ldmia   r2, { r3, r4 }             @ r3 = sw_gain, r4 = sw_cross
 
-    ldmia   r1, { r0-r2 }              @ r0 = buf->remcount, r1 = buf->p32[0],
+    ldmia   r1, { r0-r2 }              @ r0 = buf->frames_rem
+                                       @ r1 = buf->p32[0]
                                        @ r2 = buf->p32[1]
 
     subs    r0, r0, #1
@@ -115,9 +117,9 @@ channel_mode_proc_custom:
     stmia   r1!, { r5, r6 }            @ Store Lc0, Lc1
     stmia   r2!, { r7, r8 }            @ Store Rc0, Rc1
 
-    bgt     .custom_loop
+    bhi     .custom_loop
 
-    ldmpc   cond=lt, regs=r4-r10       @ < 0? even count
+    ldmpc   cond=lo, regs=r4-r10       @ wrap? even count
 
 .custom_single_sample:
     ldr     r5, [r1]                   @ handle odd sample
@@ -151,9 +153,10 @@ channel_mode_proc_karaoke:
     ldr     r1, [r1]                   @ r1 = buf = *buf_p;
     stmfd   sp!, { r4, lr }            @
                                        @
-    ldmia   r1, { r0-r2 }              @ r0 = buf->remcount, r1 = buf->p32[0],
+    ldmia   r1, { r0-r2 }              @ r0 = buf->frames_rem
+                                       @ r1 = buf->p32[0]
                                        @ r2 = buf->p32[1]
-    subs    r0, r0, #1                 @ odd: end at 0; even: end at -1
+    subs    r0, r0, #1                 @ odd: end at 0; even: end at wrap
     beq     .karaoke_singlesample      @ Zero? Only one sample!
                                        @
 .karaokeloop:                          @
@@ -168,9 +171,9 @@ channel_mode_proc_karaoke:
     subs    r0, r0, #2                 @
     stmia   r1!, { r3, r4 }            @ store Lo0, Lo1
     stmia   r2!, { r12, r14 }          @ store Ro0, Ro1
-    bgt     .karaokeloop               @
+    bhi     .karaokeloop               @
                                        @
-    ldmpc   cond=lt, regs=r4           @ if count was even, we're done
+    ldmpc   cond=lo, regs=r4           @ if count was even, we're done
                                        @
 .karaoke_singlesample:                 @
     ldr     r3, [r1]                   @ r3 = Li
@@ -197,7 +200,8 @@ crossfeed_process:
     ldr     r1, [r1]                   @ r1 = buf = *buf_p;
     stmfd   sp!, { r4-r11, lr }        @ stack modified regs
     ldr     r0, [r0]                   @ r0 = this->data = &crossfeed_state
-    ldmia   r1, { r1-r3 }              @ r1 = buf->remcount, r2 = buf->p32[0],
+    ldmia   r1, { r1-r3 }              @ r1 = buf->frames_rem
+                                       @ r2 = buf->p32[0]
                                        @ r3 = buf->p32[1]
     ldmia   r0, { r4-r12, r14 }        @ r4 = gain, r5-r7 = coeffs,
                                        @ r8-r11 = history, r12 = index,
@@ -238,8 +242,8 @@ crossfeed_process:
     ldrhs   r12, [sp]                  @ wrap delay index
 
     subs    r0, r0, #1                 @ are we finished?
-    strgt   r0, [sp, #4]               @ save count to stack
-    bgt     .cfloop
+    strhi   r0, [sp, #4]               @ save count to stack
+    bhi     .cfloop
 
     @ save data back to struct
     ldr     r0, [sp]                   @ fetch state->delay
@@ -283,27 +287,28 @@ crossfeed_meier_process:
     orr     r12, r12, r14, asl #1      @ .
     sub     r4, r4, r9                 @ r4 = vcl -= res1
     sub     r5, r5, r12                @ r5 = vcr -= res2
-    bgt     .cfm_loop                  @ more samples?
+    bhi     .cfm_loop                  @ more samples?
 
     stmib   r0, { r4-r6 }              @ save vcl, vcr, vdiff
     ldmpc   regs=r4-r10                @ restore non-volatile context, return
     .size   crossfeed_meier_process, .-crossfeed_meier_process
 
 /****************************************************************************
- * int resample_hermite(struct resample_data *data, struct dsp_buffer *src,
- *                      struct dsp_buffer *dst)
+ * unsigned long resample_hermite(struct resample_data *data,
+ *                                struct dsp_buffer *src,
+ *                                struct dsp_buffer *dst)
  */
     .section    .text, "ax",%progbits
     .global     resample_hermite
 resample_hermite:
     @input: r0 = data, r1 = src, r2 = dst
     stmfd   sp!, { r0-r2, r4-r11, lr }  @ stack parms, modified regs
-    ldr     r9, [r1]                    @ r9 = srcrem = src->remcount
+    ldr     r9, [r1]                    @ r9 = srcrem = src->frames_rem
     ldrb    r10, [r1, #17]              @ r10 = ch = num_channels
     ldr     r14, [r0]                   @ r14 = data->delta, r0 = data
 
     cmp     r9, #0x8000                 @ srcrem = MIN(srcrem, 0x8000)
-    movgt   r9, #0x8000                 @
+    movhi   r9, #0x8000                 @
 
     @ Channels are processed high to low while history is saved low to high
     @ It's really noone's business how we do this
@@ -314,17 +319,17 @@ resample_hermite:
     ldr     r5, [r0, #4]                @ r5 = data->phase
     ldr     r6, [r1, r10, lsl #2]       @ r6 = src->p32[ch]
     ldr     r7, [r2, r10, lsl #2]       @ r7 = dst->p32[ch]
-    ldr     r8, [r2, #12]               @ r8 = dstrem = dst->bufcount
+    ldr     r8, [r2, #12]               @ r8 = dstrem = dst->frames
 
     mov     r0, r5, lsr #16             @ r0 = pos = phase >> 16
     cmp     r0, r9                      @ r0 = pos = MIN(pos, srcrem)
-    movgt   r0, r9                      @
+    movhi   r0, r9                      @
 
     add     r6, r6, r0, lsl #2          @ r6 = &s[pos]
 
     cmp     r0, #3                      @ pos >= 3? history not needed
-    ldmgedb r6, { r1-r3 }               @ x3..x1 = s[pos-3]..s[pos-1]
-    bge     .hrs_loadhist_done          @
+    ldmhsdb r6, { r1-r3 }               @ x3..x1 = s[pos-3]..s[pos-1]
+    bhs     .hrs_loadhist_done          @
     add     r10, r0, r0, lsl #1         @ branch pc + pos*12
     add     pc, pc, r10, lsl #2         @
     nop                                 @
@@ -342,7 +347,7 @@ resample_hermite:
 .hrs_loadhist_done:
 
     cmp      r0, r9                     @ pos past end?
-    bge     .hrs_channel_done
+    bhs     .hrs_channel_done
 
     cmp     r14, #0x10000               @ delta >= 1.0?
     bhs     .hrs_dsstart                @ yes? is downsampling
@@ -407,7 +412,7 @@ resample_hermite:
     mov     r1, r2                      @ x3 = x2
     mov     r2, r3                      @ x2 = x1
     mov     r3, r4                      @ x1 = x0
-    bgt     .hrs_usloop_carry
+    bhi     .hrs_usloop_carry
     b       .hrs_usdone
 
 .hrs_usfull:
@@ -452,8 +457,8 @@ resample_hermite:
     mov     r3, r4                      @ x1 = x0
 .hrs_dsloop:
     subs    r8, r8, #1                  @ destination full?
-    cmpgt   r9, r0                      @ ... || pos >= srcrem?
-    ble     .hrs_channel_done
+    cmphi   r9, r0                      @ ... || pos >= srcrem?
+    bls     .hrs_channel_done
 .hrs_dsstart:
     ldr     r4, [r6]                    @ x0 = s[pos]
     sub     r10, r3, r2                 @ r10 = v, r11 = c2, r12 = c3
@@ -481,11 +486,11 @@ resample_hermite:
     str     r10, [r7], #4               @ *d++ = acc
 
     cmp     r0, r9                      @ r0 = pos = MIN(pos, srcrem)
-    movgt   r0, r9                      @
+    movhi   r0, r9                      @
     sub     r11, r0, r11                @ shift = pos - last_pos
     cmp     r11, #4                     @
     add     r6, r6, r11, lsl #2         @ r6 += shift * 4
-    bge     .hrs_dsloop_4               @
+    bhs     .hrs_dsloop_4               @
     ldr     pc, [pc, r11, lsl #2]       @ branch to corresponding loop address
     .word   0, 0
     .word   .hrs_dsloop_1
@@ -496,15 +501,15 @@ resample_hermite:
     ldmfd   sp!, { r10, r12 }           @ recover ch, h
     subs    r10, r10, #1                @ --ch
     stmia   r12!, { r1-r3 }             @ h[0..2] = x3..x1
-    ldmgtia sp, { r0-r2 }               @ load data, src, dst
-    bgt     .hrs_channel_loop
+    ldmhiia sp, { r0-r2 }               @ load data, src, dst
+    bhi     .hrs_channel_loop
 
     ldmfd   sp!, { r1-r3 }              @ pop data, src, dst
     sub     r5, r5, r0, lsl #16         @ r5 = phase - (pos << 16)
-    ldr     r2, [r3, #12]               @ r2 = dst->bufcount
+    ldr     r2, [r3, #12]               @ r2 = dst->frames
     str     r5, [r1, #4]                @ data->phase = r5
-    sub     r2, r2, r8                  @ r2 = dst->bufcount - dstrem
-    str     r2, [r3]                    @ dst->remcount = r2
+    sub     r2, r2, r8                  @ r2 = dst->frames - dstrem
+    str     r2, [r3]                    @ dst->frames_rem = r2
     ldmpc   regs=r4-r11                 @ ... and we're out
     .size   resample_hermite, .-resample_hermite
 
@@ -521,7 +526,8 @@ pga_process:
     stmfd   sp!, { r4-r8, lr }
 
     ldr     r4, [r0]                @ r4 = data->gain
-    ldr     r0, [r1], #4            @ r0 = buf->remcount, r1 = buf->p32
+    ldr     r0, [r1], #4            @ r0 = buf->frames_rem
+                                    @ r1 = buf->p32
     ldrb    r3, [r1, #13]           @ r3 = buf->format.num_channels
 
 .pga_channelloop:
@@ -539,9 +545,9 @@ pga_process:
     orr     r7, r7, r8, asl #9
     orr     r14, r14, r5, asl #9
     stmia   r2!, { r7, r14 }        @ save r7, r14 to *p32[ch] and increment
-    bgt     .pga_loop               @ end of pga loop
+    bhi     .pga_loop               @ end of pga loop
 
-    blt     .pga_evencount          @ < 0? even count
+    blo     .pga_evencount          @ < 0? even count
 
 .pga_singlesample:
     ldr     r5, [r2]                @ handle odd sample
@@ -552,14 +558,14 @@ pga_process:
 
 .pga_evencount:
     subs    r3, r3, #1
-    bgt     .pga_channelloop        @ end of channel loop
+    bhi     .pga_channelloop        @ end of channel loop
 
     ldmpc   regs=r4-r8
     .size   pga_process, .-pga_process
 
 /****************************************************************************
- * void filter_process(struct dsp_filter *f, int32_t *buf[], int count,
- *                     unsigned int channels)
+ * void filter_process(struct dsp_filter *f, int32_t *buf[],
+ *                     unsigned long count, unsigned int channels)
  *
  * define HIGH_PRECISION as '1' to make filtering calculate lower bits after
  * shifting. without this, "shift" - 1 of the lower bits will be lost here.
@@ -608,7 +614,7 @@ filter_process:
 #endif
     str     r11, [r3], #4           @ save result
     subs    r2, r2, #1              @ are we done with this channel?
-    bgt     .fp_loop                @
+    bhi     .fp_loop                @
 
     ldr     r3, [sp, #12]           @ r3 = ch
     ldr     r0, [sp]                @ r0 = history[channels-ch-1]
@@ -636,20 +642,26 @@ sample_output_mono:
     @ input: r0 = this, r1 = src, r2 = dst
     stmfd   sp!, { r4-r6, lr }
 
-    ldr     r0, [r0]                   @ r0 = this->outcount
-    ldr     r3, [r2, #4]               @ r2 = dst->p16out
-    ldr     r2, [r1, #4]               @ r1 = src->p32[0]
-    ldrb    r1, [r1, #19]              @ r2 = src->format.output_scale
+    ldrsb   r12, [r0, #4]              @ r12 = this->out_pcm_shift
+    ldrb    r5, [r0, #5]               @ r5 = this->out_pcm_chnum
+    ldr     r0, [r0]                   @ r0 = this->frames_out
+    ldr     r3, [r2, #4]               @ r3 = dst->pout
+    ldr     r2, [r1, #4]               @ r2 = src->p32[0]
 
-    mov     r4, #1
-    mov     r4, r4, lsl r1             @ r4 = 1 << (scale-1)
-    mov     r4, r4, lsr #1
+    rsb     r1, r12, #0                @ r1 = right shift
+    sub     r12, r1, #1                @
+    mov     r4, #1                     @
+    mov     r4, r4, lsl r12            @ r4 = 1 << (scale-1)
+
     mvn     r14, #0x8000               @ r14 = 0xffff7fff, needed for
                                        @ clipping and masking
-    subs    r0, r0, #1                 @
-    beq     .som_singlesample          @ Zero? Only one sample!
+    cmp     r5, #1                     @ mono output?
+    beq     .som1loop;
 
-.somloop:
+    subs    r0, r0, #1                 @
+    beq     .som2_singlesample         @ Zero? Only one sample!
+
+.som2loop:
     ldmia   r2!, { r5, r6 }
     add     r5, r5, r4                 @ r6 = (r6 + 1<<(scale-1)) >> scale
     mov     r5, r5, asr r1
@@ -661,29 +673,60 @@ sample_output_mono:
     mov     r12, r6, asr #15
     teq     r12, r12, asr #31
     eorne   r6, r14, r6, asr #31       @ Clip (-32768...+32767)
-
     and     r5, r5, r14, lsr #16
     and     r6, r6, r14, lsr #16
     orr     r5, r5, r5, lsl #16        @ pack first 2 halfwords into 1 word
     orr     r6, r6, r6, lsl #16        @ pack last 2 halfwords into 1 word
     stmia   r3!, { r5, r6 }
-
     subs    r0, r0, #2
-    bgt     .somloop
+    bhi     .som2loop
 
-    ldmpc   cond=lt, regs=r4-r6        @ even 'count'? return
+    ldmpc   cond=lo, regs=r4-r6        @ even 'count'? return
 
-.som_singlesample:
+.som2_singlesample:
     ldr     r5, [r2]                   @ do odd sample
     add     r5, r5, r4
     mov     r5, r5, asr r1
     mov     r12, r5, asr #15
     teq     r12, r12, asr #31
-    eorne   r5, r14, r5, asr #31
-
+    eorne   r5, r14, r5, asr #31       @ Clip (-32768...+32767)
     and     r5, r5, r14, lsr #16       @ pack 2 halfwords into 1 word
     orr     r5, r5, r5, lsl #16
     str     r5, [r3]
+
+    ldmpc   regs=r4-r6
+
+.som1start:
+    subs    r0, r0, #1                 @
+    beq     .som1_singlesample         @ Zero? Only one sample!
+
+.som1loop:
+    ldmia   r2!, { r5, r6 }
+    add     r5, r5, r4                 @ r6 = (r6 + 1<<(scale-1)) >> scale
+    mov     r5, r5, asr r1
+    mov     r12, r5, asr #15
+    teq     r12, r12, asr #31
+    eorne   r5, r14, r5, asr #31       @ Clip (-32768...+32767)
+    add     r6, r6, r4
+    mov     r6, r6, asr r1             @ r7 = (r7 + 1<<(scale-1)) >> scale
+    mov     r12, r6, asr #15
+    teq     r12, r12, asr #31
+    eorne   r6, r14, r6, asr #31       @ Clip (-32768...+32767)
+    strh    r5, [r3], #2
+    strh    r6, [r3], #2
+    subs    r0, r0, #2
+    bhi     .som1loop
+
+    ldmpc   cond=lo, regs=r4-r6        @ even 'count'? return
+
+.som1_singlesample:
+    ldr     r5, [r2]                   @ do odd sample
+    add     r5, r5, r4
+    mov     r5, r5, asr r1
+    mov     r12, r5, asr #15
+    teq     r12, r12, asr #31
+    eorne   r5, r14, r5, asr #31      @ Clip (-32768...+32767)
+    strh    r5, [r3]
 
     ldmpc   regs=r4-r6
     .size   sample_output_mono, .-sample_output_mono
@@ -700,14 +743,15 @@ sample_output_stereo:
     @ input: r0 = this, r1 = src, r2 = dst
     stmfd   sp!, { r4-r9, lr }
 
-    ldr     r0, [r0]                   @ r0 = this->outcount
-    ldr     r3, [r2, #4]               @ r3 = dsp->p16out
+    ldrsb   r12, [r0, #4]              @ r12 = this->out_pcm_shift
+    ldr     r0, [r0]                   @ r0 = this->frames_out
+    ldr     r3, [r2, #4]               @ r3 = dsp->pout
     ldmib   r1, { r2, r5 }             @ r2 = src->p32[0], r5 = src->p32[1]
-    ldrb    r1, [r1, #19]              @ r1 = src->format.output_scale
 
-    mov     r4, #1
-    mov     r4, r4, lsl r1             @ r4 = 1 << (scale-1)
-    mov     r4, r4, lsr #1             @
+    rsb     r1, r12, #0                @ is 2^n; this downscales
+    sub     r12, r1, #1                @
+    mov     r4, #1                     @
+    mov     r4, r4, lsl r12            @ r4 = 1 << (scale-1)
 
     mvn     r14, #0x8000               @ r14 = 0xffff7fff, needed for
                                        @ clipping and masking
@@ -748,9 +792,9 @@ sample_output_stereo:
     stmia   r3!, { r8, r9 }
 
     subs    r0, r0, #2
-    bgt     .sosloop
+    bhi     .sosloop
 
-    ldmpc   cond=lt, regs=r4-r9        @ even 'count'? return
+    ldmpc   cond=lo, regs=r4-r9        @ even 'count'? return
 
 .sos_singlesample:
     ldr     r6, [r2]                   @ left odd sample

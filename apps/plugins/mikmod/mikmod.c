@@ -43,6 +43,8 @@ static int curfile = 0, direction = DIR_NEXT, entries = 0;
 /* list of the mod files */
 static char **file_pt;
 
+static pcm_handle_t pcm_handle;
+#define MIKMOD_PCM_FORMAT PCM_FORMAT_T_PARM(PCM_FORMAT_S16_2CH_2I)
 
 /* The MP3 audio buffer which we will use as heap memory */
 static unsigned char* audio_buffer;
@@ -53,7 +55,7 @@ static size_t audio_buffer_free;
 bool quit;
 int playingtime IBSS_ATTR;
 MODULE *module IBSS_ATTR;
-char gmbuf[BUF_SIZE*NBUF];
+static int16_t gmbuf[2][BUF_COUNT*2] ALIGNED_ATTR(4);
 
 
 int textlines;
@@ -249,8 +251,10 @@ static int change_filename(int direct)
 * Playback
 */
 
-bool swap = false;
-bool lastswap = true;
+static int swap = 0;
+#ifndef SYNC
+static int lastswap = 1;
+#endif
 
 static inline void synthbuf(void)
 {
@@ -259,16 +263,14 @@ static inline void synthbuf(void)
 #ifndef SYNC
     if (lastswap == swap) return;
     lastswap = swap;
-
-    outptr = (swap ? gmbuf : gmbuf + BUF_SIZE);
-#else
-    outptr = gmbuf;
 #endif
 
-    VC_WriteBytes(outptr, BUF_SIZE);
+    outptr = (char *)gmbuf[swap];
+
+    VC_WriteBytes(outptr, BUF_COUNT*SAMPLE_SIZE);
 }
 
-static void get_more(const void** start, size_t* size)
+static int get_more(int status, const void** start, unsigned long* frames)
 {
 #ifndef SYNC
     if (lastswap != swap)
@@ -280,13 +282,13 @@ static void get_more(const void** start, size_t* size)
     synthbuf();
 #endif
 
-    *size = BUF_SIZE;
+    *frames = BUF_COUNT;
+    *start = gmbuf[swap];
 #ifndef SYNC
-    *start = swap ? gmbuf : gmbuf + BUF_SIZE;
-    swap = !swap;
-#else
-    *start = gmbuf;
+    swap ^= 1;
 #endif
+
+    return status;
 }
 
 static void showinfo(void)
@@ -660,7 +662,9 @@ static int playfile(char* filename)
     {
         display = DISPLAY_INFO;
         Player_Start(module);
-        rb->pcm_play_data(&get_more, NULL, NULL, 0);
+        rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                          MIKMOD_PCM_FORMAT);
+
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -800,11 +804,12 @@ static int playfile(char* filename)
         case ACTION_WPS_PLAY:
             if(!Player_Paused())
             {
-                rb->pcm_play_stop();
+                rb->pcm_stop(pcm_handle);
             }
             else
             {
-                rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                                  MIKMOD_PCM_FORMAT);
             }
             Player_TogglePause();
             break;
@@ -879,15 +884,25 @@ enum plugin_status plugin_start(const void* parameter)
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
-    rb->pcm_play_stop();
+    audio_buffer = rb->plugin_get_audio_buffer(&audio_buffer_free);
+    if (!audio_buffer)
+    {
+        return PLUGIN_ERROR;
+    }
+
+    pcm_handle = rb->pcm_open(PCM_STREAM_PLAYBACK);
+    if (!pcm_handle)
+    {
+        return PLUGIN_ERROR;
+    }
+
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPLE_RATE);
+    rb->pcm_set_frequency(pcm_handle, SAMPLE_RATE);
 
-    audio_buffer = rb->plugin_get_audio_buffer((size_t *)&audio_buffer_free);
     
     rb->strcpy(np_file, parameter);
     get_mod_list();
@@ -912,6 +927,7 @@ enum plugin_status plugin_start(const void* parameter)
     if (MikMod_Init(""))
     {
         rb->splashf(HZ, "%s", MikMod_strerror(MikMod_errno));
+        rb->pcm_close(pcm_handle);
         return PLUGIN_ERROR;
     }
 
@@ -922,8 +938,8 @@ enum plugin_status plugin_start(const void* parameter)
 
     MikMod_Exit();
 
-    rb->pcm_play_stop();
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    rb->pcm_set_frequency(pcm_handle, HW_SAMPR_RESET);
+    rb->pcm_close(pcm_handle);
 
     if (retval == PLUGIN_OK)
     {

@@ -37,8 +37,6 @@
 #define AUDIOHW_SOUND_SETTINGS_VAL2PHYS
 #include "audiohw_settings.h"
 
-extern bool audio_is_initialized;
-
 static const struct sound_setting_entry * get_setting_entry(int setting)
 {
     static const struct sound_settings_info default_info =
@@ -214,9 +212,6 @@ static void set_prescaled_volume(void)
 
 void sound_set_volume(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
 #if defined(AUDIOHW_HAVE_CLIPPING)
     audiohw_set_volume(value);
 #else
@@ -227,9 +222,6 @@ void sound_set_volume(int value)
 
 void sound_set_balance(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
 #if defined(AUDIOHW_HAVE_BALANCE)
     audiohw_set_balance(value);
 #else
@@ -241,9 +233,6 @@ void sound_set_balance(int value)
 #if defined(AUDIOHW_HAVE_BASS)
 void sound_set_bass(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_bass(value);
 
 #if !defined(AUDIOHW_HAVE_CLIPPING)
@@ -256,9 +245,6 @@ void sound_set_bass(int value)
 #if defined(AUDIOHW_HAVE_TREBLE)
 void sound_set_treble(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_treble(value);
 
 #if !defined(AUDIOHW_HAVE_CLIPPING)
@@ -271,9 +257,6 @@ void sound_set_treble(int value)
 #if defined(AUDIOHW_HAVE_BASS_CUTOFF)
 void sound_set_bass_cutoff(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_bass_cutoff(value);
 }
 #endif /* AUDIOHW_HAVE_BASS_CUTOFF */
@@ -281,35 +264,23 @@ void sound_set_bass_cutoff(int value)
 #if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
 void sound_set_treble_cutoff(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_treble_cutoff(value);
 }
 #endif /* AUDIOHW_HAVE_TREBLE_CUTOFF */
 
 void sound_set_channels(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_channel(value);
 }
 
 void sound_set_stereo_width(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_stereo_width(value);
 }
 
 #if defined(AUDIOHW_HAVE_DEPTH_3D)
 void sound_set_depth_3d(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_depth_3d(value);
 }
 #endif /* AUDIOHW_HAVE_DEPTH_3D */
@@ -317,9 +288,6 @@ void sound_set_depth_3d(int value)
 #if defined(AUDIOHW_HAVE_FILTER_ROLL_OFF)
 void sound_set_filter_roll_off(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_filter_roll_off(value);
 }
 #endif
@@ -394,9 +362,6 @@ int sound_enum_hw_eq_band_setting(unsigned int band,
 
 static void sound_set_hw_eq_band_gain(unsigned int band, int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_eq_band_gain(band, value);
 
 #if !defined (AUDIOHW_HAVE_CLIPPING)
@@ -442,9 +407,6 @@ void sound_set_hw_eq_band5_gain(int value)
 #if defined(AUDIOHW_HAVE_EQ_BAND1_FREQUENCY)
 void sound_set_hw_eq_band1_frequency(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_eq_band_frequency(AUDIOHW_EQ_BAND1, value);
 }
 #endif
@@ -452,9 +414,6 @@ void sound_set_hw_eq_band1_frequency(int value)
 #if defined(AUDIOHW_HAVE_EQ_BAND2_FREQUENCY)
 void sound_set_hw_eq_band2_frequency(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_eq_band_frequency(AUDIOHW_EQ_BAND2, value);
 }
 #endif
@@ -462,9 +421,6 @@ void sound_set_hw_eq_band2_frequency(int value)
 #if defined(AUDIOHW_HAVE_EQ_BAND3_FREQUENCY)
 void sound_set_hw_eq_band3_frequency(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_eq_band_frequency(AUDIOHW_EQ_BAND3, value);
 }
 #endif
@@ -472,9 +428,6 @@ void sound_set_hw_eq_band3_frequency(int value)
 #if defined(AUDIOHW_HAVE_EQ_BAND4_FREQUENCY)
 void sound_set_hw_eq_band4_frequency(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_eq_band_frequency(AUDIOHW_EQ_BAND4, value);
 }
 #endif
@@ -482,9 +435,6 @@ void sound_set_hw_eq_band4_frequency(int value)
 #if defined(AUDIOHW_HAVE_EQ_BAND5_FREQUENCY)
 void sound_set_hw_eq_band5_frequency(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_eq_band_frequency(AUDIOHW_EQ_BAND5, value);
 }
 #endif
@@ -492,9 +442,6 @@ void sound_set_hw_eq_band5_frequency(int value)
 #if defined(AUDIOHW_HAVE_EQ_BAND2_WIDTH)
 void sound_set_hw_eq_band2_width(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_eq_band_width(AUDIOHW_EQ_BAND2, value);
 }
 #endif
@@ -502,9 +449,6 @@ void sound_set_hw_eq_band2_width(int value)
 #if defined(AUDIOHW_HAVE_EQ_BAND3_WIDTH)
 void sound_set_hw_eq_band3_width(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_eq_band_width(AUDIOHW_EQ_BAND3, value);
 }
 #endif
@@ -512,9 +456,6 @@ void sound_set_hw_eq_band3_width(int value)
 #if defined(AUDIOHW_HAVE_EQ_BAND4_WIDTH)
 void sound_set_hw_eq_band4_width(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_eq_band_width(AUDIOHW_EQ_BAND4, value);
 }
 #endif
@@ -523,65 +464,41 @@ void sound_set_hw_eq_band4_width(int value)
 #if CONFIG_CODEC == MAS3587F || CONFIG_CODEC == MAS3539F
 void sound_set_loudness(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_loudness(value);
 }
 
 void sound_set_avc(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_avc(value);
 }
 
 void sound_set_mdb_strength(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_mdb_strength(value);
 }
 
 void sound_set_mdb_harmonics(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_mdb_harmonics(value);
 }
 
 void sound_set_mdb_center(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_mdb_center(value);
 }
 
 void sound_set_mdb_shape(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_mdb_shape(value);
 }
 
 void sound_set_mdb_enable(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_mdb_enable(value);
 }
 
 void sound_set_superbass(int value)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_superbass(value);
 }
 #endif /* CONFIG_CODEC == MAS3587F || CONFIG_CODEC == MAS3539F */
@@ -589,17 +506,11 @@ void sound_set_superbass(int value)
 #if defined(HAVE_PITCHCONTROL)
 void sound_set_pitch(int32_t pitch)
 {
-    if (!audio_is_initialized)
-        return;
-
     audiohw_set_pitch(pitch);
 }
 
 int32_t sound_get_pitch(void)
 {
-    if (!audio_is_initialized)
-        return PITCH_SPEED_100;
-
     return audiohw_get_pitch();
 }
 #endif /* HAVE_PITCHCONTROL */

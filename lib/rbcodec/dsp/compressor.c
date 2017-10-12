@@ -435,20 +435,19 @@ static void compressor_process(struct dsp_proc_entry *this,
                                struct dsp_buffer **buf_p)
 {
     struct dsp_buffer *buf = *buf_p;
-    int count = buf->remcount;
+    unsigned long count = buf->frames_rem;
     int32_t *in_buf[2] = { buf->p32[0], buf->p32[1] };
-    const int num_chan = buf->format.num_channels;
+    const unsigned int num_chan = buf->format.num_channels;
 
-    while (count-- > 0)
+    while (count--)
     {
-
         /* Use the average of the channels */
 
         int32_t sample_gain = UNITY;
         int32_t x = 0;
         int32_t tmpx = 0;
         int32_t in_buf_max_level = 0;
-        for (int ch = 0; ch < num_chan; ch++)
+        for (unsigned int ch = 0; ch < num_chan; ch++)
         {
             tmpx = *in_buf[ch];
             x += tmpx;
@@ -539,7 +538,7 @@ static void compressor_process(struct dsp_proc_entry *this,
          */
         if (total_gain != UNITY)
         {
-            for (int ch = 0; ch < num_chan; ch++)
+            for (unsigned int ch = 0; ch < num_chan; ch++)
             {
               *in_buf[ch]  = FRACMUL_SHL(total_gain, labuf[ch][delay_read], 7);
             }

@@ -27,7 +27,8 @@
  * remain constant whereas the upper harmonics of the noise should vary
  * with sample rate.
  */
-
+static pcm_handle_t pcm_handle;
+#define TEST_SAMPR_PCM_FORMAT   PCM_FORMAT_T_PARM(PCM_FORMAT_S16_1CH_2I)
 
 static int hw_freq IDATA_ATTR = HW_FREQ_DEFAULT;
 static unsigned long hw_sampr IDATA_ATTR = HW_SAMPR_DEFAULT;
@@ -39,9 +40,7 @@ static unsigned int gen_thread_id;
 #define OUTPUT_CHUNK_COUNT (1 << 1)
 #define OUTPUT_CHUNK_MASK (OUTPUT_CHUNK_COUNT-1)
 #define OUTPUT_CHUNK_SAMPLES 1152
-#define OUTPUT_CHUNK_SIZE (OUTPUT_CHUNK_SAMPLES*sizeof(int16_t)*2)
-static uint16_t output_buf[OUTPUT_CHUNK_COUNT][OUTPUT_CHUNK_SAMPLES*2]
-        __attribute__((aligned(4)));
+static int16_t output_buf[OUTPUT_CHUNK_COUNT][OUTPUT_CHUNK_SAMPLES];
 static int output_head IBSS_ATTR;
 static int output_tail IBSS_ATTR;
 static int output_step IBSS_ATTR;
@@ -90,29 +89,35 @@ static int16_t ICODE_ATTR fsin(uint32_t phase)
 }
 
 /* ISR handler to get next block of data */
-static void get_more(const void **start, size_t *size)
+static int get_more(int status, const void **start, unsigned long *frames)
 {
+    if (status < 0)
+        return status;
+
     /* Free previous buffer */
     output_head += output_step;
     output_step = 0;
 
     *start = output_buf[output_head & OUTPUT_CHUNK_MASK];
-    *size  = OUTPUT_CHUNK_SIZE;
+    *frames = OUTPUT_CHUNK_SAMPLES;
 
     /* Keep repeating previous if source runs low */
     if (output_head != output_tail)
         output_step = 1;
+
+    return 0;
 }
 
 static void ICODE_ATTR gen_thread_func(void)
 {
     uint32_t gen_random = *rb->current_tick;
+    uint32_t last_random = gen_random;
     uint32_t gen_phase = 0;
 
     while (!gen_quit)
     {
         int16_t *p = output_buf[output_tail & OUTPUT_CHUNK_MASK];
-        int i = OUTPUT_CHUNK_SAMPLES;
+        unsigned long i = OUTPUT_CHUNK_SAMPLES;
 
         while (output_tail - output_head >= OUTPUT_CHUNK_COUNT)
         {
@@ -121,17 +126,15 @@ static void ICODE_ATTR gen_thread_func(void)
                 return;
         }
 
-        while (--i >= 0)
+        while (i--)
         {
             int32_t val = fsin(gen_phase);
-            int32_t rnd = (int16_t)gen_random;
+            int32_t rnd = (int16_t)gen_random - (int16_t)last_random;
 
+            last_random = gen_random;
             gen_random = gen_random*0x0019660dL + 0x3c6ef35fL;
 
-            val = (rnd + 2*val) / 3;
-
-            *p++ = val;
-            *p++ = val;
+            *p++ = (rnd + 2*val) / 3;
 
             gen_phase += gen_phase_step;
         }
@@ -149,13 +152,13 @@ static void update_gen_step(void)
 
 static void output_clear(void)
 {
-    rb->pcm_play_lock();
+    rb->pcm_lock_callback(pcm_handle);
 
     rb->memset(output_buf, 0, sizeof (output_buf));
     output_head = 0;
     output_tail = 0;
 
-    rb->pcm_play_unlock();
+    rb->pcm_unlock_callback(pcm_handle);
 }
 
 /* Called to switch samplerate on the fly */
@@ -167,8 +170,7 @@ static void set_frequency(int index)
     output_clear();
     update_gen_step();
 
-    rb->pcm_set_frequency(hw_sampr);
-    rb->pcm_apply_settings();
+    rb->pcm_set_frequency(pcm_handle, hw_sampr);
 }
 
 #ifndef HAVE_VOLUME_IN_LIST
@@ -219,7 +221,7 @@ static void play_tone(bool volume_set)
     rb->cpu_boost(true);
 #endif
 
-    rb->pcm_set_frequency(rb->hw_freq_sampr[freq]);
+    rb->pcm_set_frequency(pcm_handle, rb->hw_freq_sampr[freq]);
 
 #if INPUT_SRC_CAPS != 0
     /* Recordable targets can play back from other sources */
@@ -236,7 +238,8 @@ static void play_tone(bool volume_set)
                                       IF_PRIO(, PRIORITY_PLAYBACK)
                                       IF_COP(, CPU));
 
-    rb->pcm_play_data(get_more, NULL, NULL, 0);
+    rb->pcm_play_data(pcm_handle, get_more, NULL, 0,
+                      TEST_SAMPR_PCM_FORMAT);
 
 #ifndef HAVE_VOLUME_IN_LIST
     if (volume_set)
@@ -259,7 +262,7 @@ static void play_tone(bool volume_set)
 
     rb->thread_wait(gen_thread_id);
 
-    rb->pcm_play_stop();
+    rb->pcm_stop(pcm_handle);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
@@ -267,7 +270,7 @@ static void play_tone(bool volume_set)
 
     /* restore default - user of apis is responsible for restoring
        default state - normally playback at 44100Hz */
-    rb->pcm_set_frequency(HW_FREQ_DEFAULT);
+    rb->pcm_set_frequency(pcm_handle, HW_SAMPR_RESET);
 }
 
 /* Tests hardware sample rate switching */
@@ -289,6 +292,10 @@ enum plugin_status plugin_start(const void *parameter)
                         "Set Volume",
 #endif /* HAVE_VOLUME_IN_LIST */
                         "Set Samplerate", "Quit");
+
+    pcm_handle = rb->pcm_open(PCM_STREAM_PLAYBACK);
+    if (!pcm_handle)
+        return PLUGIN_ERROR;
 
     bool exit = false;
     int selected = 0;
@@ -317,6 +324,7 @@ enum plugin_status plugin_start(const void *parameter)
         }
     }
 
+    rb->pcm_close(pcm_handle);
     rb->talk_disable(false);
 
     return PLUGIN_OK;

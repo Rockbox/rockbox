@@ -1025,9 +1025,9 @@ static void draw_spectrogram_horizontal(unsigned this_max, unsigned graph_max)
 
 /***************************** FFT functions *******************************/
 
-static bool is_playing(void)
+static inline bool is_playing(void)
 {
-    return rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) == CHANNEL_PLAYING;
+    return rb->audio_status() == AUDIO_STATUS_PLAY;
 }
 
 /** functions use in single/multi configuration **/
@@ -1047,9 +1047,8 @@ static inline bool fft_init_fft_lib(void)
 
 static inline bool fft_get_fft(void)
 {
-    int count;
-    const int16_t *value =
-        rb->mixer_channel_get_buffer(PCM_MIXER_CHAN_PLAYBACK, &count);
+    unsigned long count;
+    const void *value = rb->audio_get_unplayed_data(&count);
     /* This block can introduce discontinuities in our data. Meaning, the
      * FFT will not be done a continuous segment of the signal. Which can
      * be bad. Or not.
@@ -1070,10 +1069,12 @@ static inline bool fft_get_fft(void)
 
     do
     {
-        kiss_fft_scalar left = *value++;
-        kiss_fft_scalar right = *value++;
-        input[fft_idx].r = (left + right) >> 1; /* to mono */
-    } while (fft_idx++, --count > 0);
+        int32_t l = audio_sample_read_postidx(&value, 1, 1);
+        int32_t r = audio_sample_read_postidx(&value, 1, 1);
+        kiss_fft_scalar kfft_l = audio_scale_sample_to(l, 15);
+        kiss_fft_scalar kfft_r = audio_scale_sample_to(r, 15);
+        input[fft_idx].r = kfft_l + kfft_r; /* to mono */
+    } while (fft_idx++, --count);
 
     apply_window_func(fft.window_func);
 

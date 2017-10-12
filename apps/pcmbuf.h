@@ -22,10 +22,12 @@
 #define PCMBUF_H
 
 #include <sys/types.h>
+#include "audio.h"
 
 /* Commit PCM data */
-void *pcmbuf_request_buffer(int *count);
-void pcmbuf_write_complete(int count, unsigned long elapsed, off_t offset);
+void * pcmbuf_request_buffer(unsigned long *frames);
+void pcmbuf_write_complete(unsigned long frames, unsigned long elapsed,
+                           off_t offset);
 
 /* Init */
 size_t pcmbuf_init(void *bufend);
@@ -75,11 +77,12 @@ void pcmbuf_soft_mode(bool shhh);
 /* Time and position */
 unsigned int pcmbuf_get_position_key(void);
 void pcmbuf_sync_position_update(void);
+void pcmbuf_suspend_position_updates(bool suspend);
 
 /* Misc */
 bool pcmbuf_is_lowdata(void);
 void pcmbuf_set_low_latency(bool state);
-void pcmbuf_update_frequency(void);
-unsigned int pcmbuf_get_frequency(void);
 
+int pcmbuf_add_pcm_hook(audio_pcm_hook_fn hook);
+int pcmbuf_remove_pcm_hook(audio_pcm_hook_fn hook);
 #endif /* PCMBUF_H */

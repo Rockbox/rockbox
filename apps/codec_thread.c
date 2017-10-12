@@ -74,7 +74,6 @@ struct codec_load_info
     int afmt;   /* codec specification (AFMT_*) */
 };
 
-
 /** --- Main state control --- **/
 
 static int codec_type = AFMT_UNKNOWN; /* Codec type (C,A-) */
@@ -213,22 +212,22 @@ void codec_thread_do_callback(void (*fn)(void), unsigned int *id)
 /** --- codec API callbacks --- **/
 
 static void codec_pcmbuf_insert_callback(
-        const void *ch1, const void *ch2, int count)
+        const void *ch1, const void *ch2, unsigned long frames)
 {
     struct dsp_buffer src;
-    src.remcount  = count;
-    src.pin[0]    = ch1;
-    src.pin[1]    = ch2;
-    src.proc_mask = 0;
+    src.frames_rem = frames;
+    src.pin[0]     = ch1;
+    src.pin[1]     = ch2;
+    src.proc_mask  = 0;
 
     while (LIKELY(queue_empty(&codec_queue)) ||
            codec_check_queue__have_msg() >= 0)
     {
         struct dsp_buffer dst;
-        dst.remcount = 0;
-        dst.bufcount = MAX(src.remcount, 1024); /* Arbitrary min request */
+        dst.frames_rem = 0;
+        dst.frames = MAX(src.frames_rem, 1024); /* Arbitrary min request */
 
-        if ((dst.p16out = pcmbuf_request_buffer(&dst.bufcount)) == NULL)
+        if ((dst.pout = pcmbuf_request_buffer(&dst.frames)) == NULL)
         {
             cancel_cpu_boost();
 
@@ -240,12 +239,12 @@ static void codec_pcmbuf_insert_callback(
         {
             dsp_process(ci.dsp, &src, &dst);
 
-            if (dst.remcount > 0)
+            if (dst.frames_rem)
             {
-                pcmbuf_write_complete(dst.remcount, ci.id3->elapsed,
+                pcmbuf_write_complete(dst.frames_rem, ci.id3->elapsed,
                                       ci.id3->offset);
             }
-            else if (src.remcount <= 0)
+            else if (!src.frames_rem)
             {
                 return; /* No input remains and DSP purged */
             }
@@ -500,7 +499,9 @@ static void run_codec(void)
     codec_queue_ack(Q_CODEC_RUN);
 
     trigger_cpu_boost();
-    dsp_configure(ci.dsp, DSP_SET_OUT_FREQUENCY, pcmbuf_get_frequency());
+    dsp_configure(ci.dsp, DSP_SET_OUT_FREQUENCY,
+                  audio_get_playback_samplerate());
+    dsp_configure(ci.dsp, DSP_SET_OUT_PCM_FORMAT, 0);
 
     if (!encoder)
     {

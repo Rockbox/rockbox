@@ -25,9 +25,6 @@
 
 #define CACHEALIGN_BITS (4) /* 2^4 = 16 bytes */
 
-/* PCM addresses for obtaining buffers will be what DMA is using (physical) */
-#define HAVE_PCM_DMA_ADDRESS
-
 /* USBOTG */
 #define USB_NUM_ENDPOINTS  3
 /* This needs to be 2048 byte aligned, but USB_QHARRAY_ATTR should take care

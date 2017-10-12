@@ -526,9 +526,6 @@ CE lines
 #define SSP_ICR             (*(volatile unsigned char*)(SSP_BASE+0x20))
 #define SSP_DMACR           (*(volatile unsigned char*)(SSP_BASE+0x24))
 
-/* PCM addresses for obtaining buffers will be what DMA is using (physical) */
-#define HAVE_PCM_DMA_ADDRESS
-
 /* Timer frequency */
 #define TIMER_FREQ (24000000 / 16)
 

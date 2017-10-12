@@ -124,7 +124,7 @@ static void aic3x_apply_volume(void)
 }
 
 
-static void audiohw_mute(bool mute)
+void audiohw_mute(bool mute)
 {
     if (mute)
     {
@@ -236,10 +236,7 @@ void audiohw_init(void)
 
     /* HPLCOM is high impedance when powered down, not fully powered up */
     aic3x_write_reg(AIC3X_HPLCOM_LVL, 0x04);
-}
 
-void audiohw_postinit(void)
-{
     audiohw_mute(false);
 
     /* HPLOUT output level 0dB, not muted, fully powered up */

@@ -25,28 +25,19 @@
 #else /* Generic */
 
 /* Actually output samples into beep_buf */
-static FORCE_INLINE void beep_generate(int16_t *out, int count,
-                                       uint32_t *phase, uint32_t step,
-                                       int16_t amplitude)
+static FORCE_INLINE void beep_generate(int16_t *out, unsigned long count,
+                                       uint32_t *phase, uint32_t step)
 {
     uint32_t ph = *phase;
 
     do
     {
-        int16_t amp = amplitude;
-
-        if (ph > UINT32_MAX / 2)
-            amp = -amp;
-
-        *out++ = amp;
-        *out++ = amp;
-
+        *out++ = ph > UINT32_MAX / 2 ? -INT16_MAX : INT16_MAX;
         ph += step;
     }
-    while (--count > 0);
+    while (--count);
 
     *phase = ph;
 }
 
-#define BEEP_GENERIC
 #endif /* CPU_* */
