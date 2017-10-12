@@ -279,7 +279,7 @@ struct cpufreq_profile_t
     long cpu_freq;
     /* parameters */
     int vddd, vddd_bo;
-    int hbus_div;
+    int hbus_idiv, hbus_fdiv; /* note: set fdiv to 0 to disable, if fdiv is nonzero, idiv is ignored */
     int cpu_idiv, cpu_fdiv;
     long emi_freq;
     int arm_cache_timings;
@@ -301,16 +301,16 @@ struct cpufreq_profile_t
 #if IMX233_SUBTARGET >= 3700
 static struct cpufreq_profile_t cpu_profiles[] =
 {
-    /* clk_p@454.74 MHz, clk_h@151.58 MHz, clk_emi@130.91 MHz, VDDD@1.550 V */
-    {IMX233_CPUFREQ_454_MHz, 1550, 1450, 3, 1, 19, EMIFREQ_MAX, 0},
+    /* clk_p@454.74 MHz, clk_h@198.94 MHz, clk_emi@130.91 MHz, VDDD@1.550 V */
+    {IMX233_CPUFREQ_454_MHz, 1550, 1450, 0, 14, 1, 19, EMIFREQ_MAX, 0},
     /* clk_p@320.00 MHz, clk_h@106.66 MHz, clk_emi@130.91 MHz, VDDD@1.450 V */
-    {IMX233_CPUFREQ_320_MHz, 1450, 1350, 3, 1, 27, EMIFREQ_MAX, 0},
+    {IMX233_CPUFREQ_320_MHz, 1450, 1350, 3, 0, 1, 27, EMIFREQ_MAX, 0},
     /* clk_p@261.82 MHz, clk_h@130.91 MHz, clk_emi@130.91 MHz, VDDD@1.275 V */
-    {IMX233_CPUFREQ_261_MHz, 1275, 1175, 2, 1, 33, EMIFREQ_MAX, 0},
+    {IMX233_CPUFREQ_261_MHz, 1275, 1175, 2, 0, 1, 33, EMIFREQ_MAX, 0},
     /* clk_p@64 MHz, clk_h@64 MHz, clk_emi@64 MHz, VDDD@1.050 V (or 1.275V) */
-    {IMX233_CPUFREQ_64_MHz, VDDD_MIN, 975, 1, 5, 27, EMIFREQ_NORMAL, 3},
+    {IMX233_CPUFREQ_64_MHz, VDDD_MIN, 975, 1, 0, 5, 27, EMIFREQ_NORMAL, 3},
     /* dummy */
-    {0, 0, 0, 0, 0, 0, 0, 0}
+    {0, 0, 0, 0, 0, 0, 0, 0, 0}
 };
 #endif
 
@@ -339,14 +339,14 @@ void imx233_set_cpu_frequency(long frequency)
         /* Change ARM cache timings */
         imx233_digctl_set_arm_cache_timings(prof->arm_cache_timings);
         /* Change CPU and HBUS frequencies */
-        imx233_clkctrl_set_cpu_hbus_div(prof->cpu_idiv, prof->cpu_fdiv, prof->hbus_div);
+        imx233_clkctrl_set_cpu_hbus_div(prof->cpu_idiv, prof->cpu_fdiv, prof->hbus_idiv, prof->hbus_fdiv);
         /* Set the new EMI frequency */
         imx233_emi_set_frequency(prof->emi_freq);
     }
     else
     {
         /* Change CPU and HBUS frequencies */
-        imx233_clkctrl_set_cpu_hbus_div(prof->cpu_idiv, prof->cpu_fdiv, prof->hbus_div);
+        imx233_clkctrl_set_cpu_hbus_div(prof->cpu_idiv, prof->cpu_fdiv, prof->hbus_idiv, prof->hbus_fdiv);
         /* Set the new EMI frequency */
         imx233_emi_set_frequency(prof->emi_freq);
         /* Change ARM cache timings */

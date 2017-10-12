@@ -72,8 +72,9 @@ void imx233_clkctrl_set_frac_div(enum imx233_clock_t clk, int fracdiv);
 int imx233_clkctrl_get_frac_div(enum imx233_clock_t clk);
 void imx233_clkctrl_set_bypass(enum imx233_clock_t clk, bool bypass);
 bool imx233_clkctrl_get_bypass(enum imx233_clock_t clk);
-/* all-in-one function which handle all quirks */
-void imx233_clkctrl_set_cpu_hbus_div(int cpu_idiv, int cpu_fdiv, int hbus_div);
+/* all-in-one function which handle all quirks
+ * NOTE if hbus_fdiv is nonzero, hbus_idiv is ignored, if it's zero then frac div is disabled */
+void imx233_clkctrl_set_cpu_hbus_div(int cpu_idiv, int cpu_fdiv, int hbus_div, int hbus_fdiv);
 #endif
 void imx233_clkctrl_enable_usb(bool enable);
 bool imx233_clkctrl_is_usb_enabled(void);

@@ -210,8 +210,17 @@ bool imx233_clkctrl_get_bypass(enum imx233_clock_t clk)
     }
 }
 
-void imx233_clkctrl_set_cpu_hbus_div(int cpu_idiv, int cpu_fdiv, int hbus_div)
+void imx233_clkctrl_set_cpu_hbus_div(int cpu_idiv, int cpu_fdiv, int hbus_idiv, int hbus_fdiv)
 {
+    /* compute a "fake" multiplier for HBUS, pretending CPU is at 64MHz, this is just to compare the
+     * frequencies */
+#define HBUS_MULT(fdiv, idiv) \
+    ({ int freq = 64000000; \
+        if(fdiv == 0) /* integer mode */ \
+            freq /= idiv; \
+        else \
+            freq = (freq * fdiv) / 32; \
+        freq;})
     /* disable interrupts to avoid an IRQ being triggered at the point
      * where we are slow/weird speeds, that would result in massive slow-down... */
     int oldstatus = disable_interrupt_save(IRQ_FIQ_STATUS);
@@ -219,11 +228,19 @@ void imx233_clkctrl_set_cpu_hbus_div(int cpu_idiv, int cpu_fdiv, int hbus_div)
      * frequency and result in crash, also the cpu could be running from XTAL or
      * PLL at this point */
     int old_cpu_fdiv = imx233_clkctrl_get_frac_div(CLK_CPU);
-    int old_hbus_div = imx233_clkctrl_get_div(CLK_HBUS);
+    /* there is a complication here due to the fact that the HBUS divider can run in integer or
+     * fractional mode, so we compare "frequency" to know which divider was bigger */
+    int old_hbus_mult= HBUS_MULT(imx233_clkctrl_get_frac_div(CLK_HBUS), imx233_clkctrl_get_div(CLK_HBUS));
+    int new_hbus_mult = HBUS_MULT(hbus_fdiv, hbus_idiv);
     /* since HBUS is tied to cpu, we first ensure that the HBUS is safe to handle
      * both old and new speed: take maximum of old and new dividers */
-    if(hbus_div > old_hbus_div)
-        imx233_clkctrl_set_div(CLK_HBUS, hbus_div);
+    if(new_hbus_mult < old_hbus_mult)
+    {
+        if(hbus_fdiv)
+            imx233_clkctrl_set_frac_div(CLK_HBUS, hbus_fdiv);
+        else
+            imx233_clkctrl_set_div(CLK_HBUS, hbus_idiv);
+    }
     /* we are about to change cpu speed: we first ensure that the fractional
      * divider is safe to handle both old and new integer divided frequency: take max */
     if(cpu_fdiv > old_cpu_fdiv)
@@ -235,9 +252,14 @@ void imx233_clkctrl_set_cpu_hbus_div(int cpu_idiv, int cpu_fdiv, int hbus_div)
         imx233_clkctrl_set_frac_div(CLK_CPU, cpu_fdiv);
     /* if we were running from XTAL, switch to PLL */
     imx233_clkctrl_set_bypass(CLK_CPU, false);
-    /* finally restore HBUS to its proper value */
-    if(hbus_div < old_hbus_div)
-        imx233_clkctrl_set_div(CLK_HBUS, hbus_div);
+    /* finally set HBUS to its proper value if needed */
+    if(new_hbus_mult > old_hbus_mult)
+    {
+        if(hbus_fdiv)
+            imx233_clkctrl_set_frac_div(CLK_HBUS, hbus_fdiv);
+        else
+            imx233_clkctrl_set_div(CLK_HBUS, hbus_idiv);
+    }
     /* we are free again */
     restore_interrupt(oldstatus);
 }
