@@ -68,7 +68,7 @@ int imx233_clkctrl_get_div(enum imx233_clock_t clk);
 #if IMX233_SUBTARGET >= 3700
 /* call with fracdiv=0 to disable it */
 void imx233_clkctrl_set_frac_div(enum imx233_clock_t clk, int fracdiv);
-/* 0 means fractional dividor disable */
+/* 0 means fractional dividor disabled */
 int imx233_clkctrl_get_frac_div(enum imx233_clock_t clk);
 void imx233_clkctrl_set_bypass(enum imx233_clock_t clk, bool bypass);
 bool imx233_clkctrl_get_bypass(enum imx233_clock_t clk);
