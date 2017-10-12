@@ -38,7 +38,8 @@ enum pcm_dma_status
 /** RAW PCM routines used with playback and recording **/
 
 /* Typedef for registered data callback */
-typedef void (*pcm_play_callback_type)(const void **start, size_t *size);
+typedef void (*pcm_play_callback_type)(const void **start,
+                                       unsigned long *frames);
 
 /* Typedef for registered status callback */
 typedef enum pcm_dma_status (*pcm_status_callback_type)(enum pcm_dma_status status);
@@ -73,21 +74,31 @@ bool pcm_is_initialized(void);
 /* This is for playing "raw" PCM data */
 void pcm_play_data(pcm_play_callback_type get_more,
                    pcm_status_callback_type status_cb,
-                   const void *start, size_t size);
+                   const void *start, unsigned long frames);
 
-/* Kept internally for global PCM and used by mixer's verion of peak
-   calculation */
 struct pcm_peaks
 {
-    uint32_t left;  /* Left peak value */
-    uint32_t right; /* Right peak value */
-    long period;    /* For tracking calling period */
-    long tick;      /* Last tick called */
+    uint32_t peak[2];       /* Channel peak values */
+    /* data maintained for internal use */
+    long period;            /* For tracking calling period */
+    long tick;              /* Last tick called */
+    const void *addr;       /* last read address */
+    unsigned long frames;   /* frames remaining or now available */
+    const void *end_addr;   /* end of last readout */
+#ifdef HAVE_RECORDING
+    unsigned long seq;      /* record buffer sequence stamp */
+#endif
 };
 
-void pcm_calculate_peaks(int *left, int *right);
-const void* pcm_get_peak_buffer(int* count);
-size_t pcm_get_bytes_waiting(void);
+/* initialize when allocating non-statically */
+static inline void pcm_peaks_init(struct pcm_peaks *peaks)
+{
+    *peaks = (struct pcm_peaks){ .frames = 0 };
+}
+
+void pcm_calculate_peaks(struct pcm_peaks *peaks);
+const void * pcm_get_peak_buffer(unsigned long *frames_rem);
+unsigned long pcm_get_frames_waiting(void);
 
 void pcm_play_stop(void);
 void pcm_play_pause(bool play);
@@ -99,7 +110,8 @@ bool pcm_is_playing(void);
 /** RAW PCM recording routines **/
 
 /* Typedef for registered data callback */
-typedef void (*pcm_rec_callback_type)(void **start, size_t *size);
+typedef void (*pcm_rec_callback_type)(void **start,
+                                      unsigned long *frames);
 
 /* Reenterable locks for locking and unlocking the recording interrupt */
 void pcm_rec_lock(void);
@@ -113,7 +125,7 @@ void pcm_close_recording(void);
 /* Start recording "raw" PCM data */
 void pcm_record_data(pcm_rec_callback_type more_ready,
                      pcm_status_callback_type status_cb,
-                     void *start, size_t size);
+                     void *start, unsigned long frames);
 
 /* Stop tranferring data into supplied buffer */
 void pcm_stop_recording(void);
@@ -121,7 +133,7 @@ void pcm_stop_recording(void);
 /* Is pcm currently recording? */
 bool pcm_is_recording(void);
 
-void pcm_calculate_rec_peaks(int *left, int *right);
+void pcm_calculate_rec_peaks(struct pcm_peaks *peaks);
 
 #endif /* HAVE_RECORDING */
 

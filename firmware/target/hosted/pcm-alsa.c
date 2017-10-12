@@ -84,8 +84,8 @@ static snd_pcm_sframes_t buffer_size = MIX_FRAME_SAMPLES * 32; /* ~16k */
 static snd_pcm_sframes_t period_size = MIX_FRAME_SAMPLES * 4;  /*  ~4k */
 static sample_t *frames;
 
-static const void  *pcm_data = 0;
-static size_t       pcm_size = 0;
+static const void  *pcm_data = NULL;
+static unsigned long pcm_frames = 0;
 
 #ifdef USE_ASYNC_CALLBACK
 static snd_async_handler_t *ahandler;
@@ -261,20 +261,18 @@ static bool fill_frames(void)
 
     while (frames_left > 0)
     {
-        if (!pcm_size)
+        if (!pcm_frames)
         {
             new_buffer = true;
             if (!pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data,
-                                                &pcm_size))
+                                                &pcm_frames))
             {
                 return false;
             }
         }
 
-        if (pcm_size % 4)
-            panicf("Wrong pcm_size");
         /* the compiler will optimize this test away */
-        copy_n = MIN((ssize_t)pcm_size/4, frames_left);
+        copy_n = MIN(pcm_frames, frames_left);
         if (format == SND_PCM_FORMAT_S32_LE)
         {
             /* We have to convert 16-bit to 32-bit, the need to multiply the
@@ -289,8 +287,8 @@ static bool fill_frames(void)
             /* Rockbox and PCM have same format: memcopy */
             memcpy(&frames[2*(period_size-frames_left)], pcm_data, copy_n * 4);
         }
-        pcm_data += copy_n*4;
-        pcm_size -= copy_n*4;
+        pcm_data += copy_n*PCM_FRAME_SIZE;
+        pcm_frames -= copy_n;
         frames_left -= copy_n;
 
         if (new_buffer)
@@ -504,12 +502,12 @@ void pcm_play_dma_stop(void)
     snd_pcm_drain(handle);
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_start(const void *addr, unsigned long frames)
 {
     pcm_dma_apply_settings_nolock();
 
     pcm_data = addr;
-    pcm_size = size;
+    pcm_frames = frames;
 
     while (1)
     {
@@ -556,16 +554,15 @@ void pcm_play_dma_start(const void *addr, size_t size)
     }
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_get_frames_waiting(void)
 {
-    return pcm_size;
+    return pcm_frames;
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
+const void * pcm_play_dma_get_peak_buffer(unsigned long *frames)
 {
-    uintptr_t addr = (uintptr_t)pcm_data;
-    *count = pcm_size / 4;
-    return (void *)((addr + 3) & ~3);
+    *frames = pcm_frames;
+    return pcm_data;
 }
 
 void pcm_play_dma_postinit(void)
@@ -595,18 +592,19 @@ void pcm_rec_dma_close(void)
 {
 }
 
-void pcm_rec_dma_start(void *start, size_t size)
+void pcm_rec_dma_start(void *start, unsigned long frames)
 {
     (void)start;
-    (void)size;
+    (void)frames;
 }
 
 void pcm_rec_dma_stop(void)
 {
 }
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+const void * pcm_rec_dma_get_peak_buffer(unsigned long *frames_avail)
 {
+    *frames_avail = 0;
     return NULL;
 }
 

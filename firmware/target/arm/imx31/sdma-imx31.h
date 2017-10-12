@@ -213,6 +213,8 @@ enum SDMA_PER_ADDR
 void sdma_init(void);
 void sdma_read_words(unsigned long *buf, unsigned long start, int count);
 void sdma_write_words(const unsigned long *buf, unsigned long start, int count);
+unsigned long sdma_read_word(unsigned long at);
+void sdma_write_word(unsigned long at, unsigned long val);
 void sdma_channel_set_priority(unsigned int channel, unsigned int priority);
 bool sdma_channel_reset(unsigned int channel);
 void sdma_channel_run(unsigned int channel);

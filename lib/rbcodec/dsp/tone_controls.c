@@ -96,8 +96,8 @@ static void tone_process(struct dsp_proc_entry *this,
                          struct dsp_buffer **buf_p)
 {
     struct dsp_buffer *buf = *buf_p;
-    filter_process((struct dsp_filter *)this->data, buf->p32, buf->remcount,
-                   buf->format.num_channels);
+    filter_process((struct dsp_filter *)this->data, buf->p32,
+                   buf->frames_rem, buf->format.num_channels);
 }
 
 /* DSP message hook */

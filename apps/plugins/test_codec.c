@@ -214,40 +214,41 @@ static void* codec_get_buffer(size_t *size)
    return codec_mallocbuf;
 }
 
-static int process_dsp(const void *ch1, const void *ch2, int count)
+static int process_dsp(const void *ch1, const void *ch2, unsigned long frames)
 {
     struct dsp_buffer src;
-    src.remcount = count;
+    src.frames_rem = frames;
     src.pin[0] = ch1;
     src.pin[1] = ch2;
     src.proc_mask = 0;
 
     struct dsp_buffer dst;
-    dst.remcount = 0;
+    dst.frames_rem = 0;
     dst.p16out = (int16_t *)dspbuffer;
-    dst.bufcount = dspbuffer_count;
+    dst.frames = dspbuffer_count;
 
     while (1)
     {
-        int old_remcount = dst.remcount;
+        unsigned long old_frames_rem = dst.frames_rem;
         rb->dsp_process(ci.dsp, &src, &dst);
         
-        if (dst.bufcount <= 0 ||
-            (src.remcount <= 0 && dst.remcount <= old_remcount))
+        if (!dst.frames ||
+            (!src.frames_rem && dst.frames_rem <= old_frames_rem))
         {
             /* Dest is full or no input left and DSP purged */
             break;
         }
     }
     
-    return dst.remcount;
+    return dst.frames_rem;
 }
 
 /* Null output */
-static void pcmbuf_insert_null(const void *ch1, const void *ch2, int count)
+static void pcmbuf_insert_null(const void *ch1, const void *ch2,
+                               unsigned long frames)
 {
     if (use_dsp)
-        process_dsp(ch1, ch2, count);
+        process_dsp(ch1, ch2, frames);
 
     /* Prevent idle poweroff */
     rb->reset_poweroff_timer();
@@ -292,19 +293,20 @@ static int fill_buffer(int new_offset){
 }
 
 /* WAV output or calculate crc32 of output*/
-static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int count)
+static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2,
+                                       unsigned long frames)
 {
     /* Prevent idle poweroff */
     rb->reset_poweroff_timer();
 
     if (use_dsp) {
-        count = process_dsp(ch1, ch2, count);
-        wavinfo.totalsamples += count;
+        frames = process_dsp(ch1, ch2, frames);
+        wavinfo.totalsamples += frames;
 
 #ifdef ROCKBOX_BIG_ENDIAN
         unsigned char* p = dspbuffer;
-        int i;
-        for (i = 0; i < count; i++) {
+        unsigned long i;
+        for (i = 0; i < frames; i++) {
             int2le16(p,*(int16_t *)p);
             p += 2;
             int2le16(p,*(int16_t *)p);
@@ -312,9 +314,9 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
         }
 #endif
         if (checksum) {
-            crc32 = rb->crc_32(dspbuffer, count * 2 * sizeof (int16_t), crc32);
+            crc32 = rb->crc_32(dspbuffer, frames * 2 * sizeof (int16_t), crc32);
         } else {
-            rb->write(wavinfo.fd, dspbuffer, count * 2 * sizeof (int16_t));
+            rb->write(wavinfo.fd, dspbuffer, frames * 2 * sizeof (int16_t));
         }
     }
     else
@@ -334,7 +336,7 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
             switch(wavinfo.stereomode)
             {
                 case STEREO_INTERLEAVED:
-                    while (count--) {
+                    while (frames--) {
                         int2le16(p,*data1_16++);
                         p += 2;
                         int2le16(p,*data1_16++);
@@ -343,7 +345,7 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
                     break;
  
                 case STEREO_NONINTERLEAVED:
-                    while (count--) {
+                    while (frames--) {
                         int2le16(p,*data1_16++);
                         p += 2;
                         int2le16(p,*data2_16++);
@@ -353,7 +355,7 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
                     break;
 
                 case STEREO_MONO:
-                    while (count--) {
+                    while (frames--) {
                         int2le16(p,*data1_16++);
                         p += 2;
                     }
@@ -366,7 +368,7 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
             switch(wavinfo.stereomode)
             {
                 case STEREO_INTERLEAVED:
-                    while (count--) {
+                    while (frames--) {
                         int2le16(p, clip_sample_16((*data1_32++ + dc_bias) >> scale));
                         p += 2;
                         int2le16(p, clip_sample_16((*data1_32++ + dc_bias) >> scale));
@@ -375,7 +377,7 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
                     break;
  
                 case STEREO_NONINTERLEAVED:
-                    while (count--) {
+                    while (frames--) {
                         int2le16(p, clip_sample_16((*data1_32++ + dc_bias) >> scale));
                         p += 2;
                         int2le16(p, clip_sample_16((*data2_32++ + dc_bias) >> scale));
@@ -385,7 +387,7 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
                     break;
 
                 case STEREO_MONO:
-                    while (count--) {
+                    while (frames--) {
                         int2le16(p, clip_sample_16((*data1_32++ + dc_bias) >> scale));
                         p += 2;
                     }
@@ -393,7 +395,7 @@ static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int cou
             }
         }
 
-        wavinfo.totalsamples += count;
+        wavinfo.totalsamples += frames;
         if (checksum)
             crc32 = rb->crc_32(wavbuffer, p - wavbuffer, crc32);
         else

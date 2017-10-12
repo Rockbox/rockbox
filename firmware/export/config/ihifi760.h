@@ -104,8 +104,6 @@
 /* Define the type of audio codec */
 /*#define HAVE_RK27XX_CODEC */
 
-/* #define HAVE_PCM_DMA_ADDRESS */
-
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS

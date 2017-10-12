@@ -54,7 +54,8 @@ static int pcm_underruns = 0;
 static unsigned int old_sampr = 0;
 
 /* Small silence clip. ~5.80ms @ 44.1kHz */
-static int16_t silence[256*2] ALIGNED_ATTR(4) = { 0 };
+#define SILENCE_FRAMES 256
+static int16_t silence[SILENCE_FRAMES*2] ALIGNED_ATTR(4) = { 0 };
 
 /* Delete all buffer contents */
 static void pcm_reset_buffer(void)
@@ -87,7 +88,7 @@ static inline ssize_t pcm_output_bytes_free(void)
 }
 
 /* Audio DMA handler */
-static void get_more(const void **start, size_t *size)
+static void get_more(const void **start, unsigned long *frames)
 {
     ssize_t sz;
 
@@ -113,7 +114,7 @@ static void get_more(const void **start, size_t *size)
             {
                 /* Just show a warning about this - will never happen
                  * without a corrupted buffer */
-                DEBUGF("get_more: invalid size (%ld)\n", (long)sz);
+                DEBUGF("get_more: invalid size (%zd)\n", sz);
             }
 
             if (offset < -100*CLOCK_RATE/1000)
@@ -139,14 +140,16 @@ static void get_more(const void **start, size_t *size)
 
                 sz -= PCM_HDR_SIZE;
 
+                unsigned long frcount = sz / 4;
+
                 /* Audio is time master - keep clock synchronized */
-                clock_time = time + (sz >> 2);
+                clock_time = time + frcount;
 
                 /* Update base clock */
-                clock_tick += sz >> 2;
+                clock_tick += frcount;
 
                 *start = head->data;
-                *size = sz;
+                *frames = frcount;
                 return;
             }
             /* Frame will be dropped - play silence clip */
@@ -163,11 +166,11 @@ static void get_more(const void **start, size_t *size)
     }
 
     /* Keep clock going at all times */
-    clock_time += sizeof (silence) / 4;
-    clock_tick += sizeof (silence) / 4;
+    clock_time += SILENCE_FRAMES;
+    clock_tick += SILENCE_FRAMES;
 
     *start = silence;
-    *size = sizeof (silence);
+    *frames = SILENCE_FRAMES;
 
     if (sz < 0)
         pcmbuf_read = pcmbuf_written;
@@ -267,7 +270,7 @@ uint32_t pcm_output_get_clock(void)
     do
     {
         time = clock_time;
-        rem = rb->mixer_channel_get_bytes_waiting(MPEG_PCM_CHANNEL) >> 2;
+        rem = rb->mixer_channel_get_frames_waiting(MPEG_PCM_CHANNEL);
     }
     while (UNLIKELY(time != clock_time ||
         (rem == 0 &&
@@ -288,7 +291,7 @@ uint32_t pcm_output_get_ticks(uint32_t *start)
     do
     {
         tick = clock_tick;
-        rem = rb->mixer_channel_get_bytes_waiting(MPEG_PCM_CHANNEL) >> 2;
+        rem = rb->mixer_channel_get_frames_waiting(MPEG_PCM_CHANNEL);
     }
     while (UNLIKELY(tick != clock_tick ||
         (rem == 0 &&

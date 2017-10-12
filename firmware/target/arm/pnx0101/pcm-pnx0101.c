@@ -29,7 +29,7 @@ short __attribute__((section(".dmabuf"))) dma_buf_left[DMA_BUF_SAMPLES];
 short __attribute__((section(".dmabuf"))) dma_buf_right[DMA_BUF_SAMPLES];
 
 const int16_t* p IBSS_ATTR;
-size_t p_size IBSS_ATTR;
+unsigned long p_frames IBSS_ATTR;
 
 void pcm_play_lock(void)
 {
@@ -39,10 +39,10 @@ void pcm_play_unlock(void)
 {
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_start(const void *addr, unsigned long frames)
 {
     p = addr;
-    p_size = size;
+    p_frames = frames;
 }
 
 void pcm_play_dma_stop(void)
@@ -68,11 +68,11 @@ static inline void fill_dma_buf(int offset)
 
         do
         {
-            int count;
+            unsigned long count;
             const int16_t *tmp_p;
-            count = MIN(p_size / 4, (size_t)(lend - l));
+            count = MIN(p_frames, (unsigned long)(lend - l));
             tmp_p = p;
-            p_size -= count * 4;
+            p_frames -= count * 4;
 
             if ((int)l & 3)
             {
@@ -116,9 +116,9 @@ static inline void fill_dma_buf(int offset)
                 return;
 
             new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK,
-                                                        &p, &p_size);
+                                                        &p, &p_frames);
         }
-        while (p_size);
+        while (p_frames);
     }
 
     if (l < lend)
@@ -197,16 +197,15 @@ void pcm_dma_apply_settings(void)
 {
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_get_frames_waiting(void)
 {
-    return p_size & ~3;
+    return p_frames;
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
+const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 {
-    unsigned long addr = (unsigned long)p;
-    size_t cnt = p_size;
-    *count = cnt >> 2;
+    unsigned long addr = (unsigned long)*(volatile const int16_t **)&p;
+    *frames_rem = p_frames;
     return (void *)((addr + 2) & ~3);
 }
 

@@ -34,30 +34,26 @@
 
 static unsigned int mixer_sampr = HW_SAMPR_DEFAULT;
 
-/* Define this to nonzero to add a marker pulse at each frame start */
-#define FRAME_BOUNDARY_MARKERS 0
+/* Define this to nonzero to add a marker pulse at each buffer start */
+#define BUFFER_BOUNDARY_MARKERS 0
 
 /* Descriptor for each channel */
 struct mixer_channel
 {
     const void *start;               /* Buffer pointer */
-    size_t size;                     /* Bytes remaining */
-    size_t last_size;                /* Size of consumed data in prev. cycle */
+    unsigned long frames;            /* Frames remaining */
+    unsigned long prev_frames;       /* Frames consumed data in prev. cycle */
     pcm_play_callback_type get_more; /* Registered callback */
     enum channel_status status;      /* Playback status */
     uint32_t amplitude;              /* Amp. factor: 0x0000 = mute, 0x10000 = unity */
     chan_buffer_hook_fn_type buffer_hook; /* Callback for new buffer */
 };
 
-/* Forget about boost here for the moment */
-#define MIX_FRAME_SIZE      (MIX_FRAME_SAMPLES*4)
-
 /* Because of the double-buffering, playback is always from here, otherwise a
    mechanism for the channel callbacks not to free buffers too early would be
    needed (if we _really_ want it and it's worth it, we _can_ do that ;-) ) */
-static uint32_t downmix_buf[2][MIX_FRAME_SAMPLES] DOWNMIX_BUF_IBSS MEM_ALIGN_ATTR;
-static int downmix_index = 0;   /* Which downmix_buf? */
-static size_t next_size = 0;    /* Size of buffer to play next time */
+static uint32_t downmix_buf[2][MIX_FRAME_PERIOD] DOWNMIX_BUF_IBSS MEM_ALIGN_ATTR;
+static unsigned int downmix_index = 0;   /* Which downmix_buf? */
 
 /* Descriptors for all available channels */
 static struct mixer_channel channels[PCM_MIXER_NUM_CHANNELS] IBSS_ATTR;
@@ -66,7 +62,7 @@ static struct mixer_channel channels[PCM_MIXER_NUM_CHANNELS] IBSS_ATTR;
 static struct mixer_channel * active_channels[PCM_MIXER_NUM_CHANNELS+1] IBSS_ATTR;
 
 /* Number of silence frames to play after all data has played */
-#define MAX_IDLE_FRAMES     (mixer_sampr*3 / MIX_FRAME_SAMPLES)
+#define MAX_IDLE_PERIODS    (mixer_sampr*3 / MIX_FRAME_PERIOD)
 static unsigned int idle_counter = 0;
 
 /** Mixing routines, CPU optmized **/
@@ -96,22 +92,22 @@ static void mixer_deactivate_channel(struct mixer_channel *chan)
 static void channel_stopped(struct mixer_channel *chan)
 {
     mixer_deactivate_channel(chan);
-    chan->size = 0;
+    chan->frames = 0;
     chan->start = NULL;
     chan->status = CHANNEL_STOPPED;
 }
 
 /* Main PCM callback - sends the current prepared frame to play */
-static void mixer_pcm_callback(const void **addr, size_t *size)
+static void mixer_pcm_callback(const void **addr, unsigned long *frames)
 {
     *addr = downmix_buf[downmix_index];
-    *size = next_size;
+    *frames = MIX_FRAME_PERIOD;
 }
 
 static inline void chan_call_buffer_hook(struct mixer_channel *chan)
 {
     if (UNLIKELY(chan->buffer_hook))
-        chan->buffer_hook(chan->start, chan->size);
+        chan->buffer_hook(chan->start, chan->frames);
 }
 
 /* Buffering callback - calls sub-callbacks and mixes the data for next
@@ -125,10 +121,9 @@ mixer_buffer_callback(enum pcm_dma_status status)
     downmix_index ^= 1; /* Next buffer */
 
     void *mixptr = downmix_buf[downmix_index];
-    size_t mixsize = MIX_FRAME_SIZE;
+    unsigned long frames_rem = MIX_FRAME_PERIOD;
+    unsigned long mixframes = frames_rem;
     struct mixer_channel **chan_p;
-
-    next_size = 0;
 
     /* "Loop" back here if one round wasn't enough to fill a frame */
 fill_frame:
@@ -140,18 +135,18 @@ fill_frame:
            callbacks for channels that ran out - stopping whichever report
            "no more" */
         struct mixer_channel *chan = *chan_p;
-        chan->start += chan->last_size;
-        chan->size -= chan->last_size;
+        chan->start += chan->prev_frames * PCM_FRAME_SIZE;
+        chan->frames -= chan->prev_frames;
 
-        if (chan->size == 0)
+        if (!chan->frames)
         {
             if (chan->get_more)
             {
-                chan->get_more(&chan->start, &chan->size);
-                ALIGN_AUDIOBUF(chan->start, chan->size);
+                chan->get_more(&chan->start, &chan->frames);
+                ALIGN_AUDIOBUF(chan->start, chan->frames);
             }
 
-            if (!(chan->start && chan->size))
+            if (!(chan->start && chan->frames))
             {
                 /* Channel is stopping */
                 channel_stopped(chan);
@@ -165,8 +160,8 @@ fill_frame:
 
         /* Channel with least amount of data remaining determines the downmix
            size */
-        if (chan->size < mixsize)
-            mixsize = chan->size;
+        if (chan->frames < mixframes)
+            mixframes = chan->frames;
 
         chan_p++;
     }
@@ -180,7 +175,7 @@ fill_frame:
 
         if (LIKELY(!*chan_p))
         {
-            write_samples(mixptr, chan->start, chan->amplitude, mixsize);
+            write_samples(mixptr, chan->start, chan->amplitude, mixframes);
         }
         else
         {
@@ -190,7 +185,7 @@ fill_frame:
             /* Mix first two channels with each other as the downmix */
             src0 = chan->start;
             amp0 = chan->amplitude;
-            chan->last_size = mixsize;
+            chan->prev_frames = mixframes;
 
             chan = *chan_p++;
             src1 = chan->start;
@@ -198,13 +193,13 @@ fill_frame:
 
             while (1)
             {
-                mix_samples(mixptr, src0, amp0, src1, amp1, mixsize);
+                mix_samples(mixptr, src0, amp0, src1, amp1, mixframes);
 
                 if (!*chan_p)
                     break;
 
                 /* More channels to mix - mix each with existing downmix */
-                chan->last_size = mixsize;
+                chan->prev_frames = mixframes;
                 chan = *chan_p++;
                 src0 = mixptr;
                 amp0 = MIX_AMP_UNITY;
@@ -213,28 +208,25 @@ fill_frame:
             }
         }
 
-        chan->last_size = mixsize;
-        next_size += mixsize;
+        chan->prev_frames = mixframes;
+        frames_rem -= mixframes;
 
-        if (next_size < MIX_FRAME_SIZE)
+        if (frames_rem)
         {
             /* There is still space remaining in this frame */
-            mixptr += mixsize;
-            mixsize = MIX_FRAME_SIZE - next_size;
+            mixptr += mixframes * PCM_FRAME_SIZE;
+            mixframes = frames_rem;
             goto fill_frame;
         }
     }
-    else if (idle_counter++ < MAX_IDLE_FRAMES)
+    else if (idle_counter++ < MAX_IDLE_PERIODS)
     {
         /* Pad incomplete frames with silence */
-        if (idle_counter <= 3)
-            memset(mixptr, 0, MIX_FRAME_SIZE - next_size);
-
-        next_size = MIX_FRAME_SIZE;
+        memset(mixptr, 0, frames_rem*PCM_FRAME_SIZE);
     }
     /* else silence period ran out - go to sleep */
 
-#if FRAME_BOUNDARY_MARKERS != 0
+#if BUFFER_BOUNDARY_MARKERS != 0
     if (next_size)
         *downmix_buf[downmix_index] = downmix_index ? 0x7fff7fff : 0x80008000;
 #endif
@@ -268,7 +260,7 @@ static void mixer_start_pcm(void)
     mixer_buffer_callback(PCM_DMAST_STARTED);
 
     pcm_play_data(mixer_pcm_callback, mixer_buffer_callback,
-                  start, MIX_FRAME_SIZE);
+                  start, MIX_FRAME_PERIOD);
 }
 
 /** Public interfaces **/
@@ -276,13 +268,14 @@ static void mixer_start_pcm(void)
 /* Start playback on a channel */
 void mixer_channel_play_data(enum pcm_mixer_channel channel,
                              pcm_play_callback_type get_more,
-                             const void *start, size_t size)
+                             const void *start,
+                             unsigned long frames)
 {
     struct mixer_channel *chan = &channels[channel];
 
-    ALIGN_AUDIOBUF(start, size);
+    ALIGN_AUDIOBUF(start, frames);
 
-    if (!(start && size) && get_more)
+    if (!(start && frames) && get_more)
     {
         /* Initial buffer not passed - call the callback now */
         pcm_play_lock();
@@ -291,20 +284,20 @@ void mixer_channel_play_data(enum pcm_mixer_channel channel,
                                            must not be reentered */
         pcm_play_unlock(); /* Allow playback while doing callback */
 
-        size = 0;
-        get_more(&start, &size);
-        ALIGN_AUDIOBUF(start, size);
+        frames = 0;
+        get_more(&start, &frames);
+        ALIGN_AUDIOBUF(start, frames);
     }
 
     pcm_play_lock();
 
-    if (start && size)
+    if (start && frames)
     {
         /* We have data - start the channel */
         chan->status = CHANNEL_PLAYING;
         chan->start = start;
-        chan->size = size;
-        chan->last_size = 0;
+        chan->frames = frames;
+        chan->prev_frames = 0;
         chan->get_more = get_more;
 
         mixer_activate_channel(chan);
@@ -370,28 +363,29 @@ enum channel_status mixer_channel_status(enum pcm_mixer_channel channel)
 }
 
 /* Returns amount data remaining in channel before next callback */
-size_t mixer_channel_get_bytes_waiting(enum pcm_mixer_channel channel)
+unsigned long mixer_channel_get_frames_waiting(enum pcm_mixer_channel channel)
 {
-    return channels[channel].size;
+    return channels[channel].frames;
 }
 
 /* Return pointer to channel's playing audio data and the size remaining */
-const void * mixer_channel_get_buffer(enum pcm_mixer_channel channel, int *count)
+const void * mixer_channel_get_buffer(enum pcm_mixer_channel channel,
+                                      unsigned long *frames_rem)
 {
     struct mixer_channel *chan = &channels[channel];
-    const void * buf = *(const void * volatile *)&chan->start;
-    size_t size = *(size_t volatile *)&chan->size;
-    const void * buf2 = *(const void * volatile *)&chan->start;
+    const void *buf = *(const void * volatile *)&chan->start;
+    unsigned long rem = *(unsigned long volatile *)&chan->frames;
+    const void *buf2 = *(const void * volatile *)&chan->start;
 
     /* Still same buffer? */
     if (buf == buf2)
     {
-        *count = size >> 2;
+        *frames_rem = rem;
         return buf;
     }
-    /* else can't be sure buf and size are related */
 
-    *count = 0;
+    /* can't be sure buf and size are related */
+    *frames_rem = 0;
     return NULL;
 }
 
@@ -399,12 +393,8 @@ const void * mixer_channel_get_buffer(enum pcm_mixer_channel channel, int *count
 void mixer_channel_calculate_peaks(enum pcm_mixer_channel channel,
                                    struct pcm_peaks *peaks)
 {
-    int count;
-    const void *addr = mixer_channel_get_buffer(channel, &count);
-
-    pcm_do_peak_calculation(peaks,
-                            channels[channel].status == CHANNEL_PLAYING,
-                            addr, count);
+    peaks->addr = mixer_channel_get_buffer(channel, &peaks->frames);
+    pcm_do_peak_calculation(peaks, channels[channel].status == CHANNEL_PLAYING);
 }
 
 /* Adjust channel pointer by a given offset to support movable buffers */
