@@ -37,7 +37,7 @@ static uint32_t prescale_factor = PCM_FACTOR_UNITY;
 /* final pcm scaling factors */
 static uint32_t pcm_new_factor_l = 0, pcm_new_factor_r = 0;
 static uint32_t pcm_factor_l = 0, pcm_factor_r = 0;
-static typeof (memcpy) *pcm_scaling_fn = NULL;
+static void (* pcm_scaling_fn)(void *, const void *, unsigned long) = NULL;
 
 /***
  ** Volume scaling routines
@@ -57,45 +57,49 @@ static inline int32_t pcm_scale_sample(PCM_F_T f, int32_t s)
     return (f * s + (PCM_F_T)PCM_FACTOR_UNITY/2) >> PCM_SW_VOLUME_FRACBITS;
 }
 
-/* Both UNITY, use direct copy */
-/* static void * memcpy(void *dst, const void *src, size_t size); */
+static void pcm_scale_buffer_unity(void *dst,
+                                   const void *src,
+                                   unsigned long count)
+{
+    memcpy(dst, src, count*PCM_FRAME_SIZE);
+}
 
 /* Either cut (both <= UNITY), no clipping needed */
-static void * pcm_scale_buffer_cut(void *dst, const void *src, size_t size)
+static void pcm_scale_buffer_cut(void *dst,
+                                 const void *src,
+                                 unsigned long count)
 {
     int16_t *d = dst;
     const int16_t *s = src;
     uint32_t factor_l = pcm_factor_l, factor_r = pcm_factor_r;
 
-    while (size)
+    while (count--)
     {
         *d++ = pcm_scale_sample(factor_l, *s++);
         *d++ = pcm_scale_sample(factor_r, *s++);
-        size -= PCM_SAMPLE_SIZE;
     }
-
-    return dst;
 }
 
 /* Either boost (any > UNITY) requires clipping */
-static void * pcm_scale_buffer_boost(void *dst, const void *src, size_t size)
+static void pcm_scale_buffer_boost(void *dst,
+                                   const void *src,
+                                   unsigned long count)
 {
     int16_t *d = dst;
     const int16_t *s = src;
     uint32_t factor_l = pcm_factor_l, factor_r = pcm_factor_r;
 
-    while (size)
+    while (count--)
     {
         *d++ = clip_sample_16(pcm_scale_sample(factor_l, *s++));
         *d++ = clip_sample_16(pcm_scale_sample(factor_r, *s++));
-        size -= PCM_SAMPLE_SIZE;
     }
-
-    return dst;
 }
 
 /* Transition the volume change smoothly across a frame */
-static void * pcm_scale_buffer_trans(void *dst, const void *src, size_t size)
+static void pcm_scale_buffer_trans(void *dst,
+                                   const void *src,
+                                   unsigned long count)
 {
     int16_t *d = dst;
     const int16_t *s = src;
@@ -110,9 +114,9 @@ static void * pcm_scale_buffer_trans(void *dst, const void *src, size_t size)
     int32_t diff_l = (int32_t)new_factor_l - (int32_t)factor_l;
     int32_t diff_r = (int32_t)new_factor_r - (int32_t)factor_r;
 
-    for (size_t done = 0; done < size; done += PCM_SAMPLE_SIZE)
+    for (unsigned long done = 0; done < count; done++)
     {
-        int32_t sweep = (1 << 14) - fp14_cos(180*done / size); /* 0.0..2.0 */
+        int32_t sweep = (1 << 14) - fp14_cos(180*done / count); /* 0.0..2.0 */
         uint32_t f_l = fp_mul(sweep, diff_l, 15) + factor_l;
         uint32_t f_r = fp_mul(sweep, diff_r, 15) + factor_r;
         *d++ = clip_sample_16(pcm_scale_sample(f_l, *s++));
@@ -121,17 +125,17 @@ static void * pcm_scale_buffer_trans(void *dst, const void *src, size_t size)
 
     /* Select steady-state operation */
     pcm_sync_pcm_factors();
-
-    return dst;
 }
 
 /* Called by completion routine to scale the next buffer of samples */
 #ifndef PCM_SW_VOLUME_UNBUFFERED
-static inline
+static FORCE_INLINE
 #endif
-void pcm_sw_volume_copy_buffer(void *dst, const void *src, size_t size)
+void pcm_sw_volume_copy_buffer(void *dst,
+                               const void *src,
+                               unsigned long frames)
 {
-    pcm_scaling_fn(dst, src, size);
+    pcm_scaling_fn(dst, src, frames);
 }
 
 /* Assign the new scaling function for normal steady-state operation */
@@ -146,7 +150,7 @@ void pcm_sync_pcm_factors(void)
     if (new_factor_l == PCM_FACTOR_UNITY &&
         new_factor_r == PCM_FACTOR_UNITY)
     {
-        pcm_scaling_fn = memcpy;
+        pcm_scaling_fn = pcm_scale_buffer_unity;
     }
     else if (new_factor_l <= PCM_FACTOR_UNITY &&
              new_factor_r <= PCM_FACTOR_UNITY)
@@ -162,34 +166,32 @@ void pcm_sync_pcm_factors(void)
 #ifndef PCM_SW_VOLUME_UNBUFFERED
 /* source buffer from client */
 static const void * volatile src_buf_addr = NULL;
-static size_t volatile src_buf_rem = 0;
-
-#define PCM_PLAY_DBL_BUF_SIZE (PCM_PLAY_DBL_BUF_SAMPLE*PCM_SAMPLE_SIZE)
+static unsigned long volatile src_frames_rem = 0;
 
 /* double buffer and frame length control */
-static int16_t pcm_dbl_buf[2][PCM_PLAY_DBL_BUF_SAMPLES*2]
+static int16_t pcm_dbl_buf[2][PCM_PLAY_DBL_BUF_FRAMES*2]
         PCM_DBL_BUF_BSS MEM_ALIGN_ATTR;
-static size_t pcm_dbl_buf_size[2];
-static int pcm_dbl_buf_num = 0;
-static size_t frame_size;
-static unsigned int frame_count, frame_err, frame_frac;
+static unsigned long pcm_dbl_buf_frames[2];
+static unsigned int pcm_dbl_buf_num = 0;
+static unsigned long period_count, period_per, period_frac, period_err;
 
 /** Overrides of certain functions in pcm.c and pcm-internal.h **/
 
 bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
-                                    const void **addr, size_t *size)
+                                    const void **addr,
+                                    unsigned long *frames)
 {
     /* Check status callback first if error */
     if (status < PCM_DMAST_OK)
         status = pcm_play_call_status_cb(status);
 
-    size_t sz = pcm_dbl_buf_size[pcm_dbl_buf_num];
+    unsigned long count = pcm_dbl_buf_frames[pcm_dbl_buf_num];
 
-    if (status >= PCM_DMAST_OK && sz)
+    if (status >= PCM_DMAST_OK && count)
     {
         /* Do next chunk */
         *addr = pcm_dbl_buf[pcm_dbl_buf_num];
-        *size = sz;
+        *frames = count;
         return true;
     }
     else
@@ -203,15 +205,13 @@ bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
 /* Equitably divide large source buffers amongst double buffer frames;
    frames smaller than or equal to the double buffer chunk size will play
    in one chunk */
-static void update_frame_params(size_t size)
+static void update_period_params(unsigned long frames)
 {
-    int count    = size / PCM_SAMPLE_SIZE;
-    frame_count  = (count + PCM_PLAY_DBL_BUF_SAMPLES - 1) /
-                   PCM_PLAY_DBL_BUF_SAMPLES;
-    int perframe = count / frame_count;
-    frame_size   = perframe * PCM_SAMPLE_SIZE;
-    frame_frac   = count - perframe * frame_count;
-    frame_err    = 0;
+    period_count = (frames + PCM_PLAY_DBL_BUF_FRAMES - 1) /
+                   PCM_PLAY_DBL_BUF_FRAMES;
+    period_per   = frames / period_count;
+    period_frac  = frames - period_per * period_count;
+    period_err   = 0;
 }
 
 /* Obtain the next buffer and prepare it for pcm driver playback */
@@ -221,34 +221,34 @@ pcm_play_dma_status_callback_int(enum pcm_dma_status status)
     if (status != PCM_DMAST_STARTED)
         return status;
 
-    size_t size = pcm_dbl_buf_size[pcm_dbl_buf_num];
-    const void *addr = src_buf_addr + size;
+    unsigned long frames = pcm_dbl_buf_frames[pcm_dbl_buf_num];
+    const void *addr = src_buf_addr + frames * PCM_FRAME_SIZE;
 
-    size = src_buf_rem - size;
+    frames = src_frames_rem - frames;
 
-    if (size == 0 && pcm_get_more_int(&addr, &size))
+    if (!frames && pcm_get_more_int(&addr, &frames))
     {
-        update_frame_params(size);
+        update_period_params(frames);
         pcm_play_call_status_cb(PCM_DMAST_STARTED);
     }
 
     src_buf_addr = addr;
-    src_buf_rem = size;
+    src_frames_rem = frames;
 
-    if (size != 0)
+    if (frames)
     {
-        size = frame_size;
+        frames = period_per;
 
-        if ((frame_err += frame_frac) >= frame_count)
+        if ((period_err += period_frac) >= period_count)
         {
-            frame_err -= frame_count;
-            size += PCM_SAMPLE_SIZE;
+            period_err -= period_count;
+            frames++;
         }
     }
 
     pcm_dbl_buf_num ^= 1;
-    pcm_dbl_buf_size[pcm_dbl_buf_num] = size;
-    pcm_sw_volume_copy_buffer(pcm_dbl_buf[pcm_dbl_buf_num], addr, size);
+    pcm_dbl_buf_frames[pcm_dbl_buf_num] = frames;
+    pcm_sw_volume_copy_buffer(pcm_dbl_buf[pcm_dbl_buf_num], addr, frames);
 
     return PCM_DMAST_OK;
 }
@@ -260,21 +260,21 @@ static void start_pcm(bool reframe)
     pcm_sync_pcm_factors();
 
     pcm_dbl_buf_num = 0;
-    pcm_dbl_buf_size[0] = 0;
+    pcm_dbl_buf_frames[0] = 0;
 
     if (reframe)
-        update_frame_params(src_buf_rem);
+        update_period_params(src_frames_rem);
 
     pcm_play_dma_status_callback(PCM_DMAST_STARTED);
     pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 
-    pcm_play_dma_start(pcm_dbl_buf[1], pcm_dbl_buf_size[1]);
+    pcm_play_dma_start(pcm_dbl_buf[1], pcm_dbl_buf_frames[1]);
 }
 
-void pcm_play_dma_start_int(const void *addr, size_t size)
+void pcm_play_dma_start_int(const void *addr, unsigned long frames)
 {
     src_buf_addr = addr;
-    src_buf_rem = size;
+    src_frames_rem = frames;
     start_pcm(true);
 }
 
@@ -282,7 +282,7 @@ void pcm_play_dma_pause_int(bool pause)
 {
     if (pause)
         pcm_play_dma_pause(true);
-    else if (src_buf_rem)
+    else if (src_frames_rem)
         start_pcm(false);    /* Reprocess in case volume level changed */
     else
         pcm_play_stop_int(); /* Playing frame was last frame */
@@ -292,24 +292,26 @@ void pcm_play_dma_stop_int(void)
 {
     pcm_play_dma_stop();
     src_buf_addr = NULL;
-    src_buf_rem = 0;
+    src_frames_rem = 0;
 }
 
 /* Return playing buffer from the source buffer */
-const void * pcm_play_dma_get_peak_buffer_int(int *count)
+const void * pcm_play_dma_get_peak_buffer_int(unsigned long *frames_rem)
 {
     const void *addr = src_buf_addr;
-    size_t size = src_buf_rem;
+    unsigned int rem = src_frames_rem;
     const void *addr2 = src_buf_addr;
 
-    if (addr == addr2 && size)
+    if (addr == addr2 && rem)
     {
-        *count = size / PCM_SAMPLE_SIZE;
+        *frames_rem = rem;
         return addr;
     }
-
-    *count = 0;
-    return NULL;
+    else
+    {
+        *frames_rem = 0;
+        return NULL;
+    }
 }
 
 #endif /* PCM_SW_VOLUME_UNBUFFERED */

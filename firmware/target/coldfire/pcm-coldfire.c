@@ -236,15 +236,15 @@ void pcm_play_unlock(void)
 }
 
 /* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_start(const void *addr, unsigned long frames)
 {
     /* Stop any DMA in progress */
     pcm_play_dma_stop();
 
     /* Set up DMA transfer  */
-    SAR0 = (unsigned long)addr;   /* Source address      */
-    DAR0 = (unsigned long)&PDOR3; /* Destination address */
-    BCR0 = (unsigned long)size;   /* Bytes to transfer   */
+    SAR0 = (unsigned long)addr;    /* Source address      */
+    DAR0 = (unsigned long)&PDOR3;  /* Destination address */
+    BCR0 = (unsigned long)frames*4; /* Bytes to transfer   */
 
     DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA | DMA_SINC |
            DMA_SSIZE(DMA_SIZE_LINE) | DMA_START;
@@ -256,8 +256,9 @@ void pcm_play_dma_start(const void *addr, size_t size)
 void pcm_play_dma_stop(void)
 {
     and_l(~(DMA_EEXT | DMA_INT), &DCR0); /* per request and int OFF */
-    BCR0 = 0; /* No bytes remaining */
     DSR0 = 1; /* Clear interrupt, errors, stop transfer */
+    SAR0 = 0; /* No address */
+    BCR0 = 0; /* No bytes remaining */
 
     iis_play_reset_if_playback(true);
 
@@ -283,10 +284,10 @@ void pcm_play_dma_pause(bool pause)
     }
 } /* pcm_play_dma_pause */
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_get_frames_waiting(void)
 {
-    return BCR0 & 0xffffff;
-} /* pcm_get_bytes_waiting */
+    return (BCR0 & 0xffffff) / 4;
+} /* pcm_get_frames_waiting */
 
 /* DMA0 Interrupt is called when the DMA has finished transfering a chunk
    from the caller's buffer */
@@ -310,14 +311,14 @@ void DMA0(void)
     }
 
     const void *addr;
-    size_t size;
+    unsigned long frames;
 
     if (pcm_play_dma_complete_callback((res & 0x70) ?
                                        PCM_DMAST_ERR_DMA : PCM_DMAST_OK,
-                                       &addr, &size))
+                                       &addr, &frames))
     {
         SAR0 = (unsigned long)addr;      /* Source address */
-        BCR0 = (unsigned long)size;      /* Bytes to transfer */
+        BCR0 = (unsigned long)frames*4;  /* Bytes to transfer */
         or_l(DMA_EEXT | DMA_INT, &DCR0); /* per request and int ON */
 
         pcm_play_dma_status_callback(PCM_DMAST_STARTED);
@@ -325,18 +326,16 @@ void DMA0(void)
     /* else inished playing */
 } /* DMA0 */
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
+const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 {
-    unsigned long addr, cnt;
-
     /* Make sure interrupt doesn't change the second value after we read the
      * first value. */
     int level = set_irq_level(DMA_IRQ_LEVEL);
-    addr = SAR0;
-    cnt = BCR0;
+    unsigned long addr = SAR0;
+    unsigned long rem = BCR0;
     restore_irq(level);
 
-    *count = (cnt & 0xffffff) >> 2;
+    *frames_rem = (rem & 0xffffff) / 4;
     return (void *)((addr + 2) & ~3);
 } /* pcm_play_dma_get_peak_buffer */
 
@@ -349,6 +348,8 @@ static struct dma_lock dma_rec_lock =
     .locked = 0,
     .state = (1 << 15)  /* bit 15 is DMA1 */
 };
+
+static unsigned long rec_peak_addr; /* Point where peaks were last read */
 
 /* For the locks, DMA interrupt must be disabled when manipulating the lock
    if the handler ever calls these - right now things are arranged so it
@@ -365,7 +366,7 @@ void pcm_rec_unlock(void)
         coldfire_imr_mod(dma_rec_lock.state, 1 << 15);
 }
 
-void pcm_rec_dma_start(void *addr, size_t size)
+void pcm_rec_dma_start(void *addr, unsigned long frames)
 {
     /* Stop any DMA in progress */
     pcm_rec_dma_stop();
@@ -378,9 +379,10 @@ void pcm_rec_dma_start(void *addr, size_t size)
     INTERRUPTCLEAR = (1 << 25) | (1 << 24) | (1 << 23) | (1 << 22);
 #endif
 
-    SAR1 = (unsigned long)&PDIR2; /* Source address      */
-    DAR1 = (unsigned long)addr;   /* Destination address */
-    BCR1 = (unsigned long)size;   /* Bytes to transfer   */
+    rec_peak_addr = (unsigned long)addr;
+    SAR1 = (unsigned long)&PDIR2;    /* Source address      */
+    DAR1 = (unsigned long)addr;      /* Destination address */
+    BCR1 = (unsigned long)frames*4;  /* Bytes to transfer   */
 
     DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA | DMA_DINC |
            DMA_DSIZE(DMA_SIZE_LINE) | DMA_START;
@@ -392,7 +394,9 @@ void pcm_rec_dma_stop(void)
 {
     and_l(~(DMA_EEXT | DMA_INT), &DCR1); /* per request and int OFF */
     DSR1 = 1; /* Clear interrupt, errors, stop transfer */
+    DAR1 = 0; /* No address */
     BCR1 = 0; /* No bytes received */
+    rec_peak_addr = 0;
 
     or_l(PDIR2_FIFO_RESET, &DATAINCONTROL);
 
@@ -460,20 +464,28 @@ void DMA1(void)
 
     /* Inform PCM we have more data (or error) */
     void *addr;
-    size_t size;
+    unsigned long frames;
 
-    if (pcm_rec_dma_complete_callback(status, &addr, &size))
+    if (pcm_rec_dma_complete_callback(status, &addr, &frames))
     {
-        DAR1 = (unsigned long)addr;      /* Destination address */
-        BCR1 = (unsigned long)size;      /* Bytes to transfer */
-        or_l(DMA_EEXT | DMA_INT, &DCR1); /* per request and int ON */
+        rec_peak_addr = (unsigned long)addr;
+        DAR1 = (unsigned long)addr;       /* Destination address */
+        BCR1 = (unsigned long)frames*4;   /* Bytes to transfer */
+        or_l(DMA_EEXT | DMA_INT, &DCR1);  /* per request and int ON */
 
         pcm_rec_dma_status_callback(PCM_DMAST_STARTED);
     }
 } /* DMA1 */
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+const void * pcm_rec_dma_get_peak_buffer(unsigned long *frames_avail)
 {
-    return (void *)(DAR1 & ~3);
+    int level = set_irq_level(DMA_IRQ_LEVEL);
+    unsigned long addr = DAR1 & ~3;
+    unsigned long peakaddr = rec_peak_addr;
+    rec_peak_addr = addr;
+    restore_irq(level);
+
+    *frames_avail = (addr - peakaddr) / 4;
+    return (void *)peakaddr;
 } /* pcm_rec_dma_get_peak_buffer */
-#endif
+#endif /* HAVE_RECORDING */

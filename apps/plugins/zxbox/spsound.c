@@ -189,11 +189,11 @@ void autoclose_sound(void)
   }
 #endif
 }
-static void get_more(const void** start, size_t* size)
+static void get_more(const void** start, unsigned long* frames)
 {
     doneplay = 1;
     (void)start;
-    (void)size;
+    (void)frames;
 }
 
 /* sp_sound_buf is Unsigned 8 bit, Rate 8000 Hz, Mono */

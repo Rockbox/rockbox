@@ -320,18 +320,18 @@ int playing_time IBSS_ATTR;  /* How many seconds into the file have we been play
 int samples_this_second IBSS_ATTR;    /* How many samples produced during this second so far? */
 long bpm IBSS_ATTR;
 
-int32_t gmbuf[BUF_SIZE*NBUF];
+static int16_t gmbuf[NBUF][BUF_COUNT*2] ALIGNED_ATTR(4);
 static unsigned int samples_in_buf;
 
 bool midi_end = false;
 bool quit = false;
-bool swap = false;
-bool lastswap = true;
+static int swap = 0;
+static int lastswap = 1;
 
 static inline void synthbuf(void)
 {
-    int32_t *outptr;
-    int i = BUF_SIZE;
+    int16_t *outptr;
+    int i = BUF_COUNT;
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(true);
@@ -340,11 +340,9 @@ static inline void synthbuf(void)
     if (lastswap == swap)
         return;
     lastswap = swap;
-
-    outptr = (swap ? gmbuf : gmbuf+BUF_SIZE);
-#else
-    outptr = gmbuf;
 #endif
+    outptr = gmbuf[swap];
+
     if (midi_end) {
         samples_in_buf = 0;
         return;
@@ -365,13 +363,13 @@ static inline void synthbuf(void)
     }
 
     /* how many samples did we write to the buffer? */
-    samples_in_buf = BUF_SIZE-i;
+    samples_in_buf = BUF_COUNT-i;
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(false);
 #endif
 }
 
-static void get_more(const void** start, size_t* size)
+static void get_more(const void** start, unsigned long* frames)
 {
 #ifndef SYNC
     if(lastswap != swap)
@@ -383,12 +381,10 @@ static void get_more(const void** start, size_t* size)
     synthbuf();  /* For some reason midiplayer crashes when an update is forced */
 #endif
 
-    *size = samples_in_buf*sizeof(int32_t);
+    *frames = samples_in_buf;
+    *start = gmbuf[swap];
 #ifndef SYNC
-    *start = swap ? gmbuf : gmbuf + BUF_SIZE;
-    swap = !swap;
-#else
-    *start = gmbuf;
+    swap ^= 1;
 #endif
     if (samples_in_buf==0) {
         *start = NULL;
@@ -520,7 +516,7 @@ static int midimain(const void * filename)
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
                 rb->cpu_boost(false);
 #endif
-                lastswap = !swap;
+                lastswap = swap  ^ 1;
                 synthbuf();
                 midi_debug("Rewind to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
@@ -532,7 +528,7 @@ static int midimain(const void * filename)
             {
                 rb->pcm_play_stop();
                 seekForward(5);
-                lastswap = !swap;
+                lastswap = swap ^ 1;
                 synthbuf();
                 midi_debug("Skip to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)

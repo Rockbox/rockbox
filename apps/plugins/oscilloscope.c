@@ -1317,10 +1317,11 @@ static void waveform_buffer_done(void)
 }
     
 /* where the samples are obtained and buffered */
-static void waveform_buffer_callback(const void *start, size_t size)
+static void waveform_buffer_callback(const void *start, unsigned long frames)
 {
     size_t threshold = waveform_buffer_threshold;
     size_t have = waveform_buffer_have;
+    size_t size = frames * 4;
 
     if (have >= threshold)
     {
