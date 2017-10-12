@@ -74,8 +74,9 @@ extern const struct plugin_api * rb;
 #endif
 #endif
 
-#define BUF_SIZE 4096*8
-#define NBUF   2
+#define SAMPLE_SIZE (2*sizeof(int16_t))
+#define BUF_COUNT   (4096*2)
+#define NBUF        2
 
 /* LibMikMod defines */
 #define HAVE_SNPRINTF 1

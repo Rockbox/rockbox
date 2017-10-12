@@ -115,9 +115,15 @@ static void dma_play_callback(void *cb_data)
     const void *dataptr = cb_data;
 
     if (!pcm_remaining)
+    {
+        unsigned long frames;
+
         if (!pcm_play_dma_complete_callback(
-                     PCM_DMAST_OK, &dataptr, &pcm_remaining))
+                     PCM_DMAST_OK, &dataptr, &frames))
             return;
+
+        pcm_remaining = frames*4;
+    }
 
     uint32_t lastsize = MIN(WATERMARK_BYTES, pcm_remaining >> 1);
     pcm_remaining -= lastsize;
@@ -142,11 +148,11 @@ static void dma_play_callback(void *cb_data)
     pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 }
 
-void pcm_play_dma_start(const void* addr, size_t size)
+void pcm_play_dma_start(const void* addr, unsigned long frames)
 {
     pcm_play_dma_stop();
 
-    pcm_remaining = size;
+    pcm_remaining = frames*4;
     I2STXCOM = 0xe;
     dma_play_callback((void*)addr);
 }
@@ -224,27 +230,20 @@ void pcm_play_dma_postinit(void)
     audiohw_postinit();
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_get_frames_waiting(void)
 {
     size_t total_bytes;
     dmac_ch_get_info(&dma_play_ch, NULL, &total_bytes);
-    return total_bytes;
+    return total_bytes / 4;
 }
 
-const void* pcm_play_dma_get_peak_buffer(int *count)
+const void* pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 {
-    void *addr = dmac_ch_get_info(&dma_play_ch, count, NULL);
-    *count >>= 2; /* bytes to samples */
+    size_t total_bytes;
+    void *addr = dmac_ch_get_info(&dma_play_ch, &total_bytes, NULL);
+    *frames_rem = total_bytes / 4; /* bytes to frames */
     return addr; /* aligned to dest burst */
 }
-
-#ifdef HAVE_PCM_DMA_ADDRESS
-void * pcm_dma_addr(void *addr)
-{
-    return addr;
-}
-#endif
-
 
 /****************************************************************************
  ** Recording DMA transfer
@@ -345,9 +344,11 @@ static void dma_rec_callback(void *cb_data)
     else /* TASK_RECBUF */
     {
         /* Inform middle layer */
+        unsigned long frames;
         if (pcm_rec_dma_complete_callback(
-                    PCM_DMAST_OK, &rec_dma_addr, &rec_dma_size))
+                    PCM_DMAST_OK, &rec_dma_addr, &frames))
         {
+            rec_dma_size = frames*4;
             SIZE_PANIC(rec_dma_size);
             rec_dmac_ch_queue(rec_dma_addr + AHEADBUF_SZ,
                         rec_dma_size - AHEADBUF_SZ, TASK_RECBUF);
@@ -376,10 +377,13 @@ void pcm_rec_dma_stop(void)
     dmac_ch_stop(&dma_rec_ch);
 
     I2SRXCOM = 0x2; /* stop Rx I2S */
+    completed_task = -1;
 }
 
-void pcm_rec_dma_start(void *addr, size_t size)
+void pcm_rec_dma_start(void *addr, unsigned long frames)
 {
+    size_t size = frames * 4;
+
     SIZE_PANIC(size);
 
     pcm_rec_dma_stop();
@@ -421,30 +425,29 @@ void pcm_rec_dma_init(void)
     pcm_rec_initialized = true;
 }
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+const void * pcm_rec_dma_get_peak_buffer(unsigned long *frames_avail)
 {
-    void *dstaddr;
+    void *addr, *dmaaddr;
 
     pcm_rec_lock();
 
     if (completed_task == TASK_AHEADBUF) {
-        dstaddr = dmac_ch_get_info(&dma_rec_ch, NULL, NULL);
-
-        if ((dstaddr < rec_dma_addr) ||
-                    (dstaddr > rec_dma_addr + rec_dma_size))
-            /* At this moment, interrupt for TASK_RECBUF is waiting to
-               be handled. TASK_RECBUF is already finished and HW is
-               transfering next TASK_AHEADBUF. Return whole block. */
-            dstaddr = rec_dma_addr + rec_dma_size;
+        /* At this moment, interrupt for TASK_RECBUF is waiting to
+           be handled. TASK_RECBUF is already finished and HW is
+           transfering next TASK_AHEADBUF. Return whole block. */
+        dmaaddr = dmac_ch_get_info(&dma_rec_ch, NULL, NULL);
+        addr = rec_dma_addr;
+        *frames_avail = (dmaaddr - addr) / 4;
     }
     else {
         /* Ahead buffer not yet captured _and_ moved to
            record buffer. Return nothing. */
-        dstaddr = rec_dma_addr;
+        *frames_avail = 0;
+        addr = NULL;
     }
 
     pcm_rec_unlock();
 
-    return CACHEALIGN_DOWN(dstaddr);
+    return addr;
 }
 #endif /* HAVE_RECORDING */

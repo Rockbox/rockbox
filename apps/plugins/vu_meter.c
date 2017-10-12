@@ -749,8 +749,8 @@ static void analog_meter(void) {
     static struct pcm_peaks peaks;
     rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                       &peaks);
-    #define left_peak peaks.left
-    #define right_peak peaks.right
+    #define left_peak peaks.peak[0]
+    #define right_peak peaks.peak[1]
 #endif
 
     if(vumeter_settings.analog_use_db_scale) {
@@ -809,8 +809,8 @@ static void digital_meter(void) {
     static struct pcm_peaks peaks;
     rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                       &peaks);
-    #define left_peak peaks.left
-    #define right_peak peaks.right
+    #define left_peak peaks.peak[0]
+    #define right_peak peaks.peak[1]
 #endif
 
     if(vumeter_settings.digital_use_db_scale) {
