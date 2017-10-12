@@ -87,7 +87,9 @@ void imx233_clkctrl_set_div(enum imx233_clock_t clk, int div)
         case CLK_EMI: BF_WR(CLKCTRL_EMI, DIV(div)); break;
 #endif
         case CLK_SSP: BF_WR(CLKCTRL_SSP, DIV(div)); break;
-        case CLK_HBUS: BF_WR(CLKCTRL_HBUS, DIV(div)); break;
+        case CLK_HBUS:
+            /* make sure to switch to integer divide mode simulteanously */
+            BF_WR(CLKCTRL_HBUS, DIV_FRAC_EN(0), DIV(div)); break;
         case CLK_XBUS: BF_WR(CLKCTRL_XBUS, DIV(div)); break;
         default: return;
     }
@@ -107,7 +109,12 @@ int imx233_clkctrl_get_div(enum imx233_clock_t clk)
         case CLK_EMI: return BF_RD(CLKCTRL_EMI, DIV);
 #endif
         case CLK_SSP: return BF_RD(CLKCTRL_SSP, DIV);
-        case CLK_HBUS: return BF_RD(CLKCTRL_HBUS, DIV);
+        case CLK_HBUS:
+            /* since fractional and integer divider share the same field, clain it is disabled in frac mode */
+            if(BF_RD(CLKCTRL_HBUS, DIV_FRAC_EN))
+                return 0;
+            else
+                return BF_RD(CLKCTRL_HBUS, DIV);
         case CLK_XBUS: return BF_RD(CLKCTRL_XBUS, DIV);
         default: return 0;
     }
@@ -130,6 +137,14 @@ void imx233_clkctrl_set_frac_div(enum imx233_clock_t clk, int fracdiv)
         handle_frac(IO)
         handle_frac(CPU)
         handle_frac(EMI)
+        case CLK_HBUS:
+            if(fracdiv == 0)
+                panicf("Don't set hbus fracdiv to 0!");
+            /* value 0 is forbidden because we can't simply disabble the divider, it's always
+             * active but either in integer or fractional mode
+             * make sure we write both the value and frac_en bit at the same time */
+            BF_WR(CLKCTRL_HBUS, DIV_FRAC_EN(1), DIV(fracdiv));
+            break;
         default: break;
     }
 #undef handle_frac
@@ -151,6 +166,11 @@ int imx233_clkctrl_get_frac_div(enum imx233_clock_t clk)
         handle_frac(IO)
         handle_frac(CPU)
         handle_frac(EMI)
+        case CLK_HBUS:
+            if(BF_RD(CLKCTRL_HBUS, DIV_FRAC_EN))
+                return BF_RD(CLKCTRL_HBUS, DIV);
+            else
+                return 0;
         default: return 0;
     }
 #undef handle_frac
@@ -303,8 +323,12 @@ unsigned imx233_clkctrl_get_freq(enum imx233_clock_t clk)
             /* Derived from clk_p via integer/fractional div */
             unsigned ref = imx233_clkctrl_get_freq(CLK_CPU);
 #if IMX233_SUBTARGET >= 3700
+            /* if divider is in fractional mode, integer divider does not take effect (in fact it's
+             * the same divider but in a different mode ). Also the fractiona value is encoded as
+             * a fraction, not a divider */
             if(imx233_clkctrl_get_frac_div(CLK_HBUS) != 0)
                 ref = (ref * imx233_clkctrl_get_frac_div(CLK_HBUS)) / 32;
+            else
 #endif
             if(imx233_clkctrl_get_div(CLK_HBUS) != 0)
                 ref /= imx233_clkctrl_get_div(CLK_HBUS);
