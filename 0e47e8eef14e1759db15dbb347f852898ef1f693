@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e46220ed_69fd8506",
+        "filename": "apps/buffering.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 1705,
+      "author": {
+        "id": 1000541
+      },
+      "writtenOn": "2017-10-12T13:24:10Z",
+      "side": 1,
+      "message": "Probably shouldn\u0027t cancel if \u0027filling\u0027 becomes true again above it, just to avoid boost thrashing.",
+      "revId": "0e47e8eef14e1759db15dbb347f852898ef1f693",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
