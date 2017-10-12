@@ -77,5 +77,10 @@
 #define UNUSED_ATTR
 #endif
 
+#if defined(__GNUC__)
+#define ALIGNED_ATTR(x) __attribute__((aligned(x)))
+#else
+#error Alignment macro not defined.
+#endif
 
 #endif /* _GCC_EXTENSIONS_H_ */

@@ -98,7 +98,7 @@ static void afr_reduce_process(struct dsp_proc_entry *this,
     struct dsp_buffer *buf = *buf_p;
 
     for (int i = 0; i < 4; i++)
-        filter_process(&afr_filters[i], buf->p32, buf->remcount,
+        filter_process(&afr_filters[i], buf->p32, buf->frames_rem,
                        buf->format.num_channels);
 
     (void)this;

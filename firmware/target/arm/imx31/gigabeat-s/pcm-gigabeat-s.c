@@ -32,6 +32,9 @@
 #define DMA_PLAY_CH_PRIORITY 6
 #define DMA_REC_CH_PRIORITY 6
 
+#define PLAY_MSA_ADDR (CHANNEL_CONTEXT_ADDR(DMA_PLAY_CH_NUM)+0x0b)
+#define REC_MDA_ADDR  (CHANNEL_CONTEXT_ADDR(DMA_REC_CH_NUM)+0x0a)
+
 static struct buffer_descriptor dma_play_bd NOCACHEBSS_ATTR;
 
 static void play_dma_callback(void);
@@ -78,8 +81,9 @@ static struct dma_data dma_play_data =
     .state = 0
 };
 
-static void play_start_dma(const void *addr, size_t size)
+static void play_start_dma(const void *addr, unsigned long frames)
 {
+    size_t size = frames*4;
     commit_dcache_range(addr, size);
 
     dma_play_bd.buf_addr = (void *)addr_virt_to_phys((unsigned long)addr);
@@ -103,11 +107,11 @@ static void play_dma_callback(void)
     enum pcm_dma_status status = (dma_play_bd.mode.status & BD_RROR) ?
                   PCM_DMAST_ERR_DMA : PCM_DMAST_OK;
     const void *addr;
-    size_t size;
+    unsigned long frames;
 
-    if (pcm_play_dma_complete_callback(status, &addr, &size))
+    if (pcm_play_dma_complete_callback(status, &addr, &frames))
     {
-        play_start_dma(addr, size);
+        play_start_dma(addr, frames);
         pcm_play_dma_status_callback(PCM_DMAST_STARTED);
     }
 }
@@ -121,7 +125,7 @@ void pcm_play_unlock(void)
 {
     if (--dma_play_data.locked == 0 && dma_play_data.state != 0)
     {
-        int oldstatus = disable_irq_save();
+        unsigned long oldstatus = disable_irq_save();
         int pending = dma_play_data.callback_pending;
         dma_play_data.callback_pending = 0;
         restore_irq(oldstatus);
@@ -189,18 +193,16 @@ static void play_stop_pcm(void)
     {
         /* Stopping: clear buffer info to ensure 0-size readbacks when
          * stopped */
-        unsigned long dsa = 0;
         dma_play_bd.buf_addr = NULL;
         dma_play_bd.mode.count = 0;
-        discard_dcache_range(&dsa, sizeof(dsa));
-        sdma_write_words(&dsa, CHANNEL_CONTEXT_ADDR(DMA_PLAY_CH_NUM)+0x0b, 1);
+        sdma_write_word(PLAY_MSA_ADDR, 0);
     }
 
     /* Clear any pending callback */
     dma_play_data.callback_pending = 0;
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_start(const void *addr, unsigned long frames)
 {
     sdma_channel_stop(DMA_PLAY_CH_NUM);
 
@@ -215,7 +217,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     play_start_pcm();
 
     /* Begin DMA transfer */
-    play_start_dma(addr, size);
+    play_start_dma(addr, frames);
 }
 
 void pcm_play_dma_stop(void)
@@ -238,61 +240,44 @@ void pcm_play_dma_pause(bool pause)
     }
 }
 
-/* Return the number of bytes waiting - full L-R sample pairs only */
-size_t pcm_get_bytes_waiting(void)
+/* Return the number of frames remaining - full L-R sample pairs only */
+unsigned long pcm_get_frames_waiting(void)
 {
-    static unsigned long dsa NOCACHEBSS_ATTR;
-    long offs, size;
-    int oldstatus;
-
     /* read burst dma source address register in channel context */
-    sdma_read_words(&dsa, CHANNEL_CONTEXT_ADDR(DMA_PLAY_CH_NUM)+0x0b, 1);
+    unsigned long msa = sdma_read_word(PLAY_MSA_ADDR);
 
-    oldstatus = disable_irq_save();
-    offs = dsa - (unsigned long)dma_play_bd.buf_addr;
-    size = dma_play_bd.mode.count;
+    unsigned long oldstatus = disable_irq_save();
+    unsigned long buf = (unsigned long)dma_play_bd.buf_addr;
+    unsigned long bufend = buf + dma_play_bd.mode.count;
     restore_irq(oldstatus);
 
     /* Be addresses are coherent (no buffer change during read) */
-    if (offs >= 0 && offs < size)
-    {
-        return (size - offs) & ~3;
-    }
+    if (msa >= buf && msa < bufend)
+        return (bufend - msa) / 4;
 
     return 0;
 }
 
-/* Return a pointer to the samples and the number of them in *count */
-const void * pcm_play_dma_get_peak_buffer(int *count)
+/* Return a pointer to the frames and the number of them in *frames_rem */
+const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 {
-    static unsigned long dsa NOCACHEBSS_ATTR;
-    unsigned long addr;
-    long offs, size;
-    int oldstatus;
-
     /* read burst dma source address register in channel context */
-    sdma_read_words(&dsa, CHANNEL_CONTEXT_ADDR(DMA_PLAY_CH_NUM)+0x0b, 1);
+    unsigned long msa = sdma_read_word(PLAY_MSA_ADDR);
 
-    oldstatus = disable_irq_save();
-    addr = dsa;
-    offs = addr - (unsigned long)dma_play_bd.buf_addr;
-    size = dma_play_bd.mode.count;
+    unsigned long oldstatus = disable_irq_save();
+    unsigned long buf = (unsigned long)dma_play_bd.buf_addr;
+    unsigned long bufend = buf + dma_play_bd.mode.count;
     restore_irq(oldstatus);
 
     /* Be addresses are coherent (no buffer change during read) */
-    if (offs >= 0 && offs < size)
+    if (msa >= buf && msa < bufend)
     {
-        *count = (size - offs) >> 2;
-        return (void *)((addr + 2) & ~3);
+        *frames_rem = (bufend - msa) / 4;
+        return (void *)(msa & ~3);
     }
 
-    *count = 0;
+    *frames_rem = 0;
     return NULL;
-}
-
-void * pcm_dma_addr(void *addr)
-{
-    return (void *)addr_virt_to_phys((unsigned long)addr);
 }
 
 #ifdef HAVE_RECORDING
@@ -318,8 +303,9 @@ static struct dma_data dma_rec_data =
     .state = 0
 };
 
-static void rec_start_dma(void *addr, size_t size)
+static void rec_start_dma(void *addr, unsigned long frames)
 {
+    size_t size = frames*4;
     discard_dcache_range(addr, size);
 
     addr = (void *)addr_virt_to_phys((unsigned long)addr);
@@ -344,11 +330,11 @@ static void rec_dma_callback(void)
     enum pcm_dma_status status = (dma_rec_bd.mode.status & BD_RROR) ?
                                   PCM_DMAST_ERR_DMA : PCM_DMAST_OK;
     void *addr;
-    size_t size;
+    unsigned long frames;
 
-    if (pcm_rec_dma_complete_callback(status, &addr, &size))
+    if (pcm_rec_dma_complete_callback(status, &addr, &frames))
     {
-        rec_start_dma(addr, size);
+        rec_start_dma(addr, frames);
         pcm_rec_dma_status_callback(PCM_DMAST_STARTED);
     }
 }
@@ -362,7 +348,7 @@ void pcm_rec_unlock(void)
 {
     if (--dma_rec_data.locked == 0 && dma_rec_data.state != 0)
     {
-        int oldstatus = disable_irq_save();
+        unsigned long oldstatus = disable_irq_save();
         int pending = dma_rec_data.callback_pending;
         dma_rec_data.callback_pending = 0;
         restore_irq(oldstatus);
@@ -391,18 +377,16 @@ void pcm_rec_dma_stop(void)
     {
         /* Stopping: clear buffer info to ensure 0-size readbacks when
          * stopped */
-        unsigned long pda = 0;
         dma_rec_bd.buf_addr = NULL;
         dma_rec_bd.mode.count = 0;
-        discard_dcache_range(&pda, sizeof(pda));
-        sdma_write_words(&pda, CHANNEL_CONTEXT_ADDR(DMA_REC_CH_NUM)+0x0a, 1);
+        sdma_write_word(REC_MDA_ADDR, 0);
     }
 
     /* Clear any pending callback */
     dma_rec_data.callback_pending = 0;
 }
 
-void pcm_rec_dma_start(void *addr, size_t size)
+void pcm_rec_dma_start(void *addr, unsigned long frames)
 {
     pcm_rec_dma_stop();
 
@@ -420,7 +404,7 @@ void pcm_rec_dma_start(void *addr, size_t size)
     SSI_SIER1 |= SSI_SIER_RDMAE; /* Enable DMA req. */
 
     /* Begin DMA transfer */
-    rec_start_dma(addr, size);
+    rec_start_dma(addr, frames);
 
     dma_rec_data.state = 1; /* Check callback on unlock */
 }
@@ -440,25 +424,24 @@ void pcm_rec_dma_init(void)
     sdma_channel_set_priority(DMA_REC_CH_NUM, DMA_REC_CH_PRIORITY);
 }
 
-const void * pcm_rec_dma_get_peak_buffer(void)
+const void * pcm_rec_dma_get_peak_buffer(unsigned long *frames_avail)
 {
-    static unsigned long pda NOCACHEBSS_ATTR;
-    unsigned long buf, end, bufend;
-    int oldstatus;
-
     /* read burst dma destination address register in channel context */
-    sdma_read_words(&pda, CHANNEL_CONTEXT_ADDR(DMA_REC_CH_NUM)+0x0a, 1);
+    unsigned long mda = sdma_read_word(REC_MDA_ADDR) & ~3;
 
-    oldstatus = disable_irq_save();
-    end = pda;
-    buf = (unsigned long)dma_rec_bd.buf_addr;
-    bufend = buf + dma_rec_bd.mode.count;
+    unsigned long oldstatus = disable_irq_save();
+    unsigned long buf = (unsigned long)dma_rec_bd.buf_addr;
+    unsigned long bufend = buf + dma_rec_bd.mode.count;
     restore_irq(oldstatus);
 
-    /* Be addresses are coherent (no buffer change during read) */
-    if (end >= buf && end < bufend)
-        return (void *)(end & ~3);
+    /* Be sure addresses are coherent (no buffer change during read) */
+    if (mda >= buf && mda < bufend)
+    {
+        *frames_avail = (mda - buf) / 4;
+        return (void *)buf;
+    }
 
+    *frames_avail = 0;
     return NULL;
 }
 

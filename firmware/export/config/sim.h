@@ -9,9 +9,6 @@
 
 #undef CONFIG_I2C
 
-#undef HAVE_PCM_DMA_ADDRESS
-#undef HAVE_PCM_REC_DMA_ADDRESS
-
 #undef FLASH_SIZE
 
 #undef HAVE_ATA_POWER_OFF

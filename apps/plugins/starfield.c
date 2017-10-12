@@ -231,8 +231,8 @@ static int plugin_main(void)
             static struct pcm_peaks peaks;
             rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                               &peaks);
-            #define left_peak peaks.left
-            #define right_peak peaks.right
+            #define left_peak peaks.peak[0]
+            #define right_peak peaks.peak[1]
 #else
             int left_peak = rb->mas_codec_readreg(0xC);
             int right_peak = rb->mas_codec_readreg(0xD);

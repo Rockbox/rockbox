@@ -49,7 +49,7 @@ void sample_output_dithered(struct sample_io_data *this,
 void sample_output_mono(struct sample_io_data *this,
                         struct dsp_buffer *src, struct dsp_buffer *dst)
 {
-    int count = this->outcount;
+    unsigned long count = this->frames_out;
     const int32_t *s0 = src->p32[0];
     int16_t *d = dst->p16out;
     int scale = src->format.output_scale;
@@ -61,14 +61,14 @@ void sample_output_mono(struct sample_io_data *this,
         *d++ = lr;
         *d++ = lr;
     }
-    while (--count > 0);
+    while (--count);
 }
 
 /* write stereo internal format to output format */
 void sample_output_stereo(struct sample_io_data *this,
                           struct dsp_buffer *src, struct dsp_buffer *dst)
 {
-    int count = this->outcount;
+    unsigned long count = this->frames_out;
     const int32_t *s0 = src->p32[0];
     const int32_t *s1 = src->p32[1];
     int16_t *d = dst->p16out;
@@ -80,7 +80,7 @@ void sample_output_stereo(struct sample_io_data *this,
         *d++ = clip_sample_16((*s0++ + dc_bias) >> scale);
         *d++ = clip_sample_16((*s1++ + dc_bias) >> scale);
     }
-    while (--count > 0);
+    while (--count);
 }
 #endif /* CPU */
 
@@ -104,20 +104,20 @@ static struct dither_data
 void sample_output_dithered(struct sample_io_data *this,
                             struct dsp_buffer *src, struct dsp_buffer *dst)
 {
-    int count = this->outcount;
-    int channels = src->format.num_channels;
+    unsigned long count = this->frames_out;
+    unsigned int channels = src->format.num_channels;
     int scale = src->format.output_scale;
     int32_t dc_bias = 1L << (scale - 1); /* 1/2 bit of significance */
     int32_t mask = (1L << scale) - 1; /* Mask of bits quantized away */
 
-    for (int ch = 0; ch < channels; ch++)
+    for (unsigned int ch = 0; ch < channels; ch++)
     {
         struct dither_state *dither = &dither_data.state[ch];
 
         const int32_t *s = src->p32[ch];
         int16_t *d = &dst->p16out[ch];
 
-        for (int i = 0; i < count; i++, s++, d += 2)
+        for (unsigned long i = 0; i < count; i++, s++, d += 2)
         {
             /* Noise shape and bias (for correct rounding later) */
             int32_t sample = *s;
@@ -156,7 +156,7 @@ void sample_output_dithered(struct sample_io_data *this,
         int16_t s = *d++;
         *d++ = s;
     }
-    while (--count > 0);
+    while (--count);
 }
 
 /* Initialize the output function for settings and format */

@@ -23,7 +23,8 @@
 
 #include "lib/pluginlib_exit.h"
 
-#define BUF_SIZE 16384 /* 64 kB output buffers */
+#define SAMPLE_SIZE (2*sizeof(int16_t))
+#define BUF_COUNT 16384 /* 64 kB output buffers */
 #define NBUF   2
 
 #ifndef SIMULATOR
