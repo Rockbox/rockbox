@@ -77,9 +77,10 @@ void dsp_afr_enable(int var)
     if (var == afr_strength)
         return; /* No setting change */
 
-    bool was_enabled = afr_strength > 0;
     afr_strength = var;
 
+    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    bool was_enabled = dsp_proc_enabled(dsp, DSP_PROC_AFR);
     bool now_enabled = var > 0;
 
     if (was_enabled == now_enabled && !now_enabled)
@@ -88,7 +89,6 @@ void dsp_afr_enable(int var)
     /* If changing status, enable or disable it; if already enabled push
        additional DSP_PROC_INIT messages with value = 1 to force-update the
        filters */
-    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
     dsp_proc_enable(dsp, DSP_PROC_AFR, now_enabled);
 }
 

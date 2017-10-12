@@ -37,7 +37,7 @@
 #define B2_SIZE (B2_DLY+1)
 #define B0_SIZE (B0_DLY+1)
 
-static int pbe_strength = 100;
+static int pbe_strength = 0;
 static int pbe_precut = 0;
 static int32_t tcoef1, tcoef2, tcoef3;
 static int32_t *b0[2], *b2[2], *b3[2];
@@ -46,20 +46,21 @@ int32_t temp_buffer;
 static struct dsp_filter pbe_filter[5];
 static int handle = -1;
 
-static void pbe_buffer_alloc(void)
+#define PBE_BUFSIZE ((B0_SIZE + B2_SIZE + B3_SIZE)*2*sizeof(int32_t))
+
+static int pbe_buffer_alloc(void)
 {
-    if (handle > 0)
-        return; /* already-allocated */
+    handle = core_alloc("dsp_pbe_buffer", PBE_BUFSIZE);
+    return handle;
+}
 
-    unsigned int total_len = (B0_SIZE + B2_SIZE + B3_SIZE) * 2;
-    handle = core_alloc("dsp_pbe_buffer",sizeof(int32_t) * total_len);
-
+static void pbe_buffer_free(void)
+{
     if (handle < 0)
-    {
-        pbe_strength = 0;
         return;
-    }
-    memset(core_get_data(handle),0,sizeof(int32_t) * total_len);
+
+    core_free(handle);
+    handle = -1;
 }
 
 static void pbe_buffer_get_data(void)
@@ -76,12 +77,8 @@ static void pbe_buffer_get_data(void)
 
 static void dsp_pbe_flush(void)
 {
-    if (pbe_strength == 0)
-        return; /* Not currently enabled */
+    memset(core_get_data(handle), 0, PBE_BUFSIZE);
 
-    unsigned int total_len = (B0_SIZE + B2_SIZE + B3_SIZE) * 2;
-    if (handle > 0)
-        memset(core_get_data(handle),0,sizeof(int32_t) * total_len);
     b0_r[0] = 0; b0_w[0] = 0;
     b0_r[1] = 0; b0_w[1] = 0;
     b2_r[0] = 0; b2_w[0] = 0;
@@ -121,35 +118,28 @@ void dsp_pbe_precut(int var)
 
     pbe_precut = var;
 
-    if (pbe_strength == 0)
+    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+
+    if (!dsp_proc_enabled(dsp, DSP_PROC_PBE))
         return; /* Not currently enabled */
 
-    /* Push more DSP_PROC_INIT messages to force filter updates
-       (with value = 1) */
-    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
-    dsp_proc_enable(dsp, DSP_PROC_PBE, true);
+    pbe_update_filter(dsp_get_output_frequency(dsp));
 }
-
 
 void dsp_pbe_enable(int var)
 {
     if (var == pbe_strength)
         return; /* No change */
-    bool was_enabled = pbe_strength > 0;
+
     pbe_strength = var;
 
+    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    bool was_enabled = dsp_proc_enabled(dsp, DSP_PROC_PBE);
     bool now_enabled = var > 0;
 
     if (now_enabled == was_enabled)
         return; /* No change in enabled status */
 
-    if (now_enabled == false && handle > 0)
-    {
-        core_free(handle);
-        handle = -1;
-    }
-
-    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
     dsp_proc_enable(dsp, DSP_PROC_PBE, now_enabled);
 }
 
@@ -209,21 +199,28 @@ static intptr_t pbe_configure(struct dsp_proc_entry *this,
                                      intptr_t value)
 {
     /* This only attaches to the audio (codec) DSP */
+    intptr_t retval = 0;
 
     switch (setting)
     {
     case DSP_PROC_INIT:
-        if (value == 0)
-        {
-            /* Coming online; was disabled */
-            this->process = pbe_process;
-            pbe_buffer_alloc();
-            dsp_pbe_flush();
-            dsp_proc_activate(dsp, DSP_PROC_PBE, true);
-        }
-        /* else additional forced messages */
+        /* Coming online; was disabled */
+        retval = pbe_buffer_alloc();
+        if (retval < 0)
+            break;
 
+        this->process = pbe_process;
+
+        dsp_pbe_flush();
+
+        /* Wouldn't have been getting frequency updates */
         pbe_update_filter(dsp_get_output_frequency(dsp));
+        dsp_proc_activate(dsp, DSP_PROC_PBE, true);
+        break;
+
+    case DSP_PROC_CLOSE:
+        /* Being disabled (called also if init fails) */
+        pbe_buffer_free();
         break;
 
     case DSP_FLUSH:
@@ -237,7 +234,7 @@ static intptr_t pbe_configure(struct dsp_proc_entry *this,
         break;
     }
 
-    return 1;
+    return retval;
 }
 
 /* Database entry */
