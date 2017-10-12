@@ -27,7 +27,6 @@
 #include "dsp_filter.h"
 #include "core_alloc.h"
 
-static bool surround_enabled = false;
 static int surround_balance = 0;
 static bool surround_side_only = false;
 static int surround_mix = 100;
@@ -64,26 +63,25 @@ static int b0_r=0,b0_w=0,
            cl_r=0,cl_w=0;
 static int handle = -1;
 
-static void surround_buffer_alloc(void)
+#define SURROUND_BUFSIZE ((B0_DLY + B2_DLY + BB_DLY + HH_DLY + CL_DLY)*sizeof (int32_t))
+
+static int surround_buffer_alloc(void)
 {
-    if (handle > 0)
-        return; /* already-allocated */
+    handle = core_alloc("dsp_surround_buffer", SURROUND_BUFSIZE);
+    return handle;
+}
 
-    unsigned int total_len = B0_DLY + B2_DLY + BB_DLY + HH_DLY + CL_DLY;
-    handle = core_alloc("dsp_surround_buffer",sizeof(int32_t) * total_len);
-
+static void surround_buffer_free(void)
+{
     if (handle < 0)
-    {
-        surround_enabled = false;
         return;
-    }
-    memset(core_get_data(handle),0,sizeof(int32_t) * total_len);
+
+    core_free(handle);
+    handle = -1;
 }
 
 static void surround_buffer_get_data(void)
 {
-    if (handle < 0)
-        return;
     b0 = core_get_data(handle);
     b2 = b0 + B0_DLY;
     bb = b2 + B2_DLY;
@@ -93,12 +91,7 @@ static void surround_buffer_get_data(void)
 
 static void dsp_surround_flush(void)
 {
-    if (!surround_enabled)
-        return;
-
-    unsigned int total_len = B0_DLY + B2_DLY + BB_DLY + HH_DLY + CL_DLY;
-    if (handle > 0)
-        memset(core_get_data(handle),0,sizeof(int32_t) * total_len);
+    memset(core_get_data(handle), 0, SURROUND_BUFSIZE);
 }
 
 static void surround_update_filter(unsigned int fout)
@@ -116,8 +109,16 @@ void dsp_surround_set_balance(int var)
 
 void dsp_surround_side_only(bool var)
 {
-    dsp_surround_flush();
+    if (var == surround_side_only)
+        return; /* No setting change */
+
     surround_side_only = var;
+
+    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    if (!dsp_proc_enabled(dsp, DSP_PROC_SURROUND))
+        return;
+
+    dsp_surround_flush();
 }
 
 void dsp_surround_mix(int var)
@@ -127,12 +128,17 @@ void dsp_surround_mix(int var)
 
 void dsp_surround_set_cutoff(int frq_l, int frq_h)
 {
+    if (cutoff_l == frq_l && cutoff_h == frq_h)
+        return; /* No settings change */
+
     cutoff_l = frq_l;/*fx2*/
     cutoff_h = frq_h;/*fx1*/
 
     struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
-    unsigned int fout = dsp_get_output_frequency(dsp);
-    surround_update_filter(fout);
+    if (!dsp_proc_enabled(dsp, DSP_PROC_SURROUND))
+        return;
+
+    surround_update_filter(dsp_get_output_frequency(dsp));
 }
 
 static void surround_set_stepsize(int surround_strength)
@@ -163,23 +169,21 @@ void dsp_surround_enable(int var)
     if (var == surround_strength)
         return; /* No setting change */
 
-    bool was_enabled = surround_strength > 0;
     surround_strength = var;
-    surround_set_stepsize(surround_strength);
 
+    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    bool was_enabled = dsp_proc_enabled(dsp, DSP_PROC_SURROUND);
     bool now_enabled = var > 0;
 
     if (was_enabled == now_enabled && !now_enabled)
         return; /* No change in enabled status */
 
-    if (now_enabled == false && handle > 0)
-    {
-        core_free(handle);
-        handle = -1;
-    }
-    surround_enabled = now_enabled;
+    if (now_enabled)
+        surround_set_stepsize(var);
 
-    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
+    /* If changing status, enable or disable it; if already enabled push
+       additional DSP_PROC_INIT messages with value = 1 to force-update the
+       filters */
     dsp_proc_enable(dsp, DSP_PROC_SURROUND, now_enabled);
 }
 
@@ -284,42 +288,82 @@ static void surround_process(struct dsp_proc_entry *this,
     (void)this;
 }
 
+/* Handle format changes and verify the format compatibility */
+static intptr_t surround_new_format(struct dsp_proc_entry *this,
+                                    struct dsp_config *dsp,
+                                    struct sample_format *format)
+{
+    DSP_PRINT_FORMAT(DSP_PROC_SURROUND, *format);
+
+    /* Stereo mode only */
+    bool was_active = dsp_proc_active(dsp, DSP_PROC_SURROUND);
+    bool now_active = format->num_channels > 1;
+    dsp_proc_activate(dsp, DSP_PROC_SURROUND, now_active);
+
+    if (now_active)
+    {
+        if (!was_active)
+            dsp_surround_flush(); /* Going online */
+
+        return PROC_NEW_FORMAT_OK;
+    }
+
+    /* Can't do this. Sleep until next change. */
+    DEBUGF("  DSP_PROC_SURROUND- deactivated\n");
+    return PROC_NEW_FORMAT_DEACTIVATED;
+
+    (void)this;
+}
+
 /* DSP message hook */
 static intptr_t surround_configure(struct dsp_proc_entry *this,
                                      struct dsp_config *dsp,
                                      unsigned int setting,
                                      intptr_t value)
 {
-    unsigned int fout = dsp_get_output_frequency(dsp);
+    intptr_t retval = 0;
+
     switch (setting)
     {
     case DSP_PROC_INIT:
         if (value == 0)
         {
+            retval = surround_buffer_alloc();
+            if (retval < 0)
+                break;
+
             this->process = surround_process;
-            surround_buffer_alloc();
-            dsp_surround_flush();
-            dsp_proc_activate(dsp, DSP_PROC_SURROUND, true);
         }
-        else
-            surround_update_filter(fout);
+        /* else additional forced messages */
+
+        surround_update_filter(dsp_get_output_frequency(dsp));
         break;
+
+    case DSP_PROC_CLOSE:
+        /* Being disabled (called also if init fails) */
+        surround_buffer_free();
+        break;
+
     case DSP_FLUSH:
+        /* Discontinuity; clear filters */
         dsp_surround_flush();
         break;
-   case DSP_SET_OUT_FREQUENCY:
+
+    case DSP_SET_OUT_FREQUENCY:
+        /* New output frequency */
         surround_update_filter(value);
         break;
-   case DSP_PROC_CLOSE:
+
+    case DSP_PROC_NEW_FORMAT:
+        /* Source buffer format is changing (also sent when first enabled) */
+        retval = surround_new_format(this, dsp, (struct sample_format *)value);
         break;
     }
 
-    return 1;
-    (void)dsp;
+    return retval;
 }
 
 /* Database entry */
 DSP_PROC_DB_ENTRY(
     SURROUND,
     surround_configure);
-
