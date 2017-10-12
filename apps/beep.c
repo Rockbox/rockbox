@@ -29,37 +29,30 @@
 /** Beep generation, CPU optimized **/
 #include "asm/beep.c"
 
-static uint32_t beep_phase;     /* Phase of square wave generator */
-static uint32_t beep_step;      /* Step of square wave generator on each sample */
-#ifdef BEEP_GENERIC
-static int16_t  beep_amplitude; /* Amplitude of square wave generator */
-#else
-/* Optimized routines do XOR with phase sign bit in both channels at once */
-static uint32_t beep_amplitude; /* Amplitude of square wave generator */
-#endif
-static int beep_count;          /* Number of samples remaining to generate */
+static uint32_t beep_phase;      /* Phase of square wave generator */
+static uint32_t beep_step;       /* Step of square wave generator on each sample */
+static unsigned int beep_rem;    /* Number of samples remaining to generate */
 
 #define BEEP_COUNT(fs, duration) ((fs) / 1000 * (duration))
 
 /* Reserve enough static space for keyclick to fit in worst case */
 #define BEEP_BUF_COUNT  BEEP_COUNT(PLAY_SAMPR_MAX, KEYCLICK_DURATION)
-static int16_t beep_buf[BEEP_BUF_COUNT*2] IBSS_ATTR __attribute__((aligned(4)));
+static int16_t beep_buf[BEEP_BUF_COUNT*2] IBSS_ATTR ALIGNED_ATTR(4);
 
 /* Callback to generate the beep frames - also don't want inlining of
    call below in beep_play */
-static void __attribute__((noinline))
-beep_get_more(const void **start, size_t *size)
+static NO_INLINE void
+beep_get_more(const void **start, unsigned long *frames)
 {
-    int count = beep_count;
+    unsigned int rem = beep_rem;
 
-    if (count > 0)
+    if (rem)
     {
-        count = MIN(count, BEEP_BUF_COUNT);
-        beep_count -= count;
+        rem = MIN(rem, BEEP_BUF_COUNT);
+        beep_rem -= rem;
         *start = beep_buf;
-        *size = count * 2 * sizeof (int16_t);
-        beep_generate((void *)beep_buf, count, &beep_phase,
-                      beep_step, beep_amplitude);
+        *frames = rem;
+        beep_generate(beep_buf, rem, &beep_phase, beep_step);
     }
 }
 
@@ -80,24 +73,19 @@ void beep_play(unsigned int frequency, unsigned int duration,
     uint32_t fout = mixer_get_frequency();
     beep_phase = 0;
     beep_step = fp_div(frequency, fout, 32);
-    beep_count = BEEP_COUNT(fout, duration);
-
-#ifdef BEEP_GENERIC
-    beep_amplitude = amplitude;
-#else
-    /* Optimized routines do XOR with phase sign bit in both channels at once */
-    beep_amplitude = amplitude | (amplitude << 16); /* Word:|AMP16|AMP16| */
-#endif
+    beep_rem = BEEP_COUNT(fout, duration);
 
     /* If it fits - avoid cb overhead */
     const void *start;
-    size_t size;
+    unsigned long count;
 
     /* Generate first frame here */
-    beep_get_more(&start, &size);
+    beep_get_more(&start, &count);
 
-    mixer_channel_set_amplitude(PCM_MIXER_CHAN_BEEP, MIX_AMP_UNITY);
+    mixer_channel_set_amplitude(PCM_MIXER_CHAN_BEEP,
+                                amplitude*MIX_AMP_UNITY / INT16_MAX);
+
     mixer_channel_play_data(PCM_MIXER_CHAN_BEEP,
-                            beep_count ? beep_get_more : NULL,
-                            start, size);
+                            beep_rem ? beep_get_more : NULL,
+                            start, count);
 }

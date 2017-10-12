@@ -33,7 +33,7 @@ extern JNIEnv *env_ptr;
 
 /* infos about our pcm chunks */
 static const void *pcm_data_start;
-static size_t  pcm_data_size;
+static unsigned long pcm_data_frames;
 static int     audio_locked = 0;
 static pthread_mutex_t audio_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -78,18 +78,21 @@ Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
 
     jint left = max_size;
 
-    if (!pcm_data_size) /* get some initial data */
+    if (!pcm_data_frames) /* get some initial data */
     {
         new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK,
-                            &pcm_data_start, &pcm_data_size);
+                            &pcm_data_start, &pcm_data_frames);
     }
 
-    while(left > 0 && pcm_data_size)
+    while(left > 0 && pcm_data_frames)
     {
         jint ret;
-        jsize transfer_size = MIN((size_t)left, pcm_data_size);
+        jsize transfer_size = pcm_data_frames*4;
+        if ((jsize)left < transfer_size)
+            transfer_size = left;
+
         /* decrement both by the amount we're going to write */
-        pcm_data_size -= transfer_size; left -= transfer_size;
+        pcm_data_frames -= transfer_size / 4; left -= transfer_size;
         (*env)->SetByteArrayRegion(env, temp_array, 0,
                                         transfer_size, (jbyte*)pcm_data_start);
 
@@ -117,10 +120,10 @@ Java_org_rockbox_RockboxPCM_nativeWrite(JNIEnv *env, jobject this,
             return ret;
         }
 
-        if (pcm_data_size == 0) /* need new data */
+        if (!pcm_data_frames) /* need new data */
         {
             new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK,
-                                &pcm_data_start, &pcm_data_size);
+                                &pcm_data_start, &pcm_data_frames);
         }
         else /* increment data pointer and feed more */
             pcm_data_start += transfer_size;
@@ -149,10 +152,10 @@ void pcm_dma_apply_settings(void)
 {
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_start(const void *addr, unsigned long frames)
 {
     pcm_data_start = addr;
-    pcm_data_size = size;
+    pcm_data_frames = frames;
     
     pcm_play_dma_pause(false);
 }
@@ -176,15 +179,19 @@ void pcm_play_dma_pause(bool pause)
                                (int)pause);
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_get_frames_waiting(void)
 {
-    return pcm_data_size;
+    return pcm_data_frames;
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
+const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 {
-    uintptr_t addr = (uintptr_t)pcm_data_start;
-    *count = pcm_data_size / 4;
+    lock_audio();
+    uintptr_t addr = (uintptr_t)*(const volatile void *)&pcm_data_start;
+    unsigned long frames = pcm_data_frames;
+    unlock_audio();
+
+    *frames_rem = frames;
     return (void *)((addr + 3) & ~3);
 }
 

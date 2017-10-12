@@ -61,15 +61,15 @@ void pcm_play_dma_stop(void)
     locked = 1;
 }
 
-static void hdma_i2s_transfer(const void *addr, size_t size)
+static void hdma_i2s_transfer(const void *addr, unsigned long frames)
 {
     SCU_CLKCFG &= ~CLKCFG_HDMA; /* enable HDMA clock */
 
-    commit_discard_dcache_range(addr, size);
+    commit_discard_dcache_range(addr, frames*4);
 
     HDMA_ISRC0 = (uint32_t)addr;               /* source address */
     HDMA_IDST0 = (uint32_t)&I2S_TXR;           /* i2s tx fifo */
-    HDMA_ICNT0 = (uint16_t)((size>>2) - 1);    /* number of dma transactions
+    HDMA_ICNT0 = (uint16_t)(frames - 1);       /* number of dma transactions
                                                 * of transfer size bytes
                                                 * (zero based)
                                                 */
@@ -105,13 +105,13 @@ static void hdma_i2s_transfer(const void *addr, size_t size)
                   (1<<0));   /* hardware trigger DMA mode */
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_start(const void *addr, unsigned long frames)
 {
     /* Stop any DMA in progress */
     pcm_play_dma_stop();
 
     /* kick in DMA transfer */
-    hdma_i2s_transfer(addr, size);
+    hdma_i2s_transfer(addr, frames);
 }
 
 /* pause DMA transfer by disabling clock to DMA module */
@@ -265,35 +265,35 @@ void pcm_dma_apply_settings(void)
     audiohw_set_frequency(pcm_fsel);
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_get_frames_waiting(void)
 {
     /* current terminate count is in transfer size units (4bytes here) */
-    return (HDMA_CCNT0 & 0xffff)<<2;
+    return HDMA_CCNT0 & 0xffff;
 }
 
 /* audio DMA ISR called when chunk from callers buffer has been transfered */
 void INT_HDMA(void)
 {
     const void *start;
-    size_t size;
+    unsigned long frames;
 
-    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
+    if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &frames))
     {
-        hdma_i2s_transfer(start, size);
+        hdma_i2s_transfer(start, frames);
         pcm_play_dma_status_callback(PCM_DMAST_STARTED);
     }
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
+const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 {
-    uint32_t addr;
+    unsigned long addr;
     
     int old = disable_irq_save();
     addr = HDMA_CSRC0;
-    *count = ((HDMA_CCNT0 & 0xffff)<<2);
+    *frames_rem = HDMA_CCNT0 & 0xffff;
     restore_interrupt(old);
 
-    return (void*)addr;
+    return (void *)addr;
 }
 
 /****************************************************************************

@@ -444,9 +444,9 @@ static void commit_write_buffer(size_t size)
 }
 
 /* Request space in the buffer for writing output samples */
-void * pcmbuf_request_buffer(int *count)
+void * pcmbuf_request_buffer(unsigned long *frames)
 {
-    size_t size = *count * PCMBUF_SAMPLE_SIZE;
+    size_t size = *frames * PCMBUF_SAMPLE_SIZE;
 
 #ifdef HAVE_CROSSFADE
     /* We're going to crossfade to a new track, which is now on its way */
@@ -521,14 +521,15 @@ void * pcmbuf_request_buffer(int *count)
         buf = get_write_buffer(&size);
     }
 
-    *count = size / PCMBUF_SAMPLE_SIZE;
+    *frames = size / PCMBUF_SAMPLE_SIZE;
     return buf;
 }
 
 /* Handle new samples to the buffer */
-void pcmbuf_write_complete(int count, unsigned long elapsed, off_t offset)
+void pcmbuf_write_complete(unsigned long frames, unsigned long elapsed,
+                           off_t offset)
 {
-    size_t size = count * PCMBUF_SAMPLE_SIZE;
+    size_t size = frames * PCMBUF_SAMPLE_SIZE;
 
 #ifdef HAVE_CROSSFADE
     if (crossfade_status != CROSSFADE_INACTIVE)
@@ -785,7 +786,7 @@ void pcmbuf_start_track_change(enum pcm_track_change_type type)
 /** Playback */
 
 /* PCM driver callback */
-static void pcmbuf_pcm_callback(const void **start, size_t *size)
+static void pcmbuf_pcm_callback(const void **start, unsigned long *frames)
 {
     /*- Process the chunk that just finished -*/
     size_t index = chunk_ridx;
@@ -810,7 +811,7 @@ static void pcmbuf_pcm_callback(const void **start, size_t *size)
         current_desc = desc = index_chunkdesc(index);
 
         *start = index_buffer(index);
-        *size = desc->size;
+        *frames = desc->size / PCMBUF_SAMPLE_SIZE;
 
         if (desc->pos_key != 0)
         {

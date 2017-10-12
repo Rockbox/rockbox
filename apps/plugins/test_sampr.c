@@ -39,9 +39,8 @@ static unsigned int gen_thread_id;
 #define OUTPUT_CHUNK_COUNT (1 << 1)
 #define OUTPUT_CHUNK_MASK (OUTPUT_CHUNK_COUNT-1)
 #define OUTPUT_CHUNK_SAMPLES 1152
-#define OUTPUT_CHUNK_SIZE (OUTPUT_CHUNK_SAMPLES*sizeof(int16_t)*2)
-static uint16_t output_buf[OUTPUT_CHUNK_COUNT][OUTPUT_CHUNK_SAMPLES*2]
-        __attribute__((aligned(4)));
+static int16_t output_buf[OUTPUT_CHUNK_COUNT][OUTPUT_CHUNK_SAMPLES*2]
+        ALIGNED_ATTR(4);
 static int output_head IBSS_ATTR;
 static int output_tail IBSS_ATTR;
 static int output_step IBSS_ATTR;
@@ -90,14 +89,14 @@ static int16_t ICODE_ATTR fsin(uint32_t phase)
 }
 
 /* ISR handler to get next block of data */
-static void get_more(const void **start, size_t *size)
+static void get_more(const void **start, unsigned long *frames)
 {
     /* Free previous buffer */
     output_head += output_step;
     output_step = 0;
 
     *start = output_buf[output_head & OUTPUT_CHUNK_MASK];
-    *size  = OUTPUT_CHUNK_SIZE;
+    *frames = OUTPUT_CHUNK_SAMPLES;
 
     /* Keep repeating previous if source runs low */
     if (output_head != output_tail)

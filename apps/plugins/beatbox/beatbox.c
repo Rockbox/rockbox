@@ -142,8 +142,8 @@
 
 #endif
 
-
-#define BUF_SIZE 256
+#define SAMPLE_SIZE (2*sizeof(int16_t))
+#define BUF_COUNT 256
 #define NBUF   2
 
 #undef SYNC
@@ -213,7 +213,7 @@ const unsigned char * drumNames[]={
     "Open Surdo     "
 };
 
-long gmbuf[BUF_SIZE*NBUF];
+static int16_t gmbuf[NBUF][BUF_COUNT*2] ALIGNED_ATTR(4);
 
 int quit=0;
 
@@ -316,12 +316,12 @@ enum plugin_status plugin_start(const void* parameter)
     return PLUGIN_OK;
 }
 
-bool swap=0;
-bool lastswap=1;
+static int swap=0;
+static int lastswap=1;
 
 inline void synthbuf(void)
 {
-   long *outptr;
+   int16_t *outptr;
    register int i;
    static int currentSample=0;
    int synthtemp[2];
@@ -329,18 +329,17 @@ inline void synthbuf(void)
 #ifndef SYNC
    if(lastswap==swap) return;
    lastswap=swap;
-
-   outptr=(swap ? gmbuf : gmbuf+BUF_SIZE);
-#else
-   outptr=gmbuf;
 #endif
+   outptr=gmbuf[swap];
 
-   for(i=0; i<BUF_SIZE/2; i++)
+   for(i=0; i<BUF_COUNT; i++)
    {
       synthSample(&synthtemp[0], &synthtemp[1]);
       currentSample++;
-      *outptr=((synthtemp[0]&0xFFFF) << 16) | (synthtemp[1]&0xFFFF);
-      outptr++;
+
+      *outptr++ = synthtemp[0] & 0xFFFF;
+      *outptr++ = synthtemp[1] & 0xFFFF;
+
       if(currentSample==numberOfSamples)
       {
             if(playState == STATE_PLAYING)
@@ -516,7 +515,7 @@ void redrawScreen(unsigned char force)
     rb->lcd_update();
 }
 
-void get_more(const void** start, size_t* size)
+void get_more(const void** start, unsigned int* count)
 {
 #ifndef SYNC
     if(lastswap!=swap)
@@ -528,12 +527,11 @@ void get_more(const void** start, size_t* size)
     synthbuf();  // For some reason midiplayer crashes when an update is forced
 #endif
 
-    *size = BUF_SIZE*sizeof(short);
+    *count = BUF_COUNT;
+    *start = gmbuf[swap];
+
 #ifndef SYNC
-    *start = swap ? gmbuf : gmbuf + BUF_SIZE;
-    swap=!swap;
-#else
-    *start = gmbuf;
+    swap ^= 1;
 #endif
 }
 

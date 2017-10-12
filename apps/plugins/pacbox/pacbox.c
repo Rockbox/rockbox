@@ -275,7 +275,7 @@ static bool pacbox_menu(void)
 
 /* Sound is emulated in ISR context, so not much is done per sound frame */
 #define NBSAMPLES    128
-static uint32_t sound_buf[NBSAMPLES];
+static int16_t sound_buf[NBSAMPLES*2] ALIGNED_ATTR(4);
 #if CONFIG_CPU == MCF5249
 /* Not enough to put this in IRAM */
 static int16_t raw_buf[NBSAMPLES];
@@ -286,28 +286,26 @@ static int16_t raw_buf[NBSAMPLES] IBSS_ATTR;
 /*
     Audio callback
  */
-static void get_more(const void **start, size_t *size)
+static void get_more(const void **start, unsigned long *frames)
 {
-    int32_t *out, *outend;
-    int16_t *raw;
+    int16_t *raw, *out;
 
     /* Emulate the audio for the current register settings */
     playSound(raw_buf, NBSAMPLES);
 
-    out = sound_buf;
-    outend = out + NBSAMPLES;
     raw = raw_buf;
+    out = sound_buf;
 
     /* Convert to stereo */
-    do
+    for (unsigned int i = NBSAMPLES; i; i--)
     {
-        uint32_t sample = (uint16_t)*raw++;
-        *out++ = sample | (sample << 16);
+        int16_t sample = *raw++;
+        *out++ = sample;
+        *out++ = sample;
     }
-    while (out < outend);
 
     *start = sound_buf;
-    *size = NBSAMPLES*sizeof(sound_buf[0]); 
+    *frames = NBSAMPLES; 
 }
 
 /*

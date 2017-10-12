@@ -53,7 +53,7 @@ enum tdspeed_ops
 static struct tdspeed_state_s
 {
     struct dsp_proc_entry *this; /* this stage */
-    int channels;           /* number of audio channels */
+    unsigned int channels;  /* number of audio channels */
     int32_t samplerate;     /* current samplerate of input data */
     int32_t factor;         /* stretch factor (perdecimille) */
     int32_t shift_max;      /* maximum displacement on a frame */
@@ -119,7 +119,7 @@ static void tdspeed_flush(void)
     struct tdspeed_state_s *st = &tdspeed_state;
     st->ovl_size = 0;
     st->ovl_shift = 0;
-    dsp_outbuf.remcount = 0; /* Dump remaining output */
+    dsp_outbuf.frames_rem = 0; /* Dump remaining output */
 }
 
 static bool tdspeed_update(int32_t samplerate, int32_t factor)
@@ -170,12 +170,13 @@ static bool tdspeed_update(int32_t samplerate, int32_t factor)
     return true;
 }
 
-static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
-                         int data_len, enum tdspeed_ops op, int *consumed)
+static unsigned long tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
+                                   unsigned int data_len, enum tdspeed_ops op,
+                                   unsigned long *consumed)
 /* data_len in samples */
 {
     struct tdspeed_state_s *const st = &tdspeed_state;
-    int32_t src_frame_sz = st->shift_max + st->dst_step;
+    uint32_t src_frame_sz = st->shift_max + st->dst_step;
 
     if (st->dst_step > st->src_step)
         src_frame_sz += st->dst_step - st->src_step;
@@ -193,7 +194,7 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
 
         /* append just enough data to have all of the overlap buffer consumed */
         int32_t steps = (have - 1) / st->src_step;
-        int32_t copy = steps * st->src_step + src_frame_sz - have;
+        uint32_t copy = steps * st->src_step + src_frame_sz - have;
 
         if (copy < src_frame_sz - st->dst_step)
             copy += st->src_step;  /* one more step to allow for pregap data */
@@ -203,7 +204,7 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
 
         assert(st->ovl_size + copy <= FIXED_BUFCOUNT);
 
-        for (int ch = 0; ch < st->channels; ch++)
+        for (unsigned int ch = 0; ch < st->channels; ch++)
         {
             memcpy(st->ovl_buff[ch] + st->ovl_size, buf_in[ch],
                    copy * sizeof(int32_t));
@@ -273,7 +274,7 @@ static int tdspeed_apply(int32_t *buf_out[2], int32_t *buf_in[2],
         {
             int64_t delta = 0;
 
-            for (int ch = 0; ch < st->channels; ch++)
+            for (unsigned int ch = 0; ch < st->channels; ch++)
             {
                 int32_t *curr = buf_in[ch] + next_frame + i;
                 int32_t *prev = buf_in[ch] + prev_frame;
@@ -294,7 +295,7 @@ skip:;
         }
 
         /* overlap fading-out previous frame with fading-in current frame */
-        for (int ch = 0; ch < st->channels; ch++)
+        for (unsigned int ch = 0; ch < st->channels; ch++)
         {
             int32_t *curr = buf_in[ch] + next_frame + shift;
             int32_t *prev = buf_in[ch] + prev_frame;
@@ -333,7 +334,7 @@ skip:;
         st->ovl_size = data_len - i;
         assert(st->ovl_size <= FIXED_BUFCOUNT);
 
-        for (int ch = 0; ch < st->channels; ch++)
+        for (unsigned int ch = 0; ch < st->channels; ch++)
         {
             memmove(st->ovl_buff[ch], buf_in[ch] + i,
                     st->ovl_size * sizeof(int32_t));
@@ -357,7 +358,7 @@ skip:;
         /* last call: purge all remaining data to output buffer */
         int i = data_len - prev_frame;
 
-        for (int ch = 0; ch < st->channels; ch++)
+        for (unsigned int ch = 0; ch < st->channels; ch++)
         {
             assert(dest[ch] + i <= buf_out[ch] + out_size);
             memcpy(dest[ch], buf_in[ch] + prev_frame, i * sizeof(int32_t));
@@ -426,28 +427,28 @@ static void tdspeed_process(struct dsp_proc_entry *this,
 
     *buf_p = dst; /* switch to our buffer */
 
-    int count = dst->remcount;
+    unsigned long count = dst->frames_rem;
 
-    if (count > 0)
+    if (count)
         return; /* output remains from an earlier call */
 
     dst->p32[0] = outbuf[0];
     dst->p32[1] = outbuf[src->format.num_channels - 1];
 
-    if (src->remcount > 0)
+    if (src->frames_rem)
     {
-        dst->bufcount = 0; /* use this to get consumed src */
+        dst->frames = 0; /* use this to get consumed src */
         count = tdspeed_apply(dst->p32, src->p32,
-                              MIN(src->remcount, MAX_INPUTCOUNT),
-                              TDSOP_PROCESS, &dst->bufcount);
+                              MIN(src->frames_rem, MAX_INPUTCOUNT),
+                              TDSOP_PROCESS, &dst->frames);
 
         /* advance src by samples consumed */
-        if (dst->bufcount > 0)
-            dsp_advance_buffer32(src, dst->bufcount);
+        if (dst->frames)
+            dsp_advance_buffer32(src, dst->frames);
     }
     /* else purged dsp_outbuf */
 
-    dst->remcount = count;
+    dst->frames_rem = count;
 
     /* inherit in-place processed mask from source buffer */
     dst->proc_mask = src->proc_mask;
@@ -462,14 +463,14 @@ static intptr_t tdspeed_new_format(struct dsp_proc_entry *this,
 {
     struct dsp_buffer *dst = &dsp_outbuf;
 
-    if (dst->remcount > 0)
+    if (dst->frames_rem)
         return PROC_NEW_FORMAT_TRANSITION;
 
     DSP_PRINT_FORMAT(DSP_PROC_TIMESTRETCH, *format);
 
     bool active = dsp_proc_active(dsp, DSP_PROC_TIMESTRETCH);
     struct tdspeed_state_s *st = &tdspeed_state;
-    int channels = format->num_channels;
+    unsigned int channels = format->num_channels;
 
     if (format->codec_frequency != st->samplerate)
     {
@@ -563,7 +564,7 @@ static intptr_t tdspeed_configure(struct dsp_proc_entry *this,
     case DSP_PROC_CLOSE:
         st->this = NULL;
         st->factor = PITCH_SPEED_100;
-        dsp_outbuf.remcount = 0;
+        dsp_outbuf.frames_rem = 0;
         tdspeed_free_buffers(buffers, NBUFFERS);
         break;
 

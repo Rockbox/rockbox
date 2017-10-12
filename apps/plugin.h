@@ -659,15 +659,15 @@ struct plugin_api {
     void (*pcm_apply_settings)(void);
     void (*pcm_play_data)(pcm_play_callback_type get_more,
                           pcm_status_callback_type status_cb,
-                          const void *start, size_t size);
+                          const void *start, unsigned long frames);
     void (*pcm_play_stop)(void);
     void (*pcm_set_frequency)(unsigned int frequency);
     bool (*pcm_is_playing)(void);
     bool (*pcm_is_paused)(void);
     void (*pcm_play_pause)(bool play);
-    size_t (*pcm_get_bytes_waiting)(void);
-    void (*pcm_calculate_peaks)(int *left, int *right);
-    const void* (*pcm_get_peak_buffer)(int *count);
+    unsigned long (*pcm_get_frames_waiting)(void);
+    void (*pcm_calculate_peaks)(uint32_t *left, uint32_t *right);
+    const void* (*pcm_get_peak_buffer)(unsigned long *frames_rem);
     void (*pcm_play_lock)(void);
     void (*pcm_play_unlock)(void);
     void (*beep_play)(unsigned int frequency, unsigned int duration,
@@ -678,9 +678,9 @@ struct plugin_api {
     void (*pcm_close_recording)(void);
     void (*pcm_record_data)(pcm_rec_callback_type more_ready,
                             pcm_status_callback_type status_cb,
-                            void *start, size_t size);
+                            void *start, unsigned long frames);
     void (*pcm_stop_recording)(void);
-    void (*pcm_calculate_rec_peaks)(int *left, int *right);
+    void (*pcm_calculate_rec_peaks)(uint32_t *left, uint32_t *right);
     void (*audio_set_recording_gain)(int left, int right, int type);
 #endif /* HAVE_RECORDING */
 #if INPUT_SRC_CAPS != 0
@@ -701,17 +701,17 @@ struct plugin_api {
 
     enum channel_status (*mixer_channel_status)(enum pcm_mixer_channel channel);
     const void * (*mixer_channel_get_buffer)(enum pcm_mixer_channel channel,
-                                             int *count);
+                                             unsigned long *frames_rem);
     void (*mixer_channel_calculate_peaks)(enum pcm_mixer_channel channel,
                                           struct pcm_peaks *peaks);
     void (*mixer_channel_play_data)(enum pcm_mixer_channel channel,
                                     pcm_play_callback_type get_more,
-                                    const void *start, size_t size);
+                                    const void *start, unsigned long frames);
     void (*mixer_channel_play_pause)(enum pcm_mixer_channel channel, bool play);
     void (*mixer_channel_stop)(enum pcm_mixer_channel channel);
     void (*mixer_channel_set_amplitude)(enum pcm_mixer_channel channel,
                                         unsigned int amplitude);
-    size_t (*mixer_channel_get_bytes_waiting)(enum pcm_mixer_channel channel);
+    unsigned long (*mixer_channel_get_frames_waiting)(enum pcm_mixer_channel channel);
     void (*mixer_channel_set_buffer_hook)(enum pcm_mixer_channel channel,
                                           chan_buffer_hook_fn_type fn);
     void (*mixer_set_frequency)(unsigned int samplerate);

@@ -198,7 +198,7 @@ static void play_stop_pcm(void)
     IISCON &= ~(1<<0);
 }
 
-void pcm_play_dma_start(const void *addr, size_t size)
+void pcm_play_dma_start(const void *addr, unsigned long frames)
 {
     /* Enable the IIS clock */
     bitset32(&CLKCON, 1<<17);
@@ -220,7 +220,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     /* How many transfers to make - we transfer half-word at a time = 2 bytes */
     /* DMA control: CURR_TC int, single service mode, I2SSDO int, HW trig */
     /*     no auto-reload, half-word (16bit) */
-    DCON2 = DMA_CONTROL_SETUP | (size / 2);
+    DCON2 = DMA_CONTROL_SETUP | (frames*2);
     DISRCC2 = 0x00;  /* memory is on AHB bus, increment addresses */
 
     play_start_pcm();
@@ -256,20 +256,20 @@ void pcm_play_dma_pause(bool pause)
 void fiq_handler(void)
 {
     static const void *start;
-    static size_t size;
+    static unsigned long frames;
 
     /* clear any pending interrupt */
     SRCPND = DMA2_MASK;
 
     /* Buffer empty.  Try to get more. */
-    if (!pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
+    if (!pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &frames))
         return;
 
     /* Flush any pending cache writes */
-    commit_dcache_range(start, size);
+    commit_dcache_range(start, frames*4);
 
     /* set the new DMA values */
-    DCON2 = DMA_CONTROL_SETUP | (size >> 1);
+    DCON2 = DMA_CONTROL_SETUP | (frames*2);
     DISRC2 = (unsigned int)start + 0x30000000;
 
     /* Re-Activate the channel */
@@ -278,16 +278,19 @@ void fiq_handler(void)
     pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 }
 
-size_t pcm_get_bytes_waiting(void)
+unsigned long pcm_get_frames_waiting(void)
 {
     /* lie a little and only return full pairs */
-    return (DSTAT2 & 0xFFFFE) * 2;
+    return (DSTAT2 & 0xFFFFF) / 2;
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
+const void * pcm_play_dma_get_peak_buffer(unsigned long *frames_rem)
 {
+    int status = disable_irq_save();
     unsigned long addr = DCSRC2;
-    int cnt = DSTAT2;
-    *count = (cnt & 0xFFFFF) >> 1;
+    unsigned long rem = DSTAT2;
+    restore_irq(status);
+
+    *frames_rem = (rem & 0xFFFFF) / 2;
     return (void *)((addr + 2) & ~3);
 }

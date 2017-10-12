@@ -74,7 +74,7 @@ static FORCE_INLINE void mix_samples(void *out,
                                      int32_t src0_amp,
                                      const void *src1,
                                      int32_t src1_amp,
-                                     size_t size)
+                                     unsigned long count)
 {
     uint32_t s0, s1, s2, s3;
     save_emac_context();
@@ -95,9 +95,9 @@ static FORCE_INLINE void mix_samples(void *out,
         "swap.w     %6                        \n"
         "move.w     %6, %7                    \n"
         "move.l     %7, (%0)+                 \n"
-        "subq.l     #4, %3                    \n"
+        "subq.l     #1, %3                    \n"
         "bhi.b      1b                        \n"
-        : "+a"(out), "+a"(src0), "+a"(src1), "+d"(size),
+        : "+a"(out), "+a"(src0), "+a"(src1), "+d"(count),
           "=&a"(s0), "=&d"(s1), "=&d"(s2), "=&d"(s3)
         : "r"(src0_amp), "r"(src1_amp), "d"(16)
     );
@@ -107,12 +107,12 @@ static FORCE_INLINE void mix_samples(void *out,
 static FORCE_INLINE void write_samples(void *out,
                                        const void *src,
                                        int32_t amp,
-                                       size_t size)
+                                       unsigned long count)
 {
     if (LIKELY(amp == MIX_AMP_UNITY))
     {
         /* Channel is unity amplitude */
-        memcpy(out, src, size);
+        memcpy(out, src, count*4);
     }
     else
     {
@@ -132,9 +132,9 @@ static FORCE_INLINE void write_samples(void *out,
             "swap.w     %5                        \n"
             "move.w     %5, %6                    \n"
             "move.l     %6, (%0)+                 \n"
-            "subq.l     #4, %2                    \n"
+            "subq.l     #1, %2                    \n"
             "bhi.b      1b                        \n"
-            : "+a"(out), "+a"(src), "+d"(size),
+            : "+a"(out), "+a"(src), "+d"(count),
               "=&a"(s0), "=&d"(s1), "=&d"(s2), "=&d"(s3)
             : "r"(amp), "d"(16)
         );
