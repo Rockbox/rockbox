@@ -44,10 +44,6 @@ static int surround_strength = 0;
 #define BB_DLY  (MAX_DLY/4 + 1)
 #define HH_DLY  (MAX_DLY/2 + 1)
 #define CL_DLY  B2_DLY
-/*only need to buffer right channel */
-static int32_t *b0, *b2, *bb, *hh, *cl;
-static int32_t temp_buffer[2];
-static int32_t mid, side;
 
 /*voice from 300hz - 3400hz ?*/
 static int32_t tcoef1,tcoef2,bcoef,hcoef;
@@ -80,15 +76,6 @@ static void surround_buffer_free(void)
     handle = -1;
 }
 
-static void surround_buffer_get_data(void)
-{
-    b0 = core_get_data(handle);
-    b2 = b0 + B0_DLY;
-    bb = b2 + B2_DLY;
-    hh = bb + BB_DLY;
-    cl = hh + HH_DLY;
-}
-
 static void dsp_surround_flush(void)
 {
     memset(core_get_data(handle), 0, SURROUND_BUFSIZE);
@@ -109,16 +96,7 @@ void dsp_surround_set_balance(int var)
 
 void dsp_surround_side_only(bool var)
 {
-    if (var == surround_side_only)
-        return; /* No setting change */
-
     surround_side_only = var;
-
-    struct dsp_config *dsp = dsp_get_config(CODEC_IDX_AUDIO);
-    if (!dsp_proc_enabled(dsp, DSP_PROC_SURROUND))
-        return;
-
-    dsp_surround_flush();
 }
 
 void dsp_surround_mix(int var)
@@ -143,7 +121,9 @@ void dsp_surround_set_cutoff(int frq_l, int frq_h)
 
 static void surround_set_stepsize(int surround_strength)
 {
-    dsp_surround_flush();
+    if (handle > 0)
+        dsp_surround_flush();
+
     switch(surround_strength)
     {
     case 1:
@@ -175,7 +155,7 @@ void dsp_surround_enable(int var)
     bool was_enabled = dsp_proc_enabled(dsp, DSP_PROC_SURROUND);
     bool now_enabled = var > 0;
 
-    if (was_enabled == now_enabled && !now_enabled)
+    if (was_enabled == now_enabled)
         return; /* No change in enabled status */
 
     if (now_enabled)
@@ -201,88 +181,96 @@ static void surround_process(struct dsp_proc_entry *this,
     int i;
     int32_t x;
 
-    surround_buffer_get_data();
+    /*only need to buffer right channel */
+    static int32_t *b0, *b2, *bb, *hh, *cl;
+
+    b0 = core_get_data(handle);
+    b2 = b0 + B0_DLY;
+    bb = b2 + B2_DLY;
+    hh = bb + BB_DLY;
+    cl = hh + HH_DLY;
 
     for (i = 0; i < count; i++)
     {
-        mid = buf->p32[0][i] /2 + buf->p32[1][i] /2;
-        side = buf->p32[0][i] - buf->p32[1][i];
+        int32_t mid = buf->p32[0][i] / 2 + buf->p32[1][i] / 2;
+        int32_t side = buf->p32[0][i] - buf->p32[1][i];
+        int32_t temp0, temp1;
 
         if (!surround_side_only)
         {
             /*clone the left channal*/
-            temp_buffer[0]= buf->p32[0][i];
+            temp0 = buf->p32[0][i];
             /*keep the middle band of right channel*/
-            temp_buffer[1]= FRACMUL(buf->p32[1][i], tcoef1) -
-                            FRACMUL(buf->p32[1][i], tcoef2);
+            temp1 = FRACMUL(buf->p32[1][i], tcoef1) -
+                    FRACMUL(buf->p32[1][i], tcoef2);
         }
         else /* apply haas to side only*/
         {
-            temp_buffer[0] = side / 2;
-            temp_buffer[1] = FRACMUL(-side,tcoef1)/2 -
-                             FRACMUL(-side, tcoef2)/2;
+            temp0 = side / 2;
+            temp1 = FRACMUL(-side, tcoef1) / 2 -
+                    FRACMUL(-side, tcoef2) / 2;
         }
 
         /* inverted crossfeed delay (left channel) to make sound wider*/
-        x = temp_buffer[1]/100 * 35;
-        temp_buffer[0] += dequeue(cl, &cl_r, dly);
+        x = temp1/100 * 35;
+        temp0 += dequeue(cl, &cl_r, dly);
         enqueue(-x, cl, &cl_w, dly);
 
         /* apply 1/8 delay to frequency below fx2 */
         x = buf->p32[1][i] - FRACMUL(buf->p32[1][i], tcoef1);
-        temp_buffer[1] += dequeue(b0, &b0_r, dly_shift3);
+        temp1 += dequeue(b0, &b0_r, dly_shift3);
         enqueue(x, b0, &b0_w, dly_shift3 );
 
         /* cut frequency below half fx2*/
-        temp_buffer[1] = FRACMUL(temp_buffer[1], bcoef);
+        temp1 = FRACMUL(temp1, bcoef);
 
         /* apply 1/4 delay to frequency below half fx2 */
         /* use different delay to fake the sound direction*/
         x = buf->p32[1][i] - FRACMUL(buf->p32[1][i], bcoef);
-        temp_buffer[1] += dequeue(bb, &bb_r, dly_shift2);
+        temp1 += dequeue(bb, &bb_r, dly_shift2);
         enqueue(x, bb, &bb_w, dly_shift2 );
 
         /* apply full delay to higher band */
         x = FRACMUL(buf->p32[1][i], tcoef2);
-        temp_buffer[1] += dequeue(b2, &b2_r, dly);
+        temp1 += dequeue(b2, &b2_r, dly);
         enqueue(x, b2, &b2_w, dly );
 
         /* do the same direction trick again */
-        temp_buffer[1] -= FRACMUL(temp_buffer[1], hcoef);
+        temp1 -= FRACMUL(temp1, hcoef);
 
         x = FRACMUL(buf->p32[1][i], hcoef);
-        temp_buffer[1] += dequeue(hh, &hh_r, dly_shift1);
+        temp1 += dequeue(hh, &hh_r, dly_shift1);
         enqueue(x, hh, &hh_w, dly_shift1 );
         /*balance*/
         if (surround_balance > 0  && !surround_side_only)
         {
-            temp_buffer[0] -= temp_buffer[0]/200  * surround_balance;
-            temp_buffer[1] += temp_buffer[1]/200  * surround_balance;
+            temp0 -= temp0/200  * surround_balance;
+            temp1 += temp1/200  * surround_balance;
         }
         else if (surround_balance > 0)
         {
-            temp_buffer[0] += temp_buffer[0]/200  * surround_balance;
-            temp_buffer[1] -= temp_buffer[1]/200  * surround_balance;
+            temp0 += temp0/200  * surround_balance;
+            temp1 -= temp1/200  * surround_balance;
         }
 
         if  (surround_side_only)
         {
-            temp_buffer[0] += mid;
-            temp_buffer[1] += mid;
+            temp0 += mid;
+            temp1 += mid;
         }
 
         if (surround_mix == 100)
         {
-            buf->p32[0][i] = temp_buffer[0];
-            buf->p32[1][i] = temp_buffer[1];
+            buf->p32[0][i] = temp0;
+            buf->p32[1][i] = temp1;
         }
         else
         {
             /*dry wet mix*/
             buf->p32[0][i] = buf->p32[0][i]/100 * (100-surround_mix) +
-                             temp_buffer[0]/100 * surround_mix;
+                             temp0/100 * surround_mix;
             buf->p32[1][i] = buf->p32[1][i]/100 * (100-surround_mix) +
-                             temp_buffer[1]/100 * surround_mix;
+                             temp1/100 * surround_mix;
         }
     }
     (void)this;
@@ -326,16 +314,16 @@ static intptr_t surround_configure(struct dsp_proc_entry *this,
     switch (setting)
     {
     case DSP_PROC_INIT:
-        if (value == 0)
-        {
-            retval = surround_buffer_alloc();
-            if (retval < 0)
-                break;
+        /* Coming online; was disabled */
+        retval = surround_buffer_alloc();
+        if (retval < 0)
+            break;
 
-            this->process = surround_process;
-        }
-        /* else additional forced messages */
+        this->process = surround_process;
 
+        dsp_surround_flush();
+
+        /* Wouldn't have been getting frequency updates */
         surround_update_filter(dsp_get_output_frequency(dsp));
         break;
 
