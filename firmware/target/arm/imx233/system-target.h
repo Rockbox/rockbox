@@ -54,6 +54,23 @@ bool imx233_us_elapsed(uint32_t ref, unsigned us_delay);
 void imx233_reset_block(volatile uint32_t *block_reg);
 void imx233_enable_usb_controller(bool enable);
 void imx233_enable_usb_phy(bool enable);
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#define CPU_BOOST_LOCK_DEFINED
+
+static inline bool cpu_boost_lock(void)
+{
+    bool set_cpu_frequency__lock(void);
+    return set_cpu_frequency__lock();
+}
+
+static inline void cpu_boost_unlock(void)
+{
+    void set_cpu_frequency__unlock(void);
+    set_cpu_frequency__unlock();
+}
+#endif /* HAVE_ADJUSTABLE_CPU_FREQ */
+
 // NOTE: this is available even if HAVE_ADJUSTABLE_CPU_FREQ is undef
 void imx233_set_cpu_frequency(long frequency);
 
