@@ -303,6 +303,16 @@ static volatile int read_lock;
 
 static bool delete_entry(long idx_id);
 
+static bool cpu_boosted = false;
+static void tagcache_cpu_boost(bool state)
+{
+    if (state != cpu_boosted)
+    {
+        cpu_boosted = state;
+        cpu_boost(state);
+    }
+}
+
 static void allocate_tempbuf(void)
 {
     /* Yeah, malloc would be really nice now :) */
@@ -4561,7 +4571,7 @@ void do_tagcache_build(const char *path[])
 
     filenametag_fd = open_tag_fd(&header, tag_filename, false);
     
-    cpu_boost(true);
+    tagcache_cpu_boost(true);
 
     logf("Scanning files...");
     /* Scan for new files. */
@@ -4610,7 +4620,7 @@ void do_tagcache_build(const char *path[])
     if (!ret)
     {
         logf("Aborted.");
-        cpu_boost(false);
+        tagcache_cpu_boost(false);
         return ;
     }
 
@@ -4635,7 +4645,7 @@ void do_tagcache_build(const char *path[])
     }
 #endif
     
-    cpu_boost(false);
+    tagcache_cpu_boost(false);
 }
 
 #ifndef __PCTOOL__
@@ -4658,7 +4668,7 @@ static void load_ramcache(void)
     if (!tcramcache.hdr)
         return ;
         
-    cpu_boost(true);
+    tagcache_cpu_boost(true);
     
     /* At first we should load the cache (if exists). */
     tc_stat.ramcache = load_tagcache();
@@ -4674,7 +4684,7 @@ static void load_ramcache(void)
         core_free(handle);
     }
     
-    cpu_boost(false);
+    tagcache_cpu_boost(false);
 }
 
 void tagcache_unload_ramcache(void)
@@ -4693,7 +4703,7 @@ static void tagcache_thread(void)
 
     /* If the previous cache build/update was interrupted, commit
      * the changes first in foreground. */
-    cpu_boost(true);
+    tagcache_cpu_boost(true);
     allocate_tempbuf();
     commit();
     free_tempbuf();
@@ -4714,7 +4724,7 @@ static void tagcache_thread(void)
         allocate_tagcache();
 #endif /* HAVE_TC_RAMCACHE */
     
-    cpu_boost(false);
+    tagcache_cpu_boost(false);
     tc_stat.initialized = true;
     
     /* Don't delay bootup with the header check but do it on background. */

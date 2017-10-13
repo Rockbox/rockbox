@@ -206,6 +206,16 @@ static const char playlist_thread_name[] = "playlist cachectrl";
 static struct mutex current_playlist_mutex SHAREDBSS_ATTR;
 static struct mutex created_playlist_mutex SHAREDBSS_ATTR;
 
+static bool cpu_boosted = false;
+static void playlist_cpu_boost(bool state)
+{
+    if (state != cpu_boosted)
+    {
+        cpu_boosted = state;
+        cpu_boost(state);
+    }
+}
+
 #ifdef HAVE_DIRCACHE
 static void copy_filerefs(struct dircache_fileref *dcfto,
                           const struct dircache_fileref *dcffrom,
@@ -3092,14 +3102,14 @@ int playlist_insert_directory(struct playlist_info* playlist,
     context.queue = queue;
     context.count = 0;
     
-    cpu_boost(true);
+    playlist_cpu_boost(true);
 
     result = playlist_directory_tracksearch(dirname, recurse,
         directory_search_callback, &context);
 
     sync_control(playlist, false);
 
-    cpu_boost(false);
+    playlist_cpu_boost(false);
 
     display_playlist_count(context.count, count_str, true);
 
@@ -3163,7 +3173,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
         else return -1;
     }
 
-    cpu_boost(true);
+    playlist_cpu_boost(true);
 
     while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
     {
@@ -3227,7 +3237,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
 
     sync_control(playlist, false);
 
-    cpu_boost(false);
+    playlist_cpu_boost(false);
 
     display_playlist_count(count, count_str, true);
 
@@ -3586,7 +3596,7 @@ int playlist_save(struct playlist_info* playlist, char *filename,
 
     display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), false);
 
-    cpu_boost(true);
+    playlist_cpu_boost(true);
 
     index = playlist->first_index;
     for (i=0; i<playlist->amount; i++)
@@ -3697,7 +3707,7 @@ int playlist_save(struct playlist_info* playlist, char *filename,
     if (fd >= 0)
         close(fd);
 
-    cpu_boost(false);
+    playlist_cpu_boost(false);
 
 reset_old_buffer:
     if (playlist->buffer_handle > 0)
