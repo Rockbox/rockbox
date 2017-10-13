@@ -201,6 +201,18 @@ static int lcd_sleep_timeout = 10*HZ;
 #define lcd_sleep_timeout LCD_SLEEP_TIMEOUT
 #endif
 
+#ifdef _BACKLIGHT_FADE_BOOST
+static bool cpu_boosted = false;
+static void backlight_cpu_boost(bool state)
+{
+    if (state != cpu_boosted)
+    {
+        cpu_boosted = state;
+        cpu_boost(state);
+    }
+}
+#endif
+
 static int lcd_sleep_timer SHAREDDATA_ATTR = 0;
 
 static void backlight_lcd_sleep_countdown(bool start)
@@ -336,7 +348,7 @@ static void backlight_switch(void)
 static void backlight_release_timer(void)
 {
 #ifdef _BACKLIGHT_FADE_BOOST
-    cpu_boost(false);
+    backlight_cpu_boost(false);
 #endif
     timer_unregister();
     bl_timer_active = false;
@@ -359,7 +371,7 @@ static void backlight_dim(int value)
     {
 #ifdef _BACKLIGHT_FADE_BOOST
         /* Prevent cpu frequency changes while dimming. */
-        cpu_boost(true);
+        backlight_cpu_boost(true);
 #endif
         bl_timer_active = true;
     }
@@ -563,7 +575,7 @@ void backlight_thread(void)
         {   /* These events must always be processed */
 #ifdef _BACKLIGHT_FADE_BOOST
             case BACKLIGHT_FADE_FINISH:
-                cpu_boost(false);
+                backlight_cpu_boost(false);
                 break;
 #endif
 #ifdef _BACKLIGHT_FADE_ENABLE

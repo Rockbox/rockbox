@@ -1900,11 +1900,11 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
     int from, to, direction;
     int files_left = c->filesindir;
 
-    cpu_boost(true);
+    trigger_cpu_boost();
     if (!tagcache_search(&tcs, tag_filename))
     {
         splash(HZ, ID2P(LANG_TAGCACHE_BUSY));
-        cpu_boost(false);
+        cancel_cpu_boost();
         return false;
     }
 
@@ -1914,7 +1914,7 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
             position = PLAYLIST_INSERT_LAST;
         else
         {
-            cpu_boost(false);
+            cancel_cpu_boost();
             return false;
         }
     }
@@ -1953,7 +1953,7 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
     }
     playlist_sync(NULL);
     tagcache_search_finish(&tcs);
-    cpu_boost(false);
+    cancel_cpu_boost();
 
     return true;
 }
