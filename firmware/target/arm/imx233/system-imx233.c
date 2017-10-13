@@ -53,6 +53,8 @@
 #define WATCHDOG_HW_DELAY   (10 * HZ)
 #define WATCHDOG_SW_DELAY   (5 * HZ)
 
+static struct mutex cpufreq_mtx;
+
 void UIE(unsigned int pc, unsigned int num);
 
 static void woof_woof(void)
@@ -183,6 +185,7 @@ void system_init(void)
      * The main() will naturally set cpu speed to normal after kernel_init()
      * so don't bother if the cpu is running at 24MHz here.
      * Make sure IO clock is running at expected speed */
+    mutex_init(&cpufreq_mtx);
     imx233_clkctrl_init();
     imx233_clkctrl_enable(CLK_PLL, true);
 #if IMX233_SUBTARGET >= 3700
@@ -364,6 +367,20 @@ void imx233_set_cpu_frequency(long frequency)
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+bool set_cpu_frequency__lock(void)
+{
+    if (get_processor_mode() != CPU_MODE_THREAD_CONTEXT)
+        return false;
+
+    mutex_lock(&cpufreq_mtx);
+    return true;
+}
+
+void set_cpu_frequency__unlock(void)
+{
+    mutex_unlock(&cpufreq_mtx);
+}
+
 void set_cpu_frequency(long frequency)
 {
     return imx233_set_cpu_frequency(frequency);
