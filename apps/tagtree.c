@@ -193,6 +193,17 @@ static int tagtree_handle, lock_count;
 static size_t tagtree_bufsize, tagtree_buf_used;
 
 #define UPDATE(x, y) { x = (typeof(x))((char*)(x) + (y)); }
+
+static bool cpu_boosted = false;
+static void tagtree_cpu_boost(bool state)
+{
+    if (state != cpu_boosted)
+    {
+        cpu_boosted = state;
+        cpu_boost(state);
+    }
+}
+
 static int move_callback(int handle, void* current, void* new)
 {
     (void)handle; (void)current; (void)new;
@@ -1676,9 +1687,9 @@ int tagtree_load(struct tree_context* c)
         case ALLSUBENTRIES:
         case NAVIBROWSE:
             logf("navibrowse...");
-            cpu_boost(true);
+            tagtree_cpu_boost(true);
             count = retrieve_entries(c, 0, true);
-            cpu_boost(false);
+            tagtree_cpu_boost(false);
             break;
 
         default:
@@ -1900,11 +1911,11 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
     int from, to, direction;
     int files_left = c->filesindir;
 
-    cpu_boost(true);
+    tagtree_cpu_boost(true);
     if (!tagcache_search(&tcs, tag_filename))
     {
         splash(HZ, ID2P(LANG_TAGCACHE_BUSY));
-        cpu_boost(false);
+        tagtree_cpu_boost(false);
         return false;
     }
 
@@ -1914,7 +1925,7 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
             position = PLAYLIST_INSERT_LAST;
         else
         {
-            cpu_boost(false);
+            tagtree_cpu_boost(false);
             return false;
         }
     }
@@ -1953,7 +1964,7 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
     }
     playlist_sync(NULL);
     tagcache_search_finish(&tcs);
-    cpu_boost(false);
+    tagtree_cpu_boost(false);
 
     return true;
 }
@@ -2064,16 +2075,16 @@ static struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
     /* Load the next chunk if necessary. */
     if (realid >= current_entry_count || realid < 0)
     {
-        cpu_boost(true);
+        tagtree_cpu_boost(true);
         if (retrieve_entries(c, MAX(0, id - (current_entry_count / 2)),
                              false) < 0)
         {
             logf("retrieve failed");
-            cpu_boost(false);
+            tagtree_cpu_boost(false);
             return NULL;
         }
         realid = id - current_offset;
-        cpu_boost(false);
+        tagtree_cpu_boost(false);
     }
 
     entry = get_entries(c);

@@ -3163,7 +3163,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
         else return -1;
     }
 
-    cpu_boost(true);
+    trigger_cpu_boost();
 
     while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
     {
@@ -3227,7 +3227,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
 
     sync_control(playlist, false);
 
-    cpu_boost(false);
+    cancel_cpu_boost();
 
     display_playlist_count(count, count_str, true);
 
@@ -3586,7 +3586,7 @@ int playlist_save(struct playlist_info* playlist, char *filename,
 
     display_playlist_count(count, ID2P(LANG_PLAYLIST_SAVE_COUNT), false);
 
-    cpu_boost(true);
+    trigger_cpu_boost();
 
     index = playlist->first_index;
     for (i=0; i<playlist->amount; i++)
@@ -3697,7 +3697,7 @@ int playlist_save(struct playlist_info* playlist, char *filename,
     if (fd >= 0)
         close(fd);
 
-    cpu_boost(false);
+    cancel_cpu_boost();
 
 reset_old_buffer:
     if (playlist->buffer_handle > 0)
