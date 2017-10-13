@@ -53,6 +53,8 @@
 #define WATCHDOG_HW_DELAY   (10 * HZ)
 #define WATCHDOG_SW_DELAY   (5 * HZ)
 
+struct mutex cpufreq_mtx;
+
 void UIE(unsigned int pc, unsigned int num);
 
 static void woof_woof(void)
@@ -364,6 +366,20 @@ void imx233_set_cpu_frequency(long frequency)
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+bool set_cpu_frequency__lock(void)
+{
+    if (get_processor_mode() != CPU_MODE_THREAD_CONTEXT)
+        return false;
+
+    mutex_lock(&cpufreq_mtx);
+    return true;
+}
+
+void set_cpu_frequency__unlock(void)
+{
+    mutex_unlock(&cpufreq_mtx);
+}
+
 void set_cpu_frequency(long frequency)
 {
     return imx233_set_cpu_frequency(frequency);
