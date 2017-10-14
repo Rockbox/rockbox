@@ -841,6 +841,7 @@ static const struct plugin_api rockbox_api = {
 };
 
 static int plugin_buffer_handle;
+static size_t plugin_buffer_size;
 
 int plugin_load(const char* plugin, const void* parameter)
 {
@@ -1018,15 +1019,26 @@ static void* plugin_get_audio_buffer(size_t *buffer_size)
     /* dummy ops with no callbacks, needed because by
      * default buflib buffers can be moved around which must be avoided */
     static struct buflib_callbacks dummy_ops;
-    plugin_buffer_handle = core_alloc_maximum("plugin audio buf", buffer_size,
-        &dummy_ops);
+    if (plugin_buffer_handle <= 0)
+    {
+        plugin_buffer_handle = core_alloc_maximum("plugin audio buf",
+                                                  &plugin_buffer_size,
+                                                  &dummy_ops);
+    }
+
+    if (buffer_size)
+        *buffer_size = plugin_buffer_size;
+
     return core_get_data(plugin_buffer_handle);
 }
 
 static void plugin_release_audio_buffer(void)
 {
     if (plugin_buffer_handle > 0)
+    {
         plugin_buffer_handle = core_free(plugin_buffer_handle);
+        plugin_buffer_size = 0;
+    }
 }
 
 /* The plugin wants to stay resident after leaving its main function, e.g.
