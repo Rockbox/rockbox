@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a45ca836_67fdb206",
+        "filename": "apps/action.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2017-10-14T08:34:23Z",
+      "side": 1,
+      "message": "This might need to be added back for some targets but as far as I can tell none actually load the action system",
+      "range": {
+        "startLine": 29,
+        "startChar": 53,
+        "endLine": 29,
+        "endChar": 56
+      },
+      "revId": "44ef9d53d1ac3af17e042021674f81858c7e703b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a45ca836_c70d7e39",
+        "filename": "apps/action.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2017-10-14T08:34:23Z",
+      "side": 1,
+      "message": "all the static variables have been moved here so they can be passed as one pointer and to make it easier to keep track of them",
+      "revId": "44ef9d53d1ac3af17e042021674f81858c7e703b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a45ca836_4702ae0c",
+        "filename": "apps/action.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2017-10-14T08:34:23Z",
+      "side": 1,
+      "message": "This is the only real change to the mechanics of the action system. This makes a preference for fully matched actions versus the old behaviour of returning a partial match (pre_button \u003d\u003d BUTTON_NONE). This new behaviour might cause a few growing pains with targets that had unreachable actions being masked with the old behaviour.",
+      "revId": "44ef9d53d1ac3af17e042021674f81858c7e703b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a45ca836_2707ba1c",
+        "filename": "apps/action.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2017-10-14T08:34:23Z",
+      "side": 1,
+      "message": "Only short circuit lookup if several matches were already found meaning at least 1 full match has occurred otherwise keep looping through list. This shouldn\u0027t add too much extra overhead since the contexts will need to finish being incremented later anyways",
+      "revId": "44ef9d53d1ac3af17e042021674f81858c7e703b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a45ca836_070cb63c",
+        "filename": "apps/action.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 767,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2017-10-14T08:34:23Z",
+      "side": 1,
+      "message": "FIX: Since the user can decide to block locked notifications entirely I had originally wanted to allow the lock code to always display a message to user about \u0027buttons locked\u0027 if the power button was pressed this ended up blocking the power button action (poweroff) so it is now once the button is released",
+      "revId": "44ef9d53d1ac3af17e042021674f81858c7e703b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a45ca836_e710824f",
+        "filename": "apps/action.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1060,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2017-10-14T08:34:23Z",
+      "side": 1,
+      "message": "old code called get action worker directly now we just use get_action_custom",
+      "revId": "44ef9d53d1ac3af17e042021674f81858c7e703b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
