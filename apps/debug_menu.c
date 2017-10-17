@@ -1333,6 +1333,10 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                     "Nsac: %d clk", card->nsac);
             simplelist_addline(
                     "R2W: *%d", card->r2w_factor);
+            simplelist_addline(
+                    "Temp WP: %d", card->temp_wp);
+            simplelist_addline(
+                    "Perm WP: %d", card->perm_wp);
 #if (CONFIG_STORAGE & STORAGE_SD)
             int csd_structure = card_extract_bits(card->csd, 127, 2);
             if (csd_structure == 0) /* CSD version 1.0 */

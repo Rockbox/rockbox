@@ -40,6 +40,8 @@ typedef struct
     unsigned long numblocks;        /* size in flash blocks */
     unsigned int blocksize;         /* block size in bytes */
     unsigned long rca;              /* RCA register */
+    unsigned int temp_wp;          /* Temporary write protect*/
+    unsigned int perm_wp;          /* Permanent write protect*/
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
     unsigned char bitrate_register;

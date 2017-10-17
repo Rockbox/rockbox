@@ -62,6 +62,10 @@ void sd_parse_csd(tCardInfo *card)
 
     card->r2w_factor = card_extract_bits(card->csd, 28, 3);
 
+    card->temp_wp = card_extract_bits(card->csd, 12, 1);
+
+    card->perm_wp = card_extract_bits(card->csd, 13, 1);
+
     logf("CSD%d.0 numblocks:%ld speed:%ld", csd_version+1, card->numblocks, card->speed);
     logf("nsac: %d taac: %ld r2w: %d", card->nsac, card->taac, card->r2w_factor);
 }
