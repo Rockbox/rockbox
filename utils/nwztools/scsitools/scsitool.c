@@ -984,8 +984,6 @@ void help_us(bool unsupported, unsigned long model_id)
     cprintf_field("Model ID: ", "%#lx\n", model_id);
     get_dev_info(0, NULL);
     get_dhp(0, NULL);
-    static char *list[] = { "kas", "lyr", "fpi" };
-    get_dnk_nvp_multi(sizeof(list) / sizeof(list[0]), list);
 }
 
 int main(int argc, char **argv)
