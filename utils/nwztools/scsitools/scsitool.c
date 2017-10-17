@@ -336,11 +336,7 @@ int get_model_and_series(int *model_index, int *series_index)
         /* display list on error */
         if(*series_index == -1)
         {
-            if(strcmp(g_force_series, "?") != 0)
-                cprintf(GREY, "Unrecognized series '%s'\n", g_force_series);
-            cprintf(OFF, "Series list:\n");
-            for(int i = 0; i < NWZ_SERIES_COUNT; i++)
-                printf("  %-10s %s\n", nwz_series[i].codename, nwz_series[i].name);
+            cprintf(GREY, "Unrecognized series '%s', use -s ? to get a list of supported devices\n", g_force_series);
             return -1;
         }
     }
@@ -987,6 +983,9 @@ void help_us(bool unsupported, unsigned long model_id)
     cprintf(BLUE, "-------------------[ Paste information below ]-------------------\n");
     cprintf_field("Model ID: ", "%#lx\n", model_id);
     get_dev_info(0, NULL);
+    get_dhp(0, NULL);
+    static char *list[] = { "kas", "lyr", "fpi" };
+    get_dnk_nvp_multi(sizeof(list) / sizeof(list[0]), list);
 }
 
 int main(int argc, char **argv)
@@ -1027,6 +1026,15 @@ int main(int argc, char **argv)
             default:
                 abort();
         }
+    }
+
+    /* list devices */
+    if(g_force_series && strcmp(g_force_series, "?") == 0)
+    {
+        cprintf(OFF, "Series list:\n");
+        for(int i = 0; i < NWZ_SERIES_COUNT; i++)
+            printf("  %-10s %s\n", nwz_series[i].codename, nwz_series[i].name);
+        return 0;
     }
 
     if(argc - optind < 2)
