@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0483b4c5_e210a64f",
+        "filename": "firmware/target/arm/imx233/system-imx233.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1000541
+      },
+      "writtenOn": "2017-10-20T16:55:21Z",
+      "side": 1,
+      "message": "\u0027static\u0027 me?",
+      "revId": "46f64c4964cf665e020a2d1970788f2856b9ef12",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
