@@ -357,8 +357,8 @@ void imx233_set_cpu_frequency(long frequency)
         /* Change VDDD regulator */
         imx233_power_set_regulator(REGULATOR_VDDD, prof->vddd, prof->vddd_bo);
     }
-    /* enable auto slow again */
-    imx233_clkctrl_enable_auto_slow(true);
+    /* enable auto slow again only at lower cpu frequencies */
+    imx233_clkctrl_enable_auto_slow(frequency != CPUFREQ_MAX);
     /* update frequency */
     cpu_frequency = frequency;
 #else
