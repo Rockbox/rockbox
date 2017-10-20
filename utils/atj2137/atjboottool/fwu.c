@@ -29,6 +29,11 @@
     { cprintf(RED, str_bad); return 1; } \
     else { cprintf(RED, str_ok); }
 
+#define check_field_soft(v_exp, v_have, str_ok, str_bad) \
+    if((v_exp) != (v_have)) \
+    { cprintf(RED, str_bad); } \
+    else { cprintf(RED, str_ok); }
+
 #define FWU_SIG_SIZE    16
 #define FWU_BLOCK_SIZE  512
 
@@ -46,6 +51,19 @@ const uint8_t g_fwu_signature[FWU_SIG_SIZE] =
 {
     0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x75
 };
+
+struct fwu_tail_t
+{
+    uint8_t length; /* in blocks? it's always 1 */
+    uint8_t type; /* always 7 */
+    uint8_t reserved[14];
+    uint32_t fwu_checksum;
+    uint32_t flags; /* always 0x55aa55aa */
+    uint8_t desc[8]; /* always 'FwuTail' */
+    uint8_t fwu_crc_checksum[32]; /* always 0 */
+    uint8_t reserved2[444];
+    uint32_t fwutail_checksum;
+} __attribute__((packed));
 
 struct version_desc_t
 {
@@ -727,6 +745,7 @@ static int get_key_fwu_v3(size_t size, uint8_t *buf, uint8_t *blockA, uint8_t *b
     uint8_t ba = buf[0x1ee] & 0xf;
     uint8_t bb = buf[0x1fe] & 0xf;
 
+    cprintf(BLUE, "Crypto\n");
     cprintf_field("  Block A: ", "%d\n", ba + 2);
     cprintf_field("  Block B: ", "%d\n", ba + bb + 5);
 
@@ -882,6 +901,7 @@ static int decrypt_fwu_v3(uint8_t *buf, size_t *size, uint8_t block[512], enum f
     uint8_t blockA;
     uint8_t blockB;
     uint8_t keybuf[32];
+    struct fwu_hdr_t *hdr = (void *)buf;
     memset(keybuf, 0, sizeof(keybuf));
     int ret = get_key_fwu_v3(*size, buf, &blockA, &blockB, keybuf, block);
     if(ret != 0)
@@ -890,6 +910,7 @@ static int decrypt_fwu_v3(uint8_t *buf, size_t *size, uint8_t block[512], enum f
     size_t file_size = *size;
     /* the input buffer is reorganized based on two offsets (blockA and blockB),
      * skip 2048 bytes of data used for crypto init */
+    *size = hdr->fw_size; /* use firmware size, not file size */
     *size -= 2048;
     uint8_t *tmpbuf = malloc(*size);
     memset(tmpbuf, 0, *size);
@@ -919,12 +940,7 @@ static int decrypt_fwu_v3(uint8_t *buf, size_t *size, uint8_t block[512], enum f
         rounds_to_perform = 1;
     /* the ATJ213x and ATJ2127 do not use the same encryption at this point, and I
      * don't see any obvious way to tell which encryption is used (since they
-     * use the same version above). The only difference is that ATJ2127 images
-     * I have seen have an extra 512 bytes at the end file (ie the actual file
-     * is 512 bytes larger than indicated by the header) but I don't know if this
-     * is the case for all files. Thus, unless the user force encryption mode,
-     * try both and see if one looks like an AFI file. To guess which one to use,
-     * decrypt the first sector and see if it looks like an AFI file */
+     * use the same version above). */
     bool is_atj2127 = false;
     if(mode == FWU_AUTO)
     {
@@ -949,6 +965,17 @@ static int decrypt_fwu_v3(uint8_t *buf, size_t *size, uint8_t block[512], enum f
     }
 
     return 0;
+}
+
+uint32_t fwu_checksum(void *buf, size_t size)
+{
+    if(size % 4)
+        cprintf(GREY, "WARNING: checksum of buffer whose length is not a multiple of 4");
+    uint32_t *p = buf;
+    uint32_t sum = 0;
+    for(size_t i = 0; i < size / 4; i++)
+        sum += *p++;
+    return sum;
 }
 
 int fwu_decrypt(uint8_t *buf, size_t *size, enum fwu_mode_t mode)
@@ -1009,6 +1036,33 @@ int fwu_decrypt(uint8_t *buf, size_t *size, enum fwu_mode_t mode)
         cprintf(RED, " Mismatch\n");
         return 2;
     }
+
+    /* check whether the firmware has a FwuTail (as far as I know, there is no flag anywhere that
+     * indicates its presence or not) */
+    struct fwu_tail_t *tail = (void *)(buf + hdr->fw_size - sizeof(struct fwu_tail_t));
+    if(tail->flags == 0x55aa55aa && strcmp((char *)tail->desc, "FwuTail") == 0)
+    {
+        cprintf(BLUE, "Tail\n");
+        cprintf_field("  Length: ", "%d ", tail->length);
+        check_field_soft(tail->length, 1, "Ok\n", "Fail\n");
+        cprintf_field("  Type: ", "%d ", tail->type);
+        check_field_soft(tail->type, 7, "Ok\n", "Fail\n");
+        cprintf_field("  FW checksum: ", "%x ", tail->fwu_checksum);
+        check_field_soft(fwu_checksum(buf, hdr->fw_size - sizeof(struct fwu_tail_t)),
+            tail->fwu_checksum, "Ok\n", "Mismatch\n");
+        cprintf(GREEN, "  FW CRC Checksum: ");
+        for(unsigned i = 0; i < sizeof(tail->fwu_crc_checksum); i++)
+            cprintf(YELLOW, "%02x", tail->fwu_crc_checksum[i]);
+        cprintf(RED, " Ignored (should be 0)\n");
+        cprintf_field("  Tail checksum: ", "%x ", tail->fwutail_checksum);
+        check_field_soft(fwu_checksum(tail, sizeof(struct fwu_tail_t) - 4),
+            tail->fwutail_checksum, "Ok\n", "Mismatch\n");
+        /* if it has a tail, the firmware size includes it, so we need to decrease it to avoid
+         * "decrypting" the tail and output garbage */
+        hdr->fw_size -= sizeof(struct fwu_tail_t);
+    }
+    else
+        cprintf(BLUE, "Firmware does not seem to have a tail\n");
 
     if(g_version[ver].version == 3)
     {
