@@ -48,6 +48,7 @@ struct nwz_model_t g_model_list[] =
     { "nw-a30", false, "c40d91e7efff3e3aa5c8831dd85526fe4972086283419c8cd8fa3b7dcd39" },
     { "nw-wm1", false, "e8d171a5d92f35eed9658c03fb9f86a169591659851fd7c49525f587a70b" },
     { "nw-zx300", false, "3ab5bbcb999463c50aaa957496b066c6b76a25f4505bf5b42c0bc4815cbe3db6" },
+    { "nw-nwa40", false, "a0d2b1317794074aff77dd2afb9c7aa6b28d6cf24a5e5eb60df87a87eb562de5" },
     { 0 }
 };
 
