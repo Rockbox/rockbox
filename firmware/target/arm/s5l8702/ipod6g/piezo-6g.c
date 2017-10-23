@@ -28,10 +28,55 @@ static bool beeping;
 
 void INT_TIMERA(void)
 {
-    /* clear interrupt */
+    /* clear interrupt (just writing the same value will work) */
     TACON = TACON;
     if (!(--duration))
         piezo_stop();
+}
+
+void piezo_pwm(unsigned short per1, unsigned short per2, unsigned short periods)
+{
+#if 0
+#ifndef SIMULATOR
+    duration = periods;
+    beeping = 1;
+    /* select TA_OUT function on GPIO ports */
+    PCON0 = (PCON0 & 0x00ffffff) | 0x53000000;
+    /* configure timer for 12MHz (12 MHz / 1 / 1) */
+    TACMD = (1 << 1);   /* TA_CLR */
+    TAPRE = 0;          /* no prescaler */
+    TACON = (1 << 13) | /* TA_INT1_EN */
+            (0 << 12) | /* TA_INT0_EN */
+            (0 << 11) | /* TA_START */
+            (4 << 8)  | /* TA_CS = ECLK */
+            (1 << 6)  | /* select ECLK (12 MHz) */
+            (1 << 4);   /* TA_MODE_SEL = PWM mode */
+    TADATA0 = per1;   /* set interval period */
+    TADATA1 = per2;   /* set interval period */
+    TACMD = (1 << 0);   /* TA_EN */
+#endif
+#endif
+    duration = periods;
+    beeping = 1;
+    /* select TA_OUT function on GPIO ports */
+    PCON0 = (PCON0 & 0x00ffffff) | 0x53000000;
+    /* configure timer for 100 kHz (12 MHz / 4 / 30) */
+    TACMD = (1 << 1);   /* TA_CLR */
+    TAPRE = 30 - 1;     /* prescaler */
+    TACON = (1 << 13) | /* TA_INT1_EN */
+            (0 << 12) | /* TA_INT0_EN */
+            (0 << 11) | /* TA_START */
+            (1 << 8) |  /* TA_CS = ECLK / 4 */
+            (1 << 6) |  /* select ECLK (12 MHz) */
+            (1 << 4);   /* TA_MODE_SEL = PWM mode */
+    TADATA0 = per1;   /* set interval period */
+    TADATA1 = per2; /* set interval period */
+    TACMD = (1 << 0);   /* TA_EN */
+}
+
+void piezo_wait(void)
+{
+    while(beeping); /* busy wait */
 }
 
 static void piezo_start(unsigned short cycles, unsigned short periods)

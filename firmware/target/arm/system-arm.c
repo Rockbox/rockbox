@@ -108,6 +108,9 @@ void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
     lcd_setfont(FONT_SYSFIXED);
     lcd_set_viewport(NULL);
     lcd_clear_display();
+
+    lcd_update();
+
     lcd_putsf(0, line++, "%s at %08x" IF_COP(" (%d)"), uiename[num], pc IF_COP(, CURRENT_CORE));
 
 #if !defined(CPU_ARM7TDMI) && (CONFIG_CPU != RK27XX) /* arm7tdmi has no MPU/MMU */

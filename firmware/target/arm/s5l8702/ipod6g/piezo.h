@@ -27,6 +27,9 @@ void piezo_clear(void);
 bool piezo_busy(void);
 void piezo_button_beep(bool beep, bool force);
 
+void piezo_pwm(unsigned short per1, unsigned short per2, unsigned short periods);
+void piezo_wait(void);
+
 #ifdef BOOTLOADER
 #include <inttypes.h>
 void piezo_tone(uint32_t period, int32_t duration);

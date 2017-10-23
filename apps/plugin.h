@@ -975,6 +975,11 @@ struct plugin_api {
     void (*root_menu_load_from_cfg)(void* setting, char *value);
     int (*settings_save)(void);
 
+#if CONFIG_CPU == S5L8702
+    void (*piezo_pwm)(unsigned short per1, unsigned short per2, unsigned short periods);
+    void (*piezo_wait)(void);
+#endif
+
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 };

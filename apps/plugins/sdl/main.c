@@ -30,6 +30,7 @@ extern int wolf3d_main(int argc, char *argv[]);
 extern int testsound_main(int argc, char *argv[]);
 extern int duke3d_main(int argc,char  **argv);
 extern int quake_main (int c, char **v);
+extern int testalign_main(int argc, char *argv[]);
 
 char *wolf3d_argv[] = { "wolf3d", "--audiobuffer", "2048"  };
 char *duke3d_argv[] = { "duke3d" };
@@ -65,6 +66,7 @@ struct prog_t {
     {  "Wolf3D",                   wolf3d_main,        false, ARRAYLEN(wolf3d_argv), wolf3d_argv },
     {  "Quake",                    quake_main,         true, ARRAYLEN(quake_argv), quake_argv },
     {  "Test sound",               testsound_main,     true, 0, NULL },
+    {  "Test Alignment",           testalign_main,     true, 0, NULL },
 };
 #endif
 

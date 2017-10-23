@@ -181,6 +181,7 @@ tests/quake/world.c
 tests/quake/zone.c
 
 tests/testsound.c
+tests/testalign.c
 
 #if 0
 tests/ballfield.c

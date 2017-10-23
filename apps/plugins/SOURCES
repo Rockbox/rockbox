@@ -1,3 +1,7 @@
+#if CONFIG_CPU == S5L8702
+piezopcm.c
+#endif
+
 /* plugins common to all models */
 #if !defined(SIMULATOR) && (CONFIG_BATTERY_MEASURE != 0)
 battery_bench.c
