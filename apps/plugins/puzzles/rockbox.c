@@ -873,7 +873,7 @@ void frontend_default_color(frontend *fe, float *out)
     *out++ = BG_B;
 }
 
-void fatal(char *fmt, ...)
+void fatal(const char *fmt, ...)
 {
     va_list ap;
 
@@ -970,7 +970,7 @@ static void int_chooser(config_item *cfgs, int idx, int val)
     config_item *cfg = cfgs + idx;
     int old_val = val;
 
-    rb->snprintf(cfg->sval, MAX_STRLEN, "%d", val);
+    rb->snprintf(cfg->u.string.sval, MAX_STRLEN, "%d", val);
 
     rb->lcd_clear_display();
 
@@ -1002,7 +1002,7 @@ static void int_chooser(config_item *cfgs, int idx, int val)
             if(val != old_val)
                 rb->splash(HZ, "Canceled.");
             val = old_val;
-            rb->snprintf(cfg->sval, MAX_STRLEN, "%d", val);
+            rb->snprintf(cfg->u.string.sval, MAX_STRLEN, "%d", val);
             rb->lcd_scroll_stop();
             return;
         }
@@ -1016,7 +1016,7 @@ static void int_chooser(config_item *cfgs, int idx, int val)
             for(int i = 0; i < CHOOSER_MAX_INCR; ++i)
             {
                 val += d;
-                rb->snprintf(cfg->sval, MAX_STRLEN, "%d", val);
+                rb->snprintf(cfg->u.string.sval, MAX_STRLEN, "%d", val);
                 ret = midend_set_config(me, CFG_SETTINGS, cfgs);
                 if(!ret)
                 {
@@ -1037,7 +1037,7 @@ static void int_chooser(config_item *cfgs, int idx, int val)
 
                 /* reset value */
                 val -= d * CHOOSER_MAX_INCR;
-                rb->snprintf(cfg->sval, MAX_STRLEN, "%d", val);
+                rb->snprintf(cfg->u.string.sval, MAX_STRLEN, "%d", val);
                 assert(!midend_set_config(me, CFG_SETTINGS, cfgs));
             }
         }
@@ -1058,14 +1058,14 @@ static bool do_configure_item(config_item *cfgs, int idx)
         rb->lcd_set_foreground(LCD_WHITE);
         rb->lcd_set_background(LCD_BLACK);
 
-        if(is_integer(cfg->sval))
+        if(is_integer(cfg->u.string.sval))
         {
-            int val = atoi(cfg->sval);
+            int val = atoi(cfg->u.string.sval);
 
             /* we now free the original string and give int_chooser()
              * a clean buffer to work with */
-            sfree(cfg->sval);
-            cfg->sval = newstr;
+            sfree(cfg->u.string.sval);
+            cfg->u.string.sval = newstr;
 
             int_chooser(cfgs, idx, val);
 
@@ -1075,32 +1075,32 @@ static bool do_configure_item(config_item *cfgs, int idx)
             return true;
         }
 
-        rb->strlcpy(newstr, cfg->sval, MAX_STRLEN);
+        rb->strlcpy(newstr, cfg->u.string.sval, MAX_STRLEN);
         if(rb->kbd_input(newstr, MAX_STRLEN) < 0)
         {
             sfree(newstr);
             return false;
         }
-        sfree(cfg->sval);
-        cfg->sval = newstr;
+        sfree(cfg->u.string.sval);
+        cfg->u.string.sval = newstr;
         return true;
     }
     case C_BOOLEAN:
     {
-        bool res = cfg->ival != 0;
+        bool res = cfg->u.boolean.bval != 0;
         rb->set_bool(cfg->name, &res);
 
         /* seems to reset backdrop */
         rb->lcd_set_backdrop(NULL);
 
-        cfg->ival = res;
+        cfg->u.boolean.bval = res;
         break;
     }
     case C_CHOICES:
     {
-        int sel = list_choose(cfg->sval, cfg->name, cfg->ival);
+        int sel = list_choose(cfg->u.choices.choicenames, cfg->name, cfg->u.choices.selected);
         if(sel >= 0)
-            cfg->ival = sel;
+            cfg->u.choices.selected = sel;
         break;
     }
     default:
@@ -1172,7 +1172,7 @@ static bool config_menu(void)
 
             char *old_str = NULL;
             if(old.type == C_STRING)
-                old_str = dupstr(old.sval);
+                old_str = dupstr(old.u.string.sval);
 
             bool freed_str = do_configure_item(config, pos);
             char *err = midend_set_config(me, CFG_SETTINGS, config);
@@ -1185,7 +1185,7 @@ static bool config_menu(void)
                 memcpy(config + pos, &old, sizeof(old));
 
                 if(old.type == C_STRING && freed_str)
-                    config[pos].sval = old_str;
+                    config[pos].u.string.sval = old_str;
             }
             else
             {
