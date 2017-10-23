@@ -148,14 +148,12 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "No. of balls";
     ret[2].type = C_STRING;
@@ -163,13 +161,10 @@ static config_item *game_configure(const game_params *params)
         sprintf(buf, "%d", params->minballs);
     else
         sprintf(buf, "%d-%d", params->minballs, params->maxballs);
-    ret[2].sval = dupstr(buf);
-    ret[2].ival = 0;
+    ret[2].u.string.sval = dupstr(buf);
 
     ret[3].name = NULL;
     ret[3].type = C_END;
-    ret[3].sval = NULL;
-    ret[3].ival = 0;
 
     return ret;
 }
@@ -178,17 +173,18 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
 
     /* Allow 'a-b' for a range, otherwise assume a single number. */
-    if (sscanf(cfg[2].sval, "%d-%d", &ret->minballs, &ret->maxballs) < 2)
-        ret->minballs = ret->maxballs = atoi(cfg[2].sval);
+    if (sscanf(cfg[2].u.string.sval, "%d-%d",
+               &ret->minballs, &ret->maxballs) < 2)
+        ret->minballs = ret->maxballs = atoi(cfg[2].u.string.sval);
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w < 2 || params->h < 2)
         return "Width and height must both be at least two";
@@ -253,11 +249,11 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     return ret;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int nballs, dlen = strlen(desc), i;
     unsigned char *bmp;
-    char *ret;
+    const char *ret;
 
     /* the bitmap is 2+(nballs*2) long; the hex version is double that. */
     nballs = ((dlen/2)-2)/2;
@@ -464,7 +460,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     return dupstr("S");
 }
@@ -904,7 +900,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->cur_x = cx;
         ui->cur_y = cy;
         ui->cur_visible = 1;
-        return "";
+        return UI_UPDATE;
     }
 
     if (button == LEFT_BUTTON || button == RIGHT_BUTTON) {
@@ -914,7 +910,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         wouldflash = 1;
     } else if (button == LEFT_RELEASE) {
         ui->flash_laser = 0;
-        return "";
+        return UI_UPDATE;
     } else if (IS_CURSOR_SELECT(button)) {
         if (ui->cur_visible) {
             gx = ui->cur_x;
@@ -923,7 +919,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             wouldflash = 2;
         } else {
             ui->cur_visible = 1;
-            return "";
+            return UI_UPDATE;
         }
         /* Fix up 'button' for the below logic. */
         if (button == CURSOR_SELECT2) button = RIGHT_BUTTON;
@@ -972,9 +968,9 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	    return nullret;
         ui->flash_laserno = rangeno;
         ui->flash_laser = wouldflash;
-        nullret = "";
+        nullret = UI_UPDATE;
         if (state->exits[rangeno] != LASER_EMPTY)
-            return "";
+            return UI_UPDATE;
         sprintf(buf, "F%d", rangeno);
         break;
 

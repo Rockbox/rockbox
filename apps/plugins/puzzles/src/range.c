@@ -66,7 +66,7 @@
 
 #define setmember(obj, field) ( (obj) . field = field )
 
-static char *nfmtstr(int n, char *fmt, ...) {
+static char *nfmtstr(int n, const char *fmt, ...) {
     va_list va;
     char *ret = snewn(n+1, char);
     va_start(va, fmt);
@@ -170,18 +170,14 @@ static config_item *game_configure(const game_params *params)
 
     ret[0].name = "Width";
     ret[0].type = C_STRING;
-    ret[0].sval = nfmtstr(10, "%d", params->w);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = nfmtstr(10, "%d", params->w);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
-    ret[1].sval = nfmtstr(10, "%d", params->h);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = nfmtstr(10, "%d", params->h);
 
     ret[2].name = NULL;
     ret[2].type = C_END;
-    ret[2].sval = NULL;
-    ret[2].ival = 0;
 
     return ret;
 }
@@ -189,8 +185,8 @@ static config_item *game_configure(const game_params *params)
 static game_params *custom_params(const config_item *configuration)
 {
     game_params *ret = snew(game_params);
-    ret->w = atoi(configuration[0].sval);
-    ret->h = atoi(configuration[1].sval);
+    ret->w = atoi(configuration[0].u.string.sval);
+    ret->h = atoi(configuration[1].u.string.sval);
     return ret;
 }
 
@@ -312,7 +308,7 @@ enum {
 static move *solve_internal(const game_state *state, move *base, int diff);
 
 static char *solve_game(const game_state *orig, const game_state *curpos,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     int const n = orig->params.w * orig->params.h;
     move *const base = snewn(n, move);
@@ -910,7 +906,7 @@ static int dfs_count_white(game_state *state, int cell)
     return k;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     int const w = params->w, h = params->h;
     if (w < 1) return "Error: width is less than 1";
@@ -1077,7 +1073,7 @@ static char *newdesc_encode_game_description(int area, puzzle_size *grid)
     return desc;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int const n = params->w * params->h;
     int squares = 0;
@@ -1360,14 +1356,14 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 else if (do_post)
                     return nfmtstr(40, "W,%d,%d", ui->r, ui->c);
                 else
-                    return "";
+                    return UI_UPDATE;
 
             } else if (!out_of_bounds(ui->r + dr[i], ui->c + dc[i], w, h)) {
                 ui->r += dr[i];
                 ui->c += dc[i];
             }
         } else ui->cursor_show = TRUE;
-        return "";
+        return UI_UPDATE;
     }
 
     if (action == hint) {

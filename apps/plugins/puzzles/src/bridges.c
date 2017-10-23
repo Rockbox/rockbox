@@ -742,44 +742,40 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Difficulty";
     ret[2].type = C_CHOICES;
-    ret[2].sval = ":Easy:Medium:Hard";
-    ret[2].ival = params->difficulty;
+    ret[2].u.choices.choicenames = ":Easy:Medium:Hard";
+    ret[2].u.choices.selected = params->difficulty;
 
     ret[3].name = "Allow loops";
     ret[3].type = C_BOOLEAN;
-    ret[3].sval = NULL;
-    ret[3].ival = params->allowloops;
+    ret[3].u.boolean.bval = params->allowloops;
 
     ret[4].name = "Max. bridges per direction";
     ret[4].type = C_CHOICES;
-    ret[4].sval = ":1:2:3:4"; /* keep up-to-date with MAX_BRIDGES */
-    ret[4].ival = params->maxb - 1;
+    ret[4].u.choices.choicenames = ":1:2:3:4"; /* keep up-to-date with
+                                                * MAX_BRIDGES */
+    ret[4].u.choices.selected = params->maxb - 1;
 
     ret[5].name = "%age of island squares";
     ret[5].type = C_CHOICES;
-    ret[5].sval = ":5%:10%:15%:20%:25%:30%";
-    ret[5].ival = (params->islands / 5)-1;
+    ret[5].u.choices.choicenames = ":5%:10%:15%:20%:25%:30%";
+    ret[5].u.choices.selected = (params->islands / 5)-1;
 
     ret[6].name = "Expansion factor (%age)";
     ret[6].type = C_CHOICES;
-    ret[6].sval = ":0%:10%:20%:30%:40%:50%:60%:70%:80%:90%:100%";
-    ret[6].ival = params->expansion / 10;
+    ret[6].u.choices.choicenames = ":0%:10%:20%:30%:40%:50%:60%:70%:80%:90%:100%";
+    ret[6].u.choices.selected = params->expansion / 10;
 
     ret[7].name = NULL;
     ret[7].type = C_END;
-    ret[7].sval = NULL;
-    ret[7].ival = 0;
 
     return ret;
 }
@@ -788,18 +784,18 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w          = atoi(cfg[0].sval);
-    ret->h          = atoi(cfg[1].sval);
-    ret->difficulty = cfg[2].ival;
-    ret->allowloops = cfg[3].ival;
-    ret->maxb       = cfg[4].ival + 1;
-    ret->islands    = (cfg[5].ival + 1) * 5;
-    ret->expansion  = cfg[6].ival * 10;
+    ret->w          = atoi(cfg[0].u.string.sval);
+    ret->h          = atoi(cfg[1].u.string.sval);
+    ret->difficulty = cfg[2].u.choices.selected;
+    ret->allowloops = cfg[3].u.boolean.bval;
+    ret->maxb       = cfg[4].u.choices.selected + 1;
+    ret->islands    = (cfg[5].u.choices.selected + 1) * 5;
+    ret->expansion  = cfg[6].u.choices.selected * 10;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w < 3 || params->h < 3)
         return "Width and height must be at least 3";
@@ -1993,7 +1989,7 @@ generated:
     return ret;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int i, wh = params->w * params->h;
 
@@ -2094,7 +2090,7 @@ static char *ui_cancel_drag(game_ui *ui)
     ui->dragx_src = ui->dragy_src = -1;
     ui->dragx_dst = ui->dragy_dst = -1;
     ui->dragging = 0;
-    return "";
+    return UI_UPDATE;
 }
 
 static game_ui *new_ui(const game_state *state)
@@ -2282,7 +2278,7 @@ static char *update_drag_dst(const game_state *state, game_ui *ui,
     /*debug(("update_drag src (%d,%d) d(%d,%d) dst (%d,%d)\n",
            ui->dragx_src, ui->dragy_src, dx, dy,
            ui->dragx_dst, ui->dragy_dst));*/
-    return "";
+    return UI_UPDATE;
 }
 
 static char *finish_drag(const game_state *state, game_ui *ui)
@@ -2325,7 +2321,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         if (ggrid & G_ISLAND) {
             ui->dragx_src = gx;
             ui->dragy_src = gy;
-            return "";
+            return UI_UPDATE;
         } else
             return ui_cancel_drag(ui);
     } else if (button == LEFT_DRAG || button == RIGHT_DRAG) {
@@ -2339,7 +2335,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             /* cancel a drag when we go back to the starting point */
             ui->dragx_dst = -1;
             ui->dragy_dst = -1;
-            return "";
+            return UI_UPDATE;
         }
     } else if (button == LEFT_RELEASE || button == RIGHT_RELEASE) {
         if (ui->dragging) {
@@ -2424,19 +2420,19 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
                     if (!dingrid) break;
                 }
-                if (!oingrid) return "";
+                if (!oingrid) return UI_UPDATE;
             }
             /* not reached */
 
 found:
             ui->cur_x = nx;
             ui->cur_y = ny;
-            return "";
+            return UI_UPDATE;
         }
     } else if (IS_CURSOR_SELECT(button)) {
         if (!ui->cur_visible) {
             ui->cur_visible = 1;
-            return "";
+            return UI_UPDATE;
         }
         if (ui->dragging || button == CURSOR_SELECT2) {
             ui_cancel_drag(ui);
@@ -2444,7 +2440,7 @@ found:
                 sprintf(buf, "M%d,%d", ui->cur_x, ui->cur_y);
                 return dupstr(buf);
             } else
-                return "";
+                return UI_UPDATE;
         } else {
             grid_type v = GRID(state, ui->cur_x, ui->cur_y);
             if (v & G_ISLAND) {
@@ -2453,7 +2449,7 @@ found:
                 ui->dragy_src = ui->cur_y;
                 ui->dragx_dst = ui->dragy_dst = -1;
                 ui->drag_is_noline = (button == CURSOR_SELECT2) ? 1 : 0;
-                return "";
+                return UI_UPDATE;
             }
         }
     } else if ((button >= '0' && button <= '9') ||
@@ -2471,7 +2467,7 @@ found:
 
         if (!ui->cur_visible) {
             ui->cur_visible = 1;
-            return "";
+            return UI_UPDATE;
         }
 
         for (i = 0; i < state->n_islands; ++i) {
@@ -2498,12 +2494,12 @@ found:
         if (best_x != -1 && best_y != -1) {
             ui->cur_x = best_x;
             ui->cur_y = best_y;
-            return "";
+            return UI_UPDATE;
         } else
             return NULL;
     } else if (button == 'g' || button == 'G') {
         ui->show_hints = 1 - ui->show_hints;
-        return "";
+        return UI_UPDATE;
     }
 
     return NULL;
@@ -2577,7 +2573,7 @@ badmove:
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     char *ret;
     game_state *solved;

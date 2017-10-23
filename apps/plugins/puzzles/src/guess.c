@@ -74,7 +74,7 @@ static game_params *dup_params(const game_params *params)
 }
 
 static const struct {
-    char *name;
+    const char *name;
     game_params params;
 } guess_presets[] = {
     {"Standard", {6, 4, 10, FALSE, TRUE}},
@@ -166,35 +166,28 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Colours";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->ncolours);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Pegs per guess";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->npegs);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Guesses";
     ret[2].type = C_STRING;
     sprintf(buf, "%d", params->nguesses);
-    ret[2].sval = dupstr(buf);
-    ret[2].ival = 0;
+    ret[2].u.string.sval = dupstr(buf);
 
     ret[3].name = "Allow blanks";
     ret[3].type = C_BOOLEAN;
-    ret[3].sval = NULL;
-    ret[3].ival = params->allow_blank;
+    ret[3].u.boolean.bval = params->allow_blank;
 
     ret[4].name = "Allow duplicates";
     ret[4].type = C_BOOLEAN;
-    ret[4].sval = NULL;
-    ret[4].ival = params->allow_multiple;
+    ret[4].u.boolean.bval = params->allow_multiple;
 
     ret[5].name = NULL;
     ret[5].type = C_END;
-    ret[5].sval = NULL;
-    ret[5].ival = 0;
 
     return ret;
 }
@@ -203,17 +196,17 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->ncolours = atoi(cfg[0].sval);
-    ret->npegs = atoi(cfg[1].sval);
-    ret->nguesses = atoi(cfg[2].sval);
+    ret->ncolours = atoi(cfg[0].u.string.sval);
+    ret->npegs = atoi(cfg[1].u.string.sval);
+    ret->nguesses = atoi(cfg[2].u.string.sval);
 
-    ret->allow_blank = cfg[3].ival;
-    ret->allow_multiple = cfg[4].ival;
+    ret->allow_blank = cfg[3].u.boolean.bval;
+    ret->allow_multiple = cfg[4].u.boolean.bval;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->ncolours < 2 || params->npegs < 2)
 	return "Trivial solutions are uninteresting";
@@ -287,7 +280,7 @@ newcol:
     return ret;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     unsigned char *bmp;
     int i;
@@ -367,7 +360,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     return dupstr("S");
 }
@@ -447,7 +440,8 @@ static void free_ui(game_ui *ui)
 
 static char *encode_ui(const game_ui *ui)
 {
-    char *ret, *p, *sep;
+    char *ret, *p;
+    const char *sep;
     int i;
 
     /*
@@ -621,7 +615,8 @@ static int mark_pegs(pegrow guess, const pegrow solution, int ncols)
 
 static char *encode_move(const game_state *from, game_ui *ui)
 {
-    char *buf, *p, *sep;
+    char *buf, *p;
+    const char *sep;
     int len, i;
 
     len = ui->curr_pegs->npegs * 20 + 2;
@@ -779,7 +774,7 @@ static char *interpret_move(const game_state *from, game_ui *ui,
      */
     if (button == 'l' || button == 'L') {
         ui->show_labels = !ui->show_labels;
-        return "";
+        return UI_UPDATE;
     }
 
     if (from->solved) return NULL;
@@ -836,13 +831,13 @@ static char *interpret_move(const game_state *from, game_ui *ui,
             ui->drag_y = y;
             debug(("Start dragging, col = %d, (%d,%d)",
                    ui->drag_col, ui->drag_x, ui->drag_y));
-            ret = "";
+            ret = UI_UPDATE;
         }
     } else if (button == LEFT_DRAG && ui->drag_col) {
         ui->drag_x = x;
         ui->drag_y = y;
         debug(("Keep dragging, (%d,%d)", ui->drag_x, ui->drag_y));
-        ret = "";
+        ret = UI_UPDATE;
     } else if (button == LEFT_RELEASE && ui->drag_col) {
         if (over_guess > -1) {
             debug(("Dropping colour %d onto guess peg %d",
@@ -859,13 +854,13 @@ static char *interpret_move(const game_state *from, game_ui *ui,
         ui->drag_opeg = -1;
         ui->display_cur = 0;
         debug(("Stop dragging."));
-        ret = "";
+        ret = UI_UPDATE;
     } else if (button == RIGHT_BUTTON) {
         if (over_guess > -1) {
             /* we use ths feedback in the game_ui to signify
              * 'carry this peg to the next guess as well'. */
             ui->holds[over_guess] = 1 - ui->holds[over_guess];
-            ret = "";
+            ret = UI_UPDATE;
         }
     } else if (button == LEFT_RELEASE && over_hint && ui->markable) {
         /* NB this won't trigger if on the end of a drag; that's on
@@ -880,10 +875,10 @@ static char *interpret_move(const game_state *from, game_ui *ui,
             ui->colour_cur++;
         if (button == CURSOR_UP && ui->colour_cur > 0)
             ui->colour_cur--;
-        ret = "";
+        ret = UI_UPDATE;
     } else if (button == 'h' || button == 'H' || button == '?') {
         compute_hint(from, ui);
-        ret = "";
+        ret = UI_UPDATE;
     } else if (button == CURSOR_LEFT || button == CURSOR_RIGHT) {
         int maxcur = from->params.npegs;
         if (ui->markable) maxcur++;
@@ -893,25 +888,25 @@ static char *interpret_move(const game_state *from, game_ui *ui,
             ui->peg_cur++;
         if (button == CURSOR_LEFT && ui->peg_cur > 0)
             ui->peg_cur--;
-        ret = "";
+        ret = UI_UPDATE;
     } else if (IS_CURSOR_SELECT(button)) {
         ui->display_cur = 1;
         if (ui->peg_cur == from->params.npegs) {
             ret = encode_move(from, ui);
         } else {
             set_peg(&from->params, ui, ui->peg_cur, ui->colour_cur+1);
-            ret = "";
+            ret = UI_UPDATE;
         }
     } else if (button == 'D' || button == 'd' || button == '\b') {
         ui->display_cur = 1;
         set_peg(&from->params, ui, ui->peg_cur, 0);
-        ret = "";
+        ret = UI_UPDATE;
     } else if (button == CURSOR_SELECT2) {
         if (ui->peg_cur == from->params.npegs)
             return NULL;
         ui->display_cur = 1;
         ui->holds[ui->peg_cur] = 1 - ui->holds[ui->peg_cur];
-        ret = "";
+        ret = UI_UPDATE;
     }
     return ret;
 }

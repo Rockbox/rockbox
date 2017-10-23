@@ -9,13 +9,15 @@
 
 #include "puzzles.h"
 
+char UI_UPDATE[] = "";
+
 void free_cfg(config_item *cfg)
 {
     config_item *i;
 
     for (i = cfg; i->type != C_END; i++)
 	if (i->type == C_STRING)
-	    sfree(i->sval);
+	    sfree(i->u.string.sval);
     sfree(cfg);
 }
 
@@ -349,7 +351,7 @@ void pos2c(int w, int h, int pos, int *cx, int *cy)
 
 void draw_text_outline(drawing *dr, int x, int y, int fonttype,
                        int fontsize, int align,
-                       int text_colour, int outline_colour, char *text)
+                       int text_colour, int outline_colour, const char *text)
 {
     if (outline_colour > -1) {
         draw_text(dr, x-1, y, fonttype, fontsize, align, outline_colour, text);

@@ -222,24 +222,20 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Difficulty";
     ret[2].type = C_CHOICES;
-    ret[2].sval = DIFFCONFIG;
-    ret[2].ival = params->diff;
+    ret[2].u.choices.choicenames = DIFFCONFIG;
+    ret[2].u.choices.selected = params->diff;
 
     ret[3].name = NULL;
     ret[3].type = C_END;
-    ret[3].sval = NULL;
-    ret[3].ival = 0;
 
     return ret;
 }
@@ -248,14 +244,14 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->diff = cfg[2].ival;
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->diff = cfg[2].u.choices.selected;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w < 2 || params->h < 2)
 	return "Width and neight must be at least two";
@@ -334,10 +330,10 @@ static int c2n(char c) {
 }
 
 static void unpick_desc(const game_params *params, const char *desc,
-                        game_state **sout, char **mout)
+                        game_state **sout, const char **mout)
 {
     game_state *state = blank_game(params->w, params->h);
-    char *msg = NULL;
+    const char *msg = NULL;
     int num = 0, i = 0;
 
     if (strlen(desc) != state->n) {
@@ -1185,7 +1181,7 @@ static int solve_specific(game_state *state, int diff, int sneaky)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     game_state *solved = dup_game(currstate);
     char *move = NULL;
@@ -1414,9 +1410,9 @@ randomise:
     return ret;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
-    char *ret = NULL;
+    const char *ret = NULL;
 
     unpick_desc(params, desc, NULL, &ret);
     return ret;
@@ -1522,7 +1518,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             action = TOGGLE_CIRCLE;
         }
     }
-    if (action == UI) return "";
+    if (action == UI) return UI_UPDATE;
 
     if (action == TOGGLE_BLACK || action == TOGGLE_CIRCLE) {
         i = y * state->w + x;
@@ -1910,7 +1906,8 @@ static void start_soak(game_params *p, random_state *rs)
 
 int main(int argc, char **argv)
 {
-    char *id = NULL, *desc, *desc_gen = NULL, *tgame, *err, *aux;
+    char *id = NULL, *desc, *desc_gen = NULL, *tgame, *aux;
+    const char *err;
     game_state *s = NULL;
     game_params *p = NULL;
     int soln, soak = 0, ret = 1;

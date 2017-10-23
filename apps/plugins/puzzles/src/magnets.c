@@ -193,29 +193,24 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Difficulty";
     ret[2].type = C_CHOICES;
-    ret[2].sval = DIFFCONFIG;
-    ret[2].ival = params->diff;
+    ret[2].u.choices.choicenames = DIFFCONFIG;
+    ret[2].u.choices.selected = params->diff;
 
     ret[3].name = "Strip clues";
     ret[3].type = C_BOOLEAN;
-    ret[3].sval = NULL;
-    ret[3].ival = params->stripclues;
+    ret[3].u.boolean.bval = params->stripclues;
 
     ret[4].name = NULL;
     ret[4].type = C_END;
-    ret[4].sval = NULL;
-    ret[4].ival = 0;
 
     return ret;
 }
@@ -224,15 +219,15 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->diff = cfg[2].ival;
-    ret->stripclues = cfg[3].ival;
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->diff = cfg[2].u.choices.selected;
+    ret->stripclues = cfg[3].u.boolean.bval;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w < 2) return "Width must be at least one";
     if (params->h < 2) return "Height must be at least one";
@@ -539,7 +534,7 @@ done:
     return state;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     const char *prob;
     game_state *st = new_game_int(params, desc, &prob);
@@ -1455,7 +1450,7 @@ static void solve_from_aux(const game_state *state, const char *aux)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     game_state *solved = dup_game(currstate);
     char *move = NULL;
@@ -1804,11 +1799,11 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     if (IS_CURSOR_MOVE(button)) {
         move_cursor(button, &ui->cur_x, &ui->cur_y, state->w, state->h, 0);
         ui->cur_visible = 1;
-        return "";
+        return UI_UPDATE;
     } else if (IS_CURSOR_SELECT(button)) {
         if (!ui->cur_visible) {
             ui->cur_visible = 1;
-            return "";
+            return UI_UPDATE;
         }
         action = (button == CURSOR_SELECT) ? CYCLE_MAGNET : CYCLE_NEUTRAL;
         gx = ui->cur_x;
@@ -1817,7 +1812,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                (button == LEFT_BUTTON || button == RIGHT_BUTTON)) {
         if (ui->cur_visible) {
             ui->cur_visible = 0;
-            nullret = "";
+            nullret = UI_UPDATE;
         }
         action = (button == LEFT_BUTTON) ? CYCLE_MAGNET : CYCLE_NEUTRAL;
     } else if (button == LEFT_BUTTON && is_clue(state, gx, gy)) {
@@ -2540,7 +2535,8 @@ static void start_soak(game_params *p, random_state *rs)
 int main(int argc, const char *argv[])
 {
     int print = 0, soak = 0, solved = 0, ret;
-    char *id = NULL, *desc, *desc_gen = NULL, *err, *aux = NULL;
+    char *id = NULL, *desc, *desc_gen = NULL, *aux = NULL;
+    const char *err;
     game_state *s = NULL;
     game_params *p = NULL;
     random_state *rs = NULL;

@@ -371,24 +371,20 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Difficulty";
     ret[2].type = C_CHOICES;
-    ret[2].sval = DIFFCONFIG;
-    ret[2].ival = params->diff;
+    ret[2].u.choices.choicenames = DIFFCONFIG;
+    ret[2].u.choices.selected = params->diff;
 
     ret[3].name = NULL;
     ret[3].type = C_END;
-    ret[3].sval = NULL;
-    ret[3].ival = 0;
 
     return ret;
 }
@@ -397,14 +393,14 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->diff = cfg[2].ival;
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->diff = cfg[2].u.choices.selected;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     /*
      * Generating anything under 4x4 runs into trouble of one kind
@@ -1190,7 +1186,7 @@ static char *new_game_desc(const game_params *params_in, random_state *rs,
     return ret;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int w = params->w, h = params->h;
     int area, i;
@@ -1316,7 +1312,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     int w = state->p.w, h = state->p.h;
 
@@ -1559,13 +1555,14 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->dsy = ui->dey = y;
         ui->drag_ok = TRUE;
         ui->cdisp = 0;
-        return "";             /* ui updated */
+        return UI_UPDATE;
     }
 
     if ((IS_MOUSE_DRAG(button) || IS_MOUSE_RELEASE(button)) &&
         ui->drag_button > 0) {
         int xmin, ymin, xmax, ymax;
-        char *buf, *sep;
+        char *buf;
+        const char *sep;
         int buflen, bufsize, tmplen;
 
         x = FROMCOORD(x);
@@ -1590,14 +1587,14 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         }
 
         if (IS_MOUSE_DRAG(button))
-            return "";                 /* ui updated */
+            return UI_UPDATE;
 
         /*
          * The drag has been released. Enact it.
          */
         if (!ui->drag_ok) {
             ui->drag_button = -1;
-            return "";                 /* drag was just cancelled */
+            return UI_UPDATE;          /* drag was just cancelled */
         }
 
         xmin = min(ui->dsx, ui->dex);
@@ -1635,7 +1632,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
         if (buflen == 0) {
             sfree(buf);
-            return "";                 /* ui updated (drag was terminated) */
+            return UI_UPDATE;          /* drag was terminated */
         } else {
             buf[buflen] = '\0';
             return buf;
@@ -1663,7 +1660,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             if (len) return dupstr(tmpbuf);
         } else
             move_cursor(button, &ui->cx, &ui->cy, w, h, 0);
-        return "";
+        return UI_UPDATE;
     }
     if (ui->cdisp) {
         char rep = 0;
@@ -1690,7 +1687,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         }
     } else if (IS_CURSOR_SELECT(button)) {
         ui->cdisp = 1;
-        return "";
+        return UI_UPDATE;
     }
 
     return NULL;
@@ -2654,7 +2651,8 @@ int main(int argc, char **argv)
 {
     game_params *p;
     game_state *s, *s2;
-    char *id = NULL, *desc, *err;
+    char *id = NULL, *desc;
+    const char *err;
     int grade = FALSE;
     int ret, diff, really_verbose = FALSE;
     struct solver_scratch *sc;

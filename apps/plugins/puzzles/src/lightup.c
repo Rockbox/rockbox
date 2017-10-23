@@ -299,37 +299,32 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "%age of black squares";
     ret[2].type = C_STRING;
     sprintf(buf, "%d", params->blackpc);
-    ret[2].sval = dupstr(buf);
-    ret[2].ival = 0;
+    ret[2].u.string.sval = dupstr(buf);
 
     ret[3].name = "Symmetry";
     ret[3].type = C_CHOICES;
-    ret[3].sval = ":None"
+    ret[3].u.choices.choicenames = ":None"
                   ":2-way mirror:2-way rotational"
                   ":4-way mirror:4-way rotational";
-    ret[3].ival = params->symm;
+    ret[3].u.choices.selected = params->symm;
 
     ret[4].name = "Difficulty";
     ret[4].type = C_CHOICES;
-    ret[4].sval = ":Easy:Tricky:Hard";
-    ret[4].ival = params->difficulty;
+    ret[4].u.choices.choicenames = ":Easy:Tricky:Hard";
+    ret[4].u.choices.selected = params->difficulty;
 
     ret[5].name = NULL;
     ret[5].type = C_END;
-    ret[5].sval = NULL;
-    ret[5].ival = 0;
 
     return ret;
 }
@@ -338,16 +333,16 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w =       atoi(cfg[0].sval);
-    ret->h =       atoi(cfg[1].sval);
-    ret->blackpc = atoi(cfg[2].sval);
-    ret->symm =    cfg[3].ival;
-    ret->difficulty = cfg[4].ival;
+    ret->w =       atoi(cfg[0].u.string.sval);
+    ret->h =       atoi(cfg[1].u.string.sval);
+    ret->blackpc = atoi(cfg[2].u.string.sval);
+    ret->symm =    cfg[3].u.choices.selected;
+    ret->difficulty = cfg[4].u.choices.selected;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w < 2 || params->h < 2)
         return "Width and height must be at least 2";
@@ -1629,7 +1624,7 @@ goodpuzzle:
     return ret;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int i;
     for (i = 0; i < params->w*params->h; i++) {
@@ -1700,7 +1695,7 @@ static game_state *new_game(midend *me, const game_params *params,
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     game_state *solved;
     char *move = NULL, buf[80];
@@ -1882,7 +1877,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     enum { NONE, FLIP_LIGHT, FLIP_IMPOSSIBLE } action = NONE;
     int cx = -1, cy = -1;
     unsigned int flags;
-    char buf[80], *nullret = NULL, *empty = "", c;
+    char buf[80], *nullret = UI_UPDATE, *empty = UI_UPDATE, c;
 
     if (button == LEFT_BUTTON || button == RIGHT_BUTTON) {
         if (ui->cur_visible)
@@ -2331,7 +2326,8 @@ int main(int argc, char **argv)
 {
     game_params *p;
     game_state *s;
-    char *id = NULL, *desc, *err, *result;
+    char *id = NULL, *desc, *result;
+    const char *err;
     int nsol, diff, really_verbose = 0;
     unsigned int sflags;
 

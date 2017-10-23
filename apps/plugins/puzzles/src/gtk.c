@@ -71,7 +71,7 @@
 #ifdef DEBUGGING
 static FILE *debug_fp = NULL;
 
-void dputs(char *buf)
+void dputs(const char *buf)
 {
     if (!debug_fp) {
         debug_fp = fopen("debug.log", "w");
@@ -85,7 +85,7 @@ void dputs(char *buf)
     }
 }
 
-void debug_printf(char *fmt, ...)
+void debug_printf(const char *fmt, ...)
 {
     char buf[4096];
     va_list ap;
@@ -101,7 +101,7 @@ void debug_printf(char *fmt, ...)
  * Error reporting functions used elsewhere.
  */
 
-void fatal(char *fmt, ...)
+void fatal(const char *fmt, ...)
 {
     va_list ap;
 
@@ -189,6 +189,38 @@ struct frontend {
     int drawing_area_shrink_pending;
     int menubar_is_local;
 #endif
+#if GTK_CHECK_VERSION(3,0,0)
+    /*
+     * This is used to get round an annoying lack of GTK notification
+     * message. If we request a window resize with
+     * gtk_window_resize(), we normally get back a "configure" event
+     * on the window and on its drawing area, and we respond to the
+     * latter by doing an appropriate resize of the puzzle. If the
+     * window is maximised, so that gtk_window_resize() _doesn't_
+     * change its size, then that configure event never shows up. But
+     * if we requested the resize in response to a change of puzzle
+     * parameters (say, the user selected a differently-sized preset
+     * from the menu), then we would still like to be _notified_ that
+     * the window size was staying the same, so that we can respond by
+     * choosing an appropriate tile size for the new puzzle preset in
+     * the existing window size.
+     *
+     * Fortunately, in GTK 3, we may not get a "configure" event on
+     * the drawing area in this situation, but we still get a
+     * "size_allocate" event on the whole window (which, in other
+     * situations when we _do_ get a "configure" on the area, turns up
+     * second). So we treat _that_ event as indicating that if the
+     * "configure" event hasn't already shown up then it's not going
+     * to arrive.
+     *
+     * This flag is where we bookkeep this system. On
+     * gtk_window_resize we set this flag to true; the area's
+     * configure handler sets it back to false; then if that doesn't
+     * happen, the window's size_allocate handler does a fallback
+     * puzzle resize when it sees this flag still set to true.
+     */
+    int awaiting_resize_ack;
+#endif
 };
 
 struct blitter {
@@ -232,7 +264,7 @@ void frontend_default_colour(frontend *fe, float *output)
 #endif
 }
 
-void gtk_status_bar(void *handle, char *text)
+void gtk_status_bar(void *handle, const char *text)
 {
     frontend *fe = (frontend *)handle;
 
@@ -968,7 +1000,7 @@ void gtk_unclip(void *handle)
 }
 
 void gtk_draw_text(void *handle, int x, int y, int fonttype, int fontsize,
-		   int align, int colour, char *text)
+		   int align, int colour, const char *text)
 {
     frontend *fe = (frontend *)handle;
     int i;
@@ -1338,15 +1370,10 @@ static gint map_window(GtkWidget *widget, GdkEvent *event,
     return TRUE;
 }
 
-static gint configure_area(GtkWidget *widget,
-                           GdkEventConfigure *event, gpointer data)
+static void resize_puzzle_to_area(frontend *fe, int x, int y)
 {
-    frontend *fe = (frontend *)data;
-    int x, y;
     int oldw = fe->w, oldpw = fe->pw, oldh = fe->h, oldph = fe->ph;
 
-    x = event->width;
-    y = event->height;
     fe->w = x;
     fe->h = y;
     midend_size(fe->me, &x, &y, TRUE);
@@ -1363,9 +1390,30 @@ static gint configure_area(GtkWidget *widget,
     }
 
     midend_force_redraw(fe->me);
+}
 
+static gint configure_area(GtkWidget *widget,
+                           GdkEventConfigure *event, gpointer data)
+{
+    frontend *fe = (frontend *)data;
+    resize_puzzle_to_area(fe, event->width, event->height);
+    fe->awaiting_resize_ack = FALSE;
     return TRUE;
 }
+
+#if GTK_CHECK_VERSION(3,0,0)
+static void window_size_alloc(GtkWidget *widget, GtkAllocation *allocation,
+                              gpointer data)
+{
+    frontend *fe = (frontend *)data;
+    if (fe->awaiting_resize_ack) {
+        GtkAllocation a;
+        gtk_widget_get_allocation(fe->area, &a);
+        resize_puzzle_to_area(fe, a.width, a.height);
+        fe->awaiting_resize_ack = FALSE;
+    }
+}
+#endif
 
 static gint timer_func(gpointer data)
 {
@@ -1444,8 +1492,8 @@ static void align_label(GtkLabel *label, double x, double y)
 }
 
 #if GTK_CHECK_VERSION(3,0,0)
-int message_box(GtkWidget *parent, char *title, char *msg, int centre,
-		int type)
+int message_box(GtkWidget *parent, const char *title, const char *msg,
+                int centre, int type)
 {
     GtkWidget *window;
     gint ret;
@@ -1539,7 +1587,7 @@ int message_box(GtkWidget *parent, char *title, char *msg, int centre,
 }
 #endif /* GTK_CHECK_VERSION(3,0,0) */
 
-void error_box(GtkWidget *parent, char *msg)
+void error_box(GtkWidget *parent, const char *msg)
 {
     message_box(parent, "Error", msg, FALSE, MB_OK);
 }
@@ -1547,7 +1595,7 @@ void error_box(GtkWidget *parent, char *msg)
 static void config_ok_button_clicked(GtkButton *button, gpointer data)
 {
     frontend *fe = (frontend *)data;
-    char *err;
+    const char *err;
 
     err = midend_set_config(fe->me, fe->cfg_which, fe->cfg);
 
@@ -1593,22 +1641,25 @@ static void editbox_changed(GtkEditable *ed, gpointer data)
 {
     config_item *i = (config_item *)data;
 
-    sfree(i->sval);
-    i->sval = dupstr(gtk_entry_get_text(GTK_ENTRY(ed)));
+    assert(i->type == C_STRING);
+    sfree(i->u.string.sval);
+    i->u.string.sval = dupstr(gtk_entry_get_text(GTK_ENTRY(ed)));
 }
 
 static void button_toggled(GtkToggleButton *tb, gpointer data)
 {
     config_item *i = (config_item *)data;
 
-    i->ival = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(tb));
+    assert(i->type == C_BOOLEAN);
+    i->u.boolean.bval = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(tb));
 }
 
 static void droplist_sel(GtkComboBox *combo, gpointer data)
 {
     config_item *i = (config_item *)data;
 
-    i->ival = gtk_combo_box_get_active(combo);
+    assert(i->type == C_CHOICES);
+    i->u.choices.selected = gtk_combo_box_get_active(combo);
 }
 
 static int get_config(frontend *fe, int which)
@@ -1703,7 +1754,7 @@ static int get_config(frontend *fe, int which)
 			     GTK_EXPAND | GTK_SHRINK | GTK_FILL,
 			     3, 3);
 #endif
-	    gtk_entry_set_text(GTK_ENTRY(w), i->sval);
+	    gtk_entry_set_text(GTK_ENTRY(w), i->u.string.sval);
 	    g_signal_connect(G_OBJECT(w), "changed",
                              G_CALLBACK(editbox_changed), i);
 	    g_signal_connect(G_OBJECT(w), "key_press_event",
@@ -1728,7 +1779,8 @@ static int get_config(frontend *fe, int which)
 			     GTK_EXPAND | GTK_SHRINK | GTK_FILL,
 			     3, 3);
 #endif
-	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), i->ival);
+	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w),
+                                         i->u.boolean.bval);
 	    gtk_widget_show(w);
 	    break;
 
@@ -1751,15 +1803,16 @@ static int get_config(frontend *fe, int which)
 
             {
 		int c;
-		char *p, *q, *name;
+		const char *p, *q;
+                char *name;
                 GtkListStore *model;
 		GtkCellRenderer *cr;
                 GtkTreeIter iter;
 
                 model = gtk_list_store_new(1, G_TYPE_STRING);
 
-		c = *i->sval;
-		p = i->sval+1;
+		c = *i->u.choices.choicenames;
+		p = i->u.choices.choicenames+1;
 
 		while (*p) {
 		    q = p;
@@ -1780,7 +1833,8 @@ static int get_config(frontend *fe, int which)
 
                 w = gtk_combo_box_new_with_model(GTK_TREE_MODEL(model));
 
-		gtk_combo_box_set_active(GTK_COMBO_BOX(w), i->ival);
+		gtk_combo_box_set_active(GTK_COMBO_BOX(w),
+                                         i->u.choices.selected);
 
 		cr = gtk_cell_renderer_text_new();
 		gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(w), cr, TRUE);
@@ -1881,8 +1935,7 @@ static void changed_preset(frontend *fe)
             struct preset_menu_entry *entry =
                 (struct preset_menu_entry *)g_object_get_data(
                     G_OBJECT(gs->data), "user-data");
-
-            if (entry && entry->id != n)
+            if (!entry || entry->id != n)
                 gtk_check_menu_item_set_active(
                     GTK_CHECK_MENU_ITEM(gs->data), FALSE);
             else
@@ -1890,7 +1943,7 @@ static void changed_preset(frontend *fe)
         }
         if (found)
             gtk_check_menu_item_set_active(
-                GTK_CHECK_MENU_ITEM(found->data), FALSE);
+                GTK_CHECK_MENU_ITEM(found->data), TRUE);
     }
     fe->preset_threaded = FALSE;
 
@@ -1996,6 +2049,7 @@ static void resize_fe(frontend *fe)
 
 #if GTK_CHECK_VERSION(3,0,0)
     gtk_window_resize(GTK_WINDOW(fe->window), x, y + window_extra_height(fe));
+    fe->awaiting_resize_ack = TRUE;
 #else
     fe->drawing_area_shrink_pending = FALSE;
     gtk_drawing_area_size(GTK_DRAWING_AREA(fe->area), x, y);
@@ -2114,7 +2168,7 @@ static void filesel_ok(GtkButton *button, gpointer data)
     fe->filesel_name = dupstr(name);
 }
 
-static char *file_selector(frontend *fe, char *title, int save)
+static char *file_selector(frontend *fe, const char *title, int save)
 {
     GtkWidget *filesel =
         gtk_file_selection_new(title);
@@ -2145,7 +2199,7 @@ static char *file_selector(frontend *fe, char *title, int save)
 
 #else
 
-static char *file_selector(frontend *fe, char *title, int save)
+static char *file_selector(frontend *fe, const char *title, int save)
 {
     char *filesel_name = NULL;
 
@@ -2177,7 +2231,7 @@ struct savefile_write_ctx {
     int error;
 };
 
-static void savefile_write(void *wctx, void *buf, int len)
+static void savefile_write(void *wctx, const void *buf, int len)
 {
     struct savefile_write_ctx *ctx = (struct savefile_write_ctx *)wctx;
     if (fwrite(buf, 1, len, ctx->fp) < len)
@@ -2244,7 +2298,8 @@ static void menu_save_event(GtkMenuItem *menuitem, gpointer data)
 static void menu_load_event(GtkMenuItem *menuitem, gpointer data)
 {
     frontend *fe = (frontend *)data;
-    char *name, *err;
+    char *name;
+    const char *err;
 
     name = file_selector(fe, "Enter name of saved game file to load", FALSE);
 
@@ -2275,7 +2330,7 @@ static void menu_load_event(GtkMenuItem *menuitem, gpointer data)
 static void menu_solve_event(GtkMenuItem *menuitem, gpointer data)
 {
     frontend *fe = (frontend *)data;
-    char *msg;
+    const char *msg;
 
     msg = midend_solve(fe->me);
 
@@ -2341,7 +2396,7 @@ static void menu_about_event(GtkMenuItem *menuitem, gpointer data)
 }
 
 static GtkWidget *add_menu_ui_item(
-    frontend *fe, GtkContainer *cont, char *text, int action,
+    frontend *fe, GtkContainer *cont, const char *text, int action,
     int accel_key, int accel_keyqual)
 {
     GtkWidget *menuitem = gtk_menu_item_new_with_label(text);
@@ -2434,7 +2489,7 @@ static frontend *new_window(char *arg, int argtype, char **error)
     fe->me = midend_new(fe, &thegame, &gtk_drawing, fe);
 
     if (arg) {
-	char *err;
+	const char *err;
 	FILE *fp;
 
 	errbuf[0] = '\0';
@@ -2520,6 +2575,10 @@ static frontend *new_window(char *arg, int argtype, char **error)
             fe->menubar_is_local = !unity_mode;
         }
     }
+#endif
+
+#if GTK_CHECK_VERSION(3,0,0)
+    fe->awaiting_resize_ack = FALSE;
 #endif
 
     fe->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -2786,6 +2845,10 @@ static frontend *new_window(char *arg, int argtype, char **error)
                      G_CALLBACK(configure_area), fe);
     g_signal_connect(G_OBJECT(fe->window), "configure_event",
                      G_CALLBACK(configure_window), fe);
+#if GTK_CHECK_VERSION(3,0,0)
+    g_signal_connect(G_OBJECT(fe->window), "size_allocate",
+                     G_CALLBACK(window_size_alloc), fe);
+#endif
 
     gtk_widget_add_events(GTK_WIDGET(fe->area),
                           GDK_BUTTON_PRESS_MASK |
@@ -2865,7 +2928,7 @@ int main(int argc, char **argv)
     int soln = FALSE, colour = FALSE;
     float scale = 1.0F;
     float redo_proportion = 0.0F;
-    char *savefile = NULL, *savesuffix = NULL;
+    const char *savefile = NULL, *savesuffix = NULL;
     char *arg = NULL;
     int argtype = ARG_EITHER;
     char *screenshot_file = NULL;
@@ -3108,7 +3171,8 @@ int main(int argc, char **argv)
 	 * generated descriptive game IDs.)
 	 */
 	while (ngenerate == 0 || i < n) {
-	    char *pstr, *err, *seed;
+	    char *pstr, *seed;
+            const char *err;
             struct rusage before, after;
 
 	    if (ngenerate == 0) {
@@ -3162,7 +3226,7 @@ int main(int argc, char **argv)
                  * re-entering the same game id, and then try to solve
                  * it.
                  */
-                char *game_id, *err;
+                char *game_id;
 
                 game_id = midend_get_game_id(me);
                 err = midend_game_id(me, game_id);
@@ -3207,7 +3271,7 @@ int main(int argc, char **argv)
 		sprintf(realname, "%s%d%s", savefile, i, savesuffix);
 
                 if (soln) {
-                    char *err = midend_solve(me);
+                    const char *err = midend_solve(me);
                     if (err) {
                         fprintf(stderr, "%s: unable to show solution: %s\n",
                                 realname, err);

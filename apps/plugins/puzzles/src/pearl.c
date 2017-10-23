@@ -234,29 +234,24 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Difficulty";
     ret[2].type = C_CHOICES;
-    ret[2].sval = DIFFCONFIG;
-    ret[2].ival = params->difficulty;
+    ret[2].u.choices.choicenames = DIFFCONFIG;
+    ret[2].u.choices.selected = params->difficulty;
 
     ret[3].name = "Allow unsoluble";
     ret[3].type = C_BOOLEAN;
-    ret[3].sval = NULL;
-    ret[3].ival = params->nosolve;
+    ret[3].u.boolean.bval = params->nosolve;
 
     ret[4].name = NULL;
     ret[4].type = C_END;
-    ret[4].sval = NULL;
-    ret[4].ival = 0;
 
     return ret;
 }
@@ -265,15 +260,15 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->difficulty = cfg[2].ival;
-    ret->nosolve = cfg[3].ival;
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->difficulty = cfg[2].u.choices.selected;
+    ret->nosolve = cfg[3].u.boolean.bval;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w < 5) return "Width must be at least five";
     if (params->h < 5) return "Height must be at least five";
@@ -1392,7 +1387,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     return desc;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int i, sizesofar;
     const int totalsize = params->w * params->h;
@@ -1726,7 +1721,7 @@ static char *solve_for_diff(game_state *state, char *old_lines, char *new_lines)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     game_state *solved = dup_game(state);
     int i, ret, sz = state->shared->sz;
@@ -2022,11 +2017,11 @@ static char *mark_in_direction(const game_state *state, int x, int y, int dir,
 
     char ch = primary ? 'F' : 'M', *other;
 
-    if (!INGRID(state, x, y) || !INGRID(state, x2, y2)) return "";
+    if (!INGRID(state, x, y) || !INGRID(state, x2, y2)) return UI_UPDATE;
 
     /* disallow laying a mark over a line, or vice versa. */
     other = primary ? state->marks : state->lines;
-    if (other[y*w+x] & dir || other[y2*w+x2] & dir2) return "";
+    if (other[y*w+x] & dir || other[y2*w+x2] & dir2) return UI_UPDATE;
     
     sprintf(buf, "%c%d,%d,%d;%c%d,%d,%d", ch, dir, x, y, ch, dir2, x2, y2);
     return dupstr(buf);
@@ -2060,12 +2055,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->dragcoords[0] = gy * w + gx;
         ui->ndragcoords = 0;           /* will be 1 once drag is confirmed */
 
-        return "";
+        return UI_UPDATE;
     }
 
     if (button == LEFT_DRAG && ui->ndragcoords >= 0) {
         update_ui_drag(state, ui, gx, gy);
-        return "";
+        return UI_UPDATE;
     }
 
     if (IS_MOUSE_RELEASE(button)) release = TRUE;
@@ -2087,30 +2082,30 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	    if (ui->ndragcoords >= 0)
 		update_ui_drag(state, ui, ui->curx, ui->cury);
 	}
-	return "";
+	return UI_UPDATE;
     }
 
     if (IS_CURSOR_SELECT(button)) {
 	if (!ui->cursor_active) {
 	    ui->cursor_active = TRUE;
-	    return "";
+	    return UI_UPDATE;
 	} else if (button == CURSOR_SELECT) {
 	    if (ui->ndragcoords == -1) {
 		ui->ndragcoords = 0;
 		ui->dragcoords[0] = ui->cury * w + ui->curx;
 		ui->clickx = CENTERED_COORD(ui->curx);
 		ui->clicky = CENTERED_COORD(ui->cury);
-		return "";
+		return UI_UPDATE;
 	    } else release = TRUE;
 	} else if (button == CURSOR_SELECT2 && ui->ndragcoords >= 0) {
 	    ui->ndragcoords = -1;
-	    return "";
+	    return UI_UPDATE;
 	}
     }
 
     if (button == 27 || button == '\b') {
         ui->ndragcoords = -1;
-        return "";
+        return UI_UPDATE;
     }
 
     if (release) {
@@ -2142,7 +2137,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
             ui->ndragcoords = -1;
 
-            return buf ? buf : "";
+            return buf ? buf : UI_UPDATE;
         } else if (ui->ndragcoords == 0) {
             /* Click (or tiny drag). Work out which edge we were
              * closest to. */
@@ -2163,12 +2158,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             cx = CENTERED_COORD(gx);
             cy = CENTERED_COORD(gy);
 
-            if (!INGRID(state, gx, gy)) return "";
+            if (!INGRID(state, gx, gy)) return UI_UPDATE;
 
             if (max(abs(x-cx),abs(y-cy)) < TILE_SIZE/4) {
                 /* TODO closer to centre of grid: process as a cell click not an edge click. */
 
-                return "";
+                return UI_UPDATE;
             } else {
 		int direction;
                 if (abs(x-cx) < abs(y-cy)) {
@@ -2712,7 +2707,8 @@ int main(int argc, const char *argv[])
     game_params *p = NULL;
     random_state *rs = NULL;
     time_t seed = time(NULL);
-    char *id = NULL, *err;
+    char *id = NULL;
+    const char *err;
 
     setvbuf(stdout, NULL, _IONBF, 0);
 

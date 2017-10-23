@@ -244,25 +244,20 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Solution length limit";
     ret[2].type = C_STRING;
     sprintf(buf, "%d", params->maxmoves);
-    ret[2].sval = dupstr(buf);
-    ret[2].ival = 0;
+    ret[2].u.string.sval = dupstr(buf);
 
     ret[3].name = NULL;
     ret[3].type = C_END;
-    ret[3].sval = NULL;
-    ret[3].ival = 0;
 
     return ret;
 }
@@ -271,14 +266,14 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->maxmoves = atoi(cfg[2].sval);
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->maxmoves = atoi(cfg[2].u.string.sval);
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w > MAXWID)
 	return "Width must be at most " STR(MAXWID);
@@ -891,7 +886,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     return ret;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int w = params->w, h = params->h, wh = w*h;
     int *active, *link;
@@ -1126,7 +1121,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     int *moves;
     int nmoves;
@@ -1349,7 +1344,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	 * And that's it. Update the display to reflect the start
 	 * of a drag.
 	 */
-	return "";
+	return UI_UPDATE;
     } else if (button == LEFT_DRAG && ui->dragging) {
 	int dist, distlimit, dx, dy, s, px, py;
 
@@ -1376,7 +1371,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 		    if (px >= 0 && px < w && py >= 0 && py < h &&
 			ui->reachable[py*w+px]) {
 			ui->drag_currpos = py*w+px;
-			return "";
+			return UI_UPDATE;
 		    }
 		}
 	}

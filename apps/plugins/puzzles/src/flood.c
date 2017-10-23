@@ -170,31 +170,25 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Colours";
     ret[2].type = C_STRING;
     sprintf(buf, "%d", params->colours);
-    ret[2].sval = dupstr(buf);
-    ret[2].ival = 0;
+    ret[2].u.string.sval = dupstr(buf);
 
     ret[3].name = "Extra moves permitted";
     ret[3].type = C_STRING;
     sprintf(buf, "%d", params->leniency);
-    ret[3].sval = dupstr(buf);
-    ret[3].ival = 0;
+    ret[3].u.string.sval = dupstr(buf);
 
     ret[4].name = NULL;
     ret[4].type = C_END;
-    ret[4].sval = NULL;
-    ret[4].ival = 0;
 
     return ret;
 }
@@ -203,15 +197,15 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->colours = atoi(cfg[2].sval);
-    ret->leniency = atoi(cfg[3].sval);
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->colours = atoi(cfg[2].u.string.sval);
+    ret->leniency = atoi(cfg[3].u.string.sval);
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w * params->h < 2)
         return "Grid must contain at least two squares";
@@ -597,7 +591,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     return desc;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int w = params->w, h = params->h, wh = w*h;
     int i;
@@ -691,7 +685,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     int w = state->w, h = state->h, wh = w*h;
     char *moves, *ret, *p;
@@ -832,19 +826,19 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     } else if (button == CURSOR_LEFT && ui->cx > 0) {
         ui->cx--;
         ui->cursor_visible = TRUE;
-        return "";
+        return UI_UPDATE;
     } else if (button == CURSOR_RIGHT && ui->cx+1 < w) {
         ui->cx++;
         ui->cursor_visible = TRUE;
-        return "";
+        return UI_UPDATE;
     } else if (button == CURSOR_UP && ui->cy > 0) {
         ui->cy--;
         ui->cursor_visible = TRUE;
-        return "";
+        return UI_UPDATE;
     } else if (button == CURSOR_DOWN && ui->cy+1 < h) {
         ui->cy++;
         ui->cursor_visible = TRUE;
-        return "";
+        return UI_UPDATE;
     } else if (button == CURSOR_SELECT) {
         tx = ui->cx;
         ty = ui->cy;

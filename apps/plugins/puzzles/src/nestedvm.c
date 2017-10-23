@@ -17,7 +17,7 @@
 extern void _pause();
 extern int _call_java(int cmd, int arg1, int arg2, int arg3);
 
-void fatal(char *fmt, ...)
+void fatal(const char *fmt, ...)
 {
     va_list ap;
     fprintf(stderr, "fatal error: ");
@@ -53,7 +53,7 @@ void frontend_default_colour(frontend *fe, float *output)
     output[0] = output[1]= output[2] = 0.8f;
 }
 
-void nestedvm_status_bar(void *handle, char *text)
+void nestedvm_status_bar(void *handle, const char *text)
 {
     _call_java(4,0,(int)text,0);
 }
@@ -79,7 +79,7 @@ void nestedvm_unclip(void *handle)
 }
 
 void nestedvm_draw_text(void *handle, int x, int y, int fonttype, int fontsize,
-		   int align, int colour, char *text)
+                        int align, int colour, const char *text)
 {
     frontend *fe = (frontend *)handle;
     _call_java(5, x + fe->ox, y + fe->oy, 
@@ -259,7 +259,7 @@ void activate_timer(frontend *fe)
 void jcallback_config_ok()
 {
     frontend *fe = (frontend *)_fe;
-    char *err;
+    const char *err;
 
     err = midend_set_config(fe->me, fe->cfg_which, fe->cfg);
 
@@ -273,19 +273,22 @@ void jcallback_config_ok()
 void jcallback_config_set_string(int item_ptr, int char_ptr) {
     config_item *i = (config_item *)item_ptr;
     char* newval = (char*) char_ptr;
-    sfree(i->sval);
-    i->sval = dupstr(newval);
+    assert(i->type == C_STRING);
+    sfree(i->u.string.sval);
+    i->u.string.sval = dupstr(newval);
     free(newval);
 }
 
 void jcallback_config_set_boolean(int item_ptr, int selected) {
     config_item *i = (config_item *)item_ptr;
-    i->ival = selected != 0 ? TRUE : FALSE;
+    assert(i->type == C_BOOLEAN);
+    i->u.boolean.bval = selected != 0 ? TRUE : FALSE;
 }
 
 void jcallback_config_set_choice(int item_ptr, int selected) {
     config_item *i = (config_item *)item_ptr;
-    i->ival = selected;
+    assert(i->type == C_CHOICES);
+    i->u.choices.selected = selected;
 }
 
 static int get_config(frontend *fe, int which)
@@ -298,7 +301,18 @@ static int get_config(frontend *fe, int which)
     _call_java(10, (int)title, 0, 0);
     for (i = fe->cfg; i->type != C_END; i++) {
 	_call_java(5, (int)i, i->type, (int)i->name);
-	_call_java(11, (int)i->sval, i->ival, 0);
+        switch (i->type) {
+          case C_STRING:
+            _call_java(11, (int)i->u.string.sval, 0, 0);
+            break;
+          case C_BOOLEAN:
+            _call_java(11, 0, i->u.boolean.bval, 0);
+            break;
+          case C_CHOICES:
+            _call_java(11, (int)i->u.choices.choicenames,
+                       i->u.choices.selected, 0);
+            break;
+        }
     }
     _call_java(12,0,0,0);
     free_cfg(fe->cfg);
@@ -363,7 +377,7 @@ int jcallback_preset_event(int ptr_game_params)
 int jcallback_solve_event()
 {
     frontend *fe = (frontend *)_fe;
-    char *msg;
+    const char *msg;
 
     msg = midend_solve(fe->me);
 

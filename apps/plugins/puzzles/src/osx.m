@@ -111,7 +111,7 @@ NSApplication *app;
  * clearly defined subsystem.
  */
 
-void fatal(char *fmt, ...)
+void fatal(const char *fmt, ...)
 {
     va_list ap;
     char errorbuf[2048];
@@ -152,7 +152,7 @@ void get_random_seed(void **randseed, int *randseedsize)
     *randseedsize = sizeof(time_t);
 }
 
-static void savefile_write(void *wctx, void *buf, int len)
+static void savefile_write(void *wctx, const void *buf, int len)
 {
     FILE *fp = (FILE *)wctx;
     fwrite(buf, 1, len, fp);
@@ -275,7 +275,7 @@ id initnewitem(NSMenuItem *item, NSMenu *parent, const char *title,
     return item;
 }
 
-NSMenuItem *newitem(NSMenu *parent, char *title, char *key,
+NSMenuItem *newitem(NSMenu *parent, const char *title, const char *key,
 		    id target, SEL action)
 {
     return initnewitem([NSMenuItem allocWithZone:[NSMenu menuZone]],
@@ -437,7 +437,7 @@ struct frontend {
 - (void)keyDown:(NSEvent *)ev;
 - (void)activateTimer;
 - (void)deactivateTimer;
-- (void)setStatusLine:(char *)text;
+- (void)setStatusLine:(const char *)text;
 - (void)resizeForNewGameParams;
 - (void)updateTypeMenuTick;
 @end
@@ -726,7 +726,7 @@ struct frontend {
     last_time = now;
 }
 
-- (void)showError:(char *)message
+- (void)showError:(const char *)message
 {
     NSAlert *alert;
 
@@ -789,7 +789,7 @@ struct frontend {
 	const char *name = [[[op filenames] objectAtIndex:0]
                                cStringUsingEncoding:
                                    [NSString defaultCStringEncoding]];
-	char *err;
+	const char *err;
 
         FILE *fp = fopen(name, "r");
 
@@ -836,7 +836,7 @@ struct frontend {
 
 - (void)solveGame:(id)sender
 {
-    char *msg;
+    const char *msg;
 
     msg = midend_solve(me);
 
@@ -1103,7 +1103,8 @@ struct frontend {
 	    [tf setEditable:YES];
 	    [tf setSelectable:YES];
 	    [tf setBordered:YES];
-	    [[tf cell] setTitle:[NSString stringWithUTF8String:i->sval]];
+	    [[tf cell] setTitle:[NSString
+                                    stringWithUTF8String:i->u.string.sval]];
 	    [tf sizeToFit];
 	    rect = [tf frame];
 	    /*
@@ -1132,7 +1133,7 @@ struct frontend {
 	    [b setButtonType:NSSwitchButton];
 	    [b setTitle:[NSString stringWithUTF8String:i->name]];
 	    [b sizeToFit];
-	    [b setState:(i->ival ? NSOnState : NSOffState)];
+	    [b setState:(i->u.boolean.bval ? NSOnState : NSOffState)];
 	    rect = [b frame];
 	    if (totalw < rect.size.width + 1) totalw = rect.size.width + 1;
 	    if (thish < rect.size.height + 1) thish = rect.size.height + 1;
@@ -1161,12 +1162,14 @@ struct frontend {
 	    pb = [[NSPopUpButton alloc] initWithFrame:tmprect pullsDown:NO];
 	    [pb setBezelStyle:NSRoundedBezelStyle];
 	    {
-		char c, *p;
+		char c;
+                const char *p;
 
-		p = i->sval;
+		p = i->u.choices.choicenames;
 		c = *p++;
 		while (*p) {
-		    char *q, *copy;
+		    const char *q;
+                    char *copy;
 
 		    q = p;
 		    while (*p && *p != c) p++;
@@ -1180,7 +1183,7 @@ struct frontend {
 		    if (*p) p++;
 		}
 	    }
-	    [pb selectItemAtIndex:i->ival];
+	    [pb selectItemAtIndex:i->u.choices.selected];
 	    [pb sizeToFit];
 
 	    rect = [pb frame];
@@ -1297,23 +1300,24 @@ struct frontend {
     if (update) {
 	int k;
 	config_item *i;
-	char *error;
+	const char *error;
 
 	k = 0;
 	for (i = cfg; i->type != C_END; i++) {
 	    switch (i->type) {
 	      case C_STRING:
-		sfree(i->sval);
-		i->sval = dupstr([[[(id)cfg_controls[k+1] cell]
+		sfree(i->u.string.sval);
+		i->u.string.sval = dupstr([[[(id)cfg_controls[k+1] cell]
                                   title] UTF8String]);
 		k += 2;
 		break;
 	      case C_BOOLEAN:
-		i->ival = [(id)cfg_controls[k] state] == NSOnState;
+		i->u.boolean.bval = [(id)cfg_controls[k] state] == NSOnState;
 		k++;
 		break;
 	      case C_CHOICES:
-		i->ival = [(id)cfg_controls[k+1] indexOfSelectedItem];
+		i->u.choices.selected =
+                    [(id)cfg_controls[k+1] indexOfSelectedItem];
 		k += 2;
 		break;
 	    }
@@ -1344,7 +1348,7 @@ struct frontend {
     [self sheetEndWithStatus:NO];
 }
 
-- (void)setStatusLine:(char *)text
+- (void)setStatusLine:(const char *)text
 {
     [[status cell] setTitle:[NSString stringWithUTF8String:text]];
 }
@@ -1457,7 +1461,8 @@ static void osx_draw_rect(void *handle, int x, int y, int w, int h, int colour)
     NSRectFill(r);
 }
 static void osx_draw_text(void *handle, int x, int y, int fonttype,
-			  int fontsize, int align, int colour, char *text)
+			  int fontsize, int align, int colour,
+                          const char *text)
 {
     frontend *fe = (frontend *)handle;
     NSString *string = [NSString stringWithUTF8String:text];
@@ -1608,7 +1613,7 @@ static void osx_end_draw(void *handle)
     frontend *fe = (frontend *)handle;
     [fe->image unlockFocus];
 }
-static void osx_status_bar(void *handle, char *text)
+static void osx_status_bar(void *handle, const char *text)
 {
     frontend *fe = (frontend *)handle;
     [fe->window setStatusLine:text];

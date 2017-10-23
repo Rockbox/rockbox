@@ -387,24 +387,19 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Start and end in corners";
     ret[2].type = C_BOOLEAN;
-    ret[2].sval = NULL;
-    ret[2].ival = params->force_corner_start;
+    ret[2].u.boolean.bval = params->force_corner_start;
 
     ret[3].name = NULL;
     ret[3].type = C_END;
-    ret[3].sval = NULL;
-    ret[3].ival = 0;
 
     return ret;
 }
@@ -413,14 +408,14 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->force_corner_start = cfg[2].ival;
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->force_corner_start = cfg[2].u.boolean.bval;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w < 1) return "Width must be at least one";
     if (params->h < 1) return "Height must be at least one";
@@ -502,10 +497,11 @@ static void free_game(game_state *state)
 }
 
 static void unpick_desc(const game_params *params, const char *desc,
-                        game_state **sout, char **mout)
+                        game_state **sout, const char **mout)
 {
     game_state *state = blank_game(params->w, params->h);
-    char *msg = NULL, c;
+    const char *msg = NULL;
+    char c;
     int num = 0, i = 0;
 
     while (*desc) {
@@ -848,9 +844,9 @@ generate:
     return ret;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
-    char *ret = NULL;
+    const char *ret = NULL;
 
     unpick_desc(params, desc, NULL, &ret);
     return ret;
@@ -1342,7 +1338,7 @@ static int solve_state(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     game_state *tosolve;
     char *ret = NULL;
@@ -1441,18 +1437,20 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             ui->dx = COORD(ui->cx) + TILE_SIZE/2;
             ui->dy = COORD(ui->cy) + TILE_SIZE/2;
         }
-        return "";
+        return UI_UPDATE;
     } else if (IS_CURSOR_SELECT(button)) {
         if (!ui->cshow)
             ui->cshow = 1;
         else if (ui->dragging) {
             ui->dragging = FALSE;
-            if (ui->sx == ui->cx && ui->sy == ui->cy) return "";
+            if (ui->sx == ui->cx && ui->sy == ui->cy) return UI_UPDATE;
             if (ui->drag_is_from) {
-                if (!isvalidmove(state, 0, ui->sx, ui->sy, ui->cx, ui->cy)) return "";
+                if (!isvalidmove(state, 0, ui->sx, ui->sy, ui->cx, ui->cy))
+                    return UI_UPDATE;
                 sprintf(buf, "L%d,%d-%d,%d", ui->sx, ui->sy, ui->cx, ui->cy);
             } else {
-                if (!isvalidmove(state, 0, ui->cx, ui->cy, ui->sx, ui->sy)) return "";
+                if (!isvalidmove(state, 0, ui->cx, ui->cy, ui->sx, ui->sy))
+                    return UI_UPDATE;
                 sprintf(buf, "L%d,%d-%d,%d", ui->cx, ui->cy, ui->sx, ui->sy);
             }
             return dupstr(buf);
@@ -1464,7 +1462,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             ui->dy = COORD(ui->cy) + TILE_SIZE/2;
             ui->drag_is_from = (button == CURSOR_SELECT) ? 1 : 0;
         }
-        return "";
+        return UI_UPDATE;
     }
     if (IS_MOUSE_DOWN(button)) {
         if (ui->cshow) {
@@ -1492,29 +1490,31 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->dx = mx;
         ui->dy = my;
         ui->cshow = 0;
-        return "";
+        return UI_UPDATE;
     } else if (IS_MOUSE_DRAG(button) && ui->dragging) {
         ui->dx = mx;
         ui->dy = my;
-        return "";
+        return UI_UPDATE;
     } else if (IS_MOUSE_RELEASE(button) && ui->dragging) {
         ui->dragging = FALSE;
-        if (ui->sx == x && ui->sy == y) return ""; /* single click */
+        if (ui->sx == x && ui->sy == y) return UI_UPDATE; /* single click */
 
         if (!INGRID(state, x, y)) {
             int si = ui->sy*w+ui->sx;
             if (state->prev[si] == -1 && state->next[si] == -1)
-                return "";
+                return UI_UPDATE;
             sprintf(buf, "%c%d,%d",
                     (int)(ui->drag_is_from ? 'C' : 'X'), ui->sx, ui->sy);
             return dupstr(buf);
         }
 
         if (ui->drag_is_from) {
-            if (!isvalidmove(state, 0, ui->sx, ui->sy, x, y)) return "";
+            if (!isvalidmove(state, 0, ui->sx, ui->sy, x, y))
+                return UI_UPDATE;
             sprintf(buf, "L%d,%d-%d,%d", ui->sx, ui->sy, x, y);
         } else {
-            if (!isvalidmove(state, 0, x, y, ui->sx, ui->sy)) return "";
+            if (!isvalidmove(state, 0, x, y, ui->sx, ui->sy))
+                return UI_UPDATE;
             sprintf(buf, "L%d,%d-%d,%d", x, y, ui->sx, ui->sy);
         }
         return dupstr(buf);
@@ -1523,7 +1523,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     else if ((button == 'x' || button == 'X') && ui->cshow) {
         int si = ui->cy*w + ui->cx;
         if (state->prev[si] == -1 && state->next[si] == -1)
-            return "";
+            return UI_UPDATE;
         sprintf(buf, "%c%d,%d",
                 (int)((button == 'x') ? 'C' : 'X'), ui->cx, ui->cy);
         return dupstr(buf);
@@ -1560,7 +1560,7 @@ static game_state *execute_move(const game_state *state, const char *move)
     if (move[0] == 'S') {
         game_params p;
 	game_state *tmp;
-        char *valid;
+        const char *valid;
 	int i;
 
         p.w = state->w; p.h = state->h;
@@ -2330,7 +2330,8 @@ static void start_soak(game_params *p, char *seedstr)
 
 static void process_desc(char *id)
 {
-    char *desc, *err, *solvestr;
+    char *desc, *solvestr;
+    const char *err;
     game_params *p;
     game_state *s;
 
@@ -2374,7 +2375,8 @@ static void process_desc(char *id)
 
 int main(int argc, const char *argv[])
 {
-    char *id = NULL, *desc, *err, *aux = NULL;
+    char *id = NULL, *desc, *aux = NULL;
+    const char *err;
     int soak = 0, verbose = 0, stdin_desc = 0, n = 1, i;
     char *seedstr = NULL, newseed[16];
 

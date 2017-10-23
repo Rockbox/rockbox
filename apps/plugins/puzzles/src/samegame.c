@@ -241,35 +241,29 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "No. of colours";
     ret[2].type = C_STRING;
     sprintf(buf, "%d", params->ncols);
-    ret[2].sval = dupstr(buf);
-    ret[2].ival = 0;
+    ret[2].u.string.sval = dupstr(buf);
 
     ret[3].name = "Scoring system";
     ret[3].type = C_CHOICES;
-    ret[3].sval = ":(n-1)^2:(n-2)^2";
-    ret[3].ival = params->scoresub-1;
+    ret[3].u.choices.choicenames = ":(n-1)^2:(n-2)^2";
+    ret[3].u.choices.selected = params->scoresub-1;
 
     ret[4].name = "Ensure solubility";
     ret[4].type = C_BOOLEAN;
-    ret[4].sval = NULL;
-    ret[4].ival = params->soluble;
+    ret[4].u.boolean.bval = params->soluble;
 
     ret[5].name = NULL;
     ret[5].type = C_END;
-    ret[5].sval = NULL;
-    ret[5].ival = 0;
 
     return ret;
 }
@@ -278,16 +272,16 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->ncols = atoi(cfg[2].sval);
-    ret->scoresub = cfg[3].ival + 1;
-    ret->soluble = cfg[4].ival;
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->ncols = atoi(cfg[2].u.string.sval);
+    ret->scoresub = cfg[3].u.choices.selected + 1;
+    ret->soluble = cfg[4].u.boolean.bval;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w < 1 || params->h < 1)
 	return "Width and height must both be positive";
@@ -948,7 +942,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     return ret;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int area = params->w * params->h, i;
     const char *p = desc;
@@ -1018,7 +1012,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     return NULL;
 }
@@ -1114,7 +1108,8 @@ static void game_changed_state(game_ui *ui, const game_state *oldstate,
 static char *sel_movedesc(game_ui *ui, const game_state *state)
 {
     int i;
-    char *ret, *sep, buf[80];
+    char *ret, buf[80];
+    const char *sep;
     int retlen, retsize;
 
     retsize = 256;
@@ -1273,7 +1268,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                             int x, int y, int button)
 {
     int tx, ty;
-    char *ret = "";
+    char *ret = UI_UPDATE;
 
     ui->displaysel = 0;
 

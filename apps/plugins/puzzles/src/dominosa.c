@@ -169,18 +169,14 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Maximum number on dominoes";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->n);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Ensure unique solution";
     ret[1].type = C_BOOLEAN;
-    ret[1].sval = NULL;
-    ret[1].ival = params->unique;
+    ret[1].u.boolean.bval = params->unique;
 
     ret[2].name = NULL;
     ret[2].type = C_END;
-    ret[2].sval = NULL;
-    ret[2].ival = 0;
 
     return ret;
 }
@@ -189,13 +185,13 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->n = atoi(cfg[0].sval);
-    ret->unique = cfg[1].ival;
+    ret->n = atoi(cfg[0].u.string.sval);
+    ret->unique = cfg[1].u.boolean.bval;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->n < 1)
         return "Maximum face number must be at least one";
@@ -748,12 +744,12 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     return ret;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int n = params->n, w = n+2, h = n+1, wh = w*h;
     int *occurrences;
     int i, j;
-    char *ret;
+    const char *ret;
 
     ret = NULL;
     occurrences = snewn(n+1, int);
@@ -875,7 +871,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     int n = state->params.n, w = n+2, h = n+1, wh = w*h;
     int *placements;
@@ -1119,7 +1115,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
         move_cursor(button, &ui->cur_x, &ui->cur_y, 2*w-1, 2*h-1, 0);
 
-	return "";
+	return UI_UPDATE;
     } else if (IS_CURSOR_SELECT(button)) {
         int d1, d2;
 
@@ -1152,7 +1148,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         } else {
             return NULL;
         }
-        return "";
+        return UI_UPDATE;
     }
 
     return NULL;
