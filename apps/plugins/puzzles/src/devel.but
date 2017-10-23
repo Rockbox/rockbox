@@ -555,16 +555,15 @@ The \cw{config_item} structure contains the following elements:
 
 \c char *name;
 \c int type;
-\c char *sval;
-\c int ival;
+\c union { /* type-specific fields */ } u;
+\e         iiiiiiiiiiiiiiiiiiiiiiiiii
 
 \c{name} is an ASCII string giving the textual label for a GUI
 control. It is \e{not} expected to be dynamically allocated.
 
 \c{type} contains one of a small number of \c{enum} values defining
-what type of control is being described. The meaning of the \c{sval}
-and \c{ival} fields depends on the value in \c{type}. The valid
-values are:
+what type of control is being described. The usable member of the
+union field \c{u} depends on \c{type}. The valid type values are:
 
 \dt \c{C_STRING}
 
@@ -572,38 +571,64 @@ values are:
 input. The back end does not bother informing the front end that the
 box is numeric rather than textual; some front ends do have the
 capacity to take this into account, but I decided it wasn't worth
-the extra complexity in the interface.) For this type, \c{ival} is
-unused, and \c{sval} contains a dynamically allocated string
-representing the contents of the input box.
+the extra complexity in the interface.)
+
+\lcont{
+
+For controls of this type, \c{u.string} contains a single field
+
+\c char *sval;
+
+which stores a dynamically allocated string representing the contents
+of the input box.
+
+}
 
 \dt \c{C_BOOLEAN}
 
-\dd Describes a simple checkbox. For this type, \c{sval} is unused,
-and \c{ival} is \cw{TRUE} or \cw{FALSE}.
+\dd Describes a simple checkbox.
+
+\lcont{
+
+For controls of this type, \c{u.boolean} contains a single field
+
+\c int bval;
+
+which is either \cw{TRUE} or \cw{FALSE}.
+
+}
 
 \dt \c{C_CHOICES}
 
 \dd Describes a drop-down list presenting one of a small number of
-fixed choices. For this type, \c{sval} contains a list of strings
-describing the choices; the very first character of \c{sval} is used
-as a delimiter when processing the rest (so that the strings
-\cq{:zero:one:two}, \cq{!zero!one!two} and \cq{xzeroxonextwo} all
-define a three-element list containing \cq{zero}, \cq{one} and
-\cq{two}). \c{ival} contains the index of the currently selected
-element, numbering from zero (so that in the above example, 0 would
-mean \cq{zero} and 2 would mean \cq{two}).
+fixed choices.
 
 \lcont{
 
-Note that for this control type, \c{sval} is \e{not} dynamically
-allocated, whereas it was for \c{C_STRING}.
+For controls of this type, \c{u.choices} contains two fields:
+
+\c const char *choicenames;
+\c int selected;
+
+\c{choicenames} contains a list of strings describing the choices. The
+very first character of \c{sval} is used as a delimiter when
+processing the rest (so that the strings \cq{:zero:one:two},
+\cq{!zero!one!two} and \cq{xzeroxonextwo} all define a three-element
+list containing \cq{zero}, \cq{one} and \cq{two}).
+
+\c{selected} contains the index of the currently selected element,
+numbering from zero (so that in the above example, 0 would mean
+\cq{zero} and 2 would mean \cq{two}).
+
+Note that \c{u.choices.choicenames} is \e{not} dynamically allocated,
+unlike \c{u.string.sval}.
 
 }
 
 \dt \c{C_END}
 
-\dd Marks the end of the array of \c{config_item}s. All other fields
-are unused.
+\dd Marks the end of the array of \c{config_item}s. There is no
+associated member of the union field \c{u} for this type.
 
 The array returned from this function is expected to have filled in
 the initial values of all the controls according to the input
@@ -639,7 +664,8 @@ function is never called and need not do anything at all.
 
 \S{backend-validate-params} \cw{validate_params()}
 
-\c char *(*validate_params)(const game_params *params, int full);
+\c const char *(*validate_params)(const game_params *params,
+\c                                int full);
 
 This function takes a \c{game_params} structure as input, and checks
 that the parameters described in it fall within sensible limits. (At
@@ -724,7 +750,8 @@ again in the game description.
 
 \S{backend-validate-desc} \cw{validate_desc()}
 
-\c char *(*validate_desc)(const game_params *params, const char *desc);
+\c const char *(*validate_desc)(const game_params *params,
+\c                              const char *desc);
 
 This function is given a game description, and its job is to
 validate that it describes a puzzle which makes sense.
@@ -907,10 +934,10 @@ divide mouse coordinates by it.)
 in response to the input event; the puzzle was not interested in it
 at all.
 
-\b Returning the empty string (\cw{""}) indicates that the input
+\b Returning the special value \cw{UI_UPDATE} indicates that the input
 event has resulted in a change being made to the \c{game_ui} which
-will require a redraw of the game window, but that no actual
-\e{move} was made (i.e. no new \c{game_state} needs to be created).
+will require a redraw of the game window, but that no actual \e{move}
+was made (i.e. no new \c{game_state} needs to be created).
 
 \b Returning anything else indicates that a move was made and that a
 new \c{game_state} must be created. However, instead of actually
@@ -925,7 +952,7 @@ strings can be written to disk when saving the game and fed to
 
 The return value from \cw{interpret_move()} is expected to be
 dynamically allocated if and only if it is not either \cw{NULL}
-\e{or} the empty string.
+\e{or} the special string constant \c{UI_UPDATE}.
 
 After this function is called, the back end is permitted to rely on
 some subsequent operations happening in sequence:
@@ -1028,7 +1055,7 @@ not even offer the \q{Solve} menu option.
 \S{backend-solve} \cw{solve()}
 
 \c char *(*solve)(const game_state *orig, const game_state *curr,
-\c                const char *aux, char **error);
+\c                const char *aux, const char **error);
 
 This function is called when the user selects the \q{Solve} option
 from the menu.
@@ -1934,7 +1961,8 @@ This ensures that thin lines are visible even at small scales.
 \S{drawing-draw-text} \cw{draw_text()}
 
 \c void draw_text(drawing *dr, int x, int y, int fonttype,
-\c                int fontsize, int align, int colour, char *text);
+\c                int fontsize, int align, int colour,
+\c                const char *text);
 
 Draws text in the puzzle window.
 
@@ -2095,7 +2123,7 @@ printing routines, that code may safely call \cw{draw_update()}.)
 
 \S{drawing-status-bar} \cw{status_bar()}
 
-\c void status_bar(drawing *dr, char *text);
+\c void status_bar(drawing *dr, const char *text);
 
 Sets the text in the game's status bar to \c{text}. The text is copied
 from the supplied buffer, so the caller is free to deallocate or
@@ -2366,7 +2394,8 @@ function \cw{drawing_new()} (see \k{drawing-new}).
 \S{drawingapi-draw-text} \cw{draw_text()}
 
 \c void (*draw_text)(void *handle, int x, int y, int fonttype,
-\c                   int fontsize, int align, int colour, char *text);
+\c                   int fontsize, int align, int colour,
+\c                   const char *text);
 
 This function behaves exactly like the back end \cw{draw_text()}
 function; see \k{drawing-draw-text}.
@@ -2469,7 +2498,7 @@ called unless drawing is attempted.
 
 \S{drawingapi-status-bar} \cw{status_bar()}
 
-\c void (*status_bar)(void *handle, char *text);
+\c void (*status_bar)(void *handle, const char *text);
 
 This function behaves exactly like the back end \cw{status_bar()}
 function; see \k{drawing-status-bar}.
@@ -3129,8 +3158,8 @@ will probably need to pass it to \cw{midend_set_config}.)
 
 \H{midend-set-config} \cw{midend_set_config()}
 
-\c char *midend_set_config(midend *me, int which,
-\c                         config_item *cfg);
+\c const char *midend_set_config(midend *me, int which,
+\c                               config_item *cfg);
 
 Passes the mid-end the results of a configuration dialog box.
 \c{which} should have the same value which it had when
@@ -3151,7 +3180,7 @@ using \cw{midend_size()} and eventually perform a refresh using
 
 \H{midend-game-id} \cw{midend_game_id()}
 
-\c char *midend_game_id(midend *me, char *id);
+\c const char *midend_game_id(midend *me, const char *id);
 
 Passes the mid-end a string game ID (of any of the valid forms
 \cq{params}, \cq{params:description} or \cq{params#seed}) which the
@@ -3219,7 +3248,7 @@ conversion.
 
 \H{midend-solve} \cw{midend_solve()}
 
-\c char *midend_solve(midend *me);
+\c const char *midend_solve(midend *me);
 
 Requests the mid-end to perform a Solve operation.
 
@@ -3267,8 +3296,7 @@ visually activate and deactivate a redo button.
 \H{midend-serialise} \cw{midend_serialise()}
 
 \c void midend_serialise(midend *me,
-\c                       void (*write)(void *ctx, void *buf, int len),
-\c                       void *wctx);
+\c     void (*write)(void *ctx, const void *buf, int len), void *wctx);
 
 Calling this function causes the mid-end to convert its entire
 internal state into a long ASCII text string, and to pass that
@@ -3291,9 +3319,8 @@ output string.
 
 \H{midend-deserialise} \cw{midend_deserialise()}
 
-\c char *midend_deserialise(midend *me,
-\c                          int (*read)(void *ctx, void *buf, int len),
-\c                          void *rctx);
+\c const char *midend_deserialise(midend *me,
+\c     int (*read)(void *ctx, void *buf, int len), void *rctx);
 
 This function is the counterpart to \cw{midend_serialise()}. It
 calls the supplied \cw{read} function repeatedly to read a quantity
@@ -3330,9 +3357,8 @@ place.
 
 \H{identify-game} \cw{identify_game()}
 
-\c char *identify_game(char **name,
-\c                     int (*read)(void *ctx, void *buf, int len),
-\c                     void *rctx);
+\c const char *identify_game(char **name,
+\c     int (*read)(void *ctx, void *buf, int len), void *rctx);
 
 This function examines a serialised midend stream, of the same kind
 used by \cw{midend_serialise()} and \cw{midend_deserialise()}, and
@@ -3482,7 +3508,7 @@ calling \cw{midend_timer()}.
 
 \H{frontend-fatal} \cw{fatal()}
 
-\c void fatal(char *fmt, ...);
+\c void fatal(const char *fmt, ...);
 
 This is called by some utility functions if they encounter a
 genuinely fatal error such as running out of memory. It is a
@@ -3737,10 +3763,10 @@ quite everywhere.)
 
 \c void free_cfg(config_item *cfg);
 
-This function correctly frees an array of \c{config_item}s,
-including walking the array until it gets to the end and freeing
-precisely those \c{sval} fields which are expected to be dynamically
-allocated.
+This function correctly frees an array of \c{config_item}s, including
+walking the array until it gets to the end and freeing any subsidiary
+data items in each \c{u} sub-union which are expected to be
+dynamically allocated.
 
 (See \k{backend-configure} for details of the \c{config_item}
 structure.)

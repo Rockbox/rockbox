@@ -265,36 +265,29 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->width);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->height);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Walls wrap around";
     ret[2].type = C_BOOLEAN;
-    ret[2].sval = NULL;
-    ret[2].ival = params->wrapping;
+    ret[2].u.boolean.bval = params->wrapping;
 
     ret[3].name = "Barrier probability";
     ret[3].type = C_STRING;
     ftoa(buf, params->barrier_probability);
-    ret[3].sval = dupstr(buf);
-    ret[3].ival = 0;
+    ret[3].u.string.sval = dupstr(buf);
 
     ret[4].name = "Number of shuffling moves";
     ret[4].type = C_STRING;
     sprintf(buf, "%d", params->movetarget);
-    ret[4].sval = dupstr(buf);
-    ret[4].ival = 0;
+    ret[4].u.string.sval = dupstr(buf);
 
     ret[5].name = NULL;
     ret[5].type = C_END;
-    ret[5].sval = NULL;
-    ret[5].ival = 0;
 
     return ret;
 }
@@ -303,16 +296,16 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->width = atoi(cfg[0].sval);
-    ret->height = atoi(cfg[1].sval);
-    ret->wrapping = cfg[2].ival;
-    ret->barrier_probability = (float)atof(cfg[3].sval);
-    ret->movetarget = atoi(cfg[4].sval);
+    ret->width = atoi(cfg[0].u.string.sval);
+    ret->height = atoi(cfg[1].u.string.sval);
+    ret->wrapping = cfg[2].u.boolean.bval;
+    ret->barrier_probability = (float)atof(cfg[3].u.string.sval);
+    ret->movetarget = atoi(cfg[4].u.string.sval);
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->width <= 1 || params->height <= 1)
 	return "Width and height must both be greater than one";
@@ -701,7 +694,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     return desc;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int w = params->width, h = params->height;
     int i;
@@ -891,7 +884,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     if (!aux) {
 	*error = "Solution not known for this puzzle";
@@ -1084,7 +1077,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         }
 
         ui->cur_visible = 1;
-        return "";
+        return UI_UPDATE;
     }
 
     if (button == LEFT_BUTTON || button == RIGHT_BUTTON) {
@@ -1098,7 +1091,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         } else {
             /* 'click' when cursor is invisible just makes cursor visible. */
             ui->cur_visible = 1;
-            return "";
+            return UI_UPDATE;
         }
     } else
         return NULL;

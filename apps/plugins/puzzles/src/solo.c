@@ -299,9 +299,9 @@ static game_params *dup_params(const game_params *params)
 static int game_fetch_preset(int i, char **name, game_params **params)
 {
     static struct {
-        char *title;
+        const char *title;
         game_params params;
-    } presets[] = {
+    } const presets[] = {
         { "2x2 Trivial", { 2, 2, SYMM_ROT2, DIFF_BLOCK, DIFF_KMINMAX, FALSE, FALSE } },
         { "2x3 Basic", { 2, 3, SYMM_ROT2, DIFF_SIMPLE, DIFF_KMINMAX, FALSE, FALSE } },
         { "3x3 Trivial", { 3, 3, SYMM_ROT2, DIFF_BLOCK, DIFF_KMINMAX, FALSE, FALSE } },
@@ -445,46 +445,39 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Columns of sub-blocks";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->c);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Rows of sub-blocks";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->r);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "\"X\" (require every number in each main diagonal)";
     ret[2].type = C_BOOLEAN;
-    ret[2].sval = NULL;
-    ret[2].ival = params->xtype;
+    ret[2].u.boolean.bval = params->xtype;
 
     ret[3].name = "Jigsaw (irregularly shaped sub-blocks)";
     ret[3].type = C_BOOLEAN;
-    ret[3].sval = NULL;
-    ret[3].ival = (params->r == 1);
+    ret[3].u.boolean.bval = (params->r == 1);
 
     ret[4].name = "Killer (digit sums)";
     ret[4].type = C_BOOLEAN;
-    ret[4].sval = NULL;
-    ret[4].ival = params->killer;
+    ret[4].u.boolean.bval = params->killer;
 
     ret[5].name = "Symmetry";
     ret[5].type = C_CHOICES;
-    ret[5].sval = ":None:2-way rotation:4-way rotation:2-way mirror:"
+    ret[5].u.choices.choicenames = ":None:2-way rotation:4-way rotation:2-way mirror:"
         "2-way diagonal mirror:4-way mirror:4-way diagonal mirror:"
         "8-way mirror";
-    ret[5].ival = params->symm;
+    ret[5].u.choices.selected = params->symm;
 
     ret[6].name = "Difficulty";
     ret[6].type = C_CHOICES;
-    ret[6].sval = ":Trivial:Basic:Intermediate:Advanced:Extreme:Unreasonable";
-    ret[6].ival = params->diff;
+    ret[6].u.choices.choicenames = ":Trivial:Basic:Intermediate:Advanced:Extreme:Unreasonable";
+    ret[6].u.choices.selected = params->diff;
 
     ret[7].name = NULL;
     ret[7].type = C_END;
-    ret[7].sval = NULL;
-    ret[7].ival = 0;
 
     return ret;
 }
@@ -493,22 +486,22 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->c = atoi(cfg[0].sval);
-    ret->r = atoi(cfg[1].sval);
-    ret->xtype = cfg[2].ival;
-    if (cfg[3].ival) {
+    ret->c = atoi(cfg[0].u.string.sval);
+    ret->r = atoi(cfg[1].u.string.sval);
+    ret->xtype = cfg[2].u.boolean.bval;
+    if (cfg[3].u.boolean.bval) {
 	ret->c *= ret->r;
 	ret->r = 1;
     }
-    ret->killer = cfg[4].ival;
-    ret->symm = cfg[5].ival;
-    ret->diff = cfg[6].ival;
+    ret->killer = cfg[4].u.boolean.bval;
+    ret->symm = cfg[5].u.choices.selected;
+    ret->diff = cfg[6].u.choices.selected;
     ret->kdiff = DIFF_KINTERSECT;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->c < 2)
 	return "Both dimensions must be at least 2";
@@ -838,19 +831,20 @@ static void solver_place(struct solver_usage *usage, int x, int y, int n)
  */
 struct solver_scratch;
 static int solver_elim(struct solver_usage *usage, int *indices,
-                       char *fmt, ...) __attribute__((format(printf,3,4)));
+                       const char *fmt, ...)
+    __attribute__((format(printf,3,4)));
 static int solver_intersect(struct solver_usage *usage,
-                            int *indices1, int *indices2, char *fmt, ...)
+                            int *indices1, int *indices2, const char *fmt, ...)
     __attribute__((format(printf,4,5)));
 static int solver_set(struct solver_usage *usage,
                       struct solver_scratch *scratch,
-                      int *indices, char *fmt, ...)
+                      int *indices, const char *fmt, ...)
     __attribute__((format(printf,4,5)));
 #endif
 
 static int solver_elim(struct solver_usage *usage, int *indices
 #ifdef STANDALONE_SOLVER
-                       , char *fmt, ...
+                       , const char *fmt, ...
 #endif
                        )
 {
@@ -914,7 +908,7 @@ static int solver_elim(struct solver_usage *usage, int *indices
 static int solver_intersect(struct solver_usage *usage,
                             int *indices1, int *indices2
 #ifdef STANDALONE_SOLVER
-                            , char *fmt, ...
+                            , const char *fmt, ...
 #endif
                             )
 {
@@ -992,7 +986,7 @@ static int solver_set(struct solver_usage *usage,
                       struct solver_scratch *scratch,
                       int *indices
 #ifdef STANDALONE_SOLVER
-                      , char *fmt, ...
+                      , const char *fmt, ...
 #endif
                       )
 {
@@ -1358,7 +1352,7 @@ static int solver_forcing(struct solver_usage *usage,
 						  (ondiag1(yt*cr+xt) && ondiag1(y*cr+x)))))) {
 #ifdef STANDALONE_SOLVER
                                 if (solver_show_working) {
-                                    char *sep = "";
+                                    const char *sep = "";
                                     int xl, yl;
                                     printf("%*sforcing chain, %d at ends of ",
                                            solver_recurse_depth*4, "", orign);
@@ -2523,7 +2517,7 @@ static void solver(int cr, struct block_structure *blocks,
 
 #ifdef STANDALONE_SOLVER
 	    if (solver_show_working) {
-		char *sep = "";
+		const char *sep = "";
 		printf("%*srecursing on (%d,%d) [",
 		       solver_recurse_depth*4, "", x + 1, y + 1);
 		for (i = 0; i < j; i++) {
@@ -3161,7 +3155,8 @@ static int symmetries(const game_params *params, int x, int y,
 static char *encode_solve_move(int cr, digit *grid)
 {
     int i, len;
-    char *ret, *p, *sep;
+    char *ret, *p;
+    const char *sep;
 
     /*
      * It's surprisingly easy to work out _exactly_ how long this
@@ -3861,7 +3856,8 @@ static const char *spec_to_grid(const char *desc, digit *grid, int area)
  * end of the block spec, and return an error string or NULL if everything
  * is OK. The DSF is stored in *PDSF.
  */
-static char *spec_to_dsf(const char **pdesc, int **pdsf, int cr, int area)
+static const char *spec_to_dsf(const char **pdesc, int **pdsf,
+                               int cr, int area)
 {
     const char *desc = *pdesc;
     int pos = 0;
@@ -3929,7 +3925,7 @@ static char *spec_to_dsf(const char **pdesc, int **pdsf, int cr, int area)
     return NULL;
 }
 
-static char *validate_grid_desc(const char **pdesc, int range, int area)
+static const char *validate_grid_desc(const char **pdesc, int range, int area)
 {
     const char *desc = *pdesc;
     int squares = 0;
@@ -3959,11 +3955,11 @@ static char *validate_grid_desc(const char **pdesc, int range, int area)
     return NULL;
 }
 
-static char *validate_block_desc(const char **pdesc, int cr, int area,
-				 int min_nr_blocks, int max_nr_blocks,
-				 int min_nr_squares, int max_nr_squares)
+static const char *validate_block_desc(const char **pdesc, int cr, int area,
+                                       int min_nr_blocks, int max_nr_blocks,
+                                       int min_nr_squares, int max_nr_squares)
 {
-    char *err;
+    const char *err;
     int *dsf;
 
     err = spec_to_dsf(pdesc, &dsf, cr, area);
@@ -4036,10 +4032,10 @@ static char *validate_block_desc(const char **pdesc, int cr, int area,
     return NULL;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int cr = params->c * params->r, area = cr*cr;
-    char *err;
+    const char *err;
 
     err = validate_grid_desc(&desc, cr, area);
     if (err)
@@ -4116,7 +4112,7 @@ static game_state *new_game(midend *me, const game_params *params,
 	    state->immutable[i] = TRUE;
 
     if (r == 1) {
-	char *err;
+	const char *err;
 	int *dsf;
 	assert(*desc == ',');
 	desc++;
@@ -4134,7 +4130,7 @@ static game_state *new_game(midend *me, const game_params *params,
     make_blocks_from_whichblock(state->blocks);
 
     if (params->killer) {
-	char *err;
+	const char *err;
 	int *dsf;
 	assert(*desc == ',');
 	desc++;
@@ -4234,7 +4230,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *ai, char **error)
+                        const char *ai, const char **error)
 {
     int cr = state->cr;
     char *ret;
@@ -4586,7 +4582,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->hpencil = 0;
             }
             ui->hcursor = 0;
-            return "";		       /* UI activity occurred */
+            return UI_UPDATE;
         }
         if (button == RIGHT_BUTTON) {
             /*
@@ -4606,19 +4602,19 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->hshow = 0;
             }
             ui->hcursor = 0;
-            return "";		       /* UI activity occurred */
+            return UI_UPDATE;
         }
     }
     if (IS_CURSOR_MOVE(button)) {
         move_cursor(button, &ui->hx, &ui->hy, cr, cr, 0);
         ui->hshow = ui->hcursor = 1;
-        return "";
+        return UI_UPDATE;
     }
     if (ui->hshow &&
         (button == CURSOR_SELECT)) {
         ui->hpencil = 1 - ui->hpencil;
         ui->hcursor = 1;
-        return "";
+        return UI_UPDATE;
     }
 
     if (ui->hshow &&
@@ -5584,7 +5580,8 @@ int main(int argc, char **argv)
 {
     game_params *p;
     game_state *s;
-    char *id = NULL, *desc, *err;
+    char *id = NULL, *desc;
+    const char *err;
     int grade = FALSE;
     struct difficulty dlev;
 

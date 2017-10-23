@@ -150,7 +150,7 @@ void dputs(char *buf)
     OutputDebugString(buf);
 }
 
-void debug_printf(char *fmt, ...)
+void debug_printf(const char *fmt, ...)
 {
     char buf[4096];
     va_list ap;
@@ -258,7 +258,7 @@ void frontend_free(frontend *fe)
 static void update_type_menu_tick(frontend *fe);
 static void update_copy_menu_greying(frontend *fe);
 
-void fatal(char *fmt, ...)
+void fatal(const char *fmt, ...)
 {
     char buf[2048];
     va_list ap;
@@ -304,7 +304,7 @@ void get_random_seed(void **randseed, int *randseedsize)
     *randseedsize = sizeof(SYSTEMTIME);
 }
 
-static void win_status_bar(void *handle, char *text)
+static void win_status_bar(void *handle, const char *text)
 {
 #ifdef _WIN32_WCE
     TCHAR wText[255];
@@ -556,7 +556,8 @@ static void win_unclip(void *handle)
 }
 
 static void win_draw_text(void *handle, int x, int y, int fonttype,
-			  int fontsize, int align, int colour, char *text)
+			  int fontsize, int align, int colour,
+                          const char *text)
 {
     frontend *fe = (frontend *)handle;
     POINT xy;
@@ -1002,7 +1003,7 @@ void print(frontend *fe)
     document *doc;
     midend *nme = NULL;  /* non-interactive midend for bulk puzzle generation */
     int i;
-    char *err = NULL;
+    const char *err = NULL;
 
     /*
      * Create our document structure and fill it up with puzzles.
@@ -1550,7 +1551,7 @@ static frontend *frontend_new(HINSTANCE inst)
     return fe;
 }
 
-static void savefile_write(void *wctx, void *buf, int len)
+static void savefile_write(void *wctx, const void *buf, int len)
 {
     FILE *fp = (FILE *)wctx;
     fwrite(buf, 1, len, fp);
@@ -1586,7 +1587,7 @@ static midend *midend_for_new_game(frontend *fe, const game *cgame,
         midend_new_game(me);
     } else {
         FILE *fp;
-        char *err_param, *err_load;
+        const char *err_param, *err_load;
 
         /*
          * See if arg is a valid filename of a save game file.
@@ -2057,52 +2058,43 @@ static config_item *frontend_get_config(frontend *fe, int which,
 
 	ret[i].name = "Number of puzzles to print";
 	ret[i].type = C_STRING;
-	ret[i].sval = dupstr("1");
-	ret[i].ival = 0;
+	ret[i].u.string.sval = dupstr("1");
 	i++;
 
 	ret[i].name = "Number of puzzles across the page";
 	ret[i].type = C_STRING;
-	ret[i].sval = dupstr("1");
-	ret[i].ival = 0;
+	ret[i].u.string.sval = dupstr("1");
 	i++;
 
 	ret[i].name = "Number of puzzles down the page";
 	ret[i].type = C_STRING;
-	ret[i].sval = dupstr("1");
-	ret[i].ival = 0;
+	ret[i].u.string.sval = dupstr("1");
 	i++;
 
 	ret[i].name = "Percentage of standard size";
 	ret[i].type = C_STRING;
-	ret[i].sval = dupstr("100.0");
-	ret[i].ival = 0;
+	ret[i].u.string.sval = dupstr("100.0");
 	i++;
 
 	ret[i].name = "Include currently shown puzzle";
 	ret[i].type = C_BOOLEAN;
-	ret[i].sval = NULL;
-	ret[i].ival = TRUE;
+	ret[i].u.boolean.bval = TRUE;
 	i++;
 
 	ret[i].name = "Print solutions";
 	ret[i].type = C_BOOLEAN;
-	ret[i].sval = NULL;
-	ret[i].ival = FALSE;
+	ret[i].u.boolean.bval = FALSE;
 	i++;
 
 	if (fe->game->can_print_in_colour) {
 	    ret[i].name = "Print in colour";
 	    ret[i].type = C_BOOLEAN;
-	    ret[i].sval = NULL;
-	    ret[i].ival = FALSE;
+	    ret[i].u.boolean.bval = FALSE;
 	    i++;
 	}
 
 	ret[i].name = NULL;
 	ret[i].type = C_END;
-	ret[i].sval = NULL;
-	ret[i].ival = 0;
 	i++;
 
 	return ret;
@@ -2112,22 +2104,24 @@ static config_item *frontend_get_config(frontend *fe, int which,
     }
 }
 
-static char *frontend_set_config(frontend *fe, int which, config_item *cfg)
+static const char *frontend_set_config(
+    frontend *fe, int which, config_item *cfg)
 {
     if (which < CFG_FRONTEND_SPECIFIC) {
 	return midend_set_config(fe->me, which, cfg);
     } else if (which == CFG_PRINT) {
-	if ((fe->printcount = atoi(cfg[0].sval)) <= 0)
+	if ((fe->printcount = atoi(cfg[0].u.string.sval)) <= 0)
 	    return "Number of puzzles to print should be at least one";
-	if ((fe->printw = atoi(cfg[1].sval)) <= 0)
+	if ((fe->printw = atoi(cfg[1].u.string.sval)) <= 0)
 	    return "Number of puzzles across the page should be at least one";
-	if ((fe->printh = atoi(cfg[2].sval)) <= 0)
+	if ((fe->printh = atoi(cfg[2].u.string.sval)) <= 0)
 	    return "Number of puzzles down the page should be at least one";
-	if ((fe->printscale = (float)atof(cfg[3].sval)) <= 0)
+	if ((fe->printscale = (float)atof(cfg[3].u.string.sval)) <= 0)
 	    return "Print size should be positive";
-	fe->printcurr = cfg[4].ival;
-	fe->printsolns = cfg[5].ival;
-	fe->printcolour = fe->game->can_print_in_colour && cfg[6].ival;
+	fe->printcurr = cfg[4].u.boolean.bval;
+	fe->printsolns = cfg[5].u.boolean.bval;
+	fe->printcolour = fe->game->can_print_in_colour &&
+            cfg[6].u.boolean.bval;
 	return NULL;
     } else {
 	assert(!"We should never get here");
@@ -2140,7 +2134,7 @@ static char *frontend_set_config(frontend *fe, int which, config_item *cfg)
 /* Control coordinates should be specified in dialog units. */
 HWND mkctrl(frontend *fe, int x1, int x2, int y1, int y2,
 	    LPCTSTR wclass, int wstyle,
-	    int exstyle, const char *wtext, int wid)
+	    int exstyle, const char *wtext, INT_PTR wid)
 {
     RECT rc;
     TCHAR wwtext[256];
@@ -2191,7 +2185,7 @@ static void create_config_controls(frontend * fe)
 	    mkctrl(fe, col2l, col2r, y, y + 12,
 		   TEXT("EDIT"), WS_BORDER | WS_TABSTOP | ES_AUTOHSCROLL,
 		   0, "", (j->ctlid = id++));
-	    SetDlgItemTextA(fe->cfgbox, j->ctlid, i->sval);
+	    SetDlgItemTextA(fe->cfgbox, j->ctlid, i->u.string.sval);
 	    break;
 
 	  case C_BOOLEAN:
@@ -2201,7 +2195,7 @@ static void create_config_controls(frontend * fe)
 	    mkctrl(fe, col1l, col2r, y + 1, y + 11, TEXT("BUTTON"),
 		   BS_NOTIFY | BS_AUTOCHECKBOX | WS_TABSTOP,
 		   0, i->name, (j->ctlid = id++));
-	    CheckDlgButton(fe->cfgbox, j->ctlid, (i->ival != 0));
+	    CheckDlgButton(fe->cfgbox, j->ctlid, (i->u.boolean.bval != 0));
 	    break;
 
 	  case C_CHOICES:
@@ -2215,9 +2209,11 @@ static void create_config_controls(frontend * fe)
 			 CBS_DROPDOWNLIST | CBS_HASSTRINGS,
 			 0, "", (j->ctlid = id++));
 	    {
-		char c, *p, *q, *str;
+		char c;
+                const char *p, *q;
+                char *str;
 
-		p = i->sval;
+		p = i->u.choices.choicenames;
 		c = *p++;
 		while (*p) {
 		    q = p;
@@ -2236,7 +2232,7 @@ static void create_config_controls(frontend * fe)
 		    p = q;
 		}
 	    }
-	    SendMessage(ctl, CB_SETCURSEL, i->ival, 0);
+	    SendMessage(ctl, CB_SETCURSEL, i->u.choices.selected, 0);
 	    break;
 	}
 
@@ -2282,7 +2278,8 @@ static int CALLBACK ConfigDlgProc(HWND hwnd, UINT msg,
 	 */
 	if ((LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)) {
 	    if (LOWORD(wParam) == IDOK) {
-		char *err = frontend_set_config(fe, fe->cfg_which, fe->cfg);
+		const char *err = frontend_set_config(
+                    fe, fe->cfg_which, fe->cfg);
 
 		if (err) {
 		    MessageBox(hwnd, err, "Validation error",
@@ -2324,16 +2321,16 @@ static int CALLBACK ConfigDlgProc(HWND hwnd, UINT msg,
 	    GetDlgItemText(fe->cfgbox, j->ctlid, buffer, lenof(buffer));
 #endif
 	    buffer[lenof(buffer)-1] = '\0';
-	    sfree(i->sval);
-	    i->sval = dupstr(buffer);
+	    sfree(i->u.string.sval);
+	    i->u.string.sval = dupstr(buffer);
 	} else if (i->type == C_BOOLEAN && 
 		   (HIWORD(wParam) == BN_CLICKED ||
 		    HIWORD(wParam) == BN_DBLCLK)) {
-	    i->ival = IsDlgButtonChecked(fe->cfgbox, j->ctlid);
+	    i->u.boolean.bval = IsDlgButtonChecked(fe->cfgbox, j->ctlid);
 	} else if (i->type == C_CHOICES &&
 		   HIWORD(wParam) == CBN_SELCHANGE) {
-	    i->ival = SendDlgItemMessage(fe->cfgbox, j->ctlid,
-					 CB_GETCURSEL, 0, 0);
+	    i->u.choices.selected = SendDlgItemMessage(fe->cfgbox, j->ctlid,
+                                                       CB_GETCURSEL, 0, 0);
 	}
 
 	return 0;
@@ -2349,7 +2346,7 @@ static int CALLBACK ConfigDlgProc(HWND hwnd, UINT msg,
 #ifndef _WIN32_WCE
 HWND mkctrl(frontend *fe, int x1, int x2, int y1, int y2,
 	    char *wclass, int wstyle,
-	    int exstyle, const char *wtext, int wid)
+	    int exstyle, const char *wtext, INT_PTR wid)
 {
     HWND ret;
     ret = CreateWindowEx(exstyle, wclass, wtext,
@@ -2683,7 +2680,7 @@ static int get_config(frontend *fe, int which)
 	    ctl = mkctrl(fe, col2l, col2r, y, y+height*3/2,
 			 "EDIT", WS_TABSTOP | ES_AUTOHSCROLL,
 			 WS_EX_CLIENTEDGE, "", (j->ctlid = id++));
-	    SetWindowText(ctl, i->sval);
+	    SetWindowText(ctl, i->u.string.sval);
 	    y += height*3/2;
 	    break;
 
@@ -2694,7 +2691,7 @@ static int get_config(frontend *fe, int which)
 	    mkctrl(fe, col1l, col2r, y, y+height, "BUTTON",
 		   BS_NOTIFY | BS_AUTOCHECKBOX | WS_TABSTOP,
 		   0, i->name, (j->ctlid = id++));
-	    CheckDlgButton(fe->cfgbox, j->ctlid, (i->ival != 0));
+	    CheckDlgButton(fe->cfgbox, j->ctlid, (i->u.boolean.bval != 0));
 	    y += height;
 	    break;
 
@@ -2709,10 +2706,12 @@ static int get_config(frontend *fe, int which)
 			 CBS_DROPDOWNLIST | CBS_HASSTRINGS,
 			 WS_EX_CLIENTEDGE, "", (j->ctlid = id++));
 	    {
-		char c, *p, *q, *str;
+		char c;
+                const char *p, *q;
+                char *str;
 
 		SendMessage(ctl, CB_RESETCONTENT, 0, 0);
-		p = i->sval;
+		p = i->u.choices.choicenames;
 		c = *p++;
 		while (*p) {
 		    q = p;
@@ -2727,7 +2726,7 @@ static int get_config(frontend *fe, int which)
 		}
 	    }
 
-	    SendMessage(ctl, CB_SETCURSEL, i->ival, 0);
+	    SendMessage(ctl, CB_SETCURSEL, i->u.choices.selected, 0);
 
 	    y += height*3/2;
 	    break;
@@ -3019,7 +3018,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message,
 	    break;
 	  case IDM_SOLVE:
 	    {
-		char *msg = midend_solve(fe->me);
+		const char *msg = midend_solve(fe->me);
 		if (msg)
 		    MessageBox(hwnd, msg, "Unable to solve",
 			       MB_ICONERROR | MB_OK);
@@ -3111,7 +3110,8 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message,
 			fclose(fp);
 		    } else {
 			FILE *fp = fopen(filename, "r");
-			char *err = NULL;
+			const char *err = NULL;
+                        char *err_w = NULL;
                         midend *me = fe->me;
 #ifdef COMBINED
                         char *id_name;
@@ -3139,7 +3139,8 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message,
                                     "supported by this program";
                             } else {
                                 me = midend_for_new_game(fe, gamelist[i], NULL,
-                                                         FALSE, FALSE, &err);
+                                                         FALSE, FALSE, &err_w);
+                                err = err_w;
                                 rewind(fp); /* for the actual load */
                             }
                             sfree(id_name);
@@ -3152,6 +3153,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message,
 
 			if (err) {
 			    MessageBox(hwnd, err, "Error", MB_ICONERROR|MB_OK);
+                            sfree(err_w);
 			    break;
 			}
 

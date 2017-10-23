@@ -163,24 +163,20 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Difficulty";
     ret[2].type = C_CHOICES;
-    ret[2].sval = DIFFCONFIG;
-    ret[2].ival = params->diff;
+    ret[2].u.choices.choicenames = DIFFCONFIG;
+    ret[2].u.choices.selected = params->diff;
 
     ret[3].name = NULL;
     ret[3].type = C_END;
-    ret[3].sval = NULL;
-    ret[3].ival = 0;
 
     return ret;
 }
@@ -189,13 +185,13 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->diff = cfg[2].ival;
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->diff = cfg[2].u.choices.selected;
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if ((params->w * params->h ) > 54)  return "Grid is too big";
     if (params->w < 3)                  return "Width must be at least 3";
@@ -1440,7 +1436,7 @@ static game_state *new_game(midend *me, const game_params *params,
     return state;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int i;
     int w = params->w, h = params->h;
@@ -1493,7 +1489,7 @@ static char *validate_desc(const game_params *params, const char *desc)
 }
 
 static char *solve_game(const game_state *state_start, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     int p;
     int *old_guess;
@@ -1725,7 +1721,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
     if (button == 'a' || button == 'A') {
         ui->ascii = !ui->ascii;
-        return "";      
+        return UI_UPDATE;
     }
 
     if (button == 'm' || button == 'M') {
@@ -1771,12 +1767,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
               case CURSOR_LEFT:   ui->hx -= (ui->hx > 1)     ? 1 : 0; break;
             }
         ui->hshow = ui->hcursor = 1;
-        return "";
+        return UI_UPDATE;
     }
     if (ui->hshow && button == CURSOR_SELECT) {
         ui->hpencil = 1 - ui->hpencil;
         ui->hcursor = 1;
-        return "";
+        return UI_UPDATE;
     }
 
     if (ui->hshow == 1 && ui->hpencil == 1) {
@@ -1814,12 +1810,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 if (button == LEFT_BUTTON) {
                     ui->hshow = 1; ui->hpencil = 0; ui->hcursor = 0;
                     ui->hx = gx; ui->hy = gy;
-                    return "";
+                    return UI_UPDATE;
                 }
                 else if (button == RIGHT_BUTTON && g == 7) {
                     ui->hshow = 1; ui->hpencil = 1; ui->hcursor = 0;
                     ui->hx = gx; ui->hy = gy;
-                    return "";
+                    return UI_UPDATE;
                 }
             }
             else if (ui->hshow == 1) {
@@ -1828,36 +1824,36 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                         if (gx == ui->hx && gy == ui->hy) {
                             ui->hshow = 0; ui->hpencil = 0; ui->hcursor = 0;
                             ui->hx = 0; ui->hy = 0;
-                            return "";
+                            return UI_UPDATE;
                         }
                         else {
                             ui->hshow = 1; ui->hpencil = 0; ui->hcursor = 0;
                             ui->hx = gx; ui->hy = gy;
-                            return "";
+                            return UI_UPDATE;
                         }
                     }
                     else {
                         ui->hshow = 1; ui->hpencil = 0; ui->hcursor = 0;
                         ui->hx = gx; ui->hy = gy;
-                        return "";
+                        return UI_UPDATE;
                     }
                 }
                 else if (button == RIGHT_BUTTON) {
                     if (ui->hpencil == 0 && g == 7) {
                         ui->hshow = 1; ui->hpencil = 1; ui->hcursor = 0;
                         ui->hx = gx; ui->hy = gy;
-                        return "";
+                        return UI_UPDATE;
                     }
                     else {
                         if (gx == ui->hx && gy == ui->hy) {
                             ui->hshow = 0; ui->hpencil = 0; ui->hcursor = 0;
                             ui->hx = 0; ui->hy = 0;
-                            return "";
+                            return UI_UPDATE;
                         }
                         else if (g == 7) {
                             ui->hshow = 1; ui->hpencil = 1; ui->hcursor = 0;
                             ui->hx = gx; ui->hy = gy;
-                            return "";
+                            return UI_UPDATE;
                         }
                     }
                 }

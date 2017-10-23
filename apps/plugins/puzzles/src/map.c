@@ -213,30 +213,25 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Regions";
     ret[2].type = C_STRING;
     sprintf(buf, "%d", params->n);
-    ret[2].sval = dupstr(buf);
-    ret[2].ival = 0;
+    ret[2].u.string.sval = dupstr(buf);
 
     ret[3].name = "Difficulty";
     ret[3].type = C_CHOICES;
-    ret[3].sval = DIFFCONFIG;
-    ret[3].ival = params->diff;
+    ret[3].u.choices.choicenames = DIFFCONFIG;
+    ret[3].u.choices.selected = params->diff;
 
     ret[4].name = NULL;
     ret[4].type = C_END;
-    ret[4].sval = NULL;
-    ret[4].ival = 0;
 
     return ret;
 }
@@ -245,15 +240,15 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->n = atoi(cfg[2].sval);
-    ret->diff = cfg[3].ival;
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->n = atoi(cfg[2].u.string.sval);
+    ret->diff = cfg[3].u.choices.selected;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w < 2 || params->h < 2)
 	return "Width and height must be at least two";
@@ -878,7 +873,7 @@ static const char colnames[FOUR] = { 'R', 'Y', 'G', 'B' };
 static int place_colour(struct solver_scratch *sc,
 			int *colouring, int index, int colour
 #ifdef SOLVER_DIAGNOSTICS
-                        , char *verb
+                        , const char *verb
 #endif
                         )
 {
@@ -925,7 +920,7 @@ static char *colourset(char *buf, int set)
 {
     int i;
     char *p = buf;
-    char *sep = "";
+    const char *sep = "";
 
     for (i = 0; i < FOUR; i++)
         if (set & (1 << i)) {
@@ -1219,7 +1214,8 @@ static int map_solver(struct solver_scratch *sc,
                                 (sc->possible[k] & currc)) {
 #ifdef SOLVER_DIAGNOSTICS
                                 if (verbose) {
-                                    char buf[80], *sep = "";
+                                    char buf[80];
+                                    const char *sep = "";
                                     int r;
 
                                     printf("%*sforcing chain, colour %s, ",
@@ -1704,8 +1700,8 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     return ret;
 }
 
-static char *parse_edge_list(const game_params *params, const char **desc,
-                             int *map)
+static const char *parse_edge_list(const game_params *params,
+                                   const char **desc, int *map)
 {
     int w = params->w, h = params->h, wh = w*h, n = params->n;
     int i, k, pos, state;
@@ -1781,12 +1777,12 @@ static char *parse_edge_list(const game_params *params, const char **desc,
     return NULL;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int w = params->w, h = params->h, wh = w*h, n = params->n;
     int area;
     int *map;
-    char *ret;
+    const char *ret;
 
     map = snewn(2*wh, int);
     ret = parse_edge_list(params, &desc, map);
@@ -1846,7 +1842,7 @@ static game_state *new_game(midend *me, const game_params *params,
     p = desc;
 
     {
-	char *ret;
+	const char *ret;
 	ret = parse_edge_list(params, &p, state->map->map);
 	assert(!ret);
     }
@@ -2191,7 +2187,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     if (!aux) {
 	/*
@@ -2375,7 +2371,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
      */
     if (button == 'l' || button == 'L') {
         ui->show_numbers = !ui->show_numbers;
-        return "";
+        return UI_UPDATE;
     }
 
     if (IS_CURSOR_MOVE(button)) {
@@ -2385,14 +2381,14 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->cur_lastmove = button;
         ui->dragx = COORD(ui->cur_x) + TILESIZE/2 + EPSILON_X(button);
         ui->dragy = COORD(ui->cur_y) + TILESIZE/2 + EPSILON_Y(button);
-        return "";
+        return UI_UPDATE;
     }
     if (IS_CURSOR_SELECT(button)) {
         if (!ui->cur_visible) {
             ui->dragx = COORD(ui->cur_x) + TILESIZE/2 + EPSILON_X(ui->cur_lastmove);
             ui->dragy = COORD(ui->cur_y) + TILESIZE/2 + EPSILON_Y(ui->cur_lastmove);
             ui->cur_visible = 1;
-            return "";
+            return UI_UPDATE;
         }
         if (ui->drag_colour == -2) { /* not currently cursor-dragging, start. */
             int r = region_from_coords(state, ds, ui->dragx, ui->dragy);
@@ -2404,7 +2400,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->drag_pencil = 0;
             }
             ui->cur_moved = 0;
-            return "";
+            return UI_UPDATE;
         } else { /* currently cursor-dragging; drop the colour in the new region. */
             x = COORD(ui->cur_x) + TILESIZE/2 + EPSILON_X(ui->cur_lastmove);
             y = COORD(ui->cur_y) + TILESIZE/2 + EPSILON_Y(ui->cur_lastmove);
@@ -2430,14 +2426,14 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->dragx = x;
         ui->dragy = y;
         ui->cur_visible = 0;
-        return "";
+        return UI_UPDATE;
     }
 
     if ((button == LEFT_DRAG || button == RIGHT_DRAG) &&
         ui->drag_colour > -2) {
         ui->dragx = x;
         ui->dragy = y;
-        return "";
+        return UI_UPDATE;
     }
 
     if ((button == LEFT_RELEASE || button == RIGHT_RELEASE) &&
@@ -2461,18 +2457,18 @@ drag_dropped:
         ui->drag_colour = -2;
 
 	if (r < 0)
-            return "";                 /* drag into border; do nothing else */
+            return UI_UPDATE;          /* drag into border; do nothing else */
 
 	if (state->map->immutable[r])
-	    return "";                 /* can't change this region */
+	    return UI_UPDATE;          /* can't change this region */
 
         if (state->colouring[r] == c && state->pencil[r] == p)
-            return "";                 /* don't _need_ to change this region */
+            return UI_UPDATE;          /* don't _need_ to change this region */
 
 	if (alt_button) {
 	    if (state->colouring[r] >= 0) {
 		/* Can't pencil on a coloured region */
-		return "";
+		return UI_UPDATE;
 	    } else if (c >= 0) {
 		/* Right-dragging from colour to blank toggles one pencil */
 		p = state->pencil[r] ^ (1 << c);
@@ -3240,7 +3236,8 @@ int main(int argc, char **argv)
 {
     game_params *p;
     game_state *s;
-    char *id = NULL, *desc, *err;
+    char *id = NULL, *desc;
+    const char *err;
     int grade = FALSE;
     int ret, diff, really_verbose = FALSE;
     struct solver_scratch *sc;

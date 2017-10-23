@@ -148,19 +148,15 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = NULL;
     ret[2].type = C_END;
-    ret[2].sval = NULL;
-    ret[2].ival = 0;
 
     return ret;
 }
@@ -169,13 +165,13 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w <= 0 || params->h <= 0)
 	return "Width and height must both be greater than zero";
@@ -891,7 +887,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     return desc;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int i, n, rowspace;
     const char *p;
@@ -1051,7 +1047,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *ai, char **error)
+                        const char *ai, const char **error)
 {
     unsigned char *matrix;
     int w = state->common->w, h = state->common->h;
@@ -1287,7 +1283,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->drag_start_y = ui->drag_end_y = y;
         ui->cur_visible = 0;
 
-        return "";		       /* UI activity occurred */
+        return UI_UPDATE;
     }
 
     if (ui->dragging && button == ui->drag) {
@@ -1316,7 +1312,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->drag_end_x = x;
         ui->drag_end_y = y;
 
-        return "";		       /* UI activity occurred */
+        return UI_UPDATE;
     }
 
     if (ui->dragging && button == ui->release) {
@@ -1344,7 +1340,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 		    x1, y1, x2-x1+1, y2-y1+1);
 	    return dupstr(buf);
         } else
-            return "";		       /* UI activity occurred */
+            return UI_UPDATE;
     }
 
     if (IS_CURSOR_MOVE(button)) {
@@ -1352,12 +1348,12 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	char buf[80];
         move_cursor(button, &ui->cur_x, &ui->cur_y, state->common->w, state->common->h, 0);
         ui->cur_visible = 1;
-	if (!control && !shift) return "";
+	if (!control && !shift) return UI_UPDATE;
 
 	newstate = control ? shift ? GRID_UNKNOWN : GRID_FULL : GRID_EMPTY;
 	if (state->grid[y * state->common->w + x] == newstate &&
 	    state->grid[ui->cur_y * state->common->w + ui->cur_x] == newstate)
-	    return "";
+	    return UI_UPDATE;
 
 	sprintf(buf, "%c%d,%d,%d,%d", control ? shift ? 'U' : 'F' : 'E',
 		min(x, ui->cur_x), min(y, ui->cur_y),
@@ -1372,7 +1368,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 
         if (!ui->cur_visible) {
             ui->cur_visible = 1;
-            return "";
+            return UI_UPDATE;
         }
 
         if (button == CURSOR_SELECT2)
@@ -2027,7 +2023,8 @@ int main(int argc, char **argv)
 {
     game_params *p;
     game_state *s;
-    char *id = NULL, *desc, *err;
+    char *id = NULL, *desc;
+    const char *err;
 
     while (--argc > 0) {
         char *p = *++argv;

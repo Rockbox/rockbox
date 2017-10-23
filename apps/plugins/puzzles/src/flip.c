@@ -149,24 +149,20 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Shape type";
     ret[2].type = C_CHOICES;
-    ret[2].sval = ":Crosses:Random";
-    ret[2].ival = params->matrix_type;
+    ret[2].u.choices.choicenames = ":Crosses:Random";
+    ret[2].u.choices.selected = params->matrix_type;
 
     ret[3].name = NULL;
     ret[3].type = C_END;
-    ret[3].sval = NULL;
-    ret[3].ival = 0;
 
     return ret;
 }
@@ -175,14 +171,14 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->matrix_type = cfg[2].ival;
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->matrix_type = cfg[2].u.choices.selected;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w <= 0 || params->h <= 0)
         return "Width and height must both be greater than zero";
@@ -596,7 +592,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     return ret;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int w = params->w, h = params->h, wh = w * h;
     int mlen = (wh*wh+3)/4, glen = (wh+3)/4;
@@ -673,7 +669,7 @@ static void rowxor(unsigned char *row1, unsigned char *row2, int len)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     int w = state->w, h = state->h, wh = w * h;
     unsigned char *equations, *solution, *shortest;
@@ -951,7 +947,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             tx = ui->cx; ty = ui->cy;
             ui->cdraw = 1;
         }
-        nullret = "";
+        nullret = UI_UPDATE;
 
         if (tx >= 0 && tx < w && ty >= 0 && ty < h) {
             /*
@@ -985,7 +981,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         ui->cx = min(max(ui->cx, 0), state->w - 1);
         ui->cy = min(max(ui->cy, 0), state->h - 1);
         ui->cdraw = 1;
-        nullret = "";
+        nullret = UI_UPDATE;
     }
 
     return nullret;

@@ -149,24 +149,20 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Board type";
     ret[2].type = C_CHOICES;
-    ret[2].sval = TYPECONFIG;
-    ret[2].ival = params->type;
+    ret[2].u.choices.choicenames = TYPECONFIG;
+    ret[2].u.choices.selected = params->type;
 
     ret[3].name = NULL;
     ret[3].type = C_END;
-    ret[3].sval = NULL;
-    ret[3].ival = 0;
 
     return ret;
 }
@@ -175,14 +171,14 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->type = cfg[2].ival;
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->type = cfg[2].u.choices.selected;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (full && (params->w <= 3 || params->h <= 3))
 	return "Width and height must both be greater than three";
@@ -660,7 +656,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     return ret;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int len = params->w * params->h;
 
@@ -711,7 +707,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     return NULL;
 }
@@ -848,7 +844,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	    ui->dx = x;
 	    ui->dy = y;
             ui->cur_visible = ui->cur_jumping = 0;
-	    return "";		       /* ui modified */
+	    return UI_UPDATE;
 	}
     } else if (button == LEFT_DRAG && ui->dragging) {
 	/*
@@ -856,7 +852,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	 */
 	ui->dx = x;
 	ui->dy = y;
-	return "";		       /* ui modified */
+	return UI_UPDATE;
     } else if (button == LEFT_RELEASE && ui->dragging) {
 	int tx, ty, dx, dy;
 
@@ -868,18 +864,18 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 	tx = FROMCOORD(x);
 	ty = FROMCOORD(y);
 	if (tx < 0 || tx >= w || ty < 0 || ty >= h)
-	    return "";		       /* target out of range */
+	    return UI_UPDATE;	       /* target out of range */
 	dx = tx - ui->sx;
 	dy = ty - ui->sy;
 	if (max(abs(dx),abs(dy)) != 2 || min(abs(dx),abs(dy)) != 0)
-	    return "";		       /* move length was wrong */
+	    return UI_UPDATE;	       /* move length was wrong */
 	dx /= 2;
 	dy /= 2;
 
 	if (state->grid[ty*w+tx] != GRID_HOLE ||
 	    state->grid[(ty-dy)*w+(tx-dx)] != GRID_PEG ||
 	    state->grid[ui->sy*w+ui->sx] != GRID_PEG)
-	    return "";		       /* grid contents were invalid */
+	    return UI_UPDATE;	       /* grid contents were invalid */
 
 	/*
 	 * We have a valid move. Encode it simply as source and
@@ -899,7 +895,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->cur_x = cx;
                 ui->cur_y = cy;
             }
-            return "";
+            return UI_UPDATE;
         } else {
             int dx, dy, mx, my, jx, jy;
 
@@ -922,21 +918,21 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->cur_x = jx; ui->cur_y = jy;
                 return dupstr(buf);
             }
-            return "";
+            return UI_UPDATE;
         }
     } else if (IS_CURSOR_SELECT(button)) {
         if (!ui->cur_visible) {
             ui->cur_visible = 1;
-            return "";
+            return UI_UPDATE;
         }
         if (ui->cur_jumping) {
             ui->cur_jumping = 0;
-            return "";
+            return UI_UPDATE;
         }
         if (state->grid[ui->cur_y*w+ui->cur_x] == GRID_PEG) {
             /* cursor is on peg: next arrow-move wil jump. */
             ui->cur_jumping = 1;
-            return "";
+            return UI_UPDATE;
         }
         return NULL;
     }

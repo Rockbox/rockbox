@@ -119,10 +119,20 @@ static config_item *game_configure(const game_params *params)
 {
     config_item *ret = snewn(4, config_item);
 
-    CONFIG(0, "Width",       C_STRING, 0, string(20, "%d", params->w));
-    CONFIG(1, "Height",      C_STRING, 0, string(20, "%d", params->h));
-    CONFIG(2, "Region size", C_STRING, 0, string(20, "%d", params->k));
-    CONFIG(3, NULL,          C_END,    0, NULL);
+    ret[0].name = "Width";
+    ret[0].type = C_STRING;
+    ret[0].u.string.sval = string(20, "%d", params->w);
+
+    ret[1].name = "Height";
+    ret[1].type = C_STRING;
+    ret[1].u.string.sval = string(20, "%d", params->h);
+
+    ret[2].name = "Region size";
+    ret[2].type = C_STRING;
+    ret[2].u.string.sval = string(20, "%d", params->k);
+
+    ret[3].name = NULL;
+    ret[3].type = C_END;
 
     return ret;
 }
@@ -131,9 +141,9 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *params = snew(game_params);
 
-    params->w = atoi(cfg[0].sval);
-    params->h = atoi(cfg[1].sval);
-    params->k = atoi(cfg[2].sval);
+    params->w = atoi(cfg[0].u.string.sval);
+    params->h = atoi(cfg[1].u.string.sval);
+    params->k = atoi(cfg[2].u.string.sval);
 
     return params;
 }
@@ -145,7 +155,7 @@ static game_params *custom_params(const config_item *cfg)
  * +---+   the dominos is horizontal or vertical.            +---+---+
  */
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     int w = params->w, h = params->h, k = params->k, wh = w * h;
 
@@ -691,7 +701,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     return sresize(numbers, p - numbers, clue);
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
 
     int w = params->w, h = params->h, wh = w*h, squares = 0;
@@ -772,7 +782,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     int w = state->shared->params.w, h = state->shared->params.h, wh = w*h;
     borderflag *move;
@@ -986,7 +996,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                           ui->x, ui->y, flag, x, y, newflag);
         } else {
             move_cursor(button, &ui->x, &ui->y, w, h, FALSE);
-            return "";
+            return UI_UPDATE;
         }
     }
 

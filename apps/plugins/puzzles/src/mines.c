@@ -203,30 +203,24 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Mines";
     ret[2].type = C_STRING;
     sprintf(buf, "%d", params->n);
-    ret[2].sval = dupstr(buf);
-    ret[2].ival = 0;
+    ret[2].u.string.sval = dupstr(buf);
 
     ret[3].name = "Ensure solubility";
     ret[3].type = C_BOOLEAN;
-    ret[3].sval = NULL;
-    ret[3].ival = params->unique;
+    ret[3].u.boolean.bval = params->unique;
 
     ret[4].name = NULL;
     ret[4].type = C_END;
-    ret[4].sval = NULL;
-    ret[4].ival = 0;
 
     return ret;
 }
@@ -235,17 +229,17 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->n = atoi(cfg[2].sval);
-    if (strchr(cfg[2].sval, '%'))
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->n = atoi(cfg[2].u.string.sval);
+    if (strchr(cfg[2].u.string.sval, '%'))
 	ret->n = ret->n * (ret->w * ret->h) / 100;
-    ret->unique = cfg[3].ival;
+    ret->unique = cfg[3].u.boolean.bval;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     /*
      * Lower limit on grid size: each dimension must be at least 3.
@@ -1996,7 +1990,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
     }
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int wh = params->w * params->h;
     int x, y;
@@ -2306,7 +2300,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     if (!state->layout->mines) {
 	*error = "Game has not been started yet";
@@ -2434,14 +2428,14 @@ static char *interpret_move(const game_state *from, game_ui *ui,
     if (IS_CURSOR_MOVE(button)) {
         move_cursor(button, &ui->cur_x, &ui->cur_y, from->w, from->h, 0);
         ui->cur_visible = 1;
-        return "";
+        return UI_UPDATE;
     }
     if (IS_CURSOR_SELECT(button)) {
         int v = from->grid[ui->cur_y * from->w + ui->cur_x];
 
         if (!ui->cur_visible) {
             ui->cur_visible = 1;
-            return "";
+            return UI_UPDATE;
         }
         if (button == CURSOR_SELECT2) {
             /* As for RIGHT_BUTTON; only works on covered square. */
@@ -2481,7 +2475,7 @@ static char *interpret_move(const game_state *from, game_ui *ui,
 	else if (button == MIDDLE_BUTTON)
 	    ui->validradius = 1;
         ui->cur_visible = 0;
-	return "";
+	return UI_UPDATE;
     }
 
     if (button == RIGHT_BUTTON) {
@@ -2509,10 +2503,10 @@ static char *interpret_move(const game_state *from, game_ui *ui,
 
 	/*
 	 * At this stage we must never return NULL: we have adjusted
-	 * the ui, so at worst we return "".
+	 * the ui, so at worst we return UI_UPDATE.
 	 */
 	if (cx < 0 || cx >= from->w || cy < 0 || cy >= from->h)
-	    return "";
+	    return UI_UPDATE;
 
 	/*
 	 * Left-clicking on a covered square opens a tile. Not
@@ -2566,7 +2560,7 @@ uncover:
 		 * can.
 		 */
 		char *p = buf;
-		char *sep = "";
+		const char *sep = "";
 
 		for (dy = -1; dy <= +1; dy++)
 		    for (dx = -1; dx <= +1; dx++)
@@ -2590,7 +2584,7 @@ uncover:
 	    }
 	}
 
-	return "";
+	return UI_UPDATE;
     }
 }
 
@@ -3235,7 +3229,8 @@ int main(int argc, char **argv)
 {
     game_params *p;
     game_state *s;
-    char *id = NULL, *desc, *err;
+    char *id = NULL, *desc;
+    const char *err;
     int y, x;
 
     while (--argc > 0) {

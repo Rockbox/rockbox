@@ -238,7 +238,7 @@ static game_params *default_params(void)
 static int game_fetch_preset(int i, char **name, game_params **params)
 {
     game_params *ret = snew(game_params);
-    char *str;
+    const char *str;
 
     switch (i) {
       case 0:
@@ -489,25 +489,21 @@ static config_item *game_configure(const game_params *params)
 
     ret[0].name = "Type of solid";
     ret[0].type = C_CHOICES;
-    ret[0].sval = ":Tetrahedron:Cube:Octahedron:Icosahedron";
-    ret[0].ival = params->solid;
+    ret[0].u.choices.choicenames = ":Tetrahedron:Cube:Octahedron:Icosahedron";
+    ret[0].u.choices.selected = params->solid;
 
     ret[1].name = "Width / top";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->d1);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Height / bottom";
     ret[2].type = C_STRING;
     sprintf(buf, "%d", params->d2);
-    ret[2].sval = dupstr(buf);
-    ret[2].ival = 0;
+    ret[2].u.string.sval = dupstr(buf);
 
     ret[3].name = NULL;
     ret[3].type = C_END;
-    ret[3].sval = NULL;
-    ret[3].ival = 0;
 
     return ret;
 }
@@ -516,9 +512,9 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->solid = cfg[0].ival;
-    ret->d1 = atoi(cfg[1].sval);
-    ret->d2 = atoi(cfg[2].sval);
+    ret->solid = cfg[0].u.choices.selected;
+    ret->d1 = atoi(cfg[1].u.string.sval);
+    ret->d2 = atoi(cfg[2].u.string.sval);
 
     return ret;
 }
@@ -538,7 +534,7 @@ static void count_grid_square_callback(void *ctx, struct grid_square *sq)
     classes[thisclass]++;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     int classes[5];
     int i;
@@ -846,7 +842,7 @@ static struct solid *transform_poly(const struct solid *solid, int flip,
     return ret;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int area = grid_area(params->d1, params->d2, solids[params->solid]->order);
     int i, j;
@@ -1004,7 +1000,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     return NULL;
 }

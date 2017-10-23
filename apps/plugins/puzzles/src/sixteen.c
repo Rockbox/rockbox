@@ -140,25 +140,20 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Number of shuffling moves";
     ret[2].type = C_STRING;
     sprintf(buf, "%d", params->movetarget);
-    ret[2].sval = dupstr(buf);
-    ret[2].ival = 0;
+    ret[2].u.string.sval = dupstr(buf);
 
     ret[3].name = NULL;
     ret[3].type = C_END;
-    ret[3].sval = NULL;
-    ret[3].ival = 0;
 
     return ret;
 }
@@ -167,14 +162,14 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->h = atoi(cfg[1].sval);
-    ret->movetarget = atoi(cfg[2].sval);
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->h = atoi(cfg[1].u.string.sval);
+    ret->movetarget = atoi(cfg[2].u.string.sval);
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w < 2 || params->h < 2)
 	return "Width and height must both be at least two";
@@ -402,10 +397,9 @@ static char *new_game_desc(const game_params *params, random_state *rs,
 }
 
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
-    const char *p;
-    char *err;
+    const char *p, *err;
     int i, area;
     int *used;
 
@@ -510,7 +504,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     return dupstr("S");
 }
@@ -619,7 +613,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     if (IS_CURSOR_MOVE(button) || pad) {
         if (!ui->cur_visible) {
             ui->cur_visible = 1;
-            return "";
+            return UI_UPDATE;
         }
 
         if (control || shift || ui->cur_mode) {
@@ -674,7 +668,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             }
 
             ui->cur_visible = 1;
-            return "";
+            return UI_UPDATE;
         }
     }
 
@@ -692,11 +686,11 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 const enum cursor_mode m = (button == CURSOR_SELECT2 ?
                                             lock_position : lock_tile);
                 ui->cur_mode = (ui->cur_mode == m ? unlocked : m);
-                return "";
+                return UI_UPDATE;
             }
         } else {
             ui->cur_visible = 1;
-            return "";
+            return UI_UPDATE;
         }
     } else {
 	return NULL;
@@ -711,7 +705,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     else if (cy == state->h && cx >= 0 && cx < state->w)
         dy = +1, dx = 0;
     else
-        return "";                   /* invalid click location */
+        return UI_UPDATE;            /* invalid click location */
 
     /* reverse direction if right hand button is pressed */
     if (button == RIGHT_BUTTON || button == CURSOR_SELECT2) {

@@ -239,28 +239,24 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Width";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w2);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Height";
     ret[1].type = C_STRING;
     sprintf(buf, "%d", params->h2);
-    ret[1].sval = dupstr(buf);
-    ret[1].ival = 0;
+    ret[1].u.string.sval = dupstr(buf);
 
     ret[2].name = "Unique rows and columns";
     ret[2].type = C_BOOLEAN;
-    ret[2].ival = params->unique;
+    ret[2].u.boolean.bval = params->unique;
 
     ret[3].name = "Difficulty";
     ret[3].type = C_CHOICES;
-    ret[3].sval = DIFFCONFIG;
-    ret[3].ival = params->diff;
+    ret[3].u.choices.choicenames = DIFFCONFIG;
+    ret[3].u.choices.selected = params->diff;
 
     ret[4].name = NULL;
     ret[4].type = C_END;
-    ret[4].sval = NULL;
-    ret[4].ival = 0;
 
     return ret;
 }
@@ -269,15 +265,15 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w2 = atoi(cfg[0].sval);
-    ret->h2 = atoi(cfg[1].sval);
-    ret->unique = cfg[2].ival;
-    ret->diff = cfg[3].ival;
+    ret->w2 = atoi(cfg[0].u.string.sval);
+    ret->h2 = atoi(cfg[1].u.string.sval);
+    ret->unique = cfg[2].u.boolean.bval;
+    ret->diff = cfg[3].u.choices.selected;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if ((params->w2 & 1) || (params->h2 & 1))
         return "Width and height must both be even";
@@ -319,7 +315,7 @@ static char *validate_params(const game_params *params, int full)
     return NULL;
 }
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int w2 = params->w2, h2 = params->h2;
     int s = w2 * h2;
@@ -1178,7 +1174,7 @@ static int unruly_solve_game(game_state *state,
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     game_state *solved = dup_game(state);
     struct unruly_scratch *scratch = unruly_new_scratch(solved);
@@ -1531,7 +1527,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
     if (IS_CURSOR_MOVE(button)) {
         move_cursor(button, &ui->cx, &ui->cy, w2, h2, 0);
         ui->cursor = TRUE;
-        return "";
+        return UI_UPDATE;
     }
 
     /* Place one */
@@ -1976,7 +1972,8 @@ int main(int argc, char *argv[])
 
     game_params *params = NULL;
 
-    char *id = NULL, *desc = NULL, *err;
+    char *id = NULL, *desc = NULL;
+    const char *err;
 
     quis = argv[0];
 

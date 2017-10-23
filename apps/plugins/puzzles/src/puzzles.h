@@ -137,30 +137,36 @@ typedef struct psdata psdata;
  */
 enum { C_STRING, C_CHOICES, C_BOOLEAN, C_END };
 struct config_item {
-    /*
-     * `name' is never dynamically allocated.
-     */
-    char *name;
-    /*
-     * `type' contains one of the above values.
-     */
+    /* Not dynamically allocated */
+    const char *name;
+    /* Value from the above C_* enum */
     int type;
-    /*
-     * For C_STRING, `sval' is always dynamically allocated and
-     * non-NULL. For C_BOOLEAN and C_END, `sval' is always NULL.
-     * For C_CHOICES, `sval' is non-NULL, _not_ dynamically
-     * allocated, and contains a set of option strings separated by
-     * a delimiter. The delimeter is also the first character in
-     * the string, so for example ":Foo:Bar:Baz" gives three
-     * options `Foo', `Bar' and `Baz'.
-     */
-    char *sval;
-    /*
-     * For C_BOOLEAN, this is TRUE or FALSE. For C_CHOICES, it
-     * indicates the chosen index from the `sval' list. In the
-     * above example, 0==Foo, 1==Bar and 2==Baz.
-     */
-    int ival;
+    union {
+        struct { /* if type == C_STRING */
+            /* Always dynamically allocated and non-NULL */
+            char *sval;
+        } string;
+        struct { /* if type == C_CHOICES */
+            /*
+             * choicenames is non-NULL, not dynamically allocated, and
+             * contains a set of option strings separated by a
+             * delimiter. The delimiter is also the first character in
+             * the string, so for example ":Foo:Bar:Baz" gives three
+             * options `Foo', `Bar' and `Baz'.
+             */
+            const char *choicenames;
+            /*
+             * Indicates the chosen index from the options in
+             * choicenames. In the above example, 0==Foo, 1==Bar and
+             * 2==Baz.
+             */
+            int selected;
+        } choices;
+        struct {
+            /* just TRUE or FALSE */
+            int bval;
+        } boolean;
+    } u;
 };
 
 /*
@@ -218,12 +224,12 @@ game_params *preset_menu_lookup_by_id(struct preset_menu *menu, int id);
 /* We can't use #ifdef DEBUG, because Cygwin defines it by default. */
 #ifdef DEBUGGING
 #define debug(x) (debug_printf x)
-void debug_printf(char *fmt, ...);
+void debug_printf(const char *fmt, ...);
 #else
 #define debug(x)
 #endif
 
-void fatal(char *fmt, ...);
+void fatal(const char *fmt, ...);
 void frontend_default_colour(frontend *fe, float *output);
 void deactivate_timer(frontend *fe);
 void activate_timer(frontend *fe);
@@ -235,7 +241,7 @@ void get_random_seed(void **randseed, int *randseedsize);
 drawing *drawing_new(const drawing_api *api, midend *me, void *handle);
 void drawing_free(drawing *dr);
 void draw_text(drawing *dr, int x, int y, int fonttype, int fontsize,
-               int align, int colour, char *text);
+               int align, int colour, const char *text);
 void draw_rect(drawing *dr, int x, int y, int w, int h, int colour);
 void draw_line(drawing *dr, int x1, int y1, int x2, int y2, int colour);
 void draw_polygon(drawing *dr, int *coords, int npoints,
@@ -250,7 +256,7 @@ void start_draw(drawing *dr);
 void draw_update(drawing *dr, int x, int y, int w, int h);
 void end_draw(drawing *dr);
 char *text_fallback(drawing *dr, const char *const *strings, int nstrings);
-void status_bar(drawing *dr, char *text);
+void status_bar(drawing *dr, const char *text);
 blitter *blitter_new(drawing *dr, int w, int h);
 void blitter_free(drawing *dr, blitter *bl);
 /* save puts the portion of the current display with top-left corner
@@ -305,29 +311,31 @@ int midend_which_preset(midend *me);
 int midend_wants_statusbar(midend *me);
 enum { CFG_SETTINGS, CFG_SEED, CFG_DESC, CFG_FRONTEND_SPECIFIC };
 config_item *midend_get_config(midend *me, int which, char **wintitle);
-char *midend_set_config(midend *me, int which, config_item *cfg);
-char *midend_game_id(midend *me, char *id);
+const char *midend_set_config(midend *me, int which, config_item *cfg);
+const char *midend_game_id(midend *me, const char *id);
 char *midend_get_game_id(midend *me);
 char *midend_get_random_seed(midend *me);
 int midend_can_format_as_text_now(midend *me);
 char *midend_text_format(midend *me);
-char *midend_solve(midend *me);
+const char *midend_solve(midend *me);
 int midend_status(midend *me);
 int midend_can_undo(midend *me);
 int midend_can_redo(midend *me);
-void midend_supersede_game_desc(midend *me, char *desc, char *privdesc);
-char *midend_rewrite_statusbar(midend *me, char *text);
+void midend_supersede_game_desc(midend *me, const char *desc,
+                                const char *privdesc);
+char *midend_rewrite_statusbar(midend *me, const char *text);
 void midend_serialise(midend *me,
-                      void (*write)(void *ctx, void *buf, int len),
+                      void (*write)(void *ctx, const void *buf, int len),
                       void *wctx);
-char *midend_deserialise(midend *me,
-                         int (*read)(void *ctx, void *buf, int len),
-                         void *rctx);
-char *identify_game(char **name, int (*read)(void *ctx, void *buf, int len),
-                    void *rctx);
+const char *midend_deserialise(midend *me,
+                               int (*read)(void *ctx, void *buf, int len),
+                               void *rctx);
+const char *identify_game(char **name,
+                          int (*read)(void *ctx, void *buf, int len),
+                          void *rctx);
 void midend_request_id_changes(midend *me, void (*notify)(void *), void *ctx);
 /* Printing functions supplied by the mid-end */
-char *midend_print_puzzle(midend *me, document *doc, int with_soln);
+const char *midend_print_puzzle(midend *me, document *doc, int with_soln);
 int midend_tilesize(midend *me);
 
 /*
@@ -385,7 +393,7 @@ void pos2c(int w, int h, int pos, int *cx, int *cy);
  * by one pixel; useful for highlighting. Outline is omitted if -1. */
 void draw_text_outline(drawing *dr, int x, int y, int fonttype,
                        int fontsize, int align,
-                       int text_colour, int outline_colour, char *text);
+                       int text_colour, int outline_colour, const char *text);
 
 /* Copies text left-justified with spaces. Length of string must be
  * less than buffer size. */
@@ -587,17 +595,17 @@ struct game {
     int can_configure;
     config_item *(*configure)(const game_params *params);
     game_params *(*custom_params)(const config_item *cfg);
-    char *(*validate_params)(const game_params *params, int full);
+    const char *(*validate_params)(const game_params *params, int full);
     char *(*new_desc)(const game_params *params, random_state *rs,
 		      char **aux, int interactive);
-    char *(*validate_desc)(const game_params *params, const char *desc);
+    const char *(*validate_desc)(const game_params *params, const char *desc);
     game_state *(*new_game)(midend *me, const game_params *params,
                             const char *desc);
     game_state *(*dup_game)(const game_state *state);
     void (*free_game)(game_state *state);
     int can_solve;
     char *(*solve)(const game_state *orig, const game_state *curr,
-                   const char *aux, char **error);
+                   const char *aux, const char **error);
     int can_format_as_text_ever;
     int (*can_format_as_text_now)(const game_params *params);
     char *(*text_format)(const game_state *state);
@@ -642,7 +650,7 @@ struct game {
  */
 struct drawing_api {
     void (*draw_text)(void *handle, int x, int y, int fonttype, int fontsize,
-		      int align, int colour, char *text);
+		      int align, int colour, const char *text);
     void (*draw_rect)(void *handle, int x, int y, int w, int h, int colour);
     void (*draw_line)(void *handle, int x1, int y1, int x2, int y2,
 		      int colour);
@@ -655,7 +663,7 @@ struct drawing_api {
     void (*unclip)(void *handle);
     void (*start_draw)(void *handle);
     void (*end_draw)(void *handle);
-    void (*status_bar)(void *handle, char *text);
+    void (*status_bar)(void *handle, const char *text);
     blitter *(*blitter_new)(void *handle, int w, int h);
     void (*blitter_free)(void *handle, blitter *bl);
     void (*blitter_save)(void *handle, blitter *bl, int x, int y);
@@ -687,6 +695,14 @@ extern const int gamecount;
 #else
 extern const game thegame;
 #endif
+
+/*
+ * Special string value to return from interpret_move in the case
+ * where the game UI has been updated but no actual move is being
+ * appended to the undo chain. Must be declared as a non-const char,
+ * but should never actually be modified by anyone.
+ */
+extern char UI_UPDATE[];
 
 /* A little bit of help to lazy developers */
 #define DEFAULT_STATUSBAR_TEXT "Use status_bar() to fill this in."

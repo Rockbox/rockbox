@@ -212,18 +212,15 @@ static config_item *game_configure(const game_params *params)
     ret[0].name = "Grid size";
     ret[0].type = C_STRING;
     sprintf(buf, "%d", params->w);
-    ret[0].sval = dupstr(buf);
-    ret[0].ival = 0;
+    ret[0].u.string.sval = dupstr(buf);
 
     ret[1].name = "Difficulty";
     ret[1].type = C_CHOICES;
-    ret[1].sval = DIFFCONFIG;
-    ret[1].ival = params->diff;
+    ret[1].u.choices.choicenames = DIFFCONFIG;
+    ret[1].u.choices.selected = params->diff;
 
     ret[2].name = NULL;
     ret[2].type = C_END;
-    ret[2].sval = NULL;
-    ret[2].ival = 0;
 
     return ret;
 }
@@ -232,13 +229,13 @@ static game_params *custom_params(const config_item *cfg)
 {
     game_params *ret = snew(game_params);
 
-    ret->w = atoi(cfg[0].sval);
-    ret->diff = cfg[1].ival;
+    ret->w = atoi(cfg[0].u.string.sval);
+    ret->diff = cfg[1].u.choices.selected;
 
     return ret;
 }
 
-static char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, int full)
 {
     if (params->w < 3 || params->w > 9)
         return "Grid size must be between 3 and 9";
@@ -802,7 +799,7 @@ done
  * Gameplay.
  */
 
-static char *validate_desc(const game_params *params, const char *desc)
+static const char *validate_desc(const game_params *params, const char *desc)
 {
     int w = params->w, a = w*w;
     const char *p = desc;
@@ -970,7 +967,7 @@ static void free_game(game_state *state)
 }
 
 static char *solve_game(const game_state *state, const game_state *currstate,
-                        const char *aux, char **error)
+                        const char *aux, const char **error)
 {
     int w = state->par.w, a = w*w;
     int i, ret;
@@ -1349,7 +1346,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->hpencil = 0;
             }
             ui->hcursor = 0;
-            return "";		       /* UI activity occurred */
+            return UI_UPDATE;
         }
         if (button == RIGHT_BUTTON) {
             /*
@@ -1369,7 +1366,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->hshow = 0;
             }
             ui->hcursor = 0;
-            return "";		       /* UI activity occurred */
+            return UI_UPDATE;
         }
     } else if (button == LEFT_BUTTON) {
         if (is_clue(state, tx, ty)) {
@@ -1394,13 +1391,13 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         }
         move_cursor(button, &ui->hx, &ui->hy, w, w, 0);
         ui->hshow = ui->hcursor = 1;
-        return "";
+        return UI_UPDATE;
     }
     if (ui->hshow &&
         (button == CURSOR_SELECT)) {
         ui->hpencil = 1 - ui->hpencil;
         ui->hcursor = 1;
-        return "";
+        return UI_UPDATE;
     }
 
     if (ui->hshow &&
@@ -2021,7 +2018,8 @@ int main(int argc, char **argv)
 {
     game_params *p;
     game_state *s;
-    char *id = NULL, *desc, *err;
+    char *id = NULL, *desc;
+    const char *err;
     int grade = FALSE;
     int ret, diff, really_show_working = FALSE;
 
