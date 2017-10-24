@@ -210,6 +210,7 @@ struct nwz_model_info_t nwz_model[NWZ_MODEL_COUNT] =
     { 0x22000004, "NW-A35" },
     { 0x22000005, "NW-A36" },
     { 0x22000006, "NW-A37" },
+    { 0x23000004, "NW-ZX300A" },
     { 0x23000006, "NW-ZX300" },
     { 0x24000006, "NW-A47" },
 };
@@ -1439,7 +1440,7 @@ static unsigned long models_nwz_x1000[] = { 0x5000002, 0x5000004, 0x5000005,
 static unsigned long models_nw_zx100[] = { 0x1c000007, 0x1c000001, 0x1c000002,
     0x1c000004, 0x1c000005, 0x1c000006 };
 
-static unsigned long models_nw_zx300[] = { 0x23000006 };
+static unsigned long models_nw_zx300[] = { 0x23000004, 0x23000006 };
 
 static unsigned long models_nwz_noname[] = { 0x5010002, 0x5010004, 0x5010005 };
 
@@ -1481,6 +1482,6 @@ struct nwz_series_info_t nwz_series[NWZ_SERIES_COUNT] =
     { "nw-wm1", "NW-WM1 Series", 2, models_nw_wm1, &nvp_index_398250 },
     { "nwz-x1000", "NWZ-X1000 Series", 9, models_nwz_x1000, &nvp_index_4edba7 },
     { "nw-zx100", "NW-ZX100 Series", 6, models_nw_zx100, &nvp_index_92faee },
-    { "nw-zx300", "NW-ZX300 Series", 1, models_nw_zx300, &nvp_index_139d65 },
+    { "nw-zx300", "NW-ZX300 Series", 2, models_nw_zx300, &nvp_index_139d65 },
     { "nwz-noname", "NONAME", 3, models_nwz_noname, 0 },
 };
