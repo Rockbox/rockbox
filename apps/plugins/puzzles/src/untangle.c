@@ -1219,7 +1219,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             if(best >= 0)
             {
                 ui->cursorpoint = best;
-                return "";
+                return UI_UPDATE;
             }
         }
         else if(ui->dragpoint >= 0)
@@ -1229,16 +1229,16 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             {
             case CURSOR_UP:
                 ui->newpoint.y -= ds->tilesize / CURSOR_GRANULARITY;
-                return "";
+                return UI_UPDATE;
             case CURSOR_DOWN:
                 ui->newpoint.y += ds->tilesize / CURSOR_GRANULARITY;
-                return "";
+                return UI_UPDATE;
             case CURSOR_LEFT:
                 ui->newpoint.x -= ds->tilesize / CURSOR_GRANULARITY;
-                return "";
+                return UI_UPDATE;
             case CURSOR_RIGHT:
                 ui->newpoint.x += ds->tilesize / CURSOR_GRANULARITY;
-                return "";
+                return UI_UPDATE;
             default:
                 break;
             }
@@ -1254,7 +1254,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             ui->newpoint.x = state->pts[ui->dragpoint].x * ds->tilesize / state->pts[ui->dragpoint].d;
             ui->newpoint.y = state->pts[ui->dragpoint].y * ds->tilesize / state->pts[ui->dragpoint].d;
             ui->newpoint.d = ds->tilesize;
-            return "";
+            return UI_UPDATE;
         }
         else if(ui->dragpoint >= 0)
         {
@@ -1273,7 +1273,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
                 ui->newpoint.x >= (long)state->w*ui->newpoint.d ||
                 ui->newpoint.y < 0 ||
                 ui->newpoint.y >= (long)state->h*ui->newpoint.d)
-                return "";
+                return UI_UPDATE;
 
             /*
              * We aren't cancelling the drag. Construct a move string
@@ -1287,7 +1287,7 @@ static char *interpret_move(const game_state *state, game_ui *ui,
         else if(ui->cursorpoint < 0)
         {
             ui->cursorpoint = 0;
-            return "";
+            return UI_UPDATE;
         }
     }
 
