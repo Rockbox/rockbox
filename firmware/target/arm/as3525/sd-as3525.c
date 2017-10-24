@@ -115,9 +115,11 @@ static void init_pl180_controller(const int drive);
 
 static tCardInfo card_info[NUM_DRIVES];
 
-/* maximum timeouts recommanded in the SD Specification v2.00 */
+/* maximum timeouts recommended in the SD Specification v2.00 */
+/* MCI_DATA_TIMER register data timeout in card bus clock periods */
 #define SD_MAX_READ_TIMEOUT     ((AS3525_PCLK_FREQ) / 1000 * 100) /* 100 ms */
 #define SD_MAX_WRITE_TIMEOUT    ((AS3525_PCLK_FREQ) / 1000 * 250) /* 250 ms */
+#define DISK_IDLE_TICKS         (3*HZ)
 
 /* for compatibility */
 static long last_disk_activity = -1;
@@ -280,7 +282,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
 
     return false;
 }
-
+/* MCI_CLOCK = MCLK / 2x(ClkDiv[bits 7:0]+1) */
 #define MCI_FULLSPEED     (MCI_CLOCK_ENABLE | MCI_CLOCK_BYPASS)     /* MCLK   */
 #define MCI_HALFSPEED     (MCI_CLOCK_ENABLE)                        /* MCLK/2 */
 #define MCI_QUARTERSPEED  (MCI_CLOCK_ENABLE | 1)                    /* MCLK/4 */
@@ -489,7 +491,7 @@ static void sd_thread(void)
 #endif /* HAVE_HOTSWAP */
 
         case SYS_TIMEOUT:
-            if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
+            if (TIME_BEFORE(current_tick, last_disk_activity+(DISK_IDLE_TICKS)))
             {
                 idle_notified = false;
             }
@@ -734,27 +736,22 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
         else
             discard_dcache_range(buf, count * SECTOR_SIZE);
     }
+    const int cmd = write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
 
-    while(count)
+    while(count > 0)
     {
         /* 128 * 512 = 2^16, and doesn't fit in the 16 bits of DATA_LENGTH
          * register, so we have to transfer maximum 127 sectors at a time. */
-        unsigned int transfer = (count >= 128) ? 127 : count; /* sectors */
+
+        unsigned int transfer = (count > 127) ? 127 : count; /* sectors */
         void *dma_buf;
-        const int cmd =
-            write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
         unsigned long bank_start = start;
-        unsigned long status;
 
         /* Only switch banks for internal storage */
         if(drive == INTERNAL_AS3525)
         {
-            unsigned int bank = 0;
-            while(bank_start >= BLOCKS_PER_BANK)
-            {
-                bank_start -= BLOCKS_PER_BANK;
-                bank++;
-            }
+            unsigned int bank = bank_start / BLOCKS_PER_BANK;
+            bank_start -= bank * BLOCKS_PER_BANK;
 
             /* Switch bank if needed */
             if(card_info[INTERNAL_AS3525].current_bank != bank)
@@ -812,10 +809,7 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
             /*Small delay for writes prevents data crc failures at lower freqs*/
 #ifdef HAVE_MULTIDRIVE
             if((drive == SD_SLOT_AS3525) && !hs_card)
-            {
-                int write_delay = 125;
-                while(write_delay--);
-            }
+                udelay(4);
 #endif
         }
         else
@@ -846,7 +840,7 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
 
         last_disk_activity = current_tick;
 
-        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP, &status))
+        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP, &response))
         {
             ret = -4*20;
             goto sd_transfer_error;
