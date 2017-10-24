@@ -115,7 +115,8 @@ static void init_pl180_controller(const int drive);
 
 static tCardInfo card_info[NUM_DRIVES];
 
-/* maximum timeouts recommanded in the SD Specification v2.00 */
+/* maximum timeouts recommended in the SD Specification v2.00 */
+/* MCI_DATA_TIMER register data timeout in card bus clock periods */
 #define SD_MAX_READ_TIMEOUT     ((AS3525_PCLK_FREQ) / 1000 * 100) /* 100 ms */
 #define SD_MAX_WRITE_TIMEOUT    ((AS3525_PCLK_FREQ) / 1000 * 250) /* 250 ms */
 
@@ -276,15 +277,24 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
         }
         else if(status & MCI_CMD_SENT)  /* CMD sent, no response required */
             return true;
+        udelay(1);
     }
 
     return false;
 }
+/* freq = MCLK / 2x(ClkDiv+1) */
+#define MCI_FULLSPEED     (MCI_CLOCK_ENABLE | \
+                           MCI_CLOCK_BYPASS | \
+                           MCI_CLOCK_POWERSAVE)     /* MCLK   */
 
-#define MCI_FULLSPEED     (MCI_CLOCK_ENABLE | MCI_CLOCK_BYPASS)     /* MCLK   */
-#define MCI_HALFSPEED     (MCI_CLOCK_ENABLE)                        /* MCLK/2 */
-#define MCI_QUARTERSPEED  (MCI_CLOCK_ENABLE | 1)                    /* MCLK/4 */
-#define MCI_IDENTSPEED    (MCI_CLOCK_ENABLE | AS3525_SD_IDENT_DIV)  /* IDENT  */
+#define MCI_HALFSPEED     (MCI_CLOCK_ENABLE | \
+                           MCI_CLOCK_POWERSAVE)     /* MCLK/2 */
+
+#define MCI_QUARTERSPEED  (MCI_CLOCK_ENABLE | \
+                           MCI_CLOCK_POWERSAVE | 1) /* MCLK/4 */
+
+#define MCI_IDENTSPEED    (MCI_CLOCK_ENABLE  | \
+                           AS3525_SD_IDENT_DIV )    /* IDENT  */
 
 static int sd_init_card(const int drive)
 {
