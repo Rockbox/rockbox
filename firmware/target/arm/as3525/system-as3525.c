@@ -467,10 +467,18 @@ void set_cpu_frequency(long frequency)
             "mcr p15, 0, r0, c1, c0  \n"
             : : : "r0" );
 
+        /*  Set I2C frequency */
+        I2C2_CPSR0 = AS3525_I2C_PRESCALER & 0xFF;          /* 8 lsb */
+        I2C2_CPSR1 = (AS3525_I2C_PRESCALER >> 8) & 0x3;    /* 2 msb */
+
         cpu_frequency = CPUFREQ_MAX;
     }
     else
     {
+        /*  Set I2C frequency */
+        I2C2_CPSR0 = AS3525_I2C_PRESCALER_LOW & 0xFF;          /* 8 lsb */
+        I2C2_CPSR1 = (AS3525_I2C_PRESCALER_LOW >> 8) & 0x3;    /* 2 msb */
+
         asm volatile(
             "mrc p15, 0, r0, c1, c0  \n"
             "bic r0, r0, #3<<30      \n"     /* fastbus clocking */
