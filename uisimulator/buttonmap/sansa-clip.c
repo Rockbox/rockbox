@@ -82,12 +82,17 @@ struct button_map bm[] = {
 };
 #else
 struct button_map bm[] = {
-    { SDLK_KP_MULTIPLY, 165, 158,  17, "Home" },
-    { SDLK_KP5,         102, 230,  29, "Select" },
-    { SDLK_KP8,         100, 179,  25, "Play" },
-    { SDLK_KP4,          53, 231,  21, "Left" },
-    { SDLK_KP6,         147, 232,  19, "Right" },
-    { SDLK_KP2,         105, 275,  22, "Menu" },
+    { SDLK_KP_MULTIPLY, 166, 158,  12, "Home" },
+    { SDLK_KP5,         101, 233,  19, "Select" },
+    /* multiple entries allow rectangular regions */
+    { SDLK_KP8,         98, 194,  19, "Play" },
+    { SDLK_KP8,         104, 194,  19, "Play" },
+    { SDLK_KP4,          62, 230,  19, "Left" },
+    { SDLK_KP4,          62, 236,  19, "Left" },
+    { SDLK_KP6,         140, 230,  19, "Right" },
+    { SDLK_KP6,         140, 236,  19, "Right" },
+    { SDLK_KP2,         98, 272,  19, "Menu" },
+    { SDLK_KP2,         104, 272,  19, "Menu" },
     { 0, 0, 0, 0, "None" }
 };
 #endif
