@@ -31,6 +31,10 @@
 # error Only for AS3514!
 #endif
 
+#if CONFIG_CPU == AS3525
+void i2c_set_prescaler(int prescaler);
+#endif
+
 void ascodec_init(void) INIT_ATTR;
 void ascodec_close(void);
 
