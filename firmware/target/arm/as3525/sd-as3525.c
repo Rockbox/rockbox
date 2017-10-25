@@ -118,7 +118,7 @@ static tCardInfo card_info[NUM_DRIVES];
 /* maximum timeouts recommanded in the SD Specification v2.00 */
 #define SD_MAX_READ_TIMEOUT     ((AS3525_PCLK_FREQ) / 1000 * 100) /* 100 ms */
 #define SD_MAX_WRITE_TIMEOUT    ((AS3525_PCLK_FREQ) / 1000 * 250) /* 250 ms */
-
+#define DISK_IDLE_TIMEOUT       (3*HZ)
 /* for compatibility */
 static long last_disk_activity = -1;
 
@@ -213,8 +213,12 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
                      const int flags, long *response)
 {
     int status;
-
     unsigned cmd_retries = 6;
+
+    unsigned long clock = MCI_CLOCK(drive);
+    if ((clock & MCI_CLOCK_POWERSAVE) != 0)
+        MCI_CLOCK(drive) = (clock & ~MCI_CLOCK_POWERSAVE);
+
     while(cmd_retries--)
     {
         if ((flags & MCI_ACMD) && /* send SD_APP_CMD before each try */
@@ -374,7 +378,7 @@ static int sd_init_card(const int drive)
 
     /* Boost MCICLK to operating speed */
     if(drive == INTERNAL_AS3525)
-        MCI_CLOCK(drive) = MCI_HALFSPEED;  /* MCICLK = IDE_CLK/2 = 25 MHz  */
+        MCI_CLOCK(drive) = MCI_QUARTERSPEED;  /* MCICLK = PCLK/4 = 15.5 Mhz*/
 #if defined(HAVE_MULTIDRIVE)
     else
         /* MCICLK = PCLK/2 = 31MHz(HS) or PCLK/4 = 15.5 Mhz (STD)*/
@@ -489,7 +493,7 @@ static void sd_thread(void)
 #endif /* HAVE_HOTSWAP */
 
         case SYS_TIMEOUT:
-            if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
+            if (TIME_BEFORE(current_tick, last_disk_activity+(DISK_IDLE_TIMEOUT)))
             {
                 idle_notified = false;
             }
@@ -500,6 +504,11 @@ static void sd_thread(void)
 
                 if (!idle_notified)
                 {
+                    /* After a data write, data cannot be written to MCI_CLOCK 
+                       for 3 MCLK periods + 2 PCLK periods. 400KHz worst case */
+                    udelay(3);
+                    for (int i = 0; i < NUM_DRIVES ; i++)
+                        MCI_CLOCK(i) |= MCI_CLOCK_POWERSAVE;
                     call_storage_idle_notifys(false);
                     idle_notified = true;
                 }
