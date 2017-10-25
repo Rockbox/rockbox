@@ -215,8 +215,12 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
                      const int flags, long *response)
 {
     int status;
-
     unsigned cmd_retries = 6;
+
+    unsigned long clock = MCI_CLOCK(drive);
+    if ((clock & MCI_CLOCK_POWERSAVE) != 0)
+        MCI_CLOCK(drive) = (clock & ~MCI_CLOCK_POWERSAVE);
+
     while(cmd_retries--)
     {
         if ((flags & MCI_ACMD) && /* send SD_APP_CMD before each try */
@@ -282,6 +286,7 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
 
     return false;
 }
+
 /* MCI_CLOCK = MCLK / 2x(ClkDiv[bits 7:0]+1) */
 #define MCI_FULLSPEED     (MCI_CLOCK_ENABLE | MCI_CLOCK_BYPASS)     /* MCLK   */
 #define MCI_HALFSPEED     (MCI_CLOCK_ENABLE)                        /* MCLK/2 */
@@ -376,7 +381,7 @@ static int sd_init_card(const int drive)
 
     /* Boost MCICLK to operating speed */
     if(drive == INTERNAL_AS3525)
-        MCI_CLOCK(drive) = MCI_HALFSPEED;  /* MCICLK = IDE_CLK/2 = 25 MHz  */
+        MCI_CLOCK(drive) = MCI_QUARTERSPEED;  /* MCICLK = PCLK/4 = 15.5 Mhz*/
 #if defined(HAVE_MULTIDRIVE)
     else
         /* MCICLK = PCLK/2 = 31MHz(HS) or PCLK/4 = 15.5 Mhz (STD)*/
@@ -502,6 +507,14 @@ static void sd_thread(void)
 
                 if (!idle_notified)
                 {
+                    /* After a data write, data cannot be written to MCI_CLOCK 
+                       for 3 MCLK periods + 2 PCLK periods. 400KHz worst case 
+                       2.5us period * 3 + 2PCLK periods ~10us but shouldn't 
+                       be needed due to the DISK_IDLE_TIMEOUT
+                    */
+                    for (int i = 0; i < NUM_DRIVES ; i++)
+                        MCI_CLOCK(i) |= MCI_CLOCK_POWERSAVE;
+
                     call_storage_idle_notifys(false);
                     idle_notified = true;
                 }
