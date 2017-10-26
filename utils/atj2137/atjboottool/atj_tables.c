@@ -109,11 +109,6 @@ uint8_t g_decode_B_table[20] =
     0xf8, 0xb4, 0x36, 0x41, 0xc5, 0x51, 0xaf
 };
 
-uint32_t g_xor_key[9] =
-{
-    1, 0, 0, 0, 0, 0, 0, 0, 0
-};
-
 uint32_t g_crypto_table[8] =
 {
     0xefad6126, 0x0a4c9d6e, 0x19c26bf5, 0x149563a4, 0x29f22ff4, 0x7e731af1,
@@ -142,7 +137,7 @@ uint32_t g_crypto_key4[6] =
     0x797324f1, 0xb11c5c0c, 0xa2cdd545, 0x71a0094f, 0xd51fbc6c, 0x00000000
 };
 
-uint32_t g_crypto_data3[6] =
+uint32_t g_atj_ec163_a[6] =
 {
     0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
 };
@@ -152,7 +147,7 @@ uint32_t g_crypto_key5[6] =
     0x4a3205fd, 0x512f7874, 0x1481eb10, 0xb8c953ca, 0x0a601907, 0x00000002
 };
 
-uint32_t g_crypto_data[8] =
+uint32_t g_atj_ec233_a[8] =
 {
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
 };
