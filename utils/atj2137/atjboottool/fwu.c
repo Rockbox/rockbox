@@ -52,6 +52,13 @@ const uint8_t g_fwu_signature[FWU_SIG_SIZE] =
     0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x75
 };
 
+struct fwu_crypto_hdr_t
+{
+    uint8_t field0[16];
+    uint8_t unk;
+    uint8_t key[32];
+} __attribute__((packed));
+
 struct fwu_tail_t
 {
     uint8_t length; /* in blocks? it's always 1 */
@@ -82,11 +89,11 @@ struct version_desc_t g_version[] =
 
 #define NR_VERSIONS (int)(sizeof(g_version)/sizeof(g_version[0]))
 
-typedef struct ptr_bundle_t
+typedef struct ec_point_t
 {
-    uint32_t *ptrA;
-    uint32_t *ptrB;
-}ptr_bundle_t;
+    uint32_t *x;
+    uint32_t *y;
+}ec_point_t;
 
 struct block_A_info_t
 {
@@ -94,16 +101,16 @@ struct block_A_info_t
     uint16_t field_2;
     int nr_words;
     int nr_dwords_x12;
-    uint32_t *ptr6; // size
+    uint32_t *ec_a; // size
     uint32_t *ptr7; // size
-    uint32_t *ptr5; // size
+    uint32_t *field_poly; // size
     uint32_t size;
     uint32_t field_1C;
-    ptr_bundle_t ptr1;
+    ec_point_t ptr1;
     uint32_t *ptr3; // size
     uint32_t *ptr4; //  size
     int nr_words2;
-    uint32_t field_34;
+    uint32_t field_bits;
     int nr_dwords_x8;
     int nr_bytes;
     int nr_bytes2;
@@ -125,6 +132,28 @@ uint8_t *g_decode_buffer2;
 void *g_decode_buffer3;
 
 #include "atj_tables.h"
+#include <ctype.h>
+
+void print_hex(const char *name, void *buf, size_t sz)
+{
+    if(name)
+        cprintf(BLUE, "%s\n", name);
+    uint8_t *p = buf;
+    for(size_t i = 0; i < sz; i += 16)
+    {
+        if(name)
+            cprintf(OFF, "  ");
+        for(size_t j = i; j < i + 16; j++)
+            if(j < sz)
+                cprintf(YELLOW, "%02x ", p[j]);
+            else
+                cprintf(OFF, "   ");
+        cprintf(RED, " |");
+        for(size_t j = i; j < i + 16; j++)
+            cprintf(GREEN, "%c", (j < sz && isprint(p[j])) ? p[j] : '.');
+        cprintf(RED, "|\n");
+    }
+}
 
 void compute_checksum(uint8_t *buf, size_t size, uint8_t t[20])
 {
@@ -258,12 +287,12 @@ static int fill_decode_info(uint8_t sz)
     g_decode_A_info.nr_dwords_x2 = 2 * g_decode_A_info.nr_dwords;
     g_decode_A_info.nr_dwords_x2_m1 = g_decode_A_info.nr_dwords_x2 - 1;
     g_decode_A_info.nr_dwords_x12 = 12 * g_decode_A_info.nr_dwords;
-    g_decode_A_info.ptr1.ptrA = malloc(4 * g_decode_A_info.nr_dwords);
-    g_decode_A_info.ptr1.ptrB = malloc(g_decode_A_info.size);
+    g_decode_A_info.ptr1.x = malloc(4 * g_decode_A_info.nr_dwords);
+    g_decode_A_info.ptr1.y = malloc(g_decode_A_info.size);
     g_decode_A_info.ptr3 = malloc(g_decode_A_info.size);
     g_decode_A_info.ptr4 = malloc(g_decode_A_info.size);
-    g_decode_A_info.ptr5 = malloc(g_decode_A_info.size);
-    g_decode_A_info.ptr6 = malloc(g_decode_A_info.size);
+    g_decode_A_info.field_poly = malloc(g_decode_A_info.size);
+    g_decode_A_info.ec_a = malloc(g_decode_A_info.size);
     g_decode_A_info.ptr7 = malloc(g_decode_A_info.size);
 
     cprintf(BLUE, "  Decode Info:\n");
@@ -284,6 +313,7 @@ static int process_block_A(uint8_t block[1024])
     int ret = decode_block_A(block + 4);
     cprintf(GREEN, "  Check: ");
     check_field(ret, 0, "Pass\n", "Fail\n");
+    print_hex("BlockA", block, 1024);
 
     memcpy(g_subblock_A, block, sizeof(g_subblock_A));
     ret = fill_decode_info(g_subblock_A[276]);
@@ -340,30 +370,6 @@ static int find_last_bit_set(uint32_t *buf, bool a)
     return -1; // unreachable
 }
 
-static void xor_with_ptrs(uint8_t *buf, ptr_bundle_t *ptrs)
-{
-    /*
-    int sz = g_decode_A_info.nr_bytes2 - 1;
-    if(sz <= 32)
-    {
-        for(int i = 0; i < sz; i++)
-            buf[i] ^= ptrs->ptrA[i];
-        for(int i = sz; i < 32; i++)
-            buf[i] ^= ptrs->ptrB[i - sz];
-    }
-    else
-        for(int i = 0; i < 32; i++)
-            buf[i] ^= ptrs->ptrA[i];
-    */
-    uint8_t *ptrA = (uint8_t *)ptrs->ptrA;
-    uint8_t *ptrB = (uint8_t *)ptrs->ptrB;
-    int sz = MIN(g_decode_A_info.nr_bytes2 - 1, 32);
-    for(int i = 0; i < sz; i++)
-        buf[i] ^= ptrA[i];
-    for(int i = sz; i < 32; i++)
-        buf[i] ^= ptrB[i - sz];
-}
-
 static void copy_memory(uint32_t *to, uint32_t *from)
 {
     for(int i = 0; i < g_decode_A_info.nr_dwords; i++)
@@ -407,7 +413,27 @@ static void xor_big(uint32_t *res, uint32_t *a, uint32_t *b)
         res[i] = a[i] ^ b[i];
 }
 
-static void decode_with_xor(uint32_t *res, uint32_t *key)
+static void print_poly(const char *name, uint32_t *poly, int nr_dwords)
+{
+    bool first = true;
+    cprintf(RED, "%s", name);
+    for(int dw = 0; dw < nr_dwords; dw++)
+    {
+        for(int i = 0; i < 32; i++)
+        {
+            if(!(poly[dw] & (1 << i)))
+                continue;
+            if(first)
+                first = false;
+            else
+                cprintf(OFF, "+");
+            cprintf(OFF, "x^%d", dw * 32 + i);
+        }
+    }
+    cprintf(OFF, "\n");
+}
+
+static void gf_inverse(uint32_t *res, uint32_t *val)
 {
     uint32_t *tmp = malloc(g_decode_A_info.nr_dwords_x8);
     uint32_t *copy = malloc(g_decode_A_info.nr_dwords_x8);
@@ -417,8 +443,8 @@ static void decode_with_xor(uint32_t *res, uint32_t *key)
     clear_memory(res, g_decode_A_info.nr_dwords);
     *res = 1;
     clear_memory(tmp2, g_decode_A_info.nr_dwords);
-    copy_memory(copy_arg, key);
-    copy_memory(copy, (uint32_t *)g_decode_A_info.ptr5);
+    copy_memory(copy_arg, val);
+    copy_memory(copy, (uint32_t *)g_decode_A_info.field_poly);
 
     for(int i = find_last_bit_set(copy_arg, 1); i; i = find_last_bit_set(copy_arg, 1))
     {
@@ -460,7 +486,7 @@ static void shift_left_one(uint32_t *a)
 
 
 #if 1
-static void xor_mult(uint32_t *a1, uint32_t *a2, uint32_t *a3)
+static void gf_mult(uint32_t *res, uint32_t *a2, uint32_t *a3)
 {
     uint32_t *tmp2 = malloc(g_decode_A_info.nr_dwords_x8);
     clear_memory(tmp2, g_decode_A_info.nr_dwords_x2);
@@ -474,7 +500,7 @@ static void xor_mult(uint32_t *a1, uint32_t *a2, uint32_t *a3)
         {
             if(a2[j] & mask)
                 for(int k = 0; k < pos; k++)
-                    a1[j + k] ^= tmp2[k];
+                    res[j + k] ^= tmp2[k];
         }
         shift_left_one(tmp2);
         mask <<= 1;
@@ -483,7 +509,7 @@ static void xor_mult(uint32_t *a1, uint32_t *a2, uint32_t *a3)
     free(tmp2);
 }
 #else
-static void xor_mult(uint32_t *a1, uint32_t *a2, uint32_t *a3)
+static void gf_mult(uint32_t *res, uint32_t *a2, uint32_t *a3)
 {
     for(int i = 0; i < 32 * g_decode_A_info.nr_dwords; i++)
         for(int j = 0; j < 32 * g_decode_A_info.nr_dwords; j++)
@@ -491,64 +517,84 @@ static void xor_mult(uint32_t *a1, uint32_t *a2, uint32_t *a3)
             int k = i + j;
             uint32_t v1 = (a2[i / 32] >> (i % 32)) & 1;
             uint32_t v2 = (a3[j / 32] >> (j % 32)) & 1;
-            a1[k / 32] ^= (v1 * v2) << (k % 32);
+            res[k / 32] ^= (v1 * v2) << (k % 32);
         }
 }
 #endif
 
-static void xor_mult_high(uint32_t *a1, uint32_t *buf, uint32_t *a3)
+static void gf_mod(uint32_t *inout, uint32_t *other)
 {
-    (void) a1;
     uint32_t *tmp = malloc(g_decode_A_info.nr_dwords_x8);
-    int v4 = g_decode_A_info.field_34;
-    int pos = find_last_bit_set(buf, 0);
-    for(int i = pos - v4; i >= 0; i = find_last_bit_set(buf, 0) - v4)
+    int v4 = g_decode_A_info.field_bits;
+    int pos = find_last_bit_set(inout, 0);
+    for(int i = pos - v4; i >= 0; i = find_last_bit_set(inout, 0) - v4)
     {
         clear_memory(tmp, g_decode_A_info.nr_dwords_x2);
-        copy_memory(tmp, a3);
+        copy_memory(tmp, other);
         shift_left(tmp, i);
-        xor_big(buf, buf, tmp);
+        xor_big(inout, inout, tmp);
     }
     free(tmp);
 }
 
-static void xor_small(uint32_t *res, uint32_t *a, uint32_t *b)
+static void gf_add(uint32_t *res, uint32_t *a, uint32_t *b)
 {
     for(int i = 0; i < g_decode_A_info.nr_dwords; i++)
         res[i] = a[i] ^ b[i];
 }
 
-static void crypto(ptr_bundle_t *a1, ptr_bundle_t *a2)
+static void print_point(const char *name, ec_point_t *ptr)
+{
+    cprintf(BLUE, "%s\n", name);
+    print_poly("  x: ", ptr->x, g_decode_A_info.nr_dwords);
+    print_poly("  y: ", ptr->y, g_decode_A_info.nr_dwords);
+}
+
+static uint32_t g_gf_one[9] =
+{
+    1, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+static void ec_double(ec_point_t *point, ec_point_t *res)
 {
     uint32_t *v2 = malloc(g_decode_A_info.nr_dwords_x8);
     uint32_t *v3 = malloc(g_decode_A_info.nr_dwords_x8);
     uint32_t *v4 = malloc(g_decode_A_info.nr_dwords_x8);
     uint32_t *v5 = malloc(g_decode_A_info.nr_dwords_x8);
     uint32_t *v6 = malloc(g_decode_A_info.nr_dwords_x8);
-    clear_memory(a2->ptrA, g_decode_A_info.nr_dwords);
-    clear_memory(a2->ptrB, g_decode_A_info.nr_dwords);
+    clear_memory(res->x, g_decode_A_info.nr_dwords);
+    clear_memory(res->y, g_decode_A_info.nr_dwords);
     clear_memory(v3, g_decode_A_info.nr_dwords_x2);
     clear_memory(v6, g_decode_A_info.nr_dwords_x2);
     clear_memory(v4, g_decode_A_info.nr_dwords_x2);
-    decode_with_xor(v4, a1->ptrA);
+    /* v4 := 1/x */
+    gf_inverse(v4, point->x);
     clear_memory(v5, g_decode_A_info.nr_dwords_x2);
-
-    xor_mult(v5, v4, a1->ptrB);
-    xor_mult_high(v5, v5, g_decode_A_info.ptr5);
-    xor_small(v2, a1->ptrA, v5);
-    xor_small(v4, v2, g_decode_A_info.ptr6);
+    /* v5 := y/x */
+    gf_mult(v5, v4, point->y);
+    gf_mod(v5, g_decode_A_info.field_poly);
+    /* v2 := x + y/x   (lambda) */
+    gf_add(v2, point->x, v5);
+    /* v4 := ec_a + lambda */
+    gf_add(v4, v2, g_decode_A_info.ec_a);
     clear_memory(v3, g_decode_A_info.nr_dwords_x2);
-    xor_mult(v3, v2, v2);
-    xor_mult_high(v3, v3, g_decode_A_info.ptr5);
-    xor_small(a2->ptrA, v4, v3);
+    /* v3 := lambda^2 */
+    gf_mult(v3, v2, v2);
+    gf_mod(v3, g_decode_A_info.field_poly);
+    /* x' := lambda + lambda^2 + ec_a */
+    gf_add(res->x, v4, v3);
     clear_memory(v5, g_decode_A_info.nr_dwords_x2);
-    xor_small(v4, v2, g_xor_key);
-    xor_mult(v5, v4, a2->ptrA);
-    xor_mult_high(v5, v5, g_decode_A_info.ptr5);
+    /* v4 := lambda + g_gf_one */
+    gf_add(v4, v2, g_gf_one);
+    /* v5 := (lambda + 1) * x' = lambda.x' + x' */
+    gf_mult(v5, v4, res->x);
+    gf_mod(v5, g_decode_A_info.field_poly);
     clear_memory(v6, g_decode_A_info.nr_dwords_x2);
-    xor_mult(v6, a1->ptrA, a1->ptrA);
-    xor_mult_high(v6, v6, g_decode_A_info.ptr5);
-    xor_small(a2->ptrB, v5, v6);
+    /* v6 := x1^2 */
+    gf_mult(v6, point->x, point->x);
+    gf_mod(v6, g_decode_A_info.field_poly);
+    /* y' = (lambda + g_gf_one) * x + x^2 = x^2 + lambda.x + x */
+    gf_add(res->y, v5, v6);
     free(v2);
     free(v3);
     free(v4);
@@ -556,35 +602,47 @@ static void crypto(ptr_bundle_t *a1, ptr_bundle_t *a2)
     free(v6);
 }
 
-static void crypto2(ptr_bundle_t *a1, ptr_bundle_t *a2, ptr_bundle_t *a3)
+static void ec_add(ec_point_t *a1, ec_point_t *a2, ec_point_t *res)
 {
     uint32_t *v3 = malloc(g_decode_A_info.nr_dwords_x8);
     uint32_t *v4 = malloc(g_decode_A_info.nr_dwords_x8);
     uint32_t *v5 = malloc(g_decode_A_info.nr_dwords_x8);
     uint32_t *v6 = malloc(g_decode_A_info.nr_dwords_x8);
     uint32_t *v7 = malloc(g_decode_A_info.nr_dwords_x8);
-    clear_memory(a3->ptrA, g_decode_A_info.nr_dwords);
-    clear_memory(a3->ptrB, g_decode_A_info.nr_dwords);
+    clear_memory(res->x, g_decode_A_info.nr_dwords);
+    clear_memory(res->y, g_decode_A_info.nr_dwords);
     clear_memory(v4, g_decode_A_info.nr_dwords_x2);
     clear_memory(v7, g_decode_A_info.nr_dwords_x2);
-    xor_small(v5, a1->ptrB, a2->ptrB);
-    xor_small(v6, a1->ptrA, a2->ptrA);
-    decode_with_xor(v7, v6);
+    /* v5 = y1 + y2 */
+    gf_add(v5, a1->y, a2->y);
+    /* v6 = x1 + x2 */
+    gf_add(v6, a1->x, a2->x);
+    /* v7 = 1/(x1 + x2) */
+    gf_inverse(v7, v6);
     clear_memory(v3, g_decode_A_info.nr_dwords_x2);
-    xor_mult(v3, v7, v5);
-    xor_mult_high(v3, v3, g_decode_A_info.ptr5);
-    xor_small(v5, v3, g_decode_A_info.ptr6);
+    /* v3 = (y1 + y2) / (x1 + x2)    (lambda) */
+    gf_mult(v3, v7, v5);
+    gf_mod(v3, g_decode_A_info.field_poly);
+    /* v5 = lambda + ec_a */
+    gf_add(v5, v3, g_decode_A_info.ec_a);
     clear_memory(v4, g_decode_A_info.nr_dwords_x2);
-    xor_mult(v4, v3, v3);
-    xor_mult_high(v4, v4, g_decode_A_info.ptr5);
-    xor_small(v7, v5, v4);
-    xor_small(a3->ptrA, v7, v6);
-    xor_small(v5, a1->ptrA, a3->ptrA);
-    xor_small(v6, a3->ptrA, a1->ptrB);
+    /* v4 = lambda^2 */
+    gf_mult(v4, v3, v3);
+    gf_mod(v4, g_decode_A_info.field_poly);
+    /* v7 = lambda^2 + lambda + ec_a */
+    gf_add(v7, v5, v4);
+    /* x' = ec_a + x1 + x2 + lambda + lambda^2 */
+    gf_add(res->x, v7, v6);
+    /* v5 = x1 + x' */
+    gf_add(v5, a1->x, res->x);
+    /* v6 = x' + y1 */
+    gf_add(v6, res->x, a1->y);
     clear_memory(v7, g_decode_A_info.nr_dwords_x2);
-    xor_mult(v7, v5, v3);
-    xor_mult_high(v7, v7, g_decode_A_info.ptr5);
-    xor_small(a3->ptrB, v7, v6);
+    /* v7 = (x1 + x').lambda */
+    gf_mult(v7, v5, v3);
+    gf_mod(v7, g_decode_A_info.field_poly);
+    /* y' = (x1 + x').lambda + x' + y1 */
+    gf_add(res->y, v7, v6);
     free(v3);
     free(v4);
     free(v5);
@@ -592,113 +650,145 @@ static void crypto2(ptr_bundle_t *a1, ptr_bundle_t *a2, ptr_bundle_t *a3)
     free(v7);
 }
 
-static int crypto3(uint32_t *a1, ptr_bundle_t *ptrs_alt, ptr_bundle_t *ptrs)
+static int ec_mult(uint32_t *n, ec_point_t *point, ec_point_t *res)
 {
-    ptr_bundle_t ptrs_others;
+    ec_point_t res_others;
 
-    ptrs_others.ptrA = malloc(g_decode_A_info.size);
-    ptrs_others.ptrB = malloc(g_decode_A_info.size);
-    clear_memory(ptrs->ptrA, g_decode_A_info.nr_dwords);
-    clear_memory(ptrs->ptrB, g_decode_A_info.nr_dwords);
-    clear_memory(ptrs_others.ptrA, g_decode_A_info.nr_dwords);
-    clear_memory(ptrs_others.ptrB, g_decode_A_info.nr_dwords);
-    int pos = find_last_bit_set(a1, 1);
-    
-    copy_memory(ptrs_others.ptrA, ptrs_alt->ptrA);
-    copy_memory(ptrs_others.ptrB, ptrs_alt->ptrB);
+    res_others.x = malloc(g_decode_A_info.size);
+    res_others.y = malloc(g_decode_A_info.size);
+    clear_memory(res->x, g_decode_A_info.nr_dwords);
+    clear_memory(res->y, g_decode_A_info.nr_dwords);
+    clear_memory(res_others.x, g_decode_A_info.nr_dwords);
+    clear_memory(res_others.y, g_decode_A_info.nr_dwords);
+    int pos = find_last_bit_set(n, 1);
+
+    /* res_other := point */
+    copy_memory(res_others.x, point->x);
+    copy_memory(res_others.y, point->y);
+
+    /* for all bit from SZ-1 downto 0 */
     for(int bit = (pos % 32) - 1; bit >= 0; bit--)
     {
-        crypto(&ptrs_others, ptrs);
-        copy_memory(ptrs_others.ptrA, ptrs->ptrA);
-        copy_memory(ptrs_others.ptrB, ptrs->ptrB);
-        if(a1[pos / 32] & (1 << bit))
+        /* res := 2 * res_other */
+        ec_double(&res_others, res);
+        /* res_other := res = 2 * res_other */
+        copy_memory(res_others.x, res->x);
+        copy_memory(res_others.y, res->y);
+        /* if bit of n is set */
+        if(n[pos / 32] & (1 << bit))
         {
-            crypto2(&ptrs_others, ptrs_alt, ptrs);
-            copy_memory(ptrs_others.ptrA, ptrs->ptrA);
-            copy_memory(ptrs_others.ptrB, ptrs->ptrB);
+            /* res := res_other + point */
+            ec_add(&res_others, point, res);
+            copy_memory(res_others.x, res->x);
+            copy_memory(res_others.y, res->y);
         }
     }
+    /* same but optimized */
     for(int i = pos / 32 - 1; i >= 0; i--)
     {
         for(int bit = 31; bit >= 0; bit--)
         {
-            crypto(&ptrs_others, ptrs);
-            copy_memory(ptrs_others.ptrA, ptrs->ptrA);
-            copy_memory(ptrs_others.ptrB, ptrs->ptrB);
-            if(a1[i] & (1 << bit))
+            ec_double(&res_others, res);
+            copy_memory(res_others.x, res->x);
+            copy_memory(res_others.y, res->y);
+            if(n[i] & (1 << bit))
             {
-                crypto2(&ptrs_others, ptrs_alt, ptrs);
-                copy_memory(ptrs_others.ptrA, ptrs->ptrA);
-                copy_memory(ptrs_others.ptrB, ptrs->ptrB);
+                ec_add(&res_others, point, res);
+                copy_memory(res_others.x, res->x);
+                copy_memory(res_others.y, res->y);
             }
         }
     }
-    copy_memory(ptrs->ptrA, ptrs_others.ptrA);
-    copy_memory(ptrs->ptrB, ptrs_others.ptrB);
-    free(ptrs_others.ptrA);
-    free(ptrs_others.ptrB);
+    copy_memory(res->x, res_others.x);
+    copy_memory(res->y, res_others.y);
+    free(res_others.x);
+    free(res_others.y);
     return 0;
 }
 
-static int crypto4(uint8_t *a1, ptr_bundle_t *ptrs, uint32_t *a3)
+static void xor_with_point(uint8_t *buf, ec_point_t *point)
 {
-    ptr_bundle_t ptrs_others;
+    /*
+    int sz = g_decode_A_info.nr_bytes2 - 1;
+    if(sz <= 32)
+    {
+        for(int i = 0; i < sz; i++)
+            buf[i] ^= point->x[i];
+        for(int i = sz; i < 32; i++)
+            buf[i] ^= point->y[i - sz];
+    }
+    else
+        for(int i = 0; i < 32; i++)
+            buf[i] ^= point->x[i];
+    */
+    uint8_t *ptrA = (uint8_t *)point->x;
+    uint8_t *ptrB = (uint8_t *)point->y;
+    int sz = MIN(g_decode_A_info.nr_bytes2 - 1, 32);
+    for(int i = 0; i < sz; i++)
+        buf[i] ^= ptrA[i];
+    for(int i = sz; i < 32; i++)
+        buf[i] ^= ptrB[i - sz];
+}
 
-    ptrs_others.ptrA = malloc(g_decode_A_info.size);
-    ptrs_others.ptrB = malloc(g_decode_A_info.size);
-    clear_memory(ptrs_others.ptrA, g_decode_A_info.nr_dwords);
-    clear_memory(ptrs_others.ptrB, g_decode_A_info.nr_dwords);
-    int ret = crypto3(a3, ptrs, &ptrs_others);
+static int crypto4(uint8_t *a1, ec_point_t *ptrs, uint32_t *a3)
+{
+    ec_point_t ptrs_others;
+
+    ptrs_others.x = malloc(g_decode_A_info.size);
+    ptrs_others.y = malloc(g_decode_A_info.size);
+    clear_memory(ptrs_others.x, g_decode_A_info.nr_dwords);
+    clear_memory(ptrs_others.y, g_decode_A_info.nr_dwords);
+    int ret = ec_mult(a3, ptrs, &ptrs_others);
     if(ret == 0)
-        xor_with_ptrs(a1, &ptrs_others);
-    free(ptrs_others.ptrA);
-    free(ptrs_others.ptrB);
+        xor_with_point(a1, &ptrs_others);
+    free(ptrs_others.x);
+    free(ptrs_others.y);
     return ret;
 }
 
-static int crypto_bits(uint32_t *buf, int a2)
+static int set_field_poly(uint32_t *field_poly, int field_sz)
 {
-    clear_memory(buf, g_decode_A_info.nr_dwords);
-    g_decode_A_info.field_34 = 0;
-    if(a2 == 4)
+    clear_memory(field_poly, g_decode_A_info.nr_dwords);
+    g_decode_A_info.field_bits = 0;
+    if(field_sz == 4)
     {
-        set_bit(0, buf);
-        set_bit(74, buf);
-        set_bit(233, buf);
-        g_decode_A_info.field_34 = 233;
+        set_bit(0, field_poly);
+        set_bit(74, field_poly);
+        set_bit(233, field_poly);
+        g_decode_A_info.field_bits = 233;
         return 0;
     }
-    else if (a2 == 5)
+    else if (field_sz == 5)
     {
-        set_bit(0, buf);
-        set_bit(3, buf);
-        set_bit(6, buf);
-        set_bit(7, buf);
-        set_bit(163, buf);
-        g_decode_A_info.field_34 = 163;
+        set_bit(0, field_poly);
+        set_bit(3, field_poly);
+        set_bit(6, field_poly);
+        set_bit(7, field_poly);
+        set_bit(163, field_poly);
+        g_decode_A_info.field_bits = 163;
         return 0;
     }
     else
         return 1;
 }
 
-static int crypto_bits_copy(ptr_bundle_t *a1, char a2)
+static int ec_init(ec_point_t *a1, char field_sz)
 {
-    int ret = crypto_bits(g_decode_A_info.ptr5, a2);
+    int ret = set_field_poly(g_decode_A_info.field_poly, field_sz);
     if(ret) return ret;
-    if(a2 == 4)
+    if(field_sz == 4)
     {
-        copy_memory(a1->ptrA, g_crypto_table);
-        copy_memory(a1->ptrB, g_crypto_table2);
-        copy_memory(g_decode_A_info.ptr6, g_crypto_data);
+        copy_memory(a1->x, g_crypto_table);
+        copy_memory(a1->y, g_crypto_table2);
+        copy_memory(g_decode_A_info.ec_a, g_atj_ec233_a);
         copy_memory(g_decode_A_info.ptr7, g_crypto_key6);
         return 0;
     }
-    else if ( a2 == 5 )
+    else if(field_sz == 5 )
     {
-        copy_memory(a1->ptrA, g_crypto_key3);
-        copy_memory(a1->ptrB, g_crypto_key4);
-        copy_memory(g_decode_A_info.ptr6, g_crypto_data3);
+        copy_memory(a1->x, g_crypto_key3);
+        copy_memory(a1->y, g_crypto_key4);
+        copy_memory(g_decode_A_info.ec_a, g_atj_ec163_a);
         copy_memory(g_decode_A_info.ptr7, g_crypto_key5);
         return 0;
     }
@@ -764,31 +854,30 @@ static int get_key_fwu_v3(size_t size, uint8_t *buf, uint8_t *blockA, uint8_t *b
 
     cprintf(BLUE, "Main\n");
 
-    // WARNING you need more that 48 because 17+32 > 48 !! (see code below) */
-    uint8_t smallbuf[50];
-    memcpy(smallbuf, buf + 42, sizeof(smallbuf));
-    cprintf_field("  Byte: ", "%d ", smallbuf[16]);
-    check_field(smallbuf[16], 3, "Ok\n", "Mismatch\n");
+    struct fwu_crypto_hdr_t crypto_hdr;
+    memcpy(&crypto_hdr, buf + sizeof(struct fwu_hdr_t), sizeof(crypto_hdr));
+    cprintf_field("  Byte: ", "%d ", crypto_hdr.unk);
+    check_field(crypto_hdr.unk, 3, "Ok\n", "Mismatch\n");
 
-    ptr_bundle_t ptrs;
-    ptrs.ptrA = malloc(g_decode_A_info.size);
-    ptrs.ptrB = malloc(g_decode_A_info.size);
-    memset(ptrs.ptrA, 0, g_decode_A_info.size);
-    memset(ptrs.ptrB, 0, g_decode_A_info.size);
-    memcpy(ptrs.ptrA, buf + 91, g_decode_A_info.nr_bytes2);
-    memcpy(ptrs.ptrB, buf + 91 + g_decode_A_info.nr_bytes2, g_decode_A_info.nr_bytes2);
+    ec_point_t ptrs;
+    ptrs.x = malloc(g_decode_A_info.size);
+    ptrs.y = malloc(g_decode_A_info.size);
+    memset(ptrs.x, 0, g_decode_A_info.size);
+    memset(ptrs.y, 0, g_decode_A_info.size);
+    memcpy(ptrs.x, buf + 91, g_decode_A_info.nr_bytes2);
+    memcpy(ptrs.y, buf + 91 + g_decode_A_info.nr_bytes2, g_decode_A_info.nr_bytes2);
 
-    ret = crypto_bits_copy(&g_decode_A_info.ptr1, g_crypto_info_byte);
+    ret = ec_init(&g_decode_A_info.ptr1, g_crypto_info_byte);
     cprintf(GREEN, "  Crypto bits copy: ");
     check_field(ret, 0, "Pass\n", "Fail\n");
 
-    ret = crypto4(smallbuf + 17, &ptrs, g_decode_buffer3);
+    ret = crypto4(crypto_hdr.key, &ptrs, g_decode_buffer3);
     cprintf(GREEN, "  Crypto 4: ");
     check_field(ret, 0, "Pass\n", "Fail\n");
 
-    memcpy(keybuf, &smallbuf[17], 32);
+    memcpy(keybuf, crypto_hdr.key, 32);
     int offset = g_decode_A_info.nr_words + 91;
-    
+
     decode_block_with_swap(keybuf, 0, &buf[offset], 512 - offset, g_perm_B);
 
     int pos = *(uint16_t *)&buf[offset];
