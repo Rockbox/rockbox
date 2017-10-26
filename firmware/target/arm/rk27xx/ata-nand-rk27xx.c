@@ -116,3 +116,30 @@ int nand_num_drives(int first_drive)
     return 1;
 }
 #endif
+
+int nand_event(long id, intptr_t data)
+{
+    int rc = 0;
+
+#if 0 /* The NAND functions do nothing right now; just provide template */
+    if (LIKELY(id == Q_STORAGE_TICK))
+    {
+        if (!nand_powered ||
+            TIME_BEFORE(current_tick, nand_last_activity() + HZ / 5))
+        {
+            STG_EVENT_ASSERT_ACTIVE(STORAGE_NAND);
+        }
+    }
+    else if (id == Q_STORAGE_SLEEPNOW)
+    {
+        nand_power_down();
+    }
+    else
+    {
+        rc = storage_event_default_handler(id, data, nand_last_activity(),
+                                           STORAGE_NAND);
+    }
+#endif
+    return rc;
+    (void)id; (void)data;
+}
