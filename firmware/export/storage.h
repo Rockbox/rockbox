@@ -188,7 +188,7 @@ static inline void storage_sleep(void) {}
         #define storage_spin sd_spin
 
         #define storage_enable(on) sd_enable(on)
-        #define storage_sleepnow() sd_sleepnow()
+        #define storage_sleepnow() do {} while (0)
         #define storage_disk_is_active() 0
         #define storage_soft_reset() (void)0
         #ifdef HAVE_STORAGE_FLUSH

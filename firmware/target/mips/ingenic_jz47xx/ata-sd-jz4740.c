@@ -1375,10 +1375,6 @@ void sd_enable(bool on)
     (void)on;
 }
 
-void sd_sleepnow(void)
-{
-}
-
 bool sd_disk_is_active(void)
 {
     return false;
