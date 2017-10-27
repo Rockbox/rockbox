@@ -61,6 +61,9 @@
 #ifdef HAVE_HOTKEY
 #include "onplay.h"
 #endif
+#if CONFIG_CPU == AS3525v2 || CONFIG_CPU == AS3525
+#include "sd.h"
+#endif
 
 #if defined(DX50) || defined(DX90)
 #include "governor-ibasso.h"
@@ -2168,6 +2171,14 @@ const struct settings_list settings[] = {
 
 #if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
     OFFON_SETTING(0, usb_skip_first_drive, LANG_USB_SKIP_FIRST_DRIVE, false, "usb skip first drive", usb_set_skip_first_drive),
+#endif
+
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE)
+    OFFON_SETTING(0, cpu_undervolt, LANG_SYS_CPU_UNDERVOLT, false, "cpu undervolt", NULL),
+#endif
+
+#if CONFIG_CPU == AS3525v2 || CONFIG_CPU == AS3525
+    OFFON_SETTING(0, disk_low_speed, LANG_SYS_DISK_LOWSPEED, false, "disk_low_speed", sd_low_speed),
 #endif
 
     /* Customizable list */
