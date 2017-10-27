@@ -163,6 +163,15 @@ static void enable_controller(bool on)
 
     if(on)
     {
+        /* After a data write, data cannot be written to MCI_CLOCK 
+           for 3 MCLK periods + 2 PCLK periods. ~10us worst case
+           but if it is already disabled we haven't had writes 
+           since last disk timeout occurred
+        */
+        for (int i = 0; i < NUM_DRIVES ; i++)
+            if ((MCI_CLOCK(i) & MCI_CLOCK_POWERSAVE) != 0)
+                MCI_CLOCK(i) = (MCI_CLOCK(i) & ~MCI_CLOCK_POWERSAVE);
+
 #if defined(HAVE_BUTTON_LIGHT) && defined(HAVE_MULTIDRIVE)
         /* buttonlight AMSes need a bit of special handling for the buttonlight
          * here due to the dual mapping of GPIOD and XPD */
@@ -261,6 +270,10 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
     int status;
 
     unsigned cmd_retries = 6;
+/*
+    if ((MCI_CLOCK(drive) & MCI_CLOCK_POWERSAVE) != 0)
+        MCI_CLOCK(drive) = (MCI_CLOCK(drive) & ~MCI_CLOCK_POWERSAVE);
+*/
     while(cmd_retries--)
     {
         if ((flags & MCI_ACMD) && /* send SD_APP_CMD before each try */
@@ -421,7 +434,7 @@ static int sd_init_card(const int drive)
 
     /* Boost MCICLK to operating speed */
     if(drive == INTERNAL_AS3525)
-        MCI_CLOCK(drive) = MCI_HALFSPEED;  /* MCICLK = IDE_CLK/2 = 25 MHz  */
+        MCI_CLOCK(drive) = MCI_QUARTERSPEED;  /* MCICLK = PCLK/4 = 15.5 Mhz */
 #if defined(HAVE_MULTIDRIVE)
     else
         /* MCICLK = PCLK/2 = 31MHz(HS) or PCLK/4 = 15.5 Mhz (STD)*/
@@ -588,6 +601,7 @@ static int sd_wait_for_tran_state(const int drive)
 static int sd_select_bank(signed char bank)
 {
     int ret;
+    const int drive = INTERNAL_AS3525; /* only internal drv uses bank switching */
     unsigned loops = 0;
 
     memset(uncached_buffer, 0, 512);
@@ -603,19 +617,19 @@ static int sd_select_bank(signed char bank)
     do {
         if(loops++ > PL180_MAX_TRANSFER_ERRORS)
             panicf("SD bank %d error : 0x%x", bank,
-                    transfer_error[INTERNAL_AS3525]);
+                    transfer_error[drive]);
 
-        ret = sd_wait_for_tran_state(INTERNAL_AS3525);
+        ret = sd_wait_for_tran_state(drive);
         if (ret < 0)
             return ret - 2;
 
-        if(!send_cmd(INTERNAL_AS3525, SD_SWITCH_FUNC, 0x80ffffef, MCI_NO_RESP,
+        if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80ffffef, MCI_NO_RESP,
                      NULL))
             return -1;
 
         mci_delay();
 
-        if(!send_cmd(INTERNAL_AS3525, 35, 0, MCI_NO_RESP, NULL))
+        if(!send_cmd(drive, 35, 0, MCI_NO_RESP, NULL))
             return -2;
 
         mci_delay();
@@ -624,12 +638,12 @@ static int sd_select_bank(signed char bank)
         /* we don't use the uncached buffer here, because we need the
          * physical memory address for DMA transfers */
         dma_enable_channel(1, AS3525_PHYSICAL_ADDR(&aligned_buffer[0]),
-            MCI_FIFO(INTERNAL_AS3525), DMA_PERI_SD,
+            MCI_FIFO(drive), DMA_PERI_SD,
             DMAC_FLOWCTRL_PERI_MEM_TO_PERI, true, false, 0, DMA_S8, NULL);
 
-        MCI_DATA_TIMER(INTERNAL_AS3525) = SD_MAX_WRITE_TIMEOUT;
-        MCI_DATA_LENGTH(INTERNAL_AS3525) = 512;
-        MCI_DATA_CTRL(INTERNAL_AS3525) =  (1<<0) /* enable */   |
+        MCI_DATA_TIMER(drive) = SD_MAX_WRITE_TIMEOUT;
+        MCI_DATA_LENGTH(drive) = 512;
+        MCI_DATA_CTRL(drive) =  (1<<0) /* enable */   |
                                 (0<<1) /* transfer direction */ |
                                 (1<<3) /* DMA */                |
                                 (9<<4) /* 2^9 = 512 */ ;
@@ -638,13 +652,13 @@ static int sd_select_bank(signed char bank)
         semaphore_wait(&transfer_completion_signal, TIMEOUT_BLOCK);
 
         /*  Wait for FIFO to empty, card may still be in PRG state  */
-        while(MCI_STATUS(INTERNAL_AS3525) & MCI_TX_ACTIVE );
+        while(MCI_STATUS(drive) & MCI_TX_ACTIVE );
 
         dma_release();
 
-    } while(transfer_error[INTERNAL_AS3525]);
+    } while(transfer_error[drive]);
 
-    card_info[INTERNAL_AS3525].current_bank = (bank == -1) ? 0 : bank;
+    card_info[drive].current_bank = (bank == -1) ? 0 : bank;
 
     return 0;
 }
@@ -945,6 +959,17 @@ int sd_event(long id, intptr_t data)
         mutex_unlock(&sd_mtx);
         break;
 #endif /* HAVE_HOTSWAP */
+    case Q_STORAGE_SLEEPNOW:
+        /* After a data write, data cannot be written to MCI_CLOCK 
+           for 3 MCLK periods + 2 PCLK periods. ~10us worst case so 
+           we can't really do it from controller_enable instead we 
+           do it here when storage goes idle
+        */
+        for (int i = 0; i < NUM_DRIVES ; i++)
+            MCI_CLOCK(i) |= MCI_CLOCK_POWERSAVE;
+        rc = storage_event_default_handler(id, data, last_disk_activity,
+                                           STORAGE_SD);
+        break;
     case Q_STORAGE_TICK:
         /* never let a timer wrap confuse us */
         next_yield = current_tick;
