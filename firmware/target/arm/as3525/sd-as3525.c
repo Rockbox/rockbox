@@ -419,7 +419,7 @@ static int sd_init_card(const int drive)
 
     /* Boost MCICLK to operating speed */
     if(drive == INTERNAL_AS3525)
-        MCI_CLOCK(drive) = MCI_HALFSPEED;  /* MCICLK = IDE_CLK/2 = 25 MHz  */
+        MCI_CLOCK(drive) = MCI_HALFSPEED;  /* MCICLK = PCLK/2 = 31MHz */
 #if defined(HAVE_MULTIDRIVE)
     else
         /* MCICLK = PCLK/2 = 31MHz(HS) or PCLK/4 = 15.5 Mhz (STD)*/
@@ -968,3 +968,42 @@ int sd_event(long id, intptr_t data)
 
     return rc;
 }
+
+#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_DISK)
+/* extern in system-as3525.c */
+void sd_set_low_speed(bool slow)
+{
+    /* block access while speed is changed */
+    mutex_lock(&sd_mtx);
+    enable_controller(false);
+    /* After a data write, data cannot be written to MCI_CLOCK 
+       for 3 MCLK periods + 2 PCLK periods. ~10us worst case
+    */
+    udelay(10);
+    if (slow)
+    {
+        for (int i = 0; i < NUM_DRIVES ; i++)
+        {
+            MCI_CLOCK(i) = MCI_QUARTERSPEED;  /* MCICLK = PCLK/4 = 15.5MHz */
+        }
+
+        CGU_IDE = (CGU_IDE & ~(AS3525_IDE_DIV << 2)) | (AS3525_IDE_DIV_SLOW << 2);
+    }
+    else
+    {
+        for (int i = 0; i < NUM_DRIVES ; i++)
+        {
+            if(i == INTERNAL_AS3525)
+                MCI_CLOCK(i) = MCI_HALFSPEED;  /* MCICLK = PCLK/2 = 31MHz */
+#if defined(HAVE_MULTIDRIVE)
+            else
+                /* MCICLK = PCLK/2 = 31MHz(HS) or PCLK/4 = 15.5 Mhz (STD)*/
+                MCI_CLOCK(i) = (hs_card ? MCI_HALFSPEED : MCI_QUARTERSPEED);
+#endif
+        }
+
+        CGU_IDE = (CGU_IDE & ~(AS3525_IDE_DIV_SLOW << 2)) | (AS3525_IDE_DIV << 2);
+    }
+    mutex_unlock(&sd_mtx);
+}
+#endif
