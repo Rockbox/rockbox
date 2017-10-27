@@ -13647,3 +13647,55 @@
     *: "Disable Touch"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SYS_POWER_SAVING
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "Power Saving"
+  </source>
+  <dest>
+    *: none
+    sys_powersaving: "Power Saving"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "Power Saving"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYS_CPU_UNDERVOLT
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "CPU undervolt"
+  </source>
+  <dest>
+     *: none
+    sys_powersaving: "CPU undervolt"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "CPU undervolt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYS_DISK_LOWSPEED
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "Disk Low Speed"
+  </source>
+  <dest>
+     *: none
+    sys_powersaving: "Disk Low Speed"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "Disk Low Speed"
+  </voice>
+</phrase>
+

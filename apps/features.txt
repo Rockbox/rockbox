@@ -100,6 +100,10 @@ multivolume
 multidrive_usb
 #endif
 
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE) || CONFIG_CPU == AS3525v2
+sys_powersaving
+#endif
+
 #if defined(HAVE_QUICKSCREEN)
 quickscreen
 #endif

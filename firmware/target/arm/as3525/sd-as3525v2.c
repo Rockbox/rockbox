@@ -481,7 +481,6 @@ static int sd_wait_for_tran_state(const int drive)
     }
 }
 
-
 static int sd_init_card(const int drive)
 {
     unsigned long response;
@@ -967,4 +966,24 @@ int sd_event(long id, intptr_t data)
     }
 
     return rc;
+}
+
+void sd_low_speed(bool slow)
+{
+    while (CGU_SDSLOT & (1<<7)); /* wait till controller is disabled */
+    splashf(HZ,"SLOW %d", slow);
+    if (slow)
+    {
+        MCI_CLKDIV = (MCI_CLKDIV & ~(0xFF)) | 0x2;/* assume 24 MHz / 2 = 12 MHz */
+        CGU_SDSLOT = (0<<7)         /* interface disabled */
+            | ((AS3525_SDSLOT_DIV_SLOW) << 2)
+            | 1;             /* clock source = PLLA */
+    }    
+    else
+    {
+        MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 FULL speed*/
+        CGU_SDSLOT = (0<<7)         /* interface disabled */
+           | (AS3525_SDSLOT_DIV << 2)
+           | 1;             /* clock source = PLLA */
+    }
 }
