@@ -64,6 +64,11 @@
 #define midend_colors midend_colours
 #endif
 
+#define PAN_X LCD_WIDTH / 4
+#define PAN_Y LCD_WIDTH / 4 /* not a typo */
+
+#define ZOOM_FACTOR 3
+
 static midend *me = NULL;
 static unsigned *colors = NULL;
 static int ncolors = 0;
@@ -79,41 +84,206 @@ static int help_times = 0;
 static void fix_size(void);
 
 static struct viewport clip_rect;
-static bool clipped = false;
-extern bool audiobuf_available;
+static bool clipped = false, audiobuf_available, zoom_enabled = false;
+
+static fb_data *zoom_fb;
+static int zoom_w, zoom_h, zoom_clipu, zoom_clipd, zoom_clipl, zoom_clipr;
+static int cur_font = FONT_UI;
 
 static struct settings_t {
     int slowmo_factor;
     bool timerflash, clipoff, shortcuts, no_aa, polyanim;
 } settings;
 
+static inline void plot(fb_data *fb, int w, int h,
+                        unsigned x, unsigned y, unsigned long a,
+                        unsigned long r1, unsigned long g1, unsigned long b1,
+                        unsigned cl, unsigned cr, unsigned cu, unsigned cd);
+
+
+/* re-implementations of many rockbox primitives, adapted to draw into
+ * a custom framebuffer. */
+static void zoom_drawpixel(int x, int y)
+{
+    if(y < zoom_clipu || y >= zoom_clipd)
+        return;
+
+    if(x < zoom_clipl || x >= zoom_clipr)
+        return;
+
+    zoom_fb[y * zoom_w + x] = rb->lcd_get_foreground();
+}
+
+static void zoom_hline(int l, int r, int y)
+{
+    if(y < zoom_clipu || y >= zoom_clipd)
+        return;
+    if(l > r)
+    {
+        int t = l;
+        l = r;
+        r = t;
+    }
+
+    if(l < zoom_clipl)
+        l = zoom_clipl;
+    if(r >= zoom_clipr)
+        r = zoom_clipr;
+
+    fb_data pixel = rb->lcd_get_foreground();
+    fb_data *ptr = zoom_fb + y * zoom_w + l;
+    for(int i = 0; i < r - l; ++i)
+        *ptr++ = pixel;
+}
+
+static void zoom_fillcircle(int cx, int cy, int radius)
+{
+    /* copied straight from xlcd_draw.c */
+    int d = 3 - (radius * 2);
+    int x = 0;
+    int y = radius;
+    while(x <= y)
+    {
+        zoom_hline(cx - x, cx + x, cy + y);
+        zoom_hline(cx - x, cx + x, cy - y);
+        zoom_hline(cx - y, cx + y, cy + x);
+        zoom_hline(cx - y, cx + y, cy - x);
+        if(d < 0)
+        {
+            d += (x * 4) + 6;
+        }
+        else
+        {
+            d += ((x - y) * 4) + 10;
+            --y;
+        }
+        ++x;
+    }
+}
+
+static void zoom_drawcircle(int cx, int cy, int radius)
+{
+    int d = 3 - (radius * 2);
+    int x = 0;
+    int y = radius;
+    while(x <= y)
+    {
+        zoom_drawpixel(cx + x, cy + y);
+        zoom_drawpixel(cx - x, cy + y);
+        zoom_drawpixel(cx + x, cy - y);
+        zoom_drawpixel(cx - x, cy - y);
+        zoom_drawpixel(cx + y, cy + x);
+        zoom_drawpixel(cx - y, cy + x);
+        zoom_drawpixel(cx + y, cy - x);
+        zoom_drawpixel(cx - y, cy - x);
+        if(d < 0)
+        {
+            d += (x * 4) + 6;
+        }
+        else
+        {
+            d += ((x - y) * 4) + 10;
+            --y;
+        }
+        ++x;
+    }
+}
+
+/* This format is pretty crazy: each byte holds the states of 8 pixels
+ * in a column, with bit 0 being the topmost pixel. Who needs cache
+ * efficiency? */
+static void zoom_mono_bitmap(const unsigned char *bits, int x, int y, int w, int h)
+{
+    for(int i = 0; i < h / 8 + 1; ++i)
+    {
+        for(int j = 0; j < w; ++j)
+        {
+            unsigned char column = bits[i * w + j];
+            for(int dy = 0; dy < 8; ++dy)
+            {
+                if(column & 1)
+                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j] = LCD_BLACK;
+                column >>= 1;
+            }
+        }
+    }
+}
+
+/* Rockbox's alpha format is actually pretty sane: each byte holds
+ * alpha values for two horizontally adjacent pixels. Low half is
+ * leftmost pixel. See lcd-16bit-common.c for more info. */
+static void zoom_alpha_bitmap(const unsigned char *bits, int x, int y, int w, int h)
+{
+    const unsigned char *ptr = bits;
+    unsigned char buf;
+    int n_read = 0; /* how many 4-bit nibbles we've read (read new when even) */
+    for(int i = 0; i < h; ++i)
+    {
+        for(int j = 0; j < w; ++j)
+        {
+            if(n_read % 2 == 0)
+            {
+                buf = *ptr++;
+            }
+            int pix_alpha = (n_read++ % 2) ? buf >> 4 : buf & 0xF; /* in reverse order */
+
+            pix_alpha = 15 - pix_alpha; /* correct order now, still 0-F */
+
+            int plot_alpha = (pix_alpha << 4) | pix_alpha; /* so 0xF -> 0xFF, 0x1 -> 0x11, etc. */
+
+            plot(zoom_fb, zoom_w, zoom_h, x + j, y + i, plot_alpha, 0, 0, 0,
+                 0, zoom_w, 0, zoom_h);
+        }
+    }
+}
+
 /* clipping is implemented through viewports and offsetting
  * coordinates */
 static void rb_clip(void *handle, int x, int y, int w, int h)
 {
-    if(!settings.clipoff)
+    if(!zoom_enabled)
     {
-        LOGF("rb_clip(%d %d %d %d)", x, y, w, h);
-        clip_rect.x = MAX(0, x);
-        clip_rect.y = MAX(0, y);
-        clip_rect.width  = MIN(LCD_WIDTH, w);
-        clip_rect.height = MIN(LCD_HEIGHT, h);
-        clip_rect.font = FONT_UI;
-        clip_rect.drawmode = DRMODE_SOLID;
+        if(!settings.clipoff)
+        {
+            LOGF("rb_clip(%d %d %d %d)", x, y, w, h);
+            clip_rect.x = MAX(0, x);
+            clip_rect.y = MAX(0, y);
+            clip_rect.width  = MIN(LCD_WIDTH, w);
+            clip_rect.height = MIN(LCD_HEIGHT, h);
+            clip_rect.font = FONT_UI;
+            clip_rect.drawmode = DRMODE_SOLID;
 #if LCD_DEPTH > 1
-        clip_rect.fg_pattern = LCD_DEFAULT_FG;
-        clip_rect.bg_pattern = LCD_DEFAULT_BG;
+            clip_rect.fg_pattern = LCD_DEFAULT_FG;
+            clip_rect.bg_pattern = LCD_DEFAULT_BG;
 #endif
-        rb->lcd_set_viewport(&clip_rect);
-        clipped = true;
+            rb->lcd_set_viewport(&clip_rect);
+            clipped = true;
+        }
+    }
+    else
+    {
+        zoom_clipu = y;
+        zoom_clipd = y + h;
+        zoom_clipl = x;
+        zoom_clipr = x + w;
     }
 }
 
 static void rb_unclip(void *handle)
 {
-    LOGF("rb_unclip");
-    rb->lcd_set_viewport(NULL);
-    clipped = false;
+    if(!zoom_enabled)
+    {
+        LOGF("rb_unclip");
+        rb->lcd_set_viewport(NULL);
+        clipped = false;
+    }
+    else
+    {
+        zoom_clipu = 0;
+        zoom_clipd = LCD_HEIGHT;
+        zoom_clipl = 0;
+        zoom_clipr = LCD_WIDTH;
+    }
 }
 
 static void offset_coords(int *x, int *y)
@@ -158,7 +328,8 @@ static void unload_fonts(void)
             loaded_fonts[i].status = -3;
         }
     access_counter = -1;
-    rb->lcd_setfont(FONT_UI);
+    cur_font = FONT_UI;
+    rb->lcd_setfont(cur_font);
 }
 
 static void init_fonttab(void)
@@ -241,7 +412,8 @@ static void rb_setfont(int type, int size)
             goto fallback;
         loaded_fonts[font_idx].last_use = access_counter++;
         n_fonts++;
-        rb->lcd_setfont(loaded_fonts[font_idx].status);
+        cur_font = loaded_fonts[font_idx].status;
+        rb->lcd_setfont(cur_font);
         break;
     }
     case -2:
@@ -249,15 +421,16 @@ static void rb_setfont(int type, int size)
         goto fallback;
     default:
         loaded_fonts[font_idx].last_use = access_counter++;
-        rb->lcd_setfont(loaded_fonts[font_idx].status);
+        cur_font = loaded_fonts[font_idx].status;
+        rb->lcd_setfont(cur_font);
         break;
     }
 
     return;
 
 fallback:
-
-    rb->lcd_setfont(type == FONT_FIXED ? FONT_SYSFIXED : FONT_UI);
+    cur_font = type == FONT_FIXED ? FONT_SYSFIXED : FONT_UI;
+    rb->lcd_setfont(cur_font);
 
     return;
 }
@@ -266,37 +439,95 @@ static void rb_draw_text(void *handle, int x, int y, int fonttype,
                          int fontsize, int align, int color, char *text)
 {
     (void) fontsize;
-    LOGF("rb_draw_text(%d %d %s)", x, y, text);
+    if(!zoom_enabled)
+    {
+        LOGF("rb_draw_text(%d %d %s)", x, y, text);
 
-    offset_coords(&x, &y);
+        offset_coords(&x, &y);
 
-    rb_setfont(fonttype, fontsize);
+        rb_setfont(fonttype, fontsize);
 
-    int w, h;
-    rb->lcd_getstringsize(text, &w, &h);
+        int w, h;
+        rb->lcd_getstringsize(text, &w, &h);
 
-    if(align & ALIGN_VNORMAL)
-        y -= h;
-    else if(align & ALIGN_VCENTRE)
-        y -= h / 2;
+        if(align & ALIGN_VNORMAL)
+            y -= h;
+        else if(align & ALIGN_VCENTRE)
+            y -= h / 2;
 
-    if(align & ALIGN_HCENTRE)
-        x -= w / 2;
-    else if(align & ALIGN_HRIGHT)
-        x -= w;
+        if(align & ALIGN_HCENTRE)
+            x -= w / 2;
+        else if(align & ALIGN_HRIGHT)
+            x -= w;
 
-    rb_color(color);
-    rb->lcd_set_drawmode(DRMODE_FG);
-    rb->lcd_putsxy(x, y, text);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
+        rb_color(color);
+        rb->lcd_set_drawmode(DRMODE_FG);
+        rb->lcd_putsxy(x, y, text);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
+    }
+    else
+    {
+        rb_setfont(fonttype, fontsize); /* size will be clamped if too large */
+
+        int w, h;
+        rb->lcd_getstringsize(text, &w, &h);
+
+        if(align & ALIGN_VNORMAL)
+            y -= h;
+        else if(align & ALIGN_VCENTRE)
+            y -= h / 2;
+
+        if(align & ALIGN_HCENTRE)
+            x -= w / 2;
+        else if(align & ALIGN_HRIGHT)
+            x -= w;
+
+        /* we need to access the font bitmap directly */
+        struct font *pf = rb->font_get(cur_font);
+
+        while(*text)
+        {
+            /* still only reads 1 byte */
+            unsigned short c = *text++;
+            const unsigned char *bits = rb->font_get_bits(pf, c);
+            int width = rb->font_get_width(pf, c);
+
+            /* straight from lcd-bitmap-common.c */
+#if defined(HAVE_LCD_COLOR)
+            if (pf->depth)
+            {
+                /* lcd_alpha_bitmap_part isn't exported directly. However,
+                 * we can create a null bitmap struct with only an alpha
+                 * channel to make lcd_bmp_part call it for us. */
+
+                zoom_alpha_bitmap(bits, x, y, width, pf->height);
+            }
+            else
+#endif
+                zoom_mono_bitmap(bits, x, y, width, pf->height);
+            x += width;
+        }
+    }
 }
 
 static void rb_draw_rect(void *handle, int x, int y, int w, int h, int color)
 {
-    LOGF("rb_draw_rect(%d, %d, %d, %d, %d)", x, y, w, h, color);
-    rb_color(color);
-    offset_coords(&x, &y);
-    rb->lcd_fillrect(x, y, w, h);
+    if(!zoom_enabled)
+    {
+        LOGF("rb_draw_rect(%d, %d, %d, %d, %d)", x, y, w, h, color);
+        rb_color(color);
+        offset_coords(&x, &y);
+        rb->lcd_fillrect(x, y, w, h);
+    }
+    else
+    {
+        /* TODO: clipping */
+        for(int i = y; i < y + h; ++i)
+            for(int j = x; j < x + w; ++j)
+            {
+                zoom_fb[i * zoom_w + j] = colors[color];
+            }
+    }
 }
 
 #define SWAP(a, b, t) do { t = a; a = b; b = t; } while(0);
@@ -306,8 +537,9 @@ static void rb_draw_rect(void *handle, int x, int y, int w, int h, int color)
 
 #define FRACBITS 16
 
-/* most of our time drawing lines is spent in this function! */
-static inline void plot(unsigned x, unsigned y, unsigned long a,
+/* a goes from 0-255, with a = 255 being fully opaque and a = 0 transparent */
+static inline void plot(fb_data *fb, int w, int h,
+                        unsigned x, unsigned y, unsigned long a,
                         unsigned long r1, unsigned long g1, unsigned long b1,
                         unsigned cl, unsigned cr, unsigned cu, unsigned cd)
 {
@@ -319,7 +551,7 @@ static inline void plot(unsigned x, unsigned y, unsigned long a,
     if(!(cl <= x && x < cr && cu <= y && y < cd))
         return;
 
-    fb_data *ptr = rb->lcd_framebuffer + y * LCD_WIDTH + x;
+    fb_data *ptr = fb + y * w + x;
     fb_data orig = *ptr;
     unsigned long r2, g2, b2;
 #if LCD_DEPTH != 24
@@ -351,18 +583,28 @@ static inline void plot(unsigned x, unsigned y, unsigned long a,
  * lines/sec at full optimization on ipod6g */
 
 /* expects UN-OFFSET coordinates, directly access framebuffer */
-static void draw_antialiased_line(int x0, int y0, int x1, int y1)
+static void draw_antialiased_line(fb_data *fb, int w, int h, int x0, int y0, int x1, int y1)
 {
     /* fixed-point Wu's algorithm, modified for integer-only endpoints */
 
     /* passed to plot() to avoid re-calculation */
-    unsigned short l = 0, r = LCD_WIDTH, u = 0, d = LCD_HEIGHT;
-    if(clipped)
+    unsigned short l = 0, r = w, u = 0, d = h;
+    if(!zoom_enabled)
     {
-        l = clip_rect.x;
-        r = clip_rect.x + clip_rect.width;
-        u = clip_rect.y;
-        d = clip_rect.y + clip_rect.height;
+        if(clipped)
+        {
+            l = clip_rect.x;
+            r = clip_rect.x + clip_rect.width;
+            u = clip_rect.y;
+            d = clip_rect.y + clip_rect.height;
+        }
+    }
+    else
+    {
+        l = zoom_clipl;
+        r = zoom_clipr;
+        u = zoom_clipu;
+        d = zoom_clipd;
     }
 
     bool steep = ABS(y1 - y0) > ABS(x1 - x0);
@@ -402,8 +644,8 @@ static void draw_antialiased_line(int x0, int y0, int x1, int y1)
             unsigned y = intery >> FRACBITS;
             unsigned alpha = fp_fpart(intery, FRACBITS) >> (FRACBITS - 8);
 
-            plot(y, x, (1 << 8) - alpha, r1, g1, b1, l, r, u, d);
-            plot(y + 1, x, alpha, r1, g1, b1, l, r, u, d);
+            plot(fb, w, h, y, x, (1 << 8) - alpha, r1, g1, b1, l, r, u, d);
+            plot(fb, w, h, y + 1, x, alpha, r1, g1, b1, l, r, u, d);
         }
     }
     else
@@ -413,8 +655,8 @@ static void draw_antialiased_line(int x0, int y0, int x1, int y1)
             unsigned y = intery >> FRACBITS;
             unsigned alpha = fp_fpart(intery, FRACBITS) >> (FRACBITS - 8);
 
-            plot(x, y, (1 << 8) - alpha, r1, g1, b1, l, r, u, d);
-            plot(x, y + 1, alpha, r1, g1, b1, l, r, u, d);
+            plot(fb, w, h, x, y, (1 << 8) - alpha, r1, g1, b1, l, r, u, d);
+            plot(fb, w, h, x, y + 1, alpha, r1, g1, b1, l, r, u, d);
         }
     }
 }
@@ -422,16 +664,27 @@ static void draw_antialiased_line(int x0, int y0, int x1, int y1)
 static void rb_draw_line(void *handle, int x1, int y1, int x2, int y2,
                          int color)
 {
-    LOGF("rb_draw_line(%d, %d, %d, %d, %d)", x1, y1, x2, y2, color);
-    rb_color(color);
-    if(settings.no_aa)
+    if(!zoom_enabled)
     {
-        offset_coords(&x1, &y1);
-        offset_coords(&x2, &y2);
-        rb->lcd_drawline(x1, y1, x2, y2);
+        LOGF("rb_draw_line(%d, %d, %d, %d, %d)", x1, y1, x2, y2, color);
+        rb_color(color);
+        if(settings.no_aa)
+        {
+            offset_coords(&x1, &y1);
+            offset_coords(&x2, &y2);
+            rb->lcd_drawline(x1, y1, x2, y2);
+        }
+        else
+            draw_antialiased_line(rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, x1, y1, x2, y2);
     }
     else
-        draw_antialiased_line(x1, y1, x2, y2);
+    {
+        /* draw_antialiased_line uses rb->lcd_get_foreground() to get
+         * the color */
+        rb_color(color);
+
+        draw_antialiased_line(zoom_fb, zoom_w, zoom_h, x1, y1, x2, y2);
+    }
 }
 
 #if 0
@@ -489,7 +742,7 @@ static void fill_poly_line(int scanline, int count, int *pxy)
             intersection[num_of_intersects] =
                 x1+((scanline-y1)*(x2-x1))/(y2-y1);
             if ( (direct!=old_direct)
-                  || (intersection[num_of_intersects] != intersection[num_of_intersects-1])
+                 || (intersection[num_of_intersects] != intersection[num_of_intersects-1])
                 )
                 ++num_of_intersects;
         }
@@ -531,32 +784,176 @@ static void v_fillarea(int count, int *pxy)
 }
 #endif
 
+/* I'm a horrible person: this was copy-pasta'd straight from
+ * xlcd_draw.c */
+
+/* sort the given coordinates by increasing x value */
+static void sort_points_by_increasing_x(int* x1, int* y1,
+                                        int* x2, int* y2,
+                                        int* x3, int* y3)
+{
+    int x, y;
+    if (*x1 > *x3)
+    {
+        if (*x2 < *x3)       /* x2 < x3 < x1 */
+        {
+            x = *x1; *x1 = *x2; *x2 = *x3; *x3 = x;
+            y = *y1; *y1 = *y2; *y2 = *y3; *y3 = y;
+        }
+        else if (*x2 > *x1)  /* x3 < x1 < x2 */
+        {
+            x = *x1; *x1 = *x3; *x3 = *x2; *x2 = x;
+            y = *y1; *y1 = *y3; *y3 = *y2; *y2 = y;
+        }
+        else               /* x3 <= x2 <= x1 */
+        {
+            x = *x1; *x1 = *x3; *x3 = x;
+            y = *y1; *y1 = *y3; *y3 = y;
+        }
+    }
+    else
+    {
+        if (*x2 < *x1)       /* x2 < x1 <= x3 */
+        {
+            x = *x1; *x1 = *x2; *x2 = x;
+            y = *y1; *y1 = *y2; *y2 = y;
+        }
+        else if (*x2 > *x3)  /* x1 <= x3 < x2 */
+        {
+            x = *x2; *x2 = *x3; *x3 = x;
+            y = *y2; *y2 = *y3; *y3 = y;
+        }
+        /* else already sorted */
+    }
+}
+
+#define sort_points_by_increasing_y(x1, y1, x2, y2, x3, y3)     \
+    sort_points_by_increasing_x(y1, x1, y2, x2, y3, x3)
+
+/* draw a filled triangle, using horizontal lines for speed */
+static void zoom_filltriangle(int x1, int y1,
+                              int x2, int y2,
+                              int x3, int y3)
+{
+    long fp_x1, fp_x2, fp_dx1, fp_dx2;
+    int y;
+    sort_points_by_increasing_y(&x1, &y1, &x2, &y2, &x3, &y3);
+
+    if (y1 < y3)  /* draw */
+    {
+        fp_dx1 = ((x3 - x1) << 16) / (y3 - y1);
+        fp_x1  = (x1 << 16) + (1<<15) + (fp_dx1 >> 1);
+
+        if (y1 < y2)  /* first part */
+        {
+            fp_dx2 = ((x2 - x1) << 16) / (y2 - y1);
+            fp_x2  = (x1 << 16) + (1<<15) + (fp_dx2 >> 1);
+            for (y = y1; y < y2; y++)
+            {
+                zoom_hline(fp_x1 >> 16, fp_x2 >> 16, y);
+                fp_x1 += fp_dx1;
+                fp_x2 += fp_dx2;
+            }
+        }
+        if (y2 < y3)  /* second part */
+        {
+            fp_dx2 = ((x3 - x2) << 16) / (y3 - y2);
+            fp_x2 = (x2 << 16) + (1<<15) + (fp_dx2 >> 1);
+            for (y = y2; y < y3; y++)
+            {
+                zoom_hline(fp_x1 >> 16, fp_x2 >> 16, y);
+                fp_x1 += fp_dx1;
+                fp_x2 += fp_dx2;
+            }
+        }
+    }
+}
+
 static void rb_draw_poly(void *handle, int *coords, int npoints,
                          int fillcolor, int outlinecolor)
 {
-    LOGF("rb_draw_poly");
-
-    if(fillcolor >= 0)
+    if(!zoom_enabled)
     {
-        rb_color(fillcolor);
-#if 1
-        /* serious hack: draw a bunch of triangles between adjacent points */
-        /* this generally works, even with some concave polygons */
-        for(int i = 2; i < npoints; ++i)
+        LOGF("rb_draw_poly");
+
+        if(fillcolor >= 0)
         {
-            int x1, y1, x2, y2, x3, y3;
-            x1 = coords[0];
-            y1 = coords[1];
-            x2 = coords[(i - 1) * 2];
-            y2 = coords[(i - 1) * 2 + 1];
-            x3 = coords[i * 2];
-            y3 = coords[i * 2 + 1];
-            offset_coords(&x1, &y1);
-            offset_coords(&x2, &y2);
-            offset_coords(&x3, &y3);
-            xlcd_filltriangle(x1, y1,
-                              x2, y2,
-                              x3, y3);
+            rb_color(fillcolor);
+#if 1
+            /* serious hack: draw a bunch of triangles between adjacent points */
+            /* this generally works, even with some concave polygons */
+            for(int i = 2; i < npoints; ++i)
+            {
+                int x1, y1, x2, y2, x3, y3;
+                x1 = coords[0];
+                y1 = coords[1];
+                x2 = coords[(i - 1) * 2];
+                y2 = coords[(i - 1) * 2 + 1];
+                x3 = coords[i * 2];
+                y3 = coords[i * 2 + 1];
+                offset_coords(&x1, &y1);
+                offset_coords(&x2, &y2);
+                offset_coords(&x3, &y3);
+                xlcd_filltriangle(x1, y1,
+                                  x2, y2,
+                                  x3, y3);
+
+#ifdef DEBUG_MENU
+                if(settings.polyanim)
+                {
+                    rb->lcd_update();
+                    rb->sleep(HZ/4);
+                }
+#endif
+#if 0
+                /* debug code */
+                rb->lcd_set_foreground(LCD_RGBPACK(255,0,0));
+                rb->lcd_drawpixel(x1, y1);
+                rb->lcd_drawpixel(x2, y2);
+                rb->lcd_drawpixel(x3, y3);
+                rb->lcd_update();
+                rb->sleep(HZ);
+                rb_color(fillcolor);
+                rb->lcd_drawpixel(x1, y1);
+                rb->lcd_drawpixel(x2, y2);
+                rb->lcd_drawpixel(x3, y3);
+                rb->lcd_update();
+#endif
+            }
+#else
+            int *pxy = smalloc(sizeof(int) * 2 * npoints + 2);
+            /* copy points, offsetted */
+            for(int i = 0; i < npoints; ++i)
+            {
+                pxy[2 * i + 0] = coords[2 * i + 0];
+                pxy[2 * i + 1] = coords[2 * i + 1];
+                offset_coords(&pxy[2*i+0], &pxy[2*i+1]);
+            }
+            v_fillarea(npoints, pxy);
+            sfree(pxy);
+#endif
+        }
+
+        /* draw outlines last so they're not covered by the fill */
+        assert(outlinecolor >= 0);
+        rb_color(outlinecolor);
+
+        for(int i = 1; i < npoints; ++i)
+        {
+            int x1, y1, x2, y2;
+            x1 = coords[2 * (i - 1)];
+            y1 = coords[2 * (i - 1) + 1];
+            x2 = coords[2 * i];
+            y2 = coords[2 * i + 1];
+            if(settings.no_aa)
+            {
+                offset_coords(&x1, &y1);
+                offset_coords(&x2, &y2);
+                rb->lcd_drawline(x1, y1,
+                                 x2, y2);
+            }
+            else
+                draw_antialiased_line(rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, x1, y1, x2, y2);
 
 #ifdef DEBUG_MENU
             if(settings.polyanim)
@@ -565,97 +962,102 @@ static void rb_draw_poly(void *handle, int *coords, int npoints,
                 rb->sleep(HZ/4);
             }
 #endif
-#if 0
-            /* debug code */
-            rb->lcd_set_foreground(LCD_RGBPACK(255,0,0));
-            rb->lcd_drawpixel(x1, y1);
-            rb->lcd_drawpixel(x2, y2);
-            rb->lcd_drawpixel(x3, y3);
-            rb->lcd_update();
-            rb->sleep(HZ);
-            rb_color(fillcolor);
-            rb->lcd_drawpixel(x1, y1);
-            rb->lcd_drawpixel(x2, y2);
-            rb->lcd_drawpixel(x3, y3);
-            rb->lcd_update();
-#endif
         }
-#else
-        int *pxy = smalloc(sizeof(int) * 2 * npoints + 2);
-        /* copy points, offsetted */
-        for(int i = 0; i < npoints; ++i)
-        {
-            pxy[2 * i + 0] = coords[2 * i + 0];
-            pxy[2 * i + 1] = coords[2 * i + 1];
-            offset_coords(&pxy[2*i+0], &pxy[2*i+1]);
-        }
-        v_fillarea(npoints, pxy);
-        sfree(pxy);
-#endif
-    }
 
-    /* draw outlines last so they're not covered by the fill */
-    assert(outlinecolor >= 0);
-    rb_color(outlinecolor);
-
-    for(int i = 1; i < npoints; ++i)
-    {
         int x1, y1, x2, y2;
-        x1 = coords[2 * (i - 1)];
-        y1 = coords[2 * (i - 1) + 1];
-        x2 = coords[2 * i];
-        y2 = coords[2 * i + 1];
+        x1 = coords[0];
+        y1 = coords[1];
+        x2 = coords[2 * (npoints - 1)];
+        y2 = coords[2 * (npoints - 1) + 1];
         if(settings.no_aa)
         {
             offset_coords(&x1, &y1);
             offset_coords(&x2, &y2);
+
             rb->lcd_drawline(x1, y1,
                              x2, y2);
         }
         else
-            draw_antialiased_line(x1, y1, x2, y2);
-
-#ifdef DEBUG_MENU
-        if(settings.polyanim)
-        {
-            rb->lcd_update();
-            rb->sleep(HZ/4);
-        }
-#endif
-    }
-
-    int x1, y1, x2, y2;
-    x1 = coords[0];
-    y1 = coords[1];
-    x2 = coords[2 * (npoints - 1)];
-    y2 = coords[2 * (npoints - 1) + 1];
-    if(settings.no_aa)
-    {
-        offset_coords(&x1, &y1);
-        offset_coords(&x2, &y2);
-
-        rb->lcd_drawline(x1, y1,
-                         x2, y2);
+            draw_antialiased_line(rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, x1, y1, x2, y2);
     }
     else
-        draw_antialiased_line(x1, y1, x2, y2);
+    {
+        LOGF("rb_draw_poly");
+
+        if(fillcolor >= 0)
+        {
+            rb_color(fillcolor);
+
+            /* serious hack: draw a bunch of triangles between adjacent points */
+            /* this generally works, even with some concave polygons */
+            for(int i = 2; i < npoints; ++i)
+            {
+                int x1, y1, x2, y2, x3, y3;
+                x1 = coords[0];
+                y1 = coords[1];
+                x2 = coords[(i - 1) * 2];
+                y2 = coords[(i - 1) * 2 + 1];
+                x3 = coords[i * 2];
+                y3 = coords[i * 2 + 1];
+                zoom_filltriangle(x1, y1,
+                                  x2, y2,
+                                  x3, y3);
+            }
+        }
+
+        /* draw outlines last so they're not covered by the fill */
+        assert(outlinecolor >= 0);
+        rb_color(outlinecolor);
+
+        for(int i = 1; i < npoints; ++i)
+        {
+            int x1, y1, x2, y2;
+            x1 = coords[2 * (i - 1)];
+            y1 = coords[2 * (i - 1) + 1];
+            x2 = coords[2 * i];
+            y2 = coords[2 * i + 1];
+            draw_antialiased_line(zoom_fb, zoom_w, zoom_h, x1, y1, x2, y2);
+        }
+
+        int x1, y1, x2, y2;
+        x1 = coords[0];
+        y1 = coords[1];
+        x2 = coords[2 * (npoints - 1)];
+        y2 = coords[2 * (npoints - 1) + 1];
+        draw_antialiased_line(zoom_fb, zoom_w, zoom_h, x1, y1, x2, y2);
+    }
 }
 
 static void rb_draw_circle(void *handle, int cx, int cy, int radius,
                            int fillcolor, int outlinecolor)
 {
-    LOGF("rb_draw_circle(%d, %d, %d)", cx, cy, radius);
-    offset_coords(&cx, &cy);
-
-    if(fillcolor >= 0)
+    if(!zoom_enabled)
     {
-        rb_color(fillcolor);
-        xlcd_fillcircle(cx, cy, radius - 1);
-    }
+        LOGF("rb_draw_circle(%d, %d, %d)", cx, cy, radius);
+        offset_coords(&cx, &cy);
 
-    assert(outlinecolor >= 0);
-    rb_color(outlinecolor);
-    xlcd_drawcircle(cx, cy, radius - 1);
+        if(fillcolor >= 0)
+        {
+            rb_color(fillcolor);
+            xlcd_fillcircle(cx, cy, radius - 1);
+        }
+
+        assert(outlinecolor >= 0);
+        rb_color(outlinecolor);
+        xlcd_drawcircle(cx, cy, radius - 1);
+    }
+    else
+    {
+        if(fillcolor >= 0)
+        {
+            rb_color(fillcolor);
+            zoom_fillcircle(cx, cy, radius - 1);
+        }
+
+        assert(outlinecolor >= 0);
+        rb_color(outlinecolor);
+        zoom_drawcircle(cx, cy, radius - 1);
+    }
 }
 
 struct blitter {
@@ -680,11 +1082,14 @@ static void trim_rect(int *x, int *y, int *w, int *h)
     x1 = *x + *w;
     y1 = *y + *h;
 
+    int screenw = zoom_enabled ? zoom_w : LCD_WIDTH;
+    int screenh = zoom_enabled ? zoom_h : LCD_HEIGHT;
+
     /* Clip each coordinate at both extremes of the canvas */
-    x0 = (x0 < 0 ? 0 : x0 > LCD_WIDTH - 1 ? LCD_WIDTH - 1: x0);
-    x1 = (x1 < 0 ? 0 : x1 > LCD_WIDTH - 1 ? LCD_WIDTH - 1: x1);
-    y0 = (y0 < 0 ? 0 : y0 > LCD_HEIGHT - 1 ? LCD_HEIGHT - 1: y0);
-    y1 = (y1 < 0 ? 0 : y1 > LCD_HEIGHT - 1 ? LCD_HEIGHT - 1: y1);
+    x0 = (x0 < 0 ? 0 : x0 > screenw - 1 ? screenw - 1: x0);
+    x1 = (x1 < 0 ? 0 : x1 > screenw - 1 ? screenw - 1: x1);
+    y0 = (y0 < 0 ? 0 : y0 > screenh - 1 ? screenh - 1: y0);
+    y1 = (y1 < 0 ? 0 : y1 > screenh - 1 ? screenh - 1: y1);
 
     /* Transform back into x,y,w,h to return */
     *x = x0;
@@ -723,12 +1128,13 @@ static void rb_blitter_save(void *handle, blitter *bl, int x, int y)
     {
         int w = bl->bmp.width, h = bl->bmp.height;
         trim_rect(&x, &y, &w, &h);
+        fb_data *fb = zoom_enabled ? zoom_fb : rb->lcd_framebuffer;
         LOGF("rb_blitter_save(%d, %d, %d, %d)", x, y, w, h);
         for(int i = 0; i < h; ++i)
         {
             /* copy line-by-line */
             rb->memcpy(bl->bmp.data + sizeof(fb_data) * i * w,
-                       rb->lcd_framebuffer + (y + i) * LCD_WIDTH + x,
+                       fb + (y + i) * LCD_WIDTH + x,
                        w * sizeof(fb_data));
         }
         bl->x = x;
@@ -748,9 +1154,24 @@ static void rb_blitter_load(void *handle, blitter *bl, int x, int y)
     if(x == BLITTER_FROMSAVED) x = bl->x;
     if(y == BLITTER_FROMSAVED) y = bl->y;
 
-    offset_coords(&x, &y);
+    if(!zoom_enabled)
+        offset_coords(&x, &y);
+
     trim_rect(&x, &y, &w, &h);
-    rb->lcd_bitmap((fb_data*)bl->bmp.data, x, y, w, h);
+
+    if(!zoom_enabled)
+    {
+        rb->lcd_bitmap((fb_data*)bl->bmp.data, x, y, w, h);
+    }
+    else
+    {
+        for(int i = 0; i < h; ++i)
+        {
+            rb->memcpy(zoom_fb + i * zoom_w + x,
+                       bl->bmp.data + sizeof(fb_data) * i * w,
+                       w * sizeof(fb_data));
+        }
+    }
 }
 
 static bool need_draw_update = false;
@@ -793,11 +1214,17 @@ static void rb_start_draw(void *handle)
 static void rb_end_draw(void *handle)
 {
     (void) handle;
+    if(!zoom_enabled)
+    {
+        LOGF("rb_end_draw");
 
-    LOGF("rb_end_draw");
-
-    if(need_draw_update)
-        rb->lcd_update_rect(MAX(0, ud_l), MAX(0, ud_u), MIN(LCD_WIDTH, ud_r - ud_l), MIN(LCD_HEIGHT, ud_d - ud_u));
+        if(need_draw_update)
+            rb->lcd_update_rect(MAX(0, ud_l), MAX(0, ud_u), MIN(LCD_WIDTH, ud_r - ud_l), MIN(LCD_HEIGHT, ud_d - ud_u));
+    }
+    else
+    {
+        /* stubbed */
+    }
 }
 
 static char *titlebar = NULL;
@@ -824,7 +1251,8 @@ static void draw_title(void)
         rb_unclip(NULL);
 
     int h;
-    rb->lcd_setfont(FONT_UI);
+    cur_font = FONT_UI;
+    rb->lcd_setfont(cur_font);
     rb->lcd_getstringsize(str, NULL, &h);
 
     rb->lcd_set_foreground(BG_COLOR);
@@ -865,6 +1293,73 @@ const drawing_api rb_drawing = {
     rb_text_fallback,
     NULL,
 };
+
+/* render to a virtual framebuffer and let the user pan (but not make any moves) */
+static void zoom(void)
+{
+    zoom_w = LCD_WIDTH * ZOOM_FACTOR, zoom_h = LCD_HEIGHT * ZOOM_FACTOR;
+
+    zoom_clipu = 0;
+    zoom_clipd = zoom_h;
+    zoom_clipl = 0;
+    zoom_clipr = zoom_w;
+
+    midend_size(me, &zoom_w, &zoom_h, TRUE);
+
+    /* allocate a framebuffer */
+    zoom_fb = smalloc(zoom_w * zoom_h * sizeof(fb_data));
+    zoom_enabled = true;
+
+    /* draws go to the enlarged framebuffer */
+    midend_force_redraw(me);
+
+    int x = 0, y = 0;
+
+    rb->lcd_bitmap_part(zoom_fb, x, y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
+                        0, 0, LCD_WIDTH, LCD_HEIGHT);
+    rb->lcd_update();
+
+    /* pan around the image */
+    while(1)
+    {
+        int button = rb->button_get(true);
+        switch(button)
+        {
+        case BTN_UP:
+            y -= PAN_Y; /* clamped later */
+            break;
+        case BTN_DOWN:
+            y += PAN_Y; /* clamped later */
+            break;
+        case BTN_LEFT:
+            x -= PAN_X; /* clamped later */
+            break;
+        case BTN_RIGHT:
+            x += PAN_X; /* clamped later */
+            break;
+        case BTN_PAUSE:
+            zoom_enabled = false;
+            sfree(zoom_fb);
+            fix_size();
+            return;
+        default:
+            break;
+        }
+
+        if(y < 0)
+            y = 0;
+        if(x < 0)
+            x = 0;
+        if(y + LCD_HEIGHT >= zoom_h)
+            y = zoom_h - LCD_HEIGHT;
+        if(x + LCD_WIDTH >= zoom_w)
+            x = zoom_w - LCD_WIDTH;
+
+        rb->lcd_bitmap_part(zoom_fb, x, y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
+                            0, 0, LCD_WIDTH, LCD_HEIGHT);
+        rb->lcd_update();
+    }
+}
 
 void frontend_default_color(frontend *fe, float *out)
 {
@@ -1123,7 +1618,8 @@ static bool config_menu(void)
     char *title;
     config_item *config = midend_get_config(me, CFG_SETTINGS, &title);
 
-    rb->lcd_setfont(FONT_UI);
+    cur_font = FONT_UI;
+    rb->lcd_setfont(cur_font);
 
     bool success = false;
 
@@ -1318,7 +1814,8 @@ static void full_help(const char *name)
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(LCD_BLACK);
     unload_fonts();
-    rb->lcd_setfont(FONT_UI);
+    cur_font = FONT_UI;
+    rb->lcd_setfont(cur_font);
 
     char *buf = smalloc(help_text_len);
     LZ4_decompress_tiny(help_text, buf, help_text_len);
@@ -1354,7 +1851,7 @@ static void bench_aa(void)
     int i = 0;
     while(*rb->current_tick < next)
     {
-        draw_antialiased_line(0, 0, 20, 31);
+        draw_antialiased_line(rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, 0, 0, 20, 31);
         ++i;
     }
     rb->splashf(HZ, "%d AA lines/sec", i);
@@ -1460,7 +1957,7 @@ static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
             if(!midend_get_presets(me, NULL)->n_entries)
                 return ACTION_EXIT_MENUITEM;
             break;
-        case 10:
+        case 11:
 #if defined(FOR_REAL) && defined(DEBUG_MENU)
             if(debug_mode)
                 break;
@@ -1468,7 +1965,7 @@ static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
 #else
             break;
 #endif
-        case 11:
+        case 12:
             if(!midend_which_game(me)->can_configure)
                 return ACTION_EXIT_MENUITEM;
             break;
@@ -1507,6 +2004,7 @@ static int pause_menu(void)
                         "Undo",
                         "Redo",
                         "Solve",
+                        "Zoom In",
                         "Quick Help",
                         "Extensive Help",
                         "Playback Control",
@@ -1568,15 +2066,18 @@ static int pause_menu(void)
             break;
         }
         case 6:
-            quick_help();
+            zoom();
             break;
         case 7:
-            full_help(midend_which_game(me)->name);
+            quick_help();
             break;
         case 8:
-            playback_control(NULL);
+            full_help(midend_which_game(me)->name);
             break;
         case 9:
+            playback_control(NULL);
+            break;
+        case 10:
             if(presets_menu())
             {
                 midend_new_game(me);
@@ -1586,12 +2087,12 @@ static int pause_menu(void)
                 quit = true;
             }
             break;
-        case 10:
+        case 11:
 #ifdef DEBUG_MENU
             debug_menu();
 #endif
             break;
-        case 11:
+        case 12:
             if(config_menu())
             {
                 midend_new_game(me);
@@ -1601,9 +2102,9 @@ static int pause_menu(void)
                 quit = true;
             }
             break;
-        case 12:
-            return -2;
         case 13:
+            return -2;
+        case 14:
             return -3;
         default:
             break;
@@ -1846,7 +2347,8 @@ static size_t giant_buffer_len = 0; /* set on start */
 static void fix_size(void)
 {
     int w = LCD_WIDTH, h = LCD_HEIGHT, h_x;
-    rb->lcd_setfont(FONT_UI);
+    cur_font = FONT_UI;
+    rb->lcd_setfont(cur_font);
     rb->lcd_getstringsize("X", NULL, &h_x);
     h -= h_x;
     midend_size(me, &w, &h, TRUE);
