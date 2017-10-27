@@ -775,6 +775,23 @@ struct user_settings
     bool usb_skip_first_drive;
 #endif
 
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE)
+    bool cpu_undervolt;
+#endif
+
+#if defined(AS3525_SDSLOT_DIV_SLOW) || defined(AS3525_IDE_DIV_SLOW)
+    bool disk_low_speed;
+#endif
+#ifdef AS3525_I2C_PRESCALER_SLOW
+    bool i2c_low_speed;
+#endif
+#ifdef AS3525_SSP_PRESCALER_SLOW
+    bool ssp_low_speed;
+#endif
+#if defined(AS3525_DBOP_DIV_SLOW)// && CONFIG_CPU == AS3525
+    bool dbop_low_speed;
+#endif
+
 #ifdef HAVE_LCD_BITMAP
     unsigned char ui_vp_config[64]; /* viewport string for the lists */
 #ifdef HAVE_REMOTE_LCD

@@ -100,6 +100,10 @@ multivolume
 multidrive_usb
 #endif
 
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE) || defined(AS3525_DBOP_DIV_SLOW) || defined(AS3525_SSP_PRESCALER_SLOW) || defined(AS3525_I2C_PRESCALER_SLOW) || defined(AS3525_SDSLOT_DIV_SLOW) || defined(AS3525_IDE_DIV_SLOW)
+sys_powersaving
+#endif
+
 #if defined(HAVE_QUICKSCREEN)
 quickscreen
 #endif

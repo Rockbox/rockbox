@@ -59,4 +59,8 @@ void ascodec_write_pmu(unsigned int index, unsigned int subreg,
 int ascodec_read_pmu(unsigned int index, unsigned int subreg);
 #endif
 
+#ifdef AS3525_I2C_PRESCALER_SLOW
+void i2c_set_low_speed(bool slow);
+#endif
+
 #endif

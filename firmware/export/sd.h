@@ -55,6 +55,11 @@ bool sd_removable(IF_MD_NONVOID(int drive));
 bool sd_present(IF_MD_NONVOID(int drive));
 #endif
 
+#if defined(AS3525_IDE_DIV_SLOW) || defined(AS3525_SDSLOT_DIV_SLOW)
+/* Save power with lower disk clock */
+void sd_set_low_speed(bool slow);
+#endif
+
 long sd_last_disk_activity(void);
 
 #ifdef CONFIG_STORAGE_MULTI
