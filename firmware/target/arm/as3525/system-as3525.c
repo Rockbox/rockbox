@@ -32,6 +32,7 @@
 #include "button.h"
 #include "backlight-target.h"
 #include "lcd.h"
+#include "settings.h"
 
 struct mutex cpufreq_mtx;
 
@@ -519,6 +520,15 @@ void set_cpu_frequency(long frequency)
 
         /* Set CVDD1 power supply */
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
+
+#if defined(HAVE_AS3543)
+    if (!global_settings.cpu_undervolt)
+    {
+        ascodec_write_pmu(0x17, 1, 0x80 | 26);
+        return;
+    }
+#endif
+
 #if defined(SANSA_CLIPZIP)
         ascodec_write_pmu(0x17, 1, 0x80 | 20);
 #elif defined(SANSA_CLIPPLUS)

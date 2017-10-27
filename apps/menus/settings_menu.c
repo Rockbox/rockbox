@@ -294,7 +294,12 @@ MAKE_MENU(disk_menu, ID2P(LANG_DISK_MENU), 0, Icon_NOICON,
 #endif
          );
 #endif
-
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE) && defined(HAVE_AS3543)
+MENUITEM_SETTING(cpu_undervolt, &global_settings.cpu_undervolt, NULL);
+MAKE_MENU(power_save_menu, ID2P(LANG_SYS_POWER_SAVING), 0, Icon_NOICON,
+          &cpu_undervolt,
+         );
+#endif
 /* Limits menu */
 MENUITEM_SETTING(max_files_in_dir, &global_settings.max_files_in_dir, NULL);
 MENUITEM_SETTING(max_files_in_playlist, &global_settings.max_files_in_playlist, NULL);
@@ -412,6 +417,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &disk_menu,
 #endif
             &limits_menu,
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE) && defined(HAVE_AS3543)
+            &power_save_menu,
+#endif
 #ifdef HAVE_QUICKSCREEN
             &shortcuts_replaces_quickscreen,
 #endif

@@ -2170,6 +2170,9 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, usb_skip_first_drive, LANG_USB_SKIP_FIRST_DRIVE, false, "usb skip first drive", usb_set_skip_first_drive),
 #endif
 
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE) && defined(HAVE_AS3543)
+    OFFON_SETTING(0, cpu_undervolt, LANG_SYS_CPU_UNDERVOLT, false, "cpu undervolt", NULL),
+#endif
     /* Customizable list */
 #ifdef HAVE_LCD_BITMAP
     VIEWPORT_SETTING(ui_vp_config, "ui viewport"),

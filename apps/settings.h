@@ -775,6 +775,10 @@ struct user_settings
     bool usb_skip_first_drive;
 #endif
 
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE) && defined(HAVE_AS3543)
+    bool cpu_undervolt;
+#endif
+
 #ifdef HAVE_LCD_BITMAP
     unsigned char ui_vp_config[64]; /* viewport string for the lists */
 #ifdef HAVE_REMOTE_LCD
