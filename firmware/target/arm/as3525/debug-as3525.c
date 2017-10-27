@@ -56,6 +56,8 @@
 #define CLK_SD_MCLK_NAND     11
 #define CLK_SD_MCLK_MSD      12
 #define CLK_USB              13
+#define CLK_SD               14
+#define CLK_SSP              15
 
 #define MCI_NAND        *((volatile unsigned long *)(NAND_FLASH_BASE + 0x04))
 #define MCI_SD          *((volatile unsigned long *)(SD_MCI_BASE + 0x04))
@@ -126,6 +128,17 @@ static int calc_freq(int clk)
             r = ((CGU_PLLB >> 7) & 0x7) + 1;
             od = (CGU_PLLB >> 10) & 1 ? 2 : 1;
             return (CLK_MAIN / 2) * f / (r * od);
+        case CLK_SD:
+            switch(CGU_SDSLOT & 3) {
+                case 0:
+                    return CLK_MAIN/(((CGU_SDSLOT>>2)& 0xf)+1);
+                case 1:
+                    return calc_freq(CLK_PLLA)/(((CGU_SDSLOT>>2)& 0xf)+1);
+                case 2:
+                    return calc_freq(CLK_PLLB)/(((CGU_SDSLOT>>2)& 0xf)+1);
+                default:
+                    return 0;
+            }
 #endif
         case CLK_PROC:
 #if CONFIG_CPU == AS3525 /* not in arm926-ejs */
@@ -204,6 +217,8 @@ static int calc_freq(int clk)
             }
         case CLK_DBOP:
             return calc_freq(CLK_PCLK)/((CGU_DBOP & 7)+1);
+        case CLK_SSP:
+            return calc_freq(CLK_PCLK)/SSP_CPSR;
 #if CONFIG_CPU == AS3525
         case CLK_SD_MCLK_NAND:
             if(!(MCI_NAND & (1<<8)))
@@ -335,7 +350,18 @@ bool dbg_hw_info(void)
             ((dbg.mci_sd & MCI_CLOCK_BYPASS) ? 1: (((dbg.mci_sd & 0xff) + 1) * 2))),
             calc_freq(CLK_SD_MCLK_MSD)/1000000);
 #endif
+#else /*AS3525v2*/
+        lcd_putsf(0, line++, "SD  :%3dMHz    %3dMHz", AS3525_SDSLOT_FREQ/1000000,
+                                                    calc_freq(CLK_SD)/1000000);
 #endif  /* CONFIG_CPU == AS3525 */
+        long freq_ssp = calc_freq(CLK_SSP);
+        if (freq_ssp >= 1000000)
+            lcd_putsf(0, line++, "SSP :%3dMHz    %3dMHz", AS3525_SSP_FREQ/1000000,
+                                                    calc_freq(CLK_SSP)/1000000);
+        else
+            lcd_putsf(0, line++, "SSP :%3dMHz    %3dKHz", AS3525_SSP_FREQ/1000000,
+                                                    calc_freq(CLK_SSP)/10000);
+
         lcd_putsf(0, line++, "USB :          %3dMHz", calc_freq(CLK_USB)/1000000);
 
 #if LCD_HEIGHT < 176  /* clip  */
@@ -402,6 +428,7 @@ bool dbg_hw_info(void)
         lcd_putsf(0, line++, "CGU_MEMSTK:%8x", (unsigned int)(CGU_MEMSTICK));
         lcd_putsf(0, line++, "CGU_SDSLOT:%8x", (unsigned int)(CGU_SDSLOT));
 #endif
+        lcd_putsf(0, line++, "SSP_CPSR  :%8x", (unsigned int)(SSP_CPSR));
 
         lcd_update();
         int btn = button_get_w_tmo(HZ/10);
