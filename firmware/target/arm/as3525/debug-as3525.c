@@ -56,6 +56,7 @@
 #define CLK_SD_MCLK_NAND     11
 #define CLK_SD_MCLK_MSD      12
 #define CLK_USB              13
+#define CLK_SD               14
 
 #define MCI_NAND        *((volatile unsigned long *)(NAND_FLASH_BASE + 0x04))
 #define MCI_SD          *((volatile unsigned long *)(SD_MCI_BASE + 0x04))
@@ -126,6 +127,17 @@ static int calc_freq(int clk)
             r = ((CGU_PLLB >> 7) & 0x7) + 1;
             od = (CGU_PLLB >> 10) & 1 ? 2 : 1;
             return (CLK_MAIN / 2) * f / (r * od);
+        case CLK_SD:
+            switch(CGU_SDSLOT & 3) {
+                case 0:
+                    return CLK_MAIN/(((CGU_SDSLOT>>2)& 0xf)+1);
+                case 1:
+                    return calc_freq(CLK_PLLA)/(((CGU_SDSLOT>>2)& 0xf)+1);
+                case 2:
+                    return calc_freq(CLK_PLLB)/(((CGU_SDSLOT>>2)& 0xf)+1);
+                default:
+                    return 0;
+            }
 #endif
         case CLK_PROC:
 #if CONFIG_CPU == AS3525 /* not in arm926-ejs */
@@ -167,6 +179,8 @@ static int calc_freq(int clk)
         case CLK_PCLK:
             return calc_freq(CLK_EXTMEM)/(((CGU_PERI>>6)& 0x1)+1);
         case CLK_IDE:
+            if (!(CGU_IDE & 0xC0)) /* is clock enabled? */
+                return 0;
             switch(CGU_IDE & 3) {
                 case 0:
                     return CLK_MAIN/(((CGU_IDE>>2)& 0xf)+1);
@@ -335,6 +349,9 @@ bool dbg_hw_info(void)
             ((dbg.mci_sd & MCI_CLOCK_BYPASS) ? 1: (((dbg.mci_sd & 0xff) + 1) * 2))),
             calc_freq(CLK_SD_MCLK_MSD)/1000000);
 #endif
+#else /*AS3525v2*/
+        lcd_putsf(0, line++, "SD  :%3dMHz    %3dMHz", AS3525_SDSLOT_FREQ/1000000,
+                                                    calc_freq(CLK_SD)/1000000);
 #endif  /* CONFIG_CPU == AS3525 */
         lcd_putsf(0, line++, "USB :          %3dMHz", calc_freq(CLK_USB)/1000000);
 
