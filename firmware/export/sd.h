@@ -55,6 +55,11 @@ bool sd_removable(IF_MD_NONVOID(int drive));
 bool sd_present(IF_MD_NONVOID(int drive));
 #endif
 
+#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_DISK)
+/* Save power with lower disk clock */
+void sd_set_low_speed(bool slow);
+#endif
+
 long sd_last_disk_activity(void);
 
 #ifdef CONFIG_STORAGE_MULTI

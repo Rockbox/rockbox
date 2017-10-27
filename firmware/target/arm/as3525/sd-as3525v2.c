@@ -957,3 +957,25 @@ int sd_event(long id, intptr_t data)
 
     return rc;
 }
+
+#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_DISK)
+void sd_set_low_speed(bool slow)
+{
+    /* block access while speed is changed */
+    mutex_lock(&sd_mtx);
+    enable_controller(false);
+    if (slow)
+    {
+        MCI_CLKDIV = (MCI_CLKDIV & ~(0xFF)) | 0x2;/* assume 24 MHz / 2 = 12 MHz */
+        CGU_SDSLOT = (CGU_SDSLOT & ~(AS3525_SDSLOT_DIV << 2)) 
+                     | (AS3525_SDSLOT_DIV_SLOW << 2);
+    }
+    else
+    {
+        MCI_CLKDIV &= ~(0xFF);    /* CLK_DIV_0 : bits 7:0 = 0x00 FULL speed*/
+        CGU_SDSLOT = (CGU_SDSLOT & ~(AS3525_SDSLOT_DIV_SLOW << 2)) 
+                     | (AS3525_SDSLOT_DIV << 2);
+    }
+    mutex_unlock(&sd_mtx);
+}
+#endif

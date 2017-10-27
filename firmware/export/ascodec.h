@@ -59,4 +59,8 @@ void ascodec_write_pmu(unsigned int index, unsigned int subreg,
 int ascodec_read_pmu(unsigned int index, unsigned int subreg);
 #endif
 
+#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_I2C)
+void i2c_set_low_speed(bool slow);
+#endif
+
 #endif

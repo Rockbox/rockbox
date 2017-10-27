@@ -61,6 +61,12 @@
 #ifdef HAVE_HOTKEY
 #include "onplay.h"
 #endif
+#if defined(AS3525_SDSLOT_DIV_SLOW) || CONFIG_CPU == AS3525
+#include "sd.h"
+#endif
+#ifdef AS3525_I2C_PRESCALER_SLOW
+#include "ascodec.h"
+#endif
 
 #if defined(DX50) || defined(DX90)
 #include "governor-ibasso.h"
@@ -2169,6 +2175,21 @@ const struct settings_list settings[] = {
 #if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
     OFFON_SETTING(0, usb_skip_first_drive, LANG_USB_SKIP_FIRST_DRIVE, false, "usb skip first drive", usb_set_skip_first_drive),
 #endif
+
+#ifdef CONFIG_POWER_SAVING
+#if (CONFIG_POWER_SAVING & POWERSV_CPU)
+    OFFON_SETTING(0, cpu_low_volt, LANG_SYS_CPU_LOWVOLT, false, "cpu low volt", NULL),
+#endif
+#if (CONFIG_POWER_SAVING & POWERSV_DISK)
+    OFFON_SETTING(0, disk_low_speed, LANG_SYS_DISK_LOWSPEED, false, "disk low speed", disk_set_low_speed),
+#endif
+#if (CONFIG_POWER_SAVING & POWERSV_I2C)
+    OFFON_SETTING(0, i2c_low_speed, LANG_SYS_I2C_LOWSPEED, false, "i2c low speed", i2c_set_low_speed),
+#endif
+#if (CONFIG_POWER_SAVING & POWERSV_DISP)
+    OFFON_SETTING(0, disp_low_speed, LANG_SYS_DISP_LOWSPEED, false, "disp low speed", disp_set_low_speed),
+#endif
+#endif /*defined(CONFIG_POWER_SAVING)*/
 
     /* Customizable list */
 #ifdef HAVE_LCD_BITMAP
