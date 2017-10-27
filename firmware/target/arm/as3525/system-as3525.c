@@ -32,6 +32,7 @@
 #include "button.h"
 #include "backlight-target.h"
 #include "lcd.h"
+#include "settings.h"
 
 struct mutex cpufreq_mtx;
 
@@ -421,6 +422,27 @@ void udelay(unsigned usecs)
         : : "r"(delay)
     );
 }
+#ifndef BOOTLOADER
+#ifdef AS3525_SSP_PRESCALER_SLOW
+void ssp_set_low_speed(bool slow)
+{
+    if (slow)
+        SSP_CPSR = AS3525_SSP_PRESCALER_SLOW;
+    else
+        SSP_CPSR = AS3525_SSP_PRESCALER;
+}
+#endif
+
+#if defined(AS3525_DBOP_DIV_SLOW)// && CONFIG_CPU == AS3525
+void dbop_set_low_speed(bool slow)
+{
+    if (slow)
+        CGU_DBOP = (CGU_DBOP & ~AS3525_DBOP_DIV) | AS3525_DBOP_DIV_SLOW;
+    else
+        CGU_DBOP = (CGU_DBOP & ~AS3525_DBOP_DIV_SLOW) | AS3525_DBOP_DIV;
+}
+#endif
+#endif /*ndef BOOTLOADER*/
 
 #ifndef BOOTLOADER
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -481,7 +503,10 @@ void set_cpu_frequency(long frequency)
         CGU_PROC = ((0xf << 4) | (0x3 << 2) | AS3525_CLK_MAIN);
 
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
-        /* Decreasing frequency so reduce voltage after change */
+    /* Decreasing frequency so reduce voltage after change */
+    if (!global_settings.cpu_undervolt)
+        ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_15));
+    else
         ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_10));
 #endif  /*  HAVE_ADJUSTABLE_CPU_VOLTAGE */
 
@@ -519,6 +544,13 @@ void set_cpu_frequency(long frequency)
 
         /* Set CVDD1 power supply */
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
+
+    if (!global_settings.cpu_undervolt)
+    {
+        ascodec_write_pmu(0x17, 1, 0x80 | 26);
+        return;
+    }
+
 #if defined(SANSA_CLIPZIP)
         ascodec_write_pmu(0x17, 1, 0x80 | 20);
 #elif defined(SANSA_CLIPPLUS)

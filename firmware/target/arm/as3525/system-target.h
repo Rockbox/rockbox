@@ -73,6 +73,16 @@ static inline void mdelay(unsigned msecs)
 void usb_insert_int(void);
 void usb_remove_int(void);
 
+#ifndef BOOTLOADER
+#ifdef AS3525_SSP_PRESCALER_SLOW
+void ssp_set_low_speed(bool slow);
+#endif
+
+#if defined(AS3525_DBOP_DIV_SLOW)// && CONFIG_CPU == AS3525
+void dbop_set_low_speed(bool slow);
+#endif
+#endif /* ndef BOOTLOADER */
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #define CPU_BOOST_LOCK_DEFINED
 

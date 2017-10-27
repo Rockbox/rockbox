@@ -61,6 +61,12 @@
 #ifdef HAVE_HOTKEY
 #include "onplay.h"
 #endif
+#if defined(AS3525_SDSLOT_DIV_SLOW) || CONFIG_CPU == AS3525
+#include "sd.h"
+#endif
+#ifdef AS3525_I2C_PRESCALER_SLOW
+#include "ascodec.h"
+#endif
 
 #if defined(DX50) || defined(DX90)
 #include "governor-ibasso.h"
@@ -2168,6 +2174,23 @@ const struct settings_list settings[] = {
 
 #if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
     OFFON_SETTING(0, usb_skip_first_drive, LANG_USB_SKIP_FIRST_DRIVE, false, "usb skip first drive", usb_set_skip_first_drive),
+#endif
+
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE)
+    OFFON_SETTING(0, cpu_undervolt, LANG_SYS_CPU_UNDERVOLT, false, "cpu undervolt", NULL),
+#endif
+
+#if defined(AS3525_SDSLOT_DIV_SLOW) || CONFIG_CPU == AS3525
+    OFFON_SETTING(0, disk_low_speed, LANG_SYS_DISK_LOWSPEED, false, "disk low speed", sd_low_speed),
+#endif
+#ifdef AS3525_I2C_PRESCALER_SLOW
+    OFFON_SETTING(0, i2c_low_speed, LANG_SYS_I2C_LOWSPEED, false, "i2c low speed", i2c_low_speed),
+#endif
+#ifdef AS3525_SSP_PRESCALER_SLOW
+    OFFON_SETTING(0, ssp_low_speed, LANG_SYS_SSP_LOWSPEED, false, "ssp low speed", ssp_set_low_speed),
+#endif
+#if defined(AS3525_DBOP_DIV_SLOW)// && CONFIG_CPU == AS3525
+    OFFON_SETTING(0, dbop_low_speed, LANG_SYS_DBOP_LOWSPEED, false, "dbop low speed", dbop_set_low_speed),
 #endif
 
     /* Customizable list */

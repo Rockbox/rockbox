@@ -13647,3 +13647,106 @@
     *: "Disable Touch"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SYS_POWER_SAVING
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "Power Saving"
+  </source>
+  <dest>
+    *: none
+    sys_powersaving: "Power Saving"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "Power Saving"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYS_CPU_UNDERVOLT
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "CPU Undervolt"
+  </source>
+  <dest>
+     *: none
+    sys_powersaving: "CPU Undervolt"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "CPU Undervolt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYS_DISK_LOWSPEED
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "Disk Low Speed"
+  </source>
+  <dest>
+     *: none
+    sys_powersaving: "Disk Low Speed"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "Disk Low Speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYS_I2C_LOWSPEED
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "I2C Underclock"
+  </source>
+  <dest>
+     *: none
+    sys_powersaving: "I2C Underclock"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "I2C Underclock"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYS_SSP_LOWSPEED
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "Serial Underclock"
+  </source>
+  <dest>
+     *: none
+    sys_powersaving: "Serial Underclock"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "Serial Underclock"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYS_DBOP_LOWSPEED
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "Data Block Underclock"
+  </source>
+  <dest>
+     *: none
+    sys_powersaving: "Data Block Underclock"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "Data Block Underclock"
+  </voice>
+</phrase>
+

@@ -295,6 +295,48 @@ MAKE_MENU(disk_menu, ID2P(LANG_DISK_MENU), 0, Icon_NOICON,
          );
 #endif
 
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE)
+MENUITEM_SETTING(cpu_undervolt, &global_settings.cpu_undervolt, NULL);
+#endif
+#if defined(AS3525_SDSLOT_DIV_SLOW) || CONFIG_CPU == AS3525
+MENUITEM_SETTING(disk_low_speed, &global_settings.disk_low_speed, NULL);
+#endif
+#ifdef AS3525_I2C_PRESCALER_SLOW
+MENUITEM_SETTING(i2c_low_speed, &global_settings.i2c_low_speed, NULL);
+#endif
+#ifdef AS3525_SSP_PRESCALER_SLOW
+MENUITEM_SETTING(ssp_low_speed, &global_settings.ssp_low_speed, NULL);
+#endif
+#if defined(AS3525_DBOP_DIV_SLOW)// && CONFIG_CPU == AS3525
+MENUITEM_SETTING(dbop_low_speed, &global_settings.dbop_low_speed, NULL);
+#endif
+
+
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE) \
+|| defined(AS3525_DBOP_DIV_SLOW) \
+|| defined(AS3525_SSP_PRESCALER_SLOW) \
+|| defined(AS3525_I2C_PRESCALER_SLOW) \
+|| defined(AS3525_SDSLOT_DIV_SLOW) || CONFIG_CPU == AS3525
+//TODO more power save items
+MAKE_MENU(power_save_menu, ID2P(LANG_SYS_POWER_SAVING), 0, Icon_NOICON,
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE)
+        &cpu_undervolt,
+#endif
+#if defined(AS3525_SDSLOT_DIV_SLOW) || CONFIG_CPU == AS3525
+        &disk_low_speed,
+#endif
+#ifdef AS3525_I2C_PRESCALER_SLOW
+        &i2c_low_speed,
+#endif
+#ifdef AS3525_SSP_PRESCALER_SLOW
+        &ssp_low_speed,
+#endif
+#if defined(AS3525_DBOP_DIV_SLOW)// && CONFIG_CPU == AS3525
+        &dbop_low_speed,
+#endif
+         );
+#endif /* HAVE_ADJUSTABLE_CPU_VOLTAGE || _SLOW || CONFIG_CPU == AS3525*/
+
 /* Limits menu */
 MENUITEM_SETTING(max_files_in_dir, &global_settings.max_files_in_dir, NULL);
 MENUITEM_SETTING(max_files_in_playlist, &global_settings.max_files_in_playlist, NULL);
@@ -412,6 +454,15 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &disk_menu,
 #endif
             &limits_menu,
+
+#if defined(HAVE_ADJUSTABLE_CPU_VOLTAGE) \
+|| defined(AS3525_DBOP_DIV_SLOW) \
+|| defined(AS3525_SSP_PRESCALER_SLOW) \
+|| defined(AS3525_I2C_PRESCALER_SLOW) \
+|| defined(AS3525_SDSLOT_DIV_SLOW) || CONFIG_CPU == AS3525
+            &power_save_menu,
+#endif
+
 #ifdef HAVE_QUICKSCREEN
             &shortcuts_replaces_quickscreen,
 #endif
