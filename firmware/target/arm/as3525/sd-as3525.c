@@ -419,7 +419,7 @@ static int sd_init_card(const int drive)
 
     /* Boost MCICLK to operating speed */
     if(drive == INTERNAL_AS3525)
-        MCI_CLOCK(drive) = MCI_HALFSPEED;  /* MCICLK = IDE_CLK/2 = 25 MHz  */
+        MCI_CLOCK(drive) = MCI_HALFSPEED;  /* MCICLK = PCLK/2 = 31MHz */
 #if defined(HAVE_MULTIDRIVE)
     else
         /* MCICLK = PCLK/2 = 31MHz(HS) or PCLK/4 = 15.5 Mhz (STD)*/
@@ -961,4 +961,38 @@ int sd_event(long id, intptr_t data)
     }
 
     return rc;
+}
+
+void sd_low_speed(bool slow)
+{
+    /*TODO block access while speed is changed */
+    /*TODO investigate changing IDE_DIV / CGU_IDE */
+    //mutex_lock(&sd_mtx);
+    while (sd_enabled); /* wait till controller is disabled */
+    /* After a data write, data cannot be written to MCI_CLOCK 
+       for 3 MCLK periods + 2 PCLK periods. ~10us worst case
+    */
+    udelay(10);
+    if (slow)
+    {
+        for (int i = 0; i < NUM_DRIVES ; i++)
+        {
+            MCI_CLOCK(i) = MCI_QUARTERSPEED;  /* MCICLK = PCLK/4 = 15.5MHz */
+        }
+    }
+    else
+    {
+        for (int i = 0; i < NUM_DRIVES ; i++)
+        {
+            /* Boost MCICLK to operating speed */
+            if(i == INTERNAL_AS3525)
+                MCI_CLOCK(drive) = MCI_HALFSPEED;  /* MCICLK = PCLK/2 = 31MHz */
+#if defined(HAVE_MULTIDRIVE)
+            else
+                /* MCICLK = PCLK/2 = 31MHz(HS) or PCLK/4 = 15.5 Mhz (STD)*/
+                MCI_CLOCK(i) = (hs_card ? MCI_HALFSPEED : MCI_QUARTERSPEED);
+#endif
+        }
+    }
+    //mutex_unlock(&sd_mtx);
 }
