@@ -111,7 +111,15 @@ static void zoom_drawpixel(int x, int y)
     if(x < zoom_clipl || x >= zoom_clipr)
         return;
 
+#if LCD_DEPTH == 24
+    /* I hate these */
+    unsigned int pix = rb->lcd_get_foreground();
+    zoom_fb[y * zoom_w + x].b = RGB_UNPACK_BLUE(pix);
+    zoom_fb[y * zoom_w + x].g = RGB_UNPACK_GREEN(pix);
+    zoom_fb[y * zoom_w + x].r = RGB_UNPACK_RED(pix);
+#else
     zoom_fb[y * zoom_w + x] = rb->lcd_get_foreground();
+#endif
 }
 
 static void zoom_hline(int l, int r, int y)
@@ -130,7 +138,14 @@ static void zoom_hline(int l, int r, int y)
     if(r >= zoom_clipr)
         r = zoom_clipr;
 
+#if LCD_DEPTH == 24
+    fb_data pixel = { RGB_UNPACK_BLUE(rb->lcd_get_foreground()),
+                      RGB_UNPACK_GREEN(rb->lcd_get_foreground()),
+                      RGB_UNPACK_RED(rb->lcd_get_foreground()) };
+#else
     fb_data pixel = rb->lcd_get_foreground();
+#endif
+
     fb_data *ptr = zoom_fb + y * zoom_w + l;
     for(int i = 0; i < r - l; ++i)
         *ptr++ = pixel;
@@ -202,7 +217,15 @@ static void zoom_mono_bitmap(const unsigned char *bits, int x, int y, int w, int
             for(int dy = 0; dy < 8; ++dy)
             {
                 if(column & 1)
+                {
+#if LCD_DEPTH == 24
+                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].b = RGB_UNPACK_BLUE(LCD_BLACK);
+                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].g = RGB_UNPACK_GREEN(LCD_BLACK);
+                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].r = RGB_UNPACK_RED(LCD_BLACK);
+#else
                     zoom_fb[(y + i * 8 + dy) * zoom_w + x + j] = LCD_BLACK;
+#endif
+                }
                 column >>= 1;
             }
         }
@@ -280,9 +303,9 @@ static void rb_unclip(void *handle)
     else
     {
         zoom_clipu = 0;
-        zoom_clipd = LCD_HEIGHT;
+        zoom_clipd = zoom_h;
         zoom_clipl = 0;
-        zoom_clipr = LCD_WIDTH;
+        zoom_clipr = zoom_w;
     }
 }
 
@@ -522,11 +545,11 @@ static void rb_draw_rect(void *handle, int x, int y, int w, int h, int color)
     else
     {
         /* TODO: clipping */
+        rb_color(color);
         for(int i = y; i < y + h; ++i)
-            for(int j = x; j < x + w; ++j)
-            {
-                zoom_fb[i * zoom_w + j] = colors[color];
-            }
+        {
+            zoom_hline(x, x + w, i);
+        }
     }
 }
 
