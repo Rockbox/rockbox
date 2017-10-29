@@ -194,7 +194,7 @@ typedef struct bhdr_struct {
         struct free_ptr_struct free_ptr;
         u8_t buffer[1];         /*sizeof(struct free_ptr_struct)]; */
     } ptr;
-} bhdr_t;
+} __attribute__((packed)) bhdr_t;
 
 /* This structure is embedded at the beginning of each area, giving us
  * enough information to cope with a set of areas */
@@ -202,7 +202,7 @@ typedef struct bhdr_struct {
 typedef struct area_info_struct {
     bhdr_t *end;
     struct area_info_struct *next;
-} area_info_t;
+} __attribute__((packed)) area_info_t;
 
 typedef struct TLSF_struct {
     /* the TLSF's structure signature */
