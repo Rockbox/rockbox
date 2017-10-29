@@ -64,8 +64,8 @@
 #define midend_colors midend_colours
 #endif
 
-#define PAN_X LCD_WIDTH / 4
-#define PAN_Y LCD_WIDTH / 4 /* not a typo */
+#define PAN_X (MIN(LCD_HEIGHT, LCD_WIDTH) / 4)
+#define PAN_Y (MIN(LCD_HEIGHT, LCD_WIDTH) / 4)
 
 #define ZOOM_FACTOR 3
 
@@ -84,7 +84,9 @@ static int help_times = 0;
 static void fix_size(void);
 
 static struct viewport clip_rect;
-static bool clipped = false, audiobuf_available, zoom_enabled = false;
+static bool clipped = false, zoom_enabled = false;
+
+extern bool audiobuf_available;
 
 static fb_data *zoom_fb;
 static int zoom_w, zoom_h, zoom_clipu, zoom_clipd, zoom_clipl, zoom_clipr;
@@ -209,6 +211,7 @@ static void zoom_drawcircle(int cx, int cy, int radius)
  * efficiency? */
 static void zoom_mono_bitmap(const unsigned char *bits, int x, int y, int w, int h)
 {
+    unsigned int pix = rb->lcd_get_foreground();
     for(int i = 0; i < h / 8 + 1; ++i)
     {
         for(int j = 0; j < w; ++j)
@@ -219,11 +222,11 @@ static void zoom_mono_bitmap(const unsigned char *bits, int x, int y, int w, int
                 if(column & 1)
                 {
 #if LCD_DEPTH == 24
-                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].b = RGB_UNPACK_BLUE(LCD_BLACK);
-                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].g = RGB_UNPACK_GREEN(LCD_BLACK);
-                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].r = RGB_UNPACK_RED(LCD_BLACK);
+                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].b = RGB_UNPACK_BLUE(pix);
+                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].g = RGB_UNPACK_GREEN(pix);
+                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].r = RGB_UNPACK_RED(pix);
 #else
-                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j] = LCD_BLACK;
+                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j] = pix;
 #endif
                 }
                 column >>= 1;
@@ -240,6 +243,10 @@ static void zoom_alpha_bitmap(const unsigned char *bits, int x, int y, int w, in
     const unsigned char *ptr = bits;
     unsigned char buf;
     int n_read = 0; /* how many 4-bit nibbles we've read (read new when even) */
+
+    unsigned int pix = rb->lcd_get_foreground();
+    unsigned int r = RGB_UNPACK_RED(pix), g = RGB_UNPACK_GREEN(pix), b = RGB_UNPACK_BLUE(pix);
+
     for(int i = 0; i < h; ++i)
     {
         for(int j = 0; j < w; ++j)
@@ -254,7 +261,7 @@ static void zoom_alpha_bitmap(const unsigned char *bits, int x, int y, int w, in
 
             int plot_alpha = (pix_alpha << 4) | pix_alpha; /* so 0xF -> 0xFF, 0x1 -> 0x11, etc. */
 
-            plot(zoom_fb, zoom_w, zoom_h, x + j, y + i, plot_alpha, 0, 0, 0,
+            plot(zoom_fb, zoom_w, zoom_h, x + j, y + i, plot_alpha, r, g, b,
                  0, zoom_w, 0, zoom_h);
         }
     }
@@ -394,8 +401,9 @@ static void rb_setfont(int type, int size)
 {
     /* out of range (besides, no puzzle should ever need this large
        of a font, anyways) */
-    if(BUNDLE_MAX < size)
+    if(size > BUNDLE_MAX)
         size = BUNDLE_MAX;
+
     if(size < 10)
     {
         if(size < 7) /* no teeny-tiny fonts */
@@ -459,7 +467,7 @@ fallback:
 }
 
 static void rb_draw_text(void *handle, int x, int y, int fonttype,
-                         int fontsize, int align, int color, char *text)
+                         int fontsize, int align, int color, const char *text)
 {
     (void) fontsize;
     if(!zoom_enabled)
@@ -490,6 +498,7 @@ static void rb_draw_text(void *handle, int x, int y, int fonttype,
     }
     else
     {
+        rb_color(color);
         rb_setfont(fonttype, fontsize); /* size will be clamped if too large */
 
         int w, h;
@@ -1252,7 +1261,7 @@ static void rb_end_draw(void *handle)
 
 static char *titlebar = NULL;
 
-static void rb_status_bar(void *handle, char *text)
+static void rb_status_bar(void *handle, const char *text)
 {
     if(titlebar)
         sfree(titlebar);
@@ -1320,6 +1329,7 @@ const drawing_api rb_drawing = {
 /* render to a virtual framebuffer and let the user pan (but not make any moves) */
 static void zoom(void)
 {
+    rb->splash(0, "Please wait...");
     zoom_w = LCD_WIDTH * ZOOM_FACTOR, zoom_h = LCD_HEIGHT * ZOOM_FACTOR;
 
     zoom_clipu = 0;
@@ -1329,8 +1339,21 @@ static void zoom(void)
 
     midend_size(me, &zoom_w, &zoom_h, TRUE);
 
-    /* allocate a framebuffer */
+    /* Allocating the framebuffer will mostly likely grab the
+     * audiobuffer, which will make impossible to load new fonts, and
+     * lead to zoomed puzzles being drawn with the default fallback
+     * fonts. As a semi-workaround, we go ahead and load the biggest available
+     * monospace and proportional fonts. */
+    rb_setfont(FONT_FIXED, BUNDLE_MAX);
+    rb_setfont(FONT_VARIABLE, BUNDLE_MAX);
+
     zoom_fb = smalloc(zoom_w * zoom_h * sizeof(fb_data));
+    if(!zoom_fb)
+    {
+        rb->splashf(HZ * 2, "Not enough memory to allocate %d KB framebuffer!", zoom_w * zoom_h * sizeof(fb_data) / 1024);
+        return;
+    }
+
     zoom_enabled = true;
 
     /* draws go to the enlarged framebuffer */
@@ -1530,7 +1553,7 @@ static void int_chooser(config_item *cfgs, int idx, int val)
              * a workaround for Unruly): */
 #define CHOOSER_MAX_INCR 2
 
-            char *ret;
+            const char *ret;
             for(int i = 0; i < CHOOSER_MAX_INCR; ++i)
             {
                 val += d;
@@ -1694,7 +1717,7 @@ static bool config_menu(void)
                 old_str = dupstr(old.u.string.sval);
 
             bool freed_str = do_configure_item(config, pos);
-            char *err = midend_set_config(me, CFG_SETTINGS, config);
+            const char *err = midend_set_config(me, CFG_SETTINGS, config);
 
             if(err)
             {
@@ -1971,12 +1994,12 @@ static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
             break;
         case 7:
             break;
-        case 8:
+        case 9:
             if(audiobuf_available)
                 break;
             else
                 return ACTION_EXIT_MENUITEM;
-        case 9:
+        case 10:
             if(!midend_get_presets(me, NULL)->n_entries)
                 return ACTION_EXIT_MENUITEM;
             break;
@@ -2021,21 +2044,21 @@ static int pause_menu(void)
 #define static auto
 #define const
     MENUITEM_STRINGLIST(menu, NULL, pausemenu_cb,
-                        "Resume Game",
-                        "New Game",
-                        "Restart Game",
-                        "Undo",
-                        "Redo",
-                        "Solve",
-                        "Zoom In",
-                        "Quick Help",
-                        "Extensive Help",
-                        "Playback Control",
-                        "Game Type",
-                        "Debug Menu",
-                        "Configure Game",
-                        "Quit without Saving",
-                        "Quit");
+                        "Resume Game",         // 0
+                        "New Game",            // 1
+                        "Restart Game",        // 2
+                        "Undo",                // 3
+                        "Redo",                // 4
+                        "Solve",               // 5
+                        "Zoom In",             // 6
+                        "Quick Help",          // 7
+                        "Extensive Help",      // 8
+                        "Playback Control",    // 9
+                        "Game Type",           // 10
+                        "Debug Menu",          // 11
+                        "Configure Game",      // 12
+                        "Quit without Saving", // 13
+                        "Quit");               // 14
 #undef static
 #undef const
     /* HACK ALERT */
@@ -2082,7 +2105,7 @@ static int pause_menu(void)
             break;
         case 5:
         {
-            char *msg = midend_solve(me);
+            const char *msg = midend_solve(me);
             if(msg)
                 rb->splash(HZ, msg);
             quit = true;
@@ -2391,7 +2414,7 @@ static int read_wrapper(void *ptr, void *buf, int len)
     return rb->read(fd, buf, len);
 }
 
-static void write_wrapper(void *ptr, void *buf, int len)
+static void write_wrapper(void *ptr, const void *buf, int len)
 {
     int fd = (int) ptr;
     rb->write(fd, buf, len);
@@ -2416,7 +2439,7 @@ static void init_colors(void)
     sfree(floatcolors);
 }
 
-static char *init_for_game(const game *gm, int load_fd, bool draw)
+static const char *init_for_game(const game *gm, int load_fd, bool draw)
 {
     me = midend_new(NULL, gm, &rb_drawing, NULL);
 
@@ -2424,7 +2447,7 @@ static char *init_for_game(const game *gm, int load_fd, bool draw)
         midend_new_game(me);
     else
     {
-        char *ret = midend_deserialize(me, read_wrapper, (void*) load_fd);
+        const char *ret = midend_deserialize(me, read_wrapper, (void*) load_fd);
         if(ret)
             return ret;
     }
@@ -2584,7 +2607,7 @@ static void save_fonts(void)
             final |= oldmask;
         uint32_t left = final >> 31;
         uint32_t right = final & 0x7fffffff;
-        rb->fdprintf(outfd, "%s:%u:%u\n", midend_which_game(me)->name, left, right);
+        rb->fdprintf(outfd, "%s:%lu:%lu\n", midend_which_game(me)->name, left, right);
         rb->close(outfd);
         rb->rename(FONT_TABLE ".tmp", FONT_TABLE);
     }
@@ -2609,7 +2632,7 @@ static bool load_game(void)
     rb->splash(0, "Loading...");
 
     char *game;
-    char *ret = identify_game(&game, read_wrapper, (void*)fd);
+    const char *ret = identify_game(&game, read_wrapper, (void*)fd);
 
     if(!*game && ret)
     {
@@ -2625,12 +2648,10 @@ static bool load_game(void)
 
         if(!strcmp(game, thegame.name))
         {
-            sfree(ret);
             ret = init_for_game(&thegame, fd, false);
             if(ret)
             {
                 rb->splash(HZ, ret);
-                sfree(ret);
                 rb->close(fd);
                 rb->remove(fname);
                 return false;
@@ -2755,15 +2776,15 @@ enum plugin_status plugin_start(const void *param)
 #define static auto
 #define const
     MENUITEM_STRINGLIST(menu, NULL, mainmenu_cb,
-                        "Resume Game",
-                        "New Game",
-                        "Quick Help",
-                        "Extensive Help",
-                        "Playback Control",
-                        "Game Type",
-                        "Configure Game",
-                        "Quit without Saving",
-                        "Quit");
+                        "Resume Game",         // 0
+                        "New Game",            // 1
+                        "Quick Help",          // 2
+                        "Extensive Help",      // 3
+                        "Playback Control",    // 4
+                        "Game Type",           // 5
+                        "Configure Game",      // 6
+                        "Quit without Saving", // 7
+                        "Quit");               // 8
 #undef static
 #undef const
 

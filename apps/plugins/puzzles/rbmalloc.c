@@ -14,12 +14,9 @@
 int allocs = 0;
 int frees = 0;
 
-bool audiobuf_available =
-#ifndef COMBINED
-    true;
-#else
-    false;
-#endif
+/* We don't load as an overlay anymore, so the audiobuf should always
+ * be available. */
+bool audiobuf_available = true;
 
 static bool grab_audiobuf(void)
 {
@@ -29,9 +26,22 @@ static bool grab_audiobuf(void)
     if(rb->audio_status())
         rb->audio_stop();
 
-    size_t sz, junk;
+    size_t sz;
+
     void *audiobuf = rb->plugin_get_audio_buffer(&sz);
     extern char *giant_buffer;
+
+#if 0
+    /* Try aligning if tlsf crashes in add_new_area().  This is
+     * disabled now since things seem to work without it. */
+    void *old = audiobuf;
+
+    /* I'm sorry. */
+    audiobuf = (void*)((int) audiobuf & ~0xff);
+    audiobuf += 0x100;
+
+    sz -= audiobuf - old;
+#endif
 
     add_new_area(audiobuf, sz, giant_buffer);
     audiobuf_available = false;
