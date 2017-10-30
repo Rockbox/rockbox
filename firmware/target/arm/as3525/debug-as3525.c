@@ -57,8 +57,6 @@
 #define CLK_SD_MCLK_MSD      12
 #define CLK_USB              13
 
-#define I2C2_CPSR0      *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x1C))
-#define I2C2_CPSR1      *((volatile unsigned int *)(I2C_AUDIO_BASE + 0x20))
 #define MCI_NAND        *((volatile unsigned long *)(NAND_FLASH_BASE + 0x04))
 #define MCI_SD          *((volatile unsigned long *)(SD_MCI_BASE + 0x04))
 
@@ -79,9 +77,8 @@ static int calc_freq(int clk)
 {
     unsigned int prediv = ((unsigned int)CGU_PROC>>2) & 0x3;
     unsigned int postdiv = ((unsigned int)CGU_PROC>>4) & 0xf;
+    unsigned int u_out_div;
 #if CONFIG_CPU == AS3525
-    int out_div;
-
     switch(clk) {
         /* clk_main = clk_int = 24MHz oscillator */
         case CLK_PLLA:
@@ -89,28 +86,27 @@ static int calc_freq(int clk)
                 return 0;
 
                  /*assume 24MHz oscillator only input available */
-            out_div = ((CGU_PLLA>>13) & 0x3);         /* bits 13:14 */
-            if (out_div == 3)                         /* for 11 NO=4  */
-                out_div=4;
-            if(out_div)                               /*  NO = 0 not allowed */
+            u_out_div = ((CGU_PLLA>>13) & 0x3);         /* bits 13:14 */
+            if (u_out_div == 3)                         /* for 11 NO=4  */
+                u_out_div=4;
+            if(u_out_div)                               /*  NO = 0 not allowed */
                 return ((2 * (CGU_PLLA & 0xff))*CLK_MAIN)/
-                                               (((CGU_PLLA>>8) & 0x1f)*out_div);
+                                               (((CGU_PLLA>>8) & 0x1f)*u_out_div);
             return 0;
        case CLK_PLLB:
             if(CGU_PLLBSUP & (1<<3))
                 return 0;
 
                  /*assume 24MHz oscillator only input available */
-            out_div = ((CGU_PLLB>>13) & 0x3);         /* bits 13:14 */
-            if (out_div == 3)                         /* for 11 NO=4  */
-                out_div=4;
-            if(out_div)                               /*  NO = 0 not allowed */
+            u_out_div = ((CGU_PLLB>>13) & 0x3);         /* bits 13:14 */
+            if (u_out_div == 3)                         /* for 11 NO=4  */
+                u_out_div=4;
+            if(u_out_div)                               /*  NO = 0 not allowed */
                 return ((2 * (CGU_PLLB & 0xff))*CLK_MAIN)/
-                                               (((CGU_PLLB>>8) & 0x1f)*out_div);
+                                               (((CGU_PLLB>>8) & 0x1f)*u_out_div);
             return 0;
 #else
     int od, f, r;
-
     /* AS3525v2  */
     switch(clk) {
         case CLK_PLLA:
@@ -182,7 +178,8 @@ static int calc_freq(int clk)
                     return 0;
             }
         case CLK_I2C:
-            return calc_freq(CLK_PCLK)/AS3525_I2C_PRESCALER;
+            ams_i2c_get_debug_cpsr(&u_out_div);
+            return calc_freq(CLK_PCLK)/(u_out_div);
         case CLK_I2SI:
             switch((CGU_AUDIO>>12) & 3) {
                 case 0:
@@ -395,9 +392,9 @@ bool dbg_hw_info(void)
         lcd_clear_display();
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
-
-        lcd_putsf(0, line++, "I2C2_CPSR :%8x", (unsigned int)(I2C2_CPSR1<<8 |
-                                                       I2C2_CPSR0));
+        unsigned int i2c_cpsr;
+        ams_i2c_get_debug_cpsr(&i2c_cpsr);
+        lcd_putsf(0, line++, "I2C2_CPSR :%8x", i2c_cpsr);
 #if CONFIG_CPU == AS3525
         lcd_putsf(0, line++, "MCI_NAND  :%8x", (unsigned int)(MCI_NAND));
         lcd_putsf(0, line++, "MCI_SD    :%8x", (unsigned int)(MCI_SD));

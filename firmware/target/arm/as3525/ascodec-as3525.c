@@ -675,3 +675,18 @@ void ascodec_init(void)
                                     IFRTC_IRQ_RTC | IRQ_ADC);
 #endif
 }
+
+void ams_i2c_get_debug_cpsr(unsigned int *i2c_cpsr)
+{
+    int oldlevel = disable_interrupt_save(IRQ_FIQ_STATUS);
+    /* must be on to read regs */
+    bool i2c_enabled = bitset32(&CGU_PERI, CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE) &
+                                           CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
+
+    *i2c_cpsr = (I2C2_CPSR1<<8 | I2C2_CPSR0);
+
+    if (!i2c_enabled) /* put it back how we found it */
+        bitclr32(&CGU_PERI, CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE);
+
+    restore_irq(oldlevel);
+}

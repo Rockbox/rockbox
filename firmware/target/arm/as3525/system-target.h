@@ -96,6 +96,6 @@ struct ams_sd_debug_info
 };
 
 void ams_sd_get_debug_info(struct ams_sd_debug_info *info);
-
+void ams_i2c_get_debug_cpsr(unsigned int *i2c_cpsr);
 
 #endif /* SYSTEM_TARGET_H */
