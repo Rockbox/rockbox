@@ -126,7 +126,6 @@ static long last_disk_activity = -1;
 static long next_yield = 0;
 
 static struct mutex sd_mtx;
-bool sd_enabled = false;
 
 #if defined(HAVE_MULTIDRIVE)
 static bool hs_card = false;
@@ -154,6 +153,7 @@ static void enable_controller(bool on)
 #if defined(HAVE_HOTSWAP) && defined (HAVE_ADJUSTABLE_CPU_VOLTAGE)
     static bool cpu_boosted = false;
 #endif
+    static bool sd_enabled = true; /* force action on first call in sd_init() */
 
     if (sd_enabled == on)
         return; /* nothing to do */
@@ -540,9 +540,7 @@ int sd_init(void)
     /* init mutex */
     mutex_init(&sd_mtx);
 
-    sd_enabled = true; /* force action on next call */
     enable_controller(false);
-
     return 0;
 }
 
@@ -905,13 +903,6 @@ long sd_last_disk_activity(void)
     return last_disk_activity;
 }
 
-void sd_enable(bool on)
-{
-    mutex_lock(&sd_mtx);
-    enable_controller(on);
-    mutex_unlock(&sd_mtx);
-}
-
 tCardInfo *card_get_info_target(int card_no)
 {
     return &card_info[card_no];
@@ -924,6 +915,21 @@ int sd_num_drives(int first_drive)
     return NUM_DRIVES;
 }
 #endif /* CONFIG_STORAGE_MULTI */
+
+void ams_sd_get_debug_info(struct ams_sd_debug_info *info)
+{
+    #define MCI_NAND *((volatile unsigned long *)(NAND_FLASH_BASE + 0x04))
+    #define MCI_SD   *((volatile unsigned long *)(SD_MCI_BASE + 0x04))
+
+    mutex_lock(&sd_mtx);
+    enable_controller(true); /* must be on to read regs */
+    info->mci_nand = MCI_NAND;
+#ifdef HAVE_MULTIDRIVE
+    info->mci_sd = MCI_SD;
+#endif
+    enable_controller(false);
+    mutex_unlock(&sd_mtx);
+}
 
 int sd_event(long id, intptr_t data)
 {

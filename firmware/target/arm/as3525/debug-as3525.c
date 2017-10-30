@@ -62,8 +62,6 @@
 #define MCI_NAND        *((volatile unsigned long *)(NAND_FLASH_BASE + 0x04))
 #define MCI_SD          *((volatile unsigned long *)(SD_MCI_BASE + 0x04))
 
-extern bool sd_enabled;
-
 #if defined(SANSA_FUZE) || defined(SANSA_E200V2) || defined(SANSA_C200V2)
 #define DEBUG_DBOP
 #include "dbop-as3525.h"
@@ -253,13 +251,6 @@ static int calc_freq(int clk)
 bool dbg_hw_info(void)
 {
     int line;
-#if CONFIG_CPU == AS3525
-    int last_nand = 0;
-#ifdef HAVE_MULTIDRIVE
-    int last_sd = 0;
-#endif
-#endif /* CONFIG_CPU == AS3525 */
-
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
@@ -334,25 +325,17 @@ bool dbg_hw_info(void)
         lcd_putsf(0, line++, "I2SO: %s      %3dMHz", (CGU_AUDIO & (1<<11)) ?
                                     "on " : "off", calc_freq(CLK_I2SO)/1000000);
 #if CONFIG_CPU == AS3525
-        /* If disabled, enable SD cards so we can read the registers */
-        if(sd_enabled == false)
-        {
-            sd_enable(true);
-            last_nand = MCI_NAND;
-#ifdef HAVE_MULTIDRIVE
-            last_sd = MCI_SD;
-#endif
-            sd_enable(false);
-        }
+        struct ams_sd_debug_info dbg;
+        ams_sd_get_debug_info(&dbg);
 
         lcd_putsf(0, line++, "SD  :%3dMHz    %3dMHz",
             ((AS3525_IDE_FREQ/ 1000000) /
-            ((last_nand & MCI_CLOCK_BYPASS)? 1:(((last_nand & 0xff)+1) * 2))),
+            ((dbg.mci_nand & MCI_CLOCK_BYPASS)? 1:(((dbg.mci_nand & 0xff)+1) * 2))),
             calc_freq(CLK_SD_MCLK_NAND)/1000000);
 #ifdef HAVE_MULTIDRIVE
         lcd_putsf(0, line++, "uSD :%3dMHz    %3dMHz",
             ((AS3525_PCLK_FREQ/ 1000000) /
-            ((last_sd & MCI_CLOCK_BYPASS) ? 1: (((last_sd & 0xff) + 1) * 2))),
+            ((dbg.mci_sd & MCI_CLOCK_BYPASS) ? 1: (((dbg.mci_sd & 0xff) + 1) * 2))),
             calc_freq(CLK_SD_MCLK_MSD)/1000000);
 #endif
 #endif  /* CONFIG_CPU == AS3525 */
