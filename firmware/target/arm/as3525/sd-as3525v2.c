@@ -323,9 +323,6 @@ static int sd_first_drive = 0;
 /* for compatibility */
 static long last_disk_activity = -1;
 static struct mutex       sd_mtx SHAREDBSS_ATTR;
-#ifndef BOOTLOADER
-bool sd_enabled = false;
-#endif
 
 static struct semaphore transfer_completion_signal;
 static struct semaphore command_completion_signal;
@@ -675,7 +672,6 @@ int sd_init(void)
         return ret;
 
 #ifndef BOOTLOADER
-    sd_enabled = true;
     enable_controller(false);
 #endif
     return 0;
@@ -878,13 +874,6 @@ int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count,
 long sd_last_disk_activity(void)
 {
     return last_disk_activity;
-}
-
-void sd_enable(bool on)
-{
-    mutex_lock(&sd_mtx);
-    enable_controller(on);
-    mutex_unlock(&sd_mtx);
 }
 #endif /* BOOTLOADER */
 

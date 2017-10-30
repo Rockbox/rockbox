@@ -89,4 +89,13 @@ static inline void cpu_boost_unlock(void)
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
+struct ams_sd_debug_info
+{
+    unsigned long mci_nand;
+    unsigned long mci_sd;
+};
+
+void ams_sd_get_debug_info(struct ams_sd_debug_info *info);
+
+
 #endif /* SYSTEM_TARGET_H */
