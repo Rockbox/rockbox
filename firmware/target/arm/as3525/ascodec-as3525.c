@@ -545,14 +545,7 @@ void ascodec_wait_adc_finished(void)
 /* read sticky end-of-charge bit and clear it */
 bool ascodec_endofch(void)
 {
-    int oldlevel = disable_irq_save();
-
-    bool ret = ascodec_enrd0_shadow & CHG_ENDOFCH;
-    ascodec_enrd0_shadow &= ~CHG_ENDOFCH; /* clear interrupt */
-
-    restore_irq(oldlevel);
-
-    return ret;
+    return bitclr32(&ascodec_enrd0_shadow, CHG_ENDOFCH) & CHG_ENDOFCH;
 }
 
 /* read the presence state of the charger */
