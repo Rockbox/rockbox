@@ -6,6 +6,10 @@ The games that begin with the ``sgt-'' prefix are ports of certain
 puzzles from Simon Tatham's Portable Puzzle Collection, an open source
 collection of single-player puzzle games.
 
+\note{Certain puzzles may crash when run with demanding
+  configurations. To prevent this, avoid setting extreme configuration
+  values.}
+
 \subsubsection{Puzzle Documentation}
 For documentation on the games included, please see the ``Extensive
 Help'' menu option from inside the plugin to read puzzle-specific
@@ -27,3 +31,31 @@ whenever needed.
 \note{On hard disk-based devices, this may cause a slight delay as the
   disk spins up to load the fonts when a puzzle is first started, and
   after using the ``Extensive Help'' feature.}
+
+\subsubsection{``Zoom In'' Feature}
+The ``Zoom In'' feature is available as an option from the pause
+menu. It has two modes: viewing mode, and interaction mode. The
+current mode is indicated in the title bar at the bottom of the
+screen. This feature is most useful with low-resolution devices and
+large puzzles.
+
+Viewing mode is entered when the ``Zoom In'' option is selected, or
+when {\PluginCancel} is pressed in interaction mode. It allows you to
+pan around an enlarged version of the game. The directional keys pan
+the image by a small amount in their respective directions, and
+{\PluginSelect} should toggle interaction mode. To return to the pause
+menu from viewing mode, press {\PluginCancel}.
+
+In interaction mode, activated from viewer mode by pressing
+{\PluginSelect}, your device's buttons all function as they do in the
+normal gameplay mode, with the exception of {\PluginCancel}, which
+returns the game to viewing mode, whereas in the normal gameplay mode
+it would return directly to the pause menu. To return to the pause
+menu from interaction mode, press {\PluginCancel} twice.
+
+\note{Using certain features such as the ``Zoom In'' option may stop
+  audio playback. This is normal, as the game requires additional
+  memory from the system, which will automatically stop playback. The
+  ``Playback Control'' menu will be hidden whenever this
+  happens. Exiting the game will allow the resumption of audio
+  playback.}

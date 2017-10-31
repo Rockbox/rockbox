@@ -82,9 +82,10 @@ static int help_times = 0;
 #endif
 
 static void fix_size(void);
+static int pause_menu(void);
 
 static struct viewport clip_rect;
-static bool clipped = false, zoom_enabled = false;
+static bool clipped = false, zoom_enabled = false, view_mode = true;
 
 extern bool audiobuf_available;
 
@@ -1269,33 +1270,47 @@ static void rb_status_bar(void *handle, const char *text)
     LOGF("game title is %s\n", text);
 }
 
+static int get_titleheight(void)
+{
+    return rb->font_get(FONT_UI)->height;
+}
+
 static void draw_title(void)
 {
-    const char *str = NULL;
+    const char *base;
     if(titlebar)
-        str = titlebar;
+        base = titlebar;
     else
-        str = midend_which_game(me)->name;
+        base = midend_which_game(me)->name;
+
+    char str[128];
+    rb->snprintf(str, sizeof(str), "%s%s", base, zoom_enabled ? (view_mode ? " (viewing)" : " (interaction)") : "");
 
     /* quick hack */
-    bool orig_clipped = clipped;
-    if(orig_clipped)
-        rb_unclip(NULL);
+    bool orig_clipped;
+    if(!zoom_enabled)
+    {
+        orig_clipped = clipped;
+        if(orig_clipped)
+            rb_unclip(NULL);
+    }
 
-    int h;
+    int w, h;
     cur_font = FONT_UI;
     rb->lcd_setfont(cur_font);
-    rb->lcd_getstringsize(str, NULL, &h);
+    rb->lcd_getstringsize(str, &w, &h);
 
     rb->lcd_set_foreground(BG_COLOR);
-    rb->lcd_fillrect(0, LCD_HEIGHT - h, LCD_WIDTH, h);
+    rb->lcd_fillrect(0, LCD_HEIGHT - h, w, h);
 
     rb->lcd_set_foreground(LCD_BLACK);
     rb->lcd_putsxy(0, LCD_HEIGHT - h, str);
-    rb->lcd_update_rect(0, LCD_HEIGHT - h, LCD_WIDTH, h);
 
-    if(orig_clipped)
-        rb_clip(NULL, clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height);
+    if(!zoom_enabled)
+    {
+        if(orig_clipped)
+            rb_clip(NULL, clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height);
+    }
 }
 
 static char *rb_text_fallback(void *handle, const char *const *strings,
@@ -1325,6 +1340,236 @@ const drawing_api rb_drawing = {
     rb_text_fallback,
     NULL,
 };
+
+static bool want_redraw = true;
+static bool accept_input = true;
+
+/* set do_pausemenu to false to just return -1 on BTN_PAUSE and do
+ * nothing else. */
+static int process_input(int tmo, bool do_pausemenu)
+{
+    LOGF("process_input start");
+    LOGF("------------------");
+    int state = 0;
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(false); /* about to block for button input */
+#endif
+
+    int button = rb->button_get_w_tmo(tmo);
+
+    /* weird stuff */
+    exit_on_usb(button);
+
+    /* these games require a second input on long-press */
+    if(accept_input && (button == (BTN_FIRE | BUTTON_REPEAT)) &&
+       (strcmp("Mines", midend_which_game(me)->name)   != 0 ||
+        strcmp("Magnets", midend_which_game(me)->name) != 0))
+    {
+        accept_input = false;
+        return ' ';
+    }
+
+    button = rb->button_status();
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    rb->cpu_boost(true);
+#endif
+
+    if(button == BTN_PAUSE)
+    {
+        if(do_pausemenu)
+        {
+            want_redraw = false;
+            /* quick hack to preserve the clipping state */
+            bool orig_clipped = clipped;
+            if(orig_clipped)
+                rb_unclip(NULL);
+
+            int rc = pause_menu();
+
+            if(orig_clipped)
+                rb_clip(NULL, clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height);
+
+            last_keystate = 0;
+            accept_input = true;
+
+            return rc;
+        }
+        else
+            return -1;
+    }
+
+    /* these games require, for one reason or another, that events
+     * fire upon buttons being released rather than when they are
+     * pressed */
+    if(strcmp("Inertia", midend_which_game(me)->name) == 0 ||
+       strcmp("Mines", midend_which_game(me)->name)   == 0 ||
+       strcmp("Magnets", midend_which_game(me)->name) == 0 ||
+       strcmp("Map", midend_which_game(me)->name)     == 0)
+    {
+        LOGF("received button 0x%08x", button);
+
+        unsigned released = ~button & last_keystate;
+
+        last_keystate = button;
+
+        if(!button)
+        {
+            if(!accept_input)
+            {
+                LOGF("ignoring, all keys released but not accepting input before, can accept input later");
+                accept_input = true;
+                return 0;
+            }
+        }
+
+        if(!released || !accept_input)
+        {
+            LOGF("released keys detected: 0x%08x", released);
+            LOGF("ignoring, either no keys released or not accepting input");
+            return 0;
+        }
+
+        if(button)
+        {
+            LOGF("ignoring input from now until all released");
+            accept_input = false;
+        }
+
+        button |= released;
+        LOGF("accepting event 0x%08x", button);
+    }
+    /* default is to ignore repeats except for untangle */
+    else if(strcmp("Untangle", midend_which_game(me)->name) != 0)
+    {
+        /* start accepting input again after a release */
+        if(!button)
+        {
+            accept_input = true;
+            return 0;
+        }
+        /* ignore repeats */
+        /* Untangle gets special treatment */
+        if(!accept_input)
+            return 0;
+        accept_input = false;
+    }
+
+    switch(button)
+    {
+    case BTN_UP:
+        state = CURSOR_UP;
+        break;
+    case BTN_DOWN:
+        state = CURSOR_DOWN;
+        break;
+    case BTN_LEFT:
+        state = CURSOR_LEFT;
+        break;
+    case BTN_RIGHT:
+        state = CURSOR_RIGHT;
+        break;
+
+        /* handle diagonals (mainly for Inertia) */
+    case BTN_DOWN | BTN_LEFT:
+#ifdef BTN_DOWN_LEFT
+    case BTN_DOWN_LEFT:
+#endif
+        state = '1' | MOD_NUM_KEYPAD;
+        break;
+    case BTN_DOWN | BTN_RIGHT:
+#ifdef BTN_DOWN_RIGHT
+    case BTN_DOWN_RIGHT:
+#endif
+        state = '3' | MOD_NUM_KEYPAD;
+        break;
+    case BTN_UP | BTN_LEFT:
+#ifdef BTN_UP_LEFT
+    case BTN_UP_LEFT:
+#endif
+        state = '7' | MOD_NUM_KEYPAD;
+        break;
+    case BTN_UP | BTN_RIGHT:
+#ifdef BTN_UP_RIGHT
+    case BTN_UP_RIGHT:
+#endif
+        state = '9' | MOD_NUM_KEYPAD;
+        break;
+
+    case BTN_FIRE:
+        if(!strcmp("Fifteen", midend_which_game(me)->name))
+            state = 'h'; /* hint */
+        else
+            state = CURSOR_SELECT;
+        break;
+
+    default:
+        break;
+    }
+
+    if(settings.shortcuts)
+    {
+        static bool shortcuts_ok = true;
+        switch(button)
+        {
+        case BTN_LEFT | BTN_FIRE:
+            if(shortcuts_ok)
+                midend_process_key(me, 0, 0, 'u');
+            shortcuts_ok = false;
+            break;
+        case BTN_RIGHT | BTN_FIRE:
+            if(shortcuts_ok)
+                midend_process_key(me, 0, 0, 'r');
+            shortcuts_ok = false;
+            break;
+        case 0:
+            shortcuts_ok = true;
+            break;
+        default:
+            break;
+        }
+    }
+
+    LOGF("process_input done");
+    LOGF("------------------");
+    return state;
+}
+
+static long last_tstamp;
+
+static void timer_cb(void)
+{
+#if LCD_DEPTH != 24
+    if(settings.timerflash)
+    {
+        static bool what = false;
+        what = !what;
+        if(what)
+            rb->lcd_framebuffer[0] = LCD_BLACK;
+        else
+            rb->lcd_framebuffer[0] = LCD_WHITE;
+        rb->lcd_update();
+    }
+#endif
+
+    LOGF("timer callback");
+    midend_timer(me, ((float)(*rb->current_tick - last_tstamp) / (float)HZ) / settings.slowmo_factor);
+    last_tstamp = *rb->current_tick;
+}
+
+static volatile bool timer_on = false;
+
+void activate_timer(frontend *fe)
+{
+    last_tstamp = *rb->current_tick;
+    timer_on = true;
+}
+
+void deactivate_timer(frontend *fe)
+{
+    timer_on = false;
+}
 
 /* render to a virtual framebuffer and let the user pan (but not make any moves) */
 static void zoom(void)
@@ -1356,54 +1601,106 @@ static void zoom(void)
 
     zoom_enabled = true;
 
-    /* draws go to the enlarged framebuffer */
+    /* draws go to the zoom framebuffer */
     midend_force_redraw(me);
 
     int x = 0, y = 0;
 
     rb->lcd_bitmap_part(zoom_fb, x, y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
                         0, 0, LCD_WIDTH, LCD_HEIGHT);
+    draw_title();
     rb->lcd_update();
+
+    /* Here's how this works: pressing select (or the target's
+     * equivalent, it's whatever BTN_FIRE is) while in viewing mode
+     * will toggle the mode to interaction mode. In interaction mode,
+     * the buttons will behave as normal and be sent to the puzzle,
+     * except for the pause/quit (BTN_PAUSE) button, which will return
+     * to view mode. Finally, when in view mode, pause/quit will
+     * return to the pause menu. */
+
+    view_mode = true;
 
     /* pan around the image */
     while(1)
     {
-        int button = rb->button_get(true);
-        switch(button)
+        if(view_mode)
         {
-        case BTN_UP:
-            y -= PAN_Y; /* clamped later */
-            break;
-        case BTN_DOWN:
-            y += PAN_Y; /* clamped later */
-            break;
-        case BTN_LEFT:
-            x -= PAN_X; /* clamped later */
-            break;
-        case BTN_RIGHT:
-            x += PAN_X; /* clamped later */
-            break;
-        case BTN_PAUSE:
-            zoom_enabled = false;
-            sfree(zoom_fb);
-            fix_size();
-            return;
-        default:
-            break;
+            int button = rb->button_get_w_tmo(timer_on ? TIMER_INTERVAL : -1);
+            switch(button)
+            {
+            case BTN_UP:
+                y -= PAN_Y; /* clamped later */
+                break;
+            case BTN_DOWN:
+                y += PAN_Y; /* clamped later */
+                break;
+            case BTN_LEFT:
+                x -= PAN_X; /* clamped later */
+                break;
+            case BTN_RIGHT:
+                x += PAN_X; /* clamped later */
+                break;
+            case BTN_PAUSE:
+                zoom_enabled = false;
+                sfree(zoom_fb);
+                fix_size();
+                return;
+            case BTN_FIRE:
+                view_mode = false;
+                continue;
+            default:
+                break;
+            }
+
+            if(y < 0)
+                y = 0;
+            if(x < 0)
+                x = 0;
+
+            if(y + LCD_HEIGHT >= zoom_h)
+                y = zoom_h - LCD_HEIGHT;
+            if(x + LCD_WIDTH >= zoom_w)
+                x = zoom_w - LCD_WIDTH;
+
+            if(timer_on)
+                timer_cb();
+
+            /* goes to zoom_fb */
+            midend_redraw(me);
+
+            rb->lcd_bitmap_part(zoom_fb, x, y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
+                                0, 0, LCD_WIDTH, LCD_HEIGHT);
+            draw_title();
+            rb->lcd_update();
+            rb->yield();
         }
+        else
+        {
+            /* basically a copy-pasta'd main loop */
+            int button = process_input(timer_on ? TIMER_INTERVAL : -1, false);
 
-        if(y < 0)
-            y = 0;
-        if(x < 0)
-            x = 0;
-        if(y + LCD_HEIGHT >= zoom_h)
-            y = zoom_h - LCD_HEIGHT;
-        if(x + LCD_WIDTH >= zoom_w)
-            x = zoom_w - LCD_WIDTH;
+            if(button < 0)
+            {
+                view_mode = true;
+                continue;
+            }
 
-        rb->lcd_bitmap_part(zoom_fb, x, y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
-                            0, 0, LCD_WIDTH, LCD_HEIGHT);
-        rb->lcd_update();
+            if(button)
+                midend_process_key(me, 0, 0, button);
+
+            if(timer_on)
+                timer_cb();
+
+            if(want_redraw)
+                midend_redraw(me);
+
+            rb->lcd_bitmap_part(zoom_fb, x, y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
+                                0, 0, LCD_WIDTH, LCD_HEIGHT);
+            draw_title();
+            rb->lcd_update();
+            rb->yield();
+        }
     }
 }
 
@@ -2163,229 +2460,6 @@ static int pause_menu(void)
     return 0;
 }
 
-static bool want_redraw = true;
-static bool accept_input = true;
-
-static int process_input(int tmo)
-{
-    LOGF("process_input start");
-    LOGF("------------------");
-    int state = 0;
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(false); /* about to block for button input */
-#endif
-
-    int button = rb->button_get_w_tmo(tmo);
-
-    /* weird stuff */
-    exit_on_usb(button);
-
-    /* these games require a second input on long-press */
-    if(accept_input && (button == (BTN_FIRE | BUTTON_REPEAT)) &&
-       (strcmp("Mines", midend_which_game(me)->name)   != 0 ||
-        strcmp("Magnets", midend_which_game(me)->name) != 0))
-    {
-        accept_input = false;
-        return ' ';
-    }
-
-    button = rb->button_status();
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    rb->cpu_boost(true);
-#endif
-
-    if(button == BTN_PAUSE)
-    {
-        want_redraw = false;
-        /* quick hack to preserve the clipping state */
-        bool orig_clipped = clipped;
-        if(orig_clipped)
-            rb_unclip(NULL);
-
-        int rc = pause_menu();
-
-        if(orig_clipped)
-            rb_clip(NULL, clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height);
-
-        last_keystate = 0;
-        accept_input = true;
-
-        return rc;
-    }
-
-    /* these games require, for one reason or another, that events
-     * fire upon buttons being released rather than when they are
-     * pressed */
-    if(strcmp("Inertia", midend_which_game(me)->name) == 0 ||
-       strcmp("Mines", midend_which_game(me)->name)   == 0 ||
-       strcmp("Magnets", midend_which_game(me)->name) == 0 ||
-       strcmp("Map", midend_which_game(me)->name)     == 0)
-    {
-        LOGF("received button 0x%08x", button);
-
-        unsigned released = ~button & last_keystate;
-
-        last_keystate = button;
-
-        if(!button)
-        {
-            if(!accept_input)
-            {
-                LOGF("ignoring, all keys released but not accepting input before, can accept input later");
-                accept_input = true;
-                return 0;
-            }
-        }
-
-        if(!released || !accept_input)
-        {
-            LOGF("released keys detected: 0x%08x", released);
-            LOGF("ignoring, either no keys released or not accepting input");
-            return 0;
-        }
-
-        if(button)
-        {
-            LOGF("ignoring input from now until all released");
-            accept_input = false;
-        }
-
-        button |= released;
-        LOGF("accepting event 0x%08x", button);
-    }
-    /* default is to ignore repeats except for untangle */
-    else if(strcmp("Untangle", midend_which_game(me)->name) != 0)
-    {
-        /* start accepting input again after a release */
-        if(!button)
-        {
-            accept_input = true;
-            return 0;
-        }
-        /* ignore repeats */
-        /* Untangle gets special treatment */
-        if(!accept_input)
-            return 0;
-        accept_input = false;
-    }
-
-    switch(button)
-    {
-    case BTN_UP:
-        state = CURSOR_UP;
-        break;
-    case BTN_DOWN:
-        state = CURSOR_DOWN;
-        break;
-    case BTN_LEFT:
-        state = CURSOR_LEFT;
-        break;
-    case BTN_RIGHT:
-        state = CURSOR_RIGHT;
-        break;
-
-        /* handle diagonals (mainly for Inertia) */
-    case BTN_DOWN | BTN_LEFT:
-#ifdef BTN_DOWN_LEFT
-    case BTN_DOWN_LEFT:
-#endif
-        state = '1' | MOD_NUM_KEYPAD;
-        break;
-    case BTN_DOWN | BTN_RIGHT:
-#ifdef BTN_DOWN_RIGHT
-    case BTN_DOWN_RIGHT:
-#endif
-        state = '3' | MOD_NUM_KEYPAD;
-        break;
-    case BTN_UP | BTN_LEFT:
-#ifdef BTN_UP_LEFT
-    case BTN_UP_LEFT:
-#endif
-        state = '7' | MOD_NUM_KEYPAD;
-        break;
-    case BTN_UP | BTN_RIGHT:
-#ifdef BTN_UP_RIGHT
-    case BTN_UP_RIGHT:
-#endif
-        state = '9' | MOD_NUM_KEYPAD;
-        break;
-
-    case BTN_FIRE:
-        if(!strcmp("Fifteen", midend_which_game(me)->name))
-            state = 'h'; /* hint */
-        else
-            state = CURSOR_SELECT;
-        break;
-
-    default:
-        break;
-    }
-
-    if(settings.shortcuts)
-    {
-        static bool shortcuts_ok = true;
-        switch(button)
-        {
-        case BTN_LEFT | BTN_FIRE:
-            if(shortcuts_ok)
-                midend_process_key(me, 0, 0, 'u');
-            shortcuts_ok = false;
-            break;
-        case BTN_RIGHT | BTN_FIRE:
-            if(shortcuts_ok)
-                midend_process_key(me, 0, 0, 'r');
-            shortcuts_ok = false;
-            break;
-        case 0:
-            shortcuts_ok = true;
-            break;
-        default:
-            break;
-        }
-    }
-
-    LOGF("process_input done");
-    LOGF("------------------");
-    return state;
-}
-
-static long last_tstamp;
-
-static void timer_cb(void)
-{
-#if LCD_DEPTH != 24
-    if(settings.timerflash)
-    {
-        static bool what = false;
-        what = !what;
-        if(what)
-            rb->lcd_framebuffer[0] = LCD_BLACK;
-        else
-            rb->lcd_framebuffer[0] = LCD_WHITE;
-        rb->lcd_update();
-    }
-#endif
-
-    LOGF("timer callback");
-    midend_timer(me, ((float)(*rb->current_tick - last_tstamp) / (float)HZ) / settings.slowmo_factor);
-    last_tstamp = *rb->current_tick;
-}
-
-static volatile bool timer_on = false;
-
-void activate_timer(frontend *fe)
-{
-    last_tstamp = *rb->current_tick;
-    timer_on = true;
-}
-
-void deactivate_timer(frontend *fe)
-{
-    timer_on = false;
-}
-
 /* points to pluginbuf */
 char *giant_buffer = NULL;
 static size_t giant_buffer_len = 0; /* set on start */
@@ -2795,6 +2869,7 @@ enum plugin_status plugin_start(const void *param)
 
     bool quit = false;
     int sel = 0;
+
     while(!quit)
     {
         switch(rb->do_menu(&menu, &sel, NULL, false))
@@ -2866,9 +2941,11 @@ enum plugin_status plugin_start(const void *param)
         {
             want_redraw = true;
 
+            int theight = get_titleheight();
             draw_title();
+            rb->lcd_update_rect(0, LCD_HEIGHT - theight, LCD_WIDTH, theight);
 
-            int button = process_input(timer_on ? TIMER_INTERVAL : -1);
+            int button = process_input(timer_on ? TIMER_INTERVAL : -1, true);
 
             if(button < 0)
             {
@@ -2881,34 +2958,38 @@ enum plugin_status plugin_start(const void *param)
                     titlebar = NULL;
                 }
 
-                if(button == -1)
+                switch(button)
                 {
+                case -1:
                     /* new game */
                     midend_free(me);
                     break;
-                }
-                else if(button == -2)
-                {
+                case -2:
                     /* quit without saving */
                     midend_free(me);
                     sfree(colors);
                     exit(PLUGIN_OK);
-                }
-                else if(button == -3)
-                {
+                case -3:
                     /* save and quit */
                     save_game();
                     midend_free(me);
                     sfree(colors);
                     exit(PLUGIN_OK);
+                default:
+                    break;
                 }
             }
 
             if(button)
                 midend_process_key(me, 0, 0, button);
 
+            draw_title(); /* will draw to fb */
+
             if(want_redraw)
                 midend_redraw(me);
+
+            /* push title to screen as well */
+            rb->lcd_update_rect(0, LCD_HEIGHT - theight, LCD_WIDTH, theight);
 
             if(timer_on)
                 timer_cb();
