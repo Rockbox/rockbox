@@ -152,7 +152,7 @@ enum nwz_nvp_node_t
 /* Invalid NVP index */
 #define NWZ_NVP_INVALID     -1 /* Non-existent entry */
 /* Number of models */
-#define NWZ_MODEL_COUNT     190
+#define NWZ_MODEL_COUNT     191
 /* Number of series */
 #define NWZ_SERIES_COUNT    38
 
