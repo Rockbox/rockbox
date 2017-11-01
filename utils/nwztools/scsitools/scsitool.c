@@ -964,7 +964,7 @@ static void usage(void)
     printf("Usage: scsitool [options] <dev> <command> [arguments]\n");
     printf("Options:\n");
     printf("  -o <prefix>          Set output prefix\n");
-    printf("  -?/--help            Display this message\n");
+    printf("  -h/--help            Display this message\n");
     printf("  -d/--debug           Display debug messages\n");
     printf("  -c/--no-color        Disable color output\n");
     printf("  -s/--series <name>   Force series (disable auto-detection, use '?' for the list)\n");
@@ -986,13 +986,22 @@ void help_us(bool unsupported, unsigned long model_id)
     get_dhp(0, NULL);
 }
 
+static const char *get_model_name(uint32_t model_id)
+{
+    int index = -1;
+    for(int i = 0; i < NWZ_MODEL_COUNT; i++)
+        if(nwz_model[i].mid == model_id)
+            index = i;
+    return index == -1 ? "Unknown" : nwz_model[index].name;
+}
+
 int main(int argc, char **argv)
 {
     while(1)
     {
         static struct option long_options[] =
         {
-            {"help", no_argument, 0, '?'},
+            {"help", no_argument, 0, 'h'},
             {"debug", no_argument, 0, 'd'},
             {"no-color", no_argument, 0, 'c'},
             {"series", required_argument, 0, 's'},
@@ -1012,7 +1021,7 @@ int main(int argc, char **argv)
             case 'd':
                 g_debug = true;
                 break;
-            case '?':
+            case 'h':
                 usage();
                 break;
             case 'o':
@@ -1031,7 +1040,16 @@ int main(int argc, char **argv)
     {
         cprintf(OFF, "Series list:\n");
         for(int i = 0; i < NWZ_SERIES_COUNT; i++)
-            printf("  %-10s %s\n", nwz_series[i].codename, nwz_series[i].name);
+        {
+            printf("  %-10s %s (", nwz_series[i].codename, nwz_series[i].name);
+            for(int j = 0; j < nwz_series[i].mid_count; j++)
+            {
+                if(j != 0)
+                    printf(", ");
+                printf("%s", get_model_name(nwz_series[i].mid[j]));
+            }
+            printf(")\n");
+        }
         return 0;
     }
 
