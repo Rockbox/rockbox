@@ -1,0 +1,166 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ *
+ * Copyright (C) 2017 Amaury Pouly
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include "stdint.h"
+#include "stdio.h"
+#include "string.h"
+#include "kernel.h"
+#include "rbendian.h"
+
+#include "nwz_tuner.h"
+#include "si4700.h"
+#include "power.h"
+
+static int radio_fd = -1;
+
+bool tuner_power(bool status)
+{
+    if(status != tuner_powered())
+    {
+        if(status)
+        {
+            /* check that the si470x module is loaded, otherwise give up now */
+            if(!nwz_is_kernel_module_loaded("icx_si470x_radio_tuner"))
+                return false;
+            /* the radio may not exists, in this case we have to create the node */
+            struct stat st;
+            if(stat(NWZ_TUNER_DEV, &st) == -1 && errno == ENOENT)
+            {
+                /* try to create the node */
+                mknod(NWZ_TUNER_DEV, 0x21FF, 20800);
+            }
+            radio_fd = open(NWZ_TUNER_DEV, 0);
+            if(radio_fd == -1)
+                return false;
+        }
+        else
+        {
+            close(radio_fd);
+            radio_fd = -1;
+        }
+    }
+
+    return tuner_powered();
+}
+
+bool tuner_powered(void)
+{
+    return radio_fd != -1;
+}
+
+/* one can adjust the following depending on the tuner, for now it is calibrated for the si470x
+ * which is crazy, because it starts reading at register 0xA and writing at 0x2. We need to
+ * "emulate" this behavior... Note that Si470x transmits in big-endian */
+#define READ_START_REG  0xA
+#define WRITE_START_REG 0x2
+#define REG_COUNT       16
+#define REG_SIZE        2
+#define REG_TYPE        uint16_t
+#define REG_SWAP        swap16
+
+int fmradio_i2c_write(unsigned char address, unsigned char* buf, int count)
+{
+    (void)address;
+    struct nwz_tuner_ioctl_t req;
+    memset(&req, 0, sizeof(req)); // just to avoid garbage in
+    for(int i = 0; i < count / REG_SIZE; i++)
+    {
+        req.put.regno = (WRITE_START_REG + i) % REG_COUNT;
+        req.put.val = REG_SWAP(*(REG_TYPE *)&buf[i * REG_SIZE]);
+        int ret = ioctl(radio_fd, NWZ_TUNER_PUT_REG, &req);
+        if(ret != 0)
+            return ret;
+    }
+    return 0;
+}
+
+int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
+{
+    (void)address;
+    struct nwz_tuner_ioctl_t req;
+    memset(&req, 0, sizeof(req)); // just to avoid garbage in
+    int ret = ioctl(radio_fd, NWZ_TUNER_GET_REG_ALL, &req);
+    if(ret != 0)
+        return ret;
+    for(int i = 0; i < count / REG_SIZE; i++)
+        *(REG_TYPE *)&buf[i * REG_SIZE] = REG_SWAP(req.regs[(READ_START_REG + i) % REG_COUNT]);
+    return 0;
+}
+
+#ifdef HAVE_RDS_CAP
+
+/* Register we are going to poll */
+#define STATUSRSSI  0xA
+#define STATUSRSSI_RDSR     (0x1 << 15)
+
+/* Low-level RDS Support */
+static struct event_queue rds_queue;
+static uint32_t rds_stack[DEFAULT_STACK_SIZE / sizeof(uint32_t)];
+
+enum {
+    Q_POWERUP,
+};
+
+static void NORETURN_ATTR rds_thread(void)
+{
+    /* start up frozen */
+    int timeout = TIMEOUT_BLOCK;
+    struct queue_event ev;
+    bool rds_rdy = false;
+
+    while (true) {
+        queue_wait_w_tmo(&rds_queue, &ev, timeout);
+        switch (ev.id) {
+            case Q_POWERUP:
+                /* power up: timeout after 1 tick, else block indefinitely */
+                timeout = ev.data ? 1 : TIMEOUT_BLOCK;
+                break;
+            case SYS_TIMEOUT:;
+                /* Captures RDS data and processes it */
+                bool rdsr = si4709_read_reg(STATUSRSSI) & STATUSRSSI_RDSR;
+                if (rdsr != rds_rdy) {
+                    rds_rdy = rdsr;
+                    if (rdsr) {
+                        si4700_rds_process();
+                    }
+                }
+                break;
+        }
+    }
+}
+
+/* true after full radio power up, and false before powering down */
+void si4700_rds_powerup(bool on)
+{
+    queue_post(&rds_queue, Q_POWERUP, on);
+}
+
+/* One-time RDS init at startup */
+void si4700_rds_init(void)
+{
+    queue_init(&rds_queue, false);
+    create_thread(rds_thread, rds_stack, sizeof(rds_stack), 0, "rds"
+        IF_PRIO(, PRIORITY_PLAYBACK) IF_COP(, CPU));
+}
+#endif /* HAVE_RDS_CAP */
