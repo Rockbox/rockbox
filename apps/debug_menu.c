@@ -71,14 +71,12 @@
 #if (CONFIG_STORAGE & STORAGE_ATA)
 #include "ata.h"
 #endif
-#if CONFIG_TUNER
-#include "tuner.h"
-#include "radio.h"
-#endif
 #endif /* CONFIG_PLATFORM & PLATFORM_NATIVE */
 #include "power.h"
 
-#if (defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)) && defined(CONFIG_TUNER)
+#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) \
+        || defined(SONY_NWZ_LINUX)) \
+    && defined(CONFIG_TUNER)
 #include "tuner.h"
 #include "radio.h"
 #endif

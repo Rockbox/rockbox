@@ -62,8 +62,12 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
+#define CONFIG_TUNER SI4700
+
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
+
+#define INPUT_SRC_CAPS SRC_CAP_FMRADIO
 
 /* The A15 and A25 support more sampling rates, in fact they support crazy high bit-rates such
  * as 176.4 and 192 kHz but Rockbox does not support those */

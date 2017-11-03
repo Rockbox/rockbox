@@ -106,6 +106,8 @@ target/hosted/sonynwz/system-nwz.c
 target/hosted/sonynwz/powermgmt-nwz.c
 target/hosted/sonynwz/power-nwz.c
 target/hosted/sonynwz/adc-nwz.c
+target/hosted/sonynwz/radio-nwz.c
+target/hosted/sonynwz/audio-nwz.c
 target/hosted/sonynwz/debug-nwz.c
 target/hosted/sonynwz/nvp-nwz.c
 target/hosted/sonynwz/nwz-db.c
@@ -361,7 +363,7 @@ drivers/rtc/rtc_imx233.c
 /* Tuner */
 #if CONFIG_TUNER
 tuner.c
-#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)  || defined(SAMSUNG_YPR1))
+#if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0)  || defined(SAMSUNG_YPR1) || defined(SONY_NWZ_LINUX))
 #if (CONFIG_TUNER & LV24020LP)
 drivers/tuner/lv24020lp.c
 #endif /* (CONFIG_TUNER & LV24020LP) */
