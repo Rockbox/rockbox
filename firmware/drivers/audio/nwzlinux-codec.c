@@ -300,6 +300,17 @@ void audiohw_enable_cuerev(bool en)
     alsa_controls_set_bool("CODEC Cue/Rev Switch", en);
 }
 
+void audiohw_set_playback_src(enum nwz_src_t src)
+{
+    switch(src)
+    {
+        case NWZ_RADIO: alsa_controls_set_enum("Playback Src Switch", "Fm"); break;
+        case NWZ_MIC: alsa_controls_set_enum("Playback Src Switch", "Mic"); break;
+        case NWZ_PLAYBACK:
+        default: alsa_controls_set_enum("Playback Src Switch", "Music"); break;
+    }
+}
+
 void audiohw_preinit(void)
 {
     alsa_controls_init();
@@ -312,8 +323,8 @@ void audiohw_preinit(void)
      * them by default */
     audiohw_enable_acoustic(false);
     audiohw_enable_cuerev(false);
-    /* not sure exactly what it means */
-    alsa_controls_set_enum("Playback Src Switch", "Music");
+    /* select playback source */
+    audiohw_set_playback_src(NWZ_PLAYBACK);
     /* use headphone output */
     alsa_controls_set_enum("Output Switch", "Headphone");
     /* unmute */
