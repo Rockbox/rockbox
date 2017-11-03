@@ -3861,7 +3861,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=e350"
     bootoutput="bootloader-nwze350.sony"
-    appextra="gui:recorder"
+    appextra="gui:recorder:radio"
     plugins=""
     swcodec="yes"
     toolset=$genericbitmaptools
@@ -3924,7 +3924,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=e450"
     bootoutput="bootloader-nwze450.sony"
-    appextra="gui:recorder"
+    appextra="gui:recorder:radio"
     plugins=""
     swcodec="yes"
     toolset=$genericbitmaptools
@@ -3947,7 +3947,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=e460"
     bootoutput="bootloader-nwze460.sony"
-    appextra="gui:recorder"
+    appextra="gui:recorder:radio"
     plugins="yes"
     swcodec="yes"
     toolset=$genericbitmaptools
@@ -3970,7 +3970,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=e470"
     bootoutput="bootloader-nwze470.sony"
-    appextra="gui:recorder"
+    appextra="gui:recorder:radio"
     plugins=""
     swcodec="yes"
     toolset=$genericbitmaptools
@@ -3993,7 +3993,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=e580"
     bootoutput="bootloader-nwze580.sony"
-    appextra="gui:recorder"
+    appextra="gui:recorder:radio"
     plugins=""
     swcodec="yes"
     toolset=$genericbitmaptools
@@ -4016,7 +4016,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=a10"
     bootoutput="bootloader-nwza10.sony"
-    appextra="gui:recorder"
+    appextra="gui:recorder:radio"
     plugins=""
     swcodec="yes"
     toolset=$genericbitmaptools
@@ -4039,7 +4039,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=a20"
     bootoutput="bootloader-nwa20.sony"
-    appextra="gui:recorder"
+    appextra="gui:recorder:radio"
     plugins=""
     swcodec="yes"
     toolset=$genericbitmaptools
@@ -4062,7 +4062,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=a860"
     bootoutput="bootloader-nwza860.sony"
-    appextra="gui:recorder"
+    appextra="gui:recorder:radio"
     plugins=""
     swcodec="yes"
     toolset=$genericbitmaptools
@@ -4085,7 +4085,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=s750"
     bootoutput="bootloader-nwzs750.sony"
-    appextra="gui:recorder"
+    appextra="gui:recorder:radio"
     plugins=""
     swcodec="yes"
     toolset=$genericbitmaptools
