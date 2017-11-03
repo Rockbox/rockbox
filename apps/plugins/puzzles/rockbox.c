@@ -1275,7 +1275,7 @@ static int get_titleheight(void)
     return rb->font_get(FONT_UI)->height;
 }
 
-static void draw_title(void)
+static void draw_title(bool clear_first)
 {
     const char *base;
     if(titlebar)
@@ -1301,8 +1301,9 @@ static void draw_title(void)
     rb->lcd_getstringsize(str, &w, &h);
 
     rb->lcd_set_foreground(BG_COLOR);
-    rb->lcd_fillrect(0, LCD_HEIGHT - h, w, h);
+    rb->lcd_fillrect(0, LCD_HEIGHT - h, clear_first ? LCD_WIDTH : w, h);
 
+    rb->lcd_set_drawmode(DRMODE_FG);
     rb->lcd_set_foreground(LCD_BLACK);
     rb->lcd_putsxy(0, LCD_HEIGHT - h, str);
 
@@ -1608,7 +1609,9 @@ static void zoom(void)
 
     rb->lcd_bitmap_part(zoom_fb, x, y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
                         0, 0, LCD_WIDTH, LCD_HEIGHT);
-    draw_title();
+
+    draw_title(false); /* false since we don't want to use more screen space than we need. */
+
     rb->lcd_update();
 
     /* Here's how this works: pressing select (or the target's
@@ -1671,7 +1674,7 @@ static void zoom(void)
 
             rb->lcd_bitmap_part(zoom_fb, x, y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
                                 0, 0, LCD_WIDTH, LCD_HEIGHT);
-            draw_title();
+            draw_title(false);
             rb->lcd_update();
             rb->yield();
         }
@@ -1697,44 +1700,14 @@ static void zoom(void)
 
             rb->lcd_bitmap_part(zoom_fb, x, y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
                                 0, 0, LCD_WIDTH, LCD_HEIGHT);
-            draw_title();
+            draw_title(false);
             rb->lcd_update();
             rb->yield();
         }
     }
 }
 
-void frontend_default_color(frontend *fe, float *out)
-{
-    *out++ = BG_R;
-    *out++ = BG_G;
-    *out++ = BG_B;
-}
-
-void fatal(const char *fmt, ...)
-{
-    va_list ap;
-
-    rb->splash(HZ, "FATAL");
-
-    va_start(ap, fmt);
-    char buf[80];
-    rb->vsnprintf(buf, 80, fmt, ap);
-    rb->splash(HZ * 2, buf);
-    va_end(ap);
-
-    exit(1);
-}
-
-void get_random_seed(void **randseed, int *randseedsize)
-{
-    *randseed = snew(long);
-    long seed = *rb->current_tick;
-    rb->memcpy(*randseed, &seed, sizeof(seed));
-    *randseedsize = sizeof(long);
-}
-
-const char *config_choices_formatter(int sel, void *data, char *buf, size_t len)
+static const char *config_choices_formatter(int sel, void *data, char *buf, size_t len)
 {
     /* we can't rely on being called in any particular order */
     char *list = dupstr(data);
@@ -2325,7 +2298,7 @@ static void clear_and_draw(void)
     rb->lcd_update();
 
     midend_force_redraw(me);
-    draw_title();
+    draw_title(true);
 }
 
 static void reset_drawing(void)
@@ -2942,7 +2915,7 @@ enum plugin_status plugin_start(const void *param)
             want_redraw = true;
 
             int theight = get_titleheight();
-            draw_title();
+            draw_title(true);
             rb->lcd_update_rect(0, LCD_HEIGHT - theight, LCD_WIDTH, theight);
 
             int button = process_input(timer_on ? TIMER_INTERVAL : -1, true);
@@ -2983,7 +2956,7 @@ enum plugin_status plugin_start(const void *param)
             if(button)
                 midend_process_key(me, 0, 0, button);
 
-            draw_title(); /* will draw to fb */
+            draw_title(true); /* will draw to fb */
 
             if(want_redraw)
                 midend_redraw(me);
