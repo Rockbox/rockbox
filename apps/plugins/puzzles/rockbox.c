@@ -21,6 +21,15 @@
 
 /* rockbox frontend for puzzles */
 
+/* This file contains the majority of the rockbox-specific code for
+ * the sgt-puzzles port. It implements a set of functions for the
+ * backend to call to actually run the games, as well as rockbox UI
+ * code (menus, input, etc). For a good overview of the rest of the
+ * puzzles code, see:
+ *
+ * <https://www.chiark.greenend.org.uk/~sgtatham/puzzles/devel/>.
+ */
+
 #include "plugin.h"
 
 #include "help.h"
@@ -44,6 +53,7 @@
 #define FONT_CACHING
 #endif
 
+/* background color (mimicking from the JS frontend) */
 #define BG_R .9f /* very light gray */
 #define BG_G .9f
 #define BG_B .9f
@@ -52,9 +62,23 @@
 #define ERROR_COLOR LCD_RGBPACK(255, 0, 0)
 
 #define MAX_FONTS (MAXUSERFONTS - 2)
-
 #define FONT_TABLE PLUGIN_GAMES_DATA_DIR "/.sgt-puzzles.fnttab"
 
+/* font bundle size range */
+#define BUNDLE_MIN 7
+#define BUNDLE_MAX 36
+#define BUNDLE_COUNT (BUNDLE_MAX - BUNDLE_MIN + 1)
+
+/* max length of C_STRING config vals */
+#define MAX_STRLEN 128
+
+/* try to increment a numeric config value up to this much */
+#define CHOOSER_MAX_INCR 2
+
+/* max font table line */
+#define MAX_LINE 128
+
+/* Sorry. */
 #define MURICA
 
 #ifdef MURICA
@@ -64,10 +88,25 @@
 #define midend_colors midend_colours
 #endif
 
+/* zoom stuff */
+#define ZOOM_FACTOR 3
 #define PAN_X (MIN(LCD_HEIGHT, LCD_WIDTH) / 4)
 #define PAN_Y (MIN(LCD_HEIGHT, LCD_WIDTH) / 4)
 
-#define ZOOM_FACTOR 3
+/* utility macros */
+#undef ABS
+#define ABS(a) ((a)<0?-(a):(a))
+#define SWAP(a, b, t) do { t = a; a = b; b = t; } while(0);
+#define fp_fpart(f, bits) ((f) & ((1 << (bits)) - 1))
+#define fp_rfpart(f, bits) ((1 << (bits)) - fp_fpart(f, bits))
+#define FRACBITS 16
+
+static void fix_size(void);
+static int pause_menu(void);
+static inline void plot(fb_data *fb, int w, int h,
+                        unsigned x, unsigned y, unsigned long a,
+                        unsigned long r1, unsigned long g1, unsigned long b1,
+                        unsigned cl, unsigned cr, unsigned cu, unsigned cd);
 
 static midend *me = NULL;
 static unsigned *colors = NULL;
@@ -81,28 +120,35 @@ static bool debug_mode = false;
 static int help_times = 0;
 #endif
 
-static void fix_size(void);
-static int pause_menu(void);
-
+/* clipping stuff */
 static struct viewport clip_rect;
 static bool clipped = false, zoom_enabled = false, view_mode = true;
 
-extern bool audiobuf_available;
+extern bool audiobuf_available; /* defined in rbmalloc.c */
 
-static fb_data *zoom_fb;
+static fb_data *zoom_fb; /* dynamically allocated */
 static int zoom_w, zoom_h, zoom_clipu, zoom_clipd, zoom_clipl, zoom_clipr;
 static int cur_font = FONT_UI;
 
+static bool need_draw_update = false;
+static int ud_l = 0, ud_u = 0, ud_r = LCD_WIDTH, ud_d = LCD_HEIGHT;
+
+static char *titlebar = NULL;
+
+static bool want_redraw = true, accept_input = true;
+
+/* last timer call */
+static long last_tstamp;
+static volatile bool timer_on = false;
+
+static bool load_success;
+
+/* debug settings */
+/* did I mention there's a secret debug menu? */
 static struct settings_t {
     int slowmo_factor;
     bool timerflash, clipoff, shortcuts, no_aa, polyanim;
 } settings;
-
-static inline void plot(fb_data *fb, int w, int h,
-                        unsigned x, unsigned y, unsigned long a,
-                        unsigned long r1, unsigned long g1, unsigned long b1,
-                        unsigned cl, unsigned cr, unsigned cu, unsigned cd);
-
 
 /* re-implementations of many rockbox primitives, adapted to draw into
  * a custom framebuffer. */
@@ -268,78 +314,7 @@ static void zoom_alpha_bitmap(const unsigned char *bits, int x, int y, int w, in
     }
 }
 
-/* clipping is implemented through viewports and offsetting
- * coordinates */
-static void rb_clip(void *handle, int x, int y, int w, int h)
-{
-    if(!zoom_enabled)
-    {
-        if(!settings.clipoff)
-        {
-            LOGF("rb_clip(%d %d %d %d)", x, y, w, h);
-            clip_rect.x = MAX(0, x);
-            clip_rect.y = MAX(0, y);
-            clip_rect.width  = MIN(LCD_WIDTH, w);
-            clip_rect.height = MIN(LCD_HEIGHT, h);
-            clip_rect.font = FONT_UI;
-            clip_rect.drawmode = DRMODE_SOLID;
-#if LCD_DEPTH > 1
-            clip_rect.fg_pattern = LCD_DEFAULT_FG;
-            clip_rect.bg_pattern = LCD_DEFAULT_BG;
-#endif
-            rb->lcd_set_viewport(&clip_rect);
-            clipped = true;
-        }
-    }
-    else
-    {
-        zoom_clipu = y;
-        zoom_clipd = y + h;
-        zoom_clipl = x;
-        zoom_clipr = x + w;
-    }
-}
-
-static void rb_unclip(void *handle)
-{
-    if(!zoom_enabled)
-    {
-        LOGF("rb_unclip");
-        rb->lcd_set_viewport(NULL);
-        clipped = false;
-    }
-    else
-    {
-        zoom_clipu = 0;
-        zoom_clipd = zoom_h;
-        zoom_clipl = 0;
-        zoom_clipr = zoom_w;
-    }
-}
-
-static void offset_coords(int *x, int *y)
-{
-    if(clipped)
-    {
-        *x -= clip_rect.x;
-        *y -= clip_rect.y;
-    }
-}
-
-static void rb_color(int n)
-{
-    if(n < 0)
-    {
-        fatal("bad color %d", n);
-        return;
-    }
-    rb->lcd_set_foreground(colors[n]);
-}
-
-/* font bundle size range */
-#define BUNDLE_MIN 7
-#define BUNDLE_MAX 36
-#define BUNDLE_COUNT (BUNDLE_MAX - BUNDLE_MIN + 1)
+/* font management */
 
 static struct bundled_font {
     int status; /* -3 = never tried loading, or unloaded, -2 = failed to load, >= -1: loaded successfully */
@@ -467,6 +442,76 @@ fallback:
     return;
 }
 
+/*** Drawing API ***/
+
+static void offset_coords(int *x, int *y)
+{
+    if(clipped)
+    {
+        *x -= clip_rect.x;
+        *y -= clip_rect.y;
+    }
+}
+
+static void rb_color(int n)
+{
+    if(n < 0)
+    {
+        fatal("bad color %d", n);
+        return;
+    }
+    rb->lcd_set_foreground(colors[n]);
+}
+
+/* clipping is implemented through viewports and offsetting
+ * coordinates */
+static void rb_clip(void *handle, int x, int y, int w, int h)
+{
+    if(!zoom_enabled)
+    {
+        if(!settings.clipoff)
+        {
+            LOGF("rb_clip(%d %d %d %d)", x, y, w, h);
+            clip_rect.x = MAX(0, x);
+            clip_rect.y = MAX(0, y);
+            clip_rect.width  = MIN(LCD_WIDTH, w);
+            clip_rect.height = MIN(LCD_HEIGHT, h);
+            clip_rect.font = FONT_UI;
+            clip_rect.drawmode = DRMODE_SOLID;
+#if LCD_DEPTH > 1
+            clip_rect.fg_pattern = LCD_DEFAULT_FG;
+            clip_rect.bg_pattern = LCD_DEFAULT_BG;
+#endif
+            rb->lcd_set_viewport(&clip_rect);
+            clipped = true;
+        }
+    }
+    else
+    {
+        zoom_clipu = y;
+        zoom_clipd = y + h;
+        zoom_clipl = x;
+        zoom_clipr = x + w;
+    }
+}
+
+static void rb_unclip(void *handle)
+{
+    if(!zoom_enabled)
+    {
+        LOGF("rb_unclip");
+        rb->lcd_set_viewport(NULL);
+        clipped = false;
+    }
+    else
+    {
+        zoom_clipu = 0;
+        zoom_clipd = zoom_h;
+        zoom_clipl = 0;
+        zoom_clipr = zoom_w;
+    }
+}
+
 static void rb_draw_text(void *handle, int x, int y, int fonttype,
                          int fontsize, int align, int color, const char *text)
 {
@@ -563,13 +608,6 @@ static void rb_draw_rect(void *handle, int x, int y, int w, int h, int color)
     }
 }
 
-#define SWAP(a, b, t) do { t = a; a = b; b = t; } while(0);
-
-#define fp_fpart(f, bits) ((f) & ((1 << (bits)) - 1))
-#define fp_rfpart(f, bits) ((1 << (bits)) - fp_fpart(f, bits))
-
-#define FRACBITS 16
-
 /* a goes from 0-255, with a = 255 being fully opaque and a = 0 transparent */
 static inline void plot(fb_data *fb, int w, int h,
                         unsigned x, unsigned y, unsigned long a,
@@ -608,9 +646,6 @@ static inline void plot(fb_data *fb, int w, int h,
     *ptr = (fb_data) {b, g, r};
 #endif
 }
-
-#undef ABS
-#define ABS(a) ((a)<0?-(a):(a))
 
 /* speed benchmark: 34392 lines/sec vs 112687 non-antialiased
  * lines/sec at full optimization on ipod6g */
@@ -902,6 +937,7 @@ static void zoom_filltriangle(int x1, int y1,
     }
 }
 
+/* Should probably refactor this */
 static void rb_draw_poly(void *handle, int *coords, int npoints,
                          int fillcolor, int outlinecolor)
 {
@@ -1207,10 +1243,6 @@ static void rb_blitter_load(void *handle, blitter *bl, int x, int y)
     }
 }
 
-static bool need_draw_update = false;
-
-static int ud_l = 0, ud_u = 0, ud_r = LCD_WIDTH, ud_d = LCD_HEIGHT;
-
 static void rb_draw_update(void *handle, int x, int y, int w, int h)
 {
     LOGF("rb_draw_update(%d, %d, %d, %d)", x, y, w, h);
@@ -1259,8 +1291,6 @@ static void rb_end_draw(void *handle)
         /* stubbed */
     }
 }
-
-static char *titlebar = NULL;
 
 static void rb_status_bar(void *handle, const char *text)
 {
@@ -1342,8 +1372,70 @@ const drawing_api rb_drawing = {
     NULL,
 };
 
-static bool want_redraw = true;
-static bool accept_input = true;
+/** functions exported to puzzles code **/
+
+void fatal(const char *fmt, ...)
+{
+    va_list ap;
+
+    rb->splash(HZ, "FATAL");
+
+    va_start(ap, fmt);
+    char buf[80];
+    rb->vsnprintf(buf, 80, fmt, ap);
+    rb->splash(HZ * 2, buf);
+    va_end(ap);
+
+    exit(1);
+}
+
+void get_random_seed(void **randseed, int *randseedsize)
+{
+    *randseed = snew(long);
+    long seed = *rb->current_tick;
+    rb->memcpy(*randseed, &seed, sizeof(seed));
+    *randseedsize = sizeof(long);
+}
+
+static void timer_cb(void)
+{
+#if LCD_DEPTH != 24
+    if(settings.timerflash)
+    {
+        static bool what = false;
+        what = !what;
+        if(what)
+            rb->lcd_framebuffer[0] = LCD_BLACK;
+        else
+            rb->lcd_framebuffer[0] = LCD_WHITE;
+        rb->lcd_update();
+    }
+#endif
+
+    LOGF("timer callback");
+    midend_timer(me, ((float)(*rb->current_tick - last_tstamp) / (float)HZ) / settings.slowmo_factor);
+    last_tstamp = *rb->current_tick;
+}
+
+void activate_timer(frontend *fe)
+{
+    last_tstamp = *rb->current_tick;
+    timer_on = true;
+}
+
+void deactivate_timer(frontend *fe)
+{
+    timer_on = false;
+}
+
+void frontend_default_color(frontend *fe, float *out)
+{
+    *out++ = BG_R;
+    *out++ = BG_G;
+    *out++ = BG_B;
+}
+
+/** frontend code -- mostly UI stuff **/
 
 /* set do_pausemenu to false to just return -1 on BTN_PAUSE and do
  * nothing else. */
@@ -1537,42 +1629,7 @@ static int process_input(int tmo, bool do_pausemenu)
     return state;
 }
 
-static long last_tstamp;
-
-static void timer_cb(void)
-{
-#if LCD_DEPTH != 24
-    if(settings.timerflash)
-    {
-        static bool what = false;
-        what = !what;
-        if(what)
-            rb->lcd_framebuffer[0] = LCD_BLACK;
-        else
-            rb->lcd_framebuffer[0] = LCD_WHITE;
-        rb->lcd_update();
-    }
-#endif
-
-    LOGF("timer callback");
-    midend_timer(me, ((float)(*rb->current_tick - last_tstamp) / (float)HZ) / settings.slowmo_factor);
-    last_tstamp = *rb->current_tick;
-}
-
-static volatile bool timer_on = false;
-
-void activate_timer(frontend *fe)
-{
-    last_tstamp = *rb->current_tick;
-    timer_on = true;
-}
-
-void deactivate_timer(frontend *fe)
-{
-    timer_on = false;
-}
-
-/* render to a virtual framebuffer and let the user pan (but not make any moves) */
+/* either pan around a zoomed-in image or play zoomed-in */
 static void zoom(void)
 {
     rb->splash(0, "Please wait...");
@@ -1773,9 +1830,6 @@ static bool is_integer(const char *str)
     return true;
 }
 
-/* max length of C_STRING config vals */
-#define MAX_STRLEN 128
-
 static void int_chooser(config_item *cfgs, int idx, int val)
 {
     config_item *cfg = cfgs + idx;
@@ -1819,9 +1873,6 @@ static void int_chooser(config_item *cfgs, int idx, int val)
         }
         if(d)
         {
-            /* we try to increment the value up to this much (mainly
-             * a workaround for Unruly): */
-#define CHOOSER_MAX_INCR 2
 
             const char *ret;
             for(int i = 0; i < CHOOSER_MAX_INCR; ++i)
@@ -2026,7 +2077,7 @@ done:
     return success;
 }
 
-const char *preset_formatter(int sel, void *data, char *buf, size_t len)
+static const char *preset_formatter(int sel, void *data, char *buf, size_t len)
 {
     struct preset_menu *menu = data;
     rb->snprintf(buf, len, "%s", menu->entries[sel].title);
@@ -2433,7 +2484,9 @@ static int pause_menu(void)
     return 0;
 }
 
-/* points to pluginbuf */
+/* points to pluginbuf, used by rbmalloc.c */
+/* useless side note: originally giant_buffer was a statically
+ * allocated giant array (4096KB IIRC), hence its name. */
 char *giant_buffer = NULL;
 static size_t giant_buffer_len = 0; /* set on start */
 
@@ -2527,8 +2580,6 @@ static void exit_handler(void)
     rb->cpu_boost(false);
 #endif
 }
-
-#define MAX_LINE 128
 
 #ifdef FONT_CACHING
 /* try loading the fonts indicated in the on-disk font table */
@@ -2741,8 +2792,6 @@ static void save_game(void)
 
     rb->lcd_update();
 }
-
-static bool load_success;
 
 static int mainmenu_cb(int action, const struct menu_item_ex *this_item)
 {
