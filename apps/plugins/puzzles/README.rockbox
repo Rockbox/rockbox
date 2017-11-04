@@ -1,24 +1,39 @@
+Introduction
+============
+
 This is the readme for the Rockbox port of Simon Tatham's Portable
 Puzzle Collection.
 
-Upstream version used is 7cae89fb4b22c305b3fd98b4e1be065ad527a9f7 from
-December 2016. It should be relatively trivial to update it to a newer
-version, and should probably be done periodically as changes are made.
+The upstream version used is subject to change, as it should be
+relatively trivial to update it to a newer version. Simply copying the
+upstream repo's contents into src/ and running genhelp.sh ought to do
+it (watch out for API changes, though!).
 
-Most of the upstream files are essentially untouched, apart from some
-minor adjustments to make it compile happily on Rockbox. Some games
-still don't work due to issues with their cursor-only control scheme
-(untangle being the big culprit here) but the ones that don't are
-commented out in SOURCES.games. I'll get around to fixing them
-eventually.
+Source structure
+================
 
-Building is done rather hackily, with a rule for every puzzle to be
-built... almost 40 at the time of writing. Mr. Someone ought to figure
-out how to do that with a wildcard or something.
+Most of the upstream files in src/ are essentially untouched, apart
+from some minor adjustments to make them compile and run happily on
+Rockbox. The majority of the rockbox-specific code is found in
+rockbox.c, with some minor stuff in rbwrappers.c and rbmalloc.c.
+
+Help feature
+============
+
+The Help feature is implemented by compiling each puzzle against a
+compressed version of each puzzle's section from the upstream
+documentation. These files are stored under help/, and are generated
+by genhelp.sh from the puzzles.but file in the source
+distribution. The compression is LZ4, implemented in lz4tiny.c (for
+decompression on target), and compress.c (for generation). genhelp.sh
+should be run whenever the documentation is chagned.
 
 Kudos to Simon (duh), and Frank, for telling me about it.
 
 Franklin Wei (__builtin)
+
+Changelog
+=========
 
 April 2017: Changes made to move upstream sources to a separate
 subdirectory, where they are completely unmodified from the
@@ -29,3 +44,5 @@ of dummy header files.
 
 August 2017: Every game that can be played with only the cursor keys
 is now functional.
+
+October 2017: Added zoom feature.
