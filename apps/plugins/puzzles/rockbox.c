@@ -1196,14 +1196,17 @@ static void rb_blitter_save(void *handle, blitter *bl, int x, int y)
     if(bl->bmp.data)
     {
         int w = bl->bmp.width, h = bl->bmp.height;
+        int screen_w = zoom_enabled ? zoom_w : LCD_WIDTH;
+
         trim_rect(&x, &y, &w, &h);
+
         fb_data *fb = zoom_enabled ? zoom_fb : rb->lcd_framebuffer;
         LOGF("rb_blitter_save(%d, %d, %d, %d)", x, y, w, h);
         for(int i = 0; i < h; ++i)
         {
             /* copy line-by-line */
             rb->memcpy(bl->bmp.data + sizeof(fb_data) * i * w,
-                       fb + (y + i) * LCD_WIDTH + x,
+                       fb + (y + i) * screen_w + x,
                        w * sizeof(fb_data));
         }
         bl->x = x;
@@ -1236,7 +1239,7 @@ static void rb_blitter_load(void *handle, blitter *bl, int x, int y)
     {
         for(int i = 0; i < h; ++i)
         {
-            rb->memcpy(zoom_fb + i * zoom_w + x,
+            rb->memcpy(zoom_fb + (y + i) * zoom_w + x,
                        bl->bmp.data + sizeof(fb_data) * i * w,
                        w * sizeof(fb_data));
         }
