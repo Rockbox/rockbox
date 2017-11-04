@@ -48,6 +48,14 @@ static void stc_rds_callback(int bank, int pin, intptr_t user)
     semaphore_release(&rds_sema);
 }
 
+static inline void enable_rds_irq(void)
+{
+    /* pin is set to low when a RDS packet has arrived, and stays low for a minimum of 5ms. Thus
+     * we should not trigger on low because otherwise we might trigger several times for the same
+     * message. Instead trigger on falling edge (we might miss the very first message). */
+    imx233_pinctrl_setup_irq(2, 27, true, false, false, &stc_rds_callback, 0);
+}
+
 /* Captures RDS data and processes it */
 static void NORETURN_ATTR rds_thread(void)
 {
@@ -57,7 +65,7 @@ static void NORETURN_ATTR rds_thread(void)
         si4700_rds_process();
 
         /* renable callback */
-        imx233_pinctrl_setup_irq(2, 27, true, true, false, &stc_rds_callback, 0);
+        enable_rds_irq();
     }
 }
 
@@ -69,8 +77,7 @@ void si4700_rds_powerup(bool on)
         imx233_pinctrl_acquire(2, 27, "tuner stc/rds");
         imx233_pinctrl_set_function(2, 27, PINCTRL_FUNCTION_GPIO);
         imx233_pinctrl_enable_gpio(2, 27, false);
-        /* pin is set to 0 when an RDS packet has arrived */
-        imx233_pinctrl_setup_irq(2, 27, true, true, false, &stc_rds_callback, 0);
+        enable_rds_irq();
     }
     else
     {
