@@ -164,6 +164,10 @@ static const struct zen_md5sum_t zen_sums[] =
 {
     /** Zen Mozaic */
     {
+        /* Version 1.06.01 */
+       MODEL_ZENMOZAIC, "8441402a8db9f92659b05f05c0abe8fb", "1.06.01"
+    },
+    {
         /* Version 1.06.01e */
         MODEL_ZENMOZAIC, "88a856f8273b2bc3fcacf1f067a44aa8", "1.06.01e"
     },
