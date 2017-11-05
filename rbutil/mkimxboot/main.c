@@ -284,6 +284,6 @@ int main(int argc, char *argv[])
     opt.force_version = force_version;
     opt.model = model;
     enum imx_error_t err = mkimxboot(infile, bootfile, outfile, opt);
-    printf("Result: %d\n", err);
+    printf("Result: %d (%s)\n", err, imx_error_to_string(err));
     return 0;
 }
