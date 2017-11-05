@@ -196,7 +196,13 @@ static const struct imx_md5sum_t imx_sums[] =
         /* Version 1.00.200 */
         MODEL_NWZE370, "75cfa51078261c547717e11a4676f1af", "1.00.200",
         { [VARIANT_DEFAULT] = {0, 16429056 } }
-    }
+    },
+    /** Creative ZEN FRESC */
+    {
+        /* Version 1.21.03e */
+        MODEL_ZEN, "c44af7a324b7a93b85ddd8879c645d6e", "1.21.03e",
+        { [VARIANT_DEFAULT] = {0, 674064 } }
+    },
 };
 
 static struct crypto_key_t zero_key =
@@ -205,8 +211,15 @@ static struct crypto_key_t zero_key =
     .u.key = {0}
 };
 
+static struct crypto_key_t zen_key =
+{
+    .method = CRYPTO_KEY,
+    .u.key = {0x01, 0x1F, 0x72, 0xBC, 0x2A, 0xC9, 0xF6, 0xDF, 0x0D, 0xB9, 0x63, 0x68, 0xD9, 0x7B, 0xEB, 0xB5},
+};
+
 static struct crypto_key_t *list_zero_key[] = { &zero_key, NULL };
-static struct crypto_key_t *list_all_keys[] = { &zero_key, NULL };
+static struct crypto_key_t *list_zen_key[] = { &zen_key, NULL };
+static struct crypto_key_t *list_all_keys[] = { &zero_key, &zen_key, NULL };
 
 static const struct imx_model_desc_t imx_models[] =
 {
@@ -223,6 +236,10 @@ static const struct imx_model_desc_t imx_models[] =
         "e370", 88, list_zero_key, 0, 0x40000000 },
     [MODEL_NWZE360] = {"NWZ-E360", dualboot_nwze360, sizeof(dualboot_nwze360),
         "e360", 89, list_zero_key, 0, 0x40000000 },
+    /* the following is mostly a fake model to produce a charge firmware, we don't support building
+     * actual bootloaders with that */
+    [MODEL_ZEN] = {"Zen (FRESC)", dualboot_zen, sizeof(dualboot_zen),
+        "zen", 90, list_zen_key, 0, 0x40000000 },
 };
 
 #define NR_IMX_SUMS     (sizeof(imx_sums) / sizeof(imx_sums[0]))
@@ -507,6 +524,9 @@ static enum imx_error_t patch_firmware(struct imx_option_t opt,
         case MODEL_ZENXFISTYLE:
             /* The ZEN X-Fi Style uses the standard ____, host, play sections, patch after first
              * call in ____ section. */
+            return patch_std_zero_host_play(1, opt, sb_file, boot_fw);
+        case MODEL_ZEN:
+            /* The ZEN recovery firmware only has section ___, patch after first call in ____ */
             return patch_std_zero_host_play(1, opt, sb_file, boot_fw);
         default:
             return IMX_DONT_KNOW_HOW_TO_PATCH;
