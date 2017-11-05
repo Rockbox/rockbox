@@ -106,6 +106,8 @@ enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
 enum imx_error_t compute_md5sum(const char *file, uint8_t file_md5sum[16]);
 /* Compute "soft" MD5 sum of a SB file */
 enum imx_error_t compute_soft_md5sum(const char *file, uint8_t soft_md5sum[16]);
+/* Translate error */
+const char *imx_error_to_string(enum imx_error_t err);
 
 #ifdef __cplusplus
 }
