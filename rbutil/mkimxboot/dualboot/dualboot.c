@@ -214,6 +214,11 @@ static int boot_decision(int context)
         return BOOT_OF;
     return BOOT_ROCK;
 }
+#elif defined(CREATIVE_ZEN)
+static int boot_decision(int context)
+{
+    return BOOT_ROCK;
+}
 #else
 #warning You should define a target specific boot decision function
 static int boot_decision(int context)

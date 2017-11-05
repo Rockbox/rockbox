@@ -6,3 +6,4 @@ extern unsigned char dualboot_zenxfi3[572];
 extern unsigned char dualboot_nwze370[896];
 extern unsigned char dualboot_nwze360[944];
 extern unsigned char dualboot_zenxfistyle[660];
+extern unsigned char dualboot_zen[508];
