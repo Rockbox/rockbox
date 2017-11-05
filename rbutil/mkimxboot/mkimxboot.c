@@ -233,6 +233,27 @@ static const struct imx_model_desc_t imx_models[] =
 #define MAGIC_NORMAL    0xcafebabe
 #define MAGIC_CHARGE    0x67726863 /* 'chrg' */
 
+const char *imx_error_to_string(enum imx_error_t err)
+{
+    switch(err)
+    {
+        case IMX_SUCCESS: return "success";
+        case IMX_ERROR: return "error";
+        case IMX_OPEN_ERROR: return "open error";
+        case IMX_READ_ERROR: return "read error";
+        case IMX_NO_MATCH: return "no match";
+        case IMX_BOOT_INVALID: return "invalid";
+        case IMX_BOOT_MISMATCH: return "mismatch";
+        case IMX_BOOT_CHECKSUM_ERROR: return "checksum error";
+        case IMX_DONT_KNOW_HOW_TO_PATCH: return "don't know how to patch";
+        case IMX_VARIANT_MISMATCH: return "variant mismatch";
+        case IMX_WRITE_ERROR: return "write error";
+        case IMX_FIRST_SB_ERROR: return "sb error";
+        case IMX_MODEL_MISMATCH: return "model mismatch";
+        default: return "unknown error";
+    }
+}
+
 static void add_key_list(struct crypto_key_t **list)
 {
     while(*list != NULL)
@@ -987,7 +1008,7 @@ static enum imx_error_t make_boot(struct sb_file_t *sb_file, const char *bootfil
     /* produce file */
     ret = patch_firmware(opt, sb_file, boot_fw);
     rb_fw_free(&boot_fw);
-    return IMX_SUCCESS;
+    return ret;
 }
 
 enum imx_error_t mkimxboot(const char *infile, const char *bootfile,
