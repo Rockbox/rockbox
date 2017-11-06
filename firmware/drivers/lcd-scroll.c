@@ -200,7 +200,7 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
 
     return ended;
 }
-
+#if (!defined(BOOTLOADER) && !defined(HAVE_REMOTE_LCD)) || defined(HAVE_LCD_CHARCELLS)
 static void LCDFN(scroll_worker)(void)
 {
     int index;
@@ -251,3 +251,4 @@ static void LCDFN(scroll_worker)(void)
             s->start_tick += si->delay + si->ticks;
     }
 }
+#endif /*!BOOTLOADER*/

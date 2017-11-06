@@ -185,10 +185,12 @@ static void scroll_thread(void)
     while (1)
     {
         sleep(lcd_scroll_info.ticks);
+#if !defined(BOOTLOADER) || defined(HAVE_LCD_CHARCELLS)
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
         if (lcd_active())
 #endif
             lcd_scroll_worker();
+#endif /*!BOOTLOADER\HAVE_LCD_CHARCELLS*/
     }
 }
 #endif /* HAVE_REMOTE_LCD */
