@@ -76,7 +76,7 @@
 
 #if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) \
         || defined(SONY_NWZ_LINUX)) \
-    && defined(CONFIG_TUNER)
+    && CONFIG_TUNER != 0
 #include "tuner.h"
 #include "radio.h"
 #endif
