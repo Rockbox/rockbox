@@ -33,9 +33,9 @@
  * [3] ffmpeg source code, libavcodec/adpcm.c
  */
 
-static struct pcm_format *fmt;
+static struct libpcm_pcm_format *fmt;
 
-static bool set_format(struct pcm_format *format)
+static bool set_format(struct libpcm_pcm_format *format)
 {
     fmt = format;
 
