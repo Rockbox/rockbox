@@ -218,7 +218,7 @@ int rolo_load(const char* filename)
     unsigned char* ramstart = (void*)&loadaddress;
     unsigned char* filebuf;
     size_t filebuf_size;
-    int errno, length;
+    int err, length;
 
     lcd_clear_display();
     lcd_puts(0, 0, "ROLO...");
@@ -238,15 +238,15 @@ int rolo_load(const char* filename)
     rolo_handle = core_alloc_maximum("rolo", &filebuf_size, NULL);
     filebuf = core_get_data(rolo_handle);
 
-    errno = LOAD_FIRMWARE(filebuf, filename, filebuf_size);
+    err = LOAD_FIRMWARE(filebuf, filename, filebuf_size);
 
-    if (errno <= 0)
+    if (err <= 0)
     {
-        rolo_error(loader_strerror(errno));
+        rolo_error(loader_strerror(err));
         return -1;
     }
     else
-        length = errno;
+        length = err;
 
 #if defined(CPU_PP) && NUM_CORES > 1
     lcd_puts(0, 2, "Waiting for coprocessor...");
