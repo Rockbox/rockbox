@@ -37,14 +37,14 @@ static int16_t dec_coeff[2][2];
 static uint16_t delta[2];
 static int16_t sample[2][2];
 
-static struct pcm_format *fmt;
+static struct libpcm_pcm_format *fmt;
 
 static const int16_t adaptation_table[] ICONST_ATTR = {
     230, 230, 230, 230, 307, 409, 512, 614,
     768, 614, 512, 409, 307, 230, 230, 230
 };
 
-static bool set_format(struct pcm_format *format)
+static bool set_format(struct libpcm_pcm_format *format)
 {
     fmt = format;
 
