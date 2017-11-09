@@ -30,6 +30,9 @@
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h"
 #include "fmradio_i2c.h" /* physical interface driver */
+#ifdef HAVE_RDS_CAP
+#include "rds.h"
+#endif
 
 #define SEEK_THRESHOLD 0x16
 
@@ -51,11 +54,16 @@
 #define SYSCONFIG6  0x9 /* suspected not to exists */
 #define READCHAN    0xA
 #define STATUSRSSI  0xB
+#define RDSA        0xC
+#define RDSB        0xD
+#define RDSC        0xE
+#define RDSD        0xF
 
 
 /* POWERCFG (0x2) */
 #define POWERCFG_DMUTE      (0x1 << 14)
 #define POWERCFG_MONO       (0x1 << 13)
+#define POWERCFG_RDS_EN     (0x3 <<  2)
 #define POWERCFG_SOFT_RESET (0x1 <<  1)
 #define POWERCFG_ENABLE     (0x1 <<  0)
 
@@ -91,6 +99,7 @@
 #define READCHAN_ST         (0x1 << 10)
 
 /* STATUSRSSI (0xB) */
+#define STATUSRSSI_RDSR     (0x1 << 15)
 #define STATUSRSSI_RSSI     (0x7F << 9)
     #define STATUSRSSI_RSSIr(x) (((x) & STATUSRSSI_RSSI) >> 9)
 #define STATUSRSSI_FM_TRUE  (0x1 << 8)
@@ -180,6 +189,9 @@ static void rda5802_sleep(int snooze)
     else {
         tuner_power(true);
         rda5802_write_set(POWERCFG, POWERCFG_ENABLE);
+#ifdef HAVE_RDS_CAP
+        rda5802_write_set(POWERCFG, POWERCFG_RDS_EN);
+#endif
     }
     rda5802_write_cache();
     if(snooze)
@@ -219,6 +231,11 @@ void rda5802_init(void)
         /* write initialisation values */
         rda5802_write(8);
         sleep(HZ * 70 / 1000);
+
+// #ifdef HAVE_RDS_CAP
+//         rds_init();
+//         rda5802_rds_init();
+// #endif
     }
 }
 
