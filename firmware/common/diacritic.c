@@ -27,19 +27,23 @@
 #include "system.h"
 
 #define DIAC_NUM_RANGES      (ARRAYLEN(diac_ranges))
+#define DIAC_RTL   0x80
+#define DIAC_CNT   0x7F
 
 /* Each diac_range_ struct defines a Unicode range that begins with
  * N diacritic characters, and continues with non-diacritic characters up to the
- * base of the next item in the array */
+ * base of the next item in the array info packs RTL status and the count of
+ * diacritic chars after [base] RTL occupies the MSB and CNT the lower 
+*/
+
 struct diac_range
 {
-    unsigned base           : 16;
-    unsigned num_diacritics :  7;
-    unsigned is_rtl         :  1;
+    uint16_t base;
+    uint8_t  info; /* [RTL:1 CNT:7] */
 };
 
 #define DIAC_RANGE_ENTRY(first_diac, first_non_diac, is_rtl) \
-    { first_diac, first_non_diac - first_diac, is_rtl }
+ { first_diac, ((first_non_diac - first_diac) & DIAC_CNT) | (is_rtl * DIAC_RTL)}
 
 /* Sorted by Unicode value */
 static const struct diac_range diac_ranges[] =
@@ -190,22 +194,22 @@ static const struct diac_range diac_ranges[] =
 
 #define MRU_MAX_LEN 32
 
-static unsigned short mru_len = 0;
-static unsigned short diacritic_mru[MRU_MAX_LEN];
-
 bool is_diacritic(const unsigned short char_code, bool *is_rtl)
 {
-    unsigned short mru, i;
+    static uint8_t mru_len = 0;
+    static uint8_t diacritic_mru[MRU_MAX_LEN];
+
+    uint8_t i, info, mru;
+    uint8_t *diacmru;
     const struct diac_range *diac;
 
     /* Search in MRU */
     for (mru = 0; mru < mru_len; mru++)
     {
         i = diacritic_mru[mru];
-
         /* Found in MRU */
-        if (diac_ranges[i].base <= char_code &&
-                char_code < diac_ranges[i + 1].base)
+        if (char_code >= (diac = &diac_ranges[i])->base &&
+            char_code < (++diac)->base)
         {
             goto Found;
         }
@@ -218,7 +222,6 @@ bool is_diacritic(const unsigned short char_code, bool *is_rtl)
         if (char_code < diac_ranges[i + 1].base)
             break;
     }
-
     /* Add MRU entry, or overwrite LRU if MRU array is full */
     if (mru_len < MRU_MAX_LEN)
         mru_len++;
@@ -226,16 +229,19 @@ bool is_diacritic(const unsigned short char_code, bool *is_rtl)
         mru--;
 
 Found:
-    /* Promote MRU item to top of MRU */
-    for ( ; mru > 0; mru--)
-        diacritic_mru[mru] = diacritic_mru[mru - 1];
+    /* Promote MRU item to top of MRU; items shifted >> 1 */
+    diacmru = &diacritic_mru[mru];
+
+    while (mru--)
+        diacmru = --diacmru;
+
     diacritic_mru[0] = i;
 
     diac = &diac_ranges[i];
-
+    info = diac->info;
     /* Update RTL */
     if (is_rtl)
-        *is_rtl = diac->is_rtl;
+        *is_rtl = ((info & DIAC_RTL) == DIAC_RTL);
 
-    return (char_code < diac->base + diac->num_diacritics);
+    return (char_code < diac->base + (info & DIAC_CNT));
 }
