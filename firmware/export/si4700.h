@@ -55,7 +55,13 @@ void si4700_rds_read_raw_async(unsigned char *buf, int count); /* implemented by
 void si4700_rds_interrupt(void);
 #endif /* (CONFIG_RDS & RDS_CFG_ISR) */
 
-/* Read raw RDS info for processing */
+/* Read raw RDS info for processing.
+ * - If RDS_CFG_ISR is set, the tuner driver will call si4700_rds_read_raw_async() which should
+ *   perform an asynchronous read and call this function when the data has been read.
+ * - If RDS_CFG_POLL is set, this function will read status and RDS data and process it if a new
+ *   packet is available.
+ * - Otherwise this function will read a RDS packet and process it under the assumption that it is
+ *   new. */
 void si4700_rds_process(void);
 
 #endif /* HAVE_RDS_CAP */

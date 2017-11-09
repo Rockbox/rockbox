@@ -585,7 +585,17 @@ void si4700_rds_process(void)
     if (tuner_powered())
     {
         si4700_read_reg(RDSD);
+#if (CONFIG_RDS & RDS_CFG_POLL)
+        /* if polling, we need to keep track of the ready bit because it stays set for 80ms and we
+         * must avoid processing it twice */
+        static bool old_rdsr = false;
+        bool rdsr = (cache[STATUSRSSI] & STATUSRSSI_RDSR);
+        if (rdsr && !old_rdsr)
+            rds_process(&cache[RDSA]);
+        old_rdsr = rdsr;
+#else /* !(CONFIG_RDS & RDS_CFG_POLL) */
         rds_process(&cache[RDSA]);
+#endif
     }
 
     mutex_unlock(&fmr_mutex);

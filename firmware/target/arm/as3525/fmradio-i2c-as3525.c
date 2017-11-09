@@ -185,6 +185,9 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 }
 
 #ifdef HAVE_RDS_CAP
+/* On the Sansa Clip Zip, the tuner interrupt line is routed to the SoC so we can use to detect when
+ * a RDS packet is ready. On the Clip+, we have to regularly poll. */
+#if defined(SANSA_CLIPZIP)
 /* Low-level RDS Support */
 static struct semaphore rds_sema;
 static uint32_t rds_stack[DEFAULT_STACK_SIZE/sizeof(uint32_t)];
@@ -231,4 +234,48 @@ void si4700_rds_init(void)
     create_thread(rds_thread, rds_stack, sizeof(rds_stack), 0, "rds"
                   IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
 }
+#else /* !SANSA_CLIPZIP */
+/* Low-level RDS Support */
+static struct event_queue rds_queue;
+static uint32_t rds_stack[DEFAULT_STACK_SIZE / sizeof(uint32_t)];
+
+enum {
+    Q_POWERUP,
+};
+
+static void NORETURN_ATTR rds_thread(void)
+{
+    /* start up frozen */
+    int timeout = TIMEOUT_BLOCK;
+    struct queue_event ev;
+
+    while (true) {
+        queue_wait_w_tmo(&rds_queue, &ev, timeout);
+        switch (ev.id) {
+            case Q_POWERUP:
+                /* power up: timeout after 1 tick, else block indefinitely */
+                timeout = ev.data ? 1 : TIMEOUT_BLOCK;
+                break;
+            case SYS_TIMEOUT:;
+                /* Captures RDS data and processes it */
+                si4700_rds_process();
+                break;
+        }
+    }
+}
+
+/* true after full radio power up, and false before powering down */
+void si4700_rds_powerup(bool on)
+{
+    queue_post(&rds_queue, Q_POWERUP, on);
+}
+
+/* One-time RDS init at startup */
+void si4700_rds_init(void)
+{
+    queue_init(&rds_queue, false);
+    create_thread(rds_thread, rds_stack, sizeof(rds_stack), 0, "rds"
+        IF_PRIO(, PRIORITY_PLAYBACK) IF_COP(, CPU));
+}
+#endif /* SANSA_CLIPZIP */
 #endif /* HAVE_RDS_CAP */

@@ -182,7 +182,9 @@ void INT_GPIOA(void)
 #endif
 #ifdef HAVE_RDS_CAP
     void tuner_isr(void);
+#if !(CONFIG_RDS & RDS_CFG_POLL)
     tuner_isr();
+#endif
 #endif
 }
 

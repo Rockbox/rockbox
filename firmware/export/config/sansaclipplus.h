@@ -17,6 +17,8 @@
 
 #ifndef BOOTLOADER
 #define HAVE_HOTSWAP
+#define HAVE_RDS_CAP
+#define CONFIG_RDS (RDS_CFG_POLL | RDS_CFG_PROCESS)
 #endif
 
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
@@ -145,6 +147,9 @@
 
 /* define this if the flash memory uses the SecureDigital Memory Card protocol */
 #define CONFIG_STORAGE STORAGE_SD
+
+/* Define this if target has an additional number of threads specific to it */
+#define TARGET_EXTRA_THREADS 1  /* RDS thread */
 
 #define BATTERY_CAPACITY_DEFAULT 290    /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 290        /* min. capacity selectable */
