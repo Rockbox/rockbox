@@ -27,19 +27,23 @@
 #include "system.h"
 
 #define DIAC_NUM_RANGES      (ARRAYLEN(diac_ranges))
+#define DIAC_RTL   0x80
+#define DIAC_CNT   0x7F
 
 /* Each diac_range_ struct defines a Unicode range that begins with
  * N diacritic characters, and continues with non-diacritic characters up to the
- * base of the next item in the array */
+ * base of the next item in the array info packs RTL status and the count of
+ * diacritic chars after [base] RTL occupies the MSB and CNT the lower 
+*/
+
 struct diac_range
 {
-    unsigned base           : 16;
-    unsigned num_diacritics :  7;
-    unsigned is_rtl         :  1;
+    uint16_t base;
+    uint8_t  info; /* [RTL:1 CNT:7] */
 };
 
 #define DIAC_RANGE_ENTRY(first_diac, first_non_diac, is_rtl) \
-    { first_diac, first_non_diac - first_diac, is_rtl }
+ { first_diac, ((first_non_diac - first_diac) & DIAC_CNT) | (is_rtl * DIAC_RTL)}
 
 /* Sorted by Unicode value */
 static const struct diac_range diac_ranges[] =
@@ -188,33 +192,56 @@ static const struct diac_range diac_ranges[] =
     DIAC_RANGE_ENTRY(0xffff, 0xffff, 0),
 };
 
-static unsigned short diacritic_idx[0xF]; /*MSB 0x0-0xF*/
+#define MRU_MAX_LEN 32
+
 bool is_diacritic(const unsigned short char_code, bool *is_rtl)
 {
-    unsigned short i;
+    static uint8_t mru_len = 0;
+    static uint8_t diacritic_mru[MRU_MAX_LEN];
+
+    uint8_t i, info, mru;
+    uint8_t *diacmru;
     const struct diac_range *diac;
-    const unsigned short code_msb = (char_code &0xF000) >>12;
 
-    for (i = diacritic_idx[code_msb]; i < DIAC_NUM_RANGES - 1; i++)
+    /* Search in MRU */
+    for (mru = 0; mru < mru_len; mru++)
     {
-        /* Found, i - 1 contains the range we are looking for */
-        if (char_code < diac_ranges[i].base)
+        i = diacritic_mru[mru];
+        /* Found in MRU */
+        if (char_code >= (diac = &diac_ranges[i])->base &&
+            char_code < (++diac)->base)
         {
-            /* using MSB save the index found */
-            if (!diacritic_idx[code_msb])
-                diacritic_idx[code_msb] = i;
-
-            diac = &diac_ranges[i-1];
-            if (is_rtl)
-                *is_rtl = diac->is_rtl;
-
-            return (char_code < diac->base + diac->num_diacritics);
+            goto Found;
         }
     }
 
+    /* Search in DB */
+    for (i = 0; i < DIAC_NUM_RANGES - 1; i++)
+    {
+        /* Found */
+        if (char_code < diac_ranges[i + 1].base)
+            break;
+    }
+    /* Add MRU entry, or overwrite LRU if MRU array is full */
+    if (mru_len < MRU_MAX_LEN)
+        mru_len++;
+    else
+        mru--;
+
+Found:
+    /* Promote MRU item to top of MRU; items shifted >> 1 */
+    diacmru = &diacritic_mru[mru];
+
+    while (mru--)
+        diacmru = --diacmru;
+
+    diacritic_mru[0] = i;
+
+    diac = &diac_ranges[i];
+    info = diac->info;
     /* Update RTL */
     if (is_rtl)
-        *is_rtl = false;
+        *is_rtl = ((info & DIAC_RTL) == DIAC_RTL);
 
-    return false;
+    return (char_code < diac->base + (info & DIAC_CNT));
 }
