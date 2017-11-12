@@ -414,7 +414,7 @@ error handle::read(uint32_t addr, void *buf, size_t& sz, bool atomic)
     while(sz > 0)
     {
         size_t xfer = std::min(sz, get_buffer_size());
-        err = read_dev(addr, buf, xfer, atomic);
+        err = read_dev(addr, bufp, xfer, atomic);
         if(err != error::SUCCESS)
             return err;
         sz -= xfer;
