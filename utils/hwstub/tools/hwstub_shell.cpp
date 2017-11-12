@@ -253,6 +253,21 @@ soc_word_t hw_read32(lua_State *state, soc_addr_t addr)
     return u;
 }
 
+uint8_t *hw_read(lua_State *state, soc_addr_t addr, soc_word_t size)
+{
+    uint8_t *buf = new uint8_t[size];
+    size_t sz = size;
+    error ret = g_hwdev->read(addr, buf, sz, false);
+    if(ret != error::SUCCESS || sz != size)
+    {
+        delete[] buf;
+        luaL_error(state, "fail to read<%d> @ %p: %d", size, addr, ret);
+    }
+    if(g_print_mem_rw)
+        printf("[read<%lu> @ %#lx = ...]\n", (unsigned long)size, (unsigned long)addr);
+    return buf;
+}
+
 void hw_write8(lua_State *state, soc_addr_t addr, soc_word_t val)
 {
     uint8_t u = val;
@@ -293,6 +308,19 @@ int my_lua_readn(lua_State *state)
     if(n != 1)
         luaL_error(state, "readn takes a single argument");
     mylua_pushunsigned(state, fn(state, mylua_checkunsigned(state, 1)));
+    return 1;
+}
+
+int my_lua_read(lua_State *state)
+{
+    int n = lua_gettop(state);
+    if(n != 2)
+        luaL_error(state, "read takes a two arguments: address, length");
+    unsigned length = mylua_checkunsigned(state, 2);
+    uint8_t *buf = hw_read(state, mylua_checkunsigned(state, 1), length);
+    /* lua strings are really byte buffers, they can contain arbitrary bytes including zeroes */
+    lua_pushlstring(state, (const char *)buf, length);
+    delete[] buf;
     return 1;
 }
 
@@ -797,6 +825,8 @@ bool my_lua_import_hwstub()
     lua_pushlightuserdata(g_lua, (void *)&hw_read32);
     lua_pushcclosure(g_lua, my_lua_readn, 1);
     lua_setfield(g_lua, -2, "read32");
+    lua_pushcclosure(g_lua, my_lua_read, 0);
+    lua_setfield(g_lua, -2, "read");
 
     lua_pushlightuserdata(g_lua, (void *)&hw_write8);
     lua_pushcclosure(g_lua, my_lua_writen, 1);
