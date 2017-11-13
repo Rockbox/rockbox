@@ -91,7 +91,10 @@ int fmradio_i2c_write(unsigned char address, unsigned char* buf, int count)
         req.put.val = REG_SWAP(*(REG_TYPE *)&buf[i * REG_SIZE]);
         int ret = ioctl(radio_fd, NWZ_TUNER_PUT_REG, &req);
         if(ret != 0)
+        {
+            perror("tuner put_reg error");
             return ret;
+        }
     }
     return 0;
 }
@@ -103,8 +106,18 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
     memset(&req, 0, sizeof(req)); // just to avoid garbage in
     int ret = ioctl(radio_fd, NWZ_TUNER_GET_REG_ALL, &req);
     if(ret != 0)
+    {
+        perror("radio get_reg_all error");
         return ret;
+    }
     for(int i = 0; i < count / REG_SIZE; i++)
-        *(REG_TYPE *)&buf[i * REG_SIZE] = REG_SWAP(req.regs[(READ_START_REG + i) % REG_COUNT]);
+    {
+        /* on version 1, some registers are not reported by Sony's driver */
+        int sony_reg = (READ_START_REG + i) % REG_COUNT;
+        if(sony_reg < NWZ_TUNER_REG_COUNT)
+            *(REG_TYPE *)&buf[i * REG_SIZE] = REG_SWAP(req.regs[sony_reg]);
+        else
+            *(REG_TYPE *)&buf[i * REG_SIZE] = 0xfeca; /* recognizable pattern for debug menu */
+    }
     return 0;
 }
