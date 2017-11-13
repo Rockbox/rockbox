@@ -25,11 +25,24 @@
 /* we only describe the private ioctl, the rest is standard v4l2 */
 #define NWZ_TUNER_TYPE      'v'
 
+/* Of course Sony had to change something in the structure without changing the ioctl codes.
+ * Fortunately they are close enough so that some clever naming and ifdef solves the problem. */
+
+#if defined(SONY_NWZE350) || defined(SONY_NWZE450) || defined(SONY_NWZE460) || \
+    defined(SONY_NWZA860) || defined(SONY_NWZS750)
+#define NWZ_TUNER_V1
+#endif
+
+#ifdef NWZ_TUNER_V1
+
+#define NWZ_TUNER_REG_COUNT 14
+
+#else /* !NWZ_TUNER_V1 */
+
 #define NWZ_TUNER_REG_COUNT 20
 
-/* there is something slightly fishy about this structure, the ioctl code says it must be of size
- * 0x2C but the disassembled code looks like it uses a size of 0x24, probably Sony's code is
- * massively broken */
+#endif /* NWZ_TUNER_V1 */
+
 struct nwz_tuner_ioctl_t
 {
     union
