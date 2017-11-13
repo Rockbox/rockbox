@@ -178,6 +178,9 @@ struct usb_transfer_completion_event_data
 void usb_init(void) INIT_ATTR;
 /* target must implement this to enable/disable the usb transceiver/core */
 void usb_enable(bool on);
+/* when one or more driver requires exclusive mode, this is called after all threads have acknowledged
+ * exclusive mode and disk have been umounted; otherwise it is called immediately after host has
+ * been detected */
 void usb_attach(void);
 /* enable usb detection monitoring; before this function is called, all usb
  * detection changes are ignored */
