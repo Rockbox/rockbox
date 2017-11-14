@@ -774,24 +774,26 @@ static bool dbg_cpufreq(void)
 {
     int line;
     int button;
+    int x = 0;
+    bool done = false;
 
 #ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_SYSFIXED);
 #endif
     lcd_clear_display();
 
-    while(1)
+    while(!done)
     {
         line = 0;
 
-        int temp = FREQ/1000000;
-        lcd_putsf(0, line++, "Frequency: %ld.%ld MHz", temp, (FREQ-temp*1000000)/100000);
-        lcd_putsf(0, line++, "boost_counter: %d", get_cpu_boost_counter());
+        int temp = FREQ / 1000;
+        lcd_putsf(x, line++, "Frequency: %ld.%ld MHz", temp / 1000, temp % 1000);
+        lcd_putsf(x, line++, "boost_counter: %d", get_cpu_boost_counter());
 
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
         extern int get_cpu_voltage_setting(void);
         temp = get_cpu_voltage_setting();
-        lcd_putsf(0, line++, "CPU voltage: %d.%03dV", temp / 1000, temp % 1000);
+        lcd_putsf(x, line++, "CPU voltage: %d.%03dV", temp / 1000, temp % 1000);
 #endif
 
         lcd_update();
@@ -806,17 +808,20 @@ static bool dbg_cpufreq(void)
             case ACTION_STD_NEXT:
                 cpu_boost(false);
                 break;
-
+            case ACTION_STD_MENU:
+                x--;
+                break;
             case ACTION_STD_OK:
+                x = 0;
                 while (get_cpu_boost_counter() > 0)
                     cpu_boost(false);
                 set_cpu_frequency(CPUFREQ_DEFAULT);
                 break;
 
             case ACTION_STD_CANCEL:
-                lcd_setfont(FONT_UI);
-                return false;
+                done = true;;
         }
+        lcd_clear_display();
     }
     lcd_setfont(FONT_UI);
     return false;
