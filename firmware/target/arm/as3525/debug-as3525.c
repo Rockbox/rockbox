@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include "system.h"
 #include "kernel.h"
-#include "button.h"
+#include "action.h"
 #include "lcd.h"
 #include "font.h"
 #include "cpu.h"
@@ -31,7 +31,13 @@
 #include "adc.h"
 #include "storage.h"
 
-#define DEBUG_CANCEL BUTTON_LEFT
+#define DEBUG_CANCEL       ACTION_STD_CANCEL
+#define DEBUG_NEXT         ACTION_STD_NEXT
+#define DEBUG_LEFT_JUSTIFY ACTION_STD_OK
+#define DEBUG_LEFT_SCROLL  ACTION_STD_MENU
+
+/* if the possiblity exists to divide by zero protect with this macro */
+#define DIV_FINITE(dividend, divisor) ((divisor == 0)? divisor : dividend/divisor)
 
 #define ON "Enabled"
 #define OFF "Disabled"
@@ -41,21 +47,28 @@
 #define CP15_IC  (1<<12)           /* icache off/on */
 
 #define CLK_MAIN         24000000     /* 24 MHz  */
+#define D_MHZ            1000000
+#define D_KHZ            1000
 
-#define CLK_PLLA             0
-#define CLK_PLLB             1
-#define CLK_PROC             2
-#define CLK_FCLK             3
-#define CLK_EXTMEM           4
-#define CLK_PCLK             5
-#define CLK_IDE              6
-#define CLK_I2C              7
-#define CLK_I2SI             8
-#define CLK_I2SO             9
-#define CLK_DBOP             10
-#define CLK_SD_MCLK_NAND     11
-#define CLK_SD_MCLK_MSD      12
-#define CLK_USB              13
+enum dbg_clocks
+{
+    CLK_PLLA = 0x0,
+    CLK_PLLB,
+    CLK_PROC,
+    CLK_FCLK,
+    CLK_EXTMEM,
+    CLK_PCLK,
+    CLK_IDE,
+    CLK_I2C,
+    CLK_I2SI,
+    CLK_I2SO,
+    CLK_DBOP,
+    CLK_SD_MCLK_NAND,
+    CLK_SD_MCLK_MSD,
+    CLK_SD_SLOT,
+    CLK_USB,
+    CLK_SSP,
+};
 
 #define MCI_NAND        *((volatile unsigned long *)(NAND_FLASH_BASE + 0x04))
 #define MCI_SD          *((volatile unsigned long *)(SD_MCI_BASE + 0x04))
@@ -79,6 +92,7 @@ static int calc_freq(int clk)
     unsigned int postdiv = ((unsigned int)CGU_PROC>>4) & 0xf;
     unsigned int u_out_div;
 #if CONFIG_CPU == AS3525
+
     switch(clk) {
         /* clk_main = clk_int = 24MHz oscillator */
         case CLK_PLLA:
@@ -89,10 +103,9 @@ static int calc_freq(int clk)
             u_out_div = ((CGU_PLLA>>13) & 0x3);         /* bits 13:14 */
             if (u_out_div == 3)                         /* for 11 NO=4  */
                 u_out_div=4;
-            if(u_out_div)                               /*  NO = 0 not allowed */
-                return ((2 * (CGU_PLLA & 0xff))*CLK_MAIN)/
-                                               (((CGU_PLLA>>8) & 0x1f)*u_out_div);
-            return 0;
+            /*  NO = 0 not allowed */
+            return DIV_FINITE(((2 * (CGU_PLLA & 0xff))*CLK_MAIN),
+                                  (((CGU_PLLA>>8) & 0x1f)*u_out_div));
        case CLK_PLLB:
             if(CGU_PLLBSUP & (1<<3))
                 return 0;
@@ -101,12 +114,12 @@ static int calc_freq(int clk)
             u_out_div = ((CGU_PLLB>>13) & 0x3);         /* bits 13:14 */
             if (u_out_div == 3)                         /* for 11 NO=4  */
                 u_out_div=4;
-            if(u_out_div)                               /*  NO = 0 not allowed */
-                return ((2 * (CGU_PLLB & 0xff))*CLK_MAIN)/
-                                               (((CGU_PLLB>>8) & 0x1f)*u_out_div);
-            return 0;
-#else
+            /*  NO = 0 not allowed */
+            return DIV_FINITE(((2 * (CGU_PLLB & 0xff))*CLK_MAIN),
+                                  (((CGU_PLLB>>8) & 0x1f)*u_out_div));
+#else /* AS3525v2 */
     int od, f, r;
+
     /* AS3525v2  */
     switch(clk) {
         case CLK_PLLA:
@@ -126,7 +139,20 @@ static int calc_freq(int clk)
             r = ((CGU_PLLB >> 7) & 0x7) + 1;
             od = (CGU_PLLB >> 10) & 1 ? 2 : 1;
             return (CLK_MAIN / 2) * f / (r * od);
-#endif
+
+        case CLK_SD_SLOT:
+            switch(CGU_SDSLOT & 3) {
+                case 0:
+                    return CLK_MAIN/(((CGU_SDSLOT>>2)& 0xf)+1);
+                case 1:
+                    return calc_freq(CLK_PLLA)/(((CGU_SDSLOT>>2)& 0xf)+1);
+                case 2:
+                    return calc_freq(CLK_PLLB)/(((CGU_SDSLOT>>2)& 0xf)+1);
+                default:
+                    return 0;
+            }
+#endif /* CONFIG_CPU == AS3525 */
+
         case CLK_PROC:
 #if CONFIG_CPU == AS3525 /* not in arm926-ejs */
             if (!(read_cp15()>>30))                 /* fastbus */
@@ -150,10 +176,10 @@ static int calc_freq(int clk)
         case CLK_EXTMEM:
 #if CONFIG_CPU == AS3525
             switch(CGU_PERI & 3) {
-#else
+#else /* as3525v2 */
             /* bits 1:0 of CGU_PERI always read as 0 and source = FCLK */
             switch(3) {
-#endif
+#endif /* CONFIG_CPU == AS3525 */
                 case 0:
                     return CLK_MAIN/(((CGU_PERI>>2)& 0xf)+1);
                 case 1:
@@ -179,7 +205,8 @@ static int calc_freq(int clk)
             }
         case CLK_I2C:
             ams_i2c_get_debug_cpsr(&u_out_div);
-            return calc_freq(CLK_PCLK)/(u_out_div);
+            /*  NO = 0 not allowed */
+            return DIV_FINITE(calc_freq(CLK_PCLK), (u_out_div));
         case CLK_I2SI:
             switch((CGU_AUDIO>>12) & 3) {
                 case 0:
@@ -219,7 +246,12 @@ static int calc_freq(int clk)
                 return calc_freq(CLK_PCLK);
             else
             return calc_freq(CLK_PCLK)/(((MCI_SD & 0xff)+1)*2);
-#endif
+#else /* as3525v2 */
+        case CLK_SSP:
+            /*  NO = 0 not allowed */
+            return DIV_FINITE(calc_freq(CLK_PCLK), SSP_CPSR);
+#endif /* CONFIG_CPU == AS3525 */
+
         case CLK_USB:
             switch(CGU_USB & 3) {     /* 0-> div=1  other->div=1/(2*n)  */
                 case 0:
@@ -245,174 +277,172 @@ static int calc_freq(int clk)
         }
 }
 
+static bool dbg_btn(bool *done, int *x)
+{
+    bool cont = !*done;
+    if (cont)
+    {
+        lcd_update();
+        int button = get_action(CONTEXT_STD,HZ/10);
+        switch(button)
+        {
+            case DEBUG_CANCEL:
+                *done = true;
+            case DEBUG_NEXT:
+                cont = false;
+            case DEBUG_LEFT_JUSTIFY:
+                (*x) = 0;
+                sleep(HZ/5);
+                break;
+            case DEBUG_LEFT_SCROLL:
+                (*x)--;
+        }
+    }
+    lcd_clear_display();
+    return cont;
+}
+
 bool dbg_hw_info(void)
 {
     int line;
+    int x = 0;
+    bool done = false;
+
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
-    while(1)
+    while(!done)
     {
-        while(1)
+        while(dbg_btn(&done, &x))
         {
 #if defined(SANSA_C200V2) || defined(SANSA_FUZEV2) || \
     defined(SANSA_CLIPPLUS) || defined(SANSA_CLIPZIP)
-        lcd_clear_display();
+
         line = 0;
-        lcd_puts(0, line++, "[Submodel:]");
+        lcd_puts(x, line++, "[Submodel:]");
 #if defined(SANSA_C200V2)
-        lcd_putsf(0, line++, "C200v2 variant %d", c200v2_variant);
+        lcd_putsf(x, line++, "C200v2 variant %d", c200v2_variant);
 #elif defined(SANSA_FUZEV2) || defined(SANSA_CLIPPLUS) || \
       defined(SANSA_CLIPZIP)
-        lcd_putsf(0, line++, "AMSv2 variant %d", amsv2_variant);
+        lcd_putsf(x, line++, "AMSv2 variant %d", amsv2_variant);
 #endif
-        lcd_update();
-        int btn = button_get_w_tmo(HZ/10);
-        if(btn == (DEBUG_CANCEL|BUTTON_REL))
-            goto end;
-        else if(btn == (BUTTON_DOWN|BUTTON_REL))
-            break;
         }
-        while(1)
+        while(dbg_btn(&done, &x))
         {
 #endif
-        lcd_clear_display();
         line = 0;
-        lcd_puts(0, line++, "[Clock Frequencies:]");
-        lcd_puts(0, line++, "     SET       ACTUAL");
+        lcd_puts(x, line++, "[Clock Frequencies:]");
+        lcd_puts(x, line++, "     SET       ACTUAL");
 #if CONFIG_CPU == AS3525
-        lcd_putsf(0, line++, "922T:%s     %3dMHz",
+        lcd_putsf(x, line++, "922T:%s     %3dMHz",
                                         (!(read_cp15()>>30)) ? "FAST " :
                                         (read_cp15()>>31) ? "ASYNC" : "SYNC ",
-#else
-        lcd_putsf(0, line++, "926ejs:        %3dMHz",
+#else /* as3525v2 */
+        lcd_putsf(x, line++, "926ejs:        %3dMHz",
 #endif
-                                         calc_freq(CLK_PROC)/1000000);
-        lcd_putsf(0, line++, "PLLA:%3dMHz    %3dMHz", AS3525_PLLA_FREQ/1000000,
-                                                   calc_freq(CLK_PLLA)/1000000);
-        lcd_putsf(0, line++, "PLLB:          %3dMHz", calc_freq(CLK_PLLB)/1000000);
-        lcd_putsf(0, line++, "FCLK:          %3dMHz", calc_freq(CLK_FCLK)/1000000);
-        lcd_putsf(0, line++, "DRAM:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
-                                                 calc_freq(CLK_EXTMEM)/1000000);
-        lcd_putsf(0, line++, "PCLK:%3dMHz    %3dMHz", AS3525_PCLK_FREQ/1000000,
-                                                   calc_freq(CLK_PCLK)/1000000);
+                                         calc_freq(CLK_PROC)/D_MHZ);
+        lcd_putsf(x, line++, "%s:%3dMHz    %3dMHz", "PLLA", AS3525_PLLA_FREQ/D_MHZ,
+                                                   calc_freq(CLK_PLLA)/D_MHZ);
+        lcd_putsf(x, line++, "PLLB:          %3dMHz", calc_freq(CLK_PLLB)/D_MHZ);
+        lcd_putsf(x, line++, "FCLK:          %3dMHz", calc_freq(CLK_FCLK)/D_MHZ);
+        lcd_putsf(x, line++, "%s:%3dMHz    %3dMHz", "DRAM", AS3525_PCLK_FREQ/D_MHZ,
+                                                 calc_freq(CLK_EXTMEM)/D_MHZ);
+        lcd_putsf(x, line++, "%s:%3dMHz    %3dMHz", "PCLK", AS3525_PCLK_FREQ/D_MHZ,
+                                                   calc_freq(CLK_PCLK)/D_MHZ);
 
 #if LCD_HEIGHT < 176  /* clip  */
-        lcd_update();
-        int btn = button_get_w_tmo(HZ/10);
-        if(btn == (DEBUG_CANCEL|BUTTON_REL))
-            goto end;
-        else if(btn == (BUTTON_DOWN|BUTTON_REL))
-            break;
         }
-        while(1)
+        while(dbg_btn(&done, &x))
         {
-        lcd_clear_display();
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
 
-        lcd_putsf(0, line++, "IDE :%3dMHz    %3dMHz", AS3525_IDE_FREQ/1000000,
-                                                    calc_freq(CLK_IDE)/1000000);
-        lcd_putsf(0, line++, "DBOP:%3dMHz    %3dMHz", AS3525_DBOP_FREQ/1000000,
-                                                   calc_freq(CLK_DBOP)/1000000);
-        lcd_putsf(0, line++, "I2C :%3dkHz    %3dkHz", AS3525_I2C_FREQ/1000,
-                                                       calc_freq(CLK_I2C)/1000);
-        lcd_putsf(0, line++, "I2SI: %s      %3dMHz", (CGU_AUDIO & (1<<23)) ?
-                                   "on " : "off" , calc_freq(CLK_I2SI)/1000000);
-        lcd_putsf(0, line++, "I2SO: %s      %3dMHz", (CGU_AUDIO & (1<<11)) ?
-                                    "on " : "off", calc_freq(CLK_I2SO)/1000000);
+        lcd_putsf(x, line++, "%s:%3dMHz    %3dMHz", "IDE ", AS3525_IDE_FREQ/D_MHZ,
+                                                    calc_freq(CLK_IDE)/D_MHZ);
+        lcd_putsf(x, line++, "%s:%3dMHz    %3dMHz", "DBOP", AS3525_DBOP_FREQ/D_MHZ,
+                                                   calc_freq(CLK_DBOP)/D_MHZ);
+        lcd_putsf(x, line++, "%s:%3dMHz    %3dMHz", "I2C ", AS3525_I2C_FREQ/D_KHZ,
+                                                       calc_freq(CLK_I2C)/D_KHZ);
+        lcd_putsf(x, line++, "I2SI: %s      %3dMHz", (CGU_AUDIO & (1<<23)) ?
+                                   "on " : "off" , calc_freq(CLK_I2SI)/D_MHZ);
+        lcd_putsf(x, line++, "I2SO: %s      %3dMHz", (CGU_AUDIO & (1<<11)) ?
+                                    "on " : "off", calc_freq(CLK_I2SO)/D_MHZ);
 #if CONFIG_CPU == AS3525
         struct ams_sd_debug_info dbg;
         ams_sd_get_debug_info(&dbg);
 
-        lcd_putsf(0, line++, "SD  :%3dMHz    %3dMHz",
-            ((AS3525_IDE_FREQ/ 1000000) /
+        lcd_putsf(x, line++, "%s:%3dMHz    %3dMHz", "SD  ",
+            ((AS3525_IDE_FREQ/ D_MHZ) /
             ((dbg.mci_nand & MCI_CLOCK_BYPASS)? 1:(((dbg.mci_nand & 0xff)+1) * 2))),
-            calc_freq(CLK_SD_MCLK_NAND)/1000000);
+            calc_freq(CLK_SD_MCLK_NAND)/D_MHZ);
 #ifdef HAVE_MULTIDRIVE
-        lcd_putsf(0, line++, "uSD :%3dMHz    %3dMHz",
-            ((AS3525_PCLK_FREQ/ 1000000) /
+        lcd_putsf(x, line++, "%s:%3dMHz    %3dMHz", "uSD ",
+            ((AS3525_PCLK_FREQ/ D_MHZ) /
             ((dbg.mci_sd & MCI_CLOCK_BYPASS) ? 1: (((dbg.mci_sd & 0xff) + 1) * 2))),
-            calc_freq(CLK_SD_MCLK_MSD)/1000000);
+            calc_freq(CLK_SD_MCLK_MSD)/D_MHZ);
 #endif
+
+#else /*AS3525v2*/
+        lcd_putsf(x, line++, "%s:%3dMHz    %3dMHz", "SD  ", AS3525_SDSLOT_FREQ/D_MHZ,
+                                                        calc_freq(CLK_SD_SLOT)/D_MHZ);
+        long freq_ssp = calc_freq(CLK_SSP);
+        if (freq_ssp >= D_MHZ)
+            lcd_putsf(x, line++, "%s:%3dMHz    %3dMHz", "SSP ", AS3525_SSP_FREQ/D_MHZ,
+                                                    calc_freq(CLK_SSP)/D_MHZ);
+        else
+            lcd_putsf(x, line++, "SSP :%3dMHz    %3dKHz", AS3525_SSP_FREQ/D_MHZ,
+                                                    calc_freq(CLK_SSP)/D_KHZ);
 #endif  /* CONFIG_CPU == AS3525 */
-        lcd_putsf(0, line++, "USB :          %3dMHz", calc_freq(CLK_USB)/1000000);
+        lcd_putsf(x, line++, "USB :          %3dMHz", calc_freq(CLK_USB)/D_MHZ);
 
 #if LCD_HEIGHT < 176  /* clip  */
-        lcd_update();
-        int btn = button_get_w_tmo(HZ/10);
-        if(btn == (DEBUG_CANCEL|BUTTON_REL))
-            goto end;
-        else if(btn == (BUTTON_DOWN|BUTTON_REL))
-            break;
         }
-        while(1)
+        while(dbg_btn(&done, &x))
         {
         lcd_clear_display();
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
 
-        lcd_putsf(0, line++, "MMU :  %s CVDDP:%4d", (read_cp15() & CP15_MMU) ?
+        lcd_putsf(x, line++, "MMU :  %s CVDDP:%4d", (read_cp15() & CP15_MMU) ?
                                         " on" : "off", adc_read(ADC_CVDD) * 25);
-        lcd_putsf(0, line++, "Icache:%s Dcache:%s",
+        lcd_putsf(x, line++, "Icache:%s Dcache:%s",
                                       (read_cp15() & CP15_IC)  ? " on" : "off",
                                       (read_cp15() & CP15_DC)  ? " on" : "off");
-
-        lcd_update();
-        int btn = button_get_w_tmo(HZ/10);
-        if(btn == (DEBUG_CANCEL|BUTTON_REL))
-            goto end;
-        else if(btn == (BUTTON_DOWN|BUTTON_REL))
-            break;
         }
-        while(1)
+        while(dbg_btn(&done, &x))
         {
-        lcd_clear_display();
         line = 0;
 
-        lcd_putsf(0, line++, "CGU_PLLA  :%8x", (unsigned int)(CGU_PLLA));
-        lcd_putsf(0, line++, "CGU_PLLB  :%8x", (unsigned int)(CGU_PLLB));
-        lcd_putsf(0, line++, "CGU_PROC  :%8x", (unsigned int)(CGU_PROC));
-        lcd_putsf(0, line++, "CGU_PERI  :%8x", (unsigned int)(CGU_PERI));
-        lcd_putsf(0, line++, "CGU_IDE   :%8x", (unsigned int)(CGU_IDE));
-        lcd_putsf(0, line++, "CGU_DBOP  :%8x", (unsigned int)(CGU_DBOP));
-        lcd_putsf(0, line++, "CGU_AUDIO :%8x", (unsigned int)(CGU_AUDIO));
-        lcd_putsf(0, line++, "CGU_USB   :%8x", (unsigned int)(CGU_USB));
+        lcd_putsf(x, line++, "CGU_PLLA  :%8x", (unsigned int)(CGU_PLLA));
+        lcd_putsf(x, line++, "CGU_PLLB  :%8x", (unsigned int)(CGU_PLLB));
+        lcd_putsf(x, line++, "CGU_PROC  :%8x", (unsigned int)(CGU_PROC));
+        lcd_putsf(x, line++, "CGU_PERI  :%8x", (unsigned int)(CGU_PERI));
+        lcd_putsf(x, line++, "CGU_IDE   :%8x", (unsigned int)(CGU_IDE));
+        lcd_putsf(x, line++, "CGU_DBOP  :%8x", (unsigned int)(CGU_DBOP));
+        lcd_putsf(x, line++, "CGU_AUDIO :%8x", (unsigned int)(CGU_AUDIO));
+        lcd_putsf(x, line++, "CGU_USB   :%8x", (unsigned int)(CGU_USB));
 
 #if LCD_HEIGHT < 176  /* clip  */
-        lcd_update();
-        int btn = button_get_w_tmo(HZ/10);
-        if(btn == (DEBUG_CANCEL|BUTTON_REL))
-            goto end;
-        else if(btn == (BUTTON_DOWN|BUTTON_REL))
-            break;
         }
-        while(1)
+        while(dbg_btn(&done, &x))
         {
-        lcd_clear_display();
         line = 0;
 #endif  /*  LCD_HEIGHT < 176 */
+
         unsigned int i2c_cpsr;
         ams_i2c_get_debug_cpsr(&i2c_cpsr);
-        lcd_putsf(0, line++, "I2C2_CPSR :%8x", i2c_cpsr);
+        lcd_putsf(x, line++, "I2C2_CPSR :%8x", i2c_cpsr);
 #if CONFIG_CPU == AS3525
-        lcd_putsf(0, line++, "MCI_NAND  :%8x", (unsigned int)(MCI_NAND));
-        lcd_putsf(0, line++, "MCI_SD    :%8x", (unsigned int)(MCI_SD));
-#else
-        lcd_putsf(0, line++, "CGU_MEMSTK:%8x", (unsigned int)(CGU_MEMSTICK));
-        lcd_putsf(0, line++, "CGU_SDSLOT:%8x", (unsigned int)(CGU_SDSLOT));
+        lcd_putsf(x, line++, "MCI_NAND  :%8x", (unsigned int)(MCI_NAND));
+        lcd_putsf(x, line++, "MCI_SD    :%8x", (unsigned int)(MCI_SD));
+#else /* as3525v2 */
+        lcd_putsf(x, line++, "CGU_MEMSTK:%8x", (unsigned int)(CGU_MEMSTICK));
+        lcd_putsf(x, line++, "CGU_SDSLOT:%8x", (unsigned int)(CGU_SDSLOT));
 #endif
-
-        lcd_update();
-        int btn = button_get_w_tmo(HZ/10);
-        if(btn == (DEBUG_CANCEL|BUTTON_REL))
-            goto end;
-        else if(btn == (BUTTON_DOWN|BUTTON_REL))
-            break;
+        lcd_putsf(x, line++, "SSP_CPSR  :%8x", (unsigned int)(SSP_CPSR));
         }
     }
 
-end:
     lcd_setfont(FONT_UI);
     return false;
 }
@@ -429,38 +459,29 @@ void adc_set_voltage_mux(int channel)
 
 bool dbg_ports(void)
 {
-    int line, btn, i;
-
+    int line, i;
+    int x = 0;
+    bool done = false;
+    lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
-    while(1)
+    while(!done)
     {
-        lcd_clear_display();
-
-        while(1)
+        while(dbg_btn(&done, &x))
         {
             line = 0;
-            lcd_puts(0, line++, "[GPIO Vals and Dirs]");
-            lcd_putsf(0, line++, "GPIOA: %2x DIR: %2x", GPIOA_DATA, GPIOA_DIR);
-            lcd_putsf(0, line++, "GPIOB: %2x DIR: %2x", GPIOB_DATA, GPIOB_DIR);
-            lcd_putsf(0, line++, "GPIOC: %2x DIR: %2x", GPIOC_DATA, GPIOC_DIR);
-            lcd_putsf(0, line++, "GPIOD: %2x DIR: %2x", GPIOD_DATA, GPIOD_DIR);
-            lcd_putsf(0, line++, "CCU_IO:%8x", CCU_IO);
+            lcd_puts(x, line++, "[GPIO Vals and Dirs]");
+            lcd_putsf(x, line++, "%s: %2x DIR: %2x", "GPIOA", GPIOA_DATA, GPIOA_DIR);
+            lcd_putsf(x, line++, "%s: %2x DIR: %2x", "GPIOB", GPIOB_DATA, GPIOB_DIR);
+            lcd_putsf(x, line++, "%s: %2x DIR: %2x", "GPIOC", GPIOC_DATA, GPIOC_DIR);
+            lcd_putsf(x, line++, "%s: %2x DIR: %2x", "GPIOD", GPIOD_DATA, GPIOD_DIR);
+            lcd_putsf(x, line++, "CCU_IO:%8x", CCU_IO);
 #ifdef DEBUG_DBOP
-            lcd_puts(0, line++, "[DBOP_DIN]");
-            lcd_putsf(0, line++, "DBOP_DIN: %4x", dbop_debug());
+            lcd_puts(x, line++, "[DBOP_DIN]");
+            lcd_putsf(x, line++, "DBOP_DIN: %4x", dbop_debug());
 #endif
-            lcd_puts(0, line++, "[CP15]");
-            lcd_putsf(0, line++, "CP15: 0x%8x", read_cp15());
-            lcd_update();
-            if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
-                break;
-
-            btn = button_get_w_tmo(HZ/10);
-            if(btn == (DEBUG_CANCEL|BUTTON_REL))
-                goto end;
-            else if(btn == (BUTTON_DOWN|BUTTON_REL))
-                break;
+            lcd_puts(x, line++, "[CP15]");
+            lcd_putsf(x, line++, "CP15: 0x%8x", read_cp15());
         }
 
 #if CONFIG_CPU == AS3525 /* as3525v2 channels are different */
@@ -516,72 +537,47 @@ bool dbg_ports(void)
 #endif
 
         lcd_clear_display();
-        while(1)
+        while(dbg_btn(&done, &x))
         {
             line = 0;
 
             for(i=0; i<5; i++)
-                lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i) * 5);
+                lcd_putsf(x, line++, "%s: %d mV", adc_name[i], adc_read(i) * 5);
             for(; i<8; i++)
                 if(adc_name[i])
-                    lcd_putsf(0, line++, "%s: %d mV", adc_name[i],
+                    lcd_putsf(x, line++, "%s: %d mV", adc_name[i],
                               adc_read(i) * BATTEMP_UNIT);
 #if LCD_HEIGHT < 176  /* clip  */
-            lcd_update();
-
-            btn = button_get_w_tmo(HZ/10);
-            if(btn == (DEBUG_CANCEL|BUTTON_REL))
-                goto end;
-            else if(btn == (BUTTON_DOWN|BUTTON_REL))
-                break;
         }
-        lcd_clear_display();
-        while(1)
+        while(dbg_btn(&done, &x))
         {
             line = 0;
 #endif /* LCD_HEIGHT < 176 */
             for(i=8; i<10; i++)
                 if(adc_name[i])
-                    lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i));
+                    lcd_putsf(x, line++, "%s: %d mV", adc_name[i], adc_read(i));
             for(; i<12; i++)
                 if(adc_name[i])
-                    lcd_putsf(0, line++, "%s: %d uA", adc_name[i], adc_read(i));
+                    lcd_putsf(x, line++, "%s: %d uA", adc_name[i], adc_read(i));
 #if CONFIG_CPU == AS3525 /* different units */
-            lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i)*5/2);
+            lcd_putsf(x, line++, "%s: %d mV", adc_name[i], adc_read(i)*5/2);
 #elif CONFIG_CPU == AS3525v2
             for(; i<16; i++)
-                lcd_putsf(0, line++, "%s: %d mV", adc_name[i], adc_read(i));
+                lcd_putsf(x, line++, "%s: %d mV", adc_name[i], adc_read(i));
 #endif
-
-            lcd_update();
-
-            btn = button_get_w_tmo(HZ/10);
-            if(btn == (DEBUG_CANCEL|BUTTON_REL))
-                goto end;
-            else if(btn == (BUTTON_DOWN|BUTTON_REL))
-                break;
         }
 #if CONFIG_CPU == AS3525v2  /*extend AS3543 voltage registers*/
-       lcd_clear_display();
-        while(1)
+        while(dbg_btn(&done, &x))
         {
             line = 0;
             for(i=1; i<9; i++){
                 adc_set_voltage_mux(i); /*change the voltage mux to a new channel*/
-                lcd_putsf(0, line++, "%s: %d mV", adc_mux_name[i], adc_read(5) * 5);
+                lcd_putsf(x, line++, "%s: %d mV", adc_mux_name[i], adc_read(5) * 5);
             }
-            lcd_update();
-
-            btn = button_get_w_tmo(HZ/10);
-            if(btn == (DEBUG_CANCEL|BUTTON_REL))
-                goto end;
-            else if(btn == (BUTTON_DOWN|BUTTON_REL))
-                break;
         }
 #endif
      }
 
-end:
     lcd_setfont(FONT_UI);
     return false;
 }
