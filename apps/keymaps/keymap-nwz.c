@@ -103,8 +103,9 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_BACKSPACE,             BUTTON_BACK,                       BUTTON_NONE },
     { ACTION_KBD_BACKSPACE,             BUTTON_BACK|BUTTON_REPEAT,         BUTTON_NONE },
 
-    { ACTION_KBD_SELECT,                BUTTON_POWER,                      BUTTON_NONE },
-    { ACTION_KBD_DONE,                  BUTTON_PLAY|BUTTON_REPEAT,         BUTTON_PLAY },
+    { ACTION_KBD_SELECT,                BUTTON_PLAY|BUTTON_REL,            BUTTON_NONE },
+    { ACTION_KBD_DONE,                  BUTTON_PLAY|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_KBD_ABORT,                 BUTTON_POWER,                      BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
@@ -149,6 +150,14 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_STOP,                  BUTTON_PLAY|BUTTON_REPEAT,        BUTTON_NONE },
 
     { ACTION_FM_EXIT,                  BUTTON_BACK,                      BUTTON_NONE },
+
+/* only compiled if there is a Volume UP button defined */
+#ifdef BUTTON_VOL_UP
+    { ACTION_SETTINGS_INC,             BUTTON_VOL_UP,                    BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,       BUTTON_VOL_UP|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,             BUTTON_VOL_DOWN,                  BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,       BUTTON_VOL_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
+#endif /* BUTTON_VOL_UP */
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_radio */
