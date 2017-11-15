@@ -775,6 +775,24 @@ struct user_settings
     bool usb_skip_first_drive;
 #endif
 
+#ifdef CONFIG_POWER_SAVING
+#if (CONFIG_POWER_SAVING & POWERSV_CPU)
+    bool cpu_low_volt;
+#endif
+
+#if (CONFIG_POWER_SAVING & POWERSV_DISK)
+    bool disk_low_speed;
+#endif
+
+#if (CONFIG_POWER_SAVING & POWERSV_I2C)
+    bool i2c_low_speed;
+#endif
+
+#if (CONFIG_POWER_SAVING & POWERSV_DISP)
+    bool disp_low_speed;
+#endif
+#endif /*defined(CONFIG_POWER_SAVING)*/
+
 #ifdef HAVE_LCD_BITMAP
     unsigned char ui_vp_config[64]; /* viewport string for the lists */
 #ifdef HAVE_REMOTE_LCD
