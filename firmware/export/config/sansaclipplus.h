@@ -206,6 +206,11 @@
 /*define this to enable CPU voltage scaling on AMS devices*/
 #define HAVE_ADJUSTABLE_CPU_VOLTAGE
 
+#ifndef BOOTLOADER
+/*define this with flags for power saving options device supports*/
+#define CONFIG_POWER_SAVING (POWERSV_CPU | POWERSV_I2C | POWERSV_DISK | POWERSV_DISP)
+#endif
+
 #define BOOTFILE_EXT    "sansa"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
