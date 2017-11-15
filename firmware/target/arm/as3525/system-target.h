@@ -73,6 +73,20 @@ static inline void mdelay(unsigned msecs)
 void usb_insert_int(void);
 void usb_remove_int(void);
 
+
+#ifdef CONFIG_POWER_SAVING
+#if (CONFIG_POWER_SAVING & POWERSV_DISP)
+void disp_set_low_speed(bool slow);
+#endif
+#if (CONFIG_POWER_SAVING & POWERSV_DISK)
+void disk_set_low_speed(bool slow);
+#endif
+#if (CONFIG_POWER_SAVING & POWERSV_I2C)
+extern void i2c_set_low_speed(bool slow); /* ascodec-as3525.c */
+#endif
+#endif /*CONFIG_POWER_SAVING*/
+
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #define CPU_BOOST_LOCK_DEFINED
 
