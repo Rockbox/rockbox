@@ -109,9 +109,15 @@ static void init_pl180_controller(const int drive);
 
 static tCardInfo card_info[NUM_DRIVES];
 
-/* maximum timeouts recommanded in the SD Specification v2.00 */
+/* maximum timeouts recommended in the SD Specification v2.00 */
+/* MCI_DATA_TIMER register data timeout in card bus clock periods */
 #define SD_MAX_READ_TIMEOUT     ((AS3525_PCLK_FREQ) / 1000 * 100) /* 100 ms */
 #define SD_MAX_WRITE_TIMEOUT    ((AS3525_PCLK_FREQ) / 1000 * 250) /* 250 ms */
+#define SD_MAX_TIMEOUT          ((AS3525_PCLK_FREQ) / 1000 * 30000) /* 30 s */
+
+#define COMMAND_REG_DELAY   300
+#define DATA_REG_DELAY      1000
+#define CLK_CHANGE_DELAY    2000
 
 #ifdef CONFIG_STORAGE_MULTI
 static int sd_first_drive = 0;
@@ -132,6 +138,12 @@ static bool hs_card = false;
 #define EXT_SD_BITS (1<<2)
 #endif
 
+#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_DISK)
+    static bool disk_slow = false;
+#else
+    const bool disk_slow = false;
+#endif
+
 static struct semaphore transfer_completion_signal;
 static volatile unsigned int transfer_error[NUM_DRIVES];
 #define PL180_MAX_TRANSFER_ERRORS 10
@@ -141,7 +153,16 @@ static unsigned char aligned_buffer[UNALIGNED_NUM_SECTORS* SD_BLOCK_SIZE] __attr
 static unsigned char *uncached_buffer = AS3525_UNCACHED_ADDR(&aligned_buffer[0]);
 
 
-static inline void mci_delay(void) { udelay(1000) ; }
+static inline void mci_delay(unsigned int usec) { udelay(usec) ; }
+
+static inline bool card_detect_target(void)
+{
+#if defined(HAVE_MULTIDRIVE)
+    return !(GPIOA_PIN(2));
+#else
+    return false;
+#endif
+}
 
 static void enable_controller(bool on)
 {
@@ -197,16 +218,6 @@ static void enable_controller(bool on)
 #endif
     }
 }
-
-static inline bool card_detect_target(void)
-{
-#if defined(HAVE_MULTIDRIVE)
-    return !(GPIOA_PIN(2));
-#else
-    return false;
-#endif
-}
-
 
 #ifdef HAVE_HOTSWAP
 static int sd1_oneshot_callback(struct timeout *tmo)
@@ -326,10 +337,29 @@ static bool send_cmd(const int drive, const int cmd, const int arg,
     return false;
 }
 
+/* MCI_CLOCK = MCLK / 2x(ClkDiv[bits 7:0]+1) */
 #define MCI_FULLSPEED     (MCI_CLOCK_ENABLE | MCI_CLOCK_BYPASS)     /* MCLK   */
 #define MCI_HALFSPEED     (MCI_CLOCK_ENABLE)                        /* MCLK/2 */
 #define MCI_QUARTERSPEED  (MCI_CLOCK_ENABLE | 1)                    /* MCLK/4 */
 #define MCI_IDENTSPEED    (MCI_CLOCK_ENABLE | AS3525_SD_IDENT_DIV)  /* IDENT  */
+
+static inline void sd_set_clock(int drive)
+{
+    /* Boost MCICLK to operating speed */
+    if(drive == INTERNAL_AS3525)
+        /* MCICLK = PCLK/2 = 31MHz(STD) or PCLK/4 = 15.5 Mhz (SLOW)*/
+        MCI_CLOCK(drive) = (!disk_slow ? MCI_HALFSPEED : MCI_QUARTERSPEED);
+
+#if defined(HAVE_MULTIDRIVE)
+    else
+    {
+        hs_card = (card_info[drive].speed == 50000000) && !disk_slow;
+        /* MCICLK = PCLK/2 = 31MHz(HS) or PCLK/4 = 15.5 Mhz (STD)*/
+        MCI_CLOCK(drive) = (hs_card ? MCI_HALFSPEED : MCI_QUARTERSPEED);
+    }
+#endif
+    mci_delay(CLK_CHANGE_DELAY);
+}
 
 static int sd_init_card(const int drive)
 {
@@ -345,10 +375,10 @@ static int sd_init_card(const int drive)
     /* 100 - 400kHz clock required for Identification Mode  */
     /*  Start of Card Identification Mode ************************************/
 
-    /* CMD0 Go Idle  */
+    /* CMD0 Go Idle  -- all card functions switch back to default */
     if(!send_cmd(drive, SD_GO_IDLE_STATE, 0, MCI_NO_RESP, NULL))
         return -1;
-    mci_delay();
+    mci_delay(DATA_REG_DELAY);
 
     /* CMD8 Check for v2 sd card.  Must be sent before using ACMD41
       Non v2 cards will not respond to this command*/
@@ -385,7 +415,7 @@ static int sd_init_card(const int drive)
 #ifdef HAVE_MULTIDRIVE        /*  The internal SDs are v1 */
 
     /* Try to switch V2 cards to HS timings, non HS seem to ignore this */
-    if(sd_v2)
+    if(sd_v2 && !disk_slow)
     {
         /*  CMD7 w/rca: Select card to put it in TRAN state */
         if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
@@ -393,16 +423,16 @@ static int sd_init_card(const int drive)
 
         if(sd_wait_for_tran_state(drive))
             return -6;
-        /* CMD6 */
+        /* CMD6 0xf indicates no influence, 0x1 - HS Access*/
         if(!send_cmd(drive, SD_SWITCH_FUNC, 0x80fffff1, MCI_NO_RESP, NULL))
             return -7;
-        sleep(HZ/10);
+        sleep(HZ/10); /* need to wait at least 8 clock periods */
 
         /*  go back to STBY state so we can read csd */
         /*  CMD7 w/rca=0:  Deselect card to put it in STBY state */
         if(!send_cmd(drive, SD_DESELECT_CARD, 0, MCI_NO_RESP, NULL))
             return -8;
-        mci_delay();
+        mci_delay(DATA_REG_DELAY);
     }
 #endif /*  HAVE_MULTIDRIVE  */
 
@@ -413,18 +443,8 @@ static int sd_init_card(const int drive)
 
     sd_parse_csd(&card_info[drive]);
 
-#if defined(HAVE_MULTIDRIVE)
-    hs_card = (card_info[drive].speed == 50000000);
-#endif
-
     /* Boost MCICLK to operating speed */
-    if(drive == INTERNAL_AS3525)
-        MCI_CLOCK(drive) = MCI_HALFSPEED;  /* MCICLK = IDE_CLK/2 = 25 MHz  */
-#if defined(HAVE_MULTIDRIVE)
-    else
-        /* MCICLK = PCLK/2 = 31MHz(HS) or PCLK/4 = 15.5 Mhz (STD)*/
-        MCI_CLOCK(drive) = (hs_card ? MCI_HALFSPEED : MCI_QUARTERSPEED);
-#endif
+    sd_set_clock(drive);
 
     /*  CMD7 w/rca: Select card to put it in TRAN state */
     if(!send_cmd(drive, SD_SELECT_CARD, card_info[drive].rca, MCI_RESP, &response))
@@ -459,7 +479,7 @@ static int sd_init_card(const int drive)
         /*  CMD7 w/rca = 0: Unselect card to put it in STBY state */
         if(!send_cmd(drive, SD_SELECT_CARD, 0, MCI_NO_RESP, NULL))
             return -17;
-        mci_delay();
+        mci_delay(DATA_REG_DELAY);
 
         /* CMD9 send CSD again, so we got the correct number of blocks */
         if(!send_cmd(drive, SD_SEND_CSD, card_info[drive].rca,
@@ -504,10 +524,10 @@ static void init_pl180_controller(const int drive)
 #endif
 
     MCI_POWER(drive) = MCI_POWER_UP | (MCI_VDD_3_0);  /*  OF Setting  */
-    mci_delay();
+    mci_delay(DATA_REG_DELAY);
 
     MCI_POWER(drive) |= MCI_POWER_ON;
-    mci_delay();
+    mci_delay(DATA_REG_DELAY);
 
     MCI_SELECT(drive) = 0;
 
@@ -609,12 +629,12 @@ static int sd_select_bank(signed char bank)
                      NULL))
             return -1;
 
-        mci_delay();
+        mci_delay(DATA_REG_DELAY);
 
         if(!send_cmd(INTERNAL_AS3525, 35, 0, MCI_NO_RESP, NULL))
             return -2;
 
-        mci_delay();
+        mci_delay(DATA_REG_DELAY);
 
         dma_retain();
         /* we don't use the uncached buffer here, because we need the
@@ -693,26 +713,21 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
             discard_dcache_range(buf, count * SECTOR_SIZE);
     }
 
-    while(count)
+    const int cmd = write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
+
+    while(count > 0)
     {
         /* 128 * 512 = 2^16, and doesn't fit in the 16 bits of DATA_LENGTH
          * register, so we have to transfer maximum 127 sectors at a time. */
-        unsigned int transfer = (count >= 128) ? 127 : count; /* sectors */
+        unsigned int transfer = (count > 127) ? 127 : count; /* sectors */
         void *dma_buf;
-        const int cmd =
-            write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK;
         unsigned long bank_start = start;
-        unsigned long status;
 
         /* Only switch banks for internal storage */
         if(drive == INTERNAL_AS3525)
         {
-            unsigned int bank = 0;
-            while(bank_start >= BLOCKS_PER_BANK)
-            {
-                bank_start -= BLOCKS_PER_BANK;
-                bank++;
-            }
+            unsigned int bank = bank_start / BLOCKS_PER_BANK;
+            bank_start -= bank * BLOCKS_PER_BANK;
 
             /* Switch bank if needed */
             if(card_info[INTERNAL_AS3525].current_bank != bank)
@@ -769,11 +784,8 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
 
             /*Small delay for writes prevents data crc failures at lower freqs*/
 #ifdef HAVE_MULTIDRIVE
-            if((drive == SD_SLOT_AS3525) && !hs_card)
-            {
-                int write_delay = 125;
-                while(write_delay--);
-            }
+            if((drive == SD_SLOT_AS3525) && (!hs_card || disk_slow))
+                mci_delay(COMMAND_REG_DELAY);
 #endif
         }
         else
@@ -781,9 +793,11 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
                 (drive == INTERNAL_AS3525) ? DMA_PERI_SD : DMA_PERI_SD_SLOT,
                 DMAC_FLOWCTRL_PERI_PERI_TO_MEM, false, true, 0, DMA_S8, NULL);
 
-        MCI_DATA_TIMER(drive) = write ?
-                SD_MAX_WRITE_TIMEOUT : SD_MAX_READ_TIMEOUT;
+        MCI_DATA_TIMER(drive) = disk_slow ? SD_MAX_TIMEOUT : 
+                              write ? SD_MAX_WRITE_TIMEOUT : SD_MAX_READ_TIMEOUT;
+
         MCI_DATA_LENGTH(drive) = transfer * SD_BLOCK_SIZE;
+        mci_delay(COMMAND_REG_DELAY);
         MCI_DATA_CTRL(drive) =  (1<<0) /* enable */                     |
                                 (!write<<1) /* transfer direction */    |
                                 (1<<3) /* DMA */                        |
@@ -804,7 +818,7 @@ static int sd_transfer_sectors(IF_MD(int drive,) unsigned long start,
 
         last_disk_activity = current_tick;
 
-        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP, &status))
+        if(!send_cmd(drive, SD_STOP_TRANSMISSION, 0, MCI_RESP, &response))
         {
             ret = -4*20;
             goto sd_transfer_error;
@@ -968,3 +982,33 @@ int sd_event(long id, intptr_t data)
 
     return rc;
 }
+
+#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_DISK)
+/* extern in system-as3525.c */
+void sd_set_low_speed(bool slow)
+{
+    /* block access while speed is changed */
+    mutex_lock(&sd_mtx);
+    enable_controller(false);
+    /* After a data write, data cannot be written to MCI_CLOCK
+       for 3 MCLK periods + 2 PCLK periods. ~10us worst case
+    */
+    mci_delay(COMMAND_REG_DELAY);
+    disk_slow = slow;
+
+    if (slow)
+        CGU_IDE = (CGU_IDE & ~(0xF << 2)) | (AS3525_IDE_DIV_SLOW << 2);
+    else
+        CGU_IDE = (CGU_IDE & ~(0xF << 2)) | (AS3525_IDE_DIV << 2);
+
+    for (int i = 0; i < NUM_DRIVES ; i++)
+    {
+        if (i == INTERNAL_AS3525)
+            sd_set_clock(i);
+        else
+            sd_init_card(i);
+    }
+
+    mutex_unlock(&sd_mtx);
+}
+#endif

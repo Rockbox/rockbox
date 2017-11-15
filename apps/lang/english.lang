@@ -13647,3 +13647,88 @@
     *: "Disable Touch"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SYS_POWER_SAVING
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "Power Saving"
+  </source>
+  <dest>
+    *: none
+    sys_powersaving: "Power Saving"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "Power Saving"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYS_CPU_LOWVOLT
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "CPU Low Voltage"
+  </source>
+  <dest>
+     *: none
+    sys_powersaving: "CPU Low Voltage"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "CPU Low Voltage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYS_DISK_LOWSPEED
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "Disk Low Speed"
+  </source>
+  <dest>
+     *: none
+    sys_powersaving: "Disk Low Speed"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "Disk Low Speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYS_I2C_LOWSPEED
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "I2C Low Speed"
+  </source>
+  <dest>
+     *: none
+    sys_powersaving: "I2C Low Speed"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "I2C Low Speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYS_DISP_LOWSPEED
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "Display Low Speed"
+  </source>
+  <dest>
+     *: none
+    sys_powersaving: "Display Low Speed"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "Display Low Speed"
+  </voice>
+</phrase>
