@@ -295,6 +295,36 @@ MAKE_MENU(disk_menu, ID2P(LANG_DISK_MENU), 0, Icon_NOICON,
          );
 #endif
 
+#ifdef CONFIG_POWER_SAVING
+#if (CONFIG_POWER_SAVING & POWERSV_CPU)
+MENUITEM_SETTING(cpu_low_volt, &global_settings.cpu_low_volt, NULL);
+#endif
+#if (CONFIG_POWER_SAVING & POWERSV_DISK)
+MENUITEM_SETTING(disk_low_speed, &global_settings.disk_low_speed, NULL);
+#endif
+#if (CONFIG_POWER_SAVING & POWERSV_I2C)
+MENUITEM_SETTING(i2c_low_speed, &global_settings.i2c_low_speed, NULL);
+#endif
+#if (CONFIG_POWER_SAVING & POWERSV_DISP)
+MENUITEM_SETTING(disp_low_speed, &global_settings.disp_low_speed, NULL);
+#endif
+
+MAKE_MENU(power_save_menu, ID2P(LANG_SYS_POWER_SAVING), 0, Icon_NOICON,
+#if (CONFIG_POWER_SAVING & POWERSV_CPU)
+        &cpu_low_volt,
+#endif
+#if (CONFIG_POWER_SAVING & POWERSV_DISK)
+        &disk_low_speed,
+#endif
+#if (CONFIG_POWER_SAVING & POWERSV_I2C)
+        &i2c_low_speed,
+#endif
+#if (CONFIG_POWER_SAVING & POWERSV_DISP)
+        &disp_low_speed,
+#endif
+         );
+#endif /* ifdef CONFIG_POWER_SAVING */
+
 /* Limits menu */
 MENUITEM_SETTING(max_files_in_dir, &global_settings.max_files_in_dir, NULL);
 MENUITEM_SETTING(max_files_in_playlist, &global_settings.max_files_in_playlist, NULL);
@@ -412,6 +442,11 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &disk_menu,
 #endif
             &limits_menu,
+
+#if defined(CONFIG_POWER_SAVING)
+            &power_save_menu,
+#endif
+
 #ifdef HAVE_QUICKSCREEN
             &shortcuts_replaces_quickscreen,
 #endif
