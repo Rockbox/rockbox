@@ -863,6 +863,25 @@ struct user_settings
     int governor;
     int usb_mode;
 #endif
+
+#ifdef CONFIG_POWER_SAVING
+#if (CONFIG_POWER_SAVING & POWERSV_CPU)
+    bool cpu_low_volt;
+#endif
+
+#if (CONFIG_POWER_SAVING & POWERSV_DISK)
+    bool disk_low_speed;
+#endif
+
+#if (CONFIG_POWER_SAVING & POWERSV_I2C)
+    bool i2c_low_speed;
+#endif
+
+#if (CONFIG_POWER_SAVING & POWERSV_DISP)
+    bool disp_low_speed;
+#endif
+#endif /*defined(CONFIG_POWER_SAVING)*/
+
 };
 
 /** global variables **/
