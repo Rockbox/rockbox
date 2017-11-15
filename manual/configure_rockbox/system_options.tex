@@ -297,6 +297,30 @@ therefore result in better runtime.
         \end{description}
 } %\nopt{HAS_BUTTON_HOLD}
 
+\opt{CONFIG_POWER_SAVING}{
+  \subsection{Power Saving}
+    These options allow users to increase runtime by lowering performance
+    of select subsystems. Certain options may \emph{not} be applicable to your
+    \dap{} or may cause undesired operation to your particular use case.
+
+    \emph{WARNING!} While every effort has been made to ensure the safety of these
+    options, due to manufacturing variance some options may cause unwanted side
+    effects, cause the \dap{} to crash or (while unlikely) even \emph{destroy}
+    your \dap{}. \emph{PROCEED WITH CAUTION}
+
+        \begin{description}
+
+        \item[CPU]
+        Allows lower voltages or cpu speed when enabled.
+        \item[Disk]
+        Allows slower disk operations when enabled.
+        \item[I2C]
+        Allows slower clocking of I2C device bus when enabled.
+        \item[Display]
+        Allows slower screen refresh rates when enabled.
+
+        \end{description}
+} %\opt{CONFIG_POWER_SAVING}
 
 \opt{usb_hid}{
   \subsection{\label{ref:USB_HID}USB HID}
