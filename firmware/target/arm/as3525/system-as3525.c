@@ -33,6 +33,16 @@
 #include "backlight-target.h"
 #include "lcd.h"
 
+#ifdef CONFIG_POWER_SAVING
+#if (CONFIG_POWER_SAVING & POWERSV_CPU)
+#include "settings.h"
+#endif
+#if (CONFIG_POWER_SAVING & POWERSV_DISK)
+/* Save power with lower disk clock */
+extern void sd_set_low_speed(bool slow); /* sd-as3525.c & sd-as3525v2.c */
+#endif
+#endif /*defined(CONFIG_POWER_SAVING)*/
+
 struct mutex cpufreq_mtx;
 
 /*  Charge Pump and Power management Settings  */
@@ -422,6 +432,25 @@ void udelay(unsigned usecs)
     );
 }
 
+#ifdef CONFIG_POWER_SAVING
+#if (CONFIG_POWER_SAVING & POWERSV_DISK)
+void disk_set_low_speed(bool slow)
+{
+    sd_set_low_speed(slow);
+}
+#endif
+#if (CONFIG_POWER_SAVING & POWERSV_DISP)
+void disp_set_low_speed(bool slow)
+{
+    if (slow)
+        SSP_CPSR = AS3525_SSP_PRESCALER_SLOW;
+    else
+        SSP_CPSR = AS3525_SSP_PRESCALER;
+}
+#endif /*POWERSV_DISP*/
+#endif /*defined(CONFIG_POWER_SAVING)*/
+
+
 #ifndef BOOTLOADER
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 bool set_cpu_frequency__lock(void)
@@ -481,7 +510,12 @@ void set_cpu_frequency(long frequency)
         CGU_PROC = ((0xf << 4) | (0x3 << 2) | AS3525_CLK_MAIN);
 
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
-        /* Decreasing frequency so reduce voltage after change */
+    /* Decreasing frequency so reduce voltage after change */
+#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_CPU)
+    if (!global_settings.cpu_low_volt)
+        ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_15));
+    else
+#endif
         ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_10));
 #endif  /*  HAVE_ADJUSTABLE_CPU_VOLTAGE */
 
@@ -519,6 +553,13 @@ void set_cpu_frequency(long frequency)
 
         /* Set CVDD1 power supply */
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
+#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_CPU)
+    if (!global_settings.cpu_low_volt)
+    {
+        ascodec_write_pmu(0x17, 1, 0x80 | 26);
+        return;
+    }
+#endif
 #if defined(SANSA_CLIPZIP)
         ascodec_write_pmu(0x17, 1, 0x80 | 20);
 #elif defined(SANSA_CLIPPLUS)
