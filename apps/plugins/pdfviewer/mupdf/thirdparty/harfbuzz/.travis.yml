@@ -1,0 +1,51 @@
+# Build Configuration for Travis
+sudo: required # For Trusty beta
+os:
+  - linux
+  - osx
+dist: trusty
+language: cpp
+compiler:
+  - clang
+  - gcc
+env:
+  global:
+    - CPPFLAGS=""
+    - CFLAGS="-Werror --coverage"
+    - CXXFLAGS="-Werror -Wno-deprecated-register --coverage" # glib uses register and clang raises a warning
+    - LDFLAGS="--coverage"
+install:
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then pip install --user nose; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then pip install --user cpp-coveralls; fi # for coveralls.io code coverage tracking
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export PATH=$HOME/.local/bin:$PATH; fi # Make sure we can find the above Python packages
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi;
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew uninstall libtool && brew install libtool; fi # Workaround Travis/brew bug
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ragel freetype glib gobject-introspection cairo icu4c graphite2; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew link --force icu4c; fi # icu4c is keg-only
+script:
+  - NOCONFIGURE=1 ./autogen.sh
+  - export CONFIGURE_OPTS="--with-freetype --with-glib --with-gobject --with-cairo --with-icu --with-graphite2"
+  - if [ "$TRAVIS_OS_NAME" == "linux" -a "$CC" == "gcc" ]; then export CONFIGURE_OPTS="$CONFIGURE_OPTS  --enable-gtk-doc"; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CONFIGURE_OPTS="$CONFIGURE_OPTS --with-coretext"; fi
+  - ./configure $CONFIGURE_OPTS
+  - make
+  - make check
+  - if [ "$TRAVIS_OS_NAME" == "linux" -a "$CC" == "gcc" -a "$TRAVIS_SLUG" == "behdad/harfbuzz" ]; then rm -f src/.libs/NONE.gcov; touch src/NONE; coveralls -e docs; fi
+after_success:
+  - if [ "$TRAVIS_OS_NAME" == "linux" -a "$CC" == "gcc" -a "$TRAVIS_SECURE_ENV_VARS" == "true" ]; then bash .ci/deploy-docs.sh; fi
+notifications:
+  irc: "irc.freenode.org#harfbuzz"
+  email: harfbuzz@lists.freedesktop.org
+
+addons:
+  apt:
+    packages:
+      - pkg-config # for autogen.sh
+      - ragel
+      - gtk-doc-tools
+      - libfreetype6-dev # for font function
+      - libglib2.0-dev # for font functions / tests / utils
+      - libcairo2-dev # for utils
+      - libicu-dev # for extra unicode functions
+      - libgraphite2-dev # for extra shapers
+      - # libgirepository1.0-dev # for gobject-introspection
