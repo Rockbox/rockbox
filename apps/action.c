@@ -459,7 +459,7 @@ static inline void button_flip_horizontally(int context, int *button)
 #endif
 
 #if defined(BUTTON_MINUS) && defined(BUTTON_PLUS)
-    newbutton &= ~(BUTTON_MINUS | BUTTON_PLUS)
+    newbutton &= ~(BUTTON_MINUS | BUTTON_PLUS);
     if (has_flag(*button, BUTTON_MINUS))
     {
         newbutton |= BUTTON_PLUS;
@@ -587,7 +587,7 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
 #if (BUTTON_REMOTE != 0)
         if (has_flag(cur->button, BUTTON_REMOTE))
         {
-            *context |= CONTEXT_REMOTE;
+            context |= CONTEXT_REMOTE;
         }
 #endif
 
