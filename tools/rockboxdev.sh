@@ -730,12 +730,8 @@ do
             ;;
 
         [Ii])
-            build "binutils" "mipsel-elf" "2.17" "" "--disable-werror"
-            patch=""
-            if [ "$system" = "Interix" ]; then
-                patch="gcc-4.1.2-interix.diff"
-            fi
-            build "gcc" "mipsel-elf" "4.1.2" "$patch"
+            build "binutils" "mipsel-elf" "2.26.1" "" "--disable-werror"
+            build "gcc" "mipsel-elf" "4.9.4" "" "" "gmp mpfr mpc"
             ;;
 
         [Mm])
