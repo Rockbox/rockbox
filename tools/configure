@@ -577,7 +577,7 @@ mipselcc () {
  GCCOPTS="$GCCOPTS -ffunction-sections -msoft-float -G 0 -Wno-parentheses"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
- gccchoice="4.1.2"
+ gccchoice="4.9.4"
 }
 
 maemocc () {
