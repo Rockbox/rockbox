@@ -111,11 +111,15 @@ const unsigned char * const byte_units[] =
     ID2P(LANG_BYTE),
     ID2P(LANG_KILOBYTE),
     ID2P(LANG_MEGABYTE),
-    ID2P(LANG_GIGABYTE)
+    ID2P(LANG_GIGABYTE),
+    ID2P(LANG_BYTE),
+    ID2P(LANG_KIBIBYTE),
+    ID2P(LANG_MEBIBYTE),
+    ID2P(LANG_GIBIBYTE)
 };
 
 const unsigned char * const * const kbyte_units = &byte_units[1];
-
+const unsigned char * const * const kibyte_units = &byte_units[5];
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
  * units) if possible, and 3 significant digits are shown. If a buffer is

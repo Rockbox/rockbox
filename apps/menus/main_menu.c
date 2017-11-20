@@ -182,7 +182,7 @@ static const char* info_getname(int selected_item, void *data,
         case INFO_BUFFER: /* buffer */
         {
             long kib = audio_buffer_size() / 1024; /* to KiB */
-            output_dyn_value(s1, sizeof(s1), kib, kbyte_units, true);
+            output_dyn_value(s1, sizeof(s1), kib, kibyte_units, true);
             snprintf(buffer, buffer_len, "%s %s", str(LANG_BUFFER_STAT), s1);
         }
         break;
@@ -217,12 +217,12 @@ static const char* info_getname(int selected_item, void *data,
             break;
         case INFO_DISK1: /* disk usage 1 */
 #ifdef HAVE_MULTIVOLUME
-            output_dyn_value(s1, sizeof s1, info->free, kbyte_units, true);
-            output_dyn_value(s2, sizeof s2, info->size, kbyte_units, true);
+            output_dyn_value(s1, sizeof s1, info->free, kibyte_units, true);
+            output_dyn_value(s2, sizeof s2, info->size, kibyte_units, true);
             snprintf(buffer, buffer_len, "%s %s/%s", str(LANG_DISK_NAME_INTERNAL),
                      s1, s2);
 #else
-            output_dyn_value(s1, sizeof s1, info->free, kbyte_units, true);
+            output_dyn_value(s1, sizeof s1, info->free, kibyte_units, true);
             snprintf(buffer, buffer_len, SIZE_FMT, str(LANG_DISK_FREE_INFO), s1);
 #endif
             break;
@@ -230,8 +230,8 @@ static const char* info_getname(int selected_item, void *data,
 #ifdef HAVE_MULTIVOLUME
             if (info->size2)
             {
-                output_dyn_value(s1, sizeof s1, info->free2, kbyte_units, true);
-                output_dyn_value(s2, sizeof s2, info->size2, kbyte_units, true);
+                output_dyn_value(s1, sizeof s1, info->free2, kibyte_units, true);
+                output_dyn_value(s2, sizeof s2, info->size2, kibyte_units, true);
                 snprintf(buffer, buffer_len, "%s %s/%s", str(LANG_DISK_NAME_MMC),
                          s1, s2);
             }
@@ -241,7 +241,7 @@ static const char* info_getname(int selected_item, void *data,
                          str(LANG_NOT_PRESENT));
             }
 #else
-            output_dyn_value(s1, sizeof s1, info->size, kbyte_units, true);
+            output_dyn_value(s1, sizeof s1, info->size, kibyte_units, true);
             snprintf(buffer, buffer_len, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
 #endif
             break;
@@ -264,7 +264,7 @@ static int info_speak_item(int selected_item, void * data)
         {
             talk_id(LANG_BUFFER_STAT, false);
             long kib = audio_buffer_size() / 1024; /* to KiB */
-            output_dyn_value(NULL, 0, kib, kbyte_units, true);
+            output_dyn_value(NULL, 0, kib, kibyte_units, true);
             break;
         }
         case INFO_BATTERY: /* battery */
@@ -303,12 +303,12 @@ static int info_speak_item(int selected_item, void * data)
         case INFO_DISK1: /* disk 1 */
 #ifdef HAVE_MULTIVOLUME
             talk_ids(false, LANG_DISK_NAME_INTERNAL, LANG_DISK_FREE_INFO);
-            output_dyn_value(NULL, 0, info->free, kbyte_units, true);
+            output_dyn_value(NULL, 0, info->free, kibyte_units, true);
             talk_id(LANG_DISK_SIZE_INFO, true);
-            output_dyn_value(NULL, 0, info->size, kbyte_units, true);
+            output_dyn_value(NULL, 0, info->size, kibyte_units, true);
 #else
             talk_id(LANG_DISK_FREE_INFO, false);
-            output_dyn_value(NULL, 0, info->free, kbyte_units, true);
+            output_dyn_value(NULL, 0, info->free, kibyte_units, true);
 #endif
             break;
         case INFO_DISK2: /* disk 2 */
@@ -317,14 +317,14 @@ static int info_speak_item(int selected_item, void * data)
             if (info->size2)
             {
                 talk_id(LANG_DISK_FREE_INFO, true);
-                output_dyn_value(NULL, 0, info->free2, kbyte_units, true);
+                output_dyn_value(NULL, 0, info->free2, kibyte_units, true);
                 talk_id(LANG_DISK_SIZE_INFO, true);
-                output_dyn_value(NULL, 0, info->size2, kbyte_units, true);
+                output_dyn_value(NULL, 0, info->size2, kibyte_units, true);
             }
             else talk_id(LANG_NOT_PRESENT, true);
 #else
             talk_id(LANG_DISK_SIZE_INFO, false);
-            output_dyn_value(NULL, 0, info->size, kbyte_units, true);
+            output_dyn_value(NULL, 0, info->size, kibyte_units, true);
 #endif
             break;
             
