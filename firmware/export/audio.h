@@ -49,7 +49,16 @@
 
 
 void audio_init(void) INIT_ATTR;
+#if CONFIG_CODEC == SWCODEC
+void audio_play(unsigned long elapsed, unsigned long offset,
+                unsigned int flags);
+#define audio_play_hwswcodec(elapsed, offset, flags) \
+    audio_play((elapsed), (offset), (flags))
+#else /* !SWCODEC */
 void audio_play(unsigned long elapsed, unsigned long offset);
+#define audio_play_hwswcodec(elapsed, offset, flags) \
+    audio_play((elapsed), (offset))
+#endif /* SWCODEC */
 void audio_stop(void);
 /* Stops audio from serving playback and frees resources*/
 void audio_hard_stop(void);

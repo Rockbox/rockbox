@@ -2571,17 +2571,17 @@ unsigned int playlist_get_filename_crc32(struct playlist_info *playlist,
     return crc_32(track_info.filename, strlen(track_info.filename), -1);
 }
 
-/* resume a playlist track with the given crc_32 of the track name. */
-void playlist_resume_track(int start_index, unsigned int crc,
-                           unsigned long elapsed, unsigned long offset)
+static inline void playlist_resume_prep(int *start_index,
+                                        unsigned long *elapsed,
+                                        unsigned long *offset,
+                                        unsigned int crc)
 {
     int i;
     unsigned int tmp_crc;
     struct playlist_info* playlist = &current_playlist;
-    tmp_crc = playlist_get_filename_crc32(playlist, start_index);
+    tmp_crc = playlist_get_filename_crc32(playlist, *start_index);
     if (tmp_crc == crc)
     {
-        playlist_start(start_index, elapsed, offset);
         return;
     }
 
@@ -2590,18 +2590,43 @@ void playlist_resume_track(int start_index, unsigned int crc,
         tmp_crc = playlist_get_filename_crc32(playlist, i);
         if (tmp_crc == crc)
         {
-            playlist_start(i, elapsed, offset);
+            *start_index = i;
             return;
         }
     }
 
     /* If we got here the file wasnt found, so start from the beginning */
-    playlist_start(0, 0, 0);
+    *start_index = 0;
+    *elapsed = 0;
+    *offset = 0;
 }
 
+/* resume a playlist track with the given crc_32 of the track name. */
+#if CONFIG_CODEC == SWCODEC
+void playlist_resume_track_ex(int start_index, unsigned int crc,
+                              unsigned long elapsed, unsigned long offset,
+                              unsigned int flags)
+{
+    playlist_resume_prep(&start_index, &elapsed, &offset, crc);
+    playlist_start_ex(start_index, elapsed, offset, flags);
+}
+
+void playlist_resume_track(int start_index, unsigned int crc,
+                           unsigned long elapsed, unsigned long offset)
+{
+    playlist_resume_track_ex(start_index, crc, elapsed, offset, 0);
+}
+#else /* !SWCODEC */
+void playlist_resume_track(int start_index, unsigned int crc,
+                           unsigned long elapsed, unsigned long offset)
+{
+    playlist_resume_prep(&start_index, &elapsed, &offset, crc);
+    playlist_start(start_index, elapsed, offset);
+}
+#endif /* SWCODEC */
+
 /* start playing current playlist at specified index/offset */
-void playlist_start(int start_index, unsigned long elapsed,
-                    unsigned long offset)
+static inline void playlist_start_prep(int start_index)
 {
     struct playlist_info* playlist = &current_playlist;
 
@@ -2609,8 +2634,30 @@ void playlist_start(int start_index, unsigned long elapsed,
 
     playlist->started = true;
     sync_control(playlist, false);
+}
+
+#if CONFIG_CODEC == SWCODEC
+void playlist_start_ex(int start_index, unsigned long elapsed,
+                       unsigned long offset, unsigned int flags)
+{
+    playlist_start_prep(start_index);
+    audio_play(elapsed, offset, flags);
+}
+
+void playlist_start(int start_index, unsigned long elapsed,
+                    unsigned long offset)
+{
+    playlist_start_ex(start_index, elapsed, offset, 0);
+}
+#else /* !SWCODEC */
+void playlist_start(int start_index, unsigned long elapsed,
+                    unsigned long offset)
+{
+    playlist_start_prep(start_index);
     audio_play(elapsed, offset);
 }
+#endif /* SWCODEC */
+
 
 /* Returns false if 'steps' is out of bounds, else true */
 bool playlist_check(int steps)
