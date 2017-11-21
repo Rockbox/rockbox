@@ -302,33 +302,36 @@ static int recscrn(void* param)
 #endif
 static int wpsscrn(void* param)
 {
-    int ret_val = GO_TO_PREVIOUS;
+    int ret_val = GO_TO_WPS;
     (void)param;
     push_current_activity(ACTIVITY_WPS);
     if (audio_status())
     {
         talk_shutup();
-        ret_val = gui_wps_show();
-    }
-    else if ( global_status.resume_index != -1 )
-    {
-        DEBUGF("Resume index %X crc32 %lX offset %lX\n",
-               global_status.resume_index,
-               (unsigned long)global_status.resume_crc32,
-               (unsigned long)global_status.resume_offset);
-        if (playlist_resume() != -1)
-        {
-            playlist_resume_track(global_status.resume_index,
-                global_status.resume_crc32,
-                global_status.resume_elapsed,
-                global_status.resume_offset);
-            ret_val = gui_wps_show();
-        }
     }
     else
     {
-        splash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
+        struct audio_play_info play_info;
+        audio_play_info_init_resume(&play_info, 0);
+
+        DEBUGF("Resume:index=%d:elapsed=%lu:offset=%lu"
+                ":crc32=%08" PRIX32 ":flags=%08" PRIX32 " \n",
+               play_info.index,
+               play_info.elapsed,
+               play_info.offset,
+               play_info.crc32,
+               play_info.flags);
+
+        if (playlist_start(-1, &play_info) < 0)
+        {
+            splash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
+            ret_val = GO_TO_PREVIOUS;
+        }
     }
+
+    if (ret_val == GO_TO_WPS)
+        ret_val = gui_wps_show();
+
     pop_current_activity();
     return ret_val;
 }

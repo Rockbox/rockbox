@@ -118,7 +118,7 @@ bool ft_play_playlist(char* pathname, char* dirname, char* filename)
             playlist_shuffle(current_tick, -1);
         }
         
-        playlist_start(0, 0, 0);
+        playlist_start(0, NULL);
         return true;
     }
     
@@ -496,7 +496,7 @@ int ft_enter(struct tree_context* c)
                             start_index = 0;
                     }
 
-                    playlist_start(start_index, 0, 0);
+                    playlist_start(start_index, NULL);
                     play = true;
                 }
                 break;

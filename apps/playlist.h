@@ -123,6 +123,8 @@ struct playlist_track_info
     int  display_index;      /* index of track for display          */
 };
 
+struct audio_play_info; /* avoid requiring audio.h */
+
 /* Exported functions only for current playlist. */
 void playlist_init(void) INIT_ATTR;
 void playlist_shutdown(void);
@@ -132,10 +134,8 @@ int playlist_add(const char *filename);
 int playlist_shuffle(int random_seed, int start_index);
 unsigned int playlist_get_filename_crc32(struct playlist_info *playlist,
                                          int index);
-void playlist_resume_track(int start_index, unsigned int crc,
-                           unsigned long elapsed, unsigned long offset);
-void playlist_start(int start_index, unsigned long elapsed,
-                    unsigned long offset);
+int playlist_start(int start_index,
+                   const struct audio_play_info *play_info);
 bool playlist_check(int steps);
 const char *playlist_peek(int steps, char* buf, size_t buf_size);
 int playlist_next(int steps);

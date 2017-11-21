@@ -172,19 +172,8 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
             case ACTION_WPS_PLAY:
                 if (!audio_status())
                 {
-                    if ( global_status.resume_index != -1 )
-                    {
-                        if (playlist_resume() != -1)
-                        {
-                            playlist_start(global_status.resume_index,
-                                global_status.resume_elapsed,
-                                global_status.resume_offset);
-                        }
-                    }
-                    else
-                    {
-                        splash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
-                    }
+                    if (playlist_start(-1, NULL) < 0)
+                        splash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME);
                 }
                 else
                 {

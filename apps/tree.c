@@ -1058,6 +1058,9 @@ bool bookmark_play(char *resume_file, int index, unsigned long elapsed,
     int i;
     char* suffix = strrchr(resume_file, '.');
     bool started = false;
+    struct audio_play_info play_info;
+
+    audio_play_info_init_start(&play_info, elapsed, offset, 0);
 
     if (suffix != NULL &&
         (!strcasecmp(suffix, ".m3u") || !strcasecmp(suffix, ".m3u8")))
@@ -1082,7 +1085,7 @@ bool bookmark_play(char *resume_file, int index, unsigned long elapsed,
             {
                 if (global_settings.playlist_shuffle)
                     playlist_shuffle(seed, -1);
-                playlist_start(index, elapsed, offset);
+                playlist_start(index, &play_info);
                 started = true;
             }
             *slash='/';
@@ -1133,7 +1136,7 @@ bool bookmark_play(char *resume_file, int index, unsigned long elapsed,
                 else
                     return false;
             }
-            playlist_start(index, elapsed, offset);
+            playlist_start(index, &play_info);
             started = true;
         }
     }
