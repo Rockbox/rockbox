@@ -62,6 +62,12 @@ int playback_claim_aa_slot(struct dim *dim);
  * Save to call from other threads */
 void playback_release_aa_slot(int slot);
 
+/*
+ * Tells playback to update albumart dimensions
+ *
+ */
+void playback_update_aa_dims(void);
+
 struct bufopen_bitmap_data {
     struct dim *dim;
     struct mp3_albumart *embedded_albumart;

@@ -2051,7 +2051,7 @@ static int tagtree_play_folder(struct tree_context* c)
         c->selected_item = 0;
     gui_synclist_select_item(&tree_lists, c->selected_item);
 
-    playlist_start(c->selected_item, 0, 0);
+    playlist_start(c->selected_item, NULL);
     playlist_get_current()->num_inserted_tracks = 0; /* make warn on playlist erase work */
     return 0;
 }

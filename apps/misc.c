@@ -625,12 +625,9 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             return SYS_CALL_INCOMING;
         /* resume playback if needed */
         case SYS_CALL_HUNG_UP:
-            if (resume && playlist_resume() != -1)
-            {
-                playlist_start(global_status.resume_index,
-                               global_status.resume_elapsed,
-                               global_status.resume_offset);
-            }
+            if (resume)
+                playlist_start(-1, NULL);
+
             resume = false;
             return SYS_CALL_HUNG_UP;
 #endif
@@ -665,12 +662,10 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
                     pause_action(true, true);
             }
             else
-                if (playlist_resume() != -1)
-                {
-                    playlist_start(global_status.resume_index,
-                                   global_status.resume_elapsed,
-                                   global_status.resume_offset);
-                }
+            {
+                playlist_start(-1, NULL);
+            }
+
             return event;
         }
         case BUTTON_MULTIMEDIA_NEXT:
@@ -1017,6 +1012,26 @@ int format_sound_value(char *buf, size_t size, int snd, int val)
     unsigned int d = av - i*factor;
     return snprintf(buf, size, "%c%u%.*s%.*u %s", " -"[physval < 0],
                     i, numdec, ".", numdec, d, unit);
+}
+
+void audio_play_info_init_start(struct audio_play_info *play_info,
+                                unsigned long elapsed,
+                                unsigned long offset,
+                                uint32_t flags)
+{
+    play_info->elapsed = elapsed;
+    play_info->offset  = offset;
+    play_info->flags   = flags;
+}
+
+void audio_play_info_init_resume(struct audio_play_info *play_info,
+                                 uint32_t flags)
+{
+    play_info->elapsed = global_status.resume_elapsed;
+    play_info->offset  = global_status.resume_offset;
+    play_info->flags   = flags;
+    play_info->index   = global_status.resume_index;
+    play_info->crc32   = global_status.resume_crc32;
 }
 
 #endif /* !defined(__PCTOOL__) */
