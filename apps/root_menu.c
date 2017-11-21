@@ -323,7 +323,8 @@ static int wpsscrn(void* param)
                 global_status.resume_crc32,
                 global_status.resume_elapsed,
                 global_status.resume_offset,
-                AUDIO_STATUS_PAUSE);
+                (global_settings.pause_first_track_load ?
+                 AUDIO_STATUS_PAUSE : AUDIO_STATUS_PLAY));
             ret_val = gui_wps_show();
         }
     }

@@ -557,6 +557,8 @@ static int sleeptimer_duration_cb(int action,
 }
 
 MENUITEM_SETTING(start_screen, &global_settings.start_in_screen, NULL);
+MENUITEM_SETTING(pause_first_track_load, 
+                &global_settings.pause_first_track_load, NULL);
 MENUITEM_SETTING(poweroff, &global_settings.poweroff, NULL);
 MENUITEM_FUNCTION_DYNTEXT(sleeptimer_toggle, 0, toggle_sleeptimer, NULL,
                           sleep_timer_getname, sleep_timer_voice, NULL,
@@ -573,6 +575,7 @@ MAKE_MENU(startup_shutdown_menu, ID2P(LANG_STARTUP_SHUTDOWN),
           0, Icon_System_menu,
             &start_screen,
             &poweroff,
+            &pause_first_track_load,
             &sleeptimer_toggle,
             &sleeptimer_duration,
             &sleeptimer_on_startup,
