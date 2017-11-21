@@ -747,16 +747,15 @@ void settings_apply_play_freq(int value, bool playback)
     bool changed = value != prev_setting;
     prev_setting = value;
 
-    unsigned long elapsed = 0;
-    unsigned long offset = 0;
-    bool playing = changed && !playback &&
-                   audio_status() == AUDIO_STATUS_PLAY;
+    struct audio_play_info play_info = play_info;
+    int status = audio_status() & (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE);
+    bool playing = changed && !playback && status;
 
     if (playing)
     {
         struct mp3entry *id3 = audio_current_track();
-        elapsed = id3->elapsed;
-        offset = id3->offset;
+        audio_play_info_init_start(&play_info, id3->elapsed, id3->offset,
+                                   status & AUDIO_STATUS_PAUSE);
     }
 
     if (changed && !playback)
@@ -766,7 +765,7 @@ void settings_apply_play_freq(int value, bool playback)
     mixer_set_frequency(play_sampr[value]);
 
     if (playing)
-        audio_play(elapsed, offset);
+        audio_play(&play_info);
 }
 #endif /* HAVE_PLAY_FREQ */
 

@@ -105,13 +105,8 @@ static bool can_play(void)
 static void resume_audio(void)
 {
     int audio_status = rb->audio_status();
-    if (!audio_status && rb->global_status->resume_index != -1) {
-        if (rb->playlist_resume() != -1) {
-            rb->playlist_resume_track(rb->global_status->resume_index,
-                rb->global_status->resume_crc32,
-                rb->global_status->resume_elapsed,
-                rb->global_status->resume_offset);
-        }
+    if (!audio_status) {
+        rb->playlist_start(-1, NULL);
     }
     else if (audio_status & AUDIO_STATUS_PLAY)
         rb->audio_resume();

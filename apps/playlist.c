@@ -649,7 +649,7 @@ static int create_and_play_dir(int direction, bool play_last)
 #if (CONFIG_CODEC == SWCODEC)
         current_playlist.started = true;
 #else
-        playlist_start(index, 0, 0);
+        playlist_start(index, NULL);
 #endif
     }
 
@@ -2571,45 +2571,60 @@ unsigned int playlist_get_filename_crc32(struct playlist_info *playlist,
     return crc_32(track_info.filename, strlen(track_info.filename), -1);
 }
 
-/* resume a playlist track with the given crc_32 of the track name. */
-void playlist_resume_track(int start_index, unsigned int crc,
-                           unsigned long elapsed, unsigned long offset)
+/* start/resume playing current playlist at specified index/offset */
+int playlist_start(int index, const struct audio_play_info *play_info)
 {
-    int i;
-    unsigned int tmp_crc;
+    struct audio_play_info resume_play_info; /* if doing global resume */
     struct playlist_info* playlist = &current_playlist;
-    tmp_crc = playlist_get_filename_crc32(playlist, start_index);
-    if (tmp_crc == crc)
-    {
-        playlist_start(start_index, elapsed, offset);
-        return;
-    }
 
-    for (i = 0 ; i < playlist->amount; i++)
+    if (index < 0)
     {
-        tmp_crc = playlist_get_filename_crc32(playlist, i);
-        if (tmp_crc == crc)
+        /* playlist information is valid or is global resume */
+        if (!play_info)
         {
-            playlist_start(i, elapsed, offset);
-            return;
+            /* use the global status to resume */
+            audio_play_info_init_resume(&resume_play_info, 0);
+            play_info = &resume_play_info;
+        }
+
+        index = play_info->index;
+
+        if (index >= 0 && playlist_resume() != -1)
+        {
+            /* crc32 of track name must match what is in the resume info */
+            uint32_t tmp_crc32 = playlist_get_filename_crc32(playlist, index);
+
+            if (tmp_crc32 != play_info->crc32)
+            {
+                int i;
+                for (i = 0; i < playlist->amount; i++)
+                {
+                    tmp_crc32 = playlist_get_filename_crc32(playlist, i);
+                    if (tmp_crc32 == play_info->crc32)
+                        break;
+                }
+
+                if (i >= playlist->amount)
+                {
+                    /* not found - start at beginning */
+                    i = 0;
+                    play_info = NULL;
+                }
+
+                index = i;
+            }
         }
     }
 
-    /* If we got here the file wasnt found, so start from the beginning */
-    playlist_start(0, 0, 0);
-}
+    if (index < 0 || index >= playlist->amount)
+        return -1;
 
-/* start playing current playlist at specified index/offset */
-void playlist_start(int start_index, unsigned long elapsed,
-                    unsigned long offset)
-{
-    struct playlist_info* playlist = &current_playlist;
-
-    playlist->index = start_index;
-
+    playlist->index = index;
     playlist->started = true;
     sync_control(playlist, false);
-    audio_play(elapsed, offset);
+    audio_play(play_info);
+
+    return index;
 }
 
 /* Returns false if 'steps' is out of bounds, else true */
@@ -2727,7 +2742,7 @@ int playlist_next(int steps)
 #if CONFIG_CODEC == SWCODEC
             playlist->started = true;
 #else
-            playlist_start(0, 0, 0);
+            playlist_start(0, NULL);
 #endif
             playlist->index = 0;
             index = 0;

@@ -23,6 +23,7 @@
 
 #include <stdbool.h>
 #include <string.h> /* size_t */
+#include <stdint.h>
 #include "config.h"
 /* These must always be included with audio.h for this to compile under
    cetain conditions. Do it here or else spread the complication around to
@@ -35,6 +36,7 @@
 #endif /* HAVE_RECORDING */
 #endif /* CONFIG_CODEC == SWCODEC */
 
+/* Status flags (lower 16 bits) */
 #define AUDIO_STATUS_PLAY       0x0001
 #define AUDIO_STATUS_PAUSE      0x0002
 #define AUDIO_STATUS_RECORD     0x0004
@@ -47,9 +49,35 @@
 #define AUDIO_GAIN_LINEIN       0
 #define AUDIO_GAIN_MIC          1
 
+struct audio_play_info
+{
+    unsigned long elapsed;
+    unsigned long offset;
+    uint32_t      flags;
+    int           index;
+    uint32_t      crc32;
+};
+
+/* audio_resume_info helpers */
+void audio_play_info_init_start(struct audio_play_info *play_info,
+                                unsigned long elapsed,
+                                unsigned long offset,
+                                uint32_t flags);
+void audio_play_info_init_resume(struct audio_play_info *play_info,
+                                 uint32_t flags);
+
+static inline void audio_play_info_copy(
+        struct audio_play_info *play_info_dst,
+        const struct audio_play_info *play_info_src)
+{
+    if (play_info_src)
+        *play_info_dst = *play_info_src;
+    else
+        *play_info_dst = (struct audio_play_info){ .elapsed = 0 };
+}
 
 void audio_init(void) INIT_ATTR;
-void audio_play(unsigned long elapsed, unsigned long offset);
+void audio_play(const struct audio_play_info *play_info);
 void audio_stop(void);
 /* Stops audio from serving playback and frees resources*/
 void audio_hard_stop(void);

@@ -451,9 +451,9 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
         int nword;
         int word_count, word_width;
         const unsigned char *str;
-    } 
-#ifndef HAVE_LCD_CHARCELLS 
-        sp, 
+    }
+#ifndef HAVE_LCD_CHARCELLS
+        sp,
 #endif
         cr;
 
@@ -2678,16 +2678,8 @@ static int handle_button(void)
             ret = PLUGIN_OK;
             break;
         case ACTION_WPS_PLAY:
-            if (AUDIO_STOP && rb->global_status->resume_index != -1)
-            {
-                if (rb->playlist_resume() != -1)
-                {
-                    rb->playlist_resume_track(rb->global_status->resume_index,
-                        rb->global_status->resume_crc32,
-                        rb->global_status->resume_elapsed,
-                        rb->global_status->resume_offset);
-                }
-            }
+            if (AUDIO_STOP)
+                rb->playlist_start(-1, NULL);
             else if (AUDIO_PAUSE)
                 rb->audio_resume();
             else
@@ -2808,7 +2800,7 @@ static int lrc_main(void)
         backlight_ignore_timeout();
 
 #ifdef HAVE_LCD_BITMAP
-    /* in case settings that may affect break position 
+    /* in case settings that may affect break position
      * are changed (statusbar_on and wrap). */
     if (!current.too_many_lines)
         calc_brpos(NULL, 0);
