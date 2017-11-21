@@ -1004,6 +1004,21 @@ void replaygain_update(void)
 }
 #endif /* CONFIG_CODEC == SWCODEC */
 
+/* format a sound value like: -1.05 dB */
+int format_sound_value(char *buf, size_t size, int snd, int val)
+{
+    int numdec = sound_numdecimals(snd);
+    const char *unit = sound_unit(snd);
+    int physval = sound_val2phys(snd, val);
+
+    unsigned int factor = ipow(10, numdec);
+    unsigned int av = abs(physval);
+    unsigned int i = av / factor;
+    unsigned int d = av - i*factor;
+    return snprintf(buf, size, "%c%u%.*s%.*u %s", " -"[physval < 0],
+                    i, numdec, ".", numdec, d, unit);
+}
+
 #endif /* !defined(__PCTOOL__) */
 
 /* Read (up to) a line of text from fd into buffer and return number of bytes
@@ -1253,18 +1268,3 @@ enum current_activity get_current_activity(void)
 }
 
 #endif
-
-/* format a sound value like: -1.05 dB */
-int format_sound_value(char *buf, size_t size, int snd, int val)
-{
-    int numdec = sound_numdecimals(snd);
-    const char *unit = sound_unit(snd);
-    int physval = sound_val2phys(snd, val);
-
-    unsigned int factor = ipow(10, numdec);
-    unsigned int av = abs(physval);
-    unsigned int i = av / factor;
-    unsigned int d = av - i*factor;
-    return snprintf(buf, size, "%c%u%.*s%.*u %s", " -"[physval < 0],
-                    i, numdec, ".", numdec, d, unit);
-}
