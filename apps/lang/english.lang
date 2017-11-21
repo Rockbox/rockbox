@@ -13647,3 +13647,17 @@
     *: "Disable Touch"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PAUSE_FIRST_LOADED_TRACK
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Pause First Loaded Track"
+  </source>
+  <dest>
+    *: "Pause First Loaded Track"
+  </dest>
+  <voice>
+    *: "Pause First Loaded Track"
+  </voice>
+</phrase>
