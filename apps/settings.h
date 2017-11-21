@@ -286,8 +286,9 @@ struct system_status
 #endif
 
 };
-
-struct user_settings
+/* user_settings -- If values are just added to the end, 
+    no need to bump plugin API version. */
+struct user_settings /* new stuff to be added at the end */
 {
     /* audio settings */
 
@@ -863,8 +864,10 @@ struct user_settings
     int governor;
     int usb_mode;
 #endif
-};
+    bool pause_first_track_load; /* first track paused on startup */
+}; /* user_settings -- new stuff to be added at the end */
 
+ 
 /** global variables **/
 extern long lasttime;
 /* global settings */

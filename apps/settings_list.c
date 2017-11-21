@@ -1950,6 +1950,8 @@ const struct settings_list settings[] = {
                   UNIT_SEC, formatter_unit_0_is_skip_track,
                   getlang_unit_0_is_skip_track, NULL,
                   19, -1,0,1,2,3,5,7,10,15,20,30,45,60,90,120,180,300,600,900),
+    OFFON_SETTING(0, pause_first_track_load, LANG_PAUSE_FIRST_LOADED_TRACK,
+                  false, "pause first loaded track", NULL),
     CHOICE_SETTING(0, start_in_screen, LANG_START_SCREEN, 1,
                    "start in screen", "previous,root,files,"
 #ifdef HAVE_TAGCACHE

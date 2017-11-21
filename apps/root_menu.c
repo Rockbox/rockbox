@@ -303,7 +303,12 @@ static int recscrn(void* param)
 static int wpsscrn(void* param)
 {
     int ret_val = GO_TO_PREVIOUS;
-    (void)param;
+
+    /* obtain resume flags in parameter - might be paused if this is
+        the boot screen */
+    unsigned int resume_flags = *(unsigned int *)param;
+    *(unsigned int *)param = AUDIO_STATUS_PLAY;
+
     push_current_activity(ACTIVITY_WPS);
     if (audio_status())
     {
@@ -323,7 +328,8 @@ static int wpsscrn(void* param)
                 global_status.resume_crc32,
                 global_status.resume_elapsed,
                 global_status.resume_offset,
-                AUDIO_STATUS_PAUSE);
+                resume_flags);
+
             ret_val = gui_wps_show();
         }
     }
@@ -416,7 +422,8 @@ static const struct root_items items[] = {
 #ifdef HAVE_TAGCACHE
     [GO_TO_DBBROWSER] =     { browser, (void*)GO_TO_DBBROWSER, &tagcache_menu },
 #endif
-    [GO_TO_WPS] =           { wpsscrn, NULL, &playback_settings },
+    [GO_TO_WPS] =           { wpsscrn, &(unsigned int){ AUDIO_STATUS_PLAY },
+                                                            &playback_settings },
     [GO_TO_MAINMENU] =      { miscscrn, (struct menu_item_ex*)&main_menu_,
                                                             &manage_settings },
 
@@ -783,6 +790,10 @@ void root_menu(void)
         (global_settings.unplug_autoresume && !headphones_inserted() ))
             next_screen = GO_TO_ROOT;
 #endif
+
+    /* indicate WPS to possibly resume paused */
+    if (next_screen == GO_TO_WPS && global_settings.pause_first_track_load)
+        *(unsigned int *)items[GO_TO_WPS].param = AUDIO_STATUS_PAUSE;
 
     while (true)
     {
