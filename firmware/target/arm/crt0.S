@@ -146,6 +146,10 @@ newstart:
 put_boot_data_here
 #endif
 
+end:
+
+.section .bss
+
 /* Cache-align interrupt stacks */
 .balign    32
 
@@ -157,5 +161,3 @@ irq_stack:
     .space 256*4
 fiq_stack:
 svc_stack:
-
-end:
