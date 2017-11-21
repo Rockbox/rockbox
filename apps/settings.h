@@ -496,6 +496,7 @@ struct user_settings
     bool cuesheet;
     bool car_adapter_mode; /* 0=off 1=on */
     int start_in_screen;
+    bool pause_first_track_load; /* first track paused on startup */
 #if defined(HAVE_RTC_ALARM) && \
     (defined(HAVE_RECORDING) || CONFIG_TUNER)
     int alarm_wake_up_screen;

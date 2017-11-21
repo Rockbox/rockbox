@@ -303,6 +303,7 @@ static int recscrn(void* param)
 static int wpsscrn(void* param)
 {
     int ret_val = GO_TO_PREVIOUS;
+    bool pause_track = false;
     (void)param;
     push_current_activity(ACTIVITY_WPS);
     if (audio_status())
@@ -318,12 +319,17 @@ static int wpsscrn(void* param)
                (unsigned long)global_status.resume_offset);
         if (playlist_resume() != -1)
         {
+            /* if id3 == NULL then we havent loaded a track since startup */
+            if (global_settings.pause_first_track_load
+            && skin_get_global_state()->id3 == NULL)
+                pause_track = true;
+
             playlist_resume_track_hwswcodec(
                 global_status.resume_index,
                 global_status.resume_crc32,
                 global_status.resume_elapsed,
                 global_status.resume_offset,
-                AUDIO_STATUS_PAUSE);
+                (pause_track? AUDIO_STATUS_PAUSE : AUDIO_STATUS_PLAY));
             ret_val = gui_wps_show();
         }
     }
