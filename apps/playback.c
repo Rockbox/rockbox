@@ -155,6 +155,7 @@ struct audio_resume_info
 {
     unsigned long elapsed;
     unsigned long offset;
+    int coldstart_status; /* coldstart paused or playing */
 };
 
 /* Peeking functions can yield and mess us up */
@@ -801,7 +802,12 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
         { Q_AUDIO_PLAY, Q_AUDIO_PLAY },
     };
 
-    static struct audio_resume_info resume;
+    static struct audio_resume_info resume =
+    {
+        .elapsed = 0,
+        .offset = 0,
+        .coldstart_status = AUDIO_STATUS_PLAY,
+    };
 
     bool give_up = false;
 
@@ -825,11 +831,13 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
 
 
     /* TODO: Do it without stopping playback, if possible */
+    enum play_status status = play_status;
     struct mp3entry *id3 = audio_current_track();
     unsigned long elapsed = id3->elapsed;
     unsigned long offset = id3->offset;
     /* resume if playing */
-    bool playing = (audio_status() == AUDIO_STATUS_PLAY);
+    resume.coldstart_status = play_status;
+
     /* There's one problem with stoping and resuming: If it happens in a too
      * frequent fashion, the codecs lose the resume postion and playback
      * begins from the beginning.
@@ -842,7 +850,7 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     bool play_queued = queue_peek_ex(&audio_queue, &ev, QPEEK_REMOVE_EVENTS,
                                      filter_list);
 
-    if (playing && (elapsed > 0 || offset > 0))
+    if (status != PLAY_STOPPED && (elapsed > 0 || offset > 0))
     {
         if (play_queued)
             resume = *(struct audio_resume_info *)ev.data;
@@ -889,7 +897,7 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
             audio_reset_buffer_noalloc(start + wanted_size);
             break;
     }
-    if (playing || play_queued)
+    if (status != PLAY_STOPPED || play_queued)
     {
         /* post, to make subsequent calls not break the resume position */
         audio_queue_post(Q_AUDIO_PLAY, (intptr_t)&resume);
@@ -2494,7 +2502,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
                                  unsigned int flags)
 {
     struct audio_resume_info resume =
-        *(resume_info ?: &(struct audio_resume_info){ 0, 0 } );
+        *(resume_info ?: &(struct audio_resume_info){ 0, 0, PLAY_PLAYING } );
     enum play_status old_status = play_status;
 
     if (flags & AUDIO_START_NEWBUF)
@@ -2565,7 +2573,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
         pcmbuf_fade(false, true);
 
         /* Update our state */
-        play_status = PLAY_PLAYING;
+        play_status = resume.coldstart_status;
     }
 
     /* Codec's position should be available as soon as it knows it */
@@ -3416,7 +3424,8 @@ struct mp3entry * audio_next_track(void)
 }
 
 /* Start playback at the specified elapsed time or offset */
-void audio_play(unsigned long elapsed, unsigned long offset)
+void audio_play(unsigned long elapsed, unsigned long offset,
+                unsigned int flags)
 {
     logf("audio_play");
 
@@ -3426,9 +3435,17 @@ void audio_play(unsigned long elapsed, unsigned long offset)
     talk_force_shutup();
 #endif
 
-    LOGFQUEUE("audio >| audio Q_AUDIO_PLAY: %lu %lX", elapsed, offset);
-    audio_queue_send(Q_AUDIO_PLAY,
-                     (intptr_t)&(struct audio_resume_info){ elapsed, offset });
+    LOGFQUEUE("audio >| audio Q_AUDIO_PLAY: %lu %lX %s",
+              elapsed, offset, paused ? "paused" : "playing");
+
+    struct audio_resume_info resume_info =
+    {
+        .elapsed = elapsed,
+        .offset  = offset,
+        .coldstart_status = AUDIO_STATUS_PLAY | (flags & AUDIO_STATUS_PAUSE),
+    };
+
+    audio_queue_send(Q_AUDIO_PLAY, (intptr_t)&resume_info);
 }
 
 /* Stop playback if playing */
