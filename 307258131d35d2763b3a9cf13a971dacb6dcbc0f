@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "64aab054_255eae1d",
+        "filename": "apps/root_menu.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2017-11-21T23:34:25Z",
+      "side": 1,
+      "message": "I gather this is where you intend to make the choice\n\nSomething along the lines of...\nglobal_settings.pause_first_track_load ? AUDIO_STATUS_PAUSE :  AUDIO_STATUS_PLAY",
+      "revId": "307258131d35d2763b3a9cf13a971dacb6dcbc0f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
