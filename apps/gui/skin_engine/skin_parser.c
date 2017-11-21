@@ -2546,8 +2546,10 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
             unsigned long elapsed = id3->elapsed;
             unsigned long offset = id3->offset;
             audio_stop();
+        #if CONFIG_CODEC != SWCODEC
             if (!(status & AUDIO_STATUS_PAUSE))
-                audio_play(elapsed, offset);
+        #endif
+                audio_play_hwswcodec(elapsed, offset, status & AUDIO_STATUS_PAUSE);
         }
     }
 #endif

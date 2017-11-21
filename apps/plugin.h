@@ -737,7 +737,12 @@ struct plugin_api {
                               const char *dirname, int position, bool queue,
                               bool recurse);
     int (*playlist_shuffle)(int random_seed, int start_index);
+#if CONFIG_CODEC == SWCODEC
+    void (*audio_play)(unsigned long elapsed, unsigned long offset,
+                       unsigned int flags);
+#else /* CONFIG_CODEC != SWCODEC */
     void (*audio_play)(unsigned long elapsed, unsigned long offset);
+#endif /* CONFIG_CODEC == SWCODEC */
     void (*audio_stop)(void);
     void (*audio_pause)(void);
     void (*audio_resume)(void);

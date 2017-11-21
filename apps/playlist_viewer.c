@@ -528,7 +528,7 @@ static int onplay_menu(int index)
                         if (current_track->display_index!=viewer.num_tracks ||
                             global_settings.repeat_mode == REPEAT_ALL)
                         {
-                            audio_play(0, 0);
+                            audio_play_hwswcodec(0, 0, 0);
                             viewer.current_playing_track = -1;
                         }
                     }
