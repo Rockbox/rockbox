@@ -1585,6 +1585,8 @@ static int process_input(int tmo, bool do_pausemenu)
      * following code is needed for mouse mode. */
     if(mouse_mode)
     {
+        static int last_mousedir = 0, held_count = 0, v = 1;
+
         if(button & BTN_UP)
             state = CURSOR_UP;
         else if(button & BTN_DOWN)
@@ -1599,6 +1601,32 @@ static int process_input(int tmo, bool do_pausemenu)
 
         last_keystate = button;
 
+        /* move */
+        /* get the direction vector the cursor is moving in. */
+        int new_x = mouse_x, new_y = mouse_y;
+
+        /* in src/misc.c */
+        move_cursor(state, &new_x, &new_y, LCD_WIDTH, LCD_HEIGHT, FALSE);
+
+        int dx = new_x - mouse_x, dy = new_y - mouse_y;
+
+        mouse_x += dx * v;
+        mouse_y += dy * v;
+
+        /* clamp */
+        /* The % operator with negative operands is messy; this is much
+         * simpler. */
+        if(mouse_x < 0)
+            mouse_x = 0;
+        if(mouse_y < 0)
+            mouse_y = 0;
+
+        if(mouse_x >= LCD_WIDTH)
+            mouse_x = LCD_WIDTH - 1;
+        if(mouse_y >= LCD_HEIGHT)
+            mouse_y = LCD_HEIGHT - 1;
+
+        /* clicking/dragging */
         /* rclick on hold requires that we fire left-click on a
          * release, otherwise it's impossible to distinguish the
          * two. */
@@ -1620,8 +1648,6 @@ static int process_input(int tmo, bool do_pausemenu)
                 send_click(LEFT_DRAG, false);
         }
 
-        static int last_mousedir = 0, held_count = 0, v = 0;
-
         /* acceleration */
         if(state && state == last_mousedir)
         {
@@ -1639,29 +1665,6 @@ static int process_input(int tmo, bool do_pausemenu)
             v = 1;
             held_count = 0;
         }
-
-        /* get the direction vector the cursor is moving in. */
-        int new_x = mouse_x, new_y = mouse_y;
-
-        /* in src/misc.c */
-        move_cursor(state, &new_x, &new_y, LCD_WIDTH, LCD_HEIGHT, FALSE);
-
-        int dx = new_x - mouse_x, dy = new_y - mouse_y;
-
-        mouse_x += dx * v;
-        mouse_y += dy * v;
-
-        /* The % operator with negative operands is messy; this is much
-         * simpler. */
-        if(mouse_x < 0)
-            mouse_x = 0;
-        if(mouse_y < 0)
-            mouse_y = 0;
-
-        if(mouse_x >= LCD_WIDTH)
-            mouse_x = LCD_WIDTH - 1;
-        if(mouse_y >= LCD_HEIGHT)
-            mouse_y = LCD_HEIGHT - 1;
 
         /* no buttons are sent to the midend in mouse mode */
         return 0;
