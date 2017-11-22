@@ -1,0 +1,130 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "44a76c8a_242312ab",
+        "filename": "firmware/target/arm/imx233/regs/macro.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2017-11-22T14:34:29Z",
+      "side": 1,
+      "message": "Seems unrelated",
+      "revId": "cf41e0288244b594a58d6773c2cf4e98a9f353d9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44a76c8a_041e165e",
+        "filename": "firmware/target/mips/jz4760b/boot.lds",
+        "patchSetId": 7
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2017-11-22T14:34:29Z",
+      "side": 1,
+      "message": "My painful experience is that align statements between section declarations are ignored so this should be put at the very end of .text declaration or at the very beginning of .rodata",
+      "range": {
+        "startLine": 28,
+        "startChar": 15,
+        "endLine": 28,
+        "endChar": 17
+      },
+      "revId": "cf41e0288244b594a58d6773c2cf4e98a9f353d9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44a76c8a_841a066c",
+        "filename": "firmware/target/mips/jz4760b/crt0.S",
+        "patchSetId": 7
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2017-11-22T14:34:29Z",
+      "side": 1,
+      "message": "IMO bal is more suitable as is truly PC relative",
+      "revId": "cf41e0288244b594a58d6773c2cf4e98a9f353d9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44a76c8a_a4170243",
+        "filename": "firmware/target/mips/jz4760b/crt0.S",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2017-11-22T14:34:29Z",
+      "side": 1,
+      "message": "as above",
+      "range": {
+        "startLine": 79,
+        "startChar": 12,
+        "endLine": 79,
+        "endChar": 23
+      },
+      "revId": "cf41e0288244b594a58d6773c2cf4e98a9f353d9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44a76c8a_44240eb4",
+        "filename": "firmware/target/mips/jz4760b/crt0.S",
+        "patchSetId": 7
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2017-11-22T14:34:29Z",
+      "side": 1,
+      "message": "why do you need this?",
+      "range": {
+        "startLine": 111,
+        "startChar": 12,
+        "endLine": 111,
+        "endChar": 24
+      },
+      "revId": "cf41e0288244b594a58d6773c2cf4e98a9f353d9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44a76c8a_64290a8b",
+        "filename": "firmware/target/mips/jz4760b/crt0.S",
+        "patchSetId": 7
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2017-11-22T14:34:29Z",
+      "side": 1,
+      "message": "isn\u0027t it NOP actually?",
+      "range": {
+        "startLine": 226,
+        "startChar": 18,
+        "endLine": 226,
+        "endChar": 19
+      },
+      "revId": "cf41e0288244b594a58d6773c2cf4e98a9f353d9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
