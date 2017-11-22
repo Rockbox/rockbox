@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "44a76c8a_245eb21d",
+        "filename": "firmware/target/arm/imx233/regs/macro.h",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000536
+      },
+      "writtenOn": "2017-11-22T21:16:28Z",
+      "side": 1,
+      "message": "yes",
+      "parentUuid": "44a76c8a_242312ab",
+      "revId": "cf41e0288244b594a58d6773c2cf4e98a9f353d9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "44a76c8a_041e165e",
         "filename": "firmware/target/mips/jz4760b/boot.lds",
         "patchSetId": 7
@@ -59,6 +77,24 @@
     },
     {
       "key": {
+        "uuid": "44a76c8a_a42e228d",
+        "filename": "firmware/target/mips/jz4760b/crt0.S",
+        "patchSetId": 7
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1000536
+      },
+      "writtenOn": "2017-11-22T21:16:28Z",
+      "side": 1,
+      "message": "Good point, will change it.",
+      "parentUuid": "44a76c8a_841a066c",
+      "revId": "cf41e0288244b594a58d6773c2cf4e98a9f353d9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "44a76c8a_a4170243",
         "filename": "firmware/target/mips/jz4760b/crt0.S",
         "patchSetId": 7
@@ -70,6 +106,30 @@
       "writtenOn": "2017-11-22T14:34:29Z",
       "side": 1,
       "message": "as above",
+      "range": {
+        "startLine": 79,
+        "startChar": 12,
+        "endLine": 79,
+        "endChar": 23
+      },
+      "revId": "cf41e0288244b594a58d6773c2cf4e98a9f353d9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44a76c8a_444f2e6e",
+        "filename": "firmware/target/mips/jz4760b/crt0.S",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1000536
+      },
+      "writtenOn": "2017-11-22T21:16:28Z",
+      "side": 1,
+      "message": "same.",
+      "parentUuid": "44a76c8a_a4170243",
       "range": {
         "startLine": 79,
         "startChar": 12,
@@ -105,6 +165,30 @@
     },
     {
       "key": {
+        "uuid": "44a76c8a_6454aafd",
+        "filename": "firmware/target/mips/jz4760b/crt0.S",
+        "patchSetId": 7
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1000536
+      },
+      "writtenOn": "2017-11-22T21:16:28Z",
+      "side": 1,
+      "message": "because we wrote stuff to iram and it could contain some code.",
+      "parentUuid": "44a76c8a_44240eb4",
+      "range": {
+        "startLine": 111,
+        "startChar": 12,
+        "endLine": 111,
+        "endChar": 24
+      },
+      "revId": "cf41e0288244b594a58d6773c2cf4e98a9f353d9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "44a76c8a_64290a8b",
         "filename": "firmware/target/mips/jz4760b/crt0.S",
         "patchSetId": 7
@@ -116,6 +200,30 @@
       "writtenOn": "2017-11-22T14:34:29Z",
       "side": 1,
       "message": "isn\u0027t it NOP actually?",
+      "range": {
+        "startLine": 226,
+        "startChar": 18,
+        "endLine": 226,
+        "endChar": 19
+      },
+      "revId": "cf41e0288244b594a58d6773c2cf4e98a9f353d9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44a76c8a_04593634",
+        "filename": "firmware/target/mips/jz4760b/crt0.S",
+        "patchSetId": 7
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1000536
+      },
+      "writtenOn": "2017-11-22T21:16:28Z",
+      "side": 1,
+      "message": "I just copied the code from jz4740 without looking but yeah looks like a nop. I will need to check/rewrite this code at some point.",
+      "parentUuid": "44a76c8a_64290a8b",
       "range": {
         "startLine": 226,
         "startChar": 18,
