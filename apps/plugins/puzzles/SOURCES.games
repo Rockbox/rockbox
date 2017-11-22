@@ -5,21 +5,20 @@ src/bridges.c
 src/cube.c
 src/dominosa.c
 src/fifteen.c
-/*src/filling.c*/
+//src/filling.c /* requires numeric input */
 src/flip.c
 src/flood.c
 src/galaxies.c
 src/guess.c
 src/inertia.c
-/*src/keen.c*/
+//src/keen.c /* numeric input */
 src/lightup.c
-/*src/loopy.c*/
 src/magnets.c
 src/map.c
 src/mines.c
 src/net.c
 src/netslide.c
-/*src/palisade.c*/
+src/palisade.c
 src/pattern.c
 src/pegs.c
 src/range.c
@@ -29,17 +28,16 @@ src/signpost.c
 src/singles.c
 src/sixteen.c
 src/slant.c
-/*src/solo.c*/
 src/tents.c
-/*src/towers.c*/
+//src/towers.c /* numeric input */
 src/tracks.c
 src/twiddle.c
-/*src/undead.c*/
-/*src/unequal.c*/
+//src/undead.c /* keyboard input */
+//src/unequal.c /* numeric input */
 src/unruly.c
 src/untangle.c
 
-/* disabled for now */
+/* disabled for now (fix puzzles.make and CATEGORIES to accomodate these) */
 /*src/unfinished/group.c*/
 /*src/unfinished/separate.c*/
 /*src/unfinished/slide.c*/
@@ -48,6 +46,6 @@ src/untangle.c
 /* no c200v2 */
 #if PLUGIN_BUFFER_SIZE > 0x14000
 src/pearl.c
-/*src/loopy.c*/
-/*src/solo.c*/
+src/loopy.c /* mouse input */
+//src/solo.c /* numeric input */
 #endif

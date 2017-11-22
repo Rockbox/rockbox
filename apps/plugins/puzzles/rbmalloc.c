@@ -51,7 +51,7 @@ static bool grab_audiobuf(void)
 void *smalloc(size_t size) {
     void *p;
     p = malloc(size);
-    LOGF("allocs: %d", ++allocs);
+    //LOGF("allocs: %d", ++allocs);
     if (!p)
     {
         if(grab_audiobuf())
@@ -67,7 +67,7 @@ void *smalloc(size_t size) {
 void sfree(void *p) {
     if (p) {
         ++frees;
-        LOGF("frees: %d, total outstanding: %d", frees, allocs - frees);
+        //LOGF("frees: %d, total outstanding: %d", frees, allocs - frees);
         free(p);
     }
 }
@@ -80,7 +80,7 @@ void *srealloc(void *p, size_t size) {
     if (p) {
 	q = realloc(p, size);
     } else {
-        LOGF("allocs: %d", ++allocs);
+        //LOGF("allocs: %d", ++allocs);
 	q = malloc(size);
     }
     if (!q)

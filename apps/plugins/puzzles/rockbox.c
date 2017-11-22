@@ -44,6 +44,8 @@
 
 #include "fixedpoint.h"
 
+#include "pluginbitmaps/puzzles_cursor.h"
+
 /* how many ticks between timer callbacks */
 #define TIMER_INTERVAL (HZ / 50)
 
@@ -122,12 +124,14 @@ static int help_times = 0;
 
 /* clipping stuff */
 static struct viewport clip_rect;
-static bool clipped = false, zoom_enabled = false, view_mode = true;
+static bool clipped = false, zoom_enabled = false, view_mode = true, mouse_mode = false;
+
+static int mouse_x, mouse_y;
 
 extern bool audiobuf_available; /* defined in rbmalloc.c */
 
 static fb_data *zoom_fb; /* dynamically allocated */
-static int zoom_w, zoom_h, zoom_clipu, zoom_clipd, zoom_clipl, zoom_clipr;
+static int zoom_x, zoom_y, zoom_w, zoom_h, zoom_clipu, zoom_clipd, zoom_clipl, zoom_clipr;
 static int cur_font = FONT_UI;
 
 static bool need_draw_update = false;
@@ -135,7 +139,12 @@ static int ud_l = 0, ud_u = 0, ud_r = LCD_WIDTH, ud_d = LCD_HEIGHT;
 
 static char *titlebar = NULL;
 
-static bool want_redraw = true, accept_input = true;
+/* how to process the input (custom, per-game) */
+static struct {
+    bool want_spacebar, falling_edge, ignore_repeats, rclick_on_hold;
+} input_settings;
+
+static bool accept_input = true;
 
 /* last timer call */
 static long last_tstamp;
@@ -145,10 +154,10 @@ static bool load_success;
 
 /* debug settings */
 /* did I mention there's a secret debug menu? */
-static struct settings_t {
+static struct {
     int slowmo_factor;
     bool timerflash, clipoff, shortcuts, no_aa, polyanim;
-} settings;
+} debug_settings;
 
 /* re-implementations of many rockbox primitives, adapted to draw into
  * a custom framebuffer. */
@@ -469,7 +478,7 @@ static void rb_clip(void *handle, int x, int y, int w, int h)
 {
     if(!zoom_enabled)
     {
-        if(!settings.clipoff)
+        if(!debug_settings.clipoff)
         {
             LOGF("rb_clip(%d %d %d %d)", x, y, w, h);
             clip_rect.x = MAX(0, x);
@@ -736,7 +745,7 @@ static void rb_draw_line(void *handle, int x1, int y1, int x2, int y2,
     {
         LOGF("rb_draw_line(%d, %d, %d, %d, %d)", x1, y1, x2, y2, color);
         rb_color(color);
-        if(settings.no_aa)
+        if(debug_settings.no_aa)
         {
             offset_coords(&x1, &y1);
             offset_coords(&x2, &y2);
@@ -968,7 +977,7 @@ static void rb_draw_poly(void *handle, int *coords, int npoints,
                                   x3, y3);
 
 #ifdef DEBUG_MENU
-                if(settings.polyanim)
+                if(debug_settings.polyanim)
                 {
                     rb->lcd_update();
                     rb->sleep(HZ/4);
@@ -1014,7 +1023,7 @@ static void rb_draw_poly(void *handle, int *coords, int npoints,
             y1 = coords[2 * (i - 1) + 1];
             x2 = coords[2 * i];
             y2 = coords[2 * i + 1];
-            if(settings.no_aa)
+            if(debug_settings.no_aa)
             {
                 offset_coords(&x1, &y1);
                 offset_coords(&x2, &y2);
@@ -1025,7 +1034,7 @@ static void rb_draw_poly(void *handle, int *coords, int npoints,
                 draw_antialiased_line(rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, x1, y1, x2, y2);
 
 #ifdef DEBUG_MENU
-            if(settings.polyanim)
+            if(debug_settings.polyanim)
             {
                 rb->lcd_update();
                 rb->sleep(HZ/4);
@@ -1038,7 +1047,7 @@ static void rb_draw_poly(void *handle, int *coords, int npoints,
         y1 = coords[1];
         x2 = coords[2 * (npoints - 1)];
         y2 = coords[2 * (npoints - 1) + 1];
-        if(settings.no_aa)
+        if(debug_settings.no_aa)
         {
             offset_coords(&x1, &y1);
             offset_coords(&x2, &y2);
@@ -1193,7 +1202,7 @@ static void rb_blitter_save(void *handle, blitter *bl, int x, int y)
 #if defined(LCD_STRIDEFORMAT) && (LCD_STRIDEFORMAT == VERTICAL_STRIDE)
 #error no vertical stride
 #else
-    if(bl->bmp.data)
+    if(bl && bl->bmp.data)
     {
         int w = bl->bmp.width, h = bl->bmp.height;
         int screen_w = zoom_enabled ? zoom_w : LCD_WIDTH;
@@ -1282,6 +1291,8 @@ static void rb_start_draw(void *handle)
 static void rb_end_draw(void *handle)
 {
     (void) handle;
+    /* we ignore the backend's redraw requests and just unconditionally update everything */
+#if 0
     if(!zoom_enabled)
     {
         LOGF("rb_end_draw");
@@ -1293,6 +1304,7 @@ static void rb_end_draw(void *handle)
     {
         /* stubbed */
     }
+#endif
 }
 
 static void rb_status_bar(void *handle, const char *text)
@@ -1339,6 +1351,54 @@ static void draw_title(bool clear_first)
     rb->lcd_set_drawmode(DRMODE_FG);
     rb->lcd_set_foreground(LCD_BLACK);
     rb->lcd_putsxy(0, LCD_HEIGHT - h, str);
+
+    if(!zoom_enabled)
+    {
+        if(orig_clipped)
+            rb_clip(NULL, clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height);
+    }
+}
+
+#define MOUSE_W BMPWIDTH_puzzles_cursor
+#define MOUSE_H BMPHEIGHT_puzzles_cursor
+
+static blitter *mouse_bl = NULL;
+
+static void clear_mouse(void)
+{
+    bool orig_clipped = clipped;
+    if(!zoom_enabled)
+    {
+        if(orig_clipped)
+            rb_unclip(NULL);
+    }
+
+    if(mouse_bl)
+        rb_blitter_load(NULL, mouse_bl, BLITTER_FROMSAVED, BLITTER_FROMSAVED);
+
+    if(!zoom_enabled)
+    {
+        if(orig_clipped)
+            rb_clip(NULL, clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height);
+    }
+}
+
+static void draw_mouse(void)
+{
+    bool orig_clipped = clipped;
+    if(!zoom_enabled)
+    {
+        if(orig_clipped)
+            rb_unclip(NULL);
+    }
+
+    if(!mouse_bl)
+        mouse_bl = rb_blitter_new(NULL, MOUSE_W, MOUSE_H);
+
+    /* save area being covered (will be restored elsewhere) */
+    rb_blitter_save(NULL, mouse_bl, mouse_x, mouse_y);
+
+    rb->lcd_bitmap_transparent(puzzles_cursor, mouse_x, mouse_y, BMPWIDTH_puzzles_cursor, BMPHEIGHT_puzzles_cursor);
 
     if(!zoom_enabled)
     {
@@ -1403,7 +1463,7 @@ void get_random_seed(void **randseed, int *randseedsize)
 static void timer_cb(void)
 {
 #if LCD_DEPTH != 24
-    if(settings.timerflash)
+    if(debug_settings.timerflash)
     {
         static bool what = false;
         what = !what;
@@ -1416,7 +1476,7 @@ static void timer_cb(void)
 #endif
 
     LOGF("timer callback");
-    midend_timer(me, ((float)(*rb->current_tick - last_tstamp) / (float)HZ) / settings.slowmo_factor);
+    midend_timer(me, ((float)(*rb->current_tick - last_tstamp) / (float)HZ) / debug_settings.slowmo_factor);
     last_tstamp = *rb->current_tick;
 }
 
@@ -1440,12 +1500,27 @@ void frontend_default_color(frontend *fe, float *out)
 
 /** frontend code -- mostly UI stuff **/
 
-/* set do_pausemenu to false to just return -1 on BTN_PAUSE and do
- * nothing else. */
+static void send_click(int button, bool release)
+{
+    int x = (zoom_enabled ? zoom_x : 0) + mouse_x,
+        y = (zoom_enabled ? zoom_y : 0) + mouse_y;
+    assert(LEFT_BUTTON + 6 == LEFT_RELEASE);
+
+    midend_process_key(me, x, y, button);
+
+    if(release)
+        midend_process_key(me, x, y, button + 6);
+}
+
+/* This function handles most user input. It has specific workarounds
+ * and fixes for certain games to allow them to work well on
+ * Rockbox. It will either return a positive value that can be passed
+ * to the midend, or a negative flag value. Set do_pausemenu to false
+ * to just return -1 on BTN_PAUSE and do nothing else. */
 static int process_input(int tmo, bool do_pausemenu)
 {
     LOGF("process_input start");
-    LOGF("------------------");
+    LOGF("-------------------");
     int state = 0;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -1457,13 +1532,24 @@ static int process_input(int tmo, bool do_pausemenu)
     /* weird stuff */
     exit_on_usb(button);
 
-    /* these games require a second input on long-press */
-    if(accept_input && (button == (BTN_FIRE | BUTTON_REPEAT)) &&
-       (strcmp("Mines", midend_which_game(me)->name)   != 0 ||
-        strcmp("Magnets", midend_which_game(me)->name) != 0))
+    /* See if the button is a long-press. */
+    if(accept_input && (button == (BTN_FIRE | BUTTON_REPEAT)))
     {
+        LOGF("button is long-press, ignoring subsequent input until release");
+        /* Ignore repeated long presses. */
         accept_input = false;
-        return ' ';
+
+        if(mouse_mode && input_settings.rclick_on_hold)
+        {
+            /* simulate right-click */
+            LOGF("sending right click");
+            send_click(RIGHT_BUTTON, true);
+            return 0;
+        }
+
+        /* These games want a spacebar in this event. */
+        if(!mouse_mode && input_settings.want_spacebar)
+            return ' ';
     }
 
     button = rb->button_status();
@@ -1476,7 +1562,6 @@ static int process_input(int tmo, bool do_pausemenu)
     {
         if(do_pausemenu)
         {
-            want_redraw = false;
             /* quick hack to preserve the clipping state */
             bool orig_clipped = clipped;
             if(orig_clipped)
@@ -1496,13 +1581,99 @@ static int process_input(int tmo, bool do_pausemenu)
             return -1;
     }
 
-    /* these games require, for one reason or another, that events
+    /* Mouse movement (if enabled). This goes here since none of the
+     * following code is needed for mouse mode. */
+    if(mouse_mode)
+    {
+        if(button & BTN_UP)
+            state = CURSOR_UP;
+        else if(button & BTN_DOWN)
+            state = CURSOR_DOWN;
+        else if(button & BTN_LEFT)
+            state = CURSOR_LEFT;
+        else if(button & BTN_RIGHT)
+            state = CURSOR_RIGHT;
+
+        unsigned released = ~button & last_keystate,
+            pressed = button & ~last_keystate;
+
+        last_keystate = button;
+
+        /* rclick on hold requires that we fire left-click on a
+         * release, otherwise it's impossible to distinguish the
+         * two. */
+        if(input_settings.rclick_on_hold)
+        {
+            if(accept_input && released == BTN_FIRE)
+            {
+                LOGF("sending left click");
+                send_click(LEFT_BUTTON, true); /* right-click is handled earlier */
+            }
+        }
+        else
+        {
+            if(pressed & BTN_FIRE)
+                send_click(LEFT_BUTTON, false);
+            else if(released & BTN_FIRE)
+                send_click(LEFT_RELEASE, false);
+            else if(button & BTN_FIRE)
+                send_click(LEFT_DRAG, false);
+        }
+
+        static int last_mousedir = 0, held_count = 0, v = 0;
+
+        /* acceleration */
+        if(state && state == last_mousedir)
+        {
+            if(++held_count % 5 == 0 && v < 15)
+                v++;
+        }
+        else
+        {
+            if(!button)
+            {
+                LOGF("all keys released, accepting further input");
+                accept_input = true;
+            }
+            last_mousedir = state;
+            v = 1;
+            held_count = 0;
+        }
+
+        /* get the direction vector the cursor is moving in. */
+        int new_x = mouse_x, new_y = mouse_y;
+
+        /* in src/misc.c */
+        move_cursor(state, &new_x, &new_y, LCD_WIDTH, LCD_HEIGHT, FALSE);
+
+        int dx = new_x - mouse_x, dy = new_y - mouse_y;
+
+        mouse_x += dx * v;
+        mouse_y += dy * v;
+
+        /* The % operator with negative operands is messy; this is much
+         * simpler. */
+        if(mouse_x < 0)
+            mouse_x = 0;
+        if(mouse_y < 0)
+            mouse_y = 0;
+
+        if(mouse_x >= LCD_WIDTH)
+            mouse_x = LCD_WIDTH - 1;
+        if(mouse_y >= LCD_HEIGHT)
+            mouse_y = LCD_HEIGHT - 1;
+
+        /* no buttons are sent to the midend in mouse mode */
+        return 0;
+    }
+
+    /* These games require, for one reason or another, that events
      * fire upon buttons being released rather than when they are
-     * pressed */
-    if(strcmp("Inertia", midend_which_game(me)->name) == 0 ||
-       strcmp("Mines", midend_which_game(me)->name)   == 0 ||
-       strcmp("Magnets", midend_which_game(me)->name) == 0 ||
-       strcmp("Map", midend_which_game(me)->name)     == 0)
+     * pressed. For Inertia, it is because it needs to be able to
+     * sense multiple simultaneous keypresses (to move diagonally),
+     * and the others require a long press to map to a secondary
+     * "action" key. */
+    if(input_settings.falling_edge)
     {
         LOGF("received button 0x%08x", button);
 
@@ -1536,8 +1707,8 @@ static int process_input(int tmo, bool do_pausemenu)
         button |= released;
         LOGF("accepting event 0x%08x", button);
     }
-    /* default is to ignore repeats except for untangle */
-    else if(strcmp("Untangle", midend_which_game(me)->name) != 0)
+    /* Ignore repeats in all games which are not Untangle. */
+    else if(input_settings.ignore_repeats)
     {
         /* start accepting input again after a release */
         if(!button)
@@ -1545,10 +1716,11 @@ static int process_input(int tmo, bool do_pausemenu)
             accept_input = true;
             return 0;
         }
-        /* ignore repeats */
-        /* Untangle gets special treatment */
+
+        /* ignore repeats (in mouse mode, only ignore repeats of BTN_FIRE) */
         if(!accept_input)
             return 0;
+
         accept_input = false;
     }
 
@@ -1604,7 +1776,7 @@ static int process_input(int tmo, bool do_pausemenu)
         break;
     }
 
-    if(settings.shortcuts)
+    if(debug_settings.shortcuts)
     {
         static bool shortcuts_ok = true;
         switch(button)
@@ -1665,9 +1837,9 @@ static void zoom(void)
     /* draws go to the zoom framebuffer */
     midend_force_redraw(me);
 
-    int x = 0, y = 0;
+    zoom_x = zoom_y = 0;
 
-    rb->lcd_bitmap_part(zoom_fb, x, y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
+    rb->lcd_bitmap_part(zoom_fb, zoom_x, zoom_y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
                         0, 0, LCD_WIDTH, LCD_HEIGHT);
 
     draw_title(false); /* false since we don't want to use more screen space than we need. */
@@ -1693,16 +1865,16 @@ static void zoom(void)
             switch(button)
             {
             case BTN_UP:
-                y -= PAN_Y; /* clamped later */
+                zoom_y -= PAN_Y; /* clamped later */
                 break;
             case BTN_DOWN:
-                y += PAN_Y; /* clamped later */
+                zoom_y += PAN_Y; /* clamped later */
                 break;
             case BTN_LEFT:
-                x -= PAN_X; /* clamped later */
+                zoom_x -= PAN_X; /* clamped later */
                 break;
             case BTN_RIGHT:
-                x += PAN_X; /* clamped later */
+                zoom_x += PAN_X; /* clamped later */
                 break;
             case BTN_PAUSE:
                 zoom_enabled = false;
@@ -1716,15 +1888,15 @@ static void zoom(void)
                 break;
             }
 
-            if(y < 0)
-                y = 0;
-            if(x < 0)
-                x = 0;
+            if(zoom_y < 0)
+                zoom_y = 0;
+            if(zoom_x < 0)
+                zoom_x = 0;
 
-            if(y + LCD_HEIGHT >= zoom_h)
-                y = zoom_h - LCD_HEIGHT;
-            if(x + LCD_WIDTH >= zoom_w)
-                x = zoom_w - LCD_WIDTH;
+            if(zoom_y + LCD_HEIGHT >= zoom_h)
+                zoom_y = zoom_h - LCD_HEIGHT;
+            if(zoom_x + LCD_WIDTH >= zoom_w)
+                zoom_x = zoom_w - LCD_WIDTH;
 
             if(timer_on)
                 timer_cb();
@@ -1732,7 +1904,7 @@ static void zoom(void)
             /* goes to zoom_fb */
             midend_redraw(me);
 
-            rb->lcd_bitmap_part(zoom_fb, x, y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
+            rb->lcd_bitmap_part(zoom_fb, zoom_x, zoom_y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
                                 0, 0, LCD_WIDTH, LCD_HEIGHT);
             draw_title(false);
             rb->lcd_update();
@@ -1755,13 +1927,26 @@ static void zoom(void)
             if(timer_on)
                 timer_cb();
 
-            if(want_redraw)
-                midend_redraw(me);
+            midend_redraw(me);
 
-            rb->lcd_bitmap_part(zoom_fb, x, y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
+            /* blit */
+            rb->lcd_bitmap_part(zoom_fb, zoom_x, zoom_y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
                                 0, 0, LCD_WIDTH, LCD_HEIGHT);
+
             draw_title(false);
+
+            /* The cursor is always in screenspace coordinates; when
+             * zoomed, this means the mouse is always restricted to
+             * the bounds of the physical display, not the virtual
+             * zoom framebuffer. */
+            if(mouse_mode)
+                draw_mouse();
+
             rb->lcd_update();
+
+            if(mouse_mode)
+                clear_mouse();
+
             rb->yield();
         }
     }
@@ -2202,12 +2387,12 @@ static void full_help(const char *name)
 
 static void init_default_settings(void)
 {
-    settings.slowmo_factor = 1;
-    settings.timerflash = false;
-    settings.clipoff = false;
-    settings.shortcuts = false;
-    settings.no_aa = false;
-    settings.polyanim = false;
+    debug_settings.slowmo_factor = 1;
+    debug_settings.timerflash = false;
+    debug_settings.clipoff = false;
+    debug_settings.shortcuts = false;
+    debug_settings.no_aa = false;
+    debug_settings.polyanim = false;
 }
 
 #ifdef DEBUG_MENU
@@ -2250,6 +2435,11 @@ static void debug_menu(void)
                         "Toggle antialias",
                         "Benchmark antialias",
                         "Toggle show poly steps",
+                        "Toggle mouse mode",
+                        "Toggle spacebar on long click",
+                        "Toggle send keys on release",
+                        "Toggle ignore repeats",
+                        "Toggle right-click on hold vs. dragging",
                         "Back");
     bool quit = false;
     int sel = 0;
@@ -2258,7 +2448,7 @@ static void debug_menu(void)
         switch(rb->do_menu(&menu, &sel, NULL, false))
         {
         case 0:
-            rb->set_int("Slowmo factor", "", UNIT_INT, &settings.slowmo_factor, NULL, 1, 1, 15, NULL);
+            rb->set_int("Slowmo factor", "", UNIT_INT, &debug_settings.slowmo_factor, NULL, 1, 1, 15, NULL);
             break;
         case 1:
         {
@@ -2271,24 +2461,38 @@ static void debug_menu(void)
             break;
         }
         case 2:
-            settings.timerflash = !settings.timerflash;
+            debug_settings.timerflash = !debug_settings.timerflash;
             break;
         case 3:
-            settings.clipoff = !settings.clipoff;
+            debug_settings.clipoff = !debug_settings.clipoff;
             break;
         case 4:
-            settings.shortcuts = !settings.shortcuts;
+            debug_settings.shortcuts = !debug_settings.shortcuts;
             break;
         case 5:
-            settings.no_aa = !settings.no_aa;
+            debug_settings.no_aa = !debug_settings.no_aa;
             break;
         case 6:
             bench_aa();
             break;
         case 7:
-            settings.polyanim = !settings.polyanim;
+            debug_settings.polyanim = !debug_settings.polyanim;
             break;
         case 8:
+            mouse_mode = !mouse_mode;
+            break;
+        case 9:
+            input_settings.want_spacebar = !input_settings.want_spacebar;
+            break;
+        case 10:
+            input_settings.falling_edge = !input_settings.falling_edge;
+            break;
+        case 11:
+            input_settings.ignore_repeats = !input_settings.ignore_repeats;
+            break;
+        case 12:
+            input_settings.rclick_on_hold = !input_settings.rclick_on_hold;
+            break;
         default:
             quit = true;
             break;
@@ -2315,8 +2519,6 @@ static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
         case 5:
             if(!midend_which_game(me)->can_solve)
                 return ACTION_EXIT_MENUITEM;
-            break;
-        case 7:
             break;
         case 9:
             if(audiobuf_available)
@@ -2349,10 +2551,18 @@ static int pausemenu_cb(int action, const struct menu_item_ex *this_item)
 static void clear_and_draw(void)
 {
     rb->lcd_clear_display();
-    rb->lcd_update();
 
     midend_force_redraw(me);
+
     draw_title(true);
+
+    if(mouse_mode)
+        draw_mouse();
+
+    rb->lcd_update();
+
+    if(mouse_mode)
+        clear_mouse();
 }
 
 static void reset_drawing(void)
@@ -2482,8 +2692,8 @@ static int pause_menu(void)
     }
     rb->lcd_set_background(BG_COLOR);
     rb->lcd_clear_display();
-    rb->lcd_update();
     midend_force_redraw(me);
+    rb->lcd_update();
     return 0;
 }
 
@@ -2542,6 +2752,72 @@ static void init_colors(void)
     sfree(floatcolors);
 }
 
+static bool string_in_list(const char *target, const char **list)
+{
+    /* list is terminated with NULL */
+    const char *i;
+
+    while((i = *list++))
+    {
+        if(!strcmp(target, i))
+            return true;
+    }
+
+    return false;
+}
+
+static void tune_input(const char *name)
+{
+    /* game-specific stuff */
+
+    static const char *want_spacebar[] = {
+        "Magnets",
+        "Mines",
+        "Palisade",
+        NULL
+    };
+
+    /* these get a spacebar on long click */
+    input_settings.want_spacebar = string_in_list(name, want_spacebar);
+
+    static const char *falling_edge[] = {
+        "Inertia",
+        "Magnets",
+        "Map",
+        "Mines",
+        "Palisade",
+        NULL
+    };
+
+    /* wait until a key is released to send an action */
+    input_settings.falling_edge = string_in_list(name, falling_edge);
+
+    /* in all games but untangle (mouse mode overrides this) */
+    static const char *ignore_repeats[] = {
+        "Untangle",
+        NULL
+    };
+
+    input_settings.ignore_repeats = !string_in_list(name, falling_edge);
+
+    /* set to false if you want dragging to be possible */
+    static const char *rclick_on_hold[] = {
+        "Map",
+        "Signpost",
+        "Untangle",
+        NULL
+    };
+
+    input_settings.rclick_on_hold = !string_in_list(name, falling_edge);
+
+    static const char *mouse_games[] = {
+        "Loopy",
+        NULL
+    };
+
+    mouse_mode = string_in_list(name, mouse_games);
+}
+
 static const char *init_for_game(const game *gm, int load_fd, bool draw)
 {
     me = midend_new(NULL, gm, &rb_drawing, NULL);
@@ -2554,6 +2830,11 @@ static const char *init_for_game(const game *gm, int load_fd, bool draw)
         if(ret)
             return ret;
     }
+
+    tune_input(gm->name);
+
+    mouse_x = LCD_WIDTH / 2;
+    mouse_y = LCD_HEIGHT / 2;
 
     fix_size();
 
@@ -2845,12 +3126,6 @@ enum plugin_status plugin_start(const void *param)
 
     init_tlsf();
 
-    /* sanity check */
-    if(fabs(sqrt(3)/2 - sin(PI/3)) > .01)
-    {
-        return PLUGIN_ERROR;
-    }
-
     init_default_settings();
 
     init_fonttab();
@@ -2964,12 +3239,6 @@ enum plugin_status plugin_start(const void *param)
     game_loop:
         while(1)
         {
-            want_redraw = true;
-
-            int theight = get_titleheight();
-            draw_title(true);
-            rb->lcd_update_rect(0, LCD_HEIGHT - theight, LCD_WIDTH, theight);
-
             int button = process_input(timer_on ? TIMER_INTERVAL : -1, true);
 
             if(button < 0)
@@ -3008,16 +3277,20 @@ enum plugin_status plugin_start(const void *param)
             if(button)
                 midend_process_key(me, 0, 0, button);
 
-            draw_title(true); /* will draw to fb */
-
-            if(want_redraw)
-                midend_redraw(me);
-
-            /* push title to screen as well */
-            rb->lcd_update_rect(0, LCD_HEIGHT - theight, LCD_WIDTH, theight);
-
             if(timer_on)
                 timer_cb();
+
+            midend_redraw(me);
+
+            draw_title(true); /* will draw to fb */
+
+            if(mouse_mode)
+                draw_mouse();
+
+            rb->lcd_update();
+
+            if(mouse_mode)
+                clear_mouse();
 
             rb->yield();
         }
