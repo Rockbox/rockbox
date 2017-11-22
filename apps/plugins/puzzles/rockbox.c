@@ -2798,7 +2798,7 @@ static void tune_input(const char *name)
         NULL
     };
 
-    input_settings.ignore_repeats = !string_in_list(name, falling_edge);
+    input_settings.ignore_repeats = !string_in_list(name, ignore_repeats);
 
     /* set to false if you want dragging to be possible */
     static const char *rclick_on_hold[] = {
@@ -2808,7 +2808,7 @@ static void tune_input(const char *name)
         NULL
     };
 
-    input_settings.rclick_on_hold = !string_in_list(name, falling_edge);
+    input_settings.rclick_on_hold = !string_in_list(name, rclick_on_hold);
 
     static const char *mouse_games[] = {
         "Loopy",
