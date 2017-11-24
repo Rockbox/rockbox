@@ -52,6 +52,10 @@
 #endif
 #endif
 
+#ifdef HAVE_PLAY_FREQ
+#include "pcm_mixer.h"
+#endif
+
 /* TODO: The audio thread really is doing multitasking of acting like a
          consumer and producer of tracks. It may be advantageous to better
          logically separate the two functions. I won't go that far just yet. */
@@ -2523,6 +2527,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
             resume.elapsed = id3_get(PLAYING_ID3)->elapsed;
             resume.offset = id3_get(PLAYING_ID3)->offset;
             track_list_clear(TRACK_LIST_CLEAR_ALL);
+            pcmbuf_update_frequency();
         }
         else
         {
@@ -2555,9 +2560,6 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
 #endif
 #ifndef PLATFORM_HAS_VOLUME_CHANGE
         sound_set_volume(global_settings.volume);
-#endif
-#ifdef HAVE_PLAY_FREQ
-        settings_apply_play_freq(global_settings.play_frequency, true);
 #endif
         pcmbuf_update_frequency();
 
@@ -3628,6 +3630,12 @@ void playback_release_aa_slot(int slot)
             aa_slot->used--;
     }
 }
+
+void playback_update_aa_dims(void)
+{
+    LOGFQUEUE("audio >| audio Q_AUDIO_REMAKE_AUDIO_BUFFER");
+    audio_queue_send(Q_AUDIO_REMAKE_AUDIO_BUFFER, 0);
+}
 #endif /* HAVE_ALBUMART */
 
 /* Return file byte offset */
@@ -3701,6 +3709,26 @@ void audio_set_crossfade(int enable)
     }
 }
 #endif /* HAVE_CROSSFADE */
+
+#ifdef HAVE_PLAY_FREQ
+void audio_set_playback_frequency(int setting)
+{
+    static const unsigned long play_sampr[] = { SAMPR_44, SAMPR_48 };
+
+    if ((unsigned)setting >= ARRAYLEN(play_sampr))
+        setting = 0;
+
+    unsigned long playback_sampr = mixer_get_frequency();
+    unsigned long sampr = play_sampr[setting];
+
+    if (sampr != playback_sampr)
+    {
+        mixer_set_frequency(sampr);
+        LOGFQUEUE("audio >| audio Q_AUDIO_REMAKE_AUDIO_BUFFER");
+        audio_queue_send(Q_AUDIO_REMAKE_AUDIO_BUFFER, 0);
+    }
+}
+#endif /* HAVE_PLAY_FREQ */
 
 unsigned int playback_status(void)
 {

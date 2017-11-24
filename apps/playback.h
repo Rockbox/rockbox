@@ -62,12 +62,18 @@ int playback_claim_aa_slot(struct dim *dim);
  * Save to call from other threads */
 void playback_release_aa_slot(int slot);
 
+/*
+ * Tells playback to sync buffered album art dimensions
+ *
+ * Save to call from other threads */
+void playback_update_aa_dims(void);
+
 struct bufopen_bitmap_data {
     struct dim *dim;
     struct mp3_albumart *embedded_albumart;
 };
 
-#endif
+#endif /* HAVE_ALBUMART */
 
 /* Functions */
 int audio_track_count(void);
@@ -78,6 +84,9 @@ void audio_skip(int direction);
 void audio_set_cuesheet(bool enable);
 #ifdef HAVE_CROSSFADE
 void audio_set_crossfade(int enable);
+#endif
+#ifdef HAVE_PLAY_FREQ
+void audio_set_playback_frequency(int setting);
 #endif
 
 size_t audio_get_filebuflen(void);
