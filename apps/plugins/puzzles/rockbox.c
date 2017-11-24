@@ -1164,10 +1164,10 @@ static void trim_rect(int *x, int *y, int *w, int *h)
     int screenh = zoom_enabled ? zoom_h : LCD_HEIGHT;
 
     /* Clip each coordinate at both extremes of the canvas */
-    x0 = (x0 < 0 ? 0 : x0 > screenw - 1 ? screenw - 1: x0);
-    x1 = (x1 < 0 ? 0 : x1 > screenw - 1 ? screenw - 1: x1);
-    y0 = (y0 < 0 ? 0 : y0 > screenh - 1 ? screenh - 1: y0);
-    y1 = (y1 < 0 ? 0 : y1 > screenh - 1 ? screenh - 1: y1);
+    x0 = (x0 < 0 ? 0 : x0 > screenw ? screenw: x0);
+    x1 = (x1 < 0 ? 0 : x1 > screenw ? screenw: x1);
+    y0 = (y0 < 0 ? 0 : y0 > screenh ? screenh: y0);
+    y1 = (y1 < 0 ? 0 : y1 > screenh ? screenh: y1);
 
     /* Transform back into x,y,w,h to return */
     *x = x0;
