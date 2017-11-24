@@ -224,9 +224,6 @@ void settings_apply_skins(void);
 
 void settings_apply(bool read_disk);
 void settings_apply_pm_range(void);
-#ifdef HAVE_PLAY_FREQ
-void settings_apply_play_freq(int value, bool playback);
-#endif
 void settings_display(void);
 
 enum optiontype { INT, BOOL };

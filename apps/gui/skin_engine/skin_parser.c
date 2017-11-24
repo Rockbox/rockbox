@@ -2533,22 +2533,13 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     }
 #endif
 #if defined(HAVE_ALBUMART) && !defined(__PCTOOL__)
-    int status = audio_status();
-    if (status & AUDIO_STATUS_PLAY)
+    /* last_albumart_{width,height} is either both 0 or valid AA dimensions */
+    struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, wps_data->albumart);
+    if (aa && (aa->state != WPS_ALBUMART_NONE ||
+        (((wps_data->last_albumart_height != aa->height) ||
+        (wps_data->last_albumart_width != aa->width)))))
     {
-        /* last_albumart_{width,height} is either both 0 or valid AA dimensions */
-        struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, wps_data->albumart);
-        if (aa && (aa->state != WPS_ALBUMART_NONE ||
-            (((wps_data->last_albumart_height != aa->height) ||
-            (wps_data->last_albumart_width != aa->width)))))
-        {
-            struct mp3entry *id3 = audio_current_track();
-            unsigned long elapsed = id3->elapsed;
-            unsigned long offset = id3->offset;
-            audio_stop();
-            if (!(status & AUDIO_STATUS_PAUSE))
-                audio_play(elapsed, offset);
-        }
+        playback_update_aa_dims();
     }
 #endif
 #ifndef __PCTOOL__
