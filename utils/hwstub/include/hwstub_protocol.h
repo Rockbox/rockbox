@@ -131,6 +131,7 @@ struct hwstub_jz_desc_t
 #define HWSTUB_TARGET_PP        ('P' | 'P' << 8 | ' ' << 16 | ' ' << 24)
 #define HWSTUB_TARGET_ATJ       ('A' | 'T' << 8 | 'J' << 16 | ' ' << 24)
 #define HWSTUB_TARGET_JZ        ('J' | 'Z' << 8 | '4' << 16 | '7' << 24)
+#define HWSTUB_TARGET_TCC       ('T' | 'C' << 8 | 'C' << 16 | ' ' << 24)
 
 struct hwstub_target_desc_t
 {
