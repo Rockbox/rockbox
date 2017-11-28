@@ -19,24 +19,37 @@
  *
  ****************************************************************************/
 #include <limits.h>
+#include "system.h"
 #include "file.h"
 #include "vuprintf.h"
+
+#define FPR_WRBUF_CKSZ 32   /* write buffer chunk size */
 
 struct for_fprintf {
     int fd;  /* where to store it */
     int rem; /* amount remaining */
+    int idx; /* index of next buffer write */
+    unsigned char wrbuf[FPR_WRBUF_CKSZ]; /* write buffer */
 };
+
+static int fpr_buffer_flush(struct for_fprintf *fpr)
+{
+    /* set idx to actual but negative unflushed count to signal error */
+    ssize_t done = write(fpr->fd, fpr->wrbuf, fpr->idx);
+    fpr->idx = MAX(done, 0) - fpr->idx;
+    return fpr->idx;
+}
 
 static int fprfunc(void *pr, int letter)
 {
     struct for_fprintf *fpr  = (struct for_fprintf *)pr;
 
-    /* TODO: add a small buffer to reduce write() calls */
-    if (write(fpr->fd, &(char){ letter }, 1) > 0) {
-        return --fpr->rem;
+    if (fpr->idx >= FPR_WRBUF_CKSZ && fpr_buffer_flush(fpr)) {
+        return -1; /* don't count this one */
     }
 
-    return -1;
+    fpr->wrbuf[fpr->idx++] = letter;
+    return --fpr->rem;
 }
 
 int fdprintf(int fd, const char *fmt, ...)
@@ -47,10 +60,16 @@ int fdprintf(int fd, const char *fmt, ...)
 
     fpr.fd  = fd;
     fpr.rem = INT_MAX;
+    fpr.idx = 0;
 
     va_start(ap, fmt);
     bytes = vuprintf(fprfunc, &fpr, fmt, ap);
     va_end(ap);
+
+    /* flush any tail bytes */
+    if (fpr.idx < 0 || fpr_buffer_flush(&fpr)) {
+        bytes += fpr.idx; /* adjust for unflushed bytes */
+    }
 
     return bytes;
 }
