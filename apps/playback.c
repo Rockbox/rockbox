@@ -35,7 +35,6 @@
 #include "buffering.h"
 #include "talk.h"
 #include "playlist.h"
-#include "abrepeat.h"
 #include "pcmbuf.h"
 #include "audio_thread.h"
 #include "playback.h"
@@ -338,6 +337,8 @@ enum audio_start_playback_flags
 static void audio_start_playback(const struct audio_resume_info *resume_info,
                                  unsigned int flags);
 static void audio_stop_playback(void);
+static void audio_on_seek_begin(bool wait);
+static void audio_on_seek(unsigned long time, int whence);
 static void buffer_event_buffer_low_callback(unsigned short id, void *data, void *user_data);
 static void buffer_event_rebuffer_callback(unsigned short id, void *data);
 static void buffer_event_finished_callback(unsigned short id, void *data);
@@ -862,7 +863,7 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     {   /* inline case Q_AUDIO_STOP (audio_hard_stop() response
          * if we're in the audio thread */
         audio_stop_playback();
-        queue_clear(&audio_queue);
+        audio_queue_clear();
     }
     else
         audio_queue_send(Q_AUDIO_STOP, 1);
@@ -1038,6 +1039,7 @@ static void audio_clear_track_notifications(void)
     {
         /* codec messages */
         { Q_AUDIO_CODEC_SEEK_COMPLETE, Q_AUDIO_CODEC_COMPLETE },
+        { Q_AUDIO_SEEK_0, Q_AUDIO_SEEK_BEGIN },
         /* track change messages */
         { Q_AUDIO_TRACK_CHANGED, Q_AUDIO_TRACK_CHANGED },
     };
@@ -1225,9 +1227,9 @@ static void audio_wait_fade_complete(void)
 }
 
 /* End the ff/rw mode */
-static void audio_ff_rewind_end(void)
+static void audio_seek_end(void)
 {
-    /* A seamless seek (not calling audio_pre_ff_rewind) skips this
+    /* A seamless seek (not calling audio_seek_begin) skips this
        section */
     if (ff_rw_mode)
     {
@@ -1255,7 +1257,7 @@ static void audio_complete_codec_seek(void)
      * If seeking from seek mode, 'ff_rw_mode' is true. */
     if (codec_seeking)
     {
-        audio_ff_rewind_end();
+        audio_seek_end();
         codec_seeking = false; /* set _after_ the call! */
     }
     /* else it's waiting and we must repond */
@@ -2576,7 +2578,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
     buf_set_base_handle(-1);
 
     /* Officially playing */
-    queue_reply(&audio_queue, 1);
+    audio_queue_reply(1);
 
     /* Add these now - finish event for the first id3 will most likely be sent
        immediately */
@@ -2682,6 +2684,18 @@ static void audio_on_pause(bool pause)
     {
         /* Not in ff/rw mode - can actually change the audio state now */
         pcmbuf_pause(pause);
+    }
+
+    if (pause)
+    {
+        long pause_rewind = global_settings.pause_rewind;
+
+        if (pause_rewind)
+        {
+            audio_queue_reply(0);
+            audio_on_seek_begin(true);
+            audio_on_seek(-1000*pause_rewind, AUDIO_SEEK_CUR);
+        }
     }
 }
 
@@ -2824,17 +2838,18 @@ static void audio_on_dir_skip(int direction)
 }
 
 /* Enter seek mode in order to start a seek
-   (Q_AUDIO_PRE_FF_REWIND) */
-static void audio_on_pre_ff_rewind(void)
+   (Q_AUDIO_SEEK+AUDIO_SEEK_BEGIN) */
+static void audio_on_seek_begin(bool wait)
 {
-    logf("%s()", __func__);
+    logf("%s:wait=%d", __func__, (int)wait);
 
     if (play_status == PLAY_STOPPED || ff_rw_mode)
         return;
 
     ff_rw_mode = true;
 
-    audio_wait_fade_complete();
+    if (wait)
+        audio_wait_fade_complete();
 
     if (play_status == PLAY_PAUSED)
         return;
@@ -2843,13 +2858,36 @@ static void audio_on_pre_ff_rewind(void)
 }
 
 /* Seek the playback of the current track to the specified time
-   (Q_AUDIO_FF_REWIND) */
-static void audio_on_ff_rewind(long time)
+   (Q_AUDIO_SEEK+n) */
+static void audio_on_seek(unsigned long time, int whence)
 {
-    logf("%s(%ld)", __func__, time);
+    logf("%s:time=%ldms:whence=%d", __func__, time, whence);
 
     if (play_status == PLAY_STOPPED)
         return;
+
+    if (!ff_rw_mode)
+        audio_on_seek_begin(false);
+
+    struct mp3entry *id3 = id3_get(PLAYING_ID3);
+    unsigned long elapsed = id3->elapsed;
+    unsigned long length = id3->length;
+    signed   long stime = (long)time;
+    unsigned long atime = labs(stime);
+
+    switch (whence)
+    {
+    case AUDIO_SEEK_SET:
+        time = MIN(time, length);
+        break;
+    case AUDIO_SEEK_CUR:
+        time = stime <= 0 ? elapsed - MIN(atime, elapsed) :
+                            elapsed + MIN(atime, length - elapsed);
+        break;
+    case AUDIO_SEEK_END:
+        time = stime <= 0 ? length - MIN(atime, length) : length;
+        break;
+    }
 
     enum track_skip_type pending = skip_pending;
 
@@ -2859,7 +2897,6 @@ static void audio_on_ff_rewind(long time)
     case TRACK_SKIP_AUTO:              /* Have to back it out (fun!) */
     case TRACK_SKIP_AUTO_END_PLAYLIST: /* Still have the last codec used */
     {
-        struct mp3entry *id3 = id3_get(PLAYING_ID3);
         struct mp3entry *ci_id3 = id3_get(CODEC_ID3);
 
         track_event_flags = TEF_NONE;
@@ -2869,10 +2906,10 @@ static void audio_on_ff_rewind(long time)
         {
             send_track_event(PLAYBACK_EVENT_TRACK_FINISH,
                              track_event_flags | TEF_REWIND, id3);
+            time = 0;
         }
 
         id3->elapsed = time;
-        queue_reply(&audio_queue, 1);
 
         bool haltres = halt_decoding_track(pending == TRACK_SKIP_AUTO);
 
@@ -2954,7 +2991,7 @@ static void audio_on_ff_rewind(long time)
            lock out seeking for a couple seconds */
 
         /* Sure as heck cancel seek mode too! */
-        audio_ff_rewind_end();
+        audio_seek_end();
         return;
         }
 
@@ -3022,6 +3059,28 @@ static void audio_on_audio_flush(void)
     }
 }
 
+/* Handles events that must be processed in all audio thread modes */
+void playback_default_event_handler(struct queue_event *ev)
+{
+    switch (ev->id)
+    {
+    case Q_AUDIO_REMAKE_AUDIO_BUFFER:
+        /* buffer needs to be reinitialized */
+        LOGFQUEUE("playback < Q_AUDIO_REMAKE_AUDIO_BUFFER");
+        audio_start_playback(NULL, AUDIO_START_RESTART | AUDIO_START_NEWBUF);
+        break;
+
+#ifdef HAVE_DISK_STORAGE
+    case Q_AUDIO_UPDATE_WATERMARK:
+        /* buffering watermark needs updating */
+        LOGFQUEUE("playback < Q_AUDIO_UPDATE_WATERMARK: %d",
+                  (int)ev->data);
+        audio_update_filebuf_watermark(ev->data);
+        break;
+#endif /* HAVE_DISK_STORAGE */
+    }
+}
+
 /* Called by audio thread when playback is started */
 void audio_playback_handler(struct queue_event *ev)
 {
@@ -3064,7 +3123,7 @@ void audio_playback_handler(struct queue_event *ev)
             LOGFQUEUE("playback < Q_AUDIO_STOP");
             audio_stop_playback();
             if (ev->data != 0)
-                queue_clear(&audio_queue);
+                audio_queue_clear();
             return; /* no more playback */
 
         case Q_AUDIO_PAUSE:
@@ -3082,14 +3141,16 @@ void audio_playback_handler(struct queue_event *ev)
             audio_on_dir_skip(ev->data);
             break;
 
-        case Q_AUDIO_PRE_FF_REWIND:
-            LOGFQUEUE("playback < Q_AUDIO_PRE_FF_REWIND");
-            audio_on_pre_ff_rewind();
+        case Q_AUDIO_SEEK_BEGIN:
+            LOGFQUEUE("playback < Q_AUDIO_SEEK_BEGIN");
+            audio_on_seek_begin(true);
             break;
 
-        case Q_AUDIO_FF_REWIND:
-            LOGFQUEUE("playback < Q_AUDIO_FF_REWIND");
-            audio_on_ff_rewind(ev->data);
+        case Q_AUDIO_SEEK_0 ... Q_AUDIO_SEEK_N:
+            LOGFQUEUE("playback < Q_AUDIO_SEEK_0+%d: %lu",
+                      (int)((long)ev->id - Q_AUDIO_SEEK_0),
+                      (unsigned long)ev->data);
+            audio_on_seek(ev->data, (long)ev->id - Q_AUDIO_SEEK_0);
             break;
 
         case Q_AUDIO_FLUSH:
@@ -3122,32 +3183,13 @@ void audio_playback_handler(struct queue_event *ev)
             audio_on_handle_finished(ev->data);
             break;
 
-        /** Miscellaneous messages **/
-        case Q_AUDIO_REMAKE_AUDIO_BUFFER:
-            /* buffer needs to be reinitialized */
-            LOGFQUEUE("playback < Q_AUDIO_REMAKE_AUDIO_BUFFER");
-            audio_start_playback(NULL, AUDIO_START_RESTART | AUDIO_START_NEWBUF);
-            if (play_status == PLAY_STOPPED)
-                return; /* just need to change buffer state */
-            break;
-
-#ifdef HAVE_DISK_STORAGE
-        case Q_AUDIO_UPDATE_WATERMARK:
-            /* buffering watermark needs updating */
-            LOGFQUEUE("playback < Q_AUDIO_UPDATE_WATERMARK: %d",
-                      (int)ev->data);
-            audio_update_filebuf_watermark(ev->data);
-            if (play_status == PLAY_STOPPED)
-                return; /* just need to update setting */
-            break;
-#endif /* HAVE_DISK_STORAGE */
-
         case SYS_TIMEOUT:
             LOGFQUEUE_SYS_TIMEOUT("playback < SYS_TIMEOUT");
             break;
 
         default:
             /* LOGFQUEUE("audio < default : %08lX", ev->id); */
+            audio_default_event_handler(ev);
             break;
         } /* end switch */
 
@@ -3257,9 +3299,6 @@ static void buffer_event_finished_callback(unsigned short id, void *ev_data)
 /* Update elapsed time for next PCM insert */
 void audio_codec_update_elapsed(unsigned long elapsed)
 {
-#ifdef AB_REPEAT_ENABLE
-    ab_position_report(elapsed);
-#endif
     /* Save in codec's id3 where it is used at next pcm insert */
     id3_get(CODEC_ID3)->elapsed = elapsed;
 }
@@ -3274,14 +3313,6 @@ void audio_codec_update_offset(size_t offset)
 /* Codec has finished running */
 void audio_codec_complete(int status)
 {
-#ifdef AB_REPEAT_ENABLE
-    if (status >= CODEC_OK)
-    {
-        /* Normal automatic skip */
-        ab_end_of_track_report();
-    }
-#endif
-
     LOGFQUEUE("codec > audio Q_AUDIO_CODEC_COMPLETE: %d", status);
     audio_queue_post(Q_AUDIO_CODEC_COMPLETE, status);
 }
@@ -3416,6 +3447,11 @@ struct mp3entry * audio_next_track(void)
     return id3;
 }
 
+unsigned long audio_get_elapsed(void)
+{
+    return play_status ? audio_current_track()->elapsed : 0;
+}
+
 /* Start playback at the specified elapsed time or offset */
 void audio_play(unsigned long elapsed, unsigned long offset)
 {
@@ -3539,18 +3575,14 @@ void audio_prev_dir(void)
     audio_queue_post(Q_AUDIO_DIR_SKIP, -1);
 }
 
-/* Pause playback in order to start a seek that flushes the old audio */
-void audio_pre_ff_rewind(void)
-{
-    LOGFQUEUE("audio > audio Q_AUDIO_PRE_FF_REWIND");
-    audio_queue_post(Q_AUDIO_PRE_FF_REWIND, 0);
-}
-
 /* Seek to the new time in the current track */
-void audio_ff_rewind(long time)
+void audio_seek(unsigned long time, int whence)
 {
-    LOGFQUEUE("audio > audio Q_AUDIO_FF_REWIND");
-    audio_queue_post(Q_AUDIO_FF_REWIND, time);
+    if ((unsigned int)whence >= N_AUDIO_SEEK)
+        return;
+
+    LOGFQUEUE("audio > audio Q_AUDIO_SEEK_0+%d:time=%lu", whence, time);
+    audio_queue_post(Q_AUDIO_SEEK_0 + whence, time);
 }
 
 /* Clear all but the currently playing track then rebuffer */

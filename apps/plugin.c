@@ -646,7 +646,11 @@ static const struct plugin_api rockbox_api = {
     audio_resume,
     audio_next,
     audio_prev,
+#if CONFIG_CODEC == SWCODEC
+    audio_seek,
+#else
     audio_ff_rewind,
+#endif
     audio_next_track,
     audio_status,
     audio_current_track,

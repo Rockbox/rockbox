@@ -35,6 +35,11 @@ void codec_thread_init(void) INIT_ATTR;
 void codec_thread_do_callback(void (*fn)(void),
                               unsigned int *codec_thread_id);
 
+#ifdef AB_REPEAT_ENABLE
+void codec_update_markers(void);
+void codec_ab_seek(unsigned long time);
+#endif /* AB_REPEAT_ENABLE */
+
 #ifdef HAVE_PRIORITY_SCHEDULING
 int codec_thread_get_priority(void);
 int codec_thread_set_priority(int priority);
@@ -44,7 +49,7 @@ int codec_thread_set_priority(int priority);
 bool codec_load(int hid, int cod_spec);
 void codec_go(void);
 bool codec_pause(void);
-void codec_seek(long time);
+void codec_seek(unsigned long time);
 void codec_stop(void);
 #ifdef HAVE_RECORDING
 size_t codec_finish_stream(void);

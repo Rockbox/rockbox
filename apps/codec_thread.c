@@ -38,6 +38,35 @@
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
+enum q_codec_events
+{
+    Q_CODEC_NULL = 0,
+
+    /* basic operations */
+    Q_CODEC_LOAD,
+    Q_CODEC_UNLOAD,
+    Q_CODEC_RUN,
+
+    /* urgent (interrupts codec) */
+    Q_CODEC_URGENT_FIRST,
+
+    Q_CODEC_PAUSE = Q_CODEC_URGENT_FIRST,
+    Q_CODEC_SEEK,
+#ifdef AB_REPEAT_ENABLE
+    Q_CODEC_AB_SEEK,
+#endif /* AB_REPEAT_ENABLE */
+    Q_CODEC_STOP,
+
+    Q_CODEC_URGENT_LAST = Q_CODEC_STOP,
+
+    /* misc */
+#ifdef AB_REPEAT_ENABLE
+    Q_CODEC_UPDATE_MARKERS,
+#endif /* AB_REPEAT_ENABLE */
+    Q_CODEC_DO_CALLBACK,
+};
+
+
 /* macros to enable logf for queues
    logging on SYS_TIMEOUT can be disabled */
 #ifdef SIMULATOR
@@ -105,50 +134,14 @@ static void codec_queue_ack(intptr_t ackme)
     queue_reply(&codec_queue, ackme);
 }
 
+static void codec_queue_post(long id, intptr_t data)
+{
+    queue_post(&codec_queue, id, data);
+}
+
 static intptr_t codec_queue_send(long id, intptr_t data)
 {
     return queue_send(&codec_queue, id, data);
-}
-
-/* Poll the state of the codec queue. Returns < 0 if the message is urgent
-   and any state should exit, > 0 if it's a run message (and it was
-   scrubbed), 0 if message was ignored. */
-static int codec_check_queue__have_msg(void)
-{
-    struct queue_event ev;
-
-    queue_peek(&codec_queue, &ev);
-
-    /* Seek, pause or stop? Just peek and return if so. Codec
-       must handle the command after returing. Inserts will not
-       be allowed until it complies. */
-    switch (ev.id)
-    {
-    case Q_CODEC_SEEK:
-        LOGFQUEUE("codec - Q_CODEC_SEEK", ev.id);
-        return -1;
-    case Q_CODEC_PAUSE:
-        LOGFQUEUE("codec - Q_CODEC_PAUSE", ev.id);
-        return -1;
-    case Q_CODEC_STOP:
-        LOGFQUEUE("codec - Q_CODEC_STOP", ev.id);
-        return -1;
-    }
-
-    /* This is in error in this context unless it's "go, go, go!" */
-    queue_wait(&codec_queue, &ev);
-
-    if (ev.id == Q_CODEC_RUN)
-    {
-        logf("codec < Q_CODEC_RUN: already running!");
-        codec_queue_ack(Q_CODEC_RUN);
-        return 1;
-    }
-
-    /* Ignore it */
-    logf("codec < bad req %ld (%s)", ev.id, __func__);
-    codec_queue_ack(Q_NULL);
-    return 0;
 }
 
 /* Does the audio format type equal CODEC_TYPE_ENCODER? */
@@ -160,6 +153,156 @@ static inline bool type_is_encoder(int afmt)
     return false;
     (void)afmt;
 #endif
+}
+
+#ifdef AB_REPEAT_ENABLE
+#include "abrepeat.h"
+
+static long codec_seek_id = 0;
+static bool codec_halting = false;
+
+/* Sync the shadowed AB markers */
+static void update_ab_markers(void)
+{
+    codec_ab_update_markers(audio_get_elapsed());
+}
+
+/* Should the track repeat by seek once it's reached the end? */
+static inline bool do_eot_ab_loop(bool encoder, int status)
+{
+    bool halting = codec_halting;
+    codec_halting = false;
+
+    return !encoder && !halting && status >= CODEC_OK
+                && codec_ab_end_of_track_report();
+}
+
+/* Inform AB and playback of the position */
+static void codec_update_elapsed_callback(unsigned long elapsed)
+{
+    codec_ab_position_report(elapsed);
+    audio_codec_update_elapsed(elapsed);
+}
+
+/* For codec to sync its markers with the current values */
+void codec_update_markers(void)
+{
+    LOGFQUEUE("... > codec Q_CODEC_UPDATE_MARKERS");
+    codec_queue_post(Q_CODEC_UPDATE_MARKERS, 0);
+}
+
+/* For codec to seek itself automatically */
+void codec_ab_seek(unsigned long time)
+{
+    LOGFQUEUE("codec > codec Q_CODEC_AB_SEEK:time=%lu", time);
+    queue_remove_from_head(&codec_queue, Q_CODEC_AB_SEEK);
+    codec_queue_post(Q_CODEC_AB_SEEK, time);
+}
+
+/* If seek was automatic, do not inform playback */
+static inline bool seek_was_ab(void)
+{
+    return codec_seek_id == Q_CODEC_AB_SEEK;
+}
+#else /* ndef AB_REPEAT_ENABLE */
+#define update_ab_markers()             do {} while (0)
+#define do_eot_ab_loop(encoder, status) false
+#define codec_update_elapsed_callback   audio_codec_update_elapsed
+#define seek_was_ab()                   false
+#endif /* AB_REPEAT_ENABLE */
+
+/* Process a message - return requested action and data (if any should
+   be expected) - param being NULL indicates a 2nd-level action is wanted,
+   ie. waiting for PCM insert or a 'go' message after a seek completes. */
+static int codec_check_queue__have_msg(intptr_t *param, bool check_U)
+{
+    static const long codec_U_filter[][2] =
+        { { Q_CODEC_URGENT_FIRST, Q_CODEC_URGENT_LAST } };
+
+    enum codec_command_action action = CODEC_ACTION_NULL;
+    struct queue_event ev;
+
+    while (1)
+    {
+        /* must bail on urgent (U) messages */
+        if (check_U && queue_peek_ex(&codec_queue, NULL, 0, codec_U_filter))
+        {
+            LOGFQUEUE("codec - urgent event detected");
+            return CODEC_ACTION_HALT;
+        }
+
+        queue_wait_w_tmo(&codec_queue, &ev, TIMEOUT_NOBLOCK);
+
+        /* Messages marked (U) will not be seen below if this is 2nd-level */
+        switch (ev.id)
+        {
+        case Q_CODEC_RUN:       /* Already running */
+            LOGFQUEUE("codec < Q_CODEC_RUN");
+            if (check_U)
+                action = CODEC_ACTION_MAX;  /* something > 0 */
+            break;
+
+        case Q_CODEC_PAUSE:     /* Stay here and wait (U) */
+            LOGFQUEUE("codec < Q_CODEC_PAUSE");
+            codec_queue_ack(Q_CODEC_PAUSE);
+            queue_wait(&codec_queue, NULL); /* Wait for next (no remove) */
+            continue;
+
+        case Q_CODEC_SEEK:      /* Audio wants codec to seek (U) */
+#ifdef AB_REPEAT_ENABLE
+        case Q_CODEC_AB_SEEK:   /* Codec seeked itself (U) */
+            codec_seek_id = ev.id;
+#endif /* AB_REPEAT_ENABLE */
+            LOGFQUEUE("codec < Q_CODEC_SEEK+%ld: time=%lu",
+                      ev.id - Q_CODEC_SEEK, (unsigned long)ev.data);
+            *param = ev.data;
+            action = CODEC_ACTION_SEEK_TIME;
+            trigger_cpu_boost();
+            break;
+
+        case Q_CODEC_STOP:      /* Ack Q_CODEC_NULL only in main loop (U) */
+            LOGFQUEUE("codec < Q_CODEC_STOP:&size=%p", (void *)ev.data);
+
+#ifdef HAVE_RECORDING
+            if (type_is_encoder(codec_type))
+            {
+                /* Stream finish request (soft stop)? */
+                if (ev.data && param)
+                {
+                    /* ev.data is pointer to size */
+                    *param = ev.data;
+                    action = CODEC_ACTION_STREAM_FINISH;
+                    break;
+                }
+            }
+            else
+#endif /* HAVE_RECORDING */
+            {
+                dsp_configure(ci.dsp, DSP_FLUSH, 0); /* Discontinuity */
+            }
+
+            codec_halting = true;
+            action = CODEC_ACTION_HALT;
+            break;
+
+#ifdef AB_REPEAT_ENABLE
+        case Q_CODEC_UPDATE_MARKERS:
+            LOGFQUEUE("codec < Q_CODEC_AB_UPDATE_MARKERS");
+            update_ab_markers();
+            break;
+#endif /* AB_REPEAT_ENABLE */
+
+        default:
+            LOGFQUEUE("codec < id=%ld:data=%" PRIdPTR " (%s)",
+                      ev.id, ev.data, __func__);
+            break;
+        }
+
+        break;
+    } /* while (1) */
+
+    codec_queue_ack(ev.id);
+    return action;
 }
 
 /**************************************/
@@ -222,7 +365,7 @@ static void codec_pcmbuf_insert_callback(
     src.proc_mask = 0;
 
     while (LIKELY(queue_empty(&codec_queue)) ||
-           codec_check_queue__have_msg() >= 0)
+           codec_check_queue__have_msg(NULL, true) >= CODEC_ACTION_NULL)
     {
         struct dsp_buffer dst;
         dst.remcount = 0;
@@ -327,11 +470,14 @@ static void codec_seek_complete_callback(void)
 {
     logf("seek_complete");
 
-    /* Clear DSP */
-    dsp_configure(ci.dsp, DSP_FLUSH, 0);
-
     /* Sync position */
     audio_codec_update_offset(ci.curpos);
+
+    if (seek_was_ab())
+        return;
+
+    /* Clear DSP */
+    dsp_configure(ci.dsp, DSP_FLUSH, 0);
 
     /* Post notification to audio thread */
     audio_codec_seek_complete();
@@ -341,7 +487,7 @@ static void codec_seek_complete_callback(void)
     {
         queue_wait(&codec_queue, NULL);
     }
-    while (codec_check_queue__have_msg() == 0);
+    while (codec_check_queue__have_msg(NULL, true) == CODEC_ACTION_NULL);
 }
 
 static void codec_configure_callback(int setting, intptr_t value)
@@ -351,77 +497,14 @@ static void codec_configure_callback(int setting, intptr_t value)
 
 static long codec_get_command_callback(intptr_t *param)
 {
+    int action = CODEC_ACTION_NULL; /* As you were */
+
     yield();
 
-    if (LIKELY(queue_empty(&codec_queue)))
-        return CODEC_ACTION_NULL; /* As you were */
+    if (UNLIKELY(!queue_empty(&codec_queue)))
+        action = codec_check_queue__have_msg(param, false);
 
-    /* Process the message - return requested action and data (if any should
-       be expected) */
-    while (1)
-    {
-        long action = CODEC_ACTION_NULL;
-        struct queue_event ev;
-
-        queue_peek(&codec_queue, &ev); /* Find out what it is */
-
-        intptr_t id = ev.id;
-
-        switch (id)
-        {
-        case Q_NULL:
-            LOGFQUEUE("codec < Q_NULL");
-            break;
-
-        case Q_CODEC_RUN:   /* Already running */
-            LOGFQUEUE("codec < Q_CODEC_RUN");
-            break;
-
-        case Q_CODEC_PAUSE: /* Stay here and wait */
-            LOGFQUEUE("codec < Q_CODEC_PAUSE");
-            queue_wait(&codec_queue, &ev);  /* Remove message */
-            codec_queue_ack(Q_CODEC_PAUSE);
-            queue_wait(&codec_queue, NULL); /* Wait for next (no remove) */
-            continue;
-
-        case Q_CODEC_SEEK:  /* Audio wants codec to seek */
-            LOGFQUEUE("codec < Q_CODEC_SEEK %ld", ev.data);
-            *param = ev.data;
-            action = CODEC_ACTION_SEEK_TIME;
-            trigger_cpu_boost();
-            break;
-
-        case Q_CODEC_STOP:  /* Must only return 0 in main loop */
-            LOGFQUEUE("codec < Q_CODEC_STOP: %ld", ev.data);
-#ifdef HAVE_RECORDING
-            if (type_is_encoder(codec_type))
-            {
-                /* Stream finish request (soft stop)? */
-                if (ev.data && param)
-                {
-                    /* ev.data is pointer to size */
-                    *param = ev.data;
-                    action = CODEC_ACTION_STREAM_FINISH;
-                    break;
-                }
-            }
-            else
-#endif /* HAVE_RECORDING */
-            {
-                dsp_configure(ci.dsp, DSP_FLUSH, 0); /* Discontinuity */
-            }
-
-            return CODEC_ACTION_HALT; /* Leave in queue */
-
-        default:            /* This is in error in this context. */
-            logf("codec bad req %ld (%s)", ev.id, __func__);
-            id = Q_NULL;
-        }
-
-        queue_wait(&codec_queue, &ev); /* Actually remove it */
-        codec_queue_ack(id);
-        return action;
-    }
+    return action;
 }
 
 static bool codec_loop_track_callback(void)
@@ -513,9 +596,14 @@ static void run_codec(void)
 
         /* Pin the codec's audio data in place */
         buf_pin_handle(ci.audio_hid, true);
+        update_ab_markers();
     }
 
-    status = codec_run_proc();
+    do
+    {
+        status = codec_run_proc();
+    }
+    while (do_eot_ab_loop(encoder, status));
 
     if (!encoder)
     {
@@ -540,7 +628,7 @@ static void seek_codec(unsigned long time)
     }
 
     /* Post it up one level */
-    queue_post(&codec_queue, Q_CODEC_SEEK, time);
+    codec_queue_post(Q_CODEC_SEEK, time);
     codec_queue_ack(Q_CODEC_SEEK);
 
     /* Have to run it again */
@@ -562,6 +650,7 @@ static void do_callback(void (* callback)(void))
 
     if (callback)
     {
+        queue_clear(&codec_queue);
         commit_discard_idcache();
         callback();
         commit_dcache();
@@ -582,8 +671,15 @@ static void NORETURN_ATTR codec_thread(void)
         switch (ev.id)
         {
         case Q_CODEC_LOAD:
-            LOGFQUEUE("codec < Q_CODEC_LOAD");
+            LOGFQUEUE("codec < Q_CODEC_LOAD:hid=%d:afmt=%d",
+                      ((const struct codec_load_info *)ev.data)->hid,
+                      ((const struct codec_load_info *)ev.data)->afmt);
             load_codec((const struct codec_load_info *)ev.data);
+            break;
+
+        case Q_CODEC_UNLOAD:
+            LOGFQUEUE("codec < Q_CODEC_UNLOAD");
+            unload_codec();
             break;
 
         case Q_CODEC_RUN:
@@ -591,18 +687,9 @@ static void NORETURN_ATTR codec_thread(void)
             run_codec();
             break;
 
-        case Q_CODEC_PAUSE:
-            LOGFQUEUE("codec < Q_CODEC_PAUSE");
-            break;
-
         case Q_CODEC_SEEK:
-            LOGFQUEUE("codec < Q_CODEC_SEEK: %lu", (unsigned long)ev.data);
+            LOGFQUEUE("codec < Q_CODEC_SEEK:time=%lu", (unsigned long)ev.data);
             seek_codec(ev.data);
-            break;
-
-        case Q_CODEC_UNLOAD:
-            LOGFQUEUE("codec < Q_CODEC_UNLOAD");
-            unload_codec();
             break;
 
         case Q_CODEC_DO_CALLBACK:
@@ -611,11 +698,10 @@ static void NORETURN_ATTR codec_thread(void)
             break;
 
         default:
-            LOGFQUEUE("codec < default : %ld", ev.id);
+            LOGFQUEUE("codec < id=%ld:data=%" PRIdPTR, ev.id, ev.data);
         }
     }
 }
-
 
 /** --- Miscellaneous external interfaces -- **/
 
@@ -626,7 +712,7 @@ void INIT_ATTR codec_thread_init(void)
     ci.dsp              = dsp_get_config(CODEC_IDX_AUDIO);
     ci.codec_get_buffer = codec_get_buffer_callback;
     ci.pcmbuf_insert    = codec_pcmbuf_insert_callback;
-    ci.set_elapsed      = audio_codec_update_elapsed;
+    ci.set_elapsed      = codec_update_elapsed_callback;
     ci.read_filebuf     = codec_filebuf_callback;
     ci.request_buffer   = codec_request_buffer_callback;
     ci.advance_buffer   = codec_advance_buffer_callback;
@@ -669,7 +755,7 @@ bool codec_load(int hid, int cod_spec)
 {
     struct codec_load_info parm = { hid, cod_spec };
 
-    LOGFQUEUE("audio >| codec Q_CODEC_LOAD: %d, %d", hid, cod_spec);
+    LOGFQUEUE("audio >| codec Q_CODEC_LOAD:hid=%d:afmt=%d", hid, cod_spec);
     return codec_queue_send(Q_CODEC_LOAD, (intptr_t)&parm) != 0;
 }
 
@@ -680,11 +766,12 @@ void codec_go(void)
     codec_queue_send(Q_CODEC_RUN, 0);
 }
 
-/* Instruct the codec to seek to the specified time (should be properly
-   paused or stopped first to avoid possible buffering deadlock) */
-void codec_seek(long time)
+/* Instruct the codec to seek to the specified time */
+void codec_seek(unsigned long time)
 {
-    LOGFQUEUE("audio > codec Q_CODEC_SEEK: %ld", time);
+    /* should be properly paused or stopped first to avoid possible
+       buffering deadlock */
+    LOGFQUEUE("audio >| codec Q_CODEC_SEEK:time=%lu", time);
     codec_queue_send(Q_CODEC_SEEK, time);
 }
 
@@ -693,15 +780,15 @@ void codec_seek(long time)
 bool codec_pause(void)
 {
     LOGFQUEUE("audio >| codec Q_CODEC_PAUSE");
-    return codec_queue_send(Q_CODEC_PAUSE, 0) != Q_NULL;
+    return codec_queue_send(Q_CODEC_PAUSE, 0) != Q_CODEC_NULL;
 }
 
 /* Stop codec if running - codec stays resident if loaded */
 void codec_stop(void)
 {
     /* Wait until it's in the main loop */
-    LOGFQUEUE("audio >| codec Q_CODEC_STOP: 0");
-    while (codec_queue_send(Q_CODEC_STOP, 0) != Q_NULL);
+    LOGFQUEUE("audio >| codec Q_CODEC_STOP:&size=%p", NULL);
+    while (codec_queue_send(Q_CODEC_STOP, 0) != Q_CODEC_NULL);
 }
 
 #ifdef HAVE_RECORDING
@@ -711,12 +798,12 @@ size_t codec_finish_stream(void)
 {
     size_t size = 0;
 
-    LOGFQUEUE("audio >| codec Q_CODEC_STOP: &size");
-    if (codec_queue_send(Q_CODEC_STOP, (intptr_t)&size) != Q_NULL)
+    LOGFQUEUE("audio >| codec Q_CODEC_STOP:&size=%p", &size);
+    if (codec_queue_send(Q_CODEC_STOP, (intptr_t)&size) != Q_CODEC_NULL)
     {
         /* Sync to keep size in scope and get response */
-        LOGFQUEUE("audio >| codec Q_NULL");
-        codec_queue_send(Q_NULL, 0);
+        LOGFQUEUE("audio >| codec Q_CODEC_NULL");
+        codec_queue_send(Q_CODEC_NULL, 0);
 
         if (size == 0)
             codec_stop(); /* Replied with 0 size */

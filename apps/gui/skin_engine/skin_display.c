@@ -103,10 +103,10 @@ void skin_update(enum skinnable_screens skin, enum screen_type screen,
 #define DIRECTION_RIGHT 1
 #define DIRECTION_LEFT -1
 
-static int ab_calc_mark_x_pos(int mark, int capacity, 
+static int ab_calc_mark_x_pos(unsigned long mark, int capacity, 
         int offset, int size)
 {
-    return offset + ( (size * mark) / capacity );
+    return offset + (int)( (size * mark) / capacity );
 }
 
 static void ab_draw_vertical_line_mark(struct screen * screen,
@@ -135,7 +135,7 @@ void ab_draw_markers(struct screen * screen, int capacity,
                      int x, int y, int w, int h)
 {
     bool a_set, b_set;
-    unsigned int a, b;
+    unsigned long a, b;
     int xa, xb;
 
     a_set = ab_get_A_marker(&a);

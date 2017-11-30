@@ -23,6 +23,8 @@
 #ifndef AUDIO_THREAD_H
 #define AUDIO_THREAD_H
 
+#include "audio.h"
+
 /* Define one constant that includes recording related functionality */
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
 #define AUDIO_HAVE_RECORDING
@@ -37,8 +39,9 @@ enum
     Q_AUDIO_STOP,
     Q_AUDIO_PAUSE,
     Q_AUDIO_SKIP,
-    Q_AUDIO_PRE_FF_REWIND,
-    Q_AUDIO_FF_REWIND,
+    Q_AUDIO_SEEK_0,             /* seek operation range */
+    Q_AUDIO_SEEK_N     = Q_AUDIO_SEEK_0 + N_AUDIO_SEEK_WHENCE - 1,
+    Q_AUDIO_SEEK_BEGIN = Q_AUDIO_SEEK_0 + AUDIO_SEEK_BEGIN,
     Q_AUDIO_FLUSH,
     Q_AUDIO_DIR_SKIP,
 
@@ -56,17 +59,6 @@ enum
     /* codec -> audio (*) */
     Q_AUDIO_CODEC_SEEK_COMPLETE,
     Q_AUDIO_CODEC_COMPLETE,
-
-    /* audio -> codec */
-    Q_CODEC_LOAD,
-    Q_CODEC_RUN,
-    Q_CODEC_PAUSE,
-    Q_CODEC_SEEK,
-    Q_CODEC_STOP,
-    Q_CODEC_UNLOAD,
-
-    /* -> codec */
-    Q_CODEC_DO_CALLBACK,
 
     /* -> recording */
 #ifdef HAVE_RECORDING
@@ -102,8 +94,13 @@ void audio_playback_handler(struct queue_event *ev);
 void audio_recording_handler(struct queue_event *ev);
 #endif
 
+void audio_default_event_handler(struct queue_event *ev);
+void playback_default_event_handler(struct queue_event *ev);
+
 /** --- audio_queue helpers --- **/
 void audio_queue_post(long id, intptr_t data);
 intptr_t audio_queue_send(long id, intptr_t data);
+void audio_queue_reply(intptr_t retval);
+void audio_queue_clear(void);
 
 #endif /* AUDIO_THREAD_H */

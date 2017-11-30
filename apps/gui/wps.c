@@ -131,23 +131,20 @@ void pause_action(bool may_fade, bool updatewps)
 
     if (updatewps)
         update_non_static();
-#else
+#else /* !SWCODEC */
     if (may_fade && global_settings.fade_on_stop)
         fade(false, updatewps);
     else
         audio_pause();
-#endif
 
     if (global_settings.pause_rewind) {
-        long newpos;
+        unsigned long newpos;
 
-#if (CONFIG_CODEC == SWCODEC)
-        audio_pre_ff_rewind();
-#endif
         newpos = audio_current_track()->elapsed
             - global_settings.pause_rewind * 1000;
         audio_ff_rewind(newpos > 0 ? newpos : 0);
     }
+#endif /* SWCODEC */
 
     (void)may_fade;
 }
@@ -214,13 +211,11 @@ void fade(bool fade_in, bool updatewps)
         audio_pause();
 
         skin_get_global_state()->is_fading = false;
-#if CONFIG_CODEC != SWCODEC
 #ifndef SIMULATOR
         /* let audio thread run and wait for the mas to run out of data */
         while (!mp3_pause_done())
 #endif
             sleep(HZ/10);
-#endif
 
         /* reset volume to what it was before the fade */
         sound_set_volume(global_settings.volume);
@@ -267,19 +262,20 @@ static int skintouch_to_wps(struct wps_data *data)
         case ACTION_STD_HOTKEY:
             return ACTION_WPS_HOTKEY;
 #endif
-        case ACTION_TOUCH_SCROLLBAR:
-            skin_get_global_state()->id3->elapsed = skin_get_global_state()->id3->length*offset/100;
-#if (CONFIG_CODEC == SWCODEC)
-            audio_pre_ff_rewind();
-#else
+        case ACTION_TOUCH_SCROLLBAR:;
+            unsigned long seekto = skin_get_global_state()->id3->length*offset/100;
+            skin_get_global_state()->id3->elapsed = seekto;
+#if CONFIG_CODEC == SWCODEC
+            audio_seek(seekto, AUDIO_SEEK_SET);
+#else /* !SWCODEC */
             if (!skin_get_global_state()->paused)
                 audio_pause();
-#endif
-            audio_ff_rewind(skin_get_global_state()->id3->elapsed);
-#if (CONFIG_CODEC != SWCODEC)
+
+            audio_ff_rewind(seekto);
+
             if (!skin_get_global_state()->paused)
                 audio_resume();
-#endif
+#endif /* SWCODEC */
             return ACTION_TOUCHSCREEN;
         case ACTION_TOUCH_VOLUME:
         {
@@ -350,7 +346,7 @@ bool ffwd_rew(int button)
                           skin_get_global_state()->id3 && skin_get_global_state()->id3->length )
                     {
 #if (CONFIG_CODEC == SWCODEC)
-                        audio_pre_ff_rewind();
+                        audio_seek(0, AUDIO_SEEK_BEGIN);
 #else
                         if (!skin_get_global_state()->paused)
                             audio_pause();
@@ -396,9 +392,14 @@ bool ffwd_rew(int button)
 
                 break;
 
-            case ACTION_WPS_STOPSEEK:
-                skin_get_global_state()->id3->elapsed = skin_get_global_state()->id3->elapsed+ff_rewind_count;
-                audio_ff_rewind(skin_get_global_state()->id3->elapsed);
+            case ACTION_WPS_STOPSEEK:;
+                unsigned long newpos = skin_get_global_state()->id3->elapsed+ff_rewind_count;
+                skin_get_global_state()->id3->elapsed = newpos;
+#if (CONFIG_CODEC == SWCODEC)
+                audio_seek(newpos, AUDIO_SEEK_SET);
+#else
+                audio_ff_rewind(newpos);
+#endif
                 skin_get_global_state()->ff_rewind_count = 0;
                 skin_get_global_state()->ff_rewind = false;
                 status_set_ffmode(0);
@@ -509,15 +510,13 @@ static void prev_track(unsigned long skip_thresh)
         }
 
 #if (CONFIG_CODEC == SWCODEC)
-        audio_pre_ff_rewind();
+        audio_seek(0, AUDIO_SEEK_SET);
 #else
         if (!state->paused)
             audio_pause();
-#endif
 
         audio_ff_rewind(0);
 
-#if (CONFIG_CODEC != SWCODEC)
         if (!state->paused)
             audio_resume();
 #endif
@@ -599,20 +598,15 @@ static void play_hop(int direction)
     {
         elapsed += step * direction;
     }
-    if(audio_status() & AUDIO_STATUS_PLAY)
-    {
-#if (CONFIG_CODEC == SWCODEC)
-        audio_pre_ff_rewind();
-#else
-        if (!state->paused)
-            audio_pause();
-#endif
-    }
 
 #if (CONFIG_CODEC == SWCODEC)
-    audio_ff_rewind(elapsed);
+    audio_seek(elapsed, AUDIO_SEEK_SET);
 #else
+    if ((audio_status() & AUDIO_STATUS_PLAY) && !state->paused)
+        audio_pause();
+
     audio_ff_rewind(state->id3->elapsed = elapsed);
+
     if (!state->paused)
         audio_resume();
 #endif
@@ -890,12 +884,13 @@ long gui_wps_show(void)
                     if (state->id3->cuesheet)
                     {
 #if (CONFIG_CODEC == SWCODEC)
-                        audio_pre_ff_rewind();
+                        audio_seek(0, AUDIO_SEEK_SET);
 #else
                         if (!state->paused)
                             audio_pause();
-#endif
+
                         audio_ff_rewind(0);
+#endif
                     }
                     else
                     {
@@ -957,7 +952,9 @@ long gui_wps_show(void)
                 if (ab_repeat_mode_enabled())
                 {
                     ab_set_B_marker(state->id3->elapsed);
+#if CONFIG_CODEC != SWCODEC
                     ab_jump_to_A_marker();
+#endif
                 }
                 else
 #endif

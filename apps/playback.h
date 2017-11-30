@@ -78,7 +78,7 @@ struct bufopen_bitmap_data {
 /* Functions */
 int audio_track_count(void);
 long audio_filebufused(void);
-void audio_pre_ff_rewind(void);
+void audio_seek(unsigned long time, int whence);
 void audio_skip(int direction);
 
 void audio_set_cuesheet(bool enable);
@@ -88,6 +88,8 @@ void audio_set_crossfade(int enable);
 #ifdef HAVE_PLAY_FREQ
 void audio_set_playback_frequency(int setting);
 #endif
+
+unsigned long audio_get_elapsed(void);
 
 size_t audio_get_filebuflen(void);
 

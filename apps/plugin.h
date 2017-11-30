@@ -160,12 +160,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 234
+#define PLUGIN_API_VERSION 235
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 234
+#define PLUGIN_MIN_API_VERSION 235
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -743,7 +743,11 @@ struct plugin_api {
     void (*audio_resume)(void);
     void (*audio_next)(void);
     void (*audio_prev)(void);
+#if CONFIG_CODEC == SWCODEC
+    void (*audio_seek)(unsigned long newtime, int whence);
+#else
     void (*audio_ff_rewind)(long newtime);
+#endif
     struct mp3entry* (*audio_next_track)(void);
     int (*audio_status)(void);
     struct mp3entry* (*audio_current_track)(void);

@@ -62,6 +62,12 @@ static long audio_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
 static const char audio_thread_name[] = "audio";
 unsigned int audio_thread_id = 0;
 
+void audio_default_event_handler(struct queue_event *ev)
+{
+    playback_default_event_handler(ev);
+    /* recording needn't process anything for now */
+}
+
 static void NORETURN_ATTR audio_thread(void)
 {
     struct queue_event ev;
@@ -79,14 +85,6 @@ static void NORETURN_ATTR audio_thread(void)
             audio_playback_handler(&ev);
             continue;
 
-        /* Playback has to handle these, even if not playing */
-        case Q_AUDIO_REMAKE_AUDIO_BUFFER:
-#ifdef HAVE_DISK_STORAGE
-        case Q_AUDIO_UPDATE_WATERMARK:
-#endif
-            audio_playback_handler(&ev);
-            break;
-
 #ifdef AUDIO_HAVE_RECORDING
         /* Starts the recording engine branch */
         case Q_AUDIO_INIT_RECORDING:
@@ -102,6 +100,10 @@ static void NORETURN_ATTR audio_thread(void)
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
             usb_wait_for_disconnect(&audio_queue);
             break;
+
+        /* Audio has to handle these, even if not playing */
+        default:
+            audio_default_event_handler(&ev);
         }
 
         queue_wait(&audio_queue, &ev);
@@ -116,6 +118,16 @@ void audio_queue_post(long id, intptr_t data)
 intptr_t audio_queue_send(long id, intptr_t data)
 {
     return queue_send(&audio_queue, id, data);
+}
+
+void audio_queue_reply(intptr_t retval)
+{
+    queue_reply(&audio_queue, retval);
+}
+
+void audio_queue_clear(void)
+{
+    queue_clear(&audio_queue);
 }
 
 /* Return the playback and recording status */

@@ -2647,6 +2647,10 @@ static void ff_rewind(long time, bool resume)
 {
     if (AUDIO_PLAY)
     {
+#if CONFIG_CODEC == SWCODEC
+        rb->audio_seek(time, AUDIO_SEEK_SET);
+        (void)resume;
+#else /* !SWCODEC */
         if (!AUDIO_PAUSE)
         {
             resume = true;
@@ -2656,6 +2660,7 @@ static void ff_rewind(long time, bool resume)
         rb->sleep(HZ/10); /* take affect seeking */
         if (resume)
             rb->audio_resume();
+#endif /* SWCODEC */
     }
 }
 
@@ -2726,8 +2731,12 @@ static int handle_button(void)
             else
             {
                 current.ff_rewind = current.elapsed;
+#if CONFIG_CODEC == SWCODEC
+                rb->audio_seek(0, AUDIO_SEEK_BEGIN);
+#else /* !SWCODEC */
                 if (!AUDIO_PAUSE)
                     rb->audio_pause();
+#endif /* SWCODEC */
                 step = 1000 * rb->global_settings->ff_rewind_min_step;
             }
             break;

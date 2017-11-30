@@ -677,7 +677,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
 
                     CHECKLEN(7);
                     pos = get_u32(&buf[0x03]);
-                    audio_ff_rewind(pos);
+                    audio_seek(pos, AUDIO_SEEK_IMMEDIATE);
 
                     cmd_ok(cmd);
                     break;
@@ -906,7 +906,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
 
                     CHECKLEN(5);
                     pos = get_u16(&buf[0x03]);
-                    audio_ff_rewind(1000L * pos);
+                    audio_seek(1000L * pos, AUDIO_SEEK_IMMEDIATE);
 
                     cmd_ok(cmd);
                     break;
