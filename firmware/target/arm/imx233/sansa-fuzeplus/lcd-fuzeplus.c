@@ -566,11 +566,26 @@ void lcd_update_rect(int x, int y, int w, int h)
     if(!lcd_on)
         return;
     #endif
-    /* make sure the rectangle is included in the screen */
-    x = MIN(x, LCD_WIDTH);
-    y = MIN(y, LCD_HEIGHT);
-    w = MIN(w, LCD_WIDTH - x);
-    h = MIN(h, LCD_HEIGHT - y);
+    /* make sure the rectangle is bounded in the screen */
+    if (w > LCD_WIDTH - x)/* Clip right */
+        w = LCD_WIDTH - x;
+    if (x < 0)/* Clip left */
+    {
+        w += x;
+        x = 0;
+    }
+    if (w <= 0)
+        return; /* nothing left to do */
+
+    if (h > LCD_HEIGHT - y) /* Clip bottom */
+        h = LCD_HEIGHT - y;
+    if (y < 0) /* Clip top */
+    {
+        h += y;
+        y = 0;
+    }
+    if (h <= 0)
+        return; /* nothing left to do */
 
     imx233_lcdif_wait_ready();
     lcd_write_reg(0x50, x);
@@ -612,7 +627,7 @@ void lcd_update_rect(int x, int y, int w, int h)
      * of w or h is odd, we will send a copy of the first pixels as dummy writes. We will
      * send at most 3 bytes. We then send (w * h + 3) / 4 x 4 bytes.
      */
-    if(w % 2 == 1 || h % 2 == 1)
+    if(w % 4 || (h & 1) == 1)
     {
         /* copy three pixel after the last one */
         for(int i = 0; i < 3; i++)
