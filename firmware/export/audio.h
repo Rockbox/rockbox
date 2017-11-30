@@ -63,7 +63,18 @@ size_t audio_buffer_size(void);
 /* size of the buffer available for allocating memory from the audio buffer using core_*()
  * returns core_available() if audio buffer is not allocated yet */
 size_t audio_buffer_available(void);
+#if CONFIG_CODEC == SWCODEC
+enum {
+    AUDIO_SEEK_BEGIN,         /* pause and wait for actual position */
+    AUDIO_SEEK_SET_GAPLESS,   /* goes in normal audio flow */
+    AUDIO_SEEK_SET_IMMEDIATE, /* seek happens immediately */
+    AUDIO_SEEK_CUR_IMMEDIATE, /* relative seek happens immediately */
+    __AUDIO_SEEK_TYPE_COUNT,
+};
+void audio_seek(long newpos, unsigned int type);
+#else
 void audio_ff_rewind(long newpos);
+#endif
 void audio_flush_and_reload_tracks(void);
 struct mp3entry* audio_current_track(void);
 struct mp3entry* audio_next_track(void);

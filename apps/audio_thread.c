@@ -118,6 +118,16 @@ intptr_t audio_queue_send(long id, intptr_t data)
     return queue_send(&audio_queue, id, data);
 }
 
+void audio_queue_reply(intptr_t retval)
+{
+    queue_reply(&audio_queue, retval);
+}
+
+void audio_queue_clear(void)
+{
+    queue_clear(&audio_queue);
+}
+
 /* Return the playback and recording status */
 int audio_status(void)
 {

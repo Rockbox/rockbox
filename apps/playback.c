@@ -338,6 +338,8 @@ enum audio_start_playback_flags
 static void audio_start_playback(const struct audio_resume_info *resume_info,
                                  unsigned int flags);
 static void audio_stop_playback(void);
+static void audio_on_seek_begin(bool wait);
+static void audio_on_seek(long time, unsigned int type);
 static void buffer_event_buffer_low_callback(unsigned short id, void *data, void *user_data);
 static void buffer_event_rebuffer_callback(unsigned short id, void *data);
 static void buffer_event_finished_callback(unsigned short id, void *data);
@@ -864,7 +866,7 @@ static int shrink_callback(int handle, unsigned hints, void* start, size_t old_s
     {   /* inline case Q_AUDIO_STOP (audio_hard_stop() response
          * if we're in the audio thread */
         audio_stop_playback();
-        queue_clear(&audio_queue);
+        audio_queue_clear();
     }
     else
         audio_queue_send(Q_AUDIO_STOP, 1);
@@ -1227,9 +1229,9 @@ static void audio_wait_fade_complete(void)
 }
 
 /* End the ff/rw mode */
-static void audio_ff_rewind_end(void)
+static void audio_seek_end(void)
 {
-    /* A seamless seek (not calling audio_pre_ff_rewind) skips this
+    /* A seamless seek (not calling audio_seek_begin) skips this
        section */
     if (ff_rw_mode)
     {
@@ -1257,7 +1259,7 @@ static void audio_complete_codec_seek(void)
      * If seeking from seek mode, 'ff_rw_mode' is true. */
     if (codec_seeking)
     {
-        audio_ff_rewind_end();
+        audio_seek_end();
         codec_seeking = false; /* set _after_ the call! */
     }
     /* else it's waiting and we must repond */
@@ -2579,7 +2581,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
     buf_set_base_handle(-1);
 
     /* Officially playing */
-    queue_reply(&audio_queue, 1);
+    audio_queue_reply(1);
 
     /* Add these now - finish event for the first id3 will most likely be sent
        immediately */
@@ -2685,6 +2687,18 @@ static void audio_on_pause(bool pause)
     {
         /* Not in ff/rw mode - can actually change the audio state now */
         pcmbuf_pause(pause);
+    }
+
+    if (pause)
+    {
+        long pause_rewind = global_settings.pause_rewind;
+
+        if (pause_rewind)
+        {
+            audio_queue_reply(0);
+            audio_on_seek_begin(true);
+            audio_on_seek(-1000*pause_rewind, AUDIO_SEEK_CUR_IMMEDIATE);
+        }
     }
 }
 
@@ -2827,8 +2841,8 @@ static void audio_on_dir_skip(int direction)
 }
 
 /* Enter seek mode in order to start a seek
-   (Q_AUDIO_PRE_FF_REWIND) */
-static void audio_on_pre_ff_rewind(void)
+   (Q_AUDIO_SEEK+0|2) */
+static void audio_on_seek_begin(bool wait)
 {
     logf("%s()", __func__);
 
@@ -2837,7 +2851,8 @@ static void audio_on_pre_ff_rewind(void)
 
     ff_rw_mode = true;
 
-    audio_wait_fade_complete();
+    if (wait)
+        audio_wait_fade_complete();
 
     if (play_status == PLAY_PAUSED)
         return;
@@ -2846,13 +2861,18 @@ static void audio_on_pre_ff_rewind(void)
 }
 
 /* Seek the playback of the current track to the specified time
-   (Q_AUDIO_FF_REWIND) */
-static void audio_on_ff_rewind(long time)
+   (Q_AUDIO_SEEK+1|2) */
+static void audio_on_seek(long time, unsigned int type)
 {
     logf("%s(%ld)", __func__, time);
 
     if (play_status == PLAY_STOPPED)
         return;
+
+    struct mp3entry *id3 = id3_get(PLAYING_ID3);
+
+    if (type == AUDIO_SEEK_CUR_IMMEDIATE)
+        time += id3->elapsed;
 
     enum track_skip_type pending = skip_pending;
 
@@ -2862,20 +2882,20 @@ static void audio_on_ff_rewind(long time)
     case TRACK_SKIP_AUTO:              /* Have to back it out (fun!) */
     case TRACK_SKIP_AUTO_END_PLAYLIST: /* Still have the last codec used */
     {
-        struct mp3entry *id3 = id3_get(PLAYING_ID3);
         struct mp3entry *ci_id3 = id3_get(CODEC_ID3);
 
         track_event_flags = TEF_NONE;
 
         /* Send event before clobbering the time if rewinding. */
-        if (time == 0)
+        if (time <= 0)
         {
             send_track_event(PLAYBACK_EVENT_TRACK_FINISH,
                              track_event_flags | TEF_REWIND, id3);
+            time = 0;
         }
 
         id3->elapsed = time;
-        queue_reply(&audio_queue, 1);
+        audio_queue_reply(1);
 
         bool haltres = halt_decoding_track(pending == TRACK_SKIP_AUTO);
 
@@ -2955,7 +2975,7 @@ static void audio_on_ff_rewind(long time)
            lock out seeking for a couple seconds */
 
         /* Sure as heck cancel seek mode too! */
-        audio_ff_rewind_end();
+        audio_seek_end();
         return;
         }
 
@@ -3065,7 +3085,7 @@ void audio_playback_handler(struct queue_event *ev)
             LOGFQUEUE("playback < Q_AUDIO_STOP");
             audio_stop_playback();
             if (ev->data != 0)
-                queue_clear(&audio_queue);
+                audio_queue_clear();
             return; /* no more playback */
 
         case Q_AUDIO_PAUSE:
@@ -3083,14 +3103,19 @@ void audio_playback_handler(struct queue_event *ev)
             audio_on_dir_skip(ev->data);
             break;
 
-        case Q_AUDIO_PRE_FF_REWIND:
-            LOGFQUEUE("playback < Q_AUDIO_PRE_FF_REWIND");
-            audio_on_pre_ff_rewind();
+        case Q_AUDIO_SEEK+AUDIO_SEEK_BEGIN:
+            LOGFQUEUE("playback < Q_AUDIO_SEEK+%u",
+                      (unsigned int)ev->id - Q_AUDIO_SEEK);
+            audio_on_seek_begin(true);
             break;
 
-        case Q_AUDIO_FF_REWIND:
-            LOGFQUEUE("playback < Q_AUDIO_FF_REWIND");
-            audio_on_ff_rewind(ev->data);
+        case Q_AUDIO_SEEK+AUDIO_SEEK_SET_IMMEDIATE:
+        case Q_AUDIO_SEEK+AUDIO_SEEK_CUR_IMMEDIATE:
+            LOGFQUEUE("playback < Q_AUDIO_SEEK+%u: %ld",
+                      (unsigned int)ev->id - Q_AUDIO_SEEK, (long)ev->data);
+            audio_on_seek_begin(false);
+        case Q_AUDIO_SEEK+AUDIO_SEEK_SET_GAPLESS:
+            audio_on_seek(ev->data, (unsigned int)ev->id - Q_AUDIO_SEEK);
             break;
 
         case Q_AUDIO_FLUSH:
@@ -3540,18 +3565,14 @@ void audio_prev_dir(void)
     audio_queue_post(Q_AUDIO_DIR_SKIP, -1);
 }
 
-/* Pause playback in order to start a seek that flushes the old audio */
-void audio_pre_ff_rewind(void)
-{
-    LOGFQUEUE("audio > audio Q_AUDIO_PRE_FF_REWIND");
-    audio_queue_post(Q_AUDIO_PRE_FF_REWIND, 0);
-}
-
 /* Seek to the new time in the current track */
-void audio_ff_rewind(long time)
+void audio_seek(long time, unsigned int type)
 {
-    LOGFQUEUE("audio > audio Q_AUDIO_FF_REWIND");
-    audio_queue_post(Q_AUDIO_FF_REWIND, time);
+    if (type >= __AUDIO_SEEK_TYPE_COUNT)
+        return;
+
+    LOGFQUEUE("audio > audio Q_AUDIO_SEEK+%u:time=%ld", type, time);
+    audio_queue_post(Q_AUDIO_SEEK + type, time);
 }
 
 /* Clear all but the currently playing track then rebuffer */
