@@ -612,7 +612,7 @@ void lcd_update_rect(int x, int y, int w, int h)
      * of w or h is odd, we will send a copy of the first pixels as dummy writes. We will
      * send at most 3 bytes. We then send (w * h + 3) / 4 x 4 bytes.
      */
-    if(w % 2 == 1 || h % 2 == 1)
+    if(w % 4 || h % 4)
     {
         /* copy three pixel after the last one */
         for(int i = 0; i < 3; i++)
