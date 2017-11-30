@@ -116,13 +116,15 @@ reasonable amount of time for the typical user to react */
 
 void ab_jump_to_A_marker(void)
 {
-#if (CONFIG_CODEC != SWCODEC)
+#if (CONFIG_CODEC == SWCODEC)
+    audio_seek(ab_A_marker, AUDIO_SEEK_SET_GAPLESS);
+#else
     bool paused = (audio_status() & AUDIO_STATUS_PAUSE) != 0;
     if ( ! paused )
         audio_pause();
-#endif
+
     audio_ff_rewind(ab_A_marker);
-#if (CONFIG_CODEC != SWCODEC)
+
     if ( ! paused )
         audio_resume();
 #endif
@@ -130,6 +132,10 @@ void ab_jump_to_A_marker(void)
 
 void ab_reset_markers(void)
 {
+#if CONFIG_CODEC == SWCODEC
+    if (ab_A_marker != AB_MARKER_NONE || ab_B_marker != AB_MARKER_NONE)
+        audio_seek(0, AUDIO_SEEK_CUR_IMMEDIATE);
+#endif
     ab_A_marker = AB_MARKER_NONE;
     ab_B_marker = AB_MARKER_NONE;
 }
@@ -158,6 +164,11 @@ void ab_set_B_marker(unsigned int song_position)
     /* check if markers are out of order */
     if ( (ab_A_marker != AB_MARKER_NONE) && (ab_B_marker < ab_A_marker) )
         ab_A_marker = AB_MARKER_NONE;
+
+#if CONFIG_CODEC == SWCODEC
+    /* overcome long latency in audio */
+    audio_seek(ab_A_marker, AUDIO_SEEK_SET_IMMEDIATE);
+#endif
 }
 
 bool ab_get_A_marker(unsigned *song_position)

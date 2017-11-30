@@ -307,22 +307,19 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
  * returns false if audio  isn't playing */
 static bool seek(unsigned long pos)
 {
-    if (!(audio_status() & AUDIO_STATUS_PLAY))
-    {
-        return false;
-    }
-    else
-    {
 #if (CONFIG_CODEC == SWCODEC)
-        audio_pre_ff_rewind();
-        audio_ff_rewind(pos);
+    audio_seek(pos, AUDIO_SEEK_SET_IMMEDIATE);
+    return audio_status() & AUDIO_STATUS_PLAY;
 #else
-        audio_pause();
-        audio_ff_rewind(pos);
-        audio_resume();
+    if (!(audio_status() & AUDIO_STATUS_PLAY))
+        return false;
+
+    audio_pause();
+    audio_ff_rewind(pos);
+    audio_resume();
+
+    return true;
 #endif
-        return true;
-    }
 }
 
 /* returns the index of the track currently being played

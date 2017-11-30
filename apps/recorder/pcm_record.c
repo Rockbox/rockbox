@@ -1500,7 +1500,7 @@ static void on_recording_options(struct audio_recording_options *options)
     enc_config         = options->enc_config;
     enc_config.afmt    = afmt;
 
-    queue_reply(&audio_queue, 0);  /* Let caller go */
+    audio_queue_reply(0);  /* Let caller go */
 
     /* Pick appropriate PCM copy routine */
     pcm_copyfn = memcpy;
@@ -1592,7 +1592,7 @@ static void on_record(const char *filename)
     char path[MAX_PATH];
     strlcpy(path, filename, MAX_PATH);
 
-    queue_reply(&audio_queue, 0);
+    audio_queue_reply(0);
 
     enum mark_stream_action mark_action;
 

@@ -2951,7 +2951,7 @@ void audio_prev(void)
 #endif /* SIMULATOR */
 }
 
-void audio_ff_rewind(long newpos)
+void audio_ff_rew(long newpos)
 {
 #ifndef SIMULATOR
     queue_post(&mpeg_queue, MPEG_FF_REWIND, newpos);

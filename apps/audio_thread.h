@@ -28,6 +28,8 @@
 #define AUDIO_HAVE_RECORDING
 #endif
 
+#include "audio.h"
+
 enum
 {
     Q_NULL = 0,                 /* reserved */
@@ -37,8 +39,8 @@ enum
     Q_AUDIO_STOP,
     Q_AUDIO_PAUSE,
     Q_AUDIO_SKIP,
-    Q_AUDIO_PRE_FF_REWIND,
-    Q_AUDIO_FF_REWIND,
+    Q_AUDIO_SEEK,
+    Q_AUDIO_SEEK_LAST = Q_AUDIO_SEEK+__AUDIO_SEEK_TYPE_COUNT,
     Q_AUDIO_FLUSH,
     Q_AUDIO_DIR_SKIP,
 
@@ -105,5 +107,7 @@ void audio_recording_handler(struct queue_event *ev);
 /** --- audio_queue helpers --- **/
 void audio_queue_post(long id, intptr_t data);
 intptr_t audio_queue_send(long id, intptr_t data);
+void audio_queue_reply(intptr_t retval);
+void audio_queue_clear(void);
 
 #endif /* AUDIO_THREAD_H */
