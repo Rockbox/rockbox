@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "444cccb2_3cfdb107",
+        "filename": "firmware/target/arm/imx233/pcm-imx233.c",
+        "patchSetId": 11
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1000536
+      },
+      "writtenOn": "2017-12-01T10:23:21Z",
+      "side": 1,
+      "message": "Why do you PHYSICAL_ADDR here? imx233_dma_start_command takes care of translating the address and invalidating the cache",
+      "range": {
+        "startLine": 276,
+        "startChar": 14,
+        "endLine": 276,
+        "endChar": 27
+      },
+      "revId": "7a55e7d4d2c13f2ae6fa48a15110928d7e61ad9f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
