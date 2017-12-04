@@ -193,9 +193,25 @@ static enum filling_state
 } filling = STATE_IDLE;
 
 /* Track info - holds information about each track in the buffer */
+enum track_load_state
+{
+    TRACK_STATE_INVALID = -1,
+    TRACK_STATE_META,
+    TRACK_STATE_CUE,
+#ifdef HAVE_ALBUMART
+    TRACK_STATE_AA,
+#endif
+#ifdef HAVE_CODEC_BUFFERING
+    TRACK_STATE_CODEC,
+#endif
+    TRACK_STATE_AUDIO,
+    TRACK_STATE_COMPLETE,
+};
+
 struct track_info
 {
     /* In per-track allocated order: */
+    int state;
     int id3_hid;                /* Metadata handle ID */
     int cuesheet_hid;           /* Parsed cuesheet handle ID */
 #ifdef HAVE_ALBUMART
@@ -553,7 +569,9 @@ static struct track_info * track_list_alloc_track(void)
     if (track_list_full())
         return NULL;
 
-    return track_list_entry(track_list.end++);
+    struct track_info *entry = track_list_entry(track_list.end++);
+    entry->state = TRACK_STATE_INVALID;
+    return entry;
 }
 
 /* Remove the last track entry allocated in order to support backing out
@@ -1083,6 +1101,19 @@ static void send_track_event(unsigned int id, unsigned int flags,
         flags |= TEF_CURRENT;
 
     send_event(id, &(struct track_event){ .flags = flags, .id3 = id3 });
+}
+
+/* Announce that all user-available data is ready */
+static void audio_current_track_ready(const struct track_info *info)
+{
+    if (info == track_list_user_current(0))
+    {
+        /* Send only when the track handles could not all be opened ahead of
+           time for the user's current track - otherwise everything is ready
+           by the time PLAYBACK_EVENT_TRACK_CHANGE is sent */
+        send_track_event(PLAYBACK_EVENT_CUR_TRACK_READY, 0,
+                         id3_get(PLAYING_ID3));
+    }
 }
 
 /* Announce the end of playing the current track */
@@ -1853,6 +1884,7 @@ static int audio_load_track(void)
     else
     {
         /* Successful load initiation */
+        info->state = TRACK_STATE_CUE;
         info->filesize = filesize(fd);
         in_progress_id3_hid = info->id3_hid; /* Remember what's in-progress */
     }
@@ -1865,7 +1897,8 @@ static int audio_load_track(void)
    can load the codec, the album art and finally the audio data.
    This is called on the audio thread after the buffering thread calls the
    buffering_handle_finished_callback callback. */
-static int audio_finish_load_track(struct track_info *info)
+static int audio_finish_load_track(struct track_info *info,
+                                   bool finish_now)
 {
     int trackstat = LOAD_TRACK_OK;
 
@@ -1879,7 +1912,6 @@ static int audio_finish_load_track(struct track_info *info)
 
     /* The current track for decoding (there is always one if the list is
        populated) */
-    struct track_info *cur_info = track_list_current(0);
     struct mp3entry *track_id3 = valid_mp3entry(bufgetid3(info->id3_hid));
 
     if (!track_id3)
@@ -1888,138 +1920,156 @@ static int audio_finish_load_track(struct track_info *info)
            metadata; skip the track. */
         logf("No metadata");
         trackstat = LOAD_TRACK_ERR_FINISH_FAILED;
-        goto audio_finish_load_track_exit;
+        info->state = TRACK_STATE_INVALID;
     }
 
-    /* Try to load a cuesheet for the track */
-    if (!audio_load_cuesheet(info, track_id3))
+load_next_handle:
+    switch (info->state)
     {
-        /* No space for cuesheet on buffer, not an error */
-        filling = STATE_FULL;
-        goto audio_finish_load_track_exit;
-    }
+    case TRACK_STATE_CUE:
+        /* Try to load a cuesheet for the track */
+        if (!audio_load_cuesheet(info, track_id3))
+        {
+            /* No space for cuesheet on buffer, not an error */
+            filling = STATE_FULL;
+            break;
+        }
+
+#ifndef HAVE_ALBUMART
+        audio_current_track_ready(info);
+#endif
+        info->state++;
+        break;
 
 #ifdef HAVE_ALBUMART
-    /* Try to load album art for the track */
-    if (!audio_load_albumart(info, track_id3))
-    {
-        /* No space for album art on buffer, not an error */
-        filling = STATE_FULL;
-        goto audio_finish_load_track_exit;
-    }
-#endif
+    case TRACK_STATE_AA:
+        /* Try to load album art for the track */
+        if (!audio_load_albumart(info, track_id3))
+        {
+            /* No space for album art on buffer, not an error */
+            filling = STATE_FULL;
+            break;
+        }
+
+        audio_current_track_ready(info);
+        info->state++;
+        break;
+#endif /* HAVE_ALBUMART */
 
     /* All handles available to external routines are ready - audio and codec
        information is private */
 
-    if (info == track_list_user_current(0))
-    {
-        /* Send only when the track handles could not all be opened ahead of
-           time for the user's current track - otherwise everything is ready
-           by the time PLAYBACK_EVENT_TRACK_CHANGE is sent */
-        send_track_event(PLAYBACK_EVENT_CUR_TRACK_READY, 0,
-                         id3_get(PLAYING_ID3));
-    }
-
 #ifdef HAVE_CODEC_BUFFERING
-    /* Try to buffer a codec for the track */
-    if (info != cur_info && !audio_buffer_codec(info, track_id3))
-    {
-        if (info->codec_hid == ERR_BUFFER_FULL)
+    case TRACK_STATE_CODEC:
+        /* Try to buffer a codec for the track */
+        if (info != track_list_current(0) &&
+            !audio_buffer_codec(info, track_id3))
         {
-            /* No space for codec on buffer, not an error */
-            filling = STATE_FULL;
-            logf("buffer is full for now (%s)", __func__);
-        }
-        else
-        {
-            /* This is an error condition, either no codec was found, or
-               reading the codec file failed part way through, either way,
-               skip the track */
-            logf("No codec for: %s", track_id3->path);
-            trackstat = LOAD_TRACK_ERR_FINISH_FAILED;
+            if (info->codec_hid == ERR_BUFFER_FULL)
+            {
+                /* No space for codec on buffer, not an error */
+                filling = STATE_FULL;
+                logf("buffer is full for now (%s)", __func__);
+                break;
+            }
+            else
+            {
+                /* This is an error condition, either no codec was found, or
+                   reading the codec file failed part way through, either way,
+                   skip the track */
+                logf("No codec for: %s", track_id3->path);
+                trackstat = LOAD_TRACK_ERR_FINISH_FAILED;
+                break;
+            }
         }
 
-        goto audio_finish_load_track_exit;
-    }
+        info->state++;
+        break;
 #endif /* HAVE_CODEC_BUFFERING */
 
-    /** Finally, load the audio **/
-    size_t file_offset = 0;
+    case TRACK_STATE_AUDIO:;
+        /** Finally, load the audio **/
+        struct track_info *cur_info = track_list_current(0);
+        size_t file_offset = 0;
 
-    if (track_id3->elapsed > track_id3->length)
-        track_id3->elapsed = 0;
+        if (track_id3->elapsed > track_id3->length)
+            track_id3->elapsed = 0;
 
-    if (track_id3->offset >= info->filesize)
-        track_id3->offset = 0;
+        if (track_id3->offset >= info->filesize)
+            track_id3->offset = 0;
 
-    logf("%s: set offset for %s to %lu\n", __func__,
-         track_id3->title, (unsigned long)track_id3->offset);
+        logf("%s: set offset for %s to %lu\n", __func__,
+             track_id3->title, (unsigned long)track_id3->offset);
 
-    /* Adjust for resume rewind so we know what to buffer - starting the codec
-       calls it again, so we don't save it (and they shouldn't accumulate) */
-    unsigned long elapsed, offset;
-    resume_rewind_adjust_progress(track_id3, &elapsed, &offset);
+        /* Adjust for resume rewind so we know what to buffer - starting the codec
+           calls it again, so we don't save it (and they shouldn't accumulate) */
+        unsigned long elapsed, offset;
+        resume_rewind_adjust_progress(track_id3, &elapsed, &offset);
 
-    logf("%s: Set resume for %s to %lu %lX", __func__,
-         track_id3->title, elapsed, offset);
+        logf("%s: Set resume for %s to %lu %lX", __func__,
+             track_id3->title, elapsed, offset);
 
-    enum data_type audiotype = rbcodec_format_is_atomic(track_id3->codectype) ?
-                                      TYPE_ATOMIC_AUDIO : TYPE_PACKET_AUDIO;
+        enum data_type audiotype = rbcodec_format_is_atomic(track_id3->codectype) ?
+                                          TYPE_ATOMIC_AUDIO : TYPE_PACKET_AUDIO;
 
-    if (audiotype == TYPE_ATOMIC_AUDIO)
-        logf("Loading atomic %d", track_id3->codectype);
+        if (audiotype == TYPE_ATOMIC_AUDIO)
+            logf("Loading atomic %d", track_id3->codectype);
 
-    if (format_buffers_with_offset(track_id3->codectype))
-    {
-        /* This format can begin buffering from any point */
-        file_offset = offset;
-    }
-
-    logf("load track: %s", track_id3->path);
-
-    if (file_offset > AUDIO_REBUFFER_GUESS_SIZE)
-    {
-        /* We can buffer later in the file, adjust the hunt-and-peck margin */
-        file_offset -= AUDIO_REBUFFER_GUESS_SIZE;
-    }
-    else
-    {
-        /* No offset given or it is very minimal - begin at the first frame
-           according to the metadata */
-        file_offset = track_id3->first_frame_offset;
-    }
-
-    int hid = bufopen(track_id3->path, file_offset, audiotype, NULL);
-
-    if (hid >= 0)
-    {
-        info->audio_hid = hid;
-
-        if (info == cur_info)
+        if (format_buffers_with_offset(track_id3->codectype))
         {
-            /* This is the current track to decode - should be started now */
-            trackstat = LOAD_TRACK_READY;
+            /* This format can begin buffering from any point */
+            file_offset = offset;
         }
-    }
-    else
-    {
-        /* Buffer could be full but not properly so if this is the only
-           track! */
-        if (hid == ERR_BUFFER_FULL && audio_track_count() > 1)
+
+        logf("load track: %s", track_id3->path);
+
+        if (file_offset > AUDIO_REBUFFER_GUESS_SIZE)
         {
-            filling = STATE_FULL;
-            logf("Buffer is full for now (%s)", __func__);
+            /* We can buffer later in the file, adjust the hunt-and-peck margin */
+            file_offset -= AUDIO_REBUFFER_GUESS_SIZE;
         }
         else
         {
-            /* Nothing to play if no audio handle - skip this */
-            logf("Could not add audio data handle");
-            trackstat = LOAD_TRACK_ERR_FINISH_FAILED;
+            /* No offset given or it is very minimal - begin at the first frame
+               according to the metadata */
+            file_offset = track_id3->first_frame_offset;
         }
-    }
 
-audio_finish_load_track_exit:
+        int hid = bufopen(track_id3->path, file_offset, audiotype, NULL);
+
+        if (hid >= 0)
+        {
+            info->audio_hid = hid;
+
+            if (info == cur_info)
+            {
+                /* This is the current track to decode - should be started now */
+                trackstat = LOAD_TRACK_READY;
+            }
+        }
+        else
+        {
+            /* Buffer could be full but not properly so if this is the only
+               track! */
+            if (hid == ERR_BUFFER_FULL && audio_track_count() > 1)
+            {
+                filling = STATE_FULL;
+                logf("Buffer is full for now (%s)", __func__);
+                break;
+            }
+            else
+            {
+                /* Nothing to play if no audio handle - skip this */
+                logf("Could not add audio data handle");
+                trackstat = LOAD_TRACK_ERR_FINISH_FAILED;
+                break;
+            }
+        }
+
+        info->state++;
+        break;
+    } /* end switch */
+
     if (trackstat < LOAD_TRACK_OK)
     {
         playlist_skip_entry(NULL, playlist_peek_offset);
@@ -2034,10 +2084,24 @@ audio_finish_load_track_exit:
 
     if (filling != STATE_FULL)
     {
-        /* Load next track - error or not */
-        in_progress_id3_hid = ERR_HANDLE_NOT_FOUND;
-        LOGFQUEUE("audio > audio Q_AUDIO_FILL_BUFFER");
-        audio_queue_post(Q_AUDIO_FILL_BUFFER, 0);
+        if (trackstat != LOAD_TRACK_OK || info->state == TRACK_STATE_COMPLETE)
+        {
+            /* Load next track - error or not */
+            in_progress_id3_hid = ERR_HANDLE_NOT_FOUND;
+            LOGFQUEUE("audio > audio Q_AUDIO_FILL_BUFFER");
+            audio_queue_post(Q_AUDIO_FILL_BUFFER, 0);
+        }
+        else if (finish_now)
+        {
+            /* Want everything now */
+            goto load_next_handle;
+        }
+        else
+        {
+            /* Continue loading handles */
+            LOGFQUEUE("audio > audio Q_AUDIO_FINISH_LOAD_TRACK");
+            audio_queue_post(Q_AUDIO_FINISH_LOAD_TRACK, info->id3_hid);
+        }
     }
     else
     {
@@ -2171,14 +2235,15 @@ static void audio_on_finish_load_track(int id3_hid)
     if (!info || !buf_is_handle(id3_hid))
         return;
 
-    if (info == track_list_user_current(1))
+    if (info->state == TRACK_STATE_CUE &&
+        info == track_list_user_current(1))
     {
         /* Just loaded the metadata right after the current position */
         audio_update_and_announce_next_track(bufgetid3(info->id3_hid));
     }
 
-    if (audio_finish_load_track(info) != LOAD_TRACK_READY)
-        return; /* Not current track */
+    if (audio_finish_load_track(info, false) != LOAD_TRACK_READY)
+        return; /* Not current track/not complete */
 
     bool is_user_current = info == track_list_user_current(0);
 
@@ -2905,7 +2970,7 @@ static void audio_on_ff_rewind(long time)
         /* Track must complete the loading _now_ since a codec and audio
            handle are needed in order to do the seek */
         if (cur_info->audio_hid < 0 &&
-            audio_finish_load_track(cur_info) != LOAD_TRACK_READY)
+            audio_finish_load_track(cur_info, true) != LOAD_TRACK_READY)
         {
             /* Call above should push any load sequence - no need for
                halt_decoding_track here if no skip was pending here because
