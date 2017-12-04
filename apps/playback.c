@@ -174,7 +174,7 @@ static struct albumart_slot
     int used;           /* Counter; increments if something uses it */
 } albumart_slots[MAX_MULTIPLE_AA]; /* (A,O) */
 
-#define FOREACH_ALBUMART(i) for(i = 0;i < MAX_MULTIPLE_AA; i++)
+#define FOREACH_ALBUMART(i) for (int i = 0; i < MAX_MULTIPLE_AA; i++)
 #endif /* HAVE_ALBUMART */
 
 
@@ -465,7 +465,6 @@ static void track_info_close(struct track_info *info)
     track_info_close_handle(&info->id3_hid);
     track_info_close_handle(&info->cuesheet_hid);
 #ifdef HAVE_ALBUMART
-    int i;
     FOREACH_ALBUMART(i)
         track_info_close_handle(&info->aa_hid[i]);
 #endif
@@ -482,7 +481,6 @@ static void track_info_wipe(struct track_info * info)
     info->id3_hid = ERR_HANDLE_NOT_FOUND;
     info->cuesheet_hid = ERR_HANDLE_NOT_FOUND;
 #ifdef HAVE_ALBUMART
-    int i;
     FOREACH_ALBUMART(i)
         info->aa_hid[i] = ERR_HANDLE_NOT_FOUND;
 #endif
@@ -1609,7 +1607,6 @@ static bool audio_load_cuesheet(struct track_info *info,
 static bool audio_load_albumart(struct track_info *info,
                                 struct mp3entry *track_id3)
 {
-    int i;
     FOREACH_ALBUMART(i)
     {
         struct bufopen_bitmap_data user_data;
@@ -3588,8 +3585,6 @@ int playback_current_aa_hid(int slot)
    is already claimed - increment the use count if it is */
 int playback_claim_aa_slot(struct dim *dim)
 {
-    int i;
-
     /* First try to find a slot already having the size to reuse it since we
        don't want albumart of the same size buffered multiple times */
     FOREACH_ALBUMART(i)
