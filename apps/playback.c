@@ -2904,7 +2904,9 @@ static void audio_on_ff_rewind(long time)
 
         /* Track must complete the loading _now_ since a codec and audio
            handle are needed in order to do the seek */
-        if (cur_info->audio_hid < 0 &&
+        bool finish_load = cur_info->audio_hid < 0;
+
+        if (finish_load &&
             audio_finish_load_track(cur_info) != LOAD_TRACK_READY)
         {
             /* Call above should push any load sequence - no need for
@@ -2914,7 +2916,7 @@ static void audio_on_ff_rewind(long time)
             break;
         }
 
-        if (pending == TRACK_SKIP_AUTO)
+        if (pending == TRACK_SKIP_AUTO || finish_load)
         {
             if (!bufreadid3(cur_info->id3_hid, ci_id3) ||
                 !audio_init_codec(cur_info, ci_id3))
