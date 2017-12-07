@@ -314,7 +314,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 enum codec_status codec_run(void)
 {
     int error = CODEC_ERROR;
-    enum codec_command_action action;
+    long action;
     intptr_t param;
     ogg_sync_state oy;
     ogg_page og;

@@ -120,7 +120,7 @@ restart_track:
 
     while (pktcnt < wfx.numpackets)
     {
-        enum codec_command_action action = ci->get_command(&param);
+        long action = ci->get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;

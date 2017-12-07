@@ -1333,7 +1333,7 @@ enum codec_status codec_run(void)
     old_patterntableposition = 0;
 
     while (1) {
-        enum codec_command_action action = ci->get_command(&param);
+        long action = ci->get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;

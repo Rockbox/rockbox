@@ -97,7 +97,7 @@ next_track:
 
     /* The main decoder loop */
     while (1) {
-        enum codec_command_action action = ci->get_command(&param);
+        long action = ci->get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;

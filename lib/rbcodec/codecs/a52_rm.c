@@ -148,7 +148,7 @@ enum codec_status codec_run(void)
     int consumed, packet_offset;
     int playback_on = -1;
     size_t resume_offset;
-    enum codec_command_action action;
+    long action;
     intptr_t param;
 
     if (codec_init()) {

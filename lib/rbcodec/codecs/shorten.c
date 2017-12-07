@@ -110,7 +110,7 @@ seek_start:
     samplesdone = 0;
     buf = ci->request_buffer(&bytesleft, MAX_BUFFER_SIZE);
     while (bytesleft) {
-        enum codec_command_action action = ci->get_command(&param);
+        long action = ci->get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;

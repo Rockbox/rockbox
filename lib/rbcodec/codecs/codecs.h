@@ -46,6 +46,8 @@
 #include "gcc_extensions.h"
 #include "load_code.h"
 
+#include <limits.h>
+
 #ifdef CODEC
 #if defined(DEBUG) || defined(SIMULATOR)
 #undef DEBUGF
@@ -72,12 +74,12 @@
 #define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 47
+#define CODEC_API_VERSION 48
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 47
+#define CODEC_MIN_API_VERSION 48
 
 /* reasons for calling codec main entrypoint */
 enum codec_entry_call_reason {
@@ -99,6 +101,8 @@ enum codec_command_action {
 #ifdef HAVE_RECORDING
     CODEC_ACTION_STREAM_FINISH = 2,
 #endif
+    CODEC_ACTION_MIN = LONG_MIN,
+    CODEC_ACTION_MAX = LONG_MAX,
 };
 
 /* NOTE: To support backwards compatibility, only add new functions at
@@ -144,7 +148,7 @@ struct codec_api {
     /* Configure different codec buffer parameters. */
     void (*configure)(int setting, intptr_t value);
     /* Obtain command action on what to do next */
-    enum codec_command_action (*get_command)(intptr_t *param);
+    long (*get_command)(intptr_t *param);
     /* Determine whether the track should be looped, if applicable. */
     bool (*loop_track)(void);
 

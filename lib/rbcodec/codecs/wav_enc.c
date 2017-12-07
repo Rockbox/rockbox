@@ -188,7 +188,7 @@ enum codec_status ICODE_ATTR codec_run(void)
     /* main encoding loop */
     while (1)
     {
-        enum codec_command_action action = ci->get_command(NULL);
+        long action = ci->get_command(NULL);
 
         if (action != CODEC_ACTION_NULL)
             break;

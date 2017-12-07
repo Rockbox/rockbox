@@ -108,7 +108,7 @@ static const char *config = "";
 static uint32_t playback_vol_factor = VOL_FACTOR_UNITY;
 
 static int input_fd;
-static enum codec_command_action codec_action;
+static long codec_action;
 static intptr_t codec_action_param = 0;
 static unsigned long num_output_samples = 0;
 static struct codec_api ci;
@@ -606,9 +606,9 @@ static void ci_configure(int setting, intptr_t value)
     }
 }
 
-static enum codec_command_action ci_get_command(intptr_t *param)
+static long ci_get_command(intptr_t *param)
 {
-    enum codec_command_action ret = codec_action;
+    long ret = codec_action;
     *param = codec_action_param;
     codec_action = CODEC_ACTION_NULL;
     return ret;

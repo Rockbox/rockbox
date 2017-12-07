@@ -109,7 +109,7 @@ enum codec_status codec_run(void)
 
     /* The main decoding loop */
     while (i < demux_res.num_sample_byte_sizes) {
-        enum codec_command_action action = ci->get_command(&param);
+        long action = ci->get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;

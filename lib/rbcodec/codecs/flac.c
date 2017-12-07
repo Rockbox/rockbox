@@ -498,7 +498,7 @@ enum codec_status codec_run(void)
     frame=0;
     buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
     while (bytesleft) {
-        enum codec_command_action action = ci->get_command(&param);
+        long action = ci->get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;
