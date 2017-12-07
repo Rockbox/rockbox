@@ -50,7 +50,7 @@ enum codec_status codec_run(void)
     int elapsed = 0;
     size_t resume_offset;
     intptr_t param;
-    enum codec_command_action action;
+    long action;
 
     if (codec_init()) {
         DEBUGF("codec init failed\n");

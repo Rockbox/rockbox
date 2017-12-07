@@ -155,7 +155,7 @@ enum codec_status codec_run(void)
     int res;
     int firstbyte;
     size_t resume_offset;
-    enum codec_command_action action;
+    long action;
     intptr_t param;
 
     if (codec_init()) {

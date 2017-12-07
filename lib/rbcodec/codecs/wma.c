@@ -52,7 +52,7 @@ enum codec_status codec_run(void)
     int audiobufsize;
     int packetlength = 0;
     int errcount = 0;
-    enum codec_command_action action;
+    long action;
     intptr_t param;
 
     /* Remember the resume position - when the codec is opened, the

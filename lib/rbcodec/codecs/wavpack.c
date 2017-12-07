@@ -90,7 +90,7 @@ enum codec_status codec_run(void)
 
     while (1) {
         int32_t nsamples;
-        enum codec_command_action action = ci->get_command(&param);
+        long action = ci->get_command(&param);
 
         if (action == CODEC_ACTION_HALT)
             break;

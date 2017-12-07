@@ -405,7 +405,7 @@ enum codec_status codec_run(void)
     unsigned long strtoffset;
     void *st = NULL;
     int j = 0;
-    enum codec_command_action action;
+    long action;
     intptr_t param;
 
     memset(&bits, 0, sizeof(bits));

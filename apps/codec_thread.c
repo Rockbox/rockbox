@@ -349,8 +349,7 @@ static void codec_configure_callback(int setting, intptr_t value)
     dsp_configure(ci.dsp, setting, value);
 }
 
-static enum codec_command_action
-    codec_get_command_callback(intptr_t *param)
+static long codec_get_command_callback(intptr_t *param)
 {
     yield();
 
@@ -361,7 +360,7 @@ static enum codec_command_action
        be expected) */
     while (1)
     {
-        enum codec_command_action action = CODEC_ACTION_NULL;
+        long action = CODEC_ACTION_NULL;
         struct queue_event ev;
 
         queue_peek(&codec_queue, &ev); /* Find out what it is */

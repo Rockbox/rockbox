@@ -2961,7 +2961,7 @@ enum codec_status codec_run(void)
     while (1)
     {
         intptr_t param;
-        enum codec_command_action action = ci->get_command(&param);
+        long action = ci->get_command(&param);
 
         if (action != CODEC_ACTION_NULL)
         {

@@ -72,7 +72,7 @@ enum codec_status codec_run(void)
     uint32_t sbr_fac = 1;
     unsigned char c = 0;
     void *ret;
-    enum codec_command_action action;
+    long action;
     intptr_t param;
     bool empty_first_frame = false;
 
