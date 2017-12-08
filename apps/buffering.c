@@ -43,6 +43,8 @@
 /* #define LOGF_ENABLE */
 #include "logf.h"
 
+#define BUF_MAX_HANDLES 384
+
 /* macros to enable logf for queues
    logging on SYS_TIMEOUT can be disabled */
 #ifdef SIMULATOR
@@ -1120,6 +1122,10 @@ bool bufclose(int handle_id)
         return true;
     }
 #endif
+    if (handle_id <= 0) {
+        return true;
+    }
+
     LOGFQUEUE("buffering >| Q_CLOSE_HANDLE %d", handle_id);
     return queue_send(&buffering_queue, Q_CLOSE_HANDLE, handle_id);
 }
