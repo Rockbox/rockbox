@@ -36,6 +36,7 @@ enum data_type {
     TYPE_ATOMIC_AUDIO,
     TYPE_CUESHEET,
     TYPE_BITMAP,
+    TYPE_RAW_ATOMIC,
 };
 
 /* Error return values */
@@ -73,8 +74,6 @@ bool buffering_reset(char *buf, size_t buflen);
  * amount of data is ready (unless EOF is reached).
  * NOTE: Tail operations are only legal when the end of the file is buffered.
  ****************************************************************************/
-
-#define BUF_MAX_HANDLES         256
 
 int bufopen(const char *file, size_t offset, enum data_type type,
             void *user_data);
