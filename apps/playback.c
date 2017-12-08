@@ -73,7 +73,9 @@
 #define AUDIO_REBUFFER_GUESS_SIZE    (1024*32)
 
 /* Define LOGF_ENABLE to enable logf output in this file */
-/* #define LOGF_ENABLE */
+#if 0
+#define LOGF_ENABLE
+#endif
 #include "logf.h"
 
 /* Macros to enable logf for queues
@@ -193,63 +195,70 @@ static enum filling_state
 } filling = STATE_IDLE;
 
 /* Track info - holds information about each track in the buffer */
+#ifdef HAVE_ALBUMART
+#define TRACK_INFO_AA       MAX_MULTIPLE_AA
+#else
+#define TRACK_INFO_AA       0
+#endif
+
+#ifdef HAVE_CODEC_BUFFERING
+#define TRACK_INFO_CODEC    1
+#else
+#define TRACK_INFO_CODEC    0
+#endif
+
+#define TRACK_INFO_HANDLES  (3 + TRACK_INFO_AA + TRACK_INFO_CODEC)
+
 struct track_info
 {
+    int self_hid;                   /* handle for the info on buffer */
+
     /* In per-track allocated order: */
-    int id3_hid;                /* Metadata handle ID */
-    int cuesheet_hid;           /* Parsed cuesheet handle ID */
+    union {
+    int handle[TRACK_INFO_HANDLES]; /* array mirror for efficient wipe/close */
+    struct {
+    int id3_hid;                    /* Metadata handle ID */
+    int cuesheet_hid;               /* Parsed cuesheet handle ID */
 #ifdef HAVE_ALBUMART
-    int aa_hid[MAX_MULTIPLE_AA];/* Album art handle IDs */
+    int aa_hid[MAX_MULTIPLE_AA];    /* Album art handle IDs */
 #endif
 #ifdef HAVE_CODEC_BUFFERING
-    int codec_hid;              /* Buffered codec handle ID */
+    int codec_hid;                  /* Buffered codec handle ID */
 #endif
-    int audio_hid;              /* Main audio data handle ID */
-    size_t filesize;            /* File total length on disk
-                                   TODO: This should be stored
-                                         in the handle or the
-                                         id3 and would use less
-                                         ram */
+    int audio_hid;                  /* Main audio data handle ID */
+    }; };
+    off_t filesize;                 /* File total length on disk
+                                       TODO: This should be stored
+                                             in the handle or the
+                                             id3 and would use less
+                                             ram */
 };
 
-/* Track list - holds info about all buffered tracks */
-#if MEMORYSIZE >= 32
-#define TRACK_LIST_LEN  128 /* Must be 2^int(+n) */
-#elif MEMORYSIZE >= 16
-#define TRACK_LIST_LEN   64
-#elif MEMORYSIZE >= 8
-#define TRACK_LIST_LEN   32
-#else
-#define TRACK_LIST_LEN   16
-#endif
+/* On-buffer info format; includes links */
+struct track_buf_info
+{
+    int               link[2];   /* prev/next handles */
+    struct track_info info;
+};
 
-#define TRACK_LIST_MASK (TRACK_LIST_LEN-1)
+#define FOR_EACH_TRACK_INFO_HANDLE(i) \
+    for (int i = 0; i < TRACK_INFO_HANDLES; i++)
 
 static struct
 {
-    /* read, write and current are maintained unwrapped, limited only by the
-       unsigned int range and wrap-safe comparisons are used */
-
-    /* NOTE: there appears to be a bug in arm-elf-eabi-gcc 4.4.4 for ARMv4 where
-       if 'end' follows 'start' in this structure, track_list_count performs
-       'start - end' rather than 'end - start', giving negative count values...
-       so leave it this way for now! */
-    unsigned int end;           /* Next open position */
-    unsigned int start;         /* First track in list */
-    unsigned int current;       /* Currently decoding track */
-    struct track_info tracks[TRACK_LIST_LEN]; /* Buffered track information */
+    /* TODO: perhaps cache -1/+1 delta handles if speed ever matters much
+       because those lookups are common; also could cache a few recent
+       acccesses */
+    int first_hid;          /* handle of first track in list */
+    int current_hid;        /* handle of track delta 0 */
+    int last_hid;           /* handle of last track in list */
+    int in_progress_hid;    /* track in process of loading */
+    unsigned int count;     /* number of tracks in list */
 } track_list; /* (A, O-) */
 
 
 /* Playlist steps from playlist position to next track to be buffered */
 static int playlist_peek_offset = 0;
-
-/* Metadata handle of track load in progress (meaning all handles have not
-   yet been opened for the track, id3 always exists or the track does not)
-
-   Tracks are keyed by their metadata handles if track list pointers are
-   insufficient to make comparisons */
-static int in_progress_id3_hid = ERR_HANDLE_NOT_FOUND;
 
 #ifdef HAVE_DISK_STORAGE
 /* Buffer margin A.K.A. anti-skip buffer (in seconds) */
@@ -443,172 +452,24 @@ static void id3_write_locked(enum audio_id3_types id3_num,
 
 /** --- Track info --- **/
 
-/* Close a handle and mark it invalid */
-static void track_info_close_handle(int *hid_p)
+static void track_info_close_handle(int *hidp)
 {
-    int hid = *hid_p;
-
-    /* bufclose returns true if the handle is not found, or if it is closed
-     * successfully, so these checks are safe on non-existant handles */
-    if (hid >= 0)
-        bufclose(hid);
-
-    /* Always reset to "no handle" in case it was something else */
-    *hid_p = ERR_HANDLE_NOT_FOUND;
+    bufclose(*hidp);
+    *hidp = ERR_HANDLE_NOT_FOUND;
 }
 
-/* Close all handles in a struct track_info and clear it */
-static void track_info_close(struct track_info *info)
+/* Invalidate all members to initial values - does not close handles or sync */
+static void track_info_wipe(struct track_info *infop)
 {
-    /* Close them in the order they are allocated on the buffer to speed up
-       the handle searching */
-    track_info_close_handle(&info->id3_hid);
-    track_info_close_handle(&info->cuesheet_hid);
-#ifdef HAVE_ALBUMART
-    FOREACH_ALBUMART(i)
-        track_info_close_handle(&info->aa_hid[i]);
-#endif
-#ifdef HAVE_CODEC_BUFFERING
-    track_info_close_handle(&info->codec_hid);
-#endif
-    track_info_close_handle(&info->audio_hid);
-    info->filesize = 0;
-}
+    /* don't touch ->self_hid */
 
-/* Invalidate all members to initial values - does not close handles */
-static void track_info_wipe(struct track_info * info)
-{
-    info->id3_hid = ERR_HANDLE_NOT_FOUND;
-    info->cuesheet_hid = ERR_HANDLE_NOT_FOUND;
-#ifdef HAVE_ALBUMART
-    FOREACH_ALBUMART(i)
-        info->aa_hid[i] = ERR_HANDLE_NOT_FOUND;
-#endif
-#ifdef HAVE_CODEC_BUFFERING
-    info->codec_hid = ERR_HANDLE_NOT_FOUND;
-#endif
-    info->audio_hid = ERR_HANDLE_NOT_FOUND;
-    info->filesize = 0;
-}
+    FOR_EACH_TRACK_INFO_HANDLE(i)
+        infop->handle[i] = ERR_HANDLE_NOT_FOUND;
 
+    infop->filesize = 0;
+}
 
 /** --- Track list --- **/
-
-/* Initialize the track list */
-static void INIT_ATTR track_list_init(void)
-{
-    int i;
-    for (i = 0; i < TRACK_LIST_LEN; i++)
-        track_info_wipe(&track_list.tracks[i]);
-
-    track_list.start = track_list.end = track_list.current;
-}
-
-/* Return number of items allocated in the list */
-static unsigned int track_list_count(void)
-{
-    return track_list.end - track_list.start;
-}
-
-/* Return true if the list is empty */
-static inline bool track_list_empty(void)
-{
-    return track_list.end == track_list.start;
-}
-
-/* Returns true if the list is holding the maximum number of items */
-static bool track_list_full(void)
-{
-    return track_list.end - track_list.start >= TRACK_LIST_LEN;
-}
-
-/* Test if the index is within the allocated range */
-static bool track_list_in_range(int pos)
-{
-    return (int)(pos - track_list.start) >= 0 &&
-           (int)(pos - track_list.end) < 0;
-}
-
-static struct track_info * track_list_entry(int pos)
-{
-    return &track_list.tracks[pos & TRACK_LIST_MASK];
-}
-
-/* Return the info of the last allocation plus an offset, NULL if result is
-   out of bounds */
-static struct track_info * track_list_last(int offset)
-{
-    /* Last is before the end since the end isn't inclusive */
-    unsigned int pos = track_list.end + offset - 1;
-
-    if (!track_list_in_range(pos))
-        return NULL;
-
-    return track_list_entry(pos);
-}
-
-/* Allocate space at the end for another track if not full */
-static struct track_info * track_list_alloc_track(void)
-{
-    if (track_list_full())
-        return NULL;
-
-    return track_list_entry(track_list.end++);
-}
-
-/* Remove the last track entry allocated in order to support backing out
-   of a track load */
-static void track_list_unalloc_track(void)
-{
-    if (track_list_empty())
-        return;
-
-    track_list.end--;
-
-    if (track_list.current == track_list.end &&
-        track_list.current != track_list.start)
-    {
-        /* Current _must_ remain within bounds */
-        track_list.current--;
-    }
-}
-
-/* Return current track plus an offset, NULL if result is out of bounds */
-static struct track_info * track_list_current(int offset)
-{
-    unsigned int pos = track_list.current + offset;
-
-    if (!track_list_in_range(pos))
-        return NULL;
-
-    return track_list_entry(pos);
-}
-
-/* Return current based upon what's intended that the user sees - not
-   necessarily where decoding is taking place */
-static struct track_info * track_list_user_current(int offset)
-{
-    if (skip_pending == TRACK_SKIP_AUTO ||
-        skip_pending == TRACK_SKIP_AUTO_NEW_PLAYLIST)
-    {
-        offset--;
-    }
-
-    return track_list_current(offset);
-}
-
-/* Advance current track by an offset, return false if result is out of
-   bounds */
-static struct track_info * track_list_advance_current(int offset)
-{
-    unsigned int pos = track_list.current + offset;
-
-    if (!track_list_in_range(pos))
-        return NULL;
-
-    track_list.current = pos;
-    return track_list_entry(pos);
-}
 
 /* Clear tracks in the list, optionally preserving the current track -
    returns 'false' if the operation was changed */
@@ -619,66 +480,312 @@ enum track_clear_action
     TRACK_LIST_KEEP_NEW       /* Keep current and those that follow */
 };
 
-static void track_list_clear(enum track_clear_action action)
+/* Initialize the track list */
+static void INIT_ATTR track_list_init(void)
 {
-    logf("%s(%d)", __func__, (int)action);
+    track_list.first_hid = 0;
+    track_list.current_hid = 0;
+    track_list.last_hid = 0;
+    track_list.in_progress_hid = 0;
+    track_list.count = 0;
+}
+
+/* Return number of items allocated in the list */
+static inline unsigned int track_list_count(void)
+{
+    return track_list.count;
+}
+
+/* Return true if the list is empty */
+static inline bool track_list_empty(void)
+{
+    return track_list.count == 0;
+}
+
+/* Returns a pointer to the track info data on the buffer */
+static struct track_buf_info * track_buf_info_get(int hid)
+{
+    void *p;
+    ssize_t size = bufgetdata(hid, sizeof (struct track_buf_info), &p);
+    return size == (ssize_t)sizeof (struct track_buf_info) ? p : NULL;
+}
+
+/* Synchronize the buffer object with the cached track info */
+static bool track_info_sync(const struct track_info *infop)
+{
+    struct track_buf_info *tbip = track_buf_info_get(infop->self_hid);
+    if (!tbip)
+        return false;
+
+    tbip->info = *infop;
+    return true;
+}
+
+/* Return track info a given offset from the info referenced by hid and
+ * place a copy into *infop, if provided */
+static struct track_buf_info *
+    track_list_get_info_from(int hid, int offset, struct track_info *infop)
+{
+    int sgn = SGN(offset);
+    struct track_buf_info *tbip;
+
+    while (1)
+    {
+        if (!(tbip = track_buf_info_get(hid)))
+            break;
+
+        if (!offset)
+            break;
+
+        if ((hid = tbip->link[(unsigned)(sgn + 1) / 2]) <= 0)
+        {
+            tbip = NULL;
+            break;
+        }
+
+        offset -= sgn;
+    }
+
+    if (infop)
+    {
+        if (tbip)
+        {
+            *infop = tbip->info;
+        }
+        else
+        {
+            track_info_wipe(infop);
+            infop->self_hid = ERR_HANDLE_NOT_FOUND;
+        }
+    }
+
+    return tbip;
+}
+
+/* Commit the track info to the buffer updated with the provided source info */
+static bool track_list_commit_buf_info(struct track_buf_info *tbip,
+                                       const struct track_info *src_infop)
+{
+    /* Leaves the list unmodified if anything fails */
+    if (tbip->link[1] != ERR_HANDLE_NOT_FOUND)
+        return false;
+
+    int hid = tbip->info.self_hid;
+    int last_hid = track_list.last_hid;
+    struct track_buf_info *last_tbip = NULL;
+
+    if (last_hid > 0 && !(last_tbip = track_buf_info_get(last_hid)))
+        return false;
+
+    tbip->info = *src_infop;
+
+    /* Insert last */
+    tbip->link[0] = last_hid;
+    tbip->link[1] = 0; /* "In list" */
+
+    if (last_tbip)
+    {
+        last_tbip->link[1] = hid;
+    }
+    else
+    {
+        track_list.first_hid   = hid;
+        track_list.current_hid = hid;
+    }
+
+    track_list.last_hid = hid;
+    track_list.count++;
+    return true;
+}
+
+/* Free the track buffer entry and possibly remove it from the list if it
+   was succesfully added at some point */
+static void track_list_free_buf_info(struct track_buf_info *tbip)
+{
+    int hid = tbip->info.self_hid;
+    int next_hid = tbip->link[1];
+
+    if (next_hid != ERR_HANDLE_NOT_FOUND)
+    {
+        int prev_hid = tbip->link[0];
+        struct track_buf_info *prev_tbip = NULL;
+        struct track_buf_info *next_tbip = NULL;
+
+        if ((prev_hid > 0 && !(prev_tbip = track_buf_info_get(prev_hid))) ||
+            (next_hid > 0 && !(next_tbip = track_buf_info_get(next_hid))))
+        {
+            return;
+        }
+
+        if (prev_tbip)
+        {
+            prev_tbip->link[1] = next_hid;
+        }
+        else
+        {
+            /* Was the first track; new first track is next one */
+            track_list.first_hid = next_hid;
+
+            if (hid == track_list.current_hid)
+            {
+                /* Was the current track; new current track is next one */
+                track_list.current_hid = next_hid;
+            }
+        }
+
+        if (next_tbip)
+        {
+            next_tbip->link[0] = prev_hid;
+        }
+        else
+        {
+            /* Was the last track; new last track is previous one */
+            track_list.last_hid = prev_hid;
+
+            if (hid == track_list.current_hid)
+            {
+                /* Was the current track; new current track is previous one */
+                track_list.current_hid = prev_hid;
+            }
+        }
+
+        track_list.count--;
+    }
+
+    /* No movement allowed during bufclose calls */
+    buf_pin_handle(hid, true);
+
+    FOR_EACH_TRACK_INFO_HANDLE(i)
+        bufclose(tbip->info.handle[i]);
+
+    /* Finally, the handle itself */
+    bufclose(hid);
+}
+
+/* Return current track plus an offset */
+static bool track_list_current(int offset, struct track_info *infop)
+{
+    return !!track_list_get_info_from(track_list.current_hid, offset, infop);
+}
+
+/* Return current based upon what's intended that the user sees - not
+   necessarily where decoding is taking place */
+static bool track_list_user_current(int offset, struct track_info *infop)
+{
+    if (skip_pending == TRACK_SKIP_AUTO ||
+        skip_pending == TRACK_SKIP_AUTO_NEW_PLAYLIST)
+    {
+        offset--;
+    }
+
+    return !!track_list_get_info_from(track_list.current_hid, offset, infop);
+}
+
+/* Advance current track by an offset, return false if result is out of
+   bounds */
+static bool track_list_advance_current(int offset, struct track_info *infop)
+{
+    struct track_buf_info *new_bufinfop =
+        track_list_get_info_from(track_list.current_hid, offset, infop);
+
+    if (!new_bufinfop)
+        return false;
+
+    track_list.current_hid = new_bufinfop->info.self_hid;
+    return true;
+}
+
+/* Return the info of the last allocation plus an offset, NULL if result is
+   out of bounds */
+static bool track_list_last(int offset, struct track_info *infop)
+{
+    return !!track_list_get_info_from(track_list.last_hid, offset, infop);
+}
+
+/* Allocate a new struct track_info on the buffer; does not add to list */
+static bool track_list_alloc_info(struct track_info *infop)
+{
+    int hid = bufalloc(NULL, sizeof (struct track_buf_info), TYPE_RAW_ATOMIC);
+
+    track_info_wipe(infop);
+
+    struct track_buf_info *tbip = track_buf_info_get(hid);
+    if (!tbip)
+    {
+        infop->self_hid = ERR_HANDLE_NOT_FOUND;
+        bufclose(hid);
+        return false;
+    }
+
+    infop->self_hid = hid;
+
+    tbip->link[0] = 0;
+    tbip->link[1] = ERR_HANDLE_NOT_FOUND; /* "Not in list" */
+    tbip->info.self_hid = hid;
+    track_info_wipe(&tbip->info);
+
+    return true;
+}
+
+/* Actually commit the track info to the track list */
+static bool track_list_commit_info(const struct track_info *infop)
+{
+    struct track_buf_info *tbip = track_buf_info_get(infop->self_hid);
+    if (!tbip)
+        return false;
+
+    return track_list_commit_buf_info(tbip, infop);
+}
+
+/* Free the track entry and possibly remove it from the list if it was
+   succesfully added at some point */
+static void track_list_free_info(struct track_info *infop)
+{
+    struct track_buf_info *tbip = track_buf_info_get(infop->self_hid);
+    if (!tbip)
+        return;
+
+    track_list_free_buf_info(tbip);
+}
+
+/* Close all open handles in the range except the for the current track
+   if preserving that */
+static void track_list_clear(unsigned int action)
+{
+    logf("%s:action=%u", __func__, action);
 
     /* Don't care now since rebuffering is imminent */
     buf_set_watermark(0);
 
     if (action != TRACK_LIST_CLEAR_ALL)
     {
-        struct track_info *cur = track_list_current(0);
-
-        if (!cur || cur->id3_hid < 0)
+        struct track_info info;
+        if (!track_list_current(0, &info) || info.id3_hid < 0)
             action = TRACK_LIST_CLEAR_ALL; /* Nothing worthwhile keeping */
     }
 
-    /* Noone should see this progressing */
-    int start = track_list.start;
-    int current = track_list.current;
-    int end = track_list.end;
+    int hid         = track_list.first_hid;
+    int current_hid = track_list.current_hid;
+    int last_hid    = action == TRACK_LIST_KEEP_NEW ? current_hid : 0;
 
-    track_list.start = current;
-
-    switch (action)
+    while (hid != last_hid)
     {
-    case TRACK_LIST_CLEAR_ALL:
-        /* Result: .start = .current, .end = .current */
-        track_list.end = current;
-        break;
+        struct track_buf_info *tbip = track_buf_info_get(hid);
+        if (!tbip)
+            break;
 
-    case TRACK_LIST_KEEP_CURRENT:
-        /* Result: .start = .current, .end = .current + 1 */
-        track_list.end = current + 1;
-        break;
+        int next_hid = tbip->link[1];
 
-    case TRACK_LIST_KEEP_NEW:
-        /* Result: .start = .current, .end = .end */
-        end = current;
-        break;
-    }
-
-    /* Close all open handles in the range except the for the current track
-       if preserving that */
-    while (start != end)
-    {
-        if (action != TRACK_LIST_KEEP_CURRENT || start != current)
+        if (action != TRACK_LIST_KEEP_CURRENT || hid != current_hid)
         {
-            struct track_info *info =
-                &track_list.tracks[start & TRACK_LIST_MASK];
-
             /* If this is the in-progress load, abort it */
-            if (in_progress_id3_hid >= 0 &&
-                info->id3_hid == in_progress_id3_hid)
-            {
-                in_progress_id3_hid = ERR_HANDLE_NOT_FOUND;
-            }
+            if (hid == track_list.in_progress_hid)
+                track_list.in_progress_hid = 0;
 
-            track_info_close(info);
+            track_list_free_buf_info(tbip);
         }
 
-        start++;
+        hid = next_hid;
     }
 }
 
@@ -961,11 +1068,11 @@ static void audio_update_filebuf_watermark(int seconds)
 #endif
 
     /* Watermark is a function of the bitrate of the last track in the buffer */
+    struct track_info info;
     struct mp3entry *id3 = NULL;
-    struct track_info *info = track_list_last(0);
 
-    if (info)
-        id3 = valid_mp3entry(bufgetid3(info->id3_hid));
+    if (track_list_last(0, &info))
+        id3 = valid_mp3entry(bufgetid3(info.id3_hid));
 
     if (id3)
     {
@@ -980,20 +1087,20 @@ static void audio_update_filebuf_watermark(int seconds)
                track that fits, in which case we should avoid constant buffer
                low events */
             if (track_list_count() > 1)
-                bytes = info->filesize + 1;
+                bytes = info.filesize + 1;
         }
     }
     else
     {
         /* Then set the minimum - this should not occur anyway */
-        logf("fwmark: No id3 for last track (s%u/c%u/e%u)",
-             track_list.start, track_list.current, track_list.end);
+        logf("fwmark: No id3 for last track (f=%d:c=%d:l=%d)",
+             track_list.first_hid, track_list.current_hid, track_list.last_hid);
     }
 
     /* Actually setting zero disables the notification and we use that
        to detect that it has been reset */
     buf_set_watermark(MAX(bytes, 1));
-    logf("fwmark: %lu", (unsigned long)bytes);
+    logf("fwmark: %zu", bytes);
 }
 
 
@@ -1126,12 +1233,12 @@ static void audio_update_and_announce_next_track(const struct mp3entry *id3_next
 
 /* Bring the user current mp3entry up to date and set a new offset for the
    buffered metadata */
-static void playing_id3_sync(struct track_info *user_info,
+static void playing_id3_sync(struct track_info *user_infop,
                              unsigned long elapsed, unsigned long offset)
 {
     id3_mutex_lock();
 
-    struct mp3entry *id3 = bufgetid3(user_info->id3_hid);
+    struct mp3entry *id3 = bufgetid3(user_infop->id3_hid);
     struct mp3entry *playing_id3 = id3_get(PLAYING_ID3);
 
     pcm_play_lock();
@@ -1290,13 +1397,13 @@ static bool audio_get_track_metadata(int offset, struct mp3entry *id3)
     if (id3->path[0] != '\0')
         return true; /* Already filled */
 
-    struct track_info *info = track_list_user_current(offset);
+    struct track_info info;
 
-    if (!info)
+    if (!track_list_user_current(offset, &info))
     {
         struct mp3entry *ub_id3 = id3_get(UNBUFFERED_ID3);
 
-        if (offset > 0 && track_list_user_current(offset - 1))
+        if (offset > 0 && track_list_user_current(offset - 1, NULL))
         {
             /* Try the unbuffered id3 since we're moving forward */
             if (ub_id3->path[0] != '\0')
@@ -1306,7 +1413,7 @@ static bool audio_get_track_metadata(int offset, struct mp3entry *id3)
             }
         }
     }
-    else if (bufreadid3(info->id3_hid, id3))
+    else if (bufreadid3(info.id3_hid, id3))
     {
         id3->cuesheet = NULL;
         return true;
@@ -1348,7 +1455,7 @@ static void resume_rewind_adjust_progress(const struct mp3entry *id3,
 }
 
 /* Get the codec into ram and initialize it - keep it if it's ready */
-static bool audio_init_codec(struct track_info *track_info,
+static bool audio_init_codec(struct track_info *track_infop,
                              struct mp3entry *track_id3)
 {
     int codt_loaded = get_audio_base_codec_type(codec_loaded());
@@ -1366,8 +1473,9 @@ static bool audio_init_codec(struct track_info *track_info,
             /* Close any buffered codec (we could have skipped directly to a
                format transistion that is the same format as the current track
                and the buffered one is no longer needed) */
-            track_info_close_handle(&track_info->codec_hid);
-#endif
+            track_info_close_handle(&track_infop->codec_hid);
+            track_info_sync(track_infop);
+#endif /* HAVE_CODEC_BUFFERING */
             return true;
         }
         else
@@ -1383,12 +1491,13 @@ static bool audio_init_codec(struct track_info *track_info,
 #ifdef HAVE_CODEC_BUFFERING
     /* Codec thread will close the handle even if it fails and will load from
        storage if hid is not valid or the buffer load fails */
-    hid = track_info->codec_hid;
-    track_info->codec_hid = ERR_HANDLE_NOT_FOUND;
+    hid = track_infop->codec_hid;
+    track_infop->codec_hid = ERR_HANDLE_NOT_FOUND;
+    track_info_sync(track_infop);
 #endif
 
     return codec_load(hid, track_id3->codectype);
-    (void)track_info; /* When codec buffering isn't supported */
+    (void)track_infop; /* When codec buffering isn't supported */
 }
 
 #ifdef HAVE_TAGCACHE
@@ -1452,17 +1561,19 @@ static bool autoresumable(struct mp3entry *id3)
 /* Start the codec for the current track scheduled to be decoded */
 static bool audio_start_codec(bool auto_skip)
 {
-    struct track_info *info = track_list_current(0);
-    struct mp3entry *cur_id3 = valid_mp3entry(bufgetid3(info->id3_hid));
+    struct track_info info;
+    track_list_current(0, &info);
+
+    struct mp3entry *cur_id3 = valid_mp3entry(bufgetid3(info.id3_hid));
 
     if (!cur_id3)
         return false;
 
-    buf_pin_handle(info->id3_hid, true);
+    buf_pin_handle(info.id3_hid, true);
 
-    if (!audio_init_codec(info, cur_id3))
+    if (!audio_init_codec(&info, cur_id3))
     {
-        buf_pin_handle(info->id3_hid, false);
+        buf_pin_handle(info.id3_hid, false);
         return false;
     }
 
@@ -1523,9 +1634,9 @@ static bool audio_start_codec(bool auto_skip)
     /* Update the codec API with the metadata and track info */
     id3_write(CODEC_ID3, cur_id3);
 
-    ci.audio_hid = info->audio_hid;
-    ci.filesize = info->filesize;
-    buf_set_base_handle(info->audio_hid);
+    ci.audio_hid = info.audio_hid;
+    ci.filesize = info.filesize;
+    buf_set_base_handle(info.audio_hid);
 
     /* All required data is now available for the codec */
     codec_go();
@@ -1538,7 +1649,7 @@ static bool audio_start_codec(bool auto_skip)
         send_track_event(PLAYBACK_EVENT_TRACK_BUFFER, 0, cur_id3);
     }
 
-    buf_pin_handle(info->id3_hid, false);
+    buf_pin_handle(info.id3_hid, false);
     return true;
 
     (void)auto_skip; /* ifndef HAVE_TAGCACHE */
@@ -1549,13 +1660,13 @@ static bool audio_start_codec(bool auto_skip)
 
 /* Load and parse a cuesheet for the file - returns false if the buffer
    is full */
-static bool audio_load_cuesheet(struct track_info *info,
+static bool audio_load_cuesheet(struct track_info *infop,
                                 struct mp3entry *track_id3)
 {
     struct cuesheet *cue = get_current_cuesheet();
     track_id3->cuesheet = NULL;
 
-    if (cue && info->cuesheet_hid == ERR_HANDLE_NOT_FOUND)
+    if (cue && infop->cuesheet_hid == ERR_HANDLE_NOT_FOUND)
     {
         /* If error other than a full buffer, then mark it "unsupported" to
            avoid reloading attempt */
@@ -1595,7 +1706,7 @@ static bool audio_load_cuesheet(struct track_info *info,
             if (hid < 0)
                 logf("Cuesheet loading failed");
 
-            info->cuesheet_hid = hid;
+            infop->cuesheet_hid = hid;
         }
     }
 
@@ -1604,13 +1715,13 @@ static bool audio_load_cuesheet(struct track_info *info,
 
 #ifdef HAVE_ALBUMART
 /* Load any album art for the file - returns false if the buffer is full */
-static bool audio_load_albumart(struct track_info *info,
+static bool audio_load_albumart(struct track_info *infop,
                                 struct mp3entry *track_id3)
 {
     FOREACH_ALBUMART(i)
     {
         struct bufopen_bitmap_data user_data;
-        int *aa_hid = &info->aa_hid[i];
+        int *aa_hid = &infop->aa_hid[i];
         int hid = ERR_UNSUPPORTED_TYPE;
 
         /* albumart_slots may change during a yield of bufopen,
@@ -1656,6 +1767,11 @@ static bool audio_load_albumart(struct track_info *info,
                 logf("Album art loading failed");
                 hid = ERR_UNSUPPORTED_TYPE;
             }
+            else
+            {
+                logf("Loaded album art:%dx%d", user_data.dim->width,
+                     user_data.dim->height);
+            }
 
             *aa_hid = hid;
         }
@@ -1668,14 +1784,16 @@ static bool audio_load_albumart(struct track_info *info,
 #ifdef HAVE_CODEC_BUFFERING
 /* Load a codec for the file onto the buffer - assumes we're working from the
    currently loading track - not called for the current track */
-static bool audio_buffer_codec(struct track_info *track_info,
+static bool audio_buffer_codec(struct track_info *track_infop,
                                struct mp3entry *track_id3)
 {
     /* This will not be the current track -> it cannot be the first and the
        current track cannot be ahead of buffering -> there is a previous
        track entry which is either current or ahead of the current */
-    struct track_info *prev_info = track_list_last(-1);
-    struct mp3entry *prev_id3 = bufgetid3(prev_info->id3_hid);
+    struct track_info prev_info;
+    track_list_last(-1, &prev_info);
+
+    struct mp3entry *prev_id3 = bufgetid3(prev_info.id3_hid);
 
     /* If the previous codec is the same as this one, there is no need to
        put another copy of it on the file buffer (in other words, only
@@ -1701,11 +1819,11 @@ static bool audio_buffer_codec(struct track_info *track_info,
     char codec_path[MAX_PATH+1]; /* Full path to codec */
     codec_get_full_path(codec_path, codec_fn);
 
-    track_info->codec_hid = bufopen(codec_path, 0, TYPE_CODEC, NULL);
+    track_infop->codec_hid = bufopen(codec_path, 0, TYPE_CODEC, NULL);
 
-    if (track_info->codec_hid >= 0)
+    if (track_infop->codec_hid > 0)
     {
-        logf("Buffered codec: %d", track_info->codec_hid);
+        logf("Buffered codec: %d", track_infop->codec_hid);
         return true;
     }
 
@@ -1726,18 +1844,18 @@ static bool audio_buffer_codec(struct track_info *track_info,
 */
 static int audio_load_track(void)
 {
-    if (in_progress_id3_hid >= 0)
+    struct track_info info;
+
+    if (track_list.in_progress_hid > 0)
     {
         /* There must be an info pointer if the in-progress id3 is even there */
-        struct track_info *info = track_list_last(0);
-
-        if (info->id3_hid == in_progress_id3_hid)
+        if (track_list_last(0, &info) && info.self_hid == track_list.in_progress_hid)
         {
             if (filling == STATE_FILLING)
             {
                 /* Haven't finished the metadata but the notification is
                    anticipated to come soon */
-                logf("%s(): in progress ok: %d", __func__, info->id3_hid);
+                logf("%s:in progress:id=%d", __func__, info.self_hid);
                 return LOAD_TRACK_OK;
             }
             else if (filling == STATE_FULL)
@@ -1745,33 +1863,32 @@ static int audio_load_track(void)
                 /* Buffer was full trying to complete the load after the
                    metadata finished, so attempt to continue - older handles
                    should have been cleared already */
-                logf("%s(): finishing load: %d", __func__, info->id3_hid);
+                logf("%s:finished:id=%d", __func__, info.self_hid);
                 filling = STATE_FILLING;
-                buffer_event_finished_callback(BUFFER_EVENT_FINISHED, &info->id3_hid);
+                buffer_event_finished_callback(BUFFER_EVENT_FINISHED, &info.id3_hid);
                 return LOAD_TRACK_OK;
             }
         }
 
         /* Some old, stray buffering message */
-        logf("%s(): already in progress: %d", __func__, info->id3_hid);
+        logf("%s:busy:id=%d", __func__, info.self_hid);
         return LOAD_TRACK_ERR_BUSY;
     }
 
     filling = STATE_FILLING;
 
-    struct track_info *info = track_list_alloc_track();
-    if (info == NULL)
+    if (!track_list_alloc_info(&info))
     {
         /* List is full so stop buffering tracks - however, attempt to obtain
            metadata as the unbuffered id3 */
-        logf("No free tracks");
+        logf("buffer full:alloc");
         filling = STATE_FULL;
     }
 
     playlist_peek_offset++;
 
-    logf("Buffering track: s%u/c%u/e%u/p%d",
-         track_list.start, track_list.current, track_list.end,
+    logf("Buffering track:f=%d:c=%d:l=%d:pk=%d",
+         track_list.first_hid, track_list.current_hid, track_list.last_hid,
          playlist_peek_offset);
 
     /* Get track name from current playlist read position */
@@ -1781,7 +1898,6 @@ static int audio_load_track(void)
 
     while (1)
     {
-
         trackname = playlist_peek(playlist_peek_offset, name_buf,
                                   sizeof (name_buf));
 
@@ -1809,16 +1925,14 @@ static int audio_load_track(void)
         id3_write_locked(UNBUFFERED_ID3, NULL);
 
         if (filling != STATE_FULL)
-            track_list_unalloc_track(); /* Free this entry */
+            track_list_free_info(&info); /* Free this entry */
 
-        playlist_peek_offset--;         /* Maintain at last index */
+        playlist_peek_offset--;          /* Maintain at last index */
 
         /* We can end up here after the real last track signals its completion
            and miss the transition to STATE_FINISHED esp. if dropping the last
            songs of a playlist late in their load (2nd stage) */
-        info = track_list_last(0);
-
-        if (info && buf_handle_remaining(info->audio_hid) == 0)
+        if (track_list_last(0, &info) && buf_handle_remaining(info.audio_hid) == 0)
             filling_is_finished();
         else
             filling = STATE_END_OF_PLAYLIST;
@@ -1828,7 +1942,7 @@ static int audio_load_track(void)
 
     /* Successfully opened the file - get track metadata */
     if (filling == STATE_FULL ||
-        (info->id3_hid = bufopen(trackname, 0, TYPE_ID3, NULL)) < 0)
+        (info.id3_hid = bufopen(trackname, 0, TYPE_ID3, NULL)) < 0)
     {
         /* Buffer or track list is full */
         struct mp3entry *ub_id3;
@@ -1843,7 +1957,7 @@ static int audio_load_track(void)
 
         if (filling != STATE_FULL)
         {
-            track_list_unalloc_track();
+            track_list_free_info(&info);
             filling = STATE_FULL;
         }
 
@@ -1852,9 +1966,17 @@ static int audio_load_track(void)
     }
     else
     {
+        info.filesize = filesize(fd);
+
+        if (!track_list_commit_info(&info))
+        {
+            track_list_free_info(&info);
+            track_list.in_progress_hid = 0;
+            return LOAD_TRACK_ERR_FAILED;
+        }
+
         /* Successful load initiation */
-        info->filesize = filesize(fd);
-        in_progress_id3_hid = info->id3_hid; /* Remember what's in-progress */
+        track_list.in_progress_hid = info.self_hid;
     }
 
     close(fd);
@@ -1865,22 +1987,24 @@ static int audio_load_track(void)
    can load the codec, the album art and finally the audio data.
    This is called on the audio thread after the buffering thread calls the
    buffering_handle_finished_callback callback. */
-static int audio_finish_load_track(struct track_info *info)
+static int audio_finish_load_track(struct track_info *infop)
 {
     int trackstat = LOAD_TRACK_OK;
 
-    if (info->id3_hid != in_progress_id3_hid)
+    if (infop->self_hid != track_list.in_progress_hid)
     {
         /* We must not be here if not! */
-        logf("%s: wrong track %d/%d", __func__, info->id3_hid,
-             in_progress_id3_hid);
+        logf("%s:wrong track:hids=%d!=%d", __func__, infop->self_hid,
+             track_list.in_progress_hid);
         return LOAD_TRACK_ERR_BUSY;
     }
 
     /* The current track for decoding (there is always one if the list is
        populated) */
-    struct track_info *cur_info = track_list_current(0);
-    struct mp3entry *track_id3 = valid_mp3entry(bufgetid3(info->id3_hid));
+    struct track_info cur_info;
+    track_list_current(0, &cur_info);
+
+    struct mp3entry *track_id3 = valid_mp3entry(bufgetid3(infop->id3_hid));
 
     if (!track_id3)
     {
@@ -1892,7 +2016,7 @@ static int audio_finish_load_track(struct track_info *info)
     }
 
     /* Try to load a cuesheet for the track */
-    if (!audio_load_cuesheet(info, track_id3))
+    if (!audio_load_cuesheet(infop, track_id3))
     {
         /* No space for cuesheet on buffer, not an error */
         filling = STATE_FULL;
@@ -1901,7 +2025,7 @@ static int audio_finish_load_track(struct track_info *info)
 
 #ifdef HAVE_ALBUMART
     /* Try to load album art for the track */
-    if (!audio_load_albumart(info, track_id3))
+    if (!audio_load_albumart(infop, track_id3))
     {
         /* No space for album art on buffer, not an error */
         filling = STATE_FULL;
@@ -1912,7 +2036,9 @@ static int audio_finish_load_track(struct track_info *info)
     /* All handles available to external routines are ready - audio and codec
        information is private */
 
-    if (info == track_list_user_current(0))
+    struct track_info user_cur;
+    track_list_user_current(0, &user_cur);
+    if (infop->self_hid == user_cur.self_hid)
     {
         /* Send only when the track handles could not all be opened ahead of
            time for the user's current track - otherwise everything is ready
@@ -1923,13 +2049,14 @@ static int audio_finish_load_track(struct track_info *info)
 
 #ifdef HAVE_CODEC_BUFFERING
     /* Try to buffer a codec for the track */
-    if (info != cur_info && !audio_buffer_codec(info, track_id3))
+    if (infop->self_hid != cur_info.self_hid
+        && !audio_buffer_codec(infop, track_id3))
     {
-        if (info->codec_hid == ERR_BUFFER_FULL)
+        if (infop->codec_hid == ERR_BUFFER_FULL)
         {
             /* No space for codec on buffer, not an error */
             filling = STATE_FULL;
-            logf("buffer is full for now (%s)", __func__);
+            logf("%s:STATE_FULL", __func__);
         }
         else
         {
@@ -1950,7 +2077,7 @@ static int audio_finish_load_track(struct track_info *info)
     if (track_id3->elapsed > track_id3->length)
         track_id3->elapsed = 0;
 
-    if (track_id3->offset >= info->filesize)
+    if ((off_t)track_id3->offset >= infop->filesize)
         track_id3->offset = 0;
 
     logf("%s: set offset for %s to %lu\n", __func__,
@@ -1994,9 +2121,8 @@ static int audio_finish_load_track(struct track_info *info)
 
     if (hid >= 0)
     {
-        info->audio_hid = hid;
-
-        if (info == cur_info)
+        infop->audio_hid = hid;
+        if (infop->self_hid == cur_info.self_hid)
         {
             /* This is the current track to decode - should be started now */
             trackstat = LOAD_TRACK_READY;
@@ -2020,11 +2146,16 @@ static int audio_finish_load_track(struct track_info *info)
     }
 
 audio_finish_load_track_exit:
+    if (trackstat >= LOAD_TRACK_OK && !track_info_sync(infop))
+    {
+        logf("Track info sync failed");
+        trackstat = LOAD_TRACK_ERR_FINISH_FAILED;
+    }
+
     if (trackstat < LOAD_TRACK_OK)
     {
         playlist_skip_entry(NULL, playlist_peek_offset);
-        track_info_close(info);
-        track_list_unalloc_track();
+        track_list_free_info(infop);
 
         if (playlist_peek(playlist_peek_offset, NULL, 0))
             playlist_next(0);
@@ -2035,7 +2166,7 @@ audio_finish_load_track_exit:
     if (filling != STATE_FULL)
     {
         /* Load next track - error or not */
-        in_progress_id3_hid = ERR_HANDLE_NOT_FOUND;
+        track_list.in_progress_hid = 0;
         LOGFQUEUE("audio > audio Q_AUDIO_FILL_BUFFER");
         audio_queue_post(Q_AUDIO_FILL_BUFFER, 0);
     }
@@ -2071,10 +2202,14 @@ static int audio_fill_file_buffer(void)
 
     if (trackstat >= LOAD_TRACK_OK)
     {
-        if (track_list_current(0) == track_list_user_current(0))
+        struct track_info info, user_cur;
+        track_list_current(0, &info);
+        track_list_user_current(0, &user_cur);
+
+        if (info.self_hid == user_cur.self_hid)
             playlist_next(0);
 
-        if (filling == STATE_FULL && !track_list_user_current(1))
+        if (filling == STATE_FULL && !track_list_user_current(1, NULL))
         {
             /* There are no user tracks on the buffer after this therefore
                this is the next track */
@@ -2166,26 +2301,28 @@ static void audio_on_fill_buffer(void)
    (Q_AUDIO_FINISH_LOAD_TRACK) */
 static void audio_on_finish_load_track(int id3_hid)
 {
-    struct track_info *info = track_list_last(0);
+    struct track_info info, user_cur;
 
-    if (!info || !buf_is_handle(id3_hid))
+    if (!buf_is_handle(id3_hid) || !track_list_last(0, &info))
         return;
 
-    if (info == track_list_user_current(1))
+    track_list_user_current(1, &user_cur);
+    if (info.self_hid == user_cur.self_hid)
     {
         /* Just loaded the metadata right after the current position */
-        audio_update_and_announce_next_track(bufgetid3(info->id3_hid));
+        audio_update_and_announce_next_track(bufgetid3(info.id3_hid));
     }
 
-    if (audio_finish_load_track(info) != LOAD_TRACK_READY)
+    if (audio_finish_load_track(&info) != LOAD_TRACK_READY)
         return; /* Not current track */
 
-    bool is_user_current = info == track_list_user_current(0);
+    track_list_user_current(0, &user_cur);
+    bool is_user_current = info.self_hid == user_cur.self_hid;
 
     if (is_user_current)
     {
         /* Copy cuesheet */
-        buf_read_cuesheet(info->cuesheet_hid);
+        buf_read_cuesheet(info.cuesheet_hid);
     }
 
     if (audio_start_codec(track_event_flags & TEF_AUTO_SKIP))
@@ -2197,7 +2334,7 @@ static void audio_on_finish_load_track(int id3_hid)
                change otherwise */
             bool was_valid = valid_mp3entry(id3_get(PLAYING_ID3));
 
-            playing_id3_sync(info, -1, -1);
+            playing_id3_sync(&info, -1, -1);
 
             if (!was_valid)
             {
@@ -2220,12 +2357,12 @@ static void audio_on_handle_finished(int hid)
     /* Right now, only audio handles should end up calling this */
     if (filling == STATE_END_OF_PLAYLIST)
     {
-        struct track_info *info = track_list_last(0);
+        struct track_info info;
 
         /* Really we don't know which order the handles will actually complete
            to zero bytes remaining since another thread is doing it - be sure
            it's the right one */
-        if (info && info->audio_hid == hid)
+        if (track_list_last(0, &info) && info.audio_hid == hid)
         {
             /* This was the last track in the playlist and we now have all the
                data we need */
@@ -2276,16 +2413,17 @@ static void audio_finalise_track_change(void)
         return;
     }
 
-    struct track_info *info = track_list_current(0);
+    struct track_info info;
+    bool have_info = track_list_current(0, &info);
     struct mp3entry *track_id3 = NULL;
 
     id3_mutex_lock();
 
     /* Update the current cuesheet if any and enabled */
-    if (info)
+    if (have_info)
     {
-        buf_read_cuesheet(info->cuesheet_hid);
-        track_id3 = bufgetid3(info->id3_hid);
+        buf_read_cuesheet(info.cuesheet_hid);
+        track_id3 = bufgetid3(info.id3_hid);
     }
 
     id3_write(PLAYING_ID3, track_id3);
@@ -2294,10 +2432,10 @@ static void audio_finalise_track_change(void)
     skip_pending = TRACK_SKIP_NONE;
 
     /* Sync the next track information */
-    info = track_list_current(1);
+    have_info = track_list_current(1, &info);
 
-    id3_write(NEXTTRACK_ID3, info ? bufgetid3(info->id3_hid) :
-                                    id3_get(UNBUFFERED_ID3));
+    id3_write(NEXTTRACK_ID3, have_info ? bufgetid3(info.id3_hid) :
+                                         id3_get(UNBUFFERED_ID3));
 
     id3_mutex_unlock();
 
@@ -2326,17 +2464,19 @@ static void audio_begin_track_change(enum pcm_track_change_type type,
 
     if (trackstat >= LOAD_TRACK_OK)
     {
-        struct track_info *info = track_list_current(0);
-
-        if (info->audio_hid < 0)
-            return;
-
-        /* Everything needed for the codec is ready - start it */
-        if (audio_start_codec(auto_skip))
+        struct track_info info;
+        if (track_list_current(0, &info))
         {
-            if (!auto_skip)
-                playing_id3_sync(info, -1, -1);
-            return;
+            if (info.audio_hid < 0)
+                return;
+
+            /* Everything needed for the codec is ready - start it */
+            if (audio_start_codec(auto_skip))
+            {
+                if (!auto_skip)
+                    playing_id3_sync(&info, -1, -1);
+                return;
+            }
         }
 
         trackstat = LOAD_TRACK_ERR_START_CODEC;
@@ -2398,13 +2538,14 @@ static void audio_on_codec_complete(int status)
     skip_pending = TRACK_SKIP_AUTO;
 
     /* Does this track have an entry allocated? */
-    struct track_info *info = track_list_advance_current(1);
+    struct track_info info;
+    bool have_track = track_list_advance_current(1, &info);
 
-    if (!info || info->audio_hid < 0)
+    if (!have_track || info.audio_hid < 0)
     {
         bool end_of_playlist = false;
 
-        if (info)
+        if (have_track)
         {
             /* Track load is not complete - it might have stopped on a
                full buffer without reaching the audio handle or we just
@@ -2418,7 +2559,7 @@ static void audio_on_codec_complete(int status)
                issue and a pointless full reload of all the track's
                metadata may be avoided */
 
-            struct mp3entry *track_id3 = bufgetid3(info->id3_hid);
+            struct mp3entry *track_id3 = bufgetid3(info.id3_hid);
 
             if (track_id3 && !rbcodec_format_is_atomic(track_id3->codectype))
             {
@@ -2595,7 +2736,9 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
     if (trackstat >= LOAD_TRACK_OK)
     {
         /* This is the currently playing track - get metadata, stat */
-        playing_id3_sync(track_list_current(0), resume.elapsed, resume.offset);
+        struct track_info info;
+        track_list_current(0, &info);
+        playing_id3_sync(&info, resume.elapsed, resume.offset);
 
         if (valid_mp3entry(id3_get(PLAYING_ID3)))
         {
@@ -2765,10 +2908,11 @@ static void audio_on_skip(void)
     /* Adjust things by how much the playlist was manually moved */
     playlist_peek_offset -= playlist_delta;
 
-    struct track_info *info = track_list_advance_current(track_list_delta);
     int trackstat = LOAD_TRACK_OK;
 
-    if (!info || info->audio_hid < 0)
+    struct track_info info;
+    if (!track_list_advance_current(track_list_delta, &info)
+        || info.audio_hid < 0)
     {
         /* We don't know the next track thus we know we don't have it */
         trackstat = audio_reset_and_rebuffer(TRACK_LIST_CLEAR_ALL, -1);
@@ -2883,31 +3027,30 @@ static void audio_on_ff_rewind(long time)
         /* If in transition, key will have changed - sync to it */
         position_key = pcmbuf_get_position_key();
 
-        if (pending == TRACK_SKIP_AUTO)
+        if (pending == TRACK_SKIP_AUTO && !track_list_advance_current(-1, NULL))
         {
-            if (!track_list_advance_current(-1))
+            /* Not in list - must rebuffer at the current playlist index */
+            if (audio_reset_and_rebuffer(TRACK_LIST_CLEAR_ALL, -1)
+                    < LOAD_TRACK_OK)
             {
-                /* Not in list - must rebuffer at the current playlist index */
-                if (audio_reset_and_rebuffer(TRACK_LIST_CLEAR_ALL, -1)
-                        < LOAD_TRACK_OK)
-                {
-                    /* Codec is stopped */
-                    break;
-                }
+                /* Codec is stopped */
+                break;
             }
         }
 
         /* Set after audio_fill_file_buffer to disable playing id3 clobber if
            rebuffer is needed */
         skip_pending = TRACK_SKIP_NONE;
-        struct track_info *cur_info = track_list_current(0);
+
+        struct track_info cur_info;
+        track_list_current(0, &cur_info);
 
         /* Track must complete the loading _now_ since a codec and audio
            handle are needed in order to do the seek */
-        bool finish_load = cur_info->audio_hid < 0;
+        bool finish_load = cur_info.audio_hid < 0;
 
         if (finish_load &&
-            audio_finish_load_track(cur_info) != LOAD_TRACK_READY)
+            audio_finish_load_track(&cur_info) != LOAD_TRACK_READY)
         {
             /* Call above should push any load sequence - no need for
                halt_decoding_track here if no skip was pending here because
@@ -2918,8 +3061,8 @@ static void audio_on_ff_rewind(long time)
 
         if (pending == TRACK_SKIP_AUTO || finish_load)
         {
-            if (!bufreadid3(cur_info->id3_hid, ci_id3) ||
-                !audio_init_codec(cur_info, ci_id3))
+            if (!bufreadid3(cur_info.id3_hid, ci_id3) ||
+                !audio_init_codec(&cur_info, ci_id3))
             {
                 /* We should have still been able to get it - skip it and move
                    onto the next one - like it or not this track is broken */
@@ -2927,9 +3070,9 @@ static void audio_on_ff_rewind(long time)
             }
 
             /* Set the codec API to the correct metadata and track info */
-            ci.audio_hid = cur_info->audio_hid;
-            ci.filesize = cur_info->filesize;
-            buf_set_base_handle(cur_info->audio_hid);
+            ci.audio_hid = cur_info.audio_hid;
+            ci.filesize = cur_info.filesize;
+            buf_set_base_handle(cur_info.audio_hid);
         }
 
         if (!haltres)
@@ -3568,16 +3711,17 @@ int playback_current_aa_hid(int slot)
 {
     if ((unsigned)slot < MAX_MULTIPLE_AA)
     {
-        struct track_info *info = track_list_user_current(skip_offset);
+        struct track_info user_cur;
+        bool have_info = track_list_user_current(skip_offset, &user_cur);
 
-        if (!info && abs(skip_offset) <= 1)
+        if (!have_info && abs(skip_offset) <= 1)
         {
             /* Give the actual position a go */
-            info = track_list_user_current(0);
+            have_info = track_list_user_current(0, &user_cur);
         }
 
-        if (info)
-            return info->aa_hid[slot];
+        if (have_info)
+            return user_cur.aa_hid[slot];
     }
 
     return ERR_HANDLE_NOT_FOUND;
