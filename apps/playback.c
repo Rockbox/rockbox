@@ -452,11 +452,13 @@ static void id3_write_locked(enum audio_id3_types id3_num,
 
 /** --- Track info --- **/
 
+#ifdef HAVE_CODEC_BUFFERING
 static void track_info_close_handle(int *hidp)
 {
     bufclose(*hidp);
     *hidp = ERR_HANDLE_NOT_FOUND;
 }
+#endif /* HAVE_CODEC_BUFFERING */
 
 /* Invalidate all members to initial values - does not close handles or sync */
 static void track_info_wipe(struct track_info *infop)
