@@ -119,7 +119,7 @@ static uint32_t crc32;
 
 static volatile unsigned int elapsed;
 static volatile bool codec_playing;
-static volatile enum codec_command_action codec_action;
+static volatile long codec_action;
 static volatile long endtick;
 static volatile long rebuffertick;
 struct wavinfo_t wavinfo;
@@ -474,7 +474,7 @@ static void seek_complete(void)
 }
 
 /* Codec calls this to know what it should do next. */
-static enum codec_command_action get_command(intptr_t *param)
+static long get_command(intptr_t *param)
 {
     rb->yield();
     return codec_action;
