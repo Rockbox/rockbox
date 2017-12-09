@@ -29,7 +29,7 @@ void button_init_device(void)
     GPIOC_DIR = 0;                      /* All C pins input */
     GPIOA_DIR &= ~(1<<1|1<<6|1<<7);     /* Pins A1,A6,A7 input */
                                         /* OF does not set D6 to input  */
-    GPIOB_DIR |= (1<<6);                     /*  Pin B6 output  */
+    GPIOB_DIR |= (1<<6);                /*  Pin B6 output  */
     GPIOB_DIR |= (1<<0);                /* Pin B0 set output */
 }
 
@@ -38,24 +38,25 @@ int button_read_device(void)
     int buttons = 0;
 
     /*  Buttons do not appear to need reset */
-    /*  D6 needs special handling though   */
-
+    /*  D6 does not appear to need special handling */
+#if 0
     GPIOB_PIN(0) = 1;                   /* set B0  */
 
     int delay = 500;
     do {
         asm volatile("nop\n");
     } while (delay--);
-
+#endif
     if GPIOD_PIN(6)                     /* read D6  */
         buttons |= BUTTON_POWER;
-
+#if 0
     GPIOB_PIN(0) = 0;                   /* unset B0  */
 
     delay = 240;
     do {
         asm volatile("nop\n");
     } while (delay--);
+#endif
 
     if GPIOA_PIN(1)
         buttons |= BUTTON_HOME;
@@ -63,6 +64,9 @@ int button_read_device(void)
         buttons |= BUTTON_VOL_DOWN;
     if GPIOA_PIN(7)
         buttons |= BUTTON_VOL_UP;
+
+     if GPIOC_PIN(1)
+        buttons |= BUTTON_DOWN;
     if GPIOC_PIN(2)
         buttons |= BUTTON_UP;
     if GPIOC_PIN(3)
@@ -71,8 +75,6 @@ int button_read_device(void)
         buttons |= BUTTON_SELECT;
     if GPIOC_PIN(5)
         buttons |= BUTTON_RIGHT;
-    if GPIOC_PIN(1)
-        buttons |= BUTTON_DOWN;
 
   return buttons;
 }
