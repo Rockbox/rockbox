@@ -742,10 +742,10 @@ static bool close_handle(int handle_id)
 
 /* Free buffer space by moving the handle struct right before the useful
    part of its data buffer or by moving all the data. */
-static void shrink_handle(struct memory_handle *h)
+static struct memory_handle * shrink_handle(struct memory_handle *h)
 {
     if (!h)
-        return;
+        return NULL;
 
     if (h->type == TYPE_PACKET_AUDIO) {
         /* only move the handle struct */
@@ -756,14 +756,14 @@ static void shrink_handle(struct memory_handle *h)
 
         /* The value of delta might change for alignment reasons */
         if (!move_handle(&h, &delta, 0))
-            return;
+            return h;
 
         h->data = ringbuf_add(h->data, delta);
         h->start += delta;
     } else {
         /* metadata handle: we can move all of it */
         if (h->pinned || !HLIST_NEXT(h))
-            return; /* Pinned, last handle */
+            return h; /* Pinned, last handle */
 
         size_t data_size = h->filesize - h->start;
         uintptr_t handle_distance =
@@ -772,7 +772,7 @@ static void shrink_handle(struct memory_handle *h)
 
         /* The value of delta might change for alignment reasons */
         if (!move_handle(&h, &delta, data_size))
-            return;
+            return h;
 
         size_t olddata = h->data;
         h->data = ringbuf_add(h->data, delta);
@@ -799,6 +799,8 @@ static void shrink_handle(struct memory_handle *h)
                 break;
         }
     }
+
+    return h;
 }
 
 /* Fill the buffer by buffering as much data as possible for handles that still
@@ -809,8 +811,7 @@ static bool fill_buffer(void)
     logf("fill_buffer()");
     mutex_lock(&llist_mutex);
 
-    struct memory_handle *m = HLIST_FIRST;
-    shrink_handle(m);
+    struct memory_handle *m = shrink_handle(HLIST_FIRST);
 
     mutex_unlock(&llist_mutex);
 
@@ -1593,7 +1594,7 @@ static void shrink_buffer(void)
     mutex_lock(&llist_mutex);
 
     for (struct memory_handle *h = HLIST_LAST; h; h = HLIST_PREV(h)) {
-        shrink_handle(h);
+        h = shrink_handle(h);
     }
 
     mutex_unlock(&llist_mutex);
