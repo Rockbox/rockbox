@@ -132,6 +132,9 @@ static struct mutex llist_mutex SHAREDBSS_ATTR;
 #define HLIST_LAST \
     HLIST_HANDLE(handle_list.tail)
 
+#define HLIST_PREV(h) \
+    HLIST_HANDLE((h)->hnode.prev)
+
 #define HLIST_NEXT(h) \
     HLIST_HANDLE((h)->hnode.next)
 
@@ -1583,21 +1586,16 @@ size_t buf_get_watermark(void)
 }
 
 /** -- buffer thread helpers -- **/
-static void shrink_buffer_inner(struct memory_handle *h)
-{
-    if (h == NULL)
-        return;
-
-    shrink_buffer_inner(HLIST_NEXT(h));
-
-    shrink_handle(h);
-}
-
 static void shrink_buffer(void)
 {
     logf("shrink_buffer()");
+
     mutex_lock(&llist_mutex);
-    shrink_buffer_inner(HLIST_FIRST);
+
+    for (struct memory_handle *h = HLIST_LAST; h; h = HLIST_PREV(h)) {
+        shrink_handle(h);
+    }
+
     mutex_unlock(&llist_mutex);
 }
 
