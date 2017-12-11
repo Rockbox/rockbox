@@ -194,92 +194,74 @@ static int db_scale_count = DB_SCALE_SRC_VALUES_SIZE;
  *               The calculation is based on the results of a linear
  *               approximation tool written specifically for this problem
  *               by Andreas Zwirtes (radhard@gmx.de). The result has an
- *               accurracy of better than 2%. It is highly runtime optimized,
- *               the cascading if-clauses do an successive approximation on
- *               the input value. This avoids big lookup-tables and
- *               for-loops.
+ *               accurracy of better than 2%.
+ *
+ *               The search tree does a binary search on the input value.
+ *
+ *               Marked "NO_INLINE" because GCC really wants to inline it
+ *               in some cases.
+ *.
  *               Improved by Jvo Studer for errors < 0.2dB for critical
  *               range of -12dB to 0dB (78.0 to 90.0dB).
  */
 
-static int calc_db (int isample) 
+static NO_INLINE int calc_db (int isample)
 {
-    /* return n+m*(isample-istart)/100 */
-    int n;
-    long m;
-    int istart;
+    /* Search tree:
+     *
+     *            ________2308_______
+     *       ___115___             _12932_
+     *    __24__   __534__     _6394_   _22450_
+     *   _5_   d0 d1     d2   d3    d4 d5     d6
+     *  d7 d8
+     */
+    static const int16_t keys[] =
+    {
+            0, /* 1-based array */
+         2308,
+          115,
+        12932,
+           24,
+          534,
+         6394,
+        22450,
+            5,
+    };
 
-    if (isample < 2308) { /* Range 1-5 */
+    /* To ensure no overflow in the computations throughout the operational
+       range, M_FRAC_BITS must be 20 or less. The full range of isample for
+       20 fractional bits without overflowing int32_t is [-4, 90903]. */
+    #define M_FRAC_BITS 20
+    #define M_FIXED(m)  ((int32_t)(((int64_t)(m) << M_FRAC_BITS) / 100))
 
-        if (isample < 115) { /* Range 1-3 */
+    static const struct {
+        int16_t istart;
+        int16_t n;
+        int32_t m;
+    } data[] =
+    {
+        { .istart =    24, .n = 2858, .m = M_FIXED( 1498) },
+        { .istart =   114, .n = 4207, .m = M_FIXED(  319) },
+        { .istart =   588, .n = 5583, .m = M_FIXED(   69) },
+        { .istart =  2608, .n = 6832, .m = M_FIXED(   21) },
+        { .istart =  7000, .n = 7682, .m = M_FIXED(    9) },
+        { .istart = 13000, .n = 8219, .m = M_FIXED(    5) },
+        { .istart = 22636, .n = 8697, .m = M_FIXED(    3) },
+        { .istart =     1, .n =   98, .m = M_FIXED(34950) },
+        { .istart =     5, .n = 1496, .m = M_FIXED( 7168) },
+    };
 
-            if (isample < 24) {
+    int i = 1;
 
-                if (isample < 5) {
-                    istart = 1; /* Range 1 */
-                    n = 98;
-                    m = 34950;
-                }
-                else {
-                    istart = 5; /* Range 2 */
-                    n = 1496;
-                    m = 7168;
-                }
-            }
-            else {
-                istart = 24;  /* Range 3 */
-                n = 2858;
-                m = 1498;
-            }
-        }
-        else { /* Range 4-5 */
-
-            if (isample < 534) {
-                istart = 114; /* Range 4 */
-                n = 4207;
-                m = 319;
-            }
-            else {
-                istart = 588; /* Range 5 */
-                n = 5583;
-                m = 69;
-            }
-        }
+    /* Runs 3 times if isample >= 24, else 4 */
+    while (i < 9) {
+        i = 2*i + (isample >= keys[i]);
     }
 
-    else {  /* Range 6-9 */
+    i -= 9;
 
-        if (isample < 12932) {
-
-            if (isample < 6394) {
-                istart = 2608; /* Range 6 */
-                n = 6832;
-                m = 21;
-            }
-            else {
-                istart = 7000; /* Range 7 */
-                n = 7682;
-                m = 9;
-            }
-        }
-        else {
-
-            if (isample < 22450) {
-                istart = 13000; /* Range 8 */
-                n = 8219;
-                m = 5;
-            }
-            else {
-                istart = 22636; /* Range 9 */
-                n = 8697;
-                m = 3;
-            }
-        }
-    }
-
-    return n + (m * (long)(isample - istart)) / 100L;
+    return data[i].n + (data[i].m * (isample - data[i].istart) >> M_FRAC_BITS);
 }
-
 
 /**
  * A helper function for peak_meter_db2sample. Don't call it separately but
