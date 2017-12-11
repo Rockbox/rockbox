@@ -591,7 +591,10 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
         }
 #endif
 
-        cur->items = cur->get_context_map(context);
+        if ((context & CONTEXT_PLUGIN) && cur->get_context_map)
+            cur->items = cur->get_context_map(context);
+        else
+            cur->items = get_context_mapping(context);
 
         if (cur->items != NULL)
         {
@@ -854,15 +857,7 @@ static void init_act_cur(action_cur_t *cur,
     cur->is_prebutton        = false;
     cur->items               = NULL;
     cur->timeout             = timeout;
-
-    if (get_context_map == NULL)/* standard mapping */
-    {
-        cur->get_context_map = get_context_mapping;
-    }
-    else /* user defined button mapping*/
-    {
-        cur->get_context_map = get_context_map;
-    }
+    cur->get_context_map = get_context_map;
 }
 
 /*******************************************************
