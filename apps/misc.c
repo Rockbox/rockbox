@@ -1029,32 +1029,54 @@ int format_sound_value(char *buf, size_t size, int snd, int val)
  */
 int read_line(int fd, char* buffer, int buffer_size)
 {
+    if (!buffer || buffer_size-- <= 0)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    unsigned char rdbuf[32];
+    off_t rdbufend = 0;
+    int rdbufidx = 0;
     int count = 0;
     int num_read = 0;
 
-    errno = 0;
-
     while (count < buffer_size)
     {
-        unsigned char c;
+        if (rdbufidx >= rdbufend)
+        {
+            rdbufidx = 0;
+            rdbufend = read(fd, rdbuf, sizeof (rdbuf));
 
-        if (1 != read(fd, &c, 1))
+            if (rdbufend <= 0)
+                break;
+
+            num_read += rdbufend;
+        }
+
+        int c = rdbuf[rdbufidx++];
+
+        if (c == '\n')
             break;
 
-        num_read++;
-
-        if ( c == '\n' )
-            break;
-
-        if ( c == '\r' )
+        if (c == '\r')
             continue;
 
         buffer[count++] = c;
     }
 
-    buffer[MIN(count, buffer_size - 1)] = 0;
+    rdbufidx -= rdbufend;
 
-    return errno ? -1 : num_read;
+    if (rdbufidx < 0)
+    {
+        /* "put back" what wasn't read from the buffer */
+        num_read += rdbufidx;
+        rdbufend = lseek(fd, rdbufidx, SEEK_CUR);
+    }
+
+    buffer[count] = '\0';
+
+    return rdbufend >= 0 ? num_read : -1;
 }
 
 
