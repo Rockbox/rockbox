@@ -52,9 +52,13 @@ enum {
     /* Next track medadata was just loaded
        data = &(struct track_event){} */
     PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE,
+};
+
+/** VOICE events **/
+enum {
     /* Voice is playing
        data = &(bool){true|false} */
-    PLAYBACK_EVENT_VOICE_PLAYING,
+    VOICE_EVENT_IS_PLAYING = (EVENT_CLASS_VOICE|1),
 };
 
 /** Buffering events **/
