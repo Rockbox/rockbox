@@ -355,14 +355,6 @@ void audio_pcmbuf_sync_position(void);
 
 /**************************************/
 
-/** --- voice event --- **/
-void playback_voice_event(unsigned short id, void *data)
-{
-    (void)id;
-    /* Make audio play softly while voice is speaking */
-    pcmbuf_soft_mode(*(bool *)data);
-}
-
 /** --- MP3Entry --- **/
 
 /* Does the mp3entry have enough info for us to use it? */
@@ -3888,7 +3880,6 @@ void INIT_ATTR playback_init(void)
     track_list_init();
     buffering_init();
     pcmbuf_update_frequency();
-    add_event(PLAYBACK_EVENT_VOICE_PLAYING, playback_voice_event);
 #ifdef HAVE_CROSSFADE
     /* Set crossfade setting for next buffer init which should be about... */
     pcmbuf_request_crossfade_enable(global_settings.crossfade);

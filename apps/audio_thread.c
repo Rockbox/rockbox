@@ -27,6 +27,8 @@
 #include "usb.h"
 #include "pcm.h"
 #include "sound.h"
+#include "pcmbuf.h"
+#include "appevents.h"
 #include "audio_thread.h"
 #ifdef AUDIO_HAVE_RECORDING
 #include "pcm_record.h"
@@ -108,6 +110,13 @@ static void NORETURN_ATTR audio_thread(void)
     }
 }
 
+void audio_voice_event(unsigned short id, void *data)
+{
+    (void)id;
+    /* Make audio play softly while voice is speaking */
+    pcmbuf_soft_mode(*(bool *)data);
+}
+
 void audio_queue_post(long id, intptr_t data)
 {
     queue_post(&audio_queue, id, data);
@@ -169,6 +178,8 @@ void INIT_ATTR audio_init(void)
 #ifdef AUDIO_HAVE_RECORDING
     recording_init();
 #endif
+
+    add_event(VOICE_EVENT_IS_PLAYING, audio_voice_event);
 
    /* Probably safe to say */
     audio_is_initialized = true;

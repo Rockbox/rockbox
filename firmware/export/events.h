@@ -51,6 +51,7 @@
 #define EVENT_CLASS_GUI        0x0800
 #define EVENT_CLASS_RECORDING  0x1000
 #define EVENT_CLASS_LCD        0x2000
+#define EVENT_CLASS_VOICE      0x4000
 
 /**
  * Subscribe to an event with a simple callback. The callback will be called

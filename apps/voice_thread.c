@@ -372,7 +372,7 @@ static enum voice_state voice_message(struct voice_thread_data *td)
         {
             voice_playing = true;
             dsp_configure(td->dsp, DSP_SET_OUT_FREQUENCY, mixer_get_frequency());
-            send_event(PLAYBACK_EVENT_VOICE_PLAYING, &voice_playing);
+            send_event(VOICE_EVENT_IS_PLAYING, &voice_playing);
         }
 
         quiet_counter = QUIET_COUNT;
@@ -406,7 +406,7 @@ static enum voice_state voice_message(struct voice_thread_data *td)
             if (quiet_counter <= 0)
             {
                 voice_playing = false;
-                send_event(PLAYBACK_EVENT_VOICE_PLAYING, &voice_playing);
+                send_event(VOICE_EVENT_IS_PLAYING, &voice_playing);
             }
             break;
         }
