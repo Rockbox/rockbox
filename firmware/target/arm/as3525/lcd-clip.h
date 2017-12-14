@@ -18,8 +18,17 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef __LCDCLIP_H__
+#define __LCDCLIP_H__
 
 #include "config.h"
+
+#if !defined(BOOTLOADER) && defined(SANSA_CLIPPLUS) /* only tested for clipplus */
+/* Ensure empty FIFO for lcd commands is at least 3 deep */
+#define LCD_USE_FIFO_FOR_COMMANDS
+#endif
+
+void lcd_write_cmd_triplet(int cmd1, int cmd2, int cmd3);
 
 /* return variant number: 0 = clipv1, clipv2, old clip+, 1 = newer clip+ */
 int lcd_hw_init(void) INIT_ATTR;
@@ -27,3 +36,4 @@ int lcd_hw_init(void) INIT_ATTR;
 /* target-specific power enable */
 void lcd_enable_power(bool onoff);
 
+#endif /*__LCDCLIP_H__*/

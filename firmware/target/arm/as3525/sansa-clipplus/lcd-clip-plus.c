@@ -64,6 +64,31 @@ void lcd_write_command(int byte)
         ;
 }
 
+void lcd_write_cmd_triplet(int cmd1, int cmd2, int cmd3)
+{
+#ifndef LCD_USE_FIFO_FOR_COMMANDS
+    lcd_write_command(cmd1);
+    lcd_write_command(cmd2);
+    lcd_write_command(cmd3);
+#else
+    /* combine writes to data register */
+    while(SSP_SR & (1<<4))  /* BSY flag */
+        ;
+    /* FIFO is empty at this point */
+
+    /* LCD command mode */
+    GPIOB_PIN(2) = 0;
+
+    /* !!makes assumption FIFO is at least (3) levels deep!! */
+    SSP_DATA = cmd1;
+    SSP_DATA = cmd2;
+    SSP_DATA = cmd3;
+
+    while(SSP_SR & (1<<4))  /* BSY flag */
+        ;
+#endif
+}
+
 void lcd_write_data(const fb_data* p_bytes, int count)
 {
     /* LCD data mode */
@@ -80,6 +105,13 @@ void lcd_write_data(const fb_data* p_bytes, int count)
 
 void lcd_enable_power(bool onoff)
 {
+#ifndef BOOTLOADER
+    if (onoff)
+        bitset32(&CGU_PERI, CGU_SSP_CLOCK_ENABLE);
+    else
+        bitclr32(&CGU_PERI, CGU_SSP_CLOCK_ENABLE);
+#else
     (void) onoff;
+#endif
 }
 
