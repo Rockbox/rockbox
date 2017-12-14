@@ -10,6 +10,7 @@
  * Copyright (C) 2002 by Alan Korr
  * Copyright (C) 2008 François Dinel
  * Copyright (C) 2008-2009 Rafaël Carré
+ * Copyright (C) 2017 William Wilgus
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -118,10 +119,10 @@ void lcd_set_flip(bool yesno)
 #ifdef HAVE_LCD_ENABLE
 void lcd_enable(bool enable)
 {
-    if(display_on == enable)
+    if (display_on == enable)
         return;
 
-    if( (display_on = enable) ) /* simple '=' is not a typo ! */
+    if ( (display_on = enable) ) /* simple '=' is not a typo ! */
     {
         lcd_enable_power(enable);
         lcd_write_command(LCD_SET_DISPLAY_ON);
@@ -149,50 +150,65 @@ void lcd_init_device(void)
     variant = lcd_hw_init();
     offset = (variant == 0) ? 2 : 0;
 
-    /* Set display clock (divide ratio = 1) and oscillator frequency (1) */
-    lcd_write_command(LCD_SET_DISPLAY_CLOCK_AND_OSC_FREQ);
-    lcd_write_command(0x10);
+    /* power on display to accept commands */
+    lcd_enable_power(true);
 
-    /* Set VCOM deselect level to 0.76V */
-    lcd_write_command(LCD_SET_VCOM_DESELECT_LEVEL);
-    lcd_write_command(0x34);
+    lcd_write_cmd_triplet
+    (
+        /* Set display clock */
+        (LCD_SET_DISPLAY_CLOCK_AND_OSC_FREQ),
+        /* Set display clock (divide ratio = 1) and oscillator frequency (1) */
+        (0x10),
+        /* Set VCOM deselect level */
+        (LCD_SET_VCOM_DESELECT_LEVEL)
+    );
 
-    /* Set pre-charge period (p1period is 2 dclk and p2period is 5 dclk) */
-    lcd_write_command(LCD_SET_PRECHARGE_PERIOD);
-    lcd_write_command(0x25);
+    lcd_write_cmd_triplet
+    (
+        /* Set VCOM deselect level to 0.76V */
+        (0x34),
+        /* Set pre-charge period */
+        (LCD_SET_PRECHARGE_PERIOD),
+        /* Set pre-charge period (p1period is 2 dclk and p2period is 5 dclk) */
+        (0x25)
+    );
 
     /* Set contrast register to 12% */
     lcd_set_contrast(lcd_default_contrast());
 
-    /* Configure DC-DC */
-    lcd_write_command(LCD_SET_DC_DC);
-    lcd_write_command((variant == 0) ? 0x8A : 0x10);
+    lcd_write_cmd_triplet
+    (
+        /* Configure DC-DC */
+        (LCD_SET_DC_DC),
+        /* Configure DC-DC */
+        ((variant == 0) ? 0x8A : 0x10),
+        /* Set starting line as 0 */
+        (LCD_SET_DISPLAY_START_LINE /*|(0 & 0x3f)*/)
+    );
 
-    /* Set starting line as 0 */
-    lcd_write_command(LCD_SET_DISPLAY_START_LINE /*|(0 & 0x3f)*/);
+    lcd_write_cmd_triplet
+    (
+        /* Column 131 is remapped to SEG0 */
+        (LCD_SET_SEGMENT_REMAP_INV),
+        /* Invert COM scan direction (N-1 to 0) */
+        (LCD_SET_COM_OUTPUT_SCAN_DIRECTION_INV),
+        /* Set normal display mode (not every pixel ON) */
+        (LCD_SET_ENTIRE_DISPLAY_OFF)
+    );
 
-    /* Column 131 is remapped to SEG0 */
-    lcd_write_command(LCD_SET_SEGMENT_REMAP_INV);
-
-    /* Invert COM scan direction (N-1 to 0) */
-    lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION_INV);
-
-    /* Set normal display mode (not every pixel ON) */
-    lcd_write_command(LCD_SET_ENTIRE_DISPLAY_OFF);
-
-    /* Set normal display mode (not inverted) */
-    lcd_write_command(LCD_SET_NORMAL_DISPLAY);
-
-    /* Clear whole framebuffer, including "overscan"
-     * We don't need to handle that out of screen columns in lcd_clear_display()
-     * since we will never write into it anymore
-     */
-    lcd_write_command (LCD_SET_HIGHER_COLUMN_ADDRESS /*| 0*/);
-    lcd_write_command (LCD_SET_LOWER_COLUMN_ADDRESS /*| 0*/);
+    lcd_write_cmd_triplet
+    (
+        /* Set normal display mode (not inverted) */
+        (LCD_SET_NORMAL_DISPLAY),
+        /* set upper 4 bits of 8-bit column address */
+        (LCD_SET_HIGHER_COLUMN_ADDRESS /*| 0*/),
+        /* set lower 4 bits of 8-bit column address */
+        (LCD_SET_LOWER_COLUMN_ADDRESS /*| 0*/)
+    );
 
     fb_data p_bytes[LCD_WIDTH + 2 * offset];
     memset(p_bytes, 0, sizeof(p_bytes)); /* fills with 0 : pixel off */
-    for(i = 0; i < 8; i++)
+    for (i = 0; i < 8; i++)
     {
         lcd_write_command (LCD_SET_PAGE_ADDRESS | (i /*& 0xf*/));
         lcd_write_data(p_bytes, LCD_WIDTH + 2 * offset);
@@ -205,26 +221,47 @@ void lcd_init_device(void)
 
 /*** Update functions ***/
 
+/* returns LCD_CNTL_HIGHCOL or'd with higher 4 bits of
+   the 8-bit column address for the display data RAM.
+*/
+static inline int get_column_high_byte(const int x)
+{
+    return (LCD_CNTL_HIGHCOL | (((x+offset) >> 4) & 0xf));
+}
+
+/* returns LCD_CNTL_LOWCOL or'd with lower 4 bits of
+   the 8-bit column address for the display data RAM.
+*/
+static inline int get_column_low_byte(const int x)
+{
+     return (LCD_CNTL_LOWCOL | ((x+offset) & 0xf));
+}
+
 /* Performance function that works with an external buffer
    note that by and bheight are in 8-pixel units! */
 void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
                    int bheight, int stride)
 {
-    if(!display_on)
+    if (!display_on)
         return;
+
+    const int column_high = get_column_high_byte(x);
+    const int column_low = get_column_low_byte(x);
 
     /* Copy display bitmap to hardware */
     while (bheight--)
     {
-        lcd_write_command (LCD_CNTL_PAGE | (by++ & 0xf));
-        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+offset)>>4) & 0xf));
-        lcd_write_command (LCD_CNTL_LOWCOL | ((x+offset) & 0xf));
+        lcd_write_cmd_triplet
+        (
+            (LCD_CNTL_PAGE | (by++ & 0xf)),
+            (column_high),
+            (column_low)
+        );
 
         lcd_write_data(data, width);
         data += stride;
     }
 }
-
 
 #ifndef BOOTLOADER
 /* Helper function for lcd_grey_phase_blit(). */
@@ -235,16 +272,22 @@ void lcd_grey_data(unsigned char *values, unsigned char *phases, int count);
 void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                          int x, int by, int width, int bheight, int stride)
 {
-    if(!display_on)
+    if (!display_on)
         return;
+
+    const int column_high = get_column_high_byte(x);
+    const int column_low = get_column_low_byte(x);
 
     stride <<= 3; /* 8 pixels per block */
     /* Copy display bitmap to hardware */
     while (bheight--)
     {
-        lcd_write_command (LCD_CNTL_PAGE | (by++ & 0xf));
-        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+offset)>>4) & 0xf));
-        lcd_write_command (LCD_CNTL_LOWCOL | ((x+offset) & 0xf));
+        lcd_write_cmd_triplet
+        (
+            (LCD_CNTL_PAGE | (by++ & 0xf)),
+            (column_high),
+            (column_low)
+        );
 
         lcd_grey_data(values, phases, width);
 
@@ -255,26 +298,41 @@ void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
 
 #endif
 
+/* Shared internal function for lcd_update and lcd_update_rect
+   WARNING does NOT check bounds
+*/
+static void internal_update_rect(int, int, int, int) ICODE_ATTR;
+static void internal_update_rect(int x, int y, int width, int height)
+{
+    if (!display_on)
+        return;
+
+    const int column_high = get_column_high_byte(x);
+    const int column_low = get_column_low_byte(x);
+
+    /* Copy specified rectange bitmap to hardware */
+    for (; y <= height; y++)
+    {
+        lcd_write_cmd_triplet
+        (
+            (LCD_CNTL_PAGE | (y & 0xf)),
+            (column_high),
+            (column_low)
+        );
+
+        lcd_write_data (FBADDR(x,y), width);
+    }
+    lcd_write_command (LCD_NOP); /* return to command mode */
+
+}
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
 void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
-    int y;
-
-    if(!display_on)
-        return;
-
     /* Copy display bitmap to hardware */
-    for (y = 0; y < LCD_FBHEIGHT; y++)
-    {
-        lcd_write_command (LCD_CNTL_PAGE | (y & 0xf));
-        lcd_write_command (LCD_CNTL_HIGHCOL | ((offset >> 4) & 0xf));
-        lcd_write_command (LCD_CNTL_LOWCOL | (offset & 0xf));
-
-        lcd_write_data (FBADDR(0, y), LCD_WIDTH);
-    }
+    internal_update_rect(0, 0, LCD_WIDTH, LCD_FBHEIGHT - 1);
 }
 
 /* Update a fraction of the display. */
@@ -282,45 +340,34 @@ void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int ymax;
-
-    if(!display_on)
+    if (!display_on)
         return;
 
-    /* The Y coordinates have to work on even 8 pixel rows */
-    if (x < 0)
+    /* make sure the rectangle is bounded in the screen */
+    if (width > LCD_WIDTH - x)/* Clip right */
+        width = LCD_WIDTH - x;
+    if (x < 0)/* Clip left */
     {
         width += x;
         x = 0;
     }
-
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-
     if (width <= 0)
         return; /* nothing left to do, 0 is harmful to lcd_write_data() */
 
-    if (y < 0)
+    if (height > LCD_HEIGHT - y) /* Clip bottom */
+        height = LCD_HEIGHT - y;
+    if (y < 0) /* Clip top */
     {
         height += y;
         y = 0;
     }
-
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
-
     if (height <= 0)
         return; /* nothing left to do */
 
+    /* The Y coordinates have to work on even 8 pixel rows */
     ymax = (y + height-1) >> 3;
     y >>= 3;
 
     /* Copy specified rectange bitmap to hardware */
-    for (; y <= ymax; y++)
-    {
-        lcd_write_command (LCD_CNTL_PAGE | (y & 0xf));
-        lcd_write_command (LCD_CNTL_HIGHCOL | (((x+offset) >> 4) & 0xf));
-        lcd_write_command (LCD_CNTL_LOWCOL | ((x+offset) & 0xf));
-
-        lcd_write_data (FBADDR(x,y), width);
-    }
+    internal_update_rect(x, y, width, ymax);
 }

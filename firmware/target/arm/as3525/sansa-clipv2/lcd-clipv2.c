@@ -63,6 +63,35 @@ void lcd_write_command(int byte)
     DBOP_TIMPOL_23 = 0xE037E037;
 }
 
+void lcd_write_cmd_triplet(int cmd1, int cmd2, int cmd3)
+{
+#ifndef LCD_USE_FIFO_FOR_COMMANDS
+    lcd_write_command(cmd1);
+    lcd_write_command(cmd2);
+    lcd_write_command(cmd3);
+#else
+    /* combine writes to data register */
+
+    while ((DBOP_STAT & (1<<10)) == 0) /* While push fifo is not empty */
+        ;
+    /* FIFO is empty at this point */
+    /* unset D/C# (data or command) */
+    GPIOB_PIN(2) = 0;
+    DBOP_TIMPOL_23 = 0xE0370036;
+
+    /* Write command */
+    /* !!makes assumption FIFO is at least (3) levels deep! */
+    DBOP_DOUT8 = cmd1;
+    DBOP_DOUT8 = cmd2;
+    DBOP_DOUT8 = cmd3;
+    /* While push fifo is not empty */
+    while ((DBOP_STAT & (1<<10)) == 0)
+        ;
+
+    DBOP_TIMPOL_23 = 0xE037E037;
+#endif
+}
+
 void lcd_write_data(const fb_data* p_bytes, int count)
 {
     volatile int i = 0;
