@@ -611,37 +611,21 @@ static void track_list_free_buf_info(struct track_buf_info *tbip)
             return;
         }
 
+        /* If this one is the current track; new current track is next one,
+           if any, else, the previous */
+        if (hid == track_list.current_hid)
+            track_list.current_hid = next_hid > 0 ? next_hid : prev_hid;
+
+        /* Fixup list links */
         if (prev_tbip)
-        {
             prev_tbip->link[1] = next_hid;
-        }
         else
-        {
-            /* Was the first track; new first track is next one */
             track_list.first_hid = next_hid;
 
-            if (hid == track_list.current_hid)
-            {
-                /* Was the current track; new current track is next one */
-                track_list.current_hid = next_hid;
-            }
-        }
-
         if (next_tbip)
-        {
             next_tbip->link[0] = prev_hid;
-        }
         else
-        {
-            /* Was the last track; new last track is previous one */
             track_list.last_hid = prev_hid;
-
-            if (hid == track_list.current_hid)
-            {
-                /* Was the current track; new current track is previous one */
-                track_list.current_hid = prev_hid;
-            }
-        }
 
         track_list.count--;
     }
