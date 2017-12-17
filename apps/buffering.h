@@ -75,7 +75,7 @@ bool buffering_reset(char *buf, size_t buflen);
  * NOTE: Tail operations are only legal when the end of the file is buffered.
  ****************************************************************************/
 
-int bufopen(const char *file, size_t offset, enum data_type type,
+int bufopen(const char *file, off_t offset, enum data_type type,
             void *user_data);
 int bufalloc(const void *src, size_t size, enum data_type type);
 bool bufclose(int handle_id);
@@ -101,17 +101,19 @@ ssize_t bufcuttail(int handle_id, size_t size);
  * buf_back_off_storage: tell buffering thread to take it easy
  ****************************************************************************/
 
-enum data_type buf_handle_data_type(int handle_id);
-ssize_t buf_handle_remaining(int handle_id);
 bool buf_is_handle(int handle_id);
-ssize_t buf_handle_offset(int handle_id);
-void buf_set_base_handle(int handle_id);
-size_t buf_length(void);
-size_t buf_used(void);
+int buf_handle_data_type(int handle_id);
+off_t buf_filesize(int handle_id);
+off_t buf_handle_offset(int handle_id);
+off_t buf_handle_remaining(int handle_id);
 bool buf_pin_handle(int handle_id, bool pin);
 bool buf_signal_handle(int handle_id, bool signal);
 
+size_t buf_length(void);
+size_t buf_used(void);
+
 /* Settings */
+void buf_set_base_handle(int handle_id);
 void buf_set_watermark(size_t bytes);
 size_t buf_get_watermark(void);
 

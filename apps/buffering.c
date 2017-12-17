@@ -93,7 +93,7 @@ struct memory_handle {
     size_t  data;           /* Start index of the handle's data buffer */
     size_t  ridx;           /* Read pointer, relative to the main buffer */
     size_t  widx;           /* Write pointer, relative to the main buffer */
-    ssize_t filesize;       /* File total length */
+    off_t   filesize;       /* File total length (possibly trimmed at tail) */
     off_t   start;          /* Offset at which we started reading the file */
     off_t   pos;            /* Read position in file */
     off_t volatile end;     /* Offset at which we stopped reading the file */
@@ -917,7 +917,7 @@ management functions for all the actual handle management work.
    return value: <0 if the file cannot be opened, or one file already
    queued to be opened, otherwise the handle for the file in the buffer
 */
-int bufopen(const char *file, size_t offset, enum data_type type,
+int bufopen(const char *file, off_t offset, enum data_type type,
             void *user_data)
 {
     int handle_id = ERR_BUFFER_FULL;
@@ -1508,8 +1508,28 @@ These functions are exported, to allow interaction with the buffer.
 They take care of the content of the structs, and rely on the linked list
 management functions for all the actual handle management work.
 */
+bool buf_is_handle(int handle_id)
+{
+    return find_handle(handle_id) != NULL;
+}
 
-ssize_t buf_handle_offset(int handle_id)
+int buf_handle_data_type(int handle_id)
+{
+    const struct memory_handle *h = find_handle(handle_id);
+    if (!h)
+        return ERR_HANDLE_NOT_FOUND;
+    return h->type;
+}
+
+off_t buf_filesize(int handle_id)
+{
+    const struct memory_handle *h = find_handle(handle_id);
+    if (!h)
+        return ERR_HANDLE_NOT_FOUND;
+    return h->filesize;
+}
+
+off_t buf_handle_offset(int handle_id)
 {
     const struct memory_handle *h = find_handle(handle_id);
     if (!h)
@@ -1517,32 +1537,12 @@ ssize_t buf_handle_offset(int handle_id)
     return h->start;
 }
 
-void buf_set_base_handle(int handle_id)
-{
-    mutex_lock(&llist_mutex);
-    base_handle_id = handle_id;
-    mutex_unlock(&llist_mutex);
-}
-
-enum data_type buf_handle_data_type(int handle_id)
-{
-    const struct memory_handle *h = find_handle(handle_id);
-    if (!h)
-        return TYPE_UNKNOWN;
-    return h->type;
-}
-
-ssize_t buf_handle_remaining(int handle_id)
+off_t buf_handle_remaining(int handle_id)
 {
     const struct memory_handle *h = find_handle(handle_id);
     if (!h)
         return ERR_HANDLE_NOT_FOUND;
     return h->filesize - h->end;
-}
-
-bool buf_is_handle(int handle_id)
-{
-    return find_handle(handle_id) != NULL;
 }
 
 bool buf_pin_handle(int handle_id, bool pin)
@@ -1574,6 +1574,14 @@ bool buf_signal_handle(int handle_id, bool signal)
 size_t buf_length(void)
 {
     return buffer_len;
+}
+
+/* Set the handle from which useful data is counted */
+void buf_set_base_handle(int handle_id)
+{
+    mutex_lock(&llist_mutex);
+    base_handle_id = handle_id;
+    mutex_unlock(&llist_mutex);
 }
 
 /* Return the amount of buffer space used */
