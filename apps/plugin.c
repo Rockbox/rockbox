@@ -790,22 +790,6 @@ static const struct plugin_api rockbox_api = {
     detect_flashed_romimage,
 #endif
     led,
-#if (CONFIG_CODEC == SWCODEC)
-    bufopen,
-    bufalloc,
-    bufclose,
-    bufseek,
-    bufadvance,
-    bufread,
-    bufgetdata,
-    bufgettail,
-    bufcuttail,
-
-    buf_handle_offset,
-    buf_set_base_handle,
-    buf_used,
-#endif
-
 #ifdef HAVE_TAGCACHE
     tagcache_search,
     tagcache_search_set_uniqbuf,
