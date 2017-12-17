@@ -160,12 +160,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 234
+#define PLUGIN_API_VERSION 235
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 234
+#define PLUGIN_MIN_API_VERSION 235
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -922,24 +922,6 @@ struct plugin_api {
 #endif
 
     void (*led)(bool on);
-
-#if (CONFIG_CODEC == SWCODEC)
-    /* buffering API */
-    int (*bufopen)(const char *file, off_t offset, enum data_type type,
-                   void *user_data);
-    int (*bufalloc)(const void *src, size_t size, enum data_type type);
-    bool (*bufclose)(int handle_id);
-    int (*bufseek)(int handle_id, size_t newpos);
-    int (*bufadvance)(int handle_id, off_t offset);
-    ssize_t (*bufread)(int handle_id, size_t size, void *dest);
-    ssize_t (*bufgetdata)(int handle_id, size_t size, void **data);
-    ssize_t (*bufgettail)(int handle_id, size_t size, void **data);
-    ssize_t (*bufcuttail)(int handle_id, size_t size);
-
-    ssize_t (*buf_handle_offset)(int handle_id);
-    void (*buf_set_base_handle)(int handle_id);
-    size_t (*buf_used)(void);
-#endif
 
 #ifdef HAVE_TAGCACHE
     bool (*tagcache_search)(struct tagcache_search *tcs, int tag);
