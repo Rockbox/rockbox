@@ -1127,14 +1127,7 @@ int bufalloc(const void *src, size_t size, enum data_type type)
 bool bufclose(int handle_id)
 {
     logf("bufclose(%d)", handle_id);
-#if 0
-    /* Don't interrupt the buffering thread if the handle is already
-       stale */
-    if (!find_handle(handle_id)) {
-        logf("  handle already closed");
-        return true;
-    }
-#endif
+
     if (handle_id <= 0) {
         return true;
     }
@@ -1688,25 +1681,6 @@ static void NORETURN_ATTR buffering_thread(void)
             continue;
 
         update_data_counters(NULL);
-#if 0
-        /* TODO: This needs to be fixed to use the idle callback, disable it
-         * for simplicity until its done right */
-#if MEMORYSIZE > 8
-        /* If the disk is spinning, take advantage by filling the buffer */
-        else if (storage_disk_is_active()) {
-            if (num_handles > 0 && data_counters.useful <= high_watermark)
-                send_event(BUFFER_EVENT_BUFFER_LOW, 0);
-
-            if (data_counters.remaining > 0 && buf_used() <= high_watermark) {
-                /* This is a new fill, shrink the buffer up first */
-                if (!filling)
-                    shrink_buffer();
-                filling = fill_buffer();
-                update_data_counters(NULL);
-            }
-        }
-#endif
-#endif
 
         if (filling) {
             filling = data_counters.remaining > 0 ? fill_buffer() : false;
