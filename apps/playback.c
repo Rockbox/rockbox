@@ -227,11 +227,6 @@ struct track_info
 #endif
     int audio_hid;                  /* Main audio data handle ID */
     }; };
-    off_t filesize;                 /* File total length on disk
-                                       TODO: This should be stored
-                                             in the handle or the
-                                             id3 and would use less
-                                             ram */
 };
 
 /* On-buffer info format; includes links */
@@ -459,8 +454,6 @@ static void track_info_wipe(struct track_info *infop)
 
     FOR_EACH_TRACK_INFO_HANDLE(i)
         infop->handle[i] = ERR_HANDLE_NOT_FOUND;
-
-    infop->filesize = 0;
 }
 
 /** --- Track list --- **/
@@ -1065,7 +1058,7 @@ static void audio_update_filebuf_watermark(int seconds)
                track that fits, in which case we should avoid constant buffer
                low events */
             if (track_list_count() > 1)
-                bytes = info.filesize + 1;
+                bytes = buf_filesize(info.audio_hid) + 1;
         }
     }
     else
@@ -1613,7 +1606,7 @@ static bool audio_start_codec(bool auto_skip)
     id3_write(CODEC_ID3, cur_id3);
 
     ci.audio_hid = info.audio_hid;
-    ci.filesize = info.filesize;
+    ci.filesize = buf_filesize(info.audio_hid);
     buf_set_base_handle(info.audio_hid);
 
     /* All required data is now available for the codec */
@@ -1870,33 +1863,12 @@ static int audio_load_track(void)
          playlist_peek_offset);
 
     /* Get track name from current playlist read position */
-    int fd = -1;
-    char name_buf[MAX_PATH + 1];
-    const char *trackname;
+    char path_buf[MAX_PATH + 1];
+    const char *path = playlist_peek(playlist_peek_offset,
+                                     path_buf,
+                                     sizeof (path_buf));
 
-    while (1)
-    {
-        trackname = playlist_peek(playlist_peek_offset, name_buf,
-                                  sizeof (name_buf));
-
-        if (!trackname)
-            break;
-
-        /* Test for broken playlists by probing for the files */
-        fd = open(trackname, O_RDONLY);
-        if (fd >= 0)
-            break;
-
-        logf("Open failed");
-        /* Skip invalid entry from playlist */
-        playlist_skip_entry(NULL, playlist_peek_offset);
-
-        /* Sync the playlist if it isn't finished */
-        if (playlist_peek(playlist_peek_offset, NULL, 0))
-            playlist_next(0);
-    }
-
-    if (!trackname)
+    if (!path)
     {
         /* No track - exhausted the playlist entries */
         logf("End-of-playlist");
@@ -1920,7 +1892,7 @@ static int audio_load_track(void)
 
     /* Successfully opened the file - get track metadata */
     if (filling == STATE_FULL ||
-        (info.id3_hid = bufopen(trackname, 0, TYPE_ID3, NULL)) < 0)
+        (info.id3_hid = bufopen(path, 0, TYPE_ID3, NULL)) < 0)
     {
         /* Buffer or track list is full */
         struct mp3entry *ub_id3;
@@ -1929,9 +1901,15 @@ static int audio_load_track(void)
 
         /* Load the metadata for the first unbuffered track */
         ub_id3 = id3_get(UNBUFFERED_ID3);
-        id3_mutex_lock();
-        get_metadata(ub_id3, fd, trackname);
-        id3_mutex_unlock();
+
+        int fd = open(path, O_RDONLY);
+        if (fd >= 0)
+        {
+            id3_mutex_lock();
+            get_metadata(ub_id3, fd, path);
+            id3_mutex_unlock();
+            close(fd);
+        }
 
         if (filling != STATE_FULL)
         {
@@ -1944,8 +1922,6 @@ static int audio_load_track(void)
     }
     else
     {
-        info.filesize = filesize(fd);
-
         if (!track_list_commit_info(&info))
         {
             track_list_free_info(&info);
@@ -1957,7 +1933,6 @@ static int audio_load_track(void)
         track_list.in_progress_hid = info.self_hid;
     }
 
-    close(fd);
     return LOAD_TRACK_OK;
 }
 
@@ -2050,23 +2025,23 @@ static int audio_finish_load_track(struct track_info *infop)
 #endif /* HAVE_CODEC_BUFFERING */
 
     /** Finally, load the audio **/
-    size_t file_offset = 0;
+    off_t file_offset = 0;
 
     if (track_id3->elapsed > track_id3->length)
         track_id3->elapsed = 0;
 
-    if ((off_t)track_id3->offset >= infop->filesize)
+    if ((off_t)track_id3->offset >= buf_filesize(infop->audio_hid))
         track_id3->offset = 0;
 
     logf("%s: set offset for %s to %lu\n", __func__,
-         track_id3->title, (unsigned long)track_id3->offset);
+         track_id3->title, track_id3->offset);
 
     /* Adjust for resume rewind so we know what to buffer - starting the codec
        calls it again, so we don't save it (and they shouldn't accumulate) */
     unsigned long elapsed, offset;
     resume_rewind_adjust_progress(track_id3, &elapsed, &offset);
 
-    logf("%s: Set resume for %s to %lu %lX", __func__,
+    logf("%s: Set resume for %s to %lu %lu", __func__,
          track_id3->title, elapsed, offset);
 
     enum data_type audiotype = rbcodec_format_is_atomic(track_id3->codectype) ?
@@ -3049,7 +3024,7 @@ static void audio_on_ff_rewind(long time)
 
             /* Set the codec API to the correct metadata and track info */
             ci.audio_hid = cur_info.audio_hid;
-            ci.filesize = cur_info.filesize;
+            ci.filesize = buf_filesize(cur_info.audio_hid);
             buf_set_base_handle(cur_info.audio_hid);
         }
 
@@ -3343,9 +3318,9 @@ static void buffer_event_finished_callback(unsigned short id, void *ev_data)
 {
     (void)id;
     int hid = *(const int *)ev_data;
-    const enum data_type htype = buf_handle_data_type(hid);
+    int htype = buf_handle_data_type(hid);
 
-    logf("handle %d finished buffering (type:%u)", hid, (unsigned)htype);
+    logf("handle %d finished buffering (type:%d)", hid, htype);
 
     /* Limit queue traffic */
     switch (htype)
