@@ -38,7 +38,7 @@
  * from Lua in its stack in direct order (the first argument is pushed first). To return values to Lua,
  * a C function just pushes them onto the stack, in direct order (the first result is pushed first),
  * and returns the number of results. Any other value in the stack below the results will be properly
- * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results. 
+ * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results.
  *
  * When porting new functions, don't forget to check rocklib_aux.pl whether it automatically creates
  * wrappers for the function and if so, add the function names to @forbidden_functions. This is to
@@ -57,35 +57,178 @@
 #define ROCKLUA_IMAGE "rb.image"
 struct rocklua_image
 {
-    int width;
-    int height;
+    int     width;
+    int     height;
+    size_t  bytes;
     fb_data *data;
     fb_data dummy[1][1];
 };
 
+/* some devices need x | y coords shifted to match native format */
+static fb_data x_shift = 0;
+static fb_data y_shift = 0;
+static fb_data xy_mask = 0;
+
+static const fb_data *pixmask = NULL;
+
+static const uint8_t pixmask_h2[8] =
+    {0xC0, 0x30, 0x0C, 0x03, 0 ,0 ,0 ,0};
+static const uint8_t pixmask_v2[8] =
+    {0x03, 0x0C, 0x30, 0xC0, 0 ,0 ,0 ,0};
+static const uint16_t pixmask_vi2[8] =
+    {0x0101, 0x0202, 0x0404, 0x0808, 0x1010, 0x2020, 0x4040, 0x8080};
+static const uint8_t pixmask_v1[8] =
+    {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
+
+#ifdef HAVE_LCD_COLOR
+static unsigned invert_rgb(unsigned rgb)
+{
+    uint8_t r = 0xFFU - RGB_UNPACK_RED((unsigned) rgb);
+    uint8_t g = 0xFFU - RGB_UNPACK_GREEN((unsigned) rgb);
+    uint8_t b = 0xFFU - RGB_UNPACK_BLUE((unsigned) rgb);
+
+    return LCD_RGBPACK(r, g, b);
+}
+#endif
+
+/* Internal worker functions for image data array */
+static fb_data* data_element(fb_data *data, size_t bytes, int x , int y, int w, int h)
+{
+    (void) h;
+    if (x_shift)
+        x = ((x - 1) >> x_shift) + 1;
+
+    if (y_shift)
+        y = ((y - 1) >> y_shift) + 1;
+
+    size_t data_address = (w * (y - 1)) + (x - 1);
+
+    if (data_address < bytes)
+        return &data[data_address]; /* return element address */
+
+    return NULL; /* data overflow */
+}
+
+static fb_data data_set(fb_data *data_element, int x, int y, fb_data newvalue)
+{
+    fb_data oldvalue = *data_element;
+    fb_data mask;
+    int bit_n;
+
+    if (y_shift)
+    {
+        bit_n = (y-1) & xy_mask;
+        mask = pixmask[bit_n];
+        /*equivalent of:
+          newvalue <<=bit_n;newvalue &= mask;newvalue |= oldvalue &= ~mask;
+        */
+        newvalue = oldvalue ^ ((oldvalue ^ (newvalue << bit_n)) & mask);
+    }
+    else if (x_shift)
+    {
+        bit_n = (x-1) & xy_mask;
+        mask = pixmask[bit_n];
+        newvalue = oldvalue ^ ((oldvalue ^ (newvalue << bit_n)) & mask);
+    }
+
+    *data_element = newvalue;
+
+    return oldvalue;
+}
+
+static fb_data data_get(fb_data *data_element, int x, int y)
+{
+    fb_data value = *data_element;
+    fb_data mask;
+    int bit_n;
+
+    if (y_shift)
+    {
+        bit_n = (y-1) & xy_mask;
+        mask = pixmask[bit_n];
+        value &= mask;
+        value >>=bit_n;
+    }
+    else if (x_shift)
+    {
+        bit_n = (x-1) & xy_mask;
+        mask = pixmask[bit_n];
+        value &= mask;
+        value >>=bit_n;
+    }
+
+    return value;
+}
+
+/* LUA Interface functions */
 static void rli_wrap(lua_State *L, fb_data *src, int width, int height)
 {
-    struct rocklua_image *a = (struct rocklua_image *)lua_newuserdata(L, sizeof(struct rocklua_image));
+    int native_width;
+    int native_height;
+
+    size_t sz_header = sizeof(struct rocklua_image);
+    struct rocklua_image *a = (struct rocklua_image *)lua_newuserdata(L, sz_header);
 
     luaL_getmetatable(L, ROCKLUA_IMAGE);
     lua_setmetatable(L, -2);
 
+    /* Some devices (1-bit / 2-bit displays) have packed bit formats that need
+       to be unpacked in order to work on them at a pixel level.
+       The internal formats of these devices do not follow the same paradigm
+       for image sizes either
+    */
+    if (x_shift)
+        native_width = ((width - 1) >> x_shift) + 1;
+    else
+        native_width = width;
+
+    if (y_shift)
+        native_height = ((height - 1) >> y_shift) + 1;
+    else
+        native_height = height;
+
+    a->bytes = ((native_width * native_height)) * sizeof(fb_data);
+
+    a->data = src;
+
     a->width = width;
     a->height = height;
-    a->data = src;
 }
 
 static fb_data* rli_alloc(lua_State *L, int width, int height)
 {
-    size_t nbytes = sizeof(struct rocklua_image) + ((width*height) - 1) * sizeof(fb_data);
+    int native_width;
+    int native_height;
+
+    /* Some devices (1-bit / 2-bit displays) have packed bit formats that need
+       to be unpacked in order to work on them at a pixel level.
+       The internal formats of these devices do not follow the same paradigm
+       for image sizes either
+    */
+    if (x_shift)
+        native_width = ((width - 1) >> x_shift) + 1;
+    else
+        native_width = width;
+
+    if (y_shift)
+        native_height = ((height - 1) >> y_shift) + 1;
+    else
+        native_height = height;
+
+    size_t sz_header = sizeof(struct rocklua_image);
+    size_t nbytes = sz_header + ((native_width*native_height) - 1) * sizeof(fb_data);
+
     struct rocklua_image *a = (struct rocklua_image *)lua_newuserdata(L, nbytes);
 
     luaL_getmetatable(L, ROCKLUA_IMAGE);
     lua_setmetatable(L, -2);
 
-    a->width = width;
+    a->width  = width;
     a->height = height;
-    a->data = &a->dummy[0][0];
+
+    a->bytes  = ((native_width * native_height)) * sizeof(fb_data);
+
+    a->data   = &a->dummy[0][0];
 
     return a->data;
 }
@@ -107,6 +250,21 @@ static struct rocklua_image* rli_checktype(lua_State *L, int arg)
     return (struct rocklua_image*) ud;
 }
 
+static int rli_tostring(lua_State *L)
+{
+    struct rocklua_image *a = rli_checktype(L, 1);
+    lua_pushfstring(L, ROCKLUA_IMAGE ": %dx%d, %d bytes",
+                          a->width, a->height, a->bytes);
+    return 1;
+}
+
+static int rli_size(lua_State *L)
+{
+    struct rocklua_image *a = rli_checktype(L, 1);
+    lua_pushnumber(L, a->bytes);
+    return 1;
+}
+
 static int rli_width(lua_State *L)
 {
     struct rocklua_image *a = rli_checktype(L, 1);
@@ -121,53 +279,305 @@ static int rli_height(lua_State *L)
     return 1;
 }
 
-static fb_data* rli_element(lua_State *L)
-{
-    struct rocklua_image *a = rli_checktype(L, 1);
-    int x = luaL_checkint(L, 2);
-    int y = luaL_checkint(L, 3);
-
-    luaL_argcheck(L, 1 <= x && x <= a->width, 2,
-                    "index out of range");
-    luaL_argcheck(L, 1 <= y && y <= a->height, 3,
-                    "index out of range");
-
-    /* return element address */
-    return &a->data[a->width * (y - 1) + (x - 1)];
-}
-
 static int rli_set(lua_State *L)
 {
+    fb_data *element = NULL;
+
+    struct rocklua_image *a = rli_checktype(L, 1);
+    int x = (luaL_checkint(L, 2));
+    int y = (luaL_checkint(L, 3));
     fb_data newvalue = FB_SCALARPACK((unsigned)luaL_checknumber(L, 4));
-    *rli_element(L) = newvalue;
-    return 0;
+
+    luaL_argcheck(L, 1 <= x && x <= a->width, 2, "index out of range");
+    luaL_argcheck(L, 1 <= y && y <= a->height, 3, "index out of range");
+
+    element =  data_element(a->data, a->bytes, x , y, a->width, a->height);
+
+    luaL_argcheck(L, element != NULL, 1, "data overflow");
+
+    lua_pushnumber(L, FB_UNPACK_SCALAR_LCD(data_set(element, x, y, newvalue)));
+    return 1;
 }
 
 static int rli_get(lua_State *L)
 {
-    lua_pushnumber(L, FB_UNPACK_SCALAR_LCD(*rli_element(L)));
+    fb_data *element = NULL;
+
+    struct rocklua_image *a = rli_checktype(L, 1);
+    int x = (luaL_checkint(L, 2));
+    int y = (luaL_checkint(L, 3));
+
+    luaL_argcheck(L, 1 <= x && x <= a->width, 2, "index out of range");
+    luaL_argcheck(L, 1 <= y && y <= a->height, 3, "index out of range");
+
+    element =  data_element(a->data, a->bytes, x , y, a->width, a->height);
+
+    luaL_argcheck(L, element != NULL, 1, "data overflow");
+
+    lua_pushnumber(L, FB_UNPACK_SCALAR_LCD(data_get(element, x, y)));
+
     return 1;
 }
 
-static int rli_tostring(lua_State *L)
+static int rli_clear(lua_State *L)
 {
+    fb_data *element = NULL;
+
     struct rocklua_image *a = rli_checktype(L, 1);
-    lua_pushfstring(L, ROCKLUA_IMAGE ": %dx%d", a->width, a->height);
-    return 1;
+    fb_data newvalue = (unsigned)luaL_optnumber(L, 2, 0);
+    int x1 = luaL_optnumber(L, 3, 0);
+    int y1 = luaL_optnumber(L, 4, 0);
+    int x2 = luaL_optnumber(L, 5, 0);
+    int y2 = luaL_optnumber(L, 6, 0);
+
+    lua_settop(L, 1);/* dump everything from stack but the image pointer */
+
+    if (!x1 || !x2 || !y1 || !y2) /* whole image */
+    {
+        newvalue = FB_SCALARPACK(newvalue);
+        memset(a->data, newvalue, a->bytes);
+    }
+    else
+    {
+        luaL_argcheck(L, 1 <= x1 && x1 <= a->width, 3, "index out of range");
+        luaL_argcheck(L, 1 <= y1 && y1 <= a->height, 4, "index out of range");
+        luaL_argcheck(L, 1 <= x2 && x2 <= a->width, 5, "index out of range");
+        luaL_argcheck(L, 1 <= y2 && y2 <= a->height, 6, "index out of range");
+
+        for (int y = y1; y <= y2; y++)
+        {
+            for (int x = x1; x <= x2; x++)
+            {
+                element =  data_element(a->data, a->bytes, x , y, a->width, a->height);
+
+                luaL_argcheck(L, element != NULL, 1, "data overflow");
+
+                data_set(element, x, y, FB_SCALARPACK((newvalue)));
+            }
+        }
+    }
+    return 0;
+}
+
+static int rli_invert(lua_State *L)
+{
+    fb_data *element = NULL;
+    unsigned value;
+
+    struct rocklua_image *a = rli_checktype(L, 1);
+    int x1 = luaL_optnumber(L, 2, 1);
+    int y1 = luaL_optnumber(L, 3, 1);
+    int x2 = luaL_optnumber(L, 4, a->width);
+    int y2 = luaL_optnumber(L, 5, a->height);
+
+    lua_settop(L, 1);/* dump everything from stack but the image pointer */
+
+    luaL_argcheck(L, 1 <= x1 && x1 <= a->width, 2, "index out of range");
+    luaL_argcheck(L, 1 <= y1 && y1 <= a->height, 3, "index out of range");
+    luaL_argcheck(L, 1 <= x2 && x2 <= a->width, 2, "index out of range");
+    luaL_argcheck(L, 1 <= y2 && y2 <= a->height, 3, "index out of range");
+
+    for (int y = y1; y <= y2; y++)
+    {
+        for (int x = x1; x <= x2; x++)
+        {
+            element =  data_element(a->data, a->bytes, x , y, a->width, a->height);
+
+            luaL_argcheck(L, element != NULL, 1, "data overflow");
+
+            value = FB_UNPACK_SCALAR_LCD(data_get(element, x, y));
+            #if defined(HAVE_LCD_COLOR)
+            value = invert_rgb(value);
+            #else
+            value = ~value;
+            #endif
+            data_set(element, x, y, FB_SCALARPACK((value)));
+        }
+    }
+
+    return 0;
+}
+
+
+static int rli_copy(lua_State *L)
+{
+    /*(dest*, src*, d_x1, d_y1, s_x2, s_y2, width, height, [operation], clr) */
+    fb_data *dest_element = NULL;
+    fb_data *src_element = NULL;
+    unsigned srcvalue;
+    unsigned destvalue;
+    int x = 0;
+    int y = 0;
+
+    struct rocklua_image *d = rli_checktype(L, 1); /*dest*/
+    struct rocklua_image *s = rli_checktype(L, 2); /*src*/
+    int d_x1 = luaL_optnumber(L, 3, 0);
+    int d_y1 = luaL_optnumber(L, 4, 0);
+    int s_x2 = luaL_optnumber(L, 5, 0);
+    int s_y2 = luaL_optnumber(L, 6, 0);
+    int w  = luaL_optnumber(L, 7, 0);
+    int h  = luaL_optnumber(L, 8, 0);
+    const int op = luaL_optnumber(L, 9, 0);
+    const unsigned clr = luaL_optnumber(L, 10, 0);
+    lua_settop(L, 2); /* dump everything from stack but the image pointers */
+
+    if (!d_x1 || !s_x2 || !d_y1 || !s_y2) //whole image
+    {
+        luaL_argcheck(L, s->bytes == d->bytes && s->width == d-> width,
+                                             2, "image size mismatch");
+        memcpy(d->data, s->data, d->bytes);
+    }
+
+    if (w == 0)
+        w = MIN(d->width - d_x1, s->width - s_x2 );
+    if (h == 0)
+        h = MIN(d->height - d_y1, s->height - s_y2 );
+
+    while ((y + d_y1 <= d->height && y <= h) &&
+          (y + s_y2 <= s->height && y <= h))
+    {
+
+        while ((x + d_x1 <= d->width && x <= w) &&
+              (x + s_x2 <= s->width && x <= w))
+        {
+            dest_element = data_element(d->data, d->bytes,
+                                        x + d_x1 , y + d_y1,
+                                        d->width, d->height);
+
+            src_element = data_element(s->data, s->bytes,
+                                       x + s_x2 , y + s_y2,
+                                       s->width, s->height);
+
+            luaL_argcheck(L, src_element != NULL && dest_element != NULL,
+                             1, "image data overflow");
+
+            srcvalue = FB_UNPACK_SCALAR_LCD(data_get(src_element, x + s_x2, y + s_y2));
+            destvalue = FB_UNPACK_SCALAR_LCD(data_get(dest_element, x + d_x1, y + d_y1));
+
+            switch (op)
+            {
+                default:
+                case 0:
+                    destvalue = srcvalue; //copy
+                    break;
+                case 1:
+                    destvalue |= srcvalue; //or
+                    break;
+                case 2:
+                    destvalue ^= srcvalue; //xor
+                    break;
+                case 3:
+                    destvalue = ~(destvalue | srcvalue); //nor
+                    break;
+                case 4:
+                    destvalue &= srcvalue; //and
+                    break;
+                case 5:
+                    destvalue = ~(destvalue & srcvalue); //nand
+                    break;
+                case 6:
+                    destvalue = ~srcvalue; //not
+                    break;
+#ifdef HAVE_LCD_COLOR
+                case 7:
+                    if (srcvalue != clr)
+                        destvalue = srcvalue;
+                    break;
+                case 8:
+                    if (srcvalue == clr)
+                        destvalue = srcvalue;
+                    break;
+                case 9:
+                    if (srcvalue > clr)
+                        destvalue = srcvalue;
+                    break;
+                case 10:
+                    if (srcvalue < clr)
+                        destvalue = srcvalue;
+                    break;
+                case 11:
+                    if (destvalue != clr)
+                        destvalue = srcvalue;
+                    break;
+                case 12:
+                    if (destvalue == clr)
+                        destvalue = srcvalue;
+                    break;
+                case 13:
+                    if (destvalue > clr)
+                        destvalue = srcvalue;
+                    break;
+                case 14:
+                    if (destvalue < clr)
+                        destvalue = srcvalue;
+                    break;
+#endif
+            } /*switch op*/
+
+            data_set(dest_element, x + d_x1, y + d_y1, FB_SCALARPACK(destvalue));
+
+            x++;
+        }
+        x = 0;
+        y++;
+
+    }
+    return 0;
 }
 
 static const struct luaL_reg rli_lib [] =
 {
     {"__tostring", rli_tostring},
-    {"set", rli_set},
-    {"get", rli_get},
-    {"width", rli_width},
+    {"size",   rli_size},
+    {"width",  rli_width},
     {"height", rli_height},
+    {"set",    rli_set},
+    {"get",    rli_get},
+    {"copy",   rli_copy},
+    {"clear",  rli_clear},
+    {"invert", rli_invert},
     {NULL, NULL}
 };
 
 static inline void rli_init(lua_State *L)
 {
+
+    if (LCD_PIXELFORMAT == HORIZONTAL_PACKING)
+    {
+        if (LCD_DEPTH == 2)
+        {
+            x_shift = 2U;
+            pixmask = (fb_data *) pixmask_h2;
+        }
+    }
+    else if (LCD_PIXELFORMAT == VERTICAL_PACKING)
+    {
+        if (LCD_DEPTH == 1)
+        {
+            y_shift = 3U;
+
+            pixmask = (fb_data *) pixmask_v1;
+        }
+        else if (LCD_DEPTH == 2)
+        {
+            y_shift = 2U;
+            pixmask = (fb_data *) pixmask_v2;
+        }
+    }
+    else if (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
+    {
+        if (LCD_DEPTH == 2)
+        {
+            y_shift = 3U;
+            pixmask = (fb_data *) pixmask_vi2;
+        }
+    }
+
+    if (y_shift)
+        xy_mask = ((1 << y_shift) -1);
+    else if (x_shift)
+        xy_mask = ((1 << x_shift) -1);
+
     luaL_newmetatable(L, ROCKLUA_IMAGE);
 
     lua_pushstring(L, "__index");
@@ -193,9 +603,9 @@ static void check_tablevalue(lua_State *L, const char* key, int tablepos, void* 
 {
     lua_getfield(L, tablepos, key); /* Find table[key] */
 
-    if(!lua_isnoneornil(L, -1))
+    if (!lua_isnoneornil(L, -1))
     {
-        if(unsigned_val)
+        if (unsigned_val)
             *(unsigned*)res = luaL_checkint(L, -1);
         else
             *(int*)res = luaL_checkint(L, -1);
@@ -206,14 +616,14 @@ static void check_tablevalue(lua_State *L, const char* key, int tablepos, void* 
 
 static struct viewport* opt_viewport(lua_State *L, int narg, struct viewport* alt)
 {
-    if(lua_isnoneornil(L, narg))
+    if (lua_isnoneornil(L, narg))
         return alt;
 
     int tablepos = lua_gettop(L);
     struct viewport *vp;
 
     lua_getfield(L, tablepos, "vp");  /* get table['vp'] */
-    if(lua_isnoneornil(L, -1))
+    if (lua_isnoneornil(L, -1))
     {
         lua_pop(L, 1); /* Pop nil off stack */
 
@@ -329,7 +739,7 @@ RB_WRAP(lcd_bitmap)
 RB_WRAP(lcd_get_backdrop)
 {
     fb_data* backdrop = rb->lcd_get_backdrop();
-    if(backdrop == NULL)
+    if (backdrop == NULL)
         lua_pushnil(L);
     else
         rli_wrap(L, backdrop, LCD_WIDTH, LCD_HEIGHT);
@@ -398,12 +808,12 @@ RB_WRAP(kbd_input)
     const char *input = luaL_optstring(L, 1, NULL);
     char *buffer = luaL_prepbuffer(&b);
 
-    if(input != NULL)
+    if (input != NULL)
         rb->strlcpy(buffer, input, LUAL_BUFFERSIZE);
     else
         buffer[0] = '\0';
 
-    if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE))
+    if (!rb->kbd_input(buffer, LUAL_BUFFERSIZE))
     {
         luaL_addsize(&b, strlen(buffer));
         luaL_pushresult(&b);
@@ -476,18 +886,18 @@ RB_WRAP(read_bmp_file)
     bool transparent = luaL_optboolean(L, 3, false);
     int format = FORMAT_NATIVE;
 
-    if(dither)
+    if (dither)
         format |= FORMAT_DITHER;
 
-    if(transparent)
+    if (transparent)
         format |= FORMAT_TRANSPARENT;
 
     int result = rb->read_bmp_file(filename, &bm, 0, format | FORMAT_RETURN_SIZE, NULL);
 
-    if(result > 0)
+    if (result > 0)
     {
         bm.data = (unsigned char*) rli_alloc(L, bm.width, bm.height);
-        if(rb->read_bmp_file(filename, &bm, result, format, NULL) < 0)
+        if (rb->read_bmp_file(filename, &bm, result, format, NULL) < 0)
         {
             /* Error occured, drop newly allocated image from stack */
             lua_pop(L, 1);
@@ -503,7 +913,7 @@ RB_WRAP(read_bmp_file)
 RB_WRAP(current_path)
 {
     const char *current_path = get_current_path(L, 1);
-    if(current_path != NULL)
+    if (current_path != NULL)
         lua_pushstring(L, current_path);
     else
         lua_pushnil(L);
@@ -518,9 +928,9 @@ static void fill_text_message(lua_State *L, struct text_message * message,
     luaL_checktype(L, pos, LUA_TTABLE);
     int n = luaL_getn(L, pos);
     const char **lines = (const char**) tlsf_malloc(n * sizeof(const char*));
-    if(lines == NULL)
+    if (lines == NULL)
         luaL_error(L, "Can't allocate %d bytes!", n * sizeof(const char*));
-    for(i=1; i<=n; i++)
+    for (i=1; i<=n; i++)
     {
         lua_rawgeti(L, pos, i);
         lines[i-1] = luaL_checkstring(L, -1);
@@ -536,17 +946,17 @@ RB_WRAP(gui_syncyesno_run)
     struct text_message *yes = NULL, *no = NULL;
 
     fill_text_message(L, &main_message, 1);
-    if(!lua_isnoneornil(L, 2))
+    if (!lua_isnoneornil(L, 2))
         fill_text_message(L, (yes = &yes_message), 2);
-    if(!lua_isnoneornil(L, 3))
+    if (!lua_isnoneornil(L, 3))
         fill_text_message(L, (no = &no_message), 3);
 
     enum yesno_res result = rb->gui_syncyesno_run(&main_message, yes, no);
 
     tlsf_free(main_message.message_lines);
-    if(yes)
+    if (yes)
         tlsf_free(yes_message.message_lines);
-    if(no)
+    if (no)
         tlsf_free(no_message.message_lines);
 
     lua_pushinteger(L, result);
@@ -567,9 +977,9 @@ RB_WRAP(do_menu)
 
     n = luaL_getn(L, 2);
     items = (const char**) tlsf_malloc(n * sizeof(const char*));
-    if(items == NULL)
+    if (items == NULL)
         luaL_error(L, "Can't allocate %d bytes!", n * sizeof(const char*));
-    for(i=1; i<=n; i++)
+    for (i=1; i<=n; i++)
     {
         lua_rawgeti(L, 2, i); /* Push item on the stack */
         items[i-1] = luaL_checkstring(L, -1);
