@@ -38,7 +38,7 @@
  * from Lua in its stack in direct order (the first argument is pushed first). To return values to Lua,
  * a C function just pushes them onto the stack, in direct order (the first result is pushed first),
  * and returns the number of results. Any other value in the stack below the results will be properly
- * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results. 
+ * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results.
  *
  * When porting new functions, don't forget to check rocklib_aux.pl whether it automatically creates
  * wrappers for the function and if so, add the function names to @forbidden_functions. This is to
@@ -61,11 +61,11 @@ struct rocklua_image
     int height;
     fb_data *data;
     fb_data dummy[1][1];
-};
+} rocklua_image;
 
 static void rli_wrap(lua_State *L, fb_data *src, int width, int height)
 {
-    struct rocklua_image *a = (struct rocklua_image *)lua_newuserdata(L, sizeof(struct rocklua_image));
+    rocklua_image *a = (rocklua_image *)lua_newuserdata(L, sizeof(rocklua_image));
 
     luaL_getmetatable(L, ROCKLUA_IMAGE);
     lua_setmetatable(L, -2);
@@ -77,8 +77,8 @@ static void rli_wrap(lua_State *L, fb_data *src, int width, int height)
 
 static fb_data* rli_alloc(lua_State *L, int width, int height)
 {
-    size_t nbytes = sizeof(struct rocklua_image) + ((width*height) - 1) * sizeof(fb_data);
-    struct rocklua_image *a = (struct rocklua_image *)lua_newuserdata(L, nbytes);
+    size_t nbytes = sizeof(rocklua_image) + ((width*height) - 1) * sizeof(fb_data);
+    rocklua_image *a = (rocklua_image *)lua_newuserdata(L, nbytes);
 
     luaL_getmetatable(L, ROCKLUA_IMAGE);
     lua_setmetatable(L, -2);
@@ -100,30 +100,30 @@ static int rli_new(lua_State *L)
     return 1;
 }
 
-static struct rocklua_image* rli_checktype(lua_State *L, int arg)
+static rocklua_image* rli_checktype(lua_State *L, int arg)
 {
     void *ud = luaL_checkudata(L, arg, ROCKLUA_IMAGE);
     luaL_argcheck(L, ud != NULL, arg, "'" ROCKLUA_IMAGE "' expected");
-    return (struct rocklua_image*) ud;
+    return (rocklua_image*) ud;
 }
 
 static int rli_width(lua_State *L)
 {
-    struct rocklua_image *a = rli_checktype(L, 1);
+    rocklua_image *a = rli_checktype(L, 1);
     lua_pushnumber(L, a->width);
     return 1;
 }
 
 static int rli_height(lua_State *L)
 {
-    struct rocklua_image *a = rli_checktype(L, 1);
+    rocklua_image *a = rli_checktype(L, 1);
     lua_pushnumber(L, a->height);
     return 1;
 }
 
 static fb_data* rli_element(lua_State *L)
 {
-    struct rocklua_image *a = rli_checktype(L, 1);
+    rocklua_image *a = rli_checktype(L, 1);
     int x = luaL_checkint(L, 2);
     int y = luaL_checkint(L, 3);
 
@@ -151,7 +151,7 @@ static int rli_get(lua_State *L)
 
 static int rli_tostring(lua_State *L)
 {
-    struct rocklua_image *a = rli_checktype(L, 1);
+    rocklua_image *a = rli_checktype(L, 1);
     lua_pushfstring(L, ROCKLUA_IMAGE ": %dx%d", a->width, a->height);
     return 1;
 }
@@ -269,7 +269,7 @@ RB_WRAP(lcd_framebuffer)
 
 RB_WRAP(lcd_mono_bitmap_part)
 {
-    struct rocklua_image *src = rli_checktype(L, 1);
+    rocklua_image *src = rli_checktype(L, 1);
     int src_x = luaL_checkint(L, 2);
     int src_y = luaL_checkint(L, 3);
     int stride = luaL_checkint(L, 4);
@@ -285,7 +285,7 @@ RB_WRAP(lcd_mono_bitmap_part)
 
 RB_WRAP(lcd_mono_bitmap)
 {
-    struct rocklua_image *src = rli_checktype(L, 1);
+    rocklua_image *src = rli_checktype(L, 1);
     int x = luaL_checkint(L, 2);
     int y = luaL_checkint(L, 3);
     int width = luaL_checkint(L, 4);
@@ -299,7 +299,7 @@ RB_WRAP(lcd_mono_bitmap)
 #if LCD_DEPTH > 1
 RB_WRAP(lcd_bitmap_part)
 {
-    struct rocklua_image *src = rli_checktype(L, 1);
+    rocklua_image *src = rli_checktype(L, 1);
     int src_x = luaL_checkint(L, 2);
     int src_y = luaL_checkint(L, 3);
     int stride = luaL_checkint(L, 4);
@@ -315,7 +315,7 @@ RB_WRAP(lcd_bitmap_part)
 
 RB_WRAP(lcd_bitmap)
 {
-    struct rocklua_image *src = rli_checktype(L, 1);
+    rocklua_image *src = rli_checktype(L, 1);
     int x = luaL_checkint(L, 2);
     int y = luaL_checkint(L, 3);
     int width = luaL_checkint(L, 4);
@@ -341,7 +341,7 @@ RB_WRAP(lcd_get_backdrop)
 #if LCD_DEPTH == 16
 RB_WRAP(lcd_bitmap_transparent_part)
 {
-    struct rocklua_image *src = rli_checktype(L, 1);
+    rocklua_image *src = rli_checktype(L, 1);
     int src_x = luaL_checkint(L, 2);
     int src_y = luaL_checkint(L, 3);
     int stride = luaL_checkint(L, 4);
@@ -357,7 +357,7 @@ RB_WRAP(lcd_bitmap_transparent_part)
 
 RB_WRAP(lcd_bitmap_transparent)
 {
-    struct rocklua_image *src = rli_checktype(L, 1);
+    rocklua_image *src = rli_checktype(L, 1);
     int x = luaL_checkint(L, 2);
     int y = luaL_checkint(L, 3);
     int width = luaL_checkint(L, 4);
@@ -434,7 +434,7 @@ RB_WRAP(font_getstringsize)
     int fontnumber = luaL_checkint(L, 2);
     int w, h;
 
-    if (fontnumber == FONT_UI)
+    if(fontnumber == FONT_UI)
         fontnumber = rb->global_status->font_id[SCREEN_MAIN];
     else
         fontnumber = FONT_SYSFIXED;
@@ -670,7 +670,7 @@ RB_WRAP(get_plugin_action)
 #ifdef HAVE_REMOTE_LCD
     static const struct button_mapping *m2[] = { pla_main_ctx, pla_remote_ctx };
     bool with_remote = luaL_optint(L, 2, 0);
-    if (with_remote)
+    if(with_remote)
         btn = pluginlib_getaction(timeout, m2, 2);
     else
 #endif
