@@ -38,7 +38,7 @@
  * from Lua in its stack in direct order (the first argument is pushed first). To return values to Lua,
  * a C function just pushes them onto the stack, in direct order (the first result is pushed first),
  * and returns the number of results. Any other value in the stack below the results will be properly
- * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results. 
+ * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results.
  *
  * When porting new functions, don't forget to check rocklib_aux.pl whether it automatically creates
  * wrappers for the function and if so, add the function names to @forbidden_functions. This is to
@@ -434,7 +434,7 @@ RB_WRAP(font_getstringsize)
     int fontnumber = luaL_checkint(L, 2);
     int w, h;
 
-    if (fontnumber == FONT_UI)
+    if(fontnumber == FONT_UI)
         fontnumber = rb->global_status->font_id[SCREEN_MAIN];
     else
         fontnumber = FONT_SYSFIXED;
@@ -670,7 +670,7 @@ RB_WRAP(get_plugin_action)
 #ifdef HAVE_REMOTE_LCD
     static const struct button_mapping *m2[] = { pla_main_ctx, pla_remote_ctx };
     bool with_remote = luaL_optint(L, 2, 0);
-    if (with_remote)
+    if(with_remote)
         btn = pluginlib_getaction(timeout, m2, 2);
     else
 #endif
