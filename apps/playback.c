@@ -35,6 +35,9 @@
 #include "talk.h"
 #include "playlist.h"
 #include "abrepeat.h"
+#ifdef HAVE_PLAY_FREQ
+#include "pcm_mixer.h"
+#endif
 #include "pcmbuf.h"
 #include "audio_thread.h"
 #include "playback.h"
@@ -335,6 +338,7 @@ enum audio_start_playback_flags
 {
     AUDIO_START_RESTART = 0x1, /* "Restart" playback (flush _all_ tracks) */
     AUDIO_START_NEWBUF  = 0x2, /* Mark the audiobuffer as invalid */
+    AUDIO_START_REFRESH = 0x80
 };
 
 static void audio_start_playback(const struct audio_resume_info *resume_info,
@@ -2586,9 +2590,22 @@ static void audio_on_track_changed(void)
 static void audio_start_playback(const struct audio_resume_info *resume_info,
                                  unsigned int flags)
 {
-    struct audio_resume_info resume =
-        *(resume_info ?: &(struct audio_resume_info){ 0, 0 } );
+    static struct audio_resume_info resume = { 0, 0 };
     enum play_status old_status = play_status;
+
+    if (!(flags & AUDIO_START_REFRESH))
+    {
+        if (resume_info)
+        {
+            resume.elapsed = resume_info->elapsed;
+            resume.offset = resume_info->offset;
+        }
+        else
+        {
+            resume.elapsed = 0;
+            resume.offset = 0;
+        }
+    }
 
     if (flags & AUDIO_START_NEWBUF)
     {
@@ -2613,8 +2630,13 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
             /* Clear out some stuff to resume the current track where it
                left off */
             pcmbuf_play_stop();
-            resume.elapsed = id3_get(PLAYING_ID3)->elapsed;
-            resume.offset = id3_get(PLAYING_ID3)->offset;
+
+            if (!(flags & AUDIO_START_REFRESH))
+            {
+                resume.elapsed = id3_get(PLAYING_ID3)->elapsed;
+                resume.offset = id3_get(PLAYING_ID3)->offset;
+            }
+
             track_list_clear(TRACK_LIST_CLEAR_ALL);
             pcmbuf_update_frequency();
         }
@@ -2629,6 +2651,7 @@ static void audio_start_playback(const struct audio_resume_info *resume_info,
             pcmbuf_start_track_change(TRACK_CHANGE_MANUAL);
             wipe_track_metadata(true);
         }
+        pcmbuf_update_frequency();
 
         /* Set after track finish event in case skip was in progress */
         skip_pending = TRACK_SKIP_NONE;
@@ -3220,7 +3243,7 @@ void audio_playback_handler(struct queue_event *ev)
         case Q_AUDIO_REMAKE_AUDIO_BUFFER:
             /* buffer needs to be reinitialized */
             LOGFQUEUE("playback < Q_AUDIO_REMAKE_AUDIO_BUFFER");
-            audio_start_playback(NULL, AUDIO_START_RESTART | AUDIO_START_NEWBUF);
+            audio_start_playback(NULL, AUDIO_START_RESTART | AUDIO_START_NEWBUF | (ev->data ? AUDIO_START_REFRESH : 0));
             if (play_status == PLAY_STOPPED)
                 return; /* just need to change buffer state */
             break;
@@ -3795,15 +3818,57 @@ void audio_set_crossfade(int enable)
 #endif /* HAVE_CROSSFADE */
 
 #ifdef HAVE_PLAY_FREQ
+static unsigned long audio_guess_frequency(struct mp3entry *id3)
+{
+    return (id3->frequency % 4000) ? SAMPR_44 : SAMPR_48;
+}
+
+static void audio_change_frequency_callback(unsigned short id, void *data)
+{
+    static bool starting_playback = false;
+    struct mp3entry *id3;
+
+    switch (id)
+    {
+    case PLAYBACK_EVENT_START_PLAYBACK:
+        starting_playback = true;
+        break;
+
+    case PLAYBACK_EVENT_TRACK_CHANGE:
+        id3 = ((struct track_event *)data)->id3;
+        if (id3 && !global_settings.play_frequency)
+        {
+            unsigned long guessed_frequency = audio_guess_frequency(id3);
+            if (mixer_get_frequency() != guessed_frequency)
+            {
+#ifdef PLAYBACK_VOICE
+                voice_stop();
+#endif
+                mixer_set_frequency(guessed_frequency);
+                audio_queue_post(Q_AUDIO_REMAKE_AUDIO_BUFFER, starting_playback);
+            }
+        }
+        starting_playback = false;
+        break;
+
+    default:
+        break;
+    }
+}
+
 void audio_set_playback_frequency(int setting)
 {
     static const unsigned long play_sampr[] = { SAMPR_44, SAMPR_48 };
 
-    if ((unsigned)setting >= ARRAYLEN(play_sampr))
+    if ((unsigned)setting > ARRAYLEN(play_sampr)) /* [0] is "automatic" */
         setting = 0;
 
     unsigned long playback_sampr = mixer_get_frequency();
-    unsigned long sampr = play_sampr[setting];
+    unsigned long sampr = setting ?
+      play_sampr[setting - 1] :
+      ((audio_status() == AUDIO_STATUS_PLAY) ?
+       audio_guess_frequency(audio_current_track()) :
+       playback_sampr);
 
     if (sampr != playback_sampr)
     {
@@ -3829,6 +3894,10 @@ void INIT_ATTR playback_init(void)
     track_list_init();
     buffering_init();
     pcmbuf_update_frequency();
+#ifdef HAVE_PLAY_FREQ
+    add_event(PLAYBACK_EVENT_TRACK_CHANGE, audio_change_frequency_callback);
+    add_event(PLAYBACK_EVENT_START_PLAYBACK, audio_change_frequency_callback);
+#endif
 #ifdef HAVE_CROSSFADE
     /* Set crossfade setting for next buffer init which should be about... */
     pcmbuf_request_crossfade_enable(global_settings.crossfade);
