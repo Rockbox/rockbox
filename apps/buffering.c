@@ -1181,7 +1181,7 @@ static void rebuffer_handle(int handle_id, off_t newpos)
 
 #ifdef STORAGE_WANTS_ALIGN
     /* Strip alignment padding then redo */
-    size_t new_index = ringbuf_add(ringbuf_offset(h), sizeof (*h));
+    size_t new_index = ringbuf_add(ringbuf_offset(h), h->size);
 
     /* Align to desired storage alignment if space permits - handle could
        have been shrunken too close to the following one after a previous
