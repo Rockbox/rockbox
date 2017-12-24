@@ -453,7 +453,6 @@ int _dos_findnext(struct find_t *f)
 void _dos_getdate(struct dosdate_t *date)
 {
 	time_t curtime = time(NULL);
-	struct tm *tm;
 	
 	if (date == NULL) {
 		return;
@@ -461,11 +460,10 @@ void _dos_getdate(struct dosdate_t *date)
 	
 	memset(date, 0, sizeof(struct dosdate_t));
 
-        rb->mktime(&tm);
-        date->day = tm->tm_mday;
-        date->month = tm->tm_mon + 1;
-        date->year = tm->tm_year + 1900;
-        date->dayofweek = tm->tm_wday + 1;
+        date->day = 1;
+        date->month = 1;
+        date->year = 1970;
+        date->dayofweek = 4;
 }
 #endif
 

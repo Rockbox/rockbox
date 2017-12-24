@@ -83,8 +83,6 @@ _FILE_ *_fopen_(const char *path, const char *mode)
 
     if (fd < 0)
     {
-        //extern int errno;
-        //rb->splashf(HZ*2, "open of %s failed (%d)", path, errno);
         return NULL;
     }
 
@@ -122,11 +120,12 @@ size_t _fwrite_(const void *ptr, size_t size, size_t nmemb, _FILE_ *stream)
 
         return ret / size;
     }
-#if 1
+#if 0
+    /* stderr, stdout (disabled) */
     else
     {
         char buf[10];
-        rb->snprintf(buf, 10, "%%%ds", size*nmemb);
+        rb->snprintf(buf, 10, "%%%ds", (int)(size*nmemb));
         rb->splashf(HZ, buf, ptr);
         return size * nmemb;
     }

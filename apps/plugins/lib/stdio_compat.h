@@ -42,7 +42,9 @@
 #define ferror _ferror_
 #define feof   _feof_
 #define fprintf _fprintf_
+#undef stdout
 #define stdout _stdout_
+#undef stderr
 #define stderr _stderr_
 
 typedef struct {
