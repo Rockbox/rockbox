@@ -38,8 +38,11 @@
 #define ungetc _ungetc_
 #define fputc  _fputc_
 #define fgets  _fgets_
+#undef clearerr
 #define clearerr _clearerr_
+#undef ferror
 #define ferror _ferror_
+#undef feof
 #define feof   _feof_
 #define fprintf _fprintf_
 #undef stdout
