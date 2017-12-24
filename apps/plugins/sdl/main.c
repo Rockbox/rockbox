@@ -250,7 +250,7 @@ enum plugin_status plugin_start(const void *param)
     /* we always use the audio buffer */
     size_t sz;
     audiobuf = rb->plugin_get_audio_buffer(&sz);
-#ifndef SIMULATOR
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     if ((uintptr_t)audiobuf < (uintptr_t)plugin_start_addr)
     {
         uint32_t tmp_size = (uintptr_t)plugin_start_addr - (uintptr_t)audiobuf;

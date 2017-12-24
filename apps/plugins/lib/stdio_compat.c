@@ -120,16 +120,11 @@ size_t _fwrite_(const void *ptr, size_t size, size_t nmemb, _FILE_ *stream)
 
         return ret / size;
     }
-#if 0
     /* stderr, stdout (disabled) */
     else
     {
-        char buf[10];
-        rb->snprintf(buf, 10, "%%%ds", (int)(size*nmemb));
-        rb->splashf(HZ, buf, ptr);
         return size * nmemb;
     }
-#endif
 }
 
 int _fseek_(_FILE_ *stream, long offset, int whence)
