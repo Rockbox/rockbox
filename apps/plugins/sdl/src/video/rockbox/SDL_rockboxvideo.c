@@ -669,12 +669,12 @@ static void ROCKBOX_UnlockHWSurface(_THIS, SDL_Surface *surface)
 #if LCD_PIXELFORMAT == RGB565SWAPPED
 static void flip_pixels(int x, int y, int w, int h)
 {
-    for(int y = rects[i].y; y < rects[i].y + rects[i].h; ++y)
+    for(int y_0 = y; y_0 < y + h; ++y_0)
     {
-        for(int x = rects[i].x; x < rects[i].x + rects[i].w; ++x)
+        for(int x_0 = x; x_0 < x + w; ++x_0)
         {
             /* swap pixels directly in the framebuffer */
-            rb->lcd_framebuffer[y * LCD_WIDTH + x] = swap16(rb->lcd_framebuffer[y * LCD_WIDTH + x]);
+            rb->lcd_framebuffer[y_0 * LCD_WIDTH + x_0] = swap16(rb->lcd_framebuffer[y_0 * LCD_WIDTH + x_0]);
         }
     }
 }
