@@ -50,7 +50,7 @@ $(SDL_OBJDIR)/duke3d.ovl: $(SDL_OBJ) $(DUKE3D_OBJ) $(TLSFLIB) $(DUKE3D_OUTLDS)
 		-lgcc $(SDL_OVLFLAGS)
 	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
 
-$(SDL_OBJDIR)/%.o: $(SDL_SRCDIR)/%.c $(SDL_SRCDIR)/sdl.make
+$(SDL_OBJDIR)/%.o: $(SDL_SRCDIR)/%.c $(SDL_SRCDIR)/sdl.make $(BUILDDIR)/sysfont.h
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(SDLFLAGS) -c $< -o $@
 	$(SILENT)$(OC) --redefine-syms=$(SDL_SRCDIR)/redefines.txt $@
