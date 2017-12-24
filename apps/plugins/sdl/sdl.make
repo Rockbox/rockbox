@@ -23,7 +23,7 @@ OTHER_INC += -I$(SDL_SRCDIR)/include
 # include comes first because of possible system SDL headers taking
 # precedence
 SDLFLAGS = -I$(SDL_SRCDIR)/include $(filter-out -O%,$(PLUGINFLAGS))	\
--O3 -Wno-unused-parameter -Xpreprocessor -Wno-undef -Wcast-align
+-O3 -Wno-unused-parameter -Xpreprocessor -Wno-undef -Wcast-align -w
 
 ifndef APP_TYPE
     ### no target has a big enough plugin buffer

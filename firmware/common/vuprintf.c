@@ -23,6 +23,7 @@
 #include <limits.h>
 #include <string.h>
 #include <stddef.h>
+#include <stdio.h> /* for snprintf */
 #include "system.h"
 #include "vuprintf.h"
 
@@ -533,6 +534,8 @@ static const char * format_f(double f,
                              int radixchar,
                              bool *numericp)
 {
+    (void) radixchar;
+    (void) numericp;
     fmt_buf->length = snprintf(fmt_buf->buf, 24, "%d.%06d", (int)f, ABS((int)((f - (int)f)*1e6)));
     return fmt_buf->buf;
 }
