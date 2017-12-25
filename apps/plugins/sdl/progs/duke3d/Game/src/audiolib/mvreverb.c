@@ -1,7 +1,8 @@
 #include "multivoc.h"
 #include "_multivc.h"
+#include "fixedpoint.h"
 
-extern double *MV_FooBuffer;
+extern long *MV_FooBuffer;
 extern int MV_BufferSize;
 extern int MV_SampleSize;
 extern int MV_MaxVolume;
@@ -220,7 +221,7 @@ void MV_FPReverb(int volume)
 	{
 		for (i = 0; i < count; i++)
 		{
-			double temp = MV_FooBuffer[i];
+                    double temp = MV_FooBuffer[i] * recip;
 			MV_FooBuffer[i] += ((MixREVERBLeft(temp, temp, reverbBuffer) + MixREVERBRight()) * .5) * (double)volume / (double)MV_MaxVolume;
 		}
 	}
@@ -229,13 +230,13 @@ void MV_FPReverb(int volume)
 		count >>= 1;
 		for (i = 0; i < count; i++)
 		{
-			double left = MV_FooBuffer[i*2];
-			double right = MV_FooBuffer[i*2+1];
+			double left = MV_FooBuffer[i*2] * recip;
+			double right = MV_FooBuffer[i*2+1] * recip;
 			double scale = (double)volume / (double)MV_MaxVolume;
 			left += MixREVERBLeft(left, right, reverbBuffer) * scale;
 			right += MixREVERBRight() * scale;
-			MV_FooBuffer[i*2] = left;
-			MV_FooBuffer[i*2+1] = right;
+			MV_FooBuffer[i*2] = left * (double)(1 << FRACBITS);
+			MV_FooBuffer[i*2+1] = right * (double)(1 << FRACBITS);
 		}
 	}
 
@@ -265,7 +266,7 @@ void MV_16BitDownmix(char *dest, int count)
 
 	for (i = 0; i < count; i++)
 	{
-		int out = (int)((MV_FooBuffer[i] * (double)0x8000));
+            int out = MV_FooBuffer[i] * 0x8000 >> FRACBITS;
 		if (out < -32768) pdest[i] = -32768;
 		else if (out > 32767) pdest[i] = 32767;
 		else pdest[i] = out;
@@ -278,7 +279,7 @@ void MV_8BitDownmix(char *dest, int count)
 
 	for (i = 0; i < count; i++)
 	{
-		int out = ((int)((MV_FooBuffer[i] * (double)0x80)));
+            int out = MV_FooBuffer[i] * 0x80 >> FRACBITS;
 		if (out < -128) dest[i] = 0;
 		else if (out > 127) dest[i] = 255;
 		else dest[i] = out + 0x80;

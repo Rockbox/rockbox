@@ -120,7 +120,8 @@ static int MV_FooMemory;
 static int   MV_BufferDescriptor;
 static int   MV_BufferEmpty[ NumberOfBuffers ];
 char *MV_MixBuffer[ NumberOfBuffers + 1 ];
-double *MV_FooBuffer = NULL;
+/* fixed-point */
+long *MV_FooBuffer = NULL;
 
 static VoiceNode *MV_Voices = NULL;
 
@@ -459,7 +460,7 @@ void MV_ServiceVoc
 	}
 	
 	{
-		ClearBuffer_DW( MV_FooBuffer, 0, sizeof(double) / 4 * MV_BufferSize / MV_SampleSize * MV_Channels);
+		ClearBuffer_DW( MV_FooBuffer, 0, sizeof(long) / 4 * MV_BufferSize / MV_SampleSize * MV_Channels);
 		MV_BufferEmpty[ MV_MixPage ] = TRUE;
 	}
 	
@@ -3109,7 +3110,7 @@ int MV_Init
    MV_SetVolume( MV_MaxTotalVolume );
 
 
-   MV_FooMemory = sizeof(double) * MixBufferSize * numchannels + 1024;
+   MV_FooMemory = sizeof(long) * MixBufferSize * numchannels + 1024;
    status = USRHOOKS_GetMem( ( void ** )&ptr, MV_FooMemory);
    if ( status != USRHOOKS_Ok )
    {

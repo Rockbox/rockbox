@@ -37,6 +37,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // forward declare
 //struct SDL_mutex;
 
+#define FRACBITS 8
+static const double recip = 1 / (double) (1 << FRACBITS);
 
 #define MV_MinVoiceHandle  1
 

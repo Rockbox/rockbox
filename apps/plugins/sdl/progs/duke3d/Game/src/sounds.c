@@ -50,64 +50,64 @@ int32_t backflag,numenvsnds;
 */
 
 void SoundStartup( void )
-   {
-   int32 status;
+{
+    int32 status;
 
-   // if they chose None lets return
-   if (FXDevice == NumSoundCards) return;
+    // if they chose None lets return
+    if (FXDevice == NumSoundCards) return;
 
-   // Do special Sound Blaster, AWE32 stuff
-   if (
-         ( FXDevice == SoundBlaster ) ||
-         ( FXDevice == Awe32 )
-      )
-      {
-      int MaxVoices;
-      int MaxBits;
-      int MaxChannels;
+    // Do special Sound Blaster, AWE32 stuff
+    if (
+        ( FXDevice == SoundBlaster ) ||
+        ( FXDevice == Awe32 )
+        )
+    {
+        int MaxVoices;
+        int MaxBits;
+        int MaxChannels;
 
-      status = FX_SetupSoundBlaster
-                  (
-                  BlasterConfig, (int *)&MaxVoices, (int *)&MaxBits, (int *)&MaxChannels
-                  );
-      }
-   else
-      {
-      status = FX_Ok;
-      }
+        status = FX_SetupSoundBlaster
+            (
+                BlasterConfig, (int *)&MaxVoices, (int *)&MaxBits, (int *)&MaxChannels
+                );
+    }
+    else
+    {
+        status = FX_Ok;
+    }
 
-   if ( status == FX_Ok )
-      {
-      if ( eightytwofifty && numplayers > 1)
-         {
-         status = FX_Init( FXDevice, min( NumVoices,4 ), 1, 8, 8000 );
-         }
-      else
-         {
-         status = FX_Init( FXDevice, NumVoices, NumChannels, NumBits, MixRate );
-         }
-      if ( status == FX_Ok )
-         {
+    if ( status == FX_Ok )
+    {
+        if ( eightytwofifty && numplayers > 1)
+        {
+            status = FX_Init( FXDevice, min( NumVoices,4 ), 1, 8, 8000 );
+        }
+        else
+        {
+            status = FX_Init( FXDevice, NumVoices, NumChannels, NumBits, MixRate );
+        }
+        if ( status == FX_Ok )
+        {
 
-         FX_SetVolume( FXVolume );
-         if (ReverseStereo == 1)
+            FX_SetVolume( FXVolume );
+            if (ReverseStereo == 1)
             {
-            FX_SetReverseStereo(!FX_GetReverseStereo());
+                FX_SetReverseStereo(!FX_GetReverseStereo());
             }
-         }
-      }
-   if ( status != FX_Ok )
-      {
-      Error(EXIT_FAILURE, FX_ErrorString( FX_Error ));
-      }
+        }
+    }
+    if ( status != FX_Ok )
+    {
+        Error(EXIT_FAILURE, FX_ErrorString( FX_Error ));
+    }
 
-   status = FX_SetCallBack( TestCallBack );
+    status = FX_SetCallBack( TestCallBack );
 
-   if ( status != FX_Ok )
-      {
-      Error(EXIT_FAILURE, FX_ErrorString( FX_Error ));
-      }
-   }
+    if ( status != FX_Ok )
+    {
+        Error(EXIT_FAILURE, FX_ErrorString( FX_Error ));
+    }
+}
 
 /*
 ===================
