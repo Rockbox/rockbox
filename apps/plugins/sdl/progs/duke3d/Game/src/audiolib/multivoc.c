@@ -39,6 +39,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <conio.h>
 #endif
 
+#include "../global.h"
+
 #include "util.h"
 #include "dpmi.h"
 #include "usrhooks.h"
@@ -120,7 +122,8 @@ static int MV_FooMemory;
 static int   MV_BufferDescriptor;
 static int   MV_BufferEmpty[ NumberOfBuffers ];
 char *MV_MixBuffer[ NumberOfBuffers + 1 ];
-double *MV_FooBuffer = NULL;
+/* fixed-point */
+long *MV_FooBuffer = NULL;
 
 static VoiceNode *MV_Voices = NULL;
 
@@ -134,7 +137,7 @@ static void ( *MV_CallBackFunc )( unsigned long ) = NULL;
 static void ( *MV_RecordFunc )( char *ptr, int length ) = NULL;
 static void ( *MV_MixFunction )( VoiceNode *voice);
 
-int MV_MaxVolume = 63;
+const int MV_MaxVolume = 63;
 
 int *MV_GLast, *MV_GPos, *MV_GVal;
 
@@ -144,8 +147,8 @@ char  *MV_MixDestination;
 short *MV_LeftVolume;
 short *MV_RightVolume;
 #else
-int    MV_LeftVolume;
-int    MV_RightVolume;
+int    MV_LeftVolume, MV_LeftScale;
+int    MV_RightVolume, MV_RightScale;
 #endif
 int    MV_SampleSize = 1;
 int    MV_RightChannelOffset;
@@ -317,6 +320,9 @@ static void MV_Mix( VoiceNode *voice )
       MV_MixDestination += 8;
       }
 
+   MV_LeftScale         = (MV_LeftVolume << FRACBITS) / MV_MaxVolume;
+   MV_RightScale        = (MV_RightVolume << FRACBITS) / MV_MaxVolume;
+   
    // Add this voice to the mix
    while( length > 0 )
       {
@@ -459,7 +465,7 @@ void MV_ServiceVoc
 	}
 	
 	{
-		ClearBuffer_DW( MV_FooBuffer, 0, sizeof(double) / 4 * MV_BufferSize / MV_SampleSize * MV_Channels);
+		ClearBuffer_DW( MV_FooBuffer, 0, sizeof(long) / 4 * MV_BufferSize / MV_SampleSize * MV_Channels);
 		MV_BufferEmpty[ MV_MixPage ] = TRUE;
 	}
 	
@@ -3109,7 +3115,7 @@ int MV_Init
    MV_SetVolume( MV_MaxTotalVolume );
 
 
-   MV_FooMemory = sizeof(double) * MixBufferSize * numchannels + 1024;
+   MV_FooMemory = sizeof(long) * MixBufferSize * numchannels + 1024;
    status = USRHOOKS_GetMem( ( void ** )&ptr, MV_FooMemory);
    if ( status != USRHOOKS_Ok )
    {

@@ -195,4 +195,17 @@ void fatal(char *fmt, ...);
 void rb_exit(int rc);
 void rbsdl_atexit(void (*)(void));
 
+/* speed */
+static inline uint16_t readLE16(void *addr)
+{
+    uint8_t *ptr = addr;
+    return (*(ptr+1) << 8) | *ptr;
+}
+
+static inline uint32_t readLE32(void *addr)
+{
+    uint8_t *ptr = addr;
+    return (*(ptr+3) << 24) |(*(ptr+2) << 16) | (*(ptr+1) << 8) | *ptr;
+}
+
 #endif /* _SDL_config_rockbox_h */
