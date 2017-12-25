@@ -18,8 +18,7 @@ clock
 xworld
 
 /* for duke, etc. */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && (PLUGIN_BUFFER_SIZE > 0x14000) && \
-    defined(CPU_ARM)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && (PLUGIN_BUFFER_SIZE > 0x14000)
 sdl
 #endif
 
