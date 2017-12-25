@@ -66,9 +66,6 @@ int32_t  Intelint32_t (int32_t l);
 
 void HeapSort(uint8_t  * base, int32 nel, int32 width, int32 (*compare)(), void (*switcher)());
 
-uint16_t readLE16(void *addr);
-uint32_t readLE32(void *addr);
-
 #ifdef __cplusplus
 };
 #endif

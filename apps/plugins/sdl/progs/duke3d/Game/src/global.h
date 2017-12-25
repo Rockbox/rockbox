@@ -12,8 +12,6 @@
 #include "SDL.h"
 
 #define open rb->open
-uint16_t readLE16(void *addr);
-uint32_t readLE32(void *addr);
 
 void FixFilePath(char  *filename);
 int FindDistance3D(int ix, int iy, int iz);

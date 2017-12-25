@@ -31,12 +31,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __MULTIVOC_H
 #define __MULTIVOC_H
 
-//#include <windows.h>
 #include <SDL.h>
 
-// forward declare
-//struct SDL_mutex;
-
+/* must 8 or less, otherwise sound will clip */
+#define FRACBITS 8
 
 #define MV_MinVoiceHandle  1
 
@@ -124,7 +122,6 @@ int   MV_Shutdown( void );
 void  MV_UnlockMemory( void );
 int   MV_LockMemory( void );
 
-//CRITICAL_SECTION reverbCS;
 SDL_mutex* reverbMutex;
 
 #endif

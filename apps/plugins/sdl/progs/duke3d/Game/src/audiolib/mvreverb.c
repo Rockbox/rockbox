@@ -1,15 +1,16 @@
 #include "multivoc.h"
 #include "_multivc.h"
+#include "fixedpoint.h"
 
-extern double *MV_FooBuffer;
+extern long *MV_FooBuffer;
 extern int MV_BufferSize;
 extern int MV_SampleSize;
-extern int MV_MaxVolume;
+extern const int MV_MaxVolume;
 extern int MV_ReverbDelay;
 extern int MV_MixRate;
 extern int MV_Channels;
 
-static double * reverbBuffer = 0;
+static long * reverbBuffer = 0;
 static int delay = 0, CurrAddr;
 
 static	int FB_SRC_A, FB_SRC_B, IIR_DEST_A0, IIR_DEST_A1, ACC_SRC_A0, ACC_SRC_A1, ACC_SRC_B0,
@@ -17,10 +18,10 @@ static	int FB_SRC_A, FB_SRC_B, IIR_DEST_A0, IIR_DEST_A1, ACC_SRC_A0, ACC_SRC_A1,
 		ACC_SRC_C1, ACC_SRC_D0, ACC_SRC_D1, IIR_SRC_B1, IIR_SRC_B0, MIX_DEST_A0,
 		MIX_DEST_A1, MIX_DEST_B0, MIX_DEST_B1;
 	
-static	double IIR_ALPHA, ACC_COEF_A, ACC_COEF_B, ACC_COEF_C, ACC_COEF_D, IIR_COEF, FB_ALPHA, FB_X,
+static	long IIR_ALPHA, ACC_COEF_A, ACC_COEF_B, ACC_COEF_C, ACC_COEF_D, IIR_COEF, FB_ALPHA, FB_X,
 		IN_COEF_L, IN_COEF_R;
 
-static  double iRVBLeft, iRVBRight;
+static  long iRVBLeft, iRVBRight;
 
 static int cnv_offset(int src)
 {
@@ -31,6 +32,8 @@ static int cnv_offset(int src)
 // static char err[256];
 
 // extern __stdcall OutputDebugStringA(char *);
+
+static const double fp_scale = (double) (1 << FRACBITS);
 
 static void check_buffer()
 {
@@ -61,26 +64,26 @@ static void check_buffer()
 		MIX_DEST_A1 = cnv_offset(0x238);
 		MIX_DEST_B0 = cnv_offset(0x154);
 		MIX_DEST_B1 = cnv_offset(0xAA);
-		IIR_ALPHA = 0.8701171875;
-		ACC_COEF_A = 0.622314453125;
-		ACC_COEF_B = -0.5244140625;
-		ACC_COEF_C = 0.53955078125;
-		ACC_COEF_D = -0.50830078125;
-		IIR_COEF = -0.69921875;
-		FB_ALPHA = 0.67578125;
-		FB_X = 0.646484375;
-		IN_COEF_L = -2.;
-		IN_COEF_R = -2.;
-		if (reverbBuffer) reverbBuffer = (double*) realloc(reverbBuffer, new_delay * sizeof(double));
-		else reverbBuffer = (double*) malloc(new_delay * sizeof(double));
-		memset(reverbBuffer, 0, new_delay * sizeof(double));
+		IIR_ALPHA = 0.8701171875 * fp_scale;
+		ACC_COEF_A = 0.622314453125 * fp_scale;
+		ACC_COEF_B = -0.5244140625 * fp_scale;
+		ACC_COEF_C = 0.53955078125 * fp_scale;
+		ACC_COEF_D = -0.50830078125 * fp_scale;
+		IIR_COEF = -0.69921875 * fp_scale;
+		FB_ALPHA = 0.67578125 * fp_scale;
+		FB_X = 0.646484375 * fp_scale;
+		IN_COEF_L = -2. * fp_scale;
+		IN_COEF_R = -2. * fp_scale;
+		if (reverbBuffer) reverbBuffer = (long*) realloc(reverbBuffer, new_delay * sizeof(long));
+		else reverbBuffer = (long*) malloc(new_delay * sizeof(long));
+		memset(reverbBuffer, 0, new_delay * sizeof(long));
 		delay = new_delay;
 		CurrAddr = 0;
 	}
 
 }
 
-double g_buffer(int iOff, double *ptr)                          // get_buffer content helper: takes care about wraps
+long g_buffer(int iOff, long *ptr)                          // get_buffer content helper: takes care about wraps
 {
 	int correctDelay = delay;
 	if(!correctDelay)
@@ -98,10 +101,10 @@ double g_buffer(int iOff, double *ptr)                          // get_buffer co
 	{
 		iOff=correctDelay-(0-iOff);
 	}
-	return (double)*(ptr+iOff);
+	return (long)*(ptr+iOff);
 }
 
-void s_buffer(int iOff,double iVal, double *ptr)                // set_buffer content helper: takes care about wraps and clipping
+void s_buffer(int iOff,long iVal, long *ptr)                // set_buffer content helper: takes care about wraps and clipping
 {
 	int correctDelay = delay;
 	if(!correctDelay)
@@ -122,7 +125,7 @@ void s_buffer(int iOff,double iVal, double *ptr)                // set_buffer co
 	*(ptr+iOff)=iVal;
 }
 
-void s_buffer1(int iOff,double iVal, double *ptr)                // set_buffer (+1 sample) content helper: takes care about wraps and clipping
+void s_buffer1(int iOff,long iVal, long *ptr)                // set_buffer (+1 sample) content helper: takes care about wraps and clipping
 {
 	int correctDelay = delay;
 	if(!correctDelay)
@@ -143,61 +146,63 @@ void s_buffer1(int iOff,double iVal, double *ptr)                // set_buffer (
 	*(ptr+iOff)=iVal;
 }
 
-double MixREVERBLeft(double INPUT_SAMPLE_L, double INPUT_SAMPLE_R, double *ptr)
+long MixREVERBLeft(long INPUT_SAMPLE_L, long INPUT_SAMPLE_R, long *ptr)
 {
-	double ACC0,ACC1,FB_A0,FB_A1,FB_B0,FB_B1;
+	long ACC0,ACC1,FB_A0,FB_A1,FB_B0,FB_B1;
 	
-	const double IIR_INPUT_A0 = (g_buffer(IIR_SRC_A0, ptr) * IIR_COEF) + (INPUT_SAMPLE_L * IN_COEF_L);
-	const double IIR_INPUT_A1 = (g_buffer(IIR_SRC_A1, ptr) * IIR_COEF) + (INPUT_SAMPLE_R * IN_COEF_R);
-	const double IIR_INPUT_B0 = (g_buffer(IIR_SRC_B0, ptr) * IIR_COEF) + (INPUT_SAMPLE_L * IN_COEF_L);
-	const double IIR_INPUT_B1 = (g_buffer(IIR_SRC_B1, ptr) * IIR_COEF) + (INPUT_SAMPLE_R * IN_COEF_R);
-	
-	const double IIR_A0 = (IIR_INPUT_A0 * IIR_ALPHA) + (g_buffer(IIR_DEST_A0, ptr) * (1.f - IIR_ALPHA));
-	const double IIR_A1 = (IIR_INPUT_A1 * IIR_ALPHA) + (g_buffer(IIR_DEST_A1, ptr) * (1.f - IIR_ALPHA));
-	const double IIR_B0 = (IIR_INPUT_B0 * IIR_ALPHA) + (g_buffer(IIR_DEST_B0, ptr) * (1.f - IIR_ALPHA));
-	const double IIR_B1 = (IIR_INPUT_B1 * IIR_ALPHA) + (g_buffer(IIR_DEST_B1, ptr) * (1.f - IIR_ALPHA));
-	
+	const long IIR_INPUT_A0 = (fp_mul(g_buffer(IIR_SRC_A0, ptr), IIR_COEF, FRACBITS) + fp_mul(INPUT_SAMPLE_L, IN_COEF_L, FRACBITS));
+	const long IIR_INPUT_A1 = (fp_mul(g_buffer(IIR_SRC_A1, ptr), IIR_COEF, FRACBITS) + fp_mul(INPUT_SAMPLE_R, IN_COEF_R, FRACBITS));
+	const long IIR_INPUT_B0 = (fp_mul(g_buffer(IIR_SRC_B0, ptr), IIR_COEF, FRACBITS) + fp_mul(INPUT_SAMPLE_L, IN_COEF_L, FRACBITS));
+	const long IIR_INPUT_B1 = (fp_mul(g_buffer(IIR_SRC_B1, ptr), IIR_COEF, FRACBITS) + fp_mul(INPUT_SAMPLE_R, IN_COEF_R, FRACBITS));
+        
+        const long one = (1 << FRACBITS);
+	const long IIR_A0 = fp_mul(IIR_INPUT_A0, IIR_ALPHA, FRACBITS) + fp_mul(g_buffer(IIR_DEST_A0, ptr), (one - IIR_ALPHA), FRACBITS);
+	const long IIR_A1 = fp_mul(IIR_INPUT_A1, IIR_ALPHA, FRACBITS) + fp_mul(g_buffer(IIR_DEST_A1, ptr), (one - IIR_ALPHA), FRACBITS);
+	const long IIR_B0 = fp_mul(IIR_INPUT_B0, IIR_ALPHA, FRACBITS) + fp_mul(g_buffer(IIR_DEST_B0, ptr), (one - IIR_ALPHA), FRACBITS);
+	const long IIR_B1 = fp_mul(IIR_INPUT_B1, IIR_ALPHA, FRACBITS) + fp_mul(g_buffer(IIR_DEST_B1, ptr), (one - IIR_ALPHA), FRACBITS);
+
 	s_buffer1(IIR_DEST_A0, IIR_A0, ptr);
 	s_buffer1(IIR_DEST_A1, IIR_A1, ptr);
 	s_buffer1(IIR_DEST_B0, IIR_B0, ptr);
 	s_buffer1(IIR_DEST_B1, IIR_B1, ptr);
 	
-	ACC0 = (g_buffer(ACC_SRC_A0, ptr) * ACC_COEF_A) +
-		(g_buffer(ACC_SRC_B0, ptr) * ACC_COEF_B) +
-		(g_buffer(ACC_SRC_C0, ptr) * ACC_COEF_C) +
-		(g_buffer(ACC_SRC_D0, ptr) * ACC_COEF_D);
-	ACC1 = (g_buffer(ACC_SRC_A1, ptr) * ACC_COEF_A) +
-		(g_buffer(ACC_SRC_B1, ptr) * ACC_COEF_B) +
-		(g_buffer(ACC_SRC_C1, ptr) * ACC_COEF_C) +
-		(g_buffer(ACC_SRC_D1, ptr) * ACC_COEF_D);
+	ACC0 = (fp_mul(g_buffer(ACC_SRC_A0, ptr), ACC_COEF_A, FRACBITS) +
+		fp_mul(g_buffer(ACC_SRC_B0, ptr), ACC_COEF_B, FRACBITS) +
+		fp_mul(g_buffer(ACC_SRC_C0, ptr), ACC_COEF_C, FRACBITS) +
+                fp_mul(g_buffer(ACC_SRC_D0, ptr), ACC_COEF_D, FRACBITS));
+        ACC1 = (fp_mul(g_buffer(ACC_SRC_A1, ptr), ACC_COEF_A, FRACBITS) +
+		fp_mul(g_buffer(ACC_SRC_B1, ptr), ACC_COEF_B, FRACBITS) +
+		fp_mul(g_buffer(ACC_SRC_C1, ptr), ACC_COEF_C, FRACBITS) +
+		fp_mul(g_buffer(ACC_SRC_D1, ptr), ACC_COEF_D, FRACBITS));
 	
 	FB_A0 = g_buffer(MIX_DEST_A0 - FB_SRC_A, ptr);
 	FB_A1 = g_buffer(MIX_DEST_A1 - FB_SRC_A, ptr);
 	FB_B0 = g_buffer(MIX_DEST_B0 - FB_SRC_B, ptr);
 	FB_B1 = g_buffer(MIX_DEST_B1 - FB_SRC_B, ptr);
 	
-	s_buffer(MIX_DEST_A0, ACC0 - (FB_A0 * FB_ALPHA), ptr);
-	s_buffer(MIX_DEST_A1, ACC1 - (FB_A1 * FB_ALPHA), ptr);
+	s_buffer(MIX_DEST_A0, ACC0 - fp_mul(FB_A0 , FB_ALPHA, FRACBITS), ptr);
+	s_buffer(MIX_DEST_A1, ACC1 - fp_mul(FB_A1 , FB_ALPHA, FRACBITS), ptr);
+
+	s_buffer(MIX_DEST_B0, fp_mul(FB_ALPHA , ACC0, FRACBITS) - fp_mul(FB_A0, (FB_ALPHA - one), FRACBITS) - fp_mul(FB_B0, FB_X, FRACBITS), ptr);
+	s_buffer(MIX_DEST_B1, fp_mul(FB_ALPHA , ACC1, FRACBITS) - fp_mul(FB_A1, (FB_ALPHA - one), FRACBITS) - fp_mul(FB_B1, FB_X, FRACBITS), ptr);
 	
-	s_buffer(MIX_DEST_B0, (FB_ALPHA * ACC0) - (FB_A0 * (FB_ALPHA - 1.f)) - (FB_B0 * FB_X), ptr);
-	s_buffer(MIX_DEST_B1, (FB_ALPHA * ACC1) - (FB_A1 * (FB_ALPHA - 1.f)) - (FB_B1 * FB_X), ptr);
-	
-	iRVBLeft  = (g_buffer(MIX_DEST_A0, ptr)+g_buffer(MIX_DEST_B0, ptr))/3.f;
-	iRVBRight = (g_buffer(MIX_DEST_A1, ptr)+g_buffer(MIX_DEST_B1, ptr))/3.f;
+	iRVBLeft  = fp_div((g_buffer(MIX_DEST_A0, ptr)+g_buffer(MIX_DEST_B0, ptr)), 3 << FRACBITS, FRACBITS);
+        iRVBRight = fp_div((g_buffer(MIX_DEST_A1, ptr)+g_buffer(MIX_DEST_B1, ptr)), 3 << FRACBITS, FRACBITS);
 	
 	CurrAddr++;
 	if(CurrAddr>delay-1) CurrAddr=0;
 	
-	return (double)iRVBLeft;
+	return (long)iRVBLeft;
 }
 
-double MixREVERBRight(void)
+long MixREVERBRight(void)
 {
-	return (double)iRVBRight;
+	return (long)iRVBRight;
 }
 
 void MV_FPReverb(int volume)
 {
+    //rb->splashf(HZ, "SLOW CODE!!!");
 	int i, count = MV_BufferSize / MV_SampleSize * MV_Channels;
 
 //	sprintf(err, "count: %d, old_delay: %d", count, delay);
@@ -215,27 +220,32 @@ void MV_FPReverb(int volume)
 	}
 
 //	OutputDebugStringA(err);
+
+        long scale = (volume << FRACBITS) / MV_MaxVolume;
 	
 	if (MV_Channels == 1)
 	{
 		for (i = 0; i < count; i++)
 		{
-			double temp = MV_FooBuffer[i];
-			MV_FooBuffer[i] += ((MixREVERBLeft(temp, temp, reverbBuffer) + MixREVERBRight()) * .5) * (double)volume / (double)MV_MaxVolume;
+                    long temp = MV_FooBuffer[i];
+                    /* evaluation order matters */
+                    long total = MixREVERBLeft(temp, temp, reverbBuffer);
+                    total += MixREVERBRight();
+                    total /= 2;
+                    MV_FooBuffer[i] += (scale * total) >> FRACBITS;
 		}
 	}
 	else
 	{
-		count >>= 1;
+		count /= 2;
 		for (i = 0; i < count; i++)
 		{
-			double left = MV_FooBuffer[i*2];
-			double right = MV_FooBuffer[i*2+1];
-			double scale = (double)volume / (double)MV_MaxVolume;
-			left += MixREVERBLeft(left, right, reverbBuffer) * scale;
-			right += MixREVERBRight() * scale;
-			MV_FooBuffer[i*2] = left;
-			MV_FooBuffer[i*2+1] = right;
+                    long left = MV_FooBuffer[i*2];
+                    long right = MV_FooBuffer[i*2+1];
+                    left += (scale * MixREVERBLeft(left, right, reverbBuffer)) >> FRACBITS;
+                    right += (scale * MixREVERBRight()) >> FRACBITS;
+                    MV_FooBuffer[i*2] = left;
+                    MV_FooBuffer[i*2+1] = right;
 		}
 	}
 
@@ -265,7 +275,7 @@ void MV_16BitDownmix(char *dest, int count)
 
 	for (i = 0; i < count; i++)
 	{
-		int out = (int)((MV_FooBuffer[i] * (double)0x8000));
+            int out = MV_FooBuffer[i] >> FRACBITS;
 		if (out < -32768) pdest[i] = -32768;
 		else if (out > 32767) pdest[i] = 32767;
 		else pdest[i] = out;
@@ -278,13 +288,14 @@ void MV_8BitDownmix(char *dest, int count)
 
 	for (i = 0; i < count; i++)
 	{
-		int out = ((int)((MV_FooBuffer[i] * (double)0x80)));
+            int out = MV_FooBuffer[i] >> FRACBITS;
 		if (out < -128) dest[i] = 0;
 		else if (out > 127) dest[i] = 255;
 		else dest[i] = out + 0x80;
 	}
 }
 
+/*
 void MV_16BitReverbFast( const char *src, char *dest, int count, int shift )
 {
 	int i;
@@ -310,3 +321,4 @@ void MV_8BitReverbFast( const signed char *src, signed char *dest, int count, in
 		dest[i] = (signed char) (a + sh + c);
 	}
 }
+*/

@@ -32,18 +32,6 @@ Prepared for public release: 03/21/2003 - Charlie Wiederhold, 3D Realms
 #include "global.h"
 #include "duke3d.h"
 
-uint16_t readLE16(void *addr)
-{
-    uint8_t *ptr = addr;
-    return (*(ptr+1) << 8) | *ptr;
-}
-
-uint32_t readLE32(void *addr)
-{
-    uint8_t *ptr = addr;
-    return (*(ptr+3) << 24) |(*(ptr+2) << 16) | (*(ptr+1) << 8) | *ptr;
-}
-
 char  *mymembuf;
 uint8_t  MusicPtr[72000];
 

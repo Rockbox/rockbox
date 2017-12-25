@@ -2227,8 +2227,9 @@ void duke_tics(short offx, short offy, short color)
     else
         savedFps = fpsAvg;
 
-    extern int rbaud_underruns;
-    sprintf(fps," %d %d", savedFps, rbaud_underruns);
+    extern int rbaud_underruns, fp_calls[4];
+    sprintf(fps," %d %d %d %d %d %d", savedFps, rbaud_underruns, fp_calls[0],
+            fp_calls[1], fp_calls[2], fp_calls[3]);
     strcat(text, fps);
 
     minitext(offx,offy,text,color,2+8+16+128);
