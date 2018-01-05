@@ -122,7 +122,7 @@ static int MV_FooMemory;
 static int   MV_BufferDescriptor;
 static int   MV_BufferEmpty[ NumberOfBuffers ];
 char *MV_MixBuffer[ NumberOfBuffers + 1 ];
-/* fixed-point */
+/* raw samples in range [-2^15, 2^15-1], interleaved stereo */
 long *MV_FooBuffer = NULL;
 
 static VoiceNode *MV_Voices = NULL;
@@ -465,8 +465,8 @@ void MV_ServiceVoc
 	}
 	
 	{
-		ClearBuffer_DW( MV_FooBuffer, 0, sizeof(long) / 4 * MV_BufferSize / MV_SampleSize * MV_Channels);
-		MV_BufferEmpty[ MV_MixPage ] = TRUE;
+            ClearBuffer_DW( MV_FooBuffer, 0, (sizeof(long) * MV_BufferSize / MV_SampleSize * MV_Channels) / 4);
+            MV_BufferEmpty[ MV_MixPage ] = TRUE;
 	}
 	
 	// Play any waiting voices

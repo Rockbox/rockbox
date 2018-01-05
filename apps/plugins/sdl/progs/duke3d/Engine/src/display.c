@@ -1368,9 +1368,13 @@ int VBE_setPalette(uint8_t  *palettebuffer)
     memcpy(lastPalette, palettebuffer, 768);
     
     for (i = 0; i < 256; i++){
-        sdlp->b = (Uint8) ((((float) *p++) / 63.0) * 255.0);
-        sdlp->g = (Uint8) ((((float) *p++) / 63.0) * 255.0);
-        sdlp->r = (Uint8) ((((float) *p++) / 63.0) * 255.0);
+        /* doesn't map perfectly */
+        sdlp->b = (Uint8) (*p << 2) | (*p >> 4);
+        p++;
+        sdlp->g = (Uint8) (*p << 2) | (*p >> 4);
+        p++;
+        sdlp->r = (Uint8) (*p << 2) | (*p >> 4);
+        p++;
         sdlp->unused = *p++;   /* This byte is unused in BUILD, too. */
         sdlp++;
     }
