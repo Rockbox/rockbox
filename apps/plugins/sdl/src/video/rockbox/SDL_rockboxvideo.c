@@ -38,6 +38,15 @@
 
 #include "keymaps_extra.h"
 
+#ifndef HAVE_LCD_COLOR
+#define USE_GREY
+#include "lib/grey.h"
+
+GREY_INFO_STRUCT
+
+#define GREYBUFSIZE 1024*1024
+#endif
+
 #define ROCKBOXVID_DRIVER_NAME "rockbox"
 
 /* Key mapping. Receiving BTN_{x} sends RBSDL_{x} to the game. */
@@ -424,6 +433,7 @@ VideoBootStrap ROCKBOX_bootstrap = {
 static void rb_pixelformat(SDL_PixelFormat *vformat)
 {
     /* set the ideal format */
+#ifndef USE_GREY
     vformat->BitsPerPixel = LCD_DEPTH;
     vformat->BytesPerPixel = LCD_DEPTH / 8;
 
@@ -436,6 +446,17 @@ static void rb_pixelformat(SDL_PixelFormat *vformat)
     vformat->Bmask = 0x1f;
     vformat->Bshift = 0;
 #elif LCD_PIXELFORMAT == RGB888
+    vformat->Rmask = 0xff0000;
+    vformat->Rshift = 16;
+    vformat->Gmask = 0x00ff00;
+    vformat->Gshift = 8;
+    vformat->Bmask = 0x0000ff;
+    vformat->Bshift = 0;
+#endif
+#else
+    /* do 24-bit now, convert to greyscale later */
+    vformat->BitsPerPixel = 24;
+    vformat->BytesPerPixel = 3;
     vformat->Rmask = 0xff0000;
     vformat->Rshift = 16;
     vformat->Gmask = 0x00ff00;
@@ -456,16 +477,21 @@ int ROCKBOX_VideoInit(_THIS, SDL_PixelFormat *vformat)
 
 SDL_Rect **ROCKBOX_ListModes(_THIS, SDL_PixelFormat *format, Uint32 flags)
 {
-#if 0
+#ifdef USE_GREY
+    /* grey only supports native resolution at 24bpp */
     static SDL_Rect rect;
     static SDL_Rect *rects[2] = { &rect, NULL };
     rect.x = rect.y = 0;
     rect.w = LCD_WIDTH;
     rect.h = LCD_HEIGHT;
+    if(format->BitsPerPixel != 24)
+        return NULL;
     return rects;
-#endif
+#else
+    /* color supports any resolution at native bpp */
     if(format->BitsPerPixel != LCD_DEPTH)
         return NULL;
+#endif
     /* we will scale anything, as long as the format is correct */
     return (SDL_Rect**)-1;
 }
@@ -570,20 +596,27 @@ SDL_Surface *ROCKBOX_SetVideoMode(_THIS, SDL_Surface *current,
         SDL_free( this->hidden->buffer );
     }
 
+#ifndef USE_GREY
     if(bpp != LCD_DEPTH)
         return NULL;
+#else
+    if(bpp != 24)
+        return NULL;
+#endif
 
     init_keymap();
 
     this->hidden->rotate = false;
     this->hidden->direct = false;
 
+#ifndef USE_GREY
     /* have SDL write directly to the framebuffer */
     if(width == LCD_WIDTH && height == LCD_HEIGHT)
     {
         this->hidden->buffer = NULL;
         this->hidden->direct = true;
     }
+#endif
 
     if(!this->hidden->direct)
     {
@@ -641,6 +674,19 @@ SDL_Surface *ROCKBOX_SetVideoMode(_THIS, SDL_Surface *current,
     current->pitch = current->w * (bpp / 8);
     current->pixels = this->hidden->direct ? rb->lcd_framebuffer : this->hidden->buffer;
 
+#ifdef USE_GREY
+    /* init grey */
+    unsigned char *gbuf = malloc(GREYBUFSIZE);
+    if(!grey_init(gbuf, GREYBUFSIZE, GREY_ON_COP | GREY_BUFFERED, LCD_WIDTH, LCD_HEIGHT, NULL))
+    {
+        rb->splashf(HZ, "grey init failed");
+        return NULL;
+    }
+    grey_set_background(0);
+    grey_clear_display();
+    grey_show(true);
+#endif
+
     /* We're done */
     return(current);
 }
@@ -687,7 +733,10 @@ static void blit_rotated(fb_data *src, int x, int y, int w, int h)
             rb->lcd_framebuffer[x_0 * LCD_WIDTH + y_0] = src[(LCD_WIDTH - y_0) * LCD_HEIGHT + x_0];
 }
 
-//static fb_data tmp_fb[LCD_WIDTH * LCD_HEIGHT];
+#ifdef USE_GREY
+/* we blit a line at a time */
+static unsigned char greyline[LCD_WIDTH];
+#endif
 
 static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
 {
@@ -695,6 +744,21 @@ static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
     {
         for(int i = 0; i < numrects; ++i)
         {
+#ifdef USE_GREY
+            for(int y = rects[i].y; y < rects[i].y + rects[i].h; ++y)
+            {
+                for(int x = rects[i].x; x < rects[i].x + rects[i].w; ++x)
+                {
+                    int idx = y * LCD_WIDTH + x;
+                    unsigned char *ptr = this->screen->pixels + 3 * idx;
+                    unsigned int sum = ptr[0] + ptr[1] + ptr[2];
+                    sum /= 3;
+                    greyline[x] = (unsigned char) sum;
+                }
+                /* blit line */
+                grey_gray_bitmap(greyline, rects[i].x, y, rects[i].w, 1);
+            }
+#else
             /* no scaling */
             if(this->hidden->direct)
             {
@@ -769,8 +833,13 @@ static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
             /* FIXME: this won't work for rotated screen or overlapping rects */
             flip_pixels(rects[i].x, rects[i].y, rects[i].w, rects[i].h);
 #endif
+#endif
         } /* for */
+#ifdef USE_GREY
+        grey_update();
+#else
         rb->lcd_update();
+#endif
     } /* if */
 }
 
