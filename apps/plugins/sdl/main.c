@@ -8,61 +8,12 @@
 #include "SDL.h"
 #include "SDL_video.h"
 
-#ifndef COMBINED_SDL
+#ifdef COMBINED_SDL
+#error deprecated
+#endif
+
+/* SDL program */
 extern int my_main(int argc, char *argv[]);
-#else
-//#if 0
-extern int SDLBlock_main(int argc, char *argv[]);
-extern int ballfield_main(int argc, char *argv[]);
-extern int parallax3_main(int argc, char *argv[]);
-extern int parallax4_main(int argc, char *argv[]);
-extern int testbitmap_main(int argc, char *argv[]);
-extern int testcursor_main(int argc, char *argv[]);
-extern int testhread_main(int argc, char *argv[]);
-extern int testplatform_main(int argc, char *argv[]);
-extern int testsprite_main(int argc, char *argv[]);
-extern int testwin_main(int argc, char *argv[]);
-//#endif
-extern int abe_main(int argc, char *argv[]);
-extern int ballerburg_main(int argc, char **argv);
-extern int raytrace_main(int argc, char *argv[]);
-extern int wolf3d_main(int argc, char *argv[]);
-extern int testsound_main(int argc, char *argv[]);
-extern int duke3d_main(int argc,char  **argv);
-extern int quake_main (int c, char **v);
-
-char *wolf3d_argv[] = { "wolf3d", "--audiobuffer", "2048"  };
-char *duke3d_argv[] = { "duke3d" };
-char *quake_argv[] = { "quake", "-basedir", "/.rockbox/quake" };
-
-struct prog_t {
-    const char *name;
-    int (*main)(int argc, char *argv[]);
-    bool printf_enabled;
-    int argc;
-    char **argv;
-} programs[] = {
-#if 0
-    {  "Abe's Amazing Adventure",  abe_main,           true   },
-    {  "Ballerburg",               ballerburg_main,    false  },
-    {  "Screensaver",              SDLBlock_main,      false  },
-    {  "Ball Field",               ballfield_main,     false  },
-    {  "Parallax v.3",             parallax3_main,     false  },
-    {  "Parallax v.4",             parallax4_main,     false  },
-    {  "Raytrace",                 raytrace_main,      false  },
-    {  "Test Bitmap",              testbitmap_main,    false  },
-    {  "Test Cursor",              testcursor_main,    false  },
-    {  "Test Thread",              testhread_main,     true   },
-    {  "Test Platform",            testplatform_main,  true   },
-    {  "Test Sprite",              testsprite_main,    false  },
-    {  "Test Window",              testwin_main,       false  },
-#endif
-    {  "Duke3D",                   duke3d_main,        true, ARRAYLEN(duke3d_argv), duke3d_argv },
-    {  "Wolf3D",                   wolf3d_main,        false, ARRAYLEN(wolf3d_argv), wolf3d_argv },
-    {  "Quake",                    quake_main,         true, ARRAYLEN(quake_argv), quake_argv },
-    {  "Test sound",               testsound_main,     true, 0, NULL },
-};
-#endif
 
 void *audiobuf = NULL;
 
@@ -72,7 +23,7 @@ bool printf_enabled = true;
 
 static void (*exit_cb)(void) = NULL;
 
-/* sets "our" exit handler */
+/* sets the exit handler presented to the program */
 void rbsdl_atexit(void (*cb)(void))
 {
     if(exit_cb)
@@ -100,6 +51,16 @@ void cleanup(void)
     if(exit_cb != SDL_Quit)
         SDL_Quit();
 
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR) && !defined(RB_PROFILE)
+#define USE_TIMER
+#endif
+
+#ifdef USE_TIMER
+    /* stop timer callback if there is one, since the memory it
+     * resides in could be overwritten */
+    rb->timer_unregister();
+#endif
+
     if(audiobuf)
         memset(audiobuf, 0, 4); /* clear */
 
@@ -110,34 +71,7 @@ void cleanup(void)
 #endif
 }
 
-#ifdef COMBINED_SDL
-const char *formatter(char *buf, size_t n, int i, const char *unit)
-{
-    snprintf(buf, n, "%s", programs[i].name);
-    return buf;
-}
-#endif
-
-#ifdef SIMULATOR
-#include <signal.h>
-
-void segv(int s, siginfo_t *si, void *ptr)
-{
-    LOGF("SEGV: at address %llx (%d)", si->si_addr, si->si_code);
-    exit(1);
-}
-
-void install_segv(void)
-{
-    struct sigaction act;
-    act.sa_handler = NULL;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO;
-    act.sa_sigaction = segv;
-    sigaction(SIGSEGV, &act, NULL);
-}
-#endif
-
+/* 256KB */
 static long main_stack[1024 * 1024 / 4];
 int (*main_fn)(int argc, char *argv[]);
 int prog_idx;
@@ -266,36 +200,22 @@ enum plugin_status plugin_start(const void *param)
         return PLUGIN_ERROR;
     }
 
-#ifdef SIMULATOR
-    install_segv();
-#endif
-
-#ifdef COMBINED_SDL
-    int prog = 0;
-
-    rb->set_int("Choose SDL Program", "", UNIT_INT, &prog, NULL, 1, 0, ARRAYLEN(programs) - 1, formatter);
-    prog_idx = prog;
-
-    main_fn = programs[prog].main;
-    printf_enabled = programs[prog].printf_enabled;
-#else
     main_fn = my_main;
-#endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
 
     backlight_ignore_timeout();
-    /* real exit handler */
+    /* set the real exit handler */
 #undef rb_atexit
     rb_atexit(cleanup);
 
-    /* make a new thread to use a bigger stack */
+    /* make a new thread to use a bigger stack than otherwise accessible */
     sdl_thread_id = rb->create_thread(main_thread, main_stack, sizeof(main_stack), 0, "sdl_main" IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
     rb->thread_wait(sdl_thread_id);
 
-    rb->sleep(HZ); /* wait a second... */
+    rb->sleep(HZ); /* wait a second in case there's an error message on screen */
 
     return PLUGIN_OK;
 }

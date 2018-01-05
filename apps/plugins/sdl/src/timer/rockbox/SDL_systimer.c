@@ -114,4 +114,4 @@ void SDL_SYS_StopTimer(void)
         return;
 }
 
-#endif /* SDL_TIMER_DUMMY || SDL_TIMERS_DISABLED */
+#endif
