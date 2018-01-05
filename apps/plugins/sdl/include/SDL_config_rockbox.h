@@ -42,7 +42,7 @@
 #ifdef SIMULATOR
 #define RB_SAMPR SAMPR_44
 #else
-#define RB_SAMPR SAMPR_16
+#define RB_SAMPR SAMPR_22
 #endif
 
 /* Enable the stub cdrom driver (src/cdrom/dummy/\*.c) */
