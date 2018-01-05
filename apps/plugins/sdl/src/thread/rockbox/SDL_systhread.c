@@ -40,6 +40,7 @@ static void rbsdl_runthread(void)
     void *args = global_args;
     global_args = NULL;
     SDL_RunThread(args);
+    rb->thread_exit();
 }
 
 #define MAX_THREAD 4

@@ -264,9 +264,9 @@ simcc () {
  GCCOPTS="$GCCOPTS -fno-builtin -g"
  # Some linux setups like to warn about unused results. They are correct,
  # but cleaning this up is a lot of work.
- GCCOPTS="$GCCOPTS -Wno-unused-result"
+ GCCOPTS="$GCCOPTS -Wno-unused-result -m32"
  GCCOPTIMIZE=''
- LDOPTS="$LDOPTS -lm" # button-sdl.c uses sqrt()
+ LDOPTS="$LDOPTS -lm -m32" # button-sdl.c uses sqrt()
  sigaltstack=""
  fibers=""
  endian="" # endianess of the dap doesnt matter here
