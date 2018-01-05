@@ -241,7 +241,9 @@ int printf_wrapper(const char *fmt, ...)
         p_xtpt=0;
         if (printf_enabled)
         {
+#if LCD_DEPTH > 1
             rb->lcd_set_backdrop(NULL);
+#endif
             rb->lcd_clear_display();
         }
     }
