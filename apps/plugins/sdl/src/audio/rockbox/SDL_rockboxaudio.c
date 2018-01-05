@@ -211,6 +211,7 @@ static Uint8 *ROCKBOXAUD_GetAudioBuf(_THIS)
 
 static void ROCKBOXAUD_CloseAudio(_THIS)
 {
+    rb->pcm_play_stop();
     if ( this->hidden->mixbuf != NULL ) {
         SDL_FreeAudioMem(this->hidden->mixbuf);
         this->hidden->mixbuf = NULL;
@@ -221,7 +222,6 @@ static void ROCKBOXAUD_CloseAudio(_THIS)
         if(this->hidden->rb_buf[i])
             SDL_FreeAudioMem(this->hidden->rb_buf[i]);
     }
-    rb->pcm_play_stop();
     rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 }
 
@@ -236,7 +236,7 @@ static int ROCKBOXAUD_OpenAudio(_THIS, SDL_AudioSpec *spec)
     SDL_CalculateAudioSpec(spec);
 
     LOGF("samplerate %d", spec->freq);
-    rb->mixer_set_frequency(spec->freq);
+    rb->pcm_set_frequency(spec->freq);
 
     /* Allocate mixing buffer */
     this->hidden->mixlen = spec->size;
