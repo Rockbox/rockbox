@@ -65,7 +65,7 @@ int MV_cubic(int position)
   }
 */
 
-static int MV_cubic16(const short *src, int position, int rate)
+static inline int MV_cubic16(const short *src, int position, int rate)
 {
     int temp, hpos = position >> 16;
 
@@ -88,7 +88,7 @@ static int MV_cubic16(const short *src, int position, int rate)
     return do_cubic ? MV_cubic(position) : gval(3);
 }
 
-static int MV_cubic8to16(const unsigned char *src, int position, int rate)
+static inline int MV_cubic8to16(const unsigned char *src, int position, int rate)
 {
     int temp, hpos = position >> 16;
 
@@ -394,15 +394,17 @@ void MV_MixFPMono8( uint32_t position,
 
     for (i = 0; i < length; i++) {
         int s = MV_cubic8to16(src, position, rate) << FRACBITS;
-        long out;
+        int out;
 
-        out = (s * MV_LeftScale) >> FRACBITS;
+        /* output is long in range [0, 2^16) */
+        out = (s * MV_LeftScale) >> (FRACBITS * 2);
+
         *dest += out;
 
         position += rate;
         dest += MV_Channels;
     }
-	
+
     MV_MixPosition = position;
     MV_MixDestination = (char *)dest;
 }
@@ -423,8 +425,8 @@ void MV_MixFPStereo8( uint32_t position,
         int s = MV_cubic8to16(src, position, rate) << FRACBITS;
         long left, right;
 
-        left = (s * MV_LeftScale) >> FRACBITS;
-        right = (s * MV_RightScale) >> FRACBITS;
+        left = (s * MV_LeftScale) >> (FRACBITS * 2);
+        right = (s * MV_RightScale) >> (FRACBITS * 2);
 
         dest[0] += left;
         dest[1] += right;
@@ -452,9 +454,9 @@ void MV_MixFPMono16( uint32_t position,
 
     for (i = 0; i < length; i++) {
         int s = MV_cubic16(src, position, rate) << FRACBITS;
-        long out;
+        int out;
 
-        out = (s * MV_LeftScale) >> FRACBITS;
+        out = (s * MV_LeftScale) >> (FRACBITS * 2);
         *dest += out;
 
         position += rate;
@@ -480,10 +482,10 @@ void MV_MixFPStereo16( uint32_t position,
     for (i = 0; i < length; i++) {
         int s = MV_cubic16(src, position, rate) << FRACBITS;
 
-        long left, right;
+        int left, right;
 
-        left = (s * MV_LeftScale) >> FRACBITS;
-        right = (s * MV_RightScale) >> FRACBITS;
+        left = (s * MV_LeftScale) >> (FRACBITS * 2);
+        right = (s * MV_RightScale) >> (FRACBITS * 2);
 
         dest[0] += left;
         dest[1] += right;

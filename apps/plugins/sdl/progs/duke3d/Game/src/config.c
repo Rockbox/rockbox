@@ -728,6 +728,7 @@ void CONFIG_ReadSetup( void )
    NumBits = 16;
    SCRIPT_GetNumber( scripthandle, "Sound Setup", "MixRate",&MixRate);
    MixRate = RB_SAMPR;
+   printf("MixRate = %d Hz", MixRate);
    SCRIPT_GetNumber( scripthandle, "Sound Setup", "MidiPort",&MidiPort);
    SCRIPT_GetNumber( scripthandle, "Sound Setup", "BlasterAddress",&dummy);
    BlasterConfig.Address = dummy;

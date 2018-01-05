@@ -18,24 +18,40 @@ static	int FB_SRC_A, FB_SRC_B, IIR_DEST_A0, IIR_DEST_A1, ACC_SRC_A0, ACC_SRC_A1,
 		ACC_SRC_C1, ACC_SRC_D0, ACC_SRC_D1, IIR_SRC_B1, IIR_SRC_B0, MIX_DEST_A0,
 		MIX_DEST_A1, MIX_DEST_B0, MIX_DEST_B1;
 	
-static	long IIR_ALPHA, ACC_COEF_A, ACC_COEF_B, ACC_COEF_C, ACC_COEF_D, IIR_COEF, FB_ALPHA, FB_X,
-		IN_COEF_L, IN_COEF_R;
+//static	long IIR_ALPHA, ACC_COEF_A, ACC_COEF_B, ACC_COEF_C, ACC_COEF_D, IIR_COEF, FB_ALPHA, FB_X,
+//		IN_COEF_L, IN_COEF_R;
 
-static  long iRVBLeft, iRVBRight;
 
-static int cnv_offset(int src)
+#define fp_scale ((double)(1<<FRACBITS))
+//static const double fp_scale = (double) (1 << FRACBITS);
+
+static const long IIR_ALPHA = 0.8701171875 * fp_scale,
+    ACC_COEF_A = 0.622314453125 * fp_scale,
+    ACC_COEF_B = -0.5244140625 * fp_scale,
+    ACC_COEF_C = 0.53955078125 * fp_scale,
+    ACC_COEF_D = -0.50830078125 * fp_scale,
+    IIR_COEF = -0.69921875 * fp_scale,
+    FB_ALPHA = 0.67578125 * fp_scale,
+    FB_X = 0.646484375 * fp_scale,
+    IN_COEF_L = -2. * fp_scale,
+    IN_COEF_R = -2. * fp_scale;
+
+static long iRVBLeft, iRVBRight;
+
+static inline int cnv_offset(int src)
 {
-	int64_t temp = ((int64_t)src * (int64_t)MV_MixRate) / 22050;
-	return (int)temp;
+    /* no need for 64-bit ints here */
+    /* src can be no greater than 2^16-1, which allows sample rates up
+     * to 65KHz */
+    int temp = (src * MV_MixRate) / 22050;
+    return temp;
 }
 
 // static char err[256];
 
 // extern __stdcall OutputDebugStringA(char *);
 
-static const double fp_scale = (double) (1 << FRACBITS);
-
-static void check_buffer()
+static inline void check_buffer()
 {
 	int new_delay = cnv_offset(MV_ReverbDelay);
 
@@ -64,16 +80,6 @@ static void check_buffer()
 		MIX_DEST_A1 = cnv_offset(0x238);
 		MIX_DEST_B0 = cnv_offset(0x154);
 		MIX_DEST_B1 = cnv_offset(0xAA);
-		IIR_ALPHA = 0.8701171875 * fp_scale;
-		ACC_COEF_A = 0.622314453125 * fp_scale;
-		ACC_COEF_B = -0.5244140625 * fp_scale;
-		ACC_COEF_C = 0.53955078125 * fp_scale;
-		ACC_COEF_D = -0.50830078125 * fp_scale;
-		IIR_COEF = -0.69921875 * fp_scale;
-		FB_ALPHA = 0.67578125 * fp_scale;
-		FB_X = 0.646484375 * fp_scale;
-		IN_COEF_L = -2. * fp_scale;
-		IN_COEF_R = -2. * fp_scale;
 		if (reverbBuffer) reverbBuffer = (long*) realloc(reverbBuffer, new_delay * sizeof(long));
 		else reverbBuffer = (long*) malloc(new_delay * sizeof(long));
 		memset(reverbBuffer, 0, new_delay * sizeof(long));
@@ -83,7 +89,7 @@ static void check_buffer()
 
 }
 
-long g_buffer(int iOff, long *ptr)                          // get_buffer content helper: takes care about wraps
+static inline long g_buffer(int iOff, long *ptr)                          // get_buffer content helper: takes care about wraps
 {
 	int correctDelay = delay;
 	if(!correctDelay)
@@ -104,7 +110,7 @@ long g_buffer(int iOff, long *ptr)                          // get_buffer conten
 	return (long)*(ptr+iOff);
 }
 
-void s_buffer(int iOff,long iVal, long *ptr)                // set_buffer content helper: takes care about wraps and clipping
+static inline void s_buffer(int iOff,long iVal, long *ptr)                // set_buffer content helper: takes care about wraps and clipping
 {
 	int correctDelay = delay;
 	if(!correctDelay)
@@ -125,7 +131,7 @@ void s_buffer(int iOff,long iVal, long *ptr)                // set_buffer conten
 	*(ptr+iOff)=iVal;
 }
 
-void s_buffer1(int iOff,long iVal, long *ptr)                // set_buffer (+1 sample) content helper: takes care about wraps and clipping
+static inline void s_buffer1(int iOff,long iVal, long *ptr)                // set_buffer (+1 sample) content helper: takes care about wraps and clipping
 {
 	int correctDelay = delay;
 	if(!correctDelay)
@@ -146,7 +152,7 @@ void s_buffer1(int iOff,long iVal, long *ptr)                // set_buffer (+1 s
 	*(ptr+iOff)=iVal;
 }
 
-long MixREVERBLeft(long INPUT_SAMPLE_L, long INPUT_SAMPLE_R, long *ptr)
+static inline long MixREVERBLeft(long INPUT_SAMPLE_L, long INPUT_SAMPLE_R, long *ptr)
 {
 	long ACC0,ACC1,FB_A0,FB_A1,FB_B0,FB_B1;
 	
@@ -186,8 +192,8 @@ long MixREVERBLeft(long INPUT_SAMPLE_L, long INPUT_SAMPLE_R, long *ptr)
 	s_buffer(MIX_DEST_B0, fp_mul(FB_ALPHA , ACC0, FRACBITS) - fp_mul(FB_A0, (FB_ALPHA - one), FRACBITS) - fp_mul(FB_B0, FB_X, FRACBITS), ptr);
 	s_buffer(MIX_DEST_B1, fp_mul(FB_ALPHA , ACC1, FRACBITS) - fp_mul(FB_A1, (FB_ALPHA - one), FRACBITS) - fp_mul(FB_B1, FB_X, FRACBITS), ptr);
 	
-	iRVBLeft  = fp_div((g_buffer(MIX_DEST_A0, ptr)+g_buffer(MIX_DEST_B0, ptr)), 3 << FRACBITS, FRACBITS);
-        iRVBRight = fp_div((g_buffer(MIX_DEST_A1, ptr)+g_buffer(MIX_DEST_B1, ptr)), 3 << FRACBITS, FRACBITS);
+	iRVBLeft  = (g_buffer(MIX_DEST_A0, ptr)+g_buffer(MIX_DEST_B0, ptr)) / 3;
+	iRVBRight = (g_buffer(MIX_DEST_A1, ptr)+g_buffer(MIX_DEST_B1, ptr)) / 3;
 	
 	CurrAddr++;
 	if(CurrAddr>delay-1) CurrAddr=0;
@@ -195,7 +201,7 @@ long MixREVERBLeft(long INPUT_SAMPLE_L, long INPUT_SAMPLE_R, long *ptr)
 	return (long)iRVBLeft;
 }
 
-long MixREVERBRight(void)
+static inline long MixREVERBRight(void)
 {
 	return (long)iRVBRight;
 }
@@ -227,12 +233,12 @@ void MV_FPReverb(int volume)
 	{
 		for (i = 0; i < count; i++)
 		{
-                    long temp = MV_FooBuffer[i];
+                    long temp = MV_FooBuffer[i] << FRACBITS;
                     /* evaluation order matters */
                     long total = MixREVERBLeft(temp, temp, reverbBuffer);
                     total += MixREVERBRight();
                     total /= 2;
-                    MV_FooBuffer[i] += (scale * total) >> FRACBITS;
+                    MV_FooBuffer[i] += (scale * total) >> (FRACBITS * 2);
 		}
 	}
 	else
@@ -240,12 +246,12 @@ void MV_FPReverb(int volume)
 		count /= 2;
 		for (i = 0; i < count; i++)
 		{
-                    long left = MV_FooBuffer[i*2];
-                    long right = MV_FooBuffer[i*2+1];
+                    long left = MV_FooBuffer[i*2] << FRACBITS;
+                    long right = MV_FooBuffer[i*2+1] << FRACBITS;
                     left += (scale * MixREVERBLeft(left, right, reverbBuffer)) >> FRACBITS;
                     right += (scale * MixREVERBRight()) >> FRACBITS;
-                    MV_FooBuffer[i*2] = left;
-                    MV_FooBuffer[i*2+1] = right;
+                    MV_FooBuffer[i*2] = left >> FRACBITS;
+                    MV_FooBuffer[i*2+1] = right >> FRACBITS;
 		}
 	}
 
@@ -275,7 +281,7 @@ void MV_16BitDownmix(char *dest, int count)
 
 	for (i = 0; i < count; i++)
 	{
-            int out = MV_FooBuffer[i] >> FRACBITS;
+            int out = MV_FooBuffer[i];
 		if (out < -32768) pdest[i] = -32768;
 		else if (out > 32767) pdest[i] = 32767;
 		else pdest[i] = out;
@@ -288,7 +294,7 @@ void MV_8BitDownmix(char *dest, int count)
 
 	for (i = 0; i < count; i++)
 	{
-            int out = MV_FooBuffer[i] >> FRACBITS;
+            int out = MV_FooBuffer[i] >> 8;
 		if (out < -128) dest[i] = 0;
 		else if (out > 127) dest[i] = 255;
 		else dest[i] = out + 0x80;
