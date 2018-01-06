@@ -23,8 +23,10 @@
 #include <limits.h>
 #include <string.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include "system.h"
 #include "vuprintf.h"
+#include "ap_int.h"
 
 #ifndef BOOTLOADER
 /* turn everything on */
@@ -58,7 +60,11 @@
 #define FMT_LENMOD_ll   0x010  /* signed/unsigned long long (%ll<radix>) */
 #define FMT_LENMOD_t    0x020  /* signed/unsigned ptrdiff_t (%t<radix>) */
 #define FMT_LENMOD_z    0x040  /* size_t/ssize_t (%z<radix>) */
+#if 0
 #define FMT_LENMOD_L    0x080  /* long double (instead of double) */
+#else
+#define FMT_LENMOD_L    0x000
+#endif
 
 /* compulsory radixes: c, d, i, u, s */
 #define FMT_RADIX_c     0x001  /* single character (%c) */
@@ -74,6 +80,18 @@
 #define FMT_RADIX_f     0x400  /* floating point "[-]ddd.ddd" */
 #define FMT_RADIX_g     0x800  /* floating point exponent or decimal depending
                                   upon value and precision */
+
+/* TODO: 'a' 'A' */
+#define FMT_RADIX_floats (FMT_RADIX_e|FMT_RADIX_f|FMT_RADIX_g)
+
+#if (FMT_RADIX & FMT_RADIX_floats)
+/* Assumes IEEE 754 double-precision, native-endian; replace to parse and init
+   for some other format */
+#define parse_double            parse_ieee754_double
+#define init_double_chunks      init_ieee754_double_chunks
+#define format_double_int10     format_ap_int10
+#define format_double_frac10    format_ap_frac10
+#endif
 
 /* avoid defining redundant functions if two or more types can use the same
  * something not getting a macro means it gets assigned its own value and
@@ -374,7 +392,23 @@ struct fmt_buf {
                               or prefix (numeric) */
     char buf[24];          /* work buffer */
     char bufend[1];        /* buffer end marker and guard '0' */
+#if (FMT_RADIX & FMT_RADIX_floats)
+    int lenmod;
+    int radixchar;
+    int signchar;
+    int alignchar;
+    int width;
+    int precision;
+    char *p;
+#endif
 };
+
+#define PUSHCHAR(ch) \
+    ({  int __rc = push(userp, (ch)); \
+        count += __rc >= 0;           \
+        if (__rc <= 0) {              \
+            goto done;                \
+        } })
 
 /* %d %i */
 static inline const char * format_d(int val,
@@ -530,6 +564,400 @@ static inline const char * format_p(const void *p,
 }
 #endif /* FMT_RADIX_p */
 
+#if (FMT_RADIX & FMT_RADIX_floats)
+/* find out how many uint32_t chunks need to be allocated, if any
+ * if none are needed, finish the init for the number here */
+static long parse_ieee754_double(double f,
+                                 struct ap_int *ia,
+                                 struct ap_int *fa,
+                                 struct fmt_buf *fmt_buf)
+{
+    long rc = 0;
+
+    union {
+        double   f;
+        uint64_t f64;
+    } u = { .f = f };
+
+    int e = ((int)(u.f64 >> 52) & 0x7ff) - 1023; /* -1023..1024 */
+    uint64_t mantissa = u.f64 & 0x000fffffffffffffull;
+
+    if (u.f64 >> 63) {
+        fmt_buf->signchar = '-';
+    }
+
+    if (LIKELY(e >= -8 && e <= 63)) { /* -8 to +63 */
+        /* integer, fraction and manipulations fit in uint64_t */
+        mantissa |= 0x0010000000000000ull;
+        ia->numchunks = 0;
+        ia->shift     = 0;
+        fa->numchunks = 0;
+
+        if (e < 0) {            /* -8 to -1 - fraction */
+            long fracbits = 52 - e;
+            /* int - none */
+            ia->len   = 0;
+            ia->val   = 0;
+            /* frac */
+            fa->len   = fracbits - __builtin_ctzll(mantissa);
+            fa->shift = fracbits;
+            fa->val   = mantissa;
+        }
+        else if (e <= 51) {     /* 0 to +51 - integer|fraction */
+            long fracbits = 52 - e;
+            /* int */
+            ia->len   = base10exp(e) + 2; /* go up + possibly 1 longer */
+            ia->val   = mantissa >> fracbits;
+            /* frac */
+            fa->shift = fracbits;
+            fa->val   = mantissa ^ (ia->val << fracbits);
+            fa->len   = fa->val ? fracbits - __builtin_ctzll(mantissa) : 0;
+        }
+        else {                  /* +52 to +63 - integer */
+            /* int */
+            ia->len   = base10exp(e) + 2;
+            ia->val   = mantissa << (e - 52);
+            /* frac - none */
+            fa->len   = 0;
+            fa->shift = 0;
+            fa->val   = 0;
+        }
+    }
+    else if (e < 0) {         /* -1023 to -9 - fraction */
+        /* int - none */
+        ia->numchunks = 0;
+        ia->len       = 0;
+        ia->shift     = 0;
+        ia->val       = 0;
+        /* frac - left-justify on bit 31 of the chunk of the MSb */
+        if (e >= -1022) {       /* normal */
+            mantissa |= 0x0010000000000000ull;
+        }
+        else {                  /* subnormal (including zero) */
+            e = -1022;
+        }
+
+        if (mantissa) {
+            long fracbits = 52 - e;
+            fa->len       = fracbits - __builtin_ctzll(mantissa);
+            fa->shift     = 31 - ((51 - e) % 32);
+            fa->val       = mantissa;
+            fa->basechunk = (fa->shift + 52) / 32;
+            fa->numchunks = (51 - e + fa->shift) / 32 + 1;
+            rc = fa->numchunks;
+        }
+        else {                  /* zero */
+            fa->numchunks = 0;
+            fa->len       = 0;
+            fa->shift     = 0;
+            fa->val       = 0;
+        }
+    }
+    else if (e <= 1023) {       /* +64 to +1023 - integer */
+        /* int - right-justify on bit 0 of the first chunk */
+        ia->val       = mantissa | 0x0010000000000000ull;
+        ia->len       = base10exp(e) + 2;
+        ia->shift     = (e - 52) % 32;
+        ia->basechunk = e / 32;
+        ia->numchunks = ia->basechunk + 1;
+        rc = ia->numchunks;
+        /* frac - none */
+        fa->numchunks = 0;
+        fa->len       = 0;
+        fa->shift     = 0;
+        fa->val       = 0;
+    }
+    else {                      /* +1024: INF, NAN */
+        rc = -1 - !!mantissa;
+    }
+
+    return rc;
+}
+
+/* construct the arbitrary-precision value in the provided allocation */
+static void init_ieee754_double_chunks(struct ap_int *a,
+                                       uint32_t *a_chunks)
+{
+    long basechunk = a->basechunk;
+    long shift = a->shift;
+    uint64_t val = a->val;
+
+    a->chunks = a_chunks;
+
+    memset(a_chunks, 0, a->numchunks*sizeof (uint32_t));
+
+    if (shift < 12) {
+        a_chunks[basechunk - 1] = val << shift;
+        a_chunks[basechunk - 0] = val >> (32 - shift);
+    }
+    else {
+        a_chunks[basechunk - 2] = val << shift;
+        a_chunks[basechunk - 1] = val >> (32 - shift);
+        a_chunks[basechunk - 0] = val >> (64 - shift);
+    }
+}
+
+/* format inf, nan strings */
+static void format_inf_nan(struct fmt_buf *fmt_buf, long type)
+{
+    /* certain special values */
+    static const char text[2][2][3] =
+    {
+        { { 'I', 'N', 'F' }, { 'i', 'n', 'f' } },
+        { { 'N', 'A', 'N' }, { 'n', 'a', 'n' } },
+    };
+
+    char *p = fmt_buf->buf;
+    fmt_buf->p = p;
+    fmt_buf->length = 3;
+
+    /* they also have a sign */
+    if (fmt_buf->signchar) {
+        *p++ = fmt_buf->signchar;
+        fmt_buf->length++;
+    }
+
+    memcpy(p, &text[type][(fmt_buf->radixchar >> 5) & 0x1], 3);
+}
+
+/* %e %E %f %F %g %G */
+static int format_double_radix(double f,
+                               struct fmt_buf *fmt_buf,
+                               vuprintf_push_cb push,
+                               void *userp)
+{
+    struct ap_int ia, fa;
+    long rc = parse_double(f, &ia, &fa, fmt_buf);
+
+    if (UNLIKELY(rc < 0)) {
+        format_inf_nan(fmt_buf, -rc - 1);
+        return 0;
+    }
+
+    int count = 0;
+
+    /* default precision is 6 for all formats */
+    int prec_rem = fmt_buf->precision < 0 ? 6 : fmt_buf->precision;
+
+    int exp = exp;
+    int explen = 0;
+
+    switch (fmt_buf->radixchar & 0x3)
+    {
+    case 3: /* %g, %G */
+        fmt_buf->precision = prec_rem;
+        if (prec_rem) {
+            prec_rem--;
+        }
+    case 1: /* %e, %E */
+        explen = 2;
+        break;
+    default:
+        break;
+    }
+
+    if (rc > 0 && ia.numchunks > 0) {
+        /* large integer required */
+        init_double_chunks(&ia, alloca(rc*sizeof(*ia.chunks)));
+        rc = 0;
+    }
+
+    const int bufoffs = 6; /* log rollover + round rollover + leading zeros (%g) */
+    long f_prec = MIN(fa.len, prec_rem + 1);
+    char buf[bufoffs + ia.len + f_prec + 1];
+    char *p_last  = &buf[bufoffs + ia.len];
+    char *p_dec   = p_last;
+    char *p_first = format_double_int10(&ia, p_last);
+
+    if (explen) {
+        if (!ia.val && fa.len) {
+            p_first = p_last = &buf[bufoffs];
+            f_prec = -f_prec - 1; /* no lead zeros */
+        }
+        else { /* handles 0e+0 too */
+            exp = ia.len - 1;
+
+            if (exp) {
+                prec_rem -= exp;
+
+                if (prec_rem < 0) {
+                    p_last += prec_rem + 1;
+                    f_prec = 0;
+                }
+                else {
+                    f_prec = MIN(fa.len, prec_rem + 1);
+                }
+            }
+        }
+
+        p_dec = p_first + 1;
+    }
+
+    if (f_prec) {
+        if (rc > 0) {
+            /* large integer required */
+            init_double_chunks(&fa, alloca(rc*sizeof(*fa.chunks)));
+        }
+
+        p_last = format_double_frac10(&fa, p_last, f_prec);
+
+        if (f_prec < 0) {
+            f_prec = -f_prec - 1;
+            exp = f_prec - fa.len;
+        }
+
+        prec_rem -= f_prec;
+    }
+
+    if (prec_rem < 0) {
+        prec_rem = 0;
+        p_last--;
+
+        if (round_number_string10(p_last, p_last - p_first)) {
+            /* carried left */
+            p_first--;
+
+            if (explen) {
+                /* slide everything left by 1 */
+                exp++;
+                p_dec--;
+                p_last--;
+            }
+        }
+    }
+
+    if (explen) {
+        if ((fmt_buf->radixchar & 0x3) == 0x3) { /* g, G */
+            /* 'g' is some weird crap */
+            /* now that the final exponent is known and everything rounded,
+               it is possible to decide whether to format similarly to
+               'e' or 'f' */
+            if (fmt_buf->precision > exp && exp >= -4) { /* P > X >= -4 */
+                if (exp >= 0) {
+                    /* integer digits will be in the buffer */
+                    p_dec = p_first + exp + 1;
+                }
+                else {
+                    /* we didn't keep leading zeros and need to regenerate
+                       them; space was reserved just in case */
+                    p_first = memset(p_dec + exp - 1, '0', -exp);
+                    p_dec = p_first + 1;
+                }
+
+                /* suppress exponent */
+                explen = 0;
+            }
+
+            if (!fmt_buf->length) {
+                /* strip any trailing zeros from the fraction */
+                while (p_last > p_dec && p_last[-1] == '0') {
+                    p_last--;
+                }
+
+                /* suppress trailing precision fill */
+                prec_rem = 0;
+            }
+        }
+
+        if (explen) {
+            /* build exponent string: 'e±dd' */
+            char *p = fmt_buf->bufend;
+            int signchar = '+';
+
+            if (exp < 0) {
+                signchar = '-';
+                exp = -exp;
+            }
+
+            while (exp || explen < 4) {
+                *--p = exp % 10 + '0';
+                exp /= 10;
+                explen++;
+            }
+
+            *--p = signchar;
+            *--p = fmt_buf->radixchar & ~0x2;
+        }
+    }
+
+    int width = fmt_buf->width;
+    int point = p_last > p_dec || prec_rem || fmt_buf->length;
+    int length = p_last - p_first + !!fmt_buf->signchar + point + explen;
+
+    if (width) {
+        if (width - length <= prec_rem) {
+            width = 0;
+        }
+        else {
+            width -= length + prec_rem;
+        }
+    }
+
+    rc = -1;
+
+    /* left padding */
+    if (fmt_buf->alignchar > '0') {
+        /* space-padded width -- before sign */
+        while (width > 0) {
+            PUSHCHAR(' ');
+            width--;
+        }
+    }
+
+    if (fmt_buf->signchar) {
+        PUSHCHAR(fmt_buf->signchar);
+    }
+
+    if (fmt_buf->alignchar == '0') {
+        /* zero-padded width -- after sign */
+        while (width > 0) {
+            PUSHCHAR('0');
+            width--;
+        }
+    }
+
+    /* integer part */
+    while (p_first < p_dec) {
+        PUSHCHAR(*p_first++);
+    }
+
+    /* decimal point */
+    if (point) {
+        PUSHCHAR('.');
+    }
+
+    /* fractional part */
+    while (p_first < p_last) {
+        PUSHCHAR(*p_first++);
+    }
+
+    /* precision 0-padding */
+    while (prec_rem > 0) {
+        PUSHCHAR('0');
+        prec_rem--;
+    }
+
+    /* exponent */
+    if (explen > 0) {
+        char *p = fmt_buf->bufend;
+        while (explen > 0) {
+            PUSHCHAR(p[-explen--]);
+        }
+    }
+
+    /* right padding */
+    while (width > 0) {
+        PUSHCHAR(' ');
+        width--;
+    }
+
+    rc = 1;
+done:
+    fmt_buf->length = count;
+    return rc;
+}
+#endif /* FMT_RADIX_floats */
+
 /* parse fixed width or precision field */
 static const char * parse_number_spec(const char *fmt,
                                       int ch,
@@ -558,16 +986,6 @@ int vuprintf(vuprintf_push_cb push, /* call 'push()' for each output letter */
              const char *fmt,
              va_list ap)
 {
-    #define PUSHCHAR(ch) \
-        do {                              \
-            int __ch = (ch);              \
-            int __rc = push(userp, __ch); \
-            count += __rc >= 0;           \
-            if (__rc <= 0) {              \
-                goto done;                \
-            }                             \
-        } while (0)
-
     int count = 0;
     int ch;
 
@@ -706,6 +1124,9 @@ int vuprintf(vuprintf_push_cb push, /* call 'push()' for each output letter */
         #if (FMT_LENMOD & FMT_LENMOD_z)
         case 'z':
         #endif
+        #if (FMT_LENMOD & FMT_LENMOD_L)
+        case 'L':
+        #endif
             lenmod = ch;
             ch = *fmt++;
         #if (FMT_LENMOD & (FMT_LENMOD_hh | FMT_LENMOD_ll))
@@ -744,6 +1165,40 @@ int vuprintf(vuprintf_push_cb push, /* call 'push()' for each output letter */
         case 'P':
             buf = format_p(va_arg(ap, void *), &fmt_buf, ch,
                            &numeric);
+            break;
+        #endif
+
+        #if (FMT_RADIX & FMT_RADIX_floats)
+        /* any floats gets all of them (except with 'L' and %a, %A for now) */
+        case 'e':
+        case 'E':
+        case 'f':
+        case 'F':
+        case 'g':
+        case 'G':
+            /* LENMOD_L isn't supported for now and will be rejected automatically */
+
+            /* floating point has very different spec interpretations to other
+               formats and requires special handling */
+            fmt_buf.length    = pfxlen;
+            fmt_buf.lenmod    = lenmod;
+            fmt_buf.radixchar = ch;
+            fmt_buf.signchar  = signchar;
+            fmt_buf.alignchar = alignchar;
+            fmt_buf.width     = width;
+            fmt_buf.precision = precision;
+
+            ch = format_double_radix(va_arg(ap, double), &fmt_buf, push, userp);
+            if (ch) {
+                count += fmt_buf.length;
+                if (ch > 0) {
+                    continue;
+                }
+
+                goto done;
+            }
+
+            buf = fmt_buf.p;
             break;
         #endif
 
