@@ -199,6 +199,9 @@ libc/gmtime.c
 #endif /* CONFIG_PLATFORM || HAVE_ROCKBOX_C_LIBRARY */
 
 /* Common */
+#ifndef BOOTLOADER
+common/ap_int.c
+#endif
 common/version.c
 common/config.c
 common/crc32.c
