@@ -7,9 +7,20 @@
 # where <kernel> must be of the form
 #   linux-kernel-*.tgz
 #
-if [ "$#" -lt 1 ]; then
-    >&2 echo "usage: parse_all_nvp_header.sh /path/to/directory"
+function usage
+{
+    >&2 echo "usage: parse_all_nvp_header.sh [--new-only] /path/to/directory"
     exit 1
+}
+
+if [ "$#" -lt 1 ]; then
+    usage
+fi
+
+new_only="no"
+if [ "$1" = "--new-only" ]; then
+    shift
+    new_only="yes"
 fi
 
 # list interesting directories
@@ -20,6 +31,11 @@ do
     # only consider linux based targets
     if [ -e "$dir/not_linux" ]; then
         #echo "$codename: not linux based"
+        continue
+    fi
+    # skip if not new
+    if [ $new_only = "yes" ] && [ -e $codename.txt ]; then
+        echo "Skip $codename: already exists"
         continue
     fi
     # check if we can find a kernel
