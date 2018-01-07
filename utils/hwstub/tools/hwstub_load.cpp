@@ -117,6 +117,7 @@ void usage(void)
     printf("  --verbose/-v    Display debug output\n");
     printf("  --noload        Skip loading stage and only execute the given address\n");
     printf("  --noexec        Skip execute stage and only load data the given address\n");
+    printf("  --call          Perform a call to the code instead of a jump\n");
     printf("file types:\n");
     printf("  raw      Load a raw binary blob\n");
     printf("  rockbox  Load a rockbox image produced by scramble\n");
@@ -135,7 +136,7 @@ int main(int argc, char **argv)
     enum image_type_t type = IT_DETECT;
     bool verbose = false;
     const char *uri = hwstub::uri::default_uri().full_uri().c_str();
-    bool no_load = false, no_exec = false;
+    bool no_load = false, no_exec = false, call = false;
 
     // parse command line
     while(1)
@@ -149,10 +150,11 @@ int main(int argc, char **argv)
             {"verbose", no_argument, 0, 'v'},
             {"noload", no_argument, 0, 'e'},
             {"noexec", no_argument, 0, 'l'},
+            {"call", no_argument, 0, 'c'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hqt:d:elv", long_options, NULL);
+        int c = getopt_long(argc, argv, "hqt:d:elvc", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -188,6 +190,9 @@ int main(int argc, char **argv)
                 break;
             case 'l':
                 no_exec = true;
+                break;
+            case 'c':
+                call = true;
                 break;
             default:
                 abort();
@@ -296,7 +301,7 @@ int main(int argc, char **argv)
     /* exec */
     if(!no_exec)
     {
-        ret = hwdev->exec(addr, HWSTUB_EXEC_JUMP);
+        ret = hwdev->exec(addr, call ? HWSTUB_EXEC_CALL : HWSTUB_EXEC_JUMP);
         if(ret != hwstub::error::SUCCESS)
         {
             fprintf(stderr, "Exec failed: %s\n", error_string(ret).c_str());

@@ -8,39 +8,29 @@ STARTUP(target/mips/jz4760b/crt0.o)
 
 MEMORY
 {
-   DRAM : ORIGIN = DRAM_ORIG, LENGTH = DRAM_SIZE
-   IRAM : ORIGIN = IRAM_ORIG, LENGTH = IRAM_SIZE
+    /* this section has k0 addresses */
+    DRAM_PHYS : ORIGIN = PHYSICAL_DRAM_ADDR + 0x80000000, LENGTH = DRAM_SIZE
+    /* the following two sections use virtual addresses */
+    DRAM : ORIGIN = DRAM_ORIG, LENGTH = DRAM_SIZE
+    IRAM : ORIGIN = IRAM_ORIG, LENGTH = IRAM_SIZE
 }
 
 SECTIONS
 {
-    .relocstart (NOLOAD) :
-    {
-        _relocstart = .;
-    } > DRAM
-
     .text :
     {
         *(.init.text);
         *(.text*);
-        . = ALIGN(4);
-    } > DRAM
-
-    .rodata :
-    {
         *(.rodata*);
-        . = ALIGN(4);
-    } > DRAM
-
-    .data :
-    {
         *(.data*);
         *(.sdata*);
         *(.rel.dyn);
         . = ALIGN(4);
-    } > DRAM
+    } > DRAM AT> DRAM_PHYS
 
-    .iram IRAM_ORIG:
+    _relocstart = LOADADDR(.text);
+
+    .iram :
     {
         _iramstart = .;
         KEEP(*(.vectors.tlb_refill));
@@ -58,14 +48,14 @@ SECTIONS
         KEEP(*(.vectors*))
         . = ALIGN(4);
         _iramend = .;
-    } > IRAM AT> DRAM
+    } > IRAM AT> DRAM_PHYS
 
     _iramcopy = LOADADDR(.iram);
 
     .relocend (NOLOAD) :
     {
-        _relocend = .;
-    } > DRAM
+    } > DRAM AT> DRAM_PHYS
+    _relocend = LOADADDR(.relocend);
 
     .bss (NOLOAD):
     {
@@ -77,11 +67,6 @@ SECTIONS
          *(.scommon*);
          _end = .;
     } > DRAM
-
-    /* put the early crt0 stack in DRAM, after the IRAM content to be relocated,
-     * so that it does not overwrite anything. Note that this is the address of
-     * the end of the stack */
-    crt0_tmpstack_phys = _iramcopy + SIZEOF(.iram) + 0x2000;
 
     .stack (NOLOAD):
     {
@@ -95,7 +80,11 @@ SECTIONS
     .buffer (NOLOAD):
     {
         _loadaddress = .;
-        /*. = DRAM_ORIG + DRAM_SIZE;*/
         _loadaddressend = .;
     } > DRAM
+
+    /DISCARD/ :
+    {
+        *(.MIPS.abiflags);
+    }
 }

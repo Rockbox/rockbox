@@ -23,12 +23,12 @@
 
 /*
  * Chip Memory Map:
- *   0x00000000 - 0x10000000: dram (physical address, remapped to 0x20000000 by EMC)
+ *   0x00000000 - 0x1fffffff: dram (physical address, remapped to 0x20000000 by EMC)
  *   0x132b0000 - 0x132b3fff: tcsm0 (physical address)
  *   0x132c0000 - 0x132c7fff: tcsm1 (physical address)
  *   0x132d0000 - 0x132d2fff: sram (physical address)
- *   0x20000000 - 0x30000000: dram (physical address)
- *   0x80000000 - 0x90000000: dram (virtual address, cached)
+ *   0x20000000 - 0x2fffffff: dram (physical address)
+ *   0x80000000 - 0x8fffffff: dram (virtual address, cached)
  *   0x932b0000 - 0x132d3fff: tcsm0 (virtual address, cached)
  *   0x932c0000 - 0x132d7fff: tcsm1 (virtual address, cached)
  *   0x932d0000 - 0x132d2fff: sram (virtual address, cached)
@@ -38,10 +38,10 @@
  *   0xf4000000 - 0xf4003fff: tcsm0 (cpu virtual address, always uncached)
  *
  * We use the following map:
- *   0x00000000 - 0x10000000: dram (physical address)
+ *   0x20000000 - 0x2fffffff: dram (physical address)
  *   0x132b0000 - 0x132b3fff: tcsm0 (physical address)
- *   0x80000000 - 0x87ffffff: dram (virtual address, cached)
- *   0x88000000 - 0x88003fff: tcsm0 (mmu mapped, uncached)
+ *   0xf0000000 - 0xf3ffffff: dram (virtual address through MMU, cached)
+ *   0xf4000000 - 0xf4003fff: tcsm0 (cpu virtual address hardwired in CPU, always uncached)
  *
  * The advantage of this setting is that dram and tcsm0 are in the same 28-bit
  * segment so that jumps can access any code in the system.
@@ -52,18 +52,30 @@
  * not work.
  */
 
-#define DRAM_ORIG           0x80000000
+#define DRAM_ORIG           0xf0000000
 #define DRAM_SIZE           (MEMORYSIZE * 0x100000)
 
-#define IRAM_ORIG           0x88000000
+#define IRAM_ORIG           0xf4000000
 #define IRAM_SIZE           0x4000
 
-#define PHYSICAL_DRAM_ADDR  0x20000000
+/* make sure DRAM does not overflow on IRAM (we cannot remap IRAM, it's hardwired in the CPU) */
+#if (DRAM_ORIG + DRAM_SIZE) > IRAM_ORIG
+#error The current memory layout cannot accomodate for such a large memory, please change the layout
+#endif
+
+#define PHYSICAL_DRAM_ADDR  0x00000000
 #define PHYSICAL_IRAM_ADDR  0x132b0000
 
 /* 32 bytes per cache line */
 #define CACHEALIGN_SIZE     32
 #define CACHEALIGN_BITS     5
+#define CACHE_SIZE          16*1024
+
+/* JZ4760B is XBurst1, so MIPS32r1 with some extensions: EBASE */
+#define MIPS32_RELEASE      1
+#define MIPS32_HAVE_EBASE
+/* MIPS32r1 doesn't have hazard clearing instructions, cp0 and tlb have a 3 cycles hazard */
+#define MIPS32_HAZARD_CYCLES    3
 
 #define ___IN_RANGE(type, a) (type##_ORIG <= (a) && (a) < (type##_ORIG + type##_SIZE))
 #define __IN_RANGE(type, a) ___IN_RANGE(type, (uintptr_t)(a))
