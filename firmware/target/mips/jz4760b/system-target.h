@@ -29,8 +29,6 @@
 #include "jz4760b.h"
 #include "mipsregs.h"
 
-#define CACHE_SIZE       16*1024
-#define CACHE_LINE_SIZE  32
 #include "mmu-mips.h"
 
 /* no optimized byteswap functions implemented for mips, yet */

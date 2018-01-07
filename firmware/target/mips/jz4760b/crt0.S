@@ -22,6 +22,9 @@
 
 #include "config.h"
 #include "mips.h"
+#include "jz4760b.h"
+
+#include "mips_lib.S"
 
 /* Boot overview:
  *
@@ -31,6 +34,7 @@
  * munge the stack and jump to C code.
  */
 
+ #if 0
 .section .init.text
 .set mips32
 .set noreorder
@@ -42,7 +46,7 @@ _start:
 load_addr:
     addiu   v0, ra, -8          /* calc real load address account for branch delay slot */
 
-    /* unmask all hardware interrupt source, but disable interrupts globally */
+    /* unmask all hardware interrupt sources, but disable interrupts globally */
     li      t0, (0xfc << S_StatusIM)
     mtc0    t0, C0_STATUS
 
@@ -134,6 +138,50 @@ icache_loop:
     /* return */
     jr      ra
     nop
+#else
+/* This code expects to be run either in K0 or K1, but preferrably in K0 because relocations address
+ * is in K0 so running from K1 will incur a relocation penalty. Thus we also assumes that the
+ * cache is initialized, which is alsways the case because it is done with the IPL and SPL */
+.section .init.text
+.set mips32
+.set noreorder
+.set noat
+.global _start
+_start:
+    /* save return address */
+    move    k0, ra
+    /* save load address */
+here:
+    save_cur_pc s0
+    addiu   s0, s0, (_start - here)
+    /* disable all interrupts */
+    disable_interrupts
+enable_big_pages_mode:
+    /* we need to enable some undocumented feature to use big pages and standard JTLB */
+    li      t0, 0xa9000000
+    mtc0    t0, $5, 4 /* big page mode register */
+init_mmu:
+    /* init MMU (see jz4760b.h for details) */
+    mmu_init
+map_dram:
+    /* map dram as cacheable using 16M pages */
+    map_address DRAM_ORIG, PHYSICAL_DRAM_ADDR, DRAM_SIZE, K_CacheAttrCN, (16 * 1024 * 1024)
+relocate:
+    /* relocate binary, note that addresses at in K0 */
+    relocate    s0, _relocstart, _relocend
+flush_cache:
+    /* flush caches */
+    writeback_dcache
+    invalidate_icache
+    /* jump to real start address */
+    la      t0, real_start
+    jr      t0
+    nop
+real_start:
+    /* return */
+    jr      k0
+    nop
+#endif
 
 /*
  * 0x0   - Simple TLB refill handler

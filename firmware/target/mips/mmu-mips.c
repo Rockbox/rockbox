@@ -114,10 +114,10 @@ void map_address(unsigned long virtual, unsigned long physical,
     unsigned long entry0  = (physical & PFN_MASK) << PFN_SHIFT;
     unsigned long entry1  = ((physical+length) & PFN_MASK) << PFN_SHIFT;
     unsigned long entryhi = virtual & ~VPN2_SHIFT;
-    
+
     entry0 |= (M_EntryLoG | M_EntryLoV | (cache_flags << S_EntryLoC) );
     entry1 |= (M_EntryLoG | M_EntryLoV | (cache_flags << S_EntryLoC) );
-    
+
     add_wired_entry(entry0, entry1, entryhi, DEFAULT_PAGE_MASK);
 }
 
@@ -126,11 +126,14 @@ void mmu_init(void)
     write_c0_pagemask(DEFAULT_PAGE_MASK);
     write_c0_wired(0);
     write_c0_framemask(0);
-    
+
     local_flush_tlb_all();
 }
 
-#if CONFIG_CPU == JZ4732
+/* Target specific operations:
+ * - invalidate BTB (Branch Table Buffer)
+ * - sync barrier after cache operations */
+#if CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B
 #define INVALIDATE_BTB()                     \
 do {                                         \
         unsigned long tmp;                   \
@@ -148,10 +151,11 @@ do {                                         \
     } while (0)
 
 #define SYNC_WB() __asm__ __volatile__ ("sync")
-#else
-#define INVALIDATE_BTB() do { while(0) }
-#define SYNC_WB() do { while(0) }
-#endif
+#else /* !JZ4732 */
+#define INVALIDATE_BTB() do { } while(0)
+#define SYNC_WB() do { } while(0)
+#endif /* CONFIG_CPU */
+
 #define __CACHE_OP(op, addr)                 \
     __asm__ __volatile__(                    \
     "    .set    noreorder        \n"        \
@@ -175,16 +179,8 @@ void commit_discard_dcache(void)
 {
     unsigned int i;
 
-    asm volatile (".set   noreorder  \n"
-                  ".set   mips32     \n"
-                  "mtc0   $0, $28    \n" /* TagLo */
-                  "mtc0   $0, $29    \n" /* TagHi */
-                  ".set   mips0      \n"
-                  ".set   reorder    \n"
-                  );
-
     /* Use index type operation and iterate whole cache */
-    for (i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHE_LINE_SIZE)
+    for (i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHEALIGN_SIZE)
         __CACHE_OP(DCIndexWBInv, i);
 
     SYNC_WB();
@@ -203,7 +199,7 @@ void commit_discard_dcache_range(const void *base, unsigned int size)
         return;
     }
 
-    for (s=(char *)base; s<(char *)base+size; s+=CACHE_LINE_SIZE)
+    for (s=(char *)base; s<(char *)base+size; s+=CACHEALIGN_SIZE)
         __CACHE_OP(DCHitWBInv, s);
 
     SYNC_WB();
@@ -222,14 +218,12 @@ void discard_dcache_range(const void *base, unsigned int size)
         return;
     }
 
-    for (s=(char *)base; s<(char *)base+size; s+=CACHE_LINE_SIZE)
+    for (s=(char *)base; s<(char *)base+size; s+=CACHEALIGN_SIZE)
         __CACHE_OP(DCHitInv, s);
 }
 
-/* Invalidate the entire I-cache
- * and writeback + invalidate the entire D-cache
- */
-void commit_discard_idcache(void)
+/* Invalidate whole I-cache */
+static void discard_icache(void)
 {
     unsigned int i;
 
@@ -240,13 +234,18 @@ void commit_discard_idcache(void)
                   ".set   mips0      \n"
                   ".set   reorder    \n"
                   );
-
-    for(i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHE_LINE_SIZE)
-    {
+    /* Use index type operation and iterate whole cache */
+    for (i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHEALIGN_SIZE)
         __CACHE_OP(ICIndexStTag, i);
-        __CACHE_OP(DCIndexWBInv, i);
-    }
 
     INVALIDATE_BTB();
-    SYNC_WB();
+}
+
+/* Invalidate the entire I-cache
+ * and writeback + invalidate the entire D-cache
+ */
+void commit_discard_idcache(void)
+{
+    commit_discard_dcache();
+    discard_icache();
 }

@@ -48,13 +48,15 @@ static inline bool jz_gpio_get_input(unsigned bank, unsigned pin)
 }
 
 #define __PIN_FUNCTION      (1 << 0)
-#define __PIN_SELECT(s)     ((s) << 1)
+#define __PIN_SELECT        (1 << 1)
+#define __PIN_SELECT_v      (1 << 1)
 #define __PIN_DIR           (1 << 2)
-#define __PIN_TRIGGER(t)    ((t) << 3)
+#define __PIN_TRIGGER       (1 << 3)
+#define __PIN_TRIGGER_v     (1 << 3)
 
 #define PIN_GPIO_OUT    __PIN_DIR
 #define PIN_GPIO_IN     0
-#define PIN_FUN(f)      (__PIN_FUNCTION | __PIN_SELECT((f) & 1) | __PIN_TRIGGER(((f) >> 1) & 1))
+#define PIN_FUN(f)      (__PIN_FUNCTION | (__PIN_SELECT_v((f) & 1) | __PIN_TRIGGER_v(((f) >> 1) & 1))
 
 static inline void jz_gpio_set_function_mask(unsigned bank, unsigned mask, unsigned function)
 {
