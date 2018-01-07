@@ -55,7 +55,7 @@ const uint8_t g_fwu_signature[FWU_SIG_SIZE] =
 struct fwu_crypto_hdr_t
 {
     uint8_t field0[16];
-    uint8_t unk;
+    uint8_t unk2; // cipher?
     uint8_t key[32];
 } __attribute__((packed));
 
@@ -854,10 +854,9 @@ static int get_key_fwu_v3(size_t size, uint8_t *buf, uint8_t *blockA, uint8_t *b
 
     cprintf(BLUE, "Main\n");
 
-    struct fwu_crypto_hdr_t crypto_hdr;
-    memcpy(&crypto_hdr, buf + sizeof(struct fwu_hdr_t), sizeof(crypto_hdr));
-    cprintf_field("  Byte: ", "%d ", crypto_hdr.unk);
-    check_field(crypto_hdr.unk, 3, "Ok\n", "Mismatch\n");
+    struct fwu_crypto_hdr_t *crypto_hdr = (void *)buf + sizeof(struct fwu_hdr_t);
+    cprintf_field("  Byte: ", "%d ", crypto_hdr->unk2);
+    check_field(crypto_hdr->unk2, 3, "Ok\n", "Mismatch\n");
 
     ec_point_t ptrs;
     ptrs.x = malloc(g_decode_A_info.size);
@@ -871,11 +870,11 @@ static int get_key_fwu_v3(size_t size, uint8_t *buf, uint8_t *blockA, uint8_t *b
     cprintf(GREEN, "  Crypto bits copy: ");
     check_field(ret, 0, "Pass\n", "Fail\n");
 
-    ret = crypto4(crypto_hdr.key, &ptrs, g_decode_buffer3);
+    memcpy(keybuf, crypto_hdr->key, 32);
+    ret = crypto4(keybuf, &ptrs, g_decode_buffer3);
     cprintf(GREEN, "  Crypto 4: ");
     check_field(ret, 0, "Pass\n", "Fail\n");
 
-    memcpy(keybuf, crypto_hdr.key, 32);
     int offset = g_decode_A_info.nr_words + 91;
 
     decode_block_with_swap(keybuf, 0, &buf[offset], 512 - offset, g_perm_B);
@@ -907,7 +906,7 @@ static int get_key_fwu_v3(size_t size, uint8_t *buf, uint8_t *blockA, uint8_t *b
     memcpy(blo + bsz + 16, smallblock + bsz, 476 - bsz);
 
     decode_block_with_perm(blo + 492, 16, blo, 492, g_perm_B);
-    ret = check_block(buf + 42, midbuf + 88, 450);
+    ret = check_block((void *)crypto_hdr, midbuf + 88, 450);
     cprintf(GREEN, "  Decode block: ");
     check_field(ret, 0, "Pass\n", "Fail\n");
 
@@ -915,6 +914,7 @@ static int get_key_fwu_v3(size_t size, uint8_t *buf, uint8_t *blockA, uint8_t *b
     cprintf(GREEN, "  Compare: ");
     check_field(ret, 0, "Pass\n", "Fail\n");
 
+    //print_hex("Crypto", midbuf, 108);
     /*
     ret = memcmp(midbuf + 25, zero, sizeof(zero));
     cprintf(GREEN, "  Sanity: ");
@@ -970,10 +970,13 @@ static void atj2127_decrypt_sector(void *inbuf, size_t size,
 }
 
 static void atj2127_decrypt(uint8_t *dst, const uint8_t *src, size_t size,
-    uint8_t keybuf[32], int rounds_to_perform)
+    uint8_t keybuf[32], int rounds_to_perform, bool print_info)
 {
-    cprintf(BLUE, "ATJ2127:\n");
-    cprintf_field("  Rounds: ", "%d\n", rounds_to_perform);
+    if(print_info)
+    {
+        cprintf(BLUE, "ATJ2127:\n");
+        cprintf_field("  Rounds: ", "%d\n", rounds_to_perform);
+    }
     while(size > 0)
     {
         int sec_sz = MIN(size, 512);
@@ -1034,7 +1037,7 @@ static int decrypt_fwu_v3(uint8_t *buf, size_t *size, uint8_t block[512], enum f
     if(mode == FWU_AUTO)
     {
         uint8_t hdr_buf[512];
-        atj2127_decrypt(hdr_buf, tmpbuf, sizeof(hdr_buf), keybuf, rounds_to_perform);
+        atj2127_decrypt(hdr_buf, tmpbuf, sizeof(hdr_buf), keybuf, rounds_to_perform, false);
         is_atj2127 = afi_check(hdr_buf, sizeof(hdr_buf));
         if(is_atj2127)
             cprintf(BLUE, "File looks like an ATJ2127 firmware\n");
@@ -1045,7 +1048,7 @@ static int decrypt_fwu_v3(uint8_t *buf, size_t *size, uint8_t block[512], enum f
         is_atj2127 = true;
 
     if(is_atj2127)
-        atj2127_decrypt(buf, tmpbuf, *size, keybuf, rounds_to_perform);
+        atj2127_decrypt(buf, tmpbuf, *size, keybuf, rounds_to_perform, true);
     else
     {
         compute_perm(keybuf, 32, g_perm_B);
