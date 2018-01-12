@@ -222,6 +222,7 @@ static void ROCKBOXAUD_CloseAudio(_THIS)
             SDL_FreeAudioMem(this->hidden->rb_buf[i]);
     }
     rb->pcm_play_stop();
+    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 }
 
 static int ROCKBOXAUD_OpenAudio(_THIS, SDL_AudioSpec *spec)
