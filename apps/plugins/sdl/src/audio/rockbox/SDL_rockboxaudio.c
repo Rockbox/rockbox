@@ -212,6 +212,7 @@ static Uint8 *ROCKBOXAUD_GetAudioBuf(_THIS)
 static void ROCKBOXAUD_CloseAudio(_THIS)
 {
     rb->pcm_play_stop();
+    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
     if ( this->hidden->mixbuf != NULL ) {
         SDL_FreeAudioMem(this->hidden->mixbuf);
         this->hidden->mixbuf = NULL;

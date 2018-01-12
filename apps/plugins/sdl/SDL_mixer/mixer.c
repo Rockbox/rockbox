@@ -412,7 +412,8 @@ int Mix_OpenAudio(int frequency, Uint16 format, int nchannels, int chunksize)
 			return(0);
 		}
 		while ( audio_opened ) {
-			Mix_CloseAudio();
+                    Mix_CloseAudio();
+                    rb->yield();
 		}
 	}
 
