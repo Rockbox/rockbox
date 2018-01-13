@@ -829,7 +829,6 @@ int do_dest(int argc, char **argv)
     int shp_index = NWZ_NVP_INVALID;
     if(nwz_series[series_index].nvp_index)
         shp_index = (*nwz_series[series_index].nvp_index)[NWZ_NVP_SHP];
-    shp_index = NWZ_NVP_INVALID;
     if(shp_index == NWZ_NVP_INVALID)
     {
         printf("This device doesn't have node 'shp'\n");
