@@ -321,7 +321,7 @@ int get_model_id(unsigned long *model_id)
     return 0;
 }
 
-int get_model_and_series(int *model_index, int *series_index)
+int get_model_and_series(int *model_index, int *series_index, unsigned long *model_id_out)
 {
     /* if the user forced the series, simply match by name, special for '?' which
      * prompts the list */
@@ -346,6 +346,8 @@ int get_model_and_series(int *model_index, int *series_index)
         unsigned long model_id;
         if(get_model_id(&model_id))
             return 1;
+        if(model_id_out)
+            *model_id_out = model_id;
         *model_index = -1;
         for(int i = 0; i < NWZ_MODEL_COUNT; i++)
             if(nwz_model[i].mid == model_id)
@@ -448,7 +450,7 @@ int get_dnk_nvp(int argc, char **argv)
         return 1;
     }
     int series_index, model_index;
-    int ret = get_model_and_series(&model_index, &series_index);
+    int ret = get_model_and_series(&model_index, &series_index, NULL);
     if(ret)
         return ret;
     size_t size = 0;
@@ -820,15 +822,18 @@ int do_dest(int argc, char **argv)
     }
     /* get model/series */
     int model_index, series_index;
-    int ret = get_model_and_series(&model_index, &series_index);
+    unsigned long model_id;
+    int ret = get_model_and_series(&model_index, &series_index, &model_id);
     if(ret)
         return ret;
     int shp_index = NWZ_NVP_INVALID;
     if(nwz_series[series_index].nvp_index)
         shp_index = (*nwz_series[series_index].nvp_index)[NWZ_NVP_SHP];
+    shp_index = NWZ_NVP_INVALID;
     if(shp_index == NWZ_NVP_INVALID)
     {
         printf("This device doesn't have node 'shp'\n");
+        help_us(true, model_id);
         return 5;
     }
     /* in all cases, we need to read shp */
