@@ -127,7 +127,7 @@ static void ROCKBOXAUD_WaitAudio(_THIS)
             }
         }
 
-        rb->yield();
+        rb->sleep(0);
     }
 }
 
