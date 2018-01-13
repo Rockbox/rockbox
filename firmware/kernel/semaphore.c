@@ -133,3 +133,16 @@ void semaphore_release(struct semaphore *s)
 #endif
     (void)result;
 }
+
+int semaphore_get_count(struct semaphore *s)
+{
+    int oldlevel = disable_irq_save();
+    corelock_lock(&s->cl);
+
+    int count = s->count;
+
+    corelock_unlock(&s->cl);
+    restore_irq(oldlevel);
+
+    return count;
+}

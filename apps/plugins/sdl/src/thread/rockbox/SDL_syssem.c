@@ -150,7 +150,7 @@ Uint32 SDL_SemValue(SDL_sem *sem)
 
     value = 0;
     if ( sem ) {
-        value = sem->s.count;
+        value = (Uint32)rb->semaphore_get_count(&sem->s);
     }
     return value;
 }

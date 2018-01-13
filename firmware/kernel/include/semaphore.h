@@ -35,5 +35,6 @@ struct semaphore
 extern void semaphore_init(struct semaphore *s, int max, int start);
 extern int  semaphore_wait(struct semaphore *s, int timeout);
 extern void semaphore_release(struct semaphore *s);
+extern int  semaphore_get_count(struct semaphore *s);
 
 #endif /* SEMAPHORE_H */
