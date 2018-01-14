@@ -147,9 +147,17 @@ void usb_drv_int_enable(bool enable)
 void usb_fix_mbr(unsigned char *mbr)
 {
     unsigned char* p = mbr + 0x1be;
-    char tmp[16];
 
-    /* The Gigabeat S factory partition table contains invalid values for the
+    /* Windows ignores the partition flags and mounts the first partition it
+       sees when the device reports itself as removable. Swap the partitions
+       so the data partition appears to be partition 0. Mark the boot
+       partition 0 as hidden and make it partition 1.
+
+       Update 2018-01-14: Windows shows it if exists, so long as it can mount
+       it. Resort to not exposing entries that we want hidden.
+     */
+
+   /* The Gigabeat S factory partition table contains invalid values for the
        "active" flag in the MBR.  This prevents at least the Linux kernel
        from accepting the partition table, so we fix it on-the-fly. */
     p[0x00] &= 0x80;
@@ -158,18 +166,12 @@ void usb_fix_mbr(unsigned char *mbr)
     p[0x30] &= 0x80;
 
     if (bootloader_install_mode)
-        return;
-
-    /* Windows ignores the partition flags and mounts the first partition it
-       sees when the device reports itself as removable. Swap the partitions
-       so the data partition appears to be partition 0. Mark the boot
-       partition 0 as hidden and make it partition 1. */
-
-    /* Mark the first partition as hidden */
-    p[0x04] |= 0x10;
-
-    /* Swap first and second partitions */
-    memcpy(tmp, &p[0x00], 16);
-    memcpy(&p[0x00], &p[0x10], 16);
-    memcpy(&p[0x10], tmp, 16);
+    {
+        memset(&p[0x10], 0x00, 0x30);      /* Hide non-boot partitions */
+    }
+    else
+    {
+        memmove(&p[0x00], &p[0x10], 0x30); /* Hide boot partition */
+        memset(&p[0x30], 0x00, 0x10);
+    }
 }
