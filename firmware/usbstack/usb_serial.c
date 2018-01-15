@@ -170,7 +170,7 @@ static void sendout(void)
         buffer_transitlength = MIN(buffer_transitlength,TRANSIT_BUFFER_SIZE);
         buffer_length -= buffer_transitlength;
         memcpy(transit_buffer,&send_buffer[buffer_start],buffer_transitlength);
-        usb_drv_send_nonblocking(ep_in,transit_buffer,buffer_transitlength);
+        usb_drv_send(ep_in,transit_buffer,buffer_transitlength);
     }
 }
 

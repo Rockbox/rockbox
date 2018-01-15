@@ -55,6 +55,7 @@ void usb_core_handle_notify(long id, intptr_t data);
 /* For controllers which handle SET ADDR and/or SET CONFIG in hardware */
 void usb_core_notify_set_address(uint8_t addr);
 void usb_core_notify_set_config(uint8_t config);
+int usb_core_control_ack(void *buf, size_t len);
 
 int usb_core_request_endpoint(int type, int dir,struct usb_class_driver* drv);
 void usb_core_release_endpoint(int dir);

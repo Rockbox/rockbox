@@ -159,9 +159,6 @@ void usb_init_device(void)
 {
     usb_reset_controller();
 
-    /* Do one-time inits (no dependency on controller) */
-    usb_drv_startup();
-
     usb_pin_init();
 
     /* These set INT_LEV to the inserted level so it will fire if already
