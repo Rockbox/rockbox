@@ -21,7 +21,7 @@
 */
 #include "SDL_config.h"
 
-/* An implementation of mutexes using semaphores */
+/* Rockbox mutex wrapper */
 
 #include "SDL_thread.h"
 #include "SDL_systhread_c.h"
