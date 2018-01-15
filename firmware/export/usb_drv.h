@@ -23,7 +23,6 @@
 #include "usb_ch9.h"
 #include "kernel.h"
 
-void usb_drv_startup(void);
 void usb_drv_int_enable(bool enable); /* Target implemented */
 void usb_drv_init(void);
 void usb_drv_exit(void);
@@ -31,7 +30,6 @@ void usb_drv_int(void); /* Call from target INT handler */
 void usb_drv_stall(int endpoint, bool stall,bool in);
 bool usb_drv_stalled(int endpoint,bool in);
 int usb_drv_send(int endpoint, void* ptr, int length);
-int usb_drv_send_nonblocking(int endpoint, void* ptr, int length);
 int usb_drv_recv(int endpoint, void* ptr, int length);
 void usb_drv_ack(struct usb_ctrlrequest* req);
 void usb_drv_set_address(int address);

@@ -57,10 +57,8 @@ static inline void discard_dma_buffer_cache(void) { commit_discard_dcache(); }
 struct ep_type
 {
     unsigned int size; /* length of the data buffer */
-    struct semaphore complete; /* wait object */
     int8_t status; /* completion status (0 for success) */
     bool active; /* true is endpoint has been requested (true for EP0) */
-    bool done; /* transfer completed */
     bool busy; /* true is a transfer is pending */
 };
 
@@ -160,7 +158,7 @@ static void ep_transfer(int ep, void *ptr, int len, bool out)
     restore_irq(oldlevel);
 }
 
-int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
+int usb_drv_send(int endpoint, void *ptr, int length)
 {
     ep_transfer(EP_NUM(endpoint), ptr, length, false);
     return 0;
@@ -228,8 +226,6 @@ static void reset_endpoints(void)
             endpoint->active = false;
             endpoint->busy   = false;
             endpoint->status = -1;
-            endpoint->done   = true;
-            semaphore_release(&endpoint->complete);
 
             if (i != 0)
                 DEPCTL(ep, out) = DEPCTL_setd0pid;
@@ -259,8 +255,6 @@ static void cancel_all_transfers(bool cancel_ep0)
             struct ep_type *endpoint = &endpoints[ep][dir == DIR_OUT];
             endpoint->status = -1;
             endpoint->busy   = false;
-            endpoint->done   = false;
-            semaphore_release(&endpoint->complete);
             DEPCTL(ep, dir) = (DEPCTL(ep, dir) & ~DEPCTL_usbactep);
         }
 
@@ -270,10 +264,6 @@ static void cancel_all_transfers(bool cancel_ep0)
 #if CONFIG_CPU == AS3525v2
 void usb_drv_init(void)
 {
-    for (int i = 0; i < USB_NUM_ENDPOINTS; i++)
-        for (int dir = 0; dir < 2; dir++)
-            semaphore_init(&endpoints[i][dir].complete, 1, 0);
-
     bitset32(&CGU_PERI, CGU_USB_CLOCK_ENABLE);
     CCU_USB = (CCU_USB & ~(3<<24)) | (1 << 24); /* ?? */
     /* PHY clock */
@@ -401,10 +391,6 @@ static void usb_reset(void)
 
 void usb_drv_init(void)
 {
-    for (unsigned i = 0; i < sizeof(endpoints)/(2*sizeof(struct ep_type)); i++)
-        for (unsigned dir = 0; dir < 2; dir++)
-            semaphore_init(&endpoints[i][dir].complete, 1, 0);
-
     /* Enable USB clock */
 #if CONFIG_CPU==S5L8701
     PWRCON &= ~0x4000;
@@ -483,8 +469,6 @@ static void handle_ep_int(int ep, bool out)
             if (!out)
                 endpoint->size = size;
             usb_core_transfer_complete(ep, out ? USB_DIR_OUT : USB_DIR_IN, 0, transfered);
-            endpoint->done = true;
-            semaphore_release(&endpoint->complete);
         }
     }
 
@@ -493,8 +477,6 @@ static void handle_ep_int(int ep, bool out)
         {
             endpoint->busy = false;
             endpoint->status = 1;
-            endpoint->done = true;
-            semaphore_release(&endpoint->complete);
         }
     }
 
@@ -608,16 +590,4 @@ void usb_drv_release_endpoint(int ep)
 void usb_drv_cancel_all_transfers()
 {
     cancel_all_transfers(false);
-}
-
-
-int usb_drv_send(int ep, void *ptr, int len)
-{
-    ep = EP_NUM(ep);
-    struct ep_type *endpoint = &endpoints[ep][1];
-    endpoint->done = false;
-    ep_transfer(ep, ptr, len, false);
-    while (endpoint->busy && !endpoint->done && usb_detect() != USB_EXTRACTED)
-        semaphore_wait(&endpoint->complete, HZ);
-    return endpoint->status;
 }
