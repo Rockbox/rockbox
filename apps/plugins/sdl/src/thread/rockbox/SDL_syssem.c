@@ -21,7 +21,7 @@
 */
 #include "SDL_config.h"
 
-/* An implementation of semaphores using mutexes and condition variables */
+/* Rockbox semaphore wrapper */
 
 #include "SDL_timer.h"
 #include "SDL_thread.h"
