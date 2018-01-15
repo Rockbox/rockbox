@@ -552,27 +552,6 @@ int usb_drv_recv(int ep, void* ptr, int length)
         return usb_receive(ep);
 }
 
-int usb_drv_send_nonblocking(int ep, void* ptr, int length)
-{
-    /* First implement DMA... */
-    return usb_drv_send(ep, ptr, length);
-}
-
-static void usb_drv_wait(int ep, bool send)
-{
-    logf("usb_drv_wait(%d, %d)", ep, send);
-    if(send)
-    {
-        while (endpoints[ep].out_in_progress)
-            nop_f();
-    }
-    else
-    {
-        while (endpoints[ep].in_ack)
-            nop_f();
-    }
-}
-
 int usb_drv_send(int ep, void* ptr, int length)
 {
     logf("usb_drv_send_nb(%d, 0x%x, %d)", ep, (int)ptr, length);
@@ -592,7 +571,6 @@ int usb_drv_send(int ep, void* ptr, int length)
     {
         int rc = usb_send(ep);
         usb_data_stage_enable(ep, DIR_TX);
-        usb_drv_wait(ep, DIR_TX);
         return rc;
     }
     else

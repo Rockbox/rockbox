@@ -79,7 +79,6 @@ static union usb_ep0_buffer ep0_buffer USB_DEVBSS_ATTR;
 /* Internal EP state/info */
 struct usb_dw_ep
 {
-    struct semaphore complete;
     uint32_t* req_addr;
     uint32_t req_size;
     uint32_t* addr;
@@ -484,7 +483,6 @@ static void usb_dw_flush_endpoint(int epnum, enum usb_dw_epdir epdir)
     struct usb_dw_ep* dw_ep = usb_dw_get_ep(epnum, epdir);
     dw_ep->busy = false;
     dw_ep->status = -1;
-    semaphore_release(&dw_ep->complete);
 
     if (DWC_EPCTL(epnum, epdir) & EPENA)
     {
@@ -624,7 +622,6 @@ static void usb_dw_reset_endpoints(void)
             dw_ep->active = !ep;
             dw_ep->busy = false;
             dw_ep->status = -1;
-            semaphore_release(&dw_ep->complete);
         }
     }
 
@@ -795,7 +792,6 @@ static void usb_dw_handle_xfer_complete(int epnum, enum usb_dw_epdir epdir)
 
     dw_ep->busy = false;
     dw_ep->status = 0;
-    semaphore_release(&dw_ep->complete);
 
     int transfered = dw_ep->req_size - dw_ep->sizeleft;
     usb_core_transfer_complete(epnum, (epdir == USB_DW_EPDIR_OUT) ?
@@ -1069,16 +1065,7 @@ panic:
 
 static void usb_dw_init(void)
 {
-    static bool initialized = false;
     const struct usb_dw_config *c = &usb_dw_config;
-
-    if (!initialized)
-    {
-        for (int ep = 0; ep < USB_NUM_ENDPOINTS; ep++)
-            for (int dir = 0; dir < USB_DW_NUM_DIRS; dir++)
-                semaphore_init(&usb_dw_get_ep(ep, dir)->complete, 1, 0);
-        initialized = true;
-    }
 
     /* Disable IRQ during setup */
     usb_dw_target_disable_irq();
@@ -1345,7 +1332,7 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
     return 0;
 }
 
-int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
+int usb_drv_send(int endpoint, void *ptr, int length)
 {
     int epnum = EP_NUM(endpoint);
     struct usb_dw_ep* dw_ep = usb_dw_get_ep(epnum, USB_DW_EPDIR_IN);
@@ -1359,23 +1346,4 @@ int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
     }
     usb_dw_target_enable_irq();
     return 0;
-}
-
-int usb_drv_send(int endpoint, void *ptr, int length)
-{
-    int epnum = EP_NUM(endpoint);
-    struct usb_dw_ep* dw_ep = usb_dw_get_ep(epnum, USB_DW_EPDIR_IN);
-
-    semaphore_wait(&dw_ep->complete, 0);
-
-    usb_drv_send_nonblocking(endpoint, ptr, length);
-
-    if (semaphore_wait(&dw_ep->complete, HZ) == OBJ_WAIT_TIMEDOUT)
-    {
-        usb_dw_target_disable_irq();
-        usb_dw_abort_endpoint(epnum, USB_DW_EPDIR_IN);
-        usb_dw_target_enable_irq();
-    }
-
-    return dw_ep->status;
 }

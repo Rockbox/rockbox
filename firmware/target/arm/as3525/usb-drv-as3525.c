@@ -37,9 +37,7 @@
 #include "usb-drv-as3525.h"
 
 static struct usb_endpoint endpoints[USB_NUM_EPS][2];
-static int got_set_configuration = 0;
 static int usb_enum_timeout = -1;
-static bool initialized = false;
 
 /*
  * dma/setup descriptors and buffers should avoid sharing
@@ -179,21 +177,14 @@ static void reset_endpoints(int init)
 
         if (init) {
             if (endpoints[i][0].state & EP_STATE_BUSY) {
-                if (endpoints[i][0].state & EP_STATE_ASYNC) {
-                    endpoints[i][0].rc = -1;
-                    semaphore_release(&endpoints[i][0].complete);
-                } else {
-                    usb_core_transfer_complete(i, USB_DIR_IN, -1, 0);
-                }
+                usb_core_transfer_complete(i, USB_DIR_IN, -1, 0);
             }
             endpoints[i][0].state = 0;
-            semaphore_wait(&endpoints[i][0].complete, TIMEOUT_NOBLOCK);
 
             if (i != 2) { /* Skip the OUT EP0 alias */
                 if (endpoints[i][1].state & EP_STATE_BUSY)
                     usb_core_transfer_complete(i, USB_DIR_OUT, -1, 0);
                 endpoints[i][1].state = 0;
-                semaphore_wait(&endpoints[i][1].complete, TIMEOUT_NOBLOCK);
                 USB_OEP_SUP_PTR(i)    = 0;
             }
         }
@@ -225,18 +216,6 @@ static void reset_endpoints(int init)
 void usb_drv_init(void)
 {
     logf("usb_drv_init() !!!!\n");
-
-    if (!initialized)
-    {
-        int i;
-        for (i = 0; i < USB_NUM_EPS; i++)
-        {
-            semaphore_init(&endpoints[i][0].complete, 1, 0);
-            semaphore_init(&endpoints[i][1].complete, 1, 0);
-        }
-
-        initialized = true;
-    }
 
     usb_enable_pll();
 
@@ -335,7 +314,6 @@ void usb_drv_exit(void)
     ascodec_write(AS3515_USB_UTIL, ascodec_read(AS3515_USB_UTIL) & ~(1<<4));
     usb_disable_pll();
     cpu_boost(0);
-    initialized = false;
     logf("usb_drv_exit() !!!!\n");
 }
 
@@ -530,30 +508,7 @@ static void ep_send(int ep, void *ptr, int len)
 int usb_drv_send(int ep, void *ptr, int len)
 {
     logf("usb_drv_send(%d,%x,%d): ", ep, (int)ptr, len);
-
     ep &= 0x7f;
-
-    if (ep == 0 && got_set_configuration) {
-        got_set_configuration = 0;
-        if (len != 0)
-            panicf("usb_drv_send: GSC, but len!=0");
-        /* Tell the HW we handled the request */
-        USB_DEV_CTRL |= USB_DEV_CTRL_APCSR_DONE;
-        return 0;
-    }
-
-    ep_send(ep, ptr, len);
-    if (semaphore_wait(&endpoints[ep][0].complete, HZ) == OBJ_WAIT_TIMEDOUT)
-        logf("send timed out!\n");
-
-    return endpoints[ep][0].rc;
-}
-
-int usb_drv_send_nonblocking(int ep, void *ptr, int len)
-{
-    logf("usb_drv_send_nonblocking(%d,%x,%d): ", ep, (int)ptr, len);
-    ep &= 0x7f;
-    endpoints[ep][0].state |= EP_STATE_ASYNC;
     ep_send(ep, ptr, len);
     return 0;
 }
@@ -576,16 +531,9 @@ static void handle_in_ep(int ep)
     if (ep_sts & USB_EP_STAT_TDC) {
         endpoints[ep][0].state &= ~EP_STATE_BUSY;
         endpoints[ep][0].rc = 0;
-        logf("EP%d %x %stx done len %x stat %08x\n",
-             ep, ep_sts, endpoints[ep][0].state & EP_STATE_ASYNC ? "async " :"",
-             endpoints[ep][0].len,
-             endpoints[ep][0].uc_desc->status);
-        if (endpoints[ep][0].state & EP_STATE_ASYNC) {
-            endpoints[ep][0].state &= ~EP_STATE_ASYNC;
-            usb_core_transfer_complete(ep, USB_DIR_IN, 0, endpoints[ep][0].len);
-        } else {
-            semaphore_release(&endpoints[ep][0].complete);
-        }
+        logf("EP%d %x tx done len %x stat %08x\n",
+             ep, ep_sts, endpoints[ep][0].len, endpoints[ep][0].uc_desc->status);
+        usb_core_transfer_complete(ep, USB_DIR_IN, 0, endpoints[ep][0].len);
         ep_sts &= ~USB_EP_STAT_TDC;
     }
 
@@ -744,22 +692,9 @@ void INT_USB_FUNC(void)
         }
         if (intr & USB_DEV_INTR_SET_CONFIG) {/* SET_CONFIGURATION received */
             /*
-             * This is handled in HW, we have to fake a request here
-             * for usb_core.
+             * This is handled in HW so simply notify the core.
              */
-            static struct usb_ctrlrequest set_config = {
-            bRequestType: USB_TYPE_STANDARD | USB_RECIP_DEVICE,
-            bRequest: USB_REQ_SET_CONFIGURATION,
-            wValue: 0,
-            wIndex: 0,
-            wLength: 0,
-            };
-
-            logf("set config\n");
-            got_set_configuration = 1;
-
-            set_config.wValue = USB_DEV_STS & USB_DEV_STS_MASK_CFG;
-            usb_core_control_request(&set_config);
+            usb_core_notify_set_config(USB_DEV_STS & USB_DEV_STS_MASK_CFG);
             intr &= ~USB_DEV_INTR_SET_CONFIG;
         }
         if (intr & USB_DEV_INTR_EARLY_SUSPEND) {/* idle >3ms detected */
