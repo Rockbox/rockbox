@@ -714,8 +714,7 @@ bool usb_hid_control_request(struct usb_ctrlrequest *req, unsigned char *dest)
 
         if (dest != orig_dest)
         {
-            usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
-            usb_drv_send(EP_CONTROL, orig_dest, dest - orig_dest);
+            usb_core_control_ack(orig_dest, dest - orig_dest);
             return true;
         }
         break;
@@ -732,7 +731,7 @@ bool usb_hid_control_request(struct usb_ctrlrequest *req, unsigned char *dest)
             if (usb_hid_set_report(req))
                 break;
         case USB_HID_SET_IDLE:
-            usb_drv_send(EP_CONTROL, NULL, 0); /* ack */
+            usb_core_control_ack(NULL, 0);
             return true;
         }
         break;
@@ -760,7 +759,7 @@ static void usb_hid_try_send_drv(void)
     }
 
     logf("HID: Sending %d bytes",length);
-    rc = usb_drv_send_nonblocking(ep_in, send_buffer[cur_buf_send], length);
+    rc = usb_drv_send(ep_in, send_buffer[cur_buf_send], length);
     currently_sending = true;
     if (rc)
         send_buffer_len[cur_buf_send] = 0;
