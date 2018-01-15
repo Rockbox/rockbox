@@ -75,36 +75,34 @@ struct endpoint_t {
     volatile void *buf;          /* tx/rx buffer address */
     volatile int len;            /* size of the transfer (bytes) */
     volatile int cnt;            /* number of bytes transfered/received  */
-    volatile bool block;         /* flag indicating that transfer is blocking */ 
-    struct semaphore complete;   /* semaphore for blocking transfers */
 };
 
-#define EP_INIT(_type, _dir, _alloced, _buf, _len, _cnt, _block) \
+#define EP_INIT(_type, _dir, _alloced, _buf, _len, _cnt) \
     { .type = (_type), .dir = (_dir), .allocated = (_alloced), .buf = (_buf), \
-      .len = (_len), .cnt = (_cnt), .block = (_block) }
+      .len = (_len), .cnt = (_cnt)}
 
 static struct endpoint_t ctrlep[2] = {
-    EP_INIT(USB_ENDPOINT_XFER_CONTROL, DIR_OUT, true, NULL, 0, 0, true),
-    EP_INIT(USB_ENDPOINT_XFER_CONTROL, DIR_IN,  true, NULL, 0, 0, true),
+    EP_INIT(USB_ENDPOINT_XFER_CONTROL, DIR_OUT, true, NULL, 0, 0 ),
+    EP_INIT(USB_ENDPOINT_XFER_CONTROL, DIR_IN,  true, NULL, 0, 0 ),
 };
 
 static struct endpoint_t endpoints[16] = {
-    EP_INIT(USB_ENDPOINT_XFER_CONTROL,    3, true,  NULL, 0, 0,  true ),  /* stub   */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false ),  /* BOUT1  */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false ),  /* BIN2   */
-    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false ),  /* IIN3   */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false ),  /* BOUT4  */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false ),  /* BIN5   */
-    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false ),  /* IIN6   */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false ),  /* BOUT7  */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false ),  /* BIN8   */
-    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false ),  /* IIN9   */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false ),  /* BOUT10 */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false ),  /* BIN11  */
-    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false ),  /* IIN12  */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false ),  /* BOUT13 */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false ),  /* BIN14  */
-    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false ),  /* IIN15  */
+    EP_INIT(USB_ENDPOINT_XFER_CONTROL,    3, true,  NULL, 0, 0 ),  /* stub   */
+    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0 ),  /* BOUT1  */
+    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0 ),  /* BIN2   */
+    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0 ),  /* IIN3   */
+    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0 ),  /* BOUT4  */
+    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0 ),  /* BIN5   */
+    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0 ),  /* IIN6   */
+    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0 ),  /* BOUT7  */
+    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0 ),  /* BIN8   */
+    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0 ),  /* IIN9   */
+    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0 ),  /* BOUT10 */
+    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0 ),  /* BIN11  */
+    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0 ),  /* IIN12  */
+    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0 ),  /* BOUT13 */
+    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0 ),  /* BIN14  */
+    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0 ),  /* IIN15  */
 };
 
 static void setup_received(void)
@@ -270,10 +268,6 @@ void INT_UDC(void)
                                            USB_DIR_IN,          /* dir */
                                            0,                   /* status */
                                            ctrlep[DIR_IN].len); /* length */
-                
-                /* release semaphore for blocking transfer */
-                if (ctrlep[DIR_IN].block)
-                    semaphore_release(&ctrlep[DIR_IN].complete);
             }
         }
     }
@@ -358,10 +352,6 @@ void INT_UDC(void)
                                                USB_DIR_IN,          /* dir */
                                                0,                   /* status */
                                                endpoints[ep_num].len); /* length */
-                
-                    /* release semaphore for blocking transfer */
-                    if (endpoints[ep_num].block)
-                        semaphore_release(&endpoints[ep_num].complete);
                 }
             }
         }
@@ -385,10 +375,6 @@ void INT_UDC(void)
                                                USB_DIR_IN,          /* dir */
                                                0,                   /* status */
                                                endpoints[ep_num].len); /* length */
-                
-                    /* release semaphore for blocking transfer */
-                    if (endpoints[ep_num].block)
-                        semaphore_release(&endpoints[ep_num].complete);
                 }
             }
         }
@@ -461,7 +447,7 @@ void usb_drv_set_address(int address)
     /* UDC seems to set this automaticaly */
 }
 
-static int _usb_drv_send(int endpoint, void *ptr, int length, bool block)
+static int _usb_drv_send(int endpoint, void *ptr, int length)
 {
     struct endpoint_t *ep;
     int ep_num = EP_NUM(endpoint);
@@ -473,12 +459,7 @@ static int _usb_drv_send(int endpoint, void *ptr, int length, bool block)
 
     ep->buf = ptr;
     ep->len = ep->cnt = length;
-    
-    if (block)
-        ep->block = true;
-    else
-        ep->block = false;
-    
+
     switch (ep->type)
     {
         case USB_ENDPOINT_XFER_CONTROL:                     
@@ -493,24 +474,14 @@ static int _usb_drv_send(int endpoint, void *ptr, int length, bool block)
             int_write(ep_num);
             break;
     }
-    
-    if (block)
-        /* wait for transfer to end */
-        semaphore_wait(&ep->complete, TIMEOUT_BLOCK);
 
     return 0;
 }
 
-/* Setup a send transfer. (blocking) */
+/* Setup a send transfer. */
 int usb_drv_send(int endpoint, void *ptr, int length)
 {
-    return _usb_drv_send(endpoint, ptr, length, true);
-}
-
-/* Setup a send transfer. (non blocking) */
-int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
-{
-    return _usb_drv_send(endpoint, ptr, length, false);
+    return _usb_drv_send(endpoint, ptr, length);
 }
 
 /* Setup a receive transfer. (non blocking) */
@@ -695,14 +666,8 @@ void usb_drv_init(void)
               DEV_SOFT_CN  | /* Device soft connect */
               DEV_SELF_PWR;  /* Device self power */
 
-    /* init semaphore of ep0 */
-    semaphore_init(&ctrlep[DIR_OUT].complete, 1, 0);
-    semaphore_init(&ctrlep[DIR_IN].complete, 1, 0);
-    
     for (ep_num = 1; ep_num < USB_NUM_ENDPOINTS; ep_num++)
     {
-        semaphore_init(&endpoints[ep_num].complete, 1, 0);
-        
         if (ep_num%3 == 0) /* IIN 3, 6, 9, 12, 15 */
         {
             IIN_TXCON(ep_num) |= (ep_num<<8)|TXEPEN|TXNAK; /* ep_num, enable, NAK */

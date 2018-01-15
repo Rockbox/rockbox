@@ -83,9 +83,6 @@ int usb_detect(void)
 
 void usb_init_device(void)
 {
-    /* Do one-time inits */
-    usb_drv_startup();
-
     /* Initially poll */
     update_usb_status(usb_plugged());
 

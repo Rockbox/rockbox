@@ -69,8 +69,7 @@ static int pipe_maxpack_size (int pipe);
 static void control_received(void);
 static void transfer_complete(int endpoint);
 static int mxx_transmit_receive(int endpoint);
-static int mxx_queue(int endpoint, void * ptr, int length, bool send, 
-    bool wait);
+static int mxx_queue(int endpoint, void * ptr, int length, bool send);
 
 struct M66591_epstat {
     unsigned char dir;      /* endpoint direction */
@@ -423,18 +422,13 @@ static int mxx_transmit_receive(int endpoint) {
 }
 
 /* This function is used to start transfers.  It is a helper function for the 
- *  usb_drv_send_nonblocking, usb_drv_send, and usb_drv_receive functions.
+ *  usb_drv_send, and usb_drv_receive functions.
  *
  * The functionality for wait needs to be added.  Currently the driver is 
  *  always used in a blocking mode(USB_TRAN_BLOCK) so it is not required.
  */
-static int mxx_queue(int endpoint, void * ptr, int length, bool send, 
-    bool wait) 
+static int mxx_queue(int endpoint, void * ptr, int length, bool send)
 {
-#if defined(USB_TRAN_BLOCK) && !defined(LOGF_ENABLE)
-    (void) wait;
-#endif
-
     /* Disable IRQs */
     int flags = disable_irq_save();
 
@@ -451,8 +445,8 @@ static int mxx_queue(int endpoint, void * ptr, int length, bool send,
     M66591_eps[endpoint].dir=send;
     M66591_eps[endpoint].waiting=true;
 
-    logf("mxx: queue ep %d %s, len: %d, wait: %d", 
-        endpoint, send ? "out" : "in", length, wait);
+    logf("mxx: queue ep %d %s, len: %d",
+        endpoint, send ? "out" : "in", length);
     
     /* Pick the pipe that communications are happening on */
     pipe_c_select(endpoint, send);
@@ -850,20 +844,12 @@ void usb_drv_exit(void) {
     logf("mxx: detached");
 }
 
-/* This function begins a transmit (on an IN endpoint), it should not block
- *  so the actual transmit is done in the interrupt handler.
- */
-int usb_drv_send_nonblocking(int endpoint, void* ptr, int length)
-{
-    return mxx_queue(endpoint, ptr, length, true, false);
-}
-
 /* This function begins a transmit (on an IN endpoint), it does not block
  *  so the actual transmit is done in the interrupt handler.
  */
 int usb_drv_send(int endpoint, void* ptr, int length)
 {
-    return mxx_queue(endpoint, ptr, length, true, true);
+    return mxx_queue(endpoint, ptr, length, true);
 }
 
 /* This function begins a receive (on an OUT endpoint), it should not block
@@ -871,7 +857,7 @@ int usb_drv_send(int endpoint, void* ptr, int length)
  */
 int usb_drv_recv(int endpoint, void* ptr, int length)
 {
-    return mxx_queue(endpoint, ptr, length, false, false);
+    return mxx_queue(endpoint, ptr, length, false);
 }
 
 /* This function checks the reset handshake speed status 

@@ -684,8 +684,7 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req, unsigned char* des
             if(skip_first) (*tb.max_lun) --;
 #endif
             logf("ums: getmaxlun");
-            usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
-            usb_drv_send(EP_CONTROL, tb.max_lun, 1);
+            usb_core_control_ack(tb.max_lun, 1);
             handled = true;
             break;
         }
@@ -700,7 +699,7 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req, unsigned char* des
             usb_drv_reset_endpoint(ep_in, false);
             usb_drv_reset_endpoint(ep_out, true);
 #endif
-            usb_drv_send(EP_CONTROL, NULL, 0);  /* ack */
+            usb_core_control_ack(NULL, 0);
             handled = true;
             break;
     }
@@ -1167,19 +1166,19 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 
 static void send_block_data(void *data,int size)
 {
-    usb_drv_send_nonblocking(ep_in, data,size);
+    usb_drv_send(ep_in, data,size);
     state = SENDING_BLOCKS;
 }
 
 static void send_command_result(void *data,int size)
 {
-    usb_drv_send_nonblocking(ep_in, data,size);
+    usb_drv_send(ep_in, data,size);
     state = SENDING_RESULT;
 }
 
 static void send_command_failed_result(void)
 {
-    usb_drv_send_nonblocking(ep_in, NULL, 0);
+    usb_drv_send(ep_in, NULL, 0);
     state = SENDING_FAILED_RESULT;
 }
 
@@ -1204,8 +1203,7 @@ static void send_csw(int status)
     tb.csw->data_residue = 0;
     tb.csw->status = status;
 
-    usb_drv_send_nonblocking(ep_in, tb.csw,
-            sizeof(struct command_status_wrapper));
+    usb_drv_send(ep_in, tb.csw,sizeof(struct command_status_wrapper));
     state = WAITING_FOR_CSW_COMPLETION_OR_COMMAND;
     //logf("CSW: %X",status);
     /* Already start waiting for the next command */
