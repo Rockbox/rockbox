@@ -343,14 +343,11 @@ struct queue_head {
     unsigned int reserved;          /* for software use, pointer to the first TD */
     unsigned int status;            /* for software use, status of chain in progress */
     unsigned int length;            /* for software use, transfered bytes of chain in progress */
-    unsigned int wait;              /* for softwate use, indicates if the transfer is blocking */
+    unsigned int reserved2;
 } __attribute__((packed));
 
 static struct queue_head qh_array[USB_NUM_ENDPOINTS*2]
     USB_QHARRAY_ATTR;
-
-static struct semaphore transfer_completion_signal[USB_NUM_ENDPOINTS*2]
-    SHAREDBSS_ATTR;
 
 static const unsigned int pipe2mask[] = {
     0x01, 0x010000,
@@ -363,7 +360,7 @@ static const unsigned int pipe2mask[] = {
 /*-------------------------------------------------------------------------*/
 static void transfer_completed(void);
 static void control_received(void);
-static int prime_transfer(int ep_num, void* ptr, int len, bool send, bool wait);
+static int prime_transfer(int ep_num, void* ptr, int len, bool send);
 static void prepare_td(struct transfer_descriptor* td,
         struct transfer_descriptor* previous_td, void *ptr, int len,int pipe);
 static void bus_reset(void);
@@ -416,16 +413,6 @@ static void usb_drv_reset(void)
     outl(inl(0x70000028) & ~0x800, 0x70000028);
     while ((inl(0x70000028) & 0x80) == 0);
 #endif
-}
-
-/* One-time driver startup init */
-void usb_drv_startup(void)
-{
-    /* Initialize all the signal objects once */
-    int i;
-    for(i=0;i<USB_NUM_ENDPOINTS*2;i++) {
-        semaphore_init(&transfer_completion_signal[i], 1, 0);
-    }
 }
 
 #ifdef LOGF_ENABLE
@@ -579,20 +566,15 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
     }
 }
 
-int usb_drv_send_nonblocking(int endpoint, void* ptr, int length)
-{
-    return prime_transfer(EP_NUM(endpoint), ptr, length, true, false);
-}
-
 int usb_drv_send(int endpoint, void* ptr, int length)
 {
-    return prime_transfer(EP_NUM(endpoint), ptr, length, true, true);
+    return prime_transfer(EP_NUM(endpoint), ptr, length, true);
 }
 
 int usb_drv_recv(int endpoint, void* ptr, int length)
 {
     //logf("usbrecv(%x, %d)", ptr, length);
-    return prime_transfer(EP_NUM(endpoint), ptr, length, false, false);
+    return prime_transfer(EP_NUM(endpoint), ptr, length, false);
 }
 
 int usb_drv_port_speed(void)
@@ -657,9 +639,9 @@ void usb_drv_set_test_mode(int mode)
 /*-------------------------------------------------------------------------*/
 
 /* manual: 32.14.5.2 */
-static int prime_transfer(int ep_num, void* ptr, int len, bool send, bool wait)
+static int prime_transfer(int ep_num, void* ptr, int len, bool send)
 {
-    int rc = 0;
+    int rc;
     int pipe = ep_num * 2 + (send ? 1 : 0);
     unsigned int mask = pipe2mask[pipe];
     struct queue_head* qh = &qh_array[pipe];
@@ -673,7 +655,6 @@ static int prime_transfer(int ep_num, void* ptr, int len, bool send, bool wait)
     }
 */
     qh->status = 0;
-    qh->wait = wait;
 
     new_td=&td_array[pipe*NUM_TDS_PER_EP];
     cur_td=new_td;
@@ -737,32 +718,9 @@ static int prime_transfer(int ep_num, void* ptr, int len, bool send, bool wait)
         goto pt_error;
     }
 
-    restore_irq(oldlevel);
-
-    if (wait) {
-        /* wait for transfer to finish */
-        semaphore_wait(&transfer_completion_signal[pipe], TIMEOUT_BLOCK);
-        if(qh->status!=0) {
-            /* No need to cancel wait here since it was done and the signal
-             * came. */
-            return -5;
-        }
-        //logf("all tds done");
-    }
-
+    rc = 0;
 pt_error:
-    if(rc<0)
-        restore_irq(oldlevel);
-
-    /* Error status must make sure an abandoned wakeup signal isn't left */
-    if (rc < 0 && wait) {
-        /* Cancel wait */
-        qh->wait = 0;
-        /* Make sure to remove any signal if interrupt fired before we zeroed
-         * qh->wait. Could happen during a bus reset for example. */
-        semaphore_wait(&transfer_completion_signal[pipe], TIMEOUT_NOBLOCK);
-    }
-
+    restore_irq(oldlevel);
     return rc;
 }
 
@@ -774,11 +732,7 @@ void usb_drv_cancel_all_transfers(void)
 
     memset(td_array, 0, sizeof td_array);
     for(i=0;i<USB_NUM_ENDPOINTS*2;i++) {
-        if(qh_array[i].wait) {
-            qh_array[i].wait=0;
-            qh_array[i].status=DTD_STATUS_HALTED;
-            semaphore_release(&transfer_completion_signal[i]);
-        }
+        qh_array[i].status=DTD_STATUS_HALTED;
     }
 }
 
@@ -853,6 +807,7 @@ static void prepare_td(struct transfer_descriptor* td,
     }
 }
 
+/* called by usb_drv_int() */
 static void control_received(void)
 {
     int i;
@@ -866,16 +821,13 @@ static void control_received(void)
 
     /* Stop pending control transfers */
     for(i=0;i<2;i++) {
-        if(qh_array[i].wait) {
-            qh_array[i].wait=0;
-            qh_array[i].status=DTD_STATUS_HALTED;
-            semaphore_release(&transfer_completion_signal[i]);
-        }
+        qh_array[i].status=DTD_STATUS_HALTED;
     }
 
     usb_core_control_request((struct usb_ctrlrequest*)tmp);
 }
 
+/* called by usb_drv_int() */
 static void transfer_completed(void)
 {
     int ep;
@@ -906,13 +858,11 @@ static void transfer_completed(void)
                         ((td->size_ioc_sts & DTD_PACKET_SIZE) >> DTD_LENGTH_BIT_POS));
                     td=(struct transfer_descriptor*) td->next_td_ptr;
                 }
-                if(qh->wait) {
-                    qh->wait=0;
-                    semaphore_release(&transfer_completion_signal[pipe]);
-                }
 
-                usb_core_transfer_complete(ep, dir?USB_DIR_IN:USB_DIR_OUT,
-                        qh->status, length);
+                if (qh->status != DTD_STATUS_HALTED) {
+                    usb_core_transfer_complete(ep, dir?USB_DIR_IN:USB_DIR_OUT,
+                            qh->status, length);
+                }
                 Lskip:
                 continue;
             }
@@ -921,6 +871,7 @@ static void transfer_completed(void)
 }
 
 /* manual: 32.14.2.1 Bus Reset */
+/* called by usb_drv_int() */
 static void bus_reset(void)
 {
     int i;

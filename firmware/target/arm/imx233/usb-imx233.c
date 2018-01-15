@@ -56,7 +56,6 @@ void INT_USB_CTRL(void)
 
 void usb_init_device(void)
 {
-    usb_drv_startup();
 }
 
 int usb_detect(void)
