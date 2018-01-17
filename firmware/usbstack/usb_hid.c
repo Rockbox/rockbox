@@ -310,7 +310,6 @@ static uint8_t buf_set_consumer(unsigned char *buf, int id)
 
 #ifdef HAVE_USB_HID_MOUSE
 #define MOUSE_WHEEL_STEP       1
-#define MOUSE_STEP             8
 #define MOUSE_BUTTON_LEFT    0x1
 #define MOUSE_BUTTON_RIGHT   0x2
 //#define MOUSE_BUTTON_MIDDLE  0x4
@@ -319,13 +318,18 @@ static uint8_t buf_set_consumer(unsigned char *buf, int id)
 #define MOUSE_Y                2
 #define MOUSE_WHEEL            3
 #define BUF_LEN_MOUSE          4
-#define MOUSE_ACCEL_FACTOR(count) ((count) / 2)
+/* use tenths of a second and magic values that make for easy cursor control
+ *
+ * if ever adjusting the speed or making it a setting, change this constant
+ * increasing values of c slow it down and decreasing ones speed it up
+ */
+#define MOUSE_ACCEL_C          155
 #define MOUSE_DO(item, step) (buf[(item)] = ((uint8_t)(step)))
 
 static uint8_t buf_set_mouse(unsigned char *buf, int id)
 {
-    static int count = 0;
-    int step = MOUSE_STEP;
+    static long mouse_tick;
+    int step = 1;
 
     memset(buf, 0, BUF_LEN_MOUSE);
 
@@ -377,7 +381,7 @@ static uint8_t buf_set_mouse(unsigned char *buf, int id)
         case HID_MOUSE_RDRAG_DOWN:
         case HID_MOUSE_RDRAG_LEFT:
         case HID_MOUSE_RDRAG_RIGHT:
-            count = 0;
+            mouse_tick = current_tick;
             break;
         case HID_MOUSE_UP_REP:
         case HID_MOUSE_DOWN_REP:
@@ -390,13 +394,18 @@ static uint8_t buf_set_mouse(unsigned char *buf, int id)
         case HID_MOUSE_RDRAG_UP_REP:
         case HID_MOUSE_RDRAG_DOWN_REP:
         case HID_MOUSE_RDRAG_LEFT_REP:
-        case HID_MOUSE_RDRAG_RIGHT_REP:
-            count++;
-            /* TODO: Find a better mouse accellaration algorithm */
-            step *= 1 + MOUSE_ACCEL_FACTOR(count);
-            if (step > 255)
-                step = 255;
+        case HID_MOUSE_RDRAG_RIGHT_REP: {
+            long t = current_tick;
+            long x = (t - mouse_tick) / (HZ / 10);
+            /* function is asymptotic at y=128; this is the smallest x that
+               reaches 127, thus ensuring no multiplies or data overflow */
+            if (x > 126*MOUSE_ACCEL_C) {
+                x = 126*MOUSE_ACCEL_C;
+                mouse_tick = t - x*(HZ / 10);
+            }
+            step = (128*x + MOUSE_ACCEL_C) / (x + MOUSE_ACCEL_C);
             break;
+        }
         default:
             break;
     }
