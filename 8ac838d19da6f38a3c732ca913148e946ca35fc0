@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "64db9039_3d290f8c",
+        "filename": "apps/plugins/SUBDIRS",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2018-01-17T00:18:07Z",
+      "side": 1,
+      "message": "Merge conflict leftover?",
+      "revId": "8ac838d19da6f38a3c732ca913148e946ca35fc0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "64db9039_5d1edb5e",
+        "filename": "apps/plugins/SUBDIRS",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1000293
+      },
+      "writtenOn": "2018-01-17T00:18:07Z",
+      "side": 1,
+      "message": "also here",
+      "revId": "8ac838d19da6f38a3c732ca913148e946ca35fc0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
