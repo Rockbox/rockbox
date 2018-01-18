@@ -8201,115 +8201,115 @@ int main(int argc,char  **argv)
     {
         Error(EXIT_SUCCESS, "Could not initialize any original BASE duke3d*.grp file\n"
               "Even if you are playing a custom GRP you still need\n"
-                                                        "an original base GRP file as Shareware/Full 1.3D GRP or\n"
-                                                        "the v1.5 ATOMIC GRP file. Such a file seems to be missing\n"
-                                                        "or is corrupted\n");
+              "an original base GRP file as Shareware/Full 1.3D GRP or\n"
+              "the v1.5 ATOMIC GRP file. Such a file seems to be missing\n"
+              "or is corrupted\n");
     }
 
     rb->splashf(0, "point 1");
-        // FIX_00022: Automatically recognize the shareware grp (v1.3) + full version (1.3d) +
-        //            atomic (1.4/1.5 grp) and the con files version (either 1.3 or 1.4) (JonoF's idea)
+    // FIX_00022: Automatically recognize the shareware grp (v1.3) + full version (1.3d) +
+    //            atomic (1.4/1.5 grp) and the con files version (either 1.3 or 1.4) (JonoF's idea)
 
-        // Detecting grp version
-        // We keep the old GRP scheme detection for 19.6 compliance. Will be obsolete.
-        filehandle = kopen4load("DUKEDC9.MAP",1);
-        kclose(filehandle);
+    // Detecting grp version
+    // We keep the old GRP scheme detection for 19.6 compliance. Will be obsolete.
+    filehandle = kopen4load("DUKEDC9.MAP",1);
+    kclose(filehandle);
 
     rb->splashf(0, "point 2");
-        if (filehandle == -1) // not DC pack
+    if (filehandle == -1) // not DC pack
+    {
+        rb->splashf(0, "point 3");
+        filehandle = kopen4load("DUKESW.BIN",1);
+        kclose(filehandle);
+        rb->splashf(0, "point 4");
+
+        if (filehandle == -1) // not Shareware version 1.3
         {
-    rb->splashf(0, "point 3");
-                filehandle = kopen4load("DUKESW.BIN",1);
+            rb->splashf(0, "point 5");
+            filehandle = kopen4load("E4L11.MAP",1);
+            kclose(filehandle);
+            rb->splashf(0, "point 6");
+
+            if (filehandle == -1) // not Atomic Edition 1.4/1.5
+            {
+                rb->splashf(0, "point 7");
+                filehandle = kopen4load("E3L11.MAP",1);
                 kclose(filehandle);
-    rb->splashf(0, "point 4");
 
-                if (filehandle == -1) // not Shareware version 1.3
+                rb->splashf(0, "point 8");
+
+                if (filehandle == -1) // not Regular version 1.3d
                 {
-    rb->splashf(0, "point 5");
-                        filehandle = kopen4load("E4L11.MAP",1);
-                        kclose(filehandle);
-    rb->splashf(0, "point 6");
-
-                        if (filehandle == -1) // not Atomic Edition 1.4/1.5
-                        {
-    rb->splashf(0, "point 7");
-                                filehandle = kopen4load("E3L11.MAP",1);
-                                kclose(filehandle);
-
-    rb->splashf(0, "point 8");
-
-                                if (filehandle == -1) // not Regular version 1.3d
-                                {
-                                        grpVersion = UNKNOWN_GRP;
-                                }
-                                else
-                                {
-                                        grpVersion = REGULAR_GRP13D;
-                                }
-                        }
-                        else
-                        {
-                                grpVersion = ATOMIC_GRP14_15;
-                        }
+                    grpVersion = UNKNOWN_GRP;
                 }
                 else
                 {
-                        grpVersion = SHAREWARE_GRP13;
+                    grpVersion = REGULAR_GRP13D;
                 }
+            }
+            else
+            {
+                grpVersion = ATOMIC_GRP14_15;
+            }
         }
         else
         {
-                grpVersion = DUKEITOUTINDC_GRP;
+            grpVersion = SHAREWARE_GRP13;
         }
+    }
+    else
+    {
+        grpVersion = DUKEITOUTINDC_GRP;
+    }
 
     rb->splashf(0, "point 9");
-        // FIX_00062: Better support and identification for GRP and CON files for 1.3/1.3d/1.4/1.5
-        if (    groupefil_crc32[0]==CRC_BASE_GRP_SHAREWARE_13 ||
-                                groupefil_crc32[0]==CRC_BASE_GRP_FULL_13 ||
-                                groupefil_crc32[0]==CRC_BASE_GRP_PLUTONIUM_14 ||
-                                groupefil_crc32[0]==CRC_BASE_GRP_ATOMIC_15 )
+    // FIX_00062: Better support and identification for GRP and CON files for 1.3/1.3d/1.4/1.5
+    if (    groupefil_crc32[0]==CRC_BASE_GRP_SHAREWARE_13 ||
+            groupefil_crc32[0]==CRC_BASE_GRP_FULL_13 ||
+            groupefil_crc32[0]==CRC_BASE_GRP_PLUTONIUM_14 ||
+            groupefil_crc32[0]==CRC_BASE_GRP_ATOMIC_15 )
+    {
+        rb->splashf(0, "point 10");
+        printf("GRP identified as: %s\n", grpVersion2char_from_crc(groupefil_crc32[0]));
+    }
+    else
+    {
+        rb->splashf(0, "point 11");
+        printf( "The content of your original BASE *.GRP is corrupted. CRC=%X\n"
+                "You may run in troubles. Official GRP are:\n\n", groupefil_crc32[0]);
+
+        for(i=0; i<MAX_KNOWN_GRP; i++)
+            printf("%s -> CRC32=%X  Size=%d bytes\n", crc32lookup[i].name, crc32lookup[i].crc32, crc32lookup[i].size);
+
+        printf( "\nYou should try to get one of these GRP only as a base GRP\n"
+                "Do you want to continue anyway? (Y/N): ");
+        do
+            kbdKey = getch() | ' ';
+        while(kbdKey != 'y' && kbdKey != 'n');
+        printf("%c\n", kbdKey);
+
+        if(kbdKey == 'n')
+            Error(EXIT_SUCCESS,"");
+    }
+
+    // computing exe crc
+    ud.exeCRC[0] = 0;
+    exe = NULL;
+    //filehandle = open(argv[0],O_BINARY|O_RDONLY);
+    filehandle = -1;
+    if(filehandle!=-1)
+    {
+        exe = malloc(filelength(filehandle));
+        if(exe)
         {
-    rb->splashf(0, "point 10");
-                printf("GRP identified as: %s\n", grpVersion2char_from_crc(groupefil_crc32[0]));
+            read(filehandle, exe, filelength(filehandle));
+            ud.exeCRC[0] = crc32_update(exe, filelength(filehandle), ud.exeCRC[0]);
+            free(exe);
         }
-        else
-        {
-    rb->splashf(0, "point 11");
-                printf( "The content of your original BASE *.GRP is corrupted. CRC=%X\n"
-                        "You may run in troubles. Official GRP are:\n\n", groupefil_crc32[0]);
+        close(filehandle);
+    }
 
-                for(i=0; i<MAX_KNOWN_GRP; i++)
-                        printf("%s -> CRC32=%X  Size=%d bytes\n", crc32lookup[i].name, crc32lookup[i].crc32, crc32lookup[i].size);
-
-                printf( "\nYou should try to get one of these GRP only as a base GRP\n"
-                                "Do you want to continue anyway? (Y/N): ");
-                do
-                        kbdKey = getch() | ' ';
-                while(kbdKey != 'y' && kbdKey != 'n');
-                printf("%c\n", kbdKey);
-
-                if(kbdKey == 'n')
-                        Error(EXIT_SUCCESS,"");
-        }
-
-        // computing exe crc
-        ud.exeCRC[0] = 0;
-        exe = NULL;
-        //filehandle = open(argv[0],O_BINARY|O_RDONLY);
-        filehandle = -1;
-        if(filehandle!=-1)
-        {
-                exe = malloc(filelength(filehandle));
-                if(exe)
-                {
-                        read(filehandle, exe, filelength(filehandle));
-                        ud.exeCRC[0] = crc32_update(exe, filelength(filehandle), ud.exeCRC[0]);
-                        free(exe);
-                }
-                close(filehandle);
-        }
-
-        checkcommandline(argc,argv);
+    checkcommandline(argc,argv);
 
     _platform_init(argc, argv, "Duke Nukem 3D", "Duke3D");
 
@@ -8346,10 +8346,10 @@ int main(int argc,char  **argv)
         while( !KB_KeyWaiting() ) getpackets();
     }
 
-        if(g_bStun)
-        {
-                waitforeverybody();
-        }
+    if(g_bStun)
+    {
+        waitforeverybody();
+    }
 
     if(numplayers > 1) // if multimode > 1 and numplayer == 1 => fake player mode on
     {
@@ -8373,26 +8373,26 @@ int main(int argc,char  **argv)
     //{
     //  playerswhenstarted = ud.multimode;
 
-                // AddFaz fix.
-                // This would cause monsters not to spawn when loading a usermap
-                /*
-        if(ud.warp_on == 0)
-        {
-            ud.m_monsters_off = 1;
-            ud.m_player_skill = 0;
-        }
-                */
+    // AddFaz fix.
+    // This would cause monsters not to spawn when loading a usermap
+    /*
+      if(ud.warp_on == 0)
+      {
+      ud.m_monsters_off = 1;
+      ud.m_player_skill = 0;
+      }
+    */
 //}
 
 
-   RTS_Init(ud.rtsname);
-   if(numlumps)
-           printf("Using .RTS file:%s\n",ud.rtsname);
+    RTS_Init(ud.rtsname);
+    if(numlumps)
+        printf("Using .RTS file:%s\n",ud.rtsname);
 
-   if (CONTROL_JoystickEnabled)
-       CONTROL_CenterJoystick(CenterCenter,UpperLeft,LowerRight,CenterThrottle,CenterRudder);
+    if (CONTROL_JoystickEnabled)
+        CONTROL_CenterJoystick(CenterCenter,UpperLeft,LowerRight,CenterThrottle,CenterRudder);
 
-   puts("Loading palette/lookups.");
+    puts("Loading palette/lookups.");
     if( setgamemode(ScreenMode,ScreenWidth,ScreenHeight) < 0 )
     {
         printf("\nVESA driver for ( %i * %i ) not found/supported!\n",xdim,ydim);
@@ -8411,7 +8411,7 @@ int main(int argc,char  **argv)
     setbrightness(ud.brightness>>2,&ps[myconnectindex].palette[0]);
 
     if(KB_KeyPressed( sc_Escape ) )
-                gameexit(" ");
+        gameexit(" ");
 
     FX_StopAllSounds();
     clearsoundlocks();
@@ -8489,56 +8489,56 @@ MAIN_LOOP_RESTART:
 
 
 
-        else if(ud.warp_on == 1) //if cmd arguments /V and /L are given.
+    else if(ud.warp_on == 1) //if cmd arguments /V and /L are given.
     {
 
-                if (numplayers > 1) //if in multiplayer reset everyones weapon status.
-                {
-                        int c;
+        if (numplayers > 1) //if in multiplayer reset everyones weapon status.
+        {
+            int c;
 
             switch(ud.m_coop)   //set item spawn options, as they would be if
-                        {                                       //game was started via main menu.
-                                case 0:
-                                        ud.respawn_inventory = ud.m_respawn_inventory = 1;
-                                        ud.respawn_items = ud.m_respawn_items = 1;
-                                        break;
-                                case 1:
-                                        ud.respawn_inventory = ud.m_respawn_inventory = 1;
-                                        ud.respawn_items = ud.m_respawn_items = 0;
-                                        break;
-                                case 2:
-                                        ud.respawn_inventory = ud.m_respawn_inventory = 0;
-                                        ud.respawn_items = ud.m_respawn_items = 0;
-                                        break;
-                        }
-
-                        if( ud.m_player_skill == 4 )
-                        {
-                                ud.m_respawn_monsters = 1; //set skill
-                        }
-                        else
-                        {
-                                ud.m_respawn_monsters = 0;
-                        }
-
-                        waitforeverybody();
-
-                        for(c=connecthead;c>=0;c=connectpoint2[c])
-            {
-                            resetweapons(c); //without this players would spawn with no weapon.
-                                resetinventory(c);
+            {                                       //game was started via main menu.
+            case 0:
+                ud.respawn_inventory = ud.m_respawn_inventory = 1;
+                ud.respawn_items = ud.m_respawn_items = 1;
+                break;
+            case 1:
+                ud.respawn_inventory = ud.m_respawn_inventory = 1;
+                ud.respawn_items = ud.m_respawn_items = 0;
+                break;
+            case 2:
+                ud.respawn_inventory = ud.m_respawn_inventory = 0;
+                ud.respawn_items = ud.m_respawn_items = 0;
+                break;
             }
 
-                }
+            if( ud.m_player_skill == 4 )
+            {
+                ud.m_respawn_monsters = 1; //set skill
+            }
+            else
+            {
+                ud.m_respawn_monsters = 0;
+            }
 
-                newgame(ud.m_volume_number,ud.m_level_number,ud.m_player_skill);
-                enterlevel(MODE_GAME); //start game.
+            waitforeverybody();
+
+            for(c=connecthead;c>=0;c=connectpoint2[c])
+            {
+                resetweapons(c); //without this players would spawn with no weapon.
+                resetinventory(c);
+            }
+
+        }
+
+        newgame(ud.m_volume_number,ud.m_level_number,ud.m_player_skill);
+        enterlevel(MODE_GAME); //start game.
 
     }
     else
-        {
-                vscrn();
-        }
+    {
+        vscrn();
+    }
 
     if( ud.warp_on == 0 && playback() )
     {
@@ -8550,20 +8550,20 @@ MAIN_LOOP_RESTART:
 
     ud.warp_on = 0;
 
-        //The main game loop is here.
+    //The main game loop is here.
     while ( !(ps[myconnectindex].gm&MODE_END) )
     {
         sampletimer();
         if( ud.recstat == 2 || ud.multimode > 1 || ( ud.show_help == 0 && (ps[myconnectindex].gm&MODE_MENU) != MODE_MENU ) )
             if( ps[myconnectindex].gm&MODE_GAME )
-                        {
+            {
                 // (" It's stuck here ")
-                                //printf("ps[myconnectindex].gm&MODE_GAME\n");
-                                if( moveloop() )
-                                {
-                                        continue;
-                                }
-                        }
+                //printf("ps[myconnectindex].gm&MODE_GAME\n");
+                if( moveloop() )
+                {
+                    continue;
+                }
+            }
 
         if( ps[myconnectindex].gm&MODE_EOL || ps[myconnectindex].gm&MODE_RESTART )
         {
@@ -8585,8 +8585,8 @@ MAIN_LOOP_RESTART:
                     ud.eog = 0;
                     if(ud.multimode < 2)
                     {
-                                                if(VOLUMEONE)
-                                doorders();
+                        if(VOLUMEONE)
+                            doorders();
 
                         ps[myconnectindex].gm = MODE_MENU;
                         cmenu(0);
@@ -8611,7 +8611,7 @@ MAIN_LOOP_RESTART:
         cheats();
 
         if( !CONSOLE_IsActive() )
-          nonsharedkeys();
+            nonsharedkeys();
 
 
         if( (ud.show_help == 0 && ud.multimode < 2 && !(ps[myconnectindex].gm&MODE_MENU) ) || ud.multimode > 1 || ud.recstat == 2)
@@ -8626,19 +8626,19 @@ MAIN_LOOP_RESTART:
             goto MAIN_LOOP_RESTART;
 
         if(debug_on)
-                        caches();
+            caches();
 
         checksync();
 
-                if (VOLUMEONE)
-                if(ud.show_help == 0 && show_shareware > 0 && (ps[myconnectindex].gm&MODE_MENU) == 0 )
+        if (VOLUMEONE)
+            if(ud.show_help == 0 && show_shareware > 0 && (ps[myconnectindex].gm&MODE_MENU) == 0 )
                 rotatesprite((320-50)<<16,9<<16,65536L,0,BETAVERSION,0,0,2+8+16+128,0,0,xdim-1,ydim-1);
 
         nextpage();
     }
 
     gameexit(" ");
-        return(0);
+    return(0);
 }
 
 uint8_t  opendemoread(uint8_t  which_demo) // 0 = mine
@@ -8648,8 +8648,8 @@ uint8_t  opendemoread(uint8_t  which_demo) // 0 = mine
     uint8_t  ver;
     short i,j;
 
-        int32 dummy;
-        int32_t groupefil_crc32_from_demo[MAXGROUPFILES];
+    int32 dummy;
+    int32_t groupefil_crc32_from_demo[MAXGROUPFILES];
 
     if(which_demo == 10)
         d[4] = 'x';
@@ -8658,111 +8658,111 @@ uint8_t  opendemoread(uint8_t  which_demo) // 0 = mine
 
     ud.reccnt = 0;
 
-     if(which_demo == 1 && firstdemofile[0] != 0)
-     {
-                fname = firstdemofile;
-                if ((recfilep = TCkopen4load(firstdemofile,0)) == -1)
-                {
-                        return(0);
-                }
-     }
-     else
-         {
-                 if ((recfilep = TCkopen4load(d,0)) == -1)
-                 {
-                        return(0);
-                 }
-         }
-
-     kread(recfilep,&ud.reccnt,sizeof(int32_t));
-     kread(recfilep,&ver,sizeof(uint8_t ));
-
-         printf("%s has version = %d\n", fname, ver);
-
-        // FIX_00015: Backward compliance with older demos (down to demos v27, 28, 116, 117 and 118)
-        if (PLUTOPAK)
+    if(which_demo == 1 && firstdemofile[0] != 0)
+    {
+        fname = firstdemofile;
+        if ((recfilep = TCkopen4load(firstdemofile,0)) == -1)
         {
-                if( (ver != BYTEVERSION && ver != BYTEVERSION_116 && ver != BYTEVERSION_117 && ver != BYTEVERSION_118) ) // || (ud.reccnt < 512) )
-                {
-                        printf("%s is a demo version %d. We want v. %d, %d, %d, or %d (1.5 Atomic versions)\n",
-                                        fname, (int) ver, BYTEVERSION_116, BYTEVERSION_117, BYTEVERSION_118, BYTEVERSION);
-                        kclose(recfilep);
-                        return 0;
-                }
+            return(0);
         }
-        else // 1.3/1.3d style
+    }
+    else
+    {
+        if ((recfilep = TCkopen4load(d,0)) == -1)
         {
-                if( (ver != BYTEVERSION && ver != BYTEVERSION_27 && ver != BYTEVERSION_28 && ver != BYTEVERSION_29) ) // || (ud.reccnt < 512) )
-                {
-                        printf("%s is a demo version %d. We want v. %d, %d, %d or %d (1.3/1.3d versions)\n",
-                                        fname, (int) ver, BYTEVERSION_27, BYTEVERSION_28, BYTEVERSION_29, BYTEVERSION);
-                        kclose(recfilep);
-                        return 0;
-                }
+            return(0);
         }
+    }
 
-        // FIX_00062: Better support and identification for GRP and CON files for 1.3/1.3d/1.4/1.5
-        if(ver==BYTEVERSION)
+    kread(recfilep,&ud.reccnt,sizeof(int32_t));
+    kread(recfilep,&ver,sizeof(uint8_t ));
+
+    printf("%s has version = %d\n", fname, ver);
+
+    // FIX_00015: Backward compliance with older demos (down to demos v27, 28, 116, 117 and 118)
+    if (PLUTOPAK)
+    {
+        if( (ver != BYTEVERSION && ver != BYTEVERSION_116 && ver != BYTEVERSION_117 && ver != BYTEVERSION_118) ) // || (ud.reccnt < 512) )
         {
-                kread(recfilep, (int32_t *)groupefil_crc32_from_demo, sizeof(groupefil_crc32_from_demo));
-
-                for(i=0; i<MAXGROUPFILES; i++)
-                        if(groupefil_crc32_from_demo[i]!=groupefil_crc32[i])
-                        {
-                                for(j=0; j<=i; j++)
-                                {
-                                        printf("You have GRP #%d:  %s (CRC32=%X)\n"
-                                                   "this demo expects %s (CRC32=%X)\n",
-                                                j, grpVersion2char_from_crc(groupefil_crc32[j]),groupefil_crc32[j],
-                                                grpVersion2char_from_crc(groupefil_crc32_from_demo[j]),groupefil_crc32_from_demo[j]);
-
-                                }
-                                kclose(recfilep);
-                                return 0;
-                        }
-
-
+            printf("%s is a demo version %d. We want v. %d, %d, %d, or %d (1.5 Atomic versions)\n",
+                   fname, (int) ver, BYTEVERSION_116, BYTEVERSION_117, BYTEVERSION_118, BYTEVERSION);
+            kclose(recfilep);
+            return 0;
         }
+    }
+    else // 1.3/1.3d style
+    {
+        if( (ver != BYTEVERSION && ver != BYTEVERSION_27 && ver != BYTEVERSION_28 && ver != BYTEVERSION_29) ) // || (ud.reccnt < 512) )
+        {
+            printf("%s is a demo version %d. We want v. %d, %d, %d or %d (1.3/1.3d versions)\n",
+                   fname, (int) ver, BYTEVERSION_27, BYTEVERSION_28, BYTEVERSION_29, BYTEVERSION);
+            kclose(recfilep);
+            return 0;
+        }
+    }
 
-         ud.playing_demo_rev = ver;
+    // FIX_00062: Better support and identification for GRP and CON files for 1.3/1.3d/1.4/1.5
+    if(ver==BYTEVERSION)
+    {
+        kread(recfilep, (int32_t *)groupefil_crc32_from_demo, sizeof(groupefil_crc32_from_demo));
 
-         kread(recfilep,(uint8_t  *)&ud.volume_number,sizeof(uint8_t ));
-     kread(recfilep,(uint8_t  *)&ud.level_number,sizeof(uint8_t ));
-     kread(recfilep,(uint8_t  *)&ud.player_skill,sizeof(uint8_t ));
-     kread(recfilep,(uint8_t  *)&ud.m_coop,sizeof(uint8_t ));
-     kread(recfilep,(uint8_t  *)&ud.m_ffire,sizeof(uint8_t ));
-     kread(recfilep,(short *)&ud.multimode,sizeof(short));
-     kread(recfilep,(short *)&ud.m_monsters_off,sizeof(short));
-     kread(recfilep,(int32 *)&ud.m_respawn_monsters,sizeof(int32));
-     kread(recfilep,(int32 *)&ud.m_respawn_items,sizeof(int32));
-     kread(recfilep,(int32 *)&ud.m_respawn_inventory,sizeof(int32));
-     kread(recfilep,(int32 *)&ud.playerai,sizeof(int32));
-     kread(recfilep,(uint8_t  *)&ud.user_name[0][0],sizeof(ud.user_name));
-         // FIX_00034: Demos do not turn your run mode off anymore:
-     kread(recfilep,(int32 *)&dummy /*ud.auto_run*/,sizeof(int32)); // not needed and would affect autorun status in duke3d.cfg when quitting duke from a demo
-     kread(recfilep,(uint8_t  *)boardfilename,sizeof(boardfilename));
-     if( boardfilename[0] != 0 )
-     {
+        for(i=0; i<MAXGROUPFILES; i++)
+            if(groupefil_crc32_from_demo[i]!=groupefil_crc32[i])
+            {
+                for(j=0; j<=i; j++)
+                {
+                    printf("You have GRP #%d:  %s (CRC32=%X)\n"
+                           "this demo expects %s (CRC32=%X)\n",
+                           j, grpVersion2char_from_crc(groupefil_crc32[j]),groupefil_crc32[j],
+                           grpVersion2char_from_crc(groupefil_crc32_from_demo[j]),groupefil_crc32_from_demo[j]);
+
+                }
+                kclose(recfilep);
+                return 0;
+            }
+
+
+    }
+
+    ud.playing_demo_rev = ver;
+
+    kread(recfilep,(uint8_t  *)&ud.volume_number,sizeof(uint8_t ));
+    kread(recfilep,(uint8_t  *)&ud.level_number,sizeof(uint8_t ));
+    kread(recfilep,(uint8_t  *)&ud.player_skill,sizeof(uint8_t ));
+    kread(recfilep,(uint8_t  *)&ud.m_coop,sizeof(uint8_t ));
+    kread(recfilep,(uint8_t  *)&ud.m_ffire,sizeof(uint8_t ));
+    kread(recfilep,(short *)&ud.multimode,sizeof(short));
+    kread(recfilep,(short *)&ud.m_monsters_off,sizeof(short));
+    kread(recfilep,(int32 *)&ud.m_respawn_monsters,sizeof(int32));
+    kread(recfilep,(int32 *)&ud.m_respawn_items,sizeof(int32));
+    kread(recfilep,(int32 *)&ud.m_respawn_inventory,sizeof(int32));
+    kread(recfilep,(int32 *)&ud.playerai,sizeof(int32));
+    kread(recfilep,(uint8_t  *)&ud.user_name[0][0],sizeof(ud.user_name));
+    // FIX_00034: Demos do not turn your run mode off anymore:
+    kread(recfilep,(int32 *)&dummy /*ud.auto_run*/,sizeof(int32)); // not needed and would affect autorun status in duke3d.cfg when quitting duke from a demo
+    kread(recfilep,(uint8_t  *)boardfilename,sizeof(boardfilename));
+    if( boardfilename[0] != 0 )
+    {
         ud.m_level_number = 7;
         ud.m_volume_number = 0;
-     }
+    }
 
-     for(i=0;i<ud.multimode;i++)
-         {
+    for(i=0;i<ud.multimode;i++)
+    {
         kread(recfilep,(int32 *)&ps[i].aim_mode,sizeof(uint8_t ));
 
-                // FIX_00080: Out Of Synch in demos. Tries recovering OOS in old demos v27/28/29/116/117/118. New: v30/v119.
-                if(ver==BYTEVERSION)
-                        kread(recfilep,ud.wchoice[i],sizeof(ud.wchoice[0]));
-         }
+        // FIX_00080: Out Of Synch in demos. Tries recovering OOS in old demos v27/28/29/116/117/118. New: v30/v119.
+        if(ver==BYTEVERSION)
+            kread(recfilep,ud.wchoice[i],sizeof(ud.wchoice[0]));
+    }
 
-     ud.god = ud.cashman = ud.eog = ud.showallmap = 0;
-     ud.clipping = ud.scrollmode = ud.overhead_on = 0;
-         // FIX_00034: Demos do not turn your run mode off anymore:
-     /* ud.showweapons =  */ ud.pause_on /*= ud.auto_run */ = 0; // makes no sense to reset those 2 value!
+    ud.god = ud.cashman = ud.eog = ud.showallmap = 0;
+    ud.clipping = ud.scrollmode = ud.overhead_on = 0;
+    // FIX_00034: Demos do not turn your run mode off anymore:
+    /* ud.showweapons =  */ ud.pause_on /*= ud.auto_run */ = 0; // makes no sense to reset those 2 value!
 
-         newgame(ud.volume_number,ud.level_number,ud.player_skill);
-         return(1);
+    newgame(ud.volume_number,ud.level_number,ud.player_skill);
+    return(1);
 }
 
 
@@ -8772,21 +8772,21 @@ void opendemowrite(void)
     int32_t dummylong = 0;
     uint8_t  ver;
     short i;
-        char  fullpathdemofilename[16];
+    char  fullpathdemofilename[16];
 
     if(ud.recstat == 2) kclose(recfilep);
 
     ver = BYTEVERSION;
 
-        // Are we loading a TC?
-        if(getGameDir()[0] != '\0'){
-                // Yes
-                sprintf(fullpathdemofilename, "%s\\%s", getGameDir(), d);
-        }
-        else{
-                // No
-                sprintf(fullpathdemofilename, "%s", d);
-        }
+    // Are we loading a TC?
+    if(getGameDir()[0] != '\0'){
+        // Yes
+        sprintf(fullpathdemofilename, "%s\\%s", getGameDir(), d);
+    }
+    else{
+        // No
+        sprintf(fullpathdemofilename, "%s", d);
+    }
 
 // CTW - MODIFICATION
 //  if ((frecfilep = fopen(d,"wb")) == -1) return;
@@ -8794,8 +8794,8 @@ void opendemowrite(void)
 // CTW END - MODIFICATION
     fwrite(&dummylong,4,1,frecfilep);
     fwrite(&ver,sizeof(uint8_t ),1,frecfilep);
-        // FIX_00062: Better support and identification for GRP and CON files for 1.3/1.3d/1.4/1.5
-        fwrite((int32_t *)groupefil_crc32,sizeof(groupefil_crc32),1,frecfilep);
+    // FIX_00062: Better support and identification for GRP and CON files for 1.3/1.3d/1.4/1.5
+    fwrite((int32_t *)groupefil_crc32,sizeof(groupefil_crc32),1,frecfilep);
     fwrite((uint8_t  *)&ud.volume_number,sizeof(uint8_t ),1,frecfilep);
     fwrite((uint8_t  *)&ud.level_number,sizeof(uint8_t ),1,frecfilep);
     fwrite((uint8_t  *)&ud.player_skill,sizeof(uint8_t ),1,frecfilep);
@@ -8812,11 +8812,11 @@ void opendemowrite(void)
     fwrite((uint8_t  *)boardfilename,sizeof(boardfilename),1,frecfilep);
 
     for(i=0;i<ud.multimode;i++)
-        {
-                fwrite((int32 *)&ps[i].aim_mode,sizeof(uint8_t ),1,frecfilep); // seems wrong; prolly not needed anyway
-                // FIX_00080: Out Of Synch in demos. Tries recovering OOS in old demos v27/28/29/116/117/118. New: v30/v119.
-                fwrite(ud.wchoice[i],sizeof(ud.wchoice[0]),1,frecfilep);
-        }
+    {
+        fwrite((int32 *)&ps[i].aim_mode,sizeof(uint8_t ),1,frecfilep); // seems wrong; prolly not needed anyway
+        // FIX_00080: Out Of Synch in demos. Tries recovering OOS in old demos v27/28/29/116/117/118. New: v30/v119.
+        fwrite(ud.wchoice[i],sizeof(ud.wchoice[0]),1,frecfilep);
+    }
 
     totalreccnt = 0;
     ud.reccnt = 0;
@@ -8826,22 +8826,22 @@ void record(void)
 {
     short i;
     for(i=connecthead;i>=0;i=connectpoint2[i])
-         {
-         copybufbyte(&sync[i],&recsync[ud.reccnt],sizeof(input));
-                           ud.reccnt++;
-                 totalreccnt++;
-                 if (ud.reccnt >= RECSYNCBUFSIZ)
-                 {
-              dfwrite(recsync,sizeof(input)*ud.multimode,ud.reccnt/ud.multimode,frecfilep);
-                          ud.reccnt = 0;
-                 }
-         }
+    {
+        copybufbyte(&sync[i],&recsync[ud.reccnt],sizeof(input));
+        ud.reccnt++;
+        totalreccnt++;
+        if (ud.reccnt >= RECSYNCBUFSIZ)
+        {
+            dfwrite(recsync,sizeof(input)*ud.multimode,ud.reccnt/ud.multimode,frecfilep);
+            ud.reccnt = 0;
+        }
+    }
 }
 
 void closedemowrite(void)
 {
-         if (ud.recstat == 1)
-         {
+    if (ud.recstat == 1)
+    {
         if (ud.reccnt > 0)
         {
             dfwrite(recsync,sizeof(input)*ud.multimode,ud.reccnt/ud.multimode,frecfilep);
@@ -8861,7 +8861,7 @@ void closedemowrite(void)
 // Seems to happen when player input starts being simulated, but just guessing.
 // This change effectively disables it. The related code is still enabled.
 // (This is working on Linux, so I flipped it back to '1'. --ryan.)
- uint8_t  which_demo = 0;
+uint8_t  which_demo = 0;
 // CTW END - MODIFICATION
 
 uint8_t  in_menu = 0;
@@ -8873,18 +8873,18 @@ int32_t playback(void)
     uint8_t  foundemo;
 
     if( ready2send )
-        {
-                return 0;
-        }
+    {
+        return 0;
+    }
 
-        /*
-        if(numplayers > 1)
-                return 1;
-        */
+    /*
+      if(numplayers > 1)
+      return 1;
+    */
 
     foundemo = 0;
 
-    RECHECK:
+RECHECK:
 
     in_menu = ps[myconnectindex].gm&MODE_MENU;
 
@@ -8893,7 +8893,7 @@ int32_t playback(void)
 
     flushperms();
 
-        if(numplayers < 2 && ud.multimode_bot<2) foundemo = opendemoread(which_demo);
+    if(numplayers < 2 && ud.multimode_bot<2) foundemo = opendemoread(which_demo);
 
     if(foundemo == 0)
     {
@@ -8915,9 +8915,9 @@ int32_t playback(void)
         ps[myconnectindex].palette = palette;
         nextpage();
         for(t=63;t>0;t-=7)
-                {
-                        palto(0,0,0,t);
-                }
+        {
+            palto(0,0,0,t);
+        }
 
         ud.reccnt = 0;
     }
@@ -8926,9 +8926,9 @@ int32_t playback(void)
         ud.recstat = 2;
         which_demo++;
         if(which_demo == 10)
-                {
-                        which_demo = 1;
-                }
+        {
+            which_demo = 1;
+        }
 
         enterlevel(MODE_DEMO);
     }
@@ -8951,24 +8951,24 @@ int32_t playback(void)
     {
 
         if(foundemo) while ( totalclock >= (lockclock+TICSPERFRAME) )
-        {
-            if ((i == 0) || (i >= RECSYNCBUFSIZ))
-            {
-                i = 0;
-                l = min(ud.reccnt,RECSYNCBUFSIZ);
-                kdfread(recsync,sizeof(input)*ud.multimode,l/ud.multimode,recfilep);
-            }
+                     {
+                         if ((i == 0) || (i >= RECSYNCBUFSIZ))
+                         {
+                             i = 0;
+                             l = min(ud.reccnt,RECSYNCBUFSIZ);
+                             kdfread(recsync,sizeof(input)*ud.multimode,l/ud.multimode,recfilep);
+                         }
 
-            for(j=connecthead;j>=0;j=connectpoint2[j])
-            {
-               copybufbyte(&recsync[i],&inputfifo[movefifoend[j]&(MOVEFIFOSIZ-1)][j],sizeof(input));
+                         for(j=connecthead;j>=0;j=connectpoint2[j])
+                         {
+                             copybufbyte(&recsync[i],&inputfifo[movefifoend[j]&(MOVEFIFOSIZ-1)][j],sizeof(input));
 
-                           movefifoend[j]++;
-               i++;
-               ud.reccnt--;
-            }
-            domovethings();
-        }
+                             movefifoend[j]++;
+                             i++;
+                             ud.reccnt--;
+                         }
+                         domovethings();
+                     }
 
         if(foundemo == 0)
             drawbackground();
@@ -8988,10 +8988,10 @@ int32_t playback(void)
         }
 
         if( (ps[myconnectindex].gm&MODE_MENU) && (ps[myconnectindex].gm&MODE_EOL) )
-                {
-                        printf("playback(1) :: goto RECHECK:\n");
-                        goto RECHECK;
-                }
+        {
+            printf("playback(1) :: goto RECHECK:\n");
+            goto RECHECK;
+        }
 
         if(ps[myconnectindex].gm&MODE_TYPE)
         {
@@ -9034,11 +9034,11 @@ int32_t playback(void)
             ud.camera_time = totalclock+(TICRATE*2);
         }
 
-                if (VOLUMEONE)
-                        if( ud.show_help == 0 && (ps[myconnectindex].gm&MODE_MENU) == 0 )
-                                rotatesprite((320-50)<<16,9<<16,65536L,0,BETAVERSION,0,0,2+8+16+128,0,0,xdim-1,ydim-1);
+        if (VOLUMEONE)
+            if( ud.show_help == 0 && (ps[myconnectindex].gm&MODE_MENU) == 0 )
+                rotatesprite((320-50)<<16,9<<16,65536L,0,BETAVERSION,0,0,2+8+16+128,0,0,xdim-1,ydim-1);
 
-                getpackets();
+        getpackets();
         nextpage();
 
         if( ps[myconnectindex].gm==MODE_END || ps[myconnectindex].gm==MODE_GAME )
@@ -9046,15 +9046,15 @@ int32_t playback(void)
             if(foundemo)
                 kclose(recfilep);
             ud.playing_demo_rev = 0;
-                        return 0;
+            return 0;
         }
     }
     kclose(recfilep);
-        ud.playing_demo_rev = 0;
+    ud.playing_demo_rev = 0;
     if(ps[myconnectindex].gm&MODE_MENU)
-        {
-                goto RECHECK;
-        }
+    {
+        goto RECHECK;
+    }
 
     return 1;
 }
@@ -9064,12 +9064,12 @@ uint8_t  moveloop()
     int32_t i;
 
     if (numplayers > 1)
+    {
+        while (fakemovefifoplc < movefifoend[myconnectindex])
         {
-                while (fakemovefifoplc < movefifoend[myconnectindex])
-                {
-                        fakedomovethings();
-                }
+            fakedomovethings();
         }
+    }
 
 
     getpackets();
@@ -9087,472 +9087,472 @@ uint8_t  moveloop()
 
 void fakedomovethingscorrect(void)
 {
-     int32_t i;
-     struct player_struct *p;
+    int32_t i;
+    struct player_struct *p;
 
-     if (numplayers < 2) return;
+    if (numplayers < 2) return;
 
-     i = ((movefifoplc-1)&(MOVEFIFOSIZ-1));
-     p = &ps[myconnectindex];
+    i = ((movefifoplc-1)&(MOVEFIFOSIZ-1));
+    p = &ps[myconnectindex];
 
-     if (p->posx == myxbak[i] && p->posy == myybak[i] && p->posz == myzbak[i]
-          && p->horiz == myhorizbak[i] && p->ang == myangbak[i]) return;
+    if (p->posx == myxbak[i] && p->posy == myybak[i] && p->posz == myzbak[i]
+        && p->horiz == myhorizbak[i] && p->ang == myangbak[i]) return;
 
-     myx = p->posx; omyx = p->oposx; myxvel = p->posxv;
-     myy = p->posy; omyy = p->oposy; myyvel = p->posyv;
-     myz = p->posz; omyz = p->oposz; myzvel = p->poszv;
-     myang = p->ang; omyang = p->oang;
-     mycursectnum = p->cursectnum;
-     myhoriz = p->horiz; omyhoriz = p->ohoriz;
-     myhorizoff = p->horizoff; omyhorizoff = p->ohorizoff;
-     myjumpingcounter = p->jumping_counter;
-     myjumpingtoggle = p->jumping_toggle;
-     myonground = p->on_ground;
-     myhardlanding = p->hard_landing;
-     myreturntocenter = p->return_to_center;
+    myx = p->posx; omyx = p->oposx; myxvel = p->posxv;
+    myy = p->posy; omyy = p->oposy; myyvel = p->posyv;
+    myz = p->posz; omyz = p->oposz; myzvel = p->poszv;
+    myang = p->ang; omyang = p->oang;
+    mycursectnum = p->cursectnum;
+    myhoriz = p->horiz; omyhoriz = p->ohoriz;
+    myhorizoff = p->horizoff; omyhorizoff = p->ohorizoff;
+    myjumpingcounter = p->jumping_counter;
+    myjumpingtoggle = p->jumping_toggle;
+    myonground = p->on_ground;
+    myhardlanding = p->hard_landing;
+    myreturntocenter = p->return_to_center;
 
-     fakemovefifoplc = movefifoplc;
-     while (fakemovefifoplc < movefifoend[myconnectindex])
-          fakedomovethings();
+    fakemovefifoplc = movefifoplc;
+    while (fakemovefifoplc < movefifoend[myconnectindex])
+        fakedomovethings();
 
 }
 
 void fakedomovethings(void)
 {
-        input *syn;
-        struct player_struct *p;
-        int32_t i, j, k, doubvel, fz, cz, hz, lz, x, y;
-        uint32_t sb_snum;
-        short psect, psectlotag, tempsect, backcstat;
-        uint8_t  shrunk, spritebridge;
+    input *syn;
+    struct player_struct *p;
+    int32_t i, j, k, doubvel, fz, cz, hz, lz, x, y;
+    uint32_t sb_snum;
+    short psect, psectlotag, tempsect, backcstat;
+    uint8_t  shrunk, spritebridge;
 
-        syn = (input *)&inputfifo[fakemovefifoplc&(MOVEFIFOSIZ-1)][myconnectindex];
+    syn = (input *)&inputfifo[fakemovefifoplc&(MOVEFIFOSIZ-1)][myconnectindex];
 
-        p = &ps[myconnectindex];
+    p = &ps[myconnectindex];
 
-        backcstat = sprite[p->i].cstat;
-        sprite[p->i].cstat &= ~257;
+    backcstat = sprite[p->i].cstat;
+    sprite[p->i].cstat &= ~257;
 
-        sb_snum = syn->bits;
+    sb_snum = syn->bits;
 
-        psect = mycursectnum;
-        psectlotag = sector[psect].lotag;
-        spritebridge = 0;
+    psect = mycursectnum;
+    psectlotag = sector[psect].lotag;
+    spritebridge = 0;
 
-        shrunk = (sprite[p->i].yrepeat < 32);
+    shrunk = (sprite[p->i].yrepeat < 32);
 
-        if( ud.clipping == 0 && ( sector[psect].floorpicnum == MIRROR || psect < 0 || psect >= MAXSECTORS) )
+    if( ud.clipping == 0 && ( sector[psect].floorpicnum == MIRROR || psect < 0 || psect >= MAXSECTORS) )
+    {
+        myx = omyx;
+        myy = omyy;
+    }
+    else
+    {
+        omyx = myx;
+        omyy = myy;
+    }
+
+    omyhoriz = myhoriz;
+    omyhorizoff = myhorizoff;
+    omyz = myz;
+    omyang = myang;
+
+    getzrange(myx,myy,myz,psect,&cz,&hz,&fz,&lz,163L,CLIPMASK0);
+
+    j = getflorzofslope(psect,myx,myy);
+
+    if( (lz&49152) == 16384 && psectlotag == 1 && klabs(myz-j) > PHEIGHT+(16<<8) )
+        psectlotag = 0;
+
+    if( p->aim_mode == 0 && myonground && psectlotag != 2 && (sector[psect].floorstat&2) )
+    {
+        x = myx+(sintable[(myang+512)&2047]>>5);
+        y = myy+(sintable[myang&2047]>>5);
+        tempsect = psect;
+        updatesector(x,y,&tempsect);
+        if (tempsect >= 0)
         {
-            myx = omyx;
-            myy = omyy;
+            k = getflorzofslope(psect,x,y);
+            if (psect == tempsect)
+                myhorizoff += mulscale16(j-k,160);
+            else if (klabs(getflorzofslope(tempsect,x,y)-k) <= (4<<8))
+                myhorizoff += mulscale16(j-k,160);
+        }
+    }
+    if (myhorizoff > 0) myhorizoff -= ((myhorizoff>>3)+1);
+    else if (myhorizoff < 0) myhorizoff += (((-myhorizoff)>>3)+1);
+
+    if(hz >= 0 && (hz&49152) == 49152)
+    {
+        hz &= (MAXSPRITES-1);
+        if (sprite[hz].statnum == 1 && sprite[hz].extra >= 0)
+        {
+            hz = 0;
+            cz = getceilzofslope(psect,myx,myy);
+        }
+    }
+
+    if(lz >= 0 && (lz&49152) == 49152)
+    {
+        j = lz&(MAXSPRITES-1);
+        if ((sprite[j].cstat&33) == 33)
+        {
+            psectlotag = 0;
+            spritebridge = 1;
+        }
+        if(badguy(&sprite[j]) && sprite[j].xrepeat > 24 && klabs(sprite[p->i].z-sprite[j].z) < (84<<8) )
+        {
+            j = getangle( sprite[j].x-myx,sprite[j].y-myy);
+            myxvel -= sintable[(j+512)&2047]<<4;
+            myyvel -= sintable[j&2047]<<4;
+        }
+    }
+
+    if( sprite[p->i].extra <= 0 )
+    {
+        if( psectlotag == 2 )
+        {
+            if(p->on_warping_sector == 0)
+            {
+                if( klabs(myz-fz) > (PHEIGHT>>1))
+                    myz += 348;
+            }
+            clipmove(&myx,&myy,&myz,&mycursectnum,0,0,164L,(4L<<8),(4L<<8),CLIPMASK0);
+        }
+
+        updatesector(myx,myy,&mycursectnum);
+        pushmove(&myx,&myy,&myz,&mycursectnum,128L,(4L<<8),(20L<<8),CLIPMASK0);
+
+        myhoriz = 100;
+        myhorizoff = 0;
+
+        goto ENDFAKEPROCESSINPUT;
+    }
+
+    doubvel = TICSPERFRAME;
+
+    if(p->on_crane >= 0) goto FAKEHORIZONLY;
+
+    if(p->one_eighty_count < 0) myang += 128;
+
+    i = 40;
+
+    if( psectlotag == 2)
+    {
+        myjumpingcounter = 0;
+
+        if ( sb_snum&1 )
+        {
+            if(myzvel > 0) myzvel = 0;
+            myzvel -= 348;
+            if(myzvel < -(256*6)) myzvel = -(256*6);
+        }
+        else if (sb_snum&(1<<1))
+        {
+            if(myzvel < 0) myzvel = 0;
+            myzvel += 348;
+            if(myzvel > (256*6)) myzvel = (256*6);
         }
         else
         {
-            omyx = myx;
-            omyy = myy;
-        }
-
-        omyhoriz = myhoriz;
-        omyhorizoff = myhorizoff;
-        omyz = myz;
-        omyang = myang;
-
-        getzrange(myx,myy,myz,psect,&cz,&hz,&fz,&lz,163L,CLIPMASK0);
-
-        j = getflorzofslope(psect,myx,myy);
-
-        if( (lz&49152) == 16384 && psectlotag == 1 && klabs(myz-j) > PHEIGHT+(16<<8) )
-            psectlotag = 0;
-
-        if( p->aim_mode == 0 && myonground && psectlotag != 2 && (sector[psect].floorstat&2) )
-        {
-                x = myx+(sintable[(myang+512)&2047]>>5);
-                y = myy+(sintable[myang&2047]>>5);
-                tempsect = psect;
-                updatesector(x,y,&tempsect);
-                if (tempsect >= 0)
-                {
-                     k = getflorzofslope(psect,x,y);
-                     if (psect == tempsect)
-                          myhorizoff += mulscale16(j-k,160);
-                     else if (klabs(getflorzofslope(tempsect,x,y)-k) <= (4<<8))
-                          myhorizoff += mulscale16(j-k,160);
-                }
-        }
-        if (myhorizoff > 0) myhorizoff -= ((myhorizoff>>3)+1);
-        else if (myhorizoff < 0) myhorizoff += (((-myhorizoff)>>3)+1);
-
-        if(hz >= 0 && (hz&49152) == 49152)
-        {
-                hz &= (MAXSPRITES-1);
-                if (sprite[hz].statnum == 1 && sprite[hz].extra >= 0)
-                {
-                    hz = 0;
-                    cz = getceilzofslope(psect,myx,myy);
-                }
-        }
-
-        if(lz >= 0 && (lz&49152) == 49152)
-        {
-                 j = lz&(MAXSPRITES-1);
-                 if ((sprite[j].cstat&33) == 33)
-                 {
-                        psectlotag = 0;
-                        spritebridge = 1;
-                 }
-                 if(badguy(&sprite[j]) && sprite[j].xrepeat > 24 && klabs(sprite[p->i].z-sprite[j].z) < (84<<8) )
-                 {
-                    j = getangle( sprite[j].x-myx,sprite[j].y-myy);
-                    myxvel -= sintable[(j+512)&2047]<<4;
-                    myyvel -= sintable[j&2047]<<4;
-                }
-        }
-
-        if( sprite[p->i].extra <= 0 )
-        {
-                 if( psectlotag == 2 )
-                 {
-                            if(p->on_warping_sector == 0)
-                            {
-                                     if( klabs(myz-fz) > (PHEIGHT>>1))
-                                             myz += 348;
-                            }
-                            clipmove(&myx,&myy,&myz,&mycursectnum,0,0,164L,(4L<<8),(4L<<8),CLIPMASK0);
-                 }
-
-                 updatesector(myx,myy,&mycursectnum);
-                 pushmove(&myx,&myy,&myz,&mycursectnum,128L,(4L<<8),(20L<<8),CLIPMASK0);
-
-                myhoriz = 100;
-                myhorizoff = 0;
-
-                 goto ENDFAKEPROCESSINPUT;
-        }
-
-        doubvel = TICSPERFRAME;
-
-        if(p->on_crane >= 0) goto FAKEHORIZONLY;
-
-        if(p->one_eighty_count < 0) myang += 128;
-
-        i = 40;
-
-        if( psectlotag == 2)
-        {
-                 myjumpingcounter = 0;
-
-                 if ( sb_snum&1 )
-                 {
-                            if(myzvel > 0) myzvel = 0;
-                            myzvel -= 348;
-                            if(myzvel < -(256*6)) myzvel = -(256*6);
-                 }
-                 else if (sb_snum&(1<<1))
-                 {
-                            if(myzvel < 0) myzvel = 0;
-                            myzvel += 348;
-                            if(myzvel > (256*6)) myzvel = (256*6);
-                 }
-                 else
-                 {
-                    if(myzvel < 0)
-                    {
-                        myzvel += 256;
-                        if(myzvel > 0)
-                            myzvel = 0;
-                    }
-                    if(myzvel > 0)
-                    {
-                        myzvel -= 256;
-                        if(myzvel < 0)
-                            myzvel = 0;
-                    }
-                }
-
-                if(myzvel > 2048) myzvel >>= 1;
-
-                 myz += myzvel;
-
-                 if(myz > (fz-(15<<8)) )
-                            myz += ((fz-(15<<8))-myz)>>1;
-
-                 if(myz < (cz+(4<<8)) )
-                 {
-                            myz = cz+(4<<8);
-                            myzvel = 0;
-                 }
-        }
-
-        else if(p->jetpack_on)
-        {
-                 myonground = 0;
-                 myjumpingcounter = 0;
-                 myhardlanding = 0;
-
-                 if(p->jetpack_on < 11)
-                            myz -= (p->jetpack_on<<7); //Goin up
-
-                 if(shrunk) j = 512;
-                 else j = 2048;
-
-                 if (sb_snum&1)                            //A
-                            myz -= j;
-                 if (sb_snum&(1<<1))                       //Z
-                            myz += j;
-
-                 if(shrunk == 0 && ( psectlotag == 0 || psectlotag == 2 ) ) k = 32;
-                 else k = 16;
-
-                 if(myz > (fz-(k<<8)) )
-                            myz += ((fz-(k<<8))-myz)>>1;
-                 if(myz < (cz+(18<<8)) )
-                            myz = cz+(18<<8);
-        }
-        else if( psectlotag != 2 )
-        {
-            if (psectlotag == 1 && p->spritebridge == 0)
+            if(myzvel < 0)
             {
-                 if(shrunk == 0) i = 34;
-                 else i = 12;
+                myzvel += 256;
+                if(myzvel > 0)
+                    myzvel = 0;
             }
-                 if(myz < (fz-(i<<8)) && (floorspace(psect)|ceilingspace(psect)) == 0 ) //falling
-                 {
-                            if( (sb_snum&3) == 0 && myonground && (sector[psect].floorstat&2) && myz >= (fz-(i<<8)-(16<<8) ) )
-                                     myz = fz-(i<<8);
-                            else
-                            {
-                                     myonground = 0;
-
-                                     myzvel += (gc+80);
-
-                                     if(myzvel >= (4096+2048)) myzvel = (4096+2048);
-                            }
-                 }
-
-                 else
-                 {
-                            if(psectlotag != 1 && psectlotag != 2 && myonground == 0 && myzvel > (6144>>1))
-                                 myhardlanding = myzvel>>10;
-                            myonground = 1;
-
-                            if(i==40)
-                            {
-                                     //Smooth on the ground
-
-                                     k = ((fz-(i<<8))-myz)>>1;
-                                     if( klabs(k) < 256 ) k = 0;
-                                     myz += k; // ((fz-(i<<8))-myz)>>1;
-                                     myzvel -= 768; // 412;
-                                     if(myzvel < 0) myzvel = 0;
-                            }
-                            else if(myjumpingcounter == 0)
-                            {
-                                myz += ((fz-(i<<7))-myz)>>1; //Smooth on the water
-                                if(p->on_warping_sector == 0 && myz > fz-(16<<8))
-                                {
-                                    myz = fz-(16<<8);
-                                    myzvel >>= 1;
-                                }
-                            }
-
-                            if( sb_snum&2 )
-                                     myz += (2048+768);
-
-                            if( (sb_snum&1) == 0 && myjumpingtoggle == 1)
-                                     myjumpingtoggle = 0;
-
-                            else if( (sb_snum&1) && myjumpingtoggle == 0 )
-                            {
-                                     if( myjumpingcounter == 0 )
-                                             if( (fz-cz) > (56<<8) )
-                                             {
-                                                myjumpingcounter = 1;
-                                                myjumpingtoggle = 1;
-                                             }
-                            }
-                            if( myjumpingcounter && (sb_snum&1) == 0 )
-                                myjumpingcounter = 0;
-                 }
-
-                 if(myjumpingcounter)
-                 {
-                            if( (sb_snum&1) == 0 && myjumpingtoggle == 1)
-                                     myjumpingtoggle = 0;
-
-                            if( myjumpingcounter < (1024+256) )
-                            {
-                                     if(psectlotag == 1 && myjumpingcounter > 768)
-                                     {
-                                             myjumpingcounter = 0;
-                                             myzvel = -512;
-                                     }
-                                     else
-                                     {
-                                             myzvel -= (sintable[(2048-128+myjumpingcounter)&2047])/12;
-                                             myjumpingcounter += 180;
-
-                                             myonground = 0;
-                                     }
-                            }
-                            else
-                            {
-                                     myjumpingcounter = 0;
-                                     myzvel = 0;
-                            }
-                 }
-
-                 myz += myzvel;
-
-                 if(myz < (cz+(4<<8)) )
-                 {
-                            myjumpingcounter = 0;
-                            if(myzvel < 0) myxvel = myyvel = 0;
-                            myzvel = 128;
-                            myz = cz+(4<<8);
-                 }
-
+            if(myzvel > 0)
+            {
+                myzvel -= 256;
+                if(myzvel < 0)
+                    myzvel = 0;
+            }
         }
 
-        if ( p->fist_incs ||
-                     p->transporter_hold > 2 ||
-                     myhardlanding ||
-                     p->access_incs > 0 ||
-                     p->knee_incs > 0 ||
-                     (p->curr_weapon == TRIPBOMB_WEAPON &&
-                      p->kickback_pic > 1 &&
-                      p->kickback_pic < 4 ) )
+        if(myzvel > 2048) myzvel >>= 1;
+
+        myz += myzvel;
+
+        if(myz > (fz-(15<<8)) )
+            myz += ((fz-(15<<8))-myz)>>1;
+
+        if(myz < (cz+(4<<8)) )
         {
-                 doubvel = 0;
-                 myxvel = 0;
-                 myyvel = 0;
+            myz = cz+(4<<8);
+            myzvel = 0;
         }
-        else if ( syn->avel )          //p->ang += syncangvel * constant
-        {                         //ENGINE calculates angvel for you
-            int32_t tempang;
+    }
 
-            tempang = syn->avel<<1;
+    else if(p->jetpack_on)
+    {
+        myonground = 0;
+        myjumpingcounter = 0;
+        myhardlanding = 0;
 
+        if(p->jetpack_on < 11)
+            myz -= (p->jetpack_on<<7); //Goin up
+
+        if(shrunk) j = 512;
+        else j = 2048;
+
+        if (sb_snum&1)                            //A
+            myz -= j;
+        if (sb_snum&(1<<1))                       //Z
+            myz += j;
+
+        if(shrunk == 0 && ( psectlotag == 0 || psectlotag == 2 ) ) k = 32;
+        else k = 16;
+
+        if(myz > (fz-(k<<8)) )
+            myz += ((fz-(k<<8))-myz)>>1;
+        if(myz < (cz+(18<<8)) )
+            myz = cz+(18<<8);
+    }
+    else if( psectlotag != 2 )
+    {
+        if (psectlotag == 1 && p->spritebridge == 0)
+        {
+            if(shrunk == 0) i = 34;
+            else i = 12;
+        }
+        if(myz < (fz-(i<<8)) && (floorspace(psect)|ceilingspace(psect)) == 0 ) //falling
+        {
+            if( (sb_snum&3) == 0 && myonground && (sector[psect].floorstat&2) && myz >= (fz-(i<<8)-(16<<8) ) )
+                myz = fz-(i<<8);
+            else
+            {
+                myonground = 0;
+
+                myzvel += (gc+80);
+
+                if(myzvel >= (4096+2048)) myzvel = (4096+2048);
+            }
+        }
+
+        else
+        {
+            if(psectlotag != 1 && psectlotag != 2 && myonground == 0 && myzvel > (6144>>1))
+                myhardlanding = myzvel>>10;
+            myonground = 1;
+
+            if(i==40)
+            {
+                //Smooth on the ground
+
+                k = ((fz-(i<<8))-myz)>>1;
+                if( klabs(k) < 256 ) k = 0;
+                myz += k; // ((fz-(i<<8))-myz)>>1;
+                myzvel -= 768; // 412;
+                if(myzvel < 0) myzvel = 0;
+            }
+            else if(myjumpingcounter == 0)
+            {
+                myz += ((fz-(i<<7))-myz)>>1; //Smooth on the water
+                if(p->on_warping_sector == 0 && myz > fz-(16<<8))
+                {
+                    myz = fz-(16<<8);
+                    myzvel >>= 1;
+                }
+            }
+
+            if( sb_snum&2 )
+                myz += (2048+768);
+
+            if( (sb_snum&1) == 0 && myjumpingtoggle == 1)
+                myjumpingtoggle = 0;
+
+            else if( (sb_snum&1) && myjumpingtoggle == 0 )
+            {
+                if( myjumpingcounter == 0 )
+                    if( (fz-cz) > (56<<8) )
+                    {
+                        myjumpingcounter = 1;
+                        myjumpingtoggle = 1;
+                    }
+            }
+            if( myjumpingcounter && (sb_snum&1) == 0 )
+                myjumpingcounter = 0;
+        }
+
+        if(myjumpingcounter)
+        {
+            if( (sb_snum&1) == 0 && myjumpingtoggle == 1)
+                myjumpingtoggle = 0;
+
+            if( myjumpingcounter < (1024+256) )
+            {
+                if(psectlotag == 1 && myjumpingcounter > 768)
+                {
+                    myjumpingcounter = 0;
+                    myzvel = -512;
+                }
+                else
+                {
+                    myzvel -= (sintable[(2048-128+myjumpingcounter)&2047])/12;
+                    myjumpingcounter += 180;
+
+                    myonground = 0;
+                }
+            }
+            else
+            {
+                myjumpingcounter = 0;
+                myzvel = 0;
+            }
+        }
+
+        myz += myzvel;
+
+        if(myz < (cz+(4<<8)) )
+        {
+            myjumpingcounter = 0;
+            if(myzvel < 0) myxvel = myyvel = 0;
+            myzvel = 128;
+            myz = cz+(4<<8);
+        }
+
+    }
+
+    if ( p->fist_incs ||
+         p->transporter_hold > 2 ||
+         myhardlanding ||
+         p->access_incs > 0 ||
+         p->knee_incs > 0 ||
+         (p->curr_weapon == TRIPBOMB_WEAPON &&
+          p->kickback_pic > 1 &&
+          p->kickback_pic < 4 ) )
+    {
+        doubvel = 0;
+        myxvel = 0;
+        myyvel = 0;
+    }
+    else if ( syn->avel )          //p->ang += syncangvel * constant
+    {                         //ENGINE calculates angvel for you
+        int32_t tempang;
+
+        tempang = syn->avel<<1;
+
+        if(psectlotag == 2)
+            myang += (tempang-(tempang>>3))*sgn(doubvel);
+        else myang += (tempang)*sgn(doubvel);
+        myang &= 2047;
+    }
+
+    if ( myxvel || myyvel || syn->fvel || syn->svel )
+    {
+        if(p->steroids_amount > 0 && p->steroids_amount < 400)
+            doubvel <<= 1;
+
+        myxvel += ((syn->fvel*doubvel)<<6);
+        myyvel += ((syn->svel*doubvel)<<6);
+
+        if( ( p->curr_weapon == KNEE_WEAPON && p->kickback_pic > 10 && myonground ) || ( myonground && (sb_snum&2) ) )
+        {
+            myxvel = mulscale16(myxvel,dukefriction-0x2000);
+            myyvel = mulscale16(myyvel,dukefriction-0x2000);
+        }
+        else
+        {
             if(psectlotag == 2)
-                myang += (tempang-(tempang>>3))*sgn(doubvel);
-            else myang += (tempang)*sgn(doubvel);
-            myang &= 2047;
+            {
+                myxvel = mulscale16(myxvel,dukefriction-0x1400);
+                myyvel = mulscale16(myyvel,dukefriction-0x1400);
+            }
+            else
+            {
+                myxvel = mulscale16(myxvel,dukefriction);
+                myyvel = mulscale16(myyvel,dukefriction);
+            }
         }
 
-        if ( myxvel || myyvel || syn->fvel || syn->svel )
+        if( abs(myxvel) < 2048 && abs(myyvel) < 2048 )
+            myxvel = myyvel = 0;
+
+        if( shrunk )
         {
-                 if(p->steroids_amount > 0 && p->steroids_amount < 400)
-                     doubvel <<= 1;
-
-                 myxvel += ((syn->fvel*doubvel)<<6);
-                 myyvel += ((syn->svel*doubvel)<<6);
-
-                 if( ( p->curr_weapon == KNEE_WEAPON && p->kickback_pic > 10 && myonground ) || ( myonground && (sb_snum&2) ) )
-                 {
-                            myxvel = mulscale16(myxvel,dukefriction-0x2000);
-                            myyvel = mulscale16(myyvel,dukefriction-0x2000);
-                 }
-                 else
-                 {
-                    if(psectlotag == 2)
-                    {
-                        myxvel = mulscale16(myxvel,dukefriction-0x1400);
-                        myyvel = mulscale16(myyvel,dukefriction-0x1400);
-                    }
-                    else
-                    {
-                        myxvel = mulscale16(myxvel,dukefriction);
-                        myyvel = mulscale16(myyvel,dukefriction);
-                    }
-                 }
-
-                 if( abs(myxvel) < 2048 && abs(myyvel) < 2048 )
-                     myxvel = myyvel = 0;
-
-                 if( shrunk )
-                 {
-                     myxvel =
-                         mulscale16(myxvel,(dukefriction)-(dukefriction>>1)+(dukefriction>>2));
-                     myyvel =
-                         mulscale16(myyvel,(dukefriction)-(dukefriction>>1)+(dukefriction>>2));
-                 }
+            myxvel =
+                mulscale16(myxvel,(dukefriction)-(dukefriction>>1)+(dukefriction>>2));
+            myyvel =
+                mulscale16(myyvel,(dukefriction)-(dukefriction>>1)+(dukefriction>>2));
         }
+    }
 
 FAKEHORIZONLY:
-        if(psectlotag == 1 || spritebridge == 1) i = (4L<<8); else i = (20L<<8);
+    if(psectlotag == 1 || spritebridge == 1) i = (4L<<8); else i = (20L<<8);
 
-        clipmove(&myx,&myy,&myz,&mycursectnum,myxvel,myyvel,164L,4L<<8,i,CLIPMASK0);
-        pushmove(&myx,&myy,&myz,&mycursectnum,164L,4L<<8,4L<<8,CLIPMASK0);
+    clipmove(&myx,&myy,&myz,&mycursectnum,myxvel,myyvel,164L,4L<<8,i,CLIPMASK0);
+    pushmove(&myx,&myy,&myz,&mycursectnum,164L,4L<<8,4L<<8,CLIPMASK0);
 
-        if( p->jetpack_on == 0 && psectlotag != 1 && psectlotag != 2 && shrunk)
-            myz += 30<<8;
+    if( p->jetpack_on == 0 && psectlotag != 1 && psectlotag != 2 && shrunk)
+        myz += 30<<8;
 
-        if ((sb_snum&(1<<18)) || myhardlanding)
-            myreturntocenter = 9;
+    if ((sb_snum&(1<<18)) || myhardlanding)
+        myreturntocenter = 9;
 
-        if (sb_snum&(1<<13))
-        {
-                myreturntocenter = 9;
-                if (sb_snum&(1<<5)) myhoriz += 6;
-                myhoriz += 6;
-        }
-        else if (sb_snum&(1<<14))
-        {
-                myreturntocenter = 9;
-                if (sb_snum&(1<<5)) myhoriz -= 6;
-                myhoriz -= 6;
-        }
-        else if (sb_snum&(1<<3))
-        {
-                if (sb_snum&(1<<5)) myhoriz += 6;
-                myhoriz += 6;
-        }
-        else if (sb_snum&(1<<4))
-        {
-                if (sb_snum&(1<<5)) myhoriz -= 6;
-                myhoriz -= 6;
-        }
+    if (sb_snum&(1<<13))
+    {
+        myreturntocenter = 9;
+        if (sb_snum&(1<<5)) myhoriz += 6;
+        myhoriz += 6;
+    }
+    else if (sb_snum&(1<<14))
+    {
+        myreturntocenter = 9;
+        if (sb_snum&(1<<5)) myhoriz -= 6;
+        myhoriz -= 6;
+    }
+    else if (sb_snum&(1<<3))
+    {
+        if (sb_snum&(1<<5)) myhoriz += 6;
+        myhoriz += 6;
+    }
+    else if (sb_snum&(1<<4))
+    {
+        if (sb_snum&(1<<5)) myhoriz -= 6;
+        myhoriz -= 6;
+    }
 
-        if (myreturntocenter > 0)
-            if ((sb_snum&(1<<13)) == 0 && (sb_snum&(1<<14)) == 0)
+    if (myreturntocenter > 0)
+        if ((sb_snum&(1<<13)) == 0 && (sb_snum&(1<<14)) == 0)
         {
-             myreturntocenter--;
-             myhoriz += 33-(myhoriz/3);
-        }
-
-        if(p->aim_mode)
-            myhoriz += syn->horz>>1;
-        else
-        {
-            if( myhoriz > 95 && myhoriz < 105) myhoriz = 100;
-            if( myhorizoff > -5 && myhorizoff < 5) myhorizoff = 0;
+            myreturntocenter--;
+            myhoriz += 33-(myhoriz/3);
         }
 
-        if (myhardlanding > 0)
-        {
-            myhardlanding--;
-            myhoriz -= (myhardlanding<<4);
-        }
+    if(p->aim_mode)
+        myhoriz += syn->horz>>1;
+    else
+    {
+        if( myhoriz > 95 && myhoriz < 105) myhoriz = 100;
+        if( myhorizoff > -5 && myhorizoff < 5) myhorizoff = 0;
+    }
 
-        if (myhoriz > 299) myhoriz = 299;
-        else if (myhoriz < -99) myhoriz = -99;
+    if (myhardlanding > 0)
+    {
+        myhardlanding--;
+        myhoriz -= (myhardlanding<<4);
+    }
 
-        if(p->knee_incs > 0)
-        {
-            myhoriz -= 48;
-            myreturntocenter = 9;
-        }
+    if (myhoriz > 299) myhoriz = 299;
+    else if (myhoriz < -99) myhoriz = -99;
+
+    if(p->knee_incs > 0)
+    {
+        myhoriz -= 48;
+        myreturntocenter = 9;
+    }
 
 
 ENDFAKEPROCESSINPUT:
 
-        myxbak[fakemovefifoplc&(MOVEFIFOSIZ-1)] = myx;
-        myybak[fakemovefifoplc&(MOVEFIFOSIZ-1)] = myy;
-        myzbak[fakemovefifoplc&(MOVEFIFOSIZ-1)] = myz;
-        myangbak[fakemovefifoplc&(MOVEFIFOSIZ-1)] = myang;
-        myhorizbak[fakemovefifoplc&(MOVEFIFOSIZ-1)] = myhoriz;
-        fakemovefifoplc++;
+    myxbak[fakemovefifoplc&(MOVEFIFOSIZ-1)] = myx;
+    myybak[fakemovefifoplc&(MOVEFIFOSIZ-1)] = myy;
+    myzbak[fakemovefifoplc&(MOVEFIFOSIZ-1)] = myz;
+    myangbak[fakemovefifoplc&(MOVEFIFOSIZ-1)] = myang;
+    myhorizbak[fakemovefifoplc&(MOVEFIFOSIZ-1)] = myhoriz;
+    fakemovefifoplc++;
 
-        sprite[p->i].cstat = backcstat;
+    sprite[p->i].cstat = backcstat;
 }
 
 
@@ -9564,61 +9564,61 @@ uint8_t  domovethings(void)
 
     for(i=connecthead;i>=0;i=connectpoint2[i])
         if( sync[i].bits&(1<<17) )
-    {
-        multiflag = 2;
-        multiwhat = (sync[i].bits>>18)&1;
-        multipos = (uint32_t) (sync[i].bits>>19)&15;
-        multiwho = i;
-
-        if( multiwhat )
         {
-                        // FIX_00058: Save/load game crash in both single and multiplayer
-            screencapt = 1;
-            displayrooms(myconnectindex,65536);
-            savetemp("duke3d.tmp",tiles[MAXTILES-1].data,160*100);
-            screencapt = 0;
+            multiflag = 2;
+            multiwhat = (sync[i].bits>>18)&1;
+            multipos = (uint32_t) (sync[i].bits>>19)&15;
+            multiwho = i;
 
-            saveplayer( multipos );
-            multiflag = 0;
-
-            if(multiwho != myconnectindex)
+            if( multiwhat )
             {
-                strcpy(fta_quotes[122],&ud.user_name[multiwho][0]);
-                strcat(fta_quotes[122]," SAVED A MULTIPLAYER GAME");
-                FTA(122,&ps[myconnectindex],1);
-            }
-            else
-            {
-                strcpy(fta_quotes[122],"MULTIPLAYER GAME SAVED");
-                FTA(122,&ps[myconnectindex],1);
-            }
-            break;
-        }
-        else
-        {
-//            waitforeverybody();
+                // FIX_00058: Save/load game crash in both single and multiplayer
+                screencapt = 1;
+                displayrooms(myconnectindex,65536);
+                savetemp("duke3d.tmp",tiles[MAXTILES-1].data,160*100);
+                screencapt = 0;
 
-            j = loadplayer( multipos );
+                saveplayer( multipos );
+                multiflag = 0;
 
-            multiflag = 0;
-
-            if(j == 0)
-            {
                 if(multiwho != myconnectindex)
                 {
                     strcpy(fta_quotes[122],&ud.user_name[multiwho][0]);
-                    strcat(fta_quotes[122]," LOADED A MULTIPLAYER GAME");
+                    strcat(fta_quotes[122]," SAVED A MULTIPLAYER GAME");
                     FTA(122,&ps[myconnectindex],1);
                 }
                 else
                 {
-                    strcpy(fta_quotes[122],"MULTIPLAYER GAME LOADED");
+                    strcpy(fta_quotes[122],"MULTIPLAYER GAME SAVED");
                     FTA(122,&ps[myconnectindex],1);
                 }
-                return 1;
+                break;
+            }
+            else
+            {
+//            waitforeverybody();
+
+                j = loadplayer( multipos );
+
+                multiflag = 0;
+
+                if(j == 0)
+                {
+                    if(multiwho != myconnectindex)
+                    {
+                        strcpy(fta_quotes[122],&ud.user_name[multiwho][0]);
+                        strcat(fta_quotes[122]," LOADED A MULTIPLAYER GAME");
+                        FTA(122,&ps[myconnectindex],1);
+                    }
+                    else
+                    {
+                        strcpy(fta_quotes[122],"MULTIPLAYER GAME LOADED");
+                        FTA(122,&ps[myconnectindex],1);
+                    }
+                    return 1;
+                }
             }
         }
-    }
 
     ud.camerasprite = -1;
     lockclock += TICSPERFRAME;
@@ -9627,15 +9627,15 @@ uint8_t  domovethings(void)
     if(rtsplaying > 0) rtsplaying--;
 
     for(i=0;i<MAXUSERQUOTES;i++)
-         if (user_quote_time[i])
-         {
-             user_quote_time[i]--;
-             if (!user_quote_time[i]) pub = NUMPAGES;
-         }
-     if ((klabs(quotebotgoal-quotebot) <= 16) && (ud.screen_size <= 8))
-         quotebot += ksgn(quotebotgoal-quotebot);
-     else
-         quotebot = quotebotgoal;
+        if (user_quote_time[i])
+        {
+            user_quote_time[i]--;
+            if (!user_quote_time[i]) pub = NUMPAGES;
+        }
+    if ((klabs(quotebotgoal-quotebot) <= 16) && (ud.screen_size <= 8))
+        quotebot += ksgn(quotebotgoal-quotebot);
+    else
+        quotebot = quotebotgoal;
 
     if( show_shareware > 0 )
     {
@@ -9657,52 +9657,52 @@ uint8_t  domovethings(void)
 
     j = -1;
     for(i=connecthead;i>=0;i=connectpoint2[i])
-     {
-          if ((sync[i].bits&(1<<26)) == 0) { j = i; continue; }
+    {
+        if ((sync[i].bits&(1<<26)) == 0) { j = i; continue; }
 
-          closedemowrite();
+        closedemowrite();
 
-          if (i == myconnectindex) gameexit(" ");
-          if (screenpeek == i)
-          {
-                screenpeek = connectpoint2[i];
-                if (screenpeek < 0) screenpeek = connecthead;
-          }
+        if (i == myconnectindex) gameexit(" ");
+        if (screenpeek == i)
+        {
+            screenpeek = connectpoint2[i];
+            if (screenpeek < 0) screenpeek = connecthead;
+        }
 
-          if (i == connecthead) connecthead = connectpoint2[connecthead];
-          else connectpoint2[j] = connectpoint2[i];
+        if (i == connecthead) connecthead = connectpoint2[connecthead];
+        else connectpoint2[j] = connectpoint2[i];
 
-          numplayers--;
-          ud.multimode--;
+        numplayers--;
+        ud.multimode--;
 
-          if (numplayers < 2)
-              sound(GENERIC_AMBIENCE17);
+        if (numplayers < 2)
+            sound(GENERIC_AMBIENCE17);
 
-          pub = NUMPAGES;
-          pus = NUMPAGES;
-          vscrn();
+        pub = NUMPAGES;
+        pus = NUMPAGES;
+        vscrn();
 
-          sprintf(buf,"%s is history!",ud.user_name[i]);
+        sprintf(buf,"%s is history!",ud.user_name[i]);
 
-          quickkill(&ps[i]);
-          deletesprite(ps[i].i);
+        quickkill(&ps[i]);
+        deletesprite(ps[i].i);
 
-          adduserquote(buf);
+        adduserquote(buf);
 
-          if(j < 0 && networkmode == 0 )
-              gameexit( " \nThe 'MASTER/First player' just quit the game.  All\nplayers are returned from the game. This only happens in 5-8\nplayer mode as a different network scheme is used.");
-      }
+        if(j < 0 && networkmode == 0 )
+            gameexit( " \nThe 'MASTER/First player' just quit the game.  All\nplayers are returned from the game. This only happens in 5-8\nplayer mode as a different network scheme is used.");
+    }
 
-      if ((numplayers >= 2) && ((movefifoplc&7) == 7))
-      {
-            ch = (uint8_t )(randomseed&255);
-            for(i=connecthead;i>=0;i=connectpoint2[i])
-                 ch += ((ps[i].posx+ps[i].posy+ps[i].posz+ps[i].ang+ps[i].horiz)&255);
-            syncval[myconnectindex][syncvalhead[myconnectindex]&(MOVEFIFOSIZ-1)] = ch;
-            syncvalhead[myconnectindex]++;
+    if ((numplayers >= 2) && ((movefifoplc&7) == 7))
+    {
+        ch = (uint8_t )(randomseed&255);
+        for(i=connecthead;i>=0;i=connectpoint2[i])
+            ch += ((ps[i].posx+ps[i].posy+ps[i].posz+ps[i].ang+ps[i].horiz)&255);
+        syncval[myconnectindex][syncvalhead[myconnectindex]&(MOVEFIFOSIZ-1)] = ch;
+        syncvalhead[myconnectindex]++;
 
 
-      }
+    }
 
     if(ud.recstat == 1) record();
 
@@ -9800,22 +9800,22 @@ void dobonus(uint8_t  bonusonly)
     char text[512];
 
     int32_t breathe[] =
-    {
-         0,  30,VICTORY1+1,176,59,
-        30,  60,VICTORY1+2,176,59,
-        60,  90,VICTORY1+1,176,59,
-        90, 120,0         ,176,59
-    };
+        {
+            0,  30,VICTORY1+1,176,59,
+            30,  60,VICTORY1+2,176,59,
+            60,  90,VICTORY1+1,176,59,
+            90, 120,0         ,176,59
+        };
 
     int32_t bossmove[] =
-    {
-         0, 120,VICTORY1+3,86,59,
-       220, 260,VICTORY1+4,86,59,
-       260, 290,VICTORY1+5,86,59,
-       290, 320,VICTORY1+6,86,59,
-       320, 350,VICTORY1+7,86,59,
-       350, 380,VICTORY1+8,86,59
-    };
+        {
+            0, 120,VICTORY1+3,86,59,
+            220, 260,VICTORY1+4,86,59,
+            260, 290,VICTORY1+5,86,59,
+            290, 320,VICTORY1+6,86,59,
+            320, 350,VICTORY1+7,86,59,
+            350, 380,VICTORY1+8,86,59
+        };
 
     bonuscnt = 0;
 
@@ -9833,7 +9833,7 @@ void dobonus(uint8_t  bonusonly)
 
     if(numplayers < 2 && ud.eog && ud.from_bonus == 0)
         switch(ud.volume_number)
-    {
+        {
         case 0:
             if(ud.lockout == 0)
             {
@@ -9853,10 +9853,10 @@ void dobonus(uint8_t  bonusonly)
                     // boss
                     if( totalclock > 390 && totalclock < 780 )
                         for(t=0;t<35;t+=5) if( bossmove[t+2] && (totalclock%390) > bossmove[t] && (totalclock%390) <= bossmove[t+1] )
-                    {
-                        if(t==10 && bonuscnt == 1) { sound(SHOTGUN_FIRE);sound(SQUISHED); bonuscnt++; }
-                        rotatesprite(bossmove[t+3]<<16,bossmove[t+4]<<16,65536L,0,bossmove[t+2],0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
-                    }
+                                           {
+                                               if(t==10 && bonuscnt == 1) { sound(SHOTGUN_FIRE);sound(SQUISHED); bonuscnt++; }
+                                               rotatesprite(bossmove[t+3]<<16,bossmove[t+4]<<16,65536L,0,bossmove[t+2],0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
+                                           }
 
                     // Breathe
                     if( totalclock < 450 || totalclock >= 750 )
@@ -9868,14 +9868,14 @@ void dobonus(uint8_t  bonusonly)
                         }
                         for(t=0;t<20;t+=5)
                             if( breathe[t+2] && (totalclock%120) > breathe[t] && (totalclock%120) <= breathe[t+1] )
-                        {
+                            {
                                 if(t==5 && bonuscnt == 0)
                                 {
                                     sound(BOSSTALKTODUKE);
                                     bonuscnt++;
                                 }
                                 rotatesprite(breathe[t+3]<<16,breathe[t+4]<<16,65536L,0,breathe[t+2],0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
-                        }
+                            }
                     }
 
                     getpackets();
@@ -10026,7 +10026,7 @@ void dobonus(uint8_t  bonusonly)
             totalclock = 0;
             while(!KB_KeyWaiting() && totalclock < 120) getpackets();
 
-            ENDANM:
+        ENDANM:
 
             FX_StopAllSounds();
             clearsoundlocks();
@@ -10036,9 +10036,9 @@ void dobonus(uint8_t  bonusonly)
             clearview(0L);
 
             break;
-    }
+        }
 
-    FRAGBONUS:
+FRAGBONUS:
 
     ps[myconnectindex].palette = palette;
     KB_FlushKeyboardQueue();
@@ -10144,12 +10144,12 @@ void dobonus(uint8_t  bonusonly)
 
     switch(ud.volume_number)
     {
-        case 1:
-            gfx_offset = 5;
-            break;
-        default:
-            gfx_offset = 0;
-            break;
+    case 1:
+        gfx_offset = 5;
+        break;
+    default:
+        gfx_offset = 0;
+        break;
     }
 
     rotatesprite(0,0,65536L,0,BONUSSCREEN+gfx_offset,0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
@@ -10170,7 +10170,7 @@ void dobonus(uint8_t  bonusonly)
 
     while( 1 )
     {
-                sampletimer();
+        sampletimer();
         if(ps[myconnectindex].gm&MODE_EOL)
         {
             rotatesprite(0,0,65536L,0,BONUSSCREEN+gfx_offset,0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
@@ -10179,36 +10179,36 @@ void dobonus(uint8_t  bonusonly)
             {
                 switch( (totalclock>>4)%15 )
                 {
-                    case 0:
-                        if(bonuscnt == 6)
+                case 0:
+                    if(bonuscnt == 6)
+                    {
+                        bonuscnt++;
+                        sound(SHOTGUN_COCK);
+                        switch(rand()&3)
                         {
-                            bonuscnt++;
-                            sound(SHOTGUN_COCK);
-                            switch(rand()&3)
-                            {
-                                case 0:
-                                    sound(BONUS_SPEECH1);
-                                    break;
-                                case 1:
-                                    sound(BONUS_SPEECH2);
-                                    break;
-                                case 2:
-                                    sound(BONUS_SPEECH3);
-                                    break;
-                                case 3:
-                                    sound(BONUS_SPEECH4);
-                                    break;
-                            }
+                        case 0:
+                            sound(BONUS_SPEECH1);
+                            break;
+                        case 1:
+                            sound(BONUS_SPEECH2);
+                            break;
+                        case 2:
+                            sound(BONUS_SPEECH3);
+                            break;
+                        case 3:
+                            sound(BONUS_SPEECH4);
+                            break;
                         }
-                    case 1:
-                    case 4:
-                    case 5:
-                        rotatesprite(199<<16,31<<16,65536L,0,BONUSSCREEN+3+gfx_offset,0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
-                        break;
-                    case 2:
-                    case 3:
-                       rotatesprite(199<<16,31<<16,65536L,0,BONUSSCREEN+4+gfx_offset,0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
-                       break;
+                    }
+                case 1:
+                case 4:
+                case 5:
+                    rotatesprite(199<<16,31<<16,65536L,0,BONUSSCREEN+3+gfx_offset,0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
+                    break;
+                case 2:
+                case 3:
+                    rotatesprite(199<<16,31<<16,65536L,0,BONUSSCREEN+4+gfx_offset,0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
+                    break;
                 }
             }
             else if( totalclock > (10240+120L) ) break;
@@ -10216,13 +10216,13 @@ void dobonus(uint8_t  bonusonly)
             {
                 switch( (totalclock>>5)&3 )
                 {
-                    case 1:
-                    case 3:
-                        rotatesprite(199<<16,31<<16,65536L,0,BONUSSCREEN+1+gfx_offset,0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
-                        break;
-                    case 2:
-                        rotatesprite(199<<16,31<<16,65536L,0,BONUSSCREEN+2+gfx_offset,0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
-                        break;
+                case 1:
+                case 3:
+                    rotatesprite(199<<16,31<<16,65536L,0,BONUSSCREEN+1+gfx_offset,0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
+                    break;
+                case 2:
+                    rotatesprite(199<<16,31<<16,65536L,0,BONUSSCREEN+2+gfx_offset,0,0,2+8+16+64+128,0,0,xdim-1,ydim-1);
+                    break;
                 }
             }
 
@@ -10247,18 +10247,18 @@ void dobonus(uint8_t  bonusonly)
                         sound(PIPEBOMB_EXPLODE);
                     }
                     sprintf(text,"%02d:%02d",
-                        (ps[myconnectindex].player_par/(26*60))%60,
-                        (ps[myconnectindex].player_par/26)%60);
+                            (ps[myconnectindex].player_par/(26*60))%60,
+                            (ps[myconnectindex].player_par/26)%60);
                     gametext((320>>2)+71,60+9,text,0,2+8+16);
 
                     sprintf(text,"%02d:%02d",
-                        (partime[ud.volume_number*11+ud.last_level-1]/(26*60))%60,
-                        (partime[ud.volume_number*11+ud.last_level-1]/26)%60);
+                            (partime[ud.volume_number*11+ud.last_level-1]/(26*60))%60,
+                            (partime[ud.volume_number*11+ud.last_level-1]/26)%60);
                     gametext((320>>2)+71,69+9,text,0,2+8+16);
 
                     sprintf(text,"%02d:%02d",
-                        (designertime[ud.volume_number*11+ud.last_level-1]/(26*60))%60,
-                        (designertime[ud.volume_number*11+ud.last_level-1]/26)%60);
+                            (designertime[ud.volume_number*11+ud.last_level-1]/(26*60))%60,
+                            (designertime[ud.volume_number*11+ud.last_level-1]/26)%60);
                     gametext((320>>2)+71,78+9,text,0,2+8+16);
 
                 }
@@ -10336,7 +10336,7 @@ void dobonus(uint8_t  bonusonly)
                     totalclock = (60*13);
                 }
                 else if( totalclock < (1000000000L))
-                   totalclock = (1000000000L);
+                    totalclock = (1000000000L);
             }
         }
         else break;
@@ -10383,50 +10383,50 @@ void vglass(int32_t x,int32_t y,short a,short wn,short n)
 
 void lotsofglass(short i,short wallnum,short n)
 {
-     int32_t j, xv, yv, z, x1, y1;
-     short sect, a;
+    int32_t j, xv, yv, z, x1, y1;
+    short sect, a;
 
-     sect = -1;
+    sect = -1;
 
-     if(wallnum < 0)
-     {
+    if(wallnum < 0)
+    {
         for(j=n-1; j >= 0 ;j--)
         {
             a = SA-256+(TRAND&511)+1024;
             EGS(SECT,SX,SY,SZ,GLASSPIECES+(j%3),-32,36,36,a,32+(TRAND&63),1024-(TRAND&1023),i,5);
         }
         return;
-     }
+    }
 
-     j = n+1;
+    j = n+1;
 
-     x1 = wall[wallnum].x;
-     y1 = wall[wallnum].y;
+    x1 = wall[wallnum].x;
+    y1 = wall[wallnum].y;
 
-     xv = wall[wall[wallnum].point2].x-x1;
-     yv = wall[wall[wallnum].point2].y-y1;
+    xv = wall[wall[wallnum].point2].x-x1;
+    yv = wall[wall[wallnum].point2].y-y1;
 
-     x1 -= ksgn(yv);
-     y1 += ksgn(xv);
+    x1 -= ksgn(yv);
+    y1 += ksgn(xv);
 
-     xv /= j;
-     yv /= j;
+    xv /= j;
+    yv /= j;
 
-     for(j=n;j>0;j--)
-         {
-                  x1 += xv;
-                  y1 += yv;
+    for(j=n;j>0;j--)
+    {
+        x1 += xv;
+        y1 += yv;
 
-          updatesector(x1,y1,&sect);
-          if(sect >= 0)
-          {
-              z = sector[sect].floorz-(TRAND&(klabs(sector[sect].ceilingz-sector[sect].floorz)));
-              if( z < -(32<<8) || z > (32<<8) )
-                  z = SZ-(32<<8)+(TRAND&((64<<8)-1));
-              a = SA-1024;
-              EGS(SECT,x1,y1,z,GLASSPIECES+(j%3),-32,36,36,a,32+(TRAND&63),-(TRAND&1023),i,5);
-          }
-         }
+        updatesector(x1,y1,&sect);
+        if(sect >= 0)
+        {
+            z = sector[sect].floorz-(TRAND&(klabs(sector[sect].ceilingz-sector[sect].floorz)));
+            if( z < -(32<<8) || z > (32<<8) )
+                z = SZ-(32<<8)+(TRAND&((64<<8)-1));
+            a = SA-1024;
+            EGS(SECT,x1,y1,z,GLASSPIECES+(j%3),-32,36,36,a,32+(TRAND&63),-(TRAND&1023),i,5);
+        }
+    }
 }
 
 void spriteglass(short i,short n)
@@ -10444,40 +10444,40 @@ void spriteglass(short i,short n)
 
 void ceilingglass(short i,short sectnum,short n)
 {
-     int32_t j, xv, yv, z, x1, y1;
-     short a,s, startwall,endwall;
+    int32_t j, xv, yv, z, x1, y1;
+    short a,s, startwall,endwall;
 
-     startwall = sector[sectnum].wallptr;
-     endwall = startwall+sector[sectnum].wallnum;
+    startwall = sector[sectnum].wallptr;
+    endwall = startwall+sector[sectnum].wallnum;
 
-     for(s=startwall;s<(endwall-1);s++)
-     {
-         x1 = wall[s].x;
-         y1 = wall[s].y;
+    for(s=startwall;s<(endwall-1);s++)
+    {
+        x1 = wall[s].x;
+        y1 = wall[s].y;
 
-         xv = (wall[s+1].x-x1)/(n+1);
-         yv = (wall[s+1].y-y1)/(n+1);
+        xv = (wall[s+1].x-x1)/(n+1);
+        yv = (wall[s+1].y-y1)/(n+1);
 
-         for(j=n;j>0;j--)
-         {
-              x1 += xv;
-              y1 += yv;
-              a = TRAND&2047;
-              z = sector[sectnum].ceilingz+((TRAND&15)<<8);
-              EGS(sectnum,x1,y1,z,GLASSPIECES+(j%3),-32,36,36,a,(TRAND&31),0,i,5);
-          }
-     }
+        for(j=n;j>0;j--)
+        {
+            x1 += xv;
+            y1 += yv;
+            a = TRAND&2047;
+            z = sector[sectnum].ceilingz+((TRAND&15)<<8);
+            EGS(sectnum,x1,y1,z,GLASSPIECES+(j%3),-32,36,36,a,(TRAND&31),0,i,5);
+        }
+    }
 }
 
 
 
 void lotsofcolourglass(short i,short wallnum,short n)
 {
-     int32_t j, xv, yv, z, x1, y1;
-     short sect = -1, a, k;
+    int32_t j, xv, yv, z, x1, y1;
+    short sect = -1, a, k;
 
-     if(wallnum < 0)
-     {
+    if(wallnum < 0)
+    {
         for(j=n-1; j >= 0 ;j--)
         {
             a = TRAND&2047;
@@ -10485,164 +10485,164 @@ void lotsofcolourglass(short i,short wallnum,short n)
             sprite[k].pal = TRAND&15;
         }
         return;
-     }
+    }
 
-     j = n+1;
-     x1 = wall[wallnum].x;
-     y1 = wall[wallnum].y;
+    j = n+1;
+    x1 = wall[wallnum].x;
+    y1 = wall[wallnum].y;
 
-     xv = (wall[wall[wallnum].point2].x-wall[wallnum].x)/j;
-     yv = (wall[wall[wallnum].point2].y-wall[wallnum].y)/j;
+    xv = (wall[wall[wallnum].point2].x-wall[wallnum].x)/j;
+    yv = (wall[wall[wallnum].point2].y-wall[wallnum].y)/j;
 
-     for(j=n;j>0;j--)
-         {
-                  x1 += xv;
-                  y1 += yv;
+    for(j=n;j>0;j--)
+    {
+        x1 += xv;
+        y1 += yv;
 
-          updatesector(x1,y1,&sect);
-          z = sector[sect].floorz-(TRAND&(klabs(sector[sect].ceilingz-sector[sect].floorz)));
-          if( z < -(32<<8) || z > (32<<8) )
-              z = SZ-(32<<8)+(TRAND&((64<<8)-1));
-          a = SA-1024;
-          k = EGS(SECT,x1,y1,z,GLASSPIECES+(j%3),-32,36,36,a,32+(TRAND&63),-(TRAND&2047),i,5);
-          sprite[k].pal = TRAND&7;
-         }
+        updatesector(x1,y1,&sect);
+        z = sector[sect].floorz-(TRAND&(klabs(sector[sect].ceilingz-sector[sect].floorz)));
+        if( z < -(32<<8) || z > (32<<8) )
+            z = SZ-(32<<8)+(TRAND&((64<<8)-1));
+        a = SA-1024;
+        k = EGS(SECT,x1,y1,z,GLASSPIECES+(j%3),-32,36,36,a,32+(TRAND&63),-(TRAND&2047),i,5);
+        sprite[k].pal = TRAND&7;
+    }
 }
 
 void SetupGameButtons( void )
 {
-   CONTROL_DefineFlag(gamefunc_Move_Forward,false);
-   CONTROL_DefineFlag(gamefunc_Move_Backward,false);
-   CONTROL_DefineFlag(gamefunc_Turn_Left,false);
-   CONTROL_DefineFlag(gamefunc_Turn_Right,false);
-   CONTROL_DefineFlag(gamefunc_Strafe,false);
-   CONTROL_DefineFlag(gamefunc_Fire,false);
-   CONTROL_DefineFlag(gamefunc_Open,false);
-   CONTROL_DefineFlag(gamefunc_Run,false);
-   CONTROL_DefineFlag(gamefunc_AutoRun,false);
-   CONTROL_DefineFlag(gamefunc_Jump,false);
-   CONTROL_DefineFlag(gamefunc_Crouch,false);
-   CONTROL_DefineFlag(gamefunc_Look_Up,false);
-   CONTROL_DefineFlag(gamefunc_Look_Down,false);
-   CONTROL_DefineFlag(gamefunc_Look_Left,false);
-   CONTROL_DefineFlag(gamefunc_Look_Right,false);
-   CONTROL_DefineFlag(gamefunc_Strafe_Left,false);
-   CONTROL_DefineFlag(gamefunc_Strafe_Right,false);
-   CONTROL_DefineFlag(gamefunc_Aim_Up,false);
-   CONTROL_DefineFlag(gamefunc_Aim_Down,false);
-   CONTROL_DefineFlag(gamefunc_Weapon_1,false);
-   CONTROL_DefineFlag(gamefunc_Weapon_2,false);
-   CONTROL_DefineFlag(gamefunc_Weapon_3,false);
-   CONTROL_DefineFlag(gamefunc_Weapon_4,false);
-   CONTROL_DefineFlag(gamefunc_Weapon_5,false);
-   CONTROL_DefineFlag(gamefunc_Weapon_6,false);
-   CONTROL_DefineFlag(gamefunc_Weapon_7,false);
-   CONTROL_DefineFlag(gamefunc_Weapon_8,false);
-   CONTROL_DefineFlag(gamefunc_Weapon_9,false);
-   CONTROL_DefineFlag(gamefunc_Weapon_10,false);
-   CONTROL_DefineFlag(gamefunc_Inventory,false);
-   CONTROL_DefineFlag(gamefunc_Inventory_Left,false);
-   CONTROL_DefineFlag(gamefunc_Inventory_Right,false);
-   CONTROL_DefineFlag(gamefunc_Holo_Duke,false);
-   CONTROL_DefineFlag(gamefunc_Jetpack,false);
-   CONTROL_DefineFlag(gamefunc_NightVision,false);
-   CONTROL_DefineFlag(gamefunc_MedKit,false);
-   CONTROL_DefineFlag(gamefunc_TurnAround,false);
-   CONTROL_DefineFlag(gamefunc_SendMessage,false);
-   CONTROL_DefineFlag(gamefunc_Map,false);
-   CONTROL_DefineFlag(gamefunc_Shrink_Screen,false);
-   CONTROL_DefineFlag(gamefunc_Enlarge_Screen,false);
-   CONTROL_DefineFlag(gamefunc_Center_View,false);
-   CONTROL_DefineFlag(gamefunc_Holster_Weapon,false);
-   CONTROL_DefineFlag(gamefunc_Show_Opponents_Weapon,false);
-   CONTROL_DefineFlag(gamefunc_Map_Follow_Mode,false);
-   CONTROL_DefineFlag(gamefunc_See_Coop_View,false);
-   CONTROL_DefineFlag(gamefunc_Mouse_Aiming,false);
-   CONTROL_DefineFlag(gamefunc_Toggle_Crosshair,false);
-   CONTROL_DefineFlag(gamefunc_Steroids,false);
-   CONTROL_DefineFlag(gamefunc_Quick_Kick,false);
-   CONTROL_DefineFlag(gamefunc_Next_Weapon,false);
-   CONTROL_DefineFlag(gamefunc_Previous_Weapon,false);
-   CONTROL_DefineFlag(gamefunc_Console,false);
+    CONTROL_DefineFlag(gamefunc_Move_Forward,false);
+    CONTROL_DefineFlag(gamefunc_Move_Backward,false);
+    CONTROL_DefineFlag(gamefunc_Turn_Left,false);
+    CONTROL_DefineFlag(gamefunc_Turn_Right,false);
+    CONTROL_DefineFlag(gamefunc_Strafe,false);
+    CONTROL_DefineFlag(gamefunc_Fire,false);
+    CONTROL_DefineFlag(gamefunc_Open,false);
+    CONTROL_DefineFlag(gamefunc_Run,false);
+    CONTROL_DefineFlag(gamefunc_AutoRun,false);
+    CONTROL_DefineFlag(gamefunc_Jump,false);
+    CONTROL_DefineFlag(gamefunc_Crouch,false);
+    CONTROL_DefineFlag(gamefunc_Look_Up,false);
+    CONTROL_DefineFlag(gamefunc_Look_Down,false);
+    CONTROL_DefineFlag(gamefunc_Look_Left,false);
+    CONTROL_DefineFlag(gamefunc_Look_Right,false);
+    CONTROL_DefineFlag(gamefunc_Strafe_Left,false);
+    CONTROL_DefineFlag(gamefunc_Strafe_Right,false);
+    CONTROL_DefineFlag(gamefunc_Aim_Up,false);
+    CONTROL_DefineFlag(gamefunc_Aim_Down,false);
+    CONTROL_DefineFlag(gamefunc_Weapon_1,false);
+    CONTROL_DefineFlag(gamefunc_Weapon_2,false);
+    CONTROL_DefineFlag(gamefunc_Weapon_3,false);
+    CONTROL_DefineFlag(gamefunc_Weapon_4,false);
+    CONTROL_DefineFlag(gamefunc_Weapon_5,false);
+    CONTROL_DefineFlag(gamefunc_Weapon_6,false);
+    CONTROL_DefineFlag(gamefunc_Weapon_7,false);
+    CONTROL_DefineFlag(gamefunc_Weapon_8,false);
+    CONTROL_DefineFlag(gamefunc_Weapon_9,false);
+    CONTROL_DefineFlag(gamefunc_Weapon_10,false);
+    CONTROL_DefineFlag(gamefunc_Inventory,false);
+    CONTROL_DefineFlag(gamefunc_Inventory_Left,false);
+    CONTROL_DefineFlag(gamefunc_Inventory_Right,false);
+    CONTROL_DefineFlag(gamefunc_Holo_Duke,false);
+    CONTROL_DefineFlag(gamefunc_Jetpack,false);
+    CONTROL_DefineFlag(gamefunc_NightVision,false);
+    CONTROL_DefineFlag(gamefunc_MedKit,false);
+    CONTROL_DefineFlag(gamefunc_TurnAround,false);
+    CONTROL_DefineFlag(gamefunc_SendMessage,false);
+    CONTROL_DefineFlag(gamefunc_Map,false);
+    CONTROL_DefineFlag(gamefunc_Shrink_Screen,false);
+    CONTROL_DefineFlag(gamefunc_Enlarge_Screen,false);
+    CONTROL_DefineFlag(gamefunc_Center_View,false);
+    CONTROL_DefineFlag(gamefunc_Holster_Weapon,false);
+    CONTROL_DefineFlag(gamefunc_Show_Opponents_Weapon,false);
+    CONTROL_DefineFlag(gamefunc_Map_Follow_Mode,false);
+    CONTROL_DefineFlag(gamefunc_See_Coop_View,false);
+    CONTROL_DefineFlag(gamefunc_Mouse_Aiming,false);
+    CONTROL_DefineFlag(gamefunc_Toggle_Crosshair,false);
+    CONTROL_DefineFlag(gamefunc_Steroids,false);
+    CONTROL_DefineFlag(gamefunc_Quick_Kick,false);
+    CONTROL_DefineFlag(gamefunc_Next_Weapon,false);
+    CONTROL_DefineFlag(gamefunc_Previous_Weapon,false);
+    CONTROL_DefineFlag(gamefunc_Console,false);
 }
 
 /*
-===================
-=
-= GetTime
-=
-===================
+  ===================
+  =
+  = GetTime
+  =
+  ===================
 */
 
 int32_t GetTime(void)
-   {
-   return totalclock;
-   }
+{
+    return totalclock;
+}
 
 
 /*
-===================
-=
-= CenterCenter
-=
-===================
+  ===================
+  =
+  = CenterCenter
+  =
+  ===================
 */
 
 void CenterCenter(void)
-   {
-   printf("Center the joystick and press a button\n");
-   }
+{
+    printf("Center the joystick and press a button\n");
+}
 
 /*
-===================
-=
-= UpperLeft
-=
-===================
+  ===================
+  =
+  = UpperLeft
+  =
+  ===================
 */
 
 void UpperLeft(void)
-   {
-   printf("Move joystick to upper-left corner and press a button\n");
-   }
+{
+    printf("Move joystick to upper-left corner and press a button\n");
+}
 
 /*
-===================
-=
-= LowerRight
-=
-===================
+  ===================
+  =
+  = LowerRight
+  =
+  ===================
 */
 
 void LowerRight(void)
-   {
-   printf("Move joystick to lower-right corner and press a button\n");
-   }
+{
+    printf("Move joystick to lower-right corner and press a button\n");
+}
 
 /*
-===================
-=
-= CenterThrottle
-=
-===================
+  ===================
+  =
+  = CenterThrottle
+  =
+  ===================
 */
 
 void CenterThrottle(void)
-   {
-   printf("Center the throttle control and press a button\n");
-   }
+{
+    printf("Center the throttle control and press a button\n");
+}
 
 /*
-===================
-=
-= CenterRudder
-=
-===================
+  ===================
+  =
+  = CenterRudder
+  =
+  ===================
 */
 
 void CenterRudder(void)
 {
-   printf("Center the rudder control and press a button\n");
+    printf("Center the rudder control and press a button\n");
 }
 
 // FIX_00006: better naming system for screenshots + message when pic is taken.
