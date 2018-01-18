@@ -518,7 +518,9 @@ void Error (int errorType, char  *error, ...)
 
 
    va_start (argptr, error);
-   vprintf(error, argptr);
+   char buf[256];
+   vsnprintf(buf, sizeof(buf), error, argptr);
+   rb->splash(HZ * 2, buf);
    va_end (argptr);
 
    //printf("Press any key to continue...\n");

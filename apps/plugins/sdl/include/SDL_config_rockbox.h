@@ -45,6 +45,30 @@
 #define RB_SAMPR SAMPR_22
 #endif
 
+#ifndef HAVE_LCD_COLOR
+/* greylib will round either height or width (depending on pixel
+ * format) to a multiple of 4 or 8 (depending on pixel depth). To
+ * avoid this interfering with our code, we round up first (possibly
+ * losing up to 7 pixels on the side of the screen) */
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+#define GREY_WIDTH ((LCD_WIDTH & ~7))
+#define GREY_HEIGHT LCD_HEIGHT
+#elif (LCD_DEPTH == 1) || (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
+#define GREY_HEIGHT ((LCD_HEIGHT & ~7))
+#define GREY_WIDTH LCD_WIDTH
+#elif LCD_DEPTH == 2
+#define GREY_HEIGHT ((LCD_HEIGHT & ~3))
+#define GREY_WIDTH LCD_WIDTH
+#endif
+/* games must use this resolution to use greylib */
+#define RB_LCD_WIDTH GREY_WIDTH
+#define RB_LCD_HEIGHT GREY_HEIGHT
+#else
+/* color: this is just a recommended size */
+#define RB_LCD_WIDTH LCD_WIDTH
+#define RB_LCD_HEIGHT LCD_HEIGHT
+#endif
+
 /* Enable the stub cdrom driver (src/cdrom/dummy/\*.c) */
 #define SDL_CDROM_DISABLED      1
 

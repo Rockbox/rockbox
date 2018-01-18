@@ -207,6 +207,7 @@ char *MV_ErrorString
          ErrorString = "No voice with matching handle found.\n";
          break;
 
+         
 #ifdef PLAT_DOS
       case MV_BlasterError :
          ErrorString = BLASTER_ErrorString( BLASTER_Error );
@@ -265,8 +266,12 @@ char *MV_ErrorString
          break;
 
       default :
-         ErrorString = "Unknown Multivoc error code.\n";
+      {
+         static char buf[64];
+         snprintf(buf, sizeof(buf), "Unknown Multivoc error code (%d).\n", ErrorNumber);
+         ErrorString = buf;
          break;
+      }
       }
 
    return( ErrorString );

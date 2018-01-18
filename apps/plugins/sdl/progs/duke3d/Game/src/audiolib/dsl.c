@@ -168,7 +168,7 @@ int   DSL_BeginBufferedPlayback( char *BufferStart,
 
 	if (Mix_OpenAudio(SampleRate, format, channels, chunksize) < 0) {
 		DSL_SetErrorCode(DSL_MixerInitFailure);
-		
+                rb->splashf(HZ * 2, "Mix_OpenAudio: %s", SDL_GetError());
 		return DSL_Error;
 	}
 

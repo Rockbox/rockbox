@@ -44,7 +44,9 @@
 
 GREY_INFO_STRUCT
 
-#define GREYBUFSIZE 1024*1024
+#define GREYBUFSIZE 128*1024
+
+/* see SDL_config_rockbox.h for GREY_WIDTH/HEIGHT defintion */
 #endif
 
 #define ROCKBOXVID_DRIVER_NAME "rockbox"
@@ -478,12 +480,12 @@ int ROCKBOX_VideoInit(_THIS, SDL_PixelFormat *vformat)
 SDL_Rect **ROCKBOX_ListModes(_THIS, SDL_PixelFormat *format, Uint32 flags)
 {
 #ifdef USE_GREY
-    /* grey only supports native resolution at 24bpp */
+    /* grey only supports native resolution at 24bpp without rotation */
     static SDL_Rect rect;
     static SDL_Rect *rects[2] = { &rect, NULL };
     rect.x = rect.y = 0;
-    rect.w = LCD_WIDTH;
-    rect.h = LCD_HEIGHT;
+    rect.w = GREY_WIDTH;
+    rect.h = GREY_HEIGHT;
     if(format->BitsPerPixel != 24)
         return NULL;
     return rects;
@@ -597,11 +599,16 @@ SDL_Surface *ROCKBOX_SetVideoMode(_THIS, SDL_Surface *current,
     }
 
 #ifndef USE_GREY
+    /* we support any resolution as long as it's the correct depth */
     if(bpp != LCD_DEPTH)
         return NULL;
 #else
-    if(bpp != 24)
+    /* grey always uses 24bpp at proper grey resolution (RB_LCD_WIDTH x RB_LCD_HEIGHT)*/
+    if(bpp != 24 || width != RB_LCD_WIDTH || height != RB_LCD_HEIGHT)
+    {
+        SDL_SetError("greylib SDL video requires 24bpp at proper resolution");
         return NULL;
+    }
 #endif
 
     init_keymap();
@@ -610,7 +617,8 @@ SDL_Surface *ROCKBOX_SetVideoMode(_THIS, SDL_Surface *current,
     this->hidden->direct = false;
 
 #ifndef USE_GREY
-    /* have SDL write directly to the framebuffer */
+    /* Have SDL write directly to the framebuffer if the requested
+     * size matches the physical size. */
     if(width == LCD_WIDTH && height == LCD_HEIGHT)
     {
         this->hidden->buffer = NULL;
@@ -677,7 +685,7 @@ SDL_Surface *ROCKBOX_SetVideoMode(_THIS, SDL_Surface *current,
 #ifdef USE_GREY
     /* init grey */
     unsigned char *gbuf = malloc(GREYBUFSIZE);
-    if(!grey_init(gbuf, GREYBUFSIZE, GREY_ON_COP | GREY_BUFFERED, LCD_WIDTH, LCD_HEIGHT, NULL))
+    if(!grey_init(gbuf, GREYBUFSIZE, GREY_ON_COP | GREY_BUFFERED, GREY_WIDTH, GREY_HEIGHT, NULL))
     {
         rb->splashf(HZ, "grey init failed");
         return NULL;
@@ -735,11 +743,18 @@ static void blit_rotated(fb_data *src, int x, int y, int w, int h)
 
 #ifdef USE_GREY
 /* we blit a line at a time */
-static unsigned char greyline[LCD_WIDTH];
+static unsigned char greyline[GREY_WIDTH];
 #endif
 
 static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
 {
+    if(this->hidden->direct)
+    {
+        /* early exit (we don't care about the requested rects) */
+        rb->lcd_update();
+        return;
+    }
+
     if(this->screen->pixels)
     {
         for(int i = 0; i < numrects; ++i)
@@ -747,25 +762,26 @@ static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
 #ifdef USE_GREY
             for(int y = rects[i].y; y < rects[i].y + rects[i].h; ++y)
             {
+                /* convert one line to grayscale at a time */
                 for(int x = rects[i].x; x < rects[i].x + rects[i].w; ++x)
                 {
-                    int idx = y * LCD_WIDTH + x;
-                    unsigned char *ptr = this->screen->pixels + 3 * idx;
-                    unsigned int sum = ptr[0] + ptr[1] + ptr[2];
-                    sum /= 3;
-                    greyline[x] = (unsigned char) sum;
+                    int idx = y * this->hidden->w + x;
+                    unsigned char *ptr = (unsigned char*)this->screen->pixels + 3 * idx;
+                    unsigned int sum = 3 * ptr[0] + 3 * ptr[1] + 2 * ptr[2];
+                    sum /= 8;
+                    if(sum > 255)
+                        sum = 255;
+
+                    /* no clamping */
+                    greyline[x] = sum;
                 }
                 /* blit line */
-                grey_gray_bitmap(greyline, rects[i].x, y, rects[i].w, 1);
+                grey_gray_bitmap(greyline, 0, y, GREY_WIDTH, 1);
             }
 #else
-            /* no scaling */
-            if(this->hidden->direct)
-            {
-                /* no-op */
-            }
+            /* direct mode is handled above */
             /* screen is rotated */
-            else if(this->hidden->rotate)
+            if(this->hidden->rotate)
             {
                 LOGF("rotated copy");
                 blit_rotated(this->screen->pixels, rects[i].x, rects[i].y, rects[i].w, rects[i].h);

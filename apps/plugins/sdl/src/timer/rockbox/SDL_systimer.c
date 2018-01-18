@@ -28,6 +28,7 @@
 
 #include "plugin.h"
 
+/* only on hardware without greylib (since it needs the timer) */
 #if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR) && !defined(RB_PROFILE)
 #define USE_TIMER
 #endif

@@ -73,8 +73,8 @@ int32_t BFullScreen = 0;
 //
 
 int32 ScreenMode=2;
-int32 ScreenWidth = LCD_WIDTH;
-int32 ScreenHeight = LCD_HEIGHT;
+int32 ScreenWidth = RB_LCD_WIDTH;
+int32 ScreenHeight = RB_LCD_HEIGHT;
 
 //
 // Mouse variables
@@ -656,7 +656,14 @@ void CONFIG_ReadSetup( void )
    SCRIPT_GetNumber( scripthandle, "Screen Setup", "Tilt",&ud.screen_tilting);
    SCRIPT_GetNumber( scripthandle, "Screen Setup", "Messages",&ud.fta_on);
    SCRIPT_GetNumber( scripthandle, "Screen Setup", "ScreenWidth",&ScreenWidth);
+   /* greylib requires native resolution */
+#ifdef GREY_WIDTH
+   ScreenWidth = GREY_WIDTH;
+#endif
    SCRIPT_GetNumber( scripthandle, "Screen Setup", "ScreenHeight",&ScreenHeight);
+#ifdef GREY_HEIGHT
+   ScreenHeight = GREY_HEIGHT;
+#endif
    // SCRIPT_GetNumber( scripthandle, "Screen Setup", "ScreenMode",&ScreenMode);
    SCRIPT_GetNumber( scripthandle, "Screen Setup", "ScreenGamma",&ud.brightness);
    SCRIPT_GetNumber( scripthandle, "Screen Setup", "ScreenSize",&ud.screen_size);

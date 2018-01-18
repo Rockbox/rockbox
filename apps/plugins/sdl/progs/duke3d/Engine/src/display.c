@@ -1061,11 +1061,6 @@ static __inline void add_user_defined_resolution(void)
     int32_t w;
     int32_t h;
     const char  *envr = getenv(BUILD_USERSCREENRES);
-
-    /* rockbox hack */
-    add_vesa_mode("rockbox", LCD_WIDTH, LCD_HEIGHT);
-    add_vesa_mode("rockbox", LCD_HEIGHT, LCD_WIDTH);
-    
     
     if (envr == NULL)
         return;
@@ -1229,10 +1224,19 @@ void getvalidvesamodes(void)
    	validmodecnt = 0;
     vidoption = 1;  /* !!! tmp */
 
-        /* fill in the standard resolutions... */
+    /* fill in the standard resolutions... */
+#ifndef ROCKBOX
     for (i = 0; i < sizeof (stdres) / sizeof (stdres[0]); i++)
         add_vesa_mode("standard", stdres[i][0], stdres[i][1]);
+#endif
+    
+    /* rockbox hack, see SDL_config_rockbox.h */
+    add_vesa_mode("rockbox", RB_LCD_WIDTH, RB_LCD_HEIGHT);
 
+    /* only color supports rotation */
+#ifndef GREY_WIDTH
+    add_vesa_mode("rockbox", RB_LCD_HEIGHT, RB_LCD_WIDTH);
+#endif
          /* Anything the hardware can specifically do is added now... */
     modes = get_physical_resolutions();
     for (i = 0; (modes != (SDL_Rect **) -1) && (modes[i] != NULL); i++)
