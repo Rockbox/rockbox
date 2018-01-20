@@ -46,7 +46,7 @@
 #endif
 
 #if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) \
-    || defined(SONY_NWZ_LINUX))
+    || (defined(SONY_NWZ_LINUX) && !defined(SIMULATOR)))
 
 #ifdef AUDIO_CPU_BOOST
 static void audio_cpu_boost(bool state)
