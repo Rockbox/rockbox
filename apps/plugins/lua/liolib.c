@@ -415,7 +415,7 @@ static int f_seek (lua_State *L) {
   int op = luaL_checkoption(L, 2, "cur", modenames);
   long offset = luaL_optlong(L, 3, 0);
   op = rb->lseek(f, offset, mode[op]);
-  if (op)
+  if (op < 0)
     return pushresult(L, 0, NULL);  /* error */
   else {
     lua_pushinteger(L, rb->lseek(f, 0, SEEK_CUR));
