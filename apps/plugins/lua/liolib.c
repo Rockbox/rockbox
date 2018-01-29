@@ -18,7 +18,7 @@
 #include "lualib.h"
 #include "rocklibc.h"
 
-
+#include "llimits.h"
 
 #define IO_INPUT    1
 #define IO_OUTPUT   2
@@ -256,9 +256,9 @@ static int read_number (lua_State *L, int *f) {
 
 
 static int test_eof (lua_State *L, int *f) {
-  ssize_t s = rb->lseek(*f, 0, SEEK_CUR);
+  off_t s = rb->lseek(*f, 0, SEEK_CUR);
   lua_pushlstring(L, NULL, 0);
-  return s != rb->filesize(*f);
+  return s < rb->filesize(*f);
 }
 
 
@@ -268,10 +268,11 @@ static int _read_line (lua_State *L, int *f) {
   luaL_buffinit(L, &b);
   for (;;) {
     size_t l;
-    size_t r;
+    off_t r;
     char *p = luaL_prepbuffer(&b);
     r = rb->read_line(*f, p, LUAL_BUFFERSIZE);
     l = strlen(p);
+
     if (l == 0 || p[l-1] != '\n')
       luaL_addsize(&b, l);
     else {
@@ -281,7 +282,7 @@ static int _read_line (lua_State *L, int *f) {
     }
     if (r < LUAL_BUFFERSIZE) {  /* eof? */
       luaL_pushresult(&b);  /* close buffer */
-      return (lua_objlen(L, -1) > 0);  /* check whether read something */
+      return (r > 0);  /* check whether read something */
     }
   }
 }
@@ -289,7 +290,7 @@ static int _read_line (lua_State *L, int *f) {
 
 static int read_chars (lua_State *L, int *f, size_t n) {
   size_t rlen;  /* how much to read */
-  size_t nr;  /* number of chars actually read */
+  ssize_t nr;  /* number of chars actually read */
   luaL_Buffer b;
   luaL_buffinit(L, &b);
   rlen = LUAL_BUFFERSIZE;  /* try to read that much each time */
@@ -297,9 +298,11 @@ static int read_chars (lua_State *L, int *f, size_t n) {
     char *p = luaL_prepbuffer(&b);
     if (rlen > n) rlen = n;  /* cannot read more than asked */
     nr = rb->read(*f, p, rlen);
+    if (nr < 0)
+      luaL_error(L, "error reading file");
     luaL_addsize(&b, nr);
     n -= nr;  /* still have to read `n' chars */
-  } while (n > 0 && nr == rlen);  /* until end of count or eof */
+  } while (n > 0 && nr == (ssize_t) rlen);  /* until end of count or eof */
   luaL_pushresult(&b);  /* close buffer */
   return (n == 0 || lua_objlen(L, -1) > 0);
 }
@@ -414,11 +417,11 @@ static int f_seek (lua_State *L) {
   int f = *tofile(L);
   int op = luaL_checkoption(L, 2, "cur", modenames);
   long offset = luaL_optlong(L, 3, 0);
-  op = rb->lseek(f, offset, mode[op]);
-  if (op)
+  off_t size = rb->lseek(f, offset, mode[op]);
+  if (size < 0 || size > MAX_INT)   /* signed limit */
     return pushresult(L, 0, NULL);  /* error */
   else {
-    lua_pushinteger(L, rb->lseek(f, 0, SEEK_CUR));
+     lua_pushinteger(L, (LUA_INTEGER) size );
     return 1;
   }
 }
