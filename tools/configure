@@ -861,10 +861,10 @@ mipsellinuxcc () {
  LDOPTS="-lasound -lpthread -lm -ldl -lrt $LDOPTS"
  GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
  SHARED_LDFLAG="-shared"
- SHARED_CFLAGS='-fPIC'
+ SHARED_CFLAGS='-fPIC -fvisibility=hidden'
  endian="little"
  app_type="rocker"
- #thread_support="HAVE_SIGALTSTACK_THREADS"
+ thread_support="HAVE_SIGALTSTACK_THREADS"
 
  # Include path
  GCCOPTS="$GCCOPTS  -D_GNU_SOURCE=1 -U_FORTIFY_SOURCE -D_REENTRANT"
