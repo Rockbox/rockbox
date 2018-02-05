@@ -480,13 +480,35 @@ void luaV_execute (lua_State *L, int nexeccalls) {
         continue;
       }
       case OP_DIV: {
-        arith_op(luai_numdiv, TM_DIV);
+        TValue *rb = RKB(i);
+        TValue *rc = RKC(i);
+        if (ttisnumber(rb) && ttisnumber(rc)) {
+          lua_Number nb = nvalue(rb), nc = nvalue(rc);
+          if (nc == 0)
+            luaG_typeerror(L, rc, "divide by zero");
+
+          setnvalue(ra, luai_numdiv(nb, nc));
+        }
+        else
+          Protect(Arith(L, ra, rb, rc, TM_DIV));
+
         continue;
       }
       case OP_MOD: {
-        arith_op(luai_nummod, TM_MOD);
+        TValue *rb = RKB(i);
+        TValue *rc = RKC(i);
+        if (ttisnumber(rb) && ttisnumber(rc)) {
+          lua_Number nb = nvalue(rb), nc = nvalue(rc);
+          if (nc == 0)
+            luaG_typeerror(L, rc, "perform 'n%0'");
+
+          setnvalue(ra, luai_nummod(nb, nc));
+        }
+        else
+          Protect(Arith(L, ra, rb, rc, TM_MOD));
+
         continue;
-      }
+    }
       case OP_POW: {
         arith_op(luai_numpow, TM_POW);
         continue;
