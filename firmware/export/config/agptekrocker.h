@@ -110,7 +110,7 @@
 #define BATTERY_TYPES_COUNT  1
 
 /* Audio codec */
-#define HAVE_NWZ_LINUX_CODEC
+#define HAVE_ROCKER_CODEC
 
 /* Battery */
 #define BATTERY_CAPACITY_DEFAULT 600 /* default battery capacity */
