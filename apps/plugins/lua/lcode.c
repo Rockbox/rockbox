@@ -642,26 +642,27 @@ static int constfolding (OpCode op, expdesc *e1, expdesc *e2) {
     case OP_SUB: r = luai_numsub(v1, v2); break;
     case OP_MUL: r = luai_nummul(v1, v2); break;
     case OP_DIV:
-      if (v2 == 0) return 0;  /* do not attempt to divide by 0 */
+      if (v2 == 0) return -1;  /* do not attempt to divide by 0 */
       r = luai_numdiv(v1, v2); break;
     case OP_MOD:
-      if (v2 == 0) return 0;  /* do not attempt to divide by 0 */
+      if (v2 == 0) return -1;  /* do not attempt to divide by 0 */
       r = luai_nummod(v1, v2); break;
     case OP_POW: r = luai_numpow(v1, v2); break;
     case OP_UNM: r = luai_numunm(v1); break;
     case OP_LEN: return 0;  /* no constant folding for 'len' */
     default: lua_assert(0); r = 0; break;
   }
-  if (luai_numisnan(r)) return 0;  /* do not attempt to produce NaN */
+  if (luai_numisnan(r)) return -2;  /* do not attempt to produce NaN */
   e1->u.nval = r;
   return 1;
 }
 
 
 static void codearith (FuncState *fs, OpCode op, expdesc *e1, expdesc *e2) {
-  if (constfolding(op, e1, e2))
+  int resf = constfolding(op, e1, e2);
+  if (resf > 0)
     return;
-  else {
+  else if (resf == 0) {
     int o2 = (op != OP_UNM && op != OP_LEN) ? luaK_exp2RK(fs, e2) : 0;
     int o1 = luaK_exp2RK(fs, e1);
     if (o1 > o2) {
@@ -675,6 +676,8 @@ static void codearith (FuncState *fs, OpCode op, expdesc *e1, expdesc *e2) {
     e1->u.s.info = luaK_codeABC(fs, op, 0, o1, o2);
     e1->k = VRELOCABLE;
   }
+  else
+    luaX_syntaxerror(fs->ls, "Inf or NaN");
 }
 
 
