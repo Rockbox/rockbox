@@ -24,6 +24,7 @@
 #include "audio.h"
 #include "audiohw.h"
 #include "system.h"
+#include "panic.h"
 #include "alsa-controls.h"
 
 static int fd_hw;
