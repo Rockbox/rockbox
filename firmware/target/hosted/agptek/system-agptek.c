@@ -105,8 +105,6 @@ void system_init(void)
     sigaction(SIGTERM, &sa, NULL);
     sigaction(SIGBUS, &sa, NULL);
     sigaction(SIGTERM, &sa, NULL);
-
-    agptek_power_init();
 }
 
 void system_reboot(void)

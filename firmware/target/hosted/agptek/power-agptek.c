@@ -35,11 +35,6 @@ const char * const sysfs_bat_voltage =
 const char * const sysfs_bat_status =
     "/sys/class/power_supply/battery/status";
 
-void agptek_power_init(void)
-{
-    return;
-}
-
 unsigned int agptek_power_get_status(void)
 {
     char buf[12] = {0};
