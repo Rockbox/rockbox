@@ -304,15 +304,15 @@ int choice_screen(const char *title, bool center, int nr_choices, const char *ch
         if(btn & BUTTON_REPEAT)
             btn &= ~BUTTON_REPEAT;
         /* play -> stop loop and return mode */
-        if(btn == BUTTON_PLAY || btn == BUTTON_BACK)
+        if(btn == BUTTON_PLAY || btn == BUTTON_LEFT)
         {
             free(buf);
             return btn == BUTTON_PLAY ? choice : -1;
         }
         /* left/right/up/down: change mode */
-        if(btn == BUTTON_LEFT || btn == BUTTON_UP || btn == BUTTON_REW)
+        if(btn == BUTTON_UP)
             choice = (choice + nr_choices - 1) % nr_choices;
-        if(btn == BUTTON_RIGHT || btn == BUTTON_DOWN || btn == BUTTON_FF)
+        if(btn == BUTTON_DOWN)
             choice = (choice + 1) % nr_choices;
     }
 }
