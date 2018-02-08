@@ -44,8 +44,6 @@ static uint8_t machxbits_al;
 static uint8_t bitsSetup;
 static uint8_t * textureSetup;
 
-int drawcalls[10] = {0,0,0,0,0,0,0,0,0,0};
-
 void sethlinesizes(int32_t i1, int32_t _bits, uint8_t * textureAddress)
 {
     machxbits_al = i1;
@@ -59,7 +57,6 @@ void sethlinesizes(int32_t i1, int32_t _bits, uint8_t * textureAddress)
 //FCS:   Draw ceiling/floors
 //Draw a line from destination in the framebuffer to framebuffer-numPixels
 void hlineasm4(int32_t numPixels, int32_t shade, uint32_t i4, uint32_t i5, uint8_t *dest){
-    ++drawcalls[0];
     int32_t shifter = ((256-machxbits_al) & 0x1f);
     uint32_t source;
 
@@ -108,7 +105,6 @@ void setuprhlineasm4(int32_t i1, int32_t i2, int32_t i3, int32_t i4, int32_t i5,
 
 void rhlineasm4(int32_t i1, uint8_t* texture, int32_t i3, uint32_t i4, uint32_t i5, int32_t dest)
 {
-    ++drawcalls[1];
     uint32_t ebp = dest - i1;
     uint32_t rmach6b = ebp-1;
     int32_t numPixels;
@@ -159,7 +155,6 @@ void setuprmhlineasm4(int32_t i1, int32_t i2, int32_t i3, int32_t i4, int32_t ti
 //FCS: ????
 void rmhlineasm4(int32_t i1, intptr_t shade, int32_t colorIndex, int32_t i4, int32_t i5, int32_t dest)
 {
-    ++drawcalls[2];
     uint32_t ebp = dest - i1;
     uint32_t rmach6b = ebp-1;
     int32_t numPixels;
@@ -217,8 +212,6 @@ static uint8_t  mach3_al;
 int32_t prevlineasm1(int32_t i1, uint8_t* palette, int32_t i3, int32_t i4, uint8_t  *source, uint8_t  *dest)
 {
 
-    ++drawcalls[3];
-
     if (i3 == 0)
     {
         if (!RENDER_DRAW_TOP_AND_BOTTOM_COLUMN)
@@ -244,7 +237,6 @@ int32_t prevlineasm1(int32_t i1, uint8_t* palette, int32_t i3, int32_t i4, uint8
 //FCS: This is used to draw wall border vertical lines
 int32_t vlineasm1(int32_t vince, uint8_t* palookupoffse, int32_t numPixels, int32_t vplce, uint8_t* texture, uint8_t* dest)
 {
-    ++drawcalls[4];
     uint32_t temp;
 
     if (!RENDER_DRAW_WALL_BORDERS)
@@ -270,7 +262,6 @@ int32_t vlineasm1(int32_t vince, uint8_t* palookupoffse, int32_t numPixels, int3
 
 int32_t tvlineasm1(int32_t i1, uint8_t  * texture, int32_t numPixels, int32_t i4, uint8_t  *source, uint8_t  *dest)
 {
-    ++drawcalls[5];
     uint8_t shiftValue = (globalshiftval & 0x1f);
 
     numPixels++;
@@ -318,7 +309,6 @@ void setuptvlineasm2(int32_t i1, int32_t i2, int32_t i3)
 
 void tvlineasm2(uint32_t i1, uint32_t i2, uintptr_t i3, uintptr_t i4, uint32_t i5, uintptr_t i6)
 {
-    ++drawcalls[6];
     uint32_t ebp = i1;
     uint32_t tran2inca = i2;
     uint32_t tran2incb = asm1;
@@ -387,7 +377,6 @@ void tvlineasm2(uint32_t i1, uint32_t i2, uintptr_t i3, uintptr_t i4, uint32_t i
 static uint8_t  machmv;
 int32_t mvlineasm1(int32_t vince, uint8_t* palookupoffse, int32_t i3, int32_t vplce, uint8_t* texture, uint8_t  *dest)
 {
-    ++drawcalls[7];
     uint32_t temp;
 
     for(;i3>=0;i3--)
@@ -418,7 +407,6 @@ void setupvlineasm(int32_t i1)
 void vlineasm4(int32_t columnIndex, intptr_t framebuffer)
 {
 
-    ++drawcalls[8];
     if (!RENDER_DRAW_WALL_INSIDE)
         return ;
 
@@ -454,7 +442,6 @@ void setupmvlineasm(int32_t i1)
 /* called a lot */
 void mvlineasm4(int32_t column, intptr_t framebufferOffset)
 {
-    ++drawcalls[9];
     int i;
     uint32_t temp;
     uintptr_t index = (framebufferOffset + ylookup[column]);
