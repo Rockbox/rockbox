@@ -37,6 +37,8 @@ static const char * const sysfs_bl_power =
 
 bool backlight_hw_init(void)
 {
+    backlight_hw_on();
+    backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
     return true;
 }
 

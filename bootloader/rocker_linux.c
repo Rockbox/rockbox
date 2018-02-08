@@ -79,11 +79,11 @@
 #endif
 
 /* return icon y position (x is always centered) */
-int get_icon_y(void)
+static int get_icon_y(void)
 {
-    /* adjust so that this contains the Sony logo and produces a nice logo
-     * when used with rockbox */
-    return (LCD_HEIGHT - ICON_HEIGHT)/4;
+    int h;
+    lcd_getstringsize("X", NULL, &h);
+    return ((LCD_HEIGHT - ICON_HEIGHT)/2) - h;
 }
 
 /* Important Note: this bootloader is carefully written so that in case of
@@ -118,26 +118,30 @@ static void display_text_centerf(int y, const char *format, ...)
 }
 
 /* get timeout before taking action if the user doesn't touch the device */
-int get_inactivity_tmo(void)
+static int get_inactivity_tmo(void)
 {
+#if defined(HAS_BUTTON_HOLD)
     if(button_hold())
         return 5 * HZ; /* Inactivity timeout when on hold */
     else
+#endif
         return 10 * HZ; /* Inactivity timeout when not on hold */
 }
 
 /* return action on idle timeout */
-enum boot_mode inactivity_action(enum boot_mode cur_selection)
+static enum boot_mode inactivity_action(enum boot_mode cur_selection)
 {
+#if defined(HAS_BUTTON_HOLD)
     if(button_hold())
         return BOOT_STOP; /* power down/suspend */
     else
+#endif
         return cur_selection; /* return last choice */
 }
 
 /* we store the boot mode in a file in /tmp so we can reload it between 'boots'
  * (since the mostly suspends instead of powering down) */
-enum boot_mode load_boot_mode(enum boot_mode mode)
+static enum boot_mode load_boot_mode(enum boot_mode mode)
 {
     int fd = open("/data/rb_bl_mode.txt", O_RDONLY);
     if(fd >= 0)
@@ -148,7 +152,7 @@ enum boot_mode load_boot_mode(enum boot_mode mode)
     return mode;
 }
 
-void save_boot_mode(enum boot_mode mode)
+static void save_boot_mode(enum boot_mode mode)
 {
     int fd = open("/data/rb_bl_mode.txt", O_RDWR | O_CREAT | O_TRUNC);
     if(fd >= 0)
@@ -158,14 +162,16 @@ void save_boot_mode(enum boot_mode mode)
     }
 }
 
-enum boot_mode get_boot_mode(void)
+static enum boot_mode get_boot_mode(void)
 {
     /* load previous mode, or start with rockbox if none */
     enum boot_mode init_mode = load_boot_mode(BOOT_ROCKBOX);
     /* wait for user action */
     enum boot_mode mode = init_mode;
     int last_activity = current_tick;
+#if defined(HAS_BUTTON_HOLD)
     bool hold_status = button_hold();
+#endif
     while(true)
     {
         /* on usb detect, return to usb
@@ -187,12 +193,14 @@ enum boot_mode get_boot_mode(void)
         /* redraw */
         lcd_clear_display();
         /* display top text */
+#if defined(HAS_BUTTON_HOLD)
         if(button_hold())
         {
             lcd_set_foreground(LCD_RGBPACK(255, 0, 0));
             display_text_center(0, "ON HOLD!");
         }
         else
+#endif
         {
             lcd_set_foreground(LCD_RGBPACK(255, 201, 0));
             display_text_center(0, "SELECT PLAYER");
@@ -205,7 +213,11 @@ enum boot_mode get_boot_mode(void)
         /* display bottom description */
         const char *desc = (mode == BOOT_OF) ? "HIBY PLAYER" :
             (mode == BOOT_ROCKBOX) ? "ROCKBOX" : "TOOLS";
-        display_text_center(3 * get_icon_y() + ICON_HEIGHT, desc);
+
+        int desc_height;
+        lcd_getstringsize(desc, NULL, &desc_height);
+        display_text_center(LCD_HEIGHT - 3*desc_height, desc);
+
         /* display arrows */
         int arrow_width, arrow_height;
         lcd_getstringsize("<", &arrow_width, &arrow_height);
@@ -221,10 +233,17 @@ enum boot_mode get_boot_mode(void)
 
         /* wait for a key  */
         int btn = button_get_w_tmo(HZ / 10);
+
+#if defined(HAS_BUTTON_HOLD)
         /* record action, changing HOLD counts as action */
         if(btn & BUTTON_MAIN || hold_status != button_hold())
             last_activity = current_tick;
+
         hold_status = button_hold();
+#else
+        if(btn & BUTTON_MAIN)
+            last_activity = current_tick;
+#endif
         /* ignore release, allow repeat */
         if(btn & BUTTON_REL)
             continue;
@@ -379,28 +398,59 @@ void run_script_menu(void)
     free(entries);
 }
 
-void tools_screen(void)
+static void adb(int start)
 {
-    const char *choices[] = {"ADB", "Run script", "Restart", "Shutdown"};
-    int choice = choice_screen("TOOLS MENU", true, 4, choices);
+    pid_t pid = fork();
+    if(pid == 0)
+    {
+        execlp("/etc/init.d/K90adb", "K90adb", start ? "start" : "stop", NULL);
+        _exit(42);
+    }
+    int status;
+    waitpid(pid, &status, 0);
+#if 0
+    if(WIFEXITED(status))
+    {
+        lcd_set_foreground(LCD_RGBPACK(255, 201, 0));
+        lcd_putsf(0, 1, "program returned %d", WEXITSTATUS(status));
+    }
+    else
+    {
+        lcd_set_foreground(LCD_RGBPACK(255, 0, 0));
+        lcd_putsf(0, 1, "an error occured: %x", status);
+    }
+#endif
+}
+
+static void tools_screen(void)
+{
+    const char *choices[] = {"ADB start", "ADB stop", "Run script", "Restart", "Shutdown"};
+    int choice = choice_screen("TOOLS MENU", true, 5, choices);
     if(choice == 0)
     {
         /* run service menu */
+        printf("Starting ADB service...\n");
         fflush(stdout);
-//        execl("/usr/local/bin/mptapp", "mptapp", NULL);
-//        error_screen("Cannot boot service menu");
-        sleep(5 * HZ);
+        adb(1);
     }
     else if(choice == 1)
+    {
+        printf("Stopping ADB service...\n");
+        fflush(stdout);
+        adb(0);
+    }
+    else if(choice == 2)
+    {
         run_script_menu();
+    }
 //    else if(choice == 2)
 //        nwz_power_restart();
-    else if(choice == 3)
+    else if(choice == 4)
         power_off();
 }
 
 /* open log file */
-int open_log(void)
+static int open_log(void)
 {
     /* open regular log file */
     int fd = open("/mnt/sd_0/rockbox.log", O_RDWR | O_CREAT | O_APPEND);
@@ -445,10 +495,10 @@ int main(int argc, char **argv)
     button_init();
     backlight_init();
     backlight_set_brightness(DEFAULT_BRIGHTNESS_SETTING);
-    /* try to load the extra font we install on the device */
-    int font_id = font_load("/usr/local/share/rockbox/bootloader.fnt");
-    if(font_id >= 0)
-        lcd_setfont(font_id);
+//    /* try to load the extra font we install on the device */
+//    int font_id = font_load("/usr/local/share/rockbox/bootloader.fnt");
+//    if(font_id >= 0)
+//        lcd_setfont(font_id);
 
     /* run all tools menu */
     while(true)
@@ -462,7 +512,7 @@ int main(int argc, char **argv)
             close(fileno(stderr));
             /* for now the only way we have to trigger USB mode it to run the OF */
             /* boot OF */
-            execvp("/usr/bin/hibyplayer", argv);
+            execvp("/usr/bin/hiby_player", argv);
             error_screen("Cannot boot OF");
             sleep(5 * HZ);
         }
@@ -478,7 +528,7 @@ int main(int argc, char **argv)
             * this is neededlessly complicated and we defer this job to the dualboot
             * install script */
             fflush(stdout);
-            execl("/mnt/sd_0/.rockbox/rockbox.agptek", "rockbox.agptek", NULL);
+            execl("/mnt/sd_0/.rockbox/rockbox.rocker", "rockbox.rocker", NULL);
             printf("execvp failed: %s\n", strerror(errno));
             /* fallback to OF in case of failure */
             error_screen("Cannot boot Rockbox");
