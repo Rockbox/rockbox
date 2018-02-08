@@ -42,7 +42,7 @@ $(BUILDDIR)/rockbox.elf : $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS)
 		-L$(BUILDDIR)/lib $(call a2lnk,$(CORE_LIBS)) \
 		$(LDOPTS) $(GLOBAL_LDOPTS) -Wl,-Map,$(BUILDDIR)/rockbox.map
 
-$(BUILDDIR)/rockbox : $(BUILDDIR)/rockbox.elf
+$(BUILDDIR)/rockbox.rocker : $(BUILDDIR)/rockbox.elf
 	$(call PRINTS,OC $(@F))$(call objcopy,$^,$@)
 
 endif
