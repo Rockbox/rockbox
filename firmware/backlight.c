@@ -504,7 +504,7 @@ static void backlight_update_state(void)
         do_backlight_off();
 #if defined(HAVE_TRANSFLECTIVE_LCD) && defined(HAVE_LCD_SLEEP)
         /* LCD must be enabled to allow "passive" operation (backlight always off) */
-        lcd_awake();
+        //lcd_awake();
 #endif
 #if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_SETTING) \
     || (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_SW_HW_REG)

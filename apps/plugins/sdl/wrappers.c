@@ -165,9 +165,80 @@ static double rb_strtod(const char *str, char **endptr)
   return number;
 }
 
-double atof_wrapper(const char *str)
+// stolen from Quake
+float atof_wrapper (char *str)
 {
-    return rb_strtod(str, NULL);
+        double                  val;
+        int             sign;
+        int             c;
+        int             decimal, total;
+
+        if (*str == '-')
+        {
+                sign = -1;
+                str++;
+        }
+        else
+                sign = 1;
+
+        val = 0;
+
+//
+// check for hex
+//
+        if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X') )
+        {
+                str += 2;
+                while (1)
+                {
+                        c = *str++;
+                        if (c >= '0' && c <= '9')
+                                val = (val*16) + c - '0';
+                        else if (c >= 'a' && c <= 'f')
+                                val = (val*16) + c - 'a' + 10;
+                        else if (c >= 'A' && c <= 'F')
+                                val = (val*16) + c - 'A' + 10;
+                        else
+                                return val*sign;
+                }
+        }
+
+//
+// check for character
+//
+        if (str[0] == '\'')
+        {
+                return sign * str[1];
+        }
+
+//
+// assume decimal
+//
+        decimal = -1;
+        total = 0;
+        while (1)
+        {
+                c = *str++;
+                if (c == '.')
+                {
+                        decimal = total;
+                        continue;
+                }
+                if (c <'0' || c > '9')
+                        break;
+                val = val*10 + c - '0';
+                total++;
+        }
+
+        if (decimal == -1)
+                return val*sign;
+        while (total > decimal)
+        {
+                val /= 10;
+                total--;
+        }
+
+        return val*sign;
 }
 
 double sin_wrapper(double rads)
@@ -215,6 +286,51 @@ double cos_wrapper(double rads)
 float tan_wrapper(float f)
 {
     return sin_wrapper(f)/cos_wrapper(f);
+}
+
+// Total hack. Supports only format strings of the form %Cc, where C
+// is a format specifier and c is a delimiter. Surprisingly, most
+// format strings aren't that complicated to need a real fscanf. This
+// is just enough to make Quake run!
+int fscanf_wrapper(FILE *f, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+
+    if(strlen(fmt) != 3)
+        return 0; // not implemented
+
+    if(fmt[0] != '%')
+        return 0; // not implemented
+
+    char format = fmt[1];
+    char delim = fmt[2];
+
+    // extract argument
+    char buf[1024];
+    char *ptr = (format == 's' ? va_arg(ap, char*) : buf);
+    int c;
+    do {
+        c = fgetc(f);
+        *ptr++ = c;
+    } while(c != delim && c != EOF);
+
+    // overwrite delimiter
+    *(ptr-1) = 0;
+
+    //rb->splashf(HZ, "got argument %s, %s\n", fmt, buf);
+
+    switch(format)
+    {
+    case 'i':
+        *va_arg(ap, int*) = atoi(buf);
+        break;
+    case 'f':
+        *va_arg(ap, float*) = atof(buf);
+        break;
+    }
+    return 1;
 }
 
 /* stolen from doom */
@@ -272,7 +388,7 @@ int vsprintf_wrapper(char *str, const char *fmt, va_list ap)
 
 char *strcpy_wrapper(char *dest, const char *src)
 {
-    rb->strlcpy(dest, src, 999);
+    strlcpy(dest, src, 999);
     return dest;
 }
 

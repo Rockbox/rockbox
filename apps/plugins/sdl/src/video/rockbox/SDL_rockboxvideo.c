@@ -769,8 +769,8 @@ static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
             /* FIXME: this won't work for rotated screen or overlapping rects */
             flip_pixels(rects[i].x, rects[i].y, rects[i].w, rects[i].h);
 #endif
+            rb->lcd_update_rect(rects[i].x, rects[i].y, rects[i].w, rects[i].h);
         } /* for */
-        rb->lcd_update();
     } /* if */
 }
 
