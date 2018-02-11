@@ -108,6 +108,7 @@
 #endif
 #if defined(ROCKBOX)
 #undef __ROCKBOX__
+#undef __LINUX__ /* maybe sim */
 #define __ROCKBOX__ 1
 #endif
 

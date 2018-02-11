@@ -57,7 +57,7 @@ int SDL_SYS_CreateThread(SDL_Thread *thread, void *args)
 
     thread->handle = rb->create_thread(rbsdl_runthread, stacks[threadnum], DEFAULT_STACK_SIZE,
                                        0, names[threadnum] /* collisions allowed? */
-                                       IF_PRIO(, PRIORITY_USER_INTERFACE)
+                                       IF_PRIO(, PRIORITY_BUFFERING)
                                        IF_COP(, CPU));
 
     threadnum++;
