@@ -50,6 +50,8 @@
 #undef stderr
 #define stderr _stderr_
 
+#define getc fgetc
+
 typedef struct {
     int fd;
     int unget_char;
