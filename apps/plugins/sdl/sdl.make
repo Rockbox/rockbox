@@ -13,20 +13,26 @@ SDL_OBJDIR := $(BUILDDIR)/apps/plugins/sdl
 SDL_SRC := $(call preprocess, $(SDL_SRCDIR)/SOURCES)
 DUKE3D_SRC := $(call preprocess, $(SDL_SRCDIR)/SOURCES.duke)
 TESTSDL_SRC := $(call preprocess, $(SDL_SRCDIR)/SOURCES.test_sdl)
+QUAKE_SRC := $(call preprocess, $(SDL_SRCDIR)/SOURCES.quake)
 
 SDL_OBJ := $(call c2obj, $(SDL_SRC))
 DUKE3D_OBJ = $(call c2obj, $(DUKE3D_SRC))
 TESTSDL_OBJ = $(call c2obj, $(TESTSDL_SRC))
+QUAKE_OBJ = $(call c2obj, $(QUAKE_SRC))
 
 # add source files to OTHER_SRC to get automatic dependencies
-OTHER_SRC += $(SDL_SRC) $(DUKE3D_SRC) $(TESTSDL_SRC)
+OTHER_SRC += $(SDL_SRC) $(DUKE3D_SRC) $(TESTSDL_SRC) $(QUAKE_SRC)
 OTHER_INC += -I$(SDL_SRCDIR)/include
 
 # include comes first because of possible system SDL headers taking
 # precedence
-SDLFLAGS = -I$(SDL_SRCDIR)/include $(filter-out -O%,$(PLUGINFLAGS))	\
--O3 -Wno-unused-parameter -Xpreprocessor -Wno-undef -Wcast-align -w -save-temps
+# some of these are for Quake only
+SDLFLAGS = -I$(SDL_SRCDIR)/include $(filter-out -O%,$(PLUGINFLAGS))		\
+-O2 -Wno-unused-parameter -Xpreprocessor -Wno-undef -Wcast-align	\
+-ffast-math -funroll-loops -fomit-frame-pointer -fexpensive-optimizations	\
+-D_GNU_SOURCE=1 -D_REENTRANT -DSDL -DELF -fno-short-enums
 
+# use FPU on ARMv6
 ifeq ($(ARCH_VERSION),6)
     SDLFLAGS += -mfloat-abi=softfp
 endif
@@ -35,15 +41,24 @@ ifndef APP_TYPE
     ### no target has a big enough plugin buffer
     ROCKS += $(SDL_OBJDIR)/duke3d.ovl
     ROCKS += $(SDL_OBJDIR)/test_sdl.ovl
+    ROCKS += $(SDL_OBJDIR)/quake.ovl
+
     DUKE3D_OUTLDS = $(SDL_OBJDIR)/duke3d.link
     TESTSDL_OUTLDS = $(SDL_OBJDIR)/test_sdl.link
+    QUAKE_OUTLDS = $(SDL_OBJDIR)/quake.link
+
     DUKE3D_OVLFLAGS = -T$(DUKE3D_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
     TESTSDL_OVLFLAGS = -T$(TESTSDL_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
+    QUAKE_OVLFLAGS = -T$(QUAKE_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
 else
     ### simulator
     ROCKS += $(SDL_OBJDIR)/duke3d.rock
     ROCKS += $(SDL_OBJDIR)/test_sdl.rock
+    ROCKS += $(SDL_OBJDIR)/quake.rock
 endif
+
+# Duke
+###
 
 $(SDL_OBJDIR)/duke3d.rock: $(SDL_OBJ) $(DUKE3D_OBJ) $(TLSFLIB)
 
@@ -60,6 +75,7 @@ $(SDL_OBJDIR)/duke3d.ovl: $(SDL_OBJ) $(DUKE3D_OBJ) $(TLSFLIB) $(DUKE3D_OUTLDS)
 		-lgcc $(DUKE3D_OVLFLAGS)
 	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
 
+# test_sdl
 ###
 
 $(SDL_OBJDIR)/test_sdl.rock: $(SDL_OBJ) $(TESTSDL_OBJ) $(TLSFLIB)
@@ -75,6 +91,24 @@ $(SDL_OBJDIR)/test_sdl.ovl: $(SDL_OBJ) $(TESTSDL_OBJ) $(TLSFLIB) $(TESTSDL_OUTLD
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
 		-lgcc $(TESTSDL_OVLFLAGS)
+	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
+
+# Quake
+###
+
+$(SDL_OBJDIR)/quake.rock: $(SDL_OBJ) $(QUAKE_OBJ) $(TLSFLIB)
+
+$(SDL_OBJDIR)/quake.refmap: $(SDL_OBJ) $(QUAKE_OBJ) $(TLSFLIB)
+
+$(QUAKE_OUTLDS): $(PLUGIN_LDS) $(SDL_OBJDIR)/quake.refmap
+	$(call PRINTS,PP $(@F))$(call preprocess2file,$<,$@,-DOVERLAY_OFFSET=$(shell \
+		$(TOOLSDIR)/ovl_offset.pl $(SDL_OBJDIR)/quake.refmap))
+
+$(SDL_OBJDIR)/quake.ovl: $(SDL_OBJ) $(QUAKE_OBJ) $(TLSFLIB) $(QUAKE_OUTLDS)
+	$(SILENT)$(CC) $(PLUGINFLAGS) -o $(basename $@).elf \
+		$(filter %.o, $^) \
+		$(filter %.a, $+) \
+		-lgcc $(QUAKE_OVLFLAGS)
 	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
 
 ###

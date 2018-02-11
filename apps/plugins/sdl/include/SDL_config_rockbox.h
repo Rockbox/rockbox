@@ -42,7 +42,7 @@
 #ifdef SIMULATOR
 #define RB_SAMPR SAMPR_44
 #else
-#define RB_SAMPR SAMPR_22
+#define RB_SAMPR SAMPR_8
 #endif
 
 #ifndef HAVE_LCD_COLOR
@@ -81,6 +81,7 @@
 /* woot */
 #define SDL_AUDIO_DRIVER_ROCKBOX 1
 #define SDL_THREAD_ROCKBOX       1
+#undef  SDL_THREAD_PTHREAD
 #define SDL_TIMER_ROCKBOX        1
 #define SDL_VIDEO_DRIVER_ROCKBOX 1
 
