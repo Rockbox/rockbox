@@ -225,12 +225,29 @@ static void ROCKBOXAUD_CloseAudio(_THIS)
     rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 }
 
+static bool freq_ok(unsigned int freq)
+{
+    for(int i = 0; i < SAMPR_NUM_FREQ; i++)
+    {
+        if(rb->hw_freq_sampr[i] == freq)
+            return true;
+    }
+    return false;
+}
+
 static int ROCKBOXAUD_OpenAudio(_THIS, SDL_AudioSpec *spec)
 {
     /* change to our format */
     spec->format = AUDIO_S16SYS;
     spec->channels = 2;
-    spec->freq = RB_SAMPR;
+
+    if(!freq_ok(spec->freq))
+    {
+        rb->splashf(HZ, "Warning: Unsupported audio rate. Defaulting to %d Hz", RB_SAMPR);
+
+        // switch to default
+        spec->freq = RB_SAMPR;
+    }
 
     /* we've changed it */
     SDL_CalculateAudioSpec(spec);

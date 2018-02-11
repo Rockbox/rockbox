@@ -78,6 +78,7 @@ iriverify.c
     (!defined(LCD_STRIDEFORMAT) || (LCD_STRIDEFORMAT != VERTICAL_STRIDE))
 #if (PLUGIN_BUFFER_SIZE > 0x14000) && defined(CPU_ARM)
 duke3d.c
+quake.c
 wolf3d.c
 #endif
 #endif

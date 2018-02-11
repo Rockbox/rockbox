@@ -51,13 +51,13 @@ int SDL_SYS_CreateThread(SDL_Thread *thread, void *args)
     static int threadnum = 0;
     snprintf(names[threadnum], 16, "sdl_%d", threadnum);
 
-    while(global_args) rb->yield(); /* busy wait */
+    while(global_args) rb->yield(); /* busy wait, pray that this works */
 
     global_args = args;
 
     thread->handle = rb->create_thread(rbsdl_runthread, stacks[threadnum], DEFAULT_STACK_SIZE,
                                        0, names[threadnum] /* collisions allowed? */
-                                       IF_PRIO(, PRIORITY_USER_INTERFACE)
+                                       IF_PRIO(, PRIORITY_BUFFERING) // this is used for sound mixing
                                        IF_COP(, CPU));
 
     threadnum++;

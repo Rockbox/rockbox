@@ -38,7 +38,8 @@
 
 //#define COMBINED_SDL
 
-/* games will use this sample rate */
+/* "recommended" sample rate for Rockbox. Games should use this by
+ * default unless necessary to do otherwise. */
 #ifdef SIMULATOR
 #define RB_SAMPR SAMPR_44
 #else
@@ -57,6 +58,7 @@
 /* woot */
 #define SDL_AUDIO_DRIVER_ROCKBOX 1
 #define SDL_THREAD_ROCKBOX       1
+#undef  SDL_THREAD_PTHREAD
 #define SDL_TIMER_ROCKBOX        1
 #define SDL_VIDEO_DRIVER_ROCKBOX 1
 
@@ -78,6 +80,10 @@
 #define HAVE_FREE         1
 #define HAVE_REALLOC      1
 #define HAVE_QSORT        1
+#define HAVE_STRLEN       1
+#define HAVE_STRLCPY      1
+#define HAVE_STRCMP       1
+#define HAVE_STRNCMP      1
 
 #undef strdup
 
@@ -116,6 +122,7 @@
 #define floor floor_wrapper
 #define fmod fmod_wrapper
 #define free tlsf_free
+#define fscanf fscanf_wrapper
 #define getchar() rb->sleep(2*HZ)
 #define getenv SDL_getenv
 #define log rb_log
@@ -146,6 +153,7 @@
 #define strcpy strcpy_wrapper
 #define strdup strdup_wrapper
 #define strerror(x) "error"
+#define strlcpy rb->strlcpy
 #define strlen rb->strlen
 #define strncasecmp rb->strncasecmp
 #define strncat rb->strlcat /* hack */
@@ -163,8 +171,12 @@
 #define vsnprintf rb->vsnprintf
 #define vsprintf vsprintf_wrapper
 
+// use Rockbox's string routines
+#define SDL_memcpy memcpy
+#define SDL_memcmp memcmp
+
 #define M_PI 3.14159265358979323846
-#define EOF 0xff
+#define EOF (-1)
 
 #define LOAD_XPM
 #define MID_MUSIC
@@ -194,6 +206,7 @@ int vprintf(const char *fmt, va_list ap);
 void fatal(char *fmt, ...);
 void rb_exit(int rc);
 void rbsdl_atexit(void (*)(void));
+float atof_wrapper (char *str);
 
 /* speed */
 static inline uint16_t readLE16(void *addr)
