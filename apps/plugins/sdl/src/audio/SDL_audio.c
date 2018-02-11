@@ -204,6 +204,7 @@ int SDLCALL SDL_RunAudio(void *audiop)
 
 		/* Convert the audio if necessary */
 		if ( audio->convert.needed ) {
+                    LOGF("RB AUDIO: converting audio. Will be slow!");
 			SDL_ConvertAudio(&audio->convert);
 			stream = audio->GetAudioBuf(audio);
 			if ( stream == NULL ) {
