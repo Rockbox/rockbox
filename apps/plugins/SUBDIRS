@@ -16,11 +16,11 @@ clock
     (!defined(LCD_STRIDEFORMAT) || (LCD_STRIDEFORMAT != VERTICAL_STRIDE))
 xworld
 
-/* for duke, etc. */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && (PLUGIN_BUFFER_SIZE > 0x14000) && \
-    defined(CPU_ARM)
+/* for duke3d, wolf3d and quake */
+#if (PLUGIN_BUFFER_SIZE > 0x14000) && (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(CPU_ARM)
 sdl
 #endif
+
 puzzles
 #endif
 
