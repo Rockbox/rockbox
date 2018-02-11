@@ -38,7 +38,8 @@
 
 //#define COMBINED_SDL
 
-/* games will use this sample rate */
+/* "recommended" sample rate for Rockbox. Games should use this by
+ * default unless necessary to do otherwise. */
 #ifdef SIMULATOR
 #define RB_SAMPR SAMPR_44
 #else
@@ -57,6 +58,7 @@
 /* woot */
 #define SDL_AUDIO_DRIVER_ROCKBOX 1
 #define SDL_THREAD_ROCKBOX       1
+#undef  SDL_THREAD_PTHREAD
 #define SDL_TIMER_ROCKBOX        1
 #define SDL_VIDEO_DRIVER_ROCKBOX 1
 
@@ -194,6 +196,7 @@ int vprintf(const char *fmt, va_list ap);
 void fatal(char *fmt, ...);
 void rb_exit(int rc);
 void rbsdl_atexit(void (*)(void));
+float atof_wrapper (char *str);
 
 /* speed */
 static inline uint16_t readLE16(void *addr)
