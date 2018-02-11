@@ -165,9 +165,79 @@ static double rb_strtod(const char *str, char **endptr)
   return number;
 }
 
-double atof_wrapper(const char *str)
+float atof_wrapper (char *str)
 {
-    return rb_strtod(str, NULL);
+        double                  val;
+        int             sign;
+        int             c;
+        int             decimal, total;
+
+        if (*str == '-')
+        {
+                sign = -1;
+                str++;
+        }
+        else
+                sign = 1;
+
+        val = 0;
+
+//
+// check for hex
+//
+        if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X') )
+        {
+                str += 2;
+                while (1)
+                {
+                        c = *str++;
+                        if (c >= '0' && c <= '9')
+                                val = (val*16) + c - '0';
+                        else if (c >= 'a' && c <= 'f')
+                                val = (val*16) + c - 'a' + 10;
+                        else if (c >= 'A' && c <= 'F')
+                                val = (val*16) + c - 'A' + 10;
+                        else
+                                return val*sign;
+                }
+        }
+
+//
+// check for character
+//
+        if (str[0] == '\'')
+        {
+                return sign * str[1];
+        }
+
+//
+// assume decimal
+//
+        decimal = -1;
+        total = 0;
+        while (1)
+        {
+                c = *str++;
+                if (c == '.')
+                {
+                        decimal = total;
+                        continue;
+                }
+                if (c <'0' || c > '9')
+                        break;
+                val = val*10 + c - '0';
+                total++;
+        }
+
+        if (decimal == -1)
+                return val*sign;
+        while (total > decimal)
+        {
+                val /= 10;
+                total--;
+        }
+
+        return val*sign;
 }
 
 double sin_wrapper(double rads)
