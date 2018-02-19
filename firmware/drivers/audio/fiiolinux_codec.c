@@ -67,7 +67,7 @@ static void hw_close(void)
 
 void audiohw_preinit(void)
 {
-    alsa_controls_init();
+    alsa_controls_init("default");
     hw_open();
     // NOTE:
     // Of the exported controls, only these do anything:
@@ -130,7 +130,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
     if (!muted) {
        alsa_controls_set_ints("DACL Playback Volume", 1, &vol_hw[0]);
        alsa_controls_set_ints("DACR Playback Volume", 1, &vol_hw[1]);
-       pcm_alsa_set_digital_volume(vol_sw[0], vol_sw[1]);
+       pcm_set_mixer_volume(vol_sw[0], vol_sw[1]);
     }
 }
 
@@ -147,13 +147,13 @@ void audiohw_mute(int mute)
     {
         alsa_controls_set_ints("DACL Playback Volume", 1, &vol0);
         alsa_controls_set_ints("DACR Playback Volume", 1, &vol0);
-        pcm_alsa_set_digital_volume(0, 0);
+        pcm_set_mixer_volume(0, 0);
     }
     else
     {
         alsa_controls_set_ints("DACL Playback Volume", 1, &vol_hw[0]);
         alsa_controls_set_ints("DACR Playback Volume", 1, &vol_hw[1]);
-        pcm_alsa_set_digital_volume(vol_sw[0], vol_sw[1]);
+        pcm_set_mixer_volume(vol_sw[0], vol_sw[1]);
     }
 }
 

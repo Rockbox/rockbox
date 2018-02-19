@@ -27,16 +27,13 @@
 #include <alloca.h>
 
 /* open alsa control interface and list all controls, keep control open */
-void alsa_controls_init(void);
+void alsa_controls_init(const char *name);
 /* close alsa controls */
 void alsa_controls_close(void);
 
 /* NOTE: all the following functions panic on error. This behaviour could be changed with the
  * functions returning proper values but that would make errors happen silently */
 
-/* find a control element ID by name, return false of not found, the id needs
- * to be allocated */
-bool alsa_controls_find(snd_ctl_elem_id_t *id, const char *name);
 /* check wether a control exists */
 bool alsa_has_control(const char *name);
 /* find a control element enum index by name, return -1 if not found */
