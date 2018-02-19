@@ -66,10 +66,10 @@ static const snd_pcm_access_t access_ = SND_PCM_ACCESS_RW_INTERLEAVED; /* access
 #if defined(SONY_NWZ_LINUX) || defined(HAVE_FIIO_LINUX_CODEC)
 /* Sony NWZ must use 32-bit per sample */
 static const snd_pcm_format_t format = SND_PCM_FORMAT_S32_LE;    /* sample format */
-typedef long sample_t;
+typedef int32_t sample_t;
 #else
 static const snd_pcm_format_t format = SND_PCM_FORMAT_S16;    /* sample format */
-typedef short sample_t;
+typedef int16_t sample_t;
 #endif
 static const int channels = 2;                                /* count of channels */
 static unsigned int real_sample_rate;
@@ -260,10 +260,9 @@ error:
  * and add 48dB to the input volume. We cannot go lower -43dB because several
  * values between -48dB and -43dB would require a fractional multiplier, which is
  * stupid to implement for such very low volume. */
-static int dig_vol_mult_l = 2 ^ 16; /* multiplicative factor to apply to each sample */
-static int dig_vol_mult_r = 2 ^ 16; /* multiplicative factor to apply to each sample */
-
-void pcm_alsa_set_digital_volume(int vol_db_l, int vol_db_r)
+static int dig_vol_mult_l = 2 << 16; /* multiplicative factor to apply to each sample */
+static int dig_vol_mult_r = 2 << 16; /* multiplicative factor to apply to each sample */
+void pcm_set_mixer_volume(int vol_db_l, int vol_db_r)
 {
     if(vol_db_l > 0 || vol_db_r > 0 || vol_db_l < -43 || vol_db_r < -43)
         panicf("invalid pcm alsa volume");
@@ -336,7 +335,7 @@ static bool copy_frames(bool first)
         {
             /* We have to convert 16-bit to 32-bit, the need to multiply the
              * sample by some value so the sound is not too low */
-            const short *pcm_ptr = pcm_data;
+            const int16_t *pcm_ptr = pcm_data;
             sample_t *sample_ptr = &frames[2*(period_size-frames_left)];
             for (int i = 0; i < nframes; i++)
             {
@@ -755,11 +754,6 @@ void pcm_play_dma_postinit(void)
 #ifdef AUDIOHW_NEEDS_INITIAL_UNMUTE
     audiohw_mute(false);
 #endif
-}
-
-void pcm_set_mixer_volume(int volume)
-{
-    (void)volume;
 }
 
 int pcm_alsa_get_rate(void)

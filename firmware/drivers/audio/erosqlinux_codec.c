@@ -143,7 +143,7 @@ void erosq_set_output(int ps)
 void audiohw_preinit(void)
 {
     logf("hw preinit");
-    alsa_controls_init();
+    alsa_controls_init("default");
     hw_open();
     audiohw_mute(false);  /* No need to stay muted */
 }

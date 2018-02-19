@@ -69,7 +69,7 @@ void audiohw_mute(int mute)
 
 void audiohw_preinit(void)
 {
-    alsa_controls_init();
+    alsa_controls_init("debug");
     hw_open();
 #if defined(AUDIOHW_MUTE_ON_STOP) || defined(AUDIOHW_NEEDS_INITIAL_UNMUTE)
     audiohw_mute(true);  /* Start muted to avoid the POP */

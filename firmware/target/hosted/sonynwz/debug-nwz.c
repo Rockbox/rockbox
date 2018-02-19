@@ -369,7 +369,7 @@ bool dbg_hw_info_audio(void)
             {
                 case VOL:
                     vol += inc ? 1 : -1;
-                    pcm_alsa_set_digital_volume(vol, vol);
+                    pcm_set_mixer_volume(vol, vol);
                     break;
                 case ACOUSTIC:
                     audiohw_enable_acoustic(!audiohw_acoustic_enabled());

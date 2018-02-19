@@ -166,7 +166,7 @@ void xduoo_set_output(int ps)
 void audiohw_preinit(void)
 {
     logf("hw preinit");
-    alsa_controls_init();
+    alsa_controls_init("default");
     hw_open();
 
 #if defined(XDUOO_X3II)
