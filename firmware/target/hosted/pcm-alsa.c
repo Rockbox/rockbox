@@ -71,10 +71,10 @@ static const snd_pcm_access_t access_ = SND_PCM_ACCESS_RW_INTERLEAVED; /* access
 #ifdef SONY_NWZ_LINUX
 /* Sony NWZ must use 32-bit per sample */
 static const snd_pcm_format_t format = SND_PCM_FORMAT_S32_LE;    /* sample format */
-typedef long sample_t;
+typedef int32_t sample_t;
 #else
 static const snd_pcm_format_t format = SND_PCM_FORMAT_S16;    /* sample format */
-typedef short sample_t;
+typedef int16_t sample_t;
 #endif
 static const int channels = 2;                                /* count of channels */
 static unsigned int rate = 44100;                       /* stream rate */
@@ -231,9 +231,9 @@ error:
  * and add 48dB to the input volume. We cannot go lower -43dB because several
  * values between -48dB and -43dB would require a fractional multiplier, which is
  * stupid to implement for such very low volume. */
-static int dig_vol_mult = 2 ^ 16; /* multiplicative factor to apply to each sample */
+static int dig_vol_mult = 2 << 16; /* multiplicative factor to apply to each sample */
 
-void pcm_alsa_set_digital_volume(int vol_db)
+void pcm_set_mixer_volume(int vol_db)
 {
     if(vol_db > 0 || vol_db < -43)
         panicf("invalid pcm alsa volume");
@@ -250,7 +250,7 @@ void pcm_alsa_set_digital_volume(int vol_db)
         dig_vol_mult = 1 << vol_shift | 1 << (vol_shift - 2);
     else
         dig_vol_mult = 1 << vol_shift | 1 << (vol_shift - 1);
-    printf("%d dB -> factor = %d\n", vol_db - 48, dig_vol_mult);
+    DEBUGF("%d dB -> factor = %d\n", vol_db - 48, dig_vol_mult);
 }
 
 /* copy pcm samples to a spare buffer, suitable for snd_pcm_writei() */
@@ -279,7 +279,7 @@ static bool fill_frames(void)
         {
             /* We have to convert 16-bit to 32-bit, the need to multiply the
              * sample by some value so the sound is not too low */
-            const short *pcm_ptr = pcm_data;
+            const int16_t *pcm_ptr = pcm_data;
             sample_t *sample_ptr = &frames[2*(period_size-frames_left)];
             for (int i = 0; i < copy_n*2; i++)
                 *sample_ptr++ = *pcm_ptr++ * dig_vol_mult;
@@ -573,11 +573,6 @@ void pcm_play_dma_postinit(void)
     audiohw_postinit();
 }
 
-
-void pcm_set_mixer_volume(int volume)
-{
-    (void)volume;
-}
 #ifdef HAVE_RECORDING
 void pcm_rec_lock(void)
 {
