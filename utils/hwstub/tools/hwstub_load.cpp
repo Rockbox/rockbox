@@ -191,6 +191,7 @@ int main(int argc, char **argv)
                 break;
             case 'v':
                 verbose = true;
+                break;
             case 'e':
                 no_load = true;
                 break;
