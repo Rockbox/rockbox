@@ -107,12 +107,11 @@ void usage(void)
 {
     printf("usage: hwstub_load [options] <addr> <file>\n");
     printf("options:\n");
-    printf("  --help/-?       Display this help\n");
+    printf("  --help/-h       Display this help\n");
     printf("  --quiet/-q      Quiet output\n");
     printf("  --verbose/-v    Verbose output\n");
     printf("  --type/-t <t>   Override file type\n");
     printf("  --dev/-d <uri>  Device URI (see below)\n");
-    printf("  --verbose/-v    Display debug output\n");
     printf("  --noload        Skip loading stage and only execute the given address\n");
     printf("  --noexec        Skip execute stage and only load data the given address\n");
     printf("file types:\n");
@@ -123,7 +122,7 @@ void usage(void)
     for(int i = 0; players[i].name; i++)
         printf(" %s", players[i].name);
     printf("\n");
-    //hwstub::usage_uri(stdout);
+    hwstub::uri::print_usage(stdout, true, false);
     exit(1);
 }
 
