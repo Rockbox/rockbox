@@ -1342,7 +1342,7 @@ void usage(void)
     printf("  --debug-rw      Print read/write\n");
     printf("Relative order of -e and -f commands are preserved.\n");
     printf("Unless specified, the shell will load soc desc in regtools/desc/\n");
-    //usage_uri(stdout);
+    hwstub::uri::print_usage(stdout, true, false);
     exit(1);
 }
 
