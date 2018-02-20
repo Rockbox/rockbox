@@ -1733,6 +1733,7 @@ target/mips/jz4760b/timer-jz4760b.c
 #endif /* CONFIG_CPU == JZ4760B */
 
 #if defined(FIIO_X1)
+target/mips/jz4760b/fiio-x1/lcd-fiiox1.c
 target/mips/jz4760b/fiio-x1/backlight-fiiox1.c
 target/mips/jz4760b/fiio-x1/system-fiiox1.c
 #endif

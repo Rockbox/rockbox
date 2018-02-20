@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2008 by Maurus Cuelenaere
+ * Copyright (C) 2018 by Amaury Pouly
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,8 +18,3 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <sys/types.h> /* off_t */
-
-void lcd_update(void)
-{
-}

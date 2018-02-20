@@ -164,11 +164,10 @@
     addiu   t0, t0, CACHEALIGN_SIZE /* bytes per cache line */
 .endm
 
-/* relocate a binary blob to another place, nop if binary is already at the right place,
+/* move a binary blob to another place, nop if binary is already at the right place,
  * this macro expects cur_addr to be a register and wanted_addr(_end) to be symbols, wanted_add
  * must be cache aligned */
-
-.macro relocate cur_addr, wanted_addr, wanted_addr_end
+.macro copy_mem cur_addr, wanted_addr, wanted_addr_end
     move    a0, \cur_addr
     la      a1, \wanted_addr
     la      a2, \wanted_addr_end
@@ -210,3 +209,17 @@
 2:
 .endm
 
+/* clear a range of memory
+ * this macro expects start/end_addr to be symbols */
+.macro clear_mem start_addr, end_addr
+    la      a0, \start_addr
+    la      a1, \end_addr
+    beq     a0, a1, 2f  /* no relocation needed */
+    nop
+    /* clear 4 bytes at a time */
+1:
+    sw      zero, (a0)
+    bne     a0, a1, 1f
+    addiu   a0, 4
+2:
+.endm

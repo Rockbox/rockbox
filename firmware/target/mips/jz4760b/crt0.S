@@ -154,6 +154,8 @@ _start:
 here:
     save_cur_pc s0
     addiu   s0, s0, (_start - here)
+    jr      k0
+    nop
     /* disable all interrupts */
     disable_interrupts
 enable_big_pages_mode:
@@ -167,8 +169,15 @@ map_dram:
     /* map dram as cacheable using 16M pages */
     map_address DRAM_ORIG, PHYSICAL_DRAM_ADDR, DRAM_SIZE, K_CacheAttrCN, (16 * 1024 * 1024)
 relocate:
-    /* relocate binary, note that addresses at in K0 */
-    relocate    s0, _relocstart, _relocend
+    /* relocate binary, note that addresses are in K0 */
+    copy_mem    s0, _relocstart, _relocend
+iram_copy:
+    /* copy iram content to its correct location */
+    la          s0, IRAM_ORIG
+    copy_mem    s0, _iramcopy, _iramend
+bss_clear:
+    /* clear BSS */
+    clear_mem   _edata, _end
 flush_cache:
     /* flush caches */
     writeback_dcache
@@ -180,6 +189,8 @@ flush_cache:
 real_start:
     /* return */
     jr      k0
+    nop
+    j       main
     nop
 #endif
 

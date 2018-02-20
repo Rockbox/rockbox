@@ -22,6 +22,7 @@
 #ifndef __GPIO_JZ4760B_H__
 #define __GPIO_JZ4760B_H__
 
+#include "stdbool.h"
 #include "jz4760b.h"
 #include "jz4760b_regs.h"
 
@@ -49,14 +50,14 @@ static inline bool jz_gpio_get_input(unsigned bank, unsigned pin)
 
 #define __PIN_FUNCTION      (1 << 0)
 #define __PIN_SELECT        (1 << 1)
-#define __PIN_SELECT_v      (1 << 1)
+#define __PIN_SELECT_v(v)   (((v) & 1) << 1)
 #define __PIN_DIR           (1 << 2)
 #define __PIN_TRIGGER       (1 << 3)
-#define __PIN_TRIGGER_v     (1 << 3)
+#define __PIN_TRIGGER_v(v)  (((v) & 1) << 3)
 
 #define PIN_GPIO_OUT    __PIN_DIR
 #define PIN_GPIO_IN     0
-#define PIN_FUN(f)      (__PIN_FUNCTION | (__PIN_SELECT_v((f) & 1) | __PIN_TRIGGER_v(((f) >> 1) & 1))
+#define PIN_FUN(f)      (__PIN_FUNCTION | __PIN_SELECT_v((f) & 1) | __PIN_TRIGGER_v(((f) >> 1) & 1))
 
 static inline void jz_gpio_set_function_mask(unsigned bank, unsigned mask, unsigned function)
 {

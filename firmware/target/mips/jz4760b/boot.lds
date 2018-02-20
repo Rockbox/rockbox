@@ -45,7 +45,6 @@ SECTIONS
         *(.icode);
         *(.irodata);
         *(.idata);
-        KEEP(*(.vectors*))
         . = ALIGN(4);
         _iramend = .;
     } > IRAM AT> DRAM_PHYS
@@ -65,6 +64,7 @@ SECTIONS
          *(.ibss*);
          *(COMMON);
          *(.scommon*);
+         . = ALIGN(4);
          _end = .;
     } > DRAM
 

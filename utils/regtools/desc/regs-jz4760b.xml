@@ -10364,7 +10364,7 @@
             <name>MCFG</name>
             <title>SLCD Configure Register</title>
             <instance>
-                <name>SCFG</name>
+                <name>MCFG</name>
                 <address>0xa0</address>
             </instance>
             <register>
@@ -10444,7 +10444,7 @@
             <name>MCTRL</name>
             <title>SLCD Control Register</title>
             <instance>
-                <name>SCTRL</name>
+                <name>MCTRL</name>
                 <address>0xa4</address>
             </instance>
             <register>
@@ -10467,7 +10467,7 @@
             <name>MSTATE</name>
             <title>SLCD Status Register</title>
             <instance>
-                <name>SSTATE</name>
+                <name>MSTATE</name>
                 <address>0xa8</address>
             </instance>
             <register>
@@ -10487,7 +10487,7 @@
             </instance>
             <register>
                 <field>
-                    <name>RS_COMMAND</name>
+                    <name>RS</name>
                     <position>31</position>
                 </field>
             </register>

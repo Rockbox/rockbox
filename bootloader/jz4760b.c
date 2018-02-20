@@ -23,17 +23,26 @@
  ****************************************************************************/
 #include "system.h"
 #include "backlight.h"
+#include "lcd.h"
 
 void main(void) NORETURN_ATTR;
 void main(void)
 {
     system_init();
     backlight_init();
+#if 1
+    lcd_init();
+    //lcd_clear_display();
+    //lcd_puts(0, 0, "Hello");
+    //lcd_update();
+#endif
+#if 1
     for(int i = 0; i <= 16; i++)
     {
         backlight_hw_brightness(i);
         mdelay(500);
     }
+#endif
     /* never returns */
     while(1) {}
 }

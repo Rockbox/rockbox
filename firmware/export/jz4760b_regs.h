@@ -735,35 +735,35 @@
 #define LCD_PCFG                                REG32(LCD_ADDR + 0x2c0)
 
 #define SLCD_ADDR                               0xb3050000
-#define SLCD_SCFG                               REG32(SLCD_ADDR + 0xa0)
-#define SLCD_SCFG_DATA_WIDTH(v)                 (((v) & 7) << 10)
-#define SLCD_SCFG_DATA_WIDTH_v(v)               ((SLCD_SCFG_DATA_WIDTH_##v & 7) << 10)
-#define SLCD_SCFG_DATA_WIDTH_get(v)             (((v) >> 10) & 7)
-#define SLCD_SCFG_DATA_WIDTH_18BIT              0
-#define SLCD_SCFG_DATA_WIDTH_16BIT              1
-#define SLCD_SCFG_DATA_WIDTH_8BIT_x3            2
-#define SLCD_SCFG_DATA_WIDTH_8BIT_x2            3
-#define SLCD_SCFG_DATA_WIDTH_8BIT_x1            4
-#define SLCD_SCFG_DATA_WIDTH_24BIT              5
-#define SLCD_SCFG_DATA_WIDTH_9BIT_x2            7
-#define SLCD_SCFG_CMD_WIDTH(v)                  (((v) & 3) << 8)
-#define SLCD_SCFG_CMD_WIDTH_v(v)                ((SLCD_SCFG_CMD_WIDTH_##v & 3) << 8)
-#define SLCD_SCFG_CMD_WIDTH_get(v)              (((v) >> 8) & 3)
-#define SLCD_SCFG_CMD_WIDTH_16BIT               0
-#define SLCD_SCFG_CMD_WIDTH_8BIT                1
-#define SLCD_SCFG_CMD_WIDTH_18BIT               2
-#define SLCD_SCFG_CMD_WIDTH_24BIT               3
-#define SLCD_SCFG_CS_ACTIVE_HIGH                (1 << 4)
-#define SLCD_SCFG_RS_CMD_HIGH                   (1 << 3)
-#define SLCD_SCFG_CLK_ACTIVE_RISING             (1 << 1)
-#define SLCD_SCFG_TYPE_SERIAL                   (1 << 0)
-#define SLCD_SCTRL                              REG8(SLCD_ADDR + 0xa4)
-#define SLCD_SCTRL_DMA_MODE                     (1 << 2)
-#define SLCD_SCTRL_DMA_START                    (1 << 1)
-#define SLCD_SCTRL_DMA_EN                       (1 << 0)
-#define SLCD_SSTATE                             REG8(SLCD_ADDR + 0xa8)
-#define SLCD_SSTATE_BUSY                        (1 << 0)
+#define SLCD_MCFG                               REG32(SLCD_ADDR + 0xa0)
+#define SLCD_MCFG_DATA_WIDTH(v)                 (((v) & 7) << 10)
+#define SLCD_MCFG_DATA_WIDTH_v(v)               ((SLCD_MCFG_DATA_WIDTH_##v & 7) << 10)
+#define SLCD_MCFG_DATA_WIDTH_get(v)             (((v) >> 10) & 7)
+#define SLCD_MCFG_DATA_WIDTH_18BIT              0
+#define SLCD_MCFG_DATA_WIDTH_16BIT              1
+#define SLCD_MCFG_DATA_WIDTH_8BIT_x3            2
+#define SLCD_MCFG_DATA_WIDTH_8BIT_x2            3
+#define SLCD_MCFG_DATA_WIDTH_8BIT_x1            4
+#define SLCD_MCFG_DATA_WIDTH_24BIT              5
+#define SLCD_MCFG_DATA_WIDTH_9BIT_x2            7
+#define SLCD_MCFG_CMD_WIDTH(v)                  (((v) & 3) << 8)
+#define SLCD_MCFG_CMD_WIDTH_v(v)                ((SLCD_MCFG_CMD_WIDTH_##v & 3) << 8)
+#define SLCD_MCFG_CMD_WIDTH_get(v)              (((v) >> 8) & 3)
+#define SLCD_MCFG_CMD_WIDTH_16BIT               0
+#define SLCD_MCFG_CMD_WIDTH_8BIT                1
+#define SLCD_MCFG_CMD_WIDTH_18BIT               2
+#define SLCD_MCFG_CMD_WIDTH_24BIT               3
+#define SLCD_MCFG_CS_ACTIVE_HIGH                (1 << 4)
+#define SLCD_MCFG_RS_CMD_HIGH                   (1 << 3)
+#define SLCD_MCFG_CLK_ACTIVE_RISING             (1 << 1)
+#define SLCD_MCFG_TYPE_SERIAL                   (1 << 0)
+#define SLCD_MCTRL                              REG8(SLCD_ADDR + 0xa4)
+#define SLCD_MCTRL_DMA_MODE                     (1 << 2)
+#define SLCD_MCTRL_DMA_START                    (1 << 1)
+#define SLCD_MCTRL_DMA_EN                       (1 << 0)
+#define SLCD_MSTATE                             REG8(SLCD_ADDR + 0xa8)
+#define SLCD_MSTATE_BUSY                        (1 << 0)
 #define SLCD_MDATA                              REG32(SLCD_ADDR + 0xac)
-#define SLCD_MDATA_RS_COMMAND                   (1 << 31)
+#define SLCD_MDATA_RS                           (1 << 31)
 
 #endif /* __HEADERGEN_JZ4760B_H__*/
