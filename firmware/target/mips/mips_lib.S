@@ -125,6 +125,7 @@
             addu    t3, t3, t4          # increment PFN by pagesize
         .endif
         mtc0    t3, C0_EntryLo1     # write low entry1
+        addu    t3, t3, t4          # increment PFN by pagesize
         clear_hazard
         tlbwi                       # write mapping
         pagecount = (pagecount - 2)
@@ -171,42 +172,61 @@
     move    a0, \cur_addr
     la      a1, \wanted_addr
     la      a2, \wanted_addr_end
-    beq     a0, a1, 2f  /* no relocation needed */
+    beq     a0, a1, 3f  /* no relocation needed */
     nop
-    /* copy one cache line at a time */
+    /* if wanted < cur, do a forward copy */
+    sltu    t0, a1, a0
+    bnez    t0, 2f
+    /* backward copy, adjust a0 to point at the end */
+    addu    a0, a2
+    subu    a0, a1
 1:
+    copy_cache_line a0, a2, -CACHEALIGN_SIZE
+    subu    a2, CACHEALIGN_SIZE
+    slt     t0, a1, a2
+    bnez    t0, 1b
+    subu    a0, CACHEALIGN_SIZE
+    b       3f
+    /* forward copy */
+2:
+    copy_cache_line a0, a1, 0
+    addiu   a1, CACHEALIGN_SIZE
+    slt     t0, a1, a2
+    bnez    t0, 2b
+    addiu   a0, CACHEALIGN_SIZE
+3:
+.endm
+
+/* copy an entire cache line from one address to another, which should be held in registers.
+ * this macros uses all temporary registers as intermediates */
+.macro copy_cache_line from, to, offset
 #if CACHEALIGN_SIZE != 16 && CACHEALIGN_SIZE != 32
 #error the code below does not support this cache line size
 #endif
 #if CACHEALIGN_SIZE >= 16
-    lw      t0, 0(a0)
-    lw      t1, 4(a0)
-    lw      t2, 8(a0)
-    lw      t3, 12(a0)
+    lw      t0, (\offset + 0)(\from)
+    lw      t1, (\offset + 4)(\from)
+    lw      t2, (\offset + 8)(\from)
+    lw      t3, (\offset + 12)(\from)
 #endif
 #if CACHEALIGN_SIZE >= 32
-    lw      t4, 16(a0)
-    lw      t5, 20(a0)
-    lw      t6, 24(a0)
-    lw      t7, 28(a0)
+    lw      t4, (\offset + 16)(\from)
+    lw      t5, (\offset + 20)(\from)
+    lw      t6, (\offset + 24)(\from)
+    lw      t7, (\offset + 28)(\from)
 #endif
 #if CACHEALIGN_SIZE >= 16
-    sw      t0, 0(a1)
-    sw      t1, 4(a1)
-    sw      t2, 8(a1)
-    sw      t3, 12(a1)
+    sw      t0, (\offset + 0)(\to)
+    sw      t1, (\offset + 4)(\to)
+    sw      t2, (\offset + 8)(\to)
+    sw      t3, (\offset + 12)(\to)
 #endif
 #if CACHEALIGN_SIZE >= 32
-    sw      t4, 16(a1)
-    sw      t5, 20(a1)
-    sw      t6, 24(a1)
-    sw      t7, 28(a1)
+    sw      t4, (\offset + 16)(\to)
+    sw      t5, (\offset + 20)(\to)
+    sw      t6, (\offset + 24)(\to)
+    sw      t7, (\offset + 28)(\to)
 #endif
-    addiu   a1, CACHEALIGN_SIZE
-    slt     a3, a1, a2
-    bnez    a3, 1b
-    addiu   a0, CACHEALIGN_SIZE
-2:
 .endm
 
 /* clear a range of memory

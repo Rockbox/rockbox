@@ -149,13 +149,11 @@ icache_loop:
 .global _start
 _start:
     /* save return address */
-    move    k0, ra
+    move    k1, ra
     /* save load address */
 here:
-    save_cur_pc s0
-    addiu   s0, s0, (_start - here)
-    jr      k0
-    nop
+    save_cur_pc k0
+    addiu   k0, k0, (_start - here)
     /* disable all interrupts */
     disable_interrupts
 enable_big_pages_mode:
@@ -170,14 +168,7 @@ map_dram:
     map_address DRAM_ORIG, PHYSICAL_DRAM_ADDR, DRAM_SIZE, K_CacheAttrCN, (16 * 1024 * 1024)
 relocate:
     /* relocate binary, note that addresses are in K0 */
-    copy_mem    s0, _relocstart, _relocend
-iram_copy:
-    /* copy iram content to its correct location */
-    la          s0, IRAM_ORIG
-    copy_mem    s0, _iramcopy, _iramend
-bss_clear:
-    /* clear BSS */
-    clear_mem   _edata, _end
+    copy_mem    k0, _relocstart, _relocend
 flush_cache:
     /* flush caches */
     writeback_dcache
@@ -187,9 +178,24 @@ flush_cache:
     jr      t0
     nop
 real_start:
+iram_copy:
+    /* copy iram content to its correct location */
+    la          t0, IRAM_ORIG
+    copy_mem    t0, _iramcopy, _iramend
+bss_clear:
+    /* clear BSS */
+    clear_mem   _edata, _end
+setup_stack:
+    /* munge the stack */
+    la      sp, stackend
+    la      t0, stackbegin
+    li      t2, 0xdeadbeef
+1:
+    addiu   t0, 4
+    bne     t0, sp, 1b
+    sw      t2, -4(t0)
+call_main:
     /* return */
-    jr      k0
-    nop
     j       main
     nop
 #endif
