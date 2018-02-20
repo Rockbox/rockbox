@@ -99,6 +99,8 @@ static void *write_fifo0(void *src, unsigned size)
  * a similar trick: we do not acknowledge the last packet and leave a pending
  * SVDOUTPKTRDY to be done as part of a final STALL or ZLP. */
 
+static bool ctrl_in_xfer; /* remember if current transfer is IN or OUT (see usb_drv_send) */
+
 int usb_drv_recv_setup(struct usb_ctrlrequest *req)
 {
     while(1)
@@ -126,6 +128,7 @@ int usb_drv_recv_setup(struct usb_ctrlrequest *req)
             if(cnt == 8)
             {
                 read_fifo0(req, 8);
+                ctrl_in_xfer = (req->bRequestType & USB_DIR_IN) == USB_DIR_IN;
                 /* DO NOT acknowledge the packet, leave this to recv/send/stall */
                 return 0;
             }
@@ -177,8 +180,20 @@ int usb_drv_send(int endpoint, void *ptr, int length)
     }
     else
     {
-        /* clear packet ready for the PREVIOUS packet (SETUP or DATA) and finish */
-        REG_USB_CSR0 |= USB_CSR0_SVDOUTPKTRDY | USB_CSR0_DATAEND;
+        /* there are two cases depending on whether this is zero length IN stage (uncommon but
+         * possible), or a ACK */
+        if(ctrl_in_xfer)
+        {
+            /* clear packet ready for the PREVIOUS packet (SETUP) */
+            REG_USB_CSR0 |= USB_CSR0_SVDOUTPKTRDY;
+            /* send an empty data packet an set dataend to move to status stage */
+            REG_USB_CSR0 |= USB_CSR0_INPKTRDY | USB_CSR0_DATAEND;
+            /* wait for packet to be transmitted */
+            while(REG_USB_CSR0 & USB_CSR0_INPKTRDY) {}
+        }
+        else
+            /* clear packet ready for the PREVIOUS packet (SETUP or DATA) and finish */
+            REG_USB_CSR0 |= USB_CSR0_SVDOUTPKTRDY | USB_CSR0_DATAEND;
     }
     /* wait until acknowledgement */
     while(REG_USB_CSR0 & USB_CSR0_DATAEND) {}
