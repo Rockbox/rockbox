@@ -118,6 +118,8 @@ void usage(void)
     printf("  --noload        Skip loading stage and only execute the given address\n");
     printf("  --noexec        Skip execute stage and only load data the given address\n");
     printf("  --call          Perform a call to the code instead of a jump\n");
+    printf("  --arg/-a <arg>  Give an argument to the code\n");
+    printf("  --ret/-r        Print return value of the code (only available for call)\n");
     printf("file types:\n");
     printf("  raw      Load a raw binary blob\n");
     printf("  rockbox  Load a rockbox image produced by scramble\n");
@@ -137,6 +139,9 @@ int main(int argc, char **argv)
     bool verbose = false;
     const char *uri = hwstub::uri::default_uri().full_uri().c_str();
     bool no_load = false, no_exec = false, call = false;
+    uint32_t args[HWSTUB_EXEC_ARGS];
+    int nr_args = 0;
+    bool has_retval = false;
 
     // parse command line
     while(1)
@@ -151,10 +156,12 @@ int main(int argc, char **argv)
             {"noload", no_argument, 0, 'e'},
             {"noexec", no_argument, 0, 'l'},
             {"call", no_argument, 0, 'c'},
+            {"arg", required_argument, 0, 'a'},
+            {"ret", no_argument, 0, 'r'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "hqt:d:elvc", long_options, NULL);
+        int c = getopt_long(argc, argv, "hqt:d:elvca:r", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -193,6 +200,25 @@ int main(int argc, char **argv)
                 break;
             case 'c':
                 call = true;
+                break;
+            case 'a':
+            {
+                if(nr_args == HWSTUB_EXEC_ARGS)
+                {
+                    fprintf(stderr, "The protocol only supports up to %d arguments\n", HWSTUB_EXEC_ARGS);
+                    return 1;
+                }
+                char *end;
+                args[nr_args++] = strtoul(optarg, &end, 0);
+                if(*end)
+                {
+                    fprintf(stderr, "Invalid arguent '%s'\n", optarg);
+                    return 1;
+                }
+                break;
+            }
+            case 'r':
+                has_retval = true;
                 break;
             default:
                 abort();
@@ -301,12 +327,16 @@ int main(int argc, char **argv)
     /* exec */
     if(!no_exec)
     {
-        ret = hwdev->exec(addr, call ? HWSTUB_EXEC_CALL : HWSTUB_EXEC_JUMP);
+        uint32_t retval = 0;
+        uint32_t *retval_p = has_retval ? &retval : nullptr;
+        ret = hwdev->exec(addr, call ? HWSTUB_EXEC_CALL : HWSTUB_EXEC_JUMP, nr_args, args, retval_p);
         if(ret != hwstub::error::SUCCESS)
         {
             fprintf(stderr, "Exec failed: %s\n", error_string(ret).c_str());
             goto Lerr;
         }
+        if(has_retval)
+            printf("Return value: %x\n", retval);
     }
     else
         printf("Skip exec as requested\n");

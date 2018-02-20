@@ -42,9 +42,9 @@ extern unsigned char oc_bufferend[];
 static bool g_exit = false;
 
 /**
- * 
+ *
  * USB stack
- * 
+ *
  */
 
 static struct usb_device_descriptor device_descriptor=
@@ -401,7 +401,7 @@ static bool read_atomic(void *dst, void *src, size_t sz)
 }
 
 static void *last_read_addr = 0;
-static uint16_t last_read_id = 0xffff;
+static uint16_t last_cmd_id = 0xffff;
 static size_t last_read_max_size = 0;
 
 static void handle_read(struct usb_ctrlrequest *req)
@@ -417,13 +417,13 @@ static void handle_read(struct usb_ctrlrequest *req)
         struct hwstub_read_req_t *read = (void *)usb_buffer;
         last_read_addr = (void *)read->dAddress;
         last_read_max_size = usb_buffer_size;
-        last_read_id = id;
+        last_cmd_id = id;
         usb_drv_send(EP_CONTROL, NULL, 0);
     }
     else
     {
         /* NOTE: READ2 is also called after a coprocessor operation */
-        if(id != last_read_id)
+        if(id != last_cmd_id)
             return usb_drv_stall(EP_CONTROL, true, true);
         size_t len = MIN(req->wLength, last_read_max_size);
 
@@ -498,23 +498,21 @@ static void handle_write(struct usb_ctrlrequest *req)
     usb_drv_send(EP_CONTROL, NULL, 0);
 }
 
-static bool do_call(uint32_t addr)
+/* nr_args is expected to be at least 4 */
+static bool do_call(uint32_t addr, unsigned nr_args, uint32_t *args, uint32_t *retval)
 {
+    if(nr_args != 4)
+    {
+        logf("invalid number of arguments to do_call: %d\n", nr_args);
+        return false;
+    }
     /* trap exceptions */
     int ret = set_exception_jmp();
     if(ret == 0)
     {
-#if defined(CPU_ARM)
-        /* in case of call, respond after return */
-        asm volatile("blx %0\n" : : "r"(addr) : "memory");
+        uint32_t (*fn)(uint32_t,uint32_t,uint32_t,uint32_t) = (void *)addr;
+        *retval = fn(args[0], args[1], args[2], args[3]);
         return true;
-#elif defined(CPU_MIPS)
-        asm volatile("jalr %0\nnop\n" : : "r"(addr) : "memory");
-        return true;
-#else
-#warning call is unsupported on this platform
-        return false;
-#endif
     }
     else
     {
@@ -523,26 +521,65 @@ static bool do_call(uint32_t addr)
     }
 }
 
-static void do_jump(uint32_t addr)
+/* nr_args is expected to be at least 4 */
+void do_jump(uint32_t addr, unsigned nr_args, uint32_t *args)
 {
-#if defined(CPU_ARM)
-    asm volatile("bx %0\n" : : "r" (addr) : "memory");
-#elif defined(CPU_MIPS)
-    asm volatile("jr %0\nnop\n" : : "r" (addr) : "memory");
-#else
-#warning jump is unsupported on this platform
-#define NO_JUMP
-#endif
+    (void) nr_args;
+    uint32_t (*fn)(uint32_t,uint32_t,uint32_t,uint32_t) = (void *)addr;
+    fn(args[0], args[1], args[2], args[3]);
 }
+
+static uint32_t last_call_retval = 0xdeadbeef;
 
 static void handle_exec(struct usb_ctrlrequest *req)
 {
+    uint16_t id = req->wValue;
+
+    /* request to get return value */
+    if(req->bRequest == HWSTUB_EXEC2)
+    {
+        if(id != last_cmd_id)
+            return usb_drv_stall(EP_CONTROL, true, true);
+        size_t len = MIN(req->wLength, sizeof(uint32_t));
+        /* place return value in the usb buffer for EXEC2 */
+        *(uint32_t *)usb_buffer = last_call_retval;
+        /* send buffer */
+        usb_drv_send(EP_CONTROL, usb_buffer, len);
+        usb_drv_recv(EP_CONTROL, NULL, 0);
+        return;
+    }
+
     int size = usb_drv_recv(EP_CONTROL, usb_buffer, req->wLength);
     asm volatile("nop" : : : "memory");
-    struct hwstub_exec_req_t *exec = (void *)usb_buffer;
-    if(size != sizeof(struct hwstub_exec_req_t))
+    struct hwstub_exec_req_v2_t *exec = (void *)usb_buffer;
+    if(size == sizeof(struct hwstub_exec_req_t))
+    {
+        /* convert v1 to v2: we can use more space in the buffer for that */
+        exec->bNrArgs = 0;
+        exec->bReserved = 0;
+        for(int i = 0; i < HWSTUB_EXEC_ARGS; i++)
+            exec->dArgs[i] = 0;
+    }
+    else if(size != sizeof(struct hwstub_exec_req_v2_t))
         return usb_drv_stall(EP_CONTROL, true, true);
     uint32_t addr = exec->dAddress;
+    last_cmd_id = id;
+
+    /* some targets only support a limited number of arguments for simplicity */
+#if defined(CPU_ARM) || defined(CPU_MIPS)
+    if(exec->bNrArgs <= 4)
+    {
+        /* make sure we have four arguments, pad with zeroes if needed
+         * NOTE: we are not overflowing memory because the USB buffer is large enough */
+        while(exec->bNrArgs < 4)
+            exec->dArgs[exec->bNrArgs++] = 0;
+    }
+    else
+    {
+        logf("target only supports up to 4 arguments");
+        return usb_drv_stall(EP_CONTROL, true, true);
+    }
+#endif
 
 #if defined(CPU_ARM)
     if(exec->bmFlags & HWSTUB_EXEC_THUMB)
@@ -557,21 +594,17 @@ static void handle_exec(struct usb_ctrlrequest *req)
 
     if(exec->bmFlags & HWSTUB_EXEC_CALL)
     {
-        if(do_call(addr))
+        if(do_call(addr, exec->bNrArgs, exec->dArgs, &last_call_retval))
             usb_drv_send(EP_CONTROL, NULL, 0);
         else
             usb_drv_stall(EP_CONTROL, true, true);
     }
     else
     {
-#ifndef NO_JUMP
         /* in case of jump, respond immediately and disconnect usb */
         usb_drv_send(EP_CONTROL, NULL, 0);
         usb_drv_exit();
-        do_jump(addr);
-#else
-        usb_drv_stall(EP_CONTROL, true, true);
-#endif
+        do_jump(addr, exec->bNrArgs, exec->dArgs);
     }
 }
 
@@ -726,7 +759,7 @@ static void handle_cop(struct usb_ctrlrequest *req)
     /* if there is a read stage, prepare everything for the READ2 */
     if(ret > 0)
     {
-        last_read_id = req->wValue;
+        last_cmd_id = req->wValue;
         last_read_addr = out_buf;
         last_read_max_size = ret;
     }
@@ -750,6 +783,7 @@ static void handle_class_intf_req(struct usb_ctrlrequest *req)
         case HWSTUB_WRITE_ATOMIC:
             return handle_write(req);
         case HWSTUB_EXEC:
+        case HWSTUB_EXEC2:
             return handle_exec(req);
         case HWSTUB_COPROCESSOR_OP:
             return handle_cop(req);

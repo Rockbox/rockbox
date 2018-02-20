@@ -262,6 +262,8 @@ public:
     /** Ask the stub to execute some code.
      * NOTE: this may kill the stub */
     error exec(uint32_t addr, uint16_t flags);
+    /* NOTE: this call will fill flags with the required number of arguments */
+    error exec(uint32_t addr, uint16_t flags, int nr_args, uint32_t *args, uint32_t *reval);
     /** Read/write some device memory. sz is the size of the buffer and is updated to
      * reflect the number of bytes written to the buffer.
      * NOTE: the stub may or may not recover from bad read/write, so this may kill it.
@@ -314,7 +316,8 @@ protected:
     virtual error write_dev(uint32_t addr, const void *buf, size_t& sz, bool atomic) = 0;
     virtual error get_dev_desc(uint16_t desc, void *buf, size_t& buf_sz) = 0;
     virtual error get_dev_log(void *buf, size_t& buf_sz) = 0;
-    virtual error exec_dev(uint32_t addr, uint16_t flags) = 0;
+    virtual error exec_dev(uint32_t addr, uint16_t flags, int nr_args, uint32_t *args,
+        uint32_t *retval) = 0;
     /* cop operation: if out_data is not null, data is appended to header, if
      * in_data is not null, a READ2 operation follows to retrieve some data
      * The in_data parameters is updated to reflect the number of transfered bytes*/
@@ -354,7 +357,8 @@ protected:
     virtual error write_dev(uint32_t addr, const void *buf, size_t& sz, bool atomic);
     virtual error get_dev_desc(uint16_t desc, void *buf, size_t& buf_sz);
     virtual error get_dev_log(void *buf, size_t& buf_sz);
-    virtual error exec_dev(uint32_t addr, uint16_t flags);
+    virtual error exec_dev(uint32_t addr, uint16_t flags, int nr_args, uint32_t *args,
+        uint32_t *retval);
     virtual error cop_dev(uint8_t op, uint8_t args[HWSTUB_COP_ARGS], const void *out_data,
         size_t out_size, void *in_data, size_t *in_size);
     virtual error status() const;

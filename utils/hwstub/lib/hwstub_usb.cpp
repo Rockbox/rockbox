@@ -298,12 +298,13 @@ rb_handle::rb_handle(std::shared_ptr<hwstub::device> dev,
     :hwstub::usb::handle(dev, handle), m_intf(intf), m_transac_id(0), m_buf_size(1)
 {
     m_probe_status = error::SUCCESS;
+    m_ver = -1;
+    std::shared_ptr<hwstub::context> ctx = get_device()->get_context();
     /* claim interface */
     int err = libusb_claim_interface(m_handle, m_intf);
     if(err != 0)
     {
-        get_device()->get_context()->debug() <<
-            "Cannot claim interface: " << err <<"\n";
+        ctx->debug() << "Cannot claim interface: " << err <<"\n";
         m_probe_status = error::PROBE_FAILURE;
     }
     /* check version */
@@ -313,15 +314,22 @@ rb_handle::rb_handle(std::shared_ptr<hwstub::device> dev,
         m_probe_status = get_version_desc(ver_desc);
         if(m_probe_status == error::SUCCESS)
         {
+            m_ver = hwstub_ver(ver_desc.bMajor, ver_desc.bMinor);
             if(ver_desc.bMajor != HWSTUB_VERSION_MAJOR ||
-                    ver_desc.bMinor < HWSTUB_VERSION_MINOR)
+                    ver_desc.bMinor != HWSTUB_VERSION_MINOR)
             {
-                get_device()->get_context()->debug() <<
-                    "Version mismatch: host is " << HWSTUB_VERSION_MAJOR <<
+                ctx->debug() << "Version mismatch: host is " << HWSTUB_VERSION_MAJOR <<
                     "." << HWSTUB_VERSION_MINOR << ", device is " <<
-                    ver_desc.bMajor << "." << ver_desc.bMinor << "\n";
-                m_probe_status = error::PROBE_FAILURE;
+                    (int)ver_desc.bMajor << "." << (int)ver_desc.bMinor << "\n";
             }
+            /* Major mismatch -> error */
+            if(ver_desc.bMajor != HWSTUB_VERSION_MAJOR)
+                m_probe_status = error::PROBE_FAILURE;
+            /* Minor mismatch -> warning */
+            else if(ver_desc.bMinor < HWSTUB_VERSION_MINOR)
+                ctx->debug() << "Some operations might not be supported by the device.\n";
+            else if(ver_desc.bMinor > HWSTUB_VERSION_MINOR)
+                ctx->debug() << "Some operations might not be supported by the library.\n";
         }
     }
     /* get buffer size */
@@ -373,14 +381,56 @@ error rb_handle::get_dev_log(void *buf, size_t& buf_sz)
         HWSTUB_GET_LOG, 0, m_intf, (unsigned char *)buf, buf_sz, m_timeout), buf_sz);
 }
 
-error rb_handle::exec_dev(uint32_t addr, uint16_t flags)
+error rb_handle::exec_dev(uint32_t addr, uint16_t flags, int nr_args, uint32_t *args,
+    uint32_t *retval)
 {
-    struct hwstub_exec_req_t exec;
-    exec.dAddress = addr;
-    exec.bmFlags = flags;
-    return  interpret_libusb_error(libusb_control_transfer(m_handle,
-        LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT,
-        HWSTUB_EXEC, 0, m_intf, (unsigned char *)&exec, sizeof(exec), m_timeout), sizeof(exec));
+    if(nr_args < 0 || nr_args > HWSTUB_EXEC_ARGS)
+    {
+        get_device()->get_context()->debug()
+            << "Invalid number of arguments to exec\n";
+        return error::UNSUPPORTED;
+    }
+    error ret = error::ERROR;
+    /* use old version for maximum compatiblity when possible */
+    if(nr_args == 0 && retval == nullptr)
+    {
+        struct hwstub_exec_req_t exec;
+        exec.dAddress = addr;
+        exec.bmFlags = flags;
+
+        ret = interpret_libusb_error(libusb_control_transfer(m_handle,
+            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT,
+            HWSTUB_EXEC, 0, m_intf, (unsigned char *)&exec, sizeof(exec), m_timeout), sizeof(exec));
+    }
+    else
+    {
+        /* v2 of exec is only supported on >=4.4 */
+        if(m_ver < hwstub_ver(4, 4))
+            get_device()->get_context()->debug() << "Exec arguments are only supported in version 4.4+\n";
+        struct hwstub_exec_req_v2_t exec;
+        exec.dAddress = addr;
+        exec.bmFlags = flags;
+        exec.bNrArgs = nr_args;
+        exec.bReserved = 0;
+        for(int i = 0; i < nr_args; i++)
+            exec.dArgs[i] = args[i];
+        for(int i = nr_args; i < HWSTUB_EXEC_ARGS; i++)
+            exec.dArgs[i] = 0;
+
+        ret = interpret_libusb_error(libusb_control_transfer(m_handle,
+            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT,
+            HWSTUB_EXEC, m_transac_id, m_intf, (unsigned char *)&exec, sizeof(exec), m_timeout),
+            sizeof(exec));
+    }
+    if(ret == error::SUCCESS && retval)
+    {
+        /* get return value */
+        ret = interpret_libusb_error(libusb_control_transfer(m_handle,
+            LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_IN,
+            HWSTUB_EXEC2, m_transac_id++, m_intf, (unsigned char *)retval, sizeof(*retval),
+            m_timeout), sizeof(*retval));
+    }
+    return ret;
 }
 
 error rb_handle::read_dev(uint32_t addr, void *buf, size_t& sz, bool atomic)
@@ -692,9 +742,19 @@ error jz_handle::get_dev_log(void *buf, size_t& buf_sz)
     return error::SUCCESS;
 }
 
-error jz_handle::exec_dev(uint32_t addr, uint16_t flags)
+error jz_handle::exec_dev(uint32_t addr, uint16_t flags, int nr_args, uint32_t *args,
+    uint32_t *retval)
 {
     (void) flags;
+    (void) args;
+    (void) retval;
+    /* ROM does not support argument passing */
+    if(nr_args != 0 || retval != nullptr)
+    {
+        get_device()->get_context()->debug()
+            << "This device does not support exec arguments and return value\n";
+        return error::UNSUPPORTED;
+    }
     /* FIXME the ROM always do call so the stub can always return, this behaviour
      * cannot be changed */
     /* NOTE assume that exec at 0x80000000 is a first stage load with START1,

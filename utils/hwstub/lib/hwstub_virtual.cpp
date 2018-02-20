@@ -215,10 +215,11 @@ error handle::get_dev_log(void *buf, size_t& buf_sz)
     return p ? p->get_dev_log(buf, buf_sz) : error::DISCONNECTED;
 }
 
-error handle::exec_dev(uint32_t addr, uint16_t flags)
+error handle::exec_dev(uint32_t addr, uint16_t flags, int nr_args, uint32_t *args,
+    uint32_t *retval)
 {
     auto p = m_hwdev.lock();
-    return p ? p->exec_dev(addr, flags) : error::DISCONNECTED;
+    return p ? p->exec_dev(addr, flags, nr_args, args, retval) : error::DISCONNECTED;
 }
 
 error handle::cop_dev(uint8_t op, uint8_t args[HWSTUB_COP_ARGS],
@@ -330,10 +331,14 @@ error dummy_hardware::get_dev_log(void *buf, size_t& buf_sz)
     return error::DUMMY;
 }
 
-error dummy_hardware::exec_dev(uint32_t addr, uint16_t flags)
+error dummy_hardware::exec_dev(uint32_t addr, uint16_t flags, int nr_args, uint32_t *args,
+    uint32_t *retval)
 {
     (void) addr;
     (void) flags;
+    (void) nr_args;
+    (void) args;
+    (void) retval;
     return error::DUMMY;
 }
 

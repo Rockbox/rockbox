@@ -135,7 +135,8 @@ protected:
     virtual error write_dev(uint32_t addr, const void *buf, size_t& sz, bool atomic);
     virtual error get_dev_desc(uint16_t desc, void *buf, size_t& buf_sz);
     virtual error get_dev_log(void *buf, size_t& buf_sz);
-    virtual error exec_dev(uint32_t addr, uint16_t flags);
+    virtual error exec_dev(uint32_t addr, uint16_t flags, int nr_args, uint32_t *args,
+        uint32_t *retval);
     virtual error cop_dev(uint8_t op, uint8_t args[HWSTUB_COP_ARGS], const void *out_data,
         size_t out_size, void *in_data, size_t *in_size);
     virtual error status() const;
@@ -144,11 +145,13 @@ protected:
      * number, or <0 on error. */
     static bool find_intf(struct libusb_device_descriptor *dev,
         struct libusb_config_descriptor *config, int& intf);
+    static inline int hwstub_ver(int major, int minor) { return major * 100 + minor; }
 
     error m_probe_status; /* probing status */
     int m_intf; /* interface number */
     uint16_t m_transac_id; /* transaction ID */
     size_t m_buf_size; /* Device buffer size */
+    int m_ver; /* Device revision (uses hwstub_ver()) */
 };
 
 /** JZ USB handle
@@ -167,7 +170,8 @@ protected:
     virtual error write_dev(uint32_t addr, const void *buf, size_t& sz, bool atomic);
     virtual error get_dev_desc(uint16_t desc, void *buf, size_t& buf_sz);
     virtual error get_dev_log(void *buf, size_t& buf_sz);
-    virtual error exec_dev(uint32_t addr, uint16_t flags);
+    virtual error exec_dev(uint32_t addr, uint16_t flags, int nr_args, uint32_t *args,
+        uint32_t *retval);
     virtual error cop_dev(uint8_t op, uint8_t args[HWSTUB_COP_ARGS], const void *out_data,
         size_t out_size, void *in_data, size_t *in_size);
     virtual error status() const;

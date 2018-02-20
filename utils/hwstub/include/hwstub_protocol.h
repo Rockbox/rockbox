@@ -33,7 +33,7 @@
  */
 
 #define HWSTUB_VERSION_MAJOR    4
-#define HWSTUB_VERSION_MINOR    3
+#define HWSTUB_VERSION_MINOR    4
 
 #define HWSTUB_VERSION__(maj, min) #maj"."#min
 #define HWSTUB_VERSION_(maj, min) HWSTUB_VERSION__(maj, min)
@@ -170,6 +170,7 @@ struct hwstub_net_hdr_t
 #define HWSTUB_READ2_ATOMIC         0x45
 #define HWSTUB_WRITE_ATOMIC         0x46
 #define HWSTUB_COPROCESSOR_OP       0x47
+#define HWSTUB_EXEC2                0x48
 
 /* the following commands and the ACK/NACK mechanism are net only */
 #define HWSERVER_ACK(n) (0x100|(n))
@@ -236,20 +237,34 @@ struct hwstub_write_req_t
 } __attribute__((packed));
 
 /**
- * HWSTUB_EXEC:
+ * HWSTUB_EXEC and HWSTUB_EXEC2:
  * Execute code at an address. Several options are available regarding ARM vs Thumb,
- * jump vs call.
+ * jump vs call. The caller can optionally include some arguments, according to some
+ * calling convention (for now the C calling convention). In case of a call, the
+ * return value can be fetched with HWSTUB_EXEC2. Both requests must use the same
+ * ID in wValue, otherwise the second request will be STALLed.
  */
 
 #define HWSTUB_EXEC_ARM     (0 << 0) /* target code is ARM */
 #define HWSTUB_EXEC_THUMB   (1 << 0) /* target code is Thumb */
 #define HWSTUB_EXEC_JUMP    (0 << 1) /* branch, code will never turn */
 #define HWSTUB_EXEC_CALL    (1 << 1) /* call and expect return */
+#define HWSTUB_EXEC_ARGS    7 /* maximum number of arguments */
 
 struct hwstub_exec_req_t
 {
     uint32_t dAddress;
     uint16_t bmFlags;
+} __attribute__((packed));
+
+/* introduced in version 4.4 */
+struct hwstub_exec_req_v2_t
+{
+    uint32_t dAddress;
+    uint16_t bmFlags;
+    uint8_t bNrArgs;
+    uint8_t bReserved;
+    uint32_t dArgs[HWSTUB_EXEC_ARGS];
 } __attribute__((packed));
 
 /**

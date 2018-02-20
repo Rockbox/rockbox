@@ -383,6 +383,11 @@ error handle::get_log(void *buf, size_t& buf_sz)
 
 error handle::exec(uint32_t addr, uint16_t flags)
 {
+    return exec(addr, flags, 0, nullptr, nullptr);
+}
+
+error handle::exec(uint32_t addr, uint16_t flags, int nr_args, uint32_t *args, uint32_t *retval)
+{
     std::unique_lock<std::recursive_mutex> lock(m_mutex);
     /* get a pointer so that it's not destroyed during the runtime of the function,
      * the pointer will be released at the end of the function */
@@ -393,7 +398,7 @@ error handle::exec(uint32_t addr, uint16_t flags)
     error err = status();
     if(err != error::SUCCESS)
         return err;
-    return exec_dev(addr, flags);
+    return exec_dev(addr, flags, nr_args, args, retval);
 }
 
 error handle::read(uint32_t addr, void *buf, size_t& sz, bool atomic)
@@ -643,10 +648,14 @@ error dummy_handle::get_dev_log(void *buf, size_t& buf_sz)
     return error::DUMMY;
 }
 
-error dummy_handle::exec_dev(uint32_t addr, uint16_t flags)
+error dummy_handle::exec_dev(uint32_t addr, uint16_t flags, int nr_args, uint32_t *args,
+    uint32_t *retval)
 {
     (void) addr;
     (void) flags;
+    (void) nr_args;
+    (void) args;
+    (void) retval;
     return error::DUMMY;
 }
 

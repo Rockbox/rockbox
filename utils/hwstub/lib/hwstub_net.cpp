@@ -714,13 +714,20 @@ error handle::get_dev_log(void *buf, size_t& buf_sz)
     return error::SUCCESS;
 }
 
-error handle::exec_dev(uint32_t addr, uint16_t flags)
+error handle::exec_dev(uint32_t addr, uint16_t flags, int nr_args, uint32_t *exec_args,
+    uint32_t *retval)
 {
+    (void) exec_args;
+    (void) retval;
     std::shared_ptr<hwstub::context> hctx = get_device()->get_context();
     if(!hctx)
         return error::NO_CONTEXT;
-
     context *ctx = dynamic_cast<context*>(hctx.get());
+    if(nr_args != 0 || retval != nullptr)
+    {
+        ctx->debug() << "This device does not support exec arguments and return value\n";
+        return error::UNSUPPORTED;
+    }
     ctx->debug() << "[net::handle] --> EXEC(" << m_handle_id << ",0x" << std::hex
         << addr << ", 0x" << std::hex << flags << ")\n";
     uint32_t args[HWSTUB_NET_ARGS] = {0};
