@@ -282,6 +282,9 @@
 #define MIDI_VOL_UP     BUTTON_VOL_UP
 #define MIDI_VOL_DOWN   BUTTON_VOL_DOWN
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define MIDI_QUIT       BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

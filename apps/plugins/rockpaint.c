@@ -323,6 +323,10 @@
 #elif ( CONFIG_KEYPAD == DX50_PAD )
 #define ROCKPAINT_QUIT      (BUTTON_POWER|BUTTON_REL)
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define ROCKPAINT_QUIT        BUTTON_POWER
+#define ROCKPAINT_MENU        BUTTON_MENU
+
 #else
 #error "Please define keys for this keypad"
 #endif

@@ -340,6 +340,9 @@
 #elif CONFIG_KEYPAD == DX50_PAD
 #define PACMAN_MENU     BUTTON_POWER
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define PACMAN_MENU     BUTTON_MENU
+
 #else
 
 #error Keymap not defined!

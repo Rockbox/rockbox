@@ -466,6 +466,10 @@
 #define ROCKBLOX_DROP          BUTTON_VOL_DOWN
 #define ROCKBLOX_RESTART       BUTTON_VOL_UP
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define ROCKBLOX_OFF           BUTTON_POWER
+#define ROCKBLOX_ROTATE        BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

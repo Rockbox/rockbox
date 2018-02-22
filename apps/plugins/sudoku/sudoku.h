@@ -410,6 +410,10 @@
 #elif CONFIG_KEYPAD == DX50_PAD
 #define SUDOKU_BUTTON_QUIT       (BUTTON_POWER|BUTTON_REL)
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define SUDOKU_BUTTON_QUIT      BUTTON_POWER
+#define SUDOKU_BUTTON_MENU      BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

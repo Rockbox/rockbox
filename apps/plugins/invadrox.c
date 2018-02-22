@@ -267,6 +267,11 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define RIGHT BUTTON_PLAY
 #define FIRE  BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+
+#define QUIT  BUTTON_POWER
+#define FIRE  BUTTON_MENU
+
 #else
     #error INVADROX: Unsupported keypad
 #endif

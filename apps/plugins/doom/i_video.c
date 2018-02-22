@@ -538,6 +538,11 @@ void I_ShutdownGraphics(void)
 #define DOOMBUTTON_WEAPON     BUTTON_VOL_DOWN
 #define DOOMBUTTON_MAP        BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define DOOMBUTTON_ESC      BUTTON_POWER
+#define DOOMBUTTON_SHOOT    BUTTON_MENU
+#define DOOMBUTTON_MAP      BUTTON_TOPLEFT
+
 #else
 #error Keymap not defined!
 #endif

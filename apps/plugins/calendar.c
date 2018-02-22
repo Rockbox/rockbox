@@ -398,6 +398,11 @@
 #define CALENDAR_PREV_MONTH BUTTON_BOTTOMLEFT
 #define CALENDAR_EVENT_MENU_NAME "play"
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define CALENDAR_QUIT       BUTTON_POWER
+#define CALENDAR_SELECT     BUTTON_MENU
+#define CALENDAR_EVENT_MENU_NAME "menu"
+
 #else
 #error "No keypad setting."
 #endif

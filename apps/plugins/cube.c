@@ -400,6 +400,9 @@
 #define CUBE_DEC           BUTTON_VOL_DOWN
 #define CUBE_MODE          BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define CUBE_QUIT       BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif
