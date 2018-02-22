@@ -535,6 +535,11 @@
 #define TV_AUTOSCROLL   (BUTTON_POWER | BUTTON_PLAY)
 #define TV_BOOKMARK     (BUTTON_POWER | BUTTON_VOL_UP)
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define TV_QUIT         BUTTON_POWER
+#define TV_MENU         BUTTON_MENU
+#define TV_BOOKMARK     BUTTON_BOTTOMLEFT
+
 #else
 #error No keymap defined!
 #endif

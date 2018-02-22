@@ -469,6 +469,9 @@
 #elif CONFIG_KEYPAD == DX50_PAD
 #define FRACTAL_QUIT            (BUTTON_POWER|BUTTON_REL)
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define FRACTAL_QUIT            BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

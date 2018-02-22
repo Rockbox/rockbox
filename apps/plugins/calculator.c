@@ -511,6 +511,10 @@ F3: equal to "="
 #elif CONFIG_KEYPAD == DX50_PAD
 #define CALCULATOR_QUIT    BUTTON_POWER
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define CALCULATOR_QUIT     BUTTON_POWER
+#define CALCULATOR_INPUT    BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

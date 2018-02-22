@@ -479,6 +479,10 @@
 #define IMGVIEW_QUIT        (BUTTON_POWER|BUTTON_REL)
 #define IMGVIEW_MENU        (BUTTON_PLAY|BUTTON_REL)
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define IMGVIEW_QUIT        BUTTON_POWER
+#define IMGVIEW_MENU        BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

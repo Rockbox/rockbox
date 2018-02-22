@@ -465,6 +465,11 @@
 #define FLIPIT_STEP_BY_STEP (BUTTON_LEFT|BUTTON_POWER)
 #define FLIPIT_TOGGLE       BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+
+#define FLIPIT_QUIT         BUTTON_POWER
+#define FLIPIT_TOGGLE       BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

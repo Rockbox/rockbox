@@ -330,6 +330,10 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define DOWN     BUTTON_VOL_DOWN
 #define PAUSE    BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define QUIT     BUTTON_POWER
+#define PAUSE    BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

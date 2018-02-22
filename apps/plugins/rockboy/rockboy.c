@@ -408,6 +408,9 @@ static void setoptions (void)
         options.START   = BUTTON_LEFT;
         options.SELECT  = BUTTON_RIGHT;
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+        options.MENU    = BUTTON_POWER;
+
 #else
 #error No Keymap Defined!
 #endif

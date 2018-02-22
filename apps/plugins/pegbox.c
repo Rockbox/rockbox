@@ -621,6 +621,13 @@ CONFIG_KEYPAD == MROBE500_PAD
 
 #define QUIT_TEXT         "Power"
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define PEGBOX_QUIT     BUTTON_POWER
+#define PEGBOX_SELECT   BUTTON_MENU
+
+#define QUIT_TEXT       "POWER"
+#define SELECT_TEXT     "MENU"
+
 #else
 #error Unsupported keymap!
 #endif

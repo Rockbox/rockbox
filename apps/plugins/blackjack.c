@@ -555,6 +555,10 @@ enum {
 #define BJACK_QUIT_NAME     "Power"
 #define BJACK_DOUBLE_NAME   "Right"
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_QUIT_NAME     "Power"
+
 #else
 #error No keymap defined!
 #endif
