@@ -635,6 +635,10 @@
 #define SOKOBAN_MENU_NAME "Power"
 #define SOKOBAN_PAUSE_NAME "Play"
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define SOKOBAN_MENU    BUTTON_MENU
+#define SOKOBAN_MENU_NAME     "[MENU]"
+
 #else
 #error No keymap defined!
 #endif

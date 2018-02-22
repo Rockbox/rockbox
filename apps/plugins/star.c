@@ -601,6 +601,12 @@
 #define STAR_QUIT           BUTTON_POWER
 #define STAR_QUIT_NAME      "Power"
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define STAR_QUIT               BUTTON_POWER
+#define STAR_QUIT_NAME          "POWER"
+#define STAR_TOGGLE_CONTROL     BUTTON_MENU
+#define STAR_TOGGLE_CONTROL_NAME "MENU"
+
 #else
 #error No keymap defined!
 #endif

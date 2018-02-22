@@ -271,6 +271,9 @@
 #define ZX_LEFT         BUTTON_LEFT
 #define ZX_RIGHT        BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define ZX_MENU         BUTTON_MENU
+
 #else
 #error Keymap not defined!
 

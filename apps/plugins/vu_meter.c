@@ -403,6 +403,12 @@
 #define LABEL_QUIT      "Power"
 #define LABEL_MENU      "Play"
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define VUMETER_QUIT    BUTTON_POWER
+#define VUMETER_MENU    BUTTON_MENU
+#define LABEL_QUIT      "Power"
+#define LABEL_MENU      "Menu"
+
 #else
 #error No keymap defined!
 #endif

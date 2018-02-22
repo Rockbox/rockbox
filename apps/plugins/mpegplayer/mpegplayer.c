@@ -427,6 +427,11 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define MPEG_PAUSE      BUTTON_PLAY
 #define MPEG_STOP       (BUTTON_PLAY|BUTTON_REPEAT)
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define MPEG_MENU       BUTTON_POWER
+#define MPEG_PAUSE      BUTTON_MENU
+#define MPEG_STOP       (BUTTON_MENU|BUTTON_REPEAT)
+
 #else
 #error No keymap defined!
 #endif

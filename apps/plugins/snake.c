@@ -277,6 +277,10 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #define SNAKE_DOWN      BUTTON_VOL_DOWN
 #define SNAKE_PLAYPAUSE BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define SNAKE_QUIT      BUTTON_POWER
+#define SNAKE_PLAYPAUSE BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

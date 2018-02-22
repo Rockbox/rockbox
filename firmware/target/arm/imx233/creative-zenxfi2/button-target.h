@@ -24,8 +24,6 @@
 #include <stdbool.h>
 #include "config.h"
 
-void button_init_device(void);
-int button_read_device(int *data);
 bool button_debug_screen(void);
 
 /* Main unit's buttons */

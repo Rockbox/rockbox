@@ -297,6 +297,10 @@ CONFIG_KEYPAD == MROBE500_PAD
 #elif (CONFIG_KEYPAD == DX50_PAD)
 #define PONG_QUIT (BUTTON_POWER|BUTTON_REL)
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define PONG_QUIT        BUTTON_POWER
+#define PONG_PAUSE       BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

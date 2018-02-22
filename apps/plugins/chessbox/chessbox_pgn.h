@@ -541,6 +541,9 @@
 #define CB_SCROLL_LEFT   (BUTTON_LEFT|BUTTON_REPEAT)
 #define CB_SCROLL_RIGHT  (BUTTON_RIGHT|BUTTON_REPEAT)
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define CB_MENU    BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif

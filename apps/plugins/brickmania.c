@@ -319,6 +319,11 @@ CONFIG_KEYPAD == SANSA_CONNECT_PAD
 #define UP        BUTTON_VOL_UP
 #define DOWN      BUTTON_VOL_DOWN
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define QUIT      BUTTON_POWER
+#define SELECT    BUTTON_MENU
+#define CONTINUE_TEXT "Press MENU To Continue"
+
 #else
 #error No keymap defined!
 #endif

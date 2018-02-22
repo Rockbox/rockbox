@@ -343,6 +343,9 @@
 #define AST_RIGHT       BUTTON_PLAY
 #define AST_FIRE        BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define AST_QUIT        BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

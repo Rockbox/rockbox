@@ -267,6 +267,12 @@
 #define BATTERY_OFF_TXT "Power Long"
 #define BATTERY_ON_TXT  "Play - start"
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define BATTERY_ON      BUTTON_MENU
+#define BATTERY_OFF     BUTTON_POWER
+#define BATTERY_OFF_TXT "Power"
+#define BATTERY_ON_TXT  "Menu - start"
+
 #else
 #error No keymap defined!
 #endif

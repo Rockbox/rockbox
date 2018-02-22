@@ -363,6 +363,10 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define JEWELS_CANCEL BUTTON_POWER
 #define HK_CANCEL "Power"
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define JEWELS_CANCEL BUTTON_POWER
+#define HK_CANCEL "Power"
+
 #else
 #error No keymap defined!
 #endif

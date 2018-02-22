@@ -295,6 +295,9 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_UP          BUTTON_VOL_UP
 #define MPEG_START_TIME_DOWN        BUTTON_VOL_DOWN
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define MPEG_START_TIME_EXIT        BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

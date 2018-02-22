@@ -316,6 +316,10 @@
 #define REVERSI_BUTTON_QUIT         BUTTON_POWER
 #define REVERSI_BUTTON_MENU         BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
+#define REVERSI_BUTTON_QUIT         BUTTON_POWER
+#define REVERSI_BUTTON_MENU         BUTTON_MENU
+
 #else
 #error No keymap defined!
 #endif
