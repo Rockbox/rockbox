@@ -574,6 +574,9 @@ build_linux_toolchain () {
     # install linux headers
     # NOTE: we need to tell make where to put the build files, since buildtool
     # switches to the builddir, "." will be the correct builddir when ran
+    if [ "$arch" == "mipsel" ]; then
+        arch="mips"
+    fi
     linux_opts="O=. ARCH=$arch INSTALL_HDR_PATH=$sysroot/usr/"
     RESTART_STEP="linux-headers" \
     buildtool "linux" "$linux_ver" "NO_CONFIGURE" \
@@ -814,7 +817,7 @@ do
             # avoid patches/bugs.
             glibcopts="--enable-kernel=3.2 --enable-oldest-abi=2.4"
             # FIXME: maybe add -mhard-float
-            build_linux_toolchain "mips-rockbox-linux-gnu" "2.26.1" "" "4.9.4" \
+            build_linux_toolchain "mipsel-rockbox-linux-gnu" "2.26.1" "" "4.9.4" \
                 "$gccopts" "3.2.85" "2.25" "$glibcopts"
             # build alsa-lib
             # we need to set the prefix to how it is on device (/usr) and then
