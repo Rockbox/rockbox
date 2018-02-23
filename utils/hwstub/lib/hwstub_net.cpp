@@ -755,16 +755,36 @@ error handle::exec_dev(uint32_t addr, uint16_t flags, int nr_args, uint32_t *exe
     return error::SUCCESS;
 }
 
-error handle::cop_dev(uint8_t op, uint8_t args[HWSTUB_COP_ARGS],
+error handle::cop_dev(uint8_t op, uint8_t opargs[HWSTUB_COP_ARGS],
     const void *out_data, size_t out_size, void *in_data, size_t *in_size)
 {
-    (void) op;
-    (void) args;
-    (void) out_data;
-    (void) out_size;
-    (void) in_data;
-    (void) in_size;
-    return error::UNIMPLEMENTED;
+    std::shared_ptr<hwstub::context> hctx = get_device()->get_context();
+    if(!hctx)
+        return error::NO_CONTEXT;
+    context *ctx = dynamic_cast<context*>(hctx.get());
+    ctx->debug() << "[net::handle] --> COP(" << m_handle_id << ",0x" << std::hex << (unsigned)op;
+    for(int i = 0; i < HWSTUB_COP_ARGS; i++)
+        ctx->debug() << ",0x" << std::hex << (unsigned)opargs[i];
+    ctx->debug() << ")\n";
+    uint32_t args[HWSTUB_NET_ARGS] = {0};
+    args[0] = m_handle_id;
+    args[1] = op;
+    args[2] = HWSTUB_COP_ARGS;
+    args[3] = in_size ? *in_size : 0;
+    uint8_t *tmp_data = new uint8_t[HWSTUB_COP_ARGS + out_size];
+    for(int i = 0; i < HWSTUB_COP_ARGS; i++)
+        tmp_data[i] = opargs[i];
+    memcpy(tmp_data + HWSTUB_COP_ARGS, out_data, out_size);
+    out_size += HWSTUB_COP_ARGS;
+    error err = ctx->send_cmd(HWSERVER_COP, args, tmp_data, out_size, (uint8_t **)&in_data, in_size);
+    delete[] tmp_data;
+    if(err != error::SUCCESS)
+    {
+        ctx->debug() << "[net::handle] <-- COP failed: " << error_string(err) << "\n";
+        return err;
+    }
+    ctx->debug() << "[net::handle] <-- COP\n";
+    return error::SUCCESS;
 }
 
 error handle::status() const
@@ -1278,6 +1298,52 @@ error server::handle_cmd(client_state *state, uint32_t cmd, uint32_t args[HWSTUB
             return err;
         }
         debug() << "[net::srv::cmd] <-- EXEC\n";
+        return error::SUCCESS;
+    }
+    /* HWSERVER_COP */
+    else if(cmd == HWSERVER_COP)
+    {
+        uint32_t hid = args[0];
+        uint8_t op = args[1];
+        uint32_t args_count = args[2];
+        send_size = args[3];
+        uint8_t opargs[HWSTUB_COP_ARGS];
+        if(args_count != HWSTUB_COP_ARGS || args_count > recv_size)
+        {
+            debug() << "[net::srv::cmd] --> COP: invalid argument counts for cop\n";
+            debug() << "[net::srv::cmd] <-- COP (error)\n";
+            return error::ERROR;
+        }
+        for(int i = 0; i < HWSTUB_COP_ARGS; i++)
+            opargs[i] = recv_data[i];
+        recv_data += args_count;
+        recv_size -= args_count;
+
+        debug() << "[net::handle] --> COP(" << hid << ",0x" << std::hex << (unsigned)op <<
+            "," << args_count << "," << send_size << "," << recv_size;
+        for(int i = 0; i < HWSTUB_COP_ARGS; i++)
+            debug() << ",0x" << std::hex << (unsigned)opargs[i];
+        debug() << ")\n";
+        /* check ID is valid */
+        auto it = state->handle_map.find(hid);
+        if(it == state->handle_map.end())
+        {
+            debug() << "[net::srv::cmd] unknown handle ID\n";
+            debug() << "[net::srv::cmd] <-- COP (error)\n";
+            return error::ERROR;
+        }
+        /* exec */
+        if(send_size > 0)
+            send_data = new uint8_t[send_size];
+        error err = it->second->cop_op(op, opargs, recv_data, recv_size, send_data, &send_size);
+        if(err != error::SUCCESS)
+        {
+            delete[] send_data;
+            debug() << "[net::srv::cmd] cop failed: " << error_string(err) << "\n";
+            debug() << "[net::srv::cmd] <-- COP (error)\n";
+            return err;
+        }
+        debug() << "[net::srv::cmd] <-- COP\n";
         return error::SUCCESS;
     }
     else
