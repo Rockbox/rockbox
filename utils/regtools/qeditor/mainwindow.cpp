@@ -115,6 +115,7 @@ MainWindow::MainWindow(Backend *backend)
         tr("&Soc Description"), this);
     QAction *quit_act = new QAction(YIconManager::Get()->GetIcon(YIconManager::ApplicationExit),
         tr("&Quit"), this);
+    quit_act->setShortcuts(QKeySequence::Quit);
     QAction *about_act = new QAction(YIconManager::Get()->GetIcon(YIconManager::HelpAbout),
         tr("&About"), this);
     QAction *about_qt_act = new QAction(YIconManager::Get()->GetIcon(YIconManager::HelpAbout),
