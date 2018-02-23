@@ -438,14 +438,25 @@ void context::delayed_init()
         return;
     }
     /* check the server is running the same version */
-    debug() << "[net::ctx] <-- HELLO " << ((args[0] & 0xff00) >> 8) << "." << (args[0] & 0xff) << "";
-    if(args[0] != (HWSTUB_VERSION_MAJOR << 8 | HWSTUB_VERSION_MINOR))
+    int serv_maj = (args[0] >> 8) & 0xff;
+    int serv_min = args[0] & 0xff;
+    debug() << "[net::ctx] <-- HELLO " << serv_maj << "." << serv_min << "";
+
+    m_ver = hwstub_ver(serv_maj, serv_min);
+    /* Major mismatch -> error */
+    if(serv_maj != HWSTUB_VERSION_MAJOR)
     {
-        debug() << " (mismatch)\n";
+        debug() << " (major version mismatch)\n";
         m_state = state::DEAD;
         m_error = error::SERVER_MISMATCH;
     }
-    debug() << " (good)\n";
+    else
+        debug() << " (good)\n";
+    /* Minor mismatch -> warning */
+    if(serv_min < HWSTUB_VERSION_MINOR)
+        debug() << "[net::ctx] Some operations might not be supported by the server.\n";
+    else if(serv_min > HWSTUB_VERSION_MINOR)
+        debug() << "[net::ctx] Some operations might not be supported by this client.\n";
     /* good, we can now send commands */
     m_state = state::IDLE;
 }
@@ -1002,16 +1013,22 @@ error server::handle_cmd(client_state *state, uint32_t cmd, uint32_t args[HWSTUB
     /* HELLO */
     if(cmd == HWSERVER_HELLO)
     {
-        debug() << "[net::srv::cmd] --> HELLO " << ((args[0] & 0xff00) >> 8)
-            << "." << (args[0] & 0xff);
-        if(args[0] != (HWSTUB_VERSION_MAJOR << 8 | HWSTUB_VERSION_MINOR))
+        int cli_maj = (args[0] >> 8) & 0xff;
+        int cli_min = args[0] & 0xff;
+        debug() << "[net::srv::cmd] --> HELLO " << cli_maj << "." << cli_min;
+        if(cli_maj != HWSTUB_VERSION_MAJOR)
         {
-            debug() << " (mismatch)\n";
+            debug() << " (major version mismatch)\n";
             return error::ERROR;
         }
         debug() << " (good)\n";
         debug() << "[net::srv::cmd] <-- HELLO " << HWSTUB_VERSION_MAJOR << "."
             << HWSTUB_VERSION_MINOR << "\n";
+        /* Minor mismatch -> warning */
+        if(cli_min < HWSTUB_VERSION_MINOR)
+            debug() << "[net::ctx] Some operations might not be supported by the client.\n";
+        else if(cli_min > HWSTUB_VERSION_MINOR)
+            debug() << "[net::ctx] Some operations might not be supported by this server.\n";
         /* send HELLO with our version */
         args[0] = HWSTUB_VERSION_MAJOR << 8 | HWSTUB_VERSION_MINOR;
         return error::SUCCESS;

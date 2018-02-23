@@ -113,6 +113,7 @@ protected:
     virtual void destroy_device_list(void *ptr);
     virtual error create_device(ctx_dev_t dev, std::shared_ptr<hwstub::device>& hwdev);
     virtual bool match_device(ctx_dev_t dev, std::shared_ptr<hwstub::device> hwdev);
+    static inline int hwstub_ver(int major, int minor) { return major * 100 + minor; }
 
     enum class state
     {
@@ -123,6 +124,7 @@ protected:
 
     state m_state; /* client state */
     error m_error; /* error state for DEAD */
+    int m_ver; /* Server revision (uses hwstub_ver()) */
 };
 
 /** Socket based net context
