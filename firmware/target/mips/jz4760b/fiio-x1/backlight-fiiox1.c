@@ -27,6 +27,11 @@
 /* there are two versions of the backlight hardware, they use different pins */
 static int backlight_type;
 
+int fiiox1_get_backlight_type(void)
+{
+    return backlight_type;
+}
+
 bool backlight_hw_init(void)
 {
     /* use PA29 to detect backlight type: GPIO out, no pullup, set to 1 to see if there is a pulldown */

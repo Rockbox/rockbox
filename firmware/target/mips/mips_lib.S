@@ -51,7 +51,9 @@
 .endm
 
 
-/* disable interrupts */
+/* disable interrupts
+ *
+ * clobbers: t0 */
 .macro disable_interrupts
 #if MIPS32_RELEASE >= 2
     di
@@ -74,7 +76,9 @@
 
 /* initialize the MMU to a know state
  * WARNING: on some CPUs like XBurst, initializing the TLB in the reverse order (entry 31 to 0)
- * cause a TLB shutdown... */
+ * cause a TLB shutdown...
+ *
+ * clobbers: t0-t3 */
 .macro mmu_init
     mfc0    t0, C0_Config1
     ext     t3, t0, 25, 6      # extract number of TLB entries
@@ -98,7 +102,9 @@
 
 /* map some range of addresses using wired entries of the MMU, this macro assumes all parameters
  * are constants, this allows to unroll the loop; it also assumes virtual and physical addresses are
- * page aligned */
+ * page aligned
+ *
+ * clobbers: t0-t4 */
 .macro map_address  virtual, physical, length, cache_flags, pagesize
     mfc0    t0, C0_Wired       # get wired entry index
     li      t1, (((\pagesize << 1) - 1) & M_PageMaskMask)
@@ -135,7 +141,9 @@
     clear_hazard
 .endm
 
-/* save current address into a register */
+/* save current address into a register
+ *
+ * clobbers: ra */
 .macro save_cur_pc  reg
     bltzal  zero, 1f      /* ra = PC + 8, branch not taken */
     nop
@@ -143,7 +151,9 @@
     addiu   \reg, ra, -8          /* calc real load address account for branch delay slot */
 .endm
 
-/* invalidate icache */
+/* invalidate icache
+ *
+ * clobbers: t0-t1 */
 .macro invalidate_icache
     /* commit dcache and invalidate icache */
     la      t0, 0x80000000   /* an idx op should use an unmappable address */
@@ -154,7 +164,9 @@
     addiu   t0, t0, CACHEALIGN_SIZE  /* bytes per cache line */
 .endm
 
-/* writeback and discard icache */
+/* writeback and discard icache
+ *
+ * clobbers: t0-t1 */
 .macro writeback_dcache
     /* commit dcache and invalidate icache */
     la      t0, 0x80000000   /* an idx op should use an unmappable address */
@@ -167,38 +179,39 @@
 
 /* move a binary blob to another place, nop if binary is already at the right place,
  * this macro expects cur_addr to be a register and wanted_addr(_end) to be symbols, wanted_add
- * must be cache aligned */
-.macro copy_mem cur_addr, wanted_addr, wanted_addr_end
+ * must be cache aligned; since this macro copies in blocks of cache lines, it will overflow
+ * wanted_adr_end if it is not cache aligned
+ * this macro ensures that the icache is consistent, using the most efficient method available
+ * on the architecture
+ * NOTE: assumes a forward copy will do (may break if source and target overlap)
+ *
+ * clobbers: t0-t7, a0-a2 */
+.macro copy_code cur_addr, wanted_addr, wanted_addr_end
     move    a0, \cur_addr
     la      a1, \wanted_addr
     la      a2, \wanted_addr_end
-    beq     a0, a1, 3f  /* no relocation needed */
+    beq     a0, a1, 2f  /* no copy needed */
     nop
-    /* if wanted < cur, do a forward copy */
-    sltu    t0, a1, a0
-    bnez    t0, 2f
-    /* backward copy, adjust a0 to point at the end */
-    addu    a0, a2
-    subu    a0, a1
 1:
-    copy_cache_line a0, a2, -CACHEALIGN_SIZE
-    subu    a2, CACHEALIGN_SIZE
-    slt     t0, a1, a2
-    bnez    t0, 1b
-    subu    a0, CACHEALIGN_SIZE
-    b       3f
-    /* forward copy */
-2:
     copy_cache_line a0, a1, 0
+#if MIPS32_RELEASE >= 2
+    synci   0(a1)
+#endif
     addiu   a1, CACHEALIGN_SIZE
     slt     t0, a1, a2
-    bnez    t0, 2b
+    bnez    t0, 1b
     addiu   a0, CACHEALIGN_SIZE
-3:
+2:
+#if MIPS32_RELEASE < 2
+    /* on pre-MIPS32r2, the only way to ensure i-cache consistency is to flush*/
+    writeback_dcache
+    invalidate_icache
+#endif
 .endm
 
 /* copy an entire cache line from one address to another, which should be held in registers.
- * this macros uses all temporary registers as intermediates */
+ *
+ * clobbers: t0-t7 */
 .macro copy_cache_line from, to, offset
 #if CACHEALIGN_SIZE != 16 && CACHEALIGN_SIZE != 32
 #error the code below does not support this cache line size
@@ -230,7 +243,9 @@
 .endm
 
 /* clear a range of memory
- * this macro expects start/end_addr to be symbols */
+ * this macro expects start/end_addr to be symbols
+ *
+ * clobbers: a0-a1 */
 .macro clear_mem start_addr, end_addr
     la      a0, \start_addr
     la      a1, \end_addr
@@ -239,7 +254,7 @@
     /* clear 4 bytes at a time */
 1:
     sw      zero, (a0)
-    bne     a0, a1, 1f
+    bne     a0, a1, 1b
     addiu   a0, 4
 2:
 .endm
