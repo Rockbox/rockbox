@@ -139,7 +139,7 @@ void ClockAnalyser::FillTree()
 {
     m_tree_widget->clear();
     if(m_soc.get()->name == "imx233") FillTreeIMX233();
-    if(m_soc.get()->name == "stmp3700") FillTreeIMX233();
+    else if(m_soc.get()->name == "stmp3700") FillTreeIMX233();
     else if(m_soc.get()->name == "rk27xx") FillTreeRK27XX();
     else if(m_soc.get()->name == "atj213x") FillTreeATJ213X();
     else if(m_soc.get()->name == "jz4760b") FillTreeJZ4760B();
@@ -1216,9 +1216,14 @@ static TmplAnalyserFactory< EmiAnalyser > g_emi_factory(true, "EMI Analyser");
  * Pin analyser
  */
 
-namespace pin_desc
+namespace imx_pin_desc
 {
 #include "../../imxtools/misc/map.h"
+}
+
+namespace jz_pin_desc
+{
+#include "jz_pin_map.h"
 }
 
 PinAnalyser::PinAnalyser(const soc_desc::soc_ref_t& soc, IoBackend *backend)
@@ -1227,16 +1232,19 @@ PinAnalyser::PinAnalyser(const soc_desc::soc_ref_t& soc, IoBackend *backend)
     m_group = new QGroupBox("Pin Analyser");
     QVBoxLayout *layout = new QVBoxLayout;
     m_group->setLayout(layout);
-    QLabel *label = new QLabel("Package:");
-    m_package_edit = new QLineEdit;
-    m_package_edit->setReadOnly(true);
-    m_package_edit->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    QHBoxLayout *hlayout = new QHBoxLayout;
-    hlayout->addStretch();
-    hlayout->addWidget(label);
-    hlayout->addWidget(m_package_edit);
-    hlayout->addStretch();
-    layout->addLayout(hlayout);
+    if(m_io_backend->GetSocName() == "imx233" || m_io_backend->GetSocName() == "stmp3700")
+    {
+        QLabel *label = new QLabel("Package:");
+        m_package_edit = new QLineEdit;
+        m_package_edit->setReadOnly(true);
+        m_package_edit->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+        QHBoxLayout *hlayout = new QHBoxLayout;
+        hlayout->addStretch();
+        hlayout->addWidget(label);
+        hlayout->addWidget(m_package_edit);
+        hlayout->addStretch();
+        layout->addLayout(hlayout);
+    }
     m_panel = new QToolBox;
     layout->addWidget(m_panel);
 
@@ -1255,15 +1263,142 @@ QWidget *PinAnalyser::GetWidget()
 
 bool PinAnalyser::SupportSoc(const QString& soc_name)
 {
-    return soc_name == "imx233" || soc_name == "stmp3700";
+    return soc_name == "imx233" || soc_name == "stmp3700" || soc_name == "jz4760b";
 }
 
 void PinAnalyser::FillList()
 {
-    soc_word_t value;
-
     while(m_panel->count() > 0)
         m_panel->removeItem(0);
+
+    if(m_soc.get()->name == "imx233") FillListIMX233();
+    if(m_soc.get()->name == "stmp3700") FillListIMX233();
+    else if(m_soc.get()->name == "jz4760b") FillListJZ4760B();
+}
+
+void PinAnalyser::FillListJZ4760B()
+{
+    jz_pin_desc::jz_soc_t *soc = &jz_pin_desc::jz4760b_soc;
+
+    QMap< unsigned, QColor > color_map;
+    color_map[JZ_PIN_GROUP_EPD] = QColor(255, 255, 64);
+    color_map[JZ_PIN_GROUP_I2C] = QColor(191, 191, 255);
+    color_map[JZ_PIN_GROUP_SCC] = QColor(238, 75, 21);
+    color_map[JZ_PIN_GROUP_PWM] = QColor(255, 236, 179);
+    color_map[JZ_PIN_GROUP_PCM] = QColor(174, 235, 63);
+    color_map[JZ_PIN_GROUP_DMA] = QColor(255, 112, 237);
+    color_map[JZ_PIN_GROUP_UART] = QColor(94, 255, 128);
+    color_map[JZ_PIN_GROUP_MSC] = QColor(168, 53, 14);
+    color_map[JZ_PIN_GROUP_NEMC] = QColor(255, 211, 147);
+    color_map[JZ_PIN_GROUP_OWI] = QColor(64, 97, 255);
+    color_map[JZ_PIN_GROUP_LCD] = QColor(124, 255, 255);
+    color_map[JZ_PIN_GROUP_AIC] = QColor(255, 158, 158);
+    color_map[JZ_PIN_GROUP_SSI] = QColor(222, 128, 255);
+    color_map[JZ_PIN_GROUP_PS2] = QColor(192, 191, 191);
+    color_map[JZ_PIN_GROUP_CIM] = QColor(0, 255, 0);
+    color_map[JZ_PIN_GROUP_BOOT] = QColor(255, 255, 255);
+    color_map[JZ_PIN_GROUP_TSSI] = QColor(255, 64, 255);
+    color_map[JZ_PIN_GROUP_GPS] = QColor(50, 50, 50);
+    color_map[JZ_PIN_GROUP_NONE] = QColor(255, 255, 255);
+    QColor gpio_color = QColor(171, 214, 230);
+
+    for(int bank = 0; bank < soc->nr_banks; bank++)
+    {
+        QTableWidget *table = new QTableWidget;
+        table->setColumnCount(7);
+        table->setHorizontalHeaderItem(0, new QTableWidgetItem("Pin"));
+        table->setHorizontalHeaderItem(1, new QTableWidgetItem("Function"));
+        table->setHorizontalHeaderItem(2, new QTableWidgetItem("Direction"));
+        table->setHorizontalHeaderItem(3, new QTableWidgetItem("Drive"));
+        table->setHorizontalHeaderItem(4, new QTableWidgetItem("Slew"));
+        table->setHorizontalHeaderItem(5, new QTableWidgetItem("Pull"));
+        table->setHorizontalHeaderItem(6, new QTableWidgetItem("Value"));
+        table->verticalHeader()->setVisible(false);
+        table->horizontalHeader()->setStretchLastSection(true);
+        m_panel->addItem(table, QString("Bank %1").arg((char)('A' + bank)));
+
+        jz_pin_desc::jz_bank_map_t *b = &soc->map[bank];
+        uint32_t in, out, mask, pull, function, select, dir, trigger, flag, drive[3], slew;
+        bool error = false;
+        if(!ReadRegisterOld("GPIO", QString("IN[%1]").arg(bank), in))
+            error = true;
+        if(!ReadRegisterOld("GPIO", QString("OUT[%1]").arg(bank), out))
+            error = true;
+        if(!ReadRegisterOld("GPIO", QString("MASK[%1]").arg(bank), mask))
+            error = true;
+        if(!ReadRegisterOld("GPIO", QString("PULL[%1]").arg(bank), pull))
+            error = true;
+        if(!ReadRegisterOld("GPIO", QString("FUNCTION[%1]").arg(bank), function))
+            error = true;
+        if(!ReadRegisterOld("GPIO", QString("SELECT[%1]").arg(bank), select))
+            error = true;
+        if(!ReadRegisterOld("GPIO", QString("FLG[%1]").arg(bank), flag))
+            error = true;
+        if(!ReadRegisterOld("GPIO", QString("DRIVE0[%1]").arg(bank), drive[0]))
+            error = true;
+        if(!ReadRegisterOld("GPIO", QString("DRIVE1[%1]").arg(bank), drive[1]))
+            error = true;
+        if(!ReadRegisterOld("GPIO", QString("DRIVE2[%1]").arg(bank), drive[2]))
+            error = true;
+        if(!ReadRegisterOld("GPIO", QString("SLEW[%1]").arg(bank), slew))
+            error = true;
+        if(!ReadRegisterOld("GPIO", QString("TRIGGER[%1]").arg(bank), trigger))
+            error = true;
+        if(!ReadRegisterOld("GPIO", QString("DIR[%1]").arg(bank), dir))
+            error = true;
+        if(error)
+            continue;
+
+        for(int pin = 0; pin < b->nr_pins; pin++)
+        {
+            uint32_t mask = 1 << pin;
+            /* add line */
+            int row = table->rowCount();
+            table->setRowCount(row + 1);
+            /* name */
+            table->setItem(row, 0, new QTableWidgetItem(QString("P%1%2")
+                .arg((char)('A' + bank)).arg(pin, 2, 10, QChar('0'))));
+            table->item(row, 0)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            /* function */
+            QString fn_name = "GPIO";
+            QColor col = gpio_color;
+            QString dir_str = "";
+            QString pull_str = (pull & mask) ? "Disabled" : "Enabled";
+            if(function & mask)
+            {
+                int fn = (select & mask ? 1 : 0) + (trigger & mask ? 2 : 0);
+                col = color_map[b->pins[pin].function[fn].group];
+                fn_name = b->pins[pin].function[fn].name;
+            }
+            else
+            {
+                dir_str = (dir & mask) ? "Output" : "Input";
+            }
+            table->setItem(row, 1, new QTableWidgetItem(fn_name));
+            table->item(row, 1)->setBackground(QBrush(col));
+            table->item(row, 1)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            /* direction */
+            table->setItem(row, 2, new QTableWidgetItem(dir_str));
+            table->item(row, 2)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            /* drive */
+            table->setItem(row, 3, new QTableWidgetItem(QString("")));
+            table->item(row, 3)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            /* slew rate */
+            table->setItem(row, 4, new QTableWidgetItem(QString("")));
+            table->item(row, 4)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            /* pull */
+            table->setItem(row, 5, new QTableWidgetItem(pull_str));
+            table->item(row, 5)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            /* input */
+            table->setItem(row, 6, new QTableWidgetItem(QString("%1").arg((in >> pin) & 1)));
+            table->item(row, 6)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+        }
+    }
+}
+
+void PinAnalyser::FillListIMX233()
+{
+    soc_word_t value;
 
     const char *package_type[8] =
     {
@@ -1282,11 +1417,11 @@ void PinAnalyser::FillList()
     }
     const char *package = package_type[value];
     m_package_edit->setText(package);
-    pin_desc::bank_map_t *map = NULL;
-    for(size_t i = 0; i < sizeof(pin_desc::socs) / sizeof(pin_desc::socs[0]); i++)
-        if(QString(pin_desc::socs[i].soc) == m_io_backend->GetSocName() && 
-                QString(pin_desc::socs[i].ver) == package)
-            map = pin_desc::socs[i].map;
+    imx_pin_desc::bank_map_t *map = NULL;
+    for(size_t i = 0; i < sizeof(imx_pin_desc::socs) / sizeof(imx_pin_desc::socs[0]); i++)
+        if(QString(imx_pin_desc::socs[i].soc) == m_io_backend->GetSocName() &&
+                QString(imx_pin_desc::socs[i].ver) == package)
+            map = imx_pin_desc::socs[i].map;
     if(map == NULL)
     {
         m_package_edit->setText(QString("%1 (no map available)").arg(package));

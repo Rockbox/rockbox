@@ -704,6 +704,9 @@ struct bank_map_t SOC(STMP3600,BGA169)[NR_BANKS] =
 #undef IO
 #undef DIS
 #undef RES
+#undef BANK
+#undef _STR
+#undef STR
 
 struct soc_t socs [] =
 {
@@ -712,5 +715,7 @@ struct soc_t socs [] =
     {"stmp3700", "lqfp100", SOC(STMP3700,LQFP100)},
     {"stmp3600", "bga169", SOC(STMP3600,BGA169)},
 };
+
+#undef SOC
 
 #define NR_SOCS (sizeof(socs) / sizeof(socs[0]))

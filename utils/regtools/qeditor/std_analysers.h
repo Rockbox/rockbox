@@ -143,6 +143,8 @@ public:
 
 private:
     void FillList();
+    void FillListIMX233();
+    void FillListJZ4760B();
 
 private:
     QGroupBox *m_group;
