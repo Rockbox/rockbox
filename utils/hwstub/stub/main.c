@@ -811,12 +811,13 @@ static void handle_class_req(struct usb_ctrlrequest *req)
  * 
  */
 
-void main(uint32_t arg)
+void main(uint32_t load_addr, uint32_t arg)
 {
     usb_buffer_size = oc_buffersize;
 
     logf("hwstub %d.%d.%d\n", HWSTUB_VERSION_MAJOR, HWSTUB_VERSION_MINOR,
          HWSTUB_VERSION_REV);
+    logf("load addr: 0x%08x\n", load_addr);
     logf("argument: 0x%08x\n", arg);
 
     target_init();

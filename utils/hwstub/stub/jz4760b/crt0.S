@@ -34,6 +34,7 @@ load_addr:
     addiu   v0, ra, -8          /* calc real load address
                                    account for branch delay slot */
     move    k0, v0              /* store starting location to give it to main */
+    move    k1, a0              /* remember argument passed to hwstub */
 
     la      t0, relocstart      /* relocate code if needed */
     la      t1, relocend
@@ -110,33 +111,9 @@ stack_setup:
     mtc0    t0, C0_EBASE
     /* jump to C code */
     la      t0, main
+    move    a1, k1
     jr      t0
     move    a0, k0
-
-die_blink:
-    /* die blinking */
-    la      a0, 0xb0010400
-    li      a1, 2
-    sw      a1, 0x48(a0) /* clear function (gpio or interrupt) */
-    sw      a1, 0x58(a0) /* clear select (gpio) */
-    sw      a1, 0x64(a0) /* set direction (out) */
-    sw      a1, 0x34(a0) /* set pull (disable) */
-    /* turn backlight on and off */
-    la      a0, 0xb0010414
-    li      a1, 2
-.blink_loop:
-    sw      a1, (a0)
-    la      v0, 10000000
-.wait:
-    bnez    v0, .wait
-    subu    v0, 1
-    sw      a1, 4(a0)
-    la      v0, 10000000
-.wait2:
-    bnez    v0, .wait2
-    subu    v0, 1
-    j       .blink_loop
-    nop
 
 /* restore_exception_jmp restores the context and returns from exception, it takes
  * as argument the type of exception */
