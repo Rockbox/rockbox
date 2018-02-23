@@ -84,7 +84,7 @@ static void sig_handler(int sig, siginfo_t *siginfo, void *context)
 
 void power_off(void)
 {
-    execl("/bin/poweroff", "/bin/poweroff", NULL);
+    system("/bin/poweroff");
 }
 
 void system_init(void)
@@ -109,7 +109,7 @@ void system_init(void)
 
 void system_reboot(void)
 {
-    execl("/bin/reboot", "/bin/reboot", NULL);
+    system("/bin/reboot");
 }
 
 void system_exception_wait(void)
