@@ -74,8 +74,8 @@ function FIIOX1.setup_fiio_lcd_pins()
     JZ.gpio.pin(4, 4).std_gpio_out(1)
     -- PC9: unknown
     JZ.gpio.pin(2, 9).std_gpio_out(0)
-    -- PC2: unknown
-    JZ.gpio.pin(2, 2).std_gpio_out(1)
+    -- PC18: unknown
+    JZ.gpio.pin(2, 18).std_gpio_out(1)
     -- PF0: unknown
     JZ.gpio.pin(5, 0).std_gpio_out(1)
 end
