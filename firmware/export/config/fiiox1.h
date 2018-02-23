@@ -28,10 +28,6 @@
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 
-/* define this if you have a light associated with the buttons */
-#define HAVE_BUTTON_LIGHT
-#define HAVE_BUTTONLIGHT_BRIGHTNESS
-
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 

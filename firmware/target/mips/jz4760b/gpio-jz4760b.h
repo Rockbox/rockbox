@@ -26,9 +26,11 @@
 #include "jz4760b.h"
 #include "jz4760b_regs.h"
 
+#if 0
 static inline void jz_gpio_set_drive(unsigned bank, unsigned pin, unsigned strength)
 {
 }
+#endif
 
 static inline void jz_gpio_set_output_mask(unsigned bank, unsigned mask, bool value)
 {
@@ -43,9 +45,14 @@ static inline void jz_gpio_set_output(unsigned bank, unsigned pin, bool value)
     jz_gpio_set_output_mask(bank, 1 << pin, value);
 }
 
+static inline unsigned jz_gpio_get_input_mask(unsigned bank, unsigned mask)
+{
+    return GPIO_IN(bank) & mask;
+}
+
 static inline bool jz_gpio_get_input(unsigned bank, unsigned pin)
 {
-    return (GPIO_IN(bank) >> pin) & 1;
+    return jz_gpio_get_input_mask(bank, 1 << pin);
 }
 
 #define __PIN_FUNCTION      (1 << 0)
@@ -105,6 +112,13 @@ static inline void jz_gpio_setup_std_out(unsigned bank, unsigned pin, bool outpu
     jz_gpio_set_function(bank, pin, PIN_GPIO_OUT);
     jz_gpio_enable_pullup(bank, pin, false);
     jz_gpio_set_output(bank, pin, output);
+}
+
+/* setup pin in standard gpio in configuration: PIN_GPIO_IN, no pullup */
+static inline void jz_gpio_setup_std_in(unsigned bank, unsigned pin)
+{
+    jz_gpio_set_function(bank, pin, PIN_GPIO_IN);
+    jz_gpio_enable_pullup(bank, pin, false);
 }
 
 #endif /* __GPIO_JZ4760B_H__ */

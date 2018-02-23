@@ -32,11 +32,13 @@
 
 static void UIRQ(void)
 {
+    die_hwstub(0x13370002);
     panicf("Unhandled interrupt occurred");
 }
 
 void intr_handler(void)
 {
+    die_hwstub(0x13370001);
     while(1) {}
 }
 
@@ -73,11 +75,13 @@ static char* parse_exception(unsigned int cause)
 
 void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
 {
+    die_hwstub(0x13370003);
     panicf("Exception occurred: %s [0x%08x] at 0x%08x (stack at 0x%08x)", parse_exception(cause), read_c0_badvaddr(), epc, (unsigned int)stack_ptr);
 }
 
 void tlb_refill_handler(void)
 {
+    die_hwstub(0x13370004);
     panicf("TLB refill handler at 0x%08lx! [0x%x]", read_c0_epc(), read_c0_badvaddr());
 }
 
@@ -120,17 +124,6 @@ void system_exception_wait(void)
 void power_off(void)
 {
     while(1) {}
-}
-
-/* memory init, called very early at boot */
-void memory_init(void)
-{
-    /* reset mmu to a known state */
-    mmu_init();
-    /* ungated AHB1 so that TCSM0 access work through physical address */
-    CPM_CLKGATE1 &= ~CPM_CLKGATE1_AHB1;
-    /* map TCSM0 after DRAM (see jz4760b.h for explanation) */
-    map_address(IRAM_ORIG, PHYSICAL_IRAM_ADDR, IRAM_SIZE, K_CacheAttrU);
 }
 
 void system_init(void)

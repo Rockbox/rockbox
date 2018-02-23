@@ -24,25 +24,68 @@
 #include "system.h"
 #include "backlight.h"
 #include "lcd.h"
+#include "gpio-jz4760b.h"
+#include "button.h"
+#include "system-fiiox1.h"
 
 void main(void) NORETURN_ATTR;
 void main(void)
 {
     system_init();
     backlight_init();
-#if 1
+    button_init_device();
+
+    bool en_led = false;
+    int last_btn = 0;
+    int bl_lvl = DEFAULT_BRIGHTNESS_SETTING;
+    fiiox1_enable_blue_led(en_led);
     lcd_init();
-    //lcd_clear_display();
-    //lcd_puts(0, 0, "Hello");
-    //lcd_update();
-#endif
-#if 1
-    for(int i = 0; i <= 16; i++)
+    while(1)
     {
-        backlight_hw_brightness(i);
-        mdelay(500);
+        int btn = button_read_device();
+#define BUTTON_RELEASED(button) (last_btn & button) && !(btn & button)
+        if(BUTTON_RELEASED(BUTTON_SELECT))
+        {
+            en_led = !en_led;
+            fiiox1_enable_blue_led(en_led);
+        }
+        if(BUTTON_RELEASED(BUTTON_VOL_UP) && bl_lvl < MAX_BRIGHTNESS_SETTING)
+        {
+            backlight_hw_brightness(++bl_lvl);
+        }
+        if(BUTTON_RELEASED(BUTTON_VOL_DOWN) && bl_lvl > MIN_BRIGHTNESS_SETTING)
+        {
+            backlight_hw_brightness(--bl_lvl);
+        }
+        last_btn = btn;
+
+        lcd_clear_display();
+        int line = 0;
+        lcd_puts(0, line++, "Hello world");
+        lcd_putsf(0, line++, "Hardware V%d", fiiox1_get_hw_version());
+        lcd_putsf(0, line++, "Backlight type: %d", fiiox1_get_backlight_type());
+        for(int i = 0; i < 6; i++)
+            lcd_putsf(0, line++, "P%c=%08x", 'A' + i, jz_gpio_get_input_mask(i, 0xffffffff));
+        char buf[64];
+        buf[0] = 0;
+        if(btn & BUTTON_POWER) strcat(buf, " power");
+        if(btn & BUTTON_LEFT) strcat(buf, " left");
+        if(btn & BUTTON_RIGHT) strcat(buf, " right");
+        if(btn & BUTTON_MENU) strcat(buf, " menu");
+        if(btn & BUTTON_BACK) strcat(buf, " back");
+        if(btn & BUTTON_VOL_DOWN) strcat(buf, " vol-");
+        if(btn & BUTTON_VOL_UP) strcat(buf, " vol+");
+        if(btn & BUTTON_SELECT) strcat(buf, " select");
+        lcd_putsf(0, line++, "Buttons:%s", buf);
+        //lcd_putsf(0, line++, "Charging: %d", !jz_gpio_get_input(1, 13));
+        lcd_putsf(0, line++, "USB: %d", jz_gpio_get_input(5, 10));
+        lcd_putsf(0, line++, "LED: %d", en_led);
+        lcd_putsf(0, line++, "Brightness: %d", bl_lvl);
+        lcd_putsf(0, line++, "");
+        lcd_putsf(0, line++, "Press select to switch LED.");
+        lcd_putsf(0, line++, "Press vol-/+ to change backlight");
+        lcd_update();
     }
-#endif
     /* never returns */
     while(1) {}
 }

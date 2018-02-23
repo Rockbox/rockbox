@@ -26,119 +26,6 @@
 
 #include "mips_lib.S"
 
-/* Boot overview:
- *
- * We assume the cache is already configured and flushed. We start
- * with some basic mips init and then relocate the image in memory if necessary.
- * We then put the iram image at the right place, flush all caches, clear bss,
- * munge the stack and jump to C code.
- */
-
- #if 0
-.section .init.text
-.set mips32
-.set noreorder
-.set noat
-.global _start
-_start:
-    bltzal zero, load_addr      /* ra = PC + 8, branch not taken */
-    nop
-load_addr:
-    addiu   v0, ra, -8          /* calc real load address account for branch delay slot */
-
-    /* unmask all hardware interrupt sources, but disable interrupts globally */
-    li      t0, (0xfc << S_StatusIM)
-    mtc0    t0, C0_STATUS
-
-    /* use the special interrupt vector */
-    li      t0, M_CauseIV
-    mtc0    t0, C0_CAUSE
-
-    /* relocate if necessary */
-    la      t0, _relocstart
-    la      t1, _relocend
-    beq     t0, v0, real_start  /* no relocation needed */
-    nop
-reloc_loop:
-    lw     t3, 0(v0)            /* v0 is source */
-    addiu  v0, 4
-    addiu  t0, 4
-    bne    t0, t1, reloc_loop
-    sw     t3, -4(t0)
-
-    /* commit dcache and invalidate icache */
-    bal     flush_caches
-    nop
-
-    /* jump to real start address */
-    la      t0, real_start
-    jr      t0
-    nop
-
-real_start:
-    /* setup memory
-     * NOTE: since the final memory layout is not available, we need a different
-     * stack address that is valid */
-    la      sp, crt0_tmpstack_phys
-    bal     memory_init
-    nop
-
-    /* copy iram image to the right place */
-    la     t0, _iramcopy
-    la     t1, _iramstart
-    la     t2, _iramend
-iram_loop:
-    lw     t3, 0(t0)
-    addiu  t1, 4
-    addiu  t0, 4
-    bne    t1, t2, iram_loop
-    sw     t3, -4(t1)
-
-    /* clear bss */
-    la     t0, _edata
-    la     t1, _end
-bss_loop:
-    addiu  t0, 4
-    bne    t0, t1, bss_loop
-    sw     zero, -4(t0)
-
-    /* munge the stack */
-    la      sp, stackend
-    la      t0, stackbegin
-    li      t2, 0xdeadbeef
-stack_loop:
-    addiu   t0, 4
-    bne     t0, sp, stack_loop
-    sw      t2, -4(t0)
-
-    /* commit dcache and invalidate icache (because of iram) */
-    jal     flush_caches
-    nop
-
-    /* jump to C code */
-    j       main
-    nop
-
-/* commit and discard dcache, discard icache */
-flush_caches:
-    la      t0, 0x80000000   /* an idx op should use an unmappable address */
-    ori     t1, t0, 0x4000   /* 16kB cache */
-dcache_loop:
-    cache   DCIndexWBInv, 0(t0) /* invalidate and write-back dcache index */
-    addiu   t0, t0, 0x20     /* 32 bytes per cache line */
-    bne     t0, t1, dcache_loop
-    nop
-    la      t0, 0x80000000   /* an idx op should use an unmappable address */
-    ori     t1, t0, 0x4000   /* 16kB cache */
-icache_loop:
-    cache   ICIndexInv, 0(t0) /* invalidate icache index */
-    addiu   t0, t0, 0x20     /* 32 bytes per cache line */
-    bne     t0, t1, icache_loop
-    nop
-    /* return */
-    jr      ra
-    nop
-#else
 /* This code expects to be run either in K0 or K1, but preferrably in K0 because relocations address
  * is in K0 so running from K1 will incur a relocation penalty. Thus we also assumes that the
  * cache is initialized, which is alsways the case because it is done with the IPL and SPL */
@@ -148,12 +35,7 @@ icache_loop:
 .set noat
 .global _start
 _start:
-    /* save return address */
-    move    k1, ra
-    /* save load address */
-here:
     save_cur_pc k0
-    addiu   k0, k0, (_start - here)
     /* disable all interrupts */
     disable_interrupts
 enable_big_pages_mode:
@@ -168,20 +50,17 @@ map_dram:
     map_address DRAM_ORIG, PHYSICAL_DRAM_ADDR, DRAM_SIZE, K_CacheAttrCN, (16 * 1024 * 1024)
 relocate:
     /* relocate binary, note that addresses are in K0 */
-    copy_mem    k0, _relocstart, _relocend
-flush_cache:
-    /* flush caches */
-    writeback_dcache
-    invalidate_icache
+    copy_code   k0, _relocstart, _relocend
+copy_iram:
+    /* copy iram content to its correct location
+     * NOTE: it works because _iram{copy,end} are in k0, not in k2*/
+    la      t0, _iramcopy
+    copy_code   t0, _iramstart, _iramend
     /* jump to real start address */
     la      t0, real_start
     jr      t0
     nop
 real_start:
-iram_copy:
-    /* copy iram content to its correct location */
-    la          t0, IRAM_ORIG
-    copy_mem    t0, _iramcopy, _iramend
 bss_clear:
     /* clear BSS */
     clear_mem   _edata, _end
@@ -198,7 +77,11 @@ call_main:
     /* return */
     j       main
     nop
-#endif
+
+.section .text.hwstub
+.global die_hwstub
+die_hwstub:
+.incbin "/home/pamaury/project/rockbox/myrockbox/utils/hwstub/stub/jz4760b/build/hwstub.bin"
 
 /*
  * 0x0   - Simple TLB refill handler
