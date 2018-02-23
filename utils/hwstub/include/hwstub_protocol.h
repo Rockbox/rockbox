@@ -33,7 +33,7 @@
  */
 
 #define HWSTUB_VERSION_MAJOR    4
-#define HWSTUB_VERSION_MINOR    4
+#define HWSTUB_VERSION_MINOR    5
 
 #define HWSTUB_VERSION__(maj, min) #maj"."#min
 #define HWSTUB_VERSION_(maj, min) HWSTUB_VERSION__(maj, min)
@@ -190,6 +190,7 @@ struct hwstub_net_hdr_t
 #define HWSERVER_READ               0x407
 #define HWSERVER_WRITE              0x408
 #define HWSERVER_EXEC               0x409
+#define HWSERVER_COP                0x410
 
 /* net errors (always in arg[0] if command is NACKed) */
 #define HWERR_OK            0    /* success */
@@ -365,6 +366,14 @@ struct hwstub_cop_req_t
  * Execute code.
  * Send: args[0] = handle ID, args[1] = addr, args[2] = flags, no data
  * Receive: no data
+ */
+
+/**
+ * HWSERVER_COP
+ * Execute a coprocessor operation
+ * Send: args[0] = handle ID, args[1] = op, args[2] = arg size in bytes, args[3] = requested size,
+ *       data = {cop args, write data}
+ * Receive: read data
  */
 
 #endif /* __HWSTUB_PROTOCOL__ */
