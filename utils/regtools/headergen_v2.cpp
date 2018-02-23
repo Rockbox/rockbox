@@ -2090,10 +2090,11 @@ class jz_generator : public simple_generator
     virtual std::string macro_field_mask(const std::string& block_name, const std::string& reg_name,
         const std::string& field_name, field_ref_t field) const
     {
-        // generate a mask only if this is a 1-bit field
+        // for 1-bit field, just use the field name, otherwise add "_bm"
+        std::string field_mask = block_name + "_" + reg_name + "_" + field_name;
         if(field.get()->width != 1)
-            return "";
-        return block_name + "_" + reg_name + "_" + field_name;
+            field_mask += "_bm";
+        return field_mask;
     }
 
     virtual std::string macro_field_form(const std::string& block_name, const std::string& reg_name,
