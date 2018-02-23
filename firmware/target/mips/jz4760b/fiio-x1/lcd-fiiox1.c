@@ -28,11 +28,19 @@
 
 /* the OF bootloader initializes the LCD for us so we do not generalise run a full setup sequence
  * but we keep the code there for reference or in case it is needed */
-//#define FULL_INIT
+#define FULL_INIT
 
 #ifdef HAVE_LCD_ENABLE
 bool lcd_on;
 #endif
+
+static inline void slcd_set_data_width(unsigned width)
+{
+    uint16_t mcfg = SLCD_MCFG;
+    mcfg &= ~SLCD_MCFG_DATA_WIDTH_bm;
+    mcfg |= SLCD_MCFG_DATA_WIDTH(width);
+    SLCD_MCFG = mcfg;
+}
 
 static inline void lcd_wait_ready(void)
 {
@@ -42,14 +50,20 @@ static inline void lcd_wait_ready(void)
 static void lcd_send_cmd(unsigned cmd)
 {
     lcd_wait_ready();
+    SLCD_MDATA = cmd | SLCD_MDATA_RS;
+#if 0
+    /* out of interest, this the sequence used by the OF (assuming PC18 is setup as gpio */
+    lcd_wait_ready();
     /* for some reason the firmware not only sets RS in MDATA but also sets PC2 which is lcd_b2
      * and corresponds to slcd_d0, which does not make much sense */
-    jz_gpio_set_output(2, 2, false); /* PC2 low */
+    jz_gpio_set_output(2, 18, false); /* PC2 low */
     SLCD_MDATA = cmd | SLCD_MDATA_RS;
     lcd_wait_ready();
-    jz_gpio_set_output(2, 2, true); /* PC2 high */
+    jz_gpio_set_output(2, 18, true); /* PC2 high */
+#endif
 }
 
+/* warning: sends data using whatever width is specified in MCFG! */
 static void lcd_send_data(unsigned data)
 {
     lcd_wait_ready();
@@ -61,8 +75,8 @@ static void lcd_send_data(unsigned data)
 #define END     0xff
 
 /* format: (<cmd> <data size> <data0> <dataN>)+ */
-/* Seems somewhat compatible with ILI9163 and ILI9342 */
-static INIT_ATTR uint8_t init_seq_v1[] =
+/* controller is S6D0171, seems somewhat compatible with ILI9163 and ILI9342 */
+static uint8_t init_seq_v1[] =
 {
 /*  cmd  sz  data... */
     0x01, 0, /* Gamma Set */
@@ -109,8 +123,33 @@ static INIT_ATTR uint8_t init_seq_v1[] =
     END
 };
 
+/* format: (<cmd> <data size> <data0> <dataN>)+ */
+/* controller is ILI9342C (warning: not the same as ILI9342) */
+static uint8_t init_seq_v2[] =
+{
+/*  cmd  sz  data... */
+    0xc8, 3, 0xff, 0x93, 0x42, /* Set EXTC: turn on external commands */
+    0x36, 1, 0xd8, /* Memory Access Control: BGR, MX, MY, ML */
+    0x3a, 1, 0x66, /* Set Pixel Format: RGB=MCU=18 bits/pix */
+    0xc0, 2, 0x15, 0x15, /* Power Control 1 */
+    0xc1, 1, 0x01, /* Power Control 2 */
+    0xc5, 1, 0xda, /* VCOM Control 1 */
+    0xb1, 2, 0x00, 0x1b, /* Frame Rate Control: DIVA=0, RTNA=27 => frate = 63Hz*/
+    0xb4, 1, 0x02, /* Display Inversion Control: 2-dot inversion */
+    0xe0, 15, 0x0f, 0x13, 0x17, 0x04, 0x13, 0x07, 0x40, 0x39,
+              0x4f, 0x06, 0x0d, 0x0a, 0x1f, 0x22, 0x00, /* Positive Gamma Correction */
+    0xe1, 15, 0x00, 0x21, 0x24, 0x03, 0x0f, 0x05, 0x38, 0x32,
+              0x49, 0x00, 0x09, 0x08, 0x32, 0x35, 0x0f, /* Negative Gamma Correction */
+    0x11, 0, /* Sleep Out */
+    WAIT, 120, /* wait 120ms */
+    0x29, 0, /* Display On */
+    END
+};
+
 static INIT_ATTR void lcd_send_seq(uint8_t *seq)
 {
+    /* make sure to use 8-bit data per transfer */
+    slcd_set_data_width(SLCD_MCFG_DATA_WIDTH_8BIT_x1);
     while(seq[0] != END)
     {
         if(seq[0] == WAIT)
@@ -122,7 +161,7 @@ static INIT_ATTR void lcd_send_seq(uint8_t *seq)
         {
             lcd_send_cmd(seq[0]);
             for(unsigned i = 0; i < seq[1]; i++)
-                lcd_send_data(i + 2);
+                lcd_send_data(seq[i + 2]);
             seq += 2 + seq[1];
         }
     }
@@ -132,6 +171,9 @@ static INIT_ATTR void lcd_send_seq(uint8_t *seq)
 /* LCD init */
 void INIT_ATTR lcd_init_device(void)
 {
+    /* make sure DMA mode is disabled */
+    SLCD_MCTRL &= ~SLCD_MCTRL_DMA_EN;
+    lcd_wait_ready();
 #ifdef FULL_INIT
     /* PC[27:22,19:12,9:2] => lcd_{b2-b7, pclk, de, g2-g7, vsync, hsync, r2-r7}, all use function 0
      * note that in SLCD mode, we have the following mapping:
@@ -151,13 +193,20 @@ void INIT_ATTR lcd_init_device(void)
     jz_gpio_set_output(4, 4, true);
     mdelay(150);
 
-    /* PC9 and PC2, unure what they do but PC2 is used for command select it seems */
-    jz_gpio_setup_std_out(3, 9, false);
-    jz_gpio_setup_std_out(3, 2, true);
+    /* the purpose of PC9 is unclear */
+    jz_gpio_setup_std_out(2, 9, false);
 
     if(fiiox1_get_hw_version() == 1)
         lcd_send_seq(init_seq_v1);
+    else
+        lcd_send_seq(init_seq_v2);
 #endif
+    /* for some reason, the OF drives slcd_rs manually, revert that and let the LCDC do the job */
+    jz_gpio_set_function(2, 18, PIN_FUN(0));
+    /* change LCD settings: switch to 16-bit per pixel */
+    slcd_set_data_width(SLCD_MCFG_DATA_WIDTH_8BIT_x1);
+    lcd_send_cmd(0x3a);
+    lcd_send_data(0x55);
 }
 
 void lcd_update(void)
@@ -171,6 +220,7 @@ void lcd_update_rect(int x, int y, int w, int h)
     if(!lcd_on)
         return;
 #endif
+    slcd_set_data_width(SLCD_MCFG_DATA_WIDTH_8BIT_x1);
     lcd_send_cmd(0x2a);
     lcd_send_data(x >> 8);
     lcd_send_data(x & 0xff);
@@ -183,14 +233,10 @@ void lcd_update_rect(int x, int y, int w, int h)
     lcd_send_data((y + h - 1) & 0xff);
 
     lcd_send_cmd(0x2c);
+    slcd_set_data_width(SLCD_MCFG_DATA_WIDTH_8BIT_x2);
     for(int yy = 0; yy < h; yy++)
         for(int xx = 0; xx < w; xx++)
-        {
-            unsigned pix = *FBADDR(x + xx, y + yy);
-            lcd_send_data(pix >> 16);
-            lcd_send_data((pix >> 8) & 0xff);
-            lcd_send_data(pix & 0xff);
-        }
+            lcd_send_data(*FBADDR(x + xx, y + yy));
 }
 
 #ifdef HAVE_LCD_ENABLE

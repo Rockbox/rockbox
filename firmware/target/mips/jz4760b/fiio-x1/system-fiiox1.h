@@ -21,6 +21,8 @@
 #ifndef _SYSTEM_FIIOX1_H_
 #define _SYSTEM_FIIOX1_H_
 
+int fiiox1_get_backlight_type(void);
 int fiiox1_get_hw_version(void);
+void fiiox1_enable_blue_led(bool en);
 
 #endif /* _SYSTEM_FIIOX1_H_ */

@@ -24,19 +24,46 @@
 #include "system.h"
 #include "backlight.h"
 #include "lcd.h"
+#include "gpio-jz4760b.h"
+#include "button.h"
+#include "system-fiiox1.h"
 
 void main(void) NORETURN_ATTR;
 void main(void)
 {
     system_init();
     backlight_init();
+    button_init_device();
 #if 1
+    fiiox1_enable_blue_led(true);
     lcd_init();
-    //lcd_clear_display();
-    //lcd_puts(0, 0, "Hello");
-    //lcd_update();
+    while(1)
+    {
+        lcd_clear_display();
+        int line = 0;
+        lcd_puts(0, line++, "Hello world");
+        lcd_putsf(0, line++, "Hardware V%d", fiiox1_get_hw_version());
+        lcd_putsf(0, line++, "Backlight type: %d", fiiox1_get_backlight_type());
+        for(int i = 0; i < 6; i++)
+            lcd_putsf(0, line++, "P%c=%08x", 'A' + i, jz_gpio_get_input_mask(i, 0xffffffff));
+        int btn = button_read_device();
+        char buf[64];
+        buf[0] = 0;
+        if(btn & BUTTON_POWER) strcat(buf, " power");
+        if(btn & BUTTON_LEFT) strcat(buf, " left");
+        if(btn & BUTTON_RIGHT) strcat(buf, " right");
+        if(btn & BUTTON_MENU) strcat(buf, " menu");
+        if(btn & BUTTON_BACK) strcat(buf, " back");
+        if(btn & BUTTON_VOL_DOWN) strcat(buf, " vol-");
+        if(btn & BUTTON_VOL_UP) strcat(buf, " vol+");
+        if(btn & BUTTON_SELECT) strcat(buf, " select");
+        lcd_putsf(0, line++, "Buttons:%s", buf);
+        //lcd_putsf(0, line++, "Charging: %d", !jz_gpio_get_input(1, 13));
+        lcd_putsf(0, line++, "USB: %d", jz_gpio_get_input(5, 10));
+        lcd_update();
+    }
 #endif
-#if 1
+#if 0
     for(int i = 0; i <= 16; i++)
     {
         backlight_hw_brightness(i);

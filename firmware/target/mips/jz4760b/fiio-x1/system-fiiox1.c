@@ -34,4 +34,10 @@ int fiiox1_get_hw_version(void)
     else
         hw_ver = 2;
     jz_gpio_set_output(0, 28, false);
+    return hw_ver;
+}
+
+void fiiox1_enable_blue_led(bool en)
+{
+    jz_gpio_setup_std_out(1, 16, en); /* PB16 */
 }
