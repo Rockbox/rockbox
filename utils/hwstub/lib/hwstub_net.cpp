@@ -392,7 +392,7 @@ error context::send_cmd(uint32_t cmd, uint32_t args[HWSTUB_NET_ARGS], uint8_t *s
         }
     }
     /* copy data if user want it */
-    if(recv_data)
+    if(recv_data && recv_size)
     {
         if(*recv_data == nullptr)
         {
@@ -1246,7 +1246,6 @@ error server::handle_cmd(client_state *state, uint32_t cmd, uint32_t args[HWSTUB
         error err = it->second->write(addr, recv_data, recv_size, !!(flags & HWSERVER_RW_ATOMIC));
         if(err != error::SUCCESS)
         {
-            delete[] send_data;
             debug() << "[net::srv::cmd] cannot write: " << error_string(err) << "\n";
             debug() << "[net::srv::cmd] <-- WRITE (error)\n";
             return err;
