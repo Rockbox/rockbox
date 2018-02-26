@@ -1,0 +1,46 @@
+Steps needed to patch update.upt with rockbox bootloader are explained in
+bootloader_install.sh shell script. Process is quite involved and some
+custom tools are needed.
+
+
+For convenience Dockerfile is provided which prepares custom image based
+on debian 9 which has all the tools needed to work with Agptek Rocker update
+images.
+
+Basically image extends standard debian image by:
+1) Installing developer packages from stock debian
+2) Cloning https://github.com/wodz/rockbox-wodz.git
+3) Building custom cross toolchain
+4) Cloning and installing tools to work with UBIFS
+
+You first need to build image with:
+docker build . -t "agptek-dev"
+
+Then you can start container and work with update.upt.
+If you want to generate patched update image in automatic way:
+docker run --rm -it -v /path/to/dir/with/update.upt:/upt \
+-e UPT_DIR=/upt agptek-dev bootloader_install.sh
+
+Patched update.upt with rockbox bootloader and rockbox.zip should end up in
+specified directory.
+
+If you want to play around, hack something etc. you can run container in
+interactive mode:
+docker run -it -v /path/to/dir/with/update.upt:/upt \
+-e UPT_DIR=/upt agptek-dev bash
+
+
+Files in this directory:
+README - this file
+bootloader_install.sh - shell script documenting process of patching
+                        agptek rocker update images
+
+update_update.py      - little helper utility to patch update.txt
+                        controll file
+
+hiby_player.sh        - shell script called on player boot which
+                        originally started music player application
+                        and now it starts bootloader
+
+Dockerfile            - file to build docker image with all needed
+                        tools to play with agptek rocker files
