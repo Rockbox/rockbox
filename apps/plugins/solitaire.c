@@ -647,6 +647,23 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define HK_CUR2STACK  "Option+Left"
 #define HK_REM2STACK  "Option+Right"
 
+#elif (CONFIG_KEYPAD == AGPTEK_ROCKER_PAD)
+#define SOL_QUIT      BUTTON_POWER
+#define SOL_UP        BUTTON_UP
+#define SOL_DOWN      BUTTON_DOWN
+#define SOL_LEFT      BUTTON_LEFT
+#define SOL_RIGHT     BUTTON_RIGHT
+#define SOL_MOVE      BUTTON_SELECT
+#define SOL_DRAW      (BUTTON_VOLUP|BUTTON_UP)
+#define SOL_REM2CUR   (BUTTON_VOLUP|BUTTON_DOWN)
+#define SOL_CUR2STACK (BUTTON_VOLUP|BUTTON_LEFT)
+#define SOL_REM2STACK (BUTTON_VOLUP|BUTTON_RIGHT)
+#define HK_MOVE       "Select"
+#define HK_DRAW       "Option+Up"
+#define HK_REM2CUR    "Option+Down"
+#define HK_CUR2STACK  "Option+Left"
+#define HK_REM2STACK  "Option+Right"
+
 #elif (CONFIG_KEYPAD == CREATIVE_ZEN_PAD)
 #define SOL_QUIT      BUTTON_POWER
 #define SOL_UP        BUTTON_UP

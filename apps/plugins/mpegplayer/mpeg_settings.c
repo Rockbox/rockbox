@@ -295,6 +295,14 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_UP          BUTTON_VOL_UP
 #define MPEG_START_TIME_DOWN        BUTTON_VOL_DOWN
 
+#elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
+#define MPEG_START_TIME_SELECT      BUTTON_SELECT
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_UP          BUTTON_UP
+#define MPEG_START_TIME_DOWN        BUTTON_DOWN
+#define MPEG_START_TIME_EXIT        BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

@@ -282,6 +282,14 @@
 #define MIDI_VOL_UP     BUTTON_VOL_UP
 #define MIDI_VOL_DOWN   BUTTON_VOL_DOWN
 
+#elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
+#define MIDI_QUIT       BUTTON_POWER
+#define MIDI_FFWD       BUTTON_RIGHT
+#define MIDI_REWIND     BUTTON_LEFT
+#define MIDI_VOL_UP     BUTTON_VOLUP
+#define MIDI_VOL_DOWN   BUTTON_VOLDOWN
+#define MIDI_PLAYPAUSE  BUTTON_SELECT
+
 #else
 #error No keymap defined!
 #endif

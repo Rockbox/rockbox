@@ -427,6 +427,15 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define MPEG_PAUSE      BUTTON_PLAY
 #define MPEG_STOP       (BUTTON_PLAY|BUTTON_REPEAT)
 
+#elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
+#define MPEG_MENU       BUTTON_POWER
+#define MPEG_PAUSE      BUTTON_SELECT
+#define MPEG_STOP       BUTTON_DOWN
+#define MPEG_VOLDOWN    BUTTON_VOLDOWN
+#define MPEG_VOLUP      BUTTON_VOLUP
+#define MPEG_RW         BUTTON_LEFT
+#define MPEG_FF         BUTTON_RIGHT
+
 #else
 #error No keymap defined!
 #endif

@@ -343,6 +343,14 @@
 #define AST_RIGHT       BUTTON_PLAY
 #define AST_FIRE        BUTTON_RIGHT
 
+#elif (CONFIG_KEYPAD == AGPTEK_ROCKER_PAD)
+#define AST_QUIT        BUTTON_POWER
+#define AST_THRUST      BUTTON_UP
+#define AST_HYPERSPACE  BUTTON_VOLUP
+#define AST_LEFT        BUTTON_LEFT
+#define AST_RIGHT       BUTTON_RIGHT
+#define AST_FIRE        BUTTON_SELECT
+
 #else
 #error No keymap defined!
 #endif

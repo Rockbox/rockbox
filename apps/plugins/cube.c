@@ -400,6 +400,16 @@
 #define CUBE_DEC           BUTTON_VOL_DOWN
 #define CUBE_MODE          BUTTON_PLAY
 
+#elif (CONFIG_KEYPAD == AGPTEK_ROCKER_PAD)
+#define CUBE_QUIT          (BUTTON_POWER|BUTTON_REL)
+#define CUBE_NEXT          BUTTON_RIGHT
+#define CUBE_PREV          BUTTON_LEFT
+#define CUBE_INC           BUTTON_VOLUP
+#define CUBE_DEC           BUTTON_VOLDOWN
+#define CUBE_MODE          BUTTON_SELECT
+#define CUBE_HIGHSPEED     (BUTTON_SELECT | BUTTON_REPEAT)
+#define CUBE_PAUSE         (BUTTON_LEFT | BUTTON_REPEAT)
+
 #else
 #error No keymap defined!
 #endif

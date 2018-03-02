@@ -204,6 +204,11 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define ACTION     BUTTON_SELECT
 #define ACTIONTEXT "Select"
 
+#elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
+#define QUIT       BUTTON_POWER
+#define ACTION     BUTTON_SELECT
+#define ACTIONTEXT "Select"
+
 
 #elif !defined(HAVE_TOUCHSCREEN)
 #error No keymap defined!

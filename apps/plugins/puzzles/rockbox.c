@@ -169,7 +169,13 @@ static void zoom_drawpixel(int x, int y)
     if(x < zoom_clipl || x >= zoom_clipr)
         return;
 
-#if LCD_DEPTH == 24
+#if LCD_DEPTH > 24
+    unsigned int pix = rb->lcd_get_foreground();
+    zoom_fb[y * zoom_w + x].b = RGB_UNPACK_BLUE(pix);
+    zoom_fb[y * zoom_w + x].g = RGB_UNPACK_GREEN(pix);
+    zoom_fb[y * zoom_w + x].r = RGB_UNPACK_RED(pix);
+	zoom_fb[y * zoom_w + x].x = 255;
+#elif LCD_DEPTH == 24
     /* I hate these */
     unsigned int pix = rb->lcd_get_foreground();
     zoom_fb[y * zoom_w + x].b = RGB_UNPACK_BLUE(pix);
@@ -196,7 +202,13 @@ static void zoom_hline(int l, int r, int y)
     if(r >= zoom_clipr)
         r = zoom_clipr;
 
-#if LCD_DEPTH == 24
+#if LCD_DEPTH > 24
+    fb_data pixel = { RGB_UNPACK_BLUE(rb->lcd_get_foreground()),
+                      RGB_UNPACK_GREEN(rb->lcd_get_foreground()),
+                      RGB_UNPACK_RED(rb->lcd_get_foreground()),
+                      255
+	};
+#elif LCD_DEPTH == 24
     fb_data pixel = { RGB_UNPACK_BLUE(rb->lcd_get_foreground()),
                       RGB_UNPACK_GREEN(rb->lcd_get_foreground()),
                       RGB_UNPACK_RED(rb->lcd_get_foreground()) };
@@ -277,7 +289,12 @@ static void zoom_mono_bitmap(const unsigned char *bits, int x, int y, int w, int
             {
                 if(column & 1)
                 {
-#if LCD_DEPTH == 24
+#if LCD_DEPTH > 24
+                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].b = RGB_UNPACK_BLUE(pix);
+                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].g = RGB_UNPACK_GREEN(pix);
+                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].r = RGB_UNPACK_RED(pix);
+					zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].r = 255;
+#elif LCD_DEPTH == 24
                     zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].b = RGB_UNPACK_BLUE(pix);
                     zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].g = RGB_UNPACK_GREEN(pix);
                     zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].r = RGB_UNPACK_RED(pix);
@@ -634,7 +651,7 @@ static inline void plot(fb_data *fb, int w, int h,
     fb_data *ptr = fb + y * w + x;
     fb_data orig = *ptr;
     unsigned long r2, g2, b2;
-#if LCD_DEPTH != 24
+#if LCD_DEPTH < 24
     r2 = RGB_UNPACK_RED(orig);
     g2 = RGB_UNPACK_GREEN(orig);
     b2 = RGB_UNPACK_BLUE(orig);
@@ -649,8 +666,10 @@ static inline void plot(fb_data *fb, int w, int h,
     g = ((g1 * a) + (g2 * (256 - a))) >> 8;
     b = ((b1 * a) + (b2 * (256 - a))) >> 8;
 
-#if LCD_DEPTH != 24
+#if LCD_DEPTH < 24
     *ptr = LCD_RGBPACK(r, g, b);
+#elif LCD_DEPTH > 24
+    *ptr = (fb_data) {b, g, r, 255};
 #else
     *ptr = (fb_data) {b, g, r};
 #endif
@@ -1462,7 +1481,7 @@ void get_random_seed(void **randseed, int *randseedsize)
 
 static void timer_cb(void)
 {
-#if LCD_DEPTH != 24
+#if LCD_DEPTH < 24
     if(debug_settings.timerflash)
     {
         static bool what = false;

@@ -555,6 +555,20 @@ enum {
 #define BJACK_QUIT_NAME     "Power"
 #define BJACK_DOUBLE_NAME   "Right"
 
+#elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
+#define BJACK_SELECT        BUTTON_SELECT
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_STAY          (BUTTON_VOLUP|BUTTON_SELECT)
+#define BJACK_DOUBLEDOWN    (BUTTON_VOLUP|BUTTON_DOWN)
+#define BJACK_UP            BUTTON_UP
+#define BJACK_DOWN          BUTTON_DOWN
+#define BJACK_RIGHT         BUTTON_RIGHT
+#define BJACK_LEFT          BUTTON_LEFT
+#define BJACK_SELECT_NAME   "Select"
+#define BJACK_STAY_NAME     "Option+Select"
+#define BJACK_QUIT_NAME     "Volume up"
+#define BJACK_DOUBLE_NAME   "Option+Down"
+
 #else
 #error No keymap defined!
 #endif
