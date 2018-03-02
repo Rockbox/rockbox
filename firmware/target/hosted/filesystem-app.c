@@ -37,6 +37,10 @@
 #include "logf.h"
 
 
+#if defined(AGPTEK_ROCKER)
+#define PIVOT_ROOT "/mnt/sd_0"
+#endif
+
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 static const char rbhome[] = "/sdcard";
 #elif (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA)) \
@@ -205,6 +209,10 @@ const char * handle_special_dirs(const char *dir, unsigned flags,
 #endif
 #ifdef HAVE_MULTIDRIVE
     dir = handle_special_links(dir, flags, buf, bufsize);
+#endif
+#ifdef PIVOT_ROOT
+    snprintf(buf, bufsize, "%s/%s", PIVOT_ROOT, dir);
+    dir = buf;
 #endif
     return dir;
 }

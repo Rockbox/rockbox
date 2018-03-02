@@ -21,6 +21,7 @@
 
 #include <string.h> /* size_t */
 #include <dlfcn.h>
+#include "file.h"
 #include "debug.h"
 #include "load_code.h"
 
@@ -28,7 +29,11 @@ void *lc_open(const char *filename, unsigned char *buf, size_t buf_size)
 {
     (void)buf;
     (void)buf_size;
-    void *handle = dlopen(filename, RTLD_NOW);
+    char path[MAX_PATH];
+
+    const char *fpath = handle_special_dirs(filename, 0, path, sizeof(path));
+
+    void *handle = dlopen(fpath, RTLD_NOW);
     if (handle == NULL)
     {
         DEBUGF("failed to load %s\n", filename);
