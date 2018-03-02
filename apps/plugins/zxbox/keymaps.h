@@ -274,6 +274,14 @@
 #elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
 #define ZX_MENU         BUTTON_MENU
 
+#elif (CONFIG_KEYPAD == AGPTEK_ROCKER_PAD)
+#define ZX_MENU         BUTTON_POWER
+#define ZX_UP           BUTTON_UP
+#define ZX_DOWN         BUTTON_DOWN
+#define ZX_LEFT         BUTTON_LEFT
+#define ZX_RIGHT        BUTTON_RIGHT
+#define ZX_SELECT       BUTTON_SELECT
+
 #else
 #error Keymap not defined!
 

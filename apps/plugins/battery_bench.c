@@ -273,6 +273,12 @@
 #define BATTERY_OFF_TXT "Power"
 #define BATTERY_ON_TXT  "Menu - start"
 
+#elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
+#define BATTERY_ON      BUTTON_LEFT
+#define BATTERY_OFF     BUTTON_RIGHT
+#define BATTERY_OFF_TXT "Right"
+#define BATTERY_ON_TXT  "Left - start"
+
 #else
 #error No keymap defined!
 #endif

@@ -115,6 +115,9 @@ static struct osd grey_osd;
 #elif LCD_DEPTH == 24
 #    define _OSD_WIDTH2BYTES(w)    ((w)*3)
 #    define _OSD_BYTES2WIDTH(b)    ((b)/3)
+#elif LCD_DEPTH == 32
+#    define _OSD_WIDTH2BYTES(w)    ((w)*4)
+#    define _OSD_BYTES2WIDTH(b)    ((b)/4)
 #else /* other LCD depth */
 #  error Unknown LCD depth; please define macros
 #endif /* LCD_DEPTH */

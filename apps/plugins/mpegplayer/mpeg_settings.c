@@ -298,6 +298,13 @@ struct mpeg_settings settings;
 #elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
+#elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
+#define MPEG_START_TIME_SELECT      BUTTON_SELECT
+#define MPEG_START_TIME_LEFT        BUTTON_LEFT
+#define MPEG_START_TIME_RIGHT       BUTTON_RIGHT
+#define MPEG_START_TIME_UP          BUTTON_UP
+#define MPEG_START_TIME_DOWN        BUTTON_DOWN
+
 #else
 #error No keymap defined!
 #endif

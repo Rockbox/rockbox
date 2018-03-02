@@ -448,7 +448,11 @@ void sys_setPalette(struct System* sys, uint8_t start, uint8_t n, const uint8_t 
             uint8_t col = buf[i * 3 + j];
             c[j] = (col << 2) | (col & 3);
         }
-#if (LCD_DEPTH > 16) && (LCD_DEPTH <= 24)
+#if (LCD_DEPTH > 24)
+        sys->palette[i] = (fb_data) {
+            c[2], c[1], c[0], 255
+        };
+#elif (LCD_DEPTH > 16) && (LCD_DEPTH <= 24)
         sys->palette[i] = (fb_data) {
             c[2], c[1], c[0]
         };
@@ -621,7 +625,12 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
 #ifdef HAVE_LCD_COLOR
                 int r, g, b;
                 fb_data pix = rb->lcd_framebuffer[y * LCD_WIDTH + x];
-#if (LCD_DEPTH == 24)
+#if (LCD_DEPTH > 24)
+                r = 0xff - pix.r;
+                g = 0xff - pix.g;
+                b = 0xff - pix.b;
+                rb->lcd_framebuffer[y * LCD_WIDTH + x] = (fb_data) { b, g, r, 255 };
+#elif (LCD_DEPTH == 24)
                 r = 0xff - pix.r;
                 g = 0xff - pix.g;
                 b = 0xff - pix.b;

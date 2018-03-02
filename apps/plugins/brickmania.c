@@ -324,6 +324,14 @@ CONFIG_KEYPAD == SANSA_CONNECT_PAD
 #define SELECT    BUTTON_MENU
 #define CONTINUE_TEXT "Press MENU To Continue"
 
+#elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
+#define QUIT      BUTTON_POWER
+#define LEFT      BUTTON_LEFT
+#define RIGHT     BUTTON_RIGHT
+#define SELECT    BUTTON_SELECT
+#define UP        BUTTON_UP
+#define DOWN      BUTTON_DOWN
+
 #else
 #error No keymap defined!
 #endif

@@ -409,6 +409,18 @@
 #define LABEL_QUIT      "Power"
 #define LABEL_MENU      "Menu"
 
+#elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
+#define VUMETER_QUIT    (BUTTON_POWER|BUTTON_REL)
+#define VUMETER_MENU    BUTTON_SELECT
+#define VUMETER_UP      BUTTON_VOLUP
+#define VUMETER_DOWN    BUTTON_VOLDOWN
+#define VUMETER_HELP    BUTTON_UP
+#define LABEL_QUIT      "Power"
+#define LABEL_MENU      "Select"
+#define LABEL_HELP      "Up"
+#define LABEL_VOLUME    "Vol Up/Down"
+#define LABEL_MENU      "Select"
+
 #else
 #error No keymap defined!
 #endif

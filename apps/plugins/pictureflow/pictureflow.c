@@ -1826,7 +1826,7 @@ static inline pix_t fade_color(pix_t c, unsigned a)
     result >>= 8;
     return result;
 
-#elif LCD_PIXELFORMAT == RGB888
+#elif (LCD_PIXELFORMAT == RGB888 || LCD_PIXELFORMAT == XRGB8888) // FIXME: check this
     unsigned int pixel = FB_UNPACK_SCALAR_LCD(c);
     unsigned int result;
     a = (a + 2) & 0x1fc;

@@ -411,6 +411,18 @@ static void setoptions (void)
 #elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
         options.MENU    = BUTTON_POWER;
 
+#elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
+        options.UP     = BUTTON_UP;
+        options.DOWN   = BUTTON_DOWN;
+        options.LEFT   = BUTTON_LEFT;
+        options.RIGHT  = BUTTON_RIGHT;
+
+        options.START  = BUTTON_SELECT;
+        options.MENU   = BUTTON_POWER;
+        options.SELECT = BUTTON_SELECT|BUTTON_REPEAT;
+        options.A      = BUTTON_VOLDOWN;
+        options.B      = BUTTON_VOLUP;
+
 #else
 #error No Keymap Defined!
 #endif
