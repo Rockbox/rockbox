@@ -121,8 +121,7 @@ exists($$LRELEASE) {
 
 # Needed by QT on Win
 INCLUDEPATH += $$_PRO_FILE_PWD_ $$_PRO_FILE_PWD_/irivertools \
-            $$_PRO_FILE_PWD_/zlib $$_PRO_FILE_PWD_/base \
-            $$_PRO_FILE_PWD_/zlib $$_PRO_FILE_PWD_/gui
+            $$_PRO_FILE_PWD_/base $$_PRO_FILE_PWD_/gui
 INCLUDEPATH += $$RBBASE_DIR/rbutil/ipodpatcher $$RBBASE_DIR/rbutil/sansapatcher \
             $$RBBASE_DIR/tools/rbspeex $$RBBASE_DIR/tools
 INCLUDEPATH += logger
@@ -136,7 +135,7 @@ for(rblib, RBLIBS) {
 }
 
 # on win32 libz is linked implicitly.
-!win32 {
+!sysquazip:!win32 {
     LIBS += -lz
 }
 
@@ -158,6 +157,16 @@ contains(QT_MAJOR_VERSION, 5) {
     macx {
         QT += multimedia
     }
+    sysquazip {
+        INCLUDEPATH += $$[QT_SYSROOT]/usr/include/quazip5
+        LIBS += -lquazip5
+    }
+} else:sysquazip {
+    INCLUDEPATH += $$[QT_SYSROOT]/usr/include/quazip
+    LIBS += -lquazip
+}
+!sysquazip {
+    INCLUDEPATH += $$_PRO_FILE_PWD_/quazip $$_PRO_FILE_PWD_/zlib
 }
 
 dbg {
@@ -262,6 +271,8 @@ unix {
 
 # source files are separate.
 include(rbutilqt.pri)
-include(quazip/quazip.pri)
 include(logger/logger.pri)
 
+!sysquazip {
+    include(quazip/quazip.pri)
+}
