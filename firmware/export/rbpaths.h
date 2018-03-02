@@ -51,8 +51,6 @@
 #elif defined(DX50) || defined(DX90)
 /* Where to put save files like recordings, playlists, screen dumps ...*/
 #define HOME_DIR "/mnt/sdcard"
-#elif defined(AGPTEK_ROCKER)
-#define HOME_DIR "/mnt/sd_0"
 #else
 #define HOME_DIR "/"
 #endif

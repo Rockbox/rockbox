@@ -4212,7 +4212,6 @@ fi
     t_cpu="hosted"
     t_manufacturer="agptek"
     t_model="rocker"
-    rbdir='/mnt/sd_0/.rockbox'
     mipsellinuxcc
     ;;
 
