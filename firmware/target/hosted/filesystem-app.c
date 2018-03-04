@@ -37,7 +37,7 @@
 #include "logf.h"
 
 
-#if defined(AGPTEK_ROCKER)
+#if defined(AGPTEK_ROCKER) && !defined(BOOTLOADER)
 #define PIVOT_ROOT "/mnt/sd_0"
 #endif
 
