@@ -483,7 +483,7 @@ target/hosted/pcm-alsa.c
 drivers/audio/nwzlinux-codec.c
 target/hosted/alsa-controls.c
 target/hosted/pcm-alsa.c
-#elif defined(HAVE_ROCKER_CODEC)
+#elif defined(HAVE_ROCKER_CODEC) && !defined(SIMULATOR)
 drivers/audio/rocker_codec.c
 #elif defined(HAVE_SDL_AUDIO)
 drivers/audio/sdl.c

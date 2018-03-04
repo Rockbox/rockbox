@@ -112,7 +112,7 @@ static unsigned long get_lcd_pixel(int x, int y)
 #else
     return *FBADDR(x, y);
 #endif
-#elif LCD_DEPTH == 24
+#elif LCD_DEPTH >= 24
     return FB_UNPACK_SCALAR_LCD(*FBADDR(x, y));
 #endif
 }
