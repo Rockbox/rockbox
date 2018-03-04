@@ -118,8 +118,6 @@ target/hosted/backtrace-glibc.c
 target/hosted/kernel-unix.c
 target/hosted/filesystem-unix.c
 target/hosted/lc-unix.c
-target/hosted/alsa-controls.c
-target/hosted/pcm-alsa.c
 target/hosted/agptek/sysfs.c
 target/hosted/agptek/backlight-agptek.c
 target/hosted/agptek/button-agptek.c
@@ -487,7 +485,7 @@ target/hosted/pcm-alsa.c
 drivers/audio/nwzlinux-codec.c
 target/hosted/alsa-controls.c
 target/hosted/pcm-alsa.c
-#elif defined(HAVE_ROCKER_CODEC)
+#elif defined(HAVE_ROCKER_CODEC) && !defined(SIMULATOR)
 drivers/audio/rocker_codec.c
 target/hosted/alsa-controls.c
 target/hosted/pcm-alsa.c
