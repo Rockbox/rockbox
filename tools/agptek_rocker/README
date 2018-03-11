@@ -18,16 +18,16 @@ docker build . -t "agptek-dev"
 
 Then you can start container and work with update.upt.
 If you want to generate patched update image in automatic way:
-docker run --rm -it agptek-dev -v /path/to/dir/with/update.upt:/upt \
--e UPT_DIR=/upt bootloader_install.sh
+docker run --rm -it -v /path/to/dir/with/update.upt:/upt \
+-e UPT_DIR=/upt agptek-dev bootloader_install.sh
 
 Patched update.upt with rockbox bootloader and rockbox.zip should end up in
 specified directory.
 
 If you want to play around, hack something etc. you can run container in
 interactive mode:
-docker run -it agptek-dev -v /path/to/dir/with/update.upt:/upt \
--e UPT_DIR=/upt bash
+docker run -it -v /path/to/dir/with/update.upt:/upt \
+-e UPT_DIR=/upt agptek-dev bash
 
 
 Files in this directory:
