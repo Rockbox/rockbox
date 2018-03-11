@@ -22,6 +22,7 @@ echo
 
 [ -d "$HOME/rockbox-wodz/build" ] && rm -rf $HOME/rockbox-wodz/build
 git checkout agptek-rocker && \
+git pull && \
 mkdir $HOME/rockbox-wodz/build && cd $HOME/rockbox-wodz/build && \
 ../tools/configure --target=240 --type=b && \
 make clean && \
