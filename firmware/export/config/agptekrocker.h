@@ -79,7 +79,7 @@
 #ifndef SIMULATOR
 /* We have usb power and can detect usb but it is handled by Linux */
 #define HAVE_USB_POWER
-#define USB_NONE
+
 #endif
 
 #define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE

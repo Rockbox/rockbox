@@ -49,7 +49,7 @@ const unsigned short const percent_to_volt_charge[11] =
 unsigned int power_input_status(void)
 {
     /* POWER_INPUT_USB_CHARGER, POWER_INPUT_NONE */
-    return agptek_power_get_status();
+    return agptek_power_input_status();
 }
 
 int _battery_voltage(void)
@@ -59,5 +59,5 @@ int _battery_voltage(void)
 
 bool charging_state(void)
 {
-    return agptek_power_get_status() == POWER_INPUT_USB_CHARGER;
+    return agptek_power_charging_status();
 }
