@@ -112,6 +112,9 @@
 /* Audio codec */
 #define HAVE_ROCKER_CODEC
 
+/* We don't have hardware controls */
+#define HAVE_SW_TONE_CONTROLS
+
 /* Battery */
 #define BATTERY_CAPACITY_DEFAULT 600 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 600  /* min. capacity selectable */
