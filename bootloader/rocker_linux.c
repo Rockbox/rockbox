@@ -522,13 +522,9 @@ int main(int argc, char **argv)
         }
         else if(mode == BOOT_ROCKBOX)
         {
-            /* Rockbox expects /.rockbox to contain themes, rocks, etc, but we
-            * cannot easily create this symlink because the root filesystem is
-            * mounted read-only. Although we could remount it read-write temporarily,
-            * this is neededlessly complicated and we defer this job to the dualboot
-            * install script */
             fflush(stdout);
-            execl("/mnt/sd_0/.rockbox/rockbox.rocker", "rockbox.rocker", NULL);
+            system("/bin/cp /mnt/sd_0/.rockbox/rockbox.rocker /tmp");
+            execl("/tmp/rockbox.rocker", "rockbox.rocker", NULL);
             printf("execvp failed: %s\n", strerror(errno));
             /* fallback to OF in case of failure */
             error_screen("Cannot boot Rockbox");

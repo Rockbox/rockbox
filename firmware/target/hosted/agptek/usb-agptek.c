@@ -23,11 +23,13 @@
 #include "disk.h"
 #include "usb.h"
 #include "sysfs.h"
+#include "power.h"
+#include "power-agptek.h"
 
 /* TODO: implement usb detection properly */
 int usb_detect(void)
 {
-    return USB_EXTRACTED;
+    return power_input_status() == POWER_INPUT_USB_CHARGER ? USB_INSERTED : USB_EXTRACTED;
 }
 
 void usb_enable(bool on)
@@ -42,10 +44,13 @@ void usb_enable(bool on)
 */
 int disk_mount_all(void)
 {
-    sysfs_set_string("/sys/class/android_usb/android0/f_mass_storage/lun/file", "empty");
+    sysfs_set_string("/sys/class/android_usb/android0/f_mass_storage/lun/file", "");
 
-    system("mount /dev/mmcblk0 /mnt/sd_0");
-    system("mount /dev/mmcblk0p1 /mnt/sd_0");
+    if (system("/bin/mount /dev/mmcblk0p1 /mnt/sd_0") &&
+        system("/bin/mount /dev/mmcblk0 /mnt/sd_0"))
+    {
+        return 0;
+    }
 
     return 1;
 }
@@ -57,10 +62,19 @@ int disk_mount_all(void)
 int disk_unmount_all(void)
 {
     /* TODO: figure out actual block device */
-    system("umount /dev/mmcblk0p1 /mnt/sd_0");
-    system("umount /dev/mmcblk0 /mnt/sd_0");
+    if (!system("/bin/umount /dev/mmcblk0p1"))
+    {
+        sysfs_set_string("/sys/class/android_usb/android0/f_mass_storage/lun/file", "/dev/mmcblk0p1");
+    }
+    else if (!system("/bin/umount /dev/mmcblk0"))
+    {
+        sysfs_set_string("/sys/class/android_usb/android0/f_mass_storage/lun/file", "/dev/mmcblk0");
+    }
+    else
+    {
+        return 0;
+    }
 
-    sysfs_set_string("/sys/class/android_usb/android0/f_mass_storage/lun/file", "/dev/mmcblk0p1");
     return 1;
 }
 

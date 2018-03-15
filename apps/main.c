@@ -335,6 +335,10 @@ static void init(void)
     font_init();
 #endif
     show_logo();
+#ifndef USB_NONE
+    usb_init();
+    usb_start_monitoring();
+#endif
     button_init();
     powermgmt_init();
     backlight_init();
