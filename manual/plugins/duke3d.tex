@@ -1,0 +1,38 @@
+\subsection{Duke3D}
+
+This is a port of Duke Nukem 3D, derived from Fabien Sanglard's
+Chocolate Duke.
+
+\subsubsection{Installation}
+The \fname{.GRP} and \fname{.CON} files from an original installation of
+  the game must be placed in the \fname{/.rockbox/duke3d/} on your
+  device.
+
+\subsubsection{Music}
+In-game music will not work by default. For it to work, you must
+install a modified Timidity patchset in the
+\fname{/.rockbox/timidity/} directory on your device. There should be
+a \fname{/.rockbox/timidity/timidity.cfg} file located in this
+directory, along with the instrument files. You must edit the
+\fname{.cfg} file so that all the path names are absolute (i.e. in the
+form \fname{/.rockbox/timidity/instruments/*.cfg}).
+
+\subsubsection{Video}
+Rotation of the video output is possible by choosing the correct video
+option in the in-game menu. If your device's display is normally
+320x240, for example, choosing the 240x320 option will rotate the
+screen 90 degrees, and the keymap will be updated as well.
+
+\subsubsection{Caveats}
+Sound effects, enabled by default, could have a detrimental effect on
+playability on some devices. If you notice excessive lag, try
+disabling sound.
+
+The default button mapping may not be optimal for gameplay. Set a
+different mapping in the ``Keyboard'' section of the game setup. Note
+that not all keys are mappable on all devices.
+
+Some devices will low memory or large GRP files will prevent the game
+from completely caching the GRP file in RAM, which could lead to disk
+reads during gameplay. This might cause the game to lag slightly when
+it happens, which is normal. The game should resume in a second or so.
