@@ -2378,9 +2378,38 @@ static void full_help(const char *name)
     char *buf = smalloc(help_text_len);
     LZ4_decompress_tiny(help_text, buf, help_text_len);
 
-    view_text(name, buf);
+    /* fill the word_ptrs array to pass to display_text */
+    char **word_ptrs = smalloc(sizeof(char*) * help_text_words);
+    char **ptr = word_ptrs;
+    bool last_was_null = false;
+
+    *ptr++ = buf;
+
+    for(int i = 1; i < help_text_len; ++i)
+    {
+        switch(buf[i])
+        {
+        case '\0':
+            if(last_was_null)
+            {
+                /* newline */
+                *ptr++ = buf + i;
+            }
+            else
+                last_was_null = true;
+            break;
+        default:
+            if(last_was_null)
+                *ptr++ = buf + i;
+            last_was_null = false;
+            break;
+        }
+    }
+
+    display_text(help_text_words, word_ptrs, help_text_style, NULL, true);
 
     sfree(buf);
+    sfree(word_ptrs);
 
     rb->lcd_set_background(old_bg);
 

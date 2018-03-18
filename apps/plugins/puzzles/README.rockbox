@@ -26,7 +26,7 @@ documentation. These files are stored under help/, and are generated
 by genhelp.sh from the puzzles.but file in the source
 distribution. The compression is LZ4, implemented in lz4tiny.c (for
 decompression on target), and compress.c (for generation). genhelp.sh
-should be run whenever the documentation is chagned.
+should be run whenever the documentation is changed.
 
 Kudos to Simon (duh), and Frank, for telling me about it.
 
@@ -46,3 +46,8 @@ August 2017: Every game that can be played with only the cursor keys
 is now functional.
 
 October 2017: Added zoom feature.
+
+March 2018: Added help styling. Changed from simple_viewer to
+display_text for displaying help text. compress.c now does additional
+processing on the help text, and also requires a slightly modified
+halibut.
