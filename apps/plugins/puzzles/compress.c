@@ -114,7 +114,7 @@ int main()
             --i;
             break;
         case '$':
-            /* genhelp.sh replaces the dollar signs in URLs with
+            /* genhelp.sh replaces the underscores in URLs with
              * dollar signs to help us out. */
             buf[i] = '_';
             break;
@@ -137,9 +137,7 @@ int main()
     int words_check = 0;
     for(int i = 0; i < help_text_len; ++i)
         if(!buf[i])
-        {
             ++words_check;
-        }
 
     assert(words_check == word_idx);
 
