@@ -13,6 +13,9 @@
  *
  * Copyright (c) 1997-2003,2004 Alessandro Scotti
  * http://www.ascotti.org/
+ * AI code (c) 2017 Moshe Piekarski
+ *
+ * ToDo convert all score to pinky location
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,6 +34,10 @@
 #include "wsg3.h"
 #include "lib/configfile.h"
 #include "lib/playback_control.h"
+#include "lib/helper.h"
+
+/*Allows split screen jump and makes pacman invincible if you start at 18 credits (for testing purposes)*/
+//#define CHEATS 1
 
 struct pacman_settings {
     int difficulty;
@@ -39,14 +46,15 @@ struct pacman_settings {
     int ghostnames;
     int showfps;
     int sound;
+    int ai;
 };
 
 static struct pacman_settings settings;
 static struct pacman_settings old_settings;
 static bool sound_playing = false;
 
-#define SETTINGS_VERSION 1
-#define SETTINGS_MIN_VERSION 1
+#define SETTINGS_VERSION 2
+#define SETTINGS_MIN_VERSION 2
 #define SETTINGS_FILENAME "pacbox.cfg"
 
 static char* difficulty_options[] = { "Normal", "Hard" };
@@ -54,6 +62,45 @@ static char* numlives_options[] = { "1", "2", "3", "5" };
 static char* bonus_options[] = {"10000", "15000", "20000", "No Bonus"};
 static char* ghostnames_options[] = {"Normal", "Alternate"};
 static char* yesno_options[] = {"No", "Yes"};
+
+#ifdef AI
+static unsigned char ai_direction[15][205] =              /* level turn directions */
+{
+    {2,1,3,1,2,0,3,0,3,1,2,1,3,1,3,0,3,0,2,0,3,0,2,1,3,1,2,0,2,1,3,1,3,0,3,1,3,1,2,0,3,0,3,0,3,0,2,0,3,1,2,0,2,0,3,1,2,1,2,1,2,0,2,0,2,0,3,1,3,1,2,1,2,1,3,0,2,0,2,0,2,1,2,0,3,0,2,1,3,0,3,2,1,3,0,3,1,2,1,2,0,2,3,1,3,0,3,0,2,4}, /* first level */
+    {2,0,3,1,3,1,2,0,2,0,2,0,3,1,3,1,2,1,2,0,3,0,3,0,3,1,3,1,2,1,2,0,2,0,3,0,2,0,3,1,2,0,3,1,2,0,2,1,2,1,2,0,2,0,3,1,0,3,0,3,2,0,2,0,2,0,3,1,0,3,2,0,2,1,2,1,3,0,3,1,3,1,3,0,3,0,1,2,1,3,1,3,1,2},/* second level*/
+    {2,1,3,1,2,0,2,0,3,0,2,1,3,1,2,1,2,0,3,0,3,0,3,1,3,1,2,1,2,0,2,0,2,3,0,3,0,3,0,2,0,3,1,2,0,2,0,3,1,2,1,2,1,3,1,3,1,2,0,2,1,3,1,3,0,3,0,2,0,3,1,2,1,2,0,3,1,3,1,2,1,2,0,2,0,2,0,3,1,2,0,2,1,3,0,1,2,1,2,0},/*third level*/
+    {2,1,3,1,2,0,2,0,3,0,2,1,3,1,2,1,2,0,3,0,3,0,3,1,3,1,2,1,2,0,2,0,2,3,0,3,0,3,0,2,0,3,1,2,0,2,0,3,1,2,1,2,1,3,1,3,1,2,0,2,0,3,1,3,1,2,1,2,0,2,0,3,0,2,0,3,0,2,1,2,1,3,0,3,0,2,1,0,3,1,3,1,2,1,2,1,3,1,3,0,3,0,2,0,2,1,2,1,3,1,3,0,3,1,3,2,0,2,0,2,0,2},/*level four*/
+    {2,2,1,2,1,3,0,3,0,2,0,2,0,3,0,2,0,2,0,3,1,2,1,3,1,2,1,3,1,2,1,2,1,3,1,3,0,2,0,3,1,2,1,2,0,2,0,3,0,2,0,3,1,3,0,2,1,2,1,2,0,2,0,2,0,3,0,3,1,3,1,2,1,3,1,3,0,3,0,2,0,2,1,3,1,3,0,2,1,2,0,3,1,3,1,3,1,2,1,2,0,2,1,2,0,2,0,3,1,3,0,2,0,2},/*levels 5,7,8*/
+    {2,2,1,2,1,3,0,3,0,2,0,2,0,3,0,2,0,2,0,3,1,2,1,3,1,2,1,3,1,2,1,2,1,3,1,3,0,2,0,3,1,2,1,2,0,2,0,3,0,2,0,3,1,3,0,2,1,2,1,2,0,3,0,2,0,3,1,3,0,2,1,2,1,2,0,2,0,3,0,2,1,2,0,3,0,2,1,3,0,2,1,3,1,3,0,3,1,2,1,2,1,2,0,2,0,3,1,3,0,1,0,3,1},/*level six*/
+    {2,1,3,1,2,0,2,0,3,0,2,0,3,0,3,1,2,0,2,0,2,1,3,0,3,1,3,0,2,1,2,0,3,1,3,1,2,1,3,1,3,0,2,0,3,1,2,1,3,1,2,0,3,0,2,0,3,1,2,0,3,1,2,1,2,1,2,0,2,0,2,0,3,0,3,1,3,1,3,0,3,1,2,1,3,1,3,1,2,0,3,0,2,1,3,1,2,0,3,0,2,1,3,1,3,2,1,3,0,2,0,2,0,2,1,3,1,2,1,3,1,2,0,3,0,2,0,3,1,3,1,2,0,2,0,3,1,2,0,3,0,2,1,3,0,3,1,2,1,3,1,2,1,2,1,2,0,2,1,3,0,2,1,2,1,2,0,2,1,2,0,2,1,2,0,2,0,3,0,2,0,3,1,2,0,2,1,3,1,2,1,3,1,3,0,2},/*level nine*/
+    {2,2,1,2,1,3,0,3,0,2,0,2,0,3,0,2,0,2,0,3,1,2,1,3,1,2,1,3,1,2,1,2,1,3,1,3,0,2,0,3,1,2,1,2,0,2,0,3,0,2,0,3,1,3,0,2,1,2,1,2,0,3,0,2,0,3,1,2,0,2,1,2,1,2,1,2,0,2,0,3,0,2,1,3,0,3,0,1,2,1,3,1,2,1,0,3,0,2,0,2,1,2,0,2,0,3,1,3,0,2,1,2,1,2,0,3,0,2,0,3,1,2,0,2,1,2,1,2,1,2,0,2,0,3,0,2,1,3,0,3,0,1,2,1,3,1,2,1,0,3,0,2,0,2,1,2,0,2,0,3,1,3,0,2,1,2,1,2,},/*level ten*/
+    {2,1,3,1,2,0,2,0,3,0,2,0,3,0,3,1,2,0,2,0,2,1,3,0,3,1,3,0,2,1,2,0,3,1,3,1,2,1,3,1,3,0,2,0,3,1,2,1,3,1,2,0,3,0,2,0,3,1,2,0,3,1,2,1,2,1,2,0,2,0,2,0,3,0,3,1,3,1,3,0,3,1,2,1,3,1,3,1,2,0,3,0,2,1,3,1,2,0,3,0,2,1,3,1,3,2,1,3,0,2,0,2,0,2,1,3,1,2,1,3,1,2,0,3,0,2,0,3,1,3,1,2,0,2,0,3,1,2,0,3,0,2,1,3,0,1,3,0,3,1,3,0,2,1,3,1,3,1,2,1,2,1,3,0,2,1,2,1,2,0,2,0,2,0,3,1,2,1,2,1,2,0,2,0,2,0,3,1,3,1,2,0,2},/*level twelve*/
+    {2,2,1,2,1,3,0,3,0,2,0,2,0,3,0,2,0,2,0,3,1,2,1,3,1,2,1,3,1,2,1,2,1,3,1,3,0,2,0,3,1,2,1,2,0,2,0,3,0,2,0,3,1,2,0,3,1,2,0,2,3,1,2,1,2,1,3,1,2,0,2,0,2,0,3,1,2,1,2,1,2,0,2,1,2,1,3,1,3,0,3,0,3,0,3,0,2,1,3,1,3,1,3,0,3,0,2,0,3,0,2,1,3,0,3,1,3,2,1},/*level fourteen*/
+    {2,1,3,1,2,0,2,0,3,0,2,0,3,0,3,1,2,0,2,0,2,1,3,0,3,1,3,0,2,1,2,0,3,1,3,1,2,1,3,1,3,0,2,0,3,1,2,1,3,1,2,0,3,0,2,0,3,1,2,0,3,1,2,1,2,1,2,0,2,0,2,0,3,0,3,1,3,1,3,0,3,1,2,1,3,1,3,1,2,0,3,0,2,1,3,1,2,0,3,0,2,1,3,1,3,2,1,3,0,2,0,2,0,2,1,3,1,2,1,3,1,2,0,3,0,2,0,3,1,3,1,2,0,3,0,3,1,2,1,3,1,3,0,2,0,3,0,2,0,3,0,2,1,3,1,3,0,3,0,3,0,2,1,3,1,2,1,3,0,3,1,2,0,3,0,2,0,2,0,3,1,0,1,2,1,3,0,2,0,2,1,2,0,2,1,3,2},
+    {2,2,1,2,1,3,0,3,0,2,0,3,0,2,0,2,0,3,0,2,1,3,1,2,1,3,1,3,1,3,1,2,0,2,0,2,0,3,1,2,0,2,0,2,0,3,0,3,1,3,0,3,1,2,1,2,0,2,0,3,0,2,1,3,1,2,0,2,0,2,1,3,1,2,1,3,1,2,1,3,0,2,0,3,0,2},
+    {2,2,1,2,1,3,0,3,0,2,0,3,0,2,0,2,0,3,0,2,1,3,1,2,1,3,1,3,1,3,1,2,0,2,0,2,0,3,1,2,0,2,0,2,0,3,0,3,1,3,1,2,1,3,1,2,1,2,1,3,1,3,0,2,0,3,1,3,0,2,1,3,1,2,0,2,1,3,1,2,1,3,1,3,1,3,1,2,1},
+    {2,1,3,1,2,0,3,0,3,1,2,1,3,1,3,0,3,0,3,0,2,1,3,1,3,0,3,0,2,0,2,1,2,1,3,1,2,1,2,0,2,0,3,0,2,0,3,0,3,1,2,0,2,1,3,1,3,1,3,0,3,0,2,1,3,1,2,1,2,0,2,0,3,0,3,1,2,1,3,0},
+    {2,1,3,1,2,0,3,0,2,0,3,1,2,0,3,1,2,1,2,0,2,0,2,0,3,0,3,0,2,1,3,0,2,1,3,1,2,1,2,1,2,0,2,1,2,1,2,1,3,0,1,3,0,1,2,1,2,1,2,0,3,1,2}
+};
+static unsigned char ai_location[15][205] =               /* level turn locations */
+{
+    {0,52,58,57,61,34,60,37,54,43,55,42,58,43,61,46,60,49,57,48,54,49,51,42,52,43,55,39,54,34,55,34,58,37,107,52,58,57,61,48,60,49,57,52,42,57,39,48,35,57,40,54,39,48,35,52,37,51,40,48,43,45,42,42,39,39,35,43,37,49,40,48,43,42,49,49,45,45,42,42,39,39,40,34,39,43,35,34,40,37,39,223,39,55,52,54,57,55,57,58,54,57,119,52,58,55,57,57,54,53},   /* first level */
+    {0,47,54,52,58,57,61,45,60,42,57,39,54,43,55,49,58,48,61,34,60,37,54,40,51,49,52,57,55,57,58,54,54,51,48,52,39,48,35,57,40,54,39,57,40,54,35,48,37,40,56,37,57,33,54,37,125,54,40,51,170,42,48,39,39,34,35,37,174,39,220,45,35,39,37,34,40,37,39,40,40,43,43,46,42,49,16,40,48,42,48,45,52,55}, /*second level */
+    {0,52,58,57,61,45,60,42,57,43,54,39,55,49,58,48,61,34,60,37,54,40,51,49,52,57,55,57,58,54,54,51,51,139,49,48,52,42,57,39,48,35,57,40,54,39,48,35,52,37,51,40,48,43,49,46,52,55,39,54,34,55,34,58,37,57,43,54,42,51,49,52,48,55,39,35,43,37,49,40,48,43,45,42,42,39,39,35,43,37,39,35,34,37,43,127,37,39,40,34}, /*third level */
+    {0,52,58,57,61,45,60,42,57,43,54,39,55,49,58,48,61,34,60,37,54,40,51,49,52,57,55,57,58,54,54,51,51,71,49,48,52,42,57,39,48,35,57,40,54,39,48,35,52,37,51,40,48,43,49,46,52,55,45,54,39,48,40,49,49,52,48,55,45,54,42,45,43,42,42,39,43,35,39,37,34,40,37,39,43,35,34,151,35,37,37,49,40,48,43,42,52,43,55,46,54,49,51,42,48,39,52,34,55,34,58,37,54,43,55,87,45,54,42,48,39,88}, /*fourth level */
+    {0,14,39,58,34,61,46,60,49,57,45,54,42,45,43,42,42,39,39,35,43,37,42,40,43,43,42,49,49,52,48,55,42,58,43,61,57,60,54,54,57,55,57,58,54,57,48,54,52,39,48,35,52,37,57,35,54,46,51,49,42,48,39,42,34,39,37,35,43,37,49,40,48,43,49,46,52,42,57,39,39,35,34,37,40,105,43,35,39,40,34,39,40,40,43,43,49,52,48,55,45,54,39,58,36,57,34,54,37,55,43,54,39,51}, /*fifth level */
+    {0,184,39,58,34,61,46,60,49,57,45,54,42,45,43,42,42,39,39,35,43,37,42,40,43,43,42,49,49,52,48,55,42,58,43,61,57,60,54,54,57,55,57,58,54,57,48,54,52,39,48,35,52,37,57,35,54,46,51,49,42,45,43,42,42,39,52,40,57,39,51,40,48,43,45,42,42,39,43,35,39,40,34,39,37,35,34,37,37,35,34,200,37,46,40,45,49,49,42,52,39,58,36,57,34,54,37,55,52,119,54,48,37,},/*sixth level*/
+    {0,52,58,57,61,45,60,42,57,43,54,42,51,49,48,52,55,45,54,42,48,39,52,40,45,49,52,52,48,51,49,42,45,49,52,52,55,42,58,43,61,57,60,54,54,57,55,57,58,57,61,48,60,49,57,48,54,52,55,48,54,52,55,51,58,48,61,45,60,42,57,39,48,40,45,49,46,40,49,49,48,52,52,48,55,52,58,57,61,48,60,49,57,42,58,43,61,34,60,37,54,34,55,34,58,118,34,61,43,60,42,57,39,48,54,52,57,55,57,58,57,61,48,60,49,57,39,48,40,52,43,55,39,42,34,39,37,40,34,39,37,35,34,37,37,35,43,37,42,40,43,43,42,46,51,49,42,48,39,55,52,48,51,49,42,52,39,48,54,52,51,51,42,52,39,48,54,42,57,39,54,35,57,37,141,35,48,37,49,40,48,43,49,46,52,39},/*ninth level*/
+    {0,14,39,58,34,61,46,60,49,57,45,54,42,45,43,42,42,39,39,35,43,37,42,40,43,43,42,49,49,52,48,55,42,58,43,61,57,60,54,54,57,55,57,58,54,57,48,54,52,39,48,35,52,37,57,35,54,46,51,49,42,45,43,42,42,39,57,40,54,39,51,40,48,43,42,46,39,42,34,39,37,35,34,40,37,39,43,205,37,42,40,43,43,42,73,45,43,42,42,39,39,58,36,57,34,54,37,55,52,48,51,49,42,52,45,60,},/*tenth level*/
+    {0,52,58,57,61,45,60,42,57,43,54,42,51,49,48,52,55,45,54,42,48,39,52,40,45,49,52,52,48,51,49,42,45,49,52,52,55,42,58,43,61,57,60,54,54,57,55,57,58,57,61,48,60,49,57,48,54,52,55,48,54,52,55,51,58,48,61,45,60,42,57,39,48,40,45,49,46,40,49,49,48,52,52,48,55,52,58,57,61,48,60,49,57,42,58,43,61,34,60,37,54,34,55,34,58,94,34,61,43,60,42,57,39,48,54,52,57,55,57,58,57,61,48,60,49,57,39,48,40,52,43,55,39,42,34,39,37,40,34,39,37,35,34,37,37,191,46,40,45,49,46,52,39,42,40,43,43,49,49,42,52,39,55,52,48,51,49,42,52,39,48,54,39,48,35,57,37,51,40,48,43,45,42,42,39,39,35,43,37,57,40,54,35},/*twelfth level*/
+    {0,14,39,58,34,61,46,60,49,57,45,54,42,45,43,42,42,39,39,35,43,37,42,40,43,43,42,49,49,52,48,55,42,58,43,61,57,60,54,54,57,55,57,58,54,57,48,54,52,39,48,35,52,37,48,35,57,37,54,35,104,52,37,51,40,48,43,49,49,42,48,39,42,34,39,57,40,54,46,51,49,42,48,39,52,34,55,34,58,37,54,40,51,49,48,52,39,42,40,43,43,49,52,52,48,37,42,34,39,37,35,34,37,37,35,43,37,127,39},/*fourteenth level*/
+    {0,52,58,57,61,45,60,42,57,43,54,42,51,49,48,52,55,45,54,42,48,39,52,40,45,45,52,52,48,51,49,42,45,49,52,52,55,42,58,43,61,57,60,54,54,57,55,57,58,57,61,48,60,49,57,48,54,52,55,48,54,52,55,51,58,48,61,45,60,42,57,39,48,40,45,49,46,40,49,49,48,52,52,48,55,52,58,57,61,48,60,49,57,42,58,43,61,34,60,37,54,34,55,34,58,124,34,61,43,60,42,57,39,48,54,52,57,55,57,58,57,61,48,60,49,57,39,48,40,52,43,55,39,54,40,45,49,49,42,52,43,55,52,54,51,48,37,41,34,39,37,35,34,37,37,46,40,45,46,42,49,39,42,40,43,43,42,49,49,48,52,55,39,54,40,48,54,39,48,35,57,159,173,37,54,40,57,39,54,35,48,37,45,35,39,37,40},
+    {0,14,39,58,34,61,46,60,49,57,48,54,52,48,51,45,48,42,49,39,42,40,43,43,42,49,49,52,52,58,57,61,45,60,42,57,39,39,52,55,45,54,39,42,34,39,37,35,43,37,46,35,52,46,51,49,42,48,54,42,57,35,54,37,57,40,54,39,45,35,34,40,37,52,34,55,34,58,34,61,57,60,57,57,57,53},
+    {0,14,39,58,34,61,46,60,49,57,48,54,52,48,51,45,48,42,49,39,42,40,43,43,42,49,49,52,52,58,57,61,45,60,42,57,39,39,52,55,45,54,39,42,34,39,37,35,43,37,49,40,48,43,49,49,42,52,34,55,34,58,37,42,34,35,43,37,57,35,54,37,57,40,54,35,48,37,49,40,48,43,49,46,52,52,57,55,57},
+    {0,52,58,57,61,34,60,37,54,43,55,42,58,43,61,46,60,49,57,52,54,48,55,52,58,55,57,57,54,54,48,51,49,42,52,43,55,39,58,36,57,34,54,37,42,34,39,37,35,43,37,39,35,34,37,37,46,40,49,49,48,52,35,48,37,49,40,48,43,45,42,42,39,52,35,57,37,54,40,57},
+    {0,52,58,57,61,48,60,49,57,48,54,52,55,48,54,57,55,57,58,54,48,51,45,48,42,49,39,52,35,48,37,52,34,48,37,52,46,51,49,45,37,39,33,38,35,35,49,34,60,37,53,60,42,55,60,38,35,58,40,54,35,57,37}
+};
+#endif
 
 static struct configdata config[] =
 {
@@ -68,6 +115,10 @@ static struct configdata config[] =
     yesno_options},
    {TYPE_ENUM, 0, 2, { .int_p = &settings.sound }, "Sound",
     yesno_options},
+#ifdef AI
+   {TYPE_ENUM, 0, 2, { .int_p = &settings.ai }, "AI",
+    yesno_options},
+#endif
 };
 
 static bool loadFile( const char * name, unsigned char * buf, int len )
@@ -183,6 +234,9 @@ static bool pacbox_menu(void)
         PBMI_GHOST_NAMES,
         PBMI_DISPLAY_FPS,
         PBMI_SOUND,
+#ifdef AI
+        PBMI_AI,
+#endif
         PBMI_RESTART,
         PBMI_QUIT,
     };
@@ -190,6 +244,9 @@ static bool pacbox_menu(void)
     MENUITEM_STRINGLIST(menu, "Pacbox Menu", NULL,
                         "Difficulty", "Pacmen Per Game", "Bonus Life",
                         "Ghost Names", "Display FPS", "Sound",
+#ifdef AI
+                        "AI",
+#endif
                         "Restart", "Quit");
 
     rb->button_clear_queue();
@@ -247,6 +304,12 @@ static bool pacbox_menu(void)
                 rb->set_option("Sound",&settings.sound, INT,
                                noyes, 2, NULL);
                 break;
+#ifdef AI
+            case PBMI_AI:
+                rb->set_option("AI",&settings.ai, INT,
+                               noyes, 2, NULL);
+                break;
+#endif
             case PBMI_RESTART:
                 need_restart=true;
                 menu_quit=1;
@@ -321,7 +384,7 @@ static void start_sound(void)
         return;
 
 #ifndef PLUGIN_USE_IRAM    
-    /* Ensure control of PCM - stopping music isn't obligatory */
+    /* Ensure control of PCM - stopping music itn't obligatory */
     rb->plugin_get_audio_buffer(NULL);
 #endif
 
@@ -358,6 +421,207 @@ static void stop_sound(void)
     sound_playing = false;
 }
 
+/* use buttons for joystick */
+void joystick(void)
+{
+    int status;
+    /* Check the button status */
+    status = rb->button_status();
+    rb->button_clear_queue();
+    /*handle buttons if AI is off */
+#ifdef PACMAN_HAS_REMOTE
+    setDeviceMode( Joy1_Left, (status & PACMAN_LEFT || status == PACMAN_RC_LEFT) ? DeviceOn : DeviceOff);
+    setDeviceMode( Joy1_Right, (status & PACMAN_RIGHT || status == PACMAN_RC_RIGHT) ? DeviceOn : DeviceOff);
+    setDeviceMode( Joy1_Up, (status & PACMAN_UP || status == PACMAN_RC_UP) ? DeviceOn : DeviceOff);
+    setDeviceMode( Joy1_Down, (status & PACMAN_DOWN || status == PACMAN_RC_DOWN) ? DeviceOn : DeviceOff);
+    setDeviceMode( CoinSlot_1, (status & PACMAN_COIN || status == PACMAN_RC_COIN) ? DeviceOn : DeviceOff);
+    setDeviceMode( Key_OnePlayer, (status & PACMAN_1UP || status == PACMAN_RC_1UP) ? DeviceOn : DeviceOff);
+    setDeviceMode( Key_TwoPlayers, (status & PACMAN_2UP || status == PACMAN_RC_2UP) ? DeviceOn : DeviceOff);
+#else
+    setDeviceMode( Joy1_Left, (status & PACMAN_LEFT) ? DeviceOn : DeviceOff);
+    setDeviceMode( Joy1_Right, (status & PACMAN_RIGHT) ? DeviceOn : DeviceOff);
+    setDeviceMode( Joy1_Up, (status & PACMAN_UP) ? DeviceOn : DeviceOff);
+    setDeviceMode( Joy1_Down, (status & PACMAN_DOWN) ? DeviceOn : DeviceOff);
+    setDeviceMode( CoinSlot_1, (status & PACMAN_COIN) ? DeviceOn : DeviceOff);
+    setDeviceMode( Key_OnePlayer, (status & PACMAN_1UP) ? DeviceOn : DeviceOff);
+#ifdef PACMAN_2UP
+    setDeviceMode( Key_TwoPlayers, (status & PACMAN_2UP) ? DeviceOn : DeviceOff);
+#endif
+#endif    
+#ifdef CHEATS
+// skip level for testing purposes
+    if(status == SKIP_LEVEL)
+    {
+//dots
+        ram_[0x4E0E] = 242;
+//level
+        ram_[0x4E13] = 254;
+    }
+#endif
+}
+#ifdef AI
+/* blank controls */
+void clear_joystick(void)
+{
+    setDeviceMode( Joy1_Left, DeviceOff);
+    setDeviceMode( Joy1_Right, DeviceOff);
+    setDeviceMode( Joy1_Up, DeviceOff);
+    setDeviceMode( Joy1_Down, DeviceOff);
+
+}
+
+/* Make turns */
+void ai_turn( unsigned char level, unsigned char turn)
+{
+     switch(ai_direction[level][turn])
+            {
+                case 0:
+                    clear_joystick();
+                    setDeviceMode( Joy1_Up, DeviceOn);
+                    break;
+                case 1:
+                    clear_joystick();
+                    setDeviceMode( Joy1_Down, DeviceOn);
+                    break;
+                case 2:
+                    clear_joystick();
+                    setDeviceMode( Joy1_Right, DeviceOn);
+                    break;
+                case 3:
+                    clear_joystick();
+                    setDeviceMode( Joy1_Left, DeviceOn);
+                    break;
+                case 4:
+                    clear_joystick();
+                    break;
+            }
+}
+/*
+    Decide turns automatically
+*/
+unsigned char ai( unsigned char turn )
+{
+    unsigned char position;                       /* pac-mans current position */
+    unsigned char score = ram_[0x4E81];          /* current score */
+    unsigned char level;   /* current game level */
+    unsigned char map[20] = {0,1,2,3,4,5,4,4,6,7,4,8,8,9,10,10,11,10,12,12};
+
+    /*Select level map*/
+    if(ram_[0x4E13] < 20)
+    {
+        level=map[ram_[0x4E13]];
+    }else if(ram_[0x4E13] != 255)
+        level=13;
+    else
+        level=14;
+
+    if((level == 4) || (level == 8) || (level == 10))
+    {
+        switch(ram_[0x4E13])
+        {
+            case 4:
+                ai_location[4][85] = 105;
+                break;
+            case 6:
+                ai_location[4][85] = 143;
+                break;
+            case 7:
+                ai_location[4][85] = 91;
+                break;
+            case 10:
+                ai_location[4][85] = 217;
+                break;
+            case 11:
+                ai_location[8][105] = 94;
+                ai_location[8][145] = 191;
+                break;
+            case 12:
+                ai_location[8][105] = 138;
+                ai_location[8][145] = 75;
+                break;
+            case 14:
+                ai_location[10][105] = 124;
+                ai_location[10][181] = 159;
+                ai_location[10][182] = 173;
+                break;
+            case 15:
+                ai_location[10][105] = 200;
+                ai_location[10][181] = 75;
+                ai_location[10][182] = 89;
+                break;
+            case 17:
+                ai_location[10][105] = 154;
+                ai_location[10][181] = 189;
+                ai_location[10][182] = 203;
+            default:
+                break;
+        }
+    }
+
+    /* AI can't start in middle of a level */
+    if( turn > 200)
+    {
+        rb->splash(HZ/2, "AI will engage at next level start");
+        return 0;
+    }
+    if( turn == 0)
+    {
+        if( (ram_[0x4E0E] == 1) && (ram_[0x4D3A] == 47))
+        {
+            turn++;
+        }
+        joystick();
+        return turn;
+    }
+
+
+    if(turn != 0)
+    {
+        /* set which axis to look for pac-man along */
+        position = ram_[0x4D3A];
+        if( ai_direction[level][turn-1] < 2)
+        {
+            position = ram_[0x4D39];
+        }
+
+
+        /*move joystick if necessary */
+        if(ai_location[level][turn] < 70)
+        {
+            if(ai_location[level][turn] < 30) /* handle turns using pinky's location as basis for turn timing */
+            {
+                if( ram_[0x4D31] == (ai_location[level][turn] + 30))
+                {
+                    ai_turn(level,turn);
+                    turn++;
+                }  
+            }else if( position == ai_location[level][turn] ) /* handle turns using pacman's location as basis for turn timing */
+            {
+                ai_turn(level,turn);
+                turn++;
+            } 
+        }else /* handle turns on eating ghost after center of tile using score as basis for turn timing */
+        {
+            if( score == (ai_location[level][turn]-70))
+            {
+                ai_turn(level,turn);
+                turn++;
+            }
+        }
+    }
+
+    /* reset turn counter and joystick direction on level start */
+    if(ram_[0x4E0E] == 0 )
+    {
+        /*levels that start facing right */
+        if((level != 4) && (level != 11) && (level != 7) && (level != 5) && (level != 9) && (level !=12))
+            clear_joystick();
+        return 1;
+    }
+    return turn;
+}
+#endif
+
 /*
     Runs the game engine for one frame.
 */
@@ -368,6 +632,7 @@ static int gameProc( void )
     long end_time;
     int frame_counter = 0;
     int yield_counter = 0;
+    unsigned char turn = 250;
 
     if (settings.sound)
         start_sound();
@@ -377,10 +642,19 @@ static int gameProc( void )
         /* Run the machine for one frame (1/60th second) */
         run();
 
+/*Make Pac-man invincible*/
+#ifdef CHEATS
+        if(ram_[0x4E6E]== 23)
+            ram_[0x4DA5]=00;
+#endif
+
+
+
         frame_counter++;
 
         /* Check the button status */
         status = rb->button_status();
+        rb->button_clear_queue();
 
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold())
@@ -413,27 +687,18 @@ static int gameProc( void )
 
             start_time += *rb->current_tick-end_time;
         }
-
-#ifdef PACMAN_HAS_REMOTE
-        setDeviceMode( Joy1_Left, (status & PACMAN_LEFT || status == PACMAN_RC_LEFT) ? DeviceOn : DeviceOff);
-        setDeviceMode( Joy1_Right, (status & PACMAN_RIGHT || status == PACMAN_RC_RIGHT) ? DeviceOn : DeviceOff);
-        setDeviceMode( Joy1_Up, (status & PACMAN_UP || status == PACMAN_RC_UP) ? DeviceOn : DeviceOff);
-        setDeviceMode( Joy1_Down, (status & PACMAN_DOWN || status == PACMAN_RC_DOWN) ? DeviceOn : DeviceOff);
-        setDeviceMode( CoinSlot_1, (status & PACMAN_COIN || status == PACMAN_RC_COIN) ? DeviceOn : DeviceOff);
-        setDeviceMode( Key_OnePlayer, (status & PACMAN_1UP || status == PACMAN_RC_1UP) ? DeviceOn : DeviceOff);
-        setDeviceMode( Key_TwoPlayers, (status & PACMAN_2UP || status == PACMAN_RC_2UP) ? DeviceOn : DeviceOff);
+#ifdef AI
+        if(!settings.ai)
+        {
+            joystick();
+            turn = 250;
+        }
+        /* run ai */
+        if (settings.ai)
+            turn = ai(turn);
 #else
-        setDeviceMode( Joy1_Left, (status & PACMAN_LEFT) ? DeviceOn : DeviceOff);
-        setDeviceMode( Joy1_Right, (status & PACMAN_RIGHT) ? DeviceOn : DeviceOff);
-        setDeviceMode( Joy1_Up, (status & PACMAN_UP) ? DeviceOn : DeviceOff);
-        setDeviceMode( Joy1_Down, (status & PACMAN_DOWN) ? DeviceOn : DeviceOff);
-        setDeviceMode( CoinSlot_1, (status & PACMAN_COIN) ? DeviceOn : DeviceOff);
-        setDeviceMode( Key_OnePlayer, (status & PACMAN_1UP) ? DeviceOn : DeviceOff);
-#ifdef PACMAN_2UP
-        setDeviceMode( Key_TwoPlayers, (status & PACMAN_2UP) ? DeviceOn : DeviceOff);
+        joystick();
 #endif
-#endif
-
         /* We only update the screen every third frame - Pacman's native 
            framerate is 60fps, so we are attempting to display 20fps */
         if (frame_counter == 60 / FPS) {
@@ -506,6 +771,7 @@ enum plugin_status plugin_start(const void* parameter)
     settings.ghostnames = 0; /* Normal names */
     settings.showfps = 0;    /* Do not show FPS */
     settings.sound = 0;      /* Sound off by default */
+    settings.ai = 0;         /* AI off by default */
 
     if (configfile_load(SETTINGS_FILENAME, config,
                         sizeof(config)/sizeof(*config),
@@ -522,6 +788,10 @@ enum plugin_status plugin_start(const void* parameter)
     /* Keep a copy of the saved version of the settings - so we can check if 
        the settings have changed when we quit */
     old_settings = settings;
+
+    /*Turn off backlight for ai*/
+    if(settings.ai)
+        backlight_ignore_timeout();
 
     /* Initialise the hardware */
     init_PacmanMachine(settings_to_dip(settings));
@@ -555,5 +825,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->cpu_boost(false);
 #endif
 
+    backlight_use_settings();
+
     return PLUGIN_OK;
-}
+}//
