@@ -50,7 +50,8 @@
  * narrow_mode            1
  * indent_spaces          1
  * statusbar              1
- * (reserved)             11
+ * night_mode             1
+ * (reserved)             10
  * font name              MAX_PATH
  */
 
@@ -58,7 +59,7 @@
 #define TV_GLOBAL_SETTINGS_FILE          VIEWERS_DATA_DIR "/tv_global.dat"
 
 #define TV_GLOBAL_SETTINGS_HEADER        "\x54\x56\x47\x53" /* "TVGS" */
-#define TV_GLOBAL_SETTINGS_VERSION       0x38
+#define TV_GLOBAL_SETTINGS_VERSION       0x39
 #define TV_GLOBAL_SETTINGS_HEADER_SIZE   5
 #define TV_GLOBAL_SETTINGS_FIRST_VERSION 0x31
 
@@ -93,7 +94,8 @@
  *     narrow_mode            1
  *     indent_spaces          1
  *     statusbar              1
- *     (reserved)             11
+ *     night_mode             1
+ *     (reserved)             10
  *     font name              MAX_PATH
  *   bookmark count           1
  *   [1st bookmark]
@@ -115,7 +117,7 @@
 #define TV_SETTINGS_TMP_FILE      VIEWERS_DATA_DIR "/tv_file.tmp"
 
 #define TV_SETTINGS_HEADER        "\x54\x56\x53" /* "TVS" */
-#define TV_SETTINGS_VERSION       0x39
+#define TV_SETTINGS_VERSION       0x3A
 #define TV_SETTINGS_HEADER_SIZE   4
 #define TV_SETTINGS_FIRST_VERSION 0x32
 
@@ -214,6 +216,8 @@ static bool tv_read_preferences(int pfd, int version, struct tv_preferences *pre
 
     if (version > 6)
         prefs->statusbar = (*p++ != 0);
+    if (version > 7)
+        prefs->night_mode = (*p++ != 0);
 
 #ifdef HAVE_LCD_BITMAP
     rb->strlcpy(prefs->font_name, buf + read_size - MAX_PATH, MAX_PATH);
@@ -247,6 +251,7 @@ static void tv_serialize_preferences(unsigned char *buf, const struct tv_prefere
     *p++ = prefs->narrow_mode;
     *p++ = prefs->indent_spaces;
     *p++ = prefs->statusbar;
+    *p++ = prefs->night_mode;
 
 #ifdef HAVE_LCD_BITMAP
     rb->strlcpy(buf + 28, prefs->font_name, MAX_PATH);
