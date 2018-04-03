@@ -69,6 +69,7 @@
 #define TV_SCROLLBAR_WIDTH  rb->global_settings->scrollbar_width
 #define TV_SCROLLBAR_HEIGHT 4
 
+
 #ifndef HAVE_LCD_BITMAP
 #define TV_BOOKMARK_ICON 0xe101
 #endif
@@ -220,6 +221,7 @@ void tv_draw_text(int row, const unsigned char *text, int offset)
     }
 
     display->set_viewport(&vp_text);
+    tv_night_mode();
 #ifdef HAVE_LCD_BITMAP
     display->putsxy(xpos, row * row_height, text);
 #else
@@ -231,6 +233,7 @@ void tv_draw_text(int row, const unsigned char *text, int offset)
 void tv_start_display(void)
 {
     display->set_viewport(&vp_info);
+    tv_night_mode();
 #ifdef HAVE_LCD_BITMAP
     display->set_drawmode(DRMODE_SOLID);
 #endif
@@ -239,6 +242,7 @@ void tv_start_display(void)
     rb->lcd_set_backdrop(NULL);
 #endif
     display->clear_viewport();
+
 }
 
 void tv_end_display(void)
@@ -401,6 +405,21 @@ bool tv_init_display(unsigned char **buf, size_t *size)
     tv_add_preferences_change_listner(tv_change_preferences);
 
     return true;
+}
+
+void tv_night_mode(void)
+{
+#ifdef HAVE_LCD_COLOR
+     if(preferences->night_mode)
+    {
+        rb->lcd_set_foreground(LCD_RGBPACK(0xBF,0xBF,0x00));
+        rb->lcd_set_background(LCD_RGBPACK(0x96,0x0D,0x00));
+    }else
+    {
+        rb->lcd_set_foreground(LCD_WHITE);
+        rb->lcd_set_background(LCD_BLACK);
+    }
+#endif
 }
 
 void tv_finalize_display(void)
