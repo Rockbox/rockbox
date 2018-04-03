@@ -49,6 +49,7 @@ static bool tv_notify_change_preferences(const struct tv_preferences *oldp)
      *   - font
      *   - autoscroll_speed
      *   - narrow_mode
+     *   - night_mode
      */
     if ((oldp == NULL)                                                    ||
         (oldp->word_mode            != preferences->word_mode)            ||
@@ -120,7 +121,8 @@ void tv_set_default_preferences(struct tv_preferences *p)
     p->footer_mode = false;
     p->statusbar   = false;
 #endif
-    p->autoscroll_speed = 1;
+    p->autoscroll_speed = 10;
+    p->night_mode  = false;
     p->narrow_mode = NM_PAGE;
     p->indent_spaces = 2;
     /* Set codepage to system default */

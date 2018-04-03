@@ -247,6 +247,13 @@ static bool tv_indent_spaces_setting(void)
                        &new_prefs.indent_spaces, NULL, 1, 0, 5, NULL);
 }
 
+#ifdef HAVE_LCD_COLOR
+static bool tv_night_mode_setting(void)
+{
+    return rb->set_bool("Night Mode", &new_prefs.night_mode);
+}
+#endif
+
 MENUITEM_FUNCTION(encoding_item, 0, "Encoding", tv_encoding_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(word_wrap_item, 0, "Word Wrap", tv_word_wrap_setting,
@@ -269,6 +276,10 @@ MENUITEM_FUNCTION(font_item, 0, "Font", tv_font_setting,
 #endif
 MENUITEM_FUNCTION(indent_spaces_item, 0, "Indent Spaces", tv_indent_spaces_setting,
                   NULL, NULL, Icon_NOICON);
+#ifdef HAVE_LCD_COLOR
+MENUITEM_FUNCTION(night_mode_item, 0, "Night Mode", tv_night_mode_setting,
+                  NULL, NULL, Icon_NOICON);
+#endif
 
 MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
             &encoding_item, &word_wrap_item, &line_mode_item, &windows_item,
@@ -276,7 +287,11 @@ MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
 #ifdef HAVE_LCD_BITMAP
             &header_item, &footer_item, &font_item, &statusbar_item,
 #endif
-            &scroll_menu, &indent_spaces_item);
+            &scroll_menu, &indent_spaces_item
+#ifdef HAVE_LCD_COLOR
+            , &night_mode_item
+#endif
+            );
 
 static unsigned tv_options_menu(void)
 {

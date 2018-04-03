@@ -103,6 +103,9 @@ void tv_start_display(void);
 /* end the display processing */
 void tv_end_display(void);
 
+/*change color scheme*/
+void tv_night_mode(void);
+
 
 /* layout functions */
 
