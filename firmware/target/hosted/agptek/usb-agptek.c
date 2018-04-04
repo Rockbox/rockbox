@@ -19,12 +19,16 @@
  ****************************************************************************/
 
 #include <stdlib.h>
+#include <sys/mount.h>
+#include <string.h>
 #include "config.h"
 #include "disk.h"
 #include "usb.h"
 #include "sysfs.h"
 #include "power.h"
 #include "power-agptek.h"
+
+static bool adb_mode = false;
 
 /* TODO: implement usb detection properly */
 int usb_detect(void)
@@ -34,7 +38,13 @@ int usb_detect(void)
 
 void usb_enable(bool on)
 {
-    sysfs_set_int("/sys/class/android_usb/android0/enable", on ? 1 : 0);
+    /* Ignore usb enable/disable when ADB is enabled so we can fireup adb shell
+     * without entering ums mode
+     */
+    if (!adb_mode)
+    {
+        sysfs_set_int("/sys/class/android_usb/android0/enable", on ? 1 : 0);
+    }
 }
 
 /* This is called by usb thread after usb extract in order to return
@@ -44,15 +54,23 @@ void usb_enable(bool on)
 */
 int disk_mount_all(void)
 {
+    const char *dev[] = {"/dev/mmcblk0p1", "/dev/mmcblk0"};
+    const char *fs[] = {"vfat", "exfat"};
+
     sysfs_set_string("/sys/class/android_usb/android0/f_mass_storage/lun/file", "");
 
-    if (system("/bin/mount /dev/mmcblk0p1 /mnt/sd_0") &&
-        system("/bin/mount /dev/mmcblk0 /mnt/sd_0"))
+    for (int i=0; i<2; i++)
     {
-        return 0;
+        for (int j=0; j<2; j++)
+        {
+            if (mount(dev[i], "/mnt/sd_0", fs[j], 0, NULL) == 0)
+            {
+                return 1;
+            }
+         }
     }
 
-    return 1;
+    return 0;
 }
 
 /* This is called by usb thread after all threads ACKs usb inserted message
@@ -61,32 +79,40 @@ int disk_mount_all(void)
  */
 int disk_unmount_all(void)
 {
-    /* TODO: figure out actual block device */
-    if (!system("/bin/umount /dev/mmcblk0p1"))
-    {
-        sysfs_set_string("/sys/class/android_usb/android0/f_mass_storage/lun/file", "/dev/mmcblk0p1");
-    }
-    else if (!system("/bin/umount /dev/mmcblk0"))
+    if (umount("/mnt/sd_0") == 0)
     {
         sysfs_set_string("/sys/class/android_usb/android0/f_mass_storage/lun/file", "/dev/mmcblk0");
-    }
-    else
-    {
-        return 0;
+        return 1;
     }
 
-    return 1;
+    return 0;
 }
 
 void usb_init_device(void)
 {
+    char functions[32] = {0};
+
+    /* Check if ADB was activated in bootloader */
+    sysfs_get_string("/sys/class/android_usb/android0/functions", functions, sizeof(functions));
+    adb_mode = (strstr(functions, "adb") == NULL) ? false : true;
+
     usb_enable(false);
 
-    sysfs_set_string("/sys/class/android_usb/android0/idVendor", "C502");
-    sysfs_set_string("/sys/class/android_usb/android0/idProduct", "0029");
+    if (adb_mode)
+    {
+        sysfs_set_string("/sys/class/android_usb/android0/functions", "mass_storage,adb");
+        sysfs_set_string("/sys/class/android_usb/android0/idVendor", "18D1");
+        sysfs_set_string("/sys/class/android_usb/android0/idProduct", "D002");
+    }
+    else
+    {
+        sysfs_set_string("/sys/class/android_usb/android0/functions", "mass_storage");
+        sysfs_set_string("/sys/class/android_usb/android0/idVendor", "C502");
+        sysfs_set_string("/sys/class/android_usb/android0/idProduct", "0029");
+    }
+
     sysfs_set_string("/sys/class/android_usb/android0/iManufacturer", "Rockbox.org");
     sysfs_set_string("/sys/class/android_usb/android0/iProduct", "Rockbox media player");
     sysfs_set_string("/sys/class/android_usb/android0/iSerial", "0123456789ABCDEF");
-    sysfs_set_string("/sys/class/android_usb/android0/functions", "mass_storage");
     sysfs_set_string("/sys/class/android_usb/android0/f_mass_storage/inquiry_string", "Agptek Rocker 0100");
 }

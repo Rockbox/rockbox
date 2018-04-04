@@ -449,6 +449,7 @@ static void tools_screen(void)
         power_off();
 }
 
+#if 0
 /* open log file */
 static int open_log(void)
 {
@@ -467,11 +468,13 @@ static int open_log(void)
     /* re-open the file, truncate in case the move was unsuccessful */
     return open("/mnt/sd_0/rockbox.log", O_RDWR | O_CREAT | O_APPEND | O_TRUNC);
 }
+#endif
 
 int main(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
+#if 0
     /* redirect stdout and stderr to have error messages logged somewhere on the
      * user partition */
     int fd = open_log();
@@ -485,6 +488,7 @@ int main(int argc, char **argv)
     printf("Rockbox boot loader\n");
     printf("Version: %s\n", rbversion);
     printf("%s\n", MODEL_NAME);
+#endif
 
     system_init();
     core_allocator_init();
@@ -506,10 +510,12 @@ int main(int argc, char **argv)
         enum boot_mode mode = get_boot_mode();
         if(mode == BOOT_USB || mode == BOOT_OF)
         {
+#if 0
             fflush(stdout);
             fflush(stderr);
             close(fileno(stdout));
             close(fileno(stderr));
+#endif
             /* for now the only way we have to trigger USB mode it to run the OF */
             /* boot OF */
             execvp("/usr/bin/hiby_player", argv);

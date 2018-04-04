@@ -23,7 +23,8 @@
 #include <stdbool.h>
 #include "config.h"
 
-unsigned int agptek_power_get_status(void);
+unsigned int agptek_power_input_status(void);
+bool agptek_power_charging_status(void);
 unsigned int agptek_power_get_battery_voltage(void);
 #endif /* _POWER_AGPTEK_H_ */
 
