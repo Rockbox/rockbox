@@ -162,7 +162,15 @@ void sim_backlight(int value)
 #endif
     }
 #else /* LCD_DEPTH > 8 */
+#ifdef HAVE_TRANSFLECTIVE_LCD
+    if (!lcd_active())
+        SDL_SetAlpha(lcd_surface, SDL_SRCALPHA, 0);
+    else
+        SDL_SetAlpha(lcd_surface, SDL_SRCALPHA,
+                        MAX(BACKLIGHT_OFF_ALPHA, (value * 255) / 100));
+#else
     SDL_SetAlpha(lcd_surface, SDL_SRCALPHA, (value * 255) / 100);
+#endif
 #endif /* LCD_DEPTH */
 
     sdl_gui_update(lcd_surface, 0, 0, SIM_LCD_WIDTH, SIM_LCD_HEIGHT,
