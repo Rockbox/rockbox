@@ -78,6 +78,9 @@ void lcd_remote_set_invert_display(bool invert)
 void lcd_sleep(void)
 {
     lcd_sleeping = true;
+#ifdef HAVE_TRANSFLECTIVE_LCD
+    sim_backlight(0);   /* completely blacken the screen */
+#endif
 }
 
 void lcd_awake(void)
