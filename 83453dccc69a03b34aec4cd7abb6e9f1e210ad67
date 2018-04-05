@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c47b5cf8_08fd0707",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1000595
+      },
+      "writtenOn": "2018-04-05T20:17:10Z",
+      "side": 1,
+      "message": "This commit is dependent on g#1308",
+      "revId": "83453dccc69a03b34aec4cd7abb6e9f1e210ad67",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
