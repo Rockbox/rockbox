@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e486a02c_09fd0907",
+        "filename": "apps/plugins/CATEGORIES",
+        "patchSetId": 2
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1000595
+      },
+      "writtenOn": "2018-04-05T20:15:57Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be a demo?",
+      "revId": "d30299aeac7df39d2eb550572b9011892a36b6ec",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
