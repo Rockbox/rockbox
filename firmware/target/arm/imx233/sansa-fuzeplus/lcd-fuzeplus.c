@@ -45,8 +45,18 @@ static int lcd_dcp_channel = -1;
 #ifdef HAVE_LCD_INVERT
 static int lcd_reg_0x61_val = 1; /* used to invert display */
 #endif
+
+/* portrait */
+#if LCD_WIDTH == 240
+#define REG3_NORMAL     0x1030
+#define REG3_FLIP       0x1000
+#else /* landscape */
+#define REG3_NORMAL     0x1028
+#define REG3_FLIP       0x1018
+#endif
+
 #ifdef HAVE_LCD_FLIP
-static int lcd_reg_3_val = 0x1030; /* controls to flip display */
+static int lcd_reg_3_val = REG3_NORMAL; /* controls to flip display */
 #endif
 
 static enum lcd_kind_t
@@ -267,7 +277,7 @@ static void lcd_init_seq_7783(void)
     _mdelay(200)
     _lcd_write_reg(1, 0x100)
     _lcd_write_reg(2, 0x700)
-    _lcd_write_reg(3, 0x1030)
+    _lcd_write_reg(3, REG3_NORMAL)
     _lcd_write_reg(7, 0x121)
     _lcd_write_reg(8, 0x302)
     _lcd_write_reg(9, 0x200)
@@ -322,7 +332,7 @@ static void lcd_init_seq_9325(void)
     _lcd_write_reg(0, 1)
     _lcd_write_reg(1, 0x100)
     _lcd_write_reg(2, 0x700)
-    _lcd_write_reg(3, 0x1030)
+    _lcd_write_reg(3, REG3_NORMAL)
     _lcd_write_reg(4, 0)
     _lcd_write_reg(8, 0x207)
     _lcd_write_reg(9, 0)
@@ -545,7 +555,7 @@ void lcd_set_invert_display(bool yesno)
 #ifdef HAVE_LCD_FLIP
 void lcd_set_flip(bool yesno)
 {
-    lcd_reg_3_val = yesno ? 0x1000 : 0x1030;
+    lcd_reg_3_val = yesno ? REG3_FLIP : REG3_NORMAL;
     #ifdef HAVE_LCD_ENABLE
     if(!lcd_on)
         return;
@@ -573,12 +583,23 @@ void lcd_update_rect(int x, int y, int w, int h)
     h = MIN(h, LCD_HEIGHT - y);
 
     imx233_lcdif_wait_ready();
+#if LCD_WIDTH == 240
+    /* portrait */
     lcd_write_reg(0x50, x);
     lcd_write_reg(0x51, x + w - 1);
     lcd_write_reg(0x52, y);
     lcd_write_reg(0x53, y + h - 1);
     lcd_write_reg(0x20, x);
     lcd_write_reg(0x21, y);
+#else
+    /* landscape */
+    lcd_write_reg(0x50, LCD_HEIGHT - y - h);
+    lcd_write_reg(0x51, LCD_HEIGHT - y - 1);
+    lcd_write_reg(0x52, x);
+    lcd_write_reg(0x53, x + w - 1);
+    lcd_write_reg(0x20, y);
+    lcd_write_reg(0x21, x);
+#endif
     lcd_write_reg(0x22, 0);
     imx233_lcdif_wait_ready();
     imx233_lcdif_set_word_length(16);
