@@ -9,6 +9,7 @@
  *
  * Based upon code (C) 2002 by Björn Stenberg
  * Copyright (C) 2011 by Thomas Jarosch
+ * Copyright (C) 2018 by Marcin Bukat
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,6 +21,7 @@
  *
  ****************************************************************************/
 #include <time.h>
+#include <sys/time.h>
 
 void rtc_init(void)
 {
@@ -35,6 +37,10 @@ int rtc_read_datetime(struct tm *tm)
 
 int rtc_write_datetime(const struct tm *tm)
 {
-    (void)tm;
-    return -1;
+    struct timeval tv;
+    
+    tv.tv_sec = mktime((struct tm *)tm);
+    tv.tv_usec = 0;
+
+    return settimeofday(&tv, NULL);
 }

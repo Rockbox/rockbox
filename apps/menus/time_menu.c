@@ -37,7 +37,9 @@
 #include "list.h"
 #include "alarm_menu.h"
 #include "screens.h"
+#if CONFIG_TUNER
 #include "radio.h"
+#endif
 #include "font.h"
 #include "system.h"
 
