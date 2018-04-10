@@ -59,7 +59,7 @@
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
 
 /* define this if you have a real-time clock */
-#define CONFIG_RTC 0
+#define CONFIG_RTC APPLICATION
 
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x80000
