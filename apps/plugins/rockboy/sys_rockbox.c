@@ -261,7 +261,7 @@ void vid_init(void)
     fb.enabled=1;
 
 #if defined(HAVE_LCD_COLOR)
-#if LCD_DEPTH == 24
+#if LCD_DEPTH >= 24
     fb.cc[0].r = 0;  /* 8-8 (wasted bits on red) */
     fb.cc[0].l = 16; /* this is the offset to the R bits (24-8) */
     fb.cc[1].r = 0;  /* 8-6 (wasted bits on green) */
