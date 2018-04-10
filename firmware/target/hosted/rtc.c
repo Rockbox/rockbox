@@ -22,6 +22,10 @@
  ****************************************************************************/
 #include <time.h>
 #include <sys/time.h>
+#include <sys/ioctl.h>
+#include <linux/rtc.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 void rtc_init(void)
 {
@@ -37,10 +41,27 @@ int rtc_read_datetime(struct tm *tm)
 
 int rtc_write_datetime(const struct tm *tm)
 {
+#if defined(AGPTEK_ROCKER)
     struct timeval tv;
+    struct tm *tm_time;
+
+    int rtc = open("/dev/rtc0", O_WRONLY);
     
     tv.tv_sec = mktime((struct tm *)tm);
     tv.tv_usec = 0;
 
-    return settimeofday(&tv, NULL);
+    /* set system clock */
+    settimeofday(&tv, NULL);
+
+    /* hw clock stores time in UTC */
+    time_t now = time(NULL);
+    tm_time = gmtime(&now);
+
+    ioctl(rtc, RTC_SET_TIME, (struct rtc_time *)tm_time);
+    close(rtc);
+
+    return 0;
+#else
+    return -1;
+#endif
 }
