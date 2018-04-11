@@ -147,12 +147,19 @@ static const struct button_mapping button_context_quickscreen[]  = {
 }; /* button_context_quickscreen */
 
 static const struct button_mapping button_context_settings_time[] = {
-    { ACTION_STD_PREV,        BUTTON_UP|BUTTON_REL,             BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,  BUTTON_UP|BUTTON_REPEAT,          BUTTON_NONE },
-    { ACTION_STD_NEXT,        BUTTON_DOWN|BUTTON_REL,           BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,  BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_STD_PREV,        BUTTON_LEFT|BUTTON_REL,             BUTTON_LEFT },
+//    { ACTION_STD_PREVREPEAT,  BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_LEFT },
+    { ACTION_STD_NEXT,        BUTTON_RIGHT|BUTTON_REL,           BUTTON_RIGHT },
+    { ACTION_STD_NEXTREPEAT,  BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_RIGHT },
+    { ACTION_STD_CANCEL,      BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_LEFT },
+    { ACTION_STD_OK,          BUTTON_SELECT|BUTTON_REL,          BUTTON_SELECT },
+    { ACTION_SETTINGS_INC,      BUTTON_UP,                BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,BUTTON_UP|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,      BUTTON_DOWN,                BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+    LAST_ITEM_IN_LIST
+    //LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_settings_time */
 
 static const struct button_mapping button_context_pitchscreen[]  = {
