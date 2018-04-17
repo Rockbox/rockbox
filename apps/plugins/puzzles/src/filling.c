@@ -69,7 +69,7 @@
 static unsigned char verbose;
 
 static void printv(const char *fmt, ...) {
-#ifndef PALM
+#if !defined(PALM) && !defined(ROCKBOX)
     if (verbose) {
 	va_list va;
 	va_start(va, fmt);
