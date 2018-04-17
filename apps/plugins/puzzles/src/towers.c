@@ -864,6 +864,21 @@ static const char *validate_desc(const game_params *params, const char *desc)
     return NULL;
 }
 
+static char *game_request_keys(const game_params *params)
+{
+    int i;
+    int w = params->w;
+    char *keys = smalloc(w+2);
+    keys[0] = '\b';
+    for (i = 0; i < w; i++) {
+	if (i<9) keys[i] = '1' + i;
+	else keys[i] = 'a' + i - 9;
+    }
+    keys[w] = '\b';
+    keys[w+1] = '\0';
+    return keys;
+}
+
 static game_state *new_game(midend *me, const game_params *params,
                             const char *desc)
 {
@@ -1993,6 +2008,7 @@ const struct game thegame = {
     free_ui,
     encode_ui,
     decode_ui,
+    game_request_keys,
     game_changed_state,
     interpret_move,
     execute_move,
@@ -2072,6 +2088,17 @@ int main(int argc, char **argv)
 	    break;
     }
 
+    if (really_show_working) {
+        /*
+         * Now run the solver again at the last difficulty level we
+         * tried, but this time with diagnostics enabled.
+         */
+        solver_show_working = really_show_working;
+        memcpy(s->grid, s->clues->immutable, p->w * p->w);
+        ret = solver(p->w, s->clues->clues, s->grid,
+                     diff < DIFFCOUNT ? diff : DIFFCOUNT-1);
+    }
+
     if (diff == DIFFCOUNT) {
 	if (grade)
 	    printf("Difficulty rating: ambiguous\n");
@@ -2084,9 +2111,6 @@ int main(int argc, char **argv)
 	    else
 		printf("Difficulty rating: %s\n", towers_diffnames[ret]);
 	} else {
-	    solver_show_working = really_show_working;
-	    memcpy(s->grid, s->clues->immutable, p->w * p->w);
-	    ret = solver(p->w, s->clues->clues, s->grid, diff);
 	    if (ret != diff)
 		printf("Puzzle is inconsistent\n");
 	    else

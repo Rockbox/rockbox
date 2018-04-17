@@ -1,17 +1,17 @@
-/* commented-out games cannot be played due to controls and/or bugs */
+/* every game works! :) */
 
 src/blackbox.c
 src/bridges.c
 src/cube.c
 src/dominosa.c
 src/fifteen.c
-//src/filling.c /* requires numeric input */
+src/filling.c
 src/flip.c
 src/flood.c
 src/galaxies.c
 src/guess.c
 src/inertia.c
-//src/keen.c /* numeric input */
+src/keen.c
 src/lightup.c
 src/magnets.c
 src/map.c
@@ -29,11 +29,11 @@ src/singles.c
 src/sixteen.c
 src/slant.c
 src/tents.c
-//src/towers.c /* numeric input */
+src/towers.c
 src/tracks.c
 src/twiddle.c
-//src/undead.c /* keyboard input */
-//src/unequal.c /* numeric input */
+src/undead.c
+src/unequal.c
 src/unruly.c
 src/untangle.c
 
@@ -46,6 +46,6 @@ src/untangle.c
 /* no c200v2 */
 #if PLUGIN_BUFFER_SIZE > 0x14000
 src/pearl.c
-src/loopy.c /* mouse input */
-//src/solo.c /* numeric input */
+src/loopy.c
+src/solo.c
 #endif

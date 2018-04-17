@@ -510,7 +510,9 @@ static const char *validate_params(const game_params *params, int full)
     if ((params->c * params->r) > 31)
         return "Unable to support more than 31 distinct symbols in a puzzle";
     if (params->killer && params->c * params->r > 9)
-	return "Killer puzzle dimensions must be smaller than 10.";
+        return "Killer puzzle dimensions must be smaller than 10";
+    if (params->xtype && params->c * params->r < 4)
+        return "X-type puzzle dimensions must be larger than 3";
     return NULL;
 }
 
@@ -3103,6 +3105,8 @@ static int check_valid(int cr, struct block_structure *blocks,
 		sfree(used);
 		return FALSE;
 	    }
+
+	memset(used, FALSE, cr);
 	for (i = 0; i < cr; i++)
 	    if (grid[diag1(i)] > 0 && grid[diag1(i)] <= cr)
 		used[grid[diag1(i)]-1] = TRUE;
@@ -3602,6 +3606,20 @@ static struct block_structure *gen_killer_cages(int cr, random_state *rs,
 	assert(n_singletons == 0);
     }
     return b;
+}
+
+static char *game_request_keys(const game_params *params)
+{
+    int i;
+    int cr = params->c * params->r;
+    char *keys = smalloc(cr+2);
+    for (i = 0; i < cr; i++) {
+	if (i<9) keys[i] = '1' + i;
+	else keys[i] = 'a' + i - 9;
+    }
+    keys[cr] = '\b';
+    keys[cr+1] = '\0';
+    return keys;
 }
 
 static char *new_game_desc(const game_params *params, random_state *rs,
@@ -5575,6 +5593,7 @@ const struct game thegame = {
     free_ui,
     encode_ui,
     decode_ui,
+    game_request_keys,
     game_changed_state,
     interpret_move,
     execute_move,

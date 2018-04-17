@@ -1287,6 +1287,11 @@ static const char *validate_desc(const game_params *params, const char *desc)
     return (area < sz) ? "Not enough data to fill grid" : NULL;
 }
 
+static char *game_request_keys(const game_params *params)
+{
+    return dupstr("1234567890\b");
+}
+
 static game_state *new_game(midend *me, const game_params *params,
                             const char *desc)
 {
@@ -2125,6 +2130,7 @@ const struct game thegame = {
     free_ui,
     encode_ui,
     decode_ui,
+    game_request_keys,
     game_changed_state,
     interpret_move,
     execute_move,

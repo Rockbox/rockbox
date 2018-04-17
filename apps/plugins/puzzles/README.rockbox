@@ -51,3 +51,6 @@ March 2018: Added help styling. Changed from simple_viewer to
 display_text for displaying help text. compress.c now does additional
 processing on the help text, and also requires a slightly modified
 halibut.
+
+April 2018: Finished up the rest of the games. All work now! Surely
+there's still bugs to fix, so stay tuned...

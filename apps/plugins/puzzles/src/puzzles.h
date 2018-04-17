@@ -613,6 +613,7 @@ struct game {
     void (*free_ui)(game_ui *ui);
     char *(*encode_ui)(const game_ui *ui);
     void (*decode_ui)(game_ui *ui, const char *encoding);
+    char *(*request_keys)(const game_params *params);
     void (*changed_state)(game_ui *ui, const game_state *oldstate,
                           const game_state *newstate);
     char *(*interpret_move)(const game_state *state, game_ui *ui,
