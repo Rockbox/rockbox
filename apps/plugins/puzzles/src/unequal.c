@@ -1280,6 +1280,21 @@ fail:
     return NULL;
 }
 
+static char *game_request_keys(const game_params *params)
+{
+    int order = params->order;
+    char off = (order > 9) ? '0' : '1';
+    char *keys = smalloc(order + 2);
+    int i;
+    for(i = 0; i < order; i++) {
+	if (i==10) off = 'a'-10;
+	keys[i] = i + off;
+    }
+    keys[order] = '\b';
+    keys[order+1] = '\0';
+    return keys;
+}
+
 static game_state *new_game(midend *me, const game_params *params,
                             const char *desc)
 {
@@ -2011,6 +2026,7 @@ const struct game thegame = {
     free_ui,
     encode_ui,
     decode_ui,
+    game_request_keys,
     game_changed_state,
     interpret_move,
     execute_move,

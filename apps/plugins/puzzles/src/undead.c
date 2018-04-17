@@ -1314,6 +1314,11 @@ void num2grid(int num, int width, int height, int *x, int *y) {
     return;
 }
 
+static char *game_request_keys(const game_params *params)
+{
+    return dupstr("GVZ\b");
+}
+
 static game_state *new_game(midend *me, const game_params *params,
                             const char *desc)
 {
@@ -2716,6 +2721,7 @@ const struct game thegame = {
     free_ui,
     encode_ui,
     decode_ui,
+    game_request_keys,
     game_changed_state,
     interpret_move,
     execute_move,

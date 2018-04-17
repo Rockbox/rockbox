@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2017 Franklin Wei
+ * Copyright (C) 2018 Franklin Wei
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -139,28 +139,36 @@ static int ud_l = 0, ud_u = 0, ud_r = LCD_WIDTH, ud_d = LCD_HEIGHT;
 
 static char *titlebar = NULL;
 
+/* some games can run in a separate thread for a larger stack (only
+ * Solo for now) */
+static int thread = -1;
+
 /* how to process the input (custom, per-game) */
 static struct {
-    bool want_spacebar, falling_edge, ignore_repeats, rclick_on_hold;
+    bool want_spacebar; /* send spacebar event on long-press of select */
+    bool falling_edge; /* send events upon button release, not initial press */
+    bool ignore_repeats; /* ignore repeated button events (currently in all games but Untangle) */
+    bool rclick_on_hold; /* if in mouse mode, send right-click on long-press of select */
+    bool numerical_chooser; /* repurpose select to activate a numerical chooser */
 } input_settings;
 
 static bool accept_input = true;
 
 /* last timer call */
 static long last_tstamp;
-static volatile bool timer_on = false;
+static bool timer_on = false;
 
 static bool load_success;
 
 /* debug settings */
-/* did I mention there's a secret debug menu? */
+/* ...did I mention there's a secret debug menu? */
 static struct {
     int slowmo_factor;
     bool timerflash, clipoff, shortcuts, no_aa, polyanim;
 } debug_settings;
 
-/* re-implementations of many rockbox primitives, adapted to draw into
- * a custom framebuffer. */
+/* These are re-implementations of many rockbox drawing functions, adapted to
+ * draw into a custom framebuffer (used for the zoom feature). */
 static void zoom_drawpixel(int x, int y)
 {
     if(y < zoom_clipu || y >= zoom_clipd)
@@ -323,7 +331,7 @@ static void zoom_alpha_bitmap(const unsigned char *bits, int x, int y, int w, in
     }
 }
 
-/* font management */
+/* font management routines */
 
 static struct bundled_font {
     int status; /* -3 = never tried loading, or unloaded, -2 = failed to load, >= -1: loaded successfully */
@@ -343,8 +351,7 @@ static void unload_fonts(void)
             loaded_fonts[i].status = -3;
         }
     access_counter = -1;
-    cur_font = FONT_UI;
-    rb->lcd_setfont(cur_font);
+    rb->lcd_setfont(cur_font = FONT_UI);
 }
 
 static void init_fonttab(void)
@@ -451,7 +458,7 @@ fallback:
     return;
 }
 
-/*** Drawing API ***/
+/*** Drawing API (normal, no zoom) ***/
 
 static void offset_coords(int *x, int *y)
 {
@@ -1138,6 +1145,8 @@ static void rb_draw_circle(void *handle, int cx, int cy, int radius,
     }
 }
 
+/* blitters allow the game code to save/restore a piece of the
+ * framebuffer */
 struct blitter {
     bool have_data;
     int x, y;
@@ -1341,8 +1350,7 @@ static void draw_title(bool clear_first)
     }
 
     int w, h;
-    cur_font = FONT_UI;
-    rb->lcd_setfont(cur_font);
+    rb->lcd_setfont(cur_font = FONT_UI);
     rb->lcd_getstringsize(str, &w, &h);
 
     rb->lcd_set_foreground(BG_COLOR);
@@ -1435,7 +1443,7 @@ const drawing_api rb_drawing = {
     NULL,
 };
 
-/** functions exported to puzzles code **/
+/** utility functions exported to puzzles code **/
 
 void fatal(const char *fmt, ...)
 {
@@ -1449,7 +1457,10 @@ void fatal(const char *fmt, ...)
     rb->splash(HZ * 2, buf);
     va_end(ap);
 
-    exit(1);
+    if(rb->thread_self() == thread)
+        rb->thread_exit();
+    else
+        exit(PLUGIN_ERROR);
 }
 
 void get_random_seed(void **randseed, int *randseedsize)
@@ -1457,7 +1468,7 @@ void get_random_seed(void **randseed, int *randseedsize)
     *randseed = snew(long);
     long seed = *rb->current_tick;
     rb->memcpy(*randseed, &seed, sizeof(seed));
-    *randseedsize = sizeof(long);
+    *randseedsize = sizeof(seed);
 }
 
 static void timer_cb(void)
@@ -1512,11 +1523,57 @@ static void send_click(int button, bool release)
         midend_process_key(me, x, y, button + 6);
 }
 
+static int choose_key(void)
+{
+    char *game_keys = NULL;
+
+    const game *gm = midend_which_game(me);
+    if(gm->request_keys)
+        game_keys = gm->request_keys(midend_get_params(me));
+
+    if(!game_keys)
+        return;
+
+    int options = strlen(game_keys);
+    int sel = 0;
+
+    while(1)
+    {
+        midend_process_key(me, 0, 0, game_keys[sel]);
+        midend_redraw(me);
+        rb->lcd_update();
+
+        int button = rb->button_get(true);
+        switch(button)
+        {
+        case BTN_LEFT:
+            if(--sel < 0)
+                sel = options - 1;
+            break;
+        case BTN_RIGHT:
+            if(++sel >= options)
+                sel = 0;
+            break;
+        case BTN_PAUSE:
+            return -1;
+        case BTN_FIRE:
+            midend_force_redraw(me);
+            rb->lcd_update();
+            free(game_keys);
+
+            /* the key has already been sent to the game */
+            return 0;
+        }
+    }
+}
+
 /* This function handles most user input. It has specific workarounds
  * and fixes for certain games to allow them to work well on
  * Rockbox. It will either return a positive value that can be passed
- * to the midend, or a negative flag value. Set do_pausemenu to false
- * to just return -1 on BTN_PAUSE and do nothing else. */
+ * to the midend, or a negative flag value. `do_pausemenu' sets how
+ * this function will handle BUTTON_PAUSE: if true, it will handle it
+ * all, otherwise it will simply return -1 and let the caller do the
+ * work (this is used for zoom mode). */
 static int process_input(int tmo, bool do_pausemenu)
 {
     LOGF("process_input start");
@@ -1547,7 +1604,7 @@ static int process_input(int tmo, bool do_pausemenu)
             return 0;
         }
 
-        /* These games want a spacebar in this event. */
+        /* These games want a spacebar in the event of a long press. */
         if(!mouse_mode && input_settings.want_spacebar)
             return ' ';
     }
@@ -1769,10 +1826,38 @@ static int process_input(int tmo, bool do_pausemenu)
         break;
 
     case BTN_FIRE:
-        if(!strcmp("Fifteen", midend_which_game(me)->name))
-            state = 'h'; /* hint */
+        if(input_settings.numerical_chooser)
+        {
+            if(choose_key() < 0)
+            {
+                if(do_pausemenu)
+                {
+                    /* quick hack to preserve the clipping state */
+                    bool orig_clipped = clipped;
+                    if(orig_clipped)
+                        rb_unclip(NULL);
+
+                    int rc = pause_menu();
+
+                    if(orig_clipped)
+                        rb_clip(NULL, clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height);
+
+                    last_keystate = 0;
+                    accept_input = true;
+
+                    return rc;
+                }
+                else
+                    return -1;
+            }
+        }
         else
-            state = CURSOR_SELECT;
+        {
+            if(!strcmp("Fifteen", midend_which_game(me)->name))
+                state = 'h'; /* hint */
+            else
+                state = CURSOR_SELECT;
+        }
         break;
 
     default:
@@ -1807,7 +1892,8 @@ static int process_input(int tmo, bool do_pausemenu)
     return state;
 }
 
-/* either pan around a zoomed-in image or play zoomed-in */
+/* This function handles zoom mode, where the user can either pan
+ * around a zoomed-in image or play a zoomed-in version of the game. */
 static void zoom(void)
 {
     rb->splash(0, "Please wait...");
@@ -1954,6 +2040,8 @@ static void zoom(void)
         }
     }
 }
+
+/** settings/preset code */
 
 static const char *config_choices_formatter(int sel, void *data, char *buf, size_t len)
 {
@@ -2176,8 +2264,7 @@ static bool config_menu(void)
     char *title;
     config_item *config = midend_get_config(me, CFG_SETTINGS, &title);
 
-    cur_font = FONT_UI;
-    rb->lcd_setfont(cur_font);
+    rb->lcd_setfont(cur_font = FONT_UI);
 
     bool success = false;
 
@@ -2372,13 +2459,15 @@ static void full_help(const char *name)
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(LCD_BLACK);
     unload_fonts();
-    cur_font = FONT_UI;
-    rb->lcd_setfont(cur_font);
+    rb->lcd_setfont(cur_font = FONT_UI);
 
+    /* The help text is stored in compressed format in the help_text[]
+     * array. display_text wants an array of pointers to
+     * null-terminated words, so we create that here. */
     char *buf = smalloc(help_text_len);
     LZ4_decompress_tiny(help_text, buf, help_text_len);
 
-    /* fill the word_ptrs array to pass to display_text */
+    /* create the word_ptrs array to pass to display_text */
     char **word_ptrs = smalloc(sizeof(char*) * help_text_words);
     char **ptr = word_ptrs;
     bool last_was_null = false;
@@ -2428,6 +2517,7 @@ static void init_default_settings(void)
 }
 
 #ifdef DEBUG_MENU
+/* Useless debug code. Mostly a waste of space. */
 static void bench_aa(void)
 {
     rb->sleep(0);
@@ -2738,8 +2828,7 @@ static size_t giant_buffer_len = 0; /* set on start */
 static void fix_size(void)
 {
     int w = LCD_WIDTH, h = LCD_HEIGHT, h_x;
-    cur_font = FONT_UI;
-    rb->lcd_setfont(cur_font);
+    rb->lcd_setfont(cur_font = FONT_UI);
     rb->lcd_getstringsize("X", NULL, &h_x);
     h -= h_x;
     midend_size(me, &w, &h, TRUE);
@@ -2798,10 +2887,9 @@ static bool string_in_list(const char *target, const char **list)
     return false;
 }
 
+/* this function sets game-specific input settings */
 static void tune_input(const char *name)
 {
-    /* game-specific stuff */
-
     static const char *want_spacebar[] = {
         "Magnets",
         "Mines",
@@ -2824,7 +2912,8 @@ static void tune_input(const char *name)
     /* wait until a key is released to send an action */
     input_settings.falling_edge = string_in_list(name, falling_edge);
 
-    /* in all games but untangle (mouse mode overrides this) */
+    /* ignore repeated keypresses in all games but untangle (mouse
+     * mode overrides this no matter what) */
     static const char *ignore_repeats[] = {
         "Untangle",
         NULL
@@ -2848,6 +2937,18 @@ static void tune_input(const char *name)
     };
 
     mouse_mode = string_in_list(name, mouse_games);
+
+    static const char *number_chooser_games[] = {
+        "Filling",
+        "Keen",
+        "Solo",
+        "Towers",
+        "Undead",
+        "Unequal",
+        NULL
+    };
+
+    input_settings.numerical_chooser = string_in_list(name, number_chooser_games);
 }
 
 static const char *init_for_game(const game *gm, int load_fd, bool draw)
@@ -3143,20 +3244,9 @@ static int mainmenu_cb(int action, const struct menu_item_ex *this_item)
     return action;
 }
 
-enum plugin_status plugin_start(const void *param)
+static void puzzles_main(void)
 {
-    (void) param;
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    /* boost for init */
-    rb->cpu_boost(true);
-#endif
-
-    giant_buffer = rb->plugin_get_buffer(&giant_buffer_len);
-
     rb_atexit(exit_handler);
-
-    init_tlsf();
 
     init_default_settings();
 
@@ -3255,7 +3345,7 @@ enum plugin_status plugin_start(const void *param)
         case 7:
             /* we don't care about freeing anything because tlsf will
              * be wiped out the next time around */
-            return PLUGIN_OK;
+            return;
         default:
             break;
         }
@@ -3294,13 +3384,13 @@ enum plugin_status plugin_start(const void *param)
                     /* quit without saving */
                     midend_free(me);
                     sfree(colors);
-                    exit(PLUGIN_OK);
+                    return;
                 case -3:
                     /* save and quit */
                     save_game();
                     midend_free(me);
                     sfree(colors);
-                    exit(PLUGIN_OK);
+                    return;
                 default:
                     break;
                 }
@@ -3328,4 +3418,36 @@ enum plugin_status plugin_start(const void *param)
         }
         sfree(colors);
     }
+}
+
+enum plugin_status plugin_start(const void *param)
+{
+    (void) param;
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    /* boost for init */
+    rb->cpu_boost(true);
+#endif
+
+    giant_buffer = rb->plugin_get_buffer(&giant_buffer_len);
+    init_tlsf();
+
+    if(!strcmp(thegame.name, "Solo"))
+    {
+        /* Solo needs a big stack */
+        int stack_sz = 16 * DEFAULT_STACK_SIZE;
+        uintptr_t old = smalloc(stack_sz);
+
+        /* word alignment */
+        long *stack = ((uintptr_t)old & (uintptr_t)(~0x3)) + 4;
+        stack_sz -= ((char*)stack - (char*)old);
+
+        thread = rb->create_thread(puzzles_main, stack, stack_sz, 0, "puzzles"
+                                   IF_PRIO(, PRIORITY_USER_INTERFACE) IF_COP(, CPU));
+        rb->thread_wait(thread);
+    }
+    else
+        puzzles_main();
+
+    return PLUGIN_OK;
 }
