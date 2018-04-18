@@ -532,50 +532,35 @@ static void rb_draw_text(void *handle, int x, int y, int fonttype,
                          int fontsize, int align, int color, const char *text)
 {
     (void) fontsize;
+
+    rb_color(color);
+    rb_setfont(fonttype, fontsize); /* size will be clamped if too large */
+
+    int w, h;
+    rb->lcd_getstringsize(text, &w, &h);
+
+    if(align & ALIGN_VNORMAL)
+        y -= h;
+    else if(align & ALIGN_VCENTRE)
+        y -= h / 2;
+
+    if(align & ALIGN_HCENTRE)
+        x -= w / 2;
+    else if(align & ALIGN_HRIGHT)
+        x -= w;
+
     if(!zoom_enabled)
     {
         LOGF("rb_draw_text(%d %d %s)", x, y, text);
 
         offset_coords(&x, &y);
 
-        rb_setfont(fonttype, fontsize);
-
-        int w, h;
-        rb->lcd_getstringsize(text, &w, &h);
-
-        if(align & ALIGN_VNORMAL)
-            y -= h;
-        else if(align & ALIGN_VCENTRE)
-            y -= h / 2;
-
-        if(align & ALIGN_HCENTRE)
-            x -= w / 2;
-        else if(align & ALIGN_HRIGHT)
-            x -= w;
-
-        rb_color(color);
         rb->lcd_set_drawmode(DRMODE_FG);
         rb->lcd_putsxy(x, y, text);
         rb->lcd_set_drawmode(DRMODE_SOLID);
     }
     else
     {
-        rb_color(color);
-        rb_setfont(fonttype, fontsize); /* size will be clamped if too large */
-
-        int w, h;
-        rb->lcd_getstringsize(text, &w, &h);
-
-        if(align & ALIGN_VNORMAL)
-            y -= h;
-        else if(align & ALIGN_VCENTRE)
-            y -= h / 2;
-
-        if(align & ALIGN_HCENTRE)
-            x -= w / 2;
-        else if(align & ALIGN_HRIGHT)
-            x -= w;
-
         /* we need to access the font bitmap directly */
         struct font *pf = rb->font_get(cur_font);
 
@@ -606,17 +591,16 @@ static void rb_draw_text(void *handle, int x, int y, int fonttype,
 
 static void rb_draw_rect(void *handle, int x, int y, int w, int h, int color)
 {
+    rb_color(color);
     if(!zoom_enabled)
     {
         LOGF("rb_draw_rect(%d, %d, %d, %d, %d)", x, y, w, h, color);
-        rb_color(color);
         offset_coords(&x, &y);
         rb->lcd_fillrect(x, y, w, h);
     }
     else
     {
         /* TODO: clipping */
-        rb_color(color);
         for(int i = y; i < y + h; ++i)
         {
             zoom_hline(x, x + w, i);
@@ -748,10 +732,12 @@ static void draw_antialiased_line(fb_data *fb, int w, int h, int x0, int y0, int
 static void rb_draw_line(void *handle, int x1, int y1, int x2, int y2,
                          int color)
 {
+    rb_color(color);
+
     if(!zoom_enabled)
     {
         LOGF("rb_draw_line(%d, %d, %d, %d, %d)", x1, y1, x2, y2, color);
-        rb_color(color);
+#if defined(FOR_REAL) && defined(DEBUG_MENU)
         if(debug_settings.no_aa)
         {
             offset_coords(&x1, &y1);
@@ -759,13 +745,13 @@ static void rb_draw_line(void *handle, int x1, int y1, int x2, int y2,
             rb->lcd_drawline(x1, y1, x2, y2);
         }
         else
+#endif
             draw_antialiased_line(rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, x1, y1, x2, y2);
     }
     else
     {
         /* draw_antialiased_line uses rb->lcd_get_foreground() to get
          * the color */
-        rb_color(color);
 
         draw_antialiased_line(zoom_fb, zoom_w, zoom_h, x1, y1, x2, y2);
     }
@@ -1917,7 +1903,7 @@ static void zoom(void)
     zoom_fb = smalloc(zoom_w * zoom_h * sizeof(fb_data));
     if(!zoom_fb)
     {
-        rb->splashf(HZ * 2, "Not enough memory to allocate %d KB framebuffer!", zoom_w * zoom_h * sizeof(fb_data) / 1024);
+        rb->splash(HZ, "OOM");
         return;
     }
 
@@ -2270,7 +2256,6 @@ static bool config_menu(void)
 
     if(!config)
     {
-        rb->splash(HZ, "Nothing to configure.");
         goto done;
     }
 
@@ -3181,7 +3166,7 @@ static bool load_game(void)
             /* success */
             return true;
         }
-        rb->splashf(HZ, "Failed loading save for %s!", game);
+        rb->splash(HZ, "Load failed.");
 
         /* clean up, even on failure */
         rb->close(fd);
