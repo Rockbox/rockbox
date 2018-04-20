@@ -259,7 +259,7 @@ int rolo_load(const char* filename)
 #endif
 
 #ifdef HAVE_STORAGE_FLUSH
-    lcd_puts(0, 1, "Flushing storage buffers");
+    lcd_puts(0, 1, " Flushing storage buffers");
     lcd_update();
     storage_flush();
 #endif
