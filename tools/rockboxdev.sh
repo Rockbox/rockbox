@@ -1,10 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Abort execution as soon as an error is encountered
 # That way the script do not let the user think the process completed correctly
 # and leave the opportunity to fix the problem and restart compilation where
 # it stopped
-set -e
+set -e -E
+trap 'say "ERROR AT ${FUNCNAME:-(top level)}:$LINENO"' ERR
 
 # this is where this script will store downloaded files and check for already
 # downloaded files
@@ -43,7 +44,11 @@ reqtools="gcc bzip2 gzip make patch makeinfo automake libtool autoconf flex biso
 ##############################################################################
 # Functions:
 
-findtool(){
+say() {
+	echo "ROCKBOXDEV: $1"
+}
+
+findtool() {
   file="$1"
 
   IFS=":"
@@ -57,7 +62,7 @@ findtool(){
   done
 }
 
-findlib (){
+findlib() {
     lib="$1"
     # on error, gcc will spit out "cannot find -lxxxx", but it may not be in
     # english so grep for -lxxxx
@@ -72,12 +77,12 @@ checklib() {
     for t in "$@"; do
         lib=`findlib $t`
         if test -z "$lib"; then
-            echo "ROCKBOXDEV: library \"$t\" is required for this script to work."
+            say "Library \"$t\" is required for this script to work."
             missingtools="yes"
         fi
     done
     if [ -n "$missingtools" ]; then
-        echo "ROCKBOXDEV: Please install the missing libraries and re-run the script."
+        say "Please install the missing libraries and re-run the script."
         exit 1
     fi
 }
@@ -105,7 +110,7 @@ getfile_ex() {
     out_file="$dlwhere/$1"
     srv_file="$2"
     if test -f $out_file; then
-        echo "ROCKBOXDEV: Skipping download of $1: File already exists"
+        say "Skipping download of $1: File already exists"
         return
     fi
     # find tool (curl or wget) and build download command
@@ -114,16 +119,16 @@ getfile_ex() {
         tool=`findtool wget`
         if test -n "$tool"; then
             # wget download
-            echo "ROCKBOXDEV: Downloading $1 using wget"
+            say "Downloading $1 using wget..."
             tool="$tool -T 60 -O "
         else
-            echo "ROCKBOXDEV: No downloader tool found!"
-            echo "ROCKBOXDEV: Please install curl or wget and re-run the script"
-            exit
+            say "No downloader tool found!"
+            say "Please install curl or wget and re-run the script"
+            exit 1
         fi
     else
         # curl download
-        echo "ROCKBOXDEV: Downloading $1 using curl"
+        say "Downloading $1 using curl..."
         tool="$tool -fLo "
     fi
 
@@ -131,15 +136,15 @@ getfile_ex() {
     shift
     shift
     for url in "$@"; do
-        echo "ROCKBOXDEV: try $url/$srv_file"
+        say "Trying $url/$srv_file..."
         if $tool "$out_file" "$url/$srv_file"; then
             return
         fi
     done
 
-    echo "ROCKBOXDEV: couldn't download the file!"
-    echo "ROCKBOXDEV: check your internet connection"
-    exit
+    say "Couldn't download the file!"
+    say "Check your internet connection"
+    exit 1
 }
 
 #$1 file
@@ -197,8 +202,8 @@ gettool() {
                     ;;
 
                 *)
-                    echo "ROCKBOXDEV: I don't know how to handle this kernel version: $version"
-                    exit
+                    say "I don't know how to handle this kernel version: $version"
+                    exit 1
                 ;;
             esac
             base_url="http://www.kernel.org/pub/linux/kernel/$top_dir"
@@ -207,8 +212,8 @@ gettool() {
             ;;
 
         *)
-            echo "ROCKBOXDEV: Bad toolname $toolname"
-            exit
+            say "Bad toolname $toolname"
+            exit 1
             ;;
     esac
     getfile_ex "$file.$ext" "$srv_file.$ext" $url
@@ -218,17 +223,17 @@ gettool() {
 # extract file
 extract() {
     if [ -d "$1" ]; then
-        echo "ROCKBOXDEV: Skipping extraction of $1: already done"
+        say "Skipping extraction of $1: already done"
         return
     fi
-    echo "ROCKBOXDEV: extracting $1"
+    say "Extracting $1..."
     if [ -f "$dlwhere/$1.tar.bz2" ]; then
         tar xjf "$dlwhere/$1.tar.bz2"
     elif [ -f "$dlwhere/$1.tar.gz" ]; then
         tar xzf "$dlwhere/$1.tar.gz"
     else
-        echo "ROCKBOXDEV: I don't know how to extract $1 (no bzip2 or gzip)"
-        exit
+        say "I don't know how to extract $1 (no bzip2 or gzip)"
+        exit 1
     fi
 }
 
@@ -238,10 +243,10 @@ extract() {
 run_cmd() {
     logfile="$1"
     shift
-    echo "Running '$@'" >>$logfile
+    say "Running '$@'..." >>$logfile
     if ! $@ >> "$logfile" 2>&1; then
-        echo "ROCKBOXDEV: an error occured, please see $logfile"
-        exit
+        say "An error occured, please see $logfile"
+        exit 1
     fi
 }
 
@@ -278,25 +283,25 @@ buildtool() {
 
     stepname=${RESTART_STEP-$tool}
     if ! check_restart "$stepname"; then
-        echo "ROCKBOXDEV: Skipping step '$stepname' as requested per RESTART"
+        say "Skipping step '$stepname' as requested per RESTART"
         return
     fi
-    echo "ROCKBOXDEV: Starting step '$stepname'"
+    say "Starting step '$stepname'"
 
-    echo "ROCKBOXDEV: logging to $logfile"
+    say "Logging to $logfile"
     rm -f "$logfile"
 
-    echo "ROCKBOXDEV: mkdir build-$toolname"
+    say "mkdir build-$toolname"
     mkdir "build-$toolname"
 
-    echo "ROCKBOXDEV: cd build-$toolname"
+    say "cd build-$toolname"
     cd "build-$toolname"
 
     # in-tree/out-of-tree build
     case "$tool" in
         linux|alsa-lib)
             # in-intree
-            echo "ROCKBOXDEV: copy $toolname for in-tree build"
+            say "Copy $toolname for in-tree build"
             # copy the source directory to the build directory
             cp -r ../$toolname/* .
             cfg_dir="."
@@ -309,7 +314,7 @@ buildtool() {
     esac
 
     if [ "$config_opt" != "NO_CONFIGURE" ]; then
-        echo "ROCKBOXDEV: $toolname/configure"
+        say "$toolname/configure"
         # NOTE glibc requires to be compiled with optimization
         CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -O2' run_cmd "$logfile" \
             "$cfg_dir/configure" "--prefix=$prefix" \
@@ -317,17 +322,17 @@ buildtool() {
     fi
 
     if [ "$make_opts" != "NO_MAKE" ]; then
-        echo "ROCKBOXDEV: $toolname/make"
+        say "$toolname/make"
         run_cmd "$logfile" $make $make_opts
     fi
 
     if [ "$install_opts" = "" ]; then
         install_opts="install"
     fi
-    echo "ROCKBOXDEV: $toolname/make (install)"
+    say "$toolname/make (install)"
     run_cmd "$logfile" $make $install_opts
 
-    echo "ROCKBOXDEV: rm -rf build-$toolname $toolname"
+    say "rm -rf build-$toolname $toolname"
     cd ..
     rm -rf build-$toolname
 }
@@ -345,8 +350,8 @@ build() {
     # create build directory
     if test -d $builddir; then
         if test ! -w $builddir; then
-            echo "ROCKBOXDEV: No write permission for $builddir"
-            exit
+            say "No write permission for $builddir"
+            exit 1
         fi
     else
         mkdir -p $builddir
@@ -367,15 +372,15 @@ build() {
 
     # do we have a patch?
     for p in $patch; do
-        echo "ROCKBOXDEV: applying patch $p"
+        say "Applying patch $p..."
 
         # apply the patch
         (cd $builddir/$toolname-$version && patch -p1 < "$dlwhere/$p")
 
         # check if the patch applied cleanly
         if [ $? -gt 0 ]; then
-            echo "ROCKBOXDEV: failed to apply patch $p"
-            exit
+            say "Failed to apply patch $p"
+            exit 1
         fi
     done
 
@@ -383,35 +388,35 @@ build() {
     if test -n "$needs_libs"; then
         cd "gcc-$version"
         if (echo $needs_libs | grep -q gmp && test ! -d gmp); then
-            echo "ROCKBOXDEV: Getting GMP"
-            getfile "gmp-4.3.2.tar.bz2" "$GNU_MIRROR/gmp"
-            tar xjf $dlwhere/gmp-4.3.2.tar.bz2
-            ln -s gmp-4.3.2 gmp
+            say "Getting GMP..."
+            getfile "gmp-6.1.2.tar.bz2" "$GNU_MIRROR/gmp"
+            tar xjf $dlwhere/gmp-6.1.2.tar.bz2
+            ln -s gmp-6.1.2 gmp
         fi
 
         if (echo $needs_libs | grep -q mpfr && test ! -d mpfr); then
-            echo "ROCKBOXDEV: Getting MPFR"
-            getfile "mpfr-2.4.2.tar.bz2" "$GNU_MIRROR/mpfr"
-            tar xjf $dlwhere/mpfr-2.4.2.tar.bz2
-            ln -s mpfr-2.4.2 mpfr
+            say "Getting MPFR..."
+            getfile "mpfr-4.0.1.tar.bz2" "$GNU_MIRROR/mpfr"
+            tar xjf $dlwhere/mpfr-4.0.1.tar.bz2
+            ln -s mpfr-4.0.1 mpfr
         fi
 
         if (echo $needs_libs | grep -q mpc && test ! -d mpc); then
-            echo "ROCKBOXDEV: Getting MPC"
-            getfile "mpc-0.8.1.tar.gz" "http://www.multiprecision.org/mpc/download"
-            tar xzf $dlwhere/mpc-0.8.1.tar.gz
-            ln -s mpc-0.8.1 mpc
+            say "Getting MPC..."
+            getfile "mpc-1.1.0.tar.gz" "$GNU_MIRROR/mpc"
+            tar xzf $dlwhere/mpc-1.1.0.tar.gz
+            ln -s mpc-1.1.0 mpc
         fi
         cd $builddir
     fi
 
-    echo "ROCKBOXDEV: mkdir build-$toolname"
+    say "mkdir build-$toolname"
     mkdir build-$toolname
 
-    echo "ROCKBOXDEV: cd build-$toolname"
+    say "cd build-$toolname"
     cd build-$toolname
 
-    echo "ROCKBOXDEV: $toolname/configure"
+    say "$toolname/configure"
     case $toolname in
         crosstool-ng) # ct-ng doesnt support out-of-tree build and the src folder is named differently
             toolname="crosstool-ng"
@@ -423,13 +428,13 @@ build() {
         ;;
     esac
 
-    echo "ROCKBOXDEV: $toolname/make"
+    say "$toolname/make"
     $make
 
-    echo "ROCKBOXDEV: $toolname/make install"
+    say "$toolname/make install"
     $make install
 
-    echo "ROCKBOXDEV: rm -rf build-$toolname $toolname-$version"
+    say "rm -rf build-$toolname $toolname-$version"
     cd ..
     rm -rf build-$toolname $toolname-$version
 }
@@ -467,8 +472,8 @@ build_ctng() {
     # create build directory
     if test -d $builddir; then
         if test ! -w $builddir; then
-            echo "ROCKBOXDEV: No write permission for $builddir"
-            exit
+            say "No write permission for $builddir"
+            exit 1
         fi
     else
         mkdir -p $builddir
@@ -505,7 +510,7 @@ build_ctng() {
 # $6=linux version
 # $7=glibc version
 # $8=glibc configure extra options
-build_linux_toolchain () {
+build_linux_toolchain() {
     target="$1"
     binutils_ver="$2"
     binutils_opts="$3"
@@ -530,8 +535,8 @@ build_linux_toolchain () {
     # create build directory
     if test -d $builddir; then
         if test ! -w $builddir; then
-            echo "ROCKBOXDEV: No write permission for $builddir"
-            exit
+            say "No write permission for $builddir"
+            exit 1
         fi
     else
         mkdir -p $builddir
@@ -586,7 +591,7 @@ build_linux_toolchain () {
         --with-sysroot=$sysroot" "" ""
 }
 
-usage () {
+usage() {
     echo "usage: rockboxdev.sh [options]"
     echo "options:"
     echo "  --help              Display this help"
@@ -596,7 +601,7 @@ usage () {
     echo "  --dlwhere=DIR       Set download directory (same as RBDEV_DOWNLOAD env var)"
     echo "  --builddir=DIR      Set build directory (same as RBDEV_BUILD env var)"
     echo "  --makeflags=FLAGS   Set make flags (same as MAKEFLAGS env var)"
-    exit 1
+    exit
 }
 
 ##############################################################################
@@ -634,7 +639,7 @@ case $i in
         shift
         ;;
     *)
-        echo "Unknown option '$i'"
+        say "Unknown option '$i'"
         exit 1
         ;;
 esac
@@ -644,12 +649,12 @@ done
 for t in $reqtools; do
     tool=`findtool $t`
     if test -z "$tool"; then
-        echo "ROCKBOXDEV: \"$t\" is required for this script to work."
+        say "\"$t\" is required for this script to work."
         missingtools="yes"
     fi
 done
 if [ -n "$missingtools" ]; then
-    echo "ROCKBOXDEV: Please install the missing tools and re-run the script."
+    say "Please install the missing tools and re-run the script."
     exit 1
 fi
 
@@ -663,14 +668,14 @@ echo "Target arch        : $RBDEV_TARGET (set RBDEV_TARGET or use --target to ch
 # Verify download directory
 if test -d "$dlwhere"; then
   if ! test -w "$dlwhere"; then
-    echo "ROCKBOXDEV: No write permission for $dlwhere"
-    exit
+    say "No write permission for $dlwhere"
+    exit 1
   fi
 else
   mkdir $dlwhere
   if test $? -ne 0; then
-    echo "ROCKBOXDEV: Failed creating directory $dlwhere"
-    exit
+    say "Failed creating directory $dlwhere"
+    exit 1
   fi
 fi
 
@@ -679,13 +684,13 @@ fi
 if test ! -d $prefix; then
   mkdir -p $prefix
   if test $? -ne 0; then
-      echo "ROCKBOXDEV: Failed creating directory $prefix"
-      exit
+      say "Failed creating directory $prefix"
+      exit 1
   fi
 fi
 if test ! -w $prefix; then
-  echo "ROCKBOXDEV: No write permission for $prefix"
-  exit
+  say "No write permission for $prefix"
+  exit 1
 fi
 
 if [ -z "$RBDEV_TARGET" ]; then
@@ -698,7 +703,7 @@ if [ -z "$RBDEV_TARGET" ]; then
     echo "x   - arm-linux  (Generic Linux ARM: Samsung ypr0, Linux-based Sony NWZ)"
     echo "separate multiple targets with spaces"
     echo "(Example: \"s m a\" will build sh, m68k and arm)"
-    echo ""
+    echo
     selarch=`input`
 else
     selarch=$RBDEV_TARGET
@@ -710,7 +715,7 @@ PATH="$prefix/bin:${PATH}"
 
 for arch in $selarch
 do
-    echo ""
+    echo
     case $arch in
         [Ss])
             # For binutils 2.16.1 builtin rules conflict on some systems with a
@@ -791,14 +796,14 @@ do
                 "--host=$target --disable-python" "" "install DESTDIR=$prefix/$target/sysroot"
             ;;
         *)
-            echo "ROCKBOXDEV: Unsupported architecture option: $arch"
-            exit
+            say "Unsupported architecture option: $arch"
+            exit 1
             ;;
     esac
 done
 
-echo ""
-echo "ROCKBOXDEV: Done!"
-echo ""
-echo "ROCKBOXDEV: Make sure your PATH includes $prefix/bin"
-echo ""
+echo
+say "Done!"
+echo
+say "Make sure your PATH includes $prefix/bin"
+echo
