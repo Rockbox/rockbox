@@ -758,7 +758,7 @@ int show_logo( void )
 
     lcd_clear_display();
 #if defined(SANSA_CLIP) || defined(SANSA_CLIPV2) || defined(SANSA_CLIPPLUS)
-    /* display the logo in the blue area of the screen */
+    /* display the logo in the blue area of the screen (bottom 48 pixels) */
     lcd_setfont(FONT_SYSFIXED);
     lcd_getstringsize((unsigned char *)"A", &font_w, &font_h);
     lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),

@@ -312,7 +312,7 @@ static void init_tagcache(void)
         show_logo();
     }
 }
-#endif
+#endif /* HAVE_TAGCACHE */
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 
@@ -409,7 +409,7 @@ static void init(void)
     settings_apply_skins();
 }
 
-#else
+#else /* CONFIG_PLATFORM & PLATFORM_HOSTED */
 
 #include "errno.h"
 
@@ -763,4 +763,4 @@ void cop_main(void)
 }
 #endif /* CPU_PP */
 
-#endif /* SIMULATOR */
+#endif /* CONFIG_PLATFORM & PLATFORM_HOSTED */
