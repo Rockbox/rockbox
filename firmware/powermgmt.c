@@ -761,7 +761,7 @@ void shutdown_hw(void)
 
 /* Commit pending writes if needed. Even though we don't do write caching,
    things like flash translation layers may need this to commit scattered
-   pages to there final locations. So far only used for iPod Nano 2G. */
+   pages to their final locations. So far only used for iPod Nano 2G. */
 #ifdef HAVE_STORAGE_FLUSH
         storage_flush();
 #endif
