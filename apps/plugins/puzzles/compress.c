@@ -60,7 +60,7 @@ void dump_bytes(unsigned char *buf, int len)
  *
  * const char help_text_words[];
  * const unsigned short help_text_len;
- * const struct style_text help_text_style[];
+ * struct style_text help_text_style[];
  *
  * help_text_words consists of help_text_len bytes containing the
  * words of the help text, delimited with NULs, not a standard C
@@ -78,7 +78,7 @@ int main()
 
     printf("#include \"lib/display_text.h\"\n\n");
 
-    printf("const struct style_text help_text_style[] = {\n");
+    printf("struct style_text help_text_style[] = {\n");
 
     /* break up words on spaces and newline while printing indices of
      * underlined words */

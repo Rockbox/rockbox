@@ -1310,11 +1310,6 @@ static void rb_status_bar(void *handle, const char *text)
     LOGF("game title is %s\n", text);
 }
 
-static int get_titleheight(void)
-{
-    return rb->font_get(FONT_UI)->height;
-}
-
 static void draw_title(bool clear_first)
 {
     const char *base;
@@ -1327,7 +1322,7 @@ static void draw_title(bool clear_first)
     rb->snprintf(str, sizeof(str), "%s%s", base, zoom_enabled ? (view_mode ? " (viewing)" : " (interaction)") : "");
 
     /* quick hack */
-    bool orig_clipped;
+    bool orig_clipped = false;
     if(!zoom_enabled)
     {
         orig_clipped = clipped;
@@ -3421,10 +3416,10 @@ enum plugin_status plugin_start(const void *param)
     {
         /* Solo needs a big stack */
         int stack_sz = 16 * DEFAULT_STACK_SIZE;
-        uintptr_t old = smalloc(stack_sz);
+        uintptr_t old = (uintptr_t)smalloc(stack_sz);
 
         /* word alignment */
-        long *stack = ((uintptr_t)old & (uintptr_t)(~0x3)) + 4;
+        long *stack = (long*)((char*)(((uintptr_t)old & (uintptr_t)(~0x3)) + 4));
         stack_sz -= ((char*)stack - (char*)old);
 
         thread = rb->create_thread(puzzles_main, stack, stack_sz, 0, "puzzles"

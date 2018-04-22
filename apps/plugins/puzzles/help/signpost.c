@@ -1,10 +1,10 @@
-/* auto-generated on Mar 17 2018 by genhelp.sh */
+/* auto-generated on Apr 19 2018 by genhelp.sh */
 /* help text is compressed using LZ4; see compress.c for details */
 /* DO NOT EDIT! */
 
 #include "lib/display_text.h"
 
-const struct style_text help_text_style[] = {
+struct style_text help_text_style[] = {
  { 0, TEXT_CENTER | C_RED },
  { 158, TEXT_CENTER | C_RED },
  { 495, TEXT_CENTER | C_RED },
