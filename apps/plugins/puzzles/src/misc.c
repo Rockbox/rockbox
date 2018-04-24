@@ -21,6 +21,15 @@ void free_cfg(config_item *cfg)
     sfree(cfg);
 }
 
+void free_keys(key_label *keys, int nkeys)
+{
+    int i;
+
+    for(i = 0; i < nkeys; i++)
+        sfree(keys->label);
+    sfree(keys);
+}
+
 /*
  * The Mines (among others) game descriptions contain the location of every
  * mine, and can therefore be used to cheat.
@@ -166,6 +175,25 @@ unsigned char *hex2bin(const char *in, int outlen)
 
         ret[i / 2] |= v << (4 * (1 - (i % 2)));
     }
+    return ret;
+}
+
+char *fgetline(FILE *fp)
+{
+    char *ret = snewn(512, char);
+    int size = 512, len = 0;
+    while (fgets(ret + len, size - len, fp)) {
+	len += strlen(ret + len);
+	if (ret[len-1] == '\n')
+	    break;		       /* got a newline, we're done */
+	size = len + 512;
+	ret = sresize(ret, size, char);
+    }
+    if (len == 0) {		       /* first fgets returned NULL */
+	sfree(ret);
+	return NULL;
+    }
+    ret[len] = '\0';
     return ret;
 }
 
@@ -378,6 +406,44 @@ void copy_left_justified(char *buf, size_t sz, const char *str)
 int ftoa(char *buf, float f)
 {
     return sprintf(buf, "%d.%06d", (int)f, abs((int)((f - (int)f)*1e6)));
+}
+
+/* Returns a dynamically allocated label for a generic button.
+ * Game-specific buttons should go into the `label' field of key_label
+ * instead. */
+char *button2label(int button)
+{
+    /* check if it's a keyboard button */
+    if(('A' <= button && button <= 'Z') ||
+       ('a' <= button && button <= 'z') ||
+       ('0' <= button && button <= '9') )
+    {
+        char str[2];
+        str[0] = button;
+        str[1] = '\0';
+        return dupstr(str);
+    }
+
+    switch(button)
+    {
+    case CURSOR_UP:
+        return dupstr("Up");
+    case CURSOR_DOWN:
+        return dupstr("Down");
+    case CURSOR_LEFT:
+        return dupstr("Left");
+    case CURSOR_RIGHT:
+        return dupstr("Right");
+    case CURSOR_SELECT:
+        return dupstr("Select");
+    case '\b':
+        return dupstr("Clear");
+    default:
+        fatal("unknown generic key");
+    }
+
+    /* should never get here */
+    return NULL;
 }
 
 /* vim: set shiftwidth=4 tabstop=8: */

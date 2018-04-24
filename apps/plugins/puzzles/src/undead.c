@@ -1314,9 +1314,24 @@ void num2grid(int num, int width, int height, int *x, int *y) {
     return;
 }
 
-static char *game_request_keys(const game_params *params)
+static key_label *game_request_keys(const game_params *params, int *nkeys)
 {
-    return dupstr("GVZ\b");
+    key_label *keys = snewn(4, key_label);
+    *nkeys = 4;
+
+    keys[0].button = 'G';
+    keys[0].label = dupstr("Ghost");
+
+    keys[1].button = 'V';
+    keys[1].label = dupstr("Vampire");
+
+    keys[2].button = 'Z';
+    keys[2].label = dupstr("Zombie");
+
+    keys[3].button = '\b';
+    keys[3].label = NULL;
+
+    return keys;
 }
 
 static game_state *new_game(midend *me, const game_params *params,

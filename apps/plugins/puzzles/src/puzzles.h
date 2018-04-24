@@ -218,6 +218,24 @@ void preset_menu_add_preset(struct preset_menu *menu,
 game_params *preset_menu_lookup_by_id(struct preset_menu *menu, int id);
 
 /*
+ * Small structure specifying a UI button in a keyboardless front
+ * end. The button will have the text of "label" written on it, and
+ * pressing it causes the value "button" to be passed to
+ * midend_process_key() as if typed at the keyboard.
+ *
+ * If `label' is NULL (which it likely will be), a generic label can
+ * be generated with the button2label() function.
+ */
+typedef struct key_label {
+    /* What should be displayed to the user by the frontend. Backends
+     * can set this field to NULL and have it filled in by the midend
+     * with a generic label. Dynamically allocated, but frontends
+     * should probably use free_keys() to free instead. */
+    char *label;
+    int button; /* passed to midend_process_key when button is pressed */
+} key_label;
+
+/*
  * Platform routines
  */
 
@@ -301,6 +319,7 @@ void midend_new_game(midend *me);
 void midend_restart_game(midend *me);
 void midend_stop_anim(midend *me);
 int midend_process_key(midend *me, int x, int y, int button);
+key_label *midend_request_keys(midend *me, int *nkeys);
 void midend_force_redraw(midend *me);
 void midend_redraw(midend *me);
 float *midend_colours(midend *me, int *ncolours);
@@ -356,7 +375,9 @@ char *dupstr(const char *s);
  * misc.c
  */
 void free_cfg(config_item *cfg);
+void free_keys(key_label *keys, int nkeys);
 void obfuscate_bitmap(unsigned char *bmp, int bits, int decode);
+char *fgetline(FILE *fp);
 
 /* allocates output each time. len is always in bytes of binary data.
  * May assert (or just go wrong) if lengths are unchecked. */
@@ -402,6 +423,11 @@ void copy_left_justified(char *buf, size_t sz, const char *str);
 /* An ugly, but working float-to-string implementation for platforms
  * that don't have one */
 int ftoa(char *buf, float f);
+
+/* Returns a generic label based on the value of `button.' To be used
+   whenever a `label' field returned by the request_keys() game
+   function is NULL. Dynamically allocated, to be freed by caller. */
+char *button2label(int button);
 
 /*
  * dsf.c
@@ -613,7 +639,7 @@ struct game {
     void (*free_ui)(game_ui *ui);
     char *(*encode_ui)(const game_ui *ui);
     void (*decode_ui)(game_ui *ui, const char *encoding);
-    char *(*request_keys)(const game_params *params);
+    key_label *(*request_keys)(const game_params *params, int *nkeys);
     void (*changed_state)(game_ui *ui, const game_state *oldstate,
                           const game_state *newstate);
     char *(*interpret_move)(const game_state *state, game_ui *ui,

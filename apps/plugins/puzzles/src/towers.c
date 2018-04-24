@@ -130,7 +130,7 @@ static game_params *default_params(void)
     return ret;
 }
 
-const static struct game_params towers_presets[] = {
+static const struct game_params towers_presets[] = {
     {  4, DIFF_EASY         },
     {  5, DIFF_EASY         },
     {  5, DIFF_HARD         },
@@ -864,18 +864,22 @@ static const char *validate_desc(const game_params *params, const char *desc)
     return NULL;
 }
 
-static char *game_request_keys(const game_params *params)
+static key_label *game_request_keys(const game_params *params, int *nkeys)
 {
     int i;
     int w = params->w;
-    char *keys = smalloc(w+2);
-    keys[0] = '\b';
+    key_label *keys = snewn(w+1, key_label);
+    *nkeys = w + 1;
+
     for (i = 0; i < w; i++) {
-	if (i<9) keys[i] = '1' + i;
-	else keys[i] = 'a' + i - 9;
+	if (i<9) keys[i].button = '1' + i;
+	else keys[i].button = 'a' + i - 9;
+
+        keys[i].label = NULL;
     }
-    keys[w] = '\b';
-    keys[w+1] = '\0';
+    keys[w].button = '\b';
+    keys[w].label = NULL;
+
     return keys;
 }
 

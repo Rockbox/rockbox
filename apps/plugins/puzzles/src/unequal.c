@@ -111,7 +111,7 @@ static char const unequal_diffchars[] = DIFFLIST(ENCODE);
 
 #define DEFAULT_PRESET 0
 
-const static struct game_params unequal_presets[] = {
+static const struct game_params unequal_presets[] = {
     {  4, DIFF_EASY,    0 },
     {  5, DIFF_EASY,    0 },
     {  5, DIFF_SET,     0 },
@@ -1280,18 +1280,22 @@ fail:
     return NULL;
 }
 
-static char *game_request_keys(const game_params *params)
+static key_label *game_request_keys(const game_params *params, int *nkeys)
 {
     int order = params->order;
     char off = (order > 9) ? '0' : '1';
-    char *keys = smalloc(order + 2);
+    key_label *keys = snewn(order + 1, key_label);
+    *nkeys = order + 1;
+
     int i;
     for(i = 0; i < order; i++) {
-	if (i==10) off = 'a'-10;
-	keys[i] = i + off;
+        if (i==10) off = 'a'-10;
+        keys[i].button = i + off;
+        keys[i].label = NULL;
     }
-    keys[order] = '\b';
-    keys[order+1] = '\0';
+    keys[order].button = '\b';
+    keys[order].label = NULL;
+
     return keys;
 }
 

@@ -1287,9 +1287,22 @@ static const char *validate_desc(const game_params *params, const char *desc)
     return (area < sz) ? "Not enough data to fill grid" : NULL;
 }
 
-static char *game_request_keys(const game_params *params)
+static key_label *game_request_keys(const game_params *params, int *nkeys)
 {
-    return dupstr("1234567890\b");
+    key_label *keys = snewn(11, key_label);
+    *nkeys = 11;
+
+    int i;
+
+    for(i = 0; i < 10; ++i)
+    {
+	keys[i].button = '0' + i;
+	keys[i].label = NULL;
+    }
+    keys[10].button = '\b';
+    keys[10].label = NULL;
+
+    return keys;
 }
 
 static game_state *new_game(midend *me, const game_params *params,
