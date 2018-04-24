@@ -1,4 +1,4 @@
-/* auto-generated on Apr 19 2018 by genhelp.sh */
+/* auto-generated on Apr 24 2018 by genhelp.sh */
 /* help text is compressed using LZ4; see compress.c for details */
 /* DO NOT EDIT! */
 

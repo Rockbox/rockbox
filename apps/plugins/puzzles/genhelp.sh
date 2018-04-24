@@ -89,3 +89,6 @@ done
 
 # generate quick help from gamedesc.txt
 cat src/gamedesc.txt | awk -F ":" '{print "const char quick_help_text[] = \""$5"\";" >> "help/"$1".c" }'
+
+rm puzzles.txt
+rm compress

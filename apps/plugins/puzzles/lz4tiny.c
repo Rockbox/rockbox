@@ -188,6 +188,8 @@ void LZ4_decompress_tiny(const char* const source, char* const dest, int outputS
 
 /* testing code */
 #ifndef ROCKBOX
+#define LZ4TINY
+
 #include "help.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -195,7 +197,13 @@ int main()
 {
     char *buf = malloc(help_text_len);
     LZ4_decompress_tiny(help_text, buf, help_text_len);
-    puts(buf);
+    int col = 0;
+    for(int i = 0; i < help_text_len; ++i)
+    {
+        char c = buf[i];
+        printf("%c", (col++, !c ? (col >= 80 ? (col = 0, '\n') : ' ') : c));
+    }
+    puts("");
     free(buf);
 }
 #endif
