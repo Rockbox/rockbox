@@ -45,7 +45,7 @@ src/untangle.c
 
 /* no c200v2 */
 #if PLUGIN_BUFFER_SIZE > 0x14000
-src/pearl.c
 src/loopy.c
+src/pearl.c
 src/solo.c
 #endif

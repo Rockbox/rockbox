@@ -33,12 +33,14 @@ ifeq ($(MODELNAME), sansac200v2)
 PUZZLES_OPTIMIZE = -Os # tiny plugin buffer
 endif
 
-# we suppress all warnings
-PUZZLESFLAGS =  -I$(PUZZLES_SRCDIR)/dummy					\
-		$(filter-out -O%,$(PLUGINFLAGS)) $(PUZZLES_OPTIMIZE)		\
-		-Wno-unused-parameter -Wno-sign-compare -Wno-strict-aliasing -w	\
-		-DFOR_REAL -I$(PUZZLES_SRCDIR)/src -I$(PUZZLES_SRCDIR) -include	\
-		$(PUZZLES_SRCDIR)/rbcompat.h
+# we suppress all warnings with -w
+PUZZLESFLAGS = -I$(PUZZLES_SRCDIR)/dummy $(filter-out			\
+		-O%,$(PLUGINFLAGS)) $(PUZZLES_OPTIMIZE)			\
+		-Wno-unused-parameter -Wno-sign-compare			\
+		-Wno-strict-aliasing -DFOR_REAL				\
+		-I$(PUZZLES_SRCDIR)/src -I$(PUZZLES_SRCDIR) -include	\
+		$(PUZZLES_SRCDIR)/rbcompat.h -ffunction-sections	\
+		-fdata-sections -w
 
 $(PUZZLES_OBJDIR)/sgt-%.rock: $(PUZZLES_OBJDIR)/src/%.o $(PUZZLES_OBJDIR)/help/%.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(PUZZLES_OBJDIR)/$*.elf \

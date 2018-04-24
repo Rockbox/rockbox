@@ -1506,25 +1506,25 @@ static void send_click(int button, bool release)
 
 static int choose_key(void)
 {
-    char *game_keys = NULL;
+    int options = 0;
 
-    const game *gm = midend_which_game(me);
-    if(gm->request_keys)
-        game_keys = gm->request_keys(midend_get_params(me));
+    key_label *game_keys = midend_request_keys(me, &options);
 
-    if(!game_keys)
-        return;
+    if(!game_keys || !options)
+        return 0;
 
-    int options = strlen(game_keys);
     int sel = 0;
 
     while(1)
     {
-        midend_process_key(me, 0, 0, game_keys[sel]);
+        if(timer_on)
+            timer_cb();
+        midend_process_key(me, 0, 0, game_keys[sel].button);
         midend_redraw(me);
         rb->lcd_update();
+        rb->yield();
 
-        int button = rb->button_get(true);
+        int button = rb->button_get_w_tmo(timer_on ? TIMER_INTERVAL : -1);
         switch(button)
         {
         case BTN_LEFT:
@@ -1538,11 +1538,9 @@ static int choose_key(void)
         case BTN_PAUSE:
             return -1;
         case BTN_FIRE:
-            midend_force_redraw(me);
-            rb->lcd_update();
-            free(game_keys);
+            free_keys(game_keys, options);
 
-            /* the key has already been sent to the game */
+            /* the key has already been sent to the game, just return */
             return 0;
         }
     }

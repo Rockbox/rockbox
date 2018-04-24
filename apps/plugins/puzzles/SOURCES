@@ -13,7 +13,7 @@ src/latin.c
 src/laydomino.c
 src/loopgen.c
 /*src/malloc.c*/ /* we have our own */
-src/maxflow.c
+src/matching.c
 src/midend.c
 src/misc.c
 src/penrose.c

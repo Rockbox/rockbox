@@ -4,6 +4,7 @@
 #include "plugin.h"
 #include "rbassert.h"
 #include "lib/pluginlib_exit.h"
+#include "lib/stdio_compat.h"
 
 #include <tlsf.h>
 
@@ -77,6 +78,4 @@ double acos_wrapper(double x);
 
 #define abs(x) ((x)<0?-(x):(x))
 
-/* work around compilation error */
-typedef void FILE;
 #endif
