@@ -26,7 +26,7 @@
 #include "system.h"
 #include "vuprintf.h"
 
-#if 1
+#ifndef BOOTLOADER
 /* turn everything on */
 #define FMT_LENMOD      (0xffffffff)
 #define FMT_RADIX       (0xffffffff)
