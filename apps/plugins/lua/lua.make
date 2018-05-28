@@ -15,6 +15,9 @@ LUA_OBJ := $(call c2obj, $(LUA_SRC))
 
 OTHER_SRC += $(LUA_SRC)
 
+LUA_INCLUDEDIR := $(LUA_SRCDIR)/include_lua
+LUA_INCLUDELIST = blit color draw image lcd math_ex print timer
+
 ifndef APP_TYPE
 ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
     ### lowmem targets
@@ -30,7 +33,7 @@ else
     ROCKS += $(LUA_BUILDDIR)/lua.rock
 endif
 
-$(LUA_BUILDDIR)/lua.rock: $(LUA_OBJ) $(TLSFLIB) $(LUA_BUILDDIR)/actions.lua $(LUA_BUILDDIR)/buttons.lua $(LUA_BUILDDIR)/rocklib_aux.o
+$(LUA_BUILDDIR)/lua.rock: $(LUA_OBJ) $(TLSFLIB) $(LUA_BUILDDIR)/actions.lua $(LUA_BUILDDIR)/buttons.lua $(LUA_BUILDDIR)/rocklib_aux.o $(LUA_INCLUDELIST)
 
 $(LUA_BUILDDIR)/actions.lua: $(LUA_OBJ) $(LUA_SRCDIR)/action_helper.pl
 	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E $(APPSDIR)/plugins/lib/pluginlib_actions.h | $(LUA_SRCDIR)/action_helper.pl > $(LUA_BUILDDIR)/actions.lua
@@ -45,6 +48,9 @@ $(LUA_BUILDDIR)/rocklib_aux.c: $(APPSDIR)/plugin.h $(LUA_OBJ) $(LUA_SRCDIR)/rock
 
 $(LUA_BUILDDIR)/rocklib_aux.o: $(LUA_BUILDDIR)/rocklib_aux.c
 	$(call PRINTS,CC $(<F))$(CC) $(INCLUDES) $(PLUGINFLAGS) -I $(LUA_SRCDIR) -c $< -o $@
+
+$(LUA_INCLUDELIST): %: $(LUA_INCLUDEDIR)/%.lua
+	$(call PRINTS,CP $(subst $(LUA_INCLUDEDIR)/,,$<))cp $< $(LUA_BUILDDIR)/$@.lua
 
 $(LUA_BUILDDIR)/lua.refmap: $(LUA_OBJ) $(TLSFLIB)
 
