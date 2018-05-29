@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "04c01467_1a2fdd8b",
+        "filename": "apps/plugins/text_viewer/tv_display.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2018-05-29T05:34:06Z",
+      "side": 1,
+      "message": "I\u0027d like to see this consistent with the other functions",
+      "revId": "1e3b2a3e6ac65547e335bc9329b4604e8493c1af",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "04c01467_fa4e6970",
+        "filename": "apps/plugins/text_viewer/tv_display.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2018-05-29T05:34:06Z",
+      "side": 1,
+      "message": "#ifdef HAVE_LCD_COLOR",
+      "revId": "1e3b2a3e6ac65547e335bc9329b4604e8493c1af",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "04c01467_da53a514",
+        "filename": "apps/plugins/text_viewer/tv_display.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2018-05-29T05:34:06Z",
+      "side": 1,
+      "message": "#endif",
+      "revId": "1e3b2a3e6ac65547e335bc9329b4604e8493c1af",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
