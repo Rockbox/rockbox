@@ -55,7 +55,7 @@
  */
 
 #define ROCKLUA_IMAGE "rb.image"
-typedef struct rocklua_image
+struct rocklua_image
 {
     int width;
     int height;
