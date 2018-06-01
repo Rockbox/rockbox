@@ -88,6 +88,7 @@ struct nwz_model_info_t nwz_model[NWZ_MODEL_COUNT] =
     { 0x6030002, "NW-S744" },
     { 0x6030004, "NW-S745" },
     { 0x6030005, "NW-S746" },
+    { 0x7000002, "NWZ-A844" },
     { 0x7000004, "NWZ-A845" },
     { 0x7000005, "NWZ-A846" },
     { 0x7000006, "NWZ-A847" },
@@ -1799,8 +1800,8 @@ static unsigned long models_nwz_a810[] = { 0x10000, 0x10001, 0x10002 };
 static unsigned long models_nwz_a820[] = { 0x3010001, 0x3010002, 0x3010004,
     0x3000001, 0x3000002, 0x3000004 };
 
-static unsigned long models_nwz_a840[] = { 0x7010004, 0x7010005, 0x7010006,
-    0x7000004, 0x7000005, 0x7000006 };
+static unsigned long models_nwz_a840[] = { 0x7000002, 0x7010004, 0x7010005,
+    0x7010006, 0x7000004, 0x7000005, 0x7000006 };
 
 static unsigned long models_nwz_a850[] = { 0xe000004, 0xe000005, 0xe000006 };
 
@@ -1894,7 +1895,7 @@ struct nwz_series_info_t nwz_series[NWZ_SERIES_COUNT] =
     { "nwz-a720", "NWZ-A720 Series", 6, models_nwz_a720, 0 },
     { "nwz-a810", "NWZ-A810 Series", 3, models_nwz_a810, &nvp_index_342a18 },
     { "nwz-a820", "NWZ-A820 Series", 6, models_nwz_a820, 0 },
-    { "nwz-a840", "NWZ-A840 Series", 6, models_nwz_a840, &nvp_index_0ac81d },
+    { "nwz-a840", "NWZ-A840 Series", 7, models_nwz_a840, &nvp_index_0ac81d },
     { "nwz-a850", "NWZ-A850 Series", 3, models_nwz_a850, &nvp_index_0ac81d },
     { "nwz-a860", "NWZ-A860 Series", 15, models_nwz_a860, &nvp_index_f505c8 },
     { "nw-a910", "NW-A910 Series", 3, models_nw_a910, 0 },
