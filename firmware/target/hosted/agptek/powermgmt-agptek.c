@@ -32,18 +32,16 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
     3400
 };
 
-/* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled
- * NOTE: not calibrated simple linear scale for now
- */
+/* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3400, 3480, 3560, 3640, 3720, 3800, 3880, 3960, 4040, 4120, 4200 }
+    { 3400, 3675, 3715, 3750, 3775, 3810, 3850, 3915, 3985, 4060, 4155 }
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short const percent_to_volt_charge[11] =
 {
-      3450, 3670, 3721, 3751, 3782, 3821, 3876, 3941, 4034, 4125, 4200
+      3485, 3780, 3836, 3857, 3890, 3930, 3986, 4062, 4158, 4185, 4196
 };
 
 unsigned int power_input_status(void)
