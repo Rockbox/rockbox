@@ -182,7 +182,7 @@ static void zoom_drawpixel(int x, int y)
     zoom_fb[y * zoom_w + x].b = RGB_UNPACK_BLUE(pix);
     zoom_fb[y * zoom_w + x].g = RGB_UNPACK_GREEN(pix);
     zoom_fb[y * zoom_w + x].r = RGB_UNPACK_RED(pix);
-	zoom_fb[y * zoom_w + x].x = 255;
+    zoom_fb[y * zoom_w + x].x = 255;
 #elif LCD_DEPTH == 24
     /* I hate these */
     unsigned int pix = rb->lcd_get_foreground();
@@ -215,7 +215,7 @@ static void zoom_hline(int l, int r, int y)
                       RGB_UNPACK_GREEN(rb->lcd_get_foreground()),
                       RGB_UNPACK_RED(rb->lcd_get_foreground()),
                       255
-	};
+    };
 #elif LCD_DEPTH == 24
     fb_data pixel = { RGB_UNPACK_BLUE(rb->lcd_get_foreground()),
                       RGB_UNPACK_GREEN(rb->lcd_get_foreground()),
