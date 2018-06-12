@@ -62,6 +62,7 @@ int rtc_write_datetime(const struct tm *tm)
 
     return 0;
 #else
+    (void)tm;
     return -1;
 #endif
 }
