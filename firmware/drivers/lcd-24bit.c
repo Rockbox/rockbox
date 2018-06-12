@@ -189,7 +189,7 @@ void lcd_fillrect(int x, int y, int width, int height)
     enum fill_opt fillopt = OPT_NONE;
     fb_data *dst, *dst_end;
     int len, step;
-    fb_data bits; // = { 0, 0, 0 };
+    fb_data bits;
     memset(&bits, 0, sizeof(fb_data));
 
     /******************** In viewport clipping **********************/
