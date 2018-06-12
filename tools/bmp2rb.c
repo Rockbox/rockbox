@@ -81,6 +81,7 @@ union RAWDATA {
     void *d; /* unspecified */
     unsigned short *d16; /* depth <= 16 */
     struct { unsigned char b, g, r; } *d24; /* depth = 24 BGR */
+    struct { unsigned char b, g, r, x; } *d32;
 };
 
 short readshort(void* value)
@@ -351,6 +352,12 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
         dst_d = 24;
         break;
 
+      case 10: /* 32-bit XRGB */
+        dst_w = width;
+        dst_h = height;
+        dst_d = 32;
+        break;
+
       default: /* unknown */
         debugf("error - Undefined destination format\n");
         return 1;
@@ -358,8 +365,10 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
 
     if (dst_d <= 16)
         alloc_size = sizeof(dest.d16[0]);
-    else /* 24 bit */
+    else if (dst_d <= 24)
         alloc_size = sizeof(dest.d24[0]);
+    else
+        alloc_size = sizeof(dest.d32[0]);
     dest.d = calloc(dst_w * dst_h, alloc_size);
 
     if (dest.d == NULL)
@@ -468,6 +477,15 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
                 dest.d24[row * width + col].b = src[row * width + col].rgbBlue;
             }
         break;
+
+      case 10: /* 32-bit XRGB */
+        for (row = 0; row < height; row++)
+            for (col = 0; col < width; col++)
+            {
+                dest.d32[row * width + col].r = src[row * width + col].rgbRed;
+                dest.d32[row * width + col].g = src[row * width + col].rgbGreen;
+                dest.d32[row * width + col].b = src[row * width + col].rgbBlue;
+            }
     }
 
     return 0;
@@ -537,9 +555,9 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
 
     if (t_depth <= 8)
         fprintf(f, "const unsigned char %s[] = {\n", id);
-    else if (t_depth == 16)
+    else if (t_depth <= 16)
         fprintf(f, "const unsigned short %s[] = {\n", id);
-    else if (t_depth == 24)
+    else
         fprintf(f, "const fb_data %s[] = {\n", id);
 
     for (i = 0; i < t_height; i++)
@@ -558,6 +576,12 @@ void generate_c_source(char *id, char* header_dir, int width, int height,
                         t_bitmap->d24[i * t_width + a].g,
                         t_bitmap->d24[i * t_width + a].b,
                         (a + 1) % 4 ? ' ' : '\n');
+           else if (t_depth == 32)
+               fprintf(f, "{ .r = 0x%02x, .g = 0x%02x, .b = 0x%02x, .x = 0x00 },%c",
+                       t_bitmap->d32[i * t_width + a].r,
+                       t_bitmap->d32[i * t_width + a].g,
+                       t_bitmap->d32[i * t_width + a].b,
+                       (a + 1) % 4 ? ' ' : '\n');
         }
         fprintf(f, "\n");
     }
@@ -603,9 +627,13 @@ void generate_raw_file(const union RAWDATA *t_bitmap,
                 fwrite(&lo, 1, 1, f);
                 fwrite(&hi, 1, 1, f);
             }
-            else /* 24 */
+            else if (t_depth == 24)
             {
                 fwrite(&t_bitmap->d24[i * t_width + a], 3, 1, f);
+            }
+            else /* 32 */
+            {
+                fwrite(&t_bitmap->d32[i * t_width + a], 4, 1, f);
             }
         }
     }
@@ -654,7 +682,8 @@ void print_usage(void)
            "\t         6  Greyscale iPod 4-grey\n"
            "\t         7  Greyscale X5 remote 4-grey\n"
            "\t         8  16-bit packed 5-6-5 RGB with a vertical stride\n"
-           "\t         9  24-bit BGR\n");
+           "\t         9  24-bit BGR\n"
+           "\t        10  32-bit XRGB8888\n");
     printf("build date: " __DATE__ "\n\n");
 }
 
