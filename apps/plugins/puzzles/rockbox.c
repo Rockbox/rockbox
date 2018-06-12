@@ -301,7 +301,7 @@ static void zoom_mono_bitmap(const unsigned char *bits, int x, int y, int w, int
                     zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].b = RGB_UNPACK_BLUE(pix);
                     zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].g = RGB_UNPACK_GREEN(pix);
                     zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].r = RGB_UNPACK_RED(pix);
-					zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].r = 255;
+                    zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].x = 255;
 #elif LCD_DEPTH == 24
                     zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].b = RGB_UNPACK_BLUE(pix);
                     zoom_fb[(y + i * 8 + dy) * zoom_w + x + j].g = RGB_UNPACK_GREEN(pix);
