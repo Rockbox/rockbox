@@ -1,6 +1,21 @@
+Update file with .upt extension is actually ISO9660 image. Inside
+there are:
+1) uboot.bin   - uBoot image
+2) uimage.bin  - linux kernel image packed in legacy uboot format
+3) system.ubi  - UBIFS rootfs image
+4) update.txt  - text file describing update image content
+5) version.txt - text file describing version of update image
+
 Steps needed to patch update.upt with rockbox bootloader are explained in
-bootloader_install.sh shell script. Process is quite involved and some
-custom tools are needed.
+below. Process is quite involved and some custom tools are needed.
+bootloader_install.sh scipt is design to automate the process.
+
+1) First content of ISO9660 .upt file needs to be unpacked
+2) system.ubi UBIFS image needs to be unpacked
+3) Rockbox bootloader is copied to unpacked rootfs
+4) Recreate UBIFS with altered content
+5) Update update.txt file with correct CRC of altered system.ubi
+6) Recreate ISO9660 .upt file
 
 
 For convenience Dockerfile is provided which prepares custom image based
@@ -9,7 +24,7 @@ images.
 
 Basically image extends standard debian image by:
 1) Installing developer packages from stock debian
-2) Cloning https://github.com/wodz/rockbox-wodz.git
+2) Cloning rockbox repository http://gerrit.rockbox.org/p/rockbox
 3) Building custom cross toolchain
 4) Cloning and installing tools to work with UBIFS
 
@@ -31,7 +46,8 @@ docker run -it -v /path/to/dir/with/update.upt:/upt \
 
 
 Files in this directory:
-README - this file
+README                - this file
+
 bootloader_install.sh - shell script documenting process of patching
                         agptek rocker update images
 

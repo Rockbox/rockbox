@@ -32,11 +32,10 @@ RUN apt-get update && \
 
 # Clone rockbox repository
 RUN cd /home/rb && \
-    git clone https://github.com/wodz/rockbox-wodz.git
+    git clone http://gerrit.rockbox.org/p/rockbox
 
 # Build cross toolchain (It takes quite long)
-RUN cd /home/rb/rockbox-wodz && \
-    git checkout agptek-rocker && \
+RUN cd /home/rb/rockbox && \
     ./tools/rockboxdev.sh --target=y
 
 # Install tools for unpacking ubifs
@@ -46,5 +45,5 @@ RUN cd /home/rb && \
     python setup.py install
 
 # Copy build script
-RUN cp /home/rb/rockbox-wodz/tools/agptek_rocker/bootloader_install.sh /usr/local/bin && \
+RUN cp /home/rb/rockbox/tools/agptek_rocker/bootloader_install.sh /usr/local/bin && \
     chmod 755 /usr/local/bin/bootloader_install.sh
