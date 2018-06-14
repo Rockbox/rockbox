@@ -414,6 +414,10 @@ $releasenotes="/wiki/ReleaseNotes314";
         name => 'Creative Zen Mozaic',
         status => 3
     },
+    'agptekrocker' => {
+        name => 'Agptek Rocker',
+        status => 2
+    }
 );
 
 sub manualname {
