@@ -21,6 +21,10 @@
 #ifndef __LCD_TARGET_H__
 #define __LCD_TARGET_H__
 
-extern fb_data *framebuffer; /* see lcd-nwz.c */
+/* Agptek needs special ioctl() to redraw updated framebuffer content */
+#define LCD_OPTIMIZED_UPDATE
+#define LCD_OPTIMIZED_UPDATE_RECT
+
+extern fb_data *framebuffer; /* see lcd-agptek.c */
 #define LCD_FRAMEBUF_ADDR(col, row) (framebuffer + (row)*LCD_WIDTH + (col))
 #endif /* __LCD_TARGET_H__ */

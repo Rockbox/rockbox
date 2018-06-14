@@ -29,6 +29,7 @@
 #include "lcd.h"
 #include "lcd-target.h"
 #include "backlight-target.h"
+#include "sysfs.h"
 #include "panic.h"
 
 static int fd = -1;
@@ -72,6 +73,30 @@ void lcd_init_device(void)
     if((void *)framebuffer == MAP_FAILED)
     {
         panicf("Cannot map framebuffer");
+    }
+}
+
+#ifdef HAVE_LCD_SHUTDOWN
+void lcd_shutdown(void)
+{
+    munmap(framebuffer, FRAMEBUFFER_SIZE);
+    close(fd);
+}
+#endif
+
+void lcd_enable(bool on)
+{
+    const char * const sysfs_fb_blank = "/sys/class/graphics/fb0/blank";
+
+    if (lcd_active() != on)
+    {
+        sysfs_set_int(sysfs_fb_blank, on ? 0 : 1);
+        lcd_set_active(on);
+
+        if (on)
+        {
+            send_event(LCD_EVENT_ACTIVATION, NULL);
+        }
     }
 }
 

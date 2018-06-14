@@ -114,6 +114,7 @@ target/hosted/sonynwz/nwz-db.c
 #endif
 
 #if defined(AGPTEK_ROCKER) && !defined(SIMULATOR)
+drivers/lcd-memframe.c
 target/hosted/backtrace-glibc.c
 target/hosted/kernel-unix.c
 target/hosted/filesystem-unix.c
