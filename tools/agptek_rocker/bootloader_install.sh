@@ -59,8 +59,7 @@ echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 echo "!!! STEP 4: Copy bootloader !!!"
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 echo
-cp $BUILD/bootloader.elf $ROOTFS/usr/bin/rb_bootloader && \
-mipsel-rockbox-linux-gnu-strip --strip-unneeded $ROOTFS/usr/bin/rb_bootloader
+cp $BUILD/bootloader.rocker $ROOTFS/usr/bin/rb_bootloader
 
 # Overwrite default player starting script with one running our bootloader
 echo

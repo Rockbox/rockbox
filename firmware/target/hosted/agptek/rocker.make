@@ -31,6 +31,7 @@ $(BUILDDIR)/bootloader.elf : $$(OBJ) $(FIRMLIB) $(CORE_LIBS)
 		$(LDOPTS) $(GLOBAL_LDOPTS) -Wl,--gc-sections -Wl,-Map,$(BUILDDIR)/bootloader.map
 
 $(BUILDDIR)/$(BINARY): $(BUILDDIR)/bootloader.elf
+	$(call PRINTS,OC $(@F))$(call objcopy,$^,$@)
 
 else
 # rockbox app build
