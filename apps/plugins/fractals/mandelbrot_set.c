@@ -39,7 +39,14 @@ static fb_data imgbuffer[LCD_HEIGHT];
  * 345 (=15*26-45) is max_iter maximal value
  * This implementation ignores pixel format, thus it is not uniformly spread
  */
+#if LCD_DEPTH > 24
+/* when LCD_DEPTH is 32 casting to 64bit intermediate is needed to prevent
+ * overflow and warning 'left shift count >= width of type'
+ */
+#define LCOLOR(iter) ((unsigned int)(((unsigned long long)iter << LCD_DEPTH) / 345))
+#else
 #define LCOLOR(iter) ((iter << LCD_DEPTH) / 345)
+#endif
 #endif
 
 #ifdef HAVE_LCD_COLOR
