@@ -77,5 +77,6 @@ double acos_wrapper(double x);
 #endif
 
 #define abs(x) ((x)<0?-(x):(x))
+#define labs abs
 
 #endif
