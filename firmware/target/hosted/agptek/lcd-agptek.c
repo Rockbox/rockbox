@@ -74,6 +74,10 @@ void lcd_init_device(void)
     {
         panicf("Cannot map framebuffer");
     }
+
+#ifdef HAVE_LCD_ENABLE
+    lcd_set_active(true);
+#endif
 }
 
 #ifdef HAVE_LCD_SHUTDOWN

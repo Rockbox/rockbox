@@ -27,4 +27,6 @@
 
 extern fb_data *framebuffer; /* see lcd-agptek.c */
 #define LCD_FRAMEBUF_ADDR(col, row) (framebuffer + (row)*LCD_WIDTH + (col))
+
+extern void lcd_set_active(bool active);
 #endif /* __LCD_TARGET_H__ */
