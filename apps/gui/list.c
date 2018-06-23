@@ -682,10 +682,11 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
 
 #ifdef HAVE_VOLUME_IN_LIST
         case ACTION_LIST_VOLUP:
-            global_settings.volume += 2;
-            /* up two because the falthrough brings it down one */
+            global_settings.volume += sound_steps(SOUND_VOLUME);
+            setvol();
+            return true;
         case ACTION_LIST_VOLDOWN:
-            global_settings.volume--;
+            global_settings.volume -= sound_steps(SOUND_VOLUME);
             setvol();
             return true;
 #endif
