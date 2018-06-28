@@ -354,6 +354,15 @@
 #define AST_RIGHT       BUTTON_RIGHT
 #define AST_FIRE        BUTTON_SELECT
 
+#elif (CONFIG_KEYPAD == XDUOO_X3_PAD)
+#define AST_PAUSE       BUTTON_VOL_UP
+#define AST_QUIT        BUTTON_POWER
+#define AST_THRUST      BUTTON_HOME
+#define AST_HYPERSPACE  BUTTON_OPTION
+#define AST_LEFT        BUTTON_PREV
+#define AST_RIGHT       BUTTON_NEXT
+#define AST_FIRE        BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

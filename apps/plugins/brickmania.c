@@ -332,6 +332,16 @@ CONFIG_KEYPAD == SANSA_CONNECT_PAD
 #define UP        BUTTON_UP
 #define DOWN      BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+#define QUIT      BUTTON_POWER
+#define LEFT      BUTTON_PREV
+#define RIGHT     BUTTON_NEXT
+#define ALTLEFT   BUTTON_VOL_DOWN
+#define ALTRIGHT  BUTTON_VOL_UP
+#define SELECT    BUTTON_PLAY
+#define UP        BUTTON_HOME
+#define DOWN      BUTTON_OPTION
+
 #else
 #error No keymap defined!
 #endif

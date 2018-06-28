@@ -327,6 +327,17 @@
 #define ROCKPAINT_QUIT        BUTTON_POWER
 #define ROCKPAINT_MENU        BUTTON_MENU
 
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+#define ROCKPAINT_QUIT        BUTTON_POWER
+#define ROCKPAINT_DRAW        BUTTON_PLAY
+#define ROCKPAINT_MENU        (BUTTON_HOME | BUTTON_POWER)
+#define ROCKPAINT_TOOLBAR     BUTTON_VOL_UP
+#define ROCKPAINT_TOOLBAR2    BUTTON_VOL_DOWN
+#define ROCKPAINT_UP          BUTTON_HOME
+#define ROCKPAINT_DOWN        BUTTON_OPTION
+#define ROCKPAINT_LEFT        BUTTON_PREV
+#define ROCKPAINT_RIGHT       BUTTON_NEXT
+
 #else
 #error "Please define keys for this keypad"
 #endif

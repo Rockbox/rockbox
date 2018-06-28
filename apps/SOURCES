@@ -317,4 +317,6 @@ keymaps/keymap-ypr1.c
 keymaps/keymap-dx50.c
 #elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
 keymaps/keymap-agptekrocker.c
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+keymaps/keymap-xduoox3.c
 #endif

@@ -50,6 +50,7 @@
     .set    noat
 
 #ifdef BOOTLOADER
+#ifndef XDUOO_X3
     /* These will get filled in by scramble */
     .word 0 /* Empty    */
     .word 0 /* Filesize */
@@ -64,6 +65,7 @@ _relocate_loop:
     addiu  t0, 4
     bne    t1, t2, _relocate_loop
     sw     t3, -4(t1)
+#endif
 #endif
 
 _start:

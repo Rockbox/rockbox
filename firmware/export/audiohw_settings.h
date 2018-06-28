@@ -113,6 +113,9 @@ AUDIOHW_SETTINGS(
 #if defined(AUDIOHW_HAVE_FILTER_ROLL_OFF)
     AUDIOHW_SETTING_ENT(FILTER_ROLL_OFF,    sound_set_filter_roll_off)
 #endif
+#if defined(AUDIOHW_HAVE_FUNCTIONAL_MODE)
+    AUDIOHW_SETTING_ENT(FUNCTIONAL_MODE,    sound_set_functional_mode)
+#endif
 /* Hardware EQ tone controls */
 #if defined(AUDIOHW_HAVE_EQ)
     AUDIOHW_SETTING_ENT(EQ_BAND1_GAIN,      sound_set_hw_eq_band1_gain)

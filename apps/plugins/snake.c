@@ -289,6 +289,14 @@ dir is the current direction of the snake - 0=up, 1=right, 2=down, 3=left;
 #define SNAKE_DOWN      BUTTON_DOWN
 #define SNAKE_PLAYPAUSE BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+#define SNAKE_QUIT      BUTTON_POWER
+#define SNAKE_LEFT      BUTTON_PREV
+#define SNAKE_RIGHT     BUTTON_NEXT
+#define SNAKE_UP        BUTTON_HOME
+#define SNAKE_DOWN      BUTTON_OPTION
+#define SNAKE_PLAYPAUSE BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

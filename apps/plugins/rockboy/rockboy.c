@@ -423,6 +423,16 @@ static void setoptions (void)
         options.A      = BUTTON_VOLDOWN;
         options.B      = BUTTON_VOLUP;
 
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+        options.UP      = BUTTON_PREV;
+        options.DOWN    = BUTTON_NEXT;
+
+        options.A       = BUTTON_HOME;
+        options.B       = BUTTON_OPTION;
+        options.START   = BUTTON_VOL_DOWN;
+        options.SELECT  = BUTTON_VOL_UP;
+        options.MENU    = BUTTON_POWER;
+
 #else
 #error No Keymap Defined!
 #endif

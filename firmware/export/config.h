@@ -82,6 +82,7 @@
 #define S5L8701      8701
 #define S5L8702      8702
 #define JZ4732       4732
+#define JZ4760B     47602
 #define AS3525       3525
 #define AT91SAM9260  9260
 #define AS3525v2    35252
@@ -162,11 +163,12 @@
 #define CREATIVE_ZEN_PAD   58
 #define SAMSUNG_YPZ5_PAD   59
 #define IHIFI_PAD          60
-#define SAMSUNG_YPR1_PAD  61
+#define SAMSUNG_YPR1_PAD   61
 #define SAMSUNG_YH92X_PAD  62
 #define DX50_PAD           63
 #define SONY_NWZA860_PAD   64 /* The NWZ-A860 is too different (touchscreen) */
-#define AGPTEK_ROCKER_PAD 65
+#define AGPTEK_ROCKER_PAD  65
+#define XDUOO_X3_PAD       66
 
 /* CONFIG_POWER_SAVE combinable bit flags*/
 #define POWERSV_CPU   0x1
@@ -287,6 +289,7 @@
 #define LCD_SAMSUNGYPR1   62 /* as used by Samsung YP-R1 */
 #define LCD_NWZ_LINUX   63 /* as used in the Linux-based NWZ series */
 #define LCD_INGENIC_LINUX 64
+#define LCD_XDUOOX3       65 /* as used by the xDuoo X3 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -358,12 +361,13 @@ Lyre prototype 1 */
 #define RTC_MC13783  13 /* Freescale MC13783 PMIC */
 #define RTC_S5L8700  14
 #define RTC_S35390A  15
-#define RTC_JZ47XX   16 /* Ingenic Jz47XX */
+#define RTC_JZ4740   16 /* Ingenic Jz4740 */
 #define RTC_NANO2G   17 /* This seems to be a PCF5063x */
 #define RTC_D2       18 /* Either PCF50606 or PCF50635 */
 #define RTC_S35380A  19
 #define RTC_IMX233   20
 #define RTC_STM41T62 21 /* ST M41T62 */
+#define RTC_JZ4760   22 /* Ingenic Jz4760 */
 
 /* USB On-the-go */
 #define USBOTG_M66591   6591 /* M:Robe 500 */
@@ -372,6 +376,7 @@ Lyre prototype 1 */
 #define USBOTG_M5636    5636 /* iAudio X5 */
 #define USBOTG_ARC      5020 /* PortalPlayer 502x and IMX233 */
 #define USBOTG_JZ4740   4740 /* Ingenic Jz4740/Jz4732 */
+#define USBOTG_JZ4760   4760 /* Ingenic Jz4760/Jz4760B */
 #define USBOTG_AS3525   3525 /* AMS AS3525 */
 #define USBOTG_S3C6400X 6400 /* Samsung S3C6400X, also used in the S5L8701/S5L8702/S5L8720 */
 #define USBOTG_DESIGNWARE 6401 /* Synopsys DesignWare OTG, used in S5L8701/S5L8702/S5L8720/AS3252v2 */
@@ -612,6 +617,8 @@ Lyre prototype 1 */
 #include "config/sonynwze350.h"
 #elif defined(AGPTEK_ROCKER)
 #include "config/agptekrocker.h"
+#elif defined(XDUOO_X3)
+#include "config/xduoox3.h"
 #else
 /* no known platform */
 #endif
@@ -980,7 +987,7 @@ Lyre prototype 1 */
 
 #endif /* BOOTLOADER */
 
-#if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) \
+#if defined(HAVE_USBSTACK) || (CONFIG_CPU == JZ4732) || (CONFIG_CPU == JZ4760B) \
     || (CONFIG_CPU == AS3525) || (CONFIG_CPU == AS3525v2) \
     || defined(CPU_S5L870X) || (CONFIG_CPU == S3C2440) \
     || defined(APPLICATION) || (CONFIG_CPU == PP5002) \
@@ -1057,14 +1064,14 @@ Lyre prototype 1 */
     (CONFIG_CPU == TCC7801) || \
     (CONFIG_CPU == IMX233 && !defined(PLUGIN) && !defined(CODEC)) || /* IMX233: core only */ \
     defined(CPU_S5L870X)) || /* Samsung S5L8700: core, plugins, codecs */ \
-    (CONFIG_CPU == JZ4732 && !defined(PLUGIN) && !defined(CODEC)) /* Jz4740: core only */
+    ((CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B) && !defined(PLUGIN) && !defined(CODEC)) /* Jz47XX: core only */
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))
 #define IDATA_ATTR      __attribute__ ((section(".idata")))
 #define IBSS_ATTR       __attribute__ ((section(".ibss")))
 #define USE_IRAM
 #if CONFIG_CPU != SH7034 && (CONFIG_CPU != AS3525 || MEMORYSIZE > 2) \
-    && CONFIG_CPU != JZ4732 && CONFIG_CPU != AS3525v2 && CONFIG_CPU != IMX233
+    && CONFIG_CPU != JZ4732 && CONFIG_CPU != JZ4760B && CONFIG_CPU != AS3525v2 && CONFIG_CPU != IMX233
 #define PLUGIN_USE_IRAM
 #endif
 #else
@@ -1207,6 +1214,7 @@ Lyre prototype 1 */
 #define USB_HAS_BULK
 #elif (CONFIG_USBOTG == USBOTG_ARC) || \
     (CONFIG_USBOTG == USBOTG_JZ4740) || \
+    (CONFIG_USBOTG == USBOTG_JZ4760) || \
     (CONFIG_USBOTG == USBOTG_M66591) || \
     (CONFIG_USBOTG == USBOTG_DESIGNWARE) || \
     (CONFIG_USBOTG == USBOTG_AS3525)
@@ -1231,7 +1239,8 @@ Lyre prototype 1 */
 #if defined(HAVE_BOOTLOADER_USB_MODE) || \
      defined(CREATIVE_ZVx) || defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
      CONFIG_USBOTG == USBOTG_JZ4740 || CONFIG_USBOTG == USBOTG_AS3525 || \
-     CONFIG_USBOTG == USBOTG_S3C6400X || CONFIG_USBOTG == USBOTG_DESIGNWARE
+     CONFIG_USBOTG == USBOTG_S3C6400X || CONFIG_USBOTG == USBOTG_DESIGNWARE || \
+     CONFIG_USBOTG == USBOTG_JZ4760
 #define USB_ENABLE_STORAGE
 #endif
 

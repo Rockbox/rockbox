@@ -53,6 +53,9 @@ samsung_yps3.c
 #elif defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX767) || defined(ONDA_VX777)
 ondavx747.c
 show_logo.c
+#elif defined(XDUOO_X3)
+xduoox3.c
+show_logo.c
 #elif defined(CREATIVE_ZVx)
 creativezvm.c
 #elif CONFIG_CPU==AS3525 || CONFIG_CPU==AS3525v2

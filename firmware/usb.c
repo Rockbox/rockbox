@@ -49,7 +49,8 @@
      (defined(HAVE_USBSTACK) && (defined(CREATIVE_ZVx))) || \
      (defined(HAVE_USBSTACK) && (defined(OLYMPUS_MROBE_500))) || \
      defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
-     (CONFIG_USBOTG == USBOTG_JZ4740)
+     (CONFIG_USBOTG == USBOTG_JZ4740) || \
+     (CONFIG_USBOTG == USBOTG_JZ4760)
 /* TODO: condition should be reset to be only the original
    (defined(HAVE_USBSTACK) && defined(HAVE_BOOTLOADER_USB_MODE)) */
 #define USB_FULL_INIT

@@ -209,6 +209,10 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define ACTION     BUTTON_SELECT
 #define ACTIONTEXT "Select"
 
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+#define QUIT       BUTTON_POWER
+#define ACTION     BUTTON_PLAY
+#define ACTIONTEXT "PLAY"
 
 #elif !defined(HAVE_TOUCHSCREEN)
 #error No keymap defined!

@@ -282,6 +282,14 @@
 #define ZX_RIGHT        BUTTON_RIGHT
 #define ZX_SELECT       BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+#define ZX_SELECT       BUTTON_PLAY
+#define ZX_MENU         BUTTON_POWER
+#define ZX_LEFT         BUTTON_PREV
+#define ZX_RIGHT        BUTTON_NEXT
+#define ZX_UP           BUTTON_HOME
+#define ZX_DOWN         BUTTON_OPTION
+
 #else
 #error Keymap not defined!
 

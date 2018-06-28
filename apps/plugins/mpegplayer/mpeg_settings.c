@@ -306,6 +306,16 @@ struct mpeg_settings settings;
 #define MPEG_START_TIME_DOWN        BUTTON_DOWN
 #define MPEG_START_TIME_EXIT        BUTTON_POWER
 
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+#define MPEG_START_TIME_SELECT      BUTTON_PLAY
+#define MPEG_START_TIME_LEFT        BUTTON_PREV
+#define MPEG_START_TIME_RIGHT       BUTTON_NEXT
+#define MPEG_START_TIME_UP          BUTTON_HOME
+#define MPEG_START_TIME_DOWN        BUTTON_OPTION
+#define MPEG_START_TIME_LEFT2       BUTTON_VOL_UP
+#define MPEG_START_TIME_RIGHT2      BUTTON_VOL_DOWN
+#define MPEG_START_TIME_EXIT        BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

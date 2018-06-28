@@ -225,3 +225,4 @@ runone("sonynwze370");
 runone("creativezenxfi");
 runone("creativezen");
 runone("creativezenmozaic");
+runone("xduoox3");
