@@ -363,6 +363,24 @@
 #define AST_RIGHT       BUTTON_NEXT
 #define AST_FIRE        BUTTON_PLAY
 
+#elif (CONFIG_KEYPAD == IHIFI_770_PAD)
+#define AST_PAUSE       BUTTON_PLAY
+#define AST_QUIT        BUTTON_POWER
+#define AST_THRUST      BUTTON_NEXT
+#define AST_HYPERSPACE  BUTTON_PREV
+#define AST_LEFT        BUTTON_HOME
+#define AST_RIGHT       BUTTON_VOL_DOWN
+#define AST_FIRE        BUTTON_VOL_UP
+
+#elif (CONFIG_KEYPAD == IHIFI_800_PAD)
+#define AST_PAUSE       BUTTON_PLAY
+#define AST_QUIT        BUTTON_POWER
+#define AST_THRUST      BUTTON_NEXT
+#define AST_HYPERSPACE  BUTTON_PREV
+#define AST_LEFT        BUTTON_HOME
+#define AST_RIGHT       BUTTON_VOL_DOWN
+#define AST_FIRE        BUTTON_VOL_UP
+
 #else
 #error No keymap defined!
 #endif

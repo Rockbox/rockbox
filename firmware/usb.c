@@ -131,6 +131,14 @@ static inline bool usb_do_screendump(void)
 }
 #endif /* HAVE_LCD_BITMAP */
 
+#ifdef HAVE_USB_POWER
+static bool usb_charge_only_setting = false;
+void usb_set_charge_setting(bool charge_only)
+{
+    usb_charge_only_setting = charge_only;
+}
+#endif
+
 /* Power (charging-only) button */
 static inline void usb_detect_charging_only(bool detect)
 {
@@ -138,10 +146,11 @@ static inline void usb_detect_charging_only(bool detect)
     if (detect)
         detect = button_status() & ~USBPOWER_BTN_IGNORE;
 
-    usb_charging_only = detect;
+    usb_charging_only = (usb_charge_only_setting && !detect) || 
+        (!usb_charge_only_setting && detect);
 #endif
     (void)detect;
-}
+} 
 
 #ifdef USB_FIREWIRE_HANDLING
 static inline bool usb_reboot_button(void)

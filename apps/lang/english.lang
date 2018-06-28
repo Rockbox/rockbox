@@ -13230,6 +13230,34 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_FILTER_SHORT
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Short"
+  </source>
+  <dest>
+    *: "Short"
+  </dest>
+  <voice>
+    *: "Short"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BYPASS
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Bypass"
+  </source>
+  <dest>
+    *: "Bypass"
+  </dest>
+  <voice>
+    *: "Bypass"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_FUNCTIONAL_MODE
   desc: in sound settings
   user: core
@@ -13701,5 +13729,22 @@
   </dest>
   <voice>
     *: "Disable Touch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_CHARGE_ONLY
+  desc: in Settings -> System Settings
+  user: core
+  <source>
+    *: none
+    usb_power: "Only charge on USB insert"
+  </source>
+  <dest>
+    *: none
+    usb_power: "Only charge on USB insert"
+  </dest>
+  <voice>
+    *: none
+    usb_power: "Only charge on U S B insert"
   </voice>
 </phrase>

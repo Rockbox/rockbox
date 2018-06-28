@@ -589,6 +589,38 @@ enum {
 #define BJACK_RIGHT         BUTTON_NEXT
 #define BJACK_LEFT          BUTTON_PREV
 
+#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#define BJACK_SELECT_NAME   "PLAY"
+#define BJACK_STAY_NAME     "NEXT"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "PREV"
+#define BJACK_SELECT        BUTTON_PLAY
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_MAX           BUTTON_VOL_UP
+#define BJACK_MIN           BUTTON_VOL_DOWN
+#define BJACK_STAY          BUTTON_NEXT
+#define BJACK_DOUBLEDOWN    BUTTON_PREV
+#define BJACK_UP            BUTTON_HOME
+#define BJACK_DOWN          (BUTTON_POWER | BUTTON_HOME)
+#define BJACK_RIGHT         BUTTON_NEXT
+#define BJACK_LEFT          BUTTON_PREV
+
+#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#define BJACK_SELECT_NAME   "PLAY"
+#define BJACK_STAY_NAME     "NEXT"
+#define BJACK_QUIT_NAME     "POWER"
+#define BJACK_DOUBLE_NAME   "PREV"
+#define BJACK_SELECT        BUTTON_PLAY
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_MAX           BUTTON_VOL_UP
+#define BJACK_MIN           BUTTON_VOL_DOWN
+#define BJACK_STAY          BUTTON_NEXT
+#define BJACK_DOUBLEDOWN    BUTTON_PREV
+#define BJACK_UP            BUTTON_HOME
+#define BJACK_DOWN          (BUTTON_POWER | BUTTON_HOME)
+#define BJACK_RIGHT         BUTTON_NEXT
+#define BJACK_LEFT          BUTTON_PREV
+
 #else
 #error No keymap defined!
 #endif

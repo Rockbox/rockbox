@@ -433,6 +433,26 @@ static void setoptions (void)
         options.SELECT  = BUTTON_VOL_UP;
         options.MENU    = BUTTON_POWER;
 
+#elif CONFIG_KEYPAD == IHIFI_770_PAD
+        options.UP      = BUTTON_PREV;
+        options.DOWN    = BUTTON_NEXT;
+
+        options.A       = BUTTON_VOL_UP;
+        options.B       = BUTTON_VOL_DOWN;
+        options.START   = BUTTON_PLAY;
+        options.SELECT  = BUTTON_HOME;
+        options.MENU    = BUTTON_POWER;
+
+#elif CONFIG_KEYPAD == IHIFI_800_PAD
+        options.UP      = BUTTON_PREV;
+        options.DOWN    = BUTTON_NEXT;
+
+        options.A       = BUTTON_VOL_UP;
+        options.B       = BUTTON_VOL_DOWN;
+        options.START   = BUTTON_PLAY;
+        options.SELECT  = BUTTON_HOME;
+        options.MENU    = BUTTON_POWER;
+
 #else
 #error No Keymap Defined!
 #endif

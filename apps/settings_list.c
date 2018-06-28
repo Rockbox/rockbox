@@ -822,8 +822,13 @@ const struct settings_list settings[] = {
 
 #ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
     CHOICE_SETTING(F_SOUNDSETTING, roll_off, LANG_FILTER_ROLL_OFF, 0,
+#ifndef AUDIOHW_HAVE_SHORT_ROLL_OFF
                    "roll_off", "sharp,slow", sound_set_filter_roll_off,
                    2, ID2P(LANG_FILTER_SHARP), ID2P(LANG_FILTER_SLOW)),
+#else
+                   "roll_off", "sharp,slow,short,bypass", sound_set_filter_roll_off,
+                   4, ID2P(LANG_FILTER_SHARP), ID2P(LANG_FILTER_SLOW), ID2P(LANG_FILTER_SHORT), ID2P(LANG_FILTER_BYPASS)),
+#endif
 #endif
 
 #ifdef AUDIOHW_HAVE_FUNCTIONAL_MODE
@@ -1947,6 +1952,12 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(0, usb_charging, LANG_USB_CHARGING, 1, "usb charging",
                    "off,on,force", NULL, 3, ID2P(LANG_SET_BOOL_NO),
                    ID2P(LANG_SET_BOOL_YES), ID2P(LANG_FORCE)),
+#endif
+#ifdef HAVE_USB_POWER
+#ifndef SIMULATOR
+    OFFON_SETTING(0, usb_charge_only, LANG_USB_CHARGE_ONLY, false,
+                  "usb charge only", usb_set_charge_setting),
+#endif
 #endif
     OFFON_SETTING(F_BANFROMQS,cuesheet,LANG_CUESHEET_ENABLE,false,"cuesheet support",
                   NULL),
