@@ -85,7 +85,7 @@ bool sysfs_set_int(const char *path, int value)
     }
 
     bool success = true;
-    if(fprintf(f, "%d", value) < 1)
+    if(fprintf(f, "%d", value) < 0)
     {
         DEBUGF("ERROR %s: Write failed for %s.", __func__, path);
         success = false;
@@ -98,7 +98,7 @@ bool sysfs_set_int(const char *path, int value)
 
 bool sysfs_get_char(const char *path, char *value)
 {
-    *value = '\0';
+    int c;
     FILE *f = open_read(path);
     if(f == NULL)
     {
@@ -106,10 +106,16 @@ bool sysfs_get_char(const char *path, char *value)
     }
 
     bool success = true;
-    if(fscanf(f, "%c", value) == EOF)
+    c = fgetc(f);
+
+    if(c == EOF)
     {
         DEBUGF("ERROR %s: Read failed for %s.", __func__, path);
         success = false;
+    }
+    else
+    {
+        *value = c;
     }
 
     fclose(f);
@@ -147,7 +153,13 @@ bool sysfs_get_string(const char *path, char *value, int size)
     }
 
     bool success = true;
-    if(fgets(value, size, f) == NULL)
+
+    /* fgets returns NULL if en error occured OR
+     * when EOF occurs while no characters have been read.
+     *
+     * Empty string is not an error for us.
+     */
+    if(fgets(value, size, f) == NULL && value[0] != '\0')
     {
         DEBUGF("ERROR %s: Read failed for %s.", __func__, path);
         success = false;
@@ -175,7 +187,9 @@ bool sysfs_set_string(const char *path, char *value)
     }
 
     bool success = true;
-    if(fprintf(f, "%s", value) < 1)
+
+    /* If an output error is encountered, a negative value is returned */
+    if(fprintf(f, "%s", value) < 0)
     {
         DEBUGF("ERROR %s: Write failed for %s.", __func__, path);
         success = false;
