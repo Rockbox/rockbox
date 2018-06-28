@@ -80,7 +80,7 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
-#define CONFIG_RTC RTC_JZ47XX
+#define CONFIG_RTC RTC_JZ4740
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT

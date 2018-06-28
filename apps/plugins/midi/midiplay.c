@@ -293,6 +293,14 @@
 #define MIDI_VOL_DOWN   BUTTON_VOLDOWN
 #define MIDI_PLAYPAUSE  BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+#define MIDI_QUIT         BUTTON_POWER
+#define MIDI_FFWD         BUTTON_NEXT
+#define MIDI_REWIND       BUTTON_PREV
+#define MIDI_VOL_UP       BUTTON_VOL_UP
+#define MIDI_VOL_DOWN     BUTTON_VOL_DOWN
+#define MIDI_PLAYPAUSE    BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

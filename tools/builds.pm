@@ -418,6 +418,10 @@ $releasenotes="/wiki/ReleaseNotes314";
         name => 'Agptek Rocker',
         status => 2
     }
+    'xduoox3' => {
+        name => 'xDuoo X3',
+        status => 2,
+    },
 );
 
 sub manualname {
