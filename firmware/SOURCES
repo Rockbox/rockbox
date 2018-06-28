@@ -366,8 +366,10 @@ drivers/rtc/rtc_mr100.c
 drivers/rtc/rtc_mc13783.c
 #elif (CONFIG_RTC == RTC_TCC77X)
 drivers/rtc/rtc_tcc77x.c
-#elif (CONFIG_RTC == RTC_JZ47XX)
+#elif (CONFIG_RTC == RTC_JZ4740)
 drivers/rtc/rtc_jz4740.c
+#elif (CONFIG_RTC == RTC_JZ4760)
+drivers/rtc/rtc_jz4760.c
 #elif (CONFIG_RTC == RTC_S35390A)
 drivers/rtc/rtc_s35390a.c
 #elif (CONFIG_RTC == RTC_S35380A)
@@ -477,6 +479,8 @@ drivers/audio/dummy_codec.c
 drivers/audio/df1704.c
 #elif defined (HAVE_PCM1792_CODEC)
 drivers/audio/pcm1792.c
+#elif defined (HAVE_CS4398)
+drivers/audio/cs4398.c
 #endif /* defined(HAVE_*) */
 #else /* PLATFORM_HOSTED */
 #if defined(SAMSUNG_YPR0) && defined(HAVE_AS3514)
@@ -739,9 +743,9 @@ target/arm/crt0.S
 
 #elif defined(CPU_MIPS) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
 target/mips/mmu-mips.c
-#if CONFIG_CPU==JZ4732
+#if CONFIG_CPU==JZ4732 || CONFIG_CPU==JZ4760B
 target/mips/ingenic_jz47xx/crt0.S
-#endif /* CONFIG_CPU == JZ4732 */
+#endif /* CONFIG_CPU == JZ4732 || JZ4760B */
 
 #else
 
@@ -1725,6 +1729,24 @@ target/mips/ingenic_jz47xx/pcm-jz4740.c
 drivers/nand_id.c
 #endif /* CONFIG_CPU == JZ4732 */
 
+#if CONFIG_CPU == JZ4760B
+target/mips/ingenic_jz47xx/dma_acc-jz4760.c
+target/mips/ingenic_jz47xx/ata-nand-jz4760.c
+target/mips/ingenic_jz47xx/ata-sd-jz4760.c
+target/mips/ingenic_jz47xx/debug-jz4760.c
+target/mips/ingenic_jz47xx/kernel-jz4760.c
+target/mips/ingenic_jz47xx/i2c-jz4760.c
+target/mips/ingenic_jz47xx/lcd-jz4760.c
+target/mips/ingenic_jz47xx/system-jz4760.c
+target/mips/ingenic_jz47xx/usb-jz4760.c
+target/mips/ingenic_jz47xx/timer-jz4760.c
+#ifndef BOOTLOADER
+target/mips/ingenic_jz47xx/codec-jz4760.c
+target/mips/ingenic_jz47xx/pcm-jz4760.c
+#endif /* BOOTLOADER */
+drivers/nand_id.c
+#endif /* CONFIG_CPU == JZ4760B */
+
 #if defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX777)
 target/mips/ingenic_jz47xx/onda_vx747/backlight-onda_vx7X7.c
 target/mips/ingenic_jz47xx/onda_vx747/lcd-onda_vx747.c
@@ -1740,6 +1762,13 @@ target/mips/ingenic_jz47xx/onda_vx767/lcd-onda_vx767.c
 target/mips/ingenic_jz47xx/onda_vx767/power-onda_vx767.c
 target/mips/ingenic_jz47xx/onda_vx767/sadc-onda_vx767.c
 #endif /* ONDA_VX767 */
+
+#if defined(XDUOO_X3)
+target/mips/ingenic_jz47xx/xduoo_x3/backlight-xduoo_x3.c
+target/mips/ingenic_jz47xx/xduoo_x3/lcd-xduoo_x3.c
+target/mips/ingenic_jz47xx/xduoo_x3/power-xduoo_x3.c
+target/mips/ingenic_jz47xx/xduoo_x3/sadc-xduoo_x3.c
+#endif /* XDUOO_X3 */
 
 #if defined(LYRE_PROTO1)
 target/arm/at91sam/lyre_proto1/adc-lyre_proto1.c

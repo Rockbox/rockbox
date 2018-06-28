@@ -21,7 +21,7 @@
 
 #include "config.h"
 #include "gcc_extensions.h"
-#include "jz4740.h"
+#include "cpu.h"
 #include "ata-sd-target.h"
 #include "led.h"
 #include "sdmmc.h"

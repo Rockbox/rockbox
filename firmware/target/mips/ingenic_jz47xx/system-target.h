@@ -25,7 +25,7 @@
 #include <inttypes.h>
 
 #include "config.h"
-#include "jz4740.h"
+#include "cpu.h"
 #include "mipsregs.h"
 
 #define CACHE_SIZE       16*1024
@@ -34,6 +34,8 @@
 
 /* no optimized byteswap functions implemented for mips, yet */
 #define NEED_GENERIC_BYTESWAPS
+
+#define STORAGE_WANTS_ALIGN
 
 /* This one returns the old status */
 static inline int set_interrupt_status(int status, int mask)
@@ -86,10 +88,18 @@ void mdelay(unsigned int msec);
 void dma_enable(void);
 void dma_disable(void);
 
+#if CONFIG_CPU == JZ4732
 #define DMA_AIC_TX_CHANNEL 0
 #define DMA_NAND_CHANNEL   1
 #define DMA_USB_CHANNEL    2
 #define DMA_LCD_CHANNEL    3
+#elif CONFIG_CPU == JZ4760B
+#define DMA_AIC_TX_CHANNEL 0
+#define DMA_NAND_CHANNEL   1
+#define DMA_USB_CHANNEL    2
+#define DMA_SD_RX_CHANNEL  3
+#define DMA_SD_TX_CHANNEL  4
+#endif
 
 #define XDMA_CALLBACK(n) DMA ## n
 #define DMA_CALLBACK(n)  XDMA_CALLBACK(n)
@@ -103,7 +113,7 @@ void dma_disable(void);
  */
 static inline void core_sleep(void)
 {
-#if CONFIG_CPU == JZ4732
+#if CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B
     __cpm_idle_mode();
 #endif
     asm volatile(".set   mips32r2           \n"

@@ -687,6 +687,25 @@ CONFIG_KEYPAD == MROBE500_PAD
 #elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
 #   define SOL_QUIT         BUTTON_POWER
 
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+#   define SOL_QUIT          BUTTON_POWER
+#   define SOL_UP            BUTTON_HOME
+#   define SOL_DOWN          BUTTON_OPTION
+#   define SOL_LEFT          BUTTON_PREV
+#   define SOL_RIGHT         BUTTON_NEXT
+#   define SOL_MOVE_PRE      BUTTON_PLAY
+#   define SOL_MOVE          (BUTTON_PLAY | BUTTON_REL)
+#   define SOL_DRAW          (BUTTON_POWER | BUTTON_REPEAT)
+#   define SOL_REM2CUR       BUTTON_VOL_DOWN
+#   define SOL_CUR2STACK_PRE BUTTON_PLAY
+#   define SOL_CUR2STACK     (BUTTON_PLAY | BUTTON_REPEAT)
+#   define SOL_REM2STACK     BUTTON_VOL_UP
+#   define HK_MOVE           "PLAY"
+#   define HK_DRAW           "DBL HOME"
+#   define HK_REM2CUR        "PREV"
+#   define HK_CUR2STACK      "DBL PLAY"
+#   define HK_REM2STACK      "NEXT"
+
 #else
 #error No keymap defined!
 #endif
