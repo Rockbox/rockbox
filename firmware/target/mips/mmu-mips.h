@@ -31,14 +31,16 @@ void mmu_init(void);
 #define HAVE_CPUCACHE_INVALIDATE
 //#define HAVE_CPUCACHE_FLUSH
 
-void __dcache_writeback_all(void);
-void __dcache_invalidate_all(void);
+void __idcache_invalidate_all(void);
 void __icache_invalidate_all(void);
-void __flush_dcache_line(unsigned long addr);
+void __dcache_invalidate_all(void);
+void __dcache_writeback_all(void);
+
 void dma_cache_wback_inv(unsigned long addr, unsigned long size);
 
-#define commit_discard_idcache  __icache_invalidate_all
-#define commit_discard_dcache   __dcache_invalidate_all
-#define commit_dcache           __dcache_writeback_all
+#define commit_discard_idcache   __idcache_invalidate_all
+#define commit_discard_icache    __icache_invalidate_all
+#define commit_discard_dcache    __dcache_invalidate_all
+#define commit_dcache            __dcache_writeback_all
 
 #endif /* __MMU_MIPS_INCLUDE_H */

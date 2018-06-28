@@ -1535,6 +1535,8 @@ cat <<EOF
  232) DX50                240) Rocker            227) NW-A20 series
  233) DX90                                       228) NWZ-A860 series
                                                  229) NWZ-S750 series
+ ==xDuoo==
+ 241) X3
 EOF
 
   buildfor=`input`;
@@ -4213,6 +4215,28 @@ fi
     t_manufacturer="agptek"
     t_model="rocker"
     mipsellinuxcc
+    ;;
+
+    241|xduoox3)
+    target_id=106
+    modelname="xduoox3"
+    target="XDUOO_X3"
+    memory=64
+    mipselcc
+    tool="$rootdir/tools/scramble -add=xdx3"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$bmp2rb_mono"
+    output="rockbox.x3"
+    appextra="recorder:gui:radio"
+    plugins="yes"
+    swcodec="yes"
+    toolset=$genericbitmaptools
+    boottool="cp"
+    bootoutput="bootloader-x3.bin"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="ingenic_jz47xx"
+    t_model="xduoo_x3"
     ;;
 
    *)

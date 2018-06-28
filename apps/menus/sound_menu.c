@@ -132,6 +132,10 @@ MENUITEM_SETTING(depth_3d, &global_settings.depth_3d, NULL);
 MENUITEM_SETTING(roll_off, &global_settings.roll_off, NULL);
 #endif
 
+#ifdef AUDIOHW_HAVE_FUNCTIONAL_MODE
+MENUITEM_SETTING(func_mode, &global_settings.func_mode, NULL);
+#endif
+
 #if CONFIG_CODEC == SWCODEC
     /* Crossfeed Submenu */
     MENUITEM_SETTING(crossfeed, &global_settings.crossfeed, lowlatency_callback);
@@ -255,6 +259,9 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #endif
 #ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
           ,&roll_off
+#endif
+#ifdef AUDIOHW_HAVE_FUNCTIONAL_MODE
+          ,&func_mode
 #endif
 #if CONFIG_CODEC == SWCODEC
           ,&crossfeed_menu, &equalizer_menu, &dithering_enabled

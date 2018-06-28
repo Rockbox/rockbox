@@ -334,6 +334,15 @@ GREY_INFO_STRUCT
 #   define FFT_ORIENTATION  BUTTON_SELECT
 #   define FFT_WINDOW       BUTTON_VOLDOWN
 
+#elif (CONFIG_KEYPAD == XDUOO_X3_PAD)
+#   define FFT_PREV_GRAPH   BUTTON_PREV
+#   define FFT_NEXT_GRAPH   BUTTON_NEXT
+#   define FFT_ORIENTATION  BUTTON_HOME
+#   define FFT_FREQ_SCALE   BUTTON_OPTION
+#   define FFT_WINDOW       (BUTTON_HOME|BUTTON_POWER)
+#   define FFT_AMP_SCALE    BUTTON_PLAY
+#   define FFT_QUIT         BUTTON_POWER
+
 #elif !defined(HAVE_TOUCHSCREEN)
 #error No keymap defined!
 #endif

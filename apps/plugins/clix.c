@@ -276,6 +276,14 @@
 #define CLIX_BUTTON_RIGHT         BUTTON_RIGHT
 #define CLIX_BUTTON_CLICK         BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+#define CLIX_BUTTON_QUIT          BUTTON_POWER
+#define CLIX_BUTTON_UP            BUTTON_HOME
+#define CLIX_BUTTON_DOWN          BUTTON_OPTION
+#define CLIX_BUTTON_LEFT          BUTTON_PREV
+#define CLIX_BUTTON_RIGHT         BUTTON_NEXT
+#define CLIX_BUTTON_CLICK         BUTTON_PLAY
+
 #else
 #error "no keymap"
 #endif

@@ -85,5 +85,7 @@ creative-zen.c
 sony-nwza860.c
 #elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
 agptek-rocker.c
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+xduoo-x3.c
 #endif
 #endif /* SIMULATOR */
