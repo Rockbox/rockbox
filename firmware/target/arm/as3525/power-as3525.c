@@ -73,3 +73,11 @@ bool tuner_powered(void)
     return true;
 }
 #endif
+
+#ifdef HAVE_LINEOUT_POWEROFF
+void lineout_set(bool enable)
+{
+    /* Call audio hardware driver implementation */
+    audiohw_enable_lineout(enable);
+}
+#endif

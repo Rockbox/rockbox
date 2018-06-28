@@ -23,6 +23,7 @@
 #define _AS3514_H
 
 #include "config.h"
+#include <stdbool.h>
 
 #if 0
 #define AUDIOHW_CAPS    (LINEOUT_CAP | LIN_GAIN_CAP | MIC_GAIN_CAP)
@@ -47,6 +48,10 @@ AUDIOHW_SETTING(RIGHT_GAIN, "dB",   1,   1,   0,  31,  23, (val - 23) * 15)
 #endif /* HAVE_RECORDING */
 
 void audiohw_set_sampr_dividers(int fsel);
+
+#if defined(SANSA_FUZEV2)
+extern void audiohw_enable_lineout(bool enable);
+#endif
 
 /* Register Descriptions */
 
