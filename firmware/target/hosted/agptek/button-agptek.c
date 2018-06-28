@@ -132,7 +132,7 @@ int button_read_device(void)
 bool headphones_inserted(void)
 {
     int status = 0;
-    const char * const sysfs_hp_switch = "/sys/devices/switch/headset/status";
+    const char * const sysfs_hp_switch = "/sys/class/switch/headset/state";
     sysfs_get_int(sysfs_hp_switch, &status);
 
     return status ? true : false;
