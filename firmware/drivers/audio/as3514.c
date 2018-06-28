@@ -76,6 +76,11 @@
 
 #endif
 
+#ifdef SANSA_FUZEV2
+static int as3514_vol_l;
+static int as3514_vol_r;
+#endif
+
 /* Shadow registers */
 static uint8_t as3514_regs[AS3514_NUM_AUDIO_REGS]; /* 8-bit registers */
 /* Keep track of volume */
@@ -278,6 +283,17 @@ void audiohw_set_volume(int vol_l, int vol_r)
         return;
     }
 
+#ifdef SANSA_FUZEV2
+    as3514_vol_l = vol_l;
+    as3514_vol_r = vol_r;
+
+    if (as3514_regs[AS3514_HPH_OUT_R] & HPH_OUT_R_LINEOUT)
+    {
+        /* lineout active: force to 0dB */
+        vol_l = vol_r = vol_tenthdb2hw(0);
+    }
+#endif
+
     /* We combine the mixer/DAC channel volume range with the headphone volume
      * range. We want to keep the mixers volume as high as possible and the
      * headphone volume as low as possible. */
@@ -343,6 +359,22 @@ void audiohw_set_volume(int vol_l, int vol_r)
 
     audiohw_mute(false);
 }
+
+#if defined(SANSA_FUZEV2)
+void audiohw_enable_lineout(bool enable)
+{
+    if (enable)
+    {
+        as3514_set(AS3514_HPH_OUT_R, HPH_OUT_R_LINEOUT);
+        audiohw_set_volume(as3514_vol_l, as3514_vol_r);
+    }
+    else
+    {
+        as3514_clear(AS3514_HPH_OUT_R, HPH_OUT_R_LINEOUT);
+        audiohw_set_volume(as3514_vol_l, as3514_vol_r);
+    }
+}
+#endif
 
 #if 0 /* unused */
 void audiohw_set_lineout_volume(int vol_l, int vol_r)
