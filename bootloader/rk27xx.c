@@ -129,17 +129,7 @@ void main(void)
 
     show_logo();
 
-    int btn = button_read_device();
-
-    /* if there is some other button pressed
-     * besides POWER/PLAY we boot into OF
-     */
-    if ((btn & ~POWEROFF_BUTTON))
-        boot = of;
-
-    /* if we are woken up by USB insert boot into OF */
-    if (DEV_INFO & (1<<20))
-        boot = of;
+    sleep(HZ);
 
     lcd_clear_display();
 
@@ -153,7 +143,19 @@ void main(void)
         error(EDISK, ret, true);
 
     loadbuffer = (unsigned char*)DRAM_ORIG; /* DRAM */
-   
+
+    int btn = button_read_device();
+
+    /* if there is some other button pressed
+     * besides POWER/PLAY we boot into OF
+     */
+    if ((btn & ~POWEROFF_BUTTON))
+        boot = of;
+
+    /* if we are woken up by USB insert boot into OF */
+    if (DEV_INFO & (1<<20))
+        boot = of;
+
     if (boot == rb)
         snprintf(filename,sizeof(filename), BOOTDIR "/%s", BOOTFILE);    
     else if (boot == of)
@@ -188,7 +190,6 @@ void main(void)
     {
         /* print 'Loading OK' */
         printf("Loading OK");
-        sleep(HZ);
     }
 
     /* jump to entrypoint */

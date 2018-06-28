@@ -220,6 +220,7 @@ void usb_charging_maxcurrent_change(int maxcurrent);
 /* returns the maximum allowed USB current, based on USB charging mode and state */
 int usb_charging_maxcurrent(void);
 #endif /* HAVE_USB_CHARGING_ENABLE */
+void usb_set_charge_setting(bool charge_only);
 #endif /* HAVE_USB_POWER */
 #ifdef HAVE_USBSTACK
 /* USB driver call this function to notify that a transfer has completed */

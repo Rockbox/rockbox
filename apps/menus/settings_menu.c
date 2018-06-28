@@ -258,6 +258,9 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
             &usb_charging,
 #endif
          );
+#ifdef HAVE_USB_POWER
+MENUITEM_SETTING(usb_charge_only_item, &global_settings.usb_charge_only, NULL);
+#endif
 /* Disk */
 #ifdef HAVE_DISK_STORAGE
 MENUITEM_SETTING(disk_spindown, &global_settings.disk_spindown, NULL);
@@ -432,6 +435,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #ifdef HAVE_LINEOUT_POWEROFF
             &lineout_onoff,
+#endif
+#ifdef HAVE_USB_POWER
+            &usb_charge_only_item,
 #endif
 #ifdef HAVE_BUTTON_LIGHT
             &buttonlight_timeout,
