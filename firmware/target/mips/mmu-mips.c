@@ -127,86 +127,76 @@ void mmu_init(void)
 
 #define SYNC_WB() __asm__ __volatile__ ("sync")
 
-#define __CACHE_OP(op, addr)                 \
-    __asm__ __volatile__(                    \
-    "    .set    noreorder        \n"        \
-    "    .set    mips32\n\t       \n"        \
-    "    cache   %0, %1           \n"        \
-    "    .set    mips0            \n"        \
-    "    .set    reorder          \n"        \
-    :                                        \
-    : "i" (op), "m" (*(unsigned char *)(addr)))
-
-void __flush_dcache_line(unsigned long addr)
-{
-    __CACHE_OP(DCHitWBInv, addr);
-    SYNC_WB();
-}
+#define cache_op(base,op)	        	\
+	__asm__ __volatile__("	         	\
+		.set noreorder;		        \
+		.set mips3;		        \
+		cache %1, (%0);	                \
+		.set mips0;			\
+		.set reorder"			\
+		:				\
+		: "r" (base),			\
+		  "i" (op));
 
 void __icache_invalidate_all(void)
 {
-    unsigned int i;
+    unsigned long start;
+    unsigned long end;
 
-    asm volatile (".set   noreorder  \n"
-                  ".set   mips32     \n"
-                  "mtc0   $0, $28    \n" /* TagLo */
-                  "mtc0   $0, $29    \n" /* TagHi */
-                  ".set   mips0      \n"
-                  ".set   reorder    \n"
-                  );
-    for(i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHE_LINE_SIZE)
-        __CACHE_OP(ICIndexStTag, i);
-
-    /* invalidate btb */
-    asm volatile (
-        ".set mips32        \n"
-        "mfc0 %0, $16, 7    \n"
-        "nop                \n"
-        "ori  %0, 2         \n"
-        "mtc0 %0, $16, 7    \n"
-        ".set mips0         \n"
-        :
-        : "r" (i));
+    start = A_K0BASE;
+    end = start + CACHE_SIZE;
+    while(start < end)
+    {
+        cache_op(start,ICIndexInv);
+        start += CACHE_LINE_SIZE;
+    }
+    SYNC_WB();
 }
 
 void __dcache_invalidate_all(void)
 {
-    unsigned int i;
+    unsigned long start;
+    unsigned long end;
 
-    asm volatile (".set   noreorder  \n"
-                  ".set   mips32     \n"
-                  "mtc0   $0, $28    \n"
-                  "mtc0   $0, $29    \n"
-                  ".set   mips0      \n"
-                  ".set   reorder    \n"
-                  );
-    for (i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHE_LINE_SIZE)
-        __CACHE_OP(DCIndexStTag, i);
+    start = A_K0BASE;
+    end = start + CACHE_SIZE;
+    while (start < end)
+    {
+        cache_op(start,DCIndexWBInv);
+        start += CACHE_LINE_SIZE;
+    }
+    SYNC_WB();
 }
 
-void __dcache_writeback_all(void) __attribute__ ((section(".icode")));
+void __idcache_invalidate_all(void)
+{
+    __dcache_invalidate_all();
+    __icache_invalidate_all();
+}
+
 void __dcache_writeback_all(void)
 {
-    unsigned int i;
-    for(i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHE_LINE_SIZE)
-        __CACHE_OP(DCIndexWBInv, i);
-    
-    SYNC_WB();
+    __dcache_invalidate_all();
 }
 
 void dma_cache_wback_inv(unsigned long addr, unsigned long size)
 {
     unsigned long end, a;
 
-    if (size >= CACHE_SIZE)
+    if (size >= CACHE_SIZE*2) {
         __dcache_writeback_all();
-    else
-    {
+    }
+    else {
         unsigned long dc_lsize = CACHE_LINE_SIZE;
-        
+
         a = addr & ~(dc_lsize - 1);
         end = (addr + size - 1) & ~(dc_lsize - 1);
-        for(; a < end; a += dc_lsize)
-            __flush_dcache_line(a);
+        while (1) {
+            cache_op(a,DCHitWBInv);
+            if (a == end)
+                break;
+            a += dc_lsize;
+        }
     }
+    SYNC_WB();
 }

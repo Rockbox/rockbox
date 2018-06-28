@@ -623,6 +623,22 @@
 #define STAR_TOGGLE_CONTROL_NAME "Play"
 #define STAR_QUIT_NAME           "Back"
 
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+#define STAR_QUIT           BUTTON_POWER
+#define STAR_LEFT           BUTTON_PREV
+#define STAR_RIGHT          BUTTON_NEXT
+#define STAR_UP             BUTTON_HOME
+#define STAR_DOWN           BUTTON_OPTION
+#define STAR_TOGGLE_CONTROL BUTTON_PLAY
+#define STAR_LEVEL_UP      (BUTTON_PLAY | BUTTON_NEXT)
+#define STAR_LEVEL_DOWN    (BUTTON_PLAY | BUTTON_PREV)
+#define STAR_LEVEL_REPEAT  (BUTTON_PLAY | BUTTON_OPTION)
+#define STAR_TOGGLE_CONTROL_NAME "PLAY"
+#define STAR_QUIT_NAME      "POWER"
+#define STAR_LEVEL_UP_NAME  "PLAY + NEXT"
+#define STAR_LEVEL_DOWN_NAME "PLAY + PREV"
+#define STAR_LEVEL_REPEAT_NAME "PLAY + OPTION"
+
 #else
 #error No keymap defined!
 #endif

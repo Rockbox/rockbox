@@ -122,6 +122,14 @@ void audiohw_set_depth_3d(int value)
 void audiohw_set_lineout_volume(int vol_l, int vol_r)
     { (void)vol_l; (void)vol_r; }
 #endif
+#if defined(AUDIOHW_HAVE_FILTER_ROLL_OFF)
+void audiohw_set_filter_roll_off(int value)
+    { (void)value; }
+#endif
+#if defined(AUDIOHW_HAVE_FUNCTIONAL_MODE)
+void audiohw_set_functional_mode(int value)
+    { (void)value; }
+#endif
 
 void audiohw_close(void) {}
 

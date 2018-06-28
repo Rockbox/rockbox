@@ -41,6 +41,7 @@
 #define LIN_GAIN_CAP          (1 << 11)
 #define MIC_GAIN_CAP          (1 << 12)
 #define FILTER_ROLL_OFF_CAP   (1 << 13)
+#define FUNCTIONAL_MODE_CAP   (1 << 14)
 
 /* Used by every driver to export its min/max/default values for its audio
    settings. */
@@ -209,6 +210,8 @@ struct sound_settings_info
 #include "pcm1792.h"
 #elif defined(HAVE_NWZ_LINUX_CODEC)
 #include "nwzlinux_codec.h"
+#elif defined(HAVE_CS4398)
+#include "cs4398.h"
 #elif (CONFIG_PLATFORM & (PLATFORM_ANDROID | PLATFORM_MAEMO\
        | PLATFORM_PANDORA | PLATFORM_SDL))
 #include "hosted_codec.h"
@@ -379,6 +382,10 @@ enum AUDIOHW_EQ_SETTINGS
 
 #if (AUDIOHW_CAPS & FILTER_ROLL_OFF_CAP)
 #define AUDIOHW_HAVE_FILTER_ROLL_OFF
+#endif
+
+#if (AUDIOHW_CAPS & FUNCTIONAL_MODE_CAP)
+#define AUDIOHW_HAVE_FUNCTIONAL_MODE
 #endif
 
 #endif /* AUDIOHW_CAPS */
@@ -574,6 +581,16 @@ void audiohw_set_depth_3d(int val);
  *          FILTER_ROLL_OFF_CAP
  */
 void audiohw_set_filter_roll_off(int val);
+#endif
+
+#ifdef AUDIOHW_HAVE_FUNCTIONAL_MODE
+/**
+ * Set DAC's functional mode.
+ * @param val 0 - Sinfle-Speed, 1 - Double-Speed, 2 - Quad-Speed.
+ * NOTE: AUDIOHW_CAPS need to contain
+ *          FUNCTIONAL_MODE_CAP
+ */
+void audiohw_set_functional_mode(int val);
 #endif
 
 
