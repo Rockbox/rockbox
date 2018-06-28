@@ -324,6 +324,16 @@ void sound_set_filter_roll_off(int value)
 }
 #endif
 
+#if defined(AUDIOHW_HAVE_FUNCTIONAL_MODE)
+void sound_set_functional_mode(int value)
+{
+    if (!audio_is_initialized)
+        return;
+
+    audiohw_set_functional_mode(value);
+}
+#endif
+
 #if defined(AUDIOHW_HAVE_EQ)
 int sound_enum_hw_eq_band_setting(unsigned int band,
                                   unsigned int band_setting)

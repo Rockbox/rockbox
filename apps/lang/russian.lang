@@ -13164,3 +13164,59 @@
     *: "Цифровой фильтр ЦАП"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_FUNCTIONAL_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's oversampling"
+  </source>
+  <dest>
+    *: "Передискретизация ЦАП"
+  </dest>
+  <voice>
+    *: "Передискретизация ЦАП"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE_SPEED
+  desc: in sound settings
+  user: core
+  <source>
+    *: "128x"
+  </source>
+  <dest>
+    *: "128x"
+  </dest>
+  <voice>
+    *: "128x"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DOUBLE_SPEED
+  desc: in sound settings
+  user: core
+  <source>
+    *: "64x"
+  </source>
+  <dest>
+    *: "64x"
+  </dest>
+  <voice>
+    *: "64x"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUAD_SPEED
+  desc: in sound settings
+  user: core
+  <source>
+    *: "32x"
+  </source>
+  <dest>
+    *: "32x"
+  </dest>
+  <voice>
+    *: "32x"
+  </voice>
+</phrase>

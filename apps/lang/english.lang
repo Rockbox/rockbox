@@ -13230,6 +13230,62 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_FUNCTIONAL_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: "DAC's oversampling"
+  </source>
+  <dest>
+    *: "DAC's oversampling"
+  </dest>
+  <voice>
+    *: "DAC's oversampling"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE_SPEED
+  desc: in sound settings
+  user: core
+  <source>
+    *: "128x"
+  </source>
+  <dest>
+    *: "128x"
+  </dest>
+  <voice>
+    *: "128x"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DOUBLE_SPEED
+  desc: in sound settings
+  user: core
+  <source>
+    *: "64x"
+  </source>
+  <dest>
+    *: "64x"
+  </dest>
+  <voice>
+    *: "64x"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUAD_SPEED
+  desc: in sound settings
+  user: core
+  <source>
+    *: "32x"
+  </source>
+  <dest>
+    *: "32x"
+  </dest>
+  <voice>
+    *: "32x"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_VOLUME_LIMIT
   desc: in sound_settings
   user: core

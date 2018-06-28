@@ -826,6 +826,12 @@ const struct settings_list settings[] = {
                    2, ID2P(LANG_FILTER_SHARP), ID2P(LANG_FILTER_SLOW)),
 #endif
 
+#ifdef AUDIOHW_HAVE_FUNCTIONAL_MODE
+    CHOICE_SETTING(F_SOUNDSETTING, func_mode, LANG_FUNCTIONAL_MODE, 0,
+                   "func_mode", "Single-Speed,Double-Speed,Quad-Speed", sound_set_functional_mode,
+                   3, ID2P(LANG_SINGLE_SPEED), ID2P(LANG_DOUBLE_SPEED), ID2P(LANG_QUAD_SPEED)),
+#endif
+
     /* playback */
     OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", NULL),
     SYSTEM_SETTING(NVRAM(4), resume_index, -1),

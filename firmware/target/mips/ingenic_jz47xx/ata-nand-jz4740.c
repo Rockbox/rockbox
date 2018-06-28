@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include "config.h"
-#include "jz4740.h"
+#include "cpu.h"
 #include "nand.h"
 #include "nand_id.h"
 #include "system.h"

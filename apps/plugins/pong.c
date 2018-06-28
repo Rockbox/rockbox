@@ -309,6 +309,14 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define PONG_QUIT        BUTTON_POWER
 #define PONG_PAUSE       BUTTON_MENU
 
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD
+#define PONG_QUIT        BUTTON_POWER
+#define PONG_PAUSE       BUTTON_PLAY
+#define PONG_LEFT_UP     BUTTON_PREV
+#define PONG_LEFT_DOWN   BUTTON_OPTION
+#define PONG_RIGHT_UP    BUTTON_HOME
+#define PONG_RIGHT_DOWN  BUTTON_NEXT
+
 #else
 #error No keymap defined!
 #endif

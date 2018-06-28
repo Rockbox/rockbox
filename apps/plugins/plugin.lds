@@ -163,8 +163,14 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define IRAMORIG (0x00000000 + (56*1024))
 #define IRAMSIZE (200*1024)
 
-#elif CONFIG_CPU == JZ4732
-#define DRAMORIG 0x80004000 + STUBOFFSET
+#elif CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B
+#undef STUBOFFSET
+#ifdef DEBUG
+#define STUBOFFSET 0x14000
+#else
+#define STUBOFFSET 0x4000
+#endif
+#define DRAMORIG 0x80000000 + STUBOFFSET
 #define IRAM DRAM
 #define IRAMSIZE 0
 /* The bit of IRAM that is available is used in the core */

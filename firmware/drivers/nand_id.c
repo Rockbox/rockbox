@@ -51,10 +51,21 @@ static const struct nand_info samsung[] =
      128,        8192,   4096,      128,        2,          3,          4 },
 };
 
+static const struct nand_info gigadevice[] =
+{
+/*
+    id1, id2
+    pages/block, blocks, page_size, spare_size, col_cycles, row_cycles, planes
+*/      
+    {0xB1, 0x80, /* MD5N01G51MSD1B */
+     64,         1024,   2048,      64,         2,          2,          1 },
+};
+
 #define NI(id, x) {id, (struct nand_info*)x, (sizeof(x)/sizeof(struct nand_info))}
 static const struct nand_manufacturer all[] =
 {
     NI(0xEC, samsung),
+    NI(0x98, gigadevice),
 };
 
 // -----------------------------------------------------------------------------
