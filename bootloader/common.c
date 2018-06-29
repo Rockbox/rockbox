@@ -54,7 +54,8 @@
  || defined(SAMSUNG_YH820) || defined(PHILIPS_SA9200) \
  || defined(PHILIPS_HDD1630) || defined(PHILIPS_HDD6330) \
  || defined(ONDA_VX747) || defined(PBELL_VIBE500) \
- || defined(TOSHIBA_GIGABEAT_S) || defined(XDUOO_X3)
+ || defined(TOSHIBA_GIGABEAT_S) || defined(XDUOO_X3) \
+ || defined(IHIFI770) || defined(IHIFI770C) || defined(IHIFI800)
 bool verbose = false;
 #else
 bool verbose = true;

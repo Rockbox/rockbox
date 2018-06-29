@@ -442,6 +442,8 @@ drivers/audio/audiohw-swcodec.c
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(BOOTLOADER)
 #if defined(HAVE_UDA1380)
 drivers/audio/uda1380.c
+#elif defined(HAVE_WM8740)
+drivers/audio/wm8740.c
 #elif defined(HAVE_WM8751) \
    || defined(HAVE_WM8750)
 drivers/audio/wm8751.c
@@ -481,6 +483,8 @@ drivers/audio/df1704.c
 drivers/audio/pcm1792.c
 #elif defined (HAVE_CS4398)
 drivers/audio/cs4398.c
+#elif defined (HAVE_ES9018)
+drivers/audio/es9018.c
 #endif /* defined(HAVE_*) */
 #else /* PLATFORM_HOSTED */
 #if defined(SAMSUNG_YPR0) && defined(HAVE_AS3514)
@@ -791,6 +795,12 @@ target/arm/s3c2440/lcd-s3c2440.c
 target/arm/rk27xx/ma/lcd-ma.c
 #elif CONFIG_LCD == LCD_IHIFI
 target/arm/rk27xx/ihifi/lcd-ihifi.c
+#elif CONFIG_LCD == LCD_IHIFI770
+target/arm/rk27xx/ihifi2/lcd-ihifi770.c
+#elif CONFIG_LCD == LCD_IHIFI770C
+target/arm/rk27xx/ihifi2/lcd-ihifi770c.c
+#elif CONFIG_LCD == LCD_IHIFI800
+target/arm/rk27xx/ihifi2/lcd-ihifi800.c
 #endif
 
 /* USB Stack */
@@ -1901,6 +1911,21 @@ target/arm/rk27xx/ihifi/power-ihifi.c
 target/arm/rk27xx/ihifi/powermgmt-ihifi760.c
 #else
 target/arm/rk27xx/ihifi/powermgmt-ihifi960.c
+#endif
+#endif
+
+#if defined(IHIFI770) || defined(IHIFI770C) || defined(IHIFI800)
+target/arm/rk27xx/ihifi2/button-ihifi.c
+target/arm/rk27xx/ihifi2/power-ihifi.c
+#if defined(IHIFI770)
+target/arm/rk27xx/ihifi2/powermgmt-ihifi770.c
+target/arm/rk27xx/ihifi2/audio-ihifi770.c
+#elif defined(IHIFI770C)
+target/arm/rk27xx/ihifi2/powermgmt-ihifi770c.c
+target/arm/rk27xx/ihifi2/audio-ihifi770.c
+#elif defined(IHIFI800)
+target/arm/rk27xx/ihifi2/powermgmt-ihifi800.c
+target/arm/rk27xx/ihifi2/audio-ihifi800.c
 #endif
 #endif
 
