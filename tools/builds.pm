@@ -422,6 +422,18 @@ $releasenotes="/wiki/ReleaseNotes314";
         name => 'xDuoo X3',
         status => 2,
     },
+    'ihifi770' => {
+        name => 'Xuelin iHIFI 770',
+        status => 2,
+    },
+    'ihifi770C' => {
+        name => 'Xuelin iHIFI 770C',
+        status => 2,
+    },
+    'ihifi800' => {
+        name => 'Xuelin iHIFI 800',
+        status => 2,
+    },
 );
 
 sub manualname {

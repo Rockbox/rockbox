@@ -13230,6 +13230,34 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_FILTER_SHORT
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Short"
+  </source>
+  <dest>
+    *: "Short"
+  </dest>
+  <voice>
+    *: "Short"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BYPASS
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Bypass"
+  </source>
+  <dest>
+    *: "Bypass"
+  </dest>
+  <voice>
+    *: "Bypass"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_VOLUME_LIMIT
   desc: in sound_settings
   user: core

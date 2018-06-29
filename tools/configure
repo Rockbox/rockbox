@@ -1548,13 +1548,14 @@ cat <<EOF
  206) Android MIPS        ==IHIFI==              222) NWZ-E450 series
  207) Android x86         230) 760               223) NWZ-E460 series
  208) Samsung YP-R1       231) 960               224) NWZ-E470 series
-                                                 225) NWZ-E580 series
- ==iBasso==               ==Agptek==             226) NWZ-A10 series
- 232) DX50                240) Rocker            227) NW-A20 series
+                          250) 770C              225) NWZ-E580 series
+ ==iBasso==               251) 770               226) NWZ-A10 series
+ 232) DX50                252) 800               227) NW-A20 series
  233) DX90                                       228) NWZ-A860 series
                                                  229) NWZ-S750 series
- ==xDuoo==
- 241) X3
+ ==xDuoo==                ==AgpTek==
+ 241) X3                  240) Rocker
+
 EOF
 
   buildfor=`input`;
@@ -4255,6 +4256,75 @@ fi
     t_cpu="mips"
     t_manufacturer="ingenic_jz47xx"
     t_model="xduoo_x3"
+    ;;
+
+   250|ihifi770C)
+    target_id=107
+    modelname="ihifi770c"
+    target="IHIFI770C"
+    memory=16
+    arm7ejscc
+    tool="$rootdir/tools/scramble -rkw -modelnum=97"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.rkw"
+    bootoutput="bootloader.rkw"
+    appextra="recorder:gui"
+    plugins="yes"
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="rk27xx"
+    t_model="ihifi2"
+    ;;
+
+   251|ihifi770)
+    target_id=108
+    modelname="ihifi770"
+    target="IHIFI770"
+    memory=16
+    arm7ejscc
+    tool="$rootdir/tools/scramble -rkw -modelnum=98"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.rkw"
+    bootoutput="bootloader.rkw"
+    appextra="recorder:gui"
+    plugins="yes"
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="rk27xx"
+    t_model="ihifi2"
+    ;;
+
+   252|ihifi800)
+    target_id=109
+    modelname="ihifi800"
+    target="IHIFI800"
+    memory=16
+    arm7ejscc
+    tool="$rootdir/tools/scramble -rkw -modelnum=99"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.rkw"
+    bootoutput="bootloader.rkw"
+    appextra="recorder:gui"
+    plugins="yes"
+    swcodec="yes"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="rk27xx"
+    t_model="ihifi2"
     ;;
 
    *)

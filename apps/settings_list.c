@@ -876,8 +876,13 @@ const struct settings_list settings[] = {
 
 #ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
     CHOICE_SETTING(F_SOUNDSETTING, roll_off, LANG_FILTER_ROLL_OFF, 0,
+#ifndef AUDIOHW_HAVE_SHORT_ROLL_OFF
                    "roll_off", "sharp,slow", sound_set_filter_roll_off,
                    2, ID2P(LANG_FILTER_SHARP), ID2P(LANG_FILTER_SLOW)),
+#else
+                   "roll_off", "sharp,slow,short,bypass", sound_set_filter_roll_off,
+                   4, ID2P(LANG_FILTER_SHARP), ID2P(LANG_FILTER_SLOW), ID2P(LANG_FILTER_SHORT), ID2P(LANG_FILTER_BYPASS)),
+#endif
 #endif
 
     /* playback */
