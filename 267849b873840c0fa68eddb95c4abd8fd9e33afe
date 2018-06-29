@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "84d8846c_2e64a7e4",
+        "filename": "apps/menus/sound_menu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2018-06-29T14:55:19Z",
+      "side": 1,
+      "message": "What is functional mode?",
+      "revId": "267849b873840c0fa68eddb95c4abd8fd9e33afe",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "84d8846c_0e61ebd4",
+        "filename": "firmware/drivers/nand_id.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2018-06-29T14:55:19Z",
+      "side": 1,
+      "message": "Ugly whitespace errors. In HEAD as well...",
+      "revId": "267849b873840c0fa68eddb95c4abd8fd9e33afe",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "84d8846c_ee98dfcc",
+        "filename": "firmware/export/config/xduoox3.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2018-06-29T14:55:19Z",
+      "side": 1,
+      "message": "Check if this doesn\u0027t collide with other targets",
+      "revId": "267849b873840c0fa68eddb95c4abd8fd9e33afe",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
