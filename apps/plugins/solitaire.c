@@ -706,6 +706,44 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define HK_CUR2STACK      "DBL PLAY"
 #   define HK_REM2STACK      "NEXT"
 
+#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#   define SOL_QUIT          BUTTON_POWER
+#   define SOL_UP            BUTTON_PREV
+#   define SOL_DOWN          BUTTON_NEXT
+#   define SOL_LEFT          BUTTON_HOME
+#   define SOL_RIGHT         BUTTON_VOL_DOWN
+#   define SOL_MOVE_PRE      BUTTON_VOL_UP
+#   define SOL_MOVE          (BUTTON_PLAY | BUTTON_REL)
+#   define SOL_DRAW          (BUTTON_POWER | BUTTON_REPEAT)
+#   define SOL_REM2CUR       (BUTTON_POWER | BUTTON_VOL_DOWN)
+#   define SOL_CUR2STACK_PRE BUTTON_PLAY
+#   define SOL_CUR2STACK     (BUTTON_PLAY | BUTTON_REPEAT)
+#   define SOL_REM2STACK     (BUTTON_POWER | BUTTON_VOL_UP)
+#   define HK_MOVE           "PLAY"
+#   define HK_DRAW           "DBL POWER"
+#   define HK_REM2CUR        "POWER"
+#   define HK_CUR2STACK      "DBL PLAY"
+#   define HK_REM2STACK      "POWER+"
+
+#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#   define SOL_QUIT          BUTTON_POWER
+#   define SOL_UP            BUTTON_PREV
+#   define SOL_DOWN          BUTTON_NEXT
+#   define SOL_LEFT          BUTTON_HOME
+#   define SOL_RIGHT         BUTTON_VOL_DOWN
+#   define SOL_MOVE_PRE      BUTTON_VOL_UP
+#   define SOL_MOVE          (BUTTON_PLAY | BUTTON_REL)
+#   define SOL_DRAW          (BUTTON_POWER | BUTTON_REPEAT)
+#   define SOL_REM2CUR       (BUTTON_POWER | BUTTON_VOL_DOWN)
+#   define SOL_CUR2STACK_PRE BUTTON_PLAY
+#   define SOL_CUR2STACK     (BUTTON_PLAY | BUTTON_REPEAT)
+#   define SOL_REM2STACK     (BUTTON_POWER | BUTTON_VOL_UP)
+#   define HK_MOVE           "PLAY"
+#   define HK_DRAW           "DBL POWER"
+#   define HK_REM2CUR        "POWER"
+#   define HK_CUR2STACK      "DBL PLAY"
+#   define HK_REM2STACK      "POWER+"
+
 #else
 #error No keymap defined!
 #endif

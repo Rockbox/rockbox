@@ -35,6 +35,8 @@
 #elif defined(HM60X) || defined(HM801) || (CONFIG_KEYPAD == MA_PAD) || \
     (CONFIG_KEYPAD == IHIFI_PAD)
 #define DEBUG_CANCEL BUTTON_LEFT
+#elif (CONFIG_KEYPAD == IHIFI_770_PAD) || (CONFIG_KEYPAD == IHIFI_800_PAD)
+#define DEBUG_CANCEL BUTTON_POWER
 #endif
 
 /*  Skeleton for adding target specific debug info to the debug menu
