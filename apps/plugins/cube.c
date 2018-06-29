@@ -423,6 +423,26 @@
 #define CUBE_PAUSE         BUTTON_HOME
 #define CUBE_HIGHSPEED     BUTTON_PLAY
 
+#elif (CONFIG_KEYPAD == IHIFI_770_PAD)
+#define CUBE_QUIT          BUTTON_POWER
+#define CUBE_NEXT          BUTTON_NEXT
+#define CUBE_PREV          BUTTON_PREV
+#define CUBE_INC           BUTTON_VOL_UP
+#define CUBE_DEC           BUTTON_VOL_DOWN
+#define CUBE_MODE          (BUTTON_HOME | BUTTON_POWER)
+#define CUBE_PAUSE         BUTTON_HOME
+#define CUBE_HIGHSPEED     BUTTON_PLAY
+
+#elif (CONFIG_KEYPAD == IHIFI_800_PAD)
+#define CUBE_QUIT          BUTTON_POWER
+#define CUBE_NEXT          BUTTON_NEXT
+#define CUBE_PREV          BUTTON_PREV
+#define CUBE_INC           BUTTON_VOL_UP
+#define CUBE_DEC           BUTTON_VOL_DOWN
+#define CUBE_MODE          (BUTTON_HOME | BUTTON_POWER)
+#define CUBE_PAUSE         BUTTON_HOME
+#define CUBE_HIGHSPEED     BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif
