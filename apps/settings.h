@@ -642,7 +642,6 @@ struct user_settings
 #ifdef HAVE_USB_CHARGING_ENABLE
     int usb_charging;
 #endif
-
     /* device settings */
 #ifdef HAVE_LCD_CONTRAST
     int contrast;   /* lcd contrast */

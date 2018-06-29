@@ -80,7 +80,8 @@ nwz_linux.c
 rocker_linux.c
 #elif defined(RK27_GENERIC) || defined(HM60X) || defined(HM801) \
       || defined(MA9) || defined(MA9C) || defined(MA8) || defined(MA8C) \
-      || defined(IHIFI760) || defined(IHIFI960)
+      || defined(IHIFI760) || defined(IHIFI960) || defined(IHIFI800) \
+      || defined(IHIFI770) || defined(IHIFI770C)
 rk27xx.c
 show_logo.c
 #elif defined(SANSA_CONNECT)

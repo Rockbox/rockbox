@@ -290,6 +290,22 @@
 #define ZX_UP           BUTTON_HOME
 #define ZX_DOWN         BUTTON_OPTION
 
+#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#define ZX_SELECT       BUTTON_PLAY
+#define ZX_MENU         BUTTON_POWER
+#define ZX_LEFT         BUTTON_HOME
+#define ZX_RIGHT        BUTTON_VOL_DOWN
+#define ZX_UP           BUTTON_PREV
+#define ZX_DOWN         BUTTON_NEXT
+
+#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#define ZX_SELECT       BUTTON_PLAY
+#define ZX_MENU         BUTTON_POWER
+#define ZX_LEFT         BUTTON_HOME
+#define ZX_RIGHT        BUTTON_VOL_DOWN
+#define ZX_UP           BUTTON_PREV
+#define ZX_DOWN         BUTTON_NEXT
+
 #else
 #error Keymap not defined!
 

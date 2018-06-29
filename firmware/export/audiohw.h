@@ -165,6 +165,8 @@ struct sound_settings_info
 #include "uda1380.h"
 #elif defined(HAVE_UDA1341)
 #include "uda1341.h"
+#elif defined(HAVE_WM8740)
+#include "wm8740.h"
 #elif defined(HAVE_WM8750) || defined(HAVE_WM8751)
 #include "wm8751.h"
 #elif defined(HAVE_WM8978)
@@ -211,6 +213,8 @@ struct sound_settings_info
 #include "nwzlinux_codec.h"
 #elif defined(HAVE_CS4398)
 #include "cs4398.h"
+#elif defined(HAVE_ES9018)
+#include "es9018.h"
 #elif (CONFIG_PLATFORM & (PLATFORM_ANDROID | PLATFORM_MAEMO\
        | PLATFORM_PANDORA | PLATFORM_SDL))
 #include "hosted_codec.h"
@@ -571,7 +575,7 @@ void audiohw_set_depth_3d(int val);
 #ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
 /**
  * Set DAC's oversampling filter roll-off.
- * @param val 0 - sharp roll-off, 1 - slow roll-off.
+ * @param val 0 - sharp roll-off, 1 - slow roll-off, 2 - short roll-off, 3 - bypass.
  * NOTE: AUDIOHW_CAPS need to contain
  *          FILTER_ROLL_OFF_CAP
  */

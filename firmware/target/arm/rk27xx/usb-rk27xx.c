@@ -32,6 +32,20 @@ int usb_status = USB_EXTRACTED;
 
 void usb_init_device(void)
 {
+    /* enable UDC interrupt */
+    INTC_IMR |= (1<<16);
+    INTC_IECR |= (1<<16);
+
+    EN_INT = EN_SUSP_INTR   |  /* Enable Suspend Interrupt */
+             EN_RESUME_INTR |  /* Enable Resume Interrupt */
+             EN_USBRST_INTR |  /* Enable USB Reset Interrupt */
+             EN_OUT0_INTR   |  /* Enable OUT Token receive Interrupt EP0 */
+             EN_IN0_INTR    |  /* Enable IN Token transmits Interrupt EP0 */
+             EN_SETUP_INTR;    /* Enable SETUP Packet Receive Interrupt */
+
+    /* configure INTCON */
+    INTCON = UDC_INTHIGH_ACT |  /* interrupt high active */
+             UDC_INTEN;         /* enable EP0 interrupts */
 }
 
 void usb_attach(void)

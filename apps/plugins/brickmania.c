@@ -342,6 +342,26 @@ CONFIG_KEYPAD == SANSA_CONNECT_PAD
 #define UP        BUTTON_HOME
 #define DOWN      BUTTON_OPTION
 
+#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#define QUIT      BUTTON_POWER
+#define LEFT      BUTTON_HOME
+#define RIGHT     BUTTON_VOL_DOWN
+#define ALTLEFT   (BUTTON_POWER | BUTTON_HOME)
+#define ALTRIGHT  (BUTTON_POWER | BUTTON_VOL_UP)
+#define SELECT    BUTTON_PLAY
+#define UP        BUTTON_PREV
+#define DOWN      BUTTON_NEXT
+
+#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#define QUIT      BUTTON_POWER
+#define LEFT      BUTTON_HOME
+#define RIGHT     BUTTON_VOL_DOWN
+#define ALTLEFT   (BUTTON_POWER | BUTTON_HOME)
+#define ALTRIGHT  (BUTTON_POWER | BUTTON_VOL_UP)
+#define SELECT    BUTTON_PLAY
+#define UP        BUTTON_PREV
+#define DOWN      BUTTON_NEXT
+
 #else
 #error No keymap defined!
 #endif

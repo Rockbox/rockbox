@@ -28,36 +28,15 @@
 #include "kernel.h"
 #include "panic.h"
 
-//#include "usb-s3c6400x.h"
-
 #include "usb_ch9.h"
 #include "usb_core.h"
 #include <inttypes.h>
 #include "power.h"
 
+#define LOGF_ENABLE
 #include "logf.h"
 
 typedef volatile uint32_t reg32;
-
-/* Bulk OUT: ep1, ep4, ep7, ep10, ep13 */
-#define BOUT_RXSTAT(ep_num)       (*(reg32*)(AHB0_UDC+0x54+0x38*(ep_num/3)))
-#define BOUT_RXCON(ep_num)        (*(reg32*)(AHB0_UDC+0x58+0x38*(ep_num/3)))
-#define BOUT_DMAOUTCTL(ep_num)    (*(reg32*)(AHB0_UDC+0x5C+0x38*(ep_num/3)))
-#define BOUT_DMAOUTLMADDR(ep_num) (*(reg32*)(AHB0_UDC+0x60+0x38*(ep_num/3)))
-
-/* Bulk IN: ep2, ep5, ep8, ep11, ep4 */
-#define BIN_TXSTAT(ep_num)        (*(reg32*)(AHB0_UDC+0x64+0x38*(ep_num/3)))
-#define BIN_TXCON(ep_num)         (*(reg32*)(AHB0_UDC+0x68+0x38*(ep_num/3)))
-#define BIN_TXBUF(ep_num)         (*(reg32*)(AHB0_UDC+0x6C+0x38*(ep_num/3)))
-#define BIN_DMAINCTL(ep_num)      (*(reg32*)(AHB0_UDC+0x70+0x38*(ep_num/3)))
-#define BIN_DMAINLMADDR(ep_num)   (*(reg32*)(AHB0_UDC+0x74+0x38*(ep_num/3)))
-
-/* INTERRUPT IN: ep3, ep6, ep9, ep12, ep15 */
-#define IIN_TXSTAT(ep_num)        (*(reg32*)(AHB0_UDC+0x78+0x38*((ep_num/3)-1)))
-#define IIN_TXCON(ep_num)         (*(reg32*)(AHB0_UDC+0x7C+0x38*((ep_num/3)-1)))
-#define IIN_TXBUF(ep_num)         (*(reg32*)(AHB0_UDC+0x80+0x38*((ep_num/3)-1)))
-#define IIN_DMAINCTL(ep_num)      (*(reg32*)(AHB0_UDC+0x84+0x38*((ep_num/3)-1)))
-#define IIN_DMAINLMADDR(ep_num)   (*(reg32*)(AHB0_UDC+0x88+0x38*((ep_num/3)-1)))
 
 #ifdef LOGF_ENABLE
 #define XFER_DIR_STR(dir) ((dir) ? "IN" : "OUT")
@@ -68,9 +47,12 @@ typedef volatile uint32_t reg32;
        ((type) == USB_ENDPOINT_XFER_INT ? "INTR" : "INVL"))))
 #endif
 
-struct endpoint_t {
+struct endpoint_t
+{
+    const int ep_num;            /* EP number */
     const int type;              /* EP type */
     const int dir;               /* DIR_IN/DIR_OUT */
+    volatile unsigned long *stat; /* RXSTAT/TXSTAT register */
     bool allocated;              /* flag to mark EPs taken */
     volatile void *buf;          /* tx/rx buffer address */
     volatile int len;            /* size of the transfer (bytes) */
@@ -79,67 +61,91 @@ struct endpoint_t {
     struct semaphore complete;   /* semaphore for blocking transfers */
 };
 
-#define EP_INIT(_type, _dir, _alloced, _buf, _len, _cnt, _block) \
-    { .type = (_type), .dir = (_dir), .allocated = (_alloced), .buf = (_buf), \
-      .len = (_len), .cnt = (_cnt), .block = (_block) }
+/* compute RXCON address from RXSTAT, and so on */
+#define RXSTAT(endp)        *((endp)->stat)
+#define RXCON(endp)         *(1 + (endp)->stat)
+#define DMAOUTCTL(endp)     *(2 + (endp)->stat)
+#define DMAOUTLMADDR(endp)  *(3 + (endp)->stat)
+/* compute TXCON address from TXSTAT, and so on */
+#define TXSTAT(endp)        *((endp)->stat)
+#define TXCON(endp)         *(1 + (endp)->stat)
+#define TXBUF(endp)         *(2 + (endp)->stat)
+#define DMAINCTL(endp)      *(3 + (endp)->stat)
+#define DMAINLMADDR(endp)   *(4 + (endp)->stat)
 
-static struct endpoint_t ctrlep[2] = {
-    EP_INIT(USB_ENDPOINT_XFER_CONTROL, DIR_OUT, true, NULL, 0, 0, true),
-    EP_INIT(USB_ENDPOINT_XFER_CONTROL, DIR_IN,  true, NULL, 0, 0, true),
+#define ENDPOINT(num, type, dir, reg) \
+    {num, USB_ENDPOINT_XFER_##type, USB_DIR_##dir, reg, false, NULL, 0, 0, true, {{0, 0}, 0, 0}}
+
+static struct endpoint_t ctrlep[2] =
+{
+    ENDPOINT(0, CONTROL, OUT, &RX0STAT),
+    ENDPOINT(0, CONTROL, IN, &TX0STAT),
 };
 
-static struct endpoint_t endpoints[16] = {
-    EP_INIT(USB_ENDPOINT_XFER_CONTROL,    3, true,  NULL, 0, 0,  true ),  /* stub   */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false ),  /* BOUT1  */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false ),  /* BIN2   */
-    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false ),  /* IIN3   */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false ),  /* BOUT4  */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false ),  /* BIN5   */
-    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false ),  /* IIN6   */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false ),  /* BOUT7  */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false ),  /* BIN8   */
-    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false ),  /* IIN9   */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false ),  /* BOUT10 */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false ),  /* BIN11  */
-    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false ),  /* IIN12  */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_OUT, false, NULL, 0, 0, false ),  /* BOUT13 */
-    EP_INIT(USB_ENDPOINT_XFER_BULK, DIR_IN,  false, NULL, 0, 0, false ),  /* BIN14  */
-    EP_INIT(USB_ENDPOINT_XFER_INT,  DIR_IN,  false, NULL, 0, 0, false ),  /* IIN15  */
+static struct endpoint_t endpoints[16] =
+{
+    ENDPOINT(0,  CONTROL, OUT, NULL),  /* stub */
+    ENDPOINT(1,  BULK, OUT, &RX1STAT),  /* BOUT1 */
+    ENDPOINT(2,  BULK, IN,  &TX2STAT),  /* BIN2 */
+    ENDPOINT(3,  INT,  IN,  &TX3STAT),  /* IIN3 */
+    ENDPOINT(4,  BULK, OUT, &RX4STAT),  /* BOUT4 */
+    ENDPOINT(5,  BULK, IN,  &TX5STAT),  /* BIN5 */
+    ENDPOINT(6,  INT,  IN,  &TX6STAT),  /* IIN6 */
+    ENDPOINT(7,  BULK, OUT, &RX7STAT),  /* BOUT7 */
+    ENDPOINT(8,  BULK, IN,  &TX8STAT),  /* BIN8 */
+    ENDPOINT(9,  INT,  IN,  &TX9STAT),  /* IIN9 */
+    ENDPOINT(10, BULK, OUT, &RX10STAT), /* BOUT10 */
+    ENDPOINT(11, BULK, IN,  &TX11STAT), /* BIN11 */
+    ENDPOINT(12, INT,  IN,  &TX12STAT), /* IIN12 */
+    ENDPOINT(13, BULK, OUT, &RX13STAT), /* BOUT13 */
+    ENDPOINT(14, BULK, IN,  &TX14STAT), /* BIN14 */
+    ENDPOINT(15, INT,  IN,  &TX15STAT), /* IIN15 */
 };
+
+static volatile bool set_address = false;
+static volatile bool set_configuration = false;
+
+#undef ENDPOINT
 
 static void setup_received(void)
 {
     static uint32_t setup_data[2];
-    
+    logf("udc: setup");
+
     /* copy setup data from packet */
     setup_data[0] = SETUP1;
     setup_data[1] = SETUP2;
 
-    /* clear all pending control transfers
-     * do we need this here?
-     */
-    
     /* pass setup data to the upper layer */
     usb_core_control_request((struct usb_ctrlrequest*)setup_data);
 }
 
-/* service ep0 IN transaction */
-static void ctr_write(void)
+static int max_pkt_size(struct endpoint_t *endp)
 {
-    int xfer_size = (ctrlep[DIR_IN].cnt > 64) ? 64 : ctrlep[DIR_IN].cnt;
+    switch(endp->type)
+    {
+        case USB_ENDPOINT_XFER_CONTROL: return 64;
+        case USB_ENDPOINT_XFER_BULK: return usb_drv_port_speed() ? 512 : 64;
+        case USB_ENDPOINT_XFER_INT: return usb_drv_port_speed() ? 1024 : 64;
+        default: panicf("die"); return 0;
+    }
+}
+
+static void ep_write(struct endpoint_t *endp)
+{
+    int xfer_size = MIN(max_pkt_size(endp), endp->cnt);
     unsigned int timeout = current_tick + HZ/10;
-    
-    while (TX0BUF & TXFULL) /* TX0FULL flag */
+
+    while(TXBUF(endp) & TXFULL) /* TXFULL flag */
     {
         if(TIME_AFTER(current_tick, timeout))
             break;
     }
 
-    TX0STAT = xfer_size;                           /* size of the transfer */
-    TX0DMALM_IADDR = (uint32_t)ctrlep[DIR_IN].buf; /* local buffer address */
-    TX0DMAINCTL = DMA_START;                       /* start DMA */
-    TX0CON &= ~TXNAK;                              /* clear NAK */
-    
+    /* setup transfer size and DMA */
+    TXSTAT(endp) = xfer_size;
+    DMAINLMADDR(endp) = (uint32_t)endp->buf; /* local buffer address */
+    DMAINCTL(endp) = DMA_START;
     /* Decrement by max packet size is intentional.
      * This way if we have final packet short one we will get negative len
      * after transfer, which in turn indicates we *don't* need to send
@@ -147,290 +153,141 @@ static void ctr_write(void)
      * get zero len after transfer which indicates we need to send
      * zero length packet to signal host end of the transfer.
      */
-    ctrlep[DIR_IN].cnt -= 64;
-    ctrlep[DIR_IN].buf += xfer_size;
+    endp->cnt -= max_pkt_size(endp);
+    endp->buf += xfer_size;
+    /* clear NAK */
+    TXCON(endp) &= ~TXNAK;
 }
 
-static void ctr_read(void)
+static void ep_read(struct endpoint_t *endp)
 {
-    int xfer_size = RX0STAT & 0xffff;
-    
-    /* clear NAK bit */
-    RX0CON &= ~RXNAK;
-    
-    ctrlep[DIR_OUT].cnt -= xfer_size;
-    ctrlep[DIR_OUT].buf += xfer_size;
-    
-    RX0DMAOUTLMADDR = (uint32_t)ctrlep[DIR_OUT].buf; /* buffer address */
-    RX0DMACTLO = DMA_START;                          /* start DMA */
+    /* setup DMA */
+    DMAOUTLMADDR(endp) = (uint32_t)endp->buf; /* local buffer address */
+    DMAOUTCTL(endp) = DMA_START;
+    /* clear NAK */
+    RXCON(endp) &= ~RXNAK;
 }
 
-static void blk_write(int ep)
+static void in_intr(struct endpoint_t *endp)
 {
-    int ep_num = EP_NUM(ep);
-    int max = usb_drv_port_speed() ? 512 : 64;
-    int xfer_size = (endpoints[ep_num].cnt > max) ? max : endpoints[ep_num].cnt;  
-    unsigned int timeout = current_tick + HZ/10;
-    
-    while (BIN_TXBUF(ep_num) & TXFULL) /* TXFULL flag */
+    uint32_t txstat = TXSTAT(endp);
+    /* check if clear feature was sent by host */
+    if(txstat & TXCFINT)
     {
-        if(TIME_AFTER(current_tick, timeout))
-            break;
+        logf("clear_stall: %d", endp->ep_num);
+        usb_drv_stall(endp->ep_num, false, true);
     }
-    
-    BIN_TXSTAT(ep_num) = xfer_size;                            /* size */
-    BIN_DMAINLMADDR(ep_num) = (uint32_t)endpoints[ep_num].buf; /* buf address */
-    BIN_DMAINCTL(ep_num) = DMA_START;                          /* start DMA */
-    BIN_TXCON(ep_num) &= ~TXNAK;                               /* clear NAK */
-    
-    /* Decrement by max packet size is intentional.
-     * This way if we have final packet short one we will get negative len
-     * after transfer, which in turn indicates we *don't* need to send
-     * zero length packet. If the final packet is max sized packet we will
-     * get zero len after transfer which indicates we need to send
-     * zero length packet to signal host end of the transfer.
+    /* check if a transfer has finished */
+    if(txstat & TXACK)
+    {
+        logf("udc: ack(%d)", endp->ep_num);
+        /* finished ? */
+        if(endp->cnt <= 0)
+        {
+            usb_core_transfer_complete(endp->ep_num, endp->dir, 0, endp->len);
+            /* release semaphore for blocking transfer */
+            if(endp->block)
+                semaphore_release(&endp->complete);
+        }
+        else /* more data to send */
+            ep_write(endp);
+    }
+}
+
+static void out_intr(struct endpoint_t *endp)
+{
+    uint32_t rxstat = RXSTAT(endp);
+    logf("udc: out intr(%d)", endp->ep_num);
+    /* check if clear feature was sent by host */
+    if(rxstat & RXCFINT)
+    {
+        logf("clear_stall: %d", endp->ep_num);
+        usb_drv_stall(endp->ep_num, false, false);
+    }
+    /* check if a transfer has finished */
+    if(rxstat & RXACK)
+    {
+        int xfer_size = rxstat & 0xffff;
+        endp->cnt -= xfer_size;
+        endp->buf += xfer_size;
+        logf("udc: ack(%d) -> %d/%d", endp->ep_num, xfer_size, endp->cnt);
+        /* finished ? */
+        if(endp->cnt <= 0 || xfer_size < max_pkt_size(endp))
+            usb_core_transfer_complete(endp->ep_num, endp->dir, 0, endp->len);
+        else
+            ep_read(endp);
+    }
+}
+
+static void udc_phy_reset(void)
+{
+    DEV_CTL |= SOFT_POR;
+    udelay(10000);                 /* min 10ms */
+    DEV_CTL &= ~SOFT_POR;
+}
+
+static void udc_soft_connect(void)
+{
+    DEV_CTL |= CSR_DONE    |
+               DEV_SOFT_CN |
+               DEV_SELF_PWR;
+}
+
+static void udc_helper(void)
+{
+    uint32_t dev_info = DEV_INFO;
+
+    /* This polls for DEV_EN bit set in DEV_INFO  register
+     * as well as tracks current requested configuration
+     * (DEV_INFO [11:8]). On state change it notifies usb stack
+     * about it.
      */
-    endpoints[ep_num].cnt -= max;
-    endpoints[ep_num].buf += xfer_size;
-}
 
-static void blk_read(int ep)
-{
-    int ep_num = EP_NUM(ep);
-    int xfer_size = BOUT_RXSTAT(ep_num) & 0xffff;
-    
-    /* clear NAK bit */
-    BOUT_RXCON(ep_num) &= ~RXNAK;
-    
-    endpoints[ep_num].cnt -= xfer_size;
-    endpoints[ep_num].buf += xfer_size;
-    
-    BOUT_DMAOUTLMADDR(ep_num) = (uint32_t)endpoints[ep_num].buf;
-    BOUT_DMAOUTCTL(ep_num) = DMA_START;
-}
+    /* SET ADDRESS request */
+    if(!set_address)
+        if(dev_info & 0x7f)
+        {
+            set_address = true;
+            usb_core_notify_set_address(dev_info & 0x7f);
+        }
 
-static void int_write(int ep)
-{
-    int ep_num = EP_NUM(ep);
-    int max = usb_drv_port_speed() ? 1024 : 64;
-    int xfer_size = (endpoints[ep_num].cnt > max) ? max : endpoints[ep_num].cnt;  
-    unsigned int timeout = current_tick + HZ/10;
-    
-    while (IIN_TXBUF(ep_num) & TXFULL) /* TXFULL flag */
-    {
-        if(TIME_AFTER(current_tick, timeout))
-            break;
-    }
-    
-    IIN_TXSTAT(ep_num) = xfer_size;                            /* size */
-    IIN_DMAINLMADDR(ep_num) = (uint32_t)endpoints[ep_num].buf; /* buf address */
-    IIN_DMAINCTL(ep_num) = DMA_START;                          /* start DMA */
-    IIN_TXCON(ep_num) &= ~TXNAK;                               /* clear NAK */
-    
-    /* Decrement by max packet size is intentional.
-     * This way if we have final packet short one we will get negative len
-     * after transfer, which in turn indicates we *don't* need to send
-     * zero length packet. If the final packet is max sized packet we will
-     * get zero len after transfer which indicates we need to send
-     * zero length packet to signal host end of the transfer.
-     */
-    endpoints[ep_num].cnt -= max;
-    endpoints[ep_num].buf += xfer_size;
-}
-
-/* UDC ISR function */
-void INT_UDC(void)
-{
-    uint32_t txstat, rxstat;
-    int tmp, ep_num;
-    
-    /* read what caused UDC irq */
-    uint32_t intsrc = INT2FLAG & 0x7fffff;
-    
-    if (intsrc & SETUP_INTR) /* setup interrupt */
-    {
-        setup_received();
-    }
-    else if (intsrc & IN0_INTR) /* ep0 in interrupt */
-    {
-        txstat = TX0STAT; /* read clears flags */
-        
-        /* TODO handle errors */
-        if (txstat & TXACK) /* check TxACK flag */
+    /* SET CONFIGURATION request */
+    if(!set_configuration)
+        if(dev_info & DEV_EN)
         {
-            if (ctrlep[DIR_IN].cnt >= 0)
-            {
-                /* we still have data to send (or ZLP) */
-                ctr_write();
-            }
-            else
-            {
-                /* final ack received */
-                usb_core_transfer_complete(0,                   /* ep */
-                                           USB_DIR_IN,          /* dir */
-                                           0,                   /* status */
-                                           ctrlep[DIR_IN].len); /* length */
-                
-                /* release semaphore for blocking transfer */
-                if (ctrlep[DIR_IN].block)
-                    semaphore_release(&ctrlep[DIR_IN].complete);
-            }
+            set_configuration = true;
+            usb_core_notify_set_config(((dev_info >> 7) & 0xf) + 1);
         }
-    }
-    else if (intsrc & OUT0_INTR) /* ep0 out interrupt */
-    {
-        rxstat = RX0STAT;
-
-        /* TODO handle errors */
-        if (rxstat & RXACK) /* RxACK */
-        {
-            if (ctrlep[DIR_OUT].cnt > 0)
-                ctr_read();
-            else
-                usb_core_transfer_complete(0,                    /* ep */
-                                           USB_DIR_OUT,          /* dir */
-                                           0,                    /* status */
-                                           ctrlep[DIR_OUT].len); /* length */                
-        }
-    }
-    else if (intsrc & USBRST_INTR) /* usb reset */
-    {
-        usb_drv_init();
-    }
-    else if (intsrc & RESUME_INTR) /* usb resume */
-    {
-        TX0CON |=  TXCLR;  /* TxClr */
-        TX0CON &= ~TXCLR;
-        RX0CON |=  RXCLR; /* RxClr */
-        RX0CON &= ~RXCLR;
-    }
-    else if (intsrc & SUSP_INTR) /* usb suspend */
-    {
-    }
-    else if (intsrc & CONN_INTR) /* usb connect */
-    {
-    }
-    else
-    {
-        /* lets figure out which ep generated irq */
-        tmp = intsrc >> 7;
-        for (ep_num=1; ep_num < 15; ep_num++)
-        {
-            tmp >>= ep_num;
-            if (tmp & 0x01)
-                break;
-        }
-        
-        if (intsrc & ((1<<8)|(1<<11)|(1<<14)|(1<<17)|(1<<20)))
-        {
-            /* bulk out */
-            rxstat = BOUT_RXSTAT(ep_num);
-            
-            /* TODO handle errors */
-            if (rxstat & (1<<18)) /* RxACK */
-            {
-                if (endpoints[ep_num].cnt > 0)
-                    blk_read(ep_num);
-                else
-                    usb_core_transfer_complete(ep_num,               /* ep */
-                                               USB_DIR_OUT,          /* dir */
-                                               0,                    /* status */
-                                               endpoints[ep_num].len); /* length */                
-            }
-        }
-        else if (intsrc & ((1<<9)|(1<<12)|(1<<15)|(1<<18)|(1<<21)))
-        {
-            /* bulk in */
-            txstat = BIN_TXSTAT(ep_num);
-            
-            /* TODO handle errors */
-            if (txstat & (1<<18)) /* check TxACK flag */
-            {
-                if (endpoints[ep_num].cnt >= 0)
-                {
-                    /* we still have data to send (or ZLP) */
-                    blk_write(ep_num);
-                }
-                else
-                {
-                    /* final ack received */
-                    usb_core_transfer_complete(ep_num,                   /* ep */
-                                               USB_DIR_IN,          /* dir */
-                                               0,                   /* status */
-                                               endpoints[ep_num].len); /* length */
-                
-                    /* release semaphore for blocking transfer */
-                    if (endpoints[ep_num].block)
-                        semaphore_release(&endpoints[ep_num].complete);
-                }
-            }
-        }
-        else if (intsrc & ((1<<10)|(1<13)|(1<<16)|(1<<19)|(1<<22)))
-        {
-            /* int in */
-            txstat = IIN_TXSTAT(ep_num);
-
-            /* TODO handle errors */
-            if (txstat & TXACK) /* check TxACK flag */
-            {
-                if (endpoints[ep_num].cnt >= 0)
-                {
-                    /* we still have data to send (or ZLP) */
-                    int_write(ep_num);
-                }
-                else
-                {
-                    /* final ack received */
-                    usb_core_transfer_complete(ep_num,                   /* ep */
-                                               USB_DIR_IN,          /* dir */
-                                               0,                   /* status */
-                                               endpoints[ep_num].len); /* length */
-                
-                    /* release semaphore for blocking transfer */
-                    if (endpoints[ep_num].block)
-                        semaphore_release(&endpoints[ep_num].complete);
-                }
-            }
-        }
-    }
 }
 
 /* return port speed FS=0, HS=1 */
 int usb_drv_port_speed(void)
 {
-    return ((DEV_INFO & DEV_SPEED) == 0) ? 0 : 1;
+    return (DEV_INFO & DEV_SPEED) ? 0 : 1;
 }
 
 /* Reserve endpoint */
 int usb_drv_request_endpoint(int type, int dir)
 {
-    int ep_num, ep_dir;
-    int ep_type;
+    logf("req: %s %s", XFER_DIR_STR(dir), XFER_TYPE_STR(type));
 
-    /* Safety */
-    ep_dir = EP_DIR(dir);
-    ep_type = type & USB_ENDPOINT_XFERTYPE_MASK;
-
-    logf("req: %s %s", XFER_DIR_STR(ep_dir), XFER_TYPE_STR(ep_type));
-    
     /* Find an available ep/dir pair */
-    for (ep_num=1;ep_num<USB_NUM_ENDPOINTS;ep_num++)
+    for(int ep_num = 1; ep_num<USB_NUM_ENDPOINTS;ep_num++)
     {
-        struct endpoint_t* endpoint = &endpoints[ep_num];
-        
-        if (endpoint->type == ep_type &&
-            endpoint->dir == ep_dir &&
-            !endpoint->allocated)
-        {
-            /* mark endpoint as taken */
-            endpoint->allocated = true;
-            
-            /* enable interrupt from this endpoint */
-            EN_INT |= (1<<(ep_num+7));
-            
-            logf("add: ep%d %s", ep_num, XFER_DIR_STR(ep_dir));
-            return (ep_num | (dir & USB_ENDPOINT_DIR_MASK));
-        }
+        struct endpoint_t *endp = &endpoints[ep_num];
+
+        if(endp->allocated || endp->type != type || endp->dir != dir)
+            continue;
+        /* allocate endpoint and enable interrupt */
+        endp->allocated = true;
+        if(dir == USB_DIR_IN)
+            TXCON(endp) = (ep_num << 8) | TXEPEN | TXNAK | TXACKINTEN | TXCFINTE;
+        else
+            RXCON(endp) = (ep_num << 8) | RXEPEN | RXNAK | RXACKINTEN | RXCFINTE | RXERRINTEN;
+        EN_INT |= 1 << (ep_num + 7);
+
+        logf("add: ep%d %s", ep_num, XFER_DIR_STR(dir));
+        return ep_num | dir;
     }
     return -1;
 }
@@ -439,14 +296,12 @@ int usb_drv_request_endpoint(int type, int dir)
 void usb_drv_release_endpoint(int ep)
 {
     int ep_num = EP_NUM(ep);
-    int ep_dir = EP_DIR(ep);
-    (void) ep_dir;
 
-    logf("rel: ep%d %s", ep_num, XFER_DIR_STR(ep_dir));
+    logf("rel: ep%d", ep_num);
     endpoints[ep_num].allocated = false;
-    
+
     /* disable interrupt from this endpoint */
-    EN_INT &= ~(1<<(ep_num+7));
+    EN_INT &= ~(1 << (ep_num + 7));
 }
 
 /* Set the address (usually it's in a register).
@@ -463,39 +318,25 @@ void usb_drv_set_address(int address)
 
 static int _usb_drv_send(int endpoint, void *ptr, int length, bool block)
 {
+    logf("udc: send(%x)", endpoint);
     struct endpoint_t *ep;
     int ep_num = EP_NUM(endpoint);
-    
+
     if (ep_num == 0)
         ep = &ctrlep[DIR_IN];
     else
         ep = &endpoints[ep_num];
 
+    /* for send transfers, make sure the data is committed */
+    commit_discard_dcache_range(ptr, length);
     ep->buf = ptr;
     ep->len = ep->cnt = length;
-    
-    if (block)
-        ep->block = true;
-    else
-        ep->block = false;
-    
-    switch (ep->type)
-    {
-        case USB_ENDPOINT_XFER_CONTROL:                     
-            ctr_write();
-            break;
-        
-        case USB_ENDPOINT_XFER_BULK:
-            blk_write(ep_num);
-            break;
-        
-        case USB_ENDPOINT_XFER_INT:
-            int_write(ep_num);
-            break;
-    }
-    
-    if (block)
-        /* wait for transfer to end */
+    ep->block = block;
+
+    ep_write(ep);
+
+    /* wait for transfer to end */
+    if(block)
         semaphore_wait(&ep->complete, TIMEOUT_BLOCK);
 
     return 0;
@@ -516,28 +357,20 @@ int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
 /* Setup a receive transfer. (non blocking) */
 int usb_drv_recv(int endpoint, void* ptr, int length)
 {
+    logf("udc: recv(%x)", endpoint);
     struct endpoint_t *ep;
     int ep_num = EP_NUM(endpoint);
-    
-    if (ep_num == 0)
-    {
+
+    if(ep_num == 0)
         ep = &ctrlep[DIR_OUT];
-        
-        ctr_read();
-    }
     else
-    {
         ep = &endpoints[ep_num];
-        
-        /* clear NAK bit */
-        BOUT_RXCON(ep_num) &= ~RXNAK;
-        BOUT_DMAOUTLMADDR(ep_num) = (uint32_t)ptr;
-        BOUT_DMAOUTCTL(ep_num) = DMA_START;
-    }
-       
+
+    /* for recv, discard the cache lines related to the buffer */
+    commit_discard_dcache_range(ptr, length);
     ep->buf = ptr;
     ep->len = ep->cnt = length;
-
+    ep_read(ep);
     return 0;
 }
 
@@ -560,173 +393,54 @@ void usb_drv_set_test_mode(int mode)
 /* Check if endpoint is in stall state */
 bool usb_drv_stalled(int endpoint, bool in)
 {
-    int ep_num = EP_NUM(endpoint);
+    struct endpoint_t *endp = &endpoints[EP_NUM(endpoint)];
 
-    switch (endpoints[ep_num].type)
-    {
-        case USB_ENDPOINT_XFER_CONTROL:
-            if (in)
-                return (TX0CON & TXSTALL) ? true : false;
-            else
-                return (RX0CON & RXSTALL) ? true : false;
-
-            break;
-
-        case USB_ENDPOINT_XFER_BULK:
-            if (in)
-                return (BIN_TXCON(ep_num) & TXSTALL) ? true : false;
-            else
-                return (BOUT_RXCON(ep_num) & RXSTALL) ? true : false;
-
-            break;
-            
-        case USB_ENDPOINT_XFER_INT:
-            if (in)
-                return (IIN_TXCON(ep_num) & TXSTALL) ? true : false;
-            else
-                return false;    /* we don't have such endpoint anyway */
-                
-            break;
-    }
-
-    return false;
+    if(in)
+        return !!(TXCON(endp) & TXSTALL);
+    else
+        return !!(RXCON(endp) & RXSTALL);
 }
 
 /* Stall the endpoint. Usually set a flag in the controller */
 void usb_drv_stall(int endpoint, bool stall, bool in)
 {
-    int ep_num = EP_NUM(endpoint);
-
-    switch (endpoints[ep_num].type)
+    struct endpoint_t *endp = &endpoints[EP_NUM(endpoint)];
+    if(in)
     {
-        case USB_ENDPOINT_XFER_CONTROL:
-            if (in)
-            {
-                if (stall)
-                    TX0CON |=  TXSTALL;
-                else
-                    TX0CON &= ~TXSTALL;
-            }
-            else
-            {
-                if (stall)
-                    RX0CON |=  RXSTALL;
-                else
-                    RX0CON &= ~RXSTALL; /* doc says Auto clear by UDC 2.0 */
-            }
-            break;
-
-        case USB_ENDPOINT_XFER_BULK:
-            if (in)
-            {
-                if (stall)
-                    BIN_TXCON(ep_num) |=  TXSTALL;
-                else
-                    BIN_TXCON(ep_num) &= ~TXSTALL;
-            }
-            else
-            {
-                if (stall)
-                    BOUT_RXCON(ep_num) |=  RXSTALL;
-                else
-                    BOUT_RXCON(ep_num) &= ~RXSTALL;
-            }
-            break;
-            
-        case USB_ENDPOINT_XFER_INT:
-            if (in)
-            {
-                if (stall)
-                    IIN_TXCON(ep_num) |=  TXSTALL;
-                else
-                    IIN_TXCON(ep_num) &= ~TXSTALL;
-            }
-            break;
+        if(stall)
+            TXCON(endp) |= TXSTALL;
+        else
+            TXCON(endp) &= ~TXSTALL;
+    }
+    else
+    {
+        if(stall)
+            RXCON(endp) |= RXSTALL;
+        else
+            RXCON(endp) &= ~RXSTALL;
     }
 }
 
 /* one time init (once per connection) - basicaly enable usb core */
 void usb_drv_init(void)
 {
-    int ep_num;
-        
-    /* enable USB clock */
-    SCU_CLKCFG &= ~CLKCFG_UDC;
-    
-    /* 1. do soft disconnect */
-    DEV_CTL = DEV_SELF_PWR;
-
-    /* 2. do power on reset to PHY */
-    DEV_CTL = DEV_SELF_PWR |
-              SOFT_POR;
-    
-    /* 3. wait more than 10ms */
-    udelay(20000);
-    
-    /* 4. clear SOFT_POR bit */
-    DEV_CTL  &= ~SOFT_POR;
-    
-    /* 5. configure minimal EN_INT */
-    EN_INT = EN_SUSP_INTR   |  /* Enable Suspend Interrupt */
-             EN_RESUME_INTR |  /* Enable Resume Interrupt */
-             EN_USBRST_INTR |  /* Enable USB Reset Interrupt */
-             EN_OUT0_INTR   |  /* Enable OUT Token receive Interrupt EP0 */
-             EN_IN0_INTR    |  /* Enable IN Token transmits Interrupt EP0 */
-             EN_SETUP_INTR;    /* Enable SETUP Packet Receive Interrupt */
-             
-    /* 6. configure INTCON */
-    INTCON = UDC_INTHIGH_ACT |  /* interrupt high active */
-             UDC_INTEN;         /* enable EP0 interrupts */
-    
-    /* 7. configure EP0 control registers */
-    TX0CON = TXACKINTEN |  /* Set as one to enable the EP0 tx irq */
-             TXNAK;        /* Set as one to response NAK handshake */
-             
-    RX0CON = RXACKINTEN |
-             RXEPEN     |  /* Endpoint 0 Enable. When cleared the endpoint does
-                            * not respond to an SETUP or OUT token
-                            */
-
-             RXNAK;        /* Set as one to response NAK handshake */
-             
-    /* 8. write final bits to DEV_CTL */
-    DEV_CTL = CSR_DONE     | /* Configure CSR done */
-              DEV_PHY16BIT | /* 16-bit data path enabled. udc_clk = 30MHz */
-              DEV_SOFT_CN  | /* Device soft connect */
-              DEV_SELF_PWR;  /* Device self power */
-
     /* init semaphore of ep0 */
     semaphore_init(&ctrlep[DIR_OUT].complete, 1, 0);
     semaphore_init(&ctrlep[DIR_IN].complete, 1, 0);
-    
-    for (ep_num = 1; ep_num < USB_NUM_ENDPOINTS; ep_num++)
-    {
+
+    for(int ep_num = 1; ep_num < USB_NUM_ENDPOINTS; ep_num++)
         semaphore_init(&endpoints[ep_num].complete, 1, 0);
-        
-        if (ep_num%3 == 0) /* IIN 3, 6, 9, 12, 15 */
-        {
-            IIN_TXCON(ep_num) |= (ep_num<<8)|TXEPEN|TXNAK; /* ep_num, enable, NAK */
-        }
-        else if (ep_num%3 == 1) /* BOUT 1, 4, 7, 10, 13 */
-        {
-            BOUT_RXCON(ep_num) |= (ep_num<<8)|RXEPEN|RXNAK; /* ep_num, NAK, enable */
-        }
-        else if (ep_num%3 == 2) /* BIN 2, 5, 8, 11, 14 */
-        {
-            BIN_TXCON(ep_num) |= (ep_num<<8)|TXEPEN|TXNAK; /* ep_num, enable, NAK */
-        }
-    }
 }
 
 /* turn off usb core */
 void usb_drv_exit(void)
 {
     DEV_CTL = DEV_SELF_PWR;
-    
+
     /* disable USB interrupts in interrupt controller */
     INTC_IMR &= ~IRQ_ARM_UDC;
     INTC_IECR &= ~IRQ_ARM_UDC;
-    
+
     /* we cannot disable UDC clock since this causes data abort
      * when reading DEV_INFO in order to check usb connect event
      */
@@ -734,9 +448,94 @@ void usb_drv_exit(void)
 
 int usb_detect(void)
 {
-    if (DEV_INFO & VBUS_STS)
+    if(DEV_INFO & VBUS_STS)
         return USB_INSERTED;
     else
         return USB_EXTRACTED;
 }
 
+/* UDC ISR function */
+void INT_UDC(void)
+{
+    /* read what caused UDC irq */
+    uint32_t intsrc = INT2FLAG & 0x7fffff;
+
+    if(intsrc & USBRST_INTR) /* usb reset */
+    {
+        logf("udc_int: reset, %ld", current_tick);
+
+        EN_INT = EN_SUSP_INTR   |  /* Enable Suspend Irq */
+                 EN_RESUME_INTR |  /* Enable Resume Irq */
+                 EN_USBRST_INTR |  /* Enable USB Reset Irq */
+                 EN_OUT0_INTR   |  /* Enable OUT Token receive Irq EP0 */
+                 EN_IN0_INTR    |  /* Enable IN Token transmit Irq EP0 */
+                 EN_SETUP_INTR;    /* Enable SETUP Packet Receive Irq */
+
+        INTCON = UDC_INTHIGH_ACT | /* interrupt high active */
+                 UDC_INTEN;        /* enable EP0 irqs */
+
+        TX0CON = TXACKINTEN |      /* Set as one to enable the EP0 tx irq */
+                 TXNAK;            /* Set as one to response NAK handshake */
+
+        RX0CON = RXACKINTEN |
+                 RXEPEN     |      /* Endpoint 0 Enable. When cleared the
+                                    * endpoint does not respond to an SETUP
+                                    * or OUT token */
+                 RXNAK;            /* Set as one to response NAK handshake */
+
+        set_address = false;
+        set_configuration = false;
+    }
+    /* This needs to be processed AFTER usb reset */
+    udc_helper();
+
+    if(intsrc & SETUP_INTR) /* setup interrupt */
+    {
+        setup_received();
+    }
+    if(intsrc & IN0_INTR)
+    {
+        /* EP0 IN done */
+        in_intr(&ctrlep[DIR_IN]);
+    }
+    if(intsrc & OUT0_INTR)
+    {
+        /* EP0 OUT done */
+        out_intr(&ctrlep[DIR_OUT]);
+    }
+    if(intsrc & USBRST_INTR)
+    {
+        /* usb reset */
+        usb_drv_init();
+    }
+    if(intsrc & RESUME_INTR)
+    {
+        /* usb resume */
+        TX0CON |=  TXCLR;  /* TxClr */
+        TX0CON &= ~TXCLR;
+        RX0CON |=  RXCLR; /* RxClr */
+        RX0CON &= ~RXCLR;
+    }
+    if(intsrc & SUSP_INTR)
+    {
+        /* usb suspend */
+    }
+    if(intsrc & CONN_INTR)
+    {
+        /* usb connect */
+        udc_phy_reset();
+        udelay(10000);         /* wait at least 10ms */
+        udc_soft_connect();
+    }
+    /* other endpoints */
+    for(int ep_num = 1; ep_num < 16; ep_num++)
+    {
+        if(!(intsrc & (1 << (ep_num + 7))))
+            continue;
+        struct endpoint_t *endp = &endpoints[ep_num];
+        if(endp->dir == USB_DIR_IN)
+            in_intr(endp);
+        else
+            out_intr(endp);
+    }
+}

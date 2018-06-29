@@ -87,5 +87,7 @@ sony-nwza860.c
 agptek-rocker.c
 #elif CONFIG_KEYPAD == XDUOO_X3_PAD
 xduoo-x3.c
+#elif (CONFIG_KEYPAD == IHIFI_770_PAD) || (CONFIG_KEYPAD == IHIFI_800_PAD)
+ihifi2.c
 #endif
 #endif /* SIMULATOR */
