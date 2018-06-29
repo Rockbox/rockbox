@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "84d8846c_4eaa53d6",
+        "filename": "apps/menus/sound_menu.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-29T20:40:28Z",
+      "side": 1,
+      "message": "Basically, to support higher sample rates (ie \u003e\u003d50KHz) the CS4398 codec needs to be put into a different \"functional mode\"\n\nI don\u0027t know why this was put in as a configuration option instead of being set on the fly based on output parameters.  I\u0027ll fix it.",
+      "parentUuid": "84d8846c_2e64a7e4",
+      "revId": "267849b873840c0fa68eddb95c4abd8fd9e33afe",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "84d8846c_0e61ebd4",
         "filename": "firmware/drivers/nand_id.c",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "84d8846c_8ea71b0d",
+        "filename": "firmware/drivers/nand_id.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-29T20:40:28Z",
+      "side": 1,
+      "message": "Will fix.",
+      "parentUuid": "84d8846c_0e61ebd4",
+      "revId": "267849b873840c0fa68eddb95c4abd8fd9e33afe",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "84d8846c_ee98dfcc",
         "filename": "firmware/export/config/xduoox3.h",
         "patchSetId": 2
@@ -47,6 +83,24 @@
       "writtenOn": "2018-06-29T14:55:19Z",
       "side": 1,
       "message": "Check if this doesn\u0027t collide with other targets",
+      "revId": "267849b873840c0fa68eddb95c4abd8fd9e33afe",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "84d8846c_6ead0fec",
+        "filename": "firmware/export/config/xduoox3.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-29T20:40:28Z",
+      "side": 1,
+      "message": "I thought I\u0027d checked, but I got it wrong.\n\nBumping this to 106 instead.",
+      "parentUuid": "84d8846c_ee98dfcc",
       "revId": "267849b873840c0fa68eddb95c4abd8fd9e33afe",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
