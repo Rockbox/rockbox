@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "84d8846c_ae1d3762",
+        "filename": "tools/configure",
+        "patchSetId": 2
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-29T13:17:19Z",
+      "side": 1,
+      "message": "Not sure why this was bumped.",
+      "range": {
+        "startLine": 138,
+        "startChar": 13,
+        "endLine": 138,
+        "endChar": 14
+      },
+      "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "84d8846c_8e227ba4",
+        "filename": "tools/rockboxdev.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-29T13:17:19Z",
+      "side": 1,
+      "message": "This commented-out line was what vortex patch used; not sure why.",
+      "range": {
+        "startLine": 427,
+        "startChar": 0,
+        "endLine": 427,
+        "endChar": 186
+      },
+      "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "84d8846c_6e386fd3",
+        "filename": "tools/rockboxdev.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 757,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-29T13:17:19Z",
+      "side": 1,
+      "message": "GCC version was bumped.  Maybe there was a bug fix between 4.4.4 and 4.4.7 that mattered?  (4.4.7 was the final 4.4 release...)",
+      "range": {
+        "startLine": 757,
+        "startChar": 0,
+        "endLine": 757,
+        "endChar": 148
+      },
+      "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
