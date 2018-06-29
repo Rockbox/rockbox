@@ -284,6 +284,22 @@
 #define CLIX_BUTTON_RIGHT         BUTTON_NEXT
 #define CLIX_BUTTON_CLICK         BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#define CLIX_BUTTON_QUIT          BUTTON_POWER
+#define CLIX_BUTTON_UP            BUTTON_PREV
+#define CLIX_BUTTON_DOWN          BUTTON_NEXT
+#define CLIX_BUTTON_LEFT          BUTTON_HOME
+#define CLIX_BUTTON_RIGHT         BUTTON_VOL_DOWN
+#define CLIX_BUTTON_CLICK         BUTTON_VOL_UP
+
+#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#define CLIX_BUTTON_QUIT          BUTTON_POWER
+#define CLIX_BUTTON_UP            BUTTON_PREV
+#define CLIX_BUTTON_DOWN          BUTTON_NEXT
+#define CLIX_BUTTON_LEFT          BUTTON_HOME
+#define CLIX_BUTTON_RIGHT         BUTTON_VOL_DOWN
+#define CLIX_BUTTON_CLICK         BUTTON_VOL_UP
+
 #else
 #error "no keymap"
 #endif

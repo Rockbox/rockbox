@@ -343,6 +343,24 @@ GREY_INFO_STRUCT
 #   define FFT_AMP_SCALE    BUTTON_PLAY
 #   define FFT_QUIT         BUTTON_POWER
 
+#elif (CONFIG_KEYPAD == IHIFI_770_PAD)
+#   define FFT_PREV_GRAPH   BUTTON_PREV
+#   define FFT_NEXT_GRAPH   BUTTON_NEXT
+#   define FFT_ORIENTATION  BUTTON_HOME
+#   define FFT_FREQ_SCALE   BUTTON_VOL_UP
+#   define FFT_WINDOW       BUTTON_VOL_DOWN
+#   define FFT_AMP_SCALE    BUTTON_PLAY
+#   define FFT_QUIT         BUTTON_POWER
+
+#elif (CONFIG_KEYPAD == IHIFI_800_PAD)
+#   define FFT_PREV_GRAPH   BUTTON_PREV
+#   define FFT_NEXT_GRAPH   BUTTON_NEXT
+#   define FFT_ORIENTATION  BUTTON_HOME
+#   define FFT_FREQ_SCALE   BUTTON_VOL_UP
+#   define FFT_WINDOW       BUTTON_VOL_DOWN
+#   define FFT_AMP_SCALE    BUTTON_PLAY
+#   define FFT_QUIT         BUTTON_POWER
+
 #elif !defined(HAVE_TOUCHSCREEN)
 #error No keymap defined!
 #endif

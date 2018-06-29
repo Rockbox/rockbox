@@ -75,6 +75,13 @@ static const unsigned short lin_brightness[] = {
     759, 768, 778, 788, 800, 812, 826, 841,
     856, 873, 891, 910, 931, 952, 975, 1000
 };
+#elif defined(IHIFI770) || defined(IHIFI770C) || defined(IHIFI800)
+static const unsigned short lin_brightness[] = {
+     4096,  4215,  4381,  4603,  4887, 5243,   5679,  6201,
+     6818,  7538,  8370,  9320, 10397, 11609, 12963, 14469,
+    16133, 17963, 19968, 22156, 24534, 27110, 29893, 32890,
+    36109, 39559, 43246, 47180, 51368, 55817, 60537, 65535
+};
 #endif
 
 bool backlight_hw_init(void)
