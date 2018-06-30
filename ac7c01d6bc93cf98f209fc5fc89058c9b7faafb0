@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "64d55032_edfc650c",
+        "filename": "apps/settings.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 638,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-30T12:06:02Z",
+      "side": 1,
+      "message": "No idea why this was done.  I\u0027m dropping it.",
+      "parentUuid": "84d8846c_ee4e9f70",
+      "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "84d8846c_2e3267f1",
         "filename": "bootloader/rk27xx.c",
         "patchSetId": 2
@@ -30,6 +48,30 @@
       "writtenOn": "2018-06-29T14:41:55Z",
       "side": 1,
       "message": "Whats the point?",
+      "range": {
+        "startLine": 132,
+        "startChar": 12,
+        "endLine": 132,
+        "endChar": 14
+      },
+      "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "64d55032_cd01a908",
+        "filename": "bootloader/rk27xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-30T12:06:02Z",
+      "side": 1,
+      "message": "I wonder if this was a merge error.  Because all it did was shift the key detection later... maybe has to do with that extra preference/setting for \"usb power only\".  anyway, dropped.",
+      "parentUuid": "84d8846c_2e3267f1",
       "range": {
         "startLine": 132,
         "startChar": 12,
@@ -82,6 +124,30 @@
     },
     {
       "key": {
+        "uuid": "64d55032_ad065d1c",
+        "filename": "firmware/backlight.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 668,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-30T12:06:02Z",
+      "side": 1,
+      "message": "Maybe because they wanted positive indication of a poweroff, instead of just killing power?  Or wanted to debug something that happened later?  \n\n(That seems like a stretch, honestly.. I\u0027ll nuke it.)",
+      "parentUuid": "84d8846c_ce53e314",
+      "range": {
+        "startLine": 668,
+        "startChar": 40,
+        "endLine": 668,
+        "endChar": 60
+      },
+      "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "84d8846c_ae589731",
         "filename": "firmware/drivers/audio/es9018.c",
         "patchSetId": 2
@@ -99,6 +165,24 @@
     },
     {
       "key": {
+        "uuid": "64d55032_cd28898a",
+        "filename": "firmware/drivers/audio/es9018.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-30T12:06:02Z",
+      "side": 1,
+      "message": "Yeah, magic numbers are a pet peeve of mine too.\n\nI\u0027d already cleaned up the CS4398 driver along these lines. I\u0027ll do what I can here and resubmit.",
+      "parentUuid": "84d8846c_ae589731",
+      "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "84d8846c_8e5ddb21",
         "filename": "firmware/export/config/ihifi770.h",
         "patchSetId": 2
@@ -110,6 +194,24 @@
       "writtenOn": "2018-06-29T14:41:55Z",
       "side": 1,
       "message": "Have you checked if it doesn\u0027t collide with existing targets? Just asking.",
+      "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "64d55032_8d0ba126",
+        "filename": "firmware/export/config/ihifi770.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-30T12:06:02Z",
+      "side": 1,
+      "message": "There\u0027s a collision.  Fixed all up.",
+      "parentUuid": "84d8846c_8e5ddb21",
       "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -167,6 +269,24 @@
     },
     {
       "key": {
+        "uuid": "64d55032_6d119551",
+        "filename": "firmware/target/arm/rk27xx/ihifi2/button-ihifi.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-30T12:06:02Z",
+      "side": 1,
+      "message": "Re-implemented, but I personally think the straight-through approach looks cleaner.",
+      "parentUuid": "84d8846c_2e4dc76e",
+      "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "84d8846c_0e4a0b57",
         "filename": "firmware/target/arm/rk27xx/sd-rk27xx.c",
         "patchSetId": 2
@@ -178,6 +298,24 @@
       "writtenOn": "2018-06-29T14:41:55Z",
       "side": 1,
       "message": "This the same as for RK27_GENERIC as (1\u003c\u003c7) \u003d\u003d 0x80",
+      "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "64d55032_ed2345ab",
+        "filename": "firmware/target/arm/rk27xx/sd-rk27xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-30T12:06:02Z",
+      "side": 1,
+      "message": "MA9/MA9C/MA8/MA8C also are the same, but it would appear that for those (and the IHIFI) targets, RK27_GENERIC is not asserted.  I suppose we could add, to the top of this file, a simple \"#if defined (IHIFI|MA|whatever)/#define RK27_GENERIC/#endif\" to clean up this function.  I\u0027ll do that if you want.",
+      "parentUuid": "84d8846c_0e4a0b57",
       "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -201,6 +339,24 @@
     },
     {
       "key": {
+        "uuid": "64d55032_0d18d172",
+        "filename": "firmware/target/arm/rk27xx/usb-drv-rk27xx.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-30T12:06:02Z",
+      "side": 1,
+      "message": "I don\u0027t know if it\u0027s different; but I will add it to my todo list.\n\nI do know that the 770/770C/800 builds from xvortex were supposedly working \"well enough\" for general use.",
+      "parentUuid": "84d8846c_ee757f96",
+      "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "84d8846c_ce7ac386",
         "filename": "firmware/usb.c",
         "patchSetId": 2
@@ -212,6 +368,24 @@
       "writtenOn": "2018-06-29T14:41:55Z",
       "side": 1,
       "message": "As stated before, I am not a fan of additional setting for something which can be obtained by other means already",
+      "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "64d55032_4d0ed935",
+        "filename": "firmware/usb.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-30T12:06:02Z",
+      "side": 1,
+      "message": "It\u0027s gone now.",
+      "parentUuid": "84d8846c_ce7ac386",
       "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -253,6 +427,30 @@
       "side": 1,
       "message": "I\u0027d revert back. I am not aware of any serious bugfix in gcc4.4",
       "parentUuid": "84d8846c_ae1d3762",
+      "range": {
+        "startLine": 138,
+        "startChar": 13,
+        "endLine": 138,
+        "endChar": 14
+      },
+      "revId": "ac7c01d6bc93cf98f209fc5fc89058c9b7faafb0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "64d55032_2d1b8d73",
+        "filename": "tools/configure",
+        "patchSetId": 2
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-06-30T12:06:02Z",
+      "side": 1,
+      "message": "There\u0027s an argument made for bumping our arm toolchain to something newer (eg 4.9.x, at the very least) but I\u0027ve nuked this (probably inadvertent) bump.",
+      "parentUuid": "84d8846c_ae6f77c6",
       "range": {
         "startLine": 138,
         "startChar": 13,
