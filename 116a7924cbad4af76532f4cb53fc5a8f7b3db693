@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "44e20c1c_ecfc6b0c",
+        "filename": "firmware/target/arm/rk27xx/ihifi2/button-ihifi.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2018-07-03T09:41:42Z",
+      "side": 1,
+      "message": "Use 4 spaces instead of tabs",
+      "revId": "116a7924cbad4af76532f4cb53fc5a8f7b3db693",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44e20c1c_cc01af08",
+        "filename": "firmware/target/arm/rk27xx/ihifi2/button-target.h",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2018-07-03T09:41:42Z",
+      "side": 1,
+      "message": "why different POWEROFF_COUNT on this two targets?",
+      "revId": "116a7924cbad4af76532f4cb53fc5a8f7b3db693",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44e20c1c_ac06631c",
+        "filename": "firmware/target/arm/rk27xx/sd-rk27xx.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2018-07-03T09:41:42Z",
+      "side": 1,
+      "message": "As I commented before change to\n#if defined(RK27_GENERIC) || defined(IHIFI770) || defined(IHIFI770C) || defined(IHIFI800)\n\nand drop separate case for thouse",
+      "revId": "116a7924cbad4af76532f4cb53fc5a8f7b3db693",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44e20c1c_8c0ba726",
+        "filename": "firmware/target/arm/rk27xx/usb-drv-rk27xx.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2018-07-03T09:41:42Z",
+      "side": 1,
+      "message": "Ok, this is g#364\nAFAIK it never fully worked.",
+      "revId": "116a7924cbad4af76532f4cb53fc5a8f7b3db693",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
