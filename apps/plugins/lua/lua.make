@@ -49,8 +49,8 @@ $(LUA_BUILDDIR)/rocklib_aux.c: $(APPSDIR)/plugin.h $(LUA_OBJ) $(LUA_SRCDIR)/rock
 $(LUA_BUILDDIR)/rocklib_aux.o: $(LUA_BUILDDIR)/rocklib_aux.c
 	$(call PRINTS,CC $(<F))$(CC) $(INCLUDES) $(PLUGINFLAGS) -I $(LUA_SRCDIR) -c $< -o $@
 
-$(LUA_BUILDDIR)/%.lua: $(LUA_INCLUDEDIR)/%.lua
-	$(call PRINTS,CP $(subst $(LUA_INCLUDEDIR)/,,$<))mkdir -p $(LUA_BUILDDIR)/ && cp $< $@
+$(LUA_BUILDDIR)/%.lua: $(LUA_INCLUDEDIR)/%.lua | $(LUA_BUILDDIR)
+	$(call PRINTS,CP $(subst $(LUA_INCLUDEDIR)/,,$<))cp $< $@
 
 $(LUA_BUILDDIR)/lua.refmap: $(LUA_OBJ) $(TLSFLIB)
 
@@ -64,4 +64,7 @@ $(LUA_BUILDDIR)/lua.ovl: $(LUA_OBJ) $(TLSFLIB) $(LUA_OUTLDS)
 		$(filter %.a, $+) \
 		-lgcc $(LUA_OVLFLAGS)
 	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
+
+$(LUA_BUILDDIR):
+	$(call PRINTS,MKDIR $@)mkdir -p $(LUA_BUILDDIR)/
 
