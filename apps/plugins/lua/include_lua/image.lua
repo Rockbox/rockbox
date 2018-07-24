@@ -235,9 +235,12 @@ local _img = {} do
         elseif depth <= 16 then
             bpp = 16
             bypl = (w * 2 + 3)
-        else
+        elseif depth <= 24 then
             bpp = 24
             bypl = (w * 3 + 3)
+        else
+            bpp = 32
+            bypl = (w * 4 + 3)
         end
 
         local linebytes = bit.band(bypl, bit.bnot(3))
@@ -294,12 +297,21 @@ local _img = {} do
             bmpheader[#bmpheader + 1] = bmp_color_mix(0xFFFFFF, 0, 2, 3)
             bmpheader[#bmpheader + 1] = bmp_color(0x0)
         elseif depth == 16 then
-            -- red bitfield mask
-            bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x0000F800)
-            -- green bitfield mask
-            bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x000007E0)
-            -- blue bitfield mask
-            bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x0000001F)
+            if format == 565 then
+                -- red bitfield mask
+                bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x0000F800)
+                -- green bitfield mask
+                bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x000007E0)
+                -- blue bitfield mask
+                bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x0000001F)
+            else -- 555
+                -- red bitfield mask
+                bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x00007C00)
+                -- green bitfield mask
+                bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x000003E0)
+                -- blue bitfield mask
+                bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x0000001F)
+            end
         end
 
         dump_fbuffer(0) -- write the header to the file now

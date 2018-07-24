@@ -16,7 +16,7 @@ LUA_OBJ := $(call c2obj, $(LUA_SRC))
 OTHER_SRC += $(LUA_SRC)
 
 LUA_INCLUDEDIR := $(LUA_SRCDIR)/include_lua
-LUA_INCLUDELIST = blit color draw image lcd math_ex print timer
+LUA_INCLUDELIST := $(addprefix $(LUA_BUILDDIR)/,blit.lua color.lua draw.lua image.lua lcd.lua math_ex.lua print.lua timer.lua)
 
 ifndef APP_TYPE
 ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
@@ -49,8 +49,8 @@ $(LUA_BUILDDIR)/rocklib_aux.c: $(APPSDIR)/plugin.h $(LUA_OBJ) $(LUA_SRCDIR)/rock
 $(LUA_BUILDDIR)/rocklib_aux.o: $(LUA_BUILDDIR)/rocklib_aux.c
 	$(call PRINTS,CC $(<F))$(CC) $(INCLUDES) $(PLUGINFLAGS) -I $(LUA_SRCDIR) -c $< -o $@
 
-$(LUA_INCLUDELIST): %: $(LUA_INCLUDEDIR)/%.lua
-	$(call PRINTS,CP $(subst $(LUA_INCLUDEDIR)/,,$<))cp $< $(LUA_BUILDDIR)/$@.lua
+$(LUA_BUILDDIR)/%.lua: $(LUA_INCLUDEDIR)/%.lua
+	$(call PRINTS,CP $(subst $(LUA_INCLUDEDIR)/,,$<))cp $< $@
 
 $(LUA_BUILDDIR)/lua.refmap: $(LUA_OBJ) $(TLSFLIB)
 
