@@ -297,18 +297,18 @@ local _img = {} do
             bmpheader[#bmpheader + 1] = bmp_color_mix(0xFFFFFF, 0, 2, 3)
             bmpheader[#bmpheader + 1] = bmp_color(0x0)
         elseif depth == 16 then
-            if format == 565 then
-                -- red bitfield mask
-                bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x0000F800)
-                -- green bitfield mask
-                bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x000007E0)
-                -- blue bitfield mask
-                bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x0000001F)
-            else -- 555
+            if format == 555 then
                 -- red bitfield mask
                 bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x00007C00)
                 -- green bitfield mask
                 bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x000003E0)
+                -- blue bitfield mask
+                bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x0000001F)
+			else --565
+                -- red bitfield mask
+                bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x0000F800)
+                -- green bitfield mask
+                bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x000007E0)
                 -- blue bitfield mask
                 bmpheader[#bmpheader + 1] = s_bytesLE(32, 0x0000001F)
             end

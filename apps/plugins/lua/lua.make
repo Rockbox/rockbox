@@ -50,7 +50,7 @@ $(LUA_BUILDDIR)/rocklib_aux.o: $(LUA_BUILDDIR)/rocklib_aux.c
 	$(call PRINTS,CC $(<F))$(CC) $(INCLUDES) $(PLUGINFLAGS) -I $(LUA_SRCDIR) -c $< -o $@
 
 $(LUA_BUILDDIR)/%.lua: $(LUA_INCLUDEDIR)/%.lua
-	$(call PRINTS,CP $(subst $(LUA_INCLUDEDIR)/,,$<))cp $< $@
+	$(call PRINTS,CP $(subst $(LUA_INCLUDEDIR)/,,$<))mkdir -p $(LUA_BUILDDIR)/ && cp $< $@
 
 $(LUA_BUILDDIR)/lua.refmap: $(LUA_OBJ) $(TLSFLIB)
 
