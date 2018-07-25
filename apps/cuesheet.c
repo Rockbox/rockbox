@@ -361,12 +361,15 @@ void browse_cuesheet(struct cuesheet *cue)
     int action;
     bool done = false;
     char title[MAX_PATH];
+	int len;
+
     struct cuesheet_file cue_file;
     struct mp3entry *id3 = audio_current_track();
 
-	int remaining = 0;
-    snprintf(title, sizeof(title), "%s: %n%.*s", cue->performer, 
-					&remaining, MAX_PATH - remaining, cue->title);
+    len = snprintf(title, sizeof(title), "%s: %s", cue->performer, cue->title);
+
+	if ((unsigned) len > sizeof(title))
+		DEBUGF("browse_cuesheet title truncated\n");
 
     gui_synclist_init(&lists, list_get_name_cb, cue, false, 2, NULL);
     gui_synclist_set_nb_items(&lists, 2*cue->track_count);
