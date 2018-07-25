@@ -436,9 +436,14 @@ int ft_enter(struct tree_context* c)
     char buf[MAX_PATH];
     struct entry* file = tree_get_entry_at(c, c->selected_item);
     int file_attr = file->attr;
+    int len;
 
     if (c->currdir[1])
-        snprintf(buf,sizeof(buf),"%s/%s",c->currdir, file->name);
+    {
+        len = snprintf(buf,sizeof(buf),"%s/%s",c->currdir, file->name);
+        if ((unsigned) len > sizeof(buf))
+            splash(HZ, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
+    }
     else
         snprintf(buf,sizeof(buf),"/%s",file->name);
 

@@ -608,6 +608,7 @@ static int dirbrowse(void)
 {
     int numentries=0;
     char buf[MAX_PATH];
+    int len;
     int button;
 #ifdef HAVE_LCD_BITMAP
     int oldbutton;
@@ -800,8 +801,13 @@ static int dirbrowse(void)
                         attr = entry->attr;
 
                         if (currdir[1]) /* Not in / */
-                            snprintf(buf, sizeof buf, "%s/%s",
+                        {
+                            len = snprintf(buf, sizeof buf, "%s/%s",
                                      currdir, entry->name);
+
+                            if ((unsigned) len > sizeof(buf))
+                                splash(HZ, ID2P(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
+                        }
                         else /* In / */
                             snprintf(buf, sizeof buf, "/%s", entry->name);
                     }
