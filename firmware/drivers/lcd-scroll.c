@@ -140,6 +140,7 @@ void LCDFN(jump_scroll_delay)(int ms)
  * Returns true if the text scrolled to the end */
 bool LCDFN(scroll_now)(struct scrollinfo *s)
 {
+    int len;
     int width = LCDFN(getstringsize)(s->linebuffer, NULL, NULL);
     bool ended = false;
     /* assume s->scroll_func() don't yield; otherwise this buffer might need
@@ -164,8 +165,12 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
     }
     else
     {
-        snprintf(line_buf, sizeof(line_buf)-1, "%s%s%s",
-            s->linebuffer, "   ", s->linebuffer);
+        len = snprintf(line_buf, sizeof(line_buf)-1, "%s%s%s",
+              s->linebuffer, "   ", s->linebuffer);
+
+        if ((unsigned) len > sizeof(line_buf))
+            do { } while (0); /* ignore truncation */
+
         s->line = line_buf;
         width += LCDFN(getstringsize)("   ", NULL, NULL);
         /* scroll forward the whole time */
