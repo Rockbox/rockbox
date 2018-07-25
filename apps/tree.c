@@ -908,7 +908,7 @@ static int dirbrowse(void)
 
 bool create_playlist(void)
 {
-    char filename[MAX_PATH];
+    char filename[MAX_PATH + 16]; /* add enough space for extension */
 
     if (tc.currdir[1])
         snprintf(filename, sizeof filename, "%s.m3u8", tc.currdir);
