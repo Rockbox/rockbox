@@ -21,6 +21,11 @@
 
 #define ICON_HEIGHT 12
 #define CHAR_HEIGHT 8
+
+#ifdef CHAR_WIDTH
+    #undef CHAR_WIDTH
+#endif
+
 #define CHAR_WIDTH 6
 #define CHAR_PIXEL 2
 #define BORDER_MARGIN 1
