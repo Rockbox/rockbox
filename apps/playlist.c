@@ -416,7 +416,8 @@ static int check_control(struct playlist_info* playlist)
  */
 static int recreate_control(struct playlist_info* playlist)
 {
-    char temp_file[MAX_PATH+1];
+    const char file_suffix[] = "_temp\0";
+    char temp_file[MAX_PATH + sizeof(file_suffix)];
     int  temp_fd = -1;
     int  i;
     int  result = 0;
@@ -432,8 +433,8 @@ static int recreate_control(struct playlist_info* playlist)
         close(playlist->control_fd);
         playlist->control_fd = 0;
 
-        snprintf(temp_file, sizeof(temp_file), "%s_temp",
-            playlist->control_filename);
+        snprintf(temp_file, sizeof(temp_file), "%s%s",
+            playlist->control_filename, file_suffix);
 
         if (rename(playlist->control_filename, temp_file) < 0)
             return -1;
