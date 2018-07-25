@@ -361,7 +361,7 @@ void browse_cuesheet(struct cuesheet *cue)
     int action;
     bool done = false;
     char title[MAX_PATH];
-	int len;
+    int len;
 
     struct cuesheet_file cue_file;
     struct mp3entry *id3 = audio_current_track();
