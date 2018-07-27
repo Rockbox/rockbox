@@ -55,6 +55,16 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
                 dst+=LCD_WIDTH;
             }
         }
+#elif LCD_SCALE==100 && LCD_ROTATE==2
+        /* Native resolution - rotated 270 degrees = 288x224 */
+        next_dst=&lcd_framebuffer[(LCD_HEIGHT-YOFS)*LCD_WIDTH+XOFS];
+        for( y=0; y<ScreenHeight; y++ ) {
+            dst = (next_dst++);
+            for( x=ScreenWidth-1; x>=0; x-- ) {
+                *dst = palette[*(vbuf++)];
+                dst-=LCD_WIDTH;
+            }
+        }
 #elif LCD_SCALE==75 && LCD_ROTATE==1
         /* 0.75 scaling - display 3 out of 4 pixels - rotated = 216x168 
            Skipping pixel #2 out of 4 seems to give the most legible display 
