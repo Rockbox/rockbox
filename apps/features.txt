@@ -288,3 +288,7 @@ play_frequency
 #if defined(HAVE_BOOTDATA)
 boot_data
 #endif
+
+#if defined(CONFIG_POWER_SAVING)
+sys_powersaving
+#endif

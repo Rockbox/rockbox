@@ -35,12 +35,26 @@ static int lcd_type;
 static bool lcd_enabled;
 #endif
 
+static void ssp_set_prescaler(unsigned int prescaler)
+{
+    int oldlevel = disable_interrupt_save(IRQ_FIQ_STATUS);
+    /* must be on to write regs */
+    bool ssp_enabled = bitset32(&CGU_PERI, CGU_SSP_CLOCK_ENABLE) &
+                                           CGU_SSP_CLOCK_ENABLE;
+    SSP_CPSR = prescaler;
+
+    if (!ssp_enabled) /* put it back how we found it */
+        bitclr32(&CGU_PERI, CGU_SSP_CLOCK_ENABLE);
+
+    restore_irq(oldlevel);
+}
+
 /* initialises the host lcd hardware, returns the lcd type */
 static int lcd_hw_init(void)
 {
     /* configure SSP */
     bitset32(&CGU_PERI, CGU_SSP_CLOCK_ENABLE);
-    SSP_CPSR = 4;           /* TODO: use AS3525_SSP_PRESCALER, OF uses 8 */
+    ssp_set_prescaler(AS3525_SSP_PRESCALER);   /* OF = 0x8 */
     SSP_CR0 =   (0 << 8) |  /* SCR, serial clock rate divider = 1 */
                 (1 << 7) |  /* SPH, phase = 1 */
                 (1 << 6) |  /* SPO, polarity = 1 */
@@ -437,3 +451,11 @@ void lcd_update(void)
 {
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
+
+#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_DISP)
+/* declared in system-as3525.c */
+void ams_ssp_set_low_speed(bool slow)
+{
+    ssp_set_prescaler(slow ? AS3525_SSP_PRESCALER_MAX : AS3525_SSP_PRESCALER);
+}
+#endif

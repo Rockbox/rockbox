@@ -13647,3 +13647,54 @@
     *: "Disable Touch"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_POWER_SAVING_MENU
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "Power Saving"
+  </source>
+  <dest>
+    *: none
+    sys_powersaving: "Power Saving"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "Power Saving"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CPU
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "CPU"
+  </source>
+  <dest>
+     *: none
+    sys_powersaving: "CPU"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "CPU"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_I2C
+  desc: system clock and voltage settings
+  user: core
+  <source>
+    *: none
+    sys_powersaving: "I2C"
+  </source>
+  <dest>
+     *: none
+    sys_powersaving: "I2C"
+  </dest>
+  <voice>
+    *: none
+    sys_powersaving: "I2C"
+  </voice>
+</phrase>
