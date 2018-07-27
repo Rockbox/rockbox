@@ -80,10 +80,10 @@ local _lcd = {} do
 
     -- clears lcd, optional.. ([color, x1, y1, x2, y2, clip])
     local function clear(t, clr, ...)
+        rb.lcd_scroll_stop() --rb really doesn't like bg change while scroll
         if clr == _NIL and ... == _NIL then
             rb.lcd_clear_display()
         else
-            rb.lcd_scroll_stop() --rb really doesn't like bg change while scroll
             _LCD:clear(clr, ...)
         end
     end

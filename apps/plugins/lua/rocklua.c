@@ -160,6 +160,7 @@ enum plugin_status plugin_start(const void* parameter)
         rocklua_openlibs(L);
         status = luaL_loadfile(L, filename);
         if (!status) {
+            rb->lcd_scroll_stop(); /* rb doesn't like bg change while scroll */
             rb->lcd_clear_display();
             status = docall(L);
         }
