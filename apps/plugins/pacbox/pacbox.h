@@ -340,10 +340,10 @@
 #define PACMAN_COIN     BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == CREATIVE_ZEN_PAD
-#define PACMAN_UP       BUTTON_UP
-#define PACMAN_DOWN     BUTTON_DOWN
-#define PACMAN_LEFT     BUTTON_LEFT
-#define PACMAN_RIGHT    BUTTON_RIGHT
+#define PACMAN_UP       BUTTON_LEFT
+#define PACMAN_DOWN     BUTTON_RIGHT
+#define PACMAN_LEFT     BUTTON_DOWN
+#define PACMAN_RIGHT    BUTTON_UP
 #define PACMAN_MENU     BUTTON_MENU
 #define PACMAN_1UP      BUTTON_SELECT
 #define PACMAN_COIN     BUTTON_PLAYPAUSE
@@ -406,10 +406,17 @@
 #define YOFS ((LCD_HEIGHT-288)/2)
 
 #elif (LCD_WIDTH >= 288) && (LCD_HEIGHT >= 224)
+#if defined(CREATIVE_ZEN)
+#define LCD_SCALE  100
+#define LCD_ROTATE 2
+#define XOFS ((LCD_WIDTH-288)/2)
+#define YOFS ((LCD_HEIGHT-224)/2)
+#else
 #define LCD_SCALE  100
 #define LCD_ROTATE 1
 #define XOFS ((LCD_WIDTH-288)/2)
 #define YOFS ((LCD_HEIGHT-224)/2)
+#endif
 
 #elif (LCD_WIDTH >= 168) && (LCD_HEIGHT >= 216)
 #define LCD_SCALE  75
