@@ -13647,3 +13647,31 @@
     *: "Disable Touch"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ACTION_SAVE
+  desc: mask_select setting
+  user: core
+  <source>
+    *: "Save"
+  </source>
+  <dest>
+    *: "Save"
+  </dest>
+  <voice>
+    *: "Save"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_CANCEL
+  desc: mask_select setting
+  user: core
+  <source>
+    *: "Cancel"
+  </source>
+  <dest>
+    *: "Cancel"
+  </dest>
+  <voice>
+    *: "Cancel"
+  </voice>
+</phrase>

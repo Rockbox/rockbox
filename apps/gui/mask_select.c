@@ -73,20 +73,24 @@ static struct category empty = {
 };
 
 /* Or | all keyvalues that user selected */
-static int calculate_mask_r(struct category *root, int mask)
+static int calculate_mask_r(struct category *root, int mask, int mask_default)
 {
     int i = 0;
     while (i < root->children_count)
     {
         struct child *this = &root->children[i];
+        
         if (this->state == SELECTED)
             mask |= this->key_value;
-
         else if (this->state == EXPANDED)
-            mask = calculate_mask_r(this->category, mask);
+            mask = calculate_mask_r(this->category, mask, mask_default);
         i++;
     }
-return mask;
+
+    if ((mask & MASK_SEL_CANCEL) == MASK_SEL_CANCEL)
+        mask = mask_default;
+
+    return mask;
 }
 
 static int count_items(struct category *start)
@@ -143,6 +147,12 @@ static int item_action_callback(int action, struct gui_synclist *list)
 
     if (action == ACTION_STD_OK)
     {
+        if (this->key_value == MASK_SEL_CANCEL || this->key_value == MASK_SEL_SAVE)
+        {
+            this->state = SELECTED;
+            return ACTION_STD_CANCEL;
+        }
+
         switch (this->state)
         {
             case EXPANDED:
@@ -283,5 +293,5 @@ int mask_select(int mask, const unsigned char* headermsg,
     info.get_talk        = item_get_talk;
     simplelist_show_list(&info);
 
-    return calculate_mask_r(&root,0);
+    return calculate_mask_r(&root, 0, mask);
 }

@@ -23,6 +23,8 @@
 #ifndef __MASK_SELECT_H__
 #define __MASK_SELECT_H__
 
+#define MASK_SEL_SAVE   0x00000000
+#define MASK_SEL_CANCEL 0x40000000
 /**
  * A GUI browser to select masks on a target
  *
