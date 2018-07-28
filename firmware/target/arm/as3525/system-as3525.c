@@ -594,6 +594,9 @@ void set_cpu_frequency(long frequency)
             ascodec_write_pmu(0x17, 1, 0x80 | 22);
         else
             ascodec_write_pmu(0x17, 1, 0x80 | 26);
+#elif defined(SANSA_FUZEV2)
+        /*Some FuzeV2 devices have trouble reading SD at low voltage*/
+	ascodec_write_pmu(0x17, 1, 0x80 | 26);
 #else
         ascodec_write_pmu(0x17, 1, 0x80 | 22);
 #endif
