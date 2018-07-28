@@ -67,7 +67,7 @@ extern bool lcd_remote_scroll_now(struct scrollinfo *scroll);
 struct scrollinfo
 {
     struct viewport* vp;
-    char linebuffer[(SCROLL_LINE_SIZE / 2) - 1];
+    char linebuffer[(SCROLL_LINE_SIZE / 2) - SCROLL_SPACING];
     const char *line;
     /* rectangle for the line */
     int x, y; /* relative to the viewort */
