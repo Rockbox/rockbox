@@ -402,7 +402,7 @@ build() {
 
         if (echo $needs_libs | grep -q mpc && test ! -d mpc); then
             echo "ROCKBOXDEV: Getting MPC"
-            getfile "mpc-0.8.1.tar.gz" "http://www.multiprecision.org/mpc/download"
+            getfile "mpc-0.8.1.tar.gz" "http://www.multiprecision.org/downloads"
             tar xzf $dlwhere/mpc-0.8.1.tar.gz
             ln -s mpc-0.8.1 mpc
         fi
