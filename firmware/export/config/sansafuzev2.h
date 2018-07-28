@@ -224,7 +224,7 @@
 /*define this to enable CPU voltage scaling on AMS devices*/
 #define HAVE_ADJUSTABLE_CPU_VOLTAGE
 
-#if (!defined(BOOTLOADER)) && (!defined(SIMULATOR))
+#ifndef BOOTLOADER
 /*define this with flags for power saving options device supports*/
 #define CONFIG_POWER_SAVING (POWERSV_CPU | POWERSV_I2C | POWERSV_DISK)
 #endif
