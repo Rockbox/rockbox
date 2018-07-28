@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0433b47f_623896d3",
+        "filename": "firmware/export/audiohw_settings.h",
+        "patchSetId": 6
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-07-28T16:28:29Z",
+      "side": 1,
+      "message": "Is there a reason you put this \"functional mode\" stuff back into the global config, when there are no users?  (That was exposing an x3-specific codec option that I changed to be automatically detected..)",
+      "range": {
+        "startLine": 117,
+        "startChar": 45,
+        "endLine": 117,
+        "endChar": 69
+      },
+      "revId": "0662793ca0050e823cd1207cc4689a1cba5068bd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
