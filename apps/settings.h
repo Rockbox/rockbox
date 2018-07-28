@@ -811,10 +811,6 @@ struct user_settings
     int roll_off;
 #endif
 
-#ifdef AUDIOHW_HAVE_FUNCTIONAL_MODE
-    int func_mode;
-#endif
-
 #ifdef AUDIOHW_HAVE_EQ
     /** Hardware EQ tone controls **/
     struct hw_eq_band
