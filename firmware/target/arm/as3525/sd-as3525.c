@@ -215,7 +215,6 @@ static void enable_controller_mci(bool on)
 /* AMS v1 have two different drive interfaces MCI_SD(XPD) and GGU_IDE */
 static void enable_controller(bool on, const int drive)
 {
-    (void) on;
 
     if (drive == INTERNAL_AS3525)
     {
@@ -236,7 +235,6 @@ static void enable_controller(bool on, const int drive)
     else
         enable_controller_mci(on);
 #endif
-
 }
 
 #ifdef HAVE_HOTSWAP
