@@ -488,7 +488,7 @@ static int sd_init_card(const int drive)
     card_info[drive].initialized = 0;
     card_info[drive].rca = 0;
 
-    /*  assume 24 MHz clock / (2x)60 = 200 kHz  */
+    /*  assume 24 MHz clock / 60 = 400 kHz  */
     MCI_CLKDIV = (MCI_CLKDIV & ~(0xFF)) | 0x3C;    /* CLK_DIV_0 : bits 7:0  */
 
     /* 100 - 400kHz clock required for Identification Mode  */
@@ -957,27 +957,3 @@ int sd_event(long id, intptr_t data)
 
     return rc;
 }
-
-#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_DISK)
-/* declared in system-as3525.c */
-void ams_sd_set_low_speed(bool slow)
-{
-    /* block access while speed is changed */
-    mutex_lock(&sd_mtx);
-    enable_controller(true);
-    if (slow)
-    {
-        CGU_SDSLOT = (CGU_SDSLOT & ~(0xF << 2)) | (AS3525_SDSLOT_DIV_MAX << 2);
-        /* power save is enabled for the sd card(s) ASSUMES CRD0 is int drive! */
-        MCI_CLKENA |= (CCLK_LP_CRD1 | CCLK_LP_CRD2 | CCLK_LP_CRD3);
-    }
-    else
-    {
-        /* Full Speed */
-        CGU_SDSLOT = (CGU_SDSLOT & ~(0xF << 2)) | (AS3525_SDSLOT_DIV << 2);
-        MCI_CLKENA = (MCI_CLKENA & ~(CCLK_LP_CRD1 | CCLK_LP_CRD2 | CCLK_LP_CRD3));
-    }
-    enable_controller(false);
-    mutex_unlock(&sd_mtx);
-}
-#endif

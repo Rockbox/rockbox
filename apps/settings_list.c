@@ -2246,43 +2246,7 @@ const struct settings_list settings[] = {
                    ID2P(LANG_IBASSO_USB_MODE_CHARGE),
                    ID2P(LANG_IBASSO_USB_MODE_ADB)),
 #endif
-
-#ifdef CONFIG_POWER_SAVING
-#if (CONFIG_POWER_SAVING & POWERSV_CPU)
-    OFFON_SETTING(0,
-                  cpu_powersave,
-                  LANG_CPU,
-                  false,
-                  "cpu powersave",
-                  cpu_set_powersave),
-#endif
-#if (CONFIG_POWER_SAVING & POWERSV_DISK)
-    OFFON_SETTING(0,
-                  disk_powersave,
-                  LANG_DISK_MENU,
-                  false,
-                  "disk powersave",
-                  disk_set_powersave),
-#endif
-#if (CONFIG_POWER_SAVING & POWERSV_DISP)
-    OFFON_SETTING(0,
-                  disp_powersave,
-                  LANG_DISPLAY,
-                  false,
-                  "disp powersave",
-                  disp_set_powersave),
-#endif
-#if (CONFIG_POWER_SAVING & POWERSV_I2C)
-    OFFON_SETTING(0,
-                  i2c_powersave,
-                  LANG_I2C,
-                  false,
-                  "i2c powersave",
-                  i2c_set_powersave),
-#endif
-#endif /*defined(CONFIG_POWER_SAVING)*/
-
-};/*struct settings_list settings*/
+};
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);
 

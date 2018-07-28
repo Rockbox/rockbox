@@ -170,12 +170,6 @@
 #define AGPTEK_ROCKER_PAD  65
 #define XDUOO_X3_PAD       66
 
-/* CONFIG_POWER_SAVE combinable bit flags*/
-#define POWERSV_CPU   0x1
-#define POWERSV_I2C   0x2
-#define POWERSV_DISK  0x4
-#define POWERSV_DISP  0x8
-
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
 #define H300_REMOTE   2

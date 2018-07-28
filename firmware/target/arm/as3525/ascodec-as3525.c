@@ -623,25 +623,11 @@ void i2c_init(void)
     /* required function but called too late for our needs */
 }
 
-static void i2c_set_prescaler(unsigned int prescaler)
-{
-    int oldlevel = disable_interrupt_save(IRQ_FIQ_STATUS);
-    /* must be on to write regs */
-    bool i2c_enabled = bitset32(&CGU_PERI, CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE) &
-                                           CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE;
-
-    I2C2_CPSR0 = prescaler & 0xFF;          /* 8 lsb */
-    I2C2_CPSR1 = (prescaler >> 8) & 0x3;    /* 2 msb */
-
-    if (!i2c_enabled) /* put it back how we found it */
-        bitclr32(&CGU_PERI, CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE);
-
-    restore_irq(oldlevel);
-}
-
 /* initialises the internal i2c bus and prepares for transfers to the codec */
 void ascodec_init(void)
 {
+    int prescaler;
+
     ll_init(&req_list);
     mutex_init(&as_mtx);
     ascodec_async_init(&as_audio_req, ascodec_int_audio_cb, 0);
@@ -651,7 +637,9 @@ void ascodec_init(void)
     bitset32(&CGU_PERI, CGU_I2C_AUDIO_MASTER_CLOCK_ENABLE);
 
     /* prescaler for i2c clock */
-    i2c_set_prescaler(AS3525_I2C_PRESCALER);
+    prescaler = AS3525_I2C_PRESCALER;
+    I2C2_CPSR0 = prescaler & 0xFF;          /* 8 lsb */
+    I2C2_CPSR1 = (prescaler >> 8) & 0x3;    /* 2 msb */
 
     /* set i2c slave address of codec part */
     I2C2_SLAD0 = AS3514_I2C_ADDR << 1;
@@ -702,12 +690,3 @@ void ams_i2c_get_debug_cpsr(unsigned int *i2c_cpsr)
 
     restore_irq(oldlevel);
 }
-
-#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_I2C)
-/* declared in system-as3525.c */
-void ams_i2c_set_low_speed(bool slow)
-{
-    i2c_set_prescaler(slow ? AS3525_I2C_PRESCALER_MAX : AS3525_I2C_PRESCALER);
-}
-#endif
-

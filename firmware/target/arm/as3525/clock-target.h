@@ -158,32 +158,22 @@
 #endif /* CONFIG_CPU */
 
    /* PCLK as Source */
-  #define AS3525_DBOP_DIV           (CLK_DIV(AS3525_PCLK_FREQ, AS3525_DBOP_FREQ) - 1) /*div=1/(n+1)*/
-  #define AS3525_I2C_PRESCALER      CLK_DIV(AS3525_PCLK_FREQ, AS3525_I2C_FREQ)
-  #define AS3525_I2C_PRESCALER_MAX 0xFF | 0x300 /* Max value for prescaler */
-  #define AS3525_I2C_FREQ           400000
-  #define AS3525_SD_IDENT_DIV       ((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SD_IDENT_FREQ) / 2) - 1)
-  #define AS3525_SD_IDENT_FREQ      400000      /* must be between 100 & 400 kHz */
-  #define AS3525_SSP_PRESCALER      ((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SSP_FREQ) + 1) & ~1)    /* must be an even number */
-#if LCD_DEPTH > 1
-  #define AS3525_SSP_PRESCALER_MAX  ((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SSP_FREQ_MIN) + 1) & ~1)/* must be an even number */
-  #define AS3525_SSP_FREQ_MIN       2000000 /* 2 MHz gives a decent refresh rate on clipzip*/
-#else
-  #define AS3525_SSP_PRESCALER_MAX  0xFE & ~1  /*Max value for divider - must be an even number */
-  #define AS3525_SSP_FREQ_MIN       AS3525_SSP_FREQ /* No set minimum we just use max divider */
-#endif
-  #define AS3525_SSP_FREQ           12000000
+  #define AS3525_DBOP_DIV        (CLK_DIV(AS3525_PCLK_FREQ, AS3525_DBOP_FREQ) - 1) /*div=1/(n+1)*/
+  #define AS3525_I2C_PRESCALER   CLK_DIV(AS3525_PCLK_FREQ, AS3525_I2C_FREQ)
+  #define AS3525_I2C_FREQ        400000
+  #define AS3525_SD_IDENT_DIV    ((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SD_IDENT_FREQ) / 2) - 1)
+  #define AS3525_SD_IDENT_FREQ   400000      /* must be between 100 & 400 kHz */
+  #define AS3525_SSP_PRESCALER   ((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SSP_FREQ) + 1) & ~1)    /* must be an even number */
+  #define AS3525_SSP_FREQ        12000000
 
 #define AS3525_IDE_SEL           AS3525_CLK_PLLA           /* Input Source   */
 #define AS3525_IDE_DIV           (CLK_DIV(AS3525_PLLA_FREQ, AS3525_IDE_FREQ) - 1)/*div=1/(n+1)*/
-#define AS3525_IDE_DIV_MAX       0xF /* Max value for divider */
 
 #if CONFIG_CPU == AS3525v2
 #define AS3525_MS_FREQ           120000000
 #define AS3525_MS_DIV            (CLK_DIV(AS3525_PLLA_FREQ, AS3525_MS_FREQ) -1)
 #define AS3525_SDSLOT_FREQ       24000000
 #define AS3525_SDSLOT_DIV        (CLK_DIV(AS3525_PLLA_FREQ, AS3525_SDSLOT_FREQ) -1)
-#define AS3525_SDSLOT_DIV_MAX    0xF /* Max value for divider */
 #define AS3525_IDE_FREQ          80000000
 #else
 #define AS3525_IDE_FREQ          50000000    /* The OF uses 66MHz maximal freq */
@@ -219,10 +209,6 @@
 /* AS3525_SSP_FREQ */
 #if (((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SSP_FREQ)) + 1 ) & ~1) >= (1<<8) /* 8 bits */
 #error SSP frequency is too low : clock divider will not fit !
-#endif
-
-#if (((CLK_DIV(AS3525_PCLK_FREQ, AS3525_SSP_FREQ_MIN)) + 1 ) & ~1) >= (1<<8) /* 8 bits */
-#error SSP_MIN frequency is too low : clock divider will not fit !
 #endif
 
 /* AS3525_SD_IDENT_FREQ */
