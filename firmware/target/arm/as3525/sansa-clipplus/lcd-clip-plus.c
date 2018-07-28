@@ -26,25 +26,11 @@
 #include "system.h"
 #include "cpu.h"
 
-static void ssp_set_prescaler(unsigned int prescaler)
-{
-    int oldlevel = disable_interrupt_save(IRQ_FIQ_STATUS);
-    /* must be on to write regs */
-    bool ssp_enabled = bitset32(&CGU_PERI, CGU_SSP_CLOCK_ENABLE) &
-                                           CGU_SSP_CLOCK_ENABLE;
-    SSP_CPSR = prescaler;
-
-    if (!ssp_enabled) /* put it back how we found it */
-        bitclr32(&CGU_PERI, CGU_SSP_CLOCK_ENABLE);
-
-    restore_irq(oldlevel);
-}
-
 int lcd_hw_init(void)
 {
     bitset32(&CGU_PERI, CGU_SSP_CLOCK_ENABLE);
 
-    ssp_set_prescaler(AS3525_SSP_PRESCALER);    /* OF = 0x10 */
+    SSP_CPSR = AS3525_SSP_PRESCALER;    /* OF = 0x10 */
     SSP_CR0 = (1<<7) | (1<<6) | 7;  /* Motorola SPI frame format, 8 bits */
     SSP_CR1 = (1<<3) | (1<<1);  /* SSP Operation enabled */
     SSP_IMSC = 0;       /* No interrupts */
@@ -129,10 +115,3 @@ void lcd_enable_power(bool onoff)
 #endif
 }
 
-#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_DISP)
-/* declared in system-as3525.c */
-void ams_ssp_set_low_speed(bool slow)
-{
-    ssp_set_prescaler(slow ? AS3525_SSP_PRESCALER_MAX : AS3525_SSP_PRESCALER);
-}
-#endif

@@ -73,26 +73,6 @@ static inline void mdelay(unsigned msecs)
 void usb_insert_int(void);
 void usb_remove_int(void);
 
-
-#ifdef CONFIG_POWER_SAVING
-/* Powersave functions either manipulate the system directly
-   or pass enabled flag on to the devices specific function
-   dis/enabling powersaving for the selected subsystem
-*/
-#if (CONFIG_POWER_SAVING & POWERSV_CPU)
-void cpu_set_powersave(bool enabled);
-#endif
-#if (CONFIG_POWER_SAVING & POWERSV_DISP)
-void disp_set_powersave(bool enabled);
-#endif
-#if (CONFIG_POWER_SAVING & POWERSV_DISK)
-void disk_set_powersave(bool enabled);
-#endif
-#if (CONFIG_POWER_SAVING & POWERSV_I2C)
-void i2c_set_powersave(bool enabled);
-#endif
-#endif /*CONFIG_POWER_SAVING*/
-
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #define CPU_BOOST_LOCK_DEFINED
 

@@ -52,29 +52,6 @@ struct mutex cpufreq_mtx;
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
 
-#ifdef CONFIG_POWER_SAVING
-/* Powersave functions either manipulate the system directly
-   or pass enabled flag on to these specific functions
-   dis/enabling powersaving for the selected subsystem
-*/
-#if (CONFIG_POWER_SAVING & POWERSV_CPU)
-/*cpu_set_powersave*/
-#include "settings.h"
-#endif
-#if (CONFIG_POWER_SAVING & POWERSV_DISP)
-/*disp_set_powersave*/
-void ams_ssp_set_low_speed(bool slow); /*lcd-clip-plus.c & lcd-clipzip.c*/
-#endif
-#if (CONFIG_POWER_SAVING & POWERSV_DISK)
-/*disk_set_powersave*/
-void ams_sd_set_low_speed(bool slow); /* sd-as3525.c & sd-as3525v2.c */
-#endif
-#if (CONFIG_POWER_SAVING & POWERSV_I2C)
-/*i2c_set_powersave*/
-void ams_i2c_set_low_speed(bool slow); /* ascodec-as3525.c*/
-#endif
-#endif /*CONFIG_POWER_SAVING*/
-
 #if CONFIG_USBOTG != USBOTG_DESIGNWARE
 static void UIRQ (void) __attribute__((interrupt ("IRQ")));
 #endif
@@ -445,39 +422,6 @@ void udelay(unsigned usecs)
     );
 }
 
-#ifdef CONFIG_POWER_SAVING
-#if (CONFIG_POWER_SAVING & POWERSV_CPU)
-void cpu_set_powersave(bool enabled)
-{
-    /*global_settings.cpu_powersave*/
-    /*handled in: set_cpu_frequency()*/
-    (void) enabled;
-}
-#endif
-#if (CONFIG_POWER_SAVING & POWERSV_DISK)
-void disk_set_powersave(bool enabled)
-{
-    /*global_settings.disk_powersave*/
-    ams_sd_set_low_speed(enabled);
-}
-#endif
-#if (CONFIG_POWER_SAVING & POWERSV_DISP)
-void disp_set_powersave(bool enabled)
-{
-    /*global_settings.disp_powersave*/
-    ams_ssp_set_low_speed(enabled);
-}
-#endif
-#if (CONFIG_POWER_SAVING & POWERSV_I2C)
-void i2c_set_powersave(bool enabled)
-{
-    /*global_settings.i2c_powersave*/
-    ams_i2c_set_low_speed(enabled);
-}
-#endif
-#endif /*defined(CONFIG_POWER_SAVING)*/
-
-
 #ifndef BOOTLOADER
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 bool set_cpu_frequency__lock(void)
@@ -537,12 +481,7 @@ void set_cpu_frequency(long frequency)
         CGU_PROC = ((0xf << 4) | (0x3 << 2) | AS3525_CLK_MAIN);
 
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
-    /* Decreasing frequency so reduce voltage after change */
-#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_CPU)
-    if (!global_settings.cpu_powersave)
-        ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_15));
-    else
-#endif
+        /* Decreasing frequency so reduce voltage after change */
         ascodec_write(AS3514_CVDD_DCDC3, (AS314_CP_DCDC3_SETTING | CVDD_1_10));
 #endif  /*  HAVE_ADJUSTABLE_CPU_VOLTAGE */
 
@@ -580,13 +519,6 @@ void set_cpu_frequency(long frequency)
 
         /* Set CVDD1 power supply */
 #ifdef HAVE_ADJUSTABLE_CPU_VOLTAGE
-#if defined(CONFIG_POWER_SAVING) && (CONFIG_POWER_SAVING & POWERSV_CPU)
-    if (!global_settings.cpu_powersave)
-    {
-        ascodec_write_pmu(0x17, 1, 0x80 | 26);
-        return;
-    }
-#endif
 #if defined(SANSA_CLIPZIP)
         ascodec_write_pmu(0x17, 1, 0x80 | 20);
 #elif defined(SANSA_CLIPPLUS)
