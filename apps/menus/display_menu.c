@@ -91,27 +91,30 @@ static int filterfirstkeypress_callback(int action,const struct menu_item_ex *th
 static int selectivebacklight_set_mask(void* param)
 {
     (void)param;
-     int mask = global_settings.bl_selective_actions_mask;
-            struct s_mask_items maskitems[]={
-                                       {ID2P(LANG_VOLUME)   , SEL_ACTION_VOL},
-                                       {ID2P(LANG_ACTION_PLAY), SEL_ACTION_PLAY},
-                                       {ID2P(LANG_ACTION_SEEK), SEL_ACTION_SEEK},
-                                       {ID2P(LANG_ACTION_SKIP), SEL_ACTION_SKIP},
-                     {ID2P(LANG_ACTION_DISABLE_UNMAPPED), SEL_ACTION_NOUNMAPPED}
+    int mask = global_settings.bl_selective_actions_mask;
+    struct s_mask_items maskitems[]={
+                               {ID2P(LANG_VOLUME)   , SEL_ACTION_VOL},
+                               {ID2P(LANG_ACTION_PLAY), SEL_ACTION_PLAY},
+                               {ID2P(LANG_ACTION_SEEK), SEL_ACTION_SEEK},
+                               {ID2P(LANG_ACTION_SKIP), SEL_ACTION_SKIP},
+             {ID2P(LANG_ACTION_DISABLE_UNMAPPED), SEL_ACTION_NOUNMAPPED}
 #if CONFIG_CHARGING
-                        ,{ID2P(LANG_ACTION_DISABLE_EXT_POWER), SEL_ACTION_NOEXT}
+                ,{ID2P(LANG_ACTION_DISABLE_EXT_POWER), SEL_ACTION_NOEXT}
 #endif
-                                            };
+                                ,{ID2P(LANG_ACTION_SAVE), MASK_SEL_SAVE},
+                             {ID2P(LANG_ACTION_CANCEL), MASK_SEL_CANCEL}
 
-            mask = mask_select(mask, ID2P(LANG_BACKLIGHT_SELECTIVE)
-                                   , maskitems, ARRAYLEN(maskitems));
+    };
 
-            if (mask == SEL_ACTION_NONE ||  mask == SEL_ACTION_NOEXT)
-                global_settings.bl_selective_actions = false;
-            else if (global_settings.bl_selective_actions_mask != mask)
-                global_settings.bl_selective_actions = true;
+    mask = mask_select(mask, ID2P(LANG_BACKLIGHT_SELECTIVE)
+                           , maskitems, ARRAYLEN(maskitems));
 
-            global_settings.bl_selective_actions_mask = mask;
+    if (mask == SEL_ACTION_NONE ||  mask == SEL_ACTION_NOEXT)
+        global_settings.bl_selective_actions = false;
+    else if (global_settings.bl_selective_actions_mask != mask)
+        global_settings.bl_selective_actions = true;
+
+    global_settings.bl_selective_actions_mask = mask;
 
     return true;
 }
