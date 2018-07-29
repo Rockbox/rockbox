@@ -508,7 +508,6 @@
 #define UI_LCD_POSX                 46
 #define UI_LCD_POSY                 40
 
-<<<<<<< HEAD
 #elif defined(SONY_NWZA860)
 #define UI_TITLE                    "Sony NWZ-A860 Series"
 #define UI_WIDTH                    390 /* width of GUI window */
