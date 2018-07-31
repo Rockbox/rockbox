@@ -104,7 +104,7 @@ show the information for the next song to be played.
     \begin{tagmap}
       \config{\%dr(x,y,width,height,[color1,color2])} & Color a rectangle. \\
     \end{tagmap}
-      width and height can be - to fill the viewport. If no color is
+      width and height can be ``$-$'' to fill the viewport. If no color is
       specified the viewports foreground color will be used. If two
       colors are specified it will do a gradient fill.
 }
@@ -153,8 +153,8 @@ show the information for the next song to be played.
                        (N can be 1, 2, 3, \dots)\\
   \end{tagmap}
 Example for the \config{\%d(N)} commands: If the file is
-``/Rock/Kent/Isola/11 - 747.mp3'', \config{\%d(1)} is ``Isola'', 
-\config{\%d(2)} is ``Kent'' and \config{\%d(3)} is ``Rock''.
+``\fname{/Rock/Kent/Isola/11 - 747.mp3}'', \config{\%d(1)} is ``\fname{Isola}'', 
+\config{\%d(2)} is ``\fname{Kent}'' and \config{\%d(3)} is ``\fname{Rock}''.
 
 These tags, when written with the first letter capitalized (e.g. \config{\%Fn}
 or \config{\%D(2)}), produce the information for the next file to be played.
@@ -535,7 +535,7 @@ Example: \config{\%ax\%V(\dots)}
 \config{\%if(tag, operator, operand, [option count])}
     & Allows very simple comparisons with other tags.\newline
       \config{tag}: the tag to check against.\newline
-      \config{operator}: the comparison to perform - possible options are =, !=,
+      \config{operator}: the comparison to perform -- possible options are =, !=,
         >, >=, <, <=\newline
       \config{operand}: either a second tag, a number, or text.\newline
       \config{[option count]}: optional parameter used to select which parameter
