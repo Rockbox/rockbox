@@ -70,8 +70,10 @@ iap/iap-lingo1.c
 iap/iap-lingo2.c
 iap/iap-lingo3.c
 iap/iap-lingo4.c
+#if CONFIG_TUNER
+iap/iap-lingo7.c
 #endif
-
+#endif
 screen_access.c
 #ifdef HAVE_BUTTONBAR
 gui/buttonbar.c
