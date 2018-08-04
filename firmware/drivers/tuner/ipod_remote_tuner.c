@@ -69,7 +69,7 @@ static void rmt_tuner_set_freq(int curr_freq)
         rds_reset();
         /* ex: 00 01 63 14 = 90.9MHz */
         unsigned char data[] = {0x07, 0x0B, 0x00, 0x01, 0x63, 0x14};
-        
+
         if (curr_freq != 0)
         {
             unsigned int khz = curr_freq / 1000;
@@ -93,7 +93,7 @@ static void rmt_tuner_sleep(int state)
         old_region = -1;
         tuner_frequency = 0;
         radio_tuned = false;
-        
+
         /* tuner HW on */
         const unsigned char data[] = {0x07, 0x05, 0x01};
         iap_send_pkt(data, sizeof(data));
@@ -253,16 +253,16 @@ static void set_mono(int value)
 static bool reply_timeout(void)
 {
     int timeout = 0;
-    
+
     sleep(HZ/50);
     do
     {
-        iap_handlepkt();
+/*        iap_handlepkt(); */
         sleep(HZ/50);
         timeout++;
     }
     while((ipod_rmt_tuner_get(RADIO_TUNED) == 0) && (timeout < TIMEOUT_VALUE));
-    
+
     return (timeout >= TIMEOUT_VALUE);
 }
 
@@ -277,7 +277,7 @@ void rmt_tuner_rds_data(unsigned int len, const unsigned char *buf)
         rds_push_info(RDS_INFO_RT, (uintptr_t)(buf+4), len-4);
     }
 }
-    
+
 /* tuner abstraction layer: set something to the tuner */
 int ipod_rmt_tuner_set(int setting, int value)
 {
@@ -327,7 +327,7 @@ int ipod_rmt_tuner_set(int setting, int value)
                 /* scan up */
                 else
                     rmt_tuner_scan(1);
-                    
+
                 sleep(HZ/10);
                 if (reply_timeout())
                 {
@@ -337,7 +337,7 @@ int ipod_rmt_tuner_set(int setting, int value)
                         return 0;
                 }
                 radio_tuned = false;
-            }    
+            }
 
             if (tuner_frequency == value)
             {

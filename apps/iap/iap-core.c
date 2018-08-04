@@ -164,7 +164,9 @@ unsigned char lingo_versions[32][2] = {
     {1, 5},     /* Display remote lingo, 0x03 */
     {1, 12},    /* Extended Interface lingo, 0x04 */
     {1, 1},     /* RF/BT Transmitter lingo, 0x05 */
-    {}          /* All others are unsupported */
+    {0, 0},     /* USB Host lingo, 0x06, disabled */
+    {1, 0},     /* RF Receiver lingo, 0x07 */
+    {}          /* every other lingo, disabled */
 };
 
 /* states of the iap de-framing state machine */
@@ -307,6 +309,17 @@ static int iap_task(struct timeout *tmo)
     queue_post(&iap_queue, IAP_EV_TICK, 0);
     return MS_TO_TICKS(100);
 }
+
+
+void iap_set_remote_volume(void)
+{
+    IAP_TX_INIT(0x03, 0x0D);
+    IAP_TX_PUT(0x04);
+    IAP_TX_PUT(0x00);
+    IAP_TX_PUT(0xFF &((global_settings.volume+58) * 4));
+    iap_send_tx();
+}
+
 
 /* This thread is waiting for events posted to iap_queue and calls
  * the appropriate subroutines in response
@@ -1212,43 +1225,6 @@ static void iap_handlepkt_mode5(const unsigned int len, const unsigned char *buf
     }
 }
 
-#if 0
-static void iap_handlepkt_mode7(const unsigned int len, const unsigned char *buf)
-{
-    unsigned int cmd = buf[1];
-    switch (cmd)
-    {
-        /* RetTunerCaps */
-        case 0x02:
-        {
-            /* do nothing */
-
-            /* GetAccessoryInfo */
-            unsigned char data[] = {0x00, 0x27, 0x00};
-            iap_send_pkt(data, sizeof(data));
-            break;
-        }
-
-        /* RetTunerFreq */
-        case 0x0A:
-            /* fall through */
-        /* TunerSeekDone */
-        case 0x13:
-        {
-            rmt_tuner_freq(len, buf);
-            break;
-        }
-
-        /* RdsReadyNotify, RDS station name 0x21 1E 00 + ASCII text*/
-        case 0x21:
-        {
-            rmt_tuner_rds_data(len, buf);
-            break;
-        }
-    }
-}
-#endif
-
 void iap_handlepkt(void)
 {
     int level;
@@ -1271,17 +1247,19 @@ void iap_handlepkt(void)
     logf("R: %s", hexstring(iap_rxstart+2, (length)));
 #endif
 
-    unsigned char mode = *(iap_rxstart+2);
-    switch (mode) {
-    case 0: iap_handlepkt_mode0(length, iap_rxstart+2); break;
+    if (length != 0) {
+        unsigned char mode = *(iap_rxstart+2);
+        switch (mode) {
+        case 0: iap_handlepkt_mode0(length, iap_rxstart+2); break;
 #ifdef HAVE_LINE_REC
-    case 1: iap_handlepkt_mode1(length, iap_rxstart+2); break;
+        case 1: iap_handlepkt_mode1(length, iap_rxstart+2); break;
 #endif
-    case 2: iap_handlepkt_mode2(length, iap_rxstart+2); break;
-    case 3: iap_handlepkt_mode3(length, iap_rxstart+2); break;
-    case 4: iap_handlepkt_mode4(length, iap_rxstart+2); break;
-    case 5: iap_handlepkt_mode5(length, iap_rxstart+2); break;
-    /* case 7: iap_handlepkt_mode7(length, iap_rxstart+2); break; */
+        case 2: iap_handlepkt_mode2(length, iap_rxstart+2); break;
+        case 3: iap_handlepkt_mode3(length, iap_rxstart+2); break;
+        case 4: iap_handlepkt_mode4(length, iap_rxstart+2); break;
+        case 5: iap_handlepkt_mode5(length, iap_rxstart+2); break;
+        case 7: iap_handlepkt_mode7(length, iap_rxstart+2); break;
+        }
     }
 
     /* Remove the handled packet from the RX buffer

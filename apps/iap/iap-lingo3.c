@@ -1499,9 +1499,8 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
         {
 #ifdef LOGF_ENABLE
             logf("iap: Unsupported Mode03 Command");
-#else
-            cmd_ack(cmd, IAP_ACK_BAD_PARAM);
 #endif
+            cmd_ack(cmd, IAP_ACK_BAD_PARAM);
             break;
         }
     }
