@@ -231,7 +231,7 @@ bool logfdump(void)
 
     logfenabled = false;
 
-    fd = open(ROCKBOX_DIR "/logf.txt", O_CREAT|O_WRONLY|O_TRUNC, 0666);
+    fd = open(ROCKBOX_DIR "/logf.202006302108.txt", O_CREAT|O_WRONLY|O_TRUNC, 0666);
     if(-1 != fd) {
         int i;
 
