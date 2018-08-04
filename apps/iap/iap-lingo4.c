@@ -109,9 +109,8 @@ static void seek_to_playlist(unsigned long index)
                     ft_play_playlist(selected_playlist,
                                      global_settings.playlist_catalog_dir,
                                      strrchr(selected_playlist, '/') + 1);
-
 }
- 
+
 static unsigned long nbr_total_playlists(void)
 {
     DIR* dp;
@@ -161,7 +160,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
     switch (cmd)
     {
         case 0x0001: /* CmdAck. See above cmd_ack() */
-            /* 
+            /*
              * The following is the description for the Apple Firmware
              * The iPod sends this telegram to acknowledge the receipt of a
              * command and return the command status. The command ID field
@@ -1457,7 +1456,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                     case 0x05: /* Tracks   */
                     case 0x02: /* Artists  */
                     case 0x03: /* Albums   */
-                    case 0x04: /* Genre    */ 
+                    case 0x04: /* Genre    */
                     case 0x06: /* Composer */
                         playlist_get_track_info(NULL, start_index + counter,
                                                 &track);
@@ -2019,8 +2018,8 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                 playlist_randomise(NULL, current_tick, true);
             }
             else
-	          {
-	              playlist_sort(NULL, true);
+            {
+                playlist_sort(NULL, true);
             }
             audio_skip(index - playlist_next(0));
             if (!paused)

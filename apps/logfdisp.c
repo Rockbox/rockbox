@@ -41,18 +41,18 @@ int compute_nb_lines(int w, struct font* font)
 {
     int i, nb_lines;
     int cur_x, delta_x;
-    
+
     if(logfindex == 0 && !logfwrap)
         return 0;
-        
+
     if(logfwrap)
         i = logfindex;
     else
         i = 0;
-    
+
     cur_x = 0;
     nb_lines = 0;
-        
+
     do {
         if(logfbuffer[i] == '\0')
         {
@@ -63,13 +63,13 @@ int compute_nb_lines(int w, struct font* font)
         {
             /* does character fit on this line ? */
             delta_x = font_get_width(font, logfbuffer[i]);
-            
+
             if(cur_x + delta_x > w)
             {
                 cur_x = 0;
                 nb_lines++;
             }
-            
+
             /* update pointer */
             cur_x += delta_x;
         }
@@ -78,7 +78,7 @@ int compute_nb_lines(int w, struct font* font)
         if(i >= MAX_LOGF_SIZE)
             i = 0;
     } while(i != logfindex);
-    
+
     return nb_lines;
 }
 
@@ -91,13 +91,13 @@ bool logfdisplay(void)
     struct font* font;
     int user_index;/* user_index will be number of the first line to display (warning: line!=logf entry) */
     char buf[2];
-    
+
     fontnr = lcd_getfont();
     font = font_get(fontnr);
-    
+
     /* get the horizontal size of each line */
     font_getstringsize("A", NULL, &delta_y, fontnr);
-    
+
     buf[1] = '\0';
     w = LCD_WIDTH;
     h = LCD_HEIGHT;
@@ -106,23 +106,23 @@ bool logfdisplay(void)
 
     do {
         lcd_clear_display();
-        
+
         if(user_index < 0)
             user_index = 0;
-        
+
         if(logfwrap)
             i = logfindex;
         else
             i = 0;
-        
+
         index = 0;
         cur_x = 0;
         cur_y = 0;
-        
+
         /* nothing to print ? */
         if(logfindex == 0 && !logfwrap)
             goto end_print;
-        
+
         do {
             if(logfbuffer[i] == '\0')
             {
@@ -136,7 +136,7 @@ bool logfdisplay(void)
             {
                 /* does character fit on this line ? */
                 delta_x = font_get_width(font, logfbuffer[i]);
-                
+
                 if(cur_x + delta_x > w)
                 {
                     /* should be display a newline ? */
@@ -145,30 +145,30 @@ bool logfdisplay(void)
                     cur_x = 0;
                     index++;
                 }
-                
+
                 /* should we print character ? */
                 if(index >= user_index)
                 {
                     buf[0] = logfbuffer[i];
                     lcd_putsxy(cur_x, cur_y, buf);
                 }
-                
+
                 /* update pointer */
                 cur_x += delta_x;
             }
-            
+
             /* did we fill the screen ? */
             if(cur_y > h)
                 break;
-            
+
             i++;
             if(i >= MAX_LOGF_SIZE)
                 i = 0;
         } while(i != logfindex);
-        
+
         end_print:
         lcd_update();
-        
+
         action = get_action(CONTEXT_STD, HZ);
         switch( action )
         {
@@ -188,16 +188,16 @@ bool logfdisplay(void)
             {
                 short x, y;
                 static int prev_y;
-                
+
                 action = action_get_touchscreen_press(&x, &y);
-                
+
                 if(action & BUTTON_REL)
                     prev_y = 0;
                 else
                 {
                     if(prev_y != 0)
                         user_index += (prev_y - y) / delta_y;
-                    
+
                     prev_y = y;
                 }
             }
