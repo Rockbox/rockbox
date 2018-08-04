@@ -212,6 +212,7 @@ void iap_handlepkt_mode1(const unsigned int len, const unsigned char *buf)
 #ifdef LOGF_ENABLE
             logf("iap: Unsupported Mode1 Command");
 #endif
+            cmd_ack(cmd, IAP_ACK_BAD_PARAM);
             break;
         }
     }

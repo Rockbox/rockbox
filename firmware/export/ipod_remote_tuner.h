@@ -30,6 +30,8 @@ extern int radio_present;
 
 extern void rmt_tuner_freq(unsigned int len, const unsigned char *buf);
 extern void rmt_tuner_rds_data(unsigned int len, const unsigned char *buf);
+extern void rmt_tuner_sleep(int value);
+extern void rmt_tuner_mute(int value);
 
 int ipod_rmt_tuner_set(int setting, int value);
 int ipod_rmt_tuner_get(int setting);
