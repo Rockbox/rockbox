@@ -34,6 +34,7 @@
 
 /* The Model ID of the iPod we emulate. Currently a 160GB classic */
 #define IAP_IPOD_MODEL (0x00130200U)
+#define IAP_IPOD_VARIANT "MC293"
 
 /* The firmware version we emulate. Currently 2.0.3 */
 #define IAP_IPOD_FIRMWARE_MAJOR (2)
@@ -73,14 +74,15 @@ enum interface_state {
 
 /* States of the authentication state machine */
 enum authen_state {
-    AUST_NONE,      /* Initial state, no message sent */
-    AUST_INIT,      /* Remote side has requested authentication */
-    AUST_CERTREQ,   /* Remote certificate requested */
-    AUST_CERTBEG,   /* Certificate is being received */
-    AUST_CERTDONE,  /* Certificate received */
-    AUST_CHASENT,   /* Challenge sent */
-    AUST_CHADONE,   /* Challenge response received */
-    AUST_AUTH,      /* Authentication complete */
+    AUST_NONE,            /* Initial state, no message sent */
+    AUST_INIT,            /* Remote side has requested authentication */
+    AUST_CERTREQ,         /* Remote certificate requested */
+    AUST_CERTBEG,         /* Certificate is being received */
+    AUST_CERTALLRECEIVED, /* Certificate all Received  */
+    AUST_CERTDONE,        /* Certificate all Done */
+    AUST_CHASENT,         /* Challenge sent */
+    AUST_CHADONE,         /* Challenge response received */
+    AUST_AUTH,            /* Authentication complete */
 };
 
 /* State of authentication */
@@ -237,6 +239,7 @@ void iap_repeat_next(void);
 void iap_fill_power_state(void);
 
 void iap_send_tx(void);
+void iap_set_remote_volume(void);
 
 extern enum interface_state interface_state;
 void iap_interface_state_change(const enum interface_state new);

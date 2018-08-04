@@ -21,6 +21,10 @@
 #include "iap-lingo.h"
 #include "kernel.h"
 #include "system.h"
+#include "tuner.h"
+#if CONFIG_TUNER
+#include "ipod_remote_tuner.h"
+#endif
 
 /*
  * This macro is meant to be used inside an IAP mode message handler.
@@ -45,10 +49,13 @@
 
 static void cmd_ack(const unsigned char cmd, const unsigned char status)
 {
-    IAP_TX_INIT(0x00, 0x02);
-    IAP_TX_PUT(status);
-    IAP_TX_PUT(cmd);
-    iap_send_tx();
+    if (cmd  != 0){
+        IAP_TX_INIT(0x00, 0x02);
+        IAP_TX_PUT(status);
+        IAP_TX_PUT(cmd);
+
+        iap_send_tx();
+    }
 }
 
 #define cmd_ok(cmd) cmd_ack((cmd), IAP_ACK_OK)
@@ -59,6 +66,7 @@ static void cmd_pending(const unsigned char cmd, const uint32_t msdelay)
     IAP_TX_PUT(0x06);
     IAP_TX_PUT(cmd);
     IAP_TX_PUT_U32(msdelay);
+
     iap_send_tx();
 }
 
@@ -387,7 +395,7 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
         {
             IAP_TX_INIT(0x00, 0x0E);
             IAP_TX_PUT_U32(IAP_IPOD_MODEL);
-            IAP_TX_PUT_STRING("ROCKBOX");
+            IAP_TX_PUT_STRING(IAP_IPOD_VARIANT);
 
             iap_send_tx();
             break;
@@ -476,6 +484,59 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
             /* Issuing this command exits any extended interface states */
             iap_interface_state_change(IST_STANDARD);
 
+            /*
+             * Actions by remote listed            Apple Firmware   Rockbox Firmware
+             * Apple remote on Radio pause/play  - Mutes            Mutes
+             *                       vol up/down - Vol Up/Dn        Vol Up/Dn
+             *                       FF/FR       - Station Up/Dn    Station Up/Dn
+             *                  iPod Pause/Play  - Mutes            Mutes
+             *                       Vol up/down - Vol Up/Dn        Vol Up/Dn
+             *                       FF/FR       - Station Up/Dn    Station Up/Dn
+             *                 Remote pause/play - Pause/Play       Pause/Play
+             *                       vol up/down - Vol Up/Dn        Vol Up/Dn
+             *                       FF/FR       - Next/Prev Track  Next/Prev Track
+             *                  iPod Pause/Play  - Pause/Play       Pause/Play
+             *                       Vol up/down - Vol Up/Dn        Vol Up/Dn
+             *                       FF/FR       - Next/Prev Track  Next/Prev Track
+             *
+             * The following bytes are returned by the accessories listed
+             * FF 55 0E 00 13 00 00 00 3D 00 00 00 04 00 00 00 00 9E robi DAB Radio Remote
+             * FF 55 0E 00 13 00 00 00 35 00 00 00 04 00 00 00 00 A6 (??) FM Transmitter
+             * FF 55 0E 00 13 00 00 00 8D 00 00 00 0E 00 00 00 03 41 Apple Radio Remote
+             *
+             * Bytes 9-12 = Options         11111100 0000 00 00
+             *                              54321098 7654 32 10
+             * 00000004 = 00000000 00000000 00000000 0000 01 00 Bits 2
+             * 00000004 = 00000000 00000000 00000000 0000 01 00 Bits 2
+             * 0000000E = 00000000 00000000 00000000 0000 01 10 Bits 12
+             *
+             * Bit 0: Authentication 00 = No Authentication 
+	     *                       01 = Defer Auth until required (V1)
+             * Bit 1:                10 = Authenticate Immediately (V2) 
+	     *                       11 = Reserved
+             * Bit 2: Power Requirements 00 = Low Power Only 10 = Reserved
+             * Bit 3:                    01 = Int High Power 11 = Reserved
+             *
+             * Bytes 13-16 = Device ID
+             * 00000000
+             * 00000000
+             * 00000003
+             *
+             * Bytes 5-8 = lingoes spoken   11111100 00000000
+             *                              54321098 76543210
+             * 0000003D = 00000000 00000000 00000000 00111101 Bits 2345
+             * 00000035 = 00000000 00000000 00000000 00110101 Bits 245
+             * 0000008D = 00000000 00000000 00000000 10001101 Bits 237
+             *
+             *
+             * Bit 0: Must be set by all devices. See above
+             * Bit 1: Microphone Lingo
+             * Bit 2: Simple Remote
+             * Bit 3: Display Remote
+             * Bit 4: Extended Remote
+             * Bit 5: RF Transmitter lingo
+             */
+
             /* Loop through the lingoes advertised by the device.
              * If it tries to use a lingo we do not support, return
              * a Command Failed ACK.
@@ -531,33 +592,49 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
 
             cmd_ok(cmd);
 
+            /* Bit 0: Must be set by all devices. See above*/
+            /* Bit 1: Microphone Lingo */
+            /* Bit 2: Simple Remote */
+            /* Bit 3: Display Remote */
+            /* Bit 4: Extended Remote */
             /* Bit 5: RF Transmitter lingo */
             if (lingoes & (1 << 5))
             {
                 /* FM transmitter sends this: */
                 /* FF 55 0E 00 13 00 00 00 35 00 00 00 04 00 00 00 00 A6 (??)*/
-
+                /* 0x00000035 = 00000000 00000000 00000000 00110101 */
+                /* 1<<5                                      1      */
                 /* GetAccessoryInfo */
-                unsigned char data2[] = {0x00, 0x27, 0x00};
-                iap_send_pkt(data2, sizeof(data2));
+                IAP_TX_INIT(0x00, 0x27);
+                IAP_TX_PUT(0x00);
+
+                iap_send_tx();
+
                 /* RF Transmitter: Begin transmission */
-                unsigned char data3[] = {0x05, 0x02};
-                iap_send_pkt(data3, sizeof(data3));
+                IAP_TX_INIT(0x05, 0x02);
+
+                iap_send_tx();
             }
-
-
-#if 0
+            /* Bit 6: USB Host Control */
             /* Bit 7: RF Tuner lingo */
+#if CONFIG_TUNER
             if (lingoes & (1 << 7))
             {
-                /* ipod fm remote sends this: */
-                /* FF 55 0E 00 13 00 00 00 8D 00 00 00 0E 00 00 00 03 41 */
+                /* ipod fm radio remote sends this: */
+                /* FF 55 0E 00 13 00 00 00 8D 00 00 00 0E 00 00 00 03 */
+                /* 0x0000008D = 00000000 00000000 00000000 00011101   */
+                /* 1<<7                                               */
                 radio_present = 1;
-                /* GetDevAuthenticationInfo */
-                unsigned char data4[] = {0x00, 0x14};
-                iap_send_pkt(data4, sizeof(data4));
             }
 #endif
+            /* Bit 8: Accessory Equalizer Lingo */
+            /* Bit 9: Reserved */
+            /* Bit 10: Digial Audio Lingo */
+            /* Bit 11: Reserved */
+            /* Bit 12: Storage Lingo */
+            /* Bit 13: Reserved */
+            /* .................*/
+            /* Bit 31: Reserved */
             break;
         }
 
@@ -594,7 +671,8 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
         {
             /* There are two formats of this packet. One with only
              * the version information bytes (for Auth version 1.0)
-             * and the long form shown above
+             * and the long form shown above but it must be at least 4
+             * bytes long
              */
             CHECKLEN(4);
 
@@ -605,25 +683,8 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
 
             device.auth.version = (buf[2] << 8) | buf[3];
 
-            /* We support authentication versions 1.0 and 2.0 */
-            if (device.auth.version == 0x100) {
-                /* If we could really do authentication we'd have to
-                 * check the certificate here. Since we can't, just acknowledge
-                 * the packet with an "everything OK" AckDevAuthenticationInfo
-                 *
-                 * Skip GetAccessoryInfo process, this command together with
-                 * authentication level 2 were added in iAP release 24, it is
-                 * not be supported by devices authenticating at level 1.
-                 */
-                IAP_TX_INIT(0x00, 0x16);
-                IAP_TX_PUT(0x00);
-
-                iap_send_tx();
-                device.auth.state = AUST_CERTDONE;
-                break;
-            }
-
-            if (device.auth.version != 0x200) {
+            /* We only support authentication versions 1.0 and 2.0 */
+            if ((device.auth.version != 0x100) && (device.auth.version != 0x200)) {
                 /* Version mismatches are signalled by AckDevAuthenticationInfo
                  * with the status set to Authentication Information unsupported
                  */
@@ -635,61 +696,77 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
                 iap_send_tx();
                 break;
             }
-
-            /* There must be at least one byte of certificate data
-             * in the packet
-             */
-            CHECKLEN(7);
-
-            switch (device.auth.state)
-            {
-                /* This is the first packet. Note the maximum section number
-                 * so we can check it later.
+            if (device.auth.version == 0x100) {
+                /* If we could really do authentication we'd have to
+                 * check the certificate here. Since we can't, just acknowledge
+                 * the packet later with an "everything OK" AckDevAuthenticationInfo
+                 * and change device.auth.state to AuthenticateState_CertificateDone
                  */
-                case AUST_CERTREQ:
+                device.auth.state = AUST_CERTALLRECEIVED;
+            } else {
+                /* Version 2.00 requires at least one byte of certificate data
+                 * in the packet
+                 */
+                CHECKLEN(7);
+                switch (device.auth.state)
                 {
-                    device.auth.max_section = buf[5];
-                    device.auth.state = AUST_CERTBEG;
+                    /* This is the first packet. Note the maximum section number
+                     * so we can check it later.
+                     */
+                    case AUST_CERTREQ:
+                    {
+                        device.auth.max_section = buf[5];
+                        device.auth.state = AUST_CERTBEG;
 
-                    /* Intentional fall-through */
-                }
-                /* All following packets */
-                case AUST_CERTBEG:
-                {
-                    /* Check if this is the expected section */
-                    if (buf[4] != device.auth.next_section) {
+                        /* Intentional fall-through */
+                    }
+                    /* All following packets */
+                    case AUST_CERTBEG:
+                    {
+                        /* Check if this is the expected section */
+                        if (buf[4] != device.auth.next_section) {
+                            cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+                            break;
+                        }
+
+                        /* Is this the last section? */
+                        if (device.auth.next_section == device.auth.max_section) {
+                            /* If we could really do authentication we'd have to
+                             * check the certificate here. Since we can't, just acknowledge
+                             * the packet later with an "everything OK" AckDevAuthenticationInfo
+                             * and change device.auth.state to AuthenticateState_CertificateDone
+                             */
+                            device.auth.state = AUST_CERTALLRECEIVED;
+                        } else {
+                            device.auth.next_section++;
+                            cmd_ok(cmd);
+                        }
+                        break;
+                    }
+                    default:
+                    {
                         cmd_ack(cmd, IAP_ACK_BAD_PARAM);
                         break;
                     }
-
-                    /* Is this the last section? */
-                    if (device.auth.next_section == device.auth.max_section) {
-                        /* If we could really do authentication we'd have to
-                         * check the certificate here. Since we can't, just acknowledge
-                         * the packet with an "everything OK" AckDevAuthenticationInfo
-                         *
-                         * Also, start GetAccessoryInfo process
-                         */
-                        IAP_TX_INIT(0x00, 0x16);
-                        IAP_TX_PUT(0x00);
-
-                        iap_send_tx();
-                        device.auth.state = AUST_CERTDONE;
-                        device.accinfo = ACCST_INIT;
-                    } else {
-                        device.auth.next_section++;
-                        cmd_ok(cmd);
-                    }
-                    break;
-                }
-
-                default:
-                {
-                    cmd_ack(cmd, IAP_ACK_BAD_PARAM);
-                    break;
                 }
             }
+            if (device.auth.state == AUST_CERTALLRECEIVED) {
+                /* We've received all the certificate data so just
+                 *Acknowledge everything OK
+                 */
+                IAP_TX_INIT(0x00, 0x16);
+                IAP_TX_PUT(0x00);
 
+                iap_send_tx();
+
+                /* GetAccessoryInfo*/
+                IAP_TX_INIT(0x00, 0x27);
+                IAP_TX_PUT(0x00);
+
+                iap_send_tx();
+
+                device.auth.state = AUST_CERTDONE;
+            }
             break;
         }
 
@@ -744,6 +821,17 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
 
             iap_send_tx();
             device.auth.state = AUST_AUTH;
+#if CONFIG_TUNER
+            if (radio_present == 1)
+            {
+                /* GetTunerCaps */
+                IAP_TX_INIT(0x07, 0x01);
+
+                iap_send_tx();
+            }
+#endif
+            iap_set_remote_volume();
+
             break;
         }
 
@@ -926,7 +1014,9 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
                     CHECKLEN(7);
 
                     device.capabilities = get_u32(&buf[0x03]);
-                    /* Type 0x00 was already queried, that's where this information comes from */
+                    /* Type 0x00 was already queried, that's where this 
+		     * information comes from 
+		     */
                     device.capabilities_queried = 0x01;
                     device.capabilities &= ~0x01;
                     break;
@@ -1045,9 +1135,8 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
         {
 #ifdef LOGF_ENABLE
             logf("iap: Unsupported Mode00 Command");
-#else
-            cmd_ack(cmd, IAP_ACK_BAD_PARAM);
 #endif
+            cmd_ack(cmd, IAP_ACK_BAD_PARAM);
             break;
         }
     }

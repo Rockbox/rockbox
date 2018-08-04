@@ -30,6 +30,10 @@
 #include "button.h"
 #include "audio.h"
 #include "settings.h"
+#include "tuner.h"
+#if CONFIG_TUNER
+#include "ipod_remote_tuner.h"
+#endif
 
 /*
  * This macro is meant to be used inside an IAP mode message handler.
@@ -57,6 +61,9 @@ static void cmd_ack(const unsigned char cmd, const unsigned char status)
 void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
 {
     static bool poweron_pressed = false;
+#if CONFIG_TUNER
+    static bool remote_mute = false;
+#endif
     unsigned int cmd = buf[1];
 
     /* We expect at least three bytes in the buffer, one for the
@@ -95,7 +102,21 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
             if(buf[2] != 0)
             {
                 if(buf[2] & 1)
+                {
                     REMOTE_BUTTON(BUTTON_RC_PLAY);
+#if CONFIG_TUNER
+                    if (radio_present == 1) {
+                        if (remote_mute == 0) {
+                            /* Not Muted so  radio on*/
+                            tuner_set(RADIO_MUTE,0);
+                        } else {
+                            /* Muted so  radio off*/
+                            tuner_set(RADIO_MUTE,1);
+                        }
+                        remote_mute = !remote_mute;
+                    }
+#endif
+                }
                 if(buf[2] & 2)
                     REMOTE_BUTTON(BUTTON_RC_VOL_UP);
                 if(buf[2] & 4)
@@ -111,11 +132,21 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
                 {
                     if (audio_status() != AUDIO_STATUS_PLAY)
                         REMOTE_BUTTON(BUTTON_RC_PLAY);
+#if CONFIG_TUNER
+                    if (radio_present == 1) {
+                        tuner_set(RADIO_MUTE,0);
+                    }
+#endif
                 }
                 if(buf[3] & 2) /* pause */
                 {
                     if (audio_status() == AUDIO_STATUS_PLAY)
                         REMOTE_BUTTON(BUTTON_RC_PLAY);
+#if CONFIG_TUNER
+                    if (radio_present == 1) {
+                        tuner_set(RADIO_MUTE,1);
+                    }
+#endif
                 }
                 if(buf[3] & 128) /* Shuffle */
                 {
@@ -295,9 +326,8 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
         {
 #ifdef LOGF_ENABLE
             logf("iap: Unsupported Mode02 Command");
-#else
-            cmd_ack(cmd, IAP_ACK_BAD_PARAM);
 #endif
+            cmd_ack(cmd, IAP_ACK_BAD_PARAM);
             break;
         }
     }

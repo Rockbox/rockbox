@@ -69,7 +69,7 @@ static void rmt_tuner_set_freq(int curr_freq)
         rds_reset();
         /* ex: 00 01 63 14 = 90.9MHz */
         unsigned char data[] = {0x07, 0x0B, 0x00, 0x01, 0x63, 0x14};
-        
+
         if (curr_freq != 0)
         {
             unsigned int khz = curr_freq / 1000;
@@ -93,20 +93,23 @@ static void rmt_tuner_sleep(int state)
         old_region = -1;
         tuner_frequency = 0;
         radio_tuned = false;
-        
+
         /* tuner HW on */
         const unsigned char data[] = {0x07, 0x05, 0x01};
         iap_send_pkt(data, sizeof(data));
+        /* set rds on */
+        const unsigned char data3[] = {0x07, 0x20, 0x40, 0x00, 0x00, 0x10 };
+        iap_send_pkt(data3, sizeof(data3));
         /* boost gain */
         const unsigned char data1[] = {0x07, 0x24, 0x06 };
         iap_send_pkt(data1, sizeof(data1));
+        /* tuner mode */
+        const unsigned char data4[] = {0x07, 0x0E, 0x00 };
+        iap_send_pkt(data4, sizeof(data3));
         /* set volume */
         unsigned char data2[] = {0x03, 0x09, 0x04, 0x00, 0x00 };
         data2[4] = (char)((global_settings.volume+58) * 4);
         iap_send_pkt(data2, sizeof(data2));
-        /* set rds on */
-        const unsigned char data3[] = {0x07, 0x20, 0x40, 0x00, 0x00, 0x10 };
-        iap_send_pkt(data3, sizeof(data3));
     }
     else
     {
@@ -115,14 +118,14 @@ static void rmt_tuner_sleep(int state)
         iap_send_pkt(data, sizeof(data));
         /* set rds off */
         const unsigned char data1[] = {0x07, 0x20, 0x00, 0x00, 0x00, 0x00 };
-        iap_send_pkt(data1, sizeof(data1)); 
+        iap_send_pkt(data1, sizeof(data1));
         /* stop tuner HW */
         const unsigned char data2[] = {0x07, 0x05, 0x00};
         iap_send_pkt(data2, sizeof(data2));
     }
 }
 
-static void rmt_tuner_scan(int param)
+void rmt_tuner_scan(int param)
 {
     const unsigned char data[] = {0x07, 0x11, 0x08};  /* RSSI level */
     unsigned char updown = 0x00;
@@ -148,13 +151,23 @@ static void rmt_tuner_scan(int param)
 static void rmt_tuner_mute(int value)
 {
     /* mute flag off (play) */
-    unsigned char data[] = {0x03, 0x09, 0x03, 0x01};
+    /* The Apple Tuner does NOT appear to support muting. The Apple
+     * firmware turns the power off when pressing pause on the iPod
+     * or on the Tuner Remote.
+     */
     if (value)
     {
         /* mute flag on (pause) */
-        data[3] = 0x02;
+        unsigned char data[] = {0x03, 0x09, 0x03, 0x02};
+        iap_send_pkt(data, sizeof(data));
+        rmt_tuner_sleep(1);
     }
-    iap_send_pkt(data, sizeof(data));
+    else
+    {
+        unsigned char data[] = {0x03, 0x09, 0x03, 0x01};
+        iap_send_pkt(data, sizeof(data));
+        rmt_tuner_sleep(0);
+    }
 }
 
 static void rmt_tuner_region(int region)
@@ -163,13 +176,20 @@ static void rmt_tuner_region(int region)
     {
         const struct fm_region_data *rd = &fm_region_data[region];
         unsigned char data[] = {0x07, 0x08, 0x00};
+                /* Apple MFi Accessory Firmware Spec R46 now lists
+                 * the following bands
+                 * ID00 AM 520-1710Khz      Not Supported
+                 * ID02 Japan 76-90Mkz 100Khz 50/75uS
+                 * ID01 87.5-108Mhz US 200Khz 75uS, EU 100Kz 50uS
+                 * ID03 76-108Mhz Wideband. Not Supported
+         */
         if (rd->freq_min == 76000000)
         {
             data[2] = 0x02; /* japan band */
         }
         else
         {
-            data[2] = 0x01; /* us eur band */
+            data[2] = 0x01; /* us/europe band */
         }
         iap_send_pkt(data, sizeof(data));
         sleep(HZ/100);
@@ -225,11 +245,13 @@ static void set_deemphasis(int deemphasis)
         case 1:
         {
             tuner_param |= 0x40;
+            /* 50uS */
             break;
         }
         default:
         {
             tuner_param |= 0x00;
+            /* 75uS */
             break;
         }
     }
@@ -253,16 +275,15 @@ static void set_mono(int value)
 static bool reply_timeout(void)
 {
     int timeout = 0;
-    
+
     sleep(HZ/50);
     do
     {
-        iap_handlepkt();
         sleep(HZ/50);
         timeout++;
     }
     while((ipod_rmt_tuner_get(RADIO_TUNED) == 0) && (timeout < TIMEOUT_VALUE));
-    
+
     return (timeout >= TIMEOUT_VALUE);
 }
 
@@ -277,7 +298,7 @@ void rmt_tuner_rds_data(unsigned int len, const unsigned char *buf)
         rds_push_info(RDS_INFO_RT, (uintptr_t)(buf+4), len-4);
     }
 }
-    
+
 /* tuner abstraction layer: set something to the tuner */
 int ipod_rmt_tuner_set(int setting, int value)
 {
@@ -327,7 +348,7 @@ int ipod_rmt_tuner_set(int setting, int value)
                 /* scan up */
                 else
                     rmt_tuner_scan(1);
-                    
+
                 sleep(HZ/10);
                 if (reply_timeout())
                 {
@@ -337,7 +358,7 @@ int ipod_rmt_tuner_set(int setting, int value)
                         return 0;
                 }
                 radio_tuned = false;
-            }    
+            }
 
             if (tuner_frequency == value)
             {
@@ -360,6 +381,27 @@ int ipod_rmt_tuner_set(int setting, int value)
 
         case RADIO_REGION:
         {
+            /* The latest MFi Accessory Firmware Document I have lists the
+             * following regions
+             * US 87.5-108Mhz 200Khz 75uS
+             * US/EU 87.5-108Mhz 100Khz 75/50uS
+             * JP 76.0-90Mhz 100Mhz 50/75uS
+             *
+             * with the following bands
+             * 0x00 AM WordlWide 520-1710Khz
+             * 0x01 FM EU 87.5-108.0Mhz
+             * 0x02 FM JP 76.0-90.0Mhz
+             * 0x03 FM Wide 76.0-108.0Mhz
+             *
+             *
+             * A 7G Classic with the latest Apple Firmware returns the following
+                         * regions with the settings listed
+             * Americas   87.5-108 200Khz 75uS
+             * Asia       87.5-108 100Khz 75uS
+             * Australia  87.5-108 200Khz 75uS
+             * Europe     87.5-108 100Khz 75uS
+             * Japan      76.0-90. 100Kz  75uS
+             */
             const struct fm_region_data *rd = &fm_region_data[value];
             int band = (rd->freq_min == 76000000) ? 2 : 0;
             int spacing = (100000 / rd->freq_step);

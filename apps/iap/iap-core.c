@@ -45,7 +45,9 @@
 #include "usb.h"
 
 #include "tuner.h"
+#if CONFIG_TUNER
 #include "ipod_remote_tuner.h"
+#endif
 
 
 /* MS_TO_TICKS converts a milisecond time period into the
@@ -164,7 +166,13 @@ unsigned char lingo_versions[32][2] = {
     {1, 5},     /* Display remote lingo, 0x03 */
     {1, 12},    /* Extended Interface lingo, 0x04 */
     {1, 1},     /* RF/BT Transmitter lingo, 0x05 */
-    {}          /* All others are unsupported */
+    {0, 0},     /* USB Host lingo, 0x06, disabled */
+#if CONFIG_TUNER
+    {1, 0},     /* RF Receiver lingo, 0x07 */
+#else
+    {0, 0},     /* RF Receiver lingo, 0x07 disabled */
+#endif
+    {}          /* every other lingo, disabled */
 };
 
 /* states of the iap de-framing state machine */
@@ -307,6 +315,17 @@ static int iap_task(struct timeout *tmo)
     queue_post(&iap_queue, IAP_EV_TICK, 0);
     return MS_TO_TICKS(100);
 }
+
+
+void iap_set_remote_volume(void)
+{
+    IAP_TX_INIT(0x03, 0x0D);
+    IAP_TX_PUT(0x04);
+    IAP_TX_PUT(0x00);
+    IAP_TX_PUT(0xFF & (int)((global_settings.volume + 90) * 2.65625));
+    iap_send_tx();
+}
+
 
 /* This thread is waiting for events posted to iap_queue and calls
  * the appropriate subroutines in response
@@ -859,11 +878,15 @@ void iap_periodic(void)
 
     /* Volume change notifications are sent every 100ms */
     if (device.notifications & (BIT_N(4) | BIT_N(16))) {
-        /* Currently we do not track volume changes, so this is
-         * never sent.
+        /* Currently we do not track volume changes for BIT_N(16),
          *
-         * TODO: Fix volume tracking
          */
+        IAP_TX_INIT(0x03, 0x09);
+        IAP_TX_PUT(0x04);
+        IAP_TX_PUT(0x00);
+        IAP_TX_PUT(0xFF &(int)((global_settings.volume + 90) * 2.65625));
+        device.changed_notifications |= BIT_N(4);
+        iap_send_tx();
     }
 
     /* All other events are sent every 500ms */
@@ -972,9 +995,15 @@ void iap_periodic(void)
         unsigned char play_status;
 
         play_status = audio_status();
-
         if (device.play_status != play_status)
         {
+			/* If play_status = PAUSE/STOP we should mute else
+			 * we should unmute 
+			 * 0 = Stopped
+			 * 1 = Playing
+			 * 2 = Pause
+			 * 3 = Play/Pause
+			 */
             IAP_TX_INIT(0x03, 0x09);
             IAP_TX_PUT(0x03);
             if (play_status & AUDIO_STATUS_PLAY) {
@@ -994,6 +1023,23 @@ void iap_periodic(void)
             iap_send_tx();
 
             device.play_status = play_status;
+			if (play_status != 1) {
+			/* Not Playing */
+			   audio_pause();
+#if CONFIG_TUNER
+               if (radio_present==1) {
+                  tuner_set(RADIO_MUTE,1);
+			   }
+#endif
+			} else {
+			/* Playing */
+			   audio_resume();
+#if CONFIG_TUNER
+			   if (radio_present==1) {
+                   tuner_set(RADIO_MUTE,0);
+               }
+#endif
+			}
         }
     }
 
@@ -1212,43 +1258,6 @@ static void iap_handlepkt_mode5(const unsigned int len, const unsigned char *buf
     }
 }
 
-#if 0
-static void iap_handlepkt_mode7(const unsigned int len, const unsigned char *buf)
-{
-    unsigned int cmd = buf[1];
-    switch (cmd)
-    {
-        /* RetTunerCaps */
-        case 0x02:
-        {
-            /* do nothing */
-
-            /* GetAccessoryInfo */
-            unsigned char data[] = {0x00, 0x27, 0x00};
-            iap_send_pkt(data, sizeof(data));
-            break;
-        }
-
-        /* RetTunerFreq */
-        case 0x0A:
-            /* fall through */
-        /* TunerSeekDone */
-        case 0x13:
-        {
-            rmt_tuner_freq(len, buf);
-            break;
-        }
-
-        /* RdsReadyNotify, RDS station name 0x21 1E 00 + ASCII text*/
-        case 0x21:
-        {
-            rmt_tuner_rds_data(len, buf);
-            break;
-        }
-    }
-}
-#endif
-
 void iap_handlepkt(void)
 {
     int level;
@@ -1271,17 +1280,21 @@ void iap_handlepkt(void)
     logf("R: %s", hexstring(iap_rxstart+2, (length)));
 #endif
 
-    unsigned char mode = *(iap_rxstart+2);
-    switch (mode) {
-    case 0: iap_handlepkt_mode0(length, iap_rxstart+2); break;
+    if (length != 0) {
+        unsigned char mode = *(iap_rxstart+2);
+        switch (mode) {
+        case 0: iap_handlepkt_mode0(length, iap_rxstart+2); break;
 #ifdef HAVE_LINE_REC
-    case 1: iap_handlepkt_mode1(length, iap_rxstart+2); break;
+        case 1: iap_handlepkt_mode1(length, iap_rxstart+2); break;
 #endif
-    case 2: iap_handlepkt_mode2(length, iap_rxstart+2); break;
-    case 3: iap_handlepkt_mode3(length, iap_rxstart+2); break;
-    case 4: iap_handlepkt_mode4(length, iap_rxstart+2); break;
-    case 5: iap_handlepkt_mode5(length, iap_rxstart+2); break;
-    /* case 7: iap_handlepkt_mode7(length, iap_rxstart+2); break; */
+        case 2: iap_handlepkt_mode2(length, iap_rxstart+2); break;
+        case 3: iap_handlepkt_mode3(length, iap_rxstart+2); break;
+        case 4: iap_handlepkt_mode4(length, iap_rxstart+2); break;
+        case 5: iap_handlepkt_mode5(length, iap_rxstart+2); break;
+#if CONFIG_TUNER
+        case 7: iap_handlepkt_mode7(length, iap_rxstart+2); break;
+#endif
+        }
     }
 
     /* Remove the handled packet from the RX buffer
