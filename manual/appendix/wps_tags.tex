@@ -75,7 +75,7 @@ show the information for the next song to be played.
     \opt{lcd_non-mono}{%
       \config{\%Vs(mode[,param])}
       & See section \ref{ref:Viewports}\\}
-     \config{\%Vl('identifier',\newline\dots)} & Preloads a viewport for later
+      \config{\%Vl('identifier',\tabnlindent\dots)} & Preloads a viewport for later
       display. `identifier' is a single lowercase letter (a-z) and the `\dots'
       parameters use the same logic as the \%V tag explained above.\\
 
@@ -100,7 +100,8 @@ show the information for the next song to be played.
 
 \section{Misc Coloring Tags}
   \begin{tagmap}
-    \config{\%dr(x,y,width,height,[color1,color2])} & Color a rectangle. \\
+      \config{\%dr(x,y,width,\tabnlindent height,[color1,\tabnlindent color2])}
+      & Color a rectangle. \\
   \end{tagmap}
     width and height can be ``$-$'' to fill the viewport. If no color is
     specified the viewports foreground color will be used. If two
@@ -197,7 +198,7 @@ or \config{\%D(2)}), produce the information for the next file to be played.
 
 \section{Playlist Viewer}
   \begin{tagmap}
-    \config{\%Vp(start,code to render)} & Display the playlist viewer in
+    \config{\%Vp(start,\tabnlindent code to render)} & Display the playlist viewer in
             the current viewport.\\
   \end{tagmap}
 
@@ -321,14 +322,18 @@ Examples:
 
 \section{Drawing the lists using a skin}
   \begin{tagmap}
-    \config{\%LT[(offset, nowrap)]} & Get the current items text, can be used in normal viewports to get the selected items text.\\
-    \config{\%LI[(offset, nowrap)]} & Get the current items icon number, can be used in normal viewports to get the selected items icon number.\\
+    \config{\%LT[(offset,\tabnlindent nowrap)]} & Get the current items text,
+      can be used in normal viewports to get the selected items text.\\
+    \config{\%LI[(offset,\tabnlindent nowrap)]} & Get the current items icon
+      number, can be used in normal viewports to get the selected items icon number.\\
     \config{\%LN} & Get the position of the current item in the list (1-based). Useful for displaying numbered lists.\\
     \config{\%LR} & Get the row number on which the current item will be drawn (1-based). Can be used to change the style based on where on the screen the item appears.\\
     \config{\%Lc} & Get the column number on which the current item will be drawn (1-based). Can be used to change the style based on where on the screen the item appears.\\
     \config{\%LC} & Use as a conditional to determine if the current item is the selected item\\
     \config{\%Lb} & BAR TAG to show the scroll bar, params/options like other bar types. It still needs a bit of work though. Use as a conditional to find out if the bar is actually needed\\
-    \config{\%LB(viewport, width, height [,tile])} & specify the viewport label to draw for each item and the size of each item. if the last param is 'tile' it will form a grid instead of a list\\
+    \config{\%LB(viewport,width,\tabnlindent height[,tile])} & specify the
+      viewport label to draw for each item and the size of each item. if the
+      last param is 'tile' it will form a grid instead of a list\\
   \end{tagmap}
   \note{To do this you need at least one viewport which will be drawn for each item on the screen, and the ui viewport configured (using the %Vi tag). To make this work do the following:
     Setup the ui viewport as normal. As many items as can fit in this viewport will be displayed (Titles are not included and need to be drawn in a seperate viewport manually)
@@ -395,13 +400,13 @@ If your player has a quickscreen, the preset settings can be displayed using the
     \config{\%X(filename.bmp)}
         & Load and set a backdrop image for the WPS.
           This image must be exactly the same size as your LCD.\\
-    \config{\%x(n,filename[,x,y])}
+    \config{\%x(n,filename\tabnlindent[,x,y])}
         & Load and display an image\newline
           \config{n}: image ID for later referencing in \config{\%xd}\newline
           \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\newline
           \config{x}: x coordinate (defaults to 0 if both x and y are not specified)\newline
           \config{y}: y coordinate. (defaults to 0 if both x and y are not specified)\\
-    \config{\%xl(n,filename,[x,y],\tabnlindent[nimages])}
+    \config{\%xl(n,filename,\tabnlindent[x,y],[nimages])}
         & Preload an image for later display (useful for when your images are displayed conditionally).\newline
           \config{n}: image ID for later referencing in \config{\%xd}\newline
           \config{filename}: file name relative to \fname{/.rockbox/} and including ``.bmp''\newline
@@ -410,7 +415,7 @@ If your player has a quickscreen, the preset settings can be displayed using the
           \config{y}: y coordinate. (defaults to 0 if both x and y are not specified)\newline
           \config{nimages}: (optional) number of sub-images (tiled vertically, of the same height)
           contained in the bitmap. Default is 1.\\
-    \config{\%xd(n[i] [,tag] [,offset])} & Display a preloaded image.
+    \config{\%xd(n[i] [,tag]\tabnlindent[,offset])} & Display a preloaded image.
           \config{n}: image ID  as it was specified in \config{\%x} or \config{\%xl}\newline
           \config{i}: (optional) number of the sub-image to display (a-z for 1-26 and A-Z for 27-52).
           (ignored when \config{tag} is used). Only useable if the ID is a single letter.
@@ -547,7 +552,7 @@ Example: \config{\%ax\%V(\dots)}
     & If / Else: Evaluate for true or false case \\
 \config{\%?xx<alt1|alt2|\tabnlindent{}alt3|\dots|else>}
     & Enumerations: Evaluate for first / second / third / \dots / last condition \\
-\config{\%if(tag, operator, operand, [option count])}
+\config{\%if(tag,operator,\tabnlindent{}operand,\tabnlindent[option count])}
     & Allows very simple comparisons with other tags.\newline
       \config{tag}: the tag to check against.\newline
       \config{operator}: the comparison to perform -- possible options are =, !=,
@@ -555,9 +560,9 @@ Example: \config{\%ax\%V(\dots)}
       \config{operand}: either a second tag, a number, or text.\newline
       \config{[option count]}: optional parameter used to select which parameter
         of a tag to use when the tag has multiple options, e.g. \%?pv<a|b|c|d>\\
-\config{\%and(tag1, tag2, ..., tagN)}\newline
+\config{\%and(tag1,tag2,\tabnlindent{}...,tagN)}\newline
     & Logical ``and'' operator. Will be evaluate to true if all the tag parameters are true.\\
-\config{\%or(tag1, tag2, ..., tagN)}\newline
+\config{\%or(tag1,tag2,\tabnlindent...,tagN)}\newline
     & Logical ``or'' operator. Will be evaluate to true if any of the tag parameters are true.\\
 \end{tagmap}
 
@@ -576,7 +581,7 @@ Examples of the \%if tag:\\
 \section{Subline Tags}
 
 \begin{tagmap}
-  \config{\%t(timeshow [,timehide])} & Set the subline display cycle time.\\
+  \config{\%t(timeshow\tabnlindent[,timehide])} & Set the subline display cycle time.\\
 \end{tagmap}
     Use this tag to set the time a subline is displayed and optionally the amount of time to hide the line before line will be displayed again
 \begin{description}
@@ -710,7 +715,7 @@ display cycling round the defined sublines. See
 }
 
 \begin{tagmap}
-  \config{\%XX(x, y, width, height, [options])}
+  \config{\%XX(x,y,width,\tabnlindent{}height,[options])}
     & Draw the specified tag as a bar\newline
       \config{x}: x co-ordinate at which to start drawing the bar.\newline
       \config{y}: y co-ordinate at which to start drawing the bar (- to make the
@@ -762,7 +767,7 @@ a horizontal progressbar which doesn't fill and draws the image
 \section{Other Tags}
 
 \begin{tagmap}
-  \config{\%ss(start, length, tag [,number]} & Get a substring from another tag.\\
+  \config{\%ss(start,length,\tabnlindent tag[,number])} & Get a substring from another tag.\\
 \end{tagmap}
     Use this tag to get a substring from another tag.
 \begin{description}
@@ -775,7 +780,7 @@ a horizontal progressbar which doesn't fill and draws the image
 \end{description}
 
 \begin{tagmap}
-  \config{\%ft(filename [,line|search text]} & Get a line of text from a file.\\
+  \config{\%ft(filename[,line\tabnlindent|search text])} & Get a line of text from a file.\\
 \end{tagmap}
     Use this tag to check for the existence of a file, read a line or search for a line in a file.
     Checking if a file exists can be done with \%?ft(filename)<Found|NotFound>\newline
