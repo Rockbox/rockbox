@@ -114,7 +114,7 @@ void panicf( const char *fmt, ...)
         }
     }
 
-#if defined(CPU_ARM)
+#if defined(HAVE_RB_BACKTRACE)
     rb_backtrace(pc, sp, &y);
 #endif
 #ifdef ROCKBOX_HAS_LOGF
