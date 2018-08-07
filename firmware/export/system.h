@@ -253,6 +253,11 @@ static inline void cpu_boost_unlock(void)
     #define MIN_STACK_ALIGN 8
 #endif
 
+/* Define this if target has support for generating backtraces */
+#ifdef CPU_ARM
+    #define HAVE_RB_BACKTRACE
+#endif
+
 #ifndef MIN_STACK_ALIGN
 #define MIN_STACK_ALIGN (sizeof (uintptr_t))
 #endif
