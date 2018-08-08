@@ -370,6 +370,120 @@ RB_WRAP(get_plugin_action)
     return 1;
 }
 
+static int mem_read_write(lua_State *L, uintptr_t address, size_t maxsize)
+{
+    intptr_t offset = (intptr_t) luaL_optint(L, 1, 0);
+    size_t   size   = (size_t)   luaL_optint(L, 2, maxsize);
+    int      type   = lua_type(L, 3);
+
+    if(offset < 0)
+    {
+        /* allows pointer within structure to be calculated offset */
+        offset = -(address + offset);
+        size   = (size_t) maxsize - offset;
+    }
+
+    luaL_argcheck(L, ((uintptr_t) offset) + size <= maxsize,  2, ERR_IDX_RANGE);
+
+    char *mem = (char*) address + ((uintptr_t) offset);
+    const void *value = NULL;
+
+#ifdef UINT64_MAX
+    int64_t  var_64;
+#endif
+    int32_t  var_32;
+    int16_t  var_16;
+    int8_t   var_8;
+    bool     var_bool; 
+
+    if(type != LUA_TNONE && type != LUA_TNIL) /* writer */
+    {
+
+        if(type == LUA_TSTRING)
+        {
+            size_t len;
+            const char* str = lua_tolstring (L, 3, &len);
+
+            luaL_argcheck(L, len + 1 <= size,  3, ERR_DATA_OVF);
+            size = len + 1; /* include \0 */
+            value = str;
+        }
+        else if(type == LUA_TBOOLEAN)
+        {
+            var_bool = (bool) lua_toboolean(L, 3);
+            value = &var_bool;
+        }
+        else if(type ==  LUA_TNUMBER)
+        {
+            switch(size)
+            {
+                case sizeof(var_8):
+                    var_8 = (int8_t) lua_tointeger(L, 3);
+                    value = &var_8;
+                    break;
+                case sizeof(var_16):
+                    var_16 = (int16_t) lua_tointeger(L, 3);
+                    value = &var_16;
+                    break;
+                case sizeof(var_32):
+                    var_32 = (int32_t) lua_tointeger(L, 3);
+                    value = &var_32;
+                    break;
+#ifdef UINT64_MAX
+                case sizeof(var_64):
+                    var_64 = (int64_t) lua_tointeger(L, 3);
+                    value = &var_64;
+                    break;
+#endif
+            }
+        }
+
+        luaL_argcheck(L, value != NULL,  3, "Unknown Type");
+        rb->memcpy(mem, value, size);
+        lua_pushinteger(L, 1);
+    }
+    else /* reader */
+    {
+        luaL_Buffer b;
+        luaL_buffinit(L, &b);
+
+        luaL_addlstring (&b, mem, MIN(LUAL_BUFFERSIZE, size));
+        luaL_pushresult(&b);
+    }
+
+    return 1;
+}
+
+RB_WRAP(global_status)
+{
+    const uintptr_t address = (uintptr_t) rb->global_status;
+    const size_t    maxsize = sizeof(struct system_status);
+    return mem_read_write(L, address, maxsize);
+}
+
+RB_WRAP(global_settings)
+{
+    const uintptr_t address = (uintptr_t) rb->global_settings;
+    const size_t    maxsize = sizeof(struct user_settings);
+    return mem_read_write(L, address, maxsize);
+}
+
+RB_WRAP(audio_next_track)
+{
+    lua_settop(L, 2); /* no writes allowed */
+    const uintptr_t address = (uintptr_t) rb->audio_next_track();
+    const size_t    maxsize = sizeof(struct mp3entry);
+    return mem_read_write(L, address, maxsize);
+}
+
+RB_WRAP(audio_current_track)
+{
+    lua_settop(L, 2); /* no writes allowed */
+    const uintptr_t address = (uintptr_t) rb->audio_current_track();
+    const size_t    maxsize = sizeof(struct mp3entry);
+    return mem_read_write(L, address, maxsize);
+}
+
 #define RB_FUNC(func) {#func, rock_##func}
 static const luaL_Reg rocklib[] =
 {
@@ -416,6 +530,11 @@ static const luaL_Reg rocklib[] =
 #endif
 
     RB_FUNC(get_plugin_action),
+
+    RB_FUNC(global_status),
+    RB_FUNC(global_settings),
+    RB_FUNC(audio_next_track),
+    RB_FUNC(audio_current_track),
 
     {NULL, NULL}
 };
