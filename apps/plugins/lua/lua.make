@@ -16,7 +16,7 @@ LUA_OBJ := $(call c2obj, $(LUA_SRC))
 OTHER_SRC += $(LUA_SRC)
 
 LUA_INCLUDEDIR := $(LUA_SRCDIR)/include_lua
-LUA_INCLUDELIST := $(addprefix $(LUA_BUILDDIR)/,blit.lua color.lua draw.lua image.lua lcd.lua math_ex.lua print.lua timer.lua)
+LUA_INCLUDELIST = blit color draw image lcd math_ex print timer
 
 ifndef APP_TYPE
 ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
@@ -33,10 +33,15 @@ else
     ROCKS += $(LUA_BUILDDIR)/lua.rock
 endif
 
-$(LUA_BUILDDIR)/lua.rock: $(LUA_OBJ) $(TLSFLIB) $(LUA_BUILDDIR)/actions.lua $(LUA_BUILDDIR)/buttons.lua $(LUA_BUILDDIR)/rocklib_aux.o $(LUA_INCLUDELIST)
+$(LUA_BUILDDIR)/lua.rock: $(LUA_OBJ) $(TLSFLIB) $(LUA_BUILDDIR)/actions.lua $(LUA_BUILDDIR)/buttons.lua $(LUA_BUILDDIR)/settings.lua $(LUA_BUILDDIR)/rocklib_aux.o $(LUA_INCLUDELIST)
 
 $(LUA_BUILDDIR)/actions.lua: $(LUA_OBJ) $(LUA_SRCDIR)/action_helper.pl
 	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E $(APPSDIR)/plugins/lib/pluginlib_actions.h | $(LUA_SRCDIR)/action_helper.pl > $(LUA_BUILDDIR)/actions.lua
+
+$(LUA_BUILDDIR)/settings.lua: $(LUA_OBJ) $(LUA_SRCDIR)/settings_helper.pl
+	$(SILENT)$(CC) $(INCLUDES) -E $(TARGET) $(CFLAGS) -include settings.h - < /dev/null | $(LUA_SRCDIR)/settings_helper.pl | \
+		$(CC) $(INCLUDES) $(TARGET) $(CFLAGS) -S -x c -o $(LUA_BUILDDIR)/settings_helper.s -
+	$(call PRINTS,GEN $(@F))$(LUA_SRCDIR)/settings_helper.pl < $(LUA_BUILDDIR)/settings_helper.s > $(LUA_BUILDDIR)/settings.lua
 
 HOST_INCLUDES := $(filter-out %/libc/include,$(INCLUDES))
 $(LUA_BUILDDIR)/buttons.lua: $(LUA_OBJ) $(LUA_SRCDIR)/button_helper.pl
@@ -49,8 +54,8 @@ $(LUA_BUILDDIR)/rocklib_aux.c: $(APPSDIR)/plugin.h $(LUA_OBJ) $(LUA_SRCDIR)/rock
 $(LUA_BUILDDIR)/rocklib_aux.o: $(LUA_BUILDDIR)/rocklib_aux.c
 	$(call PRINTS,CC $(<F))$(CC) $(INCLUDES) $(PLUGINFLAGS) -I $(LUA_SRCDIR) -c $< -o $@
 
-$(LUA_BUILDDIR)/%.lua: $(LUA_INCLUDEDIR)/%.lua | $(LUA_BUILDDIR)
-	$(call PRINTS,CP $(subst $(LUA_INCLUDEDIR)/,,$<))cp $< $@
+$(LUA_INCLUDELIST): %: $(LUA_INCLUDEDIR)/%.lua
+	$(call PRINTS,CP $(subst $(LUA_INCLUDEDIR)/,,$<))cp $< $(LUA_BUILDDIR)/$@.lua
 
 $(LUA_BUILDDIR)/lua.refmap: $(LUA_OBJ) $(TLSFLIB)
 
@@ -64,7 +69,4 @@ $(LUA_BUILDDIR)/lua.ovl: $(LUA_OBJ) $(TLSFLIB) $(LUA_OUTLDS)
 		$(filter %.a, $+) \
 		-lgcc $(LUA_OVLFLAGS)
 	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
-
-$(LUA_BUILDDIR):
-	$(call PRINTS,MKDIR $@)mkdir -p $(LUA_BUILDDIR)/
 
