@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e420602f_d9fcf30c",
+        "filename": "apps/keymaps/keymap-agptekrocker.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2018-08-13T07:13:41Z",
+      "side": 1,
+      "message": "Thanks for the contribution to RockBox!\nplease use (4)spaces rather than tabs \nthis keeps gerrit and others that have to\nread the code happy",
+      "revId": "94103502e139f7f68634f6a9b973abdd2fa8a1f7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e420602f_f901b707",
+        "filename": "apps/keymaps/keymap-agptekrocker.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2018-08-13T07:13:41Z",
+      "side": 1,
+      "message": "Have you tested this? I believe I removed the need for the context list to be in proper order with the action system rewrite but I\u0027d appreciate that you make doubly sure\n\nNote in the prior code how BUTTON_REL comes before BUTTON_REPEAT, not saying to change it just make sure it works as expected",
+      "revId": "94103502e139f7f68634f6a9b973abdd2fa8a1f7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
