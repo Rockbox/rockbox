@@ -90,7 +90,7 @@ extern struct codec_api ci; /* from codecs.c */
 static unsigned int codec_thread_id; /* For modifying thread priority later */
 static struct event_queue codec_queue SHAREDBSS_ATTR;
 static struct queue_sender_list codec_queue_sender_list SHAREDBSS_ATTR;
-static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)] IBSS_ATTR;
+static long codec_stack[(DEFAULT_STACK_SIZE + 0x2800)/sizeof(long)] IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
 
 static void unload_codec(void);
