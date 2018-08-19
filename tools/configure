@@ -4231,7 +4231,7 @@ fi
     plugins="yes"
     swcodec="yes"
     toolset=$genericbitmaptools
-    boottool="cp"
+    boottool="$rootdir/tools/scramble -x1000"
     bootoutput="bootloader-x3.bin"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="mips"
