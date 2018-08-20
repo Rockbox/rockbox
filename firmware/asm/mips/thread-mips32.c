@@ -26,22 +26,23 @@
  *---------------------------------------------------------------------------
  */
 
-static void USED_ATTR start_thread(void *addr)
+void start_thread(void); /* Provide C access to ASM label */
+static void USED_ATTR _start_thread(void)
 {
+    /* t1 = context */
     asm volatile (
+      "start_thread:          \n"
         ".set noreorder       \n"
         ".set noat            \n"
-        "lw     $25,    4(%0) \n" /* Fetch thread function pointer ($25 = t9) */
-        "lw     $25,   40(%0) \n" /* Set initial sp(=$29) */
-        "jalr   $25           \n" /* Start the thread */
-        "sw     $0,    48(%0) \n" /* Clear start address */
+        "lw     $8,    4($9)  \n" /* Fetch thread function pointer ($8 = t0, $9 = t1) */
+        "lw     $29,  36($9)  \n" /* Set initial sp(=$29) */
+        "jalr   $8            \n" /* Start the thread */
+        "sw     $0,   44($9)  \n" /* Clear start address */
         ".set at              \n"
         ".set reorder         \n"
-        : : "r" (addr) : "$25"
     );
     thread_exit();
 }
-
 
 /* Place context pointer in s0 slot, function pointer in s1 slot, and
  * start_thread pointer in context_start */
@@ -59,21 +60,25 @@ static inline void store_context(void* addr)
     asm volatile (
         ".set noreorder        \n"
         ".set noat             \n"
-        "sw    $16,  0(%0)     \n" /* s0 */
-        "sw    $17,  4(%0)     \n" /* s1 */
-        "sw    $18,  8(%0)     \n" /* s2 */
-        "sw    $19, 12(%0)     \n" /* s3 */
-        "sw    $20, 16(%0)     \n" /* s4 */
-        "sw    $21, 20(%0)     \n" /* s5 */
-        "sw    $22, 24(%0)     \n" /* s6 */
-        "sw    $23, 28(%0)     \n" /* s7 */
-        "sw    $28, 32(%0)     \n" /* gp */
-        "sw    $30, 36(%0)     \n" /* fp */
-        "sw    $29, 40(%0)     \n" /* sp */
-        "sw    $31, 44(%0)     \n" /* ra */
+        "move  $8, %0          \n" /* Store addr in clobbered t0 othrewise
+                                    * compiler could select %0 to be s0-s7
+                                    * during inlining which would break
+                                    * things horribly.
+                                    */
+        "sw    $16,  0($8)     \n" /* s0 */
+        "sw    $17,  4($8)     \n" /* s1 */
+        "sw    $18,  8($8)     \n" /* s2 */
+        "sw    $19, 12($8)     \n" /* s3 */
+        "sw    $20, 16($8)     \n" /* s4 */
+        "sw    $21, 20($8)     \n" /* s5 */
+        "sw    $22, 24($8)     \n" /* s6 */
+        "sw    $23, 28($8)     \n" /* s7 */
+        "sw    $30, 32($8)     \n" /* fp */
+        "sw    $29, 36($8)     \n" /* sp */
+        "sw    $31, 40($8)     \n" /* ra */
         ".set at               \n"
         ".set reorder          \n"
-        : : "r" (addr)
+        : : "r" (addr) : "t0"
     );
 }
 
@@ -86,27 +91,31 @@ static inline void load_context(const void* addr)
     asm volatile (
         ".set noat             \n"
         ".set noreorder        \n"
-        "lw    $25, 48(%0)     \n" /* Get start address (t9 = $25) */
-        "beqz  $25, running    \n" /* NULL -> already running */
+        "lw    $8, 44(%0)      \n" /* Get start address ($8 = t0) */
+        "beqz  $8, running     \n" /* NULL -> already running */
         "nop                   \n"
-        "jr    $25             \n"
-        "move  $4, %0          \n" /* a0 = context branch delay slot anyway */
+        "jr    $8              \n"
+        "move  $9, %0          \n" /* t1 = context */
     "running:                  \n"
-        "lw    $16,  0(%0)     \n" /* s0 */
-        "lw    $17,  4(%0)     \n" /* s1 */
-        "lw    $18,  8(%0)     \n" /* s2 */
-        "lw    $19, 12(%0)     \n" /* s3 */
-        "lw    $20, 16(%0)     \n" /* s4 */
-        "lw    $21, 20(%0)     \n" /* s5 */
-        "lw    $22, 24(%0)     \n" /* s6 */
-        "lw    $23, 28(%0)     \n" /* s7 */
-        "lw    $28, 32(%0)     \n" /* gp */
-        "lw    $30, 36(%0)     \n" /* fp */
-        "lw    $29, 40(%0)     \n" /* sp */
-        "lw    $31, 44(%0)     \n" /* ra */
+        "move  $8, %0          \n" /* Store addr in clobbered t0 otherwise
+                                    * compiler could select %0 to be s0-s7
+                                    * during inlining which would break
+                                    * things horribly.
+                                    */
+        "lw    $16,  0($8)     \n" /* s0 */
+        "lw    $17,  4($8)     \n" /* s1 */
+        "lw    $18,  8($8)     \n" /* s2 */
+        "lw    $19, 12($8)     \n" /* s3 */
+        "lw    $20, 16($8)     \n" /* s4 */
+        "lw    $21, 20($8)     \n" /* s5 */
+        "lw    $22, 24($8)     \n" /* s6 */
+        "lw    $23, 28($8)     \n" /* s7 */
+        "lw    $30, 32($8)     \n" /* fp */
+        "lw    $29, 36($8)     \n" /* sp */
+        "lw    $31, 40($8)     \n" /* ra */
         ".set at               \n"
         ".set reorder          \n"
-        : : "r" (addr) : "$25"
+        : : "r" (addr) : "t0", "t1"
     );
 }
 
