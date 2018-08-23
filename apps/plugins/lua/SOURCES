@@ -28,6 +28,7 @@ lvm.c
 lzio.c
 rockaux.c
 rocklib.c
+rocklib_img.c
 tlsf_helper.c
 fscanf.c
 gmtime.c
