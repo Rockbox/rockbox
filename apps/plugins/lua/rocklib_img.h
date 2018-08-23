@@ -19,26 +19,13 @@
  *
  ****************************************************************************/
 
-#ifndef _ROCKLIB_H_
-#define _ROCKLIB_H_
+#ifndef _ROCKLIB_IMG_H_
+#define _ROCKLIB_IMG_H_
 
-#define LUA_ROCKLIBNAME	"rb"
-
-#ifndef ERR_IDX_RANGE
-#define ERR_IDX_RANGE "index out of range"
+#ifdef HAVE_LCD_BITMAP
+#define RLI_EXTENDED
 #endif
 
-#ifndef ERR_DATA_OVF
-#define ERR_DATA_OVF  "data overflow"
-#endif
+LUALIB_API int rli_init(lua_State *L);
 
-#ifndef ERR_NO_ALLOC_DBYTES
-#define ERR_NO_ALLOC_DBYTES "Can't allocate %d bytes!"
-#endif
-
-
-LUALIB_API int (luaopen_rock) (lua_State *L);
-const char* get_current_path(lua_State *L, int level);
-
-#endif /* _ROCKLIB_H_ */
-
+#endif /* _ROCKLIB_IMG_H_ */
