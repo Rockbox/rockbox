@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0481f44b_92063c1d",
+        "filename": "apps/keymaps/keymap-agptekrocker.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2018-08-23T13:01:18Z",
+      "side": 1,
+      "message": "This action will be ignored in some contexts this should be ACTION_STD_MENU why the change?",
+      "revId": "46964173ce804f8d7d6a7028992c3c85e5606cdc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0481f44b_f201c807",
+        "filename": "apps/keymaps/keymap-agptekrocker.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2018-08-23T13:01:18Z",
+      "side": 1,
+      "message": "What is the reason for removing WPS_STOP here?",
+      "revId": "46964173ce804f8d7d6a7028992c3c85e5606cdc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0481f44b_d2fcc40c",
+        "filename": "apps/keymaps/keymap-agptekrocker.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2018-08-23T13:01:18Z",
+      "side": 1,
+      "message": "I see you found the issue with the volume buttons, BUTTON_VOL_UP being defined as BUTTON_VOLUP",
+      "revId": "46964173ce804f8d7d6a7028992c3c85e5606cdc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
