@@ -81,9 +81,6 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
-/* Define this for LCD backlight available */
-#define HAVE_BACKLIGHT
-
 #ifndef BOOTLOADER
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_JZ4760
@@ -129,6 +126,7 @@
 #define CONFIG_STORAGE (STORAGE_SD /* | STORAGE_NAND */)
 
 #define HAVE_MULTIDRIVE
+#define CONFIG_STORAGE_MULTI
 #define NUM_DRIVES 2
 
 /* Define this if media can be exchanged on the fly */
