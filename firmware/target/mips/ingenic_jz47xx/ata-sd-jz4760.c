@@ -647,8 +647,11 @@ static inline unsigned int jz_sd_calc_clkrt(const int drive, unsigned int rate)
 static inline void cpm_select_msc_clk(unsigned int rate)
 {
     unsigned int div = __cpm_get_pllout2() / rate;
+    if (div == 0)
+	    div = 1;
 
-    REG_CPM_MSCCDR = div - 1;
+    REG_CPM_MSCCDR = MSCCDR_MCS | (div - 1);
+    DEBUG("MSCCLK == %x\n", REG_CPM_MSCCDR);
 }
 
 /* Set the MMC clock frequency */
