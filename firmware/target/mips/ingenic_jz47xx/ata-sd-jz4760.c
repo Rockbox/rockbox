@@ -34,7 +34,7 @@ static long               last_disk_activity = -1;
 static tCardInfo          card[NUM_DRIVES];
 
 static struct mutex       sd_mtx;
-static struct semaphore   sd_wakeup;
+//static struct semaphore   sd_wakeup;
 
 static int                use_4bit[NUM_DRIVES];
 static int                num_6[NUM_DRIVES];
@@ -1229,7 +1229,7 @@ int sd_init(void)
 
     if(!inited)
     {
-        semaphore_init(&sd_wakeup, 1, 0);
+//        semaphore_init(&sd_wakeup, 1, 0);
         mutex_init(&sd_mtx);
         inited = true;
     }
@@ -1457,6 +1457,7 @@ bool sd_present(const int drive)
 #ifdef CONFIG_STORAGE_MULTI
 int sd_num_drives(int first_drive)
 {
+    (void)first_drive;
     return NUM_DRIVES;
 }
 #endif /* CONFIG_STORAGE_MULTI */
