@@ -1332,7 +1332,7 @@ do {						\
 #define DMAC_DCCSR_CT		(1 << 1)  /* count terminated */
 #define DMAC_DCCSR_EN		(1 << 0)  /* channel enable bit */
 
-// DMA channel command register 
+// DMA channel command register
 #define DMAC_DCMD_EACKS_LOW  	(1 << 31) /* External DACK Output Level Select, active low */
 #define DMAC_DCMD_EACKS_HIGH  	(0 << 31) /* External DACK Output Level Select, active high */
 #define DMAC_DCMD_EACKM_WRITE 	(1 << 30) /* External DACK Output Mode Select, output in write cycle */
@@ -3090,7 +3090,7 @@ static __inline__ int __bdmac_get_irq(void)
 #define	CIM_CTRL_RXF_TRIGM	(1 << 9)
 #define	CIM_CTRL_RXF_OFM	(1 << 8)
 #define	CIM_CTRL_DMA_SYNC	(1 << 7)	/*when change DA, do frame sync */
-#define CIM_CTRL_H_SYNC         (1 << 6) /*Enable horizental sync when CIMCFG.SEP is 1*/       
+#define CIM_CTRL_H_SYNC         (1 << 6) /*Enable horizental sync when CIMCFG.SEP is 1*/
 
 #define	CIM_CTRL_PPW_BIT	3
 #define	CIM_CTRL_PPW_MASK	(0x3 << CIM_CTRL_PPW_BIT)
@@ -3632,7 +3632,7 @@ static __inline__ int __bdmac_get_irq(void)
 #define USBCDR_OTGDIV_LSB       0       /* USBCDR bit */
 #define USBCDR_OTGDIV_MASK      BITS_H2L(5, USBCDR_OTGDIV_LSB)
 
-/* I2S device clock divider register(I2SCDR) */ 
+/* I2S device clock divider register(I2SCDR) */
 #define I2SCDR_I2CS             BIT31
 #define I2SCDR_I2PCS            BIT30
 
@@ -4114,6 +4114,12 @@ static inline void __cpm_select_msc_clk(int sd)
 	REG_CPM_CPCCR |= CPCCR_CE;
 }
 
+/* MSC clock */
+static __inline__ unsigned int __cpm_get_mscclk(void)
+{
+    return __cpm_get_pllout2() / (__cpm_get_mscdiv() + 1);
+}
+
 #endif /* __MIPS_ASSEMBLER */
 
 #define	DDRC_BASE	0xB3020000
@@ -4163,7 +4169,7 @@ static inline void __cpm_select_msc_clk(int sd)
 /* DDRC Status Register */
 #define DDRC_ST_ENDIAN		(1 << 7) /* 0 Little data endian
 					    1 Big data endian */
-#define DDRC_ST_MISS		(1 << 6) 
+#define DDRC_ST_MISS		(1 << 6)
 
 #define DDRC_ST_DPDN		(1 << 5) /* 0 DDR memory is NOT in deep-power-down state
 					    1 DDR memory is in deep-power-down state */
@@ -4289,14 +4295,14 @@ static inline void __cpm_select_msc_clk(int sd)
 					    defined by CMD field */
 /* DDRC Mode Register Set */
 #define DDR_MRS_PD_BIT		(1 << 10) /* Active power down exit time */
-#define DDR_MRS_PD_MASK		(1 << DDR_MRS_PD_BIT) 
+#define DDR_MRS_PD_MASK		(1 << DDR_MRS_PD_BIT)
 #define DDR_MRS_PD_FAST_EXIT	(0 << 10)
 #define DDR_MRS_PD_SLOW_EXIT	(1 << 10)
 #define DDR_MRS_WR_BIT		(1 << 9) /* Write Recovery for autoprecharge */
 #define DDR_MRS_WR_MASK		(7 << DDR_MRS_WR_BIT)
 #define DDR_MRS_DLL_RST		(1 << 8) /* DLL Reset */
 #define DDR_MRS_TM_BIT		7        /* Operating Mode */
-#define DDR_MRS_TM_MASK		(1 << DDR_MRS_OM_BIT) 
+#define DDR_MRS_TM_MASK		(1 << DDR_MRS_OM_BIT)
 #define DDR_MRS_TM_NORMAL	(0 << DDR_MRS_OM_BIT)
 #define DDR_MRS_TM_TEST	(1 << DDR_MRS_OM_BIT)
 #define DDR_MRS_CAS_BIT		4        /* CAS Latency */
@@ -4423,11 +4429,11 @@ static inline void __cpm_select_msc_clk(int sd)
 #define DDRC_DQS_DET                  (1 << 24) /* Start delay detecting. */
 #define DDRC_DQS_AUTO                 (1 << 23) /* Hardware auto-detect & set delay line */
 #define DDRC_DQS_CLKD_BIT             16 /* CLKD is reference value for setting WDQS and RDQS.*/
-#define DDRC_DQS_CLKD_MASK            (0x3f << DDRC_DQS_CLKD_BIT) 
+#define DDRC_DQS_CLKD_MASK            (0x3f << DDRC_DQS_CLKD_BIT)
 #define DDRC_DQS_WDQS_BIT             8  /* Set delay element number to write DQS delay-line. */
-#define DDRC_DQS_WDQS_MASK            (0x3f << DDRC_DQS_WDQS_BIT) 
+#define DDRC_DQS_WDQS_MASK            (0x3f << DDRC_DQS_WDQS_BIT)
 #define DDRC_DQS_RDQS_BIT             0  /* Set delay element number to read DQS delay-line. */
-#define DDRC_DQS_RDQS_MASK            (0x3f << DDRC_DQS_RDQS_BIT) 
+#define DDRC_DQS_RDQS_MASK            (0x3f << DDRC_DQS_RDQS_BIT)
 
 /* DDRC DQS Delay Adjust Register */
 #define DDRC_DQS_ADJDQSCON_BIT        16
@@ -4443,7 +4449,7 @@ static inline void __cpm_select_msc_clk(int sd)
 #define DDRC_MMAP_BASE_BIT            8 /* base address */
 #define DDRC_MMAP_BASE_MASK           (0xff << DDRC_MMAP_BASE_BIT)
 #define DDRC_MMAP_MASK_BIT            0 /* address mask */
-#define DDRC_MMAP_MASK_MASK           (0xff << DDRC_MMAP_MASK_BIT)         
+#define DDRC_MMAP_MASK_MASK           (0xff << DDRC_MMAP_MASK_BIT)
 
 #define DDRC_MMAP0_BASE		     (0x20 << DDRC_MMAP_BASE_BIT)
 #define DDRC_MMAP1_BASE_64M	(0x24 << DDRC_MMAP_BASE_BIT) /*when bank0 is 128M*/
@@ -4609,8 +4615,8 @@ static inline void __cpm_select_msc_clk(int sd)
  * EMC (External Memory Controller)
  *************************************************************************/
 #define EMC_BCR    	(EMC_BASE + 0x00)  /* Bus Control Register */
-#define EMC_PMEMBS1     (EMC_BASE + 0x6004) 
-#define EMC_PMEMBS0     (EMC_BASE + 0x6008) 
+#define EMC_PMEMBS1     (EMC_BASE + 0x6004)
+#define EMC_PMEMBS0     (EMC_BASE + 0x6008)
 #define EMC_SMCR0	(EMC_BASE + 0x10)  /* Static Memory Control Register 0 ??? */
 #define EMC_SMCR1	(EMC_BASE + 0x14)  /* Static Memory Control Register 1 */
 #define EMC_SMCR2	(EMC_BASE + 0x18)  /* Static Memory Control Register 2 */
@@ -4874,7 +4880,7 @@ static inline void __cpm_select_msc_clk(int sd)
 
 #define I2C_CTRL_STPHLD		(1 << 7) /* Stop Hold Enable bit: when tx fifo empty, 0: send stop 1: never send stop*/
 #define I2C_CTRL_SLVDIS		(1 << 6) /* after reset slave is disabled*/
-#define I2C_CTRL_REST		(1 << 5)	
+#define I2C_CTRL_REST		(1 << 5)
 #define I2C_CTRL_MATP		(1 << 4) /* 1: 10bit address 0: 7bit addressing*/
 #define I2C_CTRL_SATP		(1 << 3) /* 1: 10bit address 0: 7bit address*/
 #define I2C_CTRL_SPDF		(2 << 1) /* fast mode 400kbps */
@@ -4906,7 +4912,7 @@ static inline void __cpm_select_msc_clk(int sd)
 #define I2C_INTST_ISTP			(1 << 9)
 #define I2C_INTST_IACT			(1 << 8)
 #define I2C_INTST_RXDN			(1 << 7)
-#define I2C_INTST_TXABT			(1 << 6) 
+#define I2C_INTST_TXABT			(1 << 6)
 #define I2C_INTST_RDREQ			(1 << 5)
 #define I2C_INTST_TXEMP			(1 << 4)
 #define I2C_INTST_TXOF			(1 << 3)
@@ -4944,7 +4950,7 @@ static inline void __cpm_select_msc_clk(int sd)
 
 /* I2C Enable (I2C_ENB) */
 
-#define I2C_ENB_I2CENB 		(1 << 0) /* Enable the i2c */	
+#define I2C_ENB_I2CENB 		(1 << 0) /* Enable the i2c */
 
 /* I2C Status Register (I2C_STA) */
 
@@ -4992,8 +4998,8 @@ static inline void __cpm_select_msc_clk(int sd)
 #define I2C_ENSTA_SLVRDLST		(1 << 2)
 #define I2C_ENSTA_SLVDISB 		(1 << 1)
 #define I2C_ENSTA_I2CEN 		(1 << 0) /* when read as 1, i2c is deemed to be in an enabled state
-						    when read as 0, i2c is deemed completely inactive. The cpu can 
-						 safely read this bit anytime .When this bit is read as 0 ,the cpu can 
+						    when read as 0, i2c is deemed completely inactive. The cpu can
+						 safely read this bit anytime .When this bit is read as 0 ,the cpu can
 						 safely read SLVRDLST and SLVDISB */
 
 /* I2C standard mode high count register(I2CSHCNT) */
@@ -5036,7 +5042,7 @@ static inline void __cpm_select_msc_clk(int sd)
 #define __i2c_nsend_stop(n)          SETREG8(I2C_CTRL(n), I2C_CTRL_STPHLD)
 
 #define __i2c_set_dma_td_level(n,data) OUTREG8(I2C_DMATDLR(n),data)
-#define __i2c_set_dma_rd_level(n,data) OUTREG8(I2C_DMARDLR(n),data)   
+#define __i2c_set_dma_rd_level(n,data) OUTREG8(I2C_DMARDLR(n),data)
 
 /*
 #define __i2c_set_clk(dev_clk, i2c_clk) \
@@ -5498,9 +5504,9 @@ do {				\
 #define REG_LCD_SIZE0		REG32(LCD_SIZE0)
 #define REG_LCD_SIZE0_PART2	REG32(LCD_SIZE0_PART2)
 #define REG_LCD_SIZE1		REG32(LCD_SIZE1)
-			
+
 #define REG_LCD_RGBC		REG16(LCD_RGBC)
-			
+
 #define REG_LCD_VSYNC		REG32(LCD_VSYNC)
 #define REG_LCD_HSYNC		REG32(LCD_HSYNC)
 #define REG_LCD_PS		REG32(LCD_PS)
@@ -5946,8 +5952,8 @@ do {				\
 
 #define __lcd_set_24_tftpnl()		( REG_LCD_CFG |= LCD_CFG_MODE_TFT_24BIT )
 
-/* 
- * n=1,2,4,8 for single mono-STN 
+/*
+ * n=1,2,4,8 for single mono-STN
  * n=4,8 for dual mono-STN
  */
 #define __lcd_set_panel_datawidth(n) 		\
@@ -6706,12 +6712,12 @@ static __inline__ int __mdmac_get_irq(void)
 #define	MSC_CMDAT_SEND_AS_STOP		(1 << 16)
 #define	MSC_CMDAT_RTRG_BIT		14
 #define MSC_CMDAT_RTRG_EQUALT_8	        (0x0 << MSC_CMDAT_RTRG_BIT) /*reset value*/
-  #define MSC_CMDAT_RTRG_EQUALT_16	(0x1 << MSC_CMDAT_RTRG_BIT) 
+  #define MSC_CMDAT_RTRG_EQUALT_16	(0x1 << MSC_CMDAT_RTRG_BIT)
   #define MSC_CMDAT_RTRG_EQUALT_24	(0x2 << MSC_CMDAT_RTRG_BIT)
 
 #define	MSC_CMDAT_TTRG_BIT		12
 #define MSC_CMDAT_TTRG_LESS_8		(0x0 << MSC_CMDAT_TTRG_BIT) /*reset value*/
-  #define MSC_CMDAT_TTRG_LESS_16	(0x1 << MSC_CMDAT_TTRG_BIT) 
+  #define MSC_CMDAT_TTRG_LESS_16	(0x1 << MSC_CMDAT_TTRG_BIT)
   #define MSC_CMDAT_TTRG_LESS_24	(0x2 << MSC_CMDAT_TTRG_BIT)
 #define	MSC_CMDAT_STOP_ABORT		(1 << 11)
 #define	MSC_CMDAT_BUS_WIDTH_BIT		9
@@ -7487,7 +7493,7 @@ do {							\
 #define WENR_WENPAT_WRITABLE	(0xa55a)
 
 /* Hibernate scratch pattern register(HSPR) */
-#define HSPR_RTCV               0x52544356      /* The value is 'RTCV', means rtc is valid */ 
+#define HSPR_RTCV               0x52544356      /* The value is 'RTCV', means rtc is valid */
 
 #ifndef __MIPS_ASSEMBLER
 
@@ -7926,7 +7932,7 @@ do {						\
   #define SSI_CR1_FMAT_MW1	  (2 << SSI_CR1_FMAT_BIT) /* National Microwire 1 format */
   #define SSI_CR1_FMAT_MW2	  (3 << SSI_CR1_FMAT_BIT) /* National Microwire 2 format */
 #define SSI_CR1_TTRG_BIT	16 /* SSI1 TX trigger */
-#define SSI_CR1_TTRG_MASK	(0xf << SSI_CR1_TTRG_BIT) 
+#define SSI_CR1_TTRG_MASK	(0xf << SSI_CR1_TTRG_BIT)
 #define SSI_CR1_MCOM_BIT	12
 #define SSI_CR1_MCOM_MASK	(0xf << SSI_CR1_MCOM_BIT)
   #define SSI_CR1_MCOM_1BIT	  (0x0 << SSI_CR1_MCOM_BIT) /* 1-bit command selected */
@@ -8112,7 +8118,7 @@ do { 						\
 /* frmhl,endian,mcom,flen,pha,pol MASK */
 #define SSICR1_MISC_MASK 					\
 	( SSI_CR1_FRMHL_MASK | SSI_CR1_LFST | SSI_CR1_MCOM_MASK	\
-	  | SSI_CR1_FLEN_MASK | SSI_CR1_PHA | SSI_CR1_POL )	
+	  | SSI_CR1_FLEN_MASK | SSI_CR1_PHA | SSI_CR1_POL )
 
 #define __ssi_spi_set_misc(n,frmhl,endian,flen,mcom,pha,pol)		\
 	do {								\
@@ -8127,7 +8133,7 @@ do { 						\
 #define __ssi_set_lsb(n) ( REG_SSI_CR1(n) |= SSI_CR1_LFST )
 
 #define __ssi_set_frame_length(n, m)					\
-	REG_SSI_CR1(n) = (REG_SSI_CR1(n) & ~SSI_CR1_FLEN_MASK) | (((m) - 2) << 4) 
+	REG_SSI_CR1(n) = (REG_SSI_CR1(n) & ~SSI_CR1_FLEN_MASK) | (((m) - 2) << 4)
 
 /* m = 1 - 16 */
 #define __ssi_set_microwire_command_length(n,m)				\
@@ -8510,7 +8516,7 @@ do { 						\
 #define TSSI_DCMD	( TSSI0_BASE + 0x6c )
 #define TSSI_DST	( TSSI0_BASE + 0x70 )
 #define TSSI_TC		( TSSI0_BASE + 0x74 )
- 
+
 #define REG_TSSI_ENA       REG8( TSSI_ENA )
 #define REG_TSSI_CFG       REG16( TSSI_CFG )
 #define REG_TSSI_CTRL      REG8( TSSI_CTRL )
@@ -8559,7 +8565,7 @@ do { 						\
 
 /* mode of adding data 0 select bit */
 #define TSSI_CFG_TRANS_MD_BIT	10
-#define TSSI_CFG_TRANS_MD_MASK	( 0x3 << TSSI_CFG_TRANS_MD_BIT)	
+#define TSSI_CFG_TRANS_MD_MASK	( 0x3 << TSSI_CFG_TRANS_MD_BIT)
 #define TSSI_CFG_TRANS_MD_0	(0 << TSSI_CFG_TRANS_MD_BIT)
 #define TSSI_CFG_TRANS_MD_1	(1 << TSSI_CFG_TRANS_MD_BIT)
 #define TSSI_CFG_TRANS_MD_2	(2 << TSSI_CFG_TRANS_MD_BIT)
@@ -8592,37 +8598,37 @@ do { 						\
 
 /* TSSI PID enable register */
 #define TSSI_PEN_EN00 	( 1 << 0 )      /* enable PID n */
-#define TSSI_PEN_EN10 	( 1 << 1 )      
-#define TSSI_PEN_EN20 	( 1 << 2 )      
-#define TSSI_PEN_EN30 	( 1 << 3 )      
-#define TSSI_PEN_EN40 	( 1 << 4 )      
-#define TSSI_PEN_EN50 	( 1 << 5 )      
-#define TSSI_PEN_EN60 	( 1 << 6 )      
-#define TSSI_PEN_EN70 	( 1 << 7 )      
-#define TSSI_PEN_EN80 	( 1 << 8 )      
-#define TSSI_PEN_EN90 	( 1 << 9 )      
-#define TSSI_PEN_EN100 	( 1 << 10 )      
-#define TSSI_PEN_EN110 	( 1 << 11 )      
-#define TSSI_PEN_EN120 	( 1 << 12 )      
-#define TSSI_PEN_EN130 	( 1 << 13 )      
-#define TSSI_PEN_EN140 	( 1 << 14 )      
-#define TSSI_PEN_EN150 	( 1 << 15 )      
-#define TSSI_PEN_EN01 	( 1 << 16 )      
-#define TSSI_PEN_EN11 	( 1 << 17 )      
-#define TSSI_PEN_EN21 	( 1 << 18 )     
-#define TSSI_PEN_EN31 	( 1 << 19 )      
-#define TSSI_PEN_EN41 	( 1 << 20 )     
-#define TSSI_PEN_EN51 	( 1 << 21 )      
-#define TSSI_PEN_EN61 	( 1 << 22 )     
-#define TSSI_PEN_EN71 	( 1 << 23 )      
-#define TSSI_PEN_EN81 	( 1 << 24 )      
-#define TSSI_PEN_EN91 	( 1 << 25 )      
-#define TSSI_PEN_EN101 	( 1 << 26 )      
-#define TSSI_PEN_EN111 	( 1 << 27 )      
-#define TSSI_PEN_EN121 	( 1 << 28 )      
-#define TSSI_PEN_EN131 	( 1 << 29 )      
-#define TSSI_PEN_EN141 	( 1 << 30 )      
-#define TSSI_PEN_EN151 	( 1 << 31 )      
+#define TSSI_PEN_EN10 	( 1 << 1 )
+#define TSSI_PEN_EN20 	( 1 << 2 )
+#define TSSI_PEN_EN30 	( 1 << 3 )
+#define TSSI_PEN_EN40 	( 1 << 4 )
+#define TSSI_PEN_EN50 	( 1 << 5 )
+#define TSSI_PEN_EN60 	( 1 << 6 )
+#define TSSI_PEN_EN70 	( 1 << 7 )
+#define TSSI_PEN_EN80 	( 1 << 8 )
+#define TSSI_PEN_EN90 	( 1 << 9 )
+#define TSSI_PEN_EN100 	( 1 << 10 )
+#define TSSI_PEN_EN110 	( 1 << 11 )
+#define TSSI_PEN_EN120 	( 1 << 12 )
+#define TSSI_PEN_EN130 	( 1 << 13 )
+#define TSSI_PEN_EN140 	( 1 << 14 )
+#define TSSI_PEN_EN150 	( 1 << 15 )
+#define TSSI_PEN_EN01 	( 1 << 16 )
+#define TSSI_PEN_EN11 	( 1 << 17 )
+#define TSSI_PEN_EN21 	( 1 << 18 )
+#define TSSI_PEN_EN31 	( 1 << 19 )
+#define TSSI_PEN_EN41 	( 1 << 20 )
+#define TSSI_PEN_EN51 	( 1 << 21 )
+#define TSSI_PEN_EN61 	( 1 << 22 )
+#define TSSI_PEN_EN71 	( 1 << 23 )
+#define TSSI_PEN_EN81 	( 1 << 24 )
+#define TSSI_PEN_EN91 	( 1 << 25 )
+#define TSSI_PEN_EN101 	( 1 << 26 )
+#define TSSI_PEN_EN111 	( 1 << 27 )
+#define TSSI_PEN_EN121 	( 1 << 28 )
+#define TSSI_PEN_EN131 	( 1 << 29 )
+#define TSSI_PEN_EN141 	( 1 << 30 )
+#define TSSI_PEN_EN151 	( 1 << 31 )
 //#define TSSI_PEN_PID0 	( 1 << 31 ) /* PID filter enable PID0 */
 
 /* TSSI Data Number Registers */
@@ -8664,7 +8670,7 @@ do { 						\
 /* TSSI Transfer Control Registers */
 #define TSSI_TC_OP_BIT		4
 #define TSSI_TC_OP_MASK		(0x3 << TSSI_TC_OP_BIT)
-//////////////////#define TSSI_TC_OP_0		( 
+//////////////////#define TSSI_TC_OP_0		(
 #define TSSI_TC_OPE		(1 << 2)
 #define TSSI_TC_EME		(1 << 1)
 #define TSSI_TC_APM		(1 << 0)
@@ -8733,7 +8739,7 @@ do { 						\
 #define __tssi_disable_ovrn_irq()             ( REG_TSSI_CTRL |= TSSI_CTRL_OVRNM )
 
 #define __tssi_enable_trig_irq()              ( REG_TSSI_CTRL &= ~TSSI_CTRL_TRIGM )
-#define __tssi_disable_trig_irq()             ( REG_TSSI_CTRL |= TSSI_CTRL_TRIGM ) 
+#define __tssi_disable_trig_irq()             ( REG_TSSI_CTRL |= TSSI_CTRL_TRIGM )
 
 #define __tssi_state_is_dtr()		      ( REG_TSSI_STAT & TSSI_STAT_DTR )
 #define __tssi_state_is_overrun()             ( REG_TSSI_STAT & TSSI_STAT_OVRN )
@@ -8790,7 +8796,7 @@ do { 						\
 
 #endif /* __MIPS_ASSEMBLER */
 
-#define	TVE_BASE	0xB3050100 
+#define	TVE_BASE	0xB3050100
 
 /*************************************************************************
  * TVE (TV Encoder Controller)
@@ -8829,8 +8835,8 @@ do { 						\
 #define TVE_CTRL_EYCBCR         (1 << 25)    /* YCbCr_enable */
 #define TVE_CTRL_ECVBS          (1 << 24)    /* 1: cvbs_enable 0: s-video*/
 #define TVE_CTRL_DAPD3	        (1 << 23)    /* DAC 3 power down */
-#define TVE_CTRL_DAPD2	        (1 << 22)    /* DAC 2 power down */	
-#define TVE_CTRL_DAPD1	        (1 << 21)    /* DAC 1 power down */	
+#define TVE_CTRL_DAPD2	        (1 << 22)    /* DAC 2 power down */
+#define TVE_CTRL_DAPD1	        (1 << 21)    /* DAC 1 power down */
 #define TVE_CTRL_DAPD           (1 << 20)    /* power down all DACs */
 #define TVE_CTRL_YCDLY_BIT      16
 #define TVE_CTRL_YCDLY_MASK     (0x7 << TVE_CTRL_YCDLY_BIT)
@@ -9591,7 +9597,7 @@ do {	                    			\
 #define AOSD_INT_AOSD_END        (1 << 0)
 
 #define __osd_enable_alpha() 	(REG_AOSD_CTRL |= AOSD_ALPHA_ENABLE)
-#define __osd_alpha_start()     (REG_AOSD_CTRL |= AOSD_CTRL_ALPHA_START) 
+#define __osd_alpha_start()     (REG_AOSD_CTRL |= AOSD_CTRL_ALPHA_START)
 
 /*************************************************************************
  * COMPRESS
@@ -9603,7 +9609,7 @@ do {	                    			\
 #define COMPRESS_CTRL       (AOSD_BASE + 0x3C)
 #define COMPRESS_RATIO      (AOSD_BASE + 0x40)
 #define COMPRESS_SRC_OFFSET     (AOSD_BASE + 0x44)
- 
+
 #define REG_COMPRESS_SCR_ADDR      REG32(COMPRESS_SCR_ADDR)
 #define REG_COMPRESS_DES_ADDR      REG32(COMPRESS_DES_ADDR)
 #define REG_COMPRESS_DST_OFFSET       REG32(COMPRESS_DST_OFFSET)
@@ -9627,9 +9633,9 @@ do {	                    			\
 #define COMPRESS_CTRL_ALIGNED_16_WORD	(0 << COMPRESS_CTRL_ALIGNED_MODE_BIT)
 #define COMPRESS_CTRL_ALIGNED_64_WORD	(1 << COMPRESS_CTRL_ALIGNED_MODE_BIT)
 
-#define __compress_enable()       (REG_COMPRESS_CTRL |= COMPRESS_INT_AOSD_END)      
-#define __compress_start()        (REG_COMPRESS_CTRL |= COMPRESS_CTRL_COMP_START)      
-#define __compress_with_alpha()   (REG_COMPRESS_CTRL |= COMPRESS_CTRL_ALPHA_EN)      
+#define __compress_enable()       (REG_COMPRESS_CTRL |= COMPRESS_INT_AOSD_END)
+#define __compress_start()        (REG_COMPRESS_CTRL |= COMPRESS_CTRL_COMP_START)
+#define __compress_with_alpha()   (REG_COMPRESS_CTRL |= COMPRESS_CTRL_ALPHA_EN)
 
 /* Rockbox defines */
 

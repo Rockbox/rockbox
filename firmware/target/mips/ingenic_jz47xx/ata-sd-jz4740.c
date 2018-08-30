@@ -38,7 +38,7 @@ static int                sd_drive_nr = 0;
 static tCardInfo          card;
 
 static struct mutex       sd_mtx;
-static struct semaphore   sd_wakeup;
+//static struct semaphore   sd_wakeup;
 
 static int                use_4bit;
 static int                num_6;
@@ -1218,7 +1218,7 @@ int sd_init(void)
     static bool inited = false;
     if(!inited)
     {
-        semaphore_init(&sd_wakeup, 1, 0);
+//        semaphore_init(&sd_wakeup, 1, 0);
         mutex_init(&sd_mtx);
         inited = true;
     }

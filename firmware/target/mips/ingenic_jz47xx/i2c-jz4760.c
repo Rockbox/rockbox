@@ -57,6 +57,7 @@ void I2C1(void)
         cmd_flag = -1;
         __i2c_clear_interrupts(ret,I2C_CHN);
         REG_I2C_INTM(I2C_CHN) = 0x0;
+	(void)ret;
         return;
     }
 
@@ -83,7 +84,7 @@ void I2C1(void)
     }
 
     cmd_cnt--;
-	
+
     if (!(cmd_cnt)) {
         REG_I2C_INTM(I2C_CHN) = 0x0;
         cmd_flag = 2;
@@ -198,9 +199,9 @@ int xfer_read_subaddr(unsigned char subaddr, unsigned char device, unsigned char
     i2c_rwflags = I2C_M_RD;
     i2c_ctrl_rest = I2C_CTRL_REST;
     i2c_init_as_master(device);
-	
+
     REG_I2C_DC(I2C_CHN) = (I2C_WRITE << 8) | subaddr;
-	
+
     cmd_flag = 0;
     REG_I2C_INTM(I2C_CHN) = 0x10;
     timeout = TIMEOUT;
@@ -224,6 +225,7 @@ int xfer_read_subaddr(unsigned char subaddr, unsigned char device, unsigned char
                 int ret;
                 r_i = 2;
                 __i2c_clear_interrupts(ret,I2C_CHN);
+		(void)ret;
                 goto R_dev_err;
             }
         }
@@ -269,14 +271,14 @@ int xfer_write_subaddr(unsigned char subaddr, unsigned char device, const unsign
     i2c_rwflags = I2C_M_WR;
     i2c_ctrl_rest = I2C_CTRL_REST;
     i2c_init_as_master(device);
-	
+
     REG_I2C_DC(I2C_CHN) = (I2C_WRITE << 8) | subaddr;
 
     cmd_flag = 0;
     REG_I2C_INTM(I2C_CHN) = 0x10;
 
     timeout = TIMEOUT;
-    while ((cmd_flag != 2) && (--timeout)) 
+    while ((cmd_flag != 2) && (--timeout))
     {
         if (cmd_flag == -1){
             w_i = 1;
@@ -308,6 +310,7 @@ int xfer_write_subaddr(unsigned char subaddr, unsigned char device, const unsign
         int ret;
         w_i = 5;
         __i2c_clear_interrupts(ret,I2C_CHN);
+	(void)ret;
         goto W_dev_err;
     }
 
