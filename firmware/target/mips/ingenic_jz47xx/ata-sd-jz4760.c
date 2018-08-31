@@ -33,6 +33,12 @@
 static long               last_disk_activity = -1;
 static tCardInfo          card[NUM_DRIVES];
 
+#if defined(CONFIG_STORAGE_MULTI) || defined(HAVE_HOTSWAP)
+static int                sd_drive_nr = 0;
+#else
+#define                   sd_drive_nr 0
+#endif
+
 static struct mutex       sd_mtx;
 //static struct semaphore   sd_wakeup;
 
@@ -1402,65 +1408,55 @@ int sd_soft_reset(void)
 }
 
 #ifdef HAVE_HOTSWAP
-bool sd_removable(const int drive)
+bool sd_removable(IF_MD_NONVOID(const int drive))
 {
-    (void)drive;
+#ifdef HAVE_MULTIDRIVE
+     (void)drive;
+#endif
     return true;
 }
 
-static int sd1_oneshot_callback(struct timeout *tmo)
+static int sd_oneshot_callback(struct timeout *tmo)
 {
-    int state = card_detect_target(SD_SLOT_1);
+    int slot = (int) tmo->data;
+    int state = card_detect_target(slot);
 
     /* This is called only if the state was stable for 300ms - check state
      * and post appropriate event. */
     queue_broadcast(state ? SYS_HOTSWAP_INSERTED : SYS_HOTSWAP_EXTRACTED,
-                    0);
+                    sd_drive_nr + slot);
 
-    sd_gpio_setup_irq(SD_SLOT_1, state);
-
-    return 0;
-    (void)tmo;
-}
-
-static int sd2_oneshot_callback(struct timeout *tmo)
-{
-    int state = card_detect_target(SD_SLOT_2);
-
-    /* This is called only if the state was stable for 300ms - check state
-     * and post appropriate event. */
-    queue_broadcast(state ? SYS_HOTSWAP_INSERTED : SYS_HOTSWAP_EXTRACTED,
-                    1);
-
-    sd_gpio_setup_irq(SD_SLOT_2, state);
+    sd_gpio_setup_irq(slot, state);
 
     return 0;
-    (void)tmo;
 }
 
 /* called on insertion/removal interrupt */
 void GPIO_SD1_CD(void)
 {
     static struct timeout sd1_oneshot;
-    timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
+    timeout_register(&sd1_oneshot, sd_oneshot_callback, (3*HZ/10), SD_SLOT_1);
 }
 
 void GPIO_SD2_CD(void)
 {
     static struct timeout sd2_oneshot;
-    timeout_register(&sd2_oneshot, sd2_oneshot_callback, (3*HZ/10), 0);
+    timeout_register(&sd2_oneshot, sd_oneshot_callback, (3*HZ/10), SD_SLOT_2);
 }
-#endif
 
-bool sd_present(const int drive)
+bool sd_present(IF_MD_NONVOID(const int drive))
 {
+#ifndef HAVE_MULTIDRIVE
+    const int drive = 0;
+#endif
     return card_detect_target(drive);
 }
+#endif
 
 #ifdef CONFIG_STORAGE_MULTI
 int sd_num_drives(int first_drive)
 {
-    (void)first_drive;
+    sd_drive_nr = first_drive;
     return NUM_DRIVES;
 }
 #endif /* CONFIG_STORAGE_MULTI */
@@ -1478,6 +1474,8 @@ int sd_event(long id, intptr_t data)
          * clear if the last attempt to init failed with an error. */
         mutex_lock(&sd_mtx); /* lock-out card activity */
         card[data].initialized = 0;
+	if (id == SYS_HOTSWAP_INSERTED)
+            sd_init_device(data);
         mutex_unlock(&sd_mtx);
         break;
 #endif /* HAVE_HOTSWAP */
