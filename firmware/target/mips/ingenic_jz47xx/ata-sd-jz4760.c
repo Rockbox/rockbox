@@ -1408,47 +1408,32 @@ bool sd_removable(const int drive)
     return true;
 }
 
-static int sd1_oneshot_callback(struct timeout *tmo)
+static int sd_oneshot_callback(struct timeout *tmo)
 {
-    int state = card_detect_target(SD_SLOT_1);
+    int slot = (int) tmo->data;
+    int state = card_detect_target(slot);
 
     /* This is called only if the state was stable for 300ms - check state
      * and post appropriate event. */
     queue_broadcast(state ? SYS_HOTSWAP_INSERTED : SYS_HOTSWAP_EXTRACTED,
-                    0);
+                    slot);
 
-    sd_gpio_setup_irq(SD_SLOT_1, state);
-
-    return 0;
-    (void)tmo;
-}
-
-static int sd2_oneshot_callback(struct timeout *tmo)
-{
-    int state = card_detect_target(SD_SLOT_2);
-
-    /* This is called only if the state was stable for 300ms - check state
-     * and post appropriate event. */
-    queue_broadcast(state ? SYS_HOTSWAP_INSERTED : SYS_HOTSWAP_EXTRACTED,
-                    1);
-
-    sd_gpio_setup_irq(SD_SLOT_2, state);
+    sd_gpio_setup_irq(slot, state);
 
     return 0;
-    (void)tmo;
 }
 
 /* called on insertion/removal interrupt */
 void GPIO_SD1_CD(void)
 {
     static struct timeout sd1_oneshot;
-    timeout_register(&sd1_oneshot, sd1_oneshot_callback, (3*HZ/10), 0);
+    timeout_register(&sd1_oneshot, sd_oneshot_callback, (3*HZ/10), SD_SLOT_1);
 }
 
 void GPIO_SD2_CD(void)
 {
     static struct timeout sd2_oneshot;
-    timeout_register(&sd2_oneshot, sd2_oneshot_callback, (3*HZ/10), 0);
+    timeout_register(&sd2_oneshot, sd_oneshot_callback, (3*HZ/10), SD_SLOT_2);
 }
 #endif
 
@@ -1481,6 +1466,7 @@ int sd_event(long id, intptr_t data)
         mutex_unlock(&sd_mtx);
         break;
 #endif /* HAVE_HOTSWAP */
+    case Q_STORAGE_TICK:
     default:
         rc = storage_event_default_handler(id, data, last_disk_activity,
                                            STORAGE_SD);
