@@ -331,6 +331,7 @@ $(BUILDDIR)/rockbox.zip:
 else
 $(BUILDDIR)/rockbox.zip: build
 endif
+	$(call PRINTS,ZIP $(notdir $@))
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) --app=$(APPLICATION) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -r "$(ROOTDIR)" --rbdir="$(RBDIR)" $(TARGET) $(BINARY)
 
 mapzip:
