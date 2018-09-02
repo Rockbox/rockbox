@@ -19,8 +19,7 @@ MADFLAGS += -UDEBUG -DNDEBUG -DHAVE_LIMITS_H -DHAVE_ASSERT_H
 ifeq ($(ARCH),arch_arm)
    MADFLAGS += -O1
 else
-#   MADFLAGS += -O2
-   MADFLAGS += -O0 -g
+   MADFLAGS += -O2
 endif
 
 # MPEGplayer
