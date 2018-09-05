@@ -44,7 +44,7 @@
    the limiting factor is the scanning thread stack size, not the
    implementation -- tune the two together */
 #define DIRCACHE_MAX_DEPTH  15
-#define DIRCACHE_STACK_SIZE (DEFAULT_STACK_SIZE + 0x100)
+#define DIRCACHE_STACK_SIZE (DEFAULT_STACK_SIZE + 0x200)
 
 /* memory buffer constants that control allocation */
 #define DIRCACHE_RESERVE (1024*64)     /* 64 KB - new entry slack */
