@@ -62,9 +62,12 @@ void button_init_device(void)
 
     __gpio_disable_pull(PIN_BTN_POWER);
     __gpio_disable_pull(PIN_BTN_HOLD);
-    
+
+#if 0
+    /* We poll this, no need to set it up for an interrupt */
     __gpio_as_irq_fall_edge(PIN_KEY_INT);
     system_enable_irq(GPIO_IRQ(PIN_KEY_INT));
+#endif
 
     __gpio_set_pin(PIN_CHARGE_CON); /* 0.7 A */
     __gpio_as_output(PIN_CHARGE_CON);
@@ -85,7 +88,7 @@ int button_read_device(void)
 {
     static bool hold_button = false;
     bool hold_button_old;
-    
+
     hold_button_old = hold_button;
     hold_button = (__gpio_get_pin(PIN_BTN_HOLD) ? true : false);
 
@@ -127,7 +130,7 @@ int button_read_device(void)
     else
     if (key_val < 2600)
         btn |= BUTTON_HOME;
-       
+
     return btn;
 }
 
@@ -202,7 +205,7 @@ void SADC(void)
     sadcstate = REG_SADC_ADSTATE;
     state = REG_SADC_ADSTATE & (~REG_SADC_ADCTRL);
     REG_SADC_ADSTATE &= sadcstate;
-    
+
     if(state & ADCTRL_ARDYM)
     {
         key_val = REG_SADC_ADADAT;
