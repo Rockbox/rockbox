@@ -30,6 +30,13 @@
 #include "storage.h"
 #include "string.h"
 
+#define SD_DMA_ENABLE 1
+#define SD_DMA_INTERRUPT 1
+
+#if NUM_DRIVES > 2
+#error "JZ4760 SD driver supports NUM_DRIVES <= 2 only"
+#endif
+
 static long               last_disk_activity = -1;
 static tCardInfo          card[NUM_DRIVES];
 
@@ -40,13 +47,14 @@ static int                sd_drive_nr = 0;
 #endif
 
 static struct mutex       sd_mtx;
-//static struct semaphore   sd_wakeup;
+#if SD_DMA_INTERRUPT
+static struct semaphore   sd_wakeup;
+#endif
 
 static int                use_4bit[NUM_DRIVES];
 static int                num_6[NUM_DRIVES];
 static int                sd2_0[NUM_DRIVES];
 
-#define SD_DMA_ENABLE 1
 
 //#define DEBUG(x...)         logf(x)
 #define DEBUG(x, ...)
@@ -129,45 +137,6 @@ enum sd_rsp_t
     RESPONSE_R7      = 9,
 };
 
-/*
-  MMC status in R1
-  Type
-    e : error bit
-    s : status bit
-    r : detected and set for the actual command response
-    x : detected and set during command execution. the host must poll
-        the card by sending status command in order to read these bits.
-  Clear condition
-    a : according to the card state
-    b : always related to the previous command. Reception of
-        a valid command will clear it (with a delay of one command)
-    c : clear by read
- */
-
-#define R1_OUT_OF_RANGE        (1 << 31)    /* er, c */
-#define R1_ADDRESS_ERROR       (1 << 30)    /* erx, c */
-#define R1_BLOCK_LEN_ERROR     (1 << 29)    /* er, c */
-#define R1_ERASE_SEQ_ERROR     (1 << 28)    /* er, c */
-#define R1_ERASE_PARAM         (1 << 27)    /* ex, c */
-#define R1_WP_VIOLATION        (1 << 26)    /* erx, c */
-#define R1_CARD_IS_LOCKED      (1 << 25)    /* sx, a */
-#define R1_LOCK_UNLOCK_FAILED  (1 << 24)    /* erx, c */
-#define R1_COM_CRC_ERROR       (1 << 23)    /* er, b */
-#define R1_ILLEGAL_COMMAND     (1 << 22)    /* er, b */
-#define R1_CARD_ECC_FAILED     (1 << 21)    /* ex, c */
-#define R1_CC_ERROR            (1 << 20)    /* erx, c */
-#define R1_ERROR               (1 << 19)    /* erx, c */
-#define R1_UNDERRUN            (1 << 18)    /* ex, c */
-#define R1_OVERRUN             (1 << 17)    /* ex, c */
-#define R1_CID_CSD_OVERWRITE   (1 << 16)    /* erx, c, CID/CSD overwrite */
-#define R1_WP_ERASE_SKIP       (1 << 15)    /* sx, c */
-#define R1_CARD_ECC_DISABLED   (1 << 14)    /* sx, a */
-#define R1_ERASE_RESET         (1 << 13)    /* sr, c */
-#define R1_STATUS(x)           (x & 0xFFFFE000)
-#define R1_CURRENT_STATE(x)    ((x & 0x00001E00) >> 9)    /* sx, b (4 bits) */
-#define R1_READY_FOR_DATA      (1 << 8)     /* sx, a */
-#define R1_APP_CMD             (1 << 7)     /* sr, c */
-
 /* These are unpacked versions of the actual responses */
 struct sd_response_r1
 {
@@ -176,7 +145,7 @@ struct sd_response_r1
 };
 
 struct sd_response_r3
-{  
+{
     unsigned int ocr;
 };
 
@@ -233,23 +202,23 @@ static int sd_unpack_r1(struct sd_request *request, struct sd_response_r1 *r1)
 
     DEBUG("sd_unpack_r1: cmd=%d status=%08x", r1->cmd, r1->status);
 
-    if (R1_STATUS(r1->status)) {
-        if (r1->status & R1_OUT_OF_RANGE)       return SD_ERROR_OUT_OF_RANGE;
-        if (r1->status & R1_ADDRESS_ERROR)      return SD_ERROR_ADDRESS;
-        if (r1->status & R1_BLOCK_LEN_ERROR)    return SD_ERROR_BLOCK_LEN;
-        if (r1->status & R1_ERASE_SEQ_ERROR)    return SD_ERROR_ERASE_SEQ;
-        if (r1->status & R1_ERASE_PARAM)        return SD_ERROR_ERASE_PARAM;
-        if (r1->status & R1_WP_VIOLATION)       return SD_ERROR_WP_VIOLATION;
-        //if (r1->status & R1_CARD_IS_LOCKED)     return SD_ERROR_CARD_IS_LOCKED;
-        if (r1->status & R1_LOCK_UNLOCK_FAILED) return SD_ERROR_LOCK_UNLOCK_FAILED;
-        if (r1->status & R1_COM_CRC_ERROR)      return SD_ERROR_COM_CRC;
-        if (r1->status & R1_ILLEGAL_COMMAND)    return SD_ERROR_ILLEGAL_COMMAND;
-        if (r1->status & R1_CARD_ECC_FAILED)    return SD_ERROR_CARD_ECC_FAILED;
-        if (r1->status & R1_CC_ERROR)           return SD_ERROR_CC;
-        if (r1->status & R1_ERROR)              return SD_ERROR_GENERAL;
-        if (r1->status & R1_UNDERRUN)           return SD_ERROR_UNDERRUN;
-        if (r1->status & R1_OVERRUN)            return SD_ERROR_OVERRUN;
-        if (r1->status & R1_CID_CSD_OVERWRITE)  return SD_ERROR_CID_CSD_OVERWRITE;
+    if (SD_R1_STATUS(r1->status)) {
+        if (r1->status & SD_R1_OUT_OF_RANGE)       return SD_ERROR_OUT_OF_RANGE;
+        if (r1->status & SD_R1_ADDRESS_ERROR)      return SD_ERROR_ADDRESS;
+        if (r1->status & SD_R1_BLOCK_LEN_ERROR)    return SD_ERROR_BLOCK_LEN;
+        if (r1->status & SD_R1_ERASE_SEQ_ERROR)    return SD_ERROR_ERASE_SEQ;
+        if (r1->status & SD_R1_ERASE_PARAM)        return SD_ERROR_ERASE_PARAM;
+        if (r1->status & SD_R1_WP_VIOLATION)       return SD_ERROR_WP_VIOLATION;
+        //if (r1->status & SD_R1_CARD_IS_LOCKED)     return SD_ERROR_CARD_IS_LOCKED;
+        if (r1->status & SD_R1_LOCK_UNLOCK_FAILED) return SD_ERROR_LOCK_UNLOCK_FAILED;
+        if (r1->status & SD_R1_COM_CRC_ERROR)      return SD_ERROR_COM_CRC;
+        if (r1->status & SD_R1_ILLEGAL_COMMAND)    return SD_ERROR_ILLEGAL_COMMAND;
+        if (r1->status & SD_R1_CARD_ECC_FAILED)    return SD_ERROR_CARD_ECC_FAILED;
+        if (r1->status & SD_R1_CC_ERROR)           return SD_ERROR_CC;
+        if (r1->status & SD_R1_ERROR)              return SD_ERROR_GENERAL;
+        if (r1->status & SD_R1_UNDERRUN)           return SD_ERROR_UNDERRUN;
+        if (r1->status & SD_R1_OVERRUN)            return SD_ERROR_OVERRUN;
+        if (r1->status & SD_R1_CSD_OVERWRITE)      return SD_ERROR_CID_CSD_OVERWRITE;
     }
 
     if (buf[0] != request->cmd)
@@ -257,7 +226,7 @@ static int sd_unpack_r1(struct sd_request *request, struct sd_response_r1 *r1)
 
     /* This should be last - it's the least dangerous error */
 
-    return 0;
+    return SD_NO_ERROR;
 }
 
 static int sd_unpack_r6(struct sd_request *request, struct sd_response_r1 *r1, unsigned long *rca)
@@ -287,7 +256,7 @@ static int sd_unpack_r3(struct sd_request *request, struct sd_response_r3 *r3)
     if (buf[0] != 0x3f)
         return SD_ERROR_HEADER_MISMATCH;
 
-    return 0;
+    return SD_NO_ERROR;
 }
 
 /* Stop the MMC clock and wait while it happens */
@@ -339,10 +308,8 @@ static int jz_sd_check_status(const int drive, struct sd_request *request)
     {
         DEBUG("SD CRC error, MSC_STAT 0x%x", status);
         return SD_ERROR_CRC;
-    
     }
-    
-    
+
     /* Checking for FIFO empty */
     /*if(status & MSC_STAT_DATA_FIFO_EMPTY && request->rtype != RESPONSE_NONE)
     {
@@ -358,7 +325,10 @@ static void jz_sd_get_response(const int drive, struct sd_request *request)
 {
     int i;
     unsigned char *buf;
-    unsigned int data;
+    unsigned short data;
+
+    if (request->result != SD_NO_RESPONSE)
+        return;
 
     DEBUG("fetch response for request %d, cmd %d", request->rtype,
           request->cmd);
@@ -419,37 +389,39 @@ static int jz_sd_receive_data(const int drive, struct sd_request *req)
     unsigned char *buf = req->buffer;
     unsigned int *wbuf = (unsigned int *) buf;
     unsigned int waligned = (((unsigned int) buf & 0x3) == 0);    /* word aligned ? */
-    unsigned int stat, timeout, data, cnt;
+    unsigned int stat, data, cnt;
 
     for (; nob >= 1; nob--)
     {
-        timeout = 0x3FFFFFF;
+        long deadline = current_tick + (HZ * 65);
 
-        while (timeout)
-        {
-            timeout--;
+        do {
             stat = REG_MSC_STAT(MSC_CHN(drive));
 
             if (stat & MSC_STAT_TIME_OUT_READ)
                 return SD_ERROR_TIMEOUT;
             else if (stat & MSC_STAT_CRC_READ_ERROR)
                 return SD_ERROR_CRC;
-            else if (!(stat & MSC_STAT_DATA_FIFO_EMPTY)
-                 || (stat & MSC_STAT_DATA_FIFO_AFULL))
+            else if ((stat & MSC_STAT_DATA_FIFO_AFULL) ||
+                     !(stat & MSC_STAT_DATA_FIFO_EMPTY))
                 /* Ready to read data */
                 break;
 
-            udelay(1);
-        }
-
-        if (!timeout)
-            return SD_ERROR_TIMEOUT;
+            yield();
+        } while (TIME_BEFORE(current_tick, deadline));
 
         /* Read data from RXFIFO. It could be FULL or PARTIAL FULL */
         DEBUG("Receive Data = %d", wblocklen);
         cnt = wblocklen;
         while (cnt)
         {
+            if (REG_MSC_STAT(MSC_CHN(drive)) & MSC_STAT_DATA_FIFO_EMPTY)
+            {
+                if (TIME_AFTER(current_tick, deadline))
+                    return SD_ERROR_TIMEOUT;
+                continue;
+            }
+
             data = REG_MSC_RXFIFO(MSC_CHN(drive));
             if (waligned)
                 *wbuf++ = data;
@@ -461,9 +433,6 @@ static int jz_sd_receive_data(const int drive, struct sd_request *req)
                 *buf++ = (unsigned char) (data >> 24);
             }
             cnt--;
-            while (cnt
-                   && (REG_MSC_STAT(MSC_CHN(drive)) &
-                   MSC_STAT_DATA_FIFO_EMPTY));
         }
     }
 
@@ -477,15 +446,13 @@ static int jz_sd_transmit_data(const int drive, struct sd_request *req)
     unsigned char *buf = req->buffer;
     unsigned int *wbuf = (unsigned int *) buf;
     unsigned int waligned = (((unsigned int) buf & 0x3) == 0);    /* word aligned ? */
-    unsigned int stat, timeout, data, cnt;
+    unsigned int stat, data, cnt;
 
     for (; nob >= 1; nob--)
     {
-        timeout = 0x3FFFFFF;
+        long deadline = current_tick + (HZ * 65);
 
-        while (timeout)
-        {
-            timeout--;
+        do {
             stat = REG_MSC_STAT(MSC_CHN(drive));
 
             if (stat &
@@ -496,17 +463,19 @@ static int jz_sd_transmit_data(const int drive, struct sd_request *req)
                 /* Ready to write data */
                 break;
 
-            udelay(1);
-        }
-
-        if (!timeout)
-            return SD_ERROR_TIMEOUT;
+            yield();
+        } while (TIME_BEFORE(current_tick, deadline));
 
         /* Write data to TXFIFO */
         cnt = wblocklen;
         while (cnt)
         {
-            while (REG_MSC_STAT(MSC_CHN(drive)) & MSC_STAT_DATA_FIFO_FULL);
+            if (REG_MSC_STAT(MSC_CHN(drive)) & MSC_STAT_DATA_FIFO_FULL)
+            {
+                if (TIME_AFTER(current_tick, deadline))
+                    return SD_ERROR_TIMEOUT;
+                continue;
+            }
 
             if (waligned)
                 REG_MSC_TXFIFO(MSC_CHN(drive)) = *wbuf++;
@@ -527,72 +496,81 @@ static int jz_sd_transmit_data(const int drive, struct sd_request *req)
 }
 
 #if SD_DMA_ENABLE
-static void jz_sd_receive_data_dma(const int drive, struct sd_request *req)
+static int jz_sd_receive_data_dma(const int drive, struct sd_request *req)
 {
-    unsigned int waligned = (((unsigned int)req->buffer & 0x3) == 0);    /* word aligned ? */
-    unsigned int size = req->block_len * req->nob;
-
-    if (!waligned)
-    {
-        jz_sd_receive_data(drive, req);
-        return;
-    }
+    if ((unsigned int)req->buffer & 0x3)
+        return jz_sd_receive_data(drive, req);
 
     /* flush dcache */
-    dma_cache_wback_inv((unsigned long) req->buffer, size);
+    dma_cache_wback_inv((unsigned long) req->buffer, req->cnt);
 
     /* setup dma channel */
     REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) = 0;
     REG_DMAC_DSAR(DMA_SD_RX_CHANNEL) = PHYSADDR(MSC_RXFIFO(MSC_CHN(drive))); /* DMA source addr */
     REG_DMAC_DTAR(DMA_SD_RX_CHANNEL) = PHYSADDR((unsigned long)req->buffer); /* DMA dest addr */
-    REG_DMAC_DTCR(DMA_SD_RX_CHANNEL) = (size + 3) >> 2;                      /* DMA transfer count */
+    REG_DMAC_DTCR(DMA_SD_RX_CHANNEL) = (req->cnt + 3) >> 2;                  /* DMA transfer count */
     REG_DMAC_DRSR(DMA_SD_RX_CHANNEL) = (drive == SD_SLOT_1) ? DMAC_DRSR_RS_MSC2IN : DMAC_DRSR_RS_MSC1IN;    /* DMA request type */
 
     REG_DMAC_DCMD(DMA_SD_RX_CHANNEL) =
+#if SD_DMA_INTERRUPT
+        DMAC_DCMD_TIE | /* Enable DMA interrupt */
+#endif
         DMAC_DCMD_DAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DWDH_32 |
         DMAC_DCMD_DS_32BIT;
     REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
 
     /* wait for dma completion */
-    while (REG_DMAC_DTCR(DMA_SD_RX_CHANNEL));
+#if SD_DMA_INTERRUPT
+    semaphore_wait(&sd_wakeup, TIMEOUT_BLOCK);
+#else
+    while (REG_DMAC_DTCR(DMA_SD_RX_CHANNEL))
+           yield();
+#endif
 
     /* clear status and disable channel */
     REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) = 0;
+
+    return SD_NO_ERROR;
 }
 
-static void jz_sd_transmit_data_dma(const int drive, struct sd_request *req)
+static int jz_sd_transmit_data_dma(const int drive, struct sd_request *req)
 {
-    unsigned int waligned = (((unsigned int)req->buffer & 0x3) == 0);    /* word aligned ? */
-    unsigned int size = req->block_len * req->nob;
-
-    if (!waligned)
-    {
-        jz_sd_transmit_data(drive, req);
-        return;
-    }
+    if ((unsigned int)req->buffer & 0x3)
+        return jz_sd_transmit_data(drive, req);
 
     /* flush dcache */
-    dma_cache_wback_inv((unsigned long) req->buffer, size);
+    dma_cache_wback_inv((unsigned long) req->buffer, req->cnt);
 
     /* setup dma channel */
     REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) = 0;
     REG_DMAC_DSAR(DMA_SD_TX_CHANNEL) = PHYSADDR((unsigned long) req->buffer); /* DMA source addr */
     REG_DMAC_DTAR(DMA_SD_TX_CHANNEL) = PHYSADDR(MSC_TXFIFO(MSC_CHN(drive)));  /* DMA dest addr */
-    REG_DMAC_DTCR(DMA_SD_TX_CHANNEL) = (size + 3) >> 2;                       /* DMA transfer count */
+    REG_DMAC_DTCR(DMA_SD_TX_CHANNEL) = (req->cnt + 3) >> 2;                       /* DMA transfer count */
     REG_DMAC_DRSR(DMA_SD_TX_CHANNEL) = (drive == SD_SLOT_1) ? DMAC_DRSR_RS_MSC2OUT : DMAC_DRSR_RS_MSC1OUT;    /* DMA request type */
 
     REG_DMAC_DCMD(DMA_SD_TX_CHANNEL) =
+#if SD_DMA_INTERRUPT
+        DMAC_DCMD_TIE | /* Enable DMA interrupt */
+#endif
         DMAC_DCMD_SAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DWDH_32 |
         DMAC_DCMD_DS_32BIT;
     REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
 
     /* wait for dma completion */
-    while (REG_DMAC_DTCR(DMA_SD_TX_CHANNEL));
+#if SD_DMA_INTERRUPT
+    semaphore_wait(&sd_wakeup, TIMEOUT_BLOCK);
+#else
+    while (REG_DMAC_DTCR(DMA_SD_TX_CHANNEL))
+           yield();
+#endif
 
     /* clear status and disable channel */
     REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) = 0;
+
+    return SD_NO_ERROR;
 }
 
+#if SD_DMA_INTERRUPT
 void DMA_CALLBACK(DMA_SD_RX_CHANNEL)(void)
 {
     if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) & DMAC_DCCSR_AR)
@@ -612,6 +590,8 @@ void DMA_CALLBACK(DMA_SD_RX_CHANNEL)(void)
         REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) &= ~DMAC_DCCSR_TT;
         //sd_rx_dma_callback();
     }
+
+    semaphore_release(&sd_wakeup);
 }
 
 void DMA_CALLBACK(DMA_SD_TX_CHANNEL)(void)
@@ -633,7 +613,10 @@ void DMA_CALLBACK(DMA_SD_TX_CHANNEL)(void)
         REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) &= ~DMAC_DCCSR_TT;
         //sd_tx_dma_callback();
     }
+
+    semaphore_release(&sd_wakeup);
 }
+#endif                /* SD_DMA_INTERRUPT */
 #endif                /* SD_DMA_ENABLE */
 
 static inline unsigned int jz_sd_calc_clkrt(const int drive, unsigned int rate)
@@ -654,7 +637,7 @@ static inline void cpm_select_msc_clk(unsigned int rate)
 {
     unsigned int div = __cpm_get_pllout2() / rate;
     if (div == 0)
-	    div = 1;
+            div = 1;
 
     REG_CPM_MSCCDR = MSCCDR_MCS | (div - 1);
     DEBUG("MSCCLK == %x\n", REG_CPM_MSCCDR);
@@ -686,7 +669,8 @@ static void jz_sd_set_clock(const int drive, unsigned int rate)
 static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
 {
     unsigned int cmdat = 0, events = 0;
-    int retval, timeout = 0x3fffff;
+    int retval;
+    long deadline = current_tick + (HZ * 5);
 
     /* Indicate we have no result yet */
     request->result = SD_NO_RESPONSE;
@@ -704,32 +688,14 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
         /* On reset, stop SD clock */
         jz_sd_stop_clock(drive);
     }
-    if (request->cmd == SD_SET_BUS_WIDTH)
-    {
-        if (request->arg == 0x2)
-        {
-            DEBUG("Use 4-bit bus width");
-            use_4bit[drive] = 1;
-        }
-        else
-        {
-            DEBUG("Use 1-bit bus width");
-            use_4bit[drive] = 0;
-        }
-    }
 
     /* stop clock */
     jz_sd_stop_clock(drive);
 
-    /* mask all interrupts */
-    //REG_MSC_IMASK(MSC_CHN(drive)) = 0xffff;
-    /* clear status */
-    REG_MSC_IREG(MSC_CHN(drive)) = 0xffff;
+    /* mask all interrupts and clear status */
+    SD_IRQ_MASK(MSC_CHN(drive));
     /*open interrupt */
-    REG_MSC_IMASK(MSC_CHN(drive)) = (~7);
-    /* use 4-bit bus width when possible */
-    if (use_4bit[drive])
-        cmdat |= MSC_CMDAT_BUS_WIDTH_4BIT;
+    REG_MSC_IMASK(MSC_CHN(drive)) = ~(MSC_IMASK_END_CMD_RES | MSC_IMASK_DATA_TRAN_DONE | MSC_IMASK_PRG_DONE);
 
     /* Set command type and events */
     switch (request->cmd)
@@ -750,10 +716,18 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
             break;
 
             /* adtc - addressed with data transfer */
+        case SD_SEND_SCR:
+            /* SD card returns SCR register as data.
+               SD core expect it in the response buffer,
+               after normal response. */
+            request->buffer =
+              (unsigned char *) ((unsigned int) request->response + 5);
+            request->block_len = 8;
+            request->nob = 1;
+
         case SD_READ_DAT_UNTIL_STOP:
         case SD_READ_SINGLE_BLOCK:
         case SD_READ_MULTIPLE_BLOCK:
-        case SD_SEND_SCR:
 #if SD_DMA_ENABLE
             cmdat |=
                 MSC_CMDAT_DATA_EN | MSC_CMDAT_READ | MSC_CMDAT_DMA_EN;
@@ -763,7 +737,17 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
             events = SD_EVENT_RX_DATA_DONE;
             break;
 
-        case 6:
+        case SD_SWITCH_FUNC:
+            if (request->arg == 0x2)
+            {
+                DEBUG("Use 4-bit bus width");
+                use_4bit[drive] = 1;
+            }
+            else
+            {
+                DEBUG("Use 1-bit bus width");
+                use_4bit[drive] = 0;
+            }
             if (num_6[drive] < 2)
             {
 #if SD_DMA_ENABLE
@@ -782,7 +766,7 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
         case SD_WRITE_MULTIPLE_BLOCK:
         case SD_PROGRAM_CID:
         case SD_PROGRAM_CSD:
-        case SD_LOCK_UNLOCK:
+//        case SD_LOCK_UNLOCK:
 #if SD_DMA_ENABLE
             cmdat |=
                 MSC_CMDAT_DATA_EN | MSC_CMDAT_WRITE | MSC_CMDAT_DMA_EN;
@@ -833,6 +817,10 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
             break;
     }
 
+    /* use 4-bit bus width when possible */
+    if (use_4bit[drive])
+        cmdat |= MSC_CMDAT_BUS_WIDTH_4BIT;
+
     /* Set command index */
     if (request->cmd == SD_CIM_RESET)
         REG_MSC_CMD(MSC_CHN(drive)) = SD_GO_IDLE_STATE;
@@ -843,16 +831,8 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
     REG_MSC_ARG(MSC_CHN(drive)) = request->arg;
 
     /* Set block length and nob */
-    if (request->cmd == SD_SEND_SCR)
-    {    /* get SCR from DataFIFO */
-        REG_MSC_BLKLEN(MSC_CHN(drive)) = 8;
-        REG_MSC_NOB(MSC_CHN(drive)) = 1;
-    }
-    else
-    {
-        REG_MSC_BLKLEN(MSC_CHN(drive)) = request->block_len;
-        REG_MSC_NOB(MSC_CHN(drive)) = request->nob;
-    }
+    REG_MSC_BLKLEN(MSC_CHN(drive)) = request->block_len;
+    REG_MSC_NOB(MSC_CHN(drive)) = request->nob;
 
     /* Set command */
     REG_MSC_CMDAT(MSC_CHN(drive)) = cmdat;
@@ -866,11 +846,12 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
     /* Wait for command completion */
     //__intc_unmask_irq(IRQ_MSC);
     //semaphore_wait(&sd_wakeup, 100);
-    while (timeout-- && !(REG_MSC_STAT(MSC_CHN(drive)) & MSC_STAT_END_CMD_RES));
-
-
-    if (timeout == 0)
-        return SD_ERROR_TIMEOUT;
+    while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_END_CMD_RES))
+    {
+        if (TIME_AFTER(current_tick, deadline))
+            return SD_ERROR_TIMEOUT;
+        yield();
+    }
 
     REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_END_CMD_RES;    /* clear flag */
 
@@ -891,33 +872,31 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
     {
         if (events & SD_EVENT_RX_DATA_DONE)
         {
-            if (request->cmd == SD_SEND_SCR)
-            {
-                /* SD card returns SCR register as data. 
-                   SD core expect it in the response buffer, 
-                   after normal response. */
-                request->buffer =
-                    (unsigned char *) ((unsigned int) request->response + 5);
-            }
 #if SD_DMA_ENABLE
-            jz_sd_receive_data_dma(drive, request);
+            retval = jz_sd_receive_data_dma(drive, request);
 #else
-            jz_sd_receive_data(drive, request);
+            retval = jz_sd_receive_data(drive, request);
 #endif
         }
+        if (retval)
+            return retval;
 
         if (events & SD_EVENT_TX_DATA_DONE)
         {
 #if SD_DMA_ENABLE
-            jz_sd_transmit_data_dma(drive, request);
+            retval = jz_sd_transmit_data_dma(drive, request);
 #else
-            jz_sd_transmit_data(drive, request);
+            retval = jz_sd_transmit_data(drive, request);
 #endif
         }
+        if (retval)
+            return retval;
+
         //__intc_unmask_irq(IRQ_MSC);
         //semaphore_wait(&sd_wakeup, 100);
         /* Wait for Data Done */
-        while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_DATA_TRAN_DONE));
+        while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_DATA_TRAN_DONE))
+            yield();
         REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_DATA_TRAN_DONE;    /* clear status */
     }
 
@@ -926,7 +905,8 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
     {
         //__intc_unmask_irq(IRQ_MSC);
         //semaphore_wait(&sd_wakeup, 100);
-        while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_PRG_DONE));
+        while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_PRG_DONE))
+            yield();
         REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_PRG_DONE;    /* clear status */
     }
 
@@ -986,10 +966,12 @@ static void jz_sd_hardware_init(const int drive)
     jz_sd_stop_clock(drive); /* stop SD clock */
 }
 
-static int sd_send_cmd(const int drive, struct sd_request *request, int cmd, unsigned int arg,
+static void sd_send_cmd(const int drive, struct sd_request *request, int cmd, unsigned int arg,
                          unsigned short nob, unsigned short block_len,
                          enum sd_rsp_t rtype, unsigned char* buffer)
 {
+    int retval;
+
     request->cmd = cmd;
     request->arg = arg;
     request->rtype = rtype;
@@ -998,13 +980,32 @@ static int sd_send_cmd(const int drive, struct sd_request *request, int cmd, uns
     request->buffer = buffer;
     request->cnt = nob * block_len;
 
-    return jz_sd_exec_cmd(drive, request);
+    retval = jz_sd_exec_cmd(drive, request);
+    if (retval)
+            request->result = retval;
 }
 
 static void sd_simple_cmd(const int drive, struct sd_request *request, int cmd, unsigned int arg,
                            enum sd_rsp_t rtype)
 {
     sd_send_cmd(drive, request, cmd, arg, 0, 0, rtype, NULL);
+}
+
+static int sd_exec_acmd(const int drive, struct sd_request *request, int cmd, unsigned int arg)
+{
+    struct sd_response_r1 r1;
+    int retval;
+
+    sd_simple_cmd(drive, request, SD_APP_CMD, card[drive].rca, RESPONSE_R1);
+    retval = sd_unpack_r1(request, &r1);
+
+    if (!retval)
+    {
+        sd_simple_cmd(drive, request, cmd, arg, RESPONSE_R1);
+        retval = sd_unpack_r1(request, &r1);
+    }
+
+    return retval;
 }
 
 #define SD_INIT_DOING   0
@@ -1014,7 +1015,7 @@ static int sd_init_card_state(const int drive, struct sd_request *request)
 {
     struct sd_response_r1 r1;
     struct sd_response_r3 r3;
-    int retval, i, ocr = 0x40300000, limit_41 = 0;
+    int retval, i, ocr = 0x40300000;
 
     switch (request->cmd)
     {
@@ -1028,28 +1029,15 @@ static int sd_init_card_state(const int drive, struct sd_request *request)
             break;
 
         case SD_APP_CMD:
-            retval = sd_unpack_r1(request, &r1);
-            if (retval & (limit_41 < 100))
-            {
-                DEBUG("sd_init_card_state: unable to SD_APP_CMD error=%d", 
-                      retval);
-                limit_41++;
-                sd_simple_cmd(drive, request, SD_APP_OP_COND, ocr, RESPONSE_R3);
-            }
-            else if (limit_41 < 100)
-            {
-                limit_41++;
-                sd_simple_cmd(drive, request, SD_APP_OP_COND, ocr, RESPONSE_R3);
-            }
-            else
-                /* reset the card to idle*/
-                sd_simple_cmd(drive, request, SD_GO_IDLE_STATE, 0, RESPONSE_NONE);
+            if (sd_unpack_r1(request, &r1))
+                return SD_INIT_FAILED;
+            sd_simple_cmd(drive, request, SD_APP_OP_COND, ocr, RESPONSE_R3);
             break;
 
         case SD_APP_OP_COND:
             retval = sd_unpack_r3(request, &r3);
             if (retval)
-                break;
+                return SD_INIT_FAILED;
 
             DEBUG("sd_init_card_state: read ocr value = 0x%08x", r3.ocr);
             card[drive].ocr = r3.ocr;
@@ -1068,20 +1056,24 @@ static int sd_init_card_state(const int drive, struct sd_request *request)
             break;
 
         case SD_ALL_SEND_CID:
+            if (request->result)
+                return SD_INIT_FAILED;
+
             for(i=0; i<4; i++)
-                card[drive].cid[i] = ((request->response[1+i*4]<<24) | (request->response[2+i*4]<<16) | 
+                card[drive].cid[i] = ((request->response[1+i*4]<<24) | (request->response[2+i*4]<<16) |
                                (request->response[3+i*4]<< 8) | request->response[4+i*4]);
 
             logf("CID: %08lx%08lx%08lx%08lx", card[drive].cid[0], card[drive].cid[1], card[drive].cid[2], card[drive].cid[3]);
             sd_simple_cmd(drive, request, SD_SEND_RELATIVE_ADDR, 0, RESPONSE_R6);
             break;
+
         case SD_SEND_RELATIVE_ADDR:
             retval = sd_unpack_r6(request, &r1, &card[drive].rca);
-            card[drive].rca = card[drive].rca << 16; 
+            card[drive].rca = card[drive].rca << 16;
             DEBUG("sd_init_card_state: Get RCA from SD: 0x%04lx Status: %x", card[drive].rca, r1.status);
             if (retval)
             {
-                DEBUG("sd_init_card_state: unable to SET_RELATIVE_ADDR error=%d", 
+                DEBUG("sd_init_card_state: unable to SET_RELATIVE_ADDR error=%d",
                       retval);
                 return SD_INIT_FAILED;
             }
@@ -1090,8 +1082,10 @@ static int sd_init_card_state(const int drive, struct sd_request *request)
             break;
 
         case SD_SEND_CSD:
+            if (request->result)
+                return SD_INIT_FAILED;
             for(i=0; i<4; i++)
-                card[drive].csd[i] = ((request->response[1+i*4]<<24) | (request->response[2+i*4]<<16) | 
+                card[drive].csd[i] = ((request->response[1+i*4]<<24) | (request->response[2+i*4]<<16) |
                                (request->response[3+i*4]<< 8) | request->response[4+i*4]);
 
             sd_parse_csd(&card[drive]);
@@ -1120,7 +1114,7 @@ static int sd_switch(const int drive, struct sd_request *request, int mode, int 
     arg = (mode << 31 | 0x00FFFFFF);
     arg &= ~(0xF << (group * 4));
     arg |= value << (group * 4);
-    sd_send_cmd(drive, request, 6, arg, 1, 64, RESPONSE_R1, resp);
+    sd_send_cmd(drive, request, SD_SWITCH_FUNC, arg, 1, 64, RESPONSE_R1, resp);
 
     return 0;
 }
@@ -1137,7 +1131,7 @@ static int sd_read_switch(const int drive, struct sd_request *request)
 
     if (((unsigned char *)status)[13] & 0x02)
         return 0;
-    else 
+    else
         return 1;
 }
 
@@ -1174,13 +1168,10 @@ static int sd_select_card(const int drive)
         }
     }
     num_6[drive] = 3;
-    sd_simple_cmd(drive, &request, SD_APP_CMD, card[drive].rca,
-               RESPONSE_R1);
-    retval = sd_unpack_r1(&request, &r1);
+    retval = sd_exec_acmd(drive, &request, SD_SET_BUS_WIDTH, 2);
     if (retval)
         return retval;
-    sd_simple_cmd(drive, &request, SD_SET_BUS_WIDTH, 2, RESPONSE_R1);
-    retval = sd_unpack_r1(&request, &r1);
+    retval = sd_exec_acmd(drive, &request, SD_SET_CLR_CARD_DETECT, 0);
     if (retval)
         return retval;
 
@@ -1192,8 +1183,8 @@ static int sd_select_card(const int drive)
 static int sd_init_device(const int drive)
 {
     int retval = 0;
+    long deadline;
     struct sd_request init_req;
-    register int timeout = 1000;
 
     mutex_lock(&sd_mtx);
 
@@ -1212,7 +1203,11 @@ static int sd_init_device(const int drive)
 
     sleep(HZ/2); /* Give the card/controller some rest */
 
-    while(timeout-- && ((retval = sd_init_card_state(drive, &init_req)) == SD_INIT_DOING));
+    deadline = current_tick + HZ;
+    do {
+       retval = sd_init_card_state(drive, &init_req);
+    } while (TIME_BEFORE(current_tick, deadline) && (retval == SD_INIT_DOING));
+
     retval = (retval == SD_INIT_PASSED ? sd_select_card(drive) : -1);
 
     if (drive == SD_SLOT_1)
@@ -1238,8 +1233,17 @@ int sd_init(void)
 
     if(!inited)
     {
-//        semaphore_init(&sd_wakeup, 1, 0);
+
+#if SD_DMA_INTERRUPT
+        semaphore_init(&sd_wakeup, 1, 0);
+#endif
         mutex_init(&sd_mtx);
+
+#if SD_DMA_ENABLE && SD_DMA_INTERRUPT
+        system_enable_irq(DMA_IRQ(DMA_SD_RX_CHANNEL));
+        system_enable_irq(DMA_IRQ(DMA_SD_TX_CHANNEL));
+#endif
+
         inited = true;
     }
 
@@ -1279,107 +1283,63 @@ static inline void sd_stop_transfer(const int drive)
     mutex_unlock(&sd_mtx);
 }
 
-int sd_read_sectors(const int drive, unsigned long start, int count, void* buf)
+int sd_transfer_sectors(IF_MD(const int drive,) unsigned long start, int count, void* buf, bool write)
 {
-    sd_start_transfer(drive);
-
     struct sd_request request;
     struct sd_response_r1 r1;
     int retval = -1;
+#ifndef HAVE_MULTIDRIVE
+    const int drive = 0;
+#endif
 
-    if (!card_detect_target(drive) || count == 0 || start > card[drive].numblocks)
+    sd_start_transfer(drive);
+
+    if (!card_detect_target(drive) || count < 1 || (start + count) > card[drive].numblocks)
         goto err;
 
     if(card[drive].initialized == 0 && !sd_init_device(drive))
         goto err;
 
     sd_simple_cmd(drive, &request, SD_SEND_STATUS, card[drive].rca, RESPONSE_R1);
-    retval = sd_unpack_r1(&request, &r1);
-    if (retval && (retval != SD_ERROR_STATE_MISMATCH))
+    if ((retval = sd_unpack_r1(&request, &r1)))
         goto err;
 
     sd_simple_cmd(drive, &request, SD_SET_BLOCKLEN, SD_BLOCK_SIZE, RESPONSE_R1);
     if ((retval = sd_unpack_r1(&request, &r1)))
         goto err;
 
-    if (sd2_0[drive])
-    {
-        sd_send_cmd(drive, &request, SD_READ_MULTIPLE_BLOCK, start,
-                     count, SD_BLOCK_SIZE, RESPONSE_R1, buf);
-        if ((retval = sd_unpack_r1(&request, &r1)))
-            goto err;
-    }
-    else
-    {
-        sd_send_cmd(drive, &request, SD_READ_MULTIPLE_BLOCK,
-                     start * SD_BLOCK_SIZE, count,
-                     SD_BLOCK_SIZE, RESPONSE_R1, buf);
-        if ((retval = sd_unpack_r1(&request, &r1)))
-            goto err;
-    }
-
-    last_disk_activity = current_tick;
-
-    sd_simple_cmd(drive, &request, SD_STOP_TRANSMISSION, 0, RESPONSE_R1B);
+    sd_send_cmd(drive, &request,
+                (count > 1) ?
+                (write ? SD_WRITE_MULTIPLE_BLOCK : SD_READ_MULTIPLE_BLOCK) :
+                (write ? SD_WRITE_BLOCK : SD_READ_SINGLE_BLOCK),
+                sd2_0[drive] ? start : (start * SD_BLOCK_SIZE),
+                count, SD_BLOCK_SIZE, RESPONSE_R1, buf);
     if ((retval = sd_unpack_r1(&request, &r1)))
         goto err;
 
+    if (count > 1)
+    {
+        sd_simple_cmd(drive, &request, SD_STOP_TRANSMISSION, 0, RESPONSE_R1B);
+        retval = sd_unpack_r1(&request, &r1);
+        if (!write && retval == SD_ERROR_OUT_OF_RANGE)
+            retval = 0;
+    }
+
 err:
+    last_disk_activity = current_tick;
     sd_stop_transfer(drive);
 
     return retval;
 }
 
-int sd_write_sectors(const int drive, unsigned long start, int count, const void* buf)
+int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf)
 {
-    sd_start_transfer(drive);
+  return sd_transfer_sectors(IF_MD(drive,) start, count, buf, false);
+}
 
-    struct sd_request request;
-    struct sd_response_r1 r1;
-    int retval = -1;
-
-    if (!card_detect_target(drive) || count == 0 || start > card[drive].numblocks)
-        goto err;
-
-    if(card[drive].initialized == 0 && !sd_init_device(drive))
-        goto err;
-
-    sd_simple_cmd(drive, &request, SD_SEND_STATUS, card[drive].rca, RESPONSE_R1);
-    retval = sd_unpack_r1(&request, &r1);
-    if (retval && (retval != SD_ERROR_STATE_MISMATCH))
-        goto err;
-
-    sd_simple_cmd(drive, &request, SD_SET_BLOCKLEN, SD_BLOCK_SIZE, RESPONSE_R1);
-    if ((retval = sd_unpack_r1(&request, &r1)))
-        goto err;
-
-    if (sd2_0[drive])
-    {
-        sd_send_cmd(drive, &request, SD_WRITE_MULTIPLE_BLOCK, start,
-                 count, SD_BLOCK_SIZE, RESPONSE_R1,
-                 (void*)buf);
-        if ((retval = sd_unpack_r1(&request, &r1)))
-            goto err;
-    }
-    else
-    {
-        sd_send_cmd(drive, &request, SD_WRITE_MULTIPLE_BLOCK,
-                 start * SD_BLOCK_SIZE, count,
-                 SD_BLOCK_SIZE, RESPONSE_R1, (void*)buf);
-        if ((retval = sd_unpack_r1(&request, &r1)))
-            goto err;
-    }
-
-    last_disk_activity = current_tick;
-
-    sd_simple_cmd(drive, &request, SD_STOP_TRANSMISSION, 0, RESPONSE_R1B);
-    if ((retval = sd_unpack_r1(&request, &r1)))
-        goto err;
-
-err:
-    sd_stop_transfer(drive);
-
-    return retval;
+int sd_write_sectors(IF_MD(int drive,) unsigned long start, int count, const void* buf)
+{
+  return sd_transfer_sectors(IF_MD(drive,) start, count, (void*)buf, true);
 }
 
 long sd_last_disk_activity(void)
@@ -1474,8 +1434,8 @@ int sd_event(long id, intptr_t data)
          * clear if the last attempt to init failed with an error. */
         mutex_lock(&sd_mtx); /* lock-out card activity */
         card[data].initialized = 0;
-	if (id == SYS_HOTSWAP_INSERTED)
-            sd_init_device(data);
+//	if (id == SYS_HOTSWAP_INSERTED)
+//            sd_init_device(data);
         mutex_unlock(&sd_mtx);
         break;
 #endif /* HAVE_HOTSWAP */
