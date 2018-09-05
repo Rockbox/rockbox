@@ -112,6 +112,10 @@
 #define BATTERY_CAPACITY_INC 100      /* capacity increment */
 #define BATTERY_TYPES_COUNT  1        /* only one type */
 
+/* define current usage levels */
+#define CURRENT_NORMAL       175      /* 2000 mAh / 11.36 h */
+#define CURRENT_BACKLIGHT    190      /* OLED approx. 15 mA */
+
 #define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
 
 /* Hardware controlled charging with monitoring */

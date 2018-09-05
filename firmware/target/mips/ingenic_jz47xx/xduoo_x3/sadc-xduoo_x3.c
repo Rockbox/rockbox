@@ -161,7 +161,8 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
-    { 3300, 3652, 3704, 3730, 3753, 3786, 3836, 3906, 3973, 4061, 4160 };
+    { 3444, 3827, 3893, 3909, 3931, 4001, 4067, 4150, 4206, 4207, 4208 };
+//    { 3300, 3652, 3704, 3730, 3753, 3786, 3836, 3906, 3973, 4061, 4160 };
 #endif /* CONFIG_CHARGING */
 
 /* VBAT = (BDATA/1024) * 2.5V */
