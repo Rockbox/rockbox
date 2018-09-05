@@ -142,8 +142,11 @@ static int vol_tenthdb2hw(const int tdb)
 
 void audiohw_set_volume(int vol_l, int vol_r)
 {
+    uint8_t val = cs4398_read_reg(CS4398_REG_MISC) &~ CS4398_FREEZE;
+    cs4398_write_reg(CS4398_REG_MISC, val | CS4398_FREEZE);
     cs4398_write_reg(CS4398_REG_VOL_A, vol_tenthdb2hw(vol_l));
     cs4398_write_reg(CS4398_REG_VOL_B, vol_tenthdb2hw(vol_r));
+    cs4398_write_reg(CS4398_REG_MISC, val);
 }
 
 void audiohw_set_lineout_volume(int vol_l, int vol_r)
@@ -159,8 +162,6 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
 
 void audiohw_set_filter_roll_off(int value)
 {
-    /* 0 = fast (sharp);
-       1 = slow */
     if (value == 0) {
         cs4398_write_reg(CS4398_REG_RAMPFILT, cs4398_read_reg(CS4398_REG_RAMPFILT) & ~CS4398_FILT_SEL);
     } else {
@@ -252,6 +253,7 @@ void audiohw_set_frequency(int fsel)
             return;
     }
 
+    ap_mute(true);
     __i2s_stop_bitclk();
 
     /* 0 = Single-Speed Mode (<50KHz);
@@ -268,6 +270,8 @@ void audiohw_set_frequency(int fsel)
     __cpm_set_i2sdiv(mclk_div-1);
     __i2s_set_i2sdiv(bclk_div-1);
     __i2s_start_bitclk();
+    mdelay(20);
+    ap_mute(false);
 }
 
 void audiohw_postinit(void)
