@@ -207,6 +207,13 @@ touchpad_deadzone
 depth_3d
 #endif
 
+#ifdef HAVE_CS4398
+cs4398
+#endif
+
+#ifdef HAVE_ES9018
+es9018
+#endif
 
 /* These features are only used by the manual so they won't break binary
  * compatibility
