@@ -24,106 +24,6 @@
 #include "config.h"
 #include "mips.h"
 
-#define FILL256(dst, offset, val)     \
-    sw  val, (offset + 0x00)(dst);    \
-    sw  val, (offset + 0x04)(dst);    \
-    sw  val, (offset + 0x08)(dst);    \
-    sw  val, (offset + 0x0c)(dst);    \
-    sw  val, (offset + 0x10)(dst);    \
-    sw  val, (offset + 0x14)(dst);    \
-    sw  val, (offset + 0x18)(dst);    \
-    sw  val, (offset + 0x1c)(dst);    \
-    sw  val, (offset + 0x20)(dst);    \
-    sw  val, (offset + 0x24)(dst);    \
-    sw  val, (offset + 0x28)(dst);    \
-    sw  val, (offset + 0x2c)(dst);    \
-    sw  val, (offset + 0x30)(dst);    \
-    sw  val, (offset + 0x34)(dst);    \
-    sw  val, (offset + 0x38)(dst);    \
-    sw  val, (offset + 0x3c)(dst);    \
-    sw  val, (offset + 0x40)(dst);    \
-    sw  val, (offset + 0x44)(dst);    \
-    sw  val, (offset + 0x48)(dst);    \
-    sw  val, (offset + 0x4c)(dst);    \
-    sw  val, (offset + 0x50)(dst);    \
-    sw  val, (offset + 0x54)(dst);    \
-    sw  val, (offset + 0x58)(dst);    \
-    sw  val, (offset + 0x5c)(dst);    \
-    sw  val, (offset + 0x60)(dst);    \
-    sw  val, (offset + 0x64)(dst);    \
-    sw  val, (offset + 0x68)(dst);    \
-    sw  val, (offset + 0x6c)(dst);    \
-    sw  val, (offset + 0x70)(dst);    \
-    sw  val, (offset + 0x74)(dst);    \
-    sw  val, (offset + 0x78)(dst);    \
-    sw  val, (offset + 0x7c)(dst);    \
-    sw  val, (offset + 0x80)(dst);    \
-    sw  val, (offset + 0x84)(dst);    \
-    sw  val, (offset + 0x88)(dst);    \
-    sw  val, (offset + 0x8c)(dst);    \
-    sw  val, (offset + 0x90)(dst);    \
-    sw  val, (offset + 0x94)(dst);    \
-    sw  val, (offset + 0x98)(dst);    \
-    sw  val, (offset + 0x9c)(dst);    \
-    sw  val, (offset + 0xa0)(dst);    \
-    sw  val, (offset + 0xa4)(dst);    \
-    sw  val, (offset + 0xa8)(dst);    \
-    sw  val, (offset + 0xac)(dst);    \
-    sw  val, (offset + 0xb0)(dst);    \
-    sw  val, (offset + 0xb4)(dst);    \
-    sw  val, (offset + 0xb8)(dst);    \
-    sw  val, (offset + 0xbc)(dst);    \
-    sw  val, (offset + 0xc0)(dst);    \
-    sw  val, (offset + 0xc4)(dst);    \
-    sw  val, (offset + 0xc8)(dst);    \
-    sw  val, (offset + 0xcc)(dst);    \
-    sw  val, (offset + 0xd0)(dst);    \
-    sw  val, (offset + 0xd4)(dst);    \
-    sw  val, (offset + 0xd8)(dst);    \
-    sw  val, (offset + 0xdc)(dst);    \
-    sw  val, (offset + 0xe0)(dst);    \
-    sw  val, (offset + 0xe4)(dst);    \
-    sw  val, (offset + 0xe8)(dst);    \
-    sw  val, (offset + 0xec)(dst);    \
-    sw  val, (offset + 0xf0)(dst);    \
-    sw  val, (offset + 0xf4)(dst);    \
-    sw  val, (offset + 0xf8)(dst);    \
-    sw  val, (offset + 0xfc)(dst);
-
-#define FILL128(dst, offset, val)     \
-    sw  val, (offset + 0x00)(dst);    \
-    sw  val, (offset + 0x04)(dst);    \
-    sw  val, (offset + 0x08)(dst);    \
-    sw  val, (offset + 0x0c)(dst);    \
-    sw  val, (offset + 0x10)(dst);    \
-    sw  val, (offset + 0x14)(dst);    \
-    sw  val, (offset + 0x18)(dst);    \
-    sw  val, (offset + 0x1c)(dst);    \
-    sw  val, (offset + 0x20)(dst);    \
-    sw  val, (offset + 0x24)(dst);    \
-    sw  val, (offset + 0x28)(dst);    \
-    sw  val, (offset + 0x2c)(dst);    \
-    sw  val, (offset + 0x30)(dst);    \
-    sw  val, (offset + 0x34)(dst);    \
-    sw  val, (offset + 0x38)(dst);    \
-    sw  val, (offset + 0x3c)(dst);    \
-    sw  val, (offset + 0x40)(dst);    \
-    sw  val, (offset + 0x44)(dst);    \
-    sw  val, (offset + 0x48)(dst);    \
-    sw  val, (offset + 0x4c)(dst);    \
-    sw  val, (offset + 0x50)(dst);    \
-    sw  val, (offset + 0x54)(dst);    \
-    sw  val, (offset + 0x58)(dst);    \
-    sw  val, (offset + 0x5c)(dst);    \
-    sw  val, (offset + 0x60)(dst);    \
-    sw  val, (offset + 0x64)(dst);    \
-    sw  val, (offset + 0x68)(dst);    \
-    sw  val, (offset + 0x6c)(dst);    \
-    sw  val, (offset + 0x70)(dst);    \
-    sw  val, (offset + 0x74)(dst);    \
-    sw  val, (offset + 0x78)(dst);    \
-    sw  val, (offset + 0x7c)(dst);
-
 #define FILL64(dst, offset, val)      \
     sw  val, (offset + 0x00)(dst);    \
     sw  val, (offset + 0x04)(dst);    \
@@ -142,24 +42,15 @@
     sw  val, (offset + 0x38)(dst);    \
     sw  val, (offset + 0x3c)(dst);
 
-#define FILL32(dst, offset, val)      \
-    sw  val, (offset + 0x00)(dst);    \
-    sw  val, (offset + 0x04)(dst);    \
-    sw  val, (offset + 0x08)(dst);    \
-    sw  val, (offset + 0x0c)(dst);    \
-    sw  val, (offset + 0x10)(dst);    \
-    sw  val, (offset + 0x14)(dst);    \
-    sw  val, (offset + 0x18)(dst);    \
-    sw  val, (offset + 0x1c)(dst);
-
 #define FILL    64
 #define F_FILL  FILL64
 
-
 #ifdef ROCKBOX_BIG_ENDIAN
 # define SWHI   swl                /* high part is left in big-endian        */
+# define SWLO   swr
 #else
 # define SWHI   swr                /* high part is right in little-endian    */
+# define SWLO   swl
 #endif
 
 /*
@@ -221,7 +112,7 @@ memset_partial:
 
     beqz    a2, 1f
     addu    a0, a2                /* What's left */
-    SWHI    a1, -1(a0)
+    SWLO    a1, -1(a0)
 1:  jr      ra
     move    a2, zero
 
