@@ -239,9 +239,109 @@ LUALIB_API int luaL_callmeta (lua_State *L, int obj, const char *event) {
 }
 
 
+static int latebind_func_index(lua_State *L)
+{
+  const luaL_Reg *llib;
+  /* name @ top of stack */
+  const char *name = lua_tostring (L, -1);
+
+  luaL_argcheck(L, lua_istable(L, -2) && lua_getmetatable(L, -2), -2,
+                "latebind table expected");
+
+  /* lookup late bound func(s), lua_objlen allows check of multiple luaL_Reg */
+  for(int i = lua_objlen(L, -1); i > 0; i--) {
+    lua_rawgeti (L, -1, i);
+    llib = (const luaL_Reg *) lua_touserdata (L, -1);
+    lua_pop(L, 1);
+
+    if(!llib)
+      continue;
+
+    for (; llib->name; llib++) {
+      if(!name || strcmp(name, llib->name) == 0) {
+        /* if function is used it is added to the base table */
+        lua_pushcclosure(L, llib->func, 0);
+
+        if(!name) /* nil name binds all functions in table immediately */
+          lua_setfield (L, -4, llib->name);
+        else {
+          lua_pushvalue(L, -1); /* dupe closure */
+          lua_setfield (L, -5, llib->name);
+          /* returns the closure */
+          return 1;
+        }
+      }
+    }
+  }
+  lua_pop(L, 2); /* base table is top of stack */
+  return 0;
+}
+
+static int latebind_func_pairs(lua_State *L)
+{
+  luaL_argcheck(L, lua_istable(L, 1), 1, "table expected");
+  lua_getglobal(L, "pairs");  /* function to be called / returned */
+
+  lua_createtable(L, 0, 15);
+  lua_getmetatable (L, 1);
+  lua_setmetatable (L, 3);
+
+  lua_pushnil(L); /*nil name retrieves all late bound functions */
+  latebind_func_index(L);
+
+  lua_pushnil(L); /* remove metatable */
+  lua_setmetatable (L, 3);
+
+  /* clone base table */
+  lua_pushnil(L); /* first key */
+  while(lua_next(L, 1) != 0) { 
+    lua_pushvalue(L, -2); /* dupe key */
+    lua_insert(L, -2); /* Stk = kkv */
+    lua_settable(L, 3);
+  }
+
+  lua_call(L, 1, 3); /* pairs(t_cloned) */
+
+  return 3;
+}
+
+
 LUALIB_API void (luaL_register) (lua_State *L, const char *libname,
                                 const luaL_Reg *l) {
-  luaI_openlib(L, libname, l, 0);
+  if(!libname)
+  {
+    /* if there is no libname register normally */
+    luaI_openlib(L, libname, l, 0);
+    return;
+  }
+
+  /* store this table instead of of the passed luaL_Reg table */
+  static const struct luaL_reg late_lib [] =
+  {
+    {"__latebind", latebind_func_index},
+    {NULL, NULL}
+  };
+
+  static const struct luaL_reg late_meta [] =
+  {
+    {"__index", latebind_func_index},
+    {"__pairs", latebind_func_pairs},
+    {NULL, NULL}
+  };
+
+  luaI_openlib(L, libname, late_lib, 0);
+
+  if(!lua_getmetatable(L, -1))
+    lua_createtable(L, 5, 2);
+
+  luaI_openlib(L, NULL, late_meta, 0);
+
+  /* address of luaL_Reg is stored in numbered [1] key indices of metatable */
+
+  lua_pushlightuserdata (L, (void *) l);
+  lua_rawseti (L, -2, lua_objlen(L, -2) + 1);
+
+  lua_setmetatable(L, -2);
 }
 
 
