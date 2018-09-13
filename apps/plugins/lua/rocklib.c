@@ -421,8 +421,19 @@ static const luaL_Reg rocklib[] =
 extern const luaL_Reg rocklib_aux[];
 extern const luaL_Reg rocklib_img[];
 
-#define RB_CONSTANT(x)        lua_pushinteger(L, x); lua_setfield(L, -2, #x);
-#define RB_STRING_CONSTANT(x) lua_pushstring(L, x); lua_setfield(L, -2, #x);
+#define RB_CONSTANT(x)        {#x, x}
+#define RB_STRING_CONSTANT(x) {#x, x}
+
+struct lua_int_reg {
+  char const* name;
+  int         value;
+};
+
+struct lua_str_reg {
+  char const* name;
+  char const* value;
+};
+
 /*
  ** Open Rockbox library
  */
@@ -432,41 +443,62 @@ LUALIB_API int luaopen_rock(lua_State *L)
     luaL_register(L, LUA_ROCKLIBNAME, rocklib_aux);
     luaL_register(L, LUA_ROCKLIBNAME, rocklib_img);
 
-    RB_CONSTANT(HZ);
+    static const struct lua_int_reg rlib_const_int[] =
+    {
+        /* useful integer constants */
+        RB_CONSTANT(HZ),
 
-    RB_CONSTANT(LCD_WIDTH);
-    RB_CONSTANT(LCD_HEIGHT);
-    RB_CONSTANT(LCD_DEPTH);
+        RB_CONSTANT(LCD_WIDTH),
+        RB_CONSTANT(LCD_HEIGHT),
+        RB_CONSTANT(LCD_DEPTH),
 
-    RB_CONSTANT(FONT_SYSFIXED);
-    RB_CONSTANT(FONT_UI);
+        RB_CONSTANT(FONT_SYSFIXED),
+        RB_CONSTANT(FONT_UI),
 
-    RB_CONSTANT(PLAYLIST_PREPEND);
-    RB_CONSTANT(PLAYLIST_INSERT);
-    RB_CONSTANT(PLAYLIST_INSERT_LAST);
-    RB_CONSTANT(PLAYLIST_INSERT_FIRST);
-    RB_CONSTANT(PLAYLIST_INSERT_SHUFFLED);
-    RB_CONSTANT(PLAYLIST_REPLACE);
-    RB_CONSTANT(PLAYLIST_INSERT_LAST_SHUFFLED);
+        RB_CONSTANT(PLAYLIST_PREPEND),
+        RB_CONSTANT(PLAYLIST_INSERT),
+        RB_CONSTANT(PLAYLIST_INSERT_LAST),
+        RB_CONSTANT(PLAYLIST_INSERT_FIRST),
+        RB_CONSTANT(PLAYLIST_INSERT_SHUFFLED),
+        RB_CONSTANT(PLAYLIST_REPLACE),
+        RB_CONSTANT(PLAYLIST_INSERT_LAST_SHUFFLED),
 
 #ifdef HAVE_TOUCHSCREEN
-    RB_CONSTANT(TOUCHSCREEN_POINT);
-    RB_CONSTANT(TOUCHSCREEN_BUTTON);
+        RB_CONSTANT(TOUCHSCREEN_POINT),
+        RB_CONSTANT(TOUCHSCREEN_BUTTON),
 #endif
 
-    RB_CONSTANT(SCREEN_MAIN);
+        RB_CONSTANT(SCREEN_MAIN),
 #ifdef HAVE_REMOTE_LCD
-    RB_CONSTANT(SCREEN_REMOTE);
+        RB_CONSTANT(SCREEN_REMOTE),
 #endif
+        {NULL, 0}
+    };
 
-    /* some useful paths constants */
-    RB_STRING_CONSTANT(ROCKBOX_DIR);
-    RB_STRING_CONSTANT(HOME_DIR);
-    RB_STRING_CONSTANT(PLUGIN_DIR);
-    RB_STRING_CONSTANT(PLUGIN_APPS_DATA_DIR);
-    RB_STRING_CONSTANT(PLUGIN_GAMES_DATA_DIR);
-    RB_STRING_CONSTANT(PLUGIN_DATA_DIR);
-    RB_STRING_CONSTANT(VIEWERS_DATA_DIR);
+    static const struct lua_int_reg* rlci = rlib_const_int;
+    for (; rlci->name; rlci++) {
+        lua_pushinteger(L, rlci->value);
+        lua_setfield(L, -2, rlci->name);
+    }
+
+    static const struct lua_str_reg rlib_const_str[] =
+    {
+        /* some useful paths constants */
+        RB_STRING_CONSTANT(ROCKBOX_DIR),
+        RB_STRING_CONSTANT(HOME_DIR),
+        RB_STRING_CONSTANT(PLUGIN_DIR),
+        RB_STRING_CONSTANT(PLUGIN_APPS_DATA_DIR),
+        RB_STRING_CONSTANT(PLUGIN_GAMES_DATA_DIR),
+        RB_STRING_CONSTANT(PLUGIN_DATA_DIR),
+        RB_STRING_CONSTANT(VIEWERS_DATA_DIR),
+        {NULL,NULL}
+    };
+
+    static const struct lua_str_reg* rlcs = rlib_const_str;
+    for (; rlcs->name; rlcs++) {
+        lua_pushstring(L, rlcs->value);
+        lua_setfield(L, -2, rlcs->name);
+    }
 
     rli_init(L);
 
