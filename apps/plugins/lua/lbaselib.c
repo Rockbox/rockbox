@@ -21,9 +21,7 @@
 
 
 
-static int luaB_print (lua_State *L) {
-return 0;
-}
+
 /*
 ** If your system does not support `stdout', you can just remove this function.
 ** If you need, you can define your own `print' function, following this
@@ -240,6 +238,13 @@ static int luaB_next (lua_State *L) {
 
 
 static int luaB_pairs (lua_State *L) {
+#if 0
+  luaL_checktype(L, 1, LUA_TTABLE);
+  lua_pushvalue(L, lua_upvalueindex(1));  /* return generator, */
+  lua_pushvalue(L, 1);  /* state, */
+  lua_pushnil(L);  /* and initial value */
+#else
+  /* add _pairs metamethod handling from lua 5.2 */
   if (!luaL_getmetafield(L, 1, "__pairs")) {  /* no metamethod? */
     luaL_checktype(L, 1, LUA_TTABLE);
     lua_pushvalue(L, lua_upvalueindex(1));  /* return generator, */
@@ -250,7 +255,7 @@ static int luaB_pairs (lua_State *L) {
     lua_pushvalue(L, 1);  /* argument 'self' to metamethod */
     lua_call(L, 1, 3);  /* get 3 values from metamethod */
   }
-  
+#endif
   return 3;
 }
 
@@ -468,7 +473,7 @@ static const luaL_Reg base_funcs[] = {
   {"loadstring", luaB_loadstring},
   {"next", luaB_next},
   {"pcall", luaB_pcall},
-#if 1
+#if 0
   {"print", luaB_print},
 #endif
   {"rawequal", luaB_rawequal},
