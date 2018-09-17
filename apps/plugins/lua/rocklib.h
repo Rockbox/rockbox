@@ -32,10 +32,18 @@
 #define ERR_DATA_OVF  "data overflow"
 #endif
 
-#ifndef ERR_NO_ALLOC_DBYTES
-#define ERR_NO_ALLOC_DBYTES "Can't allocate %d bytes!"
-#endif
+#define RB_CONSTANT(x)        {#x, x}
+#define RB_STRING_CONSTANT(x) RB_CONSTANT(x)
 
+struct lua_int_reg {
+  char const* name;
+  const int   value;
+};
+
+struct lua_str_reg {
+  char const* name;
+  char const* value;
+};
 
 LUALIB_API int (luaopen_rock) (lua_State *L);
 const char* get_current_path(lua_State *L, int level);
