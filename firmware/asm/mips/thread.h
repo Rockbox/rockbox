@@ -27,5 +27,5 @@ struct regs
     uint32_t start; /*   44 - Thread start address, or NULL when started */
 };
 
-#define DEFAULT_STACK_SIZE 0x400 /* Bytes */
+#define DEFAULT_STACK_SIZE 0x500 /* Bytes */
 
