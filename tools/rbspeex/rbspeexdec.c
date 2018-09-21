@@ -70,7 +70,7 @@ int main(int argc, char **argv)
     insize = ftell(fin);
     fseek(fin, 0, SEEK_SET);
     indata = malloc(insize);
-    fread(indata, 1, insize, fin);
+    insize = fread(indata, 1, insize, fin);
     fclose(fin);
 
     /* fill in wav header */

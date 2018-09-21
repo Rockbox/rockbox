@@ -103,7 +103,8 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
     memset(voiceonly, 0, sizeof(voiceonly));
     while (!feof(voicefontids))
     {
-        fgets(line, sizeof(line), voicefontids);
+        if (!fgets(line, sizeof(line), voicefontids))
+            break;
         if (line[0] == '#') /* comment */
             continue;
 
