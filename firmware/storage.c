@@ -694,6 +694,7 @@ int storage_spinup_time(void)
 #if (CONFIG_STORAGE & STORAGE_SD)
     //t=sd_spinup_time();
     //if (t>max) max=t;
+    (void)t;
 #endif
 
 #if (CONFIG_STORAGE & STORAGE_NAND)

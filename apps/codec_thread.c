@@ -127,13 +127,13 @@ static int codec_check_queue__have_msg(void)
     switch (ev.id)
     {
     case Q_CODEC_SEEK:
-        LOGFQUEUE("codec - Q_CODEC_SEEK", ev.id);
+        LOGFQUEUE("codec - Q_CODEC_SEEK %ld", ev.id);
         return -1;
     case Q_CODEC_PAUSE:
-        LOGFQUEUE("codec - Q_CODEC_PAUSE", ev.id);
+        LOGFQUEUE("codec - Q_CODEC_PAUSE %ld", ev.id);
         return -1;
     case Q_CODEC_STOP:
-        LOGFQUEUE("codec - Q_CODEC_STOP", ev.id);
+        LOGFQUEUE("codec - Q_CODEC_STOP %ld", ev.id);
         return -1;
     }
 
