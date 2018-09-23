@@ -57,10 +57,6 @@
 #define ABS(a)(((a) < 0) ? - (a) :(a))
 #endif
 
-#ifndef LCD_BLACK
-#define LCD_BLACK 0x0
-#endif
-
 struct rocklua_image
 {
     int     width;
@@ -68,18 +64,18 @@ struct rocklua_image
     int     stride;
     size_t  elems;
     fb_data *data;
-    fb_data dummy[1];
+    fb_data dummy[1][1];
 };
 
 /* holds iterator data for rlimages */
 struct rli_iter_d
 {
-    struct rocklua_image *img;
-    fb_data *elem;
     int x , y;
     int x1, y1;
     int x2, y2;
     int dx, dy;
+    fb_data *elem;
+    struct rocklua_image *img;
 };
 
 /* __tostring information enums */
@@ -92,8 +88,8 @@ enum rli_info {RLI_INFO_ALL = 0, RLI_INFO_TYPE, RLI_INFO_WIDTH,
 static inline fb_data invert_color(fb_data rgb)
 {
     uint8_t r = 0xFFU - FB_UNPACK_RED(rgb);
-    uint8_t g = 0xFFU - FB_UNPACK_RED(rgb);
-    uint8_t b = 0xFFU - FB_UNPACK_RED(rgb);
+    uint8_t g = 0xFFU - FB_UNPACK_GREEN(rgb);
+    uint8_t b = 0xFFU - FB_UNPACK_BLUE(rgb);
 
     return FB_RGBPACK(r, g, b);
 }
@@ -244,17 +240,45 @@ static inline void swap_int(bool swap, int *v1, int *v2)
 static void bounds_check_xy(lua_State *L, struct rocklua_image *img,
                          int nargx, int x, int nargy, int y)
 {
-    luaL_argcheck(L, x <= img->width && x > 0,  nargx, ERR_IDX_RANGE);
-    luaL_argcheck(L, y <= img->height && y > 0, nargy, ERR_IDX_RANGE);
+    int narg;
+
+    if(x > img->width || x < 1)
+        narg = nargx;
+    else if(y <= img->height && y > 0)
+        return; /* note -- return if no error */
+    else
+        narg = nargy;
+
+    luaL_argerror(L, narg, ERR_IDX_RANGE);
 } /* bounds_check_xy */
 
 static struct rocklua_image* rli_checktype(lua_State *L, int arg)
 {
-    void *ud = luaL_checkudata(L, arg, ROCKLUA_IMAGE);
+#if 0
+    return (struct rocklua_image*) luaL_checkudata(L, arg, ROCKLUA_IMAGE);
+#else /* cache result */
+    static struct rocklua_image* last = NULL;
+    void *ud = lua_touserdata(L, arg);
 
-    luaL_argcheck(L, ud != NULL, arg, "'" ROCKLUA_IMAGE "' expected");
+    if(ud != NULL)
+    {
+        if(ud == last)
+            return last;
+        else if (lua_getmetatable(L, arg))
+        {  /* does it have a metatable? */
+            luaL_getmetatable(L, ROCKLUA_IMAGE); /* get correct metatable */
+            if (lua_rawequal(L, -1, -2))
+            {  /* does it have the correct mt? */
+                lua_pop(L, 2);  /* remove both metatables */
+                last = (struct rocklua_image*) ud;
+                return last;
+            }
+        }
+    }
 
-    return (struct rocklua_image*) ud;
+    luaL_typerror(L, arg, ROCKLUA_IMAGE);  /* else error */
+    return NULL;  /* to avoid warnings */
+#endif
 } /* rli_checktype */
 
 static struct rocklua_image * alloc_rlimage(lua_State *L, bool alloc_data,
@@ -286,7 +310,7 @@ static struct rocklua_image * alloc_rlimage(lua_State *L, bool alloc_data,
     /* apparent w/h is stored but behind the scenes native w/h is used */
     img->width  = width;
     img->height = height;
-    img->stride = w_native;
+    img->stride = STRIDE_MAIN(w_native, h_native);
     img->elems  = n_elems;
 
     return img;
@@ -305,14 +329,14 @@ static inline fb_data* rli_alloc(lua_State *L, int width, int height)
     /* rliimage is pushed on the stack it is up to you to pop it */
     struct rocklua_image *a = alloc_rlimage(L, true, width, height);
 
-    a->data = &a->dummy[0]; /* ref to beginning of alloc'd img data */
+    a->data = &a->dummy[0][0]; /* ref to beginning of alloc'd img data */
 
     return a->data;
 } /* rli_alloc */
 
-static inline fb_data data_setget(fb_data *elem, int x, int y, fb_data *val)
+static inline fb_data data_set(fb_data *elem, int x, int y, fb_data *val)
 {
-    fb_data old_val = FB_SCALARPACK(0);
+    fb_data old_val;
     fb_data new_val;
 
     if(elem)
@@ -328,23 +352,18 @@ static inline fb_data data_setget(fb_data *elem, int x, int y, fb_data *val)
         else
             pixel_to_fb(x, y, &old_val, &new_val);
     }
+    else
+        old_val = FB_SCALARPACK(0);
 
     return old_val;
-} /* data_setget */
-
-static inline fb_data data_set(fb_data *elem, int x, int y, fb_data *new_val)
-{
-    /* get and set share the same underlying function */
-    return data_setget(elem, x, y, new_val);
 } /* data_set */
 
 static inline fb_data data_get(fb_data *elem, int x, int y)
 {
-    /* get and set share the same underlying function */
-    return data_setget(elem, x, y, NULL);
+    return data_set(elem, x, y, NULL);
 } /* data_get */
 
-static fb_data* rli_get_element(struct rocklua_image* img, int x, int y)
+static inline fb_data* rli_get_element(struct rocklua_image* img, int x, int y)
 {
     int stride      = img->stride;
     size_t elements = img->elems;
@@ -352,60 +371,61 @@ static fb_data* rli_get_element(struct rocklua_image* img, int x, int y)
 
     pixel_to_native(x, y, &x, &y);
 
+#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+    /* column major address */
+    size_t data_address = (stride * (x - 1)) + (y - 1);
+
+    /* y needs bound between 0 and stride otherwise overflow to prev/next x */
+    if(y <= 0 || y > stride || data_address >= elements)
+        return NULL; /* data overflow */
+#else
     /* row major address */
     size_t data_address = (stride * (y - 1)) + (x - 1);
 
     /* x needs bound between 0 and stride otherwise overflow to prev/next y */
     if(x <= 0 || x > stride || data_address >= elements)
         return NULL; /* data overflow */
+#endif
 
     return &data[data_address]; /* return element address */
 } /* rli_get_element */
 
 /* Lua to C Interface for pixel set and get functions */
-static int rli_setget(lua_State *L, bool is_get)
+static int rli_setget(lua_State *L, bool is_get, int narg_clip)
 {
     /*(set) (dst*, [x1, y1, clr, clip]) */
     /*(get) (dst*, [x1, y1, clip]) */
     struct rocklua_image *a = rli_checktype(L, 1);
-    int x = luaL_checkint(L, 2);
-    int y = luaL_checkint(L, 3);
+    int x = lua_tointeger(L, 2);
+    int y = lua_tointeger(L, 3);
 
-    fb_data clr = FB_SCALARPACK(0); /* Arg 4 is color if set element */
-    fb_data *p_clr = &clr;
-
-    int clip_narg;
-
-    if(is_get) /* get element */
-    {
-        p_clr = NULL;
-        clip_narg = 4;
-    }
-    else /* set element */
-    {
-        clr = FB_SCALARPACK((unsigned) luaL_checknumber(L, 4));
-        clip_narg = 5;
-    }
+    fb_data clr; /* Arg 4 is color if set element */
 
     fb_data *element = rli_get_element(a, x, y);
 
     if(!element)
     {
-        if(!luaL_optboolean(L, clip_narg, false)) /* Error if !clip */
+        if(!lua_toboolean(L, narg_clip)) /* Error if !clip */
             bounds_check_xy(L, a, 2, x, 3, y);
 
         lua_pushnil(L);
         return 1;
     }
 
-    lua_pushnumber(L, FB_UNPACK_SCALAR_LCD(data_setget(element, x, y, p_clr)));
+    if(is_get) /* get element */
+        lua_pushinteger(L, FB_UNPACK_SCALAR_LCD(data_get(element, x, y)));
+    else /* set element */
+    {
+        clr = FB_SCALARPACK((unsigned) lua_tointeger(L, 4));
+        lua_pushinteger(L, FB_UNPACK_SCALAR_LCD(data_set(element, x, y, &clr)));
+    }
 
     /* returns old value */
     return 1;
 } /* rli_setget */
 
 #ifdef RLI_EXTENDED
-static bool init_rli_iter(struct rli_iter_d *d,
+static bool rli_iter_init(struct rli_iter_d *d,
                           struct rocklua_image *img,
                           int x1, int y1,
                           int x2, int y2,
@@ -417,11 +437,11 @@ static bool init_rli_iter(struct rli_iter_d *d,
     swap_int((swy), &y1, &y2);
 
     /* stepping in the correct x direction ? */
-    if((dx > 0 && x1 > x2) || (dx < 0 && x1 < x2))
+    if((dx ^ (x2 - x1)) < 0)
         dx = -dx;
 
     /* stepping in the correct y direction ? */
-    if((dy > 0 && y1 > y2) || (dy < 0 && y1 < y2))
+    if((dy ^ (y2 - y1)) < 0)
         dy = -dy;
 
     d->img = img;
@@ -436,7 +456,33 @@ static bool init_rli_iter(struct rli_iter_d *d,
     d->elem = rli_get_element(img, d->x, d->y);
 
     return(dx != 0 || dy != 0);
-} /* init_rli_iter */
+} /* rli_iter_init */
+
+static struct rli_iter_d * rli_iter_create(lua_State *L)
+{
+    struct rocklua_image *a = rli_checktype(L, 1);
+    int x1    = luaL_optint(L, 2, 1);
+    int y1    = luaL_optint(L, 3, 1);
+    int x2    = luaL_optint(L, 4, a->width);
+    int y2    = luaL_optint(L, 5, a->height);
+    int dx    = luaL_optint(L, 6, 1);
+    int dy    = luaL_optint(L, 7, 1);
+    bool clip = lua_toboolean(L, 8);
+
+    if(!clip)
+    {
+        bounds_check_xy(L, a, 2, x1, 3, y1);
+        bounds_check_xy(L, a, 4, x2, 5, y2);
+    }
+
+    struct rli_iter_d *ds;
+    /* create new iter + pushed onto stack */
+    ds = (struct rli_iter_d *) lua_newuserdata(L, sizeof(struct rli_iter_d));
+
+    rli_iter_init(ds, a, x1, y1, x2, y2, dx, dy, false, false);
+
+    return ds;
+}
 
 /* steps to the next point(x, y) by delta x/y, stores pointer to element
    returns true if x & y haven't reached x2 & y2
@@ -464,11 +510,10 @@ static bool next_rli_iter(struct rli_iter_d *d)
     return true;
 } /* next_rli_iter */
 
-static int d_line(struct rocklua_image *img,
-                  int x1, int y1,
-                  int x2, int y2,
-                  fb_data *clr,
-                  bool clip)
+static void d_line(struct rocklua_image *img,
+                   int x1, int y1,
+                   int x2, int y2,
+                   fb_data *clr)
 {
     /* NOTE! clr passed as pointer */
     /* Bresenham midpoint line algorithm */
@@ -477,8 +522,8 @@ static int d_line(struct rocklua_image *img,
     int r_a = x2 - x1; /* range of x direction called 'a' for now */
     int r_b = y2 - y1; /* range of y direction called 'b' for now */
 
-    int s_a = 1; /* step of a direction */
-    int s_b = 1; /* step of b direction */
+    int s_a = (r_a > 0) - (r_a < 0); /* step of a direction -1, 0, 1 */
+    int s_b = (r_b > 0) - (r_b < 0); /* step of b direction -1, 0, 1 */
 
     int d_err;
     int numpixels;
@@ -486,42 +531,28 @@ static int d_line(struct rocklua_image *img,
     int *a1 = &x1; /* pointer to the x var 'a' */
     int *b1 = &y1; /* pointer to the y var 'b' */
 
-    if(r_a < 0) /* instead of negative range we will switch step instead */
-    {
-        r_a = -r_a;
-        s_a = -s_a;
-    }
-
-    if(r_b < 0) /* instead of negative range we will switch step instead */
-    {
-        r_b = -r_b;
-        s_b = -s_b;
-    }
-
-    x2 += s_a; /* add 1 extra point to make the whole line */
-    y2 += s_b; /* add 1 extra point */
+    r_a = ABS(r_a);/* instead of negative range we switch step */
+    r_b = ABS(r_b);/* instead of negative range we switch step */
 
     if(r_b > r_a) /*if rangeY('b') > rangeX('a') swap their identities */
     {
-        a1 = &y1;
-        b1 = &x1;
+        a1 = &y1; /* pointer to the y var 'a' */
+        b1 = &x1; /* pointer to the x var 'b' */
         swap_int((true), &r_a, &r_b);
         swap_int((true), &s_a, &s_b);
     }
 
     d_err = ((r_b << 1) - r_a) >> 1; /* preload err of 1 step (px centered) */
 
+    /* add 1 extra point to make the whole line */
     numpixels = r_a + 1;
 
     r_a -= r_b; /* pre-subtract 'a' - 'b' */
 
-    for(;numpixels > 0; numpixels--)
+    for(; numpixels > 0; numpixels--)
     {
         element = rli_get_element(img, x1, y1);
-        if(element || clip)
-            data_set(element, x1, y1, clr);
-        else
-            return numpixels + 1; /* Error */
+        data_set(element, x1, y1, clr);
 
         if(d_err >= 0) /* 0 is our target midpoint(exact point on the line) */
         {
@@ -534,73 +565,60 @@ static int d_line(struct rocklua_image *img,
         *a1 += s_a; /* whichever axis is in 'a' stepped(-1 or +1) */
     }
 
-    return 0;
 } /* d_line */
 
 /* ellipse worker function */
-static int d_ellipse_elements(struct rocklua_image * img,
-                              int x1, int y1,
-                              int x2, int y2,
-                              int sx, int sy,
-                              fb_data *clr,
-                              fb_data *fillclr,
-                              bool clip)
+static void d_ellipse_elements(struct rocklua_image * img,
+                               int x1, int y1,
+                               int x2, int y2,
+                               fb_data *clr,
+                               fb_data *fillclr)
 {
-    int ret = 0;
-    fb_data *element1, *element2, *element3, *element4;
+    fb_data *element;
 
-    if(fillclr && x1 - sx != x2 + sx)
+    if(fillclr)
     {
-        ret |= d_line(img, x1, y1, x2, y1, fillclr, clip); /* I. II.*/
-        ret |= d_line(img, x1, y2, x2, y2, fillclr, clip); /* III.IV.*/
+        d_line(img, x1, y1, x2, y1, fillclr); /* I. II.*/
+        d_line(img, x1, y2, x2, y2, fillclr); /* III.IV.*/
     }
 
-    x1 -= sx; /* shift x & y */
-    y1 -= sy;
-    x2 += sx;
-    y2 += sy;
+    element = rli_get_element(img, x2, y1);
+    data_set(element, x2, y1, clr); /*   I. Quadrant +x +y */
 
-    element1 = rli_get_element(img, x2, y1);
-    element2 = rli_get_element(img, x1, y1);
-    element3 = rli_get_element(img, x1, y2);
-    element4 = rli_get_element(img, x2, y2);
+    element = rli_get_element(img, x1, y1);
+    data_set(element, x1, y1, clr); /*  II. Quadrant -x +y */
 
-    if(clip || (element1 && element2 && element3 && element4))
-    {
-        data_set(element1, x2, y1, clr); /*   I. Quadrant +x +y */
-        data_set(element2, x1, y1, clr); /*  II. Quadrant -x +y */
-        data_set(element3, x1, y2, clr); /* III. Quadrant -x -y */
-        data_set(element4, x2, y2, clr); /*  IV. Quadrant +x -y */
-    }
-    else
-        ret = 2; /* ERROR */
+    element = rli_get_element(img, x1, y2);
+    data_set(element, x1, y2, clr); /* III. Quadrant -x -y */
 
-    return ret;
+    element = rli_get_element(img, x2, y2);
+    data_set(element, x2, y2, clr); /*  IV. Quadrant +x -y */
+
 } /* d_ellipse_elements */
 
-static int d_ellipse(struct rocklua_image *img,
+static void d_ellipse(struct rocklua_image *img,
                           int x1, int y1,
                           int x2, int y2,
                           fb_data *clr,
-                          fb_data *fillclr,
-                          bool clip)
+                          fb_data *fillclr)
 {
     /* NOTE! clr and fillclr passed as pointers */
     /* Rasterizing algorithm derivative of work by Alois Zingl */
-#if LCD_WIDTH > 1024 || LCD_HEIGHT > 1024
+#if (LCD_WIDTH > 1024 || LCD_HEIGHT > 1024) && defined(INT64_MAX)
     /* Prevents overflow on large screens */
-    double dx, dy, err, e2;
+    int64_t dx, dy, err, e1;
 #else
-    long dx, dy, err, e2;
+    int32_t dx, dy, err, e1;
 #endif
+    /* if called with swapped points .. exchange them */
+    swap_int((x1 > x2), &x1, &x2);
+    swap_int((y1 > y2), &y1, &y2);
 
-    int ret = 0;
+    int a = x2 - x1; /* diameter */
+    int b = y2 - y1; /* diameter */
 
-    int a = ABS(x2 - x1); /* diameter */
-    int b = ABS(y2 - y1); /* diameter */
-
-    if(a == 0 || b == 0 || !clr)
-        return ret; /* not an error but nothing to display */
+    if(a == 0 || b == 0)
+        return; /* not an error but nothing to display */
 
     int b1 = (b & 1);
     b = b - (1 - b1);
@@ -613,21 +631,16 @@ static int d_ellipse(struct rocklua_image *img,
 
     err = dx + dy + b1 * a2; /* error of 1.step */
 
-    /* if called with swapped points .. exchange them */
-    swap_int((x1 > x2), &x1, &x2);
-    swap_int((y1 > y2), &y1, &y2);
-
     y1 += (b + 1) >> 1;
     y2 = y1 - b1;
 
     do
     {
-        ret = d_ellipse_elements(img, x1, y1, x2, y2, 0, 0, clr, fillclr, clip);
+        d_ellipse_elements(img, x1, y1, x2, y2, clr, fillclr);
 
-        e2 = err;
+        e1 = err;
 
-        /* using division because you can't use bit shift on doubles.. */
-        if(e2 <= (dy / 2)) /* target midpoint - y step */
+        if(e1 <= (dy >> 1)) /* target midpoint - y step */
         {
             y1++;
             y2--;
@@ -635,7 +648,7 @@ static int d_ellipse(struct rocklua_image *img,
             err += dy;
         }
 
-        if(e2 >= (dx / 2) || err > (dy / 2)) /* target midpoint - x step */
+        if(e1 >= (dx >> 1) || err > (dy >> 1)) /* target midpoint - x step */
         {
             x1++;
             x2--;
@@ -643,21 +656,23 @@ static int d_ellipse(struct rocklua_image *img,
             err += dx;
         }
 
-    } while(ret == 0 && x1 <= x2);
+    } while(x1 <= x2);
 
-    while (ret == 0 && y1 - y2 < b) /* early stop of flat ellipse a=1 finish tip */
+    if (fillclr && x1 - x2 <= 2)
+        fillclr = clr;
+
+    while (y1 - y2 < b) /* early stop of flat ellipse a=1 finish tip */
     {
-        ret = d_ellipse_elements(img, x1, y1, x2, y2, 1, 0, clr, fillclr, clip);
+        d_ellipse_elements(img, x1, y1, x2, y2, clr, fillclr);
 
         y1++;
         y2--;
     }
 
-    return ret;
 } /* d_ellipse */
 
 /* Lua to C Interface for line and ellipse */
-static int rli_line_ellipse(lua_State *L, bool is_ellipse)
+static int rli_line_ellipse(lua_State *L, bool is_ellipse, int narg_clip)
 {
     struct rocklua_image *a = rli_checktype(L, 1);
 
@@ -666,20 +681,12 @@ static int rli_line_ellipse(lua_State *L, bool is_ellipse)
     int x2 = luaL_optint(L, 4, x1);
     int y2 = luaL_optint(L, 5, y1);
 
-    fb_data clr = FB_SCALARPACK((unsigned) luaL_checknumber(L, 6));
+    fb_data clr = FB_SCALARPACK((unsigned) lua_tointeger(L, 6));
 
     fb_data fillclr; /* fill color is index 7 if is_ellipse */
     fb_data *p_fillclr = NULL;
 
-    bool clip;
-    int clip_narg;
-
-    if(is_ellipse)
-        clip_narg = 8;
-    else
-        clip_narg = 7;
-
-    clip = luaL_optboolean(L, clip_narg, false);
+    bool clip = lua_toboolean(L, narg_clip);
 
     if(!clip)
     {
@@ -689,31 +696,27 @@ static int rli_line_ellipse(lua_State *L, bool is_ellipse)
 
     if(is_ellipse)
     {
-        if(!lua_isnoneornil(L, 7))
+        if(lua_type(L, 7) == LUA_TNUMBER)
         {
-            fillclr = FB_SCALARPACK((unsigned) luaL_checkint(L, 7));
+            fillclr = FB_SCALARPACK((unsigned) lua_tointeger(L, 7));
             p_fillclr = &fillclr;
         }
 
-        luaL_argcheck(L, d_ellipse(a, x1, y1, x2, y2, &clr, p_fillclr, clip) == 0,
-                      1, ERR_DATA_OVF);
+        d_ellipse(a, x1, y1, x2, y2, &clr, p_fillclr);
     }
     else
-        luaL_argcheck(L, d_line(a, x1, y1, x2, y2, &clr, clip) == 0,
-                      1, ERR_DATA_OVF);
+        d_line(a, x1, y1, x2, y2, &clr);
 
     return 0;
 } /* rli_line_ellipse */
 
-/* Pushes lua function from Stack at position narg to top of stack
-   and puts a reference in the global registry for later use       */
-static inline int register_luafunc(lua_State *L, int narg_funct)
+static inline int rli_pushpixel(lua_State *L, fb_data color, int x, int y)
 {
-        lua_pushvalue(L, narg_funct); /* lua function */
-        int lf_ref = luaL_ref(L, LUA_REGISTRYINDEX);
-        lua_settop(L, 0); /* clear C stack for use by lua function */
-        return lf_ref;
-} /* register_luafunc */
+    lua_pushinteger(L, FB_UNPACK_SCALAR_LCD(color));
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
+    return 3;
+}
 
 /* User defined pixel manipulations through rli_copy, rli_marshal */
 static int custom_transform(lua_State *L,
@@ -723,42 +726,40 @@ static int custom_transform(lua_State *L,
                             fb_data *color)
 {
     (void) color;
-
+    (void) op;
     fb_data dst;
     fb_data src;
 
-    unsigned int params = 3;
+    int params;
     int ret = 0;
 
-    lua_rawgeti(L, LUA_REGISTRYINDEX, op);
+    if (!lua_isfunction(L, -1))
+        return ret; /* error */
+
+    lua_pushvalue(L, -1); /* make a copy of the lua function */
 
     dst = data_get(ds->elem, ds->x, ds->y);
-    lua_pushnumber(L, FB_UNPACK_SCALAR_LCD(dst));
-    lua_pushnumber(L, ds->x);
-    lua_pushnumber(L, ds->y);
+    params = rli_pushpixel(L, dst, ds->x, ds->y);
 
     if(ss) /* Allows src to be omitted */
     {
-        params  += 3;
         src = data_get(ss->elem, ss->x, ss->y);
-        lua_pushnumber(L, FB_UNPACK_SCALAR_LCD(src));
-        lua_pushnumber(L, ss->x);
-        lua_pushnumber(L, ss->y);
+        params += rli_pushpixel(L, src, ss->x, ss->y);
     }
 
     lua_call(L, params, 2); /* call custom function w/ n-params & 2 ret */
 
-    if(!lua_isnoneornil(L, -2))
+    if(lua_type(L, -2) == LUA_TNUMBER)
     {
-        ret = 1;
-        dst = FB_SCALARPACK((unsigned) luaL_checknumber(L, -2));
+        ret |= 1;
+        dst = FB_SCALARPACK((unsigned) lua_tointeger(L, -2));
         data_set(ds->elem, ds->x, ds->y, &dst);
     }
 
-    if(!lua_isnoneornil(L, -1) && ss)
+    if(ss && (lua_type(L, -1) == LUA_TNUMBER))
     {
         ret |= 2;
-        src = FB_SCALARPACK((unsigned) luaL_checknumber(L, -1));
+        src = FB_SCALARPACK((unsigned) lua_tointeger(L, -1));
         data_set(ss->elem, ss->x, ss->y, &src);
     }
 
@@ -834,10 +835,21 @@ static int blit_transform(lua_State *L,
         case 27: { if(dst == src) { dst = clr; } break; }
         case 28: { if(dst > src)  { dst = clr; } break; }
         case 29: { if(dst < src)  { dst = clr; } break; }
+#if 0
+        /* src unneeded */
+        case 30:  { dst = clr;          break; }/* copyC  */
+        case 31:  { dst = clr | dst;    break; }/* DorC   */
+        case 32:  { dst = clr ^ dst;    break; }/* DxorC  */
+        case 33:  { dst = ~(clr | dst); break; }/* nDorC  */
+        case 34:  { dst = (~clr) | dst; break; }/* DornC  */
+        case 35:  { dst = clr & dst;    break; }/* DandC  */
+        case 36:  { dst = clr & (~dst); break; }/* nDandC */
+        case 37:  { dst = ~clr;         break; }/* notC   */
+#endif
 
     }/*switch op*/
-    fb_data data = FB_SCALARPACK(dst);
-    data_set(ds->elem, ds->x, ds->y, &data);
+    fb_data val = FB_SCALARPACK(dst);
+    data_set(ds->elem, ds->x, ds->y, &val);
     return 1;
 } /* blit_transform */
 
@@ -857,6 +869,22 @@ static int invert_transform(lua_State *L,
 
     return 1;
 } /* invert_transform */
+
+static int clear_transform(lua_State *L,
+                            struct rli_iter_d *ds,
+                            struct rli_iter_d *ss,
+                            int op,
+                            fb_data *color)
+{
+    (void) L;
+    (void) op;
+    (void) ss;
+
+    data_set(ds->elem, ds->x, ds->y, color);
+
+    return 1;
+} /* clear_transform */
+
 #endif /* RLI_EXTENDED */
 
 /* RLI to LUA Interface functions *********************************************/
@@ -865,8 +893,7 @@ RLI_LUA rli_new(lua_State *L)
     int width  = luaL_optint(L, 1, LCD_WIDTH);
     int height = luaL_optint(L, 2, LCD_HEIGHT);
 
-    luaL_argcheck(L, width  > 0, 1, ERR_IDX_RANGE);
-    luaL_argcheck(L, height > 0, 2, ERR_IDX_RANGE);
+    luaL_argcheck(L, width > 0 && height > 0, (width <= 0) ? 1 : 2, ERR_IDX_RANGE);
 
     rli_alloc(L, width, height);
 
@@ -876,29 +903,13 @@ RLI_LUA rli_new(lua_State *L)
 RLI_LUA rli_set(lua_State *L)
 {
     /*(set) (dst*, [x1, y1, clr, clip]) */
-    /* get and set share the same underlying function */
-    return rli_setget(L, false);
+    return rli_setget(L, false, 5);
 }
 
 RLI_LUA rli_get(lua_State *L)
 {
     /*(get) (dst*, [x1, y1, clip]) */
-    /* get and set share the same underlying function */
-    return rli_setget(L, true);
-}
-
-RLI_LUA rli_height(lua_State *L)
-{
-    struct rocklua_image *a = rli_checktype(L, 1);
-    lua_pushnumber(L, a->height);
-    return 1;
-}
-
-RLI_LUA rli_width(lua_State *L)
-{
-    struct rocklua_image *a = rli_checktype(L, 1);
-    lua_pushnumber(L, a->width);
-    return 1;
+    return rli_setget(L, true, 4);
 }
 
 RLI_LUA rli_equal(lua_State *L)
@@ -909,10 +920,24 @@ RLI_LUA rli_equal(lua_State *L)
     return 1;
 }
 
+RLI_LUA rli_height(lua_State *L)
+{
+    struct rocklua_image *a = rli_checktype(L, 1);
+    lua_pushinteger(L, a->height);
+    return 1;
+}
+
+RLI_LUA rli_width(lua_State *L)
+{
+    struct rocklua_image *a = rli_checktype(L, 1);
+    lua_pushinteger(L, a->width);
+    return 1;
+}
+
 RLI_LUA rli_size(lua_State *L)
 {
     struct rocklua_image *a = rli_checktype(L, 1);
-    lua_pushnumber(L, a->elems);
+    lua_pushinteger(L, a->elems);
     return 1;
 }
 
@@ -921,17 +946,17 @@ RLI_LUA rli_raw(lua_State *L)
     /*val = (img*, index, [new_val]) */
     struct rocklua_image *a = rli_checktype(L, 1);
 
-    size_t i = (unsigned) luaL_checkint(L, 2);
+    size_t i = (unsigned) lua_tointeger(L, 2);
 
     fb_data val;
 
     luaL_argcheck(L, i > 0 && i <= (a->elems), 2, ERR_IDX_RANGE);
 
-    lua_pushnumber(L, FB_UNPACK_SCALAR_LCD(a->data[i-1]));
+    lua_pushinteger(L, FB_UNPACK_SCALAR_LCD(a->data[i-1]));
 
-    if(!lua_isnoneornil(L, 3))
+    if(lua_type(L, 3) == LUA_TNUMBER)
     {
-        val = FB_SCALARPACK((unsigned) luaL_checknumber(L, 3));
+        val = FB_SCALARPACK((unsigned) lua_tointeger(L, 3));
         a->data[i-1] = val;
     }
 
@@ -943,7 +968,7 @@ RLI_LUA rli_tostring(lua_State *L)
     /* (img, [infoitem]) */
     struct rocklua_image *a = rli_checktype(L, 1);
 
-    int item     = (unsigned) luaL_optint(L, 2, 0);
+    int item     = lua_tointeger(L, 2);
     size_t bytes = a->elems * sizeof(fb_data);
 
     switch(item)
@@ -956,15 +981,18 @@ RLI_LUA rli_tostring(lua_State *L)
             a->width, a->height, a->elems, bytes, LCD_DEPTH, LCD_PIXELFORMAT);
             break;
         }
-        case RLI_INFO_TYPE:    { lua_pushfstring(L, ROCKLUA_IMAGE   ); break; }
-        case RLI_INFO_WIDTH:   { lua_pushfstring(L, "%d", a->width  ); break; }
-        case RLI_INFO_HEIGHT:  { lua_pushfstring(L, "%d", a->height ); break; }
-        case RLI_INFO_ELEMS:   { lua_pushfstring(L, "%d", a->elems  ); break; }
-        case RLI_INFO_BYTES:   { lua_pushfstring(L, "%d", bytes     ); break; }
-        case RLI_INFO_DEPTH:   { lua_pushfstring(L, "%d", LCD_DEPTH ); break; }
-        case RLI_INFO_FORMAT:  { lua_pushfstring(L, "%d", LCD_PIXELFORMAT); break; }
-        case RLI_INFO_ADDRESS: { lua_pushfstring(L, "%p", a->data); break; }
+        case RLI_INFO_TYPE:    { lua_pushfstring(L, ROCKLUA_IMAGE);   break; }
+        case RLI_INFO_WIDTH:   { lua_pushinteger(L, a->width);        break; }
+        case RLI_INFO_HEIGHT:  { lua_pushinteger(L, a->height);       break; }
+        case RLI_INFO_ELEMS:   { lua_pushinteger(L, a->elems);        break; }
+        case RLI_INFO_BYTES:   { lua_pushinteger(L, bytes);           break; }
+        case RLI_INFO_DEPTH:   { lua_pushinteger(L, LCD_DEPTH );      break; }
+        case RLI_INFO_FORMAT:  { lua_pushinteger(L, LCD_PIXELFORMAT); break; }
+        case RLI_INFO_ADDRESS: { lua_pushfstring(L, "%p", a->data);   break; }
     }
+
+    /* lua_pushstring(L, lua_tostring(L, -1)); */
+    lua_tostring(L, -1); /* converts item at index to string */
 
     return 1;
 }
@@ -974,52 +1002,38 @@ RLI_LUA rli_ellipse(lua_State *L)
 {
     /* (dst*, x1, y1, x2, y2, [clr, fillclr, clip]) */
     /* line and ellipse share the same init function */
-    return rli_line_ellipse(L, true);
+    return rli_line_ellipse(L, true, 8);
 }
 
 RLI_LUA rli_line(lua_State *L)
 {
     /* (dst*, x1, y1, [x2, y2, clr, clip]) */
     /* line and ellipse share the same init function */
-    return rli_line_ellipse(L, false);
+    return rli_line_ellipse(L, false, 7);
 }
 
 RLI_LUA rli_iterator(lua_State *L) {
     /* see rli_iterator_factory */
+    int params = 0;
     struct rli_iter_d *ds;
     ds = (struct rli_iter_d *) lua_touserdata(L, lua_upvalueindex(1));
 
     if(ds->dx != 0 || ds->dy != 0)
     {
-        lua_pushnumber(L, FB_UNPACK_SCALAR_LCD(data_get(ds->elem, ds->x, ds->y)));
-
-        lua_pushinteger(L, ds->x);
-        lua_pushinteger(L, ds->y);
+        params = rli_pushpixel(L, data_get(ds->elem, ds->x, ds->y), ds->x, ds->y);
 
         next_rli_iter(ds); /* load next element */
-
-        return 3;
     }
-    return 0; /* nothing left to do */
+    return params; /* nothing left to do */
 }
 
-RLI_LUA rli_iterator_factory(lua_State *L) {
-    /* (src*, [x1, y1, x2, y2, dx, dy]) */
-    struct rocklua_image *a = rli_checktype(L, 1); /*image we wish to iterate*/
-
-    struct rli_iter_d *ds;
-
-    int x1  = luaL_optint(L, 2, 1);
-    int y1  = luaL_optint(L, 3, 1);
-    int x2  = luaL_optint(L, 4, a->width  - x1 + 1);
-    int y2  = luaL_optint(L, 5, a->height - y1 + 1);
-    int dx  = luaL_optint(L, 6, 1);
-    int dy  = luaL_optint(L, 7, 1);
+RLI_LUA rli_iterator_factory(lua_State *L)
+{
+    /* (points) (img*, [x1, y1, x2, y2, dx, dy, clip]) */
+    /* (indices 1-8 are used by rli_iter_create) */
 
     /* create new iter + pushed onto stack */
-    ds = (struct rli_iter_d *) lua_newuserdata(L, sizeof(struct rli_iter_d));
-
-    init_rli_iter(ds, a, x1, y1, x2, y2, dx, dy, false, false);
+    rli_iter_create(L);
 
     /* returns the iter function with embedded iter data(up values) */
     lua_pushcclosure(L, &rli_iterator, 1);
@@ -1027,66 +1041,54 @@ RLI_LUA rli_iterator_factory(lua_State *L) {
     return 1;
 }
 
-RLI_LUA rli_marshal(lua_State *L) /* also invert */
+RLI_LUA rli_marshal(lua_State *L) /* also invert, clear */
 {
-    /* (img*, [x1, y1, x2, y2, dx, dy, clip, function]) */
-    struct rocklua_image *a = rli_checktype(L, 1);
-
-    struct rli_iter_d ds;
-
-    int x1 = luaL_optint(L, 2, 1);
-    int y1 = luaL_optint(L, 3, 1);
-    int x2 = luaL_optint(L, 4, a->width);
-    int y2 = luaL_optint(L, 5, a->height);
-    int dx = luaL_optint(L, 6, 1);
-    int dy = luaL_optint(L, 7, 1);
-    bool clip    = luaL_optboolean(L, 8, false);
-
-    int lf_ref = LUA_NOREF; /* de-ref'd without consequence */
+    /* (marshal/invert/clear) (img*, [x1, y1, x2, y2, dx, dy, clip, function]) */
+    /* (indices 1-8 are used by rli_iter_create) */
+    fb_data clr;
 
     int (*rli_trans)(lua_State *, struct rli_iter_d *, struct rli_iter_d *, int, fb_data *);
-    rli_trans = invert_transform; /* default transformation */
+    int ltype = lua_type (L, 9);
 
-    if(!clip)
+    /* create new iter + pushed onto stack */
+    struct rli_iter_d *ds = rli_iter_create(L);
+
+    if (ltype == LUA_TNUMBER)
     {
-        bounds_check_xy(L, a, 2, x1, 3, y1);
-        bounds_check_xy(L, a, 4, x2, 5, y2);
+        clr = FB_SCALARPACK((unsigned) lua_tointeger(L, 9));
+        rli_trans = clear_transform;
     }
-
-    init_rli_iter(&ds, a, x1, y1, x2, y2, dx, dy, false, false);
-
-    if(lua_isfunction(L, 9)) /* custom function */
+    else if(ltype == LUA_TFUNCTION) /* custom function */
     {
         rli_trans = custom_transform;
-        lf_ref = register_luafunc(L, 9);
+        lua_pushvalue(L, 9); /* ensure lua function on top of stack */
     }
+    else
+        rli_trans = invert_transform; /* default transformation */
 
     do
     {
-        luaL_argcheck(L, clip || (ds.elem != NULL), 1, ERR_DATA_OVF);
-
-        if(!(*rli_trans)(L, &ds, NULL, lf_ref, NULL))
+        if(!(*rli_trans)(L, ds, NULL, 0, &clr))
             break; /* Custom op can quit early */
 
-    } while(next_rli_iter(&ds));
+    } while(next_rli_iter(ds));
 
-    luaL_unref(L, LUA_REGISTRYINDEX, lf_ref); /* de-reference custom function */
     return 0;
 }
 
 RLI_LUA rli_copy(lua_State *L)
 {
     /* (dst*, src*, [d_x, d_y, s_x, s_y, x_off, y_off, clip, [op, funct/clr]]) */
-    struct rocklua_image *d = rli_checktype(L, 1); /*dst*/
-    struct rocklua_image *s = rli_checktype(L, 2); /*src*/
+    struct rocklua_image *dst = rli_checktype(L, 1); /* dst */
+    struct rocklua_image *src = rli_checktype(L, 2); /* src */
 
-    struct rli_iter_d ds; /*dst*/
-    struct rli_iter_d ss; /*src*/
+    struct rli_iter_d ds; /* dst */
+    struct rli_iter_d ss; /* src */
 
     /* copy whole image if possible */
-    if(s->elems == d->elems && s->width == d->width && lua_gettop(L) < 3)
+    if(src->elems == dst->elems && src->width == dst->width && lua_gettop(L) < 3)
     {
-        rb->memcpy(d->data, s->data, d->elems * sizeof(fb_data));
+        rb->memcpy(dst->data, src->data, dst->elems * sizeof(fb_data));
         return 0;
     }
 
@@ -1095,38 +1097,41 @@ RLI_LUA rli_copy(lua_State *L)
     int s_x = luaL_optint(L, 5, 1);
     int s_y = luaL_optint(L, 6, 1);
 
-    int w = MIN(d->width - d_x, s->width - s_x);
-    int h = MIN(d->height - d_y, s->height - s_y);
+    int w = MIN(dst->width - d_x, src->width - s_x);
+    int h = MIN(dst->height - d_y, src->height - s_y);
 
     int x_off = luaL_optint(L, 7, w);
     int y_off = luaL_optint(L, 8, h);
 
-    bool clip = luaL_optboolean(L, 9, false);
-    int op = luaL_optint(L, 10, 0);
-    fb_data clr = FB_SCALARPACK(0); /* 11 is custom function | color */
+    bool clip = lua_toboolean(L, 9);
+    int op; /* 10 is operation for blit */
+    fb_data clr; /* 11 is custom function | color */
 
     bool d_swx = (x_off < 0); /* dest swap */
     bool d_swy = (y_off < 0);
-    bool s_swx = false; /* src  swap */
+    bool s_swx = false; /* src swap */
     bool s_swy = false;
 
     int (*rli_trans)(lua_State *, struct rli_iter_d *, struct rli_iter_d *, int, fb_data *);
-    rli_trans = blit_transform; /* default transformation */
-
-    int lf_ref = LUA_NOREF; /* de-ref'd without consequence */
 
     if(!clip) /* Out of bounds is not allowed */
     {
-        bounds_check_xy(L, d, 3, d_x, 4, d_y);
-        bounds_check_xy(L, s, 5, s_x, 6, s_y);
+        bounds_check_xy(L, dst, 3, d_x, 4, d_y);
+        bounds_check_xy(L, src, 5, s_x, 6, s_y);
+        w = MIN(w, ABS(x_off));
+        h = MIN(h, ABS(y_off));
+        bounds_check_xy(L, dst, 7, d_x + w, 8, d_y + h);
+        bounds_check_xy(L, src, 7, s_x + w, 8, s_y + h);
     }
-    else if (w < 0 || h < 0) /* not an error but nothing to display */
-        return 0;
+    else
+    {
+        if (w < 0 || h < 0) /* not an error but nothing to display */
+            return 0;
+        w = MIN(w, ABS(x_off));
+        h = MIN(h, ABS(y_off));
+    }
 
-    w = MIN(w, ABS(x_off));
-    h = MIN(h, ABS(y_off));
-
-    /* if(s->data == d->data) need to care about fill direction */
+    /* if src->data == dst->data need to care about fill direction */
     if(d_x > s_x)
     {
         d_swx = !d_swx;
@@ -1139,67 +1144,46 @@ RLI_LUA rli_copy(lua_State *L)
         s_swy = !s_swy;
     }
 
-    init_rli_iter(&ds, d, d_x, d_y, d_x + w, d_y + h, 1, 1, d_swx, d_swy);
+    rli_iter_init(&ds, dst, d_x, d_y, d_x + w, d_y + h, 1, 1, d_swx, d_swy);
 
-    init_rli_iter(&ss, s, s_x, s_y, s_x + w, s_y + h, 1, 1, s_swx, s_swy);
+    rli_iter_init(&ss, src, s_x, s_y, s_x + w, s_y + h, 1, 1, s_swx, s_swy);
 
-    if (op == 0xFF && lua_isfunction(L, 11)) /* custom function specified.. */
+    if (lua_type(L, 11) == LUA_TFUNCTION) /* custom function supplied.. */
     {
         rli_trans = custom_transform;
-        lf_ref = register_luafunc(L, 11);
-        op = lf_ref;
+        lua_settop(L, 11); /* ensure lua function on top of stack */
+        clr = 0;
+        op = 0;
     }
     else
-        clr = FB_SCALARPACK((unsigned) luaL_optnumber(L, 11, LCD_BLACK));
+    {
+        rli_trans = blit_transform; /* default transformation */
+        clr = FB_SCALARPACK((unsigned) lua_tointeger(L, 11));
+        op = lua_tointeger(L, 10);
+    }
 
     do
     {
-        if(!clip)
-        {
-            luaL_argcheck(L, ss.elem != NULL, 2, ERR_DATA_OVF);
-            luaL_argcheck(L, ds.elem != NULL, 1, ERR_DATA_OVF);
-        }
-
         if(!(*rli_trans)(L, &ds, &ss, op, &clr))
             break; /* Custom op can quit early */
 
     } while(next_rli_iter(&ds) && next_rli_iter(&ss));
 
-    luaL_unref(L, LUA_REGISTRYINDEX, lf_ref); /* de-reference custom function */
     return 0;
 }
 
 RLI_LUA rli_clear(lua_State *L)
 {
-    /* (dst*, [color, x1, y1, x2, y2, clip]) */
-    struct rocklua_image *a = rli_checktype(L, 1);
+    /* (clear) (dst*, [color, x1, y1, x2, y2, clip, dx, dy]) */
+    lua_settop(L, 9);
 
-    struct rli_iter_d ds;
+    lua_pushvalue(L, 7); /* clip -- index 8 */
+    lua_remove(L, 7);
 
-    fb_data clr = FB_SCALARPACK((unsigned) luaL_optnumber(L, 2, LCD_BLACK));
-    int x1 = luaL_optint(L, 3, 1);
-    int y1 = luaL_optint(L, 4, 1);
-    int x2 = luaL_optint(L, 5, a->width);
-    int y2 = luaL_optint(L, 6, a->height);
-    bool clip = luaL_optboolean(L, 7, false);
+    lua_pushinteger(L, lua_tointeger(L, 2)); /*color -- index 9*/
+    lua_remove(L, 2);
 
-    if(!clip)
-    {
-        bounds_check_xy(L, a, 3, x1, 4, y1);
-        bounds_check_xy(L, a, 5, x2, 6, y2);
-    }
-
-    init_rli_iter(&ds, a, x1, y1, x2, y2, 1, 1, false, false);
-
-    do
-    {
-        luaL_argcheck(L, clip || (ds.elem != NULL), 1, ERR_DATA_OVF);
-
-        data_set(ds.elem, ds.x, ds.y, &clr);
-
-    } while(next_rli_iter(&ds));
-
-    return 0;
+    return rli_marshal(L); /* (img*, [x1, y1, x2, y2, dx, dy, clip, function]) */
 }
 #endif /* RLI_EXTENDED */
 
@@ -1236,15 +1220,11 @@ LUALIB_API int rli_init(lua_State *L)
 
     luaL_newmetatable(L, ROCKLUA_IMAGE);
 
-    lua_pushstring(L, "__index");
-    lua_pushvalue(L, -2);  /* pushes the metatable */
-    lua_settable(L, -3);  /* metatable.__index = metatable */
+    lua_pushvalue(L, -1);  /* pushes the metatable */
+    lua_setfield(L, -2, "__index"); /* metatable.__index = metatable */
 
     luaL_register(L, NULL, rli_lib);
 
-#ifdef RLI_EXTENDED
-    luaL_register(L, ROCKLUA_IMAGE, rli_lib);
-#endif
     return 1;
 }
 
@@ -1256,7 +1236,7 @@ LUALIB_API int rli_init(lua_State *L)
  * -----------------------------
  */
 
-#define RB_WRAP(M) static int rock_##M(lua_State UNUSED_ATTR *L)
+#define RB_WRAP(func) static int rock_##func(lua_State UNUSED_ATTR *L)
 #ifdef HAVE_LCD_BITMAP
 RB_WRAP(lcd_framebuffer)
 {

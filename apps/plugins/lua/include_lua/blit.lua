@@ -36,7 +36,7 @@ if not rb.lcd_framebuffer then rb.splash(rb.HZ, "No Support!") return nil end
 
 local _blit ={} do
 
-    _blit.CUSTOM = 0xFF  --user defined blit function func(dst_val, x, y, src_val, x, y)
+    _blit.CUSTOM = nil  --user defined blit function func(dst_val, x, y, src_val, x, y)
     _blit.BCOPY        = 0x0  --copy (use :copy() instead it is slightly faster
     _blit.BOR          = 0x1  --OR source and dest pixels
     _blit.BXOR         = 0x2  --XOR source and dest pixels
