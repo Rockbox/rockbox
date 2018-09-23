@@ -49,13 +49,12 @@ local _print = {} do
 
     local _NIL = nil -- _NIL placeholder
     local _LCD = rb.lcd_framebuffer()
-    local LCD_W, LCD_H = rb.LCD_WIDTH, rb.LCD_HEIGHT
     local WHITE = _clr.set(-1, 255, 255, 255)
     local BLACK = _clr.set(0, 0, 0, 0)
     local DRMODE_SOLID = 3
     local col_buf, s_lines = {}, {}
     local _p_opts = _NIL
-
+    local tabstring = string.rep(" ", 2)
 -- print internal helper functions
 --------------------------------------------------------------------------------
    -- clamps value to >= min and <= max
@@ -69,46 +68,20 @@ local _print = {} do
         return max
     end
 
-    -- updates screen in specified rectangle
-    local function update_rect(x, y, w, h)
-        rb.lcd_update_rect(x - 1, y - 1,
-             clamp(x + w, 1, LCD_W) - 1,
-             clamp(y + h, 1, LCD_H) - 1)
-    end
-
     -- Gets size of text
     local function text_extent(msg, font)
-        font = font or rb.FONT_UI
         -- res, w, h
-        return rb.font_getstringsize(msg, font)
-    end
-
-    -- Sets viewport size
-    local function set_viewport(vp)
-        if not vp then rb.set_viewport() return end
-
-        if rb.LCD_DEPTH  == 2 then -- invert 2-bit screens
-            --vp.drawmode = bit.bxor(vp.drawmode, 4)
-            vp.fg_pattern = 3 - vp.fg_pattern
-            vp.bg_pattern = 3 - vp.bg_pattern
-        end
-        rb.set_viewport(vp)
-    end
-
-    -- shallow copy of table
-    function table_clone(t)
-        local copy = {}
-        for k, v in pairs(t) do
-            copy[k] = v
-        end
-        return copy
+        return rb.font_getstringsize(msg, font or rb.FONT_UI)
     end
 
     -- Updates a single line on the screen
     local function update_line(enabled, opts, line, h)
         if enabled ~= true then return end
         local o = opts or _p_opts
-        update_rect(o.x, o.y + line * h + 1, o.width, h)
+    -- updates screen in specified rectangle
+        rb.lcd_update_rect(o.x - 1, o.y + line * h,
+             clamp(o.x + o.width, 1, rb.LCD_WIDTH) - 1,
+             clamp(o.y + line * h + 1 + h, 1, rb.LCD_HEIGHT) - 1)
     end
 
     -- Clears a single line on the screen
@@ -129,22 +102,23 @@ local _print = {} do
     local function col_buf_insert(msg, line, _p_opts)
         --if _p_opts.line <= 1 then col_buf = {} end
         if not col_buf[line] then
-        table.insert(col_buf, line, msg) end
+            table.insert(col_buf, line, msg)
+        end
     end
 
-    --replaces / strips escape characters
+    --replaces / strips tab characters
     local function check_escapes(o, msg)
+--[[    --for replacing a variety of escapes
         local tabsz  = 2
         local tabstr = string.rep(" ", tabsz)
-
         local function repl(esc)
             local ret = ""
             if esc:sub(1,1) == "\t" then ret = string.rep(tabstr, esc:len()) end
             return ret
         end
-
         msg = msg:gsub("(%c+)", repl)
-
+]]
+        msg = msg:gsub("\t", tabstring)
         local res, w, h = text_extent(msg, o.font)
         return w, h, msg
     end
@@ -154,8 +128,8 @@ local _print = {} do
     local function set_defaults()
         _p_opts = { x = 1,
                     y = 1,
-                    width = LCD_W - 1,
-                    height = LCD_H - 1,
+                    width = rb.LCD_WIDTH - 1,
+                    height = rb.LCD_HEIGHT - 1,
                     font = rb.FONT_UI,
                     drawmode = DRMODE_SOLID,
                     fg_pattern = WHITE,
@@ -178,7 +152,15 @@ local _print = {} do
     -- if bByRef is _NIL or false then a copy is returned
     local function get_settings(bByRef)
         _p_opts = _p_opts or set_defaults()
-        if not bByRef then return table_clone(_p_opts) end
+        if not bByRef then 
+            -- shallow copy of table
+            local copy = {}
+            for k, v in pairs(_p_opts) do
+                copy[k] = v
+            end
+            return copy
+        end
+
         return _p_opts
     end
 
@@ -216,7 +198,16 @@ local _print = {} do
             -- alternative selection method
             --msg = "> " .. msg
         end
-        set_viewport(o)
+
+        if not o then rb.set_viewport() return end
+
+        if rb.LCD_DEPTH  == 2 then -- invert 2-bit screens
+            o.fg_pattern = 3 - o.fg_pattern
+            o.bg_pattern = 3 - o.bg_pattern
+        end
+
+        rb.set_viewport(o)
+
         o = _NIL
     end
 
@@ -251,8 +242,8 @@ local _print = {} do
     -- sets print area
     local function set_area(x, y, w, h)
         local o = get_settings(true)
-        o.x, o.y = clamp(x, 1, LCD_W), clamp(y, 1, LCD_H)
-        o.width, o.height = clamp(w, 1, LCD_W - o.x), clamp(h, 1, LCD_H - o.y)
+        o.x, o.y = clamp(x, 1, rb.LCD_WIDTH), clamp(y, 1, rb.LCD_HEIGHT)
+        o.width, o.height = clamp(w, 1, rb.LCD_WIDTH - o.x), clamp(h, 1, rb.LCD_HEIGHT - o.y)
         o.max_line = max_lines(_p_opts)
 
         clear()
@@ -312,6 +303,7 @@ local _print = {} do
         local o = get_settings(true)
         local w, h, msg
         local line = o.line - 1 -- rb is 0-based lua is 1-based
+
         if not (...) or (...) == "\n" then -- handles blank line / single '\n'
              local res, w, h = text_extent(" ", o.font)
 

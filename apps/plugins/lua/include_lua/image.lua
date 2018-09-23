@@ -65,35 +65,43 @@ if not rb.lcd_framebuffer then rb.splash(rb.HZ, "No Support!") return nil end
 
 local _img = {} do
 
+    local rocklib_image = getmetatable(rb.lcd_framebuffer())
+    setmetatable(_img, rocklib_image)
+
     -- internal constants
     local _NIL = nil -- _NIL placeholder
     local _math = require("math_ex") -- math functions needed
     local LCD_W, LCD_H = rb.LCD_WIDTH, rb.LCD_HEIGHT
 
+    local _copy    = rocklib_image.copy
+    local _get     = rocklib_image.get
+    local _marshal = rocklib_image.marshal
+    local _points  = rocklib_image.points
+
     -- returns new image -of- img sized to fit w/h tiling to fit if needed
-    local function tile(img, w, h)
+    _img.tile = function(img, w, h)
         local hs , ws = img:height(), img:width()
         local t_img = rb.new_image(w, h)
 
-        for x = 1, w, ws do t_img:copy(img, x, 1, 1, 1) end
-        for y = hs, h, hs do t_img:copy(t_img, 1, y, 1, 1, w, hs) end
+        for x = 1, w, ws do _copy(t_img, img, x, 1, 1, 1) end
+        for y = hs, h, hs do _copy(t_img, t_img, 1, y, 1, 1, w, hs) end
         return t_img
     end
 
     -- resizes src to size of dst
-    local function resize(dst, src)
+    _img.resize = function(dst, src)
         -- simple nearest neighbor resize derived from rockbox - pluginlib_bmp.c
         -- pretty rough results highly recommend building one more suited..
         local dw, dh = dst:width(), dst:height()
 
-        local xstep = (bit.lshift(src:width(),8) / (dw)) + 1
-        local ystep = (bit.lshift(src:height(),8) / (dh))
+        local xstep = (bit.lshift(src:width(), 8) / (dw)) + 1
+        local ystep = (bit.lshift(src:height(), 8) / (dh))
 
         local xpos, ypos = 0, 0
         local src_x, src_y
 
         -- walk the dest get src pixel
-        function rsz_trans(val, x, y)
+        local function rsz_trans(val, x, y)
             if x == 1 then
                 src_y = bit.rshift(ypos,8) + 1
                 xpos = xstep - bit.rshift(xstep,4) + 1
@@ -101,14 +109,14 @@ local _img = {} do
             end
             src_x = bit.rshift(xpos,8) + 1
             xpos = xpos + xstep
-            return (src:get(src_x, src_y, true) or 0)
+            return (_get(src, src_x, src_y, true) or 0)
         end
         --/* (dst*, [x1, y1, x2, y2, dx, dy, clip, function]) */
-        dst:marshal(1, 1, dw, dh, _NIL, _NIL, false, rsz_trans)
+        _marshal(dst, 1, 1, dw, dh, _NIL, _NIL, false, rsz_trans)
     end
 
     -- returns new image -of- img rotated in whole degrees 0 - 360
-    local function rotate(img, degrees)
+    _img.rotate = function(img, degrees)
         -- we do this backwards as if dest was the unrotated object
         degrees = 360 - degrees
         local c, s = _math.d_cos(degrees), _math.d_sin(degrees)
@@ -133,7 +141,7 @@ local _img = {} do
                |_____|   |_______|       |_______|  ]]
 
         -- walk the dest get translated src pixel, oversamples src to fill gaps
-        function rot_trans(val, x, y)
+        local function rot_trans(val, x, y)
             -- move center x/y to the origin
             local xtran = x - d_xctr;
             local ytran = y - d_yctr;
@@ -142,68 +150,56 @@ local _img = {} do
             local yrot = ((xtran * s) + (ytran * c)) / 10000 + s_yctr
             local xrot = ((xtran * c) - (ytran * s)) / 10000 + s_xctr
             -- upper left of src image back to origin, copy src pixel
-            return img:get(xrot, yrot, true) or 0
+            return _get(img, xrot, yrot, true) or 0
         end
-        r_img:marshal(1, 1, dw, dh, _NIL, _NIL, false, rot_trans)
+        _marshal(r_img, 1, 1, dw, dh, _NIL, _NIL, false, rot_trans)
         return r_img
     end
 
     -- saves img to file: name
-    local function save(img, name)
+    _img.save = function(img, name)
         -- bmp saving derived from rockbox - screendump.c
         -- bitdepth is limited by the device
         -- eg. device displays greyscale, rgb images are saved greyscale
         local file
-
+        local bbuffer = {} -- concat buffer for s_bytes
         local fbuffer = {} -- concat buffer for file writes, reused
-
-        local function dump_fbuffer(thresh)
-            if #fbuffer >= thresh then
-                file:write(table.concat(fbuffer))
-                for i=1, #fbuffer do fbuffer[i] = _NIL end -- reuse table
-            end
-        end
 
         local function s_bytesLE(bits, value)
             -- bits must be multiples of 8 (sizeof byte)
             local byte
-            local result = ""
-            for b = 1, bit.rshift(bits, 3) do
+            local nbytes = bit.rshift(bits, 3)
+            for b = 1, nbytes do
                 if value > 0 then
                     byte  = value % 256
                     value = (value - byte) / 256
-                    result = result .. string.char(byte)
                 else
-                    result = result .. string.char(0)
+                    byte = 0
                 end
+                bbuffer[b] = string.char(byte)
             end
-            return result
+            return table.concat(bbuffer, _NIL, 1, nbytes)
         end
 
         local function s_bytesBE(bits, value)
             -- bits must be multiples of 8 (sizeof byte)
             local byte
-            local result = ""
-            for b = 1, bit.rshift(bits, 3) do
+            local nbytes = bit.rshift(bits, 3)
+            for b = nbytes, 1, -1 do
                 if value > 0 then
                     byte  = value % 256
                     value = (value - byte) / 256
-                    result = string.char(byte) .. result
                 else
-                    result = string.char(0) .. result
+                    byte = 0
                 end
+                bbuffer[b] = string.char(byte)
             end
-            return result
+            return table.concat(bbuffer, _NIL, 1, nbytes)
         end
 
-        local function c_cmp(color, shift)
-            -- [RR][GG][BB]
-            return bit.band(bit.rshift(color, shift), 0xFF)
-        end
-
-        local cmp = {["r"] =  function(c) return c_cmp(c, 16) end,
-                     ["g"] =  function(c) return c_cmp(c, 08) end,
-                     ["b"] =  function(c) return c_cmp(c, 00) end}
+        local cmp = {["r"] =  function(c) return bit.band(bit.rshift(c, 16), 0xFF) end,
+                     ["g"] =  function(c) return bit.band(bit.rshift(c, 08), 0xFF) end,
+                     ["b"] =  function(c) return bit.band(c, 0xFF) end}
 
         local function bmp_color(color)
             return s_bytesLE(8, cmp.b(color))..
@@ -314,7 +310,8 @@ local _img = {} do
             end
         end
 
-        dump_fbuffer(0) -- write the header to the file now
+        file:write(table.concat(fbuffer))-- write the header to the file now
+        for i=1, #fbuffer do fbuffer[i] = _NIL end -- reuse table
 
         local imgdata = fbuffer
         -- pad rows to a multiple of 4 bytes
@@ -327,18 +324,23 @@ local _img = {} do
         end
 
         -- Bitmap lines start at bottom unless biHeight is negative
-        for point in img:points(1, h, w + bytesleft, 1) do
+        for point in _points(img, 1, h, w + bytesleft, 1) do
             imgdata[#imgdata + 1] = fs_bytes_E(bpp, point or 0)
-            dump_fbuffer(31) -- buffered write, increase # for performance
-        end
 
-        dump_fbuffer(0) --write leftovers to file
+            if #fbuffer >= 31 then -- buffered write, increase # for performance
+                file:write(table.concat(fbuffer))
+                for i=1, #fbuffer do fbuffer[i] = _NIL end -- reuse table
+            end
+
+        end
+        file:write(table.concat(fbuffer)) --write leftovers to file
+        fbuffer = _NIL
 
         file:close()
     end -- save(img, name)
 
     --searches an image for target color
-    local function search(img, x1, y1, x2, y2, targetclr, variation, stepx, stepy)
+    _img.search = function(img, x1, y1, x2, y2, targetclr, variation, stepx, stepy)
 
         if variation > 128 then variation = 128 end
         if variation < -128 then variation = -128 end
@@ -352,7 +354,7 @@ local _img = {} do
             targetl = swap
         end
 
-        for point, x, y in img:points(x1, y1, x2, y2, stepx, stepy) do
+        for point, x, y in _points(img, x1, y1, x2, y2, stepx, stepy) do
             if point >= targetl and point <= targeth then
                 return point, x, y
             end
@@ -362,12 +364,12 @@ local _img = {} do
 
     --[[ we won't be extending these into RLI_IMAGE]]
     -- creates a new rbimage size w x h
-    local function new(w, h)
+    _img.new = function(w, h)
         return rb.new_image(w, h)
     end
 
     -- returns new image -of- file: name (_NIL if error)
-    local function load(name)
+    _img.load = function(name)
         return rb.read_bmp_file("/" .. name)
     end
 
@@ -381,23 +383,6 @@ local _img = {} do
     _img.RLI_INFO_DEPTH   = 0x6
     _img.RLI_INFO_FORMAT  = 0x7
     _img.RLI_INFO_ADDRESS = 0x8
-
-    -- expose functions to the outside through _img table
-    _img.save   = save
-    _img.search = search
-    _img.rotate = rotate
-    _img.resize = resize
-    _img.tile = tile
-
-    -- adds the above _img functions into the metatable for RLI_IMAGE
-    local ex = getmetatable(rb.lcd_framebuffer())
-    for k, v in pairs(_img) do
-        if ex[k] == _NIL then ex[k] = v end
-    end
-    -- not exposed through RLI_IMAGE
-     _img.new    = new
-     _img.load   = load
-
 end -- _img functions
 
 return _img

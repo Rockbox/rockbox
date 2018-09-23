@@ -51,7 +51,6 @@ local _lcd = {} do
 
     --internal constants
     local _NIL = nil -- _NIL placeholder
-    local LCD_W, LCD_H = rb.LCD_WIDTH, rb.LCD_HEIGHT
 
    -- clamps value to >= min and <= max
     local function clamp(val, min, max)
@@ -65,21 +64,21 @@ local _lcd = {} do
     end
 
     -- return a copy of lcd screen
-    local function duplicate(t, screen_img)
+    _lcd.duplicate = function(t, screen_img)
         screen_img = screen_img or rb.new_image()
         screen_img:copy(rb.lcd_framebuffer())
         return screen_img
     end
 
     -- updates screen in specified rectangle
-    local function update_rect(t, x, y, w, h)
+    _lcd.update_rect = function(t, x, y, w, h)
         rb.lcd_update_rect(x - 1, y - 1,
-             clamp(x + w, 1, LCD_W) - 1,
-             clamp(y + h, 1, LCD_H) - 1)
+             clamp(x + w, 1, rb.LCD_WIDTH) - 1,
+             clamp(y + h, 1, rb.LCD_HEIGHT) - 1)
     end
 
     -- clears lcd, optional.. ([color, x1, y1, x2, y2, clip])
-    local function clear(t, clr, ...)
+    _lcd.clear = function(t, clr, ...)
         rb.lcd_scroll_stop() --rb really doesn't like bg change while scroll
         if clr == _NIL and ... == _NIL then
             rb.lcd_clear_display()
@@ -89,7 +88,7 @@ local _lcd = {} do
     end
 
     -- loads an image to the screen
-    local function image(t, src, x, y)
+    _lcd.image = function(t, src, x, y)
         if not src then --make sure an image was passed, otherwise bail
             rb.splash(rb.HZ, "No Image!")
             return _NIL
@@ -98,19 +97,19 @@ local _lcd = {} do
     end
 
     -- Formattable version of splash
-    local function splashf(t, timeout, ...)
+    _lcd.splashf = function(t, timeout, ...)
         rb.splash(timeout, string.format(...))
     end
 
     -- Gets size of text
-    local function text_extent(t, msg, font)
+    _lcd.text_extent = function(t, msg, font)
         font = font or rb.FONT_UI
 
         return rb.font_getstringsize(msg, font)
     end
 
     -- Sets viewport size
-    local function set_viewport(t, vp)
+    _lcd.set_viewport = function(t, vp)
         if not vp then rb.set_viewport() return end
         if rb.LCD_DEPTH  == 2 then -- invert 2-bit screens
             --vp.drawmode = bit.bxor(vp.drawmode, 4)
@@ -133,14 +132,17 @@ local _lcd = {} do
     end
 
     --expose functions to the outside through _lcd table
+--[[
     _lcd.text_extent  = text_extent
     _lcd.set_viewport = set_viewport
     _lcd.duplicate    = duplicate
-    _lcd.update       = rb.lcd_update
+    _lcd.update       = _update
     _lcd.update_rect  = update_rect
     _lcd.clear        = clear
     _lcd.splashf      = splashf
     _lcd.image        = image
+]]
+    _lcd.update       = rb.lcd_update
     _lcd.DEPTH        = rb.LCD_DEPTH
     _lcd.W            = rb.LCD_WIDTH
     _lcd.H            = rb.LCD_HEIGHT

@@ -49,17 +49,9 @@ local _clr = {} do
         maxstate = (bit.lshift(1, 24) - 1)
     end
 
-    local function init(v)
-         return v or 0
-    end
-
    -- clamps value to >= min and <= max rolls over to opposite
     local function clamp_roll(val, min, max)
-        if min > max then
-            local swap = min
-            min, max = max, swap
-        end
-
+        -- Warning doesn't check if min < max
         if val < min then
             val = max
         elseif val > max then
@@ -72,12 +64,12 @@ local _clr = {} do
     -- sets color -- monochrome / greyscale use 'set' -- color targets 'r,b,g'
     -- on monochrome/ greyscale targets:
     -- '-1' sets the highest 'color' state & 0 is the minimum 'color' state
-    local function clrset(set, r, g, b)
+    _clr.set = function(set, r, g, b)
         local color = set or 0
 
         if IS_COLOR_TARGET then
-            if (r ~= _NIL or g ~= _NIL or b ~= _NIL) then
-                r, g, b = init(r), init(g), init(b)
+            if (r or g or b) then
+                r, g, b = (r or 0), (g or 0), (b or 0)
                 color = rb.lcd_rgbpack(r, g, b)
             end
         end
@@ -86,21 +78,21 @@ local _clr = {} do
     end -- clrset
 
     -- de/increments current color by 'inc' -- optionally color targets by 'r,g,b'
-    local function clrinc(current, inc, r, g, b)
+    _clr.inc = function(current, inc, r, g, b)
         local color = 0
         current = current or color
         inc = inc or 1
 
         if IS_COLOR_TARGET then
             local ru, gu, bu = rb.lcd_rgbunpack(current);
-            if (r ~= _NIL or g ~= _NIL or b ~= _NIL) then
-                r, g, b = init(r), init(g), init(b)
+            if (r or g or b) then
+                r, g, b = (r or 0), (g or 0), (b or 0)
                 ru = ru + r; gu = gu + g; bu = bu + b
-                color = rb.lcd_rgbpack(ru, gu, bu)
             else
-                ru = ru + inc; gu = gu + inc; bu = bu + inc
-                color = rb.lcd_rgbpack(ru, gu, bu)
+                ru = ru + inc; gu = gu + inc; bu = bu + inc  
             end
+
+            color = rb.lcd_rgbpack(ru, gu, bu)
         else
             color = current + inc
         end
@@ -108,9 +100,6 @@ local _clr = {} do
         return clamp_roll(color, 0, maxstate)
     end -- clrinc
 
-    -- expose functions to the outside through _clr table
-    _clr.set = clrset
-    _clr.inc = clrinc
 end -- color functions
 
 return _clr
