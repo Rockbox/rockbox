@@ -16,6 +16,24 @@
       "revId": "8dbe3de04db509d0b38f7fe109df1e18d04e21c2",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c4e8bc29_c0fc1e0d",
+        "filename": "firmware/storage.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 695,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2018-09-28T16:40:20Z",
+      "side": 1,
+      "message": "Yeah, I thought this strange too.",
+      "parentUuid": "e4e30048_a1011e09",
+      "revId": "8dbe3de04db509d0b38f7fe109df1e18d04e21c2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
