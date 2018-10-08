@@ -152,7 +152,7 @@ local _print = {} do
     -- if bByRef is _NIL or false then a copy is returned
     local function get_settings(bByRef)
         _p_opts = _p_opts or set_defaults()
-        if not bByRef then 
+        if not bByRef then
             -- shallow copy of table
             local copy = {}
             for k, v in pairs(_p_opts) do

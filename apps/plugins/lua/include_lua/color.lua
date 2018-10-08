@@ -44,7 +44,7 @@ local _clr = {} do
     local _NIL = nil -- _NIL placeholder
 
     local maxstate = (bit.lshift(1, rb.LCD_DEPTH) - 1)
-    
+
     if rb.LCD_DEPTH > 24 then -- no alpha channels
         maxstate = (bit.lshift(1, 24) - 1)
     end
@@ -89,7 +89,7 @@ local _clr = {} do
                 r, g, b = (r or 0), (g or 0), (b or 0)
                 ru = ru + r; gu = gu + g; bu = bu + b
             else
-                ru = ru + inc; gu = gu + inc; bu = bu + inc  
+                ru = ru + inc; gu = gu + inc; bu = bu + inc
             end
 
             color = rb.lcd_rgbpack(ru, gu, bu)

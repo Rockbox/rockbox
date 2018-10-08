@@ -268,13 +268,13 @@ local _draw = {} do
                 if targetclr == _get(img, x, y, true) then -- north
                     qtail = qtail + 2
                     qpt[qtail - 1] = x
-                    qpt[qtail] = y 
+                    qpt[qtail] = y
                 end
                 y = y + 2
                 if targetclr == _get(img, x, y, true) then -- south
                     qtail = qtail + 2
                     qpt[qtail - 1] = x
-                    qpt[qtail] = y 
+                    qpt[qtail] = y
                 end
                 return fillclr
             end

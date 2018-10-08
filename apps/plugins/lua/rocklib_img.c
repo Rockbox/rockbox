@@ -1152,7 +1152,7 @@ RLI_LUA rli_copy(lua_State *L)
     {
         rli_trans = custom_transform;
         lua_settop(L, 11); /* ensure lua function on top of stack */
-        clr = 0;
+        clr = FB_SCALARPACK(0);
         op = 0;
     }
     else

@@ -132,16 +132,6 @@ local _lcd = {} do
     end
 
     --expose functions to the outside through _lcd table
---[[
-    _lcd.text_extent  = text_extent
-    _lcd.set_viewport = set_viewport
-    _lcd.duplicate    = duplicate
-    _lcd.update       = _update
-    _lcd.update_rect  = update_rect
-    _lcd.clear        = clear
-    _lcd.splashf      = splashf
-    _lcd.image        = image
-]]
     _lcd.update       = rb.lcd_update
     _lcd.DEPTH        = rb.LCD_DEPTH
     _lcd.W            = rb.LCD_WIDTH
