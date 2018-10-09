@@ -93,7 +93,7 @@ static struct queue_sender_list codec_queue_sender_list SHAREDBSS_ATTR;
 
 /* Workaround stack overflow in opus codec on highmem devices (see FS#13060). */
 #if !defined(CPU_COLDFIRE) && (MEMORYSIZE >= 8) && defined(IRAMSIZE) && IRAMSIZE > (32 * 1024)
-#define WORKAROUND_FS13060 0x800
+#define WORKAROUND_FS13060 1408
 #else
 #define WORKAROUND_FS13060 0
 #endif
