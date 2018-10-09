@@ -90,8 +90,14 @@ extern struct codec_api ci; /* from codecs.c */
 static unsigned int codec_thread_id; /* For modifying thread priority later */
 static struct event_queue codec_queue SHAREDBSS_ATTR;
 static struct queue_sender_list codec_queue_sender_list SHAREDBSS_ATTR;
+
 /* Workaround stack overflow in opus codec on highmem devices (see FS#13060). */
-#define WORKAROUND_FS13060 (MEMORYSIZE >= 8 ? 0x800 : 0)
+#if !defined(CPU_COLDFIRE) && (MEMORYSIZE >= 8) && defined(IRAMSIZE) && IRAMSIZE > (32 * 1024)
+#define WORKAROUND_FS13060 0x800
+#else
+#define WORKAROUND_FS13060 0
+#endif
+
 static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000 + WORKAROUND_FS13060)/sizeof(long)] IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
 
