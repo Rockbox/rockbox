@@ -615,7 +615,7 @@ static inline void cpm_select_msc_clk(unsigned int rate)
     if (div == 0)
 	    div = 1;
 
-    REG_CPM_MSCCDR = MSCCDR_MCS | (div - 1);
+    REG_CPM_MSCCDR = (div - 1);
 }
 
 /* Set the MMC clock frequency */
