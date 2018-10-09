@@ -319,12 +319,12 @@ enum codec_status codec_run(void)
     ogg_sync_state oy;
     ogg_page og;
     ogg_packet op;
-    ogg_stream_state os;
+    ogg_stream_state *os;
     int64_t page_granule = 0;
     int stream_init = 0;
     int sample_rate = 48000;
     OpusDecoder *st = NULL;
-    OpusHeader header;
+    OpusHeader *header;
     int ret;
     unsigned long strtoffset;
     int skip = 0;
@@ -342,6 +342,10 @@ enum codec_status codec_run(void)
        inaccurate with rounding in its current incarnation */
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
 #endif
+
+    /* Allocate some stuff off the stack */
+    os = _ogg_malloc(sizeof(*os));
+    header = _ogg_malloc(sizeof(*header));
 
     /* pre-init the ogg_sync_state buffer, so it won't need many reallocs */
     ogg_sync_init(&oy);
@@ -371,13 +375,13 @@ enum codec_status codec_run(void)
             if (action == CODEC_ACTION_SEEK_TIME) {
                 if (st != NULL) {
                     /* calculate granule to seek to (including seek rewind) */
-                    seek_target = (48LL * param) + header.preskip;
+                    seek_target = (48LL * param) + header->preskip;
                     skip = MIN(seek_target, SEEK_REWIND);
                     seek_target -= skip;
 
                     LOGF("Opus seek page:%lld,%lld,%ld\n",
     		            seek_target, page_granule, (long)param);
-                    speex_seek_page_granule(seek_target, page_granule, &oy, &os);
+                    speex_seek_page_granule(seek_target, page_granule, &oy, os);
                 }
 
                 ci->set_elapsed(param);
@@ -396,33 +400,33 @@ enum codec_status codec_run(void)
         /* Loop for all complete pages we got (most likely only one) */
         while (ogg_sync_pageout(&oy, &og) == 1) {
             if (stream_init == 0) {
-                ogg_stream_init(&os, ogg_page_serialno(&og));
+                ogg_stream_init(os, ogg_page_serialno(&og));
                 stream_init = 1;
             }
 
             /* Add page to the bitstream */
-            ogg_stream_pagein(&os, &og);
+            ogg_stream_pagein(os, &og);
 
             page_granule = ogg_page_granulepos(&og);
             granule_pos = page_granule;
 
             /* Do this to avoid allocating space for huge comment packets
                (embedded Album Art) */
-            if(os.packetno == 1 && ogg_stream_packetpeek(&os, &op) != 1){
+            if(os->packetno == 1 && ogg_stream_packetpeek(os, &op) != 1){
               ogg_sync_reset(&oy);
             }
 
-            while ((ogg_stream_packetout(&os, &op) == 1) && !op.e_o_s) {
+            while ((ogg_stream_packetout(os, &op) == 1) && !op.e_o_s) {
                 if (op.packetno == 0){
                     /* identification header */
                 
-                    if (opus_header_parse(op.packet, op.bytes, &header) == 0) {
+                    if (opus_header_parse(op.packet, op.bytes, header) == 0) {
                         LOGF("Could not parse header");
                         goto done;
                     }
-                    skip = header.preskip;
+                    skip = header->preskip;
 
-                    st = opus_decoder_create(sample_rate, header.channels, &ret);
+                    st = opus_decoder_create(sample_rate, header->channels, &ret);
                     if (ret != OPUS_OK) {
                         LOGF("opus_decoder_create failed %d", ret);
                         goto done;
@@ -431,11 +435,11 @@ enum codec_status codec_run(void)
 
                     codec_set_replaygain(ci->id3);
 
-                    opus_decoder_ctl(st, OPUS_SET_GAIN(header.gain));
+                    opus_decoder_ctl(st, OPUS_SET_GAIN(header->gain));
 
                     ci->configure(DSP_SET_FREQUENCY, sample_rate);
                     ci->configure(DSP_SET_SAMPLE_DEPTH, 16);
-                    ci->configure(DSP_SET_STEREO_MODE, (header.channels == 2) ?
+                    ci->configure(DSP_SET_STEREO_MODE, (header->channels == 2) ?
                         STEREO_INTERLEAVED : STEREO_MONO);
 
                 } else if (op.packetno == 1) {
@@ -450,7 +454,7 @@ enum codec_status codec_run(void)
 
                     /* report progress */
                     ci->set_offset((size_t) ci->curpos);
-                    ci->set_elapsed((granule_pos - header.preskip) / 48);
+                    ci->set_elapsed((granule_pos - header->preskip) / 48);
 
                     /* Decode audio packets */
                     ret = opus_decode(st, op.packet, op.bytes, output, MAX_FRAME_SIZE, 0);
@@ -464,7 +468,7 @@ enum codec_status codec_run(void)
                             } else {
                                 /* part of output buffer is played */
                                 ret -= skip;
-                                ci->pcmbuf_insert(&output[skip * header.channels], NULL, ret);
+                                ci->pcmbuf_insert(&output[skip * header->channels], NULL, ret);
                                 skip = 0;
                             }
                         } else {
