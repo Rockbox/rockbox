@@ -340,7 +340,7 @@ static int jz_nand_read_oob(unsigned long page_addr, unsigned char *buf, int siz
 static int jz_nand_read_page(unsigned long page_addr, unsigned char *dst)
 {
     struct nand_param *nandp = &internal_param;
-    int page_size, oob_size, page_per_block;
+    int page_size, oob_size;
     int row_cycle, bus_width, ecc_count;
     int i;
 #ifdef USE_ECC
@@ -351,7 +351,6 @@ static int jz_nand_read_page(unsigned long page_addr, unsigned char *dst)
     
     page_size = nandp->page_size;
     oob_size = nandp->oob_size;
-    page_per_block = nandp->page_per_block;
     row_cycle = nandp->row_cycle;
     bus_width = nandp->bus_width;
 

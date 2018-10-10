@@ -110,6 +110,7 @@ int _battery_voltage(void)
 
     dummy = REG_SADC_BATDAT;
     dummy = REG_SADC_BATDAT;
+    (void)dummy;
 
     REG_SADC_ENA |= SADC_ENA_PBATEN;
 

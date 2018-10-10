@@ -371,7 +371,9 @@ bool vo_draw_frame_thumb(uint8_t * const * buf, const struct vo_rect *rc)
     uint8_t *yuv[3];
     struct vo_rect thumb_rc;
     int thumb_width, thumb_height;
+#ifdef HAVE_LCD_COLOR
     int thumb_uv_width, thumb_uv_height;
+#endif
 
     /* Obtain rectangle as clipped to the screen */
     vo_rect_set_ext(&thumb_rc, 0, 0, LCD_WIDTH, LCD_HEIGHT);
@@ -386,11 +388,15 @@ bool vo_draw_frame_thumb(uint8_t * const * buf, const struct vo_rect *rc)
 
     thumb_width = rc->r - rc->l;
     thumb_height = rc->b - rc->t;
+#ifdef HAVE_LCD_COLOR
     thumb_uv_width = thumb_width / 2;
     thumb_uv_height = thumb_height / 2;
 
     DEBUGF("thumb: w: %d h: %d uvw: %d uvh: %d\n", thumb_width,
            thumb_height, thumb_uv_width, thumb_uv_height);
+#else
+    DEBUGF("thumb: w: %d h: %d\n", thumb_width, thumb_height);
+#endif
 
     /* Use remaining mpeg2 buffer as temp space */
     mem = mpeg2_get_buf(&bufsize);
