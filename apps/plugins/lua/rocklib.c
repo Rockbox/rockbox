@@ -194,13 +194,7 @@ RB_WRAP(font_getstringsize)
 
 RB_WRAP(current_path)
 {
-    const char *current_path = get_current_path(L, 1);
-    if(current_path != NULL)
-        lua_pushstring(L, current_path);
-    else
-        lua_pushnil(L);
-
-    return 1;
+    return get_current_path(L, 1);
 }
 
 static void fill_text_message(lua_State *L, struct text_message * message,
