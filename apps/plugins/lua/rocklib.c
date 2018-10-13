@@ -327,6 +327,19 @@ RB_WRAP(playlist_insert_directory)
     return 1;
 }
 
+static int splashf(lua_State *L)
+{
+	int ticks = (int) luaL_checkint(L, 1);
+    luaL_checkstring(L, 2);
+    lua_getfield(L, LUA_GLOBALSINDEX, "string");
+    lua_getfield (L, -1, "format");
+    lua_insert(L, 2);
+    lua_call(L, lua_gettop(L) - 2, 1);
+	const char * str = (const char *) lua_tostring(L, -1);
+	rb->splash(ticks, str);
+	return 0;
+}
+
 SIMPLE_VOID_WRAPPER(backlight_force_on);
 SIMPLE_VOID_WRAPPER(backlight_use_settings);
 
@@ -416,6 +429,8 @@ static const luaL_Reg rocklib[] =
 #endif
 
     RB_FUNC(get_plugin_action),
+    {"splash", splashf},
+    {"splashf", splashf},
 
     {NULL, NULL}
 };

@@ -98,7 +98,7 @@ local _lcd = {} do
 
     -- Formattable version of splash
     _lcd.splashf = function(t, timeout, ...)
-        rb.splash(timeout, string.format(...))
+        rb.splashf(timeout, ...)
     end
 
     -- Gets size of text
