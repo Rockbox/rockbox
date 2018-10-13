@@ -26,6 +26,7 @@
 #include "lua.h"
 
 #include "lauxlib.h"
+#include "lualib.h"
 #include "rocklib_img.h"
 #include "rocklib.h"
 #include "lib/helper.h"
@@ -56,6 +57,23 @@
 
 #define RB_WRAP(func) static int rock_##func(lua_State UNUSED_ATTR *L)
 #define SIMPLE_VOID_WRAPPER(func) RB_WRAP(func) { (void)L; func(); return 0; }
+
+static int splashf(lua_State *L)
+{
+    int ticks = (int) luaL_checkint(L, 1);
+    const char *str = luaL_checkstring(L, 2);
+    lua_getfield(L, LUA_GLOBALSINDEX, LUA_STRLIBNAME);
+    lua_getfield (L, -1, "format");
+    if(lua_isfunction(L, -1)) /* skip if format function not available */
+    {
+        lua_insert(L, 2);
+        /* splash(timeout,string.format(str, ...)) */
+        lua_call(L, lua_gettop(L) - 2, 1);
+        str = (const char *) luaL_checkstring(L, -1);
+    }
+    rb->splash(ticks, str);
+    return 0;
+}
 
 /* Helper function for opt_viewport */
 static void check_tablevalue(lua_State *L,
@@ -416,6 +434,8 @@ static const luaL_Reg rocklib[] =
 #endif
 
     RB_FUNC(get_plugin_action),
+    {"splash", splashf},
+    {"splashf", splashf},
 
     {NULL, NULL}
 };
