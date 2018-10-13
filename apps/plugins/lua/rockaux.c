@@ -73,9 +73,8 @@ int strcoll(const char * str1, const char * str2)
     return rb->strcmp(str1, str2);
 }
 
-const char* get_current_path(lua_State *L, int level)
+int get_current_path(lua_State *L, int level)
 {
-    static char buffer[MAX_PATH];
     lua_Debug ar;
 
     if(lua_getstack(L, level, &ar))
@@ -84,22 +83,15 @@ const char* get_current_path(lua_State *L, int level)
             and write it to dest. */
         lua_getinfo(L, "S", &ar);
 
-        char* curfile = (char*) &ar.source[1];
-        char* pos = rb->strrchr(curfile, '/');
+        const char* curfile = &ar.source[1];
+        const char* pos = rb->strrchr(curfile, '/');
         if(pos != NULL)
         {
-            unsigned int len = (unsigned int)(pos - curfile);
-            len = len + 1 > sizeof(buffer) ? sizeof(buffer) - 1 : len;
-
-            if(len > 0)
-                memcpy(buffer, curfile, len);
-
-            buffer[len] = '/';
-            buffer[len+1] = '\0';
-
-            return buffer;
+            lua_pushlstring (L, curfile, pos - curfile + 1);
+            return 1;
         }
     }
 
-    return NULL;
+    lua_pushnil(L);    
+    return 1;
 }

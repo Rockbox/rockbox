@@ -54,7 +54,10 @@ static const char *pushnexttemplate (lua_State *L, const char *path) {
 
 static const char *findfile (lua_State *L, const char *name,
                                            const char *pname) {
-  const char *path, *current_path = get_current_path(L, 2);
+  get_current_path(L, 2);
+  const char *current_path = lua_tostring(L, -1);
+  const char *path;
+
   name = luaL_gsub(L, name, ".", LUA_DIRSEP);
   lua_getfield(L, LUA_ENVIRONINDEX, pname);
   path = lua_tostring(L, -1);
