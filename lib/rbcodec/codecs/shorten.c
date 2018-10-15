@@ -145,7 +145,7 @@ seek_start:
 
                 /* Update the elapsed-time indicator */
                 samplesdone += nsamples;
-                elapsedtime = (samplesdone*10) / (sc.sample_rate/100);
+                elapsedtime = samplesdone*1000LL/sc.sample_rate;
                 ci->set_elapsed(elapsedtime);
             }
 

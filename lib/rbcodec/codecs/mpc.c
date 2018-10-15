@@ -140,7 +140,7 @@ enum codec_status codec_run(void)
             samplesdone = 0;
         }
 
-        elapsed_time = (samplesdone*10)/frequency;
+        elapsed_time = (samplesdone*10LL)/frequency;
     }
 
     ci->set_elapsed(elapsed_time);
@@ -162,7 +162,7 @@ enum codec_status codec_run(void)
                 samplesdone = new_offset;
             }
 
-            elapsed_time = (samplesdone*10)/frequency;
+            elapsed_time = (samplesdone*10LL)/frequency;
             ci->set_elapsed(elapsed_time);
             ci->seek_complete();
         }
@@ -182,7 +182,7 @@ enum codec_status codec_run(void)
                               frame.buffer + MPC_FRAME_LENGTH,
                               frame.samples);
             samplesdone += frame.samples;
-            elapsed_time = (samplesdone*10)/frequency;
+            elapsed_time = (samplesdone*10LL)/frequency;
             ci->set_elapsed(elapsed_time);
             /* Remark: rockbox offset is the file offset in bytes. So estimate 
              * this offset from the samples, sampling frequency and bitrate */
