@@ -570,7 +570,7 @@ next_page:
                             ci->set_offset((long) ci->curpos);
 
                             ci->set_elapsed((samplerate == 0) ? 0 :
-                                             cur_granule * 1000 / samplerate);
+                                             cur_granule * 1000LL / samplerate);
                          }
                     }
                 }

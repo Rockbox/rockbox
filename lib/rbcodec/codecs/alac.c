@@ -104,7 +104,7 @@ enum codec_status codec_run(void)
         }
     }
 
-    elapsedtime = (samplesdone*10)/(ci->id3->frequency/100);
+    elapsedtime = samplesdone * 1000LL / ci->id3->frequency;
     ci->set_elapsed(elapsedtime);
 
     /* The main decoding loop */
@@ -119,7 +119,7 @@ enum codec_status codec_run(void)
             if (m4a_seek(&demux_res, &input_stream,
                          (param/10) * (ci->id3->frequency/100),
                          &samplesdone, (int *)&i)) {
-                elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
+                elapsedtime=samplesdone*1000LL/ci->id3->frequency;
             }
             ci->set_elapsed(elapsedtime);
             ci->seek_complete();
@@ -140,7 +140,7 @@ enum codec_status codec_run(void)
 
         /* Update the elapsed-time indicator */
         samplesdone+=samplesdecoded;
-        elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
+        elapsedtime=samplesdone*1000LL/ci->id3->frequency;
         ci->set_elapsed(elapsedtime);
 
         i++;

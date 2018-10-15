@@ -141,8 +141,7 @@ enum codec_status codec_run(void)
             sound_samples_done = 0;
         }
         NeAACDecPostSeekReset(decoder, i);
-        elapsed_time = (sound_samples_done * 10) /
-                       (ci->id3->frequency / 100);
+        elapsed_time = sound_samples_done * 1000LL / ci->id3->frequency;
     } else if (param) {
         elapsed_time = param;
         action = CODEC_ACTION_SEEK_TIME;
@@ -176,7 +175,7 @@ enum codec_status codec_run(void)
                           (param/10/sbr_fac)*(ci->id3->frequency/100),
                           &sound_samples_done, (int*) &i)) {
                 sound_samples_done *= sbr_fac;
-                elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
+                elapsed_time = sound_samples_done * 1000LL / ci->id3->frequency;
                 ci->set_elapsed(elapsed_time);
                 seek_idx = 0;
 

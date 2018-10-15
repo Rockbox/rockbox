@@ -420,7 +420,7 @@ enum codec_status codec_run(void)
                 break;
             }
 
-            ci->set_elapsed((samplesdone * 1000) / current_frequency);
+            ci->set_elapsed((samplesdone * 1000LL) / current_frequency);
             ci->seek_complete();
             init_mad();
             framelength = 0;
@@ -508,7 +508,7 @@ enum codec_status codec_run(void)
         }
 
         samplesdone += framelength;
-        ci->set_elapsed((samplesdone * 1000) / current_frequency);
+        ci->set_elapsed((samplesdone * 1000LL) / current_frequency);
     }
 
     /* wait for synth idle - MT only*/

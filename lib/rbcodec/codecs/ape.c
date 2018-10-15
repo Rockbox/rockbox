@@ -218,7 +218,7 @@ enum codec_status codec_run(void)
 
         ape_resume(&ape_ctx, resume_offset, 
                    &currentframe, &samplesdone, &samplestoskip, &firstbyte);
-        elapsedtime = (samplesdone*10)/(ape_ctx.samplerate/100);
+        elapsedtime = samplesdone*1000LL/ape_ctx.samplerate;
     }
     else {
         currentframe = 0;
@@ -285,8 +285,7 @@ frame_start:
                         inbuffer = ci->request_buffer(&bytesleft,
                                                       INPUT_CHUNKSIZE);
 
-                        elapsedtime = (samplesdone*10)/
-                                      (ape_ctx.samplerate/100);
+                        elapsedtime = samplesdone*1000LL/ape_ctx.samplerate;
                         ci->set_elapsed(elapsedtime);
                         ci->seek_complete();
                         action = CODEC_ACTION_NULL;
@@ -330,7 +329,7 @@ frame_start:
 
             if (!samplestoskip) {
                 /* Update the elapsed-time indicator */
-                elapsedtime = (samplesdone*10)/(ape_ctx.samplerate/100);
+                elapsedtime = samplesdone*1000LL/ape_ctx.samplerate;
                 ci->set_elapsed(elapsedtime);
             }
 
