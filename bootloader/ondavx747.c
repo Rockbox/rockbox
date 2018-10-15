@@ -252,6 +252,7 @@ redraw:
     else
         poweroff_repeat = 0;
     }
+    return 0;
 }
 
 int main(void)
