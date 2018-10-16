@@ -41,7 +41,6 @@ enum menu_item_type {
 };
 #define MENU_TYPE_MASK 0xF /* MT_* type */
 
-typedef int (*menu_function)(void);
 struct menu_func {
     union {
         int (*function_w_param)(void* param); /* intptr_t instead of void*

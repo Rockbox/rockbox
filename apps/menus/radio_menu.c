@@ -59,7 +59,7 @@ MENUITEM_FUNCTION(recscreen_item, 0, ID2P(LANG_RECORDING),
 #define FM_RECORDING_SETTINGS
 static int fm_recording_settings(void)
 {
-    bool ret = recording_menu(true);
+    int ret = recording_menu(true);
 
 #if CONFIG_CODEC != SWCODEC
     if (!ret)

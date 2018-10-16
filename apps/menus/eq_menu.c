@@ -563,7 +563,7 @@ static void draw_eq_sliders(struct screen * screen, int x, int y,
 }
 
 /* Provides a graphical means of editing the EQ settings */
-bool eq_menu_graphical(void)
+int eq_menu_graphical(void)
 {
     bool exit_request = false;
     bool result = true;
@@ -753,10 +753,10 @@ bool eq_menu_graphical(void)
         screens[i].set_viewport(NULL);
         viewportmanager_theme_undo(i, false);
     }
-    return result;
+    return (result) ? 1 : 0;
 }
 
-static bool eq_save_preset(void)
+static int eq_save_preset(void)
 {
     /* make sure that the eq is enabled for setting saving */
     bool enabled = global_settings.eq_enabled;
@@ -766,16 +766,16 @@ static bool eq_save_preset(void)
 
     global_settings.eq_enabled = enabled;
 
-    return result;
+    return (result) ? 1 : 0;
 }
 /* Allows browsing of preset files */
 static struct browse_folder_info eqs = { EQS_DIR, SHOW_CFG };
 
 MENUITEM_FUNCTION(eq_graphical, 0, ID2P(LANG_EQUALIZER_GRAPHICAL),
-                    (int(*)(void))eq_menu_graphical, NULL, lowlatency_callback,
+                    eq_menu_graphical, NULL, lowlatency_callback,
                     Icon_EQ);
 MENUITEM_FUNCTION(eq_save, 0, ID2P(LANG_EQUALIZER_SAVE),
-                    (int(*)(void))eq_save_preset, NULL, NULL, Icon_NOICON);
+                    eq_save_preset, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(eq_browse, MENU_FUNC_USEPARAM, ID2P(LANG_EQUALIZER_BROWSE),
                     browse_folder, (void*)&eqs, lowlatency_callback,
                     Icon_NOICON);

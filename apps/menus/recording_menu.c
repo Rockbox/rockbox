@@ -307,7 +307,7 @@ MENUITEM_FUNCTION(recformat, 0, ID2P(LANG_RECORDING_FORMAT),
                     recformat_func, NULL, NULL, Icon_Menu_setting);
 
 MENUITEM_FUNCTION(enc_global_config_menu_item, 0, ID2P(LANG_ENCODER_SETTINGS),
-                    (int(*)(void))enc_global_config_menu,
+                     enc_global_config_menu,
                      NULL, NULL, Icon_Submenu);
 
 #endif /* CONFIG_CODEC == SWCODEC */
@@ -651,14 +651,15 @@ MAKE_MENU(recording_settings_menu, ID2P(LANG_RECORDING_SETTINGS),
             &browse_recconfigs, &save_recpresets_item
 );
 
-bool recording_menu(bool no_source)
+int recording_menu(bool no_source)
 {
-    bool retval;
+    int retval;
     no_source_in_menu = no_source;
-    retval = do_menu(&recording_settings_menu, NULL, NULL, false) == MENU_ATTACHED_USB;
+    int retmenu = do_menu(&recording_settings_menu, NULL, NULL, false);
+    retval = (retmenu == MENU_ATTACHED_USB) ? 1 : 0;
     no_source_in_menu = false; /* always fall back to the default */
     return retval;
 };
 
 MENUITEM_FUNCTION(recording_settings, MENU_FUNC_USEPARAM, ID2P(LANG_RECORDING_SETTINGS),
-                          (int (*)(void*))recording_menu, 0, NULL, Icon_Recording);
+                          recording_menu, 0, NULL, Icon_Recording);

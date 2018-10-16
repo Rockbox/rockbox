@@ -912,7 +912,7 @@ static int dirbrowse(void)
     return true;
 }
 
-bool create_playlist(void)
+int create_playlist(void)
 {
     char filename[MAX_PATH + 16]; /* add enough space for extension */
 
@@ -924,14 +924,14 @@ bool create_playlist(void)
         
     
     if (kbd_input(filename, MAX_PATH))
-        return false;
+        return 0;
     splashf(0, "%s %s", str(LANG_CREATING), filename);
 
     trigger_cpu_boost();
     catalog_add_to_a_playlist(tc.currdir, ATTR_DIRECTORY, true, filename);
     cancel_cpu_boost();
 
-    return true;
+    return 1;
 }
 
 void browse_context_init(struct browse_context *browse,

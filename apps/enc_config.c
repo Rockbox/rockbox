@@ -440,7 +440,7 @@ void enc_global_settings_apply(void)
 
 /* Show an encoder's config menu based on the global_settings.
    Modified settings are placed in global_settings.enc_config. */
-bool enc_global_config_menu(void)
+int enc_global_config_menu(void)
 {
     struct encoder_config cfg;
 
@@ -453,12 +453,12 @@ bool enc_global_config_menu(void)
     {
         menu_callback_data.cfg = &cfg;
         menu_callback_data.global = true;
-        return do_menu(enc_data[cfg.rec_format].menu, NULL, NULL, false)
-                == MENU_ATTACHED_USB;
+        int retmenu = do_menu(enc_data[cfg.rec_format].menu, NULL, NULL, false);
+        return (retmenu == MENU_ATTACHED_USB) ? 1 : 0;
     }
     else
     {
         splash(HZ, ID2P(LANG_NO_SETTINGS));
-        return false;
+        return 0;
     }
 } /* enc_global_config_menu */

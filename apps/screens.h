@@ -43,7 +43,7 @@ bool set_time_screen(const char* title, struct tm *tm);
 
 bool shutdown_screen(void);
 bool browse_id3(void);
-bool view_runtime(void);
+int  view_runtime(void);
 
 #ifdef HAVE_TOUCHSCREEN
 int calibrate(void);
