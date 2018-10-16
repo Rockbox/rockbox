@@ -967,7 +967,7 @@ static void tagtree_track_finish_event(unsigned short id, void *ev_data)
 #endif
 }
 
-bool tagtree_export(void)
+int tagtree_export(void)
 {
     struct tagcache_search tcs;
 
@@ -977,10 +977,10 @@ bool tagtree_export(void)
         splash(HZ*2, ID2P(LANG_FAILED));
     }
 
-    return false;
+    return 0;
 }
 
-bool tagtree_import(void)
+int tagtree_import(void)
 {
     splash(0, ID2P(LANG_WAIT));
     if (!tagcache_import_changelog())
@@ -988,7 +988,7 @@ bool tagtree_import(void)
         splash(HZ*2, ID2P(LANG_FAILED));
     }
 
-    return false;
+    return 0;
 }
 
 static bool parse_menu(const char *filename);

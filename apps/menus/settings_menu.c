@@ -152,11 +152,13 @@ MENUITEM_FUNCTION(tc_update, 0, ID2P(LANG_TAGCACHE_UPDATE),
                     (int(*)(void))tagcache_update_with_splash,
                     NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(runtimedb, &global_settings.runtimedb, NULL);
+
 MENUITEM_FUNCTION(tc_export, 0, ID2P(LANG_TAGCACHE_EXPORT),
-                    (int(*)(void))tagtree_export, NULL,
+                    tagtree_export, NULL,
                     NULL, Icon_NOICON);
+
 MENUITEM_FUNCTION(tc_import, 0, ID2P(LANG_TAGCACHE_IMPORT),
-                    (int(*)(void))tagtree_import, NULL,
+                    tagtree_import, NULL,
                     NULL, Icon_NOICON);
 MENUITEM_FUNCTION(tc_paths, 0, ID2P(LANG_SELECT_DATABASE_DIRS),
                     dirs_to_scan, NULL, NULL, Icon_NOICON);

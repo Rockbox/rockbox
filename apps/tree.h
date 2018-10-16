@@ -116,7 +116,7 @@ void browse_context_init(struct browse_context *browse,
                          char *title, enum themable_icons icon,
                          const char *root, const char *selected);
 int rockbox_browse(struct browse_context *browse);
-bool create_playlist(void);
+int create_playlist(void);
 void resume_directory(const char *dir);
 static inline void tree_lock_cache(struct tree_context *t)
 {

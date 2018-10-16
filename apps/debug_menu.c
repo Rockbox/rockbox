@@ -2708,14 +2708,14 @@ static const char* menu_get_name(int item, void * data,
     return menuitems[item].desc;
 }
 
-bool debug_menu(void)
+int debug_menu(void)
 {
     struct simplelist_info info;
 
     simplelist_info_init(&info, "Debug Menu", ARRAYLEN(menuitems), NULL);
     info.action_callback = menu_action_callback;
     info.get_name        = menu_get_name;
-    return simplelist_show_list(&info);
+    return (simplelist_show_list(&info)) ? 1 : 0;
 }
 
 bool run_debug_screen(char* screen)

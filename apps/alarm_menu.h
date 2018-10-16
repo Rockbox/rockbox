@@ -21,6 +21,6 @@
 #ifndef _ALARM_MENU_H
 #define _ALARM_MENU_H
 
-bool alarm_screen(void);
+int alarm_screen(void);
 
 #endif

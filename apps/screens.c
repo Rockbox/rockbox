@@ -830,7 +830,7 @@ static int runtime_speak_data(int selected_item, void* data)
 }
 
 
-bool view_runtime(void)
+int view_runtime(void)
 {
     static const char *lines[]={ID2P(LANG_CLEAR_TIME)};
     static const struct text_message message={lines, 1};
@@ -869,9 +869,9 @@ bool view_runtime(void)
             }
         }
         if(default_event_handler(action) == SYS_USB_CONNECTED)
-            return true;
+            return 1;
     }
-    return false;
+    return 0;
 }
 
 #ifdef HAVE_TOUCHSCREEN

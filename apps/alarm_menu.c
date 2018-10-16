@@ -50,7 +50,7 @@ static void speak_time(int hours, int minutes, bool speak_hours, bool enqueue)
     }
 }
 
-bool alarm_screen(void)
+int alarm_screen(void)
 {
     int h, m;
     bool done = false;
@@ -188,10 +188,10 @@ bool alarm_screen(void)
             if(default_event_handler(button) == SYS_USB_CONNECTED)
             {
                 rtc_enable_alarm(false);
-                return true;
+                return 1;
             }
             break;
         }
     }
-    return false;
+    return 0;
 }
