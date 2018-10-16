@@ -71,5 +71,5 @@ void enc_global_settings_apply(void);
 
 /* Show an encoder's config menu based on the global_settings.
    Modified settings are placed in global_settings.enc_config. */
-bool enc_global_config_menu(void);
+int enc_global_config_menu(void);
 #endif /* ENC_CONFIG_H */

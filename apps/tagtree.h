@@ -31,8 +31,8 @@
 #define TAGMENU_MAX_MENUS  32
 #define TAGMENU_MAX_FMTS   32
 
-bool tagtree_export(void);
-bool tagtree_import(void);
+int tagtree_export(void);
+int tagtree_import(void);
 void tagtree_init(void) INIT_ATTR;
 int tagtree_enter(struct tree_context* c);
 void tagtree_exit(struct tree_context* c);

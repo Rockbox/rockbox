@@ -82,7 +82,7 @@ MENUITEM_FUNCTION(time_set, 0, ID2P(LANG_SET_TIME),
 MENUITEM_SETTING(timeformat, &global_settings.timeformat, NULL);
 #ifdef HAVE_RTC_ALARM
 MENUITEM_FUNCTION(alarm_screen_call, 0, ID2P(LANG_ALARM_MOD_ALARM_MENU),
-                  (menu_function)alarm_screen, NULL, NULL, Icon_NOICON);
+                  alarm_screen, NULL, NULL, Icon_NOICON);
 #if CONFIG_TUNER || defined(HAVE_RECORDING)
 
 #if CONFIG_TUNER && !defined(HAVE_RECORDING)

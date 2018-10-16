@@ -111,7 +111,7 @@ MAKE_MENU(manage_settings, ID2P(LANG_MANAGE_MENU), NULL, Icon_Config,
 /*      INFO MENU                  */
 
 
-static bool show_credits(void)
+static int show_credits(void)
 {
     char credits[MAX_PATH] = { '\0' };
     snprintf(credits, MAX_PATH, "%s/credits.rock", VIEWERS_DIR);
@@ -122,7 +122,7 @@ static bool show_credits(void)
         while (IS_SYSEVENT(get_action(CONTEXT_STD, TIMEOUT_BLOCK)))
             ;
     }
-    return false;
+    return 0;
 }
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -357,7 +357,7 @@ static int info_action_callback(int action, struct gui_synclist *lists)
     }
     return action;
 }
-static bool show_info(void)
+static int show_info(void)
 {
     struct info_data data = {.new_data = true };
     struct simplelist_info info;
@@ -369,10 +369,12 @@ static bool show_info(void)
     if(global_settings.talk_menu)
          info.get_talk = info_speak_item;
     info.action_callback = info_action_callback;
-    return simplelist_show_list(&info);
+    return (simplelist_show_list(&info)) ? 1 : 0;
 }
+
+
 MENUITEM_FUNCTION(show_info_item, 0, ID2P(LANG_ROCKBOX_INFO),
-                   (menu_function)show_info, NULL, NULL, Icon_NOICON);
+                   show_info, NULL, NULL, Icon_NOICON);
 
 #if CONFIG_RTC
 int time_screen(void* ignored);
@@ -381,11 +383,13 @@ MENUITEM_FUNCTION(timedate_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_TIME_MENU),
 #endif
 
 MENUITEM_FUNCTION(show_credits_item, 0, ID2P(LANG_CREDITS),
-                   (menu_function)show_credits, NULL, NULL, Icon_NOICON);
+                   show_credits, NULL, NULL, Icon_NOICON);
+
 MENUITEM_FUNCTION(show_runtime_item, 0, ID2P(LANG_RUNNING_TIME),
-                   (menu_function)view_runtime, NULL, NULL, Icon_NOICON);
+                   view_runtime, NULL, NULL, Icon_NOICON);
+
 MENUITEM_FUNCTION(debug_menu_item, 0, ID2P(LANG_DEBUG),
-                   (menu_function)debug_menu, NULL, NULL, Icon_NOICON);
+                   debug_menu, NULL, NULL, Icon_NOICON);
 
 MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_System_menu,
           &show_info_item, &show_credits_item,

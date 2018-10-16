@@ -1183,7 +1183,7 @@ bool set_bool_options(const char* string, const bool* variable,
     bool result;
 
     result = set_option(string, variable, BOOL, names, 2,
-                        (void (*)(int))function);
+                        (void (*)(int))(void (*)(void))function);
     return result;
 }
 

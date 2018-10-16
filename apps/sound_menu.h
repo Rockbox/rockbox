@@ -21,7 +21,7 @@
 #ifndef _SOUND_MENU_H
 #define _SOUND_MENU_H
 
-bool recording_menu(bool no_source);
+int recording_menu(bool no_source);
 int rectrigger(void);
 
 #endif
