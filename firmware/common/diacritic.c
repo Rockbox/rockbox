@@ -248,3 +248,4 @@ Found:
 
     return (char_code < diac->base + (info & DIAC_CNT));
 }
+
