@@ -449,7 +449,7 @@ static bool dbg_buffering_thread(void)
 
             screens[i].putsf(0, line++, "data_rem: %ld", (long)d.data_rem);
 
-            screens[i].putsf(0, line++, "track count: %2d", audio_track_count());
+            screens[i].putsf(0, line++, "track count: %2u", audio_track_count());
 
             screens[i].putsf(0, line++, "handle count: %d", (int)d.num_handles);
 

@@ -3745,7 +3745,7 @@ size_t audio_get_filebuflen(void)
 }
 
 /* How many tracks exist on the buffer - full or partial */
-int audio_track_count(void)
+unsigned int audio_track_count(void)
     __attribute__((alias("track_list_count")));
 
 /* Return total ringbuffer space occupied - ridx to widx */
