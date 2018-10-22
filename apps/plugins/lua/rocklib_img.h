@@ -26,6 +26,6 @@
 #define RLI_EXTENDED
 #endif
 
-LUALIB_API int rli_init(lua_State *L);
+LUALIB_API int (luaopen_rock_img) (lua_State *L);
 
 #endif /* _ROCKLIB_IMG_H_ */

@@ -1188,7 +1188,7 @@ RLI_LUA rli_clear(lua_State *L)
 #endif /* RLI_EXTENDED */
 
 /* Rli Image methods exported to lua */
-const struct luaL_reg rli_lib [] =
+static const struct luaL_reg rli_lib [] =
 {
     {"__tostring", rli_tostring},
     {"_data",      rli_raw},
@@ -1211,22 +1211,6 @@ const struct luaL_reg rli_lib [] =
 
     {NULL, NULL}
 };
-
-LUALIB_API int rli_init(lua_State *L)
-{
-    /* some devices need x | y coords shifted to match native format */
-    /* conversion between packed native formats and individual pixel addressing */
-    init_pixelmask(&x_shift, &y_shift, &xy_mask, &pixelmask);
-
-    luaL_newmetatable(L, ROCKLUA_IMAGE);
-
-    lua_pushvalue(L, -1);  /* pushes the metatable */
-    lua_setfield(L, -2, "__index"); /* metatable.__index = metatable */
-
-    luaL_register(L, NULL, rli_lib);
-
-    return 1;
-}
 
 /*
  * -----------------------------
@@ -1402,7 +1386,7 @@ RB_WRAP(read_bmp_file)
 }
 
 #define R(NAME) {#NAME, rock_##NAME}
-const luaL_Reg rocklib_img[] =
+static const luaL_Reg rocklib_img[] =
 {
     /* Graphics */
 #ifdef HAVE_LCD_BITMAP
@@ -1430,3 +1414,19 @@ const luaL_Reg rocklib_img[] =
 };
 #undef  R
 
+LUALIB_API int luaopen_rock_img(lua_State *L)
+{
+    /* some devices need x | y coords shifted to match native format */
+    /* conversion between packed native formats and individual pixel addressing */
+    init_pixelmask(&x_shift, &y_shift, &xy_mask, &pixelmask);
+
+    luaL_newmetatable(L, ROCKLUA_IMAGE);
+
+    lua_pushvalue(L, -1);  /* pushes the metatable */
+    lua_setfield(L, -2, "__index"); /* metatable.__index = metatable */
+
+    luaL_register(L, LUA_ROCKLIBNAME, rocklib_img);
+    luaL_register(L, NULL, rli_lib);
+
+    return 1;
+}

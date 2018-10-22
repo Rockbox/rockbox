@@ -24,6 +24,7 @@
 #include "lauxlib.h"
 #include "lualib.h"
 #include "rocklib.h"
+#include "rocklib_img.h"
 #include "luadir.h"
 
 
@@ -34,6 +35,7 @@ static const luaL_Reg lualibs[] = {
   {LUA_STRLIBNAME,  luaopen_string},
   {LUA_OSLIBNAME,   luaopen_os},
   {LUA_ROCKLIBNAME, luaopen_rock},
+  {LUA_ROCKLIBNAME, luaopen_rock_img},
   {LUA_BITLIBNAME,  luaopen_bit},
   {LUA_IOLIBNAME,   luaopen_io},
   {LUA_LOADLIBNAME, luaopen_package},

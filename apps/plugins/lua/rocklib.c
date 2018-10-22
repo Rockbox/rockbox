@@ -26,7 +26,6 @@
 #include "lua.h"
 
 #include "lauxlib.h"
-#include "rocklib_img.h"
 #include "rocklib.h"
 #include "lib/helper.h"
 #include "lib/pluginlib_actions.h"
@@ -416,7 +415,6 @@ static const luaL_Reg rocklib[] =
 #undef RB_FUNC
 
 extern const luaL_Reg rocklib_aux[];
-extern const luaL_Reg rocklib_img[];
 
 /*
  ** Open Rockbox library
@@ -425,8 +423,7 @@ LUALIB_API int luaopen_rock(lua_State *L)
 {
     luaL_register(L, LUA_ROCKLIBNAME, rocklib);
     luaL_register(L, LUA_ROCKLIBNAME, rocklib_aux);
-    luaL_register(L, LUA_ROCKLIBNAME, rocklib_img);
-
+    
     static const struct lua_int_reg rlib_const_int[] =
     {
         /* useful integer constants */
@@ -485,8 +482,6 @@ LUALIB_API int luaopen_rock(lua_State *L)
         lua_pushstring(L, rlcs->value);
         lua_setfield(L, -2, rlcs->name);
     }
-
-    rli_init(L);
 
     return 1;
 }
