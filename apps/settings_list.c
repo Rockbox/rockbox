@@ -832,6 +832,10 @@ const struct settings_list settings[] = {
     SYSTEM_SETTING(NVRAM(4), resume_crc32, -1),
     SYSTEM_SETTING(NVRAM(4), resume_elapsed, -1),
     SYSTEM_SETTING(NVRAM(4), resume_offset, -1),
+#if CONFIG_CODEC == SWCODEC
+    SYSTEM_SETTING(NVRAM(4), resume_pitch, -1),
+    SYSTEM_SETTING(NVRAM(4), resume_speed, -1),
+#endif
     CHOICE_SETTING(0, repeat_mode, LANG_REPEAT, REPEAT_OFF, "repeat",
                    "off,all,one,shuffle"
 #ifdef AB_REPEAT_ENABLE

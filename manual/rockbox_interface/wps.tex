@@ -318,9 +318,12 @@ This may even be the whole track.
     same ratio as well as remain between 50\% and 200\%.
   }
   
-  The value of the \opt{swcodec}{rate, pitch and speed}\nopt{swcodec}{rate}
-  is not persistent, i.e. after the \dap\ is turned on it will
-  always be set to 100\%.  \opt{swcodec}{ However, the rate, pitch and speed
+  The value of the \opt{swcodec}{rate, pitch and speed is persistent,
+  i.e. it is saved and restored}
+  \nopt{swcodec}{rate is not persistent, i.e.}
+  after the \dap\ is turned on
+  \nopt{swcodec}{it will always be set to 100\%}.
+  \opt{swcodec}{ Moreover, the rate, pitch and speed
   information will be stored in any bookmarks you may create
   (see \reference{ref:Bookmarkconfigactual}) and will be restored upon
   playing back those bookmarks.}
