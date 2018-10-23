@@ -131,17 +131,17 @@ RB_WRAP(kbd_input)
     char *buffer = luaL_prepbuffer(&b);
 
     if(input != NULL)
-        rb->strlcpy(buffer, input, LUAL_BUFFERSIZE);
+        luaL_addstring(&b, input);
     else
         buffer[0] = '\0';
 
     if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE))
     {
-        luaL_addsize(&b, strlen(buffer));
+        luaL_addstring(&b, buffer);
         luaL_pushresult(&b);
     }
     else
-        lua_pushnil(L);
+        return 0;
 
     return 1;
 }
@@ -196,22 +196,32 @@ RB_WRAP(current_path)
     return get_current_path(L, 1);
 }
 
-static void fill_text_message(lua_State *L, struct text_message * message,
-                              int pos)
+static const char ** get_table_items(lua_State *L, int pos, int *count)
 {
     int i;
     luaL_checktype(L, pos, LUA_TTABLE);
-    int n = luaL_getn(L, pos);
+    *count = lua_objlen(L, pos);
+    int n = *count;
 
-    const char **lines = (const char**) lua_newuserdata(L, n * sizeof(const char*));
+    /* newuserdata will be pushed onto stack after args*/
+    const char **items = (const char**) lua_newuserdata(L, n * sizeof(const char*));
 
-    for(i=1; i<=n; i++)
+    for(i=1; i<= n; i++)
     {
-        lua_rawgeti(L, pos, i);
-        lines[i-1] = luaL_checkstring(L, -1);
-        lua_pop(L, 1);
+        lua_rawgeti(L, pos, i); /* Push item on the stack */
+        items[i-1] = lua_tostring(L, -1);
+        lua_pop(L, 1); /* Pop it */
     }
-    message->message_lines = lines;
+
+    return items;
+}
+
+static inline void fill_text_message(lua_State *L, struct text_message * message,
+                              int pos)
+{
+    int n;
+    /* newuserdata will be pushed onto stack after args*/
+    message->message_lines = get_table_items(L, pos, &n);
     message->nb_lines = n;
 }
 
@@ -238,24 +248,15 @@ RB_WRAP(do_menu)
     struct menu_callback_with_desc menu_desc = {NULL, NULL, Icon_NOICON};
     struct menu_item_ex menu = {MT_RETURN_ID | MENU_HAS_DESC, {.strings = NULL},
                                 {.callback_and_desc = &menu_desc}};
-    int i, n, start_selected;
+    int n, start_selected;
     const char **items, *title;
 
     title = luaL_checkstring(L, 1);
-    luaL_checktype(L, 2, LUA_TTABLE);
+
     start_selected = lua_tointeger(L, 3);
 
-    n = luaL_getn(L, 2);
-
     /* newuserdata will be pushed onto stack after args*/
-    items = (const char**) lua_newuserdata(L, n * sizeof(const char*));
-
-    for(i=1; i<=n; i++)
-    {
-        lua_rawgeti(L, 2, i); /* Push item on the stack */
-        items[i-1] = luaL_checkstring(L, -1);
-        lua_pop(L, 1); /* Pop it */
-    }
+    items = get_table_items(L, 2, &n);
 
     menu.strings = items;
     menu.flags |= MENU_ITEM_COUNT(n);
