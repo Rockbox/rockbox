@@ -689,6 +689,37 @@ current version.
 
 \opt{archos}{\input{advanced_topics/archos-flashing.tex}}
 
+\opt{multi_boot}{
+\subsection{\label{ref:using_multiboot}Using Multiboot}
+  \newcommand{\redirectext}{<playername>}
+  \opt{fuze}{\renewcommand*{\redirectext}{fuze}}
+  \opt{fuzev2}{\renewcommand*{\redirectext}{fuze2}}
+  \opt{fuzeplus}{\renewcommand*{\redirectext}{fuze+}}
+  \opt{clipplus}{\renewcommand*{\redirectext}{clip+}}
+  \opt{clipzip}{\renewcommand*{\redirectext}{clipzip}}
+
+  Using a specially crafted redirect file combined with special firmware builds
+  that allow the boot drive to be passed from the bootloader, some devices can
+  run Rockbox from a MicroSD card. You can even direct the bootloader to run the
+  firmware from a different folder within the SD card if desired.
+  \note{
+    Each supported model looks for a specific redirect file
+    (file extension is unique to each model).
+  }
+
+  Create \fname{/rockbox\_main.\redirectext{}} in the root of the SD card.
+  The redirect file should contain a single line denoting the path to the root
+  of the desired \fname{.rockbox} directory. A single forward slash ``/'' indicates
+  \fname{/.rockbox} in the root of the sd card.
+  \note{The redirect file does not work when placed on the internal drive.}
+
+  If instead you wanted to run the Rockbox from SD card \fname{/mybuild/.rockbox}
+  then your \fname{/rockbox\_main.\redirectext{}} file should contain:\\
+  \begin{exampleredirect}
+    /mybuild/
+  \end{exampleredirect}
+}
+
 \section{Optimising battery runtime}
   Rockbox offers a lot of settings that have high impact on the battery runtime
   of your \dap{}. The largest power savings can be achieved through disabling

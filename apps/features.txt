@@ -292,3 +292,7 @@ play_frequency
 #if defined(HAVE_BOOTDATA)
 boot_data
 #endif
+
+#if defined(HAVE_MULTIBOOT)
+multi_boot
+#endif
