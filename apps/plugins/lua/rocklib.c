@@ -363,6 +363,39 @@ RB_WRAP(get_plugin_action)
     return 1;
 }
 
+RB_WRAP(strip_extension)
+{
+    const char* filename = luaL_checkstring(L, -1);
+    const char* pos = rb->strrchr(filename, '.');
+    if(pos != NULL)
+        lua_pushlstring (L, filename, pos - filename);
+
+    return 1;
+}
+
+RB_WRAP(create_numbered_filename)
+{
+    luaL_Buffer b;
+    luaL_buffinit(L, &b);
+    char *buffer = luaL_prepbuffer(&b);
+    buffer[0] = '\0';
+
+    const char * path = luaL_checkstring(L, 1);
+    const char * prefix = luaL_checkstring(L, 2);
+    const char * suffix = luaL_checkstring(L, 3);
+    int numberlen = luaL_optint(L, 4, -1);
+
+    if(rb->create_numbered_filename(buffer, path, prefix, suffix, numberlen))
+    {
+        luaL_addstring(&b, buffer);
+        luaL_pushresult(&b);
+    }
+    else
+        return 0;
+
+    return 1;
+}
+
 #define RB_FUNC(func) {#func, rock_##func}
 static const luaL_Reg rocklib[] =
 {
@@ -409,6 +442,9 @@ static const luaL_Reg rocklib[] =
 #endif
 
     RB_FUNC(get_plugin_action),
+
+    RB_FUNC(strip_extension),
+    RB_FUNC(create_numbered_filename),
 
     {NULL, NULL}
 };
