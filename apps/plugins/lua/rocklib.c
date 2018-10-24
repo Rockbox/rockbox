@@ -320,6 +320,69 @@ RB_WRAP(playlist_insert_directory)
     return 1;
 }
 
+RB_WRAP(audio)
+{
+    enum e_audio {AUDIO_STATUS = 0, AUDIO_PLAY, AUDIO_STOP, AUDIO_PAUSE,
+                  AUDIO_RESUME, AUDIO_NEXT, AUDIO_PREV, AUDIO_FFREWIND,
+                  AUDIO_FLUSHANDRELOADTRACKS, AUDIO_GETPOS, AUDIO_ECOUNT};
+    const char *audio_option[] = {"status", "play", "stop", "pause",
+                                  "resume", "next", "prev", "ffrewind",
+                                  "flushandreloadtracks", "getfilepos", NULL};
+    long elapsed, offset, newtime;
+    int status = rb->audio_status();
+
+    int option = luaL_checkoption (L, 1, NULL, audio_option);
+    switch(option)
+    {
+        default:
+        case AUDIO_STATUS:
+            break;
+        case AUDIO_PLAY:
+            elapsed = luaL_checkint(L, 2);
+            offset  = luaL_checkint(L, 3);
+
+            if (status == (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE))
+            {
+                /* not perfect but provides a decent compromise */
+                rb->audio_ff_rewind(elapsed + offset);
+                rb->audio_resume();
+            }
+            else if (status != AUDIO_STATUS_PLAY)
+                rb->audio_play((unsigned long) elapsed, (unsigned long) offset);
+
+            break;
+        case AUDIO_STOP:
+            rb->audio_stop();
+            break;
+        case AUDIO_PAUSE:
+            rb->audio_pause();
+            break;
+        case AUDIO_RESUME:
+            rb->audio_resume();
+            break;
+        case AUDIO_NEXT:
+            rb->audio_next();
+            break;
+        case AUDIO_PREV:
+            rb->audio_prev();
+            break;
+        case AUDIO_FFREWIND:
+            newtime = (long) luaL_checkint(L, 2);
+            rb->audio_ff_rewind(newtime);
+            break;
+        case AUDIO_FLUSHANDRELOADTRACKS:
+            rb->audio_flush_and_reload_tracks();
+            break;
+        case AUDIO_GETPOS:
+            lua_pushinteger(L, rb->audio_get_file_pos());
+            return 1;
+    }
+
+    rb->yield();
+    lua_pushinteger(L, status); /* return previous (or current) audio status */
+    return 1;
+}
+
 SIMPLE_VOID_WRAPPER(backlight_force_on);
 SIMPLE_VOID_WRAPPER(backlight_use_settings);
 
@@ -448,6 +511,8 @@ static const luaL_Reg rocklib[] =
 
     RB_FUNC(strip_extension),
     RB_FUNC(create_numbered_filename),
+
+    RB_FUNC(audio),
 
     {NULL, NULL}
 };
