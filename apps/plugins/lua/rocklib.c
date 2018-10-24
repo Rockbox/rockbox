@@ -383,9 +383,12 @@ RB_WRAP(create_numbered_filename)
     const char * path = luaL_checkstring(L, 1);
     const char * prefix = luaL_checkstring(L, 2);
     const char * suffix = luaL_checkstring(L, 3);
-    int numberlen = luaL_optint(L, 4, -1);
+    int numberlen = luaL_checkint(L, 4);
+    int num = luaL_optint(L, 5, -1);
+    (void) num;
 
-    if(rb->create_numbered_filename(buffer, path, prefix, suffix, numberlen))
+    if(rb->create_numbered_filename(buffer, path, prefix, suffix, numberlen
+                                    IF_CNFN_NUM_(, &num)))
     {
         luaL_addstring(&b, buffer);
         luaL_pushresult(&b);
