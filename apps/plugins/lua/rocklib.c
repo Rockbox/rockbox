@@ -267,55 +267,84 @@ RB_WRAP(do_menu)
     return 1;
 }
 
-RB_WRAP(playlist_sync)
+RB_WRAP(playlist)
 {
-    /* just pass NULL to work with the current playlist */
-    rb->playlist_sync(NULL);
-    return 1;
-}
+    /* just passes NULL to work with the current playlist */
+    enum e_playlist {PLAYL_AMOUNT = 0, PLAYL_ADD, PLAYL_CREATE,
+                     PLAYL_START, PLAYL_RESUMETRACK, PLAYL_RESUME,
+                     PLAYL_SHUFFLE, PLAYL_SYNC, PLAYL_REMOVEALLTRACKS,
+                     PLAYL_INSERTTRACK, PLAYL_INSERTDIRECTORY, PLAYL_ECOUNT};
 
-RB_WRAP(playlist_remove_all_tracks)
-{
-    /* just pass NULL to work with the current playlist */
-    int result = rb->playlist_remove_all_tracks(NULL);
-    lua_pushinteger(L, result);
-    return 1;
-}
+    const char *playlist_option[] = {"amount", "add", "create", "start", "resumetrack",
+                                     "resume", "shuffle", "sync", "removealltracks",
+                                     "inserttrack", "insertdirectory", NULL};
 
-RB_WRAP(playlist_insert_track)
-{
-    const char *filename;
-    int position, queue, sync;
+    const char *filename, *dir;
+    int result = 0;
+    bool queue, recurse, sync;
+    int pos, crc, index, random_seed;
+    unsigned long elapsed, offset;
 
-    /* for now don't take a playlist_info pointer, but just pass NULL to use
-	   the current playlist. If this changes later, all the other
-	   parameters can be shifted back. */
-    filename = luaL_checkstring(L, 1); /* only required parameter */
-    position = luaL_optint(L, 2, PLAYLIST_INSERT);
-    queue = lua_toboolean(L, 3); /* default to false */
-    sync = lua_toboolean(L, 4); /* default to false */
+    int option = luaL_checkoption (L, 1, NULL, playlist_option);
+    switch(option)
+    {
+        default:
+        case PLAYL_AMOUNT:
+            result = rb->playlist_amount();
+            break;
+        case PLAYL_ADD:
+            filename = luaL_checkstring(L, 2);
+            result = rb->playlist_add(filename);
+            break;
+        case PLAYL_CREATE:
+            dir = luaL_checkstring(L, 2);
+            filename = luaL_checkstring(L, 3);
+            result = rb->playlist_create(dir, filename);
+            break;
+        case PLAYL_START:
+            index = luaL_checkint(L, 2);
+            elapsed = luaL_checkint(L, 3);
+            offset =  luaL_checkint(L, 4);
+            rb->playlist_start(index, elapsed, offset);
+            break;
+        case PLAYL_RESUMETRACK:
+            index = luaL_checkint(L, 2);
+            crc = luaL_checkint(L, 3);
+            elapsed = luaL_checkint(L, 4);
+            offset = luaL_checkint(L, 5);
+            rb->playlist_resume_track(index, (unsigned) crc, elapsed, offset);
+            break;
+        case PLAYL_RESUME:
+            result = rb->playlist_resume();
+            break;
+        case PLAYL_SHUFFLE:
+            random_seed = luaL_checkint(L, 2);
+            index = luaL_checkint(L, 3);
+            result = rb->playlist_shuffle(random_seed, index);
+            break;
+        case PLAYL_SYNC:
+            rb->playlist_sync(NULL);
+            break;
+        case PLAYL_REMOVEALLTRACKS:
+            result = rb->playlist_remove_all_tracks(NULL);
+            break;
+        case PLAYL_INSERTTRACK:
+            filename = luaL_checkstring(L, 2); /* only required parameter */
+            pos = luaL_optint(L, 3, PLAYLIST_INSERT);
+            queue = lua_toboolean(L, 4); /* default to false */
+            sync = lua_toboolean(L, 5); /* default to false */
+            result = rb->playlist_insert_track(NULL, filename, pos, queue, sync);
+            break;
+        case PLAYL_INSERTDIRECTORY:
+            dir = luaL_checkstring(L, 2); /* only required parameter */
+            pos = luaL_optint(L, 3, PLAYLIST_INSERT);
+            queue = lua_toboolean(L, 4); /* default to false */
+            recurse = lua_toboolean(L, 5); /* default to false */
+            result = rb->playlist_insert_directory(NULL, dir, pos, queue, recurse);
+            break;
+    }
 
-    int result = rb->playlist_insert_track(NULL, filename, position,
-        queue, sync);
-
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-RB_WRAP(playlist_insert_directory)
-{
-    const char* dirname;
-    int position, queue, recurse;
-
-    /* just like in playlist_insert_track, only works with current playlist. */
-    dirname = luaL_checkstring(L, 1); /* only required parameter */
-    position = luaL_optint(L, 2, PLAYLIST_INSERT);
-    queue = lua_toboolean(L, 3); /* default to false */
-    recurse = lua_toboolean(L, 4); /* default to false */
-
-    int result = rb->playlist_insert_directory(NULL, dirname, position,
-        queue, recurse);
-
+    rb->yield();
     lua_pushinteger(L, result);
     return 1;
 }
@@ -482,10 +511,6 @@ static const luaL_Reg rocklib[] =
     RB_FUNC(clear_viewport),
     RB_FUNC(current_path),
     RB_FUNC(gui_syncyesno_run),
-    RB_FUNC(playlist_sync),
-    RB_FUNC(playlist_remove_all_tracks),
-    RB_FUNC(playlist_insert_track),
-    RB_FUNC(playlist_insert_directory),
     RB_FUNC(do_menu),
 
     /* Backlight helper */
@@ -513,6 +538,7 @@ static const luaL_Reg rocklib[] =
     RB_FUNC(create_numbered_filename),
 
     RB_FUNC(audio),
+    RB_FUNC(playlist),
 
     {NULL, NULL}
 };
