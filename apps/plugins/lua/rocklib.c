@@ -131,7 +131,7 @@ RB_WRAP(kbd_input)
     char *buffer = luaL_prepbuffer(&b);
 
     if(input != NULL)
-        luaL_addstring(&b, input);
+        rb->strlcpy(buffer, input, LUAL_BUFFERSIZE);
     else
         buffer[0] = '\0';
 
