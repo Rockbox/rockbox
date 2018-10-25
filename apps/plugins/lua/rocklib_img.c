@@ -1424,9 +1424,10 @@ LUALIB_API int luaopen_rock_img(lua_State *L)
 
     lua_pushvalue(L, -1);  /* pushes the metatable */
     lua_setfield(L, -2, "__index"); /* metatable.__index = metatable */
+    luaL_register(L, NULL, rli_lib); /*add rli_lib to the image metatable*/
 
     luaL_register(L, LUA_ROCKLIBNAME, rocklib_img);
-    luaL_register(L, NULL, rli_lib);
 
     return 1;
 }
+
