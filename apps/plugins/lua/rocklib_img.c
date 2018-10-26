@@ -719,7 +719,7 @@ static inline int rli_pushpixel(lua_State *L, fb_data color, int x, int y)
 }
 
 /* User defined pixel manipulations through rli_copy, rli_marshal */
-static int custom_transform(lua_State *L,
+static void custom_transform(lua_State *L,
                             struct rli_iter_d *ds,
                             struct rli_iter_d *ss,
                             int op,
@@ -731,44 +731,49 @@ static int custom_transform(lua_State *L,
     fb_data src;
 
     int params;
-    int ret = 0;
+    bool done = true;
 
-    if (!lua_isfunction(L, -1))
-        return ret; /* error */
-
-    lua_pushvalue(L, -1); /* make a copy of the lua function */
-
-    dst = data_get(ds->elem, ds->x, ds->y);
-    params = rli_pushpixel(L, dst, ds->x, ds->y);
-
-    if(ss) /* Allows src to be omitted */
+    if (true)/*(lua_isfunction(L, -1))*/
     {
-        src = data_get(ss->elem, ss->x, ss->y);
-        params += rli_pushpixel(L, src, ss->x, ss->y);
+        lua_pushvalue(L, -1); /* make a copy of the lua function */
+
+        dst = data_get(ds->elem, ds->x, ds->y);
+        params = rli_pushpixel(L, dst, ds->x, ds->y);
+
+        if(ss) /* Allows src to be omitted */
+        {
+            src = data_get(ss->elem, ss->x, ss->y);
+            params += rli_pushpixel(L, src, ss->x, ss->y);
+        }
+
+        lua_call(L, params, 2); /* call custom function w/ n-params & 2 ret */
+
+        if(lua_type(L, -2) == LUA_TNUMBER)
+        {
+            done = false;
+            dst = FB_SCALARPACK((unsigned) lua_tointeger(L, -2));
+            data_set(ds->elem, ds->x, ds->y, &dst);
+        }
+
+        if(ss && (lua_type(L, -1) == LUA_TNUMBER))
+        {
+            done = false;
+            src = FB_SCALARPACK((unsigned) lua_tointeger(L, -1));
+            data_set(ss->elem, ss->x, ss->y, &src);
+        }
+
+        lua_pop(L, 2);
     }
 
-    lua_call(L, params, 2); /* call custom function w/ n-params & 2 ret */
-
-    if(lua_type(L, -2) == LUA_TNUMBER)
+    if(done) /* signal iter to stop */
     {
-        ret |= 1;
-        dst = FB_SCALARPACK((unsigned) lua_tointeger(L, -2));
-        data_set(ds->elem, ds->x, ds->y, &dst);
+        ds->dx = 0;
+        ds->dy = 0;
     }
-
-    if(ss && (lua_type(L, -1) == LUA_TNUMBER))
-    {
-        ret |= 2;
-        src = FB_SCALARPACK((unsigned) lua_tointeger(L, -1));
-        data_set(ss->elem, ss->x, ss->y, &src);
-    }
-
-    lua_pop(L, 2);
-    return ret; /* 0 signals iterator to stop */
 } /* custom_transform */
 
 /* Pre defined pixel manipulations through rli_copy */
-static int blit_transform(lua_State *L,
+static void blit_transform(lua_State *L,
                           struct rli_iter_d *ds,
                           struct rli_iter_d *ss,
                           int op,
@@ -850,10 +855,9 @@ static int blit_transform(lua_State *L,
     }/*switch op*/
     fb_data val = FB_SCALARPACK(dst);
     data_set(ds->elem, ds->x, ds->y, &val);
-    return 1;
 } /* blit_transform */
 
-static int invert_transform(lua_State *L,
+static void invert_transform(lua_State *L,
                             struct rli_iter_d *ds,
                             struct rli_iter_d *ss,
                             int op,
@@ -866,11 +870,9 @@ static int invert_transform(lua_State *L,
 
     fb_data val = invert_color(data_get(ds->elem, ds->x, ds->y));
     data_set(ds->elem, ds->x, ds->y, &val);
-
-    return 1;
 } /* invert_transform */
 
-static int clear_transform(lua_State *L,
+static void clear_transform(lua_State *L,
                             struct rli_iter_d *ds,
                             struct rli_iter_d *ss,
                             int op,
@@ -881,8 +883,6 @@ static int clear_transform(lua_State *L,
     (void) ss;
 
     data_set(ds->elem, ds->x, ds->y, color);
-
-    return 1;
 } /* clear_transform */
 
 #endif /* RLI_EXTENDED */
@@ -1047,7 +1047,7 @@ RLI_LUA rli_marshal(lua_State *L) /* also invert, clear */
     /* (indices 1-8 are used by rli_iter_create) */
     fb_data clr;
 
-    int (*rli_trans)(lua_State *, struct rli_iter_d *, struct rli_iter_d *, int, fb_data *);
+    void (*rli_trans)(lua_State *, struct rli_iter_d *, struct rli_iter_d *, int, fb_data *);
     int ltype = lua_type (L, 9);
 
     /* create new iter + pushed onto stack */
@@ -1068,9 +1068,7 @@ RLI_LUA rli_marshal(lua_State *L) /* also invert, clear */
 
     do
     {
-        if(!(*rli_trans)(L, ds, NULL, 0, &clr))
-            break; /* Custom op can quit early */
-
+        (*rli_trans)(L, ds, NULL, 0, &clr);
     } while(next_rli_iter(ds));
 
     return 0;
@@ -1112,7 +1110,7 @@ RLI_LUA rli_copy(lua_State *L)
     bool s_swx = false; /* src swap */
     bool s_swy = false;
 
-    int (*rli_trans)(lua_State *, struct rli_iter_d *, struct rli_iter_d *, int, fb_data *);
+    void (*rli_trans)(lua_State *, struct rli_iter_d *, struct rli_iter_d *, int, fb_data *);
 
     if(!clip) /* Out of bounds is not allowed */
     {
@@ -1164,9 +1162,7 @@ RLI_LUA rli_copy(lua_State *L)
 
     do
     {
-        if(!(*rli_trans)(L, &ds, &ss, op, &clr))
-            break; /* Custom op can quit early */
-
+        (*rli_trans)(L, &ds, &ss, op, &clr);
     } while(next_rli_iter(&ds) && next_rli_iter(&ss));
 
     return 0;
@@ -1228,17 +1224,24 @@ RB_WRAP(lcd_framebuffer)
     return 1;
 }
 
+/* helper function for lcd_xxx_bitmap functions */
+static int get_bmp_bounds(lua_State *L, int npos, int *x, int *y, int *w, int* h)
+{
+    *x = luaL_checkint(L, npos);
+    *y = luaL_checkint(L, npos + 1);
+    *w = luaL_checkint(L, npos + 2);
+    *h = luaL_checkint(L, npos + 3);
+    return luaL_optint(L, npos + 4, SCREEN_MAIN);
+}
+
 RB_WRAP(lcd_mono_bitmap_part)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
     int src_x = luaL_checkint(L, 2);
     int src_y = luaL_checkint(L, 3);
     int stride = luaL_checkint(L, 4);
-    int x = luaL_checkint(L, 5);
-    int y = luaL_checkint(L, 6);
-    int width = luaL_checkint(L, 7);
-    int height = luaL_checkint(L, 8);
-    int screen = luaL_optint(L, 9, SCREEN_MAIN);
+    int x, y, width, height;
+    int screen = get_bmp_bounds(L, 5, &x, &y, &width, &height);
 
     rb->screens[screen]->mono_bitmap_part((const unsigned char *)src->data, src_x, src_y, stride, x, y, width, height);
     return 0;
@@ -1247,11 +1250,8 @@ RB_WRAP(lcd_mono_bitmap_part)
 RB_WRAP(lcd_mono_bitmap)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
-    int x = luaL_checkint(L, 2);
-    int y = luaL_checkint(L, 3);
-    int width = luaL_checkint(L, 4);
-    int height = luaL_checkint(L, 5);
-    int screen = luaL_optint(L, 6, SCREEN_MAIN);
+    int x, y, width, height;
+    int screen = get_bmp_bounds(L, 2, &x, &y, &width, &height);
 
     rb->screens[screen]->mono_bitmap((const unsigned char *)src->data, x, y, width, height);
     return 0;
@@ -1264,11 +1264,8 @@ RB_WRAP(lcd_bitmap_part)
     int src_x = luaL_checkint(L, 2);
     int src_y = luaL_checkint(L, 3);
     int stride = luaL_checkint(L, 4);
-    int x = luaL_checkint(L, 5);
-    int y = luaL_checkint(L, 6);
-    int width = luaL_checkint(L, 7);
-    int height = luaL_checkint(L, 8);
-    int screen = luaL_optint(L, 9, SCREEN_MAIN);
+    int x, y, width, height;
+    int screen = get_bmp_bounds(L, 5, &x, &y, &width, &height);
 
     rb->screens[screen]->bitmap_part(src->data, src_x, src_y, stride, x, y, width, height);
     return 0;
@@ -1277,11 +1274,8 @@ RB_WRAP(lcd_bitmap_part)
 RB_WRAP(lcd_bitmap)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
-    int x = luaL_checkint(L, 2);
-    int y = luaL_checkint(L, 3);
-    int width = luaL_checkint(L, 4);
-    int height = luaL_checkint(L, 5);
-    int screen = luaL_optint(L, 6, SCREEN_MAIN);
+    int x, y, width, height;
+    int screen = get_bmp_bounds(L, 2, &x, &y, &width, &height);
 
     rb->screens[screen]->bitmap(src->data, x, y, width, height);
     return 0;
@@ -1306,11 +1300,8 @@ RB_WRAP(lcd_bitmap_transparent_part)
     int src_x = luaL_checkint(L, 2);
     int src_y = luaL_checkint(L, 3);
     int stride = luaL_checkint(L, 4);
-    int x = luaL_checkint(L, 5);
-    int y = luaL_checkint(L, 6);
-    int width = luaL_checkint(L, 7);
-    int height = luaL_checkint(L, 8);
-    int screen = luaL_optint(L, 9, SCREEN_MAIN);
+    int x, y, width, height;
+    int screen = get_bmp_bounds(L, 5, &x, &y, &width, &height);
 
     rb->screens[screen]->transparent_bitmap_part(src->data, src_x, src_y, stride, x, y, width, height);
     return 0;
@@ -1319,11 +1310,8 @@ RB_WRAP(lcd_bitmap_transparent_part)
 RB_WRAP(lcd_bitmap_transparent)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
-    int x = luaL_checkint(L, 2);
-    int y = luaL_checkint(L, 3);
-    int width = luaL_checkint(L, 4);
-    int height = luaL_checkint(L, 5);
-    int screen = luaL_optint(L, 6, SCREEN_MAIN);
+    int x, y, width, height;
+    int screen = get_bmp_bounds(L, 2, &x, &y, &width, &height);
 
     rb->screens[screen]->transparent_bitmap(src->data, x, y, width, height);
     return 0;
