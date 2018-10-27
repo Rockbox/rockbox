@@ -95,3 +95,22 @@ int get_current_path(lua_State *L, int level)
     lua_pushnil(L);    
     return 1;
 }
+
+/* Helper function for opt_viewport */
+void check_tablevalue(lua_State *L,
+                      const char* key,
+                      int tablepos,
+                      void* res,
+                      bool is_unsigned)
+{
+    lua_getfield(L, tablepos, key); /* Find table[key] */
+
+    int val = lua_tointeger(L, -1);
+
+    if(is_unsigned)
+        *(unsigned*)res = (unsigned) val;
+    else
+        *(int*)res = val;
+
+    lua_pop(L, 1); /* Pop the value off the stack */
+}

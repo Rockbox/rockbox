@@ -47,6 +47,8 @@ struct lua_str_reg {
 
 LUALIB_API int (luaopen_rock) (lua_State *L);
 int get_current_path(lua_State *L, int level);
+void check_tablevalue(lua_State *L, const char* key,
+                      int tablepos,void* res, bool is_unsigned);
 
 #endif /* _ROCKLIB_H_ */
 
