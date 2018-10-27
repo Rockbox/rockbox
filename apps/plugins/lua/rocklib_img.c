@@ -1217,21 +1217,180 @@ static const struct luaL_reg rli_lib [] =
  */
 
 #define RB_WRAP(func) static int rock_##func(lua_State UNUSED_ATTR *L)
+
+#if defined NB_SCREENS && (NB_SCREENS > 1)
+#define RB_SCREENS(luastate, narg, func, ...) \
+        rb->screens[get_screen(luastate, narg)]->func(__VA_ARGS__)
+
+static int get_screen(lua_State *L, int narg)
+{
+    int screen = luaL_optint(L, narg, SCREEN_MAIN);
+
+    if(screen < SCREEN_MAIN)
+        screen = SCREEN_MAIN;
+    else if(screen > NB_SCREENS)
+        screen = NB_SCREENS;
+
+    return screen;
+}
+#else /* only SCREEN_MAIN exists */
+#define RB_SCREENS(luastate, narg, func, ...) \
+        rb->screens[SCREEN_MAIN]->func(__VA_ARGS__)
+#endif
+
+RB_WRAP(lcd_update)
+{
+    RB_SCREENS(L, 1, update);
+    return 0;
+}
+
+RB_WRAP(lcd_clear_display)
+{
+    RB_SCREENS(L, 1, clear_display);
+    return 0;
+}
+
+RB_WRAP(lcd_set_drawmode)
+{
+    int mode = (int) luaL_checkint(L, 1);
+    RB_SCREENS(L, 2, set_drawmode, mode);
+    return 0;
+}
+
+/* helper function for lcd_puts functions */
+static const unsigned char * lcd_putshelper(lua_State *L, int *x, int *y)
+{
+    *x = (int) luaL_checkint(L, 1);
+    *y = (int) luaL_checkint(L, 2);
+    return luaL_checkstring(L, 3);
+}
+
+RB_WRAP(lcd_putsxy)
+{
+    int x, y;
+    const unsigned char *string = lcd_putshelper(L, &x, &y);
+    RB_SCREENS(L, 4, putsxy, x, y, string);
+    return 0;
+}
+
+RB_WRAP(lcd_puts)
+{
+    int x, y;
+    const unsigned char * string = lcd_putshelper(L, &x, &y);
+    RB_SCREENS(L, 4, puts, x, y, string);
+    return 0;
+}
+
+RB_WRAP(lcd_puts_scroll)
+{
+    int x, y;
+    const unsigned char * string = lcd_putshelper(L, &x, &y);
+    bool result = RB_SCREENS(L, 4, puts_scroll, x, y, string);
+    lua_pushboolean(L, result);
+    return 1;
+}
+
+RB_WRAP(lcd_scroll_stop)
+{
+    RB_SCREENS(L, 1, scroll_stop);
+    return 0;
+}
+
+/* Helper function for opt_viewport */
+static int check_tablevalue(lua_State *L, const char* key, int tablepos)
+{
+    lua_getfield(L, tablepos, key); /* Find table[key] */
+
+    int val = lua_tointeger(L, -1);
+
+    lua_pop(L, 1); /* Pop the value off the stack */
+    return val;
+}
+
+static inline struct viewport* opt_viewport(lua_State *L,
+                                     int narg,
+                                     struct viewport* vp,
+                                     struct viewport* alt)
+{
+    if(lua_isnoneornil(L, narg))
+        return alt;
+
+    luaL_checktype(L, narg, LUA_TTABLE);
+
+    vp->x = check_tablevalue(L, "x", narg);
+    vp->y = check_tablevalue(L, "y", narg);
+    vp->width = check_tablevalue(L, "width", narg);
+    vp->height = check_tablevalue(L, "height", narg);
 #ifdef HAVE_LCD_BITMAP
+    vp->font = check_tablevalue(L, "font", narg);
+    vp->drawmode = check_tablevalue(L, "drawmode", narg);
+#endif
+#if LCD_DEPTH > 1
+    vp->fg_pattern = (unsigned int) check_tablevalue(L, "fg_pattern", narg);
+    vp->bg_pattern = (unsigned int) check_tablevalue(L, "bg_pattern", narg);
+#endif
+
+    return vp;
+}
+
+RB_WRAP(set_viewport)
+{
+    static struct viewport vp;
+    RB_SCREENS(L, 2, set_viewport, opt_viewport(L, 1, &vp, NULL));
+    return 0;
+}
+
+RB_WRAP(clear_viewport)
+{
+    RB_SCREENS(L, 1, clear_viewport);
+    return 0;
+}
+
+RB_WRAP(font_getstringsize)
+{
+    const unsigned char* str = luaL_checkstring(L, 1);
+    int fontnumber = lua_tointeger(L, 2);
+    int w, h, result;
+
+    if (fontnumber == FONT_UI)
+        fontnumber = rb->global_status->font_id[SCREEN_MAIN];
+    else
+        fontnumber = FONT_SYSFIXED;
+
+    if lua_isnil(L, 2)
+        result = RB_SCREENS(L, 3, getstringsize, str, &w, &h);
+    else
+        result = rb->font_getstringsize(str, &w, &h, fontnumber);
+
+    lua_pushinteger(L, result);
+    lua_pushinteger(L, w);
+    lua_pushinteger(L, h);
+
+    return 3;
+}
+
+#ifdef HAVE_LCD_BITMAP
+
 RB_WRAP(lcd_framebuffer)
 {
     rli_wrap(L, rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT);
     return 1;
 }
 
-/* helper function for lcd_xxx_bitmap functions */
-static int get_bmp_bounds(lua_State *L, int npos, int *x, int *y, int *w, int* h)
+RB_WRAP(lcd_setfont)
 {
-    *x = luaL_checkint(L, npos);
-    *y = luaL_checkint(L, npos + 1);
-    *w = luaL_checkint(L, npos + 2);
-    *h = luaL_checkint(L, npos + 3);
-    return luaL_optint(L, npos + 4, SCREEN_MAIN);
+    int font = (int) luaL_checkint(L, 1);
+    RB_SCREENS(L, 2, setfont, font);
+    return 0;
+}
+
+/* helper function for lcd_xxx_bitmap/rect functions */
+static void get_rect_bounds(lua_State *L, int narg, int *x, int *y, int *w, int* h)
+{
+    *x = luaL_checkint(L, narg);
+    *y = luaL_checkint(L, narg + 1);
+    *w = luaL_checkint(L, narg + 2);
+    *h = luaL_checkint(L, narg + 3);
 }
 
 RB_WRAP(lcd_mono_bitmap_part)
@@ -1241,9 +1400,10 @@ RB_WRAP(lcd_mono_bitmap_part)
     int src_y = luaL_checkint(L, 3);
     int stride = luaL_checkint(L, 4);
     int x, y, width, height;
-    int screen = get_bmp_bounds(L, 5, &x, &y, &width, &height);
+    get_rect_bounds(L, 5, &x, &y, &width, &height);
 
-    rb->screens[screen]->mono_bitmap_part((const unsigned char *)src->data, src_x, src_y, stride, x, y, width, height);
+    RB_SCREENS(L, 9, mono_bitmap_part, (const unsigned char *)src->data,
+                                       src_x, src_y, stride, x, y, width, height);
     return 0;
 }
 
@@ -1251,9 +1411,9 @@ RB_WRAP(lcd_mono_bitmap)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
     int x, y, width, height;
-    int screen = get_bmp_bounds(L, 2, &x, &y, &width, &height);
+    get_rect_bounds(L, 2, &x, &y, &width, &height);
 
-    rb->screens[screen]->mono_bitmap((const unsigned char *)src->data, x, y, width, height);
+    RB_SCREENS(L, 6, mono_bitmap, (const unsigned char *)src->data, x, y, width, height);
     return 0;
 }
 
@@ -1265,9 +1425,9 @@ RB_WRAP(lcd_bitmap_part)
     int src_y = luaL_checkint(L, 3);
     int stride = luaL_checkint(L, 4);
     int x, y, width, height;
-    int screen = get_bmp_bounds(L, 5, &x, &y, &width, &height);
+    get_rect_bounds(L, 5, &x, &y, &width, &height);
 
-    rb->screens[screen]->bitmap_part(src->data, src_x, src_y, stride, x, y, width, height);
+    RB_SCREENS(L, 9, bitmap_part, src->data, src_x, src_y, stride, x, y, width, height);
     return 0;
 }
 
@@ -1275,9 +1435,9 @@ RB_WRAP(lcd_bitmap)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
     int x, y, width, height;
-    int screen = get_bmp_bounds(L, 2, &x, &y, &width, &height);
+    get_rect_bounds(L, 2, &x, &y, &width, &height);
 
-    rb->screens[screen]->bitmap(src->data, x, y, width, height);
+    RB_SCREENS(L, 6, bitmap, src->data, x, y, width, height);
     return 0;
 }
 
@@ -1291,6 +1451,35 @@ RB_WRAP(lcd_get_backdrop)
 
     return 1;
 }
+
+RB_WRAP(lcd_set_foreground)
+{
+    unsigned foreground = (unsigned) luaL_checkint(L, 1);
+    RB_SCREENS(L, 2, set_foreground, foreground);
+    return 0;
+}
+
+RB_WRAP(lcd_get_foreground)
+{
+    unsigned result = RB_SCREENS(L, 1, get_foreground);
+    lua_pushinteger(L, result);
+    return 1;
+}
+
+RB_WRAP(lcd_set_background)
+{
+    unsigned background = (unsigned) luaL_checkint(L, 1);
+    RB_SCREENS(L, 2, set_background, background);
+    return 0;
+}
+
+RB_WRAP(lcd_get_background)
+{
+    unsigned result = RB_SCREENS(L, 1, get_background);
+    lua_pushinteger(L, result);
+    return 1;
+}
+
 #endif /* LCD_DEPTH > 1 */
 
 #if LCD_DEPTH == 16
@@ -1301,9 +1490,10 @@ RB_WRAP(lcd_bitmap_transparent_part)
     int src_y = luaL_checkint(L, 3);
     int stride = luaL_checkint(L, 4);
     int x, y, width, height;
-    int screen = get_bmp_bounds(L, 5, &x, &y, &width, &height);
+    get_rect_bounds(L, 5, &x, &y, &width, &height);
 
-    rb->screens[screen]->transparent_bitmap_part(src->data, src_x, src_y, stride, x, y, width, height);
+    RB_SCREENS(L, 9, transparent_bitmap_part, src->data, src_x,
+                                              src_y, stride, x, y, width, height);
     return 0;
 }
 
@@ -1311,12 +1501,70 @@ RB_WRAP(lcd_bitmap_transparent)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
     int x, y, width, height;
-    int screen = get_bmp_bounds(L, 2, &x, &y, &width, &height);
+    get_rect_bounds(L, 2, &x, &y, &width, &height);
 
-    rb->screens[screen]->transparent_bitmap(src->data, x, y, width, height);
+    RB_SCREENS(L, 6, transparent_bitmap, src->data, x, y, width, height);
     return 0;
 }
 #endif /* LCD_DEPTH == 16 */
+
+RB_WRAP(lcd_update_rect)
+{
+    int x, y, width, height;
+    get_rect_bounds(L, 1, &x, &y, &width, &height);
+    RB_SCREENS(L, 5, update_rect, x, y, width, height);
+    return 0;
+}
+
+RB_WRAP(lcd_drawrect)
+{
+    int x, y, width, height;
+    get_rect_bounds(L, 1, &x, &y, &width, &height);
+    RB_SCREENS(L, 5, drawrect, x, y, width, height);
+    return 0;
+}
+
+RB_WRAP(lcd_fillrect)
+{
+    int x, y, width, height;
+    get_rect_bounds(L, 1, &x, &y, &width, &height);
+    RB_SCREENS(L, 5, fillrect, x, y, width, height);
+    return 0;
+}
+
+RB_WRAP(lcd_drawline)
+{
+    int x1, y1, x2, y2;
+    get_rect_bounds(L, 1, &x1, &y1, &x2, &y2);
+    RB_SCREENS(L, 5, drawline, x1, y1, x2, y2);
+    return 0;
+}
+
+RB_WRAP(lcd_hline)
+{
+    int x1 = (int) luaL_checkint(L, 1);
+    int x2 = (int) luaL_checkint(L, 2);
+    int y = (int) luaL_checkint(L, 3);
+    RB_SCREENS(L, 4, hline, x1, x2, y);
+    return 0;
+}
+
+RB_WRAP(lcd_vline)
+{
+    int x = (int) luaL_checkint(L, 1);
+    int y1 = (int) luaL_checkint(L, 2);
+    int y2 = (int) luaL_checkint(L, 3);
+    RB_SCREENS(L, 4, vline, x, y1, y2);
+    return 0;
+}
+
+RB_WRAP(lcd_drawpixel)
+{
+    int x = (int) luaL_checkint(L, 1);
+    int y = (int) luaL_checkint(L, 2);
+    RB_SCREENS(L, 3, drawpixel, x, y);
+    return 0;
+}
 
 #endif /* defined(LCD_BITMAP) */
 
@@ -1377,19 +1625,42 @@ RB_WRAP(read_bmp_file)
 static const luaL_Reg rocklib_img[] =
 {
     /* Graphics */
+    R(lcd_update),
+    R(lcd_clear_display),
+    R(lcd_set_drawmode),
+    R(lcd_putsxy),
+    R(lcd_puts),
+    R(lcd_puts_scroll),
+    R(lcd_scroll_stop),
+    R(set_viewport),
+    R(clear_viewport),
+    R(font_getstringsize),
 #ifdef HAVE_LCD_BITMAP
     R(lcd_framebuffer),
+    R(lcd_setfont),
     R(lcd_mono_bitmap_part),
     R(lcd_mono_bitmap),
 #if LCD_DEPTH > 1
     R(lcd_get_backdrop),
     R(lcd_bitmap_part),
     R(lcd_bitmap),
+    R(lcd_set_foreground),
+    R(lcd_get_foreground),
+    R(lcd_set_background),
+    R(lcd_get_background),
 #endif
 #if LCD_DEPTH == 16
     R(lcd_bitmap_transparent_part),
     R(lcd_bitmap_transparent),
 #endif
+    R(lcd_update_rect),
+    R(lcd_drawrect),
+    R(lcd_fillrect),
+    R(lcd_drawline),
+    R(lcd_hline),
+    R(lcd_vline),
+    R(lcd_drawpixel),
+
 #endif /*HAVE_LCD_BITMAP*/
 #ifdef HAVE_LCD_COLOR
     R(lcd_rgbpack),
