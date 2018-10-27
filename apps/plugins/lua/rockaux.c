@@ -95,3 +95,4 @@ int get_current_path(lua_State *L, int level)
     lua_pushnil(L);    
     return 1;
 }
+
