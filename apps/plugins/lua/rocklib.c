@@ -56,66 +56,6 @@
 #define RB_WRAP(func) static int rock_##func(lua_State UNUSED_ATTR *L)
 #define SIMPLE_VOID_WRAPPER(func) RB_WRAP(func) { (void)L; func(); return 0; }
 
-/* Helper function for opt_viewport */
-static void check_tablevalue(lua_State *L,
-                             const char* key,
-                             int tablepos,
-                             void* res,
-                             bool is_unsigned)
-{
-    lua_getfield(L, tablepos, key); /* Find table[key] */
-
-    int val = lua_tointeger(L, -1);
-
-    if(is_unsigned)
-        *(unsigned*)res = (unsigned) val;
-    else
-        *(int*)res = val;
-
-    lua_pop(L, 1); /* Pop the value off the stack */
-}
-
-static inline struct viewport* opt_viewport(lua_State *L,
-                                     int narg,
-                                     struct viewport* vp,
-                                     struct viewport* alt)
-{
-    if(lua_isnoneornil(L, narg))
-        return alt;
-
-    luaL_checktype(L, narg, LUA_TTABLE);
-
-    check_tablevalue(L, "x", narg, &vp->x, false);
-    check_tablevalue(L, "y", narg, &vp->y, false);
-    check_tablevalue(L, "width", narg, &vp->width, false);
-    check_tablevalue(L, "height", narg, &vp->height, false);
-#ifdef HAVE_LCD_BITMAP
-    check_tablevalue(L, "font", narg, &vp->font, false);
-    check_tablevalue(L, "drawmode", narg, &vp->drawmode, false);
-#endif
-#if LCD_DEPTH > 1
-    check_tablevalue(L, "fg_pattern", narg, &vp->fg_pattern, true);
-    check_tablevalue(L, "bg_pattern", narg, &vp->bg_pattern, true);
-#endif
-
-    return vp;
-}
-
-RB_WRAP(set_viewport)
-{
-    static struct viewport vp;
-    int screen = luaL_optint(L, 2, SCREEN_MAIN);
-    rb->screens[screen]->set_viewport(opt_viewport(L, 1, &vp, NULL));
-    return 0;
-}
-
-RB_WRAP(clear_viewport)
-{
-    int screen = luaL_optint(L, 1, SCREEN_MAIN);
-    rb->screens[screen]->clear_viewport();
-    return 0;
-}
-
 RB_WRAP(current_tick)
 {
     lua_pushinteger(L, *rb->current_tick);
@@ -171,25 +111,6 @@ RB_WRAP(touchscreen_get_mode)
     return 1;
 }
 #endif
-
-RB_WRAP(font_getstringsize)
-{
-    const unsigned char* str = luaL_checkstring(L, 1);
-    int fontnumber = luaL_checkint(L, 2);
-    int w, h;
-
-    if (fontnumber == FONT_UI)
-        fontnumber = rb->global_status->font_id[SCREEN_MAIN];
-    else
-        fontnumber = FONT_SYSFIXED;
-
-    int result = rb->font_getstringsize(str, &w, &h, fontnumber);
-    lua_pushinteger(L, result);
-    lua_pushinteger(L, w);
-    lua_pushinteger(L, h);
-
-    return 3;
-}
 
 RB_WRAP(current_path)
 {
@@ -507,9 +428,6 @@ static const luaL_Reg rocklib[] =
 
     RB_FUNC(kbd_input),
 
-    RB_FUNC(font_getstringsize),
-    RB_FUNC(set_viewport),
-    RB_FUNC(clear_viewport),
     RB_FUNC(current_path),
     RB_FUNC(gui_syncyesno_run),
     RB_FUNC(do_menu),
@@ -563,6 +481,11 @@ LUALIB_API int luaopen_rock(lua_State *L)
         RB_CONSTANT(LCD_DEPTH),
         RB_CONSTANT(LCD_HEIGHT),
         RB_CONSTANT(LCD_WIDTH),
+#ifdef HAVE_REMOTE_LCD
+        RB_CONSTANT(LCD_REMOTE_DEPTH),
+        RB_CONSTANT(LCD_REMOTE_HEIGHT),
+        RB_CONSTANT(LCD_REMOTE_WIDTH),
+#endif
 
         RB_CONSTANT(FONT_SYSFIXED),
         RB_CONSTANT(FONT_UI),
