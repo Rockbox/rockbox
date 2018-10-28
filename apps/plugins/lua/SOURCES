@@ -33,7 +33,6 @@ tlsf_helper.c
 fscanf.c
 strcspn.c
 strftime.c
-strncat.c
 strpbrk.c
 strtoul.c
 strtol.c
