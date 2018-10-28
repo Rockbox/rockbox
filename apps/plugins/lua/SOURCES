@@ -31,7 +31,6 @@ rocklib.c
 rocklib_img.c
 tlsf_helper.c
 fscanf.c
-gmtime.c
 strcspn.c
 strftime.c
 strncat.c
