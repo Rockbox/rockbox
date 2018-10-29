@@ -30,7 +30,6 @@ rockaux.c
 rocklib.c
 rocklib_img.c
 tlsf_helper.c
-fscanf.c
 strftime.c
 strpbrk.c
 strtoul.c

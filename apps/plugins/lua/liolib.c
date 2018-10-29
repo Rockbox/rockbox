@@ -17,6 +17,7 @@
 #include "lauxlib.h"
 #include "lualib.h"
 #include "rocklibc.h"
+#include "rocklib.h"
 
 #include "llimits.h"
 
@@ -247,7 +248,7 @@ static int io_lines (lua_State *L) {
 
 static int read_number (lua_State *L, int *f) {
   lua_Number d;
-  if (PREFIX(fscanf)(*f, LUA_NUMBER_SCAN, &d) == 1) {
+  if (filetol(*f, &d) == 1) { /* was fscanf(f, LUA_NUMBER_SCAN, &d)*/
     lua_pushnumber(L, d);
     return 1;
   }

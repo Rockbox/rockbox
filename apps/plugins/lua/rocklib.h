@@ -47,6 +47,7 @@ struct lua_str_reg {
 
 LUALIB_API int (luaopen_rock) (lua_State *L);
 int get_current_path(lua_State *L, int level);
+int filetol(int fd, long *num);
 
 #endif /* _ROCKLIB_H_ */
 
