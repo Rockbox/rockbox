@@ -27,6 +27,8 @@ enum nwz_nvp_node_t
 {
     NWZ_NVP_APD, /* application debug mode flag */
     NWZ_NVP_APP, /* application parameter */
+    NWZ_NVP_ATF, /*  */
+    NWZ_NVP_AWS, /*  */
     NWZ_NVP_BFD, /* btmw factory scdb */
     NWZ_NVP_BFP, /* btmw factory pair info */
     NWZ_NVP_BLF, /* browser log mode flag */
@@ -47,6 +49,7 @@ enum nwz_nvp_node_t
     NWZ_NVP_DCC, /* secure clock */
     NWZ_NVP_DG0, /*  */
     NWZ_NVP_DG1, /*  */
+    NWZ_NVP_DGS, /*  */
     NWZ_NVP_DOR, /* key mode (debug/release) */
     NWZ_NVP_E00, /* EMPR  0 */
     NWZ_NVP_E01, /* EMPR  1 */
@@ -126,6 +129,7 @@ enum nwz_nvp_node_t
     NWZ_NVP_RTC, /* rtc alarm */
     NWZ_NVP_SDC, /* SD Card export flag */
     NWZ_NVP_SDP, /* sound driver parameter */
+    NWZ_NVP_SE2, /*  */
     NWZ_NVP_SER, /* serial number */
     NWZ_NVP_SFI, /* starfish id */
     NWZ_NVP_SHE, /*  */
@@ -136,6 +140,7 @@ enum nwz_nvp_node_t
     NWZ_NVP_SKU, /*  */
     NWZ_NVP_SLP, /* time out to sleep */
     NWZ_NVP_SPS, /* speaker ship info */
+    NWZ_NVP_SSK, /*  */
     NWZ_NVP_SYI, /* system information */
     NWZ_NVP_TR0, /* EKB 0 */
     NWZ_NVP_TR1, /* EKB 1 */
