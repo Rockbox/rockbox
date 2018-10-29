@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2008 Dan Everton (safetydan)
+ * Copyright (C) 2018 William Wilgus
  * String function implementations taken from dietlibc 0.31 (GPLv2 License)
  *
  * This program is free software; you can redistribute it and/or
@@ -101,3 +102,63 @@ int get_current_path(lua_State *L, int level)
     lua_pushnil(L);    
     return 1;
 }
+
+/* filetol()
+   reads long int from an open file, skips preceding 
+   whitespaces returns -1 if error, 1 on success. 
+   *num set to LONG_MAX or LONG_MIN on overflow
+   if number of digits is > than LUAI_MAXNUMBER2STR
+   filepointer will continue till the next non digit
+   but buffer will stop being filled with characters
+   preceding zero is ignored
+*/
+int filetol(int fd, long *num)
+{
+    static char buffer[LUAI_MAXNUMBER2STR];
+    int    retn = -1;
+    char   chbuf = 0;
+    size_t count = 0;
+    bool   neg   = false;
+    long   val;
+
+    while (rb->read(fd, &chbuf, 1) == 1)
+    {
+        if(!isspace(chbuf) || retn == 1)
+        {
+            if(chbuf == '-' && retn != 1)
+                neg = true;
+            else if (chbuf != '0')
+            {
+                rb->lseek(fd, -1, SEEK_CUR);
+                break;
+            }
+            else /* strip preceeding zeros */
+            {
+                *num = 0;
+                retn = 1;
+            }
+        }
+    }
+
+    while (rb->read(fd, &chbuf, 1) == 1)
+    {
+        if(!isdigit(chbuf))
+        {
+            rb->lseek(fd, -1, SEEK_CUR);
+            break;
+        }
+        else if (count < LUAI_MAXNUMBER2STR - 2)
+            buffer[count++] = chbuf;
+    }
+
+    if(count)
+    {
+        buffer[count] = '\0';
+        val = strtol(buffer, NULL, 10);
+        *num = (neg)? -val:val;
+        retn = 1;
+    }
+
+    return retn;
+}
+
