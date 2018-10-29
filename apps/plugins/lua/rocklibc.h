@@ -43,7 +43,5 @@ extern int errno;
 #define memcmp rb->memcmp
 #define strlen rb->strlen
 
-extern int PREFIX(fscanf)(int fd, const char *fmt, ...);
-
 #endif /* _ROCKLIBC_H_ */
 
