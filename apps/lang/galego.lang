@@ -6277,7 +6277,7 @@ iriverifp7xx: "%d%% %dh %dm"
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7172,7 +7172,7 @@ iriverifp7xx: "%d%% %dh %dm"
     *: "Ganancia do álbume"
   </dest>
   <voice>
-    *: ""
+    *: "Ganancia do álbume"
   </voice>
 </phrase>
 <phrase>
@@ -8729,7 +8729,7 @@ iriverifp7xx: "%d%% %dh %dm"
     *: "Ganancia de pista"
   </dest>
   <voice>
-    *: ""
+    *: "Ganancia de pista"
   </voice>
 </phrase>
 <phrase>
@@ -9463,7 +9463,7 @@ iriverifp7xx: "%d%% %dh %dm"
     *: "Traballo"
   </dest>
   <voice>
-    *: ""
+    *: "Traballo"
   </voice>
 </phrase>
 <phrase>
@@ -9573,7 +9573,7 @@ iriverifp7xx: "%d%% %dh %dm"
     *: "Lonxitude"
   </dest>
   <voice>
-    *: ""
+    *: "Lonxitude"
   </voice>
 </phrase>
 <phrase>
@@ -9954,7 +9954,7 @@ iriverifp7xx: "%d%% %dh %dm"
     *: "Compositor"
   </dest>
   <voice>
-    *: ""
+    *: "Compositor"
   </voice>
 </phrase>
 <phrase>
@@ -10662,7 +10662,7 @@ iriverifp7xx: "%d%% %dh %dm"
     *: "Nº de disco"
   </dest>
   <voice>
-    *: ""
+    *: "Nº de disco"
   </voice>
 </phrase>
 <phrase>
@@ -11533,7 +11533,7 @@ iriverifp7xx: "%d%% %dh %dm"
     *: "Artista do álbume"
   </dest>
   <voice>
-    *: ""
+    *: "Artista do álbume"
   </voice>
 </phrase>
 <phrase>

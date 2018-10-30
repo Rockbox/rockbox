@@ -4727,7 +4727,7 @@
     *: "Tittel"
   </dest>
   <voice>
-    *: ""
+    *: "Tittel"
   </voice>
 </phrase>
 <phrase>
@@ -4741,7 +4741,7 @@
     *: "Artist"
   </dest>
   <voice>
-    *: ""
+    *: "Artist"
   </voice>
 </phrase>
 <phrase>
@@ -4755,7 +4755,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -4769,7 +4769,7 @@
     *: "Spornummer"
   </dest>
   <voice>
-    *: ""
+    *: "Spornummer"
   </voice>
 </phrase>
 <phrase>
@@ -4783,7 +4783,7 @@
     *: "Sjanger"
   </dest>
   <voice>
-    *: ""
+    *: "Sjanger"
   </voice>
 </phrase>
 <phrase>
@@ -4797,7 +4797,7 @@
     *: "År"
   </dest>
   <voice>
-    *: ""
+    *: "År"
   </voice>
 </phrase>
 <phrase>
@@ -4811,7 +4811,7 @@
     *: "Lengd"
   </dest>
   <voice>
-    *: ""
+    *: "Lengd"
   </voice>
 </phrase>
 <phrase>
@@ -4825,7 +4825,7 @@
     *: "Speleliste"
   </dest>
   <voice>
-    *: ""
+    *: "Speleliste"
   </voice>
 </phrase>
 <phrase>
@@ -4839,7 +4839,7 @@
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -4853,7 +4853,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -4867,7 +4867,7 @@
     *: "Frekvens"
   </dest>
   <voice>
-    *: ""
+    *: "Frekvens"
   </voice>
 </phrase>
 <phrase>
@@ -4881,7 +4881,7 @@
     *: "Sporforsterking"
   </dest>
   <voice>
-    *: ""
+    *: "Sporforsterking"
   </voice>
 </phrase>
 <phrase>
@@ -4895,7 +4895,7 @@
     *: "Albumforsterking"
   </dest>
   <voice>
-    *: ""
+    *: "Albumforsterking"
   </voice>
 </phrase>
 <phrase>
@@ -4909,7 +4909,7 @@
     *: "Adresse"
   </dest>
   <voice>
-    *: ""
+    *: "Adresse"
   </voice>
 </phrase>
 <phrase>
@@ -4923,7 +4923,7 @@
     *: "<Ingen info>"
   </dest>
   <voice>
-    *: ""
+    *: "Ingen info"
   </voice>
 </phrase>
 <phrase>
@@ -8359,7 +8359,7 @@
     *: "Merknad"
   </dest>
   <voice>
-    *: ""
+    *: "Merknad"
   </voice>
 </phrase>
 <phrase>
@@ -8714,7 +8714,7 @@
     *: "Albumartist"
   </dest>
   <voice>
-    *: ""
+    *: "Albumartist"
   </voice>
 </phrase>
 <phrase>
@@ -9638,7 +9638,7 @@
     *: "Arbeid"
   </dest>
   <voice>
-    *: ""
+    *: "Arbeid"
   </voice>
 </phrase>
 <phrase>
@@ -9717,7 +9717,7 @@
     *: "Disknummer"
   </dest>
   <voice>
-    *: ""
+    *: "Disknummer"
   </voice>
 </phrase>
 <phrase>
