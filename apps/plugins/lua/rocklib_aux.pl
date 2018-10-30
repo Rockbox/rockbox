@@ -83,8 +83,11 @@ my @forbidden_functions = ('^open$',
                            '^lcd_scroll_stop$',
                            '^__.+$',
                            '^.+_(un)?cached$',
-                           '^audio_.+$',
-                           'playlist_.+$',
+                           '^audio_(status|get_file_pos|flush_and_reload_tracks)$',
+                           '^audio_(ff_rewind|next|prev|play|pause|resume|stop)$',
+                           '^playlist_(amount|add|create|start|resume|shuffle)$',
+                           '^playlist_(sync|resume_track|remove_all_tracks)$',
+                           '^playlist_(insert_track|insert_directory)$',
                            '^round_value_to_list32$');
 
 my $rocklib = sprintf("%s/rocklib.c", $ARGV[0]);
