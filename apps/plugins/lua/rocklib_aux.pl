@@ -88,6 +88,10 @@ my @forbidden_functions = ('^open$',
                            '^playlist_(amount|add|create|start|resume|shuffle)$',
                            '^playlist_(sync|resume_track|remove_all_tracks)$',
                            '^playlist_(insert_track|insert_directory)$',
+                           '^pcm_is_(playing|paused)$',
+                           '^pcm_play_(stop|pause|lock|unlock)$',
+                           '^pcm_(apply_settings|get_bytes_waiting)$',
+                           '^pcm_(set_frequency|calculate_peaks)$',
                            '^round_value_to_list32$');
 
 my $rocklib = sprintf("%s/rocklib.c", $ARGV[0]);
