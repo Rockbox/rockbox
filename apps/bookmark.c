@@ -86,7 +86,7 @@ static void  say_bookmark(const char* bookmark,
                           int bookmark_id, bool show_playlist_name);
 static bool  play_bookmark(const char* bookmark);
 static bool  generate_bookmark_file_name(const char *in);
-static bool  parse_bookmark(const char *bookmark, const bool get_filenames);
+static bool  parse_bookmark(const char *bookmark, const bool get_filenames, const bool strip_dir);
 static int   buffer_bookmarks(struct bookmark_list* bookmarks, int first_line);
 static const char* get_bookmark_info(int list_index,
                                      void* data,
@@ -339,7 +339,7 @@ static bool add_bookmark(const char* bookmark_file_name, const char* bookmark,
             if (most_recent && (bookmark_count >= MAX_BOOKMARKS))
                 break;
 
-            if (!parse_bookmark(global_read_buffer, false))
+            if (!parse_bookmark(global_read_buffer, false, false))
                 break;
 
             equal = false;
@@ -402,6 +402,10 @@ static char* create_bookmark()
         return NULL;
 
     /* create the bookmark */
+    playlist_get_name(NULL, global_temp_buffer, sizeof(global_temp_buffer));
+    if (global_temp_buffer[strlen(global_temp_buffer) - 1] != '/')
+        file = id3->path;
+    else file++;
     snprintf(global_bookmark, sizeof(global_bookmark),
              /* new optional bookmark token descriptors should be inserted
                 just before the "%s;%s" in this line... */
@@ -428,12 +432,11 @@ static char* create_bookmark()
              (long)dsp_get_timestretch(),
 #endif
              /* more mandatory tokens */
-             playlist_get_name(NULL, global_temp_buffer,
-                sizeof(global_temp_buffer)),
-             file+1);
+             global_temp_buffer,
+             file);
 
     /* checking to see if the bookmark is valid */
-    if (parse_bookmark(global_bookmark, false))
+    if (parse_bookmark(global_bookmark, false, false))
         return global_bookmark;
     else
         return NULL;
@@ -653,7 +656,7 @@ static const char* get_bookmark_info(int list_index,
         }
     }
     
-    if (!parse_bookmark(bookmarks->items[index - bookmarks->start], true))
+    if (!parse_bookmark(bookmarks->items[index - bookmarks->start], true, true))
     {
         return list_index % 2 == 0 ? (char*) str(LANG_BOOKMARK_INVALID) : " ";
     }
@@ -930,7 +933,7 @@ static bool delete_bookmark(const char* bookmark_file_name, int bookmark_id)
 static void say_bookmark(const char* bookmark,
                          int bookmark_id, bool show_playlist_name)
 {
-    if (!parse_bookmark(bookmark, true))
+    if (!parse_bookmark(bookmark, true, false))
     {
         talk_id(LANG_BOOKMARK_INVALID, false);
         return;
@@ -967,16 +970,10 @@ static void say_bookmark(const char* bookmark,
 
 #if CONFIG_CODEC == SWCODEC
     /* Track filename */
-    if(is_dir)
-        talk_file_or_spell(global_temp_buffer, global_filename,
-                           TALK_IDARRAY(VOICE_FILE), true);
-    else
-    {   /* Unfortunately if this is a playlist, we do not know in which
-           directory the file is and therefore cannot find the track's
-           .talk file. */
-        talk_id(VOICE_FILE, true);
-        talk_spell(global_filename, true);
-    }
+    if(!is_dir)
+        global_temp_buffer[0] = 0;
+    talk_file_or_spell(global_temp_buffer, global_filename,
+                       TALK_IDARRAY(VOICE_FILE), true);
 #endif
 }
 
@@ -992,7 +989,7 @@ static bool play_bookmark(const char* bookmark)
     bm.speed = dsp_get_timestretch();
 #endif
     
-    if (parse_bookmark(bookmark, true))
+    if (parse_bookmark(bookmark, true, true))
     {
         global_settings.repeat_mode = bm.repeat_mode;
         global_settings.playlist_shuffle = bm.shuffle;
@@ -1042,7 +1039,7 @@ static const char* long_token(const char* s, long* dest)
 /* the filename tokens are to be extracted.                                */
 /* Returns true on successful bookmark parse.                              */
 /* ----------------------------------------------------------------------- */
-static bool parse_bookmark(const char *bookmark, const bool parse_filenames)
+static bool parse_bookmark(const char *bookmark, const bool parse_filenames, const bool strip_dir)
 {
     const char* s = bookmark;
     const char* end;
@@ -1094,6 +1091,15 @@ static bool parse_bookmark(const char *bookmark, const bool parse_filenames)
         if (end != NULL)
         {
             end++;
+            if (strip_dir)
+            {
+                s = strrchr(end, '/');
+                if (s)
+                {
+                    end = s;
+                    end++;
+                }
+            }
             strlcpy(global_filename, end, MAX_PATH);
         }
      }

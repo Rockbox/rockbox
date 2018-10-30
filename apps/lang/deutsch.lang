@@ -7147,7 +7147,7 @@
     *: "Titel"
   </dest>
   <voice>
-    *: ""
+    *: "Titel"
   </voice>
 </phrase>
 <phrase>
@@ -7161,7 +7161,7 @@
     *: "Künstler"
   </dest>
   <voice>
-    *: ""
+    *: "Künstler"
   </voice>
 </phrase>
 <phrase>
@@ -7175,7 +7175,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -7189,7 +7189,7 @@
     *: "Titelnr."
   </dest>
   <voice>
-    *: ""
+    *: "Titelnr."
   </voice>
 </phrase>
 <phrase>
@@ -7203,7 +7203,7 @@
     *: "Genre"
   </dest>
   <voice>
-    *: ""
+    *: "Genre"
   </voice>
 </phrase>
 <phrase>
@@ -7217,7 +7217,7 @@
     *: "Jahr"
   </dest>
   <voice>
-    *: ""
+    *: "Jahr"
   </voice>
 </phrase>
 <phrase>
@@ -7231,7 +7231,7 @@
     *: "Länge"
   </dest>
   <voice>
-    *: ""
+    *: "Länge"
   </voice>
 </phrase>
 <phrase>
@@ -7245,7 +7245,7 @@
     *: "Wiedergabeliste"
   </dest>
   <voice>
-    *: ""
+    *: "Wiedergabeliste"
   </voice>
 </phrase>
 <phrase>
@@ -7259,7 +7259,7 @@
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -7273,7 +7273,7 @@
     *: "Album-Künstler"
   </dest>
   <voice>
-    *: ""
+    *: "Album-Künstler"
   </voice>
 </phrase>
 <phrase>
@@ -7287,7 +7287,7 @@
     *: "Disknr."
   </dest>
   <voice>
-    *: ""
+    *: "Disknr."
   </voice>
 </phrase>
 <phrase>
@@ -7301,7 +7301,7 @@
     *: "Kommentar"
   </dest>
   <voice>
-    *: ""
+    *: "Kommentar"
   </voice>
 </phrase>
 <phrase>
@@ -7315,7 +7315,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7329,7 +7329,7 @@
     *: "Frequenz"
   </dest>
   <voice>
-    *: ""
+    *: "Frequenz"
   </voice>
 </phrase>
 <phrase>
@@ -7343,7 +7343,7 @@
     *: "Titellautstärke"
   </dest>
   <voice>
-    *: ""
+    *: "Titellautstärke"
   </voice>
 </phrase>
 <phrase>
@@ -7357,7 +7357,7 @@
     *: "Albumlautstärke"
   </dest>
   <voice>
-    *: ""
+    *: "Albumlautstärke"
   </voice>
 </phrase>
 <phrase>
@@ -7371,7 +7371,7 @@
     *: "Pfad"
   </dest>
   <voice>
-    *: ""
+    *: "Pfad"
   </voice>
 </phrase>
 <phrase>
@@ -7385,7 +7385,7 @@
     *: "<keine Info>"
   </dest>
   <voice>
-    *: ""
+    *: "keine Info"
   </voice>
 </phrase>
 <phrase>
@@ -10051,7 +10051,7 @@
     *: "Werk"
   </dest>
   <voice>
-    *: ""
+    *: "Werk"
   </voice>
 </phrase>
 <phrase>
@@ -12347,7 +12347,7 @@
     *: "Komponist"
   </dest>
   <voice>
-    *: ""
+    *: "Komponist"
   </voice>
 </phrase>
 <phrase>

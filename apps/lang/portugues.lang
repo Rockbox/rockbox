@@ -4486,7 +4486,7 @@
     *: "Título"
   </dest>
   <voice>
-    *: ""
+    *: "Título"
   </voice>
 </phrase>
 <phrase>
@@ -4500,7 +4500,7 @@
     *: "Artista"
   </dest>
   <voice>
-    *: ""
+    *: "Artista"
   </voice>
 </phrase>
 <phrase>
@@ -4514,7 +4514,7 @@
     *: "Álbum"
   </dest>
   <voice>
-    *: ""
+    *: "Álbum"
   </voice>
 </phrase>
 <phrase>
@@ -4528,7 +4528,7 @@
     *: "Faixa Nº"
   </dest>
   <voice>
-    *: ""
+    *: "Faixa Nº"
   </voice>
 </phrase>
 <phrase>
@@ -4542,7 +4542,7 @@
     *: "Género"
   </dest>
   <voice>
-    *: ""
+    *: "Género"
   </voice>
 </phrase>
 <phrase>
@@ -4570,7 +4570,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -4584,7 +4584,7 @@
     *: "Frequência"
   </dest>
   <voice>
-    *: ""
+    *: "Frequência"
   </voice>
 </phrase>
 <phrase>
@@ -4598,7 +4598,7 @@
     *: "Ganho de Faixa"
   </dest>
   <voice>
-    *: ""
+    *: "Ganho de Faixa"
   </voice>
 </phrase>
 <phrase>
@@ -4612,7 +4612,7 @@
     *: "Ganho de Álbum"
   </dest>
   <voice>
-    *: ""
+    *: "Ganho de Álbum"
   </voice>
 </phrase>
 <phrase>
@@ -4626,7 +4626,7 @@
     *: "Caminho"
   </dest>
   <voice>
-    *: ""
+    *: "Caminho"
   </voice>
 </phrase>
 <phrase>
@@ -4640,7 +4640,7 @@
     *: "<Sem Informação>"
   </dest>
   <voice>
-    *: ""
+    *: "Sem Informação"
   </voice>
 </phrase>
 <phrase>
@@ -8320,7 +8320,7 @@
     *: "Trabalho"
   </dest>
   <voice>
-    *: ""
+    *: "Trabalho"
   </voice>
 </phrase>
 <phrase>
@@ -9736,7 +9736,7 @@
     *: "Comentário"
   </dest>
   <voice>
-    *: ""
+    *: "Comentário"
   </voice>
 </phrase>
 <phrase>
@@ -10173,7 +10173,7 @@
     *: "Taxa de Bits"
   </dest>
   <voice>
-    *: ""
+    *: "Taxa de Bits"
   </voice>
 </phrase>
 <phrase>
@@ -10218,7 +10218,7 @@
     *: "Comprimento"
   </dest>
   <voice>
-    *: ""
+    *: "Comprimento"
   </voice>
 </phrase>
 <phrase>
@@ -10277,7 +10277,7 @@
     *: "Número do Disco"
   </dest>
   <voice>
-    *: ""
+    *: "Número do Disco"
   </voice>
 </phrase>
 <phrase>
@@ -10291,7 +10291,7 @@
     *: "Artista do Álbum"
   </dest>
   <voice>
-    *: ""
+    *: "Artista do Álbum"
   </voice>
 </phrase>
 <phrase>
@@ -10946,7 +10946,7 @@
     *: "Playlist"
   </dest>
   <voice>
-    *: ""
+    *: "Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -12371,7 +12371,7 @@
     *: "Compositor"
   </dest>
   <voice>
-    *: ""
+    *: "Compositor"
   </voice>
 </phrase>
 <phrase>

@@ -1790,7 +1790,7 @@
     *: "Naslov"
   </dest>
   <voice>
-    *: ""
+    *: "Naslov"
   </voice>
 </phrase>
 <phrase>
@@ -1804,7 +1804,7 @@
     *: "Avtor"
   </dest>
   <voice>
-    *: ""
+    *: "Avtor"
   </voice>
 </phrase>
 <phrase>
@@ -1818,7 +1818,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -1832,7 +1832,7 @@
     *: "Stevika skladbe"
   </dest>
   <voice>
-    *: ""
+    *: "Stevika skladbe"
   </voice>
 </phrase>
 <phrase>
@@ -1846,7 +1846,7 @@
     *: "Stil"
   </dest>
   <voice>
-    *: ""
+    *: "Stil"
   </voice>
 </phrase>
 <phrase>
@@ -1860,7 +1860,7 @@
     *: "Leto"
   </dest>
   <voice>
-    *: ""
+    *: "Leto"
   </voice>
 </phrase>
 <phrase>
@@ -1874,7 +1874,7 @@
     *: "Seznam"
   </dest>
   <voice>
-    *: ""
+    *: "Seznam"
   </voice>
 </phrase>
 <phrase>
@@ -1888,7 +1888,7 @@
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -1902,7 +1902,7 @@
     *: "Frekvenca"
   </dest>
   <voice>
-    *: ""
+    *: "Frekvenca"
   </voice>
 </phrase>
 <phrase>
@@ -1916,7 +1916,7 @@
     *: "Pot"
   </dest>
   <voice>
-    *: ""
+    *: "Pot"
   </voice>
 </phrase>
 <phrase>
@@ -1930,7 +1930,7 @@
     *: "<Ni podatka>"
   </dest>
   <voice>
-    *: ""
+    *: "Ni podatka"
   </voice>
 </phrase>
 <phrase>
@@ -3276,7 +3276,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -3470,7 +3470,7 @@
     *: "Comment"
   </dest>
   <voice>
-    *: ""
+    *: "Comment"
   </voice>
 </phrase>
 <phrase>
@@ -4528,7 +4528,7 @@
     *: "Album Gain"
   </dest>
   <voice>
-    *: ""
+    *: "Album Gain"
   </voice>
 </phrase>
 <phrase>
@@ -6580,7 +6580,7 @@
     *: "Track Gain"
   </dest>
   <voice>
-    *: ""
+    *: "Track Gain"
   </voice>
 </phrase>
 <phrase>
@@ -7648,7 +7648,7 @@
     *: "Work"
   </dest>
   <voice>
-    *: ""
+    *: "Work"
   </voice>
 </phrase>
 <phrase>
@@ -7842,7 +7842,7 @@
     *: "Length"
   </dest>
   <voice>
-    *: ""
+    *: "Length"
   </voice>
 </phrase>
 <phrase>
@@ -9386,7 +9386,7 @@
     *: "Discnum"
   </dest>
   <voice>
-    *: ""
+    *: "Discnum"
   </voice>
 </phrase>
 <phrase>
@@ -10736,7 +10736,7 @@
     *: "Album Artist"
   </dest>
   <voice>
-    *: ""
+    *: "Album Artist"
   </voice>
 </phrase>
 <phrase>
@@ -12651,7 +12651,7 @@
     *: "Sestavljalnik"
   </dest>
   <voice>
-    *: ""
+    *: "Sestavljalnik"
   </voice>
 </phrase>
 <phrase>

@@ -7104,7 +7104,7 @@
     *: "ชื่อ"
   </dest>
   <voice>
-    *: ""
+    *: "ชื่อ"
   </voice>
 </phrase>
 <phrase>
@@ -7118,7 +7118,7 @@
     *: "นักร้อง"
   </dest>
   <voice>
-    *: ""
+    *: "นักร้อง"
   </voice>
 </phrase>
 <phrase>
@@ -7132,7 +7132,7 @@
     *: "อัลบัม"
   </dest>
   <voice>
-    *: ""
+    *: "อัลบัม"
   </voice>
 </phrase>
 <phrase>
@@ -7146,7 +7146,7 @@
     *: "เพลงที่"
   </dest>
   <voice>
-    *: ""
+    *: "เพลงที่"
   </voice>
 </phrase>
 <phrase>
@@ -7160,7 +7160,7 @@
     *: "ประเภท"
   </dest>
   <voice>
-    *: ""
+    *: "ประเภท"
   </voice>
 </phrase>
 <phrase>
@@ -7174,7 +7174,7 @@
     *: "ปี"
   </dest>
   <voice>
-    *: ""
+    *: "ปี"
   </voice>
 </phrase>
 <phrase>
@@ -7188,7 +7188,7 @@
     *: "ความยาว"
   </dest>
   <voice>
-    *: ""
+    *: "ความยาว"
   </voice>
 </phrase>
 <phrase>
@@ -7202,7 +7202,7 @@
     *: "รายการเพลง"
   </dest>
   <voice>
-    *: ""
+    *: "รายการเพลง"
   </voice>
 </phrase>
 <phrase>
@@ -7216,7 +7216,7 @@
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -7230,7 +7230,7 @@
     *: "ศิลปิน"
   </dest>
   <voice>
-    *: ""
+    *: "ศิลปิน"
   </voice>
 </phrase>
 <phrase>
@@ -7244,7 +7244,7 @@
     *: "แผ่นที่"
   </dest>
   <voice>
-    *: ""
+    *: "แผ่นที่"
   </voice>
 </phrase>
 <phrase>
@@ -7258,7 +7258,7 @@
     *: "หมายเหตุ"
   </dest>
   <voice>
-    *: ""
+    *: "หมายเหตุ"
   </voice>
 </phrase>
 <phrase>
@@ -7272,7 +7272,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7286,7 +7286,7 @@
     *: "ความถี่"
   </dest>
   <voice>
-    *: ""
+    *: "ความถี่"
   </voice>
 </phrase>
 <phrase>
@@ -7300,7 +7300,7 @@
     *: "อัตราขยายของเพลง"
   </dest>
   <voice>
-    *: ""
+    *: "อัตราขยายของเพลง"
   </voice>
 </phrase>
 <phrase>
@@ -7314,7 +7314,7 @@
     *: "อัตราขยายของอัลบัม"
   </dest>
   <voice>
-    *: ""
+    *: "อัตราขยายของอัลบัม"
   </voice>
 </phrase>
 <phrase>
@@ -7328,7 +7328,7 @@
     *: "ที่เก็บ"
   </dest>
   <voice>
-    *: ""
+    *: "ที่เก็บ"
   </voice>
 </phrase>
 <phrase>
@@ -7342,7 +7342,7 @@
     *: "<ไม่มีข้อมูล>"
   </dest>
   <voice>
-    *: ""
+    *: "ไม่มีข้อมูล"
   </voice>
 </phrase>
 <phrase>
@@ -10009,7 +10009,7 @@
     *: "งาน"
   </dest>
   <voice>
-    *: ""
+    *: "งาน"
   </voice>
 </phrase>
 <phrase>
@@ -12370,7 +12370,7 @@
     *: "ผู้แต่ง"
   </dest>
   <voice>
-    *: ""
+    *: "ผู้แต่ง"
   </voice>
 </phrase>
 <phrase>

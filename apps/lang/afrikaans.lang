@@ -825,7 +825,7 @@
     *: "Titel"
   </dest>
   <voice>
-    *: ""
+    *: "Titel"
   </voice>
 </phrase>
 <phrase>
@@ -839,7 +839,7 @@
     *: "Kunstenaar"
   </dest>
   <voice>
-    *: ""
+    *: "Kunstenaar"
   </voice>
 </phrase>
 <phrase>
@@ -853,7 +853,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -867,7 +867,7 @@
     *: "Liednommer"
   </dest>
   <voice>
-    *: ""
+    *: "Liednommer"
   </voice>
 </phrase>
 <phrase>
@@ -881,7 +881,7 @@
     *: "Speellys"
   </dest>
   <voice>
-    *: ""
+    *: "Speellys"
   </voice>
 </phrase>
 <phrase>
@@ -895,7 +895,7 @@
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -909,7 +909,7 @@
     *: "Frekwensie"
   </dest>
   <voice>
-    *: ""
+    *: "Frekwensie"
   </voice>
 </phrase>
 <phrase>
@@ -923,7 +923,7 @@
     *: "Pad"
   </dest>
   <voice>
-    *: ""
+    *: "Pad"
   </voice>
 </phrase>
 <phrase>

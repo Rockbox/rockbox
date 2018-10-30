@@ -7115,7 +7115,7 @@
     *: "Cím"
   </dest>
   <voice>
-    *: ""
+    *: "Cím"
   </voice>
 </phrase>
 <phrase>
@@ -7129,7 +7129,7 @@
     *: "Előadó"
   </dest>
   <voice>
-    *: ""
+    *: "Előadó"
   </voice>
 </phrase>
 <phrase>
@@ -7143,7 +7143,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -7157,7 +7157,7 @@
     *: "Sorszám"
   </dest>
   <voice>
-    *: ""
+    *: "Sorszám"
   </voice>
 </phrase>
 <phrase>
@@ -7171,7 +7171,7 @@
     *: "Műfaj"
   </dest>
   <voice>
-    *: ""
+    *: "Műfaj"
   </voice>
 </phrase>
 <phrase>
@@ -7185,7 +7185,7 @@
     *: "Év"
   </dest>
   <voice>
-    *: ""
+    *: "Év"
   </voice>
 </phrase>
 <phrase>
@@ -7199,7 +7199,7 @@
     *: "Hossz"
   </dest>
   <voice>
-    *: ""
+    *: "Hossz"
   </voice>
 </phrase>
 <phrase>
@@ -7213,7 +7213,7 @@
     *: "Lejátszólista"
   </dest>
   <voice>
-    *: ""
+    *: "Lejátszólista"
   </voice>
 </phrase>
 <phrase>
@@ -7227,7 +7227,7 @@
     *: "Bitráta"
   </dest>
   <voice>
-    *: ""
+    *: "Bitráta"
   </voice>
 </phrase>
 <phrase>
@@ -7241,7 +7241,7 @@
     *: "Lemez előadója"
   </dest>
   <voice>
-    *: ""
+    *: "Lemez előadója"
   </voice>
 </phrase>
 <phrase>
@@ -7255,7 +7255,7 @@
     *: "Lemez száma"
   </dest>
   <voice>
-    *: ""
+    *: "Lemez száma"
   </voice>
 </phrase>
 <phrase>
@@ -7269,7 +7269,7 @@
     *: "Megjegyzés"
   </dest>
   <voice>
-    *: ""
+    *: "Megjegyzés"
   </voice>
 </phrase>
 <phrase>
@@ -7283,7 +7283,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7297,7 +7297,7 @@
     *: "Mintavétel"
   </dest>
   <voice>
-    *: ""
+    *: "Mintavétel"
   </voice>
 </phrase>
 <phrase>
@@ -7311,7 +7311,7 @@
     *: "Számonkénti módosítás"
   </dest>
   <voice>
-    *: ""
+    *: "Számonkénti módosítás"
   </voice>
 </phrase>
 <phrase>
@@ -7325,7 +7325,7 @@
     *: "Albumonkénti módosítás"
   </dest>
   <voice>
-    *: ""
+    *: "Albumonkénti módosítás"
   </voice>
 </phrase>
 <phrase>
@@ -7339,7 +7339,7 @@
     *: "Elérési út"
   </dest>
   <voice>
-    *: ""
+    *: "Elérési út"
   </voice>
 </phrase>
 <phrase>
@@ -7353,7 +7353,7 @@
     *: "<Nincs adat>"
   </dest>
   <voice>
-    *: ""
+    *: "Nincs adat"
   </voice>
 </phrase>
 <phrase>
@@ -10019,7 +10019,7 @@
     *: "Mű"
   </dest>
   <voice>
-    *: ""
+    *: "Mű"
   </voice>
 </phrase>
 <phrase>

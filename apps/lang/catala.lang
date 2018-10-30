@@ -7133,7 +7133,7 @@
     *: "Títol"
   </dest>
   <voice>
-    *: ""
+    *: "Títol"
   </voice>
 </phrase>
 <phrase>
@@ -7147,7 +7147,7 @@
     *: "Artista"
   </dest>
   <voice>
-    *: ""
+    *: "Artista"
   </voice>
 </phrase>
 <phrase>
@@ -7161,7 +7161,7 @@
     *: "Àlbum"
   </dest>
   <voice>
-    *: ""
+    *: "Àlbum"
   </voice>
 </phrase>
 <phrase>
@@ -7175,7 +7175,7 @@
     *: "Núm. pista"
   </dest>
   <voice>
-    *: ""
+    *: "Núm. pista"
   </voice>
 </phrase>
 <phrase>
@@ -7189,7 +7189,7 @@
     *: "Gènere"
   </dest>
   <voice>
-    *: ""
+    *: "Gènere"
   </voice>
 </phrase>
 <phrase>
@@ -7203,7 +7203,7 @@
     *: "Any"
   </dest>
   <voice>
-    *: ""
+    *: "Any"
   </voice>
 </phrase>
 <phrase>
@@ -7217,7 +7217,7 @@
     *: "Durada"
   </dest>
   <voice>
-    *: ""
+    *: "Durada"
   </voice>
 </phrase>
 <phrase>
@@ -7231,7 +7231,7 @@
     *: "Llista de reprod."
   </dest>
   <voice>
-    *: ""
+    *: "Llista de reprod."
   </voice>
 </phrase>
 <phrase>
@@ -7245,7 +7245,7 @@
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -7259,7 +7259,7 @@
     *: "Artista de l'álbum"
   </dest>
   <voice>
-    *: ""
+    *: "Artista de l'álbum"
   </voice>
 </phrase>
 <phrase>
@@ -7273,7 +7273,7 @@
     *: "Núm.disc"
   </dest>
   <voice>
-    *: ""
+    *: "Núm.disc"
   </voice>
 </phrase>
 <phrase>
@@ -7301,7 +7301,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7315,7 +7315,7 @@
     *: "Freqüència"
   </dest>
   <voice>
-    *: ""
+    *: "Freqüència"
   </voice>
 </phrase>
 <phrase>
@@ -7329,7 +7329,7 @@
     *: "Guany de pista"
   </dest>
   <voice>
-    *: ""
+    *: "Guany de pista"
   </voice>
 </phrase>
 <phrase>
@@ -7343,7 +7343,7 @@
     *: "Guany d'àlbum"
   </dest>
   <voice>
-    *: ""
+    *: "Guany d'àlbum"
   </voice>
 </phrase>
 <phrase>
@@ -7357,7 +7357,7 @@
     *: "Camí"
   </dest>
   <voice>
-    *: ""
+    *: "Camí"
   </voice>
 </phrase>
 <phrase>
@@ -7371,7 +7371,7 @@
     *: "<sense info>"
   </dest>
   <voice>
-    *: ""
+    *: "sense info"
   </voice>
 </phrase>
 <phrase>
@@ -10036,7 +10036,7 @@
     *: "Treball"
   </dest>
   <voice>
-    *: ""
+    *: "Treball"
   </voice>
 </phrase>
 <phrase>
@@ -12434,7 +12434,7 @@
     *: "Compositor"
   </dest>
   <voice>
-    *: ""
+    *: "Compositor"
   </voice>
 </phrase>
 <phrase>

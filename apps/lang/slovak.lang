@@ -7141,7 +7141,7 @@
     *: "Názov"
   </dest>
   <voice>
-    *: ""
+    *: "Názov"
   </voice>
 </phrase>
 <phrase>
@@ -7155,7 +7155,7 @@
     *: "Interprét"
   </dest>
   <voice>
-    *: ""
+    *: "Interprét"
   </voice>
 </phrase>
 <phrase>
@@ -7169,7 +7169,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -7183,7 +7183,7 @@
     *: "Č. Stopy"
   </dest>
   <voice>
-    *: ""
+    *: "Č. Stopy"
   </voice>
 </phrase>
 <phrase>
@@ -7197,7 +7197,7 @@
     *: "Žáner"
   </dest>
   <voice>
-    *: ""
+    *: "Žáner"
   </voice>
 </phrase>
 <phrase>
@@ -7211,7 +7211,7 @@
     *: "Rok"
   </dest>
   <voice>
-    *: ""
+    *: "Rok"
   </voice>
 </phrase>
 <phrase>
@@ -7225,7 +7225,7 @@
     *: "Trvanie"
   </dest>
   <voice>
-    *: ""
+    *: "Trvanie"
   </voice>
 </phrase>
 <phrase>
@@ -7239,7 +7239,7 @@
     *: "Plejlist"
   </dest>
   <voice>
-    *: ""
+    *: "Plejlist"
   </voice>
 </phrase>
 <phrase>
@@ -7253,7 +7253,7 @@
     *: "Počet Bitov"
   </dest>
   <voice>
-    *: ""
+    *: "Počet Bitov"
   </voice>
 </phrase>
 <phrase>
@@ -7267,7 +7267,7 @@
     *: "Interprét Albumu"
   </dest>
   <voice>
-    *: ""
+    *: "Interprét Albumu"
   </voice>
 </phrase>
 <phrase>
@@ -7281,7 +7281,7 @@
     *: "Č. Disku"
   </dest>
   <voice>
-    *: ""
+    *: "Č. Disku"
   </voice>
 </phrase>
 <phrase>
@@ -7295,7 +7295,7 @@
     *: "Komentár"
   </dest>
   <voice>
-    *: ""
+    *: "Komentár"
   </voice>
 </phrase>
 <phrase>
@@ -7309,7 +7309,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7323,7 +7323,7 @@
     *: "Frekvencia"
   </dest>
   <voice>
-    *: ""
+    *: "Frekvencia"
   </voice>
 </phrase>
 <phrase>
@@ -7337,7 +7337,7 @@
     *: "Zosilnenie Stopy"
   </dest>
   <voice>
-    *: ""
+    *: "Zosilnenie Stopy"
   </voice>
 </phrase>
 <phrase>
@@ -7351,7 +7351,7 @@
     *: "Zosilnenie Albumu"
   </dest>
   <voice>
-    *: ""
+    *: "Zosilnenie Albumu"
   </voice>
 </phrase>
 <phrase>
@@ -7365,7 +7365,7 @@
     *: "Cesta"
   </dest>
   <voice>
-    *: ""
+    *: "Cesta"
   </voice>
 </phrase>
 <phrase>
@@ -7379,7 +7379,7 @@
     *: "<Bez Infa>"
   </dest>
   <voice>
-    *: ""
+    *: "Bez Infa"
   </voice>
 </phrase>
 <phrase>
@@ -10045,7 +10045,7 @@
     *: "Práca"
   </dest>
   <voice>
-    *: ""
+    *: "Práca"
   </voice>
 </phrase>
 <phrase>
@@ -12443,7 +12443,7 @@
     *: "Autor"
   </dest>
   <voice>
-    *: ""
+    *: "Autor"
   </voice>
 </phrase>
 <phrase>

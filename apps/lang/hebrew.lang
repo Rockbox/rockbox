@@ -7145,7 +7145,7 @@
     *: "כותרת"
   </dest>
   <voice>
-    *: ""
+    *: "כותרת"
   </voice>
 </phrase>
 <phrase>
@@ -7159,7 +7159,7 @@
     *: "אמן"
   </dest>
   <voice>
-    *: ""
+    *: "אמן"
   </voice>
 </phrase>
 <phrase>
@@ -7173,7 +7173,7 @@
     *: "אלבום"
   </dest>
   <voice>
-    *: ""
+    *: "אלבום"
   </voice>
 </phrase>
 <phrase>
@@ -7187,7 +7187,7 @@
     *: "מספר שיר"
   </dest>
   <voice>
-    *: ""
+    *: "מספר שיר"
   </voice>
 </phrase>
 <phrase>
@@ -7201,7 +7201,7 @@
     *: "סגנון"
   </dest>
   <voice>
-    *: ""
+    *: "סגנון"
   </voice>
 </phrase>
 <phrase>
@@ -7215,7 +7215,7 @@
     *: "שנה"
   </dest>
   <voice>
-    *: ""
+    *: "שנה"
   </voice>
 </phrase>
 <phrase>
@@ -7229,7 +7229,7 @@
     *: "אורך"
   </dest>
   <voice>
-    *: ""
+    *: "אורך"
   </voice>
 </phrase>
 <phrase>
@@ -7243,7 +7243,7 @@
     *: "רשימת שירים"
   </dest>
   <voice>
-    *: ""
+    *: "רשימת שירים"
   </voice>
 </phrase>
 <phrase>
@@ -7257,7 +7257,7 @@
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -7271,7 +7271,7 @@
     *: "אמן האלבום"
   </dest>
   <voice>
-    *: ""
+    *: "אמן האלבום"
   </voice>
 </phrase>
 <phrase>
@@ -7285,7 +7285,7 @@
     *: "מס' דיסק"
   </dest>
   <voice>
-    *: ""
+    *: "מס' דיסק"
   </voice>
 </phrase>
 <phrase>
@@ -7299,7 +7299,7 @@
     *: "הערה"
   </dest>
   <voice>
-    *: ""
+    *: "הערה"
   </voice>
 </phrase>
 <phrase>
@@ -7313,7 +7313,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7327,7 +7327,7 @@
     *: "תדירות"
   </dest>
   <voice>
-    *: ""
+    *: "תדירות"
   </voice>
 </phrase>
 <phrase>
@@ -7341,7 +7341,7 @@
     *: "הגברת שיר"
   </dest>
   <voice>
-    *: ""
+    *: "הגברת שיר"
   </voice>
 </phrase>
 <phrase>
@@ -7355,7 +7355,7 @@
     *: "הגברת אלבום"
   </dest>
   <voice>
-    *: ""
+    *: "הגברת אלבום"
   </voice>
 </phrase>
 <phrase>
@@ -7369,7 +7369,7 @@
     *: "נתיב"
   </dest>
   <voice>
-    *: ""
+    *: "נתיב"
   </voice>
 </phrase>
 <phrase>
@@ -7383,7 +7383,7 @@
     *: "<אין מידע>"
   </dest>
   <voice>
-    *: ""
+    *: "אין מידע"
   </voice>
 </phrase>
 <phrase>
@@ -10048,7 +10048,7 @@
     *: "עבודה"
   </dest>
   <voice>
-    *: ""
+    *: "עבודה"
   </voice>
 </phrase>
 <phrase>
@@ -12375,7 +12375,7 @@
     *: "מלחין"
   </dest>
   <voice>
-    *: ""
+    *: "מלחין"
   </voice>
 </phrase>
 <phrase>

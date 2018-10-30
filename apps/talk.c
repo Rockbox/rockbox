@@ -1191,6 +1191,33 @@ int talk_dir_or_spell(const char* dirname,
 }
 #endif
 
+/* Speak thumbnail for each component of a full path, again falling
+   back or going straight to spelling depending on settings. */
+int talk_fullpath(const char* path, bool enqueue)
+{
+    if (!enqueue)
+        talk_shutup();
+    if(path[0] != '/')
+        /* path ought to start with /... */
+        return talk_spell(path, true);
+    talk_id(VOICE_CHAR_SLASH, true);
+    char buf[MAX_PATH];
+    strlcpy(buf, path, MAX_PATH);
+    char *start = buf+1; /* start of current component */
+    char *ptr = strchr(start, '/'); /* end of current component */
+    while(ptr) { /* There are more slashes ahead */
+        /* temporarily poke a NULL at end of component to truncate string */
+        *ptr = '\0';
+        talk_dir_or_spell(buf, NULL, true);
+        *ptr = '/'; /* restore string */
+        talk_id(VOICE_CHAR_SLASH, true);
+        start = ptr+1; /* setup for next component */
+        ptr = strchr(start, '/');
+    }
+    /* no more slashes, final component is a filename */
+    return talk_file_or_spell(NULL, buf, NULL, true);
+}
+
 /* say a numeric value, this word ordering works for english,
    but not necessarily for other languages (e.g. german) */
 int talk_number(long n, bool enqueue)
@@ -1255,6 +1282,27 @@ int talk_number(long n, bool enqueue)
     }
 
     return 0;
+}
+
+/* Say year like "nineteen ninety nine" instead of "one thousand 9
+   hundred ninety nine". */
+static int talk_year(long year, bool enqueue)
+{
+    int rem;
+    if(year < 1100 || year >=2000)
+        /* just say it as a regular number */
+        return talk_number(year, enqueue);
+    /* Say century */
+    talk_number(year/100, enqueue);
+    rem = year%100;
+    if(rem == 0)
+        /* as in 1900 */
+        return talk_id(VOICE_HUNDRED, true);
+    if(rem <10)
+        /* as in 1905 */
+        talk_id(VOICE_ZERO, true);
+    /* sub-century year */
+    return talk_number(rem, true);
 }
 
 /* Say time duration/interval. Input is time in seconds,
@@ -1349,6 +1397,9 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
     if (!check_audio_status())
         return -1;
 
+    /* special pronounciation for year number */
+    if (unit == UNIT_DATEYEAR)
+        return talk_year(n, enqueue);
     /* special case for time duration */
     if (unit == UNIT_TIME)
         return talk_time_unit(n, enqueue);
@@ -1496,10 +1547,7 @@ void talk_time(const struct tm *tm, bool enqueue)
         /* Voice the time in 24 hour format */
         talk_number(tm->tm_hour, enqueue);
         if (tm->tm_min == 0)
-        {
-            talk_id(VOICE_HUNDRED, true);
-            talk_id(VOICE_HOUR, true);
-        }
+            talk_ids(true, VOICE_HUNDRED, VOICE_HOUR);
         else
         {
             /* Pronounce the leading 0 */

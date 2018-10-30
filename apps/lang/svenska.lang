@@ -7146,7 +7146,7 @@
     *: "Titel"
   </dest>
   <voice>
-    *: ""
+    *: "Titel"
   </voice>
 </phrase>
 <phrase>
@@ -7160,7 +7160,7 @@
     *: "Artist"
   </dest>
   <voice>
-    *: ""
+    *: "Artist"
   </voice>
 </phrase>
 <phrase>
@@ -7174,7 +7174,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -7188,7 +7188,7 @@
     *: "Spårnummer"
   </dest>
   <voice>
-    *: ""
+    *: "Spårnummer"
   </voice>
 </phrase>
 <phrase>
@@ -7202,7 +7202,7 @@
     *: "Genre"
   </dest>
   <voice>
-    *: ""
+    *: "Genre"
   </voice>
 </phrase>
 <phrase>
@@ -7216,7 +7216,7 @@
     *: "År"
   </dest>
   <voice>
-    *: ""
+    *: "År"
   </voice>
 </phrase>
 <phrase>
@@ -7230,7 +7230,7 @@
     *: "Längd"
   </dest>
   <voice>
-    *: ""
+    *: "Längd"
   </voice>
 </phrase>
 <phrase>
@@ -7244,7 +7244,7 @@
     *: "Spellista"
   </dest>
   <voice>
-    *: ""
+    *: "Spellista"
   </voice>
 </phrase>
 <phrase>
@@ -7258,7 +7258,7 @@
     *: "Datahastighet"
   </dest>
   <voice>
-    *: ""
+    *: "Datahastighet"
   </voice>
 </phrase>
 <phrase>
@@ -7272,7 +7272,7 @@
     *: "Albumartist"
   </dest>
   <voice>
-    *: ""
+    *: "Albumartist"
   </voice>
 </phrase>
 <phrase>
@@ -7286,7 +7286,7 @@
     *: "Skivnummer"
   </dest>
   <voice>
-    *: ""
+    *: "Skivnummer"
   </voice>
 </phrase>
 <phrase>
@@ -7300,7 +7300,7 @@
     *: "Kommentar"
   </dest>
   <voice>
-    *: ""
+    *: "Kommentar"
   </voice>
 </phrase>
 <phrase>
@@ -7314,7 +7314,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7328,7 +7328,7 @@
     *: "Frekvens"
   </dest>
   <voice>
-    *: ""
+    *: "Frekvens"
   </voice>
 </phrase>
 <phrase>
@@ -7342,7 +7342,7 @@
     *: "Spårvolymutjämning"
   </dest>
   <voice>
-    *: ""
+    *: "Spårvolymutjämning"
   </voice>
 </phrase>
 <phrase>
@@ -7356,7 +7356,7 @@
     *: "Albumvolymutjämning"
   </dest>
   <voice>
-    *: ""
+    *: "Albumvolymutjämning"
   </voice>
 </phrase>
 <phrase>
@@ -7370,7 +7370,7 @@
     *: "Sökväg"
   </dest>
   <voice>
-    *: ""
+    *: "Sökväg"
   </voice>
 </phrase>
 <phrase>
@@ -7384,7 +7384,7 @@
     *: "<Saknas>"
   </dest>
   <voice>
-    *: ""
+    *: "Saknas"
   </voice>
 </phrase>
 <phrase>
@@ -10049,7 +10049,7 @@
     *: "Verk"
   </dest>
   <voice>
-    *: ""
+    *: "Verk"
   </voice>
 </phrase>
 <phrase>
@@ -12447,7 +12447,7 @@
     *: "Kompositör"
   </dest>
   <voice>
-    *: ""
+    *: "Kompositör"
   </voice>
 </phrase>
 <phrase>

@@ -3598,7 +3598,7 @@
     *: "Heiti"
   </dest>
   <voice>
-    *: ""
+    *: "Heiti"
   </voice>
 </phrase>
 <phrase>
@@ -3612,7 +3612,7 @@
     *: "Listamaður"
   </dest>
   <voice>
-    *: ""
+    *: "Listamaður"
   </voice>
 </phrase>
 <phrase>
@@ -3626,7 +3626,7 @@
     *: "Hljómplata"
   </dest>
   <voice>
-    *: ""
+    *: "Hljómplata"
   </voice>
 </phrase>
 <phrase>
@@ -3640,7 +3640,7 @@
     *: "Lagnúmer"
   </dest>
   <voice>
-    *: ""
+    *: "Lagnúmer"
   </voice>
 </phrase>
 <phrase>
@@ -3654,7 +3654,7 @@
     *: "Tegund"
   </dest>
   <voice>
-    *: ""
+    *: "Tegund"
   </voice>
 </phrase>
 <phrase>
@@ -3668,7 +3668,7 @@
     *: "Ár"
   </dest>
   <voice>
-    *: ""
+    *: "Ár"
   </voice>
 </phrase>
 <phrase>
@@ -3682,7 +3682,7 @@
     *: "Lagalisti"
   </dest>
   <voice>
-    *: ""
+    *: "Lagalisti"
   </voice>
 </phrase>
 <phrase>
@@ -3696,7 +3696,7 @@
     *: "Gæði"
   </dest>
   <voice>
-    *: ""
+    *: "Gæði"
   </voice>
 </phrase>
 <phrase>
@@ -3710,7 +3710,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -3724,7 +3724,7 @@
     *: "Tíðni"
   </dest>
   <voice>
-    *: ""
+    *: "Tíðni"
   </voice>
 </phrase>
 <phrase>
@@ -3738,7 +3738,7 @@
     *: "Lag hækkun"
   </dest>
   <voice>
-    *: ""
+    *: "Lag hækkun"
   </voice>
 </phrase>
 <phrase>
@@ -3752,7 +3752,7 @@
     *: "Albúmaðlögun"
   </dest>
   <voice>
-    *: ""
+    *: "Albúmaðlögun"
   </voice>
 </phrase>
 <phrase>
@@ -3766,7 +3766,7 @@
     *: "Slóð"
   </dest>
   <voice>
-    *: ""
+    *: "Slóð"
   </voice>
 </phrase>
 <phrase>
@@ -3780,7 +3780,7 @@
     *: "<Engar uppl.>"
   </dest>
   <voice>
-    *: ""
+    *: "Engar uppl."
   </voice>
 </phrase>
 <phrase>

@@ -7143,7 +7143,7 @@
     *: "曲名"
   </dest>
   <voice>
-    *: ""
+    *: "曲名"
   </voice>
 </phrase>
 <phrase>
@@ -7157,7 +7157,7 @@
     *: "アーティスト"
   </dest>
   <voice>
-    *: ""
+    *: "アーティスト"
   </voice>
 </phrase>
 <phrase>
@@ -7171,7 +7171,7 @@
     *: "アルバム"
   </dest>
   <voice>
-    *: ""
+    *: "アルバム"
   </voice>
 </phrase>
 <phrase>
@@ -7185,7 +7185,7 @@
     *: "トラック"
   </dest>
   <voice>
-    *: ""
+    *: "トラック"
   </voice>
 </phrase>
 <phrase>
@@ -7199,7 +7199,7 @@
     *: "ジャンル"
   </dest>
   <voice>
-    *: ""
+    *: "ジャンル"
   </voice>
 </phrase>
 <phrase>
@@ -7213,7 +7213,7 @@
     *: "年"
   </dest>
   <voice>
-    *: ""
+    *: "年"
   </voice>
 </phrase>
 <phrase>
@@ -7227,7 +7227,7 @@
     *: "長さ"
   </dest>
   <voice>
-    *: ""
+    *: "長さ"
   </voice>
 </phrase>
 <phrase>
@@ -7241,7 +7241,7 @@
     *: "プレイリスト"
   </dest>
   <voice>
-    *: ""
+    *: "プレイリスト"
   </voice>
 </phrase>
 <phrase>
@@ -7255,7 +7255,7 @@
     *: "ビットレート"
   </dest>
   <voice>
-    *: ""
+    *: "ビットレート"
   </voice>
 </phrase>
 <phrase>
@@ -7269,7 +7269,7 @@
     *: "アルバムアーティスト"
   </dest>
   <voice>
-    *: ""
+    *: "アルバムアーティスト"
   </voice>
 </phrase>
 <phrase>
@@ -7283,7 +7283,7 @@
     *: "ディスク"
   </dest>
   <voice>
-    *: ""
+    *: "ディスク"
   </voice>
 </phrase>
 <phrase>
@@ -7297,7 +7297,7 @@
     *: "コメント"
   </dest>
   <voice>
-    *: ""
+    *: "コメント"
   </voice>
 </phrase>
 <phrase>
@@ -7311,7 +7311,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7325,7 +7325,7 @@
     *: "周波数"
   </dest>
   <voice>
-    *: ""
+    *: "周波数"
   </voice>
 </phrase>
 <phrase>
@@ -7339,7 +7339,7 @@
     *: "トラックゲイン"
   </dest>
   <voice>
-    *: ""
+    *: "トラックゲイン"
   </voice>
 </phrase>
 <phrase>
@@ -7353,7 +7353,7 @@
     *: "アルバムゲイン"
   </dest>
   <voice>
-    *: ""
+    *: "アルバムゲイン"
   </voice>
 </phrase>
 <phrase>
@@ -7367,7 +7367,7 @@
     *: "パス"
   </dest>
   <voice>
-    *: ""
+    *: "パス"
   </voice>
 </phrase>
 <phrase>
@@ -7381,7 +7381,7 @@
     *: "<情報無し>"
   </dest>
   <voice>
-    *: ""
+    *: "情報無し"
   </voice>
 </phrase>
 <phrase>
@@ -10047,7 +10047,7 @@
     *: "ワーク"
   </dest>
   <voice>
-    *: ""
+    *: "ワーク"
   </voice>
 </phrase>
 <phrase>
@@ -12445,7 +12445,7 @@
     *: "作曲者"
   </dest>
   <voice>
-    *: ""
+    *: "作曲者"
   </voice>
 </phrase>
 <phrase>

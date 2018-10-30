@@ -4803,7 +4803,7 @@
     *: "Kappale"
   </dest>
   <voice>
-    *: ""
+    *: "Kappale"
   </voice>
 </phrase>
 <phrase>
@@ -4817,7 +4817,7 @@
     *: "Esittäjä"
   </dest>
   <voice>
-    *: ""
+    *: "Esittäjä"
   </voice>
 </phrase>
 <phrase>
@@ -4831,7 +4831,7 @@
     *: "Albumi"
   </dest>
   <voice>
-    *: ""
+    *: "Albumi"
   </voice>
 </phrase>
 <phrase>
@@ -4845,7 +4845,7 @@
     *: "Kappalenro"
   </dest>
   <voice>
-    *: ""
+    *: "Kappalenro"
   </voice>
 </phrase>
 <phrase>
@@ -4859,7 +4859,7 @@
     *: "Tyylilaji"
   </dest>
   <voice>
-    *: ""
+    *: "Tyylilaji"
   </voice>
 </phrase>
 <phrase>
@@ -4873,7 +4873,7 @@
     *: "Vuosi"
   </dest>
   <voice>
-    *: ""
+    *: "Vuosi"
   </voice>
 </phrase>
 <phrase>
@@ -4887,7 +4887,7 @@
     *: "Pituus"
   </dest>
   <voice>
-    *: ""
+    *: "Pituus"
   </voice>
 </phrase>
 <phrase>
@@ -4901,7 +4901,7 @@
     *: "Soittolista"
   </dest>
   <voice>
-    *: ""
+    *: "Soittolista"
   </voice>
 </phrase>
 <phrase>
@@ -4915,7 +4915,7 @@
     *: "Bittinopeus"
   </dest>
   <voice>
-    *: ""
+    *: "Bittinopeus"
   </voice>
 </phrase>
 <phrase>
@@ -4929,7 +4929,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -4943,7 +4943,7 @@
     *: "Taajuus"
   </dest>
   <voice>
-    *: ""
+    *: "Taajuus"
   </voice>
 </phrase>
 <phrase>
@@ -4957,7 +4957,7 @@
     *: "Kappalevahvistus"
   </dest>
   <voice>
-    *: ""
+    *: "Kappalevahvistus"
   </voice>
 </phrase>
 <phrase>
@@ -4971,7 +4971,7 @@
     *: "Albumivahvistus"
   </dest>
   <voice>
-    *: ""
+    *: "Albumivahvistus"
   </voice>
 </phrase>
 <phrase>
@@ -4985,7 +4985,7 @@
     *: "Polku"
   </dest>
   <voice>
-    *: ""
+    *: "Polku"
   </voice>
 </phrase>
 <phrase>
@@ -4999,7 +4999,7 @@
     *: "<Ei tietoja>"
   </dest>
   <voice>
-    *: ""
+    *: "Ei tietoja"
   </voice>
 </phrase>
 <phrase>
@@ -8875,7 +8875,7 @@
     *: "Albumin esittäjä"
   </dest>
   <voice>
-    *: ""
+    *: "Albumin esittäjä"
   </voice>
 </phrase>
 <phrase>
@@ -8889,7 +8889,7 @@
     *: "Kommentti"
   </dest>
   <voice>
-    *: ""
+    *: "Kommentti"
   </voice>
 </phrase>
 <phrase>
@@ -9866,7 +9866,7 @@
     *: "Levynro"
   </dest>
   <voice>
-    *: ""
+    *: "Levynro"
   </voice>
 </phrase>
 <phrase>
@@ -10037,7 +10037,7 @@
     *: "Työ"
   </dest>
   <voice>
-    *: ""
+    *: "Työ"
   </voice>
 </phrase>
 <phrase>
@@ -12459,7 +12459,7 @@
     *: "Säveltäjä"
   </dest>
   <voice>
-    *: ""
+    *: "Säveltäjä"
   </voice>
 </phrase>
 <phrase>

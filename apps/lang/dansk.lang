@@ -4049,7 +4049,7 @@
     *: "Titel"
   </dest>
   <voice>
-    *: ""
+    *: "Titel"
   </voice>
 </phrase>
 <phrase>
@@ -4063,7 +4063,7 @@
     *: "Kunstner"
   </dest>
   <voice>
-    *: ""
+    *: "Kunstner"
   </voice>
 </phrase>
 <phrase>
@@ -4077,7 +4077,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -4091,7 +4091,7 @@
     *: "Sangnummer"
   </dest>
   <voice>
-    *: ""
+    *: "Sangnummer"
   </voice>
 </phrase>
 <phrase>
@@ -4105,7 +4105,7 @@
     *: "Genre"
   </dest>
   <voice>
-    *: ""
+    *: "Genre"
   </voice>
 </phrase>
 <phrase>
@@ -4119,7 +4119,7 @@
     *: "År"
   </dest>
   <voice>
-    *: ""
+    *: "År"
   </voice>
 </phrase>
 <phrase>
@@ -4133,7 +4133,7 @@
     *: "Sætliste"
   </dest>
   <voice>
-    *: ""
+    *: "Sætliste"
   </voice>
 </phrase>
 <phrase>
@@ -4147,7 +4147,7 @@
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -4161,7 +4161,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -4175,7 +4175,7 @@
     *: "Frekvens"
   </dest>
   <voice>
-    *: ""
+    *: "Frekvens"
   </voice>
 </phrase>
 <phrase>
@@ -4189,7 +4189,7 @@
     *: "Sang lydstyrke"
   </dest>
   <voice>
-    *: ""
+    *: "Sang lydstyrke"
   </voice>
 </phrase>
 <phrase>
@@ -4203,7 +4203,7 @@
     *: "Album lydstyrke"
   </dest>
   <voice>
-    *: ""
+    *: "Album lydstyrke"
   </voice>
 </phrase>
 <phrase>
@@ -4217,7 +4217,7 @@
     *: "Sti"
   </dest>
   <voice>
-    *: ""
+    *: "Sti"
   </voice>
 </phrase>
 <phrase>
@@ -4231,7 +4231,7 @@
     *: "<Ingen info>"
   </dest>
   <voice>
-    *: ""
+    *: "Ingen info"
   </voice>
 </phrase>
 <phrase>
@@ -7058,7 +7058,7 @@
     *: "Længde"
   </dest>
   <voice>
-    *: ""
+    *: "Længde"
   </voice>
 </phrase>
 <phrase>
@@ -8448,7 +8448,7 @@
     *: "Kommentar"
   </dest>
   <voice>
-    *: ""
+    *: "Kommentar"
   </voice>
 </phrase>
 <phrase>
@@ -9040,7 +9040,7 @@
     *: "Album kunstner"
   </dest>
   <voice>
-    *: ""
+    *: "Album kunstner"
   </voice>
 </phrase>
 <phrase>
@@ -9285,7 +9285,7 @@
     *: "Disc nummer"
   </dest>
   <voice>
-    *: ""
+    *: "Disc nummer"
   </voice>
 </phrase>
 <phrase>
@@ -9886,7 +9886,7 @@
     *: "Værk"
   </dest>
   <voice>
-    *: ""
+    *: "Værk"
   </voice>
 </phrase>
 <phrase>
@@ -12390,7 +12390,7 @@
     *: "Komponist"
   </dest>
   <voice>
-    *: ""
+    *: "Komponist"
   </voice>
 </phrase>
 <phrase>

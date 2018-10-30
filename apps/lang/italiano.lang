@@ -7143,7 +7143,7 @@ desc: deprecated
     *: "Titolo"
   </dest>
   <voice>
-    *: ""
+    *: "Titolo"
   </voice>
 </phrase>
 <phrase>
@@ -7157,7 +7157,7 @@ desc: deprecated
     *: "Artista"
   </dest>
   <voice>
-    *: ""
+    *: "Artista"
   </voice>
 </phrase>
 <phrase>
@@ -7171,7 +7171,7 @@ desc: deprecated
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -7185,7 +7185,7 @@ desc: deprecated
     *: "Numero traccia"
   </dest>
   <voice>
-    *: ""
+    *: "Numero traccia"
   </voice>
 </phrase>
 <phrase>
@@ -7199,7 +7199,7 @@ desc: deprecated
     *: "Genere"
   </dest>
   <voice>
-    *: ""
+    *: "Genere"
   </voice>
 </phrase>
 <phrase>
@@ -7213,7 +7213,7 @@ desc: deprecated
     *: "Anno"
   </dest>
   <voice>
-    *: ""
+    *: "Anno"
   </voice>
 </phrase>
 <phrase>
@@ -7227,7 +7227,7 @@ desc: deprecated
     *: "Lunghezza"
   </dest>
   <voice>
-    *: ""
+    *: "Lunghezza"
   </voice>
 </phrase>
 <phrase>
@@ -7241,7 +7241,7 @@ desc: deprecated
     *: "Playlist"
   </dest>
   <voice>
-    *: ""
+    *: "Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -7255,7 +7255,7 @@ desc: deprecated
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -7269,7 +7269,7 @@ desc: deprecated
     *: "Album Artista"
   </dest>
   <voice>
-    *: ""
+    *: "Album Artista"
   </voice>
 </phrase>
 <phrase>
@@ -7283,7 +7283,7 @@ desc: deprecated
     *: "Discnum"
   </dest>
   <voice>
-    *: ""
+    *: "Discnum"
   </voice>
 </phrase>
 <phrase>
@@ -7297,7 +7297,7 @@ desc: deprecated
     *: "Commento"
   </dest>
   <voice>
-    *: ""
+    *: "Commento"
   </voice>
 </phrase>
 <phrase>
@@ -7311,7 +7311,7 @@ desc: deprecated
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7325,7 +7325,7 @@ desc: deprecated
     *: "Frequenza"
   </dest>
   <voice>
-    *: ""
+    *: "Frequenza"
   </voice>
 </phrase>
 <phrase>
@@ -7339,7 +7339,7 @@ desc: deprecated
     *: "Guadagno Traccia"
   </dest>
   <voice>
-    *: ""
+    *: "Guadagno Traccia"
   </voice>
 </phrase>
 <phrase>
@@ -7353,7 +7353,7 @@ desc: deprecated
     *: "Guadagno Album"
   </dest>
   <voice>
-    *: ""
+    *: "Guadagno Album"
   </voice>
 </phrase>
 <phrase>
@@ -7367,7 +7367,7 @@ desc: deprecated
     *: "Percorso"
   </dest>
   <voice>
-    *: ""
+    *: "Percorso"
   </voice>
 </phrase>
 <phrase>
@@ -7381,7 +7381,7 @@ desc: deprecated
     *: "<No Info>"
   </dest>
   <voice>
-    *: ""
+    *: "No Info"
   </voice>
 </phrase>
 <phrase>
@@ -10047,7 +10047,7 @@ desc: deprecated
     *: "Lavoro"
   </dest>
   <voice>
-    *: ""
+    *: "Lavoro"
   </voice>
 </phrase>
 <phrase>
@@ -12445,7 +12445,7 @@ desc: deprecated
     *: "Compositore"
   </dest>
   <voice>
-    *: ""
+    *: "Compositore"
   </voice>
 </phrase>
 <phrase>

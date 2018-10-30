@@ -4819,7 +4819,7 @@
     *: "제목"
   </dest>
   <voice>
-    *: ""
+    *: "제목"
   </voice>
 </phrase>
 <phrase>
@@ -4833,7 +4833,7 @@
     *: "음악가"
   </dest>
   <voice>
-    *: ""
+    *: "음악가"
   </voice>
 </phrase>
 <phrase>
@@ -4847,7 +4847,7 @@
     *: "앨범"
   </dest>
   <voice>
-    *: ""
+    *: "앨범"
   </voice>
 </phrase>
 <phrase>
@@ -4861,7 +4861,7 @@
     *: "트랙 번호"
   </dest>
   <voice>
-    *: ""
+    *: "트랙 번호"
   </voice>
 </phrase>
 <phrase>
@@ -4875,7 +4875,7 @@
     *: "장르"
   </dest>
   <voice>
-    *: ""
+    *: "장르"
   </voice>
 </phrase>
 <phrase>
@@ -4889,7 +4889,7 @@
     *: "연도"
   </dest>
   <voice>
-    *: ""
+    *: "연도"
   </voice>
 </phrase>
 <phrase>
@@ -4903,7 +4903,7 @@
     *: "길이"
   </dest>
   <voice>
-    *: ""
+    *: "길이"
   </voice>
 </phrase>
 <phrase>
@@ -4917,7 +4917,7 @@
     *: "재생순서"
   </dest>
   <voice>
-    *: ""
+    *: "재생순서"
   </voice>
 </phrase>
 <phrase>
@@ -4931,7 +4931,7 @@
     *: "비트 전송률"
   </dest>
   <voice>
-    *: ""
+    *: "비트 전송률"
   </voice>
 </phrase>
 <phrase>
@@ -4945,7 +4945,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -4959,7 +4959,7 @@
     *: "오디오 샘플 속도"
   </dest>
   <voice>
-    *: ""
+    *: "오디오 샘플 속도"
   </voice>
 </phrase>
 <phrase>
@@ -4973,7 +4973,7 @@
     *: "트랙 게인"
   </dest>
   <voice>
-    *: ""
+    *: "트랙 게인"
   </voice>
 </phrase>
 <phrase>
@@ -4987,7 +4987,7 @@
     *: "앨범 게인"
   </dest>
   <voice>
-    *: ""
+    *: "앨범 게인"
   </voice>
 </phrase>
 <phrase>
@@ -5001,7 +5001,7 @@
     *: "파일 위치"
   </dest>
   <voice>
-    *: ""
+    *: "파일 위치"
   </voice>
 </phrase>
 <phrase>
@@ -8887,7 +8887,7 @@
     *: "앨범 음악가"
   </dest>
   <voice>
-    *: ""
+    *: "앨범 음악가"
   </voice>
 </phrase>
 <phrase>
@@ -8901,7 +8901,7 @@
     *: "설명"
   </dest>
   <voice>
-    *: ""
+    *: "설명"
   </voice>
 </phrase>
 <phrase>
@@ -9376,7 +9376,7 @@
     *: "<정보 없음>"
   </dest>
   <voice>
-    *: ""
+    *: "정보 없음"
   </voice>
 </phrase>
 <phrase>
@@ -10187,7 +10187,7 @@
     *: "작업"
   </dest>
   <voice>
-    *: ""
+    *: "작업"
   </voice>
 </phrase>
 <phrase>
@@ -10396,7 +10396,7 @@
     *: "디스크 번호"
   </dest>
   <voice>
-    *: ""
+    *: "디스크 번호"
   </voice>
 </phrase>
 <phrase>

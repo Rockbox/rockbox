@@ -573,6 +573,17 @@ static const char* openwith_get_name(int selected_item, void * data,
     else return filetypes[viewers[selected_item]].plugin;
 }
 
+static int openwith_get_talk(int selected_item, void * data)
+{
+    (void)data;
+    char viewer_filename[MAX_FILENAME];
+    snprintf(viewer_filename, MAX_FILENAME, "%s.%s",
+             filetypes[viewers[selected_item]].plugin, ROCK_EXTENSION);
+    talk_file_or_spell(PLUGIN_DIR, viewer_filename,
+                       NULL, false);
+    return 0;
+}
+
 static int openwith_action_callback(int action, struct gui_synclist *lists)
 {
     struct cb_data *info = (struct cb_data *)lists->data;
@@ -596,8 +607,7 @@ int filetype_list_viewers(const char* current_file)
 #ifndef HAVE_LCD_BITMAP
     if (viewer_count == 0)
     {
-        /* FIX: translation! */
-        splash(HZ*2, "No viewers found");
+        splash(HZ*2, ID2P(LANG_NO_VIEWERS));
         return PLUGIN_OK;
     }
 #endif
@@ -605,6 +615,7 @@ int filetype_list_viewers(const char* current_file)
     info.action_callback = openwith_action_callback;
     info.get_name = openwith_get_name;
     info.get_icon = global_settings.show_icons?openwith_get_icon:NULL;
+    info.get_talk = openwith_get_talk;
     return simplelist_show_list(&info);
 }
 

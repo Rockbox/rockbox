@@ -2493,7 +2493,7 @@
     *: "Adi"
   </dest>
   <voice>
-    *: ""
+    *: "Adi"
   </voice>
 </phrase>
 <phrase>
@@ -2507,7 +2507,7 @@
     *: "Sanatci"
   </dest>
   <voice>
-    *: ""
+    *: "Sanatci"
   </voice>
 </phrase>
 <phrase>
@@ -2521,7 +2521,7 @@
     *: "Sarki no"
   </dest>
   <voice>
-    *: ""
+    *: "Sarki no"
   </voice>
 </phrase>
 <phrase>
@@ -2535,7 +2535,7 @@
     *: "Sarki Listesi"
   </dest>
   <voice>
-    *: ""
+    *: "Sarki Listesi"
   </voice>
 </phrase>
 <phrase>
@@ -2549,7 +2549,7 @@
     *: "Frekans"
   </dest>
   <voice>
-    *: ""
+    *: "Frekans"
   </voice>
 </phrase>
 <phrase>
@@ -2563,7 +2563,7 @@
     *: "YOL"
   </dest>
   <voice>
-    *: ""
+    *: "YOL"
   </voice>
 </phrase>
 <phrase>
@@ -3057,7 +3057,7 @@
     *: "Çalış"
   </dest>
   <voice>
-    *: ""
+    *: "Çalış"
   </voice>
 </phrase>
 <phrase>

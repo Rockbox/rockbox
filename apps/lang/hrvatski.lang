@@ -7137,7 +7137,7 @@
     *: "Naslov"
   </dest>
   <voice>
-    *: ""
+    *: "Naslov"
   </voice>
 </phrase>
 <phrase>
@@ -7151,7 +7151,7 @@
     *: "Izvođač"
   </dest>
   <voice>
-    *: ""
+    *: "Izvođač"
   </voice>
 </phrase>
 <phrase>
@@ -7165,7 +7165,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -7179,7 +7179,7 @@
     *: "Br. pjesme"
   </dest>
   <voice>
-    *: ""
+    *: "Br. pjesme"
   </voice>
 </phrase>
 <phrase>
@@ -7193,7 +7193,7 @@
     *: "Žanr"
   </dest>
   <voice>
-    *: ""
+    *: "Žanr"
   </voice>
 </phrase>
 <phrase>
@@ -7207,7 +7207,7 @@
     *: "Godina"
   </dest>
   <voice>
-    *: ""
+    *: "Godina"
   </voice>
 </phrase>
 <phrase>
@@ -7221,7 +7221,7 @@
     *: "Dužina"
   </dest>
   <voice>
-    *: ""
+    *: "Dužina"
   </voice>
 </phrase>
 <phrase>
@@ -7235,7 +7235,7 @@
     *: "Popis izvođenja"
   </dest>
   <voice>
-    *: ""
+    *: "Popis izvođenja"
   </voice>
 </phrase>
 <phrase>
@@ -7249,7 +7249,7 @@
     *: "Protok bitova"
   </dest>
   <voice>
-    *: ""
+    *: "Protok bitova"
   </voice>
 </phrase>
 <phrase>
@@ -7263,7 +7263,7 @@
     *: "Izvođač albuma"
   </dest>
   <voice>
-    *: ""
+    *: "Izvođač albuma"
   </voice>
 </phrase>
 <phrase>
@@ -7277,7 +7277,7 @@
     *: "Br. diska"
   </dest>
   <voice>
-    *: ""
+    *: "Br. diska"
   </voice>
 </phrase>
 <phrase>
@@ -7291,7 +7291,7 @@
     *: "Komentar"
   </dest>
   <voice>
-    *: ""
+    *: "Komentar"
   </voice>
 </phrase>
 <phrase>
@@ -7305,7 +7305,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7319,7 +7319,7 @@
     *: "Frekvencija"
   </dest>
   <voice>
-    *: ""
+    *: "Frekvencija"
   </voice>
 </phrase>
 <phrase>
@@ -7333,7 +7333,7 @@
     *: "Ujednačenje glasnoće pjesme"
   </dest>
   <voice>
-    *: ""
+    *: "Ujednačenje glasnoće pjesme"
   </voice>
 </phrase>
 <phrase>
@@ -7347,7 +7347,7 @@
     *: "Ujednačenje glasnoće albuma"
   </dest>
   <voice>
-    *: ""
+    *: "Ujednačenje glasnoće albuma"
   </voice>
 </phrase>
 <phrase>
@@ -7361,7 +7361,7 @@
     *: "Putanja"
   </dest>
   <voice>
-    *: ""
+    *: "Putanja"
   </voice>
 </phrase>
 <phrase>
@@ -7375,7 +7375,7 @@
     *: "<Nema informacija>"
   </dest>
   <voice>
-    *: ""
+    *: "Nema informacija"
   </voice>
 </phrase>
 <phrase>
@@ -10040,7 +10040,7 @@
     *: "Posao"
   </dest>
   <voice>
-    *: ""
+    *: "Posao"
   </voice>
 </phrase>
 <phrase>
@@ -12434,7 +12434,7 @@
     *: "Skladatelj"
   </dest>
   <voice>
-    *: ""
+    *: "Skladatelj"
   </voice>
 </phrase>
 <phrase>

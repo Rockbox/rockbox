@@ -7139,7 +7139,7 @@
     *: "Titulua"
   </dest>
   <voice>
-    *: ""
+    *: "Titulua"
   </voice>
 </phrase>
 <phrase>
@@ -7153,7 +7153,7 @@
     *: "Artista"
   </dest>
   <voice>
-    *: ""
+    *: "Artista"
   </voice>
 </phrase>
 <phrase>
@@ -7167,7 +7167,7 @@
     *: "Albuma"
   </dest>
   <voice>
-    *: ""
+    *: "Albuma"
   </voice>
 </phrase>
 <phrase>
@@ -7181,7 +7181,7 @@
     *: "Abesti Zk"
   </dest>
   <voice>
-    *: ""
+    *: "Abesti Zk"
   </voice>
 </phrase>
 <phrase>
@@ -7195,7 +7195,7 @@
     *: "Mota"
   </dest>
   <voice>
-    *: ""
+    *: "Mota"
   </voice>
 </phrase>
 <phrase>
@@ -7209,7 +7209,7 @@
     *: "Urtea"
   </dest>
   <voice>
-    *: ""
+    *: "Urtea"
   </voice>
 </phrase>
 <phrase>
@@ -7223,7 +7223,7 @@
     *: "Iraupena"
   </dest>
   <voice>
-    *: ""
+    *: "Iraupena"
   </voice>
 </phrase>
 <phrase>
@@ -7237,7 +7237,7 @@
     *: "Zerrendan"
   </dest>
   <voice>
-    *: ""
+    *: "Zerrendan"
   </voice>
 </phrase>
 <phrase>
@@ -7251,7 +7251,7 @@
     *: "Bit-tasa"
   </dest>
   <voice>
-    *: ""
+    *: "Bit-tasa"
   </voice>
 </phrase>
 <phrase>
@@ -7265,7 +7265,7 @@
     *: "Albuma Artista"
   </dest>
   <voice>
-    *: ""
+    *: "Albuma Artista"
   </voice>
 </phrase>
 <phrase>
@@ -7279,7 +7279,7 @@
     *: "Disko Zk"
   </dest>
   <voice>
-    *: ""
+    *: "Disko Zk"
   </voice>
 </phrase>
 <phrase>
@@ -7293,7 +7293,7 @@
     *: "Iruzkina"
   </dest>
   <voice>
-    *: ""
+    *: "Iruzkina"
   </voice>
 </phrase>
 <phrase>
@@ -7307,7 +7307,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7321,7 +7321,7 @@
     *: "Frekuentzia"
   </dest>
   <voice>
-    *: ""
+    *: "Frekuentzia"
   </voice>
 </phrase>
 <phrase>
@@ -7335,7 +7335,7 @@
     *: "Abesti Irabazia"
   </dest>
   <voice>
-    *: ""
+    *: "Abesti Irabazia"
   </voice>
 </phrase>
 <phrase>
@@ -7349,7 +7349,7 @@
     *: "Album Irabazia"
   </dest>
   <voice>
-    *: ""
+    *: "Album Irabazia"
   </voice>
 </phrase>
 <phrase>
@@ -7363,7 +7363,7 @@
     *: "Kokapena"
   </dest>
   <voice>
-    *: ""
+    *: "Kokapena"
   </voice>
 </phrase>
 <phrase>
@@ -7377,7 +7377,7 @@
     *: "<Info Gabe>"
   </dest>
   <voice>
-    *: ""
+    *: "Info Gabe"
   </voice>
 </phrase>
 <phrase>
@@ -10043,7 +10043,7 @@
     *: "Lana"
   </dest>
   <voice>
-    *: ""
+    *: "Lana"
   </voice>
 </phrase>
 <phrase>
@@ -12441,7 +12441,7 @@
     *: "Konposatzailea"
   </dest>
   <voice>
-    *: ""
+    *: "Konposatzailea"
   </voice>
 </phrase>
 <phrase>
