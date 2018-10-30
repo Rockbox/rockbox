@@ -271,6 +271,19 @@ static bool write_bookmark(bool create_bookmark_file, const char *bookmark)
     return ret;
 }
 
+/* Get the name of the playlist and the name of the track from a bookmark. */
+/* Returns true iff both were extracted.                                   */
+static bool get_playlist_and_track(const char *bookmark, char **pl_start,
+                  char **pl_end, char **track)
+{
+    *pl_start = strchr(bookmark,'/');
+    if (!(*pl_start))
+        return false;
+    *pl_end = strrchr(bookmark,';');
+    *track = *pl_end + 1;
+    return true;
+}
+
 /* ----------------------------------------------------------------------- */
 /* This function adds a bookmark to a file.                                */
 /* Returns true on successful bookmark add.                                */
@@ -281,11 +294,13 @@ static bool add_bookmark(const char* bookmark_file_name, const char* bookmark,
     int    temp_bookmark_file = 0;
     int    bookmark_file = 0;
     int    bookmark_count = 0;
-    char*  playlist = NULL;
-    char*  cp;
-    char*  tmp;
-    int    len = 0;
-    bool   unique = false;
+    char   *pl_start = NULL, *bm_pl_start;
+    char   *pl_end = NULL, *bm_pl_end;
+    int    pl_len = 0, bm_pl_len;
+    char   *track = NULL, *bm_track;
+    bool   comp_playlist = false;
+    bool   comp_track = false;
+    bool   equal;
 
     /* Opening up a temp bookmark file */
     snprintf(global_temp_buffer, sizeof(global_temp_buffer),
@@ -295,12 +310,16 @@ static bool add_bookmark(const char* bookmark_file_name, const char* bookmark,
     if (temp_bookmark_file < 0)
         return false; /* can't open the temp file */
 
-    if (most_recent && (global_settings.usemrb == BOOKMARK_UNIQUE_ONLY))
+    if (most_recent && ((global_settings.usemrb == BOOKMARK_ONE_PER_PLAYLIST)
+                      || (global_settings.usemrb == BOOKMARK_ONE_PER_TRACK)))
     {
-        playlist = strchr(bookmark,'/');
-        cp = strrchr(bookmark,';');
-        len = cp - playlist;
-        unique = true;
+        if (get_playlist_and_track(bookmark, &pl_start, &pl_end, &track))
+        {
+            comp_playlist = true;
+            pl_len = pl_end - pl_start;
+            if (global_settings.usemrb == BOOKMARK_ONE_PER_TRACK)
+                comp_track = true;
+        }
     }
 
     /* Writing the new bookmark to the begining of the temp file */
@@ -319,11 +338,23 @@ static bool add_bookmark(const char* bookmark_file_name, const char* bookmark,
             /* This keeps it from getting too large */
             if (most_recent && (bookmark_count >= MAX_BOOKMARKS))
                 break;
-                        
-            cp  = strchr(global_read_buffer,'/');
-            tmp = strrchr(global_read_buffer,';');
-            if (parse_bookmark(global_read_buffer, false) &&
-               (!unique || len != tmp -cp || strncmp(playlist,cp,len)))
+
+            if (!parse_bookmark(global_read_buffer, false))
+                break;
+
+            equal = false;
+            if (comp_playlist)
+            {
+                if (get_playlist_and_track(global_read_buffer, &bm_pl_start,
+                        &bm_pl_end, &bm_track))
+                {
+                    bm_pl_len = bm_pl_end - bm_pl_start;
+                    equal = (pl_len == bm_pl_len) && !strncmp(pl_start, bm_pl_start, pl_len);
+                    if (equal && comp_track)
+                        equal = !strcmp(track, bm_track);
+                }
+            }
+            if (!equal)
             {
                 bookmark_count++;
                 write(temp_bookmark_file, global_read_buffer,

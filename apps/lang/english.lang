@@ -4737,16 +4737,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: Save only on bookmark for each playlist in recent bookmarks
+  desc: deprecated
   user: core
   <source>
-    *: "Unique only"
+    *: ""
   </source>
   <dest>
-    *: "Unique only"
+    *: ""
   </dest>
   <voice>
-    *: "Unique only"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13687,5 +13687,33 @@
   </dest>
   <voice>
     *: "gibibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
+  desc: Save only one bookmark for a playlist in recent bookmarks
+  user: core
+  <source>
+    *: "One per playlist"
+  </source>
+  <dest>
+    *: "One per playlist"
+  </dest>
+  <voice>
+    *: "One per playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
+  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
+  user: core
+  <source>
+    *: "One per track"
+  </source>
+  <dest>
+    *: "One per track"
+  </dest>
+  <voice>
+    *: "One per track"
   </voice>
 </phrase>

@@ -1246,9 +1246,10 @@ const struct settings_list settings[] = {
                    ID2P(LANG_ASK)),
     CHOICE_SETTING(0, usemrb, LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS,
                    BOOKMARK_NO, "use most-recent-bookmarks",
-                   "off,on,unique only", NULL, 3, ID2P(LANG_SET_BOOL_NO),
+                   "off,on,unique only,one per track", NULL, 4, ID2P(LANG_SET_BOOL_NO),
                    ID2P(LANG_SET_BOOL_YES),
-                   ID2P(LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY)),
+                   ID2P(LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST),
+                   ID2P(LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK)),
 #ifdef HAVE_LCD_BITMAP
     /* peak meter */
     STRINGCHOICE_SETTING(0, peak_meter_clip_hold, LANG_PM_CLIP_HOLD, 16,
