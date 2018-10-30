@@ -19,10 +19,26 @@
   Empty lines and lines starting with a whitespace are ignored, for all other
   lines the first character will become the separator.
 
+
+  Russian
+
+/russian/.*/.*/USB/Ю Эс Би/g
+/russian/.*/.*/VBR/Ви Би Ар/g
+/russian/.*/.*/ПДУ/П Д У/g
+/russian/.*/.*/ЖКД/Ж Ка Д/g
+
+
   General for all engines and languages
 
 /.*/.*/.*/USB/U S B/g
+/.*/.*/.*/LCD/L C D/g
+/.*/.*/.*/VBR/V B R/g
+/.*/.*/.*/FPS/F P S/g
+/.*/.*/.*/RWPS/R W P S/g
+/.*/.*/.*/WPS/W P S/g
 /.*/.*/.*/ID3/I D 3/g
+/.*/.*/.*/last\.fm/Last F M/ig
+
   English
 /english/(sapi|festival)/.*/plugin(s?)/plug-in$1/ig
 /english/festival/.*/\ba\b/ay/ig
