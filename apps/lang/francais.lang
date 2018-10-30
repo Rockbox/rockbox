@@ -7170,7 +7170,7 @@
     *: "Titre"
   </dest>
   <voice>
-    *: ""
+    *: "Titre"
   </voice>
 </phrase>
 <phrase>
@@ -7184,7 +7184,7 @@
     *: "Artiste"
   </dest>
   <voice>
-    *: ""
+    *: "Artiste"
   </voice>
 </phrase>
 <phrase>
@@ -7198,7 +7198,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -7212,7 +7212,7 @@
     *: "Numéro de Piste"
   </dest>
   <voice>
-    *: ""
+    *: "Numéro de Piste"
   </voice>
 </phrase>
 <phrase>
@@ -7226,7 +7226,7 @@
     *: "Genre"
   </dest>
   <voice>
-    *: ""
+    *: "Genre"
   </voice>
 </phrase>
 <phrase>
@@ -7240,7 +7240,7 @@
     *: "Année"
   </dest>
   <voice>
-    *: ""
+    *: "Année"
   </voice>
 </phrase>
 <phrase>
@@ -7254,7 +7254,7 @@
     *: "Durée"
   </dest>
   <voice>
-    *: ""
+    *: "Durée"
   </voice>
 </phrase>
 <phrase>
@@ -7268,7 +7268,7 @@
     *: "Liste de lecture"
   </dest>
   <voice>
-    *: ""
+    *: "Liste de lecture"
   </voice>
 </phrase>
 <phrase>
@@ -7282,7 +7282,7 @@
     *: "Débit binaire"
   </dest>
   <voice>
-    *: ""
+    *: "Débit binaire"
   </voice>
 </phrase>
 <phrase>
@@ -7296,7 +7296,7 @@
     *: "Artiste de l'album"
   </dest>
   <voice>
-    *: ""
+    *: "Artiste de l'album"
   </voice>
 </phrase>
 <phrase>
@@ -7310,7 +7310,7 @@
     *: "Numéro du disque"
   </dest>
   <voice>
-    *: ""
+    *: "Numéro du disque"
   </voice>
 </phrase>
 <phrase>
@@ -7324,7 +7324,7 @@
     *: "Commentaire"
   </dest>
   <voice>
-    *: ""
+    *: "Commentaire"
   </voice>
 </phrase>
 <phrase>
@@ -7338,7 +7338,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7352,7 +7352,7 @@
     *: "Echantillonnage"
   </dest>
   <voice>
-    *: ""
+    *: "Echantillonnage"
   </voice>
 </phrase>
 <phrase>
@@ -7366,7 +7366,7 @@
     *: "Gain par piste"
   </dest>
   <voice>
-    *: ""
+    *: "Gain par piste"
   </voice>
 </phrase>
 <phrase>
@@ -7380,7 +7380,7 @@
     *: "Gain par album"
   </dest>
   <voice>
-    *: ""
+    *: "Gain par album"
   </voice>
 </phrase>
 <phrase>
@@ -7394,7 +7394,7 @@
     *: "Chemin"
   </dest>
   <voice>
-    *: ""
+    *: "Chemin"
   </voice>
 </phrase>
 <phrase>
@@ -7408,7 +7408,7 @@
     *: "<Pas d'Info>"
   </dest>
   <voice>
-    *: ""
+    *: "Pas d'Info"
   </voice>
 </phrase>
 <phrase>
@@ -10074,7 +10074,7 @@
     *: "Œuvre"
   </dest>
   <voice>
-    *: ""
+    *: "Œuvre"
   </voice>
 </phrase>
 <phrase>
@@ -12472,7 +12472,7 @@
     *: "Compositeur"
   </dest>
   <voice>
-    *: ""
+    *: "Compositeur"
   </voice>
 </phrase>
 <phrase>

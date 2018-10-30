@@ -7029,7 +7029,7 @@
     *: "Searching... %d found (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Found"
   </voice>
 </phrase>
 <phrase>
@@ -7225,7 +7225,7 @@
     *: "Title"
   </dest>
   <voice>
-    *: ""
+    *: "Title"
   </voice>
 </phrase>
 <phrase>
@@ -7239,7 +7239,7 @@
     *: "Artist"
   </dest>
   <voice>
-    *: ""
+    *: "Artist"
   </voice>
 </phrase>
 <phrase>
@@ -7253,7 +7253,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -7267,7 +7267,7 @@
     *: "Tracknum"
   </dest>
   <voice>
-    *: ""
+    *: "Track number"
   </voice>
 </phrase>
 <phrase>
@@ -7281,7 +7281,7 @@
     *: "Genre"
   </dest>
   <voice>
-    *: ""
+    *: "Genre"
   </voice>
 </phrase>
 <phrase>
@@ -7295,7 +7295,7 @@
     *: "Year"
   </dest>
   <voice>
-    *: ""
+    *: "Year"
   </voice>
 </phrase>
 <phrase>
@@ -7309,7 +7309,7 @@
     *: "Length"
   </dest>
   <voice>
-    *: ""
+    *: "Length"
   </voice>
 </phrase>
 <phrase>
@@ -7323,7 +7323,7 @@
     *: "Playlist"
   </dest>
   <voice>
-    *: ""
+    *: "Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -7337,7 +7337,7 @@
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bit rate"
   </voice>
 </phrase>
 <phrase>
@@ -7351,7 +7351,7 @@
     *: "Album Artist"
   </dest>
   <voice>
-    *: ""
+    *: "Album Artist"
   </voice>
 </phrase>
 <phrase>
@@ -7365,7 +7365,7 @@
     *: "Discnum"
   </dest>
   <voice>
-    *: ""
+    *: "Disc number"
   </voice>
 </phrase>
 <phrase>
@@ -7379,7 +7379,7 @@
     *: "Comment"
   </dest>
   <voice>
-    *: ""
+    *: "Comment"
   </voice>
 </phrase>
 <phrase>
@@ -7393,7 +7393,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7407,7 +7407,7 @@
     *: "Frequency"
   </dest>
   <voice>
-    *: ""
+    *: "Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -7421,7 +7421,7 @@
     *: "Track Gain"
   </dest>
   <voice>
-    *: ""
+    *: "Track gain"
   </voice>
 </phrase>
 <phrase>
@@ -7435,7 +7435,7 @@
     *: "Album Gain"
   </dest>
   <voice>
-    *: ""
+    *: "Album gain"
   </voice>
 </phrase>
 <phrase>
@@ -7449,7 +7449,7 @@
     *: "Path"
   </dest>
   <voice>
-    *: ""
+    *: "Path"
   </voice>
 </phrase>
 <phrase>
@@ -7463,7 +7463,7 @@
     *: "<No Info>"
   </dest>
   <voice>
-    *: ""
+    *: "No info"
   </voice>
 </phrase>
 <phrase>
@@ -10131,7 +10131,7 @@
     *: "Work"
   </dest>
   <voice>
-    *: ""
+    *: "Work"
   </voice>
 </phrase>
 <phrase>
@@ -12563,7 +12563,7 @@
     *: "Composer"
   </dest>
   <voice>
-    *: ""
+    *: "Composer"
   </voice>
 </phrase>
 <phrase>
@@ -13715,5 +13715,75 @@
   </dest>
   <voice>
     *: "One per track"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TRACK_TO_MOVE
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Track to move"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEUED
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Queued"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAD_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Bad track"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MOVING_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Moving track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_VIEWERS
+  desc: text for splash to indicate that no viewers are available
+  user: core
+  <source>
+    *: "No viewers found"
+  </source>
+  <dest>
+    *: "No viewers  found"
+  </dest>
+  <voice>
+    *: "No viewers found"
   </voice>
 </phrase>

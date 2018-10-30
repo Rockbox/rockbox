@@ -7152,7 +7152,7 @@
     *: "Tytuł"
   </dest>
   <voice>
-    *: ""
+    *: "Tytuł"
   </voice>
 </phrase>
 <phrase>
@@ -7166,7 +7166,7 @@
     *: "Wykonawca"
   </dest>
   <voice>
-    *: ""
+    *: "Wykonawca"
   </voice>
 </phrase>
 <phrase>
@@ -7180,7 +7180,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -7194,7 +7194,7 @@
     *: "Nr utworu"
   </dest>
   <voice>
-    *: ""
+    *: "Nr utworu"
   </voice>
 </phrase>
 <phrase>
@@ -7208,7 +7208,7 @@
     *: "Gatunek"
   </dest>
   <voice>
-    *: ""
+    *: "Gatunek"
   </voice>
 </phrase>
 <phrase>
@@ -7222,7 +7222,7 @@
     *: "Rok"
   </dest>
   <voice>
-    *: ""
+    *: "Rok"
   </voice>
 </phrase>
 <phrase>
@@ -7236,7 +7236,7 @@
     *: "Długość"
   </dest>
   <voice>
-    *: ""
+    *: "Długość"
   </voice>
 </phrase>
 <phrase>
@@ -7250,7 +7250,7 @@
     *: "Lista odtwarzania"
   </dest>
   <voice>
-    *: ""
+    *: "Lista odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -7264,7 +7264,7 @@
     *: "Prędkość transmisji"
   </dest>
   <voice>
-    *: ""
+    *: "Prędkość transmisji"
   </voice>
 </phrase>
 <phrase>
@@ -7278,7 +7278,7 @@
     *: "Wykonawca Albumu"
   </dest>
   <voice>
-    *: ""
+    *: "Wykonawca Albumu"
   </voice>
 </phrase>
 <phrase>
@@ -7292,7 +7292,7 @@
     *: "Numer płyty"
   </dest>
   <voice>
-    *: ""
+    *: "Numer płyty"
   </voice>
 </phrase>
 <phrase>
@@ -7306,7 +7306,7 @@
     *: "Komentarz"
   </dest>
   <voice>
-    *: ""
+    *: "Komentarz"
   </voice>
 </phrase>
 <phrase>
@@ -7320,7 +7320,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7334,7 +7334,7 @@
     *: "Częstotliwość"
   </dest>
   <voice>
-    *: ""
+    *: "Częstotliwość"
   </voice>
 </phrase>
 <phrase>
@@ -7348,7 +7348,7 @@
     *: "Wzm. utworu"
   </dest>
   <voice>
-    *: ""
+    *: "Wzm. utworu"
   </voice>
 </phrase>
 <phrase>
@@ -7362,7 +7362,7 @@
     *: "Wzm. albumu"
   </dest>
   <voice>
-    *: ""
+    *: "Wzm. albumu"
   </voice>
 </phrase>
 <phrase>
@@ -7376,7 +7376,7 @@
     *: "Ścieżka"
   </dest>
   <voice>
-    *: ""
+    *: "Ścieżka"
   </voice>
 </phrase>
 <phrase>
@@ -7390,7 +7390,7 @@
     *: "<brak danych>"
   </dest>
   <voice>
-    *: ""
+    *: "brak danych"
   </voice>
 </phrase>
 <phrase>
@@ -10055,7 +10055,7 @@
     *: "Praca"
   </dest>
   <voice>
-    *: ""
+    *: "Praca"
   </voice>
 </phrase>
 <phrase>
@@ -12518,7 +12518,7 @@
     *: "Kompozytor"
   </dest>
   <voice>
-    *: ""
+    *: "Kompozytor"
   </voice>
 </phrase>
 <phrase>
