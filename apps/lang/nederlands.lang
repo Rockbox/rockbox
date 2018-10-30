@@ -4806,7 +4806,7 @@
     *: "Titel"
   </dest>
   <voice>
-    *: ""
+    *: "Titel"
   </voice>
 </phrase>
 <phrase>
@@ -4820,7 +4820,7 @@
     *: "Artiest"
   </dest>
   <voice>
-    *: ""
+    *: "Artiest"
   </voice>
 </phrase>
 <phrase>
@@ -4834,7 +4834,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -4848,7 +4848,7 @@
     *: "Tracknum"
   </dest>
   <voice>
-    *: ""
+    *: "Tracknum"
   </voice>
 </phrase>
 <phrase>
@@ -4862,7 +4862,7 @@
     *: "Genre"
   </dest>
   <voice>
-    *: ""
+    *: "Genre"
   </voice>
 </phrase>
 <phrase>
@@ -4876,7 +4876,7 @@
     *: "Jaar"
   </dest>
   <voice>
-    *: ""
+    *: "Jaar"
   </voice>
 </phrase>
 <phrase>
@@ -4890,7 +4890,7 @@
     *: "Lengte"
   </dest>
   <voice>
-    *: ""
+    *: "Lengte"
   </voice>
 </phrase>
 <phrase>
@@ -4904,7 +4904,7 @@
     *: "Speellijst"
   </dest>
   <voice>
-    *: ""
+    *: "Speellijst"
   </voice>
 </phrase>
 <phrase>
@@ -4918,7 +4918,7 @@
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -4946,7 +4946,7 @@
     *: "Frequentie"
   </dest>
   <voice>
-    *: ""
+    *: "Frequentie"
   </voice>
 </phrase>
 <phrase>
@@ -4988,7 +4988,7 @@
     *: "Lokatie"
   </dest>
   <voice>
-    *: ""
+    *: "Lokatie"
   </voice>
 </phrase>
 <phrase>
@@ -5002,7 +5002,7 @@
     *: "<geen info>"
   </dest>
   <voice>
-    *: ""
+    *: "geen info"
   </voice>
 </phrase>
 <phrase>
@@ -8872,7 +8872,7 @@
     *: "Artiest van Album"
   </dest>
   <voice>
-    *: ""
+    *: "Artiest van Album"
   </voice>
 </phrase>
 <phrase>
@@ -8886,7 +8886,7 @@
     *: "Commentaar"
   </dest>
   <voice>
-    *: ""
+    *: "Commentaar"
   </voice>
 </phrase>
 <phrase>
@@ -9418,7 +9418,7 @@
     *: "DiscNr"
   </dest>
   <voice>
-    *: ""
+    *: "DiscNr"
   </voice>
 </phrase>
 <phrase>
@@ -10034,7 +10034,7 @@
     *: "Werk"
   </dest>
   <voice>
-    *: ""
+    *: "Werk"
   </voice>
 </phrase>
 <phrase>
@@ -12432,7 +12432,7 @@
     *: "Componist"
   </dest>
   <voice>
-    *: ""
+    *: "Componist"
   </voice>
 </phrase>
 <phrase>

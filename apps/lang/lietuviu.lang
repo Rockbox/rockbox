@@ -7199,7 +7199,7 @@
     *: "Pavadinimas"
   </dest>
   <voice>
-    *: ""
+    *: "Pavadinimas"
   </voice>
 </phrase>
 <phrase>
@@ -7213,7 +7213,7 @@
     *: "Autorius"
   </dest>
   <voice>
-    *: ""
+    *: "Autorius"
   </voice>
 </phrase>
 <phrase>
@@ -7227,7 +7227,7 @@
     *: "Albumas"
   </dest>
   <voice>
-    *: ""
+    *: "Albumas"
   </voice>
 </phrase>
 <phrase>
@@ -7241,7 +7241,7 @@
     *: "Įrašo nr."
   </dest>
   <voice>
-    *: ""
+    *: "Įrašo nr."
   </voice>
 </phrase>
 <phrase>
@@ -7255,7 +7255,7 @@
     *: "Žanras"
   </dest>
   <voice>
-    *: ""
+    *: "Žanras"
   </voice>
 </phrase>
 <phrase>
@@ -7269,7 +7269,7 @@
     *: "Metai"
   </dest>
   <voice>
-    *: ""
+    *: "Metai"
   </voice>
 </phrase>
 <phrase>
@@ -7283,7 +7283,7 @@
     *: "Trukmė"
   </dest>
   <voice>
-    *: ""
+    *: "Trukmė"
   </voice>
 </phrase>
 <phrase>
@@ -7297,7 +7297,7 @@
     *: "Grojaraštis"
   </dest>
   <voice>
-    *: ""
+    *: "Grojaraštis"
   </voice>
 </phrase>
 <phrase>
@@ -7311,7 +7311,7 @@
     *: "Bitreitas"
   </dest>
   <voice>
-    *: ""
+    *: "Bitreitas"
   </voice>
 </phrase>
 <phrase>
@@ -7325,7 +7325,7 @@
     *: "Albumo autorius"
   </dest>
   <voice>
-    *: ""
+    *: "Albumo autorius"
   </voice>
 </phrase>
 <phrase>
@@ -7339,7 +7339,7 @@
     *: "Disko nr."
   </dest>
   <voice>
-    *: ""
+    *: "Disko nr."
   </voice>
 </phrase>
 <phrase>
@@ -7353,7 +7353,7 @@
     *: "Komentarai"
   </dest>
   <voice>
-    *: ""
+    *: "Komentarai"
   </voice>
 </phrase>
 <phrase>
@@ -7367,7 +7367,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7381,7 +7381,7 @@
     *: "Dažnis"
   </dest>
   <voice>
-    *: ""
+    *: "Dažnis"
   </voice>
 </phrase>
 <phrase>
@@ -7395,7 +7395,7 @@
     *: "Įrašo stiprinimas"
   </dest>
   <voice>
-    *: ""
+    *: "Įrašo stiprinimas"
   </voice>
 </phrase>
 <phrase>
@@ -7409,7 +7409,7 @@
     *: "Albumo stiprinimas"
   </dest>
   <voice>
-    *: ""
+    *: "Albumo stiprinimas"
   </voice>
 </phrase>
 <phrase>
@@ -7423,7 +7423,7 @@
     *: "Kelias"
   </dest>
   <voice>
-    *: ""
+    *: "Kelias"
   </voice>
 </phrase>
 <phrase>
@@ -7437,7 +7437,7 @@
     *: "<Nėra informacijos>"
   </dest>
   <voice>
-    *: ""
+    *: "Nėra informacijos"
   </voice>
 </phrase>
 <phrase>
@@ -10103,7 +10103,7 @@
     *: "Darbas"
   </dest>
   <voice>
-    *: ""
+    *: "Darbas"
   </voice>
 </phrase>
 <phrase>

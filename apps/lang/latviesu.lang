@@ -7141,7 +7141,7 @@
     *: "Nosaukums"
   </dest>
   <voice>
-    *: ""
+    *: "Nosaukums"
   </voice>
 </phrase>
 <phrase>
@@ -7155,7 +7155,7 @@
     *: "Izpildītājs"
   </dest>
   <voice>
-    *: ""
+    *: "Izpildītājs"
   </voice>
 </phrase>
 <phrase>
@@ -7169,7 +7169,7 @@
     *: "Albūms"
   </dest>
   <voice>
-    *: ""
+    *: "Albūms"
   </voice>
 </phrase>
 <phrase>
@@ -7183,7 +7183,7 @@
     *: "Numurs"
   </dest>
   <voice>
-    *: ""
+    *: "Numurs"
   </voice>
 </phrase>
 <phrase>
@@ -7197,7 +7197,7 @@
     *: "Žanrs"
   </dest>
   <voice>
-    *: ""
+    *: "Žanrs"
   </voice>
 </phrase>
 <phrase>
@@ -7211,7 +7211,7 @@
     *: "Gads"
   </dest>
   <voice>
-    *: ""
+    *: "Gads"
   </voice>
 </phrase>
 <phrase>
@@ -7225,7 +7225,7 @@
     *: "Garums"
   </dest>
   <voice>
-    *: ""
+    *: "Garums"
   </voice>
 </phrase>
 <phrase>
@@ -7239,7 +7239,7 @@
     *: "Saraksts"
   </dest>
   <voice>
-    *: ""
+    *: "Saraksts"
   </voice>
 </phrase>
 <phrase>
@@ -7253,7 +7253,7 @@
     *: "Bitreits"
   </dest>
   <voice>
-    *: ""
+    *: "Bitreits"
   </voice>
 </phrase>
 <phrase>
@@ -7267,7 +7267,7 @@
     *: "Albūma Izpildītājs"
   </dest>
   <voice>
-    *: ""
+    *: "Albūma Izpildītājs"
   </voice>
 </phrase>
 <phrase>
@@ -7281,7 +7281,7 @@
     *: "Diska Numurs"
   </dest>
   <voice>
-    *: ""
+    *: "Diska Numurs"
   </voice>
 </phrase>
 <phrase>
@@ -7295,7 +7295,7 @@
     *: "Komentārs"
   </dest>
   <voice>
-    *: ""
+    *: "Komentārs"
   </voice>
 </phrase>
 <phrase>
@@ -7309,7 +7309,7 @@
     *: " (MBR)"
   </dest>
   <voice>
-    *: ""
+    *: "MBR"
   </voice>
 </phrase>
 <phrase>
@@ -7323,7 +7323,7 @@
     *: "Frekvence"
   </dest>
   <voice>
-    *: ""
+    *: "Frekvence"
   </voice>
 </phrase>
 <phrase>
@@ -7337,7 +7337,7 @@
     *: "Dziesmas Skaļums"
   </dest>
   <voice>
-    *: ""
+    *: "Dziesmas Skaļums"
   </voice>
 </phrase>
 <phrase>
@@ -7351,7 +7351,7 @@
     *: "Albūma Skaļums"
   </dest>
   <voice>
-    *: ""
+    *: "Albūma Skaļums"
   </voice>
 </phrase>
 <phrase>
@@ -7365,7 +7365,7 @@
     *: "Ceļš"
   </dest>
   <voice>
-    *: ""
+    *: "Ceļš"
   </voice>
 </phrase>
 <phrase>
@@ -7379,7 +7379,7 @@
     *: "<Nav Informācijas>"
   </dest>
   <voice>
-    *: ""
+    *: "Nav Informācijas"
   </voice>
 </phrase>
 <phrase>
@@ -10047,7 +10047,7 @@
     *: "Darbs"
   </dest>
   <voice>
-    *: ""
+    *: "Darbs"
   </voice>
 </phrase>
 <phrase>
@@ -12428,7 +12428,7 @@
     *: "Komponists"
   </dest>
   <voice>
-    *: ""
+    *: "Komponists"
   </voice>
 </phrase>
 <phrase>
