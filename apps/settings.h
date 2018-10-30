@@ -45,14 +45,16 @@ struct opt_items {
 #define MAX_FILENAME 32
 #define MAX_PATHNAME 80
 
-
+/* The values are assigned to the enums so that they correspond to */
+/* setting values in settings_list.c                               */
 enum {
     BOOKMARK_NO = 0,
     BOOKMARK_YES,
     BOOKMARK_ASK,
-    BOOKMARK_UNIQUE_ONLY = 2,
+    BOOKMARK_ONE_PER_PLAYLIST = 2,
     BOOKMARK_RECENT_ONLY_YES,
     BOOKMARK_RECENT_ONLY_ASK,
+    BOOKMARK_ONE_PER_TRACK = 3,
 };
 
 enum
@@ -557,7 +559,8 @@ struct user_settings
     int autoloadbookmark;   /* auto load option: 0=off, 1=ask, 2=on */
     int autocreatebookmark; /* auto create option: 0=off, 1=ask, 2=on */
     bool autoupdatebookmark;/* auto update option */
-    int usemrb;             /* use MRB list: 0=No, 1=Yes, 2=One per playlist */
+    int usemrb;             /* use MRB list: 0=No, 1=Yes, 2=One per playlist,
+                                             3=One per playlist and track */
 
 #ifdef HAVE_DIRCACHE
     bool dircache;          /* enable directory cache */
