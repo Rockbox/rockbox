@@ -4629,7 +4629,7 @@
     *: "Titolo"
   </dest>
   <voice>
-    *: ""
+    *: "Titolo"
   </voice>
 </phrase>
 <phrase>
@@ -4643,7 +4643,7 @@
     *: "Artisto"
   </dest>
   <voice>
-    *: ""
+    *: "Artisto"
   </voice>
 </phrase>
 <phrase>
@@ -4657,7 +4657,7 @@
     *: "Albumo"
   </dest>
   <voice>
-    *: ""
+    *: "Albumo"
   </voice>
 </phrase>
 <phrase>
@@ -4671,7 +4671,7 @@
     *: "Kanta Numero"
   </dest>
   <voice>
-    *: ""
+    *: "Kanta Numero"
   </voice>
 </phrase>
 <phrase>
@@ -4685,7 +4685,7 @@
     *: "Ĝenro"
   </dest>
   <voice>
-    *: ""
+    *: "Ĝenro"
   </voice>
 </phrase>
 <phrase>
@@ -4699,7 +4699,7 @@
     *: "Jaro"
   </dest>
   <voice>
-    *: ""
+    *: "Jaro"
   </voice>
 </phrase>
 <phrase>
@@ -4713,7 +4713,7 @@
     *: "Longo"
   </dest>
   <voice>
-    *: ""
+    *: "Longo"
   </voice>
 </phrase>
 <phrase>
@@ -4727,7 +4727,7 @@
     *: "Leglisto"
   </dest>
   <voice>
-    *: ""
+    *: "Leglisto"
   </voice>
 </phrase>
 <phrase>
@@ -4741,7 +4741,7 @@
     *: "Bitfrekvenco"
   </dest>
   <voice>
-    *: ""
+    *: "Bitfrekvenco"
   </voice>
 </phrase>
 <phrase>
@@ -4755,7 +4755,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -4769,7 +4769,7 @@
     *: "Frekvenco"
   </dest>
   <voice>
-    *: ""
+    *: "Frekvenco"
   </voice>
 </phrase>
 <phrase>
@@ -4783,7 +4783,7 @@
     *: "Kanta Gajno"
   </dest>
   <voice>
-    *: ""
+    *: "Kanta Gajno"
   </voice>
 </phrase>
 <phrase>
@@ -4797,7 +4797,7 @@
     *: "Albumo Gajno"
   </dest>
   <voice>
-    *: ""
+    *: "Albumo Gajno"
   </voice>
 </phrase>
 <phrase>
@@ -4811,7 +4811,7 @@
     *: "Vojo"
   </dest>
   <voice>
-    *: ""
+    *: "Vojo"
   </voice>
 </phrase>
 <phrase>
@@ -4825,7 +4825,7 @@
     *: "<Sen Informoj>"
   </dest>
   <voice>
-    *: ""
+    *: "Sen Informoj"
   </voice>
 </phrase>
 <phrase>
