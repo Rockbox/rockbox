@@ -334,6 +334,68 @@ RB_WRAP(audio)
     return 1;
 }
 
+#if CONFIG_CODEC == SWCODEC
+RB_WRAP(pcm)
+{
+    enum e_pcm {PCM_APPLYSETTINGS = 0, PCM_ISPLAYING, PCM_ISPAUSED,
+                PCM_PLAYSTOP, PCM_PLAYPAUSE, PCM_PLAYLOCK, PCM_PLAYUNLOCK,
+                PCM_CALCULATEPEAKS, PCM_SETFREQUENCY, PCM_GETBYTESWAITING, PCM_ECOUNT};
+
+    const char *pcm_option[] = {"applysettings", "isplaying", "ispaused",
+                                "playstop", "playpause", "playlock", "playunlock",
+                                "calculatepeaks", "setfrequency", "getbyteswaiting", NULL};
+    bool   b_result;
+    int    left, right;
+    size_t byteswait;
+
+    lua_pushnil(L); /*push nil so options w/o return have something to return */
+
+    int option = luaL_checkoption (L, 1, NULL, pcm_option);
+    switch(option)
+    {
+        default:
+        case PCM_APPLYSETTINGS:
+            rb->pcm_apply_settings();
+            break;
+        case PCM_ISPLAYING:
+            b_result = rb->pcm_is_playing();
+            lua_pushboolean(L, b_result);
+            break;
+        case PCM_ISPAUSED:
+            b_result = rb->pcm_is_paused();
+            lua_pushboolean(L, b_result);
+            break;
+        case PCM_PLAYPAUSE:
+            rb->pcm_play_pause(luaL_checkboolean(L, 1));
+            break;
+        case PCM_PLAYSTOP:
+            rb->pcm_play_stop();
+            break;
+        case PCM_PLAYLOCK:
+            rb->pcm_play_lock();
+            break;
+        case PCM_PLAYUNLOCK:
+            rb->pcm_play_unlock();
+            break;
+        case PCM_CALCULATEPEAKS:
+            rb->pcm_calculate_peaks(&left, &right);
+            lua_pushinteger(L, left);
+            lua_pushinteger(L, right);
+            return 2;
+        case PCM_SETFREQUENCY:
+            rb->pcm_set_frequency((unsigned int) luaL_checkint(L, 1));
+            break;
+        case PCM_GETBYTESWAITING:
+            byteswait = rb->pcm_get_bytes_waiting();
+            lua_pushinteger(L, byteswait);
+            break;
+    }
+
+    rb->yield();
+    return 1;
+}
+#endif /*CONFIG_CODEC == SWCODEC*/
+
 SIMPLE_VOID_WRAPPER(backlight_force_on);
 SIMPLE_VOID_WRAPPER(backlight_use_settings);
 
@@ -458,7 +520,9 @@ static const luaL_Reg rocklib[] =
 
     RB_FUNC(audio),
     RB_FUNC(playlist),
-
+#if CONFIG_CODEC == SWCODEC
+    RB_FUNC(pcm),
+#endif
     {NULL, NULL}
 };
 #undef RB_FUNC
