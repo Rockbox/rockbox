@@ -6368,7 +6368,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -6466,7 +6466,7 @@
     *: "Pansin"
   </dest>
   <voice>
-    *: ""
+    *: "Pansin"
   </voice>
 </phrase>
 <phrase>
@@ -6618,7 +6618,7 @@
     *: "Playlist"
   </dest>
   <voice>
-    *: ""
+    *: "Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -6719,7 +6719,7 @@
     *: "<Wala Inpormasyon>"
   </dest>
   <voice>
-    *: ""
+    *: "Wala Inpormasyon"
   </voice>
 </phrase>
 <phrase>
@@ -6879,7 +6879,7 @@
     *: "Typo"
   </dest>
   <voice>
-    *: ""
+    *: "Typo"
   </voice>
 </phrase>
 <phrase>
@@ -6997,7 +6997,7 @@
     *: "Album tubo"
   </dest>
   <voice>
-    *: ""
+    *: "Album tubo"
   </voice>
 </phrase>
 <phrase>
@@ -7011,7 +7011,7 @@
     *: "Artista"
   </dest>
   <voice>
-    *: ""
+    *: "Artista"
   </voice>
 </phrase>
 <phrase>
@@ -7137,7 +7137,7 @@
     *: "Dalas"
   </dest>
   <voice>
-    *: ""
+    *: "Dalas"
   </voice>
 </phrase>
 <phrase>
@@ -7359,7 +7359,7 @@
     *: "Pamagat"
   </dest>
   <voice>
-    *: ""
+    *: "Pamagat"
   </voice>
 </phrase>
 <phrase>
@@ -7516,7 +7516,7 @@
     *: "Taon"
   </dest>
   <voice>
-    *: ""
+    *: "Taon"
   </voice>
 </phrase>
 <phrase>
@@ -7953,7 +7953,7 @@
     *: "Landas Tubo"
   </dest>
   <voice>
-    *: ""
+    *: "Landas Tubo"
   </voice>
 </phrase>
 <phrase>
@@ -8206,7 +8206,7 @@
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -8406,7 +8406,7 @@
     *: "Landas"
   </dest>
   <voice>
-    *: ""
+    *: "Landas"
   </voice>
 </phrase>
 <phrase>
@@ -8532,7 +8532,7 @@
     *: "Trabaho"
   </dest>
   <voice>
-    *: ""
+    *: "Trabaho"
   </voice>
 </phrase>
 <phrase>
@@ -8602,7 +8602,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -8644,7 +8644,7 @@
     *: "Haba"
   </dest>
   <voice>
-    *: ""
+    *: "Haba"
   </voice>
 </phrase>
 <phrase>
@@ -9273,7 +9273,7 @@
     *: "Discnum"
   </dest>
   <voice>
-    *: ""
+    *: "Discnum"
   </voice>
 </phrase>
 <phrase>
@@ -9391,7 +9391,7 @@
     *: "Tracknum"
   </dest>
   <voice>
-    *: ""
+    *: "Tracknum"
   </voice>
 </phrase>
 <phrase>
@@ -9759,7 +9759,7 @@
     *: "Album Artista"
   </dest>
   <voice>
-    *: ""
+    *: "Album Artista"
   </voice>
 </phrase>
 <phrase>
@@ -12165,7 +12165,7 @@
     *: "Kompositor"
   </dest>
   <voice>
-    *: ""
+    *: "Kompositor"
   </voice>
 </phrase>
 <phrase>

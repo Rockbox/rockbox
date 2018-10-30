@@ -4421,7 +4421,7 @@
     *: "Title"
   </dest>
   <voice>
-    *: ""
+    *: "Title"
   </voice>
 </phrase>
 <phrase>
@@ -4435,7 +4435,7 @@
     *: "Artist"
   </dest>
   <voice>
-    *: ""
+    *: "Artist"
   </voice>
 </phrase>
 <phrase>
@@ -4449,7 +4449,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -4463,7 +4463,7 @@
     *: "Tracknum"
   </dest>
   <voice>
-    *: ""
+    *: "Tracknum"
   </voice>
 </phrase>
 <phrase>
@@ -4477,7 +4477,7 @@
     *: "Genre"
   </dest>
   <voice>
-    *: ""
+    *: "Genre"
   </voice>
 </phrase>
 <phrase>
@@ -4491,7 +4491,7 @@
     *: "Year"
   </dest>
   <voice>
-    *: ""
+    *: "Year"
   </voice>
 </phrase>
 <phrase>
@@ -4505,7 +4505,7 @@
     *: "Length"
   </dest>
   <voice>
-    *: ""
+    *: "Length"
   </voice>
 </phrase>
 <phrase>
@@ -4519,7 +4519,7 @@
     *: "Playlist"
   </dest>
   <voice>
-    *: ""
+    *: "Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -4533,7 +4533,7 @@
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -4547,7 +4547,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -4561,7 +4561,7 @@
     *: "Frequency"
   </dest>
   <voice>
-    *: ""
+    *: "Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -4575,7 +4575,7 @@
     *: "Track Gain"
   </dest>
   <voice>
-    *: ""
+    *: "Track Gain"
   </voice>
 </phrase>
 <phrase>
@@ -4589,7 +4589,7 @@
     *: "Album Gain"
   </dest>
   <voice>
-    *: ""
+    *: "Album Gain"
   </voice>
 </phrase>
 <phrase>
@@ -4603,7 +4603,7 @@
     *: "Path"
   </dest>
   <voice>
-    *: ""
+    *: "Path"
   </voice>
 </phrase>
 <phrase>
@@ -4617,7 +4617,7 @@
     *: "<No Info>"
   </dest>
   <voice>
-    *: ""
+    *: "No Info"
   </voice>
 </phrase>
 <phrase>

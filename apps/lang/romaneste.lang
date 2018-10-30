@@ -1662,7 +1662,7 @@
     *: "Titlu"
   </dest>
   <voice>
-    *: ""
+    *: "Titlu"
   </voice>
 </phrase>
 <phrase>
@@ -1676,7 +1676,7 @@
     *: "Artist"
   </dest>
   <voice>
-    *: ""
+    *: "Artist"
   </voice>
 </phrase>
 <phrase>
@@ -1690,7 +1690,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -1704,7 +1704,7 @@
     *: "Nr. pistă"
   </dest>
   <voice>
-    *: ""
+    *: "Nr. pistă"
   </voice>
 </phrase>
 <phrase>
@@ -1718,7 +1718,7 @@
     *: "Gen"
   </dest>
   <voice>
-    *: ""
+    *: "Gen"
   </voice>
 </phrase>
 <phrase>
@@ -1732,7 +1732,7 @@
     *: "An"
   </dest>
   <voice>
-    *: ""
+    *: "An"
   </voice>
 </phrase>
 <phrase>
@@ -1746,7 +1746,7 @@
     *: "Lista de redare"
   </dest>
   <voice>
-    *: ""
+    *: "Lista de redare"
   </voice>
 </phrase>
 <phrase>
@@ -1760,7 +1760,7 @@
     *: "Bitrate"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -1774,7 +1774,7 @@
     *: "Frecvență"
   </dest>
   <voice>
-    *: ""
+    *: "Frecvență"
   </voice>
 </phrase>
 <phrase>
@@ -1788,7 +1788,7 @@
     *: "Cale"
   </dest>
   <voice>
-    *: ""
+    *: "Cale"
   </voice>
 </phrase>
 <phrase>
@@ -1802,7 +1802,7 @@
     *: "<date lipsă>"
   </dest>
   <voice>
-    *: ""
+    *: "date lipsă"
   </voice>
 </phrase>
 <phrase>
@@ -2872,7 +2872,7 @@
     *: "(VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -3049,7 +3049,7 @@
     *: "Comentariu"
   </dest>
   <voice>
-    *: ""
+    *: "Comentariu"
   </voice>
 </phrase>
 <phrase>
@@ -4024,7 +4024,7 @@
     *: "Normalizare volum pentru album"
   </dest>
   <voice>
-    *: ""
+    *: "Normalizare volum pentru album"
   </voice>
 </phrase>
 <phrase>
@@ -5762,7 +5762,7 @@
     *: "Amplificare pistă"
   </dest>
   <voice>
-    *: ""
+    *: "Amplificare pistă"
   </voice>
 </phrase>
 <phrase>
@@ -6722,7 +6722,7 @@
     *: "Lucru"
   </dest>
   <voice>
-    *: ""
+    *: "Lucru"
   </voice>
 </phrase>
 <phrase>
@@ -6910,7 +6910,7 @@
     *: "Lungime"
   </dest>
   <voice>
-    *: ""
+    *: "Lungime"
   </voice>
 </phrase>
 <phrase>
@@ -8227,7 +8227,7 @@
     *: "Nr. disc"
   </dest>
   <voice>
-    *: ""
+    *: "Nr. disc"
   </voice>
 </phrase>
 <phrase>
@@ -9371,7 +9371,7 @@
     *: "Artistul albumului"
   </dest>
   <voice>
-    *: ""
+    *: "Artistul albumului"
   </voice>
 </phrase>
 <phrase>
@@ -11321,7 +11321,7 @@
     *: "Compozitor"
   </dest>
   <voice>
-    *: ""
+    *: "Compozitor"
   </voice>
 </phrase>
 <phrase>

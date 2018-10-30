@@ -7136,7 +7136,7 @@
     *: "Назва"
   </dest>
   <voice>
-    *: ""
+    *: "Назва"
   </voice>
 </phrase>
 <phrase>
@@ -7150,7 +7150,7 @@
     *: "Виконавець"
   </dest>
   <voice>
-    *: ""
+    *: "Виконавець"
   </voice>
 </phrase>
 <phrase>
@@ -7164,7 +7164,7 @@
     *: "Альбом"
   </dest>
   <voice>
-    *: ""
+    *: "Альбом"
   </voice>
 </phrase>
 <phrase>
@@ -7178,7 +7178,7 @@
     *: "Номер треку"
   </dest>
   <voice>
-    *: ""
+    *: "Номер треку"
   </voice>
 </phrase>
 <phrase>
@@ -7192,7 +7192,7 @@
     *: "Жанр"
   </dest>
   <voice>
-    *: ""
+    *: "Жанр"
   </voice>
 </phrase>
 <phrase>
@@ -7206,7 +7206,7 @@
     *: "Рiк"
   </dest>
   <voice>
-    *: ""
+    *: "Рiк"
   </voice>
 </phrase>
 <phrase>
@@ -7220,7 +7220,7 @@
     *: "Тривалiсть"
   </dest>
   <voice>
-    *: ""
+    *: "Тривалiсть"
   </voice>
 </phrase>
 <phrase>
@@ -7234,7 +7234,7 @@
     *: "Список вiдтворення"
   </dest>
   <voice>
-    *: ""
+    *: "Список вiдтворення"
   </voice>
 </phrase>
 <phrase>
@@ -7248,7 +7248,7 @@
     *: "Бiтрейт"
   </dest>
   <voice>
-    *: ""
+    *: "Бiтрейт"
   </voice>
 </phrase>
 <phrase>
@@ -7262,7 +7262,7 @@
     *: "Обкладинка Альбому"
   </dest>
   <voice>
-    *: ""
+    *: "Обкладинка Альбому"
   </voice>
 </phrase>
 <phrase>
@@ -7276,7 +7276,7 @@
     *: "Номер диску"
   </dest>
   <voice>
-    *: ""
+    *: "Номер диску"
   </voice>
 </phrase>
 <phrase>
@@ -7290,7 +7290,7 @@
     *: "Коментар"
   </dest>
   <voice>
-    *: ""
+    *: "Коментар"
   </voice>
 </phrase>
 <phrase>
@@ -7304,7 +7304,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7318,7 +7318,7 @@
     *: "Частота"
   </dest>
   <voice>
-    *: ""
+    *: "Частота"
   </voice>
 </phrase>
 <phrase>
@@ -7332,7 +7332,7 @@
     *: "Пiдсилення Треку"
   </dest>
   <voice>
-    *: ""
+    *: "Пiдсилення Треку"
   </voice>
 </phrase>
 <phrase>
@@ -7346,7 +7346,7 @@
     *: "Пiдсилення Альбому"
   </dest>
   <voice>
-    *: ""
+    *: "Пiдсилення Альбому"
   </voice>
 </phrase>
 <phrase>
@@ -7360,7 +7360,7 @@
     *: "Шлях"
   </dest>
   <voice>
-    *: ""
+    *: "Шлях"
   </voice>
 </phrase>
 <phrase>
@@ -7374,7 +7374,7 @@
     *: "<Iнформацiя вiдсутня>"
   </dest>
   <voice>
-    *: ""
+    *: "Iнформацiя вiдсутня"
   </voice>
 </phrase>
 <phrase>
@@ -10040,7 +10040,7 @@
     *: "Робота"
   </dest>
   <voice>
-    *: ""
+    *: "Робота"
   </voice>
 </phrase>
 <phrase>
@@ -12321,7 +12321,7 @@
     *: "Композитор"
   </dest>
   <voice>
-    *: ""
+    *: "Композитор"
   </voice>
 </phrase>
 <phrase>

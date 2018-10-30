@@ -4813,7 +4813,7 @@
     *: "標題"
   </dest>
   <voice>
-    *: ""
+    *: "標題"
   </voice>
 </phrase>
 <phrase>
@@ -4827,7 +4827,7 @@
     *: "作者"
   </dest>
   <voice>
-    *: ""
+    *: "作者"
   </voice>
 </phrase>
 <phrase>
@@ -4841,7 +4841,7 @@
     *: "專輯"
   </dest>
   <voice>
-    *: ""
+    *: "專輯"
   </voice>
 </phrase>
 <phrase>
@@ -4855,7 +4855,7 @@
     *: "曲目編號"
   </dest>
   <voice>
-    *: ""
+    *: "曲目編號"
   </voice>
 </phrase>
 <phrase>
@@ -4869,7 +4869,7 @@
     *: "類別"
   </dest>
   <voice>
-    *: ""
+    *: "類別"
   </voice>
 </phrase>
 <phrase>
@@ -4883,7 +4883,7 @@
     *: "年份"
   </dest>
   <voice>
-    *: ""
+    *: "年份"
   </voice>
 </phrase>
 <phrase>
@@ -4897,7 +4897,7 @@
     *: "長度"
   </dest>
   <voice>
-    *: ""
+    *: "長度"
   </voice>
 </phrase>
 <phrase>
@@ -4911,7 +4911,7 @@
     *: "播放清單"
   </dest>
   <voice>
-    *: ""
+    *: "播放清單"
   </voice>
 </phrase>
 <phrase>
@@ -4925,7 +4925,7 @@
     *: "位元率"
   </dest>
   <voice>
-    *: ""
+    *: "位元率"
   </voice>
 </phrase>
 <phrase>
@@ -4939,7 +4939,7 @@
     *: " (變動位元率)"
   </dest>
   <voice>
-    *: ""
+    *: "變動位元率"
   </voice>
 </phrase>
 <phrase>
@@ -4953,7 +4953,7 @@
     *: "頻率"
   </dest>
   <voice>
-    *: ""
+    *: "頻率"
   </voice>
 </phrase>
 <phrase>
@@ -4967,7 +4967,7 @@
     *: "Track Gain"
   </dest>
   <voice>
-    *: ""
+    *: "Track Gain"
   </voice>
 </phrase>
 <phrase>
@@ -4981,7 +4981,7 @@
     *: "Album Gain"
   </dest>
   <voice>
-    *: ""
+    *: "Album Gain"
   </voice>
 </phrase>
 <phrase>
@@ -4995,7 +4995,7 @@
     *: "路徑"
   </dest>
   <voice>
-    *: ""
+    *: "路徑"
   </voice>
 </phrase>
 <phrase>
@@ -5009,7 +5009,7 @@
     *: "<無資訊>"
   </dest>
   <voice>
-    *: ""
+    *: "無資訊"
   </voice>
 </phrase>
 <phrase>
@@ -8058,7 +8058,7 @@
     *: "註解"
   </dest>
   <voice>
-    *: ""
+    *: "註解"
   </voice>
 </phrase>
 <phrase>
@@ -9133,7 +9133,7 @@
     *: "作品"
   </dest>
   <voice>
-    *: ""
+    *: "作品"
   </voice>
 </phrase>
 <phrase>
@@ -9423,7 +9423,7 @@
     *: "唱片編號"
   </dest>
   <voice>
-    *: ""
+    *: "唱片編號"
   </voice>
 </phrase>
 <phrase>
@@ -9752,7 +9752,7 @@
     *: "專輯作者"
   </dest>
   <voice>
-    *: ""
+    *: "專輯作者"
   </voice>
 </phrase>
 <phrase>
