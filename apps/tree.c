@@ -101,7 +101,7 @@ static int curr_context = false;/* id3db or tree*/
 
 static int dirbrowse(void);
 static int ft_play_dirname(char* name);
-static void ft_play_filename(char *dir, char *file);
+static int ft_play_filename(char *dir, char *file, int attr);
 static void say_filetype(int attr);
 
 struct entry* tree_get_entries(struct tree_context *t)
@@ -225,7 +225,7 @@ static int tree_voice_cb(int selected_item, void * data)
         if(global_settings.talk_dir_clip)
         {
             did_clip = true;
-            if(ft_play_dirname(name) <0)
+            if (ft_play_dirname(name) <= 0)
                 /* failed, not existing */
                 did_clip = false;
         }
@@ -233,7 +233,9 @@ static int tree_voice_cb(int selected_item, void * data)
         if (global_settings.talk_file_clip && (attr & FILE_ATTR_THUMBNAIL))
         {
             did_clip = true;
-            ft_play_filename(local_tc->currdir, name);
+            if (ft_play_filename(local_tc->currdir, name, attr) <= 0)
+                /* failed, not existing */
+                did_clip = false;
         }
     }
     if(!did_clip)
@@ -1150,17 +1152,25 @@ bool bookmark_play(char *resume_file, int index, unsigned long elapsed,
     return started;
 }
 
+static long filetype_voiceclip(int attr)
+{
+    int j;
+    if (global_settings.talk_filetype)
+    {
+        /* try to find a voice ID for the extension, if known */
+        attr &= FILE_ATTR_MASK; /* file type */
+        for (j=0; j<filetypes_count; j++)
+            if (attr == filetypes[j].tree_attr)
+            {
+                return filetypes[j].voiceclip;
+            }
+    }
+    return -1;
+}
+
 static void say_filetype(int attr)
 {
-    /* try to find a voice ID for the extension, if known */
-    int j;
-    attr &= FILE_ATTR_MASK; /* file type */
-    for (j=0; j<filetypes_count; j++)
-        if (attr == filetypes[j].tree_attr)
-        {
-            talk_id(filetypes[j].voiceclip, true);
-            return;
-        }
+    talk_id(filetype_voiceclip(attr), true);
 }
 
 static int ft_play_dirname(char* name)
@@ -1170,34 +1180,29 @@ static int ft_play_dirname(char* name)
         return 0;
 #endif
 
-    if(talk_file(tc.currdir, name, dir_thumbnail_name, NULL,
-                 NULL, false))
-    {
-        if(global_settings.talk_filetype)
-            talk_id(VOICE_DIR, true);
-        return 1;
-    }
-    else
-        return -1;
+    return talk_file(tc.currdir, name, dir_thumbnail_name, NULL,
+                     global_settings.talk_filetype ?
+                     TALK_IDARRAY(VOICE_DIR) : NULL,
+                     false);
 }
 
-static void ft_play_filename(char *dir, char *file)
+static int ft_play_filename(char *dir, char *file, int attr)
 {
 #if CONFIG_CODEC != SWCODEC
     if (audio_status() & AUDIO_STATUS_PLAY)
-        return;
+        return 0;
 #endif
 
     if (strlen(file) >= strlen(file_thumbnail_ext)
         && strcasecmp(&file[strlen(file) - strlen(file_thumbnail_ext)],
                       file_thumbnail_ext))
         /* file has no .talk extension */
-        talk_file(dir, NULL, file, file_thumbnail_ext,
-                  NULL, false);
-    else
-        /* it already is a .talk file, play this directly, but prefix it. */
-        talk_file(dir, NULL, file, NULL,
-                  TALK_IDARRAY(LANG_VOICE_DIR_HOVER), false);
+        return talk_file(dir, NULL, file, file_thumbnail_ext,
+                         TALK_IDARRAY(filetype_voiceclip(attr)), false);
+
+    /* it already is a .talk file, play this directly, but prefix it. */
+    return talk_file(dir, NULL, file, NULL,
+                     TALK_IDARRAY(LANG_VOICE_DIR_HOVER), false);
 }
 
 /* These two functions are called by the USB and shutdown handlers */

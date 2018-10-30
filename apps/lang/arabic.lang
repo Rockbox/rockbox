@@ -596,7 +596,7 @@
     *: "النوع"
   </dest>
   <voice>
-    *: ""
+    *: "النوع"
   </voice>
 </phrase>
 <phrase>
@@ -697,7 +697,7 @@
     *: "الفنان"
   </dest>
   <voice>
-    *: ""
+    *: "الفنان"
   </voice>
 </phrase>
 <phrase>
@@ -2682,7 +2682,7 @@
     *: "فنان الألبوم"
   </dest>
   <voice>
-    *: ""
+    *: "فنان الألبوم"
   </voice>
 </phrase>
 <phrase>
@@ -3849,7 +3849,7 @@
     *: "تعليق"
   </dest>
   <voice>
-    *: ""
+    *: "تعليق"
   </voice>
 </phrase>
 <phrase>
@@ -4001,7 +4001,7 @@
     *: "قائمة التشغيل"
   </dest>
   <voice>
-    *: ""
+    *: "قائمة التشغيل"
   </voice>
 </phrase>
 <phrase>
@@ -4125,7 +4125,7 @@
     *: "<المعلومات غير متوفرة>"
   </dest>
   <voice>
-    *: ""
+    *: "المعلومات غير متوفرة"
   </voice>
 </phrase>
 <phrase>
@@ -4745,7 +4745,7 @@
     *: "التردد"
   </dest>
   <voice>
-    *: ""
+    *: "التردد"
   </voice>
 </phrase>
 <phrase>
@@ -4964,7 +4964,7 @@
     *: "العنوان"
   </dest>
   <voice>
-    *: ""
+    *: "العنوان"
   </voice>
 </phrase>
 <phrase>
@@ -5051,7 +5051,7 @@
     *: "السنة"
   </dest>
   <voice>
-    *: ""
+    *: "السنة"
   </voice>
 </phrase>
 <phrase>
@@ -5237,7 +5237,7 @@
     *: "معدل البت"
   </dest>
   <voice>
-    *: ""
+    *: "معدل البت"
   </voice>
 </phrase>
 <phrase>
@@ -5437,7 +5437,7 @@
     *: "البوم"
   </dest>
   <voice>
-    *: ""
+    *: "البوم"
   </voice>
 </phrase>
 <phrase>
@@ -5471,7 +5471,7 @@
     *: "طول"
   </dest>
   <voice>
-    *: ""
+    *: "طول"
   </voice>
 </phrase>
 <phrase>

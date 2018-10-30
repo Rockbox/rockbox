@@ -51,6 +51,7 @@ enum {
     UNIT_KBIT,    /* kilobits per sec */
     UNIT_PM_TICK, /* peak meter units per tick */
     UNIT_TIME,    /* time duration/interval in seconds, says hours,mins,secs */
+    UNIT_DATEYEAR,/* for 1999 say nineteen ninety nine */
     UNIT_LAST     /* END MARKER */
 };
 
@@ -111,6 +112,8 @@ int talk_file_or_spell(const char *dirname, const char* filename,
 int talk_dir_or_spell(const char* filename,
                       const long *prefix_ids, bool enqueue);
 #endif
+/* play thumbnails for each components of full path, or spell */
+int talk_fullpath(const char* path, bool enqueue);
 int talk_number(long n, bool enqueue); /* say a number */
 int talk_value(long n, int unit, bool enqueue); /* say a numeric value */
 int talk_value_decimal(long n, int unit, int decimals, bool enqueue);

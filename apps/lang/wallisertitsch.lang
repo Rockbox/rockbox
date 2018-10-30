@@ -2715,7 +2715,7 @@
     *: "Titel"
   </dest>
   <voice>
-    *: ""
+    *: "Titel"
   </voice>
 </phrase>
 <phrase>
@@ -2729,7 +2729,7 @@
     *: "Künschtler"
   </dest>
   <voice>
-    *: ""
+    *: "Künschtler"
   </voice>
 </phrase>
 <phrase>
@@ -2743,7 +2743,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -2757,7 +2757,7 @@
     *: "Lied Nr."
   </dest>
   <voice>
-    *: ""
+    *: "Lied Nr."
   </voice>
 </phrase>
 <phrase>
@@ -2771,7 +2771,7 @@
     *: "Stil"
   </dest>
   <voice>
-    *: ""
+    *: "Stil"
   </voice>
 </phrase>
 <phrase>
@@ -2785,7 +2785,7 @@
     *: "Jahr"
   </dest>
   <voice>
-    *: ""
+    *: "Jahr"
   </voice>
 </phrase>
 <phrase>
@@ -2799,7 +2799,7 @@
     *: "Liederlischta"
   </dest>
   <voice>
-    *: ""
+    *: "Liederlischta"
   </voice>
 </phrase>
 <phrase>
@@ -2813,7 +2813,7 @@
     *: "Bitrata"
   </dest>
   <voice>
-    *: ""
+    *: "Bitrata"
   </voice>
 </phrase>
 <phrase>
@@ -2827,7 +2827,7 @@
     *: "Frequänz"
   </dest>
   <voice>
-    *: ""
+    *: "Frequänz"
   </voice>
 </phrase>
 <phrase>
@@ -2841,7 +2841,7 @@
     *: "Pfad"
   </dest>
   <voice>
-    *: ""
+    *: "Pfad"
   </voice>
 </phrase>
 <phrase>
@@ -2855,7 +2855,7 @@
     *: "<kei Info>"
   </dest>
   <voice>
-    *: ""
+    *: "kei Info"
   </voice>
 </phrase>
 <phrase>

@@ -326,7 +326,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
     if (!have_list)
     {
         /* Nothing to view, exit */
-        splash(HZ, str(LANG_CATALOG_NO_PLAYLISTS));
+        splash(HZ, ID2P(LANG_CATALOG_NO_PLAYLISTS));
         return false;
     }
 
@@ -638,27 +638,28 @@ static enum themable_icons playlist_callback_icons(int selected_item,
 static int playlist_callback_voice(int selected_item, void *data)
 {
     struct playlist_viewer *local_viewer = (struct playlist_viewer *)data;
-
-    int track_num = get_track_num(local_viewer, selected_item);
-    struct playlist_entry *track =
-        playlist_buffer_get_track(&(local_viewer->buffer), track_num);
-
-    bool enqueue = false;
-
-    if (global_settings.talk_file_clip || global_settings.talk_file == 2)
-    {
-        if (global_settings.playlist_viewer_indices)
-        {
-            talk_number(track->display_index, false);
-            enqueue = true;
-        }
-        talk_file_or_spell(NULL, track->name, NULL, enqueue);
+    struct playlist_entry *track=
+        playlist_buffer_get_track(&(local_viewer->buffer),
+                                  selected_item);
+    (void)selected_item;
+    if(global_settings.playlist_viewer_icons) {
+        if (track->index == local_viewer->current_playing_track)
+            talk_id(VOICE_NOW_PLAYING, true);
+        if (track->index == local_viewer->moving_track)
+            talk_id(VOICE_TRACK_TO_MOVE, true);
+        if (track->queued)
+            talk_id(VOICE_QUEUED, true);
     }
-    else if (global_settings.talk_file == 1) /* as numbers */
-    {
-        talk_id(VOICE_FILE, false);
+    if (track->skipped)
+        talk_id(VOICE_BAD_TRACK, true);
+    if (global_settings.playlist_viewer_indices)
         talk_number(track->display_index, true);
-    }
+
+    if(global_settings.playlist_viewer_track_display)
+        talk_fullpath(track->name, true);
+    else talk_file_or_spell(NULL, track->name, NULL, true);
+    if (viewer.moving_track != -1)
+        talk_ids(true,VOICE_PAUSE, VOICE_MOVING_TRACK);
 
     return 0;
 }
@@ -678,7 +679,9 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
     push_current_activity(ACTIVITY_PLAYLISTVIEWER);
     gui_synclist_init(&playlist_lists, playlist_callback_name,
                       &viewer, false, 1, NULL);
-    gui_synclist_set_voice_callback(&playlist_lists, playlist_callback_voice);
+    gui_synclist_set_voice_callback(&playlist_lists,
+                                    global_settings.talk_file?
+                                    &playlist_callback_voice:NULL);
     gui_synclist_set_icon_callback(&playlist_lists,
                   global_settings.playlist_viewer_icons?
                   &playlist_callback_icons:NULL);
@@ -708,6 +711,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
             gui_synclist_set_nb_items(&playlist_lists, viewer.num_tracks);
 
             gui_synclist_draw(&playlist_lists);
+            gui_synclist_speak_item(&playlist_lists);
         }
 
         /* Timeout so we can determine if play status has changed */
@@ -740,6 +744,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                     viewer.moving_track = -1;
                     viewer.moving_playlist_index = -1;
                     gui_synclist_draw(&playlist_lists);
+                    gui_synclist_speak_item(&playlist_lists);
                 }
                 else
                 {
@@ -763,8 +768,11 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                                             viewer.moving_playlist_index,
                                             current_track->index);
                     if (ret_val < 0)
+                    {
+                         cond_talk_ids_fq(LANG_MOVE, LANG_FAILED);
                          splashf(HZ, (unsigned char *)"%s %s", str(LANG_MOVE),
                                                                str(LANG_FAILED));
+                    }
                     update_playlist(true);
                     viewer.moving_track = -1;
                     viewer.moving_playlist_index = -1;
@@ -800,6 +808,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                     exit = true;
                 }
                 gui_synclist_draw(&playlist_lists);
+                gui_synclist_speak_item(&playlist_lists);
 
                 break;
             }
@@ -833,6 +842,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                               global_settings.playlist_viewer_icons?
                               &playlist_callback_icons:NULL);
                 gui_synclist_draw(&playlist_lists);
+                gui_synclist_speak_item(&playlist_lists);
                 break;
             }
             case ACTION_STD_MENU:
@@ -849,6 +859,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
     }
 
 exit:
+    talk_shutup();
     pop_current_activity();
     if (viewer.playlist)
     {
@@ -870,6 +881,17 @@ static const char* playlist_search_callback_name(int selected_item, void * data,
     return buffer;
 }
 
+static int say_search_item(int selected_item, void *data)
+{
+    int *found_indicies = (int*)data;
+    static struct playlist_track_info track;
+    playlist_get_track_info(viewer.playlist,found_indicies[selected_item],&track);
+    if(global_settings.playlist_viewer_track_display)
+        talk_fullpath(track.filename, false);
+    else talk_file_or_spell(NULL, track.filename, NULL, false);
+    return 0;
+}
+
 bool search_playlist(void)
 {
     char search_str[32] = "";
@@ -887,6 +909,7 @@ bool search_playlist(void)
         return ret;
     lcd_clear_display();
     playlist_count = playlist_amount_ex(viewer.playlist);
+    cond_talk_ids_fq(LANG_WAIT);
 
     cpu_boost(true);
 
@@ -913,6 +936,8 @@ bool search_playlist(void)
 
     cpu_boost(false);
 
+    cond_talk_ids_fq(TALK_ID(found_indicies_count, UNIT_INT),
+                     LANG_PLAYLIST_SEARCH_MSG);
     if (!found_indicies_count)
     {
         return ret;
@@ -923,9 +948,14 @@ bool search_playlist(void)
                       found_indicies, false, 1, NULL);
     gui_synclist_set_title(&playlist_lists, str(LANG_SEARCH_RESULTS), NOICON);
     gui_synclist_set_icon_callback(&playlist_lists, NULL);
+    if(global_settings.talk_file)
+        gui_synclist_set_voice_callback(&playlist_lists,
+                                        global_settings.talk_file?
+                                        &say_search_item:NULL);
     gui_synclist_set_nb_items(&playlist_lists, found_indicies_count);
     gui_synclist_select_item(&playlist_lists, 0);
     gui_synclist_draw(&playlist_lists);
+    gui_synclist_speak_item(&playlist_lists);
     while (!exit)
     {
         if (list_do_action(CONTEXT_LIST, HZ/4,
@@ -954,5 +984,6 @@ bool search_playlist(void)
                 break;
         }
     }
+    talk_shutup();
     return ret;
 }

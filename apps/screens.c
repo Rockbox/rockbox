@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "backlight.h"
 #include "action.h"
 #include "lcd.h"
@@ -81,6 +82,7 @@ int mmc_remove_request(void)
     }
 }
 #endif
+#include "ctype.h"
 
 /* the charging screen is only used for archos targets */
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING) && defined(CPU_SH)
@@ -643,14 +645,102 @@ struct id3view_info {
     int info_id[ARRAYLEN(id3_headers)];
 };
 
-static const char* id3_get_info(int selected_item, void* data,
-                                char *buffer, size_t buffer_len)
+/* Spell out a buffer, but when successive digits are encountered, say
+   the whole number. Useful for some ID3 tags that usually contain a
+   number but are in fact free-form. */
+static void say_number_and_spell(char *buf, bool year_style)
+{
+    char *ptr = buf;
+    while(*ptr) {
+        if(isdigit(*ptr)) {
+            /* parse the number */
+            int n = atoi(ptr);
+            /* skip over digits to rest of string */
+            while(isdigit(*++ptr));
+            /* say the number */
+            if(year_style)
+                talk_value(n, UNIT_DATEYEAR, true);
+            else talk_number(n, true);
+        }else{
+            /* Spell a sequence of non-digits */
+            char tmp, *start = ptr;
+            while(*++ptr && !isdigit(*ptr));
+            /* temporarily truncate the string here */
+            tmp = *ptr;
+            *ptr = '\0';
+            talk_spell(start, true);
+            *ptr = tmp; /* restore string */
+        }
+    }
+}
+
+/* Say a replaygain ID3 value from its text form */
+static void say_gain(char *buf)
+{
+    /* Expected form is "-5.74 dB". We'll try to parse out the number
+       until the dot, say it (forcing the + sign), then say dot and
+       spell the following numbers, and then say the decibel unit. */
+    char *ptr = buf;
+    if(*ptr == '-' || *ptr == '+')
+        /* skip sign */
+        ++ptr;
+    /* See if we can parse out a number. */
+    if(isdigit(*ptr)) {
+        char tmp;
+        /* skip successive digits */
+        while(isdigit(*++ptr));
+        /* temporarily truncate the string here */
+        tmp = *ptr;
+        *ptr = '\0';
+        /* parse out the number we just skipped */
+        talk_value(atoi(buf), UNIT_SIGNED, true); /* say the number with sign */
+        *ptr = tmp; /* restore the string */
+        if(*ptr == '.') {
+            /* found the dot, get fractional part */
+            buf = ptr;
+            while (isdigit(*++ptr));
+            while (*--ptr == '0');
+            if (ptr > buf) {
+                tmp = *++ptr;
+                *ptr = '\0';
+                talk_id(LANG_POINT, true);
+                while (*++buf == '0')
+                    talk_id(VOICE_ZERO, true);
+                talk_number(atoi(buf), true);
+                *ptr = tmp;
+            }
+            ptr = buf;
+            while (isdigit(*++ptr));
+        }
+        buf = ptr;
+        if(strlen(buf) >2 && !strcmp(buf+strlen(buf)-2, "dB")) {
+            /* String does end with "dB" */
+            /* point to that "dB" */
+            ptr = buf+strlen(buf)-2;
+            /* backup any spaces */
+            while (ptr >buf && ptr[-1] == ' ')
+                --ptr;
+            if (ptr > buf)
+                talk_spell(buf, true);
+            else talk_id(VOICE_DB, true); /* say the dB unit */
+        }else /* doesn't end with dB, just spell everything after the
+                 number of dot. */
+            talk_spell(buf, true);
+    }else /* we didn't find a number, just spell everything */
+        talk_spell(buf, true);
+}
+
+static const char * id3_get_or_speak_info(int selected_item, void* data,
+                                          char *buffer, size_t buffer_len,
+                                          bool say_it)
 {
     struct id3view_info *info = (struct id3view_info*)data;
     struct mp3entry* id3 =info->id3;
     int info_no=selected_item/2;
     if(!(selected_item%2))
     {/* header */
+        if(say_it)
+            talk_id(id3_headers[info->info_id[info_no]], false);
         snprintf(buffer, buffer_len,
                  "[%s]", str(id3_headers[info->info_id[info_no]]));
         return buffer;
@@ -663,35 +753,57 @@ static const char* id3_get_info(int selected_item, void* data,
         {
             case LANG_ID3_TITLE:
                 val=id3->title;
+                if(say_it && val)
+                    talk_spell(val, true);
                 break;
             case LANG_ID3_ARTIST:
                 val=id3->artist;
+                if(say_it && val)
+                    talk_spell(val, true);
                 break;
             case LANG_ID3_ALBUM:
                 val=id3->album;
+                if(say_it && val)
+                    talk_spell(val, true);
                 break;
             case LANG_ID3_ALBUMARTIST:
                 val=id3->albumartist;
+                if(say_it && val)
+                    talk_spell(val, true);
                 break;
             case LANG_ID3_GROUPING:
                 val=id3->grouping;
+                if(say_it && val)
+                    talk_spell(val, true);
                 break;
             case LANG_ID3_DISCNUM:
                 if (id3->disc_string)
+                {
                     val = id3->disc_string;
+                    if(say_it)
+                        say_number_and_spell(val, true);
+                }
                 else if (id3->discnum)
                 {
                     snprintf(buffer, buffer_len, "%d", id3->discnum);
                     val = buffer;
+                    if(say_it)
+                        talk_number(id3->discnum, true);
                 }
                 break;
             case LANG_ID3_TRACKNUM:
                 if (id3->track_string)
+                {
                     val = id3->track_string;
+                    if(say_it)
+                        say_number_and_spell(val, true);
+                }
                 else if (id3->tracknum)
                 {
                     snprintf(buffer, buffer_len, "%d", id3->tracknum);
                     val = buffer;
+                    if(say_it)
+                        talk_number(id3->tracknum, true);
                 }
                 break;
             case LANG_ID3_COMMENT:
@@ -699,60 +811,117 @@ static const char* id3_get_info(int selected_item, void* data,
                     return NULL;
                 snprintf(buffer, buffer_len, "%s", id3->comment);
                 val=buffer;
+                if(say_it && val)
+                    talk_spell(val, true);
                 break;
             case LANG_ID3_GENRE:
                 val = id3->genre_string;
+                if(say_it && val)
+                    talk_spell(val, true);
                 break;
             case LANG_ID3_YEAR:
                 if (id3->year_string)
+                {
                     val = id3->year_string;
+                    if(say_it && val)
+                        say_number_and_spell(val, true);
+                }
                 else if (id3->year)
                 {
                     snprintf(buffer, buffer_len, "%d", id3->year);
                     val = buffer;
+                    if(say_it)
+                        talk_value(id3->year, UNIT_DATEYEAR, true);
                 }
                 break;
             case LANG_ID3_LENGTH:
                 format_time(buffer, buffer_len, id3->length);
                 val=buffer;
+                if(say_it)
+                    talk_value(id3->length /1000, UNIT_TIME, true);
                 break;
             case LANG_ID3_PLAYLIST:
                 snprintf(buffer, buffer_len, "%d/%d",
                          playlist_get_display_index(), playlist_amount());
                 val=buffer;
+                if(say_it)
+                {
+                    talk_number(playlist_get_display_index(), true);
+                    talk_id(VOICE_OF, true);
+                    talk_number(playlist_amount(), true);
+                }
                 break;
             case LANG_ID3_BITRATE:
                 snprintf(buffer, buffer_len, "%d kbps%s", id3->bitrate,
             id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
                 val=buffer;
+                if(say_it)
+                {
+                    talk_value(id3->bitrate, UNIT_KBIT, true);
+                    if(id3->vbr)
+                        talk_id(LANG_ID3_VBR, true);
+                }
                 break;
             case LANG_ID3_FREQUENCY:
                 snprintf(buffer, buffer_len, "%ld Hz", id3->frequency);
                 val=buffer;
+                if(say_it)
+                    talk_value(id3->frequency, UNIT_HERTZ, true);
                 break;
 #if CONFIG_CODEC == SWCODEC
             case LANG_ID3_TRACK_GAIN:
                 replaygain_itoa(buffer, buffer_len, id3->track_level);
                 val=(id3->track_level) ? buffer : NULL; /* only show level!=0 */
+                if(say_it && val)
+                    say_gain(val);
                 break;
             case LANG_ID3_ALBUM_GAIN:
                 replaygain_itoa(buffer, buffer_len, id3->album_level);
                 val=(id3->album_level) ? buffer : NULL; /* only show level!=0 */
+                if(say_it && val)
+                    say_gain(val);
                 break;
 #endif
             case LANG_ID3_PATH:
                 val=id3->path;
+                if(say_it && val)
+                    talk_fullpath(val, true);
                 break;    
             case LANG_ID3_COMPOSER:
                 val=id3->composer;
+                if(say_it && val)
+                    talk_spell(val, true);
                 break;
             case LANG_FILESIZE: /* not LANG_ID3_FILESIZE because the string is shared */
                 output_dyn_value(buffer, buffer_len, id3->filesize, byte_units, true);
                 val=buffer;
+                if(say_it && val)
+                    output_dyn_value(NULL, 0, id3->filesize, byte_units, true);
                 break;
         }
+        if((!val || !*val) && say_it)
+            talk_id(LANG_ID3_NO_INFO, true);
         return val && *val ? val : NULL;
     }
+}
+
+/* gui_synclist callback */
+static const char* id3_get_info(int selected_item, void* data,
+                                char *buffer, size_t buffer_len)
+{
+    return id3_get_or_speak_info(selected_item, data, buffer,
+                                 buffer_len, false);
+}
+
+static int id3_speak_item(int selected_item, void* data)
+{
+    char buffer[MAX_PATH];
+    selected_item &= ~1; /* Make sure it's even, to indicate the header */
+    /* say field name */
+    id3_get_or_speak_info(selected_item, data, buffer, MAX_PATH, true);
+    /* and field value */
+    id3_get_or_speak_info(selected_item+1, data, buffer, MAX_PATH, true);
+    return 0;
 }
 
 bool browse_id3(void)
@@ -775,11 +944,15 @@ bool browse_id3(void)
     }
 
     gui_synclist_init(&id3_lists, &id3_get_info, &info, true, 2, NULL);
+    if(global_settings.talk_menu)
+        gui_synclist_set_voice_callback(&id3_lists, id3_speak_item);
     gui_synclist_set_nb_items(&id3_lists, info.count*2);
     gui_synclist_draw(&id3_lists);
+    gui_synclist_speak_item(&id3_lists);
     while (true) {
-        key = get_action(CONTEXT_LIST,HZ/2);
-        if(!gui_synclist_do_button(&id3_lists, &key,LIST_WRAP_UNLESS_HELD))
+        if(!list_do_action(CONTEXT_LIST,HZ/2,
+                           &id3_lists, &key,LIST_WRAP_UNLESS_HELD)
+           && key!=ACTION_NONE && key!=ACTION_UNKNOWN)
         {
             if (key == ACTION_STD_OK || key == ACTION_STD_CANCEL)
             {
