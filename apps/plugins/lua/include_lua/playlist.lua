@@ -37,19 +37,19 @@ rb.playlist_start =             function(index, elapsed, offset)
                                     rb.playlist("start", index, elapsed, offset)
                                 end
 rb.playlist_resume_track =      function(index, crc, elapsed, offset)
-                                    rb.playlist("resumetrack", index, crc, elapsed, offset)
+                                    rb.playlist("resume_track", index, crc, elapsed, offset)
                                 end
 rb.playlist_resume =            function() return rb.playlist("resume") end
 rb.playlist_shuffle =           function(random_seed, index)
                                     rb.playlist("shuffle", random_seed, index)
                                 end
 rb.playlist_sync =              function () rb.playlist("sync") end
-rb.playlist_remove_all_tracks = function() return rb.playlist("removealltracks") end
+rb.playlist_remove_all_tracks = function() return rb.playlist("remove_all_tracks") end
 rb.playlist_insert_track =      function(filename, pos, bqueue, bsync)
-                                    return rb.playlist("inserttrack", filename, pos, bqueue, bsync)
+                                    return rb.playlist("insert_track", filename, pos, bqueue, bsync)
                                 end
 rb.playlist_insert_directory =  function(dir, pos, bqueue, brecurse)
-                                    return rb.playlist("insertdirectory", dir, pos, bqueue, brecurse)
+                                    return rb.playlist("insert_directory", dir, pos, bqueue, brecurse)
                                 end
 rb.playlist_tracks =            function(dir, filename)
                                     local tracks = {}

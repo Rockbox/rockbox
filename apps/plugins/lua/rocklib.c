@@ -197,9 +197,9 @@ RB_WRAP(playlist)
                      PLAYL_SHUFFLE, PLAYL_SYNC, PLAYL_REMOVEALLTRACKS,
                      PLAYL_INSERTTRACK, PLAYL_INSERTDIRECTORY, PLAYL_ECOUNT};
 
-    const char *playlist_option[] = {"amount", "add", "create", "start", "resumetrack",
-                                     "resume", "shuffle", "sync", "removealltracks",
-                                     "inserttrack", "insertdirectory", NULL};
+    const char *playlist_option[] = {"amount", "add", "create", "start", "resume_track",
+                                     "resume", "shuffle", "sync", "remove_all_tracks",
+                                     "insert_track", "insert_directory", NULL};
 
     const char *filename, *dir;
     int result = 0;
@@ -210,7 +210,6 @@ RB_WRAP(playlist)
     int option = luaL_checkoption (L, 1, NULL, playlist_option);
     switch(option)
     {
-        default:
         case PLAYL_AMOUNT:
             result = rb->playlist_amount();
             break;
@@ -277,15 +276,14 @@ RB_WRAP(audio)
                   AUDIO_RESUME, AUDIO_NEXT, AUDIO_PREV, AUDIO_FFREWIND,
                   AUDIO_FLUSHANDRELOADTRACKS, AUDIO_GETPOS, AUDIO_ECOUNT};
     const char *audio_option[] = {"status", "play", "stop", "pause",
-                                  "resume", "next", "prev", "ffrewind",
-                                  "flushandreloadtracks", "getfilepos", NULL};
+                                  "resume", "next", "prev", "ff_rewind",
+                                  "flush_and_reload_tracks", "get_file_pos", NULL};
     long elapsed, offset, newtime;
     int status = rb->audio_status();
 
     int option = luaL_checkoption (L, 1, NULL, audio_option);
     switch(option)
     {
-        default:
         case AUDIO_STATUS:
             break;
         case AUDIO_PLAY:
@@ -341,9 +339,9 @@ RB_WRAP(pcm)
                 PCM_PLAYSTOP, PCM_PLAYPAUSE, PCM_PLAYLOCK, PCM_PLAYUNLOCK,
                 PCM_CALCULATEPEAKS, PCM_SETFREQUENCY, PCM_GETBYTESWAITING, PCM_ECOUNT};
 
-    const char *pcm_option[] = {"applysettings", "isplaying", "ispaused",
-                                "playstop", "playpause", "playlock", "playunlock",
-                                "calculatepeaks", "setfrequency", "getbyteswaiting", NULL};
+    const char *pcm_option[] = {"apply_settings", "is_playing", "is_paused",
+                                "play_stop", "play_pause", "play_lock", "play_unlock",
+                                "calculate_peaks", "set_frequency", "get_bytes_waiting", NULL};
     bool   b_result;
     int    left, right;
     size_t byteswait;
@@ -353,7 +351,6 @@ RB_WRAP(pcm)
     int option = luaL_checkoption (L, 1, NULL, pcm_option);
     switch(option)
     {
-        default:
         case PCM_APPLYSETTINGS:
             rb->pcm_apply_settings();
             break;
