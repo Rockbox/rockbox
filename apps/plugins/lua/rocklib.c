@@ -472,6 +472,16 @@ RB_WRAP(create_numbered_filename)
     return 1;
 }
 
+RB_WRAP(utf8encode)
+{
+    unsigned long ucs = (unsigned long) luaL_checkint(L, 1);
+    unsigned char tmp[9];
+    unsigned char *end = rb->utf8encode(ucs, tmp);
+    *end = '\0';
+    lua_pushstring(L, tmp);
+    return 1;
+}
+
 #define RB_FUNC(func) {#func, rock_##func}
 static const luaL_Reg rocklib[] =
 {
@@ -520,6 +530,9 @@ static const luaL_Reg rocklib[] =
 #if CONFIG_CODEC == SWCODEC
     RB_FUNC(pcm),
 #endif
+
+    RB_FUNC(utf8encode),
+
     {NULL, NULL}
 };
 #undef RB_FUNC
