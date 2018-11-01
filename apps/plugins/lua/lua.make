@@ -17,8 +17,7 @@ OTHER_SRC += $(LUA_SRC)
 
 LUA_INCLUDEDIR := $(LUA_SRCDIR)/include_lua
 LUA_INCLUDELIST := $(addprefix $(LUA_BUILDDIR)/,audio.lua blit.lua color.lua draw.lua \
-	image.lua lcd.lua math_ex.lua print.lua \
-	timer.lua playlist.lua pcm.lua)
+	image.lua lcd.lua math_ex.lua print.lua timer.lua playlist.lua pcm.lua rbcompat.lua)
 
 
 ifndef APP_TYPE
