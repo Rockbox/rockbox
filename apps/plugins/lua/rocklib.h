@@ -33,7 +33,7 @@
 #endif
 
 #define RB_CONSTANT(x)        {#x, x}
-#define RB_STRING_CONSTANT(x) RB_CONSTANT(x)
+#define RB_STRING_CONSTANT(x) {#x, x}
 
 struct lua_int_reg {
   char const* name;

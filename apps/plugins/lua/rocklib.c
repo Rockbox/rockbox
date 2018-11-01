@@ -363,7 +363,7 @@ RB_WRAP(pcm)
             lua_pushboolean(L, b_result);
             break;
         case PCM_PLAYPAUSE:
-            rb->pcm_play_pause(luaL_checkboolean(L, 1));
+            rb->pcm_play_pause(luaL_checkboolean(L, 2));
             break;
         case PCM_PLAYSTOP:
             rb->pcm_play_stop();
@@ -380,7 +380,7 @@ RB_WRAP(pcm)
             lua_pushinteger(L, right);
             return 2;
         case PCM_SETFREQUENCY:
-            rb->pcm_set_frequency((unsigned int) luaL_checkint(L, 1));
+            rb->pcm_set_frequency((unsigned int) luaL_checkint(L, 2));
             break;
         case PCM_GETBYTESWAITING:
             byteswait = rb->pcm_get_bytes_waiting();
