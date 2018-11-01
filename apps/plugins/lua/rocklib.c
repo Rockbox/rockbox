@@ -9,6 +9,7 @@
  *
  * Copyright (C) 2008 Dan Everton (safetydan)
  * Copyright (C) 2009 Maurus Cuelenaere
+ * Copyright (C) 2018 William Wilgus
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -62,6 +63,73 @@ RB_WRAP(current_tick)
     return 1;
 }
 
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+RB_WRAP(schedule_cpu_boost)
+{
+    bool boost = luaL_checkboolean(L, 1);
+
+    if(boost)
+        rb->trigger_cpu_boost();
+    else
+        rb->cancel_cpu_boost();
+
+    return 0;
+}
+#endif
+
+RB_WRAP(current_path)
+{
+    return get_current_path(L, 1);
+}
+
+
+/* DEVICE INPUT CONTROL */
+
+RB_WRAP(get_plugin_action)
+{
+    static const struct button_mapping *m1[] = { pla_main_ctx };
+    int timeout = luaL_checkint(L, 1);
+    int btn;
+
+#ifdef HAVE_REMOTE_LCD
+    static const struct button_mapping *m2[] = { pla_main_ctx, pla_remote_ctx };
+    bool with_remote = luaL_optint(L, 2, 0);
+    if (with_remote)
+        btn = pluginlib_getaction(timeout, m2, 2);
+    else
+#endif
+        btn = pluginlib_getaction(timeout, m1, 1);
+
+    lua_pushinteger(L, btn);
+    return 1;
+}
+
+#ifdef HAVE_TOUCHSCREEN
+RB_WRAP(action_get_touchscreen_press)
+{
+    short x, y;
+    int result = rb->action_get_touchscreen_press(&x, &y);
+
+    lua_pushinteger(L, result);
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
+    return 3;
+}
+
+RB_WRAP(touchscreen_mode)
+{
+    int origmode = rb->touchscreen_get_mode();
+    if(!lua_isnoneornil(L, 1))
+    {
+        enum touchscreen_mode mode = luaL_checkint(L, 1);
+        rb->touchscreen_set_mode(mode);
+    }
+    lua_pushinteger(L, origmode);
+    return 1;
+}
+
+#endif
+
 RB_WRAP(kbd_input)
 {
     luaL_Buffer b;
@@ -84,37 +152,6 @@ RB_WRAP(kbd_input)
         return 0;
 
     return 1;
-}
-
-#ifdef HAVE_TOUCHSCREEN
-RB_WRAP(action_get_touchscreen_press)
-{
-    short x, y;
-    int result = rb->action_get_touchscreen_press(&x, &y);
-
-    lua_pushinteger(L, result);
-    lua_pushinteger(L, x);
-    lua_pushinteger(L, y);
-    return 3;
-}
-
-RB_WRAP(touchscreen_set_mode)
-{
-    enum touchscreen_mode mode = luaL_checkint(L, 1);
-    rb->touchscreen_set_mode(mode);
-    return 0;
-}
-
-RB_WRAP(touchscreen_get_mode)
-{
-    lua_pushinteger(L, rb->touchscreen_get_mode());
-    return 1;
-}
-#endif
-
-RB_WRAP(current_path)
-{
-    return get_current_path(L, 1);
 }
 
 static const char ** get_table_items(lua_State *L, int pos, int *count)
@@ -188,6 +225,9 @@ RB_WRAP(do_menu)
     lua_pushinteger(L, result);
     return 1;
 }
+
+
+/* DEVICE AUDIO / PLAYLIST CONTROL */
 
 RB_WRAP(playlist)
 {
@@ -391,7 +431,32 @@ RB_WRAP(pcm)
     rb->yield();
     return 1;
 }
+
+RB_WRAP(mixer_frequency)
+{
+    unsigned int result = rb->mixer_get_frequency();
+
+    if(!lua_isnoneornil(L, 1))
+    {
+        unsigned int samplerate = (unsigned int) luaL_checkint(L, 1);
+        rb->mixer_set_frequency(samplerate);
+    }
+    lua_pushinteger(L, result);
+    return 1;
+}
 #endif /*CONFIG_CODEC == SWCODEC*/
+
+/* DEVICE LIGHTING CONTROL */
+RB_WRAP(backlight_onoff)
+{
+    bool on = luaL_checkboolean(L, 1);
+    if(on)
+        rb->backlight_on();
+    else
+        rb->backlight_off();
+
+    return 0;
+}
 
 SIMPLE_VOID_WRAPPER(backlight_force_on);
 SIMPLE_VOID_WRAPPER(backlight_use_settings);
@@ -409,32 +474,35 @@ SIMPLE_VOID_WRAPPER(buttonlight_use_settings);
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 RB_WRAP(backlight_brightness_set)
 {
-    int brightness = luaL_checkint(L, 1);
-    backlight_brightness_set(brightness);
+    if(lua_isnoneornil(L, 1))
+        backlight_brightness_use_setting();
+    else
+    {
+        int brightness = luaL_checkint(L, 1);
+        backlight_brightness_set(brightness);
+    }
 
     return 0;
 }
-SIMPLE_VOID_WRAPPER(backlight_brightness_use_setting);
 #endif
 
-RB_WRAP(get_plugin_action)
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+RB_WRAP(buttonlight_brightness_set)
 {
-    static const struct button_mapping *m1[] = { pla_main_ctx };
-    int timeout = luaL_checkint(L, 1);
-    int btn;
-
-#ifdef HAVE_REMOTE_LCD
-    static const struct button_mapping *m2[] = { pla_main_ctx, pla_remote_ctx };
-    bool with_remote = luaL_optint(L, 2, 0);
-    if (with_remote)
-        btn = pluginlib_getaction(timeout, m2, 2);
+    if(lua_isnoneornil(L, 1))
+        buttonlight_brightness_use_setting();
     else
-#endif
-        btn = pluginlib_getaction(timeout, m1, 1);
+    {
+        int brightness = luaL_checkint(L, 1);
+        buttonlight_brightness_set(brightness);
+    }
 
-    lua_pushinteger(L, btn);
-    return 1;
+    return 0;
 }
+#endif
+
+
+/* DEVICE STRING / FILENAME MANIPULATION */
 
 RB_WRAP(strip_extension)
 {
@@ -482,24 +550,52 @@ RB_WRAP(utf8encode)
     return 1;
 }
 
+RB_WRAP(strncasecmp)
+{
+    int result;
+    const char * s1 = luaL_checkstring(L, 1);
+    const char * s2 = luaL_checkstring(L, 2);
+    if(lua_isnoneornil(L, 3))
+        result = rb->strcasecmp(s1, s2);
+    else
+        result = rb->strncasecmp(s1, s2, (size_t) luaL_checkint(L, 3));
+
+    lua_pushinteger(L, result);
+    return 1;
+}
+
 #define RB_FUNC(func) {#func, rock_##func}
+#define RB_ALIAS(name, func) {name, rock_##func}
 static const luaL_Reg rocklib[] =
 {
     /* Kernel */
     RB_FUNC(current_tick),
-
-    /* Buttons */
-#ifdef HAVE_TOUCHSCREEN
-    RB_FUNC(action_get_touchscreen_press),
-    RB_FUNC(touchscreen_set_mode),
-    RB_FUNC(touchscreen_get_mode),
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+    RB_FUNC(schedule_cpu_boost),
 #endif
 
-    RB_FUNC(kbd_input),
-
     RB_FUNC(current_path),
+
+    /* DEVICE INPUT CONTROL */
+    RB_FUNC(get_plugin_action),
+#ifdef HAVE_TOUCHSCREEN
+    RB_FUNC(action_get_touchscreen_press),
+    RB_FUNC(touchscreen_mode),
+#endif
+    RB_FUNC(kbd_input),
     RB_FUNC(gui_syncyesno_run),
     RB_FUNC(do_menu),
+
+    /* DEVICE AUDIO / PLAYLIST CONTROL */
+    RB_FUNC(audio),
+    RB_FUNC(playlist),
+#if CONFIG_CODEC == SWCODEC
+    RB_FUNC(pcm),
+    RB_FUNC(mixer_frequency),
+#endif
+
+    /* DEVICE LIGHTING CONTROL */
+    RB_FUNC(backlight_onoff),
 
     /* Backlight helper */
     RB_FUNC(backlight_force_on),
@@ -517,25 +613,22 @@ static const luaL_Reg rocklib[] =
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     RB_FUNC(backlight_brightness_set),
-    RB_FUNC(backlight_brightness_use_setting),
 #endif
 
-    RB_FUNC(get_plugin_action),
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    RB_FUNC(buttonlight_brightness_set),
+#endif
 
+    /* DEVICE STRING / FILENAME MANIPULATION */
     RB_FUNC(strip_extension),
     RB_FUNC(create_numbered_filename),
-
-    RB_FUNC(audio),
-    RB_FUNC(playlist),
-#if CONFIG_CODEC == SWCODEC
-    RB_FUNC(pcm),
-#endif
-
     RB_FUNC(utf8encode),
+    RB_FUNC(strncasecmp),
 
     {NULL, NULL}
 };
 #undef RB_FUNC
+#undef RB_ALIAS
 
 extern const luaL_Reg rocklib_aux[];
 
@@ -546,7 +639,7 @@ LUALIB_API int luaopen_rock(lua_State *L)
 {
     luaL_register(L, LUA_ROCKLIBNAME, rocklib);
     luaL_register(L, LUA_ROCKLIBNAME, rocklib_aux);
-    
+
     static const struct lua_int_reg rlib_const_int[] =
     {
         /* useful integer constants */
@@ -555,10 +648,12 @@ LUALIB_API int luaopen_rock(lua_State *L)
         RB_CONSTANT(LCD_DEPTH),
         RB_CONSTANT(LCD_HEIGHT),
         RB_CONSTANT(LCD_WIDTH),
+        RB_CONSTANT(SCREEN_MAIN),
 #ifdef HAVE_REMOTE_LCD
         RB_CONSTANT(LCD_REMOTE_DEPTH),
         RB_CONSTANT(LCD_REMOTE_HEIGHT),
         RB_CONSTANT(LCD_REMOTE_WIDTH),
+        RB_CONSTANT(SCREEN_REMOTE),
 #endif
 
         RB_CONSTANT(FONT_SYSFIXED),
@@ -571,12 +666,6 @@ LUALIB_API int luaopen_rock(lua_State *L)
         RB_CONSTANT(PLAYLIST_INSERT_SHUFFLED),
         RB_CONSTANT(PLAYLIST_PREPEND),
         RB_CONSTANT(PLAYLIST_REPLACE),
-
-
-        RB_CONSTANT(SCREEN_MAIN),
-#ifdef HAVE_REMOTE_LCD
-        RB_CONSTANT(SCREEN_REMOTE),
-#endif
 
 #ifdef HAVE_TOUCHSCREEN
         RB_CONSTANT(TOUCHSCREEN_POINT),
