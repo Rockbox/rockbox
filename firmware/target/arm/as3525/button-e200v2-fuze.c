@@ -79,7 +79,7 @@ int button_read_device(void)
 
     /* hold button handling */
     hold_button = ((dbop_din & (1<<12)) != 0);
-#ifndef BOOTLOADER
+#if !defined(BOOTLOADER) && defined(HAS_BUTTON_HOLD)
     /* light handling */
     if (hold_button != hold_button_old)
     {

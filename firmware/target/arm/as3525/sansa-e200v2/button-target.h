@@ -22,7 +22,7 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#define HAS_BUTTON_HOLD
+//#define HAS_BUTTON_HOLD
 
 unsigned short button_read_dbop(void);
 #define get_scrollwheel button_read_dbop

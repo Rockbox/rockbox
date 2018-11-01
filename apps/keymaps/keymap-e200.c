@@ -48,7 +48,6 @@ static const struct button_mapping button_context_standard[]  = {
 
     { ACTION_STD_QUICKSCREEN, BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_DOWN },
     { ACTION_STD_CONTEXT,     BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_SELECT },
-
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
@@ -85,7 +84,9 @@ static const struct button_mapping button_context_wps[]  = {
     
     { ACTION_WPS_PITCHSCREEN,   BUTTON_SELECT|BUTTON_UP,      BUTTON_SELECT },
     { ACTION_WPS_ID3SCREEN,     BUTTON_SELECT|BUTTON_DOWN,    BUTTON_SELECT },
-    
+    #ifndef HAS_BUTTON_HOLD
+    { ACTION_STD_KEYLOCK,       BUTTON_SELECT|BUTTON_RIGHT,      BUTTON_NONE },
+    #endif /* HAS_BUTTON_HOLD */
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 
