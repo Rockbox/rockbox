@@ -283,7 +283,7 @@ static int _read_line (lua_State *L, int *f) {
     }
     if (r < LUAL_BUFFERSIZE) {  /* eof? */
       luaL_pushresult(&b);  /* close buffer */
-      return (r > 0);  /* check whether read something */
+      return (lua_objlen(L, -1) > 0);  /* check whether read something */
     }
   }
 }
