@@ -224,6 +224,12 @@ static void pixel_to_fb(int x, int y, fb_data *oldv, fb_data *newv)
 #endif /* (LCD_DEPTH > 2) no native to pixel mapping needed */
 
 /* Internal worker functions for image data array *****************************/
+static inline fb_data lua_to_fbscalar(lua_State *L, int narg)
+{
+    lua_Integer luaint = lua_tointeger(L, narg);
+    fb_data val = FB_SCALARPACK((unsigned) luaint);
+    return val;
+}
 
 static inline void swap_int(bool swap, int *v1, int *v2)
 {
@@ -416,7 +422,7 @@ static int rli_setget(lua_State *L, bool is_get, int narg_clip)
         lua_pushinteger(L, FB_UNPACK_SCALAR_LCD(data_get(element, x, y)));
     else /* set element */
     {
-        clr = FB_SCALARPACK((unsigned) lua_tointeger(L, 4));
+        clr = lua_to_fbscalar(L, 4);
         lua_pushinteger(L, FB_UNPACK_SCALAR_LCD(data_set(element, x, y, &clr)));
     }
 
@@ -681,7 +687,7 @@ static int rli_line_ellipse(lua_State *L, bool is_ellipse, int narg_clip)
     int x2 = luaL_optint(L, 4, x1);
     int y2 = luaL_optint(L, 5, y1);
 
-    fb_data clr = FB_SCALARPACK((unsigned) lua_tointeger(L, 6));
+    fb_data clr = lua_to_fbscalar(L, 6);
 
     fb_data fillclr; /* fill color is index 7 if is_ellipse */
     fb_data *p_fillclr = NULL;
@@ -698,7 +704,7 @@ static int rli_line_ellipse(lua_State *L, bool is_ellipse, int narg_clip)
     {
         if(lua_type(L, 7) == LUA_TNUMBER)
         {
-            fillclr = FB_SCALARPACK((unsigned) lua_tointeger(L, 7));
+            fillclr = lua_to_fbscalar(L, 7);
             p_fillclr = &fillclr;
         }
 
@@ -751,14 +757,14 @@ static void custom_transform(lua_State *L,
         if(lua_type(L, -2) == LUA_TNUMBER)
         {
             done = false;
-            dst = FB_SCALARPACK((unsigned) lua_tointeger(L, -2));
+            dst = lua_to_fbscalar(L, -2);
             data_set(ds->elem, ds->x, ds->y, &dst);
         }
 
         if(ss && (lua_type(L, -1) == LUA_TNUMBER))
         {
             done = false;
-            src = FB_SCALARPACK((unsigned) lua_tointeger(L, -1));
+            src = lua_to_fbscalar(L, -1);
             data_set(ss->elem, ss->x, ss->y, &src);
         }
 
@@ -956,7 +962,7 @@ RLI_LUA rli_raw(lua_State *L)
 
     if(lua_type(L, 3) == LUA_TNUMBER)
     {
-        val = FB_SCALARPACK((unsigned) lua_tointeger(L, 3));
+        val = lua_to_fbscalar(L, 3);
         a->data[i-1] = val;
     }
 
@@ -1055,7 +1061,7 @@ RLI_LUA rli_marshal(lua_State *L) /* also invert, clear */
 
     if (ltype == LUA_TNUMBER)
     {
-        clr = FB_SCALARPACK((unsigned) lua_tointeger(L, 9));
+        clr = lua_to_fbscalar(L, 9);
         rli_trans = clear_transform;
     }
     else if(ltype == LUA_TFUNCTION) /* custom function */
@@ -1156,7 +1162,7 @@ RLI_LUA rli_copy(lua_State *L)
     else
     {
         rli_trans = blit_transform; /* default transformation */
-        clr = FB_SCALARPACK((unsigned) lua_tointeger(L, 11));
+        clr = lua_to_fbscalar(L, 11);
         op = lua_tointeger(L, 10);
     }
 
