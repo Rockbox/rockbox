@@ -271,17 +271,20 @@ static int _read_line (lua_State *L, int *f) {
     size_t l;
     off_t r;
     char *p = luaL_prepbuffer(&b);
-    r = rb->read_line(*f, p, LUAL_BUFFERSIZE);
+    r = rb->read_line(*f, p, LUAL_BUFFERSIZE); /* does not include `eol' */
     l = strlen(p);
 
-    if (l == 0 || p[l-1] != '\n')
-      luaL_addsize(&b, l);
-    else {
-      luaL_addsize(&b, l - 1);  /* do not include `eol' */
+    if (l == 0 && r > 0)
+      continue;
+    else if(l > 0){
+      luaL_addsize(&b, l);  /* does not include `eol' */
+      if(r >= LUAL_BUFFERSIZE - 1)
+        continue; /* more to read */
+
       luaL_pushresult(&b);  /* close buffer */
-      return 1;  /* read at least an `eol' */
+      return 1;
     }
-    if (r < LUAL_BUFFERSIZE) {  /* eof? */
+    if (r < LUAL_BUFFERSIZE - 1) {  /* eof? */
       luaL_pushresult(&b);  /* close buffer */
       return (r > 0);  /* check whether read something */
     }
