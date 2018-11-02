@@ -269,22 +269,19 @@ static int _read_line (lua_State *L, int *f) {
   luaL_buffinit(L, &b);
   for (;;) {
     size_t l;
-    off_t r;
     char *p = luaL_prepbuffer(&b);
-    r = rb->read_line(*f, p, LUAL_BUFFERSIZE);
+    off_t r = rb->read_line(*f, p, LUAL_BUFFERSIZE); /* does not include `eol' */
+    if (r <= 0) {  /* eof? */
+      luaL_pushresult(&b);  /* close buffer */
+      return (lua_objlen(L, -1) > 0);  /* check whether read something */
+    }
     l = strlen(p);
+    luaL_addsize(&b, l);
+    if(r >= LUAL_BUFFERSIZE - 1)
+      continue; /* more to read */
 
-    if (l == 0 || p[l-1] != '\n')
-      luaL_addsize(&b, l);
-    else {
-      luaL_addsize(&b, l - 1);  /* do not include `eol' */
-      luaL_pushresult(&b);  /* close buffer */
-      return 1;  /* read at least an `eol' */
-    }
-    if (r < LUAL_BUFFERSIZE) {  /* eof? */
-      luaL_pushresult(&b);  /* close buffer */
-      return (r > 0);  /* check whether read something */
-    }
+    luaL_pushresult(&b);  /* close buffer */
+    return 1;  /* we read at least 1 character */
   }
 }
 
