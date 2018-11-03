@@ -232,9 +232,9 @@ function load_scores(filename)
     if f ~= nil then
         local highscores = {}
         for i=1,3 do
-            local line = f:read()
+            local line = f:read() or ""
             local value = false
-            if line ~= nil then
+            if line ~= "" then
                 value = tonumber(line)
             end
 
@@ -307,9 +307,9 @@ if rb ~= nil then
     }
     DEFAULT_DIFFICULTY = 2 --1: Easy, 2: Normal, 3: Hard
 
-    FILES_ROOT = "/.rockbox/rocks/games/"
-    SCORES_FILE = FILES_ROOT.."pixel-painter.score"
-    SAVE_FILE = FILES_ROOT.."pixel-painter.save"
+    FILES_ROOT = rb.PLUGIN_GAMES_DATA_DIR
+    SCORES_FILE = FILES_ROOT.."/pixel-painter.score"
+    SAVE_FILE = FILES_ROOT.."/pixel-painter.save"
     r,w,TEXT_LINE_HEIGHT = rb.font_getstringsize(" ", rb.FONT_UI) --Get font height
     --Determine which layout to use by considering the screen dimensions
     --the +9 is so we have space for the chooser
