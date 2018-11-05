@@ -42,7 +42,7 @@ int rtc_read_datetime(struct tm *tm)
 
 int rtc_write_datetime(const struct tm *tm)
 {
-#if defined(AGPTEK_ROCKER) && !defined(WIN32)
+#if !defined(WIN32)
     struct timeval tv;
     struct tm *tm_time;
 

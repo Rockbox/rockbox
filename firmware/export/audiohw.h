@@ -224,6 +224,8 @@ struct sound_settings_info
 #include "codec-dx90.h"
 #elif defined(HAVE_ROCKER_CODEC)
 #include "rocker_codec.h"
+#elif defined(HAVE_XDUOO_LINUX_CODEC)
+#include "rocker_codec.h"
 #endif
 
 /* convert caps into defines */

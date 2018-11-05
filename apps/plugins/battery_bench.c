@@ -298,6 +298,18 @@
 #define BATTERY_ON_TXT  "PLAY - start"
 #define BATTERY_OFF_TXT "POWER"
 
+#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
+#define BATTERY_ON      BUTTON_PLAY
+#define BATTERY_OFF     BUTTON_POWER
+#define BATTERY_ON_TXT  "Play - start"
+#define BATTERY_OFF_TXT "POWER"
+
+#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#define BATTERY_ON      BUTTON_PLAY
+#define BATTERY_OFF     BUTTON_POWER
+#define BATTERY_ON_TXT  "Play - start"
+#define BATTERY_OFF_TXT "POWER"
+
 #else
 #error No keymap defined!
 #endif

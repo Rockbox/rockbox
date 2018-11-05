@@ -78,6 +78,8 @@ mpio_hd200_hd300.c
 nwz_linux.c
 #elif defined(AGPTEK_ROCKER)
 rocker_linux.c
+#elif (defined(XDUOO_X3II) || defined(XDUOO_X20))
+xduoo_linux.c
 #elif defined(RK27_GENERIC) || defined(HM60X) || defined(HM801) \
       || defined(MA9) || defined(MA9C) || defined(MA8) || defined(MA8C) \
       || defined(IHIFI760) || defined(IHIFI960) || defined(IHIFI800) \

@@ -42,7 +42,7 @@
 
 #if !defined(APPLICATION) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || \
     defined(DX50) || defined(DX90) || defined(SONY_NWZ_LINUX) || \
-    defined(AGPTEK_ROCKER)
+    defined(AGPTEK_ROCKER) || defined(XDUOO_X3II) || defined(XDUOO_X20)
 
 #if defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
 #define HOME_DIR "/mnt/media0"

@@ -3,7 +3,7 @@
  */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 103//???
+#define MODEL_NUMBER 105
 
 #define MODEL_NAME   "Agptek Rocker"
 

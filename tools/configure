@@ -888,7 +888,6 @@ mipsellinuxcc () {
  SHARED_LDFLAG="-shared"
  SHARED_CFLAGS='-fPIC -fvisibility=hidden'
  endian="little"
- app_type="rocker"
  thread_support="HAVE_SIGALTSTACK_THREADS"
 
  # Include path
@@ -1244,7 +1243,7 @@ voiceconfig () {
             exit 4
          fi
     fi
- 
+
     echo "Using $ENCODER for encoding voice clips"
 
     # Read custom encoder options from command line
@@ -1392,7 +1391,7 @@ ARG_ARM_THUMB=
 ARG_PREFIX="$PREFIX"
 ARG_THREAD_SUPPORT=
 ARG_32BIT=
-err=            
+err=
 for arg in "$@"; do
 	case "$arg" in
 		--ccache)     ARG_CCACHE=1;;
@@ -1565,6 +1564,8 @@ cat <<EOF
                                                  229) NWZ-S750 series
  ==xDuoo==                ==AgpTek==
  241) X3                  240) Rocker
+ 242) X3II
+ 243) X20
 
 EOF
 
@@ -2260,7 +2261,7 @@ fi
     t_manufacturer="tcc780x"
     t_model="cowond2"
     ;;
-    
+
    34|iaudiom3)
     target_id=37
     modelname="iaudiom3"
@@ -2403,7 +2404,7 @@ fi
     t_manufacturer="tcc77x"
     t_model="logikdax"
     ;;
-	
+
     89|creativezenxfistyle)
     target_id=94
     modelname="creativezenxfistyle"
@@ -2446,7 +2447,7 @@ fi
     t_manufacturer="tms320dm320"
     t_model="creative-zvm"
     ;;
-    
+
     91|zenvisionm60gb)
     target_id=40
     modelname="zenvisionm60gb"
@@ -2469,7 +2470,7 @@ fi
     t_manufacturer="tms320dm320"
     t_model="creative-zvm"
     ;;
-    
+
     92|zenvision)
     target_id=39
     modelname="zenvision"
@@ -2717,9 +2718,9 @@ fi
     ;;
 
    54|sansac100)
-    target_id=42 
-    modelname="sansac100" 
-    target="SANSA_C100"     
+    target_id=42
+    modelname="sansac100"
+    target="SANSA_C100"
     memory=2
     arm946cc
     tool="$rootdir/tools/scramble -add=c100"
@@ -3117,7 +3118,7 @@ fi
     t_manufacturer="s5l8700"
     t_model="meizu-m6sl"
     ;;
-    
+
    111|meizum6sp)
     target_id=46
     modelname="meizum6sp"
@@ -3139,7 +3140,7 @@ fi
     t_manufacturer="s5l8700"
     t_model="meizu-m6sp"
     ;;
-    
+
    112|meizum3)
     target_id=47
     modelname="meizum3"
@@ -3161,7 +3162,7 @@ fi
     t_manufacturer="s5l8700"
     t_model="meizu-m3"
     ;;
-    
+
     120|ondavx747)
     target_id=45
     modelname="ondavx747"
@@ -3183,7 +3184,7 @@ fi
     t_manufacturer="ingenic_jz47xx"
     t_model="onda_vx747"
     ;;
-    
+
     121|ondavx767)
     target_id=64
     modelname="ondavx767"
@@ -3205,7 +3206,7 @@ fi
     t_manufacturer="ingenic_jz47xx"
     t_model="onda_vx767"
     ;;
-    
+
     122|ondavx747p)
     target_id=54
     modelname="ondavx747p"
@@ -3227,7 +3228,7 @@ fi
     t_manufacturer="ingenic_jz47xx"
     t_model="onda_vx747"
     ;;
-    
+
     123|ondavx777)
     target_id=61
     modelname="ondavx777"
@@ -3249,7 +3250,7 @@ fi
     t_manufacturer="ingenic_jz47xx"
     t_model="onda_vx747"
     ;;
-    
+
     130|lyreproto1)
     target_id=56
     modelname="lyreproto1"
@@ -3271,7 +3272,7 @@ fi
     t_manufacturer="at91sam"
     t_model="lyre_proto1"
     ;;
-    
+
    131|mini2440)
     target_id=99
     modelname="mini2440"
@@ -3390,7 +3391,7 @@ fi
     t_manufacturer="s5l8700"
     t_model="yps3"
     ;;
-    
+
   144|samsungypz5)
     target_id=90
     modelname="samsungypz5"
@@ -4226,10 +4227,11 @@ fi
 
     240|agptekrocker)
     application="yes"
+    app_type="rocker"
     target_id=97
     modelname="agptekrocker"
     target="AGPTEK_ROCKER"
-    memory=6
+    memory=8
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -4266,6 +4268,52 @@ fi
     t_cpu="mips"
     t_manufacturer="ingenic_jz47xx"
     t_model="xduoo_x3"
+    ;;
+
+    242|xduoox3ii)
+    target_id=110
+    application=yes
+    app_type="xduoo"
+    modelname="xduoox3ii"
+    target="XDUOO_X3II"
+    memory=8
+    mipsellinuxcc
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 10"
+    output="rockbox.x3ii"
+    bootoutput="bootloader.x3ii"
+    appextra="recorder:gui:hosted"
+    plugins="yes"
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="xduoo"
+    t_model="xduoo_x3ii"
+    ;;
+
+    243|xduoox20)
+    target_id=111
+    application=yes
+    app_type="xduoo"
+    modelname="xduoox20"
+    target="XDUOO_X20"
+    memory=8
+    mipsellinuxcc
+    tool="cp "
+    boottool="cp "
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 10"
+    output="rockbox.x20"
+    bootoutput="bootloader.x20"
+    appextra="recorder:gui:hosted"
+    plugins="yes"
+    swcodec="yes"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="hosted"
+    t_manufacturer="xduoo"
+    t_model="xduoo_x20"
     ;;
 
    250|ihifi770c)
@@ -4749,7 +4797,7 @@ if [ -z "$arch" ]; then
         arch="none"
         echo "Warning: Could not determine target arch"
     fi
-    if [ "$arch" != "none" ]; then        
+    if [ "$arch" != "none" ]; then
         if [ -n "$arch_version" ]; then
             echo "Automatically selected arch: $arch (ver $arch_version)"
         else
@@ -4789,7 +4837,7 @@ if [ "$ARG_RBDIR" != "" ]; then
         rbdir="/"$ARG_RBDIR
     else
         rbdir=$ARG_RBDIR
-    fi 
+    fi
   echo "Using alternate rockbox dir: ${rbdir}"
 fi
 

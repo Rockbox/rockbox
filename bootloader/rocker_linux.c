@@ -12,7 +12,7 @@
  *
  * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
  * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -464,7 +464,7 @@ static int open_log(void)
         return fd;
     close(fd);
     /* move file */
-    rename("/mnt/sd_0/rockbox.log", "/mnt_sd0/rockbox.log.1");
+    rename("/mnt/sd_0/rockbox.log", "/mnt_sd_0/rockbox.log.1");
     /* re-open the file, truncate in case the move was unsuccessful */
     return open("/mnt/sd_0/rockbox.log", O_RDWR | O_CREAT | O_APPEND | O_TRUNC);
 }
