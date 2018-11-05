@@ -113,23 +113,35 @@ target/hosted/sonynwz/nvp-nwz.c
 target/hosted/sonynwz/nwz-db.c
 #endif
 
-#if defined(AGPTEK_ROCKER) && !defined(SIMULATOR)
+#if ((defined(AGPTEK_ROCKER) || defined(XDUOO_X3II) || defined(XDUOO_X20)) && !defined(SIMULATOR))
 drivers/lcd-memframe.c
-target/hosted/backtrace-glibc.c
-target/hosted/kernel-unix.c
-target/hosted/filesystem-unix.c
-target/hosted/lc-unix.c
 target/hosted/alsa-controls.c
 target/hosted/pcm-alsa.c
-target/hosted/agptek/sysfs.c
-target/hosted/agptek/backlight-agptek.c
+target/hosted/backtrace-glibc.c
+target/hosted/filesystem-unix.c
+target/hosted/kernel-unix.c
+target/hosted/lc-unix.c
+target/hosted/sysfs.c
+target/hosted/backlight-unix.c
+target/hosted/system-hosted.c
+#endif
+
+#if defined(AGPTEK_ROCKER) && !defined(SIMULATOR)
 target/hosted/agptek/button-agptek.c
 target/hosted/agptek/debug-agptek.c
 target/hosted/agptek/lcd-agptek.c
 target/hosted/agptek/power-agptek.c
 target/hosted/agptek/powermgmt-agptek.c
-target/hosted/agptek/system-agptek.c
 target/hosted/agptek/usb-agptek.c
+#endif
+
+#if ((defined(XDUOO_X3II)||defined(XDUOO_X20)) && !defined(SIMULATOR))
+target/hosted/xduoo/button-xduoo.c
+target/hosted/xduoo/debug-xduoo.c
+target/hosted/xduoo/lcd-xduoo.c
+target/hosted/xduoo/power-xduoo.c
+target/hosted/xduoo/powermgmt-xduoo.c
+target/hosted/xduoo/usb-xduoo.c
 #endif
 
 #if defined(SAMSUNG_YPR0) && !defined(SIMULATOR)
@@ -502,6 +514,8 @@ target/hosted/alsa-controls.c
 target/hosted/pcm-alsa.c
 #elif defined(HAVE_ROCKER_CODEC) && !defined(SIMULATOR)
 drivers/audio/rocker_codec.c
+#elif defined(HAVE_XDUOO_LINUX_CODEC) && !defined(SIMULATOR)
+drivers/audio/xduoolinux_codec.c
 #elif defined(HAVE_SDL_AUDIO)
 drivers/audio/sdl.c
 #if CONFIG_CODEC == SWCODEC
@@ -584,7 +598,7 @@ target/arm/ipod/powermgmt-ipod-pcf.c
 target/arm/pp/i2c-pp.c
 #elif CONFIG_I2C == I2C_PNX0101
 target/arm/pnx0101/i2c-pnx0101.c
-#elif CONFIG_I2C == I2C_TCC780X || CONFIG_I2C == I2C_TCC77X 
+#elif CONFIG_I2C == I2C_TCC780X || CONFIG_I2C == I2C_TCC77X
 target/arm/i2c-telechips.c
 #elif CONFIG_I2C == I2C_S3C2440
 target/arm/s3c2440/i2c-s3c2440.c
@@ -837,9 +851,9 @@ drivers/isp1583.c
 target/arm/rk27xx/usb-drv-rk27xx.c
 #endif
 #else /* !defined(HAVE_USBSTACK) */
-#if CONFIG_USBOTG == USBOTG_ISP1362	 
+#if CONFIG_USBOTG == USBOTG_ISP1362
 drivers/isp1362.c
-#elif CONFIG_USBOTG == USBOTG_M5636	 
+#elif CONFIG_USBOTG == USBOTG_M5636
 drivers/m5636.c
 #endif
 #endif /* !defined(HAVE_USBSTACK) */
@@ -1415,7 +1429,7 @@ target/arm/pnx0101/iriver-ifp7xx/button-ifp7xx.c
 target/arm/pnx0101/iriver-ifp7xx/lcd-ifp7xx.c
 target/arm/pnx0101/iriver-ifp7xx/power-ifp7xx.c
 target/arm/pnx0101/iriver-ifp7xx/powermgmt-ifp7xx.c
-target/arm/pnx0101/iriver-ifp7xx/usb-ifp7xx.c   
+target/arm/pnx0101/iriver-ifp7xx/usb-ifp7xx.c
 #ifndef BOOTLOADER
 target/arm/pnx0101/pcm-pnx0101.c
 #endif /* BOOTLOADER */
@@ -1989,7 +2003,7 @@ target/hosted/ibasso/dx90/button-dx90.c
 #ifdef WIN32
 asm/mempcpy.c
 target/hosted/filesystem-win32.c
-#else /* !WIN32 */ 
+#else /* !WIN32 */
 target/hosted/filesystem-unix.c
 #endif /* WIN32 */
 target/hosted/sdl/load_code-sdl.c
