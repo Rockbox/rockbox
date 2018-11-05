@@ -521,12 +521,27 @@
 #define UI_HEIGHT                   380
 #define UI_LCD_POSX                 29
 #define UI_LCD_POSY                 25
+
 #elif defined(XDUOO_X3)
 #define UI_TITLE                    "xDuoo X3"
 #define UI_WIDTH                    192 /* width of GUI window */
 #define UI_HEIGHT                   457 /* height of GUI window */
 #define UI_LCD_POSX                 34
 #define UI_LCD_POSY                 73
+
+#elif defined(XDUOO_X3II)
+#define UI_TITLE                    "xDuoo X3ii"
+#define UI_WIDTH                    322 /* width of GUI window */
+#define UI_HEIGHT                   609 /* height of GUI window */
+#define UI_LCD_POSX                 43
+#define UI_LCD_POSY                 62
+
+#elif defined(XDUOO_X20)
+#define UI_TITLE                    "xDuoo X20"
+#define UI_WIDTH                    322 /* width of GUI window */
+#define UI_HEIGHT                   609 /* height of GUI window */
+#define UI_LCD_POSX                 43
+#define UI_LCD_POSY                 62
 
 #elif defined(IHIFI770)
 #define UI_TITLE                    "iHiFi 770"
@@ -554,4 +569,3 @@
 #endif
 
 #endif /* #ifndef __UISDL_H__ */
-
