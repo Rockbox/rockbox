@@ -171,6 +171,8 @@
 #define XDUOO_X3_PAD       66
 #define IHIFI_770_PAD      67
 #define IHIFI_800_PAD      68
+#define XDUOO_X3II_PAD     69
+#define XDUOO_X20_PAD      70
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -624,6 +626,10 @@ Lyre prototype 1 */
 #include "config/agptekrocker.h"
 #elif defined(XDUOO_X3)
 #include "config/xduoox3.h"
+#elif defined(XDUOO_X3II)
+#include "config/xduoox3ii.h"
+#elif defined(XDUOO_X20)
+#include "config/xduoox20.h"
 #else
 /* no known platform */
 #endif
