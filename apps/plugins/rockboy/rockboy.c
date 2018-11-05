@@ -433,6 +433,26 @@ static void setoptions (void)
         options.SELECT  = BUTTON_VOL_UP;
         options.MENU    = BUTTON_POWER;
 
+#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
+        options.UP      = BUTTON_PREV;
+        options.DOWN    = BUTTON_NEXT;
+
+        options.A       = BUTTON_HOME;
+        options.B       = BUTTON_OPTION;
+        options.START   = BUTTON_VOL_DOWN;
+        options.SELECT  = BUTTON_VOL_UP;
+        options.MENU    = BUTTON_POWER;
+
+#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+        options.UP      = BUTTON_PREV;
+        options.DOWN    = BUTTON_NEXT;
+
+        options.A       = BUTTON_HOME;
+        options.B       = BUTTON_OPTION;
+        options.START   = BUTTON_VOL_DOWN;
+        options.SELECT  = BUTTON_VOL_UP;
+        options.MENU    = BUTTON_POWER;
+
 #elif CONFIG_KEYPAD == IHIFI_770_PAD
         options.UP      = BUTTON_PREV;
         options.DOWN    = BUTTON_NEXT;
