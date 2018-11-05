@@ -1,17 +1,17 @@
 /*
- * This config file is for the Agptek Rocket
+ * This config file is for the xDuoo X3ii
  */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 105
+#define MODEL_NUMBER 110
 
-#define MODEL_NAME   "Agptek Rocker"
+#define MODEL_NAME   "xDuoo X3ii"
 
 /* LCD dimensions */
-#define LCD_WIDTH  128
-#define LCD_HEIGHT 160
-/* sqrt(128^2 + 160^2) / 2 = 102. */
-#define LCD_DPI 102
+#define LCD_WIDTH  240
+#define LCD_HEIGHT 320
+/* sqrt(240^2 + 320^2) / 2.4 = 166 */
+#define LCD_DPI 166
 
 #ifndef SIMULATOR
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
@@ -39,9 +39,6 @@
 
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
-
-/* define this if the target has volume keys which can be used in the lists */
-#define HAVE_VOLUME_IN_LIST
 
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
@@ -74,12 +71,17 @@
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
-#define HAVE_ROCKER_CODEC
 
 #define HAVE_HEADPHONE_DETECTION
 
 /* KeyPad configuration for plugins */
-#define CONFIG_KEYPAD AGPTEK_ROCKER_PAD
+#define CONFIG_KEYPAD XDUOO_X3II_PAD
+
+/* Define this if a programmable hotkey is mapped */
+#define HAVE_HOTKEY
+
+/* define this if the target has volume keys which can be used in the lists */
+#define HAVE_VOLUME_IN_LIST
 
 #ifndef SIMULATOR
 /* We have usb power and can detect usb but it is handled by Linux */
@@ -102,26 +104,23 @@
 #define HAVE_SW_POWEROFF
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ            532000000
+#define CPU_FREQ            504000000
 
 /* No special storage */
-#define CONFIG_STORAGE (STORAGE_HOSTFS)//|STORAGE_SD)
-//#define MULTIDRIVE_DIR "/mnt/sd_0"
-//#define NUM_DRIVES 1
-//#define HAVE_HOTSWAP
+#define CONFIG_STORAGE STORAGE_HOSTFS
 #define HAVE_STORAGE_FLUSH
 
 /* Battery */
 #define BATTERY_TYPES_COUNT  1
 
 /* Audio codec */
-#define HAVE_ROCKER_CODEC
+#define HAVE_XDUOO_LINUX_CODEC
 
 /* We don't have hardware controls */
 #define HAVE_SW_TONE_CONTROLS
 
 /* Battery */
-#define BATTERY_CAPACITY_DEFAULT 600 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 600  /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 600 /* max. capacity selectable */
+#define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 2000  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 2000 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0   /* capacity increment */
