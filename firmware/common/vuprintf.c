@@ -473,15 +473,20 @@ static inline const char * format_s(const void *str,
         return NULL; /* wchar_t support for now */
     }
 
+    const char *s = str;
+    size_t len;
     /* string length may be specified by precision instead of \0-
        terminated; however, don't go past a \0 if one is there */
-    const char *s = str;
-    size_t len = precision >= 0 ? precision : -1;
+    if (precision >= 0) {
+        const char *nil = memchr(s, '\0', (size_t) precision);
 
-    const char *nil = memchr(s, '\0', len);
-    if (nil) {
-        len = nil - s;
-    }
+        if (nil != NULL && (nil - s) < precision)
+            len = nil - s;
+        else
+            len = precision;
+    } 
+    else
+        len = strlen(s);
 
     fmt_buf->length = len;
     return s;
