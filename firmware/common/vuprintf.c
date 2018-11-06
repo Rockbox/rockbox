@@ -476,12 +476,14 @@ static inline const char * format_s(const void *str,
     /* string length may be specified by precision instead of \0-
        terminated; however, don't go past a \0 if one is there */
     const char *s = str;
-    size_t len = precision >= 0 ? precision : -1;
+    size_t len = precision >= 0 ? precision : SSIZE_MAX; /* BUGFIX */
 
     const char *nil = memchr(s, '\0', len);
     if (nil) {
         len = nil - s;
     }
+    else if(precision < 0)
+        len = 0; /* no null found */
 
     fmt_buf->length = len;
     return s;
