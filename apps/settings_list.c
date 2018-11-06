@@ -1131,10 +1131,11 @@ const struct settings_list settings[] = {
 /** End of old RTC config block **/
 
 #ifndef HAS_BUTTON_HOLD
-    OFFON_SETTING(0, bt_selective_softlock_actions,
+    OFFON_SETTING(F_BANFROMQS, bt_selective_softlock_actions,
                   LANG_ACTION_ENABLED, false,
                   "No Screen Lock For Selected Actions", NULL),
-    INT_SETTING(0, bt_selective_softlock_actions_mask, LANG_SOFTLOCK_SELECTIVE,
+    INT_SETTING(F_BANFROMQS, bt_selective_softlock_actions_mask,
+                LANG_SOFTLOCK_SELECTIVE,
                 0, "Selective Screen Lock Actions", UNIT_INT,
                 0, 2048,2, NULL, NULL, NULL),
 #endif /* !HAS_BUTTON_HOLD */
@@ -1143,11 +1144,12 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, caption_backlight, LANG_CAPTION_BACKLIGHT,
                   false, "caption backlight", NULL),
 
-    OFFON_SETTING(0, bl_selective_actions,
+    OFFON_SETTING(F_BANFROMQS, bl_selective_actions,
                   LANG_ACTION_ENABLED, false,
                   "No Backlight On Selected Actions", NULL),
 
-    INT_SETTING(0, bl_selective_actions_mask, LANG_BACKLIGHT_SELECTIVE,
+    INT_SETTING(F_BANFROMQS, bl_selective_actions_mask,
+                LANG_BACKLIGHT_SELECTIVE,
                 0, "Selective Backlight Actions", UNIT_INT,
                 0, 2048,2, NULL, NULL, NULL),
 #ifdef HAVE_REMOTE_LCD
