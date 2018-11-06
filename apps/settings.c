@@ -494,8 +494,7 @@ bool cfg_to_string(int i/*setting_id*/, char* buf, int buf_len)
                             settings[i].filename_setting->suffix);
                 }
             }
-            else strlcpy(buf,(char*)settings[i].setting,
-                         settings[i].filename_setting->max_len);
+            else strlcpy(buf,(char*)settings[i].setting, buf_len);
             break;
     } /* switch () */
     return true;
@@ -548,8 +547,9 @@ static bool settings_write_config(const char* filename, int options)
     fd = open(filename,O_CREAT|O_TRUNC|O_WRONLY, 0666);
     if (fd < 0)
         return false;
+    strlcpy(value, rbversion, MAX_PATH);
     fdprintf(fd, "# .cfg file created by rockbox %s - "
-                 "http://www.rockbox.org\r\n\r\n", rbversion);
+                 "http://www.rockbox.org\r\n\r\n", value);
     for(i=0; i<nb_settings; i++)
     {
         if (settings[i].cfg_name == NULL)

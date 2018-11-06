@@ -482,6 +482,9 @@ static inline const char * format_s(const void *str,
     if (nil) {
         len = nil - s;
     }
+    else if (precision < 0) {
+        len = 0; /* no null found */
+    }
 
     fmt_buf->length = len;
     return s;
