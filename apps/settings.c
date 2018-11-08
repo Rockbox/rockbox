@@ -402,8 +402,8 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
                     strlcpy(buf, start, buf_len);
                 else
                 {
-                    int len = (buf_len > (end-start))? end-start: buf_len;
-                    strlcpy(buf, start, len+1);
+                    int len = MIN(buf_len, (end-start) + 1);
+                    strlcpy(buf, start, len);
                 }
                 return true;
             }
@@ -430,8 +430,8 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
         strlcpy(buf, start, buf_len);
     else
     {
-        int len = (buf_len > (end-start))? end-start: buf_len;
-        strlcpy(buf, start, len+1);
+        int len = MIN(buf_len, (end-start) + 1);
+        strlcpy(buf, start, len);
     }
     return true;
 }
@@ -494,8 +494,11 @@ bool cfg_to_string(int i/*setting_id*/, char* buf, int buf_len)
                             settings[i].filename_setting->suffix);
                 }
             }
-            else strlcpy(buf,(char*)settings[i].setting,
-                         settings[i].filename_setting->max_len);
+            else
+            {
+                int len = MIN(buf_len, settings[i].filename_setting->max_len);
+                strlcpy(buf,(char*)settings[i].setting,len);
+            }
             break;
     } /* switch () */
     return true;
