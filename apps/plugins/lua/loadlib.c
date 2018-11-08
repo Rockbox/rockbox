@@ -21,9 +21,9 @@
 #include "lauxlib.h"
 #include "lualib.h"
 #include "rocklib.h"
+#include "rocklibc.h"
 
-
-#define setprogdir(L)       ((void)0)
+#define setprogdir(L)       ((void)0) /* ROCKLUA ADDED */
 
 
 /*
@@ -54,7 +54,7 @@ static const char *pushnexttemplate (lua_State *L, const char *path) {
 
 static const char *findfile (lua_State *L, const char *name,
                                            const char *pname) {
-  get_current_path(L, 2);
+  get_current_path(L, 2); /* ROCKLUA ADDED */
   const char *current_path = lua_tostring(L, -1);
   const char *path;
 
@@ -196,7 +196,7 @@ static void modinit (lua_State *L, const char *modname) {
   lua_setfield(L, -2, "_M");  /* module._M = module */
   lua_pushstring(L, modname);
   lua_setfield(L, -2, "_NAME");
-  dot = rb->strrchr(modname, '.');  /* look for last dot in module name */
+  dot = strrchr(modname, '.');  /* look for last dot in module name */
   if (dot == NULL) dot = modname;
   else dot++;
   /* set _PACKAGE as package name (full module name minus last part) */
