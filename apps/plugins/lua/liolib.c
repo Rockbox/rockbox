@@ -40,7 +40,7 @@ static int pushresult (lua_State *L, int i, const char *filename) {
       lua_pushfstring(L, "%s: %s", filename, strerror(en));
     else
       lua_pushfstring(L, "%s", strerror(en));
-    lua_pushinteger(L, 0);
+    lua_pushinteger(L, en);
     return 3;
   }
 }
@@ -51,6 +51,7 @@ static void fileerror (lua_State *L, int arg, const char *filename) {
   luaL_argerror(L, arg, lua_tostring(L, -1));
 }
 
+#define tofilep(L)	((int*) luaL_checkudata(L, 1, LUA_FILEHANDLE))
 
 static int io_type (lua_State *L) {
   void *ud;
@@ -68,7 +69,7 @@ static int io_type (lua_State *L) {
 
 
 static int* tofile (lua_State *L) {
-  int *f = (int*) luaL_checkudata(L, 1, LUA_FILEHANDLE);
+  int *f = tofilep(L);
   if (*f < 0)
     luaL_error(L, "attempt to use a closed file");
   return f;
@@ -115,20 +116,20 @@ static int io_close (lua_State *L) {
 
 
 static int io_gc (lua_State *L) {
-  int f = *(int*) luaL_checkudata(L, 1, LUA_FILEHANDLE);
+  int *f = tofilep(L);
   /* ignore closed files */
-  if (f >= 0)
+  if (*f >= 0)
     aux_close(L);
   return 0;
 }
 
 
 static int io_tostring (lua_State *L) {
-  int f = *(int*) luaL_checkudata(L, 1, LUA_FILEHANDLE);
-  if (f < 0)
+  int *f = tofilep(L);
+  if (*f < 0)
     lua_pushliteral(L, "file (closed)");
   else
-    lua_pushfstring(L, "file (%d)", f);
+    lua_pushfstring(L, "file (%d)", *f);
   return 1;
 }
 
@@ -137,28 +138,33 @@ static int io_open (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
   const char *mode = luaL_optstring(L, 2, "r");
   int *pf = newfile(L);
-  int flags = 0;
-  if(*(mode+1) == '+') {
+  int flags, wrmode;
+
+  switch(*mode) {
+      case 'r':
+          flags  = O_RDONLY;
+          wrmode = 0;
+          break;
+      case 'w':
+          flags  = O_WRONLY;
+          wrmode = O_CREAT | O_TRUNC;
+          break;
+      case 'a':
+          flags  = O_WRONLY;
+          wrmode = O_CREAT | O_APPEND;
+          break;
+      default:
+          flags  = 0;
+          wrmode = 0;
+          return luaL_error(L, "invalid option " LUA_QL("%c") " to "
+                               LUA_QL("open"), *mode);
+  }
+
+  if(*(mode+1) == '+')
     flags = O_RDWR;
-    switch(*mode) {
-        case 'w':
-            flags |= O_TRUNC; break;
-        case 'a':
-            flags |= O_APPEND; break;
-    }
-  }
-  else {
-    switch(*mode) {
-        case 'r':
-            flags = O_RDONLY; break;
-        case 'w':
-            flags = O_WRONLY | O_TRUNC; break;
-        case 'a':
-            flags = O_WRONLY | O_APPEND; break;
-    }
-  }
-  if((*mode == 'w' || *mode == 'a') && !rb->file_exists(filename))
-    flags |= O_CREAT;
+
+  flags |= wrmode;
+
   *pf = rb->open(filename, flags, 0666);
   return (*pf < 0) ? pushresult(L, 0, filename) : 1;
 }
@@ -252,7 +258,10 @@ static int read_number (lua_State *L, int *f) {
     lua_pushnumber(L, d);
     return 1;
   }
-  else return 0;  /* read fails */
+  else {
+    lua_pushnil(L);  /* "result" to be removed */
+    return 0;  /* read fails */
+  }
 }
 
 
@@ -412,14 +421,14 @@ static int f_write (lua_State *L) {
 static int f_seek (lua_State *L) {
   static const int mode[] = {SEEK_SET, SEEK_CUR, SEEK_END};
   static const char *const modenames[] = {"set", "cur", "end", NULL};
-  int f = *tofile(L);
+  int *f = tofile(L);
   int op = luaL_checkoption(L, 2, "cur", modenames);
   long offset = luaL_optlong(L, 3, 0);
-  off_t size = rb->lseek(f, offset, mode[op]);
+  off_t size = rb->lseek(*f, offset, mode[op]);
   if (size < 0 || size > MAX_INT)   /* signed limit */
     return pushresult(L, 0, NULL);  /* error */
   else {
-     lua_pushinteger(L, (LUA_INTEGER) size );
+    lua_pushinteger(L, (LUA_INTEGER) size );
     return 1;
   }
 }
