@@ -1,5 +1,5 @@
 /*
-** $Id: loadlib.c,v 1.52.1.3 2008/08/06 13:29:28 roberto Exp $
+** $Id: loadlib.c,v 1.52.1.4 2009/09/09 13:17:16 roberto Exp $
 ** Dynamic library loader for Lua
 ** See Copyright Notice in lua.h
 **
@@ -21,9 +21,9 @@
 #include "lauxlib.h"
 #include "lualib.h"
 #include "rocklib.h"
+#include "rocklibc.h"
 
-
-#define setprogdir(L)       ((void)0)
+#define setprogdir(L)       ((void)0) /* ROCKLUA ADDED */
 
 
 /*
@@ -54,7 +54,7 @@ static const char *pushnexttemplate (lua_State *L, const char *path) {
 
 static const char *findfile (lua_State *L, const char *name,
                                            const char *pname) {
-  get_current_path(L, 2);
+  get_current_path(L, 2); /* ROCKLUA ADDED */
   const char *current_path = lua_tostring(L, -1);
   const char *path;
 
@@ -196,7 +196,7 @@ static void modinit (lua_State *L, const char *modname) {
   lua_setfield(L, -2, "_M");  /* module._M = module */
   lua_pushstring(L, modname);
   lua_setfield(L, -2, "_NAME");
-  dot = rb->strrchr(modname, '.');  /* look for last dot in module name */
+  dot = strrchr(modname, '.');  /* look for last dot in module name */
   if (dot == NULL) dot = modname;
   else dot++;
   /* set _PACKAGE as package name (full module name minus last part) */
@@ -292,7 +292,7 @@ LUALIB_API int luaopen_package (lua_State *L) {
   lua_pushvalue(L, -1);
   lua_replace(L, LUA_ENVIRONINDEX);
   /* create `loaders' table */
-  lua_createtable(L, 0, sizeof(loaders)/sizeof(loaders[0]) - 1);
+  lua_createtable(L, sizeof(loaders)/sizeof(loaders[0]) - 1, 0);
   /* fill it with pre-defined loaders */
   for (i=0; loaders[i] != NULL; i++) {
     lua_pushcfunction(L, loaders[i]);
