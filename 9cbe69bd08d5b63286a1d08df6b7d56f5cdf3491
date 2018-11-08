@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c4843c90_c0019e08",
+        "filename": "apps/plugins/lua/liolib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2018-11-08T18:10:53Z",
+      "side": 1,
+      "message": "This is incorrect..",
+      "revId": "9cbe69bd08d5b63286a1d08df6b7d56f5cdf3491",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
