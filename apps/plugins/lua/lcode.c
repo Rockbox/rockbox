@@ -1,5 +1,5 @@
 /*
-** $Id: lcode.c,v 2.25.1.3 2007/12/28 15:32:23 roberto Exp $
+** $Id: lcode.c,v 2.25.1.5 2011/01/31 14:53:16 roberto Exp $
 ** Code generator for Lua
 ** See Copyright Notice in lua.h
 */
@@ -544,10 +544,6 @@ void luaK_goiftrue (FuncState *fs, expdesc *e) {
       pc = NO_JUMP;  /* always true; do nothing */
       break;
     }
-    case VFALSE: {
-      pc = luaK_jump(fs);  /* always jump */
-      break;
-    }
     case VJMP: {
       invertjump(fs, e);
       pc = e->u.s.info;
@@ -570,10 +566,6 @@ static void luaK_goiffalse (FuncState *fs, expdesc *e) {
   switch (e->k) {
     case VNIL: case VFALSE: {
       pc = NO_JUMP;  /* always false; do nothing */
-      break;
-    }
-    case VTRUE: {
-      pc = luaK_jump(fs);  /* always jump */
       break;
     }
     case VJMP: {
@@ -641,10 +633,10 @@ static int constfolding (OpCode op, expdesc *e1, expdesc *e2) {
     case OP_ADD: r = luai_numadd(v1, v2); break;
     case OP_SUB: r = luai_numsub(v1, v2); break;
     case OP_MUL: r = luai_nummul(v1, v2); break;
-    case OP_DIV:
+    case OP_DIV: /* ROCKLUA BUGFIX */
       if (v2 == 0) return -1;  /* do not attempt to divide by 0 */
       r = luai_numdiv(v1, v2); break;
-    case OP_MOD:
+    case OP_MOD: /* ROCKLUA BUGFIX */
       if (v2 == 0) return -1;  /* do not attempt to divide by 0 */
       r = luai_nummod(v1, v2); break;
     case OP_POW: r = luai_numpow(v1, v2); break;
@@ -659,7 +651,7 @@ static int constfolding (OpCode op, expdesc *e1, expdesc *e2) {
 
 
 static void codearith (FuncState *fs, OpCode op, expdesc *e1, expdesc *e2) {
-  int resf = constfolding(op, e1, e2);
+  int resf = constfolding(op, e1, e2);  /* ROCKLUA BUGFIX */
   if (resf > 0)
     return;
   else if (resf == 0) {

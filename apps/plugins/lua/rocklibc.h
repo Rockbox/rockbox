@@ -42,6 +42,7 @@ extern int errno;
 /* Simple substitutions */
 #define memcmp rb->memcmp
 #define strlen rb->strlen
+#define strrchr rb->strrchr
 
 #endif /* _ROCKLIBC_H_ */
 
