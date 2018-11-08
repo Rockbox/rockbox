@@ -199,7 +199,7 @@ LUALIB_API lua_Integer luaL_optinteger (lua_State *L, int narg,
   return luaL_opt(L, luaL_checkinteger, narg, def);
 }
 
-
+/* ROCKLUA ADDED */
 LUALIB_API int luaL_checkboolean (lua_State *L, int narg) {
   int b = lua_toboolean(L, narg);
   if( b == 0 && !lua_isboolean(L, narg))
@@ -207,7 +207,7 @@ LUALIB_API int luaL_checkboolean (lua_State *L, int narg) {
   return b;
 }
 
-
+/* ROCKLUA ADDED */
 LUALIB_API int luaL_optboolean (lua_State *L, int narg, int def) {
   return luaL_opt(L, luaL_checkboolean, narg, def);
 }
@@ -538,7 +538,7 @@ typedef struct LoadF {
   char buff[LUAL_BUFFERSIZE];
 } LoadF;
 
-static const char *getF(lua_State *L, void *ud, size_t *size) {
+static const char *getF (lua_State *L, void *ud, size_t *size) {
   LoadF *lf = (LoadF *)ud;
   (void)L;
   if (lf->extraline) {
@@ -547,7 +547,6 @@ static const char *getF(lua_State *L, void *ud, size_t *size) {
     return "\n";
   }
   *size = rb->read(lf->f, lf->buff, LUAL_BUFFERSIZE);
-  if (*size <= 0) return NULL;
   return (*size > 0) ? lf->buff : NULL;
 }
 

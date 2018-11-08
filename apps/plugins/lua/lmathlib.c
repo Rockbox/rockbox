@@ -82,19 +82,17 @@ static int math_atan2 (lua_State *L) {
   lua_pushnumber(L, atan2(luaL_checknumber(L, 1), luaL_checknumber(L, 2)));
   return 1;
 }
-#endif
 
 static int math_ceil (lua_State *L) {
-  /* Doesn't change anything in fixed point arithmetic */
-  lua_pushnumber(L, luaL_checknumber(L, 1));
+  lua_pushnumber(L, ceil(luaL_checknumber(L, 1)));
   return 1;
 }
 
 static int math_floor (lua_State *L) {
-  /* Doesn't change anything in fixed point arithmetic */
-  lua_pushnumber(L, luaL_checknumber(L, 1));
+  lua_pushnumber(L, floor(luaL_checknumber(L, 1)));
   return 1;
 }
+#endif
 
 static int math_fmod (lua_State *L) {
   /* Was: lua_pushnumber(L, fmod(luaL_checknumber(L, 1), luaL_checknumber(L, 2))); */
@@ -220,6 +218,11 @@ static int math_randomseed (lua_State *L) {
   return 0;
 }
 
+static int math_ident (lua_State *L) { /* ROCKLUA ADDED */
+  /* Ceil & floor Doesn't change anything in fixed point arithmetic */
+  lua_pushnumber(L, luaL_checknumber(L, 1));
+  return 1;
+}
 
 static const luaL_Reg mathlib[] = {
   {"abs",   math_abs},
@@ -228,17 +231,15 @@ static const luaL_Reg mathlib[] = {
   {"asin",  math_asin},
   {"atan2", math_atan2},
   {"atan",  math_atan},
-#endif
   {"ceil",  math_ceil},
-#if 0
   {"cosh",  math_cosh},
   {"cos",   math_cos},
 #endif
   {"deg",   math_deg},
 #if 0
   {"exp",   math_exp},
-#endif
   {"floor", math_floor},
+#endif
   {"fmod",  math_fmod},
 #if 0
   {"frexp", math_frexp},
@@ -262,6 +263,8 @@ static const luaL_Reg mathlib[] = {
   {"tanh",  math_tanh},
   {"tan",   math_tan},
 #endif
+  {"ceil",  math_ident},
+  {"floor",  math_ident},
   {NULL, NULL}
 };
 

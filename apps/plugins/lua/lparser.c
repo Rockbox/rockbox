@@ -1,5 +1,5 @@
 /*
-** $Id: lparser.c,v 2.42.1.3 2007/12/28 15:32:23 roberto Exp $
+** $Id: lparser.c,v 2.42.1.4 2011/10/21 19:31:42 roberto Exp $
 ** Lua Parser
 ** See Copyright Notice in lua.h
 */
@@ -325,7 +325,7 @@ static void pushclosure (LexState *ls, FuncState *func, expdesc *v) {
 }
 
 
-static void lparser_open_func (LexState *ls, FuncState *fs) {
+static void open_func (LexState *ls, FuncState *fs) {
   lua_State *L = ls->L;
   Proto *f = luaF_newproto(L);
   fs->f = f;
@@ -374,9 +374,9 @@ static void close_func (LexState *ls) {
   lua_assert(luaG_checkcode(f));
   lua_assert(fs->bl == NULL);
   ls->fs = fs->prev;
-  L->top -= 2;  /* remove table and prototype from the stack */
   /* last token read was anchored in defunct function; must reanchor it */
   if (fs) anchor_token(ls);
+  L->top -= 2;  /* remove table and prototype from the stack */
 }
 
 
@@ -385,7 +385,7 @@ Proto *luaY_parser (lua_State *L, ZIO *z, Mbuffer *buff, const char *name) {
   struct FuncState funcstate;
   lexstate.buff = buff;
   luaX_setinput(L, &lexstate, z, luaS_new(L, name));
-  lparser_open_func(&lexstate, &funcstate);
+  open_func(&lexstate, &funcstate);
   funcstate.f->is_vararg = VARARG_ISVARARG;  /* main func. is always vararg */
   luaX_next(&lexstate);  /* read first token */
   chunk(&lexstate);
@@ -576,7 +576,7 @@ static void parlist (LexState *ls) {
 static void body (LexState *ls, expdesc *e, int needself, int line) {
   /* body ->  `(' parlist `)' chunk END */
   FuncState new_fs;
-  lparser_open_func(ls, &new_fs);
+  open_func(ls, &new_fs);
   new_fs.f->linedefined = line;
   checknext(ls, '(');
   if (needself) {
