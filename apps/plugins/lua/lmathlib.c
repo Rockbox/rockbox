@@ -86,13 +86,15 @@ static int math_atan2 (lua_State *L) {
 
 static int math_ceil (lua_State *L) {
   /* Doesn't change anything in fixed point arithmetic */
-  lua_pushnumber(L, luaL_checknumber(L, 1));
+  /* lua_pushnumber(L, ceil(luaL_checknumber(L, 1))); */
+  (void) L;
   return 1;
 }
 
 static int math_floor (lua_State *L) {
   /* Doesn't change anything in fixed point arithmetic */
-  lua_pushnumber(L, luaL_checknumber(L, 1));
+  /* lua_pushnumber(L, floor(luaL_checknumber(L, 1))); */
+  (void) L;
   return 1;
 }
 
