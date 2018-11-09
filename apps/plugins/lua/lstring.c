@@ -58,7 +58,6 @@ static TString *newlstr (lua_State *L, const char *str, size_t l,
   ts->tsv.hash = h;
   ts->tsv.marked = luaC_white(G(L));
   ts->tsv.tt = LUA_TSTRING;
-  ts->tsv.reserved = 0;
   memcpy(ts+1, str, l*sizeof(char));
   ((char *)(ts+1))[l] = '\0';  /* ending 0 */
   tb = &G(L)->strt;
