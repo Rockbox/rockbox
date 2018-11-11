@@ -11,10 +11,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "lstring.h" /* ROCKLUA ADDED */
 
 
 /* This file uses only the official API of Lua.
 ** Any function declared here could be written as an application function.
+** Note ** luaS_newlloc breaks this guarantee ROCKLUA ADDED
 */
 
 #define lauxlib_c
@@ -258,6 +260,7 @@ LUALIB_API void luaI_openlib (lua_State *L, const char *libname,
     int size = libsize(l);
     /* check whether lib already exists */
     luaL_findtable(L, LUA_REGISTRYINDEX, "_LOADED", 1);
+    luaS_newlloc(L, libname, TSTR_INBIN); /* ROCKLUA ADDED */
     lua_getfield(L, -1, libname);  /* get _LOADED[libname] */
     if (!lua_istable(L, -1)) {  /* not found? */
       lua_pop(L, 1);  /* remove previous result */
@@ -275,6 +278,7 @@ LUALIB_API void luaI_openlib (lua_State *L, const char *libname,
     for (i=0; i<nup; i++)  /* copy upvalues to the top */
       lua_pushvalue(L, -nup);
     lua_pushcclosure(L, l->func, nup);
+    luaS_newlloc(L, l->name, TSTR_INBIN); /* ROCKLUA ADDED */
     lua_setfield(L, -(nup+2), l->name);
   }
   lua_pop(L, nup);  /* remove upvalues */
