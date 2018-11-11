@@ -25,6 +25,7 @@
 #define LUA_LIB
 
 #include "lua.h"
+#include "lstring.h"
 
 #include "lauxlib.h"
 #include "rocklib.h"
@@ -835,6 +836,7 @@ LUALIB_API int luaopen_rock(lua_State *L)
     static const struct lua_int_reg* rlci = rlib_const_int;
     for (; rlci->name; rlci++) {
         lua_pushinteger(L, rlci->value);
+        luaS_newlloc(L, rlci->name, TSTR_INBIN);
         lua_setfield(L, -2, rlci->name);
     }
 
@@ -853,7 +855,9 @@ LUALIB_API int luaopen_rock(lua_State *L)
 
     static const struct lua_str_reg* rlcs = rlib_const_str;
     for (; rlcs->name; rlcs++) {
+        luaS_newlloc(L, rlcs->value, TSTR_INBIN);
         lua_pushstring(L, rlcs->value);
+        luaS_newlloc(L, rlcs->name, TSTR_INBIN);
         lua_setfield(L, -2, rlcs->name);
     }
 

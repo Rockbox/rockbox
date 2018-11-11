@@ -11,10 +11,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "lstring.h" /* ROCKLUA ADDED */
 
 
 /* This file uses only the official API of Lua.
 ** Any function declared here could be written as an application function.
+** Note ** luaS_newlloc breaks this guarantee ROCKLUA ADDED
 */
 
 #define lauxlib_c
@@ -239,23 +241,36 @@ LUALIB_API int luaL_callmeta (lua_State *L, int obj, const char *event) {
 }
 
 
+ /* ROCKLUA ADDED */
+static int libsize_storenames (lua_State *L, const char* libname, const luaL_Reg *l) {
+  int size = 0;
+  if (libname)
+    luaS_newlloc(L, libname, TSTR_INBIN);
+  for (; l->name; l++) {
+    size++;
+    luaS_newlloc(L, l->name, TSTR_INBIN);
+  }
+  return size;
+}
+
+
 LUALIB_API void (luaL_register) (lua_State *L, const char *libname,
                                 const luaL_Reg *l) {
   luaI_openlib(L, libname, l, 0);
 }
 
-
+#if 0
 static int libsize (const luaL_Reg *l) {
   int size = 0;
   for (; l->name; l++) size++;
   return size;
 }
-
+#endif
 
 LUALIB_API void luaI_openlib (lua_State *L, const char *libname,
                               const luaL_Reg *l, int nup) {
+  int size = libsize_storenames(L, libname, l);
   if (libname) {
-    int size = libsize(l);
     /* check whether lib already exists */
     luaL_findtable(L, LUA_REGISTRYINDEX, "_LOADED", 1);
     lua_getfield(L, -1, libname);  /* get _LOADED[libname] */

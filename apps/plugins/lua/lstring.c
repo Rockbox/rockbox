@@ -2,6 +2,8 @@
 ** $Id: lstring.c,v 2.8.1.1 2007/12/27 13:02:25 roberto Exp $
 ** String table (keeps all strings handled by Lua)
 ** See Copyright Notice in lua.h
+** luaS_newllocstr is adapted from "elua -- pseudo RO strings"
+** by bogdanm, distributed under a MIT license.
 */
 
 
@@ -48,19 +50,26 @@ void luaS_resize (lua_State *L, int newsize) {
 
 
 static TString *newlstr (lua_State *L, const char *str, size_t l,
-                                       unsigned int h) {
+                                       unsigned int h, char type) {
   TString *ts;
   stringtable *tb;
-  if (l+1 > (MAX_SIZET - sizeof(TString))/sizeof(char))
+  if (l > ((MAX_SIZET - sizeof(TString))/sizeof(char)) - sizeof(""))
     luaM_toobig(L);
-  ts = cast(TString *, luaM_malloc(L, (l+1)*sizeof(char)+sizeof(TString)));
+  ts = cast(TString *, luaM_malloc(L, sizetstring(type, l)));
   ts->tsv.len = l;
   ts->tsv.hash = h;
   ts->tsv.marked = luaC_white(G(L));
+  if (testbits(type, TSTR_FIXED))
+    luaS_fix(ts);
   ts->tsv.tt = LUA_TSTRING;
   ts->tsv.reserved = 0;
-  memcpy(ts+1, str, l*sizeof(char));
-  ((char *)(ts+1))[l] = '\0';  /* ending 0 */
+  ts->tsv.type = cast_byte(type);
+  if (testbits(type, TSTR_INBIN)) /* ROCKLUA ADDED */
+    *(const char **)(ts+1) = str; /* store a pointer to the string instead */
+  else {
+    memcpy(ts+1, str, l*sizeof(char));
+    ((char *)(ts+1))[l] = '\0';  /* ending 0 */
+  }
   tb = &G(L)->strt;
   h = lmod(h, tb->size);
   ts->tsv.next = tb->hash[h];  /* chain new entry */
@@ -72,8 +81,16 @@ static TString *newlstr (lua_State *L, const char *str, size_t l,
 }
 
 
-TString *luaS_newlstr (lua_State *L, const char *str, size_t l) {
+TString *luaS_newllocstr (lua_State *L, const char *str, size_t l, char type) {
   GCObject *o;
+  if (testbits(type, TSTR_CHKSZ))
+    l = strlen(str);
+#ifdef INBINARYSTRINGS
+  else if (!testbits(type, TSTR_ISLIT))
+#else
+  if (true)
+#endif
+    resetbits(type, TSTR_INBIN); /* only whole strings can be used inbin */
   unsigned int h = cast(unsigned int, l);  /* seed */
   size_t step = (l>>5)+1;  /* if string is too long, don't hash all its chars */
   size_t l1;
@@ -86,10 +103,12 @@ TString *luaS_newlstr (lua_State *L, const char *str, size_t l) {
     if (ts->tsv.len == l && (memcmp(str, getstr(ts), l) == 0)) {
       /* string may be dead */
       if (isdead(G(L), o)) changewhite(o);
+      if (testbits(type, TSTR_FIXED))
+        luaS_fix(ts);
       return ts;
     }
   }
-  return newlstr(L, str, l, h);  /* not found */
+  return newlstr(L, str, l, h, type);  /* not found */
 }
 
 

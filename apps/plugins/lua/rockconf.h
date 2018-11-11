@@ -31,6 +31,7 @@
 
 #undef LUA_PATH_DEFAULT
 #define LUA_PATH_DEFAULT  "$/?.lua;" "$/?/init.lua;" VIEWERS_DIR"/lua/?.lua;" VIEWERS_DIR"/lua/?/init.lua;"
+#define INBINARYSTRINGS /* Static strings stored as pointer rather than copied into lua state */
 
 #include <setjmp.h>
 
