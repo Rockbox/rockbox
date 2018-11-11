@@ -107,6 +107,21 @@ static void pushstr (lua_State *L, const char *str) {
 }
 
 
+/* ROCKLUA ADDED -- Retrieves C string from TString */
+const char *luaO_getstring(const TString * ts){
+  const char *string;
+#ifdef INBINARYSTRINGS
+  if (testbits((ts)->tsv.type, TSTR_INBIN))
+    string = *(cast(const char **, (ts) + 1));
+  else
+#else
+  if (true)
+#endif
+    string = cast(const char *, (ts) + 1);
+  return string;
+}
+
+
 /* this function handles only `%d', `%c', %f, %p, and `%s' formats */
 const char *luaO_pushvfstring (lua_State *L, const char *fmt, va_list argp) {
   int n = 1;

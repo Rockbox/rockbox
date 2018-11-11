@@ -201,13 +201,14 @@ typedef union TString {
   struct {
     CommonHeader;
     lu_byte reserved;
+    lu_byte type;
     unsigned int hash;
     size_t len;
   } tsv;
 } TString;
 
 
-#define getstr(ts)	cast(const char *, (ts) + 1)
+#define getstr(ts) (luaO_getstring(ts)) /* ROCKLUA ADDED */
 #define svalue(o)       getstr(rawtsvalue(o))
 
 
@@ -371,6 +372,7 @@ LUAI_FUNC int luaO_int2fb (unsigned int x);
 LUAI_FUNC int luaO_fb2int (int x);
 LUAI_FUNC int luaO_rawequalObj (const TValue *t1, const TValue *t2);
 LUAI_FUNC int luaO_str2d (const char *s, lua_Number *result);
+LUAI_FUNC const char *luaO_getstring(const TString * ts); /* ROCKLUA ADDED */
 LUAI_FUNC const char *luaO_pushvfstring (lua_State *L, const char *fmt,
                                                        va_list argp);
 LUAI_FUNC const char *luaO_pushfstring (lua_State *L, const char *fmt, ...);
