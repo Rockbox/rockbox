@@ -22,11 +22,12 @@
  ****************************************************************************/
 #include <time.h>
 #include <sys/time.h>
+#if !defined(WIN32)
 #include <sys/ioctl.h>
 #include <linux/rtc.h>
 #include <fcntl.h>
 #include <unistd.h>
-
+#endif
 void rtc_init(void)
 {
 }
@@ -41,12 +42,12 @@ int rtc_read_datetime(struct tm *tm)
 
 int rtc_write_datetime(const struct tm *tm)
 {
-#if defined(AGPTEK_ROCKER)
+#if defined(AGPTEK_ROCKER) && !defined(WIN32)
     struct timeval tv;
     struct tm *tm_time;
 
     int rtc = open("/dev/rtc0", O_WRONLY);
-    
+
     tv.tv_sec = mktime((struct tm *)tm);
     tv.tv_usec = 0;
 
