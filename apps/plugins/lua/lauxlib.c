@@ -254,10 +254,142 @@ static int libsize_storenames (lua_State *L, const char* libname, const luaL_Reg
 }
 
 
+#if 0
 LUALIB_API void (luaL_register) (lua_State *L, const char *libname,
                                 const luaL_Reg *l) {
   luaI_openlib(L, libname, l, 0);
 }
+#else /* late bind cfunction tables to save ram */
+static int latebind_func_index(lua_State *L)
+{
+  const luaL_Reg *llib;
+  /* name @ top of stack 1(basetable;name)-1*/
+  const char *name = lua_tostring(L, -1);
+
+  lua_pushstring (L, "__latebind");/* basetable;name;__latebind;*/
+  lua_rawget (L, -3);/* basetable;name;__latebind(t);*/
+
+  luaL_argcheck(L, lua_istable(L, -3) && lua_istable(L, -1), 1,
+                "__latebind table expected");
+  /* (btable;name;__latebind(t)) */
+
+  /* lookup late bound func(s), lua_objlen allows check of multiple luaL_Reg */
+  for(int i = lua_objlen(L, -1); i > 0; i--) {
+    lua_rawgeti (L, -1, i);/* btable;name;__lb(t);llib*/
+    llib = (const luaL_Reg *) lua_touserdata (L, -1);
+    lua_pop(L, 1); /* (btable;name;__lb(t);llib) -> (btable;name;__lb(t)) */
+
+    if(!llib)
+      continue;
+
+    for (; llib->name; llib++) {
+      if(!name || strcmp(name, llib->name) == 0) {
+        /* don't overwrite existing keys within basetable */
+        lua_pushstring(L, llib->name); /* (btable;name;__lb(t);llib->name) */
+        lua_rawget(L, -4); /* (btable;name;__lb(t);btable[func]?) */
+
+        if(lua_isnil(L, -1)) {
+          /* if function is used it is added to the base table */
+          lua_pop(L, 1);
+          lua_pushcclosure(L, llib->func, 0); /* (btable;name;__lb(t);llib->func) */
+        }
+
+        if(!name) /* nil name binds all functions in table immediately */
+          lua_setfield(L, -4, llib->name); /* (btable;name;mtable) */
+        else {
+          lua_pushvalue(L, -1); /* dupe closure or existing func */
+          /* (btable;name;__lb(t);llib->func;llib->func) */
+          lua_setfield(L, -5, llib->name); /* (btable;name;__lb(t);llib->func) */
+          /* returns the closure */
+          return 1;
+        }
+      }
+    }
+  }
+
+  lua_pop(L, 2); /* (btable;name;__lb(t)) -> (btable) */
+  if(!name) {
+    lua_pushnil(L); /* remove metatable (btable;name;__lb(t);nil)*/
+    lua_setmetatable(L, -2);
+    lua_pushnil(L); /* remove __latebind table*/
+    lua_setfield (L, -2, "__latebind");
+  }
+
+  return 0;
+}
+
+
+static int latebind_func_pairs(lua_State *L)
+{
+  /* basetable @ top of stack 1(basetable)-1 */
+  luaL_argcheck(L, lua_istable(L, 1), 1, "table expected");
+  lua_getglobal(L, "pairs"); /* function to be called / returned (btable;pairs) */
+
+  lua_createtable(L, 0, 15); /* btable;pairs;newtable; */
+  /* clone base table */
+  lua_pushnil(L); /* first key */
+  while(lua_next(L, 1) != 0) {
+    /* (btable;pairs;ntable;k;v) */
+    lua_pushvalue(L, -2); /* dupe key Stk = (..;k;v -> ..k;v;k)*/
+    lua_insert(L, -2); /* Stk = (..k;k;v) */
+    lua_rawset(L, 3); /* btable;pairs;ntable;k */
+  }
+
+  lua_pushnil(L); /*nil name retrieves all unbound late bound functions */
+  latebind_func_index(L);/* (btable;pairs;ntable;nil) -> (btable;pairs;ntable) */
+
+  /* (btable;pairs;ntable) */
+  lua_call(L, 1, 3); /* pairs(ntable) -> (btable;iter;state;value) */
+
+  return 3;
+}
+
+
+LUALIB_API void (luaL_register) (lua_State *L, const char *libname,
+                                const luaL_Reg *l) {
+  if(!libname)
+  {
+    /* if there is no libname register normally */
+    luaI_openlib(L, libname, l, 0);
+    return;
+  }
+
+  /* store empty table instead of passed luaL_Reg table */
+  static const struct luaL_reg late_lib [] =
+  {
+    {NULL, NULL}
+  };
+
+  static const struct luaL_reg late_meta [] =
+  {
+    {"__index", latebind_func_index},
+    {"__pairs", latebind_func_pairs},
+    {"__call", latebind_func_index}, /* allows t("func") -- nil binds all */
+    {NULL, NULL}
+  };
+
+  libsize_storenames(L, libname, l); /* store func names */
+  luaI_openlib(L, libname, late_lib, 0); /* basetable; */
+
+  luaL_findtable(L, -1,"__latebind", 0); /* create table if doesn't exist */
+  /* basetable;__latebind(t); */
+  /* save pointer to real luaL_reg */
+  lua_pushlightuserdata (L, (void *) l); /*basetable;__lb(t);userdata;*/
+  lua_rawseti(L, -2, lua_objlen(L, -2) + 1); /*lb(t)[n] = userdata */
+
+  lua_pop(L, 1);/* (basetable;__latebind(t)) -> (basetable) */
+
+  if(luaL_newmetatable(L, "META_LATEBIND"))
+  {
+    luaI_openlib(L, NULL, late_meta, 0); /*basetable;metatable*/
+    lua_pushvalue(L, -1); /* dupe the metatable (basetable;mt;mt) */
+    lua_setfield (L, -2, "__metatable"); /* metatable[__metatable] = metatable */
+  }
+
+  lua_setmetatable(L, -2); /* (basetable;mt) -> (basetable+mtable) */
+  /* base table is top of stack (basetable) */
+}
+#endif
 
 #if 0
 static int libsize (const luaL_Reg *l) {
