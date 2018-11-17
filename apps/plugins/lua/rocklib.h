@@ -45,7 +45,7 @@ struct lua_str_reg {
   char const* value;
 };
 
-LUALIB_API int (luaopen_rock) (lua_State *L);
+LUALIB_API int (luaopen_rock) (lua_State *L) __attribute__((aligned(0x8)));
 int get_current_path(lua_State *L, int level);
 int filetol(int fd, long *num);
 
