@@ -350,8 +350,8 @@ local _draw = {} do
 
         if rb.LCD_DEPTH  == 2 then -- invert 2-bit screens
             --vp.drawmode = bit.bxor(vp.drawmode, 4)
-            vp.fg_pattern = 3 - vp.fg_pattern
-            vp.bg_pattern = 3 - vp.bg_pattern
+            opts.fg_pattern = 3 - opts.fg_pattern
+            opts.bg_pattern = 3 - opts.bg_pattern
         end
         rb.set_viewport(opts)
 
