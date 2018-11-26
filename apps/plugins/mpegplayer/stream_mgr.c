@@ -155,13 +155,13 @@ void stream_add_stream(struct stream *str)
 }
 
 /* Callback for various list-moving operations */
-static bool strl_enum_callback(struct stream *str, intptr_t data)
+static bool strl_enum_callback(struct stream *str, void *data)
 {
     actl_lock();
 
     list_remove_item(stream_mgr.strl, str);
 
-    if (data == 1)
+    if (*(int*)data == 1)
         list_add_item(stream_mgr.actl, str);
 
     actl_unlock();
@@ -172,15 +172,17 @@ static bool strl_enum_callback(struct stream *str, intptr_t data)
 /* Clear all streams from active and playback pools */
 void stream_remove_streams(void)
 {
+    int add_item = 0;
     list_enum_items(stream_mgr.strl,
-                    (list_enum_callback_t)strl_enum_callback, 0);
+                    (list_enum_callback_t)strl_enum_callback, (void *)&add_item);
 }
 
 /* Move the playback pool to the active list */
 void move_strl_to_actl(void)
 {
+    int add_item = 1;
     list_enum_items(stream_mgr.strl,
-                    (list_enum_callback_t)strl_enum_callback, 1);
+                    (list_enum_callback_t)strl_enum_callback, (void *)&add_item);
 }
 
 /* Remove a stream from the active list and return it to the pool */
@@ -238,7 +240,7 @@ static void actl_stream_broadcast(int cmd, intptr_t data)
     sbd.data = data;
     list_enum_items(stream_mgr.actl,
                     (list_enum_callback_t)actl_stream_broadcast_callback,
-                    (intptr_t)&sbd);
+                    (void*)&sbd);
 }
 
 /* Set the current base clock */
@@ -923,7 +925,7 @@ bool stream_get_window(struct stream_window *sw)
     actl_lock();
     list_enum_items(stream_mgr.actl,
                     (list_enum_callback_t)stream_get_window_callback,
-                    (intptr_t)sw);
+                    (void*)sw);
     actl_unlock();
 
     return sw->left <= sw->right;

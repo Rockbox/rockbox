@@ -146,7 +146,7 @@ void list_clear_all(void **list)
  * may return 'false' to stop the enumeration early. */
 void list_enum_items(void **list,
                      list_enum_callback_t callback,
-                     intptr_t data)
+                     void* data)
 {
     for (;;)
     {

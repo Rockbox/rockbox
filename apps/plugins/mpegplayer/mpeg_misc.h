@@ -222,11 +222,11 @@ void list_add_item(void **list, void *item);
 void list_clear_all(void **list);
 
 /* Enumerate all items in the array. */
-typedef bool (*list_enum_callback_t)(void *item, intptr_t data);
+typedef bool (*list_enum_callback_t)(void *item, void* data);
 
 void list_enum_items(void **list,
                      list_enum_callback_t callback,
-                     intptr_t data);
+                     void *data);
 
 
 /** System events **/
