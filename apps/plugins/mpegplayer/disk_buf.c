@@ -108,7 +108,9 @@ static int disk_buf_on_data_notify(struct stream_hdr *sh)
     return DISK_BUF_NOTIFY_ERROR;
 }
 
-static bool check_data_notifies_callback(struct stream_hdr *sh, intptr_t data)
+static bool check_data_notifies_callback(struct stream_hdr *sh,
+                                         intptr_t data,
+                                         void* pdata)
 {
     if (disk_buf_is_data_ready(sh, 0))
     {
@@ -123,6 +125,7 @@ static bool check_data_notifies_callback(struct stream_hdr *sh, intptr_t data)
 
     return true;
     (void)data;
+    (void)pdata;
 }
 
 /* Check registered streams and notify them if their data is available */
@@ -130,7 +133,7 @@ static inline void check_data_notifies(void)
 {
     list_enum_items(nf_list,
                     (list_enum_callback_t)check_data_notifies_callback,
-                    0);
+                    0, NULL);
 }
 
 /* Clear all registered notifications - do not post them */

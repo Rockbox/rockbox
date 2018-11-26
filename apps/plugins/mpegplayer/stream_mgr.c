@@ -155,7 +155,7 @@ void stream_add_stream(struct stream *str)
 }
 
 /* Callback for various list-moving operations */
-static bool strl_enum_callback(struct stream *str, intptr_t data)
+static bool strl_enum_callback(struct stream *str, intptr_t data, void* pdata)
 {
     actl_lock();
 
@@ -167,20 +167,21 @@ static bool strl_enum_callback(struct stream *str, intptr_t data)
     actl_unlock();
 
     return true;
+    (void)pdata;
 }
 
 /* Clear all streams from active and playback pools */
 void stream_remove_streams(void)
 {
     list_enum_items(stream_mgr.strl,
-                    (list_enum_callback_t)strl_enum_callback, 0);
+                    (list_enum_callback_t)strl_enum_callback, 0, NULL);
 }
 
 /* Move the playback pool to the active list */
 void move_strl_to_actl(void)
 {
     list_enum_items(stream_mgr.strl,
-                    (list_enum_callback_t)strl_enum_callback, 1);
+                    (list_enum_callback_t)strl_enum_callback, 1, NULL);
 }
 
 /* Remove a stream from the active list and return it to the pool */
@@ -202,6 +203,7 @@ static bool actl_stream_remove(struct stream *str)
 
 /* Broadcast a message to all active streams */
 static bool actl_stream_broadcast_callback(struct stream *str,
+                                           intptr_t data,
                                            struct str_broadcast_data *sbd)
 {
     switch (sbd->cmd)
@@ -229,6 +231,7 @@ static bool actl_stream_broadcast_callback(struct stream *str,
 
     str_send_msg(str, sbd->cmd, sbd->data);
     return true;
+    (void)data;
 }
 
 static void actl_stream_broadcast(int cmd, intptr_t data)
@@ -238,7 +241,7 @@ static void actl_stream_broadcast(int cmd, intptr_t data)
     sbd.data = data;
     list_enum_items(stream_mgr.actl,
                     (list_enum_callback_t)actl_stream_broadcast_callback,
-                    (intptr_t)&sbd);
+                    0, (void *) &sbd);
 }
 
 /* Set the current base clock */
@@ -898,6 +901,7 @@ void stream_wait_status(void)
 /* Returns the smallest file window that includes all active streams'
  * windows */
 static bool stream_get_window_callback(struct stream *str,
+                                       intptr_t data,
                                        struct stream_window *sw)
 {
     off_t swl = str->hdr.win_left;
@@ -910,6 +914,7 @@ static bool stream_get_window_callback(struct stream *str,
         sw->right = swr;
 
     return true;
+    (void)data;
 }
 
 bool stream_get_window(struct stream_window *sw)
@@ -923,7 +928,7 @@ bool stream_get_window(struct stream_window *sw)
     actl_lock();
     list_enum_items(stream_mgr.actl,
                     (list_enum_callback_t)stream_get_window_callback,
-                    (intptr_t)sw);
+                    0, (void *) sw);
     actl_unlock();
 
     return sw->left <= sw->right;
