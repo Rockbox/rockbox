@@ -331,8 +331,8 @@ int get_model_and_series(int *model_index, int *series_index, unsigned long *mod
         *series_index = -1;
         *model_index = -1;
         for(int i = 0; i < NWZ_SERIES_COUNT; i++)
-                if(strcmp(nwz_series[i].codename, g_force_series) == 0)
-                    *series_index = i;
+            if(strcmp(nwz_series[i].codename, g_force_series) == 0)
+                *series_index = i;
         /* display list on error */
         if(*series_index == -1)
         {
