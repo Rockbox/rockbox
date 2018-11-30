@@ -373,6 +373,18 @@ int get_model_and_series(int *model_index, int *series_index, unsigned long *mod
     return 0;
 }
 
+/* model IDs follow a pattern: the high 16-bit seem to encode the series and low 16-bit the size
+ * (although this is not entirely reliable). Just try to find any device with the same high 16-bits
+ * and return the series it belongs to. */
+int guess_series_for_model(unsigned long model_id)
+{
+    for(int i = 0; i < NWZ_SERIES_COUNT; i++)
+        for(int j = 0; j < nwz_series[i].mid_count; j++)
+            if(nwz_series[i].mid[j] >> 16 == model_id >> 16)
+                return i;
+    return -1;
+}
+
 /* Read nvp node, retrun nonzero on error, update size to actual length. The
  * index is the raw node number sent to the device */
 int read_nvp_node(int node_index, void *buffer, size_t *size)
@@ -988,6 +1000,13 @@ void help_us(bool unsupported, unsigned long model_id)
         cprintf(RED, "Your device is not supported yet.\n");
     cprintf(RED, "Please contact developers and send them the information below.\n");
     cprintf(RED, "See https://www.rockbox.org/wiki/SonyNWDestTool#ReportDevice\n");
+    /* try to see if we know a device in the same series, so we can recommend a force action */
+    int series_idx = guess_series_for_model(model_id);
+    if(series_idx >= 0)
+    {
+        cprintf(OFF, "It seems your devices belongs to the %s series.\n", nwz_series[series_idx].name);
+        cprintf(OFF, "You can try to re-run this tool with the option -s %s\n", nwz_series[series_idx].codename);
+    }
     cprintf(BLUE, "-------------------[ Paste information below ]-------------------\n");
     cprintf_field("Model ID: ", "%#lx\n", model_id);
     get_dev_info(0, NULL);
