@@ -965,16 +965,20 @@ int process_cmd(const char *cmd, int argc, char **argv)
 
 static void usage(void)
 {
-    printf("Usage: scsitool [options] <dev> <command> [arguments]\n");
+    printf("Usage:\n");
+    printf("  scsitool [options] list_devices\n");
+    printf("  scsitool [options] <dev> <command> [arguments]\n");
     printf("Options:\n");
     printf("  -o <prefix>          Set output prefix\n");
     printf("  -h/--help            Display this message\n");
     printf("  -d/--debug           Display debug messages\n");
     printf("  -c/--no-color        Disable color output\n");
     printf("  -s/--series <name>   Force series (disable auto-detection, use '?' for the list)\n");
+    printf("  -a/--all             List all devices, not just Sony (for list_devices)\n");
     printf("Commands:\n");
+    printf("  %-20sList all connected Sony devices (experimental)\n", "list_devices");
     for(unsigned i = 0; i < NR_CMDS; i++)
-        printf("  %s\t%s\n", cmd_list[i].name, cmd_list[i].desc);
+        printf("  %-20s%s\n", cmd_list[i].name, cmd_list[i].desc);
     exit(1);
 }
 
@@ -999,8 +1003,44 @@ static const char *get_model_name(uint32_t model_id)
     return index == -1 ? "Unknown" : nwz_model[index].name;
 }
 
+static bool is_sony_device(struct rb_scsi_devent_t *dev)
+{
+    /* vendor must be SONY */
+    if(!dev->vendor || strcmp(dev->vendor, "SONY    ") != 0)
+        return false;
+    /* model must be WALKMAN */
+    if(!dev->model || strcmp(dev->model, "WALKMAN         ") != 0)
+        return false;
+    return true;
+}
+
+static int list_devices(bool list_all)
+{
+    printf("%s device(s) found:\n", list_all ? "SCSI" : "Sony");
+    struct rb_scsi_devent_t *dev = rb_scsi_list();
+    if(dev == NULL)
+    {
+        cprintf(GREY, "Could not get the list of devices.\n");
+        return 1;
+    }
+    bool empty_list = true;
+    for(struct rb_scsi_devent_t *p = dev; p->scsi_path; p++)
+    {
+        /* filter non-Sony devices */
+        if(!list_all && !is_sony_device(p))
+            continue;
+        printf("%-20s%-20s%s %s %s\n", p->scsi_path, p->block_path, p->vendor, p->model, p->rev);
+        empty_list = false;
+    }
+    if(empty_list)
+        cprintf(GREY, "No devices found.\n");
+    rb_scsi_free_list(dev);
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
+    bool list_all = false;
     while(1)
     {
         static struct option long_options[] =
@@ -1009,10 +1049,11 @@ int main(int argc, char **argv)
             {"debug", no_argument, 0, 'd'},
             {"no-color", no_argument, 0, 'c'},
             {"series", required_argument, 0, 's'},
+            {"all", no_argument, 0, 'a'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?dcfo:s:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?dcfo:s:a", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -1033,6 +1074,9 @@ int main(int argc, char **argv)
                 break;
             case 's':
                 g_force_series = optarg;
+                break;
+            case 'a':
+                list_all = true;
                 break;
             default:
                 abort();
@@ -1056,6 +1100,10 @@ int main(int argc, char **argv)
         }
         return 0;
     }
+
+    /* special list_devices command */
+    if(argc == optind + 1 && strcmp(argv[optind], "list_devices") == 0)
+        return list_devices(list_all);
 
     if(argc - optind < 2)
     {
