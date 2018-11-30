@@ -213,10 +213,12 @@ struct nwz_model_info_t nwz_model[NWZ_MODEL_COUNT] =
     { 0x22000006, "NW-A37" },
     { 0x23000004, "NW-ZX300A" },
     { 0x23000006, "NW-ZX300" },
+    { 0x23000007, "NW-ZX300" },
     { 0x24000004, "NW-A45" },
     { 0x24000005, "NW-A46" },
     { 0x24000006, "NW-A47" },
     { 0x25000004, "NW-A55" },
+    { 0x25000006, "NW-A57" },
 };
 
 static int nvp_index_06a782[NWZ_NVP_COUNT] =
@@ -1790,7 +1792,7 @@ static unsigned long models_nw_a30[] = { 0x22000004, 0x22000005, 0x22000006 };
 
 static unsigned long models_nw_a40[] = { 0x24000004, 0x24000005, 0x24000006 };
 
-static unsigned long models_nw_a50[] = { 0x25000004 };
+static unsigned long models_nw_a50[] = { 0x25000004, 0x25000006 };
 
 static unsigned long models_nwz_a720[] = { 0x3030001, 0x3030002, 0x3030004,
     0x3020001, 0x3020002, 0x3020004 };
@@ -1881,7 +1883,7 @@ static unsigned long models_nwz_x1000[] = { 0x5000002, 0x5000004, 0x5000005,
 static unsigned long models_nw_zx100[] = { 0x1c000007, 0x1c000001, 0x1c000002,
     0x1c000004, 0x1c000005, 0x1c000006 };
 
-static unsigned long models_nw_zx300[] = { 0x23000004, 0x23000006 };
+static unsigned long models_nw_zx300[] = { 0x23000004, 0x23000006, 0x23000007 };
 
 static unsigned long models_nwz_noname[] = { 0x5010002, 0x5010004, 0x5010005 };
 
@@ -1891,7 +1893,7 @@ struct nwz_series_info_t nwz_series[NWZ_SERIES_COUNT] =
     { "nw-a20", "NW-A20 Series", 6, models_nw_a20, &nvp_index_92faee },
     { "nw-a30", "NW-A30 Series", 3, models_nw_a30, &nvp_index_398250 },
     { "nw-a40", "NW-A40 Series", 3, models_nw_a40, &nvp_index_139d65 },
-    { "nw-a50", "NW-A50 Series", 1, models_nw_a50, &nvp_index_94b5fc },
+    { "nw-a50", "NW-A50 Series", 2, models_nw_a50, &nvp_index_94b5fc },
     { "nwz-a720", "NWZ-A720 Series", 6, models_nwz_a720, 0 },
     { "nwz-a810", "NWZ-A810 Series", 3, models_nwz_a810, &nvp_index_342a18 },
     { "nwz-a820", "NWZ-A820 Series", 6, models_nwz_a820, 0 },
@@ -1924,6 +1926,6 @@ struct nwz_series_info_t nwz_series[NWZ_SERIES_COUNT] =
     { "nw-wm1", "NW-WM1 Series", 2, models_nw_wm1, &nvp_index_398250 },
     { "nwz-x1000", "NWZ-X1000 Series", 9, models_nwz_x1000, &nvp_index_4edba7 },
     { "nw-zx100", "NW-ZX100 Series", 6, models_nw_zx100, &nvp_index_92faee },
-    { "nw-zx300", "NW-ZX300 Series", 2, models_nw_zx300, &nvp_index_139d65 },
+    { "nw-zx300", "NW-ZX300 Series", 3, models_nw_zx300, &nvp_index_139d65 },
     { "nwz-noname", "NONAME", 3, models_nwz_noname, 0 },
 };
