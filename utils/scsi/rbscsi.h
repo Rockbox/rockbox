@@ -89,6 +89,31 @@ void rb_scsi_decode_sense(rb_scsi_device_t dev, void *sense, int sense_len);
 /* close a device */
 void rb_scsi_close(rb_scsi_device_t dev);
 
+/* SCSI device reported by rb_scsi_list() */
+struct rb_scsi_devent_t
+{
+    /* device path to the raw SCSI device, typically:
+     * - Linux: /dev/sgX
+     * - Windows: TODO
+     * This path can be used directly with scsi_rb_open(), and is guaranteed to
+     * be valid. */
+    char *scsi_path;
+    /* device path to the corresponding block device, if it exists, typically:
+     * - Linux: /dev/sdX
+     * - Windows: TODO
+     * If this path is not-NULL, then it can used directly with scsi_rb_open() */
+    char *block_path;
+    /* various information about the device, can be NULL on error */
+    char *vendor;
+    char *model;
+    char *rev;
+};
+/* try to list all SCSI devices, returns a list of devices or NULL on error
+ * the list is terminated by an entry with scsi_path=NULL */
+struct rb_scsi_devent_t *rb_scsi_list(void);
+/* free the list returned by rb_scsi_list */
+void rb_scsi_free_list(struct rb_scsi_devent_t *list);
+
 #ifdef __cplusplus
 }
 #endif
