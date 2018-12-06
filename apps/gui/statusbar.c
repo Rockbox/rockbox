@@ -427,9 +427,10 @@ static void gui_statusbar_icon_battery(struct screen * display, int percent,
     /* show graphical animation when charging instead of numbers */
     if ((global_settings.battery_display) &&
         (charge_state != CHARGING) &&
-        (percent > -1)) {
+        (percent > -1) &&
+        (percent <= 100)) {
 #else /* all others */
-    if (global_settings.battery_display && (percent > -1)) {
+    if (global_settings.battery_display && (percent > -1) && (percent <= 100)) {
 #endif
         /* Numeric display */
         display->setfont(FONT_SYSFIXED);
@@ -465,7 +466,7 @@ static void gui_statusbar_icon_battery(struct screen * display, int percent,
 #endif
     }
 
-    if (percent == -1) {
+    if (percent == -1 || percent > 100) {
         display->setfont(FONT_SYSFIXED);
         display->putsxy(STATUSBAR_BATTERY_X_POS + STATUSBAR_BATTERY_WIDTH / 2
                          - 4, STATUSBAR_Y_POS, "?");
