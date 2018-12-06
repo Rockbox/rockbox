@@ -126,9 +126,16 @@ char *output_dyn_value(char *buf, int buf_size, int value,
                        const unsigned char * const *units, bool bin_scale)
 {
     int scale = bin_scale ? 1024 : 1000;
-    int fraction = 0;
+    unsigned int fraction = 0;
     int unit_no = 0;
     char tbuf[5];
+    bool is_neg = false;
+
+    if (value < 0)
+    {
+        value = -value;
+        is_neg = true;
+    }
 
     while (value >= scale)
     {
@@ -139,12 +146,15 @@ char *output_dyn_value(char *buf, int buf_size, int value,
     if (bin_scale)
         fraction = fraction * 1000 / 1024;
 
-    if (value >= 100 || !unit_no)
+    if (value >= 100 || !unit_no || fraction > 1000)
         tbuf[0] = '\0';
     else if (value >= 10)
-        snprintf(tbuf, sizeof(tbuf), "%01d", fraction / 100);
+        snprintf(tbuf, sizeof(tbuf), "%01u", fraction / 100);
     else
-        snprintf(tbuf, sizeof(tbuf), "%02d", fraction / 10);
+        snprintf(tbuf, sizeof(tbuf), "%02u", fraction / 10);
+
+    if (is_neg)
+        value = -value;
 
     if (buf)
     {
