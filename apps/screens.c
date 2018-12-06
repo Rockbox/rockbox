@@ -747,7 +747,7 @@ static const char* id3_get_info(int selected_item, void* data,
                 val=id3->composer;
                 break;
             case LANG_FILESIZE: /* not LANG_ID3_FILESIZE because the string is shared */
-                output_dyn_value(buffer, buffer_len, id3->filesize, byte_units, true);
+                output_dyn_value(buffer, buffer_len, id3->filesize, byte_units, 4, true);
                 val=buffer;
                 break;
         }
