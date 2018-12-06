@@ -23,6 +23,10 @@
 
 #include "config.h"
 
+#if defined(SIMULATOR) && !defined(WIN32)
+#include <byteswap.h>
+#endif
+
 #ifndef __MINGW32__
 #include <endian.h>
 #endif
