@@ -10,6 +10,9 @@
 # global CC options for all platforms
 CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe -std=gnu99"
 
+#newer versions GLIBC use byteswap.h
+BYTESWP="/usr/include/byteswap.h"
+
 # LD options for the core
 LDOPTS=""
 # LD options for the core + plugins
@@ -4471,6 +4474,10 @@ fi
 if [ "yes" = "$simulator" ]; then
     echo Unsetting APPLICATION define for SIMULATOR build
     unset application
+    if test -f "$BYTESWP"; then
+        echo Using "$BYTESWP"
+        extradefines="$extradefines -DSIM_USE_BYTESWAP_H=$BYTESWP"
+    fi
 fi
 
 if [ "yes" = "$application" ]; then

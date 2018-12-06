@@ -23,6 +23,10 @@
 
 #include "config.h"
 
+#ifdef SIM_USE_BYTESWAP_H
+#include <byteswap.h>
+#endif
+
 #ifndef __MINGW32__
 #include <endian.h>
 #endif
