@@ -259,9 +259,9 @@ static void draw_screen(struct screen *display, char *title,
         display->putsxy(text_x, text_top, buf);
         /* Draw color value */
         if (display->depth >= 24)
-            snprintf(buf, 4, "%03d", rgb->rgb_val[i]);
+            snprintf(buf, 4, "%03d", rgb->rgb_val[i] & 0xFF);
         else
-            snprintf(buf, 3, "%02d", rgb->rgb_val[i]);
+            snprintf(buf, 3, "%02d", rgb->rgb_val[i] & 0x3F);
         vp.flags |= VP_FLAG_ALIGN_RIGHT;
         display->putsxy(text_x, text_top, buf);
 
