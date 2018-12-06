@@ -8441,44 +8441,44 @@
 </phrase>
 <phrase>
   id: LANG_KILOBYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "KB"
+    *: ""
   </source>
   <dest>
-    *: "KB"
+    *: ""
   </dest>
   <voice>
-    *: "kilobyte"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_MEGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "MB"
+    *: ""
   </source>
   <dest>
-    *: "MB"
+    *: ""
   </dest>
   <voice>
-    *: "megabyte"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_GIGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "GB"
+    *: ""
   </source>
   <dest>
-    *: "GB"
+    *: ""
   </dest>
   <voice>
-    *: "gigabyte"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13645,5 +13645,47 @@
   </dest>
   <voice>
     *: "Disable Touch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "KiB"
+  </source>
+  <dest>
+    *: "KiB"
+  </dest>
+  <voice>
+    *: "kibibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "MiB"
+  </source>
+  <dest>
+    *: "MiB"
+  </dest>
+  <voice>
+    *: "mebibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "GiB"
+  </source>
+  <dest>
+    *: "GiB"
+  </dest>
+  <voice>
+    *: "gibibyte"
   </voice>
 </phrase>
