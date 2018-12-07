@@ -322,7 +322,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
                                bool new_playlist, char *m3u8name)
 {
     int result;
-    char playlist[MAX_PATH];
+    char playlist[MAX_PATH + 6];
     if (in_add_to_playlist)
         return false;
 
@@ -336,7 +336,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
         {
             /*If sel is a folder, we prefill the text field with its name*/
             const char *name = strrchr(sel, '/');
-            snprintf(playlist, MAX_PATH, "%s/%s.m3u8",
+            snprintf(playlist, sizeof(playlist), "%s/%s.m3u8",
                      playlist_dir,
                      (name!=NULL && (sel_attr & ATTR_DIRECTORY))?name+1:"");
         }
@@ -350,7 +350,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
         else if(len <= 5 || strcasecmp(&playlist[len-5], ".m3u8"))
             strcat(playlist, ".m3u8");
         
-        if (kbd_input(playlist, MAX_PATH))
+        if (kbd_input(playlist, sizeof(playlist)))
             return false;
     }
     else
