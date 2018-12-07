@@ -60,7 +60,7 @@ void cpufreq_available_governors(char* governors, int governors_size, int cpu)
     snprintf(available_governors_interface,
              sizeof(available_governors_interface),
              "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_available_governors",
-             cpu);
+             cpu & 0xFFFF);
 
     FILE *f = open_read(available_governors_interface);
     if(f == NULL)
