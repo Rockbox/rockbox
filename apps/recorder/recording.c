@@ -959,6 +959,30 @@ static const char* reclist_get_name(int selected_item, void * data,
     return buffer;
 }
 
+void recording_step_levels(int setting_id, int steps)
+{
+    steps *= sound_steps(setting_id);
+    switch(setting_id)
+    {
+        case SOUND_VOLUME:
+            global_settings.volume += steps;
+            setvol();
+            break;
+        case SOUND_LEFT_GAIN:
+            global_settings.rec_left_gain += steps;
+            break;
+        case SOUND_RIGHT_GAIN:
+            global_settings.rec_right_gain += steps;
+            break;
+#ifdef HAVE_MIC_REC
+        case SOUND_MIC_GAIN:
+            global_settings.rec_mic_gain += steps;
+            break;
+#endif /* MIC */
+        default:
+            break;
+    }
+}
 
 bool recording_start_automatic = false;
 
@@ -967,7 +991,7 @@ bool recording_screen(bool no_source)
     int button;
     int done = -1;      /* negative to re-init, positive to quit, zero to run */
     char buf[32];       /* for preparing strings */
-    char buf2[32];      /* for preparing strings */
+    char buf2[16];      /* for preparing strings */
     int w, h;           /* character width/height */
     int update_countdown = 0;   /* refresh counter */
     unsigned int seconds;
@@ -1330,34 +1354,24 @@ bool recording_screen(bool no_source)
                 switch (listid_to_enum[gui_synclist_get_sel_pos(&lists)])
                 {
                     case ITEM_VOLUME:
-                        global_settings.volume += sound_steps(SOUND_VOLUME);
-                        setvol();
+                        recording_step_levels(SOUND_VOLUME, 1);
                         break;
                     case ITEM_GAIN:
 #ifdef HAVE_MIC_REC
                         if(global_settings.rec_source == AUDIO_SRC_MIC)
-                        {
-                            global_settings.rec_mic_gain +=
-                                sound_steps(SOUND_MIC_GAIN);
-                        }
+                            recording_step_levels(SOUND_MIC_GAIN, 1);
                         else
 #endif /* MIC */
                         {
-                            global_settings.rec_left_gain +=
-                                sound_steps(SOUND_LEFT_GAIN);
-                            global_settings.rec_right_gain +=
-                                sound_steps(SOUND_RIGHT_GAIN);
+                            recording_step_levels(SOUND_LEFT_GAIN, 1);
+                            recording_step_levels(SOUND_RIGHT_GAIN, 1);
                         }
                         break;
                     case ITEM_GAIN_L:
-                        global_settings.rec_left_gain +=
-                            sound_steps(SOUND_LEFT_GAIN);
-
+                        recording_step_levels(SOUND_LEFT_GAIN, 1);
                         break;
                     case ITEM_GAIN_R:
-                        global_settings.rec_right_gain +=
-                            sound_steps(SOUND_RIGHT_GAIN);
-
+                        recording_step_levels(SOUND_RIGHT_GAIN, 1);
                         break;
 #ifdef HAVE_AGC
                     case ITEM_AGC_MODE:
@@ -1400,37 +1414,24 @@ bool recording_screen(bool no_source)
                 switch (listid_to_enum[gui_synclist_get_sel_pos(&lists)])
                 {
                     case ITEM_VOLUME:
-                        global_settings.volume -= sound_steps(SOUND_VOLUME);
-
-                        /* check range and update */
-                        setvol();
+                        recording_step_levels(SOUND_VOLUME, -1);
                         break;
                     case ITEM_GAIN:
 #ifdef HAVE_MIC_REC
                         if(global_settings.rec_source == AUDIO_SRC_MIC)
-                        {
-                            global_settings.rec_mic_gain -=
-                                sound_steps(SOUND_MIC_GAIN);
-                        }
+                            recording_step_levels(SOUND_MIC_GAIN, -1);
                         else
 #endif /* MIC */
                         {
-                            global_settings.rec_left_gain -=
-                                sound_steps(SOUND_LEFT_GAIN);
-
-                            global_settings.rec_right_gain -=
-                                sound_steps(SOUND_RIGHT_GAIN);
+                            recording_step_levels(SOUND_LEFT_GAIN, -1);
+                            recording_step_levels(SOUND_RIGHT_GAIN, -1);
                         }
                         break;
                     case ITEM_GAIN_L:
-                        global_settings.rec_left_gain -=
-                            sound_steps(SOUND_LEFT_GAIN);
-
+                        recording_step_levels(SOUND_LEFT_GAIN, -1);
                         break;
                     case ITEM_GAIN_R:
-                        global_settings.rec_right_gain -=
-                            sound_steps(SOUND_RIGHT_GAIN);
-
+                        recording_step_levels(SOUND_RIGHT_GAIN, -1);
                         break;
 #ifdef HAVE_AGC
                     case ITEM_AGC_MODE:
