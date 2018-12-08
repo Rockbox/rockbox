@@ -967,7 +967,7 @@ bool recording_screen(bool no_source)
     int button;
     int done = -1;      /* negative to re-init, positive to quit, zero to run */
     char buf[32];       /* for preparing strings */
-    char buf2[32];      /* for preparing strings */
+    char buf2[16];      /* for preparing strings */
     int w, h;           /* character width/height */
     int update_countdown = 0;   /* refresh counter */
     unsigned int seconds;
