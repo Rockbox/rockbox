@@ -459,7 +459,7 @@ void lsp_to_lpc(spx_lsp_t *freq,spx_coef_t *ak,int lpcrdr, char *stack)
 
     /* work out 2cos terms in Q14 */
 
-    ALLOC(freqn, lpcrdr, spx_word16_t);
+    ALLOC(freqn, (lpcrdr + 1), spx_word16_t);
     for (i=0;i<lpcrdr;i++) 
        freqn[i] = ANGLE2X(freq[i]);
 
