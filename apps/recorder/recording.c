@@ -78,56 +78,60 @@
 #include "appevents.h"
 
 #ifdef HAVE_RECORDING
-/* This array holds the record timer interval lengths, in seconds */
-static const unsigned long rec_timer_seconds[] =
+/* This array holds the record timer interval lengths, in minutes */
+static const unsigned short rec_timer_minutes[] =
 {
-    0,        /* 0 means OFF */
-    5*60,     /* 00:05 */
-    10*60,    /* 00:10 */
-    15*60,    /* 00:15 */
-    30*60,    /* 00:30 */
-    60*60,    /* 01:00 */
-    74*60,    /* 01:14 */
-    80*60,    /* 01:20 */
-    2*60*60,  /* 02:00 */
-    4*60*60,  /* 04:00 */
-    6*60*60,  /* 06:00 */
-    8*60*60,  /* 08:00 */
-    10L*60*60, /* 10:00 */
-    12L*60*60, /* 12:00 */
-    18L*60*60, /* 18:00 */
-    24L*60*60  /* 24:00 */
+    0,     /* 0 means OFF */
+    5,     /* 00:05 */
+    10,    /* 00:10 */
+    15,    /* 00:15 */
+    30,    /* 00:30 */
+    60,    /* 01:00 */
+    74,    /* 01:14 */
+    80,    /* 01:20 */
+    2*60,  /* 02:00 */
+    4*60,  /* 04:00 */
+    6*60,  /* 06:00 */
+    8*60,  /* 08:00 */
+    10*60, /* 10:00 */
+    12*60, /* 12:00 */
+    18*60, /* 18:00 */
+    24*60  /* 24:00 */
 };
 
 static unsigned int rec_timesplit_seconds(void)
 {
-    return rec_timer_seconds[global_settings.rec_timesplit];
+    unsigned long tm_min = rec_timer_minutes[global_settings.rec_timesplit];
+    unsigned long tm_sec = tm_min * 60;
+    return tm_sec;
 }
 
-/* This array holds the record size interval lengths, in bytes */
-static const unsigned long rec_size_bytes[] =
+/* This array holds the record size interval lengths, in mebibytes */
+static const unsigned short rec_size_mbytes[] =
 {
-    0,               /* 0 means OFF */
-    5*1024*1024,     /* 5MB */
-    10*1024*1024,    /* 10MB */
-    15*1024*1024,    /* 15MB */
-    32*1024*1024,    /* 32MB */
-    64*1024*1024,    /* 64MB */
-    75*1024*1024,    /* 75MB */
-    100*1024*1024,   /* 100MB */
-    128*1024*1024,   /* 128MB */
-    256*1024*1024,   /* 256MB */
-    512*1024*1024,   /* 512MB */
-    650*1024*1024,   /* 650MB */
-    700*1024*1024,   /* 700MB */
-    1024*1024*1024,  /* 1GB */
-    1536*1024*1024,  /* 1.5GB */
-    1792*1024*1024,  /* 1.75GB  */
+    0,     /* 0 means OFF */
+    5,     /* 5MB */
+    10,    /* 10MB */
+    15,    /* 15MB */
+    32,    /* 32MB */
+    64,    /* 64MB */
+    75,    /* 75MB */
+    100,   /* 100MB */
+    128,   /* 128MB */
+    256,   /* 256MB */
+    512,   /* 512MB */
+    650,   /* 650MB */
+    700,   /* 700MB */
+    1024,  /* 1GB */
+    1536,  /* 1.5GB */
+    1792,  /* 1.75GB  */
 };
 
 static unsigned long rec_sizesplit_bytes(void)
 {
-    return rec_size_bytes[global_settings.rec_sizesplit];
+    unsigned long sz_mbytes = rec_size_mbytes[global_settings.rec_sizesplit];
+    unsigned long sz_bytes = sz_mbytes << 20;
+    return sz_bytes;
 }
 
 void settings_apply_trigger(void)
@@ -959,7 +963,7 @@ static const char* reclist_get_name(int selected_item, void * data,
     return buffer;
 }
 
-void recording_step_levels(int setting_id, int steps)
+static void recording_step_levels(int setting_id, int steps)
 {
     steps *= sound_steps(setting_id);
     switch(setting_id)
@@ -999,6 +1003,8 @@ bool recording_screen(bool no_source)
     int audio_stat = 0;         /* status of the audio system */
     int last_audio_stat = -1;   /* previous status so we can act on changes */
     struct viewport vp_list[NB_SCREENS], vp_top[NB_SCREENS]; /* the viewports */
+    const long split_seconds = rec_timesplit_seconds();
+    const long split_bytes = rec_sizesplit_bytes();
 
 #if CONFIG_CODEC == SWCODEC
     int warning_counter = 0;
@@ -1681,8 +1687,8 @@ bool recording_screen(bool no_source)
             update_countdown = 5;
             last_seconds = seconds;
 
-            dseconds = rec_timesplit_seconds();
-            dsize = rec_sizesplit_bytes();
+            dseconds = split_seconds;
+            dsize = split_bytes;
             num_recorded_bytes = audio_num_recorded_bytes();
 
 #if CONFIG_CODEC == SWCODEC
@@ -1702,7 +1708,7 @@ bool recording_screen(bool no_source)
             if ((global_settings.rec_sizesplit) &&
                 (global_settings.rec_split_method))
             {
-                dmb = dsize/1024/1024;
+                dmb = dsize >> 20;
                 snprintf(buf, sizeof(buf), "%s %luMB",
                          str(LANG_SPLIT_SIZE), dmb);
             }
