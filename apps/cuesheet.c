@@ -369,7 +369,10 @@ void browse_cuesheet(struct cuesheet *cue)
     len = snprintf(title, sizeof(title), "%s: %s", cue->performer, cue->title);
 
     if ((unsigned) len > sizeof(title))
+    {
+        title[MAX_PATH - 2] = '~'; /* give indication of truncation */
         DEBUGF("browse_cuesheet title truncated\n");
+    }
 
     gui_synclist_init(&lists, list_get_name_cb, cue, false, 2, NULL);
     gui_synclist_set_nb_items(&lists, 2*cue->track_count);
