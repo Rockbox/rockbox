@@ -400,8 +400,8 @@ bool set_time_screen(const char* title, struct tm *tm)
            an easily printable buffer */
         snprintf(buffer, sizeof(buffer),
                  "%02d " "%02d " "%02d " "%04d " "%02d",
-                 tm->tm_hour, tm->tm_min, tm->tm_sec,
-                 tm->tm_year+1900, tm->tm_mday);
+                 tm->tm_hour & 0x1F, tm->tm_min & 0x3F, tm->tm_sec & 0x3F,
+                 (tm->tm_year + 1900) & 0xFFFF, tm->tm_mday & 0x1F);
 
         /* convert spaces in the buffer to '\0' to make it possible to work
            directly on the buffer */
