@@ -20,7 +20,7 @@ OTHER_SRC += $(PDBOX_SRC)
 
 $(PDBOXBUILDDIR)/pdbox.rock: $(PDBOX_OBJ) $(MPEG_OBJ)
 
-PDBOXFLAGS = $(PLUGINFLAGS) -fno-strict-aliasing
+PDBOXFLAGS = $(PLUGINFLAGS) -fno-strict-aliasing -Wno-cast-function-type 
 PDBOXLDFLAGS = $(PLUGINLDFLAGS) 
 ifdef APP_TYPE
 PDBOXLDFLAGS += -lm
