@@ -23,7 +23,7 @@
 
 #include "config.h"
 
-#ifdef SIM_USE_BYTESWAP_H
+#ifdef OS_USE_BYTESWAP_H
 #include <byteswap.h>
 #endif
 

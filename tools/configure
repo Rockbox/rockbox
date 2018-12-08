@@ -4394,6 +4394,7 @@ fi
       ;;
     [Cc])
       uname=`uname`
+      checkwps="yes"
       simcc "checkwps"
       toolset='';
       t_cpu='';
@@ -4474,9 +4475,13 @@ fi
 if [ "yes" = "$simulator" ]; then
     echo Unsetting APPLICATION define for SIMULATOR build
     unset application
+fi
+
+# newer glibc implementations use byteswap.h
+if [ "$simulator" = "yes" ] || [ "$checkwps" = "yes" ]; then
     if test -f "$BYTESWP"; then
         echo Using "$BYTESWP"
-        extradefines="$extradefines -DSIM_USE_BYTESWAP_H=$BYTESWP"
+        extradefines="$extradefines -DOS_USE_BYTESWAP_H=$BYTESWP"
     fi
 fi
 
