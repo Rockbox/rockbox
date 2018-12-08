@@ -281,7 +281,7 @@ int open_soundfile(const char *dirname, const char *filename, int headersize,
 	    nchannels = 1;
 	    bytespersamp = 2;
 	    	/* copy the first chunk header to beginnning of buffer. */
-	    memcpy(buf, buf + headersize, sizeof(t_wavechunk));
+	    memmove(buf, buf + headersize, sizeof(t_wavechunk));
 	    /* post("chunk %c %c %c %c",
 		    ((t_wavechunk *)buf)->wc_id[0],
 		    ((t_wavechunk *)buf)->wc_id[1],
@@ -338,7 +338,7 @@ int open_soundfile(const char *dirname, const char *filename, int headersize,
 	    nchannels = 1;
 	    bytespersamp = 2;
 	    	/* copy the first chunk header to beginnning of buffer. */
-	    memcpy(buf, buf + headersize, sizeof(t_datachunk));
+	    memmove(buf, buf + headersize, sizeof(t_datachunk));
 	    	/* read chunks in loop until we get to the data chunk */
 	    while (strncmp(((t_datachunk *)buf)->dc_id, "SSND", 4))
 	    {

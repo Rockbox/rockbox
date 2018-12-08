@@ -20,7 +20,7 @@ OTHER_SRC += $(PDBOX_SRC)
 
 $(PDBOXBUILDDIR)/pdbox.rock: $(PDBOX_OBJ) $(MPEG_OBJ)
 
-PDBOXFLAGS = $(PLUGINFLAGS) -fno-strict-aliasing
+PDBOXFLAGS = $(PLUGINFLAGS) -fno-strict-aliasing -Wno-cast-function-type 
 PDBOXLDFLAGS = $(PLUGINLDFLAGS) 
 ifdef APP_TYPE
 PDBOXLDFLAGS += -lm
@@ -31,4 +31,6 @@ $(PDBOXBUILDDIR)/pdbox.rock: $(PDBOX_OBJ) $(TLSFLIB)
 # Compile PDBox with extra flags (adapted from ZXBox)
 $(PDBOXBUILDDIR)/%.o: $(PDBOXSRCDIR)/%.c $(PDBOXSRCDIR)/pdbox.make
 	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PDBOXFLAGS) -c $< -o $@
+	$(call PRINTS,CCN $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PDBOXFLAGS) -c $< -o $@
+# Ignore errors in pdbox headers with -isystem
+# WAS: $(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PDBOXFLAGS) -c $< -o $@
