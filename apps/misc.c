@@ -110,41 +110,47 @@
 const unsigned char * const byte_units[] =
 {
     ID2P(LANG_BYTE),
-    ID2P(LANG_KILOBYTE),
-    ID2P(LANG_MEGABYTE),
-    ID2P(LANG_GIGABYTE)
+    ID2P(LANG_KIBIBYTE),
+    ID2P(LANG_MEBIBYTE),
+    ID2P(LANG_GIBIBYTE)
 };
 
-const unsigned char * const * const kbyte_units = &byte_units[1];
+const unsigned char * const * const kibyte_units = &byte_units[1];
 
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
  * units) if possible, and 3 significant digits are shown. If a buffer is
  * given, the result is snprintf()'d into that buffer, otherwise the result is
  * voiced.*/
-char *output_dyn_value(char *buf, int buf_size, int value,
-                       const unsigned char * const *units, bool bin_scale)
+char *output_dyn_value(char *buf,
+                       int buf_size,
+                       int value,
+                       const unsigned char * const *units,
+                       unsigned int unit_count,
+                       bool binary_scale)
 {
-    int scale = bin_scale ? 1024 : 1000;
-    int fraction = 0;
-    int unit_no = 0;
+    unsigned int scale = binary_scale ? 1024 : 1000;
+    unsigned int fraction = 0;
+    unsigned int unit_no = 0;
+    unsigned int value_abs = (value < 0) ? -value : value;
     char tbuf[5];
 
-    while (value >= scale)
+    while (value_abs >= scale && unit_no < (unit_count - 1))
     {
-        fraction = value % scale;
-        value /= scale;
+        fraction = value_abs % scale;
+        value_abs /= scale;
         unit_no++;
     }
-    if (bin_scale)
-        fraction = fraction * 1000 / 1024;
+    
+    value = (value < 0) ? -value_abs : value_abs; /* preserve sign */
+    fraction = (fraction * 1000 / scale) / 10;
 
-    if (value >= 100 || !unit_no)
+    if (value_abs >= 100 || fraction >= 100 || !unit_no) 
         tbuf[0] = '\0';
-    else if (value >= 10)
-        snprintf(tbuf, sizeof(tbuf), "%01d", fraction / 100);
+    else if (value_abs >= 10)
+        snprintf(tbuf, sizeof(tbuf), "%01u", fraction / 10);
     else
-        snprintf(tbuf, sizeof(tbuf), "%02d", fraction / 10);
+        snprintf(tbuf, sizeof(tbuf), "%02u", fraction);
 
     if (buf)
     {

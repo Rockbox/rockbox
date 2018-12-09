@@ -1326,11 +1326,11 @@ static int disk_callback(int btn, struct gui_synclist *lists)
             simplelist_addline(
                     "Blocks: 0x%08lx", card->numblocks);
             output_dyn_value(pbuf, sizeof pbuf, card->speed / 1000,
-                                            kbit_units, false);
+                                            kbit_units, 3, false);
             simplelist_addline(
                     "Speed: %s", pbuf);
             output_dyn_value(pbuf, sizeof pbuf, card->taac,
-                            nsec_units, false);
+                            nsec_units, 3, false);
             simplelist_addline(
                     "Taac: %s", pbuf);
             simplelist_addline(

@@ -1330,7 +1330,7 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
         [UNIT_HERTZ]
             = VOICE_HERTZ,
         [UNIT_MB]
-            = LANG_MEGABYTE,
+            = LANG_MEBIBYTE,
         [UNIT_KBIT]
             = VOICE_KBIT_PER_SEC,
         [UNIT_PM_TICK]
