@@ -355,20 +355,6 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #endif
             scrobbler_shutdown(true);
 
-            if(global_settings.talk_menu)
-            {
-                bool enqueue = false;
-                if(msg_id != -1)
-                {
-                    talk_id(msg_id, enqueue);
-                    enqueue = true;
-                }
-                talk_id(LANG_SHUTTINGDOWN, enqueue);
-#if CONFIG_CODEC == SWCODEC
-                voice_wait();
-#endif
-            }
-
             system_flush();
 #ifdef HAVE_EEPROM_SETTINGS
             if (firmware_settings.initialized)
@@ -383,6 +369,20 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
         else
             dircache_disable();
 #endif
+
+        if(global_settings.talk_menu)
+        {
+            bool enqueue = false;
+            if(msg_id != -1)
+            {
+                talk_id(msg_id, enqueue);
+                enqueue = true;
+            }
+            talk_id(LANG_SHUTTINGDOWN, enqueue);
+#if CONFIG_CODEC == SWCODEC
+            voice_wait();
+#endif
+        }
 
         shutdown_hw();
     }
