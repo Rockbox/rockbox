@@ -1756,7 +1756,7 @@ bool recording_screen(bool no_source)
                 {
                     output_dyn_value(buf2, sizeof buf2,
                                      num_recorded_bytes,
-                                     byte_units, true);
+                                     byte_units, 4, true);
                     snprintf(buf, sizeof(buf), "%s %s",
                              str(LANG_RECORDING_SIZE), buf2);
                 }
