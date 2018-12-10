@@ -10,9 +10,6 @@
 # global CC options for all platforms
 CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe -std=gnu99"
 
-#newer versions GLIBC use byteswap.h
-BYTESWP="/usr/include/byteswap.h"
-
 # LD options for the core
 LDOPTS=""
 # LD options for the core + plugins
@@ -349,6 +346,11 @@ simcc () {
    sigaltstack=`check_sigaltstack`
    echo "Linux host detected"
    LDOPTS="$LDOPTS -ldl"
+   # newer glibc implementations use byteswap.h
+   if echo "#include <byteswap.h>" | gcc -E - > /dev/null 2>&1; then
+       echo "Using byteswap.h"
+       extradefines="$extradefines -DOS_USE_BYTESWAP_H"
+   fi
    ;;
 
    FreeBSD)
@@ -4394,7 +4396,6 @@ fi
       ;;
     [Cc])
       uname=`uname`
-      checkwps="yes"
       simcc "checkwps"
       toolset='';
       t_cpu='';
@@ -4475,14 +4476,6 @@ fi
 if [ "yes" = "$simulator" ]; then
     echo Unsetting APPLICATION define for SIMULATOR build
     unset application
-fi
-
-# newer glibc implementations use byteswap.h
-if [ "$simulator" = "yes" ] || [ "$checkwps" = "yes" ]; then
-    if test -f "$BYTESWP"; then
-        echo Using "$BYTESWP"
-        extradefines="$extradefines -DOS_USE_BYTESWAP_H=$BYTESWP"
-    fi
 fi
 
 if [ "yes" = "$application" ]; then
