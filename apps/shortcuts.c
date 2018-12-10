@@ -235,6 +235,12 @@ static void shortcuts_ata_idle_callback(void)
             write(fd, sc->u.setting->cfg_name, strlen(sc->u.setting->cfg_name));
         else
             write(fd, sc->u.path, strlen(sc->u.path));
+
+        /* write name:, icon:, talkclip: */
+        len = snprintf(buf, MAX_PATH, "\nname: %s\nicon: %d\ntalkclip: ",
+                       sc->name, sc->icon);
+        write(fd, buf, len);
+        write(fd, sc->talk_clip, strlen(sc->talk_clip));
         write(fd, "\n\n", 2);
     }
     close(fd);
