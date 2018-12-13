@@ -202,7 +202,8 @@ static int move_callback(int handle, void* current, void* new)
 {
     /*could compare to strdup_handle, but ops is only used once */
     (void)handle;
-    size_t diff = new - current;
+    ptrdiff_t diff = (int32_t *) new - (int32_t *) current;
+    /* only update address for filetypes stored in strdup buffer */
 #define FIX_PTR(x) \
     { if ((void*)x >= current && (void*)x < (current+strdup_bufsize)) x+= diff; }
     for(int i = 0; i < filetype_count; i++)

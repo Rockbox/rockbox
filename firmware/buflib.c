@@ -252,13 +252,27 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     struct buflib_callbacks *ops = block[2].ops;
     crc_slot = (union buflib_data*)tmp->alloc - 1;
     const int metadata_size = (crc_slot - block)*sizeof(union buflib_data);
+    #if 0
     uint32_t crc = crc_32((void *)block, metadata_size, 0xffffffff);
 
     /* check for metadata validity */
     if (crc != crc_slot->crc)
         buflib_panic(ctx, "buflib metadata corrupted, crc: 0x%08x, expected: 0x%08x",
                (unsigned int)crc, (unsigned int)crc_slot->crc);
+    #endif
+    if (metadata_size >= 0)
+    {
+        uint32_t crc = crc_32((void *)block, metadata_size, 0xffffffff);
 
+        /* check for metadata validity */
+        if (crc != crc_slot->crc)
+            buflib_panic(ctx, "buflib metadata corrupted, crc: 0x%08x, expected: 0x%08x",
+                   (unsigned int)crc, (unsigned int)crc_slot->crc);
+    }
+    else
+    {
+        splashf(3000, "ERR %p < %p", (void*)crc_slot ,(void*)block);
+    }
     if (!IS_MOVABLE(block))
         return false;
 
@@ -511,11 +525,11 @@ buflib_alloc_ex(struct buflib_context *ctx, size_t size, const char *name,
     /* This really is assigned a value before use */
     int block_len;
     size += name_len;
-    size = (size + sizeof(union buflib_data) - 1) /
+    size = B_ALIGN_UP((size + sizeof(union buflib_data) - 1) /
            sizeof(union buflib_data)
            /* add 5 objects for alloc len, pointer to handle table entry and
             * name length, the ops pointer and crc */
-           + 5;
+           + 5);
 handle_alloc:
     handle = handle_alloc(ctx);
     if (!handle)
