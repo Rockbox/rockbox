@@ -111,6 +111,8 @@ struct entry* tree_get_entries(struct tree_context *t)
 
 struct entry* tree_get_entry_at(struct tree_context *t, int index)
 {
+    if(index >= t->cache.max_entries)
+        return NULL; /* no more entries */
     struct entry* entries = tree_get_entries(t);
     return &entries[index];
 }
