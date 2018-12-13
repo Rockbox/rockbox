@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "string-extra.h"
+#include "panic.h"
 
 #include "applimits.h"
 #include "dir.h"
@@ -111,10 +112,11 @@ struct entry* tree_get_entries(struct tree_context *t)
 
 struct entry* tree_get_entry_at(struct tree_context *t, int index)
 {
+    if(index < 0 || index >= t->cache.max_entries)
+        return NULL; /* no entry */
     struct entry* entries = tree_get_entries(t);
     return &entries[index];
 }
-
 
 static const char* tree_get_filename(int selected_item, void *data,
                                      char *buffer, size_t buffer_len)
@@ -133,9 +135,11 @@ static const char* tree_get_filename(int selected_item, void *data,
     else 
 #endif
     {
-        struct entry* e = tree_get_entry_at(local_tc, selected_item);
-        name = e->name;
-        attr = e->attr;
+        struct entry *entry = tree_get_entry_at(local_tc, selected_item);
+        if (!entry)
+            panicf("Invalid tree entry");
+        name = entry->name;
+        attr = entry->attr;
     }
     
     if(!(attr & ATTR_DIRECTORY))
@@ -175,8 +179,11 @@ static int tree_get_filecolor(int selected_item, void * data)
     if (*tc.dirfilter == SHOW_ID3DB)
         return -1;
     struct tree_context * local_tc=(struct tree_context *)data;
-    struct entry* e = tree_get_entry_at(local_tc, selected_item);
-    return filetype_get_color(e->name, e->attr);
+    struct entry *entry = tree_get_entry_at(local_tc, selected_item);
+    if (!entry)
+        panicf("Invalid tree entry");
+
+    return filetype_get_color(entry->name, entry->attr);
 }
 #endif
 
@@ -191,8 +198,11 @@ static enum themable_icons tree_get_fileicon(int selected_item, void * data)
     else
 #endif
     {
-        struct entry* e = tree_get_entry_at(local_tc, selected_item);
-        return filetype_get_icon(e->attr);
+        struct entry *entry = tree_get_entry_at(local_tc, selected_item);
+        if (!entry)
+            panicf("Invalid tree entry");
+
+        return filetype_get_icon(entry->attr);
     }
 }
 
@@ -213,9 +223,12 @@ static int tree_voice_cb(int selected_item, void * data)
     else
 #endif
     {
-        struct entry* e = tree_get_entry_at(local_tc, selected_item);
-        name = e->name;
-        attr = e->attr;
+        struct entry *entry = tree_get_entry_at(local_tc, selected_item);
+        if (!entry)
+            panicf("Invalid tree entry");
+
+        name = entry->name;
+        attr = entry->attr;
     }
     bool is_dir = (attr & ATTR_DIRECTORY);
     bool did_clip = false;
@@ -318,17 +331,22 @@ struct tree_context* tree_get_context(void)
  */
 static int tree_get_file_position(char * filename)
 {
-    int i;
-    struct entry* e;
+    int i, ret = -1;/* no file match, return undefined */
+
+    tree_lock_cache(&tc);
+    struct entry *entries = tree_get_entries(&tc);
 
     /* use lastfile to determine the selected item (default=0) */
     for (i=0; i < tc.filesindir; i++)
     {
-        e = tree_get_entry_at(&tc, i);
-        if (!strcasecmp(e->name, filename))
-            return(i);
+        if (!strcasecmp(entries[i].name, filename))
+        {
+            ret = i;
+            break;
+        }
     }
-    return(-1);/* no file can match, returns undefined */
+    tree_unlock_cache(&tc);
+    return(ret);
 }
 
 /*
@@ -527,14 +545,14 @@ char* get_current_file(char* buffer, size_t buffer_len)
         return NULL;
 #endif
 
-    struct entry* e = tree_get_entry_at(&tc, tc.selected_item);
-    if (getcwd(buffer, buffer_len))
+    struct entry *entry = tree_get_entry_at(&tc, tc.selected_item);
+    if (entry && getcwd(buffer, buffer_len))
     {
         if (tc.dirlength)
         {
             if (buffer[strlen(buffer)-1] != '/')
                 strlcat(buffer, "/", buffer_len);
-            if (strlcat(buffer, e->name, buffer_len) >= buffer_len)
+            if (strlcat(buffer, entry->name, buffer_len) >= buffer_len)
                 return NULL;
         }
         return buffer;
@@ -670,7 +688,11 @@ static int dirbrowse(void)
                 if ( numentries == 0 )
                     break;
 
-                short attr = tree_get_entry_at(&tc, tc.selected_item)->attr;
+                struct entry *entry = tree_get_entry_at(&tc, tc.selected_item);
+                if (!entry)
+                    panicf("Invalid tree entry");
+
+                short attr = entry->attr;
                 if ((tc.browse->flags & BROWSE_SELECTONLY) &&
                     !(attr & ATTR_DIRECTORY))
                 {
@@ -798,6 +820,9 @@ static int dirbrowse(void)
 #endif
                     {
                         struct entry *entry = tree_get_entry_at(&tc, tc.selected_item);
+                        if (!entry)
+                            panicf("Invalid tree entry");
+
                         attr = entry->attr;
 
                         if (currdir[1]) /* Not in / */
@@ -1017,7 +1042,7 @@ static int move_callback(int handle, void* current, void* new)
     if (cache->lock_count > 0)
         return BUFLIB_CB_CANNOT_MOVE;
 
-    size_t diff = new - current;
+    ptrdiff_t diff = (int32_t *) new - (int32_t *) current;
     /* FIX_PTR makes sure to not accidentally update static allocations */
 #define FIX_PTR(x) \
     { if ((void*)x >= current && (void*)x < (current+cache->name_buffer_size)) x+= diff; }

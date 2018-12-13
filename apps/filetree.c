@@ -137,8 +137,9 @@ static void check_file_thumbnails(struct tree_context* c)
     if(!dir)
         return;
     /* mark all files as non talking, except the .talk ones */
-    entries = tree_get_entries(c);
     tree_lock_cache(c);
+    entries = tree_get_entries(c);
+
     for (i=0; i < c->filesindir; i++)
     {
         if (entries[i].attr & ATTR_DIRECTORY)

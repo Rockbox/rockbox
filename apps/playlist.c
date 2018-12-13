@@ -1573,10 +1573,10 @@ static int get_next_dir(char *dir, bool is_forward)
             break;
         }
         
+        tree_lock_cache(tc);
         files = tree_get_entries(tc);
         num_files = tc->filesindir;
 
-        tree_lock_cache(tc);
         for (i=0; i<num_files; i++)
         {
             /* user abort */
@@ -1666,9 +1666,10 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
         return -2;
     }
     
+    tree_lock_cache(tc);
     files = tree_get_entries(tc);
     num_files = tc->filesindir;
-    
+
     for (i=0; i<num_files; i++)
     {
         if (files[i].attr & ATTR_DIRECTORY)
@@ -1681,9 +1682,11 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
     }
 
     if (has_music)
+    {
+        tree_unlock_cache(tc);
         return 0;
-        
-    tree_lock_cache(tc);
+    }
+
     if (has_subdir && recurse)
     {
         for (i=0; i<num_files; i++)
