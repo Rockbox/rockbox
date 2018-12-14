@@ -436,6 +436,12 @@ int ft_enter(struct tree_context* c)
     int rc = GO_TO_PREVIOUS;
     char buf[MAX_PATH];
     struct entry* file = tree_get_entry_at(c, c->selected_item);
+    if (!file)
+    {
+        splashf(HZ, str(LANG_READ_FAILED), str(LANG_UNKNOWN));
+        return rc;
+    }
+
     int file_attr = file->attr;
     int len;
 
@@ -680,6 +686,12 @@ int ft_enter(struct tree_context* c)
                 }
 
                 struct entry* file = tree_get_entry_at(c, c->selected_item);
+                if (!file)
+                {
+                    splashf(HZ, str(LANG_READ_FAILED), str(LANG_UNKNOWN));
+                    return rc;
+                }
+
                 plugin = filetype_get_plugin(file);
                 if (plugin)
                 {
