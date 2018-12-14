@@ -192,6 +192,272 @@ static int bookmark_menu_callback(int action,
     return action;
 }
 
+/* Format time in seconds to string like 00:00:00.  This version takes
+   seconds instead of ms so that a bigger max value fits the data
+   type. */
+void format_time_secs(char* buf, int buf_size, long time)
+{
+    if ( time < 3600 ) {
+        snprintf(buf, buf_size, "%d:%02d",
+                 (int) (time / 60), (int) (time % 60));
+    } else {
+        snprintf(buf, buf_size, "%d:%02d:%02d",
+                 (int) (time / 3600), (int) (time % 3600 / 60),
+                 (int) (time % 60));
+    }
+}
+
+/* playing_time screen context */
+struct playing_time_info {
+    int curr_playing; /* index of currently playing track in playlist */
+    int nb_tracks; /* how many tracks in playlist */
+    /* seconds before and after current position, and total.  Datatype
+       allows for values up to 68years.  If I had kept it in ms
+       though, it would have overflowed at 24days, which takes
+       something like 8.5GB at 32kbps, and so we could conceivably
+       have playlists lasting longer than that. */
+    long secs_bef, secs_aft, secs_ttl;
+    long trk_secs_bef, trk_secs_aft, trk_secs_ttl;
+    /* kilobytes played before and after current pos, and total.
+       Kilobytes because bytes would overflow. Data type range is up
+       to 2TB. */
+    long kbs_bef, kbs_aft, kbs_ttl;
+};
+
+/* list callback for playing_time screen */
+static const char * playing_time_get_or_speak_info(int selected_item, void * data,
+                                                   char *buf, size_t buffer_len,
+                                                   bool say_it)
+{
+    struct playing_time_info *pti = (struct playing_time_info *)data;
+    switch(selected_item) {
+    case 0: { /* elapsed and total time */
+        char timestr1[15], timestr2[15];
+        format_time_secs(timestr1, sizeof(timestr1), pti->secs_bef);
+        format_time_secs(timestr2, sizeof(timestr2), pti->secs_ttl);
+        long elapsed_perc; /* percentage of duration elapsed */
+        if(pti->secs_ttl == 0)
+            elapsed_perc = 0;
+        else if(pti->secs_ttl <= 0xFFFFFF)
+            elapsed_perc = pti->secs_bef *100 / pti->secs_ttl;
+        else /* sacrifice some precision to avoid overflow */
+            elapsed_perc = (pti->secs_bef>>7) *100 /(pti->secs_ttl>>7);
+        snprintf(buf, buffer_len, str(LANG_PLAYTIME_ELAPSED),
+                 timestr1, timestr2, elapsed_perc);
+        if(say_it)
+            talk_ids(false, LANG_PLAYTIME_ELAPSED,
+                     TALK_ID(pti->secs_bef, UNIT_TIME),
+                     VOICE_OF,
+                     TALK_ID(pti->secs_ttl, UNIT_TIME),
+                     VOICE_PAUSE,
+                     TALK_ID(elapsed_perc, UNIT_PERCENT));
+        break;
+    }
+    case 1: { /* remaining time */
+        char timestr[15];
+        format_time_secs(timestr, sizeof(timestr), pti->secs_aft);
+        snprintf(buf, buffer_len, str(LANG_PLAYTIME_REMAINING),
+                 timestr);
+        if(say_it)
+          talk_ids(false, LANG_PLAYTIME_REMAINING,
+                     TALK_ID(pti->secs_aft, UNIT_TIME));
+        break;
+    }
+    case 2: { /* track elapsed and duration */
+        char timestr1[15], timestr2[15];
+        format_time_secs(timestr1, sizeof(timestr1), pti->trk_secs_bef);
+        format_time_secs(timestr2, sizeof(timestr2), pti->trk_secs_ttl);
+        long elapsed_perc; /* percentage of duration elapsed */
+        if(pti->trk_secs_ttl == 0)
+            elapsed_perc = 0;
+        else if(pti->trk_secs_ttl <= 0xFFFFFF)
+            elapsed_perc = pti->trk_secs_bef *100 / pti->trk_secs_ttl;
+        else /* sacrifice some precision to avoid overflow */
+            elapsed_perc = (pti->trk_secs_bef>>7) *100 /(pti->trk_secs_ttl>>7);
+        snprintf(buf, buffer_len, str(LANG_PLAYTIME_TRK_ELAPSED),
+                 timestr1, timestr2, elapsed_perc);
+        if(say_it)
+            talk_ids(false, LANG_PLAYTIME_TRK_ELAPSED,
+                     TALK_ID(pti->trk_secs_bef, UNIT_TIME),
+                     VOICE_OF,
+                     TALK_ID(pti->trk_secs_ttl, UNIT_TIME),
+                     VOICE_PAUSE,
+                     TALK_ID(elapsed_perc, UNIT_PERCENT));
+        break;
+    }
+    case 3: { /* remaining time */
+        char timestr[15];
+        format_time_secs(timestr, sizeof(timestr), pti->trk_secs_aft);
+        snprintf(buf, buffer_len, str(LANG_PLAYTIME_TRK_REMAINING),
+                 timestr);
+        if(say_it)
+          talk_ids(false, LANG_PLAYTIME_TRK_REMAINING,
+                     TALK_ID(pti->trk_secs_aft, UNIT_TIME));
+        break;
+    }
+    case 4: { /* track index */
+        int track_perc = (pti->curr_playing+1) *100 / pti->nb_tracks;
+        snprintf(buf, buffer_len, str(LANG_PLAYTIME_TRACK),
+                 pti->curr_playing, pti->nb_tracks, track_perc);
+        if(say_it)
+          talk_ids(false, LANG_PLAYTIME_TRACK,
+                     TALK_ID(pti->curr_playing+1, UNIT_INT),
+                     VOICE_OF,
+                     TALK_ID(pti->nb_tracks, UNIT_INT),
+                     VOICE_PAUSE,
+                     TALK_ID(track_perc, UNIT_PERCENT));
+        break;
+    }
+    case 5: { /* storage size */
+        char str1[10], str2[10], str3[10];
+        output_dyn_value(str1, sizeof(str1), pti->kbs_ttl, kibyte_units, 3, true);
+        output_dyn_value(str2, sizeof(str2), pti->kbs_bef, kibyte_units, 3, true);
+        output_dyn_value(str3, sizeof(str3), pti->kbs_aft, kibyte_units, 3, true);
+        snprintf(buf, buffer_len, str(LANG_PLAYTIME_STORAGE),
+                 str1,str2,str3);
+        if(say_it) {
+            talk_id(LANG_PLAYTIME_STORAGE, false);
+            output_dyn_value(NULL, 0, pti->kbs_ttl, kibyte_units, 3, true);
+            talk_ids(true, VOICE_PAUSE, VOICE_PLAYTIME_DONE);
+            output_dyn_value(NULL, 0, pti->kbs_bef, kibyte_units, 3, true);
+            talk_id(LANG_PLAYTIME_REMAINING, true);
+            output_dyn_value(NULL, 0, pti->kbs_aft, kibyte_units, 3, true);
+        }
+        break;
+    }
+    case 6: { /* Average track file size */
+        char str[10];
+        long avg_track_size = pti->kbs_ttl /pti->nb_tracks;
+        output_dyn_value(str, sizeof(str), avg_track_size, kibyte_units, 3, true);
+        snprintf(buf, buffer_len, str(LANG_PLAYTIME_AVG_TRACK_SIZE),
+                 str);
+        if(say_it) {
+            talk_id(LANG_PLAYTIME_AVG_TRACK_SIZE, false);
+            output_dyn_value(NULL, 0, avg_track_size, kibyte_units, 3, true);
+        }
+        break;
+    }
+    case 7: { /* Average bitrate */
+        /* Convert power of 2 kilobytes to power of 10 kilobits */
+        long avg_bitrate = pti->kbs_ttl / pti->secs_ttl *1024 *8 /1000;
+        snprintf(buf, buffer_len, str(LANG_PLAYTIME_AVG_BITRATE),
+                 avg_bitrate);
+        if(say_it)
+          talk_ids(false, LANG_PLAYTIME_AVG_BITRATE,
+                   TALK_ID(avg_bitrate, UNIT_KBIT));
+        break;
+    }
+    }
+    return buf;
+}
+
+static const char * playing_time_get_info(int selected_item, void * data,
+                                          char *buffer, size_t buffer_len)
+{
+    return playing_time_get_or_speak_info(selected_item, data,
+                                          buffer, buffer_len, false);
+}
+
+static int playing_time_speak_info(int selected_item, void * data)
+{
+    static char buffer[MAX_PATH];
+    playing_time_get_or_speak_info(selected_item, data,
+                                   buffer, MAX_PATH, true);
+    return 0;
+}
+
+/* playing time screen: shows total and elapsed playlist duration and
+   other stats */
+static bool playing_time(void)
+{
+    unsigned long talked_tick = current_tick;
+    struct playing_time_info pti;
+    struct playlist_track_info pltrack;
+    struct mp3entry id3;
+    int i, fd, ret;
+
+    pti.nb_tracks = playlist_amount();
+    playlist_get_resume_info(&pti.curr_playing);
+    struct mp3entry *curr_id3 = audio_current_track();
+    if(pti.curr_playing == -1 || !curr_id3)
+        return false;
+    pti.secs_bef = pti.trk_secs_bef = curr_id3->elapsed/1000;
+    pti.secs_aft = pti.trk_secs_aft
+        = (curr_id3->length -curr_id3->elapsed)/1000;
+    pti.kbs_bef = curr_id3->offset/1024;
+    pti.kbs_aft = (curr_id3->filesize -curr_id3->offset)/1024;
+
+    splash(0, ID2P(LANG_WAIT));
+
+    /* Go through each file in the playlist and get its stats. For
+       huge playlists this can take a while... The reference position
+       is the position at the moment this function was invoked,
+       although playback continues forward. */
+    for(i=0; i<pti.nb_tracks;i++) {
+        /* Show a splash while we are loading. */
+        splashf(0, str(LANG_LOADING_PERCENT),
+                i*100/pti.nb_tracks, str(LANG_OFF_ABORT));
+        /* Voice equivalent */
+        if(TIME_AFTER(current_tick, talked_tick+5*HZ)) {
+            talked_tick = current_tick;
+            talk_ids(false, LANG_LOADING_PERCENT,
+                     TALK_ID(i*100/pti.nb_tracks, UNIT_PERCENT));
+        }
+        if (action_userabort(TIMEOUT_NOBLOCK))
+            goto exit;
+
+        if(i == pti.curr_playing)
+            continue;
+
+        if(playlist_get_track_info(NULL, i, &pltrack) <0)
+            goto error;
+        if((fd = open(pltrack.filename, O_RDONLY)) <0)
+            goto error;
+        ret = get_metadata(&id3, fd, pltrack.filename);
+        close(fd);
+        if (!ret)
+            goto error;
+
+        if(i < pti.curr_playing) {
+            pti.secs_bef += id3.length/1000;
+            pti.kbs_bef += id3.filesize/1024;
+        }else{
+            pti.secs_aft += id3.length/1000;
+            pti.kbs_aft += id3.filesize/1024;
+        }
+    }
+
+    pti.secs_ttl = pti.secs_bef +pti.secs_aft;
+    pti.trk_secs_ttl = pti.trk_secs_bef +pti.trk_secs_aft;
+    pti.kbs_ttl = pti.kbs_bef +pti.kbs_aft;
+
+    struct gui_synclist pt_lists;
+    int key;
+
+    gui_synclist_init(&pt_lists, &playing_time_get_info, &pti, true, 1, NULL);
+    if (global_settings.talk_menu)
+        gui_synclist_set_voice_callback(&pt_lists, playing_time_speak_info);
+    gui_synclist_set_nb_items(&pt_lists, 8);
+    gui_synclist_draw(&pt_lists);
+    gui_syncstatusbar_draw(&statusbars, true);
+    gui_synclist_speak_item(&pt_lists);
+    while (true) {
+        gui_syncstatusbar_draw(&statusbars, false);
+        if(list_do_action(CONTEXT_LIST, HZ/2,
+                          &pt_lists, &key, LIST_WRAP_UNLESS_HELD) == 0
+           && key!=ACTION_NONE && key!=ACTION_UNKNOWN)
+        {
+            talk_force_shutup();
+            return(default_event_handler(key) == SYS_USB_CONNECTED);
+        }
+    }
+ error:
+    splash(HZ, ID2P(LANG_PLAYTIME_ERROR));
+ exit:
+    return false;
+}
+
+
 /* CONTEXT_WPS playlist options */
 static bool shuffle_playlist(void)
 {
@@ -213,10 +479,12 @@ MENUITEM_FUNCTION(playlist_save_item, 0, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
                   save_playlist, NULL, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(reshuffle_item, 0, ID2P(LANG_SHUFFLE_PLAYLIST),
                   shuffle_playlist, NULL, NULL, Icon_Playlist);
+MENUITEM_FUNCTION(playing_time_item, 0, ID2P(LANG_PLAYING_TIME),
+                  playing_time, NULL, NULL, Icon_Playlist);
 MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_PLAYLIST),
                  NULL, Icon_Playlist,
                  &view_cur_playlist, &search_playlist_item,
-                 &playlist_save_item, &reshuffle_item
+                 &playlist_save_item, &reshuffle_item, &playing_time_item
                );
 
 /* CONTEXT_[TREE|ID3DB] playlist options */
