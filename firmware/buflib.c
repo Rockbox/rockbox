@@ -248,9 +248,16 @@ static bool
 move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
 {
     char* new_start;
+
+    if (block < ctx->buf_start || block > ctx->alloc_end)
+        buflib_panic(ctx, "buflib data corrupted %p", block);
+
     union buflib_data *new_block, *tmp = block[1].handle, *crc_slot;
     struct buflib_callbacks *ops = block[2].ops;
     crc_slot = (union buflib_data*)tmp->alloc - 1;
+    if (crc_slot < ctx->buf_start || crc_slot > ctx->alloc_end)
+        buflib_panic(ctx, "buflib metadata corrupted %p", crc_slot);
+
     const int metadata_size = (crc_slot - block)*sizeof(union buflib_data);
     uint32_t crc = crc_32((void *)block, metadata_size, 0xffffffff);
 
