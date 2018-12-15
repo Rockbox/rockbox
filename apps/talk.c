@@ -1172,7 +1172,6 @@ int talk_file_or_spell(const char *dirname, const char *filename,
     return 0;
 }
 
-#if CONFIG_CODEC == SWCODEC
 /* Play a directory's .talk thumbnail, fallback to spelling the filename, or
    go straight to spelling depending on settings. */
 int talk_dir_or_spell(const char* dirname,
@@ -1189,7 +1188,6 @@ int talk_dir_or_spell(const char* dirname,
         return talk_spell_basename(dirname, prefix_ids, enqueue);
     return 0;
 }
-#endif
 
 /* Speak thumbnail for each component of a full path, again falling
    back or going straight to spelling depending on settings. */

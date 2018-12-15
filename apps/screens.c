@@ -674,6 +674,7 @@ static void say_number_and_spell(char *buf, bool year_style)
     }
 }
 
+#if CONFIG_CODEC == SWCODEC
 /* Say a replaygain ID3 value from its text form */
 static void say_gain(char *buf)
 {
@@ -729,6 +730,7 @@ static void say_gain(char *buf)
     }else /* we didn't find a number, just spell everything */
         talk_spell(buf, true);
 }
+#endif
 
 static const char * id3_get_or_speak_info(int selected_item, void* data,
                                           char *buffer, size_t buffer_len,
