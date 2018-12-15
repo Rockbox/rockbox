@@ -896,7 +896,7 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 output_dyn_value(buffer, buffer_len, id3->filesize, byte_units, 4, true);
                 val=buffer;
                 if(say_it && val)
-                    output_dyn_value(NULL, 0, id3->filesize, byte_units, true);
+                    output_dyn_value(NULL, 0, id3->filesize, byte_units, 4, true);
                 break;
         }
         if((!val || !*val) && say_it)
