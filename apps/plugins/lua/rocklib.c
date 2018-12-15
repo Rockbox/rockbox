@@ -564,6 +564,137 @@ RB_WRAP(strncasecmp)
     return 1;
 }
 
+static int mem_read_write(lua_State *L, uintptr_t address, size_t maxsize)
+{
+    intptr_t offset = (intptr_t) luaL_optint(L, 1, 0);
+    size_t   size   = (size_t)   luaL_optint(L, 2, maxsize);
+    size_t   written;
+    int      type   = lua_type(L, 3);
+
+    if(offset < 0)
+    {
+        /* allows pointer within structure to be calculated offset */
+        offset = -(address + offset);
+        size   = (size_t) maxsize - offset;
+    }
+
+    luaL_argcheck(L, ((uintptr_t) offset) + size <= maxsize,  2, ERR_IDX_RANGE);
+
+    char *mem = (char*) address + ((uintptr_t) offset);
+    const void *value = NULL;
+
+    lua_Integer var_luaint;
+#ifdef UINT64_MAX
+    int64_t  var_64;
+#endif
+    int32_t  var_32;
+    int16_t  var_16;
+    int8_t   var_8;
+    bool     var_bool;
+
+    switch(type)
+    {
+        case LUA_TSTRING:
+        {
+            size_t len;
+            const char* str = lua_tolstring (L, 3, &len);
+
+            luaL_argcheck(L, len + 1 <= size,  3, ERR_DATA_OVF);
+            size = len + 1; /* include \0 */
+            value = str;
+            break;
+        }
+        case LUA_TBOOLEAN:
+        {
+            var_bool = (bool) lua_toboolean(L, 3);
+            value = &var_bool;
+            break;
+        }
+        case LUA_TNUMBER:
+        {
+            var_luaint = lua_tointeger(L, 3);
+            switch(size)
+            {
+                case sizeof(var_8):
+                    var_8 = (int8_t) var_luaint;
+                    value = &var_8;
+                    break;
+                case sizeof(var_16):
+                    var_16 = (int16_t) var_luaint;
+                    value = &var_16;
+                    break;
+                case sizeof(var_32):
+                    var_32 = (int32_t) var_luaint;
+                    value = &var_32;
+                    break;
+#ifdef UINT64_MAX
+                case sizeof(var_64):
+                    var_64 = (int64_t) var_luaint;
+                    value = &var_64;
+                    break;
+#endif
+            } /* switch size */
+            break;
+        }
+        case  LUA_TNIL:
+        case LUA_TNONE: /* reader */
+        {
+            luaL_Buffer b;
+            luaL_buffinit(L, &b);
+            while(size > 0)
+            {
+                written = MIN(LUAL_BUFFERSIZE, size);
+                luaL_addlstring (&b, mem, written);
+                mem += written;
+                size -= written;
+            }
+
+            luaL_pushresult(&b);
+            return 1;
+        }
+
+        default:
+            break;
+    } /* switch type */
+
+    /* writer */
+    luaL_argcheck(L, value != NULL,  3, "Unknown Type");
+    rb->memcpy(mem, value, size);
+    lua_pushinteger(L, 1);
+
+    return 1;
+}
+
+RB_WRAP(global_status)
+{
+    const uintptr_t address = (uintptr_t) rb->global_status;
+    const size_t    maxsize = sizeof(struct system_status);
+    return mem_read_write(L, address, maxsize);
+}
+
+RB_WRAP(global_settings)
+{
+    const uintptr_t address = (uintptr_t) rb->global_settings;
+    const size_t    maxsize = sizeof(struct user_settings);
+    return mem_read_write(L, address, maxsize);
+}
+
+RB_WRAP(audio_next_track)
+{
+    lua_settop(L, 2); /* no writes allowed */
+    const uintptr_t address = (uintptr_t) rb->audio_next_track();
+    const size_t    maxsize = sizeof(struct mp3entry);
+    return mem_read_write(L, address, maxsize);
+}
+
+RB_WRAP(audio_current_track)
+{
+    lua_settop(L, 2); /* no writes allowed */
+    const uintptr_t address = (uintptr_t) rb->audio_current_track();
+    const size_t    maxsize = sizeof(struct mp3entry);
+    return mem_read_write(L, address, maxsize);
+}
+
 #define RB_FUNC(func) {#func, rock_##func}
 #define RB_ALIAS(name, func) {name, rock_##func}
 static const luaL_Reg rocklib[] =
@@ -624,6 +755,12 @@ static const luaL_Reg rocklib[] =
     RB_FUNC(create_numbered_filename),
     RB_FUNC(utf8encode),
     RB_FUNC(strncasecmp),
+
+    /* ROCKBOX SETTINGS / INFO */
+    RB_FUNC(global_status),
+    RB_FUNC(global_settings),
+    RB_FUNC(audio_next_track),
+    RB_FUNC(audio_current_track),
 
     {NULL, NULL}
 };
