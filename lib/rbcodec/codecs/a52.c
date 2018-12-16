@@ -36,6 +36,14 @@ static unsigned long frequency;
 
 /* used outside liba52 */
 static uint8_t buf[3840] IBSS_ATTR;
+static uint8_t *bufptr = buf;
+static uint8_t *bufpos = buf + 7;
+
+static void a52_decoder_reset(void)
+{
+    bufptr = buf;
+    bufpos = buf + 7;
+}
 
 static inline void output_audio(sample_t *samples)
 {
@@ -43,10 +51,8 @@ static inline void output_audio(sample_t *samples)
     ci->pcmbuf_insert(&samples[0], &samples[256], 256);
 }
 
-static void a52_decode_data(uint8_t *start, uint8_t *end)
+static size_t a52_decode_data(uint8_t *start, uint8_t *end)
 {
-    static uint8_t *bufptr = buf;
-    static uint8_t *bufpos = buf + 7;
     /*
      * sample_rate and flags are static because this routine could
      * exit between the a52_syncinfo() and the ao_setup(), and we want
@@ -56,6 +62,7 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
     static int flags;
     int bit_rate;
     int len;
+    size_t consumed = 0;
 
     while (1) {
         len = end - start;
@@ -66,6 +73,7 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
         memcpy(bufptr, start, len);
         bufptr += len;
         start += len;
+        consumed += len;
         if (bufptr == bufpos) {
             if (bufpos == buf + 7) {
                 int length;
@@ -105,7 +113,7 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
                 ci->set_elapsed(samplesdone/(frequency/1000));
                 bufptr = buf;
                 bufpos = buf + 7;
-                continue;
+                break;
             error:
                 //logf("Error decoding A52 stream\n");
                 bufptr = buf;
@@ -113,6 +121,7 @@ static void a52_decode_data(uint8_t *start, uint8_t *end)
             }
         }   
     }
+    return consumed;
 }
 
 /* this is the codec entry point */
@@ -134,7 +143,7 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 /* this is called for each file to process */
 enum codec_status codec_run(void)
 {
-    size_t n;
+    size_t n, consumed = 0, rest = 0;
     unsigned char *filebuf;
     int sample_loc;
     intptr_t param;
@@ -145,7 +154,7 @@ enum codec_status codec_run(void)
     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     codec_set_replaygain(ci->id3);
     
-    /* Intialise the A52 decoder and check for success */
+    /* Initialise the A52 decoder and check for success */
     state = a52_init(0);
 
     samplesdone = 0;
@@ -187,15 +196,25 @@ enum codec_status codec_run(void)
                 ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
             }
             ci->seek_complete();
+            a52_decoder_reset();
         }
 
         filebuf = ci->request_buffer(&n, BUFFER_SIZE);
 
         if (n == 0) /* End of Stream */
+        {
+            filebuf += consumed;
+            for (n = ci->curpos + consumed; rest; rest -= consumed, n += consumed)
+            {
+                ci->set_offset(n);
+                consumed = a52_decode_data(filebuf, filebuf + rest);
+            }
             break;
-  
-        a52_decode_data(filebuf, filebuf + n);
-        ci->advance_buffer(n);
+        }
+
+        consumed = a52_decode_data(filebuf, filebuf + n);
+        rest = n - consumed;
+        ci->advance_buffer(consumed);
     }
 
     return CODEC_OK;
