@@ -320,6 +320,48 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
         gui_list->start_item[screen] = new_start_item;
 }
 
+static void edge_beep(struct gui_synclist * gui_list, bool wrap)
+{
+#if CONFIG_CODEC != SWCODEC
+    (void)gui_list;
+    (void)wrap;
+#else
+    if (global_settings.keyclick)
+    {
+        list_speak_item *cb = gui_list->callback_speak_item;
+        if (!wrap) /* a bounce */
+        {
+            static long last_bounce_tick = 0;
+            if(TIME_BEFORE(current_tick, last_bounce_tick+HZ/4))
+                return;
+            last_bounce_tick = current_tick;
+        }
+        /* Next thing the list code will do is go speak the item, doing
+           a talk_shutup() first. Shutup now so the beep is clearer, and
+           make sure the subsequent shutup is skipped because otherwise
+           it'd kill the pcm buffer. */
+	if (cb) {
+            talk_shutup();
+            talk_force_enqueue_next();
+	}
+        system_sound_play(wrap ? SOUND_LIST_EDGE_BEEP_WRAP : SOUND_LIST_EDGE_BEEP_NOWRAP);
+	if (cb) {
+            /* On at least x5: if, instead of the above shutup, I insert a
+               sleep just after the beep_play() call, to delay the subsequent
+               shutup and talk, then in some cases the beep is not played: if
+               the end of a previous utterance is still playing from the pcm buf,
+               the beep fails, even if there would seem to remain enough time
+               to the utterance to mix in the beep. */
+
+            /* Somehow, the following voice utterance is suppressed on e200,
+               but not on x5. Work around... */
+            sleep((40*HZ +999)/1000); // FIXME:  Is this really needed?
+            talk_force_shutup();
+	}
+    }
+#endif
+}
+
 static void _gui_synclist_speak_item(struct gui_synclist *lists)
 {
     list_speak_item *cb = lists->callback_speak_item;
@@ -390,11 +432,13 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
     {
         new_selection = gui_list->limit_scroll ?
             gui_list->nb_items - gui_list->selected_size : 0;
+        edge_beep(gui_list, !gui_list->limit_scroll);
     }
     else if (new_selection < 0)
     {
         new_selection = gui_list->limit_scroll ?
             0 : gui_list->nb_items - gui_list->selected_size;
+        edge_beep(gui_list, !gui_list->limit_scroll);
     }
     else if (gui_list->show_selection_marker == false)
     {
