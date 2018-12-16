@@ -95,7 +95,7 @@ static void list_init_viewports(struct gui_synclist *list)
 #else
 static struct viewport parent[NB_SCREENS] =
 {
-    [SCREEN_MAIN] = 
+    [SCREEN_MAIN] =
     {
         .x        = 0,
         .y        = 0,
@@ -117,7 +117,7 @@ static int list_nb_lines(struct gui_synclist *list, enum screen_type screen)
 
 bool list_display_title(struct gui_synclist *list, enum screen_type screen)
 {
-    return list->title != NULL && 
+    return list->title != NULL &&
         !sb_set_title_text(list->title, list->title_icon, screen) &&
         list_nb_lines(list, screen) > 2;
 }
@@ -161,8 +161,8 @@ void list_init_item_height(struct gui_synclist *list, enum screen_type screen)
  *  - callback_get_item_name : pointer to a function that associates a label
  *    to a given item number
  *  - data : extra data passed to the list callback
- *  - scroll_all : 
- *  - selected_size : 
+ *  - scroll_all :
+ *  - selected_size :
  *  - parent : the parent viewports to use. NULL means the full screen minus
  *             statusbar if enabled. NOTE: new screens should NOT set this to NULL.
  */
@@ -264,7 +264,7 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
     }
     FOR_NB_SCREENS(i)
     {
-#ifdef HAVE_LCD_BITMAP        
+#ifdef HAVE_LCD_BITMAP
         if (!skinlist_draw(&screens[i], gui_list))
 #endif
             list_draw(&screens[i], gui_list);
@@ -320,6 +320,48 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
         gui_list->start_item[screen] = new_start_item;
 }
 
+static void edge_beep(struct gui_synclist * gui_list, bool wrap)
+{
+#if CONFIG_CODEC != SWCODEC
+    (void)gui_list;
+    (void)wrap;
+#else
+    if (global_settings.keyclick)
+    {
+        list_speak_item *cb = gui_list->callback_speak_item;
+        if (!wrap) /* a bounce */
+        {
+            static long last_bounce_tick = 0;
+            if(TIME_BEFORE(current_tick, last_bounce_tick+HZ/4))
+                return;
+            last_bounce_tick = current_tick;
+        }
+        /* Next thing the list code will do is go speak the item, doing
+           a talk_shutup() first. Shutup now so the beep is clearer, and
+           make sure the subsequent shutup is skipped because otherwise
+           it'd kill the pcm buffer. */
+        if (cb) {
+            talk_shutup();
+            talk_force_enqueue_next();
+        }
+        system_sound_play(wrap ? SOUND_LIST_EDGE_BEEP_WRAP : SOUND_LIST_EDGE_BEEP_NOWRAP);
+        if (cb) {
+            /* On at least x5: if, instead of the above shutup, I insert a
+               sleep just after the beep_play() call, to delay the subsequent
+               shutup and talk, then in some cases the beep is not played: if
+               the end of a previous utterance is still playing from the pcm buf,
+               the beep fails, even if there would seem to remain enough time
+               to the utterance to mix in the beep. */
+
+            /* Somehow, the following voice utterance is suppressed on e200,
+               but not on x5. Work around... */
+            sleep((40*HZ +999)/1000); // FIXME:  Is this really needed?
+            talk_force_shutup();
+        }
+    }
+#endif
+}
+
 static void _gui_synclist_speak_item(struct gui_synclist *lists)
 {
     list_speak_item *cb = lists->callback_speak_item;
@@ -330,13 +372,13 @@ static void _gui_synclist_speak_item(struct gui_synclist *lists)
            to stay silent for a while until things settle. Likewise if
            we already had a pending scheduled announcement not yet due
            we need to reschedule it. */
-        if ((lists->scheduled_talk_tick && 
+        if ((lists->scheduled_talk_tick &&
                 TIME_BEFORE(current_tick, lists->scheduled_talk_tick)) ||
-            (lists->last_talked_tick && 
+            (lists->last_talked_tick &&
                 TIME_BEFORE(current_tick, lists->last_talked_tick + HZ/5)))
         {
             lists->scheduled_talk_tick = current_tick + HZ/5;
-        } 
+        }
         else
         {
             lists->scheduled_talk_tick = 0; /* work done */
@@ -390,11 +432,13 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
     {
         new_selection = gui_list->limit_scroll ?
             gui_list->nb_items - gui_list->selected_size : 0;
+        edge_beep(gui_list, !gui_list->limit_scroll);
     }
     else if (new_selection < 0)
     {
         new_selection = gui_list->limit_scroll ?
             0 : gui_list->nb_items - gui_list->selected_size;
+        edge_beep(gui_list, !gui_list->limit_scroll);
     }
     else if (gui_list->show_selection_marker == false)
     {
@@ -404,13 +448,13 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
             if (offset > 0)
             {
                 int screen_top = MAX(0, gui_list->nb_items - nb_lines);
-                gui_list->start_item[i] = MIN(screen_top, gui_list->start_item[i] + 
+                gui_list->start_item[i] = MIN(screen_top, gui_list->start_item[i] +
                                                 gui_list->selected_size);
                 gui_list->selected_item = gui_list->start_item[i];
             }
             else
             {
-                gui_list->start_item[i] = MAX(0, gui_list->start_item[i] - 
+                gui_list->start_item[i] = MAX(0, gui_list->start_item[i] -
                                                     gui_list->selected_size);
                 gui_list->selected_item = gui_list->start_item[i] + nb_lines;
             }
@@ -549,7 +593,7 @@ void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
 #ifdef HAVE_LCD_BITMAP
 /*
  * Makes all the item in the list scroll by one step to the right.
- * Should stop increasing the value when reaching the widest item value 
+ * Should stop increasing the value when reaching the widest item value
  * in the list.
  */
 static void gui_synclist_scroll_right(struct gui_synclist * lists)
@@ -765,7 +809,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
             int screen =
 #ifdef HAVE_REMOTE_LCD
                 get_action_statuscode(NULL)&ACTION_REMOTE ?
-                         SCREEN_REMOTE : 
+                         SCREEN_REMOTE :
 #endif
                                           SCREEN_MAIN;
             gui_synclist_select_previous_page(lists, screen);
@@ -780,7 +824,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
             int screen =
 #ifdef HAVE_REMOTE_LCD
                 get_action_statuscode(NULL)&ACTION_REMOTE ?
-                         SCREEN_REMOTE : 
+                         SCREEN_REMOTE :
 #endif
                                           SCREEN_MAIN;
             gui_synclist_select_next_page(lists, screen);
@@ -804,7 +848,7 @@ int list_do_action_timeout(struct gui_synclist *lists, int timeout)
     if (lists != current_lists)
     {
         if (!ui_update_event_registered)
-            ui_update_event_registered = 
+            ui_update_event_registered =
                     add_event(GUI_EVENT_NEED_UI_UPDATE, _lists_uiviewport_update_callback);
         current_lists = lists;
     }
@@ -902,7 +946,7 @@ bool simplelist_show_list(struct simplelist_info *info)
     FOR_NB_SCREENS(i)
         viewportmanager_theme_enable(i, true, NULL);
 
-    gui_synclist_init(&lists, getname,  info->callback_data, 
+    gui_synclist_init(&lists, getname,  info->callback_data,
                       info->scroll_all, info->selection_size, NULL);
 
     if (info->title)
