@@ -17,6 +17,8 @@
 # KIND, either express or implied.
 #
 ############################################################################
+use strict;
+use warnings;
 
 # Extracts members from c struct
 # places them in a lua array 'member = {offset,size,"type"}'
@@ -36,7 +38,7 @@ my @sections = (
     'struct eq_band_setting',
     'struct compressor_settings',
     'struct mp3_enc_config',
-    '',
+    '', # nothing to be captured just placeholder for lua section
     'struct mp3entry',
     'struct mp3_albumart',
     'struct embedded_cuesheet',
@@ -108,6 +110,9 @@ my $decl_regex = qr/^(.+?\s.+;)/;
 my $typevar_regex = qr/\W*(?<type>.*?)\W*(?<var>[^\s\[]+)(?<arr>)\W*;/;
 my$typevar_array_regex = qr/\W*(?<type>.*?)\W*(?<var>[^\s\[]+)\W*(?<arr>\[.+\]).*;/;
 
+# struct or union defined within another structure
+my $embed_structunion_regex = qr/\W*(struct|union\s[^;}]+)/;
+
 #.."section",.."member"..=..offset,..size,..type,..arrayct
 my $asm_regex = qr/.*?,.*?(\".+?\".*?=.*?,.+?,.+?\".+\".*?,.*);/;
 my $asmMOST_regex = qr/\"(?<member>.+)\"=(?<offset>\d+),(?<size>\d+),\"(?<type>.+)\",(?<arr>\d+).*/;
@@ -132,7 +137,7 @@ while(my $line = <STDIN>)
 
     chomp($line);
 
-    if($header) #second pass
+    if($header) # [PASS 2]
     {
         for(my $i = 0; $i < @sections; $i++)
         {
@@ -156,7 +161,7 @@ while(my $line = <STDIN>)
             @section_count[$i] = 0;
         }
     }
-    else #first pass
+    else # [PASS 1]
     {
         if($line =~ $incl_regex){$current_include = $1; next;}
         elsif($line =~ $extern_regex){next;}
@@ -172,6 +177,25 @@ while(my $line = <STDIN>)
                 {
                     $section_lists[$i] .= $1.'@';
                     $section_count[$i]++;
+                }
+                # struct or union defined within a structure skip if single line
+                elsif($line =~ $embed_structunion_regex && (index($line, "}") < 0))
+                {
+                    my $embedtype = $line;
+                    $embedtype =~ s{[^\w\d_]+}{}gx; #strip non conforming chars
+                    while($line = <STDIN>)
+                    {
+                        #skip over the contents user will have to determine how to parse
+                        if($line =~ /^\s*}.+$/)
+                        {
+                            if($line =~ $decl_regex)
+                            {
+                                $section_lists[$i] .= $embedtype." ".$1.'@';
+                                $section_count[$i]++;
+                            }
+                            last
+                        }
+                    }
                 }
 
                 # struct end?
@@ -206,7 +230,7 @@ for(my $i = 0; $i < @sections; $i++)
 }
 
 sub Extract_Variable {
-    #extracts the member, offset, size, and type from the include file
+    #[PASS 1] extracts the member, offset, size, and type from the include file
     my $sinput = $_[0];
     my ($type, $var, $arr);
 
@@ -216,6 +240,7 @@ sub Extract_Variable {
         $type = $+{type};
         $var  = $+{var};
         $arr  = $+{var};
+        if($type eq ''){$type = "<unknown>";}
         if($sinput =~ s/\bchar\b//){$type = $replace_type{'#string#'};}
         else{$type .= ${array_marker};} #for identification of array .. stripped later
     }
@@ -225,24 +250,32 @@ sub Extract_Variable {
         $var  = $+{var};
         $arr  = $+{var};
     }
-    else { return ('', '', ''); }
+    else {
+        warn "Skipping ".$sinput."\n";
+        return ('', '', '');
+    }
 
+    # Type substitutions
     $type =~ s/^(unsigned|signed|struct)/$replace_type_prefix{$1}/x;
     $type =~ s/\b(const|enum)\b/$replace_type_prefix{$1}/gx;
     $type =~ s/^(?:.?+)(bool)\b/$replace_type{lc $1}/ix;
-    $type =~ s/^(uint|int)(?:\d\d_t)\b/$replace_type{lc $1}/ix;
-    $type =~ s/\b(int|long|char|double)(${array_marker}.*)?\b/$replace_type{$1}$2/;
+    $type =~ s/^(uint|int)(?:\d\d_t)\b/$replace_type{lc $1}/ix; # ...intNN_t...
+    if($type =~ $array_mark_regex)
+    {
+        $type =~ s/\b(int|long|char|double)(${array_marker}.*)\b/$replace_type{$1}$2/;
+    }
+    else {$type =~ s/\b(int|long|char|double)\b/$replace_type{$1}/;}
     $type =~ s{\s+}{}gx;
 
-    $var =~ s{[^\w\d_]+}{}gx; #strip non conforming chars
+    $var =~ s{[^\w\d_]+}{}gx; # strip non conforming chars
 
-    $arr =~ s{[^\[\d\]]+}{}gx;
+    $arr =~ s{[^\[\d\]]+}{}gx; # get element count
 
     return ($type, $var, $arr);
 }
 
 sub Print_Variable {
-    #prints the member, offset, size, and type from the assembly file
+    #[PASS 2] prints the member, offset, size, and type from the assembly file
     my $sinput = $_[0];
     my ($member, $offset, $size, $type, $arr);
 
@@ -255,7 +288,7 @@ sub Print_Variable {
         $type = $+{type};
         $arr  = $+{arr};
 
-        if($type =~ /^(.*)${array_marker}$/) #strip array marker add [n]
+        if($type =~ /^(.*)${array_marker}$/) # strip array marker add [n]
         {
             $type = sprintf('%s[%d]', $1, $arr);
         }
@@ -266,7 +299,7 @@ sub Print_Variable {
     return 0;
 }
 
-if($header) #output sections to lua file
+if($header) #output sections to lua file [PASS 2]
 {
     print "-- Don't change this file!\n";
     printf "-- It is automatically generated %s\n", $svnrev;
@@ -309,8 +342,8 @@ if($header) #output sections to lua file
     exit;
 }
 
-#else output sections to .c file
-my $header = join(", ", $helper_name, @sections);
+#else output sections to .c file [PASS 1]
+my $c_header = join(", ", $helper_name, @sections);
 my $print_variable = 'PRINT_M_O_S_T';
 my $print_array    = 'PRINT_ARRAY_M_O_S_T';
 my $emit_asm       = 'ASM_EMIT_M_O_S_T';
@@ -335,6 +368,8 @@ print <<EOF
 ("/* "#name ", " #member " = %0, %1, " #type ", %2; */\\n" : : \\
 "n"(offset), "n"(size), "n"(elems))
 
+/* constraint 'n' - An immediate integer operand with a known numeric value is allowed */
+
 #undef ${print_variable}
 #define ${print_variable}(name, member, value, type) ${emit_asm}(#name, \\
 #member, #type, offsetof(name, member), sizeof(value), 0)
@@ -348,7 +383,7 @@ int main(void)
 
 /* GAS supports C-style comments in asm files other compilers may not */
 /* This header identifies assembler output for second pass */
-asm volatile("/* $header; */");
+asm volatile("/* $c_header; */");
 
 EOF
 ;
@@ -394,4 +429,3 @@ EOF
 
 #my ($user,$system,$cuser,$csystem) = times;
 #warn "Pass1 ".$user." ".$system." ".$cuser." ".$csystem."\n";
-

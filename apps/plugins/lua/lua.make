@@ -41,7 +41,7 @@ $(LUA_BUILDDIR)/actions.lua: $(LUA_OBJ) $(LUA_SRCDIR)/action_helper.pl
 	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E $(APPSDIR)/plugins/lib/pluginlib_actions.h | $(LUA_SRCDIR)/action_helper.pl > $(LUA_BUILDDIR)/actions.lua
 
 $(LUA_BUILDDIR)/settings.lua: $(LUA_OBJ) $(LUA_SRCDIR)/settings_helper.pl
-	$(SILENT)$(CC) $(INCLUDES) -E $(TARGET) $(CFLAGS) -include plugin.h -include cuesheet.h - < /dev/null | $(LUA_SRCDIR)/settings_helper.pl | \
+	$(SILENT)$(CC) $(INCLUDES) -E -P $(TARGET) $(CFLAGS) -include plugin.h -include cuesheet.h - < /dev/null | $(LUA_SRCDIR)/settings_helper.pl | \
 		$(CC) $(INCLUDES) $(TARGET) $(CFLAGS) -S -x c -include config.h -include plugin.h -o $(LUA_BUILDDIR)/settings_helper.s -
 	$(call PRINTS,GEN $(@F))$(LUA_SRCDIR)/settings_helper.pl < $(LUA_BUILDDIR)/settings_helper.s > $(LUA_BUILDDIR)/settings.lua
 
