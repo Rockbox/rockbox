@@ -41,6 +41,57 @@ char *output_dyn_value(char *buf,
                        unsigned int unit_count,
                        bool binary_scale);
 
+extern const unsigned char * const unit_strings_core[];
+/* format_time_auto */
+enum e_fmt_time_auto_idx
+{
+    UNIT_IDX_HR = 0,
+    UNIT_IDX_MIN,
+    UNIT_IDX_SEC,
+    UNIT_IDX_MS,
+    UNIT_IDX_TIME_COUNT,
+};
+#define UNIT_IDX_MASK       0x01FFU /*Return only Unit_IDX*/
+#define UNIT_TRIM_ZERO      0x0200U /*Don't show leading zero on max_idx*/
+#define UNIT_LOCK_HR        0x0400U /*Don't Auto Range below this field*/
+#define UNIT_LOCK_MIN       0x0800U /*Don't Auto Range below this field*/
+#define UNIT_LOCK_SEC       0x1000U /*Don't Auto Range below this field*/
+
+/* convert ticks to MS and back*/
+#define MS_IN_TICK (1000UL/HZ)
+unsigned long ms_to_ticks(unsigned long ms);
+unsigned long ticks_to_ms(unsigned long ticks);
+
+/*  time_split_units()
+    split time values depending on base unit
+    unit_idx: UNIT_HOUR, UNIT_MIN, UNIT_SEC, UNIT_MS
+    abs_value: absolute time value
+    units_in: array of unsigned ints with IDX_TIME_COUNT fields
+*/
+unsigned int time_split_units(int unit_idx, unsigned long abs_val,
+                        unsigned int (*units_in)[UNIT_IDX_TIME_COUNT]);
+
+/* format_time_auto - return an auto ranged time string;
+   buffer:  needs to be at least 25 characters
+
+   unit_idx: specifies lowest or base index of the value
+   add | UNIT_LOCK_ to prevent autorange below this index
+   add | UNIT_TRIM_ZERO to supress leading zero on the largest unit
+
+   value: should be passed in the same form as unit_idx
+
+   supress_unit: if true unit string is NOT printed
+
+   idx_pos[2]: (if !NULL) [0] specifies an index of interest,
+   the offset and width for that index will be returned.
+   In field [0] offset, field [1] length
+   Ex: given 12:34:56.78 if you pass the idx_pos UNIT_IDX_MIN
+   idx_pos returns -> {3,2}.. offset(3) and length(2) = '34'
+*/
+const char *format_time_auto(char *buffer, int buf_len, const long value,
+                                  int unit_idx, bool supress_unit,
+                                  unsigned char (*idx_pos)[2]);
+
 /* Format time into buf.
  *
  * buf      - buffer to format to.

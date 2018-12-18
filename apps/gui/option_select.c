@@ -48,18 +48,15 @@ int option_value_as_int(const struct settings_list *setting)
         temp = *(int*)setting->setting;
     return temp;
 }
-static const char *unit_strings[] = 
-{   
-    [UNIT_INT] = "",    [UNIT_MS]  = "ms",
-    [UNIT_SEC] = "s",   [UNIT_MIN] = "min", 
-    [UNIT_HOUR]= "hr",  [UNIT_KHZ] = "kHz",
-    [UNIT_DB]  = "dB",  [UNIT_PERCENT] = "%",
-    [UNIT_MAH] = "mAh", [UNIT_PIXEL] = "px",
-    [UNIT_PER_SEC] = "per sec",
-    [UNIT_HERTZ] = "Hz",
-    [UNIT_MB]  = "MB",  [UNIT_KBIT]  = "kb/s",
-    [UNIT_PM_TICK] = "units/10ms",
-};
+
+/* return an auto ranged time string, unit_idx specifies lowest or
+   base index of the passed value -- flag F_TIME_SETTING calls this */
+const char *option_get_timestring(char *buf, int buf_len, int val, int unit_idx)
+{
+    return format_time_auto(buf, buf_len, val,
+                            unit_idx | UNIT_TRIM_ZERO, false, NULL);
+}
+
 /* these two vars are needed so arbitrary values can be added to the
    TABLE_SETTING settings if the F_ALLOW_ARBITRARY_VALS flag is set */
 static int table_setting_oldval = 0, table_setting_array_position = 0;
@@ -92,16 +89,22 @@ const char *option_get_valuestring(const struct settings_list *setting,
         if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
         {
             formatter = int_info->formatter;
-            unit = unit_strings[int_info->unit];
+            unit = unit_strings_core[int_info->unit];
+                if ((setting->flags & F_TIME_SETTING) == F_TIME_SETTING)
+                    str = option_get_timestring(buffer, buf_len,
+                                                (int)temp_var, int_info->unit);
         }
         else
         {
             formatter = tbl_info->formatter;
-            unit = unit_strings[tbl_info->unit];
+            unit = unit_strings_core[tbl_info->unit];
+                if ((setting->flags & F_TIME_SETTING) == F_TIME_SETTING)
+                    str = option_get_timestring(buffer, buf_len,
+                                                (int)temp_var, tbl_info->unit);
         }
         if (formatter)
             str = formatter(buffer, buf_len, (int)temp_var, unit);
-        else
+        else if ((setting->flags & F_TIME_SETTING) != F_TIME_SETTING)
             snprintf(buffer, buf_len, "%d %s", (int)temp_var, unit?unit:"");
     }
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
