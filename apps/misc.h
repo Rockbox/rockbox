@@ -28,7 +28,7 @@
 
 extern const unsigned char * const byte_units[];
 extern const unsigned char * const * const kibyte_units;
-
+extern const unsigned char * const unit_strings_core[];
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
  * units) if possible, and 3 significant digits are shown. If a buffer is
@@ -40,6 +40,50 @@ char *output_dyn_value(char *buf,
                        const unsigned char * const *units,
                        unsigned int unit_count,
                        bool binary_scale);
+
+
+/* format_time_auto */
+enum e_fmt_time_auto_idx
+{
+    UNIT_IDX_HR = 0,
+    UNIT_IDX_MIN,
+    UNIT_IDX_SEC,
+    UNIT_IDX_MS,
+    UNIT_IDX_TIME_COUNT,
+};
+#define UNIT_IDX_MASK       0x01FFU /*Return only Unit_IDX*/
+#define UNIT_TRIM_ZERO      0x0200U /*Don't show leading zero on max_idx*/
+#define UNIT_LOCK_HR        0x0400U /*Don't Auto Range below this field*/
+#define UNIT_LOCK_MIN       0x0800U /*Don't Auto Range below this field*/
+#define UNIT_LOCK_SEC       0x1000U /*Don't Auto Range below this field*/
+
+/*  time_split_units()
+    split time values depending on base unit
+    unit_idx: UNIT_HOUR, UNIT_MIN, UNIT_SEC, UNIT_MS
+    abs_value: absolute time value
+    units_in: array of unsigned ints with IDX_TIME_COUNT fields
+*/
+unsigned int time_split_units(int unit_idx, unsigned long abs_val,
+                        unsigned long (*units_in)[UNIT_IDX_TIME_COUNT]);
+
+/* format_time_auto - return an auto ranged time string;
+   buffer:  needs to be at least 25 characters for full range
+
+   unit_idx: specifies lowest or base index of the value
+   add | UNIT_LOCK_ to keep place holder of units that would normally be
+   discarded.. For instance, UNIT_LOCK_HR would keep the hours place, ex: string
+   00:10:10 (0 HRS 10 MINS 10 SECONDS) normally it would return as 10:10
+   add | UNIT_TRIM_ZERO to supress leading zero on the largest unit
+
+   value: should be passed in the same form as unit_idx
+
+   supress_unit: may be set to true and in this case the
+   hr, min, sec, ms identifiers will be left off the resulting string but
+   since right to left languages are handled it is advisable to leave units
+   as an indication of the text direction
+*/
+const char *format_time_auto(char *buffer, int buf_len, long value,
+                                  int unit_idx, bool supress_unit);
 
 /* Format time into buf.
  *

@@ -48,18 +48,15 @@ int option_value_as_int(const struct settings_list *setting)
         temp = *(int*)setting->setting;
     return temp;
 }
-static const char *unit_strings[] = 
-{   
-    [UNIT_INT] = "",    [UNIT_MS]  = "ms",
-    [UNIT_SEC] = "s",   [UNIT_MIN] = "min", 
-    [UNIT_HOUR]= "hr",  [UNIT_KHZ] = "kHz",
-    [UNIT_DB]  = "dB",  [UNIT_PERCENT] = "%",
-    [UNIT_MAH] = "mAh", [UNIT_PIXEL] = "px",
-    [UNIT_PER_SEC] = "per sec",
-    [UNIT_HERTZ] = "Hz",
-    [UNIT_MB]  = "MB",  [UNIT_KBIT]  = "kb/s",
-    [UNIT_PM_TICK] = "units/10ms",
-};
+
+/* return an auto ranged time string, unit_idx specifies lowest or
+   base index of the passed value -- flag F_TIME_SETTING calls this */
+static const char *option_get_timestring(char *buf, int buf_len,
+                                         int val, int unit_idx)
+{
+    return format_time_auto(buf, buf_len, val, unit_idx | UNIT_TRIM_ZERO, false);
+}
+
 /* these two vars are needed so arbitrary values can be added to the
    TABLE_SETTING settings if the F_ALLOW_ARBITRARY_VALS flag is set */
 static int table_setting_oldval = 0, table_setting_array_position = 0;
@@ -87,22 +84,28 @@ const char *option_get_valuestring(const struct settings_list *setting,
     {
         const struct int_setting *int_info = setting->int_setting;
         const struct table_setting *tbl_info = setting->table_setting;
-        const char *unit;
+        int info_unit;
+        const char *str_unit;
         const char* (*formatter)(char*, size_t, int, const char*);
         if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
         {
             formatter = int_info->formatter;
-            unit = unit_strings[int_info->unit];
+            info_unit = int_info->unit;
         }
         else
         {
             formatter = tbl_info->formatter;
-            unit = unit_strings[tbl_info->unit];
+            info_unit = tbl_info->unit;
         }
+
+        if ((setting->flags & F_TIME_SETTING) == F_TIME_SETTING)
+            str = option_get_timestring(buffer, buf_len, (long)temp_var, info_unit);
+
+        str_unit = unit_strings_core[info_unit];
         if (formatter)
-            str = formatter(buffer, buf_len, (int)temp_var, unit);
-        else
-            snprintf(buffer, buf_len, "%d %s", (int)temp_var, unit?unit:"");
+            str = formatter(buffer, buf_len, (int)temp_var, str_unit);
+        else if ((setting->flags & F_TIME_SETTING) != F_TIME_SETTING)
+            snprintf(buffer, buf_len, "%d %s", (int)temp_var, str_unit?str_unit:"");
     }
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
@@ -167,6 +170,8 @@ void option_talk_value(const struct settings_list *setting, int value, bool enqu
         }
         if (get_talk_id)
             talk_id(get_talk_id(value, unit), enqueue);
+        else if ((setting->flags & F_TIME_SETTING) == F_TIME_SETTING)
+            talk_time_intervals(value, unit, enqueue);
         else
             talk_value(value, unit, enqueue);
     }
