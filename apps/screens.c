@@ -989,8 +989,8 @@ static const char* runtime_get_data(int selected_item, void* data,
             return "";
     }
 
-    snprintf(buffer, buffer_len, "%dh %dm %ds",
-        t / 3600, (t % 3600) / 60, t % 60);
+    format_time_auto(buffer, buffer_len, t, UNIT_SEC, false, NULL);
+
     return buffer;
 }
 
