@@ -47,6 +47,7 @@
 #include "plugin.h" /* plugin_get_buffer() */
 #include "debug.h"
 #include "panic.h"
+#include "misc.h" /* time_split_units() */
 
 /* Memory layout varies between targets because the
    Archos (MASCODEC) devices cannot mix voice and audio playback
@@ -1307,22 +1308,7 @@ static int talk_year(long year, bool enqueue)
    say hours,minutes,seconds. */
 static int talk_time_unit(long secs, bool enqueue)
 {
-    int hours, mins;
-    if (!enqueue)
-        talk_shutup();
-    if((hours = secs/3600)) {
-        secs %= 3600;
-        talk_value(hours, UNIT_HOUR, true);
-    }
-    if((mins = secs/60)) {
-        secs %= 60;
-        talk_value(mins, UNIT_MIN, true);
-    }
-    if((secs) || (!hours && !mins))
-        talk_value(secs, UNIT_SEC, true);
-    else if(!hours && secs)
-        talk_number(secs, true);
-    return 0;
+    return talk_time_intervals(secs, UNIT_SEC, enqueue);
 }
 
 void talk_fractional(char *tbuf, int value, int unit)
@@ -1441,6 +1427,59 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
     talk_id(unit_id, true); /* say the unit, if any */
 
     return 0;
+}
+
+/* Say time duration/interval. Input is time unit specifies base unit,
+   say hours,minutes,seconds, milliseconds. or any combination thereof */
+int talk_time_intervals(long time, int unit_idx, bool enqueue)
+{
+    unsigned long units_in[UNIT_IDX_TIME_COUNT];
+
+    if (talk_temp_disable_count > 0)
+        return -1;  /* talking has been disabled */
+    if (!check_audio_status())
+        return -1;
+
+    if (talk_handle <= 0 || index_handle <= 0) /* reload needed? */
+    {
+        int fd = open_voicefile();
+        if (fd < 0 || !load_voicefile_index(fd))
+            return -1;
+        load_voicefile_data(fd);
+        close(fd);
+    }
+
+    if (!enqueue)
+        talk_shutup(); /* cut off all the pending stuff */
+
+    time_split_units(unit_idx, labs(time), &units_in);
+
+    if (time < 0)
+        talk_id(VOICE_MINUS, true);
+
+    if (time == 0)
+        talk_value(0, unit_idx, true);
+    else
+    {
+        if (units_in[UNIT_IDX_HR] != 0)
+        {
+            talk_value(units_in[UNIT_IDX_HR], UNIT_HOUR, true);
+        }
+        if (units_in[UNIT_IDX_MIN] != 0)
+        {
+            talk_value(units_in[UNIT_IDX_MIN], UNIT_MIN, true);
+        }
+        if (units_in[UNIT_IDX_SEC] != 0)
+        {
+            talk_value(units_in[UNIT_IDX_SEC], UNIT_SEC, true);
+        }
+        if (units_in[UNIT_IDX_MS] != 0)
+        {
+            talk_value(units_in[UNIT_IDX_MS], UNIT_MS, true);
+        }
+    }
+
+    return -1;
 }
 
 /* spell a string */

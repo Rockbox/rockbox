@@ -187,6 +187,13 @@
                     {cb, formatter, get_talk_id, unit, count,       \
                     (const int[]){__VA_ARGS__}}}}}
 
+#define TABLE_SETTING_LIST(flags, var, lang_id, default, name, cfg_vals, \
+                      unit, formatter, get_talk_id, cb, count, list) \
+            {flags|F_TABLE_SETTING|F_T_INT, &global_settings.var,   \
+                lang_id, INT(default), name, cfg_vals,              \
+                {.table_setting = (struct table_setting[]) {        \
+                    {cb, formatter, get_talk_id, unit, count, list}}}}
+
 #define CUSTOM_SETTING(flags, var, lang_id, default, name,              \
                        load_from_cfg, write_to_cfg,                     \
                        is_change, set_default)                          \
@@ -200,9 +207,18 @@
         TEXT_SETTING(F_THEMESETTING,var,name,"-", NULL, NULL)
 
 /* some sets of values which are used more than once, to save memory */
+static const char off[] = "off";
 static const char off_on[] = "off,on";
 static const char off_on_ask[] = "off,on,ask";
 static const char off_number_spell[] = "off,number,spell";
+static const int timeout_sec_common[] = {-1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,
+                                        45,60,90,120,180,240,300,600,900,1200,
+                                        1500,1800,2700,3600,4500,5400,6300,7200};
+static const int time_recording_trigger[] = {0,1,2,5,10,15,20,25,30,60,120,300,600};
+#if defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
+static const int backlight_fade[] = {0,100,200,300,500,1000,2000,3000,5000,10000};
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 static const char graphic_numeric[] = "graphic,numeric";
 #endif
@@ -330,6 +346,14 @@ static const char graphic_numeric[] = "graphic,numeric";
 #define DEFAULT_TAGCACHE_SCAN_PATHS "/"
 #endif
 
+#ifdef HAVE_BACKLIGHT
+#ifdef SIMULATOR
+#define DEFAULT_BACKLIGHT_TIMEOUT 0
+#else
+#define DEFAULT_BACKLIGHT_TIMEOUT 15
+#endif
+#endif /* HAVE_BACKLIGHT */
+
 #if LCD_DEPTH > 1
 static const char* list_pad_formatter(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
@@ -373,61 +397,89 @@ static int32_t getlang_unit_0_is_off(int value, int unit)
         return TALK_ID(value,unit);
 }
 
-static const char* formatter_unit_0_is_skip_track(char *buffer, size_t buffer_size,
-                                           int val, const char *unit)
+static const char* formatter_time_unit_0_is_off(char *buffer, size_t buffer_size,
+                                    int val, const char *unit)
+{
+    (void) buffer_size;
+    (void) unit;
+    if (val == 0)
+        return str(LANG_OFF);
+    return buffer;
+}
+
+static int32_t getlang_time_unit_0_is_off(int value, int unit)
+{
+    if (value == 0)
+        return LANG_OFF;
+    else
+        return talk_time_intervals(value, unit, false);
+}
+
+#if defined(HAVE_BACKLIGHT) || defined(HAVE_LCD_SLEEP_SETTING)
+static const char* formatter_time_unit_0_is_always(char *buffer, size_t buffer_size,
+                                    int val, const char *unit)
+{
+    (void) buffer_size;
+    (void) unit;
+    if (val == -1)
+        return str(LANG__NEVER);
+    else if (val == 0)
+        return str(LANG_ALWAYS);
+    return buffer;
+}
+
+static int32_t getlang_time_unit_0_is_always(int value, int unit)
+{
+    if (value == -1)
+        return LANG__NEVER;
+    else if (value == 0)
+        return LANG_ALWAYS;
+    else
+        return talk_time_intervals(value, unit, false);
+}
+#endif /* HAVE_BACKLIGHT || HAVE_LCD_SLEEP_SETTING */
+
+static const char* formatter_time_unit_0_is_skip_track(char *buffer,
+                                size_t buffer_size, int val, const char *unit)
 {
     (void)unit;
+    (void)buffer_size;
     if (val == -1)
         return str(LANG_SKIP_OUTRO);
     else if (val == 0)
         return str(LANG_SKIP_TRACK);
-    else if (val % 60 == 0)
-        snprintf(buffer, buffer_size, "%d min", val/60);
-    else
-        snprintf(buffer, buffer_size, "%d s", val);
     return buffer;
 }
 
-static int32_t getlang_unit_0_is_skip_track(int value, int unit)
+static int32_t getlang_time_unit_0_is_skip_track(int value, int unit)
 {
     (void)unit;
     if (value == -1)
         return LANG_SKIP_OUTRO;
     else if (value == 0)
         return LANG_SKIP_TRACK;
-    else if (value % 60 == 0)
-        return TALK_ID(value/60, UNIT_MIN);
     else
-        return TALK_ID(value, UNIT_SEC);
+        return talk_time_intervals(value, unit, false);
 }
 
-#ifdef HAVE_BACKLIGHT
-#ifdef SIMULATOR
-#define DEFAULT_BACKLIGHT_TIMEOUT 0
-#else
-#define DEFAULT_BACKLIGHT_TIMEOUT 15
-#endif
-static const char* backlight_formatter(char *buffer, size_t buffer_size,
-                                int val, const char *unit)
+#ifdef HAVE_LCD_BITMAP
+static const char* formatter_time_unit_0_is_eternal(char *buffer,
+                                size_t buffer_size, int val, const char *unit)
 {
-    if (val == -1)
-        return str(LANG_OFF);
-    else if (val == 0)
-        return str(LANG_ON);
-    else
-        snprintf(buffer, buffer_size, "%d %s", val, unit);
+    (void) buffer_size;
+    (void) unit;
+    if (val == 0)
+        return str(LANG_PM_ETERNAL);
     return buffer;
 }
-static int32_t backlight_getlang(int value, int unit)
+static int32_t getlang_time_unit_0_is_eternal(int value, int unit)
 {
-    if (value == -1)
-        return LANG_OFF;
-    else if (value == 0)
-        return LANG_ON;
+    if (value == 0)
+        return LANG_PM_ETERNAL;
     else
-        return TALK_ID(value, unit);
+        return talk_time_intervals(value, unit, false);
 }
-#endif
+#endif /* HAVE_LCD_BITMAP */
 
 #ifndef HAVE_WHEEL_ACCELERATION
 static const char* scanaccel_formatter(char *buffer, size_t buffer_size,
@@ -437,7 +489,7 @@ static const char* scanaccel_formatter(char *buffer, size_t buffer_size,
     if (val == 0)
         return str(LANG_OFF);
     else
-        snprintf(buffer, buffer_size, "Speed up every %ds", val);
+        snprintf(buffer, buffer_size, "Speed up every %d s", val);
     return buffer;
 }
 #endif
@@ -798,8 +850,9 @@ const struct settings_list settings[] = {
 /* 3-d enhancement effect */
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     SOUND_SETTING(0,loudness, LANG_LOUDNESS, "loudness", SOUND_LOUDNESS),
+    /* requires index, uses table defined by driver */
     STRINGCHOICE_SETTING(F_SOUNDSETTING,avc,LANG_AUTOVOL,0,"auto volume",
-                         "off,20ms,2,4,8,", sound_set_avc, 5,
+                         "off,20 ms,2 s,4 s,8 s,", sound_set_avc, 5,
                          LANG_OFF,TALK_ID(20, UNIT_MS),TALK_ID(2, UNIT_SEC),
                          TALK_ID(4, UNIT_SEC),TALK_ID(8, UNIT_SEC)),
     OFFON_SETTING(F_SOUNDSETTING, superbass, LANG_SUPERBASS, false, "superbass",
@@ -864,18 +917,19 @@ const struct settings_list settings[] = {
                   MAX_CONTRAST_SETTING, 1, NULL, NULL }}}},
 #endif
 #ifdef HAVE_BACKLIGHT
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_timeout, LANG_BACKLIGHT,
-                    DEFAULT_BACKLIGHT_TIMEOUT,
-                  "backlight timeout", off_on, UNIT_SEC, backlight_formatter,
-                  backlight_getlang, backlight_set_timeout, 20,
-                  -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
+    TABLE_SETTING_LIST(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS,
+                    backlight_timeout, LANG_BACKLIGHT,
+                    DEFAULT_BACKLIGHT_TIMEOUT, "backlight timeout",
+                    off_on, UNIT_SEC, formatter_time_unit_0_is_always,
+                    getlang_time_unit_0_is_always, backlight_set_timeout,
+                    23, timeout_sec_common),
 #if CONFIG_CHARGING
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_timeout_plugged,
-                  LANG_BACKLIGHT_ON_WHEN_CHARGING, 10,
-                  "backlight timeout plugged", off_on, UNIT_SEC,
-                  backlight_formatter, backlight_getlang,
-                  backlight_set_timeout_plugged,  20,
-                  -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
+    TABLE_SETTING_LIST(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS,
+                    backlight_timeout_plugged, LANG_BACKLIGHT_ON_WHEN_CHARGING,
+                    DEFAULT_BACKLIGHT_TIMEOUT, "backlight timeout plugged",
+                    off_on, UNIT_SEC, formatter_time_unit_0_is_always,
+                    getlang_time_unit_0_is_always, backlight_set_timeout_plugged,
+                    23, timeout_sec_common),
 #endif
 #endif /* HAVE_BACKLIGHT */
 #ifdef HAVE_LCD_BITMAP
@@ -951,10 +1005,10 @@ const struct settings_list settings[] = {
 #endif /* HAVE_LCD_BITMAP */
     OFFON_SETTING(0,show_icons, LANG_SHOW_ICONS ,true,"show icons", NULL),
     /* system */
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, poweroff, LANG_POWEROFF_IDLE, 10,
-                  "idle poweroff", "off", UNIT_MIN, formatter_unit_0_is_off,
-                  getlang_unit_0_is_off, set_poweroff_timeout, 15,
-                  0,1,2,3,4,5,6,7,8,9,10,15,30,45,60),
+    INT_SETTING(F_TIME_SETTING, poweroff, LANG_POWEROFF_IDLE, 10,
+                "idle poweroff", UNIT_MIN, 0,60,1,
+                formatter_time_unit_0_is_off, getlang_time_unit_0_is_off,
+                set_poweroff_timeout),
     SYSTEM_SETTING(NVRAM(4), runtime, 0),
     SYSTEM_SETTING(NVRAM(4), topruntime, 0),
     INT_SETTING(F_BANFROMQS, max_files_in_playlist,
@@ -1039,18 +1093,17 @@ const struct settings_list settings[] = {
                  lcd_remote_set_invert_display),
     OFFON_SETTING(0,remote_flip_display, LANG_FLIP_DISPLAY,
                   false,"remote flip display", NULL),
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, remote_backlight_timeout,
-                  LANG_BACKLIGHT, 5, "remote backlight timeout", off_on,
-                  UNIT_SEC, backlight_formatter, backlight_getlang,
-                  remote_backlight_set_timeout, 20,
-                  -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
+    TABLE_SETTING_LIST(F_ALLOW_ARBITRARY_VALS, remote_backlight_timeout,
+                  LANG_BACKLIGHT, 5,
+                  "remote backlight timeout", off_on, UNIT_SEC,
+                  formatter_time_unit_0_is_always, getlang_time_unit_0_is_always,
+                  remote_backlight_set_timeout, 23, timeout_sec_common),
 #if CONFIG_CHARGING
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, remote_backlight_timeout_plugged,
+    TABLE_SETTING_LIST(F_ALLOW_ARBITRARY_VALS, remote_backlight_timeout_plugged,
                   LANG_BACKLIGHT_ON_WHEN_CHARGING, 10,
                   "remote backlight timeout plugged", off_on, UNIT_SEC,
-                  backlight_formatter, backlight_getlang,
-                  remote_backlight_set_timeout_plugged, 20,
-                  -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
+                  formatter_time_unit_0_is_always, getlang_time_unit_0_is_always,
+                  remote_backlight_set_timeout_plugged, 23, timeout_sec_common),
 #endif
 #ifdef HAVE_REMOTE_LCD_TICKING
     OFFON_SETTING(0, remote_reduce_ticking, LANG_REDUCE_TICKING,
@@ -1103,15 +1156,15 @@ const struct settings_list settings[] = {
 #endif
     /* backlight fading */
 #if defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_fade_in,
+    TABLE_SETTING_LIST(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS, backlight_fade_in,
                   LANG_BACKLIGHT_FADE_IN, 300, "backlight fade in", "off",
-                  UNIT_MS, formatter_unit_0_is_off, getlang_unit_0_is_off,
-                  backlight_set_fade_in, 7,  0,100,200,300,500,1000,2000),
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, backlight_fade_out,
+                  UNIT_MS, formatter_time_unit_0_is_off, getlang_unit_0_is_off,
+                  backlight_set_fade_in, 7, backlight_fade),
+    TABLE_SETTING_LIST(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS, backlight_fade_out,
                   LANG_BACKLIGHT_FADE_OUT, 2000, "backlight fade out", "off",
-                  UNIT_MS, formatter_unit_0_is_off, getlang_unit_0_is_off,
-                  backlight_set_fade_out, 10,
-                  0,100,200,300,500,1000,2000,3000,5000,10000),
+                  UNIT_MS, formatter_time_unit_0_is_off,
+                  getlang_time_unit_0_is_off,
+                  backlight_set_fade_out, 10, backlight_fade),
 #elif defined(HAVE_BACKLIGHT_FADING_BOOL_SETTING)
     OFFON_SETTING(0, backlight_fade_in, LANG_BACKLIGHT_FADE_IN,
                     true, "backlight fade in", backlight_set_fade_in),
@@ -1121,9 +1174,10 @@ const struct settings_list settings[] = {
 #endif /* HAVE_BACKLIGHT */
     INT_SETTING(F_PADTITLE, scroll_speed, LANG_SCROLL_SPEED, 9,"scroll speed",
                 UNIT_INT, 0, 17, 1, NULL, NULL, lcd_scroll_speed),
-    INT_SETTING(F_PADTITLE, scroll_delay, LANG_SCROLL_DELAY, 1000,
-                "scroll delay", UNIT_MS, 0, 2500, 100, NULL,
-                NULL, lcd_scroll_delay),
+    INT_SETTING(F_TIME_SETTING | F_PADTITLE, scroll_delay, LANG_SCROLL_DELAY,
+                1000, "scroll delay", UNIT_MS, 0, 3000, 100,
+                formatter_time_unit_0_is_off,
+                getlang_time_unit_0_is_off, lcd_scroll_delay),
     INT_SETTING(0, bidir_limit, LANG_BIDIR_SCROLL, 50, "bidir limit",
                 UNIT_PERCENT, 0, 200, 25, NULL, NULL, lcd_bidir_scroll),
 #ifdef HAVE_REMOTE_LCD
@@ -1133,8 +1187,9 @@ const struct settings_list settings[] = {
     INT_SETTING(0, remote_scroll_step, LANG_SCROLL_STEP, 6,
                 "remote scroll step", UNIT_PIXEL, 1, LCD_REMOTE_WIDTH, 1, NULL,
                 NULL, lcd_remote_scroll_step),
-    INT_SETTING(0, remote_scroll_delay, LANG_SCROLL_DELAY, 1000,
-                "remote scroll delay", UNIT_MS, 0, 2500, 100, NULL, NULL,
+    INT_SETTING(F_TIME_SETTING, remote_scroll_delay, LANG_SCROLL_DELAY, 1000,
+                "remote scroll delay", UNIT_MS, 0, 3000, 100,
+                formatter_time_unit_0_is_off, getlang_time_unit_0_is_off,
                 lcd_remote_scroll_delay),
     INT_SETTING(0, remote_bidir_limit, LANG_BIDIR_SCROLL, 50,
                 "remote bidir limit", UNIT_PERCENT, 0, 200, 25, NULL, NULL,
@@ -1172,27 +1227,25 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0,play_selected,LANG_PLAY_SELECTED,true,"play selected",NULL),
     OFFON_SETTING(0,party_mode,LANG_PARTY_MODE,false,"party mode",NULL),
     OFFON_SETTING(0,fade_on_stop,LANG_FADE_ON_STOP,true,"volume fade",NULL),
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, ff_rewind_min_step,
-                  LANG_FFRW_STEP, 1, "scan min step", NULL, UNIT_SEC,
-                  NULL, NULL, NULL, 14,  1,2,3,4,5,6,8,10,15,20,25,30,45,60),
+    INT_SETTING(F_TIME_SETTING, ff_rewind_min_step, LANG_FFRW_STEP, 1,
+                "scan min step", UNIT_SEC, 1, 60, 1, NULL, NULL, NULL),
     CHOICE_SETTING(0, ff_rewind_accel, LANG_FFRW_ACCEL, 2,
                    "seek acceleration", "very fast,fast,normal,slow,very slow", NULL, 5,
                    ID2P(LANG_VERY_FAST), ID2P(LANG_FAST), ID2P(LANG_NORMAL),
                    ID2P(LANG_SLOW) , ID2P(LANG_VERY_SLOW)),
 #if (CONFIG_CODEC == SWCODEC) && defined(HAVE_DISK_STORAGE)
-    STRINGCHOICE_SETTING(0, buffer_margin, LANG_MP3BUFFER_MARGIN, 0,"antiskip",
-                         "5s,15s,30s,1min,2min,3min,5min,10min", NULL, 8,
-                         TALK_ID(5, UNIT_SEC), TALK_ID(15, UNIT_SEC),
-                         TALK_ID(30, UNIT_SEC), TALK_ID(1, UNIT_MIN),
-                         TALK_ID(2, UNIT_MIN), TALK_ID(3, UNIT_MIN),
-                         TALK_ID(5, UNIT_MIN), TALK_ID(10, UNIT_MIN)),
+    TABLE_SETTING(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS, buffer_margin,
+                  LANG_MP3BUFFER_MARGIN, 5, "antiskip", NULL, UNIT_SEC,
+                  NULL, NULL,
+                  NULL,8, 5,15,30,60,120,180,300,600),
 #elif defined(HAVE_DISK_STORAGE)
-    INT_SETTING(0, buffer_margin, LANG_MP3BUFFER_MARGIN, 0, "antiskip",
-                UNIT_SEC, 0, 7, 1, NULL, NULL, audio_set_buffer_margin),
+    INT_SETTING(F_TIME_SETTING, buffer_margin, LANG_MP3BUFFER_MARGIN, 0,
+                "antiskip", UNIT_SEC, 0, 7, 1, formatter_time_unit_0_is_off,
+                getlang_time_unit_0_is_off, audio_set_buffer_margin),
 #endif
     /* disk */
 #ifdef HAVE_DISK_STORAGE
-    INT_SETTING(0, disk_spindown, LANG_SPINDOWN, 5, "disk spindown",
+    INT_SETTING(F_TIME_SETTING, disk_spindown, LANG_SPINDOWN, 5, "disk spindown",
                     UNIT_SEC, 3, 254, 1, NULL, NULL, storage_spindown),
 #endif /* HAVE_DISK_STORAGE */
     /* browser */
@@ -1252,35 +1305,16 @@ const struct settings_list settings[] = {
                    ID2P(LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK)),
 #ifdef HAVE_LCD_BITMAP
     /* peak meter */
-    STRINGCHOICE_SETTING(0, peak_meter_clip_hold, LANG_PM_CLIP_HOLD, 16,
-                         "peak meter clip hold",
-                         "on,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,2min"
-                         ",3min,5min,10min,20min,45min,90min",
-                         peak_meter_set_clip_hold, 25, LANG_PM_ETERNAL,
-                         TALK_ID(1, UNIT_SEC), TALK_ID(2, UNIT_SEC),
-                         TALK_ID(3, UNIT_SEC), TALK_ID(4, UNIT_SEC),
-                         TALK_ID(5, UNIT_SEC), TALK_ID(6, UNIT_SEC),
-                         TALK_ID(7, UNIT_SEC), TALK_ID(8, UNIT_SEC),
-                         TALK_ID(9, UNIT_SEC), TALK_ID(10, UNIT_SEC),
-                         TALK_ID(15, UNIT_SEC), TALK_ID(20, UNIT_SEC),
-                         TALK_ID(25, UNIT_SEC), TALK_ID(30, UNIT_SEC),
-                         TALK_ID(45, UNIT_SEC), TALK_ID(60, UNIT_SEC),
-                         TALK_ID(90, UNIT_SEC), TALK_ID(2, UNIT_MIN),
-                         TALK_ID(3, UNIT_MIN), TALK_ID(5, UNIT_MIN),
-                         TALK_ID(10, UNIT_MIN), TALK_ID(20, UNIT_MIN),
-                         TALK_ID(45, UNIT_MIN), TALK_ID(90, UNIT_MIN)),
-    STRINGCHOICE_SETTING(0, peak_meter_hold, LANG_PM_PEAK_HOLD, 3,
-                         "peak meter hold",
-                     "off,200ms,300ms,500ms,1,2,3,4,5,6,7,8,9,10,15,20,30,1min",
-                         NULL, 18, LANG_OFF, TALK_ID(200, UNIT_MS),
-                         TALK_ID(300, UNIT_MS), TALK_ID(500, UNIT_MS),
-                         TALK_ID(1, UNIT_SEC), TALK_ID(2, UNIT_SEC),
-                         TALK_ID(3, UNIT_SEC), TALK_ID(4, UNIT_SEC),
-                         TALK_ID(5, UNIT_SEC), TALK_ID(6, UNIT_SEC),
-                         TALK_ID(7, UNIT_SEC), TALK_ID(8, UNIT_SEC),
-                         TALK_ID(9, UNIT_SEC), TALK_ID(10, UNIT_SEC),
-                         TALK_ID(15, UNIT_SEC), TALK_ID(20, UNIT_SEC),
-                         TALK_ID(30, UNIT_SEC), TALK_ID(60, UNIT_SEC)),
+    TABLE_SETTING_LIST(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS, peak_meter_clip_hold,
+                  LANG_PM_CLIP_HOLD, 60, "peak meter clip hold", "eternal",
+                  UNIT_SEC, formatter_time_unit_0_is_eternal,
+                  getlang_time_unit_0_is_eternal, peak_meter_set_clip_hold,
+                  31, &timeout_sec_common[1]), /* skip -1 entry */
+    TABLE_SETTING(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS, peak_meter_hold,
+                  LANG_PM_PEAK_HOLD, 500, "peak meter hold", off, UNIT_MS,
+                  formatter_time_unit_0_is_off, getlang_time_unit_0_is_off,NULL,
+                  18, 0,200,300,500,1000,2000,3000,4000,5000,6000,7000,8000,
+                  9000,10000,15000,20000,30000,60000),
     INT_SETTING(0, peak_meter_release, LANG_PM_RELEASE, 8, "peak meter release",
                 UNIT_PM_TICK, 1, 0x7e, 1, NULL, NULL,NULL),
     OFFON_SETTING(0,peak_meter_dbfs,LANG_PM_DBFS,true,"peak meter dbfs",NULL),
@@ -1328,20 +1362,12 @@ const struct settings_list settings[] = {
                   "Announce Battery Level", NULL),
 
 #ifdef HAVE_RECORDING
-    /* recording */
-    STRINGCHOICE_SETTING(F_RECSETTING, rec_timesplit, LANG_SPLIT_TIME, 0,
-                         "rec timesplit",
-                         "off,00:05,00:10,00:15,00:30,01:00,01:14,01:20,02:00,"
-                         "04:00,06:00,08:00,10:00,12:00,18:00,24:00",
-                         NULL, 16, LANG_OFF,
-                         TALK_ID(5, UNIT_MIN), TALK_ID(10, UNIT_MIN),
-                         TALK_ID(15, UNIT_MIN), TALK_ID(30, UNIT_MIN),
-                         TALK_ID(60, UNIT_MIN), TALK_ID(74, UNIT_MIN),
-                         TALK_ID(80, UNIT_MIN), TALK_ID(2, UNIT_HOUR),
-                         TALK_ID(4, UNIT_HOUR), TALK_ID(6, UNIT_HOUR),
-                         TALK_ID(8, UNIT_HOUR), TALK_ID(10, UNIT_HOUR),
-                         TALK_ID(12, UNIT_HOUR), TALK_ID(18, UNIT_HOUR),
-                         TALK_ID(20, UNIT_HOUR), TALK_ID(24, UNIT_HOUR)),
+     /* recording */
+    TABLE_SETTING(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS | F_RECSETTING,
+                  rec_timesplit,
+                  LANG_SPLIT_TIME, 0, "rec timesplit", off, UNIT_MIN,
+                  formatter_time_unit_0_is_off, getlang_time_unit_0_is_off,NULL,
+                  16, 0,5,10,15,30,60,74,80,120,240,360,480,600,720,1080,1440),
     STRINGCHOICE_SETTING(F_RECSETTING, rec_sizesplit, LANG_SPLIT_SIZE, 0,
                          "rec sizesplit",
                          "off,5MB,10MB,15MB,32MB,64MB,75MB,100MB,128MB,"
@@ -1374,9 +1400,10 @@ const struct settings_list settings[] = {
         HAVE_SPDIF_REC_(",spdif")
         HAVE_FMRADIO_REC_(",fmradio")[1],
         UNUSED},
-    INT_SETTING(F_RECSETTING, rec_prerecord_time, LANG_RECORD_PRERECORD_TIME, 0,
+    INT_SETTING(F_TIME_SETTING | F_RECSETTING, rec_prerecord_time,
+                LANG_RECORD_PRERECORD_TIME, 0,
                 "prerecording time", UNIT_SEC, 0, 30, 1,
-                formatter_unit_0_is_off, getlang_unit_0_is_off, NULL),
+                formatter_time_unit_0_is_off, getlang_time_unit_0_is_off, NULL),
 
     TEXT_SETTING(F_RECSETTING, rec_directory, "rec path",
                      REC_BASE_DIR, NULL, NULL),
@@ -1444,21 +1471,15 @@ const struct settings_list settings[] = {
         "trigger stop threshold dB", UNIT_DB, -89, 0, 1, NULL, NULL, NULL),
     INT_SETTING(F_RECSETTING, rec_stop_thres_linear, LANG_RECORD_STOP_THRESHOLD, 10,
         "trigger stop threshold linear", UNIT_PERCENT, 0, 100, 1, NULL, NULL, NULL),
-    TABLE_SETTING(F_RECSETTING, rec_start_duration, LANG_MIN_DURATION, 0,
-        "trigger start duration",
-        "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min",
-        UNIT_SEC, NULL, NULL, NULL, 13,
-        0,1,2,5,10,15,20,25,30,60,120,300,600),
-    TABLE_SETTING(F_RECSETTING, rec_stop_postrec, LANG_MIN_DURATION, 0,
-        "trigger stop duration",
-        "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min",
-        UNIT_SEC, NULL, NULL, NULL, 13,
-        0,1,2,5,10,15,20,25,30,60,120,300,600),
-    TABLE_SETTING(F_RECSETTING, rec_stop_gap, LANG_RECORD_STOP_GAP, 1,
-        "trigger min gap",
-        "0s,1s,2s,5s,10s,15s,20s,25s,30s,1min,2min,5min,10min",
-        UNIT_SEC, NULL, NULL, NULL, 13,
-        0,1,2,5,10,15,20,25,30,60,120,300,600),
+    TABLE_SETTING_LIST(F_TIME_SETTING | F_RECSETTING, rec_start_duration,
+        LANG_MIN_DURATION, 0, "trigger start duration",
+        off, UNIT_SEC, NULL, NULL, NULL, 13, time_recording_trigger),
+    TABLE_SETTING_LIST(F_TIME_SETTING | F_RECSETTING, rec_stop_postrec,
+        LANG_MIN_DURATION, 0, "trigger stop duration",
+        off, UNIT_SEC, NULL, NULL, NULL, 13, time_recording_trigger),
+    TABLE_SETTING_LIST(F_TIME_SETTING | F_RECSETTING, rec_stop_gap,
+        LANG_RECORD_STOP_GAP, 1, "trigger min gap",
+        off, UNIT_SEC, NULL, NULL, NULL, 13, time_recording_trigger),
     CHOICE_SETTING(F_RECSETTING, rec_trigger_mode, LANG_RECORD_TRIGGER, TRIG_MODE_OFF,
        "trigger mode","off,once,repeat", NULL ,3,
        ID2P(LANG_OFF), ID2P(LANG_RECORD_TRIG_NOREARM), ID2P(LANG_REPEAT)),
@@ -1469,9 +1490,10 @@ const struct settings_list settings[] = {
 
 #ifdef HAVE_HISTOGRAM
      /* TO DO: additional restictions of following REP items? */
-    TABLE_SETTING(F_RECSETTING, histogram_interval, LANG_HISTOGRAM_INTERVAL, 0,
-        "histogram interval","0s,1s,2s,4s",
-        UNIT_SEC, NULL, NULL, NULL, 4, 0,1,2,4),
+    INT_SETTING(F_TIME_SETTING | F_RECSETTING, histogram_interval,
+        LANG_HISTOGRAM_INTERVAL, 0,
+        "histogram interval", UNIT_SEC, 0,4,1,
+        NULL, NULL, NULL),
 #endif /* HAVE_HISTOGRAM */
 
 #ifdef HAVE_SPDIF_POWER
@@ -1532,20 +1554,18 @@ const struct settings_list settings[] = {
                    NULL, 6, ID2P(LANG_OFF), ID2P(LANG_AUTOTRACKSKIP),
                    ID2P(LANG_MANTRACKSKIP), ID2P(LANG_SHUFFLE),
                    ID2P(LANG_SHUFFLE_TRACKSKIP), ID2P(LANG_ALWAYS)),
-    INT_SETTING(F_SOUNDSETTING, crossfade_fade_in_delay,
+    INT_SETTING(F_TIME_SETTING | F_SOUNDSETTING, crossfade_fade_in_delay,
                 LANG_CROSSFADE_FADE_IN_DELAY, 0,
                 "crossfade fade in delay", UNIT_SEC, 0, 7, 1, NULL, NULL, NULL),
-    INT_SETTING(F_SOUNDSETTING, crossfade_fade_out_delay,
+    INT_SETTING(F_TIME_SETTING | F_SOUNDSETTING, crossfade_fade_out_delay,
                 LANG_CROSSFADE_FADE_OUT_DELAY, 0,
                 "crossfade fade out delay", UNIT_SEC, 0, 7, 1, NULL, NULL,NULL),
-    INT_SETTING(F_SOUNDSETTING, crossfade_fade_in_duration,
+    INT_SETTING(F_TIME_SETTING | F_SOUNDSETTING, crossfade_fade_in_duration,
                 LANG_CROSSFADE_FADE_IN_DURATION, 2,
-                "crossfade fade in duration", UNIT_SEC, 0, 15, 1, NULL, NULL,
-                NULL),
-    INT_SETTING(F_SOUNDSETTING, crossfade_fade_out_duration,
+                "crossfade fade in duration", UNIT_SEC, 0, 15, 1, NULL, NULL, NULL),
+    INT_SETTING(F_TIME_SETTING | F_SOUNDSETTING, crossfade_fade_out_duration,
                 LANG_CROSSFADE_FADE_OUT_DURATION, 2,
-                "crossfade fade out duration", UNIT_SEC, 0, 15, 1, NULL, NULL,
-                NULL),
+                "crossfade fade out duration", UNIT_SEC, 0, 15, 1, NULL, NULL, NULL),
     CHOICE_SETTING(F_SOUNDSETTING, crossfade_fade_out_mixmode,
                    LANG_CROSSFADE_FADE_OUT_MODE, 0,
                    "crossfade fade out mode", "crossfade,mix", NULL, 2,
@@ -1697,9 +1717,10 @@ const struct settings_list settings[] = {
     OFFON_SETTING(F_SOUNDSETTING, dithering_enabled, LANG_DITHERING, false,
                   "dithering enabled", dsp_dither_enable),
     /* surround */
-    TABLE_SETTING(F_SOUNDSETTING, surround_enabled,
-                  LANG_SURROUND, 0, "surround enabled", "off",
-                  UNIT_MS, formatter_unit_0_is_off, getlang_unit_0_is_off,
+     TABLE_SETTING(F_TIME_SETTING | F_SOUNDSETTING, surround_enabled,
+                  LANG_SURROUND, 0, "surround enabled", off,
+                  UNIT_MS, formatter_time_unit_0_is_off,
+                  getlang_time_unit_0_is_off,
                   dsp_surround_enable, 6,
                   0,5,8,10,15,30),
     INT_SETTING_NOWRAP(F_SOUNDSETTING, surround_balance,
@@ -1760,11 +1781,13 @@ const struct settings_list settings[] = {
                    LANG_COMPRESSOR_KNEE, 1, "compressor knee",
                    "hard knee,soft knee", compressor_set, 2,
                    ID2P(LANG_COMPRESSOR_HARD_KNEE), ID2P(LANG_COMPRESSOR_SOFT_KNEE)),
-    INT_SETTING_NOWRAP(F_SOUNDSETTING, compressor_settings.attack_time,
+    INT_SETTING_NOWRAP(F_TIME_SETTING | F_SOUNDSETTING,
+                       compressor_settings.attack_time,
                        LANG_COMPRESSOR_ATTACK, 5,
                        "compressor attack time", UNIT_MS, 0, 30,
                        5, NULL, NULL, compressor_set),
-    INT_SETTING_NOWRAP(F_SOUNDSETTING, compressor_settings.release_time,
+    INT_SETTING_NOWRAP(F_TIME_SETTING | F_SOUNDSETTING,
+                       compressor_settings.release_time,
                        LANG_COMPRESSOR_RELEASE, 500,
                        "compressor release time", UNIT_MS, 100, 1000,
                        100, NULL, NULL, compressor_set),
@@ -1831,16 +1854,12 @@ const struct settings_list settings[] = {
 #endif
 
 #ifdef HAVE_LCD_SLEEP_SETTING
-    STRINGCHOICE_SETTING(0, lcd_sleep_after_backlight_off,
-                         LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF, 3,
-                         "lcd sleep after backlight off",
-                         "always,never,5,10,15,20,30,45,60,90",
-                         lcd_set_sleep_after_backlight_off, 10,
-                         LANG_ALWAYS, LANG_NEVER, TALK_ID(5, UNIT_SEC),
-                         TALK_ID(10, UNIT_SEC), TALK_ID(15, UNIT_SEC),
-                         TALK_ID(20, UNIT_SEC), TALK_ID(30, UNIT_SEC),
-                         TALK_ID(45, UNIT_SEC),TALK_ID(60, UNIT_SEC),
-                         TALK_ID(90, UNIT_SEC)),
+    TABLE_SETTING_LIST(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS,
+                    lcd_sleep_after_backlight_off, LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF,
+                    5, "lcd sleep after backlight off",
+                    off_on, UNIT_SEC, formatter_time_unit_0_is_always,
+                    getlang_time_unit_0_is_always, lcd_set_sleep_after_backlight_off,
+                    23, timeout_sec_common),
 #endif /* HAVE_LCD_SLEEP_SETTING */
 #endif /* HAVE_BACKLIGHT */
 
@@ -1863,7 +1882,7 @@ const struct settings_list settings[] = {
     {F_T_INT,&global_settings.rec_agc_maxgain_line,-1,INT(96),
         "agc maximum line gain",NULL,UNUSED},
     {F_T_INT,&global_settings.rec_agc_cliptime,LANG_RECORDING_AGC_CLIPTIME,
-        INT(1),"agc cliptime","0.2s,0.4s,0.6s,0.8,1s",UNUSED},
+        INT(1),"agc cliptime","0.2 s,0.4 s,0.6 s,0.8 s,1 s",UNUSED},
 #endif
 
 #ifdef HAVE_REMOTE_LCD
@@ -1884,9 +1903,9 @@ const struct settings_list settings[] = {
                   LANG_HEADPHONE_UNPLUG_DISABLE_AUTORESUME, false,
                   "disable autoresume if phones not present",NULL),
 #endif
-    INT_SETTING(0, pause_rewind, LANG_PAUSE_REWIND, 0,
-                "rewind duration on pause", UNIT_SEC, 0, 15, 1, NULL, NULL,
-                NULL),
+    INT_SETTING(F_TIME_SETTING, pause_rewind, LANG_PAUSE_REWIND, 0,
+                "rewind duration on pause", UNIT_SEC, 0, 15, 1,
+                formatter_time_unit_0_is_off, getlang_time_unit_0_is_off, NULL),
 #if CONFIG_TUNER
     CHOICE_SETTING(0, fm_region, LANG_FM_REGION, 0,
                    "fm_region", "eu,us,jp,kr,it,wo", set_radio_region, 6,
@@ -1945,12 +1964,12 @@ const struct settings_list settings[] = {
 #endif
     OFFON_SETTING(F_BANFROMQS,cuesheet,LANG_CUESHEET_ENABLE,false,"cuesheet support",
                   NULL),
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, skip_length,
+    TABLE_SETTING_LIST(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS, skip_length,
                   LANG_SKIP_LENGTH, 0, "skip length",
-                  "outro,track,1s,2s,3s,5s,7s,10s,15s,20s,30s,45s,1min,90s,2min,3min,5min,10min,15min",
-                  UNIT_SEC, formatter_unit_0_is_skip_track,
-                  getlang_unit_0_is_skip_track, NULL,
-                  19, -1,0,1,2,3,5,7,10,15,20,30,45,60,90,120,180,300,600,900),
+                  "outro,track",
+                  UNIT_SEC, formatter_time_unit_0_is_skip_track,
+                  getlang_time_unit_0_is_skip_track, NULL,
+                  25, timeout_sec_common),
     CHOICE_SETTING(0, start_in_screen, LANG_START_SCREEN, 1,
                    "start in screen", "previous,root,files,"
 #ifdef HAVE_TAGCACHE
@@ -2025,11 +2044,12 @@ const struct settings_list settings[] = {
                      THEME_DIR "/", ".colours"),
 #endif
 #ifdef HAVE_BUTTON_LIGHT
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, buttonlight_timeout,
-                  LANG_BUTTONLIGHT_TIMEOUT, 5, "button light timeout", off_on,
-                  UNIT_SEC, backlight_formatter, backlight_getlang,
-                  buttonlight_set_timeout, 20,
-                  -1,0,1,2,3,4,5,6,7,8,9,10,15,20,25,30,45,60,90,120),
+    TABLE_SETTING_LIST(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS,
+                    buttonlight_timeout, LANG_BUTTONLIGHT_TIMEOUT,
+                    DEFAULT_BACKLIGHT_TIMEOUT, "button light timeout",
+                    off_on, UNIT_SEC, formatter_time_unit_0_is_always,
+                    getlang_time_unit_0_is_always, buttonlight_set_timeout,
+                    23, timeout_sec_common),
 #endif
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
     INT_SETTING(F_NO_WRAP, buttonlight_brightness, LANG_BUTTONLIGHT_BRIGHTNESS,
@@ -2039,9 +2059,9 @@ const struct settings_list settings[] = {
                 buttonlight_set_brightness),
 #endif
 #ifndef HAVE_WHEEL_ACCELERATION
-    INT_SETTING(0, list_accel_start_delay, LANG_LISTACCEL_START_DELAY,
+    INT_SETTING(F_TIME_SETTING, list_accel_start_delay, LANG_LISTACCEL_START_DELAY,
                 2, "list_accel_start_delay", UNIT_SEC, 0, 10, 1,
-                formatter_unit_0_is_off, getlang_unit_0_is_off, NULL),
+                formatter_time_unit_0_is_off, getlang_time_unit_0_is_off, NULL),
     INT_SETTING(0, list_accel_wait, LANG_LISTACCEL_ACCEL_SPEED,
                 3, "list_accel_wait", UNIT_SEC, 1, 10, 1,
                 scanaccel_formatter, getlang_unit_0_is_off, NULL),
@@ -2068,9 +2088,9 @@ const struct settings_list settings[] = {
 #endif /* CONFIG_CODEC == SWCODEC */
     TEXT_SETTING(0, playlist_catalog_dir, "playlist catalog directory",
                      PLAYLIST_CATALOG_DEFAULT_DIR, NULL, NULL),
-    INT_SETTING(0, sleeptimer_duration, LANG_SLEEP_TIMER_DURATION, 30,
-                "sleeptimer duration",
-                UNIT_MIN, 5, 300, 5, NULL, NULL, NULL),
+    INT_SETTING(F_TIME_SETTING, sleeptimer_duration, LANG_SLEEP_TIMER_DURATION,
+                30, "sleeptimer duration", UNIT_MIN, 5, 300, 5,
+                NULL, NULL, NULL),
     OFFON_SETTING(0, sleeptimer_on_startup, LANG_SLEEP_TIMER_ON_POWER_UP, false,
                   "sleeptimer on startup", NULL),
     OFFON_SETTING(0, keypress_restarts_sleeptimer, LANG_KEYPRESS_RESTARTS_SLEEP_TIMER, false,
@@ -2211,9 +2231,9 @@ const struct settings_list settings[] = {
 #endif
 
 #if CONFIG_CODEC == SWCODEC
-    INT_SETTING(0, resume_rewind, LANG_RESUME_REWIND, 0,
+    INT_SETTING(F_TIME_SETTING, resume_rewind, LANG_RESUME_REWIND, 0,
                 "resume rewind", UNIT_SEC, 0, 60, 5,
-                NULL, NULL, NULL),
+                formatter_time_unit_0_is_off, getlang_time_unit_0_is_off, NULL),
 #endif
    CUSTOM_SETTING(0, root_menu_customized,
                   LANG_ROCKBOX_TITLE, /* lang string here is never actually used */

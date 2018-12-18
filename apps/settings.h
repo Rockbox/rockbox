@@ -396,11 +396,7 @@ struct user_settings
     bool rec_editable; /* true means that the bit reservoir is off */
 
     /* note: timesplit setting is not saved */
-    int rec_timesplit; /* 0 = off,
-                          1 = 00:05, 2 = 00:10, 3 = 00:15, 4 = 00:30
-                          5 = 01:00, 6 = 02:00, 7 = 04:00, 8 = 06:00
-                          9 = 08:00, 10= 10:00, 11= 12:00, 12= 18:00,
-                          13= 24:00 */
+    int rec_timesplit;  /* IN MINUTES 0 = off */
     int rec_sizesplit; /* 0 = off,
                           1 = 5MB, 2 = 10MB, 3 = 15MB, 4 = 32MB
                           5 = 64MB, 6 = 75MB, 7 = 100MB, 8 = 128MB

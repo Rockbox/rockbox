@@ -97,10 +97,10 @@ static unsigned short pm_db_min = 0;      /* minimum of range in 1/100 dB */
 static unsigned short pm_db_max = 9000;   /* maximum of range in 1/100 dB */
 static unsigned short pm_db_range = 9000; /* range width in 1/100 dB */
 /* Timing behaviour */
-static int pm_peak_hold = 1;          /* peak hold timeout index */
-static int pm_peak_release = 8;       /* peak release in units per read */
-static int pm_clip_hold = 16;         /* clip hold timeout index */
-static bool pm_clip_eternal = false;  /* true if clip timeout is disabled */
+static int pm_peak_hold     = HZ / 5;  /* peak hold timeout ticks */
+static int pm_peak_release  = 8;       /* peak release in units per read */
+static int pm_clip_hold     = HZ * 60; /* clip hold timeout ticks */
+static bool pm_clip_eternal = false;   /* true if clip timeout is disabled */
 
 #ifdef HAVE_RECORDING
 static unsigned short trig_strt_threshold;
@@ -171,22 +171,6 @@ static int history_pos = 0;
 
 static void peak_meter_draw(struct screen *display, struct meter_scales *meter_scales,
                             int x, int y, int width, int height);
-
-/* time out values for max */
-static const short peak_time_out[] = {
-    0 * HZ, HZ / 5, 30, HZ / 2, HZ, 2 * HZ, 
-    3 * HZ, 4 * HZ, 5 * HZ, 6 * HZ, 7 * HZ, 8 * HZ,
-    9 * HZ, 10 * HZ, 15 * HZ, 20 * HZ, 30 * HZ, 60 * HZ
-};
-
-/* time out values for clip */
-static const long clip_time_out[] = {
-    0 * HZ, 1  * HZ, 2 * HZ, 3 * HZ, 4 * HZ, 5 * HZ, 
-    6 * HZ, 7 * HZ, 8 * HZ, 9 * HZ, 10 * HZ, 15 * HZ,
-    20 * HZ, 25 * HZ, 30 * HZ, 45 * HZ, 60 * HZ, 90 * HZ,
-    120 * HZ, 180 * HZ, 300 * HZ, 600L * HZ, 1200L * HZ,
-    2700L * HZ, 5400L * HZ
-};
 
 /* precalculated peak values that represent magical
    dBfs values. Used to draw the scale */
@@ -522,18 +506,16 @@ void peak_meter_init_range( bool dbfs, int range_min, int range_max)
  * Initialize the peak meter with all relevant values concerning times.
  * @param int release - Set the maximum amount of pixels the meter is allowed
  *                      to decrease with each redraw
- * @param int hold - Select the time preset for the time the peak indicator 
- *                   is reset after a peak occurred. The preset values are 
- *                   stored in peak_time_out.
- * @param int clip_hold - Select the time preset for the time the peak 
- *                        indicator is reset after a peak occurred. The preset 
- *                        values are stored in clip_time_out.
+ * @param int hold_ms - Select the time in ms for the time the peak indicator
+ *                      is reset after a peak occurred.
+ * @param int clip_hold_sec - Select the time in seconds for the time the peak
+ *                            indicator is reset after a peak occurred.
  */
-void peak_meter_init_times(int release, int hold, int clip_hold) 
+void peak_meter_init_times(int release, int hold_ms, int clip_hold_sec)
 {
-    pm_peak_hold = hold;
+    pm_peak_hold = hold_ms/(1000UL/HZ); /* convert ms to ticks */
     pm_peak_release = release;
-    pm_clip_hold = clip_hold;
+    pm_clip_hold = HZ * clip_hold_sec;
 }
 
 #ifdef HAVE_RECORDING
@@ -657,8 +639,7 @@ void peak_meter_peek(void)
         (left == MAX_PEAK - 1)) {
 #endif
         pm_clip_left = true;
-        pm_clip_timeout_l = 
-            current_tick + clip_time_out[pm_clip_hold];
+        pm_clip_timeout_l = current_tick + pm_clip_hold;
     }
 
 #if CONFIG_CODEC == SWCODEC
@@ -668,8 +649,7 @@ void peak_meter_peek(void)
         (right == MAX_PEAK - 1)) {
 #endif
         pm_clip_right = true;
-        pm_clip_timeout_r = 
-            current_tick + clip_time_out[pm_clip_hold];
+        pm_clip_timeout_r = current_tick + pm_clip_hold;
     }
 
 #ifdef HAVE_RECORDING
@@ -1099,14 +1079,12 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
         /* check for new max values */
         if (left > scales->pm_peak_left) {
             scales->pm_peak_left = left - 1;
-            scales->pm_peak_timeout_l =
-                current_tick + peak_time_out[pm_peak_hold];
+            scales->pm_peak_timeout_l = current_tick + pm_peak_hold;
         }
 
         if (right > scales->pm_peak_right) {
             scales->pm_peak_right = right - 1;
-            scales->pm_peak_timeout_r = 
-                current_tick + peak_time_out[pm_peak_hold];
+            scales->pm_peak_timeout_r = current_tick + pm_peak_hold;
         }
     }
 

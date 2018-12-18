@@ -2697,19 +2697,19 @@
 </phrase>
 <phrase>
   id: LANG_NEVER
-  desc: in lcd settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: ""
   </source>
   <dest>
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: ""
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: ""
   </voice>
 </phrase>
 <phrase>
@@ -13785,5 +13785,19 @@
   </dest>
   <voice>
     *: "No viewers found"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG__NEVER
+  desc: in lcd settings
+  user: core
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Never"
+  </dest>
+  <voice>
+    *: "Never"
   </voice>
 </phrase>

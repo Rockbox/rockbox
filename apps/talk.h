@@ -131,6 +131,9 @@ void talk_time(const struct tm *tm, bool enqueue);
 void talk_date(const struct tm *tm, bool enqueue);
 #endif /* CONFIG_RTC */
 
+/* speaks hr, min, sec, ms; unit_idx is lowest or base unit of the time value */
+int talk_time_intervals(long time, int unit_idx, bool enqueue);
+
 /* This (otherwise invalid) ID signals the end of the array. */
 #define TALK_FINAL_ID LANG_LAST_INDEX_IN_ARRAY
 

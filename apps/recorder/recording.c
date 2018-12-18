@@ -78,34 +78,6 @@
 #include "appevents.h"
 
 #ifdef HAVE_RECORDING
-/* This array holds the record timer interval lengths, in minutes */
-static const unsigned short rec_timer_minutes[] =
-{
-    0,     /* 0 means OFF */
-    5,     /* 00:05 */
-    10,    /* 00:10 */
-    15,    /* 00:15 */
-    30,    /* 00:30 */
-    60,    /* 01:00 */
-    74,    /* 01:14 */
-    80,    /* 01:20 */
-    2*60,  /* 02:00 */
-    4*60,  /* 04:00 */
-    6*60,  /* 06:00 */
-    8*60,  /* 08:00 */
-    10*60, /* 10:00 */
-    12*60, /* 12:00 */
-    18*60, /* 18:00 */
-    24*60  /* 24:00 */
-};
-
-static unsigned int rec_timesplit_seconds(void)
-{
-    unsigned long tm_min = rec_timer_minutes[global_settings.rec_timesplit];
-    unsigned long tm_sec = tm_min * 60;
-    return tm_sec;
-}
-
 /* This array holds the record size interval lengths, in mebibytes */
 static const unsigned short rec_size_mbytes[] =
 {
@@ -1003,8 +975,8 @@ bool recording_screen(bool no_source)
     int audio_stat = 0;         /* status of the audio system */
     int last_audio_stat = -1;   /* previous status so we can act on changes */
     struct viewport vp_list[NB_SCREENS], vp_top[NB_SCREENS]; /* the viewports */
-    const long split_seconds = rec_timesplit_seconds();
-    const long split_bytes = rec_sizesplit_bytes();
+    const unsigned long split_seconds = (unsigned) global_settings.rec_timesplit;
+    const unsigned long split_bytes = rec_sizesplit_bytes();
 
 #if CONFIG_CODEC == SWCODEC
     int warning_counter = 0;

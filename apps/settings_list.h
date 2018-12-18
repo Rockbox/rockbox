@@ -135,6 +135,7 @@ struct custom_setting {
     void (*set_default)(void* setting, void* defaultval);
 };
 
+#define F_TIME_SETTING  0x10000 /* int,table format hh:mm:ss.mss auto ranged */
 #define F_THEMESETTING  0x0800000
 #define F_RECSETTING    0x1000000
 #define F_EQSETTING     0x2000000
