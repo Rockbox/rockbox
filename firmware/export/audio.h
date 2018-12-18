@@ -69,7 +69,7 @@ struct mp3entry* audio_current_track(void);
 struct mp3entry* audio_next_track(void);
 bool audio_peek_track(struct mp3entry* id3, int offset);
 #ifdef HAVE_DISK_STORAGE
-void audio_set_buffer_margin(int setting);
+void audio_set_buffer_margin(int seconds);
 #endif
 void audio_error_clear(void);
 int audio_get_file_pos(void);
