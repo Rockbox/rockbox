@@ -137,7 +137,7 @@ static const char* tree_get_filename(int selected_item, void *data,
     {
         struct entry *entry = tree_get_entry_at(local_tc, selected_item);
         if (!entry)
-            panicf("Invalid tree entry");
+            panicf("Invalid tree entry %s", __func__);
         name = entry->name;
         attr = entry->attr;
     }
@@ -181,7 +181,7 @@ static int tree_get_filecolor(int selected_item, void * data)
     struct tree_context * local_tc=(struct tree_context *)data;
     struct entry *entry = tree_get_entry_at(local_tc, selected_item);
     if (!entry)
-        panicf("Invalid tree entry");
+        panicf("Invalid tree entry %s", __func__);
 
     return filetype_get_color(entry->name, entry->attr);
 }
@@ -200,7 +200,7 @@ static enum themable_icons tree_get_fileicon(int selected_item, void * data)
     {
         struct entry *entry = tree_get_entry_at(local_tc, selected_item);
         if (!entry)
-            panicf("Invalid tree entry");
+            panicf("Invalid tree entry %s", __func__);
 
         return filetype_get_icon(entry->attr);
     }
@@ -225,7 +225,7 @@ static int tree_voice_cb(int selected_item, void * data)
     {
         struct entry *entry = tree_get_entry_at(local_tc, selected_item);
         if (!entry)
-            panicf("Invalid tree entry");
+            panicf("Invalid tree entry %s", __func__);
 
         name = entry->name;
         attr = entry->attr;
@@ -689,20 +689,20 @@ static int dirbrowse(void)
                 /* nothing to do if no files to display */
                 if ( numentries == 0 )
                     break;
-
-                struct entry *entry = tree_get_entry_at(&tc, tc.selected_item);
-                if (!entry)
-                    panicf("Invalid tree entry");
-
-                short attr = entry->attr;
-                if ((tc.browse->flags & BROWSE_SELECTONLY) &&
-                    !(attr & ATTR_DIRECTORY))
+                if (tc.browse->flags & BROWSE_SELECTONLY)
                 {
-                    tc.browse->flags |= BROWSE_SELECTED;
-                    get_current_file(tc.browse->buf, tc.browse->bufsize);
-                    return GO_TO_PREVIOUS;
-                }
+                    struct entry *entry = tree_get_entry_at(&tc, tc.selected_item);
+                    if (!entry)
+                        panicf("Invalid tree entry %s", __func__);
 
+                    short attr = entry->attr;
+                    if(!(attr & ATTR_DIRECTORY))
+                    {
+                        tc.browse->flags |= BROWSE_SELECTED;
+                        get_current_file(tc.browse->buf, tc.browse->bufsize);
+                        return GO_TO_PREVIOUS;
+                    }
+                }
 #ifdef HAVE_TAGCACHE
                 switch (id3db?tagtree_enter(&tc):ft_enter(&tc))
 #else
@@ -823,7 +823,7 @@ static int dirbrowse(void)
                     {
                         struct entry *entry = tree_get_entry_at(&tc, tc.selected_item);
                         if (!entry)
-                            panicf("Invalid tree entry");
+                            panicf("Invalid tree entry %s", __func__);
 
                         attr = entry->attr;
 
