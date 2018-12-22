@@ -379,24 +379,6 @@ static int32_t list_pad_getlang(int value, int unit)
 }
 #endif
 
-static const char* formatter_unit_0_is_off(char *buffer, size_t buffer_size,
-                                    int val, const char *unit)
-{
-    if (val == 0)
-        return str(LANG_OFF);
-    else
-        snprintf(buffer, buffer_size, "%d %s", val, unit);
-    return buffer;
-}
-
-static int32_t getlang_unit_0_is_off(int value, int unit)
-{
-    if (value == 0)
-        return LANG_OFF;
-    else
-        return TALK_ID(value,unit);
-}
-
 static const char* formatter_time_unit_0_is_off(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
 {
@@ -495,6 +477,25 @@ static const char* scanaccel_formatter(char *buffer, size_t buffer_size,
 #endif
 
 #if CONFIG_CODEC == SWCODEC
+
+static const char* formatter_unit_0_is_off(char *buffer, size_t buffer_size,
+                                    int val, const char *unit)
+{
+    if (val == 0)
+        return str(LANG_OFF);
+    else
+        snprintf(buffer, buffer_size, "%d %s", val, unit);
+    return buffer;
+}
+
+static int32_t getlang_unit_0_is_off(int value, int unit)
+{
+    if (value == 0)
+        return LANG_OFF;
+    else
+        return TALK_ID(value,unit);
+}
+
 static void crossfeed_cross_set(int val)
 {
    (void)val;
@@ -1158,7 +1159,7 @@ const struct settings_list settings[] = {
 #if defined(HAVE_BACKLIGHT_FADING_INT_SETTING)
     TABLE_SETTING_LIST(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS, backlight_fade_in,
                   LANG_BACKLIGHT_FADE_IN, 300, "backlight fade in", "off",
-                  UNIT_MS, formatter_time_unit_0_is_off, getlang_unit_0_is_off,
+                  UNIT_MS, formatter_time_unit_0_is_off, getlang_time_unit_0_is_off,
                   backlight_set_fade_in, 7, backlight_fade),
     TABLE_SETTING_LIST(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS, backlight_fade_out,
                   LANG_BACKLIGHT_FADE_OUT, 2000, "backlight fade out", "off",
@@ -1791,7 +1792,8 @@ const struct settings_list settings[] = {
                        LANG_COMPRESSOR_RELEASE, 500,
                        "compressor release time", UNIT_MS, 100, 1000,
                        100, NULL, NULL, compressor_set),
-#endif
+#endif /* CONFIG_CODEC == SWCODEC */
+
 #ifdef AUDIOHW_HAVE_BASS_CUTOFF
     SOUND_SETTING(F_NO_WRAP, bass_cutoff, LANG_BASS_CUTOFF,
                   "bass cutoff", SOUND_BASS_CUTOFF),
@@ -2064,7 +2066,7 @@ const struct settings_list settings[] = {
                 formatter_time_unit_0_is_off, getlang_time_unit_0_is_off, NULL),
     INT_SETTING(0, list_accel_wait, LANG_LISTACCEL_ACCEL_SPEED,
                 3, "list_accel_wait", UNIT_SEC, 1, 10, 1,
-                scanaccel_formatter, getlang_unit_0_is_off, NULL),
+                scanaccel_formatter, NULL, NULL),
 #endif /* HAVE_WHEEL_ACCELERATION */
 #if CONFIG_CODEC == SWCODEC
     /* keyclick */
