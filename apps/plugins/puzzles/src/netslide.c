@@ -77,14 +77,14 @@ enum {
 struct game_params {
     int width;
     int height;
-    int wrapping;
+    bool wrapping;
     float barrier_probability;
     int movetarget;
 };
 
 struct game_state {
-    int width, height, cx, cy, wrapping, completed;
-    int used_solve;
+    int width, height, cx, cy, completed;
+    bool wrapping, used_solve;
     int move_count, movetarget;
 
     /* position (row or col number, starting at 0) of last move. */
@@ -150,7 +150,7 @@ static game_params *default_params(void)
 
     ret->width = 3;
     ret->height = 3;
-    ret->wrapping = FALSE;
+    ret->wrapping = false;
     ret->barrier_probability = 1.0;
     ret->movetarget = 0;
 
@@ -159,24 +159,24 @@ static game_params *default_params(void)
 
 static const struct { int x, y, wrap, bprob; const char* desc; }
 netslide_presets[] = {
-    {3, 3, FALSE, 1, " easy"},
-    {3, 3, FALSE, 0, " medium"},
-    {3, 3, TRUE,  0, " hard"},
-    {4, 4, FALSE, 1, " easy"},
-    {4, 4, FALSE, 0, " medium"},
-    {4, 4, TRUE,  0, " hard"},
-    {5, 5, FALSE, 1, " easy"},
-    {5, 5, FALSE, 0, " medium"},
-    {5, 5, TRUE,  0, " hard"},
+    {3, 3, false, 1, " easy"},
+    {3, 3, false, 0, " medium"},
+    {3, 3, true,  0, " hard"},
+    {4, 4, false, 1, " easy"},
+    {4, 4, false, 0, " medium"},
+    {4, 4, true,  0, " hard"},
+    {5, 5, false, 1, " easy"},
+    {5, 5, false, 0, " medium"},
+    {5, 5, true,  0, " hard"},
 };
 
-static int game_fetch_preset(int i, char **name, game_params **params)
+static bool game_fetch_preset(int i, char **name, game_params **params)
 {
     game_params *ret;
     char str[80];
 
     if (i < 0 || i >= lenof(netslide_presets))
-        return FALSE;
+        return false;
 
     ret = snew(game_params);
     ret->width = netslide_presets[i].x;
@@ -189,7 +189,7 @@ static int game_fetch_preset(int i, char **name, game_params **params)
 
     *name = dupstr(str);
     *params = ret;
-    return TRUE;
+    return true;
 }
 
 static void free_params(game_params *params)
@@ -208,7 +208,7 @@ static void decode_params(game_params *ret, char const *string)
 {
     char const *p = string;
 
-    ret->wrapping = FALSE;
+    ret->wrapping = false;
     ret->barrier_probability = 0.0;
     ret->movetarget = 0;
 
@@ -218,7 +218,8 @@ static void decode_params(game_params *ret, char const *string)
         p++;
         ret->height = atoi(p);
         while (*p && isdigit((unsigned char)*p)) p++;
-        if ( (ret->wrapping = (*p == 'w')) != 0 )
+        ret->wrapping = (*p == 'w');
+        if (ret->wrapping)
             p++;
         if (*p == 'b') {
             ret->barrier_probability = (float)atof(++p);
@@ -232,7 +233,7 @@ static void decode_params(game_params *ret, char const *string)
     }
 }
 
-static char *encode_params(const game_params *params, int full)
+static char *encode_params(const game_params *params, bool full)
 {
     char ret[400];
     int len;
@@ -305,7 +306,7 @@ static game_params *custom_params(const config_item *cfg)
     return ret;
 }
 
-static const char *validate_params(const game_params *params, int full)
+static const char *validate_params(const game_params *params, bool full)
 {
     if (params->width <= 1 || params->height <= 1)
 	return "Width and height must both be greater than one";
@@ -323,7 +324,7 @@ static const char *validate_params(const game_params *params, int full)
  */
 
 static char *new_game_desc(const game_params *params, random_state *rs,
-			   char **aux, int interactive)
+			   char **aux, bool interactive)
 {
     tree234 *possibilities, *barriertree;
     int w, h, x, y, cx, cy, nbarriers;
@@ -744,7 +745,7 @@ static game_state *new_game(midend *me, const game_params *params,
     state->wrapping = params->wrapping;
     state->movetarget = params->movetarget;
     state->completed = 0;
-    state->used_solve = FALSE;
+    state->used_solve = false;
     state->move_count = 0;
     state->last_move_row = -1;
     state->last_move_col = -1;
@@ -811,25 +812,25 @@ static game_state *new_game(midend *me, const game_params *params,
             for (dir = 1; dir < 0x10; dir <<= 1) {
                 int dir2 = A(dir);
                 int x1, y1, x2, y2, x3, y3;
-                int corner = FALSE;
+                bool corner = false;
 
                 if (!(barrier(state, x, y) & dir))
                     continue;
 
                 if (barrier(state, x, y) & dir2)
-                    corner = TRUE;
+                    corner = true;
 
                 x1 = x + X(dir), y1 = y + Y(dir);
                 if (x1 >= 0 && x1 < state->width &&
                     y1 >= 0 && y1 < state->height &&
                     (barrier(state, x1, y1) & dir2))
-                    corner = TRUE;
+                    corner = true;
 
                 x2 = x + X(dir2), y2 = y + Y(dir2);
                 if (x2 >= 0 && x2 < state->width &&
                     y2 >= 0 && y2 < state->height &&
                     (barrier(state, x2, y2) & dir))
-                    corner = TRUE;
+                    corner = true;
 
                 if (corner) {
                     barrier(state, x, y) |= (dir << 4);
@@ -894,9 +895,9 @@ static char *solve_game(const game_state *state, const game_state *currstate,
     return dupstr(aux);
 }
 
-static int game_can_format_as_text_now(const game_params *params)
+static bool game_can_format_as_text_now(const game_params *params)
 {
-    return TRUE;
+    return true;
 }
 
 static char *game_text_format(const game_state *state)
@@ -972,7 +973,7 @@ static unsigned char *compute_active(const game_state *state,
 
 struct game_ui {
     int cur_x, cur_y;
-    int cur_visible;
+    bool cur_visible;
 };
 
 static game_ui *new_ui(const game_state *state)
@@ -980,7 +981,7 @@ static game_ui *new_ui(const game_state *state)
     game_ui *ui = snew(game_ui);
     ui->cur_x = 0;
     ui->cur_y = -1;
-    ui->cur_visible = FALSE;
+    ui->cur_visible = false;
 
     return ui;
 }
@@ -1047,7 +1048,7 @@ static void game_changed_state(game_ui *ui, const game_state *oldstate,
 }
 
 struct game_drawstate {
-    int started;
+    bool started;
     int width, height;
     int tilesize;
     unsigned char *visible;
@@ -1076,21 +1077,21 @@ static char *interpret_move(const game_state *state, game_ui *ui,
             } while (ui->cur_x == state->cx || ui->cur_y == state->cy);
         }
 
-        ui->cur_visible = 1;
+        ui->cur_visible = true;
         return UI_UPDATE;
     }
 
     if (button == LEFT_BUTTON || button == RIGHT_BUTTON) {
         cx = (x - (BORDER + WINDOW_OFFSET + TILE_BORDER) + 2*TILE_SIZE) / TILE_SIZE - 2;
         cy = (y - (BORDER + WINDOW_OFFSET + TILE_BORDER) + 2*TILE_SIZE) / TILE_SIZE - 2;
-        ui->cur_visible = 0;
+        ui->cur_visible = false;
     } else if (IS_CURSOR_SELECT(button)) {
         if (ui->cur_visible) {
             cx = ui->cur_x;
             cy = ui->cur_y;
         } else {
             /* 'click' when cursor is invisible just makes cursor visible. */
-            ui->cur_visible = 1;
+            ui->cur_visible = true;
             return UI_UPDATE;
         }
     } else
@@ -1130,7 +1131,8 @@ static char *interpret_move(const game_state *state, game_ui *ui,
 static game_state *execute_move(const game_state *from, const char *move)
 {
     game_state *ret;
-    int c, d, col;
+    int c, d;
+    bool col;
 
     if ((move[0] == 'C' || move[0] == 'R') &&
 	sscanf(move+1, "%d,%d", &c, &d) == 2 &&
@@ -1140,7 +1142,7 @@ static game_state *execute_move(const game_state *from, const char *move)
 	       strlen(move) == from->width * from->height + 1) {
 	int i;
 	ret = dup_game(from);
-	ret->used_solve = TRUE;
+	ret->used_solve = true;
 	ret->completed = ret->move_count = 1;
 
 	for (i = 0; i < from->width * from->height; i++) {
@@ -1179,12 +1181,12 @@ static game_state *execute_move(const game_state *from, const char *move)
     if (!ret->completed) {
 	unsigned char *active = compute_active(ret, -1, -1);
 	int x1, y1;
-	int complete = TRUE;
+        bool complete = true;
 
 	for (x1 = 0; x1 < ret->width; x1++)
 	    for (y1 = 0; y1 < ret->height; y1++)
 		if (!index(ret, active, x1, y1)) {
-		    complete = FALSE;
+		    complete = false;
 		    goto break_label;  /* break out of two loops at once */
 		}
 	break_label:
@@ -1206,7 +1208,7 @@ static game_drawstate *game_new_drawstate(drawing *dr, const game_state *state)
 {
     game_drawstate *ds = snew(game_drawstate);
 
-    ds->started = FALSE;
+    ds->started = false;
     ds->width = state->width;
     ds->height = state->height;
     ds->visible = snewn(state->width * state->height, unsigned char);
@@ -1535,7 +1537,7 @@ static void draw_tile_barriers(drawing *dr, game_drawstate *ds,
 }
 
 static void draw_arrow(drawing *dr, game_drawstate *ds,
-                       int x, int y, int xdx, int xdy, int cur)
+                       int x, int y, int xdx, int xdy, bool cur)
 {
     int coords[14];
     int ydy = -xdx, ydx = xdy;
@@ -1559,7 +1561,7 @@ static void draw_arrow(drawing *dr, game_drawstate *ds,
 }
 
 static void draw_arrow_for_cursor(drawing *dr, game_drawstate *ds,
-                                  int cur_x, int cur_y, int cur)
+                                  int cur_x, int cur_y, bool cur)
 {
     if (cur_x == -1 && cur_y == -1)
         return; /* 'no cursur here */
@@ -1598,7 +1600,7 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
     if (!ds->started) {
         int phase;
 
-        ds->started = TRUE;
+        ds->started = true;
 
         draw_rect(dr, 0, 0, 
                   BORDER * 2 + WINDOW_OFFSET * 2 + TILE_SIZE * state->width + TILE_BORDER,
@@ -1646,13 +1648,13 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
          */
         for (x = 0; x < ds->width; x++) {
             if (x == state->cx) continue;
-            draw_arrow(dr, ds, x, 0, +1, 0, 0);
-            draw_arrow(dr, ds, x+1, ds->height, -1, 0, 0);
+            draw_arrow(dr, ds, x, 0, +1, 0, false);
+            draw_arrow(dr, ds, x+1, ds->height, -1, 0, false);
         }
         for (y = 0; y < ds->height; y++) {
             if (y == state->cy) continue;
-            draw_arrow(dr, ds, ds->width, y, 0, +1, 0);
-            draw_arrow(dr, ds, 0, y+1, 0, -1, 0);
+            draw_arrow(dr, ds, ds->width, y, 0, +1, false);
+            draw_arrow(dr, ds, 0, y+1, 0, -1, false);
         }
     }
     if (ui->cur_visible) {
@@ -1662,8 +1664,8 @@ static void game_redraw(drawing *dr, game_drawstate *ds,
         /* Cursor has changed; redraw two (prev and curr) arrows. */
         assert(cur_x != state->cx && cur_y != state->cy);
 
-        draw_arrow_for_cursor(dr, ds, cur_x, cur_y, 1);
-        draw_arrow_for_cursor(dr, ds, ds->cur_x, ds->cur_y, 0);
+        draw_arrow_for_cursor(dr, ds, cur_x, cur_y, true);
+        draw_arrow_for_cursor(dr, ds, ds->cur_x, ds->cur_y, false);
         ds->cur_x = cur_x; ds->cur_y = cur_y;
     }
 
@@ -1833,9 +1835,9 @@ static int game_status(const game_state *state)
     return state->completed ? +1 : 0;
 }
 
-static int game_timing_state(const game_state *state, game_ui *ui)
+static bool game_timing_state(const game_state *state, game_ui *ui)
 {
-    return FALSE;
+    return false;
 }
 
 static void game_print_size(const game_params *params, float *x, float *y)
@@ -1858,15 +1860,15 @@ const struct game thegame = {
     encode_params,
     free_params,
     dup_params,
-    TRUE, game_configure, custom_params,
+    true, game_configure, custom_params,
     validate_params,
     new_game_desc,
     validate_desc,
     new_game,
     dup_game,
     free_game,
-    TRUE, solve_game,
-    FALSE, game_can_format_as_text_now, game_text_format,
+    true, solve_game,
+    false, game_can_format_as_text_now, game_text_format,
     new_ui,
     free_ui,
     encode_ui,
@@ -1883,9 +1885,9 @@ const struct game thegame = {
     game_anim_length,
     game_flash_length,
     game_status,
-    FALSE, FALSE, game_print_size, game_print,
-    TRUE,			       /* wants_statusbar */
-    FALSE, game_timing_state,
+    false, false, game_print_size, game_print,
+    true,			       /* wants_statusbar */
+    false, game_timing_state,
     0,				       /* flags */
 };
 

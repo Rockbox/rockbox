@@ -1661,7 +1661,7 @@ static int process_input(int tmo, bool do_pausemenu)
         int new_x = mouse_x, new_y = mouse_y;
 
         /* in src/misc.c */
-        move_cursor(state, &new_x, &new_y, LCD_WIDTH, LCD_HEIGHT, FALSE);
+        move_cursor(state, &new_x, &new_y, LCD_WIDTH, LCD_HEIGHT, false);
 
         int dx = new_x - mouse_x, dy = new_y - mouse_y;
 
@@ -1902,7 +1902,7 @@ static void zoom(void)
     zoom_clipl = 0;
     zoom_clipr = zoom_w;
 
-    midend_size(me, &zoom_w, &zoom_h, TRUE);
+    midend_size(me, &zoom_w, &zoom_h, true);
 
     /* Allocating the framebuffer will mostly likely grab the
      * audiobuffer, which will make impossible to load new fonts, and
@@ -2828,7 +2828,7 @@ static void fix_size(void)
     rb->lcd_setfont(cur_font = FONT_UI);
     rb->lcd_getstringsize("X", NULL, &h_x);
     h -= h_x;
-    midend_size(me, &w, &h, TRUE);
+    midend_size(me, &w, &h, true);
 }
 
 static void init_tlsf(void)
