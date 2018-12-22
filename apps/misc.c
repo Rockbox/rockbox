@@ -1111,7 +1111,8 @@ char* skip_whitespace(char* const str)
 
     return s;
 }
-#ifndef CHECKWPS
+
+#if !defined(CHECKWPS) && !defined(DBTOOL)
 /*  time_split_units()
     split time values depending on base unit
     unit_idx: UNIT_HOUR, UNIT_MIN, UNIT_SEC, UNIT_MS
@@ -1337,7 +1338,8 @@ void format_time(char* buf, int buf_size, long t)
              t < 0, "-", units_in[UNIT_IDX_HR], hashours, ":",
              hashours+1, units_in[UNIT_IDX_MIN], units_in[UNIT_IDX_SEC]);
 }
-#endif /* !defined(CHECKWPS) */
+#endif /* !defined(CHECKWPS) && !defined(DBTOOL)*/
+
 /**
  * Splits str at each occurence of split_char and puts the substrings into vector,
  * but at most vector_lenght items. Empty substrings are ignored.
