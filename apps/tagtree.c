@@ -1627,6 +1627,9 @@ static int load_root(struct tree_context *c)
     if (menu == NULL)
         return 0;
 
+    if (menu->itemcount > c->cache.max_entries)
+            panicf("%s tree_cache too small", __func__);
+
     for (i = 0; i < menu->itemcount; i++)
     {
         dptr->name = menu->items[i]->name;
