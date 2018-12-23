@@ -63,4 +63,5 @@ metadata/vorbis.c
 metadata/vox.c
 metadata/wave.c
 metadata/wavpack.c
+metadata/aac.c
 #endif

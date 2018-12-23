@@ -42,6 +42,7 @@ vgm.c
 #if MEMORYSIZE > 2
 kss.c
 #endif
+aac_bsf.c
 
 #ifdef HAVE_RECORDING
 

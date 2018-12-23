@@ -90,6 +90,7 @@ enum
     AFMT_VGM,         /* VGM (Video Game Music Format) */
     AFMT_KSS,          /* KSS (MSX computer KSS Music File) */
     AFMT_OPUS,         /* Opus (see http://www.opus-codec.org ) */
+    AFMT_AAC_BSF,
 #endif
 
     /* add new formats at any index above this line to have a sensible order -

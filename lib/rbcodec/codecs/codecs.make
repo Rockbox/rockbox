@@ -181,6 +181,7 @@ $(CODECDIR)/sgc.codec : $(CODECDIR)/libsgc.a $(CODECDIR)/libemu2413.a
 $(CODECDIR)/vgm.codec : $(CODECDIR)/libvgm.a $(CODECDIR)/libemu2413.a
 $(CODECDIR)/kss.codec : $(CODECDIR)/libkss.a $(CODECDIR)/libemu2413.a
 $(CODECDIR)/opus.codec : $(CODECDIR)/libopus.a $(TLSFLIB)
+$(CODECDIR)/aac_bsf.codec : $(CODECDIR)/libfaad.a
 
 $(CODECS): $(CODEC_LIBS) # this must be last in codec dependency list
 

@@ -235,6 +235,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* Opus */
     [AFMT_OPUS] =
         AFMT_ENTRY("Opus", "opus", NULL, get_ogg_metadata,   "opus\0"),
+    /* AAC bitstream format */
+    [AFMT_AAC_BSF] =
+        AFMT_ENTRY("AAC", "aac_bsf", NULL, get_aac_metadata,   "aac\0"),
 #endif
 };
 
