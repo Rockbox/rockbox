@@ -157,7 +157,7 @@
     *: "Otevírám... %d%% hotovo (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Otevírám"
   </voice>
 </phrase>
 <phrase>
@@ -256,6 +256,7 @@
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
+    creativezen*: "Select = Yes"
   </source>
   <dest>
   *: "PLAY = Ano"
@@ -265,6 +266,7 @@
     mrobe500: "PLAY, POWER, nebo vpravo nahoře = Ano"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Ano"
+    creativezen*: "Select = Ano"
   </dest>
   <voice>
     *: ""
@@ -444,7 +446,7 @@
     *: "Pluginy"
   </dest>
   <voice>
-    *: "Plaginy, neozvučené"
+    *: "Plaginy"
   </voice>
 </phrase>
 <phrase>
@@ -1173,19 +1175,22 @@
 </phrase>
 <phrase>
   id: LANG_DITHERING
-  desc: in the sound settings menu
+  desc: in the sound settings and some other menus
   user: core
   <source>
     *: none
     swcodec: "Dithering"
+    lcd_bitmap: "Dithering"
   </source>
   <dest>
     *: none
     swcodec: "Kolísání"
+    lcd_bitmap: "Kolísání"
   </dest>
   <voice>
     *: none
     swcodec: "Kolísání"
+    : "Kolísání"
   </voice>
 </phrase>
 <phrase>
@@ -2594,7 +2599,7 @@
   </dest>
   <voice>
     *: "První stisk klávesy pouze zapne podsvícení"
-  </voice>
+ </voice>
 </phrase>
 <phrase>
   id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
@@ -4246,7 +4251,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Červenec"
+    rtc: "ćervenec"
   </voice>
 </phrase>
 <phrase>
@@ -4436,6 +4441,23 @@
   <voice>
     *: none
     alarm: "Budík"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_TIMER
+  desc: in alarm menu setting
+  user: core
+  <source>
+    *: none
+    alarm: "Alarm Timer"
+  </source>
+  <dest>
+    *: none
+    alarm: "Časovač alarmu"
+  </dest>
+  <voice>
+    *: none
+    alarm: "Časovač alarmu"
   </voice>
 </phrase>
 <phrase>
@@ -5706,8 +5728,8 @@
   </source>
   <dest>
     *: none
-    recording: "Mikrofon"
-    iriverh100,iriverh120,iriverh300: "Interní mikrofon"
+    recording: "Mikrofón"
+    iriverh100,iriverh120,iriverh300: "Interní mikrofón"
   </dest>
   <voice>
     *: none
@@ -5968,6 +5990,23 @@
   <voice>
     *: none
     recording: "Nelze zapsat do složky pro nahrávání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR
+  desc: used in the info screen to show a recording dir
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Adresář pro nahrávání"
+  </dest>
+  <voice>
+    *: none
+    recording: "Adresář pro nahrávání"
   </voice>
 </phrase>
 <phrase>
@@ -7129,7 +7168,7 @@
     *: "Zobrazit informace o skladbě"
   </dest>
   <voice>
-    *: "Zobrazit informace o skladbě, neozvučené"
+    *: "Zobrazit informace o skladbě"
   </voice>
 </phrase>
 <phrase>
@@ -7143,7 +7182,7 @@
     *: "Název"
   </dest>
   <voice>
-    *: ""
+    *: "Název"
   </voice>
 </phrase>
 <phrase>
@@ -7157,7 +7196,7 @@
     *: "Autor"
   </dest>
   <voice>
-    *: ""
+    *: "Autor"
   </voice>
 </phrase>
 <phrase>
@@ -7171,7 +7210,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -7185,7 +7224,7 @@
     *: "Č.skladby"
   </dest>
   <voice>
-    *: ""
+    *: "Číslo skladby"
   </voice>
 </phrase>
 <phrase>
@@ -7199,7 +7238,7 @@
     *: "Žánr"
   </dest>
   <voice>
-    *: ""
+    *: "Žánr"
   </voice>
 </phrase>
 <phrase>
@@ -7213,7 +7252,7 @@
     *: "Rok"
   </dest>
   <voice>
-    *: ""
+    *: "Rok"
   </voice>
 </phrase>
 <phrase>
@@ -7227,7 +7266,7 @@
     *: "Délka"
   </dest>
   <voice>
-    *: ""
+    *: "Délka"
   </voice>
 </phrase>
 <phrase>
@@ -7241,7 +7280,7 @@
     *: "Playlist"
   </dest>
   <voice>
-    *: ""
+    *: "Plejlist"
   </voice>
 </phrase>
 <phrase>
@@ -7255,7 +7294,7 @@
     *: "Datový tok"
   </dest>
   <voice>
-    *: ""
+    *: "Datový tok"
   </voice>
 </phrase>
 <phrase>
@@ -7269,7 +7308,7 @@
     *: "Autor alba"
   </dest>
   <voice>
-    *: ""
+    *: "Autor alba"
   </voice>
 </phrase>
 <phrase>
@@ -7283,7 +7322,7 @@
     *: "Č.disku"
   </dest>
   <voice>
-    *: ""
+    *: "Číslo disku"
   </voice>
 </phrase>
 <phrase>
@@ -7297,7 +7336,7 @@
     *: "Komentář"
   </dest>
   <voice>
-    *: ""
+    *: "Komentář"
   </voice>
 </phrase>
 <phrase>
@@ -7311,7 +7350,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "vé bé er"
   </voice>
 </phrase>
 <phrase>
@@ -7325,7 +7364,7 @@
     *: "Frekvence"
   </dest>
   <voice>
-    *: ""
+    *: "Frekvence"
   </voice>
 </phrase>
 <phrase>
@@ -7339,7 +7378,7 @@
     *: "Zesílení skladby"
   </dest>
   <voice>
-    *: ""
+    *: "Zesílení skladby"
   </voice>
 </phrase>
 <phrase>
@@ -7353,7 +7392,7 @@
     *: "Zesílení alba"
   </dest>
   <voice>
-    *: ""
+    *: "Zesílení alba"
   </voice>
 </phrase>
 <phrase>
@@ -7367,7 +7406,7 @@
     *: "Cesta"
   </dest>
   <voice>
-    *: ""
+    *: "Cesta"
   </voice>
 </phrase>
 <phrase>
@@ -7381,7 +7420,7 @@
     *: "<Bez informace>"
   </dest>
   <voice>
-    *: ""
+    *: "Bez informace"
   </voice>
 </phrase>
 <phrase>
@@ -7642,7 +7681,7 @@
     *: "Vlastnosti"
   </dest>
   <voice>
-    *: "Vlastnosti, neozvučené"
+    *: "Vlastnosti"
   </voice>
 </phrase>
 <phrase>
@@ -7674,6 +7713,57 @@
   <voice>
     *: none
     pitchscreen: "Rychlost"
+ </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_ABSOLUTE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Absolutní režim"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_SEMITONE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Půltónový režim"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_TIMESTRETCH_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Časový úsek"
   </voice>
 </phrase>
 <phrase>
@@ -10047,7 +10137,7 @@
     *: "Dílo"
   </dest>
   <voice>
-    *: ""
+    *: "Dílo"
   </voice>
 </phrase>
 <phrase>
@@ -10994,11 +11084,11 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono mod"
+    recording_swcodec: "Mono mód"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono mod"
+    recording_swcodec: "Mono mód"
   </voice>
 </phrase>
 <phrase>
@@ -11968,7 +12058,7 @@
   <voice>
     *: none
     morse_input: "Používat vstup morseovkou"
-  </voice>
+</voice>
 </phrase>
 <phrase>
   id: LANG_AUTOTRACKSKIP
@@ -12273,15 +12363,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Regulace tónu"
+    gigabeats,samsungypr1: "Regulace tónu"
   </dest>
   <voice>
     *: none
-    gigabeats: "Regulace tónu"
+    gigabeats,samsungypr1: "Regulace tónu"
   </voice>
 </phrase>
 <phrase>
@@ -12290,15 +12380,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Pokročilé nastavení regulace tónu"
+    gigabeats,samsungypr1: "Pokročilé nastavení regulace tónu"
   </dest>
   <voice>
     *: none
-    gigabeats: "Pokročilé nastavení regulace tónu"
+    gigabeats,samsungypr1: "Pokročilé nastavení regulace tónu"
   </voice>
 </phrase>
 <phrase>
@@ -12307,15 +12397,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Rozsah zesílení %d"
+    gigabeats,samsungypr1: "Rozsah zesílení %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Rozsah zesílení"
+    gigabeats,samsungypr1: "Rozsah zesílení"
   </voice>
 </phrase>
 <phrase>
@@ -12324,15 +12414,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Rozsah frekvence %d"
+    gigabeats,samsungypr1: "Rozsah frekvence %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Rozsah frekvence"
+    gigabeats,samsungypr1: "Rozsah frekvence"
   </voice>
 </phrase>
 <phrase>
@@ -12341,15 +12431,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Rozsah šířky %d"
+    gigabeats,samsungypr1: "Rozsah šířky %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Rozsah šířky"
+    gigabeats,samsungypr1: "Rozsah šířky"
   </voice>
 </phrase>
 <phrase>
@@ -12358,15 +12448,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Zúžení"
+    gigabeats,samsungypr1: "Zúžení"
   </dest>
   <voice>
     *: none
-    gigabeats: "Zúžení"
+    gigabeats,samsungypr1: "Zúžení"
   </voice>
 </phrase>
 <phrase>
@@ -12375,15 +12465,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Rozšíření"
+    gigabeats,samsungypr1: "Rozšíření"
   </dest>
   <voice>
     *: none
-    gigabeats: "Rozšíření"
+    gigabeats,samsungypr1: "Rozšíření"
   </voice>
 </phrase>
 <phrase>
@@ -12392,15 +12482,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D vylepšení"
+    depth_3d: "3-D vylepšení"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "TŘIDÉ vylepšení"
+    depth_3d: "TŘIDÉ vylepšení"
   </voice>
 </phrase>
 <phrase>
@@ -12445,7 +12535,7 @@
     *: "Skladatel"
   </dest>
   <voice>
-    *: ""
+    *: "Skladatel"
   </voice>
 </phrase>
 <phrase>
@@ -12750,11 +12840,11 @@
   </source>
   <dest>
     *: none
-    multidrive_usb: "Skrýt interní pamět přes USB"
+    multidrive_usb: "Skrýt interní paměť přes USB"
   </dest>
   <voice>
     *: none
-    multidrive_usb: "Skrýt interní pamět přes ÚESBÉ"
+    multidrive_usb: "Skrýt interní paměť přes ÚESBÉ"
   </voice>
 </phrase>
 <phrase>
@@ -13039,5 +13129,1984 @@
   </dest>
   <voice>
     *: "Vybrat adresáře pro prohledávání"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NOW_PLAYING
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Nyní hraje"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TRACK_TO_MOVE
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Další stopa"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEUED
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Ve frontě"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAD_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Špatná stopa"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MOVING_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Skladba v pohybu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist elapsed: %s / %s %ld%%"
+  </source>
+  <dest>
+    *: "Uplynulo z playlistu: %s / %s %ld%%"
+  </dest>
+  <voice>
+    *: "Uplynulo z plejlistu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track elapsed: %s / %s %ld%%"
+  </source>
+  <dest>
+    *: "Uplynulo ze skladby: %s / %s %ld%%"
+  </dest>
+  <voice>
+    *: "Uplynulo ze skladby"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist remaining: %s"
+  </source>
+  <dest>
+    *: "Zbývá z playlistu: %s"
+  </dest>
+  <voice>
+    *: "Zbývá z plejlistu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track remaining: %s"
+  </source>
+  <dest>
+    *: "Zbývá ze skladby: %s"
+  </dest>
+  <voice>
+    *: "Zbývá ze skladby"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRACK
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track %d / %d %d%%"
+  </source>
+  <dest>
+    *: "Skladba %d / %d %d%%"
+  </dest>
+  <voice>
+    *: "Skladba"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_STORAGE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Storage: %s (done %s, remaining %s)"
+  </source>
+  <dest>
+    *: "Úložistě: %s (dokončeno %s, zbývá %s)"
+  </dest>
+  <voice>
+    *: "Úložistě"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYTIME_DONE
+  desc: playing time screen
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Dokončeno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_TRACK_SIZE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average track size: %s"
+  </source>
+  <dest>
+    *: "Průměrná velikost skladby: %s"
+  </dest>
+  <voice>
+    *: "Průměrná velikost skladby"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_BITRATE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average bitrate: %ld kbps"
+  </source>
+  <dest>
+    *: "Průměrný bitrate: %ld kbps"
+  </dest>
+  <voice>
+    *: "Průměrný bytrejt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ERROR
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Error while gathering info"
+  </source>
+  <dest>
+    *: "Chyba při shromažďování informací"
+  </dest>
+  <voice>
+    *: "Chyba při shromažďování informací"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_TIME
+  desc: onplay menu
+  user: core
+  <source>
+    *: "Playing time"
+  </source>
+  <dest>
+    *: "Doba přehrávání"
+  </dest>
+  <voice>
+    *: "Doba přehrávání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
+  desc: Save only one bookmark for a playlist in recent bookmarks
+  user: core
+  <source>
+    *: "One per playlist"
+  </source>
+  <dest>
+    *: "Jedna na playlist"
+  </dest>
+  <voice>
+    *: "Jedna na playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
+  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
+  user: core
+  <source>
+    *: "One per track"
+  </source>
+  <dest>
+    *: "Jedna na skladbu"
+  </dest>
+  <voice>
+    *: "Jedna na skladbu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKONLY
+  desc: used in track x of y constructs
+  user: core
+  <source>
+    *: none
+    hotkey: "Track"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Skladba"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Skladba"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICEINFO
+  desc: progressively voice information on the wps hotkey
+  user: core
+  <source>
+    *: none
+    hotkey: "Announce Information"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Oznámování informací"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Oznámování informací"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ELAPSED
+  desc: prefix for elapsed playtime announcement
+  user: core
+  <source>
+    *: none
+    hotkey: "Elapsed"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Uplynulo"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Uplynulo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS_ANNOUNCEMENT_FORMAT
+  desc: format for wps hotkey announcement
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Announcement"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Oznamované informace v přehrávací obrazovce"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Oznamované informace v přehrávací obrazovce"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAINING
+  desc: for constructs such as number of tracks remaining etc
+  user: core
+  <source>
+    *: none
+    hotkey: "Remaining"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Zbývá"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Zbývá"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATE
+  desc: for constructing time and date announcements
+  user: core
+  <source>
+    *: none
+    hotkey: "Date"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Datum"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Datum"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_BETWEEN_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Pause between tracks"
+  </source>
+  <dest>
+    *: "Pauza mezi skladbami"
+  </dest>
+  <voice>
+    *: "Pauza mezi skladbami"
+ </voice>
+</phrase>
+<phrase>
+  id: LANG_BTN_LONG_PRESS_DURATION
+  desc: Long button press duration in ticks
+  user: core
+  <source>
+    *: "Long Button Press Duration"
+  </source>
+  <dest>
+    *: "Doba pro dlouhý stisk klávesy"
+  </dest>
+  <voice>
+    *: "Doba pro dlouhý stisk klávesy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Remote Control"
+  </source>
+  <dest>
+    *: "Dálkové ovládání"
+  </dest>
+  <voice>
+    *: "Dálkové ovládání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_REM_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "No Rem. Control"
+  </source>
+  <dest>
+    *: "Bez dálkového ovládání"
+  </dest>
+  <voice>
+    *: "Bez dálkového ovládání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OUT_OF_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Out of Control"
+  </source>
+  <dest>
+    *: "Bez ovládání"
+  </dest>
+  <voice>
+    *: "Bez ovládání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_2_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "2 Key Control"
+  </source>
+  <dest>
+    *: "Dvoutlačítkové ovládání"
+  </dest>
+  <voice>
+    *: "Dvoutlačítkové ovládání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_4_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "4 Key Control"
+  </source>
+  <dest>
+    *: "Čtyřtlačítkové ovládání"
+  </dest>
+  <voice>
+    *: "Čtyřtlačítkové ovládání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_WORMLET
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Play Wormlet!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Hrát Wormlet!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Hrát Wormlet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_WORMS
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Number of Worms"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Počet červů"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Počet červů"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_GROWTH_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Worm Growth Per Food"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Růst červa podle jídla"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Růst červa podle jídla"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_SPEED
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Worm Speed"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Rychlost červa"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Rychlost červa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGHS_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Arghs Per Food"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Hněv podle jídla"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Hněv podle jídla"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGH_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Argh Size"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Velikost hněvu"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Velikost hněvu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOOD_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Food Size"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Velikost jídla"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Velikost jídla"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_PLAYERS
+  desc: For game menus
+  user: core
+  <source>
+    *: "Number of Players"
+  </source>
+  <dest>
+    *: "Počet hráčů"
+  </dest>
+  <voice>
+    *: "Počet hráčů"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTROL_STYLE
+  desc: In various menus
+  user: core
+  <source>
+    *: "Control Style"
+  </source>
+  <dest>
+    *: "Styl ovládání"
+  </dest>
+  <voice>
+    *: "Styl ovládání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERT_TO_DEFAULT_SETTINGS
+  desc: In various menus
+  user: core
+  <source>
+    *: "Revert to Default Settings"
+  </source>
+  <dest>
+    *: "Vrátit se na výchozí nastavení"
+  </dest>
+  <voice>
+    *: "Vrátit se na výchozí nastavení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_CHECKMATE
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Checkmate!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Šachmat !"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Šachmat"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_ILLEGAL_MOVE
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Illegal move!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Nedovolený tah !"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Nedovolený tah"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_NEW_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "New Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Nová hra"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Nová hra"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESUME_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Resume Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Pozastavit hru"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Pozastavit hru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SAVE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Save Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Uložit hru"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Uložit hru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTORE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Restore Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Obnovit hru"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Obnovit hru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_VIEW_GAMES
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "View Played Games"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Zobrazit již hrané hry"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Zobrazit již hrané hry"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTART_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Restart Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Restartovat hru"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Restartovat hru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SELECT_OTHER_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Select Other Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Zvolit jinou hru"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Zvolit jinou hru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_1
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 1: 60 moves / 5 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Úroveň 1: 60 tahů / 5 minut"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Úroveň 1, 60 tahů za 5 minut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_2
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 2: 60 moves / 15 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Úroveň 2: 60 tahů / 15 minut"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Úroveň 2, 60 tahů za 15 minut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_3
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 3: 60 moves / 30 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Úroveň 3: 60 tahů / 30 minut"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Úroveň 3, 60 tahů za 30 minut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_4
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 4: 40 moves / 30 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Úroveň 4: 40 tahů / 30 minut"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Úroveň 4, 40 tahů za 30 minut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_5
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 5: 40 moves / 60 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Úroveň 5: 40 tahů / 60 minut"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Úroveň 5, 40 tahů za 60 minut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_6
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 6: 40 moves / 120 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Úroveň 6: 40 tahů / 120 minut"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Úroveň 6, 40 tahů za 120 minut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_7
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 7: 40 moves / 240 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Úroveň 7: 40 tahů / 240 minut"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Úroveň 7, 40 tahů za 240 minut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_8
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 8: 1 move / 15 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Úroveň 8: 1 tah / 15 minut"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Úroveň 8, jeden tah za 15 minut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_9
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 9: 1 move / 60 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Úroveň 9: 1 tah / 60 minut"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Úroveň 9, jeden tah za 60 minut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_10
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 10: 1 move / 600 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Úroveň 10: 1 tah / 600 minut"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Úroveň 10, jeden tah za 600 minut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_PGN_PARSE_ERROR
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Error parsing game !"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Chyba při analýze hry !"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Chyba při analýze hry"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_NO_GAMES
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "No games found !"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Nenalezeny žádné hry !"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Nenalezeny žádné hry"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_BEGINNING
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "At the beginning of the game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Na začátku hry"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Na začátku hry"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_END
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "At the end of the game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Na konci hry"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Na konci hry"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYER
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Hráč"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_GNUCHESS
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Gé eN ú šachy"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MARKED
+  desc: spoken only, for announcing chess piece marking
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Označeno"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_UNMARKED
+  desc: spoken only, for announcing chess piece unmarking
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Neoznačeno"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_WHITE
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Bílý"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLACK
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Černý"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CHECK
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Šach"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CAPTURES
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "sebrání"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CASTLE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Rošáda"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_KINGSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Strana krále"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_QUEENSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Strana královny"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PAWN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Pěšec"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KNIGHT
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Jezdec"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BISHOP
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Střelec"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ROOK
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Věž"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEEN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Královna"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KING
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Král"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BATTERY_BENCH_IS_ALREADY_RUNNING
+  desc: Spoken if battery bench is already running
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Test baterie je již spuštěn"
+  </voice>
+</phrase>
+<phrase>
+id: VOICE_BAT_BENCH_KEYS
+  desc: Battery bench start up message
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Pro spuštění testu baterie stiskněte tlačítko přehrávání nebo pro jeho ukončení tlačítko stop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_VIEWERS
+  desc: text for splash to indicate that no viewers are available
+  user: core
+  <source>
+    *: "No viewers found"
+  </source>
+  <dest>
+    *: "Nenalezen žádný prohlížeč"
+  </dest>
+  <voice>
+    *: "Nenalezen žádný prohlížeč"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_QUIT
+  desc: in various menus
+  user: core
+  <source>
+    *: "Quit"
+  </source>
+  <dest>
+    *: "Konec"
+  </dest>
+  <voice>
+    *: "Konec"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_DISPLAY_OPTIONS
+  desc: in various menus
+  user: core
+  <source>
+    *: "Display Options"
+  </source>
+  <dest>
+    *: "Možnosti zobrazení"
+  </dest>
+  <voice>
+    *: "Možnosti zobrazení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_AUDIO_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Audio Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Možnosti audia"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    lowmem: none
+    swcodec: "Možnosti audia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_RESUME_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Resume Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Možnosti pokračování v přehrávání"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Možnosti pokračování v přehrávání"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_PLAY_MODE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Play Mode"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Režim přehrávání"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Režim přehrávání"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Single"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Jednou"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Jednou"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SOUND_SETTING
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Use sound setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Použít nastavení zvuku"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Použít nastavení zvuku"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTART_PLAYBACK
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Play from beginning"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Přehrávat od začátku"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Přehrávat od začátku"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_RESUME_TIME
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Set resume time (min)"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Čas pro pokračování v přehr.(min)"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Čas pro pokračování v přehrávání"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FPS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Display FPS"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Zobrazit FPS"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Zobrazit eF Pé eS"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMIT_FPS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit FPS"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limit FPS"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limit eF Pé eS"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_FRAMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Skip frames"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Přeskakovat frejmy"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Přeskakovat frejmy"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_BRIGHTNESS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Backlight brightness"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Jas podsvícení"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Jas podsvícení"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_COMMON_SETTING
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Use common setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Použít výchozí nastavení"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Použít výchozí nastavení"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TONE_CONTROLS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Tone controls"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Regulace tónu"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Regulace tónu"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Start menu"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Zapnout menu"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Zapnout menu"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONDITIONAL_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Start menu if not completed"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Pokud není dokončeno tak zapnout menu"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Pokud není dokončeno tak zapnout menu"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_RESUME
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Resume automatically"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Automatické pokračování v přehrávání"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Automatické pokračování v přehrávání"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL_RESUMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Clear all resumes"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Smazat všechny pokračování v přehrávání"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Smazat všechny pokračování v přehrávání"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNAVAILABLE
+  desc: in mpegplayer settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Unavailable"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Nedostupné"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Nedostupné"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANNOT_RESTART_PLAYBACK
+  desc: cannot restart playback splash in imageviewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Cannot restart playback"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Nelze spustit přehrávání"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Nelze spustit přehrávání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ORDERED
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Ordered"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Uspořádaný"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Uspořádaný"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFUSION
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Diffusion"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Rozházený"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Rozházený"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GRAYSCALE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Grayscale"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "V odstínech šedi"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "V odstínech šedi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_MODE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Toggle Slideshow Mode"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Přepnout na režim prezentace"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Přepnout na režim prezentace"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_TIME
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Slideshow Time"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Čas prezentace"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Čas prezentace"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RETURN
+  desc: in various plugin menus
+  user: core
+  <source>
+    *: "Return"
+  </source>
+  <dest>
+    *: "Zpět"
+  </dest>
+  <voice>
+    *: "Zpět"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Previous Track"
+  </source>
+  <dest>
+    *: "Předchozí skladba"
+  </dest>
+  <voice>
+    *: "Předchozí skladba"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYPAUSE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Pause / Play"
+  </source>
+  <dest>
+    *: "Pauza / Přehrávání"
+  </dest>
+  <voice>
+    *: "Pauza nebo přehrávání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_PLAYBACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Stop Playback"
+  </source>
+  <dest>
+    *: "Zastavit přehrávání"
+  </dest>
+  <voice>
+    *: "Zastavit přehrávání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXTTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Next Track"
+  </source>
+  <dest>
+    *: "Další skladba"
+  </dest>
+  <voice>
+    *: "Další skladba"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_VOLUME
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Volume"
+  </source>
+  <dest>
+    *: "Změnit hlasitost"
+  </dest>
+  <voice>
+    *: "Změnit hlasitost"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_SHUFFLE_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Shuffle Mode"
+  </source>
+  <dest>
+    *: "Náhodný režim"
+  </dest>
+  <voice>
+    *: "Náhodný režim"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_REPEAT_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Repeat Mode"
+  </source>
+  <dest>
+    *: "Změnit režim opakování"
+  </dest>
+  <voice>
+    *: "Změnit režim opakování"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_CONTROL
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Playback Control"
+  </source>
+  <dest>
+    *: "Ovládání přehrávání"
+  </dest>
+  <voice>
+    *: "Ovládání přehrávání"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_A_VBR_FILE
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "Not a VBR file"
+  </source>
+  <dest>
+    *: "Toto není VBR soubor"
+  </dest>
+  <voice>
+    *: "Toto není Vé Bé eR soubor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_ERROR
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "File error: %d"
+  </source>
+  <dest>
+    *: "Chyba souboru: %d"
+  </dest>
+  <voice>
+    *: "Chyba souboru"
   </voice>
 </phrase>
