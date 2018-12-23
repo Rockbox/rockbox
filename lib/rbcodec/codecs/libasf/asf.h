@@ -8,6 +8,7 @@
 #define ASF_CODEC_ID_WMAV2      0x161
 #define ASF_CODEC_ID_WMAPRO     0x162
 #define ASF_CODEC_ID_WMAVOICE   0x00A
+#define ASF_CODEC_ID_MP3        0x055
 
 enum asf_error_e {
     ASF_ERROR_INTERNAL       = -1,  /* incorrect input to API calls */
