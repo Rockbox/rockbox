@@ -516,7 +516,6 @@ int handle_radio_presets(void)
                 curr_preset = gui_synclist_get_sel_pos(&lists);
                 curr_freq = presets[curr_preset].frequency;
                 next_station(0);
-                remember_frequency();
                 result = 1;
                 break;
             case ACTION_F3:

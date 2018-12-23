@@ -333,7 +333,8 @@ void next_station(int direction)
     if (radio_status == FMRADIO_PLAYING)
         tuner_set(RADIO_MUTE, 1);
 
-    tuner_set(RADIO_FREQUENCY, curr_freq);
+    if(radio_status != FMRADIO_OFF)
+        tuner_set(RADIO_FREQUENCY, curr_freq);
 
     if (radio_status == FMRADIO_PLAYING)
         tuner_set(RADIO_MUTE, 0);
@@ -853,17 +854,19 @@ void radio_screen(void)
 
 void toggle_mono_mode(bool mono)
 {
-    tuner_set(RADIO_FORCE_MONO, mono);
+    if(radio_status != FMRADIO_OFF)
+        tuner_set(RADIO_FORCE_MONO, mono);
 }
 
 void set_radio_region(int region)
 {
 #ifdef HAVE_RADIO_REGION
-    tuner_set(RADIO_REGION, region);
+    if(radio_status != FMRADIO_OFF)
+        tuner_set(RADIO_REGION, region);
+#else
+    (void)region;
 #endif
     next_station(0);
-    remember_frequency();
-    (void)region;
 }
 
 #endif
