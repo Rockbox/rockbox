@@ -326,6 +326,9 @@ struct mp3entry {
 
     /* Musicbrainz Track ID */
     char* mb_track_id;
+
+    /* For ASF files with MP3 audio stream */
+    bool is_asf_stream;
 };
 
 unsigned int probe_file_format(const char *filename);
