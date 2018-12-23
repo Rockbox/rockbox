@@ -2138,16 +2138,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: Save only on bookmark for each playlist in recent bookmarks
+  desc: deprecated
   user: core
   <source>
-    *: "Unique only"
+    *: ""
   </source>
   <dest>
-    *: "Только уникальные"
+    *: ""
   </dest>
   <voice>
-    *: "Только уникальные"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5668,44 +5668,44 @@
 </phrase>
 <phrase>
   id: LANG_KILOBYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "KB"
+    *: ""
   </source>
   <dest>
-    *: "КБ"
+    *: ""
   </dest>
   <voice>
-    *: "Килобайт"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_MEGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "MB"
+    *: ""
   </source>
   <dest>
-    *: "МБ"
+    *: ""
   </dest>
   <voice>
-    *: "Мегабайт"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_GIGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "GB"
+    *: ""
   </source>
   <dest>
-    *: "ГБ"
+    *: ""
   </dest>
   <voice>
-    *: "Гигабайт"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8190,15 +8190,17 @@
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
+    creativezen*: "Select = Yes"
   </source>
   <dest>
     *: "ВОСПР. = Да"
     cowond2*: "МЕНЮ или прав. верх. = Да"
     iriverh100,iriverh120,iriverh300: "НАВИГ. = Да"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "ВЫБОР = Да"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "ВЫБРАТЬ = Да"
     mrobe500: "ВОСПР., ВЫКЛ или прав. верх. = Да"
     archosplayer: "(ВОСПР./СТОП)"
     vibe500: "OK = Да"
+    creativezen*: "Выбрать = Да"
   </dest>
   <voice>
     *: ""
@@ -11385,15 +11387,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Усиление %d полосы"
+    gigabeats,samsungypr1: "Полоса усиления"
   </dest>
   <voice>
     *: none
-    gigabeats: "Усиление полосы"
+    gigabeats,samsungypr1: ""
   </voice>
 </phrase>
 <phrase>
@@ -11470,15 +11472,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Ширина"
+    gigabeats,samsungypr1: "Ширина "
   </dest>
   <voice>
     *: none
-    gigabeats: "Ширина"
+    gigabeats,samsungypr1: ""
   </voice>
 </phrase>
 <phrase>
@@ -11835,15 +11837,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Узкий"
+    gigabeats,samsungypr1: "Узкость"
   </dest>
   <voice>
     *: none
-    gigabeats: "Узкий"
+    gigabeats,samsungypr1: ""
   </voice>
 </phrase>
 <phrase>
@@ -12001,15 +12003,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Доп. настройки управления тоном"
+    gigabeats,samsungypr1: "Расширенные настройки управления тоном"
   </dest>
   <voice>
     *: none
-    gigabeats: "Доп. настройки управления тоном"
+    gigabeats,samsungypr1: ""
   </voice>
 </phrase>
 <phrase>
@@ -12100,15 +12102,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Полоса %d частот"
+    gigabeats,samsungypr1: "Полоса частот"
   </dest>
   <voice>
     *: none
-    gigabeats: "Полоса частот"
+    gigabeats,samsungypr1: ""
   </voice>
 </phrase>
 <phrase>
@@ -12117,15 +12119,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Ширина %d полосы"
+    gigabeats,samsungypr1: "Полоса ширины"
   </dest>
   <voice>
     *: none
-    gigabeats: "Ширина полосы"
+    gigabeats,samsungypr1: ""
   </voice>
 </phrase>
 <phrase>
@@ -12405,15 +12407,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Настройки тона"
+    gigabeats,samsungypr1: "Регуляторы тона"
   </dest>
   <voice>
     *: none
-    gigabeats: "Настройки тона"
+    gigabeats,samsungypr1: ""
   </voice>
 </phrase>
 <phrase>
@@ -13162,5 +13164,549 @@
   </dest>
   <voice>
     *: "Цифровой фильтр ЦАП"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEUED
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Queued"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "MiB"
+  </source>
+  <dest>
+    *: "MiB"
+  </dest>
+  <voice>
+    *: "mebibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "KiB"
+  </source>
+  <dest>
+    *: "KiB"
+  </dest>
+  <voice>
+    *: "kibibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Haas Surround"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Haas Surround"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Haas Surround"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
+  desc: Save only one bookmark for a playlist in recent bookmarks
+  user: core
+  <source>
+    *: "One per playlist"
+  </source>
+  <dest>
+    *: "Одна на плейлист"
+  </dest>
+  <voice>
+    *: "One per playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Выключить касания"
+  </dest>
+  <voice>
+    *: "Disable Touch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Снижение слуховой усталости"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x2)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x2)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x2)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Seek"
+  </source>
+  <dest>
+    *: "Искать"
+  </dest>
+  <voice>
+    *: "Seek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "Мертвая зона сенсора"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE
+  desc: in Settings -> General -> System -> USB Mode
+  user: core
+  <source>
+    *: none
+    ibassodx50: "USB Mode"
+    ibassodx90: "USB Mode"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Режим USB"
+    ibassodx90: "Режим USB"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "USB Mode"
+    ibassodx90: "USB Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_CHARGE
+  desc: in Settings -> General -> System -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Charge Only"
+    ibassodx90: "Charge Only"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Только зарядка"
+    ibassodx90: "Только зарядка"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Charge Only"
+    ibassodx90: "Charge Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Notify"
+  </source>
+  <dest>
+    *: "Отключить уведомление"
+  </dest>
+  <voice>
+    *: "Disable Notify"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_ADB
+  desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Отладка Android"
+    ibassodx90: "Отладка Android"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAD_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Bad track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
+  desc: in Settings -> General -> System -> Freq Scaling Governor
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_FX1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x1)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x1)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x1)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Backlight Exemptions"
+  </source>
+  <dest>
+    *: "Исключения подсветки"
+  </dest>
+  <voice>
+    *: "Backlight Exemptions"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Отключить от внешнего источника питания"
+  </dest>
+  <voice>
+    *: "Disable on External Power"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IBASSO_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> System -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Mass Storage"
+    ibassodx90: "Mass Storage"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Массовое хранилище"
+    ibassodx90: "Массовое хранилище"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Mass Storage"
+    ibassodx90: "Mass Storage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Skip"
+  </source>
+  <dest>
+    *: "Пропустить"
+  </dest>
+  <voice>
+    *: "Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_METHOD2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "SIDE ONLY"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ТОЛЬКО С ОДНОЙ СТОРОНЫ"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "SIDE ONLY"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MOVING_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Moving track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Отключить неотображенные ключи"
+  </dest>
+  <voice>
+    *: "Disable Unmapped Keys"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "GiB"
+  </source>
+  <dest>
+    *: "GiB"
+  </dest>
+  <voice>
+    *: "gibibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ENABLED
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Enabled"
+  </source>
+  <dest>
+    *: "Включено"
+  </dest>
+  <voice>
+    *: "Enabled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_VIEWERS
+  desc: text for splash to indicate that no viewers are available
+  user: core
+  <source>
+    *: "No viewers found"
+  </source>
+  <dest>
+    *: "Ничего не найдено"
+  </dest>
+  <voice>
+    *: "No viewers found"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PBE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Улучшение восприятия баса"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
+  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
+  user: core
+  <source>
+    *: "One per track"
+  </source>
+  <dest>
+    *: "Одна на трек"
+  </dest>
+  <voice>
+    *: "One per track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Расширенная блокировка клавиш"
+  </dest>
+  <voice>
+    *: "Advanced Key Lock"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Автоблокировка включена"
+  </dest>
+  <voice>
+    *: "Autolock On"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TRACK_TO_MOVE
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Track to move"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Автоблокировка выключена"
+  </dest>
+  <voice>
+    *: "Autolock Off"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SURROUND_MIX
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_PLAY
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Играть"
+  </dest>
+  <voice>
+    *: "Play"
   </voice>
 </phrase>
