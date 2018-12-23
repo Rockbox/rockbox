@@ -28,6 +28,8 @@
 # - Desu Rozen
 # - James Hunt
 # - Dmitriy Gamza
+# - Roman Levkin-Taymenev
+
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
