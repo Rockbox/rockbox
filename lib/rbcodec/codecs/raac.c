@@ -109,7 +109,8 @@ enum codec_status codec_run(void)
     if (resume_offset) {
         resume_offset -= MIN(resume_offset, rmctx.data_offset + DATA_HEADER_SIZE);
         /* put number of subpackets to skip in resume_offset */
-        resume_offset /= (rmctx.block_align + PACKET_HEADER_SIZE);
+        resume_offset /= (rmctx.block_align + PACKET_HEADER_SIZE +
+                          ((rmctx.flags & RM_PKT_V1) ? 1 : 0));
         param = (int)resume_offset * ((rmctx.block_align * 8 * 1000)/rmctx.bit_rate);
     }
 

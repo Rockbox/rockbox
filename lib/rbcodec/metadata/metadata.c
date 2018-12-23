@@ -444,13 +444,13 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
     /* Load codec specific track tag information and confirm the codec type. */
     if (!entry->parse_func)
     {
-        DEBUGF("nothing to parse for %s (format %s)", trackname, entry->label);
+        DEBUGF("nothing to parse for %s (format %s)\n", trackname, entry->label);
         return false;
     }
 
     if (!entry->parse_func(fd, id3))
     {
-        DEBUGF("parsing %s failed (format: %s)", trackname, entry->label);
+        DEBUGF("parsing %s failed (format: %s)\n", trackname, entry->label);
         return false;
     }
 

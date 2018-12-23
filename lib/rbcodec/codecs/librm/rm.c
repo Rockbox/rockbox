@@ -27,8 +27,6 @@
 #include "codeclib.h"
 #endif
 
-#define SWAP(a, b) do{uint8_t SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
-
 #ifdef TEST
 #include <fcntl.h>
 #include <unistd.h>
@@ -500,17 +498,33 @@ void rm_get_packet_fd(int fd,RMContext *rmctx, RMPacket *pkt)
 }
 #endif /*TEST*/
 
+void rm_ac3_swap_bytes(uint8_t *buf, int bufsize)
+{
+    uint8_t *bufptr;
+    for (bufptr = buf; bufptr < buf + bufsize - 1; bufptr += 2)
+    {
+        bufptr[0] ^= bufptr[1];
+        bufptr[1] ^= bufptr[0];
+        bufptr[0] ^= bufptr[1];
+    }
+}
+
 int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
 {   
     int consumed = 0;
+    int headerlen;
     /* rockbox: comment 'set but unused' variables
     uint8_t unknown;
     */
-    uint16_t x, place;
+    uint16_t x;
     uint16_t sps = rmctx->sub_packet_size;
     uint16_t h = rmctx->sub_packet_h;
-    uint16_t y = rmctx->sub_packet_cnt;
+    uint16_t y = 0;
     uint16_t w = rmctx->audio_framesize;
+
+    rmctx->sub_packet_cnt = 0;
+    rmctx->audio_pkt_cnt = 0;
+
     do
     {
         y = rmctx->sub_packet_cnt;
@@ -523,6 +537,7 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
              return -1;
         }
         
+        headerlen = PACKET_HEADER_SIZE + (pkt->version ? 1 : 0);
         pkt->length        = rm_get_uint16be(*src+2);
         pkt->stream_number = rm_get_uint16be(*src+4);
         pkt->timestamp     = rm_get_uint32be(*src+6);
@@ -534,25 +549,27 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
         pkt->flags   = rm_get_uint8(*src+11);
 
         if(pkt->version == 1)
-            /* unknown = */ rm_get_uint8(*src+10);
+            /* unknown = */ rm_get_uint8(*src+12);
 
-        if (pkt->flags & 2) /* keyframe */
-            y = rmctx->sub_packet_cnt = 0;
+        if (pkt->flags & 2) { /* keyframe */
+            if (y)
+                return consumed;
+            y = 0;
+        }
         if (!y)
             rmctx->audiotimestamp = pkt->timestamp;
-        
+
         /* Skip packet header */
-        advance_buffer(src, PACKET_HEADER_SIZE);
-        consumed += PACKET_HEADER_SIZE;
+        advance_buffer(src, headerlen);
+        consumed += headerlen;
         if (rmctx->codec_type == CODEC_COOK || rmctx->codec_type == CODEC_ATRAC) {
             for(x = 0 ; x < w/sps; x++)
             {
-                place = sps*(h*x+((h+1)/2)*(y&1)+(y>>1)); 
-                pkt->frames[place/sps] = *src;
+                pkt->frames[h*x+((h+1)/2)*(y&1)+(y>>1)] = *src;
                 advance_buffer(src,sps);
                 consumed += sps;
             }
-         }
+        }
         else if (rmctx->codec_type == CODEC_AAC) {
             rmctx->sub_packet_cnt = (rm_get_uint16be(*src) & 0xf0) >> 4;
             advance_buffer(src, 2);
@@ -563,22 +580,22 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
                     advance_buffer(src, 2);
                     consumed += 2;
                 }                
-                rmctx->audio_pkt_cnt = --rmctx->sub_packet_cnt;
+                rmctx->audio_pkt_cnt = rmctx->sub_packet_cnt;
             }
+            break;
         } 
 
         else if (rmctx->codec_type == CODEC_AC3) {
         /* The byte order of the data is reversed from standard AC3 */
-            for(x = 0; x < pkt->length - PACKET_HEADER_SIZE; x+=2) {
-                SWAP((*src)[0], (*src)[1]);
-                *src += 2;                                
-            }
-            *src -= x;
+            rm_ac3_swap_bytes(*src, pkt->length - headerlen);
+            break;
         }
+        else return -1; /* invalid codec type */
+
         rmctx->audio_pkt_cnt++;
     }while(++(rmctx->sub_packet_cnt) < h);
 
-return consumed;
+    return consumed;
 }
 
 #ifdef DEBUG
@@ -587,6 +604,6 @@ void dump_rm_context(RMContext *rmctx)
     DEBUGF("block_align = %d\n", rmctx->block_align);
     DEBUGF("nb_channels = %d\n", rmctx->nb_channels);
     DEBUGF("sample_rate = %d\n", rmctx->sample_rate);
-    DEBUGF("bit_rate    = %d\n", rmctx->bit_rate   );
+    DEBUGF("bit_rate    = %ld\n", rmctx->bit_rate   );
 }
 #endif

@@ -21,7 +21,6 @@
 
 #include <string.h>
 
-#include "logf.h"
 #include "codeclib.h"
 #include "inttypes.h"
 #include "libatrac/atrac3.h"
@@ -37,8 +36,24 @@ static void init_rm(RMContext *rmctx)
     /* initialize the RMContext */
     memcpy(rmctx, (void*)(( (intptr_t)ci->id3->id3v2buf + 3 ) &~ 3), sizeof(RMContext));
 
-    /* and atrac3 expects extadata in id3v2buf, so we shall give it that */
+    /* and atrac3 expects extradata in id3v2buf, so we shall give it that */
     memcpy(ci->id3->id3v2buf, (char*)rmctx->codec_extradata, rmctx->extradata_size*sizeof(char));
+}
+
+static int request_packet(int size)
+{
+    int consumed = 0;
+    while (1)
+    {
+        uint8_t *buffer = ci->request_buffer((size_t *)(&consumed), size);
+        if (!consumed)
+            break;
+        consumed = rm_get_packet(&buffer, &rmctx, &pkt);
+        if (consumed < 0 || consumed == size)
+            break;
+        ci->advance_buffer(size);
+    }
+    return consumed;
 }
 
 /* this is the codec entry point */
@@ -52,12 +67,10 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
 /* this is called for each file to process */
 enum codec_status codec_run(void)
 {
-    static size_t buff_size;
     int datasize, res, consumed, i, time_offset;
-    uint8_t *bit_buffer;
     uint16_t fs,sps,h;
     uint32_t packet_count;
-    int scrambling_unit_size, num_units, elapsed;
+    int spn, packet_header_size, scrambling_unit_size, num_units, elapsed;
     int playback_on = -1;
     size_t resume_offset;
     intptr_t param;
@@ -85,14 +98,17 @@ enum codec_status codec_run(void)
     ci->configure(DSP_SET_STEREO_MODE, rmctx.nb_channels == 1 ?
         STEREO_MONO : STEREO_NONINTERLEAVED);
 
+    packet_header_size = PACKET_HEADER_SIZE +
+      ((rmctx.flags & RM_PKT_V1) ? 1 : 0);
     packet_count = rmctx.nb_packets;
     rmctx.audio_framesize = rmctx.block_align;
     rmctx.block_align = rmctx.sub_packet_size;
     fs = rmctx.audio_framesize;
     sps= rmctx.block_align;
     h = rmctx.sub_packet_h;
-    scrambling_unit_size = h * (fs + PACKET_HEADER_SIZE);
-    
+    scrambling_unit_size = h * (fs + packet_header_size);
+    spn = h * fs / sps;
+
     res = atrac3_decode_init(&q, ci->id3);
     if(res < 0) {
         DEBUGF("failed to initialize RM atrac decoder\n");
@@ -102,10 +118,10 @@ enum codec_status codec_run(void)
     /* check for a mid-track resume and force a seek time accordingly */
     if(resume_offset) {
         resume_offset -= MIN(resume_offset, rmctx.data_offset + DATA_HEADER_SIZE);
-        num_units = (int)resume_offset / scrambling_unit_size;        
-        /* put number of subpackets to skip in resume_offset */
-        resume_offset /= (sps + PACKET_HEADER_SIZE);
-        elapsed = (int)resume_offset * ((sps * 8 * 1000)/rmctx.bit_rate);
+        num_units = (int)resume_offset / scrambling_unit_size;
+        /* put number of packets to skip in resume_offset */
+        resume_offset = num_units * h;
+        elapsed = (int)resume_offset * ((8000LL * fs)/rmctx.bit_rate);
     }
 
     if (elapsed > 0) {
@@ -123,8 +139,9 @@ enum codec_status codec_run(void)
 seek_start :         
     while((unsigned)elapsed < rmctx.duration)
     {  
-        bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, scrambling_unit_size);
-        consumed = rm_get_packet(&bit_buffer, &rmctx, &pkt);
+        consumed = request_packet(scrambling_unit_size);
+        if (!consumed)
+            break;
         if(consumed < 0 && playback_on != 0) {
             if(playback_on == -1) {
             /* Error only if packet-parsing failed and playback hadn't started */
@@ -135,7 +152,7 @@ seek_start :
                 return CODEC_OK;
         }
 
-        for(i = 0; i < rmctx.audio_pkt_cnt*(fs/sps) ; i++)
+        for (i = 0; i < spn; i++)
         { 
             if (action == CODEC_ACTION_NULL)
                 action = ci->get_command(&param);
@@ -164,10 +181,11 @@ seek_start :
                     action = CODEC_ACTION_NULL;
                     goto seek_start;           
                 }                                                                
-                num_units = (param/(sps*1000*8/rmctx.bit_rate))/(h*(fs/sps));                    
-                ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE + consumed * num_units);
-                bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, scrambling_unit_size);
-                consumed = rm_get_packet(&bit_buffer, &rmctx, &pkt);
+                num_units = (param/(sps*1000*8/rmctx.bit_rate))/spn;
+                ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE + scrambling_unit_size * num_units);
+                consumed = request_packet(scrambling_unit_size);
+                if (!consumed)
+                    return CODEC_OK;
                 if(consumed < 0 && playback_on != 0) {
                     if(playback_on == -1) {
                     /* Error only if packet-parsing failed and playback hadn't started */
@@ -178,19 +196,32 @@ seek_start :
                         return CODEC_OK;
                 }
 
-                packet_count = rmctx.nb_packets - rmctx.audio_pkt_cnt * num_units;
+                packet_count = rmctx.nb_packets - h * num_units;
                 rmctx.frame_number = (param/(sps*1000*8/rmctx.bit_rate)); 
-                while(rmctx.audiotimestamp > (unsigned) param) {
+                while (rmctx.audiotimestamp > (unsigned)param && num_units-- > 0) {
                     rmctx.audio_pkt_cnt = 0;
-                    ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE + consumed * (num_units-1));
-                    bit_buffer = (uint8_t *) ci->request_buffer(&buff_size, scrambling_unit_size); 
-                    consumed = rm_get_packet(&bit_buffer, &rmctx, &pkt);                                                                             
-                    packet_count += rmctx.audio_pkt_cnt;
-                    num_units--;
+                    ci->seek_buffer(rmctx.data_offset + DATA_HEADER_SIZE + scrambling_unit_size * num_units);
+                    consumed = request_packet(scrambling_unit_size);
+                    if (!consumed)
+                        return CODEC_OK;
+                    if(consumed < 0 && playback_on != 0) {
+                        if(playback_on == -1) {
+                        /* Error only if packet-parsing failed and playback hadn't started */
+                            DEBUGF("rm_get_packet failed\n");
+                            return CODEC_ERROR;
+                        }
+                        else
+                            return CODEC_OK;
+                    }
+
+                    packet_count += h;
                 }
+
+                if (num_units < 0)
+                    rmctx.audiotimestamp = 0;
                 time_offset = param - rmctx.audiotimestamp;
                 i = (time_offset/((sps * 8 * 1000)/rmctx.bit_rate));
-                elapsed = rmctx.audiotimestamp+(1000*8*sps/rmctx.bit_rate)*i;
+                elapsed = param;
                 ci->set_elapsed(elapsed);
                 ci->seek_complete(); 
             }
@@ -198,11 +229,11 @@ seek_start :
             action = CODEC_ACTION_NULL;
 
             if(pkt.length)    
-                res = atrac3_decode_frame(rmctx.block_align, &q, &datasize, pkt.frames[i], rmctx.block_align);
+                res = atrac3_decode_frame(sps, &q, &datasize, pkt.frames[i], sps);
             else /* indicates that there are no remaining frames */
                 return CODEC_OK;
 
-            if(res != rmctx.block_align) {
+            if (res != sps) {
                 DEBUGF("codec error\n");
                 return CODEC_ERROR;
             }
@@ -214,9 +245,9 @@ seek_start :
             ci->set_elapsed(elapsed);
             rmctx.frame_number++;
         }
-        packet_count -= rmctx.audio_pkt_cnt;
+        packet_count -= h;
         rmctx.audio_pkt_cnt = 0;
-        ci->advance_buffer(consumed);
+        ci->advance_buffer(scrambling_unit_size);
     }
 
     return CODEC_OK;

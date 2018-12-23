@@ -25,6 +25,9 @@
 #include <inttypes.h>
 #include "bytestream.h"
 
+#define RM_RAW_DATASTREAM 0x0100
+#define RM_PKT_V1 0x0200
+
 #define MAX_EXTRADATA_SIZE 16
 #define DATA_HEADER_SIZE 18
 #define PACKET_HEADER_SIZE 12
@@ -85,6 +88,8 @@ typedef struct rm_context
 } RMContext;
 
 int real_parse_header(int fd, RMContext *rmctx);
+
+void rm_ac3_swap_bytes(uint8_t *buf, int bufsize);
 
 /* Get a (sub_packet_h*frames_per_packet) number of audio frames from a memory buffer */
 int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt);

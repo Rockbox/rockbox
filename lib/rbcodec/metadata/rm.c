@@ -89,7 +89,7 @@ static char* fourcc2str(uint32_t f)
 }
 #endif
 
-static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
+static int real_read_audio_stream_info(int fd, RMContext *rmctx)
 {
     int skipped = 0;
     uint32_t version;
@@ -111,6 +111,7 @@ static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
     DEBUGF("    version=0x%04lx\n",((version >> 16) & 0xff));
     if (((version >> 16) & 0xff) == 3) {
         /* Very old version */
+        return -1;
     } else {
 #ifdef SIMULATOR
        real_read_object_header(fd, &obj);
@@ -218,7 +219,7 @@ static inline int real_read_audio_stream_info(int fd, RMContext *rmctx)
     return skipped;
 }
 
-static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
+static inline int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
 {
     struct real_object_t obj;
     int res;
@@ -242,6 +243,7 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
     uint32_t max_bitrate;
     uint16_t num_streams;
     uint32_t next_data_off;
+    uint16_t pkt_version;
     uint8_t  header_end;
 
     memset(&obj,0,sizeof(obj));
@@ -250,6 +252,35 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
 
     if (obj.fourcc == FOURCC('.','r','a',0xfd))
     {
+        lseek(fd, 4, SEEK_SET);
+        skipped = real_read_audio_stream_info(fd, rmctx);
+        if (skipped > 0 && rmctx->codec_type == CODEC_AC3)
+        {
+            read_uint8(fd,&len);
+            skipped += (int)read_string(fd, id3->id3v1buf[0], sizeof(id3->id3v1buf[0]), '\0', len);
+            read_uint8(fd,&len);
+            skipped += (int)read_string(fd, id3->id3v1buf[1], sizeof(id3->id3v1buf[1]), '\0', len);
+            read_uint8(fd,&len);
+            skipped += (int)read_string(fd, id3->id3v1buf[2], sizeof(id3->id3v1buf[2]), '\0', len);
+            read_uint8(fd,&len);
+            skipped += (int)read_string(fd, id3->id3v1buf[3], sizeof(id3->id3v1buf[3]), '\0', len);
+            rmctx->data_offset = skipped + 8;
+            rmctx->bit_rate = rmctx->block_align * rmctx->sample_rate / 192;
+            if (rmctx->block_align)
+                rmctx->nb_packets = (filesize(fd) - rmctx->data_offset) / rmctx->block_align;
+            if (rmctx->sample_rate)
+                rmctx->duration = (uint32_t)(256LL * 6 * 1000 * rmctx->nb_packets / rmctx->sample_rate);
+            rmctx->flags |= RM_RAW_DATASTREAM;
+
+            DEBUGF("    data_offset = %ld\n",rmctx->data_offset);
+            DEBUGF("    avg_bitrate = %ld\n",rmctx->bit_rate);
+            DEBUGF("    duration = %ld\n",rmctx->duration);
+            DEBUGF("    title=\"%s\"\n",id3->id3v1buf[0]);
+            DEBUGF("    author=\"%s\"\n",id3->id3v1buf[1]);
+            DEBUGF("    copyright=\"%s\"\n",id3->id3v1buf[2]);
+            DEBUGF("    comment=\"%s\"\n",id3->id3v1buf[3]);
+            return 0;
+        }
         /* Very old .ra format - not yet supported */
         return -1;
     } 
@@ -305,6 +336,8 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
                 DEBUGF("    data_offset = %ld\n",rmctx->data_offset);
                 DEBUGF("    num_streams = %d\n",num_streams);
                 DEBUGF("    flags=0x%04x\n",rmctx->flags);
+
+                rmctx->flags &= 0x00FF;
                 break;
 
             case FOURCC('C','O','N','T'):
@@ -409,7 +442,22 @@ static int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3)
 
                 DEBUGF("    data_nb_packets = %ld\n",rmctx->nb_packets);
                 DEBUGF("    next DATA offset = %ld\n",next_data_off);
-                header_end = 1;         
+
+                if (!next_data_off)
+                {
+                    if (rmctx->duration == 0 && rmctx->bit_rate != 0)
+                    {
+                        rmctx->duration = (uint32_t)(8000LL * rmctx->nb_packets * rmctx->block_align / rmctx->bit_rate);
+                        DEBUGF("    estimated duration = %ld\n",rmctx->duration);
+                    }
+                    read_uint16be(fd, &pkt_version);
+                    skipped += 2;
+                    DEBUGF("    pkt_version=0x%04x\n", pkt_version);
+                    if (pkt_version)
+                        rmctx->flags |= RM_PKT_V1;
+                    rmctx->data_offset = curpos;
+                    header_end = 1;
+                }
                 break; 
         }
         if(header_end) break;
@@ -456,7 +504,7 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
 
     id3->channels = rmctx->nb_channels;
     id3->extradata_size = rmctx->extradata_size;
-    id3->bitrate = rmctx->bit_rate / 1000;
+    id3->bitrate = (rmctx->bit_rate + 500) / 1000;
     id3->frequency = rmctx->sample_rate;
     id3->length = rmctx->duration;
     id3->filesize = filesize(fd);
