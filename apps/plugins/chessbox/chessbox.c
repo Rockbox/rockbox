@@ -92,6 +92,9 @@ const char *level_string[] = { "Level 1: 60 moves / 5 min" ,
 /* "While thinking" command */
 int wt_command = COMMAND_NOP;
 
+/* System event id */
+static long cb_sysevent = 0;
+
 /* ---- Get the board column and row (e2 f.e.) for a physical x y ---- */
 static void xy2cr ( short x, short y, short *c, short *r ) {
     if (computer == black ) {
@@ -189,12 +192,14 @@ static void cb_wt_callback ( void ) {
     wt_command = COMMAND_NOP;
     button = rb->button_get(false);
     switch (button) {
+        case SYS_POWEROFF:
+            cb_sysevent = button;
 #ifdef CB_RC_QUIT
         case CB_RC_QUIT:
+#endif
             wt_command = COMMAND_QUIT;
             timeout = true;
             break;
-#endif
         case CB_MENU:
             wt_command = COMMAND_MENU;
             timeout = true;
@@ -531,11 +536,13 @@ static struct cb_command cb_get_viewer_command (void) {
     while ( true ) {
         button = rb->button_get(true);
         switch (button) {
+            case SYS_POWEROFF:
+                cb_sysevent = button;
 #ifdef CB_RC_QUIT
             case CB_RC_QUIT:
+#endif
                 result.type = COMMAND_QUIT;
                 return result;
-#endif
 #ifdef CB_RESTART
             case CB_RESTART:
                 result.type = COMMAND_RESTART;
@@ -764,11 +771,13 @@ static struct cb_command cb_getcommand (void) {
     while ( true ) {
         button = rb->button_get(true);
         switch (button) {
+            case SYS_POWEROFF:
+                cb_sysevent = button;
 #ifdef CB_RC_QUIT
             case CB_RC_QUIT:
+#endif
                 result.type = COMMAND_QUIT;
                 return result;
-#endif
 #ifdef CB_RESTART
             case CB_RESTART:
                 result.type = COMMAND_RESTART;
@@ -1058,6 +1067,7 @@ enum plugin_status plugin_start(const void* parameter) {
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
+    cb_sysevent = 0;
 
     /* end of plugin init */
 
@@ -1069,6 +1079,9 @@ enum plugin_status plugin_start(const void* parameter) {
      } else {
         cb_play_game();
     }
+
+    if (cb_sysevent)
+        rb->default_event_handler(cb_sysevent);
 
     return PLUGIN_OK;
 }
