@@ -152,7 +152,7 @@ $(CODECLINK_LDS): $(CODEC_LDS) $(CONFIGFILE)
 
 # codec/library dependencies
 $(CODECDIR)/spc.codec : $(CODECDIR)/libspc.a
-$(CODECDIR)/mpa.codec : $(CODECDIR)/libmad.a
+$(CODECDIR)/mpa.codec : $(CODECDIR)/libmad.a $(CODECDIR)/libasf.a
 $(CODECDIR)/a52.codec : $(CODECDIR)/liba52.a
 $(CODECDIR)/flac.codec : $(CODECDIR)/libffmpegFLAC.a
 $(CODECDIR)/vorbis.codec : $(CODECDIR)/libtremor.a $(TLSFLIB) $(SETJMPLIB)
