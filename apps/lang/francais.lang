@@ -13422,3 +13422,171 @@
     ibassodx90: "Mode USB"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Seek"
+  </source>
+  <dest>
+    *: "Chercher"
+  </dest>
+  <voice>
+    *: "Chercher"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_PLAY
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Jouer"
+  </dest>
+  <voice>
+    *: "Jouer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Désactiver l'écran tactile"
+  </dest>
+  <voice>
+    *: "Désactiver l'écran Tactile"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Autoblocage désactivé"
+  </dest>
+  <voice>
+    *: "autoblocage désactivé"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Notify"
+  </source>
+  <dest>
+    *: "Désactiver les notifications"
+  </dest>
+  <voice>
+    *: "Désactiver les notifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Désactiver sur alimentation externe"
+  </dest>
+  <voice>
+    *: "Désactiver sur alimentation externe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Clef avancée de verrouillage"
+  </dest>
+  <voice>
+    *: "Clef avancée de verrouillage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Backlight Exemptions"
+  </source>
+  <dest>
+    *: "Exceptions de rétroéclairage"
+  </dest>
+  <voice>
+    *: "Exceptions de rétroéclairage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Désactiver les touches non assignées"
+  </dest>
+  <voice>
+    *: "Désactiver les touches non assignées"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Skip"
+  </source>
+  <dest>
+    *: "Passer"
+  </dest>
+  <voice>
+    *: "Passer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Autoblocage activé"
+  </dest>
+  <voice>
+    *: "Autoblocage activé"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ENABLED
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Enabled"
+  </source>
+  <dest>
+    *: "Activé"
+  </dest>
+  <voice>
+    *: "Désactivé"
+  </voice>
+</phrase>
