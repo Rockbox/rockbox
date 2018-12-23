@@ -184,6 +184,14 @@ sub voicestring {
         print("> $cmd\n") if $verbose;
         system($cmd);
     }
+    elsif ($name eq 'rbspeak') {
+        # xxx: $tts_engine_opts isn't used
+        $cmd = "rbspeak $output";
+        print("> $cmd\n") if $verbose;
+        open(RBSPEAK, "| $cmd");
+        print RBSPEAK $string . "\n";
+        close(RBSPEAK);
+    }
 }
 
 # trim leading / trailing silence from the clip

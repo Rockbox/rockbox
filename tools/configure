@@ -1119,6 +1119,14 @@ voiceconfig () {
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="w"
     fi
+    if [ -n "`findtool rbspeak`" ]; then
+        RBSPEAK="(O)ther "
+        RBSPEAK_OPTS=""
+        DEFAULT_TTS="rbspeak"
+        DEFAULT_TTS_OPTS=$RBSPEAK_OPTS
+        DEFAULT_NOISEFLOOR="500"
+        DEFAULT_CHOICE="O"
+    fi
     # Allow SAPI if Windows is in use
     if [ -n "`findtool winver`" ]; then
         SAPI="(S)API "
@@ -1129,7 +1137,7 @@ voiceconfig () {
         DEFAULT_CHOICE="s"
     fi
 
-    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$SWIFT" ]; then
+    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$SWIFT" ] && [ "$SWIFT" = "$RBSPEAK" ]; then
         echo "You need Festival, eSpeak or Flite in your path, or SAPI available to build voice files"
         exit 3
     fi
@@ -1137,7 +1145,7 @@ voiceconfig () {
     if [ "$ARG_TTS" ]; then
         option=$ARG_TTS
     else
-        echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${SAPI}${SWIFT}(${DEFAULT_CHOICE})?"
+        echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${SAPI}${SWIFT}${RBSPEAK}(${DEFAULT_CHOICE})?"
         option=`input`
         if [ -z "$option" ]; then option=${DEFAULT_CHOICE}; fi
         advopts="$advopts --tts=$option"
@@ -1167,6 +1175,11 @@ voiceconfig () {
         TTS_ENGINE="swift"
         NOISEFLOOR="500"
         TTS_OPTS=$SWIFT_OPTS
+	;;
+	[Oo])
+        TTS_ENGINE="rbspeak"
+        NOISEFLOOR="500"
+        TTS_OPTS=$RBSPEAK_OPTS
 	;;
         *)
         TTS_ENGINE=$DEFAULT_TTS
@@ -1213,11 +1226,11 @@ voiceconfig () {
 
     if [ "$swcodec" = "yes" ]; then
         ENCODER="rbspeexenc"
-        ENC_OPTS="-q 4 -c 10"
+        ENC_OPTS="-q 7 -c 10"
     else
         if [ -n "`findtool lame`" ]; then
             ENCODER="lame"
-            ENC_OPTS="--resample 12 -t -m m -h -V 9.999 -S -B 64 --vbr-new"
+            ENC_OPTS="-t -m m -h -V 9 -S -B 64 -b 8"
          else
             echo "You need LAME in the system path to build voice files for"
             echo "HWCODEC targets."
