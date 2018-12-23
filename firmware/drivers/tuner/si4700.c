@@ -31,6 +31,8 @@
 #ifdef HAVE_RDS_CAP
 #include "rds.h"
 #endif
+#include "audio.h"
+#include "backlight.h"
 
 #if defined(SANSA_CLIP) || defined(SANSA_E200V2) || defined(SANSA_FUZE) || defined(SANSA_C200V2) \
     || defined(SANSA_FUZEPLUS)
@@ -510,15 +512,15 @@ int si4700_get(int setting)
             break;
 
         case RADIO_TUNED:
-            val = si4700_tuned();
+            val = ((audio_status() & AUDIO_STATUS_RECORD) || !is_backlight_on(true)) ? 1 : si4700_tuned();
             break;
 
         case RADIO_STEREO:
-            val = si4700_st();
+            val = ((audio_status() & AUDIO_STATUS_RECORD) || !is_backlight_on(true)) ? 1 : si4700_st();
             break;
-    
+
         case RADIO_RSSI:
-            val = STATUSRSSI_RSSIr(si4700_read_reg(STATUSRSSI));
+            val = ((audio_status() & AUDIO_STATUS_RECORD) || !is_backlight_on(true)) ? RADIO_RSSI_MAX : STATUSRSSI_RSSIr(si4700_read_reg(STATUSRSSI));
             break;
 
         case RADIO_RSSI_MIN:

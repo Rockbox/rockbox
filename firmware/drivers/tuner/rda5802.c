@@ -30,6 +30,8 @@
 #include "tuner.h" /* tuner abstraction interface */
 #include "fmradio.h"
 #include "fmradio_i2c.h" /* physical interface driver */
+#include "audio.h"
+#include "backlight.h"
 
 #define SEEK_THRESHOLD 0x16
 
@@ -328,15 +330,15 @@ int rda5802_get(int setting)
         break;
 
     case RADIO_TUNED:
-        val = rda5802_tuned();
+        val = ((audio_status() & AUDIO_STATUS_RECORD) || !is_backlight_on(true)) ? 1 : rda5802_tuned();
         break;
 
     case RADIO_STEREO:
-        val = rda5802_st();
+        val = ((audio_status() & AUDIO_STATUS_RECORD) || !is_backlight_on(true)) ? 1 : rda5802_st();
         break;
 
     case RADIO_RSSI:
-        val = rda5802_rssi();
+        val = ((audio_status() & AUDIO_STATUS_RECORD) || !is_backlight_on(true)) ? RSSI_MAX : rda5802_rssi();
         break;
 
     case RADIO_RSSI_MIN:
