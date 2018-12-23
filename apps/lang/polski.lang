@@ -13403,3 +13403,171 @@
     swcodec: "Percepcyjne rozszerzenie basu"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Wyłącz niezmapowane klawisze"
+  </dest>
+  <voice>
+    *: "Wyłącz niezmapowane klawisze"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Automatyczna blokada włączona"
+  </dest>
+  <voice>
+    *: "Automatyczna blokada włączona"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Wyłącz dotyk"
+  </dest>
+  <voice>
+    *: "Wyłącz dotyk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ENABLED
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Enabled"
+  </source>
+  <dest>
+    *: "Włączone"
+  </dest>
+  <voice>
+    *: "Włączone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Seek"
+  </source>
+  <dest>
+    *: "Przewijanie"
+  </dest>
+  <voice>
+    *: "Przewijanie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Automatyczna blokada wyłączona"
+  </dest>
+  <voice>
+    *: "Automatyczna blokada wyłączona"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Backlight Exemptions"
+  </source>
+  <dest>
+    *: "Zwolnienia podświetlenia"
+  </dest>
+  <voice>
+    *: "Zwolnienia podświetlenia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Skip"
+  </source>
+  <dest>
+    *: "Pomijanie"
+  </dest>
+  <voice>
+    *: "Pomijanie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Wyłącz na zasilaniu zewnętrznym"
+  </dest>
+  <voice>
+    *: "Wyłącz na zasilaniu zewnętrznym"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Zaawansowana blokada klawszy"
+  </dest>
+  <voice>
+    *: "Zaawansowana blokada klawszy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Notify"
+  </source>
+  <dest>
+    *: "Wyłącz powiadomienie"
+  </dest>
+  <voice>
+    *: "Wyłącz powiadomienie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_PLAY
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Odtwarzanie"
+  </dest>
+  <voice>
+    *: "Odtwarzanie"
+  </voice>
+</phrase>
