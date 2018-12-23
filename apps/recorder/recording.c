@@ -1615,6 +1615,11 @@ bool recording_screen(bool no_source)
                 break;
 #endif /*  CONFIG_KEYPAD == RECORDER_PAD */
 
+            case SYS_POWEROFF:
+                default_event_handler(SYS_POWEROFF);
+                done = true;
+                break;
+
             case SYS_USB_CONNECTED:
                 /* Only accept USB connection when not recording */
                 if(!(audio_stat & AUDIO_STATUS_RECORD))
