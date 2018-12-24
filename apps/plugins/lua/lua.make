@@ -38,7 +38,7 @@ endif
 $(LUA_BUILDDIR)/lua.rock: $(LUA_OBJ) $(TLSFLIB) $(LUA_BUILDDIR)/actions.lua $(LUA_BUILDDIR)/buttons.lua $(LUA_BUILDDIR)/settings.lua $(LUA_BUILDDIR)/rocklib_aux.o $(LUA_INCLUDELIST)
 
 $(LUA_BUILDDIR)/actions.lua: $(LUA_OBJ) $(LUA_SRCDIR)/action_helper.pl
-	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E $(APPSDIR)/plugins/lib/pluginlib_actions.h | $(LUA_SRCDIR)/action_helper.pl > $(LUA_BUILDDIR)/actions.lua
+	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E -P $(APPSDIR)/plugins/lib/pluginlib_actions.h | $(LUA_SRCDIR)/action_helper.pl > $(LUA_BUILDDIR)/actions.lua
 
 $(LUA_BUILDDIR)/settings.lua: $(LUA_OBJ) $(LUA_SRCDIR)/settings_helper.pl
 	$(SILENT)$(CC) $(INCLUDES) -E -P $(TARGET) $(CFLAGS) -include plugin.h -include cuesheet.h - < /dev/null | $(LUA_SRCDIR)/settings_helper.pl | \
@@ -47,11 +47,11 @@ $(LUA_BUILDDIR)/settings.lua: $(LUA_OBJ) $(LUA_SRCDIR)/settings_helper.pl
 
 HOST_INCLUDES := $(filter-out %/libc/include,$(INCLUDES))
 $(LUA_BUILDDIR)/buttons.lua: $(LUA_OBJ) $(LUA_SRCDIR)/button_helper.pl
-	$(SILENT)$(CC) $(INCLUDES) -dM -E -include button-target.h - < /dev/null | $(LUA_SRCDIR)/button_helper.pl | $(HOSTCC) -fno-builtin $(HOST_INCLUDES) -x c -o $(LUA_BUILDDIR)/button_helper -
+	$(SILENT)$(CC) $(INCLUDES) -dM -E -P -include button-target.h - < /dev/null | $(LUA_SRCDIR)/button_helper.pl | $(HOSTCC) -fno-builtin $(HOST_INCLUDES) -x c -o $(LUA_BUILDDIR)/button_helper -
 	$(call PRINTS,GEN $(@F))$(LUA_BUILDDIR)/button_helper > $(LUA_BUILDDIR)/buttons.lua
 
 $(LUA_BUILDDIR)/rocklib_aux.c: $(APPSDIR)/plugin.h $(LUA_OBJ) $(LUA_SRCDIR)/rocklib_aux.pl
-	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E -include plugin.h - < /dev/null | $(LUA_SRCDIR)/rocklib_aux.pl $(LUA_SRCDIR) > $(LUA_BUILDDIR)/rocklib_aux.c
+	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E -P -include plugin.h - < /dev/null | $(LUA_SRCDIR)/rocklib_aux.pl $(LUA_SRCDIR) > $(LUA_BUILDDIR)/rocklib_aux.c
 
 $(LUA_BUILDDIR)/rocklib_aux.o: $(LUA_BUILDDIR)/rocklib_aux.c
 	$(call PRINTS,CC $(<F))$(CC) $(INCLUDES) $(PLUGINFLAGS) -I $(LUA_SRCDIR) -c $< -o $@
