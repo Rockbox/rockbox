@@ -22,6 +22,8 @@
 # - Stijn Hisken
 # - Sam Bouwer
 # - Bertrik Sikken
+# - Nathan Follens
+#
 # Maintainer: Peter D'Hoye
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -148,11 +150,11 @@
   </source>
   <dest>
     *: none
-    archosondio*: "Verwijder ingestoken MMC AUB"
+    archosondio*: "Verwijder de ingevoerde MMC-geheugenkaart"
   </dest>
   <voice>
     *: none
-    archosondio*: "Verwijder ingestoken multimedia kaart AUB"
+    archosondio*: "Verwijder de ingevoerde MMC-geheugenkaart"
   </voice>
 </phrase>
 <phrase>
@@ -191,10 +193,10 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "Geluids instellingen"
+    *: "Geluidsinstellingen"
   </dest>
   <voice>
-    *: "Geluids instellingen"
+    *: "Geluidsinstellingen"
   </voice>
 </phrase>
 <phrase>
@@ -219,10 +221,10 @@
     *: "Manage Settings"
   </source>
   <dest>
-    *: "Beheer instellingen"
+    *: "Instellingen beheren"
   </dest>
   <voice>
-    *: "Beheer instellingen"
+    *: "Instellingen beheren"
   </voice>
 </phrase>
 <phrase>
@@ -233,10 +235,10 @@
     *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Thema bestand laden"
+    *: "Themabestand laden"
   </dest>
   <voice>
-    *: "Thema bestand laden"
+    *: "Themabestand laden"
   </voice>
 </phrase>
 <phrase>
@@ -249,11 +251,11 @@
   </source>
   <dest>
     *: none
-    radio: "FM radio"
+    radio: "FM-radio"
   </dest>
   <voice>
     *: none
-    radio: "FM radio"
+    radio: "FM-radio"
   </voice>
 </phrase>
 <phrase>
@@ -281,10 +283,10 @@
     *: "Plugins"
   </source>
   <dest>
-    *: "Plugins"
+    *: "Plug-ins"
   </dest>
   <voice>
-    *: "Plugins"
+    *: "Plug-ins"
   </voice>
 </phrase>
 <phrase>
@@ -326,10 +328,10 @@
     *: "Bass"
   </source>
   <dest>
-    *: "Bass"
+    *: "Bas"
   </dest>
   <voice>
-    *: "Bass"
+    *: "Bas"
   </voice>
 </phrase>
 <phrase>
@@ -452,10 +454,10 @@
     *: "Stereo Width"
   </source>
   <dest>
-    *: "Stereo breedte"
+    *: "Stereobreedte"
   </dest>
   <voice>
-    *: "Stereo breedte"
+    *: "Stereobreedte"
   </voice>
 </phrase>
 <phrase>
@@ -468,11 +470,11 @@
   </source>
   <dest>
     *: none
-    masf: "Loudness"
+    masf: "Geluidsterkte"
   </dest>
   <voice>
     *: none
-    masf: "Loudness"
+    masf: "Geluidsterkte"
   </voice>
 </phrase>
 <phrase>
@@ -485,11 +487,11 @@
   </source>
   <dest>
     *: none
-    masf: "Auto volume"
+    masf: "Automatisch volume"
   </dest>
   <voice>
     *: none
-    masf: "Auto volume"
+    masf: "Automatisch volume"
   </voice>
 </phrase>
 <phrase>
@@ -502,11 +504,11 @@
   </source>
   <dest>
     *: none
-    masf: "AV terugloop"
+    masf: "AV-terugloop"
   </dest>
   <voice>
     *: none
-    masf: "AV terugloop"
+    masf: "AV-terugloop"
   </voice>
 </phrase>
 <phrase>
@@ -519,11 +521,11 @@
   </source>
   <dest>
     *: none
-    masf: "Super bass"
+    masf: "Superbas"
   </dest>
   <voice>
     *: none
-    masf: "Super bass"
+    masf: "Superbas"
   </voice>
 </phrase>
 <phrase>
@@ -536,11 +538,11 @@
   </source>
   <dest>
     *: none
-    masf: "MDB aan"
+    masf: "MDB inschakelen"
   </dest>
   <voice>
     *: none
-    masf: "MDB aan"
+    masf: "MDB inschakelen"
   </voice>
 </phrase>
 <phrase>
@@ -553,11 +555,11 @@
   </source>
   <dest>
     *: none
-    masf: "MDB sterkte"
+    masf: "MDB-sterkte"
   </dest>
   <voice>
     *: none
-    masf: "MDB sterkte"
+    masf: "MDB-sterkte"
   </voice>
 </phrase>
 <phrase>
@@ -570,11 +572,11 @@
   </source>
   <dest>
     *: none
-    masf: "MDB boventonen"
+    masf: "MDB-boventonen"
   </dest>
   <voice>
     *: none
-    masf: "MDB boventonen"
+    masf: "MDB-boventonen"
   </voice>
 </phrase>
 <phrase>
@@ -587,11 +589,11 @@
   </source>
   <dest>
     *: none
-    masf: "MDB middenfrequentie"
+    masf: "MDB-middenfrequentie"
   </dest>
   <voice>
     *: none
-    masf: "MDB middenfrequentie"
+    masf: "MDB-middenfrequentie"
   </voice>
 </phrase>
 <phrase>
@@ -604,11 +606,11 @@
   </source>
   <dest>
     *: none
-    masf: "MDB vorm"
+    masf: "MDB-vorm"
   </dest>
   <voice>
     *: none
-    masf: "MDB vorm"
+    masf: "MDB-vorm"
   </voice>
 </phrase>
 <phrase>
@@ -638,11 +640,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Equaliser"
+    swcodec: "Equalizer"
   </dest>
   <voice>
     *: none
-    swcodec: "Equaliser"
+    swcodec: "Equalizer"
   </voice>
 </phrase>
 <phrase>
@@ -653,10 +655,10 @@
     *: "Playback Settings"
   </source>
   <dest>
-    *: "Weergave instellingen"
+    *: "Afspeelinstellingen"
   </dest>
   <voice>
-    *: "Weergave instellingen"
+    *: "Afspeelinstellingen"
   </voice>
 </phrase>
 <phrase>
@@ -751,10 +753,10 @@
     *: "Browse .cfg Files"
   </source>
   <dest>
-    *: "Configuratie bestand laden"
+    *: "Configuratiebestand laden"
   </dest>
   <voice>
-    *: "Configuratie bestand laden"
+    *: "Configuratiebestand laden"
   </voice>
 </phrase>
 <phrase>
@@ -765,10 +767,10 @@
     *: "Reset Settings"
   </source>
   <dest>
-    *: "Terug naar standaard instellingen"
+    *: "Terug naar standaardinstellingen"
   </dest>
   <voice>
-    *: "Terug naar standaard instellingen"
+    *: "Terug naar standaardinstellingen"
   </voice>
 </phrase>
 <phrase>
@@ -793,10 +795,10 @@
     *: "Save .cfg File"
   </source>
   <dest>
-    *: "Schrijf configuratie bestand"
+    *: "Configuratiebestand opslaan"
   </dest>
   <voice>
-    *: "Schrijf configuratie bestand"
+    *: "Configuratiebestand opslaan"
   </voice>
 </phrase>
 <phrase>
@@ -809,11 +811,11 @@
   </source>
   <dest>
     *: none
-    recording: "Opname instellingen"
+    recording: "Opname-instellingen"
   </dest>
   <voice>
     *: none
-    recording: "Opname instellingen"
+    recording: "Opname-instellingen"
   </voice>
 </phrase>
 <phrase>
@@ -826,11 +828,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "EQ aanzetten"
+    swcodec: "EQ inschakelen"
   </dest>
   <voice>
     *: none
-    swcodec: "EQ aanzetten"
+    swcodec: "EQ inschakelen"
   </voice>
 </phrase>
 <phrase>
@@ -877,11 +879,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Eenvoudige EQ instellingen"
+    swcodec: "Eenvoudige EQ-instellingen"
   </dest>
   <voice>
     *: none
-    swcodec: "Eenvoudige EQ instellingen"
+    swcodec: "Eenvoudige EQ-instellingen"
   </voice>
 </phrase>
 <phrase>
@@ -894,11 +896,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Geavanceerde EQ instellingen"
+    swcodec: "Geavanceerde EQ-instellingen"
   </dest>
   <voice>
     *: none
-    swcodec: "Geavanceerde EQ instellingen"
+    swcodec: "Geavanceerde EQ-instellingen"
   </voice>
 </phrase>
 <phrase>
@@ -911,11 +913,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "EQ voorkeuze opslaan"
+    swcodec: "EQ-voorkeuze opslaan"
   </dest>
   <voice>
     *: none
-    swcodec: "EQ voorkeuze opslaan"
+    swcodec: "EQ-voorkeuze opslaan"
   </voice>
 </phrase>
 <phrase>
@@ -928,11 +930,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "EQ voorkeuzes laden"
+    swcodec: "EQ-voorkeuzes laden"
   </dest>
   <voice>
     *: none
-    swcodec: "EQ voorkeuzes laden"
+    swcodec: "EQ-voorkeuzes laden"
   </voice>
 </phrase>
 <phrase>
@@ -945,11 +947,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Bewerk modus: %s"
+    swcodec: "Bewerkmodus: %s"
   </dest>
   <voice>
     *: none
-    swcodec: "Bewerk modus %s"
+    swcodec: "Bewerkmodus %s"
   </voice>
 </phrase>
 <phrase>
@@ -962,11 +964,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "%d Hz band Versterking"
+    swcodec: "%d Hz-bandversterking"
   </dest>
   <voice>
     *: none
-    swcodec: "%d Hz band Versterking"
+    swcodec: "%d Hz-bandversterking"
   </voice>
 </phrase>
 <phrase>
@@ -979,11 +981,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Lage band filter"
+    swcodec: "Lagebandfilter"
   </dest>
   <voice>
     *: none
-    swcodec: "Lage band filter"
+    swcodec: "Lagebandfilter"
   </voice>
 </phrase>
 <phrase>
@@ -996,11 +998,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Piek filter %d"
+    swcodec: "Piekfilter %d"
   </dest>
   <voice>
     *: none
-    swcodec: "Piek filter"
+    swcodec: "Piekfilter"
   </voice>
 </phrase>
 <phrase>
@@ -1013,11 +1015,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Hoge band filter"
+    swcodec: "Hogebandfilter"
   </dest>
   <voice>
     *: none
-    swcodec: "Hoge band filter"
+    swcodec: "Hogebandfilter"
   </voice>
 </phrase>
 <phrase>
@@ -1030,11 +1032,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Afsnij frequentie"
+    swcodec: "Afsnijfrequentie"
   </dest>
   <voice>
     *: none
-    swcodec: "Afsnij frequentie"
+    swcodec: "Afsnijfrequentie"
   </voice>
 </phrase>
 <phrase>
@@ -1047,11 +1049,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Midden frequentie"
+    swcodec: "Middenfrequentie"
   </dest>
   <voice>
     *: none
-    swcodec: "Midden frequentie"
+    swcodec: "Middenfrequentie"
   </voice>
 </phrase>
 <phrase>
@@ -1079,10 +1081,10 @@
     *: "Create Playlist"
   </source>
   <dest>
-    *: "Speellijst maken"
+    *: "Afspeellijst maken"
   </dest>
   <voice>
-    *: "Speellijst maken"
+    *: "Afspeellijst maken"
   </voice>
 </phrase>
 <phrase>
@@ -1093,10 +1095,10 @@
     *: "View Current Playlist"
   </source>
   <dest>
-    *: "Toon huidige speellijst"
+    *: "Huidige afspeellijst tonen"
   </dest>
   <voice>
-    *: "Toon huidige speellijst"
+    *: "Huidige afspeellijst tonen"
   </voice>
 </phrase>
 <phrase>
@@ -1107,10 +1109,10 @@
     *: "Save Current Playlist"
   </source>
   <dest>
-    *: "Huidige speellijst opslaan"
+    *: "Huidige afspeellijst opslaan"
   </dest>
   <voice>
-    *: "Huidige speellijst opslaan"
+    *: "Huidige afspeellijst opslaan"
   </voice>
 </phrase>
 <phrase>
@@ -1135,10 +1137,10 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "Waarschuwen bij wissen dynamische speellijst"
+    *: "Waarschuwen bij wissen dynamische afspeellijst"
   </dest>
   <voice>
-    *: "Waarschuwen bij wissen dynamische speellijst"
+    *: "Waarschuwen bij wissen dynamische afspeellijst"
   </voice>
 </phrase>
 <phrase>
@@ -1163,10 +1165,10 @@
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "Debug (Afblijven!)"
+    *: "Debug (afblijven!)"
   </dest>
   <voice>
-    *: "Debug, (Afblijven!)"
+    *: "Debug (afblijven!)"
   </voice>
 </phrase>
 <phrase>
@@ -1205,10 +1207,10 @@
     *: "One"
   </source>
   <dest>
-    *: "Een"
+    *: "Één"
   </dest>
   <voice>
-    *: "Een"
+    *: "Één"
   </voice>
 </phrase>
 <phrase>
@@ -1247,10 +1249,10 @@
     *: "Fast-Forward/Rewind"
   </source>
   <dest>
-    *: "Snel voor- en achteruit spoelen"
+    *: "Snel vooruit- en achteruitspoelen"
   </dest>
   <voice>
-    *: "Snel voor- en achteruit spoelen"
+    *: "Snel vooruit- en achteruitspoelen"
   </voice>
 </phrase>
 <phrase>
@@ -1262,11 +1264,11 @@
     flash_storage: none
   </source>
   <dest>
-    *: "Buffer tijd"
+    *: "Buffertijd"
     flash_storage*: none
   </dest>
   <voice>
-    *: "Buffer tijd"
+    *: "Buffertijd"
     flash_storage*: none
   </voice>
 </phrase>
@@ -1278,10 +1280,10 @@
     *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "Uitvloeien bij Stop/Pauze"
+    *: "Uitvloeien bij stop/pauze"
   </dest>
   <voice>
-    *: "Uitvloeien bij Stop en Pauze"
+    *: "Uitvloeien bij stop en pauze"
   </voice>
 </phrase>
 <phrase>
@@ -1292,10 +1294,10 @@
     *: "Party Mode"
   </source>
   <dest>
-    *: "Feest modus"
+    *: "Feestmodus"
   </dest>
   <voice>
-    *: "Feest modus"
+    *: "Feestmodus"
   </voice>
 </phrase>
 <phrase>
@@ -1323,10 +1325,10 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Versterking"
+    *: "ReplayGain"
   </dest>
   <voice>
-    *: "Versterking"
+    *: "ReplayGain"
   </voice>
 </phrase>
 <phrase>
@@ -1339,11 +1341,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Nummer overslaan signaal"
+    swcodec: "Biep bij nummer overslaan"
   </dest>
   <voice>
     *: none
-    swcodec: "Nummer overslaan signaal"
+    swcodec: "Biep bij nummer overslaan"
   </voice>
 </phrase>
 <phrase>
@@ -1407,11 +1409,11 @@
   </source>
   <dest>
     *: none
-    spdif_power: "Optische uitgang"
+    spdif_power: "Optische uitvoer"
   </dest>
   <voice>
     *: none
-    spdif_power: "Optische uitgang"
+    spdif_power: "Optische uitvoer"
   </voice>
 </phrase>
 <phrase>
@@ -1467,10 +1469,10 @@
     *: "Initialize Now"
   </source>
   <dest>
-    *: "Vernieuw database nu"
+    *: "Nu initialiseren"
   </dest>
   <voice>
-    *: "Vernieuw database nu"
+    *: "Nu initialiseren"
   </voice>
 </phrase>
 <phrase>
@@ -1481,10 +1483,10 @@
     *: "Updating in background"
   </source>
   <dest>
-    *: "Vernieuwen op de achtergrond"
+    *: "Bijwerken in achtergrond"
   </dest>
   <voice>
-    *: "Vernieuwen op de achtergrond"
+    *: "Bijwerken in achtergrond"
   </voice>
 </phrase>
 <phrase>
@@ -1509,10 +1511,10 @@
     *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Verzamel runtime data"
+    *: "Runtimegegevens verzamelen"
   </dest>
   <voice>
-    *: "Verzamel runtime data"
+    *: "Runtimegegevens verzamelen"
   </voice>
 </phrase>
 <phrase>
@@ -1523,10 +1525,10 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "Sorteer op hoofd en kleine letters"
+    *: "Sorteren op hoofd- en kleine letters"
   </dest>
   <voice>
-    *: "Sorteer op hoofd en kleine letters"
+    *: "Sorteren op hoofd- en kleine letters"
   </voice>
 </phrase>
 <phrase>
@@ -1537,10 +1539,10 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "Sorteer mappen"
+    *: "Mappen sorteren"
   </dest>
   <voice>
-    *: "Sorteer mappen"
+    *: "Mappen sorteren"
   </voice>
 </phrase>
 <phrase>
@@ -1551,10 +1553,10 @@
     *: "Sort Files"
   </source>
   <dest>
-    *: "Sorteer bestanden"
+    *: "Bestanden sorteren"
   </dest>
   <voice>
-    *: "Sorteer bestanden"
+    *: "Bestanden sorteren"
   </voice>
 </phrase>
 <phrase>
@@ -1663,10 +1665,10 @@
     *: "Follow Playlist"
   </source>
   <dest>
-    *: "Speellijst volgen"
+    *: "Afspeellijst volgen"
   </dest>
   <voice>
-    *: "Speellijst volgen"
+    *: "Afspeellijst volgen"
   </voice>
 </phrase>
 <phrase>
@@ -1677,10 +1679,10 @@
     *: "Show Icons"
   </source>
   <dest>
-    *: "Ikonen weergeven"
+    *: "Pictogrammen weergeven"
   </dest>
   <voice>
-    *: "Ikonen weergeven"
+    *: "Pictogrammen weergeven"
   </voice>
 </phrase>
 <phrase>
@@ -1693,11 +1695,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Lettertype kiezen"
+    lcd_bitmap: "Lettertype"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Lettertype kiezen"
+    lcd_bitmap: "Lettertype"
   </voice>
 </phrase>
 <phrase>
@@ -1708,10 +1710,10 @@
     *: "While Playing Screen"
   </source>
   <dest>
-    *: "Speelscherm kiezen (WPS)"
+    *: "Speelscherm (WPS)"
   </dest>
   <voice>
-    *: "Speelscherm kiezen WPS"
+    *: "Speelscherm (WPS)"
   </voice>
 </phrase>
 <phrase>
@@ -1724,11 +1726,11 @@
   </source>
   <dest>
     *: none
-    remote: "WPS afstandsbediening kiezen"
+    remote: "Extern speelscherm (WPS)"
   </dest>
   <voice>
     *: none
-    remote: "WPS afstandsbediening kiezen"
+    remote: "Extern speelscherm (WPS)"
   </voice>
 </phrase>
 <phrase>
@@ -1739,10 +1741,10 @@
     *: "LCD Settings"
   </source>
   <dest>
-    *: "LCD instellingen"
+    *: "LCD-instellingen"
   </dest>
   <voice>
-    *: "LCD installingen"
+    *: "LCD-instellingen"
   </voice>
 </phrase>
 <phrase>
@@ -1755,11 +1757,11 @@
   </source>
   <dest>
     *: none
-    remote: "Afstandsbediening LCD instellingen"
+    remote: "Instellingen voor externe LCD"
   </dest>
   <voice>
     *: none
-    remote: "Afstandsbediening LCD instellingen"
+    remote: "Instellingen voor externe LCD"
   </voice>
 </phrase>
 <phrase>
@@ -1786,11 +1788,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Status-/Scrollbalk"
+    lcd_bitmap: "Status-/scrollbalk"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Status en Scrollbalk"
+    lcd_bitmap: "Status- en scrollbalk"
   </voice>
 </phrase>
 <phrase>
@@ -1803,11 +1805,11 @@
   </source>
   <dest>
     *: "Peak Meter"
-    masd: "Piek meter"
+    masd: "Piekmeter"
   </dest>
   <voice>
     *: "Peak Meter"
-    masd: "Piek meter"
+    masd: "Piekmeter"
   </voice>
 </phrase>
 <phrase>
@@ -1835,7 +1837,7 @@
     *: "Latijns1 (ISO-8859-1)"
   </dest>
   <voice>
-    *: ""
+    *: "Latijns1"
   </voice>
 </phrase>
 <phrase>
@@ -1849,7 +1851,7 @@
     *: "Grieks (ISO-8859-7)"
   </dest>
   <voice>
-    *: ""
+    *: "Grieks"
   </voice>
 </phrase>
 <phrase>
@@ -1880,7 +1882,7 @@
     *: "Cyrillisch (CP1251)"
   </dest>
   <voice>
-    *: ""
+    *: "Cyrillisch"
   </voice>
 </phrase>
 <phrase>
@@ -1928,7 +1930,7 @@
     *: "Turks (ISO-8859-9)"
   </dest>
   <voice>
-    *: ""
+    *: "Turks"
   </voice>
 </phrase>
 <phrase>
@@ -1939,10 +1941,10 @@
     *: "Latin Extended (ISO-8859-2)"
   </source>
   <dest>
-    *: "Latijns Uitgebreid (ISO-8859-2)"
+    *: "Latijns uitgebreid (ISO-8859-2)"
   </dest>
   <voice>
-    *: ""
+    *: "Latijns uitgebreid"
   </voice>
 </phrase>
 <phrase>
@@ -1972,11 +1974,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Simp. Chinees (GB2312)"
+    lcd_bitmap: "Vereenvoudigd Chinees (GB2312)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Simp Chinees"
+    lcd_bitmap: "Vereenvoudigd Chinees"
   </voice>
 </phrase>
 <phrase>
@@ -2006,7 +2008,7 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Trad. Chinees (BIG5)"
+    lcd_bitmap: "Traditioneel Chinees (BIG5)"
   </dest>
   <voice>
     *: none
@@ -2024,7 +2026,7 @@
     *: "Unicode (UTF-8)"
   </dest>
   <voice>
-    *: ""
+    *: "Unicode"
   </voice>
 </phrase>
 <phrase>
@@ -2094,10 +2096,10 @@
     *: "Sleep Timer"
   </source>
   <dest>
-    *: "Slaap Klok"
+    *: "Slaaptimer"
   </dest>
   <voice>
-    *: "Slaap Klok"
+    *: "Slaaptimer"
   </voice>
 </phrase>
 <phrase>
@@ -2110,11 +2112,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Alarm klok"
+    alarm: "Wekker"
   </dest>
   <voice>
     *: none
-    alarm: "Alarm klok"
+    alarm: "Wekker"
   </voice>
 </phrase>
 <phrase>
@@ -2141,11 +2143,11 @@
   </source>
   <dest>
     *: none
-    recording,archosplayer: "Lijn ingang"
+    recording,archosplayer: "Analoge invoer"
   </dest>
   <voice>
     *: none
-    recording,archosplayer: "Lijn ingang"
+    recording,archosplayer: "Analoge invoer"
   </voice>
 </phrase>
 <phrase>
@@ -2158,11 +2160,11 @@
   </source>
   <dest>
     *: none
-    charging: "Auto adapter modus"
+    charging: "Auto-adaptermodus"
   </dest>
   <voice>
     *: none
-    charging: "Auto adapter modus"
+    charging: "Auto-adaptermodus"
   </voice>
 </phrase>
 <phrase>
@@ -2173,10 +2175,10 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Maak bladwijzer bij stop"
+    *: "Bladwijzer aanmaken bij stoppen"
   </dest>
   <voice>
-    *: "Maak bladwijzer bij stop"
+    *: "Bladwijzer aanmaken bij stoppen"
   </voice>
 </phrase>
 <phrase>
@@ -2187,10 +2189,10 @@
     *: "Yes - Recent only"
   </source>
   <dest>
-    *: "Ja - Alleen recente"
+    *: "Ja - enkel recente"
   </dest>
   <voice>
-    *: "Ja - Alleen recente"
+    *: "Ja - enkel recente"
   </voice>
 </phrase>
 <phrase>
@@ -2201,10 +2203,10 @@
     *: "Ask - Recent only"
   </source>
   <dest>
-    *: "Vraag - Alleen recente"
+    *: "Vragen - enkel recente"
   </dest>
   <voice>
-    *: "Vraag - Alleen recente"
+    *: "Vragen - enkel recente"
   </voice>
 </phrase>
 <phrase>
@@ -2215,10 +2217,10 @@
     *: "Load Last Bookmark"
   </source>
   <dest>
-    *: "Laad laatste bladwijzer"
+    *: "Laatste bladwijzer laden"
   </dest>
   <voice>
-    *: "Laad laatste bladwijzer"
+    *: "Laatste bladwijzer laden"
   </voice>
 </phrase>
 <phrase>
@@ -2229,10 +2231,10 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "Een lijst met recente bladwijzers onderhouden?"
+    *: "Een lijst met recente bladwijzers bijhouden?"
   </dest>
   <voice>
-    *: "Een lijst met recente bladwijzers onderhouden?"
+    *: "Een lijst met recente bladwijzers bijhouden?"
   </voice>
 </phrase>
 <phrase>
@@ -2243,10 +2245,10 @@
     *: "Unique only"
   </source>
   <dest>
-    *: "Alleen unieke"
+    *: "Enkel unieke"
   </dest>
   <voice>
-    *: "Alleen unieke"
+    *: "Enkel unieke"
   </voice>
 </phrase>
 <phrase>
@@ -2257,10 +2259,10 @@
     *: "Voice Menus"
   </source>
   <dest>
-    *: "Voorlezen van menu"
+    *: "Menu's voorlezen"
   </dest>
   <voice>
-    *: "Voorlezen van menu"
+    *: "Menu's voorlezen"
   </voice>
 </phrase>
 <phrase>
@@ -2271,10 +2273,10 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Voorlezen van mappen"
+    *: "Mappen voorlezen"
   </dest>
   <voice>
-    *: "Voorlezen van mappen"
+    *: "Mappen voorlezen"
   </voice>
 </phrase>
 <phrase>
@@ -2285,10 +2287,10 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "Voorlezen van bestanden"
+    *: "Bestandsnamen voorlezen"
   </dest>
   <voice>
-    *: "Voorlezen van bestanden"
+    *: "Bestandsnamen voorlezen"
   </voice>
 </phrase>
 <phrase>
@@ -2299,10 +2301,10 @@
     *: "Numbers"
   </source>
   <dest>
-    *: "Nummers"
+    *: "Cijfers"
   </dest>
   <voice>
-    *: "Nummers"
+    *: "Cijfers"
   </voice>
 </phrase>
 <phrase>
@@ -2327,10 +2329,10 @@
     *: ".talk Clip"
   </source>
   <dest>
-    *: ".voorlezen clip"
+    *: ".talk-clip"
   </dest>
   <voice>
-    *: "voorlezen clip"
+    *: ".talk clip"
   </voice>
 </phrase>
 <phrase>
@@ -2414,11 +2416,11 @@
   </source>
   <dest>
     *: none
-    recording: "Digitale ingang"
+    recording: "Digitale invoer"
   </dest>
   <voice>
     *: none
-    recording: "Digitale ingang"
+    recording: "Digitale invoer"
   </voice>
 </phrase>
 <phrase>
@@ -2448,11 +2450,11 @@
   </source>
   <dest>
     *: none
-    recording: "Automatisch splitsen"
+    recording: "Opties voor splitsen van bestanden"
   </dest>
   <voice>
     *: none
-    recording: "Automatisch splitsen"
+    recording: "Opties voor splitsen van bestanden"
   </voice>
 </phrase>
 <phrase>
@@ -2465,11 +2467,11 @@
   </source>
   <dest>
     *: none
-    recording: "Bufferopname tijd"
+    recording: "Bufferopnametijd"
   </dest>
   <voice>
     *: none
-    recording: "Bufferopname tijd"
+    recording: "Bufferopnametijd"
   </voice>
 </phrase>
 <phrase>
@@ -2499,11 +2501,11 @@
   </source>
   <dest>
     *: none
-    recording: "Trigger"
+    recording: "Trekker"
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "Trekker"
   </voice>
 </phrase>
 <phrase>
@@ -2520,7 +2522,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Clip Licht"
+    recording: "Clip-licht"
   </voice>
 </phrase>
 <phrase>
@@ -2533,11 +2535,11 @@
   </source>
   <dest>
     *: none
-    remote: "Alleen speler"
+    remote: "Enkel lokaal"
   </dest>
   <voice>
     *: none
-    remote: "Alleen speler"
+    remote: "Enkel lokaal"
   </voice>
 </phrase>
 <phrase>
@@ -2550,11 +2552,11 @@
   </source>
   <dest>
     *: none
-    remote: "Alleen afstandsbediening"
+    remote: "Enkel extern"
   </dest>
   <voice>
     *: none
-    remote: "Alleen afstandsbediening"
+    remote: "Enkel extern"
   </voice>
 </phrase>
 <phrase>
@@ -2567,11 +2569,11 @@
   </source>
   <dest>
     *: none
-    remote: "Speler en afstandsbediening"
+    remote: "Lokaal en extern"
   </dest>
   <voice>
     *: none
-    remote: "Speler en afstandsbediening"
+    remote: "Lokaal en extern"
   </voice>
 </phrase>
 <phrase>
@@ -2582,10 +2584,10 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "FF/RW min. Stap"
+    *: "FF/RW min. stapgrootte"
   </dest>
   <voice>
-    *: "Snel voor en achteruit minimale stapgroote"
+    *: "Snel voor en achteruit minimale stapgrootte"
   </voice>
 </phrase>
 <phrase>
@@ -2596,7 +2598,7 @@
     *: "FF/RW Accel"
   </source>
   <dest>
-    *: "FF/RW versnelling"
+    *: "FF/RW-versnelling"
   </dest>
   <voice>
     *: "Snel voor en achteruit versnelling"
@@ -2612,11 +2614,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Overvloeien aanzetten"
+    crossfade: "Overvloeien inschakelen"
   </dest>
   <voice>
     *: none
-    crossfade: "Overvloeien aanzetten"
+    crossfade: "Overvloeien inschakelen"
   </voice>
 </phrase>
 <phrase>
@@ -2629,11 +2631,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Alleen bij handmatig overslaan"
+    crossfade: "Enkel bij handmatig overslaan"
   </dest>
   <voice>
     *: none
-    crossfade: "Alleen bij handmatig overslaan"
+    crossfade: "Enkel bij handmatig overslaan"
   </voice>
 </phrase>
 <phrase>
@@ -2646,11 +2648,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Invloei vertraging"
+    crossfade: "Invloeivertraging"
   </dest>
   <voice>
     *: none
-    crossfade: "Invloei vertraging"
+    crossfade: "Invloeivertraging"
   </voice>
 </phrase>
 <phrase>
@@ -2663,11 +2665,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Invloei duur"
+    crossfade: "Invloeiduur"
   </dest>
   <voice>
     *: none
-    crossfade: "Invloei duur"
+    crossfade: "Invloeiduur"
   </voice>
 </phrase>
 <phrase>
@@ -2680,11 +2682,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Uitvloei vertraging"
+    crossfade: "Uitvloeivertraging"
   </dest>
   <voice>
     *: none
-    crossfade: "Uitvloei vertraging"
+    crossfade: "Uitvloeivertraging"
   </voice>
 </phrase>
 <phrase>
@@ -2697,11 +2699,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Uitvloei duur"
+    crossfade: "Uitvloeiduur"
   </dest>
   <voice>
     *: none
-    crossfade: "Uitvloei duur"
+    crossfade: "Uitvloeiduur"
   </voice>
 </phrase>
 <phrase>
@@ -2714,11 +2716,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Overvloei modus"
+    crossfade: "Overvloeimodus"
   </dest>
   <voice>
     *: none
-    crossfade: "Overvloei modus"
+    crossfade: "Overvloeimodus"
   </voice>
 </phrase>
 <phrase>
@@ -2763,10 +2765,10 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Soort versterking"
+    *: "ReplayGain-type"
   </dest>
   <voice>
-    *: "Soort versterking"
+    *: "ReplayGain-type"
   </voice>
 </phrase>
 <phrase>
@@ -2777,10 +2779,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Album versterking"
+    *: "Albumversterking"
   </dest>
   <voice>
-    *: "Album versterking"
+    *: "Albumversterking"
   </voice>
 </phrase>
 <phrase>
@@ -2791,10 +2793,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Nummer versterking"
+    *: "Nummerversterking"
   </dest>
   <voice>
-    *: "Nummer versterking"
+    *: "Nummerversterking"
   </voice>
 </phrase>
 <phrase>
@@ -2805,10 +2807,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Nummer versterking tijdens shuffle"
+    *: "Nummerversterking tijdens shuffle"
   </dest>
   <voice>
-    *: "Nummer versterking tijdens shuffle"
+    *: "Nummerversterking tijdens shuffle"
   </voice>
 </phrase>
 <phrase>
@@ -2959,11 +2961,11 @@
   </source>
   <dest>
     *: none
-    lcd_invert,remote_lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD-modus"
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "LCD-modus"
   </voice>
 </phrase>
 <phrase>
@@ -3010,11 +3012,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Regelkiezer type"
+    lcd_bitmap: "Regelkiezertype"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Regelkiezer type"
+    lcd_bitmap: "Regelkiezertype"
   </voice>
 </phrase>
 <phrase>
@@ -3027,11 +3029,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Aanwijs pijl"
+    lcd_bitmap: "Aanwijzer"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Aanwijs pijl"
+    lcd_bitmap: "Aanwijzer"
   </voice>
 </phrase>
 <phrase>
@@ -3044,11 +3046,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Balk (geinverteerd)"
+    lcd_bitmap: "Balk (geïnverteerd)"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Balk (geinverteerd)"
+    lcd_bitmap: "Balk (geïnverteerd)"
   </voice>
 </phrase>
 <phrase>
@@ -3078,11 +3080,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Achtergrond kleur"
+    lcd_color: "Achtergrondkleur"
   </dest>
   <voice>
     *: none
-    lcd_color: "Achtergrond kleur"
+    lcd_color: "Achtergrondkleur"
   </voice>
 </phrase>
 <phrase>
@@ -3095,11 +3097,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Voorgrond kleur"
+    lcd_color: "Voorgrondkleur"
   </dest>
   <voice>
     *: none
-    lcd_color: "Voorgrond kleur"
+    lcd_color: "Voorgrondkleur"
   </voice>
 </phrase>
 <phrase>
@@ -3129,11 +3131,11 @@
   </source>
   <dest>
     *: none
-    remote_ticking: "Reduceer tikken"
+    remote_ticking: "Verminder tikken"
   </dest>
   <voice>
     *: none
-    remote_ticking: "Reduceer tikken"
+    remote_ticking: "Verminder tikken"
   </voice>
 </phrase>
 <phrase>
@@ -3144,10 +3146,10 @@
     *: "Scroll Speed"
   </source>
   <dest>
-    *: "Scroll snelheid"
+    *: "Scrollsnelheid"
   </dest>
   <voice>
-    *: "Scroll snelheid"
+    *: "Scrollsnelheid"
   </voice>
 </phrase>
 <phrase>
@@ -3172,10 +3174,10 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "Scroll start vertraging"
+    *: "Scrollstartvertraging"
   </dest>
   <voice>
-    *: "Scroll start vertraging"
+    *: "Scrollstartvertraging"
   </voice>
 </phrase>
 <phrase>
@@ -3186,10 +3188,10 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "Scroll stapgrootte"
+    *: "Scrollstapgrootte"
   </dest>
   <voice>
-    *: "Scroll stapgrootte"
+    *: "Scrollstapgrootte"
   </voice>
 </phrase>
 <phrase>
@@ -3200,10 +3202,10 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "Voorbeeld scroll stapgrootte text"
+    *: "Voorbeeldtekst voor scrollstapgrootte-instelling"
   </dest>
   <voice>
-    *: ""
+    *: "Voorbeeldtekst voor scrollstapgrootte-instelling"
   </voice>
 </phrase>
 <phrase>
@@ -3214,10 +3216,10 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "Tweerichting scroll limiet"
+    *: "Tweerichtingsscrolllimiet"
   </dest>
   <voice>
-    *: "Tweerichting scroll limiet"
+    *: "Tweerichtingsscrolllimiet"
   </voice>
 </phrase>
 <phrase>
@@ -3247,11 +3249,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Scherm scrol stap groote"
+    lcd_bitmap: "Schermscrollstapgrootte"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scherm scrol stap groote"
+    lcd_bitmap: "Schermscrollstapgrootte"
   </voice>
 </phrase>
 <phrase>
@@ -3278,11 +3280,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Scroll balk"
+    lcd_bitmap: "Scrollbalk"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll balk"
+    lcd_bitmap: "Scrollbalk"
   </voice>
 </phrase>
 <phrase>
@@ -3295,11 +3297,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Status balk"
+    lcd_bitmap: "Statusbalk"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Status balk"
+    lcd_bitmap: "Statusbalk"
   </voice>
 </phrase>
 <phrase>
@@ -3312,11 +3314,11 @@
   </source>
   <dest>
     *: none
-    recorder_pad: "Knoppen balk"
+    recorder_pad: "Knoppenbalk"
   </dest>
   <voice>
     *: none
-    recorder_pad: "Knoppen balk"
+    recorder_pad: "Knoppenbalk"
   </voice>
 </phrase>
 <phrase>
@@ -3396,11 +3398,11 @@
     masd: none
   </source>
   <dest>
-    *: "Piek terugloop"
+    *: "Piekterugloop"
     masd: none
   </dest>
   <voice>
-    *: "Piek terugloop"
+    *: "Piekterugloop"
     masd: none
   </voice>
 </phrase>
@@ -3413,11 +3415,11 @@
     masd: none
   </source>
   <dest>
-    *: "Piek vasthoud tijd"
+    *: "Piekvasthoudtijd"
     masd: none
   </dest>
   <voice>
-    *: "Piek vasthoud tijd"
+    *: "Piekvasthoudtijd"
     masd: none
   </voice>
 </phrase>
@@ -3548,10 +3550,10 @@
     *: "Battery Capacity"
   </source>
   <dest>
-    *: "Batterij capaciteit"
+    *: "Batterijcapaciteit"
   </dest>
   <voice>
-    *: "Batterij capaciteit"
+    *: "Batterijcapaciteit"
   </voice>
 </phrase>
 <phrase>
@@ -3564,11 +3566,11 @@
   </source>
   <dest>
     *: none
-    battery_types: "Batterij type"
+    battery_types: "Batterijtype"
   </dest>
   <voice>
     *: none
-    battery_types: "Batterij type"
+    battery_types: "Batterijtype"
   </voice>
 </phrase>
 <phrase>
@@ -3602,7 +3604,7 @@
   </dest>
   <voice>
     *: none
-    battery_types: "Nikkel metaal hydride"
+    battery_types: "Nikkelmetaalhydride"
   </voice>
 </phrase>
 <phrase>
@@ -3614,11 +3616,11 @@
     flash_storage: none
   </source>
   <dest>
-    *: "Schijf stoptijd"
+    *: "Schijfstoptijd"
     flash_storage: none
   </dest>
   <voice>
-    *: "Schijf stoptijd"
+    *: "Schijfstoptijd"
     flash_storage: none
   </voice>
 </phrase>
@@ -3632,11 +3634,11 @@
   </source>
   <dest>
     *: none
-    dircache: "Map buffer"
+    dircache: "Mapbuffer"
   </dest>
   <voice>
     *: none
-    dircache: "Map buffer"
+    dircache: "Mapbuffer"
   </voice>
 </phrase>
 <phrase>
@@ -3647,10 +3649,10 @@
     *: "Time"
   </source>
   <dest>
-    *: "Stel datum/tijd in"
+    *: "Tijd"
   </dest>
   <voice>
-    *: "Stel datum/tijd in"
+    *: "Tijd"
   </voice>
 </phrase>
 <phrase>
@@ -3663,11 +3665,11 @@
   </source>
   <dest>
     *: none
-    rtc: "Tijds aanduiding"
+    rtc: "Tijdsaanduiding"
   </dest>
   <voice>
     *: none
-    rtc: "Tijds aanduiding"
+    rtc: "Tijdsaanduiding"
   </voice>
 </phrase>
 <phrase>
@@ -3680,11 +3682,11 @@
   </source>
   <dest>
     *: none
-    rtc: "12 uur klok"
+    rtc: "12-uursklok"
   </dest>
   <voice>
     *: none
-    rtc: "12 uur Klok"
+    rtc: "12-uursklok"
   </voice>
 </phrase>
 <phrase>
@@ -3697,11 +3699,11 @@
   </source>
   <dest>
     *: none
-    rtc: "24 uur klok"
+    rtc: "24-uursklok"
   </dest>
   <voice>
     *: none
-    rtc: "24 uur klok"
+    rtc: "24-uursklok"
   </voice>
 </phrase>
 <phrase>
@@ -3712,10 +3714,10 @@
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "Max aantal bestanden in bestandsbeheer"
+    *: "Max. aantal bestanden in bestandsbeheer"
   </dest>
   <voice>
-    *: "Max aantal bestanden in bestandsbeheer"
+    *: "Maximaal aantal bestanden in bestandsbeheer"
   </voice>
 </phrase>
 <phrase>
@@ -3726,10 +3728,10 @@
     *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Max speellijst grootte"
+    *: "Max. afspeellijstgrootte"
   </dest>
   <voice>
-    *: "Max speellijst grootte"
+    *: "Maximale afspeellijstgrootte"
   </voice>
 </phrase>
 <phrase>
@@ -3740,10 +3742,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Speellijst"
+    *: "Afspeellijst"
   </dest>
   <voice>
-    *: "Speellijst"
+    *: "Afspeellijst"
   </voice>
 </phrase>
 <phrase>
@@ -3768,10 +3770,10 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "Toon ID3 tags"
+    *: "Nummerinformatie tonen"
   </dest>
   <voice>
-    *: "Toon ID3 tags"
+    *: "Nummerinformatie tonen"
   </voice>
 </phrase>
 <phrase>
@@ -3782,10 +3784,10 @@
     *: "Set Song Rating"
   </source>
   <dest>
-    *: "Nummer beoordeling"
+    *: "Nummer beoordelen"
   </dest>
   <voice>
-    *: "Nummer beoordeling"
+    *: "Nummer beoordelen"
   </voice>
 </phrase>
 <phrase>
@@ -3796,10 +3798,10 @@
     *: "Rename"
   </source>
   <dest>
-    *: "Hernoem"
+    *: "Hernoemen"
   </dest>
   <voice>
-    *: "Hernoem"
+    *: "Hernoemen"
   </voice>
 </phrase>
 <phrase>
@@ -3882,11 +3884,11 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Kies als achtergrond"
+    lcd_non-mono: "Instellen als achtergrond"
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Kies als achtergrond"
+    lcd_non-mono: "Instellen als achtergrond"
   </voice>
 </phrase>
 <phrase>
@@ -3897,10 +3899,10 @@
     *: "Delete Directory"
   </source>
   <dest>
-    *: "Verwijder map"
+    *: "Map verwijderen"
   </dest>
   <voice>
-    *: "Verwijder map"
+    *: "Map verwijderen"
   </voice>
 </phrase>
 <phrase>
@@ -3953,10 +3955,10 @@
     *: "Create Directory"
   </source>
   <dest>
-    *: "Maak map"
+    *: "Map aanmaken"
   </dest>
   <voice>
-    *: "Maak map"
+    *: "Map aanmaken"
   </voice>
 </phrase>
 <phrase>
@@ -3984,10 +3986,10 @@
     *: "View"
   </source>
   <dest>
-    *: "Toon"
+    *: "Tonen"
   </dest>
   <voice>
-    *: "Toon"
+    *: "Tonen"
   </voice>
 </phrase>
 <phrase>
@@ -3998,10 +4000,10 @@
     *: "Reshuffle"
   </source>
   <dest>
-    *: "Herschud"
+    *: "Herschudden"
   </dest>
   <voice>
-    *: "Herschud"
+    *: "Herschudden"
   </voice>
 </phrase>
 <phrase>
@@ -4026,10 +4028,10 @@
     *: "Insert Next"
   </source>
   <dest>
-    *: "Voeg in als volgende"
+    *: "Invoegen als volgende"
   </dest>
   <voice>
-    *: "Voeg in als volgende"
+    *: "Invoegen als volgende"
   </voice>
 </phrase>
 <phrase>
@@ -4040,10 +4042,10 @@
     *: "Insert Last"
   </source>
   <dest>
-    *: "Voeg in als laatste"
+    *: "Invoegen als laatste"
   </dest>
   <voice>
-    *: "Voeg in als laatste"
+    *: "Invoegen als laatste"
   </voice>
 </phrase>
 <phrase>
@@ -4054,10 +4056,10 @@
     *: "Insert Shuffled"
   </source>
   <dest>
-    *: "Voeg in geschud"
+    *: "Geschud invoegen"
   </dest>
   <voice>
-    *: "Voeg in geschud"
+    *: "Geschud invoegen"
   </voice>
 </phrase>
 <phrase>
@@ -4068,10 +4070,10 @@
     *: "Queue"
   </source>
   <dest>
-    *: "In wachtrij"
+    *: "In wachtrij plaatsen"
   </dest>
   <voice>
-    *: "In wachtrij"
+    *: "In wachtrij plaatsen"
   </voice>
 </phrase>
 <phrase>
@@ -4082,10 +4084,10 @@
     *: "Queue Next"
   </source>
   <dest>
-    *: "Volgende in wachtrij"
+    *: "Als volgende in wachtrij plaatsen"
   </dest>
   <voice>
-    *: "Volgende in wachtrij"
+    *: "Als volgende in wachtrij plaatsen"
   </voice>
 </phrase>
 <phrase>
@@ -4096,10 +4098,10 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "Onderaan Wachtrij"
+    *: "Onderaan wachtrij plaatsen"
   </dest>
   <voice>
-    *: "Onderaan Wachtrij"
+    *: "Onderaan wachtrij plaatsen"
   </voice>
 </phrase>
 <phrase>
@@ -4110,10 +4112,10 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "In wachtrij geschud"
+    *: "Geschud in wachtrij plaatsen"
   </dest>
   <voice>
-    *: "In wachtrij geschud"
+    *: "Geschud in wachtrij plaatsen"
   </voice>
 </phrase>
 <phrase>
@@ -4124,10 +4126,10 @@
     *: "Search In Playlist"
   </source>
   <dest>
-    *: "Zoek in speellijst"
+    *: "Zoeken in afspeellijst"
   </dest>
   <voice>
-    *: "Zoek in speellijst"
+    *: "Zoeken in afspeellijst"
   </voice>
 </phrase>
 <phrase>
@@ -4141,7 +4143,7 @@
     *: "Zoeken... %d gevonden (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Zoeken... %d gevonden (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -4152,10 +4154,10 @@
     *: "Create Bookmark"
   </source>
   <dest>
-    *: "Maak bladwijzer"
+    *: "Bladwijzer aanmaken"
   </dest>
   <voice>
-    *: "Maak bladwijzer"
+    *: "Bladwijzer aanmaken"
   </voice>
 </phrase>
 <phrase>
@@ -4166,10 +4168,10 @@
     *: "List Bookmarks"
   </source>
   <dest>
-    *: "Toon bladwijzers"
+    *: "Bladwijzers tonen"
   </dest>
   <voice>
-    *: "Toon bladwijzers"
+    *: "Bladwijzers tonen"
   </voice>
 </phrase>
 <phrase>
@@ -4180,10 +4182,10 @@
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "Rockbox info"
+    *: "Rockbox-info"
   </dest>
   <voice>
-    *: "Rockbox info"
+    *: "Rockbox-info"
   </voice>
 </phrase>
 <phrase>
@@ -4196,7 +4198,7 @@
   </source>
   <dest>
     *: none
-    charging: "Batterij: Opladen"
+    charging: "Batterij: opladen"
   </dest>
   <voice>
     *: none
@@ -4213,7 +4215,7 @@
   </source>
   <dest>
     *: none
-    archosrecorder: "Batterij: Vol Laden"
+    archosrecorder: "Batterij: vol laden"
   </dest>
   <voice>
     *: none
@@ -4230,11 +4232,11 @@
   </source>
   <dest>
     *: none
-    charging: "Batterij: Druppel Laden"
+    charging: "Batterij: druppelsgewijs laden"
   </dest>
   <voice>
     *: none
-    charging: "Batterij druppel laden"
+    charging: "Batterij druppelsgewijs laden"
   </voice>
 </phrase>
 <phrase>
@@ -4252,7 +4254,7 @@
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
-    *: "Batterij niveau"
+    *: "Batterijniveau"
   </voice>
 </phrase>
 <phrase>
@@ -4263,10 +4265,10 @@
     *: "Disk:"
   </source>
   <dest>
-    *: "Schijf"
+    *: "Schijf:"
   </dest>
   <voice>
-    *: "Schijf groote"
+    *: "Schijfgrootte"
   </voice>
 </phrase>
 <phrase>
@@ -4280,7 +4282,7 @@
     *: "Beschikbaar:"
   </dest>
   <voice>
-    *: "Shijfruimte beschikbaar:"
+    *: "Beschikbare schijfruimte:"
   </voice>
 </phrase>
 <phrase>
@@ -4293,7 +4295,7 @@
   </source>
   <dest>
     *: none
-    multivolume: "Intern"
+    multivolume: "Intern:"
   </dest>
   <voice>
     *: none
@@ -4320,7 +4322,7 @@
     *: none
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro S D"
-    archosondio*: "Multimedia kaart"
+    archosondio*: "Multimediakaart"
   </voice>
 </phrase>
 <phrase>
@@ -4350,11 +4352,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Versnel"
+    pitchscreen: "Versnellen"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Versnel"
+    pitchscreen: "Versnellen"
   </voice>
 </phrase>
 <phrase>
@@ -4367,11 +4369,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Vertraag"
+    pitchscreen: "Vertragen"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Vertraag"
+    pitchscreen: "Vertragen"
   </voice>
 </phrase>
 <phrase>
@@ -4382,10 +4384,10 @@
     *: "Pause"
   </source>
   <dest>
-    *: "Pauze"
+    *: "Pauzeren"
   </dest>
   <voice>
-    *: "Pauze"
+    *: "Pauzeren"
   </voice>
 </phrase>
 <phrase>
@@ -4396,10 +4398,10 @@
     *: "Create a Bookmark?"
   </source>
   <dest>
-    *: "Maak een bladwijzer?"
+    *: "Bladwijzer aanmaken?"
   </dest>
   <voice>
-    *: "Maak een bladwijzer?"
+    *: "Bladwijzer aanmaken?"
   </voice>
 </phrase>
 <phrase>
@@ -4410,10 +4412,10 @@
     *: "Bookmark Created"
   </source>
   <dest>
-    *: "Bladwijzer gemaakt"
+    *: "Bladwijzer aangemaakt"
   </dest>
   <voice>
-    *: "Bladwijzer gemaakt"
+    *: "Bladwijzer aangemaakt"
   </voice>
 </phrase>
 <phrase>
@@ -4424,10 +4426,10 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Bladwijzer maken mislukt!"
+    *: "Bladwijzer aanmaken mislukt!"
   </dest>
   <voice>
-    *: "Bladwijzer maken mislukt!"
+    *: "Bladwijzer aanmaken mislukt!"
   </voice>
 </phrase>
 <phrase>
@@ -4438,10 +4440,10 @@
     *: "Bookmark Empty"
   </source>
   <dest>
-    *: "Bladwijzer leeg"
+    *: "Bladwijzer is leeg"
   </dest>
   <voice>
-    *: "Bladwijzer leeg"
+    *: "Bladwijzer is leeg"
   </voice>
 </phrase>
 <phrase>
@@ -4481,7 +4483,20 @@
     samsungyh*: "REW = terugzetten"
   </dest>
   <voice>
-    *: ""
+    *: none
+    rtc: "OFF = terugzetten"
+    mrobe500: "POWER = terugzetten"
+    iriverh100,iriverh120,iriverh300: "STOP = terugzetten"
+    ipod*,sansac200*,mpiohd300: "MENU = terugzetten"
+    iaudiox5,iaudiom5: "RECORD = terugzetten"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = terugzetten"
+    gigabeatfx: "POWER = terugzetten"
+    sansafuzeplus: "BACK = terugzetten"
+    mrobe100: "DISPLAY = terugzetten"
+    gigabeats: "BACK = terugzetten"
+    gogearsa9200: "LINKS = terugzetten"
+    vibe500: "C = terugzetten"
+    samsungyh*: "REW = terugzetten"
   </voice>
 </phrase>
 <phrase>
@@ -4498,7 +4513,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Tijd"
   </voice>
 </phrase>
 <phrase>
@@ -4532,14 +4547,19 @@
   </source>
   <dest>
     *: none
-    recording: "De schijf is vol. Druk OFF om door te gaan."
-    iriverh100,iriverh120,iriverh300: "De schijf is vol. Druk STOP om door te gaan."
-    iaudiom5,iaudiox5: "De schijf is vol. Druk POWER om door te gaan."
-    sansae200*,sansac200*,vibe500: "De schijf is vol. Druk PREV om door te gaan."
-    samsungyh*: "De schijf is vol. Druk LEFT om door te gaan."
+    recording: "De schijf is vol. Druk op OFF om verder te gaan."
+    iriverh100,iriverh120,iriverh300: "De schijf is vol. Druk op STOP om verder te gaan."
+    iaudiom5,iaudiox5: "De schijf is vol. Druk op POWER om verder te gaan."
+    sansae200*,sansac200*,vibe500: "De schijf is vol. Druk op PREV om verder te gaan."
+    samsungyh*: "De schijf is vol. Druk op LINKS om verder te gaan."
   </dest>
   <voice>
-    *: ""
+    *: none
+    recording: "De schijf is vol. Druk op OFF om verder te gaan."
+    iriverh100,iriverh120,iriverh300: "De schijf is vol. Druk op STOP om verder te gaan."
+    iaudiom5,iaudiox5: "De schijf is vol. Druk op POWER om verder te gaan."
+    sansae200*,sansac200*,vibe500: "De schijf is vol. Druk op PREV om verder te gaan."
+    samsungyh*: "De schijf is vol. Druk op LINKS om verder te gaan."
   </voice>
 </phrase>
 <phrase>
@@ -4552,11 +4572,11 @@
   </source>
   <dest>
     *: none
-    recording: "Eenmaal"
+    recording: "Eenmalig"
   </dest>
   <voice>
     *: none
-    recording: "Eenmaal"
+    recording: "Eenmalig"
   </voice>
 </phrase>
 <phrase>
@@ -4569,11 +4589,11 @@
   </source>
   <dest>
     *: none
-    recording: "Begin boven"
+    recording: "Bovenaan beginnen"
   </dest>
   <voice>
     *: none
-    recording: "Begin boven"
+    recording: "Bovenaan beginnen"
   </voice>
 </phrase>
 <phrase>
@@ -4586,11 +4606,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stop onder"
+    recording: "Onderaan stoppen"
   </dest>
   <voice>
     *: none
-    recording: "Stop onder"
+    recording: "Onderaan stoppen"
   </voice>
 </phrase>
 <phrase>
@@ -4603,11 +4623,11 @@
   </source>
   <dest>
     *: none
-    recording: "Voor splits gat"
+    recording: "Voorsplitsgat"
   </dest>
   <voice>
     *: none
-    recording: "Voor splits gat"
+    recording: "Voorsplitsgat"
   </voice>
 </phrase>
 <phrase>
@@ -4637,11 +4657,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Inschakel tijd:"
+    alarm: "Alarmtijd:"
   </dest>
   <voice>
     *: none
-    alarm: "Inschakel tijd:"
+    alarm: "Alarmtijd"
   </voice>
 </phrase>
 <phrase>
@@ -4654,11 +4674,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Inschakelen om: %d:%02d"
+    alarm: "Wekken om: %d:%02d"
   </dest>
   <voice>
     *: none
-    alarm: "Inschakelen om: %d:%02d"
+    alarm: "Wekken om: %d:%02d"
   </voice>
 </phrase>
 <phrase>
@@ -4671,11 +4691,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Alarm Ingesteld"
+    alarm: "Alarm ingesteld"
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Ingesteld"
+    alarm: "Alarm ingesteld"
   </voice>
 </phrase>
 <phrase>
@@ -4688,11 +4708,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Inschakel tijd te dichtbij"
+    alarm: "Inschakeltijd is te dichtbij!"
   </dest>
   <voice>
     *: none
-    alarm: "Inschakel tijd te dichtbij"
+    alarm: "Inschakeltijd is te dichtbij!"
   </voice>
 </phrase>
 <phrase>
@@ -4711,20 +4731,23 @@
   </source>
   <dest>
     *: none
-    alarm: "PLAY=Instellen OFF=Afbreken"
-    ipod*: "SELECT=Instellen MENU=Afbreken"
-    iriverh10,iriverh10_5gb: "SELECT=Instellen PREV=Afbreken"
-    gigabeats: "SELECT=Instellen POWER=Afbreken"
-    vibe500: "OK=Instellen C=Afbreken"
-    mpiohd300: "ENTER=Instellen MENU=Afbreken"
-    sansafuzeplus: "SELECT=Instellen  BACK=Afbreken"
+    alarm: "PLAY=instellen, OFF=annuleren"
+    ipod*: "SELECT=instellen, MENU=annuleren"
+    iriverh10,iriverh10_5gb: "SELECT=instellen, PREV=annuleren"
+    gigabeats: "SELECT=instellen, POWER=annuleren"
+    vibe500: "OK=instellen, C=annuleren"
+    mpiohd300: "ENTER=instellen, MENU=annuleren"
+    sansafuzeplus: "SELECT=instellen, BACK=annuleren"
   </dest>
   <voice>
     *: none
-    alarm: "PLAY=Instellen OFF=Afbreken"
-    ipod*: "SELECT=Instellen MENU=Afbreken"
-    iriverh10,iriverh10_5gb: "SELECT=Instellen PREV=Afbreken"
-    gigabeats: "SELECT=Instellen POWER=Afbreken"
+    alarm: "PLAY=instellen, OFF=annuleren"
+    ipod*: "SELECT=instellen, MENU=annuleren"
+    iriverh10,iriverh10_5gb: "SELECT=instellen, PREV=annuleren"
+    gigabeats: "SELECT=instellen, POWER=annuleren"
+    vibe500: "OK=instellen, C=annuleren"
+    mpiohd300: "ENTER=instellen, MENU=annuleren"
+    sansafuzeplus: "SELECT=instellen, BACK=annuleren"
   </voice>
 </phrase>
 <phrase>
@@ -4737,11 +4760,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Alarm Uitgeschakeld"
+    alarm: "Alarm uitgeschakeld"
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Uitgeschakeld"
+    alarm: "Alarm uitgeschakeld"
   </voice>
 </phrase>
 <phrase>
@@ -4848,7 +4871,7 @@
     *: "Tracknum"
   </dest>
   <voice>
-    *: "Tracknum"
+    *: "Tracknummer"
   </voice>
 </phrase>
 <phrase>
@@ -4901,10 +4924,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Speellijst"
+    *: "Afspeellijst"
   </dest>
   <voice>
-    *: "Speellijst"
+    *: "Afspeellijst"
   </voice>
 </phrase>
 <phrase>
@@ -4957,10 +4980,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Nummer versterking"
+    *: "Nummerversterking"
   </dest>
   <voice>
-    *: "Nummer versterking"
+    *: "Nummerversterking"
   </voice>
 </phrase>
 <phrase>
@@ -4971,10 +4994,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Album versterking"
+    *: "Albumversterking"
   </dest>
   <voice>
-    *: "Album versterking"
+    *: "Albumversterking"
   </voice>
 </phrase>
 <phrase>
@@ -4985,10 +5008,10 @@
     *: "Path"
   </source>
   <dest>
-    *: "Lokatie"
+    *: "Pad"
   </dest>
   <voice>
-    *: "Lokatie"
+    *: "Pad"
   </voice>
 </phrase>
 <phrase>
@@ -5002,7 +5025,7 @@
     *: "<geen info>"
   </dest>
   <voice>
-    *: "geen info"
+    *: "Geen info"
   </voice>
 </phrase>
 <phrase>
@@ -6501,7 +6524,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "audiobestand"
   </voice>
 </phrase>
 <phrase>
@@ -6515,7 +6538,7 @@
     *: ""
   </dest>
   <voice>
-    *: "configuratie"
+    *: "configuratiebestand"
   </voice>
 </phrase>
 <phrase>
@@ -6529,7 +6552,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Het terwijl spelen scherm"
+    *: "speelschermbestand"
   </voice>
 </phrase>
 <phrase>
@@ -6543,7 +6566,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plugin"
+    *: "plug-in"
   </voice>
 </phrase>
 <phrase>
@@ -6602,7 +6625,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Afstand bediening tijdens spelen scherm"
+    remote: "externspeelschermbestand"
   </voice>
 </phrase>
 <phrase>
@@ -6627,10 +6650,10 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Speellijst Buffer Vol"
+    *: "Afspeellijstbuffer vol"
   </dest>
   <voice>
-    *: "Speellijst Buffer Vol"
+    *: "Afspeellijstbuffer vol"
   </voice>
 </phrase>
 <phrase>
@@ -6641,10 +6664,10 @@
     *: "Creating"
   </source>
   <dest>
-    *: "Creeëren..."
+    *: "Aanmaken..."
   </dest>
   <voice>
-    *: ""
+    *: "Aanmaken"
   </voice>
 </phrase>
 <phrase>
@@ -6655,10 +6678,10 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "%d nummers toegevoegd (%s)"
+    *: "%d nummers ingevoegd (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "%d nummers ingevoegd (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -6669,10 +6692,10 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "%d nummers in wachtrij (%s)"
+    *: "%d nummers in wachtrij geplaatst (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "%d nummers in wachtrij geplaatst (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -6686,7 +6709,7 @@
     *: "%d nummers opgeslagen (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "%d nummers opgeslagen (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -6697,10 +6720,10 @@
     *: "Recursively?"
   </source>
   <dest>
-    *: "Ook sub-mappen?"
+    *: "Ook onderliggende mappen?"
   </dest>
   <voice>
-    *: "Ook sub-mappen?"
+    *: "Ook onderliggende mappen?"
   </voice>
 </phrase>
 <phrase>
@@ -6711,10 +6734,10 @@
     *: "Erase dynamic playlist?"
   </source>
   <dest>
-    *: "Dynamische speellijst wissen?"
+    *: "Dynamische afspeellijst wissen?"
   </dest>
   <voice>
-    *: "Dynamische speellijst wissen?"
+    *: "Dynamische afspeellijst wissen?"
   </voice>
 </phrase>
 <phrase>
@@ -6739,10 +6762,10 @@
     *: "Error updating playlist control file"
   </source>
   <dest>
-    *: "Fout in bijwerken speellijst stuurbestand"
+    *: "Fout bij bijwerken van afspeellijststuurbestand"
   </dest>
   <voice>
-    *: "Fout in bijwerken speellijst stuurbestand"
+    *: "Fout bij bijwerken van afspeellijststuurbestand"
   </voice>
 </phrase>
 <phrase>
@@ -6753,10 +6776,10 @@
     *: "Error accessing playlist file"
   </source>
   <dest>
-    *: "Fout tijdens benaderen speellijst bestand"
+    *: "Fout bij openen van afspeellijstbestand"
   </dest>
   <voice>
-    *: "Fout tijdens benaderen speellijst bestand"
+    *: "Fout bij openen van afspeellijstbestand"
   </voice>
 </phrase>
 <phrase>
@@ -6767,10 +6790,10 @@
     *: "Error accessing playlist control file"
   </source>
   <dest>
-    *: "Fout tijdens benaderen speellijst stuurbestand"
+    *: "Fout bij openen van afspeellijststuurbestand"
   </dest>
   <voice>
-    *: "Fout tijdens benaderen speellijst stuurbestand"
+    *: "Fout bij openen van afspeellijststuurbestand"
   </voice>
 </phrase>
 <phrase>
@@ -6781,10 +6804,10 @@
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "Fout bij toegang map"
+    *: "Fout bij openen van map"
   </dest>
   <voice>
-    *: "Fout bij toegang map"
+    *: "Fout bij openen van map"
   </voice>
 </phrase>
 <phrase>
@@ -6795,10 +6818,10 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "Speellijst stuurbestand is niet geldig"
+    *: "Afspeellijststuurbestand is niet geldig"
   </dest>
   <voice>
-    *: "Speellijst stuurbestand is niet geldig"
+    *: "Afspeellijststuurbestand is niet geldig"
   </voice>
 </phrase>
 <phrase>
@@ -6845,11 +6868,11 @@
   </source>
   <dest>
     *: none
-    radio: "Bewerk voorkeuze"
+    radio: "Voorkeuze bewerken"
   </dest>
   <voice>
     *: none
-    radio: "Bewerk voorkeuze"
+    radio: "Voorkeuze bewerken"
   </voice>
 </phrase>
 <phrase>
@@ -6862,11 +6885,11 @@
   </source>
   <dest>
     *: none
-    radio: "Verwijder voorkeuze"
+    radio: "Voorkeuze verwijderen"
   </dest>
   <voice>
     *: none
-    radio: "Verwijder voorkeuze"
+    radio: "Voorkeuze verwijderen"
   </voice>
 </phrase>
 <phrase>
@@ -6896,11 +6919,11 @@
   </source>
   <dest>
     *: none
-    radio: "De voorkeuze lijst is vol"
+    radio: "De voorkeuzelijst is vol"
   </dest>
   <voice>
     *: none
-    radio: "De voorkeuze lijst is vol"
+    radio: "De voorkeuzelijst is vol"
   </voice>
 </phrase>
 <phrase>
@@ -6964,11 +6987,11 @@
   </source>
   <dest>
     *: none
-    radio_screen_button_bar: "Voeg toe"
+    radio_screen_button_bar: "Toevoegen"
   </dest>
   <voice>
     *: none
-    radio_screen_button_bar: "Voeg toe"
+    radio_screen_button_bar: "Toevoegen"
   </voice>
 </phrase>
 <phrase>
@@ -6998,11 +7021,11 @@
   </source>
   <dest>
     *: none
-    radio: "Forceer mono"
+    radio: "Mono dwingen"
   </dest>
   <voice>
     *: none
-    radio: "Forceer mono"
+    radio: "Mono dwingen"
   </voice>
 </phrase>
 <phrase>
@@ -7019,7 +7042,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Scherm geblokkeerd"
+    radio: "Scherm geblokkeerd!"
   </voice>
 </phrase>
 <phrase>
@@ -7032,11 +7055,11 @@
   </source>
   <dest>
     *: none
-    radio: "Automatische voorkeuzes"
+    radio: "Voorkeuzes automatisch zoeken"
   </dest>
   <voice>
     *: none
-    radio: "Automatische voorkeuzes"
+    radio: "Voorkeuzes automatisch zoeken"
   </voice>
 </phrase>
 <phrase>
@@ -7049,11 +7072,11 @@
   </source>
   <dest>
     *: none
-    radio: "Voorkeuzes wissen?"
+    radio: "Huidige voorkeuzes wissen?"
   </dest>
   <voice>
     *: none
-    radio: "Voorkeuzes wissen?"
+    radio: "Huidige voorkeuzes wissen?"
   </voice>
 </phrase>
 <phrase>
@@ -7115,10 +7138,10 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Map Buffer Is Vol!"
+    *: "Mapbuffer is vol!"
   </dest>
   <voice>
-    *: "Map Buffer Is Vol!"
+    *: "Mapbuffer is vol!"
   </voice>
 </phrase>
 <phrase>
@@ -7129,7 +7152,7 @@
     *: "New Language"
   </source>
   <dest>
-    *: "Nieuwe Taal"
+    *: "Nieuwe taal"
   </dest>
   <voice>
     *: "Nieuwe taal"
@@ -7171,10 +7194,10 @@
     *: "Boot changed"
   </source>
   <dest>
-    *: "Opstart bestand gewijzigd"
+    *: "Opstartbestand gewijzigd"
   </dest>
   <voice>
-    *: "Opstart bestand gewijzigd"
+    *: "Opstartbestand gewijzigd"
   </voice>
 </phrase>
 <phrase>
@@ -7185,10 +7208,10 @@
     *: "Reboot now?"
   </source>
   <dest>
-    *: "Opnieuw starten?"
+    *: "Opnieuw opstarten?"
   </dest>
   <voice>
-    *: "Opnieuw starten?"
+    *: "Opnieuw opstarten?"
   </voice>
 </phrase>
 <phrase>
@@ -7216,7 +7239,14 @@
     sansafuzeplus: "BACK om af te breken"
   </dest>
   <voice>
-    *: ""
+    *: "OFF om af te breken"
+    archosplayer,iriverh100,iriverh120,iriverh300: "STOP om af te breken"
+    ipod*: "PLAY/PAUSE om af te breken"
+    iaudiox5,iaudiom5: "Long PLAY om af te breken"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV om af te breken"
+    gigabeats: "BACK om af te breken"
+    gigabeatfx: "POWER om af te breken"
+    sansafuzeplus: "BACK om af te breken"
   </voice>
 </phrase>
 <phrase>
@@ -7275,10 +7305,10 @@
     *: "New Keyboard"
   </source>
   <dest>
-    *: "Nieuw Toetsenbord"
+    *: "Nieuw toetsenbord"
   </dest>
   <voice>
-    *: "Nieuw Toetsenbord"
+    *: "Nieuw toetsenbord"
   </voice>
 </phrase>
 <phrase>
@@ -7289,10 +7319,10 @@
     *: "Move"
   </source>
   <dest>
-    *: "Verplaats"
+    *: "Verplaatsen"
   </dest>
   <voice>
-    *: "Verplaats"
+    *: "Verplaatsen"
   </voice>
 </phrase>
 <phrase>
@@ -7303,10 +7333,10 @@
     *: "Show Indices"
   </source>
   <dest>
-    *: "Toon Indexen"
+    *: "Indices weergeven"
   </dest>
   <voice>
-    *: "Toon Indexen"
+    *: "Indices weergeven"
   </voice>
 </phrase>
 <phrase>
@@ -7317,10 +7347,10 @@
     *: "Track Display"
   </source>
   <dest>
-    *: "Track weergave"
+    *: "Trackweergave"
   </dest>
   <voice>
-    *: "Track weergave"
+    *: "Trackweergave"
   </voice>
 </phrase>
 <phrase>
@@ -7331,10 +7361,10 @@
     *: "Track Name Only"
   </source>
   <dest>
-    *: "Enkel track naam"
+    *: "Enkel tracknaam"
   </dest>
   <voice>
-    *: "Enkel track naam"
+    *: "Enkel tracknaam"
   </voice>
 </phrase>
 <phrase>
@@ -7359,10 +7389,10 @@
     *: "Remove"
   </source>
   <dest>
-    *: "Verwijder"
+    *: "Verwijderen"
   </dest>
   <voice>
-    *: "Verwijder"
+    *: "Verwijderen"
   </voice>
 </phrase>
 <phrase>
@@ -7376,7 +7406,7 @@
     *: "Kan %s niet openen"
   </dest>
   <voice>
-    *: ""
+    *: "Kan %s niet openen"
   </voice>
 </phrase>
 <phrase>
@@ -7387,10 +7417,10 @@
     *: "Failed reading %s"
   </source>
   <dest>
-    *: "Kon %s niet lezen"
+    *: "Kan %s niet lezen"
   </dest>
   <voice>
-    *: ""
+    *: "Kan %s niet lezen"
   </voice>
 </phrase>
 <phrase>
@@ -7401,10 +7431,10 @@
     *: "Incompatible model"
   </source>
   <dest>
-    *: "Model niet geschikt voor plugin"
+    *: "Model niet geschikt voor plug-in"
   </dest>
   <voice>
-    *: ""
+    *: "Model niet geschikt voor plug-in"
   </voice>
 </phrase>
 <phrase>
@@ -7415,10 +7445,10 @@
     *: "Incompatible version"
   </source>
   <dest>
-    *: "Versie niet geschikt voor plugin"
+    *: "Versie niet geschikt voor plug-in"
   </dest>
   <voice>
-    *: ""
+    *: "Versie niet geschikt voor plug-in"
   </voice>
 </phrase>
 <phrase>
@@ -7429,10 +7459,10 @@
     *: "Plugin returned error"
   </source>
   <dest>
-    *: "Plugin foutmelding"
+    *: "Plug-infoutmelding"
   </dest>
   <voice>
-    *: ""
+    *: "Plug-infoutmelding"
   </voice>
 </phrase>
 <phrase>
@@ -7443,10 +7473,10 @@
     *: "Filetype array full"
   </source>
   <dest>
-    *: "Bestandstype lijst vol"
+    *: "Bestandstypelijst vol"
   </dest>
   <voice>
-    *: "Bestandstype lijst vol"
+    *: "Bestandstypelijst vol"
   </voice>
 </phrase>
 <phrase>
@@ -7459,11 +7489,11 @@
   </source>
   <dest>
     *: none
-    radio: "Laad voorkeuze lijst"
+    radio: "Voorkeuzelijst laden"
   </dest>
   <voice>
     *: none
-    radio: "Laad voorkeuze lijst"
+    radio: "Voorkeuzelijst laden"
   </voice>
 </phrase>
 <phrase>
@@ -7476,11 +7506,11 @@
   </source>
   <dest>
     *: none
-    radio: "Sla voorkeuze lijst op"
+    radio: "Voorkeuzelijst opslaan"
   </dest>
   <voice>
     *: none
-    radio: "Sla voorkeuze lijst op"
+    radio: "Voorkeuzelijst opslaan"
   </voice>
 </phrase>
 <phrase>
@@ -7493,11 +7523,11 @@
   </source>
   <dest>
     *: none
-    radio: "Verwijder voorkeuze lijst"
+    radio: "Voorkeuzelijst wissen"
   </dest>
   <voice>
     *: none
-    radio: "Verwijder voorkeuze lijst"
+    radio: "Voorkeuzelijst wissen"
   </voice>
 </phrase>
 <phrase>
@@ -7510,11 +7540,11 @@
   </source>
   <dest>
     *: none
-    radio: "Voorkeuze lijst"
+    radio: "Voorkeuzelijst"
   </dest>
   <voice>
     *: none
-    radio: "Voorkeuze lijst"
+    radio: "Voorkeuzelijst"
   </voice>
 </phrase>
 <phrase>
@@ -7527,11 +7557,11 @@
   </source>
   <dest>
     *: none
-    radio: "Geen voorkeuze gevonden, zoeken?"
+    radio: "Geen instellingen gevonden, automatisch zoeken?"
   </dest>
   <voice>
     *: none
-    radio: "Geen voorkeuze gevonden, zoeken?"
+    radio: "Geen instellingen gevonden, automatisch zoeken?"
   </voice>
 </phrase>
 <phrase>
@@ -7561,11 +7591,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Directe versterking"
+    swcodec: "Rechtstreekse versterking"
   </dest>
   <voice>
     *: none
-    swcodec: "Directe versterking"
+    swcodec: "Rechtstreekse versterking"
   </voice>
 </phrase>
 <phrase>
@@ -7578,11 +7608,11 @@
   </source>
   <dest>  
     *: none
-    swcodec: "Cross versterking"
+    swcodec: "Crossversterking"
   </dest>
   <voice>  
     *: none
-    swcodec: "Cross versterking"
+    swcodec: "Crossversterking"
   </voice>
 </phrase>
 <phrase>
@@ -7595,11 +7625,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Hoge frequentie vermindering"
+    swcodec: "Hogefrequentievermindering"
   </dest>
   <voice>
     *: none
-    swcodec: "Hoge frequentie vermindering"
+    swcodec: "Hogefrequentievermindering"
   </voice>
 </phrase>
 <phrase>
@@ -7627,10 +7657,10 @@
     *: "Database is not ready"
   </source>
   <dest>
-    *: "Database niet klaar"
+    *: "Database is niet klaar"
   </dest>
   <voice>
-    *: "Database niet klaar"
+    *: "Database is niet klaar"
   </voice>
 </phrase>
 <phrase>
@@ -7641,10 +7671,10 @@
     *: "<All tracks>"
   </source>
   <dest>
-    *: "<Alle tracks>"
+    *: "<Alle nummers>"
   </dest>
   <voice>
-    *: "Alle tracks"
+    *: "Alle nummers"
   </voice>
 </phrase>
 <phrase>
@@ -7655,10 +7685,10 @@
     *: "Invalid Filename!"
   </source>
   <dest>
-    *: "Foute bestandsnaam!"
+    *: "Ongeldige bestandsnaam!"
   </dest>
   <voice>
-    *: "Foute bestandsnaam!"
+    *: "Ongeldige bestandsnaam!"
   </voice>
 </phrase>
 <phrase>
@@ -7671,11 +7701,11 @@
   </source>
   <dest>
     *: none
-    remote: "Scroll opties afstandsbediening"
+    remote: "Externe scrollopties"
   </dest>
   <voice>
     *: none
-    remote: "Scroll opties afstandsbediening"
+    remote: "Externe scrollopties"
   </voice>
 </phrase>
 <phrase>
@@ -7686,10 +7716,10 @@
     *: "Update Now"
   </source>
   <dest>
-    *: "Ververs nu"
+    *: "Nu bijwerken"
   </dest>
   <voice>
-    *: "Ververs nu"
+    *: "Nu bijwerken"
   </voice>
 </phrase>
 <phrase>
@@ -7700,10 +7730,10 @@
     *: "Auto Update"
   </source>
   <dest>
-    *: "Automatisch verversen"
+    *: "Automatisch bijwerken"
   </dest>
   <voice>
-    *: "Automatisch verversen"
+    *: "Automatisch bijwerken"
   </voice>
 </phrase>
 <phrase>
@@ -7714,10 +7744,10 @@
     *: "Export Modifications"
   </source>
   <dest>
-    *: "Exporteer wijzigingen"
+    *: "Wijzigingen exporteren"
   </dest>
   <voice>
-    *: "Exporteer wijzigingen"
+    *: "Wijzigingen exporteren"
   </voice>
 </phrase>
 <phrase>
@@ -7728,10 +7758,10 @@
     *: "Playlist Catalogue"
   </source>
   <dest>
-    *: "Speellijst cataloog"
+    *: "Afspeellijstcatalogus"
   </dest>
   <voice>
-    *: "Speellijst cataloog"
+    *: "Afspeellijstcatalogus"
   </voice>
 </phrase>
 <phrase>
@@ -7742,10 +7772,10 @@
     *: "Add to Playlist"
   </source>
   <dest>
-    *: "Voeg toe aan speellijst"
+    *: "Toevoegen aan afspeellijst"
   </dest>
   <voice>
-    *: "Voeg toe aan speellijst"
+    *: "Toevoegen aan afspeellijst"
   </voice>
 </phrase>
 <phrase>
@@ -7756,10 +7786,10 @@
     *: "Add to New Playlist"
   </source>
   <dest>
-    *: "Voeg toe aan nieuwe speellijst"
+    *: "Toevoegen aan nieuwe afspeellijst"
   </dest>
   <voice>
-    *: "Voeg toe aan nieuwe speellijst"
+    *: "Toevoegen aan nieuwe afspeellijst"
   </voice>
 </phrase>
 <phrase>
@@ -7770,10 +7800,10 @@
     *: "View Catalogue"
   </source>
   <dest>
-    *: "Toon catalogus"
+    *: "Catalogus tonen"
   </dest>
   <voice>
-    *: "Toon catalogus"
+    *: "Catalogus tonen"
   </voice>
 </phrase>
 <phrase>
@@ -7787,7 +7817,7 @@
     *: "%s bestaat niet"
   </dest>
   <voice>
-    *: ""
+    *: "%s bestaat niet"
   </voice>
 </phrase>
 <phrase>
@@ -7798,10 +7828,10 @@
     *: "No Playlists"
   </source>
   <dest>
-    *: "Geen speellijsten"
+    *: "Geen afspeellijsten"
   </dest>
   <voice>
-    *: ""
+    *: "Geen afspeellijsten"
   </voice>
 </phrase>
 <phrase>
@@ -7812,10 +7842,10 @@
     *: "Import Modifications"
   </source>
   <dest>
-    *: "Importeer wijzigingen"
+    *: "Wijzigingen importeren"
   </dest>
   <voice>
-    *: "Importeer wijzigingen"
+    *: "Wijzigingen importeren"
   </voice>
 </phrase>
 <phrase>
@@ -7828,11 +7858,11 @@
   </source>
   <dest>
     *: none
-    recording: "Splits criterium"
+    recording: "Splitscriterium"
   </dest>
   <voice>
     *: none
-    recording: "Splits criterium"
+    recording: "Splitscriterium"
   </voice>
 </phrase>
 <phrase>
@@ -7862,11 +7892,11 @@
   </source>
   <dest>
     *: none
-    recording: "Splits Tijd"
+    recording: "Splitstijd"
   </dest>
   <voice>
     *: none
-    recording: "Splits Tijd"
+    recording: "Splitstijd"
   </voice>
 </phrase>
 <phrase>
@@ -7879,11 +7909,11 @@
   </source>
   <dest>
     *: none
-    recording: "Splits Bestandsgrootte"
+    recording: "Splitsbestandsgrootte"
   </dest>
   <voice>
     *: none
-    recording: "Splits Bestandsgrootte"
+    recording: "Splitsbestandsgrootte"
   </voice>
 </phrase>
 <phrase>
@@ -7896,11 +7926,11 @@
   </source>
   <dest>
     *: none
-    recording: "Begin nieuw bestand"
+    recording: "Nieuw bestand beginnen"
   </dest>
   <voice>
     *: none
-    recording: "Begin nieuw bestand"
+    recording: "Nieuw bestand beginnen"
   </voice>
 </phrase>
 <phrase>
@@ -7913,11 +7943,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stop opname"
+    recording: "Opname stoppen"
   </dest>
   <voice>
     *: none
-    recording: "Stop opname"
+    recording: "Opname stoppen"
   </voice>
 </phrase>
 <phrase>
@@ -7930,11 +7960,11 @@
   </source>
   <dest>
     *: none
-    remote: "Afstandsbediening scherm uit"
+    remote: "Extern scherm uit"
   </dest>
   <voice>
     *: none
-    remote: "Afstandsbediening scherm uit"
+    remote: "Extern scherm uit"
   </voice>
 </phrase>
 <phrase>
@@ -7947,11 +7977,11 @@
   </source>
   <dest>
     *: none
-    remote: "(Vol- : terug aan)"
+    remote: "(Vol- : terug inschakelen)"
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : terug aan)"
+    remote: "(Vol- : terug inschakelen)"
   </voice>
 </phrase>
 <phrase>
@@ -7964,11 +7994,11 @@
   </source>
   <dest>
     *: none
-    hold_button: "Verlichting met Hold knop"
+    hold_button: "Verlichting met Hold-knop"
   </dest>
   <voice>
     *: none
-    hold_button: "Verlichting met hold knop"
+    hold_button: "Verlichting met Hold-knop"
   </voice>
 </phrase>
 <phrase>
@@ -7998,11 +8028,11 @@
   </source>
   <dest>
     *: none
-    lcd_sleep: "Slaap (Na verlichting uit)"
+    lcd_sleep: "Slapen (na uitgaan verlichting)"
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Slaap na verlichting uit"
+    lcd_sleep: "Slapen na uitgaan verlichting"
   </voice>
 </phrase>
 <phrase>
@@ -8049,11 +8079,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Bewerk mode: %s %s"
+    swcodec: "Bewerkmodus: %s %s"
   </dest>
   <voice>
     *: none
-    swcodec: "Bewerk mode %s %s"
+    swcodec: "Bewerkmodus %s %s"
   </voice>
 </phrase>
 <phrase>
@@ -8066,11 +8096,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Afsnij freq"
+    swcodec: "Afsnijfrequentie"
   </dest>
   <voice>
     *: none
-    swcodec: "Afsnij freq"
+    swcodec: "Afsnijfrequentie"
   </voice>
 </phrase>
 <phrase>
@@ -8134,11 +8164,11 @@
   </source>
   <dest>
     *: none
-    recording: "Int. Microfoon"
+    recording: "Int. microfoon"
   </dest>
   <voice>
     *: none
-    recording: "Int. Microfoon"
+    recording: "Interne microfoon"
   </voice>
 </phrase>
 <phrase>
@@ -8151,11 +8181,11 @@
   </source>
   <dest>
     *: none
-    recording: "Digitale ingang"
+    recording: "Digitaal"
   </dest>
   <voice>
     *: none
-    recording: "Digitale ingang"
+    recording: "Digitaal"
   </voice>
 </phrase>
 <phrase>
@@ -8168,11 +8198,11 @@
   </source>
   <dest>
     *: none
-    recording: "Trigger"
+    recording: "Trekker"
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "Trekker"
   </voice>
 </phrase>
 <phrase>
@@ -8237,7 +8267,7 @@
     *: "Laden... %d%% klaar (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Laden... %d%% klaar (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -8248,10 +8278,10 @@
     *: "Show Path"
   </source>
   <dest>
-    *: "Toon Path"
+    *: "Pad tonen"
   </dest>
   <voice>
-    *: "Toon Path"
+    *: "Pad tonen"
   </voice>
 </phrase>
 <phrase>
@@ -8312,7 +8342,7 @@
   </source>
   <dest>
     *: none
-    agc: "DJ-Set (traag)"
+    agc: "DJ-set (traag)"
   </dest>
   <voice>
     *: none
@@ -8329,11 +8359,11 @@
   </source>
   <dest>
     *: none
-    agc: "Medium"
+    agc: "Gemiddeld"
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: "Gemiddeld"
   </voice>
 </phrase>
 <phrase>
@@ -8474,10 +8504,10 @@
     *: "Last.fm Log"
   </source>
   <dest>
-    *: "Last.fm Log"
+    *: "Last.fm-logboek"
   </dest>
   <voice>
-    *: "Last.fm Log"
+    *: "Last.fm-logboek"
   </voice>
 </phrase>
 <phrase>
@@ -8488,10 +8518,10 @@
     *: "Please reboot to enable"
   </source>
   <dest>
-    *: "Start opnieuw om toe te passen"
+    *: "Start opnieuw op om toe te passen"
   </dest>
   <voice>
-    *: "Start opnieuw om toe te passen"
+    *: "Start opnieuw op om toe te passen"
   </voice>
 </phrase>
 <phrase>
@@ -8589,11 +8619,11 @@
   </source>
   <dest>
     *: none
-    recording: "Encoder Instellingen"
+    recording: "Encoderinstellingen"
   </dest>
   <voice>
     *: none
-    recording: "Encoder Instellingen"
+    recording: "Encoderinstellingen"
   </voice>
 </phrase>
 <phrase>
@@ -8606,7 +8636,7 @@
   </source>
   <dest>
     *: none
-    recording: "(Geen Instellingen)"
+    recording: "(Geen instellingen)"
   </dest>
   <voice>
     *: none
@@ -8657,11 +8687,11 @@
   </source>
   <dest>
     *: none
-    recording: "Trigtype"
+    recording: "Trekkertype"
   </dest>
   <voice>
     *: none
-    recording: "Trigtype"
+    recording: "Trekkertype"
   </voice>
 </phrase>
 <phrase>
@@ -8674,11 +8704,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stop"
+    recording: "Stoppen"
   </dest>
   <voice>
     *: none
-    recording: "Stop"
+    recording: "Stoppen"
   </voice>
 </phrase>
 <phrase>
@@ -8720,10 +8750,10 @@
     *: "Battery empty! RECHARGE!"
   </source>
   <dest>
-    *: "Batterij leeg! OPLADEN!"
+    *: "Batterij leeg! TIJD OM OP TE LADEN!"
   </dest>
   <voice>
-    *: "Batterij leeg! OPLADEN!"
+    *: "Batterij leeg! TIJD OM OP TE LADEN!"
   </voice>
 </phrase>
 <phrase>
@@ -8767,11 +8797,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Shuffle or Manual Track Skip"
+    crossfade: "Shuffle of handmatig nummer overslaan"
   </dest>
   <voice>
     *: none
-    crossfade: "Shuffle or Manual Track Skip"
+    crossfade: "Shuffle of handmatig nummer overslaan"
   </voice>
 </phrase>
 <phrase>
@@ -8824,10 +8854,10 @@
     *: "Play Next"
   </source>
   <dest>
-    *: "Speel volgende"
+    *: "Volgende afspelen"
   </dest>
   <voice>
-    *: "Speel volgende"
+    *: "Volgende afspelen"
   </voice>
 </phrase>
 <phrase>
@@ -8838,10 +8868,10 @@
     *: "Save Theme Settings"
   </source>
   <dest>
-    *: "Sla thema instellingen op"
+    *: "Thema-instellingen opslaan"
   </dest>
   <voice>
-    *: "Sla thema instellingen op"
+    *: "Thema-instellingen opslaan"
   </voice>
 </phrase>
 <phrase>
@@ -8854,7 +8884,7 @@
   </source>
   <dest>
     *: none
-    usb_charging_enable: "Opladen bij USB verbinding"
+    usb_charging_enable: "Opladen bij USB-verbinding"
   </dest>
   <voice>
     *: none
@@ -8869,10 +8899,10 @@
     *: "Album Artist"
   </source>
   <dest>
-    *: "Artiest van Album"
+    *: "Artiest van album"
   </dest>
   <voice>
-    *: "Artiest van Album"
+    *: "Artiest van album"
   </voice>
 </phrase>
 <phrase>
@@ -8897,10 +8927,10 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Cuesheet Ondersteuning"
+    *: "Cuesheet-ondersteuning"
   </dest>
   <voice>
-    *: "Cuesheet Ondersteuning"
+    *: "Cuesheet-ondersteuning"
   </voice>
 </phrase>
 <phrase>
@@ -8913,11 +8943,11 @@
   </source>
   <dest>
     *: none
-    radio: "FM Radio Menu"
+    radio: "FM-radiomenu"
   </dest>
   <voice>
     *: none
-    radio: "FM Radio Menu"
+    radio: "FM-radiomenu"
   </voice>
 </phrase>
 <phrase>
@@ -8942,10 +8972,10 @@
     *: "Now Playing"
   </source>
   <dest>
-    *: "Speelt nu"
+    *: "Speelt nu af"
   </dest>
   <voice>
-    *: "Speelt nu"
+    *: "Speelt nu af"
   </voice>
 </phrase>
 <phrase>
@@ -8956,10 +8986,10 @@
     *: "Resume Playback"
   </source>
   <dest>
-    *: "Hervat afspelen"
+    *: "Afspelen hervatten"
   </dest>
   <voice>
-    *: "Hervat afspelen"
+    *: "Afspelen hervatten"
   </voice>
 </phrase>
 <phrase>
@@ -9012,10 +9042,10 @@
     *: "Previous Screen"
   </source>
   <dest>
-    *: "Vorige scherm"
+    *: "Vorig scherm"
   </dest>
   <voice>
-    *: "Vorige scherm"
+    *: "Vorig scherm"
   </voice>
 </phrase>
 <phrase>
@@ -9028,11 +9058,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Alarm scherm"
+    alarm: "Wekkerscherm"
   </dest>
   <voice>
     *: none
-    alarm: "Alarm scherm"
+    alarm: "Wekkerscherm"
   </voice>
 </phrase>
 <phrase>
@@ -9058,7 +9088,13 @@
     archosplayer: "Aanmaken DB %d gev."
   </dest>
   <voice>
-    *: "Aanmaken van database"
+    *: "Aanmaken van database... %d gevonden (OFF = terug)"
+    iriverh100,iriverh120,iriverh300: "Aanmaken van database... %d gevonden (STOP = terug)"
+    ipod*: "Aanmaken van database... %d gevonden (PREV = terug)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Aanmaken van database... %d gevonden (LINKS = terug)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Aanmaken van database... %d gevonden (PREV = terug)"
+    gogearsa9200: "Aanmaken van database... %d gevonden (REW =  terug)"
+    archosplayer: "Aanmaken van database... %d gevonden"
   </voice>
 </phrase>
 <phrase>
@@ -9097,10 +9133,10 @@
     *: "Playlist Viewer Settings"
   </source>
   <dest>
-    *: "Speellijst scherm instellingen"
+    *: "Afspeellijstscherminstellingen"
   </dest>
   <voice>
-    *: "Speellijst scherm instellingen"
+    *: "Afspeellijstscherminstellingen"
   </voice>
 </phrase>
 <phrase>
@@ -9112,11 +9148,11 @@
     wheel_acceleration: none
   </source>
   <dest>
-    *: "Lijst Acceleratie Snelheid"
+    *: "Lijstversnelling"
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "Lijst Acceleratie Snelheid"
+    *: "Lijstversnelling"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -9128,10 +9164,10 @@
     *: "Bookmark Actions"
   </source>
   <dest>
-    *: "Bladwijzer Acties"
+    *: "Bladwijzeracties"
   </dest>
   <voice>
-    *: "Bladwijzer Acties"
+    *: "Bladwijzeracties"
   </voice>
 </phrase>
 <phrase>
@@ -9144,11 +9180,11 @@
   </source>
   <dest>
     *: none
-    recording: "Kan niet schrijven naar opname locatie"
+    recording: "Kan niet schrijven naar opnamemap"
   </dest>
   <voice>
     *: none
-    recording: "Kan niet schrijven naar opname locatie"
+    recording: "Kan niet schrijven naar opnamemap"
   </voice>
 </phrase>
 <phrase>
@@ -9159,10 +9195,10 @@
     *: "Browse Cuesheet"
   </source>
   <dest>
-    *: "Cuesheets Laden"
+    *: "Cuesheet laden"
   </dest>
   <voice>
-    *: "Cuesheets Laden"
+    *: "Cuesheet laden"
   </voice>
 </phrase>
 <phrase>
@@ -9173,10 +9209,10 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "Gebruik .talk Clips Voor Bestanden"
+    *: ".talk-clips gebruiken voor bestanden"
   </dest>
   <voice>
-    *: "Gebruik .talk Clips Voor Bestanden"
+    *: ".talk-clips gebruiken voor bestanden"
   </voice>
 </phrase>
 <phrase>
@@ -9189,11 +9225,11 @@
   </source>
   <dest>
     *: none
-    recording: "Opname Locatie Wissen"
+    recording: "Opnamemap wissen"
   </dest>
   <voice>
     *: none
-    recording: "Opname Locatie Wissen"
+    recording: "Opnamemap wissen"
   </voice>
 </phrase>
 <phrase>
@@ -9218,10 +9254,10 @@
     *: "Context Menu"
   </source>
   <dest>
-    *: "Context Menu"
+    *: "Contextmenu"
   </dest>
   <voice>
-    *: "Context Menu"
+    *: "Contextmenu"
   </voice>
 </phrase>
 <phrase>
@@ -9234,11 +9270,11 @@
   </source>
   <dest>
     *: none
-    buttonlight_brightness: "Helderheid Licht Knoppen"
+    buttonlight_brightness: "Knoplichthelderheid"
   </dest>
   <voice>
     *: none
-    buttonlight_brightness: "Helderheid Licht Knoppen"
+    buttonlight_brightness: "Knoplichthelderheid"
   </voice>
 </phrase>
 <phrase>
@@ -9263,10 +9299,10 @@
     *: "<Don't Resume>"
   </source>
   <dest>
-    *: "<Niet Hervatten>"
+    *: "<Niet hervatten>"
   </dest>
   <voice>
-    *: "Niet Hervatten"
+    *: "Niet hervatten"
   </voice>
 </phrase>
 <phrase>
@@ -9277,10 +9313,10 @@
     *: "Select Bookmark"
   </source>
   <dest>
-    *: "Bladwijzer Kiezen"
+    *: "Bladwijzer kiezen"
   </dest>
   <voice>
-    *: "Bladwijzer Kiezen"
+    *: "Bladwijzer kiezen"
   </voice>
 </phrase>
 <phrase>
@@ -9292,11 +9328,11 @@
     wheel_acceleration: none
   </source>
   <dest>
-    *: "Lijst Acceleratie Start Vertraging"
+    *: "Startvertraging van lijstversnelling"
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "Lijst Acceleratie Start Vertraging"
+    *: "Startvertraging van lijstversnelling"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -9308,10 +9344,10 @@
     *: "Moving..."
   </source>
   <dest>
-    *: "Bezig Met Verplaatsen..."
+    *: "Bezig met verplaatsen..."
   </dest>
   <voice>
-    *: "Bezig Met Verplaatsen"
+    *: "Bezig met verplaatsen"
   </voice>
 </phrase>
 <phrase>
@@ -9322,10 +9358,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Gebruik .talk Clips Voor Folders"
+    *: ".talk-clips gebruiken voor mappen"
   </dest>
   <voice>
-    *: "Gebruik .talk Clips Voor Folders"
+    *: ".talk-clips gebruiken voor mappen"
   </voice>
 </phrase>
 <phrase>
@@ -9336,10 +9372,10 @@
     *: ", Shuffle"
   </source>
   <dest>
-    *: ", Shuffle"
+    *: ", shuffle"
   </dest>
   <voice>
-    *: ""
+    *: ", shuffle"
   </voice>
 </phrase>
 <phrase>
@@ -9350,10 +9386,10 @@
     *: "<Invalid Bookmark>"
   </source>
   <dest>
-    *: "<Ongeldige Bladwijzer>"
+    *: "<Ongeldige bladwijzer>"
   </dest>
   <voice>
-    *: "Ongeldige Bladwijzer"
+    *: "Ongeldige bladwijzer"
   </voice>
 </phrase>
 <phrase>
@@ -9368,12 +9404,12 @@
   <dest>
     *: none
     button_light: "Knoppen Licht Vertraging"
-    sansafuze*,sansae200*: "Wiel Licht Vertraging"
+    sansafuze*,sansae200*: "Wiellichttime-out"
   </dest>
   <voice>
     *: none
     button_light: "Knoppen Licht Vertraging"
-    sansafuze*,sansae200*: "Wiel Licht Vertraging"
+    sansafuze*,sansae200*: "Wiellichttime-out"
   </voice>
 </phrase>
 <phrase>
@@ -9384,10 +9420,10 @@
     *: "Copying..."
   </source>
   <dest>
-    *: "Bezig Met Kopiëren..."
+    *: "Bezig met kopiëren..."
   </dest>
   <voice>
-    *: "Bezig Met Kopiëren"
+    *: "Bezig met kopiëren"
   </voice>
 </phrase>
 <phrase>
@@ -9400,11 +9436,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stel in als Opname Locatie"
+    recording: "Instellen als opnamemap"
   </dest>
   <voice>
     *: none
-    recording: "Stel in als Opname Locatie"
+    recording: "Instellen als opnamemap"
   </voice>
 </phrase>
 <phrase>
@@ -9415,10 +9451,10 @@
     *: "Discnum"
   </source>
   <dest>
-    *: "DiscNr"
+    *: "Schijfnr"
   </dest>
   <voice>
-    *: "DiscNr"
+    *: "Schijfnummer"
   </voice>
 </phrase>
 <phrase>
@@ -9431,11 +9467,11 @@
   </source>
   <dest>
     *: none
-    recording: "Analoge ingang"
+    recording: "Analoge invoer"
   </dest>
   <voice>
     *: none
-    recording: "Analoge ingang"
+    recording: "Analoge invoer"
   </voice>
 </phrase>
 <phrase>
@@ -9476,11 +9512,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Schakel hervatten bij opstarten uit bij geen hoofdtelefoon"
+    headphone_detection: "Hervatten bij opstarten uitschakelen zonder hoofdtelefoon"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Schakel hervatten bij opstarten uit bij geen hoofdtelefoon"
+    headphone_detection: "Hervatten bij opstarten uitschakelen zonder hoofdtelefoon"
   </voice>
 </phrase>
 <phrase>
@@ -9493,11 +9529,11 @@
   </source>
   <dest>
     *: none
-    rtc: "Stel datum/tijd in"
+    rtc: "Datum/tijd instellen"
   </dest>
   <voice>
     *: none
-    rtc: "Stel datum/tijd in"
+    rtc: "Datum/tijd instellen"
   </voice>
 </phrase>
 <phrase>
@@ -9555,10 +9591,10 @@
     *: "Channel Configuration"
   </source>
   <dest>
-    *: "Kanaal configuratie"
+    *: "Kanaalconfiguratie"
   </dest>
   <voice>
-    *: "Kanaal configuratie"
+    *: "Kanaalconfiguratie"
   </voice>
 </phrase>
 <phrase>
@@ -9566,6 +9602,15 @@
   desc: Generic string to use to confirm
   user: core
   <source>
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "PLAY = Yes"
+###     cowond2*: "MENU, or top-right = Yes"
+###     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+###     ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
+###     mrobe500: "PLAY, POWER, or top-right = Yes"
+###     archosplayer: "(PLAY/STOP)"
+###     vibe500: "OK = Yes"
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
@@ -9573,18 +9618,27 @@
     mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
+    creativezen*: "Select = Yes"
   </source>
   <dest>
-    *: "PLAY = Ja"
-    cowond2*: "MENU of bovenaan rechts = Ja"
-    iriverh100,iriverh120,iriverh300: "NAVI = Ja"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Ja"
-    mrobe500: "PLAY, POWER, of bovenaan rechts = Ja"
+    *: "PLAY = ja"
+    cowond2*: "MENU of rechtsboven = ja"
+    iriverh100,iriverh120,iriverh300: "NAVI = ja"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = ja"
+    mrobe500: "PLAY, POWER of rechtsboven = ja"
     archosplayer: "(PLAY/STOP)"
-    vibe500: "OK = Ja"
+    vibe500: "OK = ja"
+    creativezen*: "Select = ja"
   </dest>
   <voice>
-    *: ""
+    *: "PLAY = ja"
+    cowond2*: "MENU of rechtsboven = ja"
+    iriverh100,iriverh120,iriverh300: "NAVI = ja"
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = ja"
+    mrobe500: "PLAY, POWER of rechtsboven = ja"
+    archosplayer: "(PLAY/STOP)"
+    vibe500: "OK = ja"
+    creativezen*: "Select = ja"
   </voice>
 </phrase>
 <phrase>
@@ -9603,17 +9657,23 @@
   </source>
   <dest>
     *: none
-    rtc: "ON = Instellen"
-    mrobe500: "HEART = Instellen"
-    iriverh100,iriverh120,iriverh300: "NAVI = Instellen"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Instellen"
-    gogearsa9200,samsungyh*: "PLAY = Instellen"
-    vibe500: "OK = Instellen"
-    mpiohd300: "ENTER = Instellen"
+    rtc: "ON = instellen"
+    mrobe500: "HEART = instellen"
+    iriverh100,iriverh120,iriverh300: "NAVI = instellen"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = instellen"
+    gogearsa9200,samsungyh*: "PLAY = instellen"
+    vibe500: "OK = instellen"
+    mpiohd300: "ENTER = instellen"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,gigabeatfx,samsungyh*: ""
+    rtc: "ON = instellen"
+    mrobe500: "HEART = instellen"
+    iriverh100,iriverh120,iriverh300: "NAVI = instellen"
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = instellen"
+    gogearsa9200,samsungyh*: "PLAY = instellen"
+    vibe500: "OK = instellen"
+    mpiohd300: "ENTER = instellen"
   </voice>
 </phrase>
 <phrase>
@@ -9625,11 +9685,11 @@
     archosplayer: none
   </source>
   <dest>
-    *: "Elke andere = Nee"
+    *: "Elke andere = nee"
     archosplayer: none
   </dest>
   <voice>
-    *: ""
+    *: "Elke andere = nee"
     archosplayer: none
   </voice>
 </phrase>
@@ -9687,11 +9747,11 @@
     archosplayer: "End of List"
   </source>
   <dest>
-    *: "Einde van de titellijst"
+    *: "Einde van de afspeellijst"
     archosplayer: "Einde lijst"
   </dest>
   <voice>
-    *: "Einde lijst"
+    *: "Einde van de afspeellijst"
   </voice>
 </phrase>
 <phrase>
@@ -9719,10 +9779,10 @@
     *: "Buttons Unlocked"
   </source>
   <dest>
-    *: "Toetsvergrendeling UIT"
+    *: "Knoppen ontgrendeld"
   </dest>
   <voice>
-    *: ""
+    *: "Knoppen ontgrendeld"
   </voice>
 </phrase>
 <phrase>
@@ -9735,11 +9795,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mode:"
+    lcd_bitmap: "Modus:"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: ""
+    lcd_bitmap: "Modus"
   </voice>
 </phrase>
 <phrase>
@@ -9752,11 +9812,11 @@
   </source>
   <dest>
     *: none
-    recording: "Zeker voor"
+    recording: "voor minstens"
   </dest>
   <voice>
     *: none
-    recording: "Zeker voor"
+    recording: "voor minstens"
   </voice>
 </phrase>
 <phrase>
@@ -9781,10 +9841,10 @@
     *: "Ask"
   </source>
   <dest>
-    *: "Vraag"
+    *: "Vragen"
   </dest>
   <voice>
-    *: "Vraag"
+    *: "Vragen"
   </voice>
 </phrase>
 <phrase>
@@ -9795,10 +9855,10 @@
     *: "Mode:"
   </source>
   <dest>
-    *: "Mode:"
+    *: "Modus:"
   </dest>
   <voice>
-    *: "Mode:"
+    *: "Modus"
   </voice>
 </phrase>
 <phrase>
@@ -9815,7 +9875,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: ""
+    pitchscreen: "Halve toon omlaag"
   </voice>
 </phrase>
 <phrase>
@@ -9828,11 +9888,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Pauzeren bij verwijderen hoofdtelefoon"
+    headphone_detection: "Pauzeren bij loskoppelen hoofdtelefoon"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pauzeren bij verwijderen hoofdtelefoon"
+    headphone_detection: "Pauzeren bij loskoppelen hoofdtelefoon"
   </voice>
 </phrase>
 <phrase>
@@ -9863,7 +9923,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: ""
+    pitchscreen: "Halve toon omhoog"
   </voice>
 </phrase>
 <phrase>
@@ -9905,10 +9965,10 @@
     *: "Playlists"
   </source>
   <dest>
-    *: "Speellijsten"
+    *: "Afspeellijsten"
   </dest>
   <voice>
-    *: "Speellijsten"
+    *: "Afspeellijsten"
   </voice>
 </phrase>
 <phrase>
@@ -9919,10 +9979,10 @@
     *: "Buttons Locked"
   </source>
   <dest>
-    *: "Toetsvergrendeling AAN"
+    *: "Knoppen vergrendeld"
   </dest>
   <voice>
-    *: ""
+    *: "Knoppen vergrendeld"
   </voice>
 </phrase>
 <phrase>
@@ -9961,10 +10021,10 @@
     *: "Are You Sure?"
   </source>
   <dest>
-    *: "Weet u het zeker?"
+    *: "Weet je het zeker?"
   </dest>
   <voice>
-    *: "Weet u het zeker?"
+    *: "Weet je het zeker?"
   </voice>
 </phrase>
 <phrase>
@@ -9975,10 +10035,10 @@
     *: "Demos"
   </source>
   <dest>
-    *: "Demos"
+    *: "Demo's"
   </dest>
   <voice>
-    *: "Demos"
+    *: "Demo's"
   </voice>
 </phrase>
 <phrase>
@@ -10020,7 +10080,7 @@
     *: ""
   </dest>
   <voice>
-    *: "of"
+    *: "van"
   </voice>
 </phrase>
 <phrase>
@@ -10045,10 +10105,10 @@
     *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "Bestandsextenties tonen"
+    *: "Bestandsextensies tonen"
   </dest>
   <voice>
-    *: "Bestandsextenties tonen"
+    *: "Bestandsextensies tonen"
   </voice>
 </phrase>
 <phrase>
@@ -10171,11 +10231,11 @@
   </source>
   <dest>
     *: none
-    recording: "Clip Teller"
+    recording: "Clipteller"
   </dest>
   <voice>
     *: none
-    recording: "Clip Teller"
+    recording: "Clipteller"
   </voice>
 </phrase>
 <phrase>
@@ -10188,11 +10248,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Eerste kleur"
+    lcd_color: "Hoofdkleur"
   </dest>
   <voice>
     *: none
-    lcd_color: "Eerste kleur"
+    lcd_color: "Hoofdkleur"
   </voice>
 </phrase>
 <phrase>
@@ -10205,11 +10265,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Regelkiezer kleuren"
+    lcd_color: "Regelkiezerkleuren"
   </dest>
   <voice>
     *: none
-    lcd_color: "Regelkiezer kleuren"
+    lcd_color: "Regelkiezerkleuren"
   </voice>
 </phrase>
 <phrase>
@@ -10237,10 +10297,10 @@
     *: "Theme Settings"
   </source>
   <dest>
-    *: "Thema instellingen"
+    *: "Thema-instellingen"
   </dest>
   <voice>
-    *: "Thema instellingen"
+    *: "Thema-instellingen"
   </voice>
 </phrase>
 <phrase>
@@ -10253,11 +10313,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Balk (gradient)"
+    lcd_color: "Balk (kleurovergang)"
   </dest>
   <voice>
     *: none
-    lcd_color: "Balk (gradient)"
+    lcd_color: "Balk (kleurovergang)"
   </voice>
 </phrase>
 <phrase>
@@ -10304,11 +10364,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Tweede kleur"
+    lcd_color: "Secundaire kleur"
   </dest>
   <voice>
     *: none
-    lcd_color: "Tweede kleur"
+    lcd_color: "Secundaire kleur"
   </voice>
 </phrase>
 <phrase>
@@ -10350,7 +10410,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Wijzig"
+    *: "Bewerken"
   </voice>
 </phrase>
 <phrase>
@@ -10392,10 +10452,10 @@
     *: "Say File Type"
   </source>
   <dest>
-    *: "Zeg Bestandstype"
+    *: "Bestandstype uitspreken"
   </dest>
   <voice>
-    *: "Zeg Bestandstype"
+    *: "Bestandstype uitspreken"
   </voice>
 </phrase>
 <phrase>
@@ -10406,10 +10466,10 @@
     *: "Announce Battery Level"
   </source>
   <dest>
-    *: "Zeg Batterijniveau"
+    *: "Batterijniveau uitspreken"
   </dest>
   <voice>
-    *: "Zeg Batterijniveau"
+    *: "Batterijniveau uitspreken"
   </voice>
 </phrase>
 <phrase>
@@ -10422,11 +10482,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Afsnijfrequentie"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bas-afsnijfrequentie"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Afsnijfrequentie"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bas-afsnijfrequentie"
   </voice>
 </phrase>
 <phrase>
@@ -10439,11 +10499,11 @@
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Afsnijfrequentie"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble-afsnijfrequentie"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Afsnijfrequentie"
+    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble-afsnijfrequentie"
   </voice>
 </phrase>
 <phrase>
@@ -10468,10 +10528,10 @@
     *: "Save Sound Settings"
   </source>
   <dest>
-    *: "Bewaar geluidsinstellingen"
+    *: "Geluidsinstellingen opslaan"
   </dest>
   <voice>
-    *: "Bewaar geluidsinstellingen"
+    *: "Geluidsinstellingen opslaan"
   </voice>
 </phrase>
 <phrase>
@@ -10501,11 +10561,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Toetsklik herhaling"
+    swcodec: "Toetsklikherhaling"
   </dest>
   <voice>
     *: none
-    swcodec: "Toetsklik herhaling"
+    swcodec: "Toetsklikherhaling"
   </voice>
 </phrase>
 <phrase>
@@ -10564,7 +10624,7 @@
     *: ""
   </dest>
   <voice>
-    *: "OK"
+    *: "Oké"
   </voice>
 </phrase>
 <phrase>
@@ -10577,11 +10637,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stop opname en zet uit"
+    recording: "Opname stoppen en uitschakelen"
   </dest>
   <voice>
     *: none
-    recording: "Stop opname en zet uit"
+    recording: "Opname stoppen en uitschakelen"
   </voice>
 </phrase>
 <phrase>
@@ -10594,11 +10654,11 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad gevoeligheid"
+    gigabeatfx,sansafuzeplus: "Touchpadgevoeligheid"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad gevoeligheid"
+    gigabeatfx,sansafuzeplus: "Touchpadgevoeligheid"
   </voice>
 </phrase>
 <phrase>
@@ -10682,10 +10742,10 @@
     *: "Skip Length"
   </source>
   <dest>
-    *: "Verspring lengte"
+    *: "Verspringlengte"
   </dest>
   <voice>
-    *: "Verspring lengte"
+    *: "Verspringlengte"
   </voice>
 </phrase>
 <phrase>
@@ -10747,7 +10807,7 @@
   </dest>
   <voice>
     *: none
-    agc: "AGC maximum versterking"
+    agc: "AGC maximale versterking"
   </voice>
 </phrase>
 <phrase>
@@ -10760,11 +10820,11 @@
   </source>
   <dest>
     *: none
-    recording: "Splits tijd:"
+    recording: "Splitstijd:"
   </dest>
   <voice>
     *: none
-    recording: "Splits tijd:"
+    recording: "Splitstijd:"
   </voice>
 </phrase>
 <phrase>
@@ -10781,7 +10841,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "CLIP:"
   </voice>
 </phrase>
 <phrase>
@@ -10862,11 +10922,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC clip tijd"
+    agc: "AGC-cliptijd"
   </dest>
   <voice>
     *: none
-    agc: "AGC clip tijd"
+    agc: "AGC-cliptijd"
   </voice>
 </phrase>
 <phrase>
@@ -10896,11 +10956,11 @@
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono mode"
+    recording_swcodec: "Mono-modus"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono mode"
+    recording_swcodec: "Mono-modus"
   </voice>
 </phrase>
 <phrase>
@@ -10969,11 +11029,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Instellen als linker snelscherm item"
+    quickscreen: "Instellen als linkersnelschermitem"
   </dest>
   <voice>
     *: none
-    quickscreen: "Instellen als linker snelscherm item"
+    quickscreen: "Instellen als linkersnelschermitem"
   </voice>
 </phrase>
 <phrase>
@@ -10986,11 +11046,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Instellen als rechter snelscherm item"
+    quickscreen: "Instellen als rechtersnelschermitem"
   </dest>
   <voice>
     *: none
-    quickscreen: "Instellen als rechter snelscherm item"
+    quickscreen: "Instellen als rechtersnelschermitem"
   </voice>
 </phrase>
 <phrase>
@@ -11003,11 +11063,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Instellen als onderzijde snelscherm item"
+    quickscreen: "Instellen als ondersnelschermitem"
   </dest>
   <voice>
     *: none
-    quickscreen: "Instellen als onderzijde snelscherm item"
+    quickscreen: "Instellen als ondersnelschermitem"
   </voice>
 </phrase>
 <phrase>
@@ -11037,11 +11097,11 @@
   </source>
   <dest> 
     *: none
-    serial_port: "Seriele snelheid"
+    serial_port: "Seriële bitrate"
   </dest>
   <voice> 
     *: none
-    serial_port: "Seriele snelheid"
+    serial_port: "Seriële bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -11151,10 +11211,10 @@
     *: "Interpret numbers when sorting"
   </source>
   <dest>
-    *: "Hou rekening met getallen bij sorteren"
+    *: "Rekening houden met getallen bij sorteren"
   </dest>
   <voice>
-    *: "Hou rekening met getallen bij sorteren"
+    *: "Rekening houden met getallen bij sorteren"
   </voice>
 </phrase>
 <phrase>
@@ -11195,11 +11255,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Touchscreen modus"
+    touchscreen: "Aanraakschermmodus"
   </dest>
   <voice>
     *: none
-    touchscreen: "Touchscreen modus"
+    touchscreen: "Aanraakschermmodus"
   </voice>
 </phrase>
 <phrase>
@@ -11212,7 +11272,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "3x3 raster"
+    touchscreen: "3x3-raster"
   </dest>
   <voice>
     *: none
@@ -11244,10 +11304,10 @@
     *: "Prevent Track Skipping"
   </source>
   <dest>
-    *: "Voorkom nummers overslaan"
+    *: "Verhinder overslaan van nummers"
   </dest>
   <voice>
-    *: "Voorkom nummers overslaan"
+    *: "Verhinder overslaan van nummers"
   </voice>
 </phrase>
 <phrase>
@@ -11294,11 +11354,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Touchscreen instellingen"
+    touchscreen: "Aanraakscherminstellingen"
   </dest>
   <voice>
     *: none
-    touchscreen: "Touchscreen instellingen"
+    touchscreen: "Aanraakscherminstellingen"
   </voice>
 </phrase>
 <phrase>
@@ -11311,11 +11371,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Kalibreer"
+    touchscreen: "Kalibreren"
   </dest>
   <voice>
     *: none
-    touchscreen: "Kalibreer"
+    touchscreen: "Kalibreren"
   </voice>
 </phrase>
 <phrase>
@@ -11345,11 +11405,11 @@
   </source>
   <dest>
     *: none
-    remote: "Statusbalk afstandsbediening"
+    remote: "Externe statusbalk"
   </dest>
   <voice>
     *: none
-    remote: "Statusbalk afstandsbediening"
+    remote: "Externe statusbalk"
   </voice>
 </phrase>
 <phrase>
@@ -11441,11 +11501,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Scroll balk breedte"
+    lcd_bitmap: "Scrollbalkbreedte"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll balk breedte"
+    lcd_bitmap: "Scrollbalkbreedte"
   </voice>
 </phrase>
 <phrase>
@@ -11458,11 +11518,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Scroll balk positie"
+    lcd_bitmap: "Scrollbalkpositie"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Scroll balk positie"
+    lcd_bitmap: "Scrollbalkpositie"
   </voice>
 </phrase>
 <phrase>
@@ -11473,10 +11533,10 @@
     *: "Queue Last Shuffled"
   </source>
   <dest>
-    *: "Voeg in willekeurige volgorde toe aan wachtrij"
+    *: "Geschud onderaan wachtrij plaatsen"
   </dest>
   <voice>
-    *: "Voeg in willekeurige volgorde toe aan wachtrij"
+    *: "Geschud onderaan wachtrij plaatsen"
   </voice>
 </phrase>
 <phrase>
@@ -11490,7 +11550,7 @@
     *: ""
   </dest>
   <voice>
-    *: "statusbalk uitzicht"
+    *: "statusbalkthema"
   </voice>
 </phrase>
 <phrase>
@@ -11503,11 +11563,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Release Tijd"
+    swcodec: "Releasetijd"
   </dest>
   <voice>
     *: none
-    swcodec: "Release Tijd"
+    swcodec: "Releasetijd"
   </voice>
 </phrase>
 <phrase>
@@ -11558,7 +11618,7 @@
   </dest>
   <voice>
     *: none
-    remote: "remote statusbalk uitzicht"
+    remote: "externestatusbalkthema"
   </voice>
 </phrase>
 <phrase>
@@ -11603,10 +11663,10 @@
     *: "Insert Last Shuffled"
   </source>
   <dest>
-    *: "Voeg in willekeurige volgorde in wachtrij"
+    *: "Geschud onderaan wachtrij plaatsen"
   </dest>
   <voice>
-    *: "Voeg in willekeurige volgorde in wachtrij"
+    *: "Geschud onderaan wachtrij plaatsen"
   </voice>
 </phrase>
 <phrase>
@@ -11653,11 +11713,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "USB toetsenbord mode"
+    usb_hid: "USB-toetsenbordmodus"
   </dest>
   <voice>
     *: none
-    usb_hid: "USB toetsenbord mode"
+    usb_hid: "USB-toetsenbordmodus"
   </voice>
 </phrase>
 <phrase>
@@ -11687,11 +11747,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Stel bovenaan snelscherm in"
+    quickscreen: "Instellen als bovensnelschermitem"
   </dest>
   <voice>
     *: none
-    quickscreen: "Stel bovenaan snelscherm in"
+    quickscreen: "Instellen als bovensnelschermitem"
   </voice>
 </phrase>
 <phrase>
@@ -11883,10 +11943,10 @@
     *: "Skip to Outro"
   </source>
   <dest>
-    *: "Verspring naar uitloop"
+    *: "Verspringen naar uitloop"
   </dest>
   <voice>
-    *: "Verspring naar uitloop"
+    *: "Verspringen naar uitloop"
   </voice>
 </phrase>
 <phrase>
@@ -11981,11 +12041,11 @@
   </source>
   <dest>
     *: none
-    morse_input: "Gebruik Morse Code Input"
+    morse_input: "Morse-invoer gebruiken"
   </dest>
   <voice>
     *: none
-    morse_input: "Gebruiker Morse Code Input"
+    morse_input: "Morse-invoer gebruiken"
   </voice>
 </phrase>
 <phrase>
@@ -12043,11 +12103,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Basis skin"
+    lcd_bitmap: "Basisthema"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Basis skin"
+    lcd_bitmap: "Basisthema"
   </voice>
 </phrase>
 <phrase>
@@ -12060,11 +12120,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Afstandsbediening basis skin"
+    lcd_bitmap: "Extern basisthema"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Afstandsbediening basis skin"
+    lcd_bitmap: "Extern basisthema"
   </voice>
 </phrase>
 <phrase>
@@ -12077,11 +12137,11 @@
   </source>
   <dest>
     *: none
-    remote: "Afstandsbediening scherm"
+    remote: "Extern scherm"
   </dest>
   <voice>
     *: none
-    remote: "Afstandsbediening scherm"
+    remote: "Extern scherm"
   </voice>
 </phrase>
 <phrase>
@@ -12094,11 +12154,11 @@
   </source>
   <dest>
     *: none
-    remote: "Hoofd scherm"
+    remote: "Hoofdscherm"
   </dest>
   <voice>
     *: none
-    remote: "Hoofd scherm"
+    remote: "Hoofdscherm"
   </voice>
 </phrase>
 <phrase>
@@ -12111,11 +12171,11 @@
   </source>
   <dest>
     *: none
-    histogram: "Histogram interval"
+    histogram: "Histograminterval"
   </dest>
   <voice>
     *: none
-    histogram: "Histogram interval"
+    histogram: "Histograminterval"
   </voice>
 </phrase>
 <phrase>
@@ -12128,11 +12188,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "WPS sneltoets"
+    hotkey: "Speelschermsneltoets"
   </dest>
   <voice>
     *: none
-    hotkey: "WPS sneltoets"
+    hotkey: "Speelschermsneltoets"
   </voice>
 </phrase>
 <phrase>
@@ -12145,11 +12205,11 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Band %d Versterking"
+    gigabeats,samsungypr1: "Band %d-versterking"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Band versterking"
+    gigabeats,samsungypr1: "Band %d-versterking"
   </voice>
 </phrase>
 <phrase>
@@ -12162,11 +12222,11 @@
   </source>
   <dest>
     *: none
-    lineout_poweroff: "Lijn uitgang"
+    lineout_poweroff: "Analoge uitvoer"
   </dest>
   <voice>
     *: none
-    lineout_poweroff: "Lijn uitgang"
+    lineout_poweroff: "Analoge uitvoer"
   </voice>
 </phrase>
 <phrase>
@@ -12183,7 +12243,7 @@
   </dest>
   <voice>
     *: none
-    radio: "radio scherm uitzicht"
+    radio: "radioschermthema"
   </voice>
 </phrase>
 <phrase>
@@ -12217,7 +12277,7 @@
   </dest>
   <voice>
     *: none
-    radio_remote: "remote radio screen skin"
+    radio_remote: "externradioschermthema"
   </voice>
 </phrase>
 <phrase>
@@ -12247,11 +12307,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Bestanden bladeren Hotkey"
+    hotkey: "Bestandsbeheersneltoets"
   </dest>
   <voice>
     *: none
-    hotkey: "Bestanden bladeren Hotkey"
+    hotkey: "Bestandsbeheersneltoets"
   </voice>
 </phrase>
 <phrase>
@@ -12264,11 +12324,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Terugspoelen alvorens te hernemen"
+    swcodec: "Terugspoelen alvorens te hervatten"
   </dest>
   <voice>
     *: none
-    swcodec: "Terugspoelen alvorens te hernemen"
+    swcodec: "Terugspoelen alvorens te hervatten"
   </voice>
 </phrase>
 <phrase>
@@ -12279,10 +12339,10 @@
     *: "<Untagged>"
   </source>
   <dest>
-    *: "<GeenTags>"
+    *: "<Geen tags>"
   </dest>
   <voice>
-    *: "GeenTags"
+    *: "Geen tags"
   </voice>
 </phrase>
 <phrase>
@@ -12295,11 +12355,11 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Uitgebreide klank instellingen"
+    gigabeats,samsungypr1: "Uitgebreide klankinstellingen"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Uitgebreide klank instellingen"
+    gigabeats,samsungypr1: "Uitgebreide klankinstellingen"
   </voice>
 </phrase>
 <phrase>
@@ -12312,11 +12372,11 @@
   </source>
   <dest>
     *: none
-    depth_3d: "3-D Verbetering"
+    depth_3d: "3D-verbetering"
   </dest>
   <voice>
     *: none
-    depth_3d: "3-D Verbetering"
+    depth_3d: "3D-verbetering"
   </voice>
 </phrase>
 <phrase>
@@ -12329,11 +12389,11 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Band %d Frequentie"
+    gigabeats,samsungypr1: "Band %d-frequentie"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Band Frequentie"
+    gigabeats,samsungypr1: "Band %d-frequentie"
   </voice>
 </phrase>
 <phrase>
@@ -12346,11 +12406,11 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Band %d Breedte"
+    gigabeats,samsungypr1: "Band %d-breedte"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Band Breedte"
+    gigabeats,samsungypr1: "Band %d-breedte"
   </voice>
 </phrase>
 <phrase>
@@ -12367,7 +12427,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "Zender"
   </voice>
 </phrase>
 <phrase>
@@ -12380,11 +12440,11 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Klank instellingen"
+    gigabeats,samsungypr1: "Klankinstellingen"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Klank instellingen"
+    gigabeats,samsungypr1: "Klankinstellingen"
   </voice>
 </phrase>
 <phrase>
@@ -12414,11 +12474,11 @@
   </source>
   <dest>
     *: none
-    radio_remote: "Radio scherm op afstandsbediening"
+    radio_remote: "Extern radioscherm"
   </dest>
   <voice>
     *: none
-    radio_remote: "Radio scherm op afstandsbediening"
+    radio_remote: "Extern radioscherm"
   </voice>
 </phrase>
 <phrase>
@@ -12445,11 +12505,11 @@
   </source>
   <dest>
     *: none
-    radio: "Radio scherm"
+    radio: "Radioscherm"
   </dest>
   <voice>
     *: none
-    radio: "Radio scherm"
+    radio: "Radioscherm"
   </voice>
 </phrase>
 <phrase>
@@ -12462,11 +12522,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "OK"
+    touchscreen: "Oké"
   </dest>
   <voice>
     *: none
-    touchscreen: "OK"
+    touchscreen: "Oké"
   </voice>
 </phrase>
 <phrase>
@@ -12477,10 +12537,10 @@
     *: "Update on Stop"
   </source>
   <dest>
-    *: "Ververs na stoppen"
+    *: "Bijwerken na stoppen"
   </dest>
   <voice>
-    *: "Ververs na stoppen"
+    *: "Bijwerken na stoppen"
   </voice>
 </phrase>
 <phrase>
@@ -12510,11 +12570,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Annuleer"
+    touchscreen: "Annuleren"
   </dest>
   <voice>
     *: none
-    touchscreen: "Annuleer"
+    touchscreen: "Annuleren"
   </voice>
 </phrase>
 <phrase>
@@ -12525,10 +12585,10 @@
     *: "PictureFlow"
   </source>
   <dest>
-    *: "PictureFlow"
+    *: "Albumhoesweergave"
   </dest>
   <voice>
-    *: "start picture flow"
+    *: "Albumhoesweergave"
   </voice>
 </phrase>
 <phrase>
@@ -12539,10 +12599,10 @@
     *: "Force"
   </source>
   <dest>
-    *: "Forceer"
+    *: "Dwingen"
   </dest>
   <voice>
-    *: "Forceer"
+    *: "Dwingen"
   </voice>
 </phrase>
 <phrase>
@@ -12553,10 +12613,10 @@
     *: "Start File Browser at /"
   </source>
   <dest>
-    *: "Start bestandsbeheer op /"
+    *: "Bestandsbeheer starten op /"
   </dest>
   <voice>
-    *: "Start bestandsbeheer aan het begin"
+    *: "Bestandsbeheer starten aan het begin"
   </voice>
 </phrase>
 <phrase>
@@ -12567,10 +12627,10 @@
     *: "Start File Browser Here"
   </source>
   <dest>
-    *: "Start bestandsbeheer hier"
+    *: "Bestandsbeheer hier starten"
   </dest>
   <voice>
-    *: "Start bestandsbeheer hier"
+    *: "Bestandsbeheer hier starten"
   </voice>
 </phrase>
 <phrase>
@@ -12609,10 +12669,10 @@
     *: "Resume on automatic track change"
   </source>
   <dest>
-    *: "Hervat bij automatische nummerwissel"
+    *: "Hervatten bij automatische nummerwissel"
   </dest>
   <voice>
-    *: "Hervat bij automatische nummerwissel"
+    *: "Hervatten bij automatische nummerwissel"
   </voice>
 </phrase>
 <phrase>
@@ -12668,10 +12728,10 @@
     *: "In custom directories only"
   </source>
   <dest>
-    *: "Alleen in bepaalde mappen"
+    *: "Enkel in bepaalde mappen"
   </dest>
   <voice>
-    *: "Alleen in bepaalde mappen"
+    *: "Enkel in bepaalde mappen"
   </voice>
 </phrase>
 <phrase>
@@ -12696,10 +12756,10 @@
     *: "Current Playlist"
   </source>
   <dest>
-    *: "Huidige speellijst"
+    *: "Huidige afspeellijst"
   </dest>
   <voice>
-    *: "Huidige speellijst"
+    *: "Huidige afspeellijst"
   </voice>
 </phrase>
 <phrase>
@@ -12712,11 +12772,11 @@
   </source>
   <dest>
     *: none
-    multidrive_usb: "USB Verberg interne schijf"
+    multidrive_usb: "USB interne schijf verbergen"
   </dest>
   <voice>
     *: none
-    multidrive_usb: "USB Verberg interne schijf"
+    multidrive_usb: "USB interne schijf verbergen"
   </voice>
 </phrase>
 <phrase>
@@ -12727,10 +12787,10 @@
     *: "Set As Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "Kies als speellijst catalogus map"
+    *: "Instellen als afspeellijstcatalogusmap"
   </dest>
   <voice>
-    *: "Kies als speellijst catalogus map"
+    *: "Instellen als afspeellijstcatalogusmap"
   </voice>
 </phrase>
 <phrase>
@@ -12755,10 +12815,10 @@
     *: "Reset Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "Speellijst catalogus map terugzetten"
+    *: "Afspeellijstcatalogusmap terugzetten"
   </dest>
   <voice>
-    *: "Speellijst catalogus map terugzetten"
+    *: "Afspeellijstcatalogusmap terugzetten"
   </voice>
 </phrase>
 <phrase>
@@ -12771,11 +12831,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Lijn spatiëring in lijsten"
+    touchscreen: "Regelspatiëring in lijsten"
   </dest>
   <voice>
     *: none
-    touchscreen: "Lijn spatiëring in lijsten"
+    touchscreen: "Regelspatiëring in lijsten"
   </voice>
 </phrase>
 <phrase>
@@ -12800,10 +12860,10 @@
     *: "Cancel Sleep Timer"
   </source>
   <dest>
-    *: "Annuleer slaap klok"
+    *: "Slaaptimer annuleren"
   </dest>
   <voice>
-    *: "Annuleer slaap klok"
+    *: "Slaaptimer annuleren"
   </voice>
 </phrase>
 <phrase>
@@ -12814,10 +12874,10 @@
     *: "Default Sleep Timer Duration"
   </source>
   <dest>
-    *: "Standaard slaap klok duur"
+    *: "Standaardduur van slaaptimer"
   </dest>
   <voice>
-    *: "Standaard slaap klok duur"
+    *: "Standaardduur van slaaptimer"
   </voice>
 </phrase>
 <phrase>
@@ -12828,10 +12888,10 @@
     *: "Start Sleep Timer On Boot"
   </source>
   <dest>
-    *: "Start slaap klok bij opstarten"
+    *: "Slaaptimer starten bij opstarten"
   </dest>
   <voice>
-    *: "Start slaap klok bij opstarten"
+    *: "Slaaptimer starten bij opstarten"
   </voice>
 </phrase>
 <phrase>
@@ -12842,10 +12902,10 @@
     *: "Glyphs To Cache"
   </source>
   <dest>
-    *: "Tekens te bufferen"
+    *: "Te bufferen gliefen"
   </dest>
   <voice>
-    *: "Tekens te bufferen"
+    *: "Te bufferen gliefen"
   </voice>
 </phrase>
 <phrase>
@@ -12856,10 +12916,10 @@
     *: "Start Sleep Timer"
   </source>
   <dest>
-    *: "Start slaap klok"
+    *: "Slaaptimer starten"
   </dest>
   <voice>
-    *: "Start slaap klok"
+    *: "Slaaptimer starten"
   </voice>
 </phrase>
 <phrase>
@@ -12872,11 +12932,11 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Luidspreker toetsklik"
+    hardware_click: "Luidsprekertoetsklik"
   </dest>
   <voice>
     *: none
-    hardware_click: "Luidspreker toetsklik"
+    hardware_click: "Luidsprekertoetsklik"
   </voice>
 </phrase>
 <phrase>
@@ -12889,11 +12949,11 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Hoofdtelefoon toetsklik"
+    hardware_click: "Hoofdtelefoontoetsklik"
   </dest>
   <voice>
     *: none
-    hardware_click: "Hoofdtelefoon toetsklik"
+    hardware_click: "Hoofdtelefoontoetsklik"
   </voice>
 </phrase>
 <phrase>
@@ -12904,10 +12964,10 @@
     *: "Western European (CP1252)"
   </source>
   <dest>
-    *: "West-Europa (CP1252)"
+    *: "West-Europees (CP1252)"
   </dest>
   <voice>
-    *: "West-Europa"
+    *: "West-Europees"
   </voice>
 </phrase>
 <phrase>
@@ -12932,10 +12992,10 @@
     *: "Startup/Shutdown"
   </source>
   <dest>
-    *: "Opstarten/Afsluiten"
+    *: "Opstarten/afsluiten"
   </dest>
   <voice>
-    *: "Opstarten/Afsluiten"
+    *: "Opstarten/afsluiten"
   </voice>
 </phrase>
 <phrase>
@@ -12946,10 +13006,10 @@
     *: "Restart Sleep Timer On Keypress"
   </source>
   <dest>
-    *: "Herstart slaap klok bij toetsklik"
+    *: "Slaaptimer herstarten bij toetsklik"
   </dest>
   <voice>
-    *: "Herstart slaap klok bij toetsklik"
+    *: "Slaaptimer herstarten bij toetsklik"
   </voice>
 </phrase>
 <phrase>
@@ -12962,11 +13022,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Gebruik snelkoppelmenu in plaats van snelscherm"
+    quickscreen: "Snelkoppelingsmenu gebruiken in plaats van snelscherm"
   </dest>
   <voice>
     *: none
-    quickscreen: "Gebruik snelkoppelmenu in plaats van snelscherm"
+    quickscreen: "Snelkoppelingsmenu gebruiken in plaats van snelscherm"
   </voice>
 </phrase>
 <phrase>
@@ -12977,10 +13037,10 @@
     *: "Constrain Auto-Change"
   </source>
   <dest>
-    *: "Beperk automatisch naar volgende map"
+    *: "Automatisch overschakelen naar volgende map beperken"
   </dest>
   <voice>
-    *: "Beperk automatisch naar volgende map"
+    *: "Automatisch overschakelen naar volgende map beperken"
   </voice>
 </phrase>
 <phrase>
@@ -12991,10 +13051,10 @@
     *: "Select one or more directories"
   </source>
   <dest>
-    *: "Kies een of meerdere mappen"
+    *: "Kies één of meerdere mappen"
   </dest>
   <voice>
-    *: "Kies een of meerdere mappen"
+    *: "Kies één of meerdere mappen"
   </voice>
 </phrase>
 <phrase>
@@ -13011,7 +13071,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Eenvoudig"
+    swcodec: "Eenvoudig (Meier)"
   </voice>
 </phrase>
 <phrase>
@@ -13053,10 +13113,10 @@
     *: "Maximum Volume Limit"
   </source>
   <dest>
-    *: "Maximum volumelimiet"
+    *: "Maximale volumelimiet"
   </dest>
   <voice>
-    *: "Maximum volumelimiet"
+    *: "Maximale volumelimiet"
   </voice>
 </phrase>
 <phrase>
@@ -13084,10 +13144,10 @@
     *: "Line Separator Colour"
   </source>
   <dest>
-    *: "Scheidingslijnkleur"
+    *: "Scheidingsregelkleur"
   </dest>
   <voice>
-    *: "Scheidingslijnkleur"
+    *: "Scheidingsregelkleur"
   </voice>
 </phrase>
 <phrase>
@@ -13112,10 +13172,10 @@
     *: "Line Separator"
   </source>
   <dest>
-    *: "Scheidingslijn"
+    *: "Scheidingsregel"
   </dest>
   <voice>
-    *: "Scheidingslijn"
+    *: "Scheidingsregel"
   </voice>
 </phrase>
 <phrase>
@@ -13157,9 +13217,463 @@
     *: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "DAC filtersteilheid"
+    *: "DAC-filtersteilheid"
   </dest>
   <voice>
-    *: "DAC filtersteilheid"
+    *: "DAC-filtersteilheid"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Automatisch vergrendelen ingeschakeld"
+  </dest>
+  <voice>
+    *: "Automatisch vergrendelen ingeschakeld"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_SURROUND_METHOD2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "SIDE ONLY"
+  </source>
+  <dest>
+    *: none
+    swcodec: "ENKEL ZIJKANT"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "ENKEL ZIJKANT"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_DEADZONE
+  desc: touchpad deadzone setting
+  user: core
+  <source>
+    *: none
+    sansafuzeplus: "Touchpad Dead Zone"
+  </source>
+  <dest>
+    *: none
+    sansafuzeplus: "Dode zone van touchpad"
+  </dest>
+  <voice>
+    *: none
+    sansafuzeplus: "Dode zone van touchpad"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Niet-toegewezen toetsen uitschakelen"
+  </dest>
+  <voice>
+    *: "Niet-toegewezen toetsen uitschakelen"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_ACTION_PLAY
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Afspelen"
+  </dest>
+  <voice>
+    *: "Afspelen"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Automatisch vergrendelen uitgeschakeld"
+  </dest>
+  <voice>
+    *: "Automatisch vergrendelen uitgeschakeld"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Notify"
+  </source>
+  <dest>
+    *: "Melden uitschakelen"
+  </dest>
+  <voice>
+    *: "Melden uitschakelen"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_SURROUND_FX1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x1)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x1)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x1)"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_IBASSO_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> System -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Mass Storage"
+    ibassodx90: "Mass Storage"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "massaopslag"
+    ibassodx90: "massaopslag"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "massaopslag"
+    ibassodx90: "massaopslag"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_IBASSO_USB_MODE
+  desc: in Settings -> General -> System -> USB Mode
+  user: core
+  <source>
+    *: none
+    ibassodx50: "USB Mode"
+    ibassodx90: "USB Mode"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "USB-modus"
+    ibassodx90: "USB-modus"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "USB-modus"
+    ibassodx90: "USB-modus"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Geavanceerde toetsvergrendeling"
+  </dest>
+  <voice>
+    *: "Geavanceerde toetsvergrendeling"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_AFR
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Auditory Fatigue Reduction"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Auditievevermoeidheidsvermindering"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Auditievevermoeidheidsvermindering"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Uitschakelen op externe energiebron"
+  </dest>
+  <voice>
+    *: "Uitschakelen op externe energiebron"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_ACTION_ENABLED
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Enabled"
+  </source>
+  <dest>
+    *: "Ingeschakeld"
+  </dest>
+  <voice>
+    *: "Ingeschakeld"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_PBE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Perceptual Bass Enhancement"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Perceptuele basversterking"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Perceptual basversterking"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Skip"
+  </source>
+  <dest>
+    *: "Overslaan"
+  </dest>
+  <voice>
+    *: "Overslaan"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_IBASSO_USB_MODE_CHARGE
+  desc: in Settings -> General -> System -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Charge Only"
+    ibassodx90: "Charge Only"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "enkel opladen"
+    ibassodx90: "enkel opladen"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "enkel opladen"
+    ibassodx90: "enkel opladen"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_IBASSO_USB_MODE_ADB
+  desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "Android Debug Bridge"
+    ibassodx90: "Android Debug Bridge"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
+  desc: in Settings -> General -> System -> Freq Scaling Governor
+  user: core
+  <source>
+    *: none
+    ibassodx50: "Freq Scaling Governor"
+    ibassodx90: "Freq Scaling Governor"
+  </source>
+  <dest>
+    *: none
+    ibassodx50: "frequentieschalingsgovernor"
+    ibassodx90: "frequentieschalingsgovernor"
+  </dest>
+  <voice>
+    *: none
+    ibassodx50: "frequentieschalingsgovernor"
+    ibassodx90: "frequentieschalingsgovernor"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_SURROUND_FX2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "f(x2)"
+  </source>
+  <dest>
+    *: none
+    swcodec: "f(x2)"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "f(x2)"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Aanraken uitschakelen"
+  </dest>
+  <voice>
+    *: "Aanraken uitschakelen"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Backlight Exemptions"
+  </source>
+  <dest>
+    *: "Verlichtingsuitzonderingen"
+  </dest>
+  <voice>
+    *: "Verlichtingsuitzonderingen"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_SURROUND_MIX
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Dry / Wet Mix"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Droge / natte mix"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Droge of natte mix"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_SURROUND
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Haas Surround"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Haas-surround"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Haas-surround"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Seek"
+  </source>
+  <dest>
+    *: "Zoeken"
+  </dest>
+  <voice>
+    *: "Zoeken"
   </voice>
 </phrase>
