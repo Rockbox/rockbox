@@ -250,7 +250,7 @@
     mrobe500: "PLAY, POWER, veya üst-sağ = Evet"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Devam et"
-    creativezen*: ""
+    creativezen*: "SELECT = Evet"
   </dest>
   <voice>
     *: ""
