@@ -601,9 +601,9 @@ int rm_get_packet(uint8_t **src,RMContext *rmctx, RMPacket *pkt)
 #ifdef DEBUG
 void dump_rm_context(RMContext *rmctx)
 {
-    DEBUGF("block_align = %d\n", rmctx->block_align);
-    DEBUGF("nb_channels = %d\n", rmctx->nb_channels);
-    DEBUGF("sample_rate = %d\n", rmctx->sample_rate);
-    DEBUGF("bit_rate    = %ld\n", rmctx->bit_rate   );
+    DEBUGF("block_align = %u\n", rmctx->block_align);
+    DEBUGF("nb_channels = %u\n", rmctx->nb_channels);
+    DEBUGF("sample_rate = %u\n", rmctx->sample_rate);
+    DEBUGF("bit_rate    = %lu\n", rmctx->bit_rate   );
 }
 #endif
