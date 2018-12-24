@@ -98,6 +98,9 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_PCF50606
 
+/* define this if you have a real-time clock alarm */
+#define HAVE_RTC_ALARM
+
 /* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
 

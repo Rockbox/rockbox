@@ -268,6 +268,9 @@ static const struct button_mapping remote_button_context_settings[] = {
     { ACTION_SETTINGS_DEC,       BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT, BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_STD_PREV,           BUTTON_RC_REW,                    BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,     BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_RIGHT,                     BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE },
     { ACTION_STD_CANCEL,         BUTTON_RC_REC,                    BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)

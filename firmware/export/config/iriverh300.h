@@ -76,6 +76,9 @@
    that needs spinups and can cause skips when shaked */
 #define HAVE_DISK_STORAGE
 
+/* Define if the device can wake from an RTC alarm */
+#define HAVE_RTC_ALARM
+
 /* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
 
