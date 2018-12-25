@@ -13,21 +13,11 @@
 
 # disable strict aliasing optimizations for now, it gives warnings due to
 # some horrid typecasting
-_SPEEXFLAGS = $(filter-out -fstrict-aliasing, $(CODECFLAGS)) \
+SPEEXFLAGS = $(filter-out -fstrict-aliasing, $(CODECFLAGS)) \
 		-fno-strict-aliasing -DHAVE_CONFIG_H -DSPEEX_DISABLE_ENCODER \
 		-I$(RBCODECLIB_DIR)/codecs/libspeex
 
-# build voice codec with core -O switch
-VOICESPEEXFLAGS = $(filter-out -ffunction-sections, $(filter-out -DCODEC,$(_SPEEXFLAGS))) -DROCKBOX_VOICE_CODEC
-
-# libspeex is faster on ARM-targets with -O1 instead of -O2
-SPEEXFLAGS = $(filter-out -O%,$(_SPEEXFLAGS))
-
-ifeq ($(ARCH),arch_arm)
-   SPEEXFLAGS += -O1
-else
-   SPEEXFLAGS += -O2
-endif
+VOICESPEEXFLAGS = $(filter-out -ffunction-sections, $(filter-out -DCODEC,$(SPEEXFLAGS))) -DROCKBOX_VOICE_CODEC
 
 # libspeex
 SPEEXLIB := $(CODECDIR)/libspeex.a

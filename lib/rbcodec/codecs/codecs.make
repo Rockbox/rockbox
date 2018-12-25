@@ -67,6 +67,7 @@ include $(RBCODECLIB_DIR)/codecs/libopus/libopus.make
 
 # set CODECFLAGS per codec lib, since gcc takes the last -Ox and the last
 # in a -ffoo -fno-foo pair, there is no need to filter them out
+$(CODECLIB) : CODECFLAGS += -O1
 $(A52LIB) : CODECFLAGS += -O1
 $(ALACLIB) : CODECFLAGS += -O1
 $(ASAPLIB) : CODECFLAGS += -O1
@@ -81,6 +82,7 @@ $(GBSLIB) : CODECFLAGS +=  -O2
 $(HESLIB) : CODECFLAGS +=  -O2
 $(KSSLIB) : CODECFLAGS +=  -O2
 $(M4ALIB) : CODECFLAGS += -O3
+$(MADLIB) : CODECFLAGS += -O2
 $(MUSEPACKLIB) : CODECFLAGS += -O1
 $(NSFLIB) : CODECFLAGS +=  -O2
 $(OPUSLIB) : CODECFLAGS +=  -O2
@@ -88,6 +90,7 @@ $(PCMSLIB) : CODECFLAGS += -O1
 $(RMLIB) : CODECFLAGS += -O3
 $(SGCLIB) : CODECFLAGS +=  -O2
 $(SPCLIB) : CODECFLAGS +=  -O1
+$(SPEEXLIB) : CODECFLAGS += -O2
 $(TREMORLIB) : CODECFLAGS += -O2
 $(TTALIB) : CODECFLAGS += -O2
 $(VGMLIB) : CODECFLAGS +=  -O2
@@ -102,15 +105,18 @@ ifeq ($(ARCH),arch_arm)
   # redo per arm generation
   $(ALACLIB) : CODECFLAGS += -O2
   $(AYLIB) : CODECFLAGS +=  -O1
+  $(EMU2413LIB) : CODECFLAGS +=  -O3
   $(GBSLIB) : CODECFLAGS +=  -O1
   $(HESLIB) : CODECFLAGS +=  -O1
   $(KSSLIB) : CODECFLAGS +=  -O1
+  $(MADLIB) : CODECFLAGS += -O1
   $(NSFLIB) : CODECFLAGS +=  -O1
+  $(SPEEXLIB) : CODECFLAGS += -O2
   $(SGCLIB) : CODECFLAGS +=  -O1
   $(VGMLIB) : CODECFLAGS +=  -O1
-  $(EMU2413LIB) : CODECFLAGS +=  -O3
   $(WAVPACKLIB) : CODECFLAGS += -O3
 else ifeq ($(ARCH),arch_m68k)
+  $(CODECLIB) : CODECFLAGS += -O2
   $(A52LIB) : CODECFLAGS += -O2
   $(ASFLIB) : CODECFLAGS += -O3
   $(ATRACLIB) : CODECFLAGS += -O2
@@ -124,6 +130,7 @@ else ifeq ($(ARCH),arch_mips)
 endif
 
 ifeq ($(MEMORYSIZE),2)
+  $(CODECLIB) : CODECFLAGS += -Os
   $(ASFLIB) : CODECFLAGS += -Os
   $(WMALIB) : CODECFLAGS += -Os
 endif
@@ -152,7 +159,7 @@ $(CODECDIR)/vorbis.codec : $(CODECDIR)/libtremor.a $(TLSFLIB) $(SETJMPLIB)
 $(CODECDIR)/speex.codec : $(CODECDIR)/libspeex.a
 $(CODECDIR)/mpc.codec : $(CODECDIR)/libmusepack.a
 $(CODECDIR)/wavpack.codec : $(CODECDIR)/libwavpack.a
-$(CODECDIR)/alac.codec : $(CODECDIR)/libalac.a $(CODECDIR)/libm4a.a 
+$(CODECDIR)/alac.codec : $(CODECDIR)/libalac.a $(CODECDIR)/libm4a.a
 $(CODECDIR)/aac.codec : $(CODECDIR)/libfaad.a $(CODECDIR)/libm4a.a
 $(CODECDIR)/shorten.codec : $(CODECDIR)/libffmpegFLAC.a
 $(CODECDIR)/ape-pre.map : $(CODECDIR)/libdemac-pre.a

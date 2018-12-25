@@ -16,15 +16,7 @@ $(CODECLIB): $(CODECLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-CODECLIBFLAGS = $(filter-out -O%,$(CODECFLAGS))
-
-ifeq ($(MEMORYSIZE),2)
-    CODECLIBFLAGS += -Os
-else ifeq ($(ARCH),arch_m68k)
-    CODECLIBFLAGS += -O2
-else
-    CODECLIBFLAGS += -O1
-endif
+CODECLIBFLAGS = $(CODECFLAGS)
 
 # Do not use '-ffunction-sections' when compiling sdl-sim
 ifneq ($(findstring sdl-sim, $(APP_TYPE)), sdl-sim)

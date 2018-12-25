@@ -17,13 +17,7 @@ $(WMAVOICELIB): $(WMAVOICELIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-WMAVOICEFLAGS = -I$(RBCODECLIB_DIR)/codecs/libwmavoice $(filter-out -O%,$(CODECFLAGS))
-
-ifeq ($(ARCH),arch_m68k)
-	WMAVOICEFLAGS += -O2
-else
-	WMAVOICEFLAGS += -O1
-endif
+WMAVOICEFLAGS = -I$(RBCODECLIB_DIR)/codecs/libwmavoice $(CODECFLAGS)
 
 ifeq ($(APP_TYPE),sdl-sim)
 # wmavoice needs libm in the simulator

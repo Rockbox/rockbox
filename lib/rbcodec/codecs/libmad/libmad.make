@@ -11,16 +11,8 @@
 # (one for codec, one for mpegplayer)
 # so a little trickery is necessary
 
-# Extract optimization level ('-O') from compile flags. Will be set later.
-MADFLAGS = $(filter-out -O%,$(CODECFLAGS)) -I$(RBCODECLIB_DIR)/codecs/libmad
+MADFLAGS = $(CODECFLAGS) -I$(RBCODECLIB_DIR)/codecs/libmad
 MADFLAGS += -UDEBUG -DNDEBUG -DHAVE_LIMITS_H -DHAVE_ASSERT_H
-
-# libmad is faster on ARM-targets with -O1 than -O2
-ifeq ($(ARCH),arch_arm)
-   MADFLAGS += -O1
-else
-   MADFLAGS += -O2
-endif
 
 # MPEGplayer
 MPEGMADFLAGS = $(MADFLAGS) -DMPEGPLAYER
