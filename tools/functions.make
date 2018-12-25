@@ -55,8 +55,10 @@ bmpdepfile = $(SILENT) \
 	for each in $(2); do \
 	    obj=`echo $$each | sed -e 's/\.bmp/.o/' -e 's:$(ROOTDIR):$(BUILDDIR):'`; \
 	    src=`echo $$each | sed -e 's/\.bmp/.c/' -e 's:$(ROOTDIR):$(BUILDDIR):'`; \
+	    hdr=`echo $$each | sed -e 's/.*\/\(.*\)\..*\.bmp/bitmaps\/\1\.h/'`; \
 	    echo $$obj: $$src; \
 	    echo $$src: $$each; \
+	    echo $(BUILDDIR)/$$hdr: $$src; \
 	done \
 	>> $(1)
 
