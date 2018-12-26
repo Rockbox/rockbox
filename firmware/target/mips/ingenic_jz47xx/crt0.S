@@ -28,7 +28,7 @@
  * e-mail: seeger.chin@gmail.com
  *
  * Copyright (C) 2006 Ingenic Semiconductor Inc.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
@@ -120,7 +120,7 @@ _cache_loop:
     ori     t0, 2
     mtc0    t0, C0_CONFIG
     nop
-    
+
     /*
       ----------------------------------------------------
        Copy IRAM section
@@ -137,7 +137,7 @@ _iram_loop:
     addiu  t0, 4
     bne    t1, t2, _iram_loop
     sw     t3, -4(t1)
-   
+
     /*
       ----------------------------------------------------
        Clear BSS section
@@ -158,11 +158,24 @@ _bss_loop:
     la      sp, stackend
     la      t0, stackbegin
     li      t2, 0xDEADBEEF
-    
+
 _stack_loop:
     addiu   t0, 4
     bne     t0, sp, _stack_loop
     sw      t2, -4(t0)
+
+    /*
+      ----------------------------------------------------
+       Set up interrupt stack
+      ----------------------------------------------------
+    */
+    la     k0, irqstackend
+    la     t0, irqstackbegin
+
+_irq_stack_loop:
+    addiu  t0, 4
+    bne    t0, k0, _irq_stack_loop
+    sw     t2, -4(t0)
 
     /*
       ----------------------------------------------------
@@ -174,33 +187,43 @@ _stack_loop:
     j       main
     nop
 
-    
+
     /*
      * 0x0   - Simple TLB refill handler
      * 0x100 - Cache error handler
      * 0x180 - Exception/Interrupt handler
      * 0x200 - Special Exception Interrupt handler (when IV is set in CP0_CAUSE)
      */
-    
+
     .section .vectors.1, "ax", %progbits
     j      tlb_refill_handler
     nop
-    
+
     .section .vectors.2, "ax", %progbits
     j      real_exception_handler
     nop
-    
+
     .section .vectors.3, "ax", %progbits
     j      real_exception_handler
     nop
-    
+
     .section .vectors.4, "ax", %progbits
     j      real_exception_handler
     nop
 
     .section .vectors, "ax", %progbits
 real_exception_handler:
-    addiu   sp, -0x80
+
+    /* Store stack pointer */
+    move    k0, sp
+    /* jump to IRQ stack */
+    la      sp, irqstackend
+
+    /* Push crap on frame */
+    addiu   sp, -0x84
+    /* store current stack pointer */
+    sw      k0, 0x80(sp)
+
     sw      ra,    0(sp)
     sw      fp,    4(sp)
     sw      gp,    8(sp)
@@ -236,18 +259,16 @@ real_exception_handler:
     nop
     sw      k0, 0x74(sp)
     mfc0    k0, C0_STATUS
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
+    nop
+    nop
+    nop
     sw      k0, 0x78(sp)
     mfc0    k0, C0_EPC
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
+    nop
+    nop
+    nop
     sw      k0, 0x7C(sp)
-    
+
     li      k1, M_CauseExcCode
     mfc0    k0, C0_CAUSE
     and     k0, k1
@@ -255,24 +276,22 @@ real_exception_handler:
     nop
     j       _exception
     nop
-    
+
 _int:
     jal     intr_handler
     nop
     j       _exception_return
-    
+
 _exception:
     move    a0, sp
     mfc0    a1, C0_CAUSE
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
+    nop
+    nop
+    nop
     mfc0    a2, C0_EPC
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
+    nop
+    nop
+    nop
     jal     exception_handler
     nop
 
@@ -314,18 +333,15 @@ _exception_return:
     lw      k0, 0x78(sp)
     mtc0    k0, C0_STATUS
     nop
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
+    nop
+    nop
     lw      k0, 0x7C(sp)
     mtc0    k0, C0_EPC
     nop
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
-    sll     zero, 1
-    addiu   sp, 0x80
+    nop
+    nop
+    /* Restore previous stack pointer */
+    lw      sp, 0x80(sp)
     eret
     nop
     .set reorder
