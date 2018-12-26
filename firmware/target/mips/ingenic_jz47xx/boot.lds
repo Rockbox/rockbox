@@ -87,5 +87,8 @@ SECTIONS
          stackbegin = .;
          . += 0x2000;
          stackend = .;
+         irqstackbegin = .;
+         . += 0x400;
+         irqstackend = .;
     } > IRAM
 }
