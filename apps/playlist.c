@@ -1434,7 +1434,9 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
 
         if (max < 0)
         {
-            if (control_file)
+            if (usb_detect() == USB_INSERTED)
+                ; /* ignore error on usb plug */
+            else if (control_file)
                 splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_ACCESS_ERROR));
             else
                 splash(HZ*2, ID2P(LANG_PLAYLIST_ACCESS_ERROR));
