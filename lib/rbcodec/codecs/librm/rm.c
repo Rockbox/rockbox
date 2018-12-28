@@ -604,6 +604,6 @@ void dump_rm_context(RMContext *rmctx)
     DEBUGF("block_align = %u\n", rmctx->block_align);
     DEBUGF("nb_channels = %u\n", rmctx->nb_channels);
     DEBUGF("sample_rate = %u\n", rmctx->sample_rate);
-    DEBUGF("bit_rate    = %zu\n", rmctx->bit_rate   );
+    DEBUGF("bit_rate    = %lu\n", (unsigned long) rmctx->bit_rate   );
 }
 #endif
