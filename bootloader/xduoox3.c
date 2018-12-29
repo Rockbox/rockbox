@@ -44,6 +44,7 @@
 extern void show_logo(void);
 extern void power_off(void);
 
+#ifdef HAVE_BOOTLOADER_USB_MODE
 static void show_splash(int timeout, const char *msg)
 {
     reset_screen();
@@ -88,6 +89,7 @@ static void usb_mode(void)
         }
     }
 }
+#endif
 
 static int boot_rockbox(void)
 {
@@ -95,11 +97,17 @@ static int boot_rockbox(void)
     void (*kernel_entry)(void);
 
     printf("Mounting disk...\n");
-    rc = disk_mount_all();
-    if (rc <= 0)
+
+    while((rc = disk_mount_all()) <= 0)
     {
         verbose = true;
-        error(EDISK,rc, true);
+#ifdef HAVE_BOOTLOADER_USB_MODE
+        error(EDISK, rc, false);
+        usb_start_monitoring();
+        usb_mode();
+#else
+        error(EDISK, rc, true);
+#endif
     }
 
     printf("Loading firmware...\n");
@@ -119,6 +127,7 @@ static int boot_rockbox(void)
     }
 }
 
+#if 0
 static void reset_configuration(void)
 {
     int rc;
@@ -135,6 +144,7 @@ static void reset_configuration(void)
     else
         show_splash(HZ/2, "Couldn't reset configuration!");
 }
+#endif
 
 int main(void)
 {
@@ -151,14 +161,28 @@ int main(void)
 
     show_logo();
 
-    filesystem_init();
-
     rc = storage_init();
     if(rc)
     {
         verbose = true;
         error(EATA, rc, true);
     }
+
+    filesystem_init();
+
+#ifdef HAVE_BOOTLOADER_USB_MODE
+    button_init_device();
+    int btn = button_read_device();
+
+    usb_init();
+
+    /* Enter USB mode if USB is plugged and PLAY button is pressed */
+    if(btn & BUTTON_PLAY) {
+        usb_start_monitoring();
+        if(usb_detect() == USB_INSERTED)
+            usb_mode();
+    }
+#endif /* HAVE_BOOTLOADER_USB_MODE */
 
     /* Don't mount the disks yet, there could be file system/partition errors
        which are fixable in USB mode */
