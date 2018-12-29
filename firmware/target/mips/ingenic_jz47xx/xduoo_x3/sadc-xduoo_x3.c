@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "system.h"
 #include "cpu.h"
@@ -86,11 +86,13 @@ bool button_hold(void)
 
 int button_read_device(void)
 {
+#ifndef BOOTLOADER
     static bool hold_button = false;
     bool hold_button_old;
 
     hold_button_old = hold_button;
     hold_button = (__gpio_get_pin(PIN_BTN_HOLD) ? true : false);
+#endif
 
     int btn = BUTTON_NONE;
     bool gpio_btn = (__gpio_get_pin(PIN_BTN_POWER) ? false : true);
