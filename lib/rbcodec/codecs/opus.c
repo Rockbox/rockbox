@@ -408,8 +408,14 @@ enum codec_status codec_run(void)
 
             /* Do this to avoid allocating space for huge comment packets
                (embedded Album Art) */
-            if(os.packetno == 1 && ogg_stream_packetpeek(&os, &op) != 1){
-              ogg_sync_reset(&oy);
+            if(os.packetno == 1 || ogg_page_continued(&og)){
+                
+                if (ogg_stream_packetpeek(&os, &op) != 1)
+                {
+                    if (!ogg_page_continued(&og))
+                        ogg_sync_reset(&oy);
+                    continue;
+                }
             }
 
             while ((ogg_stream_packetout(&os, &op) == 1) && !op.e_o_s) {
