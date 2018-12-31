@@ -57,6 +57,27 @@ static int get_more_data(ogg_sync_state *oy)
 
     return bytes;
 }
+
+/* seek to ogg page after given file position */
+static int seek_ogg_page(int64_t filepos)
+{
+    const char synccode[] = "OggS\0"; /* Note: there are two nulls here */
+    char buf[sizeof(synccode)];
+    ci->seek_buffer(filepos);
+    while (ci->read_filebuf(buf, 1) == 1) {
+        if (buf[0] == synccode[0]) {
+            if (ci->read_filebuf(&buf[1], sizeof(buf) - 1) != sizeof(buf) - 1)
+                break;
+            if (memcmp(buf, synccode, sizeof(buf)) == 0) {
+                ci->seek_buffer(ci->curpos - sizeof(buf));
+                LOGF("next page %ld", ci->curpos);
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 /* The read/seek functions track absolute position within the stream */
 static int64_t get_next_page(ogg_sync_state *oy, ogg_page *og,
                                  int64_t boundary)
@@ -408,8 +429,12 @@ enum codec_status codec_run(void)
 
             /* Do this to avoid allocating space for huge comment packets
                (embedded Album Art) */
-            if(os.packetno == 1 && ogg_stream_packetpeek(&os, &op) != 1){
-              ogg_sync_reset(&oy);
+            if (os.packetno == 1 && ogg_stream_packetpeek(&os, NULL) == 0){
+                LOGF("sync reset");
+                /* seek buffer directly to the first audio packet */
+                seek_ogg_page(ci->curpos - oy.returned);
+                ogg_sync_reset(&oy);
+                break;
             }
 
             while ((ogg_stream_packetout(&os, &op) == 1) && !op.e_o_s) {
