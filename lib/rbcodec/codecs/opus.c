@@ -57,6 +57,27 @@ static int get_more_data(ogg_sync_state *oy)
 
     return bytes;
 }
+
+/* Find ogg page after given file position */
+static int find_ogg_page(ogg_sync_state *oy, int64_t filepos)
+{
+    char chr;
+    char buf[5];
+    ci->seek_buffer(filepos);
+    while (ci->read_filebuf(&chr, 1) > 0) {
+        if (chr == 'O') {
+            if (ci->read_filebuf(&buf, sizeof(buf)) < sizeof(buf))
+                break;
+            if(memcmp(buf,"ggS",3) == 0 && buf[3] == 0 && buf[4] == 0) {
+                ci->seek_buffer(ci->curpos - sizeof(buf) + 1);
+                LOGF("next page %ld", ci->curpos);
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 /* The read/seek functions track absolute position within the stream */
 static int64_t get_next_page(ogg_sync_state *oy, ogg_page *og,
                                  int64_t boundary)
@@ -408,8 +429,11 @@ enum codec_status codec_run(void)
 
             /* Do this to avoid allocating space for huge comment packets
                (embedded Album Art) */
-            if(os.packetno == 1 && ogg_stream_packetpeek(&os, &op) != 1){
-              ogg_sync_reset(&oy);
+            if (os.packetno == 1 && ogg_stream_packetpeek(&os, NULL) == 0){
+                LOGF("sync reset");
+                find_ogg_page(&oy, ci->curpos - oy.returned);
+                ogg_sync_reset(&oy);
+                break;
             }
 
             while ((ogg_stream_packetout(&os, &op) == 1) && !op.e_o_s) {
