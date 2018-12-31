@@ -409,7 +409,9 @@ enum codec_status codec_run(void)
             /* Do this to avoid allocating space for huge comment packets
                (embedded Album Art) */
             if(os.packetno == 1 && ogg_stream_packetpeek(&os, &op) != 1){
-              ogg_sync_reset(&oy);
+                while (ogg_sync_pageseek(&oy, &og) == 1 && ogg_page_continued(&og))
+                    ; /*skip this page + continued pages */
+                continue;
             }
 
             while ((ogg_stream_packetout(&os, &op) == 1) && !op.e_o_s) {
