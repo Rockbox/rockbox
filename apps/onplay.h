@@ -45,6 +45,7 @@ enum hotkey_action {
     HOTKEY_INSERT,
     HOTKEY_INSERT_SHUFFLED,
     HOTKEY_PICTUREFLOW,
+    HOTKEY_BOOKMARK,
 };
 #endif
 
