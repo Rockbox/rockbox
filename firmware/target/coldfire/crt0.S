@@ -46,6 +46,10 @@ start:
     lea     MBAR2, %a1
     move.l  (%a1), %a0        /* store GPIO_READ result for button check in main() */
 
+    tst.b 0x30000000 /* preloader sets this to 1
+                        if woke up due to RTC alarm */
+    bne .loadrockbox
+
     /* Wait ~3 seconds for ON-button release. We need roughly 300ns per
        iteration, so we check 10000000 times to reach the desired delay */
     move.l  #10000000, %d0
