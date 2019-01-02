@@ -1496,6 +1496,9 @@ static struct hotkey_assignment hotkey_items[] = {
             HOTKEY_FUNC(NULL, NULL),
             ONPLAY_PICTUREFLOW },
 #endif
+    { HOTKEY_BOOKMARK,   LANG_BOOKMARK_MENU_CREATE,
+            HOTKEY_FUNC(bookmark_create_menu, NULL),
+            ONPLAY_OK },
 };
 
 /* Return the language ID for this action */
