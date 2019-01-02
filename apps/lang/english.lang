@@ -13983,3 +13983,20 @@
     *: "Playing time"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CAR_ADAPTER_MODE_DELAY
+  desc: Displayed for setting car adapter mode delay
+  user: core
+  <source>
+    *: none
+    charging: "Delay Before Resume"
+  </source>
+  <dest>
+    *: none
+    charging: "Delay Before Resume"
+  </dest>
+  <voice>
+    *: none
+    charging: "Delay Before Resume"
+  </voice>
+</phrase>

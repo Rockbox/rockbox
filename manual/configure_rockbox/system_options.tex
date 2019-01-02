@@ -145,14 +145,23 @@ This sub menu relates to limits in the Rockbox operating system.
   in the \setting{Idle Poweroff} setting
   (see \reference{ref:IdlePoweroffSetting}).
   If power to the DC in jack is turned back on before the \emph{Idle Poweroff}
-  function has shut the \dap{} off, playback will be resumed 5 seconds after
-  the power is applied. This delay is to allow for the time while the car
-  engine is being started.
+  function has shut the \dap{} off, playback will be resumed after
+  \setting{Car Adapter Mode Delay} seconds after the power is applied.
+  This delay is to allow for the time while the car engine is being started.
   \end{description}
 
   Once the \dap{} is shut off either manually, or automatically with the
   \setting{Idle Poweroff} function, it must be powered up manually to resume
   playback.
+
+\subsection{Car Adapter Mode Delay}
+  This option specifies
+  the time between power being applied and playback resuming
+  \begin{description}
+  \item [Car Adapter Mode Delay.]  As different car headunits take
+    varying amounts of time to start up, the \setting{Car Adapter Mode Delay}
+    is configurable between 5 and 30 seconds, in 5 second increments.
+  \end{description}
 }
 
 \opt{accessory_supply}{

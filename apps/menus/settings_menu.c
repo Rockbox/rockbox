@@ -345,6 +345,9 @@ MENUITEM_SETTING(line_in, &global_settings.line_in, linein_callback);
 #endif
 #if CONFIG_CHARGING
 MENUITEM_SETTING(car_adapter_mode, &global_settings.car_adapter_mode, NULL);
+MENUITEM_SETTING(car_adapter_mode_delay, &global_settings.car_adapter_mode_delay, NULL);
+MAKE_MENU(car_adapter_mode_menu, ID2P(LANG_CAR_ADAPTER_MODE), 0, Icon_NOICON,
+           &car_adapter_mode, &car_adapter_mode_delay);
 #endif
 #ifdef IPOD_ACCESSORY_PROTOCOL
 MENUITEM_SETTING(serial_bitrate, &global_settings.serial_bitrate, NULL);
@@ -424,7 +427,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &line_in,
 #endif
 #if CONFIG_CHARGING
-            &car_adapter_mode,
+            &car_adapter_mode_menu,
 #endif
 #ifdef IPOD_ACCESSORY_PROTOCOL
             &serial_bitrate,
