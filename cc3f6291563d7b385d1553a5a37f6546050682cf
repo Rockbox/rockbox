@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "290171f3_db3e93b5",
+        "filename": "firmware/target/mips/ingenic_jz47xx/crt0.S",
+        "patchSetId": 3
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-01-02T14:48:04Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "290171f3_5b2a8380",
+      "revId": "cc3f6291563d7b385d1553a5a37f6546050682cf",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "290171f3_1b0bdb26",
         "filename": "firmware/target/mips/ingenic_jz47xx/crt0.S",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2019-01-02T14:12:16Z",
       "side": 1,
       "message": "It is not return address! It is saved SP",
+      "revId": "cc3f6291563d7b385d1553a5a37f6546050682cf",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "290171f3_bb4bc759",
+        "filename": "firmware/target/mips/ingenic_jz47xx/crt0.S",
+        "patchSetId": 3
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-01-02T14:48:04Z",
+      "side": 1,
+      "message": "Fixed!",
+      "parentUuid": "290171f3_1b0bdb26",
       "revId": "cc3f6291563d7b385d1553a5a37f6546050682cf",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "290171f3_3b71f7a8",
+        "filename": "firmware/target/mips/ingenic_jz47xx/crt0.S",
+        "patchSetId": 3
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-01-02T14:48:04Z",
+      "side": 1,
+      "message": "IIRC I saw this in refrence/example IRQ handling code.\n\nDunno why it isn\u0027t just a NOP.\n\nBTW The jz4670 manual says it only needs 3 extra cycles.  Not sure why a fourth one was added here.",
+      "parentUuid": "290171f3_db0c533d",
+      "revId": "cc3f6291563d7b385d1553a5a37f6546050682cf",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "290171f3_7b253fb0",
         "filename": "firmware/target/mips/ingenic_jz47xx/crt0.S",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2019-01-02T14:12:16Z",
       "side": 1,
       "message": "Again not directly related to this patch but the purpose of special exception vector (when IV is set in CP0_CAUSE) is to speedup interrupt processing.\n\nBigger issue is that this code is not safe to catch exception inside interrupt handler as it will override SP and destroy evidence :-)",
+      "revId": "cc3f6291563d7b385d1553a5a37f6546050682cf",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "290171f3_9b480b5e",
+        "filename": "firmware/target/mips/ingenic_jz47xx/crt0.S",
+        "patchSetId": 3
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-01-02T14:48:04Z",
+      "side": 1,
+      "message": "I can attempt to address exception handling, but IMO it should be a separate patch.",
+      "parentUuid": "290171f3_7b253fb0",
       "revId": "cc3f6291563d7b385d1553a5a37f6546050682cf",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
