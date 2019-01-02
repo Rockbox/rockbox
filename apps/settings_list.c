@@ -1061,6 +1061,9 @@ const struct settings_list settings[] = {
 #if CONFIG_CHARGING
     OFFON_SETTING(NVRAM(1), car_adapter_mode,
                   LANG_CAR_ADAPTER_MODE, false, "car adapter mode", NULL),
+    INT_SETTING_NOWRAP(0, car_adapter_mode_delay, LANG_CAR_ADAPTER_MODE_DELAY,
+                5, "delay before resume", UNIT_SEC, 5, 30, 5,
+                NULL, NULL, NULL),
 #endif
 #ifdef IPOD_ACCESSORY_PROTOCOL
     CHOICE_SETTING(0, serial_bitrate, LANG_SERIAL_BITRATE, 0, "serial bitrate",
