@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "290171f3_5b2a8380",
+        "filename": "firmware/target/mips/ingenic_jz47xx/crt0.S",
+        "patchSetId": 3
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-01-02T14:12:16Z",
+      "side": 1,
+      "message": "no // comments please",
+      "revId": "cc3f6291563d7b385d1553a5a37f6546050682cf",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "290171f3_1b0bdb26",
+        "filename": "firmware/target/mips/ingenic_jz47xx/crt0.S",
+        "patchSetId": 3
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-01-02T14:12:16Z",
+      "side": 1,
+      "message": "It is not return address! It is saved SP",
+      "revId": "cc3f6291563d7b385d1553a5a37f6546050682cf",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "290171f3_db0c533d",
+        "filename": "firmware/target/mips/ingenic_jz47xx/crt0.S",
+        "patchSetId": 3
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-01-02T14:12:16Z",
+      "side": 1,
+      "message": "Not related to this change but I was always wondering why it is not simply NOP. Any operation with $0 as destination should be treated like NOP in any sane implementation.",
+      "revId": "cc3f6291563d7b385d1553a5a37f6546050682cf",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "290171f3_7b253fb0",
+        "filename": "firmware/target/mips/ingenic_jz47xx/crt0.S",
+        "patchSetId": 3
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-01-02T14:12:16Z",
+      "side": 1,
+      "message": "Again not directly related to this patch but the purpose of special exception vector (when IV is set in CP0_CAUSE) is to speedup interrupt processing.\n\nBigger issue is that this code is not safe to catch exception inside interrupt handler as it will override SP and destroy evidence :-)",
+      "revId": "cc3f6291563d7b385d1553a5a37f6546050682cf",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
