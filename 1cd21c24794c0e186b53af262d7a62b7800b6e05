@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "290171f3_5b016306",
+        "filename": "firmware/target/arm/rk27xx/sd-rk27xx.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-01-02T13:52:54Z",
+      "side": 1,
+      "message": "thats PF2, isn\u0027t it?",
+      "revId": "1cd21c24794c0e186b53af262d7a62b7800b6e05",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
