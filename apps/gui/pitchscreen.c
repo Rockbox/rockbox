@@ -31,6 +31,7 @@
 #include "lang.h"
 #include "icons.h"
 #include "screens.h"
+#include "talk.h"
 #include "viewport.h"
 #include "font.h"
 #include "system.h"
@@ -163,6 +164,18 @@ static bool at_limit = false;
  *
  * 
  */
+
+static void speak_pitch_mode(bool enqueue)
+{
+    bool timestretch_mode = global_settings.pitch_mode_timestretch && dsp_timestretch_available();
+    if (timestretch_mode)
+        talk_id(VOICE_PITCH_TIMESTRETCH_MODE, enqueue);
+    if (global_settings.pitch_mode_semitone)
+        talk_id(VOICE_PITCH_SEMITONE_MODE, timestretch_mode ? true : enqueue);
+    else
+        talk_id(VOICE_PITCH_ABSOLUTE_MODE, timestretch_mode ? true : enqueue);
+    return;
+}
 
 /*
  * Fixes the viewports so they represent the 3 rows, and adds a little margin
@@ -739,6 +752,7 @@ int gui_syncpitchscreen_run(void)
     int32_t new_pitch;
     int32_t pitch_delta;
     bool nudged = false;
+    int i, updated = 4, decimals = 0;
     bool exit = false;
     /* should maybe be passed per parameter later, not needed for now */
     struct viewport parent[NB_SCREENS];
@@ -768,6 +782,10 @@ int gui_syncpitchscreen_run(void)
         settings_save();
     }
 #endif
+
+    /* Count decimals for speaking */
+    for (i = PITCH_SPEED_PRECISION; i >= 10; i /= 10)
+        decimals++;
 
     /* set the semitone index based on the current pitch */
     semitone = get_semitone_from_pitch(pitch);
@@ -801,6 +819,49 @@ int gui_syncpitchscreen_run(void)
 #if CONFIG_CODEC == SWCODEC
         new_speed = 0;
 #endif
+
+        if (global_settings.talk_menu && updated)
+        {
+            talk_shutup();
+            switch (updated)
+            {
+            case 1:
+                if (global_settings.pitch_mode_semitone)
+                    talk_value_decimal(semitone, UNIT_SIGNED, decimals, false);
+                else
+                    talk_value_decimal(pitch, UNIT_PERCENT, decimals, false);
+                break;
+#if CONFIG_CODEC == SWCODEC
+            case 2:
+                talk_value_decimal(speed, UNIT_PERCENT, decimals, false);
+                break;
+#endif
+            case 3:
+                speak_pitch_mode(false);
+                break;
+            case 4:
+#if CONFIG_CODEC == SWCODEC
+                if (global_settings.pitch_mode_timestretch && dsp_timestretch_available())
+                    talk_id(LANG_PITCH, false);
+                else
+#endif
+                    talk_id(LANG_PLAYBACK_RATE, false);
+                talk_value_decimal(pitch, UNIT_PERCENT, decimals, true);
+#if CONFIG_CODEC == SWCODEC
+                if (global_settings.pitch_mode_timestretch && dsp_timestretch_available())
+                {
+                    talk_id(LANG_SPEED, true);
+                    talk_value_decimal(speed, UNIT_PERCENT, decimals, true);
+                }
+#endif
+                speak_pitch_mode(true);
+                break;
+            default:
+                break;
+            }
+        }
+        updated = 0;
+
         button = get_action(CONTEXT_PITCHSCREEN, HZ);
         
 #ifdef HAVE_TOUCHSCREEN
@@ -817,6 +878,7 @@ int gui_syncpitchscreen_run(void)
                     pitch_delta = SEMITONE_SMALL_DELTA;
                 else 
                     pitch_delta = PITCH_SMALL_DELTA;
+                updated = 1;
                 break;
 
             case ACTION_PS_INC_BIG:
@@ -824,6 +886,7 @@ int gui_syncpitchscreen_run(void)
                     pitch_delta = SEMITONE_BIG_DELTA;
                 else 
                     pitch_delta = PITCH_BIG_DELTA;
+                updated = 1;
                 break;
 
             case ACTION_PS_DEC_SMALL:
@@ -831,6 +894,7 @@ int gui_syncpitchscreen_run(void)
                     pitch_delta = -SEMITONE_SMALL_DELTA;
                 else 
                     pitch_delta = -PITCH_SMALL_DELTA;
+                updated = 1;
                 break;
 
             case ACTION_PS_DEC_BIG:
@@ -838,6 +902,7 @@ int gui_syncpitchscreen_run(void)
                     pitch_delta = -SEMITONE_BIG_DELTA;
                 else 
                     pitch_delta = -PITCH_BIG_DELTA;
+                updated = 1;
                 break;
 
             case ACTION_PS_NUDGE_RIGHT:
@@ -856,6 +921,7 @@ int gui_syncpitchscreen_run(void)
 #if CONFIG_CODEC == SWCODEC
                     speed = pitch;
 #endif
+                    updated = nudged ? 1 : 0;
                     break;
 #if CONFIG_CODEC == SWCODEC
                 }
@@ -863,6 +929,7 @@ int gui_syncpitchscreen_run(void)
                 {
                     new_speed = speed + SPEED_SMALL_DELTA;
                     at_limit = false;
+                    updated = 2;
                 }
                 break;
 
@@ -874,6 +941,7 @@ int gui_syncpitchscreen_run(void)
                     if(new_speed % PITCH_SPEED_PRECISION != 0)
                         new_speed -= new_speed % PITCH_SPEED_PRECISION;
                     at_limit = false;
+                    updated = 2;
                 }
                 break;
 #endif
@@ -891,6 +959,7 @@ int gui_syncpitchscreen_run(void)
 #endif
                     semitone = get_semitone_from_pitch(pitch);
                     nudged = false;
+                    updated = 1;
                 }
                 break;
 
@@ -910,6 +979,7 @@ int gui_syncpitchscreen_run(void)
 #if CONFIG_CODEC == SWCODEC
                     speed = pitch;
 #endif
+                    updated = nudged ? 1 : 0;
                     break;
 #if CONFIG_CODEC == SWCODEC
                 }
@@ -917,6 +987,7 @@ int gui_syncpitchscreen_run(void)
                 {
                     new_speed = speed - SPEED_SMALL_DELTA;
                     at_limit = false;
+                    updated = 2;
                 }
                 break;
 
@@ -928,6 +999,7 @@ int gui_syncpitchscreen_run(void)
                     if(new_speed % PITCH_SPEED_PRECISION != 0)
                         new_speed += PITCH_SPEED_PRECISION - speed % PITCH_SPEED_PRECISION;
                     at_limit = false;
+                    updated = 2;
                 }
                 break;
 #endif
@@ -945,6 +1017,7 @@ int gui_syncpitchscreen_run(void)
 #endif
                     semitone = get_semitone_from_pitch(pitch);
                     nudged = false;
+                    updated = 1;
                 }
                 break;
 
@@ -960,6 +1033,7 @@ int gui_syncpitchscreen_run(void)
                 }
 #endif
                 semitone = get_semitone_from_pitch(pitch);
+                updated = 4;
                 break;
 
             case ACTION_PS_TOGGLE_MODE:
@@ -978,6 +1052,7 @@ int gui_syncpitchscreen_run(void)
                 }
                 settings_save();
 #endif
+                updated = 3;
                 break;
 
             case ACTION_PS_EXIT:
