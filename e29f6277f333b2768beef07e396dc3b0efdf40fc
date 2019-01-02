@@ -16,6 +16,24 @@
       "revId": "e29f6277f333b2768beef07e396dc3b0efdf40fc",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "290171f3_7b989fc9",
+        "filename": "lib/rbcodec/codecs/libasf/asf.h",
+        "patchSetId": 13
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-01-02T16:07:45Z",
+      "side": 1,
+      "message": "ASF is technically just a generic container, MS did define WMMEDIASUBTYPE_MP3:\n\nhttps://docs.microsoft.com/en-us/windows/desktop/wmformat/media-type-identifiers\n\n(Also not implemented in rockbox\u0027s asf code is WMA lossless (x163), and PCM (x001))  mpeg-4 is also defined but may be a bit tricker to hook up.",
+      "parentUuid": "290171f3_7b777fa0",
+      "revId": "e29f6277f333b2768beef07e396dc3b0efdf40fc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
