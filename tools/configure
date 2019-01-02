@@ -4258,7 +4258,7 @@ fi
     t_model="xduoo_x3"
     ;;
 
-   250|ihifi770C)
+   250|ihifi770c)
     target_id=107
     modelname="ihifi770c"
     target="IHIFI770C"
