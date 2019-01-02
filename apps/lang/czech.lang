@@ -2620,19 +2620,19 @@
 </phrase>
 <phrase>
   id: LANG_NEVER
-  desc: in lcd settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: ""
   </source>
   <dest>
     *: none
-    lcd_sleep: "Nikdy"
+    lcd_sleep: ""
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Nikdy"
+    lcd_sleep: ""
   </voice>
 </phrase>
 <phrase>
@@ -4677,16 +4677,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: Save only on bookmark for each playlist in recent bookmarks
+  desc: deprecated
   user: core
   <source>
-    *: "Unique only"
+    *: ""
   </source>
   <dest>
-    *: "Jen unikátní"
+    *: ""
   </dest>
   <voice>
-    *: "Jen unikátní"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8447,44 +8447,44 @@
 </phrase>
 <phrase>
   id: LANG_KILOBYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "KB"
+    *: ""
   </source>
   <dest>
-    *: "KB"
+    *: ""
   </dest>
   <voice>
-    *: "kilobajt"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_MEGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "MB"
+    *: ""
   </source>
   <dest>
-    *: "MB"
+    *: ""
   </dest>
   <voice>
-    *: "megabajt"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_GIGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "GB"
+    *: ""
   </source>
   <dest>
-    *: "GB"
+    *: ""
   </dest>
   <voice>
-    *: "gigabajt"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13132,20 +13132,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: VOICE_NOW_PLAYING
-  desc: playlist viewer
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "Nyní hraje"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_TRACK_TO_MOVE
   desc: playlist viewer
   user: core
@@ -15108,5 +15094,61 @@ id: VOICE_BAT_BENCH_KEYS
   </dest>
   <voice>
     *: "Chyba souboru"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG__NEVER
+  desc: in lcd settings
+  user: core
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Nikdy"
+  </dest>
+  <voice>
+    *: "Nikdy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "KiB"
+  </source>
+  <dest>
+    *: "KiB"
+  </dest>
+  <voice>
+    *: "kibibajt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "MiB"
+  </source>
+  <dest>
+    *: "MiB"
+  </dest>
+  <voice>
+    *: "mebibajt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "GiB"
+  </source>
+  <dest>
+    *: "GiB"
+  </dest>
+  <voice>
+    *: "gibibajt"
   </voice>
 </phrase>
