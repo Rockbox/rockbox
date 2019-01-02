@@ -40,9 +40,10 @@ static const struct button_mapping button_context_standard[] = {
     { ACTION_STD_NEXT,        BUTTON_NEXT,                      BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,  BUTTON_NEXT|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_STD_CONTEXT,     BUTTON_PLAY|BUTTON_REPEAT,        BUTTON_PLAY },
-    { ACTION_STD_CANCEL,      BUTTON_OPTION|BUTTON_REL,         BUTTON_OPTION },
+    { ACTION_STD_CANCEL,      BUTTON_HOME|BUTTON_REL,           BUTTON_HOME },
     { ACTION_STD_OK,          BUTTON_PLAY|BUTTON_REL,           BUTTON_PLAY },
-    { ACTION_STD_MENU,        BUTTON_HOME|BUTTON_REL,           BUTTON_HOME },
+    { ACTION_STD_MENU,        BUTTON_OPTION|BUTTON_REL,         BUTTON_OPTION },
+    { ACTION_STD_QUICKSCREEN, BUTTON_OPTION|BUTTON_REPEAT,      BUTTON_OPTION },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
@@ -60,11 +61,15 @@ static const struct button_mapping button_context_wps[] = {
     { ACTION_WPS_VOLUP,       BUTTON_VOL_UP|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,     BUTTON_VOL_DOWN,                  BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,     BUTTON_VOL_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_WPS_BROWSE,      BUTTON_OPTION|BUTTON_REL,         BUTTON_OPTION },
+    { ACTION_WPS_BROWSE,      BUTTON_HOME|BUTTON_REL,           BUTTON_HOME },
     { ACTION_WPS_CONTEXT,     BUTTON_PLAY|BUTTON_REPEAT,        BUTTON_PLAY },
-    { ACTION_WPS_MENU,        BUTTON_HOME|BUTTON_REL,           BUTTON_HOME },
-    { ACTION_WPS_QUICKSCREEN, BUTTON_HOME|BUTTON_REPEAT,        BUTTON_HOME },
-    { ACTION_WPS_HOTKEY,      BUTTON_OPTION|BUTTON_REPEAT,      BUTTON_OPTION },
+    { ACTION_WPS_MENU,        BUTTON_OPTION|BUTTON_REL,         BUTTON_OPTION },
+    { ACTION_WPS_QUICKSCREEN, BUTTON_OPTION|BUTTON_REPEAT,      BUTTON_OPTION },
+    { ACTION_WPS_HOTKEY,      BUTTON_HOME|BUTTON_REPEAT,        BUTTON_HOME },
+
+    { ACTION_WPS_ABSETB_NEXTDIR,    BUTTON_POWER|BUTTON_NEXT,   BUTTON_POWER },
+    { ACTION_WPS_ABSETA_PREVDIR,    BUTTON_POWER|BUTTON_PREV,   BUTTON_POWER },
+    { ACTION_WPS_ABRESET,           BUTTON_POWER|BUTTON_PLAY,   BUTTON_POWER },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
@@ -118,7 +123,9 @@ static const struct button_mapping button_context_pitchscreen[] = {
     { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_NEXT|BUTTON_REL,         BUTTON_NONE },
     { ACTION_PS_TOGGLE_MODE,  BUTTON_PLAY|BUTTON_REL,           BUTTON_NONE },
     { ACTION_PS_RESET,        BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
-    { ACTION_PS_EXIT,         BUTTON_OPTION|BUTTON_REL,         BUTTON_OPTION },
+    { ACTION_PS_EXIT,         BUTTON_HOME|BUTTON_REL,           BUTTON_HOME },
+    { ACTION_PS_SLOWER,       BUTTON_PREV|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_PS_FASTER,       BUTTON_NEXT|BUTTON_REPEAT,        BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchscreen */
@@ -146,7 +153,7 @@ static const struct button_mapping button_context_settings[] = {
     { ACTION_STD_NEXT,        BUTTON_NEXT,                      BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,  BUTTON_NEXT|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_STD_OK,          BUTTON_PLAY|BUTTON_REL,           BUTTON_PLAY },
-    { ACTION_STD_CANCEL,      BUTTON_OPTION|BUTTON_REL,         BUTTON_OPTION },
+    { ACTION_STD_CANCEL,      BUTTON_HOME|BUTTON_REL,           BUTTON_HOME },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
@@ -162,9 +169,9 @@ static const struct button_mapping button_context_settings_vol_is_inc[] = {
 
 /** Tree **/
 static const struct button_mapping button_context_tree[] = {
-    { ACTION_TREE_WPS,        BUTTON_HOME|BUTTON_REL,           BUTTON_HOME },
-    { ACTION_TREE_STOP,       BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
-    { ACTION_TREE_HOTKEY,     BUTTON_OPTION|BUTTON_REPEAT,      BUTTON_OPTION },
+    { ACTION_TREE_WPS,        BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
+    { ACTION_TREE_STOP,       BUTTON_POWER|BUTTON_REPEAT,       BUTTON_POWER },
+    { ACTION_TREE_HOTKEY,     BUTTON_HOME|BUTTON_REPEAT,        BUTTON_HOME },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST)
 }; /* button_context_tree */
