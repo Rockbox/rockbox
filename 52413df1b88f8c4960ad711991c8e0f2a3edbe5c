@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "09102d3d_ba199179",
+        "filename": "apps/onplay.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-01-03T09:19:22Z",
+      "side": 1,
+      "message": "no tabs please",
+      "revId": "52413df1b88f8c4960ad711991c8e0f2a3edbe5c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09102d3d_7a2539b0",
+        "filename": "apps/onplay.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-01-03T09:19:22Z",
+      "side": 1,
+      "message": "playlist remaining?",
+      "revId": "52413df1b88f8c4960ad711991c8e0f2a3edbe5c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09102d3d_9a16cd47",
+        "filename": "apps/onplay.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-01-03T09:19:22Z",
+      "side": 1,
+      "message": "track remaining?",
+      "revId": "52413df1b88f8c4960ad711991c8e0f2a3edbe5c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09102d3d_3a1fc15a",
+        "filename": "apps/onplay.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-01-03T09:19:22Z",
+      "side": 1,
+      "message": "This makes me thinking that current track remaining stats are not important. We cannot guarantee it will be accurate in any way. In particular playback of that track may be long time finished when stats are displayed. Remaining time for playlist is (almost) not affected as this will manifest in huge playlists where remaining time of current track almost doesn\u0027t matter.",
+      "revId": "52413df1b88f8c4960ad711991c8e0f2a3edbe5c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09102d3d_5a2a7580",
+        "filename": "apps/onplay.c",
+        "patchSetId": 21
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-01-03T09:19:22Z",
+      "side": 1,
+      "message": "space after semicolon please",
+      "revId": "52413df1b88f8c4960ad711991c8e0f2a3edbe5c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
