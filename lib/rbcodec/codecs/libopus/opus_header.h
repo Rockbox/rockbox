@@ -30,6 +30,8 @@
 
 #include "ogg/ogg.h"
 
+#define OPUS_DEMIXING_MATRIX_SIZE_MAX (18 * 18 * 2)
+
 typedef struct {
    int version;
    int channels; /* Number of channels: 1..255 */
@@ -41,10 +43,10 @@ typedef struct {
    int nb_streams;
    int nb_coupled;
    unsigned char stream_map[255];
+   unsigned char dmatrix[OPUS_DEMIXING_MATRIX_SIZE_MAX];
 } OpusHeader;
 
 int opus_header_parse(const unsigned char *header, int len, OpusHeader *h);
-int opus_header_to_packet(const OpusHeader *h, unsigned char *packet, int len);
 
 extern const int wav_permute_matrix[8][8];
 

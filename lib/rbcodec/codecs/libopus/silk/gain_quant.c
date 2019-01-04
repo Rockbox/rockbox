@@ -35,7 +35,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #define SCALE_Q16               ( ( 65536 * ( N_LEVELS_QGAIN - 1 ) ) / ( ( ( MAX_QGAIN_DB - MIN_QGAIN_DB ) * 128 ) / 6 ) )
 #define INV_SCALE_Q16           ( ( 65536 * ( ( ( MAX_QGAIN_DB - MIN_QGAIN_DB ) * 128 ) / 6 ) ) / ( N_LEVELS_QGAIN - 1 ) )
 
-#if 0
 /* Gain scalar quantization with hysteresis, uniform on log scale */
 void silk_gains_quant(
     opus_int8                   ind[ MAX_NB_SUBFR ],            /* O    gain indices                                */
@@ -77,6 +76,7 @@ void silk_gains_quant(
             /* Accumulate deltas */
             if( ind[ k ] > double_step_size_threshold ) {
                 *prev_ind += silk_LSHIFT( ind[ k ], 1 ) - double_step_size_threshold;
+                *prev_ind = silk_min_int( *prev_ind, N_LEVELS_QGAIN - 1 );
             } else {
                 *prev_ind += ind[ k ];
             }
@@ -89,7 +89,6 @@ void silk_gains_quant(
         gain_Q16[ k ] = silk_log2lin( silk_min_32( silk_SMULWB( INV_SCALE_Q16, *prev_ind ) + OFFSET, 3967 ) ); /* 3967 = 31 in Q7 */
     }
 }
-#endif
 
 /* Gains scalar dequantization, uniform on log scale */
 void silk_gains_dequant(
@@ -125,7 +124,6 @@ void silk_gains_dequant(
     }
 }
 
-#if 0
 /* Compute unique identifier of gain indices vector */
 opus_int32 silk_gains_ID(                                       /* O    returns unique identifier of gains          */
     const opus_int8             ind[ MAX_NB_SUBFR ],            /* I    gain indices                                */
@@ -142,4 +140,3 @@ opus_int32 silk_gains_ID(                                       /* O    returns 
 
     return gainsID;
 }
-#endif
