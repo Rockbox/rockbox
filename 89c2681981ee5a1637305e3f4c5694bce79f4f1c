@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e914b934_b932bfef",
+        "filename": "lib/rbcodec/codecs/libopus/celt/arch.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-01-04T16:10:52Z",
+      "side": 1,
+      "message": "this needs to be:\n\n#elif defined(OPUS_ARM_INLINE_EDSP)\n\nOtherwise we get a _ton_ of compile warnings.",
+      "range": {
+        "startLine": 163,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 26
+      },
+      "revId": "89c2681981ee5a1637305e3f4c5694bce79f4f1c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e914b934_992ffb89",
+        "filename": "lib/rbcodec/codecs/libopus/celt/cwrs.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-01-04T16:10:52Z",
+      "side": 1,
+      "message": "on mips targets:\n \nwarning: implicit declaration of function ‘ABS’ [-Wimplicit-function-declaration]\n\n(This warning pops up in four different places, and results in a failure to link at the end)",
+      "range": {
+        "startLine": 447,
+        "startChar": 8,
+        "endLine": 447,
+        "endChar": 10
+      },
+      "revId": "89c2681981ee5a1637305e3f4c5694bce79f4f1c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e914b934_5953a316",
+        "filename": "lib/rbcodec/codecs/libopus/silk/LPC_fit.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-01-04T16:10:52Z",
+      "side": 1,
+      "message": "silk/LPC_fit.c is missing from SOURCES so this doesn\u0027t get linked in on mips targets.",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 18
+      },
+      "revId": "89c2681981ee5a1637305e3f4c5694bce79f4f1c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
