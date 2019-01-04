@@ -37,7 +37,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #define silk_enc_map(a)                  ( silk_RSHIFT( (a), 15 ) + 1 )
 #define silk_dec_map(a)                  ( silk_LSHIFT( (a),  1 ) - 1 )
 
-#if 0
 /* Encodes signs of excitation */
 void silk_encode_signs(
     ec_enc                      *psRangeEnc,                        /* I/O  Compressor data structure                   */
@@ -71,7 +70,6 @@ void silk_encode_signs(
         q_ptr += SHELL_CODEC_FRAME_LENGTH;
     }
 }
-#endif
 
 /* Decodes signs of excitation */
 void silk_decode_signs(

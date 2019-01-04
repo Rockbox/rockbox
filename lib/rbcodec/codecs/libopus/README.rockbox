@@ -1,5 +1,5 @@
 Libraries:  Opus (snapshot) / Opus-tools (snapshot) / libogg 1.3
-Imported:   September 15th, 2012
+Imported:   January 1st, 2019
 
 Steps taken to adapt original opus/opus-tool/ogg source files to rockbox
 (useful when for example syncing a new snapshot)
@@ -10,13 +10,21 @@ Opus:
 * copied .c/.h files from opus/celt to lib/rbcodec/codecs/libopus/celt
 * copied .c/.h files from opus/silk to lib/rbcodec/codecs/libopus/silk
 
+Celt:
+* changed #if FIXED_POINT to #ifdef FIXED_POINT in bands.c
+* changed #elif OPUS_ARM_INLINE_EDSP to #elif defined (OPUS_ARM_INLINE_EDSP)
+* add #define ABS(a)(((a) < 0) ? - (a) :(a)) to mathops.h
+
 Opus-tools:
 * copied src/opus_header.h and src/opus_header.c to lib/rbcodec/codecs/libopus
-* changed #include <ogg/ogg.h> to #include "ogg/ogg.h" in opus_header.c
+* changed #include <ogg/ogg.h> to #include "ogg/ogg.h" in opus_header.h
 
 Ogg:
 * copied libogg/src/framing.c to lib/rbcodec/codecs/libopus/ogg
 * copied libogg/include/ogg.h to lib/rbcodec/codecs/libopus/ogg
+* copied libogg/include/crctable.h to lib/rbcodec/codecs/libopus/ogg
 * changed #include "ogg/ogg.h" to #include "ogg.h" in framing.c
-* added os_config.h to lib/rbcodec/codecs/libopus/ogg
-
+* -- added os_config.h to lib/rbcodec/codecs/libopus/ogg
+* added our own os_types.h
+* changed #include <ogg/os_types.h> to #include "os_types.h" in ogg.h
+* changed #include <ogg/os_types.h> to #include "os_types.h" in crctable.h

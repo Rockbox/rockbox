@@ -4,9 +4,14 @@
 #include "modes.h"
 #include "rate.h"
 
+#ifdef HAVE_ARM_NE10
+#define OVERRIDE_FFT 1
+#include "static_modes_fixed_arm_ne10.h"
+#endif
+
 #ifndef DEF_WINDOW120
 #define DEF_WINDOW120
-static const opus_val16 window120[120] ICONST_ATTR = {
+static const opus_val16 window120[120] = {
 2, 20, 55, 108, 178,
 266, 372, 494, 635, 792,
 966, 1157, 1365, 1590, 1831,
@@ -36,13 +41,13 @@ static const opus_val16 window120[120] ICONST_ATTR = {
 
 #ifndef DEF_LOGN400
 #define DEF_LOGN400
-static const opus_int16 logN400[21] ICONST_ATTR = {
+static const opus_int16 logN400[21] = {
 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 16, 16, 16, 21, 21, 24, 29, 34, 36, };
 #endif
 
 #ifndef DEF_PULSE_CACHE50
 #define DEF_PULSE_CACHE50
-static const opus_int16 cache_index50[105] ICONST_ATTR = {
+static const opus_int16 cache_index50[105] = {
 -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 41, 41, 41,
 82, 82, 123, 164, 200, 222, 0, 0, 0, 0, 0, 0, 0, 0, 41,
 41, 41, 41, 123, 123, 123, 164, 164, 240, 266, 283, 295, 41, 41, 41,
@@ -51,7 +56,7 @@ static const opus_int16 cache_index50[105] ICONST_ATTR = {
 305, 305, 305, 318, 318, 343, 351, 358, 364, 240, 240, 240, 240, 240, 240,
 240, 240, 305, 305, 305, 305, 343, 343, 343, 351, 351, 370, 376, 382, 387,
 };
-static const unsigned char cache_bits50[392] ICONST_ATTR = {
+static const unsigned char cache_bits50[392] = {
 40, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 40, 15, 23, 28,
@@ -79,7 +84,7 @@ static const unsigned char cache_bits50[392] ICONST_ATTR = {
 106, 151, 192, 231, 5, 59, 111, 158, 202, 243, 5, 55, 103, 147, 187,
 224, 5, 60, 113, 161, 206, 248, 4, 65, 122, 175, 224, 4, 67, 127,
 182, 234, };
-static const unsigned char cache_caps50[168] ICONST_ATTR = {
+static const unsigned char cache_caps50[168] = {
 224, 224, 224, 224, 224, 224, 224, 224, 160, 160, 160, 160, 185, 185, 185,
 178, 178, 168, 134, 61, 37, 224, 224, 224, 224, 224, 224, 224, 224, 240,
 240, 240, 240, 207, 207, 207, 198, 198, 183, 144, 66, 40, 160, 160, 160,
@@ -96,7 +101,7 @@ static const unsigned char cache_caps50[168] ICONST_ATTR = {
 
 #ifndef FFT_TWIDDLES48000_960
 #define FFT_TWIDDLES48000_960
-static const kiss_twiddle_cpx fft_twiddles48000_960[480] ICONST_ATTR = {
+static const kiss_twiddle_cpx fft_twiddles48000_960[480] = {
 {32767, 0}, {32766, -429},
 {32757, -858}, {32743, -1287},
 {32724, -1715}, {32698, -2143},
@@ -424,53 +429,73 @@ static const opus_int16 fft_bitrev60[60] = {
 
 #ifndef FFT_STATE48000_960_0
 #define FFT_STATE48000_960_0
-static const kiss_fft_state fft_state48000_960_0 ICONST_ATTR = {
+static const kiss_fft_state fft_state48000_960_0 = {
 480,    /* nfft */
-17476,	/* scale */
+17476,    /* scale */
 8,      /* scale_shift */
 -1,     /* shift */
-{5, 96, 3, 32, 4, 8, 2, 4, 4, 1, 0, 0, 0, 0, 0, 0, },	/* factors */
+{5, 96, 3, 32, 4, 8, 2, 4, 4, 1, 0, 0, 0, 0, 0, 0, },    /* factors */
 fft_bitrev480,  /* bitrev */
 fft_twiddles48000_960,  /* bitrev */
+#ifdef OVERRIDE_FFT
+(arch_fft_state *)&cfg_arch_480,
+#else
+NULL,
+#endif
 };
 #endif
 
 #ifndef FFT_STATE48000_960_1
 #define FFT_STATE48000_960_1
-static const kiss_fft_state fft_state48000_960_1 ICONST_ATTR = {
+static const kiss_fft_state fft_state48000_960_1 = {
 240,    /* nfft */
-17476,	/* scale */
+17476,    /* scale */
 7,      /* scale_shift */
 1,      /* shift */
-{5, 48, 3, 16, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, },	/* factors */
+{5, 48, 3, 16, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, },    /* factors */
 fft_bitrev240,  /* bitrev */
 fft_twiddles48000_960,  /* bitrev */
+#ifdef OVERRIDE_FFT
+(arch_fft_state *)&cfg_arch_240,
+#else
+NULL,
+#endif
 };
 #endif
 
 #ifndef FFT_STATE48000_960_2
 #define FFT_STATE48000_960_2
-static const kiss_fft_state fft_state48000_960_2 ICONST_ATTR = {
+static const kiss_fft_state fft_state48000_960_2 = {
 120,    /* nfft */
-17476,	/* scale */
+17476,    /* scale */
 6,      /* scale_shift */
 2,      /* shift */
-{5, 24, 3, 8, 2, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, },	/* factors */
+{5, 24, 3, 8, 2, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, },    /* factors */
 fft_bitrev120,  /* bitrev */
 fft_twiddles48000_960,  /* bitrev */
+#ifdef OVERRIDE_FFT
+(arch_fft_state *)&cfg_arch_120,
+#else
+NULL,
+#endif
 };
 #endif
 
 #ifndef FFT_STATE48000_960_3
 #define FFT_STATE48000_960_3
-static const kiss_fft_state fft_state48000_960_3 ICONST_ATTR = {
+static const kiss_fft_state fft_state48000_960_3 = {
 60,     /* nfft */
-17476,	/* scale */
+17476,    /* scale */
 5,      /* scale_shift */
 3,      /* shift */
-{5, 12, 3, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },	/* factors */
+{5, 12, 3, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },    /* factors */
 fft_bitrev60,   /* bitrev */
 fft_twiddles48000_960,  /* bitrev */
+#ifdef OVERRIDE_FFT
+(arch_fft_state *)&cfg_arch_60,
+#else
+NULL,
+#endif
 };
 #endif
 
@@ -478,7 +503,7 @@ fft_twiddles48000_960,  /* bitrev */
 
 #ifndef MDCT_TWIDDLES960
 #define MDCT_TWIDDLES960
-static const opus_val16 mdct_twiddles960[1800] ICONST_ATTR = {
+static const opus_val16 mdct_twiddles960[1800] = {
 32767, 32767, 32767, 32766, 32765,
 32763, 32761, 32759, 32756, 32753,
 32750, 32746, 32742, 32738, 32733,
@@ -842,7 +867,7 @@ static const opus_val16 mdct_twiddles960[1800] ICONST_ATTR = {
 };
 #endif
 
-static const CELTMode mode48000_960_120 ICONST_ATTR = {
+static const CELTMode mode48000_960_120 = {
 48000,  /* Fs */
 120,    /* overlap */
 21,     /* nbEBands */
