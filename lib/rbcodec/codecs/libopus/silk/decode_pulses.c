@@ -56,7 +56,7 @@ void silk_decode_pulses(
     silk_assert( 1 << LOG2_SHELL_CODEC_FRAME_LENGTH == SHELL_CODEC_FRAME_LENGTH );
     iter = silk_RSHIFT( frame_length, LOG2_SHELL_CODEC_FRAME_LENGTH );
     if( iter * SHELL_CODEC_FRAME_LENGTH < frame_length ) {
-        silk_assert( frame_length == 12 * 10 ); /* Make sure only happens for 10 ms @ 12 kHz */
+        celt_assert( frame_length == 12 * 10 ); /* Make sure only happens for 10 ms @ 12 kHz */
         iter++;
     }
 
@@ -69,9 +69,9 @@ void silk_decode_pulses(
         sum_pulses[ i ] = ec_dec_icdf( psRangeDec, cdf_ptr, 8 );
 
         /* LSB indication */
-        while( sum_pulses[ i ] == MAX_PULSES + 1 ) {
+        while( sum_pulses[ i ] == SILK_MAX_PULSES + 1 ) {
             nLshifts[ i ]++;
-            /* When we've already got 10 LSBs, we shift the table to not allow (MAX_PULSES + 1) */
+            /* When we've already got 10 LSBs, we shift the table to not allow (SILK_MAX_PULSES + 1) */
             sum_pulses[ i ] = ec_dec_icdf( psRangeDec,
                     silk_pulses_per_block_iCDF[ N_RATE_LEVELS - 1] + ( nLshifts[ i ] == 10 ), 8 );
         }

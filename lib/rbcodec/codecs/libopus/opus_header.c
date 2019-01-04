@@ -44,7 +44,7 @@
              2..254: reserved, 255: multistream with no mapping)
 
   - if (mapping != 0)
-     - N = totel number of streams (8 bits)
+     - N = total number of streams (8 bits)
      - M = number of paired streams (8 bits)
      - C times channel origin
           - if (C<2*M)
@@ -58,48 +58,10 @@
 */
 
 typedef struct {
-   unsigned char *data;
-   int maxlen;
-   int pos;
-} Packet;
-
-typedef struct {
    const unsigned char *data;
    int maxlen;
    int pos;
 } ROPacket;
-
-static int write_uint32(Packet *p, ogg_uint32_t val)
-{
-   if (p->pos>p->maxlen-4)
-      return 0;
-   p->data[p->pos  ] = (val    ) & 0xFF;
-   p->data[p->pos+1] = (val>> 8) & 0xFF;
-   p->data[p->pos+2] = (val>>16) & 0xFF;
-   p->data[p->pos+3] = (val>>24) & 0xFF;
-   p->pos += 4;
-   return 1;
-}
-
-static int write_uint16(Packet *p, ogg_uint16_t val)
-{
-   if (p->pos>p->maxlen-2)
-      return 0;
-   p->data[p->pos  ] = (val    ) & 0xFF;
-   p->data[p->pos+1] = (val>> 8) & 0xFF;
-   p->pos += 2;
-   return 1;
-}
-
-static int write_chars(Packet *p, const unsigned char *str, int nb_chars)
-{
-   int i;
-   if (p->pos>p->maxlen-nb_chars)
-      return 0;
-   for (i=0;i<nb_chars;i++)
-      p->data[p->pos++] = str[i];
-   return 1;
-}
 
 static int read_uint32(ROPacket *p, ogg_uint32_t *val)
 {
@@ -194,12 +156,28 @@ int opus_header_parse(const unsigned char *packet, int len, OpusHeader *h)
       h->nb_coupled = ch;
 
       /* Multi-stream support */
-      for (i=0;i<h->channels;i++)
+      if (h->channel_mapping == 3)
       {
-         if (!read_chars(&p, &h->stream_map[i], 1))
+         int dmatrix_size = h->channels * (h->nb_streams + h->nb_coupled) * 2;
+         if (dmatrix_size > len - p.pos)
             return 0;
-         if (h->stream_map[i]>(h->nb_streams+h->nb_coupled) && h->stream_map[i]!=255)
+         if (dmatrix_size > OPUS_DEMIXING_MATRIX_SIZE_MAX)
+            p.pos += dmatrix_size;
+         else if (!read_chars(&p, h->dmatrix, dmatrix_size))
             return 0;
+         for (i=0;i<h->channels;i++) {
+            h->stream_map[i] = i;
+         }
+      }
+      else
+      {
+         for (i=0;i<h->channels;i++)
+         {
+            if (!read_chars(&p, &h->stream_map[i], 1))
+               return 0;
+            if (h->stream_map[i]>(h->nb_streams+h->nb_coupled) && h->stream_map[i]!=255)
+               return 0;
+         }
       }
    } else {
       if(h->channels>2)
@@ -214,61 +192,6 @@ int opus_header_parse(const unsigned char *packet, int len, OpusHeader *h)
    if ((h->version==0 || h->version==1) && p.pos != len)
       return 0;
    return 1;
-}
-
-int opus_header_to_packet(const OpusHeader *h, unsigned char *packet, int len)
-{
-   int i;
-   Packet p;
-   unsigned char ch;
-
-   p.data = packet;
-   p.maxlen = len;
-   p.pos = 0;
-   if (len<19)return 0;
-   if (!write_chars(&p, (const unsigned char*)"OpusHead", 8))
-      return 0;
-   /* Version is 1 */
-   ch = 1;
-   if (!write_chars(&p, &ch, 1))
-      return 0;
-
-   ch = h->channels;
-   if (!write_chars(&p, &ch, 1))
-      return 0;
-
-   if (!write_uint16(&p, h->preskip))
-      return 0;
-
-   if (!write_uint32(&p, h->input_sample_rate))
-      return 0;
-
-   if (!write_uint16(&p, h->gain))
-      return 0;
-
-   ch = h->channel_mapping;
-   if (!write_chars(&p, &ch, 1))
-      return 0;
-
-   if (h->channel_mapping != 0)
-   {
-      ch = h->nb_streams;
-      if (!write_chars(&p, &ch, 1))
-         return 0;
-
-      ch = h->nb_coupled;
-      if (!write_chars(&p, &ch, 1))
-         return 0;
-
-      /* Multi-stream support */
-      for (i=0;i<h->channels;i++)
-      {
-         if (!write_chars(&p, &h->stream_map[i], 1))
-            return 0;
-      }
-   }
-
-   return p.pos;
 }
 
 /* This is just here because it's a convenient file linked by both opusenc and

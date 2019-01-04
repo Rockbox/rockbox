@@ -116,7 +116,7 @@ opus_uint32 ec_tell_frac(ec_ctx *_this){
 
 #ifdef USE_SMALL_DIV_TABLE
 /* Result of 2^32/(2*i+1), except for i=0. */
-const opus_uint32 SMALL_DIV_TABLE[129] ICONST_ATTR = {
+const opus_uint32 SMALL_DIV_TABLE[129] = {
    0xFFFFFFFF, 0x55555555, 0x33333333, 0x24924924,
    0x1C71C71C, 0x1745D174, 0x13B13B13, 0x11111111,
    0x0F0F0F0F, 0x0D79435E, 0x0C30C30C, 0x0B21642C,

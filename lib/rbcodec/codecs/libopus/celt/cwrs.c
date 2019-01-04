@@ -74,7 +74,7 @@ int log2_frac(opus_uint32 val, int frac)
 /*Although derived separately, the pulse vector coding scheme is equivalent to
    a Pyramid Vector Quantizer \cite{Fis86}.
   Some additional notes about an early version appear at
-   http://people.xiph.org/~tterribe/notes/cwrs.html, but the codebook ordering
+   https://people.xiph.org/~tterribe/notes/cwrs.html, but the codebook ordering
    and the definitions of some terms have evolved since that was written.
 
   The conversion from a pulse vector to an integer index (encoding) and back
@@ -210,7 +210,7 @@ int log2_frac(opus_uint32 val, int frac)
 #if defined(CUSTOM_MODES)
 static const opus_uint32 CELT_PVQ_U_DATA[1488]={
 #else
-static const opus_uint32 CELT_PVQ_U_DATA[1272] ICONST_ATTR ={
+static const opus_uint32 CELT_PVQ_U_DATA[1272]={
 #endif
   /*N=0, K=0...176:*/
   1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -418,7 +418,7 @@ static const opus_uint32 *const CELT_PVQ_U_ROW[15]={
   CELT_PVQ_U_DATA+1464,CELT_PVQ_U_DATA+1470,CELT_PVQ_U_DATA+1473
 };
 #else
-static const opus_uint32 *const CELT_PVQ_U_ROW[15] ICONST_ATTR ={
+static const opus_uint32 *const CELT_PVQ_U_ROW[15]={
   CELT_PVQ_U_DATA+   0,CELT_PVQ_U_DATA+ 176,CELT_PVQ_U_DATA+ 351,
   CELT_PVQ_U_DATA+ 525,CELT_PVQ_U_DATA+ 698,CELT_PVQ_U_DATA+ 870,
   CELT_PVQ_U_DATA+1041,CELT_PVQ_U_DATA+1131,CELT_PVQ_U_DATA+1178,
@@ -482,7 +482,7 @@ static opus_val32 cwrsi(int _n,int _k,opus_uint32 _i,int *_y){
       k0=_k;
       q=row[_n];
       if(q>_i){
-        celt_assert(p>q);
+        celt_sig_assert(p>q);
         _k=_n;
         do p=CELT_PVQ_U_ROW[--_k][_n];
         while(p>_i);
