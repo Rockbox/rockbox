@@ -104,6 +104,10 @@ OPUS_EXPORT void opus_pcm_soft_clip(float *_x, int N, int C, float *declip_mem)
 
          /* Compute a such that maxval + a*maxval^2 = 1 */
          a=(maxval-1)/(maxval*maxval);
+         /* Slightly boost "a" by 2^-22. This is just enough to ensure -ffast-math
+            does not cause output values larger than +/-1, but small enough not
+            to matter even for 24-bit output.  */
+         a += a*2.4e-7f;
          if (x[i*C]>0)
             a = -a;
          /* Apply soft clipping */
@@ -133,7 +137,6 @@ OPUS_EXPORT void opus_pcm_soft_clip(float *_x, int N, int C, float *declip_mem)
 }
 #endif
 
-#if 0
 int encode_size(int size, unsigned char *data)
 {
    if (size < 252)
@@ -146,7 +149,6 @@ int encode_size(int size, unsigned char *data)
       return 2;
    }
 }
-#endif
 
 static int parse_size(const unsigned char *data, opus_int32 len, opus_int16 *size)
 {
@@ -203,8 +205,10 @@ int opus_packet_parse_impl(const unsigned char *data, opus_int32 len,
    opus_int32 pad = 0;
    const unsigned char *data0 = data;
 
-   if (size==NULL)
+   if (size==NULL || len<0)
       return OPUS_BAD_ARG;
+   if (len==0)
+      return OPUS_INVALID_PACKET;
 
    framesize = opus_packet_get_samples_per_frame(data, 48000);
 
@@ -248,7 +252,7 @@ int opus_packet_parse_impl(const unsigned char *data, opus_int32 len,
       /* Number of frames encoded in bits 0 to 5 */
       ch = *data++;
       count = ch&0x3F;
-      if (count <= 0 || framesize*count > 5760)
+      if (count <= 0 || framesize*(opus_int32)count > 5760)
          return OPUS_INVALID_PACKET;
       len--;
       /* Padding flag is bit 6 */
@@ -342,7 +346,6 @@ int opus_packet_parse_impl(const unsigned char *data, opus_int32 len,
    return count;
 }
 
-#if 0
 int opus_packet_parse(const unsigned char *data, opus_int32 len,
       unsigned char *out_toc, const unsigned char *frames[48],
       opus_int16 size[48], int *payload_offset)
@@ -350,5 +353,4 @@ int opus_packet_parse(const unsigned char *data, opus_int32 len,
    return opus_packet_parse_impl(data, len, 0, out_toc,
                                  frames, size, payload_offset, NULL);
 }
-#endif
 

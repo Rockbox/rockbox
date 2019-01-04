@@ -45,7 +45,6 @@ static OPUS_INLINE void combine_pulses(
     }
 }
 
-#if 0
 static OPUS_INLINE void encode_split(
     ec_enc                      *psRangeEnc,    /* I/O  compressor data structure                   */
     const opus_int              p_child1,       /* I    pulse amplitude of first child subframe     */
@@ -57,7 +56,6 @@ static OPUS_INLINE void encode_split(
         ec_enc_icdf( psRangeEnc, p_child1, &shell_table[ silk_shell_code_table_offsets[ p ] ], 8 );
     }
 }
-#endif
 
 static OPUS_INLINE void decode_split(
     opus_int16                  *p_child1,      /* O    pulse amplitude of first child subframe     */
@@ -76,7 +74,6 @@ static OPUS_INLINE void decode_split(
     }
 }
 
-#if 0
 /* Shell encoder, operates on one shell code frame of 16 pulses */
 void silk_shell_encoder(
     ec_enc                      *psRangeEnc,                    /* I/O  compressor data structure                   */
@@ -116,7 +113,6 @@ void silk_shell_encoder(
     encode_split( psRangeEnc, pulses0[ 12 ], pulses1[ 6 ], silk_shell_code_table0 );
     encode_split( psRangeEnc, pulses0[ 14 ], pulses1[ 7 ], silk_shell_code_table0 );
 }
-#endif
 
 
 /* Shell decoder, operates on one shell code frame of 16 pulses */
