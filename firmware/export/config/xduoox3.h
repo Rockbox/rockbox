@@ -73,6 +73,9 @@
 /* Define this if you can detect headphones */
 #define HAVE_HEADPHONE_DETECTION
 
+/* Define this if you can detect lineout */
+#define HAVE_LINEOUT_DETECTION
+
 #define CONFIG_KEYPAD XDUOO_X3_PAD
 
 /* Define this if a programmable hotkey is mapped */

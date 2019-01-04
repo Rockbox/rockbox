@@ -157,11 +157,11 @@ char *output_dyn_value(char *buf,
         value_abs /= scale;
         unit_no++;
     }
-    
+
     value = (value < 0) ? -value_abs : value_abs; /* preserve sign */
     fraction = (fraction * 1000 / scale) / 10;
 
-    if (value_abs >= 100 || fraction >= 100 || !unit_no) 
+    if (value_abs >= 100 || fraction >= 100 || !unit_no)
         tbuf[0] = '\0';
     else if (value_abs >= 10)
         snprintf(tbuf, sizeof(tbuf), "%01u", fraction / 10);
@@ -521,7 +521,7 @@ void car_adapter_mode_init(void)
 #endif
 
 #ifdef HAVE_HEADPHONE_DETECTION
-static void unplug_change(bool inserted)
+static void hp_unplug_change(bool inserted)
 {
     static bool headphone_caused_pause = false;
 
@@ -549,6 +549,18 @@ static void unplug_change(bool inserted)
 #ifdef HAVE_SPEAKER
     /* update speaker status */
     audio_enable_speaker(global_settings.speaker_mode);
+#endif
+}
+#endif
+
+#ifdef HAVE_LINEOUT_DETECTION
+static void lo_unplug_change(bool inserted)
+{
+#ifdef HAVE_LINEOUT_POWEROFF
+    lineout_set(inserted);
+#else
+    (void)inserted;
+    audiohw_set_lineout_volume(0,0);
 #endif
 }
 #endif
@@ -632,12 +644,21 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
 #endif
 #ifdef HAVE_HEADPHONE_DETECTION
         case SYS_PHONE_PLUGGED:
-            unplug_change(true);
+            hp_unplug_change(true);
             return SYS_PHONE_PLUGGED;
 
         case SYS_PHONE_UNPLUGGED:
-            unplug_change(false);
+            hp_unplug_change(false);
             return SYS_PHONE_UNPLUGGED;
+#endif
+#ifdef HAVE_LINEOUT_DETECTION
+        case SYS_LINEOUT_PLUGGED:
+            lo_unplug_change(true);
+            return SYS_LINEOUT_PLUGGED;
+
+        case SYS_LINEOUT_UNPLUGGED:
+            lo_unplug_change(false);
+            return SYS_LINEOUT_UNPLUGGED;
 #endif
 #if CONFIG_PLATFORM & (PLATFORM_ANDROID|PLATFORM_MAEMO)
         /* stop playback if we receive a call */
