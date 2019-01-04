@@ -53,6 +53,13 @@ bool headphones_inserted(void)
     return (__gpio_get_pin(PIN_PH_DECT) != 0);
 }
 
+bool lineout_inserted(void)
+{
+    /* We want to prevent LO being "enabled" if HP is attached
+       to avoid potential eardrum damage */
+    return (__gpio_get_pin(PIN_LO_DECT) == 0) && !headphones_inserted();
+}
+
 void button_init_device(void)
 {
     key_val = 0xfff;
@@ -72,11 +79,11 @@ void button_init_device(void)
     __gpio_set_pin(PIN_CHARGE_CON); /* 0.7 A */
     __gpio_as_output(PIN_CHARGE_CON);
 
-    __gpio_as_input(PIN_LO_DECT);
     __gpio_as_input(PIN_PH_DECT);
-
-    __gpio_disable_pull(PIN_LO_DECT);
     __gpio_disable_pull(PIN_PH_DECT);
+
+    __gpio_as_input(PIN_LO_DECT);
+    __gpio_disable_pull(PIN_LO_DECT);
 }
 
 bool button_hold(void)

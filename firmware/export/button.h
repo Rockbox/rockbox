@@ -44,7 +44,7 @@ int button_read_device(void);
 #ifdef HAS_BUTTON_HOLD
 bool button_hold(void);
 #endif
-#ifdef HAS_REMOTE_BUTTON_HOLD 
+#ifdef HAS_REMOTE_BUTTON_HOLD
 bool remote_button_hold(void);
 #endif
 
@@ -71,6 +71,9 @@ void set_remote_backlight_filter_keypress(bool value);
 
 #ifdef HAVE_HEADPHONE_DETECTION
 bool headphones_inserted(void);
+#endif
+#ifdef HAVE_LINEOUT_DETECTION
+bool lineout_inserted(void);
 #endif
 #ifdef HAVE_WHEEL_POSITION
 int wheel_status(void);

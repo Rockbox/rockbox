@@ -59,6 +59,9 @@ static bool remote_filter_first_keypress;
 #ifdef HAVE_HEADPHONE_DETECTION
 static bool phones_present = false;
 #endif
+#ifdef HAVE_LINEOUT_DETECTION
+static bool lineout_present = false;
+#endif
 
 /* how long until repeat kicks in, in centiseconds */
 #define REPEAT_START      (30*HZ/100)
@@ -94,15 +97,27 @@ static int button_read(void);
 
 #ifdef HAVE_TOUCHSCREEN
 static int last_touchscreen_touch;
-#endif    
+#endif
 #if defined(HAVE_HEADPHONE_DETECTION)
 static struct timeout hp_detect_timeout; /* Debouncer for headphone plug/unplug */
-/* This callback can be used for many different functions if needed -
-   just check to which object tmo points */
-static int btn_detect_callback(struct timeout *tmo)
+
+static int hp_detect_callback(struct timeout *tmo)
 {
     /* Try to post only transistions */
     const long id = tmo->data ? SYS_PHONE_PLUGGED : SYS_PHONE_UNPLUGGED;
+    queue_remove_from_head(&button_queue, id);
+    queue_post(&button_queue, id, 0);
+    return 0;
+}
+#endif
+
+#if defined(HAVE_LINEOUT_DETECTION)
+static struct timeout lo_detect_timeout; /* Debouncer for lineout plug/unplug */
+
+static int lo_detect_callback(struct timeout *tmo)
+{
+    /* Try to post only transistions */
+    const long id = tmo->data ? SYS_LINEOUT_PLUGGED : SYS_LINEOUT_UNPLUGGED;
     queue_remove_from_head(&button_queue, id);
     queue_post(&button_queue, id, 0);
     return 0;
@@ -176,8 +191,17 @@ static void button_tick(void)
     {
         /* Use the autoresetting oneshot to debounce the detection signal */
         phones_present = !phones_present;
-        timeout_register(&hp_detect_timeout, btn_detect_callback,
+        timeout_register(&hp_detect_timeout, hp_detect_callback,
                          HZ/2, phones_present);
+    }
+#endif
+#if defined(HAVE_LINEOUT_DETECTION)
+    if (lineout_inserted() != lineout_present)
+    {
+        /* Use the autoresetting oneshot to debounce the detection signal */
+        lineout_present = !lineout_present;
+        timeout_register(&lo_detect_timeout, lo_detect_callback,
+                         HZ/2, lineout_present);
     }
 #endif
 
@@ -318,7 +342,7 @@ static void button_tick(void)
 #ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                     if (btn & BUTTON_REMOTE) {
-                        if (!remote_filter_first_keypress 
+                        if (!remote_filter_first_keypress
                             || is_remote_backlight_on(false)
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
                             || (remote_type()==REMOTETYPE_H300_NONLCD)
@@ -427,7 +451,7 @@ static void button_queue_wait(struct queue_event *evp, int timeout)
         #endif
                 button_boost(true);
 
-            break; 
+            break;
         }
 
         if (button_boosted && TIME_AFTER(current_tick, button_unboost_tick))
@@ -462,7 +486,7 @@ long button_get(bool block)
 
 long button_get_w_tmo(int ticks)
 {
-    struct queue_event ev;    
+    struct queue_event ev;
     button_queue_wait(&ev, ticks);
 
     if (ev.id == SYS_TIMEOUT)
@@ -496,7 +520,7 @@ void button_init(void)
     button_read();
     lastbtn = button_read();
 #endif
-    
+
     reset_poweroff_timer();
 
 #ifdef HAVE_LCD_BITMAP
@@ -506,11 +530,11 @@ void button_init(void)
     filter_first_keypress = false;
 #ifdef HAVE_REMOTE_LCD
     remote_filter_first_keypress = false;
-#endif    
+#endif
 #endif
 #ifdef HAVE_TOUCHSCREEN
     last_touchscreen_touch = 0xffff;
-#endif    
+#endif
     /* Start polling last */
     tick_add_task(button_tick);
 }
@@ -647,7 +671,7 @@ static int button_read(void)
 #ifdef HAVE_TOUCHSCREEN
     if (btn & BUTTON_TOUCHSCREEN)
         last_touchscreen_touch = current_tick;
-#endif        
+#endif
     /* Filter the button status. It is only accepted if we get the same
        status twice in a row. */
 #ifndef HAVE_TOUCHSCREEN
@@ -696,8 +720,8 @@ int touchscreen_last_touch(void)
  *  [23:0] Velocity - degree/sec
  *
  * WHEEL_ACCEL_FACTOR:
- * Value in degree/sec -- configurable via settings -- above which 
- * the accelerated scrolling starts. Factor is internally scaled by 
+ * Value in degree/sec -- configurable via settings -- above which
+ * the accelerated scrolling starts. Factor is internally scaled by
  * 1<<16 in respect to the following 32bit integer operations.
  */
 int button_apply_acceleration(const unsigned int data)

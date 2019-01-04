@@ -26,6 +26,7 @@
 #include "pcm_sw_volume.h"
 #include "cs4398.h"
 #include "kernel.h"
+#include "button.h"
 
 #define PIN_CS_RST      (32*1+10)
 #define PIN_CODEC_PWRON (32*1+13)
@@ -140,7 +141,11 @@ static int vol_tenthdb2hw(const int tdb)
     }
 }
 
-void audiohw_set_volume(int vol_l, int vol_r)
+#ifdef HAVE_LINEOUT_DETECTION
+static int real_vol_l, real_vol_r;
+#endif
+
+static void jz4760_set_vol(int vol_l, int vol_r)
 {
     uint8_t val = cs4398_read_reg(CS4398_REG_MISC) &~ CS4398_FREEZE;
     cs4398_write_reg(CS4398_REG_MISC, val | CS4398_FREEZE);
@@ -149,14 +154,31 @@ void audiohw_set_volume(int vol_l, int vol_r)
     cs4398_write_reg(CS4398_REG_MISC, val);
 }
 
+void audiohw_set_volume(int vol_l, int vol_r)
+{
+#ifdef HAVE_LINEOUT_DETECTION
+    real_vol_l = vol_l;
+    real_vol_r = vol_r;
+
+    if (lineout_inserted()) {
+       vol_l = 0;
+       vol_r = 0;
+    }
+#endif
+    jz4760_set_vol(vol_l, vol_r);
+}
+
 void audiohw_set_lineout_volume(int vol_l, int vol_r)
 {
-#if 0 /* unused */
-    cs4398_write_reg(CS4398_REG_VOL_A, vol_tenthdb2hw(vol_l));
-    cs4398_write_reg(CS4398_REG_VOL_B, vol_tenthdb2hw(vol_r));
-#else
     (void)vol_l;
     (void)vol_r;
+
+#ifdef HAVE_LINEOUT_DETECTION
+    if (lineout_inserted()) {
+       jz4760_set_vol(0, 0);
+    } else {
+       jz4760_set_vol(real_vol_l, real_vol_r);
+    }
 #endif
 }
 
