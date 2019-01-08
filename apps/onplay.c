@@ -65,6 +65,11 @@
 #include "pathfuncs.h"
 #include "shortcuts.h"
 
+#ifdef HAVE_HOTKEY
+#include "ctype.h"
+#include "powermgmt.h"
+#endif
+
 static int context;
 static const char *selected_file = NULL;
 static int selected_file_attr = 0;
@@ -1714,6 +1719,294 @@ static int playlist_insert_shuffled(void)
     return ONPLAY_RELOAD_DIR;
 }
 
+
+
+#define ANNOUNCEMENT_TIMEOUT  10
+
+static int target_info = 0;
+
+static int info_reset_timeout = 0;
+
+
+static unsigned char* voice_info_group(unsigned char* current_token);
+
+static int voice_general_info(void)
+{
+    unsigned char* infotemplate = global_settings.wps_announcement_format;
+
+    if (*infotemplate == 0)
+    {
+#if CONFIG_RTC
+        /* announce the time */
+        strcpy(infotemplate, "Ac");
+#else
+        /* announce elapsed play for this track */
+        strcpy(infotemplate, "Be");
+#endif
+    }
+
+    if (TIME_AFTER(current_tick, info_reset_timeout))
+    {
+        target_info = 0;
+    }
+
+    info_reset_timeout = current_tick + ANNOUNCEMENT_TIMEOUT * HZ;
+
+    talk_shutup();
+
+    /*
+        Consume announcement groups until we hit the target group
+    */
+    int test_info = 0;
+
+    while (*infotemplate != 0 && test_info != target_info)
+    {
+        if (*infotemplate == '.')
+        {
+            test_info++;
+        }
+
+        infotemplate++;
+    }
+
+
+    /*
+        On a match, voice the found group and move on to the next
+    */
+    if (test_info == target_info)
+    {
+        infotemplate = voice_info_group(infotemplate);
+
+        target_info++;
+    }
+
+    /*
+        If this was the last group, reset to the start
+    */
+    if (*infotemplate == 0)
+    {
+        target_info = 0;
+    }
+
+    return ONPLAY_OK;
+}
+
+
+static unsigned char* voice_info_group(unsigned char* current_token)
+{
+    unsigned char current_char;
+
+    while (*current_token != 0 && *current_token != '.')
+    {
+        current_char = toupper(*current_token);
+        if (current_char == 'A')
+        {
+            /*
+                Date and time functions
+            */
+            current_token++;
+
+            current_char = toupper(*current_token);
+
+#if CONFIG_RTC
+            struct tm *tm = get_time();
+
+            if (valid_time(tm))
+            {
+                if (current_char == 'A')
+                {
+                    talk_time(tm, true);
+                }
+                else if (current_char == 'B')
+                {
+                    talk_date(tm, true);
+                }
+                else if (current_char == 'C')
+                {
+                    /* Time xxx */
+                    (void)voice_info_group("SaAa");
+                }
+                else if (current_char == 'D')
+                {
+                    /* Date xxx */
+                    (void)voice_info_group("SbAb");
+                }
+                else if (current_char == 'E')
+                {
+                    /* Date Time */
+                    (void)voice_info_group("AbAa");
+                }
+            }
+#endif
+
+            int sleep_remaining = get_sleep_timer();
+
+            if (current_char == 'F')
+            {
+                talk_value_decimal(sleep_remaining, UNIT_TIME, 0, true);
+            }
+            else if (current_char == 'G')
+            {
+                /* SLEEPTIMER sleeptimer remaining */
+                (void)voice_info_group("ShDf");
+            }
+        }
+        else if (current_char == 'B')
+        {
+            /*
+                Current track information
+            */
+            current_token++;
+
+            current_char = toupper(*current_token);
+
+            struct mp3entry* id3 = audio_current_track();
+
+            int elapsed_length = id3->elapsed / 1000;
+            int track_length = id3->length / 1000;
+            int track_remaining = track_length - elapsed_length;
+
+            if (current_char == 'A')
+            {
+                talk_value_decimal(elapsed_length, UNIT_TIME, 0, true);
+            }
+            else if (current_char == 'B')
+            {
+                talk_value_decimal(track_length, UNIT_TIME, 0, true);
+            }
+            else if (current_char == 'C')
+            {
+                talk_value_decimal(track_remaining, UNIT_TIME, 0, true);
+            }
+            else if (current_char == 'D')
+            {
+                /* xxx elapsed yyy remaining */
+                (void)voice_info_group("BaSdBcSe");
+            }
+            else if (current_char == 'E')
+            {
+                /* xxx of yyy */
+                (void)voice_info_group("BaSfBb");
+            }
+        }
+        else if (current_char == 'C')
+        {
+            /*
+                Current playlist information
+            */
+            current_token++;
+
+            current_char = toupper(*current_token);
+
+            int current_track = playlist_get_display_index();
+            int total_tracks = playlist_amount();
+            int remaining_tracks = total_tracks - current_track;
+
+            if (current_char == 'A')
+            {
+                talk_number(current_track, true);
+            }
+            else if (current_char == 'B')
+            {
+                talk_number(total_tracks, true);
+            }
+            else if (current_char == 'C')
+            {
+                talk_number(remaining_tracks, true);
+            }
+            else if (current_char == 'D')
+            {
+                /* TRACK current track OF number of tracks */
+                (void)voice_info_group("ScCaSfCb");
+            }
+        }
+        else if (current_char == 'D')
+        {
+            /*
+                Battery, sleep timer and runtime
+            */
+            current_token++;
+
+            current_char = toupper(*current_token);
+
+            if (current_char == 'A')
+            {
+                talk_value(battery_level(), UNIT_PERCENT, true);
+            }
+            else if (current_char == 'B')
+            {
+                talk_value(battery_time() * 60, UNIT_TIME, true);
+            }
+            else if (current_char == 'C')
+            {
+                /* BATTERY LEVEL battery level percent */
+                (void)voice_info_group("SgDa");
+            }
+            else if (current_char == 'D')
+            {
+                /* BATTERY LEVEL battery level in minutes */
+                (void)voice_info_group("SgDb");
+            }
+
+        }
+        else if (current_char == 'S')
+        {
+            /*
+                Stock prefixes, suffixes and connectives
+            */
+            current_token++;
+
+            current_char = toupper(*current_token);
+
+            if (current_char == 'A')
+            {
+                talk_id(LANG_TIME, true);
+            }
+            else if (current_char == 'B')
+            {
+                talk_id(LANG_DATE, true);
+            }
+            else if (current_char == 'C')
+            {
+                talk_id(LANG_TRACKONLY, true);
+            }
+            else if (current_char == 'D')
+            {
+                talk_id(LANG_ELAPSED, true);
+            }
+            else if (current_char == 'E')
+            {
+                talk_id(LANG_REMAINING, true);
+            }
+            else if (current_char == 'F')
+            {
+                talk_id(LANG_OF, true);
+            }
+            else if (current_char == 'G')
+            {
+                talk_id(LANG_BATTERY_TIME, true);
+            }
+            else if (current_char == 'H')
+            {
+                talk_id(LANG_SLEEP_TIMER, true);
+            }
+        }
+        else if (current_char == ' ')
+        {
+            /*
+                Catch your breath
+            */
+            talk_id(VOICE_PAUSE, true);
+        }
+
+        current_token++;
+    }
+
+    return current_token;
+}
+
+
+
 struct hotkey_assignment {
     int action;             /* hotkey_action */
     int lang_id;            /* Language ID */
@@ -1750,6 +2043,9 @@ static struct hotkey_assignment hotkey_items[] = {
     { HOTKEY_INSERT_SHUFFLED,   LANG_INSERT_SHUFFLED,
             HOTKEY_FUNC(playlist_insert_shuffled, NULL),
             ONPLAY_RELOAD_DIR },
+    { HOTKEY_VOICEINFO,   LANG_VOICEINFO,
+            HOTKEY_FUNC(voice_general_info, NULL),
+            ONPLAY_OK },
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
     { HOTKEY_PICTUREFLOW, LANG_ONPLAY_PICTUREFLOW,
             HOTKEY_FUNC(NULL, NULL),
