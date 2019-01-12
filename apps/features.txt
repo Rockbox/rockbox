@@ -48,6 +48,10 @@ flash_storage
 headphone_detection
 #endif
 
+#if defined(HAVE_LINEOUT_DETECTION)
+lineout_detection
+#endif
+
 #if defined(HAS_BUTTON_HOLD)
 hold_button
 #endif
