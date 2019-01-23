@@ -2600,19 +2600,19 @@
 </phrase>
 <phrase>
   id: LANG_NEVER
-  desc: in lcd settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: ""
   </source>
   <dest>
     *: none
-    lcd_sleep: "Ποτέ"
+    lcd_sleep: ""
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Ποτέ"
+    lcd_sleep: ""
   </voice>
 </phrase>
 <phrase>
@@ -4637,16 +4637,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: Save only on bookmark for each playlist in recent bookmarks
+  desc: deprecated
   user: core
   <source>
-    *: "Unique only"
+    *: ""
   </source>
   <dest>
-    *: "Μοναδικοί μόνο"
+    *: ""
   </dest>
   <voice>
-    *: "Μοναδικοί μόνο"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8339,44 +8339,44 @@
 </phrase>
 <phrase>
   id: LANG_KILOBYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "KB"
+    *: ""
   </source>
   <dest>
-    *: "KB"
+    *: ""
   </dest>
   <voice>
-    *: "κίλο μπάιτ"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_MEGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "MB"
+    *: ""
   </source>
   <dest>
-    *: "MB"
+    *: ""
   </dest>
   <voice>
-    *: "μέγκα μπάιτ"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_GIGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "GB"
+    *: ""
   </source>
   <dest>
-    *: "GB"
+    *: ""
   </dest>
   <voice>
-    *: "γίγκα μπάιτ"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11854,13 +11854,13 @@
   desc: Backlight behaviour setting
   user: core
   <source>
-    *: "Selective Backlight"
+    *: "Backlight Exemptions"
   </source>
   <dest>
-    *: "Selective Backlight"
+    *: "Επιλογή Φωτισμού"
   </dest>
   <voice>
-    *: "Selective Backlight"
+    *: "Επιλογή Φωτισμού"
   </voice>
 </phrase>
 <phrase>
@@ -13560,5 +13560,187 @@
   </dest>
   <voice>
     *: "Συνθέτης"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAD_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Κακό Κομμάτι"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BYPASS
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Bypass"
+  </source>
+  <dest>
+    *: "Παράβλεψη"
+  </dest>
+  <voice>
+    *: "Παράβλεψη"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MOVING_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Μετακίνηση κομματιού"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "GiB"
+  </source>
+  <dest>
+    *: "Gigabyte"
+  </dest>
+  <voice>
+    *: "Gigabyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "KiB"
+  </source>
+  <dest>
+    *: "Kilobyte"
+  </dest>
+  <voice>
+    *: "Kilobyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_VIEWERS
+  desc: text for splash to indicate that no viewers are available
+  user: core
+  <source>
+    *: "No viewers found"
+  </source>
+  <dest>
+    *: "Δεν βρέθηκε  προβολέας"
+  </dest>
+  <voice>
+    *: "Δεν βρέθηκε προβολέας"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TRACK_TO_MOVE
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Κομμάτι για μετακίνηση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
+  desc: Save only one bookmark for a playlist in recent bookmarks
+  user: core
+  <source>
+    *: "One per playlist"
+  </source>
+  <dest>
+    *: "Ένας για κάθε λίστα αναπαραγωγής"
+  </dest>
+  <voice>
+    *: "Ένας για κάθε λίστα αναπαραγωγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Short"
+  </source>
+  <dest>
+    *: "Σύντομο"
+  </dest>
+  <voice>
+    *: "Σύντομο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "MiB"
+  </source>
+  <dest>
+    *: "MegaByte"
+  </dest>
+  <voice>
+    *: "megabyte"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEUED
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Προστέθηκε"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
+  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
+  user: core
+  <source>
+    *: "One per track"
+  </source>
+  <dest>
+    *: "Ένας για κάθε κομμάτι"
+  </dest>
+  <voice>
+    *: "Ένας για κάθε κομμάτι"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG__NEVER
+  desc: in lcd settings
+  user: core
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Ποτέ"
+  </dest>
+  <voice>
+    *: "Ποτέ"
   </voice>
 </phrase>
