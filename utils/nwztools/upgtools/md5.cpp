@@ -21,11 +21,12 @@
 #include "md5.h"
 /* MD5 is considered insecure by crypto++ */
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK  1
-#include <crypto++/md5.h>
+#include <cryptopp/cryptlib.h>
+#include <cryptopp/md5.h>
 
 using namespace CryptoPP::Weak;
 
 void MD5_CalculateDigest(void *digest, const void *input, size_t length)
 {
-    MD5().CalculateDigest((byte *)digest, (const byte *)input, length);
+    MD5().CalculateDigest((CryptoPP::byte *)digest, (const CryptoPP::byte *)input, length);
 }

@@ -18,6 +18,8 @@ LIBCRYPTO_NAMES = libcryptopp libcrypto++ cryptopp crypto++
 $(foreach l,$(LIBCRYPTO_NAMES),\
 	$(eval LDOPTS += $(shell $(PKGCONFIG) --silence-errors --libs $(l))))
 
+LDOPTS += -lpthread
+
 OUTPUT = mkimxboot
 
 # inputs for lib
@@ -34,4 +36,3 @@ include ../libtools.make
 # explicit dependencies on dualboot.{c,h} and mkimxboot.h
 $(OBJDIR)mkimxboot.o: dualboot.h dualboot.c mkimxboot.c mkimxboot.h
 $(OBJDIR)main.o: dualboot.h dualboot.c main.c mkimxboot.h
-

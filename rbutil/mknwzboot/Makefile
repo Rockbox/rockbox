@@ -12,7 +12,13 @@ CFLAGS += -I$(UPGTOOLS_DIR) -Wall
 CFLAGS += -std=gnu99 -g -O3
 # dependencies
 # FIXME make it work for windows and maybe embed crypto++
-LDOPTS += `pkg-config --libs libcrypto++`
+
+PKGCONFIG := $(CROSS)pkg-config
+LIBCRYPTO_NAMES = libcryptopp libcrypto++ cryptopp crypto++
+$(foreach l,$(LIBCRYPTO_NAMES),\
+        $(eval LDOPTS += $(shell $(PKGCONFIG) --silence-errors --libs $(l))))
+LDOPTS += -lpthread
+
 
 OUTPUT = mknwzboot
 
@@ -23,7 +29,7 @@ LIBSOURCES := mknwzboot.c install_script.c uninstall_script.c \
 # inputs for binary only
 SOURCES := $(LIBSOURCES) main.c
 # dependencies for binary
-EXTRADEPS := 
+EXTRADEPS :=
 
 include ../libtools.make
 
