@@ -19,10 +19,10 @@
  *
  ****************************************************************************/
 #include "mg.h"
-#include <crypto++/cryptlib.h>
-#include <crypto++/modes.h>
-#include <crypto++/des.h>
-#include <crypto++/aes.h>
+#include <cryptopp/cryptlib.h>
+#include <cryptopp/modes.h>
+#include <cryptopp/des.h>
+#include <cryptopp/aes.h>
 #include <stdio.h>
 
 using namespace CryptoPP;
