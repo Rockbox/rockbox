@@ -6,17 +6,26 @@
 #                     \/            \/     \/    \/            \/
 
 # We use the SB code available in the Rockbox utils/sbtools directory
+
 IMXTOOLS_DIR=../../utils/imxtools/sbtools/
 CFLAGS += -I$(IMXTOOLS_DIR) -Wall
 # std=gnu99 is required by MinGW on Windows (c99 is sufficient for Linux / MXE)
 CFLAGS += -std=gnu99 -g -O3
 
+# Location to pkg-config binary.
+PKGCONFIG := pkg-config
+
 # Distros could use different names for the crypto library. We try a list
 # of candidate names, only one of them should be the valid one.
-PKGCONFIG := $(CROSS)pkg-config
 LIBCRYPTO_NAMES = libcryptopp libcrypto++ cryptopp crypto++
+
 $(foreach l,$(LIBCRYPTO_NAMES),\
 	$(eval LDOPTS += $(shell $(PKGCONFIG) --silence-errors --libs $(l))))
+$(foreach l,$(LIBCRYPTO_NAMES),\
+	$(eval CFLAGS += $(shell $(PKGCONFIG) --silence-errors --cflags $(l))))
+$(foreach l,$(LIBCRYPTO_NAMES),\
+	$(eval CXXFLAGS += $(shell $(PKGCONFIG) --silence-errors --cflags $(l))))
+LDOPTS += -lpthread
 
 OUTPUT = mkimxboot
 
@@ -34,4 +43,3 @@ include ../libtools.make
 # explicit dependencies on dualboot.{c,h} and mkimxboot.h
 $(OBJDIR)mkimxboot.o: dualboot.h dualboot.c mkimxboot.c mkimxboot.h
 $(OBJDIR)main.o: dualboot.h dualboot.c main.c mkimxboot.h
-

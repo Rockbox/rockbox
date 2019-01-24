@@ -135,6 +135,9 @@ for(rblib, RBLIBS) {
     LIBS += -l$$rblib
 }
 
+# We need libcrypto++
+LIBS += -lcryptopp
+
 # on win32 libz is linked implicitly.
 !win32 {
     LIBS += -lz
@@ -264,4 +267,3 @@ unix {
 include(rbutilqt.pri)
 include(quazip/quazip.pri)
 include(logger/logger.pri)
-
