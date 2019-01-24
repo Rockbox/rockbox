@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c93e15b9_50014c06",
+        "filename": "utils/nwztools/upgtools/mg.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000536
+      },
+      "writtenOn": "2019-01-24T14:33:05Z",
+      "side": 1,
+      "message": "You might want to check that some other system don\u0027t use crypto++. I seem to recall there are some stupid incompatiblities between systems. Or maybe cryptopp always works.",
+      "range": {
+        "startLine": 22,
+        "startChar": 10,
+        "endLine": 22,
+        "endChar": 18
+      },
+      "revId": "db6193cc780e5f45ad4bbd7ccb2bf43a953ee054",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
