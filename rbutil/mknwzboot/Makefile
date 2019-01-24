@@ -12,7 +12,21 @@ CFLAGS += -I$(UPGTOOLS_DIR) -Wall
 CFLAGS += -std=gnu99 -g -O3
 # dependencies
 # FIXME make it work for windows and maybe embed crypto++
-LDOPTS += `pkg-config --libs libcrypto++`
+
+# Location to pkg-config binary.
+PKGCONFIG := pkg-config
+
+# Distros could use different names for the crypto library. We try a list
+# of candidate names, only one of them should be the valid one.
+LIBCRYPTO_NAMES = libcryptopp libcrypto++ cryptopp crypto++
+
+$(foreach l,$(LIBCRYPTO_NAMES),\
+        $(eval LDOPTS += $(shell $(PKGCONFIG) --silence-errors --libs $(l))))
+$(foreach l,$(LIBCRYPTO_NAMES),\
+	$(eval CFLAGS += $(shell $(PKGCONFIG) --silence-errors --cflags $(l))))
+$(foreach l,$(LIBCRYPTO_NAMES),\
+	$(eval CXXFLAGS += $(shell $(PKGCONFIG) --silence-errors --cflags $(l))))
+LDOPTS += -lpthread
 
 OUTPUT = mknwzboot
 
@@ -23,7 +37,7 @@ LIBSOURCES := mknwzboot.c install_script.c uninstall_script.c \
 # inputs for binary only
 SOURCES := $(LIBSOURCES) main.c
 # dependencies for binary
-EXTRADEPS := 
+EXTRADEPS :=
 
 include ../libtools.make
 
