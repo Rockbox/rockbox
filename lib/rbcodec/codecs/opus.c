@@ -81,7 +81,6 @@ static int seek_ogg_page(uint64_t filepos)
 /* seek to comment header */
 static int seek_opus_tags(void)
 {
-    int pos = 0;
     const int64_t maxpos = sizeof(OpusHeader) + 1024;
     const char synccode[] = "OpusTags";
     char buf[sizeof(synccode)];
