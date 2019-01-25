@@ -968,7 +968,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "%d Hz-bandversterking"
+    swcodec: "%d Hertz bandversterking"
   </voice>
 </phrase>
 <phrase>
@@ -1002,7 +1002,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Piekfilter"
+    swcodec: "Piekfilter %d"
   </voice>
 </phrase>
 <phrase>
@@ -1252,7 +1252,7 @@
     *: "Snel vooruit- en achteruitspoelen"
   </dest>
   <voice>
-    *: "Snel vooruit- en achteruitspoelen"
+    *: "Snel vooruit en achteruitspoelen"
   </voice>
 </phrase>
 <phrase>
@@ -2239,10 +2239,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: Save only on bookmark for each playlist in recent bookmarks
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: Save only on bookmark for each playlist in recent bookmarks
+  desc: deprecated
   user: core
   <source>
-    *: "Unique only"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "Unique only"
+    *: ""
   </source>
   <dest>
     *: "Enkel unieke"
@@ -3131,11 +3137,11 @@
   </source>
   <dest>
     *: none
-    remote_ticking: "Verminder tikken"
+    remote_ticking: "Tikken verminderen"
   </dest>
   <voice>
     *: none
-    remote_ticking: "Verminder tikken"
+    remote_ticking: "Tikken verminderen"
   </voice>
 </phrase>
 <phrase>
@@ -3163,7 +3169,7 @@
     *: "Voorbeeld scrollsnelheid"
   </dest>
   <voice>
-    *: ""
+    *: "Voorbeeld scrollsnelheid"
   </voice>
 </phrase>
 <phrase>
@@ -3686,7 +3692,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "12-uursklok"
+    rtc: "12 uursklok"
   </voice>
 </phrase>
 <phrase>
@@ -3703,7 +3709,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "24-uursklok"
+    rtc: "24 uursklok"
   </voice>
 </phrase>
 <phrase>
@@ -6039,10 +6045,16 @@
 </phrase>
 <phrase>
   id: LANG_KILOBYTE
-  desc: a unit postfix, also voiced
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "KB"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "KB"
+    *: ""
   </source>
   <dest>
     *: "KB"
@@ -6053,10 +6065,16 @@
 </phrase>
 <phrase>
   id: LANG_MEGABYTE
-  desc: a unit postfix, also voiced
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "MB"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "MB"
+    *: ""
   </source>
   <dest>
     *: "MB"
@@ -6067,10 +6085,16 @@
 </phrase>
 <phrase>
   id: LANG_GIGABYTE
-  desc: a unit postfix, also voiced
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "GB"
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: "GB"
+    *: ""
   </source>
   <dest>
     *: "GB"
@@ -7232,7 +7256,7 @@
     *: "OFF om af te breken"
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP om af te breken"
     ipod*: "PLAY/PAUSE om af te breken"
-    iaudiox5,iaudiom5: "Long PLAY om af te breken"
+    iaudiox5,iaudiom5: "Lang PLAY om af te breken"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV om af te breken"
     gigabeats: "BACK om af te breken"
     gigabeatfx: "POWER om af te breken"
@@ -7242,7 +7266,7 @@
     *: "OFF om af te breken"
     archosplayer,iriverh100,iriverh120,iriverh300: "STOP om af te breken"
     ipod*: "PLAY/PAUSE om af te breken"
-    iaudiox5,iaudiom5: "Long PLAY om af te breken"
+    iaudiox5,iaudiom5: "Lang PLAY om af te breken"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV om af te breken"
     gigabeats: "BACK om af te breken"
     gigabeatfx: "POWER om af te breken"
@@ -8003,11 +8027,18 @@
 </phrase>
 <phrase>
   id: LANG_NEVER
-  desc: in lcd settings
+### The 'desc' field differs from the english!
+### the previously used desc is commented below:
+### desc: in lcd settings
+  desc: deprecated
   user: core
   <source>
+### The <source> section differs from the english!
+### the previously used one is commented below:
+###     *: none
+###     lcd_sleep: "Never"
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: ""
   </source>
   <dest>
     *: none
@@ -8445,7 +8476,7 @@
   </dest>
   <voice>
     *: none
-    radio: "VS / Canada"
+    radio: "VS en Canada"
   </voice>
 </phrase>
 <phrase>
@@ -9602,15 +9633,6 @@
   desc: Generic string to use to confirm
   user: core
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "PLAY = Yes"
-###     cowond2*: "MENU, or top-right = Yes"
-###     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-###     ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
-###     mrobe500: "PLAY, POWER, or top-right = Yes"
-###     archosplayer: "(PLAY/STOP)"
-###     vibe500: "OK = Yes"
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
@@ -11304,10 +11326,10 @@
     *: "Prevent Track Skipping"
   </source>
   <dest>
-    *: "Verhinder overslaan van nummers"
+    *: "Overslaan van nummers verhinderen"
   </dest>
   <voice>
-    *: "Verhinder overslaan van nummers"
+    *: "Overslaan van nummers verhinderen"
   </voice>
 </phrase>
 <phrase>
@@ -12995,7 +13017,7 @@
     *: "Opstarten/afsluiten"
   </dest>
   <voice>
-    *: "Opstarten/afsluiten"
+    *: "Opstarten en afsluiten"
   </voice>
 </phrase>
 <phrase>
@@ -13223,8 +13245,6 @@
     *: "DAC-filtersteilheid"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_ACTION_AUTOLOCK_ON
   desc: Softlock behaviour setting
@@ -13239,8 +13259,6 @@
     *: "Automatisch vergrendelen ingeschakeld"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SURROUND_METHOD2
   desc: in sound settings
@@ -13258,8 +13276,6 @@
     swcodec: "ENKEL ZIJKANT"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_DEADZONE
   desc: touchpad deadzone setting
@@ -13277,8 +13293,6 @@
     sansafuzeplus: "Dode zone van touchpad"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_ACTION_DISABLE_UNMAPPED
   desc: Backlight behaviour setting
@@ -13293,8 +13307,6 @@
     *: "Niet-toegewezen toetsen uitschakelen"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_ACTION_PLAY
   desc: Selective Actions
@@ -13309,8 +13321,6 @@
     *: "Afspelen"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_ACTION_AUTOLOCK_OFF
   desc: Softlock behaviour setting
@@ -13325,8 +13335,6 @@
     *: "Automatisch vergrendelen uitgeschakeld"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_ACTION_DISABLE_NOTIFY
   desc: Softlock behaviour setting
@@ -13341,8 +13349,6 @@
     *: "Melden uitschakelen"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SURROUND_FX1
   desc: in sound settings
@@ -13360,8 +13366,6 @@
     swcodec: "f(x1)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_IBASSO_USB_MODE_MASS_STORAGE
   desc: in Settings -> General -> System -> USB Mode: Mass Storage
@@ -13382,8 +13386,6 @@
     ibassodx90: "massaopslag"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_IBASSO_USB_MODE
   desc: in Settings -> General -> System -> USB Mode
@@ -13404,8 +13406,6 @@
     ibassodx90: "USB-modus"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SOFTLOCK_SELECTIVE
   desc: Softlock behaviour setting
@@ -13420,8 +13420,6 @@
     *: "Geavanceerde toetsvergrendeling"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_AFR
   desc: in sound settings
@@ -13439,8 +13437,6 @@
     swcodec: "Auditievevermoeidheidsvermindering"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_ACTION_DISABLE_EXT_POWER
   desc: Backlight behaviour setting
@@ -13455,8 +13451,6 @@
     *: "Uitschakelen op externe energiebron"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_ACTION_ENABLED
   desc: Selective Actions
@@ -13471,8 +13465,6 @@
     *: "Ingeschakeld"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_PBE
   desc: in sound settings
@@ -13487,11 +13479,9 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Perceptual basversterking"
+    swcodec: "Perceptuele basversterking"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_ACTION_SKIP
   desc: Selective Actions
@@ -13506,8 +13496,6 @@
     *: "Overslaan"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_IBASSO_USB_MODE_CHARGE
   desc: in Settings -> General -> System -> USB Mode: Charge Only
@@ -13528,8 +13516,6 @@
     ibassodx90: "enkel opladen"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_IBASSO_USB_MODE_ADB
   desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
@@ -13550,8 +13536,6 @@
     ibassodx90: "Android Debug Bridge"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_IBASSO_FREQ_SCALING_GOVERNOR
   desc: in Settings -> General -> System -> Freq Scaling Governor
@@ -13572,8 +13556,6 @@
     ibassodx90: "frequentieschalingsgovernor"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SURROUND_FX2
   desc: in sound settings
@@ -13591,8 +13573,6 @@
     swcodec: "f(x2)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_ACTION_DISABLE_TOUCH
   desc: Softlock behaviour setting
@@ -13607,8 +13587,6 @@
     *: "Aanraken uitschakelen"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_BACKLIGHT_SELECTIVE
   desc: Backlight behaviour setting
@@ -13623,8 +13601,6 @@
     *: "Verlichtingsuitzonderingen"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SURROUND_MIX
   desc: in sound settings
@@ -13642,8 +13618,6 @@
     swcodec: "Droge of natte mix"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SURROUND
   desc: in the sound settings menu
@@ -13661,8 +13635,6 @@
     swcodec: "Haas-surround"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_ACTION_SEEK
   desc: Selective Actions
@@ -13675,5 +13647,213 @@
   </dest>
   <voice>
     *: "Zoeken"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: VOICE_TRACK_TO_MOVE
+  desc: playlist viewer
+  user: core
+  <source>
+    *: "Track to move"
+  </source>
+  <dest>
+    *: "Te verplaatsen nummer"
+  </dest>
+  <voice>
+    *: "Te verplaatsen nummer"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
+  desc: Save only one bookmark for a playlist in recent bookmarks
+  user: core
+  <source>
+    *: "One per playlist"
+  </source>
+  <dest>
+    *: "Eén per afspeellijst"
+  </dest>
+  <voice>
+    *: "1 per afspeellijst"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_KIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "KiB"
+  </source>
+  <dest>
+    *: "KiB"
+  </dest>
+  <voice>
+    *: "kibibyte"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG__NEVER
+  desc: in lcd settings
+  user: core
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Nooit"
+  </dest>
+  <voice>
+    *: "Nooit"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_FILTER_SHORT
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Short"
+  </source>
+  <dest>
+    *: "Kort"
+  </dest>
+  <voice>
+    *: "Kort"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: VOICE_BAD_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: "Bad track"
+  </source>
+  <dest>
+    *: "Beschadigd nummer"
+  </dest>
+  <voice>
+    *: "Beschadigd nummer"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_GIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "GiB"
+  </source>
+  <dest>
+    *: "GiB"
+  </dest>
+  <voice>
+    *: "gibibyte"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: VOICE_QUEUED
+  desc: playlist viewer
+  user: core
+  <source>
+    *: "Queued"
+  </source>
+  <dest>
+    *: "In wachtrij"
+  </dest>
+  <voice>
+    *: "In wachtrij"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
+  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
+  user: core
+  <source>
+    *: "One per track"
+  </source>
+  <dest>
+    *: "Eén per nummer"
+  </dest>
+  <voice>
+    *: "1 per nummer"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_FILTER_BYPASS
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Bypass"
+  </source>
+  <dest>
+    *: "Bypass"
+  </dest>
+  <voice>
+    *: "Bypass"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_MEBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "MiB"
+  </source>
+  <dest>
+    *: "MiB"
+  </dest>
+  <voice>
+    *: "mebibyte"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_NO_VIEWERS
+  desc: text for splash to indicate that no viewers are available
+  user: core
+  <source>
+    *: "No viewers found"
+  </source>
+  <dest>
+    *: "Geen viewers gevonden"
+  </dest>
+  <voice>
+    *: "Geen viewers gevonden"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: VOICE_MOVING_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: "Moving track"
+  </source>
+  <dest>
+    *: "Nummer wordt verplaatst"
+  </dest>
+  <voice>
+    *: "Nummer wordt verplaatst"
   </voice>
 </phrase>
