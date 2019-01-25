@@ -72,7 +72,8 @@ static int seek_ogg_page(uint64_t filepos)
                 ci->seek_buffer(ci->curpos - sizeof(buf));
                 LOGF("next page %ld", ci->curpos);
                 return 1;
-            }
+            } else
+                ci->seek_buffer(ci->curpos - (sizeof(buf) - 1));
         }
     }
     return 0;
@@ -81,20 +82,19 @@ static int seek_ogg_page(uint64_t filepos)
 /* seek to comment header */
 static int seek_opus_tags(void)
 {
-    int pos = 0;
-    const int64_t maxpos = sizeof(OpusHeader) + 1024;
     const char synccode[] = "OpusTags";
-    char buf[sizeof(synccode)];
+    char buf[sizeof(synccode) - 1]; /* Exclude null */
     ci->seek_buffer(0);
-    while (ci->read_filebuf(buf, 1) == 1 && ci->curpos < maxpos) {
+    while (ci->read_filebuf(buf, 1) == 1) {
         if (buf[0] == synccode[0]) {
-            if (ci->read_filebuf(&buf[1], sizeof(buf) - 2) != sizeof(buf) - 2)
+            if (ci->read_filebuf(&buf[1], sizeof(buf) - 1) != sizeof(buf) - 1)
                 break;
             if (memcmp(buf, synccode, sizeof(buf)) == 0) {
                 ci->seek_buffer(ci->curpos - sizeof(buf));
                 LOGF("OpusTags %ld", ci->curpos);
                 return 1;
-            }
+            } else
+                ci->seek_buffer(ci->curpos - (sizeof(buf) - 1));
         }
     }
     /* comment header not found probably invalid file */
