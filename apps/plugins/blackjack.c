@@ -1336,8 +1336,8 @@ static unsigned int insurance(struct game_context* bj) {
 
     insurance = blackjack_get_yes_no("Buy Insurance?");
     bj->asked_insurance = true;
-    max_amount = bj->current_bet < (unsigned int)bj->player_money ?
-                            bj->current_bet/2 : (unsigned int)bj->player_money;
+    max_amount = bj->current_bet/2 < (unsigned int)bj->player_money-bj->current_bet ?
+            bj->current_bet/2 : (unsigned int)bj->player_money-bj->current_bet;
     if (insurance != 0) return 0;
 
     insurance = blackjack_get_amount("How much?", 0, max_amount, 0);
@@ -1522,7 +1522,7 @@ static int blackjack(struct game_context* bj) {
             temp_var = insurance(bj);
             if (bj->dealer_total == 21) {
                 rb->splash(HZ, "Dealer has blackjack");
-                bj->player_money += temp_var;
+                bj->player_money += temp_var * 2;
                 bj->end_hand = true;
                 breakout = true;
                 redraw_board(bj);
@@ -1538,12 +1538,19 @@ static int blackjack(struct game_context* bj) {
         }
         if(!bj->end_hand && bj->split_status == 0 &&
            bj->player_cards[0][0].num == bj->player_cards[0][1].num) {
-            split(bj);
-            redraw_board(bj);
-            rb->lcd_update_rect(0, LCD_HEIGHT/2, LCD_WIDTH, LCD_HEIGHT/2);
-            if (bj->split_status == 2) {
-                todo++;
-                player_x = bj->num_player_cards[0] * 10 + 4;
+            if((signed int)bj->current_bet * 2 <= bj->player_money) {
+                split(bj);
+                redraw_board(bj);
+                rb->lcd_update_rect(0, LCD_HEIGHT/2, LCD_WIDTH, LCD_HEIGHT/2);
+                if (bj->split_status == 2) {
+                    todo++;
+                    player_x = bj->num_player_cards[0] * 10 + 4;
+                }
+            }
+            else {
+                rb->splash(HZ, "Not enough money to split.");
+                redraw_board(bj);
+                rb->lcd_update();
             }
         }
 
@@ -1583,10 +1590,8 @@ static int blackjack(struct game_context* bj) {
                          bj->num_player_cards[0]==2 && todo==1) {
                         double_down(bj);
                         dbl_down = true;
-                        if (bj->player_total < 22) {
+                        if (bj->player_total < 22)
                             bj->end_hand = true;
-                            finish_game(bj);
-                        }
                     }
                     else if((signed int)bj->current_bet * 2 >
                             bj->player_money){
@@ -1608,10 +1613,8 @@ static int blackjack(struct game_context* bj) {
                     bj->player_cards[done][temp].is_soft_ace = false;
                     bj->player_total -= 10;
                     update_total(bj);
-                    if (dbl_down) {
+                    if (dbl_down)
                         bj->end_hand = true;
-                        finish_game(bj);
-                    }
                 }
                 else
                     bj->end_hand = true;
@@ -1624,13 +1627,13 @@ static int blackjack(struct game_context* bj) {
                         temp = bj->player_total;
                         bj->player_total = temp_var;
                         temp_var = temp;
+                        bj->current_bet /= 2;
                         finish_game(bj);
                         rb->lcd_getstringsize(" Split 1 ", &w, &h);
                         rb->lcd_putsxy(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
                                        " Split 1 ");
                         rb->lcd_update_rect(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
                                             w,h);
-                        bj->current_bet /= 2;
                         rb->lcd_update_rect(LCD_WIDTH/2-w/2, LCD_HEIGHT/2-3*h/2,
                                             w,h);
                         rb->sleep(HZ*2);
