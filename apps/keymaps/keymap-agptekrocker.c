@@ -206,7 +206,7 @@ static const struct button_mapping button_context_keyboard[]  = {
 }; /* button_context_keyboard */
 
 static const struct button_mapping button_context_bmark[]  = {
-    { ACTION_BMS_DELETE, BUTTON_LEFT, BUTTON_NONE },
+    { ACTION_BMS_DELETE,      BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_SELECT },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_bmark */
