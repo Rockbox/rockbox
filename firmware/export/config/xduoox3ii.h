@@ -63,6 +63,9 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC APPLICATION
 
+/* Define if the device can wake from an RTC alarm */
+//#define HAVE_RTC_ALARM
+
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x80000
 
