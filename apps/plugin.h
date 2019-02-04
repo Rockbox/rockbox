@@ -71,6 +71,9 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "mp3_playback.h"
 #include "root_menu.h"
 #include "talk.h"
+#ifdef PLUGIN
+#include "lang_enum.h"
+#endif
 #ifdef RB_PROFILE
 #include "profile.h"
 #endif
@@ -160,12 +163,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 235
+#define PLUGIN_API_VERSION 2350
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 235
+#define PLUGIN_MIN_API_VERSION 2350
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -384,11 +387,13 @@ struct plugin_api {
             bool scroll_all,int selected_size,
             struct viewport parent[NB_SCREENS]);
     void (*gui_synclist_set_nb_items)(struct gui_synclist * lists, int nb_items);
+    void (*gui_synclist_set_voice_callback)(struct gui_synclist * lists, list_speak_item voice_callback);
     void (*gui_synclist_set_icon_callback)(struct gui_synclist * lists,
                                            list_get_icon icon_callback);
     int (*gui_synclist_get_nb_items)(struct gui_synclist * lists);
     int  (*gui_synclist_get_sel_pos)(struct gui_synclist * lists);
     void (*gui_synclist_draw)(struct gui_synclist * lists);
+    void (*gui_synclist_speak_item)(struct gui_synclist * lists);
     void (*gui_synclist_select_item)(struct gui_synclist * lists,
                                      int item_number);
     void (*gui_synclist_add_item)(struct gui_synclist * lists);
@@ -480,6 +485,24 @@ struct plugin_api {
                                 char *title, enum themable_icons icon,
                                 const char *root, const char *selected);
     int (*rockbox_browse)(struct browse_context *browse);
+
+    /* talking */
+    int (*talk_id)(int32_t id, bool enqueue);
+    int (*talk_file)(const char *root, const char *dir, const char *file,
+                     const char *ext, const long *prefix_ids, bool enqueue);
+    int (*talk_file_or_spell)(const char *dirname, const char* filename,
+                              const long *prefix_ids, bool enqueue);
+    int (*talk_dir_or_spell)(const char* filename,
+                             const long *prefix_ids, bool enqueue);
+    int (*talk_number)(long n, bool enqueue);
+    int (*talk_value)(long n, int unit, bool enqueue);
+    int (*talk_spell)(const char* spell, bool enqueue);
+    void (*talk_time)(const struct tm *tm, bool enqueue);
+    void (*talk_date)(const struct tm *tm, bool enqueue);
+    void (*talk_disable)(bool disable);
+    void (*talk_shutup)(void);
+    void (*talk_force_shutup)(void);
+    void (*talk_force_enqueue_next)(void);
 
     /* kernel/ system */
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
@@ -716,6 +739,7 @@ struct plugin_api {
                                           chan_buffer_hook_fn_type fn);
     void (*mixer_set_frequency)(unsigned int samplerate);
     unsigned int (*mixer_get_frequency)(void);
+    void (*pcmbuf_fade)(bool fade, bool in);
     void (*system_sound_play)(enum system_sound sound);
     void (*keyclick_click)(bool rawbutton, int action);
 #endif /* CONFIG_CODEC == SWCODC */
@@ -797,6 +821,11 @@ struct plugin_api {
                     const int* variable, void (*function)(int), int step,
                     int min, int max,
                     const char* (*formatter)(char*, size_t, int, const char*) );
+    bool (*set_int_ex)(const unsigned char* string, const char* unit, int voice_unit,
+                       const int* variable, void (*function)(int), int step,
+                       int min, int max,
+                       const char* (*formatter)(char*, size_t, int, const char*) ,
+                       int32_t (*get_talk_id)(int, int));
     bool (*set_bool)(const char* string, const bool* variable );
 
 #ifdef HAVE_LCD_COLOR
@@ -846,6 +875,9 @@ struct plugin_api {
     void (*plugin_release_audio_buffer)(void);
     void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
     char* (*plugin_get_current_filename)(void);
+#ifdef PLUGIN_USE_IRAM
+    void (*audio_hard_stop)(void);
+#endif
 #if defined(DEBUG) || defined(SIMULATOR)
     void (*debugf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
@@ -854,7 +886,7 @@ struct plugin_api {
 #endif
     struct user_settings* global_settings;
     struct system_status *global_status;
-    void (*talk_disable)(bool disable);
+    unsigned char **language_strings;
 #if CONFIG_CODEC == SWCODEC
     void (*codec_thread_do_callback)(void (*fn)(void),
                                      unsigned int *audio_thread_id);
@@ -987,6 +1019,13 @@ extern unsigned char plugin_end_addr[];
         plugin__start, &rb };
 #endif /* CONFIG_PLATFORM */
 #endif /* PLUGIN */
+
+/*
+ * The str() macro/functions is how to access strings that might be
+ * translated. Use it like str(MACRO) and expect a string to be
+ * returned!
+ */
+#define str(x) language_strings[x]
 
 int plugin_load(const char* plugin, const void* parameter);
 

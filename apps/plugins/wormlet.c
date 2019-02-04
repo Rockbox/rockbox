@@ -2499,39 +2499,41 @@ enum plugin_status plugin_start(const void* parameter)
     /* Setup screen */
 
     static const struct opt_items noyes[2] = {
-        { "No", -1 },
-        { "Yes", -1 },
+        { STR(LANG_SET_BOOL_NO) },
+        { STR(LANG_SET_BOOL_YES) },
     };
 
     static const struct opt_items remoteonly_option[1] = {
-        { "Remote Control", -1 }
+        { STR(LANG_REMOTE_CONTROL) }
     };
 
     static const struct opt_items key24_option[2] = {
-        { "4 Key Control", -1 },
-        { "2 Key Control", -1 }
+        { STR(LANG_4_KEY_CONTROL) },
+        { STR(LANG_2_KEY_CONTROL) }
     };
 
 #ifdef REMOTE
     static const struct opt_items remote_option[2] = {
-        { "Remote Control", -1 },
-        { "No Rem. Control", -1 }
+        { STR(LANG_REMOTE_CONTROL) },
+        { STR(LANG_NO_REM_CONTROL) }
     };
 #else
     static const struct opt_items key2_option[1] = {
-        { "2 Key Control", -1 }
+        { STR(LANG_2_KEY_CONTROL) }
     };
 #endif
 
     static const struct opt_items nokey_option[1] = {
-        { "Out of Control", -1 }
+        { STR(LANG_OUT_OF_CONTROL) }
     };
 
-    MENUITEM_STRINGLIST(menu, "Wormlet Menu", NULL, "Play Wormlet!",
-                        "Number of Worms", "Number of Players", "Control Style",
-                        "Worm Growth Per Food","Worm Speed","Arghs Per Food",
-                        "Argh Size","Food Size","Revert to Default Settings",
-                        "Playback Control", "Quit");
+    MENUITEM_STRINGLIST(menu, "Wormlet Menu", NULL,
+                        ID2P(LANG_PLAY_WORMLET), ID2P(LANG_NUMBER_OF_WORMS),
+                        ID2P(LANG_NUMBER_OF_PLAYERS), ID2P(LANG_CONTROL_STYLE),
+                        ID2P(LANG_WORM_GROWTH_PER_FOOD), ID2P(LANG_WORM_SPEED),
+                        ID2P(LANG_ARGHS_PER_FOOD), ID2P(LANG_ARGH_SIZE),
+                        ID2P(LANG_FOOD_SIZE), ID2P(LANG_REVERT_TO_DEFAULT_SETTINGS),
+                        ID2P(LANG_PLAYBACK_CONTROL), ID2P(LANG_MENU_QUIT));
 
     rb->button_clear_queue();
 
@@ -2543,7 +2545,7 @@ enum plugin_status plugin_start(const void* parameter)
                 launch_wormlet();
                 break;
             case 1:
-                rb->set_int("Number of Worms", "", UNIT_INT, &worm_count, NULL,
+                rb->set_int(rb->str(LANG_NUMBER_OF_WORMS), "", UNIT_INT, &worm_count, NULL,
                             1, 1, 3, NULL);
                 if (worm_count < players) {
                     worm_count = players;
@@ -2551,10 +2553,10 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
             case 2:
 #ifdef MULTIPLAYER
-                rb->set_int("Number of Players", "", UNIT_INT, &players, NULL,
+                rb->set_int(rb->str(LANG_NUMBER_OF_PLAYERS), "", UNIT_INT, &players, NULL,
                             1, 0, 4, NULL);
 #else
-                rb->set_int("Number of Players", "", UNIT_INT, &players, NULL,
+                rb->set_int(rb->str(LANG_NUMBER_OF_PLAYERS), "", UNIT_INT, &players, NULL,
                             1, 0, 2, NULL);
 #endif
                 if (players > worm_count) {
@@ -2567,53 +2569,53 @@ enum plugin_status plugin_start(const void* parameter)
             case 3:
                 switch(players) {
                     case 0:
-                        rb->set_option("Control Style",&use_remote,INT,
+                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote,INT,
                                        nokey_option, 1, NULL);
                         break;
                     case 1:
-                        rb->set_option("Control Style",&use_remote,INT,
+                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote,INT,
                                        key24_option, 2, NULL);
                         break;
                     case 2:
 #ifdef REMOTE
-                        rb->set_option("Control Style",&use_remote,INT,
+                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote,INT,
                                        remote_option, 2, NULL);
 #else
-                        rb->set_option("Control Style",&use_remote,INT,
+                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote,INT,
                                        key2_option, 1, NULL);
 #endif
                         break;
                     case 3:
-                        rb->set_option("Control Style",&use_remote,INT,
+                        rb->set_option(rb->str(LANG_CONTROL_STYLE),&use_remote,INT,
                                        remoteonly_option, 1, NULL);
                         break;
                 }
                 break;
             case 4:
-                rb->set_int("Worm Growth Per Food", "", UNIT_INT, &worm_food,
+                rb->set_int(rb->str(LANG_WORM_GROWTH_PER_FOOD), "", UNIT_INT, &worm_food,
                             NULL, 1, 0, 15, NULL);
                 break;
             case 5:
                 new_setting = 20 - speed;
-                rb->set_int("Worm Speed", "", UNIT_INT, &new_setting,
+                rb->set_int(rb->str(LANG_WORM_SPEED), "", UNIT_INT, &new_setting,
                             NULL, 1, 0, 20, NULL);
                 speed = 20 - new_setting;
                 break;
             case 6:
-                rb->set_int("Arghs Per Food", "", UNIT_INT, &arghs_per_food,
+                rb->set_int(rb->str(LANG_ARGHS_PER_FOOD), "", UNIT_INT, &arghs_per_food,
                             NULL, 1, 0, 8, NULL);
                 break;
             case 7:
-                rb->set_int("Argh Size", "", UNIT_INT, &argh_size,
+                rb->set_int(rb->str(LANG_ARGH_SIZE), "", UNIT_INT, &argh_size,
                             NULL, 1, 2, 10, NULL);
                 break;
             case 8:
-                rb->set_int("Food Size", "", UNIT_INT, &food_size,
+                rb->set_int(rb->str(LANG_FOOD_SIZE), "", UNIT_INT, &food_size,
                             NULL, 1, 2, 10, NULL);
                 break;
             case 9:
                 new_setting = 0;
-                rb->set_option("Reset Settings?", &new_setting, INT, noyes , 2, NULL);
+                rb->set_option(rb->str(LANG_RESET), &new_setting, INT, noyes , 2, NULL);
                 if (new_setting == 1)
                     default_settings();
                 break;
