@@ -162,14 +162,18 @@ static bool at_limit = false;
  * |      |        |        | <-- Two "OK" for exit on the sides for touchscreen
  * |------------------------|
  *
- * 
+ *
  */
 
 static void speak_pitch_mode(bool enqueue)
 {
+#if CONFIG_CODEC == SWCODEC
     bool timestretch_mode = global_settings.pitch_mode_timestretch && dsp_timestretch_available();
     if (timestretch_mode)
         talk_id(VOICE_PITCH_TIMESTRETCH_MODE, enqueue);
+#else
+#define timestretch_mode 0
+#endif
     if (global_settings.pitch_mode_semitone)
         talk_id(VOICE_PITCH_SEMITONE_MODE, timestretch_mode ? true : enqueue);
     else
