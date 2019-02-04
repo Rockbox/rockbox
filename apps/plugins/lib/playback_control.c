@@ -90,21 +90,21 @@ static bool repeat_mode(void)
   
     return false;
 }
-MENUITEM_FUNCTION(prevtrack_item, 0, "Previous Track",
+MENUITEM_FUNCTION(prevtrack_item, 0, ID2P(LANG_PREVTRACK),
                   prevtrack, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(playpause_item, 0, "Pause / Play",
+MENUITEM_FUNCTION(playpause_item, 0, ID2P(LANG_PLAYPAUSE),
                   play, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(stop_item, 0, "Stop Playback",
+MENUITEM_FUNCTION(stop_item, 0, ID2P(LANG_STOP_PLAYBACK),
                   stop, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(nexttrack_item, 0, "Next Track",
+MENUITEM_FUNCTION(nexttrack_item, 0, ID2P(LANG_NEXTTRACK),
                   nexttrack, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(volume_item, 0, "Change Volume",
+MENUITEM_FUNCTION(volume_item, 0, ID2P(LANG_CHANGE_VOLUME),
                   volume, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(shuffle_item, 0, "Enable/Disable Shuffle",
+MENUITEM_FUNCTION(shuffle_item, 0, ID2P(LANG_CHANGE_SHUFFLE_MODE),
                   shuffle, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(repeat_mode_item, 0, "Change Repeat Mode",
+MENUITEM_FUNCTION(repeat_mode_item, 0, ID2P(LANG_CHANGE_REPEAT_MODE),
                   repeat_mode, NULL, NULL, Icon_NOICON);
-MAKE_MENU(playback_control_menu, "Playback Control", NULL, Icon_NOICON,
+MAKE_MENU(playback_control_menu, ID2P(LANG_PLAYBACK_CONTROL), NULL, Icon_NOICON,
             &prevtrack_item, &playpause_item, &stop_item, &nexttrack_item,
             &volume_item, &shuffle_item, &repeat_mode_item);
 
