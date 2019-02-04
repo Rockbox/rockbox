@@ -1255,19 +1255,22 @@
 </phrase>
 <phrase>
   id: LANG_DITHERING
-  desc: in the sound settings menu
+  desc: in the sound settings and some other menus
   user: core
   <source>
     *: none
     swcodec: "Dithering"
+    lcd_bitmap: "Dithering"
   </source>
   <dest>
     *: none
     swcodec: "Dithering"
+    lcd_bitmap: "Dithering"
   </dest>
   <voice>
     *: none
     swcodec: "Dithering"
+    lcd_bitmap: "Dithering"
   </voice>
 </phrase>
 <phrase>
@@ -8259,7 +8262,7 @@
     *: "Incompatible model"
   </dest>
   <voice>
-    *: ""
+    *: "Incompatible model"
   </voice>
 </phrase>
 <phrase>
@@ -8273,7 +8276,7 @@
     *: "Incompatible version"
   </dest>
   <voice>
-    *: ""
+    *: "Incompatible version"
   </voice>
 </phrase>
 <phrase>
@@ -8287,7 +8290,7 @@
     *: "Plugin returned error"
   </dest>
   <voice>
-    *: ""
+    *: "Plugin returned error"
   </voice>
 </phrase>
 <phrase>
@@ -14049,5 +14052,376 @@
   <voice>
     *: none
     pitchscreen: "Time stretch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Remote Control"
+  </source>
+  <dest>
+    *: "Remote Control"
+  </dest>
+  <voice>
+    *: "Remote Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_REM_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "No Rem. Control"
+  </source>
+  <dest>
+    *: "No Rem. Control"
+  </dest>
+  <voice>
+    *: "No Remote Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OUT_OF_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Out of Control"
+  </source>
+  <dest>
+    *: "Out of Control"
+  </dest>
+  <voice>
+    *: "Out of Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_2_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "2 Key Control"
+  </source>
+  <dest>
+    *: "2 Key Control"
+  </dest>
+  <voice>
+    *: "2 Key Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_4_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "4 Key Control"
+  </source>
+  <dest>
+    *: "4 Key Control"
+  </dest>
+  <voice>
+    *: "4 Key Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_WORMLET
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Play Wormlet!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Play Wormlet!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Play Wormlet!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_WORMS
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Number of Worms"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Number of Worms"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Number of Worms"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_GROWTH_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Worm Growth Per Food"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Worm Growth Per Food"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Worm Growth Per Food"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_SPEED
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Worm Speed"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Worm Speed"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Worm Speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGHS_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Arghs Per Food"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Arghs Per Food"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Arghs Per Food"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGH_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Argh Size"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Argh Size"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Argh Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOOD_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Food Size"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Food Size"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Food Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_PLAYERS
+  desc: For game menus
+  user: core
+  <source>
+    *: "Number of Players"
+  </source>
+  <dest>
+    *: "Number of Players"
+  </dest>
+  <voice>
+    *: "Number of Players"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTROL_STYLE
+  desc: In various menus
+  user: core
+  <source>
+    *: "Control Style"
+  </source>
+  <dest>
+    *: "Control Style"
+  </dest>
+  <voice>
+    *: "Control Style"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERT_TO_DEFAULT_SETTINGS
+  desc: In various menus
+  user: core
+  <source>
+    *: "Revert to Default Settings"
+  </source>
+  <dest>
+    *: "Revert to Default Settings"
+  </dest>
+  <voice>
+    *: "Revert to Default Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_QUIT
+  desc: in various menus
+  user: core
+  <source>
+    *: "Quit"
+  </source>
+  <dest>
+    *: "Quit"
+  </dest>
+  <voice>
+    *: "Quit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_DISPLAY_OPTIONS
+  desc: in various menus
+  user: core
+  <source>
+    *: "Display Options"
+  </source>
+  <dest>
+    *: "Display Options"
+  </dest>
+  <voice>
+    *: "Display Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Previous Track"
+  </source>
+  <dest>
+    *: "Previous Track"
+  </dest>
+  <voice>
+    *: "Previous Track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYPAUSE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Pause / Play"
+  </source>
+  <dest>
+    *: "Pause / Play"
+  </dest>
+  <voice>
+    *: "Pause / Play"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_PLAYBACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Stop Playback"
+  </source>
+  <dest>
+    *: "Stop Playback"
+  </dest>
+  <voice>
+    *: "Stop Playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXTTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Next Track"
+  </source>
+  <dest>
+    *: "Next Track"
+  </dest>
+  <voice>
+    *: "Next Track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_VOLUME
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Volume"
+  </source>
+  <dest>
+    *: "Change Volume"
+  </dest>
+  <voice>
+    *: "Change Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_SHUFFLE_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Shuffle Mode"
+  </source>
+  <dest>
+    *: "Shuffle Mode"
+  </dest>
+  <voice>
+    *: "Shuffle Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_REPEAT_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Repeat Mode"
+  </source>
+  <dest>
+    *: "Change Repeat Mode"
+  </dest>
+  <voice>
+    *: "Change Repeat Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_CONTROL
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Playback Control"
+  </source>
+  <dest>
+    *: "Playback Control"
+  </dest>
+  <voice>
+    *: "Playback Control"
   </voice>
 </phrase>

@@ -51,14 +51,14 @@ static struct dices dice;
 static int sides_index;
 
 static struct opt_items nb_sides_option[8] = {
-    { "3", -1 },
-    { "4", -1 },
-    { "6", -1 },
-    { "8", -1 },
-    { "10", -1 },
-    { "12", -1 },
-    { "20", -1 },
-    { "100", -1 }
+    { "3", TALK_ID(3, UNIT_INT) },
+    { "4", TALK_ID(4, UNIT_INT) },
+    { "6", TALK_ID(6, UNIT_INT) },
+    { "8", TALK_ID(8, UNIT_INT) },
+    { "10", TALK_ID(10, UNIT_INT) },
+    { "12", TALK_ID(12, UNIT_INT) },
+    { "20", TALK_ID(20, UNIT_INT) },
+    { "100", TALK_ID(100, UNIT_INT) }
 };
 static int nb_sides_values[] = { 3, 4, 6, 8, 10, 12, 20, 100 };
 static char *sides_conf[] = {"3", "4", "6", "8", "10", "12", "20", "100" };

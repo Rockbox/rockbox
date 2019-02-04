@@ -338,10 +338,12 @@ static const struct plugin_api rockbox_api = {
     /* list */
     gui_synclist_init,
     gui_synclist_set_nb_items,
+    gui_synclist_set_voice_callback,
     gui_synclist_set_icon_callback,
     gui_synclist_get_nb_items,
     gui_synclist_get_sel_pos,
     gui_synclist_draw,
+    gui_synclist_speak_item,
     gui_synclist_select_item,
     gui_synclist_add_item,
     gui_synclist_del_item,
@@ -420,6 +422,21 @@ static const struct plugin_api rockbox_api = {
     /* browsing */
     browse_context_init,
     rockbox_browse,
+
+    /* talking */
+    talk_id,
+    talk_file,
+    talk_file_or_spell,
+    talk_dir_or_spell,
+    talk_number,
+    talk_value,
+    talk_spell,
+    talk_time,
+    talk_date,
+    talk_disable,
+    talk_shutup,
+    talk_force_shutup,
+    talk_force_enqueue_next,
 
     /* kernel/ system */
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
@@ -625,6 +642,7 @@ static const struct plugin_api rockbox_api = {
     mixer_set_frequency,
     mixer_get_frequency,
 
+    pcmbuf_fade,
     system_sound_play,
     keyclick_click,
 #endif /* CONFIG_CODEC == SWCODEC */
@@ -688,6 +706,7 @@ static const struct plugin_api rockbox_api = {
     set_option,
     set_bool_options,
     set_int,
+    set_int_ex,
     set_bool,
 #ifdef HAVE_LCD_COLOR
     set_color,
@@ -733,6 +752,9 @@ static const struct plugin_api rockbox_api = {
     plugin_release_audio_buffer, /* defined in plugin.c */
     plugin_tsr,                  /* defined in plugin.c */ 
     plugin_get_current_filename,
+#ifdef PLUGIN_USE_IRAM
+    audio_hard_stop,
+#endif
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
 #endif
@@ -741,7 +763,7 @@ static const struct plugin_api rockbox_api = {
 #endif
     &global_settings,
     &global_status,
-    talk_disable,
+    language_strings,
 #if CONFIG_CODEC == SWCODEC
     codec_thread_do_callback,
     codec_load_file,
@@ -869,14 +891,14 @@ int plugin_load(const char* plugin, const void* parameter)
         )
     {
         lc_close(current_plugin_handle);
-        splash(HZ*2, str(LANG_PLUGIN_WRONG_MODEL));
+        splash(HZ*2, ID2P(LANG_PLUGIN_WRONG_MODEL));
         return -1;
     }
     if (hdr->api_version > PLUGIN_API_VERSION
         || hdr->api_version < PLUGIN_MIN_API_VERSION)
     {
         lc_close(current_plugin_handle);
-        splash(HZ*2, str(LANG_PLUGIN_WRONG_VERSION));
+        splash(HZ*2, ID2P(LANG_PLUGIN_WRONG_VERSION));
         return -1;
     }
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
@@ -907,7 +929,8 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 
     /* allow voice to back off if the plugin needs lots of memory */
-    talk_buffer_set_policy(TALK_BUFFER_LOOSE);
+    if (!global_settings.talk_menu)
+        talk_buffer_set_policy(TALK_BUFFER_LOOSE);
 
     plugin_check_open_close__enter();
 

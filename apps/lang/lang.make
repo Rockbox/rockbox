@@ -42,6 +42,8 @@ $(BUILDDIR)/lang/lang.h: $(APPSDIR)/lang/$(LANGUAGE).lang $(BUILDDIR)/apps/featu
 		perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(MODELNAME)$$feat $<
 $(BUILDDIR)/lang/lang_core.c: $(BUILDDIR)/lang/lang.h
 
+$(BUILDDIR)/lang_enum.h: $(BUILDDIR)/lang/lang.h
+
 # NOTE: for some weird reasons in GNU make, multi targets rules WITH patterns actually express
 # the fact that the two files are created as the result of one invocation of the rule
 $(BUILDDIR)/%.lng $(BUILDDIR)/%.vstrings: $(ROOTDIR)/%.lang $(BUILDDIR)/apps/genlang-features
