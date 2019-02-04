@@ -289,7 +289,7 @@ static const char * playing_time_get_or_speak_info(int selected_item, void * dat
     case 4: { /* track index */
         int track_perc = (pti->curr_playing+1) *100 / pti->nb_tracks;
         snprintf(buf, buffer_len, str(LANG_PLAYTIME_TRACK),
-                 pti->curr_playing, pti->nb_tracks, track_perc);
+                 pti->curr_playing + 1, pti->nb_tracks, track_perc);
         if (say_it)
           talk_ids(false, LANG_PLAYTIME_TRACK,
                      TALK_ID(pti->curr_playing+1, UNIT_INT),
@@ -430,10 +430,10 @@ static bool playing_time(void)
         gui_synclist_set_voice_callback(&pt_lists, playing_time_speak_info);
     gui_synclist_set_nb_items(&pt_lists, 8);
     gui_synclist_draw(&pt_lists);
-    gui_syncstatusbar_draw(&statusbars, true);
+/*    gui_syncstatusbar_draw(&statusbars, true); */
     gui_synclist_speak_item(&pt_lists);
     while (true) {
-        gui_syncstatusbar_draw(&statusbars, false);
+/*        gui_syncstatusbar_draw(&statusbars, false); */
         if (list_do_action(CONTEXT_LIST, HZ/2,
                           &pt_lists, &key, LIST_WRAP_UNLESS_HELD) == 0
            && key!=ACTION_NONE && key!=ACTION_UNKNOWN)
