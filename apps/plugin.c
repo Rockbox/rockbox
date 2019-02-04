@@ -176,6 +176,10 @@ static void plugin_check_open_close__exit(void)
 #endif /* HAVE_PLUGIN_CHECK_OPEN_CLOSE */
 
 static const struct plugin_api rockbox_api = {
+    rbversion,
+    &global_settings,
+    &global_status,
+    language_strings,
 
     /* lcd */
 #ifdef HAVE_LCD_CONTRAST
@@ -258,6 +262,7 @@ static const struct plugin_api rockbox_api = {
     bidi_l2v,
 #ifdef HAVE_LCD_BITMAP
     is_diacritic,
+    get_codepage_name,
 #endif
     font_get_bits,
     font_load,
@@ -268,7 +273,6 @@ static const struct plugin_api rockbox_api = {
     screen_clear_area,
     gui_scrollbar_draw,
 #endif /* HAVE_LCD_BITMAP */
-    get_codepage_name,
 
     backlight_on,
     backlight_off,
@@ -334,14 +338,16 @@ static const struct plugin_api rockbox_api = {
     viewportmanager_theme_undo,
     viewport_set_fullscreen,
 #endif
-    
+
     /* list */
     gui_synclist_init,
     gui_synclist_set_nb_items,
+    gui_synclist_set_voice_callback,
     gui_synclist_set_icon_callback,
     gui_synclist_get_nb_items,
     gui_synclist_get_sel_pos,
     gui_synclist_draw,
+    gui_synclist_speak_item,
     gui_synclist_select_item,
     gui_synclist_add_item,
     gui_synclist_del_item,
@@ -369,7 +375,7 @@ static const struct plugin_api rockbox_api = {
     touchscreen_set_mode,
     touchscreen_get_mode,
 #endif
-    
+
 #ifdef HAVE_BUTTON_LIGHT
     buttonlight_set_timeout,
     buttonlight_off,
@@ -420,6 +426,21 @@ static const struct plugin_api rockbox_api = {
     /* browsing */
     browse_context_init,
     rockbox_browse,
+
+    /* talking */
+    talk_id,
+    talk_file,
+    talk_file_or_spell,
+    talk_dir_or_spell,
+    talk_number,
+    talk_value,
+    talk_spell,
+    talk_time,
+    talk_date,
+    talk_disable,
+    talk_shutup,
+    talk_force_shutup,
+    talk_force_enqueue_next,
 
     /* kernel/ system */
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
@@ -541,7 +562,7 @@ static const struct plugin_api rockbox_api = {
     utf8encode,
     utf8length,
     utf8seek,
-    
+
     /* the buflib memory management library */
     buflib_init,
     buflib_available,
@@ -625,6 +646,7 @@ static const struct plugin_api rockbox_api = {
     mixer_set_frequency,
     mixer_get_frequency,
 
+    pcmbuf_fade,
     system_sound_play,
     keyclick_click,
 #endif /* CONFIG_CODEC == SWCODEC */
@@ -676,7 +698,12 @@ static const struct plugin_api rockbox_api = {
 #endif /* !SIMULATOR && CONFIG_CODEC != SWCODEC */
 
     /* menu */
+    root_menu_get_options,
     do_menu,
+    root_menu_set_default,
+    root_menu_write_to_cfg,
+    root_menu_load_from_cfg,
+
     /* statusbars */
     &statusbars,
     gui_syncstatusbar_draw,
@@ -684,10 +711,12 @@ static const struct plugin_api rockbox_api = {
     /* options */
     get_settings_list,
     find_setting,
+    settings_save,
     option_screen,
     set_option,
     set_bool_options,
     set_int,
+    set_int_ex,
     set_bool,
 #ifdef HAVE_LCD_COLOR
     set_color,
@@ -731,17 +760,17 @@ static const struct plugin_api rockbox_api = {
     plugin_get_buffer,
     plugin_get_audio_buffer,     /* defined in plugin.c */
     plugin_release_audio_buffer, /* defined in plugin.c */
-    plugin_tsr,                  /* defined in plugin.c */ 
+    plugin_tsr,                  /* defined in plugin.c */
     plugin_get_current_filename,
+#ifdef PLUGIN_USE_IRAM
+    audio_hard_stop,
+#endif
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
 #endif
 #ifdef ROCKBOX_HAS_LOGF
     _logf,
 #endif
-    &global_settings,
-    &global_status,
-    talk_disable,
 #if CONFIG_CODEC == SWCODEC
     codec_thread_do_callback,
     codec_load_file,
@@ -813,13 +842,6 @@ static const struct plugin_api rockbox_api = {
     semaphore_release,
 #endif
 
-    rbversion,
-    root_menu_get_options,
-    root_menu_set_default,
-    root_menu_write_to_cfg,
-    root_menu_load_from_cfg,
-    settings_save,
-
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 };
@@ -857,7 +879,7 @@ int plugin_load(const char* plugin, const void* parameter)
     p_hdr = lc_get_header(current_plugin_handle);
 
     hdr = p_hdr ? &p_hdr->lc_hdr : NULL;
-    
+
 
     if (hdr == NULL
         || hdr->magic != PLUGIN_MAGIC
@@ -869,14 +891,14 @@ int plugin_load(const char* plugin, const void* parameter)
         )
     {
         lc_close(current_plugin_handle);
-        splash(HZ*2, str(LANG_PLUGIN_WRONG_MODEL));
+        splash(HZ*2, ID2P(LANG_PLUGIN_WRONG_MODEL));
         return -1;
     }
     if (hdr->api_version > PLUGIN_API_VERSION
         || hdr->api_version < PLUGIN_MIN_API_VERSION)
     {
         lc_close(current_plugin_handle);
-        splash(HZ*2, str(LANG_PLUGIN_WRONG_VERSION));
+        splash(HZ*2, ID2P(LANG_PLUGIN_WRONG_VERSION));
         return -1;
     }
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
@@ -901,18 +923,19 @@ int plugin_load(const char* plugin, const void* parameter)
 
     FOR_NB_SCREENS(i)
        viewportmanager_theme_enable(i, false, NULL);
-    
+
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
 
     /* allow voice to back off if the plugin needs lots of memory */
-    talk_buffer_set_policy(TALK_BUFFER_LOOSE);
+    if (!global_settings.talk_menu)
+        talk_buffer_set_policy(TALK_BUFFER_LOOSE);
 
     plugin_check_open_close__enter();
 
     int rc = p_hdr->entry_point(parameter);
-    
+
     tree_unlock_cache(tree_get_context());
     pop_current_activity();
 

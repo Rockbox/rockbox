@@ -71,6 +71,9 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "mp3_playback.h"
 #include "root_menu.h"
 #include "talk.h"
+#ifdef PLUGIN
+#include "lang_enum.h"
+#endif
 #ifdef RB_PROFILE
 #include "profile.h"
 #endif
@@ -160,12 +163,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 235
+#define PLUGIN_API_VERSION 236
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 235
+#define PLUGIN_MIN_API_VERSION 236
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -186,9 +189,13 @@ enum plugin_status {
          version
  */
 struct plugin_api {
+    /* let's put these at the top */
+    const char *rbversion;
+    struct user_settings* global_settings;
+    struct system_status *global_status;
+    unsigned char **language_strings;
 
     /* lcd */
-    
 #ifdef HAVE_LCD_CONTRAST
     void (*lcd_set_contrast)(int x);
 #endif
@@ -284,6 +291,7 @@ struct plugin_api {
     unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
 #ifdef HAVE_LCD_BITMAP
     bool (*is_diacritic)(const unsigned short char_code, bool *is_rtl);
+    const char* (*get_codepage_name)(int cp);
 #endif
     const unsigned char *(*font_get_bits)( struct font *pf, unsigned short char_code );
     int (*font_load)(const char *path);
@@ -299,8 +307,6 @@ struct plugin_api {
                                int min_shown, int max_shown,
                                unsigned flags);
 #endif  /* HAVE_LCD_BITMAP */
-    const char* (*get_codepage_name)(int cp);
-
     /* backlight */
     /* The backlight_* functions must be present in the API regardless whether
      * HAVE_BACKLIGHT is defined or not. The reason is that the stock Ondio has
@@ -370,7 +376,7 @@ struct plugin_api {
                               int width, int height);
 #endif
     void (*viewport_set_defaults)(struct viewport *vp,
-                                  const enum screen_type screen);                                  
+                                  const enum screen_type screen);
 #ifdef HAVE_LCD_BITMAP
     void (*viewportmanager_theme_enable)(enum screen_type screen, bool enable,
                                          struct viewport *viewport);
@@ -384,11 +390,13 @@ struct plugin_api {
             bool scroll_all,int selected_size,
             struct viewport parent[NB_SCREENS]);
     void (*gui_synclist_set_nb_items)(struct gui_synclist * lists, int nb_items);
+    void (*gui_synclist_set_voice_callback)(struct gui_synclist * lists, list_speak_item voice_callback);
     void (*gui_synclist_set_icon_callback)(struct gui_synclist * lists,
                                            list_get_icon icon_callback);
     int (*gui_synclist_get_nb_items)(struct gui_synclist * lists);
     int  (*gui_synclist_get_sel_pos)(struct gui_synclist * lists);
     void (*gui_synclist_draw)(struct gui_synclist * lists);
+    void (*gui_synclist_speak_item)(struct gui_synclist * lists);
     void (*gui_synclist_select_item)(struct gui_synclist * lists,
                                      int item_number);
     void (*gui_synclist_add_item)(struct gui_synclist * lists);
@@ -463,8 +471,6 @@ struct plugin_api {
 
     int (*filetype_get_attr)(const char* file);
 
-
-
     /* dir */
     DIR * (*opendir)(const char *dirname);
     int (*closedir)(DIR *dirp);
@@ -480,6 +486,24 @@ struct plugin_api {
                                 char *title, enum themable_icons icon,
                                 const char *root, const char *selected);
     int (*rockbox_browse)(struct browse_context *browse);
+
+    /* talking */
+    int (*talk_id)(int32_t id, bool enqueue);
+    int (*talk_file)(const char *root, const char *dir, const char *file,
+                     const char *ext, const long *prefix_ids, bool enqueue);
+    int (*talk_file_or_spell)(const char *dirname, const char* filename,
+                              const long *prefix_ids, bool enqueue);
+    int (*talk_dir_or_spell)(const char* filename,
+                             const long *prefix_ids, bool enqueue);
+    int (*talk_number)(long n, bool enqueue);
+    int (*talk_value)(long n, int unit, bool enqueue);
+    int (*talk_spell)(const char* spell, bool enqueue);
+    void (*talk_time)(const struct tm *tm, bool enqueue);
+    void (*talk_date)(const struct tm *tm, bool enqueue);
+    void (*talk_disable)(bool disable);
+    void (*talk_shutup)(void);
+    void (*talk_force_shutup)(void);
+    void (*talk_force_enqueue_next)(void);
 
     /* kernel/ system */
 #if defined(CPU_ARM) && CONFIG_PLATFORM & PLATFORM_NATIVE
@@ -716,6 +740,7 @@ struct plugin_api {
                                           chan_buffer_hook_fn_type fn);
     void (*mixer_set_frequency)(unsigned int samplerate);
     unsigned int (*mixer_get_frequency)(void);
+    void (*pcmbuf_fade)(bool fade, bool in);
     void (*system_sound_play)(enum system_sound sound);
     void (*keyclick_click)(bool rawbutton, int action);
 #endif /* CONFIG_CODEC == SWCODC */
@@ -773,8 +798,12 @@ struct plugin_api {
 #endif
 
     /* menu */
+    struct menu_table *(*root_menu_get_options)(int *nb_options);
     int (*do_menu)(const struct menu_item_ex *menu, int *start_selected,
                    struct viewport parent[NB_SCREENS], bool hide_theme);
+    void (*root_menu_set_default)(void* setting, void* defaultval);
+    char* (*root_menu_write_to_cfg)(void* setting, char*buf, int buf_len);
+    void (*root_menu_load_from_cfg)(void* setting, char *value);
 
     /* scroll bar */
     struct gui_syncstatusbar *statusbars;
@@ -783,6 +812,7 @@ struct plugin_api {
     /* options */
     const struct settings_list* (*get_settings_list)(int*count);
     const struct settings_list* (*find_setting)(const void* variable, int *id);
+    int (*settings_save)(void);
     bool (*option_screen)(const struct settings_list *setting,
                           struct viewport parent[NB_SCREENS],
                           bool use_temp_var, unsigned char* option_title);
@@ -797,6 +827,11 @@ struct plugin_api {
                     const int* variable, void (*function)(int), int step,
                     int min, int max,
                     const char* (*formatter)(char*, size_t, int, const char*) );
+    bool (*set_int_ex)(const unsigned char* string, const char* unit, int voice_unit,
+                       const int* variable, void (*function)(int), int step,
+                       int min, int max,
+                       const char* (*formatter)(char*, size_t, int, const char*) ,
+                       int32_t (*get_talk_id)(int, int));
     bool (*set_bool)(const char* string, const bool* variable );
 
 #ifdef HAVE_LCD_COLOR
@@ -846,15 +881,15 @@ struct plugin_api {
     void (*plugin_release_audio_buffer)(void);
     void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
     char* (*plugin_get_current_filename)(void);
+#ifdef PLUGIN_USE_IRAM
+    void (*audio_hard_stop)(void);
+#endif
 #if defined(DEBUG) || defined(SIMULATOR)
     void (*debugf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
 #ifdef ROCKBOX_HAS_LOGF
     void (*logf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
-    struct user_settings* global_settings;
-    struct system_status *global_status;
-    void (*talk_disable)(bool disable);
 #if CONFIG_CODEC == SWCODEC
     void (*codec_thread_do_callback)(void (*fn)(void),
                                      unsigned int *audio_thread_id);
@@ -950,13 +985,6 @@ struct plugin_api {
     void (*semaphore_release)(struct semaphore *s);
 #endif
 
-    const char *rbversion;
-    struct menu_table *(*root_menu_get_options)(int *nb_options);
-    void (*root_menu_set_default)(void* setting, void* defaultval);
-    char* (*root_menu_write_to_cfg)(void* setting, char*buf, int buf_len);
-    void (*root_menu_load_from_cfg)(void* setting, char *value);
-    int (*settings_save)(void);
-
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 };
@@ -987,6 +1015,13 @@ extern unsigned char plugin_end_addr[];
         plugin__start, &rb };
 #endif /* CONFIG_PLATFORM */
 #endif /* PLUGIN */
+
+/*
+ * The str() macro/functions is how to access strings that might be
+ * translated. Use it like str(MACRO) and expect a string to be
+ * returned!
+ */
+#define str(x) language_strings[x]
 
 int plugin_load(const char* plugin, const void* parameter);
 

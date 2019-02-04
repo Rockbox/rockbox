@@ -3685,19 +3685,19 @@ static int recording_menu(void)
     bool done = false;
 
     static const struct opt_items freqs[9] = {
-        { "8000Hz", -1 },
-        { "11025Hz", -1 },
-        { "12000Hz", -1 },
-        { "16000Hz", -1 },
-        { "22050Hz", -1 },
-        { "24000Hz", -1 },
-        { "32000Hz", -1 },
-        { "44100Hz", -1 },
-        { "48000Hz", -1 },
+        { "8000Hz", TALK_ID(8, UNIT_KHZ) },
+        { "11025Hz", TALK_ID(11, UNIT_KHZ) },
+        { "12000Hz", TALK_ID(12, UNIT_KHZ) },
+        { "16000Hz", TALK_ID(16, UNIT_KHZ) },
+        { "22050Hz", TALK_ID(22, UNIT_KHZ) },
+        { "24000Hz", TALK_ID(24, UNIT_KHZ) },
+        { "32000Hz", TALK_ID(32, UNIT_KHZ) },
+        { "44100Hz", TALK_ID(44, UNIT_KHZ) },
+        { "48000Hz", TALK_ID(48, UNIT_KHZ) },
     };
     static const struct opt_items chans[2] = {
-        { "Mono", -1 },
-        { "Stereo", -1 },
+        { STR(LANG_CHANNEL_MONO) },
+        { STR(LANG_CHANNEL_STEREO) },
     };
     static const struct opt_items srcs[WAV_NUM_SRC] = {
         { "Line In", -1 },

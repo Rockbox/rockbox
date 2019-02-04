@@ -658,6 +658,20 @@ extern unsigned char *language_strings[];
 /* this contains the concatenation of all strings, separated by \\0 chars */
 extern const unsigned char core_language_builtin[];
 
+#include "${prefix}_enum.h"
+
+MOO
+    ;
+
+    close(HFILE_CORE);
+
+    open(HFILE_CORE, ">${prefix}_enum.h") ||
+        die "couldn't create file ${prefix}_enum.h\n";
+
+    print HFILE_CORE <<MOO
+/* This file was automatically generated using genlang */
+#ifndef _LANG_ENUM_H_
+#define _LANG_ENUM_H_
 /* The enum below contains all available strings */
 enum \{
 MOO
@@ -702,8 +716,13 @@ MOO
         printf HFILE_CORE ("    %s, /* 0x%x */\n", $name, $i);
     }
 
-    # Output end of enum
-    print HFILE_CORE "\n};\n/* end of generated enum list */\n";
+    # Output end of lang_enum.h
+    print HFILE_CORE <<MOO
+};
+/* end of generated enum list */
+#endif /* _LANG_ENUM_H_ */
+MOO
+    ;
 
     # Output the target phrases for the source file
     for $i (0 .. $idcount[$users{"core"}]-1) {
