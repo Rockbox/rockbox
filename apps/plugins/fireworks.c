@@ -113,35 +113,35 @@ LCD_RGBPACK(19,10,26) };
 #endif
 
 static const struct opt_items autofire_delay_settings[15] = {
-    { "Off",   -1 },
-    { "50ms",  -1 },
-    { "100ms", -1 },
-    { "200ms", -1 },
-    { "300ms", -1 },
-    { "400ms", -1 },
-    { "500ms", -1 },
-    { "600ms", -1 },
-    { "700ms", -1 },
-    { "800ms", -1 },
-    { "900ms", -1 },
-    { "1s",    -1 },
-    { "2s",    -1 },
-    { "3s",    -1 },
-    { "4s",    -1 }
+    { STR(LANG_OFF) },
+    { "50ms",  TALK_ID(50, UNIT_MS) },
+    { "100ms", TALK_ID(100, UNIT_MS) },
+    { "200ms", TALK_ID(200, UNIT_MS) },
+    { "300ms", TALK_ID(300, UNIT_MS) },
+    { "400ms", TALK_ID(400, UNIT_MS) },
+    { "500ms", TALK_ID(500, UNIT_MS) },
+    { "600ms", TALK_ID(600, UNIT_MS) },
+    { "700ms", TALK_ID(700, UNIT_MS) },
+    { "800ms", TALK_ID(800, UNIT_MS) },
+    { "900ms", TALK_ID(900, UNIT_MS) },
+    { "1s",    TALK_ID(1, UNIT_SEC) },
+    { "2s",    TALK_ID(2, UNIT_SEC) },
+    { "3s",    TALK_ID(3, UNIT_SEC) },
+    { "4s",    TALK_ID(4, UNIT_SEC) }
 };
 
 int autofire_delay_values[15] = {
     0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400 };
 
 static const struct opt_items particle_settings[8] = {
-    { "5",  -1 },
-    { "10", -1 },
-    { "15", -1 },
-    { "20", -1 },
-    { "25", -1 },
-    { "30", -1 },
-    { "35", -1 },
-    { "40", -1 },
+    { "5",  TALK_ID(5, UNIT_INT) },
+    { "10", TALK_ID(10, UNIT_INT) },
+    { "15", TALK_ID(15, UNIT_INT) },
+    { "20", TALK_ID(20, UNIT_INT) },
+    { "25", TALK_ID(25, UNIT_INT) },
+    { "30", TALK_ID(30, UNIT_INT) },
+    { "35", TALK_ID(35, UNIT_INT) },
+    { "40", TALK_ID(40, UNIT_INT) },
 };
 
 int particle_values[8] = {
@@ -163,7 +163,7 @@ int particle_life_values[9] = {
     20, 30, 40, 50, 60, 70, 80, 90, 100 };
 
 static const struct opt_items gravity_settings[4] = {
-    { "Off",      -1 },
+    { STR(LANG_OFF)    },
     { "Weak",     -1 },
     { "Moderate", -1 },
     { "Strong",   -1 },
@@ -185,8 +185,8 @@ int rocket_values[4] = {
 #else
 
 static const struct opt_items rocket_settings[2] = {
-    { "No",  -1 },
-    { "Yes", -1 },
+    { STR(LANG_SET_BOOL_NO) },
+    { STR(LANG_SET_BOOL_YES) },
 };
 int rocket_values[4] = {
     1, 0 };
