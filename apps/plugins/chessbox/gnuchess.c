@@ -1117,6 +1117,10 @@ static short i,alpha,beta,score,tempb,tempc,tempsf,tempst,xside,rpt;
   for (index=0;index<5;index++){
       move_buffer[index] = mvstr1[index];
   }
+  if (SqAtakd(PieceList[(side==white)?black:white][0],side)){
+      move_buffer[4] = '+';
+      move_buffer[5] = '\0';
+  }
 
   if (score == -9999 || score == 9998) mate = true;
   if (mate) hint = 0;

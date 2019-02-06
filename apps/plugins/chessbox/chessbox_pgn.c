@@ -539,14 +539,21 @@ static void coords_to_pgn(struct pgn_ply_node* ply){
     }
 }
 
-static const char* get_game_text(int selected_item, void *data,
-                                 char *buffer, size_t buffer_len){
+static struct pgn_game_node *get_game_info(int selected_item, void *data){
     int i;
     struct pgn_game_node *temp_node = (struct pgn_game_node *)data;
 
     for (i=0;i<selected_item && temp_node != NULL;i++){
         temp_node = temp_node->next_node;
     }
+
+    return temp_node;
+}
+
+static const char* get_game_text(int selected_item, void *data,
+                                 char *buffer, size_t buffer_len){
+    struct pgn_game_node *temp_node = get_game_info(selected_item, data);
+
     if (temp_node == NULL){
         return NULL;
     }
@@ -554,6 +561,35 @@ static const char* get_game_text(int selected_item, void *data,
                          temp_node->black_player, temp_node->game_date);
 
     return buffer;
+}
+
+static void say_player(const char *name, bool enqueue) {
+    if (!rb->strcasecmp(name, "player"))
+        rb->talk_id(VOICE_PLAYER, enqueue);
+    else if (!rb->strcasecmp(name, "gnuchess"))
+        rb->talk_id(VOICE_GNUCHESS, enqueue);
+    else
+        rb->talk_spell(name, enqueue);
+}
+
+static int speak_game_selection(int selected_item, void *data){
+    struct pgn_game_node *temp_node = get_game_info(selected_item, data);
+
+    if (temp_node != NULL){
+        say_player(temp_node->white_player, false);
+        say_player(temp_node->black_player, true);
+        if (temp_node->game_date[0] != '?') {
+            char buf[12];
+            rb->strcpy(buf, temp_node->game_date);
+            buf[4] = 0;
+            buf[7] = 0;
+            rb->talk_id(LANG_MONTH_JANUARY + rb->atoi(&(buf[5])) - 1, true);
+            rb->talk_number(rb->atoi(&(buf[8])), true);
+            rb->talk_number(rb->atoi(buf), true);
+        }
+    }
+
+    return 0;
 }
 
 static void write_pgn_token(int fhandler, char *buffer, size_t *line_length){
@@ -636,14 +672,18 @@ struct pgn_game_node* pgn_show_game_list(struct pgn_game_node* first_game){
 
 
     rb->gui_synclist_init(&games_list, &get_game_text, first_game, false, 1, NULL);
-    rb->gui_synclist_set_title(&games_list, "Games", NOICON);
+    rb->gui_synclist_set_title(&games_list, rb->str(LANG_CHESSBOX_GAMES), NOICON);
     rb->gui_synclist_set_icon_callback(&games_list, NULL);
+    if (rb->global_settings->talk_menu)
+        rb->gui_synclist_set_voice_callback(&games_list, speak_game_selection);
     rb->gui_synclist_set_nb_items(&games_list, i);
     rb->gui_synclist_limit_scroll(&games_list, true);
     rb->gui_synclist_select_item(&games_list, 0);
 
+    rb->gui_synclist_draw(&games_list);
+    rb->gui_synclist_speak_item(&games_list);
+
     while (true) {
-        rb->gui_synclist_draw(&games_list);
         curr_selection = rb->gui_synclist_get_sel_pos(&games_list);
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
         if (rb->gui_synclist_do_button(&games_list,&button,LIST_WRAP_OFF)){
@@ -651,11 +691,7 @@ struct pgn_game_node* pgn_show_game_list(struct pgn_game_node* first_game){
         }
         switch (button) {
             case ACTION_STD_OK:
-                temp_node = first_game;
-                for (i=0;i<curr_selection && temp_node != NULL;i++){
-                    temp_node = temp_node->next_node;
-                }
-                return temp_node;
+                return get_game_info(curr_selection, first_game);
             break;
             case ACTION_STD_CANCEL:
                 return NULL;

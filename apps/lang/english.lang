@@ -14367,3 +14367,734 @@
     *: "Playback Control"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CHESSBOX_CHECKMATE
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Checkmate!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Checkmate!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Checkmate!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_ILLEGAL_MOVE
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Illegal move!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Illegal move!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Illegal move!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_NEW_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "New Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "New Game"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "New Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESUME_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Resume Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Resume Game"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Resume Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SAVE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Save Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Save Game"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Save Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTORE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Restore Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Restore Game"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Restore Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTART_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Restart Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Restart Game"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Restart Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SELECT_OTHER_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Select Other Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Select Other Game"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Select Other Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_1
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 1: 60 moves / 5 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Level 1: 60 moves / 5 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Level 1: 60 moves per 5 minutes"
+</voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_2
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 2: 60 moves / 15 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Level 2: 60 moves / 15 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Level 2: 60 moves per 15 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_3
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 3: 60 moves / 30 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Level 3: 60 moves / 30 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Level 3: 60 moves per 30 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_4
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 4: 40 moves / 30 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Level 4: 40 moves / 30 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Level 4: 40 moves per 30 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_5
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 5: 40 moves / 60 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Level 5: 40 moves / 60 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Level 5: 40 moves per 60 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_6
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 6: 40 moves / 120 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Level 6: 40 moves / 120 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Level 6: 40 moves per 120 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_7
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 7: 40 moves / 240 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Level 7: 40 moves / 240 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Level 7: 40 moves per 240 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_8
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 8: 1 move / 15 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Level 8: 1 move / 15 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Level 8: 1 move per 15 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_9
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 9: 1 move / 60 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Level 9: 1 move / 60 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Level 9: 1 move per 60 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_10
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 10: 1 move / 600 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Level 10: 1 move / 600 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Level 10: 1 move per 600 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_PGN_PARSE_ERROR
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Error parsing game !"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Error parsing game !"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Error parsing game !"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_NO_GAMES
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "No games found !"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "No games found !"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "No games found!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_BEGINNING
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "At the beginning of the game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "At the beginning of the game"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "At the beginning of the game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_END
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "At the end of the game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "At the end of the game"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "At the end of the game"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYER
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Player"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_GNUCHESS
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "GNU Chess"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MARKED
+  desc: spoken only, for announcing chess piece marking
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Marked"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_UNMARKED
+  desc: spoken only, for announcing chess piece unmarking
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Unmarked"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_WHITE
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "White"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLACK
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Black"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CHECK
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Check!"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CAPTURES
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "captures"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CASTLE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "castle"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_KINGSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "king side"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_QUEENSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "queen side"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PAWN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Pawn"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KNIGHT
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Knight"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BISHOP
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Bishop"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ROOK
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Rook"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEEN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Queen"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KING
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "King"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAMES
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Games"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Games"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_SAVING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Saving position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Saving position"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Saving position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LOADING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Loading position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Loading position"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Loading position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_THINKING
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Thinking..."
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Thinking..."
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: ""
+  </voice>
+</phrase>
