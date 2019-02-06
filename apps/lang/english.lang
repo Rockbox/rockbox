@@ -15098,3 +15098,31 @@
     lcd_bitmap: ""
   </voice>
 </phrase>
+<phrase>
+  id: VOICE_BATTERY_BENCH_IS_ALREADY_RUNNING
+  desc: Spoken if battery bench is already running
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Battery bench is already running"
+  </voice>
+</phrase>
+<phrase>
+id: VOICE_BAT_BENCH_KEYS
+  desc: Battery bench start up message
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Press play to run battery bench or stop to cancel"
+  </voice>
+</phrase>
