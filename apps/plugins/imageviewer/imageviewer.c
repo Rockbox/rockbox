@@ -218,19 +218,19 @@ static bool set_option_grayscale(void)
 static bool set_option_dithering(void)
 {
     static const struct opt_items dithering[DITHER_NUM_MODES] = {
-        [DITHER_NONE]      = { "Off",       -1 },
-        [DITHER_ORDERED]   = { "Ordered",   -1 },
-        [DITHER_DIFFUSION] = { "Diffusion", -1 },
+        [DITHER_NONE]      = { STR(LANG_OFF) },
+        [DITHER_ORDERED]   = { STR(LANG_ORDERED) },
+        [DITHER_DIFFUSION] = { STR(LANG_DIFFUSION) },
     };
 
-    rb->set_option("Dithering (Jpeg)", &settings.jpeg_dither_mode, INT,
+    rb->set_option(rb->str(LANG_DITHERING), &settings.jpeg_dither_mode, INT,
                    dithering, DITHER_NUM_MODES, NULL);
     return false;
 }
 
-MENUITEM_FUNCTION(grayscale_item, 0, "Greyscale (Jpeg)",
+MENUITEM_FUNCTION(grayscale_item, 0, ID2P(LANG_GRAYSCALE),
                   set_option_grayscale, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(dithering_item, 0, "Dithering (Jpeg)",
+MENUITEM_FUNCTION(dithering_item, 0, ID2P(LANG_DITHERING),
                   set_option_dithering, NULL, NULL, Icon_NOICON);
 MAKE_MENU(display_menu, "Display Options", NULL, Icon_NOICON,
             &grayscale_item, &dithering_item);
@@ -260,19 +260,20 @@ static int show_menu(void) /* return 1 to quit */
     };
 
     MENUITEM_STRINGLIST(menu, "Image Viewer Menu", NULL,
-                        "Return", "Toggle Slideshow Mode",
-                        "Change Slideshow Time",
+                        ID2P(LANG_RETURN),
+                        ID2P(LANG_SLIDESHOW_MODE),
+                        ID2P(LANG_SLIDESHOW_TIME),
 #ifdef USE_PLUG_BUF
-                        "Show Playback Menu",
+                        ID2P(LANG_PLAYBACK_CONTROL),
 #endif
 #ifdef HAVE_LCD_COLOR
-                        "Display Options",
+                        ID2P(LANG_MENU_DISPLAY_OPTIONS),
 #endif
-                        "Quit");
+                        ID2P(LANG_MENU_QUIT));
 
     static const struct opt_items slideshow[2] = {
-        { "Disable", -1 },
-        { "Enable", -1 },
+        { STR(LANG_OFF) },
+        { STR(LANG_ON) },
     };
 
     result=rb->do_menu(&menu, NULL, NULL, false);
@@ -282,11 +283,11 @@ static int show_menu(void) /* return 1 to quit */
         case MIID_RETURN:
             break;
         case MIID_TOGGLE_SS_MODE:
-            rb->set_option("Toggle Slideshow", &iv_api.slideshow_enabled, BOOL,
+            rb->set_option(rb->str(LANG_SLIDESHOW_MODE), &iv_api.slideshow_enabled, BOOL,
                            slideshow , 2, NULL);
             break;
         case MIID_CHANGE_SS_MODE:
-            rb->set_int("Slideshow Time", "s", UNIT_SEC,
+            rb->set_int(rb->str(LANG_SLIDESHOW_TIME), "s", UNIT_SEC,
                         &settings.ss_timeout, NULL, 1,
                         SS_MIN_TIMEOUT, SS_MAX_TIMEOUT, NULL);
             break;
@@ -299,7 +300,7 @@ static int show_menu(void) /* return 1 to quit */
             }
             else
             {
-                rb->splash(HZ, "Cannot restart playback");
+                rb->splash(HZ, ID2P(LANG_CANNOT_RESTART_PLAYBACK));
             }
             break;
 #endif

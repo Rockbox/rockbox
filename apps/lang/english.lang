@@ -15126,3 +15126,119 @@ id: VOICE_BAT_BENCH_KEYS
     *: "Press play to run battery bench or stop to cancel"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CANNOT_RESTART_PLAYBACK
+  desc: cannot restart playback splash in imageviewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Cannot restart playback"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Cannot restart playback"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Cannot restart playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ORDERED
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Ordered"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ordered"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ordered"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFUSION
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Diffusion"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Diffusion"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Diffusion"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GRAYSCALE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Grayscale"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Grayscale"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Grayscale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_MODE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Toggle Slideshow Mode"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Toggle Slideshow Mode"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Toggle Slide show Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_TIME
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Slideshow Time"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Slideshow Time"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Slide show Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RETURN
+  desc: in various plugin menus
+  user: core
+  <source>
+    *: "Return"
+  </source>
+  <dest>
+    *: "Return"
+  </dest>
+  <voice>
+    *: "Return"
+  </voice>
+</phrase>
