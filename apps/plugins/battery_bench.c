@@ -22,6 +22,7 @@
 
 #include "version.h"
 #include "plugin.h"
+#include "lang_enum.h"
 
 
 #define BATTERY_LOG  HOME_DIR"/battery_bench.txt"
@@ -348,6 +349,8 @@ static bool exit_tsr(bool reenter)
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_puts_scroll(0, 2, "Anything else will resume");
 #endif
+    if(rb->global_settings->talk_menu)
+        rb->talk_id(VOICE_BATTERY_BENCH_IS_ALREADY_RUNNING, true);
     rb->lcd_update();
 
     while (1)
@@ -564,6 +567,8 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_puts_scroll(0, 0, "Batt.Bench.");
     rb->lcd_puts_scroll(0, 1, "PLAY/STOP");
 #endif
+    if(rb->global_settings->talk_menu)
+        rb->talk_id(VOICE_BAT_BENCH_KEYS, true);
     rb->lcd_update();
     
 #ifdef HAVE_REMOTE_LCD
