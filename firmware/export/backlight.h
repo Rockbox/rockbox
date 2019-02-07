@@ -64,10 +64,6 @@ void lcd_set_sleep_after_backlight_off(int timeout_seconds);
 void lcd_awake(void);
 #endif
 
-#ifdef HAVE_LCD_SLEEP
-void lcd_awake(void);
-#endif
-
 #else /* !HAVE_BACKLIGHT */
 #define backlight_init()
 #endif /* !HAVE_BACKLIGHT */
