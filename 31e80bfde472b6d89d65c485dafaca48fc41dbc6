@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a95c8136_47018e06",
+        "filename": "apps/gui/skin_engine/skin_engine.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-02-07T17:59:13Z",
+      "side": 1,
+      "message": "whitespace error",
+      "revId": "31e80bfde472b6d89d65c485dafaca48fc41dbc6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
