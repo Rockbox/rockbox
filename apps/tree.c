@@ -1044,7 +1044,7 @@ static int move_callback(int handle, void* current, void* new)
     if (cache->lock_count > 0)
         return BUFLIB_CB_CANNOT_MOVE;
 
-    ptrdiff_t diff = (int32_t *) new - (int32_t *) current;
+    ptrdiff_t diff = new - current;
     /* FIX_PTR makes sure to not accidentally update static allocations */
 #define FIX_PTR(x) \
     { if ((void*)x >= current && (void*)x < (current+cache->name_buffer_size)) x+= diff; }
