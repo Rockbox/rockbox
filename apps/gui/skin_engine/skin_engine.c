@@ -39,6 +39,9 @@
 #define FAILSAFENAME "rockbox_failsafe"
 
 void skin_data_free_buflib_allocs(struct wps_data *wps_data);
+#ifdef HAVE_ALBUMART
+void playback_release_aa_slot(int slot);
+#endif
 char* wps_default_skin(enum screen_type screen);
 char* default_radio_skin(enum screen_type screen);
 static bool skins_initialised = false;
@@ -169,6 +172,10 @@ void settings_apply_skins(void)
             if (!first_run)
             {
                 skin_data_free_buflib_allocs(&skins[i][j].data);
+#ifdef HAVE_ALBUMART
+                if (skins[i][j].data.playback_aa_slot >= 0)
+                    playback_release_aa_slot(skins[i][j].data.playback_aa_slot);
+#endif
 #ifdef HAVE_BACKDROP_IMAGE
                 if (skins[i][j].data.backdrop_id >= 0)
                     skin_backdrop_unload(skins[i][j].data.backdrop_id);
