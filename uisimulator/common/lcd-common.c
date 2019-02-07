@@ -26,6 +26,10 @@
 #include "config.h"
 #include "system.h"
 #include "lcd.h"
+#if defined(HAVE_TRANSFLECTIVE_LCD) && defined(HAVE_LCD_ENABLE)
+/* in uisimulator/sdl/lcd-bitmap.c and lcd-charcell.c */
+extern void sim_backlight(int value);
+#endif
 
 #ifdef HAVE_LCD_ENABLE
 static bool lcd_enabled = false;
@@ -78,7 +82,7 @@ void lcd_remote_set_invert_display(bool invert)
 void lcd_sleep(void)
 {
     lcd_sleeping = true;
-#ifdef HAVE_TRANSFLECTIVE_LCD
+#if defined(HAVE_TRANSFLECTIVE_LCD) && defined(HAVE_LCD_ENABLE)
     sim_backlight(0);   /* completely blacken the screen */
 #endif
 }
