@@ -93,6 +93,9 @@ void lcd_awake(void)
     {
         send_event(LCD_EVENT_ACTIVATION, NULL);
         lcd_sleeping = false;
+#if defined(HAVE_TRANSFLECTIVE_LCD) && defined(HAVE_LCD_SLEEP)
+        sim_backlight(0);   /* Make LCD visible again */
+#endif
     }
 }
 #endif
