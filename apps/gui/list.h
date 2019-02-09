@@ -167,6 +167,8 @@ extern void gui_synclist_set_title(struct gui_synclist * lists, char * title,
                                    enum themable_icons icon);
 extern void gui_synclist_hide_selection_marker(struct gui_synclist *lists,
                                                 bool hide);
+extern bool gui_synclist_item_is_onscreen(struct gui_synclist *lists,
+                                          enum screen_type screen, int item);
 
 #if CONFIG_CODEC == SWCODEC
 extern bool gui_synclist_keyclick_callback(int action, void* data);
