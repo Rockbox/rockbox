@@ -15242,3 +15242,20 @@ id: VOICE_BAT_BENCH_KEYS
     *: "Return"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_REC_DIR
+  desc: used in the info screen to show a recording dir
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Recording Directory"
+  </dest>
+  <voice>
+    *: none
+    recording: "Recording Directory"
+  </voice>
+</phrase>
