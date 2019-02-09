@@ -147,7 +147,14 @@ enum infoscreenorder
     INFO_DISK1, /* capacity or internal capacity/free on hotswap */
     INFO_DISK2, /* free space or external capacity/free on hotswap */
     INFO_BUFFER,
+#ifdef HAVE_RECORDING
+    INFO_REC_DIR,
+#endif
     INFO_VERSION,
+#if CONFIG_RTC
+    INFO_DATE,
+    INFO_TIME,
+#endif
     INFO_COUNT
 };
 
@@ -155,6 +162,9 @@ static const char* info_getname(int selected_item, void *data,
                                 char *buffer, size_t buffer_len)
 {
     struct info_data *info = (struct info_data*)data;
+#if CONFIG_RTC
+    struct tm *tm;
+#endif
     char s1[32];
 #if defined(HAVE_MULTIVOLUME)
     char s2[32];
@@ -178,6 +188,46 @@ static const char* info_getname(int selected_item, void *data,
             snprintf(buffer, buffer_len, "%s: %s", 
                      str(LANG_VERSION), rbversion);
             break;
+
+#if CONFIG_RTC
+        case INFO_TIME:
+            tm = get_time();
+            if (valid_time(tm))
+            {
+                snprintf(buffer, buffer_len, "%02d:%02d:%02d %s",
+                    global_settings.timeformat == 0 ? tm->tm_hour :
+                         ((tm->tm_hour + 11) % 12) + 1,
+                         tm->tm_min,
+                         tm->tm_sec,
+                         global_settings.timeformat == 0 ? "" :
+                         tm->tm_hour>11 ? "P" : "A");
+            }
+            else
+            {
+                snprintf(buffer, buffer_len, "%s", "--:--:--");
+            }
+            break;
+        case INFO_DATE:
+            tm = get_time();
+            if (valid_time(tm))
+            {
+                snprintf(buffer, buffer_len, "%s %d %d",
+                    str(LANG_MONTH_JANUARY + tm->tm_mon),
+                    tm->tm_mday,
+                    tm->tm_year+1900);
+            }
+            else
+            {
+                snprintf(buffer, buffer_len, "%s", str(LANG_UNKNOWN));
+            }
+            break;
+#endif
+
+#ifdef HAVE_RECORDING
+        case INFO_REC_DIR:
+            snprintf(buffer, buffer_len, "%s %s", str(LANG_REC_DIR), global_settings.rec_directory);
+            break;
+#endif
 
         case INFO_BUFFER: /* buffer */
         {
@@ -253,12 +303,80 @@ static int info_speak_item(int selected_item, void * data)
 {
     struct info_data *info = (struct info_data*)data;
 
+#if CONFIG_RTC
+    struct tm *tm;
+#endif
+
+    if (info->new_data)
+    {
+        volume_size(IF_MV(0,) &info->size, &info->free);
+#ifdef HAVE_MULTIVOLUME
+        if (volume_ismounted(1))
+            volume_size(1, &info->size2, &info->free2);
+        else
+            info->size2 = 0;
+#endif
+        info->new_data = false;
+    }
+
     switch (selected_item)
     {
         case INFO_VERSION: /* version */
             talk_id(LANG_VERSION, false);
             talk_spell(rbversion, true);
             break;
+
+#if CONFIG_RTC
+        case INFO_TIME:
+            tm = get_time();
+            talk_id(VOICE_CURRENT_TIME, false);
+            if (valid_time(tm))
+            {
+                talk_time(tm, true);
+            }
+            else
+            {
+                talk_id(LANG_UNKNOWN, true);
+            }
+            break;
+        case INFO_DATE:
+            tm = get_time();
+            if (valid_time(tm))
+            {
+                talk_date(get_time(), true);
+            }
+            else
+            {
+                talk_id(LANG_UNKNOWN, true);
+            }
+            break;
+#endif
+
+#ifdef HAVE_RECORDING
+        case INFO_REC_DIR:
+            talk_id(LANG_REC_DIR, false);
+            if (global_settings.rec_directory && global_settings.rec_directory[0])
+            {
+                long *pathsep = NULL;
+                char rec_directory[MAX_PATHNAME+1];
+                char *s;
+                strcpy(rec_directory, global_settings.rec_directory);
+                s = rec_directory;
+                if ((strlen(s) > 1) && (s[strlen(s) - 1] == '/'))
+                    s[strlen(s) - 1] = 0;
+                while (s)
+                {
+                    s = strchr(s + 1, '/');
+                    if (s)
+                        s[0] = 0;
+                    talk_dir_or_spell(rec_directory, pathsep, true);
+                    if (s)
+                        s[0] = '/';
+                    pathsep = TALK_IDARRAY(VOICE_CHAR_SLASH);
+                }
+            }
+            break;
+#endif
 
         case INFO_BUFFER: /* buffer */
         {
@@ -271,22 +389,38 @@ static int info_speak_item(int selected_item, void * data)
 #if CONFIG_CHARGING == CHARGING_SIMPLE
             /* Only know if plugged */
             if (charger_inserted())
+            {
                 talk_id(LANG_BATTERY_CHARGE, true);
+                if (battery_level() >= 0)
+                    talk_value(battery_level(), UNIT_PERCENT, true);
+            }
             else
 #elif CONFIG_CHARGING >= CHARGING_MONITOR
 #ifdef ARCHOS_RECORDER
             /* Report the particular algorithm state */
             if (charge_state == CHARGING)
+            {
                 talk_id(LANG_BATTERY_CHARGE, true);
+                if (battery_level() >= 0)
+                    talk_value(battery_level(), UNIT_PERCENT, true);
+            }
             else if (charge_state == TOPOFF)
                 talk_id(LANG_BATTERY_TOPOFF_CHARGE, true);
             else if (charge_state == TRICKLE)
+            {
                 talk_id(LANG_BATTERY_TRICKLE_CHARGE, true);
+                if (battery_level() >= 0)
+                    talk_value(battery_level(), UNIT_PERCENT, true);
+            }
             else
 #else /* !ARCHOS_RECORDER */
             /* Go by what power management reports */
             if (charging_state())
+            {
                 talk_id(LANG_BATTERY_CHARGE, true);
+                if (battery_level() >= 0)
+                    talk_value(battery_level(), UNIT_PERCENT, true);
+            }
             else
 #endif /* ARCHOS_RECORDER */
 #endif /* CONFIG_CHARGING = */
@@ -349,12 +483,22 @@ static int info_action_callback(int action, struct gui_synclist *lists)
         splash(0, ID2P(LANG_SCANNING_DISK));
         for (i = 0; i < NUM_VOLUMES; i++)
             volume_recalc_free(IF_MV(i));
-#else
-        (void) lists;
 #endif
         gui_synclist_speak_item(lists);
         return ACTION_REDRAW;
     }
+#if CONFIG_RTC
+    else if (action == ACTION_NONE)
+    {
+        static int last_redraw = 0;
+        if (gui_synclist_item_is_onscreen(lists, 0, INFO_TIME)
+            && TIME_AFTER(current_tick, last_redraw + HZ*5))
+        {
+            last_redraw = current_tick;
+            return ACTION_REDRAW;
+        }
+    }
+#endif
     return action;
 }
 static int show_info(void)
