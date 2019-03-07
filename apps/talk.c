@@ -883,6 +883,9 @@ void talk_init(void)
         mutex_init(&queue_mutex);
 #endif /* CONFIG_CODEC == SWCODEC */
         mutex_init(&read_buffer_mutex);
+#ifndef PLATFORM_HAS_VOLUME_CHANGE
+        sound_set_volume(global_settings.volume);
+#endif
     }
     talk_initialized = true;
     strlcpy((char *)last_lang, (char *)global_settings.lang_file,
