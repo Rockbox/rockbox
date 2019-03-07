@@ -816,6 +816,9 @@ void talk_init(void)
     {
         mutex_init(&queue_mutex);
         mutex_init(&read_buffer_mutex);
+#ifndef PLATFORM_HAS_VOLUME_CHANGE
+        sound_set_volume(global_settings.volume);
+#endif
     }
 
     talk_force_shutup();  /* In case we have something speaking! */
