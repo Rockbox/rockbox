@@ -585,7 +585,7 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
     {
         /* logf("context = %x",context); */
 #if (BUTTON_REMOTE != 0)
-        if (has_flag(cur->button, BUTTON_REMOTE))
+        if ((cur->button & BUTTON_REMOTE) != 0)
         {
             context |= CONTEXT_REMOTE;
         }
