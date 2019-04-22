@@ -24,7 +24,7 @@ if [ "$1" = "--new-only" ]; then
 fi
 
 # list interesting directories
-for dir in `find "$1" -maxdepth 1 -name "nw-*" -or -name "nwz-*"`
+for dir in `find "$1" -maxdepth 1 -name "nw-*" -or -name "nwz-*" -or -name "dmp-*"`
 do
     # extract codename
     codename=`basename "$dir"`

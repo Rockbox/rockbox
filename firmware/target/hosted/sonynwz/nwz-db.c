@@ -219,6 +219,7 @@ struct nwz_model_info_t nwz_model[NWZ_MODEL_COUNT] =
     { 0x24000006, "NW-A47" },
     { 0x25000004, "NW-A55" },
     { 0x25000006, "NW-A57" },
+    { 0x26000008, "DMP-Z1" },
 };
 
 static int nvp_index_06a782[NWZ_NVP_COUNT] =
@@ -1887,6 +1888,8 @@ static unsigned long models_nw_zx300[] = { 0x23000004, 0x23000006, 0x23000007 };
 
 static unsigned long models_nwz_noname[] = { 0x5010002, 0x5010004, 0x5010005 };
 
+static unsigned long models_dmp_z1[] = { 0x26000008 };
+
 struct nwz_series_info_t nwz_series[NWZ_SERIES_COUNT] =
 {
     { "nwz-a10", "NWZ-A10 Series", 10, models_nwz_a10, &nvp_index_92faee },
@@ -1928,4 +1931,5 @@ struct nwz_series_info_t nwz_series[NWZ_SERIES_COUNT] =
     { "nw-zx100", "NW-ZX100 Series", 6, models_nw_zx100, &nvp_index_92faee },
     { "nw-zx300", "NW-ZX300 Series", 3, models_nw_zx300, &nvp_index_139d65 },
     { "nwz-noname", "NONAME", 3, models_nwz_noname, 0 },
+    { "dmp-z1", "DMP-Z1 Series", 1, models_dmp_z1, &nvp_index_94b5fc },
 };

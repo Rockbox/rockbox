@@ -46,12 +46,12 @@ with open('series.txt') as fp:
 g_hash_nvp = dict() # hash -> nvp
 g_nvp_hash = dict() # codename -> hash
 HASH_SIZE=6
-map_files = glob.glob('nvp/nw*.txt')
+map_files = glob.glob('nvp/nw*.txt') + glob.glob('nvp/dmp*.txt')
 for f in map_files:
     h = hashlib.md5()
     h.update(open(f, "rb").read())
     hash = h.hexdigest()
-    codename = re.search('(nw.*)\.txt', f).group(1)
+    codename = re.search('nvp/([^\.]*)\.txt', f).group(1)
     # sanity check
     if not (codename in g_series_codename):
         print("Warning: file %s does not have a match series in series.txt" % f)
