@@ -59,7 +59,7 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
         unsigned long i;
         int type;
         
-        if (read(fd, buf, 4) < 0)
+        if (read(fd, buf, 4) != 4)
         {
             return rc;
         }
@@ -73,7 +73,7 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
         {
             unsigned long totalsamples;
             
-            if (i >= sizeof(id3->path) || read(fd, buf, i) < 0)
+            if (i >= sizeof(id3->path) || read(fd, buf, i) != i)
             {
                 return rc;
             }
