@@ -19,6 +19,7 @@ src/misc.c
 src/penrose.c
 src/printing.c
 src/random.c
+src/sort.c
 src/tdq.c
 src/tree234.c
 src/version.c
