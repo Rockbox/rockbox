@@ -17,6 +17,9 @@ from some minor adjustments to make them compile and run happily on
 Rockbox. The majority of the rockbox-specific code is found in
 rockbox.c, with some minor stuff in rbwrappers.c and rbmalloc.c.
 
+NOTE: the build makefile (puzzles.make) automatically includes
+`rbcompat.h` when compiling! Check there when things break.
+
 Help feature
 ============
 

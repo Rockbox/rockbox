@@ -1915,7 +1915,7 @@ static void zoom(void)
     zoom_fb = smalloc(zoom_w * zoom_h * sizeof(fb_data));
     if(!zoom_fb)
     {
-        rb->splash(HZ, "OOM");
+        rb->splash(HZ, "Out of memory. Cannot zoom in.");
         return;
     }
 
@@ -2412,6 +2412,8 @@ static int do_preset_menu(struct preset_menu *menu, char *title, int selected)
     }
 }
 
+/* Let user choose from game presets. Returns true if the user chooses
+ * one (in which case the caller should start a new game. */
 static bool presets_menu(void)
 {
     /* figure out the index of the current preset
@@ -2692,6 +2694,17 @@ static void reset_drawing(void)
     rb->lcd_set_background(BG_COLOR);
 }
 
+/* Make a new game, but tell the user through a splash so they don't
+ * think we're locked up. Also performs new-game initialization
+ * specific to Rockbox. */
+static void new_game_notify(void)
+{
+    rb->splash(0, "Please wait...");
+    midend_new_game(me);
+    fix_size();
+    rb->lcd_update();
+}
+
 static int pause_menu(void)
 {
 #define static auto
@@ -2733,8 +2746,7 @@ static int pause_menu(void)
             quit = true;
             break;
         case 1:
-            midend_new_game(me);
-            fix_size();
+            new_game_notify();
             quit = true;
             break;
         case 2:
@@ -2779,8 +2791,7 @@ static int pause_menu(void)
         case 10:
             if(presets_menu())
             {
-                midend_new_game(me);
-                fix_size();
+                new_game_notify();
                 reset_drawing();
                 clear_and_draw();
                 quit = true;
@@ -2794,8 +2805,7 @@ static int pause_menu(void)
         case 12:
             if(config_menu())
             {
-                midend_new_game(me);
-                fix_size();
+                new_game_notify();
                 reset_drawing();
                 clear_and_draw();
                 quit = true;
@@ -2948,12 +2958,14 @@ static void tune_input(const char *name)
     input_settings.numerical_chooser = string_in_list(name, number_chooser_games);
 }
 
-static const char *init_for_game(const game *gm, int load_fd, bool draw)
+static const char *init_for_game(const game *gm, int load_fd)
 {
     me = midend_new(NULL, gm, &rb_drawing, NULL);
 
     if(load_fd < 0)
-        midend_new_game(me);
+    {
+        new_game_notify();
+    }
     else
     {
         const char *ret = midend_deserialize(me, read_wrapper, (void*) load_fd);
@@ -2966,16 +2978,9 @@ static const char *init_for_game(const game *gm, int load_fd, bool draw)
     mouse_x = LCD_WIDTH / 2;
     mouse_y = LCD_HEIGHT / 2;
 
-    fix_size();
-
     init_colors();
 
     reset_drawing();
-
-    if(draw)
-    {
-        clear_and_draw();
-    }
 
     return NULL;
 }
@@ -3160,7 +3165,7 @@ static bool load_game(void)
 
         if(!strcmp(game, thegame.name))
         {
-            ret = init_for_game(&thegame, fd, false);
+            ret = init_for_game(&thegame, fd);
             if(ret)
             {
                 rb->splash(HZ, ret);
@@ -3254,7 +3259,7 @@ static void puzzles_main(void)
     if(!load_success)
     {
         /* our main menu expects a ready-to-use midend */
-        init_for_game(&thegame, -1, false);
+        init_for_game(&thegame, -1);
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -3294,14 +3299,17 @@ static void puzzles_main(void)
         switch(rb->do_menu(&menu, &sel, NULL, false))
         {
         case 0:
-            clear_and_draw();
+            /* Loaded. Run the game! */
             goto game_loop;
         case 1:
             if(!load_success)
             {
-                clear_and_draw();
+                /* Failed to load (so midend is already initialized
+                 * with new game) */
                 goto game_loop;
             }
+
+            /* Otherwise we need to generate a new game. */
             quit = true;
             break;
         case 2:
@@ -3316,22 +3324,14 @@ static void puzzles_main(void)
         case 5:
             if(presets_menu())
             {
-                midend_new_game(me);
-                fix_size();
-                init_colors();
-                reset_drawing();
-                clear_and_draw();
+                new_game_notify();
                 goto game_loop;
             }
             break;
         case 6:
             if(config_menu())
             {
-                midend_new_game(me);
-                fix_size();
-                init_colors();
-                reset_drawing();
-                clear_and_draw();
+                new_game_notify();
                 goto game_loop;
             }
             break;
@@ -3350,16 +3350,19 @@ static void puzzles_main(void)
 
     while(1)
     {
-        init_for_game(&thegame, -1, true);
+        init_for_game(&thegame, -1);
+    game_loop:
+        reset_drawing();
+        clear_and_draw();
 
         last_keystate = 0;
         accept_input = true;
 
-    game_loop:
         while(1)
         {
             int button = process_input(timer_on ? TIMER_INTERVAL : -1, true);
 
+            /* special codes are < 0 */
             if(button < 0)
             {
                 rb_unclip(NULL);
@@ -3393,6 +3396,7 @@ static void puzzles_main(void)
                 }
             }
 
+            /* we have a game input */
             if(button)
                 midend_process_key(me, 0, 0, button);
 
@@ -3403,6 +3407,7 @@ static void puzzles_main(void)
 
             draw_title(true); /* will draw to fb */
 
+            /* Blit mouse but immediately clear it. */
             if(mouse_mode)
                 draw_mouse();
 

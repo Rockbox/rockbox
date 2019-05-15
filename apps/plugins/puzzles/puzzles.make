@@ -40,7 +40,7 @@ PUZZLESFLAGS = -I$(PUZZLES_SRCDIR)/dummy $(filter-out			\
 		-Wno-strict-aliasing -DFOR_REAL				\
 		-I$(PUZZLES_SRCDIR)/src -I$(PUZZLES_SRCDIR) -include	\
 		$(PUZZLES_SRCDIR)/rbcompat.h -ffunction-sections	\
-		-fdata-sections -w
+		-fdata-sections -w -Wl,--gc-sections
 
 $(PUZZLES_OBJDIR)/sgt-%.rock: $(PUZZLES_OBJDIR)/src/%.o $(PUZZLES_OBJDIR)/help/%.o $(PUZZLES_SHARED_OBJ) $(TLSFLIB)
 	$(call PRINTS,LD $(@F))$(CC) $(PLUGINFLAGS) -o $(PUZZLES_OBJDIR)/$*.elf \
