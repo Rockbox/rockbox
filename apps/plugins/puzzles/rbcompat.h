@@ -49,6 +49,7 @@ double acos_wrapper(double x);
 #define getenv getenv_wrapper
 #define malloc tlsf_malloc
 #define memchr rb->memchr
+#define memswap puzzles_memswap
 #define pow pow_wrapper
 #define printf LOGF
 #define puts puts_wrapper
