@@ -31,7 +31,7 @@
 #include "string.h"
 
 #define SD_DMA_ENABLE 1
-#define SD_DMA_INTERRUPT 1
+#define SD_DMA_INTERRUPT 0
 
 #if NUM_DRIVES > 2
 #error "JZ4760 SD driver supports NUM_DRIVES <= 2 only"
