@@ -114,27 +114,33 @@ extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
 
 void lcd_update(void)
 {
-    /* Copy the Rockbox framebuffer to the second framebuffer */
-    lcd_copy_buffer_rect(LCD_FRAMEBUF_ADDR(0, 0), FBADDR(0,0),
-                         LCD_WIDTH*LCD_HEIGHT, 1);
-    redraw();
+    if (lcd_active())
+    {
+        /* Copy the Rockbox framebuffer to the second framebuffer */
+        lcd_copy_buffer_rect(LCD_FRAMEBUF_ADDR(0, 0), FBADDR(0,0),
+                             LCD_WIDTH*LCD_HEIGHT, 1);
+        redraw();
+    }
 }
 
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    fb_data *dst = LCD_FRAMEBUF_ADDR(x, y);
-    fb_data * src = FBADDR(x,y);
+    if (lcd_active())
+    {
+        fb_data *dst = LCD_FRAMEBUF_ADDR(x, y);
+        fb_data * src = FBADDR(x,y);
 
-    /* Copy part of the Rockbox framebuffer to the second framebuffer */
-    if (width < LCD_WIDTH)
-    {
-        /* Not full width - do line-by-line */
-        lcd_copy_buffer_rect(dst, src, width, height);
+        /* Copy part of the Rockbox framebuffer to the second framebuffer */
+        if (width < LCD_WIDTH)
+        {
+            /* Not full width - do line-by-line */
+            lcd_copy_buffer_rect(dst, src, width, height);
+        }
+        else
+        {
+            /* Full width - copy as one line */
+            lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
+        }
+        redraw();
     }
-    else
-    {
-        /* Full width - copy as one line */
-        lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
-    }
-    redraw();
 }
