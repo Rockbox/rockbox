@@ -21,8 +21,6 @@
 
 #include "plugin.h"
 
-
-
 #if PLUGIN_BUFFER_SIZE <= 0x8000
 #define BUF_SIZE (1<<12) /* 16 KB = (1<<12)*sizeof(int) */
 #elif PLUGIN_BUFFER_SIZE <= 0x10000
@@ -39,10 +37,17 @@ static int loop_repeat_dram = LOOP_REPEAT_DRAM;
 static volatile int buf_dram[BUF_SIZE]           MEM_ALIGN_ATTR;
 
 #if defined(PLUGIN_USE_IRAM)
+
+#if PLUGIN_BUFFER_SIZE <= 0x8000
+#define IBUF_SIZE (1<<12) /* 16 KB = (1<<12)*sizeof(int) */
+#else
+#define IBUF_SIZE (1<<13) /* 32 KB = (1<<13)*sizeof(int) */
+#endif
+
 #define LOOP_REPEAT_IRAM 256
 #define MAX_REPEAT_IRAM  512
 static int loop_repeat_iram = LOOP_REPEAT_DRAM;
-static volatile int buf_iram[BUF_SIZE] IBSS_ATTR MEM_ALIGN_ATTR;
+static volatile int buf_iram[IBUF_SIZE] IBSS_ATTR MEM_ALIGN_ATTR;
 #endif
 
 /* (Byte per loop * loops)>>20 * ticks per s * 10 / ticks = dMB per s */
