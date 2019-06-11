@@ -50,10 +50,10 @@ static const struct button_mapping button_context_standard[]  = {
 
     { ACTION_STD_KEYLOCK,               BUTTON_POWER,                      BUTTON_NONE },
 
-/*    { ACTION_STD_QUICKSCREEN,           BUTTON_REC|BUTTON_SELECT,          BUTTON_REC },
-    { ACTION_STD_REC,                   BUTTON_REC|BUTTON_REPEAT,          BUTTON_REC },
-    { ACTION_STD_HOTKEY,                BUTTON_REC|BUTTON_SELECT,          BUTTON_REC },
-   on some gesture later? */
+    { ACTION_STD_QUICKSCREEN,           BUTTON_BOTTOMLEFT|BUTTON_REL,      BUTTON_BOTTOMLEFT },
+//  { ACTION_STD_REC,                   BUTTON_REC|BUTTON_REPEAT,          BUTTON_REC },
+    { ACTION_STD_HOTKEY,                BUTTON_BOTTOMRIGHT|BUTTON_REL,     BUTTON_BOTTOMRIGHT },
+//   on some gesture later?
 
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
@@ -155,12 +155,12 @@ static const struct button_mapping button_context_list[]  = {
     { ACTION_LIST_VOLDOWN,              BUTTON_VOL_DOWN,                   BUTTON_NONE },
     { ACTION_LIST_VOLDOWN,              BUTTON_VOL_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
 #endif
-    { ACTION_LISTTREE_PGUP,             BUTTON_BOTTOMLEFT,                 BUTTON_NONE },
+//  { ACTION_LISTTREE_PGUP,             BUTTON_BOTTOMLEFT,                 BUTTON_NONE },
     { ACTION_LISTTREE_PGUP,             BUTTON_BOTTOMLEFT|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_LISTTREE_PGDOWN,           BUTTON_BOTTOMRIGHT,                BUTTON_NONE },
+//  { ACTION_LISTTREE_PGDOWN,           BUTTON_BOTTOMRIGHT,                BUTTON_NONE },
     { ACTION_LISTTREE_PGDOWN,           BUTTON_BOTTOMRIGHT|BUTTON_REPEAT,  BUTTON_NONE },
-/*#ifdef HAVE_HOTKEY on some gesture later?
-    { ACTION_TREE_HOTKEY,               BUTTON_BACK|BUTTON_REL,            BUTTON_BACK|BUTTON_REPEAT },
+#ifdef HAVE_HOTKEY //on some gesture later?
+    { ACTION_TREE_HOTKEY,               BUTTON_BOTTOMRIGHT|BUTTON_REL,     BUTTON_BOTTOMRIGHT },
 #endif*/
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
