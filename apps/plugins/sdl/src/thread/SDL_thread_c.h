@@ -35,8 +35,6 @@
 #include "os2/SDL_systhread_c.h"
 #elif SDL_THREAD_PTH
 #include "pth/SDL_systhread_c.h"
-#elif SDL_THREAD_PTHREAD
-#include "pthread/SDL_systhread_c.h"
 #elif SDL_THREAD_SPROC
 #include "irix/SDL_systhread_c.h"
 #elif SDL_THREAD_WIN32
