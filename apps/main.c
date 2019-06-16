@@ -190,12 +190,14 @@ int main(void)
 #else
                                 PLUGIN_GAMES_DIR
 #endif
-                                    "/puzzles.rock";
+                                    "/duke3d.rock";
         if(file_exists(file)) /* no complaint if it doesn't exist */
         {
             plugin_load(file, NULL); /* start if it does */
             return;
         }
+        else
+            return;
     }
 #endif /* #ifdef AUTOROCK */
 

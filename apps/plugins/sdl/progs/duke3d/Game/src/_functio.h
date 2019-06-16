@@ -114,7 +114,7 @@ extern "C" {
         {  "Turn_Left",              "Left",  ""  },
         {  "Turn_Right",             "Right",  ""  },
         {  "Strafe",                 "",  ""  },
-        {  "Fire",                   "Enter",  ""  },
+        {  "Fire",                   "",  ""  },
         {  "Open",                   "Up",  ""  },
         {  "Run",                    "",  ""  },
         {  "AutoRun",                "",  ""  },

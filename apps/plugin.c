@@ -157,12 +157,6 @@ static void plugin_check_open_close__exit(void)
 
     logf("Plugin '%s' leaks file handles", current_plugin);
 
-    static const char *lines[] =
-        { ID2P(LANG_PLUGIN_ERROR), "#leak-file-handles" };
-    static const struct text_message message = { lines, 2 };
-    button_clear_queue(); /* Empty the keyboard buffer */
-    gui_syncyesno_run(&message, NULL, NULL);
-
     FOR_EACH_BITARRAY_SET_BIT(&open_files_bitmap, fildes)
         WRAPPER(close)(fildes);
 }
