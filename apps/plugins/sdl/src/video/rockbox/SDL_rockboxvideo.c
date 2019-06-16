@@ -195,6 +195,25 @@ void ROCKBOX_PumpEvents(_THIS)
     unsigned pressed = button & ~last_keystate;
     last_keystate = button;
 
+    static int i = 0;
+
+    if(i%10==0)
+    {
+        rb_press(rb_keymap.fire, BTN_FIRE);
+    }
+
+    if(i%10 == 5)
+        rb_release(rb_keymap.fire, BTN_FIRE);
+    i++;
+
+    if(i == 200)
+    {
+        rb->screen_dump();
+        exit(0);
+    }
+
+    LOGF("%d", i);
+
 #ifndef HAS_BUTTON_HOLD
     /* button combo for menu */
     if(button == BTN_PAUSE)

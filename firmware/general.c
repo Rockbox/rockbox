@@ -101,64 +101,12 @@ char *create_numbered_filename(char *buffer, const char *path,
                                const char *prefix, const char *suffix,
                                int numberlen IF_CNFN_NUM_(, int *num))
 {
-    DIR *dir;
-    struct dirent *entry;
-    int max_num;
-    int pathlen;
-    int prefixlen = strlen(prefix);
-    int suffixlen = strlen(suffix);
-
     if (buffer != path)
         strlcpy(buffer, path, MAX_PATH);
 
-    pathlen = strlen(buffer);
-
-#ifdef IF_CNFN_NUM
-    if (num && *num >= 0)
-    {
-        /* number specified */
-        max_num = *num;
-    }
-    else
-#endif
-    {
-        /* automatic numbering */
-        max_num = 0;
-
-    dir = opendir(pathlen ? buffer : HOME_DIR);
-    if (!dir)
-        return NULL;
-
-    while ((entry = readdir(dir)))
-    {
-        int curr_num, namelen;
-
-        if (strncasecmp((char *)entry->d_name, prefix, prefixlen))
-            continue;
-            
-        namelen = strlen((char *)entry->d_name);
-        if ((namelen <= prefixlen + suffixlen)
-            || strcasecmp((char *)entry->d_name + namelen - suffixlen, suffix))
-            continue;
-
-        curr_num = atoi((char *)entry->d_name + prefixlen);
-        if (curr_num > max_num)
-            max_num = curr_num;
-    }
-
-    closedir(dir);
-    }
-
-    max_num++;
-
-    snprintf(buffer + pathlen, MAX_PATH - pathlen, "/%s%0*d%s", prefix,
-             numberlen, max_num, suffix);
-
-#ifdef IF_CNFN_NUM
-    if (num)
-        *num = max_num;
-#endif
-
+    int pathlen = strlen(buffer);
+    snprintf(buffer + pathlen, MAX_PATH - pathlen,
+             "/ss-2048-%dx%dx%d%s", LCD_WIDTH, LCD_HEIGHT, LCD_DEPTH, suffix);
     return buffer;
 }
 
@@ -187,9 +135,7 @@ char *create_datetime_filename(char *buffer, const char *path,
 
     pathlen = strlen(buffer);
     snprintf(buffer + pathlen, MAX_PATH - pathlen,
-             "/%s%02d%02d%02d-%02d%02d%02d%s", prefix,
-             tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday,
-             tm->tm_hour, tm->tm_min, tm->tm_sec, suffix);
+             "/ss-quake-%dx%dx%d%s", LCD_WIDTH, LCD_HEIGHT, LCD_DEPTH, suffix);
 
     return buffer;
 }

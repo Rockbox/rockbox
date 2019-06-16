@@ -28,8 +28,7 @@ OTHER_INC += -I$(SDL_SRCDIR)/include
 # precedence
 # some of these are for Quake only
 SDLFLAGS = -I$(SDL_SRCDIR)/include $(filter-out -O%,$(PLUGINFLAGS))		\
--O3 -Wno-unused-parameter -Xpreprocessor -Wno-undef -Wcast-align	\
--ffast-math -funroll-loops -fomit-frame-pointer -fexpensive-optimizations	\
+-O1 -Wno-unused-parameter -Xpreprocessor -Wno-undef -Wcast-align	\
 -D_GNU_SOURCE=1 -D_REENTRANT -DSDL -DELF -w # disable all warnings
 
 # use FPU on ARMv6

@@ -71,7 +71,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "mp3_playback.h"
 #include "root_menu.h"
 #include "talk.h"
-#include "lang_enum.h"
+//#include "lang_enum.h"
 #ifdef RB_PROFILE
 #include "profile.h"
 #endif
@@ -991,6 +991,7 @@ struct plugin_api {
     void (*audio_hard_stop)(void);
 #endif
 
+    void (*screen_dump)(void);
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */

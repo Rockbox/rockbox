@@ -1,0 +1,1 @@
+cat ../rockbox-www/buildserver/builds | grep sim | awk 'BEGIN { FS=":"; } { system("rm -rf build && mkdir build && cd build && "$7 " -j9 && make install && mkdir -p simdisk/.rockbox/quake && cp -R ~/quake/QUAKE_SW/id1 simdisk/.rockbox/quake && xvfb-run ./rockboxui && cp simdisk/*.bmp ../screenshots/ && cd .. && rm -rf build"); }'

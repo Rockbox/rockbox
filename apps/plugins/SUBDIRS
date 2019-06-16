@@ -1,12 +1,4 @@
-/* For all targets */
-shortcuts
-text_viewer
 
-/* For various targets... */
-
-#if CONFIG_RTC
-clock
-#endif
 
 /* For all targets with a bitmap display */
 #ifdef HAVE_LCD_BITMAP
@@ -14,92 +6,8 @@ clock
 /* color horizontal-stride LCDs */
 #if defined(HAVE_LCD_COLOR) && \
     (!defined(LCD_STRIDEFORMAT) || (LCD_STRIDEFORMAT != VERTICAL_STRIDE))
-xworld
 
-/* for duke3d, wolf3d and quake */
-#if (PLUGIN_BUFFER_SIZE > 0x14000) && (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(CPU_ARM)
 sdl
+
 #endif
-
-puzzles
-#endif
-
-#if    (CONFIG_KEYPAD != ONDIO_PAD) /* not enough buttons */ \
-    && (CONFIG_KEYPAD != SANSA_M200_PAD) /* not enough buttons */ \
-    && (CONFIG_KEYPAD != HM60X_PAD) /* not enough buttons */ \
-    && (LCD_PIXELFORMAT != HORIZONTAL_PACKING) /* TODO */ \
-    && (LCD_PIXELFORMAT != VERTICAL_INTERLEAVED) /* TODO */ \
-    && (defined(HAVE_LCD_COLOR) || (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) || \
-                                   (LCD_HEIGHT == 128) && (LCD_DEPTH == 2))
-rockboy
-#endif
-
-#if defined(HAVE_TAGCACHE)
-pictureflow
-#endif
-
-#if CONFIG_CODEC == SWCODEC && PLUGIN_BUFFER_SIZE > 0x20000
-fft
-#endif
-
-chessbox
-fractals
-imageviewer
-sudoku
-reversi
-goban
-
-/* setjmp/longjmp are not implemented on sh */
-#if (CONFIG_CPU != SH7034)
-frotz
-#endif
-
-#ifndef OLYMPUS_MROBE_500
-#if PLUGIN_BUFFER_SIZE > 0x40000 || PLUGIN_BUFFER_SIZE <= 0x20000 /* overlay */
-zxbox
-#endif
-#endif
-
-#endif /* HAVE_LCD_BITMAP */
-
-/* For all big enough colour screens, iriver H1x0 and iAudio M5 */
-#if defined(HAVE_LCD_COLOR) && ( (LCD_HEIGHT >= 90 && LCD_WIDTH >=116) \
-                              || (LCD_HEIGHT >= 96 && LCD_WIDTH >=75) ) \
- || defined(IRIVER_H100_SERIES) || defined(IAUDIO_M5)
-pacbox
-#endif
-
-#if (defined(HAVE_LCD_COLOR) || defined(MROBE_100) || defined(SANSA_CLIPPLUS) \
-    || defined(SANSA_CLIPV2) || (LCD_DEPTH == 2)) \
-    && (MEMORYSIZE > 2 && !defined(RB_PROFILE))
-doom
-#endif
-
-/* For all the swcodec targets */
-#if CONFIG_CODEC == SWCODEC
-
-#if MEMORYSIZE > 2 /* we need a lot of RAM for instruments */
-midi
-mikmod
-#endif
-
-/* beatbox */
-#if defined(IRIVER_H300_SERIES) || defined(IRIVER_H100_SERIES) || \
-    (CONFIG_KEYPAD == SANSA_FUZE_PAD) || (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-    (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-    (CONFIG_KEYPAD == IPOD_1G2G_PAD || CONFIG_KEYPAD == SAMSUNG_YPR0_PAD)
-/* PDBox is confirmed to run on these player models. */
-pdbox
-#endif
-
-#if !defined(RB_PROFILE) && MEMORYSIZE > 2  /* mpegplayer allocates at least 2MB of RAM */
-mpegplayer
-#endif
-
-#endif /* CONFIG_CODEC == SWCODEC */
-
-/* Lua needs at least 160 KB to work in */
-#if PLUGIN_BUFFER_SIZE >= 0x80000
-lua
-lua_scripts
 #endif
