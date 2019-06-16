@@ -1,12 +1,16 @@
 \subsection{Duke3D}
 
+\screenshot{plugins/images/ss-duke3d}{``Hollywood Holocaust'', the
+  first level of Duke Nukem 3D}{fig:Duke3D}
+
 This is a port of Duke Nukem 3D, derived from Fabien Sanglard's
 Chocolate Duke.
 
 \subsubsection{Installation}
-The \fname{.GRP} and \fname{.CON} files from an original installation of
-  the game must be placed in the \fname{/.rockbox/duke3d/} on your
-  device.
+The \fname{.GRP} and \fname{.CON} files from an original installation
+of the game must be placed in the \fname{/.rockbox/duke3d/} on your
+device. The shareware files work as well, and are available at
+\wikilink{PluginDuke3D}.
 
 \subsubsection{Music}
 In-game music will not work by default. For it to work, you must
@@ -16,6 +20,9 @@ a \fname{/.rockbox/timidity/timidity.cfg} file located in this
 directory, along with the instrument files. You must edit the
 \fname{.cfg} file so that all the path names are absolute (i.e. in the
 form \fname{/.rockbox/timidity/instruments/*.cfg}).
+
+As above, there is a free patchset available from
+\wikilink{PluginDuke3D}.
 
 \subsubsection{Video}
 Rotation of the video output is possible by choosing the correct video
@@ -36,3 +43,8 @@ Some devices will low memory or large GRP files will prevent the game
 from completely caching the GRP file in RAM, which could lead to disk
 reads during gameplay. This might cause the game to lag slightly when
 it happens, which is normal. The game should resume in a second or so.
+
+On other devices, large GRP files will render the game completely
+unplayable. If this occurs, try using the smaller shareware GRP. If
+this still fails, then please see Appendix \ref{sec:feedback} for
+instructions to report a bug.
