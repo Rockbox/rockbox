@@ -537,7 +537,7 @@ do  -- attempt to get stats to fit on screen
 end
 
 if HAS_TOUCHSCREEN then
-    rb.touchscreen_set_mode(rb.TOUCHSCREEN_POINT)
+    rb.touchscreen_mode(rb.TOUCHSCREEN_POINT)
 end
 
 rb.backlight_force_on()
