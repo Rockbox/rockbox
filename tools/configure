@@ -271,6 +271,13 @@ simcc () {
  fibers=""
  endian="" # endianess of the dap doesnt matter here
 
+ # build a 32-bit simulator
+ if [ "$ARG_32BIT" = "1" ]; then
+     echo "Building 32-bit simulator"
+     GCCOPTS="$GCCOPTS -m32"
+     LDOPTS="$LDOPTS -m32"
+ fi
+
  # default output binary name, don't override app_get_platform()
  if [ "$app_type" != "sdl-app" ]; then
     output="rockboxui"
@@ -1361,6 +1368,7 @@ help() {
     --no-sdl-threads  Disallow use of SDL threads. This prevents the default
                       behavior of falling back to them if no native thread
                       support was found.
+    --32-bit          Force a 32-bit simulator (use with --sdl-threads for duke3d)
     --prefix          Target installation directory
     --compiler-prefix Override compiler prefix (inherently dangerous)
     --help            Shows this message (must not be used with other options)
@@ -1383,6 +1391,7 @@ ARG_VOICE=
 ARG_ARM_THUMB=
 ARG_PREFIX="$PREFIX"
 ARG_THREAD_SUPPORT=
+ARG_32BIT=
 err=            
 for arg in "$@"; do
 	case "$arg" in
@@ -1401,6 +1410,7 @@ for arg in "$@"; do
 		--voice=*)    ARG_VOICE=`echo "$arg" | cut -d = -f 2`;;
 		--thumb)      ARG_ARM_THUMB=1;;
 		--no-thumb)   ARG_ARM_THUMB=0;;
+		--32-bit)     ARG_32BIT=1;;
         --sdl-threads)ARG_THREAD_SUPPORT=1;;
         --no-sdl-threads)
                       ARG_THREAD_SUPPORT=0;;
