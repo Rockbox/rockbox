@@ -64,7 +64,7 @@ cactype cac[MAXCACHEOBJECTS];
 int32_t lockrecip[200];
 
 // TC game directory
-char  game_dir[512] = "/.rockbox/duke3d";
+char  game_dir[512] = "/home/franklin/duke3d_data";
 
 void initcache(uint8_t* dacachestart, int32_t dacachesize)
 {

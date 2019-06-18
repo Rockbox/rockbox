@@ -192,6 +192,8 @@ enum plugin_status plugin_start(const void *param)
     }
 #endif
 
+    printf("Initializing application with %d bytes of heap", sz);
+
     /* wipe sig */
     rb->memset(audiobuf, 0, sz);
     if(init_memory_pool(sz, audiobuf) == (size_t) -1)

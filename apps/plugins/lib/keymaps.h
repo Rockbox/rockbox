@@ -240,14 +240,14 @@
 #define BTN_PAUSE        BUTTON_POWER
 
 #else
-#error Unsupported keypad
-#endif
 
 #ifdef HAVE_TOUCHSCREEN
 #define BTN_UP         BUTTON_TOPMIDDLE
 #define BTN_DOWN       BUTTON_BOTTOMMIDDLE
 #define BTN_LEFT       BUTTON_LEFT
 #define BTN_RIGHT      BUTTON_RIGHT
+
+#define BTN_FIRE       BUTTON_TOPRIGHT
 
 #if (CONFIG_KEYPAD == MROBE500_PAD) || \
     (CONFIG_KEYPAD == ONDAVX777_PAD)
@@ -261,7 +261,13 @@
 #define BTN_PAUSE      BUTTON_TOPLEFT
 #endif
 
+#else
+
+#error Unsupported keypad
+
 /* HAVE_TOUCHSCREEN */
+#endif
+
 #endif
 
 /* __PLUGINLIB_KEYMAPS_H__ */

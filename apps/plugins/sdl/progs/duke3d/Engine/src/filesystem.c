@@ -868,7 +868,7 @@ void   setGameDir(char* gameDir){
 
 char*  getGameDir(void){
     //return game_dir;
-    return "/.rockbox/duke3d";
+    return "/home/franklin/duke3d_data";
 }
 
 int      getGRPcrc32(int grpID){

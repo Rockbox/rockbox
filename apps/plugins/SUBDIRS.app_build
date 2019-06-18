@@ -30,3 +30,5 @@ mikmod
 
 #endif /* CONFIG_CODEC == SWCODEC */
 #endif /* HAVE_TOUCHSCREEN */
+
+sdl

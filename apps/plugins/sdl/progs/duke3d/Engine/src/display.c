@@ -1229,6 +1229,7 @@ void getvalidvesamodes(void)
    	validmodecnt = 0;
     vidoption = 1;  /* !!! tmp */
 
+#ifndef ROCKBOX
         /* fill in the standard resolutions... */
     for (i = 0; i < sizeof (stdres) / sizeof (stdres[0]); i++)
         add_vesa_mode("standard", stdres[i][0], stdres[i][1]);
@@ -1237,7 +1238,8 @@ void getvalidvesamodes(void)
     modes = get_physical_resolutions();
     for (i = 0; (modes != (SDL_Rect **) -1) && (modes[i] != NULL); i++)
         add_vesa_mode("physical", modes[i]->w, modes[i]->h);
-
+#endif
+    
         /* Now add specific resolutions that the user wants... */
     add_user_defined_resolution();
 

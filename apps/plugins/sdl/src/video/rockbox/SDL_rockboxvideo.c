@@ -149,6 +149,7 @@ struct {
 
 void ROCKBOX_PumpEvents(_THIS)
 {
+//#ifndef HAVE_TOUCHSCREEN
     /* poll buttons */
     static long last_keystate = 0;
 
@@ -361,6 +362,7 @@ void ROCKBOX_PumpEvents(_THIS)
 #endif
     }
     rb->yield();
+//#endif
 }
 
 static SDL_VideoDevice *ROCKBOX_CreateDevice(int devindex)
