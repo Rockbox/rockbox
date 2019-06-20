@@ -1217,7 +1217,7 @@
   </dest>
   <voice>
     *: none
-    masf: ""
+    masf: "Време опадања за AV"
   </voice>
 </phrase>
 <phrase>
@@ -2596,19 +2596,19 @@
 </phrase>
 <phrase>
   id: LANG_NEVER
-  desc: in lcd settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: ""
   </source>
   <dest>
     *: none
-    lcd_sleep: "Никад"
+    lcd_sleep: ""
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Никад"
+    lcd_sleep: ""
   </voice>
 </phrase>
 <phrase>
@@ -4450,7 +4450,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "Време аларма"
   </voice>
 </phrase>
 <phrase>
@@ -4636,16 +4636,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: Save only on bookmark for each playlist in recent bookmarks
+  desc: deprecated
   user: core
   <source>
-    *: "Unique only"
+    *: ""
   </source>
   <dest>
-    *: "Само јединствене"
+    *: ""
   </dest>
   <voice>
-    *: "Само јединствене"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7937,7 +7937,7 @@
     *: "Тастери откључани"
   </dest>
   <voice>
-    *: ""
+    *: "Тастери откључани"
   </voice>
 </phrase>
 <phrase>
@@ -7954,7 +7954,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Време"
   </voice>
 </phrase>
 <phrase>
@@ -8338,44 +8338,44 @@
 </phrase>
 <phrase>
   id: LANG_KILOBYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "KB"
+    *: ""
   </source>
   <dest>
-    *: "KБ"
+    *: ""
   </dest>
   <voice>
-    *: "килобајт"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_MEGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "MB"
+    *: ""
   </source>
   <dest>
-    *: "MБ"
+    *: ""
   </dest>
   <voice>
-    *: "мегабајт"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_GIGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "GB"
+    *: ""
   </source>
   <dest>
-    *: "ГБ"
+    *: ""
   </dest>
   <voice>
-    *: "гигабајт"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10685,7 +10685,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Време дељења"
   </voice>
 </phrase>
 <phrase>
@@ -10716,7 +10716,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "КЛИП"
   </voice>
 </phrase>
 <phrase>
@@ -10750,7 +10750,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Фајл"
   </voice>
 </phrase>
 <phrase>
@@ -13518,13 +13518,13 @@
   desc: Backlight behaviour setting
   user: core
   <source>
-    *: "Selective Backlight"
+    *: "Backlight Exemptions"
   </source>
   <dest>
-    *: "Селективно позадинско светло"
+    *: "Изузећа за позадинско светло"
   </dest>
   <voice>
-    *: "Селективно позадинско светло"
+    *: "Изузећа за позадинско светло"
   </voice>
 </phrase>
 <phrase>
@@ -13561,3 +13561,408 @@
     ibassodx90: "Само пуњење"
   </voice>
 </phrase>
+<phrase>
+  id: VOICE_QUEUED
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Стављено у ред"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track elapsed: %s / %s %ld%%"
+  </source>
+  <dest>
+    *: "Од почетка нумере: %s / %s %ld%%"
+  </dest>
+  <voice>
+    *: "Од почетка нумере"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAD_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Лоша ставка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Short"
+  </source>
+  <dest>
+    *: "Кратко"
+  </dest>
+  <voice>
+    *: "Кратко"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_TIME
+  desc: onplay menu
+  user: core
+  <source>
+    *: "Playing time"
+  </source>
+  <dest>
+    *: "Дужина репродукције"
+  </dest>
+  <voice>
+    *: "Дужина репродукције"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYTIME_DONE
+  desc: playing time screen
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Готово"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist elapsed: %s / %s %ld%%"
+  </source>
+  <dest>
+    *: "Од почетка плејлисте: %s / %s %ld%%"
+  </dest>
+  <voice>
+    *: "Од почетка плејлисте"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_TIMESTRETCH_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Тајм стреч"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_BITRATE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average bitrate: %ld kbps"
+  </source>
+  <dest>
+    *: "Просечни битски проток: %ld kbps"
+  </dest>
+  <voice>
+    *: "Просечни битски проток"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_TRACK_SIZE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average track size: %s"
+  </source>
+  <dest>
+    *: "Просечна величина нумере: %s"
+  </dest>
+  <voice>
+    *: "Просечна величина нумере"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MOVING_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Померање нумере"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG__NEVER
+  desc: in lcd settings
+  user: core
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Никада"
+  </dest>
+  <voice>
+    *: "Никада"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "GiB"
+  </source>
+  <dest>
+    *: "GiB"
+  </dest>
+  <voice>
+    *: "Гибибајт"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track remaining: %s"
+  </source>
+  <dest>
+    *: "Од нумере преостаје: %s"
+  </dest>
+  <voice>
+    *: "Од нумере преостаје"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
+  desc: Save only one bookmark for a playlist in recent bookmarks
+  user: core
+  <source>
+    *: "One per playlist"
+  </source>
+  <dest>
+    *: "Један по плејлисти"
+  </dest>
+  <voice>
+    *: "Један по плејлисти"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_VIEWERS
+  desc: text for splash to indicate that no viewers are available
+  user: core
+  <source>
+    *: "No viewers found"
+  </source>
+  <dest>
+    *: "Нема доступног приказивача"
+  </dest>
+  <voice>
+    *: "Нема доступног приказивача"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
+  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
+  user: core
+  <source>
+    *: "One per track"
+  </source>
+  <dest>
+    *: "Један по нумери"
+  </dest>
+  <voice>
+    *: "Један по нумери"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_ABSOLUTE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Апсолутни режим"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "MiB"
+  </source>
+  <dest>
+    *: "MiB"
+  </dest>
+  <voice>
+    *: "мебибајт"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "KiB"
+  </source>
+  <dest>
+    *: "KiB"
+  </dest>
+  <voice>
+    *: "кибибајт"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_SEMITONE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Режим полустепена"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_STORAGE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Storage: %s (done %s, remaining %s)"
+  </source>
+  <dest>
+    *: "Складиште: %s (готово %s, преостаје %s)"
+  </dest>
+  <voice>
+    *: "Складиште"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist remaining: %s"
+  </source>
+  <dest>
+    *: "Преостаје од плејлисте: %s"
+  </dest>
+  <voice>
+    *: "Преостаје од плејлисте"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TRACK_TO_MOVE
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Нумера за померање"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAR_ADAPTER_MODE_DELAY
+  desc: Displayed for setting car adapter mode delay
+  user: core
+  <source>
+    *: none
+    charging: "Delay Before Resume"
+  </source>
+  <dest>
+    *: none
+    charging: "Задршка пре настављања"
+  </dest>
+  <voice>
+    *: none
+    charging: "Задршка пре настављања"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRACK
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track %d / %d %d%%"
+  </source>
+  <dest>
+    *: "Нумера %d / %d %d%%"
+  </dest>
+  <voice>
+    *: "Нумера"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BYPASS
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Bypass"
+  </source>
+  <dest>
+    *: "Премошћење"
+  </dest>
+  <voice>
+    *: "Премошћење"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ERROR
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Error while gathering info"
+  </source>
+  <dest>
+    *: "Грешка током прикупљања инфо"
+  </dest>
+  <voice>
+    *: "Грешка током прикупљања инфо"
+  </voice>
+</phrase>
+
