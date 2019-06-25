@@ -668,9 +668,8 @@ struct user_settings
 #endif
     unsigned char kbd_file[MAX_FILENAME+1];  /* last keyboard */
 #endif /* HAVE_LCD_BITMAP */
-    int  backlight_timeout;  /* backlight off timeout:  0-18 0=never,
-                               1=always,
-                               then according to timeout_values[] */
+    int  backlight_timeout;  /* backlight off timeout:  -1=never,
+                                0=always, or time in seconds */
     bool caption_backlight; /* turn on backlight at end and start of track */
     bool bl_filter_first_keypress;   /* filter first keypress when dark? */
 #if CONFIG_CHARGING
@@ -689,7 +688,8 @@ struct user_settings
 #endif
 #ifdef HAVE_LCD_SLEEP_SETTING
     int lcd_sleep_after_backlight_off; /* when to put lcd to sleep after backlight
-                                          has turned off */
+                                          has turned off:  -1=never, 0=always,
+                                          or time in seconds */
 #endif
 #endif /* HAVE_BACKLIGHT */
 
@@ -707,8 +707,8 @@ struct user_settings
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
     int  remote_contrast;          /* lcd contrast:       0-63 0=low 63=high */
-    int  remote_backlight_timeout; /* backlight off timeout:  0-18 0=never,
-                                   1=always, then according to timeout_values[] */
+    int  remote_backlight_timeout; /* backlight off timeout:  -1=never,
+                                      0=always, or time in seconds */
     int  remote_backlight_timeout_plugged;
     int  remote_scroll_speed;      /* long texts scrolling speed: 1-30 */
     int  remote_scroll_delay;      /* delay (in 1/10s) before starting scroll */

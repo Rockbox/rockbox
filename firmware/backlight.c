@@ -209,15 +209,18 @@ static void backlight_lcd_sleep_countdown(bool start)
     }
 
     /* Start LCD sleep countdown */
-    if (lcd_sleep_timeout < 0)
+    if (lcd_sleep_timeout <= 0)
     {
-        lcd_sleep_timer = 0; /* Setting == Always */
-        /* Ensure lcd_sleep() is called from backlight_thread() */
+        lcd_sleep_timer = 0;
+        if (lcd_sleep_timeout == 0) /* Setting == Always */
+        {
+            /* Ensure lcd_sleep() is called from backlight_thread() */
 #if (CONFIG_BACKLIGHT_FADING == BACKLIGHT_FADING_PWM)
-        queue_post(&backlight_queue, LCD_SLEEP, 0);
+            queue_post(&backlight_queue, LCD_SLEEP, 0);
 #else
-        lcd_sleep();
+            lcd_sleep();
 #endif
+        }
     }
     else
     {
