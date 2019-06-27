@@ -758,6 +758,6 @@ union luai_Cast { double l_d; long l_l; };
 */
 
 #include "rockconf.h"
-
+#define LUA_USER_H "lua_user.h" /* lua_lock, lua_unlock */
 #endif
 
