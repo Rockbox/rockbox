@@ -31,6 +31,7 @@ my @rockbox_defines = (
     '^SCREEN_REMOTE$',
     '^FONT_SYSFIXED$',
     '^FONT_UI$',
+    '^PLAYBACK_EVENT_.*',
     '^PLAYLIST_(INSERT|PREPEND|REPLACE)',
     '^TOUCHSCREEN_(POINT|BUTTON)$',
     '^HOME_DIR$',
