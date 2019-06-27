@@ -24,6 +24,7 @@
 #include "plugin.h"
 #define _ROCKCONF_H_ /* Protect against unwanted include */
 #include "lua.h"
+#include "lib/pluginlib_actions.h"
 
 extern long strtol(const char *nptr, char **endptr, int base);
 
@@ -164,3 +165,21 @@ int filetol(int fd, long *num)
     return retn;
 }
 
+int get_plugin_action(int timeout, bool with_remote)
+{
+    static const struct button_mapping *m1[] = { pla_main_ctx };
+    int btn;
+
+#ifndef HAVE_REMOTE_LCD
+    (void) with_remote;
+#else
+    static const struct button_mapping *m2[] = { pla_main_ctx, pla_remote_ctx };
+
+    if (with_remote)
+        btn = pluginlib_getaction(timeout, m2, 2);
+    else
+#endif
+    btn = pluginlib_getaction(timeout, m1, 1);
+
+    return btn;
+}

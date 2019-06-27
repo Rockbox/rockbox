@@ -30,7 +30,6 @@
 #include "lauxlib.h"
 #include "rocklib.h"
 #include "lib/helper.h"
-#include "lib/pluginlib_actions.h"
 
 /*
  * http://www.lua.org/manual/5.1/manual.html#lua_CFunction
@@ -88,19 +87,9 @@ RB_WRAP(current_path)
 
 RB_WRAP(get_plugin_action)
 {
-    static const struct button_mapping *m1[] = { pla_main_ctx };
     int timeout = luaL_checkint(L, 1);
-    int btn;
-
-#ifdef HAVE_REMOTE_LCD
-    static const struct button_mapping *m2[] = { pla_main_ctx, pla_remote_ctx };
     bool with_remote = luaL_optint(L, 2, 0);
-    if (with_remote)
-        btn = pluginlib_getaction(timeout, m2, 2);
-    else
-#endif
-        btn = pluginlib_getaction(timeout, m1, 1);
-
+    int btn = get_plugin_action(timeout, with_remote);
     lua_pushinteger(L, btn);
     return 1;
 }
@@ -828,6 +817,14 @@ LUALIB_API int luaopen_rock(lua_State *L)
         RB_CONSTANT(PLAYLIST_INSERT_SHUFFLED),
         RB_CONSTANT(PLAYLIST_PREPEND),
         RB_CONSTANT(PLAYLIST_REPLACE),
+
+/* queue sys events */
+        RB_CONSTANT(SYS_USB_CONNECTED),
+        RB_CONSTANT(SYS_USB_DISCONNECTED),
+        RB_CONSTANT(SYS_TIMEOUT),
+        RB_CONSTANT(SYS_POWEROFF),
+        RB_CONSTANT(SYS_CHARGER_CONNECTED),
+        RB_CONSTANT(SYS_CHARGER_DISCONNECTED),
 
 #ifdef HAVE_TOUCHSCREEN
         RB_CONSTANT(TOUCHSCREEN_POINT),

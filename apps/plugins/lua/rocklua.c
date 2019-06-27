@@ -26,7 +26,7 @@
 #include "rocklib.h"
 #include "rocklib_img.h"
 #include "luadir.h"
-
+#include "rocklib_events.h"
 
 
 static const luaL_Reg lualibs[] = {
@@ -40,6 +40,7 @@ static const luaL_Reg lualibs[] = {
   {LUA_OSLIBNAME,   luaopen_os},
   {LUA_ROCKLIBNAME, luaopen_rock},
   {LUA_ROCKLIBNAME, luaopen_rock_img},
+  {LUA_ROCKEVENTSNAME, luaopen_rockevents},
   {LUA_DIRLIBNAME,  luaopen_luadir},
   {NULL, NULL}
 };

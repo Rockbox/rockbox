@@ -37,3 +37,4 @@ strtol.c
 strstr.c
 rocklua.c
 luadir.c
+rocklib_events.c
