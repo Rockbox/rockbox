@@ -26,21 +26,22 @@
 #include "rocklib.h"
 #include "rocklib_img.h"
 #include "luadir.h"
-
+#include "rocklib_events.h"
 
 
 static const luaL_Reg lualibs[] = {
-  {"",              luaopen_base},
-  {LUA_TABLIBNAME,  luaopen_table},
-  {LUA_STRLIBNAME,  luaopen_string},
-  {LUA_OSLIBNAME,   luaopen_os},
-  {LUA_ROCKLIBNAME, luaopen_rock},
-  {LUA_ROCKLIBNAME, luaopen_rock_img},
-  {LUA_BITLIBNAME,  luaopen_bit},
-  {LUA_IOLIBNAME,   luaopen_io},
-  {LUA_LOADLIBNAME, luaopen_package},
-  {LUA_MATHLIBNAME, luaopen_math},
-  {LUA_DIRLIBNAME,  luaopen_luadir},
+  {"",                 luaopen_base},
+  {LUA_TABLIBNAME,     luaopen_table},
+  {LUA_STRLIBNAME,     luaopen_string},
+  {LUA_OSLIBNAME,      luaopen_os},
+  {LUA_ROCKLIBNAME,    luaopen_rock},
+  {LUA_ROCKLIBNAME,    luaopen_rock_img},
+  {LUA_BITLIBNAME,     luaopen_bit},
+  {LUA_IOLIBNAME,      luaopen_io},
+  {LUA_LOADLIBNAME,    luaopen_package},
+  {LUA_MATHLIBNAME,    luaopen_math},
+  {LUA_DIRLIBNAME,     luaopen_luadir},
+  {LUA_ROCKEVENTSNAME, luaopen_rockevents},
   {NULL, NULL}
 };
 

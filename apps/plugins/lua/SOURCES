@@ -23,6 +23,7 @@ lstrlib.c
 ltable.c
 ltablib.c
 ltm.c
+lua_user.c
 lundump.c
 lvm.c
 lzio.c
@@ -37,3 +38,4 @@ strtol.c
 strstr.c
 rocklua.c
 luadir.c
+rocklib_events.c
