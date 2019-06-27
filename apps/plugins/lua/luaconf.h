@@ -70,6 +70,7 @@
 #define LUA_CPATH       "LUA_CPATH"
 #define LUA_INIT	"LUA_INIT"
 
+#define LUA_USER_H	"lua_user.h" /* lua_lock, lua_unlock */
 
 /*
 @@ LUA_PATH_DEFAULT is the default path that Lua uses to look for
