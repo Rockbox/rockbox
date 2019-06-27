@@ -46,8 +46,10 @@ struct lua_str_reg {
 };
 
 LUALIB_API int (luaopen_rock) (lua_State *L) __attribute__((aligned(0x8)));
+/* in rockaux.c */
 int get_current_path(lua_State *L, int level);
 int filetol(int fd, long *num);
+int get_plugin_action(int timeout, bool with_remote);
 
 #endif /* _ROCKLIB_H_ */
 
