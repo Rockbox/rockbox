@@ -758,6 +758,6 @@ union luai_Cast { double l_d; long l_l; };
 */
 
 #include "rockconf.h"
-
+#define LUAC_TRUST_BINARIES
 #endif
 

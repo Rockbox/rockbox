@@ -28,8 +28,8 @@ typedef struct {
 } LoadState;
 
 #ifdef LUAC_TRUST_BINARIES
-#define IF(c,s)
-#define error(S,s)
+#define IF(c,s)    if (c) error(S,s)
+#define error(S,s) {(void) S; (void) s;}
 #else
 #define IF(c,s)		if (c) error(S,s)
 
