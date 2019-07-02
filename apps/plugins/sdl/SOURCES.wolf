@@ -1,4 +1,4 @@
-progs/wolf3d/fmopl.c
+progs/wolf3d/fmopl_gpl.c
 progs/wolf3d/id_ca.c
 progs/wolf3d/id_in.c
 progs/wolf3d/id_pm.c

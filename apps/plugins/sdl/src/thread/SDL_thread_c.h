@@ -24,24 +24,11 @@
 #ifndef _SDL_thread_c_h
 #define _SDL_thread_c_h
 
-/* Need the definitions of SYS_ThreadHandle */
-#if SDL_THREADS_DISABLED
-#include "generic/SDL_systhread_c.h"
-#elif SDL_THREAD_BEOS
-#include "beos/SDL_systhread_c.h"
-#elif SDL_THREAD_DC
-#include "dc/SDL_systhread_c.h"
-#elif SDL_THREAD_OS2
-#include "os2/SDL_systhread_c.h"
-#elif SDL_THREAD_PTH
-#include "pth/SDL_systhread_c.h"
-#elif SDL_THREAD_SPROC
-#include "irix/SDL_systhread_c.h"
-#elif SDL_THREAD_WIN32
-#include "win32/SDL_systhread_c.h"
-#elif SDL_THREAD_SYMBIAN
-#include "symbian/SDL_systhread_c.h"
-#elif SDL_THREAD_ROCKBOX
+#ifndef SDL_THREAD_ROCKBOX
+#define SDL_THREAD_ROCKBOX 1
+#endif
+
+#if SDL_THREAD_ROCKBOX
 #include "rockbox/SDL_systhread_c.h"
 #else
 #error Need thread implementation for this platform

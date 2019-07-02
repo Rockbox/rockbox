@@ -72,7 +72,7 @@ void cleanup(void)
 }
 
 /* 256KB */
-static long main_stack[1024 * 1024 / 4];
+static long main_stack[1024 * 1024 / 2];
 int (*main_fn)(int argc, char *argv[]);
 int prog_idx;
 static void main_thread(void)
@@ -174,8 +174,19 @@ enum plugin_status plugin_start(const void *param)
     (void) param;
 
 #if defined(CPU_ARM) && !defined(SIMULATOR)
-    /* (don't) set alignment trap */
-    //set_cr(get_cr() | CR_A);
+    /* (don't) set alignment trap. Will generate a data abort
+     * exception on ARM. */
+    set_cr(get_cr() | CR_A);
+#endif
+
+#if 0
+    char c = *((char*)NULL);
+
+    /* test alignment trap */
+    unsigned int x = 0x12345678;
+    char *p = ((char*)&x) + 1;
+    unsigned short *p2 = (unsigned short*)p;
+    rb->splashf(HZ, "%04x, %02x%02x", *p2, *(p+1), *p);
 #endif
 
     /* don't confuse this with the main SDL thread! */

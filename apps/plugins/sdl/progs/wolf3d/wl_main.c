@@ -90,7 +90,7 @@ int     param_audiobuffer = 128;
 #else
 int     param_joystickhat = -1;
 int     param_samplerate = RB_SAMPR;
-int     param_audiobuffer = 2048 / (44100 / 44100);
+int     param_audiobuffer = 2048 / (44100 / RB_SAMPR);
 #endif
 
 int     param_mission = 0;
@@ -170,19 +170,10 @@ void ReadConfig(void)
         close(file);
 
         /* hack to always enable sound */
-#ifndef SOUND_ENABLE
-        if ((sd == sdm_AdLib || sm == smm_AdLib) && !AdLibPresent
-                && !SoundBlasterPresent)
-        {
-            sd = sdm_PC;
-            sm = smm_Off;
-        }
-#endif
+        sd = sdm_AdLib;
+        sm = smm_AdLib;
 
-#ifndef SOUND_ENABLE
-        if ((sds == sds_SoundBlaster && !SoundBlasterPresent))
-            sds = sds_Off;
-#endif
+        sds = sds_SoundBlaster;
 
         // make sure values are correct
 
@@ -209,21 +200,11 @@ void ReadConfig(void)
         // no config file, so select by hardware
         //
 noconfig:
-        if (SoundBlasterPresent || AdLibPresent)
-        {
-            sd = sdm_AdLib;
-            sm = smm_AdLib;
-        }
-        else
-        {
-            sd = sdm_PC;
-            sm = smm_Off;
-        }
+        // always -FW19
+        sd = sdm_AdLib;
+        sm = smm_AdLib;
 
-        if (SoundBlasterPresent)
-            sds = sds_SoundBlaster;
-        else
-            sds = sds_Off;
+        sds = sds_SoundBlaster;
 
         if (MousePresent)
             mouseenabled = true;
@@ -1256,7 +1237,7 @@ static void InitGame()
     VH_Startup ();
     IN_Startup ();
     PM_Startup ();
-    //SD_Startup (); // moved to end
+    SD_Startup ();
     CA_Startup ();
     US_Startup ();
 
@@ -1282,7 +1263,7 @@ static void InitGame()
 //
 // build some tables
 //
-    //InitDigiMap (); // moved to end
+    InitDigiMap ();
 
     rb->splash(0, "Reading configuration...");
 
@@ -1338,9 +1319,6 @@ static void InitGame()
     if(!didjukebox)
 #endif
         FinishSignon();
-
-    SD_Startup();
-    InitDigiMap();
 
 #ifdef NOTYET
     vdisp = (byte *) (0xa0000+PAGE1START);
@@ -1581,6 +1559,10 @@ static void DemoLoop()
     #endif
 
     StartCPMusic(INTROSONG);
+
+    IN_UserInput(TickBase * 10);
+
+    exit(0);
 
 #ifndef JAPAN
     if (!param_nowait)
