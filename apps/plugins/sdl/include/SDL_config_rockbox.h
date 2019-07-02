@@ -42,7 +42,7 @@
 #ifdef SIMULATOR
 #define RB_SAMPR SAMPR_44
 #else
-#define RB_SAMPR SAMPR_22
+#define RB_SAMPR SAMPR_44
 #endif
 
 /* Enable the stub cdrom driver (src/cdrom/dummy/\*.c) */
@@ -163,7 +163,7 @@
 #define vsnprintf rb->vsnprintf
 #define vsprintf vsprintf_wrapper
 
-#define M_PI 3.141592
+#define M_PI 3.14159265358979323846
 #define EOF 0xff
 
 #define LOAD_XPM

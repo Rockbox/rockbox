@@ -8,7 +8,9 @@
 #ifndef __ID_SD__
 #define __ID_SD__
 
-#define alOut(n,b) YM3812Write(0, n, b)
+extern void *OPL_ptr;
+
+#define alOut(n,b) YM3812Write(OPL_ptr, n, b)
 
 #define TickBase        70      // 70Hz per tick - used as a base for timer 0
 

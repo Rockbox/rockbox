@@ -1085,6 +1085,8 @@ longword curAlLengthLeft = 0;
 int soundTimeCounter = 5;
 int samplesPerMusicTick;
 
+void *OPL_ptr = NULL;
+
 void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
 {
 #ifdef SOUND_ENABLE
@@ -1098,13 +1100,13 @@ void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
         {
             if(numreadysamples<sampleslen)
             {
-                YM3812UpdateOne(0, stream16, numreadysamples);
+                YM3812UpdateOne(OPL_ptr, stream16, numreadysamples);
                 stream16 += numreadysamples*2;
                 sampleslen -= numreadysamples;
             }
             else
             {
-                YM3812UpdateOne(0, stream16, sampleslen);
+                YM3812UpdateOne(OPL_ptr, stream16, sampleslen);
                 numreadysamples -= sampleslen;
                 return;
             }
@@ -1190,15 +1192,15 @@ SD_Startup(void)
 
     samplesPerMusicTick = param_samplerate / 700;    // SDL_t0FastAsmService played at 700Hz
 
-    if(YM3812Init(1,3579545,param_samplerate))
+    if(!(OPL_ptr = YM3812Init((void*)1,3579545,param_samplerate)))
     {
-        printf("Unable to create virtual OPL!!\n");
+        //printf("Unable to create virtual OPL!!\n");
     }
 
     for(i=1;i<0xf6;i++)
-        YM3812Write(0,i,0);
+        YM3812Write(OPL_ptr,i,0);
 
-    YM3812Write(0,1,0x20); // Set WSE=1
+    YM3812Write(OPL_ptr,1,0x20); // Set WSE=1
 //    YM3812Write(0,8,0); // Set CSM=0 & SEL=0		 // already set in for statement
 
     Mix_HookMusic(SDL_IMFMusicPlayer, 0);

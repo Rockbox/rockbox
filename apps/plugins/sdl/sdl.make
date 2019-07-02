@@ -25,7 +25,7 @@ OTHER_INC += -I$(SDL_SRCDIR)/include
 # include comes first because of possible system SDL headers taking
 # precedence
 SDLFLAGS = -I$(SDL_SRCDIR)/include $(filter-out -O%,$(PLUGINFLAGS))	\
--O3 -Wno-unused-parameter -Xpreprocessor -Wno-undef -Wcast-align -w
+-O3 -Wno-unused-parameter -Xpreprocessor -Wno-undef -Wcast-align
 
 ifeq ($(ARCH_VERSION),6)
     SDLFLAGS += -mfloat-abi=softfp

@@ -1,8 +1,3 @@
-#define USE_GPL 1
-#if USE_GPL
-#include "fmopl_gpl.h"
-#endif
-
 #ifndef __FMOPL_H_
 #define __FMOPL_H_
 
@@ -46,18 +41,21 @@ typedef unsigned char (*OPL_PORTHANDLER_R)(int param);
 
 #if BUILD_YM3812
 
-int  YM3812Init(int num, int clock, int rate);
-void YM3812Shutdown(void);
-void YM3812ResetChip(int which);
-int  YM3812Write(int which, int a, int v);
-unsigned char YM3812Read(int which, int a);
-void YM3812Mute(int which,int channel,bool mute);
-int  YM3812TimerOver(int which, int c);
-void YM3812UpdateOne(int which, INT16 *buffer, int length);
 
-void YM3812SetTimerHandler(int which, OPL_TIMERHANDLER TimerHandler, int channelOffset);
-void YM3812SetIRQHandler(int which, OPL_IRQHANDLER IRQHandler, int param);
-void YM3812SetUpdateHandler(int which, OPL_UPDATEHANDLER UpdateHandler, int param);
+typedef void device_t;
+void *YM3812Init(device_t *junk, UINT32 clock, UINT32 rate);
+void YM3812Shutdown(void *chip);
+void YM3812ResetChip(void *chip);
+int  YM3812Write(void *chip, int a, int v);
+unsigned char YM3812Read(void *chip, int a);
+void YM3812Mute(void *chip,int channel,bool mute);
+int  YM3812TimerOver(void *chip, int c);
+void YM3812UpdateOne(void *chip, INT16 *buffer, int length);
+
+// not used
+//void YM3812SetTimerHandler(void *chip, OPL_TIMERHANDLER TimerHandler, int channelOffset);
+//void YM3812SetIRQHandler(void *chip, OPL_IRQHANDLER IRQHandler, int param);
+//void YM3812SetUpdateHandler(void *chip, OPL_UPDATEHANDLER UpdateHandler, int param);
 
 #endif
 
