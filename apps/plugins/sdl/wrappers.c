@@ -21,6 +21,7 @@ void fatal(char *fmt, ...)
     va_start(ap, fmt);
     char buf[80];
     vsnprintf(buf, 80, fmt, ap);
+    printf("%s", buf);
     rb->splash(HZ * 2, buf);
     va_end(ap);
 

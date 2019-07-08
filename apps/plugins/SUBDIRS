@@ -8,7 +8,6 @@ text_viewer
 clock
 #endif
 
-
 /* For all targets with a bitmap display */
 #ifdef HAVE_LCD_BITMAP
 
@@ -22,7 +21,6 @@ xworld
     defined(CPU_ARM)
 sdl
 #endif
-
 puzzles
 #endif
 
