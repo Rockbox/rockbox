@@ -89,8 +89,54 @@ void __attribute__((weak,naked)) undef_instr_handler(void)
 /* Unexpected Interrupt or Exception handler. Currently only deals with
    exceptions, but will deal with interrupts later.
  */
+static void piezo_tone(uint32_t period /*uS*/, int32_t duration /*ms*/)
+{
+    int32_t stop = USEC_TIMER + duration*1000;
+    uint32_t level = 0;
+
+    while ((int32_t)USEC_TIMER - stop < 0)
+    {
+        level ^= 1;
+        GPIOCMD = 0x0060e | level;
+        udelay(period >> 1);
+    }
+
+    GPIOCMD = 0x0060e;
+}
+
+#define HI 1136
+#define LO 2272
+
+void beep_int(unsigned int n)
+{
+    while(n)
+    {
+        if(n & 1)
+            piezo_tone(HI, 500);
+        else
+            piezo_tone(LO, 500);
+        udelay(200000);
+        n>>=1;
+    }
+}
+
 void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
 {
+    beep_int(pc);
+
+    udelay(1000000);
+    beep_int(num);
+
+    while(1);
+
+    //lcd_clear_display();
+
+    unsigned line = 0;
+    lcd_update();
+    lcd_putsf(0, line++, "PC: %08x, #%08x", pc, num);
+
+    piezo_tone(2272, 1000);
+
     /* safe guard variable - we call backtrace() only on first
      * UIE call. This prevent endless loop if backtrace() touches
      * memory regions which cause abort
@@ -103,12 +149,13 @@ void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
     lcd_set_foreground(LCD_BLACK);
     lcd_set_background(LCD_WHITE);
 #endif
-    unsigned line = 0;
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_set_viewport(NULL);
     lcd_clear_display();
     lcd_putsf(0, line++, "%s at %08x" IF_COP(" (%d)"), uiename[num], pc IF_COP(, CURRENT_CORE));
+
+    lcd_update();
 
 #if !defined(CPU_ARM7TDMI) && (CONFIG_CPU != RK27XX) /* arm7tdmi has no MPU/MMU */
     if(num == 1 || num == 2) /* prefetch / data abort */
