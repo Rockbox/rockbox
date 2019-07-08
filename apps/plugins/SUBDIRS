@@ -8,6 +8,7 @@ text_viewer
 clock
 #endif
 
+sdl
 
 /* For all targets with a bitmap display */
 #ifdef HAVE_LCD_BITMAP
@@ -20,7 +21,6 @@ xworld
 /* for duke, etc. */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) && (PLUGIN_BUFFER_SIZE > 0x14000) && \
     defined(CPU_ARM)
-sdl
 #endif
 
 puzzles
