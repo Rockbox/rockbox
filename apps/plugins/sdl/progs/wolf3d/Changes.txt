@@ -1,0 +1,157 @@
+Wolf4SDL v1.7 (released 2011-05-15, revision 256)
+ - Added support for Mac OS X
+   (thanks to Chris Ballinger)
+ - Added support for .sd1 SOD game files as delivered by Steam
+   by changing --mission parameter slightly
+   (thanks to Pickle)
+ - Added --windowed-mouse parameter to start windowed mode with grabbed mouse
+   (thanks to Jared Breland)
+ - Rain and snow speed fix (thanks to Tricob)
+ - Floor/ceiling fix (thanks to Tricob / Adam Biser)
+ - Fixed moon out of screen bug (thanks to Tricob)
+ - Rain/snow leaking ceilings fix (thanks to Adam Biser / Tricob)
+ - Per-user configuration/savegame directories (~/.wolf4sdl) on
+   Linux like systems per default (thanks to Jared Breland)
+ - Added --configdir parameter
+ - Use SDL_DOUBLEBUF for vsync to avoid or at least reduce flickering
+   (thanks to Greg Ayrton for the hint, use --nodblbuf to disable it)
+ - Removed remainings of the frame rate counter on screen, when disabled
+ - Don't quit game when using TAB+E with --tedlevel
+ - Added --extravbls parameter
+ - Changed default for "extra VBLs" from 1 to 0
+ - Fixed missing umask parameter for open with O_CREAT
+   (bug reported by Daniel Fass)
+ - Fixed support for 1.0 shareware data files
+   (bug reported by Marcus Naylor)
+ - Fixed xtile and ytile not being valid in HitHorizWall and HitVertWall,
+   respectively. This caused problems with some tutorials.
+ - Removed unused HitHorizPWall and HitVertPWall.
+
+Wolf4SDL v1.6 (released 2008-09-01, revision 233)
+ - Fixed songs not really supporting more than 64kb
+ - Try to recognize whether data files don't fit to program version
+   instead of just using them and probably crash
+   (can be disabled with --ignorenumchunks)
+ - Fizzle fade now works for resolutions up to 8191x4095
+   (thanks to Xilinx, Inc. for the list of maximum-length LFSR counters)
+ - Fixed demos being dependent on actual duration of GETGATLINGSND
+   (fixes second demo, which even rarely worked in vanilla Wolf3D)
+ - Fixed demos by disabling some bugfixes during recording and playback
+   (see PLAYDEMOLIKEORIGINAL define in version.h)
+ - Removed system menu on Windows in windowed mode to avoid ALT to open it
+ - Fixed palette issues occurring on some Windows systems by using the
+   "best" color depth reported by libSDL per default (also see --bits option)
+ - Fixed directional 3d sprites on architectures only allowing aligned memory
+   access (bug reported by Pickle)
+ - Fixed remaining status bar after end of demo in 320x240s resolutions
+   (bug reported by Pickle)
+ - Removed last busy waiting (fixes very unstable framerates on machines with
+   stricter schedulers like FreeBSD; thanks to Tron for making me notice)
+ - Fixed compiling of SOD on case sensitive file systems
+   (thanks to Michael)
+
+Wolf4SDL v1.5 (released 2008-05-25, revision 215)
+ - Reduced minimum distance to back of moving pushwall to PLAYERSIZE
+ - Fixed pushwall rendering when player's eye is in the pushwall back tile
+   (bug reported by Pickle)
+ - Enable 'End game' menu item also when using --tedlevel
+ - Removed some unneccessary fade outs
+   (DrawPlayScreen does not call VW_FadeOut anymore!!)
+ - When using 'End game', 'View scores' does not directly show up anymore
+ - Fixed quickload/quicksave not working when started with --tedlevel (vanilla
+   bug). This now also only checks for save games once at startup (may speed
+   up entering the menu on Dreamcast)
+ - Fixed drawing moving pushwalls viewed at acute angles near the level border
+ - Fixed vanilla bug hiding bonus items on same tile as player, when he cannot
+   pick them up (e.g. medikit at 100% health) (thanks to Pickle for noticing)
+ - Added GP2X specific code by Pickle
+ - Reimplemented picture grabber to support all screen resolutions
+   (<TAB>+P in debug mode)
+ - Added --resf option to force to use unsupported resolutions >= 320x200
+ - Added support for resolutions being a multiple of 320x240
+   (thanks for your help, Pickle!)
+ - Fixed crash when cheat-hurting oneself to death (bug reported by Tricob)
+ - Cleaned up id_sd.cpp (kept PC speaker stuff for future reference)
+ - Added move buttons (invalidates config file, only hardcoded yet)
+ - Added joystick support to US_LineInput used for highscore names
+   and save games
+ - Added US_Printf and US_CPrintf (works just like printf)
+ - Fixed wrong surface locks/unlocks
+ - Added Visual C++ 6 support
+ - Removed some useless VW_WaitVBLs (Thanks to TexZK)
+ - Added some asserts in id_vl.cpp to check for screen access out of bounds
+ - Fixed BJ face popping up in fullsize mode sometimes
+   (Thanks to Andy_Nonymous)
+ - Rewrote page manager to support page >= 64kB
+   and to correctly handle sounds >= 4kB
+ - Improved SOD mission packs support (Thanks to fackue)
+ - Updated Code::Blocks search paths to ..\SDL-devel\
+ - Added version.h to Dev-C++ and Code::Blocks project file
+ - Fixed some files being read in text mode on MinGW
+
+Wolf4SDL v1.4 (released 2008-03-10, revision 164)
+ - Added MinGW/MSYS compatibility
+ - Updated Code::Blocks project
+ - Updated Dev-C++ project and added a README-devcpp.txt
+ - Fixed some busy waiting situations
+ - Added directional 3D sprites support (USE_DIR3DSPR)
+ - Added support for Spear mission packs (by fackue)
+ - Added support for Wolf3D full v1.1 and shareware v1.0, v1.1 and v1.2
+ - Added shading support (USE_SHADING)
+ - Added object flags (see objflag_t enum in wl_def.h)
+ - Reintroduced version.h
+ - Increased MAXVISABLE from 50 to 250
+ - Added outside atmosphere features (USE_STARSKY, USE_RAIN, USE_SNOW)
+ - Added cloud sky support (USE_CLOUDSKY)
+ - Added support for SoD demo
+ - Fixed SoD on systems with case sensitive filenames
+ - Added DarkOne's/Adam's multi-textured floors/ceiling (USE_FLOORCEILINGTEX)
+ - Added parallax sky support (USE_PARALLAX define)
+ - Introduced level feature flags (USE_FEATUREFLAGS define)
+ - Added high resolution support (USE_HIRES define)
+ - Added support for music > 64 kB as supported by WDC
+ - Added --samplerate and --audiobuffer parameters
+ - Added support for GP2X (ARM processor, thanks to Pickle)
+ - Added support for Dreamcast (SH-4 processor, thanks to fackue)
+ - Added joystick support (up to 32 buttons)
+
+Wolf4SDL v1.3 (released 2008-01-20, revision 113)
+ - Added parameter for SOD to disable copy protection quiz
+ - F12 now also grabs the mouse (for keyboards without scrolllock)
+ - Fixed out of bounds array access in key processing
+
+Wolf4SDL v1.2 (released 2008-01-09, revision 108)
+ - Fixed fading for 'End Game'
+ - Corrected fading speed
+ - Added Spear of Destiny compile support
+ - Reimplemented palette file (Sorry...)
+ - Fixed end game crash, when player did not die yet
+   (Thanks to Agent87 for noticing this bug!)
+ - Added full size screen feature
+ - Added project files for Code::Blocks and Dev-C++
+   (Thanks to Codetech84!)
+ - Made it MinGW compatible
+ - Fixed demo fading issues
+ - Reformatted many source code files
+ - Resolved all warnings reported by VC++ 8 and GCC
+ - Fixed crash when starting the game with no sound >effects<
+   (Thanks to Agent87 for noticing this bug!)
+ - Always grab mouse when started in fullscreen
+ - Map left and right alt, shift and ctrl keys to the same keys
+ - Fix numpad keys with numlock off
+ - Fixed a buffer overflow causing a crash
+
+Wolf4SDL v1.1 (released 2007-12-28, revision 70)
+ - Fixed Pause
+ - Fixed IN_Ack()
+ - Added command line parameters for windowed mode and screen resolution
+ - Reimplemented command line parameters (try --help)
+ - Improved scaled "Get Psyched" progress bar graphic
+ - Improved scaled screen borders
+ - Fixed "Fade in black screen" bug
+ - Avoid asserts when shutting down with an error
+ - Use software surfaces to reduce problems with palette on Windows
+ - Windows: Statically links to MSVCR80.DLL now to avoid missing files
+
+Wolf4SDL v1.0 (released 2007-12-26, revision 53)
+ - Initial release
