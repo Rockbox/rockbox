@@ -95,13 +95,11 @@
   #define __swap16_os(x)    swap16(x)
   #define __swap32_os(x)    swap32(x)
   #define __swap64_os(x)    swap64(x)
-#elif defined (__MINGW32__) || (CONFIG_PLATFORM & PLATFORM_MAEMO)
+#else
   /* kinda hacky but works */
   #define __swap16_os(x)    SWAP16_CONST(x)
   #define __swap32_os(x)    SWAP32_CONST(x)
   #define __swap64_os(x)    SWAP64_CONST(x)
-#else
-  #error "Missing OS swap defines."
 #endif
 
 /* wrap these because they aren't always compatible with compound initializers */
