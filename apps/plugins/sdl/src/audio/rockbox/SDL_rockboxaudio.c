@@ -82,7 +82,7 @@ static void get_more(const void **start, size_t *size)
         if(this->hidden->status[idx] == 1)
         {
             /* Play this one. */
-            LOGF("Playing buffer %d", idx);
+            //LOGF("Playing buffer %d", idx);
             *start = this->hidden->rb_buf[idx];
             *size = this->hidden->mixlen;
 
@@ -163,7 +163,7 @@ static void ROCKBOXAUD_PlayAudio(_THIS)
 
     memcpy(dst + size, src + size, this->hidden->mixlen - size);
 
-    LOGF("filled buffer %d (status %d %d %d)", idx, this->hidden->status[0], this->hidden->status[1], this->hidden->status[2]);
+    //LOGF("filled buffer %d (status %d %d %d)", idx, this->hidden->status[0], this->hidden->status[1], this->hidden->status[2]);
 }
 
 static SDL_AudioDevice *ROCKBOXAUD_CreateDevice(int devindex)
