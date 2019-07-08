@@ -163,7 +163,7 @@
 #define vsnprintf rb->vsnprintf
 #define vsprintf vsprintf_wrapper
 
-#define M_PI 3.141592
+#define M_PI 3.14159265358979323846
 #define EOF 0xff
 
 #define LOAD_XPM
