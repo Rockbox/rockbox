@@ -36,7 +36,7 @@ ifndef APP_TYPE
     ROCKS += $(SDL_OBJDIR)/duke3d.ovl $(SDL_OBJDIR)/wolf3d.ovl
     DUKE3D_OUTLDS = $(SDL_OBJDIR)/duke3d.link
     WOLF3D_OUTLDS = $(SDL_OBJDIR)/wolf3d.link
-    SDL_OVLFLAGS = -T$(DUKE3D_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
+    SDL_OVLFLAGS = -Wl,--gc-sections -Wl,-Map,$(basename $@).map
 else
     ### simulator
     ROCKS += $(SDL_OBJDIR)/duke3d.rock
@@ -57,7 +57,7 @@ $(SDL_OBJDIR)/duke3d.ovl: $(SDL_OBJ) $(DUKE3D_OBJ) $(TLSFLIB) $(DUKE3D_OUTLDS)
 	$(SILENT)$(CC) $(PLUGINFLAGS) -o $(basename $@).elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
-		-lgcc $(SDL_OVLFLAGS)
+		-lgcc -T$(DUKE3D_OUTLDS) $(SDL_OVLFLAGS)
 	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
 
 # Wolf3D
@@ -74,7 +74,7 @@ $(SDL_OBJDIR)/wolf3d.ovl: $(SDL_OBJ) $(WOLF3D_OBJ) $(TLSFLIB) $(WOLF3D_OUTLDS)
 	$(SILENT)$(CC) $(PLUGINFLAGS) -o $(basename $@).elf \
 		$(filter %.o, $^) \
 		$(filter %.a, $+) \
-		-lgcc $(SDL_OVLFLAGS)
+		-lgcc  -T$(WOLF3D_OUTLDS) $(SDL_OVLFLAGS)
 	$(call PRINTS,LD $(@F))$(call objcopy,$(basename $@).elf,$@)
 
 # common
