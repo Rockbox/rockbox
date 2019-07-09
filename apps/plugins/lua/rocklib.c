@@ -314,10 +314,14 @@ RB_WRAP(audio)
 {
     enum e_audio {AUDIO_STATUS = 0, AUDIO_PLAY, AUDIO_STOP, AUDIO_PAUSE,
                   AUDIO_RESUME, AUDIO_NEXT, AUDIO_PREV, AUDIO_FFREWIND,
-                  AUDIO_FLUSHANDRELOADTRACKS, AUDIO_GETPOS, AUDIO_ECOUNT};
-    const char *audio_option[] = {"status", "play", "stop", "pause",
-                                  "resume", "next", "prev", "ff_rewind",
-                                  "flush_and_reload_tracks", "get_file_pos", NULL};
+                  AUDIO_FLUSHANDRELOADTRACKS, AUDIO_GETPOS, AUDIO_LENGTH,
+                  AUDIO_ELAPSED, AUDIO_ECOUNT};
+    const char *audio_option[] = {"status", "play", "stop",
+                                  "pause", "resume", "next",
+                                  "prev", "ff_rewind",
+                                  "flush_and_reload_tracks",
+                                  "get_file_pos", "length",
+                                  "elapsed", NULL};
     long elapsed, offset, newtime;
     int status = rb->audio_status();
 
@@ -364,6 +368,18 @@ RB_WRAP(audio)
             break;
         case AUDIO_GETPOS:
             lua_pushinteger(L, rb->audio_get_file_pos());
+            return 1;
+        case AUDIO_LENGTH:
+            if ((status & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY)
+                lua_pushinteger(L, rb->audio_current_track()->length);
+            else
+                lua_pushnil(L);
+            return 1;
+        case AUDIO_ELAPSED:
+            if ((status & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY)
+                lua_pushinteger(L, rb->audio_current_track()->elapsed);
+            else
+                lua_pushnil(L);
             return 1;
     }
 
