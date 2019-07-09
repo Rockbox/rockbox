@@ -82,7 +82,9 @@ verify volume of the FM part on the Y8950
 
 #include "fmopl.h"
 
-
+// Don't pack structs in here. This causes dangerous things on ARM
+// regarding alignment.
+#pragma pack()
 
 /* output final shift */
 #if (OPL_SAMPLE_BITS==16)
@@ -207,8 +209,6 @@ static FILE * cymfile = NULL;
 #define OPL_TYPE_YM3812 (OPL_TYPE_WAVESEL)
 #define OPL_TYPE_Y8950  (OPL_TYPE_ADPCM|OPL_TYPE_KEYBOARD|OPL_TYPE_IO)
 
-
-
 struct OPL_SLOT
 {
     UINT32  ar;         /* attack rate: AR<<2           */
@@ -267,10 +267,6 @@ typedef struct OPL_CH OPL_CH;
 /* OPL state */
 struct FM_OPL
 {
-    // moved to beginning to fix alignment
-    signed int phase_modulation __attribute__((aligned));    /* phase modulation input (SLOT 2) */
-    signed int output[1] __attribute__((aligned));
-
     /* FM channel slots */
     OPL_CH  P_CH[9];                /* OPL/OPL2 chips have 9 channels*/
 
@@ -326,7 +322,6 @@ struct FM_OPL
     void *IRQParam;                 /* IRQ parameter                */
     OPL_UPDATEHANDLER UpdateHandler;/* stream update handler        */
     void *UpdateParam;              /* stream update parameter      */
-
     UINT8 type;                     /* chip type                    */
     UINT8 address;                  /* address register             */
     UINT8 status;                   /* status flag                  */
@@ -339,10 +334,13 @@ struct FM_OPL
     double TimerBase;         /* Timer base time (==sampling time)*/
     device_t *device;
 
+    signed int phase_modulation;    /* phase modulation input (SLOT 2) */
+    signed int output[1];
+
 #if BUILD_Y8950
     INT32 output_deltat[4];     /* for Y8950 DELTA-T, chip is mono, that 4 here is just for safety */
 #endif
-} __attribute__((aligned));
+};
 
 typedef struct FM_OPL FM_OPL;
 

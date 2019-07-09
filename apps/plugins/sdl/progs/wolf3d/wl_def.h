@@ -22,6 +22,7 @@
 #	define O_BINARY 0
 #endif
 
+// needed by wolf, but is dangerous on ARM
 #pragma pack(1)
 
 #if defined(_arch_dreamcast)
