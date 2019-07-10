@@ -4001,7 +4001,7 @@ CheckForEpisodes (void)
         {
             Quit("Your $HOME directory is not defined. You must set this before playing.");
         }
-        #define WOLFDIR "/.wolf4sdl"
+#define WOLFDIR ROCKBOX_DIR "/wolf3d"
         if(strlen(homedir) + sizeof(WOLFDIR) > sizeof(configdir))
         {
             Quit("Your $HOME directory path is too long. It cannot be used for saving games.");
