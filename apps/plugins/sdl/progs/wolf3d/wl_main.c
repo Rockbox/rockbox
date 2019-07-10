@@ -212,7 +212,7 @@ noconfig:
         if (IN_JoyPresent())
             joystickenabled = true;
 
-        viewsize = 19;                          // start with a good size
+        viewsize = 20;                          // start with a good size
         mouseadjustment=5;
     }
 
