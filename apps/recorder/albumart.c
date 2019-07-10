@@ -141,7 +141,7 @@ static bool try_exts(char *path, int len)
 bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
                            char *buf, int buflen)
 {
-    char path[MAX_PATH + 1];
+    char path[MAX_PATH + 11]; /* need room for filename and null termination */
     char dir[MAX_PATH + 1];
     bool found = false;
     int track_first = 1;
@@ -281,7 +281,7 @@ bool find_albumart(const struct mp3entry *id3, char *buf, int buflen,
     if (!id3 || !buf)
         return false;
 
-    char size_string[9];
+    char size_string[15];/* .-32768x-32768\0 */
     logf("Looking for album art for %s", id3->path);
 
     /* Write the size string, e.g. ".100x100". */
