@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e9d599cf_d10f642f",
+        "filename": "apps/plugins/lua/luaconf.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2019-07-11T17:59:43Z",
+      "side": 1,
+      "message": "NOTE tab/white space changes this file is directly from the lua source",
+      "revId": "ee58f2601c2a03cec96568371a68e5f1bf0de170",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
