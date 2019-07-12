@@ -63,6 +63,7 @@ long lpow(long x, long y);
 #define strcmp   rb->strcmp
 #define strcpy   rb->strcpy
 #define strlen   rb->strlen
+#define yield()  rb->yield()
 
 #endif /* _ROCKCONF_H_ */
 
