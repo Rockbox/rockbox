@@ -295,7 +295,7 @@ RB_WRAP(playlist)
             break;
     }
 
-    rb->yield();
+    yield();
     lua_pushinteger(L, result);
     return 1;
 }
@@ -373,7 +373,7 @@ RB_WRAP(audio)
             return 1;
     }
 
-    rb->yield();
+    yield();
     lua_pushinteger(L, status); /* return previous (or current) audio status */
     return 1;
 }
@@ -434,7 +434,7 @@ RB_WRAP(pcm)
             break;
     }
 
-    rb->yield();
+    yield();
     return 1;
 }
 

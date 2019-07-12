@@ -13,7 +13,6 @@
 #include <string.h>
 #include "lstring.h" /* ROCKLUA ADDED */
 
-
 /* This file uses only the official API of Lua.
 ** Any function declared here could be written as an application function.
 ** Note ** luaS_newlloc breaks this guarantee ROCKLUA ADDED
@@ -34,7 +33,9 @@
 #define abs_index(L, i)		((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : \
 					lua_gettop(L) + (i) + 1)
 
-
+#ifndef LUA_OOM
+  #define LUA_OOM(L) {}
+#endif
 /*
 ** {======================================================
 ** Error-report functions
@@ -756,14 +757,30 @@ LUALIB_API int (luaL_loadstring) (lua_State *L, const char *s) {
 
 
 static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
-  (void)ud;
-  (void)osize;
+  (void) osize;
+  lua_State *L = (lua_State *)ud;
+  void *nptr;
+
   if (nsize == 0) {
     free(ptr);
     return NULL;
   }
-  else
-    return realloc(ptr, nsize);
+
+  nptr = realloc(ptr, nsize);
+  if (nptr == NULL) {
+    if(L != NULL)
+    {
+      luaC_fullgc(L); /* emergency full collection. */
+      nptr = realloc(ptr, nsize); /* try allocation again */
+    }
+
+    if (nptr == NULL) {
+      LUA_OOM(L); /* if defined.. signal OOM condition */
+      nptr = realloc(ptr, nsize); /* try allocation again */
+    }
+  }
+
+  return nptr;
 }
 
 
@@ -779,6 +796,7 @@ static int panic (lua_State *L) {
 
 LUALIB_API lua_State *luaL_newstate (void) {
   lua_State *L = lua_newstate(l_alloc, NULL);
+  lua_setallocf(L, l_alloc, L); /* allocator needs lua_State. */
   if (L) lua_atpanic(L, &panic);
   return L;
 }
