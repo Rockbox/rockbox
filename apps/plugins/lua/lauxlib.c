@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "lstring.h" /* ROCKLUA ADDED */
-
+#include "plugin.h"
 
 /* This file uses only the official API of Lua.
 ** Any function declared here could be written as an application function.
@@ -25,6 +25,10 @@
 #include "lua.h"
 
 #include "lauxlib.h"
+#include "lgc.h"
+#include "ldo.h"
+#include "lobject.h"
+#include "lstate.h"
 
 
 #define FREELIST_REF	0	/* free list of references */
@@ -34,7 +38,13 @@
 #define abs_index(L, i)		((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : \
 					lua_gettop(L) + (i) + 1)
 
+#ifndef yield
+  #define yield() {}
+#endif
 
+#ifndef LUA_OOM
+  #define LUA_OOM(L) {}
+#endif
 /*
 ** {======================================================
 ** Error-report functions
@@ -755,15 +765,63 @@ LUALIB_API int (luaL_loadstring) (lua_State *L, const char *s) {
 /* }====================================================== */
 
 
+static int l_check_memlimit(lua_State *L, size_t needbytes, lu_mem memlimit) {
+  global_State *g = G(L);
+  lu_mem limit;
+
+  if (memlimit > 0)
+  {
+    limit = memlimit - needbytes;
+    /* don't allow allocation if it requires more memory then the total limit. */
+    if (needbytes > g->memlimit) return 1;
+  } 
+  else
+    limit = g->totalbytes - needbytes;
+
+  /* make sure the GC is not disabled. */
+  if (!is_block_gc(L)) {
+    do {
+      luaC_step(L);
+      /* only allow the GC to finish 1 full cycle. */
+      if (G(L)->gcstate == GCSpause) break;
+      yield();
+    } while (g->totalbytes >= limit);
+  }
+  return (g->totalbytes >= limit) ? 1 : 0;
+}
+
+
 static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
-  (void)ud;
-  (void)osize;
+  lua_State *L = (lua_State *)ud;
+  void *nptr;
+
   if (nsize == 0) {
     free(ptr);
     return NULL;
   }
+
+  if(nsize > osize && L != NULL) {
+#if defined(LUA_STRESS_EMERGENCY_GC)
+    luaC_fullgc(L);
+#endif
+    if(G(L)->memlimit > 0 && l_check_memlimit(L, nsize - osize, G(L)->memlimit))
+      return NULL;
+    else /* OOM! */
+    {
+      nptr = realloc(ptr, nsize);
+      if (nptr == NULL && l_check_memlimit(L, nsize - osize, 0))
+        LUA_OOM(L); /* call custom function if defined to signal OOM condition */
+    }
+
+    if (nptr == NULL) {
+      luaC_fullgc(L); /* emergency full collection. */
+      nptr = realloc(ptr, nsize); /* try allocation again */
+    }
+  }
   else
-    return realloc(ptr, nsize);
+    nptr = realloc(ptr, nsize);
+
+  return nptr;
 }
 
 
@@ -779,6 +837,7 @@ static int panic (lua_State *L) {
 
 LUALIB_API lua_State *luaL_newstate (void) {
   lua_State *L = lua_newstate(l_alloc, NULL);
+  lua_setallocf(L, l_alloc, L); /* allocator needs lua_State. */
   if (L) lua_atpanic(L, &panic);
   return L;
 }

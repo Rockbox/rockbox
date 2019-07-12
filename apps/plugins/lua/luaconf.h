@@ -368,6 +368,16 @@
 
 
 /*
+@@ LUA_STRESS_EMERGENCY_GC enables stress testing code for the Emergency GC.
+** CHANGE it to defined if you want to test for Emergency GC related bugs.
+** Note that this will make the Lua vm very slow, since it will force a
+** full GC on every new allocation.
+*/
+#undef LUA_STRESS_EMERGENCY_GC
+
+
+
+/*
 @@ luai_apicheck is the assert macro used by the Lua-C API.
 ** CHANGE luai_apicheck if you want Lua to perform some checks in the
 ** parameters it gets from API calls. This may slow down the interpreter
@@ -812,5 +822,5 @@ extern long rb_pow(long, long);
 
 /*else*/
 #define LUAC_TRUST_BINARIES
-
+#define LUA_USER_H "lua_user.h"
 #endif
