@@ -547,7 +547,9 @@ LUA_API void lua_getfield (lua_State *L, int idx, const char *k) {
   lua_lock(L);
   t = index2adr(L, idx);
   api_checkvalidindex(L, t);
+  fixedstack(L);
   setsvalue(L, &key, luaS_new(L, k));
+  unfixedstack(L);
   luaV_gettable(L, t, &key, L->top);
   api_incr_top(L);
   lua_unlock(L);
@@ -656,14 +658,14 @@ LUA_API void lua_settable (lua_State *L, int idx) {
 
 LUA_API void lua_setfield (lua_State *L, int idx, const char *k) {
   StkId t;
-  TValue key;
   lua_lock(L);
   api_checknelems(L, 1);
   t = index2adr(L, idx);
   api_checkvalidindex(L, t);
-  setsvalue(L, &key, luaS_new(L, k));
-  luaV_settable(L, t, &key, L->top - 1);
-  L->top--;  /* pop value */
+  setsvalue2s(L, L->top, luaS_new(L, k));
+  api_incr_top(L);
+  luaV_settable(L, t, L->top - 1, L->top - 2);
+  L->top -= 2;  /* pop key and value */
   lua_unlock(L);
 }
 
@@ -674,7 +676,9 @@ LUA_API void lua_rawset (lua_State *L, int idx) {
   api_checknelems(L, 2);
   t = index2adr(L, idx);
   api_check(L, ttistable(t));
+  fixedstack(L);
   setobj2t(L, luaH_set(L, hvalue(t), L->top-2), L->top-1);
+  unfixedstack(L);
   luaC_barriert(L, hvalue(t), L->top-1);
   L->top -= 2;
   lua_unlock(L);
@@ -687,7 +691,9 @@ LUA_API void lua_rawseti (lua_State *L, int idx, int n) {
   api_checknelems(L, 1);
   o = index2adr(L, idx);
   api_check(L, ttistable(o));
+  fixedstack(L);
   setobj2t(L, luaH_setnum(L, hvalue(o), n), L->top-1);
+  unfixedstack(L);
   luaC_barriert(L, hvalue(o), L->top-1);
   L->top--;
   lua_unlock(L);
@@ -903,11 +909,11 @@ LUA_API int lua_gc (lua_State *L, int what, int data) {
   g = G(L);
   switch (what) {
     case LUA_GCSTOP: {
-      g->GCthreshold = MAX_LUMEM;
+      set_block_gc(L);
       break;
     }
     case LUA_GCRESTART: {
-      g->GCthreshold = g->totalbytes;
+      unset_block_gc(L);
       break;
     }
     case LUA_GCCOLLECT: {
@@ -924,6 +930,10 @@ LUA_API int lua_gc (lua_State *L, int what, int data) {
       break;
     }
     case LUA_GCSTEP: {
+      if(is_block_gc(L)) {
+        res = 1; /* gc is block so we need to pretend that the collection cycle finished. */
+        break;
+      }
       lu_mem a = (cast(lu_mem, data) << 10);
       if (a <= g->totalbytes)
         g->GCthreshold = g->totalbytes - a;

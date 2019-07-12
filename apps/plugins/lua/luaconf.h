@@ -810,7 +810,13 @@ extern long rb_pow(long, long);
 /*Rocklua functions*/
 #include "rockconf.h"
 
+/* heap */
+#undef LUAI_GCPAUSE /*200*/
+#define LUAI_GCPAUSE  125
+#define MINSTRTABSIZE 512 /*32*/
+
 /*else*/
+#define LUA_USER_H "lua_user.h"
 #define LUA_DISABLE_BYTECODE
 
 #endif

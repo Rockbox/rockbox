@@ -20,6 +20,7 @@
 
 #include "plugin.h"
 #include <tlsf.h>
+#include "lua.h"
 
 void *get_new_area(size_t *size)
 {
@@ -36,7 +37,8 @@ void *get_new_area(size_t *size)
         return pluginbuf_ptr;
     }
 
-    if (audiobuf_ptr == NULL)
+    /* only grab the next area if lua already tried + failed to garbage collect*/
+    if (audiobuf_ptr == NULL && (get_lua_OOM())->count > 0)
     {
         /* grab audiobuffer */
         audiobuf_ptr = rb->plugin_get_audio_buffer(size);

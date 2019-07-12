@@ -51,11 +51,13 @@ struct lua_longjmp {
 void luaD_seterrorobj (lua_State *L, int errcode, StkId oldtop) {
   switch (errcode) {
     case LUA_ERRMEM: {
-      setsvalue2s(L, oldtop, luaS_newliteral(L, MEMERRMSG));
+      ptrdiff_t oldtopr = savestack(L, oldtop);
+      setsvalue2s(L, restorestack(L, oldtopr), luaS_newliteral(L, MEMERRMSG));
       break;
     }
     case LUA_ERRERR: {
-      setsvalue2s(L, oldtop, luaS_newliteral(L, "error in error handling"));
+      ptrdiff_t oldtopr = savestack(L, oldtop);
+      setsvalue2s(L, restorestack(L, oldtopr), luaS_newliteral(L, "error in error handling"));
       break;
     }
     case LUA_ERRSYNTAX:
@@ -92,6 +94,8 @@ static void resetstack (lua_State *L, int status) {
 
 
 void luaD_throw (lua_State *L, int errcode) {
+  unfixedstack(L); /* make sure the fixedstack & block_gc flags get reset. */
+  unset_block_gc(L);
   if (L->errorJmp) {
     L->errorJmp->status = errcode;
     LUAI_THROW(L, L->errorJmp);
@@ -208,7 +212,9 @@ void luaD_callhook (lua_State *L, int event, int line) {
 static StkId adjust_varargs (lua_State *L, Proto *p, int actual) {
   int i;
   int nfixargs = p->numparams;
+#if defined(LUA_COMPAT_VARARG)
   Table *htab = NULL;
+#endif
   StkId base, fixed;
   for (; actual < nfixargs; ++actual)
     setnilvalue(L->top++);
@@ -219,10 +225,15 @@ static StkId adjust_varargs (lua_State *L, Proto *p, int actual) {
     luaC_checkGC(L);
     luaD_checkstack(L, p->maxstacksize);
     htab = luaH_new(L, nvar, 1);  /* create `arg' table */
+    sethvalue2s(L, L->top, htab); /* put table on stack */
+    incr_top(L);
+    fixedstack(L);
     for (i=0; i<nvar; i++)  /* put extra arguments into `arg' table */
-      setobj2n(L, luaH_setnum(L, htab, i+1), L->top - nvar + i);
+      setobj2n(L, luaH_setnum(L, htab, i+1), L->top - 1 - nvar + i);
+    unfixedstack(L);
     /* store counter in field `n' */
     setnvalue(luaH_setstr(L, htab, luaS_newliteral(L, "n")), cast_num(nvar));
+    L->top--; /* remove table from stack */
   }
 #endif
   /* move fixed parameters to final position */
@@ -232,11 +243,13 @@ static StkId adjust_varargs (lua_State *L, Proto *p, int actual) {
     setobjs2s(L, L->top++, fixed+i);
     setnilvalue(fixed+i);
   }
+#if defined(LUA_COMPAT_VARARG)
   /* add `arg' parameter */
   if (htab) {
     sethvalue(L, L->top++, htab);
     lua_assert(iswhite(obj2gco(htab)));
   }
+#endif
   return base;
 }
 
@@ -495,6 +508,7 @@ static void f_parser (lua_State *L, void *ud) {
   struct SParser *p = cast(struct SParser *, ud);
   int c = luaZ_lookahead(p->z);
   luaC_checkGC(L);
+  set_block_gc(L);  /* stop collector during parsing */
   tf = ((c == LUA_SIGNATURE[0]) ? luaU_undump : luaY_parser)(L, p->z,
                                                              &p->buff, p->name);
   cl = luaF_newLclosure(L, tf->nups, hvalue(gt(L)));
@@ -503,6 +517,7 @@ static void f_parser (lua_State *L, void *ud) {
     cl->l.upvals[i] = luaF_newupval(L);
   setclvalue(L, L->top, cl);
   incr_top(L);
+  unset_block_gc(L);
 }
 
 
