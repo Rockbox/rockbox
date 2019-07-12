@@ -811,6 +811,8 @@ extern long rb_pow(long, long);
 #include "rockconf.h"
 
 /*else*/
+#define LUA_USER_H "lua_user.h"
+#define MINSTRTABSIZE   512
 #define LUA_DISABLE_BYTECODE
 
 #endif
