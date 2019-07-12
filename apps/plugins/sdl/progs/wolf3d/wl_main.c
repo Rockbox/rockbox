@@ -1277,7 +1277,13 @@ static void InitGame()
 // HOLDING DOWN 'M' KEY? (Fire for rockbox)
 //
 #ifndef SPEARDEMO
-    if (Keyboard[sc_Control])
+    /* allow entering jukebox */
+
+    rb->sleep(HZ / 10);
+
+    IN_ProcessEvents();
+
+    if (Keyboard[sc_Return])
     {
         DoJukebox();
         didjukebox=true;
