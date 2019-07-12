@@ -812,5 +812,6 @@ extern long rb_pow(long, long);
 
 /*else*/
 #define LUAC_TRUST_BINARIES
-
+#define LUA_USER_H "lua_user.h"
+#define MINSTRTABSIZE   512
 #endif
