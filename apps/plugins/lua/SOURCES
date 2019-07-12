@@ -24,6 +24,7 @@ ltable.c
 ltablib.c
 ltm.c
 lundump.c
+lua_user.c
 lvm.c
 lzio.c
 rockaux.c
