@@ -370,7 +370,8 @@ local _draw = {} do
         end
 
         -- make a copy of the current screen for later
-        local screen_img = _newimg(LCD_W, LCD_H)
+        --local screen_img = _newimg(LCD_W, LCD_H)
+        local screen_img = _newimg(LCD_W, h * 2)
         _copy(screen_img, _LCD)
 
         -- check if the screen buffer is supplied image if so set img to the copy
@@ -379,7 +380,8 @@ local _draw = {} do
         end
 
         -- we will be printing the text to the screen then blitting into img
-        rb.lcd_clear_display()
+        --rb.lcd_clear_display()
+        _clear(_LCD, opts.bg_pattern or 0, 1, 1, LCD_W, h * 2)
 
         if w > LCD_W then -- text is too long for the screen do it in chunks
             local l = 1
@@ -405,7 +407,9 @@ local _draw = {} do
                 -- using the mask we made blit color into img
                 _copy(img, _LCD, x + width, y + height, _NIL, _NIL, _NIL, _NIL, false, BSAND, color)
                 x = x + wp
-                rb.lcd_clear_display()
+                --rb.lcd_clear_display()
+                _clear(_LCD, opts.bg_pattern or 0, 1, 1, LCD_W, h * 2)
+
                 lenr = text:len()
             end
         else --w <= LCD_W
