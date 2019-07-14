@@ -811,6 +811,6 @@ extern long rb_pow(long, long);
 #include "rockconf.h"
 
 /*else*/
-#define LUAC_TRUST_BINARIES
+#define LUA_DISABLE_BYTECODE
 
 #endif

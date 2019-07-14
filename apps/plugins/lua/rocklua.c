@@ -159,8 +159,14 @@ enum plugin_status plugin_start(const void* parameter)
 
         lua_State *L = luaL_newstate();
 
-        rocklua_openlibs(L);
+        lua_gc(L, LUA_GCSTOP, 0);  /* stop collector during initialization */
+        rocklua_openlibs(L);  /* open libraries */
+        lua_gc(L, LUA_GCRESTART, 0);
+        
         status = luaL_loadfile(L, filename);
+
+        lua_gc(L, LUA_GCCOLLECT, 0);
+
         if (!status) {
             rb->lcd_scroll_stop(); /* rb doesn't like bg change while scroll */
             rb->lcd_clear_display();
