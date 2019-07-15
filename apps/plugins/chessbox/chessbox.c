@@ -74,6 +74,8 @@ extern const fb_data chessbox_pieces[];
 #define COMMAND_SELECT    10
 #define COMMAND_NEXT      11
 #define COMMAND_PREV      12
+#define COMMAND_VIEW      13
+#define COMMAND_RETURN    14
 
 short plugin_mode;
 
@@ -360,7 +362,7 @@ static void cb_saveposition_dbg ( void )
                                                       sizeof(temp));
         rb->write(fd, buf, ch_ct);
     }
-    for (i = 0; i <= GameCnt; i++) {
+    for (i = 0; i < ((GameCnt + 1) & 0xFF); i++) {
         ch_ct = rb->snprintf(buf,31,"GameCt %d, %d bytes\n",i,
                                                       sizeof(GameCnt));
         rb->write(fd, buf, ch_ct);
@@ -399,17 +401,21 @@ static void cb_saveposition_dbg ( void )
 }
 #endif
 
-/* ---- Save current position ---- */
-static void cb_saveposition ( void ) {
+/* ---- Save current position and game history ---- */
+static void cb_saveposition ( struct pgn_game_node* game ) {
     int fd;
     short sq,i,c;
     unsigned short temp;
+    struct pgn_ply_node *ply;
+    char buf[4];
+
 #ifdef CHESSBOX_SAVE_FILE_DBG
     cb_saveposition_dbg();
 #endif
+
     rb->splash ( 0 , ID2P(LANG_CHESSBOX_SAVING_POSITION) );
 
-    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT, 0666);
+    fd = rb->open(SAVE_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 
     computer++; rb->write(fd, &(computer), sizeof(computer)); computer--;
     opponent++; rb->write(fd, &(opponent), sizeof(opponent)); opponent--;
@@ -438,7 +444,9 @@ static void cb_saveposition ( void ) {
         temp = 256*board[sq] + c ;
         rb->write(fd, &(temp), sizeof(temp));
     }
-    for (i = 0; i <= GameCnt; i++) {
+    c = GameCnt;
+    rb->write(fd, &(c), sizeof(c));
+    for (i = 0; i < ((GameCnt + 1) & 0xFF); i++) {
         if (GameList[i].color == neutral)
             c = 0;
         else
@@ -451,14 +459,24 @@ static void cb_saveposition ( void ) {
         rb->write(fd, &(GameList[i].piece), sizeof(GameList[i].piece));
         rb->write(fd, &(c), sizeof(c));
     }
+    for (ply=game->first_ply; ply!=NULL; ply=ply->next_node) {
+        buf[0] = ply->column_from + 'a';
+        buf[1] = ply->row_from + '1';
+        buf[2] = ply->column_to + 'a';
+        buf[3] = ply->row_to + '1';
+        rb->write(fd, buf, 4);
+    }
     rb->close(fd);
 }
 
-/* ---- Restore saved position ---- */
-static void cb_restoreposition ( void ) {
+/* ---- Restore saved position and game history ---- */
+static struct pgn_game_node* cb_restoreposition ( void ) {
     int fd;
     short sq;
     unsigned short m;
+    short n;
+    char buf[4];
+    struct pgn_game_node* game = pgn_init_game();
 
     if ( (fd = rb->open(SAVE_FILE, O_RDONLY)) >= 0 ) {
         rb->splash ( 0 , ID2P(LANG_CHESSBOX_LOADING_POSITION) );
@@ -492,9 +510,12 @@ static void cb_restoreposition ( void ) {
             else
                 --color[sq];
         }
-        GameCnt = MAX_GAME_CNT - 1; /*uchar rollsover to 0 after 255*/
-        while (rb->read(fd, &(GameList[++GameCnt].gmove),
-                        sizeof(GameList[GameCnt].gmove)) > 0) {
+        rb->read(fd, &(n), sizeof(n));
+        n++;
+        n &= 0xFF;
+        for (GameCnt = 0; GameCnt < n; GameCnt++) {
+            rb->read(fd, &(GameList[GameCnt].gmove),
+                     sizeof(GameList[GameCnt].gmove));
             rb->read(fd, &(GameList[GameCnt].score),
                      sizeof(GameList[GameCnt].score));
             rb->read(fd, &(GameList[GameCnt].depth),
@@ -506,7 +527,7 @@ static void cb_restoreposition ( void ) {
             rb->read(fd, &(GameList[GameCnt].piece),
                      sizeof(GameList[GameCnt].piece));
             rb->read(fd, &(GameList[GameCnt].color),
-                         sizeof(GameList[GameCnt].color));
+                     sizeof(GameList[GameCnt].color));
             if (GameList[GameCnt].color == 0)
                 GameList[GameCnt].color = neutral;
             else
@@ -516,47 +537,45 @@ static void cb_restoreposition ( void ) {
         if (TimeControl.clock[white] > 0)
             TCflag = true;
         computer--; opponent--;
+        n = 0;
+        while (rb->read(fd, buf, 4) > 0)
+            pgn_append_ply(game, ((n++) & 1) ? black : white, buf, false);
+        rb->close(fd);
     }
-    rb->close(fd);
     cb_setlevel(Level);
     InitializeStats();
     Sdepth = 0;
+
+    return game;
 }
 
 /* ---- show menu in viewer mode---- */
 static int cb_menu_viewer(void)
 {
     int selection;
-    int result = 0;
-    bool menu_quit = false;
 
     MENUITEM_STRINGLIST(menu,"Chessbox Menu",NULL,
                         ID2P(LANG_CHESSBOX_MENU_RESTART_GAME),
                         ID2P(LANG_CHESSBOX_MENU_SELECT_OTHER_GAME),
+                        ID2P(LANG_CHESSBOX_MENU_RESUME_GAME),
+                        ID2P(LANG_RETURN),
                         ID2P(LANG_MENU_QUIT));
 
-    while(!menu_quit)
+    switch(rb->do_menu(&menu, &selection, NULL, false))
     {
-        switch(rb->do_menu(&menu, &selection, NULL, false))
-        {
-            case 0:
-                menu_quit = true;
-                result = COMMAND_RESTART;
-                break;
-            case 1:
-                result = COMMAND_SELECT;
-                menu_quit = true;
-                break;
-            case 2:
-                result = COMMAND_QUIT;
-                menu_quit = true;
-                break;
-        }
+        case 0:
+            return COMMAND_RESTART;
+        case 1:
+            return COMMAND_SELECT;
+        case 3:
+            return COMMAND_RETURN;
+        case 4:
+            return COMMAND_QUIT;
     }
-    return result;
+    return COMMAND_RESUME;
 }
 
-/* ---- get a command in game mode ---- */
+/* ---- get a command in viewer mode ---- */
 static struct cb_command cb_get_viewer_command (void) {
     int button;
     struct cb_command result = { 0, {0,0,0,0,0}, 0 };
@@ -592,17 +611,18 @@ static struct cb_command cb_get_viewer_command (void) {
 }
 
 /* ---- viewer main loop ---- */
-static void cb_start_viewer(char* filename){
+static bool cb_start_viewer(const char* filename){
     struct pgn_game_node *first_game, *selected_game;
     struct pgn_ply_node *curr_ply;
     bool exit_game = false;
     bool exit_viewer = false;
+    bool exit_app = false;
     struct cb_command command;
 
     first_game = pgn_list_games(filename);
     if (first_game == NULL){
         rb->splash ( HZ*2 , ID2P(LANG_CHESSBOX_NO_GAMES) );
-        return;
+        return exit_app;
     }
 
     do {
@@ -759,6 +779,8 @@ static void cb_start_viewer(char* filename){
                         exit_game = true;
                         break;
                     case COMMAND_QUIT:
+                        exit_app = true;
+                    case COMMAND_RETURN:
                         exit_viewer = true;
                         break;
                 }
@@ -767,57 +789,44 @@ static void cb_start_viewer(char* filename){
             rb->splash ( HZ*2 , ID2P(LANG_CHESSBOX_PGN_PARSE_ERROR));
         }
     } while (!exit_viewer);
+    return exit_app;
 }
 
 /* ---- show menu ---- */
 static int cb_menu(void)
 {
     int selection;
-    int result = 0;
-    bool menu_quit = false;
 
     MENUITEM_STRINGLIST(menu,"Chessbox Menu",NULL,
                         ID2P(LANG_CHESSBOX_MENU_NEW_GAME),
                         ID2P(LANG_CHESSBOX_MENU_RESUME_GAME),
                         ID2P(LANG_CHESSBOX_MENU_SAVE_GAME),
                         ID2P(LANG_CHESSBOX_MENU_RESTORE_GAME),
+                        ID2P(LANG_CHESSBOX_MENU_VIEW_GAMES),
 #ifdef HAVE_PLAYBACK_CONTROL
                         ID2P(LANG_PLAYBACK_CONTROL),
 #endif
                         ID2P(LANG_MENU_QUIT));
 
-    while(!menu_quit)
+    switch(rb->do_menu(&menu, &selection, NULL, false))
     {
-        switch(rb->do_menu(&menu, &selection, NULL, false))
-        {
-            case 0:
-                menu_quit = true;
-                result = COMMAND_RESTART;
-                break;
-            case 1:
-                result = COMMAND_RESUME;
-                menu_quit = true;
-                break;
-            case 2:
-                result = COMMAND_SAVE;
-                menu_quit = true;
-                break;
-            case 3:
-                result = COMMAND_RESTORE;
-                menu_quit = true;
-                break;
-            case 4:
+        case 0:
+            return COMMAND_RESTART;
+        case 2:
+            return COMMAND_SAVE;
+        case 3:
+            return COMMAND_RESTORE;
+        case 4:
+            return COMMAND_VIEW;
+        case 5:
 #ifdef HAVE_PLAYBACK_CONTROL
-                playback_control(NULL);
-                break;
-            case 5:
+            playback_control(NULL);
+            break;
+        case 6:
 #endif
-                result = COMMAND_QUIT;
-                menu_quit = true;
-                break;
-        }
+            return COMMAND_QUIT;
     }
-    return result;
+    return COMMAND_RESUME;
 }
 
 /* ---- get a command in game mode ---- */
@@ -1029,12 +1038,8 @@ static void cb_play_game(void) {
     /* init board */
     GNUChess_Initialize();
 
-    /* init PGN history data structures */
-    game = pgn_init_game();
-
     /* restore saved position, if saved */
-    cb_restoreposition();
-    /* TODO: save/restore the PGN history of unfinished games */
+    game = cb_restoreposition();
 
     /* draw the board */
     /* I don't like configscreens, start game inmediatly */
@@ -1097,7 +1102,7 @@ static void cb_play_game(void) {
                 cb_drawboard();
                 break;
             case COMMAND_SAVE:
-                cb_saveposition();
+                cb_saveposition(game);
                 cb_drawboard();
                 break;
             case COMMAND_RESTORE:
@@ -1106,12 +1111,21 @@ static void cb_play_game(void) {
                 /* init board */
                 GNUChess_Initialize();
 
-                /* init PGN history data structures */
-                game = pgn_init_game();
-
                 /* restore saved position, if saved */
-                cb_restoreposition();
+                game = cb_restoreposition();
 
+                cb_drawboard();
+                break;
+            case COMMAND_VIEW:
+                if (rb->file_exists(pgn_file)) {
+                    cb_saveposition(game);
+                    if (cb_start_viewer(pgn_file))
+                        return;
+                    GNUChess_Initialize();
+                    game = cb_restoreposition();
+                }else{
+                    rb->splash ( HZ*2 , ID2P(LANG_CHESSBOX_NO_GAMES) );
+                }
                 cb_drawboard();
                 break;
             case COMMAND_PLAY:
@@ -1158,9 +1172,7 @@ static void cb_play_game(void) {
         }
     }
 
-    cb_saveposition();
-    /* TODO: save/restore the PGN history of unfinished games */
-    rb->lcd_setfont(FONT_UI);
+    cb_saveposition(game);
 
 }
 
@@ -1186,6 +1198,8 @@ enum plugin_status plugin_start(const void* parameter) {
      } else {
         cb_play_game();
     }
+
+    rb->lcd_setfont(FONT_UI);
 
     if (cb_sysevent)
         rb->default_event_handler(cb_sysevent);
