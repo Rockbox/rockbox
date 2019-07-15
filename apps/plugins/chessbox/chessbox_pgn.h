@@ -649,7 +649,7 @@
 /* structure to represent the plies */
 struct pgn_ply_node {
     unsigned short player;
-    char pgn_text[9];
+    char pgn_text[11];
     unsigned short row_from;
     unsigned short column_from;
     unsigned short row_to;
@@ -676,6 +676,9 @@ struct pgn_game_node {
     struct pgn_ply_node* first_ply;
     struct pgn_game_node* next_node;
 };
+
+/* File for saving games */
+extern const char* pgn_file;
 
 /* Return the list of games in a PGN file.
  * Parsing of the games themselves is postponed until

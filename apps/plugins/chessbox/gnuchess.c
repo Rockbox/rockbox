@@ -1167,12 +1167,12 @@ void OpeningBook()
   m = 0;
   while ( o_c < MAX_OPENING )  {
       m_c = 0 ;
-      for (j = 0; j <= GameCnt; j++) {
+      for (j = 0; j < ((GameCnt + 1) & 0xFF); j++) {
         if ( GameList[j].gmove != OBook[o_c][m_c] ) break;
         m_c++;
       }
       /* I added ( m != OBook[o_c][m_c] ) trying to get more random games */
-      if ( ( j > GameCnt ) && ( m != OBook[o_c][m_c] ) ) {
+      if ( ( j >= ((GameCnt + 1) & 0xFF) ) && ( m != OBook[o_c][m_c] ) ) {
           r=rb->rand();
           if ( r > r0 ) {
                   r0 = r; m = OBook[o_c][m_c];
@@ -2066,7 +2066,7 @@ register short i,c,f,t;
 short b[64];
 unsigned short m;
   *cnt = c = 0;
-  if (GameCnt > Game50+3)
+  if (((GameCnt + 1) & 0xFF) > Game50+4)
     {
       for (i = 0; i < 64; b[i++] = 0);
       for (i = GameCnt; i > Game50; i--)
