@@ -22,9 +22,9 @@
 #include "plugin.h"
 #include "chessbox_pgn.h"
 
-#define PGN_FILE  PLUGIN_GAMES_DATA_DIR  "/chessbox.pgn"
 #define LOG_FILE  PLUGIN_GAMES_DATA_DIR  "/chessbox.log"
 int loghandler;
+const char *pgn_file = PLUGIN_GAMES_DATA_DIR  "/chessbox.pgn";
 
 short kn_offs[8][2] = {{2,1},{2,-1},{-2,1},{-2,-1},{1,2},{1,-2},{-1,2},{-1,-2}};
 short rk_offs[4][2] = {{1,0},{-1,0},{0,1},{0,-1}};
@@ -889,7 +889,7 @@ void pgn_store_game(struct pgn_game_node* game){
         ply_count++;
     }
 
-    fhandler = rb->open(PGN_FILE, O_WRONLY|O_CREAT|O_APPEND, 0666);
+    fhandler = rb->open(pgn_file, O_WRONLY|O_CREAT|O_APPEND, 0666);
 
 
     /* the first 7 tags are mandatory according to the PGN specification so we
