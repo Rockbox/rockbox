@@ -15259,3 +15259,20 @@ id: VOICE_BAT_BENCH_KEYS
     recording: "Recording Directory"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_VIEW_GAMES
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "View Played Games"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "View Played Games"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "View Played Games"
+  </voice>
+</phrase>
