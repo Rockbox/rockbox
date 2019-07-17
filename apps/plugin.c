@@ -881,6 +881,9 @@ int plugin_load(const char* plugin, const void* parameter)
     }
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     plugin_size = hdr->end_addr - pluginbuf;
+#if defined(CPU_ARM)
+    plugin_size = ALIGN_UP(plugin_size, 0x8);
+#endif
 #else
     plugin_size = 0;
 #endif
