@@ -270,9 +270,12 @@ sub out_bool
     return sprintf("\tbool result = %s;\n\tlua_pushboolean(L, result);\n\treturn 1;\n", $name);
 }
 
+#Sort the functions
+my @sorted_functions = sort { @$a{'name'} cmp @$b{'name'} } @functions;
+
 # Print the functions
 my @valid_functions;
-foreach my $function (@functions)
+foreach my $function (@sorted_functions)
 {
     my $valid = 1, @arguments = ();
     # Check for supported arguments
