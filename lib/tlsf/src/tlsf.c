@@ -508,7 +508,8 @@ size_t add_new_area(void *area, size_t area_size, void *mem_pool)
 
     /* FW 28-10-17: disabled memset due to crashes on ARM. Functions
      * fine without it. */
-    /* memset(area, 0, area_size); */
+    /* BILGUS 17-7-19 re-enabled after setting pluginbuf aligned to 8 bytes */ 
+    memset(area, 0, area_size);
     ptr = tlsf->area_head;
     ptr_prev = 0;
 
