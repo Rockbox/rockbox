@@ -921,7 +921,8 @@ int plugin_load(const char* plugin, const void* parameter)
         return -1;
     }
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-    plugin_size = hdr->end_addr - pluginbuf;
+    /* tlsf crashes observed on arm with 0x4 aligned addresses */
+    plugin_size = ALIGN_UP(hdr->end_addr - pluginbuf, 0x8);
 #else
     plugin_size = 0;
 #endif
