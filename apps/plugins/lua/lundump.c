@@ -20,6 +20,8 @@
 #include "lundump.h"
 #include "lzio.h"
 
+#ifndef LUA_DISABLE_BYTECODE
+
 typedef struct {
  lua_State* L;
  ZIO* Z;
@@ -225,3 +227,14 @@ void luaU_header (char* h)
  *h++=(char)sizeof(lua_Number);
  *h++=(char)(((lua_Number)0.5)==0);		/* is lua_Number integral? */
 }
+
+#else /* LUA_DISABLE_BYTECODE */
+#include "lauxlib.h"
+Proto* luaU_undump (lua_State* L, ZIO* Z, Mbuffer* buff, const char* name)
+{
+ (void) Z;
+ (void) buff;
+ luaL_error(L, LUA_QL("%s") " bytecode not supported", name);
+ return NULL;
+}
+#endif

@@ -797,7 +797,7 @@ extern long rb_pow(long, long);
 #undef LUA_COMPAT_GFIND
 #undef LUA_COMPAT_OPENLIB
 
-/* Resize heap allocated buffers */
+/* Resize [STACK] allocated buffers */
 #undef LUAI_MAXVARS /*200*/
 #define LUAI_MAXVARS  100
 
@@ -811,6 +811,6 @@ extern long rb_pow(long, long);
 #include "rockconf.h"
 
 /*else*/
-#define LUAC_TRUST_BINARIES
+#define LUA_DISABLE_BYTECODE
 
 #endif
