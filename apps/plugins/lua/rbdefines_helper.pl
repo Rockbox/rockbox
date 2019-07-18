@@ -47,7 +47,10 @@ my @all_defines;
 my $def_regex = qr/#define\s+([^\s\r\n]+)\s+([^\r\n]+)/;
 my $quot_regex = qr/.*([\"\']).*/;
 my $num_regex = qr/.*([\+\-\*\\|&\d]).*/;
-
+my $configh_regex = qr/^\s*#define\s*__CONFIG_H__\s*$/;
+my $config_h = "?";
+my $exclude_regex = qr/^#define\s*_?POSIX.*/;
+my $exclude_enum_regex = qr/^#define\s*(_SC_|_PC_|_CS_).*/;
 print <<EOF
 #include <stdio.h>
 #include <stdbool.h>
@@ -62,7 +65,10 @@ EOF
 
 while(my $line = <STDIN>)
 {
-        
+        if($config_h eq "?" && $line =~ $configh_regex) { $config_h = $line; }
+        next if($config_h eq "?"); #don't capture till we get to the config file
+        next if($line =~ $exclude_regex);
+
         if($line =~ $def_regex) #does it begin with #define?
         {
             push(@all_defines, $line); #save all defines for possible ambiguous macros
@@ -85,12 +91,14 @@ while(my $line = <STDIN>)
         }
         elsif($line =~ /^(?!.*;)enum.*{/) #enum {
         {
+            next if($line =~ /enum\s*__.*/); #don't add reserved
             print $line;
             next if($line =~ /.*};.*/);
             do_enum($line)
         }
         elsif($line =~ /^(?!.*[;\(\)])enum.*/) #enum
         {
+            next if($line =~ /enum\s*__.*/); #don't add reserved
             #need to be careful might be a function returning enum
             my $lastline = $line;
             next if($line =~ /.*};.*/);
@@ -105,7 +113,8 @@ while(my $line = <STDIN>)
         }
 
 }
-
+#warn "total defines: ".scalar @all_defines;
+#warn "captured defines: ".scalar @captured_defines;
 #Sort the functions
 my @sorted_defines = sort { @$a{'name'} cmp @$b{'name'} } @captured_defines;
 
@@ -176,7 +185,7 @@ sub do_enum {
 
     while($line = <STDIN>)
     {
-        
+        next if($line =~ $exclude_enum_regex);
         if($line =~ /.*};.*/)
         {
             print $line;
