@@ -793,7 +793,11 @@ LUALIB_API int luaopen_rock(lua_State *L)
 {
     luaL_register(L, LUA_ROCKLIBNAME, rocklib);
     luaL_register(L, LUA_ROCKLIBNAME, rocklib_aux);
-
+    lua_getglobal(L, "require");
+    lua_pushstring(L, "rb_defines");
+    if (lua_pcall (L, 1, 0, 0))
+        lua_pop(L, 1);
+#if 0
     static const struct lua_int_reg rlib_const_int[] =
     {
         /* useful integer constants */
@@ -860,7 +864,7 @@ LUALIB_API int luaopen_rock(lua_State *L)
         luaS_newlloc(L, rlcs->name, TSTR_INBIN);
         lua_setfield(L, -2, rlcs->name);
     }
-
+#endif
     return 1;
 }
 

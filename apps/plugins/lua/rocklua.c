@@ -31,15 +31,15 @@
 
 static const luaL_Reg lualibs[] = {
   {"",              luaopen_base},
+  {LUA_LOADLIBNAME, luaopen_package},
   {LUA_TABLIBNAME,  luaopen_table},
   {LUA_STRLIBNAME,  luaopen_string},
+  {LUA_BITLIBNAME,  luaopen_bit},
+  {LUA_IOLIBNAME,   luaopen_io},
+  {LUA_MATHLIBNAME, luaopen_math},
   {LUA_OSLIBNAME,   luaopen_os},
   {LUA_ROCKLIBNAME, luaopen_rock},
   {LUA_ROCKLIBNAME, luaopen_rock_img},
-  {LUA_BITLIBNAME,  luaopen_bit},
-  {LUA_IOLIBNAME,   luaopen_io},
-  {LUA_LOADLIBNAME, luaopen_package},
-  {LUA_MATHLIBNAME, luaopen_math},
   {LUA_DIRLIBNAME,  luaopen_luadir},
   {NULL, NULL}
 };

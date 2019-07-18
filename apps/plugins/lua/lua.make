@@ -35,10 +35,15 @@ else
     ROCKS += $(LUA_BUILDDIR)/lua.rock
 endif
 
-$(LUA_BUILDDIR)/lua.rock: $(LUA_OBJ) $(TLSFLIB) $(LUA_BUILDDIR)/actions.lua $(LUA_BUILDDIR)/buttons.lua $(LUA_BUILDDIR)/settings.lua $(LUA_BUILDDIR)/rocklib_aux.o $(LUA_INCLUDELIST)
+$(LUA_BUILDDIR)/lua.rock: $(LUA_OBJ) $(TLSFLIB) $(LUA_BUILDDIR)/actions.lua $(LUA_BUILDDIR)/buttons.lua $(LUA_BUILDDIR)/settings.lua $(LUA_BUILDDIR)/rocklib_aux.o $(LUA_BUILDDIR)/rb_defines.lua $(LUA_INCLUDELIST)
 
 $(LUA_BUILDDIR)/actions.lua: $(LUA_OBJ) $(LUA_SRCDIR)/action_helper.pl
 	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E -P $(APPSDIR)/plugins/lib/pluginlib_actions.h | $(LUA_SRCDIR)/action_helper.pl > $(LUA_BUILDDIR)/actions.lua
+
+$(LUA_BUILDDIR)/rb_defines.lua: $(LUA_OBJ) $(LUA_SRCDIR)/rbdefines_helper.pl
+	$(SILENT)$(CC) $(INCLUDES) -dD -E -P $(TARGET) $(CFLAGS) -include plugin.h - < /dev/null | $(LUA_SRCDIR)/rbdefines_helper.pl | \
+	$(HOSTCC) -fno-builtin $(HOST_INCLUDES) -x c -o $(LUA_BUILDDIR)/rbdefines_helper -
+	$(call PRINTS,GEN $(@F))$(LUA_BUILDDIR)/rbdefines_helper > $(LUA_BUILDDIR)/rb_defines.lua
 
 $(LUA_BUILDDIR)/settings.lua: $(LUA_OBJ) $(LUA_SRCDIR)/settings_helper.pl
 	$(SILENT)$(CC) $(INCLUDES) -E -P $(TARGET) $(CFLAGS) -include plugin.h -include cuesheet.h - < /dev/null | $(LUA_SRCDIR)/settings_helper.pl | \
