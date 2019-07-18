@@ -15,6 +15,8 @@
 #include "lstate.h"
 #include "lundump.h"
 
+#ifndef LUA_DISABLE_BYTECODE
+
 typedef struct {
  lua_State* L;
  lua_Writer writer;
@@ -162,3 +164,14 @@ int luaU_dump (lua_State* L, const Proto* f, lua_Writer w, void* data, int strip
  DumpFunction(f,NULL,&D);
  return D.status;
 }
+#else /* LUA_DISABLE_BYTECODE */
+#include "lauxlib.h"
+int luaU_dump (lua_State* L, const Proto* f, lua_Writer w, void* data, int strip)
+{
+ (void) f;
+ (void) w;
+ (void) data;
+ (void) strip;
+ return luaL_error(L, " bytecode not supported");
+}
+#endif
