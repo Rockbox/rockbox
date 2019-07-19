@@ -52,6 +52,8 @@ $(BUILDDIR)/sysfont.o: $(SYSFONT) $(BUILDDIR)/sysfont.h
 SVNVERSION:=$(shell VERSION='$(VERSION)' $(TOOLSDIR)/version.sh $(ROOTDIR))
 OLDSVNVERSION:=$(shell grep 'RBVERSION' $(BUILDDIR)/rbversion.h 2>/dev/null|cut -d '"' -f 2 || echo "NOREVISION")
 
+CORE_LIBS:=$(FIRMLIB)
+
 ifneq ($(SVNVERSION),$(OLDSVNVERSION))
 .PHONY: $(BUILDDIR)/rbversion.h
 endif
