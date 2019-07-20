@@ -384,11 +384,13 @@ bool pcm_output_init(void)
 
     old_sampr = rb->mixer_get_frequency();
     rb->mixer_set_frequency(CLOCK_RATE);
+    rb->pcmbuf_fade(false, true);
     return true;
 }
 
 void pcm_output_exit(void)
 {
+    rb->pcmbuf_fade(false, false);
     if (old_sampr != 0)
         rb->mixer_set_frequency(old_sampr);
 }

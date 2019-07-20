@@ -634,6 +634,54 @@ static unsigned draw_blendcolor(unsigned c1, unsigned c2, unsigned char amount)
 }
 #endif
 
+#ifdef PLUGIN_USE_IRAM
+/* IRAM preserving mechanism to enable talking menus */
+static char *iram_saved_copy;
+extern char iramstart[], iramend[];
+
+static void iram_saving_init(void)
+{
+#ifndef SIMULATOR
+    size_t size;
+    iram_saved_copy = (char *)rb->plugin_get_buffer(&size);
+
+    if (size >= (size_t)(iramend-iramstart))
+        iram_saved_copy += size - (size_t)(iramend - iramstart);
+    else
+#endif
+        iram_saved_copy = NULL;
+
+    return;
+}
+
+void mpegplayer_iram_preserve(void)
+{
+    if (iram_saved_copy)
+    {
+        rb->memcpy(iram_saved_copy, iramstart, iramend-iramstart);
+#ifdef HAVE_CPUCACHE_INVALIDATE
+        /* make the icache (if it exists) up to date with the new code */
+        rb->cpucache_invalidate();
+#endif /* HAVE_CPUCACHE_INVALIDATE */
+    }
+    return;
+}
+
+void mpegplayer_iram_restore(void)
+{
+    if (iram_saved_copy)
+    {
+        rb->audio_hard_stop();
+        rb->memcpy(iramstart, iram_saved_copy, iramend-iramstart);
+#ifdef HAVE_CPUCACHE_INVALIDATE
+        /* make the icache (if it exists) up to date with the new code */
+        rb->cpucache_invalidate();
+#endif /* HAVE_CPUCACHE_INVALIDATE */
+    }
+    return;
+}
+#endif
+
 /* Drawing functions that operate rotated on LCD_PORTRAIT displays -
  * most are just wrappers of lcd_* functions with transforms applied.
  * The origin is the upper-left corner of the OSD area */
@@ -2369,6 +2417,10 @@ enum plugin_status plugin_start(const void* parameter)
     int status = PLUGIN_OK; /* assume success */
     bool quit = false;
 
+#if defined(PLUGIN_USE_IRAM) && !defined(SIMULATOR)
+    bool preserved_talk_state;
+#endif
+
     if (parameter == NULL) {
         /* No file = GTFO */
         rb->splash(HZ*2, "No File");
@@ -2377,6 +2429,16 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* Disable all talking before initializing IRAM */
     rb->talk_disable(true);
+
+#ifdef PLUGIN_USE_IRAM
+    iram_saving_init();
+
+#ifndef SIMULATOR
+    preserved_talk_state = rb->global_settings->talk_menu;
+    if (!iram_saved_copy)
+        rb->global_settings->talk_menu = false;
+#endif
+#endif
 
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_backdrop(NULL);
@@ -2527,6 +2589,11 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     stream_exit();
+
+#if defined(PLUGIN_USE_IRAM) && !defined(SIMULATOR)
+    if (!iram_saved_copy)
+        rb->global_settings->talk_menu = preserved_talk_state;
+#endif
 
     rb->talk_disable(false);
 

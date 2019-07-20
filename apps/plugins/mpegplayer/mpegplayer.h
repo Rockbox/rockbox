@@ -86,4 +86,10 @@
 #define LCD_ENABLE_EVENT_0 MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 0)
 #define LCD_ENABLE_EVENT_1 MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 1)
 
+#ifdef PLUGIN_USE_IRAM
+/* IRAM preserving mechanism to enable talking menus */
+extern void mpegplayer_iram_preserve(void);
+extern void mpegplayer_iram_restore(void);
+#endif
+
 #endif /* MPEGPLAYER_H */

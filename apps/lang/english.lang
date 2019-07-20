@@ -15279,3 +15279,363 @@ id: VOICE_BAT_BENCH_KEYS
     lcd_bitmap: "View Played Games"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_MENU_AUDIO_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Audio Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Audio Options"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Audio Options"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_RESUME_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Resume Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Resume Options"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Resume Options"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_PLAY_MODE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Play Mode"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Play Mode"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Play Mode"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Single"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Single"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Single"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SOUND_SETTING
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Use sound setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Use sound setting"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Use sound setting"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTART_PLAYBACK
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Play from beginning"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Play from beginning"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Play from beginning"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_RESUME_TIME
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Set resume time (min)"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Set resume time (min)"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Set resume time"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FPS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Display FPS"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Display FPS"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Display FPS"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMIT_FPS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit FPS"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limit FPS"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limit FPS"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_FRAMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Skip frames"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Skip frames"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Skip frames"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_BRIGHTNESS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Backlight brightness"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Backlight brightness"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Backlight brightness"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_COMMON_SETTING
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Use common setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Use common setting"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Use common setting"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TONE_CONTROLS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Tone controls"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Tone controls"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Tone controls"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Start menu"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Start menu"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Start menu"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONDITIONAL_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Start menu if not completed"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Start menu if not completed"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Start menu if not completed"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_RESUME
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Resume automatically"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Resume automatically"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Resume automatically"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL_RESUMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Clear all resumes"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Clear all resumes"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Clear all resumes"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNAVAILABLE
+  desc: in mpegplayer settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Unavailable"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Unavailable"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Unavailable"
+    lowmem: none
+  </voice>
+</phrase>

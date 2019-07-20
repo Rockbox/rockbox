@@ -395,28 +395,19 @@ static struct configdata config[] =
 };
 
 static const struct opt_items noyes[2] = {
-    { "No", -1 },
-    { "Yes", -1 },
+    { STR(LANG_SET_BOOL_NO) },
+    { STR(LANG_SET_BOOL_YES) },
 };
 
 static const struct opt_items singleall[2] = {
-    { "Single", -1 },
-    { "All", -1 },
-};
-
-static const struct opt_items enabledisable[2] = {
-    { "Disable", -1 },
-    { "Enable", -1 },
+    { STR(LANG_SINGLE) },
+    { STR(LANG_ALL) },
 };
 
 static const struct opt_items globaloff[2] = {
-    { "Force off", -1 },
-    { "Use sound setting", -1 },
+    { STR(LANG_OFF) },
+    { STR(LANG_USE_SOUND_SETTING) },
 };
-
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-#define BACKLIGHT_OPTION_DEFAULT "Use setting"
-#endif
 
 static void mpeg_settings(void);
 static bool mpeg_set_option(const char* string,
@@ -444,21 +435,28 @@ static bool mpeg_set_int(const char *string, const char *unit,
                          void (*function)(int), int step,
                          int min,
                          int max,
-                         const char* (*formatter)(char*, size_t, int, const char*))
+                         const char* (*formatter)(char*, size_t, int, const char*),
+                         int32_t (*get_talk_id)(int, int))
 {
     mpeg_sysevent_clear();
 
-    bool usb = rb->set_int(string, unit, voice_unit, variable, function,
-                           step, min, max, formatter);
+    bool usb = rb->set_int_ex(string, unit, voice_unit, variable, function,
+                           step, min, max, formatter, get_talk_id);
 
     if (usb)
         mpeg_sysevent_set();
 
     return usb;
 }
-#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+static int32_t backlight_brightness_getlang(int value, int unit)
+{
+    if (value < 0)
+        return LANG_USE_COMMON_SETTING;
+
+    return TALK_ID(value + MIN_BRIGHTNESS_SETTING, unit);
+}
+
 void mpeg_backlight_update_brightness(int value)
 {
     if (value >= 0)
@@ -483,7 +481,7 @@ static const char* backlight_brightness_formatter(char *buf, size_t length,
     (void)input;
 
     if (value < 0)
-        return BACKLIGHT_OPTION_DEFAULT;
+        return rb->str(LANG_USE_COMMON_SETTING);
     else
         rb->snprintf(buf, length, "%d", value + MIN_BRIGHTNESS_SETTING);
     return buf;
@@ -764,6 +762,7 @@ static int get_start_time(uint32_t duration)
     uint32_t resume_time = settings.resume_time;
     struct vo_rect rc_vid, rc_bound;
     uint32_t aspect_vid, aspect_bound;
+    bool sliding = false;
 
     enum state_enum slider_state = STATE0;
 
@@ -937,7 +936,18 @@ static int get_start_time(uint32_t duration)
         switch (slider_state)
         {
         case STATE0:
-            trigger_cpu_boost();
+            if (!sliding)
+            {
+                if (rb->global_settings->talk_menu)
+                {
+                    rb->talk_disable(true);
+#ifdef PLUGIN_USE_IRAM
+                    mpegplayer_iram_restore();
+#endif
+                }
+                trigger_cpu_boost();
+                sliding = true;
+            }
             stream_seek(resume_time, SEEK_SET);
             show_loading(&rc_bound);
             draw_slider(duration, resume_time, NULL);
@@ -947,9 +957,21 @@ static int get_start_time(uint32_t duration)
         case STATE1:
             display_thumb_image(&rc_vid);
             slider_state = STATE2;
-        case STATE2:
-            cancel_cpu_boost();
             tmo = TIMEOUT_BLOCK;
+            if (sliding)
+            {
+                cancel_cpu_boost();
+                if (rb->global_settings->talk_menu)
+                {
+#ifdef PLUGIN_USE_IRAM
+                    mpegplayer_iram_preserve();
+#endif
+                    rb->talk_disable(false);
+                    rb->talk_value(resume_time / TS_SECOND, UNIT_TIME, false);
+                    rb->talk_value(resume_time * 100 / duration, UNIT_PERCENT, true);
+                }
+                sliding = false;
+            }
         default:
             break;
         }
@@ -977,19 +999,20 @@ static int show_start_menu(uint32_t duration)
     int result = 0;
     bool menu_quit = false;
 
-    /* add the resume time to the menu display */
-    static char resume_str[32];
-    char hms_str[32];
-    struct hms hms;
-
     MENUITEM_STRINGLIST(menu, "Mpegplayer Menu", mpeg_sysevent_callback,
-                        "Play from beginning", resume_str, "Set start time",
-                        "Settings", "Quit mpegplayer");
+                        ID2P(LANG_RESTART_PLAYBACK),
+                        ID2P(LANG_RESUME_PLAYBACK),
+                        ID2P(LANG_SET_RESUME_TIME),
+                        ID2P(LANG_SETTINGS),
+                        ID2P(LANG_MENU_QUIT));
 
-    ts_to_hms(settings.resume_time, &hms);
-    hms_format(hms_str, sizeof(hms_str), &hms);
-    rb->snprintf(resume_str, sizeof (resume_str),
-                     "Resume at: %s", hms_str);
+    if (rb->global_settings->talk_menu)
+    {
+#ifdef PLUGIN_USE_IRAM
+        mpegplayer_iram_preserve();
+#endif
+        rb->talk_disable(false);
+    }
 
     rb->button_clear_queue();
 
@@ -1012,7 +1035,7 @@ static int show_start_menu(uint32_t duration)
         case MPEG_START_SEEK:
             if (!stream_can_seek())
             {
-                rb->splash(HZ, "Unavailable");
+                rb->splash(HZ, ID2P(LANG_UNAVAILABLE));
                 break;
             }
 
@@ -1037,6 +1060,14 @@ static int show_start_menu(uint32_t duration)
             result = MPEG_START_QUIT;
             menu_quit = true;
         }
+    }
+
+    if (rb->global_settings->talk_menu)
+    {
+        rb->talk_disable(true);
+#ifdef PLUGIN_USE_IRAM
+        mpegplayer_iram_restore();
+#endif
     }
 
     return result;
@@ -1069,7 +1100,17 @@ int mpeg_menu(void)
     int result;
 
     MENUITEM_STRINGLIST(menu, "Mpegplayer Menu", mpeg_sysevent_callback,
-                        "Settings", "Resume playback", "Quit mpegplayer");
+                        ID2P(LANG_SETTINGS),
+                        ID2P(LANG_RESUME_PLAYBACK),
+                        ID2P(LANG_MENU_QUIT));
+
+    if (rb->global_settings->talk_menu)
+    {
+#ifdef PLUGIN_USE_IRAM
+        mpegplayer_iram_preserve();
+#endif
+        rb->talk_disable(false);
+    }
 
     rb->button_clear_queue();
 
@@ -1096,6 +1137,14 @@ int mpeg_menu(void)
     if (mpeg_sysevent() != 0)
         result = MPEG_MENU_QUIT;
 
+    if (rb->global_settings->talk_menu)
+    {
+        rb->talk_disable(true);
+#ifdef PLUGIN_USE_IRAM
+        mpegplayer_iram_restore();
+#endif
+    }
+
     return result;
 }
 
@@ -1107,11 +1156,13 @@ static void display_options(void)
 
     MENUITEM_STRINGLIST(menu, "Display Options", mpeg_sysevent_callback,
 #if MPEG_OPTION_DITHERING_ENABLED
-                        "Dithering",
+                        ID2P(LANG_DITHERING),
 #endif
-                        "Display FPS", "Limit FPS", "Skip frames",
+                        ID2P(LANG_DISPLAY_FPS),
+                        ID2P(LANG_LIMIT_FPS),
+                        ID2P(LANG_SKIP_FRAMES),
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-                        "Backlight brightness",
+                        ID2P(LANG_BACKLIGHT_BRIGHTNESS),
 #endif
                         );
 
@@ -1127,7 +1178,7 @@ static void display_options(void)
 #if MPEG_OPTION_DITHERING_ENABLED
         case MPEG_OPTION_DITHERING:
             result = (settings.displayoptions & LCD_YUV_DITHER) ? 1 : 0;
-            mpeg_set_option("Dithering", &result, INT, noyes, 2, NULL);
+            mpeg_set_option(rb->str(LANG_DITHERING), &result, INT, noyes, 2, NULL);
             settings.displayoptions =
                 (settings.displayoptions & ~LCD_YUV_DITHER)
                       | ((result != 0) ? LCD_YUV_DITHER : 0);
@@ -1136,17 +1187,17 @@ static void display_options(void)
 #endif /* MPEG_OPTION_DITHERING_ENABLED */
 
         case MPEG_OPTION_DISPLAY_FPS:
-            mpeg_set_option("Display FPS", &settings.showfps, INT,
+            mpeg_set_option(rb->str(LANG_DISPLAY_FPS), &settings.showfps, INT,
                             noyes, 2, NULL);
             break;
 
         case MPEG_OPTION_LIMIT_FPS:
-            mpeg_set_option("Limit FPS", &settings.limitfps, INT,
+            mpeg_set_option(rb->str(LANG_LIMIT_FPS), &settings.limitfps, INT,
                             noyes, 2, NULL);
             break;
 
         case MPEG_OPTION_SKIP_FRAMES:
-            mpeg_set_option("Skip frames", &settings.skipframes, INT,
+            mpeg_set_option(rb->str(LANG_SKIP_FRAMES), &settings.skipframes, INT,
                             noyes, 2, NULL);
             break;
 
@@ -1154,10 +1205,11 @@ static void display_options(void)
         case MPEG_OPTION_BACKLIGHT_BRIGHTNESS:
             result = settings.backlight_brightness;
             mpeg_backlight_update_brightness(result);
-            mpeg_set_int("Backlight brightness", NULL, -1, &result,
+            mpeg_set_int(rb->str(LANG_BACKLIGHT_BRIGHTNESS), NULL, UNIT_INT, &result,
                          backlight_brightness_function, 1, -1,
                          MAX_BRIGHTNESS_SETTING - MIN_BRIGHTNESS_SETTING,
-                         backlight_brightness_formatter);
+                         backlight_brightness_formatter,
+                         backlight_brightness_getlang);
             settings.backlight_brightness = result;
             mpeg_backlight_update_brightness(-1);
             break;
@@ -1173,6 +1225,7 @@ static void display_options(void)
     }
 }
 
+#if CONFIG_CODEC == SWCODEC
 static void audio_options(void)
 {
     int selected = 0;
@@ -1180,8 +1233,11 @@ static void audio_options(void)
     bool menu_quit = false;
 
     MENUITEM_STRINGLIST(menu, "Audio Options", mpeg_sysevent_callback,
-                        "Tone Controls", "Channel Modes", "Crossfeed",
-                        "Equalizer", "Dithering");
+                        ID2P(LANG_TONE_CONTROLS),
+                        ID2P(LANG_CHANNEL_CONFIGURATION),
+                        ID2P(LANG_CROSSFEED),
+                        ID2P(LANG_EQUALIZER),
+                        ID2P(LANG_DITHERING));
 
     rb->button_clear_queue();
 
@@ -1193,31 +1249,31 @@ static void audio_options(void)
         switch (result)
         {
         case MPEG_AUDIO_TONE_CONTROLS:
-            mpeg_set_option("Tone Controls", &settings.tone_controls, INT,
+            mpeg_set_option(rb->str(LANG_TONE_CONTROLS), &settings.tone_controls, INT,
                             globaloff, 2, NULL);
             sync_audio_setting(result, false);
             break;
 
         case MPEG_AUDIO_CHANNEL_MODES:
-            mpeg_set_option("Channel Modes", &settings.channel_modes,
+            mpeg_set_option(rb->str(LANG_CHANNEL_CONFIGURATION), &settings.channel_modes,
                             INT, globaloff, 2, NULL);
             sync_audio_setting(result, false);
             break;
 
         case MPEG_AUDIO_CROSSFEED:
-            mpeg_set_option("Crossfeed", &settings.crossfeed, INT,
+            mpeg_set_option(rb->str(LANG_CROSSFEED), &settings.crossfeed, INT,
                             globaloff, 2, NULL);
             sync_audio_setting(result, false);
             break;
 
         case MPEG_AUDIO_EQUALIZER:
-            mpeg_set_option("Equalizer", &settings.equalizer, INT,
+            mpeg_set_option(rb->str(LANG_EQUALIZER), &settings.equalizer, INT,
                             globaloff, 2, NULL);
             sync_audio_setting(result, false);
             break;
 
         case MPEG_AUDIO_DITHERING:
-            mpeg_set_option("Dithering", &settings.dithering, INT,
+            mpeg_set_option(rb->str(LANG_DITHERING), &settings.dithering, INT,
                             globaloff, 2, NULL);
             sync_audio_setting(result, false);
             break;
@@ -1231,21 +1287,22 @@ static void audio_options(void)
             menu_quit = true;
     }
 }
+#endif
 
 static void resume_options(void)
 {
     static const struct opt_items items[MPEG_RESUME_NUM_OPTIONS] = {
         [MPEG_RESUME_MENU_ALWAYS] =
-            { "Start menu", -1 },
+            { STR(LANG_FORCE_START_MENU) },
         [MPEG_RESUME_MENU_IF_INCOMPLETE] =
-            { "Start menu if not completed", -1 },
+            { STR(LANG_CONDITIONAL_START_MENU) },
         [MPEG_RESUME_ALWAYS] =
-            { "Resume automatically", -1 },
+            { STR(LANG_AUTO_RESUME) },
         [MPEG_RESUME_RESTART] =
-            { "Play from beginning", -1 },
+            { STR(LANG_RESTART_PLAYBACK) },
     };
 
-    mpeg_set_option("Resume Options", &settings.resume_options,
+    mpeg_set_option(rb->str(LANG_MENU_RESUME_OPTIONS), &settings.resume_options,
                     INT, items, MPEG_RESUME_NUM_OPTIONS, NULL);
 }
 
@@ -1261,21 +1318,19 @@ static void mpeg_settings(void)
     int selected = 0;
     int result;
     bool menu_quit = false;
-    static char clear_str[32];
 
     MENUITEM_STRINGLIST(menu, "Settings", mpeg_sysevent_callback,
-                        "Display Options", "Audio Options",
-                        "Resume Options", "Play Mode", clear_str);
+                        ID2P(LANG_MENU_DISPLAY_OPTIONS),
+                        ID2P(LANG_MENU_AUDIO_OPTIONS),
+                        ID2P(LANG_MENU_RESUME_OPTIONS),
+                        ID2P(LANG_MENU_PLAY_MODE),
+                        ID2P(LANG_CLEAR_ALL_RESUMES));
 
     rb->button_clear_queue();
 
     while (!menu_quit)
     {
         mpeg_sysevent_clear();
-
-        /* Format and add resume option to the menu display */
-        rb->snprintf(clear_str, sizeof(clear_str),
-                     "Clear all resumes: %u", settings.resume_count);
 
         result = rb->do_menu(&menu, &selected, NULL, false);
 
@@ -1294,7 +1349,7 @@ static void mpeg_settings(void)
             break;
 
         case MPEG_SETTING_PLAY_MODE:
-            mpeg_set_option("Play mode", &settings.play_mode,
+            mpeg_set_option(rb->str(LANG_MENU_PLAY_MODE), &settings.play_mode,
                             INT, singleall, 2, NULL);
             break;
 
