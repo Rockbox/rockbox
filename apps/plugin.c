@@ -84,7 +84,7 @@ char *plugin_get_current_filename(void);
 static void* plugin_get_audio_buffer(size_t *buffer_size);
 static void plugin_release_audio_buffer(void);
 static void plugin_tsr(bool (*exit_callback)(bool));
-
+int sound_current(int setting); /*stub*/
 
 #ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
 /* File handle leak prophylaxis */
@@ -182,6 +182,8 @@ static const struct plugin_api rockbox_api = {
     language_strings,
 
     /* lcd */
+    splash,
+    splashf,
 #ifdef HAVE_LCD_CONTRAST
     lcd_set_contrast,
 #endif
@@ -203,7 +205,7 @@ static const struct plugin_api rockbox_api = {
     lcd_remove_cursor,
     lcd_icon,
     lcd_double_height,
-#else
+#else /* HAVE_LCD_BITMAP */
     &lcd_static_framebuffer[0][0],
     lcd_set_viewport,
     lcd_set_framebuffer,
@@ -274,20 +276,6 @@ static const struct plugin_api rockbox_api = {
     gui_scrollbar_draw,
 #endif /* HAVE_LCD_BITMAP */
 
-    backlight_on,
-    backlight_off,
-    backlight_set_timeout,
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    backlight_set_brightness,
-#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
-
-#if CONFIG_CHARGING
-    backlight_set_timeout_plugged,
-#endif
-    is_backlight_on,
-    splash,
-    splashf,
-
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
     lcd_remote_set_contrast,
@@ -311,20 +299,7 @@ static const struct plugin_api rockbox_api = {
     &lcd_remote_static_framebuffer[0][0],
     lcd_remote_update,
     lcd_remote_update_rect,
-
-    remote_backlight_on,
-    remote_backlight_off,
-    remote_backlight_set_timeout,
-#if CONFIG_CHARGING
-    remote_backlight_set_timeout_plugged,
-#endif
-#endif /* HAVE_REMOTE_LCD */
-#if NB_SCREENS == 2
-    {&screens[SCREEN_MAIN], &screens[SCREEN_REMOTE]},
-#else
-    {&screens[SCREEN_MAIN]},
-#endif
-#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
+#if (LCD_REMOTE_DEPTH > 1)
     lcd_remote_set_foreground,
     lcd_remote_get_foreground,
     lcd_remote_set_background,
@@ -332,12 +307,48 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_bitmap_part,
     lcd_remote_bitmap,
 #endif
+#endif /* HAVE_REMOTE_LCD */
+#if NB_SCREENS == 2
+    {&screens[SCREEN_MAIN], &screens[SCREEN_REMOTE]},
+#else
+    {&screens[SCREEN_MAIN]},
+#endif
+
     viewport_set_defaults,
 #ifdef HAVE_LCD_BITMAP
     viewportmanager_theme_enable,
     viewportmanager_theme_undo,
     viewport_set_fullscreen,
 #endif
+
+    /* lcd backlight */
+    /* The backlight_* functions must be present in the API regardless whether
+     * HAVE_BACKLIGHT is defined or not. The reason is that the stock Ondio has
+     * no backlight but can be modded to have backlight (it's prepared on the
+     * PCB). This makes backlight an all-target feature API wise, and keeps API
+     * compatible between stock and modded Ondio.
+     * For OLED targets like the Sansa Clip, the backlight_* functions control
+     * the display enable, which has essentially the same effect. */
+    is_backlight_on,
+    backlight_on,
+    backlight_off,
+    backlight_set_timeout,
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    backlight_set_brightness,
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
+
+#if CONFIG_CHARGING
+    backlight_set_timeout_plugged,
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+    remote_backlight_on,
+    remote_backlight_off,
+    remote_backlight_set_timeout,
+#if CONFIG_CHARGING
+    remote_backlight_set_timeout_plugged,
+#endif
+#endif /* HAVE_REMOTE_LCD */
 
     /* list */
     gui_synclist_init,
@@ -357,6 +368,14 @@ static const struct plugin_api rockbox_api = {
     gui_syncyesno_run,
     simplelist_info_init,
     simplelist_show_list,
+
+    /* action handling */
+    get_custom_action,
+    get_action,
+#ifdef HAVE_TOUCHSCREEN
+    action_get_touchscreen_press,
+#endif
+    action_userabort,
 
     /* button */
     button_get,
@@ -426,6 +445,11 @@ static const struct plugin_api rockbox_api = {
     /* browsing */
     browse_context_init,
     rockbox_browse,
+    tree_get_context,
+    tree_get_entries,
+    tree_get_entry_at,
+    set_current_file,
+    set_dirfilter,
 
     /* talking */
     talk_id,
@@ -464,8 +488,14 @@ static const struct plugin_api rockbox_api = {
     mutex_lock,
     mutex_unlock,
 #endif
-
+#ifdef HAVE_SEMAPHORE_OBJECTS
+    semaphore_init,
+    semaphore_wait,
+    semaphore_release,
+#endif
     reset_poweroff_timer,
+    set_sleeptimer_duration, /*stub*/
+    get_sleep_timer, /*stub*/
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     system_memory_guard,
     &cpu_frequency,
@@ -507,10 +537,7 @@ static const struct plugin_api rockbox_api = {
     queue_send,
     queue_reply,
 #endif
-    usb_acknowledge,
-#ifdef USB_ENABLE_HID
-    usb_hid_send,
-#endif
+
 #ifdef RB_PROFILE
     profile_thread,
     profstop,
@@ -578,6 +605,7 @@ static const struct plugin_api rockbox_api = {
 
     /* sound */
     sound_set,
+    sound_current, /*stub*/
     sound_default,
     sound_min,
     sound_max,
@@ -585,6 +613,10 @@ static const struct plugin_api rockbox_api = {
     sound_val2phys,
 #ifdef AUDIOHW_HAVE_EQ
     sound_enum_hw_eq_band_setting,
+#endif
+#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
+     (CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHCONTROL)
+    sound_set_pitch,
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     mp3_play_data,
@@ -650,6 +682,37 @@ static const struct plugin_api rockbox_api = {
     system_sound_play,
     keyclick_click,
 #endif /* CONFIG_CODEC == SWCODEC */
+
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    peak_meter_scale_value,
+    peak_meter_set_use_dbfs,
+    peak_meter_get_use_dbfs,
+#endif
+
+
+    /* metadata */
+    get_metadata,
+    mp3info,
+    count_mp3_frames,
+    create_xing_header,
+    find_next_frame,
+#ifdef HAVE_TAGCACHE
+    tagcache_search,
+    tagcache_search_set_uniqbuf,
+    tagcache_search_add_filter,
+    tagcache_get_next,
+    tagcache_retrieve,
+    tagcache_search_finish,
+    tagcache_get_numeric,
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
+    tagcache_fill_tags,
+#endif
+#endif /* HAVE_TAGCACHE */
+
+#ifdef HAVE_ALBUMART
+    search_albumart_files,
+#endif
+
     /* playback control */
     playlist_amount,
     playlist_resume,
@@ -676,10 +739,6 @@ static const struct plugin_api rockbox_api = {
     audio_get_file_pos,
 #if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     mpeg_get_last_header,
-#endif
-#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
-     (CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHCONTROL)
-    sound_set_pitch,
 #endif
 
 #if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
@@ -722,14 +781,6 @@ static const struct plugin_api rockbox_api = {
     set_color,
 #endif
 
-    /* action handling */
-    get_custom_action,
-    get_action,
-#ifdef HAVE_TOUCHSCREEN
-    action_get_touchscreen_press,
-#endif
-    action_userabort,
-
     /* power */
     battery_level,
     battery_level_safe,
@@ -741,8 +792,12 @@ static const struct plugin_api rockbox_api = {
     charging_state,
 # endif
 #endif
+    /* usb */
     usb_inserted,
-
+    usb_acknowledge,
+#ifdef USB_ENABLE_HID
+    usb_hid_send,
+#endif
     /* misc */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     __errno,
@@ -757,14 +812,7 @@ static const struct plugin_api rockbox_api = {
 #if CONFIG_RTC
     mktime,
 #endif
-    plugin_get_buffer,
-    plugin_get_audio_buffer,     /* defined in plugin.c */
-    plugin_release_audio_buffer, /* defined in plugin.c */
-    plugin_tsr,                  /* defined in plugin.c */
-    plugin_get_current_filename,
-#ifdef PLUGIN_USE_IRAM
-    audio_hard_stop,
-#endif
+
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
 #endif
@@ -781,16 +829,7 @@ static const struct plugin_api rockbox_api = {
     remove_array_ptr,
     round_value_to_list32,
 #endif /* CONFIG_CODEC == SWCODEC */
-    get_metadata,
-    mp3info,
-    count_mp3_frames,
-    create_xing_header,
-    find_next_frame,
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    peak_meter_scale_value,
-    peak_meter_set_use_dbfs,
-    peak_meter_get_use_dbfs,
-#endif
+
 #ifdef HAVE_LCD_BITMAP
     read_bmp_file,
     read_bmp_fd,
@@ -801,11 +840,6 @@ static const struct plugin_api rockbox_api = {
     screen_dump_set_hook,
 #endif
     show_logo,
-    tree_get_context,
-    tree_get_entries,
-    tree_get_entry_at,
-    set_current_file,
-    set_dirfilter,
 
 #ifdef HAVE_WHEEL_POSITION
     wheel_status,
@@ -819,27 +853,15 @@ static const struct plugin_api rockbox_api = {
     detect_flashed_romimage,
 #endif
     led,
-#ifdef HAVE_TAGCACHE
-    tagcache_search,
-    tagcache_search_set_uniqbuf,
-    tagcache_search_add_filter,
-    tagcache_get_next,
-    tagcache_retrieve,
-    tagcache_search_finish,
-    tagcache_get_numeric,
-#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-    tagcache_fill_tags,
-#endif
-#endif
 
-#ifdef HAVE_ALBUMART
-    search_albumart_files,
-#endif
-
-#ifdef HAVE_SEMAPHORE_OBJECTS
-    semaphore_init,
-    semaphore_wait,
-    semaphore_release,
+    /*plugin*/
+    plugin_get_buffer,
+    plugin_get_audio_buffer,     /* defined in plugin.c */
+    plugin_release_audio_buffer, /* defined in plugin.c */
+    plugin_tsr,                  /* defined in plugin.c */
+    plugin_get_current_filename,
+#ifdef PLUGIN_USE_IRAM
+    audio_hard_stop,
 #endif
 
     /* new stuff at the end, sort into place next time
@@ -1059,4 +1081,10 @@ static void plugin_tsr(bool (*exit_callback)(bool))
 char *plugin_get_current_filename(void)
 {
     return current_plugin;
+}
+
+int sound_current(int setting) /*stub*/
+{
+    (void) setting;
+    return 0;
 }
