@@ -29,9 +29,16 @@
 #include "ap_int.h"
 
 #ifndef BOOTLOADER
+
+/* Only the Quake plugin needs float formatting */
+#if defined(HAVE_LCD_COLOR)  && \
+    (!defined(LCD_STRIDEFORMAT) || (LCD_STRIDEFORMAT != VERTICAL_STRIDE)) && \
+    (PLUGIN_BUFFER_SIZE > 0x14000) && (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(CPU_ARM)
 /* turn everything on */
 #define FMT_LENMOD      (0xffffffff)
 #define FMT_RADIX       (0xffffffff)
+#endif
+
 #endif
 
 /* these are the defaults if no other preference is given */
