@@ -374,7 +374,16 @@ bool set_time_screen(const char* title, struct tm *tm)
         int button;
         unsigned int i, realyear, min, max;
         unsigned char *ptr[6];
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
+        /* The format strings in the snprintf can in theory need 60 characters
+           This will not happen in practice (because seconds are 0..60 and not
+           full-range integers etc.), but -D_FORTIFY_SOURCE will still warn
+           about it, so we use 60 characters for HOSTED to make the compiler
+           happy. Native builds still use 20, which is enough in practice.  */
+        unsigned char buffer[60];
+#else
         unsigned char buffer[20];
+#endif
         int *valptr = NULL;
         static unsigned char daysinmonth[] =
             {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
