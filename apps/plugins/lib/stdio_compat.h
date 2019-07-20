@@ -49,7 +49,7 @@
 #define stdout _stdout_
 #undef stderr
 #define stderr _stderr_
-
+#undef getc
 #define getc fgetc
 
 typedef struct {
