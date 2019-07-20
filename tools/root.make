@@ -211,7 +211,7 @@ clean::
 		$(LINKRAM) $(LINKROM) rockbox.elf rockbox.map rockbox.bin \
 		make.dep rombox.elf rombox.map rombox.bin rombox.ucl romstart.txt \
 		$(BINARY) $(FLASHFILE) uisimulator bootloader flash $(BOOTLINK) \
-		rockbox.apk
+		rockbox.apk lang_enum.h rbversion.h
 
 #### linking the binaries: ####
 

@@ -53,7 +53,8 @@ $(PUZZLES_SRCDIR)/rbcompat.h:	$(APPSDIR)/plugin.h			\
 				$(APPSDIR)/plugins/lib/pluginlib_exit.h	\
 				$(BUILDDIR)/sysfont.h			\
 				$(PUZZLES_SRCDIR)/rbassert.h		\
-				$(TLSFLIB_DIR)/src/tlsf.h
+				$(TLSFLIB_DIR)/src/tlsf.h \
+				$(BUILDDIR)/lang_enum.h
 
 # special pattern rule for compiling puzzles with extra flags
 $(PUZZLES_OBJDIR)/%.o: $(PUZZLES_SRCDIR)/%.c $(PUZZLES_SRCDIR)/puzzles.make $(PUZZLES_SRCDIR)/rbcompat.h
