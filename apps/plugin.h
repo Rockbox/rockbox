@@ -71,9 +71,7 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "mp3_playback.h"
 #include "root_menu.h"
 #include "talk.h"
-#ifdef PLUGIN
 #include "lang_enum.h"
-#endif
 #ifdef RB_PROFILE
 #include "profile.h"
 #endif
