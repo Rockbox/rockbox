@@ -734,8 +734,8 @@ void SaveGamestate()
 	fprintf (f, "%i\n", SAVEGAME_VERSION);
 	Host_SavegameComment (comment);
 	fprintf (f, "%s\n", comment);
-//	for (i=0 ; i<NUM_SPAWN_PARMS ; i++)
-//		fprintf (f, "%f\n", svs.clients->spawn_parms[i]);
+	for (i=0 ; i<NUM_SPAWN_PARMS ; i++)
+		fprintf (f, "%f\n", svs.clients->spawn_parms[i]);
 	fprintf (f, "%f\n", skill.value);
 	fprintf (f, "%s\n", sv.name);
 	fprintf (f, "%f\n", sv.time);
@@ -775,7 +775,7 @@ int LoadGamestate(char *level, char *startspot)
 	edict_t	*ent;
 	int		entnum;
 	int		version;
-//	float	spawn_parms[NUM_SPAWN_PARMS];
+	float	spawn_parms[NUM_SPAWN_PARMS];
 
 	sprintf (name, "%s/%s.gip", com_gamedir, level);
 	
