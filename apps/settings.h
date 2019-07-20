@@ -480,9 +480,7 @@ struct user_settings
     int qs_items[QUICKSCREEN_ITEM_COUNT];
 #endif
 
-#if CONFIG_RTC
     int timeformat;    /* time format: 0=24 hour clock, 1=12 hour clock */
-#endif
 
 #ifdef HAVE_DISK_STORAGE
     int disk_spindown; /* time until disk spindown, in seconds (0=off) */
