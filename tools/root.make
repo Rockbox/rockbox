@@ -120,8 +120,8 @@ else ifneq (,$(findstring warble,$(APP_TYPE)))
   include $(ROOTDIR)/lib/tlsf/libtlsf.make
   include $(ROOTDIR)/lib/rbcodec/rbcodec.make
 else # core
-  include $(APPSDIR)/apps.make
   include $(APPSDIR)/lang/lang.make
+  include $(APPSDIR)/apps.make
   include $(ROOTDIR)/lib/rbcodec/rbcodec.make
 
   ifdef ENABLEDPLUGINS
