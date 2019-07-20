@@ -262,10 +262,7 @@ static const struct plugin_api rockbox_api = {
     &button_queue,
 #endif
     bidi_l2v,
-#ifdef HAVE_LCD_BITMAP
     is_diacritic,
-    get_codepage_name,
-#endif
     font_get_bits,
     font_load,
     font_unload,
@@ -275,6 +272,7 @@ static const struct plugin_api rockbox_api = {
     screen_clear_area,
     gui_scrollbar_draw,
 #endif /* HAVE_LCD_BITMAP */
+    get_codepage_name,
 
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
