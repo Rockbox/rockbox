@@ -112,9 +112,9 @@ void beep_int(unsigned int n)
     while(n)
     {
         if(n & 1)
-            piezo_tone(HI, 500);
+            piezo_tone(HI, 800);
         else
-            piezo_tone(LO, 500);
+            piezo_tone(LO, 800);
         udelay(200000);
         n>>=1;
     }
@@ -122,11 +122,19 @@ void beep_int(unsigned int n)
 
 void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
 {
+    register unsigned address;
+    /* read FAR (fault address register) */
+    asm volatile( "mrc p15, 0, %0, c6, c0\n" : "=r"(address));
     for(;;)
     {
         beep_int(pc);
 
         udelay(1000000);
+
+        beep_int(address);
+
+        udelay(1000000);
+
         beep_int(num);
         udelay(1000000);
     }
