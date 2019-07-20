@@ -1560,16 +1560,13 @@
   desc: select the time format of time in status bar
   user: core
   <source>
-    *: none
-    rtc: "Time Format"
+    *: "Time Format"
   </source>
   <dest>
-    *: none
-    rtc: "वक्त का Format"
+    *: "वक्त का Format"
   </dest>
   <voice>
-    *: none
-    rtc: "वक्त का Format"
+    *: "वक्त का Format"
   </voice>
 </phrase>
 <phrase>
@@ -1577,16 +1574,13 @@
   desc: option for 12 hour clock
   user: core
   <source>
-    *: none
-    rtc: "12 Hour Clock"
+    *: "12 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "बारा घंटओ की घड़ी"
+    *: "बारा घंटओ की घड़ी"
   </dest>
   <voice>
-    *: none
-    rtc: "बारा घंटओ की घड़ी"
+    *: "बारा घंटओ की घड़ी"
   </voice>
 </phrase>
 <phrase>
@@ -1594,16 +1588,13 @@
   desc: option for 24 hour clock
   user: core
   <source>
-    *: none
-    rtc: "24 Hour Clock"
+    *: "24 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "चौबीस घंटओ की घड़ी"
+    *: "चौबीस घंटओ की घड़ी"
   </dest>
   <voice>
-    *: none
-    rtc: "चौबीस घंटओ की घड़ी"
+    *: "चौबीस घंटओ की घड़ी"
   </voice>
 </phrase>
 <phrase>
@@ -1730,16 +1721,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jan"
+    *: "Jan"
   </source>
   <dest>
-    *: none
-    rtc: "जन"
+    *: "जन"
   </dest>
   <voice>
-    *: none
-    rtc: "जनवरी"
+    *: "जनवरी"
   </voice>
 </phrase>
 <phrase>
@@ -1747,16 +1735,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Feb"
+    *: "Feb"
   </source>
   <dest>
-    *: none
-    rtc: "फर"
+    *: "फर"
   </dest>
   <voice>
-    *: none
-    rtc: "फरवरी"
+    *: "फरवरी"
   </voice>
 </phrase>
 <phrase>
@@ -1764,16 +1749,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Mar"
+    *: "Mar"
   </source>
   <dest>
-    *: none
-    rtc: "मार"
+    *: "मार"
   </dest>
   <voice>
-    *: none
-    rtc: "मार्च"
+    *: "मार्च"
   </voice>
 </phrase>
 <phrase>
@@ -1781,16 +1763,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Apr"
+    *: "Apr"
   </source>
   <dest>
-    *: none
-    rtc: "अप्"
+    *: "अप्"
   </dest>
   <voice>
-    *: none
-    rtc: "अप्रेल"
+    *: "अप्रेल"
   </voice>
 </phrase>
 <phrase>
@@ -1798,16 +1777,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "May"
+    *: "May"
   </source>
   <dest>
-    *: none
-    rtc: "मई"
+    *: "मई"
   </dest>
   <voice>
-    *: none
-    rtc: "मई"
+    *: "मई"
   </voice>
 </phrase>
 <phrase>
@@ -1815,16 +1791,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jun"
+    *: "Jun"
   </source>
   <dest>
-    *: none
-    rtc: "जून"
+    *: "जून"
   </dest>
   <voice>
-    *: none
-    rtc: "जून"
+    *: "जून"
   </voice>
 </phrase>
 <phrase>
@@ -1832,16 +1805,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jul"
+    *: "Jul"
   </source>
   <dest>
-    *: none
-    rtc: "जूल"
+    *: "जूल"
   </dest>
   <voice>
-    *: none
-    rtc: "जूलाई"
+    *: "जूलाई"
   </voice>
 </phrase>
 <phrase>
@@ -1849,16 +1819,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Aug"
+    *: "Aug"
   </source>
   <dest>
-    *: none
-    rtc: "अगस"
+    *: "अगस"
   </dest>
   <voice>
-    *: none
-    rtc: "अगस्त"
+    *: "अगस्त"
   </voice>
 </phrase>
 <phrase>
@@ -1866,16 +1833,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Sep"
+    *: "Sep"
   </source>
   <dest>
-    *: none
-    rtc: "सित"
+    *: "सित"
   </dest>
   <voice>
-    *: none
-    rtc: "सितम्बर"
+    *: "सितम्बर"
   </voice>
 </phrase>
 <phrase>
@@ -1883,16 +1847,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Oct"
+    *: "Oct"
   </source>
   <dest>
-    *: none
-    rtc: "अक्"
+    *: "अक्"
   </dest>
   <voice>
-    *: none
-    rtc: "अक्टूबर"
+    *: "अक्टूबर"
   </voice>
 </phrase>
 <phrase>
@@ -1900,16 +1861,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Nov"
+    *: "Nov"
   </source>
   <dest>
-    *: none
-    rtc: "नवम"
+    *: "नवम"
   </dest>
   <voice>
-    *: none
-    rtc: "नवम्बर"
+    *: "नवम्बर"
   </voice>
 </phrase>
 <phrase>
@@ -1917,16 +1875,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Dec"
+    *: "Dec"
   </source>
   <dest>
-    *: none
-    rtc: "दिस"
+    *: "दिस"
   </dest>
   <voice>
-    *: none
-    rtc: "दिसम्बर"
+    *: "दिसम्बर"
   </voice>
 </phrase>
 <phrase>

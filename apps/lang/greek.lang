@@ -3880,16 +3880,13 @@
   desc: select the time format of time in status bar
   user: core
   <source>
-    *: none
-    rtc: "Time Format"
+    *: "Time Format"
   </source>
   <dest>
-    *: none
-    rtc: "Μορφή ώρας"
+    *: "Μορφή ώρας"
   </dest>
   <voice>
-    *: none
-    rtc: "Μορφή ώρας"
+    *: "Μορφή ώρας"
   </voice>
 </phrase>
 <phrase>
@@ -3897,16 +3894,13 @@
   desc: option for 12 hour clock
   user: core
   <source>
-    *: none
-    rtc: "12 Hour Clock"
+    *: "12 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "12 ώρες"
+    *: "12 ώρες"
   </dest>
   <voice>
-    *: none
-    rtc: "δώδεκα άωρο"
+    *: "δώδεκα άωρο"
   </voice>
 </phrase>
 <phrase>
@@ -3914,16 +3908,13 @@
   desc: option for 24 hour clock
   user: core
   <source>
-    *: none
-    rtc: "24 Hour Clock"
+    *: "24 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "24 ώρες"
+    *: "24 ώρες"
   </dest>
   <voice>
-    *: none
-    rtc: "είκοσι τετράωρο"
+    *: "είκοσι τετράωρο"
   </voice>
 </phrase>
 <phrase>
@@ -4118,16 +4109,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jan"
+    *: "Jan"
   </source>
   <dest>
-    *: none
-    rtc: "Ιαν"
+    *: "Ιαν"
   </dest>
   <voice>
-    *: none
-    rtc: "Ιανουάριος"
+    *: "Ιανουάριος"
   </voice>
 </phrase>
 <phrase>
@@ -4135,16 +4123,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Feb"
+    *: "Feb"
   </source>
   <dest>
-    *: none
-    rtc: "Φεβ"
+    *: "Φεβ"
   </dest>
   <voice>
-    *: none
-    rtc: "Φεβρουάριος"
+    *: "Φεβρουάριος"
   </voice>
 </phrase>
 <phrase>
@@ -4152,16 +4137,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Mar"
+    *: "Mar"
   </source>
   <dest>
-    *: none
-    rtc: "Μάρ"
+    *: "Μάρ"
   </dest>
   <voice>
-    *: none
-    rtc: "Μάρτιος"
+    *: "Μάρτιος"
   </voice>
 </phrase>
 <phrase>
@@ -4169,16 +4151,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Apr"
+    *: "Apr"
   </source>
   <dest>
-    *: none
-    rtc: "Απρ"
+    *: "Απρ"
   </dest>
   <voice>
-    *: none
-    rtc: "Απρίλιος"
+    *: "Απρίλιος"
   </voice>
 </phrase>
 <phrase>
@@ -4186,16 +4165,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "May"
+    *: "May"
   </source>
   <dest>
-    *: none
-    rtc: "Μάι"
+    *: "Μάι"
   </dest>
   <voice>
-    *: none
-    rtc: "Μάιος"
+    *: "Μάιος"
   </voice>
 </phrase>
 <phrase>
@@ -4203,16 +4179,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jun"
+    *: "Jun"
   </source>
   <dest>
-    *: none
-    rtc: "Ιού"
+    *: "Ιού"
   </dest>
   <voice>
-    *: none
-    rtc: "Ιούνιος"
+    *: "Ιούνιος"
   </voice>
 </phrase>
 <phrase>
@@ -4220,16 +4193,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jul"
+    *: "Jul"
   </source>
   <dest>
-    *: none
-    rtc: "Ιολ"
+    *: "Ιολ"
   </dest>
   <voice>
-    *: none
-    rtc: "Ιούλιος"
+    *: "Ιούλιος"
   </voice>
 </phrase>
 <phrase>
@@ -4237,16 +4207,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Aug"
+    *: "Aug"
   </source>
   <dest>
-    *: none
-    rtc: "Αύγ"
+    *: "Αύγ"
   </dest>
   <voice>
-    *: none
-    rtc: "Αύγουστος"
+    *: "Αύγουστος"
   </voice>
 </phrase>
 <phrase>
@@ -4254,16 +4221,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Sep"
+    *: "Sep"
   </source>
   <dest>
-    *: none
-    rtc: "Σεπ"
+    *: "Σεπ"
   </dest>
   <voice>
-    *: none
-    rtc: "Σεπτέμβριος"
+    *: "Σεπτέμβριος"
   </voice>
 </phrase>
 <phrase>
@@ -4271,16 +4235,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Oct"
+    *: "Oct"
   </source>
   <dest>
-    *: none
-    rtc: "Οκτ"
+    *: "Οκτ"
   </dest>
   <voice>
-    *: none
-    rtc: "Οκτώβριος"
+    *: "Οκτώβριος"
   </voice>
 </phrase>
 <phrase>
@@ -4288,16 +4249,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Nov"
+    *: "Nov"
   </source>
   <dest>
-    *: none
-    rtc: "Νοέ"
+    *: "Νοέ"
   </dest>
   <voice>
-    *: none
-    rtc: "Νοέμβριος"
+    *: "Νοέμβριος"
   </voice>
 </phrase>
 <phrase>
@@ -4305,16 +4263,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Dec"
+    *: "Dec"
   </source>
   <dest>
-    *: none
-    rtc: "Δεκ"
+    *: "Δεκ"
   </dest>
   <voice>
-    *: none
-    rtc: "Δεκέμβριος"
+    *: "Δεκέμβριος"
   </voice>
 </phrase>
 <phrase>
@@ -10093,16 +10048,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "ακριβώς"
+    *: "ακριβώς"
   </voice>
 </phrase>
 <phrase>
@@ -10110,16 +10062,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "μετά μεσημβρίας"
+    *: "μετά μεσημβρίας"
   </voice>
 </phrase>
 <phrase>
@@ -10127,16 +10076,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "πρό μεσημβρίας"
+    *: "πρό μεσημβρίας"
   </voice>
 </phrase>
 <phrase>
@@ -10144,16 +10090,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "μηδέν"
+    *: "μηδέν"
   </voice>
 </phrase>
 <phrase>

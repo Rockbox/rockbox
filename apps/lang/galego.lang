@@ -2283,16 +2283,13 @@
   desc: select the time format of time in status bar
   user: core
   <source>
-    *: none
-    rtc: "Time Format"
+    *: "Time Format"
   </source>
   <dest>
-    *: none
-    rtc: "Formato da hora"
+    *: "Formato da hora"
   </dest>
   <voice>
-    *: none
-    rtc: "Formato da hora"
+    *: "Formato da hora"
   </voice>
 </phrase>
 <phrase>
@@ -2300,16 +2297,13 @@
   desc: option for 12 hour clock
   user: core
   <source>
-    *: none
-    rtc: "12 Hour Clock"
+    *: "12 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "Reloxo 12 horas"
+    *: "Reloxo 12 horas"
   </dest>
   <voice>
-    *: none
-    rtc: "Reloxo 12 horas"
+    *: "Reloxo 12 horas"
   </voice>
 </phrase>
 <phrase>
@@ -2317,16 +2311,13 @@
   desc: option for 24 hour clock
   user: core
   <source>
-    *: none
-    rtc: "24 Hour Clock"
+    *: "24 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "Reloxo 24 horas"
+    *: "Reloxo 24 horas"
   </dest>
   <voice>
-    *: none
-    rtc: "Reloxo 24 horas"
+    *: "Reloxo 24 horas"
   </voice>
 </phrase>
 <phrase>
@@ -3557,16 +3548,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jan"
+    *: "Jan"
   </source>
   <dest>
-    *: none
-    rtc: "xan"
+    *: "xan"
   </dest>
   <voice>
-    *: none
-    rtc: "xaneiro"
+    *: "xaneiro"
   </voice>
 </phrase>
 <phrase>
@@ -3574,16 +3562,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Feb"
+    *: "Feb"
   </source>
   <dest>
-    *: none
-    rtc: "feb"
+    *: "feb"
   </dest>
   <voice>
-    *: none
-    rtc: "febreiro"
+    *: "febreiro"
   </voice>
 </phrase>
 <phrase>
@@ -3591,16 +3576,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Mar"
+    *: "Mar"
   </source>
   <dest>
-    *: none
-    rtc: "mar"
+    *: "mar"
   </dest>
   <voice>
-    *: none
-    rtc: "marzo"
+    *: "marzo"
   </voice>
 </phrase>
 <phrase>
@@ -3608,16 +3590,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Apr"
+    *: "Apr"
   </source>
   <dest>
-    *: none
-    rtc: "abr"
+    *: "abr"
   </dest>
   <voice>
-    *: none
-    rtc: "abril"
+    *: "abril"
   </voice>
 </phrase>
 <phrase>
@@ -3625,16 +3604,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "May"
+    *: "May"
   </source>
   <dest>
-    *: none
-    rtc: "mai"
+    *: "mai"
   </dest>
   <voice>
-    *: none
-    rtc: "maio"
+    *: "maio"
   </voice>
 </phrase>
 <phrase>
@@ -3642,16 +3618,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jun"
+    *: "Jun"
   </source>
   <dest>
-    *: none
-    rtc: "xuñ"
+    *: "xuñ"
   </dest>
   <voice>
-    *: none
-    rtc: "xuño"
+    *: "xuño"
   </voice>
 </phrase>
 <phrase>
@@ -3659,16 +3632,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jul"
+    *: "Jul"
   </source>
   <dest>
-    *: none
-    rtc: "xul"
+    *: "xul"
   </dest>
   <voice>
-    *: none
-    rtc: "xullo"
+    *: "xullo"
   </voice>
 </phrase>
 <phrase>
@@ -3676,16 +3646,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Aug"
+    *: "Aug"
   </source>
   <dest>
-    *: none
-    rtc: "ago"
+    *: "ago"
   </dest>
   <voice>
-    *: none
-    rtc: "agosto"
+    *: "agosto"
   </voice>
 </phrase>
 <phrase>
@@ -3693,16 +3660,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Sep"
+    *: "Sep"
   </source>
   <dest>
-    *: none
-    rtc: "set"
+    *: "set"
   </dest>
   <voice>
-    *: none
-    rtc: "setembro"
+    *: "setembro"
   </voice>
 </phrase>
 <phrase>
@@ -3710,16 +3674,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Oct"
+    *: "Oct"
   </source>
   <dest>
-    *: none
-    rtc: "out"
+    *: "out"
   </dest>
   <voice>
-    *: none
-    rtc: "outubro"
+    *: "outubro"
   </voice>
 </phrase>
 <phrase>
@@ -3727,16 +3688,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Nov"
+    *: "Nov"
   </source>
   <dest>
-    *: none
-    rtc: "nov"
+    *: "nov"
   </dest>
   <voice>
-    *: none
-    rtc: "novembro"
+    *: "novembro"
   </voice>
 </phrase>
 <phrase>
@@ -3744,16 +3702,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Dec"
+    *: "Dec"
   </source>
   <dest>
-    *: none
-    rtc: "dec"
+    *: "dec"
   </dest>
   <voice>
-    *: none
-    rtc: "decembro"
+    *: "decembro"
   </voice>
 </phrase>
 <phrase>
@@ -7561,16 +7516,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "A M"
+    *: "A M"
   </voice>
 </phrase>
 <phrase>
@@ -8340,16 +8292,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "oh"
+    *: "oh"
   </voice>
 </phrase>
 <phrase>
@@ -8689,16 +8638,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "P M"
+    *: "P M"
   </voice>
 </phrase>
 <phrase>
@@ -10974,16 +10920,13 @@ iriverifp7xx: "%d%% %dh %dm"
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "en punto"
+    *: "en punto"
   </voice>
 </phrase>
 <phrase>

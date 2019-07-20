@@ -3890,16 +3890,13 @@
   desc: select the time format of time in status bar
   user: core
   <source>
-    *: none
-    rtc: "Time Format"
+    *: "Time Format"
   </source>
   <dest>
-    *: none
-    rtc: "Oblik vremena"
+    *: "Oblik vremena"
   </dest>
   <voice>
-    *: none
-    rtc: "Oblik vremena"
+    *: "Oblik vremena"
   </voice>
 </phrase>
 <phrase>
@@ -3907,16 +3904,13 @@
   desc: option for 12 hour clock
   user: core
   <source>
-    *: none
-    rtc: "12 Hour Clock"
+    *: "12 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "12-satno vrijeme"
+    *: "12-satno vrijeme"
   </dest>
   <voice>
-    *: none
-    rtc: "Dvanaestsatno vrijeme"
+    *: "Dvanaestsatno vrijeme"
   </voice>
 </phrase>
 <phrase>
@@ -3924,16 +3918,13 @@
   desc: option for 24 hour clock
   user: core
   <source>
-    *: none
-    rtc: "24 Hour Clock"
+    *: "24 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "24-satno vrijeme"
+    *: "24-satno vrijeme"
   </dest>
   <voice>
-    *: none
-    rtc: "Dvadesetčetirisatno vrijeme"
+    *: "Dvadesetčetirisatno vrijeme"
   </voice>
 </phrase>
 <phrase>
@@ -4130,16 +4121,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jan"
+    *: "Jan"
   </source>
   <dest>
-    *: none
-    rtc: "Sij"
+    *: "Sij"
   </dest>
   <voice>
-    *: none
-    rtc: "Siječanj"
+    *: "Siječanj"
   </voice>
 </phrase>
 <phrase>
@@ -4147,16 +4135,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Feb"
+    *: "Feb"
   </source>
   <dest>
-    *: none
-    rtc: "Velj"
+    *: "Velj"
   </dest>
   <voice>
-    *: none
-    rtc: "Veljača"
+    *: "Veljača"
   </voice>
 </phrase>
 <phrase>
@@ -4164,16 +4149,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Mar"
+    *: "Mar"
   </source>
   <dest>
-    *: none
-    rtc: "Ožu"
+    *: "Ožu"
   </dest>
   <voice>
-    *: none
-    rtc: "Ožujak"
+    *: "Ožujak"
   </voice>
 </phrase>
 <phrase>
@@ -4181,16 +4163,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Apr"
+    *: "Apr"
   </source>
   <dest>
-    *: none
-    rtc: "Tra"
+    *: "Tra"
   </dest>
   <voice>
-    *: none
-    rtc: "Travanj"
+    *: "Travanj"
   </voice>
 </phrase>
 <phrase>
@@ -4198,16 +4177,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "May"
+    *: "May"
   </source>
   <dest>
-    *: none
-    rtc: "Svi"
+    *: "Svi"
   </dest>
   <voice>
-    *: none
-    rtc: "Svibanj"
+    *: "Svibanj"
   </voice>
 </phrase>
 <phrase>
@@ -4215,16 +4191,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jun"
+    *: "Jun"
   </source>
   <dest>
-    *: none
-    rtc: "Lip"
+    *: "Lip"
   </dest>
   <voice>
-    *: none
-    rtc: "Lipanj"
+    *: "Lipanj"
   </voice>
 </phrase>
 <phrase>
@@ -4232,16 +4205,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jul"
+    *: "Jul"
   </source>
   <dest>
-    *: none
-    rtc: "Srp"
+    *: "Srp"
   </dest>
   <voice>
-    *: none
-    rtc: "Srpanj"
+    *: "Srpanj"
   </voice>
 </phrase>
 <phrase>
@@ -4249,16 +4219,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Aug"
+    *: "Aug"
   </source>
   <dest>
-    *: none
-    rtc: "Kol"
+    *: "Kol"
   </dest>
   <voice>
-    *: none
-    rtc: "Kolovoz"
+    *: "Kolovoz"
   </voice>
 </phrase>
 <phrase>
@@ -4266,16 +4233,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Sep"
+    *: "Sep"
   </source>
   <dest>
-    *: none
-    rtc: "Ruj"
+    *: "Ruj"
   </dest>
   <voice>
-    *: none
-    rtc: "Rujan"
+    *: "Rujan"
   </voice>
 </phrase>
 <phrase>
@@ -4283,16 +4247,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Oct"
+    *: "Oct"
   </source>
   <dest>
-    *: none
-    rtc: "Lis"
+    *: "Lis"
   </dest>
   <voice>
-    *: none
-    rtc: "Listopad"
+    *: "Listopad"
   </voice>
 </phrase>
 <phrase>
@@ -4300,16 +4261,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Nov"
+    *: "Nov"
   </source>
   <dest>
-    *: none
-    rtc: "Stu"
+    *: "Stu"
   </dest>
   <voice>
-    *: none
-    rtc: "Studeni"
+    *: "Studeni"
   </voice>
 </phrase>
 <phrase>
@@ -4317,16 +4275,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Dec"
+    *: "Dec"
   </source>
   <dest>
-    *: none
-    rtc: "Pro"
+    *: "Pro"
   </dest>
   <voice>
-    *: none
-    rtc: "Prosinac"
+    *: "Prosinac"
   </voice>
 </phrase>
 <phrase>
@@ -10104,16 +10059,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "sati"
+    *: "sati"
   </voice>
 </phrase>
 <phrase>
@@ -10121,16 +10073,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "poslije podne"
+    *: "poslije podne"
   </voice>
 </phrase>
 <phrase>
@@ -10138,16 +10087,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "prije podne"
+    *: "prije podne"
   </voice>
 </phrase>
 <phrase>
@@ -10155,16 +10101,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "oh"
+    *: "oh"
   </voice>
 </phrase>
 <phrase>

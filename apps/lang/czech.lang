@@ -3900,16 +3900,13 @@
   desc: select the time format of time in status bar
   user: core
   <source>
-    *: none
-    rtc: "Time Format"
+    *: "Time Format"
   </source>
   <dest>
-    *: none
-    rtc: "Formát času"
+    *: "Formát času"
   </dest>
   <voice>
-    *: none
-    rtc: "Formát času"
+    *: "Formát času"
   </voice>
 </phrase>
 <phrase>
@@ -3917,16 +3914,13 @@
   desc: option for 12 hour clock
   user: core
   <source>
-    *: none
-    rtc: "12 Hour Clock"
+    *: "12 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "12 hodinový cyklus"
+    *: "12 hodinový cyklus"
   </dest>
   <voice>
-    *: none
-    rtc: "dvanácti hodinový cyklus"
+    *: "dvanácti hodinový cyklus"
   </voice>
 </phrase>
 <phrase>
@@ -3934,16 +3928,13 @@
   desc: option for 24 hour clock
   user: core
   <source>
-    *: none
-    rtc: "24 Hour Clock"
+    *: "24 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "24 hodinový cyklus"
+    *: "24 hodinový cyklus"
   </dest>
   <voice>
-    *: none
-    rtc: "dvaceti čtyř hodinový cyklus"
+    *: "dvaceti čtyř hodinový cyklus"
   </voice>
 </phrase>
 <phrase>
@@ -4140,16 +4131,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jan"
+    *: "Jan"
   </source>
   <dest>
-    *: none
-    rtc: "Led"
+    *: "Led"
   </dest>
   <voice>
-    *: none
-    rtc: "leden"
+    *: "leden"
   </voice>
 </phrase>
 <phrase>
@@ -4157,16 +4145,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Feb"
+    *: "Feb"
   </source>
   <dest>
-    *: none
-    rtc: "Úno"
+    *: "Úno"
   </dest>
   <voice>
-    *: none
-    rtc: "únor"
+    *: "únor"
   </voice>
 </phrase>
 <phrase>
@@ -4174,16 +4159,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Mar"
+    *: "Mar"
   </source>
   <dest>
-    *: none
-    rtc: "Bře"
+    *: "Bře"
   </dest>
   <voice>
-    *: none
-    rtc: "březen"
+    *: "březen"
   </voice>
 </phrase>
 <phrase>
@@ -4191,16 +4173,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Apr"
+    *: "Apr"
   </source>
   <dest>
-    *: none
-    rtc: "Dub"
+    *: "Dub"
   </dest>
   <voice>
-    *: none
-    rtc: "duben"
+    *: "duben"
   </voice>
 </phrase>
 <phrase>
@@ -4208,16 +4187,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "May"
+    *: "May"
   </source>
   <dest>
-    *: none
-    rtc: "Kvě"
+    *: "Kvě"
   </dest>
   <voice>
-    *: none
-    rtc: "květen"
+    *: "květen"
   </voice>
 </phrase>
 <phrase>
@@ -4225,16 +4201,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jun"
+    *: "Jun"
   </source>
   <dest>
-    *: none
-    rtc: "Čer"
+    *: "Čer"
   </dest>
   <voice>
-    *: none
-    rtc: "červen"
+    *: "červen"
   </voice>
 </phrase>
 <phrase>
@@ -4242,16 +4215,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jul"
+    *: "Jul"
   </source>
   <dest>
-    *: none
-    rtc: "Čec"
+    *: "Čec"
   </dest>
   <voice>
-    *: none
-    rtc: "ćervenec"
+    *: "ćervenec"
   </voice>
 </phrase>
 <phrase>
@@ -4259,16 +4229,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Aug"
+    *: "Aug"
   </source>
   <dest>
-    *: none
-    rtc: "Srp"
+    *: "Srp"
   </dest>
   <voice>
-    *: none
-    rtc: "srpen"
+    *: "srpen"
   </voice>
 </phrase>
 <phrase>
@@ -4276,16 +4243,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Sep"
+    *: "Sep"
   </source>
   <dest>
-    *: none
-    rtc: "Zář"
+    *: "Zář"
   </dest>
   <voice>
-    *: none
-    rtc: "září"
+    *: "září"
   </voice>
 </phrase>
 <phrase>
@@ -4293,16 +4257,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Oct"
+    *: "Oct"
   </source>
   <dest>
-    *: none
-    rtc: "Říj"
+    *: "Říj"
   </dest>
   <voice>
-    *: none
-    rtc: "říjen"
+    *: "říjen"
   </voice>
 </phrase>
 <phrase>
@@ -4310,16 +4271,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Nov"
+    *: "Nov"
   </source>
   <dest>
-    *: none
-    rtc: "Lis"
+    *: "Lis"
   </dest>
   <voice>
-    *: none
-    rtc: "listopad"
+    *: "listopad"
   </voice>
 </phrase>
 <phrase>
@@ -4327,16 +4285,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Dec"
+    *: "Dec"
   </source>
   <dest>
-    *: none
-    rtc: "Pro"
+    *: "Pro"
   </dest>
   <voice>
-    *: none
-    rtc: "prosinec"
+    *: "prosinec"
   </voice>
 </phrase>
 <phrase>
@@ -10201,16 +10156,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "hodin"
+    *: "hodin"
   </voice>
 </phrase>
 <phrase>
@@ -10218,16 +10170,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "odpoledne"
+    *: "odpoledne"
   </voice>
 </phrase>
 <phrase>
@@ -10235,16 +10184,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "dopoledne"
+    *: "dopoledne"
   </voice>
 </phrase>
 <phrase>
@@ -10252,16 +10198,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "nula"
+    *: "nula"
   </voice>
 </phrase>
 <phrase>

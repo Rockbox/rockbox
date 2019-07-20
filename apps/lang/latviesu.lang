@@ -3893,16 +3893,13 @@
   desc: select the time format of time in status bar
   user: core
   <source>
-    *: none
-    rtc: "Time Format"
+    *: "Time Format"
   </source>
   <dest>
-    *: none
-    rtc: "Laika Formāts"
+    *: "Laika Formāts"
   </dest>
   <voice>
-    *: none
-    rtc: "laika formaats"
+    *: "laika formaats"
   </voice>
 </phrase>
 <phrase>
@@ -3910,16 +3907,13 @@
   desc: option for 12 hour clock
   user: core
   <source>
-    *: none
-    rtc: "12 Hour Clock"
+    *: "12 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "12 Stundu Pulkstenis"
+    *: "12 Stundu Pulkstenis"
   </dest>
   <voice>
-    *: none
-    rtc: "divpadsmit stundu pulkstenis"
+    *: "divpadsmit stundu pulkstenis"
   </voice>
 </phrase>
 <phrase>
@@ -3927,16 +3921,13 @@
   desc: option for 24 hour clock
   user: core
   <source>
-    *: none
-    rtc: "24 Hour Clock"
+    *: "24 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "24 Stundu Pulkstenis"
+    *: "24 Stundu Pulkstenis"
   </dest>
   <voice>
-    *: none
-    rtc: "divdesmit chetru stundu pulkstenis"
+    *: "divdesmit chetru stundu pulkstenis"
   </voice>
 </phrase>
 <phrase>
@@ -4133,16 +4124,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jan"
+    *: "Jan"
   </source>
   <dest>
-    *: none
-    rtc: "Jan"
+    *: "Jan"
   </dest>
   <voice>
-    *: none
-    rtc: "janvaaris"
+    *: "janvaaris"
   </voice>
 </phrase>
 <phrase>
@@ -4150,16 +4138,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Feb"
+    *: "Feb"
   </source>
   <dest>
-    *: none
-    rtc: "Feb"
+    *: "Feb"
   </dest>
   <voice>
-    *: none
-    rtc: "februaaris"
+    *: "februaaris"
   </voice>
 </phrase>
 <phrase>
@@ -4167,16 +4152,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Mar"
+    *: "Mar"
   </source>
   <dest>
-    *: none
-    rtc: "Mar"
+    *: "Mar"
   </dest>
   <voice>
-    *: none
-    rtc: "marts"
+    *: "marts"
   </voice>
 </phrase>
 <phrase>
@@ -4184,16 +4166,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Apr"
+    *: "Apr"
   </source>
   <dest>
-    *: none
-    rtc: "Apr"
+    *: "Apr"
   </dest>
   <voice>
-    *: none
-    rtc: "apriilis"
+    *: "apriilis"
   </voice>
 </phrase>
 <phrase>
@@ -4201,16 +4180,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "May"
+    *: "May"
   </source>
   <dest>
-    *: none
-    rtc: "Mai"
+    *: "Mai"
   </dest>
   <voice>
-    *: none
-    rtc: "maijs"
+    *: "maijs"
   </voice>
 </phrase>
 <phrase>
@@ -4218,16 +4194,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jun"
+    *: "Jun"
   </source>
   <dest>
-    *: none
-    rtc: "Jūn"
+    *: "Jūn"
   </dest>
   <voice>
-    *: none
-    rtc: "juunijs"
+    *: "juunijs"
   </voice>
 </phrase>
 <phrase>
@@ -4235,16 +4208,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jul"
+    *: "Jul"
   </source>
   <dest>
-    *: none
-    rtc: "Jūl"
+    *: "Jūl"
   </dest>
   <voice>
-    *: none
-    rtc: "juulijs"
+    *: "juulijs"
   </voice>
 </phrase>
 <phrase>
@@ -4252,16 +4222,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Aug"
+    *: "Aug"
   </source>
   <dest>
-    *: none
-    rtc: "Aug"
+    *: "Aug"
   </dest>
   <voice>
-    *: none
-    rtc: "augusts"
+    *: "augusts"
   </voice>
 </phrase>
 <phrase>
@@ -4269,16 +4236,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Sep"
+    *: "Sep"
   </source>
   <dest>
-    *: none
-    rtc: "Sep"
+    *: "Sep"
   </dest>
   <voice>
-    *: none
-    rtc: "septembris"
+    *: "septembris"
   </voice>
 </phrase>
 <phrase>
@@ -4286,16 +4250,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Oct"
+    *: "Oct"
   </source>
   <dest>
-    *: none
-    rtc: "Okt"
+    *: "Okt"
   </dest>
   <voice>
-    *: none
-    rtc: "oktobris"
+    *: "oktobris"
   </voice>
 </phrase>
 <phrase>
@@ -4303,16 +4264,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Nov"
+    *: "Nov"
   </source>
   <dest>
-    *: none
-    rtc: "Nov"
+    *: "Nov"
   </dest>
   <voice>
-    *: none
-    rtc: "novembris"
+    *: "novembris"
   </voice>
 </phrase>
 <phrase>
@@ -4320,16 +4278,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Dec"
+    *: "Dec"
   </source>
   <dest>
-    *: none
-    rtc: "Dec"
+    *: "Dec"
   </dest>
   <voice>
-    *: none
-    rtc: "decembris"
+    *: "decembris"
   </voice>
 </phrase>
 <phrase>
@@ -10111,16 +10066,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "pulkstenis"
+    *: "pulkstenis"
   </voice>
 </phrase>
 <phrase>
@@ -10128,16 +10080,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "pee em"
+    *: "pee em"
   </voice>
 </phrase>
 <phrase>
@@ -10145,16 +10094,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "aa em"
+    *: "aa em"
   </voice>
 </phrase>
 <phrase>
@@ -10162,16 +10108,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: " "
+    *: " "
   </voice>
 </phrase>
 <phrase>

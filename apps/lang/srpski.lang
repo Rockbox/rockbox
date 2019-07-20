@@ -3876,16 +3876,13 @@
   desc: select the time format of time in status bar
   user: core
   <source>
-    *: none
-    rtc: "Time Format"
+    *: "Time Format"
   </source>
   <dest>
-    *: none
-    rtc: "Формат приказа времена"
+    *: "Формат приказа времена"
   </dest>
   <voice>
-    *: none
-    rtc: "Формат приказа времена"
+    *: "Формат приказа времена"
   </voice>
 </phrase>
 <phrase>
@@ -3893,16 +3890,13 @@
   desc: option for 12 hour clock
   user: core
   <source>
-    *: none
-    rtc: "12 Hour Clock"
+    *: "12 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "12-часовни сат"
+    *: "12-часовни сат"
   </dest>
   <voice>
-    *: none
-    rtc: "12 часовни сат"
+    *: "12 часовни сат"
   </voice>
 </phrase>
 <phrase>
@@ -3910,16 +3904,13 @@
   desc: option for 24 hour clock
   user: core
   <source>
-    *: none
-    rtc: "24 Hour Clock"
+    *: "24 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "24-часовни сат"
+    *: "24-часовни сат"
   </dest>
   <voice>
-    *: none
-    rtc: "24 часовни сат"
+    *: "24 часовни сат"
   </voice>
 </phrase>
 <phrase>
@@ -4116,16 +4107,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jan"
+    *: "Jan"
   </source>
   <dest>
-    *: none
-    rtc: "Јан"
+    *: "Јан"
   </dest>
   <voice>
-    *: none
-    rtc: "Јануар"
+    *: "Јануар"
   </voice>
 </phrase>
 <phrase>
@@ -4133,16 +4121,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Feb"
+    *: "Feb"
   </source>
   <dest>
-    *: none
-    rtc: "Феб"
+    *: "Феб"
   </dest>
   <voice>
-    *: none
-    rtc: "Фебруар"
+    *: "Фебруар"
   </voice>
 </phrase>
 <phrase>
@@ -4150,16 +4135,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Mar"
+    *: "Mar"
   </source>
   <dest>
-    *: none
-    rtc: "Мар"
+    *: "Мар"
   </dest>
   <voice>
-    *: none
-    rtc: "Март"
+    *: "Март"
   </voice>
 </phrase>
 <phrase>
@@ -4167,16 +4149,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Apr"
+    *: "Apr"
   </source>
   <dest>
-    *: none
-    rtc: "Апр"
+    *: "Апр"
   </dest>
   <voice>
-    *: none
-    rtc: "Април"
+    *: "Април"
   </voice>
 </phrase>
 <phrase>
@@ -4184,16 +4163,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "May"
+    *: "May"
   </source>
   <dest>
-    *: none
-    rtc: "Мај"
+    *: "Мај"
   </dest>
   <voice>
-    *: none
-    rtc: "Мај"
+    *: "Мај"
   </voice>
 </phrase>
 <phrase>
@@ -4201,16 +4177,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jun"
+    *: "Jun"
   </source>
   <dest>
-    *: none
-    rtc: "Јун"
+    *: "Јун"
   </dest>
   <voice>
-    *: none
-    rtc: "Јун"
+    *: "Јун"
   </voice>
 </phrase>
 <phrase>
@@ -4218,16 +4191,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jul"
+    *: "Jul"
   </source>
   <dest>
-    *: none
-    rtc: "Јул"
+    *: "Јул"
   </dest>
   <voice>
-    *: none
-    rtc: "Јул"
+    *: "Јул"
   </voice>
 </phrase>
 <phrase>
@@ -4235,16 +4205,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Aug"
+    *: "Aug"
   </source>
   <dest>
-    *: none
-    rtc: "Авг"
+    *: "Авг"
   </dest>
   <voice>
-    *: none
-    rtc: "Август"
+    *: "Август"
   </voice>
 </phrase>
 <phrase>
@@ -4252,16 +4219,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Sep"
+    *: "Sep"
   </source>
   <dest>
-    *: none
-    rtc: "Сеп"
+    *: "Сеп"
   </dest>
   <voice>
-    *: none
-    rtc: "Септембар"
+    *: "Септембар"
   </voice>
 </phrase>
 <phrase>
@@ -4269,16 +4233,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Oct"
+    *: "Oct"
   </source>
   <dest>
-    *: none
-    rtc: "Окт"
+    *: "Окт"
   </dest>
   <voice>
-    *: none
-    rtc: "Октобар"
+    *: "Октобар"
   </voice>
 </phrase>
 <phrase>
@@ -4286,16 +4247,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Nov"
+    *: "Nov"
   </source>
   <dest>
-    *: none
-    rtc: "Нов"
+    *: "Нов"
   </dest>
   <voice>
-    *: none
-    rtc: "Новембар"
+    *: "Новембар"
   </voice>
 </phrase>
 <phrase>
@@ -4303,16 +4261,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Dec"
+    *: "Dec"
   </source>
   <dest>
-    *: none
-    rtc: "Дец"
+    *: "Дец"
   </dest>
   <voice>
-    *: none
-    rtc: "Децембар"
+    *: "Децембар"
   </voice>
 </phrase>
 <phrase>
@@ -10092,16 +10047,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "o'clock"
+    *: "o'clock"
   </voice>
 </phrase>
 <phrase>
@@ -10109,16 +10061,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "P M"
+    *: "P M"
   </voice>
 </phrase>
 <phrase>
@@ -10126,16 +10075,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "A M"
+    *: "A M"
   </voice>
 </phrase>
 <phrase>
@@ -10143,16 +10089,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "oh"
+    *: "oh"
   </voice>
 </phrase>
 <phrase>

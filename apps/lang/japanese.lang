@@ -3895,16 +3895,13 @@
   desc: select the time format of time in status bar
   user: core
   <source>
-    *: none
-    rtc: "Time Format"
+    *: "Time Format"
   </source>
   <dest>
-    *: none
-    rtc: "時間の形式"
+    *: "時間の形式"
   </dest>
   <voice>
-    *: none
-    rtc: "時間の形式"
+    *: "時間の形式"
   </voice>
 </phrase>
 <phrase>
@@ -3912,16 +3909,13 @@
   desc: option for 12 hour clock
   user: core
   <source>
-    *: none
-    rtc: "12 Hour Clock"
+    *: "12 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "12時間表示"
+    *: "12時間表示"
   </dest>
   <voice>
-    *: none
-    rtc: "12時間表示"
+    *: "12時間表示"
   </voice>
 </phrase>
 <phrase>
@@ -3929,16 +3923,13 @@
   desc: option for 24 hour clock
   user: core
   <source>
-    *: none
-    rtc: "24 Hour Clock"
+    *: "24 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "24時間表示"
+    *: "24時間表示"
   </dest>
   <voice>
-    *: none
-    rtc: "24時間表示"
+    *: "24時間表示"
   </voice>
 </phrase>
 <phrase>
@@ -4135,16 +4126,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jan"
+    *: "Jan"
   </source>
   <dest>
-    *: none
-    rtc: "Jan"
+    *: "Jan"
   </dest>
   <voice>
-    *: none
-    rtc: "1月"
+    *: "1月"
   </voice>
 </phrase>
 <phrase>
@@ -4152,16 +4140,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Feb"
+    *: "Feb"
   </source>
   <dest>
-    *: none
-    rtc: "Feb"
+    *: "Feb"
   </dest>
   <voice>
-    *: none
-    rtc: "2月"
+    *: "2月"
   </voice>
 </phrase>
 <phrase>
@@ -4169,16 +4154,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Mar"
+    *: "Mar"
   </source>
   <dest>
-    *: none
-    rtc: "Mar"
+    *: "Mar"
   </dest>
   <voice>
-    *: none
-    rtc: "3月"
+    *: "3月"
   </voice>
 </phrase>
 <phrase>
@@ -4186,16 +4168,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Apr"
+    *: "Apr"
   </source>
   <dest>
-    *: none
-    rtc: "Apr"
+    *: "Apr"
   </dest>
   <voice>
-    *: none
-    rtc: "4月"
+    *: "4月"
   </voice>
 </phrase>
 <phrase>
@@ -4203,16 +4182,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "May"
+    *: "May"
   </source>
   <dest>
-    *: none
-    rtc: "May"
+    *: "May"
   </dest>
   <voice>
-    *: none
-    rtc: "5月"
+    *: "5月"
   </voice>
 </phrase>
 <phrase>
@@ -4220,16 +4196,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jun"
+    *: "Jun"
   </source>
   <dest>
-    *: none
-    rtc: "Jun"
+    *: "Jun"
   </dest>
   <voice>
-    *: none
-    rtc: "6月"
+    *: "6月"
   </voice>
 </phrase>
 <phrase>
@@ -4237,16 +4210,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jul"
+    *: "Jul"
   </source>
   <dest>
-    *: none
-    rtc: "Jul"
+    *: "Jul"
   </dest>
   <voice>
-    *: none
-    rtc: "7月"
+    *: "7月"
   </voice>
 </phrase>
 <phrase>
@@ -4254,16 +4224,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Aug"
+    *: "Aug"
   </source>
   <dest>
-    *: none
-    rtc: "Aug"
+    *: "Aug"
   </dest>
   <voice>
-    *: none
-    rtc: "8月"
+    *: "8月"
   </voice>
 </phrase>
 <phrase>
@@ -4271,16 +4238,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Sep"
+    *: "Sep"
   </source>
   <dest>
-    *: none
-    rtc: "Sep"
+    *: "Sep"
   </dest>
   <voice>
-    *: none
-    rtc: "9月"
+    *: "9月"
   </voice>
 </phrase>
 <phrase>
@@ -4288,16 +4252,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Oct"
+    *: "Oct"
   </source>
   <dest>
-    *: none
-    rtc: "Oct"
+    *: "Oct"
   </dest>
   <voice>
-    *: none
-    rtc: "10月"
+    *: "10月"
   </voice>
 </phrase>
 <phrase>
@@ -4305,16 +4266,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Nov"
+    *: "Nov"
   </source>
   <dest>
-    *: none
-    rtc: "Nov"
+    *: "Nov"
   </dest>
   <voice>
-    *: none
-    rtc: "11月"
+    *: "11月"
   </voice>
 </phrase>
 <phrase>
@@ -4322,16 +4280,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Dec"
+    *: "Dec"
   </source>
   <dest>
-    *: none
-    rtc: "Dec"
+    *: "Dec"
   </dest>
   <voice>
-    *: none
-    rtc: "12月"
+    *: "12月"
   </voice>
 </phrase>
 <phrase>
@@ -10111,16 +10066,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "じ 丁度"
+    *: "じ 丁度"
   </voice>
 </phrase>
 <phrase>
@@ -10128,16 +10080,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "午後"
+    *: "午後"
   </voice>
 </phrase>
 <phrase>
@@ -10145,16 +10094,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "午前"
+    *: "午前"
   </voice>
 </phrase>
 <phrase>
@@ -10162,16 +10108,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "oh"
+    *: "oh"
   </voice>
 </phrase>
 <phrase>

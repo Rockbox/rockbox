@@ -49,7 +49,6 @@
 # apps/features.txt for available categories that can be used instead of the
 # target name, for example: swcodec: "swcodec-specific string".
 #
-#
 # The target names used are picked from the configure script and are set in the
 # MODELNAME variable in the root makefile. Currently, they are:
 # Target        Target string

@@ -46,7 +46,6 @@
 # apps/features.txt for available categories that can be used instead of the
 # target name, for example: swcodec: "swcodec-specific string".
 #
-#
 # The target names used are picked from the configure script and are set in the
 # MODELNAME variable in the root makefile. Currently, they are:
 # Target        Target string
@@ -3958,16 +3957,13 @@
   desc: select the time format of time in status bar
   user: core
   <source>
-    *: none
-    rtc: "Time Format"
+    *: "Time Format"
   </source>
   <dest>
-    *: none
-    rtc: "Laiko formatas"
+    *: "Laiko formatas"
   </dest>
   <voice>
-    *: none
-    rtc: "Laiko formatas"
+    *: "Laiko formatas"
   </voice>
 </phrase>
 <phrase>
@@ -3975,16 +3971,13 @@
   desc: option for 12 hour clock
   user: core
   <source>
-    *: none
-    rtc: "12 Hour Clock"
+    *: "12 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "12 valandų laikrodis"
+    *: "12 valandų laikrodis"
   </dest>
   <voice>
-    *: none
-    rtc: "12 valandų laikrodis"
+    *: "12 valandų laikrodis"
   </voice>
 </phrase>
 <phrase>
@@ -3992,16 +3985,13 @@
   desc: option for 24 hour clock
   user: core
   <source>
-    *: none
-    rtc: "24 Hour Clock"
+    *: "24 Hour Clock"
   </source>
   <dest>
-    *: none
-    rtc: "24 valandų laikrodis"
+    *: "24 valandų laikrodis"
   </dest>
   <voice>
-    *: none
-    rtc: "24 valandų laikrodis"
+    *: "24 valandų laikrodis"
   </voice>
 </phrase>
 <phrase>
@@ -4191,16 +4181,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jan"
+    *: "Jan"
   </source>
   <dest>
-    *: none
-    rtc: "Sau"
+    *: "Sau"
   </dest>
   <voice>
-    *: none
-    rtc: "Sausis"
+    *: "Sausis"
   </voice>
 </phrase>
 <phrase>
@@ -4208,16 +4195,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Feb"
+    *: "Feb"
   </source>
   <dest>
-    *: none
-    rtc: "Vas"
+    *: "Vas"
   </dest>
   <voice>
-    *: none
-    rtc: "Vasaris"
+    *: "Vasaris"
   </voice>
 </phrase>
 <phrase>
@@ -4225,16 +4209,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Mar"
+    *: "Mar"
   </source>
   <dest>
-    *: none
-    rtc: "Kov"
+    *: "Kov"
   </dest>
   <voice>
-    *: none
-    rtc: "Kovas"
+    *: "Kovas"
   </voice>
 </phrase>
 <phrase>
@@ -4242,16 +4223,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Apr"
+    *: "Apr"
   </source>
   <dest>
-    *: none
-    rtc: "Bal"
+    *: "Bal"
   </dest>
   <voice>
-    *: none
-    rtc: "Balandis"
+    *: "Balandis"
   </voice>
 </phrase>
 <phrase>
@@ -4259,16 +4237,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "May"
+    *: "May"
   </source>
   <dest>
-    *: none
-    rtc: "Geg"
+    *: "Geg"
   </dest>
   <voice>
-    *: none
-    rtc: "Gegužė"
+    *: "Gegužė"
   </voice>
 </phrase>
 <phrase>
@@ -4276,16 +4251,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jun"
+    *: "Jun"
   </source>
   <dest>
-    *: none
-    rtc: "Bir"
+    *: "Bir"
   </dest>
   <voice>
-    *: none
-    rtc: "Birželis"
+    *: "Birželis"
   </voice>
 </phrase>
 <phrase>
@@ -4293,16 +4265,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Jul"
+    *: "Jul"
   </source>
   <dest>
-    *: none
-    rtc: "Lie"
+    *: "Lie"
   </dest>
   <voice>
-    *: none
-    rtc: "Liepa"
+    *: "Liepa"
   </voice>
 </phrase>
 <phrase>
@@ -4310,16 +4279,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Aug"
+    *: "Aug"
   </source>
   <dest>
-    *: none
-    rtc: "Rgp"
+    *: "Rgp"
   </dest>
   <voice>
-    *: none
-    rtc: "Rugpjūtis"
+    *: "Rugpjūtis"
   </voice>
 </phrase>
 <phrase>
@@ -4327,16 +4293,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Sep"
+    *: "Sep"
   </source>
   <dest>
-    *: none
-    rtc: "Rgs"
+    *: "Rgs"
   </dest>
   <voice>
-    *: none
-    rtc: "Rugsėjis"
+    *: "Rugsėjis"
   </voice>
 </phrase>
 <phrase>
@@ -4344,16 +4307,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Oct"
+    *: "Oct"
   </source>
   <dest>
-    *: none
-    rtc: "Spa"
+    *: "Spa"
   </dest>
   <voice>
-    *: none
-    rtc: "Spalis"
+    *: "Spalis"
   </voice>
 </phrase>
 <phrase>
@@ -4361,16 +4321,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Nov"
+    *: "Nov"
   </source>
   <dest>
-    *: none
-    rtc: "Lap"
+    *: "Lap"
   </dest>
   <voice>
-    *: none
-    rtc: "Lapkritis"
+    *: "Lapkritis"
   </voice>
 </phrase>
 <phrase>
@@ -4378,16 +4335,13 @@
   desc: Maximum 3-letter abbreviation for monthname
   user: core
   <source>
-    *: none
-    rtc: "Dec"
+    *: "Dec"
   </source>
   <dest>
-    *: none
-    rtc: "Gru"
+    *: "Gru"
   </dest>
   <voice>
-    *: none
-    rtc: "Gruodis"
+    *: "Gruodis"
   </voice>
 </phrase>
 <phrase>
@@ -10167,16 +10121,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "o'clock"
+    *: "o'clock"
   </voice>
 </phrase>
 <phrase>
@@ -10184,16 +10135,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "P M"
+    *: "P M"
   </voice>
 </phrase>
 <phrase>
@@ -10201,16 +10149,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "A M"
+    *: "A M"
   </voice>
 </phrase>
 <phrase>
@@ -10218,16 +10163,13 @@
   desc: spoken only, for wall clock announce
   user: core
   <source>
-    *: none
-    rtc: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    rtc: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    rtc: "oh"
+    *: "oh"
   </voice>
 </phrase>
 <phrase>
