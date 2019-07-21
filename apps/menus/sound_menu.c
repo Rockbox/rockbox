@@ -38,11 +38,6 @@
 #include "option_select.h"
 #include "misc.h"
 
-static int32_t get_dec_talkid(int value, int unit)
-{
-    return TALK_ID_DECIMAL(value, 1, unit);
-}
-
 static int volume_limit_callback(int action,const struct menu_item_ex *this_item)
 {
     (void)this_item;
@@ -54,7 +49,7 @@ static int volume_limit_callback(int action,const struct menu_item_ex *this_item
     volume_limit_int_setting.max = sound_max(SOUND_VOLUME);
     volume_limit_int_setting.step = sound_steps(SOUND_VOLUME);
     volume_limit_int_setting.formatter = NULL;
-    volume_limit_int_setting.get_talk_id = get_dec_talkid;
+    volume_limit_int_setting.get_talk_id = NULL;
 
     struct settings_list setting;
     setting.flags = F_BANFROMQS|F_INT_SETTING|F_T_INT|F_NO_WRAP;
