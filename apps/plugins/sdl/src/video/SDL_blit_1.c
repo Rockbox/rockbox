@@ -76,9 +76,9 @@ static void Blit1to1(SDL_BlitInfo *info)
 #endif
 static void Blit1to2(SDL_BlitInfo *info)
 {
-#ifndef USE_DUFFS_LOOP
+//#ifndef USE_DUFFS_LOOP
 	int c;
-#endif
+//#endif
 	int width, height;
 	Uint8 *src, *dst;
 	Uint16 *map;
@@ -93,7 +93,7 @@ static void Blit1to2(SDL_BlitInfo *info)
 	dstskip = info->d_skip;
 	map = (Uint16 *)info->table;
 
-#ifdef USE_DUFFS_LOOP
+//#ifdef USE_DUFFS_LOOP
 	while ( height-- ) {
 		DUFFS_LOOP(
 		{
@@ -104,7 +104,7 @@ static void Blit1to2(SDL_BlitInfo *info)
 		src += srcskip;
 		dst += dstskip;
 	}
-#else
+//#else
 	/* Memory align at 4-byte boundary, if necessary */
 	if ( (long)dst & 0x03 ) {
 		/* Don't do anything if width is 0 */
@@ -148,7 +148,69 @@ static void Blit1to2(SDL_BlitInfo *info)
 			src += srcskip;
 			dst += dstskip;
 		}
-	} else { 
+	} else {
+#if defined(__ARM_ARCH_5TEJ__)
+            if(!((long)dst & 0x07) && !(width & 0x07) && !((long)src & 0x07)) // 8-aligned and multiple of 8 width
+            {
+                const uint32_t mask = 0x1fe; /* 111111110 */
+                while(height--) {
+                    asm volatile(
+                        "sub r6, %[width], #8                         \n" /* x = width - 8 */
+                        "mov r8, r6, lsl #1                           \n" /* y = 2 * x */
+                        "1:                                           \n"
+                        "ldrd r0, r1, [%[src], r6]                    \n" /* load 8 bytes; r1=src[7,6,5,4], r0=src[3,2,1,0] */
+
+                        /* process first 4 bytes */
+                        "and r2, %[mask], r0, lsl #1                  \n" /* extract byte 0 from r0, shifted left 1 */
+                        "ldrh r3, [%[map], r2]                        \n" /* r3 = map[src[0]] */
+                        "and r2, %[mask], lsr #7                      \n" /* byte 1 */
+                        "ldrh r4, [%[map], r2]                        \n" /* r4 = map[src[1]] */
+                        "orr r4, r3, r4, lsl #16                      \n" /* r3 = [r4:r3], TRASH r2, r3 */
+
+                        "and r2, r0, lsr #15                          \n" /* byte 2 */
+                        "ldrh r3, [%[map], r2]                        \n" /* r3 = map[src[2]] */
+                        "and r2, r0, lsr #23                          \n" /* byte 3, TRASH r0 */
+                        "ldrh r5, [%[map], r0]                        \n" /* r5 = map[src[3]] */
+                        "orr r5, r3, r5, lsl #16                      \n" /* r5 = [r5, r3] */
+
+                        "strd r4, r5, [%[dst], r8]                    \n" /* dst[0..7] = r4, r5 (write 4 pixels) */
+                        "sub r6, r6, #4                               \n" /* advance to next 4 */
+                        "sub r8, r8, #8                               \n"
+
+                        /* process next 4 bytes */
+                        "and r2, %[mask], r1, lsl #1                  \n" /* extract byte 0 from r1, shifted left 1 */
+                        "ldrh r3, [%[map], r2]                        \n" /* r3 = map[src[0]] */
+                        "and r2, %[mask], lsr #7                      \n" /* byte 1 */
+                        "ldrh r4, [%[map], r2]                        \n" /* r4 = map[src[1]] */
+                        "orr r4, r3, r4, lsl #16                      \n" /* r3 = [r4:r3], trash r2, r3 */
+
+                        "and r2, r1, lsr #15                          \n" /* byte 2 */
+                        "ldrh r3, [%[map], r2]                        \n" /* r3 = map[src[2]] */
+                        "and r2, r1, lsr #23                          \n" /* byte 3, TRASH r1 */
+                        "ldrh r5, [%[map], r1]                        \n" /* r5 = map[src[3]] */
+                        "orr r5, r3, r5, lsl #16                      \n" /* r5 = [r5, r3] */
+
+                        "strd r4, r5, [%[dst], r8]                    \n" /* dst[0..3] = r3, r4 */
+
+                        "sub  r8, r8, #8                              \n"
+                        "subs r6, r6, #4                              \n"
+                        //"bgt 1b                                       \n" /* loop if > 0 */
+                        : /* output */
+                          [dst] "&=r" (dst)
+                        : /* input */
+                          [src] "r" (src),
+                          [map] "r" (map),
+                          [width] "r" (width),
+                          [mask] "r" (mask)
+                        : /* clobber */
+                          "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r8");
+                    src += srcskip;
+                    dst += dstskip;
+                }
+            }
+#else
+            else
+#error a
 		while ( height-- ) {
 			/* Copy in 4 pixel chunks */
 			for ( c=width/4; c; --c ) {
@@ -180,8 +242,9 @@ static void Blit1to2(SDL_BlitInfo *info)
 			src += srcskip;
 			dst += dstskip;
 		}
+#endif
 	}
-#endif /* USE_DUFFS_LOOP */
+//#endif /* USE_DUFFS_LOOP */
 }
 static void Blit1to3(SDL_BlitInfo *info)
 {
