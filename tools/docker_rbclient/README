@@ -1,0 +1,35 @@
+This directory builds a Docker container image for a rockbox build
+client with all toolchains except android.
+
+There is a pre-built client available as built1n/rbclient on Docker
+Hub if you would like to avoid having to build all the toolchains. See
+the Docker documentation on how to pull and run it.
+
+To build from scratch:
+
+1. Make sure you have Docker installed and running.
+
+2. Run:
+
+  docker build . -t myclient
+
+  This will build the image and tag it as `myclient.'
+
+3. To run your client:
+
+  docker run -e USER=your username -e PASS=anything -e NAME=clientname \
+             myclient
+
+  You can also run a bash shell interactively by issuing:
+
+  docker run -it myclient bash
+
+  This will drop you into a fully-equiped rockbox development
+  environment.
+
+It is also possible to pull straight from Docker Hub. Run:
+
+  docker pull built1n/rbclient
+  
+Then you can use all the commands above, with `myclient' replaced with
+`built1n/rbclient'.
