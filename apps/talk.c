@@ -345,6 +345,7 @@ static int free_oldest_clip(void)
 {
     unsigned i;
     int oldest = 0;
+    bool thumb = false;
     long age, now;
     struct clip_entry* clipbuf;
     struct clip_cache_metadata *cc = buflib_get_data(&clip_ctx, metadata_table_handle);
@@ -352,17 +353,26 @@ static int free_oldest_clip(void)
     {
         if (cc[i].handle)
         {
-            if ((now - cc[i].tick) > age && cc[i].voice_id != VOICE_PAUSE)
+            if (thumb && cc[i].voice_id == VOICEONLY_DELIMITER && (now - cc[i].tick) > age)
             {
-                /* find the last-used clip but never consider silence */
+                /* thumb clips are freed first */
                 age = now - cc[i].tick;
                 oldest = i;
             }
-            else if (cc[i].voice_id == VOICEONLY_DELIMITER)
+            else if (!thumb)
             {
-                /* thumb clips are freed immediately */
-                oldest = i;
-                break;
+                if (cc[i].voice_id == VOICEONLY_DELIMITER)
+                {
+                    age = now - cc[i].tick;
+                    oldest = i;
+                    thumb = true;
+                }
+                else if ((now - cc[i].tick) > age && cc[i].voice_id != VOICE_PAUSE)
+                {
+                    /* find the last-used clip but never consider silence */
+                    age = now - cc[i].tick;
+                    oldest = i;
+                }
             }
         }
     }
