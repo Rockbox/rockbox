@@ -446,58 +446,111 @@ float   (*LittleFloat) (float l);
 
 short   ShortSwap (short l)
 {
-	byte    b1,b2;
+    byte    b1,b2;
 
-	b1 = l&255;
-	b2 = (l>>8)&255;
+    b1 = l&255;
+    b2 = (l>>8)&255;
 
-	return (b1<<8) + b2;
+    return (b1<<8) + b2;
 }
 
 short   ShortNoSwap (short l)
 {
-	return l;
+    return l;
 }
 
 int    LongSwap (int l)
 {
-	byte    b1,b2,b3,b4;
+    byte    b1,b2,b3,b4;
 
-	b1 = l&255;
-	b2 = (l>>8)&255;
-	b3 = (l>>16)&255;
-	b4 = (l>>24)&255;
+    b1 = l&255;
+    b2 = (l>>8)&255;
+    b3 = (l>>16)&255;
+    b4 = (l>>24)&255;
 
-	return ((int)b1<<24) + ((int)b2<<16) + ((int)b3<<8) + b4;
+    return ((int)b1<<24) + ((int)b2<<16) + ((int)b3<<8) + b4;
 }
 
 int     LongNoSwap (int l)
 {
-	return l;
+    return l;
 }
 
 float FloatSwap (float f)
+{
+    union
+    {
+        float   f;
+        byte    b[4];
+    } dat1, dat2;
+        
+        
+    dat1.f = f;
+    dat2.b[0] = dat1.b[3];
+    dat2.b[1] = dat1.b[2];
+    dat2.b[2] = dat1.b[1];
+    dat2.b[3] = dat1.b[0];
+    return dat2.f;
+}
+
+float FloatNoSwap (float f)
+{
+        return f;
+}
+
+// safe for unaligned accesses
+short   ReadLittleShort (char *l)
+{
+    return *(l + 0) | (*(l + 1) << 8);
+}
+
+short   ReadBigShort (char *l)
+{
+    return *(l + 1) | (*(l + 0) << 8);
+}
+
+int    ReadLittleLong (char *l)
+{
+    return *(l + 0) | (*(l + 1) << 8) | (*(l + 2) << 16) | (*(l + 3) << 24);
+}
+
+int ReadBigLong (char *l)
+{
+    return *(l + 3) | (*(l + 2) << 8) | (*(l + 1) << 16) | (*(l + 0) << 24);
+}
+
+// same
+float ReadLittleFloat (char *f)
 {
 	union
 	{
 		float   f;
 		byte    b[4];
-	} dat1, dat2;
+	} dat2;
 	
 	
-	dat1.f = f;
-	dat2.b[0] = dat1.b[3];
-	dat2.b[1] = dat1.b[2];
-	dat2.b[2] = dat1.b[1];
-	dat2.b[3] = dat1.b[0];
+	dat2.b[0] = f[0];
+	dat2.b[1] = f[1];
+	dat2.b[2] = f[2];
+	dat2.b[3] = f[3];
 	return dat2.f;
 }
 
-float FloatNoSwap (float f)
+float ReadBigFloat (char *f)
 {
-	return f;
+	union
+	{
+		float   f;
+		byte    b[4];
+	} dat2;
+	
+	
+	dat2.b[0] = f[0];
+	dat2.b[1] = f[1];
+	dat2.b[2] = f[2];
+	dat2.b[3] = f[3];
+	return dat2.f;
 }
-
 /*
 ==============================================================================
 
@@ -1136,6 +1189,7 @@ void COM_Init (char *basedir)
 {
 	byte    swaptest[2] = {1,0};
 
+#if 1
 // set the byte swapping variables in a portable manner 
 #ifdef SDL
 	// This is necessary because egcs 1.1.1 mis-compiles swaptest with -O2
@@ -1162,6 +1216,7 @@ void COM_Init (char *basedir)
 		BigFloat = FloatNoSwap;
 		LittleFloat = FloatSwap;
 	}
+#endif
 
 	Cvar_RegisterVariable (&registered);
 	Cvar_RegisterVariable (&cmdline);
