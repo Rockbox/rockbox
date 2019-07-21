@@ -15639,3 +15639,87 @@ id: VOICE_BAT_BENCH_KEYS
     lowmem: none
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOGGLE_ITEM
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Toggle Item"
+  </source>
+  <dest>
+    *: "Toggle Item"
+  </dest>
+  <voice>
+    *: "Toggle Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_UP
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Up"
+  </source>
+  <dest>
+    *: "Move Item Up"
+  </dest>
+  <voice>
+    *: "Move Item Up"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_DOWN
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Down"
+  </source>
+  <dest>
+    *: "Move Item Down"
+  </dest>
+  <voice>
+    *: "Move Item Down"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOAD_DEFAULT_CONFIGURATION
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Load Default Configuration"
+  </source>
+  <dest>
+    *: "Load Default Configuration"
+  </dest>
+  <voice>
+    *: "Load Default Configuration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_EXIT
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Save and Exit"
+  </source>
+  <dest>
+    *: "Save and Exit"
+  </dest>
+  <voice>
+    *: "Save and Exit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU_ORDER
+  desc: main_menu_config plugin title
+  user: core
+  <source>
+    *: "Rockbox Main Menu Order"
+  </source>
+  <dest>
+    *: "Rockbox Main Menu Order"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>

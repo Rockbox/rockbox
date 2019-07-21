@@ -13700,3 +13700,87 @@
     charging: "Задержка перед возобновлением"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOGGLE_ITEM
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Toggle Item"
+  </source>
+  <dest>
+    *: "Сменить Статус"
+  </dest>
+  <voice>
+    *: "Сменить Статус"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_UP
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Up"
+  </source>
+  <dest>
+    *: "Переместить вверх"
+  </dest>
+  <voice>
+    *: "Переместить вверх"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_DOWN
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Down"
+  </source>
+  <dest>
+    *: "Переместить Вниз"
+  </dest>
+  <voice>
+    *: "Переместить Вниз"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOAD_DEFAULT_CONFIGURATION
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Load Default Configuration"
+  </source>
+  <dest>
+    *: "Загрузить Исходную Конфигурацию"
+  </dest>
+  <voice>
+    *: "Загрузить Исходную Конфигурацию"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_EXIT
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Save and Exit"
+  </source>
+  <dest>
+    *: "Сохранить и Выйти"
+  </dest>
+  <voice>
+    *: "Сохранить и Выйти"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU_ORDER
+  desc: main_menu_config plugin title
+  user: core
+  <source>
+    *: "Rockbox Main Menu Order"
+  </source>
+  <dest>
+    *: "Настройка Главного Меню Rockbox"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
