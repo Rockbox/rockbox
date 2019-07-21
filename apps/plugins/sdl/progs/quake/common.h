@@ -88,12 +88,29 @@ void InsertLinkAfter (link_t *l, link_t *after);
 
 extern	qboolean		bigendien;
 
-extern	short	(*BigShort) (short l);
-extern	short	(*LittleShort) (short l);
-extern	int	(*BigLong) (int l);
-extern	int	(*LittleLong) (int l);
-extern	float	(*BigFloat) (float l);
-extern	float	(*LittleFloat) (float l);
+// not safe on unaligned data 
+extern  short   (*BigShort) (short l);
+extern  short   (*LittleShort) (short l);
+extern  int     (*BigLong) (int l);
+extern  int     (*LittleLong) (int l);
+extern  float   (*BigFloat) (float l);
+extern  float   (*LittleFloat) (float l);
+
+#define LittleShortUnaligned(x) ReadLittleShort(((char*)(&(x))))
+#define BigShortUnaligned(x) ReadBigShort(((char*)&(x)))
+#define LittleLongUnaligned(x) ReadLittleLong(((char*)&(x)))
+#define BigLongUnaligned(x) ReadBigLong(((char*)&(x)))
+#define LittleFloatUnaligned(x) ReadLittleFloat(((char*)&(x)))
+#define BigFloatUnaligned(x) ReadBigFloat(((char*)&(x))
+
+
+// for unaligned
+short	ReadBigShort (char *l);
+short	ReadLittleShort (char *l);
+int	ReadBigLong (char *l);
+int	ReadLittleLong (char *l);
+float	ReadBigFloat (char *l);
+float	ReadLittleFloat (char *l);
 
 //============================================================================
 
