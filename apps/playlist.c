@@ -3288,6 +3288,11 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
     bool queue;
     bool current = false;
     int r;
+    struct playlist_track_info info;
+    int idx_cur; /* display index of the currently playing track */
+    int idx_from; /* display index of the track we're moving */
+    int idx_to; /* display index of the position we're moving to */
+    bool displace_current = false;
     char filename[MAX_PATH];
 
     if (!playlist)
@@ -3303,8 +3308,35 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
         return -1;
 
     if (index == playlist->index)
+    {
         /* Moving the current track */
         current = true;
+    }
+    else
+    {
+        /* Get display index of the currently playing track */
+        if (playlist_get_track_info(playlist, playlist->index, &info) != -1)
+        {
+            idx_cur = info.display_index;
+            /* Get display index of the position we're moving to */
+            if (playlist_get_track_info(playlist, new_index, &info) != -1)
+            {
+                idx_to = info.display_index;
+                /* Get display index of the track we're trying to move */
+                if (playlist_get_track_info(playlist, index, &info) != -1)
+                {
+                    idx_from = info.display_index;
+                    /* Check if moving will displace the current track.
+                       Displace happens when moving from after current to
+                       before, but also when moving from before to before
+                       due to the removal from the original position */
+                    if ( ((idx_from > idx_cur) && (idx_to <= idx_cur)) ||
+                         ((idx_from < idx_cur) && (idx_to < idx_cur)) )
+                        displace_current = true;
+                }
+            }
+        }
+    }
 
     control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;
     queue = playlist->indices[index] & PLAYLIST_QUEUE_MASK;
@@ -3320,7 +3352,7 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
        We calculate this before we do the remove as it depends on the
        size of the playlist before the track removal */
     r = rotate_index(playlist, new_index);
-          
+
     /* Delete track from original position */
     result = remove_track_from_playlist(playlist, index, true);
 
@@ -3338,7 +3370,7 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
 
         result = add_track_to_playlist(playlist, filename, new_index, queue,
             -1);
-        
+
         if (result != -1)
         {
             if (current)
@@ -3359,6 +3391,10 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
                         break;
                 }
             }
+            else
+                if ((displace_current) && (new_index != PLAYLIST_PREPEND))
+                    /* make the index point to the currently playing track */
+                    playlist->index++;
 
             if ((audio_status() & AUDIO_STATUS_PLAY) && playlist->started)
                 audio_flush_and_reload_tracks();
