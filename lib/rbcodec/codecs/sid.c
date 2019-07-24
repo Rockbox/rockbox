@@ -73,7 +73,9 @@ CODEC_HEADER
  * 
  */
 
-static int32_t samples[CHUNK_SIZE] IBSS_ATTR;   /* The sample buffer */
+/* The sample buffers */
+static int32_t samples_r[CHUNK_SIZE] IBSS_ATTR;
+static int32_t samples_l[CHUNK_SIZE] IBSS_ATTR;
 
 void sidPoke(int reg, unsigned char val) ICODE_ATTR;
 
@@ -371,8 +373,8 @@ void synth_init(unsigned long mixfrq)
 }
 
 /* render a buffer of n samples with the actual register contents */
-void synth_render (int32_t *buffer, unsigned long len) ICODE_ATTR;
-void synth_render (int32_t *buffer, unsigned long len)
+void synth_render (int32_t *buffer_r, int32_t *buffer_l, unsigned long len) ICODE_ATTR;
+void synth_render (int32_t *buffer_r, int32_t *buffer_l, unsigned long len)
 {
     unsigned long bp;
     /* step 1: convert the not easily processable sid registers into some
@@ -415,9 +417,9 @@ void synth_render (int32_t *buffer, unsigned long len)
     /* now render the buffer */
     for (bp=0;bp<len;bp++) {
 #ifdef USE_FILTER
-        int outo=0;
+        int outo[2]={0,0};
 #endif
-        int outf=0;
+        int outf[2]={0,0};
     /* step 2 : generate the two output signals (for filtered and non-
                 filtered) from the osc/eg sections */
     for (v=0;v<3;v++) {
@@ -524,16 +526,16 @@ void synth_render (int32_t *buffer, unsigned long len)
             if (v<2 || filter.v3ena)
             {
                 if (osc[v].filter)
-                    outf+=(((int)(outv-0x80))*osc[v].envval)>>22;
+                    outf[v&1]+=(((int)(outv-0x80))*osc[v].envval)>>22;
                 else
-                    outo+=(((int)(outv-0x80))*osc[v].envval)>>22;
+                    outo[v&1]+=(((int)(outv-0x80))*osc[v].envval)>>22;
             }
 #endif
 #ifndef USE_FILTER
-            /* Don't use filters, just mix all voices together */
-            outf+=((signed short)(outv-0x80)) * (osc[v].envval>>4);
+            /* Don't use filters, just mix voices together */
+            outf[v&1]+=((signed short)(outv-0x80)) * (osc[v].envval>>4);
 #endif
-        }
+        } /* for (v=0;v<3;v++) */
 
 
 #ifdef USE_FILTER
@@ -549,23 +551,30 @@ void synth_render (int32_t *buffer, unsigned long len)
          * This filter sounds a lot like the 8580, as the low-quality, dirty
          * sound of the 6581 is uuh too hard to achieve :) */
 
-        filter.h = quickfloat_ConvertFromInt(outf) - (filter.b>>8)*filter.rez - filter.l;
-        filter.b += quickfloat_Multiply(filter.freq, filter.h);
-        filter.l += quickfloat_Multiply(filter.freq, filter.b);
+        outf[0]+=outf[2]; /* mix voice 1 and 3 to right channel */
+        for (v=0;v<2;v++) { /* do step 3 for both channels */
+            filter.h = quickfloat_ConvertFromInt(outf[v]) - (filter.b>>8)*filter.rez - filter.l;
+            filter.b += quickfloat_Multiply(filter.freq, filter.h);
+            filter.l += quickfloat_Multiply(filter.freq, filter.b);
 
-        outf = 0;
+            outf[v] = 0;
 
-        if (filter.l_ena) outf+=quickfloat_ConvertToInt(filter.l);
-        if (filter.b_ena) outf+=quickfloat_ConvertToInt(filter.b);
-        if (filter.h_ena) outf+=quickfloat_ConvertToInt(filter.h);
+            if (filter.l_ena) outf[v]+=quickfloat_ConvertToInt(filter.l);
+            if (filter.b_ena) outf[v]+=quickfloat_ConvertToInt(filter.b);
+            if (filter.h_ena) outf[v]+=quickfloat_ConvertToInt(filter.h);
+        }
 
-        int final_sample = (filter.vol*(outo+outf));        
-        *(buffer+bp)= GenerateDigi(final_sample)<<13;
+        /* mix in other channel to reduce stereo panning for better sound on headphones */
+        int final_sample_r = filter.vol*((outo[0]+outf[0]) + ((outo[1]+outf[1])>>4));
+        int final_sample_l = filter.vol*((outo[1]+outf[1]) + ((outo[0]+outf[0])>>4));
+        *(buffer_r+bp)= GenerateDigi(final_sample_r)<<13;
+        *(buffer_l+bp)= GenerateDigi(final_sample_l)<<13;
 #endif
 #ifndef USE_FILTER
-        *(buffer+bp) = GenerateDigi(outf)<<3;
+        *(buffer_r+bp) = GenerateDigi(outf[0])<<3;
+        *(buffer_l+bp) = GenerateDigi(outf[1])<<3;
 #endif
-    }
+    } /*for (bp=0;bp<len;bp++) */
 }
 
 
@@ -1238,8 +1247,8 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
         ci->configure(DSP_SET_FREQUENCY, SAMPLE_RATE);
         /* Sample depth is 28 bit host endian */
         ci->configure(DSP_SET_SAMPLE_DEPTH, 28);
-        /* Mono output */
-        ci->configure(DSP_SET_STEREO_MODE, STEREO_MONO);
+        /* Stereo output */
+        ci->configure(DSP_SET_STEREO_MODE, STEREO_NONINTERLEAVED);
     }
 
     return CODEC_OK;
@@ -1323,19 +1332,19 @@ enum codec_status codec_run(void)
             }
             if (nSamplesRendered + nSamplesToRender > CHUNK_SIZE)
             {
-                synth_render(samples+nSamplesRendered, CHUNK_SIZE-nSamplesRendered);
+                synth_render(samples_r+nSamplesRendered, samples_l+nSamplesRendered, CHUNK_SIZE-nSamplesRendered);
                 nSamplesToRender -= CHUNK_SIZE-nSamplesRendered;
                 nSamplesRendered = CHUNK_SIZE;
             }
             else
             {
-                synth_render(samples+nSamplesRendered, nSamplesToRender);
+                synth_render(samples_r+nSamplesRendered, samples_l+nSamplesRendered, nSamplesToRender);
                 nSamplesRendered += nSamplesToRender;
                 nSamplesToRender = 0;
             } 
         }
         
-        ci->pcmbuf_insert(samples, NULL, CHUNK_SIZE);
+        ci->pcmbuf_insert(samples_r, samples_l, CHUNK_SIZE);
     }
 
     return CODEC_OK;
