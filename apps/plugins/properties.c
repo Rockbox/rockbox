@@ -72,30 +72,22 @@ static unsigned human_size_log(unsigned long long size)
     return i;
 }
 
-static bool file_properties(char* selected_file)
+static bool file_properties(const char* selected_file)
 {
     bool found = false;
-    char tstr[MAX_PATH];
     DIR* dir;
     struct dirent* entry;
-    struct mp3entry id3;
+    static struct mp3entry id3;
 
-    char* ptr = rb->strrchr(selected_file, '/') + 1;
-    int dirlen = (ptr - selected_file);
-    rb->strlcpy(tstr, selected_file, dirlen + 1);
-
-    dir = rb->opendir(tstr);
+    dir = rb->opendir(str_dirname);
     if (dir)
     {
         while(0 != (entry = rb->readdir(dir)))
         {
             struct dirinfo info = rb->dir_get_info(dir, entry);
-            if(!rb->strcmp(entry->d_name, selected_file+dirlen))
+            if(!rb->strcmp(entry->d_name, str_filename))
             {
                 unsigned log;
-                rb->snprintf(str_dirname, sizeof str_dirname, "%s", tstr);
-                rb->snprintf(str_filename, sizeof str_filename, "%s",
-                             selected_file+dirlen);
                 log = human_size_log((unsigned long)info.size);
                 rb->snprintf(str_size, sizeof str_size, "%lu %cB",
                              ((unsigned long)info.size) >> (log*10), human_size_prefix[log]);
@@ -152,15 +144,15 @@ static bool file_properties(char* selected_file)
     return found;
 }
 
-typedef struct {
+static struct {
     char dirname[MAX_PATH];
     int len;
     unsigned int dc;
     unsigned int fc;
     unsigned long long bc;
-} DPS;
+} dps;
 
-static bool _dir_properties(DPS* dps)
+static bool _dir_properties(void)
 {
     /* recursively scan directories in search of files
        and informs the user of the progress */
@@ -171,11 +163,11 @@ static bool _dir_properties(DPS* dps)
     struct dirent* entry;
 
     result = true;
-    dirlen = rb->strlen(dps->dirname);
-    dir = rb->opendir(dps->dirname);
+    dirlen = rb->strlen(dps.dirname);
+    dir = rb->opendir(dps.dirname);
     if (!dir)
     {
-        rb->splashf(HZ*2, "%s", dps->dirname);
+        rb->splashf(HZ*2, "%s", dps.dirname);
         return false; /* open error */
     }
 
@@ -184,7 +176,7 @@ static bool _dir_properties(DPS* dps)
     {
         struct dirinfo info = rb->dir_get_info(dir, entry);
         /* append name to current directory */
-        rb->snprintf(dps->dirname+dirlen, dps->len-dirlen, "/%s",
+        rb->snprintf(dps.dirname+dirlen, dps.len-dirlen, "/%s",
                      entry->d_name);
 
         if (info.attribute & ATTR_DIRECTORY)
@@ -195,29 +187,29 @@ static bool _dir_properties(DPS* dps)
                 !rb->strcmp((char *)entry->d_name, ".."))
                 continue; /* skip these */
 
-            dps->dc++; /* new directory */
+            dps.dc++; /* new directory */
             if (*rb->current_tick - lasttick > (HZ/8))
             {
                 lasttick = *rb->current_tick;
                 rb->lcd_clear_display();
                 rb->lcd_puts(0,0,"SCANNING...");
-                rb->lcd_puts(0,1,dps->dirname);
+                rb->lcd_puts(0,1,dps.dirname);
                 rb->lcd_puts(0,2,entry->d_name);
-                rb->lcd_putsf(0,3,"Directories: %d", dps->dc);
-                rb->lcd_putsf(0,4,"Files: %d", dps->fc);
-                log = human_size_log(dps->bc);
-                rb->lcd_putsf(0,5,"Size: %lu %cB", (unsigned long)(dps->bc >> (10*log)),
+                rb->lcd_putsf(0,3,"Directories: %d", dps.dc);
+                rb->lcd_putsf(0,4,"Files: %d", dps.fc);
+                log = human_size_log(dps.bc);
+                rb->lcd_putsf(0,5,"Size: %lu %cB", (unsigned long)(dps.bc >> (10*log)),
                                                 human_size_prefix[log]);
                 rb->lcd_update();
             }
 
              /* recursion */
-            result = _dir_properties(dps);
+            result = _dir_properties();
         }
         else
         {
-            dps->fc++; /* new file */
-            dps->bc += info.size;
+            dps.fc++; /* new file */
+            dps.bc += info.size;
         }
         if(ACTION_STD_CANCEL == rb->get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
             result = false;
@@ -227,23 +219,27 @@ static bool _dir_properties(DPS* dps)
     return result;
 }
 
-static bool dir_properties(char* selected_file)
+static bool dir_properties(const char* selected_file)
 {
     unsigned log;
-    DPS dps = {
-        .len = MAX_PATH,
-        .dc  = 0,
-        .fc  = 0,
-        .bc  = 0,
-    };
+    dps.len = MAX_PATH;
+    dps.dc  = 0;
+    dps.fc  = 0;
+    dps.bc  = 0;
+
     rb->strlcpy(dps.dirname, selected_file, MAX_PATH);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
 
-    if(false == _dir_properties(&dps))
+    if (!_dir_properties())
+    {
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+        rb->cpu_boost(false);
+#endif
         return false;
+    }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
@@ -293,9 +289,8 @@ enum plugin_status plugin_start(const void* parameter)
     struct gui_synclist properties_lists;
     int button;
     bool quit = false, usb = false;
-    char file[MAX_PATH];
+    const char *file = parameter;
     if(!parameter) return PLUGIN_ERROR;
-    rb->strcpy(file, (const char *) parameter);
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
 #endif
@@ -307,13 +302,14 @@ enum plugin_status plugin_start(const void* parameter)
     char* ptr = rb->strrchr(file, '/') + 1;
     int dirlen = (ptr - file);
     rb->strlcpy(str_dirname, file, dirlen + 1);
+    rb->snprintf(str_filename, sizeof str_filename, "%s", file+dirlen);
 
     dir = rb->opendir(str_dirname);
     if (dir)
     {
         while(0 != (entry = rb->readdir(dir)))
         {
-            if(!rb->strcmp(entry->d_name, file+dirlen))
+            if(!rb->strcmp(entry->d_name, str_filename))
             {
                 struct dirinfo info = rb->dir_get_info(dir, entry);
                 its_a_dir = info.attribute & ATTR_DIRECTORY ? true : false;
@@ -347,7 +343,7 @@ enum plugin_status plugin_start(const void* parameter)
         rb->viewportmanager_theme_enable(i, true, NULL);
 #endif
 
-    rb->gui_synclist_init(&properties_lists, &get_props, file, false, 2, NULL);
+    rb->gui_synclist_init(&properties_lists, &get_props, NULL, false, 2, NULL);
     rb->gui_synclist_set_title(&properties_lists, its_a_dir ?
                                                   "Directory properties" :
                                                   "File properties", NOICON);
