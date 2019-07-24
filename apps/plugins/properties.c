@@ -37,32 +37,44 @@ char str_artist[MAX_PATH];
 char str_album[MAX_PATH];
 char str_duration[32];
 
+unsigned nseconds;
+unsigned long nsize;
+int32_t size_unit;
+struct tm tm;
+
 int num_properties;
 
-static const char* props_file[] =
+static const unsigned char* const props_file[] =
 {
-    "[Path]",       str_dirname,
-    "[Filename]",   str_filename,
-    "[Size]",       str_size,
-    "[Date]",       str_date,
-    "[Time]",       str_time,
-    "[Artist]",     str_artist,
-    "[Title]",      str_title,
-    "[Album]",      str_album,
-    "[Duration]",   str_duration,
+    ID2P(LANG_PROPERTIES_PATH),       str_dirname,
+    ID2P(LANG_PROPERTIES_FILENAME),   str_filename,
+    ID2P(LANG_PROPERTIES_SIZE),       str_size,
+    ID2P(LANG_PROPERTIES_DATE),       str_date,
+    ID2P(LANG_PROPERTIES_TIME),       str_time,
+    ID2P(LANG_PROPERTIES_ARTIST),     str_artist,
+    ID2P(LANG_PROPERTIES_TITLE),      str_title,
+    ID2P(LANG_PROPERTIES_ALBUM),      str_album,
+    ID2P(LANG_PROPERTIES_DURATION),   str_duration,
 };
-static const char* props_dir[] =
+static const unsigned char* const props_dir[] =
 {
-    "[Path]",       str_dirname,
-    "[Subdirs]",    str_dircount,
-    "[Files]",      str_filecount,
-    "[Size]",       str_size,
+    ID2P(LANG_PROPERTIES_PATH),       str_dirname,
+    ID2P(LANG_PROPERTIES_SUBDIRS),    str_dircount,
+    ID2P(LANG_PROPERTIES_FILES),      str_filecount,
+    ID2P(LANG_PROPERTIES_SIZE),       str_size,
 };
 
-static const char human_size_prefix[4] = { '\0', 'K', 'M', 'G' };
+static const int32_t units[] =
+{
+    LANG_BYTE,
+    LANG_KIBIBYTE,
+    LANG_MEBIBYTE,
+    LANG_GIBIBYTE
+};
+
 static unsigned human_size_log(unsigned long long size)
 {
-    const size_t n = sizeof(human_size_prefix)/sizeof(human_size_prefix[0]);
+    const size_t n = sizeof(units)/sizeof(units[0]);
 
     unsigned i;
     /* margin set at 10K boundary: 10239 B +1 => 10 KB */
@@ -89,9 +101,9 @@ static bool file_properties(const char* selected_file)
             {
                 unsigned log;
                 log = human_size_log((unsigned long)info.size);
-                rb->snprintf(str_size, sizeof str_size, "%lu %cB",
-                             ((unsigned long)info.size) >> (log*10), human_size_prefix[log]);
-                struct tm tm;
+                nsize = ((unsigned long)info.size) >> (log*10);
+                size_unit = units[log];
+                rb->snprintf(str_size, sizeof str_size, "%lu %s", nsize, rb->str(size_unit));
                 rb->gmtime_r(&info.mtime, &tm);
                 rb->snprintf(str_date, sizeof str_date, "%04d/%02d/%02d",
                     tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
@@ -119,6 +131,7 @@ static bool file_properties(const char* selected_file)
 
                     if (dur > 0)
                     {
+                        nseconds = dur;
                         if (dur < 3600)
                             rb->snprintf(str_duration, sizeof str_duration,
                                          "%d:%02d", (int)(dur / 60),
@@ -181,8 +194,6 @@ static bool _dir_properties(void)
 
         if (info.attribute & ATTR_DIRECTORY)
         {
-            unsigned log;
-
             if (!rb->strcmp((char *)entry->d_name, ".") ||
                 !rb->strcmp((char *)entry->d_name, ".."))
                 continue; /* skip these */
@@ -190,20 +201,19 @@ static bool _dir_properties(void)
             dps.dc++; /* new directory */
             if (*rb->current_tick - lasttick > (HZ/8))
             {
+                unsigned log = human_size_log(dps.bc);
                 lasttick = *rb->current_tick;
                 rb->lcd_clear_display();
                 rb->lcd_puts(0,0,"SCANNING...");
                 rb->lcd_puts(0,1,dps.dirname);
-                rb->lcd_puts(0,2,entry->d_name);
-                rb->lcd_putsf(0,3,"Directories: %d", dps.dc);
-                rb->lcd_putsf(0,4,"Files: %d", dps.fc);
-                log = human_size_log(dps.bc);
-                rb->lcd_putsf(0,5,"Size: %lu %cB", (unsigned long)(dps.bc >> (10*log)),
-                                                human_size_prefix[log]);
+                rb->lcd_putsf(0,2,"Directories: %d", dps.dc);
+                rb->lcd_putsf(0,3,"Files: %d", dps.fc);
+                rb->lcd_putsf(0,4,"Size: %lu %s", (unsigned long)(dps.bc >> (10*log)),
+                              rb->str(units[log]));
                 rb->lcd_update();
             }
 
-             /* recursion */
+            /* recursion */
             result = _dir_properties();
         }
         else
@@ -249,10 +259,17 @@ static bool dir_properties(const char* selected_file)
     rb->snprintf(str_dircount, sizeof str_dircount, "%d", dps.dc);
     rb->snprintf(str_filecount, sizeof str_filecount, "%d", dps.fc);
     log = human_size_log(dps.bc);
-    rb->snprintf(str_size, sizeof str_size, "%ld %cB",
-                 (long) (dps.bc >> (log*10)), human_size_prefix[log]);
+    nsize = (long) (dps.bc >> (log*10));
+    size_unit = units[log];
+    rb->snprintf(str_size, sizeof str_size, "%ld %s", nsize, rb->str(size_unit));
     num_properties = 4;
     return true;
+}
+
+static const unsigned char* p2str(const unsigned char* p)
+{
+    int id = P2ID(p);
+    return (id != -1) ? rb->str(id) : p;
 }
 
 static const char * get_props(int selected_item, void* data,
@@ -267,7 +284,7 @@ static const char * get_props(int selected_item, void* data,
         }
         else
         {
-            rb->strlcpy(buffer, props_dir[selected_item], buffer_len);
+            rb->strlcpy(buffer, p2str(props_dir[selected_item]), buffer_len);
         }
     }
     else
@@ -278,10 +295,67 @@ static const char * get_props(int selected_item, void* data,
         }
         else
         {
-            rb->strlcpy(buffer, props_file[selected_item], buffer_len);
+            rb->strlcpy(buffer, p2str(props_file[selected_item]), buffer_len);
         }
     }
     return buffer;
+}
+
+static int speak_property_selection(int selected_item, void *data)
+{
+    (void)data;
+    int32_t id = P2ID((its_a_dir ? props_dir : props_file)[selected_item]);
+    rb->talk_id(id, false);
+    switch (id)
+    {
+    case LANG_PROPERTIES_PATH:
+        if (str_dirname[0] == '/')
+        {
+            char *start = str_dirname;
+            char *ptr;
+            while (0 != (ptr = rb->strchr(start, '/')))
+            {
+                *ptr = '\0';
+                rb->talk_dir_or_spell(str_dirname, NULL, true);
+                *ptr = '/';
+                rb->talk_id(VOICE_CHAR_SLASH, true);
+                start = ptr + 1;
+            }
+            if (*start)
+                rb->talk_dir_or_spell(str_dirname, NULL, true);
+        }
+        else
+        {
+            rb->talk_spell(str_dirname, true);
+        }
+        break;
+    case LANG_PROPERTIES_FILENAME:
+        rb->talk_file_or_spell(str_dirname, str_filename, NULL, true);
+        break;
+    case LANG_PROPERTIES_SIZE:
+        rb->talk_number(nsize, true);
+        rb->talk_id(size_unit, true);
+        break;
+    case LANG_PROPERTIES_DATE:
+        rb->talk_date(&tm, true);
+        break;
+    case LANG_PROPERTIES_TIME:
+        rb->talk_time(&tm, true);
+        break;
+    case LANG_PROPERTIES_DURATION:
+        rb->talk_value(nseconds, UNIT_TIME, true);
+        break;
+    case LANG_PROPERTIES_SUBDIRS:
+        rb->talk_number(dps.dc, true);
+        break;
+    case LANG_PROPERTIES_FILES:
+        rb->talk_number(dps.fc, true);
+        break;
+    default:
+        rb->talk_spell(props_file[selected_item + 1], true);
+        break;
+    }
+    return 0;
 }
 
 enum plugin_status plugin_start(const void* parameter)
@@ -333,7 +407,7 @@ enum plugin_status plugin_start(const void* parameter)
     if(!(its_a_dir ? dir_properties(file) : file_properties(file)))
     {
         /* something went wrong (to do: tell user what it was (nesting,...) */
-        rb->splash(0, "Failed to gather information");
+        rb->splash(0, ID2P(LANG_PROPERTIES_FAIL));
         rb->action_userabort(TIMEOUT_BLOCK);
         return PLUGIN_OK;
     }
@@ -344,14 +418,15 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     rb->gui_synclist_init(&properties_lists, &get_props, NULL, false, 2, NULL);
-    rb->gui_synclist_set_title(&properties_lists, its_a_dir ?
-                                                  "Directory properties" :
-                                                  "File properties", NOICON);
+    rb->gui_synclist_set_title(&properties_lists, rb->str(its_a_dir ? LANG_PROPERTIES_DIRECTORY_PROPERTIES : LANG_PROPERTIES_FILE_PROPERTIES), NOICON);
     rb->gui_synclist_set_icon_callback(&properties_lists, NULL);
+    if (rb->global_settings->talk_menu)
+        rb->gui_synclist_set_voice_callback(&properties_lists, speak_property_selection);
     rb->gui_synclist_set_nb_items(&properties_lists, num_properties * 2);
     rb->gui_synclist_limit_scroll(&properties_lists, true);
     rb->gui_synclist_select_item(&properties_lists, 0);
     rb->gui_synclist_draw(&properties_lists);
+    rb->gui_synclist_speak_item(&properties_lists);
 
     while(!quit)
     {
