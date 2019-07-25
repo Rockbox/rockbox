@@ -99,6 +99,7 @@ my @forbidden_functions = ('^open$',
                            '^pcm_play_(stop|pause|lock|unlock)$',
                            '^pcm_(apply_settings|get_bytes_waiting)$',
                            '^pcm_(set_frequency|calculate_peaks)$',
+                           '^sound_(set|current|default|min|max|unit|pitch|val2phys)$',
                            '^mixer_(set|get)_frequency$',
                            '^(trigger|cancel)_cpu_boost$',
                            '^round_value_to_list32$');

@@ -17,7 +17,9 @@ OTHER_SRC += $(LUA_SRC)
 
 LUA_INCLUDEDIR := $(LUA_SRCDIR)/include_lua
 LUA_INCLUDELIST := $(addprefix $(LUA_BUILDDIR)/,audio.lua blit.lua color.lua draw.lua \
-	image.lua lcd.lua math_ex.lua print.lua timer.lua playlist.lua pcm.lua rbcompat.lua)
+						image.lua lcd.lua math_ex.lua print.lua \
+						timer.lua playlist.lua pcm.lua sound.lua \
+						rbcompat.lua )
 
 
 ifndef APP_TYPE
@@ -35,15 +37,12 @@ else
     ROCKS += $(LUA_BUILDDIR)/lua.rock
 endif
 
-$(LUA_BUILDDIR)/lua.rock: $(LUA_OBJ) $(TLSFLIB) $(LUA_BUILDDIR)/actions.lua $(LUA_BUILDDIR)/buttons.lua $(LUA_BUILDDIR)/settings.lua $(LUA_BUILDDIR)/rocklib_aux.o $(LUA_BUILDDIR)/rb_defines.lua $(LUA_INCLUDELIST)
+$(LUA_BUILDDIR)/lua.rock: $(LUA_OBJ) $(TLSFLIB) $(LUA_BUILDDIR)/actions.lua $(LUA_BUILDDIR)/buttons.lua $(LUA_BUILDDIR)/settings.lua \
+                                                $(LUA_BUILDDIR)/rocklib_aux.o $(LUA_BUILDDIR)/rb_defines.lua $(LUA_BUILDDIR)/sound_defines.lua \
+                                                $(LUA_INCLUDELIST)
 
 $(LUA_BUILDDIR)/actions.lua: $(LUA_OBJ) $(LUA_SRCDIR)/action_helper.pl
 	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E -P $(APPSDIR)/plugins/lib/pluginlib_actions.h | $(LUA_SRCDIR)/action_helper.pl > $(LUA_BUILDDIR)/actions.lua
-
-$(LUA_BUILDDIR)/rb_defines.lua: $(LUA_OBJ) $(LUA_SRCDIR)/rbdefines_helper.pl
-	$(SILENT)$(CC) $(INCLUDES) -dD -E -P $(TARGET) $(CFLAGS) -include plugin.h - < /dev/null | $(LUA_SRCDIR)/rbdefines_helper.pl | \
-	$(HOSTCC) -fno-builtin $(HOST_INCLUDES) -x c -o $(LUA_BUILDDIR)/rbdefines_helper -
-	$(call PRINTS,GEN $(@F))$(LUA_BUILDDIR)/rbdefines_helper > $(LUA_BUILDDIR)/rb_defines.lua
 
 $(LUA_BUILDDIR)/settings.lua: $(LUA_OBJ) $(LUA_SRCDIR)/settings_helper.pl
 	$(SILENT)$(CC) $(INCLUDES) -E -P $(TARGET) $(CFLAGS) -include plugin.h -include cuesheet.h - < /dev/null | $(LUA_SRCDIR)/settings_helper.pl | \
@@ -54,6 +53,16 @@ HOST_INCLUDES := $(filter-out %/libc/include,$(INCLUDES))
 $(LUA_BUILDDIR)/buttons.lua: $(LUA_OBJ) $(LUA_SRCDIR)/button_helper.pl
 	$(SILENT)$(CC) $(INCLUDES) -dM -E -P -include button-target.h - < /dev/null | $(LUA_SRCDIR)/button_helper.pl | $(HOSTCC) -fno-builtin $(HOST_INCLUDES) -x c -o $(LUA_BUILDDIR)/button_helper -
 	$(call PRINTS,GEN $(@F))$(LUA_BUILDDIR)/button_helper > $(LUA_BUILDDIR)/buttons.lua
+
+$(LUA_BUILDDIR)/rb_defines.lua: $(LUA_OBJ) $(LUA_SRCDIR)/rbdefines_helper.pl
+	$(SILENT)$(CC) $(INCLUDES) -dD -E -P $(TARGET) $(CFLAGS) -include plugin.h - < /dev/null | $(LUA_SRCDIR)/rbdefines_helper.pl "rb_defines" | \
+	$(HOSTCC) -fno-builtin $(HOST_INCLUDES) -x c -o $(LUA_BUILDDIR)/rbdefines_helper -
+	$(call PRINTS,GEN $(@F))$(LUA_BUILDDIR)/rbdefines_helper > $(LUA_BUILDDIR)/rb_defines.lua
+
+$(LUA_BUILDDIR)/sound_defines.lua: $(LUA_OBJ) $(LUA_SRCDIR)/rbdefines_helper.pl
+	$(SILENT)$(CC) $(INCLUDES) -dD -E -P $(TARGET) $(CFLAGS) -include config.h -include audiohw_settings.h - < /dev/null | $(LUA_SRCDIR)/rbdefines_helper.pl "sound_defines" | \
+	$(HOSTCC) -fno-builtin $(HOST_INCLUDES) -x c -o $(LUA_BUILDDIR)/sounddefines_helper -
+	$(call PRINTS,GEN $(@F))$(LUA_BUILDDIR)/sounddefines_helper > $(LUA_BUILDDIR)/sound_defines.lua
 
 $(LUA_BUILDDIR)/rocklib_aux.c: $(APPSDIR)/plugin.h $(LUA_OBJ) $(LUA_SRCDIR)/rocklib_aux.pl
 	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E -P -include plugin.h - < /dev/null | $(LUA_SRCDIR)/rocklib_aux.pl $(LUA_SRCDIR) > $(LUA_BUILDDIR)/rocklib_aux.c

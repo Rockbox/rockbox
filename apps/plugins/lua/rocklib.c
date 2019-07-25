@@ -378,6 +378,65 @@ RB_WRAP(audio)
     return 1;
 }
 
+RB_WRAP(sound)
+{
+    enum e_snd {SOUND_SET = 0, SOUND_CURRENT, SOUND_DEFAULT,
+                SOUND_MIN, SOUND_MAX, SOUND_UNIT, SOUND_SET_PITCH,
+                SOUND_VAL2PHYS, SOUND_ECOUNT};
+
+    const char *snd_option[] = {"set", "current", "default",
+                                "min", "max", "unit", "pitch",
+                                "val2phys", NULL};
+
+    lua_pushnil(L); /*push nil so options w/o return have something to return */
+
+    int option = luaL_checkoption (L, 1, NULL, snd_option);
+    int setting = luaL_checkint(L, 2);
+    int value, result;
+    switch(option)
+    {
+        case SOUND_SET:
+            value = luaL_checkint(L, 3);
+            rb->sound_set(setting, value);
+            return 1; /*nil*/
+            break;
+        case SOUND_CURRENT:
+            result = rb->sound_current(setting);
+            break;
+        case SOUND_DEFAULT:
+            result = rb->sound_default(setting);
+            break;
+        case SOUND_MIN:
+            result = rb->sound_min(setting);
+            break;
+        case SOUND_MAX:
+            result = rb->sound_max(setting);
+            break;
+        case SOUND_UNIT:
+            lua_pushstring (L, rb->sound_unit(setting));
+            return 1;
+            break;
+#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
+    (CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHCONTROL)
+        case SOUND_SET_PITCH:
+            rb->sound_set_pitch(setting);
+            return 1;/*nil*/
+            break;
+#endif
+        case SOUND_VAL2PHYS:
+            value = luaL_checkint(L, 3);
+            result = rb->sound_val2phys(setting, value);      
+            break;
+
+        default:
+            return 1;
+            break;
+    }
+
+    lua_pushinteger(L, result);
+    return 1;
+}
+
 #if CONFIG_CODEC == SWCODEC
 RB_WRAP(pcm)
 {
@@ -723,9 +782,10 @@ static const luaL_Reg rocklib[] =
     RB_FUNC(gui_syncyesno_run),
     RB_FUNC(do_menu),
 
-    /* DEVICE AUDIO / PLAYLIST CONTROL */
+    /* DEVICE AUDIO / SOUND / PLAYLIST CONTROL */
     RB_FUNC(audio),
     RB_FUNC(playlist),
+    RB_FUNC(sound),
 #if CONFIG_CODEC == SWCODEC
     RB_FUNC(pcm),
     RB_FUNC(mixer_frequency),
