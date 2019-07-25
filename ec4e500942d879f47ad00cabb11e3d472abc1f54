@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "69aa8954_a52ffe88",
+        "filename": "apps/plugin.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 885,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-07-25T15:56:23Z",
+      "side": 1,
+      "message": "I think we can do this unconditionally.",
+      "revId": "ec4e500942d879f47ad00cabb11e3d472abc1f54",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e9be798f_6901e506",
         "filename": "lib/tlsf/src/tlsf.c",
         "patchSetId": 1
@@ -13,6 +30,24 @@
       "writtenOn": "2019-07-20T07:44:38Z",
       "side": 1,
       "message": "This may have to be revisited but we will just push it and see where the cards fall",
+      "revId": "ec4e500942d879f47ad00cabb11e3d472abc1f54",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69aa8954_454e4a72",
+        "filename": "lib/tlsf/src/tlsf.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-07-25T15:56:23Z",
+      "side": 1,
+      "message": "The comment is strange. I am pretty sure memset behaves correctly on unaligned buffers and odd sizes.",
+      "parentUuid": "e9be798f_6901e506",
       "revId": "ec4e500942d879f47ad00cabb11e3d472abc1f54",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
