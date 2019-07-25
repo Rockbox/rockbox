@@ -1165,7 +1165,11 @@ void Mod_LoadBrushModel (model_t *mod, void *buffer)
 	mod_base = (byte *)header;
 
 	for (i=0 ; i<sizeof(dheader_t)/4 ; i++)
-		((int *)header)[i] = LittleLongUnaligned ( ((int *)header)[i]);
+        {
+            int before = ((int*)header)[i];
+		((int *)header)[i] = LittleLongUnaligned ( ((int *)header) [i]);
+                assert(((int*)header)[i] == before); // sanity check of our *Unaligned routines
+        }
 
 // load into heap
 	

@@ -96,21 +96,21 @@ extern  int     (*LittleLong) (int l);
 extern  float   (*BigFloat) (float l);
 extern  float   (*LittleFloat) (float l);
 
-#define LittleShortUnaligned(x) ReadLittleShort(((char*)(&(x))))
-#define BigShortUnaligned(x) ReadBigShort(((char*)&(x)))
-#define LittleLongUnaligned(x) ReadLittleLong(((char*)&(x)))
-#define BigLongUnaligned(x) ReadBigLong(((char*)&(x)))
-#define LittleFloatUnaligned(x) ReadLittleFloat(((char*)&(x)))
-#define BigFloatUnaligned(x) ReadBigFloat(((char*)&(x))
+#define LittleShortUnaligned(x) ReadLittleShort(((unsigned char*)(&(x))))
+#define BigShortUnaligned(x) ReadBigShort(((unsigned char*)&(x)))
+#define LittleLongUnaligned(x) ReadLittleLong(((unsigned char*)&(x)))
+#define BigLongUnaligned(x) ReadBigLong(((unsigned char*)&(x)))
+#define LittleFloatUnaligned(x) ReadLittleFloat(((unsigned char*)&(x)))
+#define BigFloatUnaligned(x) ReadBigFloat(((unsigned char*)&(x))
 
 
 // for unaligned
-short	ReadBigShort (char *l);
-short	ReadLittleShort (char *l);
-int	ReadBigLong (char *l);
-int	ReadLittleLong (char *l);
-float	ReadBigFloat (char *l);
-float	ReadLittleFloat (char *l);
+short	ReadBigShort (unsigned char *l);
+short	ReadLittleShort (unsigned char *l);
+int	ReadBigLong (unsigned char *l);
+int	ReadLittleLong (unsigned char *l);
+float	ReadBigFloat (unsigned char *l);
+float	ReadLittleFloat (unsigned char *l);
 
 //============================================================================
 

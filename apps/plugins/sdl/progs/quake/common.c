@@ -499,28 +499,28 @@ float FloatNoSwap (float f)
 }
 
 // safe for unaligned accesses
-short   ReadLittleShort (char *l)
+short   ReadLittleShort (unsigned char *l)
 {
     return *(l + 0) | (*(l + 1) << 8);
 }
 
-short   ReadBigShort (char *l)
+short   ReadBigShort (unsigned char *l)
 {
     return *(l + 1) | (*(l + 0) << 8);
 }
 
-int    ReadLittleLong (char *l)
+int    ReadLittleLong (unsigned char *l)
 {
     return *(l + 0) | (*(l + 1) << 8) | (*(l + 2) << 16) | (*(l + 3) << 24);
 }
 
-int ReadBigLong (char *l)
+int ReadBigLong (unsigned char *l)
 {
     return *(l + 3) | (*(l + 2) << 8) | (*(l + 1) << 16) | (*(l + 0) << 24);
 }
 
 // same
-float ReadLittleFloat (char *f)
+float ReadLittleFloat (unsigned char *f)
 {
 	union
 	{
@@ -536,7 +536,7 @@ float ReadLittleFloat (char *f)
 	return dat2.f;
 }
 
-float ReadBigFloat (char *f)
+float ReadBigFloat (unsigned char *f)
 {
 	union
 	{
