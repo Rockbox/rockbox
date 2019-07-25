@@ -25,7 +25,10 @@
 #include "config.h"
 #include "system.h"
 #include "sound.h"
+
+#ifndef BOOTLOADER
 #include "settings.h" /* sound_current */
+#endif
 
 #ifdef HAVE_SW_VOLUME_CONTROL
 #include "pcm_sw_volume.h"
@@ -112,6 +115,7 @@ int sound_current(int setting)
 {
     switch(setting)
     {
+#ifndef BOOTLOADER 
 #ifndef PLATFORM_HAS_VOLUME_CHANGE
         SOUND_CUR_SET(VOLUME,             global_settings.volume)
 #endif
@@ -144,8 +148,10 @@ int sound_current(int setting)
         SOUND_CUR_SET(DEPTH_3D,           global_settings.depth_3d)
 #endif
 #if defined(AUDIOHW_HAVE_FILTER_ROLL_OFF)
-        SOUND_CUR_SET(FILTER_ROLL_OFF,    global_settings.filter_roll_off)
+        SOUND_CUR_SET(FILTER_ROLL_OFF,    global_settings.roll_off)
 #endif
+
+#if 0 /*WRONG -- these need to index the hw_eq_bands[AUDIOHW_EQ_BAND_NUM] struct*/
 /* Hardware EQ tone controls */
 #if defined(AUDIOHW_HAVE_EQ)
         SOUND_CUR_SET(EQ_BAND1_GAIN,      global_settings.hw_eq_band1_gain)
@@ -184,8 +190,12 @@ int sound_current(int setting)
 #if defined(AUDIOHW_HAVE_EQ_BAND5_FREQUENCY)
         SOUND_CUR_SET(EQ_BAND5_FREQUENCY, global_settings.hw_eq_band5_frequency)
 #endif
+
 #endif /* AUDIOHW_HAVE_EQ_BAND5 */
 #endif /* AUDIOHW_HAVE_EQ */
+#endif /*IF 0*/
+
+#endif /*ndef BOOTLOADER*/
         default:
             return INT_MIN;
     } /* switch(setting)  */
