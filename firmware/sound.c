@@ -196,8 +196,15 @@ int sound_current(int setting)
 #endif /*IF 0*/
 
 #endif /*ndef BOOTLOADER*/
+#ifdef INT_MIN
         default:
             return INT_MIN;
+#else
+        default:
+            return -32768;
+#endif
+
+
     } /* switch(setting)  */
 }/* sound_current */
 
