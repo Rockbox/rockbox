@@ -16,6 +16,24 @@
       "revId": "1fe7be1d16c2303e842c1c72a77b782a2b8ac20c",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69aa8954_255d4e1f",
+        "filename": "apps/plugins/properties.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-07-25T16:19:55Z",
+      "side": 0,
+      "message": "Yeah, I wasn\u0027t happy with this approach either, which is why I didn\u0027t just immediately commit it.\n\nI\u0027ll respin the patch soonish.",
+      "parentUuid": "69aa8954_652a6681",
+      "revId": "1fe7be1d16c2303e842c1c72a77b782a2b8ac20c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
