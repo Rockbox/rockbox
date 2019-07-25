@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "69aa8954_45772aa0",
+        "filename": "lib/rbcodec/codecs/sid.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-07-25T16:25:54Z",
+      "side": 1,
+      "message": "Need to add a changelog entry here.",
+      "revId": "1fe7be1d16c2303e842c1c72a77b782a2b8ac20c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "69aa8954_25246eb1",
         "filename": "lib/rbcodec/codecs/sid.c",
         "patchSetId": 1
@@ -13,6 +30,24 @@
       "writtenOn": "2019-07-25T15:50:23Z",
       "side": 1,
       "message": "whats the difference between USE_FILTER an !USE_FILTER here?",
+      "revId": "1fe7be1d16c2303e842c1c72a77b782a2b8ac20c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69aa8954_a5485e5d",
+        "filename": "lib/rbcodec/codecs/sid.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 419,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-07-25T16:25:54Z",
+      "side": 1,
+      "message": "I\u0027m not sure I follow as the code paths are not identical.  when USE_FILTER is defined, an additional state variable is needed, when it\u0027s not defined, the variable is not created.\n\nNow if you\u0027re asking if it\u0027s worth just eliminating the !USE_FILTER case (since we #define USE_FILTER unconditionally)..",
+      "parentUuid": "69aa8954_25246eb1",
       "revId": "1fe7be1d16c2303e842c1c72a77b782a2b8ac20c",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -36,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "69aa8954_854be259",
+        "filename": "lib/rbcodec/codecs/sid.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 534,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-07-25T16:25:54Z",
+      "side": 1,
+      "message": "Will clean up.",
+      "parentUuid": "69aa8954_c538fad3",
+      "revId": "1fe7be1d16c2303e842c1c72a77b782a2b8ac20c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "69aa8954_e535f6da",
         "filename": "lib/rbcodec/codecs/sid.c",
         "patchSetId": 1
@@ -47,6 +100,24 @@
       "writtenOn": "2019-07-25T15:50:23Z",
       "side": 1,
       "message": "#else",
+      "revId": "1fe7be1d16c2303e842c1c72a77b782a2b8ac20c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69aa8954_e53e56b5",
+        "filename": "lib/rbcodec/codecs/sid.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 573,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-07-25T16:25:54Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "69aa8954_e535f6da",
       "revId": "1fe7be1d16c2303e842c1c72a77b782a2b8ac20c",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
