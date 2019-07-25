@@ -11,13 +11,18 @@ extern int desired_speed;
 extern int desired_bits;
 
 // SDL hereby demands `len' samples in stream, *NOW*!
+static bool is_mixing = false;
 static void paint_audio(void *unused, Uint8 *stream, int len)
 {
 	if ( shm ) {
+            if(is_mixing)
+                rb->splash(HZ, "already mixing");
+            is_mixing = true;
 		shm->buffer = stream;
 		shm->samplepos += len/(shm->samplebits/8)/2;
 		// Check for samplepos overflow?
 		S_PaintChannels (shm->samplepos);
+                is_mixing = false;
 	}
 }
 

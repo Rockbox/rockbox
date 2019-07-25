@@ -335,9 +335,9 @@ int fscanf_wrapper(FILE *f, const char *fmt, ...)
 
 /* stolen from doom */
 // Here is a hacked up printf command to get the output from the game.
+int p_xtpt = 0;
 int printf_wrapper(const char *fmt, ...)
 {
-    static int p_xtpt;
     char p_buf[256];
     rb->yield();
     va_list ap;

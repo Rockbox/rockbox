@@ -280,9 +280,19 @@ model_t *Mod_LoadModel (model_t *mod, qboolean crash)
 //
 // load the file
 //
+
+        extern int p_xtpt;
+        p_xtpt = 0;
+        printf("=======");
+        printf("before junk:");
+        dumpmem(buf, 4);
         
         //printf("loadmodel 2");
 	buf = (unsigned *)COM_LoadStackFile (mod->name, stackbuf, sizeof(stackbuf));
+
+        printf("after:");
+        dumpmem(buf, 4);
+        
 	if (!buf)
 	{
 		if (crash)
@@ -1142,6 +1152,15 @@ float RadiusFromBounds (vec3_t mins, vec3_t maxs)
 	return Length (corner);
 }
 
+void dumpmem(void *buffer, int n)
+{
+    for(int i = 0; i < n; i+=4)
+    {
+        unsigned char *ptr = (unsigned char*)buffer + i;
+        printf("%02x %02x %02x %02x\n", ptr[0], ptr[1], ptr[2], ptr[3]);
+    }
+}
+
 /*
 =================
 Mod_LoadBrushModel
@@ -1157,9 +1176,22 @@ void Mod_LoadBrushModel (model_t *mod, void *buffer)
 	
 	header = (dheader_t *)buffer;
 
+        int version_before = header->version;
+        
 	i = LittleLongUnaligned (header->version);
+
+        if(i != version_before)
+        {
+            rb->splashf(HZ * 2, "un corrupts %08x -> %08x", version_before, i);
+        }
+        
+
+        rb->sleep(HZ);
 	if (i != BSPVERSION)
+        {
             rb->splashf (HZ, "Mod_LoadBrushModel: %s has wrong version number (%i should be %i)", mod->name, i, BSPVERSION);
+
+        }
 
 // swap all the lumps
 	mod_base = (byte *)header;

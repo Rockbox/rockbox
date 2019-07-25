@@ -933,6 +933,8 @@ void COM_FileBase (char *in, char *out)
             /* BUG */
 		s--;
                 //printf("writing %d bytes to outbuf", s-s2);
+                if(s - s2 > 16)
+                    rb->splashf(HZ, "suspicious filebase");
 		Q_strncpy (out,s2+1, s-s2);
 		out[s-s2] = 0;
 	}
@@ -1603,6 +1605,7 @@ Filename are reletive to the quake directory.
 Allways appends a 0 byte.
 ============
 */
+void dumpmem(void *buffer, int n);
 cache_user_t *loadcache;
 byte    *loadbuf;
 int             loadsize;
@@ -1622,11 +1625,23 @@ byte *COM_LoadFile (char *path, int usehunk)
 		return NULL;
 
         check_ptr = &h;
+
+        if(loadbuf)
+        {
+            printf("pt1");
+            dumpmem(loadbuf, 4);
+        }
         
         //printf("handle %d", h);
 // extract the filename base name for hunk tag
         /* BUG IS HERE */
 	COM_FileBase (path, base);
+        if(loadbuf)
+        {
+            printf("pt2");
+            dumpmem(loadbuf, 4);
+        }
+        
 
         //printf("handle %d base \"%s\"", h, base);
         //printf("");
