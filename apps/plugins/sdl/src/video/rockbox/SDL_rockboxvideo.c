@@ -687,21 +687,21 @@ static void blit_rotated(fb_data *src, int x, int y, int w, int h)
             rb->lcd_framebuffer[x_0 * LCD_WIDTH + y_0] = src[(LCD_WIDTH - y_0) * LCD_HEIGHT + x_0];
 }
 
-//static fb_data tmp_fb[LCD_WIDTH * LCD_HEIGHT];
-
 static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
 {
+    /* Direct mode writes directly to lcd_framebuffer. Update and
+     * exit! */
+    if(this->hidden->direct)
+    {
+        rb->lcd_update();
+        return;
+    }
+
     if(this->screen->pixels)
     {
         for(int i = 0; i < numrects; ++i)
         {
-            /* no scaling */
-            if(this->hidden->direct)
-            {
-                /* no-op */
-            }
-            /* screen is rotated */
-            else if(this->hidden->rotate)
+            if(this->hidden->rotate)
             {
                 LOGF("rotated copy");
                 blit_rotated(this->screen->pixels, rects[i].x, rects[i].y, rects[i].w, rects[i].h);
@@ -769,9 +769,13 @@ static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
             /* FIXME: this won't work for rotated screen or overlapping rects */
             flip_pixels(rects[i].x, rects[i].y, rects[i].w, rects[i].h);
 #endif
-            rb->lcd_update_rect(rects[i].x, rects[i].y, rects[i].w, rects[i].h);
+            /* We are lazy and do not want to figure out the new
+             * rectangle coordinates. See lcd_update() below. */
+            //rb->lcd_update_rect(rects[i].x, rects[i].y, rects[i].w, rects[i].h);
         } /* for */
     } /* if */
+
+    rb->lcd_update();
 }
 
 int ROCKBOX_SetColors(_THIS, int firstcolor, int ncolors, SDL_Color *colors)
