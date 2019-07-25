@@ -25,6 +25,8 @@
 #include "config.h"
 #include "system.h"
 #include "sound.h"
+#include "settings.h" /* sound_current */
+
 #ifdef HAVE_SW_VOLUME_CONTROL
 #include "pcm_sw_volume.h"
 #endif /* HAVE_SW_VOLUME_CONTROL */
@@ -36,6 +38,10 @@
 /* Implements sound_val2phys */
 #define AUDIOHW_SOUND_SETTINGS_VAL2PHYS
 #include "audiohw_settings.h"
+
+/* Returns current sound settings from global_settings */
+#define SOUND_CUR_SET(name, var) \
+        case SOUND_##name: return var;
 
 extern bool audio_is_initialized;
 
@@ -101,6 +107,89 @@ void sound_set(int setting, int value)
     if (sound_set_val)
         sound_set_val(value);
 }
+
+int sound_current(int setting)
+{
+    switch(setting)
+    {
+#ifndef PLATFORM_HAS_VOLUME_CHANGE
+        SOUND_CUR_SET(VOLUME,             global_settings.volume)
+#endif
+#if defined(AUDIOHW_HAVE_BASS)
+        SOUND_CUR_SET(BASS,               global_settings.bass)
+#endif
+#if defined(AUDIOHW_HAVE_TREBLE)
+        SOUND_CUR_SET(TREBLE,             global_settings.treble)
+#endif
+        SOUND_CUR_SET(BALANCE,            global_settings.balance)
+        SOUND_CUR_SET(CHANNELS,           global_settings.channel_config)
+        SOUND_CUR_SET(STEREO_WIDTH,       global_settings.stereo_width)
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+        SOUND_CUR_SET(LOUDNESS,           global_settings.loudness)
+        SOUND_CUR_SET(AVC,                global_settings.avc)
+        SOUND_CUR_SET(MDB_STRENGTH,       global_settings.mdb_strength)
+        SOUND_CUR_SET(MDB_HARMONICS,      global_settings.mdb_harmonics)
+        SOUND_CUR_SET(MDB_CENTER,         global_settings.mdb_center)
+        SOUND_CUR_SET(MDB_SHAPE,          global_settings.mdb_shape)
+        SOUND_CUR_SET(MDB_ENABLE,         global_settings.mdb_enable)
+        SOUND_CUR_SET(SUPERBASS,          global_settings.superbass)
+#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
+#if defined(AUDIOHW_HAVE_BASS_CUTOFF)
+        SOUND_CUR_SET(BASS_CUTOFF,        global_settings.bass_cutoff)
+#endif
+#if defined(AUDIOHW_HAVE_TREBLE_CUTOFF)
+        SOUND_CUR_SET(TREBLE_CUTOFF,      global_settings.treble_cutoff)
+#endif
+#if defined(AUDIOHW_HAVE_DEPTH_3D)
+        SOUND_CUR_SET(DEPTH_3D,           global_settings.depth_3d)
+#endif
+#if defined(AUDIOHW_HAVE_FILTER_ROLL_OFF)
+        SOUND_CUR_SET(FILTER_ROLL_OFF,    global_settings.filter_roll_off)
+#endif
+/* Hardware EQ tone controls */
+#if defined(AUDIOHW_HAVE_EQ)
+        SOUND_CUR_SET(EQ_BAND1_GAIN,      global_settings.hw_eq_band1_gain)
+#if defined(AUDIOHW_HAVE_EQ_BAND1_FREQUENCY)
+        SOUND_CUR_SET(EQ_BAND1_FREQUENCY, global_settings.hw_eq_band1_frequency)
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND2)
+        SOUND_CUR_SET(EQ_BAND2_GAIN,      global_settings.hw_eq_band2_gain)
+#if defined(AUDIOHW_HAVE_EQ_BAND2_FREQUENCY)
+        SOUND_CUR_SET(EQ_BAND2_FREQUENCY, global_settings.hw_eq_band2_frequency)
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND2_WIDTH)
+        SOUND_CUR_SET(EQ_BAND2_WIDTH,     global_settings.hw_eq_band2_width)
+#endif
+#endif /* AUDIOHW_HAVE_EQ_BAND2 */
+#if defined(AUDIOHW_HAVE_EQ_BAND3)
+        SOUND_CUR_SET(EQ_BAND3_GAIN,      global_settings.hw_eq_band3_gain)
+#if defined(AUDIOHW_HAVE_EQ_BAND3_FREQUENCY)
+        SOUND_CUR_SET(EQ_BAND3_FREQUENCY, global_settings.hw_eq_band3_frequency)
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND3_WIDTH)
+        SOUND_CUR_SET(EQ_BAND3_WIDTH,     global_settings.hw_eq_band3_width)
+#endif
+#endif /* AUDIOHW_HAVE_EQ_BAND3 */
+#if defined(AUDIOHW_HAVE_EQ_BAND4)
+        SOUND_CUR_SET(EQ_BAND4_GAIN,      global_settings.hw_eq_band4_gain)
+#if defined(AUDIOHW_HAVE_EQ_BAND4_FREQUENCY)
+        SOUND_CUR_SET(EQ_BAND4_FREQUENCY, global_settings.hw_eq_band4_frequency)
+#endif
+#if defined(AUDIOHW_HAVE_EQ_BAND4_WIDTH)
+        SOUND_CUR_SET(EQ_BAND4_WIDTH,     global_settings.hw_eq_band4_width)
+#endif
+#endif /* AUDIOHW_HAVE_EQ_BAND4 */
+#if defined(AUDIOHW_HAVE_EQ_BAND5)
+        SOUND_CUR_SET(EQ_BAND5_GAIN,      global_settings.hw_eq_band5_gain)
+#if defined(AUDIOHW_HAVE_EQ_BAND5_FREQUENCY)
+        SOUND_CUR_SET(EQ_BAND5_FREQUENCY, global_settings.hw_eq_band5_frequency)
+#endif
+#endif /* AUDIOHW_HAVE_EQ_BAND5 */
+#endif /* AUDIOHW_HAVE_EQ */
+        default:
+            return INT_MIN;
+    } /* switch(setting)  */
+}/* sound_current */
 
 #if !defined(AUDIOHW_HAVE_CLIPPING)
 /*

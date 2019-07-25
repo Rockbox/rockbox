@@ -84,7 +84,6 @@ char *plugin_get_current_filename(void);
 static void* plugin_get_audio_buffer(size_t *buffer_size);
 static void plugin_release_audio_buffer(void);
 static void plugin_tsr(bool (*exit_callback)(bool));
-int sound_current(int setting); /*stub*/
 
 #ifdef HAVE_PLUGIN_CHECK_OPEN_CLOSE
 /* File handle leak prophylaxis */
@@ -1079,10 +1078,4 @@ static void plugin_tsr(bool (*exit_callback)(bool))
 char *plugin_get_current_filename(void)
 {
     return current_plugin;
-}
-
-int sound_current(int setting) /*stub*/
-{
-    (void) setting;
-    return 0;
 }
