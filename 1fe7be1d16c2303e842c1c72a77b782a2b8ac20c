@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "69aa8954_25246eb1",
+        "filename": "lib/rbcodec/codecs/sid.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 419,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-07-25T15:50:23Z",
+      "side": 1,
+      "message": "whats the difference between USE_FILTER an !USE_FILTER here?",
+      "revId": "1fe7be1d16c2303e842c1c72a77b782a2b8ac20c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69aa8954_c538fad3",
+        "filename": "lib/rbcodec/codecs/sid.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 534,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-07-25T15:50:23Z",
+      "side": 1,
+      "message": "#else",
+      "revId": "1fe7be1d16c2303e842c1c72a77b782a2b8ac20c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69aa8954_e535f6da",
+        "filename": "lib/rbcodec/codecs/sid.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 573,
+      "author": {
+        "id": 1000555
+      },
+      "writtenOn": "2019-07-25T15:50:23Z",
+      "side": 1,
+      "message": "#else",
+      "revId": "1fe7be1d16c2303e842c1c72a77b782a2b8ac20c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
