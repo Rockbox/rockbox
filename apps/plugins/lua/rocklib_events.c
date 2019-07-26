@@ -137,6 +137,7 @@ struct event_data {
     int             thread_state;
     long           *event_stack;
     long            timer_ticks;
+    short           freq_input;
     short           next_input;
     short           next_event;
     /* callbacks */
@@ -171,8 +172,9 @@ static void init_event_data(lua_State *L, struct event_data *ev_data)
     ev_data->thread_state = THREAD_YIELD;
     //ev_data->event_stack = NULL;
     //ev_data->timer_ticks = 0;
-    ev_data->next_input  = EV_TICKS;
-    ev_data->next_event  = EV_INPUT;
+    ev_data->freq_input  = EV_INPUT;
+    ev_data->next_input  = EV_INPUT;
+    ev_data->next_event  = EV_TICKS;
     /* callbacks */
     for (int i= 0; i < EVENT_CT; i++)
         ev_data->cb[i] = NULL;
@@ -336,7 +338,7 @@ static void rev_timer_isr(void)
     if (ev_data.next_input <=0)
     {
         ev_data.thread_state |= ((ev_data.thread_state & THREAD_INPUTMASK) >> 16);
-        ev_data.next_input = EV_INPUT;
+        ev_data.next_input = ev_data.freq_input;
     }
 
     if (ev_data.cb[TIMEREVENT] != NULL && !is_suspend(TIMEREVENT))
@@ -535,6 +537,8 @@ static int rockev_register(lua_State *L)
         case ACTEVENT:
             /* fall through */
         case BUTEVENT:
+            ev_data.freq_input = luaL_optinteger(L, 3, EV_INPUT);
+            if (ev_data.freq_input < HZ / 20) ev_data.freq_input = HZ / 20;
             ev_data.thread_state |= (ev_flag | (ev_flag << 16));
             break;
         case CUSTOMEVENT:
