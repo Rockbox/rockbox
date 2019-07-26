@@ -1225,6 +1225,8 @@ static const struct luaL_reg rli_lib [] =
 #define RB_WRAP(func) static int rock_##func(lua_State UNUSED_ATTR *L)
 
 #if defined NB_SCREENS && (NB_SCREENS > 1)
+#define RB_SCREEN_STRUCT(luastate, narg) \
+        rb->screens[get_screen(luastate, narg)]
 #define RB_SCREENS(luastate, narg, func, ...) \
         rb->screens[get_screen(luastate, narg)]->func(__VA_ARGS__)
 
@@ -1240,6 +1242,8 @@ static int get_screen(lua_State *L, int narg)
     return screen;
 }
 #else /* only SCREEN_MAIN exists */
+#define RB_SCREEN_STRUCT(luastate, narg) \
+        rb->screens[SCREEN_MAIN]
 #define RB_SCREENS(luastate, narg, func, ...) \
         rb->screens[SCREEN_MAIN]->func(__VA_ARGS__)
 #endif
@@ -1376,6 +1380,20 @@ RB_WRAP(font_getstringsize)
 }
 
 #ifdef HAVE_LCD_BITMAP
+RB_WRAP(gui_scrollbar_draw)
+{
+    int x= (int) luaL_checkint(L, 1) - 1;
+    int y= (int) luaL_checkint(L, 2) - 1;
+    int width= (int) luaL_checkint(L, 3) - 1;
+    int height= (int) luaL_checkint(L, 4) - 1;
+    int items= (int) luaL_checkint(L, 5);
+    int min_shown= (int) luaL_checkint(L, 6);
+    int max_shown= (int) luaL_checkint(L, 7);
+    unsigned flags= (unsigned) luaL_checkint(L, 8);
+    rb->gui_scrollbar_draw(RB_SCREEN_STRUCT(L, 9), x, y, width, height,
+                           items, min_shown, max_shown, flags);
+return 0;
+}
 
 RB_WRAP(lcd_framebuffer)
 {
@@ -1642,6 +1660,7 @@ static const luaL_Reg rocklib_img[] =
     R(clear_viewport),
     R(font_getstringsize),
 #ifdef HAVE_LCD_BITMAP
+    R(gui_scrollbar_draw),
     R(lcd_framebuffer),
     R(lcd_setfont),
     R(lcd_mono_bitmap_part),
