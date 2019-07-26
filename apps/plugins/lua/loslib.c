@@ -172,8 +172,11 @@ static int os_time (lua_State *L) {
 
 
 static int os_exit (lua_State *L) {
+  lua_settop(L, 2);
   int status = luaL_optint(L, 1, EXIT_SUCCESS);
-  lua_close(L);
+  if (status != EXIT_SUCCESS &&  lua_type (L, 2) != LUA_TSTRING)
+    lua_pushfstring(L, "exit (%d)", status);
+  lua_pushvalue(L, 1); /* put exit status on top of stack */
   exit(status);
   return EXIT_SUCCESS; /* never reached, surpress warning */
 }

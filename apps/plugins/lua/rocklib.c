@@ -771,6 +771,17 @@ RB_WRAP(audio_current_track)
     return mem_read_write(L, address, maxsize);
 }
 
+RB_WRAP(restart_lua)
+{
+    /*close lua state, open a new lua state, load script @ filename */
+    luaL_checktype (L, 1, LUA_TSTRING);
+    lua_settop(L, 1);
+    lua_pushlightuserdata(L, L); /* signal exit handler */
+    exit(1); /* atexit in rocklua.c */
+    return -1;
+}
+
+
 #define RB_FUNC(func) {#func, rock_##func}
 #define RB_ALIAS(name, func) {name, rock_##func}
 static const luaL_Reg rocklib[] =
@@ -842,6 +853,8 @@ static const luaL_Reg rocklib[] =
     RB_FUNC(global_settings),
     RB_FUNC(audio_next_track),
     RB_FUNC(audio_current_track),
+
+    RB_FUNC(restart_lua),
 
     {NULL, NULL}
 };
@@ -939,4 +952,3 @@ LUALIB_API int luaopen_rock(lua_State *L)
 #endif
     return 1;
 }
-

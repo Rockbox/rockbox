@@ -101,4 +101,5 @@ mpegplayer
 /* Lua needs at least 160 KB to work in */
 #if PLUGIN_BUFFER_SIZE >= 0x80000
 lua
+lua_scripts
 #endif

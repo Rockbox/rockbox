@@ -28,6 +28,8 @@
 #include "luadir.h"
 #include "rocklib_events.h"
 
+static lua_State *Ls = NULL;
+static int lu_status = 0;
 
 static const luaL_Reg lualibs[] = {
   {"",              luaopen_base},
@@ -142,41 +144,77 @@ static int docall (lua_State *L) {
   return status;
 }
 
+static void lua_atexit(void);
+static int loadfile_newstate(lua_State **L, const char *filename)
+{
+        *L = luaL_newstate();
+        rb_atexit(lua_atexit);
+        rocklua_openlibs(*L);
+        return luaL_loadfile(*L, filename);
+}
+
+static void lua_atexit(void)
+{
+  char *filename;
+
+  if(Ls && lua_gettop(Ls) > 1)
+  {
+    if (Ls == lua_touserdata(Ls, -1)) /* signal from restart_lua */
+    {
+      filename = (char *) malloc(MAX_PATH);
+
+      if (filename) /* out of memory? */
+        rb->strlcpy(filename, lua_tostring(Ls, -2), MAX_PATH);
+      lua_close(Ls); /* close old state */
+
+      lu_status = loadfile_newstate(&Ls, filename);
+
+      free(filename);
+      plugin_start(NULL);
+    }
+    else if (lua_tointeger(Ls, -1) != 0) /* os.exit */
+    {
+      lu_status = LUA_ERRRUN;
+      lua_pop(Ls, 1); /* put exit string on top of stack */
+      plugin_start(NULL);
+    }
+  }
+  _exit(0); /* don't call exit handler */
+}
 
 /***************** Plugin Entry Point *****************/
 enum plugin_status plugin_start(const void* parameter)
 {
     const char* filename;
-    int status;
 
     if (parameter == NULL)
     {
+      if (!Ls)
         rb->splash(HZ, "Play a .lua file!");
-        return PLUGIN_ERROR;
     }
     else
     {
         filename = (char*) parameter;
+        lu_status = loadfile_newstate(&Ls, filename);
+    }
 
-        lua_State *L = luaL_newstate();
-
-        rocklua_openlibs(L);
-        status = luaL_loadfile(L, filename);
-        if (!status) {
+    if (Ls)
+    {
+        if (!lu_status) {
             rb->lcd_scroll_stop(); /* rb doesn't like bg change while scroll */
             rb->lcd_clear_display();
-            status = docall(L);
+            lu_status= docall(Ls);
         }
 
-        if (status) {
-            DEBUGF("%s\n", lua_tostring(L, -1));
-            rb->splashf(5 * HZ, "%s", lua_tostring(L, -1));
-            lua_pop(L, 1);
+        if (lu_status) {
+            DEBUGF("%s\n", lua_tostring(Ls, -1));
+            rb->splash(5 * HZ, lua_tostring(Ls, -1));
+            /*lua_pop(Ls, 1);*/
         }
-
-        lua_close(L);
+        lua_close(Ls);
     }
+    else
+      return PLUGIN_ERROR;
 
     return PLUGIN_OK;
 }
-
