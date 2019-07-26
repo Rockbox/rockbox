@@ -173,6 +173,16 @@ sub make_install {
     }
     glob_install("$src/rocks/viewers/lua/*", "$libdir/rocks/viewers/lua");
 
+    #lua example scripts
+    if(-e "$ROOT/apps/plugins/lua_scripts") {
+        unless (glob_mkdir("$libdir/rocks/demos/lua_scripts")) {
+            return 0;
+        }
+        glob_install("$ROOT/apps/plugins/lua_scripts/*.lua", "$libdir/rocks/demos/lua_scripts");
+        #glob_mkdir("$temp_dir/rocks/demos/lua_scripts");
+        #glob_copy("$ROOT/apps/plugins/lua_scripts/*.lua", "$temp_dir/rocks/demos/lua_scripts/");
+    }
+
     # all the rest directories
     foreach my $t (@userstuff) {
         unless (glob_mkdir("$userdir/$t")) {
@@ -432,6 +442,12 @@ sub buildzip {
     rmdir("$temp_dir/codecs");
 
     find(find_copyfile(qr/\.(rock|ovl|lua)/, abs_path("$temp_dir/rocks/")), 'apps/plugins');
+
+    #lua example scripts
+    if(-e "$ROOT/apps/plugins/lua_scripts") {
+        glob_mkdir("$temp_dir/rocks/demos/lua_scripts");
+        glob_copy("$ROOT/apps/plugins/lua_scripts/*.lua", "$temp_dir/rocks/demos/lua_scripts/");
+    }
 
     # exclude entries for the image file types not supported by the imageviewer for the target.
     my $viewers = "$ROOT/apps/plugins/viewers.config";

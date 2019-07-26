@@ -28,6 +28,7 @@
 #include "luadir.h"
 #include "rocklib_events.h"
 
+static lua_State *L = NULL;
 
 static const luaL_Reg lualibs[] = {
   {"",              luaopen_base},
@@ -142,7 +143,33 @@ static int docall (lua_State *L) {
   return status;
 }
 
+static void lua_atexit(void)
+{
+  char *filename;
+  int status;
 
+  if(L && lua_gettop(L) > 0)
+  {
+    if (L == lua_touserdata(L, -1)) /* signal from lua_restart */
+    {
+      filename = (char *) malloc(MAX_PATH);
+      rb->strlcpy(filename, lua_tostring(L, -2), MAX_PATH);
+      lua_close(L); /* close old state */
+      L = luaL_newstate();
+      rocklua_openlibs(L);
+      status = luaL_loadfile(L, filename);
+      free(filename);
+      if (!status)
+        plugin_start(NULL);
+    }
+    else if (lua_tointeger(L, -1) != 0) /* os.exit */
+    {
+      rb->splash(HZ * 5, lua_tostring(L, -2));
+      lua_close(L); /* make sure lua state gets cleaned up */
+    }
+  }
+  _exit(0); /* don't call exit handler */
+}
 /***************** Plugin Entry Point *****************/
 enum plugin_status plugin_start(const void* parameter)
 {
@@ -151,17 +178,24 @@ enum plugin_status plugin_start(const void* parameter)
 
     if (parameter == NULL)
     {
+      if (!L)
+      {
         rb->splash(HZ, "Play a .lua file!");
         return PLUGIN_ERROR;
+      }
+      status = lua_status(L);
     }
     else
     {
         filename = (char*) parameter;
-
-        lua_State *L = luaL_newstate();
-
+        L = luaL_newstate();
+        rb_atexit(lua_atexit);
         rocklua_openlibs(L);
         status = luaL_loadfile(L, filename);
+    }
+
+    if (L)
+    {
         if (!status) {
             rb->lcd_scroll_stop(); /* rb doesn't like bg change while scroll */
             rb->lcd_clear_display();
@@ -173,7 +207,6 @@ enum plugin_status plugin_start(const void* parameter)
             rb->splashf(5 * HZ, "%s", lua_tostring(L, -1));
             lua_pop(L, 1);
         }
-
         lua_close(L);
     }
 
