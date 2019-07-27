@@ -116,16 +116,25 @@ FILE IO
 */
 
 #define	MAX_HANDLES		10
-static FILE	*sys_handles[MAX_HANDLES];
+//static FILE	*sys_handles[MAX_HANDLES];
+
+/* a file fully or partially cached in memory */
+/* We use the FILE handle to track the current position */
+static struct memfile {
+    FILE *f; /* NULL: unused slot */
+    char *buf;
+    size_t resident_len; /* bytes 0-(resident_len-1) are in memory */
+    size_t full_len;
+} sys_handles[MAX_HANDLES];
 
 void Sys_Shutdown(void)
 {
     for(int i = 0; i < MAX_HANDLES; i++)
     {
-        FILE *f = sys_handles[i];
+        FILE *f = sys_handles[i].f;
         if(f)
             fclose(f);
-        sys_handles[i] = NULL;
+        sys_handles[i].f = NULL;
     }
 }
 
@@ -134,7 +143,7 @@ int		findhandle (void)
 	int		i;
 	
 	for (i=1 ; i<MAX_HANDLES ; i++)
-		if (!sys_handles[i])
+		if (!sys_handles[i].f)
 			return i;
 	Sys_Error ("out of handles");
 	return -1;
@@ -158,26 +167,60 @@ static int Qfilelength (FILE *f)
 	return end;
 }
 
+#define CACHE_THRESHOLD (1024*1024)
+
+/* really rough guesses */
+#if MEMORYSIZE >= 64
+#define MAX_CACHE (32*1024*1024)
+#elif MEMORYSIZE >= 32
+#define MAX_CACHE (20*1024*1024)
+#else
+#define MAX_CACHE 0
+#endif
+
+static int cache_left = MAX_CACHE;
+
 int Sys_FileOpenRead (char *path, int *hndl)
 {
-	FILE	*f;
-	int		i;
+    FILE	*f;
+    int		i;
 	
-	i = findhandle ();
+    i = findhandle ();
 
-	f = fopen(path, "rb");
-	if (!f)
-	{
-		*hndl = -1;
-		return -1;
-	}
-	sys_handles[i] = f;
-	*hndl = i;
+    f = fopen(path, "rb");
+    if (!f)
+    {
+        *hndl = -1;
+        return -1;
+    }
+    sys_handles[i].f = f;
+    *hndl = i;
 
-        //rb->splashf(HZ*2, "Allocating handle %d to %s", i, path);
-        
-	
-	return Qfilelength(f);
+    //rb->splashf(HZ*2, "Allocating handle %d to %s", i, path);
+
+    int len = sys_handles[i].full_len = Qfilelength(f);
+
+    /* cache in memory? */
+    if(len > CACHE_THRESHOLD && cache_left > 0)
+    {
+        /* cache all or part of it */
+        int cachelen = (cache_left > len) ? len : cache_left;
+
+        if((sys_handles[i].buf = malloc(cachelen)))
+        {
+            cache_left -= cachelen;
+
+            /* fill in cache */
+            printf("Please wait... caching %d KB of large file", cachelen / 1024);
+            if(fread(sys_handles[i].buf, 1, cachelen, f) == cachelen)
+            {
+                sys_handles[i].resident_len = cachelen;
+                fseek(f, 0, SEEK_SET);
+
+                printf("Success!");
+            }
+        }
+    }
 }
 
 int Sys_FileOpenWrite (char *path)
@@ -190,7 +233,7 @@ int Sys_FileOpenWrite (char *path)
 	f = fopen(path, "wb");
 	if (!f)
 		Sys_Error ("Error opening %s: %s", path,strerror(errno));
-	sys_handles[i] = f;
+	sys_handles[i].f = f;
 	
 	return i;
 }
@@ -199,15 +242,19 @@ void Sys_FileClose (int handle)
 {
 	if ( handle >= 0 ) {
             //rb->splashf(HZ, "Close handle %d", handle);
-		fclose (sys_handles[handle]);
-		sys_handles[handle] = NULL;
+		fclose (sys_handles[handle].f);
+
+                cache_left += sys_handles[handle].resident_len;
+
+                // clear all fields so we can safely reuse
+                memset(sys_handles + handle, 0, sizeof(sys_handles[0]));
 	}
 }
 
 void Sys_FileSeek (int handle, int position)
 {
 	if ( handle >= 0 ) {
-		fseek (sys_handles[handle], position, SEEK_SET);
+		fseek (sys_handles[handle].f, position, SEEK_SET);
 	}
 }
 
@@ -218,20 +265,38 @@ int Sys_FileRead (int handle, void *dst, int count)
 
 	size = 0;
 	if ( handle >= 0 ) {
-		data = dst;
-		while ( count > 0 ) {
-			done = fread (data, 1, count, sys_handles[handle]);
-			if ( done == 0 ) {
-				break;
-			}
-                        else if(done < 0)
-                        {
-                            Sys_Error("stream error %d, file is %d = %d", done, handle, sys_handles[handle]);
-                        }
-			data += done;
-			count -= done;
-			size += done;
-		}
+            FILE *f = sys_handles[handle].f;
+
+            data = dst;
+            
+            /* partially or fully in memory */
+            int pos = ftell(f);
+            if(pos < sys_handles[handle].resident_len)
+            {
+                int memleft = sys_handles[handle].resident_len - pos;
+                int memlen = MIN(count, memleft);
+
+                memcpy(data, sys_handles[handle].buf + pos, memlen);
+                data += memlen;
+                count -= memlen;
+                size += memlen;
+
+                fseek(f, memlen, SEEK_CUR);
+            }
+
+            while ( count > 0 ) {
+                done = fread (data, 1, count, sys_handles[handle].f);
+                if ( done == 0 ) {
+                    break;
+                }
+                else if(done < 0)
+                {
+                    Sys_Error("stream error %d, file is %d = %d", done, handle, sys_handles[handle]);
+                }
+                data += done;
+                count -= done;
+                size += done;
+            }
 	}
 	return size;
 		
@@ -246,7 +311,7 @@ int Sys_FileWrite (int handle, void *src, int count)
 	if ( handle >= 0 ) {
 		data = src;
 		while ( count > 0 ) {
-			done = fread (data, 1, count, sys_handles[handle]);
+			done = fread (data, 1, count, sys_handles[handle].f);
 			if ( done == 0 ) {
 				break;
 			}
