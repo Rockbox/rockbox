@@ -76,11 +76,6 @@ int32_t gc,neartaghitdist,lockclock,max_player_health,max_armour_amount,max_ammo
 struct weaponhit hittype[MAXSPRITES];
 short spriteq[1024],spriteqloc,spriteqamount=64;
 
-// ported build engine has this, too.  --ryan.
-#if PLATFORM_DOS
-short moustat = 0;
-#endif
-
 struct animwalltype animwall[MAXANIMWALLS];
 short numanimwalls;
 int32_t *animateptr[MAXANIMATES], animategoal[MAXANIMATES], animatevel[MAXANIMATES], animatecnt;
@@ -232,7 +227,6 @@ int32_t *curipos[MAXINTERPOLATIONS];
 
 void FixFilePath(char  *filename)
 {
-#if PLATFORM_UNIX || PLATFORM_ROCKBOX
     uint8_t  *ptr;
     uint8_t  *lastsep = filename;
 
@@ -304,73 +298,7 @@ void FixFilePath(char  *filename)
                 return;
         }
     }
-#endif
 }
-
-
-#if PLATFORM_DOS
- /* no-op. */
-
-#elif PLATFORM_WIN32
-int _dos_findfirst(uint8_t  *filename, int x, struct find_t *f)
-{
-    int32_t rc = _findfirst(filename, &f->data);
-    f->handle = rc;
-    if (rc != -1)
-    {
-        strncpy(f->name, f->data.name, sizeof (f->name) - 1);
-        f->name[sizeof (f->name) - 1] = '\0';
-        return(0);
-    }
-    return(1);
-}
-
-int _dos_findnext(struct find_t *f)
-{
-    int rc = 0;
-    if (f->handle == -1)
-        return(1);   /* invalid handle. */
-
-    rc = _findnext(f->handle, &f->data);
-    if (rc == -1)
-    {
-        _findclose(f->handle);
-        f->handle = -1;
-        return(1);
-    }
-
-    strncpy(f->name, f->data.name, sizeof (f->name) - 1);
-    f->name[sizeof (f->name) - 1] = '\0';
-    return(0);
-}
-
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_MACOSX) || defined(PLATFORM_ROCKBOX)
-int _dos_findfirst(char  *filename, int x, struct find_t *f)
-{
-    char  *ptr;
-
-    if (strlen(filename) >= sizeof (f->pattern))
-        return(1);
-
-    strcpy(f->pattern, filename);
-    FixFilePath(f->pattern);
-    ptr = strrchr(f->pattern, PATH_SEP_CHAR);
-
-    if (ptr == NULL)
-    {
-        ptr = filename;
-        f->dir = opendir(CURDIR);
-    }
-    else
-    {
-        *ptr = '\0';
-        f->dir = opendir(f->pattern);
-        memmove(f->pattern, ptr + 1, strlen(ptr + 1) + 1);
-    }
-
-    return(_dos_findnext(f));
-}
-
 
 static int check_pattern_nocase(const char  *x, const char  *y)
 {
@@ -408,53 +336,6 @@ static int check_pattern_nocase(const char  *x, const char  *y)
 
     return(*x == *y);  /* it's a match (both should be EOS). */
 }
-
-int _dos_findnext(struct find_t *f)
-{
-    struct dirent *dent;
-
-    if (f->dir == NULL)
-        return(1);  /* no such dir or we're just done searching. */
-
-    while ((dent = readdir(f->dir)) != NULL)
-    {
-        if (check_pattern_nocase(f->pattern, dent->d_name))
-        {
-            if (strlen(dent->d_name) < sizeof (f->name))
-            {
-                strcpy(f->name, dent->d_name);
-                return(0);  /* match. */
-            }
-        }
-    }
-
-    closedir(f->dir);
-    f->dir = NULL;
-    return(1);  /* no match in whole directory. */
-}
-#else
-#error please define for your platform.
-#endif
-
-
-#if !PLATFORM_DOS
-void _dos_getdate(struct dosdate_t *date)
-{
-	time_t curtime = time(NULL);
-	
-	if (date == NULL) {
-		return;
-	}
-	
-	memset(date, 0, sizeof(struct dosdate_t));
-
-        date->day = 1;
-        date->month = 1;
-        date->year = 1970;
-        date->dayofweek = 4;
-}
-#endif
-
 
 int FindDistance2D(int ix, int iy)
 {
@@ -560,11 +441,7 @@ int32 SafeOpenAppend (const char  *_filename, int32 filetype)
     filename[sizeof (filename) - 1] = '\0';
     FixFilePath(filename);
 
-#if (defined PLATFORM_WIN32)
-    handle = open(filename,O_RDWR | O_BINARY | O_CREAT | O_APPEND );
-#else
 	handle = open(filename,O_RDWR | O_BINARY | O_CREAT | O_APPEND , 0666);
-#endif
 
 	if (handle == -1)
 		Error (EXIT_FAILURE, "Error opening for append %s: %s",filename,strerror(errno));
@@ -579,11 +456,7 @@ boolean SafeFileExists ( const char  * _filename )
     filename[sizeof (filename) - 1] = '\0';
     FixFilePath(filename);
 
-#if( defined PLATFORM_WIN32)
-        return(access(filename, 6) == 0);
-#else
-        return(rb->file_exists(filename));
-#endif
+	return(rb->file_exists(filename));
 }
 
 
@@ -595,12 +468,8 @@ int32 SafeOpenWrite (const char  *_filename, int32 filetype)
     filename[sizeof (filename) - 1] = '\0';
     FixFilePath(filename);
 
-#if (defined PLATFORM_WIN32)
-    handle = open(filename,O_RDWR | O_BINARY | O_CREAT | O_TRUNC );
-#else
 	handle = open(filename,O_RDWR | O_BINARY | O_CREAT | O_TRUNC
 	, 0666);
-#endif
 
 	if (handle == -1)
 		Error (EXIT_FAILURE, "Error opening %s: %s",filename,strerror(errno));
@@ -783,7 +652,6 @@ void SwapIntelShortArray(short *s, int num)
   Stolen for Duke3D, too.
  */
  
-#if PLATFORM_UNIX
 uint8_t  *strlwr(uint8_t  *s)
 {
 	uint8_t  *p = s;
@@ -858,13 +726,11 @@ uint8_t  *ultoa(uint32_t value, uint8_t  *string, int radix)
 	
 	return string;
 }
-#endif
 
 char  ApogeePath[256];
 
 int setup_homedir (void)
 {
-#if PLATFORM_UNIX
 	int err;
 
 	snprintf (ApogeePath, sizeof (ApogeePath), "%s/.duke3d/", getenv ("HOME"));
@@ -877,9 +743,6 @@ int setup_homedir (void)
 				strerror (errno));
 		return -1;
 	}
-#else
-    sprintf(ApogeePath, ".%s", PATH_SEP_STR);
-#endif
 
 	return 0;
 }

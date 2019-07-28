@@ -28,11 +28,7 @@ Prepared for public release: 03/21/2003 - Charlie Wiederhold, 3D Realms
 
 #include "platform.h"
 
-#ifdef _WIN32
-#include "../../Engine/src/windows/inttypes.h"
-#else
 #include <inttypes.h>
-#endif
 
 #include <fcntl.h>
 #include <time.h>
@@ -48,26 +44,6 @@ Prepared for public release: 03/21/2003 - Charlie Wiederhold, 3D Realms
   #else
     #define MAX_PATH 256
   #endif
-#endif
-
-#if PLATFORM_DOS
-#include <dos.h>
-#include <bios.h>
-#include <io.h>
-#define PATH_SEP_CHAR '\\'
-#define PATH_SEP_STR  "\\"
-#endif
-
-#if PLATFORM_UNIX && !defined(ROCKBOX)
-#include "dukeunix.h"
-#endif
-
-#if PLATFORM_MACOSX
-#include "dukeunix.h"
-#endif
-
-#if PLATFORM_WIN32
-#include "dukewin.h"
 #endif
 
 #ifdef ROCKBOX
@@ -523,11 +499,6 @@ extern short spriteq[1024],spriteqloc,spriteqamount;
 extern struct player_struct ps[MAXPLAYERS];
 extern struct player_orig po[MAXPLAYERS];
 extern struct user_defs ud;
-
-// ported build engine has this, too.  --ryan.
-#if PLATFORM_DOS
-extern short int moustat;
-#endif
 
 extern short int global_random;
 extern int32_t scaredfallz;

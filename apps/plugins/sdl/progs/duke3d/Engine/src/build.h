@@ -7,11 +7,8 @@
 
 #ifndef _INCLUDE_BUILD_H_
 #define _INCLUDE_BUILD_H_
-#ifdef _WIN32
-   #include "windows/inttypes.h"
-#else
-   #include <inttypes.h>
-#endif
+
+#include <inttypes.h>
 
 #define MAXSECTORS 1024
 #define MAXWALLS 8192
@@ -223,12 +220,8 @@ SPRITE VARIABLES:
 
 	Example: if the linked lists look like the following:
 		 ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-		 ³      Sector lists:               Status lists:               ³
-		 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
-		 ³  Sector0:  4, 5, 8             Status0:  2, 0, 8             ³
-		 ³  Sector1:  16, 2, 0, 7         Status1:  4, 5, 16, 7, 3, 9   ³
-		 ³  Sector2:  3, 9                                              ³
-		 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		 ?     Sector lists:               Status lists:               ?		 ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+		 ? Sector0:  4, 5, 8             Status0:  2, 0, 8             ?		 ? Sector1:  16, 2, 0, 7         Status1:  4, 5, 16, 7, 3, 9   ?		 ? Sector2:  3, 9                                              ?		 ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 	Notice that each number listed above is shown exactly once on both the
 		left and right side.  This is because any sprite that exists must
 		be in some sector, and must have some kind of status that you define.

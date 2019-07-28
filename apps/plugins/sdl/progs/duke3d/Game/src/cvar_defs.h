@@ -1,11 +1,7 @@
 #ifndef _CVARDEFS_H_
 #define _CVARDEFS_H_
 
-#ifdef _WIN32
-   #include "../../Engine/src/windows/inttypes.h"
-#else
-   #include <inttypes.h>
-#endif
+#include <inttypes.h>
 
 void CVARDEFS_Init();
 void CVARDEFS_Render();

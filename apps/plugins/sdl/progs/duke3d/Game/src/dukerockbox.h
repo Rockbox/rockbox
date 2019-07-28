@@ -32,25 +32,6 @@
 #define O_BINARY 0
 #endif
 
-struct find_t
-{
-    DIR *dir;
-    char  pattern[MAX_PATH];
-    char  name[MAX_PATH];
-};
-int _dos_findfirst(char  *filename, int x, struct find_t *f);
-int _dos_findnext(struct find_t *f);
-
-struct dosdate_t
-{
-    uint8_t  day;
-    uint8_t  month;
-    unsigned int year;
-    uint8_t  dayofweek;
-};
-
-void _dos_getdate(struct dosdate_t *date);
-
 #ifndef min
 #define min(x, y) ((x) < (y) ? (x) : (y))
 #endif

@@ -4,11 +4,7 @@
 #define REGCONVAR(varname, varhelp, variable, function) CVAR_RegisterCvar(varname, varhelp, &variable, &function)
 #define REGCONFUNC(varname, varhelp, function) CVAR_RegisterCvar(varname, varhelp, NULL, &function)
 
-#ifdef _WIN32
-   #include "../../Engine/src/windows/inttypes.h"
-#else
-   #include <inttypes.h>
-#endif
+#include <inttypes.h>
 
 typedef void (*function_t) (void* binding);
 

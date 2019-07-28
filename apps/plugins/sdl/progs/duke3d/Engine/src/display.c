@@ -69,10 +69,6 @@ void TIMER_GetPlatformTicks(int64_t* t);
 
 
 
-#if ((defined PLATFORM_WIN32))
-#include <windows.h>
-#endif
-
 #include "draw.h"
 #include "cache.h"
 
@@ -763,12 +759,6 @@ void _platform_init(int argc, char  **argv, const char  *title, const char  *ico
     }
     
     
-
-#ifdef __APPLE__
-    SDL_putenv("SDL_VIDEODRIVER=Quartz");
-#endif
-  	
-
     if (SDL_Init(SDL_INIT_VIDEO) == -1){
         Error(EXIT_FAILURE, "BUILDSDL: SDL_Init() failed!\nBUILDSDL: SDL_GetError() says \"%s\".\n", SDL_GetError());
     } 
@@ -946,14 +936,11 @@ int32_t _setgamemode(uint8_t  davidoption, int32_t daxdim, int32_t daydim)
 	SDL_Surface     *image;
 	Uint32          colorkey;
 
-    // don't override higher-res app icon on OS X
-#ifndef PLATFORM_MACOSX
 	// Install icon
 	image = SDL_LoadBMP_RW(SDL_RWFromMem(iconBMP, iconBMP_size), 1);
 	colorkey = 0; // index in this image to be transparent
     SDL_SetColorKey(image, SDL_SRCCOLORKEY, colorkey);
 	SDL_WM_SetIcon(image,NULL);
-#endif
     
     if (daxdim > MAXXDIM || daydim > MAXYDIM)
     {
@@ -1915,29 +1902,6 @@ void uninitkeys(void)
     /* does nothing in SDL. Key input handling is set up elsewhere. */
 }
 
-
-//unsigned int32_t getticks(void)
-//{
-//    return(SDL_GetTicks());
-//} /* getticks */
-
-
-//Timer on windows 98 used to be really poor but now it is very accurate
-// We can just use what SDL uses, no need for QueryPerformanceFrequency or QueryPerformanceCounter
-// (which I bet SDL is using anyway).
-#if 0//PLATFORM_WIN32 
-int TIMER_GetPlatformTicksInOneSecond(int64_t* t)
-{
-    QueryPerformanceFrequency((LARGE_INTEGER*)t);
-    return 1;
-}
-
-void TIMER_GetPlatformTicks(int64_t* t)
-{
-    QueryPerformanceCounter((LARGE_INTEGER*)t);
-}
-#else
-//FCS: Let's try to use SDL again: Maybe SDL library is accurate enough now.
 int TIMER_GetPlatformTicksInOneSecond(int64_t* t)
 {
     *t = 1000;
@@ -1948,6 +1912,5 @@ void TIMER_GetPlatformTicks(int64_t* t)
 {
     *t = SDL_GetTicks();
 }
-#endif
 /* end of sdl_driver.c ... */
 

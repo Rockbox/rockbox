@@ -557,49 +557,8 @@ void deinit_network_transport(gcomtype *gcom)
 
 void unstable_callcommit(void){}
 
-#elif (defined PLATFORM_DOS)
-gcomtype *init_network_transport(char **ARGV, int argpos)
-{
-    /*
-     * How to talk to COMMIT is passed as a pointer to a block of memory
-     *  that COMMIT.EXE configures...
-     */
-	return((gcomtype *)atol(ARGV[argpos]));  /* UGH!  --ryan. */
-} /* init_network_transport */
-
-static union REGS regs;
-
-#pragma aux longcall =\
-	"call eax",\
-	parm [eax]
-
-void callcommit(void)
-{
-	if (gcom->intnum&0xff00)
-		longcall(gcom->longcalladdress);
-	else
-		int386(gcom->intnum,&regs,&regs);
-}
-
-void deinit_network_transport(gcomtype *gcom)
-{
-    /* no-op, apparently. */
-}
-
-
 #elif UDP_NETWORKING
 
-#if PLATFORM_WIN32
-#  include <winsock.h>
-#  define EAGAIN WSAEWOULDBLOCK
-#  define EWOULDBLOCK WSAEWOULDBLOCK
-#  define ECONNREFUSED WSAECONNRESET
-#  define socklen_t size_t
-#  define netstrerror() win32netstrerror()
-#  define neterrno() WSAGetLastError()
-#  define sockettype SOCKET
-#  define socketclose(x) closesocket(x)
-#else
 #  include <sys/types.h>
 #  include <sys/socket.h>
 #  include <netinet/in.h>
@@ -618,7 +577,6 @@ void deinit_network_transport(gcomtype *gcom)
 #  ifndef MSG_ERRQUEUE  /* legacy glibc header workaround... */
 #    define MSG_ERRQUEUE 0x2000
 #  endif
-#endif
 
 #define SOCKET_SHUTDOWN_BOTH 2
 
@@ -649,47 +607,6 @@ static void siginthandler(int sigint)
 {
     ctrlc_pressed = 1;
 }
-
-#if PLATFORM_WIN32
-/*
- * Figure out what the last failing Win32 API call was, and
- *  generate a human-readable string for the error message.
- *
- * The return value is a static buffer that is overwritten with
- *  each call to this function.
- *
- * Code lifted from PhysicsFS: http://icculus.org/physfs/
- */
-static const char *win32netstrerror(void)
-{
-    static TCHAR msgbuf[255];
-    TCHAR *ptr = msgbuf;
-
-    FormatMessage(
-        FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-        WSAGetLastError(), /*GetLastError(),*/
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), /* Default language */
-        msgbuf,
-        sizeof (msgbuf) / sizeof (TCHAR),
-        NULL 
-    );
-
-        /* chop off newlines. */
-    for (ptr = msgbuf; *ptr; ptr++)
-    {
-        if ((*ptr == '\n') || (*ptr == '\r'))
-        {
-            *ptr = ' ';
-            break;
-        } /* if */
-    } /* for */
-
-    return((const char *) msgbuf);
-} /* win32strerror */
-#endif
-
 
 typedef enum
 {
@@ -758,7 +675,6 @@ static int get_udp_packet(int *ip, short *_port, void *pkt, size_t pktsize)
 	if (rc == -1)
         err = neterrno();
 
-#if !PLATFORM_WIN32
 	/* !!! FIXME: Linux specific? */
     if (rc == -1)  /* fill in the addr structure on error... */
     {
@@ -766,7 +682,6 @@ static int get_udp_packet(int *ip, short *_port, void *pkt, size_t pktsize)
         recvfrom(udpsocket, NULL, 0, MSG_ERRQUEUE,
                  (struct sockaddr *) &addr, &l);
     }
-#endif
 
     *ip = ntohl(addr.sin_addr.s_addr);
     port = ntohs(addr.sin_port);
@@ -933,10 +848,6 @@ static int set_socket_blockmode(int onOrOff)
 
     /* set socket to be (non-)blocking. */
 
-#if PLATFORM_WIN32
-    flags = (onOrOff) ? 0 : 1;
-    rc = (ioctlsocket(udpsocket, FIONBIO, &flags) == 0);
-#else
     flags = fcntl(udpsocket, F_GETFL, 0);
     if (flags != -1)
     {
@@ -946,7 +857,6 @@ static int set_socket_blockmode(int onOrOff)
     	    flags |= O_NONBLOCK;
 	    rc = (fcntl(udpsocket, F_SETFL, flags) == 0);
     }
-#endif
 
     if (!rc)
     {
@@ -992,13 +902,11 @@ static int open_udp_socket(int ip, int port)
     if (!set_socket_blockmode(0))
         return(0);
 
-    #if !PLATFORM_WIN32
     {
         /* !!! FIXME: Might be Linux (not Unix, not BSD, not WinSock) specific. */
         int flags = 1;
         setsockopt(udpsocket, SOL_IP, IP_RECVERR, &flags, sizeof (flags));
     }
-    #endif
 
     memset(&addr, '\0', sizeof (addr));
     addr.sin_family = AF_INET;
@@ -1376,37 +1284,11 @@ static int parse_interface(char *str, int *ip, short *udpport)
 
 static int initialize_sockets(void)
 {
-#if PLATFORM_WIN32
-    int rc;
-    WSADATA data;
-    printf("initializing WinSock...\n");
-    rc = WSAStartup(0x0101, &data);
-    if (rc != 0)
-    {
-        printf("WinSock failed to initialize! [err==%d].\n", rc);
-        return(0);
-    }
-    else
-    {
-        printf("WinSock initialized.\n");
-        printf("  - Caller uses version %d.%d, highest supported is %d.%d.\n",
-                data.wVersion >> 8, data.wVersion & 0xFF,
-                data.wHighVersion >> 8, data.wHighVersion & 0xFF);
-        printf("  - Implementation description: [%s].\n", data.szDescription);
-        printf("  - System status: [%s].\n", data.szSystemStatus);
-        printf("  - Max sockets: %d.\n", data.iMaxSockets);
-        printf("  - Max UDP datagram size: %d.\n", data.iMaxUdpDg);
-    }
-#endif
-
     return(1);
 }
 
 static void deinitialize_sockets(void)
 {
-#if PLATFORM_WIN32
-    WSACleanup();
-#endif
 }
 
 static int parse_udp_config(const char *cfgfile, gcomtype *gcom)

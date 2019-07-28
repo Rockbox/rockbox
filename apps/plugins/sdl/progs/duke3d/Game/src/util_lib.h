@@ -30,11 +30,7 @@ Prepared for public release: 03/21/2003 - Charlie Wiederhold, 3D Realms
 //
 //***************************************************************************
 
-#ifdef _WIN32
-   #include "../../Engine/src/windows/inttypes.h"
-#else
-   #include <inttypes.h>
-#endif
+#include <inttypes.h>
 
 #ifndef _util_lib_public
 #define _util_lib_public
