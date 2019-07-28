@@ -77,6 +77,7 @@ RB_WRAP(schedule_cpu_boost)
 }
 #endif
 
+#ifdef HAVE_PRIORITY_SCHEDULING
 RB_WRAP(thread_set_priority)
 {
     unsigned int thread_id = rb->thread_self();
@@ -85,6 +86,7 @@ RB_WRAP(thread_set_priority)
     lua_pushinteger(L, result);
     return 1;
 }
+#endif
 
 RB_WRAP(current_path)
 {
@@ -778,7 +780,10 @@ static const luaL_Reg rocklib[] =
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     RB_FUNC(schedule_cpu_boost),
 #endif
+
+#ifdef HAVE_PRIORITY_SCHEDULING
     RB_FUNC(thread_set_priority),
+#endif
 
     RB_FUNC(current_path),
 
