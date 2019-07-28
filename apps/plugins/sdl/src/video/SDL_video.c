@@ -21,6 +21,8 @@
 */
 #include "SDL_config.h"
 
+#undef WIN32
+
 /* The high-level video driver subsystem */
 
 #include "SDL.h"
