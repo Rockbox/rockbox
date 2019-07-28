@@ -22,7 +22,7 @@ PLUGINS_SRC = $(call preprocess, $(APPSDIR)/plugins/SOURCES)
 endif
 OTHER_SRC += $(PLUGINS_SRC)
 ROCKS1 := $(PLUGINS_SRC:.c=.rock)
-ROCKS1 := $(subst $(ROOTDIR),$(BUILDDIR),$(ROCKS1))
+ROCKS1 := $(call full_path_subst,$(ROOTDIR)/%,$(BUILDDIR)/%,$(ROCKS1))
 
 ROCKS := $(ROCKS1)
 
@@ -35,7 +35,7 @@ OTHER_SRC += $(PLUGINLIB_SRC)
 
 PLUGINLIB_OBJ := $(PLUGINLIB_SRC:.c=.o)
 PLUGINLIB_OBJ := $(PLUGINLIB_OBJ:.S=.o)
-PLUGINLIB_OBJ := $(subst $(ROOTDIR),$(BUILDDIR),$(PLUGINLIB_OBJ))
+PLUGINLIB_OBJ := $(call full_path_subst,$(ROOTDIR)/%,$(BUILDDIR)/%,$(PLUGINLIB_OBJ))
 
 ### build data / rules
 ifndef APP_TYPE
