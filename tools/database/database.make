@@ -14,7 +14,7 @@ createsrc = $(shell cat $(1) > $(3); echo "\#if CONFIG_CODEC == SWCODEC" >> $(3)
                                      echo "\#endif" >> $(3); \
                                      echo $(3))
 
-METADATAS := $(subst $(ROOTDIR), ../.., $(wildcard $(ROOTDIR)/lib/rbcodec/metadata/*.c))
+METADATAS := $(call full_path_subst,$(ROOTDIR)/%,../../%,$(wildcard $(ROOTDIR)/lib/rbcodec/metadata/*.c))
 
 SRCFILE := $(call createsrc, $(TOOLSDIR)/database/SOURCES, \
                              $(METADATAS), \
