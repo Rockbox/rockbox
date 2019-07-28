@@ -241,10 +241,6 @@ Be careful in setting #define values for numerical constants of type
 size_t. On some systems, literal values are not automatically extended
 to size_t precision unless they are explicitly casted.
 
-WIN32                    default: defined if _WIN32 defined
-  Defining WIN32 sets up defaults for MS environment and compilers.
-  Otherwise defaults are for unix.
-
 MALLOC_ALIGNMENT         default: (size_t)8
   Controls the minimum alignment for malloc'ed chunks.  It must be a
   power of two and at least 8, even on machines for which smaller
@@ -473,28 +469,6 @@ DEFAULT_MMAP_THRESHOLD       default: 256K
   disable mmap by setting to MAX_SIZE_T.
 
 */
-
-#ifndef WIN32
-#ifdef _WIN32
-#define WIN32 1
-#endif  /* _WIN32 */
-#endif  /* WIN32 */
-#ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#define HAVE_MMAP 1
-#define HAVE_MORECORE 0
-#define LACKS_UNISTD_H
-#define LACKS_SYS_PARAM_H
-#define LACKS_SYS_MMAN_H
-#define LACKS_STRING_H
-#define LACKS_STRINGS_H
-#define LACKS_SYS_TYPES_H
-#define LACKS_ERRNO_H
-#define LACKS_FCNTL_H 
-#define MALLOC_FAILURE_ACTION
-#define MMAP_CLEARS 0 /* WINCE and some others apparently don't clear */
-#endif  /* WIN32 */
 
 #if defined(DARWIN) || defined(_DARWIN)
 /* Mac OSX docs advise not to use sbrk; it seems better to use mmap */

@@ -18,23 +18,11 @@ int FindDistance3D(int ix, int iy, int iz);
 void Shutdown(void);
 
 #ifndef LITTLE_ENDIAN
-    #ifdef __APPLE__
-    #else
-        #define LITTLE_ENDIAN 1234
-    #endif
+	#define LITTLE_ENDIAN 1234
 #endif
 
 #ifndef BIG_ENDIAN
-     #ifdef __APPLE__
-     #else
-        #define BIG_ENDIAN 4321
-    #endif
-#endif
-
-#if PLATFORM_WIN32
-#ifndef BYTE_ORDER
-#define BYTE_ORDER LITTLE_ENDIAN
-#endif
+	#define BIG_ENDIAN 4321
 #endif
 
 #ifdef ROCKBOX
@@ -42,15 +30,6 @@ void Shutdown(void);
 #define BYTE_ORDER LITTLE_ENDIAN
 #else
 #define BYTE_ORDER BIG_ENDIAN
-#endif
-#endif
-
-#ifdef __APPLE__
-#if __powerpc__
-#define BYTE_ORDER BIG_ENDIAN
-#else
-// Defined in endian.h
-// #define BYTE_ORDER LITTLE_ENDIAN
 #endif
 #endif
 

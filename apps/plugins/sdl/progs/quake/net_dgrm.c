@@ -23,9 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define BAN_TEST
 
 #ifdef BAN_TEST
-#if defined(_WIN32)
-#include <windows.h>
-#elif defined (NeXT)
+#if defined (NeXT)
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #else

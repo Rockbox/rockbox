@@ -24,11 +24,6 @@ Prepared for public release: 03/21/2003 - Charlie Wiederhold, 3D Realms
 */
 //-------------------------------------------------------------------------
 
-#if PLATFORM_DOS
-#include <conio.h>
-#include <dos.h>
-#endif
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -698,17 +693,10 @@ void CONFIG_ReadSetup( void )
     }
    SCRIPT_GetNumber( scripthandle, "Sound Setup", "FXDevice",&FXDevice);
 
-    #if !PLATFORM_DOS   // reimplementation of ASS expects a "SoundScape".
     if (FXDevice != NumSoundCards)
         FXDevice = SoundScape;
-    #endif
 
    SCRIPT_GetNumber( scripthandle, "Sound Setup", "MusicDevice",&MusicDevice);
-
-   //#if !PLATFORM_DOS   // reimplementation of ASS expects a "SoundScape".
-   //  if (MusicDevice != NumSoundCards)
-   //     MusicDevice = SoundScape;
-   //#endif
 
 // FIX_00015: Forced NumVoices=8, NumChannels=2, NumBits=16, MixRate=44100, ScreenMode = x(
 //            (ScreenMode has no meaning anymore)

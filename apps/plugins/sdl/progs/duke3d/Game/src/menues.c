@@ -1287,38 +1287,6 @@ int getfilenames(uint8_t  kind[6])
 
 int getfilenames(char  kind[6])
 {
-/* !!! FIXME: Visual C? */
-#if (defined __WATCOMC__)
-    short type;
-    struct find_t fileinfo;
-
-    if (strcmp(kind,"SUBD") == 0)
-    {
-        strcpy(kind,"*.*");
-        if (_dos_findfirst(kind,_A_SUBDIR,&fileinfo) != 0)
-            return(-1);
-        type = 1;
-    }
-    else
-    {
-        if (_dos_findfirst(kind,_A_NORMAL,&fileinfo) != 0)
-            return(-1);
-        type = 0;
-    }
-    do
-    {
-        if ((type == 0) || ((fileinfo.attrib&16) > 0))
-            if ((fileinfo.name[0] != '.') || (fileinfo.name[1] != 0))
-            {
-                strcpy(menuname[menunamecnt],fileinfo.name);
-                menuname[menunamecnt][16] = type;
-                menunamecnt++;
-            }
-    }
-    while (_dos_findnext(&fileinfo) == 0);
-
-#elif (defined PLATFORM_UNIX)
-
     DIR *dir;
     struct dirent *dent;
     struct stat statbuf;
@@ -1373,7 +1341,6 @@ int getfilenames(char  kind[6])
 
     closedir(dir);
 
-#endif
     return(0);
 }
 

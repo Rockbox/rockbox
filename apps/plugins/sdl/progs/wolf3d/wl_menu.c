@@ -3992,7 +3992,6 @@ CheckForEpisodes (void)
     int statbuf;
 
     // On Linux like systems, the configdir defaults to $HOME/.wolf4sdl
-#if !defined(_WIN32) && !defined(_arch_dreamcast)
     if(configdir[0] == 0)
     {
         // Set config location to home directory for multi-user support
@@ -4008,18 +4007,13 @@ CheckForEpisodes (void)
         }
         snprintf(configdir, sizeof(configdir), "%s" WOLFDIR, homedir);
     }
-#endif
 
     if(configdir[0] != 0)
     {
         // Ensure config directory exists and create if necessary
         if(stat(configdir, &statbuf) != 0)
         {
-#ifdef _WIN32
-            if(_mkdir(configdir) != 0)
-#else
             if(mkdir(configdir) != 0)
-#endif
             {
                 Quit("The configuration directory \"%s\" could not be created.", configdir);
             }

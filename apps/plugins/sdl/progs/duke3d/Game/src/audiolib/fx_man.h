@@ -32,11 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define __FX_MAN_H
 
 #include "sndcards.h"
-#ifdef _WIN32
-   #include "../../Engine/src/windows/inttypes.h"
-#else
-   #include <inttypes.h>
-#endif
+#include <inttypes.h>
 
 typedef struct
    {

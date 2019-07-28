@@ -24,11 +24,7 @@
 */
 //-------------------------------------------------------------------------
 
-#ifdef _WIN32
-#include <windows.h>
-#else
 #include "SDL.h"
-#endif
 
 #include "types.h"
 
@@ -113,38 +109,12 @@ void pitch_test( void );
 uint8_t  restorepalette,screencapt,nomorelogohack;
 int sendmessagecommand = -1;
 
-#if PLATFORM_DOS
-task *TimerPtr=NULL;
-#endif
-
 extern int32_t lastvisinc;
 
-// Build Engine port implements this.  --ryan.
-#if PLATFORM_DOS
-static void timerhandler(task *unused)
-{
-    totalclock++;
-}
-
-void inittimer()
-{
-    TimerPtr = TS_ScheduleTask( timerhandler,TICRATE, 1, NULL );
-    TS_Dispatch();
-}
-
-void uninittimer(void)
-{
-    if (TimerPtr)
-        TS_Terminate( TimerPtr );
-    TimerPtr = NULL;
-    TS_Shutdown();
-}
-#else
 void timerhandler(void)
 {
     totalclock++;
 }
-#endif
 
 int gametext(int x,int y,char  *t,uint8_t  s,short dabits)
 {
@@ -2471,11 +2441,7 @@ GOTOHERE:
         if(true)
         {
             if(*t == ' ' && *(t+1) == 0) *t = 0;
-#if PLATFORM_DOS   // Is there a good reason for this? --ryan.
-            printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-#else
             printf("\n%s\n",t);
-#endif
         }
 // CTW END - MODIFICATION
     }
@@ -7818,18 +7784,11 @@ void Startup(void)
     if(networkmode == 255)
         networkmode = 1;
 
-#ifdef PLATFORM_DOS
-    puts("Checking music inits.");
-    MusicStartup();
-    puts("Checking sound inits.");
-    SoundStartup();
-#else
     /* SBF - wasn't sure if swapping them would harm anything. */
     puts("Checking sound inits.");
     SoundStartup();
     puts("Checking music inits.");
     MusicStartup();
-#endif
 
     // AutoAim
     if(nHostForceDisableAutoaim)
@@ -8019,64 +7978,6 @@ void getnames(void)
 
 
 const char* const baseDir="duke3d*.grp";
-#ifdef _WIN32
-
-void findGRPToUse(uint8_t * groupfilefullpath)
-{
-    WIN32_FIND_DATA FindFileData;
-    HANDLE hFind =  INVALID_HANDLE_VALUE;
-    int i=0,kbdKey ;
-    char  groupfile[9][512];
-    int grpID ;
-
-    if(getGameDir()[0] != '\0')
-    {
-        sprintf(groupfilefullpath, "%s\\%s", getGameDir(), baseDir);
-        hFind = FindFirstFile(groupfilefullpath, &FindFileData);
-        if (hFind == INVALID_HANDLE_VALUE)
-        {
-            sprintf(groupfilefullpath, "%s", baseDir);
-        }
-        else
-            FindClose(hFind);
-    }
-    else
-        sprintf(groupfilefullpath, "%s", baseDir);
-
-    printf("Searching '%d':\n\n",groupfilefullpath);
-    hFind = FindFirstFile(groupfilefullpath,&FindFileData);
-
-    if ( hFind==INVALID_HANDLE_VALUE )
-        Error(EXIT_SUCCESS, "Can't find '%s'\n", groupfilefullpath);
-
-    do
-    {
-        i++;
-        sprintf(groupfile[i-1], "%s", FindFileData.cFileName);
-        printf("Found GRP #%d:\t%d Bytes\t %s \n", i, FindFileData.nFileSizeLow, groupfile[i-1]);
-    } while ( FindNextFile(hFind, &FindFileData) && i < 9 );
-
-    if(i==1)
-        grpID = 0;
-    else
-    {
-        printf("\n-> Choose a base GRP file from 1 to %c: ",'0' + i);
-        do
-            kbdKey = getch();
-        while(kbdKey < '1' || kbdKey > ('0' + i));
-        printf("%c\n", kbdKey);
-        grpID =  groupfile[kbdKey-'1'];
-
-    }
-
-    FindClose(hFind);
-    if (strlen(getGameDir()) == 0)
-        sprintf(groupfilefullpath, "./%s", groupfile[grpID]);
-    else
-        sprintf(groupfilefullpath, "%s//%s", getGameDir(), groupfile[grpID]);
-}
-
-#else
 
 int dukeGRP_Match(char* filename,int length)
 {
@@ -8125,8 +8026,6 @@ void findGRPToUse(char * groupfilefullpath){
 
     }
 }
-
-#endif
 
 static int load_duke3d_groupfile(void)
 {

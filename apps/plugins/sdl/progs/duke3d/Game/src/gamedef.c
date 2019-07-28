@@ -1155,11 +1155,7 @@ uint8_t  parsecommand(int readfromGRP)
                     break;
                 }
             }
-#ifdef PLATFORM_UNIX
             volume_names[j][i] = '\0';
-#else
-            volume_names[j][i-1] = '\0';
-#endif
             return 0;
         case 108:
             scriptptr--;
@@ -1182,11 +1178,7 @@ uint8_t  parsecommand(int readfromGRP)
                     break;
                 }
             }
-#if defined(PLATFORM_UNIX) || defined(PLATFORM_ROCKBOX)
             skill_names[j][i] = '\0';
-#else
-            skill_names[j][i-1] = '\0';
-#endif
             return 0;
 
         case 0:
@@ -1212,11 +1204,7 @@ uint8_t  parsecommand(int readfromGRP)
                     break;
                 }
             }
-#if defined(PLATFORM_UNIX) || defined(PLATFORM_ROCKBOX)
             level_names[j*11+k][i] = '\0';
-#else
-            level_names[j*11+k][i-1] = '\0';
-#endif
             while( *textptr == ' ' ) textptr++;
 
             partime[j*11+k] =
@@ -1247,11 +1235,7 @@ uint8_t  parsecommand(int readfromGRP)
                     break;
                 }
             }
-#ifdef PLATFORM_UNIX
             level_names[j*11+k][i] = '\0';
-#else
-            level_names[j*11+k][i-1] = '\0';
-#endif
             return 0;
 
         case 79:
@@ -1570,11 +1554,7 @@ void loadefs(char  *filenam, char  *mptr, int readfromGRP)
 		//ud.conCRC[0] = crc32_update((uint8_t  *)textptr, fs, ud.conCRC[0]);
     }
 
-#ifdef PLATFORM_UNIX
     textptr[fs - 1] = 0;
-#else
-    textptr[fs - 2] = 0;
-#endif
 
     clearbuf(actorscrptr,MAXSPRITES,0L);
     clearbufbyte(actortype,MAXSPRITES,0L);

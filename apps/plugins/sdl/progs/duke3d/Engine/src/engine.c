@@ -3335,13 +3335,7 @@ int saveboard(char  *filename, int32_t *daposx, int32_t *daposy,
     walltype *w;
     sectortype *sect;
 
-#if ((defined PLATFORM_DOS) || (defined PLATFORM_WIN32))
-    permissions = S_IWRITE;
-#elif (defined PLATFORM_UNIX)
-    permissions = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-#elif (defined PLATFORM_ROCKBOX)
     permissions = 0644;
-#endif
 
     if ((fil = rb->open(filename,
                     O_BINARY|O_TRUNC|O_CREAT|O_WRONLY,

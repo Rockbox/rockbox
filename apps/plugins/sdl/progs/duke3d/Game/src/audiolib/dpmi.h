@@ -33,11 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "SDL.h"
 
-#ifdef _WIN32
-#include "../../../Engine/src/windows/inttypes.h"
-#else
 #include <inttypes.h>
-#endif
 
 enum DPMI_Errors
    {

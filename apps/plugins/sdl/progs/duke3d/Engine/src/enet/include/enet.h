@@ -12,11 +12,7 @@ extern "C"
 
 #include <stdlib.h>
 
-#ifdef _WIN32
-#include "win32.h"
-#else
 #include "unix.h"
-#endif
 
 #include "types.h"
 #include "protocol.h"

@@ -175,7 +175,7 @@ AUTOMAKE = ${SHELL} /home/franklin/chocolate_duke3D/build-aux/missing automake-1
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -Wall -Wno-pointer-sign -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-parentheses -Wno-maybe-uninitialized -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-result -fno-strict-aliasing -fno-aggressive-loop-optimizations -DPLATFORM_UNIX -D_GNU_SOURCE=1 -D_REENTRANT -I/usr/include/SDL -g -O2
+CFLAGS = -Wall -Wno-pointer-sign -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast -Wno-parentheses -Wno-maybe-uninitialized -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-result -fno-strict-aliasing -fno-aggressive-loop-optimizations -D_GNU_SOURCE=1 -D_REENTRANT -I/usr/include/SDL -g -O2
 CPP = gcc -E
 CPPFLAGS = 
 CYGPATH_W = echo

@@ -46,39 +46,9 @@ long crctable[256];
 
 	//COM ONLY variables
 long comnum, comvect, comspeed, comtemp, comi, comescape, comreset;
-#ifdef PLATFORM_DOS   // !!! this is a real mess. --ryan.
-static void interrupt far comhandler(void);
-static unsigned short orig_pm_sel, orig_rm_seg, orig_rm_off;
-static unsigned long orig_pm_off;
-#endif
 volatile unsigned char *inbuf, *outbuf, *comerror, *incnt, *comtype;
 volatile unsigned char *comresend;
 volatile short *inbufplc, *inbufend, *outbufplc, *outbufend, *comport;
-#ifdef PLATFORM_DOS   // !!! this is a real mess. --ryan.
-static char rmbuffer[COMCODEBYTES] =        //See realcom.asm
-{
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x50,0x53,0x66,0x51,0x52,0x2e,
-	0x8b,0x16,0x08,0x00,0x83,0xc2,0x02,0xec,0x24,0x07,
-	0x8a,0xe0,0x80,0xfc,0x02,0x74,0x08,0x80,0xfc,0x04,
-	0x74,0x62,0xe9,0x89,0x00,0x2e,0x8b,0x16,0x08,0x00,
-	0x2e,0x8a,0x0e,0x0a,0x00,0x80,0xe9,0x01,0x78,0x7a,
-	0x2e,0x80,0x3e,0x0c,0x00,0x01,0x7c,0x10,0x74,0x04,
-	0xb0,0x83,0xeb,0x02,0xb0,0x8f,0xee,0x2e,0xfe,0x0e,
-	0x0c,0x00,0xeb,0xe3,0x2e,0x80,0x3e,0x0b,0x00,0x01,
-	0x7c,0x12,0x74,0x04,0xb0,0x83,0xeb,0x04,0x2e,0xa0,
-	0x0d,0x00,0xee,0x2e,0xfe,0x0e,0x0b,0x00,0xeb,0xc9,
-	0x2e,0x8b,0x1e,0x04,0x00,0x2e,0x3b,0x1e,0x06,0x00,
-	0x74,0x3c,0x2e,0x8a,0x87,0x80,0x41,0xee,0x43,0x81,
-	0xe3,0xff,0x3f,0x2e,0x89,0x1e,0x04,0x00,0xeb,0xab,
-	0x2e,0x8b,0x16,0x08,0x00,0xec,0x2e,0x8b,0x1e,0x02,
-	0x00,0x2e,0x88,0x87,0x80,0x01,0x43,0x81,0xe3,0xff,
-	0x3f,0x2e,0x89,0x1e,0x02,0x00,0x2e,0x80,0x3e,0x0a,
-	0x00,0x10,0x75,0x08,0x83,0xc2,0x05,0xec,0xa8,0x01,
-	0x75,0xd6,0xf6,0xc4,0x01,0x0f,0x84,0x56,0xff,0xb0,
-	0x20,0xe6,0x20,0x5a,0x66,0x59,0x5b,0x58,0xcf,
-};
-#endif
 
 	//NET ONLY variables
 short socket = 0x4949;
@@ -106,80 +76,17 @@ static char rmnetbuffer[NETCODEBYTES] =
 };
 static long my7a = 0;
 
-#ifdef PLATFORM_DOS
-#pragma aux koutp =\
-	"out dx, al",\
-	parm [edx][eax]\
-
-#pragma aux kinp =\
-	"in al, dx",\
-	parm [edx]
-#endif
-
 long convalloc32 (long size)
 {
-#ifdef PLATFORM_DOS	
-	union REGS r;
-
-	r.x.eax = 0x0100;           //DPMI allocate DOS memory
-	r.x.ebx = ((size+15)>>4);   //Number of paragraphs requested
-	int386(0x31,&r,&r);
-
-	if (r.x.cflag != 0) return ((long)0);   //Failed
-	return ((long)((r.x.eax&0xffff)<<4));   //Returns full 32-bit offset
-#else
 	fprintf (stderr, "%s, line %d; convalloc32() called\n", __FILE__,
 		__LINE__);
 	return 0;
-#endif	
 }
-
-#ifdef PLATFORM_DOS
-#pragma aux fixregistersaftersimulate =\
-	"cld",\
-	"push ds",\
-	"pop es",\
-
-static struct rminfo
-{
-	long EDI, ESI, EBP, ESP, EBX, EDX, ECX, EAX;
-	short flags, ES, DS, FS, GS, IP, CS, SP, SS;
-} RMI;
-#endif
 
 long simulateint(char intnum, long daeax, long daebx, long daecx, long daedx, long daesi, long daedi)
 {
-#ifdef PLATFORM_DOS	
-	union REGS regs;
-	struct SREGS sregs;
-
-	memset(&RMI,0,sizeof(RMI));    // Set up real-mode call structure
-	memset(&sregs,0,sizeof(sregs));
-
-	RMI.EAX = daeax;
-	RMI.EBX = daebx;
-	RMI.ECX = daecx;
-	RMI.EDX = daedx;
-	RMI.ESI = daesi-rmoffset32;
-	RMI.EDI = daedi-rmoffset32;
-	RMI.DS = rmsegment16;
-	RMI.ES = rmsegment16;
-
-	regs.w.ax = 0x0300;            // Use DMPI call 300h to issue the DOS interrupt
-	regs.h.bl = intnum;
-	regs.h.bh = 0;
-	regs.w.cx = 0;
-	sregs.es = FP_SEG(&RMI);
-	regs.x.edi = FP_OFF(&RMI);
-	int386x(0x31,&regs,&regs,&sregs);
-
-	fixregistersaftersimulate();
-
-	return(RMI.EAX);
-#else
 	fprintf(stderr, "%s line %d; simulateint() called\n",__FILE__,__LINE__);
 	return 0;
-#endif	
 }
 
 void initmultiplayers(char damultioption, char dacomrateoption, char dapriority)
@@ -237,22 +144,6 @@ int neton(void)
 	long i, j;
 
 	if ((simulateint(0x2f,(long)0x7a00,0L,0L,0L,0L,0L)&255) != 255) return(-1);
-	if (*(long *)(0x7a<<2) == 0)
-	{
-#ifdef PLATFORM_DOS		
-		printf("Faking int 0x7a to call IPX entry at: %4x:%4x\n",RMI.ES,RMI.EDI&65535);
-		my7a = convalloc32(16L);
-		*(short *)((0x7a<<2)+0) = (my7a&15);
-		*(short *)((0x7a<<2)+2) = (my7a>>4);
-
-		*(char *)(my7a+0) = 0x2e;               //call far ptr [L1]
-		*(char *)(my7a+1) = 0x9a;
-		*(long *)(my7a+2) = 7L;
-		*(char *)(my7a+6) = 0xcf;               //iret
-		*(short *)(my7a+7) = (RMI.EDI&65535);   //L1: ipxoff
-		*(short *)(my7a+9) = RMI.ES;            //    ipxseg
-#endif		
-	}
 
 		//Special stuff for WATCOM C
 	if ((rmoffset32 = convalloc32(1380L+NETCODEBYTES+COMBUFSIZ)) == 0)
@@ -349,9 +240,6 @@ int comon()
 	  // Baud-Setting,?,?,Parity O/E,Parity Off/On, Stop-1/2,Bits-5/6/7/8
 	  // 0x0b is odd parity,1 stop bit, 8 bits
 
-#ifdef PLATFORM_DOS	
-	_disable();
-#endif	
 	koutp((*comport)+3,0x80);                  //enable latch registers
 	divisor = 115200 / comspeed;
 	koutp((*comport)+0,divisor&255);           //# = 115200 / bps
@@ -384,9 +272,6 @@ int comon()
 
 	comescape = 0; comreset = 0;
 	*comerror = 0; *comresend = 0;
-#ifdef PLATFORM_DOS	
-	_enable();
-#endif	
 
 	syncbufleng = 0;
 
@@ -410,18 +295,12 @@ void comoff()
 		i--;
 	}
 
-#ifdef PLATFORM_DOS	
-	_disable();
-#endif	
 	koutp(0x21,kinp(0x21)|(1<<(comvect&7)));          //Mask vector
 	if (hangup != 0)
 	{
 		koutp((*comport)+1,0);
 		koutp((*comport)+4,0);
 	}
-#ifdef PLATFORM_DOS	
-	_enable();
-#endif	
 	uninstallbicomhandlers();
 }
 
@@ -921,87 +800,14 @@ long getcrc(char *buffer, short bufleng)
 
 void installbicomhandlers(void)
 {
-#ifdef PLATFORM_DOS	
-	union REGS r;
-	struct SREGS sr;
-	long lowp;
-	void far *fh;
-
-		//Get old protected mode handler
-	r.x.eax = 0x3500+comvect;   /* DOS get vector (INT 0Ch) */
-	sr.ds = sr.es = 0;
-	int386x(0x21,&r,&r,&sr);
-	orig_pm_sel = (unsigned short)sr.es;
-	orig_pm_off = r.x.ebx;
-
-		//Get old real mode handler
-	r.x.eax = 0x0200;   /* DPMI get real mode vector */
-	r.h.bl = comvect;
-	int386(0x31,&r,&r);
-	orig_rm_seg = (unsigned short)r.x.ecx;
-	orig_rm_off = (unsigned short)r.x.edx;
-
-		//Allocate memory in low memory to store real mode handler
-	if ((lowp = convalloc32(COMCODEBYTES+(COMBUFSIZ<<1))) == 0)
-		{ printf("Can't allocate conventional memory.\n"); exit; }
-
-	inbufplc = (short *)(lowp+0);
-	inbufend = (short *)(lowp+2);
-	outbufplc = (short *)(lowp+4);
-	outbufend = (short *)(lowp+6);
-	comport = (short *)(lowp+8);
-	comtype = (char *)(lowp+10);
-	comerror = (char *)(lowp+11);
-	comresend = (char *)(lowp+12);
-	incnt = (char *)(lowp+13);
-	inbuf = (char *)(lowp+COMCODEBYTES);
-	outbuf = (char *)(lowp+COMCODEBYTES+COMBUFSIZ);
-
-	memcpy((void *)lowp,(void *)rmbuffer,COMCODEBYTES);
-
-		//Set new protected mode handler
-	r.x.eax = 0x2500+comvect;   /* DOS set vector (INT 0Ch) */
-	fh = (void far *)comhandler;
-	r.x.edx = FP_OFF(fh);
-	sr.ds = FP_SEG(fh);      //DS:EDX == &handler
-	sr.es = 0;
-	int386x(0x21,&r,&r,&sr);
-
-		//Set new real mode handler (must be after setting protected mode)
-	r.x.eax = 0x0201;
-	r.h.bl = comvect;              //CX:DX == real mode &handler
-	r.x.ecx = ((lowp>>4)&0xffff);  //D32realseg
-	r.x.edx = COMCODEOFFS;         //D32realoff
-	int386(0x31,&r,&r);
-#else
 	fprintf (stderr,"%s, line %d; installbicomhandlers() called\n",
 		__FILE__, __LINE__);
-#endif	
 }
 
 void uninstallbicomhandlers(void)
 {
-#ifdef PLATFORM_DOS	
-	union REGS r;
-	struct SREGS sr;
-
-		//restore old protected mode handler
-	r.x.eax = 0x2500+comvect;   /* DOS set vector (INT 0Ch) */
-	r.x.edx = orig_pm_off;
-	sr.ds = orig_pm_sel;    /* DS:EDX == &handler */
-	sr.es = 0;
-	int386x(0x21,&r,&r,&sr);
-
-		//restore old real mode handler
-	r.x.eax = 0x0201;   /* DPMI set real mode vector */
-	r.h.bl = comvect;
-	r.x.ecx = (unsigned long)orig_rm_seg;     //CX:DX == real mode &handler
-	r.x.edx = (unsigned long)orig_rm_off;
-	int386(0x31,&r,&r);
-#else
 	fprintf (stderr, "%s line %d; uninstallbicomhandlers() called\n",
 		__FILE__, __LINE__);	
-#endif	
 }
 
 void processreservedmessage(short tempbufleng, char *datempbuf)

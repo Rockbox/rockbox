@@ -1392,23 +1392,17 @@ static fixed FixedMul(fixed a, fixed b)
 
 #define CHECKMALLOCRESULT(x) if(!(x)) Quit("Out of memory at %s:%i", __FILE__, __LINE__)
 
-#ifdef _WIN32
-    #define strcasecmp stricmp
-    #define strncasecmp strnicmp
-    #define snprintf _snprintf
-#else
-    static char* itoa(int value, char* string, int radix)
-    {
-	    sprintf(string, "%d", value);
-	    return string;
-    }
+static char* itoa(int value, char* string, int radix)
+{
+	sprintf(string, "%d", value);
+	return string;
+}
 
-    static char* ltoa(long value, char* string, int radix)
-    {
-	    sprintf(string, "%ld", value);
-	    return string;
-    }
-#endif
+static char* ltoa(long value, char* string, int radix)
+{
+	sprintf(string, "%ld", value);
+	return string;
+}
 
 #define lengthof(x) (sizeof(x) / sizeof(*(x)))
 #define endof(x)    ((x) + lengthof(x))

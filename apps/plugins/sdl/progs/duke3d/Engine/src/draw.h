@@ -8,11 +8,7 @@
 #ifndef _INCLUDE_A_H_
 #define _INCLUDE_A_H_
 
-#ifdef _WIN32
-   #include "windows/inttypes.h"
-#else
-   #include <inttypes.h>
-#endif
+#include <inttypes.h>
 
 
 //C++ linker friendly
