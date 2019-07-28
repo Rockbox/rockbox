@@ -90,13 +90,13 @@ static int write_settings_file(void* param)
     return settings_save_config((intptr_t)param);
 }
 
-MENUITEM_FUNCTION(browse_configs, MENU_FUNC_USEPARAM, ID2P(LANG_CUSTOM_CFG), 
+MENUITEM_FUNCTION(browse_configs, MENU_FUNC_USEPARAM, ID2P(LANG_CUSTOM_CFG),
         browse_folder, (void*)&config, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(save_settings_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_SETTINGS), 
+MENUITEM_FUNCTION(save_settings_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_SETTINGS),
         write_settings_file, (void*)SETTINGS_SAVE_ALL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(save_theme_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_THEME), 
+MENUITEM_FUNCTION(save_theme_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_THEME),
         write_settings_file, (void*)SETTINGS_SAVE_THEME, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(save_sound_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_SOUND), 
+MENUITEM_FUNCTION(save_sound_item, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_SOUND),
         write_settings_file, (void*)SETTINGS_SAVE_SOUND, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(reset_settings_item, 0, ID2P(LANG_RESET),
                   reset_settings, NULL, NULL, Icon_NOICON);
@@ -130,22 +130,17 @@ static int show_credits(void)
 #else
 #define SIZE_FMT "%s %s"
 #endif
-struct info_data 
+struct info_data
 
 {
+    unsigned long size[NUM_VOLUMES];
+    unsigned long free[NUM_VOLUMES];
+    unsigned long name[NUM_VOLUMES];
     bool new_data;
-    unsigned long size;
-    unsigned long free;
-#ifdef HAVE_MULTIVOLUME
-    unsigned long size2;
-    unsigned long free2;
-#endif
 };
 enum infoscreenorder
 {
     INFO_BATTERY = 0,
-    INFO_DISK1, /* capacity or internal capacity/free on hotswap */
-    INFO_DISK2, /* free space or external capacity/free on hotswap */
     INFO_BUFFER,
 #ifdef HAVE_RECORDING
     INFO_REC_DIR,
@@ -155,8 +150,41 @@ enum infoscreenorder
     INFO_DATE,
     INFO_TIME,
 #endif
+    INFO_DISK1, /* capacity/free on internal */
     INFO_COUNT
 };
+
+/* NOTE:  This code is not quite right for
+   (HAVE_MULTIVOLUME && !HAVE_MULTIDRIVE), but there are no
+   in-tree matches so.. eh.
+*/
+static int refresh_data(struct info_data *info)
+{
+    int i;
+#ifdef HAVE_MULTIDRIVE
+    int drive;
+    int max = -1;
+#endif
+
+    for (i = 0 ; CHECK_VOL(i) ; i++) {
+	volume_size(IF_MV(i,) &info->size[i], &info->free[i]);
+#ifdef HAVE_MULTIDRIVE
+	drive = volume_drive(i);
+	if (drive > 0 || info->size[i] == 0)
+	    info->name[i] = LANG_DISK_NAME_MMC;
+	else
+#endif
+	    info->name[i] = LANG_DISK_NAME_INTERNAL;
+#ifdef HAVE_MULTIDRIVE
+	if (drive > max)
+	    max = drive;
+	else if (drive < max)
+	    break;
+#endif
+    }
+    info->new_data = false;
+    return i;
+}
 
 static const char* info_getname(int selected_item, void *data,
                                 char *buffer, size_t buffer_len)
@@ -166,26 +194,16 @@ static const char* info_getname(int selected_item, void *data,
     struct tm *tm;
 #endif
     char s1[32];
-#if defined(HAVE_MULTIVOLUME)
     char s2[32];
-#endif
-    if (info->new_data)
-    {
-        volume_size(IF_MV(0,) &info->size, &info->free);
-#ifdef HAVE_MULTIVOLUME
-#ifndef APPLICATION
-        volume_size(1, &info->size2, &info->free2);
-#else
-        info->size2 = 0;
-#endif
+    int i;
 
-#endif
-        info->new_data = false;
-    }
+    if (info->new_data)
+	refresh_data(info);
+
     switch (selected_item)
     {
         case INFO_VERSION:
-            snprintf(buffer, buffer_len, "%s: %s", 
+            snprintf(buffer, buffer_len, "%s: %s",
                      str(LANG_VERSION), rbversion);
             break;
 
@@ -265,35 +283,20 @@ static const char* info_getname(int selected_item, void *data,
             else
                 return "Battery n/a"; /* translating worth it? */
             break;
-        case INFO_DISK1: /* disk usage 1 */
+        case INFO_DISK1: /* disk usage for internal */
+        default:
+	    i = selected_item - INFO_DISK1;
+	    if (info->size[i]) {
+		output_dyn_value(s1, sizeof s1, info->free[i], kibyte_units, 3, true);
+		output_dyn_value(s2, sizeof s2, info->size[i], kibyte_units, 3, true);
+		snprintf(buffer, buffer_len, "%s %s/%s", str(info->name[i]),
+			 s1, s2);
 #ifdef HAVE_MULTIVOLUME
-            output_dyn_value(s1, sizeof s1, info->free, kibyte_units, 3, true);
-            output_dyn_value(s2, sizeof s2, info->size, kibyte_units, 3, true);
-            snprintf(buffer, buffer_len, "%s %s/%s", str(LANG_DISK_NAME_INTERNAL),
-                     s1, s2);
-#else
-            output_dyn_value(s1, sizeof s1, info->free, kibyte_units, 3, true);
-            snprintf(buffer, buffer_len, SIZE_FMT, str(LANG_DISK_FREE_INFO), s1);
+	    } else {
+		snprintf(buffer, buffer_len, "%s %s", str(info->name[i]),
+			 str(LANG_NOT_PRESENT));
 #endif
-            break;
-        case INFO_DISK2: /* disk usage 2 */
-#ifdef HAVE_MULTIVOLUME
-            if (info->size2)
-            {
-                output_dyn_value(s1, sizeof s1, info->free2, kibyte_units, 3, true);
-                output_dyn_value(s2, sizeof s2, info->size2, kibyte_units, 3, true);
-                snprintf(buffer, buffer_len, "%s %s/%s", str(LANG_DISK_NAME_MMC),
-                         s1, s2);
-            }
-            else 
-            {
-                snprintf(buffer, buffer_len, "%s %s", str(LANG_DISK_NAME_MMC),
-                         str(LANG_NOT_PRESENT));
-            }
-#else
-            output_dyn_value(s1, sizeof s1, info->size, kibyte_units, 3, true);
-            snprintf(buffer, buffer_len, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
-#endif
+	    }
             break;
     }
     return buffer;
@@ -306,20 +309,10 @@ static int info_speak_item(int selected_item, void * data)
 #if CONFIG_RTC
     struct tm *tm;
 #endif
+    int i;
 
     if (info->new_data)
-    {
-        volume_size(IF_MV(0,) &info->size, &info->free);
-#ifdef HAVE_DIRCACHE
-#ifdef HAVE_MULTIVOLUME
-        if (volume_ismounted(1))
-	    volume_size(1, &info->size2, &info->free2);
-        else
-            info->size2 = 0;
-#endif
-#endif
-        info->new_data = false;
-    }
+	refresh_data(info);
 
     switch (selected_item)
     {
@@ -437,33 +430,19 @@ static int info_speak_item(int selected_item, void * data)
             else talk_id(VOICE_BLANK, false);
             break;
         case INFO_DISK1: /* disk 1 */
+        default:
+	    i = selected_item - INFO_DISK1;
+	    if (info->size[i]) {
+		talk_ids(false, info->name[i], LANG_DISK_FREE_INFO);
+		output_dyn_value(NULL, 0, info->free[i], kibyte_units, 3, true);
+		talk_id(LANG_DISK_SIZE_INFO, true);
+		output_dyn_value(NULL, 0, info->size[i], kibyte_units, 3, true);
 #ifdef HAVE_MULTIVOLUME
-            talk_ids(false, LANG_DISK_NAME_INTERNAL, LANG_DISK_FREE_INFO);
-            output_dyn_value(NULL, 0, info->free, kibyte_units, 3, true);
-            talk_id(LANG_DISK_SIZE_INFO, true);
-            output_dyn_value(NULL, 0, info->size, kibyte_units, 3, true);
-#else
-            talk_id(LANG_DISK_FREE_INFO, false);
-            output_dyn_value(NULL, 0, info->free, kibyte_units, 3, true);
+	    } else {
+		talk_id(LANG_NOT_PRESENT, true);
 #endif
-            break;
-        case INFO_DISK2: /* disk 2 */
-#ifdef HAVE_MULTIVOLUME
-            talk_id(LANG_DISK_NAME_MMC, false);
-            if (info->size2)
-            {
-                talk_id(LANG_DISK_FREE_INFO, true);
-                output_dyn_value(NULL, 0, info->free2, kibyte_units, 3, true);
-                talk_id(LANG_DISK_SIZE_INFO, true);
-                output_dyn_value(NULL, 0, info->size2, kibyte_units, 3, true);
-            }
-            else talk_id(LANG_NOT_PRESENT, true);
-#else
-            talk_id(LANG_DISK_SIZE_INFO, false);
-            output_dyn_value(NULL, 0, info->size, kibyte_units, 3, true);
-#endif
-            break;
-            
+	    }
+	    break;
     }
     return 0;
 }
@@ -503,11 +482,13 @@ static int info_action_callback(int action, struct gui_synclist *lists)
 #endif
     return action;
 }
+
 static int show_info(void)
 {
     struct info_data data = {.new_data = true };
     struct simplelist_info info;
-    simplelist_info_init(&info, str(LANG_ROCKBOX_INFO), INFO_COUNT, (void*)&data);
+    int count = INFO_COUNT + refresh_data(&data) - 1;
+    simplelist_info_init(&info, str(LANG_ROCKBOX_INFO), count, (void*)&data);
     info.hide_selection = !global_settings.talk_menu;
     if (info.hide_selection)
         info.scroll_all = true;
