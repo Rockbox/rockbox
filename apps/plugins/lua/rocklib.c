@@ -77,6 +77,15 @@ RB_WRAP(schedule_cpu_boost)
 }
 #endif
 
+RB_WRAP(thread_set_priority)
+{
+    unsigned int thread_id = rb->thread_self();
+    int priority = (int) luaL_checkint(L, 1);
+    int result = rb->thread_set_priority(thread_id, priority);
+    lua_pushinteger(L, result);
+    return 1;
+}
+
 RB_WRAP(current_path)
 {
     return get_current_path(L, 1);
@@ -769,6 +778,7 @@ static const luaL_Reg rocklib[] =
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     RB_FUNC(schedule_cpu_boost),
 #endif
+    RB_FUNC(thread_set_priority),
 
     RB_FUNC(current_path),
 
@@ -846,7 +856,7 @@ LUALIB_API int luaopen_rock(lua_State *L)
     lua_pushstring(L, "rb_defines");
     if (lua_pcall (L, 1, 0, 0))
         lua_pop(L, 1);
-#if 0
+#if 0 /* see rb_defines.lua */
     static const struct lua_int_reg rlib_const_int[] =
     {
         /* useful integer constants */
