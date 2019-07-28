@@ -53,6 +53,7 @@ my @ported_functions;
 my @forbidden_functions = ('^open$',
                            '^open_utf8$',
                            '^close$',
+                           'dcache',
                            '^read$',
                            '^write$',
                            '^mkdir$',
@@ -101,7 +102,13 @@ my @forbidden_functions = ('^open$',
                            '^pcm_(set_frequency|calculate_peaks)$',
                            '^sound_(set|current|default|min|max|unit|pitch|val2phys)$',
                            '^mixer_(set|get)_frequency$',
+                           '^rock_plugin_get_current_filename$',
+                           '^plugin_release_audio_buffer$',
+                           '^reload_directory$',
+                           '^set_current_file$',
+                           '^set_dirfilter$',
                            '^(trigger|cancel)_cpu_boost$',
+                           '^thread_',
                            '^round_value_to_list32$');
 
 my $rocklib = sprintf("%s/rocklib.c", $ARGV[0]);
