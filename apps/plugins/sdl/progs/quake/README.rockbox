@@ -1,0 +1,42 @@
+Introduction
+============
+
+These are my port notes for Quake. This runs, of course, on our SDL
+port. See <https://www.rockbox.org/wiki/SdlPort> for more.
+
+Port Lineage
+============
+
+This port stems from SDLQuake
+(https://www.libsdl.org/projects/quake/), which was built on top of id
+Software's source release.
+
+How is <X> done?
+================
+
+Custom settings: This is implemented through a modification to
+Cmd_Exec_f and Key_Bind_f, in cmd.c and keys.c.
+
+Sound mixing: There is a handwritten assembly sound mixing routine in
+snd_mix_arm.S, using the ARMv5 DSP extensions for saturating
+addition. Disable that if you run into sound issues.
+
+File caching: There is an automatic caching layer in sys_sdl.c which
+loads files over 1 MB into memory. Quake only uses about 8 MB of heap
+when running, so there's plenty of space for this on some targets
+(e.g. ipods).
+
+Known bugs
+==========
+
+Setting the sample rate to 44.1 KHz leads to all sorts of weird
+crashes, which stem (probably) from the same underlying memory
+corruption issue. Only thing is, it seems to occur only on hardware so
+it's a huge pain to debug.
+
+Optimization targets
+====================
+
+D_DrawZSpans, D_DrawSpans8, and Turbulent8 (in d_scan.c) should be
+fairly straightforward to write in assembly and are big time
+hogs. Make them fast!
