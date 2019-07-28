@@ -6674,16 +6674,13 @@
   desc: in info menu; name for internal disk with multivolume (keep short!)
   user: core
   <source>
-    *: none
-    multivolume: "Int:"
+    *: "Int:"
   </source>
   <dest>
-    *: none
-    multivolume: "Int:"
+    *: "Int:"
   </dest>
   <voice>
-    *: none
-    multivolume: "Internal"
+    *: "Internal"
   </voice>
 </phrase>
 <phrase>
