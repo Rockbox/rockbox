@@ -30,6 +30,6 @@ To build from scratch:
 It is also possible to pull straight from Docker Hub. Run:
 
   docker pull built1n/rbclient
-  
+
 Then you can use all the commands above, with `myclient' replaced with
 `built1n/rbclient'.
