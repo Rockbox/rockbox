@@ -17,6 +17,8 @@
 #define read(a, b, c) rb->read((a), (b), (c))
 #define write(a, b, c) rb->write((a), (b), (c))
 #define close(a) rb->close(a)
+#define itoa wolf3d_itoa
+#define ltoa wolf3d_ltoa
 
 #if !defined O_BINARY
 #	define O_BINARY 0

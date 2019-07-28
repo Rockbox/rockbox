@@ -30,6 +30,10 @@
 #include "plugin.h"
 #include "lib/pluginlib_exit.h"
 
+#ifdef _WIN32
+#define __int64 long long
+#endif
+
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stdint.h>

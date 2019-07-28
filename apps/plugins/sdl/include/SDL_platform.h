@@ -30,6 +30,7 @@
 #if defined(ROCKBOX)
 #undef __ROCKBOX__
 #undef __LINUX__ /* maybe sim */
+#undef __WIN32__ /* maybe sim */
 #define __ROCKBOX__ 1
 #else
 #error This SDL supports Rockbox only!

@@ -42,6 +42,7 @@ void     setGameDir(char* gameDir);
 
 int32_t  TCkopen4load(const char  *filename, int32_t readfromGRP);
 
+#define filelength rb_filelength
 int32_t  filelength(int32_t fd);
 
 #endif

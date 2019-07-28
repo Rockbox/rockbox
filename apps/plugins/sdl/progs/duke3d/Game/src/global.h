@@ -12,6 +12,11 @@
 #include "SDL.h"
 
 #define open rb->open
+#define strlwr duke_strlwr
+#define strupr duke_strupr
+#define itoa duke_itoa
+#define ltoa duke_ltoa
+#define ultoa duke_ultoa
 
 void FixFilePath(char  *filename);
 int FindDistance3D(int ix, int iy, int iz);
