@@ -100,7 +100,9 @@
 void volume_recalc_free(IF_MV_NONVOID(int volume));
 unsigned int volume_get_cluster_size(IF_MV_NONVOID(int volume));
 void volume_size(IF_MV(int volume,) unsigned long *size, unsigned long *free);
+#ifdef HAVE_DIRCACHE
 bool volume_ismounted(IF_MV_NONVOID(int volume));
+#endif
 #ifdef HAVE_HOTSWAP
 bool volume_removable(int volume);
 bool volume_present(int volume);

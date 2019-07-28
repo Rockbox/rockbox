@@ -310,7 +310,7 @@ static int info_speak_item(int selected_item, void * data)
     if (info->new_data)
     {
         volume_size(IF_MV(0,) &info->size, &info->free);
-#ifdef HAVE_MULTIVOLUME
+#ifdef HAVE_DIRCACHE
         if (volume_ismounted(1))
             volume_size(1, &info->size2, &info->free2);
         else
