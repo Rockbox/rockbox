@@ -7,12 +7,6 @@
 
 #include "mmulti_unstable.h"
 
-#if (HAVE_ENET_ENET_H == 1)
-	#include <enet/enet.h>
-#else
-	#include "enet/include/enet.h"
-#endif
-
 //STL
 //#include <vector>
 //#include "buildqueue.h"
