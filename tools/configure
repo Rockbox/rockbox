@@ -4274,7 +4274,7 @@ fi
     target="IHIFI770C"
     memory=16
     arm7ejscc
-    tool="$rootdir/tools/scramble -rkw -modelnum=97"
+    tool="$rootdir/tools/scramble -rkw -modelnum=112"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
@@ -4297,7 +4297,7 @@ fi
     target="IHIFI770"
     memory=16
     arm7ejscc
-    tool="$rootdir/tools/scramble -rkw -modelnum=98"
+    tool="$rootdir/tools/scramble -rkw -modelnum=111"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
@@ -4320,7 +4320,7 @@ fi
     target="IHIFI800"
     memory=16
     arm7ejscc
-    tool="$rootdir/tools/scramble -rkw -modelnum=99"
+    tool="$rootdir/tools/scramble -rkw -modelnum=113"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"

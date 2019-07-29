@@ -349,8 +349,6 @@ int main (int argc, char** argv)
             modelnum = 67;
         else if (!strcmp(&argv[1][5], "fuz2")) /* Sansa Fuze v2 */
             modelnum = 68;
-        else if (!strcmp(&argv[1][5], "m244"))
-            modelnum = 131;
         else if (!strcmp(&argv[1][5], "hd20")) /* MPIO HD200 */
             modelnum = 69;
         else if (!strcmp(&argv[1][5], "hd30")) /* MPIO HD300 */
@@ -383,8 +381,6 @@ int main (int argc, char** argv)
             modelnum = 90;
         else if (!strcmp(&argv[1][5], "zxfs")) /* Creative ZEN X-Fi Style */
             modelnum = 94;
-        else if (!strcmp(&argv[1][5], "xdx3")) /* xDuoo X3 */
-            modelnum = 96;
         else if (!strcmp(&argv[1][5], "e450")) /* Sony NWZ-E450 series */
             modelnum = 100;
         else if (!strcmp(&argv[1][5], "e460")) /* Sony NWZ-E460 series */
@@ -403,6 +399,10 @@ int main (int argc, char** argv)
             modelnum = 108;
         else if (!strcmp(&argv[1][5], "e350")) /* Sony NWZ-E350 series */
             modelnum = 109;
+        else if (!strcmp(&argv[1][5], "xdx3")) /* xDuoo X3 */
+            modelnum = 110;
+        else if (!strcmp(&argv[1][5], "m244"))
+            modelnum = 131;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;
