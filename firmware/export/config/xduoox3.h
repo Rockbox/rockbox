@@ -3,7 +3,7 @@
  */
 
 #define MODEL_NAME   "xDuoo X3"
-#define MODEL_NUMBER 106
+#define MODEL_NUMBER 96
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC  0

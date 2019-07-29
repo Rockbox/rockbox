@@ -3,7 +3,7 @@
  */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 108
+#define MODEL_NUMBER 97
 
 #define MODEL_NAME   "IHIFI 770C"
 
