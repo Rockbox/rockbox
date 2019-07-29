@@ -1434,8 +1434,8 @@ int sd_event(long id, intptr_t data)
          * clear if the last attempt to init failed with an error. */
         mutex_lock(&sd_mtx); /* lock-out card activity */
         card[data].initialized = 0;
-//	if (id == SYS_HOTSWAP_INSERTED)
-//            sd_init_device(data);
+	if (id == SYS_HOTSWAP_INSERTED)
+            sd_init_device(data);
         mutex_unlock(&sd_mtx);
         break;
 #endif /* HAVE_HOTSWAP */
