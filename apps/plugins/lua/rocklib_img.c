@@ -1394,48 +1394,45 @@ RB_WRAP(lcd_setfont)
 }
 
 /* helper function for lcd_xxx_bitmap/rect functions */
-static void get_rect_bounds(lua_State *L, int narg, int *x, int *y, int *w, int* h)
+static void checkint_arr(lua_State *L, int *val, int narg, int elems)
 {
-    *x = luaL_checkint(L, narg);
-    *y = luaL_checkint(L, narg + 1);
-    *w = luaL_checkint(L, narg + 2);
-    *h = luaL_checkint(L, narg + 3);
+    /* fills passed array of integers with lua integers from stack */
+    for (int i = 0; i < elems; i++) 
+        val[i] = luaL_checkint(L, narg + i);
 }
 
 RB_WRAP(gui_scrollbar_draw)
 {
-    int x, y, width, height;
-    get_rect_bounds(L, 1, &x, &y, &width, &height);
-    int items = luaL_checkint(L, 5);
-    int min_shown = luaL_checkint(L, 6);
-    int max_shown = luaL_checkint(L, 7);
-    unsigned flags = (unsigned) luaL_checkint(L, 8);
-    rb->gui_scrollbar_draw(RB_SCREEN_STRUCT(L, 9), x, y, width, height,
-                           items, min_shown, max_shown, flags);
+    enum {x = 0, y, w, h, items, min_shown, max_shown, flags, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 1, eCNT);
+
+    rb->gui_scrollbar_draw(RB_SCREEN_STRUCT(L, 9), v[x], v[y], v[w], v[h],
+                    v[items], v[min_shown], v[max_shown], (unsigned) v[flags]);
 return 0;
 }
 
 RB_WRAP(lcd_mono_bitmap_part)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
-    int src_x = luaL_checkint(L, 2);
-    int src_y = luaL_checkint(L, 3);
-    int stride = luaL_checkint(L, 4);
-    int x, y, width, height;
-    get_rect_bounds(L, 5, &x, &y, &width, &height);
+    enum {src_x = 0, src_y, stride, x, y, w, h, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 2, eCNT);;
 
     RB_SCREENS(L, 9, mono_bitmap_part, (const unsigned char *)src->data,
-                                       src_x, src_y, stride, x, y, width, height);
+                  v[src_x], v[src_y], v[stride], v[x], v[y], v[w], v[h]);
     return 0;
 }
 
 RB_WRAP(lcd_mono_bitmap)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
-    int x, y, width, height;
-    get_rect_bounds(L, 2, &x, &y, &width, &height);
+    enum {x = 0, y, w, h, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 2, eCNT);
 
-    RB_SCREENS(L, 6, mono_bitmap, (const unsigned char *)src->data, x, y, width, height);
+    RB_SCREENS(L, 6, mono_bitmap, (const unsigned char *)src->data,
+                                                        v[x], v[y], v[w], v[h]);
     return 0;
 }
 
@@ -1443,23 +1440,23 @@ RB_WRAP(lcd_mono_bitmap)
 RB_WRAP(lcd_bitmap_part)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
-    int src_x = luaL_checkint(L, 2);
-    int src_y = luaL_checkint(L, 3);
-    int stride = luaL_checkint(L, 4);
-    int x, y, width, height;
-    get_rect_bounds(L, 5, &x, &y, &width, &height);
+    enum {src_x = 0, src_y, stride, x, y, w, h, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 2, eCNT);
 
-    RB_SCREENS(L, 9, bitmap_part, src->data, src_x, src_y, stride, x, y, width, height);
+    RB_SCREENS(L, 9, bitmap_part, src->data,
+               v[src_x], v[src_y], v[stride], v[x], v[y], v[w], v[h]);
     return 0;
 }
 
 RB_WRAP(lcd_bitmap)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
-    int x, y, width, height;
-    get_rect_bounds(L, 2, &x, &y, &width, &height);
+    enum {x = 0, y, w, h, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 2, eCNT);
 
-    RB_SCREENS(L, 6, bitmap, src->data, x, y, width, height);
+    RB_SCREENS(L, 6, bitmap, src->data, v[x], v[y], v[w], v[h]);
     return 0;
 }
 
@@ -1501,82 +1498,117 @@ RB_WRAP(lcd_get_background)
     lua_pushinteger(L, result);
     return 1;
 }
-
 #endif /* LCD_DEPTH > 1 */
+
+#if (LCD_DEPTH < 4) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
+RB_WRAP(lcd_blit_grey_phase)
+{
+    /* note that by and bheight are in 8-pixel units! */
+    unsigned char * values = (unsigned char *) luaL_checkstring(L, 1);
+    unsigned char * phases = (unsigned char *) luaL_checkstring(L, 2);
+    enum {bx = 0, by, bw, bh, stride, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 3, eCNT);
+
+    rb->lcd_blit_grey_phase(values, phases, v[bx], v[by], v[bw], v[bh], v[stride]);
+    return 0;
+}
+
+RB_WRAP(lcd_blit_mono)
+{
+    /* note that by and bheight are in 8-pixel units! */
+    const unsigned char * data = (const unsigned char *) luaL_checkstring(L, 1);
+    enum {x = 0, by, w, bh, stride, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 3, eCNT);
+
+    rb->lcd_blit_mono(data, v[x], v[by], v[w], v[bh], v[stride]);
+    return 0;
+}
+#endif /* LCD_DEPTH < 4 && CONFIG_PLATFORM & PLATFORM_NATIVE */
 
 #if LCD_DEPTH == 16
 RB_WRAP(lcd_bitmap_transparent_part)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
-    int src_x = luaL_checkint(L, 2);
-    int src_y = luaL_checkint(L, 3);
-    int stride = luaL_checkint(L, 4);
-    int x, y, width, height;
-    get_rect_bounds(L, 5, &x, &y, &width, &height);
+    enum {src_x = 0, src_y, stride, x, y, w, h, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 2, eCNT);
 
-    RB_SCREENS(L, 9, transparent_bitmap_part, src->data, src_x,
-                                              src_y, stride, x, y, width, height);
+    RB_SCREENS(L, 9, transparent_bitmap_part, src->data, 
+              v[src_x], v[src_y], v[stride], v[x], v[y], v[w], v[h]);
     return 0;
 }
 
 RB_WRAP(lcd_bitmap_transparent)
 {
     struct rocklua_image *src = rli_checktype(L, 1);
-    int x, y, width, height;
-    get_rect_bounds(L, 2, &x, &y, &width, &height);
+    enum {x = 0, y, w, h, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 2, eCNT);
 
-    RB_SCREENS(L, 6, transparent_bitmap, src->data, x, y, width, height);
+    RB_SCREENS(L, 6, transparent_bitmap, src->data, v[x], v[y], v[w], v[h]);
     return 0;
 }
 #endif /* LCD_DEPTH == 16 */
 
 RB_WRAP(lcd_update_rect)
 {
-    int x, y, width, height;
-    get_rect_bounds(L, 1, &x, &y, &width, &height);
-    RB_SCREENS(L, 5, update_rect, x, y, width, height);
+    enum {x = 0, y, w, h, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 1, eCNT);
+
+    RB_SCREENS(L, 5, update_rect, v[x], v[y], v[w], v[h]);
     return 0;
 }
 
 RB_WRAP(lcd_drawrect)
 {
-    int x, y, width, height;
-    get_rect_bounds(L, 1, &x, &y, &width, &height);
-    RB_SCREENS(L, 5, drawrect, x, y, width, height);
+    enum {x = 0, y, w, h, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 1, eCNT);
+
+    RB_SCREENS(L, 5, drawrect, v[x], v[y], v[w], v[h]);
     return 0;
 }
 
 RB_WRAP(lcd_fillrect)
 {
-    int x, y, width, height;
-    get_rect_bounds(L, 1, &x, &y, &width, &height);
-    RB_SCREENS(L, 5, fillrect, x, y, width, height);
+    enum {x = 0, y, w, h, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 1, eCNT);
+
+    RB_SCREENS(L, 5, fillrect, v[x], v[y], v[w], v[h]);
     return 0;
 }
 
 RB_WRAP(lcd_drawline)
 {
-    int x1, y1, x2, y2;
-    get_rect_bounds(L, 1, &x1, &y1, &x2, &y2);
-    RB_SCREENS(L, 5, drawline, x1, y1, x2, y2);
+    enum {x1 = 0, y1, x2, y2, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 1, eCNT);
+
+    RB_SCREENS(L, 5, drawline, v[x1], v[y1], v[x2], v[y2]);
     return 0;
 }
 
 RB_WRAP(lcd_hline)
 {
-    int x1 = (int) luaL_checkint(L, 1);
-    int x2 = (int) luaL_checkint(L, 2);
-    int y = (int) luaL_checkint(L, 3);
-    RB_SCREENS(L, 4, hline, x1, x2, y);
+    enum {x1 = 0, x2, y, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 1, eCNT);
+
+    RB_SCREENS(L, 4, hline, v[x1], v[x2], v[y]);
     return 0;
 }
 
 RB_WRAP(lcd_vline)
 {
-    int x = (int) luaL_checkint(L, 1);
-    int y1 = (int) luaL_checkint(L, 2);
-    int y2 = (int) luaL_checkint(L, 3);
-    RB_SCREENS(L, 4, vline, x, y1, y2);
+    enum {x = 0, y1, y2, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 1, eCNT);
+
+    RB_SCREENS(L, 4, vline, v[x], v[y1], v[y2]);
     return 0;
 }
 
@@ -1593,10 +1625,11 @@ RB_WRAP(lcd_drawpixel)
 #ifdef HAVE_LCD_COLOR
 RB_WRAP(lcd_rgbpack)
 {
-    int r = luaL_checkint(L, 1);
-    int g = luaL_checkint(L, 2);
-    int b = luaL_checkint(L, 3);
-    int result = LCD_RGBPACK(r, g, b);
+    enum {r = 0, g, b, eCNT};
+    int v[eCNT];
+    checkint_arr(L, v, 1, eCNT);
+
+    int result = LCD_RGBPACK(v[r], v[g], v[b]);
     lua_pushinteger(L, result);
     return 1;
 }
@@ -1671,7 +1704,11 @@ static const luaL_Reg rocklib_img[] =
     R(lcd_get_foreground),
     R(lcd_set_background),
     R(lcd_get_background),
-#endif
+#endif /* LCD_DEPTH > 1 */
+#if (LCD_DEPTH < 4) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
+    R(lcd_blit_grey_phase),
+    R(lcd_blit_mono),
+#endif /* LCD_DEPTH < 4 && CONFIG_PLATFORM & PLATFORM_NATIVE */
 #if LCD_DEPTH == 16
     R(lcd_bitmap_transparent_part),
     R(lcd_bitmap_transparent),
