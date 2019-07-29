@@ -39,6 +39,9 @@
 /*Allows split screen jump and makes pacman invincible if you start at 18 credits (for testing purposes)*/
 //#define CHEATS 1
 
+/* Enable AI on all targets */
+#define AI 1
+
 struct pacman_settings {
     int difficulty;
     int numlives;
@@ -632,7 +635,9 @@ static int gameProc( void )
     long end_time;
     int frame_counter = 0;
     int yield_counter = 0;
+#ifdef AI
     unsigned char turn = 250;
+#endif
 
     if (settings.sound)
         start_sound();
