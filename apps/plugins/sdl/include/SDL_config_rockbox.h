@@ -203,6 +203,7 @@ int mkdir_wrapepr(const char *path);
 int printf_wrapper(const char*, ...);
 int sprintf_wrapper(char*, const char*, ...);
 int vprintf(const char *fmt, va_list ap);
+int fscanf_wrapper(FILE *f, const char *fmt, ...);
 void fatal(char *fmt, ...);
 void rb_exit(int rc);
 void rbsdl_atexit(void (*)(void));
