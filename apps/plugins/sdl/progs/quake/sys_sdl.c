@@ -168,13 +168,19 @@ static int Qfilelength (FILE *f)
 }
 
 #define CACHE_THRESHOLD (1024*1024)
+#define CACHE_ENABLE
 
 /* really rough guesses */
+
+#ifdef CACHE_ENABLE
 #if MEMORYSIZE >= 64
 #define MAX_CACHE (32*1024*1024)
 #elif MEMORYSIZE >= 32
 #define MAX_CACHE (20*1024*1024)
-#else
+#endif
+#endif
+
+#ifndef MAX_CACHE
 #define MAX_CACHE 0
 #endif
 
@@ -221,6 +227,8 @@ int Sys_FileOpenRead (char *path, int *hndl)
             }
         }
     }
+
+    return len;
 }
 
 int Sys_FileOpenWrite (char *path)
