@@ -1614,6 +1614,9 @@ byte *COM_LoadFile (char *path, int usehunk)
 	if (h == -1)
 		return NULL;
 
+        if(len < 1)
+            rb->splashf(HZ, "suspicious length %d", len);
+
         check_ptr = &h;
         
         //printf("handle %d", h);
@@ -1635,9 +1638,15 @@ byte *COM_LoadFile (char *path, int usehunk)
 	else if (usehunk == 4)
 	{
 		if (len+1 > loadsize)
+                {
+                    LOGF("LoadFile: allocating hunk b/c stackbuf too small (filelen=%d)\n", len);
 			buf = Hunk_TempAlloc (len+1);
+                }
 		else
+                {
+                    LOGF("filelen=%d, using stack buf\n", len);
 			buf = loadbuf;
+                }
 	}
 	else
 		Sys_Error ("COM_LoadFile: bad usehunk");
@@ -1671,16 +1680,34 @@ void COM_LoadCacheFile (char *path, struct cache_user_s *cu)
 	COM_LoadFile (path, 3);
 }
 
+/*
+ * This function was NOT originally thread-safe, leading to a race
+ * condition between the Mod_LoadModel and S_LoadSound (which run in
+ * different threads). Fixed with mutex lock. - FW 7/29/19
+ */
+
 // uses temp hunk if larger than bufsize
 byte *COM_LoadStackFile (char *path, void *buffer, int bufsize)
 {
-	byte    *buf;
-	
-	loadbuf = (byte *)buffer;
-	loadsize = bufsize;
-	buf = COM_LoadFile (path, 4);
-	
-	return buf;
+    static struct mutex m;
+    static int init = 0;
+    if(!init)
+    {
+        rb->mutex_init(&m);
+        init = 1;
+    }
+
+    rb->mutex_lock(&m);
+
+    byte    *buf;
+
+    loadbuf = (byte *)buffer;
+    loadsize = bufsize;
+    buf = COM_LoadFile (path, 4);
+
+    rb->mutex_unlock(&m);
+
+    return buf;
 }
 
 /*
