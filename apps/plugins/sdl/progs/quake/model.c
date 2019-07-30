@@ -1472,8 +1472,11 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 
 	version = LittleLongUnaligned (pinmodel->version);
 	if (version != ALIAS_VERSION)
+        {
+            rb->splashf(HZ*2, "Likely race condition! S_LoadSound and this use the same allocator!");
 		Sys_Error ("%s has wrong version number (%i should be %i)",
 				 mod->name, version, ALIAS_VERSION);
+        }
 
 //
 // allocate space for a working header, plus all the data except the frames,
