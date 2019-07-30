@@ -105,6 +105,7 @@ enum variables {
     var_format,
     menu_next,
     menu_load,
+    menu_reload,
 };
 
 /* Capacity 10 000 entries (for example 10k different artists) */
@@ -114,6 +115,7 @@ static long uniqbuf[UNIQBUF_SIZE / sizeof(long)];
 #define MAX_TAGS 5
 #define MAX_MENU_ID_SIZE 32
 
+#define RELOAD_TAGTREE (-1024)
 static bool sort_inverse;
 
 /*
@@ -348,7 +350,8 @@ static int get_tag(int *tag)
         {"%root_menu", var_rootmenu},
         {"%format", var_format},
         {"->", menu_next},
-        {"==>", menu_load}
+        {"==>", menu_load},
+        {"%tagtree_reload", menu_reload}
     };
     char buf[128];
     unsigned int i;
@@ -1461,6 +1464,12 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             dptr->newtable = PLAYTRACK;
             dptr->extraseek = tcs.idx_id;
         }
+        else if (tag == menu_reload)
+        {
+                tagcache_search_finish(&tcs);
+                tree_unlock_cache(c);
+                return RELOAD_TAGTREE;
+        }
         else
             dptr->extraseek = tcs.result_seek;
 
@@ -1655,6 +1664,47 @@ static int load_root(struct tree_context *c)
     return i;
 }
 
+static void tagtree_unload(struct tree_context *c)
+{
+    int i;
+    tagtree_lock();
+    tree_lock_cache(c);
+
+    remove_event(PLAYBACK_EVENT_TRACK_BUFFER, tagtree_buffer_event);
+    remove_event(PLAYBACK_EVENT_TRACK_FINISH, tagtree_track_finish_event);
+
+    struct tagentry *dptr = core_get_data(c->cache.entries_handle);
+    menu = menus[c->currextra];
+    if (menu == NULL)
+    {
+        splash(100, "ERR!");
+        return;
+    }
+
+    for (i = 0; i < menu->itemcount; i++)
+    {
+        dptr->name = NULL;
+        dptr->newtable = 0;
+        dptr->extraseek = 0;
+        dptr++;
+    }
+
+    for (i = 0; i < menu_count; i++)
+        menus[i] = NULL;
+    menu_count = 0;
+
+    for (i = 0; i < format_count; i++)
+        formats[i] = NULL;
+    format_count = 0;
+
+    core_free(tagtree_handle);
+    tagtree_buf_used = 0;
+
+    tree_unlock_cache(c);
+    tagtree_unlock();
+    tagtree_unlock();/* second unlock to enable re-init */
+}
+
 int tagtree_load(struct tree_context* c)
 {
     int count;
@@ -1691,9 +1741,16 @@ int tagtree_load(struct tree_context* c)
 
     if (count < 0)
     {
+        if (count != RELOAD_TAGTREE)
+            splash(HZ, str(LANG_TAGCACHE_BUSY));
+        else
+        {
+            splash(HZ, str(LANG_TAGCACHE_FORCE_UPDATE));
+            tagtree_unload(c);
+            tagtree_init();
+        }
         c->dirlevel = 0;
         count = load_root(c);
-        splash(HZ, str(LANG_TAGCACHE_BUSY));
     }
 
     /* The _total_ numer of entries available. */
