@@ -105,6 +105,7 @@ enum variables {
     var_format,
     menu_next,
     menu_load,
+    menu_reload,
 };
 
 /* Capacity 10 000 entries (for example 10k different artists) */
@@ -114,6 +115,7 @@ static long uniqbuf[UNIQBUF_SIZE / sizeof(long)];
 #define MAX_TAGS 5
 #define MAX_MENU_ID_SIZE 32
 
+#define RELOAD_TAGTREE (-1024)
 static bool sort_inverse;
 
 /*
@@ -264,8 +266,12 @@ static struct buflib_callbacks ops = {
 
 static void* tagtree_alloc(size_t size)
 {
-    char* buf = core_get_data(tagtree_handle) + tagtree_buf_used;
     size = ALIGN_UP(size, sizeof(void*));
+    if (size > (tagtree_bufsize - tagtree_buf_used))
+        return NULL;
+
+    char* buf = core_get_data(tagtree_handle) + tagtree_buf_used;
+
     tagtree_buf_used += size;
     return buf;
 }
@@ -273,7 +279,8 @@ static void* tagtree_alloc(size_t size)
 static void* tagtree_alloc0(size_t size)
 {
     void* ret = tagtree_alloc(size);
-    memset(ret, 0, size);
+    if (ret)
+        memset(ret, 0, size);
     return ret;
 }
 
@@ -281,7 +288,8 @@ static char* tagtree_strdup(const char* buf)
 {
     size_t len = strlen(buf) + 1;
     char* dest = tagtree_alloc(len);
-    strcpy(dest, buf);
+    if (dest)
+        strcpy(dest, buf);
     return dest;
 }
 
@@ -348,7 +356,8 @@ static int get_tag(int *tag)
         {"%root_menu", var_rootmenu},
         {"%format", var_format},
         {"->", menu_next},
-        {"==>", menu_load}
+        {"==>", menu_load},
+        {"%reload", menu_reload}
     };
     char buf[128];
     unsigned int i;
@@ -467,7 +476,12 @@ static bool read_clause(struct tagcache_search_clause *clause)
         clause->str = tagtree_strdup(buf);
     }
 
-    if (TAGCACHE_IS_NUMERIC(clause->tag))
+    if (!clause->str)
+    {
+        logf("tagtree failed to allocate %s", "clause string");
+        return false;
+    }
+    else if (TAGCACHE_IS_NUMERIC(clause->tag))
     {
         clause->numeric = true;
         clause->numeric_data = atoi(clause->str);
@@ -581,11 +595,16 @@ static int add_format(const char *buf)
 
     if (formats[format_count] == NULL)
         formats[format_count] = tagtree_alloc0(sizeof(struct display_format));
-
+    if (!formats[format_count])
+    {
+        logf("tagtree failed to allocate %s", "format string");
+        return -2;
+    }
     if (get_format_str(formats[format_count]) < 0)
     {
         logf("get_format_str() parser failed!");
-        memset(formats[format_count], 0, sizeof(struct display_format));
+        if (formats[format_count])
+            memset(formats[format_count], 0, sizeof(struct display_format));
         return -4;
     }
 
@@ -600,7 +619,7 @@ static int add_format(const char *buf)
         tagtree_lock();
         while (1)
         {
-            struct tagcache_search_clause *newclause;
+            struct tagcache_search_clause *new_clause;
 
             if (clause_count >= TAGCACHE_MAX_CLAUSES)
             {
@@ -608,10 +627,14 @@ static int add_format(const char *buf)
                 break;
             }
 
-            newclause = tagtree_alloc(sizeof(struct tagcache_search_clause));
-
-            formats[format_count]->clause[clause_count] = newclause;
-            if (!read_clause(newclause))
+            new_clause = tagtree_alloc(sizeof(struct tagcache_search_clause));
+            if (!new_clause)
+            {
+                logf("tagtree failed to allocate %s", "search clause");
+                return -3;
+            }
+            formats[format_count]->clause[clause_count] = new_clause;
+            if (!read_clause(new_clause))
                 break;
 
             clause_count++;
@@ -670,10 +693,16 @@ static int get_condition(struct search_instruction *inst)
     if (clause_count >= TAGCACHE_MAX_CLAUSES)
     {
         logf("Too many clauses");
-        return false;
+        return -2;
     }
 
     new_clause = tagtree_alloc(sizeof(struct tagcache_search_clause));
+    if (!new_clause)
+    {
+        logf("tagtree failed to allocate %s", "search clause");
+        return -3;
+    }
+
     inst->clause[inst->tagorder_count][clause_count] = new_clause;
 
     if (*strp == '|')
@@ -746,6 +775,11 @@ static bool parse_search(struct menu_entry *entry, const char *str)
 
         /* Allocate a new menu unless link is found. */
         menus[menu_count] = tagtree_alloc0(sizeof(struct menu_root));
+        if (!menus[menu_count])
+        {
+            logf("tagtree failed to allocate %s", "menu");
+            return false;
+        }
         strlcpy(menus[menu_count]->id, buf, MAX_MENU_ID_SIZE);
         entry->link = menu_count;
         ++menu_count;
@@ -1088,6 +1122,11 @@ static int parse_line(int n, char *buf, void *parameters)
                 if (menu == NULL)
                 {
                     menus[menu_count] = tagtree_alloc0(sizeof(struct menu_root));
+                    if (!menus[menu_count])
+                    {
+                        logf("tagtree failed to allocate %s", "menu");
+                        return -2;
+                    }
                     menu = menus[menu_count];
                     ++menu_count;
                     strlcpy(menu->id, data, MAX_MENU_ID_SIZE);
@@ -1135,7 +1174,11 @@ static int parse_line(int n, char *buf, void *parameters)
     /* Allocate */
     if (menu->items[menu->itemcount] == NULL)
         menu->items[menu->itemcount] = tagtree_alloc0(sizeof(struct menu_entry));
-
+    if (!menu->items[menu->itemcount])
+    {
+        logf("tagtree failed to allocate %s", "menu items");
+        return -2;
+    }
     tagtree_lock();
     if (parse_search(menu->items[menu->itemcount], buf))
         menu->itemcount++;
@@ -1148,6 +1191,7 @@ static bool parse_menu(const char *filename)
 {
     int fd;
     char buf[1024];
+    int rc;
 
     if (menu_count >= TAGMENU_MAX_MENUS)
     {
@@ -1163,10 +1207,58 @@ static bool parse_menu(const char *filename)
     }
 
     /* Now read file for real, parsing into si */
-    fast_readline(fd, buf, sizeof buf, NULL, parse_line);
+    rc = fast_readline(fd, buf, sizeof buf, NULL, parse_line);
     close(fd);
 
-    return true;
+    return (rc >= 0);
+}
+
+static void tagtree_unload(struct tree_context *c)
+{
+    int i;
+    tagtree_lock();
+
+    remove_event(PLAYBACK_EVENT_TRACK_BUFFER, tagtree_buffer_event);
+    remove_event(PLAYBACK_EVENT_TRACK_FINISH, tagtree_track_finish_event);
+
+    if (c)
+    {
+        tree_lock_cache(c);
+        struct tagentry *dptr = core_get_data(c->cache.entries_handle);
+        menu = menus[c->currextra];
+        if (!menu)
+        {
+            logf("tagtree menu doesn't exist");
+            return;
+        }
+
+        for (i = 0; i < menu->itemcount; i++)
+        {
+            dptr->name = NULL;
+            dptr->newtable = 0;
+            dptr->extraseek = 0;
+            dptr++;
+        }
+    }
+
+    for (i = 0; i < menu_count; i++)
+        menus[i] = NULL;
+    menu_count = 0;
+
+    for (i = 0; i < format_count; i++)
+        formats[i] = NULL;
+    format_count = 0;
+
+    core_free(tagtree_handle);
+    tagtree_handle   = 0;
+    tagtree_buf_used = 0;
+    tagtree_bufsize  = 0;
+
+    if (c)
+        tree_unlock_cache(c);
+    tagtree_unlock();
+    if (lock_count > 0)
+        tagtree_unlock();/* second unlock to enable re-init */
 }
 
 void tagtree_init(void)
@@ -1176,7 +1268,11 @@ void tagtree_init(void)
     menu = NULL;
     rootmenu = -1;
     tagtree_handle = core_alloc_maximum("tagtree", &tagtree_bufsize, &ops);
-    parse_menu(FILE_SEARCH_INSTRUCTIONS);
+    if (!parse_menu(FILE_SEARCH_INSTRUCTIONS))
+    {
+        tagtree_unload(NULL);
+        return;
+    }
 
     /* safety check since tree.c needs to cast tagentry to entry */
     if (sizeof(struct tagentry) != sizeof(struct entry))
@@ -1357,6 +1453,9 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     }
     else
         tag = csi->tagorder[level];
+
+    if (tag == menu_reload)
+        return RELOAD_TAGTREE;
 
     if (!tagcache_search(&tcs, tag))
         return -1;
@@ -1691,9 +1790,16 @@ int tagtree_load(struct tree_context* c)
 
     if (count < 0)
     {
+        if (count != RELOAD_TAGTREE)
+            splash(HZ, str(LANG_TAGCACHE_BUSY));
+        else /* unload and re-init tagtree */
+        {
+            splash(HZ, str(LANG_WAIT));
+            tagtree_unload(c);
+            tagtree_init();
+        }
         c->dirlevel = 0;
         count = load_root(c);
-        splash(HZ, str(LANG_TAGCACHE_BUSY));
     }
 
     /* The _total_ numer of entries available. */
