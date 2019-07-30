@@ -275,6 +275,9 @@ pushback:
 	// find out where the edge goes in the edge list
 		pwedge = pedge->prev->prev;
 
+                // BUG??? - FW 7/29/19
+                if(!pwedge || !pedge)
+                    rb->splashf(HZ, "BUG 1!!!!!");
 		while (pwedge->u > pedge->u)
 		{
 			pwedge = pwedge->prev;
