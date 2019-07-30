@@ -45,6 +45,8 @@ typedef struct
 void Cache_FreeLow (int new_low_hunk);
 void Cache_FreeHigh (int new_high_hunk);
 
+// prevent race conditions
+static struct mutex zone_mutex;
 
 /*
 ==============================================================================
@@ -73,6 +75,7 @@ Z_ClearZone
 */
 void Z_ClearZone (memzone_t *zone, int size)
 {
+        rb->mutex_lock(&zone_mutex);
 	memblock_t	*block;
 	
 // set the entire zone to one free block
@@ -88,6 +91,7 @@ void Z_ClearZone (memzone_t *zone, int size)
 	block->tag = 0;			// free block
 	block->id = ZONEID;
 	block->size = size - sizeof(memzone_t);
+        rb->mutex_unlock(&zone_mutex);
 }
 
 
@@ -98,6 +102,7 @@ Z_Free
 */
 void Z_Free (void *ptr)
 {
+        rb->mutex_lock(&zone_mutex);
 	memblock_t	*block, *other;
 	
 	if (!ptr)
@@ -131,6 +136,7 @@ void Z_Free (void *ptr)
 		if (other == mainzone->rover)
 			mainzone->rover = block;
 	}
+        rb->mutex_unlock(&zone_mutex);
 }
 
 
@@ -154,6 +160,7 @@ Z_CheckHeap ();	// DEBUG
 
 void *Z_TagMalloc (int size, int tag)
 {
+        rb->mutex_lock(&zone_mutex);
 	int		extra;
 	memblock_t	*start, *rover, *new, *base;
 
@@ -174,7 +181,10 @@ void *Z_TagMalloc (int size, int tag)
 	do
 	{
 		if (rover == start)	// scaned all the way around the list
+                {
+                    rb->mutex_unlock(&zone_mutex);
 			return NULL;
+                }
 		if (rover->tag)
 			base = rover = rover->next;
 		else
@@ -207,6 +217,7 @@ void *Z_TagMalloc (int size, int tag)
 // marker for memory trash testing
 	*(int *)((byte *)base + base->size - 4) = ZONEID;
 
+        rb->mutex_unlock(&zone_mutex);
 	return (void *) ((byte *)base + sizeof(memblock_t));
 }
 
@@ -218,6 +229,7 @@ Z_Print
 */
 void Z_Print (memzone_t *zone)
 {
+        rb->mutex_lock(&zone_mutex);
 	memblock_t	*block;
 	
 	Con_Printf ("zone size: %i  location: %p\n",mainzone->size,mainzone);
@@ -236,6 +248,7 @@ void Z_Print (memzone_t *zone)
 		if (!block->tag && !block->next->tag)
 			Con_Printf ("ERROR: two consecutive free blocks\n");
 	}
+        rb->mutex_unlock(&zone_mutex);
 }
 
 
@@ -246,6 +259,7 @@ Z_CheckHeap
 */
 void Z_CheckHeap (void)
 {
+        rb->mutex_lock(&zone_mutex);
 	memblock_t	*block;
 	
 	for (block = mainzone->blocklist.next ; ; block = block->next)
@@ -259,6 +273,7 @@ void Z_CheckHeap (void)
 		if (!block->tag && !block->next->tag)
 			Sys_Error ("Z_CheckHeap: two consecutive free blocks\n");
 	}
+        rb->mutex_unlock(&zone_mutex);
 }
 
 //============================================================================
@@ -292,6 +307,7 @@ Run consistancy and sentinal trahing checks
 */
 void Hunk_Check (void)
 {
+        rb->mutex_lock(&zone_mutex);
 	hunk_t	*h;
 	
 	for (h = (hunk_t *)hunk_base ; (byte *)h != hunk_base + hunk_low_used ; )
@@ -302,6 +318,7 @@ void Hunk_Check (void)
 			Sys_Error ("Hunk_Check: bad size");
 		h = (hunk_t *)((byte *)h+h->size);
 	}
+        rb->mutex_unlock(&zone_mutex);
 }
 
 /*
@@ -314,6 +331,7 @@ Otherwise, allocations with the same name will be totaled up before printing.
 */
 void Hunk_Print (qboolean all)
 {
+        rb->mutex_lock(&zone_mutex);
 	hunk_t	*h, *next, *endlow, *starthigh, *endhigh;
 	int		count, sum;
 	int		totalblocks;
@@ -388,7 +406,7 @@ void Hunk_Print (qboolean all)
 
 	Con_Printf ("-------------------------\n");
 	Con_Printf ("%8i total blocks\n", totalblocks);
-	
+        rb->mutex_unlock(&zone_mutex);
 }
 
 /*
@@ -398,6 +416,7 @@ Hunk_AllocName
 */
 void *Hunk_AllocName (int size, char *name)
 {
+        rb->mutex_lock(&zone_mutex);
 	hunk_t	*h;
 	
 #ifdef PARANOID
@@ -423,6 +442,7 @@ void *Hunk_AllocName (int size, char *name)
 	h->sentinal = HUNK_SENTINAL;
 	Q_strncpy (h->name, name, 8);
 	
+        rb->mutex_unlock(&zone_mutex);
 	return (void *)(h+1);
 }
 
@@ -438,30 +458,39 @@ void *Hunk_Alloc (int size)
 
 int	Hunk_LowMark (void)
 {
-	return hunk_low_used;
+        rb->mutex_lock(&zone_mutex);
+	int x = hunk_low_used;
+        rb->mutex_unlock(&zone_mutex);
+        return x;
 }
 
 void Hunk_FreeToLowMark (int mark)
 {
+        rb->mutex_lock(&zone_mutex);
 	if (mark < 0 || mark > hunk_low_used)
 		Sys_Error ("Hunk_FreeToLowMark: bad mark %i", mark);
 	memset (hunk_base + mark, 0, hunk_low_used - mark);
 	hunk_low_used = mark;
+        rb->mutex_unlock(&zone_mutex);
 }
 
 int	Hunk_HighMark (void)
 {
+        rb->mutex_lock(&zone_mutex);
 	if (hunk_tempactive)
 	{
 		hunk_tempactive = false;
 		Hunk_FreeToHighMark (hunk_tempmark);
 	}
 
-	return hunk_high_used;
+	int x = hunk_high_used;
+        rb->mutex_unlock(&zone_mutex);
+        return x;
 }
 
 void Hunk_FreeToHighMark (int mark)
 {
+        rb->mutex_lock(&zone_mutex);
 	if (hunk_tempactive)
 	{
 		hunk_tempactive = false;
@@ -471,6 +500,7 @@ void Hunk_FreeToHighMark (int mark)
 		Sys_Error ("Hunk_FreeToHighMark: bad mark %i", mark);
 	memset (hunk_base + hunk_size - hunk_high_used, 0, hunk_high_used - mark);
 	hunk_high_used = mark;
+        rb->mutex_unlock(&zone_mutex);
 }
 
 
@@ -481,6 +511,7 @@ Hunk_HighAllocName
 */
 void *Hunk_HighAllocName (int size, char *name)
 {
+        rb->mutex_lock(&zone_mutex);
 	hunk_t	*h;
 
 	if (size < 0)
@@ -501,6 +532,7 @@ void *Hunk_HighAllocName (int size, char *name)
 	if (hunk_size - hunk_low_used - hunk_high_used < size)
 	{
 		Con_Printf ("Hunk_HighAlloc: failed on %i bytes\n",size);
+                rb->mutex_unlock(&zone_mutex);
 		return NULL;
 	}
 
@@ -514,6 +546,7 @@ void *Hunk_HighAllocName (int size, char *name)
 	h->sentinal = HUNK_SENTINAL;
 	Q_strncpy (h->name, name, 8);
 
+        rb->mutex_unlock(&zone_mutex);
 	return (void *)(h+1);
 }
 
@@ -527,6 +560,7 @@ Return space from the top of the hunk
 */
 void *Hunk_TempAlloc (int size)
 {
+        rb->mutex_lock(&zone_mutex);
 	void	*buf;
 
 	size = (size+15)&~15;
@@ -543,6 +577,7 @@ void *Hunk_TempAlloc (int size)
 
 	hunk_tempactive = true;
 
+        rb->mutex_unlock(&zone_mutex);
 	return buf;
 }
 
@@ -574,6 +609,7 @@ Cache_Move
 */
 void Cache_Move ( cache_system_t *c)
 {
+        rb->mutex_lock(&zone_mutex);
 	cache_system_t		*new;
 
 // we are clearing up space at the bottom, so only allocate it late
@@ -594,6 +630,7 @@ void Cache_Move ( cache_system_t *c)
 
 		Cache_Free (c->user);		// tough luck...
 	}
+        rb->mutex_unlock(&zone_mutex);
 }
 
 /*
@@ -605,15 +642,22 @@ Throw things out until the hunk can be expanded to the given point
 */
 void Cache_FreeLow (int new_low_hunk)
 {
+        rb->mutex_lock(&zone_mutex);
 	cache_system_t	*c;
 	
 	while (1)
 	{
 		c = cache_head.next;
 		if (c == &cache_head)
+                {
+                        rb->mutex_unlock(&zone_mutex);
 			return;		// nothing in cache at all
+                }
 		if ((byte *)c >= hunk_base + new_low_hunk)
+                {
+                        rb->mutex_unlock(&zone_mutex);
 			return;		// there is space to grow the hunk
+                }
 		Cache_Move ( c );	// reclaim the space
 	}
 }
@@ -627,6 +671,7 @@ Throw things out until the hunk can be expanded to the given point
 */
 void Cache_FreeHigh (int new_high_hunk)
 {
+        rb->mutex_lock(&zone_mutex);
 	cache_system_t	*c, *prev;
 	
 	prev = NULL;
@@ -634,9 +679,15 @@ void Cache_FreeHigh (int new_high_hunk)
 	{
 		c = cache_head.prev;
 		if (c == &cache_head)
+                {
+                        rb->mutex_unlock(&zone_mutex);
 			return;		// nothing in cache at all
+                }
 		if ( (byte *)c + c->size <= hunk_base + hunk_size - new_high_hunk)
+                {
+                        rb->mutex_unlock(&zone_mutex);
 			return;		// there is space to grow the hunk
+                }
 		if (c == prev)
 			Cache_Free (c->user);	// didn't move out of the way
 		else
@@ -649,6 +700,7 @@ void Cache_FreeHigh (int new_high_hunk)
 
 void Cache_UnlinkLRU (cache_system_t *cs)
 {
+        rb->mutex_lock(&zone_mutex);
 	if (!cs->lru_next || !cs->lru_prev)
 		Sys_Error ("Cache_UnlinkLRU: NULL link");
 
@@ -656,10 +708,12 @@ void Cache_UnlinkLRU (cache_system_t *cs)
 	cs->lru_prev->lru_next = cs->lru_next;
 	
 	cs->lru_prev = cs->lru_next = NULL;
+        rb->mutex_unlock(&zone_mutex);
 }
 
 void Cache_MakeLRU (cache_system_t *cs)
 {
+        rb->mutex_lock(&zone_mutex);
 	if (cs->lru_next || cs->lru_prev)
 		Sys_Error ("Cache_MakeLRU: active link");
 
@@ -667,6 +721,7 @@ void Cache_MakeLRU (cache_system_t *cs)
 	cs->lru_next = cache_head.lru_next;
 	cs->lru_prev = &cache_head;
 	cache_head.lru_next = cs;
+        rb->mutex_unlock(&zone_mutex);
 }
 
 /*
@@ -679,6 +734,7 @@ Size should already include the header and padding
 */
 cache_system_t *Cache_TryAlloc (int size, qboolean nobottom)
 {
+        rb->mutex_lock(&zone_mutex);
 	cache_system_t	*cs, *new;
 	
 // is the cache completely empty?
@@ -696,6 +752,7 @@ cache_system_t *Cache_TryAlloc (int size, qboolean nobottom)
 		new->prev = new->next = &cache_head;
 		
 		Cache_MakeLRU (new);
+                rb->mutex_unlock(&zone_mutex);
 		return new;
 	}
 	
@@ -720,6 +777,7 @@ cache_system_t *Cache_TryAlloc (int size, qboolean nobottom)
 				
 				Cache_MakeLRU (new);
 	
+                                rb->mutex_unlock(&zone_mutex);
 				return new;
 			}
 		}
@@ -743,9 +801,11 @@ cache_system_t *Cache_TryAlloc (int size, qboolean nobottom)
 		
 		Cache_MakeLRU (new);
 
+                rb->mutex_unlock(&zone_mutex);
 		return new;
 	}
 	
+        rb->mutex_unlock(&zone_mutex);
 	return NULL;		// couldn't allocate
 }
 
@@ -758,8 +818,10 @@ Throw everything out, so new data will be demand cached
 */
 void Cache_Flush (void)
 {
+        rb->mutex_lock(&zone_mutex);
 	while (cache_head.next != &cache_head)
 		Cache_Free ( cache_head.next->user );	// reclaim the space
+        rb->mutex_unlock(&zone_mutex);
 }
 
 
@@ -823,6 +885,7 @@ Frees the memory and removes it from the LRU list
 */
 void Cache_Free (cache_user_t *c)
 {
+        rb->mutex_lock(&zone_mutex);
 	cache_system_t	*cs;
 
 	if (!c->data)
@@ -837,6 +900,7 @@ void Cache_Free (cache_user_t *c)
 	c->data = NULL;
 
 	Cache_UnlinkLRU (cs);
+        rb->mutex_unlock(&zone_mutex);
 }
 
 
@@ -848,10 +912,14 @@ Cache_Check
 */
 void *Cache_Check (cache_user_t *c)
 {
+        rb->mutex_lock(&zone_mutex);
 	cache_system_t	*cs;
 
 	if (!c->data)
+        {
+            rb->mutex_unlock(&zone_mutex);
 		return NULL;
+        }
 
 	cs = ((cache_system_t *)c->data) - 1;
 
@@ -859,6 +927,7 @@ void *Cache_Check (cache_user_t *c)
 	Cache_UnlinkLRU (cs);
 	Cache_MakeLRU (cs);
 	
+        rb->mutex_unlock(&zone_mutex);
 	return c->data;
 }
 
@@ -870,6 +939,8 @@ Cache_Alloc
 */
 void *Cache_Alloc (cache_user_t *c, int size, char *name)
 {
+        rb->mutex_lock(&zone_mutex);
+    
 	cache_system_t	*cs;
 
 	if (c->data)
@@ -899,6 +970,7 @@ void *Cache_Alloc (cache_user_t *c, int size, char *name)
 		Cache_Free ( cache_head.lru_prev->user );
 	} 
 	
+        rb->mutex_unlock(&zone_mutex);
 	return Cache_Check (c);
 }
 
@@ -912,6 +984,8 @@ Memory_Init
 */
 void Memory_Init (void *buf, int size)
 {
+    rb->mutex_init(&zone_mutex);
+    
 	int p;
 	int zonesize = DYNAMIC_SIZE;
 
