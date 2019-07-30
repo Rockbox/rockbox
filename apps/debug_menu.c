@@ -558,7 +558,7 @@ static const char* dbg_partitions_getname(int selected_item, void *data,
 static bool dbg_partitions(void)
 {
     struct simplelist_info info;
-    simplelist_info_init(&info, "Partition Info", 4, NULL);
+    simplelist_info_init(&info, "Partition Info", NUM_DRIVES * 4, NULL);
     info.selection_size = 2;
     info.hide_selection = true;
     info.scroll_all = true;
