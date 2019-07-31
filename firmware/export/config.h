@@ -874,12 +874,6 @@ Lyre prototype 1 */
 #define CONFIG_STORAGE_MULTI
 #endif
 
-/* Explicit HAVE_MULTIVOLUME in the config file. Allow the maximum number */
-#ifdef HAVE_MULTIVOLUME
-#define NUM_VOLUMES_PER_DRIVE 4
-#else
-#define NUM_VOLUMES_PER_DRIVE 1
-#endif
 #if defined(CONFIG_STORAGE_MULTI) && !defined(HAVE_MULTIDRIVE)
 #define HAVE_MULTIDRIVE
 #endif
@@ -890,6 +884,12 @@ Lyre prototype 1 */
 
 #if defined(HAVE_MULTIDRIVE) && !defined(NUM_DRIVES)
 #error HAVE_MULTIDRIVE needs to have an explicit NUM_DRIVES
+#endif
+
+#ifdef HAVE_MULTIVOLUME
+#define NUM_VOLUMES_PER_DRIVE 4
+#else
+#define NUM_VOLUMES_PER_DRIVE 1
 #endif
 
 /* note to remove multi-partition booting this could be changed to MULTIDRIVE */
