@@ -138,6 +138,7 @@
 #define CONFIG_STORAGE STORAGE_SD
 #define NUM_DRIVES 2
 #define HAVE_MULTIDRIVE
+#define HAVE_MULTIVOLUME
 #define HAVE_HOTSWAP
 
 /* todo */
