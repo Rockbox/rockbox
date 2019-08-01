@@ -59,9 +59,6 @@
 /* define this if you can invert the colours on your LCD */
 //#define HAVE_LCD_INVERT
 
-/* LCD stays visible without backlight - simulator hint */
-#define HAVE_TRANSFLECTIVE_LCD
-
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 
