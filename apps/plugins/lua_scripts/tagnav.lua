@@ -1,4 +1,26 @@
--- BILGUS 2018
+-- tagnav.lua BILGUS 2018
+--[[
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2018 William Wilgus
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+]]
 
 --local scrpath = rb.current_path()"
 
@@ -18,10 +40,12 @@ local sERRORMENUENTRY = "Error finding menu entry"
 local sBLANKLINE = "##sBLANKLINE##"
 local sDEFAULTMENU = "customfilter"
 
-local sFILEOUT    = "/.rockbox/tagnavi_custom.config"
-local sFILEHEADER = "#! rockbox/tagbrowser/2.0"
-local sMENUSTART  = "%menu_start \"custom\" \"Database\""
-local sMENUTITLE  = "title = \"fmt_title\""
+local sFILEOUT       = "/.rockbox/tagnavi_custom.config"
+local sFILEHEADER    = "#! rockbox/tagbrowser/2.0"
+local sMENUSTART     = "%menu_start \"custom\" \"Database\""
+local sMENUTITLE     = "title = \"fmt_title\""
+local sRELOADSEARCH  = "^\"Reload\.\.\.\"%s*%->.+"
+local sRELOADMENU    = "\"Reload...\" -> %reload"
 
 local TAG_ARTIST, TAG_ALBARTIST, TAG_ALBUM, TAG_GENRE, TAG_COMPOSER = 1, 2, 3, 4, 5
 local ts_TAGTYPE = {"Artist", "AlbumArtist", "Album", "Genre", "Composer"}
@@ -121,7 +145,7 @@ local function savedata(filename, ts_tags, cond, menuname)
         if rb.file_exists(filename) ~= true then
             lines_next(sFILEHEADER)
             lines_next("#")
-            lines_next("# MAIN MENU")
+            lines_next("# CUSTOM MENU")
             lines_next(sMENUSTART)
         else
             local file = io.open(filename, "r") -- read
@@ -130,6 +154,7 @@ local function savedata(filename, ts_tags, cond, menuname)
                 return
             end
 
+            -- copy all existing lines to table we will overwrite existing file
             for line in file:lines() do
                 lines_next(line)
             end
@@ -144,17 +169,22 @@ local function savedata(filename, ts_tags, cond, menuname)
 
         replaceemptylines(lines, sBLANKLINE, menupos)
 
+        -- remove reload menu, we will add it at the end
+        replacelines(lines, sRELOADSEARCH, sBLANKLINE)
+
         local existmenupos = checkexistingmenu(lines, menuname)
         if existmenupos and existmenupos < 1 then return end -- user canceled
 
         local lastcond = ""
         local n_cond = COND_OR
         local tags, tagtype
+        local tagpos = 0
 
         local function buildtag(e_tagtype)
             if ts_tags[e_tagtype] then
+                tagpos = tagpos + 1
                 n_cond = (cond[e_tagtype] or COND_OR)
-                if e_tagtype > 1 then
+                if tagpos > 1 then
                     lines_append(" " .. ts_CONDSYMBOLS[n_cond])
                 end
                 tags = ts_tags[e_tagtype]
@@ -183,10 +213,12 @@ local function savedata(filename, ts_tags, cond, menuname)
             buildtag(TAG_ALBUM)
             buildtag(TAG_GENRE)
             buildtag(TAG_COMPOSER)
+            -- add reload menu
+            lines_next(sRELOADMENU .. "\n")
 
-            lines_next("\n")
         else
             rb.splash(rb.HZ, "Nothing to save")
+            return
         end
 
         local file = io.open(filename, "w+") -- overwrite
@@ -219,7 +251,7 @@ local function print_tags(ftable, settings, t_selected)
 
     if not settings then
         settings = {}
-        settings.justify = "center"
+        settings.justify = "left"
         settings.wrap = true
         settings.msel = true
     end
@@ -249,7 +281,7 @@ end -- print_tags
 -- uses print_table to display a menu
 function main_menu()
     local menuname = sDEFAULTMENU
-    local t_tags
+    local t_tags = {}
     local ts_tags = {}
     local cond = {}
     local sel = {}
@@ -265,8 +297,9 @@ function main_menu()
                 [9] = ts_TAGTYPE[TAG_GENRE],
                 [10] = ts_CONDITIONALS[cond[TAG_COMPOSER] or COND_OR],
                 [11] = ts_TAGTYPE[TAG_COMPOSER],
-                [12] = "Save to Tagnav",
-                [13] = "Exit"
+                [12] = "",
+                [13] = "Save to Tagnav",
+                [14] = "Exit"
                 }
 
     local function sel_cond(item, item_mt)
@@ -277,7 +310,7 @@ function main_menu()
     end
 
     local function sel_tag(item, item_mt, t_tags)
-        t_tags = get_tags(rb.ROCKBOX_DIR .. "/" .. ts_DBPATH[item], ts_TAGTYPE[item])
+        t_tags = get_tags(rb.ROCKBOX_DIR .. "/" .. ts_DBPATH[item], ts_TAGTYPE[item], t_tags)
         sel[item], ts_tags[item] = print_tags(t_tags, nil, sel[item])
         if ts_tags[item] then
             mt[item_mt] = ts_TAGTYPE[item] .. " [" .. #sel[item] .. "]"
@@ -319,16 +352,17 @@ function main_menu()
                 [11]  = function(COMP)
                             sel_tag(TAG_COMPOSER, COMP, t_tags)
                         end,
-
-                [12]  = function(SAVET)
+                [12]  = function(B) mt[B] = "TNC Bilgus 2018" end,
+                [13]  = function(SAVET)
                             menuname = menuname or sDEFAULTMENU
                             menuname = rb.kbd_input(menuname)
-                            menuname = string.match(menuname, "%w+")
+                            menuname = string.match(menuname or "", "%w+")
                             if menuname == "" then menuname = nil end
-                            menuname = menuname or sDEFAULTMENU
-                            savedata(sFILEOUT, ts_tags, cond, menuname)
+                            if menuname then
+                                savedata(sFILEOUT, ts_tags, cond, menuname)
+                            end
                         end,
-                [13] = function(EXIT_) return true end
+                [14] = function(EXIT_) return true end
                 }
 
     print_menu(mt, ft, 2) --start at item 2

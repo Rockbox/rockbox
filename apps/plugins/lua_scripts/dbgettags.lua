@@ -1,4 +1,4 @@
---dbgettags.lua Bilgus 2018
+-- dbgettags.lua Bilgus 2017
 --[[
 /***************************************************************************
  *             __________               __   ___.
@@ -48,10 +48,11 @@ end
 
 -- uses database files to retrieve database tags
 -- adds all unique tags into a lua table
-function get_tags(filename, hstr)
+-- ftable is optional
+function get_tags(filename, hstr, ftable)
 
     if not filename then return end
-
+    if not ftable then ftable = {} end
     hstr = hstr or filename
 
     local file = io.open('/' .. filename or "", "r") --read
@@ -70,6 +71,7 @@ function get_tags(filename, hstr)
         return file:read(count)
     end
 
+    -- check the header and get size + #entries
     local tagcache_header = readchrs(DATASZ) or ""
     local tagcache_sz = readchrs(DATASZ) or ""
     local tagcache_entries = readchrs(DATASZ) or ""
@@ -82,8 +84,8 @@ function get_tags(filename, hstr)
     
     -- local tag_entries = bytesLE_n(tagcache_entries)
 
-    local ftable = {}
-    table.insert(ftable, 1, hstr)
+    for k, v in pairs(ftable) do ftable[k] = nil end -- clear table
+    ftable[1] = hstr
 
     local tline = #ftable + 1
     ftable[tline] = ""
@@ -94,7 +96,7 @@ function get_tags(filename, hstr)
         tag_len = bytesLE_n(readchrs(DATASZ))
         readchrs(DATASZ) -- idx = bytesLE_n(readchrs(DATASZ))
         str = readchrs(tag_len) or ""
-        str = string.match(str, "(%Z+)%z")
+        str = string.match(str, "(%Z+)%z") -- \0 terminated string 
 
         if str then
             if ftable[tline - 1] ~= str then -- Remove dupes
