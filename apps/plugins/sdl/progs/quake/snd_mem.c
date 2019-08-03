@@ -89,6 +89,10 @@ void ResampleSfx (sfx_t *sfx, int inrate, int inwidth, byte *data)
 
 //=============================================================================
 
+// used to synchronize with Mod_LoadModel, which causes crashes if not done.
+struct mutex snd_mutex;
+int snd_mutex_init = 0;
+
 /*
 ==============
 S_LoadSound
@@ -96,6 +100,7 @@ S_LoadSound
 */
 sfxcache_t *S_LoadSound (sfx_t *s)
 {
+    //return NULL;
     char	namebuffer[256];
 	byte	*data;
 	wavinfo_t	info;
@@ -104,11 +109,21 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	sfxcache_t	*sc;
 	byte	stackbuf[1*1024];		// avoid dirtying the cache heap
 
-// see if still in memory
+// see if still in memory (no mutex)
 	sc = Cache_Check (&s->cache);
 	if (sc)
+        {
 		return sc;
+        }
 
+    if(!snd_mutex_init)
+    {
+        rb->mutex_init(&snd_mutex);
+        snd_mutex_init = 1;
+    }
+
+    rb->mutex_lock(&snd_mutex);
+    
 //Con_Printf ("S_LoadSound: %x\n", (int)stackbuf);
 // load it in
     Q_strcpy(namebuffer, "sound/");
@@ -120,6 +135,7 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 
 	if (!data)
 	{
+        rb->mutex_unlock(&snd_mutex);
 		Con_Printf ("Couldn't load %s\n", namebuffer);
 		return NULL;
 	}
@@ -127,6 +143,7 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 	info = GetWavinfo (s->name, data, com_filesize);
 	if (info.channels != 1)
 	{
+        rb->mutex_unlock(&snd_mutex);
 		Con_Printf ("%s is a stereo sample\n",s->name);
 		return NULL;
 	}
@@ -138,7 +155,10 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 
 	sc = Cache_Alloc ( &s->cache, len + sizeof(sfxcache_t), s->name);
 	if (!sc)
+        {
+        rb->mutex_unlock(&snd_mutex);
 		return NULL;
+        }
 	
 	sc->length = info.samples;
 	sc->loopstart = info.loopstart;
@@ -148,6 +168,7 @@ sfxcache_t *S_LoadSound (sfx_t *s)
 
 	ResampleSfx (s, sc->speed, sc->width, data + info.dataofs);
 
+        rb->mutex_unlock(&snd_mutex);
 	return sc;
 }
 
