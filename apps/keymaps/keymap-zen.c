@@ -66,11 +66,11 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_CONTEXT,               BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_SELECT },
     { ACTION_STD_CONTEXT,               BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_RIGHT },
 #ifdef ZEN_HAS_CONTROL
-    { ACTION_STD_CONTEXT,               BUTTON_MENU,                       BUTTON_NONE },
+    { ACTION_STD_CONTEXT,               BUTTON_MENU|BUTTON_REL,            BUTTON_MENU },
 #endif
+    { ACTION_STD_QUICKSCREEN,           BUTTON_BACK|BUTTON_REPEAT,         BUTTON_BACK },
 
-    { ACTION_STD_CANCEL,                BUTTON_BACK,                       BUTTON_NONE },
-    { ACTION_STD_CANCEL,                BUTTON_BACK|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_STD_CANCEL,                BUTTON_BACK|BUTTON_REL,            BUTTON_BACK },
     { ACTION_STD_CANCEL,                BUTTON_LEFT,                       BUTTON_NONE },
     { ACTION_STD_CANCEL,                BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_STD_OK,                    BUTTON_SELECT|BUTTON_REL,          BUTTON_SELECT },
@@ -85,7 +85,10 @@ static const struct button_mapping button_context_wps[]  = {
 
     { ACTION_WPS_CONTEXT,               BUTTON_SELECT|BUTTON_REPEAT,       BUTTON_NONE },
 #ifdef ZEN_HAS_CONTROL
-    { ACTION_WPS_CONTEXT,               BUTTON_MENU,                       BUTTON_NONE },
+    { ACTION_WPS_CONTEXT,               BUTTON_MENU|BUTTON_REL,            BUTTON_MENU },
+#ifdef HAVE_HOTKEY
+    { ACTION_WPS_HOTKEY,                BUTTON_MENU|BUTTON_REPEAT,         BUTTON_MENU },
+#endif
 #endif
 
     { ACTION_WPS_SKIPNEXT,              BUTTON_RIGHT|BUTTON_REL,           BUTTON_RIGHT },
@@ -109,7 +112,8 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_VOLDOWN,               BUTTON_DOWN,                       BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,               BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
 
-    { ACTION_WPS_MENU,                  BUTTON_BACK,                       BUTTON_NONE },
+    { ACTION_WPS_MENU,                  BUTTON_BACK|BUTTON_REL,            BUTTON_BACK },
+    { ACTION_WPS_QUICKSCREEN,           BUTTON_BACK|BUTTON_REPEAT,         BUTTON_BACK },
     { ACTION_WPS_BROWSE,                BUTTON_SELECT|BUTTON_REL,          BUTTON_SELECT },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
@@ -145,9 +149,13 @@ static const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_STD_CANCEL,                BUTTON_BACK,                       BUTTON_NONE },
     { ACTION_STD_CANCEL,                BUTTON_PLAYPAUSE,                  BUTTON_NONE },
     { ACTION_QS_TOP,                    BUTTON_UP,                         BUTTON_NONE },
+    { ACTION_QS_TOP,                    BUTTON_UP|BUTTON_REPEAT,           BUTTON_NONE },
     { ACTION_QS_DOWN,                   BUTTON_DOWN,                       BUTTON_NONE },
+    { ACTION_QS_DOWN,                   BUTTON_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_QS_LEFT,                   BUTTON_LEFT,                       BUTTON_NONE },
+    { ACTION_QS_LEFT,                   BUTTON_LEFT|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_QS_RIGHT,                  BUTTON_RIGHT,                      BUTTON_NONE },
+    { ACTION_QS_RIGHT,                  BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_quickscreen */
@@ -155,6 +163,10 @@ static const struct button_mapping button_context_quickscreen[]  = {
 static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,                  BUTTON_PLAYPAUSE|BUTTON_REL,       BUTTON_PLAYPAUSE },
     { ACTION_TREE_STOP,                 BUTTON_PLAYPAUSE|BUTTON_REPEAT,    BUTTON_NONE },
+
+#if defined(HAVE_HOTKEY) && defined(ZEN_HAS_CONTROL)
+    { ACTION_TREE_HOTKEY,               BUTTON_MENU|BUTTON_REPEAT,         BUTTON_MENU },
+#endif
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST)
 }; /* button_context_tree */
@@ -277,17 +289,23 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_DEC_BIG,        BUTTON_DOWN|BUTTON_REPEAT,                 BUTTON_NONE },
 
     { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,                               BUTTON_NONE },
-    { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT|BUTTON_REPEAT,                 BUTTON_NONE },
+    { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,                    BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,                              BUTTON_NONE },
-    { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT|BUTTON_REPEAT,                BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,                   BUTTON_NONE },
 
+#ifdef ZEN_HAS_CONTROL
     { ACTION_PS_TOGGLE_MODE,    BUTTON_MENU,                               BUTTON_NONE },
+#else
+    { ACTION_PS_TOGGLE_MODE,    BUTTON_PLAYPAUSE,                          BUTTON_NONE },
+#endif
 
     { ACTION_PS_RESET,          BUTTON_SELECT,                             BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_BACK,                               BUTTON_NONE },
-    { ACTION_PS_EXIT,           BUTTON_PLAYPAUSE,                          BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST
+    { ACTION_PS_SLOWER,         BUTTON_LEFT|BUTTON_REPEAT,                 BUTTON_NONE },
+    { ACTION_PS_FASTER,         BUTTON_RIGHT|BUTTON_REPEAT,                BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
 
 static const struct button_mapping button_context_yesno[]  = {
