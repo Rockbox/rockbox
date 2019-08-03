@@ -255,6 +255,18 @@ Loads a model into the cache
 */
 model_t *Mod_LoadModel (model_t *mod, qboolean crash)
 {
+    // prevents crashes
+    extern struct mutex snd_mutex;
+    extern int snd_mutex_init;
+
+    if(!snd_mutex_init)
+    {
+        rb->mutex_init(&snd_mutex);
+        snd_mutex_init = 1;
+    }
+
+    rb->mutex_lock(&snd_mutex);
+    
     //printf("loadmodel 1");
 	unsigned *buf;
 	byte	stackbuf[1024];		// avoid dirtying the cache heap
@@ -264,13 +276,17 @@ model_t *Mod_LoadModel (model_t *mod, qboolean crash)
 		if (Cache_Check (&mod->cache))
 		{
 			mod->needload = NL_PRESENT;
+                        rb->mutex_unlock(&snd_mutex);
 			return mod;
 		}
 	}
 	else
 	{
 		if (mod->needload == NL_PRESENT)
-			return mod;
+                {
+                    rb->mutex_unlock(&snd_mutex);
+                    return mod;
+                }
 	}
 
 //
@@ -283,17 +299,23 @@ model_t *Mod_LoadModel (model_t *mod, qboolean crash)
         
         //printf("loadmodel 2");
 	buf = (unsigned *)COM_LoadStackFile (mod->name, stackbuf, sizeof(stackbuf));
+        //printf("LoadModel0: %08x (%08x)", buf[0], buf);
 	if (!buf)
 	{
 		if (crash)
 			Sys_Error ("Mod_NumForName: %s not found", mod->name);
+                
+                rb->mutex_unlock(&snd_mutex);
 		return NULL;
 	}
 	
 //
 // allocate a new model
 //
+        //printf("LoadModel1: %08x (%08x)", buf[0], buf);
+        
 	COM_FileBase (mod->name, loadname);
+        //printf("LoadModel2: %08x (%08x)", buf[0], buf);
 	
 	loadmodel = mod;
 
@@ -316,10 +338,12 @@ model_t *Mod_LoadModel (model_t *mod, qboolean crash)
 		break;
 	
 	default:
+            //printf("unkn %08x (&=%08x), nat %08x def to brush", LittleLongUnaligned(buf[0]), &buf[0], buf[0]);
 		Mod_LoadBrushModel (mod, buf);
 		break;
 	}
 
+        rb->mutex_unlock(&snd_mutex);
 	return mod;
 }
 
