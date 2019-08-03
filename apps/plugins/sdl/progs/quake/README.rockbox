@@ -2,7 +2,7 @@ Introduction
 ============
 
 These are my port notes for Quake. This runs, of course, on our SDL
-port. See <https://www.rockbox.org/wiki/SdlPort> for more.
+port. See <https://www.rockbox.org/wiki/SdlPluginPort> for more.
 
 Port Lineage
 ============
@@ -29,10 +29,17 @@ when running, so there's plenty of space for this on some targets
 Known bugs
 ==========
 
-Setting the sample rate to 44.1 KHz leads to all sorts of weird
-crashes, which stem (probably) from the same underlying memory
+SOLVED: Setting the sample rate to 44.1 KHz leads to all sorts of
+weird crashes, which stem (probably) from the same underlying memory
 corruption issue. Only thing is, it seems to occur only on hardware so
 it's a huge pain to debug.
+
+This issue turned out to be a synchronization issue when loading files
+from multiple threads. Fixed with some mutex locks. - 8/2/19
+
+There is a weird crash that occurs on simulator only when playing the
+first demo. I've inserted a splash statement so we can watch for it on
+target.
 
 Optimization targets
 ====================
