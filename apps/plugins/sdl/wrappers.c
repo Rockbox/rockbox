@@ -333,11 +333,24 @@ int fscanf_wrapper(FILE *f, const char *fmt, ...)
     return 1;
 }
 
+
 /* stolen from doom */
 // Here is a hacked up printf command to get the output from the game.
 int printf_wrapper(const char *fmt, ...)
 {
-    static int p_xtpt;
+    static volatile struct mutex printf_mutex;
+    static volatile int mutex_init = 0;
+
+    if(!mutex_init)
+    {
+        rb->mutex_init(&printf_mutex);
+        mutex_init = 1;
+    }
+
+    static volatile int p_xtpt;
+
+    rb->mutex_lock(&printf_mutex);
+
     char p_buf[256];
     rb->yield();
     va_list ap;
@@ -362,6 +375,9 @@ int printf_wrapper(const char *fmt, ...)
             rb->lcd_clear_display();
         }
     }
+
+    rb->mutex_unlock(&printf_mutex);
+
     return 1;
 }
 
