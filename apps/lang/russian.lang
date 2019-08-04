@@ -13784,3 +13784,103 @@
     *: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PANNING_SEPARATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Panning Separation"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Панорама"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Панорама"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERBERATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Reverberation"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Реверберация"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Реверберация"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INTERPOLATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Interpolation"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Интерполяция"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Интерполяция"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SURROUND
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Surround"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Окружение"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Окружение"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CPU_BOOST
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "CPU Boost"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Разгон процессора"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Разгон процессора"
+    lowmem: none
+  </voice>
+</phrase>
