@@ -317,7 +317,7 @@ static void init_playback(void)
 #endif /* #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 
 void mp3_init(int volume, int bass, int treble, int balance, int loudness,
-              int avc, int channel_config, int stereo_width,
+              int avc, int channel_config, int stereo_width, bool swap_channels,
               int mdb_strength, int mdb_harmonics,
               int mdb_center, int mdb_shape, bool mdb_enable,
               bool superbass)
@@ -427,6 +427,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     sound_set(SOUND_VOLUME, volume);
     sound_set(SOUND_CHANNELS, channel_config);
     sound_set(SOUND_STEREO_WIDTH, stereo_width);
+    sound_set(SOUND_SWAP_CHANNELS, swap_channels);
     
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     sound_set(SOUND_LOUDNESS, loudness);

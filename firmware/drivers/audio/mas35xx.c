@@ -28,6 +28,7 @@
 
 int channel_configuration = SOUND_CHAN_STEREO;
 int stereo_width = 100;
+bool swap_channels = false;
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 unsigned long mdb_shape_shadow = 0;
@@ -46,7 +47,15 @@ static void set_channel_config(void)
 
     switch(channel_configuration)
     {
-        /* case SOUND_CHAN_STEREO unnecessary */
+        case SOUND_CHAN_STEREO:
+            if (swap_channels)
+            {
+                val_ll = 0;
+                val_lr = 0x80000;
+                val_rl = 0x80000;
+                val_rr = 0;
+            }
+            break;
 
         case SOUND_CHAN_MONO:
             val_ll = 0xc0000;
@@ -74,8 +83,16 @@ static void set_channel_config(void)
                     fp_straight = - ((((1<<19) + fp_width) / (fp_width >> 9)) << 9);
                     fp_cross = (1<<19) + fp_straight;
                 }
-                val_ll = val_rr = fp_straight & 0xfffff;
-                val_lr = val_rl = fp_cross & 0xfffff;
+                if (swap_channels)
+                {
+                    val_ll = val_rr = fp_cross & 0xfffff;
+                    val_lr = val_rl = fp_straight & 0xfffff;
+                }
+                else
+                {
+                    val_ll = val_rr = fp_straight & 0xfffff;
+                    val_lr = val_rl = fp_cross & 0xfffff;
+                }
             }
             break;
 
@@ -94,10 +111,20 @@ static void set_channel_config(void)
             break;
 
         case SOUND_CHAN_KARAOKE:
-            val_ll = 0xc0000;
-            val_lr = 0x40000;
-            val_rl = 0x40000;
-            val_rr = 0xc0000;
+            if (swap_channels)
+            {
+                val_ll = 0x40000;
+                val_lr = 0xc0000;
+                val_rl = 0xc0000;
+                val_rr = 0x40000;
+            }
+            else
+            {
+                val_ll = 0xc0000;
+                val_lr = 0x40000;
+                val_rl = 0x40000;
+                val_rr = 0xc0000;
+            }
             break;
     }
 
@@ -125,6 +152,12 @@ void audiohw_set_stereo_width(int val)
     if (channel_configuration == SOUND_CHAN_CUSTOM) {
         set_channel_config();
     }
+}
+
+void audiohw_set_swap_channels(bool val)
+{
+    swap_channels = val;
+    set_channel_config();
 }
 
 void audiohw_set_bass(int val)
