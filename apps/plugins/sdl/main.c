@@ -173,7 +173,7 @@ enum plugin_status plugin_start(const void *param)
 {
     (void) param;
 
-#if defined(CPU_ARM) && !defined(SIMULATOR)
+#if defined(CPU_ARM) && !defined(SIMULATOR) && (ARM_ARCH >= 5)
     /* (don't) set alignment trap. Will generate a data abort
      * exception on ARM. */
     set_cr(get_cr() | CR_A);
