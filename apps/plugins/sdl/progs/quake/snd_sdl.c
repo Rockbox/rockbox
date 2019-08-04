@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "SDL_audio.h"
 #include "SDL_byteorder.h"
+#include "SDL_mixer.h"
 #include "quakedef.h"
 
 static dma_t the_shm;
@@ -11,7 +12,7 @@ extern int desired_speed;
 extern int desired_bits;
 
 // SDL hereby demands `len' samples in stream, *NOW*!
-static void paint_audio(void *unused, Uint8 *stream, int len)
+static void paint_audio(int chan, Uint8 *stream, int len, void *unused)
 {
 	if ( shm ) {
 		shm->buffer = stream;
@@ -46,49 +47,40 @@ qboolean SNDDMA_Init(void)
 	}
 	desired.channels = 2;
 	desired.samples = 1024;
-	desired.callback = paint_audio;
+	//desired.callback = paint_audio;
 
+        if( Mix_OpenAudio(desired_speed, desired.format, desired.channels, desired.samples) < 0 )
+        {
+            Con_Printf("Couldn't open SDL audio: %s\n", Mix_GetError());
+            return 0;
+        }
+
+        Mix_RegisterEffect(0, paint_audio, NULL, NULL);
+
+#if 0
 	/* Open the audio device */
 	if ( SDL_OpenAudio(&desired, &obtained) < 0 ) {
         	Con_Printf("Couldn't open SDL audio: %s\n", SDL_GetError());
 		return 0;
 	}
+#endif
 
-	/* Make sure we can support the audio format */
-	switch (obtained.format) {
-		case AUDIO_U8:
-			/* Supported */
-			break;
-		case AUDIO_S16LSB:
-		case AUDIO_S16MSB:
-			if ( ((obtained.format == AUDIO_S16LSB) &&
-			     (SDL_BYTEORDER == SDL_LIL_ENDIAN)) ||
-			     ((obtained.format == AUDIO_S16MSB) &&
-			     (SDL_BYTEORDER == SDL_BIG_ENDIAN)) ) {
-				/* Supported */
-				break;
-			}
-			/* Unsupported, fall through */;
-		default:
-			/* Not supported -- force SDL to do our bidding */
-			SDL_CloseAudio();
-			if ( SDL_OpenAudio(&desired, NULL) < 0 ) {
-        			Con_Printf("Couldn't open SDL audio: %s\n",
-							SDL_GetError());
-				return 0;
-			}
-			memcpy(&obtained, &desired, sizeof(desired));
-			break;
-	}
+        void *blank_buf = (Uint8 *)malloc(4096);
+	memset(blank_buf, 0, 4096);
+
+	Mix_Chunk *blank = Mix_QuickLoad_RAW(blank_buf, 4096);
+
+	Mix_PlayChannel(0, blank, -1);
+
 	SDL_PauseAudio(0);
 
 	/* Fill the audio DMA information block */
 	shm = &the_shm;
 	shm->splitbuffer = 0;
-	shm->samplebits = (obtained.format & 0xFF);
-	shm->speed = obtained.freq;
-	shm->channels = obtained.channels;
-	shm->samples = obtained.samples*shm->channels;
+	shm->samplebits = (desired.format & 0xFF);
+	shm->speed = desired.freq;
+	shm->channels = desired.channels;
+	shm->samples = desired.samples*shm->channels;
 	shm->samplepos = 0;
 	shm->submission_chunk = 1;
 	shm->buffer = NULL;
