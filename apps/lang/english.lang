@@ -15919,3 +15919,17 @@ id: VOICE_BAT_BENCH_KEYS
     *: "Failed to gather information"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SWAP_CHANNELS
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Swap Channels"
+  </source>
+  <dest>
+    *: "Swap Channels"
+  </dest>
+  <voice>
+    *: "Swap Channels"
+  </voice>
+</phrase>

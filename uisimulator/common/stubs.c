@@ -55,7 +55,7 @@ static bool playing; /* We are playing an MP3 stream */
 bool audio_is_initialized = false;
 
 void mp3_init(int volume, int bass, int treble, int balance, int loudness,
-              int avc, int channel_config, int stereo_width,
+              int avc, int channel_config, int stereo_width, bool swap_channels,
               int mdb_strength, int mdb_harmonics,
               int mdb_center, int mdb_shape, bool mdb_enable,
               bool superbass)
@@ -68,6 +68,7 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
     (void)avc;
     (void)channel_config;
     (void)stereo_width;
+    (void)swap_channels;
     (void)mdb_strength;
     (void)mdb_harmonics;
     (void)mdb_center;
