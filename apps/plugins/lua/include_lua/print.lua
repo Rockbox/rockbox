@@ -299,23 +299,23 @@ local _print = {} do
     end
 
     -- Helper function that acts mostly like a normal printf() would
-    local function printf(...)
+    local function printf(fmt, v1, ...)
         local o = get_settings(true)
         local w, h, msg
         local line = o.line - 1 -- rb is 0-based lua is 1-based
 
-        if not (...) or (...) == "\n" then -- handles blank line / single '\n'
+        if not (fmt) or (fmt) == "\n" then -- handles blank line / single '\n'
              local res, w, h = text_extent(" ", o.font)
 
             clear_line(o, line, h)
             update_line(o.autoupdate, o, line, h)
 
-            if (...) then set_line(_NIL) end
+            if (fmt) then set_line(_NIL) end
 
             return o.line, o.max_line, o.width, h
         end
 
-        msg = string.format(...)
+        msg = string.format(fmt, v1, ...)
 
         show_selected(o.line, msg)
 

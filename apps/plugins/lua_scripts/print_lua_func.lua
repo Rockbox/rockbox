@@ -4,7 +4,13 @@ require "audio"
 require "buttons"
 require "color"
 require "draw"
+require "draw_floodfill"
+require "draw_poly"
+require "draw_text"
+
 require "image"
+require "image_save"
+
 require "lcd"
 require "math_ex"
 require "pcm"
