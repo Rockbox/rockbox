@@ -152,7 +152,7 @@
     *: "Loading... %d%% done (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Loading"
   </voice>
 </phrase>
 <phrase>
@@ -6905,7 +6905,7 @@
     *: "Searching... %d found (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Found"
   </voice>
 </phrase>
 <phrase>
@@ -8133,7 +8133,7 @@
     *: "Incompatible model"
   </dest>
   <voice>
-    *: ""
+    *: "Incompatible model"
   </voice>
 </phrase>
 <phrase>
@@ -8147,7 +8147,7 @@
     *: "Incompatible version"
   </dest>
   <voice>
-    *: ""
+    *: "Incompatible version"
   </voice>
 </phrase>
 <phrase>
@@ -8161,7 +8161,7 @@
     *: "Plugin returned error"
   </dest>
   <voice>
-    *: ""
+    *: "Plugin returned error"
   </voice>
 </phrase>
 <phrase>
@@ -15551,5 +15551,285 @@
     *: none
     swcodec: "Clear all resumes"
     lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TITLE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Title]"
+  </source>
+  <dest>
+    *: "[Title]"
+  </dest>
+  <voice>
+    *: "Title"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILE_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "File properties"
+  </source>
+  <dest>
+    *: "File properties"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Files]"
+  </source>
+  <dest>
+    *: "[Files]"
+  </dest>
+  <voice>
+    *: "Files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_PATH
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Path]"
+  </source>
+  <dest>
+    *: "[Path]"
+  </dest>
+  <voice>
+    *: "Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_UP
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Up"
+  </source>
+  <dest>
+    *: "Move Item Up"
+  </dest>
+  <voice>
+    *: "Move Item Up"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FAIL
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Failed to gather information"
+  </source>
+  <dest>
+    *: "Failed to gather information"
+  </dest>
+  <voice>
+    *: "Failed to gather information"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_EXIT
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Save and Exit"
+  </source>
+  <dest>
+    *: "Save and Exit"
+  </dest>
+  <voice>
+    *: "Save and Exit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOGGLE_ITEM
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Toggle Item"
+  </source>
+  <dest>
+    *: "Toggle Item"
+  </dest>
+  <voice>
+    *: "Toggle Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOAD_DEFAULT_CONFIGURATION
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Load Default Configuration"
+  </source>
+  <dest>
+    *: "Load Default Configuration"
+  </dest>
+  <voice>
+    *: "Load Default Configuration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DURATION
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Duration]"
+  </source>
+  <dest>
+    *: "[Duration]"
+  </dest>
+  <voice>
+    *: "Duration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SUBDIRS
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Subdirs]"
+  </source>
+  <dest>
+    *: "[Subdirs]"
+  </dest>
+  <voice>
+    *: "Subdirs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SIZE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Size]"
+  </source>
+  <dest>
+    *: "[Size]"
+  </dest>
+  <voice>
+    *: "Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TIME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Time]"
+  </source>
+  <dest>
+    *: "[Time]"
+  </dest>
+  <voice>
+    *: "Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ARTIST
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Artist]"
+  </source>
+  <dest>
+    *: "[Artist]"
+  </dest>
+  <voice>
+    *: "Artist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILENAME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Filename]"
+  </source>
+  <dest>
+    *: "[Filename]"
+  </dest>
+  <voice>
+    *: "Filename"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DIRECTORY_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Directory properties"
+  </source>
+  <dest>
+    *: "Directory properties"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU_ORDER
+  desc: main_menu_config plugin title
+  user: core
+  <source>
+    *: "Rockbox Main Menu Order"
+  </source>
+  <dest>
+    *: "Rockbox Main Menu Order"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ALBUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Album]"
+  </source>
+  <dest>
+    *: "[Album]"
+  </dest>
+  <voice>
+    *: "Album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Date]"
+  </source>
+  <dest>
+    *: "[Date]"
+  </dest>
+  <voice>
+    *: "Date"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_DOWN
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Down"
+  </source>
+  <dest>
+    *: "Move Item Down"
+  </dest>
+  <voice>
+    *: "Move Item Down"
   </voice>
 </phrase>
