@@ -161,7 +161,7 @@ static const struct button_mapping button_context_list[]  = {
     { ACTION_LISTTREE_PGDOWN,           BUTTON_BOTTOMRIGHT|BUTTON_REPEAT,  BUTTON_NONE },
 #ifdef HAVE_HOTKEY //on some gesture later?
     { ACTION_TREE_HOTKEY,               BUTTON_BOTTOMRIGHT|BUTTON_REL,     BUTTON_BOTTOMRIGHT },
-#endif*/
+#endif
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
