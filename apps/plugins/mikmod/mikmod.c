@@ -8,7 +8,7 @@
 #undef SYNC
 #ifdef SIMULATOR
 #define SYNC
-#elif NUM_CORES > 1
+#else
 #define USETHREADS
 #endif
 
@@ -525,10 +525,14 @@ static int settings_menu(void)
 {
     int selection = 0;
 
-    MENUITEM_STRINGLIST(settings_menu, "Mikmod Settings", NULL, "Panning Separation",
-                        "Reverberation", "Interpolation", "Reverse Channels", "Surround",
+    MENUITEM_STRINGLIST(settings_menu, "Mikmod Settings", NULL,
+                        ID2P(LANG_PANNING_SEPARATION),
+                        ID2P(LANG_REVERBERATION),
+                        ID2P(LANG_INTERPOLATION),
+                        ID2P(LANG_SWAP_CHANNELS),
+                        ID2P(LANG_MIKMOD_SURROUND),
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-                        "CPU Boost"
+                        ID2P(LANG_CPU_BOOST)
 #endif
                         );
 
@@ -538,36 +542,36 @@ static int settings_menu(void)
         switch(selection)
         {
         case 0:
-            rb->set_int("Panning Separation", "", 1,
+            rb->set_int(rb->str(LANG_PANNING_SEPARATION), "", 1,
                         &(settings.pansep),
                         NULL, 8, 0, 128, NULL );
             applysettings();
             break;
 
         case 1:
-            rb->set_int("Reverberation", "", 1,
+            rb->set_int(rb->str(LANG_REVERBERATION), "", 1,
                         &(settings.reverb),
                         NULL, 1, 0, 15, NULL );
             applysettings();
             break;
 
         case 2:
-            rb->set_bool("Interpolation", &(settings.interp));
+            rb->set_bool(rb->str(LANG_INTERPOLATION), &(settings.interp));
             applysettings();
             break;
 
         case 3:
-            rb->set_bool("Reverse Channels", &(settings.reverse));
+            rb->set_bool(rb->str(LANG_SWAP_CHANNELS), &(settings.reverse));
             applysettings();
             break;
 
         case 4:
-            rb->set_bool("Surround", &(settings.surround));
+            rb->set_bool(rb->str(LANG_MIKMOD_SURROUND), &(settings.surround));
             applysettings();
             break;
 
         case 5:
-            rb->set_bool("CPU Boost", &(settings.boost));
+            rb->set_bool(rb->str(LANG_CPU_BOOST), &(settings.boost));
             applysettings();
             break;
 
@@ -587,7 +591,9 @@ static int main_menu(void)
     int result;
 
     MENUITEM_STRINGLIST(main_menu,"Mikmod Main Menu",NULL,
-                        "Settings", "Return", "Quit");
+                        ID2P(LANG_SETTINGS),
+                        ID2P(LANG_RETURN),
+                        ID2P(LANG_MENU_QUIT));
     while (1)
     {
         switch (rb->do_menu(&main_menu,&selection, NULL, false))
@@ -620,8 +626,12 @@ static void thread(void)
 
     while (1)
     {
-        synthbuf();
-        rb->queue_wait_w_tmo(&thread_q, &ev, HZ/20);
+        if (rb->queue_empty(&thread_q))
+        {
+            synthbuf();
+            rb->yield();
+        }
+        else rb->queue_wait(&thread_q, &ev);
         switch (ev.id) {
             case EV_EXIT:
                 return;
@@ -660,7 +670,8 @@ static int playfile(char* filename)
     {
         display = DISPLAY_INFO;
         Player_Start(module);
-        rb->pcm_play_data(&get_more, NULL, NULL, 0);
+        rb->pcmbuf_fade(false, true);
+        rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, get_more, NULL, 0);
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -798,14 +809,7 @@ static int playfile(char* filename)
             break;
 
         case ACTION_WPS_PLAY:
-            if(!Player_Paused())
-            {
-                rb->pcm_play_stop();
-            }
-            else
-            {
-                rb->pcm_play_data(&get_more, NULL, NULL, 0);
-            }
+            rb->mixer_channel_play_pause(PCM_MIXER_CHAN_PLAYBACK, Player_Paused());
             Player_TogglePause();
             break;
 
@@ -870,6 +874,7 @@ static int playfile(char* filename)
 enum plugin_status plugin_start(const void* parameter)
 {
     enum plugin_status retval;
+    int orig_samplerate = rb->mixer_get_frequency();
 
     if (parameter == NULL)
     {
@@ -879,13 +884,14 @@ enum plugin_status plugin_start(const void* parameter)
 
     rb->lcd_setfont(FONT_SYSFIXED);
 
+    rb->talk_force_shutup();
     rb->pcm_play_stop();
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPLE_RATE);
+    rb->mixer_set_frequency(SAMPLE_RATE);
 
     audio_buffer = rb->plugin_get_audio_buffer((size_t *)&audio_buffer_free);
     
@@ -922,8 +928,9 @@ enum plugin_status plugin_start(const void* parameter)
 
     MikMod_Exit();
 
-    rb->pcm_play_stop();
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
+    rb->pcmbuf_fade(false, false);
+    rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
+    rb->mixer_set_frequency(orig_samplerate);
 
     if (retval == PLUGIN_OK)
     {
