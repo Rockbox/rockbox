@@ -48,6 +48,8 @@
 
 extern bool audio_is_initialized;
 
+static bool swap_channels = false;
+
 static const struct sound_setting_entry * get_setting_entry(int setting)
 {
     static const struct sound_settings_info default_info =
@@ -308,7 +310,9 @@ static void set_prescaled_volume(void)
         r += (r - minvol) * balance / 100;
     }
 
-    audiohw_set_volume(l, r);
+    if (swap_channels)
+        audiohw_set_volume(r, l);
+    else audiohw_set_volume(l, r);
 #endif /* AUDIOHW_HAVE_MONO_VOLUME */
 
 #if defined(AUDIOHW_HAVE_LINEOUT)
@@ -408,6 +412,16 @@ void sound_set_stereo_width(int value)
         return;
 
     audiohw_set_stereo_width(value);
+}
+
+void sound_set_swap_channels(int value)
+{
+    if(!audio_is_initialized)
+        return;
+
+    swap_channels = value;
+    audiohw_set_swap_channels(value);
+    set_prescaled_volume();
 }
 
 #if defined(AUDIOHW_HAVE_DEPTH_3D)

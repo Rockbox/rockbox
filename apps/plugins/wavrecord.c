@@ -3663,6 +3663,7 @@ static int record_file(char *filename)
     mas_restore();
     rb->sound_set(SOUND_CHANNELS, rb->global_settings->channel_config);
     rb->sound_set(SOUND_STEREO_WIDTH, rb->global_settings->stereo_width);
+    rb->sound_set(SOUND_SWAP_CHANNELS, rb->global_settings->swap_channels);
 
     for (i = 0; i < 9; i++)
     {
