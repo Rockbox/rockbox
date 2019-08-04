@@ -25,14 +25,11 @@
 
 #define BUF_SIZE 16384 /* 64 kB output buffers */
 #define NBUF   2
+#define MAX_SAMPLES 512
 
 #ifndef SIMULATOR
 
-#if (HW_SAMPR_CAPS & SAMPR_CAP_22)  /* use 22050Hz if we can */
-#define SAMPLE_RATE SAMPR_22        /* 22050 */
-#else
 #define SAMPLE_RATE SAMPR_44        /* 44100 */
-#endif
 
 /* Some of the pp based targets can't handle too many voices
    mainly because they have to use 44100Hz sample rate, this could be

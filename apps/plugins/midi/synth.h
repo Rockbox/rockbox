@@ -20,7 +20,7 @@
  ****************************************************************************/
 int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig);
 void setPoint(struct SynthObject * so, int pt);
-void synthSamples(int32_t *buf_ptr, unsigned int num_samples);
+size_t synthSamples(int32_t *buf_ptr, size_t num_samples);
 
 void resetControllers(void);
 
