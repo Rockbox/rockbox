@@ -90,6 +90,7 @@ void audiohw_set_treble(int value)      { (void)value; }
 #if CONFIG_CODEC != SWCODEC
 void audiohw_set_channel(int value)     { (void)value; }
 void audiohw_set_stereo_width(int value){ (void)value; }
+void audiohw_set_swap_channels(bool value){ (void)value; }
 #ifdef HAVE_PITCHCONTROL
 void audiohw_set_pitch(int32_t value)   { (void)value; }
 int32_t audiohw_get_pitch(void)         { return PITCH_SPEED_100; }
