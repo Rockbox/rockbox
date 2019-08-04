@@ -26,6 +26,9 @@
 #endif
 #include "channel_mode.h"
 #include "dsp_misc.h"
+#include "platform.h"
+#include "dsp_core.h"
+#include "dsp_sample_io.h"
 
 /** Functions exported by audiohw.h but implemented in DSP **/
 
@@ -37,6 +40,11 @@ void audiohw_set_channel(int value)
 void audiohw_set_stereo_width(int value)
 {
     channel_mode_custom_set_width(value);
+}
+
+void audiohw_set_swap_channels(int value)
+{
+    dsp_sample_io_set_swap_channels(value);
 }
 
 #ifdef HAVE_SW_TONE_CONTROLS
