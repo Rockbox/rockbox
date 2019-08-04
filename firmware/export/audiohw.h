@@ -652,6 +652,8 @@ int32_t audiohw_get_pitch(void);
  */
 void audiohw_set_stereo_width(int val);
 
+void audiohw_set_swap_channels(int val);
+
 #ifdef HAVE_SPEAKER
 void audiohw_enable_speaker(bool on);
 #endif /* HAVE_SPEAKER */
@@ -666,5 +668,6 @@ AUDIOHW_SETTING(TREBLE,      "dB", 0, 1,  -24,  24,   0)
 AUDIOHW_SETTING(BALANCE,      "%", 0, 1, -100, 100,   0)
 AUDIOHW_SETTING(CHANNELS,      "", 0, 1,    0,   5,   0)
 AUDIOHW_SETTING(STEREO_WIDTH, "%", 0, 5,    0, 250, 100)
+AUDIOHW_SETTING(SWAP_CHANNELS, "", 0, 1, 0, 1, 0)
 
 #endif /* _AUDIOHW_H_ */
