@@ -29,7 +29,6 @@
     _draw.ellipse_filled
     _draw.ellipse_rect_filled
     _draw.ellipse_rect
-    _draw.flood_fill
     _draw.hline
     _draw.image
     _draw.line
@@ -39,7 +38,6 @@
     _draw.rect_filled
     _draw.rounded_rect
     _draw.rounded_rect_filled
-    _draw.text
     _draw.vline
 
 ]]
@@ -56,21 +54,17 @@ local _draw = {} do
     setmetatable(_draw, rocklib_image)
 
     -- Internal Constants
-    local _LCD = rb.lcd_framebuffer()
-    local LCD_W, LCD_H = rb.LCD_WIDTH, rb.LCD_HEIGHT
     local BSAND = 8 -- blits color to dst if src <> 0
     local _NIL = nil -- nil placeholder
 
-    local _abs     = math.abs
+
     local _clear   = rocklib_image.clear
     local _copy    = rocklib_image.copy
     local _ellipse = rocklib_image.ellipse
     local _get     = rocklib_image.get
     local _line    = rocklib_image.line
-    local _marshal = rocklib_image.marshal
     local _min     = math.min
     local _newimg  = rb.new_image
-    local _points  = rocklib_image.points
 
     -- line
     _draw.line = function(img, x1, y1, x2, y2, color, bClip)
@@ -87,33 +81,22 @@ local _draw = {} do
         _line(img, x, y, _NIL, y + length, color, bClip)
     end
 
-    -- draws a non-filled figure based on points in t-points
-    local function polyline(img, x, y, t_points, color, bClosed, bClip)
-        if #t_points < 2 then error("not enough points", 3) end
-
-        local pt_first_last
-
-        if bClosed then
-            pt_first_last = t_points[1]
-        else
-            pt_first_last = t_points[#t_points]
-        end
-
-        for i = 1, #t_points, 1 do
-            local pt1 = t_points[i]
-
-            local pt2 = t_points[i + 1] or pt_first_last-- first and last point
-
+    -- draws a non-filled rect based on points in t-points
+    local function polyrect(img, x, y, t_points, color, bClip)
+        local pt_first_last = t_points[1]
+        local pt1, pt2
+        for i = 1, 4, 1 do
+            pt1 = t_points[i]
+            pt2 = t_points[i + 1] or pt_first_last-- first and last point
             _line(img, pt1[1] + x, pt1[2] + y, pt2[1] + x, pt2[2] + y, color, bClip)
         end
-
     end
 
     -- rectangle
     local function rect(img, x, y, width, height, color, bClip)
         if width == 0 or height == 0 then return end
 
-        polyline(img, x, y, {{0, 0}, {width, 0}, {width, height}, {0, height}}, color, true, bClip)
+        polyrect(img, x, y, {{0, 0}, {width, 0}, {width, height}, {0, height}}, color, bClip)
 
     end
 
@@ -240,190 +223,9 @@ local _draw = {} do
         _copy(dst, src, x, y, 1, 1, _NIL, _NIL, bClip)
     end
 
-    -- floods an area of targetclr with fillclr x, y specifies the start seed
-    _draw.flood_fill = function(img, x, y, targetclr, fillclr)
-        -- scanline 4-way flood algorithm
-        --          ^
-        -- <--------x--->
-        --          v
-        -- check that target color doesn't = fill and the first point is target color
-        if targetclr == fillclr or targetclr ~= _get(img, x, y, true) then return end
-        local max_w = img:width()
-        local max_h = img:height()
-
-        local qpt = {} -- FIFO queue
-        -- rather than moving elements around in our FIFO queue
-        -- for each read; increment 'qhead' by 2
-        -- set both elements to nil and let the
-        -- garbage collector worry about it
-        -- for each write; increment 'qtail' by 2
-        -- x coordinates are in odd indices while
-        -- y coordinates are in even indices
-
-        local qtail = 0
-
-        local function check_ns(val, x, y)
-            if targetclr == val then
-                y = y - 1
-                if targetclr == _get(img, x, y, true) then -- north
-                    qtail = qtail + 2
-                    qpt[qtail - 1] = x
-                    qpt[qtail] = y
-                end
-                y = y + 2
-                if targetclr == _get(img, x, y, true) then -- south
-                    qtail = qtail + 2
-                    qpt[qtail - 1] = x
-                    qpt[qtail] = y
-                end
-                return fillclr
-            end
-            return _NIL -- signal marshal to stop
-        end
-
-        local function seed_pt(x, y)
-            -- should never hit max but make sure not to end early
-            for qhead = 2, 0x40000000, 2 do
-
-                if targetclr == _get(img, x, y, true) then
-                    _marshal(img, x, y, 1, y, _NIL, _NIL, true, check_ns) -- west
-                    _marshal(img, x + 1, y, max_w, y, _NIL, _NIL, true, check_ns) -- east
-                end
-
-                x = qpt[qhead - 1]
-                    qpt[qhead - 1] = _NIL
-
-                if not x then break end
-
-                y = qpt[qhead]
-                    qpt[qhead] = _NIL
-            end
-        end
-
-        seed_pt(x, y) -- Begin
-    end -- flood_fill
-
-    -- draws a closed figure based on points in t_points
-    _draw.polygon = function(img, x, y, t_points, color, fillcolor, bClip)
-        if #t_points < 2 then error("not enough points", 3) end
-
-        if fillcolor then
-                local x_min, x_max = 0, 0
-                local y_min, y_max = 0, 0
-                local w, h = 0, 0
-                -- find boundries of polygon
-                for i = 1, #t_points, 1 do
-                    local pt = t_points[i]
-                    if pt[1] < x_min then x_min = pt[1] end
-                    if pt[1] > x_max then x_max = pt[1] end
-                    if pt[2] < y_min then y_min = pt[2] end
-                    if pt[2] > y_max then y_max = pt[2] end
-                end
-                w = _abs(x_max) + _abs(x_min)
-                h = _abs(y_max) + _abs(y_min)
-                x_min = x_min - 2  -- leave a border to use flood_fill
-                y_min = y_min - 2
-
-                local fill_img = _newimg(w + 3, h + 3)
-                _clear(fill_img, 0x1)
-
-                for i = 1, #t_points, 1 do
-                    local pt1 = t_points[i]
-                    local pt2 = t_points[i + 1] or t_points[1]-- first and last point
-                    _line(fill_img, pt1[1] - x_min, pt1[2] - y_min,
-                                      pt2[1]- x_min, pt2[2] - y_min, 0)
-
-                end
-            _draw.flood_fill(fill_img, fill_img:width(), fill_img:height() , 0x1, 0x0)
-            _copy(img, fill_img, x - 1, y - 1, _NIL, _NIL, _NIL, _NIL, bClip, BSAND, fillcolor)
-        end
-
-        polyline(img, x, y, t_points, color, true, bClip)
-    end
-
-    -- draw text onto image if width/height are supplied text is centered
-    _draw.text = function(img, x, y, width, height, font, color, text)
-        font = font or rb.FONT_UI
-
-        local opts = {x = 0, y = 0, width = LCD_W - 1, height = LCD_H - 1,
-               font = font, drawmode = 3, fg_pattern = 0x1, bg_pattern = 0}
-
-        if rb.LCD_DEPTH  == 2 then -- invert 2-bit screens
-            --vp.drawmode = bit.bxor(vp.drawmode, 4)
-            opts.fg_pattern = 3 - opts.fg_pattern
-            opts.bg_pattern = 3 - opts.bg_pattern
-        end
-        rb.set_viewport(opts)
-
-        local res, w, h = rb.font_getstringsize(text, font)
-
-        if not width then
-            width = 0
-        else
-            width = (width - w) / 2
-        end
-
-        if not height then
-            height = 0
-        else
-            height = (height - h) / 2
-        end
-
-        -- make a copy of the current screen for later
-        local screen_img = _newimg(LCD_W, LCD_H)
-        _copy(screen_img, _LCD)
-
-        -- check if the screen buffer is supplied image if so set img to the copy
-        if img == _LCD then
-            img = screen_img
-        end
-
-        -- we will be printing the text to the screen then blitting into img
-        rb.lcd_clear_display()
-
-        if w > LCD_W then -- text is too long for the screen do it in chunks
-            local l = 1
-            local resp, wp, hp
-            local lenr = text:len()
-
-            while lenr > 1 do
-                l = lenr
-                resp, wp, hp = rb.font_getstringsize(text:sub(1, l), font)
-
-                while wp >= LCD_W and l > 1 do
-                    l = l - 1
-                    resp, wp, hp = rb.font_getstringsize(text:sub( 1, l), font)
-                end
-
-                rb.lcd_putsxy(0, 0, text:sub(1, l))
-                text = text:sub(l)
-
-                if x + width > img:width() or y + height > img:height() then
-                    break
-                end
-
-                -- using the mask we made blit color into img
-                _copy(img, _LCD, x + width, y + height, _NIL, _NIL, _NIL, _NIL, false, BSAND, color)
-                x = x + wp
-                rb.lcd_clear_display()
-                lenr = text:len()
-            end
-        else --w <= LCD_W
-            rb.lcd_putsxy(0, 0, text)
-
-            -- using the mask we made blit color into img
-            _copy(img, _LCD, x + width, y + height, _NIL, _NIL, _NIL, _NIL, false, BSAND, color)
-        end
-
-        _copy(_LCD, screen_img) -- restore screen
-        rb.set_viewport() -- set viewport default
-        return res, w, h
-    end
-
     -- expose internal functions to the outside through _draw table
     _draw.hline    = hline
     _draw.vline    = vline
-    _draw.polyline = polyline
     _draw.rect     = rect
     _draw.rounded_rect  = rounded_rect
 end -- _draw functions
