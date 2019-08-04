@@ -348,6 +348,10 @@
 #define SYNC
 #endif
 
+#ifndef ALIGNED_ATTR
+#define ALIGNED_ATTR(x) __attribute__((aligned(x)))
+#endif
+
 struct MIDIfile * mf IBSS_ATTR;
 
 int number_of_samples IBSS_ATTR; /* the number of samples in the current tick */
@@ -355,52 +359,79 @@ int playing_time IBSS_ATTR;  /* How many seconds into the file have we been play
 int samples_this_second IBSS_ATTR;    /* How many samples produced during this second so far? */
 long bpm IBSS_ATTR;
 
-int32_t gmbuf[BUF_SIZE*NBUF];
-static unsigned int samples_in_buf;
+#ifndef SYNC
+/* Small silence clip. ~5.80ms @ 44.1kHz */
+static int32_t silence[256] ALIGNED_ATTR(4) = { 0 };
 
-bool midi_end = false;
-bool quit = false;
-bool swap = false;
-bool lastswap = true;
+static int32_t gmbuf[BUF_SIZE * NBUF] ALIGNED_ATTR(4);
+
+static volatile bool swap = false;
+static volatile bool lastswap = true;
+#else
+static int32_t gmbuf[BUF_SIZE] ALIGNED_ATTR(4);
+#endif
+
+static volatile size_t samples_in_buf;
+
+static volatile bool midi_end = false;
+static volatile bool quit = false;
+
+static int32_t samp_buf[MAX_SAMPLES * 2] IBSS_ATTR;
+
+static struct dsp_config *dsp;
+static struct dsp_buffer src;
+static struct dsp_buffer dst;
 
 static inline void synthbuf(void)
 {
     int32_t *outptr;
-    int i = BUF_SIZE;
+    int available = BUF_SIZE;
 
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
-    rb->cpu_boost(true);
-#endif
 #ifndef SYNC
     if (lastswap == swap)
         return;
-    lastswap = swap;
 
     outptr = (swap ? gmbuf : gmbuf+BUF_SIZE);
 #else
     outptr = gmbuf;
 #endif
-    if (midi_end) {
-        samples_in_buf = 0;
-        return;
-    }
 
-    /* synth samples for as many whole ticks as we can fit in the buffer */
-    for (; i >= number_of_samples; i -= number_of_samples)
-    {
-        synthSamples((int32_t*)outptr, number_of_samples);
-        outptr += number_of_samples;
-#ifndef SYNC
-        /* synthbuf is called in interrupt context is SYNC is defined so it cannot yield
-           that bug causing the sim to crach when not using SYNC should really be fixed */
-        rb->yield();
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+    rb->cpu_boost(true);
 #endif
-        if (tick() == 0)
-            midi_end = true;    /* no more midi data to play */
+    /* synth samples for as many whole ticks as we can fit in the buffer */
+    while (available > 0)
+    {
+        if ((dst.remcount <= 0) && !midi_end)
+        {
+            int nsamples = synthSamples(samp_buf, number_of_samples);
+            if (nsamples < number_of_samples)
+                number_of_samples -= nsamples;
+            else if (!tick())
+                midi_end = true;    /* no more midi data to play */
+            src.remcount = nsamples;
+            src.pin[0]    = &samp_buf[0];
+            src.pin[1]    = &samp_buf[1];
+            src.proc_mask = 0;
+        }
+        dst.remcount = 0;
+        dst.bufcount = available;
+        dst.p16out = (int16_t *)outptr;
+        rb->dsp_process(dsp, &src, &dst);
+        if (dst.remcount > 0)
+        {
+            outptr += dst.remcount;
+            available -= dst.remcount;
+        }
+        else if (midi_end)
+            break;
     }
 
     /* how many samples did we write to the buffer? */
-    samples_in_buf = BUF_SIZE-i;
+    samples_in_buf = BUF_SIZE - available;
+#ifndef SYNC
+    lastswap = swap;
+#endif
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(false);
 #endif
@@ -409,26 +440,27 @@ static inline void synthbuf(void)
 static void get_more(const void** start, size_t* size)
 {
 #ifndef SYNC
-    if(lastswap != swap)
+    swap = !swap;
+    if(lastswap == swap)
     {
-        midi_debug("Buffer miss!"); /* Comment out the midi_debug to make missses less noticable. */
+        *start = silence;
+        *size = sizeof(silence);
+        swap = !swap;
+        return;
     }
-
+    else if (samples_in_buf)
+        *start = swap ? (gmbuf + BUF_SIZE) : gmbuf;
 #else
     synthbuf();  /* For some reason midiplayer crashes when an update is forced */
+    if (samples_in_buf)
+        *start = gmbuf;
 #endif
-
-    *size = samples_in_buf*sizeof(int32_t);
-#ifndef SYNC
-    *start = swap ? gmbuf : gmbuf + BUF_SIZE;
-    swap = !swap;
-#else
-    *start = gmbuf;
-#endif
-    if (samples_in_buf==0) {
+    else
+    {
         *start = NULL;
         quit = true;    /* this was the last buffer to play */
     }
+    *size = samples_in_buf*sizeof(int32_t);
 }
 
 static int midimain(const void * filename)
@@ -460,13 +492,26 @@ static int midimain(const void * filename)
         return -1;
     }
 
+    rb->talk_force_shutup();
     rb->pcm_play_stop();
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->pcm_set_frequency(SAMPLE_RATE); /* 44100 22050 11025 */
+
+    dst.remcount = 0;
+    dsp = rb->dsp_get_config(CODEC_IDX_AUDIO);
+    rb->dsp_configure(dsp, DSP_RESET, 0);
+    rb->dsp_configure(dsp, DSP_FLUSH, 0);
+    rb->dsp_configure(dsp, DSP_SET_OUT_FREQUENCY, rb->mixer_get_frequency());
+#ifdef HAVE_PITCHCONTROL
+    rb->sound_set_pitch(PITCH_SPEED_100);
+    rb->dsp_set_timestretch(PITCH_SPEED_100);
+#endif
+    rb->dsp_configure(dsp, DSP_SET_SAMPLE_DEPTH, 22);
+    rb->dsp_configure(dsp, DSP_SET_FREQUENCY, SAMPLE_RATE); /* 44100 22050 11025 */
+    rb->dsp_configure(dsp, DSP_SET_STEREO_MODE, STEREO_INTERLEAVED);
 
     /*
         * tick() will do one MIDI clock tick. Then, there's a loop here that
@@ -501,8 +546,12 @@ static int midimain(const void * filename)
     playing_time = 0;
     samples_this_second = 0;
 
+#ifndef SYNC
     synthbuf();
-    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+#endif
+
+    rb->pcmbuf_fade(false, true);
+    rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, get_more, NULL, 0);
 
     while (!quit)
     {
@@ -547,7 +596,9 @@ static int midimain(const void * filename)
             {
                 /* Rewinding is tricky. Basically start the file over */
                 /* but run through the tracks without the synth running */
-                rb->pcm_play_stop();
+                rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
+                rb->dsp_configure(dsp, DSP_FLUSH, 0);
+                dst.remcount = 0;
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
                 rb->cpu_boost(true);
 #endif
@@ -555,39 +606,45 @@ static int midimain(const void * filename)
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
                 rb->cpu_boost(false);
 #endif
+#ifndef SYNC
                 lastswap = !swap;
                 synthbuf();
+#endif
                 midi_debug("Rewind to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                    rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, get_more, NULL, 0);
                 break;
             }
 
             case MIDI_FFWD:
             {
-                rb->pcm_play_stop();
+                rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
+                rb->dsp_configure(dsp, DSP_FLUSH, 0);
+                dst.remcount = 0;
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+                rb->cpu_boost(true);
+#endif
                 seekForward(5);
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+                rb->cpu_boost(false);
+#endif
+#ifndef SYNC
                 lastswap = !swap;
                 synthbuf();
+#endif
                 midi_debug("Skip to %d:%02d\n", playing_time/60, playing_time%60);
                 if (is_playing)
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
+                    rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, get_more, NULL, 0);
                 break;
             }
 
             case MIDI_PLAYPAUSE:
             {
-                if (is_playing)
-                {
-                    midi_debug("Paused at %d:%02d\n", playing_time/60, playing_time%60);
-                    is_playing = false;
-                    rb->pcm_play_stop();
-                } else
-                {
-                    midi_debug("Playing from %d:%02d\n", playing_time/60, playing_time%60);
-                    is_playing = true;
-                    rb->pcm_play_data(&get_more, NULL, NULL, 0);
-                }
+                is_playing = !is_playing;
+                midi_debug("%s %d:%02d\n",
+                           is_playing ? "Playing from" : "Paused at",
+                           playing_time/60, playing_time%60);
+                rb->mixer_channel_play_pause(PCM_MIXER_CHAN_PLAYBACK, is_playing);
                 break;
             }
 
@@ -598,6 +655,10 @@ static int midimain(const void * filename)
                 quit = true;
         }
     }
+
+    rb->pcmbuf_fade(false, false);
+    rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
+
     return 0;
 }
 
@@ -624,9 +685,6 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef RB_PROFILE
     rb->profstop();
 #endif
-
-    rb->pcm_play_stop();
-    rb->pcm_set_frequency(HW_SAMPR_DEFAULT);
 
     rb->splash(HZ, "FINISHED PLAYING");
 

@@ -39,37 +39,40 @@ struct SynthObject voices[MAX_VOICES] IBSS_ATTR;
 
 static void *alloc(int size)
 {
-    static char *offset = NULL;
-    static size_t totalSize = 0;
+    static char *offset[2] = {NULL};
+    static size_t totalSize[2] = {0};
     char *ret;
+    int n;
 
     int remainder = size % 4;
 
     size = size + 4-remainder;
 
-    if (offset == NULL)
+    if (offset[0] == NULL)
     {
-        offset = rb->plugin_get_audio_buffer(&totalSize);
+        offset[0] = rb->plugin_get_buffer(&totalSize[0]);
     }
 
-    if (size + 4 > (int)totalSize)
+    if (offset[1] == NULL)
+    {
+        offset[1] = rb->plugin_get_audio_buffer(&totalSize[1]);
+    }
+
+    n = (totalSize[0] > totalSize[1]) ? 1 : 0;
+
+    if (size + 4 > (int)totalSize[n])
+        n ^= 1;
+    if (size + 4 > (int)totalSize[n])
     {
         midi_debug("Out of Memory");
-        midi_debug("MALLOC BARF");
-        midi_debug("MALLOC BARF");
-        midi_debug("MALLOC BARF");
-        midi_debug("MALLOC BARF");
-        midi_debug("MALLOC BARF");
-        /* We've made our point. */
-
         return NULL;
     }
 
-    ret = offset + 4;
-    *((unsigned int *)offset) = size;
+    ret = offset[n] + 4;
+    *((unsigned int *)offset[n]) = size;
 
-    offset += size + 4;
-    totalSize -= size + 4;
+    offset[n] += size + 4;
+    totalSize[n] -= size + 4;
     return ret;
 }
 
@@ -117,7 +120,8 @@ unsigned char readChar(int file)
 void * readData(int file, int len)
 {
     void * dat = malloc(len);
-    rb->read(file, dat, len);
+    if (dat)
+        rb->read(file, dat, len);
     return dat;
 }
 

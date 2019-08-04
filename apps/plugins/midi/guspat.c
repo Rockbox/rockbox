@@ -66,6 +66,8 @@ static struct GWaveform * loadWaveform(int file)
     rb->memset(wav, 0, sizeof(struct GWaveform));
 
     wav->name=readData(file, 7);
+    if (!wav->name)
+        return NULL;
 /*    printf("\nWAVE NAME = [%s]", wav->name); */
     wav->fractions=readChar(file);
     wav->wavSize=readDWord(file);
@@ -81,7 +83,11 @@ static struct GWaveform * loadWaveform(int file)
 
     wav->balance=readChar(file);
     wav->envRate=readData(file, 6);
+    if (!wav->envRate)
+        return NULL;
     wav->envOffset=readData(file, 6);
+    if (!wav->envOffset)
+        return NULL;
 
     wav->tremSweep=readChar(file);
     wav->tremRate=readChar(file);
@@ -95,7 +101,11 @@ static struct GWaveform * loadWaveform(int file)
     wav->scaleFactor=readWord(file);
 /*    printf("\nScaleFreq = %d   ScaleFactor = %d   RootFreq = %d", wav->scaleFreq, wav->scaleFactor, wav->rootFreq); */
     wav->res=readData(file, 36);
+    if (!wav->res)
+        return NULL;
     wav->data=readData(file, wav->wavSize);
+    if (!wav->data)
+        return NULL;
 
     wav->numSamples = wav->wavSize / 2;
     wav->startLoop = wav->startLoop >> 1;
@@ -166,7 +176,10 @@ static int selectWaveform(struct GPatch * pat, int midiNote)
 struct GPatch * gusload(char * filename)
 {
     struct GPatch * gp = (struct GPatch *)malloc(sizeof(struct GPatch));
-    rb->memset(gp, 0, sizeof(struct GPatch));
+
+    if (gp)
+        rb->memset(gp, 0, sizeof(struct GPatch));
+    else return NULL;
 
     int file = rb->open(filename, O_RDONLY);
 
@@ -179,8 +192,23 @@ struct GPatch * gusload(char * filename)
     }
 
     gp->header=readData(file, 12);
+    if (!gp->header)
+    {
+        rb->close(file);
+        return NULL;
+    }
     gp->gravisid=readData(file, 10);
+    if (!gp->gravisid)
+    {
+        rb->close(file);
+        return NULL;
+    }
     gp->desc=readData(file, 60);
+    if (!gp->desc)
+    {
+        rb->close(file);
+        return NULL;
+    }
     gp->inst=readChar(file);
     gp->voc=readChar(file);
     gp->chan=readChar(file);
@@ -188,28 +216,52 @@ struct GPatch * gusload(char * filename)
     gp->vol=readWord(file);
     gp->datSize=readDWord(file);
     gp->res=readData(file, 36);
+    if (!gp->res)
+    {
+        rb->close(file);
+        return NULL;
+    }
 
     gp->instrID=readWord(file);
     gp->instrName=readData(file,16);
+    if (!gp->instrName)
+    {
+        rb->close(file);
+        return NULL;
+    }
     gp->instrSize=readDWord(file);
     gp->layers=readChar(file);
     gp->instrRes=readData(file,40);
-
+    if (!gp->instrRes)
+    {
+        rb->close(file);
+        return NULL;
+    }
 
     gp->layerDup=readChar(file);
     gp->layerID=readChar(file);
     gp->layerSize=readDWord(file);
     gp->numWaves=readChar(file);
     gp->layerRes=readData(file,40);
-
+    if (!gp->layerRes)
+    {
+        rb->close(file);
+        return NULL;
+    }
 
 /*    printf("\nFILE: %s", filename); */
 /*    printf("\nlayerSamples=%d", gp->numWaves); */
 
     int a=0;
     for(a=0; a<gp->numWaves; a++)
+    {
         gp->waveforms[a] = loadWaveform(file);
-
+        if (!gp->waveforms[a])
+        {
+            rb->close(file);
+            return NULL;
+        }
+    }
 
 /*    printf("\nPrecomputing note table"); */
 
