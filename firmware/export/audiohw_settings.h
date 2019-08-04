@@ -84,6 +84,7 @@ AUDIOHW_SETTINGS(
     AUDIOHW_SETTING_ENT(BALANCE,            sound_set_balance)
     AUDIOHW_SETTING_ENT(CHANNELS,           sound_set_channels)
     AUDIOHW_SETTING_ENT(STEREO_WIDTH,       sound_set_stereo_width)
+    AUDIOHW_SETTING_ENT(SWAP_CHANNELS,      sound_set_swap_channels)
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     AUDIOHW_SETTING_ENT(LOUDNESS,           sound_set_loudness)
     AUDIOHW_SETTING_ENT(AVC,                sound_set_avc)
