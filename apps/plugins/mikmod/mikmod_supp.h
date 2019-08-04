@@ -64,15 +64,7 @@ int mmsupp_sprintf(char *buf, const char *fmt, ... );
 extern const struct plugin_api * rb;
 
 
-#ifdef SIMULATOR 
-#define SAMPLE_RATE SAMPR_44		/* Simulator requires 44100Hz */
-#else
-#if (HW_SAMPR_CAPS & SAMPR_CAP_22)  /* use 22050Hz if we can */
-#define SAMPLE_RATE SAMPR_22        /* 22050 */
-#else
 #define SAMPLE_RATE SAMPR_44        /* 44100 */
-#endif
-#endif
 
 #define BUF_SIZE 4096*8
 #define NBUF   2
