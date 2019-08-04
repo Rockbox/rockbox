@@ -300,7 +300,8 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
                 s1 = so->decay;
                 s2 = s1 * pan;
                 s1 = (s1 << 7) -s2;
-                *(out++) += ((s1 << 9) & 0xFFFF0000) | ((s2 >> 7) &0xFFFF);
+                *(out++) += s1;
+                *(out++) += s2;
                 continue;
             }
         } else  /* OK to advance voice */
@@ -431,7 +432,8 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
 
         s2 = s1 * pan;
         s1 = (s1 << 7) - s2;
-        *(out++) += ((s1 << 9) & 0xFFFF0000) | ((s2 >> 7) &0xFFFF);
+        *(out++) += s1;
+        *(out++) += s2;
     }
 
     /* store these again */
@@ -441,40 +443,29 @@ static inline void synthVoice(struct SynthObject * so, int32_t * out, unsigned i
     return;
 }
 
-/* buffer to hold all the samples for the current tick, this is a hack
-   neccesary for coldfire targets as pcm_play_data uses the dma which cannot
-   access iram */
-int32_t samp_buf[512] IBSS_ATTR;
-
 /* synth num_samples samples and write them to the */
 /* buffer pointed to by buf_ptr                    */
-void synthSamples(int32_t *buf_ptr, unsigned int num_samples) ICODE_ATTR;
-void synthSamples(int32_t *buf_ptr, unsigned int num_samples)
+size_t synthSamples(int32_t *buf_ptr, size_t num_samples) ICODE_ATTR;
+size_t synthSamples(int32_t *buf_ptr, size_t num_samples)
 {
-    if (UNLIKELY(num_samples > 512))
-        DEBUGF("num_samples is too big!\n");
-    else
+    unsigned int i;
+    struct SynthObject *voicept;
+    size_t nsamples = MIN(num_samples, MAX_SAMPLES);
+
+    rb->memset(buf_ptr, 0, nsamples * 2 * sizeof(int32_t));
+
+    for(i=0; i < MAX_VOICES; i++)
     {
-        int i;
-        struct SynthObject *voicept;
-
-        rb->memset(samp_buf, 0, num_samples*4);
-
-        for(i=0; i < MAX_VOICES; i++)
+        voicept=&voices[i];
+        if(voicept->isUsed)
         {
-            voicept=&voices[i];
-            if(voicept->isUsed)
-            {
-                synthVoice(voicept, samp_buf, num_samples);
-            }
+            synthVoice(voicept, buf_ptr, nsamples);
         }
-
-        rb->memcpy(buf_ptr, samp_buf, num_samples*4);
     }
 
     /* TODO: Automatic Gain Control, anyone? */
     /* Or, should this be implemented on the DSP's output volume instead? */
 
-    return;  /* No more ghetto lowpass filter. Linear interpolation works well. */
+    return nsamples; /* No more ghetto lowpass filter. Linear interpolation works well. */
 }
 

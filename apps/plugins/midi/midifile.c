@@ -106,6 +106,11 @@ struct MIDIfile * loadFile(const char * filename)
         if(id == ID_MTRK)
         {
             mfload->tracks[track] = readTrack(file);
+            if (!mfload->tracks[track])
+            {
+                rb->close(file);
+                return NULL;
+            }
             track++;
         } else
         {
@@ -125,7 +130,7 @@ struct MIDIfile * loadFile(const char * filename)
  * and then track 2 starts loading */
 
 int rStatus = 0;
-/* Returns 0 if done, 1 if keep going */
+/* Returns 0 if done, 1 if keep going and -1 in case of error */
 static int readEvent(int file, void * dest)
 {
     struct Event dummy;
@@ -152,6 +157,8 @@ static int readEvent(int file, void * dest)
             {
                 /* Null-terminate for text events */
                 ev->evData = malloc(ev->len+1); /* Extra byte for the null termination */
+                if (!ev->evData)
+                    return -1;
 
                 rb->read(file, ev->evData, ev->len);
                 ev->evData[ev->len] = 0;
@@ -272,27 +279,35 @@ struct Track * readTrack(int file)
 
     int pos = rb->lseek(file, 0, SEEK_CUR);
 
-    while(readEvent(file, NULL))    /* Memory saving technique                   */
+    int evstat;
+
+    while ((evstat = readEvent(file, NULL)) > 0) /* Memory saving technique                   */
         numEvents++;                /* Attempt to read in events, count how many */
                                     /* THEN allocate memory and read them in     */
+    if (evstat < 0)
+        return NULL;
     rb->lseek(file, pos, SEEK_SET);
 
     int trackSize = (numEvents+1) * sizeof(struct Event);
     void * dataPtr = malloc(trackSize);
+    if (!dataPtr)
+        return NULL;
     trk->dataBlock = dataPtr;
 
     numEvents=0;
 
-    while(readEvent(file, dataPtr))
+    while ((evstat = readEvent(file, dataPtr)) > 0)
     {
         if(trackSize < dataPtr-trk->dataBlock)
         {
             midi_debug("Track parser memory out of bounds");
-            exit(1);
+            return NULL;
         }
         dataPtr+=sizeof(struct Event);
         numEvents++;
     }
+    if (evstat < 0)
+        return NULL;
     trk->numEvents = numEvents;
 
     return trk;
