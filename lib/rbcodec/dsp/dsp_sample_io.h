@@ -62,6 +62,8 @@ void dsp_sample_input_format_change(struct sample_io_data *this,
 void dsp_sample_output_format_change(struct sample_io_data *this,
                                      struct sample_format *format);
 
+void dsp_sample_io_set_swap_channels(bool swap_channels);
+
 /* Sample IO watches the format setting from the codec */
 bool dsp_sample_io_configure(struct sample_io_data *this,
                              unsigned int setting,
