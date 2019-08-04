@@ -975,7 +975,7 @@ bool recording_screen(bool no_source)
     int audio_stat = 0;         /* status of the audio system */
     int last_audio_stat = -1;   /* previous status so we can act on changes */
     struct viewport vp_list[NB_SCREENS], vp_top[NB_SCREENS]; /* the viewports */
-    const unsigned long split_seconds = (unsigned) global_settings.rec_timesplit;
+    const unsigned long split_seconds = (unsigned) global_settings.rec_timesplit * 60;
     const unsigned long split_bytes = rec_sizesplit_bytes();
 
 #if CONFIG_CODEC == SWCODEC
