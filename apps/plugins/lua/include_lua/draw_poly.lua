@@ -29,6 +29,8 @@
 if not rb.lcd_framebuffer then rb.splash(rb.HZ, "No Support!") return nil end
 
 local _poly = {} do
+    -- Internal Constants
+    local rocklib_image = getmetatable(rb.lcd_framebuffer())
     local BSAND = 8 -- blits color to dst if src <> 0
     local _NIL = nil -- nil placeholder
 
