@@ -183,6 +183,8 @@
 #define EOF (-1)
 
 #define LOAD_XPM
+
+#define WAV_MUSIC
 #define MID_MUSIC
 #define USE_TIMIDITY_MIDI
 
