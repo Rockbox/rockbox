@@ -3444,6 +3444,7 @@ void cleanup(void *fd)
     mas_restore();
     rb->sound_set(SOUND_CHANNELS, rb->global_settings->channel_config);
     rb->sound_set(SOUND_STEREO_WIDTH, rb->global_settings->stereo_width);
+    rb->sound_set(SOUND_SWAP_CHANNELS, rb->global_settings->swap_channels);
 
     /* reconfigure SCI */
     while (!(SSR0 & SCI_TEND)); /* wait for end of transfer */

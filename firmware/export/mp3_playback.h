@@ -34,7 +34,7 @@ typedef void (*mp3_play_callback_t)(const void **start, size_t* size);
 
 /* functions formerly in mpeg.c */
 void mp3_init(int volume, int bass, int treble, int balance, int loudness,
-              int avc, int channel_config, int stereo_width,
+              int avc, int channel_config, int stereo_width, bool swap_channels,
               int mdb_strength, int mdb_harmonics,
               int mdb_center, int mdb_shape, bool mdb_enable,
               bool superbass);

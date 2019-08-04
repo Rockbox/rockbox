@@ -58,6 +58,23 @@ extern void dsp_sample_output_format_change(struct sample_io_data *this,
 /* CODEC_IDX_AUDIO = left and right, CODEC_IDX_VOICE = mono */
 static int32_t sample_bufs[3][SAMPLE_BUF_COUNT] IBSS_ATTR;
 
+static int lch = 0;
+static int rch = 1;
+
+void dsp_sample_io_set_swap_channels(bool swap_channels)
+{
+    if (swap_channels)
+    {
+        lch = 1;
+        rch = 0;
+    }
+    else
+    {
+        lch = 0;
+        rch = 1;
+    }
+}
+
 /* inline helper to setup buffers when conversion is required */
 static FORCE_INLINE int sample_input_setup(struct sample_io_data *this,
                                            struct dsp_buffer **buf_p,
@@ -119,8 +136,8 @@ static void sample_input_i_stereo16(struct sample_io_data *this,
         return;
 
     const int16_t *s = src->pin[0];
-    int32_t *dl = dst->p32[0];
-    int32_t *dr = dst->p32[1];
+    int32_t *dl = dst->p32[lch];
+    int32_t *dr = dst->p32[rch];
     const int scale = WORD_SHIFT;
 
     dsp_advance_buffer_input(src, count, 2*sizeof (int16_t));
@@ -145,8 +162,8 @@ static void sample_input_ni_stereo16(struct sample_io_data *this,
 
     const int16_t *sl = src->pin[0];
     const int16_t *sr = src->pin[1];
-    int32_t *dl = dst->p32[0];
-    int32_t *dr = dst->p32[1];
+    int32_t *dl = dst->p32[lch];
+    int32_t *dr = dst->p32[rch];
     const int scale = WORD_SHIFT;
 
     dsp_advance_buffer_input(src, count, sizeof (int16_t));
@@ -188,8 +205,8 @@ static void sample_input_i_stereo32(struct sample_io_data *this,
         return;
 
     const int32_t *s = src->pin[0];
-    int32_t *dl = dst->p32[0];
-    int32_t *dr = dst->p32[1];
+    int32_t *dl = dst->p32[lch];
+    int32_t *dr = dst->p32[rch];
 
     dsp_advance_buffer_input(src, count, 2*sizeof (int32_t));
 
@@ -205,11 +222,25 @@ static void sample_input_i_stereo32(struct sample_io_data *this,
 static void sample_input_ni_stereo32(struct sample_io_data *this,
                                      struct dsp_buffer **buf_p)
 {
-    struct dsp_buffer *dst = &this->sample_buf;
+    struct dsp_buffer *src, *dst;
+    int count = sample_input_setup(this, buf_p, 2, &src, &dst);
 
-    if (dst->remcount > 0)
-        *buf_p = dst; /* data still remains */
-    /* else no buffer switch */
+    if (count <= 0)
+        return;
+
+    const int32_t *sl = src->pin[0];
+    const int32_t *sr = src->pin[1];
+    int32_t *dl = dst->p32[lch];
+    int32_t *dr = dst->p32[rch];
+
+    dsp_advance_buffer_input(src, count, sizeof (int32_t));
+
+    do
+    {
+        *dl++ = *sl++;
+        *dr++ = *sr++;
+    }
+    while (--count > 0);
 }
 
 /* set the to-native sample conversion function based on dsp sample
