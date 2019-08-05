@@ -18,7 +18,7 @@ INCLUDES= $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(BUILDDI
 .PHONY: all buildmanual clean objdir-check
 MANFILE := rockbox-build
 
-VERSION= `$(TOOLSDIR)/version.sh $(ROOTDIR)`
+VERSION ?= $(shell $(TOOLSDIR)/version.sh $(ROOTDIR))
 
 .PHONY: $(OBJDIR)/version.tex $(OBJDIR)/$(MANFILE).tex
 
