@@ -19,9 +19,7 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
-
-
-
+ 
 /*
 ** If your system does not support `stdout', you can just remove this function.
 ** If you need, you can define your own `print' function, following this

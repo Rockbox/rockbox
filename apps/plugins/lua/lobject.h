@@ -230,24 +230,29 @@ typedef union Udata {
 } Udata;
 
 
-
-
 /*
 ** Function Prototypes
 */
+
 typedef struct Proto {
   CommonHeader;
   TValue *k;  /* constants used by the function */
   Instruction *code;
   struct Proto **p;  /* functions defined inside the function */
+#ifdef LUA_OPTIMIZE_DEBUG
+  unsigned char *packedlineinfo;
+#else
   int *lineinfo;  /* map from opcodes to source lines */
+#endif
   struct LocVar *locvars;  /* information about local variables */
   TString **upvalues;  /* upvalue names */
   TString  *source;
   int sizeupvalues;
   int sizek;  /* size of `k' */
   int sizecode;
+#ifndef LUA_OPTIMIZE_DEBUG
   int sizelineinfo;
+#endif
   int sizep;  /* size of `p' */
   int sizelocvars;
   int linedefined;

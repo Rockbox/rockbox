@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <stddef.h>  /*DEBUG */ 
+
 #define lvm_c
 #define LUA_CORE
 
@@ -25,7 +27,6 @@
 #include "ltable.h"
 #include "ltm.h"
 #include "lvm.h"
-
 
 
 /* limit for table tag-method chains (to avoid loops) */

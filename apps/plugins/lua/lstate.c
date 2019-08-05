@@ -101,17 +101,27 @@ static void preinit_state (lua_State *L, global_State *g) {
   setnilvalue(gt(L));
 }
 
+//#define print_state_size(g) printf("STATE SIZE(%4i): %8i\n", scnt++, g->totalbytes - sizeof(LG))
+#define print_state_size(g) 
 
 static void close_state (lua_State *L) {
+//int scnt=0;
   global_State *g = G(L);
+print_state_size(g);
   luaF_close(L, L->stack);  /* close all upvalues for this thread */
+print_state_size(g);
   luaC_freeall(L);  /* collect all objects */
+print_state_size(g);
   lua_assert(g->rootgc == obj2gco(L));
   lua_assert(g->strt.nuse == 0);
   luaM_freearray(L, G(L)->strt.hash, G(L)->strt.size, TString *);
+print_state_size(g);
   luaZ_freebuffer(L, &g->buff);
+print_state_size(g);
   freestack(L, L);
+print_state_size(g);
   lua_assert(g->totalbytes == sizeof(LG));
+print_state_size(g);
   (*g->frealloc)(g->ud, fromstate(L), state_size(LG), 0);
 }
 
