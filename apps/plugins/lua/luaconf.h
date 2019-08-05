@@ -818,5 +818,6 @@ extern long rb_pow(long, long);
 /*else*/
 #define LUA_USER_H "lua_user.h"
 #define LUA_DISABLE_BYTECODE
+#define LUA_OPTIMIZE_DEBUG 2 /* Lua Compact Debug -- Terry Ellison 2015 */
 
 #endif
