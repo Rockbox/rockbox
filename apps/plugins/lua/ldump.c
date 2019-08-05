@@ -113,8 +113,17 @@ static void DumpConstants(const Proto* f, DumpState* D)
 static void DumpDebug(const Proto* f, DumpState* D)
 {
  int i,n;
+#ifdef LUA_OPTIMIZE_DEBUG
+ n = (D->strip || f->packedlineinfo == NULL) ? 0: f->sizelineinfo;
+ DumpInt(n,D);
+ if (n)
+ {
+  DumpBlock(f->packedlineinfo, n, D);
+ }
+#else
  n= (D->strip) ? 0 : f->sizelineinfo;
  DumpVector(f->lineinfo,n,sizeof(int),D);
+#endif
  n= (D->strip) ? 0 : f->sizelocvars;
  DumpInt(n,D);
  for (i=0; i<n; i++)
