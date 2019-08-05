@@ -233,10 +233,9 @@ static void talk_qs_option(const struct settings_list *opt, bool enqueue)
     if (!global_settings.talk_menu || !opt)
         return;
 
-    if (!enqueue)
-        talk_shutup();
-    talk_id(opt->lang_id, true);
-    option_talk_value(opt, option_value_as_int(opt), true);
+    if (enqueue)
+        talk_id(opt->lang_id, enqueue);
+    option_talk_value(opt, option_value_as_int(opt), enqueue);
 }
 
 /*
@@ -334,9 +333,11 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
        changed. */
     cond_talk_ids(VOICE_QUICKSCREEN);
     talk_qs_option(qs->items[QUICKSCREEN_TOP], true);
+    if (qs->items[QUICKSCREEN_TOP] != qs->items[QUICKSCREEN_BOTTOM])
+        talk_qs_option(qs->items[QUICKSCREEN_BOTTOM], true);
     talk_qs_option(qs->items[QUICKSCREEN_LEFT], true);
-    talk_qs_option(qs->items[QUICKSCREEN_BOTTOM], true);
-    talk_qs_option(qs->items[QUICKSCREEN_RIGHT], true);
+    if (qs->items[QUICKSCREEN_LEFT] != qs->items[QUICKSCREEN_RIGHT])
+        talk_qs_option(qs->items[QUICKSCREEN_RIGHT], true);
     while (true) {
         button = get_action(CONTEXT_QUICKSCREEN, HZ/5);
 #ifdef HAVE_TOUCHSCREEN

@@ -188,7 +188,7 @@ void option_talk_value(const struct settings_list *setting, int value, bool enqu
             talkunit = UNIT_PERCENT;
         else if (!strcmp(unit, "Hz"))
             talkunit = UNIT_HERTZ;
-        talk_value_decimal(phys, talkunit, decimals, false);
+        talk_value_decimal(phys, talkunit, decimals, enqueue);
     }
     else if ((setting->flags & F_CHOICE_SETTING) == F_CHOICE_SETTING)
     {
