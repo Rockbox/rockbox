@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "69aa8954_e56736eb",
+        "filename": "apps/plugins/properties.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2019-08-05T02:25:06Z",
+      "side": 1,
+      "message": "Turns out that while this doesn\u0027t need to be global for this patch, the followup patch (adding voice capabilities to this plugin) needs a non-stack-allocated dps struct for a callback.  Still working on cleaning all of this up.",
+      "range": {
+        "startLine": 147,
+        "startChar": 1,
+        "endLine": 153,
+        "endChar": 6
+      },
+      "revId": "0e52b56b886fa4fd34d3087782abdc97f468303e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
