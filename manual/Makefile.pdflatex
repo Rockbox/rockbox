@@ -6,7 +6,7 @@ HTLATEX := htlatex
 HTOPTS1 := rockbox-html,charset=utf-8,early_
 HTOPTS2 := " -utf8 -cmozhtf"
 HTOPTS3 := "-dhtml/ -cvalidate"
-VERSION=`$(TOOLSDIR)/version.sh $(ROOTDIR)`
+VERSION ?= $(shell $(TOOLSDIR)/version.sh $(ROOTDIR))
 SPLITHTML ?= 2
 
 .PHONY: all cleaner buildmanual output
