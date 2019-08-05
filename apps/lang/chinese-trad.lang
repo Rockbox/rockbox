@@ -4456,16 +4456,16 @@
   <dest>
     *: none
     rtc: "OFF = 返回"
-    mrobe500: ""
+    mrobe500: "POWER = 回去"
     iriverh100,iriverh120,iriverh300: "STOP = 返回"
-    ipod*,sansac200*,mpiohd300: ""
+    ipod*,sansac200*,mpiohd300: "MENU = 回去"
     iaudiox5,iaudiom5: "RECORD = 回去"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = 返回"
     gigabeatfx: "POWER = 返回"
     sansafuzeplus: "BACK = 返回"
     mrobe100: "DISPLAY = 返回"
     gigabeats: "BACK = 返回"
-    gogearsa9200: ""
+    gogearsa9200: "LEFT = 返回"
     vibe500: "CANCEL = 返回"
     samsungyh*: "REW = 返回"
   </dest>
@@ -7961,9 +7961,9 @@
     iriverh100,iriverh120,iriverh300: "建立資料庫... 找到 %d 項 (STOP: 回上一畫面)"
     ipod*: "建立資料庫... 找到 %d 項 (PREV: 回上一畫面)"
     iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "建立資料庫... 找到 %d 項 (LEFT: 回上一畫面)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: ""
-    gogearsa9200: ""
-    archosplayer: ""
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "建立資料庫... 找到 %d 項 (PREV: 回上一畫面)"
+    gogearsa9200: "建立資料庫... 找到 %d 項 (REW: 回上一畫面)"
+    archosplayer: "建立資料庫... 找到 %d"
   </dest>
   <voice>
     *: "entries found for database"
@@ -8092,7 +8092,7 @@
 </phrase>
 <phrase>
   id: LANG_DELETING
-  desc: 
+  desc:
   user: core
   <source>
     *: "Deleting..."
@@ -8411,7 +8411,7 @@
 </phrase>
 <phrase>
   id: LANG_REC_DIR_NOT_WRITABLE
-  desc: 
+  desc:
   user: core
   <source>
     *: none
@@ -8458,11 +8458,11 @@
     *: "PLAY = 是"
     cowond2*: ""
     iriverh100,iriverh120,iriverh300: "NAVI = 是"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: ""
-    mrobe500: ""
+    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = 是"
+    mrobe500: "PLAY, POWER, or top-right = 是"
     archosplayer: "(PLAY/STOP)"
     vibe500: "OK = 是"
-    creativezen*: ""
+    creativezen*: "Select = 是"
   </dest>
   <voice>
     *: ""
@@ -8487,7 +8487,7 @@
     rtc: "ON = 設定"
     mrobe500: ""
     iriverh100,iriverh120,iriverh300: "NAVI = 設定"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: ""
+    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = 設定"
     gogearsa9200,samsungyh*: "PLAY = 設定"
     vibe500: "OK = 設定"
     mpiohd300: "ENTER = 設定"
@@ -8515,7 +8515,7 @@
 </phrase>
 <phrase>
   id: LANG_BROWSE_CUESHEET
-  desc: 
+  desc:
   user: core
   <source>
     *: "Browse Cuesheet"
@@ -8633,7 +8633,7 @@
 </phrase>
 <phrase>
   id: LANG_ADD_TO_FAVES
-  desc: 
+  desc:
   user: core
   <source>
     *: "Add to Shortcuts"
@@ -8726,7 +8726,7 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_REC_DIR
-  desc: 
+  desc:
   user: core
   <source>
     *: none
@@ -9574,7 +9574,7 @@
 </phrase>
 <phrase>
   id: LANG_MOVING
-  desc: 
+  desc:
   user: core
   <source>
     *: "Moving..."
@@ -9630,7 +9630,7 @@
 </phrase>
 <phrase>
   id: VOICE_EXT_CUESHEET
-  desc: 
+  desc:
   user: core
   <source>
     *: ""
@@ -9939,7 +9939,7 @@
 </phrase>
 <phrase>
   id: LANG_COPYING
-  desc: 
+  desc:
   user: core
   <source>
     *: "Copying..."
@@ -11121,7 +11121,7 @@
 </phrase>
 <phrase>
   id: LANG_FILESIZE
-  desc: in record timesplit options and in track information viewer 
+  desc: in record timesplit options and in track information viewer
   user: core
   <source>
     *: "Filesize"
