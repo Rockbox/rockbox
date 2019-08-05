@@ -3952,12 +3952,15 @@
   user: core
   <source>
     *: "Int:"
+    xduoox3: "mSD1:"
   </source>
   <dest>
     *: "Int:"
+    xduoox3: "MSD1:"
   </dest>
   <voice>
     *: "Seesmine"
+    xduoox3: "micro S D 1"
   </voice>
 </phrase>
 <phrase>
@@ -3965,13 +3968,25 @@
   desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
   user: core
   <source>
-    *: "MMC:"
+    *: none
+    multivolume: "HD1"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
+    xduoox3: "mSD2:"
+    archosondio*: "MMC:"
   </source>
   <dest>
-    *: "MMK:"
+    *: none
+    multivolume: "HD1"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "MSD:"
+    xduoox3: "MSD2:"
+    archosondio*: "MMK:"
   </dest>
   <voice>
-    *: "Multimeedia kaart"
+    *: none
+    multivolume: "H D 1"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro S D"
+    xduoox3: "micro S D 2"
+    archosondio*: "Multimeedia kaart"
   </voice>
 </phrase>
 <phrase>

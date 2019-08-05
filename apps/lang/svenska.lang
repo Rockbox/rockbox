@@ -6593,16 +6593,16 @@
   desc: in info menu; name for internal disk with multivolume (keep short!)
   user: core
   <source>
-    *: none
-    multivolume: "Int:"
+    *: "Int:"
+    xduoox3: "mSD1:"
   </source>
   <dest>
-    *: none
-    multivolume: "Int:"
+    *: "Int:"
+    xduoox3: "mSD1:"
   </dest>
   <voice>
-    *: none
-    multivolume: "Internt:"
+    *: "Internt:"
+    xduoox3: "mikro S D 1"
   </voice>
 </phrase>
 <phrase>
@@ -6613,18 +6613,21 @@
     *: none
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
+    xduoox3: "mSD2:"
     archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
+    xduoox3: "mSD2:"
     archosondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "mikro S D"
+    xduoox3: "mikro S D 2"
     archosondio*: "M M C"
   </voice>
 </phrase>
