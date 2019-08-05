@@ -318,9 +318,13 @@ static l_mem propagatemark (global_State *g) {
       return sizeof(Proto) + sizeof(Instruction) * p->sizecode +
                              sizeof(Proto *) * p->sizep +
                              sizeof(TValue) * p->sizek + 
-                             sizeof(int) * p->sizelineinfo +
                              sizeof(LocVar) * p->sizelocvars +
-                             sizeof(TString *) * p->sizeupvalues;
+                             sizeof(TString *) * p->sizeupvalues +
+#ifdef LUA_OPTIMIZE_DEBUG
+                             p->sizelineinfo;
+#else
+                             sizeof(int) * p->sizelineinfo;
+#endif
     }
     default: lua_assert(0); return 0;
   }
