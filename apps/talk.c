@@ -177,7 +177,7 @@ static int index_handle, talk_handle;
 
 static int move_callback(int handle, void *current, void *new)
 {
-    (void)handle; (void)current; (void)new;
+    (void)current;
     if (handle == talk_handle && !buflib_context_relocate(&clip_ctx, new))
         return BUFLIB_CB_CANNOT_MOVE;
     return BUFLIB_CB_OK;
@@ -246,7 +246,7 @@ static ssize_t read_to_handle(int fd, int handle, int handle_offset, size_t coun
 
 static int shrink_callback(int handle, unsigned hints, void *start, size_t old_size)
 {
-    (void)start;(void)old_size;(void)hints;
+    (void)start;(void)old_size;
     int *h;
 #if (MAX_CLIP_BUFFER_SIZE < (MEMORYSIZE<<20) || (MEMORYSIZE > 2))
     /* on low-mem and when the voice buffer size is not limited (i.e.
@@ -258,18 +258,22 @@ static int shrink_callback(int handle, unsigned hints, void *start, size_t old_s
      * not necessary. */
     if (give_buffer_away
             && (hints & BUFLIB_SHRINK_POS_MASK) == BUFLIB_SHRINK_POS_MASK)
+#else
+    (void)hints;
 #endif
     {
         if (handle == talk_handle)
             h = &talk_handle;
-        else //if (handle == index_handle)
+        else if (handle == index_handle)
             h = &index_handle;
+        else h = NULL;
 
         mutex_lock(&read_buffer_mutex);
         /* the clip buffer isn't usable without index table */
         if (handle == index_handle && talk_handle > 0)
             talk_handle = core_free(talk_handle);
-        *h = core_free(handle);
+        if (h)
+            *h = core_free(handle);
         mutex_unlock(&read_buffer_mutex);
 
         return BUFLIB_CB_OK;
@@ -435,8 +439,9 @@ static ssize_t read_clip_data(int fd, int index, int clip_handle)
 
 static void load_initial_clips(int fd)
 {
+#if defined(TALK_PROGRESSIVE_LOAD)
     (void) fd;
-#ifndef TALK_PROGRESSIVE_LOAD
+#else
     unsigned index, i;
     unsigned num_clips = voicefile.id1_max + voicefile.id2_max;
 
@@ -1059,8 +1064,14 @@ static int _talk_file(const char* filename,
         return -1;  /* talking has been disabled */
     if (!check_audio_status())
         return -1;
-    if (talk_handle <= 0)
-        load_voicefile_data(-1);
+    if (talk_handle <= 0 || index_handle <= 0)
+    {
+        int fd = open_voicefile();
+        if (fd < 0 || !load_voicefile_index(fd))
+            return -1;
+        load_voicefile_data(fd);
+        close(fd);
+    }
 
 #if CONFIG_CODEC != SWCODEC
     if(mp3info(&info, filename)) /* use this to find real start */
