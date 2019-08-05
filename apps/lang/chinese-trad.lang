@@ -8456,7 +8456,7 @@
   </source>
   <dest>
     *: "PLAY = 是"
-    cowond2*: ""
+    cowond2*: "MENU, or top-right = 是"
     iriverh100,iriverh120,iriverh300: "NAVI = 是"
     ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = 是"
     mrobe500: "PLAY, POWER, or top-right = 是"
@@ -8485,7 +8485,7 @@
   <dest>
     *: none
     rtc: "ON = 設定"
-    mrobe500: ""
+    mrobe500: "HEART = 設定"
     iriverh100,iriverh120,iriverh300: "NAVI = 設定"
     ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = 設定"
     gogearsa9200,samsungyh*: "PLAY = 設定"
