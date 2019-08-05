@@ -4277,16 +4277,16 @@
   desc: in info menu; name for internal disk with multivolume (keep short!)
   user: core
   <source>
-    *: none
-    multivolume: "Int:"
+    *: "Int:"
+    xduoox3: "mSD1:"
   </source>
   <dest>
-    *: none
-    multivolume: "內建:"
+    *: "內建:"
+    xduoox3: "Multimedia 卡1:"
   </dest>
   <voice>
-    *: none
-    multivolume: "Internal"
+    *: "Internal"
+    xduoox3: "Multimedia 卡1"
   </voice>
 </phrase>
 <phrase>
@@ -4297,18 +4297,21 @@
     *: none
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
+    xduoox3: "mSD2:"
     archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "磁盤1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "Multimedia 卡:"
+    xduoox3: "Multimedia 卡2:"
     archosondio*: "MMC 卡:"
   </dest>
   <voice>
     *: none
     multivolume: "磁盤1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "Multimedia 卡"
+    xduoox3: "Multimedia 卡2"
     archosondio*: "MMC 卡"
   </voice>
 </phrase>

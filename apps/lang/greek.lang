@@ -6572,16 +6572,16 @@
   desc: in info menu; name for internal disk with multivolume (keep short!)
   user: core
   <source>
-    *: none
-    multivolume: "Int:"
+    *: "Int:"
+    xduoox3: "mSD1:"
   </source>
   <dest>
-    *: none
-    multivolume: "Εσωτ."
+    *: "Εσωτ."
+    xduoox3: "mSD1:"
   </dest>
   <voice>
-    *: none
-    multivolume: "Εσωτερικός"
+    *: "Εσωτερικός"
+    xduoox3: "μάικρο Ες Ντι 1"
   </voice>
 </phrase>
 <phrase>
@@ -6592,18 +6592,21 @@
     *: none
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
+    xduoox3: "mSD2:"
     archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
+    xduoox3: "mSD2:"
     archosondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "Έιτς Ντι 1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "μάικρο Ες Ντι"
+    xduoox3: "μάικρο Ες Ντι 2"
     archosondio*: "Εμ Εμ Σι"
   </voice>
 </phrase>
