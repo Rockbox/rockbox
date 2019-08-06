@@ -46,7 +46,7 @@ qboolean SNDDMA_Init(void)
 			return 0;
 	}
 	desired.channels = 2;
-	desired.samples = 1024;
+	desired.samples = 2048;
 	//desired.callback = paint_audio;
 
         if( Mix_OpenAudio(desired_speed, desired.format, desired.channels, desired.samples) < 0 )
