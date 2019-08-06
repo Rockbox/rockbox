@@ -1261,7 +1261,7 @@ static bool create_albumart_cache(void)
     draw_progressbar(i);
     if ( slides == 0 ) {
         /* Warn the user that we couldn't find any albumart */
-        rb->splash(2*HZ, "No album art found");
+        rb->splash(2*HZ, ID2P(LANG_NO_ALBUMART_FOUND));
         return false;
     }
     return true;
@@ -2236,36 +2236,43 @@ static int settings_menu(void)
     int selection = 0;
     bool old_val;
 
-    MENUITEM_STRINGLIST(settings_menu, "PictureFlow Settings", NULL, "Show FPS",
-                        "Spacing", "Centre margin", "Number of slides", "Zoom",
-                        "Show album title", "Resize Covers", "Rebuild cache", 
-                        "WPS Integration", "Backlight");
+    MENUITEM_STRINGLIST(settings_menu, "PictureFlow Settings", NULL,
+                        ID2P(LANG_DISPLAY_FPS),
+                        ID2P(LANG_SPACING),
+                        ID2P(LANG_CENTRE_MARGIN),
+                        ID2P(LANG_NUMBER_OF_SLIDES),
+                        ID2P(LANG_ZOOM),
+                        ID2P(LANG_SHOW_ALBUM_TITLE),
+                        ID2P(LANG_RESIZE_COVERS),
+                        ID2P(LANG_REBUILD_CACHE),
+                        ID2P(LANG_WPS_INTEGRATION),
+                        ID2P(LANG_BACKLIGHT));
 
     static const struct opt_items album_name_options[] = {
-        { "Hide album title", -1 },
-        { "Show at the bottom", -1 },
-        { "Show at the top", -1 }
+        { STR(LANG_HIDE_ALBUM_TITLE) },
+        { STR(LANG_SHOW_AT_THE_BOTTOM) },
+        { STR(LANG_SHOW_AT_THE_TOP) }
     };
     static const struct opt_items wps_options[] = {
-        { "Off", -1 },
-        { "Direct", -1 },
-        { "Via Track list", -1 }
+        { STR(LANG_OFF) },
+        { STR(LANG_DIRECT) },
+        { STR(LANG_VIA_TRACK_LIST) }
     };
     static const struct opt_items backlight_options[] = {
-        { "Always On", -1 },
-        { "Normal", -1 },
+        { STR(LANG_ALWAYS_ON) },
+        { STR(LANG_NORMAL) },
     };
 
     do {
         selection=rb->do_menu(&settings_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
-                rb->set_bool("Show FPS", &show_fps);
+                rb->set_bool(rb->str(LANG_DISPLAY_FPS), &show_fps);
                 reset_track_list();
                 break;
 
             case 1:
-                rb->set_int("Spacing between slides", "", 1,
+                rb->set_int(rb->str(LANG_SPACING), "", 1,
                             &slide_spacing,
                             NULL, 1, 0, 100, NULL );
                 recalc_offsets();
@@ -2273,7 +2280,7 @@ static int settings_menu(void)
                 break;
 
             case 2:
-                rb->set_int("Centre margin", "", 1,
+                rb->set_int(rb->str(LANG_CENTRE_MARGIN), "", 1,
                             &center_margin,
                             NULL, 1, 0, 80, NULL );
                 recalc_offsets();
@@ -2281,20 +2288,20 @@ static int settings_menu(void)
                 break;
 
             case 3:
-                rb->set_int("Number of slides", "", 1, &num_slides,
+                rb->set_int(rb->str(LANG_NUMBER_OF_SLIDES), "", 1, &num_slides,
                             NULL, 1, 1, MAX_SLIDES_COUNT, NULL );
                 recalc_offsets();
                 reset_slides();
                 break;
 
             case 4:
-                rb->set_int("Zoom", "", 1, &zoom,
+                rb->set_int(rb->str(LANG_ZOOM), "", 1, &zoom,
                             NULL, 1, 10, 300, NULL );
                 recalc_offsets();
                 reset_slides();
                 break;
             case 5:
-                rb->set_option("Show album title", &show_album_name,
+                rb->set_option(rb->str(LANG_SHOW_ALBUM_TITLE), &show_album_name,
                                INT, album_name_options, 3, NULL);
                 reset_track_list();
                 recalc_offsets();
@@ -2302,7 +2309,7 @@ static int settings_menu(void)
                 break;
             case 6:
                 old_val = resize;
-                rb->set_bool("Resize Covers", &resize);
+                rb->set_bool(rb->str(LANG_RESIZE_COVERS), &resize);
                 if (old_val == resize) /* changed? */
                     break;
                 /* fallthrough if changed, since cache needs to be rebuilt */
@@ -2311,13 +2318,13 @@ static int settings_menu(void)
                 rb->remove(EMPTY_SLIDE);
                 configfile_save(CONFIG_FILE, config,
                                 CONFIG_NUM_ITEMS, CONFIG_VERSION);
-                rb->splash(HZ, "Cache will be rebuilt on next restart");
+                rb->splash(HZ, ID2P(LANG_CACHE_REBUILT_NEXT_RESTART));
                 break;
             case 8:
-                rb->set_option("WPS Integration", &auto_wps, INT, wps_options, 3, NULL);
+                rb->set_option(rb->str(LANG_WPS_INTEGRATION), &auto_wps, INT, wps_options, 3, NULL);
                 break;
             case 9:
-                rb->set_option("Backlight", &backlight_mode, INT, backlight_options, 2, NULL);
+                rb->set_option(rb->str(LANG_BACKLIGHT), &backlight_mode, INT, backlight_options, 2, NULL);
                 break;
 
             case MENU_ATTACHED_USB:
@@ -2350,12 +2357,15 @@ static int main_menu(void)
     rb->lcd_set_foreground(N_BRIGHT(255));
 #endif
 
-    MENUITEM_STRINGLIST(main_menu,"PictureFlow Main Menu",NULL,
-                        "Go to WPS",
+    MENUITEM_STRINGLIST(main_menu, "PictureFlow Main Menu", NULL,
+                        ID2P(LANG_GOTO_WPS),
 #if PF_PLAYBACK_CAPABLE
-                        "Clear playlist", "Playback Control",
+                        ID2P(LANG_CLEAR_PLAYLIST),
+                        ID2P(LANG_PLAYBACK_CONTROL),
 #endif
-                                            "Settings", "Return", "Quit");
+                        ID2P(LANG_SETTINGS),
+                        ID2P(LANG_RETURN),
+                        ID2P(LANG_MENU_QUIT));
     while (1)  {
         switch (rb->do_menu(&main_menu,&selection, NULL, false)) {
             case PF_GOTO_WPS: /* WPS */
@@ -2364,7 +2374,7 @@ static int main_menu(void)
             case PF_MENU_CLEAR_PLAYLIST: 
                 if(rb->playlist_remove_all_tracks(NULL) == 0) {
                     rb->playlist_create(NULL, NULL);
-                    rb->splash(HZ*2, "Playlist Cleared");
+                    rb->splash(HZ*2, ID2P(LANG_PLAYLIST_CLEARED));
                 }
                 break;
             case PF_MENU_PLAYBACK_CONTROL: /* Playback Control */
@@ -2900,13 +2910,13 @@ static int pictureflow_main(void)
                     create_track_index(center_slide.slide_index);
                     reset_track_list();
                     start_playback(true);
-                    rb->splash(HZ*2, "Added to playlist");
+                    rb->splash(HZ*2, ID2P(LANG_ADDED_TO_PLAYLIST));
                 }
                 else if( pf_state == pf_show_tracks ) {
                     rb->playlist_insert_track(NULL, get_track_filename(selected_track),
                                                     PLAYLIST_INSERT_LAST, false, true);
                     rb->playlist_sync(NULL);
-                    rb->splash(HZ*2, "Added to playlist");
+                    rb->splash(HZ*2, ID2P(LANG_ADDED_TO_PLAYLIST));
                 }
             }
             break;
@@ -2989,7 +2999,7 @@ enum plugin_status plugin_start(const void *parameter)
         if (configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
                             CONFIG_VERSION))
         {
-            rb->splash(HZ, "Error writing config.");
+            rb->splash(HZ, ID2P(LANG_ERROR_WRITING_CONFIG));
             ret = PLUGIN_ERROR;
         }
     }
