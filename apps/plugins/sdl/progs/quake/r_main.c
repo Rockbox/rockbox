@@ -1018,12 +1018,15 @@ void R_RenderView_ (void)
 
 	R_SetupFrame ();
 
+        rb->yield(); // let sound run
 #ifdef PASSAGES
 SetVisibilityByPassages ();
 #else
 	R_MarkLeaves ();	// done here so we know if we're in water
 #endif
 
+        rb->yield(); // let sound run
+        
 // make FDIV fast. This reduces timing precision after we've been running for a
 // while, so we don't do it globally.  This also sets chop mode, and we do it
 // here so that setup stuff like the refresh area calculations match what's
@@ -1057,6 +1060,7 @@ SetVisibilityByPassages ();
 		de_time1 = se_time2;
 	}
 
+        rb->yield(); // let sound run
 	R_DrawEntitiesOnList ();
 
 	if (r_dspeeds.value)
@@ -1065,6 +1069,7 @@ SetVisibilityByPassages ();
 		dv_time1 = de_time2;
 	}
 
+        rb->yield(); // let sound run
 	R_DrawViewModel ();
 
 	if (r_dspeeds.value)
@@ -1072,6 +1077,7 @@ SetVisibilityByPassages ();
 		dv_time2 = Sys_FloatTime ();
 		dp_time1 = Sys_FloatTime ();
 	}
+        rb->yield(); // let sound run
 
 	R_DrawParticles ();
 
