@@ -1018,6 +1018,7 @@ int view_runtime(void)
 {
     static const char *lines[]={ID2P(LANG_CLEAR_TIME)};
     static const struct text_message message={lines, 1};
+    bool say_runtime = true;
 
     struct gui_synclist lists;
     int action;
@@ -1031,12 +1032,17 @@ int view_runtime(void)
         gui_synclist_set_voice_callback(&lists, runtime_speak_data);
     gui_synclist_set_icon_callback(&lists, NULL);
     gui_synclist_set_nb_items(&lists, 4);
-    gui_synclist_speak_item(&lists);
+
     while(1)
     {
         global_status.runtime += ((current_tick - lasttime) / HZ);
         
         lasttime = current_tick;
+        if (say_runtime)
+        {
+            gui_synclist_speak_item(&lists);
+            say_runtime = false;
+        }
         gui_synclist_draw(&lists);
         list_do_action(CONTEXT_STD, HZ,
                     &lists, &action, LIST_WRAP_UNLESS_HELD);
@@ -1049,7 +1055,7 @@ int view_runtime(void)
                     global_status.runtime = 0;
                 else
                     global_status.topruntime = 0;
-                gui_synclist_speak_item(&lists);
+                say_runtime = true;
             }
         }
         if(default_event_handler(action) == SYS_USB_CONNECTED)
