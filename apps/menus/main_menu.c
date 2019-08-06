@@ -160,13 +160,13 @@ enum infoscreenorder
 */
 static int refresh_data(struct info_data *info)
 {
-    int i;
+    int i = 0;
 #ifdef HAVE_MULTIDRIVE
     int drive;
     int max = -1;
-#endif
 
     for (i = 0 ; CHECK_VOL(i) ; i++) {
+#endif
 	volume_size(IF_MV(i,) &info->size[i], &info->free[i]);
 #ifdef HAVE_MULTIDRIVE
 	drive = volume_drive(i);
@@ -180,8 +180,11 @@ static int refresh_data(struct info_data *info)
 	    max = drive;
 	else if (drive < max)
 	    break;
-#endif
     }
+#else
+    i++;
+#endif
+
     info->new_data = false;
     return i;
 }
