@@ -696,8 +696,14 @@ void R_DrawParticles (void)
 		break;
 	}
 
+        rb->yield();
+
+        int cnt = 0;
+        
 	for (p=active_particles ; p ; p=p->next)
 	{
+            if(!(++cnt%50))
+                rb->yield();
 		for ( ;; )
 		{
 			kill = p->next;
