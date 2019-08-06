@@ -13305,7 +13305,7 @@ desc: deprecated
   desc: Backlight behaviour setting
   user: core
   <source>
-    *: "Selective Backlight"
+    *: "Backlight Exemptions"
   </source>
   <dest>
     *: "Retroilluminazione adattabile"
