@@ -178,6 +178,8 @@ static void lua_atexit(void)
       lua_pop(Ls, 1); /* put exit string on top of stack */
       plugin_start(NULL);
     }
+    else
+      lua_close(Ls);
   }
   _exit(0); /* don't call exit handler */
 }
