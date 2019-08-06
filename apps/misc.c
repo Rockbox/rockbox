@@ -295,6 +295,8 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 {
     long msg_id = -1;
 
+    status_save();
+
 #if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING)
     if(!charger_inserted())
 #endif

@@ -1008,6 +1008,8 @@ int plugin_load(const char* plugin, const void* parameter)
 
     plugin_check_open_close__exit();
 
+    status_save();
+
     if (rc == PLUGIN_ERROR)
         splash(HZ*2, str(LANG_PLUGIN_ERROR));
 
