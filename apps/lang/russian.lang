@@ -4780,7 +4780,7 @@
     *: "Янв"
   </dest>
   <voice>
-    *: "Янв"
+    *: "Январь"
   </voice>
 </phrase>
 <phrase>
@@ -4791,7 +4791,7 @@
     *: "Feb"
   </source>
   <dest>
-    *: "Фев"
+    *: "Февраль"
   </dest>
   <voice>
     *: "Фев"
@@ -4808,7 +4808,7 @@
     *: "Мар"
   </dest>
   <voice>
-    *: "Мар"
+    *: "Март"
   </voice>
 </phrase>
 <phrase>
@@ -4822,7 +4822,7 @@
     *: "Апр"
   </dest>
   <voice>
-    *: "Апр"
+    *: "Апрель"
   </voice>
 </phrase>
 <phrase>
@@ -4850,7 +4850,7 @@
     *: "Июн"
   </dest>
   <voice>
-    *: "Июн"
+    *: "Июнь"
   </voice>
 </phrase>
 <phrase>
@@ -4861,7 +4861,7 @@
     *: "Jul"
   </source>
   <dest>
-    *: "Июл"
+    *: "Июль"
   </dest>
   <voice>
     *: "Июл"
@@ -4878,7 +4878,7 @@
     *: "Авг"
   </dest>
   <voice>
-    *: "Авг"
+    *: "Август"
   </voice>
 </phrase>
 <phrase>
@@ -4892,7 +4892,7 @@
     *: "Сен"
   </dest>
   <voice>
-    *: "Сен"
+    *: "Сентябрь"
   </voice>
 </phrase>
 <phrase>
@@ -4906,7 +4906,7 @@
     *: "Окт"
   </dest>
   <voice>
-    *: "Окт"
+    *: "Октябрь"
   </voice>
 </phrase>
 <phrase>
@@ -4920,7 +4920,7 @@
     *: "Ноя"
   </dest>
   <voice>
-    *: "Ноя"
+    *: "Ноябрь"
   </voice>
 </phrase>
 <phrase>
@@ -4934,7 +4934,7 @@
     *: "Дек"
   </dest>
   <voice>
-    *: "Дек"
+    *: "Декабрь"
   </voice>
 </phrase>
 <phrase>
@@ -7619,7 +7619,7 @@
 </phrase>
 <phrase>
   id: LANG_DELETING
-  desc: 
+  desc:
   user: core
   <source>
     *: "Deleting..."
@@ -8103,7 +8103,7 @@
 </phrase>
 <phrase>
   id: LANG_REC_DIR_NOT_WRITABLE
-  desc: 
+  desc:
   user: core
   <source>
     *: none
@@ -8236,7 +8236,7 @@
 </phrase>
 <phrase>
   id: LANG_BROWSE_CUESHEET
-  desc: 
+  desc:
   user: core
   <source>
     *: "Browse Cuesheet"
@@ -8442,12 +8442,12 @@
     *: ""
   </dest>
   <voice>
-    *: "Ох"
+    *: "ноль"
   </voice>
 </phrase>
 <phrase>
   id: LANG_ADD_TO_FAVES
-  desc: 
+  desc:
   user: core
   <source>
     *: "Add to Shortcuts"
@@ -8573,7 +8573,7 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_REC_DIR
-  desc: 
+  desc:
   user: core
   <source>
     *: none
@@ -9754,7 +9754,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "ноль ноль"
   </voice>
 </phrase>
 <phrase>
@@ -9872,7 +9872,7 @@
 </phrase>
 <phrase>
   id: LANG_MOVING
-  desc: 
+  desc:
   user: core
   <source>
     *: "Moving..."
@@ -9945,7 +9945,7 @@
 </phrase>
 <phrase>
   id: VOICE_EXT_CUESHEET
-  desc: 
+  desc:
   user: core
   <source>
     *: ""
@@ -10364,7 +10364,7 @@
 </phrase>
 <phrase>
   id: LANG_COPYING
-  desc: 
+  desc:
   user: core
   <source>
     *: "Copying..."
@@ -12545,7 +12545,7 @@
 </phrase>
 <phrase>
   id: LANG_FILESIZE
-  desc: in record timesplit options and in track information viewer 
+  desc: in record timesplit options and in track information viewer
   user: core
   <source>
     *: "Filesize"
