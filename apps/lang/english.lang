@@ -6683,7 +6683,7 @@
   </dest>
   <voice>
     *: "Internal"
-    xduoox3: "micro S D 1:"
+    xduoox3: "micro S D 1"
   </voice>
 </phrase>
 <phrase>
@@ -6708,7 +6708,7 @@
     *: none
     multivolume: "H D 1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro S D"
-    xduoox3: "micro S D 2:"
+    xduoox3: "micro S D 2"
     archosondio*: "M M C"
   </voice>
 </phrase>

@@ -3999,16 +3999,16 @@
   desc: in info menu; name for internal disk with multivolume (keep short!)
   user: core
   <source>
-    *: none
-    multivolume: "Int:"
+    *: "Int:"
+    xduoox3: "mSD1:"
   </source>
   <dest>
-    *: none
-    multivolume: "Внутр:"
+    *: "Внутр:"
+    xduoox3: "mSD1:"
   </dest>
   <voice>
-    *: none
-    multivolume: "Внутр:"
+    *: "Внутр"
+    xduoox3: "микро Эс Ди 1"
   </voice>
 </phrase>
 <phrase>
@@ -4019,18 +4019,21 @@
     *: none
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
+    xduoox3: "mSD2:"
     archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
+    xduoox3: "mSD2:"
     archosondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "Эйч Ди 1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "микро Эс Ди"
+    xduoox3: "микро Эс Ди 2"
     archosondio*: "Эм Эм Си"
   </voice>
 </phrase>
@@ -15441,22 +15444,22 @@
 </phrase>
 <phrase>
   id: LANG_DISPLAY_FPS
-  desc: in the mpegplayer settings menu
+  desc: in the mpegplayer and pictureflow settings menus
   user: core
   <source>
     *: none
     swcodec: "Display FPS"
-    lowmem: none
+    lcd_bitmap: "Display FPS"
   </source>
   <dest>
     *: none
     swcodec: "Кадров в секунду"
-    lowmem: none
+    lcd_bitmap: "Кадров в секунду"
   </dest>
   <voice>
     *: none
     swcodec: "Кадров в секунду"
-    lowmem: none
+    lcd_bitmap: "Кадров в секунду"
   </voice>
 </phrase>
 <phrase>
