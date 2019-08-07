@@ -4794,10 +4794,10 @@
     *: "Feb"
   </source>
   <dest>
-    *: "Февраль"
+    *: "Фев"
   </dest>
   <voice>
-    *: "Фев"
+    *: "Февраль"
   </voice>
 </phrase>
 <phrase>
@@ -4864,10 +4864,10 @@
     *: "Jul"
   </source>
   <dest>
-    *: "Июль"
+    *: "Июл"
   </dest>
   <voice>
-    *: "Июл"
+    *: "Июль"
   </voice>
 </phrase>
 <phrase>
@@ -16492,3 +16492,4 @@ id: VOICE_BAT_BENCH_KEYS
   <voice>
     *: "Не удалось собрать информацию"
   </voice>
+</phrase>
