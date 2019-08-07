@@ -195,7 +195,7 @@ static int browser(void* param)
                     /* Check if ready status is known */
                     if (!stat->readyvalid)
                     {
-                        splash(0, str(LANG_TAGCACHE_BUSY));
+                        splash(0, ID2P(LANG_TAGCACHE_BUSY));
                         continue;
                     }
 
@@ -741,6 +741,20 @@ static int load_plugin_screen(char *plug_path)
         last_screen = (old_previous == next_screen) ? GO_TO_ROOT : old_previous;
     return ret_val;
 }
+
+static bool check_database(void)
+{
+    bool needwarn = true;
+    while ( !tagcache_is_usable() )
+    {
+        if (needwarn)
+            splash(0, ID2P(LANG_TAGCACHE_BUSY));
+        if ( action_userabort(HZ/5) )
+            return false;
+        needwarn = false;
+    }
+    return true;
+}
 #endif
 
 void root_menu(void)
@@ -821,20 +835,17 @@ void root_menu(void)
                 break;
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
             case GO_TO_PICTUREFLOW:
-                while ( !tagcache_is_usable() )
-                {
-                    splash(0, str(LANG_TAGCACHE_BUSY));
-                    if ( action_userabort(HZ/5) )
-                        break;
-                }
+                if (check_database())
                 {
                     char pf_path[MAX_PATH];
                     snprintf(pf_path, sizeof(pf_path),
                             "%s/pictureflow.rock",
                             PLUGIN_DEMOS_DIR);
                     next_screen = load_plugin_screen(pf_path);
+		    previous_browser = (next_screen != GO_TO_WPS) ? GO_TO_FILEBROWSER : GO_TO_PICTUREFLOW;
                 }
-                previous_browser = GO_TO_PICTUREFLOW;
+                else
+		    next_screen = GO_TO_PREVIOUS;
                 break;
 #endif
             default:
