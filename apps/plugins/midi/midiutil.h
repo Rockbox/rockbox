@@ -27,27 +27,45 @@
 #define NBUF   2
 #define MAX_SAMPLES 512
 
-#ifndef SIMULATOR
+#ifdef SIMULATOR
 
-#define SAMPLE_RATE SAMPR_44        /* 44100 */
+/* Simulator requires 44100Hz, and we can afford to use more voices */
+#define RB_SAMPR SAMPR_44
+#define MAX_VOICES 48
+
+#elif (CONFIG_PLATFORM & PLATFORM_HOSTED)
+
+/* All hosted targets have CPU to spare */
+#define MAX_VOICES 48
+#define RB_SAMPR SAMPR_44
+
+#elif defined(CPU_PP)
 
 /* Some of the pp based targets can't handle too many voices
    mainly because they have to use 44100Hz sample rate, this could be
    improved to increase MAX_VOICES for targets that can do 22kHz */
-#ifdef CPU_PP
-#define MAX_VOICES 16
-#elif (CONFIG_PLATFORM & PLATFORM_HOSTED)
-#define MAX_VOICES 48
+#if HW_SAMPR_CAPS & SAMPR_CAP_22
+#define RB_SAMPR SAMPR_22
+#define MAX_VOICES 24 /* General MIDI minimum */
 #else
-#define MAX_VOICES 24 /* Note: 24 midi channels is the minimum general midi spec implementation */
-#endif /* CPU_PP */
-
-#else   /* Simulator requires 44100Hz, and we can afford to use more voices */
-
-#define SAMPLE_RATE SAMPR_44
-#define MAX_VOICES 48
-
+#define RB_SAMPR HW_SAMPR_MIN_QUAL
+#define MAX_VOIDES 16
 #endif
+
+#else /* !CPU_PP */
+
+//  XXX need heuristic.
+//  COLDFIRE & ARM7TDMI is "slow", limit to 22KHz/24ch
+//  ARMv5/v6 is "faster", 22KHz, 32ch?
+//  All MIPS targets, are FAST, 44KHz, 32/48ch?
+#define RB_SAMPR HW_SAMPR_MIN_QUAL
+#if HW_SAMPR_CAPS & SAMPR_CAP_22
+#define MAX_VOICES 24 /* General MIDI minimum */
+#endif
+
+#endif /* Wrap it up. */
+
+#define SAMPLE_RATE RB_SAMPR
 
 #define BYTE unsigned char
 

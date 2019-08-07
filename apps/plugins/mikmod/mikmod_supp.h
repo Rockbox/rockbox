@@ -63,8 +63,26 @@ int mmsupp_sprintf(char *buf, const char *fmt, ... );
 
 extern const struct plugin_api * rb;
 
+#ifdef SIMULATOR
 
-#define SAMPLE_RATE SAMPR_44        /* 44100 */
+#define RB_SAMPR SAMPR_44  /* Required by Simulator */
+
+#elif (CONFIG_PLATFORM & PLATFORM_HOSTED)
+
+#define RB_SAMPR SAMPR_44 /* All hosted targets are fast */
+
+#else
+
+// XXX need hauristic, bump to 44KHz for non-slow targets.
+//  COLDFIRE & ARM7TDMI is "slow", limit to 22KHz
+// ARMv5/v6 should all be fast enough
+// All mips targets are fast.
+
+#define RB_SAMPR HW_SAMPR_MIN_QUAL  /* Minumum, no less than 22KHz */
+
+#endif /* !SIMULATOR */
+
+#define SAMPLE_RATE RB_SAMPR
 
 #define BUF_SIZE 4096*8
 #define NBUF   2
