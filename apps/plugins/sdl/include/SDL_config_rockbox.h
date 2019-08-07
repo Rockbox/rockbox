@@ -50,7 +50,7 @@
 #if HW_SAMPR_CAPS & SAMPR_CAP_22
 #define RB_SAMPR SAMPR_22
 #else
-#define RB_SAMPR HW_SAMPR_MIN
+#define RB_SAMPR HW_SAMPR_MIN_QUAL
 #endif
 #endif
 
