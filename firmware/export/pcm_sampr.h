@@ -80,6 +80,11 @@
                          SAMPR_CAP_24 | SAMPR_CAP_22 | SAMPR_CAP_16 | \
                          SAMPR_CAP_12 | SAMPR_CAP_11 | SAMPR_CAP_8)
 
+/* List of sampling rates that are good enough for most purposes. */
+#define SAMPR_CAP_ALL_GE_22   (SAMPR_CAP_96 | SAMPR_CAP_88 | SAMPR_CAP_64 | \
+                               SAMPR_CAP_48 | SAMPR_CAP_44 | SAMPR_CAP_32 | \
+                               SAMPR_CAP_24 | SAMPR_CAP_22)
+
 #ifndef PCM_SAMPR_CONFIG_ONLY
 /* Master list of all "standard" rates supported. */
 extern const unsigned long audio_master_sampr_list[SAMPR_NUM_FREQ];
@@ -229,6 +234,17 @@ extern const unsigned long hw_freq_sampr[HW_NUM_FREQ];
 # define HW_SAMPR_MIN   SAMPR_32
 #else
 # define HW_SAMPR_MIN   SAMPR_44
+#endif
+
+#define HW_SAMPR_CAPS_QUAL (HW_SAMPR_CAPS & SAMPR_CAP_ALL_GE_22)
+#if HW_SAMPR_CAPS_QUAL & SAMPR_CAP_22
+# define HW_SAMPR_MIN_GE_22  SAMPR_22
+#elif HW_SAMPR_CAPS_QUAL & SAMPR_CAP_24
+# define HW_SAMPR_MIN_GE_22  SAMPR_24
+#elif HW_SAMPR_CAPS_QUAL & SAMPR_CAP_32
+# define HW_SAMPR_MIN_GE_22  SAMPR_32
+#else
+# define HW_SAMPR_MIN_GE_22  SAMPR_44
 #endif
 
 #ifdef HAVE_RECORDING
