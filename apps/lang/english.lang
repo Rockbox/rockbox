@@ -16390,3 +16390,31 @@ id: VOICE_BAT_BENCH_KEYS
     lcd_bitmap: "Error writing config"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_NOT_A_VBR_FILE
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "Not a VBR file"
+  </source>
+  <dest>
+    *: "Not a VBR file"
+  </dest>
+  <voice>
+    *: "Not a VBR file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_ERROR
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "File error: %d"
+  </source>
+  <dest>
+    *: "File error: %d"
+  </dest>
+  <voice>
+    *: "File error"
+  </voice>
+</phrase>

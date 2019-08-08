@@ -39,6 +39,9 @@
 #include "mp3data.h"
 #include "platform.h"
 
+#include "metadata.h"
+#include "metadata/metadata_parsers.h"
+
 //#define DEBUG_VERBOSE
 
 #ifdef DEBUG_VERBOSE
@@ -340,7 +343,7 @@ static int buf_getbyte(int fd, unsigned char *c)
 static int buf_seek(int fd, int len)
 {
     fnf_read_index += len;
-    if(fnf_read_index > fnf_buf_len)
+    if(fnf_read_index >= fnf_buf_len)
     {
         len = fnf_read_index - fnf_buf_len;
         
@@ -348,23 +351,22 @@ static int buf_seek(int fd, int len)
         if(fnf_buf_len < 0)
             return -1;
 
-        fnf_read_index = 0;
-        fnf_read_index += len;
+        fnf_read_index = len;
     }
     
-    if(fnf_read_index > fnf_buf_len)
+    if(fnf_read_index >= fnf_buf_len)
     {
         return -1;
     }
-    else
-        return 0;
+
+    return 0;
 }
 
 static void buf_init(unsigned char* buf, size_t buflen)
 {
     fnf_buf = buf;
     fnf_buf_len = buflen;
-    fnf_read_index = 0;
+    fnf_read_index = buflen;
 }
 
 static unsigned long buf_find_next_frame(int fd, long *offset, long max_offset)
@@ -601,14 +603,18 @@ int get_mp3file_info(int fd, struct mp3info *info)
     }
     else
     {
+        long offset;
+
         VDEBUGF("-- No VBR header --\n");
         
         /* There was no VBR header found. So, we seek back to beginning and
          * search for the first MPEG frame header of the mp3 stream. */
-        lseek(fd, -info->frame_size, SEEK_CUR);
+        offset = lseek(fd, -info->frame_size, SEEK_CUR);
         result = get_next_header_info(fd, &bytecount, info, false);
         if(result)
             return result;
+
+        info->byte_count = filesize(fd) - getid3v1len(fd) - offset - bytecount;
     }
 
     return bytecount;
@@ -647,7 +653,7 @@ int count_mp3_frames(int fd,  int startpos,  int filesize,
     num_frames = 0;
     cnt = 0;
     
-    while((header = buf_find_next_frame(fd, &bytes, header_template))) {
+    while((header = buf_find_next_frame(fd, &bytes, startpos + filesize))) {
         mp3headerinfo(&info, header);
 
         if(!header_template)
@@ -723,7 +729,7 @@ int create_xing_header(int fd, long startpos, long filesize,
             /* Advance from the last seek point to this one */
             for(j = 0;j < pos - last_pos;j++)
             {
-                header = buf_find_next_frame(fd, &bytes, header_template);
+                header = buf_find_next_frame(fd, &bytes, startpos + filesize);
                 filepos += bytes;
                 mp3headerinfo(&info, header);
                 buf_seek(fd, info.frame_size-4);
