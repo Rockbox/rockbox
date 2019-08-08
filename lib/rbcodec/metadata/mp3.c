@@ -71,7 +71,9 @@ static int getsonglength(int fd, struct mp3entry *entry)
     if(bytecount < 0)
         return -1;
 
-    bytecount += entry->id3v2len;
+    /* Subtract the meta information from the file size to get
+       the true size of the MP3 stream */
+    entry->filesize -= entry->id3v1len + entry->id3v2len;
 
     /* Validate byte count, in case the file has been edited without
      * updating the header.
@@ -98,6 +100,9 @@ static int getsonglength(int fd, struct mp3entry *entry)
              */
         }
     }
+
+    entry->filesize -= bytecount;
+    bytecount += entry->id3v2len;
 
     entry->bitrate   = info.bitrate;
     entry->frequency = info.frequency;
@@ -127,7 +132,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
         if (info.bitrate < 8)
             filetime = 0;
         else
-            filetime = (entry->filesize - bytecount) / (info.bitrate / 8);
+            filetime = entry->filesize / (info.bitrate >> 3);
         /* bitrate is in kbps so this delivers milliseconds. Doing bitrate / 8
          * instead of filesize * 8 is exact, because mpeg audio bitrates are
          * always multiples of 8, and it avoids overflows. */
@@ -163,6 +168,7 @@ bool get_mp3_metadata(int fd, struct mp3entry *entry)
 {
     entry->title = NULL;
     entry->filesize = filesize(fd);
+    entry->id3v1len = getid3v1len(fd);
     entry->id3v2len = getid3v2len(fd);
     entry->tracknum = 0;
     entry->discnum = 0;
@@ -173,10 +179,6 @@ bool get_mp3_metadata(int fd, struct mp3entry *entry)
     if (len < 0)
         return false;
     entry->length = len;
-
-    /* Subtract the meta information from the file size to get
-       the true size of the MP3 stream */
-    entry->filesize -= entry->first_frame_offset;
 
     /* only seek to end of file if no id3v2 tags were found */
     if (!entry->id3v2len) {

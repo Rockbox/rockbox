@@ -1135,6 +1135,29 @@ void setid3v2title(int fd, struct mp3entry *entry)
 }
 
 /*
+ * Calculates the size of the ID3v1 tag if any.
+ *
+ * Arguments: file - the file to search for a tag.
+ *
+ * Returns: the size of the tag or 0 if none was found
+ */
+int getid3v1len(int fd)
+{
+    char buf[4];
+
+    if (-1 == lseek(fd, -128, SEEK_END))
+        return 0;
+
+    if (read(fd, buf, 3) != 3)
+        return 0;
+
+    if (strncmp(buf, "TAG", 3))
+        return 0;
+
+    return 128;
+}
+
+/*
  * Calculates the size of the ID3v2 tag.
  *
  * Arguments: file - the file to search for a tag.
