@@ -77,7 +77,7 @@ extern const struct plugin_api * rb;
 #if (ARM_ARCH >= 5)
 #define SAMPLE_RATE SAMPR_44
 #else
-#define SAMPLE_RATE SAMPR_MIN_GE_22
+#define SAMPLE_RATE HW_SAMPR_MIN_GE_22
 #endif
 
 #else /* !CPU_ARM */
