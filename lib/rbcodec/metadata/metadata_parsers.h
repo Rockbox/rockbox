@@ -22,6 +22,7 @@
 #if CONFIG_CODEC == SWCODEC
 char* id3_get_num_genre(unsigned int genre_num);
 #endif
+int getid3v1len(int fd);
 int getid3v2len(int fd);
 bool setid3v1title(int fd, struct mp3entry *entry);
 void setid3v2title(int fd, struct mp3entry *entry);
