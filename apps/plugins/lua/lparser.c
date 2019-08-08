@@ -370,6 +370,7 @@ static void close_func (LexState *ls) {
   f->packedlineinfo[fs->lastlineOffset+1]=0;
   luaM_reallocvector(L, f->packedlineinfo, f->sizelineinfo,
                      fs->lastlineOffset+2, unsigned char);
+  f->sizelineinfo = fs->lastlineOffset + 2;
 #else
   luaM_reallocvector(L, f->lineinfo, f->sizelineinfo, fs->pc, int);
   f->sizelineinfo = fs->pc;

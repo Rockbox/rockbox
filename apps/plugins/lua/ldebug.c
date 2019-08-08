@@ -253,6 +253,7 @@ static int stripdebug (lua_State *L, Proto *f, const int level) {
     case 3:
       len += f->sizelineinfo;
       f->packedlineinfo = luaM_freearray(L, f->packedlineinfo, f->sizelineinfo, unsigned char);
+      f->f->sizelineinfo = 0;
     case 2:
       len += f->sizelocvars * (sizeof(struct LocVar) + sizeof(dummy->tsv) + sizeof(struct LocVar *));
       f->locvars = luaM_freearray(L, f->locvars, f->sizelocvars, struct LocVar);
