@@ -196,6 +196,8 @@ enum plugin_status plugin_start(const void *param)
     size_t sz;
     audiobuf = rb->plugin_get_audio_buffer(&sz);
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+    /* We are loaded as an overlay towards the end of the audio
+     * buffer. We must take care not to overwrite ourselves. */
     if ((uintptr_t)audiobuf < (uintptr_t)plugin_start_addr)
     {
         uint32_t tmp_size = (uintptr_t)plugin_start_addr - (uintptr_t)audiobuf;
