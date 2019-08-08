@@ -26,11 +26,21 @@ static char   *audiobuf;
 static size_t audiobuflen;
 unsigned char xingbuf[1500];
 char tmpname[MAX_PATH];
+static long last_talk = 0;
 
 static void xingupdate(int percent)
 {
     rb->lcd_putsf(0, 1, "%d%%", percent);
     rb->lcd_update();
+    if (rb->global_settings->talk_menu)
+    {
+        long now = *(rb->current_tick) / HZ;
+        if (now - last_talk >= 5)
+        {
+            rb->talk_value(percent, UNIT_PERCENT, false);
+            last_talk = now;
+        }
+    }
 }
 
 static int insert_data_in_file(const char *fname, int fpos, char *buf, int num_bytes)
@@ -114,7 +124,7 @@ static int insert_data_in_file(const char *fname, int fpos, char *buf, int num_b
 
 static void fileerror(int rc)
 {
-    rb->splashf(HZ*2, "File error: %d", rc);
+    rb->splashf(HZ*2, ID2P(LANG_FILE_ERROR), rc);
 }
 
 static const unsigned char empty_id3_header[] =
@@ -128,7 +138,6 @@ static bool vbr_fix(const char *selected_file)
     struct mp3entry entry;
     int fd;
     int rc;
-    int flen;
     int num_frames;
     int numbytes;
     int framelen;
@@ -152,18 +161,16 @@ static bool vbr_fix(const char *selected_file)
         return true;
     }
 
-    flen = rb->lseek(fd, 0, SEEK_END);
-
     xingupdate(0);
 
     num_frames = rb->count_mp3_frames(fd, entry.first_frame_offset,
-                                      flen, xingupdate, audiobuf, audiobuflen);
+                                      entry.filesize, xingupdate, audiobuf, audiobuflen);
 
     if(num_frames) {
         /* Note: We don't need to pass a template header because it will be
            taken from the mpeg stream */
         framelen = rb->create_xing_header(fd, entry.first_frame_offset,
-                                          flen, xingbuf, num_frames, 0,
+                                          entry.filesize, xingbuf, num_frames, 0,
                                           0, xingupdate, true,
                                           audiobuf, audiobuflen);
         
@@ -253,7 +260,7 @@ static bool vbr_fix(const char *selected_file)
     {
         /* Not a VBR file */
         DEBUGF("Not a VBR file\n");
-        rb->splash(HZ*2, "Not a VBR file");
+        rb->splash(HZ*2, ID2P(LANG_NOT_A_VBR_FILE));
     }
 
     return false;
@@ -261,6 +268,7 @@ static bool vbr_fix(const char *selected_file)
 
 enum plugin_status plugin_start(const void *parameter)
 {
+    last_talk = *(rb->current_tick) / HZ;
 
     if (!parameter)
         return PLUGIN_ERROR;
