@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "896b3dfd_7658f02f",
+        "filename": "apps/plugins/windows_lnk.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000539
+      },
+      "writtenOn": "2019-08-10T00:00:38Z",
+      "side": 1,
+      "message": "Is this needed? plugin.h already includes rbunicode.h",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 22
+      },
+      "revId": "f9e77038a41ecba68e5920dfbf9c35c5eb773dc2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
