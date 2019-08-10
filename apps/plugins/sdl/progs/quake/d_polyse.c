@@ -122,6 +122,7 @@ void D_PolysetScanLeftEdge (int height);
 D_PolysetDraw
 ================
 */
+#ifndef USE_PQ_OPT
 void D_PolysetDraw (void)
 {
 	spanpackage_t	spans[DPS_MAXSPANS + 1 +
@@ -140,7 +141,21 @@ void D_PolysetDraw (void)
 		D_DrawNonSubdiv ();
 	}
 }
+#else
+//JB: Optimization
+//Dan East: May result in image quality loss. Actual performance gain not verified.
+void D_PolysetDraw (void)
+{
+	spanpackage_t	spans[DPS_MAXSPANS + 1 +
+			((CACHE_SIZE - 1) / sizeof(spanpackage_t)) + 1];
+						// one extra because of cache line pretouching
 
+	a_spans = (spanpackage_t *)
+			(((long)&spans[0] + CACHE_SIZE - 1) & ~(CACHE_SIZE - 1));
+
+	D_DrawNonSubdiv ();
+}
+#endif
 
 /*
 ================
@@ -528,6 +543,7 @@ void D_PolysetSetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv,
 D_PolysetCalcGradients
 ================
 */
+#ifndef USE_PQ_OPT4
 void D_PolysetCalcGradients (int skinwidth)
 {
 	float	xstepdenominv, ystepdenominv, t0, t1;
@@ -583,7 +599,88 @@ void D_PolysetCalcGradients (int skinwidth)
 
 	a_ststepxwhole = skinwidth * (r_tstepx >> 16) + (r_sstepx >> 16);
 }
+#else
+void D_PolysetCalcGradients (int skinwidth)
+{
+	//Dan East: Fixed point conversion
+	int p01_minus_p21, p11_minus_p21, p00_minus_p20, p10_minus_p20, t0, t1;
+	int tmp, ydenom;
 
+	//float xstepdenominv = (float)(1.0 / (float)d_xdenom);
+	//float ystepdenominv = -xstepdenominv; 
+	//int checkx, checky;
+
+	p00_minus_p20 = (r_p0[0] - r_p2[0]);
+	p01_minus_p21 = (r_p0[1] - r_p2[1]);
+	p10_minus_p20 = (r_p1[0] - r_p2[0]);
+	p11_minus_p21 = (r_p1[1] - r_p2[1]);
+
+	 //xstepdenominv = d_xdenom;
+	ydenom=-d_xdenom;
+    //ystepdenominv = -xstepdenominv; 
+
+    t0 = (r_p0[4] - r_p2[4]); 
+    t1 = (r_p1[4] - r_p2[4]); 
+	//TODO: Ceil has been removed
+	tmp=t1 * p01_minus_p21 - t0 * p11_minus_p21;
+    r_lstepx = tmp / d_xdenom;
+	if (tmp%d_xdenom) r_lstepx++;
+
+	tmp=t1 * p00_minus_p20 - t0 * p10_minus_p20;
+    r_lstepy = tmp / ydenom;
+	if (tmp%ydenom) r_lstepy++;
+	/*
+	checkx = (int)ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	checky = (int)ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+	if (checkx-r_lstepx>1||checkx-r_lstepx<-1) 
+		r_lstepx=r_lstepx;
+	if (checky-r_lstepy>1||checky-r_lstepy<-1) 
+		r_lstepy=r_lstepy;
+	*/
+	t0 = (r_p0[2] - r_p2[2]); 
+	t1 = (r_p1[2] - r_p2[2]); 
+	r_sstepx = (t1 * p01_minus_p21 - t0 * p11_minus_p21) / d_xdenom; 
+	r_sstepy = (t1 * p00_minus_p20 - t0* p10_minus_p20) / ydenom; 
+	/*
+	checkx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	checky = (int)((t1 * p00_minus_p20 - t0* p10_minus_p20) * ystepdenominv);
+	if (checkx-r_sstepx>1||checkx-r_sstepx<-1) 
+		r_lstepx=r_lstepx;
+	if (checky-r_sstepy>1||checky-r_sstepy<-1) 
+		r_lstepy=r_lstepy;
+	*/
+
+	t0 = (r_p0[3] - r_p2[3]); 
+	t1 = (r_p1[3] - r_p2[3]); 
+	r_tstepx = (t1 * p01_minus_p21 - t0 * p11_minus_p21) / d_xdenom; 
+	r_tstepy = (t1 * p00_minus_p20 - t0 * p10_minus_p20) / ydenom; 
+	/*
+	checkx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	checky = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+	if (checkx-r_tstepx>1||checkx-r_tstepx<-1) 
+		r_lstepx=r_lstepx;
+	if (checky-r_tstepy>1||checky-r_tstepy<-1) 
+		r_lstepy=r_lstepy;
+	*/
+
+	t0 = (r_p0[5] - r_p2[5]); 
+	t1 = (r_p1[5] - r_p2[5]); 
+	r_zistepx = (t1 * p01_minus_p21 - t0 * p11_minus_p21) / d_xdenom; 
+	r_zistepy = (t1 * p00_minus_p20 - t0 * p10_minus_p20) / ydenom; 
+	/*
+	checkx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	checky = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+	if (checkx-r_zistepx>1||checkx-r_zistepx<-1) 
+		r_lstepx=checkx;
+	if (checky-r_zistepy>1||checky-r_zistepy<-1) 
+		r_lstepy=checky;
+	*/
+
+	a_sstepxfrac = r_sstepx & 0xFFFF; 
+	a_tstepxfrac = r_tstepx & 0xFFFF; 
+	a_ststepxwhole = skinwidth * (r_tstepx >> 16) + (r_sstepx >> 16); 
+}
+#endif
 #endif	// !id386
 
 

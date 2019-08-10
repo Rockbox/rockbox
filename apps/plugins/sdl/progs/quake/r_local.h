@@ -96,6 +96,11 @@ typedef struct clipplane_s
 
 extern	clipplane_t	view_clipplanes[4];
 
+#ifdef USE_PQ_OPT2
+extern	clipplane_fxp_t	view_clipplanes_fxp[4];
+#endif
+
+
 //=============================================================================
 
 void R_RenderWorld (void);
@@ -277,6 +282,10 @@ extern int		r_outofsurfaces;
 extern int		r_outofedges;
 
 extern mvertex_t	*r_pcurrentvertbase;
+extern mvertex_FPM_t	*r_pcurrentvertbaseFPM;
+#ifdef USE_PQ_OPT2
+extern mvertex_fxp_t	*r_pcurrentvertbase_fxp;
+#endif
 extern int			r_maxvalidedgeoffset;
 
 void R_AliasClipTriangle (mtriangle_t *ptri);
