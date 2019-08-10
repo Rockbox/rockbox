@@ -60,7 +60,7 @@ int			num_sfx;
 sfx_t		*ambient_sfx[NUM_AMBIENTS];
 
 // lowest rockbox supported
-int 		desired_speed = SAMPR_16;
+int 		desired_speed = RB_SAMPR;
 int 		desired_bits = 16;
 
 int sound_started=0;
